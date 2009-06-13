@@ -23,9 +23,17 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#if !defined(_MSC_VER)
+#include <unistd.h>
+#else
+#include <io.h>
+#define snprintf _snprintf
+#define open _open
+#define close _close
+#define read _read
+#endif
 
 #ifndef O_BINARY
 #define O_BINARY 0

@@ -49,8 +49,8 @@ beastpatcher-ppc: beastpatcher.c bootimg.c usb.h main.c libusb-ppc.a
 	$(CC) -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -framework iokit -framework coreservices -arch ppc $(CFLAGS) -o beastpatcher-ppc beastpatcher.c bootimg.c -I. libusb-ppc.a
 	strip beastpatcher-ppc
 
-bin2c: ../../../rbutil/sansapatcher/bin2c.c
-	$(NATIVECC) $(CFLAGS) -o bin2c ../../../rbutil/sansapatcher/bin2c.c
+bin2c: ../../../rbutil/tools/bin2c.c
+	$(NATIVECC) $(CFLAGS) -o bin2c ../../../rbutil/tools/bin2c.c
 
 bootimg.c: bootloader.bin bin2c
 	./bin2c bootloader.bin bootimg

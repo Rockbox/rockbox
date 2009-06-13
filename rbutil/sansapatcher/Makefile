@@ -42,14 +42,11 @@ sansapatcher-ppc: main.c sansapatcher.c sansaio-posix.c parttypes.h bootimg_c200
 	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch ppc $(CFLAGS) -o sansapatcher-ppc main.c sansapatcher.c sansaio-posix.c bootimg_c200.c bootimg_e200.c
 	strip sansapatcher-ppc
 
-bin2c: bin2c.c
-	$(NATIVECC) $(CFLAGS) -o bin2c bin2c.c
+bootimg_c200.c: firmware.mi4 ../tools/bin2c
+	../tools/bin2c firmware.mi4 bootimg_c200
 
-bootimg_c200.c: firmware.mi4 bin2c
-	./bin2c firmware.mi4 bootimg_c200
-
-bootimg_e200.c: PP5022.mi4 bin2c
-	./bin2c PP5022.mi4 bootimg_e200
+bootimg_e200.c: PP5022.mi4 ../tools/bin2c
+	../tools/bin2c PP5022.mi4 bootimg_e200
 
 clean:
-	rm -f sansapatcher.exe sansapatcher-mac sansapatcher-i386 sansapatcher-ppc sansapatcher bin2c bootimg_c200.c bootimg_c200.h bootimg_e200.c bootimg_e200.h *~
+	rm -f sansapatcher.exe sansapatcher-mac sansapatcher-i386 sansapatcher-ppc sansapatcher bootimg_c200.c bootimg_c200.h bootimg_e200.c bootimg_e200.h *~
