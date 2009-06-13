@@ -38,6 +38,14 @@ OUTPUT_FORMAT(elf32-littlemips)
 #if CONFIG_CPU==DM320 || CONFIG_CPU==IMX31L
 /* Give this 1 meg to allow it to align to the MMU boundary */
 #if CONFIG_CPU==DM320
+#ifndef LCD_NATIVE_WIDTH
+#define LCD_NATIVE_WIDTH LCD_WIDTH
+#endif
+
+#ifndef LCD_NATIVE_HEIGHT
+#define LCD_NATIVE_HEIGHT LCD_HEIGHT
+#endif
+
 #define LCD_FUDGE       LCD_NATIVE_WIDTH%32
 #define LCD_BUFFER_SIZE  ((LCD_NATIVE_WIDTH+LCD_FUDGE)*LCD_NATIVE_HEIGHT*2)
 #define LCD_TTB_AREA    0x100000*((LCD_BUFFER_SIZE>>19)+1)
