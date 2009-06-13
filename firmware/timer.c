@@ -184,7 +184,7 @@ static bool timer_set(long cycles, bool start)
     TIMER1_LOAD = TIMER1_BGLOAD = cycles;
     /* /!\ bit 4 (reserved) must not be modified
      * periodic mode, interrupt enabled, no prescale, 32 bits counter */
-    TIMER1_CONTROL = (TIMER2_CONTROL & (1<<4)) |
+    TIMER1_CONTROL = (TIMER1_CONTROL & (1<<4)) |
                      TIMER_ENABLE |
                      TIMER_PERIODIC |
                      TIMER_INT_ENABLE |
