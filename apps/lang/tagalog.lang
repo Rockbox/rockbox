@@ -1877,7 +1877,7 @@
     *: "Track Gain if Shuffling"
  </source>
  <dest>
-    *: "Landas ng tubo kong balasahin"
+    *: "Landas ng tubo kung balasahin"
  </dest>
  <voice>
     *: "Track Gain if Shuffling"
@@ -6000,7 +6000,7 @@
  </dest>
  <voice>
     *: none
-    recording: "What to do when Splitting"
+    recording: "Ano gawin kung hatiin"
  </voice>
 </phrase>
 <phrase>
@@ -6119,7 +6119,7 @@
  </dest>
  <voice>
     *: none
-    recording: "Directory"
+    recording: "Listahan"
  </voice>
 </phrase>
 <phrase>
@@ -6153,7 +6153,7 @@
  </dest>
  <voice>
     *: none
-    recording: "Set As Recording Directory"
+    recording: "Ilagay Listahan ng rekording"
  </voice>
 </phrase>
 <phrase>
@@ -6170,7 +6170,7 @@
  </dest>
  <voice>
     *: none
-    recording: "Clear Recording Directory"
+    recording: "Alisin Listahan ng rekording"
  </voice>
 </phrase>
 <phrase>
@@ -12409,5 +12409,39 @@
   </dest>
   <voice>
     *: "Gaya ng numero"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Pahabain ang oras"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Pahabain ang oras"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Tulin"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Tulin"
   </voice>
 </phrase>
