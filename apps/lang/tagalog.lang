@@ -12411,3 +12411,37 @@
     *: "Gaya ng numero"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Pahabain ang oras"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Pahabain ang oras"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Tulin"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Tulin"
+  </voice>
+</phrase>
