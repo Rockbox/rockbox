@@ -1496,8 +1496,6 @@ static const unsigned char zag[] =
     29, 22, 15, 23, 30, 37, 44, 51,
     58, 59, 52, 45, 38, 31, 39, 46,
     53, 60, 61, 54, 47, 55, 62, 63,
-     0,  0,  0,  0,  0,  0,  0,  0, /* extra entries in case k>63 below */
-     0,  0,  0,  0,  0,  0,  0,  0
 };
 
 /* zig[i] is the the zig-zag order position of the i'th element of natural
@@ -1949,34 +1947,29 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                     /* coefficient buffer must be cleared */
                     MEMSET(block+1, 0, p_jpeg->zero_need[!!ci] * sizeof(int));
                     /* Section F.2.2.2: decode the AC coefficients */
-                    for (; k < p_jpeg->k_need[!!ci]; k++)
+                    while(true)
                     {
                         huff_decode_ac(p_jpeg, actbl, s);
                         r = s >> 4;
                         s &= 15;
+                        k += r;
                         if (s)
                         {
-                            k += r;
                             check_bit_buffer(p_jpeg, s);
+                            if (k >= p_jpeg->k_need[!!ci])
+                                goto skip_rest;
                             r = get_bits(p_jpeg, s);
                             r = HUFF_EXTEND(r, s);
-                            int a = zag[k];
-                            if (a <= zag[p_jpeg->k_need[!!ci]] && (a & 7) <=
-                                (zag[p_jpeg->k_need[!!ci]] & 7))
-                            {
-                                r = MULTIPLY16(r, p_jpeg->quanttable[!!ci][k]);
-                                block[zag[k]] = r ;
-                            }
+                            r = MULTIPLY16(r, p_jpeg->quanttable[!!ci][k]);
+                            block[zag[k]] = r ;
                         }
                         else
                         {
                             if (r != 15)
-                            {
-                                k = 64;
-                                break;
-                            }
-                            k += r;
+                                goto block_end;
                         }
+                        if ((++k) & 64)
+                            goto block_end;
                     }  /* for k */
                 }
                 for (; k < 64; k++)
@@ -1989,6 +1982,7 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                     {
                         k += r;
                         check_bit_buffer(p_jpeg, s);
+skip_rest:
                         drop_bits(p_jpeg, s);
                     }
                     else
@@ -1998,6 +1992,7 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                         k += r;
                     }
                 }  /* for k */
+block_end:
 #ifndef HAVE_LCD_COLOR
                 if (!ci)
 #endif
