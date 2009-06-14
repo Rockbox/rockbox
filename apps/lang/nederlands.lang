@@ -12398,3 +12398,37 @@
     *: "Voorkom nummers overslaan"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Afspeelsnelheid"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Afspeelsnelheid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Snelheid"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Snelheid"
+  </voice>
+</phrase>
