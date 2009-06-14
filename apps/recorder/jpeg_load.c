@@ -259,36 +259,31 @@ INLINE unsigned range_limit(int value)
 */
 
 /* horizontal-pass 1-point IDCT */
-static void idct1h(int16_t *ws, unsigned char *out, int rows, int rowstep)
+static void idct1h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 {
-    int row;
-    for (row = 0; row < rows; row++)
+    for (; ws < end; ws += 8)
     {
         *out = range_limit(128 + (int) DESCALE(*ws, 3 + PASS1_BITS));
         out += rowstep;
-        ws += 8;
     }
 }
 
 /* vertical-pass 2-point IDCT */
-static void idct2v(int16_t *ws, int cols)
+static void idct2v(int16_t *ws, int16_t *end)
 {
-    int col;
-    for (col = 0; col < cols; col++)
+    for (; ws < end; ws++)
     {
         int tmp1 = ws[0];
         int tmp2 = ws[8];
         ws[0] = tmp1 + tmp2;
         ws[8] = tmp1 - tmp2;
-        ws++;
     }
 }
 
 /* horizontal-pass 2-point IDCT */
-static void idct2h(int16_t *ws, unsigned char *out, int rows, int rowstep)
+static void idct2h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 {
-    int row;
-    for (row = 0; row < rows; row++)
+    for (; ws < end; ws += 8, out += rowstep)
     {
         int tmp1 = ws[0] + (ONE << (PASS1_BITS + 2))
                    + (128 << (PASS1_BITS + 3));
@@ -297,16 +292,13 @@ static void idct2h(int16_t *ws, unsigned char *out, int rows, int rowstep)
             PASS1_BITS + 3));
         out[JPEG_PIX_SZ*1] = range_limit((int) RIGHT_SHIFT(tmp1 - tmp2,
             PASS1_BITS + 3));
-        out += rowstep;
-        ws += 8;
     }
 }
 
 /* vertical-pass 4-point IDCT */
-static void idct4v(int16_t *ws, int cols)
+static void idct4v(int16_t *ws, int16_t *end)
 {
-    int col;
-    for (col = 0; col < cols; col++, ws++)
+    for (; ws < end; ws++)
     {
 #if defined(CPU_ARM)
         int t0, t1, t2, t3, t4;
@@ -400,10 +392,9 @@ static void idct4v(int16_t *ws, int cols)
 }
 
 /* horizontal-pass 4-point IDCT */
-static void idct4h(int16_t *ws, unsigned char *out, int rows, int rowstep)
+static void idct4h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 {
-    int row;
-    for (row = 0; row < rows; row++, out += rowstep, ws += 8)
+    for (; ws < end; out += rowstep, ws += 8)
     {
 #if defined(CPU_ARM)
         int t0, t1, t2, t3, t4;
@@ -514,13 +505,12 @@ static void idct4h(int16_t *ws, unsigned char *out, int rows, int rowstep)
 }
 
 /* vertical-pass 8-point IDCT */
-static void idct8v(int16_t *ws, int cols)
+static void idct8v(int16_t *ws, int16_t *end)
 {
     long tmp0, tmp1, tmp2, tmp3;
     long tmp10, tmp11, tmp12, tmp13;
     long z1, z2, z3, z4, z5;
-    int col;
-    for (col = 0; col < cols; col++, ws++)
+    for (; ws < end; ws++)
     {
     /* Due to quantization, we will usually find that many of the input
     * coefficients are zero, especially the AC terms.  We can exploit this
@@ -608,13 +598,12 @@ static void idct8v(int16_t *ws, int cols)
 }
 
 /* horizontal-pass 8-point IDCT */
-static void idct8h(int16_t *ws, unsigned char *out, int rows, int rowstep)
+static void idct8h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 {
     long tmp0, tmp1, tmp2, tmp3;
     long tmp10, tmp11, tmp12, tmp13;
     long z1, z2, z3, z4, z5;
-    int row;
-    for (row = 0; row < rows; row++, out += rowstep, ws += 8)
+    for (; ws < end; out += rowstep, ws += 8)
     {
         /* Rows of zeroes can be exploited in the same way as we did with
          * columns. However, the column calculation has created many nonzero AC
@@ -720,13 +709,12 @@ static void idct8h(int16_t *ws, unsigned char *out, int rows, int rowstep)
 
 #ifdef HAVE_LCD_COLOR
 /* vertical-pass 16-point IDCT */
-static void idct16v(int16_t *ws, int cols)
+static void idct16v(int16_t *ws, int16_t *end)
 {
     long tmp0, tmp1, tmp2, tmp3, tmp10, tmp11, tmp12, tmp13;
     long tmp20, tmp21, tmp22, tmp23, tmp24, tmp25, tmp26, tmp27;
     long z1, z2, z3, z4;
-    int col;
-    for (col = 0; col < cols; col++, ws++)
+    for (; ws < end; ws++)
     {
         /* Even part */
 
@@ -827,13 +815,12 @@ static void idct16v(int16_t *ws, int cols)
 }
 
 /* horizontal-pass 16-point IDCT */
-static void idct16h(int16_t *ws, unsigned char *out, int rows, int rowstep)
+static void idct16h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 {
     long tmp0, tmp1, tmp2, tmp3, tmp10, tmp11, tmp12, tmp13;
     long tmp20, tmp21, tmp22, tmp23, tmp24, tmp25, tmp26, tmp27;
     long z1, z2, z3, z4;
-    int row;
-    for (row = 0; row < rows; row++, out += rowstep, ws += 8)
+    for (; ws < end; out += rowstep, ws += 8)
     {
         /* Even part */
 
@@ -954,8 +941,8 @@ static void idct16h(int16_t *ws, unsigned char *out, int rows, int rowstep)
 
 struct idct_entry {
     int scale;
-    void (*v_idct)(int16_t *ws, int cols);
-    void (*h_idct)(int16_t *ws, unsigned char *out, int rows, int rowstep);
+    void (*v_idct)(int16_t *ws, int16_t *end);
+    void (*h_idct)(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
 };
 
 struct idct_entry idct_tbl[] = {
@@ -2002,9 +1989,9 @@ block_end:
                     unsigned char *b_out = out + (ci ? ci : store_offs[blkn]);
                     if (idct_tbl[p_jpeg->v_scale[!!ci]].v_idct)
                         idct_tbl[p_jpeg->v_scale[!!ci]].v_idct(block,
-                            idct_cols);
+                            block + idct_cols);
                     idct_tbl[p_jpeg->h_scale[!!ci]].h_idct(block, b_out,
-                        idct_rows, b_width);
+                        block + idct_rows * 8, b_width);
                 }
             } /* for blkn */
             /* don't starve other threads while an MCU row decodes */
