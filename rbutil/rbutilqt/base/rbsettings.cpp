@@ -46,7 +46,7 @@ const static struct {
     { RbSettings::ThemesUrl,            "themes_url",           "" },
     { RbSettings::BleedingInfo,         "bleeding_info",        "" },
     { RbSettings::CurPlatformName,      ":platform:/name",      "" },
-    { RbSettings::CurManual,            ":platform:/manual",    "rockbox-:platform:" },
+    { RbSettings::CurManual,            ":platform:/manualname","rockbox-:platform:" },
     { RbSettings::CurBootloaderMethod,  ":platform:/bootloadermethod", "none" },
     { RbSettings::CurBootloaderName,    ":platform:/bootloadername", "" },
     { RbSettings::CurBootloaderFile,    ":platform:/bootloaderfile", "" },
@@ -107,7 +107,7 @@ void RbSettings::ensureRbSettingsExists()
         // only use built-in rbutil.ini
         systemSettings = new QSettings(":/ini/rbutil.ini", QSettings::IniFormat, 0);
     }
-    
+
     if(userSettings == NULL)
     {
         // portable installation:
@@ -132,7 +132,7 @@ void RbSettings::ensureRbSettingsExists()
 
 void RbSettings::sync()
 {
-    ensureRbSettingsExists(); 
+    ensureRbSettingsExists();
 
     userSettings->sync();
 #if defined(Q_OS_LINUX)
@@ -160,13 +160,13 @@ void RbSettings::sync()
 
 QString RbSettings::userSettingFilename()
 {
-    ensureRbSettingsExists();       
+    ensureRbSettingsExists();
     return userSettings->fileName();
 }
 
 QVariant RbSettings::value(enum SystemSettings setting)
 {
-    ensureRbSettingsExists();       
+    ensureRbSettingsExists();
 
     // locate setting item
     int i = 0;
@@ -181,14 +181,14 @@ QVariant RbSettings::value(enum SystemSettings setting)
 }
 
 QVariant RbSettings::value(enum UserSettings setting)
-{   
-    QString empty; 
+{
+    QString empty;
     return subValue(empty, setting);
 }
 
 QVariant RbSettings::subValue(QString sub, enum UserSettings setting)
 {
-    ensureRbSettingsExists();       
+    ensureRbSettingsExists();
 
     // locate setting item
     int i = 0;
@@ -202,13 +202,13 @@ QVariant RbSettings::subValue(QString sub, enum UserSettings setting)
 
 void RbSettings::setValue(enum UserSettings setting , QVariant value)
 {
-   QString empty; 
+   QString empty;
    return setSubValue(empty, setting, value);
 }
 
 void RbSettings::setSubValue(QString sub, enum UserSettings setting, QVariant value)
 {
-    ensureRbSettingsExists();   
+    ensureRbSettingsExists();
 
     // locate setting item
     int i = 0;
