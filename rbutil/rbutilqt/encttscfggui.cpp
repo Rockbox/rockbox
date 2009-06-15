@@ -91,6 +91,7 @@ QLayout* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
         case EncTtsSetting::eDOUBLE:
         {
             QDoubleSpinBox *spinBox = new QDoubleSpinBox(this);
+            spinBox->setAccessibleName(setting->name());
             spinBox->setMinimum(setting->min().toDouble());
             spinBox->setMaximum(setting->max().toDouble());
             spinBox->setSingleStep(0.01);
@@ -102,6 +103,7 @@ QLayout* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
         case EncTtsSetting::eINT:
         {
             QSpinBox *spinBox = new QSpinBox(this);
+            spinBox->setAccessibleName(setting->name());
             spinBox->setMinimum(setting->min().toInt());
             spinBox->setMaximum(setting->max().toInt());
             spinBox->setValue(setting->current().toInt());
@@ -112,6 +114,7 @@ QLayout* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
         case EncTtsSetting::eSTRING:
         {
             QLineEdit *lineEdit = new QLineEdit(this);
+            lineEdit->setAccessibleName(setting->name());
             lineEdit->setText(setting->current().toString());
             connect(lineEdit,SIGNAL(textChanged(QString)),this,SLOT(updateSetting()));
             value = lineEdit;
@@ -125,6 +128,7 @@ QLayout* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
         case EncTtsSetting::eSTRINGLIST:
         {
             QComboBox *comboBox = new QComboBox(this);
+            comboBox->setAccessibleName(setting->name());
             comboBox->addItems(setting->list());
             int index = comboBox->findText(setting->current().toString());
             comboBox->setCurrentIndex(index);
@@ -135,6 +139,7 @@ QLayout* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
         case EncTtsSetting::eBOOL:
         {
             QCheckBox *checkbox = new QCheckBox(this);
+            checkbox->setAccessibleName(setting->name());
             checkbox->setCheckState(setting->current().toBool() == true ? Qt::Checked : Qt::Unchecked);
             connect(checkbox,SIGNAL(stateChanged(int)),this,SLOT(updateSetting()));
             value = checkbox;

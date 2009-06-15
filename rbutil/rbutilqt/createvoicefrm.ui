@@ -43,7 +43,11 @@
     </widget>
    </item>
    <item row="1" column="1" colspan="2" >
-    <widget class="QComboBox" name="comboLanguage" />
+    <widget class="QComboBox" name="comboLanguage" >
+     <property name="accessibleName" >
+      <string>Language</string>
+     </property>
+    </widget>
    </item>
    <item row="2" column="1" colspan="2" >
     <widget class="QGroupBox" name="groupBox_2" >
@@ -155,6 +159,9 @@
      </item>
      <item>
       <widget class="QSpinBox" name="wavtrimthreshold" >
+       <property name="accessibleName" >
+        <string>Wavtrim Threshold</string>
+       </property>
        <property name="maximum" >
         <number>5000</number>
        </property>
@@ -168,7 +175,9 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>comboLanguage</tabstop>
   <tabstop>change</tabstop>
+  <tabstop>wavtrimthreshold</tabstop>
   <tabstop>buttonOk</tabstop>
   <tabstop>buttonCancel</tabstop>
  </tabstops>
