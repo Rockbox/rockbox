@@ -1391,9 +1391,8 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
     {
         if (s->channel_coded[ch])
         {
-            int n4, index, n;
+            int n4, index;
 
-            n = s->block_len;
             n4 = s->block_len >>1;
 
             /*faster IMDCT from Vorbis*/
