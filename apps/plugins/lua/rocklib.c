@@ -425,7 +425,7 @@ RB_WRAP(lcd_mono_bitmap_part)
     int width = luaL_checkint(L, 7);
     int height = luaL_checkint(L, 8);
 
-    rb->lcd_mono_bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
+    rb->lcd_mono_bitmap_part((const unsigned char *)src->data, src_x, src_y, stride, x, y, width, height);
     return 0;
 }
 
@@ -437,7 +437,7 @@ RB_WRAP(lcd_mono_bitmap)
     int width = luaL_checkint(L, 4);
     int height = luaL_checkint(L, 5);
 
-    rb->lcd_mono_bitmap(src->data, x, y, width, height);
+    rb->lcd_mono_bitmap((const unsigned char *)src->data, x, y, width, height);
     return 0;
 }
 
