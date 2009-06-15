@@ -32,7 +32,12 @@ end
 -- Helper function which draws a transparent image at the center of the screen
 function draw_image(img)
     local x, y = (rb.LCD_WIDTH - img:width()) / 2, (rb.LCD_HEIGHT - img:height()) / 2
-    rb.lcd_bitmap_transparent_part(img, 0, 0, img:width(), x, y, img:width(), img:height())
+
+    local func = rb.lcd_bitmap_transparent_part
+    if(func == nil) then
+        func = rb.lcd_bitmap_part -- Fallback version for mono targets
+    end
+    func(img, 0, 0, img:width(), x, y, img:width(), img:height())
     rb.lcd_update()
 end
 
@@ -99,18 +104,23 @@ rb.lcd_clear_display()
 rb.lcd_drawline(0, 0, rb.LCD_WIDTH, rb.LCD_HEIGHT)
 rb.lcd_drawline(rb.LCD_WIDTH, 0, 0, rb.LCD_HEIGHT)
 
-local rectangle = rb.new_image(10, 15) -- Create a new image with width 10 and height 15
-for i=1, 10 do
-    for j=1, 15 do
-        rectangle:set(i, j, rb.lcd_rgbpack(200, i*20, j*20)) -- Set the pixel at position i, j to the specified color
+if(rb.lcd_rgbpack ~= nil) then -- Only do this when we're on a color target, i.e. when LCD_RGBPACK is available
+    local rectangle = rb.new_image(10, 15) -- Create a new image with width 10 and height 15
+    for i=1, 10 do
+        for j=1, 15 do
+            rectangle:set(i, j, rb.lcd_rgbpack(200, i*20, j*20)) -- Set the pixel at position i, j to the specified color
+        end
     end
-end
 
--- rb.lcd_bitmap_part(src, src_x, src_y, stride, x, y, width, height)
-rb.lcd_bitmap_part(rectangle, 0, 0, 10, rb.LCD_WIDTH/2-5, rb.LCD_HEIGHT/10-1, 10, 10) -- Draws our rectangle at the top-center of the screen
+    -- rb.lcd_bitmap_part(src, src_x, src_y, stride, x, y, width, height)
+    rb.lcd_bitmap_part(rectangle, 0, 0, 10, rb.LCD_WIDTH/2-5, rb.LCD_HEIGHT/10-1, 10, 10) -- Draws our rectangle at the top-center of the screen
+end
 
 -- Load a BMP file in the variable backdrop
 local backdrop = rb.read_bmp_file("/.rockbox/icons/tango_small_viewers.bmp") -- This image should always be present?
+if(backdrop == nil) then
+    backdrop = rb.read_bmp_file("/.rockbox/icons/tango_small_viewers_mono.bmp") -- Try using the mono version
+end
 -- Draws the image using our own draw_image() function; see up
 draw_image(backdrop)
 
