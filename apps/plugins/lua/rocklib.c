@@ -414,6 +414,33 @@ RB_WRAP(lcd_fillrect)
     return 0;
 }
 
+RB_WRAP(lcd_mono_bitmap_part)
+{
+    struct rocklua_image *src = rli_checktype(L, 1);
+    int src_x = luaL_checkint(L, 2);
+    int src_y = luaL_checkint(L, 3);
+    int stride = luaL_checkint(L, 4);
+    int x = luaL_checkint(L, 5);
+    int y = luaL_checkint(L, 6);
+    int width = luaL_checkint(L, 7);
+    int height = luaL_checkint(L, 8);
+
+    rb->lcd_mono_bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
+    return 0;
+}
+
+RB_WRAP(lcd_mono_bitmap)
+{
+    struct rocklua_image *src = rli_checktype(L, 1);
+    int x = luaL_checkint(L, 2);
+    int y = luaL_checkint(L, 3);
+    int width = luaL_checkint(L, 4);
+    int height = luaL_checkint(L, 5);
+
+    rb->lcd_mono_bitmap(src->data, x, y, width, height);
+    return 0;
+}
+
 #if LCD_DEPTH > 1
 RB_WRAP(lcd_set_foreground)
 {
@@ -871,6 +898,8 @@ static const luaL_Reg rocklib[] =
     R(lcd_vline),
     R(lcd_drawrect),
     R(lcd_fillrect),
+    R(lcd_mono_bitmap_part),
+    R(lcd_mono_bitmap),
 #if LCD_DEPTH > 1
     R(lcd_set_foreground),
     R(lcd_get_foreground),

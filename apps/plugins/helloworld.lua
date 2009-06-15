@@ -35,7 +35,10 @@ function draw_image(img)
 
     local func = rb.lcd_bitmap_transparent_part
     if(func == nil) then
-        func = rb.lcd_bitmap_part -- Fallback version for mono targets
+        func = rb.lcd_bitmap_part -- Fallback version for grayscale targets
+        if(func == nil) then
+            func = rb.lcd_mono_bitmap_part -- Fallback version for mono targets
+        end
     end
     func(img, 0, 0, img:width(), x, y, img:width(), img:height())
     rb.lcd_update()
@@ -120,6 +123,9 @@ end
 local backdrop = rb.read_bmp_file("/.rockbox/icons/tango_small_viewers.bmp") -- This image should always be present?
 if(backdrop == nil) then
     backdrop = rb.read_bmp_file("/.rockbox/icons/tango_small_viewers_mono.bmp") -- Try using the mono version
+    if(backdrop == nil) then
+        backdrop = rb.read_bmp_file("/.rockbox/icons/viewers.bmp") -- Try using the builtin version
+    end
 end
 -- Draws the image using our own draw_image() function; see up
 draw_image(backdrop)
