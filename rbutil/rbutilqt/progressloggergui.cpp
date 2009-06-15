@@ -61,8 +61,11 @@ void ProgressLoggerGui::addItem(const QString &text, int flag)
 
 void ProgressLoggerGui::setProgress(int value, int max)
 {
-    setProgressValue(value);
+    // set maximum first to avoid setting a value outside of the max range.
+    // If the current value is outside of the valid range QProgressBar
+    // calls reset() internally.
     setProgressMax(max);
+    setProgressValue(value);
 }
 
 
