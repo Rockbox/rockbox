@@ -1036,6 +1036,8 @@ void RbUtilQt::downloadManual(void)
     buildInfo.close();
 
     QString manual = RbSettings::value(RbSettings::CurManual).toString();
+    if(manual.isEmpty())
+        manual = "rockbox-" + RbSettings::value(RbSettings::Platform).toString();
 
     QString date = (info.value("dailies/date").toString());
 
