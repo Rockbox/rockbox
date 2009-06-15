@@ -857,7 +857,7 @@ void RbUtilQt::installVoice()
 
     QString voiceurl = RbSettings::value(RbSettings::VoiceUrl).toString();
 
-    voiceurl += RbSettings::value(RbSettings::CurConfigureModel).toString() + "-" +
+    voiceurl += RbSettings::value(RbSettings::CurBuildserverModel).toString() + "-" +
         versmap.value("arch_date") + "-english.zip";
     qDebug() << voiceurl;
 
