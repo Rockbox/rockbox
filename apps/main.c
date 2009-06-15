@@ -79,6 +79,7 @@
 
 #if (CONFIG_CODEC == SWCODEC)
 #include "playback.h"
+#include "tdspeed.h"
 #endif
 #if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && !defined(SIMULATOR)
 #include "pcm_record.h"
