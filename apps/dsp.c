@@ -245,20 +245,6 @@ static int32_t *resample_buf;
 #define RESAMPLE_BUF_LEFT_CHANNEL 0
 #define RESAMPLE_BUF_RIGHT_CHANNEL (sample_buf_count/2 * RESAMPLE_RATIO)
 
-#if 0
-/* Clip sample to arbitrary limits where range > 0 and min + range = max */
-static inline long clip_sample(int32_t sample, int32_t min, int32_t range)
-{
-    if ((uint32_t)(sample - min) > (uint32_t)range)
-    {
-        int32_t c = min;
-        if (sample > min)
-            c += range;
-        sample = c;
-    }
-    return sample;
-}
-#endif
 
 /* Clip sample to signed 16 bit range */
 static inline int32_t clip_sample_16(int32_t sample)
@@ -282,14 +268,14 @@ void sound_set_pitch(int permille)
 
 void tdspeed_setup(struct dsp_config *dspc)
 {
+    dspc->tdspeed_active = false;
     if (dspc == &AUDIO_DSP)
     {
-        dspc->tdspeed_active = false;
         if (!dspc->tdspeed_enabled)
             return;
         if (dspc->tdspeed_percent == 0)
             dspc->tdspeed_percent = 100;
-        if (!tdspeed_init(
+        if (!tdspeed_config(
             dspc->codec_frequency == 0 ? NATIVE_FREQUENCY : dspc->codec_frequency,
             dspc->stereo_mode != STEREO_MONO,
             dspc->tdspeed_percent))
@@ -1277,19 +1263,7 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 /* dsp_input_size MUST be called afterwards */
 int dsp_output_count(struct dsp_config *dsp, int count)
 {
-    if(!dsp->tdspeed_active)
-    {
-        sample_buf = small_sample_buf;
-        resample_buf = small_resample_buf;
-        sample_buf_count = SMALL_SAMPLE_BUF_COUNT;
-    }
-    else
-    {
-        sample_buf = big_sample_buf;
-        sample_buf_count = big_sample_buf_count;
-        resample_buf = big_resample_buf;
-    }
-    if(dsp->tdspeed_active)
+    if (dsp->tdspeed_active)
         count = tdspeed_est_output_size();
     if (dsp->resample)
     {
@@ -1324,7 +1298,7 @@ int dsp_input_count(struct dsp_config *dsp, int count)
                       dsp->data.resample_data.delta) >> 16);
     }
 
-    if(dsp->tdspeed_active)
+    if (dsp->tdspeed_active)
         count = tdspeed_est_input_size(count);
 
     return count;
@@ -1462,6 +1436,19 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
 
     default:
         return 0;
+    }
+
+    if (!dsp->tdspeed_active)
+    {
+        sample_buf = small_sample_buf;
+        resample_buf = small_resample_buf;
+        sample_buf_count = SMALL_SAMPLE_BUF_COUNT;
+    }
+    else
+    {
+        sample_buf = big_sample_buf;
+        sample_buf_count = big_sample_buf_count;
+        resample_buf = big_resample_buf;
     }
 
     return 1;

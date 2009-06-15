@@ -336,6 +336,9 @@ static void init(void)
 
     scrobbler_init();
     cuesheet_init();
+#if CONFIG_CODEC == SWCODEC
+    tdspeed_init();
+#endif /* CONFIG_CODEC == SWCODEC */
 
     audio_init();
     button_clear_queue(); /* Empty the keyboard buffer */
@@ -549,6 +552,9 @@ static void init(void)
     filetype_init();
     scrobbler_init();
     cuesheet_init();
+#if CONFIG_CODEC == SWCODEC
+    tdspeed_init();
+#endif /* CONFIG_CODEC == SWCODEC */
 
 #if CONFIG_CODEC != SWCODEC
     /* No buffer allocation (see buffer.c) may take place after the call to

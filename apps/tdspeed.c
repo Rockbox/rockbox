@@ -54,11 +54,8 @@ static struct tdspeed_state_s tdspeed_state;
 static int32_t *overlap_buffer[2] = { NULL, NULL };
 static int32_t *outbuf[2] = { NULL, NULL };
 
-bool tdspeed_init(int samplerate, bool stereo, int factor)
+void tdspeed_init()
 {
-    struct tdspeed_state_s *st = &tdspeed_state;
-    int src_frame_sz;
-
     /* Allocate buffers */
     if (overlap_buffer[0] == NULL)
         overlap_buffer[0] = (int32_t *) buffer_alloc(FIXED_BUFSIZE * sizeof(int32_t));
@@ -68,6 +65,19 @@ bool tdspeed_init(int samplerate, bool stereo, int factor)
         outbuf[0] = (int32_t *) buffer_alloc(TDSPEED_OUTBUFSIZE * sizeof(int32_t));
     if (outbuf[1] == NULL)
         outbuf[1] = (int32_t *) buffer_alloc(TDSPEED_OUTBUFSIZE * sizeof(int32_t));
+}
+
+
+bool tdspeed_config(int samplerate, bool stereo, int factor)
+{
+    struct tdspeed_state_s *st = &tdspeed_state;
+    int src_frame_sz;
+
+    /* Check buffers were allocated ok */
+    if (overlap_buffer[0] == NULL || overlap_buffer[1] == NULL)
+        return false;
+    if (outbuf[0] == NULL || outbuf[1] == NULL)
+        return false;
 
     /* Check parameters */
     if (factor == 100)

@@ -25,7 +25,8 @@
 
 #define TDSPEED_OUTBUFSIZE 4096
 
-bool tdspeed_init(int samplerate, bool stereo, int factor);
+void tdspeed_init();
+bool tdspeed_config(int samplerate, bool stereo, int factor);
 long tdspeed_est_output_size(void);
 long tdspeed_est_input_size(long size);
 int tdspeed_doit(int32_t *src[], int count);
