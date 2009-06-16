@@ -28,6 +28,7 @@
 #include "debug.h"
 #include "system.h"
 #include "tdspeed.h"
+#include "settings.h"
 
 #define assert(cond)
 
@@ -56,15 +57,18 @@ static int32_t *outbuf[2] = { NULL, NULL };
 
 void tdspeed_init()
 {
-    /* Allocate buffers */
-    if (overlap_buffer[0] == NULL)
-        overlap_buffer[0] = (int32_t *) buffer_alloc(FIXED_BUFSIZE * sizeof(int32_t));
-    if (overlap_buffer[1] == NULL)
-        overlap_buffer[1] = (int32_t *) buffer_alloc(FIXED_BUFSIZE * sizeof(int32_t));
-    if (outbuf[0] == NULL)
-        outbuf[0] = (int32_t *) buffer_alloc(TDSPEED_OUTBUFSIZE * sizeof(int32_t));
-    if (outbuf[1] == NULL)
-        outbuf[1] = (int32_t *) buffer_alloc(TDSPEED_OUTBUFSIZE * sizeof(int32_t));
+    if (global_settings.timestretch_enabled)
+    {
+        /* Allocate buffers */
+        if (overlap_buffer[0] == NULL)
+            overlap_buffer[0] = (int32_t *) buffer_alloc(FIXED_BUFSIZE * sizeof(int32_t));
+        if (overlap_buffer[1] == NULL)
+            overlap_buffer[1] = (int32_t *) buffer_alloc(FIXED_BUFSIZE * sizeof(int32_t));
+        if (outbuf[0] == NULL)
+            outbuf[0] = (int32_t *) buffer_alloc(TDSPEED_OUTBUFSIZE * sizeof(int32_t));
+        if (outbuf[1] == NULL)
+            outbuf[1] = (int32_t *) buffer_alloc(TDSPEED_OUTBUFSIZE * sizeof(int32_t));
+    }
 }
 
 
@@ -327,3 +331,4 @@ int tdspeed_doit(int32_t *src[], int count)
     src[1] = outbuf[1];
     return count;
 }
+

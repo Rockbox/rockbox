@@ -161,7 +161,6 @@ struct dsp_config
     int  sample_depth;
     int  sample_bytes;
     int  stereo_mode;
-    bool tdspeed_enabled; /* User has enabled timestretch */
     int  tdspeed_percent; /* Speed % */
     bool tdspeed_active;  /* Timestretch is in use */
     int  frac_bits;
@@ -266,12 +265,12 @@ void sound_set_pitch(int permille)
                   AUDIO_DSP.codec_frequency);
 }
 
-void tdspeed_setup(struct dsp_config *dspc)
+static void tdspeed_setup(struct dsp_config *dspc)
 {
     dspc->tdspeed_active = false;
     if (dspc == &AUDIO_DSP)
     {
-        if (!dspc->tdspeed_enabled)
+        if(!dsp_timestretch_enabled())
             return;
         if (dspc->tdspeed_percent == 0)
             dspc->tdspeed_percent = 100;
@@ -304,7 +303,7 @@ void dsp_timestretch_enable(bool enable)
         if (big_sample_buf_count < 0)
             big_sample_buf_count = 0;
     }
-    AUDIO_DSP.tdspeed_enabled = enable;
+    global_settings.timestretch_enabled = enable;
     tdspeed_setup(&AUDIO_DSP);
 }
 
@@ -321,7 +320,7 @@ int dsp_get_timestretch()
 
 bool dsp_timestretch_enabled()
 {
-    return (AUDIO_DSP.tdspeed_enabled && big_sample_buf_count > 0);
+    return (global_settings.timestretch_enabled && big_sample_buf_count > 0);
 }
 
 /* Convert count samples to the internal format, if needed.  Updates src
