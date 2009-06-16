@@ -359,6 +359,8 @@ static char *get_wps_item_name(int selected_item, void * data, char *buffer)
     (void)selected_item; (void)data; (void)buffer;
     if (audio_status())
         return ID2P(LANG_NOW_PLAYING);
+    else if ( global_status.resume_index < 0 )
+        return ID2P(LANG_NOTHING_TO_RESUME);
     return ID2P(LANG_RESUME_PLAYBACK);
 }
 MENUITEM_RETURNVALUE_DYNTEXT(wps_item, GO_TO_WPS, NULL, get_wps_item_name, 
