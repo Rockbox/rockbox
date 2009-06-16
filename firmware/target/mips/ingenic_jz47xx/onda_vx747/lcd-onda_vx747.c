@@ -37,7 +37,7 @@ do {                                    \
 } while (0)
 
 
-#define SLEEP(x) { register int __i; for(__i=0; __i<x; __i++) {asm("nop"); asm("nop");} }
+#define SLEEP(x) { register int __i; for(__i=0; __i<x; __i++) asm volatile("nop\n nop\n"); }
 #define DELAY    SLEEP(700000);
 static void _display_pin_init(void)
 {
