@@ -298,7 +298,6 @@ static int chessclock_set_int(char* string,
 #define FLAGS_SET_INT_SECONDS 1
 
 static char * show_time(int secs);
-static int simple_menu(int nr, unsigned char **strarr);
 
 static bool pause;
 
@@ -514,53 +513,57 @@ static int run_timer(int nr)
                 /* MENU  */
             case CHC_MENU:
             {
-                int ret;
-                char *menu[]={"Delete player", "Restart round",
-                              "Set round time", "Set total time"};
-                ret=simple_menu(4, (unsigned char **)menu);
-                if (ret==-1) {
-                    retval = 3;
-                    done=true;
-                } else if (ret==-2) {
-                } else if (ret==0) {
-                     /* delete timer */
-                    timer_holder[nr].hidden=true;
-                    retval=1;
-                    done=true;
-                    break;
-                } else if (ret==1) {
-                    /* restart */
-                    ticks=0;
-                    break;
-                } else if (ret==2) {
-                    /* set round time */
-                    int res;
-                    int val=(max_ticks-ticks)/HZ;
-                    res=chessclock_set_int("Round time",
-                                           &val,
-                                           10, 0, MAX_TIME,
-                                           FLAGS_SET_INT_SECONDS);
-                    if (res==-1) { /*usb*/
+                MENUITEM_STRINGLIST(menu, "Menu", NULL,
+                                    "Delete player", "Restart round",
+                                    "Set round time", "Set total time");
+
+                int val, res;
+                switch(rb->do_menu(&menu, NULL, NULL, false))
+                {
+                    case 0:
+                         /* delete timer */
+                        timer_holder[nr].hidden=true;
+                        retval=1;
+                        done=true;
+                        break;
+                    case 1:
+                        /* restart */
+                        ticks=0;
+                        break;
+                    case 2:
+                        /* set round time */
+                        val=(max_ticks-ticks)/HZ;
+                        res=chessclock_set_int("Round time",
+                                               &val,
+                                               10, 0, MAX_TIME,
+                                               FLAGS_SET_INT_SECONDS);
+                        if (res==-1) { /*usb*/
+                            retval = 3;
+                            done=true;
+                        } else if (res==1) {
+                            ticks=max_ticks-val*HZ;
+                        }
+                        break;
+                    case 3:
+                        /* set total time */
+                        val=timer_holder[nr].total_time;
+                        res=chessclock_set_int("Total time",
+                                               &val,
+                                               10, 0, MAX_TIME,
+                                               FLAGS_SET_INT_SECONDS);
+                        if (res==-1) { /*usb*/
+                            retval = 3;
+                            done=true;
+                        } else if (res==1) {
+                            timer_holder[nr].total_time=val;
+                        }
+                        break;
+                    case MENU_ATTACHED_USB:
                         retval = 3;
                         done=true;
-                    } else if (res==1) {
-                        ticks=max_ticks-val*HZ;
-                    }
-                } else if (ret==3) {
-                    /* set total time */
-                    int res;
-                    int val=timer_holder[nr].total_time;
-                    res=chessclock_set_int("Total time",
-                                           &val,
-                                           10, 0, MAX_TIME,
-                                           FLAGS_SET_INT_SECONDS);
-                    if (res==-1) { /*usb*/
-                        retval = 3;
-                        done=true;
-                    } else if (res==1) {
-                        timer_holder[nr].total_time=val;
-                    }
+                        break;
                 }
+                rb->lcd_clear_display();
             }
             break;
 
@@ -663,56 +666,4 @@ static char * show_time(int seconds)
     rb->snprintf(buf, sizeof(buf), "%02d:%02d", seconds/60, seconds%60);
     return buf;
 }
-
-/* -1 = USB
-   -2 = cancel
-*/
-static int simple_menu(int nr, unsigned char **strarr)
-{
-    int show=0;
-    int button;
-    rb->lcd_clear_display();
-
-    while (1) {
-        if (show>=nr)
-            show=0;
-        if (show<0)
-            show=nr-1;
-        rb->lcd_puts_scroll(0, FIRST_LINE, strarr[show]);
-        rb->lcd_update();
-
-        button = rb->button_get(true);
-        switch(button) {
-            case CHC_SETTINGS_INC:
-            case CHC_SETTINGS_INC | BUTTON_REPEAT:
-                show++;
-                break;
-
-            case CHC_SETTINGS_DEC:
-            case CHC_SETTINGS_DEC | BUTTON_REPEAT:
-                show--;
-                break;
-
-            case CHC_SETTINGS_OK:
-#ifdef CHC_SETTINGS_OK2
-            case CHC_SETTINGS_OK2:
-#endif
-                return show;
-                break;
-
-            case CHC_SETTINGS_CANCEL:
-#ifdef CHC_SETTINGS_CANCEL2
-            case CHC_SETTINGS_CANCEL2:
-#endif
-                return -2; /* cancel */
-                break;
-
-            default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    return -1; /* been in usb mode */
-                break;
-        }
-    }
-}
-
 

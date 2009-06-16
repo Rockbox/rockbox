@@ -24,7 +24,6 @@
 #include "lib/configfile.h"
 #include "button.h"
 #include "lcd.h"
-#include "lib/oldmenuapi.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -773,15 +772,10 @@ static struct configdata config[] = {
    { TYPE_INT, 0, 1, { .int_p = &sol_disk.draw_type }, "draw_type", NULL }
 };
 
-char draw_option_string[32];
-
-static void create_draw_option_string(void)
-{
-    if (sol.draw_type == 0)
-        rb->strcpy(draw_option_string, "Draw Three Cards");
-    else
-        rb->strcpy(draw_option_string, "Draw One Card");
-}
+static const struct opt_items drawcards[2] = {
+    { "Draw Three Cards", -1 },
+    { "Draw One Card", -1 },
+};
 
 void solitaire_init(void);
 
@@ -790,37 +784,22 @@ enum { MENU_RESUME, MENU_SAVE_AND_QUIT, MENU_QUIT, MENU_USB };
 
 int solitaire_menu(bool in_game)
 {
-    int m;
+    int selected = 0;
     int result = -1;
-    int i = 0;
 
-    struct menu_item items[6];
+    MENUITEM_STRINGLIST(menu, "Solitaire Menu", NULL,
+                        "Start Game", "Draw Cards Option",
+                        "Help", "Audio Playback", "Quit");
+    MENUITEM_STRINGLIST(menu_in_game, "Solitaire Menu", NULL,
+                        "Resume Game", "Restart Game", "Help",
+                        "Audio Playback", "Save and Quit", "Quit");
 
-    if( in_game )
-    {
-        items[i++].desc = "Resume Game";
-        items[i++].desc = "Restart Game";
-    }
-    else
-    {
-        items[i++].desc = "Start Game";
-        items[i++].desc = draw_option_string;
-    }
-    items[i++].desc = "Help";
-    items[i++].desc = "Audio Playback";
-    if( in_game )
-    {
-        items[i++].desc = "Save and Quit";
-    }
-    items[i++].desc = "Quit";
-
-    create_draw_option_string();
-    m = menu_init(items, i, NULL, NULL, NULL, NULL);
     while (result < 0)
     {
-        switch (menu_show(m))
+        switch (rb->do_menu(in_game? &menu_in_game: &menu,
+                            &selected, NULL, false))
         {
-            case MENU_SELECTED_EXIT:
+            default:
                 result = MENU_RESUME;
                 break;
 
@@ -840,8 +819,9 @@ int solitaire_menu(bool in_game)
                 }
                 else
                 {
-                    sol.draw_type = (sol.draw_type + 1) % 2;
-                    create_draw_option_string();
+                    if (rb->set_option("Draw Cards Option", &sol.draw_type,
+                                       INT, drawcards, 2, NULL))
+                        result = MENU_USB;
                 }
                 break;
 
@@ -866,7 +846,6 @@ int solitaire_menu(bool in_game)
                 break;
         }
     }
-    menu_exit(m);
     return result;
 }
 

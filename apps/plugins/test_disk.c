@@ -20,7 +20,6 @@
  ****************************************************************************/
 
 #include "plugin.h"
-#include "lib/oldmenuapi.h"
 #include "lib/helper.h"
 
 PLUGIN_HEADER
@@ -406,11 +405,10 @@ static bool test_speed(void)
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
-    static const struct menu_item items[] = {
-        { "Disk speed",     test_speed  },
-        { "Write & verify", test_fs     },
-    };
-    int m;
+    MENUITEM_STRINGLIST(menu, "Test Disk Menu", NULL,
+                        "Disk speed", "Write & verify");
+    int selected=0;
+    bool quit = false;
     int align;
     DIR *dir;
 
@@ -440,10 +438,21 @@ enum plugin_status plugin_start(const void* parameter)
     /* Turn off backlight timeout */
     backlight_force_on(); /* backlight control in lib/helper.c */
 
-    m = menu_init(items, sizeof(items) / sizeof(*items), NULL,
-                      NULL, NULL, NULL);
-    menu_run(m);
-    menu_exit(m);
+    while(!quit)
+    {
+        switch(rb->do_menu(&menu, &selected, NULL, false))
+        {
+            case 0:
+                test_speed();
+                break;
+            case 1:
+                test_fs();
+                break;
+            default:
+                quit = true;
+                break;
+        }
+    }
 
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(); /* backlight control in lib/helper.c */

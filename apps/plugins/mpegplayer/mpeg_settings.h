@@ -100,7 +100,7 @@ enum
 int mpeg_menu(unsigned flags);
 void mpeg_menu_sysevent_clear(void);
 long mpeg_menu_sysevent(void);
-int mpeg_menu_sysevent_callback(int btn, int menu);
+int mpeg_menu_sysevent_callback(int btn, const struct menu_item_ex *menu);
 void mpeg_menu_sysevent_handle(void);
 
 void init_settings(const char* filename);

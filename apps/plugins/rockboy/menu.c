@@ -8,7 +8,6 @@
 #include "rockmacros.h"
 #include "mem.h"
 #include "save.h"
-#include "lib/oldmenuapi.h"
 #include "rtc-gb.h"
 #include "pcm.h"
 
@@ -85,7 +84,7 @@ static void setupkeys(void)
  */
 int do_user_menu(void) {
     bool done=false;
-    int m, ret=0;
+    int selected=0, ret=0;
     int result;
     int time = 0;
     
@@ -97,20 +96,15 @@ int do_user_menu(void) {
     while (rb->button_get(false) != BUTTON_NONE) 
         rb->yield();
 
-    static const struct menu_item items[] = {
-        {"Load Game", NULL },
-        {"Save Game", NULL },
-        {"Options", NULL },
-        {"Quit", NULL },
-    };
+    MENUITEM_STRINGLIST(menu, "Rockboy Menu", NULL,
+                        "Load Game", "Save Game",
+                        "Options", "Quit");
 
     pcm_init();
 
-    m = menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
-
     while(!done)
     {
-        result=menu_show(m);
+        result = rb->do_menu(&menu, &selected, NULL, false);
 
         switch (result)
         {
@@ -132,8 +126,6 @@ int do_user_menu(void) {
                 break;
         }
     }
-
-    menu_exit(m);
 
     rb->lcd_setfont(0); /* Reset the font */
     rb->lcd_clear_display(); /* Clear display for screen size changes */
@@ -288,50 +280,65 @@ static void slot_info(char *info_buf, size_t info_bufsiz, size_t slot_id) {
     }
 }
 
+/* 
+ * slot_get_name
+ */
+static char *slot_get_name(int selected_item, void * data,
+                             char * buffer, size_t buffer_len)
+{
+    char (*items)[20] = data;
+    (void) buffer;
+    (void) buffer_len;
+    return items[selected_item];
+}
+
+/*
+ * list_action_callback
+ */
+static int list_action_callback(int action, struct gui_synclist *lists)
+{
+    (void) lists;
+    if (action == ACTION_STD_OK)
+        return ACTION_STD_CANCEL;
+    return action;
+}
+
 /*
  * do_slot_menu - prompt the user for a load/save memory slot
  */
 static void do_slot_menu(bool is_load) {
     bool done=false;
-
-    char buf[5][20];
-
-    int m;
+    char items[5][20];
     int result;
     int i;
-
-    struct menu_item items[] = {
-        { buf[0] , NULL },
-        { buf[1] , NULL },
-        { buf[2] , NULL },
-        { buf[3] , NULL },
-        { buf[4] , NULL },
-    };
-
     int num_items = sizeof(items) / sizeof(*items);
+    struct simplelist_info info;
 
     /* create menu items */
     for (i = 0; i < num_items; i++)
-        slot_info(buf[i], 20, i);
+        slot_info(items[i], 20, i);
 
-    m = menu_init(items, num_items, NULL, NULL, NULL, NULL);
+    rb->simplelist_info_init(&info, NULL, num_items, (void *)items);
+    info.get_name = slot_get_name;
+    info.action_callback = list_action_callback;
 
     while(!done)
     {
-        result=menu_show(m);
-    
+        if(rb->simplelist_show_list(&info))
+            break;
+
+        result = info.selection;
         if (result<num_items && result >= 0 )
             done = do_slot(result, is_load);
         else
             done = true;
     }
-    menu_exit(m);
 }
 
 static void do_opt_menu(void)
 {
     bool done=false;
-    int m;
+    int selected=0;
     int result;
 
     static const struct opt_items onoff[2] = {
@@ -379,63 +386,54 @@ static void do_opt_menu(void)
     };
 #endif
 
-    static const struct menu_item items[] = {
-        { "Max Frameskip", NULL },
-        { "Sound"        , NULL },
-        { "Stats"        , NULL },
-        { "Set Keys (Buggy)", NULL },
+    MENUITEM_STRINGLIST(menu, "Options", NULL,
+                        "Max Frameskip", "Sound", "Stats", "Set Keys (Buggy)",
 #ifdef HAVE_LCD_COLOR
-        { "Screen Size"  , NULL },
-        { "Screen Rotate"  , NULL },
-        { "Set Palette"  , NULL },
+                        "Screen Size", "Screen Rotate", "Set Palette",
 #endif
-    };
-
-    m = menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
+                        );
 
     options.dirty=1; /* Assume that the settings have been changed */
 
     while(!done)
     {
-        
-        result=menu_show(m);
-    
+        result = rb->do_menu(&menu, &selected, NULL, false);
+
         switch (result)
         {
             case 0: /* Frameskip */
-                rb->set_option(items[0].desc, &options.maxskip, INT, frameskip, 
+                rb->set_option("Max Frameskip", &options.maxskip, INT, frameskip, 
                     sizeof(frameskip)/sizeof(*frameskip), NULL );
                 break;
             case 1: /* Sound */
                 if(options.sound>1) options.sound=1;
-                rb->set_option(items[1].desc, &options.sound, INT, onoff, 2, NULL );
+                rb->set_option("Sound", &options.sound, INT, onoff, 2, NULL );
                 if(options.sound) sound_dirty();
                 break;
             case 2: /* Stats */
-                rb->set_option(items[2].desc, &options.showstats, INT, onoff, 2, NULL );
+                rb->set_option("Stats", &options.showstats, INT, onoff, 2, NULL );
                 break;
             case 3: /* Keys */
                 setupkeys();
                 break;
 #ifdef HAVE_LCD_COLOR
             case 4: /* Screen Size */
-                rb->set_option(items[4].desc, &options.scaling, INT, scaling,
+                rb->set_option("Screen Size", &options.scaling, INT, scaling,
                     sizeof(scaling)/sizeof(*scaling), NULL );
                 setvidmode();
                 break;
             case 5: /* Screen rotate */
-                rb->set_option(items[5].desc, &options.rotate, INT, onoff, 2, NULL );
+                rb->set_option("Screen Rotate", &options.rotate, INT, onoff, 2, NULL );
                 setvidmode();
                 break;
             case 6: /* Palette */
-                rb->set_option(items[6].desc, &options.pal, INT, palette, 17, NULL );
+                rb->set_option("Set Palette", &options.pal, INT, palette, 17, NULL );
                 set_pal();
                 break;
-#endif                
+#endif
             default:
                 done=true;
                 break;
         }
     }
-    menu_exit(m);
 }

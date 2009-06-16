@@ -29,7 +29,6 @@
 #include "pacbox.h"
 #include "pacbox_lcd.h"
 #include "lib/configfile.h"
-#include "lib/oldmenuapi.h"
 
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
@@ -138,7 +137,7 @@ static int settings_to_dip(struct pacman_settings settings)
 
 static bool pacbox_menu(void)
 {
-    int m;
+    int selected=0;
     int result;
     int menu_quit=0;
     int new_setting;
@@ -173,23 +172,14 @@ static bool pacbox_menu(void)
         { "Alternate", -1 },
     };
 
-    static const struct menu_item items[] = {
-        { "Difficulty", NULL },
-        { "Pacmen Per Game", NULL },
-        { "Bonus Life", NULL },
-        { "Ghost Names", NULL },
-        { "Display FPS", NULL },
-        { "Restart", NULL },
-        { "Quit", NULL },
-    };
-    
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
+    MENUITEM_STRINGLIST(menu, "Pacbox Menu", NULL,
+                        "Difficulty", "Pacmen Per Game", "Bonus Life",
+                        "Ghost Names", "Display FPS", "Restart", "Quit");
 
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result=menu_show(m);
+        result=rb->do_menu(&menu, &selected, NULL, false);
 
         switch(result)
         {
@@ -242,8 +232,6 @@ static bool pacbox_menu(void)
                 break;
         }
     }
-
-    menu_exit(m);
 
     if (need_restart) {
         init_PacmanMachine(settings_to_dip(settings));

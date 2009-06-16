@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "lib/oldmenuapi.h"
 #include "lib/helper.h"
 #include "lib/playback_control.h"
 
@@ -287,17 +286,10 @@ static const struct opt_items fps_settings[9] = {
 int fps_values[9] = {
     20, 25, 30, 35, 40, 45, 50, 55, 60 };
 
-static const struct menu_item items[] = {
-    { "Start Demo", NULL },
-    { "Auto-Fire", NULL },
-    { "Particles Per Firework", NULL },
-    { "Particle Life", NULL },
-    { "Gravity", NULL },
-    { "Show Rockets", NULL },
-    { "FPS (Speed)", NULL },
-    { "Playback Control", NULL },
-    { "Quit", NULL }
-};
+MENUITEM_STRINGLIST(menu, "Fireworks Menu", NULL,
+                    "Start Demo", "Auto-Fire", "Particles Per Firework",
+                    "Particle Life", "Gravity", "Show Rockets",
+                    "FPS (Speed)", "Playback Control", "Quit");
 
 /* called on startup. initializes all variables, etc */
 void init_all(void)
@@ -348,7 +340,7 @@ void init_rocket(int rocket)
 /* startup/configuration menu. */
 void fireworks_menu(void)
 {
-    int m, result;
+    int selected = 0, result;
     bool menu_quit = false;
 
     rb->lcd_setfont(FONT_UI);
@@ -359,14 +351,11 @@ void fireworks_menu(void)
     rb->lcd_clear_display();
     rb->lcd_update();
 
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
-
     rb->button_clear_queue();
 
     while(!menu_quit)
     {
-        result = menu_show(m);
+        result = rb->do_menu(&menu, &selected, NULL, false);
 
         switch(result)
         {
@@ -419,8 +408,6 @@ void fireworks_menu(void)
                 break;
         }
     }
-
-    menu_exit(m);
 }
 
 /* this is the plugin entry point */

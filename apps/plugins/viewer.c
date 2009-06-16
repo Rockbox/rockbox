@@ -22,7 +22,6 @@
 #include "plugin.h"
 #include <ctype.h>
 #include "lib/playback_control.h"
-#include "lib/oldmenuapi.h"
 
 PLUGIN_HEADER
 
@@ -1448,30 +1447,37 @@ static bool autoscroll_speed_setting(void)
                        &prefs.autoscroll_speed, NULL, 1, 1, 10, NULL);
 }
 
+MENUITEM_FUNCTION(encoding_item, 0, "Encoding", encoding_setting,
+                  NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(word_wrap_item, 0, "Word Wrap", word_wrap_setting,
+                  NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(line_mode_item, 0, "Line Mode", line_mode_setting,
+                  NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(view_mode_item, 0, "Wide View", view_mode_setting,
+                  NULL, NULL, Icon_NOICON);
+#ifdef HAVE_LCD_BITMAP
+MENUITEM_FUNCTION(scrollbar_item, 0, "Show Scrollbar", scrollbar_setting,
+                  NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(page_mode_item, 0, "Overlap Pages", page_mode_setting,
+                  NULL, NULL, Icon_NOICON);
+#endif
+MENUITEM_FUNCTION(scroll_mode_item, 0, "Scroll Mode", scroll_mode_setting,
+                  NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(autoscroll_speed_item, 0, "Auto-Scroll Speed",
+                  autoscroll_speed_setting, NULL, NULL, Icon_NOICON);
+MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
+            &encoding_item, &word_wrap_item, &line_mode_item, &view_mode_item,
+#ifdef HAVE_LCD_BITMAP
+            &scrollbar_item, &page_mode_item,
+#endif
+            &scroll_mode_item, &autoscroll_speed_item);
+
 static bool viewer_options_menu(void)
 {
-    int m;
     bool result;
+    result = (rb->do_menu(&option_menu, NULL, NULL, false) == MENU_ATTACHED_USB);
 
-    static const struct menu_item items[] = {
-        {"Encoding",          encoding_setting },
-        {"Word Wrap",         word_wrap_setting },
-        {"Line Mode",         line_mode_setting },
-        {"Wide View",         view_mode_setting },
 #ifdef HAVE_LCD_BITMAP
-        {"Show Scrollbar",    scrollbar_setting },
-        {"Overlap Pages",     page_mode_setting },
-#endif
-        {"Scroll Mode",       scroll_mode_setting},
-        {"Auto-Scroll Speed", autoscroll_speed_setting },
-    };
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
-
-    result = menu_run(m);
-    menu_exit(m);
-#ifdef HAVE_LCD_BITMAP
-
     /* Show-scrollbar mode for current view-width mode */
     init_need_scrollbar();
 #endif
@@ -1480,23 +1486,15 @@ static bool viewer_options_menu(void)
 
 static void viewer_menu(void)
 {
-    int m;
     int result;
-    static const struct menu_item items[] = {
-        {"Quit", NULL },
-        {"Viewer Options", NULL },
-        {"Show Playback Menu", NULL },
-        {"Return", NULL },
-    };
+    MENUITEM_STRINGLIST(menu, "Viewer Menu", NULL,
+                        "Return", "Viewer Options",
+                        "Show Playback Menu", "Quit");
 
-    m = menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
-    result=menu_show(m);
+    result = rb->do_menu(&menu, NULL, NULL, false);
     switch (result)
     {
-        case 0: /* quit */
-            menu_exit(m);
-            viewer_exit(NULL);
-            done = true;
+        case 0: /* return */
             break;
         case 1: /* change settings */
             done = viewer_options_menu();
@@ -1504,10 +1502,11 @@ static void viewer_menu(void)
         case 2: /* playback control */
             playback_control(NULL);
             break;
-        case 3: /* return */
+        case 3: /* quit */
+            viewer_exit(NULL);
+            done = true;
             break;
     }
-    menu_exit(m);
     viewer_draw(col);
 }
 

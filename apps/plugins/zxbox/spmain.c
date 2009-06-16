@@ -20,7 +20,6 @@
 #include "zxmisc.h"
 #include "zxconfig.h"
 #include "lib/configfile.h"
-#include "lib/oldmenuapi.h"
 
 #include "spperif.h"
 #include "z80.h"
@@ -134,25 +133,18 @@ int spcf_read_conf_file(const char *filename)
 
 /* set keys */
 static void set_keys(void){
-    int m;
     char c;
+    int selected=0;
     int result;
     int menu_quit=0;
-    static const struct menu_item items[] = {
-        { "Map Up key", NULL },
-        { "Map Down key", NULL },
-        { "Map Left key", NULL },
-        { "Map Right key", NULL },
-        { "Map Fire/Jump key", NULL },
-       };
-
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
+    MENUITEM_STRINGLIST(menu, "Custom keymap", NULL,
+                        "Map Up key", "Map Down key", "Map Left key",
+                        "Map Right key", "Map Fire/Jump key");
 
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result=menu_show(m);
+        result = rb->do_menu(&menu, &selected, NULL, false);
 
         switch(result)
         {
@@ -161,7 +153,7 @@ static void set_keys(void){
                 {
                     settings.keymap[0]=c;
                 }
-                break;            
+                break;
             case 1:
                 if (!zx_kbd_input((char*) &c))
                 {
@@ -191,41 +183,33 @@ static void set_keys(void){
                 break;
         }
     }
-
-    menu_exit(m);
 }
 
 /* select predefined keymap */
 static void select_keymap(void){
-    int m;
+    int selected=0;
     int result;
     int menu_quit=0;
-    static const struct menu_item items[] = {
-        { "2w90z", NULL },
-        { "qaopS", NULL },
-        { "7658S", NULL },
-       };
-
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
+    MENUITEM_STRINGLIST(menu, "Predefined keymap", NULL,
+                        "2w90z", "qaopS", "7658S");
 
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result=menu_show(m);
+        result = rb->do_menu(&menu, &selected, NULL, false);
 
         switch(result)
         {
             case 0:
-                rb->memcpy ( (void*)&settings.keymap[0] , (void*)items[0].desc , sizeof(items[0].desc));
+                rb->memcpy ( (void*)&settings.keymap[0] , (void*)"2w90z" , 5);
                 menu_quit=1;
-                break;            
+                break;
             case 1:
-                rb->memcpy ( (void*)&settings.keymap[0] , (void*)items[1].desc , sizeof(items[1].desc));
+                rb->memcpy ( (void*)&settings.keymap[0] , (void*)"qaopS" , 5);
                 menu_quit=1;
                 break;
             case 2:
-                rb->memcpy ( (void*)&settings.keymap[0] , (void*)items[2].desc , sizeof(items[2].desc));
+                rb->memcpy ( (void*)&settings.keymap[0] , (void*)"7658S" , 5);
                 menu_quit=1;
                 break;
             default:
@@ -233,8 +217,6 @@ static void select_keymap(void){
                 break;
         }
     }
-
-    menu_exit(m);
 }
 
 /* options menu */
@@ -243,20 +225,15 @@ static void options_menu(void){
         { "No", -1 },
         { "Yes", -1 },
     };
-    int m;
+    int selected;
     int result;
     int menu_quit=0;
     int new_setting;
-    static const struct menu_item items[] = {
-        { "Map Keys to kempston", NULL },
-        { "Display Speed", NULL },
-        { "Invert Colors", NULL },
-        { "Frameskip", NULL },
-        { "Sound", NULL },
-        { "Volume", NULL },
-        { "Predefined keymap", NULL },
-        { "Custom keymap", NULL },
-       };
+    MENUITEM_STRINGLIST(menu, "Options", NULL,
+                        "Map Keys to kempston", "Display Speed",
+                        "Invert Colors", "Frameskip", "Sound", "Volume",
+                        "Predefined keymap", "Custom keymap");
+
     static struct opt_items frameskip_items[] = {
         { "0", -1 },
         { "1", -1 },
@@ -269,15 +246,12 @@ static void options_menu(void){
         { "8", -1 },
         { "9", -1 },
        };
-        
 
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result=menu_show(m);
+        result = rb->do_menu(&menu, &selected, NULL, false);
 
         switch(result)
         {
@@ -287,7 +261,7 @@ static void options_menu(void){
                                no_yes, 2, NULL);
                 if (new_setting != settings.kempston )
                     settings.kempston=new_setting;
-                break;            
+                break;
             case 1:
                 new_setting = settings.showfps;
                 rb->set_option("Display Speed",&new_setting,INT, 
@@ -339,8 +313,6 @@ static void options_menu(void){
                 break;
         }
     }
-
-    menu_exit(m);
 }
 
 /* menu */
@@ -349,29 +321,21 @@ static bool zxbox_menu(void)
 #if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
     rb->pcm_play_stop();
 #endif
-    int m;
+    int selected=0;
     int result;
     int menu_quit=0;
     int exit=0;
     char c;
-    static const struct menu_item items[] = {
-        { "VKeyboard", NULL },
-        { "Play/Pause Tape", NULL },
-        { "Save quick snapshot", NULL },
-        { "Load quick snapshot", NULL },
-        { "Save Snapshot", NULL },
-        { "Toggle \"fast\" mode", NULL },
-        { "Options", NULL },
-        { "Quit", NULL },
-    };
-
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
+    MENUITEM_STRINGLIST(menu, "ZXBox Menu", NULL,
+                        "VKeyboard", "Play/Pause Tape",
+                        "Save quick snapshot", "Load quick snapshot",
+                        "Save Snapshot", "Toggle \"fast\" mode",
+                        "Options", "Quit");
 
     rb->button_clear_queue();
 
     while (!menu_quit) {
-        result=menu_show(m);
+        result = rb->do_menu(&menu, &selected, NULL, false);
 
         switch(result)
         {
@@ -415,7 +379,6 @@ static bool zxbox_menu(void)
         }
     }
 
-    menu_exit(m);
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(true);
 #endif

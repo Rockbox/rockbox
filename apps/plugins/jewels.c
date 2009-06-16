@@ -330,59 +330,6 @@ enum game_type {
     GAME_TYPE_PUZZLE
 };
 
-/* menu values */
-#define FONT_HEIGHT 8
-#define MAX_MITEMS  6
-#define MENU_WIDTH  100
-
-/* menu results */
-enum menu_result {
-    MRES_NONE,
-    MRES_NEW,
-    MRES_PUZZLE,
-    MRES_SAVE,
-    MRES_RESUME,
-    MRES_SCORES,
-    MRES_HELP,
-    MRES_QUIT,
-    MRES_PLAYBACK,
-    MRES_EXIT
-};
-
-/* menu commands */
-enum menu_cmd {
-    MCMD_NONE,
-    MCMD_NEXT,
-    MCMD_PREV,
-    MCMD_SELECT
-};
-
-/* menus */
-struct jewels_menu {
-    char *title;
-    bool hasframe;
-    int selected;
-    int itemcnt;
-    struct jewels_menuitem {
-        char *text;
-        enum menu_result res;
-    } items[MAX_MITEMS];
-} bjmenu[] = {
-    {"Jewels", false, 0, 6,
-        {{"New Game",    MRES_NEW},
-         {"Puzzle",      MRES_PUZZLE},
-         {"Resume Saved Game", MRES_RESUME},
-         {"High Scores", MRES_SCORES},
-         {"Help",        MRES_HELP},
-         {"Quit",        MRES_QUIT}}},
-    {"Menu", true, 0, 5,
-        {{"Audio Playback", MRES_PLAYBACK },
-         {"Resume Game", MRES_RESUME},
-         {"Save Game",   MRES_SAVE},
-         {"End Game",    MRES_QUIT},
-         {"Exit Jewels", MRES_EXIT}}}
-};
-
 /* external bitmaps */
 extern const fb_data jewels[];
 
@@ -674,73 +621,6 @@ static void jewels_drawboard(struct game_context* bj) {
 #endif /* layout */
 
     rb->lcd_update();
-}
-
-/*****************************************************************************
-* jewels_showmenu() displays the chosen menu after performing the chosen
-*     menu command.
-******************************************************************************/
-static enum menu_result jewels_showmenu(struct jewels_menu* menu,
-                                           enum menu_cmd cmd) {
-    int i;
-    int w, h;
-    int firstline;
-    int adj;
-    int extraline = LCD_HEIGHT <= ((menu->itemcnt+2)*FONT_HEIGHT) ? 0 : 1;
-
-    /* handle menu command */
-    switch(cmd) {
-        case MCMD_NEXT:
-            menu->selected = (menu->selected+1)%menu->itemcnt;
-            break;
-
-        case MCMD_PREV:
-            menu->selected = (menu->selected-1+menu->itemcnt)%menu->itemcnt;
-            break;
-
-        case MCMD_SELECT:
-            return menu->items[menu->selected].res;
-
-        default:
-            break;
-    }
-
-    /* clear menu area */
-    firstline = (LCD_HEIGHT/FONT_HEIGHT-(menu->itemcnt+3))/2;
-
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect((LCD_WIDTH-MENU_WIDTH)/2, firstline*FONT_HEIGHT,
-                     MENU_WIDTH, (menu->itemcnt+3)*FONT_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-
-    if(menu->hasframe) {
-        rb->lcd_drawrect((LCD_WIDTH-MENU_WIDTH)/2-1, firstline*FONT_HEIGHT-1,
-                         MENU_WIDTH+2, (menu->itemcnt+3)*FONT_HEIGHT+2);
-        rb->lcd_hline((LCD_WIDTH-MENU_WIDTH)/2-1,
-                      (LCD_WIDTH-MENU_WIDTH)/2-1+MENU_WIDTH+2,
-                      (firstline+1)*FONT_HEIGHT);
-    }
-
-    /* draw menu items */
-    rb->lcd_getstringsize(menu->title, &w, &h);
-    rb->lcd_putsxy((LCD_WIDTH-w)/2, firstline*FONT_HEIGHT, menu->title);
-
-    for(i=0; i<menu->itemcnt; i++) {
-        if(i == menu->selected) {
-            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        }
-        rb->lcd_putsxy((LCD_WIDTH-MENU_WIDTH)/2,
-                       (firstline+i+1+extraline)*FONT_HEIGHT,
-                       menu->items[i].text);
-        if(i == menu->selected) {
-            rb->lcd_set_drawmode(DRMODE_SOLID);
-        }
-    }
-
-    adj = (firstline == 0 ? 0 : 1);
-    rb->lcd_update_rect((LCD_WIDTH-MENU_WIDTH)/2-1, firstline*FONT_HEIGHT-adj,
-                        MENU_WIDTH+2, (menu->itemcnt+3)*FONT_HEIGHT+2*adj);
-    return MRES_NONE;
 }
 
 /*****************************************************************************
@@ -1457,18 +1337,36 @@ static void jewels_callback(void* param) {
 }
 
 /*****************************************************************************
+* jewels_displayscores() displays the high scores
+******************************************************************************/
+static char * scores_get_name(int selected_item, void * data,
+                             char * buffer, size_t buffer_len)
+{
+    struct game_context* bj = (struct game_context*)data;
+    rb->snprintf(buffer, buffer_len, "#%02d: %d",
+                  selected_item+1, bj->highscores[selected_item]);
+    return buffer;
+}
+static void jewels_displayscores(struct game_context* bj)
+{
+    struct simplelist_info info;
+    rb->simplelist_info_init(&info, "High Scores", NUM_SCORES, (void*)bj);
+    info.hide_selection = true;
+    info.get_name = scores_get_name;
+    rb->simplelist_show_list(&info);
+}
+
+
+/*****************************************************************************
 * jewels_main() is the main game subroutine, it returns the final game status.
 ******************************************************************************/
 static int jewels_main(struct game_context* bj) {
-    int i, j;
     int w, h;
     int button;
+    struct viewport vp[NB_SCREENS];
     char str[18];
-    bool startgame = false;
-    bool inmenu = false;
+    bool inmenu = true;
     bool selected = false;
-    enum menu_cmd cmd = MCMD_NONE;
-    enum menu_result res;
 
     /* the cursor coordinates */
     int x=0, y=0;
@@ -1479,67 +1377,47 @@ static int jewels_main(struct game_context* bj) {
     /********************
     *       menu        *
     ********************/
-    rb->lcd_clear_display();
+    MENUITEM_STRINGLIST(main_menu,"Jewels",NULL,
+                        "New Game", "Puzzle", "Resume Saved Game",
+                        "High Scores", "Help", "Quit");
+    FOR_NB_SCREENS(h)
+    {
+        rb->viewport_set_defaults(&vp[h], h);
+#if (LCD_DEPTH >= 16) || defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH >= 16)
+        if (rb->screens[h]->depth >= 16)
+        {
+            vp->bg_pattern = LCD_RGBPACK(49, 26, 26);
+            vp->fg_pattern = LCD_RGBPACK(210, 181, 181);
+        }
+#endif
+    }
 
-    while(!startgame) {
-        res = jewels_showmenu(&bjmenu[0], cmd);
-        cmd = MCMD_NONE;
+    while(inmenu) {
 
-        rb->snprintf(str, 18, "High Score: %d", bj->highscores[0]);
-        rb->lcd_getstringsize(str, &w, &h);
-        rb->lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT-8, str);
-        rb->lcd_update();
-
-        rb->yield();
-
-        switch(res) {
-            case MRES_NEW:
-                startgame = true;
+        switch (rb->do_menu(&main_menu, NULL, vp, true)) {
+            case 0:
+                inmenu = false;
                 bj->type = GAME_TYPE_NORMAL;
-                continue;
+                break;
 
-            case MRES_PUZZLE:
-                startgame = true;
+            case 1:
+                inmenu = false;
                 bj->type = GAME_TYPE_PUZZLE;
-                continue;
+                break;
 
-            case MRES_RESUME:
+            case 2:
                 if(!jewels_loadgame(bj)) {
                     rb->splash(HZ*2, "Nothing to resume");
-                    rb->lcd_clear_display();
                 } else {
-                    startgame = true;
+                    inmenu = false;
                 }
-                continue;
+                break;
 
-            case MRES_SCORES:
-                rb->lcd_clear_display();
+            case 3:
+                jewels_displayscores(bj);
+                break;
 
-                /* room for a title? */
-                j = 0;
-                if(LCD_HEIGHT-NUM_SCORES*8 >= 8) {
-                    rb->snprintf(str, 12, "%s", "High Scores");
-                    rb->lcd_getstringsize(str, &w, &h);
-                    rb->lcd_putsxy((LCD_WIDTH-w)/2, 0, str);
-                    j = 2;
-                }
-
-                /* print high scores */
-                for(i=0; i<NUM_SCORES; i++) {
-                    rb->snprintf(str, 11, "#%02d: %d", i+1, bj->highscores[i]);
-                    rb->lcd_puts(0, i+j, str);
-                }
-
-                rb->lcd_update();
-                while(true) {
-                    button = rb->button_get(true);
-                    if(button != BUTTON_NONE && !(button&BUTTON_REL)) break;
-                    rb->yield();
-                }
-                rb->lcd_clear_display();
-                continue;
-
-            case MRES_HELP:
+            case 4:
                 /* welcome screen to display key bindings */
                 rb->lcd_clear_display();
                 rb->snprintf(str, 5, "%s", "Help");
@@ -1694,54 +1572,17 @@ static int jewels_main(struct game_context* bj) {
                     if(button != BUTTON_NONE && !(button&BUTTON_REL)) break;
                 }
                 rb->lcd_clear_display();
-                continue;
+                break;
 
-            case MRES_QUIT:
+            case 5:
                 return BJ_QUIT;
+ 
+            case MENU_ATTACHED_USB:
+                jewels_callback(bj);
+                return BJ_USB;
 
             default:
-                break;
-        }
-
-        /* handle menu button presses */
-        button = rb->button_get(true);
-        switch(button){
-#ifdef JEWELS_SCROLLWHEEL
-            case JEWELS_PREV:
-            case (JEWELS_PREV|BUTTON_REPEAT):
-#endif
-            case JEWELS_UP:
-            case (JEWELS_UP|BUTTON_REPEAT):
-                cmd = MCMD_PREV;
-                break;
-
-#ifdef JEWELS_SCROLLWHEEL
-            case JEWELS_NEXT:
-            case (JEWELS_NEXT|BUTTON_REPEAT):
-#endif
-            case JEWELS_DOWN:
-            case (JEWELS_DOWN|BUTTON_REPEAT):
-                cmd = MCMD_NEXT;
-                break;
-
-            case JEWELS_SELECT:
-            case JEWELS_RIGHT:
-                cmd = MCMD_SELECT;
-                break;
-
-#ifdef JEWELS_CANCEL
-#ifdef JEWELS_RC_CANCEL
-            case JEWELS_RC_CANCEL:
-#endif
-            case JEWELS_CANCEL:
                 return BJ_QUIT;
-#endif
-
-            default:
-                if(rb->default_event_handler_ex(button, jewels_callback,
-                   (void*) bj) == SYS_USB_CONNECTED)
-                    return BJ_USB;
-                break;
         }
     }
 
@@ -1771,56 +1612,61 @@ static int jewels_main(struct game_context* bj) {
     /**********************
     *        play         *
     **********************/
+    MENUITEM_STRINGLIST(ingame_menu,"Menu",NULL,
+                        "Audio Playback", "Resume Game",
+                        "Save Game", "End Game", "Exit Jewels");
+
+    selected = false;
     while(true) {
-        int no_movesavail = false;
+        bool no_movesavail = false;
 
-        if(!inmenu) {
-            /* refresh the board */
-            jewels_drawboard(bj);
-
-            /* display the cursor */
-            if(selected) {
-                rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-                rb->lcd_fillrect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
-                                 TILE_WIDTH, TILE_HEIGHT);
-                rb->lcd_set_drawmode(DRMODE_SOLID);
-            } else {
-                rb->lcd_drawrect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
-                                 TILE_WIDTH, TILE_HEIGHT);
-            }
-            rb->lcd_update_rect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
-                                TILE_WIDTH, TILE_HEIGHT);
-        } else {
-            res = jewels_showmenu(&bjmenu[1], cmd);
-            cmd = MCMD_NONE;
-            switch(res) {
-                case MRES_RESUME:
-                    inmenu = false;
-                    selected = false;
-                    continue;
-
-                case MRES_PLAYBACK:
+        while(inmenu) {
+            switch (rb->do_menu(&ingame_menu, NULL, vp, true)) {
+                case 0:
                     playback_control(NULL);
-                    rb->lcd_setfont(FONT_SYSFIXED);
                     inmenu = false;
-                    selected = false;
                     break;
 
-                case MRES_SAVE:
+                case 1:
+                    inmenu = false;
+                    break;
+
+                case 2:
                     rb->splash(HZ, "Saving game...");
                     jewels_savegame(bj);
                     return BJ_END;
 
-                case MRES_QUIT:
+                case 3:
                     return BJ_END;
 
-                case MRES_EXIT:
+                case 4:
                     return BJ_QUIT_FROM_GAME;
 
+                case MENU_ATTACHED_USB:
+                    jewels_callback(bj);
+                    return BJ_USB;
+
                 default:
+                    inmenu = false;
                     break;
             }
         }
+
+        /* refresh the board */
+        jewels_drawboard(bj);
+
+        /* display the cursor */
+        if(selected) {
+            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+            rb->lcd_fillrect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
+                             TILE_WIDTH, TILE_HEIGHT);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
+        } else {
+            rb->lcd_drawrect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
+                             TILE_WIDTH, TILE_HEIGHT);
+        }
+        rb->lcd_update_rect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
+                            TILE_WIDTH, TILE_HEIGHT);
 
         /* handle game button presses */
         rb->yield();
@@ -1828,105 +1674,80 @@ static int jewels_main(struct game_context* bj) {
         switch(button){
             case JEWELS_LEFT:             /* move cursor left */
             case (JEWELS_LEFT|BUTTON_REPEAT):
-                if(!inmenu) {
-                    if(selected) {
-                        bj->score += jewels_swapjewels(bj, x, y, SWAP_LEFT);
-                        selected = false;
-                        if (!jewels_movesavail(bj)) no_movesavail = true;
-                    } else {
-                        x = (x+BJ_WIDTH-1)%BJ_WIDTH;
-                    }
+                if(selected) {
+                    bj->score += jewels_swapjewels(bj, x, y, SWAP_LEFT);
+                    selected = false;
+                    if (!jewels_movesavail(bj)) no_movesavail = true;
+                } else {
+                    x = (x+BJ_WIDTH-1)%BJ_WIDTH;
                 }
                 break;
 
             case JEWELS_RIGHT:            /* move cursor right */
             case (JEWELS_RIGHT|BUTTON_REPEAT):
-                if(!inmenu) {
-                    if(selected) {
-                        bj->score += jewels_swapjewels(bj, x, y, SWAP_RIGHT);
-                        selected = false;
-                        if (!jewels_movesavail(bj)) no_movesavail = true;
-                    } else {
-                        x = (x+1)%BJ_WIDTH;
-                    }
+                if(selected) {
+                    bj->score += jewels_swapjewels(bj, x, y, SWAP_RIGHT);
+                    selected = false;
+                    if (!jewels_movesavail(bj)) no_movesavail = true;
                 } else {
-                    cmd = MCMD_SELECT;
+                    x = (x+1)%BJ_WIDTH;
                 }
                 break;
 
             case JEWELS_DOWN:             /* move cursor down */
             case (JEWELS_DOWN|BUTTON_REPEAT):
-                if(!inmenu) {
-                    if(selected) {
-                        bj->score += jewels_swapjewels(bj, x, y, SWAP_DOWN);
-                        selected = false;
-                        if (!jewels_movesavail(bj)) no_movesavail = true;
-                    } else {
-                        y = (y+1)%(BJ_HEIGHT-1);
-                    }
+                if(selected) {
+                    bj->score += jewels_swapjewels(bj, x, y, SWAP_DOWN);
+                    selected = false;
+                    if (!jewels_movesavail(bj)) no_movesavail = true;
                 } else {
-                    cmd = MCMD_NEXT;
+                    y = (y+1)%(BJ_HEIGHT-1);
                 }
                 break;
 
             case JEWELS_UP:               /* move cursor up */
             case (JEWELS_UP|BUTTON_REPEAT):
-                if(!inmenu) {
-                    if(selected) {
-                        bj->score += jewels_swapjewels(bj, x, y, SWAP_UP);
-                        selected = false;
-                        if (!jewels_movesavail(bj)) no_movesavail = true;
-                    } else {
-                        y = (y+(BJ_HEIGHT-1)-1)%(BJ_HEIGHT-1);
-                    }
+                if(selected) {
+                    bj->score += jewels_swapjewels(bj, x, y, SWAP_UP);
+                    selected = false;
+                    if (!jewels_movesavail(bj)) no_movesavail = true;
                 } else {
-                    cmd = MCMD_PREV;
+                    y = (y+(BJ_HEIGHT-1)-1)%(BJ_HEIGHT-1);
                 }
                 break;
 
 #ifdef JEWELS_SCROLLWHEEL
             case JEWELS_PREV:             /* scroll backwards */
             case (JEWELS_PREV|BUTTON_REPEAT):
-                if(!inmenu) {
-                    if(!selected) {
-                        if(x == 0) {
-                            y = (y+(BJ_HEIGHT-1)-1)%(BJ_HEIGHT-1);
-                        }
-                        x = (x+BJ_WIDTH-1)%BJ_WIDTH;
+                if(!selected) {
+                    if(x == 0) {
+                        y = (y+(BJ_HEIGHT-1)-1)%(BJ_HEIGHT-1);
                     }
-                } else {
-                    cmd = MCMD_PREV;
+                    x = (x+BJ_WIDTH-1)%BJ_WIDTH;
                 }
                 break;
 
             case JEWELS_NEXT:             /* scroll forwards */
             case (JEWELS_NEXT|BUTTON_REPEAT):
-                if(!inmenu) {
-                    if(!selected) {
-                        if(x == BJ_WIDTH-1) {
-                            y = (y+1)%(BJ_HEIGHT-1);
-                        }
-                        x = (x+1)%BJ_WIDTH;
+                if(!selected) {
+                    if(x == BJ_WIDTH-1) {
+                        y = (y+1)%(BJ_HEIGHT-1);
                     }
-                } else {
-                    cmd = MCMD_NEXT;
+                    x = (x+1)%BJ_WIDTH;
                 }
                 break;
 #endif
 
             case JEWELS_SELECT:           /* toggle selected */
-                if(!inmenu) {
-                    selected = !selected;
-                } else {
-                    cmd = MCMD_SELECT;
-                }
+                selected = !selected;
                 break;
 
 #ifdef JEWELS_MENU
             case JEWELS_MENU:
 #endif
             case (JEWELS_SELECT|BUTTON_REPEAT): /* show menu */
-                if(!inmenu) inmenu = true;
+                inmenu = true;
+                selected = false;
                 break;
 
 #ifdef JEWELS_CANCEL

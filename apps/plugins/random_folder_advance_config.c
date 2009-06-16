@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "lib/oldmenuapi.h"
 
 PLUGIN_HEADER
 
@@ -321,15 +320,11 @@ int edit_list(void)
                 break;
             case ACTION_STD_CONTEXT:
             {
-                int m, len;
-                static const struct menu_item items[] = {
-                    { "Remove Folder", NULL },
-                    { "Remove Folder Tree", NULL },
-                };
-                m = menu_init(items, sizeof(items) / sizeof(*items),
-                                  NULL, NULL, NULL, NULL);
+                int len;
+                MENUITEM_STRINGLIST(menu, "Remove Menu", NULL,
+                                    "Remove Folder", "Remove Folder Tree");
 
-                switch (menu_show(m))
+                switch (rb->do_menu(&menu, NULL, NULL, false))
                 {
                     case 0:
                         list->folder[selection][0] = ' ';
@@ -351,20 +346,14 @@ int edit_list(void)
                     }
                     break;
                 }
-                menu_exit(m);
             }
             break;
             case ACTION_STD_CANCEL:
             {
-                int m;
-                static const struct menu_item items[] = {
-                    { "Save and Exit", NULL },
-                    { "Ignore Changes and Exit", NULL },
-                };
-                m = menu_init(items, sizeof(items) / sizeof(*items),
-                                  NULL, NULL, NULL, NULL);
+                MENUITEM_STRINGLIST(menu, "Exit Menu", NULL,
+                                    "Save and Exit", "Ignore Changes and Exit");
 
-                switch (menu_show(m))
+                switch (rb->do_menu(&menu, NULL, NULL, false))
                 {
                     case 0:
                         save_list();
@@ -372,7 +361,6 @@ int edit_list(void)
                         exit = true;
                         ret = -2;
                 }
-                menu_exit(m);
             }
             break;
         }
@@ -474,19 +462,16 @@ int import_list_from_file_text(void)
 
 int main_menu(void)
 {
-    int m;
     bool exit = false;
-    static const struct menu_item items[] = {
-        { "Generate Folder List", NULL },
-        { "Edit Folder List", NULL },
-        { "Export List To Textfile", NULL },
-        { "Import List From Textfile", NULL },
-        { "Quit", NULL },
-    };
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
 
-    switch (menu_show(m))
+    MENUITEM_STRINGLIST(menu, "Main Menu", NULL,
+                        "Generate Folder List",
+                        "Edit Folder List",
+                        "Export List To Textfile",
+                        "Import List From Textfile",
+                        "Quit");
+
+    switch (rb->do_menu(&menu, NULL, NULL, false))
     {
         case 0: /* generate */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -542,10 +527,8 @@ int main_menu(void)
             rb->backlight_on();
             break;
         case 4:
-            menu_exit(m);
             return 1;
     }
-    menu_exit(m);
     return exit?1:0;
 }
 

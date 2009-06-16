@@ -1498,7 +1498,7 @@ static void button_loop(void)
         mpeg_menu_sysevent_clear();
         button = rb->button_get_w_tmo(WVS_MIN_UPDATE_INTERVAL);
 
-        button = mpeg_menu_sysevent_callback(button, -1);
+        button = mpeg_menu_sysevent_callback(button, NULL);
 
         switch (button)
         {

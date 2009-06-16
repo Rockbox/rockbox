@@ -39,7 +39,6 @@
 #include "i_system.h"
 #include "hu_stuff.h"
 #include "st_stuff.h"
-#include "lib/oldmenuapi.h"
 #include "lib/helper.h"
 
 PLUGIN_HEADER
@@ -217,8 +216,8 @@ const unsigned char wads_builtin[7][30] =
 };
 
 int namemap[7];
-static struct menu_item *addons;
-static struct menu_item *demolmp;
+static char **addons;
+static char **demolmp;
 char addon[200];
 // This sets up the base game and builds up myargv/c
 bool Dhandle_ver (int dver)
@@ -274,14 +273,14 @@ bool Dhandle_ver (int dver)
 
    if(argvlist.addonnum)
    {
-      snprintf(addon,sizeof(addon),"%s%s", GAMEBASE"addons/", addons[argvlist.addonnum].desc);
+      snprintf(addon,sizeof(addon),"%s%s", GAMEBASE"addons/", addons[argvlist.addonnum]);
       D_AddFile(addon,source_pwad);
       modifiedgame = true; 
    }
 
    if(argvlist.demonum)
    {
-      snprintf(addon, sizeof(addon),"%s%s", GAMEBASE"demos/", demolmp[argvlist.demonum].desc);
+      snprintf(addon, sizeof(addon),"%s%s", GAMEBASE"demos/", demolmp[argvlist.demonum]);
       D_AddFile(addon, source_lmp);
       G_DeferedPlayDemo(addon);
       singledemo = true;          // quit after one demo
@@ -323,21 +322,20 @@ int Dbuild_base (struct opt_items *names)
 
 // This is a general function that takes in a menu_item structure and makes a list
 // of files within it based on matching the string stringmatch to the files.
-int Dbuild_filelistm(struct menu_item **names, char *firstentry, char *directory, char *stringmatch)
+int Dbuild_filelistm(char ***names, char *firstentry, char *directory, char *stringmatch)
 {
    int            i=0;
    DIR            *filedir;
    struct dirent  *dptr;
    char           *startpt;
-   struct menu_item *temp;
+   char           **temp;
 
    filedir=rb->opendir(directory);
 
    if(filedir==NULL)
    {
-      temp=malloc(sizeof(struct menu_item));
-      temp[0].desc=firstentry;
-      temp[0].function=0;
+      temp=malloc(sizeof(char *));
+      temp[0]=firstentry;
       *names=temp;
       return 1;
    }
@@ -351,9 +349,8 @@ int Dbuild_filelistm(struct menu_item **names, char *firstentry, char *directory
    filedir=rb->opendir(directory);
 
    i++;
-   temp=malloc(i*sizeof(struct menu_item));
-   temp[0].desc=firstentry;
-   temp[0].function=0;
+   temp=malloc(i*sizeof(char *));
+   temp[0]=firstentry;
    i=1;
 
    while((dptr=rb->readdir(filedir)))
@@ -362,8 +359,7 @@ int Dbuild_filelistm(struct menu_item **names, char *firstentry, char *directory
       {
          startpt=malloc(strlen(dptr->d_name)*sizeof(char));
          strcpy(startpt,dptr->d_name);
-         temp[i].desc=startpt;
-         temp[i].function=0;
+         temp[i]=startpt;
          i++;
       }
    }
@@ -444,7 +440,7 @@ static int translatekey(int key)
 
 int Oset_keys()
 {
-   int m, result;
+   int selected=0, result;
    int menuquit=0;
 
 
@@ -483,35 +479,23 @@ int Oset_keys()
 
    int numdoomkeys=sizeof(doomkeys) / sizeof(*doomkeys);
 
-   static const struct menu_item items[] = {
-      { "Game Right", NULL },
-      { "Game Left", NULL },
-      { "Game Up", NULL },
-      { "Game Down", NULL },
-      { "Game Shoot", NULL },
-      { "Game Open", NULL },
-      { "Game Strafe", NULL },
-      { "Game Weapon", NULL },
-      { "Game Automap", NULL },
-   };
-
-   m = menu_init(items, sizeof(items) / sizeof(*items),
-                NULL, NULL, NULL, NULL);
+    MENUITEM_STRINGLIST(menu, "Set Keys", NULL,
+                        "Game Right", "Game Left", "Game Up", "Game Down",
+                        "Game Shoot", "Game Open", "Game Strafe",
+                        "Game Weapon", "Game Automap");
 
     while(!menuquit)
     {
-        result=menu_show(m);
+        result = rb->do_menu(&menu, &selected, NULL, false);
         if(result<0)
             menuquit=1;
         else
         {
             *keys[result]=translatekey(*keys[result]);
-            rb->set_option(items[result].desc, keys[result], INT, doomkeys, numdoomkeys, NULL );
+            rb->set_option(menu_[result], keys[result], INT, doomkeys, numdoomkeys, NULL );
             *keys[result]=translatekey(*keys[result]);
         }
    }
-
-   menu_exit(m);
 
    return (1);
 }
@@ -525,24 +509,17 @@ static bool Doptions()
       { "On", -1 },
    };
 
-   int m, result;
+   int selected=0, result;
    int menuquit=0;
 
-   static const struct menu_item items[] = {
-      { "Set Keys", NULL },
-      { "Sound", NULL },
-      { "Timedemo", NULL },
-      { "Player Bobbing", NULL },
-      { "Weapon Recoil", NULL },
-      { "Translucency", NULL },
-      { "Fake Contrast", NULL },
-      { "Always Run", NULL },
-      { "Headsup Display", NULL },
-      { "Statusbar Always Red", NULL },
+    MENUITEM_STRINGLIST(menu, "Options", NULL,
+                        "Set Keys", "Sound", "Timedemo", "Player Bobbing",
+                        "Weapon Recoil", "Translucency", "Fake Contrast",
+                        "Always Run", "Headsup Display", "Statusbar Always Red",
 #if(LCD_HEIGHT>LCD_WIDTH)
-      { "Rotate Screen 90 deg", NULL },
+                        "Rotate Screen 90 deg",
 #endif
-   };
+                        );
    
    void *options[]={
         &enable_sound,
@@ -559,36 +536,48 @@ static bool Doptions()
 #endif
     };
 
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-        NULL, NULL, NULL, NULL);
-
     while(!menuquit)
     {
-        result=menu_show(m);
+        result = rb->do_menu(&menu, &selected, NULL, false);
         if(result==0) 
             Oset_keys();
         else if (result > 0)
-            rb->set_option(items[result].desc, options[result-1], INT, onoff, 2, NULL );
+            rb->set_option(menu_[result], options[result-1], INT, onoff, 2, NULL );
         else
             menuquit=1;
     }
 
-    menu_exit(m);
-
     return (1);
 }
 
-int menuchoice(struct menu_item *menu, int items)
+char* choice_get_name(int selected_item, void * data,
+                     char * buffer, size_t buffer_len)
 {
-   int m, result;
-   
-   m = menu_init(menu, items,NULL, NULL, NULL, NULL);
+    char **names = (char **) data;
+    (void) buffer;
+    (void) buffer_len;
+    return names[selected_item];
+}
+int list_action_callback(int action, struct gui_synclist *lists)
+{
+    (void) lists;
+    if (action == ACTION_STD_OK)
+        return ACTION_STD_CANCEL;
+    return action;
+}
+bool menuchoice(char **names, int count, int *selected)
+{
+   struct simplelist_info info;
+   rb->simplelist_info_init(&info, NULL, count, (void*)names);
+   info.selection = *selected;
+   info.get_name = choice_get_name;
+   info.action_callback = list_action_callback;
+   if(rb->simplelist_show_list(&info))
+      return true;
 
-   result= menu_show(m);
-   menu_exit(m);
-   if(result<items && result>=0)
-      return result;
-   return 0;
+   if(info.selection<count && info.selection>=0)
+      *selected = info.selection;
+   return false;
 }
 
 //
@@ -596,22 +585,16 @@ int menuchoice(struct menu_item *menu, int items)
 //
 int doom_menu()
 {
-   int m;
-   int result;
+   int selected=0, result;
    int status;
    int gamever;
    bool menuquit=0;
 
    static struct opt_items names[7];
 
-   static const struct menu_item items[] = {
-      { "Game", NULL },
-      { "Addons", NULL },
-      { "Demos", NULL },
-      { "Options", NULL },
-      { "Play Game", NULL },
-      { "Quit", NULL },
-   };
+   MENUITEM_STRINGLIST(menu, "Doom Menu", NULL,
+                       "Game", "Addons", "Demos",
+                       "Options", "Play Game", "Quit");
 
    if( (status=Dbuild_base(names)) == 0 ) // Build up the base wad files (select last added file)
    {
@@ -632,23 +615,20 @@ int doom_menu()
     while (rb->button_get(false) != BUTTON_NONE) 
         rb->yield();
 
-   m = menu_init(items, sizeof(items) / sizeof(*items),
-                NULL, NULL, NULL, NULL);
-
    while(!menuquit)
    {
-      result=menu_show(m);
+      result = rb->do_menu(&menu, &selected, NULL, false);
       switch (result) {
          case 0: /* Game picker */
             rb->set_option("Game WAD", &gamever, INT, names, status, NULL );
             break;
 
          case 1: /* Addon picker */
-            argvlist.addonnum=menuchoice(addons,numadd);
+            menuchoice(addons,numadd,&argvlist.addonnum);
             break;
 
          case 2: /* Demos */
-            argvlist.demonum=menuchoice(demolmp,numdemos);
+            menuchoice(demolmp,numdemos,&argvlist.demonum);
             break;
 
          case 3: /* Options */
@@ -668,8 +648,6 @@ int doom_menu()
             break;
       }
    }
-
-   menu_exit(m);
 
    return (gamever);
 }

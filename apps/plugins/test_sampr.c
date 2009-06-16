@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "lib/oldmenuapi.h"
 
 /* This plugin generates a 1kHz tone + noise in order to quickly verify
  * hardware samplerate setup is operating correctly.
@@ -285,32 +284,23 @@ enum plugin_status plugin_start(const void *parameter)
         MENU_QUIT,
     };
 
-    static const struct menu_item items[] =
-    {
+    MENUITEM_STRINGLIST(menu, "Test Sampr Menu", NULL,
 #ifndef HAVE_VOLUME_IN_LIST
-        [MENU_VOL_SET] =
-            { "Set Volume",     NULL },
+                        "Set Volume",
 #endif /* HAVE_VOLUME_IN_LIST */
-        [MENU_SAMPR_SET] =
-            { "Set Samplerate", NULL },
-        [MENU_QUIT] =
-            { "Quit",           NULL },
-    };
+                        "Set Samplerate", "Quit");
 
     bool exit = false;
-    int m;
+    int selected = 0;
 
     /* Disable all talking before initializing IRAM */
     rb->talk_disable(true);
 
     PLUGIN_IRAM_INIT(rb);
 
-    m = menu_init(items, ARRAYLEN(items),
-                      NULL, NULL, NULL, NULL);
-
     while (!exit)
     {
-        int result = menu_show(m);
+        int result = rb->do_menu(&menu, &selected, NULL, false);
 
         switch (result)
         {
@@ -328,8 +318,6 @@ enum plugin_status plugin_start(const void *parameter)
             break;
         }
     }
-
-    menu_exit(m);
 
     rb->talk_disable(false);
 

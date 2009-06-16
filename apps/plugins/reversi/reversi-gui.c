@@ -47,7 +47,6 @@ further options:
 #include "reversi-strategy.h"
 #include "reversi-gui.h"
 
-#include "lib/oldmenuapi.h"
 #include "lib/playback_control.h"
 
 PLUGIN_HEADER
@@ -375,23 +374,15 @@ static bool reversi_gui_choose_strategy(
 
 /* Returns true iff USB ws connected while in the menu */
 static bool reversi_gui_menu(void) {
-    int m, index, num_items, i;
+    int index, num_items, i;
     int result;
 
-    static const struct menu_item items[] = {
-        { "Start new game", NULL },
-        { "Pass the move", NULL },
-        { MENU_TEXT_STRAT_BLACK, NULL },
-        { MENU_TEXT_STRAT_WHITE, NULL },
-        { MENU_TEXT_WRAP_MODE, NULL },
-        { "Playback Control", NULL },
-        { "Quit", NULL },
-    };
+    MENUITEM_STRINGLIST(menu, "Reversi Menu", NULL,
+                        "Start new game", "Pass the move",
+                        MENU_TEXT_STRAT_BLACK, MENU_TEXT_STRAT_WHITE,
+                        MENU_TEXT_WRAP_MODE, "Playback Control", "Quit");
 
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
-
-    result = menu_show(m);
+    result = rb->do_menu(&menu, NULL, NULL, false);
 
     switch (result) {
         case 0: /* Start a new game */
@@ -432,8 +423,6 @@ static bool reversi_gui_menu(void) {
             quit_plugin = true;
             break;
     }
-
-    menu_exit(m);
 
     return (result == MENU_ATTACHED_USB);
 }

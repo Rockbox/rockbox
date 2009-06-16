@@ -27,7 +27,6 @@
 
 #include "plugin.h"
 #include <lib/playback_control.h>
-#include <lib/oldmenuapi.h>
 #include <lib/helper.h>
 #include <lib/configfile.h>
 
@@ -323,17 +322,16 @@ bool set_option_dithering(void)
     return false;
 }
 
+MENUITEM_FUNCTION(grayscale_item, 0, "Greyscale",
+                  set_option_grayscale, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(dithering_item, 0, "Dithering",
+                  set_option_dithering, NULL, NULL, Icon_NOICON);
+MAKE_MENU(display_menu, "Display Options", NULL, Icon_NOICON,
+            &grayscale_item, &dithering_item);
+
 static void display_options(void)
 {
-    static const struct menu_item items[] = {
-        { "Greyscale", set_option_grayscale },
-        { "Dithering", set_option_dithering },
-    };
-
-    int m = menu_init(items, ARRAYLEN(items),
-                          NULL, NULL, NULL, NULL);
-    menu_run(m);
-    menu_exit(m);
+    rb->do_menu(&display_menu, NULL, NULL, false);
 }
 #endif /* HAVE_LCD_COLOR */
 
@@ -349,12 +347,11 @@ int show_menu(void) /* return 1 to quit */
     rb->lcd_set_background(LCD_WHITE);
 #endif
 #endif
-    int m;
     int result;
 
     enum menu_id
     {
-        MIID_QUIT = 0,
+        MIID_RETURN = 0,
         MIID_TOGGLE_SS_MODE,
         MIID_CHANGE_SS_MODE,
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
@@ -363,42 +360,30 @@ int show_menu(void) /* return 1 to quit */
 #ifdef HAVE_LCD_COLOR
         MIID_DISPLAY_OPTIONS,
 #endif
-        MIID_RETURN,
+        MIID_QUIT,
     };
 
-    static const struct menu_item items[] = {
-        [MIID_QUIT] =
-            { "Quit", NULL },
-        [MIID_TOGGLE_SS_MODE] =
-            { "Toggle Slideshow Mode", NULL },
-        [MIID_CHANGE_SS_MODE] =
-            { "Change Slideshow Time", NULL },
+    MENUITEM_STRINGLIST(menu, "Jpeg Menu", NULL,
+                        "Return", "Toggle Slideshow Mode",
+                        "Change Slideshow Time",
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
-        [MIID_SHOW_PLAYBACK_MENU] =
-            { "Show Playback Menu", NULL },
+                        "Show Playback Menu",
 #endif
 #ifdef HAVE_LCD_COLOR
-        [MIID_DISPLAY_OPTIONS] =
-            { "Display Options", NULL },
+                        "Display Options",
 #endif
-        [MIID_RETURN] =
-            { "Return", NULL },
-    };
+                        "Quit");
 
     static const struct opt_items slideshow[2] = {
         { "Disable", -1 },
         { "Enable", -1 },
     };
 
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
-    result=menu_show(m);
+    result=rb->do_menu(&menu, NULL, NULL, false);
 
     switch (result)
     {
-        case MIID_QUIT:
-            menu_exit(m);
-            return 1;
+        case MIID_RETURN:
             break;
         case MIID_TOGGLE_SS_MODE:
             rb->set_option("Toggle Slideshow", &slideshow_enabled, INT,
@@ -427,7 +412,8 @@ int show_menu(void) /* return 1 to quit */
             display_options();
             break;
 #endif
-        case MIID_RETURN:
+        case MIID_QUIT:
+            return 1;
             break;
     }
 
@@ -456,7 +442,6 @@ int show_menu(void) /* return 1 to quit */
     rb->lcd_set_background(LCD_BLACK);
 #endif
     rb->lcd_clear_display();
-    menu_exit(m);
     return 0;
 }
 

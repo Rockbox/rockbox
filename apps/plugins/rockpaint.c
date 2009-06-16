@@ -516,89 +516,46 @@ static void buffer_putsxyofs( fb_data *buf, int buf_width, int buf_height,
 /***********************************************************************
  * Menu handling
  ***********************************************************************/
-struct menu_items
-{
-    int value;
-    char label[16]; /* GRUIK ? */
-};
-
-#define MENU_ESC -1242
 enum {
-        /* Generic menu items */
-        MENU_END = -42, MENU_TITLE = -12,
         /* Main menu */
         MAIN_MENU_RESUME,
         MAIN_MENU_NEW, MAIN_MENU_LOAD, MAIN_MENU_SAVE,
         MAIN_MENU_BRUSH_SIZE, MAIN_MENU_BRUSH_SPEED, MAIN_MENU_COLOR,
         MAIN_MENU_GRID_SIZE,
         MAIN_MENU_EXIT,
+     };
+enum {
         /* Select action menu */
         SELECT_MENU_CUT, SELECT_MENU_COPY, SELECT_MENU_INVERT,
         SELECT_MENU_HFLIP, SELECT_MENU_VFLIP, SELECT_MENU_ROTATE90,
         SELECT_MENU_ROTATE180, SELECT_MENU_ROTATE270,
         SELECT_MENU_CANCEL,
+     };
+enum {
         /* Text menu */
         TEXT_MENU_TEXT, TEXT_MENU_FONT,
         TEXT_MENU_PREVIEW, TEXT_MENU_APPLY, TEXT_MENU_CANCEL,
      };
 
-static struct menu_items main_menu[]=
-    { { MENU_TITLE, "RockPaint" },
-      { MAIN_MENU_RESUME, "Resume" },
-      { MAIN_MENU_NEW, "New" },
-      { MAIN_MENU_LOAD, "Load" },
-      { MAIN_MENU_SAVE, "Save" },
-      { MAIN_MENU_BRUSH_SIZE, "Brush Size" },
-      { MAIN_MENU_BRUSH_SPEED, "Brush Speed" },
-      { MAIN_MENU_COLOR, "Choose Color" },
-      { MAIN_MENU_GRID_SIZE, "Grid Size" },
-      { MAIN_MENU_EXIT, "Exit" },
-      { MENU_END, "" } };
-
-static struct menu_items size_menu[] =
-    { { MENU_TITLE, "Choose Size" },
-      {  1, "1x" },
-      {  2, "2x" },
-      {  4, "4x" },
-      {  8, "8x" },
-      { MENU_END, "" } };
-
-static struct menu_items speed_menu[] =
-    { { MENU_TITLE, "Choose Speed" },
-      {  1, "1x" },
-      {  2, "2x" },
-      {  4, "4x" },
-      { MENU_END, "" } };
-
-static struct menu_items gridsize_menu[] =
-    { { MENU_TITLE, "Grid Size" },
-      { 0, "No grid" },
-      { 5, "5px" },
-      { 10, "10px" },
-      { 20, "20px" },
-      { MENU_END, "" } };
-
-static struct menu_items select_menu[] =
-    { { MENU_TITLE, "Select..." },
-      { SELECT_MENU_CUT, "Cut" },
-      { SELECT_MENU_COPY, "Copy" },
-      { SELECT_MENU_INVERT, "Invert" },
-      { SELECT_MENU_HFLIP, "Horizontal flip" },
-      { SELECT_MENU_VFLIP, "Vertical flip" },
-//      { SELECT_MENU_ROTATE90, "Rotate 90°" },
-      { SELECT_MENU_ROTATE180, "Rotate 180°" },
-//      { SELECT_MENU_ROTATE270, "Rotate 270°" },
-      { SELECT_MENU_CANCEL, "Cancel" },
-      { MENU_END, "" } };
-
-static struct menu_items text_menu[] =
-    { { MENU_TITLE, "Text" },
-      { TEXT_MENU_TEXT, "Set text" },
-      { TEXT_MENU_FONT, "Change font" },
-      { TEXT_MENU_PREVIEW, "Preview" },
-      { TEXT_MENU_APPLY, "Apply" },
-      { TEXT_MENU_CANCEL, "Cancel" },
-      { MENU_END, "" } };
+MENUITEM_STRINGLIST(main_menu, "RockPaint", NULL,
+                    "Resume", "New", "Load", "Save",
+                    "Brush Size", "Brush Speed",
+                    "Choose Color", "Grid Size", "Exit");
+MENUITEM_STRINGLIST(size_menu, "Choose Size", NULL,
+                    "1x", "2x","4x", "8x");
+MENUITEM_STRINGLIST(speed_menu, "Choose Speed", NULL,
+                    "1x", "2x","4x");
+MENUITEM_STRINGLIST(gridsize_menu, "Grid Size", NULL,
+                    "No grid", "5px", "10px", "20px");
+MENUITEM_STRINGLIST(select_menu, "Select...", NULL,
+                    "Cut", "Copy", "Invert", "Horizontal Flip" ,
+                    "Vertical Flip", "Rotate 90°",
+                    "Rotate 180°", "Rotate 270°", "Cancel");
+MENUITEM_STRINGLIST(text_menu, "Text", NULL,
+                    "Set Text", "Change Font",
+                    "Preview", "Apply", "Cancel");
+static const int times_list[] = { 1, 2, 4, 8 };
+static const int gridsize_list[] = { 0, 5, 10, 20 };
 
 static int draw_window( int height, int width,
                          int *top, int *left,
@@ -624,143 +581,37 @@ static int draw_window( int height, int width,
     return _top+fh+4;
 }
 
-static int menu_display( struct menu_items menu[], int prev_value )
-{
-    int i,
-        fh, /* font height */
-        width, height,
-        a, b,
-        selection=1,
-        menu_length,
-        top, left;
-    int scroll = 0, onscreen = 0;
-
-    rb->lcd_getstringsize( menu[0].label, &width, &fh );
-    for( i=1; menu[i].value != MENU_END; i++ )
-    {
-        if( prev_value == menu[i].value )
-        {
-            selection = i;
-        }
-        rb->lcd_getstringsize( menu[i].label, &a, &b );
-        if( a > width ) width = a;
-        if( b > fh ) fh = b;
-    }
-    menu_length = i;
-    fh++;
-    width += 10;
-
-    height = menu_length * fh + 4 + 2 + 2;
-    if( height >= LCD_HEIGHT )
-    {
-        scroll = 1;
-        onscreen = ( LCD_HEIGHT - 4 - 2 - 2 )/fh;
-        height = onscreen * fh + 4 + 2 + 2;
-        width += 5;
-    }
-    else
-    {
-        onscreen = menu_length;
-    }
-
-    draw_window( height, width, &top, &left, menu[0].label );
-
-    while( 1 )
-    {
-        for( i = (scroll == 0 ? 1 : scroll);
-             i < (scroll ? scroll + onscreen - 1:onscreen);
-             i++ )
-        {
-            if( i == selection )
-            {
-                rb->lcd_set_foreground( COLOR_WHITE );
-                rb->lcd_set_background( COLOR_BLUE );
-            }
-            else
-            {
-                rb->lcd_set_foreground( COLOR_BLACK );
-                rb->lcd_set_background( COLOR_LIGHTGRAY );
-            }
-            rb->lcd_putsxy( left+2,
-                            top+6+fh*(i-(scroll == 0 ? 0 : scroll-1 )),
-                            menu[i].label );
-        }
-        if( scroll )
-        {
-            int scroll_height = ((height-fh-4-2)*onscreen)/menu_length;
-            rb->lcd_set_foreground( COLOR_BLACK );
-            rb->lcd_vline( left+width-5, top+fh+4, top+height-2 );
-            rb->lcd_fillrect( left+width-4,
-  top+fh+4+((height-4-2-fh-scroll_height)*(scroll-1))/(menu_length-onscreen),
-                              3, scroll_height );
-        }
-        rb->lcd_update();
-
-        switch( rb->button_get(true) )
-        {
-            case ROCKPAINT_UP:
-            case ROCKPAINT_UP|BUTTON_REPEAT:
-                selection = (selection + menu_length-1)%menu_length;
-                if( !selection ) selection = menu_length-1;
-                break;
-
-            case ROCKPAINT_DOWN:
-            case ROCKPAINT_DOWN|BUTTON_REPEAT:
-                selection = (selection + 1)%menu_length;
-                if( !selection ) selection++;
-                break;
-
-            case ROCKPAINT_LEFT:
-                restore_screen();
-                return MENU_ESC;
-
-            case ROCKPAINT_RIGHT:
-            case ROCKPAINT_DRAW:
-                restore_screen();
-                return menu[selection].value;
-        }
-        if( scroll )
-        {
-            if( selection < scroll )
-            {
-                scroll = selection;
-                draw_window( height, width, NULL, NULL, menu[0].label );
-            }
-            if( selection >= scroll + onscreen - 1 )
-            {
-                scroll++;
-                draw_window( height, width, NULL, NULL, menu[0].label );
-            }
-        }
-    }
-}
-
 /***********************************************************************
  * File browser
  ***********************************************************************/
 
 char bbuf[MAX_PATH+1]; /* used by file and font browsers */
 char bbuf_s[MAX_PATH+1]; /* used by file and font browsers */
+struct tree_context *tree = NULL;
+
+static char * browse_get_name_cb( int selected_item, void *data,
+                                  char *buffer, size_t buffer_len )
+{
+    int *indexes = (int *) data;
+    struct entry* dc = tree->dircache;
+    struct entry* e = &dc[indexes[selected_item]];
+    (void) buffer;
+    (void) buffer_len;
+
+    return (e->name);
+}
 
 static bool browse( char *dst, int dst_size, const char *start )
 {
-#define WIDTH ( LCD_WIDTH - 20 )
-#define HEIGHT ( LCD_HEIGHT - 20 )
-#define LINE_SPACE 2
-    int top, top_inside, left;
+    struct gui_synclist browse_list;
+    int item_count, selected, button;
+    struct tree_context backup;
+    struct entry *dc;
+    bool reload = true;
+    int dirfilter = SHOW_ALL;
+    int *indexes = (int *) buffer.clipboard;
 
-    DIR *d;
-    struct dirent *de;
-    int fvi = 0; /* first visible item */
-    int lvi = 0; /* last visible item */
-    int si = 0; /* selected item */
-    int li = 0; /* last item */
-    int i;
-
-    int fh;
     char *a;
-
-    rb->lcd_getstringsize( "Ap", NULL, &fh );
 
     rb->strcpy( bbuf, start );
     a = bbuf+rb->strlen(bbuf)-1;
@@ -769,124 +620,106 @@ static bool browse( char *dst, int dst_size, const char *start )
         a[1] = '/';
         a[2] = '\0';
     }
+    bbuf_s[0] = '\0';
 
+    rb->gui_synclist_init( &browse_list, browse_get_name_cb,
+                            (void*) indexes, false, 1, NULL );
+
+    tree = rb->tree_get_context();
+    backup = *tree;
+    dc = tree->dircache;
+    a = backup.currdir+rb->strlen(backup.currdir)-1;
+    if( *a != '/' )
+    {
+        *++a = '/';
+        *++a = '\0';
+    }
+    rb->strcpy( a, dc[tree->selected_item].name );
+    tree->dirfilter = &dirfilter;
     while( 1 )
     {
-        d = rb->opendir( bbuf );
-        if( !d )
+        if( reload )
         {
-            /*
-            if( errno == ENOTDIR )
-            {*/
-                /* this is a file */
-                bbuf[rb->strlen(bbuf)-1] = '\0';
-                rb->strncpy( dst, bbuf, dst_size );
-                return true;
-            /*}
-            else if( errno == EACCES || errno == ENOENT )
+            int i;
+            rb->set_current_file(bbuf);
+            item_count = 0;
+            selected = 0;
+            for( i = 0; i < tree->filesindir ; i++)
             {
-                bbuf[0] = '/'; bbuf[1] = '\0';
-                d = rb->opendir( "/" );
-            }
-            else
-            {
-                return false;
-            }*/
-        }
-        top_inside = draw_window( HEIGHT, WIDTH, &top, &left, bbuf );
-        i = 0;
-        li = -1;
-        while( i < fvi )
-        {
-            rb->readdir( d );
-            i++;
-        }
-        while( top_inside+(i-fvi)*(fh+LINE_SPACE) < HEIGHT )
-        {
-            de = rb->readdir( d );
-            if( !de )
-            {
-                li = i-1;
-                break;
-            }
-            rb->lcd_set_foreground((si==i?COLOR_WHITE:COLOR_BLACK));
-            rb->lcd_set_background((si==i?COLOR_BLUE:COLOR_LIGHTGRAY));
-            rb->lcd_putsxy( left+10,
-                            top_inside+(i-fvi)*(fh+LINE_SPACE),
-                            de->d_name );
-            if( si == i )
-                rb->strcpy( bbuf_s, de->d_name );
-            i++;
-        }
-        lvi = i-1;
-        if( li == -1 )
-        {
-            if( !rb->readdir( d ) )
-            {
-                li = lvi;
-            }
-        }
-        rb->closedir( d );
-
-        rb->lcd_update();
-
-        switch( rb->button_get(true) )
-        {
-            case ROCKPAINT_UP:
-            case ROCKPAINT_UP|BUTTON_REPEAT:
-                if( si > 0 )
+                /* only displayes directories and .bmp files */
+                if( ((dc[i].attr & ATTR_DIRECTORY ) &&
+                      rb->strcmp( dc[i].name, "." ) &&
+                      rb->strcmp( dc[i].name, ".." )) ||
+                    ( !(dc[i].attr & ATTR_DIRECTORY) &&
+                      (a = rb->strrchr( dc[i].name,'.' )) &&
+                      !rb->strcmp( a, ".bmp" ) ))
                 {
-                    si--;
-                    if( si<fvi )
+                    if( !rb->strcmp( dc[i].name, bbuf_s ) )
+                        selected = item_count;
+                    indexes[item_count++] = i;
+                }
+            }
+
+            rb->gui_synclist_set_nb_items(&browse_list,item_count);
+            rb->gui_synclist_select_item(&browse_list, selected);
+            rb->gui_synclist_set_title(&browse_list, bbuf, NOICON);
+            rb->gui_synclist_draw(&browse_list);
+            reload = false;
+        }
+        button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
+        if (rb->gui_synclist_do_button(&browse_list,&button,LIST_WRAP_UNLESS_HELD))
+            continue;
+        switch( button )
+        {
+            case ACTION_STD_CANCEL:
+                if( !rb->strcmp( bbuf, "/" ) )
+                {
+                    *tree = backup;
+                    rb->set_current_file( backup.currdir );
+                    return false;
+                }
+                rb->strcpy( bbuf_s, ".." );
+            case ACTION_STD_OK:
+                if( button == ACTION_STD_OK )
+                {
+                    selected = rb->gui_synclist_get_sel_pos( &browse_list );
+                    if( selected < 0 || selected >= item_count )
+                        break;
+                    struct entry* e = &dc[indexes[selected]];
+                    rb->strncpy( bbuf_s, e->name, sizeof( bbuf_s ) );
+                    if( !( e->attr & ATTR_DIRECTORY ) )
                     {
-                        fvi--;
+                        *tree = backup;
+                        rb->set_current_file( backup.currdir );
+                        rb->snprintf( dst, dst_size, "%s%s", bbuf, bbuf_s );
+                        return true;
                     }
                 }
-                break;
-
-            case ROCKPAINT_DOWN:
-            case ROCKPAINT_DOWN|BUTTON_REPEAT:
-                if( li == -1 || si < li )
-                {
-                    si++;
-                    if( si>lvi )
-                    {
-                        fvi++;
-                    }
-                }
-                break;
-
-            case ROCKPAINT_LEFT:
-                if( bbuf[0] == '/' && !bbuf[1] ) return false;
-                bbuf_s[0] = '.';
-                bbuf_s[1] = '.';
-                bbuf_s[2] = '\0';
-            case ROCKPAINT_RIGHT:
-            case ROCKPAINT_DRAW:
-                if( *bbuf_s == '.' && !bbuf_s[1] ) break;
-                a = bbuf;
-                while( *a ) a++;
-                if( *bbuf_s == '.' && bbuf_s[1] == '.' && !bbuf_s[2] )
+                if( !rb->strcmp( bbuf_s, "." ) ) break;
+                a = bbuf+rb->strlen(bbuf);
+                if( !rb->strcmp( bbuf_s, ".." ) )
                 {
                     a--;
                     if( a == bbuf ) break;
                     if( *a == '/' ) a--;
                     while( *a != '/' ) a--;
-                    *++a = '\0';
+                    rb->strcpy( bbuf_s, ++a );
+                    /* select parent directory */
+                    bbuf_s[rb->strlen(bbuf_s)-1] = '\0';
+                    *a = '\0';
+                    reload = true;
                     break;
                 }
-                rb->strcpy( a, bbuf_s );
-                while( *a ) a++;
-                *a++ = '/';
-                *a = '\0';
-                fvi = si = 0;
+                rb->snprintf( a, bbuf+sizeof(bbuf)-a, "%s/", bbuf_s );
+                reload = true;
                 break;
+
+            case ACTION_STD_MENU:
+                *tree = backup;
+                rb->set_current_file( backup.currdir );
+                return false;
         }
     }
-
-#undef WIDTH
-#undef HEIGHT
-#undef LINE_SPACE
 }
 
 /***********************************************************************
@@ -898,7 +731,6 @@ static bool browse( char *dst, int dst_size, const char *start )
  ***********************************************************************/
 static bool browse_fonts( char *dst, int dst_size )
 {
-    char old_font[MAX_PATH];
 #define WIDTH ( LCD_WIDTH - 20 )
 #define HEIGHT ( LCD_HEIGHT - 20 )
 #define LINE_SPACE 2
@@ -923,7 +755,7 @@ static bool browse_fonts( char *dst, int dst_size )
     int fw;
     #define fontname_buf buffer.text.fontname_buf
 
-    rb->snprintf( old_font, MAX_PATH,
+    rb->snprintf( buffer.text.old_font, MAX_PATH,
                   FONT_DIR "/%s.fnt",
                   rb->global_settings->font_file );
 
@@ -1019,7 +851,7 @@ static bool browse_fonts( char *dst, int dst_size )
                     nvih = fh;
                 }
             }
-            rb->font_load( old_font );
+            rb->font_load( buffer.text.old_font );
             rb->closedir( d );
         }
 
@@ -1501,6 +1333,74 @@ static void draw_vflip( int x1, int y1, int x2, int y2 )
     rb->lcd_update();
 }
 
+/* direction: -1 = left, 1 = right */
+static void draw_rot_90_deg( int x1, int y1, int x2, int y2, int direction )
+{
+    int i, j;
+    if( x1 > x2 )
+    {
+        i = x1;
+        x1 = x2;
+        x2 = i;
+    }
+    if( y1 > y2 )
+    {
+        i = y1;
+        y1 = y2;
+        y2 = i;
+    }
+
+    copy_to_clipboard();
+
+    fb_data color = rp_colors[ bgdrawcolor ];
+    const int width = x2 - x1, height = y2 - y1;
+    const int sub_half = width/2-height/2, add_half = (width+height)/2;
+    if( width > height )
+    {
+        for( i = 0; i <= height; i++ )
+        {
+            for( j = 0; j < sub_half; j++ )
+                save_buffer[(y1+i)*COLS+x1+j] = color;
+            for( j = add_half+1; j <= width; j++ )
+                save_buffer[(y1+i)*COLS+x1+j] = color;
+        }
+    }
+    else if( width < height )
+    {
+        for( j = 0; j <= width; j++ )
+        {
+            for( i = 0; i < -sub_half; i++ )
+                save_buffer[(y1+i)*COLS+x1+j] = color;
+            for( i = add_half+1; i <= height; i++ )
+                save_buffer[(y1+i)*COLS+x1+j] = color;
+        }
+    }
+    int x3 = x1 + sub_half, y3 = y1 - sub_half;
+    int is = x3<0?-x3:0, ie = COLS-x3-1, js = y3<0?-y3:0, je = ROWS-y3-1;
+    if( ie > height ) ie = height;
+    if( je > width ) je = width;
+    for( i = is; i <= ie; i++ )
+    {
+        for( j = js; j <= je; j++ )
+        {
+            int x, y;
+            if(direction > 0)
+            {
+                x = x1+j;
+                y = y1+height-i;
+            }
+            else
+            {
+                x = x1+width-j;
+                y = y1+i;
+            }
+            save_buffer[(y3+j)*COLS+x3+i] = buffer.clipboard[y*COLS+x];
+        }
+    }
+    restore_screen();
+    rb->lcd_update();
+}
+
 static void draw_paste_rectangle( int src_x1, int src_y1, int src_x2,
                                   int src_y2, int x1, int y1, int mode )
 {
@@ -1558,18 +1458,18 @@ static void show_grid( bool update )
 
 static void draw_text( int x, int y )
 {
+    int selected = 0;
     buffer.text.text[0] = '\0';
     rb->snprintf( buffer.text.old_font, MAX_PATH,
                   FONT_DIR "/%s.fnt",
                   rb->global_settings->font_file );
     while( 1 )
     {
-        int m = TEXT_MENU_TEXT;
-        switch( m = menu_display( text_menu, m ) )
+        switch( rb->do_menu( &text_menu, &selected, NULL, NULL ) )
         {
             case TEXT_MENU_TEXT:
+                rb->lcd_set_foreground(COLOR_BLACK);
                 rb->kbd_input( buffer.text.text, MAX_TEXT );
-                restore_screen();
                 break;
 
             case TEXT_MENU_FONT:
@@ -1583,7 +1483,7 @@ static void draw_text( int x, int y )
                 rb->lcd_set_foreground( rp_colors[ drawcolor ] );
                 while( 1 )
                 {
-                    unsigned int button;
+                    int button;
                     restore_screen();
                     rb->lcd_putsxy( x, y, buffer.text.text );
                     rb->lcd_update();
@@ -1614,10 +1514,14 @@ static void draw_text( int x, int y )
                             break;
 
                         case ROCKPAINT_DRAW:
-                            button = 1242;
+                            break;
+                        default:
+                            if(rb->default_event_handler(button)
+                                == SYS_USB_CONNECTED)
+                                button = ROCKPAINT_DRAW;
                             break;
                     }
-                    if( button == 1242 ) break;
+                    if( button == ROCKPAINT_DRAW ) break;
                 }
                 break;
 
@@ -1626,6 +1530,7 @@ static void draw_text( int x, int y )
                 buffer_putsxyofs( save_buffer, COLS, ROWS, x, y, 0,
                                   buffer.text.text );
             case TEXT_MENU_CANCEL:
+            default:
                 restore_screen();
                 rb->font_load( buffer.text.old_font );
                 return;
@@ -2541,10 +2446,11 @@ static void clear_drawing(void)
 static void goto_menu(void)
 {
     int multi;
+    int selected = 0;
 
     while( 1 )
     {
-        switch( menu_display( main_menu, 1 ) )
+        switch( rb->do_menu( &main_menu, &selected, NULL, false ) )
         {
             case MAIN_MENU_NEW:
                 clear_drawing();
@@ -2569,6 +2475,7 @@ static void goto_menu(void)
                 break;
 
             case MAIN_MENU_SAVE:
+                rb->lcd_set_foreground(COLOR_BLACK);
                 if (!filename[0])
                     rb->strcpy(filename,"/");
                 if( !rb->kbd_input( filename, MAX_PATH ) )
@@ -2582,15 +2489,19 @@ static void goto_menu(void)
                 break;
 
             case MAIN_MENU_BRUSH_SIZE:
-                multi = menu_display( size_menu, bsize );
-                if( multi != - 1 )
-                    bsize = multi;
+                for(multi = 0; multi<4; multi++)
+                    if(bsize == times_list[multi]) break;
+                rb->do_menu( &size_menu, &multi, NULL, false );
+                if( multi >= 0 )
+                    bsize = times_list[multi];
                 break;
 
             case MAIN_MENU_BRUSH_SPEED:
-                multi = menu_display( speed_menu, bspeed );
-                if( multi != -1 )
-                    bspeed = multi;
+                for(multi = 0; multi<3; multi++)
+                    if(bspeed == times_list[multi]) break;
+                rb->do_menu( &speed_menu, &multi, NULL, false );
+                if( multi >= 0 )
+                    bspeed = times_list[multi];
                 break;
 
             case MAIN_MENU_COLOR:
@@ -2598,17 +2509,21 @@ static void goto_menu(void)
                 break;
 
             case MAIN_MENU_GRID_SIZE:
-                multi = menu_display( gridsize_menu, gridsize );
-                if( multi != - 1 )
-                    gridsize = multi;
+                for(multi = 0; multi<4; multi++)
+                    if(gridsize == gridsize_list[multi]) break;
+                rb->do_menu( &gridsize_menu, &multi, NULL, false );
+                if( multi >= 0 )
+                    gridsize = gridsize_list[multi];
                 break;
 
             case MAIN_MENU_EXIT:
+                restore_screen();
                 quit=true;
                 return;
 
             case MAIN_MENU_RESUME:
-            case MENU_ESC:
+            default:
+                restore_screen();
                 return;
         }/* end switch */
     }/* end while */
@@ -2660,6 +2575,7 @@ static bool rockpaint_loop( void )
             case ROCKPAINT_MENU:
                 inv_cursor(false);
                 goto_menu();
+                restore_screen();
                 inv_cursor(true);
                 break;
 
@@ -2697,8 +2613,8 @@ static bool rockpaint_loop( void )
                         else if( tool == SelectRectangle
                                  && ( prev_x2 == -1 || prev_y2 == -1 ) )
                         {
-                            tool_mode = menu_display( select_menu,
-                                                      SELECT_MENU_CUT );
+                            tool_mode = rb->do_menu( &select_menu,
+                                                     NULL, NULL, false );
                             switch( tool_mode )
                             {
                                 case SELECT_MENU_CUT:
@@ -2726,22 +2642,29 @@ static bool rockpaint_loop( void )
                                     break;
 
                                 case SELECT_MENU_ROTATE90:
+                                    draw_rot_90_deg( prev_x, prev_y, x, y, 1 );
+                                    reset_tool();
                                     break;
+
                                 case SELECT_MENU_ROTATE180:
                                     draw_hflip( prev_x, prev_y, x, y );
                                     draw_vflip( prev_x, prev_y, x, y );
                                     reset_tool();
                                     break;
+
                                 case SELECT_MENU_ROTATE270:
+                                    draw_rot_90_deg( prev_x, prev_y, x, y, -1 );
+                                    reset_tool();
                                     break;
 
                                 case SELECT_MENU_CANCEL:
                                     reset_tool();
                                     break;
 
-                                case MENU_ESC:
+                                default:
                                     break;
                             }
+                            restore_screen();
                         }
                         else if( tool == Curve
                                  && ( prev_x3 == -1 || prev_y3 == -1 ) )

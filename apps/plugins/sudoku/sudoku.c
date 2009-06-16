@@ -60,7 +60,6 @@ Example ".ss" file, and one with a saved state:
 
 #include "plugin.h"
 #include "lib/configfile.h"
-#include "lib/oldmenuapi.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -1167,30 +1166,20 @@ enum {
 
 bool sudoku_menu(struct sudoku_state_t* state)
 {
-    int m;
     int result;
 
-    static const struct menu_item items[] = {
-        [SM_AUDIO_PLAYBACK] = { "Audio Playback", NULL },
+    MENUITEM_STRINGLIST(menu, "Sudoku Menu", NULL,
+                        "Audio Playback",
 #ifdef HAVE_LCD_COLOR
-        [SM_NUMBER_DISPLAY] = { "Number Display", NULL },
+                        "Number Display",
 #endif
 #ifdef SUDOKU_BUTTON_POSSIBLE
-        [SM_SHOW_MARKINGS] = { "Show Markings", NULL },
+                        "Show Markings",
 #endif
-        [SM_SAVE]     = { "Save", NULL },
-        [SM_RELOAD]   = { "Reload", NULL },
-        [SM_CLEAR]    = { "Clear", NULL },
-        [SM_SOLVE]    = { "Solve", NULL },
-        [SM_GENERATE] = { "Generate", NULL },
-        [SM_NEW]      = { "New", NULL },
-        [SM_QUIT]     = { "Quit", NULL },
-    };
-    
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
+                        "Save", "Reload", "Clear", "Solve",
+                        "Generate", "New", "Quit");
 
-    result=menu_show(m);
+    result = rb->do_menu(&menu, NULL, NULL, false);
 
     switch (result) {
         case SM_AUDIO_PLAYBACK:
@@ -1235,7 +1224,6 @@ bool sudoku_menu(struct sudoku_state_t* state)
 
         case SM_QUIT:
             save_sudoku(state);
-            menu_exit(m);
             return true;
             break;
 
@@ -1243,26 +1231,18 @@ bool sudoku_menu(struct sudoku_state_t* state)
             break;
     }
 
-    menu_exit(m);
-
     return (result==MENU_ATTACHED_USB);
 }
 
 /* Menu used when user is in edit mode - i.e. creating a new game manually */
 int sudoku_edit_menu(struct sudoku_state_t* state)
 {
-    int m;
     int result;
 
-    static const struct menu_item items[] = {
-        { "Save as", NULL },
-        { "Quit", NULL },
-    };
-    
-    m = menu_init(items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
+    MENUITEM_STRINGLIST(menu, "Edit Menu", NULL,
+                        "Save as", "Quit");
 
-    result=menu_show(m);
+    result = rb->do_menu(&menu, NULL, NULL, false);
 
     switch (result) {
         case 0: /* Save new game */
@@ -1280,8 +1260,6 @@ int sudoku_edit_menu(struct sudoku_state_t* state)
         default:
             break;
     }
-
-    menu_exit(m);
 
     return result;
 }
