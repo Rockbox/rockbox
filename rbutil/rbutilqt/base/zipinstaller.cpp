@@ -31,7 +31,7 @@ ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
 
 void ZipInstaller::install()
 {
-    qDebug() << "[ZipInstall] install()";
+    qDebug() << "[ZipInstall] initializing installation";
 
     runner = 0;
     connect(this, SIGNAL(cont()), this, SLOT(installContinue()));
@@ -51,7 +51,7 @@ void ZipInstaller::abort()
 
 void ZipInstaller::installContinue()
 {
-    qDebug() << "[ZipInstall] installContinue";
+    qDebug() << "[ZipInstall] continuing installation";
 
     runner++; // this gets called when a install finished, so increase first.
     qDebug() << "[ZipInstall] runner done:" << runner << "/" << m_urllist.size();
@@ -75,7 +75,7 @@ void ZipInstaller::installContinue()
 
 void ZipInstaller::installStart()
 {
-    qDebug() << "[ZipInstall] installStart";
+    qDebug() << "[ZipInstall] starting installation";
 
     emit logItem(tr("Downloading file %1.%2").arg(QFileInfo(m_url).baseName(),
             QFileInfo(m_url).completeSuffix()),LOGINFO);
@@ -105,7 +105,7 @@ void ZipInstaller::installStart()
 
 void ZipInstaller::downloadDone(bool error)
 {
-    qDebug() << "[ZipInstall] downloadDone, error:" << error;
+    qDebug() << "[ZipInstall] download done, error:" << error;
     QStringList zipContents; // needed later
      // update progress bar
 

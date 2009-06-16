@@ -92,7 +92,7 @@ void Install::accept()
     logger = new ProgressLoggerGui(this);
     logger->show();
     QString mountPoint = RbSettings::value(RbSettings::Mountpoint).toString();
-    qDebug() << "mountpoint:" << RbSettings::value(RbSettings::Mountpoint).toString();
+    qDebug() << "[Install] mountpoint:" << RbSettings::value(RbSettings::Mountpoint).toString();
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
@@ -128,7 +128,7 @@ void Install::accept()
         myversion = "r" + version.value("bleed_rev");
     }
     else {
-        qDebug() << "no build selected -- this shouldn't happen";
+        qDebug() << "[Install] no build selected -- this shouldn't happen";
         return;
     }
     RbSettings::sync();
@@ -212,7 +212,7 @@ void Install::changeBackupPath()
 // Zip installer has finished
 void Install::done(bool error)
 {
-    qDebug() << "Install::done, error:" << error;
+    qDebug() << "[Install] done, error:" << error;
 
     if(error)
     {
@@ -285,7 +285,7 @@ void Install::setVersionStrings(QMap<QString, QString>& ver)
 
     if(version.value("arch_rev").isEmpty()) {
         ui.radioArchived->setEnabled(false);
-        qDebug() << "no information about archived version available!";
+        qDebug() << "[Install] no information about archived version available!";
     }
     if(version.value("rel_rev").isEmpty()) {
         ui.radioStable->setEnabled(false);
@@ -316,7 +316,7 @@ void Install::setVersionStrings(QMap<QString, QString>& ver)
         ui.radioCurrent->setFont(font);
     }
 
-    qDebug() << "Install::setVersionStrings" << version;
+    qDebug() << "[Install] setting version strings to:" << version;
 }
 
 

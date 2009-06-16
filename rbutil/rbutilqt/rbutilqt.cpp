@@ -163,7 +163,7 @@ void RbUtilQt::downloadInfo()
         daily->setCache(true);
     else
         daily->setCache(false);
-    qDebug() << "downloading build info";
+    qDebug() << "[RbUtil] downloading build info";
     daily->setFile(&buildInfo);
     daily->getFile(QUrl(RbSettings::value(RbSettings::ServerConfUrl).toString()));
 }
@@ -172,12 +172,12 @@ void RbUtilQt::downloadInfo()
 void RbUtilQt::downloadDone(bool error)
 {
     if(error) {
-        qDebug() << "network error:" << daily->error();
+        qDebug() << "[RbUtil] network error:" << daily->error();
         QMessageBox::critical(this, tr("Network error"),
             tr("Can't get version information."));
         return;
     }
-    qDebug() << "network status:" << daily->error();
+    qDebug() << "[RbUtil] network status:" << daily->error();
 
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
@@ -229,7 +229,7 @@ void RbUtilQt::downloadDone(bool error)
 void RbUtilQt::downloadBleedingDone(bool error)
 {
     if(error) {
-        qDebug() << "network error:" << bleeding->error();
+        qDebug() << "[RbUtil] network error:" << bleeding->error();
     }
     else {
         bleedingInfo.open();
@@ -237,7 +237,7 @@ void RbUtilQt::downloadBleedingDone(bool error)
         bleedingInfo.close();
         versmap.insert("bleed_rev", info.value("bleeding/rev").toString());
         versmap.insert("bleed_date", info.value("bleeding/timestamp").toString());
-        qDebug() << "versmap =" << versmap;
+        qDebug() << "[RbUtil] version map:" << versmap;
 
         m_gotInfo = true;
     }
@@ -253,7 +253,7 @@ void RbUtilQt::downloadDone(int id, bool error)
         QMessageBox::about(this, "Network Error", errorString);
         m_networkerror = daily->errorString();
     }
-    qDebug() << "downloadDone:" << id << "error:" << error;
+    qDebug() << "[RbUtil] downloadDone:" << id << "error:" << error;
 }
 
 
@@ -304,7 +304,7 @@ void RbUtilQt::configDialog()
 
 void RbUtilQt::updateSettings()
 {
-    qDebug() << "updateSettings()";
+    qDebug() << "[RbUtil] updating current settings";
     updateDevice();
     updateManual();
     if(RbSettings::value(RbSettings::ProxyType) == "system") {
@@ -505,7 +505,7 @@ bool RbUtilQt::smallInstallInner()
 
 void RbUtilQt::installdone(bool error)
 {
-    qDebug() << "install done";
+    qDebug() << "[RbUtil] install done";
     m_installed = true;
     m_error = error;
 }
@@ -715,7 +715,7 @@ void RbUtilQt::installBootloader()
             tree.exec();
 
             backupDestination = tree.getSelected() + "/" + targetFolder;
-            qDebug() << backupDestination;
+            qDebug() << "[RbUtil] backing up to" << backupDestination;
             // backup needs to be done after the logger has been set up.
         }
     }
@@ -770,7 +770,7 @@ void RbUtilQt::installBootloader()
 
 void RbUtilQt::installBootloaderPost(bool error)
 {
-    qDebug() << __func__ << error;
+    qDebug() << "[RbUtil] Bootloader Post-Installation, error state:" << error;
     // if an error occured don't perform post install steps.
     if(error) {
         m_error = true;
@@ -859,7 +859,7 @@ void RbUtilQt::installVoice()
 
     voiceurl += RbSettings::value(RbSettings::CurBuildserverModel).toString() + "-" +
         versmap.value("arch_date") + "-english.zip";
-    qDebug() << voiceurl;
+    qDebug() << "[RbUtil] voicefile URL:" << voiceurl;
 
     installer->setUrl(voiceurl);
     installer->setLogSection("Voice");
@@ -1053,7 +1053,7 @@ void RbUtilQt::downloadManual(void)
         section = "Manual (HTML)";
     }
     manualurl = RbSettings::value(RbSettings::ManualUrl).toString() + "/" + target;
-    qDebug() << "manualurl =" << manualurl;
+    qDebug() << "[RbUtil] Manual URL:" << manualurl;
 
     ProgressLoggerGui* logger = new ProgressLoggerGui(this);
     logger->show();
@@ -1126,7 +1126,7 @@ void RbUtilQt::installPortable(void)
 
 void RbUtilQt::updateInfo()
 {
-    qDebug() << "RbUtilQt::updateInfo()";
+    qDebug() << "[RbUtil] updating server info";
 
     QSettings log(RbSettings::value(RbSettings::Mountpoint).toString()
                     + "/.rockbox/rbutil.log", QSettings::IniFormat, this);

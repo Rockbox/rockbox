@@ -44,7 +44,7 @@ BrowseDirtree::BrowseDirtree(QWidget *parent, const QString &caption) : QDialog(
 
 void BrowseDirtree::setDir(const QDir &dir)
 {
-    qDebug() << "BrowseDirtree::setDir()" << model.index(dir.absolutePath());
+    qDebug() << "[BrowseDirtree] setDir()" << model.index(dir.absolutePath());
 
     // do not try to hilight directory if it's not valid.
     if(!dir.exists()) return;

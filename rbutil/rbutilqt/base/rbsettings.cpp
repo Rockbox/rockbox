@@ -119,13 +119,13 @@ void RbSettings::ensureRbSettingsExists()
         {
             userSettings = new QSettings(QCoreApplication::instance()->applicationDirPath()
                 + "/RockboxUtility.ini", QSettings::IniFormat, NULL);
-            qDebug() << "config: portable";
+            qDebug() << "[Settings] configuration: portable";
         }
         else
         {
             userSettings = new QSettings(QSettings::IniFormat,
             QSettings::UserScope, "rockbox.org", "RockboxUtility",NULL);
-            qDebug() << "config: system";
+            qDebug() << "[Settings] configuration: system";
         }
     }
 }
