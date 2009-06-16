@@ -50,5 +50,10 @@ bool shutdown_screen(void);
 bool browse_id3(void);
 bool view_runtime(void);
 
+#ifdef HAVE_TOUCHSCREEN
+int calibrate(void);
+int reset_mapping(void);
+#endif
+
 #endif
 

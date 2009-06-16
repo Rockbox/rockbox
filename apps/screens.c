@@ -1019,3 +1019,85 @@ bool view_runtime(void)
     }
     return false;
 }
+
+#ifdef HAVE_TOUCHSCREEN
+static int get_sample(struct touchscreen_calibration *cal, int x, int y, int i,
+                      struct screen* screen)
+{
+    int action;
+    short ts_x, ts_y;
+
+    /* Draw a cross */
+    screen->drawline(x - 10, y, x - 2, y);
+    screen->drawline(x + 2, y, x + 10, y);
+    screen->drawline(x, y - 10, x, y - 2);
+    screen->drawline(x, y + 2, x, y + 10);
+    screen->update();
+
+    /* Wait for a touchscreen press */
+    while(true)
+    {
+        action = get_action(CONTEXT_STD, TIMEOUT_BLOCK);
+        if(action == ACTION_TOUCHSCREEN)
+        {
+            if(action_get_touchscreen_press(&ts_x, &ts_y) == BUTTON_REL)
+                break;
+        }
+        else if(action == ACTION_STD_CANCEL)
+            return -1;
+    }
+
+    cal->x[i][0] = ts_x;
+    cal->y[i][0] = ts_y;
+    cal->x[i][1] = x;
+    cal->y[i][1] = y;
+
+    return 0;
+}
+
+
+int calibrate(void)
+{
+    short points[3][2] = {
+        {LCD_WIDTH/10, LCD_HEIGHT/10},
+        {7*LCD_WIDTH/8, LCD_HEIGHT/2},
+        {LCD_WIDTH/2, 7*LCD_HEIGHT/8}
+    };
+    struct screen* screen = &screens[SCREEN_MAIN];
+    enum touchscreen_mode old_mode = touchscreen_get_mode();
+    struct touchscreen_calibration cal;
+    int i, ret = 0;
+    bool statusbar = global_settings.statusbar; /* hide the statusbar */
+
+    global_settings.statusbar = false;
+    touchscreen_disable_mapping(); /* set raw mode */
+    touchscreen_set_mode(TOUCHSCREEN_POINT);
+    for(i=0; i<3; i++)
+    {
+        screen->clear_display();
+
+        if(get_sample(&cal, points[i][0], points[i][1], i, screen))
+        {
+            ret = -1;
+            break;
+        }
+    }
+
+    if(ret == 0)
+        touchscreen_calibrate(&cal);
+    else
+        touchscreen_reset_mapping();
+    memcpy(&global_settings.ts_calibration_data, &calibration_parameters, sizeof(struct touchscreen_parameter));
+    touchscreen_set_mode(old_mode);
+    global_settings.statusbar = statusbar;
+
+    return ret;
+}
+
+int reset_mapping(void)
+{
+    touchscreen_reset_mapping();
+    memcpy(&global_settings.ts_calibration_data, &calibration_parameters, sizeof(struct touchscreen_parameter));
+    return 0;
+}
+#endif

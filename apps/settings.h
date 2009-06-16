@@ -730,6 +730,7 @@ struct user_settings
 
 #ifdef HAVE_TOUCHSCREEN
     int touch_mode;
+    struct touchscreen_parameter ts_calibration_data;
 #endif
 
     /* If values are just added to the end, no need to bump plugin API

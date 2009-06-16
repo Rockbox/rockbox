@@ -265,21 +265,6 @@ MENUITEM_SETTING(buttonlight_brightness, &global_settings.buttonlight_brightness
 MENUITEM_SETTING(touchpad_sensitivity, &global_settings.touchpad_sensitivity, NULL);
 #endif
 
-#ifdef HAVE_TOUCHSCREEN
-static int touch_mode_callback(int action,const struct menu_item_ex *this_item)
-{
-    (void)this_item;
-    switch (action)
-    {
-        case ACTION_EXIT_MENUITEM: /* on exit */
-            touchscreen_set_mode(global_settings.touch_mode);
-            break;
-    }
-    return action;
-}
-MENUITEM_SETTING(touch_mode, &global_settings.touch_mode, touch_mode_callback);
-#endif
-
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
           0, Icon_System_menu,
             &start_screen,
@@ -314,9 +299,6 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
             &touchpad_sensitivity,
-#endif
-#ifdef HAVE_TOUCHSCREEN
-            &touch_mode,
 #endif
          );
 

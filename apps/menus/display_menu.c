@@ -36,6 +36,9 @@
 #include "talk.h"
 #include "lcd.h"
 #include "lcd-remote.h"
+#ifdef HAVE_TOUCHSCREEN
+#include "screens.h"
+#endif
 
 #ifdef HAVE_BACKLIGHT
 static int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)
@@ -496,6 +499,29 @@ MAKE_MENU(peak_meter_menu, ID2P(LANG_PM_MENU), NULL, Icon_NOICON,
 /***********************************/
 
 
+#ifdef HAVE_TOUCHSCREEN
+static int touch_mode_callback(int action,const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+    switch (action)
+    {
+        case ACTION_EXIT_MENUITEM: /* on exit */
+            touchscreen_set_mode(global_settings.touch_mode);
+            break;
+    }
+    return action;
+}
+MENUITEM_SETTING(touch_mode, &global_settings.touch_mode, touch_mode_callback);
+
+MENUITEM_FUNCTION(touchscreen_menu_calibrate, 0, ID2P(LANG_TOUCHSCREEN_CALIBRATE), calibrate,
+                    NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(touchscreen_menu_reset_calibration, 0, ID2P(LANG_TOUCHSCREEN_RESET_CALIBRATION), reset_mapping,
+                    NULL, NULL, Icon_NOICON);
+
+MAKE_MENU(touchscreen_menu, ID2P(LANG_TOUCHSCREEN_SETTINGS), NULL, Icon_NOICON, &touch_mode,
+            &touchscreen_menu_calibrate, &touchscreen_menu_reset_calibration);
+#endif
+
 
 MENUITEM_SETTING(codepage_setting, &global_settings.default_codepage, NULL);
 
@@ -511,4 +537,7 @@ MAKE_MENU(display_menu, ID2P(LANG_DISPLAY),
             &bars_menu, &peak_meter_menu,
 #endif
             &codepage_setting,
+#ifdef HAVE_TOUCHSCREEN
+            &touchscreen_menu,
+#endif
             );

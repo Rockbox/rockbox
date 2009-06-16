@@ -24,10 +24,14 @@
 
 struct touchscreen_calibration
 {
-    int   x[3];
-    int xfb[3];
-    int   y[3];
-    int yfb[3];
+    int x[3][2];
+    int y[3][2];
+};
+
+struct touchscreen_parameter
+{
+    int A, B, C, D, E, F;
+    int divider;
 };
 
 enum touchscreen_mode
@@ -38,6 +42,8 @@ enum touchscreen_mode
                               from button_get_data */
 };
 
+extern struct touchscreen_parameter calibration_parameters;
+extern const struct touchscreen_parameter default_calibration_parameters;
 int touchscreen_calibrate(struct touchscreen_calibration *cal);
 int touchscreen_to_pixels(int x, int y, int *data);
 void touchscreen_set_mode(enum touchscreen_mode mode);

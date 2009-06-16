@@ -53,6 +53,10 @@
 #include "iap.h"
 #endif
 #include "statusbar.h"
+#ifdef HAVE_TOUCHSCREEN
+#include "touchscreen.h"
+#include "ctype.h" /* For isspace() */
+#endif
 
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
@@ -450,6 +454,48 @@ static bool qs_is_changed(void* setting, void* defaultval)
 static void qs_set_default(void* setting, void* defaultval)
 {
     find_setting(defaultval, (int*)setting);
+}
+#endif
+#ifdef HAVE_TOUCHSCREEN
+static void tsc_load_from_cfg(void* setting, char*value)
+{
+    struct touchscreen_parameter *var = (struct touchscreen_parameter*) setting;
+
+    /* Replacement for sscanf(value, "%d ..., &var->A, ...); */
+    int vals[7], count = 0;
+    while(*value != 0 && count < 7)
+    {
+        if(isspace(*value))
+            value++;
+        else
+        {
+            vals[count++] = atoi(value);
+            while(!isspace(*value))
+                value++;
+        }
+    }
+    var->A = vals[0];
+    var->B = vals[1];
+    var->C = vals[2];
+    var->D = vals[3];
+    var->E = vals[4];
+    var->F = vals[5];
+    var->divider = vals[6];
+}
+
+static char* tsc_write_to_cfg(void* setting, char*buf, int buf_len)
+{
+    const struct touchscreen_parameter *var = (const struct touchscreen_parameter*) setting;
+    snprintf(buf, buf_len, "%d %d %d %d %d %d %d", var->A, var->B, var->C, var->D, var->E, var->F, var->divider);
+    return buf;
+}
+static bool tsc_is_changed(void* setting, void* defaultval)
+{
+    return memcmp(setting, defaultval, sizeof(struct touchscreen_parameter)) != 0;
+}
+static void tsc_set_default(void* setting, void* defaultval)
+{
+    memcpy(setting, defaultval, sizeof(struct touchscreen_parameter));
 }
 #endif
 const struct settings_list settings[] = {
@@ -1470,6 +1516,10 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0, touch_mode, LANG_TOUCHSCREEN_MODE, TOUCHSCREEN_BUTTON,
                    "touchscreen mode", "point,grid", NULL, 2,
                    ID2P(LANG_TOUCHSCREEN_POINT), ID2P(LANG_TOUCHSCREEN_GRID)),
+    CUSTOM_SETTING(0, ts_calibration_data, -1, 
+                    &default_calibration_parameters, "touchscreen calibration",
+                    tsc_load_from_cfg, tsc_write_to_cfg,
+                    tsc_is_changed, tsc_set_default),
 #endif
     OFFON_SETTING(0, prevent_skip, LANG_PREVENT_SKIPPING, false, "prevent track skip", NULL),
 };

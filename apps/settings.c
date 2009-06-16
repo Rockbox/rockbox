@@ -966,6 +966,7 @@ void settings_apply(bool read_disk)
 
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(global_settings.touch_mode);
+    memcpy(&calibration_parameters, &global_settings.ts_calibration_data, sizeof(struct touchscreen_parameter));
 #endif
 
     /* This should stay last */

@@ -34,119 +34,93 @@ static const int touchscreen_buttons[3][3] =
     {BUTTON_BOTTOMLEFT, BUTTON_BOTTOMMIDDLE, BUTTON_BOTTOMRIGHT}
 };
 
-/* Based on ftp://ftp.embedded.com/pub/2002/06vidales/calibrate.c
- *
- *   Copyright (c) 2001, Carlos E. Vidales. All rights reserved.
- *
- *   This sample program was written and put in the public domain 
- *    by Carlos E. Vidales.  The program is provided "as is" 
- *    without warranty of any kind, either expressed or implied.
- *   If you choose to use the program within your own products
- *    you do so at your own risk, and assume the responsibility
- *    for servicing, repairing or correcting the program should
- *    it prove defective in any manner.
- *   You may copy and distribute the program's source code in any 
- *    medium, provided that you also include in each copy an
- *    appropriate copyright notice and disclaimer of warranty.
- *   You may also modify this program and distribute copies of
- *    it provided that you include prominent notices stating 
- *    that you changed the file(s) and the date of any change,
- *    and that you do not charge any royalties or licenses for 
- *    its use.
- */
-struct touchscreen_parameter
-{
-    long A;
-    long B;
-    long C;
-    long D;
-    long E;
-    long F;
-    long divider;
-};
-
 #ifndef DEFAULT_TOUCHSCREEN_CALIBRATION
-#define DEFAULT_TOUCHSCREEN_CALIBRATION {.A=1, .B=0, .C=0, \
-                                         .D=0, .E=1, .F=0, \
-                                         .divider=1}
+#define DEFAULT_TOUCHSCREEN_CALIBRATION { .A=1, .B=0, .C=0, \
+                                          .D=0, .E=1, .F=0, \
+                                          .divider=1 }
 #endif
 
-static struct touchscreen_parameter calibration_parameters
+struct touchscreen_parameter calibration_parameters
                                               = DEFAULT_TOUCHSCREEN_CALIBRATION;
-static const struct touchscreen_parameter default_parameters
+const struct touchscreen_parameter default_calibration_parameters
                                               = DEFAULT_TOUCHSCREEN_CALIBRATION;
 
 void touchscreen_disable_mapping(void)
 {
-    calibration_parameters.A = 1;
-    calibration_parameters.B = 0;
-    calibration_parameters.C = 0;
-    calibration_parameters.D = 0;
-    calibration_parameters.E = 1;
-    calibration_parameters.F = 0;
-    calibration_parameters.divider = 1;
+#define C(x) calibration_parameters.x
+    C(A) = C(E) = 1;
+    C(B) = C(C) = C(D) = C(F) = 0;
+    C(divider) = 1;
+#undef C
 }
 
 void touchscreen_reset_mapping(void)
 {
-    memcpy(&calibration_parameters, &default_parameters,
+    memcpy(&calibration_parameters, &default_calibration_parameters,
            sizeof(struct touchscreen_parameter));
 }
 
 int touchscreen_calibrate(struct touchscreen_calibration *cal)
 {
-    calibration_parameters.divider = ((cal->x[0] - cal->x[2]) * (cal->y[1] - cal->y[2])) - 
-                                     ((cal->x[1] - cal->x[2]) * (cal->y[0] - cal->y[2])) ;
+#define C(x)   calibration_parameters.x /* Calibration */
+#define S(i,j) cal->i[j][0]             /* Screen */
+#define D(i,j) cal->i[j][1]             /* Display */
+    long divider = (S(x,0) - S(x,2)) * (S(y,1) - S(y,2)) -
+                   (S(x,1) - S(x,2)) * (S(y,0) - S(y,2));
 
-    if(calibration_parameters.divider == 0)
+    if(divider == 0)
         return -1;
-    
-    calibration_parameters.A = ((cal->xfb[0] - cal->xfb[2]) * (cal->y[1] - cal->y[2])) - 
-                               ((cal->xfb[1] - cal->xfb[2]) * (cal->y[0] - cal->y[2])) ;
+    else
+        C(divider) = divider;
 
-    calibration_parameters.B = ((cal->x[0]   - cal->x[2])   * (cal->xfb[1] - cal->xfb[2])) - 
-                               ((cal->xfb[0] - cal->xfb[2]) * (cal->x[1]   - cal->x[2])) ;
+    C(A) = (D(x,0) - D(x,2)) * (S(y,1) - S(y,2)) -
+           (D(x,1) - D(x,2)) * (S(y,0) - S(y,2));
 
-    calibration_parameters.C = (cal->x[2] * cal->xfb[1] - cal->x[1] * cal->xfb[2]) * cal->y[0] +
-                               (cal->x[0] * cal->xfb[2] - cal->x[2] * cal->xfb[0]) * cal->y[1] +
-                               (cal->x[1] * cal->xfb[0] - cal->x[0] * cal->xfb[1]) * cal->y[2] ;
+    C(B) = (S(x,0) - S(x,2)) * (D(x,1) - D(x,2)) -
+           (D(x,0) - D(x,2)) * (S(x,1) - S(x,2));
 
-    calibration_parameters.D = ((cal->yfb[0] - cal->yfb[2]) * (cal->y[1] - cal->y[2])) - 
-                               ((cal->yfb[1] - cal->yfb[2]) * (cal->y[0] - cal->y[2])) ;
+    C(C) = S(y,0) * (S(x,2) * D(x,1) - S(x,1) * D(x,2)) +
+           S(y,1) * (S(x,0) * D(x,2) - S(x,2) * D(x,0)) +
+           S(y,2) * (S(x,1) * D(x,0) - S(x,0) * D(x,1));
 
-    calibration_parameters.E = ((cal->x[0]   - cal->x[2])   * (cal->yfb[1] - cal->yfb[2])) - 
-                               ((cal->yfb[0] - cal->yfb[2]) * (cal->x[1]   - cal->x[2])) ;
+    C(D) = (D(y,0) - D(y,2)) * (S(y,1) - S(y,2)) -
+           (D(y,1) - D(y,2)) * (S(y,0) - S(y,2));
 
-    calibration_parameters.F = (cal->x[2] * cal->yfb[1] - cal->x[1] * cal->yfb[2]) * cal->y[0] +
-                               (cal->x[0] * cal->yfb[2] - cal->x[2] * cal->yfb[0]) * cal->y[1] +
-                               (cal->x[1] * cal->yfb[0] - cal->x[0] * cal->yfb[1]) * cal->y[2] ;
+    C(E) = (S(x,0) - S(x,2)) * (D(y,1) - D(y,2)) -
+           (D(y,0) - D(y,2)) * (S(x,1) - S(x,2));
 
-    logf("A: %lX B: %lX C: %lX", calibration_parameters.A,
-         calibration_parameters.B, calibration_parameters.C);
-    logf("D: %lX E: %lX F: %lX", calibration_parameters.D,
-         calibration_parameters.E, calibration_parameters.F);
-    logf("divider: %lX", calibration_parameters.divider);
-    
+    C(F) = S(y,0) * (S(x,2) * D(y,1) - S(x,1) * D(y,2)) +
+           S(y,1) * (S(x,0) * D(y,2) - S(x,2) * D(y,0)) +
+           S(y,2) * (S(x,1) * D(y,0) - S(x,0) * D(y,1));
+
+    logf("A: %lX B: %lX C: %lX", C(A), C(B), C(C));
+    logf("D: %lX E: %lX F: %lX", C(D), C(E), C(F));
+    logf("divider: %lX", C(divider));
+
     return 0;
+#undef C
+#undef S
+#undef D
 }
 
 static void map_pixels(int *x, int *y)
 {
+#define C(x) calibration_parameters.x
     int _x = *x, _y = *y;
-    
-    *x = (calibration_parameters.A*_x + calibration_parameters.B*_y +
-          calibration_parameters.C) / calibration_parameters.divider;
-    *y = (calibration_parameters.D*_x + calibration_parameters.E*_y +
-          calibration_parameters.F) / calibration_parameters.divider;
+
+    *x = (C(A) * _x + C(B) * _y + C(C)) / C(divider);
+    *y = (C(D) * _x + C(E) * _y + C(F)) / C(divider);
+#undef C
 }
 
+/* TODO: add jitter (and others) filter */
 int touchscreen_to_pixels(int x, int y, int *data)
 {
     x &= 0xFFFF;
     y &= 0xFFFF;
-    
+
     map_pixels(&x, &y);
-    
+
     if(current_mode == TOUCHSCREEN_BUTTON)
         return touchscreen_buttons[y / (LCD_HEIGHT/3)]
                                   [x / (LCD_WIDTH/3) ];
