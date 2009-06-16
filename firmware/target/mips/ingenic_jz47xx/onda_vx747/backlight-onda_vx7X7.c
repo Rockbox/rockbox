@@ -35,9 +35,6 @@
 static int old_val;
 static void set_backlight(int val)
 {
-    if(val == old_val)
-        return;
-
     /* The pulse repetition frequency should be greater than 100Hz so
        the flickering is not perceptible to the human eye but
        not greater than about 1kHz. */
@@ -62,15 +59,12 @@ static void set_backlight(int val)
 static void set_backlight_on(void)
 {
     set_backlight(old_val);
-
-    __tcu_enable_pwm_output(BACKLIGHT_PWM);
-    __tcu_start_counter(BACKLIGHT_PWM);
 }
 
 static void set_backlight_off(void)
 {
-    __tcu_stop_counter(BACKLIGHT_PWM);
     __tcu_disable_pwm_output(BACKLIGHT_PWM);
+    __tcu_stop_counter(BACKLIGHT_PWM);
 }
 
 bool _backlight_init(void)
@@ -81,7 +75,7 @@ bool _backlight_init(void)
     __tcu_stop_counter(BACKLIGHT_PWM);
     __tcu_init_pwm_output_low(BACKLIGHT_PWM);
     __tcu_set_pwm_output_shutdown_graceful(BACKLIGHT_PWM);
-    __tcu_enable_pwm_output(BACKLIGHT_PWM);
+    __tcu_disable_pwm_output(BACKLIGHT_PWM);
 
     __tcu_select_rtcclk(BACKLIGHT_PWM); /* 32.768 kHz */
     __tcu_select_clk_div1(BACKLIGHT_PWM);
@@ -90,7 +84,6 @@ bool _backlight_init(void)
     __tcu_mask_full_match_irq(BACKLIGHT_PWM);
 
     old_val = MAX_BRIGHTNESS_SETTING;
-    set_backlight_on();
 
     return true;
 }
