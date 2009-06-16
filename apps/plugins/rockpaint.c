@@ -604,7 +604,7 @@ static char * browse_get_name_cb( int selected_item, void *data,
 static bool browse( char *dst, int dst_size, const char *start )
 {
     struct gui_synclist browse_list;
-    int item_count, selected, button;
+    int item_count = 0, selected, button;
     struct tree_context backup;
     struct entry *dc;
     bool reload = true;
