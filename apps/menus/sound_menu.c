@@ -94,7 +94,7 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
-            if (global_settings.timestretch_enabled && !dsp_timestretch_enabled())
+            if (global_settings.timestretch_enabled && !dsp_timestretch_available())
                 splash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
             break;
     }

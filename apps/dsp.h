@@ -160,13 +160,13 @@ void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain,
 void dsp_set_eq(bool enable);
 void dsp_set_eq_precut(int precut);
 void dsp_set_eq_coefs(int band);
-void sound_set_pitch(int r);
-int sound_get_pitch(void);
-int dsp_callback(int msg, intptr_t param);
 void dsp_dither_enable(bool enable);
 void dsp_timestretch_enable(bool enable);
+bool dsp_timestretch_available(void);
+void sound_set_pitch(int r);
+int sound_get_pitch(void);
 void dsp_set_timestretch(int percent);
-bool dsp_timestretch_enabled(void);
 int dsp_get_timestretch(void);
+int dsp_callback(int msg, intptr_t param);
 
 #endif

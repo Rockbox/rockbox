@@ -449,7 +449,7 @@ int gui_syncpitchscreen_run(void)
             case ACTION_PS_TOGGLE_MODE:
                 ++pitch_mode;
 #if CONFIG_CODEC == SWCODEC
-                if (dsp_timestretch_enabled())
+                if (dsp_timestretch_available())
                 {
                     if (pitch_mode > PITCH_MODE_TIMESTRETCH)
                         pitch_mode = PITCH_MODE_ABSOLUTE;

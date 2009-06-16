@@ -270,7 +270,7 @@ static void tdspeed_setup(struct dsp_config *dspc)
     dspc->tdspeed_active = false;
     if (dspc == &AUDIO_DSP)
     {
-        if(!dsp_timestretch_enabled())
+        if(!dsp_timestretch_available())
             return;
         if (dspc->tdspeed_percent == 0)
             dspc->tdspeed_percent = 100;
@@ -285,26 +285,25 @@ static void tdspeed_setup(struct dsp_config *dspc)
     }
 }
 
-void dsp_timestretch_enable(bool enable)
+void dsp_timestretch_enable(bool enabled)
 {
-    if (enable)
+    /* Hook to set up timestretch buffer on first call to settings_apply() */
+    if (big_sample_buf_count < 0) /* Only do something on first call */
     {
-        /* Set up timestretch buffers on first enable */
-        if (big_sample_buf_count < 0)
+        if (enabled)
         {
+            /* Set up timestretch buffers */
             big_sample_buf_count = SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO;
             big_sample_buf = small_resample_buf;
             big_resample_buf = (int32_t *) buffer_alloc(big_sample_buf_count * RESAMPLE_RATIO * sizeof(int32_t));
         }
-    }
-    else
-    {
-        /* If not enabled at startup, buffers will never be available */
-        if (big_sample_buf_count < 0)
+        else
+        {
+            /* Not enabled at startup, "big" buffers will never be available */
             big_sample_buf_count = 0;
+        }
+        tdspeed_setup(&AUDIO_DSP);
     }
-    global_settings.timestretch_enabled = enable;
-    tdspeed_setup(&AUDIO_DSP);
 }
 
 void dsp_set_timestretch(int percent)
@@ -318,7 +317,7 @@ int dsp_get_timestretch()
     return AUDIO_DSP.tdspeed_percent;
 }
 
-bool dsp_timestretch_enabled()
+bool dsp_timestretch_available()
 {
     return (global_settings.timestretch_enabled && big_sample_buf_count > 0);
 }
