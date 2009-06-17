@@ -266,7 +266,7 @@ void sound_set_pitch(int permille)
 
 static void tdspeed_setup(struct dsp_config *dspc)
 {
-    /* Assume timestretch will not not be used */
+    /* Assume timestretch will not be used */
     dspc->tdspeed_active = false;
     sample_buf = small_sample_buf;
     resample_buf = small_resample_buf;
