@@ -31,7 +31,6 @@
 #include "settings.h"
 #include "replaygain.h"
 #include "misc.h"
-#include "debug.h"
 #include "tdspeed.h"
 #include "buffer.h"
 
@@ -267,22 +266,27 @@ void sound_set_pitch(int permille)
 
 static void tdspeed_setup(struct dsp_config *dspc)
 {
+    /* Assume timestretch will not not be used */
     dspc->tdspeed_active = false;
-    if (dspc == &AUDIO_DSP)
-    {
-        if(!dsp_timestretch_available())
-            return;
-        if (dspc->tdspeed_percent == 0)
-            dspc->tdspeed_percent = 100;
-        if (!tdspeed_config(
-            dspc->codec_frequency == 0 ? NATIVE_FREQUENCY : dspc->codec_frequency,
-            dspc->stereo_mode != STEREO_MONO,
-            dspc->tdspeed_percent))
-            return;
-        if (dspc->tdspeed_percent == 100 || big_sample_buf_count <= 0)
-            return;
-        dspc->tdspeed_active = true;
-    }
+    sample_buf = small_sample_buf;
+    resample_buf = small_resample_buf;
+    sample_buf_count = SMALL_SAMPLE_BUF_COUNT;
+
+    if(!dsp_timestretch_available())
+        return; /* Timestretch not enabled or buffer not allocated */
+    if (dspc->tdspeed_percent == 0)
+        dspc->tdspeed_percent = 100;
+    if (!tdspeed_config(
+        dspc->codec_frequency == 0 ? NATIVE_FREQUENCY : dspc->codec_frequency,
+        dspc->stereo_mode != STEREO_MONO,
+        dspc->tdspeed_percent))
+        return; /* Timestretch not possible or needed with these parameters */
+
+    /* Timestretch is to be used */
+    dspc->tdspeed_active = true;
+    sample_buf = big_sample_buf;
+    sample_buf_count = big_sample_buf_count;
+    resample_buf = big_resample_buf;
 }
 
 void dsp_timestretch_enable(bool enabled)
@@ -1434,19 +1438,6 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
 
     default:
         return 0;
-    }
-
-    if (!dsp->tdspeed_active)
-    {
-        sample_buf = small_sample_buf;
-        resample_buf = small_resample_buf;
-        sample_buf_count = SMALL_SAMPLE_BUF_COUNT;
-    }
-    else
-    {
-        sample_buf = big_sample_buf;
-        sample_buf_count = big_sample_buf_count;
-        resample_buf = big_resample_buf;
     }
 
     return 1;
