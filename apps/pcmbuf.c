@@ -1154,3 +1154,9 @@ bool pcmbuf_is_crossfade_enabled(void)
 
     return crossfade_enabled;
 }
+
+void pcmbuf_play_remainder(void)
+{
+    if (audiobuffer_fillpos)
+        pcmbuf_flush_fillpos();
+}

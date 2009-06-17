@@ -2182,6 +2182,8 @@ static void audio_stop_playback(void)
     /* If we were playing, save resume information */
     if (playing)
     {
+        pcmbuf_play_remainder();
+    
         struct mp3entry *id3 = NULL;
 
         if (!ci.stop_codec)
