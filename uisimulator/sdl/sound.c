@@ -96,6 +96,11 @@ void pcm_play_dma_start(const void *addr, size_t size)
 void pcm_play_dma_stop(void)
 {
     SDL_PauseAudio(1);
+    if (udata.debug != NULL) {
+        fclose(udata.debug);
+        udata.debug = NULL;
+        DEBUGF("Audio debug file closed\n");
+    }
 }
 
 void pcm_play_dma_pause(bool pause)
@@ -113,6 +118,11 @@ size_t pcm_get_bytes_waiting(void)
 
 extern int sim_volume; /* in firmware/sound.c */
 void write_to_soundcard(struct pcm_udata *udata) {
+    if (debug_audio && (udata->debug == NULL)) {
+        udata->debug = fopen("audiodebug.raw", "ab");
+        DEBUGF("Audio debug file open\n");
+    }
+
     if (cvt.needed) {
         Uint32 rd = udata->num_in;
         Uint32 wr = (double)rd * cvt.len_ratio;
@@ -292,8 +302,9 @@ void pcm_play_dma_init(void)
 
     if (debug_audio) {
         udata.debug = fopen("audiodebug.raw", "wb");
+        DEBUGF("Audio debug file open\n");
     }
-
+    
     /* Set 16-bit stereo audio at 44Khz */
     wanted_spec.freq = 44100;
     wanted_spec.format = AUDIO_S16SYS;
