@@ -27,7 +27,7 @@
 #include <inttypes.h>
 #include "config.h"
 #include "lcd.h"
-#include "backlight-target.h"
+#include "backlight.h"
 #include "button-target.h"
 #include "common.h"
 #include "storage.h"
@@ -48,14 +48,12 @@ void main(void)
     system_init();
     kernel_init();
 
-#ifdef SANSA_C200V2
-    /* stop here */
-    while(1);
-#endif
+    enable_irq();
+
     lcd_init();
     show_logo();
 
-    _backlight_on();
+    backlight_init();
 
     button_init_device();
     int btn = button_read_device();
@@ -78,8 +76,6 @@ void main(void)
         lcd_clear_display();
         verbose = true;
     }
-
-    enable_irq();
 
     ret = storage_init();
     if(ret < 0)

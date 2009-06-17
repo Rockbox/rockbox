@@ -26,8 +26,12 @@
 #include "ascodec-target.h"
 #include "as3514.h"
 
-/* TODO: This file is copy & pasted from backlight-e200v2-fuze.c, as I think
- * it'll be the same for c200v2; prove it */
+bool _backlight_init(void)
+{
+    GPIOA_DIR |= 1<<5;
+    return true;
+}
+
 void _backlight_set_brightness(int brightness)
 {
     if (brightness > 0)
@@ -41,12 +45,12 @@ void _backlight_on(void)
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
-    ascodec_write(AS3514_DCDC15, backlight_brightness);
+    GPIOA_PIN(5) = 1<<5;
 }
 
 void _backlight_off(void)
 {
-    ascodec_write(AS3514_DCDC15, 0x0);
+    GPIOA_PIN(5) = 0;
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif

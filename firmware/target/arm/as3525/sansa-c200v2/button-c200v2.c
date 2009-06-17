@@ -19,47 +19,70 @@
  *
  ****************************************************************************/
 
-/* Taken from button-h10.c by Barry Wardell and reverse engineering by MrH. */
-
 #include "system.h"
+#include "button-target.h"
 #include "button.h"
 #include "backlight.h"
 #include "powermgmt.h"
 
 
-#ifndef BOOTLOADER
-/* Buttons */
+unsigned short _dbop_din    = 0;
+
+/* in the lcd driver */
+extern bool lcd_button_support(void);
+
 static bool hold_button     = false;
+#ifndef BOOTLOADER
 static bool hold_button_old = false;
-#define _button_hold() hold_button
-#else
-#define _button_hold() false  /* FIXME */
-#endif /* BOOTLOADER */
-static int  int_btn         = BUTTON_NONE;
+#endif
 
 void button_init_device(void)
 {
+    GPIOA_DIR &= ~(1<<3);
 }
 
 bool button_hold(void)
 {
-    return _button_hold();
+    return hold_button;
 }
 
-/* device buttons */
-void button_int(void)
+static void button_read_dbop(void)
 {
-    int delay = 0x50;
+    /* Set up dbop for input */
+    DBOP_CTRL |= (1<<19);                /* Tri-state DBOP on read cycle */
+    DBOP_CTRL &= ~(1<<16);               /* disable output (1:write enabled) */
+    DBOP_TIMPOL_01 = 0xe167e167;         /* Set Timing & Polarity regs 0 & 1 */
+    DBOP_TIMPOL_23 = 0xe167006e;         /* Set Timing & Polarity regs 2 & 3 */
+
+    int i = 50;
+    while(i--) asm volatile ("nop\n");
+
+    DBOP_CTRL |= (1<<15);                /* start read */
+    while (!(DBOP_STAT & (1<<16)));      /* wait for valid data */
+
+    _dbop_din = DBOP_DIN;                /* Read dbop data*/
+
+    /* Reset dbop for output */
+    DBOP_TIMPOL_01 = 0x6e167;            /* Set Timing & Polarity regs 0 & 1 */
+    DBOP_TIMPOL_23 = 0xa167e06f;         /* Set Timing & Polarity regs 2 & 3 */
+    DBOP_CTRL |= (1<<16);                /* Enable output (0:write disable)  */
+    DBOP_CTRL &= ~(1<<19);               /* Tri-state when no active write */
+}
+
+/*
+ * Get button pressed from hardware
+ */
+int button_read_device(void)
+{
+    int delay;
     int dir_save_c = 0;
     int afsel_save_c = 0;
-
-    int_btn = BUTTON_NONE;
+    int btn = BUTTON_NONE;
 
     /* Save the current direction and afsel */
     dir_save_c = GPIOC_DIR;
     afsel_save_c = GPIOC_AFSEL;
 
-    GPIOA_DIR &= ~(1<<3);
     GPIOC_AFSEL &= ~(1<<6|1<<5|1<<4|1<<3);
     GPIOC_DIR |= (1<<6|1<<5|1<<4|1<<3);
 
@@ -72,32 +95,32 @@ void button_int(void)
     GPIOC_PIN(3) = (1<<3);
     GPIOC_DIR &= ~(1<<6|1<<5|1<<4|1<<3);
 
-    while(delay--);
+    delay = 100;
+    while(delay--)
+        asm volatile("nop\n");
     
     /* direct GPIO connections */
     if (GPIOA_PIN(3))
-        int_btn |= BUTTON_POWER;
+        btn |= BUTTON_POWER;
     if (!GPIOC_PIN(6))
-        int_btn |= BUTTON_RIGHT;
+        btn |= BUTTON_RIGHT;
     if (!GPIOC_PIN(5))
-        int_btn |= BUTTON_UP;
+        btn |= BUTTON_UP;
     if (!GPIOC_PIN(4))
-        int_btn |= BUTTON_SELECT;
+        btn |= BUTTON_SELECT;
     if (!GPIOC_PIN(3))
-        int_btn |= BUTTON_DOWN;
+        btn |= BUTTON_DOWN;
 
     /* return to settings needed for lcd */
     GPIOC_DIR = dir_save_c;
     GPIOC_AFSEL = afsel_save_c;
-}
 
-/*
- * Get button pressed from hardware
- */
-int button_read_device(void)
-{
-    /* Read buttons directly */
-    button_int();
+    if(lcd_button_support())
+        button_read_dbop();
+
+    if(_dbop_din & (1<<6))
+        btn |= BUTTON_LEFT;
+
 #ifndef BOOTLOADER
     /* light handling */
     if (hold_button != hold_button_old)
@@ -107,5 +130,5 @@ int button_read_device(void)
     }
 #endif /* BOOTLOADER */
 
-    return int_btn;
+    return btn;
 }

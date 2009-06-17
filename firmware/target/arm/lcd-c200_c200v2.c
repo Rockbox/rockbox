@@ -24,6 +24,11 @@
 #include "kernel.h"
 #include "system.h"
 
+#ifdef SANSA_C200V2
+/* button driver needs to know if a lcd operation is in progress */
+static bool lcd_busy = false;
+#endif
+
 /* Display status */
 static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 static bool is_lcd_enabled = true;
@@ -65,7 +70,7 @@ static bool is_lcd_enabled = true;
 #define R_SCROLL_START_LINE    0x5a
 #define R_DATA_FORMAT_SELECT   0x60
 
-
+#if defined(SANSA_C200)
 /* wait for LCD */
 static inline void lcd_wait_write(void)
 {
@@ -73,23 +78,28 @@ static inline void lcd_wait_write(void)
 }
 
 /* send LCD data */
-static void lcd_send_data(unsigned data)
+static void lcd_send_data(const fb_data *data, int width)
 {
-    lcd_wait_write();
-    LCD1_DATA = data >> 8;
-    lcd_wait_write();
-    LCD1_DATA = data & 0xff;
+    while(width--)
+    {
+        lcd_wait_write();
+        LCD1_DATA = *data >> 8;
+        lcd_wait_write();
+        LCD1_DATA = *data++ & 0xff;
+    }
 }
 
 /* send LCD command */
-static void lcd_send_command(unsigned cmd)
+static void lcd_send_command(unsigned char cmd, unsigned char arg)
 {
     lcd_wait_write();
     LCD1_CMD = cmd;
+    /* if the argument is 0, we send a NOP (= 0) command */
+    lcd_wait_write();
+    LCD1_CMD = arg;
 }
 
-/* LCD init */
-void lcd_init_device(void)
+static inline void c200v1_lcd_init(void)
 {
     /* This is from the c200 of bootloader beginning at offset 0xbbf4 */
     outl(inl(0x70000010) & ~0xfc000000, 0x70000010);
@@ -97,7 +107,7 @@ void lcd_init_device(void)
 
     DEV_INIT2 &= ~0x400;
     udelay(10000);
-    
+
     LCD1_CONTROL &= ~0x4;
     udelay(15);
 
@@ -106,70 +116,138 @@ void lcd_init_device(void)
 
     LCD1_CONTROL = 0x0084; /* bits (9,10) = 00 -> fastest setting */
     udelay(10000);
+}
 
-    lcd_send_command(R_STANDBY_OFF);
-    udelay(20000);
+#define lcd_delay(delay) udelay((delay) * 1000)
 
-    lcd_send_command(R_OSCILLATION_MODE);
-    lcd_send_command(0x01);
-    udelay(20000);
+#elif defined(SANSA_C200V2)
 
-    lcd_send_command(R_DCDC_AMP_ONOFF);
-    lcd_send_command(0x01);
-    udelay(20000);
+static inline void lcd_delay(int delay)
+{   //TUNEME : delay is in milliseconds
+    delay <<= 14;
+    while(delay--) ;
+}
 
-    lcd_send_command(R_DCDC_AMP_ONOFF);
-    lcd_send_command(0x09);
-    udelay(20000);
+/* send LCD data */
+static void lcd_send_data(const fb_data *data, int width)
+{
+    while(width--)
+    {
+        DBOP_DOUT = *data << 8 | *data >> 8;
+        data++;
+        while ((DBOP_STAT & (1<<10)) == 0);
+    }
+}
 
-    lcd_send_command(R_DCDC_AMP_ONOFF);
-    lcd_send_command(0x0b);
-    udelay(20000);
+/* send LCD command */
+static void lcd_send_command(unsigned char cmd, unsigned char val)
+{
+    DBOP_TIMPOL_23 = 0xa167006e;
 
-    lcd_send_command(R_DCDC_AMP_ONOFF);
-    lcd_send_command(0x0f);
-    udelay(20000);
+    DBOP_DOUT = cmd | val << 8;
 
-    lcd_send_command(R_DRIVER_OUTPUT_MODE);
-    lcd_send_command(0x07);
+    while ((DBOP_STAT & (1<<10)) == 0);
 
-    lcd_send_command(R_DCDC_SET);
-    lcd_send_command(0x03);
+    DBOP_TIMPOL_23 = 0xa167e06f;
+}
 
-    lcd_send_command(R_DCDC_CLOCK_DIV);
-    lcd_send_command(0x03);
+static inline void as3525_dbop_init(void)
+{
+    CGU_DBOP = (1<<3) | AS3525_DBOP_DIV;
 
-    lcd_send_command(R_TEMP_COMPENSATION);
-    lcd_send_command(0x01);
+    DBOP_TIMPOL_01 = 0xe167e167;
+    DBOP_TIMPOL_23 = 0xe167006e;
+    DBOP_CTRL = 0x40008;
 
-    lcd_send_command(R_CONTRAST_CONTROL1);
-    lcd_send_command(0x55);
+    GPIOB_AFSEL = 0xc;
+    GPIOC_AFSEL = 0xff;
 
-    lcd_send_command(R_ADDRESSING_MODE);
-    lcd_send_command(0x10);
+    DBOP_TIMPOL_23 = 0x6006e;
+    DBOP_CTRL = 0x52008;
+    DBOP_TIMPOL_01 = 0x6e167;
+    DBOP_TIMPOL_23 = 0xa167e06f;
 
-    lcd_send_command(R_ROW_VECTOR_MODE);
-    lcd_send_command(0x0e);
+    lcd_delay(20);
+}
 
-    lcd_send_command(R_N_LINE_INVERSION);
-    lcd_send_command(0x0d);
+/* we need to set the DBOP_DOUT pins high, for correct dbop reads */
+bool lcd_button_support(void)
+{
+    const fb_data data = 0xffff;
 
-    lcd_send_command(R_FRAME_FREQ_CONTROL);
-    lcd_send_command(0);
+    if (lcd_busy)       /* we can't use dbop for reading if we are in the */
+        return false;   /* middle of a write operation */
 
-    lcd_send_command(R_ENTRY_MODE);
-    lcd_send_command(0x82);
+    /* use out of screen coordinates */
+    lcd_send_command(R_X_ADDR_AREA, 0);
+    lcd_send_command(1, 0);
+    lcd_send_command(R_Y_ADDR_AREA, 0);
+    lcd_send_command(1, 0);
 
-    lcd_send_command(R_Y_ADDR_AREA);         /* vertical dimensions */
-    lcd_send_command(0x1a);                  /* y1 + 0x1a */
-    lcd_send_command(LCD_HEIGHT - 1 + 0x1a); /* y2 + 0x1a */
+    lcd_send_data(&data, 1);
 
-    lcd_send_command(R_X_ADDR_AREA);         /* horizontal dimensions */
-    lcd_send_command(0);                     /* x1 */
-    lcd_send_command(LCD_WIDTH - 1);         /* x2 */
-    udelay(100000);
+    return true;
+}
+#endif
 
-    lcd_send_command(R_DISPLAY_ON);
+/* LCD init */
+void lcd_init_device(void)
+{
+#if defined(SANSA_C200)
+    c200v1_lcd_init();
+#elif defined(SANSA_C200V2)
+    as3525_dbop_init();
+#endif
+
+    lcd_send_command(R_STANDBY_OFF, 0);
+    lcd_delay(20);
+
+    lcd_send_command(R_OSCILLATION_MODE, 0x01);
+    lcd_delay(20);
+
+    lcd_send_command(R_DCDC_AMP_ONOFF, 0x01);
+    lcd_delay(20);
+
+    lcd_send_command(R_DCDC_AMP_ONOFF, 0x09);
+    lcd_delay(20);
+
+    lcd_send_command(R_DCDC_AMP_ONOFF, 0x0b);
+    lcd_delay(20);
+
+    lcd_send_command(R_DCDC_AMP_ONOFF, 0x0f);
+    lcd_delay(20);
+
+    lcd_send_command(R_DRIVER_OUTPUT_MODE, 0x07);
+
+    lcd_send_command(R_DCDC_SET, 0x03);
+
+    lcd_send_command(R_DCDC_CLOCK_DIV, 0x03);
+
+    lcd_send_command(R_TEMP_COMPENSATION, 0x01);
+
+    lcd_send_command(R_CONTRAST_CONTROL1, 0x55);
+
+    lcd_send_command(R_ADDRESSING_MODE, 0x10);
+
+    lcd_send_command(R_ROW_VECTOR_MODE, 0x0e);
+
+    lcd_send_command(R_N_LINE_INVERSION, 0x0d);
+
+    lcd_send_command(R_FRAME_FREQ_CONTROL, 0);
+
+    lcd_send_command(R_ENTRY_MODE, 0x82);
+
+    /* vertical dimensions */
+    lcd_send_command(R_Y_ADDR_AREA, 0x1a);      /* y1 + 0x1a */
+    lcd_send_command(LCD_HEIGHT - 1 + 0x1a, 0); /* y2 + 0x1a */
+
+    /* horizontal dimensions */
+    lcd_send_command(R_X_ADDR_AREA, 0); /* x1 */
+    lcd_send_command(LCD_WIDTH - 1, 0); /* x2 */
+
+    lcd_delay(100);
+
+    lcd_send_command(R_DISPLAY_ON, 0);
 }
 
 /*** hardware configuration ***/
@@ -180,8 +258,13 @@ int lcd_default_contrast(void)
 
 void lcd_set_contrast(int val)
 {
-    lcd_send_command(R_CONTRAST_CONTROL1);
-    lcd_send_command(val);
+#ifdef SANSA_C200V2
+    lcd_busy = true;
+#endif
+    lcd_send_command(R_CONTRAST_CONTROL1, val);
+#ifdef SANSA_C200V2
+    lcd_busy = false;
+#endif
 }
 
 void lcd_set_invert_display(bool yesno)
@@ -196,16 +279,22 @@ void lcd_enable(bool yesno)
     if (yesno == is_lcd_enabled)
         return;
 
+#ifdef SANSA_C200V2
+    lcd_busy = true;
+#endif
     if ((is_lcd_enabled = yesno))
     {
-        lcd_send_command(R_STANDBY_OFF);
-        lcd_send_command(R_DISPLAY_ON);
+        lcd_send_command(R_STANDBY_OFF, 0);
+        lcd_send_command(R_DISPLAY_ON, 0);
         lcd_activation_call_hook();
     }
     else
     {
-        lcd_send_command(R_STANDBY_ON);
+        lcd_send_command(R_STANDBY_ON, 0);
     }
+#ifdef SANSA_C200V2
+    lcd_busy = false;
+#endif
 }
 #endif
 
@@ -220,8 +309,13 @@ bool lcd_active(void)
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-    lcd_send_command(R_DRIVER_OUTPUT_MODE);
-    lcd_send_command(yesno ? 0x02 : 0x07);
+#ifdef SANSA_C200V2
+    lcd_busy = true;
+#endif
+    lcd_send_command(R_DRIVER_OUTPUT_MODE, yesno ? 0x02 : 0x07);
+#ifdef SANSA_C200V2
+    lcd_busy = false;
+#endif
 }
 
 /*** update functions ***/
@@ -248,10 +342,14 @@ void lcd_blit_yuv(unsigned char * const src[3],
     unsigned char const * yuv_src[3];
     off_t z;
 
+#ifdef SANSA_C200V2
+    lcd_busy = true;
+#endif
+
     /* Sorry, but width and height must be >= 2 or else */
     width &= ~1;
     height >>= 1;
-    
+
     y += 0x1a;
 
     z = stride*src_y;
@@ -259,27 +357,21 @@ void lcd_blit_yuv(unsigned char * const src[3],
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
     yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
 
-    lcd_send_command(R_ENTRY_MODE);
-    lcd_send_command(0x80);
+    lcd_send_command(R_ENTRY_MODE, 0x80);
 
-    lcd_send_command(R_X_ADDR_AREA);
-    lcd_send_command(x);
-    lcd_send_command(x + width - 1);
+    lcd_send_command(R_X_ADDR_AREA, x);
+    lcd_send_command(x + width - 1, 0);
 
     if (lcd_yuv_options & LCD_YUV_DITHER)
     {
         do
         {
-            lcd_send_command(R_Y_ADDR_AREA);
-            lcd_send_command(y);
-            lcd_send_command(y + 1);
+            lcd_send_command(R_Y_ADDR_AREA, y);
+            lcd_send_command(y + 1, 0);
 
-            /* NOP needed because on some c200s, the previous lcd_send_command
-               is interpreted as a separate command instead of part of
-               R_Y_ADDR_AREA. */
-            lcd_send_command(R_NOP);
-
+#ifndef SANSA_C200V2 // TODO
             lcd_write_yuv420_lines_odither(yuv_src, width, stride, x, y);
+#endif
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
             yuv_src[2] += stride >> 1;
@@ -291,13 +383,12 @@ void lcd_blit_yuv(unsigned char * const src[3],
     {
         do
         {
-            lcd_send_command(R_Y_ADDR_AREA);
-            lcd_send_command(y);
-            lcd_send_command(y + 1);
+            lcd_send_command(R_Y_ADDR_AREA, y);
+            lcd_send_command(y + 1, 0);
 
-            lcd_send_command(R_NOP);
-
+#ifndef SANSA_C200V2 // TODO
             lcd_write_yuv420_lines(yuv_src, width, stride);
+#endif
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
             yuv_src[2] += stride >> 1;
@@ -305,6 +396,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
         }
          while (--height > 0);
     }
+
+#ifdef SANSA_C200V2
+    lcd_busy = false;
+#endif
 }
 
 /* Update the display.
@@ -318,44 +413,43 @@ void lcd_update(void)
 void lcd_update_rect(int x, int y, int width, int height)
 {
     const fb_data *addr;
-    
+
     if (x + width >= LCD_WIDTH)
         width = LCD_WIDTH - x;
     if (y + height >= LCD_HEIGHT)
         height = LCD_HEIGHT - y;
-        
+
     if ((width <= 0) || (height <= 0))
         return; /* Nothing left to do. */
 
     addr = &lcd_framebuffer[y][x];
 
-    if (width <= 1) {                    
-        lcd_send_command(R_ENTRY_MODE);  /* The X end address must be larger */
-        lcd_send_command(0x80);          /* that the X start address, so we */
-        lcd_send_command(R_X_ADDR_AREA); /* switch to vertical mode for */
-        lcd_send_command(x);             /* single column updates and set */
-        lcd_send_command(x + 1);         /* the window width to 2 */
+#ifdef SANSA_C200V2
+    lcd_busy = true;
+#endif
+
+    if (width <= 1) {
+        /* The X end address must be larger than the X start address, so we
+         * switch to vertical mode for single column updates and set the
+         * window width to 2 */
+        lcd_send_command(R_ENTRY_MODE, 0x80);
+        lcd_send_command(R_X_ADDR_AREA, x);
+        lcd_send_command(x + 1, 0);
     } else {
-        lcd_send_command(R_ENTRY_MODE);
-        lcd_send_command(0x82);
-        lcd_send_command(R_X_ADDR_AREA);
-        lcd_send_command(x);
-        lcd_send_command(x + width - 1);
+        lcd_send_command(R_ENTRY_MODE, 0x82);
+        lcd_send_command(R_X_ADDR_AREA, x);
+        lcd_send_command(x + width - 1, 0);
     }
 
-    lcd_send_command(R_Y_ADDR_AREA);
-    lcd_send_command(y + 0x1a);
-    lcd_send_command(y + height - 1 + 0x1a);
-
-    /* NOP needed because on some c200s, the previous lcd_send_command is
-       interpreted as a separate command instead of part of R_Y_ADDR_AREA. */
-    lcd_send_command(R_NOP);
+    lcd_send_command(R_Y_ADDR_AREA, y + 0x1a);
+    lcd_send_command(y + height - 1 + 0x1a, 0);
 
     do {
-        int w = width;
-        do {
-            lcd_send_data(*addr++);
-        } while (--w > 0);
-        addr += LCD_WIDTH - width;
+        lcd_send_data(addr, width);
+        addr += LCD_WIDTH;
     } while (--height > 0);
+
+#ifdef SANSA_C200V2
+    lcd_busy = false;
+#endif
 }

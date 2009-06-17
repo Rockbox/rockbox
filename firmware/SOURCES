@@ -535,7 +535,7 @@ target/arm/powermgmt-ascodec.c
 target/arm/usb-fw-pp502x.c
 target/arm/sandisk/backlight-c200_e200.c
 target/arm/sandisk/power-c200_e200.c
-target/arm/sandisk/sansa-c200/lcd-c200.c
+target/arm/lcd-c200_c200v2.c
 target/arm/sandisk/sansa-c200/lcd-as-c200.S
 target/arm/sandisk/sansa-c200/button-c200.c
 target/arm/sandisk/sansa-c200/powermgmt-c200.c
@@ -1137,7 +1137,7 @@ target/arm/as3525/sansa-e200v2/powermgmt-e200v2.c
 
 #ifdef SANSA_C200V2
 #ifndef SIMULATOR
-target/arm/as3525/sansa-c200v2/lcd-c200v2.c
+target/arm/lcd-c200_c200v2.c
 target/arm/as3525/sansa-c200v2/button-c200v2.c
 target/arm/as3525/sansa-c200v2/backlight-c200v2.c
 #ifndef BOOTLOADER
