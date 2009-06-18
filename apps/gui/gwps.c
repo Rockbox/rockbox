@@ -768,8 +768,9 @@ long gui_wps_show(void)
             break;
 #endif /* HAVE_TOUCHSCREEN */            
             case ACTION_REDRAW: /* yes are locked, just redraw */
-                /* fall througgh */
-            case ACTION_NONE: /* Timeout, do an partial update */
+                wps_state.do_full_update = true;
+                break;
+            case ACTION_NONE: /* Timeout, do a partial update */
                 update = true;
                 ffwd_rew(button); /* hopefully fix the ffw/rwd bug */
                 break;
