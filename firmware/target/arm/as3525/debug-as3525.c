@@ -65,7 +65,7 @@
 /* FIXME: target tree is including ./debug-target.h rather than the one in
  * sansa-fuze/, even though deps contains the correct one
  * if I put the below into a sansa-fuze/debug-target.h, it doesn't work*/
-#if defined(SANSA_FUZE) || defined(SANSA_E200V2)
+#if defined(SANSA_FUZE) || defined(SANSA_E200V2) || defined(SANSA_C200V2)
 #define DEBUG_DBOP
 unsigned short button_dbop_data(void);
 #endif

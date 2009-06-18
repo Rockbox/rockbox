@@ -36,6 +36,12 @@ static bool hold_button     = false;
 static bool hold_button_old = false;
 #endif
 
+/* for the debug menu */
+unsigned short button_dbop_data(void)
+{
+    return _dbop_din;
+}
+
 void button_init_device(void)
 {
     GPIOA_DIR &= ~(1<<3);
@@ -54,9 +60,6 @@ static void button_read_dbop(void)
     DBOP_TIMPOL_01 = 0xe167e167;         /* Set Timing & Polarity regs 0 & 1 */
     DBOP_TIMPOL_23 = 0xe167006e;         /* Set Timing & Polarity regs 2 & 3 */
 
-    int i = 50;
-    while(i--) asm volatile ("nop\n");
-
     DBOP_CTRL |= (1<<15);                /* start read */
     while (!(DBOP_STAT & (1<<16)));      /* wait for valid data */
 
@@ -74,52 +77,25 @@ static void button_read_dbop(void)
  */
 int button_read_device(void)
 {
-    int delay;
-    int dir_save_c = 0;
-    int afsel_save_c = 0;
     int btn = BUTTON_NONE;
 
-    /* Save the current direction and afsel */
-    dir_save_c = GPIOC_DIR;
-    afsel_save_c = GPIOC_AFSEL;
-
-    GPIOC_AFSEL &= ~(1<<6|1<<5|1<<4|1<<3);
-    GPIOC_DIR |= (1<<6|1<<5|1<<4|1<<3);
-
-    /* These should not be needed with button event interupts */
-    /* they are necessary now to clear out lcd data */
-
-    GPIOC_PIN(6) = (1<<6);
-    GPIOC_PIN(5) = (1<<5);
-    GPIOC_PIN(4) = (1<<4);
-    GPIOC_PIN(3) = (1<<3);
-    GPIOC_DIR &= ~(1<<6|1<<5|1<<4|1<<3);
-
-    delay = 100;
-    while(delay--)
-        asm volatile("nop\n");
-    
     /* direct GPIO connections */
     if (GPIOA_PIN(3))
         btn |= BUTTON_POWER;
-    if (!GPIOC_PIN(6))
-        btn |= BUTTON_RIGHT;
-    if (!GPIOC_PIN(5))
-        btn |= BUTTON_UP;
-    if (!GPIOC_PIN(4))
-        btn |= BUTTON_SELECT;
-    if (!GPIOC_PIN(3))
-        btn |= BUTTON_DOWN;
-
-    /* return to settings needed for lcd */
-    GPIOC_DIR = dir_save_c;
-    GPIOC_AFSEL = afsel_save_c;
 
     if(lcd_button_support())
         button_read_dbop();
 
-    if(_dbop_din & (1<<6))
+    if(!(_dbop_din & (1<<2)))
         btn |= BUTTON_LEFT;
+    if(!(_dbop_din & (1<<3)))
+        btn |= BUTTON_DOWN;
+    if(!(_dbop_din & (1<<4)))
+        btn |= BUTTON_SELECT;
+    if(!(_dbop_din & (1<<5)))
+        btn |= BUTTON_UP;
+    if(!(_dbop_din & (1<<6)))
+        btn |= BUTTON_RIGHT;
 
 #ifndef BOOTLOADER
     /* light handling */

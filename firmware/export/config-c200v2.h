@@ -80,7 +80,9 @@
 #define MAX_CONTRAST_SETTING        255
 #define DEFAULT_CONTRAST_SETTING    85
 
- #define IRAM_LCDFRAMEBUFFER IDATA_ATTR /* put the lcd frame buffer in IRAM */
+#if 0   /* not enough room for a 16 bits framebuffer */
+#define IRAM_LCDFRAMEBUFFER IDATA_ATTR /* put the lcd frame buffer in IRAM */
+#endif
 
 #define CONFIG_KEYPAD SANSA_C200_PAD
 
@@ -108,7 +110,7 @@
 #define HAVE_FAT16SUPPORT
 
 /* The number of bytes reserved for loadable codecs */
-#define CODEC_SIZE 0x100000
+#define CODEC_SIZE 0x48000
 
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
@@ -116,7 +118,7 @@
 #define AB_REPEAT_ENABLE 1
 
 /* FM Tuner - suspected to be the SI4702 */
-//#define CONFIG_TUNER SI4700
+#define CONFIG_TUNER SI4700
 /* #define HAVE_TUNER_PWR_CTRL */
 
 /* Define this for LCD backlight available */
@@ -148,7 +150,7 @@
 #define CONFIG_CPU AS3525
 
 /* Define how much SD sectors are reserved for OF */
-#define AMS_OF_SIZE 0x5000  /* TODO : check */
+#define AMS_OF_SIZE 0x5000
 
 /* Define this if you want to use the PP5024 i2c interface */
 #define CONFIG_I2C I2C_AS3525
@@ -163,14 +165,14 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      250000000
 
-/* Type of LCD TODO: hopefully the same as the x5 but check this*/
+/* Type of LCD : Samsung S6B33B2 */
 #define CONFIG_LCD LCD_C200
 
 #define USB_HANDLED_BY_OF
 
 #ifndef BOOTLOADER
-//#define HAVE_MULTIVOLUME
-//#define HAVE_HOTSWAP
+#define HAVE_MULTIVOLUME
+#define HAVE_HOTSWAP
 #endif
 
 /* enable these for the experimental usb stack */

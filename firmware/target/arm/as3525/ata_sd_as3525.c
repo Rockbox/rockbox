@@ -122,7 +122,7 @@ static volatile bool retry;
 static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
 #ifdef HAVE_HOTSWAP
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
 static int sd1_oneshot_callback(struct timeout *tmo)
 {
     (void)tmo;
@@ -146,7 +146,7 @@ void INT_GPIOA(void)
     GPIOA_IC = (1<<2);
     timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
 }
-#endif  /* defined(SANSA_E200V2) || defined(SANSA_FUZE) */
+#endif  /* defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2) */
 #endif  /* HAVE_HOTSWAP */
 
 void INT_NAND(void)
@@ -437,7 +437,7 @@ static void init_pl180_controller(const int drive)
     VIC_INT_ENABLE |=
         (drive == INTERNAL_AS3525) ? INTERRUPT_NAND : INTERRUPT_MCI0;
 
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
     /* setup isr for microsd monitoring */
     VIC_INT_ENABLE |= (INTERRUPT_GPIOA);
     /* clear previous irq */
@@ -886,13 +886,12 @@ tCardInfo *card_get_info_target(int card_no)
 
 bool card_detect_target(void)
 {
-#ifdef HAVE_HOTSWAP
-    /* TODO: add e200/c200 */
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#if defined(HAVE_HOTSWAP) && \
+    (defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2))
     return !(GPIOA_PIN(2));
-#endif
-#endif
+#else
     return false;
+#endif
 }
 
 #ifdef HAVE_HOTSWAP
@@ -901,14 +900,14 @@ void card_enable_monitoring_target(bool on)
     if (on)
     {
     /* add e200v2/c200v2 here */
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
         /* enable isr*/
         GPIOA_IE |= (1<<2);
 #endif
     }
     else
     {
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
         /* edisable isr*/
         GPIOA_IE &= ~(1<<2);
 #endif
