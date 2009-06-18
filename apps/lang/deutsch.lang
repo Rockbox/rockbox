@@ -1922,15 +1922,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Piep-Lautstärke"
+    swcodec: "Piepen bei Titelwechsel"
   </dest>
   <voice>
     *: none
-    swcodec: "Piep-Lautstärke"
+    swcodec: "Piepen bei Titelwechsel"
   </voice>
 </phrase>
 <phrase>
@@ -12347,5 +12347,155 @@
   <voice>
     *: none
     speaker: "Lautsprecher einschalten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Titelwechsel verhindern"
+  </dest>
+  <voice>
+    *: "Titelwechsel verhindern"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Direktes Berühren"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Direktes Berühren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Kalibrieren"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Kalibrieren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Kalibrierung zurücksetzen"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Kalibrierung zurücksetzen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "3x3-Gitter"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "3x3-Gitter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Touchscreen-Modus"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Touchscreen-Modus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Abspielgeschwindigkeit"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Abspielgeschwindigkeit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Touchscreen-Einstellungen"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Touchscreen-Einstellungen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Geschwindigkeit"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Geschwindigkeit"
   </voice>
 </phrase>
