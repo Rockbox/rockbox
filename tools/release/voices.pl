@@ -23,16 +23,16 @@ sub runone {
         return;
     }
 
-    mkdir "build-$dir";
-    chdir "build-$dir";
-    print "Build in build-$dir\n" if($verbose);
+    mkdir "buildv-$dir";
+    chdir "buildv-$dir";
+    print "Build in buildv-$dir\n" if($verbose);
 
     # build the manual(s)
     $a = buildit($dir, $select, $newl);
 
     chdir "..";
 
-    my $o="build-$dir/english.voice";
+    my $o="buildv-$dir/english.voice";
     if (-f $o) {
         my $newo="output/$dir-$version-english.zip";
         system("cp $o output/$dir-$version-english.voice");
@@ -43,8 +43,8 @@ sub runone {
         print "moved $o to $newo\n" if($verbose);
     }
 
-    print "remove all contents in build-$dir\n" if($verbose);
-    system("rm -rf build-$dir");
+    print "remove all contents in buildv-$dir\n" if($verbose);
+    system("rm -rf buildv-$dir");
 
     return $a;
 };
@@ -68,8 +68,12 @@ sub buildit {
 # run make in tools first to make sure they're up-to-date
 `(cd tools && make ) >/dev/null 2>&1`;
 
-`rm -f /home/dast/tmp/rockbox-voices-$version/voice-pool/*`;
-$ENV{'POOL'}="/home/dast/tmp/rockbox-voices-$version/voice-pool";
+my $home=$ENV{'HOME'};
+
+my $pool="$home/tmp/rockbox-voices-$version/voice-pool";
+`mkdir -p $pool`;
+`rm -f $pool/*`;
+$ENV{'POOL'}="$pool";
 
 runone("player", "player", 1);
 runone("recorder", "recorder", 1);
