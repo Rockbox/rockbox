@@ -55,7 +55,7 @@ sub buildit {
     `rm -rf * >/dev/null 2>&1`;
 
     # V (voice), F (festival), L (lame), [blank] (English)
-    my $c = sprintf('echo -e "%s\n%sa\nv\n\n\nf\n\n" | ../tools/configure',
+    my $c = sprintf('printf "%s\n%sa\nv\n\n\nf\n\n" | ../tools/configure',
                     $select, $newl?'\n':"");
 
     print "C: $c\n" if($verbose);

@@ -57,7 +57,7 @@ sub buildit {
 
     `rm -rf * >/dev/null 2>&1`;
 
-    my $c = sprintf('echo -e "%s\n%sm\n" | ../tools/configure',
+    my $c = sprintf('printf "%s\n%sm\n" | ../tools/configure',
                     $confnum, $newl?'\n':'');
 
     print "C: $c\n" if($verbose);
