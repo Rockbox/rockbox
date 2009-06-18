@@ -38,6 +38,9 @@
 #include "pl081.h"  /* DMA controller */
 #include "dma-target.h" /* DMA request lines */
 #include "clock-target.h"
+#ifdef HAVE_BUTTON_LIGHT
+#include "backlight-target.h"
+#endif
 #include "stdbool.h"
 #include "ata_idle_notify.h"
 #include "sd.h"
@@ -822,6 +825,11 @@ long sd_last_disk_activity(void)
 
 void sd_enable(bool on)
 {
+    /* buttonlight AMSes need a bit of special handling for the buttonlight here,
+     * due to the dual mapping of GPIOD and XPD */
+#ifdef HAVE_BUTTON_LIGHT
+    extern int buttonlight_is_on;
+#endif
     if (sd_enabled == on)
         return; /* nothing to do */
     if(on)
@@ -829,10 +837,13 @@ void sd_enable(bool on)
         CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
 #ifdef HAVE_MULTIVOLUME
         CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
-        /* Needed for buttonlight and MicroSD to work at the same time */
-        /* Turn ROD control on, as the OF does */
-        SD_MCI_POWER |= (1<<7);
+#ifdef HAVE_BUTTON_LIGHT
         CCU_IO |= (1<<2);
+        if (buttonlight_is_on)
+            GPIOD_DIR &= ~(1<<7);
+        else
+            _buttonlight_off();
+#endif
 #endif
         CGU_IDE |= (1<<7)  /* AHB interface enable */  |
                    (1<<6)  /* interface enable */;
@@ -842,11 +853,12 @@ void sd_enable(bool on)
     {
         CGU_PERI &= ~CGU_NAF_CLOCK_ENABLE;
 #ifdef HAVE_MULTIVOLUME
-        CGU_PERI &= ~CGU_MCI_CLOCK_ENABLE;
-        /* Needed for buttonlight and MicroSD to work at the same time */
-        /* Turn ROD control off, as the OF does */
-        SD_MCI_POWER &= ~(1<<7);
+#ifdef HAVE_BUTTON_LIGHT
         CCU_IO &= ~(1<<2);
+        if (buttonlight_is_on)
+            _buttonlight_on();
+#endif
+        CGU_PERI &= ~CGU_MCI_CLOCK_ENABLE;
 #endif
         CGU_IDE &= ~((1<<7)|(1<<6));
         sd_enabled = false;
