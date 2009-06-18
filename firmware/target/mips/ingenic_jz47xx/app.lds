@@ -16,7 +16,7 @@ STARTUP(target/mips/ingenic_jz47xx/crt0.o)
 
 #define DRAMORIG      0x80004000
 #define IRAMORIG      0x80000000
-#define IRAMSIZE      (16K-0x220)
+#define IRAMSIZE      16K
 
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
@@ -41,14 +41,14 @@ SECTIONS
         *(.init.text);
         *(.text*);
     } > DRAM
-    
+
     . = ALIGN(4);
 
     .rodata :
     {
         *(.rodata*);
     } > DRAM
-    
+
     . = ALIGN(4);
 
     .data :
@@ -57,9 +57,9 @@ SECTIONS
         *(.sdata*);
         *(.rel.dyn);
     } > DRAM
-       
+
     . = ALIGN(4);
-    
+ 
     /* Set the load address of .iram at the same address as .bss
      * so RAM won't be wasted as .iram in the end will get copied
      * to IRAM. */
@@ -74,7 +74,7 @@ SECTIONS
         . = 0x200;
         *(.vectors.4);
         *(.vectors);
-        
+
         *(.icode);
         *(.irodata);
         *(.idata);
@@ -83,9 +83,9 @@ SECTIONS
         _iramend = .;
     } > IRAM
     _iramcopy = LOADADDR(.iram);
-    
+
     . = ALIGN(4);
-    
+
     .stack (NOLOAD):
     {
          *(.stack);
@@ -93,28 +93,20 @@ SECTIONS
          . += 0x2000;
          stackend = .;
     } > IRAM
-    
-    . = ALIGN(4);
 
     .bss (NOLOAD):
     {
          _edata = .;
          *(.sbss*);
          *(.bss*);
+         *(.ibss*); /* Don't put this in IRAM as there's not enough space */
          *(COMMON);
          *(.scommon*);
          _end = .;
     } > DRAM
-    
+
     . = ALIGN(4);
-    
-    .ibss (NOLOAD) :
-    {
-        _iedata = .;
-        *(.ibss*);
-        _iend = .;
-    } > IRAM
-    
+
     .audiobuf ALIGN(4) :
     {
         audiobuffer = .;
@@ -134,7 +126,7 @@ SECTIONS
     {
         pluginbuf = .;
     }
-    
+
     /DISCARD/ :
     {
         *(.eh_frame);

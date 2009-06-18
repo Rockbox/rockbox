@@ -639,13 +639,14 @@ Lyre prototype 1*/
     (CONFIG_CPU == AS3525 && MEMORYSIZE > 2) || /* AS3525 +2MB: core, plugins, codecs */ \
     (CONFIG_CPU == AS3525 && MEMORYSIZE <= 2 && !defined(PLUGIN) && !defined(CODEC)) || /* AS3525 2MB:core only */ \
     (CONFIG_CPU == PNX0101) || \
-    (CONFIG_CPU == S5L8700)) /* Samsung S5L8700: core, plugins, codecs */
+    (CONFIG_CPU == S5L8700)) /* Samsung S5L8700: core, plugins, codecs */ || \
+    (CONFIG_CPU == JZ4732 && !defined(PLUGIN) && !defined(CODEC)) /* Jz4740: core only */
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))
 #define IDATA_ATTR      __attribute__ ((section(".idata")))
 #define IBSS_ATTR       __attribute__ ((section(".ibss")))
 #define USE_IRAM
-#if CONFIG_CPU != SH7034 && (CONFIG_CPU != AS3525 || MEMORYSIZE > 2)
+#if CONFIG_CPU != SH7034 && (CONFIG_CPU != AS3525 || MEMORYSIZE > 2) && CONFIG_CPU != JZ4732
 #define PLUGIN_USE_IRAM
 #endif
 #if defined(CPU_ARM)
