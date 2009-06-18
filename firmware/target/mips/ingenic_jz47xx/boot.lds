@@ -28,14 +28,14 @@ SECTIONS
         *(.init.text);
         *(.text*);
     } > DRAM
-    
+
     . = ALIGN(4);
 
     .rodata :
     {
         *(.rodata*);
     } > DRAM
-    
+
     . = ALIGN(4);
 
     .data :
@@ -44,9 +44,9 @@ SECTIONS
         *(.sdata*);
         *(.rel.dyn);
     } > DRAM
-    
+
     . = ALIGN(4);
-    
+
     .iram IRAMORIG:
     {
         _iramstart = .;
@@ -58,7 +58,7 @@ SECTIONS
         . = 0x200;
         *(.vectors.4);
         *(.vectors);
-        
+
         *(.icode);
         *(.irodata);
         *(.idata);
@@ -66,30 +66,22 @@ SECTIONS
         _iramend = .;
     } > IRAM AT> DRAM
     _iramcopy = LOADADDR(.iram);
-    
+
     . = ALIGN(4);
-    
+
     .bss (NOLOAD):
     {
          _edata = .;
          *(.sbss*);
          *(.bss*);
+         *(.ibss*);
          *(COMMON);
          *(.scommon*);
          _end = .;
     } > DRAM
-    
+
     _bootend = .;
-    
-    .ibss (NOLOAD) :
-    {
-        _iedata = .;
-        *(.ibss*)
-        _iend = .;
-    } > IRAM
-    
-    . = ALIGN(4);
-    
+
     .stack (NOLOAD):
     {
          *(.stack)
