@@ -827,7 +827,7 @@ void sd_enable(bool on)
 {
     /* buttonlight AMSes need a bit of special handling for the buttonlight here,
      * due to the dual mapping of GPIOD and XPD */
-#ifdef HAVE_BUTTON_LIGHT
+#if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIVOLUME)
     extern int buttonlight_is_on;
 #endif
     if (sd_enabled == on)
