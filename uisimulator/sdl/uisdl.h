@@ -206,8 +206,12 @@
 #define UI_LCD_POSX                 42 /* x position of lcd */
 #define UI_LCD_POSY                 37  /* y position of lcd */
 
-#elif defined(SANSA_C200)
+#elif defined(SANSA_C200) || defined(SANSA_C200V2)
+#ifdef SANSA_C200
 #define UI_TITLE                    "Sansa c200"
+#else
+#define UI_TITLE                    "Sansa c200v2"
+#endif
 #define UI_WIDTH                    350 /* width of GUI window */
 #define UI_HEIGHT                   152 /* height of GUI window */
 #define UI_LCD_POSX                 42 /* x position of lcd */
