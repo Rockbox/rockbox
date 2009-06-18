@@ -26,6 +26,8 @@
 #include "ascodec-target.h"
 #include "as3514.h"
 
+int buttonlight_is_on = 0;
+
 bool _backlight_init(void)
 {
     GPIOA_DIR |= 1<<5;
@@ -58,12 +60,20 @@ void _backlight_off(void)
 
 void _buttonlight_on(void)
 {
+    /* Needed for buttonlight and MicroSD to work at the same time */
+    /* Turn ROD control on, as the OF does */
     GPIOD_DIR |= (1<<7);
+    SD_MCI_POWER |= (1<<7);
     GPIOD_PIN(7) = (1<<7);
+    buttonlight_is_on = 1;
 }
 
 void _buttonlight_off(void)
 {
-    GPIOD_DIR |= (1<<7);
+    /* Needed for buttonlight and MicroSD to work at the same time */
+    /* Turn ROD control off, as the OF does */
+    SD_MCI_POWER &= ~(1<<7);
     GPIOD_PIN(7) = 0;
+    GPIOD_DIR &= ~(1<<7);
+    buttonlight_is_on = 0;
 }
