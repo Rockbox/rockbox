@@ -270,11 +270,7 @@ INLINE unsigned range_limit(int value)
 #define BUFAC           227
 #define COMPONENT_SHIFT  15
 
-/* Some of the below have inline ASM optimizations of the loop contents. To
-   make comparison with the C versions easier, the C variable names are used
-   in comments whenever intermediate values are labeled.
-*/
-
+#ifndef CPU_ARM
 /* horizontal-pass 1-point IDCT */
 static void jpeg_idct1h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 {
@@ -312,7 +308,6 @@ static void jpeg_idct2h(int16_t *ws, unsigned char *out, int16_t *end, int rowst
     }
 }
 
-#ifndef CPU_ARM
 /* vertical-pass 4-point IDCT */
 static void jpeg_idct4v(int16_t *ws, int16_t *end)
 {
@@ -388,6 +383,9 @@ static void jpeg_idct4h(int16_t *ws, unsigned char *out, int16_t *end, int rowst
     }
 }
 #else
+extern void jpeg_idct1h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
+extern void jpeg_idct2v(int16_t *ws, int16_t *end);
+extern void jpeg_idct2h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
 extern void jpeg_idct4v(int16_t *ws, int16_t *end);
 extern void jpeg_idct4h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
 #endif

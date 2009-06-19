@@ -25,10 +25,139 @@
 
     .section .text
     .align   2
+    .global jpeg_idct1h
+    .type   jpeg_idct1h, %function
+    .global jpeg_idct2v
+    .type   jpeg_idct2v, %function
+    .global jpeg_idct2h
+    .type   jpeg_idct2h, %function
     .global jpeg_idct4v
     .type   jpeg_idct4v, %function
     .global jpeg_idct4h
     .type   jpeg_idct4h, %function
+
+jpeg_idct1h:
+/* In the common case of one pass through the loop, the extra add should be
+   cheaper than saving registers to stack and loading a the value 4112. */
+1:
+    ldrsh  r12, [r0]
+    add    r12, r12, #4096
+    add    r12, r12, #16
+#if ARM_ARCH < 6
+    mov    r12, r12, asr #5
+    cmp    r12, #255
+    mvnhi  r12, r12, asr #31
+#else
+    usat   r12, #8,  r12, asr #5
+#endif
+    strb   r12, [r1]
+    add    r0,  r0,  #16
+    add    r1,  r1,  r3
+    cmp    r0,  r2
+    bcc    1b
+    bx     lr
+    .size jpeg_idct1h, .-jpeg_idct1h
+
+jpeg_idct2v:
+#if ARM_ARCH < 6
+/* Use SWAR tricks to fake partitioned add and subtract. This is slightly faster
+   than loading two values in each register and using shifts and strh, and
+   requires fewer fixup operations than splitting the values, calculating, and
+   merging.
+*/
+    stmdb  sp!, { r4, lr }
+1:
+    ldr    r2,  [r0]
+    ldr    r3,  [r0, #16]
+    eor    r12, r2,  r3
+    and    r12, r12, #0x8000
+    bic    r3,  r3,  #0x8000
+    bic    r4,  r2,  #0x8000
+    add    r4,  r4,  r3
+    eor    r4,  r4,  r12
+    orr    r2,  r2,  #0x8000
+    sub    r2,  r2,  r3
+    eor    r2,  r2,  r12
+    eor    r2,  r2,  #0x8000
+    str    r4,  [r0]
+    str    r2,  [r0, #16]
+    add    r0,  r0,  #4
+    cmp    r0,  r1
+    bcc    1b
+    ldmia  sp!, { r4, pc }
+#else
+/* ARMv6 offers partitioned adds and subtracts, used here to unroll the loop
+   to two columns.
+*/
+1:
+    ldr    r2,  [r0]
+    ldr    r3,  [r0, #16]
+    sadd16 r12, r2,  r3
+    ssub16 r2,  r2,  r3
+    str    r12, [r0]
+    str    r2,  [r0, #16]
+    add    r0,  r0,  #4
+    cmp    r0,  r1
+    bcc    1b
+    bx     lr
+#endif
+    .size jpeg_idct2v, .-jpeg_idct2v
+
+jpeg_idct2h:
+#if ARM_ARCH < 6
+/* Using LDR and shifts here would costs two more ops, and is no faster as
+   results can not be stored merged.
+*/
+    stmdb  sp!, { r4-r5, lr }
+    ldr    r14, =4112
+1:
+    ldrsh  r12, [r0]
+    ldrsh  r4,  [r0, #2]
+    add    r12, r12, r14
+    add    r5,  r12, r4
+    sub    r4,  r12, r4
+    mov    r5,  r5,  asr #5
+    mov    r4,  r4,  asr #5
+    cmp    r5,  #255
+    mvnhi  r5,  r5,  asr #31
+    cmp    r4,  #255
+    mvnhi  r4,  r4,  asr #31
+#ifdef HAVE_LCD_COLOR
+    strb   r5,  [r1]
+    strb   r4,  [r1, #4]
+#else
+    strb   r5,  [r1]
+    strb   r4,  [r1, #1]
+#endif
+    add    r0,  r0,  #16
+    add    r1,  r1,  r3
+    cmp    r0,  r2
+    bcc    1b
+    ldmia  sp!, { r4-r5, pc }
+#else
+    stmdb  sp!, { r4, lr }
+    ldr    r14, =4112
+1:
+    ldr    r12, [r0]
+    sadd16 r12, r12, r14
+    saddsubx    r12, r12, r12
+    usat   r4,  #8,  r12, asr #21
+    sxth   r12, r12
+    usat   r12, #8,  r12, asr #5
+#ifdef HAVE_LCD_COLOR
+    strb   r4,  [r1]
+    strb   r12, [r1, #4]
+#else
+    strb   r4,  [r1]
+    strb   r12, [r1, #1]
+#endif
+    add    r0,  r0,  #16
+    add    r1,  r1,  r3
+    cmp    r0,  r2
+    bcc    1b
+    ldmia  sp!, { r4, pc }
+#endif
+    .size jpeg_idct2h, .-jpeg_idct2h
 
 jpeg_idct4v:
 #if ARM_ARCH < 5
@@ -60,8 +189,8 @@ jpeg_idct4v:
     strh   r6,  [r0, #16]
     strh   r2,  [r0, #32]
     add    r0,  r0,  #2
-    teq    r0,  r1
-    bne    1b
+    cmp    r0,  r1
+    bcc    1b
     ldmia  sp!, { r4-r7, pc }
 #elif ARM_ARCH < 6
     stmdb sp!, { r4-r8, lr }
@@ -90,8 +219,8 @@ jpeg_idct4v:
     strh   r3,  [r0, #16]
     strh   r2,  [r0, #32]
     add    r0,  r0,  #2
-    teq    r0,  r1
-    bne    1b
+    cmp    r0,  r1
+    bcc    1b
     ldmia sp!, { r4-r8, pc }
 #else
     stmdb  sp!, { r4-r10, lr }
@@ -192,8 +321,8 @@ jpeg_idct4h:
 #endif
     add    r0,  r0,  #16
     add    r1,  r1,  r3
-    teq    r0,  r2
-    bne    1b
+    cmp    r0,  r2
+    bcc    1b
     ldmia sp!, { r4-r10, pc }
 #elif ARM_ARCH < 6
     stmdb  sp!, { r4-r10, lr }
@@ -241,8 +370,8 @@ jpeg_idct4h:
 #endif
     add    r0,  r0,  #16
     add    r1,  r1,  r3
-    teq    r0,  r2
-    bne    1b
+    cmp    r0,  r2
+    bcc    1b
     ldmia sp!, { r4-r10, pc }
 #else
     stmdb sp!, { r4-r9, lr }
@@ -280,8 +409,8 @@ jpeg_idct4h:
 #endif
     add   r0,  r0,  #16
     add   r1,  r1,  r3
-    teq   r0,  r2
-    bne   1b
+    cmp    r0,  r2
+    bcc    1b
     ldmia sp!, { r4-r9, pc }
 #endif
     .size jpeg_idct4h, .-jpeg_idct4h
