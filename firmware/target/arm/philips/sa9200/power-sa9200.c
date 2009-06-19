@@ -97,7 +97,7 @@ unsigned int power_input_status(void)
     /* GPIOF indicates that the connector is present,
        GPIOB indicates that there's power there too.
        Same status bits for both USB and the charger. */
-    if (!(GPIOF_INPUT_VAL & 0x80) && !(GPIOB_INPUT_VAL & 0x80))
+    if (!(GPIOF_INPUT_VAL & 0x80) && (GPIOB_INPUT_VAL & 0x40))
         status = POWER_INPUT_MAIN_CHARGER;
 
     return status;

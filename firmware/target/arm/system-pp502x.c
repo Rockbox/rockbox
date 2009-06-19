@@ -126,6 +126,10 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
         }
 /* end MROBE_100 */
 #elif defined(PHILIPS_SA9200)
+        else if (CPU_HI_INT_STAT & GPIO0_MASK) {
+            if (GPIOD_INT_STAT & 0x02)
+                button_int();
+        }
         else if (CPU_HI_INT_STAT & GPIO1_MASK) {
             if (GPIOF_INT_STAT & 0x80)
                 usb_insert_int();
@@ -418,6 +422,12 @@ void system_init(void)
 
         /* reset all allowed devices */
         DEV_RS         = 0x3bfffef8;
+        DEV_RS2        = 0xffffffff;
+        DEV_RS         = 0x00000000;
+        DEV_RS2        = 0x00000000;
+#elif defined(PHILIPS_SA9200)
+        /* reset all allowed devices */
+        DEV_RS         = 0x3ffffef8;
         DEV_RS2        = 0xffffffff;
         DEV_RS         = 0x00000000;
         DEV_RS2        = 0x00000000;

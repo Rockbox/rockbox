@@ -666,21 +666,12 @@ static void sd_init_device(int card_no)
     sd_card_mux(card_no);
 
 /* Init NAND */
-#if defined(PHILIPS_SA9200)
-    MMC_INIT_1 |=  (1 << 15);
-    MMC_INIT_2 |=  (1 << 15);
-    MMC_INIT_2 &= ~(3 << 12);
-    MMC_INIT_2 |=  (1 << 12);
-    MMC_INIT_1 &= ~(3 << 12);
-    MMC_INIT_1 |=  (1 << 12);
-#else
     MMC_INIT_1 |=  (1 << 15);
     MMC_INIT_2 |=  (1 << 15);
     MMC_INIT_2 &= ~(3 << 12);
     MMC_INIT_2 |=  (1 << 13);
     MMC_INIT_1 &= ~(3 << 12);
     MMC_INIT_1 |=  (1 << 13);
-#endif
 
     DEV_EN |= DEV_ATA; /* Enable controller */
     DEV_RS |= DEV_ATA; /* Reset controller */

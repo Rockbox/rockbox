@@ -24,6 +24,44 @@
 #include "kernel.h"
 #include "system.h"
 
+/* The SA9200 controller closely matches the register defines for the
+   Samsung S6D0151 */
+#define R_START_OSC             0x00
+#define R_DRV_OUTPUT_CONTROL    0x01
+#define R_INVERSION_CONTROL     0x02
+#define R_ENTRY_MODE            0x03
+#define R_DISP_CONTROL          0x07
+#define R_BLANK_PERIOD_CONTROL  0x08
+#define R_FRAME_CYCLE_CONTROL   0x0b
+#define R_EXT_INTERFACE_CONTROL 0x0c
+#define R_POWER_CONTROL1        0x10
+#define R_GAMMA_CONTROL1        0x11
+#define R_POWER_CONTROL2        0x12
+#define R_POWER_CONTROL3        0x13
+#define R_POWER_CONTROL4        0x14
+#define R_RAM_ADDR_SET          0x21
+#define R_WRITE_DATA_2_GRAM     0x22
+#define R_RAM_READ_DATA         0x22
+#define R_GAMMA_FINE_ADJ_POS1   0x30
+#define R_GAMMA_FINE_ADJ_POS2   0x31
+#define R_GAMMA_FINE_ADJ_POS3   0x32
+#define R_GAMMA_GRAD_ADJ_POS    0x33
+#define R_GAMMA_FINE_ADJ_NEG1   0x34
+#define R_GAMMA_FINE_ADJ_NEG2   0x35
+#define R_GAMMA_FINE_ADJ_NEG3   0x36
+#define R_GAMMA_GRAD_ADJ_NEG    0x37
+#define R_GAMMA_CONTROL3        0x38
+#define R_GATE_SCAN_START_POS   0x40
+#define R_1ST_SCR_DRV_POS       0x42
+#define R_2ND_SCR_DRV_POS       0x43
+#define R_HORIZ_RAM_ADDR_POS    0x44
+#define R_VERT_RAM_ADDR_POS     0x45
+#define R_OSC_CONTROL           0x61
+#define R_LOW_POWER_MODE        0x69
+#define R_PRE_DRIVING_PERIOD    0x70
+#define R_GATE_OUT_PERIOD_CTRL  0x71
+#define R_SOFTWARE_RESET        0x72
+
 /* Display status */
 static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 
@@ -80,51 +118,54 @@ void lcd_init_device(void)
 
     LCD1_CONTROL |= 0x1;
 
-    lcd_write_reg(0x0000, 0x0001);
+    lcd_write_reg(R_START_OSC, 0x0001);
     udelay(50000);
 
-    lcd_write_reg(0x0011, 0x171f);
-    lcd_write_reg(0x0012, 0x0001);
-    lcd_write_reg(0x0013, 0x08cd);
-    lcd_write_reg(0x0014, 0x0416);
-    lcd_write_reg(0x0010, 0x1208);
+    lcd_write_reg(R_GAMMA_CONTROL1, 0x171f);
+    lcd_write_reg(R_POWER_CONTROL2, 0x0001);
+    lcd_write_reg(R_POWER_CONTROL3, 0x08cd);
+    lcd_write_reg(R_POWER_CONTROL4, 0x0416);
+    lcd_write_reg(R_POWER_CONTROL1, 0x1208);
     udelay(50000);
 
-    lcd_write_reg(0x0013, 0x081C);
+    lcd_write_reg(R_POWER_CONTROL3, 0x081c);
     udelay(200000);
 
-    lcd_write_reg(0x0001, 0x0a0c);
-    lcd_write_reg(0x0002, 0x0200);
-    lcd_write_reg(0x0003, 0x1030);
-    lcd_write_reg(0x0007, 0x0005);
-    lcd_write_reg(0x0008, 0x030a);
-    lcd_write_reg(0x000b, 0x0000);
-    lcd_write_reg(0x000c, 0x0000);
-    lcd_write_reg(0x0030, 0x0000);
-    lcd_write_reg(0x0031, 0x0204);
-    lcd_write_reg(0x0032, 0x0001);
-    lcd_write_reg(0x0033, 0x0600);
-    lcd_write_reg(0x0034, 0x0607);
-    lcd_write_reg(0x0035, 0x0305);
-    lcd_write_reg(0x0036, 0x0707);
-    lcd_write_reg(0x0037, 0x0006);
-    lcd_write_reg(0x0038, 0x0400);
-    lcd_write_reg(0x0040, 0x0000);
-    lcd_write_reg(0x0042, 0x9f00);
-    lcd_write_reg(0x0043, 0x0000);
-    lcd_write_reg(0x0044, 0x7f00);
-    lcd_write_reg(0x0045, 0x9f00);
+    lcd_write_reg(R_DRV_OUTPUT_CONTROL, 0x0a0c);
+    lcd_write_reg(R_INVERSION_CONTROL, 0x0200);
+    lcd_write_reg(R_ENTRY_MODE, 0x1030);
+    lcd_write_reg(R_DISP_CONTROL, 0x0005);
+    lcd_write_reg(R_BLANK_PERIOD_CONTROL, 0x030a);
+    lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x0000);
+    lcd_write_reg(R_EXT_INTERFACE_CONTROL, 0x0000);
+
+    lcd_write_reg(R_GAMMA_FINE_ADJ_POS1, 0x0000);
+    lcd_write_reg(R_GAMMA_FINE_ADJ_POS2, 0x0204);
+    lcd_write_reg(R_GAMMA_FINE_ADJ_POS3, 0x0001);
+    lcd_write_reg(R_GAMMA_GRAD_ADJ_POS, 0x0600);
+    lcd_write_reg(R_GAMMA_FINE_ADJ_NEG1, 0x0607);
+    lcd_write_reg(R_GAMMA_FINE_ADJ_NEG2, 0x0305);
+    lcd_write_reg(R_GAMMA_FINE_ADJ_NEG3, 0x0707);
+    lcd_write_reg(R_GAMMA_GRAD_ADJ_NEG, 0x0006);
+    lcd_write_reg(R_GAMMA_CONTROL3, 0x0400);
+
+    lcd_write_reg(R_GATE_SCAN_START_POS, 0x0000);
+    lcd_write_reg(R_1ST_SCR_DRV_POS, 0x9f00);
+    lcd_write_reg(R_2ND_SCR_DRV_POS, 0x0000);
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 0x7f00);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, 0x9f00);
+
     lcd_write_reg(0x00a8, 0x0125);
     lcd_write_reg(0x00a9, 0x0014);
     lcd_write_reg(0x00a7, 0x0022);
 
-    lcd_write_reg(0x0007, 0x0021);
+    lcd_write_reg(R_DISP_CONTROL, 0x0021);
     udelay(40000);
-    lcd_write_reg(0x0007, 0x0023);
+    lcd_write_reg(R_DISP_CONTROL, 0x0023);
     udelay(40000);
-    lcd_write_reg(0x0007, 0x1037);
+    lcd_write_reg(R_DISP_CONTROL, 0x1037);
 
-    lcd_write_reg(0x0021, 0x0000);
+    lcd_write_reg(R_RAM_ADDR_SET, 0x0000);
 #endif
 }
 
@@ -195,8 +236,8 @@ void lcd_update_rect(int x, int y, int width, int height)
     addr = &lcd_framebuffer[y][x];
 
     do {
-        lcd_write_reg(0x0021, ((y++ & 0xff) << 8) | (x & 0xff));
-        lcd_send_command(0x0022);
+        lcd_write_reg(R_RAM_ADDR_SET, ((y++ & 0xff) << 8) | (x & 0xff));
+        lcd_send_command(R_WRITE_DATA_2_GRAM);
 
         int w = width;
         do {
