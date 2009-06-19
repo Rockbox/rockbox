@@ -1313,18 +1313,7 @@ static bool get_next(struct tagcache_search *tcs)
         
         tcs->seek_list_count--;
         flag = tcs->seek_flags[tcs->seek_list_count];
-        
-        /* Seek stream to the correct position and continue to direct fetch. */
-        if ((!tcs->ramsearch || !TAG_FILENAME_RAM(tcs))
-            && !TAGCACHE_IS_NUMERIC(tcs->type))
-        {
-            if (!open_files(tcs, tcs->type))
-                return false;
-        
-            lseek(tcs->idxfd[tcs->type], tcs->seek_list[tcs->seek_list_count], SEEK_SET);
-        }
-        else
-            tcs->position = tcs->seek_list[tcs->seek_list_count];
+        tcs->position = tcs->seek_list[tcs->seek_list_count];
     }
     
     if (TAGCACHE_IS_NUMERIC(tcs->type))
@@ -1374,20 +1363,21 @@ static bool get_next(struct tagcache_search *tcs)
         
         return true;
     }
-    else
 #endif
+    
+    if (!open_files(tcs, tcs->type))
+        return false;
+    
+    /* Seek stream to the correct position and continue to direct fetch. */
+    lseek(tcs->idxfd[tcs->type], tcs->position, SEEK_SET);
+    tcs->result_seek = tcs->position;
+    
+    if (ecread(tcs->idxfd[tcs->type], &entry, 1,
+               tagfile_entry_ec, tc_stat.econ) != sizeof(struct tagfile_entry))
     {
-        if (!open_files(tcs, tcs->type))
-            return false;
-        
-        tcs->result_seek = lseek(tcs->idxfd[tcs->type], 0, SEEK_CUR);
-        if (ecread(tcs->idxfd[tcs->type], &entry, 1,
-                 tagfile_entry_ec, tc_stat.econ) != sizeof(struct tagfile_entry))
-        {
-            /* End of data. */
-            tcs->valid = false;
-            return false;
-        }
+        /* End of data. */
+        tcs->valid = false;
+        return false;
     }
     
     if (entry.tag_length > (long)sizeof(buf))
@@ -1404,6 +1394,11 @@ static bool get_next(struct tagcache_search *tcs)
         return false;
     }
     
+    /**
+     Update the position for the next read (this may be overridden
+     if filters or clauses are being used).
+     */
+    tcs->position += sizeof(struct tagfile_entry) + entry.tag_length;
     tcs->result = buf;
     tcs->result_len = strlen(tcs->result) + 1;
     tcs->idx_id = entry.idx_id;
