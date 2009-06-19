@@ -319,7 +319,7 @@ int gui_syncpitchscreen_run(void)
     int maintain_speed_pitch = speed * pitch; /* speed * pitch to maintain */
 #endif
     int new_pitch;
-    int pitch_delta = 0;
+    int pitch_delta;
     bool nudged = false;
     bool exit = false;
     /* should maybe be passed per parameter later, not needed for now */
@@ -351,6 +351,7 @@ int gui_syncpitchscreen_run(void)
                               , speed
 #endif
                               );
+        pitch_delta = 0;
         button = get_action(CONTEXT_PITCHSCREEN, HZ);
         switch (button)
         {
@@ -490,7 +491,6 @@ int gui_syncpitchscreen_run(void)
             else
                 maintain_speed_pitch = speed * pitch;
 #endif
-            pitch_delta = 0;
         }
     }
 #if CONFIG_CODEC == SWCODEC
