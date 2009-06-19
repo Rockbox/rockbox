@@ -28,10 +28,6 @@
 #define LOGF_ENABLE
 #include "logf.h"
 
-#define MEP_BUTTON_HEADER   0x1a
-#define MEP_BUTTON_ID       0x9
-#define MEP_ABSOLUTE_HEADER 0x0b
-
 static int int_btn = BUTTON_NONE;
 
 #ifndef BOOTLOADER
@@ -56,9 +52,9 @@ void button_init_device(void)
     GPIOD_OUTPUT_EN  |=  0x4; /* DATA */
     GPIOD_OUTPUT_VAL |=  0x4; /* high */
 
-    if (!syn_init())
+    if (!touchpad_init())
     {
-        logf("button_init_dev: touchpad not ready");
+        logf("touchpad not ready");
     }
 }
 
@@ -67,73 +63,34 @@ void button_init_device(void)
  */
 void button_int(void)
 {
-    int data[4];
-    int val, id;
+    char data[4];
+    int val;
 
     int_btn = BUTTON_NONE;
 
-    if (syn_get_status())
+    val = touchpad_read_device(data, 4);
+
+    if (val == MEP_BUTTON_HEADER)
     {
-        /* disable interrupt while we read the touchpad */
-        syn_int_enable(false);
+        /* Buttons packet - touched one of the 5 "buttons" */
+        if (data[1] & 0x1) int_btn |= BUTTON_PLAY;
+        if (data[1] & 0x2) int_btn |= BUTTON_MENU;
+        if (data[1] & 0x4) int_btn |= BUTTON_LEFT;
+        if (data[1] & 0x8) int_btn |= BUTTON_DISPLAY;
+        if (data[2] & 0x1) int_btn |= BUTTON_RIGHT;
+    }
+    else if (val == MEP_ABSOLUTE_HEADER)
+    {
+        /* Absolute packet - the finger is on the vertical strip.
+           Position ranges from 1-4095, with 1 at the bottom. */
+        val = ((data[1] >> 4) << 8) | data[2]; /* position */
 
-        val = syn_read(data, 4);
-        if (val > 0)
-        {
-            val = data[0] & 0xff;      /* packet header */
-            id = (data[1] >> 4) & 0xf; /* packet id */
-
-            logf("button_read_device...");
-            logf("  data[0] = 0x%08x", data[0]);
-            logf("  data[1] = 0x%08x", data[1]);
-            logf("  data[2] = 0x%08x", data[2]);
-            logf("  data[3] = 0x%08x", data[3]);
-
-            if ((val == MEP_BUTTON_HEADER) && (id == MEP_BUTTON_ID))
-            {
-                /* Buttons packet - touched one of the 5 "buttons" */
-                if (data[1] & 0x1)
-                    int_btn |= BUTTON_PLAY;
-                if (data[1] & 0x2)
-                    int_btn |= BUTTON_MENU;
-                if (data[1] & 0x4)
-                    int_btn |= BUTTON_LEFT;
-                if (data[1] & 0x8)
-                    int_btn |= BUTTON_DISPLAY;
-                if (data[2] & 0x1)
-                    int_btn |= BUTTON_RIGHT;
-
-                /* An Absolute packet should follow which we ignore */
-                val = syn_read(data, 4);
-
-                logf("  int_btn = 0x%04x", int_btn);
-            }
-            else if (val == MEP_ABSOLUTE_HEADER)
-            {
-                /* Absolute packet - the finger is on the vertical strip.
-                   Position ranges from 1-4095, with 1 at the bottom. */
-                val = ((data[1] >> 4) << 8) | data[2]; /* position */
-
-                logf(" pos %d", val);
-                logf(" z %d", data[3]);
-                logf(" finger %d", data[1] & 0x1);
-                logf(" gesture %d", data[1] & 0x2);
-                logf(" RelPosVld %d", data[1] & 0x4);
-
-                if(data[1] & 0x1)  /* if finger on touch strip */
-                {
-                    if ((val > 0) && (val <= 1365))
-                        int_btn |= BUTTON_DOWN;
-                    else if ((val > 1365) && (val <= 2730))
-                        int_btn |= BUTTON_SELECT;
-                    else if ((val > 2730) && (val <= 4095))
-                        int_btn |= BUTTON_UP;
-                }
-            }
-        }
-
-        /* re-enable interrupts */
-        syn_int_enable(true);
+        if ((val > 0) && (val <= 1365))
+            int_btn |= BUTTON_DOWN;
+        else if ((val > 1365) && (val <= 2730))
+            int_btn |= BUTTON_SELECT;
+        else if ((val > 2730) && (val <= 4095))
+            int_btn |= BUTTON_UP;
     }
 }
 #else

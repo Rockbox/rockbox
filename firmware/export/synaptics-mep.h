@@ -21,10 +21,8 @@
 #ifndef SYNAPTICS_MEP_H
 #define SYNAPTICS_MEP_H
 
-int  syn_init(void);
-int  syn_get_status(void);
-void syn_int_enable(bool enable);
-int  syn_read(int *data, int len);
-int  syn_send(int *data, int len);
+int touchpad_init(void);
+int touchpad_read_device(char *data, int len);
+int touchpad_set_buttonlights(char led_mask, char brightness);
 
 #endif

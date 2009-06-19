@@ -24,6 +24,7 @@
 #include "cpu.h"
 #include "system.h"
 #include "kernel.h"
+#include "button-target.h"
 
 #define LOGF_ENABLE
 #include "logf.h"
@@ -32,38 +33,46 @@
    Protocol: 3-Wire Interface Specification" documentation */
 
 #if defined(MROBE_100)
-#define INT_ENABLE  GPIOD_INT_LEV &= ~0x2; GPIOD_INT_EN  |= 0x2
-#define INT_DISABLE GPIOD_INT_EN  &= ~0x2; GPIOD_INT_CLR |= 0x2
+#define INT_ENABLE  GPIO_CLEAR_BITWISE(GPIOD_INT_LEV, 0x2);\
+                    GPIO_SET_BITWISE(GPIOD_INT_EN, 0x2)
+#define INT_DISABLE GPIO_CLEAR_BITWISE(GPIOD_INT_EN, 0x2);\
+                    GPIO_SET_BITWISE(GPIOD_INT_CLR, 0x2)
 
 #define ACK     (GPIOD_INPUT_VAL & 0x1)
-#define ACK_HI  GPIOD_OUTPUT_VAL |=  0x1
-#define ACK_LO  GPIOD_OUTPUT_VAL &= ~0x1
+#define ACK_HI  GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x1)
+#define ACK_LO  GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_VAL, 0x1)
 
 #define CLK     ((GPIOD_INPUT_VAL & 0x2) >> 1)
-#define CLK_HI  GPIOD_OUTPUT_VAL |=  0x2
-#define CLK_LO  GPIOD_OUTPUT_VAL &= ~0x2
+#define CLK_HI  GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x2)
+#define CLK_LO  GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_VAL, 0x2)
 
 #define DATA    ((GPIOD_INPUT_VAL & 0x4) >> 2)
-#define DATA_HI GPIOD_OUTPUT_EN |= 0x4; GPIOD_OUTPUT_VAL |=  0x4
-#define DATA_LO GPIOD_OUTPUT_EN |= 0x4; GPIOD_OUTPUT_VAL &= ~0x4
-#define DATA_CL GPIOD_OUTPUT_EN &= ~0x4
+#define DATA_HI GPIO_SET_BITWISE(GPIOD_OUTPUT_EN, 0x4);\
+                GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x4)
+#define DATA_LO GPIO_SET_BITWISE(GPIOD_OUTPUT_EN, 0x4);\
+                GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_VAL, 0x4)
+#define DATA_CL GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_EN, 0x4)
 
 #elif defined(PHILIPS_HDD1630)
-#define INT_ENABLE  GPIOA_INT_LEV &= ~0x20; GPIOA_INT_EN  |= 0x20
-#define INT_DISABLE GPIOA_INT_EN  &= ~0x20; GPIOA_INT_CLR |= 0x20
+#define INT_ENABLE  GPIO_CLEAR_BITWISE(GPIOA_INT_LEV, 0x20);\
+                    GPIO_SET_BITWISE(GPIOA_INT_EN, 0x20)
+#define INT_DISABLE GPIO_CLEAR_BITWISE(GPIOA_INT_EN, 0x20);\
+                    GPIO_SET_BITWISE(GPIOA_INT_CLR, 0x20)
 
 #define ACK     (GPIOD_INPUT_VAL & 0x80)
-#define ACK_HI  GPIOD_OUTPUT_VAL |=  0x80
-#define ACK_LO  GPIOD_OUTPUT_VAL &= ~0x80
+#define ACK_HI  GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x80)
+#define ACK_LO  GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_VAL, 0x80)
 
 #define CLK     ((GPIOA_INPUT_VAL & 0x20) >> 5)
-#define CLK_HI  GPIOA_OUTPUT_VAL |=  0x20
-#define CLK_LO  GPIOA_OUTPUT_VAL &= ~0x20
+#define CLK_HI  GPIO_SET_BITWISE(GPIOA_OUTPUT_VAL, 0x20)
+#define CLK_LO  GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_VAL, 0x20)
 
 #define DATA    ((GPIOA_INPUT_VAL & 0x10) >> 4)
-#define DATA_HI GPIOA_OUTPUT_EN |= 0x10; GPIOA_OUTPUT_VAL |=  0x10
-#define DATA_LO GPIOA_OUTPUT_EN |= 0x10; GPIOA_OUTPUT_VAL &= ~0x10
-#define DATA_CL GPIOA_OUTPUT_EN &= ~0x10
+#define DATA_HI GPIO_SET_BITWISE(GPIOA_OUTPUT_EN, 0x10);\
+                GPIO_SET_BITWISE(GPIOA_OUTPUT_VAL, 0x10)
+#define DATA_LO GPIO_SET_BITWISE(GPIOA_OUTPUT_EN, 0x10);\
+                GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_VAL, 0x10)
+#define DATA_CL GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_EN, 0x10)
 #endif
 
 #define LO 0
@@ -80,6 +89,18 @@
 
 static unsigned short syn_status = 0;
 
+static void syn_enable_int(bool enable)
+{
+    if (enable)
+    {
+        INT_ENABLE;
+    }
+    else
+    {
+        INT_DISABLE;
+    }
+}
+
 static int syn_wait_clk_change(unsigned int val)
 {
     int i;
@@ -91,6 +112,30 @@ static int syn_wait_clk_change(unsigned int val)
     }
 
     return 0;
+}
+
+static void syn_set_ack(int val)
+{
+    if (val == HI)
+    {
+        ACK_HI;
+    }
+    else
+    {
+        ACK_LO;
+    }
+}
+
+static void syn_set_data(int val)
+{
+    if (val == HI)
+    {
+        DATA_HI;
+    }
+    else
+    {
+        DATA_LO;
+    }
 }
 
 static inline int syn_get_data(void)
@@ -105,20 +150,20 @@ static void syn_wait_guest_flush(void)
        handshake until DATA goes high during P3 stage */
     if (CLK == LO)
     {
-        ACK_HI;                  /* P1 -> P2 */
+        syn_set_ack(HI);         /* P1 -> P2 */
         syn_wait_clk_change(HI); /* P2 -> P3 */
     }
 
     while (syn_get_data() == LO)
     {
-        ACK_HI;                  /* P3 -> P0 */
+        syn_set_ack(HI);         /* P3 -> P0 */
         syn_wait_clk_change(LO); /* P0 -> P1 */
-        ACK_LO;                  /* P1 -> P2 */
+        syn_set_ack(LO);         /* P1 -> P2 */
         syn_wait_clk_change(HI); /* P2 -> P3 */
     }
 
     /* Continue handshaking until back to P0 */
-    ACK_HI;                      /* P3 -> P0 */
+    syn_set_ack(HI);             /* P3 -> P0 */
 }
 
 static void syn_flush(void)
@@ -128,26 +173,26 @@ static void syn_flush(void)
     logf("syn_flush...");
 
     /* Flusher holds DATA low for at least 36 handshake cycles */
-    DATA_LO;
+    syn_set_data(LO);
 
     for (i = 0; i < 36; i++)
     {
         syn_wait_clk_change(LO); /* P0 -> P1 */
-        ACK_LO;                  /* P1 -> P2 */
+        syn_set_ack(LO);         /* P1 -> P2 */
         syn_wait_clk_change(HI); /* P2 -> P3 */
-        ACK_HI;                  /* P3 -> P0 */
+        syn_set_ack(HI);         /* P3 -> P0 */
     }
 
     /* Raise DATA in P1 stage */
     syn_wait_clk_change(LO); /* P0 -> P1 */
-    DATA_HI;
+    syn_set_data(HI);
 
     /* After a flush, the flushing device enters a flush-receiving (flushee)
        state */
     syn_wait_guest_flush();
 }
 
-int syn_send(int *data, int len)
+static int syn_send(char *data, int len)
 {
     int i, bit;
     int parity = 0;
@@ -155,13 +200,13 @@ int syn_send(int *data, int len)
     logf("syn_send...");
 
     /* 1. Lower DATA line to issue a request-to-send to guest */
-    DATA_LO;
+    syn_set_data(LO);
 
     /* 2. Wait for guest to lower CLK */
     syn_wait_clk_change(LO);
 
     /* 3. Lower ACK (with DATA still low) */
-    ACK_LO;
+    syn_set_ack(LO);
 
     /* 4. Wait for guest to raise CLK */
     syn_wait_clk_change(HI);
@@ -177,17 +222,17 @@ int syn_send(int *data, int len)
             /* 5a. Drive data low if bit is 0, or high if bit is 1 */
             if (data[i] & (1 << bit))
             {
-                DATA_HI;
+                syn_set_data(HI);
                 parity++;
             }
             else
             {
-                DATA_LO;
+                syn_set_data(LO);
             }
             bit++;
 
             /* 5b. Invert ACK to indicate that the data bit is ready */
-            ACK_HI;
+            syn_set_ack(HI);
 
             /* 5c. Wait for guest to invert CLK */
             syn_wait_clk_change(LO);
@@ -195,16 +240,16 @@ int syn_send(int *data, int len)
             /* Repeat for next bit */
             if (data[i] & (1 << bit))
             {
-                DATA_HI;
+                syn_set_data(HI);
                 parity++;
             }
             else
             {
-                DATA_LO;
+                syn_set_data(LO);
             }
             bit++;
 
-            ACK_LO;
+            syn_set_ack(LO);
 
             syn_wait_clk_change(HI);
         }
@@ -217,25 +262,25 @@ int syn_send(int *data, int len)
     parity = parity % 2;
     if (parity)
     {
-        DATA_HI;
+        syn_set_data(HI);
     }
     else
     {
-        DATA_LO;
+        syn_set_data(LO);
     }
     logf("  send parity = %d", parity);
 
     /* 7b. Raise ACK to indicate that the optional parity bit is ready */
-    ACK_HI;
+    syn_set_ack(HI);
 
     /* 7c. Guest lowers CLK */
     syn_wait_clk_change(LO);
 
     /* 7d. Pull DATA high (if parity bit was 0) */
-    DATA_HI;
+    syn_set_data(HI);
 
     /* 7e. Lower ACK to indicate that the stop bit is ready */
-    ACK_LO;
+    syn_set_ack(LO);
 
     /* 7f. Guest raises CLK */
     syn_wait_clk_change(HI);
@@ -251,15 +296,15 @@ int syn_send(int *data, int len)
     }
 
     /* 7h. Host raises ACK and the link enters the idle state */
-    ACK_HI;
+    syn_set_ack(HI);
 
     return len;
 }
 
-static int syn_read_data(int *data, int data_len)
+static int syn_read_data(char *data, int data_len)
 {
-    int i, len, bit, parity, tmp;
-    int *data_ptr;
+    int i, len, bit, parity;
+    char *data_ptr, tmp;
 
     logf("syn_read_data...");
 
@@ -268,7 +313,7 @@ static int syn_read_data(int *data, int data_len)
         return 0;
 
     /* 1a. If the host is willing to receive a packet it lowers ACK */
-    ACK_LO;
+    syn_set_ack(LO);
 
     /* 2. Guest may issue a request-to-send by lowering DATA. If the
           guest decides not to transmit a packet, it may abort the
@@ -284,12 +329,12 @@ static int syn_read_data(int *data, int data_len)
     {
         logf("  read abort");
 
-        ACK_HI;
+        syn_set_ack(HI);
         return READ_ERROR;
     }
     else
     {
-        ACK_HI;
+        syn_set_ack(HI);
     }
 
     /* 5. Read the incoming data packet */
@@ -320,7 +365,7 @@ static int syn_read_data(int *data, int data_len)
             bit++;
 
             /* 5e. Invert ACK to indicate that data has been read */
-            ACK_LO;
+            syn_set_ack(LO);
 
             /* Repeat for next bit */
             syn_wait_clk_change(HI);
@@ -332,7 +377,7 @@ static int syn_read_data(int *data, int data_len)
             }
             bit++;
 
-            ACK_HI;
+            syn_set_ack(HI);
         }
 
         /* First byte is the packet header */
@@ -367,7 +412,7 @@ static int syn_read_data(int *data, int data_len)
     /* TODO: parity error handling */
 
     /* 7d. The host lowers ACK */
-    ACK_LO;
+    syn_set_ack(LO);
 
     /* 7e. The host waits for the guest to raise CLK indicating 
            that the stop bit is ready */
@@ -378,16 +423,16 @@ static int syn_read_data(int *data, int data_len)
     {
         logf("  framing error");
 
-        ACK_HI;
+        syn_set_ack(HI);
         return READ_ERROR;
     }
 
-    ACK_HI;
+    syn_set_ack(HI);
 
     return len;
 }
 
-int syn_read(int *data, int len)
+static int syn_read(char *data, int len)
 {
     int i;
     int ret = READ_ERROR;
@@ -413,16 +458,16 @@ int syn_read(int *data, int len)
     return ret;
 }
 
-int syn_reset(void)
+static int syn_reset(void)
 {
     int val, id;
-    int data[2];
+    char data[2];
 
     logf("syn_reset...");
 
     /* reset module 0 */
-    val = (0 << 4) | (1 << 3) | 0;
-    syn_send(&val, 1);
+    data[0] = (0 << 4) | (1 << 3) | 0;
+    syn_send(data, 1);
 
     val = syn_read(data, 2);
     if (val == 1)
@@ -440,15 +485,16 @@ int syn_reset(void)
     return 0;
 }
 
-int syn_init(void)
+int touchpad_init(void)
 {
     syn_flush();
     syn_status = syn_reset();
 
     if (syn_status)
     {
-        INT_DISABLE;
-        INT_ENABLE;
+        /* reset interrupts */
+        syn_enable_int(false);
+        syn_enable_int(true);
 
         CPU_INT_EN    |= HI_MASK;
         CPU_HI_INT_EN |= GPIO0_MASK;
@@ -457,21 +503,86 @@ int syn_init(void)
     return syn_status;
 }
 
-int syn_get_status(void)
+int touchpad_read_device(char *data, int len)
 {
-    return syn_status;
+    char tmp[4];
+    int id;
+    int val = 0;
+
+    if (syn_status)
+    {
+        /* disable interrupt while we read the touchpad */
+        syn_enable_int(false);
+
+        val = syn_read(data, len);
+        if (val > 0)
+        {
+            val = data[0] & 0xff;      /* packet header */
+            id = (data[1] >> 4) & 0xf; /* packet id */
+
+            logf("syn_read:");
+            logf("  data[0] = 0x%08x", data[0]);
+            logf("  data[1] = 0x%08x", data[1]);
+            logf("  data[2] = 0x%08x", data[2]);
+            logf("  data[3] = 0x%08x", data[3]);
+
+            if ((val == MEP_BUTTON_HEADER) && (id == MEP_BUTTON_ID))
+            {
+                /* an absolute packet should follow which we ignore */
+                syn_read(tmp, 4);
+            }
+            else if (val == MEP_ABSOLUTE_HEADER)
+            {
+                logf(" pos %d", val);
+                logf(" z %d", data[3]);
+                logf(" finger %d", data[1] & 0x1);
+                logf(" gesture %d", data[1] & 0x2);
+                logf(" RelPosVld %d", data[1] & 0x4);
+
+                if (!(data[1] & 0x1))
+                {
+                    /* finger is NOT on touch strip */
+                    val = 0;
+                }
+            }
+            else
+            {
+                val = 0;
+            }
+        }
+
+        /* re-enable interrupts */
+        syn_enable_int(true);
+    }
+
+    return val;
 }
 
-void syn_int_enable(bool enable)
+int touchpad_set_buttonlights(int led_mask, char brightness)
 {
-    if (enable)
+    char data[6];
+    int val = 0;
+
+    if (syn_status)
     {
-        INT_ENABLE;
+        syn_enable_int(false);
+
+        /* turn on all touchpad leds */
+        data[0] = 0x05;
+        data[1] = 0x31;
+        data[2] = (brightness & 0xf) << 4;
+        data[3] = 0x00;
+        data[4] = (led_mask >> 8) & 0xff;
+        data[5] = led_mask & 0xff;
+        syn_send(data, 6);
+
+        /* device responds with a single-byte ACK packet */
+        val = syn_read(data, 2);
+
+        syn_enable_int(true);
     }
-    else
-    {
-        INT_DISABLE;
-    }
+
+    return val;
 }
 
 #ifdef ROCKBOX_HAS_LOGF
@@ -493,7 +604,7 @@ void syn_info(void)
         for (i = 0; i < 8; i++)
             logf("  data[%d] = 0x%02x", i, data[i]);
     }
-    
+
     /* module product info */
     logf("module product info:");
     data[0] = MEP_READ;

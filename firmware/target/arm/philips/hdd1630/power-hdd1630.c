@@ -65,7 +65,10 @@ void power_init(void)
     GPIOA_OUTPUT_EN  |=  0x10; /* set DATA */
     GPIOA_OUTPUT_VAL |=  0x10; /*     high */
 
-    syn_init();
+    if (!touchpad_init())
+    {
+        logf("touchpad not ready");
+    }
 #endif
 }
 

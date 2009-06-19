@@ -25,6 +25,10 @@
 #include <stdbool.h>
 #include "config.h"
 
+#define MEP_BUTTON_HEADER   0x1a
+#define MEP_BUTTON_ID       0x09
+#define MEP_ABSOLUTE_HEADER 0x0b
+
 #define HAS_BUTTON_HOLD
 
 bool button_hold(void);
