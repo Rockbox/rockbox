@@ -292,6 +292,13 @@
 #define UI_LCD_POSX                 38 /* x position of lcd */
 #define UI_LCD_POSY                 38 /* y position of lcd */
 
+#elif defined(PHILIPS_SA9200)
+#define UI_TITLE                    "Philips GoGear SA9200"
+#define UI_WIDTH                    233 /* width of GUI window */
+#define UI_HEIGHT                   435 /* height of GUI window */
+#define UI_LCD_POSX                 50  /* x position of lcd */
+#define UI_LCD_POSY                 50  /* y position of lcd */
+
 #elif defined(PHILIPS_HDD1630)
 #define UI_TITLE                    "Philips GoGear HDD1630"
 #define UI_WIDTH                    407 /* width of GUI window */
