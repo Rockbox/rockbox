@@ -31,6 +31,7 @@
 #include "debug.h"
 #include "jpeg_load.h"
 /*#define JPEG_BS_DEBUG*/
+#define ROCKBOX_DEBUG_JPEG
 /* for portability of below JPEG code */
 #define MEMSET(p,v,c) memset(p,v,c)
 #define MEMCPY(d,s,c) memcpy(d,s,c)
@@ -49,7 +50,23 @@ typedef struct uint8_rgb jpeg_pix_t;
 #else
 typedef uint8_t jpeg_pix_t;
 #endif
+#define JPEG_IDCT_TRANSPOSE
 #define JPEG_PIX_SZ (sizeof(jpeg_pix_t))
+#ifdef HAVE_LCD_COLOR
+#define COLOR_EXTRA_IDCT_WS 64
+#else
+#define COLOR_EXTRA_IDCT_WS 0
+#endif
+#ifdef JPEG_IDCT_TRANSPOSE
+#define V_OUT(n) ws2[8*n]
+#define V_IN_ST 1
+#define TRANSPOSE_EXTRA_IDCT_WS 64
+#else
+#define V_OUT(n) ws[8*n]
+#define V_IN_ST 8
+#define TRANSPOSE_EXTRA_IDCT_WS 0
+#endif
+#define IDCT_WS_SIZE (64 + TRANSPOSE_EXTRA_IDCT_WS + COLOR_EXTRA_IDCT_WS)
 
 /* This can't be in jpeg_load.h because plugin.h includes it, and it conflicts
  * with the definition in jpeg_decoder.h
@@ -259,7 +276,7 @@ INLINE unsigned range_limit(int value)
 */
 
 /* horizontal-pass 1-point IDCT */
-static void idct1h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
+static void jpeg_idct1h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 {
     for (; ws < end; ws += 8)
     {
@@ -269,19 +286,19 @@ static void idct1h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 }
 
 /* vertical-pass 2-point IDCT */
-static void idct2v(int16_t *ws, int16_t *end)
+static void jpeg_idct2v(int16_t *ws, int16_t *end)
 {
     for (; ws < end; ws++)
     {
-        int tmp1 = ws[0];
-        int tmp2 = ws[8];
-        ws[0] = tmp1 + tmp2;
-        ws[8] = tmp1 - tmp2;
+        int tmp1 = ws[0*8];
+        int tmp2 = ws[1*8];
+        ws[0*8] = tmp1 + tmp2;
+        ws[1*8] = tmp1 - tmp2;
     }
 }
 
 /* horizontal-pass 2-point IDCT */
-static void idct2h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
+static void jpeg_idct2h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 {
     for (; ws < end; ws += 8, out += rowstep)
     {
@@ -295,69 +312,12 @@ static void idct2h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
     }
 }
 
+#ifndef CPU_ARM
 /* vertical-pass 4-point IDCT */
-static void idct4v(int16_t *ws, int16_t *end)
+static void jpeg_idct4v(int16_t *ws, int16_t *end)
 {
     for (; ws < end; ws++)
     {
-#if defined(CPU_ARM)
-        int t0, t1, t2, t3, t4;
-#if ARM_ARCH <= 4
-        int t5;
-#endif
-        asm volatile(
-            "ldrsh %[t4], [%[ws]]\n\t"         /* t4 = tmp0 (ws[8*0]) */
-            "ldrsh %[t1], [%[ws], #32]\n\t"    /* t1 = tmp2 (ws[8*2]) */
-            "ldrsh %[t2], [%[ws], #16]\n\t"    /* t2 = z2 (ws[8*1]) */
-            "add   %[t0], %[t4], %[t1]\n\t"    /* t0 = tmp10 >> 2
-                                                  (tmp0 + tmp2) */
-            "sub   %[t1], %[t4], %[t1]\n\t"    /* t1 = tmp12 >> 2
-                                                  (tmp0 - tmp2) */
-            "ldrsh %[t3], [%[ws], #48]\n\t"    /* t3 = z3 (ws[8*3] */
-            "add   %[t4], %[t2], %[t3]\n\t"    /* t4 = z2 + z3 */
-#if ARM_ARCH > 4
-            "smulbb %[t4], %[c1], %[t4]\n\t"
-            "add    %[t4], %[t4], #1024\n\t"   /* t4 = z1 */
-            "smlatb %[t3], %[c2c3], %[t3], %[t4]\n\t"
-            "smlabb %[t2], %[c2c3], %[t2], %[t4]\n\t"
-            "mov   %[t3], %[t3], asr #11\n\t"  /* t3 = tmp0 */
-            "mov   %[t2], %[t2], asr #11\n\t"  /* t2 = tmp2 */
-#else
-            "add   %[t5], %[t4], %[t4], lsl #3\n\t"
-            "rsb   %[t4], %[t4], %[t5], lsl #4\n\t"
-            "rsb   %[t4], %[t4], %[t4], lsl #5\n\t"
-            "add   %[t4], %[t4], #1024\n\t" /*z1*/
-            "mla   %[t3], %[c2], %[t3], %[t4]\n\t"
-            "mla   %[t2], %[c3], %[t2], %[t4]\n\t"
-            "mov   %[t3], %[t3], asr #11\n\t"  /* t3 = tmp0 */
-            "mov   %[t2], %[t2], asr #11\n\t"  /* t2 = tmp2 */
-#endif
-            "add   %[t4], %[t2], %[t0], lsl #2\n\t" /* t4 = tmp10 + tmp2 */
-            "rsb   %[t0], %[t2], %[t0], lsl #2\n\t" /* t0 = tmp10 - tmp2 */
-            "add   %[t2], %[t3], %[t1], lsl #2\n\t" /* t2 = tmp12 + tmp0 */
-            "rsb   %[t3], %[t3], %[t1], lsl #2\n\t" /* t3 = tmp12 - tmp0 */
-            "strh  %[t4], [%[ws]]\n\t"
-            "strh  %[t0], [%[ws], #48]\n\t"
-            "strh  %[t2], [%[ws], #16]\n\t"
-            "strh  %[t3], [%[ws], #32]\n\t"
-            : [t0] "=&r" (t0),
-              [t1] "=&r" (t1),
-              [t2] "=&r" (t2),
-              [t3] "=&r" (t3),
-              [t4] "=&r" (t4)
-#if ARM_ARCH <= 4
-              ,[t5] "=&r" (t5)
-#endif
-            : [ws] "r" (ws),
-#if ARM_ARCH > 4
-              [c1]   "r" (FIX_0_541196100),
-              [c2c3] "r" (((-FIX_1_847759065)<<16)|FIX_0_765366865)
-#else
-              [c2] "r" (-FIX_1_847759065),
-              [c3]  "r" (FIX_0_765366865)
-#endif
-        );
-#else
         int tmp0, tmp2, tmp10, tmp12;
         int z1, z2, z3;
         /* Even part */
@@ -382,93 +342,18 @@ static void idct4v(int16_t *ws, int16_t *end)
             CONST_BITS-PASS1_BITS);
 
         /* Final output stage */
-
         ws[8*0] = (int) (tmp10 + tmp2);
         ws[8*3] = (int) (tmp10 - tmp2);
         ws[8*1] = (int) (tmp12 + tmp0);
         ws[8*2] = (int) (tmp12 - tmp0);
-#endif
     }
 }
 
 /* horizontal-pass 4-point IDCT */
-static void idct4h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
+static void jpeg_idct4h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 {
     for (; ws < end; out += rowstep, ws += 8)
     {
-#if defined(CPU_ARM)
-        int t0, t1, t2, t3, t4;
-#if ARM_ARCH <= 4
-        int t5;
-#endif
-        asm volatile(
-            "ldrsh %[t4], [%[ws]]\n\t"               /* t4 = tmp0 (ws[0]) */
-            "ldrsh %[t1], [%[ws], #4]\n\t"           /* t1 = tmp2 (ws[2]) */
-            "add   %[t4], %[t4], #16\n\t"            /* add rounding to DC */
-            "add   %[t4], %[t4], #4096\n\t"          /* pre-add offset */
-            "ldrsh %[t2], [%[ws], #2]\n\t"           /* t2 = z2 (ws[1]) */
-            "add   %[t0], %[t4], %[t1]\n\t"          /* t0 = tmp10 >> 13
-                                                        (tmp0 + tmp2) */
-            "sub   %[t1], %[t4], %[t1]\n\t"          /* t1 = tmp12 >> 13
-                                                        (tmp0 - tmp2) */
-            "ldrsh %[t3], [%[ws], #6]\n\t"           /* t3 = z3 (ws[3] */
-            "add   %[t4], %[t2], %[t3]\n\t"          /* t4 = z2 + z3 */
-#if ARM_ARCH > 4
-            "smulbb %[t4], %[c1], %[t4]\n\t"
-            "smlatb %[t3], %[c2c3], %[t3], %[t4]\n\t"
-            "smlabb %[t2], %[c2c3], %[t2], %[t4]\n\t"
-#else
-            "add   %[t5], %[t4], %[t4], lsl #3\n\t"
-            "rsb   %[t4], %[t4], %[t5], lsl #4\n\t"
-            "rsb   %[t4], %[t4], %[t4], lsl #5\n\t"  /* t4 = z1 */
-            "mla   %[t3], %[c2], %[t3], %[t4]\n\t"
-            "mla   %[t2], %[c3], %[t2], %[t4]\n\t"
-#endif
-            "add   %[t4], %[t2], %[t0], lsl #13\n\t" /* t4 = tmp10 + tmp2 */
-            "rsb   %[t0], %[t2], %[t0], lsl #13\n\t" /* t0 = tmp10 - tmp2 */
-            "add   %[t2], %[t3], %[t1], lsl #13\n\t" /* t2 = tmp12 + tmp0 */
-            "rsb   %[t3], %[t3], %[t1], lsl #13\n\t" /* t3 = tmp12 - tmp0 */
-            "mov   %[t4], %[t4], asr #18\n\t"        /* descale results */
-            "mov   %[t0], %[t0], asr #18\n\t"
-            "mov   %[t2], %[t2], asr #18\n\t"
-            "mov   %[t3], %[t3], asr #18\n\t"
-            "cmp   %[t4], #255\n\t"                  /* range limit results */
-            "mvnhi %[t4], %[t4], asr #31\n\t"
-            "cmp   %[t0], #255\n\t"
-            "mvnhi %[t0], %[t0], asr #31\n\t"
-            "cmp   %[t2], #255\n\t"
-            "mvnhi %[t2], %[t2], asr #31\n\t"
-            "cmp   %[t3], #255\n\t"
-            "mvnhi %[t3], %[t3], asr #31\n\t"
-            "cmp   %[t4], #255\n\t"
-            "mvnhi %[t4], %[t4], asr #31\n\t"
-            "strb  %[t4], [%[out]]\n\t"
-            "strb  %[t0], [%[out], %[o3]]\n\t"
-            "strb  %[t2], [%[out], %[o1]]\n\t"
-            "strb  %[t3], [%[out], %[o2]]\n\t"
-            : [t0] "=&r" (t0),
-              [t1] "=&r" (t1),
-              [t2] "=&r" (t2),
-              [t3] "=&r" (t3),
-              [t4] "=&r" (t4)
-#if ARM_ARCH <= 4
-
-              ,[t5] "=&r" (t5)
-#endif
-            : [ws]  "r" (ws),
-              [out] "r" (out),
-              [o1]  "i" (JPEG_PIX_SZ),
-              [o2]  "i" (JPEG_PIX_SZ*2),
-              [o3]  "i" (JPEG_PIX_SZ*3),
-#if ARM_ARCH > 4
-              [c1]   "r" (FIX_0_541196100),
-              [c2c3] "r" (((-FIX_1_847759065)<<16)|FIX_0_765366865)
-#else
-              [c2] "r" (-FIX_1_847759065),
-              [c3] "r" (FIX_0_765366865)
-#endif
-        );
-#else
         int tmp0, tmp2, tmp10, tmp12;
         int z1, z2, z3;
         /* Even part */
@@ -500,18 +385,27 @@ static void idct4h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
             DS_OUT));
         out[JPEG_PIX_SZ*2] = range_limit((int) RIGHT_SHIFT(tmp12 - tmp0,
             DS_OUT));
-#endif
     }
 }
+#else
+extern void jpeg_idct4v(int16_t *ws, int16_t *end);
+extern void jpeg_idct4h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
+#endif
 
 /* vertical-pass 8-point IDCT */
-static void idct8v(int16_t *ws, int16_t *end)
+static void jpeg_idct8v(int16_t *ws, int16_t *end)
 {
     long tmp0, tmp1, tmp2, tmp3;
     long tmp10, tmp11, tmp12, tmp13;
     long z1, z2, z3, z4, z5;
+#ifdef JPEG_IDCT_TRANSPOSE
+    int16_t *ws2 = ws + 64;
+    for (; ws < end; ws += 8, ws2++)
+    {
+#else
     for (; ws < end; ws++)
     {
+#endif
     /* Due to quantization, we will usually find that many of the input
     * coefficients are zero, especially the AC terms.  We can exploit this
     * by short-circuiting the IDCT calculation for any column in which all
@@ -520,30 +414,30 @@ static void idct8v(int16_t *ws, int16_t *end)
     * With typical images and quantization tables, half or more of the
     * column DCT calculations can be simplified this way.
     */
-        if ((ws[8*1] | ws[8*2] | ws[8*3]
-           | ws[8*4] | ws[8*5] | ws[8*6] | ws[8*7]) == 0)
+        if ((ws[V_IN_ST*1] | ws[V_IN_ST*2] | ws[V_IN_ST*3]
+           | ws[V_IN_ST*4] | ws[V_IN_ST*5] | ws[V_IN_ST*6] | ws[V_IN_ST*7]) == 0)
         {
             /* AC terms all zero */
-            int dcval = ws[8*0] << PASS1_BITS;
+            int dcval = ws[V_IN_ST*0] << PASS1_BITS;
 
-            ws[8*0] = ws[8*1] = ws[8*2] = ws[8*3] = ws[8*4]
-                       = ws[8*5] = ws[8*6] = ws[8*7] = dcval;
+            V_OUT(0) = V_OUT(1) = V_OUT(2) = V_OUT(3) = V_OUT(4) = V_OUT(5) =
+                       V_OUT(6) = V_OUT(7) = dcval;
             continue;
         }
 
         /* Even part: reverse the even part of the forward DCT. */
         /* The rotator is sqrt(2)*c(-6). */
 
-        z2 = ws[8*2];
-        z3 = ws[8*6];
+        z2 = ws[V_IN_ST*2];
+        z3 = ws[V_IN_ST*6];
 
         z1 = MULTIPLY16(z2 + z3, FIX_0_541196100);
         tmp2 = z1 + MULTIPLY16(z3, - FIX_1_847759065);
         tmp3 = z1 + MULTIPLY16(z2, FIX_0_765366865);
 
-        z2 = ws[8*0] << CONST_BITS;
+        z2 = ws[V_IN_ST*0] << CONST_BITS;
         z2 += ONE << (CONST_BITS - PASS1_BITS - 1);
-        z3 = ws[8*4] << CONST_BITS;
+        z3 = ws[V_IN_ST*4] << CONST_BITS;
 
         tmp0 = (z2 + z3);
         tmp1 = (z2 - z3);
@@ -556,10 +450,10 @@ static void idct8v(int16_t *ws, int16_t *end)
         /* Odd part per figure 8; the matrix is unitary and hence its
            transpose is its inverse.  i0..i3 are y7,y5,y3,y1 respectively. */
 
-        tmp0 = ws[8*7];
-        tmp1 = ws[8*5];
-        tmp2 = ws[8*3];
-        tmp3 = ws[8*1];
+        tmp0 = ws[V_IN_ST*7];
+        tmp1 = ws[V_IN_ST*5];
+        tmp2 = ws[V_IN_ST*3];
+        tmp3 = ws[V_IN_ST*1];
 
         z1 = tmp0 + tmp3;
         z2 = tmp1 + tmp2;
@@ -586,19 +480,19 @@ static void idct8v(int16_t *ws, int16_t *end)
 
         /* Final output stage: inputs are tmp10..tmp13, tmp0..tmp3 */
 
-        ws[8*0] = (int) RIGHT_SHIFT(tmp10 + tmp3, CONST_BITS-PASS1_BITS);
-        ws[8*7] = (int) RIGHT_SHIFT(tmp10 - tmp3, CONST_BITS-PASS1_BITS);
-        ws[8*1] = (int) RIGHT_SHIFT(tmp11 + tmp2, CONST_BITS-PASS1_BITS);
-        ws[8*6] = (int) RIGHT_SHIFT(tmp11 - tmp2, CONST_BITS-PASS1_BITS);
-        ws[8*2] = (int) RIGHT_SHIFT(tmp12 + tmp1, CONST_BITS-PASS1_BITS);
-        ws[8*5] = (int) RIGHT_SHIFT(tmp12 - tmp1, CONST_BITS-PASS1_BITS);
-        ws[8*3] = (int) RIGHT_SHIFT(tmp13 + tmp0, CONST_BITS-PASS1_BITS);
-        ws[8*4] = (int) RIGHT_SHIFT(tmp13 - tmp0, CONST_BITS-PASS1_BITS);
+        V_OUT(0) = (int) RIGHT_SHIFT(tmp10 + tmp3, CONST_BITS-PASS1_BITS);
+        V_OUT(7) = (int) RIGHT_SHIFT(tmp10 - tmp3, CONST_BITS-PASS1_BITS);
+        V_OUT(1) = (int) RIGHT_SHIFT(tmp11 + tmp2, CONST_BITS-PASS1_BITS);
+        V_OUT(6) = (int) RIGHT_SHIFT(tmp11 - tmp2, CONST_BITS-PASS1_BITS);
+        V_OUT(2) = (int) RIGHT_SHIFT(tmp12 + tmp1, CONST_BITS-PASS1_BITS);
+        V_OUT(5) = (int) RIGHT_SHIFT(tmp12 - tmp1, CONST_BITS-PASS1_BITS);
+        V_OUT(3) = (int) RIGHT_SHIFT(tmp13 + tmp0, CONST_BITS-PASS1_BITS);
+        V_OUT(4) = (int) RIGHT_SHIFT(tmp13 - tmp0, CONST_BITS-PASS1_BITS);
     }
 }
 
 /* horizontal-pass 8-point IDCT */
-static void idct8h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
+static void jpeg_idct8h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 {
     long tmp0, tmp1, tmp2, tmp3;
     long tmp10, tmp11, tmp12, tmp13;
@@ -709,20 +603,26 @@ static void idct8h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 
 #ifdef HAVE_LCD_COLOR
 /* vertical-pass 16-point IDCT */
-static void idct16v(int16_t *ws, int16_t *end)
+static void jpeg_idct16v(int16_t *ws, int16_t *end)
 {
     long tmp0, tmp1, tmp2, tmp3, tmp10, tmp11, tmp12, tmp13;
     long tmp20, tmp21, tmp22, tmp23, tmp24, tmp25, tmp26, tmp27;
     long z1, z2, z3, z4;
+#ifdef JPEG_IDCT_TRANSPOSE
+    int16_t *ws2 = ws + 64;
+    for (; ws < end; ws += 8, ws2++)
+    {
+#else
     for (; ws < end; ws++)
     {
+#endif
         /* Even part */
 
-        tmp0 = ws[8*0] << CONST_BITS;
+        tmp0 = ws[V_IN_ST*0] << CONST_BITS;
         /* Add fudge factor here for final descale. */
         tmp0 += 1 << (CONST_BITS-PASS1_BITS-1);
 
-        z1 = ws[8*4];
+        z1 = ws[V_IN_ST*4];
         tmp1 = MULTIPLY(z1, FIX(1.306562965));      /* c4[16] = c2[8] */
         tmp2 = MULTIPLY(z1, FIX_0_541196100);       /* c12[16] = c6[8] */
 
@@ -731,8 +631,8 @@ static void idct16v(int16_t *ws, int16_t *end)
         tmp12 = tmp0 + tmp2;
         tmp13 = tmp0 - tmp2;
 
-        z1 = ws[8*2];
-        z2 = ws[8*6];
+        z1 = ws[V_IN_ST*2];
+        z2 = ws[V_IN_ST*6];
         z3 = z1 - z2;
         z4 = MULTIPLY(z3, FIX(0.275899379));        /* c14[16] = c7[8] */
         z3 = MULTIPLY(z3, FIX(1.387039845));        /* c2[16] = c1[8] */
@@ -757,10 +657,10 @@ static void idct16v(int16_t *ws, int16_t *end)
 
         /* Odd part */
 
-        z1 = ws[8*1];
-        z2 = ws[8*3];
-        z3 = ws[8*5];
-        z4 = ws[8*7];
+        z1 = ws[V_IN_ST*1];
+        z2 = ws[V_IN_ST*3];
+        z3 = ws[V_IN_ST*5];
+        z4 = ws[V_IN_ST*7];
 
         tmp11 = z1 + z3;
 
@@ -795,27 +695,27 @@ static void idct16v(int16_t *ws, int16_t *end)
         tmp11 += z2;
 
         /* Final output stage */
-        ws[8*0]  = (int) RIGHT_SHIFT(tmp20 + tmp0,  CONST_BITS-PASS1_BITS);
-        ws[8*15] = (int) RIGHT_SHIFT(tmp20 - tmp0,  CONST_BITS-PASS1_BITS);
-        ws[8*1]  = (int) RIGHT_SHIFT(tmp21 + tmp1,  CONST_BITS-PASS1_BITS);
-        ws[8*14] = (int) RIGHT_SHIFT(tmp21 - tmp1,  CONST_BITS-PASS1_BITS);
-        ws[8*2]  = (int) RIGHT_SHIFT(tmp22 + tmp2,  CONST_BITS-PASS1_BITS);
-        ws[8*13] = (int) RIGHT_SHIFT(tmp22 - tmp2,  CONST_BITS-PASS1_BITS);
-        ws[8*3]  = (int) RIGHT_SHIFT(tmp23 + tmp3,  CONST_BITS-PASS1_BITS);
-        ws[8*12] = (int) RIGHT_SHIFT(tmp23 - tmp3,  CONST_BITS-PASS1_BITS);
-        ws[8*4]  = (int) RIGHT_SHIFT(tmp24 + tmp10, CONST_BITS-PASS1_BITS);
-        ws[8*11] = (int) RIGHT_SHIFT(tmp24 - tmp10, CONST_BITS-PASS1_BITS);
-        ws[8*5]  = (int) RIGHT_SHIFT(tmp25 + tmp11, CONST_BITS-PASS1_BITS);
-        ws[8*10] = (int) RIGHT_SHIFT(tmp25 - tmp11, CONST_BITS-PASS1_BITS);
-        ws[8*6]  = (int) RIGHT_SHIFT(tmp26 + tmp12, CONST_BITS-PASS1_BITS);
-        ws[8*9]  = (int) RIGHT_SHIFT(tmp26 - tmp12, CONST_BITS-PASS1_BITS);
-        ws[8*7]  = (int) RIGHT_SHIFT(tmp27 + tmp13, CONST_BITS-PASS1_BITS);
-        ws[8*8]  = (int) RIGHT_SHIFT(tmp27 - tmp13, CONST_BITS-PASS1_BITS);
+        V_OUT(0)  = (int) RIGHT_SHIFT(tmp20 + tmp0,  CONST_BITS-PASS1_BITS);
+        V_OUT(15) = (int) RIGHT_SHIFT(tmp20 - tmp0,  CONST_BITS-PASS1_BITS);
+        V_OUT(1)  = (int) RIGHT_SHIFT(tmp21 + tmp1,  CONST_BITS-PASS1_BITS);
+        V_OUT(14) = (int) RIGHT_SHIFT(tmp21 - tmp1,  CONST_BITS-PASS1_BITS);
+        V_OUT(2)  = (int) RIGHT_SHIFT(tmp22 + tmp2,  CONST_BITS-PASS1_BITS);
+        V_OUT(13) = (int) RIGHT_SHIFT(tmp22 - tmp2,  CONST_BITS-PASS1_BITS);
+        V_OUT(3)  = (int) RIGHT_SHIFT(tmp23 + tmp3,  CONST_BITS-PASS1_BITS);
+        V_OUT(12) = (int) RIGHT_SHIFT(tmp23 - tmp3,  CONST_BITS-PASS1_BITS);
+        V_OUT(4)  = (int) RIGHT_SHIFT(tmp24 + tmp10, CONST_BITS-PASS1_BITS);
+        V_OUT(11) = (int) RIGHT_SHIFT(tmp24 - tmp10, CONST_BITS-PASS1_BITS);
+        V_OUT(5)  = (int) RIGHT_SHIFT(tmp25 + tmp11, CONST_BITS-PASS1_BITS);
+        V_OUT(10) = (int) RIGHT_SHIFT(tmp25 - tmp11, CONST_BITS-PASS1_BITS);
+        V_OUT(6)  = (int) RIGHT_SHIFT(tmp26 + tmp12, CONST_BITS-PASS1_BITS);
+        V_OUT(9)  = (int) RIGHT_SHIFT(tmp26 - tmp12, CONST_BITS-PASS1_BITS);
+        V_OUT(7)  = (int) RIGHT_SHIFT(tmp27 + tmp13, CONST_BITS-PASS1_BITS);
+        V_OUT(8)  = (int) RIGHT_SHIFT(tmp27 - tmp13, CONST_BITS-PASS1_BITS);
     }
 }
 
 /* horizontal-pass 16-point IDCT */
-static void idct16h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
+static void jpeg_idct16h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep)
 {
     long tmp0, tmp1, tmp2, tmp3, tmp10, tmp11, tmp12, tmp13;
     long tmp20, tmp21, tmp22, tmp23, tmp24, tmp25, tmp26, tmp27;
@@ -946,12 +846,12 @@ struct idct_entry {
 };
 
 struct idct_entry idct_tbl[] = {
-    { PASS1_BITS, NULL, idct1h },
-    { PASS1_BITS, idct2v, idct2h },
-    { 0, idct4v, idct4h },
-    { 0, idct8v, idct8h },
+    { PASS1_BITS, NULL, jpeg_idct1h },
+    { PASS1_BITS, jpeg_idct2v, jpeg_idct2h },
+    { 0, jpeg_idct4v, jpeg_idct4h },
+    { 0, jpeg_idct8v, jpeg_idct8h },
 #ifdef HAVE_LCD_COLOR
-    { 0, idct16v, idct16h },
+    { 0, jpeg_idct16v, jpeg_idct16h },
 #endif
 };
 
@@ -1468,21 +1368,27 @@ static void fix_huff_tbl(int* htbl, struct derived_tbl* dtbl)
 }
 
 
-/* zag[i] is the natural-order position of the i'th element of zigzag order.
- * If the incoming data is corrupted, decode_mcu could attempt to
- * reference values beyond the end of the array.  To avoid a wild store,
- * we put some extra zeroes after the real entries.
- */
+/* zag[i] is the natural-order position of the i'th element of zigzag order. */
 static const unsigned char zag[] =
 {
-     0,  1,  8, 16,  9,  2,  3, 10,
-    17, 24, 32, 25, 18, 11,  4,  5,
-    12, 19, 26, 33, 40, 48, 41, 34,
-    27, 20, 13,  6,  7, 14, 21, 28,
-    35, 42, 49, 56, 57, 50, 43, 36,
-    29, 22, 15, 23, 30, 37, 44, 51,
-    58, 59, 52, 45, 38, 31, 39, 46,
-    53, 60, 61, 54, 47, 55, 62, 63,
+#ifdef JPEG_IDCT_TRANSPOSE
+      0,   8,   1,   2,   9,  16,  24,  17,
+     10,   3,   4,  11,  18,  25,  32,  40,
+     33,  26,  19,  12,   5,   6,  13,  20,
+     27,  34,  41,  48,  56,  49,  42,  35,
+     28,  21,  14,   7,  15,  22,  29,  36,
+     43,  50,  57,  58,  51,  44,  37,  30,
+     23,  31,  38,  45,  52,  59,  60,  53,
+     46,  39,  47,  54,  61,  62,  55,  63,
+#endif
+      0,   1,   8,  16,   9,   2,   3,  10,
+     17,  24,  32,  25,  18,  11,   4,   5,
+     12,  19,  26,  33,  40,  48,  41,  34,
+     27,  20,  13,   6,   7,  14,  21,  28,
+     35,  42,  49,  56,  57,  50,  43,  36,
+     29,  22,  15,  23,  30,  37,  44,  51,
+     58,  59,  52,  45,  38,  31,  39,  46,
+     53,  60,  61,  54,  47,  55,  62,  63,
 };
 
 /* zig[i] is the the zig-zag order position of the i'th element of natural
@@ -1898,17 +1804,20 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
         store_offs[p_jpeg->store_pos[1]] = JPEG_PIX_SZ << p_jpeg->h_scale[0];
         store_offs[p_jpeg->store_pos[2]] = b_width << p_jpeg->v_scale[0];
         store_offs[p_jpeg->store_pos[3]] = store_offs[1] + store_offs[2];
-
-        int16_t block[128]; /* decoded DCT coefficients */
+        /* decoded DCT coefficients */
+        int16_t block[IDCT_WS_SIZE] __attribute__((aligned(8)));
         for (x = 0; x < p_jpeg->x_mbl; x++)
         {
             int blkn;
             for (blkn = 0; blkn < p_jpeg->blocks; blkn++)
             {
-                int k = 1; /* coefficient index */
-                int s, r; /* huffman values */
                 int ci = p_jpeg->mcu_membership[blkn]; /* component index */
                 int ti = p_jpeg->tab_membership[blkn]; /* table index */
+#ifdef JPEG_IDCT_TRANSPOSE
+                bool transpose = p_jpeg->v_scale[!!ci] > 2;
+#endif
+                int k = 1; /* coefficient index */
+                int s, r; /* huffman values */
                 struct derived_tbl* dctbl = &p_jpeg->dc_derived_tbls[ti];
                 struct derived_tbl* actbl = &p_jpeg->ac_derived_tbls[ti];
 
@@ -1948,7 +1857,11 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                             r = get_bits(p_jpeg, s);
                             r = HUFF_EXTEND(r, s);
                             r = MULTIPLY16(r, p_jpeg->quanttable[!!ci][k]);
+#ifdef JPEG_IDCT_TRANSPOSE
+                            block[zag[transpose ? k : k + 64]] = r ;
+#else
                             block[zag[k]] = r ;
+#endif
                         }
                         else
                         {
@@ -1988,10 +1901,19 @@ block_end:
                     int idct_rows = BIT_N(p_jpeg->v_scale[!!ci]);
                     unsigned char *b_out = out + (ci ? ci : store_offs[blkn]);
                     if (idct_tbl[p_jpeg->v_scale[!!ci]].v_idct)
+#ifdef JPEG_IDCT_TRANSPOSE
+                        idct_tbl[p_jpeg->v_scale[!!ci]].v_idct(block,
+                            transpose ? block + 8 * idct_cols
+                                      : block + idct_cols);
+                    uint16_t * h_block = transpose ? block + 64 : block;
+                    idct_tbl[p_jpeg->h_scale[!!ci]].h_idct(h_block, b_out,
+                        h_block + idct_rows * 8, b_width);
+#else
                         idct_tbl[p_jpeg->v_scale[!!ci]].v_idct(block,
                             block + idct_cols);
                     idct_tbl[p_jpeg->h_scale[!!ci]].h_idct(block, b_out,
                         block + idct_rows * 8, b_width);
+#endif
                 }
             } /* for blkn */
             /* don't starve other threads while an MCU row decodes */
@@ -2048,7 +1970,6 @@ int read_jpeg_file(const char* filename,
 {
     int fd, ret;
     fd = open(filename, O_RDONLY);
-
     JDEBUGF("read_jpeg_file: filename: %s buffer len: %d cformat: %p\n",
         filename, maxsize, cformat);
     /* Exit if file opening failed */
@@ -2181,14 +2102,22 @@ int read_jpeg_fd(int fd,
     int decode_h = BIT_N(p_jpeg->v_scale[0]) - 1;
     src_dim.width = (p_jpeg->x_size << p_jpeg->h_scale[0]) >> 3;
     src_dim.height = (p_jpeg->y_size << p_jpeg->v_scale[0]) >> 3;
-    p_jpeg->zero_need[0] = (decode_h << 3) + decode_w;
-    p_jpeg->k_need[0] = zig[p_jpeg->zero_need[0]];
+#ifdef JPEG_IDCT_TRANSPOSE
+    if (p_jpeg->v_scale[0] > 2)
+        p_jpeg->zero_need[0] = (decode_w << 3) + decode_h;
+    else
+#endif
+        p_jpeg->zero_need[0] = (decode_h << 3) + decode_w;
+    p_jpeg->k_need[0] = zig[(decode_h << 3) + decode_w];
     JDEBUGF("need luma components to %d\n", p_jpeg->k_need[0]);
 #ifdef HAVE_LCD_COLOR
     decode_w = BIT_N(MIN(p_jpeg->h_scale[1],3)) - 1;
     decode_h = BIT_N(MIN(p_jpeg->v_scale[1],3)) - 1;
-    p_jpeg->zero_need[1] = (decode_h << 3) + decode_w;
-    p_jpeg->k_need[1] =  zig[p_jpeg->zero_need[1]];
+    if (p_jpeg->v_scale[1] > 2)
+        p_jpeg->zero_need[1] = (decode_w << 3) + decode_h;
+    else
+        p_jpeg->zero_need[1] = (decode_h << 3) + decode_w;
+    p_jpeg->k_need[1] = zig[(decode_h << 3) + decode_w];
     JDEBUGF("need chroma components to %d\n", p_jpeg->k_need[1]);
 #endif
     if (cformat)

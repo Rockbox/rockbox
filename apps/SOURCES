@@ -104,6 +104,9 @@ recorder/resize.c
 #endif
 #ifdef HAVE_JPEG
 recorder/jpeg_load.c
+#ifdef CPU_ARM
+recorder/jpeg_idct_arm.S
+#endif
 #endif
 #ifdef HAVE_ALBUMART
 recorder/albumart.c

@@ -27,6 +27,9 @@ playergfx.c
 profile_plugin.c
 #endif
 #ifdef HAVE_LCD_BITMAP
+#ifdef CPU_ARM
+pluginlib_jpeg_idct_arm.S
+#endif
 pluginlib_jpeg_mem.c
 pluginlib_resize.c
 #ifndef HAVE_JPEG
