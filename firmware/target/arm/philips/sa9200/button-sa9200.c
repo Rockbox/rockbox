@@ -22,11 +22,58 @@
 #include "system.h"
 #include "button.h"
 #include "backlight.h"
+#include "synaptics-mep.h"
 
+#define LOGF_ENABLE
+#include "logf.h"
+
+static int int_btn = BUTTON_NONE;
+
+#ifndef BOOTLOADER
 void button_init_device(void)
 {
-    /* TODO...for now, hardware initialisation is done by the c200 bootloader */
+    /* The touchpad is powered on and initialized in power-sa9200.c
+       since it needs to be ready for both buttons and button lights. */
 }
+
+/*
+ * Button interrupt handler
+ */
+void button_int(void)
+{
+    char data[4];
+    int val;
+
+    int_btn = BUTTON_NONE;
+
+    val = touchpad_read_device(data, 4);
+
+    if (val == MEP_BUTTON_HEADER)
+    {
+        /* Buttons packet */
+        if (data[1] & 0x1) int_btn |= BUTTON_FFWD;
+        if (data[1] & 0x2) int_btn |= BUTTON_RIGHT;
+        if (data[1] & 0x4) int_btn |= BUTTON_LEFT;
+        if (data[1] & 0x8) int_btn |= BUTTON_REW;
+        if (data[2] & 0x1) int_btn |= BUTTON_MENU;
+    }
+    else if (val == MEP_ABSOLUTE_HEADER)
+    {
+        /* Absolute packet - the finger is on the vertical strip.
+           Position ranges from 1-4095, with 1 at the bottom. */
+        val = ((data[1] >> 4) << 8) | data[2]; /* position */
+
+        if ((val > 0) && (val <= 1365))
+            int_btn |= BUTTON_DOWN;
+        else if ((val > 1365) && (val <= 2730))
+            int_btn |= BUTTON_PLAY;
+        else if ((val > 2730) && (val <= 4095))
+            int_btn |= BUTTON_UP;
+    }
+}
+#else
+void button_init_device(void){}
+#endif /* bootloader */
 
 bool button_hold(void)
 {
@@ -38,32 +85,14 @@ bool button_hold(void)
  */
 int button_read_device(void)
 {
-    int btn = BUTTON_NONE;
-    static bool hold_button = false;
-    bool hold_button_old;
+    int btn = int_btn;
 
-    /* Hold */
-    hold_button_old = hold_button;
-    hold_button = button_hold();
+    if (button_hold())
+        return BUTTON_NONE;
 
-#ifndef BOOTLOADER
-    if (hold_button != hold_button_old)
-        backlight_hold_changed(hold_button);
-#endif
-
-    /* device buttons */
-    if (!hold_button)
-    {
-#if 0
-        if (!(GPIOB_INPUT_VAL & 0x20)) btn |= BUTTON_POWER;
-        if (!(GPIOF_INPUT_VAL & 0x10)) btn |= BUTTON_VOL_UP;
-        if (!(GPIOF_INPUT_VAL & 0x04)) btn |= BUTTON_VOL_DOWN;
-#endif
-        /* A hack until the touchpad works */
-        if (!(GPIOB_INPUT_VAL & 0x20)) btn |= BUTTON_SELECT;
-        if (!(GPIOF_INPUT_VAL & 0x10)) btn |= BUTTON_UP;
-        if (!(GPIOF_INPUT_VAL & 0x04)) btn |= BUTTON_DOWN;
-    }
+    if (!(GPIOB_INPUT_VAL & 0x20)) btn |= BUTTON_POWER;
+    if (!(GPIOF_INPUT_VAL & 0x10)) btn |= BUTTON_VOL_UP;
+    if (!(GPIOF_INPUT_VAL & 0x04)) btn |= BUTTON_VOL_DOWN;
 
     return btn;
 }

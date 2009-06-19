@@ -25,15 +25,23 @@
 #include <stdbool.h>
 #include "config.h"
 
+#define MEP_BUTTON_HEADER   0x1a
+#define MEP_BUTTON_ID       0x09
+#define MEP_ABSOLUTE_HEADER 0x0b
+
 #define HAS_BUTTON_HOLD
 
 bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
 
+#ifndef BOOTLOADER
+void button_int(void);
+#endif
+
 /* Main unit's buttons */
 #define BUTTON_POWER        0x00000001
-#define BUTTON_SELECT       0x00000002
+#define BUTTON_PLAY         0x00000002
 #define BUTTON_MENU         0x00000004
 #define BUTTON_LEFT         0x00000008
 #define BUTTON_RIGHT        0x00000010

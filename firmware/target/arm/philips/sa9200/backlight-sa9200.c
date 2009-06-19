@@ -21,10 +21,10 @@
 #include "config.h"
 #include "backlight-target.h"
 #include "system.h"
-#include "lcd.h"
 #include "backlight.h"
 #include "ascodec.h"
 #include "as3514.h"
+#include "synaptics-mep.h"
 
 void _backlight_set_brightness(int brightness)
 {
@@ -51,12 +51,29 @@ void _backlight_off(void)
 #endif
 }
 
+#ifdef HAVE_BUTTON_LIGHT
+
+#define BUTTONLIGHT_MASK 0x7f
+#define BUTTONLIGHT_MAX  0x0f
+static unsigned short buttonlight_status = 0;
+
 void _buttonlight_on(void)
 {
-    /* TODO */
+    if (!buttonlight_status)
+    {
+        touchpad_set_buttonlights(BUTTONLIGHT_MASK, BUTTONLIGHT_MAX);
+        GPIOD_OUTPUT_VAL &= ~(0x40 | 0x20 | 0x04); /* REW/FFWD/MENU */
+        buttonlight_status = 1;
+    }
 }
 
 void _buttonlight_off(void)
 {
-    /* TODO */
+    if (buttonlight_status)
+    {
+        touchpad_set_buttonlights(BUTTONLIGHT_MASK, 0);
+        GPIOD_OUTPUT_VAL |= (0x40 | 0x20 | 0x04); /* REW/FFWD/MENU */
+        buttonlight_status = 0;
+    }
 }
+#endif

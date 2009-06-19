@@ -547,6 +547,9 @@ target/arm/sandisk/audio-c200_e200.c
 
 #ifdef PHILIPS_SA9200
 #ifndef SIMULATOR
+#ifndef BOOTLOADER
+drivers/synaptics-mep.c
+#endif /* BOOTLOADER */
 target/arm/adc-as3514.c
 target/arm/ascodec-pp.c
 target/arm/ata-sd-pp.c

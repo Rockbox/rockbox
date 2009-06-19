@@ -22,14 +22,50 @@
 #include <stdbool.h>
 #include "system.h"
 #include "cpu.h"
-#include "i2c-pp.h"
-#include "tuner.h"
 #include "ascodec.h"
 #include "as3514.h"
 #include "power.h"
+#include "synaptics-mep.h"
+#include "logf.h"
 
 void power_init(void)
 {
+#ifndef BOOTLOADER
+    /* Power on and initialize the touchpad here because we need it for
+       both buttons and button lights */
+    DEV_INIT2 &= ~0x800;
+
+    char byte = ascodec_read(AS3514_CVDD_DCDC3);
+    byte = (byte & ~0x18) | 0x08;
+    ascodec_write(AS3514_CVDD_DCDC3, byte);
+
+    /* LEDs for REW, FFWD, MENU */
+    GPIOD_ENABLE     |=  (0x40 | 0x20 | 0x04);
+    GPIOD_OUTPUT_VAL |=  (0x40 | 0x20 | 0x04);
+    GPIOD_OUTPUT_EN  |=  (0x40 | 0x20 | 0x04);
+    udelay(20000);
+
+    GPIOL_ENABLE     |=  0x10;
+    GPIOL_OUTPUT_VAL &= ~0x10;
+    GPIOL_OUTPUT_EN  |=  0x10;
+    udelay(100000);
+
+    /* enable DATA, ACK, CLK lines */
+    GPIOD_ENABLE     |=  (0x10 | 0x08 | 0x02);
+
+    GPIOD_OUTPUT_EN  |=  0x08; /* ACK  */
+    GPIOD_OUTPUT_VAL |=  0x08; /* high */
+
+    GPIOD_OUTPUT_EN  &= ~0x02; /* CLK  */
+    
+    GPIOD_OUTPUT_EN  |=  0x10; /* DATA */
+    GPIOD_OUTPUT_VAL |=  0x10; /* high */
+
+    if (!touchpad_init())
+    {
+        logf("touchpad not ready");
+    }
+#endif
 }
 
 void power_off(void)

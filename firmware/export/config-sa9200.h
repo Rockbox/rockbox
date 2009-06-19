@@ -59,6 +59,9 @@
 
 #define CONFIG_KEYPAD PHILIPS_SA9200_PAD
 
+/* define this if the target has volume keys which can be used in the lists */
+#define HAVE_VOLUME_IN_LIST
+
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
@@ -98,6 +101,11 @@
 
 /* Which backlight fading type? */
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
+
+/* define this if you have a light associated with the buttons */
+#define HAVE_BUTTON_LIGHT
+/* Can't control the brightness on all the buttons */
+/* #define HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
