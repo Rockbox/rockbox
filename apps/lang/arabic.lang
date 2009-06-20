@@ -4289,14 +4289,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "جاري بناء قاعدة البيانات...  عثر على d% (إيقاف للعودة)"
     h100,h120,h300: "جاري بناء قاعدة البيانات...  عثر على d% (إيقاف للعودة)"
     ipod*: "جاري بناء قاعدة البيانات...  عثر على d% (السابق للعودة)"
     x5,m5,gigabeat*,mrobe100: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
-    h10,h10_5gb,e200*,c200,sa9200: "جاري بناء قاعدة البيانات...  عثر على d% (السابق للعودة)"
+    h10,h10_5gb,e200*,c200: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
+    sa9200: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
   </dest>
   <voice>
     *: "المدخلات التي عثر عليها لفاعدة البيانات"
@@ -6760,5 +6762,1345 @@
   <voice>
     *: none
     rtc: "آذار"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_INIT
+  desc: while initializing tagcache on boot
+  user: core
+  <source>
+    *: "Committing database"
+  </source>
+  <dest>
+    *: "ارتكاب قاعدة البيانات"
+  </dest>
+  <voice>
+    *: "ارتكاب قاعدة البيانات"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE
+  desc: in wps and recording trigger menu
+  user: core
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "إيقاف مؤقت"
+  </dest>
+  <voice>
+    *: "إيقاف مؤقت"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATE_DIR
+  desc: in main menu
+  user: core
+  <source>
+    *: "Create Directory"
+  </source>
+  <dest>
+    *: "إنشاء دليل"
+  </dest>
+  <voice>
+    *: "إنشاء دليل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user: core
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "أعلن مستوى البطارية"
+  </dest>
+  <voice>
+    *: "أعلن مستوى البطارية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user: core
+  <source>
+    *: none
+    recording: "Encoder Settings"
+  </source>
+  <dest>
+    *: none
+    recording: "إعدادات التشفير"
+  </dest>
+  <voice>
+    *: none
+    recording: "إعدادات التشفير"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in the main menu
+  user: core
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "التشغيل الآن"
+  </dest>
+  <voice>
+    *: "التشغيل الآن"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest>
+    *: none
+    serial_port: "معدل البت المسلسل"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "معدل البت المسلسل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DIR
+  desc: browser sorting setting
+  user: core
+  <source>
+    *: "Sort Directories"
+  </source>
+  <dest>
+    *: "فرز الأدلة"
+  </dest>
+  <voice>
+    *: "فرز الأدلة"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_WITH_ANY
+  desc: Generic string to use to cancel
+  user: core
+  <source>
+    *: "Any Other = No"
+    player: none
+  </source>
+  <dest>
+    *: "أي آخر = لا"
+    player: none
+  </dest>
+  <voice>
+    *: ""
+    player: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user: core
+  <source>
+    *: none
+    recording_swcodec: "Bitrate"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "معدل البت"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "معدل البت"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALL
+  desc: generic string used both in dir file filter and repeat mode selection
+  user: core
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "الكل"
+  </dest>
+  <voice>
+    *: "الكل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATE_PLAYLIST
+  desc: Menu option for creating a playlist
+  user: core
+  <source>
+    *: "Create Playlist"
+  </source>
+  <dest>
+    *: "إنشاء قائمة التشغيل"
+  </dest>
+  <voice>
+    *: "إنشاء قائمة التشغيل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add to Shortcuts"
+  </source>
+  <dest>
+    *: "أضف إلى اختصارات"
+  </dest>
+  <voice>
+    *: "أضف إلى اختصارات"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETED
+  desc: A file has beed deleted
+  user: core
+  <source>
+    *: "Deleted"
+  </source>
+  <dest>
+    *: "إنحذف"
+  </dest>
+  <voice>
+    *: "إنحذف"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST
+  desc: when playlist has finished
+  user: core
+  <source>
+    *: "End of Song List"
+    player: "End of List"
+  </source>
+  <dest>
+    *: "نهاية القائمة"
+    player: "نهاية القائمة الاغنية"
+  </dest>
+  <voice>
+    *: "نهاية القائمة الاغنية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QS_ITEMS
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK
+  desc: in settings_menu()
+  user: core
+  <source>
+    *: "Playback Settings"
+  </source>
+  <dest>
+    *: "إعدادات التشغيل"
+  </dest>
+  <voice>
+    *: "إعدادات التشغيل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_LIVE
+  desc: AGC preset
+  user: core
+  <source>
+    *: none
+    agc: "Live (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "مباشر (بطيء)"
+  </dest>
+  <voice>
+    *: none
+    agc: "مباشر (بطيء)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECURSE_DIRECTORY_QUESTION
+  desc: Asked from onplay screen
+  user: core
+  <source>
+    *: "Recursively?"
+  </source>
+  <dest>
+    *: "تكراري?"
+  </dest>
+  <voice>
+    *: "تكراري?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user: core
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "حفظ إعدادات الموضوع"
+  </dest>
+  <voice>
+    *: "حفظ إعدادات الموضوع"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING_AND_SHUTDOWN
+  desc: in record timesplit options
+  user: core
+  <source>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </source>
+  <dest>
+    *: none
+    recording: "وقف التسجيل و وقف التشغيل"
+  </dest>
+  <voice>
+    *: none
+    recording: "وقف التسجيل و وقف التشغيل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPY
+  desc: The verb/action Copy
+  user: core
+  <source>
+    *: "Copy"
+  </source>
+  <dest>
+    *: "نسخ"
+  </dest>
+  <voice>
+    *: "نسخ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_DYNAMIC_PLAYLIST
+  desc: in playlist menu.
+  user: core
+  <source>
+    *: "Save Current Playlist"
+  </source>
+  <dest>
+    *: "حفظ قائمة التشغيل الحالية"
+  </dest>
+  <voice>
+    *: "حفظ قائمة التشغيل الحالية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIN_DURATION
+  desc: in recording settings_menu
+  user: core
+  <source>
+    *: none
+    recording: "for at least"
+  </source>
+  <dest>
+    *: none
+    recording: "على الأقل"
+  </dest>
+  <voice>
+    *: none
+    recording: "على الأقل"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_TXT
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: deprecated
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BALANCE
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Balance"
+  </source>
+  <dest>
+    *: "التوازن"
+  </dest>
+  <voice>
+    *: "التوازن"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASK
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Ask"
+  </source>
+  <dest>
+    *: "إسأل"
+  </dest>
+  <voice>
+    *: "إسأل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  user: core
+  <source>
+    *: none
+    agc: "Medium"
+  </source>
+  <dest>
+    *: none
+    agc: "متوسط"
+  </dest>
+  <voice>
+    *: none
+    agc: "متوسط"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user: core
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "حفظ إعدادات الصوت"
+  </dest>
+  <voice>
+    *: "حفظ إعدادات الصوت"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: ""
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PM_CLIPCOUNT
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: ""
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CYRILLIC
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Cyrillic (CP1251)"
+  </source>
+  <dest>
+    *: "السيريلية (CP1251)"
+  </dest>
+  <voice>
+    *: "السيريلية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_UTF8
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Unicode (UTF-8)"
+  </source>
+  <dest>
+    *: "يونيكود  (UTF-8)"
+  </dest>
+  <voice>
+    *: "يونيكود"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_HOP_STEP
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_SLOW
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Very slow"
+  </source>
+  <dest>
+    *: "بطىء جدا"
+  </dest>
+  <voice>
+    *: "بطىء جدا"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT
+  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  user: core
+  <source>
+    *: "Insert"
+  </source>
+  <dest>
+    *: "إضف"
+  </dest>
+  <voice>
+    *: "إضف"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_MENU
+  desc: item of voice menu, enable/disable the voice UI
+  user: core
+  <source>
+    *: "Voice Menus"
+  </source>
+  <dest>
+    *: "قوائم الصوت"
+  </dest>
+  <voice>
+    *: "قوائم الصوت"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_DJSET
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    agc: ""
+  </source>
+  <dest>
+    *: none
+    agc: ""
+  </dest>
+  <voice>
+    *: none
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "إعادة معايرة"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "إعادة معايرة"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_FREE_INFO
+  desc: disk size info
+  user: core
+  <source>
+    *: "Free:"
+  </source>
+  <dest>
+    *: "المساحة الحرة:"
+  </dest>
+  <voice>
+    *: "المساحة الحرة:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_CFG
+  desc: in setting_menu()
+  user: core
+  <source>
+    *: "Browse .cfg Files"
+  </source>
+  <dest>
+    *: "تصفح ملفات التهيئة"
+  </dest>
+  <voice>
+    *: "تصفح ملفات التهيئة"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_TIME
+  desc: Display of recorded time
+  user: core
+  <source>
+    *: none
+    recording: "Time:"
+  </source>
+  <dest>
+    *: none
+    recording: "وقت:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_PRESET
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    agc: ""
+  </source>
+  <dest>
+    *: none
+    agc: ""
+  </dest>
+  <voice>
+    *: none
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: main menu title
+  user: core
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "روكبوكس"
+  </dest>
+  <voice>
+    *: "روكبوكس"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user: core
+  <source>
+    *: "Add to New Playlist"
+  </source>
+  <dest>
+    *: "اضف الى قائمة تشغيل جديدة"
+  </dest>
+  <voice>
+    *: "اضف الى قائمة تشغيل جديدة"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_FILE
+  desc: browser sorting setting
+  user: core
+  <source>
+    *: "Sort Files"
+  </source>
+  <dest>
+    *: "فرز الملفات"
+  </dest>
+  <voice>
+    *: "فرز الملفات"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_VOICE
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    agc: ""
+  </source>
+  <dest>
+    *: none
+    agc: ""
+  </dest>
+  <voice>
+    *: none
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: ""
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLEASE_REBOOT
+  desc: when activating an option that requires a reboot
+  user: core
+  <source>
+    *: "Please reboot to enable"
+  </source>
+  <dest>
+    *: "الرجاء إعادة تشغيل لتمكين"
+  </dest>
+  <voice>
+    *: "الرجاء إعادة تشغيل لتمكين"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_REVERT
+  desc: used in set_time()
+  user: core
+  <source>
+    *: none
+    rtc: "OFF = Revert"
+    h100,h120,h300: "STOP = Revert"
+    ipod*,c200: "MENU = Revert"
+    x5,m5: "RECORD = Revert"
+    h10,h10_5gb,e200*: "PREV = Revert"
+    gigabeatf: "POWER = Revert"
+    mrobe100: "DISPLAY = Revert"
+    gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
+  </source>
+  <dest>
+    *: none
+    rtc: "OFF = Revert"
+    h100,h120,h300: "عرض = إاغاء الأمر"
+    ipod*,c200: "قائمة = إاغاء الأمر"
+    x5,m5: "سجل = إاغاء الأمر"
+    h10,h10_5gb,e200*: "السابق = إاغاء الأمر"
+    gigabeatf: "طاقة = إاغاء الأمر"
+    mrobe100: "DISPLAY = Revert"
+    gigabeats: "خلف = إاغاء الأمر"
+    sa9200: "يسار = إاغاء الأمر"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_GRAPHIC
+  desc: Label for type of icon display
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Graphic"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "الرسوم البيانية"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "الرسوم البيانية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in start screen setting
+  user: core
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "الشاشة السابقة"
+  </dest>
+  <voice>
+    *: "الشاشة السابقة"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_ONE
+  desc: repeat one song
+  user: core
+  <source>
+    *: "One"
+  </source>
+  <dest>
+    *: "واحد"
+  </dest>
+  <voice>
+    *: "واحد"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN_EXTENDED
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Latin Extended (ISO-8859-2)"
+  </source>
+  <dest>
+    *: "اللاتينية الممدد (ISO-8859-2)"
+  </dest>
+  <voice>
+    *: "اللاتينية الممدد"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user: core
+  <source>
+    *: "Add to Playlist"
+  </source>
+  <dest>
+    *: "اضف الى قائمة التشغيل"
+  </dest>
+  <voice>
+    *: "اضف الى قائمة التشغيل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_AB
+  desc: repeat range from point A to B
+  user: core
+  <source>
+    *: "A-B"
+  </source>
+  <dest>
+    *: "أ-ب"
+  </dest>
+  <voice>
+    *: "أ-ب"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE
+  desc: The verb/action Move
+  user: core
+  <source>
+    *: "Move"
+  </source>
+  <dest>
+    *: "نقل"
+  </dest>
+  <voice>
+    *: "نقل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RADIO
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    radio: "FM Radio"
+  </source>
+  <dest>
+    *: none
+    radio: "إذاعة اف ام"
+  </dest>
+  <voice>
+    *: none
+    radio: "إذاعة اف ام"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user: core
+  <source>
+    *: none
+    recording: "Start new file"
+  </source>
+  <dest>
+    *: none
+    recording: "بدء ملف جديد"
+  </dest>
+  <voice>
+    *: none
+    recording: "بدء ملف جديد"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "شاشة البداية"
+  </dest>
+  <voice>
+    *: "شاشة البداية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SPLIT_SIZE
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: ""
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_FAST
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Very fast"
+  </source>
+  <dest>
+    *: "سريع جدا"
+  </dest>
+  <voice>
+    *: "سريع جدا"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_DELETE
+  desc: bookmark context menu, delete this bookmark
+  user: core
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "حذف"
+  </dest>
+  <voice>
+    *: "حذف"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_JAPAN
+  desc: fm region japan
+  user: core
+  <source>
+    *: none
+    radio: "Japan"
+  </source>
+  <dest>
+    *: none
+    radio: "اليابان"
+  </dest>
+  <voice>
+    *: none
+    radio: "اليابان"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_ARABIC
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Arabic (CP1256)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "العربية (CP1256)"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "العربية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_LIVE
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    agc: ""
+  </source>
+  <dest>
+    *: none
+    agc: ""
+  </dest>
+  <voice>
+    *: none
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_RIGHT
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: ""
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_MENU
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: "Disk"
+  </source>
+  <dest>
+    *: "القرص"
+  </dest>
+  <voice>
+    *: "القرص"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONBAR_MENU
+  desc: in button bar
+  user: core
+  <source>
+    *: none
+    radio_screen_button_bar: "Menu"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "قائمة"
+  </dest>
+  <voice>
+    *: none
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SHUFFLE
+  desc: bookmark selection list, bookmark enables shuffle
+  user: core
+  <source>
+    *: ", Shuffle"
+  </source>
+  <dest>
+    *: "تشغيل التبديل ،"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user: core
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "نتائج البحث"
+  </dest>
+  <voice>
+    *: "نتائج البحث"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_NUMERIC
+  desc: Label for type of icon display
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Numeric"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "رقمي"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "رقمي"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_NUMBER
+  desc: "talkbox" mode for files+directories
+  user: core
+  <source>
+    *: "Numbers"
+  </source>
+  <dest>
+    *: "أرقام"
+  </dest>
+  <voice>
+    *: "أرقام"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAILED
+  desc: Something failed. To be appended after actions
+  user: core
+  <source>
+    *: "Failed"
+  </source>
+  <dest>
+    *: "فشل"
+  </dest>
+  <voice>
+    *: "فشل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "أوروبا الوسطى (CP1250)"
+  </dest>
+  <voice>
+    *: "أوروبا الوسطى"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEBUG
+  desc: in the info menu
+  user: core
+  <source>
+    *: "Debug (Keep Out!)"
+  </source>
+  <dest>
+    *: "التصحيح (ابعاد!)"
+  </dest>
+  <voice>
+    *: "التصحيح ، ابعاد!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_TIME
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: ""
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_BACKDROP
+  desc: text for onplay menu entry
+  user: core
+  <source>
+    *: none
+    lcd_non-mono: "Set As Backdrop"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "تعيين كخلفية"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: "تعيين كخلفية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_NOVEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
+    *: none
+    rtc: "Nov"
+  </source>
+  <dest>
+    *: none
+    rtc: "Nov"
+  </dest>
+  <voice>
+    *: none
+    rtc: "تشرين الثاني"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest>
+    *: none
+    serial_port: "تلقائي"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "تلقائي"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_READ_FAILED
+  desc: There was an error reading a file
+  user: core
+  <source>
+    *: "Failed reading %s"
+  </source>
+  <dest>
+    *: "فشل قراءة %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user: core
+  <source>
+    *: none
+    radio: "FM Radio Menu"
+  </source>
+  <dest>
+    *: none
+    radio: "قائمة اذاعة اف ام"
+  </dest>
+  <voice>
+    *: none
+    radio: "قائمة اذاعة اف ام"
   </voice>
 </phrase>
