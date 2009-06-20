@@ -91,7 +91,7 @@ sub runone {
     my ($dir, $confnum, $extra)=@_;
     my $a;
 
-    if(@doonly > 0 && !grep(/$dir/, @doonly)) {
+    if(@doonly > 0 && !grep(/^$dir$/, @doonly)) {
         return;
     }
 
@@ -204,3 +204,8 @@ runone("zvm60gb", "creativezvm60gb");
 runone("hdd1630", "hdd1630");
 runone("fuze", "fuze");
 runone("m200v4", "m200v4");
+runone("sa9200", "sa9200");
+runone("sansac200v2", "c200v2");
+runone("yh820", "yh_820");
+runone("yh920", "yh_920");
+runone("yh925", "yh_925");
