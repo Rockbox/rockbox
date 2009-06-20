@@ -774,6 +774,7 @@ cat <<EOF
  120) VX747               110) M6SL
  121) VX767               111) M6SP              ==Logik==
  122) VX747+              112) M3                80) DAX 1GB MP3/DAB
+ 123) VX777
 
  ==Samsung==              ==Tatung==             ==Lyre project==
  140) YH-820              150) Elio TPJ-1022     130) Lyre proto 1
@@ -2055,18 +2056,40 @@ fi
     target_id=54
     modelname="ondavx747p"
     target="-DONDA_VX747P"
-    memory=16 #FIXME
+    memory=16
     mipselcc
-    tool="cp"
+    tool="$rootdir/tools/scramble -add=747p"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.vx747p"
     appextra="recorder:gui"
-    plugins="" #FIXME
+    plugins="yes"
     swcodec="yes"
     toolset=$genericbitmaptools
     boottool="cp"
     bootoutput="rockboot.vx747p"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_jz47xx"
+    t_model="onda_vx747"
+    ;;
+    
+    123|ondavx777)
+    target_id=61
+    modelname="ondavx777"
+    target="-DONDA_VX777"
+    memory=16
+    mipselcc
+    tool="$rootdir/tools/scramble -add=x777"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.vx777"
+    appextra="recorder:gui"
+    plugins="" #TODO
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    boottool="cp"
+    bootoutput="rockboot.vx777"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="mips"
     t_manufacturer="ingenic_jz47xx"

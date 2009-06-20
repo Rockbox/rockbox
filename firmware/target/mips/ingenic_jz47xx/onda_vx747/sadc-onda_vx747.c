@@ -42,6 +42,8 @@
 #define BTN_HOLD     (1 << 22)  /* on REG_GPIO_PXPIN(2) */
 #define BTN_MENU     (1 << 20)
 #define BTN_VOL_UP   (1 << 19)
+#elif defined(ONDA_VX777)
+/* TODO */
 #else
 #error No buttons defined!
 #endif
@@ -123,7 +125,7 @@ unsigned int battery_adc_voltage(void)
 }
 
 void button_init_device(void)
-{   
+{
 #ifdef ONDA_VX747
     __gpio_as_input(32*3 + 29);
     __gpio_as_input(32*3 + 27);
@@ -146,6 +148,8 @@ bool button_hold(void)
             (~REG_GPIO_PXPIN(3)) & BTN_HOLD
 #elif defined(ONDA_VX747P)
             (~REG_GPIO_PXPIN(2)) & BTN_HOLD
+#elif defined(ONDA_VX777)
+            false /* TODO */
 #endif
             ? true : false
            );
@@ -153,13 +157,14 @@ bool button_hold(void)
 
 int button_read_device(int *data)
 {
-    int ret = 0, tmp;
+    int ret = 0;
 
     /* Filter button events out if HOLD button is pressed at firmware/ level */
     if(button_hold())
         return 0;
 
-    tmp = (~REG_GPIO_PXPIN(3)) & BTN_MASK;
+#ifndef ONDA_VX777
+    int tmp = (~REG_GPIO_PXPIN(3)) & BTN_MASK;
 
     if(tmp & BTN_VOL_DOWN)
         ret |= BUTTON_VOL_DOWN;
@@ -169,6 +174,7 @@ int button_read_device(int *data)
         ret |= BUTTON_MENU;
     if(tmp & BTN_OFF)
         ret |= BUTTON_POWER;
+#endif
 
     if(cur_touch != 0 && pen_down)
     {
@@ -176,9 +182,6 @@ int button_read_device(int *data)
         if( UNLIKELY(!is_backlight_on(true)) )
             *data = 0;
     }
-    
-    if(ret & (BUTTON_VOL_DOWN|BUTTON_VOL_UP))
-        touchscreen_set_mode( touchscreen_get_mode() == TOUCHSCREEN_BUTTON ? TOUCHSCREEN_POINT : TOUCHSCREEN_BUTTON);
 
     return ret;
 }

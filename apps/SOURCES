@@ -234,6 +234,8 @@ keymaps/keymap-logikdax.c
 keymaps/keymap-fuze.c
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
 keymaps/keymap-ondavx747.c
+#elif CONFIG_KEYPAD == ONDAVX777_PAD
+keymaps/keymap-ondavx777.c
 #elif CONFIG_KEYPAD == ONDAVX767_PAD
 keymaps/keymap-ondavx767.c
 #elif CONFIG_KEYPAD == SAMSUNG_YH_PAD

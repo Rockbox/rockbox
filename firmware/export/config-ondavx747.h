@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 /*
- * This config file is for the Onda VX747(+)
+ * This config file is for the Onda VX747(+)/VX777
  */
 
 #define TARGET_TREE /* this target is using the target tree system */
@@ -29,8 +29,11 @@
 
 #ifdef ONDA_VX747P
 #define MODEL_NAME  "Onda VX747+"
-#define MODEL_NUMBER 44
+#define MODEL_NUMBER 54
 /* Define something for camera interface... */
+#elif defined(ONDA_VX777)
+#define MODEL_NAME  "Onda VX777"
+#define MODEL_NUMBER 61
 #else
 #define MODEL_NAME  "Onda VX747"
 #define MODEL_NUMBER 45
@@ -87,7 +90,11 @@
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE
 
+#ifdef ONDA_VX777
+#define CONFIG_KEYPAD ONDAVX777_PAD
+#else
 #define CONFIG_KEYPAD ONDAVX747_PAD
+#endif
 #define HAVE_TOUCHSCREEN
 #define HAVE_BUTTON_DATA
 

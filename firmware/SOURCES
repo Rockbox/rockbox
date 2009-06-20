@@ -1267,13 +1267,13 @@ target/mips/ingenic_jz47xx/pcm-jz4740.c
 drivers/nand_id.c
 #endif /* CONFIG_CPU == JZ4732 */
 
-#if defined(ONDA_VX747) || defined(ONDA_VX747P)
+#if defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX777)
 target/mips/ingenic_jz47xx/onda_vx747/backlight-onda_vx7X7.c
 target/mips/ingenic_jz47xx/onda_vx747/lcd-onda_vx747.c
 target/mips/ingenic_jz47xx/onda_vx747/power-onda_vx747.c
 target/mips/ingenic_jz47xx/onda_vx747/sadc-onda_vx747.c
 target/mips/ingenic_jz47xx/onda_vx747/speaker-onda_vx747.c
-#endif /* ONDA_VX747 || ONDA_VX747P */
+#endif /* ONDA_VX747 || ONDA_VX747P || ONDA_VX777 */
 
 #ifdef ONDA_VX767
 target/mips/ingenic_jz47xx/onda_vx747/backlight-onda_vx7X7.c

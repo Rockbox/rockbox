@@ -110,6 +110,7 @@
 #define SANSA_FUZE_PAD     36
 #define LYRE_PROTO1_PAD    37
 #define SAMSUNG_YH_PAD     38
+#define ONDAVX777_PAD      39
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -351,7 +352,7 @@ Lyre prototype 1*/
 #include "config-meizu-m6sp.h"
 #elif defined(MEIZU_M3)
 #include "config-meizu-m3.h"
-#elif defined(ONDA_VX747) || defined(ONDA_VX747P)
+#elif defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX777)
 #include "config-ondavx747.h"
 #elif defined(ONDA_VX767)
 #include "config-ondavx767.h"
