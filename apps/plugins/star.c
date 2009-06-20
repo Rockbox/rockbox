@@ -66,9 +66,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       BUTTON_F3
 #define STAR_LEVEL_DOWN     BUTTON_F1
 #define STAR_LEVEL_REPEAT   BUTTON_F2
-#define STAR_MENU_RUN       BUTTON_PLAY
-#define STAR_MENU_RUN2      BUTTON_RIGHT
-#define STAR_MENU_RUN3      BUTTON_ON
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
 #define STAR_QUIT           BUTTON_OFF
@@ -81,9 +78,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       BUTTON_F3
 #define STAR_LEVEL_DOWN     BUTTON_F1
 #define STAR_LEVEL_REPEAT   BUTTON_F2
-#define STAR_MENU_RUN       BUTTON_SELECT
-#define STAR_MENU_RUN2      BUTTON_RIGHT
-#define STAR_MENU_RUN3      BUTTON_ON
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define STAR_QUIT           BUTTON_OFF
@@ -96,7 +90,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       (BUTTON_MENU | BUTTON_RIGHT)
 #define STAR_LEVEL_DOWN     (BUTTON_MENU | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT   (BUTTON_MENU | BUTTON_UP)
-#define STAR_MENU_RUN       BUTTON_RIGHT
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -110,8 +103,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       (BUTTON_ON | BUTTON_RIGHT)
 #define STAR_LEVEL_DOWN     (BUTTON_ON | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT   (BUTTON_ON | BUTTON_SELECT)
-#define STAR_MENU_RUN       BUTTON_RIGHT
-#define STAR_MENU_RUN2      BUTTON_SELECT
 
 #define STAR_RC_QUIT BUTTON_RC_STOP
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
@@ -128,8 +119,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       (BUTTON_SELECT | BUTTON_RIGHT)
 #define STAR_LEVEL_DOWN     (BUTTON_SELECT | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT   (BUTTON_SELECT | BUTTON_PLAY)
-#define STAR_MENU_RUN       BUTTON_RIGHT
-#define STAR_MENU_RUN2      BUTTON_SELECT
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 
@@ -144,8 +133,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_DOWN_PRE BUTTON_REC
 #define STAR_LEVEL_DOWN     (BUTTON_REC|BUTTON_REPEAT)
 #define STAR_LEVEL_REPEAT   BUTTON_PLAY
-#define STAR_MENU_RUN       BUTTON_RIGHT
-#define STAR_MENU_RUN2      BUTTON_SELECT
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 
@@ -158,8 +145,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       BUTTON_VOL_UP
 #define STAR_LEVEL_DOWN     BUTTON_VOL_DOWN
 #define STAR_LEVEL_REPEAT   BUTTON_A
-#define STAR_MENU_RUN       BUTTON_SELECT
-
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
 (CONFIG_KEYPAD == SANSA_C200_PAD) || \
@@ -175,7 +160,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP      (BUTTON_SELECT | BUTTON_RIGHT)
 #define STAR_LEVEL_DOWN    (BUTTON_SELECT | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT  (BUTTON_SELECT | BUTTON_DOWN)
-#define STAR_MENU_RUN       BUTTON_SELECT
 
 
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
@@ -189,8 +173,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP      (BUTTON_SELECT | BUTTON_RIGHT)
 #define STAR_LEVEL_DOWN    (BUTTON_SELECT | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT  (BUTTON_SELECT | BUTTON_DOWN)
-#define STAR_MENU_RUN       BUTTON_SELECT
-
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 
@@ -203,7 +185,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       (BUTTON_PLAY | BUTTON_SCROLL_UP)
 #define STAR_LEVEL_DOWN     (BUTTON_PLAY | BUTTON_SCROLL_DOWN)
 #define STAR_LEVEL_REPEAT   (BUTTON_PLAY | BUTTON_RIGHT)
-#define STAR_MENU_RUN       BUTTON_FF
 
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
 
@@ -216,7 +197,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       BUTTON_VOL_UP
 #define STAR_LEVEL_DOWN     BUTTON_VOL_DOWN
 #define STAR_LEVEL_REPEAT   BUTTON_MENU
-#define STAR_MENU_RUN       BUTTON_SELECT
 
 #elif (CONFIG_KEYPAD == MROBE100_PAD)
 
@@ -229,7 +209,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       BUTTON_PLAY
 #define STAR_LEVEL_DOWN     BUTTON_MENU
 #define STAR_LEVEL_REPEAT   BUTTON_DISPLAY
-#define STAR_MENU_RUN       BUTTON_SELECT
 
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
 
@@ -242,13 +221,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       (BUTTON_RC_PLAY|BUTTON_RC_VOL_UP)
 #define STAR_LEVEL_DOWN     (BUTTON_RC_PLAY|BUTTON_RC_VOL_DOWN)
 #define STAR_LEVEL_REPEAT   (BUTTON_RC_PLAY|BUTTON_RC_MENU)
-#define STAR_MENU_RUN       BUTTON_RC_FF
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 
 #define STAR_QUIT           BUTTON_POWER
 #define STAR_QUIT_NAME      "[POWER]"
-#define STAR_MENU_RUN       BUTTON_MENU
 
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 
@@ -261,7 +238,6 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       (BUTTON_CUSTOM | BUTTON_UP)
 #define STAR_LEVEL_DOWN     (BUTTON_CUSTOM | BUTTON_DOWN)
 #define STAR_LEVEL_REPEAT   (BUTTON_CUSTOM | BUTTON_RIGHT)
-#define STAR_MENU_RUN       BUTTON_MENU
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 
@@ -274,13 +250,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       BUTTON_VOL_UP
 #define STAR_LEVEL_DOWN     BUTTON_VOL_DOWN
 #define STAR_LEVEL_REPEAT   BUTTON_VIEW
-#define STAR_MENU_RUN       BUTTON_MENU
 
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD)
 
 #define STAR_QUIT           BUTTON_POWER
 #define STAR_QUIT_NAME      "[POWER]"
-#define STAR_MENU_RUN       BUTTON_MENU
 
 #elif CONFIG_KEYPAD == MROBE500_PAD
 #define STAR_QUIT           BUTTON_POWER
@@ -295,9 +269,6 @@ PLUGIN_HEADER
 //#define STAR_QUIT           BUTTON_TOPLEFT
 //#define STAR_QUIT_NAME           "[TOPLEFT]"
 //#endif
-#ifndef STAR_MENU_RUN
-#define STAR_MENU_RUN       BUTTON_TOPRIGHT
-#endif
 #ifndef STAR_LEFT
 #define STAR_LEFT           BUTTON_MIDLEFT
 #endif
@@ -1035,26 +1006,15 @@ static int star_menu(void)
 {
     int selection, level=1;
     bool menu_quit = false;
-    struct viewport vp[NB_SCREENS];
     /* get the size of char */
     rb->lcd_getstringsize("a", &char_width, &char_height);
 
     MENUITEM_STRINGLIST(menu,"Star Menu",NULL,"Play","Choose Level",
                         "Information","Keys","Quit");
-    FOR_NB_SCREENS(selection)
-    {
-        rb->viewport_set_defaults(&vp[selection], selection);
-#if LCD_DEPTH > 1
-        if (rb->screens[selection]->depth > 1)
-        {
-            vp->bg_pattern = LCD_BLACK;
-            vp->fg_pattern = LCD_WHITE;
-        }
-#endif
-    }
+
     while(!menu_quit)
     {
-        switch(rb->do_menu(&menu, &selection, vp, false))
+        switch(rb->do_menu(&menu, &selection, NULL, false))
         {
             case 0:
                 menu_quit = true;
