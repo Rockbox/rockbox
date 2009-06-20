@@ -1108,12 +1108,10 @@ const struct settings_list settings[] = {
 
 #if CONFIG_CODEC == SWCODEC
     /* replay gain */
-    OFFON_SETTING(F_SOUNDSETTING, replaygain, LANG_REPLAYGAIN_ENABLE, true,
-                  "replaygain", NULL),
     CHOICE_SETTING(F_SOUNDSETTING, replaygain_type, LANG_REPLAYGAIN_MODE,
                    REPLAYGAIN_SHUFFLE, "replaygain type",
-                   "track,album,track shuffle", NULL, 3, ID2P(LANG_TRACK_GAIN),
-                   ID2P(LANG_ALBUM_GAIN), ID2P(LANG_SHUFFLE_GAIN)),
+                   "track,album,track shuffle,off", NULL, 4, ID2P(LANG_TRACK_GAIN),
+                   ID2P(LANG_ALBUM_GAIN), ID2P(LANG_SHUFFLE_GAIN), ID2P(LANG_OFF)),
     OFFON_SETTING(F_SOUNDSETTING, replaygain_noclip, LANG_REPLAYGAIN_NOCLIP,
                   false, "replaygain noclip", NULL),
     INT_SETTING_NOWRAP(F_SOUNDSETTING, replaygain_preamp,

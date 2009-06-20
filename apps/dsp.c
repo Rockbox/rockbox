@@ -1449,13 +1449,14 @@ void dsp_set_replaygain(void)
 
     new_gain = false;
 
-    if (global_settings.replaygain || global_settings.replaygain_noclip)
+    if ((global_settings.replaygain_type != REPLAYGAIN_OFF) ||
+            global_settings.replaygain_noclip)
     {
         bool track_mode = get_replaygain_mode(track_gain != 0,
             album_gain != 0) == REPLAYGAIN_TRACK;
         long peak = (track_mode || !album_peak) ? track_peak : album_peak;
 
-        if (global_settings.replaygain)
+        if (global_settings.replaygain_type != REPLAYGAIN_OFF)
         {
             gain = (track_mode || !album_gain) ? track_gain : album_gain;
 

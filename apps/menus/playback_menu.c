@@ -120,13 +120,11 @@ static int replaygain_callback(int action,const struct menu_item_ex *this_item)
     }
     return action;
 }
-MENUITEM_SETTING(replaygain, &global_settings.replaygain ,replaygain_callback);
 MENUITEM_SETTING(replaygain_noclip, &global_settings.replaygain_noclip ,replaygain_callback);
 MENUITEM_SETTING(replaygain_type, &global_settings.replaygain_type ,replaygain_callback);
 MENUITEM_SETTING(replaygain_preamp, &global_settings.replaygain_preamp ,replaygain_callback);
 MAKE_MENU(replaygain_settings_menu,ID2P(LANG_REPLAYGAIN),0, Icon_NOICON,
-          &replaygain,&replaygain_noclip,
-          &replaygain_type,&replaygain_preamp);
+          &replaygain_type, &replaygain_noclip, &replaygain_preamp);
           
 MENUITEM_SETTING(beep, &global_settings.beep ,NULL);
 #endif /* CONFIG_CODEC == SWCODEC */

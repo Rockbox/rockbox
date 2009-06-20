@@ -1227,7 +1227,7 @@ static const char *get_token_value(struct gui_wps *gwps,
         {
             int val;
 
-            if (global_settings.replaygain == 0)
+            if (global_settings.replaygain_type == REPLAYGAIN_OFF)
                 val = 1; /* off */
             else
             {

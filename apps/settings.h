@@ -126,6 +126,7 @@ enum
     NUM_REPEAT_MODES
 };
 
+
 /* dir filter options */
 /* Note: Any new filter modes need to be added before NUM_FILTER_MODES.
  *       Any new rockbox browse filter modes (accessible through the menu)
@@ -143,7 +144,7 @@ enum { SORT_INTERPRET_AS_DIGIT, SORT_INTERPRET_AS_NUMBER };
 enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };
 
 /* replaygain types */
-enum { REPLAYGAIN_TRACK = 0, REPLAYGAIN_ALBUM, REPLAYGAIN_SHUFFLE };
+enum { REPLAYGAIN_TRACK = 0, REPLAYGAIN_ALBUM, REPLAYGAIN_SHUFFLE, REPLAYGAIN_OFF };
 
 /* show path types */
 enum { SHOW_PATH_OFF = 0, SHOW_PATH_CURRENT, SHOW_PATH_FULL };
@@ -324,10 +325,9 @@ struct user_settings
     int crossfade_fade_out_mixmode;   /* Fade out mode (0=crossfade,1=mix) */
 
     /* Replaygain */
-    bool replaygain;        /* enable replaygain */
     bool replaygain_noclip; /* scale to prevent clips */
     int  replaygain_type;   /* 0=track gain, 1=album gain, 2=track gain if
-                               shuffle is on, album gain otherwise */
+                               shuffle is on, album gain otherwise, 4=off */
     int  replaygain_preamp; /* scale replaygained tracks by this */
 
     /* Crossfeed */
