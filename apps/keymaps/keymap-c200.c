@@ -281,8 +281,8 @@ static const struct button_mapping button_context_bmark[]  = {
 
 #ifdef HAVE_USBSTACK
 static const struct button_mapping button_context_usb_hid[] = {
-    { ACTION_USB_HID_PLAY,     BUTTON_UP,                        BUTTON_NONE },
-    { ACTION_USB_HID_STOP,     BUTTON_UP|BUTTON_REPEAT,          BUTTON_NONE },
+    { ACTION_USB_HID_PLAY,     BUTTON_UP|BUTTON_REL,             BUTTON_UP },
+    { ACTION_USB_HID_STOP,     BUTTON_UP|BUTTON_REPEAT,          BUTTON_UP },
     { ACTION_USB_HID_SKIPPREV, BUTTON_LEFT,                      BUTTON_NONE },
     { ACTION_USB_HID_SKIPNEXT, BUTTON_RIGHT,                     BUTTON_NONE },
     { ACTION_USB_HID_VOLUP,    BUTTON_VOL_UP,                    BUTTON_NONE },

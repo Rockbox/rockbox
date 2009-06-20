@@ -338,8 +338,8 @@ static const struct button_mapping button_context_radio[]  = {
 
 #ifdef HAVE_USBSTACK
 static const struct button_mapping button_context_usb_hid[] = {
-    { ACTION_USB_HID_PLAY,     BUTTON_PLAY,                      BUTTON_NONE },
-    { ACTION_USB_HID_STOP,     BUTTON_PLAY|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_USB_HID_PLAY,     BUTTON_PLAY|BUTTON_REL,           BUTTON_PLAY },
+    { ACTION_USB_HID_STOP,     BUTTON_PLAY|BUTTON_REPEAT,        BUTTON_PLAY },
     { ACTION_USB_HID_SKIPPREV, BUTTON_REW,                       BUTTON_NONE },
     { ACTION_USB_HID_SKIPNEXT, BUTTON_FF,                        BUTTON_NONE },
     { ACTION_USB_HID_VOLUP,    BUTTON_SCROLL_UP,                 BUTTON_NONE },

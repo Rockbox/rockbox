@@ -192,8 +192,8 @@ const struct button_mapping button_context_recscreen[]  = {
 
 #ifdef HAVE_USBSTACK
 static const struct button_mapping button_context_usb_hid[] = {
-    { ACTION_USB_HID_PLAY,     BUTTON_PLAY,                      BUTTON_NONE },
-    { ACTION_USB_HID_STOP,     BUTTON_PLAY|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_USB_HID_PLAY,     BUTTON_PLAY|BUTTON_REL,           BUTTON_PLAY },
+    { ACTION_USB_HID_STOP,     BUTTON_PLAY|BUTTON_REPEAT,        BUTTON_PLAY },
     { ACTION_USB_HID_SKIPPREV, BUTTON_LEFT,                      BUTTON_NONE },
     { ACTION_USB_HID_SKIPNEXT, BUTTON_RIGHT,                     BUTTON_NONE },
     { ACTION_USB_HID_VOLUP,    BUTTON_SCROLL_FWD,                BUTTON_NONE },
