@@ -82,6 +82,10 @@
 #define KBD_CURSOR_KEYS
 #define KBD_MODES
 
+#elif CONFIG_KEYPAD == SANSA_C200_PAD
+#define KBD_CURSOR_KEYS
+#define KBD_MODES
+
 #elif CONFIG_KEYPAD == MROBE100_PAD
 #define KBD_MORSE_INPUT
 #endif
