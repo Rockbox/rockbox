@@ -10,8 +10,8 @@
     \toprule
     \textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\
     \midrule\localendhead % endhead breaks with htlatex
-    volume      & \opt{player}{-78 to +18}%
-                  \opt{recorder,recorderv2fm,ondiosp,ondiofm}{-100 -to +12}%
+    volume      & \opt{masd}{-78 to +18}%
+                  \opt{masf}{-100 -to +12}%
                   \opt{h100,h300}{-84 to 0}%
                   \opt{ipodnano}{-72 to +6}%
                   \opt{ipodvideo}{-57 to +6}%
@@ -20,12 +20,14 @@
                   \opt{ipodcolor}{-74 to +6}%
                                         & dB\\
     \nopt{x5}{%
-      bass      & \opt{MASCODEC}{-15 to +15}%
+      bass      & \opt{masd}{-15 to +15}%
+                  \opt{masf}{-12 to +12}%
                   \opt{h100,h300}{0 to +24}%
                   \opt{ipod}{-6 to +9}%
                   \opt{e200}{-24 to +24}%
                                         & dB\\
-      treble    & \opt{MASCODEC}{-15 to +15}%
+      treble    & \opt{masd}{-15 to +15}%
+                  \opt{masf}{-12 to +12}%
                   \opt{h100,h300}{0 to +6}%
                   \opt{ipod}{-6 to +9}%
                   \opt{e200}{-24 to +24}%
@@ -200,7 +202,7 @@
       tagcache\_ram & on, off           & N/A\\
     }%
 
-    \opt{recorder,recorderv2fm}{
+    \opt{masf}{
       loudness      & 0 to 17           & N/A\\
       superbass     & on, off           & N/A\\
       auto volume   & off, 20ms, 2s, 4s, 8s

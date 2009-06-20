@@ -8,9 +8,9 @@ greyscale library}.
   the decoding process needs to share memory with audio tracks. To be able to
   view a bigger file you may need to stop playback.}
 }
-\opt{MASCODEC}{
-\note{This plugin will cause playback to stop.}
-}
+\nopt{large_plugin_buffer}{%
+\note{This plugin will cause playback to stop.}%
+}%
 
 \begin{table}
 \begin{btnmap}{}{}
@@ -81,7 +81,7 @@ The menu has the following entries.
 \item[Toggle Slideshow Mode.] Enables or disables the slideshow mode.
 \item[Change Slideshow Timeout.] You can set the timeout for the slideshow
   between 1 second and 20 seconds.
-\nopt{MASCODEC}{
+\opt{large_plugin_buffer}{
 \item[Show Playback Menu.] From the playback menu you can control the
 playback of the currently loaded playlist and change the volume of your \dap.
 }

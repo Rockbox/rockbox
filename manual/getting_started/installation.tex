@@ -146,7 +146,7 @@ still available to you.\\
   various important aspects of Rockbox, such as the different versions
   available.\\}}
 
-\opt{MASCODEC}{Rockbox itself comes as a single package. There is no need
+\opt{hwcodec}{Rockbox itself comes as a single package. There is no need
   to install additional software to run Rockbox.}
 \opt{swcodec} {
   \opt{HAVE_RB_BL_ON_DISK}{There are three separate components,
@@ -495,8 +495,10 @@ The new build will be installed over your current build.\\
   data partiton.\\}
 }
 
-The bootloader only changes rarely, and should not normally
-need to be updated.\\
+\nopt{hwcodec}{
+  The bootloader only changes rarely, and should not normally
+  need to be updated.\\
+}
 
 \note{If you use Rockbox Utility be aware that it cannot detect manually
         installed components.}
