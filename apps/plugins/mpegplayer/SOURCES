@@ -9,7 +9,11 @@ idct_coldfire.S
 motion_comp_coldfire_c.c
 motion_comp_coldfire_s.S
 #elif defined CPU_ARM
+#if ARM_ARCH >= 6
+idct_armv6.S
+#else
 idct_arm.S
+#endif
 motion_comp_arm_c.c
 motion_comp_arm_s.S
 #else  /* other CPU or SIM */

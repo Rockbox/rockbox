@@ -35,7 +35,7 @@
 
 #define BUFFER_SIZE (1194 * 1024)
 
-#ifdef CPU_COLDFIRE
+#if defined(CPU_COLDFIRE) || (defined(CPU_ARM) && ARM_ARCH >= 6)
 /* twice as large as on other targets because coldfire uses
  * a secondary, transposed buffer for optimisation */
 static int16_t static_dct_block[128] IBSS_ATTR ATTR_ALIGN(16);
