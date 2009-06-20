@@ -78,15 +78,19 @@ static inline void lcd_wait_write(void)
 }
 
 /* send LCD data */
-static void lcd_send_data(const fb_data *data, int width)
+static void lcd_send_pixel(const fb_data data)
 {
-    while(width--)
-    {
-        lcd_wait_write();
-        LCD1_DATA = *data >> 8;
-        lcd_wait_write();
-        LCD1_DATA = *data++ & 0xff;
-    }
+    lcd_wait_write();
+    LCD1_DATA = data >> 8;
+    lcd_wait_write();
+    LCD1_DATA = data & 0xff;
+}
+
+inline void lcd_write_data(const fb_data *data, int width)
+{
+    do {
+        lcd_send_pixel(*data++);
+    } while(--width);
 }
 
 /* send LCD command */
@@ -129,14 +133,18 @@ static inline void lcd_delay(int delay)
 }
 
 /* send LCD data */
-static void lcd_send_data(const fb_data *data, int width)
+void lcd_write_data(const fb_data *data, int width)
 {
-    while(width--)
-    {
+    do {
         DBOP_DOUT = *data << 8 | *data >> 8;
         data++;
-        while ((DBOP_STAT & (1<<10)) == 0);
-    }
+
+        /* Wait if push fifo is full */
+        while ((DBOP_STAT & (1<<6)) != 0);
+    } while(--width);
+
+    /* While push fifo is not empty */
+    while ((DBOP_STAT & (1<<10)) == 0);
 }
 
 /* send LCD command */
@@ -184,7 +192,7 @@ bool lcd_button_support(void)
     lcd_send_command(R_Y_ADDR_AREA, 0);
     lcd_send_command(1, 0);
 
-    lcd_send_data(&data, 1);
+    lcd_write_data(&data, 1);
 
     return true;
 }
@@ -445,7 +453,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     lcd_send_command(y + height - 1 + 0x1a, 0);
 
     do {
-        lcd_send_data(addr, width);
+        lcd_write_data(addr, width);
         addr += LCD_WIDTH;
     } while (--height > 0);
 
