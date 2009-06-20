@@ -173,7 +173,7 @@ struct tagcache_search {
     int clause_count;
     int list_position;
     int seek_pos;
-    int32_t position;
+    long position;
     int entry_count;
     bool valid;
     bool initialized;
