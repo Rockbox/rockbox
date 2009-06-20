@@ -12338,7 +12338,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_MODE
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12346,16 +12346,16 @@
   </source>
   <dest>
     *: none
-    touchscreen: "タッチスクリーンの設定"
+    touchscreen: "タッチスクリーン・モード"
   </dest>
   <voice>
     *: none
-    touchscreen: "タッチスクリーンの設定"
+    touchscreen: "タッチスクリーン・モード"
   </voice>
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_GRID
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12372,7 +12372,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_POINT
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12399,5 +12399,90 @@
   </dest>
   <voice>
     *: "スキップの禁止"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "タイムストレッチ"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "タイムストレッチ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "スピード"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "スピード"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "タッチスクリーンの設定"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "タッチスクリーンの設定"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "較正"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "較正"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "較正のリセット"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "較正のリセット"
   </voice>
 </phrase>

@@ -30,6 +30,7 @@
 # - Simon Descarpentries
 # - Nicolas Pennequin
 # - Clément Pit-Claudel 
+# - Michaël Burtin
 #
 # Original comments below:
 #
@@ -1950,15 +1951,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Volume du bip"
+    swcodec: "Bip changement de piste"
   </dest>
   <voice>
     *: none
-    swcodec: "Volume du bip"
+    swcodec: "Bip changement de piste"
   </voice>
 </phrase>
 <phrase>
@@ -9969,7 +9970,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -12407,5 +12408,19 @@
   <voice>
     *: none
     touchscreen: "Point absolu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Interdire le changement de piste"
+  </dest>
+  <voice>
+    *: "Interdire le changement de piste"
   </voice>
 </phrase>

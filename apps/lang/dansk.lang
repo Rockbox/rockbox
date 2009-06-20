@@ -3889,23 +3889,25 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200,sa9200: "MENU = Revert"
+    ipod*,c200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "SLUK = Fortryd"
     h100,h120,h300: "STOP = Fortryd"
-    ipod*,c200,sa9200: "MENU = Fortryd"
+    ipod*,c200: "MENU = Fortryd"
     x5,m5: "OPTAG = Fortryd"
     h10,h10_5gb,e200*: "FORRIGE = Fortryd"
     gigabeatf: "TÆND/SLUK = Fortryd"
     mrobe100: "VIS = Fortryd"
     gigabeats: "TILBAGE = Fortryd"
+    sa9200: "VENSTRE = Fortryd"
   </dest>
   <voice>
     *: none
@@ -9323,14 +9325,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Bygger database... %d fundet (SLUK for at stoppe)"
     h100,h120,h300: "Bygger database... %d fundet (STOP for at stoppe)"
     ipod*: "Bygger database... %d fundet (FORRIGE for at stoppe)"
     x5,m5,gigabeat*,mrobe100: "Bygger database... %d fundet (VENSTRE for at stoppe)"
-    h10,h10_5gb,e200*,c200,sa9200: "Bygger database... %d fundet (FORRIGE for at stoppe)"
+    h10,h10_5gb,e200*,c200: "Bygger database... %d fundet (FORRIGE for at stoppe)"
+    sa9200: "Bygger database... %d fundet (SPOL TILBAGE for at stoppe)"
   </dest>
   <voice>
     *: "filer fundet til databasen"
@@ -10557,13 +10561,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "SPIL = Ja"
     h100,h120,h300: "NAVI = Ja"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "VÆLG = Ja"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100: "VÆLG = Ja"
     player: "(SPIL/STOP)"
   </dest>
   <voice>
@@ -10578,13 +10582,15 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100: "SELECT = Set"
+    sa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "Tænd = Indstil"
     h100,h120,h300: "NAVI = Indstil"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "VÆLG = Indstil"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100: "VÆLG = Indstil"
+    sa9200: "SPIL = Indstil"
   </dest>
   <voice>
     *: none
@@ -12381,7 +12387,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_POINT
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12398,7 +12404,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_GRID
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12415,7 +12421,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_MODE
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12428,5 +12434,90 @@
   <voice>
     *: none
     touchscreen: "Trykfølsom skærm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Kalibrer"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Kalibrer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Nulstil kalibrering"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Nulstil kalibrering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Afspilningshastighed"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Afspilningshastighed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Indstilninger for trykfølsom skærm"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Indstilninger for trykfølsom skærm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Hastighed"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Hastighed"
   </voice>
 </phrase>

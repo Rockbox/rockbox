@@ -1907,11 +1907,11 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "עוצמת הצפצוף"
+    swcodec: "צפצוף מעבר שיר"
   </dest>
   <voice>
     *: none
@@ -7472,7 +7472,7 @@
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[מספר רצועה]"
+    *: "[מספר שיר]"
   </dest>
   <voice>
     *: ""
@@ -12330,5 +12330,154 @@
   <voice>
     *: none
     serial_port: "אוטומטית"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "מנע דילוג שירים"
+  </dest>
+  <voice>
+    *: "מנע דילוג שירים"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "נקודה מוחלטת"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "נקודה מוחלטת"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "כייל"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "כייל"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "אפס כיול"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "אפס כיול"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "רשת 3x3"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "רשת 3 על 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "מצב מסך-מגע"
+  <voice>
+    *: none
+    touchscreen: "מצב מסך מגע"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "מתיחת זמן"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "מתיחת זמן"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "הגדרות מסך-מגע"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "הגדרות מסך מגע"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "מהירות"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "מהירות"
   </voice>
 </phrase>

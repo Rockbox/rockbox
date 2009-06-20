@@ -16,6 +16,7 @@
 #
 # Arabic language file, translated by:
 # - Mohamed Tarek
+# - Raafat Akkad
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
   desc: deprecated
@@ -5840,5 +5841,924 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user: core
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "لون النص"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "لون النص"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUTDOWN
+  desc: in main menu
+  user: core
+  <source>
+    *: none
+    soft_shutdown: "Shut down"
+  </source>
+  <dest>
+    *: none
+    soft_shutdown: "إيقاف التشغيل"
+  </dest>
+  <voice>
+    *: none
+    soft_shutdown: "إيقاف التشغيل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MUSIC
+  desc: show only music-related files
+  user: core
+  <source>
+    *: "Music"
+  </source>
+  <dest>
+    *: "الموسيقى"
+  </dest>
+  <voice>
+    *: "الموسيقى"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  user: core
+  <source>
+    *: none
+    recording: "New file"
+  </source>
+  <dest>
+    *: none
+    recording: "ملف جديد"
+  </dest>
+  <voice>
+    *: none
+    recording: "ملف جديد"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_DECEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
+    *: none
+    rtc: "Dec"
+  </source>
+  <dest>
+    *: none
+    rtc: "Dec"
+  </dest>
+  <voice>
+    *: none
+    rtc: "كانون الأول"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in start screen setting
+  user: core
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "القائمة الرئيسية"
+  </dest>
+  <voice>
+    *: "القائمة الرئيسية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_GAMES
+  desc: in the main menu
+  user: core
+  <source>
+    *: "Games"
+  </source>
+  <dest>
+    *: "الألعاب"
+  </dest>
+  <voice>
+    *: "الألعاب"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TRADITIONAL
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Trad. Chinese (BIG5)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "الصينية التقليدية"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "الصينية التقليدية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_BOOL_NO
+  desc: bool false representation
+  user: core
+  <source>
+    *: "No"
+  </source>
+  <dest>
+    *: "لا"
+  </dest>
+  <voice>
+    *: "لا"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FREQUENCY
+  desc: in the recording settings
+  user: core
+  <source>
+    *: none
+    recording: "Frequency"
+  </source>
+  <dest>
+    *: none
+    recording: "تردد"
+  </dest>
+  <voice>
+    *: none
+    recording: "تردد"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNELS
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Channels"
+  </source>
+  <dest>
+    *: "قنوات"
+  </dest>
+  <voice>
+    *: "قنوات"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_BITRATE
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[معدل البت]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_SEPTEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
+    *: none
+    rtc: "Sep"
+  </source>
+  <dest>
+    *: none
+    rtc: "Sep"
+  </dest>
+  <voice>
+    *: none
+    rtc: "أيلول"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_RECORD
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio_screen_button_bar: "Record"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "سجل"
+  </dest>
+  <voice>
+    *: none
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONE_TIME
+  desc: (player) the jump scroll shall be done "one time"
+  user: core
+  <source>
+    *: "One time"
+  </source>
+  <dest>
+    *: "مرة واحدة"
+  </dest>
+  <voice>
+    *: "مرة واحدة"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RENAME
+  desc: The verb/action Rename
+  user: core
+  <source>
+    *: "Rename"
+  </source>
+  <dest>
+    *: "إعادة تسمية"
+  </dest>
+  <voice>
+    *: "إعادة تسمية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TYPE
+  desc: in battery settings
+  user: core
+  <source>
+    *: none
+    battery_types: "Battery Type"
+  </source>
+  <dest>
+    *: none
+    battery_types: "نوع البطارية"
+  </dest>
+  <voice>
+    *: none
+    battery_types: "نوع البطارية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
+  desc: in the recording settings
+  user: core
+  <source>
+    *: none
+    recording: "Digital"
+  </source>
+  <dest>
+    *: none
+    recording: "الرقمي"
+  </dest>
+  <voice>
+    *: none
+    recording: "الرقمي"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Playlist"
+  </source>
+  <dest>
+    *: "قائمة التشغيل"
+  </dest>
+  <voice>
+    *: "قائمة التشغيل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "معايرة"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "معايرة"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user: core
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "تشغيل المقبل"
+  </dest>
+  <voice>
+    *: "تشغيل المقبل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETE_DIR
+  desc: in on+play menu
+  user: core
+  <source>
+    *: "Delete Directory"
+  </source>
+  <dest>
+    *: "حذف الدليل"
+  </dest>
+  <voice>
+    *: "حذف الدليل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POINT
+  desc: decimal separator for composing numbers
+  user: core
+  <source>
+    *: "."
+  </source>
+  <dest>
+    *: "."
+  </dest>
+  <voice>
+    *: "نقطة"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_ERROR
+  desc: The plugin return an error code
+  user: core
+  <source>
+    *: "Plugin returned error"
+  </source>
+  <dest>
+    *: "البرنامج الإضافية عاد خطأ"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_UNACCEPTABLE
+  desc: splash when user selects an invalid colour
+  user: core
+  <source>
+    *: none
+    lcd_non-mono: "Invalid colour"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "لون غير صالح"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUM
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "[Album]"
+  </source>
+  <dest>
+    *: "[البوم]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SRC_MIC
+  desc: in the recording settings
+  user: core
+  <source>
+    *: none
+    recording: "Microphone"
+    h100,h120,h300: "Internal Microphone"
+  </source>
+  <dest>
+    *: none
+    recording: "ميكروفون"
+    h100,h120,h300: "ميكروفون داخلي"
+  </dest>
+  <voice>
+    *: none
+    recording: "ميكروفون"
+    h100,h120,h300: "ميكروفون داخلي"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_LENGTH
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "[Length]"
+  </source>
+  <dest>
+    *: "[طول]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_KOREA
+  desc: fm region korea
+  user: core
+  <source>
+    *: none
+    radio: "Korea"
+  </source>
+  <dest>
+    *: none
+    radio: "كوريا"
+  </dest>
+  <voice>
+    *: none
+    radio: "كوريا"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user: core
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "الملف غير صالح"
+  </dest>
+  <voice>
+    *: "الملف غير صالح"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_IN_PLAYLIST
+  desc: in playlist menu.
+  user: core
+  <source>
+    *: "Search In Playlist"
+  </source>
+  <dest>
+    *: "بحث في قائمة التشغيل"
+  </dest>
+  <voice>
+    *: "بحث في قائمة التشغيل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_TYPE
+  desc: browser sorting setting
+  user: core
+  <source>
+    *: "By Type"
+  </source>
+  <dest>
+    *: "حسب النوع"
+  </dest>
+  <voice>
+    *: "حسب النوع"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_ADD
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio_screen_button_bar: "Add"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "إضافة"
+  </dest>
+  <voice>
+    *: none
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_US
+  desc: fm region us / canada
+  user: core
+  <source>
+    *: none
+    radio: "US / Canada"
+  </source>
+  <dest>
+    *: none
+    radio: "الولايات المتحدة / كندا"
+  </dest>
+  <voice>
+    *: none
+    radio: "الولايات المتحدة وكندا"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_MENU
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: "Battery"
+  </source>
+  <dest>
+    *: "بطارية"
+  </dest>
+  <voice>
+    *: "بطارية"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user: core
+  <source>
+    *: none
+    recording: "Filename:"
+  </source>
+  <dest>
+    *: none
+    recording: "اسم الملف:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_FEBRUARY
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
+    *: none
+    rtc: "Feb"
+  </source>
+  <dest>
+    *: none
+    rtc: "Feb"
+  </dest>
+  <voice>
+    *: none
+    rtc: "شباط"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_COLORS
+  desc: menu
+  user: core
+  <source>
+    *: none
+    lcd_non-mono: "Reset Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "إعادة الألوان"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: "إعادة الألوان"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS
+  desc: used in various places
+  user: core
+  <source>
+    *: "Always"
+  </source>
+  <dest>
+    *: "دائما"
+  </dest>
+  <voice>
+    *: "دائما"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
+  user: core
+  <source>
+    *: none
+    radio: "Region"
+  </source>
+  <dest>
+    *: none
+    radio: "المنطقة"
+  </dest>
+  <voice>
+    *: none
+    radio: "المنطقة"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user: core
+  <source>
+    *: none
+    headphone_detection: "Duration to Rewind"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "المدة لإرجاع التسجيل"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "المدة لإرجاع التسجيل"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  user: core
+  <source>
+    *: none
+    recording: "Stop"
+  </source>
+  <dest>
+    *: none
+    recording: "إيقاف"
+  </dest>
+  <voice>
+    *: none
+    recording: "إيقاف"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_MENU
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    rtc: "Time & Date"
+  </source>
+  <dest>
+    *: none
+    rtc: "الوقت والتاريخ"
+  </dest>
+  <voice>
+    *: none
+    rtc: "الوقت والتاريخ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_EXIT
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio_screen_button_bar: "Exit"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "إخرج"
+  </dest>
+  <voice>
+    *: none
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLOW
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "بطيء"
+  </dest>
+  <voice>
+    *: "بطيء"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYBOARD_LOADED
+  desc: shown when a keyboard has been loaded from the dir browser
+  user: core
+  <source>
+    *: "New Keyboard"
+  </source>
+  <dest>
+    *: "لوحة مفاتيح جديدة"
+  </dest>
+  <voice>
+    *: "لوحة مفاتيح جديدة"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JANUARY
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
+    *: none
+    rtc: "Jan"
+  </source>
+  <dest>
+    *: none
+    rtc: "Jan"
+  </dest>
+  <voice>
+    *: none
+    rtc: "كانون الثاني"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_CANT_OPEN
+  desc: Plugin open error message
+  user: core
+  <source>
+    *: "Can't open %s"
+  </source>
+  <dest>
+    *: "غير قادر على فتح s%"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JUNE
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
+    *: none
+    rtc: "Jun"
+  </source>
+  <dest>
+    *: none
+    rtc: "Jun"
+  </dest>
+  <voice>
+    *: none
+    rtc: "حزيران"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_APPS
+  desc: in the main menu
+  user: core
+  <source>
+    *: "Applications"
+  </source>
+  <dest>
+    *: "تطبيقات"
+  </dest>
+  <voice>
+    *: "تطبيقات"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user: core
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "خصائص"
+  </dest>
+  <voice>
+    *: "خصائص"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUT
+  desc: The verb/action Cut
+  user: core
+  <source>
+    *: "Cut"
+  </source>
+  <dest>
+    *: "قص"
+  </dest>
+  <voice>
+    *: "قص"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_AUGUST
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
+    *: none
+    rtc: "Aug"
+  </source>
+  <dest>
+    *: none
+    rtc: "Aug"
+  </dest>
+  <voice>
+    *: none
+    rtc: "آب"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user: core
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "الون الثانوي"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "الون الثانوي"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_SIZE_INFO
+  desc: disk size info
+  user: core
+  <source>
+    *: "Disk:"
+  </source>
+  <dest>
+    *: "حجم القرص:"
+  </dest>
+  <voice>
+    *: "حجم القرص"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN
+  desc: generic string for unknown states, such as an unset clock
+  user: core
+  <source>
+    *: "Unknown"
+  </source>
+  <dest>
+    *: "غير معروف"
+  </dest>
+  <voice>
+    *: "غير معروف"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_BOOL_YES
+  desc: bool true representation
+  user: core
+  <source>
+    *: "Yes"
+  </source>
+  <dest>
+    *: "نعم"
+  </dest>
+  <voice>
+    *: "نعم"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_OCTOBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
+    *: none
+    rtc: "Oct"
+  </source>
+  <dest>
+    *: none
+    rtc: "Oct"
+  </dest>
+  <voice>
+    *: none
+    rtc: "تشرين الأول"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_MARCH
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
+    *: none
+    rtc: "Mar"
+  </source>
+  <dest>
+    *: none
+    rtc: "Mar"
+  </dest>
+  <voice>
+    *: none
+    rtc: "آذار"
   </voice>
 </phrase>

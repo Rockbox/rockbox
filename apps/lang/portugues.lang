@@ -1138,7 +1138,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -1316,7 +1316,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
@@ -8733,19 +8733,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device"
   </source>
   <dest>
     *: none
-    usbstack: "Dispositivo"
   </dest>
   <voice>
     *: none
-    usbstack: "Dispositivo"
   </voice>
 </phrase>
 <phrase>
@@ -11206,19 +11203,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_MODE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack Mode"
   </source>
   <dest>
     *: none
-    usbstack: "Modo de USB Stack"
   </dest>
   <voice>
     *: none
-    usbstack: "Modo de U S B Stack"
   </voice>
 </phrase>
 <phrase>
@@ -11512,5 +11506,496 @@
   <voice>
     *: none
     gigabeatf: "Alto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest>
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Prevenir Salto de Faixas"
+  </dest>
+  <voice>
+    *: "Prevenir Salto de Faixas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user: core
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Corte de Graves"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Corte de Graves"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_LINEAR
+  desc: in the peak meter menu
+  user: core
+  <source>
+    *: "Linear (%)"
+    masd: none
+  </source>
+  <dest>
+    *: "Linear (%)"
+    masd: none
+  </dest>
+  <voice>
+    *: "Percentagem Linear"
+    masd: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user: core
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "Contador de Clips"
+  </dest>
+  <voice>
+    *: none
+    recording: "Contador de Clips"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Activar Altifalante"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Activar Altifalante"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Interpretar números a ordenar"
+  </dest>
+  <voice>
+    *: "Interpretar números a ordenar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_PRECUT
+  desc: in eq settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Precut"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Pré-corte"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Pré-corte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NORMAL
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "Normal"
+  </dest>
+  <voice>
+    *: "Normal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "First Buttonpress Enables Backlight Only"
+  </source>
+  <dest>
+    *: "Primeiro Toque Activa Só a Retro-iluminação"
+  </dest>
+  <voice>
+    *: "Primeiro Toque Activa Só a Retro-iluminação"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Ponto Absoluto"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Ponto Absoluto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_DEMOS
+  desc: in the main menu
+  user: core
+  <source>
+    *: "Demos"
+  </source>
+  <dest>
+    *: "Demonstrações"
+  </dest>
+  <voice>
+    *: "Demonstrações"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  user: core
+  <source>
+    *: none
+    swcodec: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Corte das Altas Frequências"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Corte das Altas Frequências"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest>
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Como números inteiros"
+  </dest>
+  <voice>
+    *: "Como números inteiros"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user: core
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Créditos"
+  </dest>
+  <voice>
+    *: "Créditos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Grelha 3x3"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Grelha 3 por 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    buttonlight_brightness: "Button Light Brightness"
+  </source>
+  <dest>
+    *: none
+    buttonlight_brightness: "Brilho da Luz do Botão"
+  </dest>
+  <voice>
+    *: none
+    buttonlight_brightness: "Brilho da Luz do Botão"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user: core
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "Suporte da lista Cue"
+  </dest>
+  <voice>
+    *: "Suporte da lista Cue"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Modo Touchscreen"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Modo Touchscreen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  user: core
+  <source>
+    *: none
+    swcodec: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Atenuação das Altas Frequências"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Atenuação das Altas Frequências"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONBAR_MENU
+  desc: in button bar
+  user: core
+  <source>
+    *: none
+    radio_screen_button_bar: "Menu"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "Menu"
+  </dest>
+  <voice>
+    *: none
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CURRENT_TIME
+  desc: spoken only, for wall clock announce
+  user: core
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "Tempo actual:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Como dígitos"
+  </dest>
+  <voice>
+    *: "Como dígitos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user: core
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Corte de Agudos"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Corte dos Agudos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Auto"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Automático"
   </voice>
 </phrase>
