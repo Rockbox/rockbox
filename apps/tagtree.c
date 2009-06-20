@@ -23,6 +23,9 @@
  * Basic structure on this file was copied from dbtree.c and modified to
  * support the tag cache interface.
  */
+
+/* #define LOGF_ENABLE */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -96,7 +99,6 @@ static long *uniqbuf;
 #define MAX_TAGS 5
 #define MAX_MENU_ID_SIZE 32
 
-static struct tagcache_search tcs, tcs2;
 static bool sort_inverse;
 
 /*
@@ -642,6 +644,8 @@ static int compare(const void *p1, const void *p2)
 
 static void tagtree_buffer_event(struct mp3entry *id3)
 {
+    struct tagcache_search tcs;
+    
     /* Do not gather data unless proper setting has been enabled. */
     if (!global_settings.runtimedb)
         return;
@@ -719,6 +723,8 @@ static void tagtree_track_finish_event(struct mp3entry *id3)
 
 bool tagtree_export(void)
 {
+    struct tagcache_search tcs;
+    
     splash(0, str(LANG_CREATING));
     if (!tagcache_create_changelog(&tcs))
     {
@@ -1040,9 +1046,9 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
     return 0;
 }
 
-static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
-                            int offset, bool init)
+static int retrieve_entries(struct tree_context *c, int offset, bool init)
 {
+    struct tagcache_search tcs;
     struct tagentry *dptr = (struct tagentry *)c->dircache;
     struct display_format *fmt;
     int i;
@@ -1055,15 +1061,16 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     int sort_limit;
     int strip;
     
-    if (init
+    if (init && (tagcache_is_busy()
 #ifdef HAVE_TC_RAMCACHE
-        && !tagcache_is_ramcache()
+        || !tagcache_is_ramcache()
 #endif
-        )
+        ) )
     {
         /* Show search progress straight away if the disk needs to spin up,
            otherwise show it after the normal 1/2 second delay */
         show_search_progress(
+            !tagcache_is_busy() &&
 #ifdef HAVE_DISK_STORAGE
             storage_disk_is_active()
 #else
@@ -1080,11 +1087,11 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     else
         tag = csi->tagorder[level];
 
-    if (!tagcache_search(tcs, tag))
+    if (!tagcache_search(&tcs, tag))
         return -1;
     
     /* Prevent duplicate entries in the search list. */
-    tagcache_search_set_uniqbuf(tcs, uniqbuf, UNIQBUF_SIZE);
+    tagcache_search_set_uniqbuf(&tcs, uniqbuf, UNIQBUF_SIZE);
     
     if (level || csi->clause_count[0] || TAGCACHE_IS_NUMERIC(tag))
         sort = true;
@@ -1100,11 +1107,11 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
             cc.type = clause_is;
             cc.numeric = true;
             cc.numeric_data = csi->result_seek[i];
-            tagcache_search_add_clause(tcs, &cc);
+            tagcache_search_add_clause(&tcs, &cc);
         }
         else
         {
-            tagcache_search_add_filter(tcs, csi->tagorder[i], 
+            tagcache_search_add_filter(&tcs, csi->tagorder[i], 
                                        csi->result_seek[i]);
         }
     }
@@ -1114,7 +1121,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
         int j;
         
         for (j = 0; j < csi->clause_count[i]; j++)
-            tagcache_search_add_clause(tcs, csi->clause[i][j]);
+            tagcache_search_add_clause(&tcs, csi->clause[i][j]);
     }
     
     current_offset = offset;
@@ -1164,7 +1171,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     
     total_count += special_entry_count;
     
-    while (tagcache_get_next(tcs))
+    while (tagcache_get_next(&tcs))
     {
         if (total_count++ < offset)
             continue;
@@ -1173,10 +1180,10 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
         if (tag == tag_title || tag == tag_filename)
         {
             dptr->newtable = PLAYTRACK;
-            dptr->extraseek = tcs->idx_id;
+            dptr->extraseek = tcs.idx_id;
         }
         else
-            dptr->extraseek = tcs->result_seek;
+            dptr->extraseek = tcs.result_seek;
         
         fmt = NULL;
         /* Check the format */
@@ -1185,7 +1192,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
             if (formats[i]->group_id != csi->format_id[level])
                 continue;
             
-            if (tagcache_check_clauses(tcs, formats[i]->clause,
+            if (tagcache_check_clauses(&tcs, formats[i]->clause,
                                        formats[i]->clause_count))
             {
                 fmt = formats[i];
@@ -1193,15 +1200,16 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
             }
         }
 
-        if (!tcs->ramresult || fmt)
+        if (!tcs.ramresult || fmt)
         {
             char buf[MAX_PATH];
             
             if (fmt)
             {
-                if (format_str(tcs, fmt, buf, sizeof buf) < 0)
+                if (format_str(&tcs, fmt, buf, sizeof buf) < 0)
                 {
                     logf("format_str() failed");
+                    tagcache_search_finish(&tcs);
                     return 0;
                 }
             }
@@ -1210,7 +1218,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
             if (fmt)
                 namebufused += strlen(buf)+1;
             else
-                namebufused += tcs->result_len;
+                namebufused += tcs.result_len;
             
             if (namebufused >= c->name_buffer_size)
             {
@@ -1222,10 +1230,10 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
             if (fmt)
                 strcpy(dptr->name, buf);
             else
-                strcpy(dptr->name, tcs->result);
+                strcpy(dptr->name, tcs.result);
         }
         else
-            dptr->name = tcs->result;
+            dptr->name = tcs.result;
         
         dptr++;
         current_entry_count++;
@@ -1238,11 +1246,11 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
             break ;
         }
         
-        if (init && !tcs->ramsearch)
+        if (init && !tcs.ramsearch)
         {
             if (!show_search_progress(false, total_count))
             {
-                tagcache_search_finish(tcs);
+                tagcache_search_finish(&tcs);
                 return current_entry_count;
             }
         }
@@ -1255,13 +1263,13 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     
     if (!init)
     {
-        tagcache_search_finish(tcs);
+        tagcache_search_finish(&tcs);
         return current_entry_count;
     }
     
-    while (tagcache_get_next(tcs))
+    while (tagcache_get_next(&tcs))
     {
-        if (!tcs->ramsearch)
+        if (!tcs.ramsearch)
         {
             if (!show_search_progress(false, total_count))
                 break;
@@ -1269,7 +1277,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
         total_count++;
     }
     
-    tagcache_search_finish(tcs);
+    tagcache_search_finish(&tcs);
     
     if (!sort && (sort_inverse || sort_limit))
     {
@@ -1363,7 +1371,7 @@ int tagtree_load(struct tree_context* c)
         case NAVIBROWSE:
             logf("navibrowse...");
             cpu_boost(true);
-            count = retrieve_entries(c, &tcs, 0, true);
+            count = retrieve_entries(c, 0, true);
             cpu_boost(false);
             break;
         
@@ -1549,6 +1557,7 @@ void tagtree_exit(struct tree_context* c)
 
 int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
 {
+    struct tagcache_search tcs;
     struct tagentry *entry;
     
     entry = tagtree_get_entry(c, c->selected_item);
@@ -1569,6 +1578,7 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
 
 static bool insert_all_playlist(struct tree_context *c, int position, bool queue)
 {
+    struct tagcache_search tcs;
     int i;
     char buf[MAX_PATH];
     int from, to, direction;
@@ -1639,7 +1649,7 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     int dirlevel = tc->dirlevel;
 
     /* We need to set the table to allsubentries. */
-    show_search_progress(true, 0);
+    show_search_progress(!tagcache_is_busy(), 0);
     
     dptr = tagtree_get_entry(tc, tc->selected_item);
     
@@ -1732,7 +1742,7 @@ struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
     if (realid >= current_entry_count || realid < 0)
     {
         cpu_boost(true);
-        if (retrieve_entries(c, &tcs2, MAX(0, id - (current_entry_count / 2)),
+        if (retrieve_entries(c, MAX(0, id - (current_entry_count / 2)),
                              false) < 0)
         {
             logf("retrieve failed");

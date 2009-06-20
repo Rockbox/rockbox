@@ -112,8 +112,6 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define FLAG_DIRTYNUM    0x0004  /* Numeric data has been modified */
 #define FLAG_TRKNUMGEN   0x0008  /* Track number has been generated  */
 #define FLAG_RESURRECTED 0x0010  /* Statistics data has been resurrected */
-#define FLAG_GET_ATTR(flag)      ((flag >> 16) & 0x0000ffff)
-#define FLAG_SET_ATTR(flag,attr) flag = (flag & 0x0000ffff) | (attr << 16)
 
 enum clause { clause_none, clause_is, clause_is_not, clause_gt, clause_gteq,
     clause_lt, clause_lteq, clause_contains, clause_not_contains, 
@@ -156,20 +154,26 @@ struct tagcache_search_clause
     char *str;
 };
 
+struct tagcache_seeklist_entry {
+    int32_t seek;
+    int32_t flag;
+    int32_t idx_id;
+};
+
 struct tagcache_search {
     /* For internal use only. */
     int fd, masterfd;
     int idxfd[TAG_COUNT];
-    long seek_list[SEEK_LIST_SIZE];
-    long seek_flags[SEEK_LIST_SIZE];
-    long filter_tag[TAGCACHE_MAX_FILTERS];
-    long filter_seek[TAGCACHE_MAX_FILTERS];
+    struct tagcache_seeklist_entry seeklist[SEEK_LIST_SIZE];
+    int seek_list_count;
+    int32_t filter_tag[TAGCACHE_MAX_FILTERS];
+    int32_t filter_seek[TAGCACHE_MAX_FILTERS];
     int filter_count;
     struct tagcache_search_clause *clause[TAGCACHE_MAX_CLAUSES];
     int clause_count;
-    int seek_list_count;
+    int list_position;
     int seek_pos;
-    long position;
+    int32_t position;
     int entry_count;
     bool valid;
     bool initialized;
@@ -178,13 +182,13 @@ struct tagcache_search {
     int unique_list_count;
 
     /* Exported variables. */
-    bool ramsearch;
-    bool ramresult;
+    bool ramsearch;      /* Is ram copy of the tagcache being used. */
+    bool ramresult;      /* False if result is not static, and must be copied. */
     int type;
-    char *result;
-    int result_len;
-    long result_seek;
-    int idx_id;
+    char *result;        /* The result data for all tags. */
+    int result_len;      /* Length of the result including \0 */
+    int32_t result_seek; /* Current position in the tag data. */
+    int32_t idx_id;      /* Entry number in the master index. */
 };
 
 void tagcache_build(const char *path);
@@ -201,6 +205,7 @@ bool tagcache_is_numeric_tag(int type);
 bool tagcache_find_index(struct tagcache_search *tcs, const char *filename);
 bool tagcache_check_clauses(struct tagcache_search *tcs,
                             struct tagcache_search_clause **clause, int count);
+bool tagcache_is_busy(void);
 bool tagcache_search(struct tagcache_search *tcs, int tag);
 void tagcache_search_set_uniqbuf(struct tagcache_search *tcs,
                                  void *buffer, long length);
