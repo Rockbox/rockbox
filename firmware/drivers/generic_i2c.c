@@ -91,9 +91,9 @@ static unsigned char i2c_inb(const struct i2c_interface *iface, bool ack)
 
     iface->sda_input();
 
-    iface->delay_su_dat();
     /* clock in each bit, MSB first */
     for ( i=0x80; i; i>>=1 ) {
+        iface->delay_su_dat();
         iface->scl_hi();
         iface->delay_thigh();
         if (iface->sda())
@@ -123,7 +123,6 @@ static int i2c_outb(const struct i2c_interface *iface, unsigned char byte)
         iface->scl_hi();
         iface->delay_thigh();
         iface->scl_lo();
-        iface->delay_hd_dat();
    }
 
    return i2c_getack(iface);

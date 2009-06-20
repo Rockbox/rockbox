@@ -111,7 +111,7 @@ static void fm_delay(void)
     volatile int i;
 
     /* this loop is uncalibrated and could use more sophistication */
-    for (i = 0; i < 100; i++) {
+    for (i = 0; i < 20; i++) {
     }
 }
 
