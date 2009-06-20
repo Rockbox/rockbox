@@ -311,50 +311,30 @@
 % Note: you still need to enclose this with \begin{table} / \end{table}
 % Cheers for the usenet helping me building this up :)
 
-% btnmap is set to be either two or three columns wide depending on whether
+% tabularx is set to be either two or three columns wide depending on whether
 % remote_keymap is defined in the platform file for the target in question.
-% If it is, then every button table needs to have three columns of the form
+% If it is, then every button table has three columns of the form
 % Main Unit Key  &  Remote Key  &  Description \\
-% or the manual will fail to build.  For some reason, it doesn't seem possible
-% to put the \end{btnmap} in a macro, so leave it as it is in the keymaps.
 
-\opt{remote_keymap}{
-\newenvironment{btnmap}[3]{%
-  \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
-  \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
-    \bottomrule
-    \SavedEndTab%
-     \if\given{#1}\caption{#1}\fi%
-     \if\given{#2}\caption{#2}\fi%
-     \if\given{#3}\label{#3}\fi%
-    \endcenter%
-  }
-  \center
-  \tabularx{.9\textwidth}{>{\raggedright\arraybackslash}p{.2\textwidth}X>{\raggedright\arraybackslash}p{.2\textwidth}X}\toprule % here is the table width defined
-  \btnhead
-}{%
-  \endtabularx
-}
-\newcommand{\beginbuttonmap}{\begin{btnmap}{}{}{}}
-}
-
-\nopt{remote_keymap}{
 \newenvironment{btnmap}[2]{%
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
     \bottomrule
     \SavedEndTab%
-    \if\given{#1}\caption{#1}\fi%
-    \if\given{#2}\label{#2}\fi%
-  \endcenter%
+     \if\given{#1}\caption{#1}\fi%
+     \if\given{#2}\label{#2}\fi%
+    \endcenter%
   }
   \center
-  \tabularx{.75\textwidth}{>{\raggedright\arraybackslash}p{.22\textwidth}X}\toprule % here is the table width defined
+  \opt{remote_keymap}{
+    % here is the table width defined for 3 columns
+    \tabularx{.9\textwidth}{>{\raggedright\arraybackslash}p{.2\textwidth}>{\raggedright\arraybackslash}p{.2\textwidth}X}\toprule 
+  }
+  \nopt{remote_keymap}{
+    % here is the table width defined for 2 columns
+    \tabularx{.75\textwidth}{>{\raggedright\arraybackslash}p{.22\textwidth}X}\toprule
+  }
   \btnhead
 }{%
   \endtabularx
 }
-\newcommand{\beginbuttonmap}{\begin{btnmap}{}{}}
-}
-
-%\newcommand{\closebuttonmap}{\end{btnmap}}
