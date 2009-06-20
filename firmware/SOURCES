@@ -1166,7 +1166,8 @@ target/arm/as3525/sansa-fuze/lcd-fuze.c
 target/arm/as3525/lcd-as-e200v2-fuze.S
 target/arm/as3525/backlight-e200v2-fuze.c
 #ifndef BOOTLOADER
-target/arm/as3525/powermgmt-as3525.c
+target/arm/powermgmt-ascodec.c
+target/arm/as3525/sansa-fuze/powermgmt-fuze.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
 #endif /* SANSA_FUZE */
