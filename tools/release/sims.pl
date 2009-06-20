@@ -209,3 +209,5 @@ runone("sansac200v2", "c200v2");
 runone("yh820", "yh_820");
 runone("yh920", "yh_920");
 runone("yh925", "yh_925");
+runone("ondavx747", "ondavx747");
+runone("ondavx747p", "ondavx747p");
