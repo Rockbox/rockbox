@@ -113,7 +113,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
                              struct viewport pitch_viewports[PITCH_ITEM_COUNT],
                              int pitch
 #if CONFIG_CODEC == SWCODEC
-                             ,int speed
+                             ,int speedxpitch
 #endif
                              )
 {
@@ -195,7 +195,8 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     else
     {
         /* "Speed:XXX%" */
-        snprintf(buf, sizeof(buf), "%s:%d%%", str(LANG_SPEED), speed);
+        snprintf(buf, sizeof(buf), "%s:%d%%", str(LANG_SPEED), 
+             speedxpitch / 1000);
     }
 #endif
     display->getstringsize(buf, &w, &h);
@@ -348,7 +349,7 @@ int gui_syncpitchscreen_run(void)
             pitchscreen_draw(&screens[i], max_lines[i],
                               pitch_viewports[i], pitch
 #if CONFIG_CODEC == SWCODEC
-                              , speed
+                              , maintain_speed_pitch
 #endif
                               );
         pitch_delta = 0;
