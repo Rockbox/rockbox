@@ -1,10 +1,12 @@
 \subsection{PictureFlow}
 \screenshot{plugins/images/ss-pictureflow}{PictureFlow}{img:pictureflow}
-PictureFlow is a plugin that provides a visualisation of your albums with
-their associated cover art.
+PictureFlow provides a visualisation of your albums with their associated cover
+art. \opt{swcodec}{It is possible to start playback of the selected
+album from PictureFlow. Playback will start from the selected track.}
 
 \opt{hwcodec}{
-\note{This plugin will cause playback to stop.}
+\note{PictureFlow is a visualisation only. It cannot be used to select and
+-play music.  Also, using this plugin will cause playback to stop.}
 }
 
 \subsubsection{Requirements}
@@ -18,9 +20,6 @@ aware:
     \item PictureFlow will accept album art larger than the dimensions of the
     screen, but the larger the dimensions, the longer they will take to scale.
   \end{itemize}
-
-\note{PictureFlow is a visualisation only. It cannot be used to select and
-play music.}
 
 \subsubsection{Keys}
 \begin{table}
@@ -40,7 +39,8 @@ play music.}
         \opt{ONDIO_PAD}{\ButtonUp}
         \opt{RECORDER_PAD}{\ButtonOn}
         \nopt{ONDIO_PAD,IRIVER_H10_PAD,RECORDER_PAD}{\ButtonSelect}
-        & Enter track list\\
+        & Enter track list \opt{swcodec}{/ Play album from selected
+          track}\\
 
         \ButtonLeft & Exit track list\\
 
