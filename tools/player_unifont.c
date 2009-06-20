@@ -774,7 +774,7 @@ int main(int argc, char **argv)
 
             sprintf(buffer, "convert tmp.pnm %s", filename);
             system(buffer);
-            system("rm tmp.pnm");
+            remove("tmp.pnm");
         }
     }
 }
