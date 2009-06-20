@@ -33,7 +33,7 @@
 /* some models use the internal 32 kHz oscillator which needs special attention
    during initialisation, power-up and power-down.
 */
-#if defined(SANSA_CLIP) || defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#if defined(SANSA_CLIP) || defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
 #define USE_INTERNAL_OSCILLATOR
 #elif defined(TOSHIBA_GIGABEAT_S)
 #define SI4700_GPIO_SETUP (SYSCONFIG1_GPIO1_HI_Z | \
