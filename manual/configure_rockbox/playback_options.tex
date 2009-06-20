@@ -157,12 +157,6 @@ you to configure settings related to audio playback.
       
     Options for replaygain are:
     \begin{description}
-      \item[Enable Replaygain]This turns on/off the replaygain function.
-        %
-      \item[Prevent Clipping]Avoid clipping of a song's waveform.
-        If a song would clip during playback, the volume is lowered for 
-        that song. Replaygain information is needed for this to work.
-        %
       \item[Replaygain Type]Choose the type of replaygain to apply:
         \begin{description}
         \item[Album Gain]Maintain a constant volume level between
@@ -177,7 +171,14 @@ you to configure settings related to audio playback.
         \item[Track Gain If Shuffling]Maintains a constant volume
           between tracks if \setting{Shuffle} is set to \setting{Yes}.
           Reverts to album mode if \setting{Shuffle} is set to \setting{No}.
+          %
+        \item[Off]Do not process replaygain information, i.e. turn off
+          the replaygain function.
         \end{description}
+        %
+      \item[Prevent Clipping]Avoid clipping of a song's waveform.
+        If a song would clip during playback, the volume is lowered for 
+        that song. Replaygain information is needed for this to work.
         %
       \item[Pre-amp]This allows you to adjust the volume when replaygain
         is applied. Replaygain often lowers the volume, sometimes quite
