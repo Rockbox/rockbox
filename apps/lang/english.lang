@@ -1888,16 +1888,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLAYGAIN_ENABLE
-  desc: in replaygain
+  desc: deprecated
   user: core
   <source>
-    *: "Enable Replaygain"
+    *: ""
   </source>
   <dest>
-    *: "Enable Replaygain"
+    *: ""
   </dest>
   <voice>
-    *: "Enable Replaygain"
+    *: ""
   </voice>
 </phrase>
 <phrase>
