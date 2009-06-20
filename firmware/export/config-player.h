@@ -60,10 +60,6 @@
 /* Define this if you have a SH7034 */
 #define CONFIG_CPU SH7034
 
-/* Uncomment this if you want to enable ATA power-off control.
- * Attention, some players crash when ATA power-off is enabled! */
-//#define HAVE_ATA_POWER_OFF
-
 /* Define this if you control ata power player style
    (with PB4, new player only) */
 #define ATA_POWER_PLAYERSTYLE

@@ -321,6 +321,9 @@ whichadvanced () {
   if [ "$memory" = "2" ]; then
     printf ", (8)MB MOD"
   fi
+  if [ "$modelname" = "player" ]; then
+    printf ", Use (A)TA poweroff"
+  fi
   if [ "$t_model" = "ondio" ]; then
     printf ", (B)acklight MOD"
   fi
@@ -371,6 +374,14 @@ whichadvanced () {
         if [ "$memory" = "2" ]; then
           memory="8"
           echo "Memory size selected: 8MB"
+        else
+          cont=0
+        fi
+        ;;
+      [Aa])
+        if [ "$modelname" = "player" ]; then
+          have_ata_poweroff="#define HAVE_ATA_POWEROFF"
+          echo "ATA poweroff enabled"
         else
           cont=0
         fi
@@ -2551,6 +2562,7 @@ sed > autoconf.h \
  -e "s,@RBDIR@,${rbdir},g" \
  -e "s,@have_backlight@,$have_backlight,g" \
  -e "s,@have_fmradio_in@,$have_fmradio_in,g" \
+ -e "s,@have_ata_poweroff@,$have_ata_poweroff,g" \
 <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
@@ -2567,6 +2579,9 @@ sed > autoconf.h \
 
 /* optional define for FM radio mod for iAudio M5 */
 @have_fmradio_in@
+
+/* optional define for ATA poweroff on Player */
+@have_ata_poweroff@
 
 /* optional defines for RTC mod for h1x0 */
 @config_rtc@
