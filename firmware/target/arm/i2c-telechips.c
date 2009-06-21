@@ -36,7 +36,7 @@ static struct mutex i2c_mtx;
 
 void i2c_init(void)
 {
-    /* nothing to do */
+    mutex_init(&i2c_mtx);
 }
 
 void i2c_start(void)
