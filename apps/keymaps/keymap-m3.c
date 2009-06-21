@@ -137,13 +137,13 @@ static const struct button_mapping remote_button_context_keyboard[] = {
     { ACTION_KBD_LEFT,        BUTTON_RC_REW|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_KBD_RIGHT,       BUTTON_RC_FF,                     BUTTON_NONE },
     { ACTION_KBD_RIGHT,       BUTTON_RC_FF|BUTTON_REPEAT,       BUTTON_NONE },
-    { ACTION_KBD_UP,          BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
-    { ACTION_KBD_UP,          BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_KBD_DOWN,        BUTTON_RC_VOL_UP,                 BUTTON_NONE },
-    { ACTION_KBD_DOWN,        BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_KBD_UP,          BUTTON_RC_VOL_UP,                 BUTTON_NONE },
+    { ACTION_KBD_UP,          BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_KBD_DOWN,        BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
+    { ACTION_KBD_DOWN,        BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_KBD_PAGE_FLIP,   BUTTON_RC_MODE,                   BUTTON_NONE },
-    { ACTION_KBD_SELECT,      BUTTON_RC_PLAY|BUTTON_REL,        BUTTON_PLAY },
-    { ACTION_KBD_DONE,        BUTTON_RC_PLAY|BUTTON_REPEAT,     BUTTON_PLAY },
+    { ACTION_KBD_SELECT,      BUTTON_RC_PLAY|BUTTON_REL,        BUTTON_RC_PLAY },
+    { ACTION_KBD_DONE,        BUTTON_RC_PLAY|BUTTON_REPEAT,     BUTTON_RC_PLAY },
     { ACTION_KBD_ABORT,       BUTTON_RC_REC,                    BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
@@ -423,6 +423,7 @@ static const struct button_mapping* get_context_mapping_remote( int context )
             return remote_button_context_settings;
 
         case CONTEXT_SETTINGS_EQ:
+        case CONTEXT_SETTINGS_TIME:
             return remote_button_context_settings_r_is_inc;
 
         case CONTEXT_TREE:
