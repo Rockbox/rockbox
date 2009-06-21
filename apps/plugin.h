@@ -128,12 +128,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 155
+#define PLUGIN_API_VERSION 156
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 151
+#define PLUGIN_MIN_API_VERSION 156
 
 /* plugin return codes */
 enum plugin_status {
@@ -205,6 +205,7 @@ struct plugin_api {
             int x, int y, int width, int height);
     void (*lcd_bitmap_transparent)(const fb_data *src, int x, int y,
             int width, int height);
+#if MEMORYSIZE > 2
     void (*lcd_blit_yuv)(unsigned char * const src[3],
                          int src_x, int src_y, int stride,
                          int x, int y, int width, int height);
@@ -212,6 +213,7 @@ struct plugin_api {
     || defined(IRIVER_H10) || defined(COWON_D2) || defined(PHILIPS_HDD1630) || defined(SANSA_FUZE) || defined(SANSA_E200V2)
     void (*lcd_yuv_set_options)(unsigned options);
 #endif
+#endif /* MEMORYSIZE > 2 */
 #elif (LCD_DEPTH < 4) && !defined(SIMULATOR)
     void (*lcd_blit_mono)(const unsigned char *data, int x, int by, int width,
                           int bheight, int stride);

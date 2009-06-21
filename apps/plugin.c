@@ -126,11 +126,13 @@ static const struct plugin_api rockbox_api = {
 #if LCD_DEPTH == 16
     lcd_bitmap_transparent_part,
     lcd_bitmap_transparent,
+#if MEMORYSIZE > 2
     lcd_blit_yuv,
 #if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) \
     || defined(IRIVER_H10) || defined(COWON_D2) || defined(PHILIPS_HDD1630) || defined(SANSA_FUZE) || defined(SANSA_E200V2)
     lcd_yuv_set_options,
 #endif
+#endif /* MEMORYSIZE > 2 */
 #elif (LCD_DEPTH < 4) && !defined(SIMULATOR)
     lcd_blit_mono,
     lcd_blit_grey_phase,

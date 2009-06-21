@@ -30,7 +30,9 @@ static bool lcd_busy = false;
 #endif
 
 /* Display status */
+#if MEMORYSIZE > 2
 static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
+#endif
 static bool is_lcd_enabled = true;
 
 /* LCD command set for Samsung S6B33B2 */
@@ -328,6 +330,7 @@ void lcd_set_flip(bool yesno)
 
 /*** update functions ***/
 
+#if MEMORYSIZE > 2
 void lcd_yuv_set_options(unsigned options)
 {
     lcd_yuv_options = options;
@@ -349,10 +352,6 @@ void lcd_blit_yuv(unsigned char * const src[3],
 {
     unsigned char const * yuv_src[3];
     off_t z;
-
-#ifdef SANSA_C200V2
-    lcd_busy = true;
-#endif
 
     /* Sorry, but width and height must be >= 2 or else */
     width &= ~1;
@@ -377,9 +376,8 @@ void lcd_blit_yuv(unsigned char * const src[3],
             lcd_send_command(R_Y_ADDR_AREA, y);
             lcd_send_command(y + 1, 0);
 
-#ifndef SANSA_C200V2 // TODO
             lcd_write_yuv420_lines_odither(yuv_src, width, stride, x, y);
-#endif
+
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
             yuv_src[2] += stride >> 1;
@@ -394,9 +392,8 @@ void lcd_blit_yuv(unsigned char * const src[3],
             lcd_send_command(R_Y_ADDR_AREA, y);
             lcd_send_command(y + 1, 0);
 
-#ifndef SANSA_C200V2 // TODO
             lcd_write_yuv420_lines(yuv_src, width, stride);
-#endif
+
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
             yuv_src[2] += stride >> 1;
@@ -404,11 +401,8 @@ void lcd_blit_yuv(unsigned char * const src[3],
         }
          while (--height > 0);
     }
-
-#ifdef SANSA_C200V2
-    lcd_busy = false;
-#endif
 }
+#endif /* MEMORYSIZE > 2 */
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */

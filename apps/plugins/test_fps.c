@@ -132,7 +132,7 @@ static void time_main_update(void)
     log_text(str);
 }
 
-#ifdef HAVE_LCD_COLOR
+#if defined(HAVE_LCD_COLOR) && (MEMORYSIZE > 2)
 
 #if LCD_WIDTH >= LCD_HEIGHT
 #define YUV_WIDTH LCD_WIDTH
@@ -353,7 +353,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     log_text("Main LCD Update");
     time_main_update();
-#ifdef HAVE_LCD_COLOR
+#if defined(HAVE_LCD_COLOR) && (MEMORYSIZE > 2)
     log_text("Main LCD YUV");
     time_main_yuv();
 #endif

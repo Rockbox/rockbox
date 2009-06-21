@@ -151,11 +151,13 @@ extern void lcd_puts_scroll_style(int x, int y, const unsigned char* string,
 
 /* performance function */
 #if defined(HAVE_LCD_COLOR)
+#if MEMORYSIZE > 2
 #define LCD_YUV_DITHER 0x1
 extern void lcd_yuv_set_options(unsigned options);
 extern void lcd_blit_yuv(unsigned char * const src[3],
                          int src_x, int src_y, int stride,
                          int x, int y, int width, int height);
+#endif /* MEMORYSIZE > 2 */
 #else
 extern void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
                           int bheight, int stride);
