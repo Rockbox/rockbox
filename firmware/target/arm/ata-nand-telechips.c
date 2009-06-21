@@ -770,6 +770,8 @@ int nand_init(void)
     unsigned char spare_buf[16];
 
     if (initialized) return 0;
+    
+    mutex_init(&ata_mtx);
 
 #ifdef CPU_TCC77X
     CSCFG2 = 0x318a8010;
