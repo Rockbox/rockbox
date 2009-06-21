@@ -29,8 +29,16 @@
 #include "metadata_common.h"
 #include "metadata_parsers.h"
 #include "structec.h"
+
+/* Define LOGF_ENABLE to enable logf output in this file */
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
+#ifdef SIMULATOR
+#define LOGFQUEUE logf
+#else
+#define LOGFQUEUE(...)
+#endif
 
 struct file
 {
@@ -345,7 +353,7 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
             return 0;
         }
 
-        DEBUGF("Vorbis comment %d: %s=%s\n", i, name, id3->path);
+        LOGFQUEUE("Vorbis comment %d: %s=%s", i, name, id3->path);
         len = parse_tag(name, id3->path, id3, buf, buf_remaining, 
             TAGTYPE_VORBIS);
         buf += len;
