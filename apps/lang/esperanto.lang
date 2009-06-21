@@ -2979,16 +2979,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLAYGAIN_ENABLE
-  desc: in replaygain
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *: "Enable Replaygain"
+    *: none
   </source>
   <dest>
-    *: "Ebligi Legagajno"
+    *: none
   </dest>
   <voice>
-    *: "Ebligi Legagajno"
+    *: none
   </voice>
 </phrase>
 <phrase>

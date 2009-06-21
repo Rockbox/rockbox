@@ -2984,16 +2984,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLAYGAIN_ENABLE
-  desc: in replaygain
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *: "Enable Replaygain"
+    *: none
   </source>
   <dest>
-    *: "Luba Replaygain"
+    *: none
   </dest>
   <voice>
-    *: "Luba Replaygain"
+    *: none
   </voice>
 </phrase>
 <phrase>

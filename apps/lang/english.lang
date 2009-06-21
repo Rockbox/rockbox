@@ -1889,15 +1889,15 @@
 <phrase>
   id: LANG_REPLAYGAIN_ENABLE
   desc: deprecated
-  user: core
+  user:
   <source>
-    *: ""
+    *: none
   </source>
   <dest>
-    *: ""
+    *: none
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>

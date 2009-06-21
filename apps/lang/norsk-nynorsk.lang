@@ -2761,16 +2761,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLAYGAIN_ENABLE
-  desc: in replaygain
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *: "Enable Replaygain"
+    *: none
   </source>
   <dest>
-    *: "Bruk Replaygain"
+    *: none
   </dest>
   <voice>
-    *: "Bruk Replaygain"
+    *: none
   </voice>
 </phrase>
 <phrase>

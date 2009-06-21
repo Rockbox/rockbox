@@ -2813,16 +2813,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLAYGAIN_ENABLE
-  desc: in replaygain
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *: "Enable Replaygain"
+    *: none
   </source>
   <dest>
-    *: "Zet replaygain aan"
+    *: none
   </dest>
   <voice>
-    *: "Zet replaygain aan"
+    *: none
   </voice>
 </phrase>
 <phrase>

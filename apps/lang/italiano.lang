@@ -1817,16 +1817,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLAYGAIN_ENABLE
-  desc: in replaygain
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *: "Enable Replaygain"
+    *: none
   </source>
   <dest>
-    *: "Abilita Replaygain"
+    *: none
   </dest>
   <voice>
-    *: "Abilita Replaygain"
+    *: none
   </voice>
 </phrase>
 <phrase>
