@@ -27,9 +27,18 @@
 #include "gwps.h"
 #include "buffering.h"
 #include "dircache.h"
-#include "debug.h"
 #include "misc.h"
 #include "settings.h"
+
+/* Define LOGF_ENABLE to enable logf output in this file */
+/*#define LOGF_ENABLE*/
+#include "logf.h"
+
+#ifdef SIMULATOR
+#define LOGFQUEUE logf
+#else
+#define LOGFQUEUE(...)
+#endif
 
 #if defined(HAVE_JPEG) || defined(PLUGIN)
 #define USE_JPEG_COVER
@@ -264,7 +273,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
         return false;
 
     strncpy(buf, path, buflen);
-    DEBUGF("Album art found: %s\n", path);
+    LOGFQUEUE("Album art found: %s", path);
     return true;
 }
 
@@ -283,7 +292,7 @@ bool find_albumart(const struct mp3entry *id3, char *buf, int buflen)
     if (!data)
         return false;
 
-    DEBUGF("Looking for album art for %s\n", id3->path);
+    LOGFQUEUE("Looking for album art for %s", id3->path);
 
     /* Write the size string, e.g. ".100x100". */
     snprintf(size_string, sizeof(size_string), ".%dx%d",
