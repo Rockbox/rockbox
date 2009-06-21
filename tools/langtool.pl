@@ -176,7 +176,7 @@ foreach my $file (@ARGV) {
         }
 
         if ($deprecate) {
-            if ($id ne "" and grep(/$id/, @ids)) {
+            if ($id ne "" and grep(/^$id$/, @ids)) {
                 # Set desc
                 $line =~ s/\s*desc:.*/  desc: deprecated/;
                 # Set user
@@ -193,19 +193,19 @@ foreach my $file (@ARGV) {
         }
         elsif ($changetarget) {
             # Change target if set and it's the same as $from
-            if ($id ne "" and grep(/$id/, @ids) and $location =~ /source|dest|voice/ and $target eq $from) {
+            if ($id ne "" and grep(/^$id$/, @ids) and $location =~ /source|dest|voice/ and $target eq $from) {
                 $line =~ s/\Q$from/$to/;
             }
         }
         elsif ($changesource) {
             # Change string if $target is set and matches $s_target
-            if ($id ne "" and grep(/$id/, @ids) and $target eq $s_target and $location eq "source") {
+            if ($id ne "" and grep(/^$id$/, @ids) and $target eq $s_target and $location eq "source") {
                 $line =~ s/\Q$string/$to/;
             }
         }
         elsif ($changedesc) {
             # Simply change the desc line if the id matches
-            if ($id ne "" and grep(/$id/, @ids)) {
+            if ($id ne "" and grep(/^$id$/, @ids)) {
                 $line =~ s/\s*desc:.*/  desc: $to/;
             }
         }
