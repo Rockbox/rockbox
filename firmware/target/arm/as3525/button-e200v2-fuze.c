@@ -20,19 +20,34 @@
  *
  ****************************************************************************/
 
-
-/* Basic button driver for the Fuze
- *
- * TODO: - Get the wheel working with interrupts (seems to be impossible
- *              so far)
- */
-
 #include "system.h"
 #include "button.h"
 #include "button-target.h"
 #include "backlight.h"
 
+
+#ifdef SANSA_FUZE
+#define DBOP_BIT15_BUTTON       BUTTON_HOME
 #define WHEEL_REPEAT_INTERVAL   (HZ/5)
+#define WHEEL_COUNTER_DIV       4
+#define ACCEL_INCREMENT         2
+#define ACCEL_SHIFT             2
+#define BUTTON_DELAY            45
+#endif
+
+#ifdef SANSA_E200V2
+#define DBOP_BIT15_BUTTON       BUTTON_REC
+#define WHEEL_REPEAT_INTERVAL   (HZ/5)
+#define WHEEL_COUNTER_DIV       2
+#define ACCEL_INCREMENT         3
+#define ACCEL_SHIFT             1
+#define BUTTON_DELAY            10
+
+/* read_missed is true if buttons could not
+ * be read (see lcd_button_support) */
+static bool read_missed              = false;
+
+#endif
 
 /* Buttons */
 static bool hold_button     = false;
@@ -118,15 +133,15 @@ static void scrollwheel(unsigned short dbop_din)
         if (TIME_BEFORE(current_tick, last_wheel_post + WHEEL_REPEAT_INTERVAL))
         {
             btn |= BUTTON_REPEAT;
-            wheel_delta = accel>>2;
+            wheel_delta = accel>>ACCEL_SHIFT;
         }
 
-        accel += 2;
+        accel += ACCEL_INCREMENT;
 
         /* the wheel is more reliable if we don't send every change,
-         * every 4th is basically one "physical click" which should
-         * make up 1 item in lists */
-        if (++counter >= 4 && queue_empty(&button_queue))
+         * every WHEEL_COUNTER_DIVth is basically one "physical click" 
+         * which should make up 1 item in lists */
+        if (++counter >= WHEEL_COUNTER_DIV && queue_empty(&button_queue))
         {
             buttonlight_on();
             backlight_on();
@@ -136,7 +151,11 @@ static void scrollwheel(unsigned short dbop_din)
             last_wheel_post = current_tick;
         }
     }
-    if (accel > 0)
+    if (accel > 0
+#ifdef SANSA_E200V2
+         && !read_missed /* decrement only if reading buttons was successful */
+#endif         
+        )
         accel--;
 
     old_wheel_value = wheel_value;
@@ -150,49 +169,69 @@ bool button_hold(void)
 
 static void button_delay(void)
 {
-    int i = 50;
+    int i = BUTTON_DELAY;
     while(i--) asm volatile ("nop\n");
 }
 
 unsigned short button_read_dbop(void)
 {
+#ifdef SANSA_FUZE
     /* skip home and power reading if lcd_button_support was blocked,
-     * since the dbop bit 15 is invalid then, and use the old value instead */
-    /* -20 (arbitary value) indicates valid home&power button read */
+     * since the dbop bit 15 is invalid then, and use the old value instead
+     * -20 (arbitary value) indicates valid home&power button read 
+     * (fuze only) */
     int old_home_power = -20;
+#endif
     if(!lcd_button_support())
     {
+#if defined(SANSA_FUZE)
         old_home_power = (_dbop_din & (1<<15|1<<8));
+#elif defined(SANSA_E200V2)
+        read_missed = true;
+#endif
     }
 
-    /* Set up dbop for input */
-    DBOP_CTRL |= (1<<19);                /* Tri-state DBOP on read cycle */
-    DBOP_CTRL &= ~(1<<16);               /* disable output (1:write enabled) */
-    DBOP_TIMPOL_01 = 0xe167e167;         /* Set Timing & Polarity regs 0 & 1 */
-    DBOP_TIMPOL_23 = 0xe167006e;         /* Set Timing & Polarity regs 2 & 3 */
+#ifdef SANSA_E200V2
+    if (!read_missed)   /* read buttons only if lcd_button_support was not blocked */
+#endif
+    {
+        /* Set up dbop for input */
+        DBOP_CTRL |= (1<<19);                /* Tri-state DBOP on read cycle */
+        DBOP_CTRL &= ~(1<<16);               /* disable output (1:write enabled) */
+        DBOP_TIMPOL_01 = 0xe167e167;         /* Set Timing & Polarity regs 0 & 1 */
+        DBOP_TIMPOL_23 = 0xe167006e;         /* Set Timing & Polarity regs 2 & 3 */
 
-    button_delay();
-    DBOP_CTRL |= (1<<15);                /* start read */
-    while (!(DBOP_STAT & (1<<16)));      /* wait for valid data */
+        button_delay();
+        DBOP_CTRL |= (1<<15);                /* start read */
+        while (!(DBOP_STAT & (1<<16)));      /* wait for valid data */
 
-    _dbop_din = DBOP_DIN;                /* Read dbop data*/
+        _dbop_din = DBOP_DIN;                /* Read dbop data*/
 
-    /* Reset dbop for output */
-    DBOP_TIMPOL_01 = 0x6e167;            /* Set Timing & Polarity regs 0 & 1 */
-    DBOP_TIMPOL_23 = 0xa167e06f;         /* Set Timing & Polarity regs 2 & 3 */
-    DBOP_CTRL |= (1<<16);                /* Enable output (0:write disable)  */
-    DBOP_CTRL &= ~(1<<19);               /* Tri-state when no active write */
+        /* Reset dbop for output */
+        DBOP_TIMPOL_01 = 0x6e167;            /* Set Timing & Polarity regs 0 & 1 */
+        DBOP_TIMPOL_23 = 0xa167e06f;         /* Set Timing & Polarity regs 2 & 3 */
+        DBOP_CTRL |= (1<<16);                /* Enable output (0:write disable)  */
+        DBOP_CTRL &= ~(1<<19);               /* Tri-state when no active write */
+    }
 
+#ifdef SANSA_FUZE
     /* write back old values if blocked */
     if (old_home_power != -20)
     {
         _dbop_din |= old_home_power & 1<<15;
         _dbop_din &= 0xfeff|(old_home_power & 1<<8);
     }
+#endif
+
 #if defined(HAVE_SCROLLWHEEL) && !defined(BOOTLOADER)
     /* read wheel on bit 13 & 14, but sent to the button queue seperately */
         scrollwheel(_dbop_din);
 #endif
+
+#ifdef SANSA_E200V2
+    read_missed = false;
+#endif
+
     return _dbop_din;
 }
 
@@ -248,26 +287,38 @@ int button_read_device(void)
 {
     int btn = BUTTON_NONE;
     unsigned short dbop = button_read_dbop();
+#ifdef SANSA_FUZE
     static unsigned power_counter = 0;
+#endif
     /* hold button */
     if(dbop & (1<<12))
     {
+#ifdef SANSA_FUZE
         power_counter = HZ;
+#endif
         hold_button = true;
     }
     else
     {
         hold_button = false;
+#ifdef SANSA_FUZE
     /* read power on bit 8, but not if hold button was just released, since
      * you basically always hit power due to the slider mechanism after releasing
+     * (fuze only)
      * hold (wait 1 sec) */
         if (power_counter)
             power_counter--;
-        if (!power_counter && dbop & (1<<8))
+#endif
+        if (dbop & (1<<8)
+#ifdef SANSA_FUZE
+            && !power_counter
+#endif
+            )
             btn |= BUTTON_POWER;
     /* read home on bit 15 */
         if (!(dbop & (1<<15)))
-            btn |= BUTTON_HOME;
+            btn |= DBOP_BIT15_BUTTON;
+
         btn |= button_gpio();
     }
 
