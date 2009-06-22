@@ -34,12 +34,6 @@
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
-#ifdef SIMULATOR
-#define LOGFQUEUE logf
-#else
-#define LOGFQUEUE(...)
-#endif
-
 #if defined(HAVE_JPEG) || defined(PLUGIN)
 #define USE_JPEG_COVER
 #endif
@@ -273,7 +267,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
         return false;
 
     strncpy(buf, path, buflen);
-    LOGFQUEUE("Album art found: %s", path);
+    logf("Album art found: %s", path);
     return true;
 }
 
@@ -292,7 +286,7 @@ bool find_albumart(const struct mp3entry *id3, char *buf, int buflen)
     if (!data)
         return false;
 
-    LOGFQUEUE("Looking for album art for %s", id3->path);
+    logf("Looking for album art for %s", id3->path);
 
     /* Write the size string, e.g. ".100x100". */
     snprintf(size_string, sizeof(size_string), ".%dx%d",

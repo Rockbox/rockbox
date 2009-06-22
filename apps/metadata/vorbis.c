@@ -34,12 +34,6 @@
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
-#ifdef SIMULATOR
-#define LOGFQUEUE logf
-#else
-#define LOGFQUEUE(...)
-#endif
-
 struct file
 {
     int fd;
@@ -353,7 +347,7 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
             return 0;
         }
 
-        LOGFQUEUE("Vorbis comment %d: %s=%s", i, name, id3->path);
+        logf("Vorbis comment %d: %s=%s", i, name, id3->path);
         len = parse_tag(name, id3->path, id3, buf, buf_remaining, 
             TAGTYPE_VORBIS);
         buf += len;
