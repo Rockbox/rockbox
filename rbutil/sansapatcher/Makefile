@@ -48,5 +48,8 @@ bootimg_c200.c: firmware.mi4 ../tools/bin2c
 bootimg_e200.c: PP5022.mi4 ../tools/bin2c
 	../tools/bin2c PP5022.mi4 bootimg_e200
 
+../tools/bin2c:
+	make -C ../tools bin2c
+
 clean:
 	rm -f sansapatcher.exe sansapatcher-mac sansapatcher-i386 sansapatcher-ppc sansapatcher bootimg_c200.c bootimg_c200.h bootimg_e200.c bootimg_e200.h *~
