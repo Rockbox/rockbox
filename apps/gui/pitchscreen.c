@@ -474,7 +474,7 @@ int gui_syncpitchscreen_run(void)
                 }
             }
             else
-                speed = stretch * new_pitch;
+                speed = stretch * pitch;
 #endif           
         }
     }
