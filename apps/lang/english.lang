@@ -2649,15 +2649,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </voice>
 </phrase>
 <phrase>
@@ -2665,13 +2665,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </dest>
   <voice>
-    *: "Browse while-playing-screen files"
+    *: "While playing screen"
   </voice>
 </phrase>
 <phrase>
@@ -2680,15 +2680,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </dest>
   <voice>
     *: none
-    remote: "Browse remote while-playing-screen files"
+    remote: "Remote While Playing Screen"
   </voice>
 </phrase>
 <phrase>
@@ -5187,13 +5187,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </dest>
   <voice>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </voice>
 </phrase>
 <phrase>

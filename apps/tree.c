@@ -904,6 +904,7 @@ int rockbox_browse(const char *root, int dirfilter)
     if (dirfilter >= NUM_FILTER_MODES)
     {
         static struct tree_context backup;
+        char current[MAX_PATH];
         int last_context;
         
         backup = tc;
@@ -913,6 +914,58 @@ int rockbox_browse(const char *root, int dirfilter)
         start_wps = false;
         last_context = curr_context;
         
+        /* Center on the currently loaded language when browsing languages. */
+        if (dirfilter == SHOW_LNG)
+        {
+            if (global_settings.lang_file[0])
+            {
+                snprintf(current, sizeof(current), LANG_DIR "/%s.lng",
+                        global_settings.lang_file);
+            }
+            else
+            {
+                strncpy(current, LANG_DIR "/english.lng", sizeof(current));
+            }
+        }
+        /* Center on currently loaded WPS */
+        else if (dirfilter == SHOW_WPS)
+        {
+            snprintf(current, sizeof(current), WPS_DIR "/%s.wps",
+                    global_settings.wps_file);
+        }
+#ifdef HAVE_REMOTE_LCD
+        /* Center on currently loaded RWPS */
+        else if (dirfilter == SHOW_RWPS)
+        {
+            snprintf(current, sizeof(current), WPS_DIR "/%s.rwps",
+                    global_settings.rwps_file);
+        }
+#endif
+#ifdef HAVE_LCD_BITMAP
+        /* Center on the currently loaded font when browsing fonts */
+        else if (dirfilter == SHOW_FONT)
+        {
+            snprintf(current, sizeof(current), FONT_DIR "/%s.fnt",
+                    global_settings.font_file);
+        }
+#endif
+#if CONFIG_TUNER
+        /* Center on the currently loaded FM preset when browsing those */
+        else if (dirfilter == SHOW_FMR)
+        {
+            snprintf(current, sizeof(current), FMPRESET_PATH "/%s.fmr",
+                    global_settings.fmr_file);
+        }
+#endif
+        
+        /* If we've found a file to center on, do it */
+        if (current[0] == '/')
+        {
+            set_current_file(current);
+            /* set_current_file changes dirlevel, change it back */
+            tc.dirlevel = 0; 
+        }
+
         ret_val = dirbrowse();
         tc = backup;
         curr_context = last_context;
