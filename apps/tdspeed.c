@@ -88,7 +88,7 @@ bool tdspeed_config(int samplerate, bool stereo, int factor)
         return false;
     if (samplerate < MIN_RATE || samplerate > MAX_RATE)
         return false;
-    if (factor < SPEED_MIN || factor > SPEED_MAX)
+    if (factor < STRETCH_MIN || factor > STRETCH_MAX)
         return false;
 
     st->stereo = stereo;

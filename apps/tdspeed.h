@@ -31,7 +31,7 @@ long tdspeed_est_output_size(void);
 long tdspeed_est_input_size(long size);
 int tdspeed_doit(int32_t *src[], int count);
 
-#define SPEED_MAX 250
-#define SPEED_MIN 35
+#define STRETCH_MAX 250
+#define STRETCH_MIN 35
 
 #endif

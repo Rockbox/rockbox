@@ -50,14 +50,10 @@
 #define PITCH_BIG_DELTA   10
 #define PITCH_NUDGE_DELTA 20
 
-static enum
-{
-    PITCH_MODE_ABSOLUTE,
-    PITCH_MODE_SEMITONE,
+static bool pitch_mode_semitone = false;
 #if CONFIG_CODEC == SWCODEC
-    PITCH_MODE_TIMESTRETCH,
+static bool pitch_mode_timestretch = false;
 #endif
-} pitch_mode = PITCH_MODE_ABSOLUTE;
 
 enum
 {
@@ -113,7 +109,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
                              struct viewport pitch_viewports[PITCH_ITEM_COUNT],
                              int pitch
 #if CONFIG_CODEC == SWCODEC
-                             ,int speedxpitch
+                             ,int speed
 #endif
                              )
 {
@@ -127,7 +123,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     {
         /* UP: Pitch Up */
         display->set_viewport(&pitch_viewports[PITCH_TOP]);
-        if (pitch_mode == PITCH_MODE_SEMITONE)
+        if (pitch_mode_semitone)
             ptr = str(LANG_PITCH_UP_SEMITONE);
         else
             ptr = str(LANG_PITCH_UP);
@@ -140,7 +136,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
 
         /* DOWN: Pitch Down */
         display->set_viewport(&pitch_viewports[PITCH_BOTTOM]);
-        if (pitch_mode == PITCH_MODE_SEMITONE)
+        if (pitch_mode_semitone)
             ptr = str(LANG_PITCH_DOWN_SEMITONE);
         else
             ptr = str(LANG_PITCH_DOWN);
@@ -161,7 +157,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     if ((show_lang_pitch = (max_lines >= 3)))
     {
 #if CONFIG_CODEC == SWCODEC
-        if (pitch_mode != PITCH_MODE_TIMESTRETCH)
+        if (!pitch_mode_timestretch)
         {
 #endif
             /* LANG_PITCH */
@@ -184,7 +180,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
 
     /* Middle section lower line */
 #if CONFIG_CODEC == SWCODEC
-    if (pitch_mode != PITCH_MODE_TIMESTRETCH)
+    if (!pitch_mode_timestretch)
     {
 #endif
         /* "XXX.X%" */
@@ -196,7 +192,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     {
         /* "Speed:XXX%" */
         snprintf(buf, sizeof(buf), "%s:%d%%", str(LANG_SPEED), 
-             speedxpitch / 1000);
+             speed / 1000);
     }
 #endif
     display->getstringsize(buf, &w, &h);
@@ -209,7 +205,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     const char *leftlabel = "-2%";
     const char *rightlabel = "+2%";
 #if CONFIG_CODEC == SWCODEC
-    if (pitch_mode == PITCH_MODE_TIMESTRETCH)
+    if (pitch_mode_timestretch)
     {
         leftlabel = "<<";
         rightlabel = ">>";
@@ -316,8 +312,8 @@ int gui_syncpitchscreen_run(void)
     int button, i;
     int pitch = sound_get_pitch();
 #if CONFIG_CODEC == SWCODEC
-    int speed = dsp_get_timestretch();
-    int maintain_speed_pitch = speed * pitch; /* speed * pitch to maintain */
+    int stretch = dsp_get_timestretch();
+    int speed = stretch * pitch; /* speed to maintain */
 #endif
     int new_pitch;
     int pitch_delta;
@@ -349,7 +345,7 @@ int gui_syncpitchscreen_run(void)
             pitchscreen_draw(&screens[i], max_lines[i],
                               pitch_viewports[i], pitch
 #if CONFIG_CODEC == SWCODEC
-                              , maintain_speed_pitch
+                              , speed
 #endif
                               );
         pitch_delta = 0;
@@ -374,7 +370,7 @@ int gui_syncpitchscreen_run(void)
 
             case ACTION_PS_NUDGE_RIGHT:
 #if CONFIG_CODEC == SWCODEC
-                if (pitch_mode != PITCH_MODE_TIMESTRETCH)
+                if (!pitch_mode_timestretch)
                 {
 #endif
                     new_pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false);
@@ -385,14 +381,11 @@ int gui_syncpitchscreen_run(void)
                 }
 
             case ACTION_PS_FASTER:
-                if (pitch_mode == PITCH_MODE_TIMESTRETCH)
+                if (pitch_mode_timestretch && stretch < STRETCH_MAX)
                 {
-                    if (speed < SPEED_MAX)
-                    {
-                        speed++;
-                        dsp_set_timestretch(speed);
-                        maintain_speed_pitch = speed * pitch;
-                    }
+                    stretch++;
+                    dsp_set_timestretch(stretch);
+                    speed = stretch * pitch;
                 }
                 break;
 #endif
@@ -407,7 +400,7 @@ int gui_syncpitchscreen_run(void)
 
             case ACTION_PS_NUDGE_LEFT:
 #if CONFIG_CODEC == SWCODEC
-                if (pitch_mode != PITCH_MODE_TIMESTRETCH)
+                if (!pitch_mode_timestretch)
                 {
 #endif
                     new_pitch = pitch_increase(pitch, -PITCH_NUDGE_DELTA, false);
@@ -418,14 +411,11 @@ int gui_syncpitchscreen_run(void)
                 }
 
             case ACTION_PS_SLOWER:
-                if (pitch_mode == PITCH_MODE_TIMESTRETCH)
+                if (pitch_mode_timestretch && stretch > STRETCH_MIN)
                 {
-                    if (speed > SPEED_MIN)
-                    {
-                        speed--;
-                        dsp_set_timestretch(speed);
-                        maintain_speed_pitch = speed * pitch;
-                    }
+                    stretch--;
+                    dsp_set_timestretch(stretch);
+                    speed = stretch * pitch;
                 }
                 break;
 #endif
@@ -442,24 +432,18 @@ int gui_syncpitchscreen_run(void)
                 pitch = 1000;
                 sound_set_pitch(pitch);
 #if CONFIG_CODEC == SWCODEC
-                speed = 100;
-                dsp_set_timestretch(speed);
-                maintain_speed_pitch = speed * pitch;
+                stretch = 100;
+                dsp_set_timestretch(stretch);
+                speed = stretch * pitch;
 #endif
                 break;
 
             case ACTION_PS_TOGGLE_MODE:
-                ++pitch_mode;
 #if CONFIG_CODEC == SWCODEC
-                if (dsp_timestretch_available())
-                {
-                    if (pitch_mode > PITCH_MODE_TIMESTRETCH)
-                        pitch_mode = PITCH_MODE_ABSOLUTE;
-                    break;
-                }
+                if (dsp_timestretch_available() && pitch_mode_semitone)
+                    pitch_mode_timestretch = !pitch_mode_timestretch;
 #endif
-                if (pitch_mode > PITCH_MODE_SEMITONE)
-                    pitch_mode = PITCH_MODE_ABSOLUTE;
+                pitch_mode_semitone = !pitch_mode_semitone;
                 break;
 
             case ACTION_PS_EXIT:
@@ -473,25 +457,25 @@ int gui_syncpitchscreen_run(void)
         }
         if (pitch_delta)
         {
-            if (pitch_mode == PITCH_MODE_SEMITONE)
+            if (pitch_mode_semitone)
                 pitch = pitch_increase_semitone(pitch, pitch_delta > 0);
             else
                 pitch = pitch_increase(pitch, pitch_delta, true);
 #if CONFIG_CODEC == SWCODEC
-            if (pitch_mode == PITCH_MODE_TIMESTRETCH)
+            if (pitch_mode_timestretch)
             {
-                /* Set speed to maintain time dimension */
-                /* i.e. increase pitch, slow down speed */
-                int new_speed = maintain_speed_pitch / pitch;
-                if (new_speed >= SPEED_MIN && new_speed <= SPEED_MAX)
+                /* Set stretch to maintain speed  */
+                /* i.e. increase pitch, reduce stretch */
+                int new_stretch = speed / pitch;
+                if (new_stretch >= STRETCH_MIN && new_stretch <= STRETCH_MAX)
                 {
-                    speed = new_speed;
-                    dsp_set_timestretch(speed);
+                    stretch = new_stretch;
+                    dsp_set_timestretch(stretch);
                 }
             }
             else
-                maintain_speed_pitch = speed * pitch;
-#endif
+                speed = stretch * new_pitch;
+#endif           
         }
     }
 #if CONFIG_CODEC == SWCODEC
