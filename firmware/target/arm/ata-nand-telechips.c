@@ -40,6 +40,9 @@ long last_disk_activity = -1;
 /** static, private data **/
 static bool initialized = false;
 
+static long next_yield = 0;
+#define MIN_YIELD_PERIOD 1000
+
 static struct mutex ata_mtx SHAREDBSS_ATTR;
 
 #if defined(COWON_D2) || defined(IAUDIO_7)
@@ -713,6 +716,14 @@ int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
                 mutex_unlock(&ata_mtx);
                 return -1;
             }
+
+#ifdef CPU_TCC780X /* 77x doesn't have USEC_TIMER yet */
+            if (TIME_AFTER(USEC_TIMER, next_yield))
+            {
+                next_yield = USEC_TIMER + MIN_YIELD_PERIOD;
+                yield();
+            }
+#endif
 
             inbuf += SECTOR_SIZE;
             incount--;
