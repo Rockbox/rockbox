@@ -43,7 +43,7 @@
 #include "rbunicode.h"
 #include "usb.h"
 #include "qt1106.h"
-#include "rockboxlogo.h"
+#include "bitmaps/rockboxlogo.h"
 
 
 #include <stdarg.h>
@@ -108,7 +108,7 @@ void main(void)
     int oldval = PCON0;
     PCON0 = ((oldval & ~(3 << 4)) | (1 << 4));
     PDAT0 |= (1 << 2);
-
+    
     //power on
 //    oldval = PCON1;
 //    PCON1 = ((oldval & ~(0xf << 12)) | (1 << 12));
@@ -128,6 +128,7 @@ void main(void)
     EINTMSK = 0x11;
     asm volatile("msr cpsr_c, #0x13\n\t"); // enable interrupts
         
+    backlight_init();
     lcd_init();
     lcd_update();
 
@@ -157,6 +158,8 @@ void main(void)
         if(slider & 0x008000)
             bl_debug_count(((slider&0xff)) + 1);
         */
+        
+        _backlight_set_brightness(slider & 0xFF);
     }
 
     //power off

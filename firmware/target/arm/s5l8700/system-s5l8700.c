@@ -95,12 +95,13 @@ void irq_handler(void)
     asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
 
-    int irq_no = INTOFFSET;   /* Read clears the corresponding IRQ status */
+    int irq_no = INTOFFSET;
     
-    if ((irq_no & (1<<31)) == 0)  /* Ensure invalid flag is not set */
-    {
-        irqvector[irq_no]();
-    }
+    irqvector[irq_no]();
+
+    /* clear interrupt */
+    SRCPND = (1 << irq_no);
+    INTPND = INTPND;
     
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */

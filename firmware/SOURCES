@@ -1241,6 +1241,7 @@ target/arm/s5l8700/meizu-m6sp/lcd-m6sp.c
 #endif /* MEIZU_M6SP */
 
 #ifdef MEIZU_M3
+target/arm/s5l8700/backlight-meizu.c
 target/arm/s5l8700/meizu-m3/lcd-m3.c
 drivers/qt1106.c
 #ifndef SIMULATOR
