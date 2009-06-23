@@ -29,8 +29,9 @@
 #include "cpu.h"
 #include "pl180.h"
 
-#define _DEBUG_PRINTF(a,varargs...) \
-    snprintf(buf, sizeof(buf), (a), ##varargs); lcd_puts(0,line++,buf)
+#define _DEBUG_PRINTF(a,varargs...) do { \
+        snprintf(buf, sizeof(buf), (a), ##varargs); lcd_puts(0,line++,buf); \
+        } while(0)
 
 #define ON "Enabled"
 #define OFF "Disabled"
@@ -70,15 +71,12 @@
 unsigned short button_dbop_data(void);
 #endif
 
-static unsigned read_cp15 (void)
+static inline unsigned read_cp15 (void)
 {
-    unsigned value;
-
+    unsigned cp15_value;
     asm volatile (
-            "mrc p15, 0, %0, c1, c0, 0   @ read control reg\n":"=r"
-            (value)::"memory"
-    );
-    return (value);
+        "mrc p15, 0, %0, c1, c0, 0   @ read control reg\n" : "=r"(cp15_value));
+    return (cp15_value);
 }
 
 int calc_freq(int clk)
@@ -222,7 +220,7 @@ int calc_freq(int clk)
 
 bool __dbg_hw_info(void)
 {
-char buf[50];
+    char buf[50];
     int line;
 
     lcd_clear_display();
