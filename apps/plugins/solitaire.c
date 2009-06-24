@@ -1459,6 +1459,7 @@ int solitaire( int skipmenu )
         /* if there aren't any, that means you won :) */
         if( biggest_col_length == 0 && rem == NOT_A_CARD )
         {
+            rb->lcd_update();
             rb->splash( HZ, "You Won :)" );
             return bouncing_cards();
         }
