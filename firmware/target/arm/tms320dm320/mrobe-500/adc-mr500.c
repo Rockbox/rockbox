@@ -38,6 +38,9 @@ void adc_init(void)
 /* Touchscreen data available interupt */
 void GIO14(void)
 {
+    /* Interrupts work properly when cleared first */
+    IO_INTC_IRQ2 = (1<<3); /* IRQ_GIO14 == 35 */
+    
     short tsadc = tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS);
     short adscm = (tsadc&TSADC_ADSCM_MASK)>>TSADC_ADSCM_SHIFT;
     
@@ -62,8 +65,6 @@ void GIO14(void)
         case 0x0B:
             tsc2100_set_mode(true, 0x01);
             break;
-    }
-    
-    IO_INTC_IRQ2 = (1<<3); /* IRQ_GIO14 == 35 */
+    }    
 }
 

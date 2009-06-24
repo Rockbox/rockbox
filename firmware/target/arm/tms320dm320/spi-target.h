@@ -38,7 +38,6 @@ enum SPI_target {
 
 void spi_init(void);
 int spi_block_transfer(enum SPI_target target,
-                       const bool spi_msb_first,
                        const uint8_t *tx_bytes, unsigned int tx_size,
                              uint8_t *rx_bytes, unsigned int rx_size);
 

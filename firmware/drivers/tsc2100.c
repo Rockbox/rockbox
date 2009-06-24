@@ -44,7 +44,7 @@ void tsc2100_read_data(void)
     
     adc_last_read=current_tick;
     
-    spi_block_transfer(SPI_target_TSC2100, false,
+    spi_block_transfer(SPI_target_TSC2100,
                        out, sizeof(out), (char *)adc_data, sizeof(adc_data));
                        
     for(i=0; i<sizeof(adc_data); i+=2)
@@ -128,8 +128,7 @@ short tsc2100_readreg(int page, int address)
     unsigned short command = 0x8000|(page << 11)|(address << 5);
     unsigned char out[] = {command >> 8, command & 0xff};
     unsigned char in[2];
-    spi_block_transfer(SPI_target_TSC2100, false,
-                       out, sizeof(out), in, sizeof(in));
+    spi_block_transfer(SPI_target_TSC2100, out, sizeof(out), in, sizeof(in));
     return (in[0]<<8)|in[1];
 }
 
@@ -139,8 +138,7 @@ void tsc2100_writereg(int page, int address, short value)
     unsigned short command = (page << 11)|(address << 5);
     unsigned char out[4] = {command >> 8, command & 0xff,
                             value >> 8,   value & 0xff};
-    spi_block_transfer(SPI_target_TSC2100, false,
-                       out, sizeof(out), NULL, 0);
+    spi_block_transfer(SPI_target_TSC2100, out, sizeof(out), NULL, 0);
 }
 
 void tsc2100_keyclick(void)

@@ -29,10 +29,17 @@
 #include "spi-target.h"
 #include "lcd-target.h"
 
+short read_brightness = 0x0;
+
 static void _backlight_write_brightness(int brightness)
 {
-    uint8_t bl_command[] = {0xa4, 0x00, brightness, 0xbb};
-    spi_block_transfer(SPI_target_BACKLIGHT, false, bl_command, 4, 0, 0);
+    uint8_t bl_command[] = {0xA4, 0x00, brightness, 0xA4};
+    
+    uint8_t bl_read[] = {0xA8, 0x00};
+    
+    spi_block_transfer(SPI_target_BACKLIGHT, bl_read, 2, (char*)&read_brightness, 2);
+    
+    spi_block_transfer(SPI_target_BACKLIGHT, bl_command, 4, 0, 0);
 }
 
 void _backlight_on(void)

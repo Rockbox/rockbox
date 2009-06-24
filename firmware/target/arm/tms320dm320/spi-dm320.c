@@ -39,16 +39,24 @@ struct SPI_info {
     volatile unsigned short *setreg;
     volatile unsigned short *clrreg;
     int bit;
+    bool idle_low;
+    char divider;
 };
 
 struct SPI_info spi_targets[] =
 {
 #ifndef CREATIVE_ZVx
-    [SPI_target_TSC2100]   = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, GIO_TS_ENABLE },
-    [SPI_target_RX5X348AB] = { &IO_GIO_BITSET0, &IO_GIO_BITCLR0, GIO_RTC_ENABLE},
-    [SPI_target_BACKLIGHT] = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, GIO_BL_ENABLE },
+    [SPI_target_TSC2100]   = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, 
+        GIO_TS_ENABLE, true, 0x07},
+    /* RTC seems to have timing problems if the CLK idles low */
+    [SPI_target_RX5X348AB] = { &IO_GIO_BITSET0, &IO_GIO_BITCLR0, 
+        GIO_RTC_ENABLE, false, 0x3F},
+    /* This appears to work properly idleing low, idling high is very glitchy */
+    [SPI_target_BACKLIGHT] = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, 
+        GIO_BL_ENABLE, true, 0x07},
 #else
-    [SPI_target_LTV250QV] =  { &IO_GIO_BITCLR2, &IO_GIO_BITSET2, GIO_LCD_ENABLE},
+    [SPI_target_LTV250QV] =  { &IO_GIO_BITCLR2, &IO_GIO_BITSET2, 
+        GIO_LCD_ENABLE, true, 0x07},
 #endif
 };
 
@@ -65,22 +73,27 @@ static void spi_disable_all_targets(void)
 }
 
 int spi_block_transfer(enum SPI_target target,
-                       const bool spi_msb_first,
                        const uint8_t *tx_bytes, unsigned int tx_size,
                              uint8_t *rx_bytes, unsigned int rx_size)
 {
     mutex_lock(&spi_mtx);
     
-    IO_SERIAL0_MODE = (IO_SERIAL0_MODE& ~(spi_msb_first<<9))|(spi_msb_first<<9);
+    IO_SERIAL0_MODE &= ~(1<<10);
+    IO_SERIAL0_MODE |= (spi_targets[target].idle_low << 10);
+    
+    IO_SERIAL0_MODE &= ~(0xFF);
+    IO_SERIAL0_MODE |= spi_targets[target].divider;
     
     /* Activate the slave select pin */
-    *spi_targets[target].setreg = spi_targets[target].bit;
+    if(tx_size) {
+        IO_SERIAL0_TX_ENABLE = 0x0001;
+        *spi_targets[target].setreg = spi_targets[target].bit;
+    }
 
     while (tx_size--)
     {
         /* Send one byte */
         IO_SERIAL0_TX_DATA = *tx_bytes++;
-
         /* Wait until transfer finished */
         while (IO_SERIAL0_RX_DATA & IO_SERIAL0_XMIT);
     }
@@ -106,8 +119,8 @@ int spi_block_transfer(enum SPI_target target,
 void spi_init(void)
 {
     mutex_init(&spi_mtx);
-    
-    IO_SERIAL0_MODE = 0x3607;
+
+    IO_SERIAL0_MODE = 0x2200 | 0x3F;
     /* Enable TX */
     IO_SERIAL0_TX_ENABLE = 0x0001;
 #ifndef CREATIVE_ZVx
@@ -115,7 +128,8 @@ void spi_init(void)
     IO_GIO_DIR1 &= ~GIO_TS_ENABLE;
     /* Set GIO 12 to output for rtc slave enable */
     IO_GIO_DIR0 &= ~GIO_RTC_ENABLE;
-#endif  
-    spi_disable_all_targets(); /* make sure only one is ever enabled at a time */
+#endif
+    /* make sure only one is ever enabled at a time */
+    spi_disable_all_targets();
 
 }
