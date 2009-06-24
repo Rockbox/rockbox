@@ -263,13 +263,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Sì"
     h100,h120,h300: "NAVI = Sì"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Sì"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100: "SELECT = Sì"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -2386,14 +2386,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Costruzione database... %d trovato (OFF per uscire)"
     h100,h120,h300: "Costruzione database... %d trovato (STOP per uscire)"
     ipod*: "Costruzione database... %d trovato (PREV per uscire)"
-    x5,m5,gigabeat*,mrobe100: "Costruzione database... %d trovato (Sinistra per uscire)"
-    h10,h10_5gb,e200*,c200,sa9200: "Costruzione database... %d trovato (PREV per uscire)"
+    x5,m5,gigabeat*,mrobe100: "Costruzione database... %d trovato (LEFT per uscire)"
+    h10,h10_5gb,e200*,c200: "Costruzione database... %d trovato (PREV per uscire)"
+    sa9200: "Costruzione database... %d trovato (REW per uscire)"
   </dest>
   <voice>
     *: "Elementi trovati per il database"
@@ -2576,15 +2578,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Scegli carattere"
+    lcd_bitmap: "Carattere"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scegli carattere"
+    lcd_bitmap: "Carattere"
   </voice>
 </phrase>
 <phrase>
@@ -2592,13 +2594,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Scegli file .wps"
+    *: "Schermata Di Riproduzione"
   </dest>
   <voice>
-    *: "Scegli file schermata di riproduzione"
+    *: "Schermata Di Riproduzione"
   </voice>
 </phrase>
 <phrase>
@@ -2607,15 +2609,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "Scegli file .rwps"
+    remote: "Schermata Di Riproduzione Per Telecomando"
   </dest>
   <voice>
     *: none
-    remote: "Scegli file schermata di riproduzione per telecomando"
+    remote: "Schermata Di Riproduzione Per Telecomando"
   </voice>
 </phrase>
 <phrase>
@@ -4145,13 +4147,15 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100: "SELECT = Set"
+    sa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Imposta"
     h100,h120,h300: "NAVI = Imposta"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Imposta"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100: "SELECT = Imposta"
+    sa9200: "PLAY = Imposta"
   </dest>
   <voice>
     *: none
@@ -4166,23 +4170,25 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200,sa9200: "MENU = Revert"
+    ipod*,c200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = Annulla"
     h100,h120,h300: "STOP = Annulla"
-    ipod*,c200,sa9200: "MENU = Annulla"
+    ipod*,c200: "MENU = Annulla"
     x5,m5: "RECORD = Annulla"
     h10,h10_5gb,e200*: "PREV = Annulla"
     gigabeatf: "POWER = Annulla"
     mrobe100: "DISPLAY = Annulla"
-    gigabeats: "Indietro = Annulla"
+    gigabeats: "BACK = Annulla"
+    sa9200: "LEFT = Annulla"
   </dest>
   <voice>
     *: none
@@ -5110,13 +5116,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Scegli Tema"
+    *: "Scegli File Di Tema"
   </dest>
   <voice>
-    *: "Scegli Tema"
+    *: "Scegli File Di Tema"
   </voice>
 </phrase>
 <phrase>
