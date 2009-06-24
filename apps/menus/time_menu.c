@@ -176,13 +176,13 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
     
     if (valid_time(tm))
     {
-        snprintf(time, 16, "%02d:%02d:%02d %s", 
+        snprintf(time, 16, "%02d:%02d:%02d%s", 
                 global_settings.timeformat == 0 ? tm->tm_hour :
                         ((tm->tm_hour + 11) % 12) + 1,
                             tm->tm_min, 
                             tm->tm_sec, 
                         global_settings.timeformat == 0 ? "" :
-                                tm->tm_hour>11 ? "P" : "A");
+                                tm->tm_hour>11 ? " P" : " A");
         snprintf(date, 16, "%s %d %d", 
                 str(LANG_MONTH_JANUARY + tm->tm_mon),
                     tm->tm_mday,
