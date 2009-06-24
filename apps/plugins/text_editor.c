@@ -326,14 +326,11 @@ enum plugin_status plugin_start(const void* parameter)
     bool changed = false;
     int cur_sel=0;
     static char copy_buffer[MAX_LINE_LEN];
-    bool prev_show_statusbar;
 #ifdef HAVE_LCD_COLOR
     bool edit_colors_file = false;
 #endif
 
     copy_buffer[0]='\0';
-    prev_show_statusbar = rb->global_settings->statusbar;
-    rb->global_settings->statusbar = false;
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -515,6 +512,5 @@ enum plugin_status plugin_start(const void* parameter)
         }
         rb->gui_synclist_set_nb_items(&lists,line_count);
     }
-    rb->global_settings->statusbar = prev_show_statusbar;
     return PLUGIN_OK;
 }

@@ -274,7 +274,6 @@ enum plugin_status plugin_start(const void* parameter)
 {
     struct gui_synclist properties_lists;
     int button;
-    bool prev_show_statusbar;
     bool quit = false;
     char file[MAX_PATH];
     rb->strcpy(file, (const char *) parameter);
@@ -321,10 +320,6 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_OK;
     }
 
-    /* prepare the list for the user */
-    prev_show_statusbar = rb->global_settings->statusbar;
-    rb->global_settings->statusbar = false;
-
     rb->gui_synclist_init(&properties_lists, &get_props, file, false, 1, NULL);
     rb->gui_synclist_set_title(&properties_lists, its_a_dir ?
                                                   "Directory properties" :
@@ -347,13 +342,9 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                {
-                    rb->global_settings->statusbar = prev_show_statusbar;
                     return PLUGIN_USB_CONNECTED;
-                }
         }
     }
-    rb->global_settings->statusbar = prev_show_statusbar;
 
     return PLUGIN_OK;
 }
