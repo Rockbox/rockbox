@@ -32,23 +32,20 @@
  * [PWM half rate, PWM full rate[ -> backlight on
  * [PWM full rate, PWM full rate] -> counter reset to 0
  */
-static int old_val;
+static int old_val = MAX_BRIGHTNESS_SETTING;
+static const unsigned char logtable[] = {255, 254, 253, 252, 250, 248, 245, 240, 233, 224, 211, 192, 165, 128, 75, 0};
 static void set_backlight(int val)
 {
-    /* The pulse repetition frequency should be greater than 100Hz so
-       the flickering is not perceptible to the human eye but
-       not greater than about 1kHz. */
+    if(val == old_val)
+        return;
 
     /* Clock = 32 768 Hz */
-    /* 1 <= val <= 30 */
-    int cycle = (MAX_BRIGHTNESS_SETTING - val + 1);
-
     __tcu_disable_pwm_output(BACKLIGHT_PWM);
     __tcu_stop_counter(BACKLIGHT_PWM);
 
     __tcu_set_count(BACKLIGHT_PWM, 0);
-    __tcu_set_half_data(BACKLIGHT_PWM, cycle-1);
-    __tcu_set_full_data(BACKLIGHT_PWM, cycle);
+    __tcu_set_half_data(BACKLIGHT_PWM, logtable[val]);
+    __tcu_set_full_data(BACKLIGHT_PWM, 256);
 
     __tcu_start_counter(BACKLIGHT_PWM);
     __tcu_enable_pwm_output(BACKLIGHT_PWM);
@@ -58,7 +55,8 @@ static void set_backlight(int val)
 
 static void set_backlight_on(void)
 {
-    set_backlight(old_val);
+    __tcu_start_counter(BACKLIGHT_PWM);
+    __tcu_enable_pwm_output(BACKLIGHT_PWM);
 }
 
 static void set_backlight_off(void)
@@ -83,7 +81,9 @@ bool _backlight_init(void)
     __tcu_mask_half_match_irq(BACKLIGHT_PWM);
     __tcu_mask_full_match_irq(BACKLIGHT_PWM);
 
-    old_val = MAX_BRIGHTNESS_SETTING;
+    __tcu_set_count(BACKLIGHT_PWM, 0);
+    __tcu_set_half_data(BACKLIGHT_PWM, 0);
+    __tcu_set_full_data(BACKLIGHT_PWM, 256);
 
     return true;
 }

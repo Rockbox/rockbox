@@ -116,9 +116,9 @@
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_HW_REG
 
 /* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING          1
-#define MAX_BRIGHTNESS_SETTING          30
-#define DEFAULT_BRIGHTNESS_SETTING      30 /* "full brightness" */
+#define MIN_BRIGHTNESS_SETTING          0
+#define MAX_BRIGHTNESS_SETTING          15
+#define DEFAULT_BRIGHTNESS_SETTING      10 /* "full brightness" */
 #define DEFAULT_DIMNESS_SETTING         1  /* "most dim" */
 
 /* Define this if you have a software controlled poweroff */
