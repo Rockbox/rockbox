@@ -1352,10 +1352,13 @@ int save_game( void )
 
 int load_game( void )
 {
+    int checksum, retval;
+    
     int fd = open_save_file( O_RDONLY );
-    int checksum;
     if( fd < 0 )
         return -1;
+    
+    retval = 0; /* Assume good case */
     if(    ( rb->lseek( fd, -sizeof( int ), SEEK_END ) == -((ssize_t)sizeof( int ))-1 )
         || ( rb->read( fd, &checksum, sizeof( int ) ) < ((ssize_t)sizeof( int )) )
         || ( rb->lseek( fd, 0, SEEK_SET ) == -1 )
@@ -1370,19 +1373,18 @@ int load_game( void )
         || save_read( fd, cols, COL_NUM * sizeof( int ), &checksum )
         || save_read( fd, stacks, SUITS * sizeof( int ), &checksum ) )
     {
-        rb->close( fd );
         rb->splash( 2*HZ, "Error while loading saved game. Aborting." );
-        delete_save_file();
-        return -2;
+        retval = -2;
     }
-    rb->close( fd );
-    if( checksum != 42 )
+    else if( checksum != 42 )
     {
         rb->splash( 2*HZ, "Save file was corrupted. Aborting." );
-        delete_save_file();
-        return -3;
+        retval = -3;
     }
-    return 0;
+    
+    rb->close( fd );
+    delete_save_file();
+    return retval;
 }
 
 /**
@@ -1931,9 +1933,8 @@ enum plugin_status plugin_start(const void* parameter )
      * winning instead of quiting) */
     while( ( result = solitaire( result ) ) == SOLITAIRE_WIN );
 
-    if( result == SOLITAIRE_QUIT )
-        delete_save_file();
-    else /* result == SOLITAIRE_USB || result == SOLITAIRE_SAVE_AND_QUIT */
+    if( result != SOLITAIRE_QUIT )
+        /* result == SOLITAIRE_USB || result == SOLITAIRE_SAVE_AND_QUIT */
         save_game();
 
     if (rb->memcmp(&sol, &sol_disk, sizeof(sol))) /* save settings if changed */
