@@ -822,21 +822,23 @@ int nand_init(void)
                           16, spare_buf);
             
             int type = get_sector_type(spare_buf);
-            
+
+#ifdef FTL_V2
             if (type == SECTYPE_MAIN_INPLACE_CACHE)
             {
-                /* Check last sector of sequential write cache block */
+                /* Since this type of segment is written to sequentially, its
+                   job is complete if the final page has been written. In this
+                   case we need to treat it as a normal data segment. */
                 nand_read_raw(bank, phys_segment_to_page_addr
                                 (phys_segment, pages_per_segment - 1),
-                              nand_data->page_size + nand_data->spare_size - 16,
-                              16, spare_buf);
+                              SECTOR_SIZE, 16, spare_buf);
                 
-                /* If last sector has been written, treat block as main data */
                 if (get_sector_type(spare_buf) != 0xff)
                 {
                     type = SECTYPE_MAIN_DATA;
                 }
             }
+#endif
 
             switch (type)
             {
