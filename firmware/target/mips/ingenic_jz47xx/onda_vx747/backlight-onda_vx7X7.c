@@ -44,7 +44,7 @@ static void set_backlight(int val)
     __tcu_stop_counter(BACKLIGHT_PWM);
 
     __tcu_set_count(BACKLIGHT_PWM, 0);
-    __tcu_set_half_data(BACKLIGHT_PWM, logtable[val]);
+    __tcu_set_half_data(BACKLIGHT_PWM, logtable[val - 1]);
     __tcu_set_full_data(BACKLIGHT_PWM, 256);
 
     __tcu_start_counter(BACKLIGHT_PWM);
