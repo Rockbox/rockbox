@@ -81,26 +81,3 @@ void __timer_unregister(void)
     
     restore_interrupt(oldstatus);
 }
-
-
-/* Timer interrupt processing - all timers (inc. tick) have a single IRQ */
-void TIMER0(void)
-{
-    if (TIREQ & TIREQ_TF0)    /* Timer0 reached ref value */
-    {
-        /* Run through the list of tick tasks */
-        call_tick_tasks();
-        
-        /* reset Timer 0 IRQ & ref flags */
-        TIREQ = TIREQ_TI0 | TIREQ_TF0;
-    }
-
-    if (TIREQ & TIREQ_TF4)    /* Timer4 reached ref value */
-    {
-        /* dispatch user timer */
-        if (pfn_timer != NULL)
-            pfn_timer();
-
-        TIREQ = TIREQ_TI4 | TIREQ_TF4;
-    }
-}

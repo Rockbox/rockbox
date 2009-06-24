@@ -38,5 +38,25 @@ void tick_start(unsigned int interval_in_ms)
     TCFG(0) = TCFG_CLEAR | (0 << TCFG_SEL) | TCFG_IEN | TCFG_EN;
 }
 
-/* NB: Since we are using a single timer IRQ, tick tasks are dispatched as
-       part of the central timer IRQ processing in timer-tcc780x.c */
+
+/* Timer interrupt processing - all timers (inc. tick) share a single IRQ */
+void TIMER0(void)
+{
+    if (TIREQ & TIREQ_TF0)    /* Timer0 reached ref value */
+    {
+        /* Run through the list of tick tasks */
+        call_tick_tasks();
+        
+        /* reset Timer 0 IRQ & ref flags */
+        TIREQ = TIREQ_TI0 | TIREQ_TF0;
+    }
+
+    if (TIREQ & TIREQ_TF4)    /* Timer4 reached ref value */
+    {
+        /* dispatch user timer */
+        if (pfn_timer != NULL)
+            pfn_timer();
+
+        TIREQ = TIREQ_TI4 | TIREQ_TF4;
+    }
+}

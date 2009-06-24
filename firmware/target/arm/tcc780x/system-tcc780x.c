@@ -23,8 +23,6 @@
 #include "system.h"
 #include "panic.h"
 
-#if !defined(BOOTLOADER)
-
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
 
@@ -144,8 +142,6 @@ void irq_handler(void)
                     "subs  pc, lr, #4           \n"); /* Return from IRQ */
 }
 
-#endif /* !defined(BOOTLOADER) */
-
 
 /* TODO - these should live in the target-specific directories and
    once we understand what all the GPIO pins do, move the init to the
@@ -254,8 +250,6 @@ void system_init(void)
     /* mask all interrupts */
     IEN = 0;
 
-#if !defined(BOOTLOADER)
-
     /* Set DAI interrupts as FIQ, all others are IRQ. */
     IRQSEL = ~(DAI_RX_IRQ_MASK | DAI_TX_IRQ_MASK);
 
@@ -272,8 +266,6 @@ void system_init(void)
     }
 
     ALLMASK = 3;        /* Global FIQ/IRQ unmask */
-    
-#endif /* !defined(BOOTLOADER) */
 
     gpio_init();
     clock_init();

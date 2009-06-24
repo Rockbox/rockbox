@@ -57,19 +57,18 @@ extern int line;
 #define MAX_LOAD_SIZE (8*1024*1024) /* Arbitrary, but plenty. */
 
 /* The following function is just test/development code */
-#ifdef CPU_TCC77X
 void show_debug_screen(void)
 {
     int button;
     int power_count = 0;
     int count = 0;
     bool do_power_off = false;
-	
-    lcd_puts_scroll(0,0,"this is a very long line to test scrolling");
+    
+    lcd_puts_scroll(0,0,"+++ this is a very very long line to test scrolling. ---");
     while (!do_power_off) {
         line = 1;
         button = button_get(false);
-		
+        
         /* Power-off if POWER button has been held for a time
            This loop is currently running at about 100 iterations/second
          */
@@ -107,6 +106,7 @@ void show_debug_screen(void)
 #endif
         count++;
         printf("Count: %d",count);
+        lcd_update();
         sleep(HZ/10);
 
     }
@@ -122,57 +122,6 @@ void show_debug_screen(void)
     while (true);
 }
 
-#else /* !CPU_TCC77X */
-
-void show_debug_screen(void)
-{
-    int button;
-    int power_count = 0;
-    int count = 0;
-    bool do_power_off = false;
-#ifdef HAVE_BUTTON_DATA
-    unsigned int data;
-#endif
-
-    while(!do_power_off) {
-        line = 0;
-        printf("Hello World!");
-
-#ifdef HAVE_BUTTON_DATA
-        button = button_read_device(&data);
-#else
-        button = button_read_device();
-#endif
-
-        /* Power-off if POWER button has been held for a long time
-           This loop is currently running at about 100 iterations/second
-         */
-        if (button & POWEROFF_BUTTON) {
-            power_count++;
-            if (power_count > 200)
-               do_power_off = true;
-        } else {
-            power_count = 0;
-        }
-
-        printf("Btn: 0x%08x",button);
-
-        count++;
-        printf("Count: %d",count);
-    }
-
-    lcd_clear_display();
-    line = 0;
-    printf("POWER-OFF");
-
-    /* Power-off */
-    power_off();
-
-    printf("(NOT) POWERED OFF");
-    while (true);
-}
-#endif
-
 void* main(void)
 {
 #ifdef TCCBOOT
@@ -182,11 +131,10 @@ void* main(void)
 
     system_init();
     power_init();
-#ifndef COWON_D2
-    /* The D2 doesn't enable threading or interrupts */
+    
     kernel_init();
     enable_irq();
-#endif
+    
     lcd_init();
 
     adc_init();

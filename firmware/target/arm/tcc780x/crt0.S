@@ -94,9 +94,8 @@ start_loc:
     ldr    pc, =copied_start   /* jump to the relocated start_loc:  */
 
 copied_start:
-#endif
-#else
-    /* We don't use interrupts in the bootloader */
+#endif /* TCCBOOT */
+#endif /* BOOTLOADER */
 
     /* Set up stack for IRQ mode */ 
     mov    r0,#0xd2
@@ -107,13 +106,15 @@ copied_start:
     mov    r0,#0xd1
     msr    cpsr, r0
     ldr    sp, =fiq_stack
-    
+
+#ifndef BOOTLOADER
     /* Load the banked FIQ mode registers with useful values here.
        These values will be used in the FIQ handler in pcm-tcc780x.c */
     .equ   DADO_BASE,  0xF0059020
     
     ldr    r10, =DADO_BASE
     ldr    r11, =dma_play_data
+#endif
 
     /* Let abort and undefined modes use IRQ stack */
     mov    r0,#0xd7
@@ -122,7 +123,6 @@ copied_start:
     mov    r0,#0xdb
     msr    cpsr, r0
     ldr    sp, =irq_stack
-#endif
 
     /* Switch to supervisor mode */
     mov    r0,#0xd3
@@ -176,18 +176,19 @@ copied_start:
     mcr     p15, 0, r0, c7, c6, 0  /* Invalidate Dcache */
     mcr     p15, 0, r1, c8, c7, 0  /* Invalidate TLB */
 
-#if !defined(BOOTLOADER) && !defined(STUB)
-
+#ifndef STUB
+    
     /* Copy exception handler code to address 0 */
-    ldr    r2, =_vectorsstart
-    ldr    r3, =_vectorsend
-    ldr    r4, =_vectorscopy
+    mov    r2, #0x0
+    ldr    r3, =vectors_start
+    ldr    r4, =vectors_end
 1:
-    cmp    r3, r2
-    ldrhi  r5, [r4], #4
+    cmp    r4, r3
+    ldrhi  r5, [r3], #4
     strhi  r5, [r2], #4
     bhi    1b
 
+#ifndef BOOTLOADER
     /* Copy the IRAM (SRAM) */
     ldr    r2, =_iramcopy
     ldr    r3, =_iramstart
@@ -226,7 +227,8 @@ copied_start:
     ldrhi  r5, [r2], #4
     strhi  r5, [r3], #4
     bhi    1b
-#endif /* !BOOTLOADER,!STUB */
+#endif /* !BOOTLOADER */
+#endif /* !STUB */
 
     /* Initialise bss section to zero */
     ldr    r2, =_edata
@@ -250,10 +252,9 @@ copied_start:
     bl     main
     /* main() should never return */
 
-#ifndef BOOTLOADER
-
 /* Exception handlers. Will be copied to address 0 after memory remapping */
-    .section .vectors,"aw"
+
+vectors_start:
     ldr    pc, [pc, #24]
     ldr    pc, [pc, #24]
     ldr    pc, [pc, #24]
@@ -274,6 +275,7 @@ vectors:
     .word  reserved_handler
     .word  irq_handler
     .word  fiq_handler
+vectors_end:
 
     .text
 
@@ -304,12 +306,15 @@ data_abort_handler:
     mov    r1, #2
     b      UIE
 
+#ifdef BOOTLOADER
+fiq_handler:
+    subs    pc, lr, #4
+#endif
+    
 #if defined(STUB)
 UIE:
     b UIE
 #endif
-
-    /* We don't use interrupts in the bootloader */
 
 /* Align stacks to cache line boundary */
     .balign 16
@@ -321,5 +326,3 @@ irq_stack:
 /* 256 words of FIQ stack */
     .space 256*4
 fiq_stack:
-
-#endif
