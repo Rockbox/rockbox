@@ -51,7 +51,7 @@ unsigned short button_read_dbop(void);
 
 #define BUTTON_MAIN         (BUTTON_HOME|BUTTON_DOWN|BUTTON_RIGHT|BUTTON_LEFT \
                             |BUTTON_SELECT|BUTTON_UP|BUTTON_POWER \
-                            |BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD| \
+                            |BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD \
                             |BUTTON_HOLD)
 
 /* No Remote control */
