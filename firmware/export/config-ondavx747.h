@@ -118,7 +118,7 @@
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING          1
 #define MAX_BRIGHTNESS_SETTING          16
-#define DEFAULT_BRIGHTNESS_SETTING      10 /* "full brightness" */
+#define DEFAULT_BRIGHTNESS_SETTING      16 /* "full brightness" */
 #define DEFAULT_DIMNESS_SETTING         1  /* "most dim" */
 
 /* Define this if you have a software controlled poweroff */
