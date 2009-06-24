@@ -136,31 +136,34 @@ char *list_get_name_cb(int selected_item, void* data,
     else rb->strncpy(buf, b, buf_len);
     return buf;
 }
+
 char filename[MAX_PATH];
 int get_eol_string(char* fn)
 {
-    int fd=-1;
+    int fd, result;
     char t;
-    if (!fn)
-        return 0;
-    else if  (!fn[0])
+    
+    if (!fn || !fn[0])
         return 0;
     fd = rb->open(fn,O_RDONLY);
     if (fd<0)
         return 0;
+        
     eol[0] = '\0';
+    result = 1;
     while (!eol[0])
     {
         if (!rb->read(fd,&t,1))
         {
             rb->strcpy(eol,"\n");
-            return 0;
+            result = 0;
         }
         if (t == '\r')
         {
             if (rb->read(fd,&t,1) && t=='\n')
                 rb->strcpy(eol,"\r\n");
-            else rb->strcpy(eol,"\r");
+            else
+                rb->strcpy(eol,"\r");
         }
         else if (t == '\n')
         {
@@ -168,7 +171,7 @@ int get_eol_string(char* fn)
         }
     }
     rb->close(fd);
-    return 1;
+    return result;
 }
 
 void save_changes(int overwrite)
