@@ -598,6 +598,7 @@ LUALIB_API int luaL_loadfile (lua_State *L, const char *filename) {
   int fnameindex = lua_gettop(L) + 1;  /* index of filename on the stack */
   lf.extraline = 0;
   lf.f = rb->open(filename, O_RDONLY);
+  lua_pushfstring(L, "@%s", filename);
   if(lf.f < 0) {
     /* Fallback */
 
@@ -613,12 +614,7 @@ LUALIB_API int luaL_loadfile (lua_State *L, const char *filename) {
       if(lf.f < 0)
         return errfile(L, "open", fnameindex);
     }
-
-    if(lf.f >= 0)
-      lua_pushfstring(L, "@%s", buffer);
   }
-  else
-    lua_pushfstring(L, "@%s", filename);
 
   status = lua_load(L, getF, &lf, lua_tostring(L, -1));
   rb->close(lf.f);
