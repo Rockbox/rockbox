@@ -4444,19 +4444,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200: "mSD:"
+    e200*,c200*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "磁盤1"
-    e200*,c200: "Multimedia 卡:"
+    e200*,c200*: "Multimedia 卡:"
     ondio*: "MMC卡:"
   </dest>
   <voice>
     *: none
     multivolume: "磁盤1"
-    e200*,c200: "Multimedia 卡"
+    e200*,c200*: "Multimedia 卡"
     ondio*: "mmc卡"
   </voice>
 </phrase>
@@ -4589,7 +4589,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200,sa9200: "MENU = Revert"
+    ipod*,c200*,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
@@ -4600,7 +4600,7 @@
     *: none
     rtc: "OFF = 回去"
     h100,h120,h300: "STOP = 回去"
-    ipod*,c200,sa9200: "MENU = 回去"
+    ipod*,c200*,sa9200: "MENU = 回去"
     x5,m5: "RECORD = 回去"
     h10,h10_5gb,e200*: "PREV = 回去"
     gigabeatf: "POWER = 回去"
@@ -4611,7 +4611,7 @@
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,e200*,c200,sa9200: ""
+    ipod*,e200*,c200*,sa9200: ""
     x5,m5: ""
     h10,h10_5gb: ""
     gigabeatf: ""
@@ -4696,21 +4696,21 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press PREV to continue."
+    e200*,c200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "硬碟已滿，按下OFF繼續。"
     h100,h120,h300: "硬碟已滿，按下STOP繼續。"
     m5,x5: "硬碟已滿，按下POWER繼續。"
-    e200*,c200: "硬碟已滿，按下PREV繼續。"
+    e200*,c200*: "硬碟已滿，按下PREV繼續。"
   </dest>
   <voice>
     *: none
     recording: ""
     h100,h120,h300: ""
     m5,x5: ""
-    e200*,c200: ""
+    e200*,c200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -7410,7 +7410,7 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200*: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatf: "POWER to abort"
   </source>
@@ -7419,7 +7419,7 @@
     player,h100,h120,h300: "STOP: 離開"
     ipod*: "PLAY/PAUSE: 離開"
     x5,m5: "長按PLAY: 離開"
-    h10,h10_5gb,e200*,c200: "PREV: 離開"
+    h10,h10_5gb,e200*,c200*: "PREV: 離開"
     gigabeats: "BACK: 離開"
     gigabeatf: "POWER: 離開"
   </dest>
@@ -8480,7 +8480,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8758,21 +8758,21 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "建立資料庫... 找到%d項 (OFF: 回上一畫面)"
     h100,h120,h300: "建立資料庫... 找到%d項 (STOP: 回上一畫面)"
     ipod*: "建立資料庫... 找到%d項 (PREV: 回上一畫面)"
     x5,m5,gigabeat*,mrobe100: "建立資料庫... 找到%d項 (LEFT: 回上一畫面)"
-    h10,h10_5gb,e200*,c200,sa9200: "建立資料庫... 找到%d項 (PREV: 回上一畫面)"
+    h10,h10_5gb,e200*,c200*,sa9200: "建立資料庫... 找到%d項 (PREV: 回上一畫面)"
   </dest>
   <voice>
     *: "entries found for database"
     h100,h120,h300: ""
     ipod*: ""
     x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200*,c200,sa9200: ""
+    h10,h10_5gb,e200*,c200*,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9332,19 +9332,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = 是"
     h100,h120,h300: "NAVI = 是"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = 是"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = 是"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: ""
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: ""
     player: ""
   </voice>
 </phrase>
@@ -9356,19 +9356,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = 設定"
     h100,h120,h300: "NAVI = 設定"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = 設定"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = 設定"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: ""
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>

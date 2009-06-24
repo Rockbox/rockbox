@@ -1517,7 +1517,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200,sa9200: "MENU = Revert"
+    ipod*,c200*,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
@@ -1528,7 +1528,7 @@
     *: none
     rtc: "OFF pentru anulare"
     h100,h120,h300: "STOP pentru anulare"
-    ipod*,c200,sa9200: "MENU pentru anulare"
+    ipod*,c200*,sa9200: "MENU pentru anulare"
     x5,m5: "RECORD pentru anulare"
     h10,h10_5gb,e200*: "PREV pentru anulare"
     gigabeatf: "POWER pentru anulare"
@@ -3229,14 +3229,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Creare bază de date... %d găsite (OFF pentru revenire)"
     h100,h120,h300: "Creare bază de date... %d găsite (STOP pentru revenire)"
     ipod*: "Creare bază de date... %d găsite (PREV pentru revenire)"
     x5,m5,gigabeat*,mrobe100: "Creare bază de date... %d găsite (LEFT pentru revenire)"
-    h10,h10_5gb,e200*,c200,sa9200: "Creare bază de date... %d găsite (PREV pentru revenire)"
+    h10,h10_5gb,e200*,c200*,sa9200: "Creare bază de date... %d găsite (PREV pentru revenire)"
   </dest>
   <voice>
     *: "intrări găsite pentru baza de date"
@@ -3757,7 +3757,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4907,21 +4907,21 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press PREV to continue."
+    e200*,c200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Discul este plin. Apasati OFF pentru a continua."
     h100,h120,h300: "Discul este plin. Apasati STOP pentru a continua."
     m5,x5: "Discul este plin. Apasati POWER pentru a continua."
-    e200*,c200: "Discul este plin. Apasati PREV pentru a continua."
+    e200*,c200*: "Discul este plin. Apasati PREV pentru a continua."
   </dest>
   <voice>
     *: none
     recording: ""
     h100,h120,h300: ""
     m5,x5: ""
-    e200*,c200: ""
+    e200*,c200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -5244,13 +5244,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Da"
     h100,h120,h300: "NAVI = Da"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Da"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Da"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -5279,13 +5279,13 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Setat"
     h100,h120,h300: "NAVI = Setat"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Setat"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Setat"
   </dest>
   <voice>
     *: none
@@ -5675,7 +5675,7 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200*: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatf: "POWER to abort"
   </source>
@@ -5684,7 +5684,7 @@
     player,h100,h120,h300: "STOP pentru anulare"
     ipod*: "PLAY/PAUSE pentru anulare"
     x5,m5: "PLAY (apasare lunga) pentru anulare"
-    h10,h10_5gb,e200*,c200: "PREV pentru anulare"
+    h10,h10_5gb,e200*,c200*: "PREV pentru anulare"
     gigabeats: "BACK pentru anulare"
     gigabeatf: "POWER pentru anulare"
   </dest>
@@ -8982,19 +8982,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200: "mSD:"
+    e200*,c200*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200: "mSD:"
+    e200*,c200*: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    e200*,c200: "micro S D"
+    e200*,c200*: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>

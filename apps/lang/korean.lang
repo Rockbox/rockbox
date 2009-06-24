@@ -4454,19 +4454,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200: "mSD:"
+    e200*,c200*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200: "mSD:"
+    e200*,c200*: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1 "
-    e200*,c200: "micro S D"
+    e200*,c200*: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -4599,7 +4599,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200,sa9200: "MENU = Revert"
+    ipod*,c200*,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4610,7 +4610,7 @@
     *: none
     rtc: "[끔]: 원상태 복구"
     h100,h120,h300: "[정지]: 원상태 복구"
-    ipod*,c200,sa9200: "[메뉴]: 원상태 복구"
+    ipod*,c200*,sa9200: "[메뉴]: 원상태 복구"
     x5,m5: "[녹음]: 원상태 복구"
     h10,h10_5gb,e200*: "[이전]: 원상태 복구"
     gigabeatf: "[전원]: 원상태 복구"
@@ -4715,14 +4715,14 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press UP to continue."
+    e200*,c200*: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "디스크 공간이 부족합니다. [끔] 버튼을 누르세요."
     h100,h120,h300: "디스크 공간이 부족합니다. [정지] 버튼을 누르세요."
     m5,x5: "디스크 공간이 부족합니다. [전원] 버튼을 누르세요."
-    e200*,c200: "디스크 공간이 부족합니다. [위] 버튼을 누르세요."
+    e200*,c200*: "디스크 공간이 부족합니다. [위] 버튼을 누르세요."
   </dest>
   <voice>
     *: none
@@ -7407,7 +7407,7 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200*: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatf: "POWER to abort"
   </source>
@@ -7416,7 +7416,7 @@
     player,h100,h120,h300: "[정지]: 중지"
     ipod*: "[재생/일시정지]: 중지"
     x5,m5: "[재생 길게누름]: 중지"
-    h10,h10_5gb,e200*,c200: "[이전]: 중지"
+    h10,h10_5gb,e200*,c200*: "[이전]: 중지"
     gigabeats: "[뒤]: 중지"
     gigabeatf: "[전원]: 중지"
   </dest>
@@ -8813,7 +8813,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -9988,14 +9988,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "음악 DB 생성 중... %d개 완료 ([꺼짐]: 돌아가기)"
     h100,h120,h300: "음악 DB 생성 중... %d개 완료 ([정지]: 돌아가기)"
     ipod*: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
     x5,m5,gigabeat*,mrobe100: "음악 DB 생성 중... %d개 완료 ([왼쪽]: 돌아가기)"
-    h10,h10_5gb,e200*,c200,sa9200: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
+    h10,h10_5gb,e200*,c200*,sa9200: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
   </dest>
   <voice>
     *: "음악 DB의 요소를 찾음"
@@ -10731,13 +10731,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "[재생] = 예"
     h100,h120,h300: "[네비] = 예"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "[선택] = 예"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "[선택] = 예"
     player: "(재생/정지)"
   </dest>
   <voice>
@@ -10752,13 +10752,13 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "[켬] = 설정"
     h100,h120,h300: "[네비] = 설정"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "[선택] = 설정"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "[선택] = 설정"
   </dest>
   <voice>
     *: none

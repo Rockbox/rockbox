@@ -4289,7 +4289,7 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*: "Building database... %d found (PREV to return)"
     sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
@@ -4297,7 +4297,7 @@
     h100,h120,h300: "جاري بناء قاعدة البيانات...  عثر على d% (إيقاف للعودة)"
     ipod*: "جاري بناء قاعدة البيانات...  عثر على d% (السابق للعودة)"
     x5,m5,gigabeat*,mrobe100: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
-    h10,h10_5gb,e200*,c200: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
+    h10,h10_5gb,e200*,c200*: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
     sa9200: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
   </dest>
   <voice>
@@ -4676,7 +4676,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -5449,14 +5449,14 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press PREV to continue."
+    e200*,c200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "القرص مملوء. اضغط إيقاف للاستمرار."
     h100,h120,h300: "القرص مملوء. اضغط إيقاف للاستمرار."
     m5,x5: "القرص مملوء. اضغط زر التشغيل للاستمرار."
-    e200*,c200: "القرص مملوء. اضغط السابق للاستمرار."
+    e200*,c200*: "القرص مملوء. اضغط السابق للاستمرار."
   </dest>
   <voice>
     *: none
@@ -7570,7 +7570,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200: "MENU = Revert"
+    ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
@@ -7582,7 +7582,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "عرض = إاغاء الأمر"
-    ipod*,c200: "قائمة = إاغاء الأمر"
+    ipod*,c200*: "قائمة = إاغاء الأمر"
     x5,m5: "سجل = إاغاء الأمر"
     h10,h10_5gb,e200*: "السابق = إاغاء الأمر"
     gigabeatf: "طاقة = إاغاء الأمر"

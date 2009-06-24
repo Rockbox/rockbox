@@ -262,13 +262,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Si"
     h100,h120,h300: "NAVI = Si"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Si"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Si"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -2365,14 +2365,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Construint Base de dades... %d trobats (OFF per tornar)"
     h100,h120,h300: "Construint Base de dades... %d trobats (STOP per tornar)"
     ipod*: "Construint Base de dades... %d trobats (PREV per tornar)"
     x5,m5,gigabeat*,mrobe100: "Construint Base de dades... %d trobats (LEFT per tornar)"
-    h10,h10_5gb,e200*,c200,sa9200: "Construint Base de dades... %d trobats (PREV per tornar)"
+    h10,h10_5gb,e200*,c200*,sa9200: "Construint Base de dades... %d trobats (PREV per tornar)"
   </dest>
   <voice>
     *: "entrades trobades per base de dades"
@@ -4122,17 +4122,17 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Desar"
     h100,h120,h300: "NAVI = Desar"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Desar"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Desar"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200*,c200,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200*,c200*,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4143,7 +4143,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200,sa9200: "MENU = Revert"
+    ipod*,c200*,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
@@ -4154,7 +4154,7 @@
     *: none
     rtc: "OFF = Cancel·lar"
     h100,h120,h300: "STOP = Cancel·lar"
-    ipod*,c200,sa9200: "MENU = Cancel·lar"
+    ipod*,c200*,sa9200: "MENU = Cancel·lar"
     x5,m5: "RECORD = Cancel·lar"
     h10,h10_5gb,e200*: "PREV = Cancel·lar"
     gigabeatf: "POWER = Cancel·lar"
@@ -4163,7 +4163,7 @@
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200*,c200,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,ipod*,e200*,c200*,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -6920,19 +6920,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200: "mSD:"
+    e200*,c200*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200: "mSD:"
+    e200*,c200*: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    e200*,c200: "micro S D"
+    e200*,c200*: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -8292,18 +8292,18 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press PREV to continue."
+    e200*,c200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Disc ple. Prem OFF per continuar"
     h100,h120,h300: "Disc ple. Prem STOP per continuar"
     m5,x5: "Disc ple. Prem POWER per continuar"
-    e200*,c200: "Disc ple. Prem PREV per continuar"
+    e200*,c200*: "Disc ple. Prem PREV per continuar"
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200*,c200: ""
+    recording,h100,h120,h300,m5,x5,e200*,c200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8394,7 +8394,7 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200*: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatf: "POWER to abort"
   </source>
@@ -8403,7 +8403,7 @@
     player,h100,h120,h300: "STOP per a cancelar"
     ipod*: "PLAY/PAUSE per a cancelar"
     x5,m5: "Long PLAY per a cancelar"
-    h10,h10_5gb,e200*,c200: "PREV per a cancelar"
+    h10,h10_5gb,e200*,c200*: "PREV per a cancelar"
     gigabeats: "BACK per a cancelar"
     gigabeatf: "POWER per a cancelar"
   </dest>
@@ -10458,7 +10458,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
   </voice>
 </phrase>
 <phrase>

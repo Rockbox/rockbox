@@ -267,13 +267,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = はい"
     h100,h120,h300: "NAVI = はい"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = はい"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = はい"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -2390,14 +2390,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "データベース構築中... %d 件 (OFFで戻る)"
     h100,h120,h300: "データベース構築中... %d 件 (STOPで戻る)"
     ipod*: "データベース構築中... %d 件 (PLAY/PAUSEで戻る)"
     x5,m5,gigabeat*,mrobe100: "データベース構築中... %d 件 (左で戻る)"
-    h10,h10_5gb,e200*,c200,sa9200: "データベース構築中... %d 件 (PREVで戻る)"
+    h10,h10_5gb,e200*,c200*,sa9200: "データベース構築中... %d 件 (PREVで戻る)"
   </dest>
   <voice>
     *: "データベースに登録"
@@ -4149,17 +4149,17 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = 設定"
     h100,h120,h300: "NAVI = 設定"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = 設定"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = 設定"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200*,c200,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200*,c200*,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4170,7 +4170,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200,sa9200: "MENU = Revert"
+    ipod*,c200*,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
@@ -4181,7 +4181,7 @@
     *: none
     rtc: "OFF = 元に戻す"
     h100,h120,h300: "STOP = 元に戻す"
-    ipod*,c200,sa9200: "MENU = 元に戻す"
+    ipod*,c200*,sa9200: "MENU = 元に戻す"
     x5,m5: "RECORD = 元に戻す"
     h10,h10_5gb,e200*: "PREV = 元に戻す"
     gigabeatf: "POWER = 元に戻す"
@@ -4190,7 +4190,7 @@
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200*,c200,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,ipod*,e200*,c200*,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -6949,19 +6949,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200: "mSD:"
+    e200*,c200*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200: "mSD:"
+    e200*,c200*: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    e200*,c200: "マイクロSD"
+    e200*,c200*: "マイクロSD"
     ondio*: "マルチメディアカード"
   </voice>
 </phrase>
@@ -8324,18 +8324,18 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press PREV to continue."
+    e200*,c200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "ディスクが一杯です．停止ボタンを押してください"
     h100,h120,h300: "ディスクが一杯です．停止ボタンを押してください"
     m5,x5: "ディスクが一杯です．電源ボタンを押してください"
-    e200*,c200: "ディスクが一杯です．PREVボタンを押してください"
+    e200*,c200*: "ディスクが一杯です．PREVボタンを押してください"
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200*,c200: ""
+    recording,h100,h120,h300,m5,x5,e200*,c200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8426,7 +8426,7 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200*: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatf: "POWER to abort"
   </source>
@@ -8435,7 +8435,7 @@
     player,h100,h120,h300: "STOP： キャンセル"
     ipod*: "PLAY/PAUSE： キャンセル"
     x5,m5: "Long PLAY： キャンセル"
-    h10,h10_5gb,e200*,c200: "PREV： キャンセル"
+    h10,h10_5gb,e200*,c200*: "PREV： キャンセル"
     gigabeats: "BACK： キャンセル"
     gigabeatf: "POWER： キャンセル"
   </dest>
@@ -10490,7 +10490,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
   </voice>
 </phrase>
 <phrase>
