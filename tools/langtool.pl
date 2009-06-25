@@ -62,6 +62,12 @@ Usage langtool [--inplace] --options langfile1 [langfile2 ...]
 MOO
 }
 
+sub error {
+    my ($msg) = @_;
+    printf("%s\n\nUse --help for usage help.\n", $msg);
+    exit(1);
+}
+
 use Getopt::Long;
 use strict;
 
@@ -99,25 +105,37 @@ my $numids = @ids;
 my $numfiles = @ARGV;
 
 # Show help if necessary
-if (
-    $help
-        or # More than one option set
-        ($deprecate + $changesource + $changeid + $changetarget + $changedesc) != 1
-        or # Do changeid, but either from or to is empty
-        ($changeid and ($from eq "" or $to eq ""))
-        or # Do changedesc, but to isn't set
-        ($changedesc and $to eq "")
-        or # Do changetarget, but 
-        ($changetarget and ($from eq "" or $to eq ""))
-        or # Do deprecate, but no ids set
-        ($deprecate and $numids < 1)
-        or # Do changesource, but either target or to not set
-        ($changesource and ($s_target eq "" or $to eq ""))
-        or # More than one file passed, but inplace isn't set
-        ($numfiles > 1 and not $inplace)
-   ) {
+if ($help) {
     usage();
-    exit(1);
+    exit();
+}
+# More than one option set (or none)
+elsif (($deprecate + $changesource + $changeid + $changetarget + $changedesc) != 1) {
+    error("Exactly one of --deprecate, --changesource, --changeid, --changetarget,\n--changedesc must be used.");
+}
+# Do changeid, but either from or to is empty
+elsif ($changeid and ($from eq "" or $to eq "")) {
+    error("--changid used, but either --from or --to not set");
+}
+# Do changedesc, but to isn't set
+elsif ($changedesc and $to eq "") {
+    error("--changedesc used, but --to not set");
+}
+# Do changetarget, but from or to is empty
+elsif ($changetarget and ($from eq "" or $to eq "")) {
+    error("--changetarget used, but --from or --to not set");
+}
+# Do deprecate, but no ids set
+elsif ($deprecate and $numids < 1) {
+    error("--deprecate used, but no IDs specified");
+}
+# Do changesource, but either target or to not set
+elsif ($changesource and ($s_target eq "" or $to eq "")) {
+    error("--changesource used, but --target or --to not set");
+}
+# More than one file passed, but inplace isn't set
+elsif ($numfiles > 1 and not $inplace) {
+    error("More than one file specified - this only works with --inplace");
 }
 
 # Check that all supplied files exist before doing anything
