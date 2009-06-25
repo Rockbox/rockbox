@@ -21,7 +21,7 @@
 
 ]]--
 
-dofile("actions.lua") -- Contains rb.actions & rb.contexts
+require("actions") -- Contains rb.actions & rb.contexts
 
 -- Example function which splashes a message for x seconds
 function sayhello(seconds)

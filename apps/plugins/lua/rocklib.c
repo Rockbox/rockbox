@@ -866,13 +866,33 @@ RB_WRAP(read_bmp_file)
 RB_WRAP(current_path)
 {
     char buffer[MAX_PATH];
-    if(get_cur_path(L, buffer, sizeof(buffer)))
+    lua_Debug ar;
+
+    if(lua_getstack(L, 1, &ar))
     {
-        lua_pushstring(L, buffer);
-        return 1;
+        /* Try determining the base path of the current Lua chunk
+            and write it to dest. */
+        lua_getinfo(L, "S", &ar);
+
+        char* curfile = (char*) &ar.source[1];
+        char* pos = rb->strrchr(curfile, '/');
+        if(pos != NULL)
+        {
+            unsigned int len = (unsigned int)(pos - curfile);
+            len = len + 1 > sizeof(buffer) ? sizeof(buffer) - 1 : len;
+
+            if(len > 0)
+                memcpy(buffer, curfile, len);
+
+            buffer[len] = '/';
+            buffer[len+1] = '\0';
+
+            lua_pushstring(L, buffer);
+            return 1;
+        }
     }
-    else
-        return 0;
+
+    return 0;
 }
 
 #define R(NAME) {#NAME, rock_##NAME}
