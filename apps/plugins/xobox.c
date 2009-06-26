@@ -307,9 +307,6 @@ PLUGIN_HEADER
 #define PIC_QIX 0
 #define PIC_PLAYER 1
 
-#define MENU_START 0
-#define MENU_QUIT 1
-
 /* The time (in ms) for one iteration through the game loop - decrease this
    to speed up the game - note that current_tick is (currently) only accurate
    to 10ms.
@@ -932,7 +929,7 @@ static int xobox_menu(bool ingame)
                                  "Resume Game",
                                  "Restart Level",
                                  "Speed",
-                                 "Difficult",
+                                 "Difficulty",
                                  "Playback Control",
                                  "Quit");
 
@@ -1005,7 +1002,7 @@ static int xobox_loop (void)
     bool pause = false;
     int end;
 
-    if (xobox_menu(false)==1) {
+    if (xobox_menu(false)) {
         return PLUGIN_OK;
     }
 
@@ -1014,8 +1011,8 @@ static int xobox_loop (void)
 
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold()) {
-        pause = true;
-        rb->splash (HZ, "PAUSED");
+            pause = true;
+            rb->splash (HZ, "Paused");
         }
 #endif
 
@@ -1043,8 +1040,10 @@ static int xobox_loop (void)
                     rb->splash (HZ, "Paused");
                 break;
             case QUIT:
-                if (xobox_menu(true)==1) {
-                    quit = true;
+                if (!pause) {
+                    if (xobox_menu(true)) {
+                        quit = true;
+                    }
                 }
                 break;
             default:
@@ -1058,7 +1057,7 @@ static int xobox_loop (void)
         }
         if (player.gameover) {
             rb->splash (HZ, "Game Over!");
-            if (xobox_menu(false)==1) {
+            if (xobox_menu(false)) {
                 quit = true;
             }
         }
