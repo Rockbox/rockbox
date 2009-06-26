@@ -340,7 +340,7 @@ jpeg_idct4h:
     add    r9,  r4,  r6             /* r9 = tmp10 >> 13 = d0 + d2 */
     smlabb r5,  r12, r5,  r8        /* r5 = tmp2 = z1 + z2 * 6270 */ 
     smlatb r7,  r12, r7,  r8        /* r7 = tmp0 = z1 - z3 * 15137 */
-    sub    r4,  r5,  r6             /* r4 = tmp12 >> 13 = d0 - d2 */
+    sub    r4,  r4,  r6             /* r4 = tmp12 >> 13 = d0 - d2 */
     add    r6,  r5,  r9,  lsl #13   /* r6 = o0 */
     rsb    r9,  r5,  r9,  lsl #13   /* r9 = o3 */
     add    r5,  r7,  r4,  lsl #13   /* r5 = o1 */
