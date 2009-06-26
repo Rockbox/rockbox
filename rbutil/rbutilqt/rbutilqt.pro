@@ -53,7 +53,8 @@ SOURCES += rbutilqt.cpp \
  base/zipinstaller.cpp \
  progressloggergui.cpp \
  installtalkwindow.cpp \
- talkfile.cpp \
+ base/talkfile.cpp \
+ base/talkgenerator.cpp \
  base/autodetection.cpp \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
@@ -69,7 +70,7 @@ SOURCES += rbutilqt.cpp \
  base/tts.cpp \
  ../../tools/wavtrim.c \
  ../../tools/voicefont.c \
- voicefile.cpp \
+ base/voicefile.cpp \
  createvoicewindow.cpp \
  base/rbsettings.cpp \
  base/rbunzip.cpp \
@@ -97,7 +98,8 @@ HEADERS += rbutilqt.h \
  version.h \
  base/zipinstaller.h \
  installtalkwindow.h \
- talkfile.h \
+ base/talkfile.h \
+ base/talkgenerator.h \
  base/autodetection.h \
  progressloggerinterface.h \
  progressloggergui.h \
@@ -121,7 +123,7 @@ HEADERS += rbutilqt.h \
  base/tts.h \
  ../../tools/wavtrim.h \
  ../../tools/voicefont.h \
- voicefile.h \
+ base/voicefile.h \
  createvoicewindow.h \
  base/rbsettings.h \
  base/rbunzip.h \

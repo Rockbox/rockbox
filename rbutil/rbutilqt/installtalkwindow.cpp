@@ -103,7 +103,12 @@ void InstallTalkWindow::accept()
     talkcreator->setTalkFolders(ui.talkFolders->isChecked());
     talkcreator->setTalkFiles(ui.talkFiles->isChecked());
     
-    talkcreator->createTalkFiles(logger);
+    connect(talkcreator, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+    connect(talkcreator, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(talkcreator, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(logger,SIGNAL(aborted()),talkcreator,SLOT(abort()));
+    
+    talkcreator->createTalkFiles();
 }
 
 

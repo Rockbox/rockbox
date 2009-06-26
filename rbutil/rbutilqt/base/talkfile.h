@@ -26,8 +26,7 @@
 #include <QtCore>
 #include "progressloggerinterface.h"
 
-#include "encoders.h"
-#include "tts.h"
+#include "talkgenerator.h"
 
 class TalkFileCreator :public QObject
 {
@@ -36,7 +35,7 @@ class TalkFileCreator :public QObject
 public:
     TalkFileCreator(QObject* parent);
 
-    bool createTalkFiles(ProgressloggerInterface* logger);
+    bool createTalkFiles();
     
     void setDir(QDir dir){m_dir = dir; }
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
@@ -47,26 +46,26 @@ public:
     void setTalkFolders(bool ov) {m_talkFolders = ov;} 
     void setTalkFiles(bool ov) {m_talkFiles = ov;}
     
-private slots:
+public slots:
     void abort();
-
-private:
-    bool cleanup(QStringList list);
-    QString stripExtension(QString filename);
-    void doAbort(QStringList cleanupList);
-    void resetProgress(int max);
-    bool createDirAndFileMaps(QDir startDir,QMultiMap<QString,QString> *dirMap,QMultiMap<QString,QString> *fileMap);
-    TTSStatus voiceList(QStringList toSpeak,QStringList& voicedEntries);
-    bool encodeList(QStringList toEncode,QStringList& encodedEntries);
-    bool copyTalkDirFiles(QMultiMap<QString,QString> dirMap,QString* errString);
-    bool copyTalkFileFiles(QMultiMap<QString,QString> fileMap,QString* errString);
     
-    TTSBase* m_tts;
-    EncBase* m_enc;
+signals:
+    void done(bool);
+    void aborted();
+    void logItem(QString, int); //! set logger item
+    void logProgress(int, int); //! set progress bar.
+    
+private:
+    bool cleanup();
+    QString stripExtension(QString filename);
+    void doAbort();
+    void resetProgress(int max);
+    bool copyTalkFiles(QString* errString);
+    
+    bool createTalkList(QDir startDir);
    
     QDir   m_dir;
     QString m_mountpoint;
-    int m_progress;
  
     bool m_overwriteTalk;
     bool m_recursive;
@@ -74,9 +73,9 @@ private:
     bool m_talkFolders;
     bool m_talkFiles;
 
-    ProgressloggerInterface* m_logger;
-
     bool m_abort;
+    
+    QList<TalkGenerator::TalkEntry> m_talkList;
 };
 
 

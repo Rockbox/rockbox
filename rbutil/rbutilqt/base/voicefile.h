@@ -26,12 +26,9 @@
 #include <QtCore>
 #include "progressloggerinterface.h"
 
-#include "encoders.h"
-#include "tts.h"
 #include "httpget.h"
-
-#include "wavtrim.h"
 #include "voicefont.h"
+#include "talkgenerator.h"
 
 class VoiceFileCreator :public QObject
 {
@@ -40,39 +37,38 @@ public:
     VoiceFileCreator(QObject* parent);
 
     //start creation
-    bool createVoiceFile(ProgressloggerInterface* logger);
+    bool createVoiceFile();
 
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
     void setTargetId(int id){m_targetid = id;}
     void setLang(QString name){m_lang =name;}
     void setWavtrimThreshold(int th){m_wavtrimThreshold = th;}
-
+    
+public slots:
+    void abort();
+    
 signals:
-    void done(bool error);
+    void done(bool);
+    void aborted();
+    void logItem(QString, int); //! set logger item
+    void logProgress(int, int); //! set progress bar.
 
 private slots:
-    void abort();
     void downloadDone(bool error);
-    void updateDataReadProgress(int read, int total);
 
 private:
-
-    // ptr to encoder, tts and settings
-    TTSBase* m_tts;
-    EncBase* m_enc;
+    void cleanup();
+    
     HttpGet *getter;
-
     QString filename;  //the temporary file
-
     QString m_mountpoint;  //mountpoint of the device
     QString m_path;   //path where the wav and mp3 files are stored to
     int m_targetid;  //the target id
     QString m_lang;  // the language which will be spoken
     int m_wavtrimThreshold;
 
-    ProgressloggerInterface* m_logger;
-
     bool m_abort;
+    QList<TalkGenerator::TalkEntry> m_talkList;
 };
 
 #endif
