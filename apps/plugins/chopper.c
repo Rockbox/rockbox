@@ -700,9 +700,17 @@ static void chopDrawScene(void)
     rb->lcd_update();
 }
 
+static bool _ingame;
+static int chopMenuCb(int action, const struct menu_item_ex *this_item)
+{
+    if(action == ACTION_REQUEST_MENUITEM
+       && !_ingame && ((intptr_t)this_item)==0)
+        return ACTION_EXIT_MENUITEM;
+    return action;
+}
 static int chopMenu(int menunum)
 {
-    int result = (menunum==0)?0:1;
+    int result = 0;
     int res = 0;
     bool menu_quit = false;
 
@@ -711,8 +719,10 @@ static int chopMenu(int menunum)
         { "Steep", -1 },
     };
     
-    MENUITEM_STRINGLIST(menu,"Chopper Menu",NULL,"Start New Game","Resume Game",
+    MENUITEM_STRINGLIST(menu,"Chopper Menu",chopMenuCb,
+                        "Resume Game","Start New Game",
                         "Level","Playback Control","Quit");
+    _ingame = (menunum!=0);
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
@@ -727,18 +737,14 @@ static int chopMenu(int menunum)
     while (!menu_quit) {
         switch(rb->do_menu(&menu, &result, NULL, false))
         {
-            case 0:     /* Start New Game */
+            case 0:     /* Resume Game */
+                menu_quit=true;
+                res = -1;
+                break;
+            case 1:     /* Start New Game */
                 menu_quit=true;
                 chopper_load(true);
                 res = -1;
-                break;
-            case 1:     /* Resume Game */
-                if(menunum==1) {
-                    menu_quit=true;
-                    res = -1;
-                } else if(menunum==0){
-                    rb->splash(HZ, "No game to resume");
-                }
                 break;
             case 2:
                 rb->set_option("Level", &iLevelMode, INT, levels, 2, NULL);

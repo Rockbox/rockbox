@@ -627,8 +627,9 @@ static void add_memo(struct shown *shown, int type)
 
 static int edit_menu_cb(int action, const struct menu_item_ex *this_item)
 {
-    (void) this_item;
-    if (action == ACTION_REQUEST_MENUITEM && memos_in_shown_memory <= 0)
+    int i = (intptr_t)this_item;
+    if (action == ACTION_REQUEST_MENUITEM
+        && memos_in_shown_memory <= 0 && (i==0 || i==1))
         return ACTION_EXIT_MENUITEM;
     return action;
 }
@@ -638,24 +639,10 @@ static bool edit_memo(int change, struct shown *shown)
     bool exit = false;
     int selected = 0;
 
-    MENUITEM_RETURNVALUE(edit_menu_remove, "Remove", 0,
-                         edit_menu_cb, Icon_NOICON);
-    MENUITEM_RETURNVALUE(edit_menu_edit, "Edit", 1,
-                         edit_menu_cb, Icon_NOICON);
-    MENUITEM_RETURNVALUE(edit_menu_weekly, "New Weekly", 2,
-                         NULL, Icon_NOICON);
-    MENUITEM_RETURNVALUE(edit_menu_monthly, "New Monthly", 3,
-                         NULL, Icon_NOICON);
-    MENUITEM_RETURNVALUE(edit_menu_yearly, "New Yearly", 4,
-                         NULL, Icon_NOICON);
-    MENUITEM_RETURNVALUE(edit_menu_oneoff, "New One off", 5,
-                         NULL, Icon_NOICON);
-
-    MAKE_MENU(edit_menu, "Edit menu",
-              NULL, Icon_NOICON,
-              &edit_menu_remove, &edit_menu_edit,
-              &edit_menu_weekly, &edit_menu_monthly,
-              &edit_menu_yearly, &edit_menu_oneoff);
+    MENUITEM_STRINGLIST(edit_menu, "Edit menu", edit_menu_cb,
+                        "Remove", "Edit",
+                        "New Weekly", "New Monthly",
+                        "New Yearly", "New One off");
 
     while (!exit)
     {

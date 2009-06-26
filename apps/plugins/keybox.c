@@ -71,7 +71,6 @@ static uint32_t salt;
 static union hash pwhash;
 static bool data_changed = false;
 
-static int context_item_cb(int action, const struct menu_item_ex *this_item);
 static void encrypt_buffer(char *buf, size_t size, uint32_t *key);
 static void decrypt_buffer(char *buf, size_t size, uint32_t *key);
 
@@ -105,34 +104,21 @@ static void decrypt(uint32_t* v, uint32_t* k)
     v[0]=v0; v[1]=v1;
 }
 
-MENUITEM_RETURNVALUE(context_add_entry, "Add entry", 0,
-                     NULL, Icon_NOICON);
-MENUITEM_RETURNVALUE(context_edit_title, "Edit title", 1,
-                     &context_item_cb, Icon_NOICON);
-MENUITEM_RETURNVALUE(context_edit_name, "Edit user name", 2,
-                     &context_item_cb, Icon_NOICON);
-MENUITEM_RETURNVALUE(context_edit_password, "Edit password", 3,
-                     &context_item_cb, Icon_NOICON);
-MENUITEM_RETURNVALUE(context_delete_entry, "Delete entry", 4,
-                     &context_item_cb, Icon_NOICON);
-MENUITEM_RETURNVALUE(context_debug, "debug", 5,
-                     &context_item_cb, Icon_NOICON);
-
-MAKE_MENU(context_m, "Context menu",
-          context_item_cb, Icon_NOICON,
-          &context_add_entry, &context_edit_title, &context_edit_name,
-          &context_edit_password, &context_delete_entry);
-
 static int context_item_cb(int action, const struct menu_item_ex *this_item)
 {
     if (action == ACTION_REQUEST_MENUITEM
         && pw_list.num_entries == 0
-        && this_item != &context_add_entry)
+        && ((intptr_t)this_item) != 0)
     {
         return ACTION_EXIT_MENUITEM;
     }
     return action;
 }
+
+MENUITEM_STRINGLIST(context_m, "Context menu", context_item_cb,
+                    "Add entry",
+                    "Edit title", "Edit user name", "Edit password", 
+                    "Delete entry")
 
 static char * kb_list_cb(int selected_item, void *data,
                          char *buffer, size_t buffer_len)

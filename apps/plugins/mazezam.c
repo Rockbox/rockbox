@@ -52,13 +52,12 @@ const struct button_mapping *plugin_contexts[]
 #define MAZEZAM_TEXT_WELLDONE_OPTION "Goodbye"
 #define MAZEZAM_TEXT_MAZEZAM_MENU    "MazezaM Menu"
 #define MAZEZAM_TEXT_RETRY_LEVEL     "Retry level"
-#define MAZEZAM_TEXT_AUDIO_PLAYBACK  "Audio playback"
+#define MAZEZAM_TEXT_AUDIO_PLAYBACK  "Playback Control"
 #define MAZEZAM_TEXT_QUIT            "Quit"
-#define MAZEZAM_TEXT_BACK            "Return"
+#define MAZEZAM_TEXT_BACK            "Resume Game"
 #define MAZEZAM_TEXT_MAIN_MENU       "MazezaM"
 #define MAZEZAM_TEXT_CONTINUE        "Play from checkpoint"
-#define MAZEZAM_TEXT_PLAY_GAME       "Play game"
-#define MAZEZAM_TEXT_PLAY_NEW_GAME   "Play new game"
+#define MAZEZAM_TEXT_PLAY_NEW_GAME   "Start New Game"
 
 #define MAZEZAM_START_LIVES         3 /* how many lives at game start */
 #define MAZEZAM_FIRST_CHECKPOINT    3 /* The level at the first checkpoint */
@@ -838,31 +837,16 @@ static void resume_save_data (struct resume_data *r, struct resume_data *old)
 }
 
 /*****************************************************************************
-* Offer a main menu with no continue option 
-******************************************************************************/
-static int main_menu_without_continue(int* start_selection) 
-{
-    MENUITEM_STRINGLIST(menu,MAZEZAM_TEXT_MAIN_MENU,NULL,
-                          MAZEZAM_TEXT_PLAY_GAME,
-                          MAZEZAM_TEXT_QUIT);
-    return rb->do_menu(&menu, start_selection, NULL, false);
-}
-
-/*****************************************************************************
-* Offer a main menu with a continue option
-******************************************************************************/
-static int main_menu_with_continue(int* start_selection)
-{
-    MENUITEM_STRINGLIST(menu,MAZEZAM_TEXT_MAIN_MENU,NULL,
-                          MAZEZAM_TEXT_CONTINUE,
-                          MAZEZAM_TEXT_PLAY_NEW_GAME,
-                          MAZEZAM_TEXT_QUIT);
-    return rb->do_menu(&menu, start_selection, NULL, false);
-}
-
-/*****************************************************************************
 * Manages the main menu 
 ******************************************************************************/
+static bool have_continue;
+static int main_menu_cb(int action, const struct menu_item_ex *this_item)
+{
+    if(action == ACTION_REQUEST_MENUITEM
+       && !have_continue && ((intptr_t)this_item)==0)
+        return ACTION_EXIT_MENUITEM;
+    return action;
+}
 static void main_menu(void)
 {
     /* The initial option is "play game" */
@@ -873,11 +857,14 @@ static void main_menu(void)
     /* Load data */
     resume_load_data(&r_data, &old_data);
 
+    MENUITEM_STRINGLIST(menu,MAZEZAM_TEXT_MAIN_MENU,main_menu_cb,
+                          MAZEZAM_TEXT_CONTINUE,
+                          MAZEZAM_TEXT_PLAY_NEW_GAME,
+                          MAZEZAM_TEXT_QUIT);
+
     while (state >= STATE_IN_APPLICATION) {
-        if (r_data.level == 0)
-            choice = main_menu_without_continue(&start_selection);
-        else
-            choice = main_menu_with_continue(&start_selection);
+        have_continue = (r_data.level != 0);
+        choice = rb->do_menu(&menu, &start_selection, NULL, false);
 
         switch(choice) {
             case 0: /* Continue */
@@ -885,14 +872,10 @@ static void main_menu(void)
                 game_loop(&r_data);
                 break;
 
-            case 1: /* Quit or Play new game */
-                if (r_data.level == 0)
-                    state = STATE_QUIT;
-                else { /* Play new game */
-                    r_data.level = 0;
-                    state = STATE_IN_GAME;
-                    game_loop(&r_data);
-                }
+            case 1: /* Play new game */
+                r_data.level = 0;
+                state = STATE_IN_GAME;
+                game_loop(&r_data);
                 break;
 
             case MENU_ATTACHED_USB:

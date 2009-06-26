@@ -782,22 +782,33 @@ void solitaire_init(void);
 /* menu return codes */
 enum { MENU_RESUME, MENU_SAVE_AND_QUIT, MENU_QUIT, MENU_USB };
 
+static bool _ingame;
+int solitaire_menu_cb(int action, const struct menu_item_ex *this_item)
+{
+    int i = (intptr_t)this_item;
+    if( action == ACTION_REQUEST_MENUITEM )
+    {
+        if((!_ingame && (i==0 || i==5)) || ( _ingame && i==2 ))
+            return ACTION_EXIT_MENUITEM;
+    }
+    return action;
+}
+
 int solitaire_menu(bool in_game)
 {
     int selected = 0;
     int result = -1;
 
-    MENUITEM_STRINGLIST(menu, "Solitaire Menu", NULL,
-                        "Start Game", "Draw Cards Option",
-                        "Help", "Audio Playback", "Quit");
-    MENUITEM_STRINGLIST(menu_in_game, "Solitaire Menu", NULL,
-                        "Resume Game", "Restart Game", "Help",
-                        "Audio Playback", "Save and Quit", "Quit");
+    MENUITEM_STRINGLIST(menu, "Solitaire Menu", solitaire_menu_cb,
+                        "Resume Game", "Start New Game",
+                        "Draw Cards Option",
+                        "Help", "Playback Control",
+                        "Save and Quit", "Quit");
+    _ingame = in_game;
 
     while (result < 0)
     {
-        switch (rb->do_menu(in_game? &menu_in_game: &menu,
-                            &selected, NULL, false))
+        switch (rb->do_menu(&menu, &selected, NULL, false))
         {
             default:
                 result = MENU_RESUME;
@@ -812,36 +823,30 @@ int solitaire_menu(bool in_game)
                 break;
 
             case 1:
-                if (in_game)
-                {
-                    solitaire_init();
-                    result = MENU_RESUME;
-                }
-                else
-                {
-                    if (rb->set_option("Draw Cards Option", &sol.draw_type,
-                                       INT, drawcards, 2, NULL))
-                        result = MENU_USB;
-                }
+                solitaire_init();
+                result = MENU_RESUME;
                 break;
 
             case 2:
-                if (solitaire_help() == HELP_USB)
+                if (rb->set_option("Draw Cards Option", &sol.draw_type,
+                                   INT, drawcards, 2, NULL))
                     result = MENU_USB;
                 break;
 
             case 3:
+                if (solitaire_help() == HELP_USB)
+                    result = MENU_USB;
+                break;
+
+            case 4:
                  playback_control(NULL);
                  break;
 
-            case 4:
-                if( in_game )
-                    result = MENU_SAVE_AND_QUIT;
-                else
-                    result = MENU_QUIT;
+            case 5:
+                result = MENU_SAVE_AND_QUIT;
                 break;
 
-            case 5:
+            case 6:
                 result = MENU_QUIT;
                 break;
         }

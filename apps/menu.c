@@ -81,7 +81,8 @@ static void get_menu_callback(const struct menu_item_ex *m,
 static int get_menu_selection(int selected_item, const struct menu_item_ex *menu)
 {
     int type = (menu->flags&MENU_TYPE_MASK);
-    if (type == MT_MENU && (selected_item<current_subitems_count))
+    if ((type == MT_MENU || type == MT_RETURN_ID)
+        && (selected_item<current_subitems_count))
         return current_subitems[selected_item];
     return selected_item;
 }

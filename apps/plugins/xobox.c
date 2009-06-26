@@ -920,77 +920,49 @@ static void init_game (void)
 }
 
 /* the main menu */
+static bool _ingame;
+static int xobox_menu_cb(int action, const struct menu_item_ex *this_item)
+{
+    if(action == ACTION_REQUEST_MENUITEM
+       && !_ingame && ((intptr_t)this_item)==0)
+        return ACTION_EXIT_MENUITEM;
+    return action;
+}
+
 static int xobox_menu(bool ingame)
 {
     rb->button_clear_queue();
-    int choice = 0;
-    if (ingame) {
-        MENUITEM_STRINGLIST (main_menu, "Xobox Menu", NULL,
-                                 "Resume Game",
-                                 "Restart Level",
-                                 "Speed",
-                                 "Difficulty",
-                                 "Playback Control",
-                                 "Quit");
+    
+    int selection = 0;
+    MENUITEM_STRINGLIST(main_menu, "Xobox Menu", xobox_menu_cb,
+                        "Resume Game", "Start New Game",
+                        "Speed", "Difficulty",
+                        "Playback Control", "Quit");
+    _ingame = ingame;
 
-        while (true) {
-            choice = rb->do_menu(&main_menu, &choice, NULL, false);
-            switch (choice) {
-                case 0:
-                    return 0;
-                case 1:
-                    init_game ();
-                    return 0;
-                case 2:
-                    rb->set_int ("Speed", "", UNIT_INT, &speed, NULL, 1, 1, 10, NULL);
-                    break;
-                case 3:
-                    rb->set_int ("Difficulty", "", UNIT_INT, &difficulty, NULL,
-                                5, 50, 95, NULL);
-                    break;
-                case 4:
-                    playback_control(NULL);
-                    break;
-                case 5:
-                    return 1;
-                case MENU_ATTACHED_USB:
-                    return 1;
-                default:
-                    break;
-            }
-        }
-    }
-    else {
-        MENUITEM_STRINGLIST (main_menu, "Xobox Menu", NULL,
-                                 "Start Game",
-                                 "Speed",
-                                 "Difficulty",
-                                 "Playback Control",
-                                 "Quit");
-
-        while (true) {
-            choice = rb->do_menu(&main_menu, &choice, NULL, false);
-            switch (choice) {
-                case 0:
-                    init_game ();
-                    return 0;
-                case 1:
-                    rb->set_int ("Speed", "", UNIT_INT, &speed, NULL, 1, 1, 10, NULL);
-                    break;
-                case 2:
-                    rb->set_int ("Difficulty", "", UNIT_INT, &difficulty, NULL,
-                                5, 50, 95, NULL);
-                    break;
-                case 3:
-                    playback_control(NULL);
-                    break;
-                case 4:
-                    return 1;
-                case MENU_ATTACHED_USB:
-                    return 1;
-                default:
-                    break;
-            }
+    while (true) {
+        switch (rb->do_menu(&main_menu, &selection, NULL, false)) {
+            case 0:
+                return 0;
+            case 1:
+                init_game ();
+                return 0;
+            case 2:
+                rb->set_int ("Speed", "", UNIT_INT, &speed, NULL, 1, 1, 10, NULL);
+                break;
+            case 3:
+                rb->set_int ("Difficulty", "", UNIT_INT, &difficulty, NULL,
+                            5, 50, 95, NULL);
+                break;
+            case 4:
+                playback_control(NULL);
+                break;
+            case 5:
+                return 1;
+            case MENU_ATTACHED_USB:
+                return 1;
+            default:
+                break;
         }
     }
 }
