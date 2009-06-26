@@ -380,7 +380,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="3" >
+          <item row="0" column="1" colspan="2" >
            <widget class="QComboBox" name="comboTts" />
           </item>
           <item row="1" column="0" >
@@ -415,6 +415,13 @@
             <property name="icon" >
              <iconset resource="rbutilqt.qrc" >
               <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QPushButton" name="testTTS">
+            <property name="text">
+             <string>Test TTS</string>
             </property>
            </widget>
           </item>

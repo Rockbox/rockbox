@@ -70,6 +70,7 @@ class Config : public QDialog
         void configEnc(void);
         void updateTtsState(int);
         void updateEncState();
+        void testTts();
 };
 
 #endif

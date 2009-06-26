@@ -85,7 +85,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     connect(ui.configEncoder, SIGNAL(clicked()), this, SLOT(configEnc()));
     connect(ui.comboTts, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTtsState(int)));
     connect(ui.treeDevices, SIGNAL(itemSelectionChanged()), this, SLOT(updateEncState()));
-
+    connect(ui.testTTS,SIGNAL(clicked()),this,SLOT(testTts()));
     setUserSettings();
     setDevices();
 }
@@ -660,6 +660,39 @@ void Config::configTts()
     updateTtsState(ui.comboTts->currentIndex());
 }
 
+void Config::testTts()
+{
+    QString errstr;
+    int index = ui.comboTts->currentIndex();
+    TTSBase* tts = TTSBase::getTTS(this,ui.comboTts->itemData(index).toString());
+    if(!tts->configOk())
+    {
+        QMessageBox::warning(this,tr("TTS configuration invalid"),tr("TTS configuration invalid. \n Please configure TTS engine."));
+        return;
+    }
+    
+    if(!tts->start(&errstr))
+    {
+        QMessageBox::warning(this,tr("Could not start TTS engine"),tr("Could not start TTS engine.\n") + errstr 
+                        +tr("\nPlease configure TTS engine."));
+        return;
+    }
+    
+    QTemporaryFile file(this);
+    file.open();
+    QString filename = file.fileName();
+    file.close();
+    
+    if(tts->voice(tr("Rockbox Utility Voice Test"),filename,&errstr) == FatalError)
+    {
+        tts->stop();
+        QMessageBox::warning(this,tr("Could not voice test string"),tr("Could not voice test string.\n") + errstr 
+                        +tr("\nPlease configure TTS engine."));
+        return;
+    }
+    tts->stop();    
+    QSound::play(filename);
+}
 
 void Config::configEnc()
 {
