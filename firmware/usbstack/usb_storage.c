@@ -472,6 +472,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                 if((unsigned int)length!=(SECTOR_SIZE* cur_cmd.count)
                   && (unsigned int)length!=WRITE_BUFFER_SIZE) {
                     logf("unexpected length :%d",length);
+                    break;
                 }
 
                 unsigned int next_sector = cur_cmd.sector +
