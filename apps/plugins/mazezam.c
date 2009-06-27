@@ -22,27 +22,51 @@
 #include "plugin.h"
 #include "lib/configfile.h"
 #include "lib/helper.h"
-#include "lib/pluginlib_actions.h"
 #include "lib/playback_control.h"
 
 /* Include standard plugin macro */
 PLUGIN_HEADER
 
-/* The plugin actions of interest. */
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+#   define MAZEZAM_MENU     (BUTTON_SELECT | BUTTON_MENU)
+#   define MAZEZAM_RIGHT    BUTTON_RIGHT
+#   define MAZEZAM_LEFT     BUTTON_LEFT
+#   define MAZEZAM_UP       BUTTON_MENU
+#   define MAZEZAM_DOWN     BUTTON_PLAY
+
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD)
+#   define MAZE_QUIT     BUTTON_MENU
+#   define MAZE_RIGHT    BUTTON_RIGHT
+#   define MAZE_LEFT     BUTTON_LEFT
+#   define MAZE_UP       BUTTON_SCROLL_BACK
+#   define MAZE_DOWN     BUTTON_SCROLL_FWD
+
+#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+#   define MAZEZAM_MENU     (BUTTON_HOME | BUTTON_REPEAT)
+#   define MAZEZAM_RIGHT    BUTTON_RIGHT
+#   define MAZEZAM_LEFT     BUTTON_LEFT
+#   define MAZEZAM_UP       BUTTON_UP
+#   define MAZEZAM_DOWN     BUTTON_DOWN
+
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
+#   define MAZEZAM_MENU     BUTTON_POWER
+#   define MAZEZAM_SOLVE    BUTTON_SELECT
+#   define MAZEZAM_RIGHT    BUTTON_RIGHT
+#   define MAZEZAM_LEFT     BUTTON_LEFT
+#   define MAZEZAM_UP       BUTTON_UP
+#   define MAZEZAM_DOWN     BUTTON_DOWN
+
+#else
+#   include "lib/pluginlib_actions.h"
+#   define MAZEZAM_MENU     PLA_QUIT
+#   define MAZEZAM_RIGHT    PLA_RIGHT
+#   define MAZEZAM_LEFT     PLA_LEFT
+#   define MAZEZAM_UP       PLA_UP
+#   define MAZEZAM_DOWN     PLA_DOWN
 const struct button_mapping *plugin_contexts[]
 = {generic_directions, generic_actions};
-
-/* Use the standard plugin buttons rather than a hard-to-maintain list of
- * MazezaM specific buttons. */
-#define MAZEZAM_UP                  PLA_UP
-#define MAZEZAM_UP_REPEAT           PLA_UP_REPEAT
-#define MAZEZAM_DOWN                PLA_DOWN
-#define MAZEZAM_DOWN_REPEAT         PLA_DOWN_REPEAT
-#define MAZEZAM_LEFT                PLA_LEFT
-#define MAZEZAM_LEFT_REPEAT         PLA_LEFT_REPEAT
-#define MAZEZAM_RIGHT               PLA_RIGHT
-#define MAZEZAM_RIGHT_REPEAT        PLA_RIGHT_REPEAT
-#define MAZEZAM_MENU                PLA_QUIT
+#endif
 
 /* All the text is here */
 #define MAZEZAM_TEXT_GAME_OVER       "Game Over"
@@ -541,12 +565,16 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
     while (state >= STATE_IN_LEVEL) {
         draw_level(li, shift, *x, *y);
         rb->lcd_update();
+#ifdef __PLUGINLIB_ACTIONS_H__
         button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts, 2);
+#else
+        button = rb->button_get(true);
+#endif
         blocked = false;
 
         switch (button) {
             case MAZEZAM_UP:
-            case MAZEZAM_UP_REPEAT:
+            case (MAZEZAM_UP|BUTTON_REPEAT):
                 if ((*y > 0) && (*x >= 0) && (*x < li->width)) {
                     for (i = 0; i < li->cd.l_num[*y-1]; i++)
                         blocked = blocked ||
@@ -560,7 +588,7 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
 
 
             case MAZEZAM_DOWN:
-            case MAZEZAM_DOWN_REPEAT:
+            case (MAZEZAM_DOWN|BUTTON_REPEAT):
                 if ((*y < li->height-1) && (*x >= 0) && (*x < li->width)) {
                     for (i = 0; i < li->cd.l_num[*y+1]; i++)
                         blocked = blocked ||
@@ -572,7 +600,7 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
                 break;
 
             case MAZEZAM_LEFT:
-            case MAZEZAM_LEFT_REPEAT:
+            case (MAZEZAM_LEFT|BUTTON_REPEAT):
                 if (*x > 0) {
                     for (i = 0; i < li->cd.l_num[*y]; i++)
                         blocked = blocked ||
@@ -587,7 +615,7 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
                 break;
 
             case MAZEZAM_RIGHT:
-            case MAZEZAM_RIGHT_REPEAT:
+            case (MAZEZAM_RIGHT|BUTTON_REPEAT):
                 if (*x < li->width-1) {
                     for (i = 0; i < li->cd.l_num[*y]; i++)
                         blocked = blocked ||
