@@ -358,6 +358,8 @@ target/arm/pnx0101/i2c-pnx0101.c
 target/arm/i2c-telechips.c
 #elif CONFIG_I2C == I2C_S3C2440
 /* no i2c driver yet */
+#elif CONFIG_I2C == I2C_S5L8700
+target/arm/s5l8700/i2c-s5l8700.c
 #endif
 
 #if CONFIG_CPU == PNX0101
