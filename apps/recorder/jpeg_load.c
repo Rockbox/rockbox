@@ -183,6 +183,19 @@ INLINE unsigned range_limit(int value)
 #endif
 }
 
+INLINE unsigned scale_output(int value)
+{
+#if defined(CPU_ARM) && ARM_ARCH >= 6
+    asm (
+        "usat %[v], #8, %[v], asr #18\n"
+        : [v] "+r" (value)
+    );
+    return value;
+#else
+    return range_limit(value >> 18);
+#endif
+}
+
 /* IDCT implementation */
 
 
@@ -804,38 +817,22 @@ static void jpeg_idct16h(int16_t *ws, unsigned char *out, int16_t *end, int rows
 
         /* Final output stage */
 
-        out[JPEG_PIX_SZ*0]  = range_limit((int) RIGHT_SHIFT(tmp20 + tmp0,
-            DS_OUT));
-        out[JPEG_PIX_SZ*15] = range_limit((int) RIGHT_SHIFT(tmp20 - tmp0,
-            DS_OUT));
-        out[JPEG_PIX_SZ*1]  = range_limit((int) RIGHT_SHIFT(tmp21 + tmp1,
-            DS_OUT));
-        out[JPEG_PIX_SZ*14] = range_limit((int) RIGHT_SHIFT(tmp21 - tmp1,
-            DS_OUT));
-        out[JPEG_PIX_SZ*2]  = range_limit((int) RIGHT_SHIFT(tmp22 + tmp2,
-            DS_OUT));
-        out[JPEG_PIX_SZ*13] = range_limit((int) RIGHT_SHIFT(tmp22 - tmp2,
-            DS_OUT));
-        out[JPEG_PIX_SZ*3]  = range_limit((int) RIGHT_SHIFT(tmp23 + tmp3,
-            DS_OUT));
-        out[JPEG_PIX_SZ*12] = range_limit((int) RIGHT_SHIFT(tmp23 - tmp3,
-            DS_OUT));
-        out[JPEG_PIX_SZ*4]  = range_limit((int) RIGHT_SHIFT(tmp24 + tmp10,
-            DS_OUT));
-        out[JPEG_PIX_SZ*11] = range_limit((int) RIGHT_SHIFT(tmp24 - tmp10,
-            DS_OUT));
-        out[JPEG_PIX_SZ*5]  = range_limit((int) RIGHT_SHIFT(tmp25 + tmp11,
-            DS_OUT));
-        out[JPEG_PIX_SZ*10] = range_limit((int) RIGHT_SHIFT(tmp25 - tmp11,
-            DS_OUT));
-        out[JPEG_PIX_SZ*6]  = range_limit((int) RIGHT_SHIFT(tmp26 + tmp12,
-            DS_OUT));
-        out[JPEG_PIX_SZ*9]  = range_limit((int) RIGHT_SHIFT(tmp26 - tmp12,
-            DS_OUT));
-        out[JPEG_PIX_SZ*7]  = range_limit((int) RIGHT_SHIFT(tmp27 + tmp13,
-            DS_OUT));
-        out[JPEG_PIX_SZ*8]  = range_limit((int) RIGHT_SHIFT(tmp27 - tmp13,
-            DS_OUT));
+        out[JPEG_PIX_SZ*0]  = scale_output(tmp20 + tmp0);
+        out[JPEG_PIX_SZ*15] = scale_output(tmp20 - tmp0);
+        out[JPEG_PIX_SZ*1]  = scale_output(tmp21 + tmp1);
+        out[JPEG_PIX_SZ*14] = scale_output(tmp21 - tmp1);
+        out[JPEG_PIX_SZ*2]  = scale_output(tmp22 + tmp2);
+        out[JPEG_PIX_SZ*13] = scale_output(tmp22 - tmp2);
+        out[JPEG_PIX_SZ*3]  = scale_output(tmp23 + tmp3);
+        out[JPEG_PIX_SZ*12] = scale_output(tmp23 - tmp3);
+        out[JPEG_PIX_SZ*4]  = scale_output(tmp24 + tmp10);
+        out[JPEG_PIX_SZ*11] = scale_output(tmp24 - tmp10);
+        out[JPEG_PIX_SZ*5]  = scale_output(tmp25 + tmp11);
+        out[JPEG_PIX_SZ*10] = scale_output(tmp25 - tmp11);
+        out[JPEG_PIX_SZ*6]  = scale_output(tmp26 + tmp12);
+        out[JPEG_PIX_SZ*9]  = scale_output(tmp26 - tmp12);
+        out[JPEG_PIX_SZ*7]  = scale_output(tmp27 + tmp13);
+        out[JPEG_PIX_SZ*8]  = scale_output(tmp27 - tmp13);
     }
 }
 #endif
