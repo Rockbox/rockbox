@@ -101,7 +101,7 @@ HEADERS += rbutilqt.h \
  base/talkfile.h \
  base/talkgenerator.h \
  base/autodetection.h \
- progressloggerinterface.h \
+ base/progressloggerinterface.h \
  progressloggergui.h \
  ../ipodpatcher/ipodpatcher.h \
  ../ipodpatcher/ipodio.h \
