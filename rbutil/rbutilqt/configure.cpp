@@ -29,7 +29,7 @@
 #include "detect.h"
 #include "encttscfggui.h"
 #include "rbsettings.h"
-
+#include "utils.h"
 #include <stdio.h>
 #if defined(Q_OS_WIN32)
 #if defined(UNICODE)
@@ -691,7 +691,16 @@ void Config::testTts()
         return;
     }
     tts->stop();    
+#if defined(Q_OS_LINUX)
+    QString exe = findExecutable("aplay");
+    if(exe == "") exe = findExecutable("play");
+    if(exe != "")
+    {
+        QProcess::execute(exe+" "+filename);
+    }
+#else    
     QSound::play(filename);
+#endif    
 }
 
 void Config::configEnc()
