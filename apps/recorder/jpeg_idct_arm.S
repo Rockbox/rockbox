@@ -35,6 +35,10 @@
     .type   jpeg_idct4v, %function
     .global jpeg_idct4h
     .type   jpeg_idct4h, %function
+    .global jpeg_idct8v
+    .type   jpeg_idct8v, %function
+    .global jpeg_idct8h
+    .type   jpeg_idct8h, %function
 
 jpeg_idct1h:
 /* In the common case of one pass through the loop, the extra add should be
@@ -414,3 +418,264 @@ jpeg_idct4h:
     ldmia sp!, { r4-r9, pc }
 #endif
     .size jpeg_idct4h, .-jpeg_idct4h
+
+jpeg_idct8v:
+    stmdb  sp!, { r4-r11, lr }
+    add    r2,  r0,  #128
+1:
+    ldmia  r0!, { r4-r7 }
+    mov    r8,  r4,  lsl #16
+    orrs   r9,  r6,  r7
+    orreqs r9,  r5,  r4, lsr #16
+    bne    2f
+    mov    r8,  r8,  asr #14
+    strh   r8,  [r2]
+    strh   r8,  [r2, #16]
+    strh   r8,  [r2, #32]
+    strh   r8,  [r2, #48]
+    strh   r8,  [r2, #64]
+    strh   r8,  [r2, #80]
+    strh   r8,  [r2, #96]
+    strh   r8,  [r2, #112]
+    cmp    r0,  r1
+    add    r2,  r2,  #2
+    bcc    1b
+    ldmia  sp!, { r4-r11, pc }
+2:
+    ldr    r14, =4433
+    ldr    r12, =-15137
+    mov    r10, r5,  lsl #16
+    mov    r11, r7,  lsl #16
+    mov    r10, r10, asr #16        /* r10 = z2 = d2 */
+    mov    r11, r11, asr #16        /* r11 = z3 = d6 */
+    add    r8,  r8,  #8192
+    add    r9,  r10, r11
+    mov    r8,  r8,  asr #3         /* r8  = z4 = (d0 + 4112) << 13 */
+    mul    r9,  r14, r9             /* r9  = z1 = (z2 + z3) * 4433 */
+    ldr    r14, =6270
+    mla    r11, r12, r11, r9         /* r11 = tmp2 = z1 - z3 * 15137 */
+    mla    r10, r14, r10, r9         /* r10 = tmp3 = z1 + z2 * 6270 */
+    mov    r9,  r6,  lsl #16         /* r9  = z5 << 3 = d4 << 16 */
+    add    r12, r8,  r9,  asr #3     /* r12 = tmp0 = z4 + z5 */
+    sub    r14, r8,  r9,  asr #3     /* r14 = tmp1 = z4 - z5 */
+    add    r8,  r12, r10             /* r8  = tmp10 = tmp0 + tmp3 */
+    sub    r9,  r12, r10             /* r9  = tmp13 = tmp0 - tmp3 */
+    add    r10, r14, r11             /* r10 = tmp11 = tmp1 + tmp2 */
+    sub    r11, r14, r11             /* r11 = tmp12 = tmp1 - tmp2 */
+    stmdb  sp,  { r8-r11 }           /* tmp10 tmp13 tmp11 tmp12 */
+    mov    r4,  r4,  asr #16         /* r4  = tmp3 = d1 */
+    mov    r5,  r5,  asr #16         /* r5  = tmp2 = d3 */
+    mov    r6,  r6,  asr #16         /* r6  = tmp1 = d5 */
+    mov    r7,  r7,  asr #16         /* r7  = tmp0 = d7 */
+    ldr    r10, =9633
+    ldr    r11, =-16069
+    add    r12, r5,  r7              /* r12 = z3 = tmp0 + tmp2 */
+    add    r14, r4,  r6              /* r14 = z4 = tmp1 + tmp3 */
+    add    r9,  r12, r14             /* r9  = z3 + z4 */
+    mul    r9,  r10, r9              /* r9  = z5 = (z3 + z4) * 9633 */
+    ldr    r10, =-3196
+    mla    r12, r11, r12, r9         /* r12 = z3 = z5 - z3 * 16069 */
+    ldr    r11, =-7373
+    mla    r14, r10, r14, r9         /* r14 = z4 = z5 - z4 * 3196 */
+    ldr    r10, =2446
+    add    r9,  r4,  r7              /* r9  = tmp0 + tmp3 */
+    mla    r8,  r11, r9,  r12        /* r8  = z1 + z3 */
+    mla    r9,  r11, r9,  r14        /* r9  = z1 + z4 */
+    ldr    r11, =12299
+    mla    r7,  r10, r7,  r8         /* r7  = tmp0 = z1 + z3 + tmp0 * 2446 */
+    ldr    r10, =-20995
+    mla    r4,  r11, r4,  r9         /* r4  = tmp3 = z1 + z4 + tmp0 * 12299 */
+    ldr    r11, =25172
+    add    r9,  r5,  r6              /* r9  = tmp1 + tmp2 */
+    mla    r12, r10, r9, r12         /* r12 = z2 + z3 */
+    mla    r14, r10, r9, r14         /* r14 = z2 + z4 */
+    ldr    r10, =16819
+    mla    r5,  r11, r5, r12         /* r5  = tmp2 = z2 + z3 + tmp2 * 25172 */
+    mla    r6,  r10, r6, r14         /* r6  = tmp1 = z2 + z4 + tmp1 * 16819 */
+    ldmdb  sp,  { r8-r11 }
+    add    r12, r8,  r4              /* o0 */
+    sub    r14, r8,  r4              /* o7 */
+    add    r8,  r9,  r7              /* o3 */
+    sub    r9,  r9,  r7              /* o4 */
+    add    r4,  r10, r5              /* O1 */
+    sub    r5,  r10, r5              /* o6 */
+    add    r10, r11, r6              /* o2 */
+    sub    r11, r11, r6              /* o5 */
+    /* output in order: r12 r4  r10 r8  r9  r11 r5  r14 */
+    mov    r12, r12, asr #11
+    mov    r4,  r4,  asr #11
+    mov    r10, r10, asr #11
+    mov    r8,  r8,  asr #11
+    mov    r9,  r9,  asr #11
+    mov    r11, r11, asr #11
+    mov    r5,  r5,  asr #11
+    mov    r14, r14, asr #11
+    strh   r12, [r2]
+    strh   r4,  [r2, #16]
+    strh   r10, [r2, #32]
+    strh   r8,  [r2, #48]
+    strh   r9,  [r2, #64]
+    strh   r11, [r2, #80]
+    strh   r5,  [r2, #96]
+    strh   r14, [r2, #112]
+    cmp    r0,  r1
+    add    r2,  r2,  #2
+    bcc    1b
+    ldmia  sp!, { r4-r11, pc }
+    .size jpeg_idct8v, .-jpeg_idct8v
+
+jpeg_idct8h:
+    stmdb  sp!, { r4-r11, lr }
+1:
+    ldmia  r0!, { r4-r7 }
+    ldr    r14, =4112
+    mov    r8,  r4,  lsl #16
+    add    r8,  r8,  r14, lsl #16
+    orrs   r9,  r6,  r7
+    orreqs r9,  r5,  r4, lsr #16
+    bne    2f
+    mov    r8,  r8,  asr #21
+    cmp    r8,  #255
+    mvnhi  r8,  r8,  asr #31
+#ifdef HAVE_LCD_COLOR
+    strb   r8,  [r1]
+    strb   r8,  [r1, #4]
+    strb   r8,  [r1, #8]
+    strb   r8,  [r1, #12]
+    strb   r8,  [r1, #16]
+    strb   r8,  [r1, #20]
+    strb   r8,  [r1, #24]
+    strb   r8,  [r1, #28]
+#else
+    strb   r8,  [r1]
+    strb   r8,  [r1, #1]
+    strb   r8,  [r1, #2]
+    strb   r8,  [r1, #3]
+    strb   r8,  [r1, #4]
+    strb   r8,  [r1, #5]
+    strb   r8,  [r1, #6]
+    strb   r8,  [r1, #7]
+#endif
+    add    r1,  r1,  r3
+    cmp    r0,  r2
+    bcc    1b
+    ldmia  sp!, { r4-r11, pc }
+2:
+    ldr    r14, =4433
+    ldr    r12, =-15137
+    mov    r10, r5,  lsl #16
+    mov    r11, r7,  lsl #16
+    mov    r10, r10, asr #16        /* r10 = z2 = d2 */
+    mov    r11, r11, asr #16        /* r11 = z3 = d6 */
+    add    r9,  r10, r11
+    mov    r8,  r8,  asr #3         /* r8  = z4 = (d0 + 4112) << 13 */
+    mul    r9,  r14, r9             /* r9  = z1 = (z2 + z3) * 4433 */
+    ldr    r14, =6270
+    mla    r11, r12, r11, r9         /* r11 = tmp2 = z1 - z3 * 15137 */
+    mla    r10, r14, r10, r9         /* r10 = tmp3 = z1 + z2 * 6270 */
+    mov    r9,  r6,  lsl #16         /* r9  = z5 << 3 = d4 << 16 */
+    add    r12, r8,  r9,  asr #3     /* r12 = tmp0 = z4 + z5 */
+    sub    r14, r8,  r9,  asr #3     /* r14 = tmp1 = z4 - z5 */
+    add    r8,  r12, r10             /* r8  = tmp10 = tmp0 + tmp3 */
+    sub    r9,  r12, r10             /* r9  = tmp13 = tmp0 - tmp3 */
+    add    r10, r14, r11             /* r10 = tmp11 = tmp1 + tmp2 */
+    sub    r11, r14, r11             /* r11 = tmp12 = tmp1 - tmp2 */
+    stmdb  sp,  { r8-r11 }           /* tmp10 tmp13 tmp11 tmp12 */
+    mov    r4,  r4,  asr #16         /* r4  = tmp3 = d1 */
+    mov    r5,  r5,  asr #16         /* r5  = tmp2 = d3 */
+    mov    r6,  r6,  asr #16         /* r6  = tmp1 = d5 */
+    mov    r7,  r7,  asr #16         /* r7  = tmp0 = d7 */
+    ldr    r10, =9633
+    ldr    r11, =-16069
+    add    r12, r5,  r7              /* r12 = z3 = tmp0 + tmp2 */
+    add    r14, r4,  r6              /* r14 = z4 = tmp1 + tmp3 */
+    add    r9,  r12, r14             /* r9  = z3 + z4 */
+    mul    r9,  r10, r9              /* r9  = z5 = (z3 + z4) * 9633 */
+    ldr    r10, =-3196
+    mla    r12, r11, r12, r9         /* r12 = z3 = z5 - z3 * 16069 */
+    ldr    r11, =-7373
+    mla    r14, r10, r14, r9         /* r14 = z4 = z5 - z4 * 3196 */
+    ldr    r10, =2446
+    add    r9,  r4,  r7              /* r9  = tmp0 + tmp3 */
+    mla    r8,  r11, r9,  r12        /* r8  = z1 + z3 */
+    mla    r9,  r11, r9,  r14        /* r9  = z1 + z4 */
+    ldr    r11, =12299
+    mla    r7,  r10, r7,  r8         /* r7  = tmp0 = z1 + z3 + tmp0 * 2446 */
+    ldr    r10, =-20995
+    mla    r4,  r11, r4,  r9         /* r4  = tmp3 = z1 + z4 + tmp0 * 12299 */
+    ldr    r11, =25172
+    add    r9,  r5,  r6              /* r9  = tmp1 + tmp2 */
+    mla    r12, r10, r9, r12         /* r12 = z2 + z3 */
+    mla    r14, r10, r9, r14         /* r14 = z2 + z4 */
+    ldr    r10, =16819
+    mla    r5,  r11, r5, r12         /* r5  = tmp2 = z2 + z3 + tmp2 * 25172 */
+    mla    r6,  r10, r6, r14         /* r6  = tmp1 = z2 + z4 + tmp1 * 16819 */
+    ldmdb  sp,  { r8-r11 }
+    add    r12, r8,  r4              /* o0 */
+    sub    r14, r8,  r4              /* o7 */
+    add    r8,  r9,  r7              /* o3 */
+    sub    r9,  r9,  r7              /* o4 */
+    add    r4,  r10, r5              /* O1 */
+    sub    r5,  r10, r5              /* o6 */
+    add    r10, r11, r6              /* o2 */
+    sub    r11, r11, r6              /* o5 */
+    /* output in order: r12 r4  r10 r8  r9  r11 r5  r14 */
+#if ARM_ARCH < 6
+    mov    r12, r12, asr #18
+    cmp    r12, #255
+    mvnhi  r12, r12, asr #31
+    mov    r4,  r4,  asr #18
+    cmp    r4,  #255
+    mvnhi  r4,  r4,  asr #31
+    mov    r10, r10, asr #18
+    cmp    r10, #255
+    mvnhi  r10, r10, asr #31
+    mov    r8,  r8,  asr #18
+    cmp    r8,  #255
+    mvnhi  r8,  r8,  asr #31
+    mov    r9,  r9,  asr #18
+    cmp    r9,  #255
+    mvnhi  r9,  r9,  asr #31
+    mov    r11, r11, asr #18
+    cmp    r11, #255
+    mvnhi  r11, r11, asr #31
+    mov    r5,  r5,  asr #18
+    cmp    r5,  #255
+    mvnhi  r5,  r5,  asr #31
+    mov    r14, r14, asr #18
+    cmp    r14, #255
+    mvnhi  r14, r14, asr #31
+#else
+    usat   r12, #8,  r12, asr #18
+    usat   r4,  #8,  r4,  asr #18
+    usat   r10, #8,  r10, asr #18
+    usat   r8,  #8,  r8,  asr #18
+    usat   r9,  #8,  r9,  asr #18
+    usat   r11, #8,  r11, asr #18
+    usat   r5,  #8,  r5,  asr #18
+    usat   r14, #8,  r14, asr #18
+#endif
+#ifdef HAVE_LCD_COLOR
+    strb   r12, [r1]
+    strb   r4,  [r1, #4]
+    strb   r10, [r1, #8]
+    strb   r8,  [r1, #12]
+    strb   r9,  [r1, #16]
+    strb   r11, [r1, #20]
+    strb   r5,  [r1, #24]
+    strb   r14, [r1, #28]
+#else
+    strb   r12, [r1]
+    strb   r4,  [r1, #1]
+    strb   r10, [r1, #2]
+    strb   r8,  [r1, #3]
+    strb   r9,  [r1, #4]
+    strb   r11, [r1, #5]
+    strb   r5,  [r1, #6]
+    strb   r14, [r1, #7]
+#endif
+    add    r1,  r1,  r3
+    cmp    r0,  r2
+    bcc    1b
+    ldmia  sp!, { r4-r11, pc }
+    .size jpeg_idct8h, .-jpeg_idct8h

@@ -382,13 +382,6 @@ static void jpeg_idct4h(int16_t *ws, unsigned char *out, int16_t *end, int rowst
             DS_OUT));
     }
 }
-#else
-extern void jpeg_idct1h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
-extern void jpeg_idct2v(int16_t *ws, int16_t *end);
-extern void jpeg_idct2h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
-extern void jpeg_idct4v(int16_t *ws, int16_t *end);
-extern void jpeg_idct4h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
-#endif
 
 /* vertical-pass 8-point IDCT */
 static void jpeg_idct8v(int16_t *ws, int16_t *end)
@@ -598,6 +591,16 @@ static void jpeg_idct8h(int16_t *ws, unsigned char *out, int16_t *end, int rowst
             DS_OUT));
     }
 }
+
+#else
+extern void jpeg_idct1h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
+extern void jpeg_idct2v(int16_t *ws, int16_t *end);
+extern void jpeg_idct2h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
+extern void jpeg_idct4v(int16_t *ws, int16_t *end);
+extern void jpeg_idct4h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
+extern void jpeg_idct8v(int16_t *ws, int16_t *end);
+extern void jpeg_idct8h(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
+#endif
 
 #ifdef HAVE_LCD_COLOR
 /* vertical-pass 16-point IDCT */
