@@ -179,6 +179,6 @@
 
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING      0
-#define MAX_BRIGHTNESS_SETTING      255
-#define DEFAULT_BRIGHTNESS_SETTING  200
+#define MAX_BRIGHTNESS_SETTING      15
+#define DEFAULT_BRIGHTNESS_SETTING  10
 

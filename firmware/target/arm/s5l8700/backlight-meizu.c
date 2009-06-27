@@ -58,6 +58,8 @@ void INT_TIMERA(void)
 
 void _backlight_set_brightness(int brightness)
 {
+    static const unsigned char logtable[] = {0, 1, 2, 3, 5, 7, 10, 15, 22, 31, 44, 63, 90, 127, 180, 255};
+
     if (brightness == MIN_BRIGHTNESS_SETTING) {
         /* turn backlight fully off and disable interrupt */
         PDAT0 &= ~(1 << 2);
@@ -70,7 +72,7 @@ void _backlight_set_brightness(int brightness)
     }
     else {
         /* set PWM width and enable interrupt */
-        TADATA0 = brightness;
+        TADATA0 = logtable[brightness];
         INTMSK |= (1 << 5);
     }
 }
@@ -101,8 +103,8 @@ bool _backlight_init(void)
             (1 << 11) | /* TA_START */
             (3 << 8) |  /* TA_CS = PCLK / 64 */
             (1 << 4);   /* TA_MODE_SEL = PWM mode */
-    TADATA1 = MAX_BRIGHTNESS_SETTING;   /* set PWM period */
-    TAPRE = 100;    /* prescaler */
+    TADATA1 = 255;   /* set PWM period */
+    TAPRE = 30;    /* prescaler */
    
     _backlight_on();
 
