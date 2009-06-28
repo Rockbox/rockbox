@@ -27,6 +27,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <arpa/inet.h>
 
 #include <usb.h>
 
@@ -110,7 +111,10 @@ void init_img(image_data_t *img, const char *filename, image_attr_t *attr)
 
   printf("Reading %s...", filename);
 
-  stat(filename, &statbuf);
+  if (stat(filename, &statbuf) < 0) {
+    printf("\nCould not stat file, exiting.\n");
+    exit(1);
+  }
   len = statbuf.st_size;
 
   img->name = basename(strdup(filename));
