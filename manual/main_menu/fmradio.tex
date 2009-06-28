@@ -22,13 +22,16 @@
     \begin{table}
       \begin{btnmap}{}{}
           \ActionFMPrev, \ActionFMNext
+          \opt{IRIVER_RC_H100_PAD}{& \ActionRCFMPrev, \ActionRCFMNext}
           & Change frequency in \setting{SCAN} mode or jump to next/previous
           station in \setting{PRESET} mode\\
           %
           Long \ActionFMPrev, \ActionFMNext
+          \opt{IRIVER_RC_H100_PAD}{& Long \ActionRCFMPrev, Long \ActionRCFMNext}
           & Seek to next station or preset in \setting{SCAN} mode.\\
           %
           \ActionFMSettingsInc, \ActionFMSettingsDec
+          \opt{IRIVER_RC_H100_PAD}{& \ActionRCFMVolUp, \ActionRCFMVolDown}
           & Change volume.\\
           \opt{RECORDER_PAD}{
             \ButtonPlay
@@ -38,23 +41,30 @@
 
           %
           \ActionFMExit
+          \opt{IRIVER_RC_H100_PAD}{& \ActionRCFMExit}
           & Leave the radio screen with the radio playing.\\
           %
           \ActionFMStop
+          \opt{IRIVER_RC_H100_PAD}{& \ActionRCFMStop}
           & Stops the radio and returns to \setting{Main Menu}.\\%
           %
           \nopt{ONDIO_PAD}{%
-            \nopt{RECORDER_PAD}{\ActionFMPlay & Mutes radio playback.\\}%
+            \nopt{RECORDER_PAD}{\ActionFMPlay
+              \opt{IRIVER_RC_H100_PAD}{& \ActionRCFMPlay}
+              & Mutes radio playback.\\}%
             %
             \ActionFMMode
+            \opt{IRIVER_RC_H100_PAD}{& \ActionRCFMMode}
             & Switches between \setting{SCAN} and \setting{PRESET} mode.\\
             %
             \ActionFMPreset
+            \opt{IRIVER_RC_H100_PAD}{& \ActionRCFMPreset}
             & Opens a list of radio presets. You can view all the presets that 
               you have, and switch to the station.\\
           }%
           %
           \ActionFMMenu
+          \opt{IRIVER_RC_H100_PAD}{& \ActionRCFMMenu}
           & Displays the FM radio settings menu.\\
        \end{btnmap}
     \end{table}

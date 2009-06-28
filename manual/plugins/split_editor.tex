@@ -114,11 +114,11 @@ The whole process of splitting an mp3 file consists of three steps:
 
   \begin{table}
     \begin{btnmap}{Controls in the split editor}{}
-      \ButtonOff & Quit plugin \\
+      \ButtonOff \opt{IRIVER_RC_H100_PAD}{&} & Quit plugin \\
       %
-      \ButtonLeft\ / \ButtonRight &  Move the split point indicator \\
+      \ButtonLeft\ / \ButtonRight \opt{IRIVER_RC_H100_PAD}{&} &  Move the split point indicator \\
       %
-      \ButtonUp\ / \ButtonDown & Zoom in / out \\
+      \ButtonUp\ / \ButtonDown \opt{IRIVER_RC_H100_PAD}{&} & Zoom in / out \\
       %
       \opt{RECORDER_PAD}{\ButtonPlay}
       \opt{ONDIO_PAD}{\ButtonMenu}
@@ -138,12 +138,15 @@ The whole process of splitting an mp3 file consists of three steps:
       \opt{RECORDER_PAD}{
       %
       \ButtonOn\ + \ButtonLeft
+      \opt{IRIVER_RC_H100_PAD}{&} 
       & Play half speed \\
       %
       \ButtonOn\ + \ButtonRight
+      \opt{IRIVER_RC_H100_PAD}{&} 
       & Play 150\% speed \\
       %
       \ButtonOn\ + \ButtonPlay
+      \opt{IRIVER_RC_H100_PAD}{&} 
       & Play normal speed \\
     }
     \end{btnmap}
@@ -164,13 +167,13 @@ Save Dialogue}{}
 
 \begin{table}
   \begin{btnmap}{Controls in the save dialogue}{}
-    \ButtonUp\ / \ButtonDown & Select item \\
+    \ButtonUp\ / \ButtonDown \opt{IRIVER_RC_H100_PAD}{&} & Select item \\
     %
     \opt{RECORDER_PAD}{\ButtonPlay}
     \opt{ONDIO_PAD}{\ButtonRight}
     & Toggle / edit item \\
     %
-    \ButtonOff & Cancel \\
+    \ButtonOff \opt{IRIVER_RC_H100_PAD}{&} & Cancel \\
   \end{btnmap}
 \end{table}
 

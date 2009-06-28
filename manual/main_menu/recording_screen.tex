@@ -30,24 +30,38 @@ The controls for this screen are:
 \begin{table}
   \begin{btnmap}{}{}
     
-    \ActionRecPrev{} / \ActionRecNext & Select setting.\\
+    \ActionRecPrev{} / \ActionRecNext 
+    \opt{IRIVER_RC_H100_PAD}{& \ActionRCRecPrev{} / \ActionRCRecNext}
+    & Select setting.\\
     %
-    \ActionRecSettingsDec{} / \ActionRecSettingsInc & Adjust selected setting.\\
+    \ActionRecSettingsDec{} / \ActionRecSettingsInc
+    \opt{IRIVER_RC_H100_PAD}{& \ActionRCRecSettingsDec{} / \ActionRecSettingsInc}
+    & Adjust selected setting.\\
     %
-    \ActionRecPause & Start recording.\\
-                    & While recording: pause recording (press again to
+    \ActionRecPause 
+    \opt{IRIVER_RC_H100_PAD}{& \ActionRCRecPause}
+                    & Start recording.\\
+                    & \opt{IRIVER_RC_H100_PAD}{&}
+                      While recording: pause recording (press again to
                       continue).\\
     %
-    \ActionRecExit  & Exit \setting{Recording Screen}.\\
-                    & While recording: Stop recording.\\
+    \ActionRecExit  
+    \opt{IRIVER_RC_H100_PAD}{& \ActionRCRecExit}
+                    & Exit \setting{Recording Screen}.\\
+                    & \opt{IRIVER_RC_H100_PAD}{&}
+                      While recording: Stop recording.\\
     %
     \opt{IRIVER_H10_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,%
          SANSA_E200_PAD,IPOD_4G_PAD,SANSA_C200_PAD}{
-      \ActionRecNewfile & While recording: close the current file and open
-                          a new one.\\
+      \ActionRecNewfile
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCRecNewfile} 
+                     & While recording: close the current file and open
+                     a new one.\\
     }
     %
-    \ActionRecMenu & Open \setting{Recording Settings} (see 
+    \ActionRecMenu
+    \opt{IRIVER_RC_H100_PAD}{& \ActionRCRecMenu}
+                       & Open \setting{Recording Settings} (see 
                        \reference{ref:Recordingsettings}).\\
     %
     \opt{RECORDER_PAD}{

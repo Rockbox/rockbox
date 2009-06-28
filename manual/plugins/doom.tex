@@ -79,21 +79,28 @@ Rockdoom options, you will need to quit your current game and restart the plugin
 \begin{btnmap}{}{}
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
       ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonUp}
+      \opt{IRIVER_RC_H100_PAD}{&} 
   \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
   \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
     & Move Forward \\
 %
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
-      ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonDown & Down\\}
+      ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonDown
+          \opt{IRIVER_RC_H100_PAD}{&}
+      & Down\\}
+      
   \opt{IRIVER_H10_PAD}{\ButtonScrollDown & Down\\}
 %
   \ButtonLeft
+      \opt{IRIVER_RC_H100_PAD}{&} 
     & Turn Left \\
 %
   \ButtonRight
+      \opt{IRIVER_RC_H100_PAD}{&} 
     & Turn Right \\
 %
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
+      \opt{IRIVER_RC_H100_PAD}{&} 
   \opt{IPOD_3G_PAD,IPOD_4G_PAD,GIGABEAT_S_PAD}{\ButtonPlay}
   \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonSelect}
   \opt{IRIVER_H10_PAD}{\ButtonRew}
@@ -102,6 +109,7 @@ Rockdoom options, you will need to quit your current game and restart the plugin
     & Shoot \\
 %
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+      \opt{IRIVER_RC_H100_PAD}{&} 
   \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
   \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
   \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}
@@ -109,6 +117,7 @@ Rockdoom options, you will need to quit your current game and restart the plugin
     & Open \\
 %
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+      \opt{IRIVER_RC_H100_PAD}{&} 
   \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonHold{} switch}
   \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
       ,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonPower}
@@ -116,10 +125,12 @@ Rockdoom options, you will need to quit your current game and restart the plugin
 %
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD%
       ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD,MROBE100_PAD}{\ButtonSelect}
+      \opt{IRIVER_RC_H100_PAD}{&} 
   \opt{IRIVER_H10_PAD}{\ButtonRew}
     & Enter \\
 %
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+      \opt{IRIVER_RC_H100_PAD}{&} 
   \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonSelect}
   \opt{IAUDIO_X5_PAD}{\ButtonRec}
   \opt{IRIVER_H10_PAD}{\ButtonFF}

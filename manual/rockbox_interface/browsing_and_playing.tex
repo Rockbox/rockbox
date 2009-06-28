@@ -46,12 +46,14 @@ the \setting{Show Files} setting to all.
 \begin{table}
     \begin{btnmap}{}{}
       \ActionStdPrev{}/\ActionStdNext{}
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCStdPrev{}/\ActionRCStdNext{}}
          & Go to previous/next item in list. If you are on the first/last 
            entry, the cursor will wrap to the last/first entry.\\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
         {
           \ButtonOn+\ButtonUp{}/ \ButtonDown
+          \opt{IRIVER_RC_H100_PAD}{& \ButtonRCBitrate{}/ \ButtonRCSource}
           & Move one page up/down in the list.\\
         }
       \opt{IRIVER_H10_PAD}
@@ -60,28 +62,39 @@ the \setting{Show Files} setting to all.
           & Move one page up/down in the list.\\
         }
       %
-      \ActionTreeParentDirectory & Go to the parent directory.\\
+      \ActionTreeParentDirectory
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCTreeParentDirectory}
+      & Go to the parent directory.\\
       %
       \ActionTreeEnter
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCTreeEnter}
       & Executes the default action on the selected file or enters a
         directory.\\
       %
-      \ActionTreeWps & If there is an audio file playing, returns to the
+      \ActionTreeWps 
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCTreeWps}
+         & If there is an audio file playing, returns to the
          \setting{While Playing Screen} (WPS) without stopping playback.\\
       %
       \nopt{player,c200}%
         {%
-          \ActionTreeStop & Stops audio playback.\\%
+          \ActionTreeStop 
+          \opt{IRIVER_RC_H100_PAD}{& \ActionRCTreeStop}
+          & Stops audio playback.\\%
         }%
       %
       \ActionStdContext{}
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCStdContext}
       & Enter the \setting{Context Menu}\\
       %
       \ActionStdMenu{}
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCStdMenu}
       & Enter the \setting{Main Menu}\\
       %
       \opt{quickscreen}{
-        \ActionStdQuickScreen & Switches to the \setting{Quick Screen}
+        \ActionStdQuickScreen
+        \opt{IRIVER_RC_H100_PAD}{& \ActionRCStdQuickScreen}
+        & Switches to the \setting{Quick Screen}
         (see \reference{ref:QuickScreen}) \\
       }
       \opt{RECORDER_PAD}{
@@ -186,18 +199,24 @@ can be easily changed by making a text file with the required layout.  More
   \begin{table}
     \begin{btnmap}{}{}
       \ActionKbdLeft~/ \ActionKbdRight~/ \ActionKbdUp~/ \ActionKbdDown
+      \opt{IRIVER_RC_H100_PAD}{
+      &  \ActionRCKbdLeft~/ \ActionRCKbdRight~/ \ActionRCKbdUp~/ \ActionRCKbdDown}
       & Move about the virtual keyboard (moves the solid cursor) \\
       %
       \ActionKbdPageFlip
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdPageFlip}
       & Flip to the next page of characters (if there is more than one) \\
       %
-      \ActionKbdCursorLeft or \ActionKbdCursorRight
+      \ActionKbdCursorLeft{} / \ActionKbdCursorRight
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdCursorLeft{} / \ActionRCKbdCursorRight}
       & Move the line cursor within the text line \\
       %
       \ActionKbdSelect
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdSelect}
       & Inserts the selected keyboard letter at the current cursor position \\
       %
       \ActionKbdAbort
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdAbort}
       & Exits the virtual keyboard without saving any changes \\
       %
       \opt{RECORDER_PAD}{
@@ -206,14 +225,19 @@ can be easily changed by making a text file with the required layout.  More
       }
       %
       \ActionKbdDone
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdDone}
       & Exits the virtual keyboard and saves any changes \\
+      %
       \ActionKbdBackSpace
+      \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdBackSpace}
       & Deletes the character before the line cursor \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,MROBE100_PAD}{
         \ActionKbdMorseInput
+         \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdMorseInput}
         & Enters Morse input mode \\
         \ActionKbdMorseSelect
+        \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdMorseSelect}
         & Tap to select a character in Morse input mode \\
       }
     \end{btnmap}

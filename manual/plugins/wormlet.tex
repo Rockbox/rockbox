@@ -17,10 +17,13 @@ Menu controls:}
 
 \begin{table}
     \begin{btnmap}{}{}
-    \ButtonLeft\ / \ButtonRight & Controls number of worms in the game\\
+    \ButtonLeft\ / \ButtonRight 
+        \opt{IRIVER_RC_H100_PAD}{&}
+    & Controls number of worms in the game\\
     \opt{RECORDER_PAD}{
         \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
             {\ButtonUp\ / \ButtonDown}
+              \opt{IRIVER_RC_H100_PAD}{&}
             \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu\ / \ButtonPlay} & Selects number of players\\
         \ButtonFOne & Selects game mode.\\}
     \end{btnmap}
@@ -70,16 +73,20 @@ Game controls:}
 \begin{table}
     \begin{btnmap}{}{}
         \ButtonLeft
+          \opt{IRIVER_RC_H100_PAD}{&}
         & Turn left\\
         \ButtonRight
+          \opt{IRIVER_RC_H100_PAD}{&}
         & Turn right\\
         \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
             ,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonUp}
+          \opt{IRIVER_RC_H100_PAD}{&}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
         \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
         & Turn Up\\
         \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
             ,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonDown}
+          \opt{IRIVER_RC_H100_PAD}{&}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}
         \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
         & Turn Down\\

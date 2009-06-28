@@ -30,21 +30,26 @@ aware:
           & Scroll through albums / track list\\}
           
         \nopt{scrollwheel,IRIVER_H10_PAD}{\ButtonLeft{} / \ButtonRight
-         & Scroll through albums\\}
+         
+            \opt{IRIVER_RC_H100_PAD}{&}
+        & Scroll through albums\\}
 
         \nopt{scrollwheel,IRIVER_H10_PAD}{\ButtonUp{} / \ButtonDown
+           \opt{IRIVER_RC_H100_PAD}{&} 
         & Scroll through track list\\}
         
         \opt{IRIVER_H10_PAD}{\ButtonRight}
         \opt{ONDIO_PAD}{\ButtonUp}
         \opt{RECORDER_PAD}{\ButtonOn}
         \nopt{ONDIO_PAD,IRIVER_H10_PAD,RECORDER_PAD}{\ButtonSelect}
+          \opt{IRIVER_RC_H100_PAD}{&} 
         & Enter track list \opt{swcodec}{/ Play album from selected
           track}\\
 
-        \ButtonLeft & Exit track list\\
+        \ButtonLeft \opt{IRIVER_RC_H100_PAD}{&}  & Exit track list\\
 
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+           \opt{IRIVER_RC_H100_PAD}{&} 
         \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,GIGABEAT_PAD,%
              GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonMenu}
         \opt{IAUDIO_X5_PAD}{\ButtonRec}
@@ -55,6 +60,7 @@ aware:
         & Enter menu\\
 
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
+           \opt{IRIVER_RC_H100_PAD}{&} 
         \opt{IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,%
              MROBE100_PAD}{\ButtonPower}
         \opt{SANSA_C200_PAD,IRIVER_H10_PAD}{Long \ButtonPower}
