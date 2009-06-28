@@ -18,15 +18,16 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <string.h>
+
+#include "config.h"
 #include "logf.h"
 #include "system.h"
-#include "string.h"
 #include "audio.h"
 #include "debug.h"
+#include "udacodec.h"
 
-#include "i2c-coldfire.h"
 #include "audiohw.h"
-#include "pcf50606.h"
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -84,   0, -25},
@@ -109,13 +110,7 @@ unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
 /* Returns 0 if register was written or -1 if write failed */
 static int uda1380_write_reg(unsigned char reg, unsigned short value)
 {
-    unsigned char data[3];
-
-    data[0] = reg;
-    data[1] = value >> 8;
-    data[2] = value & 0xff;
-
-    if (i2c_write(I2C_IFACE_0, UDA1380_ADDR, data, 3) != 3)
+    if (udacodec_write(reg, value) < 0)
     {
         DEBUGF("uda1380 error reg=0x%x", reg);
         return -1;
@@ -193,23 +188,6 @@ static int audiohw_set_regs(void)
     return 0;
 }
 
-static void reset(void)
-{
-#ifdef IRIVER_H300_SERIES
-    int mask = disable_irq_save();
-    pcf50606_write(0x3b, 0x00);  /* GPOOD2 high Z */
-    pcf50606_write(0x3b, 0x07);  /* GPOOD2 low */
-    restore_irq(mask);
-#else
-    /* RESET signal */
-    or_l(1<<29, &GPIO_OUT);
-    or_l(1<<29, &GPIO_ENABLE);
-    or_l(1<<29, &GPIO_FUNCTION);
-    sleep(HZ/100);
-    and_l(~(1<<29), &GPIO_OUT);
-#endif
-}
-
 /**
  * Sets frequency settings for DAC and ADC relative to MCLK
  *
@@ -268,7 +246,7 @@ void audiohw_init(void)
     recgain_mic = 0;
     recgain_line = 0;
 
-    reset();
+    udacodec_reset();
 
     if (audiohw_set_regs() == -1)
     {
@@ -419,20 +397,13 @@ void audiohw_set_recvol(int left, int right, int type)
             {
                 /* for this order we can combine both registers,
                     making the glitch even smaller */
-                unsigned char data[5];
                 unsigned short value_dec;
                 unsigned short value_pga;
                 value_dec = DEC_VOLL(left) | DEC_VOLR(right);
                 value_pga = (uda1380_regs[REG_PGA] & ~PGA_GAIN_MASK)
                                 | PGA_GAINL(left_ag) | PGA_GAINR(right_ag);
 
-                data[0] = REG_DEC_VOL;
-                data[1] = value_dec >> 8;
-                data[2] = value_dec & 0xff;
-                data[3] = value_pga >> 8;
-                data[4] = value_pga & 0xff;
-
-                if (i2c_write(I2C_IFACE_0, UDA1380_ADDR, data, 5) != 5)
+                if (udacodec_write2(REG_DEC_VOL, value_dec, value_pga) < 0)
                 {
                     DEBUGF("uda1380 error reg=combi rec gain");
                 }

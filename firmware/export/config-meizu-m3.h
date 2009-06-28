@@ -85,8 +85,8 @@
 
 #define CONFIG_LCD LCD_MEIZUM6
 
-/* Define this if you have the WM8975 audio codec */
-#define HAVE_WM8751 //FIXME
+/* Define the type of audio codec */
+#define HAVE_UDA1380
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT

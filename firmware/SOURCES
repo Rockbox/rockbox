@@ -689,6 +689,7 @@ target/coldfire/iriver/h300/powermgmt-h300.c
 target/coldfire/iriver/h300/usb-h300.c
 #ifndef BOOTLOADER
 target/coldfire/iriver/audio-iriver.c
+target/coldfire/iriver/udacodec-iriver.c
 #endif
 #endif /* SIMULATOR */
 #endif /* IRIVER_H300_SERIES */
@@ -711,6 +712,7 @@ target/coldfire/iriver/h100/power-h100.c
 target/coldfire/iriver/h100/powermgmt-h100.c
 #ifndef BOOTLOADER
 target/coldfire/iriver/audio-iriver.c
+target/coldfire/iriver/udacodec-iriver.c
 target/coldfire/iriver/h100/spdif-h100.c
 #endif
 target/coldfire/iriver/h100/usb-h100.c
@@ -1250,6 +1252,7 @@ target/arm/s5l8700/meizu-m3/lcd-m3.c
 drivers/qt1106.c
 #ifndef SIMULATOR
 #ifndef BOOTLOADER
+target/arm/s5l8700/udacodec-meizu.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* MEIZU_M3 */
