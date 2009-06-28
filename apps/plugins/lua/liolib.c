@@ -259,7 +259,7 @@ static int read_number (lua_State *L, int *f) {
   if(i == 0) return 0;
   else {
     rb->lseek(*f, i-10, SEEK_CUR);
-    d = atoi(buf);
+    d = rb->atoi(buf);
     lua_pushnumber(L, d);
     return 1;
   }
