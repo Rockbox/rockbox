@@ -177,6 +177,8 @@ drivers/rtc/rtc_mc13783.c
 drivers/rtc/rtc_tcc77x.c
 #elif (CONFIG_RTC == RTC_JZ47XX)
 drivers/rtc/rtc_jz4740.c
+#elif (CONFIG_RTC == RTC_S35390A)
+drivers/rtc/rtc_s35390a.c
 #endif /* (CONFIG_RTC == RTC_) */
 #endif /* SIMULATOR */
 

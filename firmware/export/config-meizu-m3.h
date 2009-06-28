@@ -80,8 +80,8 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-#define CONFIG_RTC RTC_S5L8700
-//#define CONFIG_RTC RTC_S35390A
+//#define CONFIG_RTC RTC_S5L8700
+#define CONFIG_RTC RTC_S35390A
 
 #define CONFIG_LCD LCD_MEIZUM6
 
