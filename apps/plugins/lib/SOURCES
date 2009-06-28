@@ -5,6 +5,7 @@ fixedpoint.c
 playback_control.c
 rgb_hsv.c
 buflib.c
+display_text.c
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 grey_core.c
 grey_draw.c
