@@ -1,0 +1,110 @@
+ 
+\newcommand{\ButtonRCRew}{\btnfnt{Rewind}}
+\newcommand{\ButtonRCFF}{\btnfnt{Forward}}
+\newcommand{\ButtonRCVolUp}{\btnfnt{Volume Up}}
+\newcommand{\ButtonRCVolDown}{\btnfnt{Volume Down}}
+\newcommand{\ButtonRCSource}{\btnfnt{Source}}
+\newcommand{\ButtonRCBitrate}{\btnfnt{Bitrate}}
+\newcommand{\ButtonRCSelect}{\btnfnt{Navi}}
+\newcommand{\ButtonRCRec}{\btnfnt{Rec}}
+\newcommand{\ButtonRCMode}{\btnfnt{A-B}}
+\newcommand{\ButtonRCOn}{\btnfnt{Play}}
+\newcommand{\ButtonRCStop}{\btnfnt{Stop}}
+\newcommand{\ButtonRCHold}{\btnfnt{Hold}}
+
+%Button actions, standard context
+\newcommand{\ActionRCStdPrev}{\ButtonRCRew}
+\newcommand{\ActionRCStdPrevRepeat}{Long \ButtonRCRew}
+\newcommand{\ActionRCStdNext}{\ButtonRCFF}
+\newcommand{\ActionRCStdNextRepeat}{Long \ButtonRCFF}
+\newcommand{\ActionRCStdCancel}{\ButtonRCStop}
+\newcommand{\ActionRCStdContext}{Long \ButtonRCSelect}
+\newcommand{\ActionRCStdQuickScreen}{Long \ButtonRCMode}
+\newcommand{\ActionRCQuickScreenExit}{\ButtonRCMode}
+\newcommand{\ActionRCStdMenu}{\ButtonMode}
+\newcommand{\ActionRCStdOk}{\ButtonSelect}
+
+%Button actions, wps context
+\newcommand{\ActionRCWpsPlay}{\ButtonRCOn}
+\newcommand{\ActionRCWpsSkipNext}{\ButtonRCFF}
+\newcommand{\ActionRCWpsSkipPrev}{\ButtonRCRew}
+\newcommand{\ActionRCWpsSeekBack}{Long \ButtonRCFF}
+\newcommand{\ActionRCWpsSeekFwd}{Long \ButtonRCRew}
+\newcommand{\ActionRCWpsAbSetBNextDir}{\ButtonRCBitrate}
+\newcommand{\ActionRCWpsAbSetAPrevDir}{\ButtonRCSource}
+\newcommand{\ActionRCWpsStop}{\ButtonRCStop}
+\newcommand{\ActionRCWpsVolDown}{\ButtonRCVolDown}
+\newcommand{\ActionRCWpsVolUp}{\ButtonRCVolUp}
+\newcommand{\ActionRCWpsPitchScreen}{Long \ButtonRCOn}
+\newcommand{\ActionRCWpsQuickScreen}{Long \ButtonMode}
+\newcommand{\ActionRCWpsMenu}{\ButtonMode}
+\newcommand{\ActionRCWpsContext}{Long \ButtonSelect}
+\newcommand{\ActionRCWpsBrowse}{\ButtonSelect}
+\newcommand{\ActionRCWpsAbReset}{\ButtonOn{} + \ButtonSelect}
+\newcommand{\ActionRCWpsIdThreeScreen}{\ButtonOn{} + \ButtonMode}
+ 
+%Button actions, tree context
+\newcommand{\ActionRCTreeWps}{\ButtonRCOn}
+\newcommand{\ActionRCTreeStop}{\ButtonRCStop}
+\newcommand{\ActionRCTreeEnter}{\ButtonRCSelect}
+\newcommand{\ActionRCTreeParentDirectory}{\ButtonRCStop}
+
+%Button actions, YesNo context
+\newcommand{\ActionRCYesNoAccept}{\ButtonRCSelect}
+
+%Button actions, Setting context
+\newcommand{\ActionRCSettingInc}{\ButtonRCRew}
+\newcommand{\ActionRCSettingDec}{\ButtonRCFF}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionRCKbdLeft}{\ButtonRCRew}
+\newcommand{\ActionRCKbdRight}{\ButtonRCFF}
+\newcommand{\ActionRCKbdSelect}{\ButtonRCSelect}
+\newcommand{\ActionRCKbdCursorLeft}{\ButtonRCOn{} + \ButtonRCRew{} or \ButtonRCVolDown}
+\newcommand{\ActionRCKbdCursorRight}{\ButtonRCOn{} + \ButtonRCFF{} or \ButtonRCVolUp}
+\newcommand{\ActionRCKbdPageFlip}{\ButtonRCMode}
+\newcommand{\ActionRCKbdDone}{\ButtonRCOn}
+\newcommand{\ActionRCKbdAbort}{\ButtonRCStop}
+\newcommand{\ActionRCKbdBackSpace}{\ButtonRCRec}
+\newcommand{\ActionRCKbdMorseInput}{\ButtonRCOn{} + \ButtonRCMode}
+\newcommand{\ActionRCKbdMorseSelect}{\ButtonRCSelect}
+\newcommand{\ActionRCKbdUp}{\ButtonRCSource}
+\newcommand{\ActionRCKbdDown}{\ButtonRCBitrate}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionRCPsToggleMode}{\ButtonMode}
+\newcommand{\ActionRCPsIncSmall}{\ButtonRCFF}
+\newcommand{\ActionRCPsIncBig}{Long \ButtonRCFF}
+\newcommand{\ActionRCPsDecSmall}{\ButtonRCRew}
+\newcommand{\ActionRCPsDecBig}{Long \ButtonRCRew}
+\newcommand{\ActionRCPsNudgeLeft}{\ButtonRCSource}
+\newcommand{\ActionRCPsNudgeRight}{\ButtonRCBitratet}
+\newcommand{\ActionRCPsReset}{\ButtonRCSelect}
+\newcommand{\ActionRCPsExit}{\ButtonRCOn{} or \ButtonRCStop}
+
+%Button actions, Recording screen context
+\newcommand{\ActionRCRecPause}{\ButtonRCOn}
+\newcommand{\ActionRCRecNewfile}{\ButtonRCRec}
+\newcommand{\ActionRCRecSettingsInc}{\ButtonRCBitrate}
+\newcommand{\ActionRCRecSettingsDec}{\ButtonRCSource}
+\newcommand{\ActionRCRecPrev}{\ButtonRCRew}
+\newcommand{\ActionRCRecNext}{\ButtonRCFF}
+\newcommand{\ActionRCRecMenu}{\ButtonMode}
+\newcommand{\ActionRCRecExit}{\ButtonRCStop}
+
+%Button actions, FM radio context
+\newcommand{\ActionRCFMPreset}{\ButtonRCSelect}
+\newcommand{\ActionRCFMMenu}{Long \ButtonRCSelect}
+\newcommand{\ActionRCFMMode}{Long \ButtonRCOn}
+\newcommand{\ActionRCFMStop}{\ButtonRCStop}
+\newcommand{\ActionRCFMExit}{\ButtonRCMode}
+\newcommand{\ActionRCFMPlay}{\ButtonRCOn}
+\newcommand{\ActionRCFMSettingsInc}{\ActionRCSettingInc}
+\newcommand{\ActionRCFMSettingsDec}{\ActionRCSettingInc}
+\newcommand{\ActionRCFMPrev}{\ButtonRCRew}
+\newcommand{\ActionRCFMNext}{\ButtonRCFF}
+\newcommand{\ActionRCFMVolUp}{\ButtonRCVolUp}
+\newcommand{\ActionRCFMVolDown}{\ButtonRCVolDown}
+
+%Button actions, Bookmark screen context
+\newcommand{\ActionRCBmDelete}{\ButtonRCRec}
