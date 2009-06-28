@@ -685,76 +685,10 @@ RB_WRAP(backlight_set_brightness)
 }
 #endif
 
-RB_WRAP(open)
-{
-    const char* pathname = luaL_checkstring(L, 1);
-    int flags = luaL_checkint(L, 2);
-    int result = rb->open(pathname, flags);
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(close)
-{
-    int fd = luaL_checkint(L, 1);
-    int result = rb->close(fd);
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(read)
-{
-    size_t len, n, result = 0;
-    luaL_Buffer b;
-
-    int fd = luaL_checkint(L, 1);
-    size_t count = luaL_checkint(L, 2);
-
-    luaL_buffinit(L, &b);
-    len = LUAL_BUFFERSIZE;
-    do
-    {
-        char *p = luaL_prepbuffer(&b);
-
-        if (len > count)
-            len = count;
-
-        n = rb->read(fd, p, len);
-
-        luaL_addsize(&b, n);
-        count -= n;
-        result += n;
-    } while (count > 0 && n == len);
-    luaL_pushresult(&b); /* close buffer */
-
-    lua_pushinteger(L, result);
-    return 2;
-}
-
-RB_WRAP(lseek)
-{
-    int fd = luaL_checkint(L, 1);
-    off_t offset = luaL_checkint(L, 2);
-    int whence = luaL_checkint(L, 3);
-    off_t result = rb->lseek(fd, offset, whence);
-    lua_pushinteger(L, result);
-    return 1;
-}
-
 RB_WRAP(creat)
 {
     const char* pathname = luaL_checkstring(L, 1);
     int result = rb->creat(pathname);
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(write)
-{
-    size_t count;
-    int fd = luaL_checkint(L, 1);
-    void* buf = (void*)luaL_checklstring(L, 2, &count);
-    ssize_t result = rb->write(fd, buf, count);
     lua_pushinteger(L, result);
     return 1;
 }
@@ -772,23 +706,6 @@ RB_WRAP(rename)
     const char* path = luaL_checkstring(L, 1);
     const char* newname = luaL_checkstring(L, 2);
     int result = rb->rename(path, newname);
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(ftruncate)
-{
-    int fd = luaL_checkint(L, 1);
-    off_t length = luaL_checkint(L, 2);
-    int result = rb->ftruncate(fd, length);
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(filesize)
-{
-    int fd = luaL_checkint(L, 1);
-    off_t result = rb->filesize(fd);
     lua_pushinteger(L, result);
     return 1;
 }
@@ -940,16 +857,9 @@ static const luaL_Reg rocklib[] =
 #endif
 
     /* File handling */
-    R(open),
-    R(close),
-    R(read),
-    R(lseek),
     R(creat),
-    R(write),
     R(remove),
     R(rename),
-    R(ftruncate),
-    R(filesize),
     R(file_exists),
 
     /* Kernel */
@@ -1007,16 +917,6 @@ LUALIB_API int luaopen_rock(lua_State *L)
 
     RB_CONSTANT(LCD_WIDTH);
     RB_CONSTANT(LCD_HEIGHT);
-
-    RB_CONSTANT(O_RDONLY);
-    RB_CONSTANT(O_WRONLY);
-    RB_CONSTANT(O_RDWR);
-    RB_CONSTANT(O_CREAT);
-    RB_CONSTANT(O_APPEND);
-    RB_CONSTANT(O_TRUNC);
-    RB_CONSTANT(SEEK_SET);
-    RB_CONSTANT(SEEK_CUR);
-    RB_CONSTANT(SEEK_END);
 
     RB_CONSTANT(FONT_SYSFIXED);
     RB_CONSTANT(FONT_UI);

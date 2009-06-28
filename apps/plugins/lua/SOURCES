@@ -8,6 +8,7 @@ ldo.c
 ldump.c
 lfunc.c
 lgc.c
+liolib.c
 llex.c
 lmem.c
 loadlib.c

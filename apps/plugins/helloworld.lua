@@ -21,31 +21,29 @@
 
 ]]--
 
-require("actions") -- Contains rb.actions & rb.contexts
+require("actions")   -- Contains rb.actions & rb.contexts
+--require("buttons") -- Contains rb.buttons; not needed in this example
 
 -- Example function which splashes a message for x seconds
 function sayhello(seconds)
-    message = string.format("Hello world from LUA for %d seconds", seconds)
+    local message = string.format("Hello world from LUA for %d seconds", seconds)
     rb.splash(seconds * rb.HZ, message)
 end
 
--- Helper function which draws a transparent image at the center of the screen
+-- Helper function which draws a (transparent) image at the center of the screen
 function draw_image(img)
     local x, y = (rb.LCD_WIDTH - img:width()) / 2, (rb.LCD_HEIGHT - img:height()) / 2
 
     local func = rb.lcd_bitmap_transparent_part
-    if(func == nil) then
-        func = rb.lcd_bitmap_part -- Fallback version for grayscale targets
-        if(func == nil) then
-            func = rb.lcd_mono_bitmap_part -- Fallback version for mono targets
-        end
-    end
+              or rb.lcd_bitmap_part      -- Fallback version for grayscale targets
+              or rb.lcd_mono_bitmap_part -- Fallback version for mono targets
+
     func(img, 0, 0, img:width(), x, y, img:width(), img:height())
     rb.lcd_update()
 end
 
 -- Helper function that acts like a normal printf() would do
-line = 0
+local line = 0
 function printf(...)
     local msg = string.format(...)
     local res, w, h = rb.font_getstringsize(msg, rb.FONT_UI)
@@ -66,37 +64,26 @@ end
 
 -- Helper function which reads the contents of a file
 function file_get_contents(filename)
-    if(not rb.file_exists(filename)) then
+    local file = io.open(filename, "r")
+    if(file == nil) then
         return nil
     end
 
-    local fd = rb.open(filename, rb.O_RDONLY)
-    if(fd == -1) then
-        return nil
-    end
-
-    local contents = rb.read(fd, rb.filesize(fd))
-    rb.close(fd)
+    local contents = file:read("*all") -- See Lua manual for more information
+    file:close() -- GC takes care of this if you would've forgotten it
 
     return contents
 end
 
 -- Helper function which saves contents to a file
 function file_put_contents(filename, contents)
-    local flags = rb.O_WRONLY
-    if(rb.file_exists(filename)) then
-        flags = bit.bor(flags, rb.O_APPEND) -- binary OR O_APPEND if the file exists
-    else
-        flags = bit.bor(flags, rb.O_CREAT) -- binary OR O_CREAT if the file doesn't exist
-    end
-
-    local fd = rb.open(filename, flags)
-    if(fd == -1) then
+    local file = io.open(filename, "w+") -- See Lua manual for more information
+    if(file == nil) then
         return false
     end
 
-    local ret = rb.write(fd, contents) ~= string.len(contents)
-    rb.close(fd)
+    local ret = file:write(contents) == 1
+    file:close() -- GC takes care of this if you would've forgotten it
     return ret
 end
 
@@ -120,13 +107,10 @@ if(rb.lcd_rgbpack ~= nil) then -- Only do this when we're on a color target, i.e
 end
 
 -- Load a BMP file in the variable backdrop
-local backdrop = rb.read_bmp_file("/.rockbox/icons/tango_small_viewers.bmp") -- This image should always be present?
-if(backdrop == nil) then
-    backdrop = rb.read_bmp_file("/.rockbox/icons/tango_small_viewers_mono.bmp") -- Try using the mono version
-    if(backdrop == nil) then
-        backdrop = rb.read_bmp_file("/.rockbox/icons/viewers.bmp") -- Try using the builtin version
-    end
-end
+local backdrop = rb.read_bmp_file("/.rockbox/icons/tango_small_viewers.bmp")      -- This image should always be present...
+              or rb.read_bmp_file("/.rockbox/icons/tango_small_viewers_mono.bmp") -- ... if not, try using the mono version...
+              or rb.read_bmp_file("/.rockbox/icons/viewers.bmp")                  -- ... or try using the builtin version
+
 -- Draws the image using our own draw_image() function; see up
 draw_image(backdrop)
 
@@ -134,7 +118,7 @@ draw_image(backdrop)
 rb.lcd_update()
 
 -- Sleep for 2 seconds
-seconds = 2
+local seconds = 2
 rb.sleep(seconds * rb.HZ) -- rb.HZ equals to the amount of ticks that fit in 1 second
 
 -- Call the function sayhello() with arguments seconds
@@ -152,14 +136,18 @@ file_put_contents(pathname, "Hello from Lua!")
 -- Splash the contents of pathname
 printf(file_get_contents(pathname))
 
-line = line + 1 -- empty line
+line = line + 1 -- Add empty line
+
+-- Some examples of how bitlib works
+printf("1 | 2 = %d <> 7 & 3 = %d", bit.bor(1, 2), bit.band(7, 3))
+printf("~8 = %d <> 5 ^ 1 = %d", bit.bnot(8), bit.bxor(5, 1))
+
+line = line + 1 -- Add empty line
 
 -- Display some long lines
-local tmp = ""
-for i=1, 5 do
-    printf("This is a %s long line!", tmp)
-    tmp = tmp .. " very very very"
-    rb.yield()
+for i=0, 4 do
+    printf("This is a %slong line!", string.rep("very very very ", i))
+    rb.yield() -- Always try to yield to give other threads some breathing space!
 end
 
 -- Loop until the user exits the program
