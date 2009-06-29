@@ -504,6 +504,7 @@ target/sh/archos/fm_v2/usb-fm_v2.c
 
 #if defined(ARCHOS_ONDIOFM) || defined(ARCHOS_ONDIOSP)
 #ifndef SIMULATOR
+target/sh/archos/timer-archos.c
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
 target/sh/archos/ondio/button-ondio.c
