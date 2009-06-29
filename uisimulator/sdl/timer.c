@@ -36,9 +36,8 @@ Uint32 SDL_timer_callback(Uint32 interval, void *param){
     ((int)((1000*cycles)/TIMER_FREQ))
 
 bool timer_register(int reg_prio, void (*unregister_callback)(void),
-                    long cycles, int int_prio, void (*timer_callback)(void))
+                    long cycles, void (*timer_callback)(void))
 {
-    (void)int_prio;/* interrupt priority not used */
     (void)unregister_callback;
     if (reg_prio <= timer_prio || cycles == 0)
         return false;

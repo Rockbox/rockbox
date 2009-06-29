@@ -41,7 +41,7 @@
  #define TIMER_FREQ CPU_FREQ
 #endif
 bool timer_register(int reg_prio, void (*unregister_callback)(void),
-                    long cycles, int int_prio, void (*timer_callback)(void)
+                    long cycles, void (*timer_callback)(void)
                     IF_COP(,int core));
 bool timer_set_period(long cycles);
 #ifdef CPU_COLDFIRE

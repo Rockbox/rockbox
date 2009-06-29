@@ -2438,11 +2438,10 @@ void thread_wait(struct thread_entry *thread)
     \param thread
     \description
 
-bool timer_register(int reg_prio, void (*unregister_callback)(void), long cycles, int int_prio, void (*timer_callback)(void) IF_COP(, int core))
+bool timer_register(int reg_prio, void (*unregister_callback)(void), long cycles, void (*timer_callback)(void) IF_COP(, int core))
     \param reg_prio
     \param unregister_callback
     \param cycles
-    \param int_prio
     \param core
     \param timer_callback
     \return

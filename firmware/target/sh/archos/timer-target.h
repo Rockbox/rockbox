@@ -24,7 +24,7 @@
 #include "config.h"
 
 bool __timer_set(long cycles, bool start);
-bool __timer_start(int int_prio);
+bool __timer_start(void);
 void __timer_stop(void);
 
 #define TIMER_FREQ CPU_FREQ
@@ -32,8 +32,8 @@ void __timer_stop(void);
 #define __TIMER_SET(cycles, set) \
     __timer_set(cycles, set)
 
-#define __TIMER_START(int_prio) \
-    __timer_start(int_prio)
+#define __TIMER_START() \
+    __timer_start()
 
 #define __TIMER_STOP(...) \
     __timer_stop()

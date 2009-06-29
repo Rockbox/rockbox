@@ -39,10 +39,10 @@ void __timer_stop(void);
     __timer_set(cycles, set)
 
 #if NUM_CORES > 1
-#define __TIMER_START(int_prio, core) \
+#define __TIMER_START(core) \
     __timer_start(core)
 #else
-#define __TIMER_START(int_prio) \
+#define __TIMER_START() \
     __timer_start()
 #endif
 

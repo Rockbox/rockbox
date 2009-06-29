@@ -910,7 +910,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif /* CONFIG_CODEC != SWCODEC */
 
     calc_period();
-    rb->timer_register(1, NULL, TIMER_FREQ/1024, 1, timer_callback IF_COP(, CPU));
+    rb->timer_register(1, NULL, TIMER_FREQ/1024, timer_callback IF_COP(, CPU));
 
     draw_display();
 

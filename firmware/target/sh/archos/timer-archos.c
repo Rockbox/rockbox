@@ -71,9 +71,9 @@ bool __timer_set(long cycles, bool start)
     return true;
 }
 
-bool __timer_start(int int_prio)
+bool __timer_start(void)
 {
-    IPRD = (IPRD & 0xFF0F) | int_prio << 4;  /* interrupt priority */
+    IPRD = (IPRD & 0xFF0F) | 1 << 4;  /* interrupt priority */
     or_b(0x10, &TSTR); /* start timer 4 */
     return true;
 }

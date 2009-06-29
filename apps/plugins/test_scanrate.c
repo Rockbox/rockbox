@@ -162,7 +162,7 @@ int plugin_main(void)
     rb->cpu_boost(true);
 #endif
     /* The actual frequency is twice the displayed value */
-    rb->timer_register(1, NULL, TIMER_FREQ * 5 / scan_rate, 1,
+    rb->timer_register(1, NULL, TIMER_FREQ * 5 / scan_rate,
                        timer_isr IF_COP(, CPU));
 
     while (!done)

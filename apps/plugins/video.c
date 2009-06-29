@@ -562,10 +562,10 @@ int SeekTo(int fd, int nPos)
         gPlay.bVideoUnderrun = false;
         /* start display interrupt */
 #if FREQ == 12000000 /* Ondio speed kludge */
-        rb->timer_register(1, NULL, gPlay.nFrameTimeAdjusted, 1,
+        rb->timer_register(1, NULL, gPlay.nFrameTimeAdjusted,
                            timer4_isr IF_COP(, CPU));
 #else
-        rb->timer_register(1, NULL, gFileHdr.video_frametime, 1,
+        rb->timer_register(1, NULL, gFileHdr.video_frametime,
                            timer4_isr IF_COP(, CPU));
 #endif
     }
@@ -748,10 +748,10 @@ int PlayTick(int fd)
                 {   /* start the video */
 #if FREQ == 12000000 /* Ondio speed kludge */
                     rb->timer_register(1, NULL,
-                        gPlay.nFrameTimeAdjusted, 1, timer4_isr);
+                        gPlay.nFrameTimeAdjusted, timer4_isr);
 #else
                     rb->timer_register(1, NULL,
-                        gFileHdr.video_frametime, 1, timer4_isr);
+                        gFileHdr.video_frametime, timer4_isr);
 #endif
                 }
             }

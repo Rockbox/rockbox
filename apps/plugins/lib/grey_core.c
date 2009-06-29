@@ -648,11 +648,10 @@ void grey_show(bool enable)
 #endif
 #if NUM_CORES > 1
         rb->timer_register(1, NULL, TIMER_FREQ / LCD_SCANRATE,
-                                      1, _timer_isr,
+                                      _timer_isr,
                                       (_grey_info.flags & GREY_ON_COP) ? COP : CPU);
 #else
-        rb->timer_register(1, NULL, TIMER_FREQ / LCD_SCANRATE, 1,
-                                      _timer_isr);
+        rb->timer_register(1, NULL, TIMER_FREQ / LCD_SCANRATE, _timer_isr);
 #endif
 #endif /* !SIMULATOR */
         rb->screen_dump_set_hook(grey_screendump_hook);
