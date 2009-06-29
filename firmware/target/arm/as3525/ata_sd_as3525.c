@@ -571,7 +571,11 @@ static int sd_wait_for_state(const int drive, unsigned int state)
 
 static int sd_select_bank(signed char bank)
 {
-    unsigned char card_data[512];
+    /* allocate card data buffer on the stack */
+    unsigned char card_data[512 + 31];
+    /* align it on cache line size */
+    unsigned char *aligned_card_data = (void*)(((int)&card_data[0] + 31) & ~31);
+    unsigned char *uncached_card_data = UNCACHED_ADDR(aligned_card_data);
     int ret;
 
     do {
@@ -592,19 +596,22 @@ static int sd_select_bank(signed char bank)
 
         mci_delay();
 
-        memset(card_data, 0, 512);
+        memset(uncached_card_data, 0, 512);
         if(bank == -1)
         {   /* enable bank switching */
-            card_data[0] = 16;
-            card_data[1] = 1;
-            card_data[2] = 10;
+            uncached_card_data[0] = 16;
+            uncached_card_data[1] = 1;
+            uncached_card_data[2] = 10;
         }
         else
-            card_data[0] = bank;
+            uncached_card_data[0] = bank;
 
         dma_retain();
-        dma_enable_channel(0, card_data, MCI_FIFO(INTERNAL_AS3525), DMA_PERI_SD,
-            DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
+        /* we don't use the uncached card data for DMA, because we need the
+         * physical memory address for DMA transfers */
+        dma_enable_channel(0, aligned_card_data, MCI_FIFO(INTERNAL_AS3525),
+            DMA_PERI_SD, DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8,
+            NULL);
 
         MCI_DATA_TIMER(INTERNAL_AS3525) = SD_MAX_WRITE_TIMEOUT;
         MCI_DATA_LENGTH(INTERNAL_AS3525) = 512;
