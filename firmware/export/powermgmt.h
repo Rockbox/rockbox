@@ -99,7 +99,9 @@ extern unsigned int power_thread_inputs;
 #endif
 
 #ifdef HAVE_REMOTE_LCD
+#ifndef CURRENT_REMOTE
 #define CURRENT_REMOTE      1  /* additional current when remote connected */
+#endif /* CURRENT_REMOTE */
 #endif /* HAVE_REMOTE_LCD */
 
 #if CONFIG_CHARGING
