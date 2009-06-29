@@ -31,7 +31,7 @@ void __timer_stop(void);
 #define __TIMER_SET(cycles, set) \
     __timer_set(cycles, set)
 
-#define __TIMER_START() \
+#define __TIMER_START(int_prio) \
     __timer_start()
 
 #define __TIMER_STOP(...) \

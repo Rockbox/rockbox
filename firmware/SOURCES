@@ -461,6 +461,7 @@ drivers/i2c.c
 #ifdef ARCHOS_PLAYER
 #ifndef SIMULATOR
 target/sh/archos/ata-archos.c
+target/sh/archos/timer-archos.c
 target/sh/archos/ata-as-archos.S
 target/sh/archos/player/button-player.c
 target/sh/archos/player/hwcompat-player.c
@@ -475,6 +476,7 @@ target/sh/archos/player/usb-player.c
 #ifdef ARCHOS_RECORDER
 #ifndef SIMULATOR
 target/sh/archos/ata-archos.c
+target/sh/archos/timer-archos.c
 target/sh/archos/ata-as-archos.S
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S   
@@ -488,6 +490,7 @@ target/sh/archos/recorder/usb-recorder.c
 #if defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
 #ifndef SIMULATOR
 target/sh/archos/ata-archos.c
+target/sh/archos/timer-archos.c
 target/sh/archos/ata-as-archos.S
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S

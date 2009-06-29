@@ -7,7 +7,7 @@
 *                     \/            \/     \/    \/            \/
 * $Id$
 *
-* Copyright (C) 2007 by Karl Kurbjun
+* Copyright (C) 2005 Jens Arnold
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -21,18 +21,19 @@
 #ifndef TIMER_TARGET_H
 #define TIMER_TARGET_H
 
-/* timer is based on PCLK and minimum division is 2 */
-#define TIMER_FREQ (27000000)
+#include "config.h"
 
-bool __timer_set(long cycles, bool set);
-bool __timer_start(void);
+bool __timer_set(long cycles, bool start);
+bool __timer_start(int int_prio);
 void __timer_stop(void);
+
+#define TIMER_FREQ CPU_FREQ
 
 #define __TIMER_SET(cycles, set) \
     __timer_set(cycles, set)
 
 #define __TIMER_START(int_prio) \
-    __timer_start()
+    __timer_start(int_prio)
 
 #define __TIMER_STOP(...) \
     __timer_stop()

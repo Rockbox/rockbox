@@ -42,15 +42,7 @@ static long SHAREDBSS_ATTR cycles_new = 0;
 #endif
 
 /* interrupt handler */
-#if CONFIG_CPU == SH7034
-void IMIA4(void) __attribute__((interrupt_handler));
-void IMIA4(void)
-{
-    if (pfn_timer != NULL)
-        pfn_timer();
-    and_b(~0x01, &TSR4); /* clear the interrupt */
-}
-#elif defined(CPU_PP)
+#if defined(CPU_PP)
 void TIMER2(void)
 {
     TIMER2_VAL; /* ACK interrupt */
@@ -72,43 +64,7 @@ void TIMER2(void)
 
 static bool timer_set(long cycles, bool start)
 {
-#if CONFIG_CPU == SH7034
-    int phi = 0; /* bits for the prescaler */
-    int prescale = 1;
-
-    while (cycles > 0x10000)
-    {   /* work out the smallest prescaler that makes it fit */
-        phi++;
-        prescale <<= 1;
-        cycles >>= 1;
-    }
-
-    if (prescale > 8)
-        return false;
-
-    if (start)
-    {
-        if (pfn_unregister != NULL)
-        {
-            pfn_unregister();
-            pfn_unregister = NULL;
-        }
-
-        and_b(~0x10, &TSTR); /* Stop the timer 4 */
-        and_b(~0x10, &TSNC); /* No synchronization */
-        and_b(~0x10, &TMDR); /* Operate normally */
-
-        TIER4 = 0xF9;        /* Enable GRA match interrupt */
-    }
-
-    TCR4 = 0x20 | phi;   /* clear at GRA match, set prescaler */
-    GRA4 = (unsigned short)(cycles - 1);
-    if (start || (TCNT4 >= GRA4))
-        TCNT4 = 0;
-    and_b(~0x01, &TSR4); /* clear an eventual interrupt */
-
-    return true;
-#elif defined(CPU_PP)
+#if defined(CPU_PP)
     if (cycles > 0x20000000 || cycles < 2)
         return false;
 
@@ -153,11 +109,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     pfn_unregister = unregister_callback;
     timer_prio = reg_prio;
 
-#if CONFIG_CPU == SH7034
-    IPRD = (IPRD & 0xFF0F) | int_prio << 4;  /* interrupt priority */
-    or_b(0x10, &TSTR); /* start timer 4 */
-    return true;
-#elif defined(CPU_PP)
+#if defined(CPU_PP)
     /* unmask interrupt source */
 #if NUM_CORES > 1
     if (core == COP)
@@ -167,7 +119,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
         CPU_INT_EN = TIMER2_MASK;
     return true;
 #else
-    return __TIMER_START();
+    return __TIMER_START(int_prio);
 #endif
     /* Cover for targets that don't use all these */
     (void)reg_prio;
@@ -185,10 +137,7 @@ bool timer_set_period(long cycles)
 
 void timer_unregister(void)
 {
-#if CONFIG_CPU == SH7034
-    and_b(~0x10, &TSTR);    /* stop the timer 4 */
-    IPRD = (IPRD & 0xFF0F); /* disable interrupt */
-#elif defined(CPU_PP)
+#if defined(CPU_PP)
     TIMER2_CFG = 0;         /* stop timer 2 */
     CPU_INT_DIS = TIMER2_MASK;
     COP_INT_DIS = TIMER2_MASK;
