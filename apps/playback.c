@@ -2179,11 +2179,16 @@ static void audio_stop_codec_flush(void)
 
 static void audio_stop_playback(void)
 {
-    /* If we were playing, save resume information */
     if (playing)
     {
-        pcmbuf_play_remainder();
-    
+        /* If still actively playing here, play out the last samples in the track
+         * before stopping.  A manual stop is actually paused at this point, so
+         * don't continue playback.
+         */
+        if (!paused)
+            pcmbuf_play_remainder();
+        
+        /* If we were playing, save resume information */
         struct mp3entry *id3 = NULL;
 
         if (!ci.stop_codec)
