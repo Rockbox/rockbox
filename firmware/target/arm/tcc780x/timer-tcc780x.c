@@ -62,7 +62,7 @@ bool __timer_set(long cycles, bool start)
     return true;
 }
 
-bool __timer_register(void)
+bool __timer_start(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_STATUS);
     
@@ -73,7 +73,7 @@ bool __timer_register(void)
     return true;
 }
 
-void __timer_unregister(void)
+void __timer_stop(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_STATUS);
     

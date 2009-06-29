@@ -39,9 +39,8 @@ static long SHAREDBSS_ATTR cycles_new = 0;
 /* Define these if not defined by target to make the #else cases compile
  * even if the target doesn't have them implemented. */
 #define __TIMER_SET(cycles, set) false
-#define __TIMER_REGISTER(reg_prio, unregister_callback, cycles, \
-                         int_prio, timer_callback) false
-#define __TIMER_UNREGISTER(...)
+#define __TIMER_START() false
+#define __TIMER_STOP(...)
 #endif
 
 /* interrupt handler */
@@ -288,8 +287,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     irq_enable_int(IRQ_TIMER1);
     return true;
 #else
-    return __TIMER_REGISTER(reg_prio, unregister_callback, cycles,
-                            int_prio, timer_callback);
+    return __TIMER_START();
 #endif
     /* Cover for targets that don't use all these */
     (void)reg_prio;
@@ -321,7 +319,7 @@ void timer_unregister(void)
     TIMER1.ctrl &= ~0x80;  /* disable timer 1 */
     irq_disable_int(IRQ_TIMER1);
 #else
-    __TIMER_UNREGISTER();
+    __TIMER_STOP();
 #endif
     pfn_timer = NULL;
     pfn_unregister = NULL;

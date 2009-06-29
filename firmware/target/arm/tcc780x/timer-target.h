@@ -25,17 +25,16 @@
 #define TIMER_FREQ (2000000)
 
 bool __timer_set(long cycles, bool set);
-bool __timer_register(void);
-void __timer_unregister(void);
+bool __timer_start(void);
+void __timer_stop(void);
 
 #define __TIMER_SET(cycles, set) \
     __timer_set(cycles, set)
 
-#define __TIMER_REGISTER(reg_prio, unregister_callback, cycles, \
-                              int_prio, timer_callback) \
-    __timer_register()
+#define __TIMER_START() \
+    __timer_start()
 
-#define __TIMER_UNREGISTER(...) \
-    __timer_unregister()
+#define __TIMER_STOP(...) \
+    __timer_stop()
 
 #endif /* TIMER_TARGET_H */

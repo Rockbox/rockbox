@@ -82,7 +82,7 @@ static void stop_timer(void)
     IO_CLK_MOD2 &= ~CLK_MOD2_TMR0; //disable TIMER0 clock
 }
 
-bool __timer_register(void)
+bool __timer_start(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     
@@ -100,7 +100,7 @@ bool __timer_register(void)
     return true;
 }
 
-void __timer_unregister(void)
+void __timer_stop(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     stop_timer();

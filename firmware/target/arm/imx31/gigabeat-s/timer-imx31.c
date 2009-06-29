@@ -86,7 +86,7 @@ bool _timer_set(long cycles, bool start)
     return true;
 }
 
-bool _timer_register(void)
+bool _timer_start(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
 
@@ -104,7 +104,7 @@ bool _timer_register(void)
     return true;
 }
 
-void _timer_unregister(void)
+void _timer_stop(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     /* Halt timer if running - stop module clock */

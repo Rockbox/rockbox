@@ -79,14 +79,14 @@ bool __timer_set(long cycles, bool start)
     return true;
 }
 
-bool __timer_register(void)
+bool __timer_start(void)
 {
     __tcu_start_counter(1);
 
     return true;
 }
 
-void __timer_unregister(void)
+void __timer_stop(void)
 {
     unsigned int old_irq = disable_irq_save();
     __tcu_stop_counter(1);
