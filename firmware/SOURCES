@@ -394,6 +394,7 @@ target/arm/as3525/pcm-as3525.c
 
 #if defined(CPU_PP)
 target/arm/kernel-pp.c
+target/arm/timer-pp.c
 #if CONFIG_CPU == PP5002
 target/arm/system-pp5002.c
 #elif defined CPU_PP502x
