@@ -497,4 +497,7 @@ interface */
 /* PCM addresses for obtaining buffers will be what DMA is using (physical) */
 #define HAVE_PCM_DMA_ADDRESS
 
+/* Timer frequency */
+#define TIMER_FREQ (24000000 / 16)
+
 #endif /*__AS3525_H__*/

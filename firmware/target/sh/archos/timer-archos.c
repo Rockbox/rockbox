@@ -22,7 +22,6 @@
 #include "cpu.h"
 #include "system.h"
 #include "timer.h"
-#include "timer-target.h"
 
 void IMIA4(void) __attribute__((interrupt_handler));
 void IMIA4(void)

@@ -25,7 +25,6 @@
 #include "system.h"
 #include "cpu.h"
 #include "timer.h"
-#include "timer-target.h"
 
 static int base_prescale;
 

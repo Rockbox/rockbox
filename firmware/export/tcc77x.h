@@ -261,4 +261,8 @@
 #define USB_NUM_ENDPOINTS 3
 #define USB_DEVBSS_ATTR   IBSS_ATTR
 
+/* Timer frequency */
+/* timers are based on XIN (12Mhz) */
+#define TIMER_FREQ (12000000)
+
 #endif

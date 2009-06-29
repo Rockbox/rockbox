@@ -370,4 +370,7 @@
 #define SCI_MPB               0x02        /* Multiprocessor bit */
 #define SCI_MPBT              0x01        /* Multiprocessor bit transfer */
 
+/* Timer frequency */
+#define TIMER_FREQ CPU_FREQ
+
 #endif

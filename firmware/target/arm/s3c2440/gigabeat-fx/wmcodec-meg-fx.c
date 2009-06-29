@@ -30,7 +30,7 @@
 #include "sound.h"
 #include "i2c-meg-fx.h"
 #include "system-target.h"
-#include "timer-target.h"
+#include "timer.h"
 #include "wmcodec.h"
 
 #ifdef HAVE_HARDWARE_BEEP

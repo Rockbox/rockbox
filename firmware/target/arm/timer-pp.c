@@ -22,7 +22,6 @@
 #include "cpu.h"
 #include "system.h"
 #include "timer.h"
-#include "timer-target.h"
 
 static long SHAREDBSS_ATTR cycles_new = 0;
 

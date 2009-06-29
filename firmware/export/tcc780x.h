@@ -249,4 +249,8 @@
 #define USB_NUM_ENDPOINTS 3
 #define USB_DEVBSS_ATTR   IBSS_ATTR
 
+/* Timer frequency */
+/* Timer is based on PCK_TCT (set to 2Mhz in system.c) */
+#define TIMER_FREQ (2000000)
+
 #endif

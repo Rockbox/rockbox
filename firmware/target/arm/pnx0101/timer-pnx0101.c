@@ -19,7 +19,6 @@
 *
 ****************************************************************************/
 
-#include "timer-target.h"
 #include "system.h"
 #include "timer.h"
 

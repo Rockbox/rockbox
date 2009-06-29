@@ -279,5 +279,8 @@
 #define DMA1_REQ_AUDIO_1     0x8000
 #define DMA1_REQ_AUDIO_2     0x8100
 
+/* Timer frequency */
+/* timer is based on busclk == cpuclk/2 */
+#define TIMER_FREQ (CPU_FREQ/2)
 
 #endif

@@ -248,4 +248,8 @@
 #define MMAP3_LOGICAL    (*(volatile unsigned long *)(0xf000f018))
 #define MMAP3_PHYSICAL   (*(volatile unsigned long *)(0xf000f01c))
 
+/* Timer frequency */
+/* Portalplayer chips use a microsecond timer. */
+#define TIMER_FREQ 1000000
+
 #endif

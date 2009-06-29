@@ -676,3 +676,7 @@ base address */
 #define AT91C_EBI_SDRAM_32BIT    (0x20000000) /* SDRAM on EBI Chip Select 1
 base address */
 #define AT91C_BASE_AIC       0xFFFFF000 /* (AIC) Base Address */
+
+/* Timer frequency */
+/* timer is based on PCLK and minimum division is 2 */
+#define TIMER_FREQ (49156800/2)

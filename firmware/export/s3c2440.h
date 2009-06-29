@@ -550,4 +550,11 @@
 #define DRAM1 0x31000000
 #define BOOTRAM 0x40000000
 
+/* Timer frequency */
+
+/* timer is based on PCLK and minimum division is 2 */
+#define TIMER_FREQ (49156800/2)
+#define TIMER234_PRESCALE 21
+
+
 #endif /* __S3C2440_H__ */

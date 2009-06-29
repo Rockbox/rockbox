@@ -262,4 +262,7 @@ struct pnx0101_audio {
  
 #endif /* ASM */
 
+/* Timer frequency */
+#define TIMER_FREQ 3000000
+
 #endif

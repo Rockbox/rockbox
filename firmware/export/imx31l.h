@@ -1754,4 +1754,8 @@
 #define UART_FIFO_CTRL          0x881
 #define TIMEOUT                 1000
 
+/* Timer frequency */
+/* timer is based on ipg_clk */
+#define TIMER_FREQ (66000000)
+
 #endif /* __IMX31L_H__ */

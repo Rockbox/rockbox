@@ -1016,4 +1016,8 @@ extern unsigned long _ttbstart;
 #define VENC_DCLKCTL_DCKIH    (1 << 8)
 #define VENC_DCLKCTL_DCKPW(x) (x << 0)
 
+/* Timer frequency */
+/* timer is based on PCLK and minimum division is 2 */
+#define TIMER_FREQ (27000000)
+
 #endif

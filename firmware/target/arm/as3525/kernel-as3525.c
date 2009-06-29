@@ -22,7 +22,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "panic.h"
-#include "timer-target.h"
+#include "timer.h"
 
 #ifdef HAVE_SCROLLWHEEL
 /* let the timer interrupt twice as often for the scrollwheel polling */

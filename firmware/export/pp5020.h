@@ -690,4 +690,8 @@
 #define DMA_INCR_WIDTH_32BIT    (0x2 << 28)
 /* All other values reserved? */
 
+/* Timer frequency */
+/* Portalplayer chips use a microsecond timer. */
+#define TIMER_FREQ 1000000
+
 #endif /* __PP5020_H__ */

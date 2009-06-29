@@ -5209,4 +5209,7 @@ struct Ration2m
 #define USB_NUM_ENDPOINTS  3
 #define USB_DEVBSS_ATTR    IBSS_ATTR
 
+/* Timer frequency */
+#define TIMER_FREQ (CFG_EXTAL) /* For full precision! */
+
 #endif /* __JZ4740_H__ */
