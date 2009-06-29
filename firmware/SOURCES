@@ -372,6 +372,7 @@ target/arm/pnx0101/system-pnx0101.c
 #if CONFIG_CPU == AS3525
 target/arm/as3525/system-as3525.c
 target/arm/as3525/kernel-as3525.c
+target/arm/as3525/timer-as3525.c
 target/arm/as3525/ata_sd_as3525.c
 target/arm/as3525/power-as3525.c
 target/arm/as3525/usb-as3525.c

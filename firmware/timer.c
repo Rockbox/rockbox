@@ -61,14 +61,6 @@ void TIMER1(void)
         pfn_timer();
     TER1 = 0xff; /* clear all events */
 }
-#elif CONFIG_CPU == AS3525
-void INT_TIMER1(void)
-{
-    if (pfn_timer != NULL)
-        pfn_timer();
-
-    TIMER1_INTCLR = 0; /* clear interrupt */
-}
 #elif defined(CPU_PP)
 void TIMER2(void)
 {
@@ -170,25 +162,6 @@ static bool timer_set(long cycles, bool start)
         TCNT4 = 0;
     and_b(~0x01, &TSR4); /* clear an eventual interrupt */
 
-    return true;
-#elif CONFIG_CPU == AS3525
-    if (start)
-    {
-        if (pfn_unregister != NULL)
-        {
-            pfn_unregister();
-            pfn_unregister = NULL;
-        }
-    }
-
-    TIMER1_LOAD = TIMER1_BGLOAD = cycles;
-    /* /!\ bit 4 (reserved) must not be modified
-     * periodic mode, interrupt enabled, no prescale, 32 bits counter */
-    TIMER1_CONTROL = (TIMER1_CONTROL & (1<<4)) |
-                     TIMER_ENABLE |
-                     TIMER_PERIODIC |
-                     TIMER_INT_ENABLE |
-                     TIMER_32_BIT;
     return true;
 #elif defined CPU_COLDFIRE
     if (prescale > 4096/CPUFREQ_MAX_MULT)
@@ -314,10 +287,6 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     irq_set_int_handler(IRQ_TIMER1, TIMER1_ISR);
     irq_enable_int(IRQ_TIMER1);
     return true;
-#elif CONFIG_CPU == AS3525
-    CGU_PERI |= CGU_TIMER1_CLOCK_ENABLE;    /* enable peripheral */
-    VIC_INT_ENABLE |= INTERRUPT_TIMER1;
-    return true;
 #else
     return __TIMER_REGISTER(reg_prio, unregister_callback, cycles,
                             int_prio, timer_callback);
@@ -351,10 +320,6 @@ void timer_unregister(void)
 #elif CONFIG_CPU == PNX0101
     TIMER1.ctrl &= ~0x80;  /* disable timer 1 */
     irq_disable_int(IRQ_TIMER1);
-#elif CONFIG_CPU == AS3525
-    TIMER1_CONTROL &= 0x10; /* disable timer 1 (don't modify bit 4) */
-    VIC_INT_EN_CLEAR = INTERRUPT_TIMER1;  /* disable interrupt */
-    CGU_PERI &= ~CGU_TIMER1_CLOCK_ENABLE;   /* disable peripheral */
 #else
     __TIMER_UNREGISTER();
 #endif
