@@ -1146,15 +1146,14 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
 
 void set_file(const char* filename, char* setting, int maxlen)
 {
-    char* fptr = strrchr(filename,'/');
+    const char* fptr = strrchr(filename,'/');
     int len;
     int extlen = 0;
-    char* ptr;
+    const char* ptr;
 
     if (!fptr)
         return;
 
-    *fptr = 0;
     fptr++;
 
     len = strlen(fptr);
