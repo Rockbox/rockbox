@@ -27,10 +27,11 @@
 #include "timefuncs.h"
 #include "debug.h"
 
-#if !(defined SIMULATOR && CONFIG_RTC)
-
+#if !defined SIMULATOR || !CONFIG_RTC
 static struct tm tm;
+#endif /* !defined SIMULATOR || !CONFIG_RTC */
 
+#if !CONFIG_RTC
 static void fill_default_tm(struct tm *tm)
 {
     tm->tm_sec = 0;
@@ -43,7 +44,7 @@ static void fill_default_tm(struct tm *tm)
     tm->tm_yday = 0; /* Not implemented for now */
     tm->tm_isdst = -1; /* Not implemented for now */
 }
-#endif /* !(defined SIMULATOR && CONFIG_RTC)*/
+#endif /* !CONFIG_RTC */
 
 bool valid_time(const struct tm *tm)
 {
