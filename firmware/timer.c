@@ -29,9 +29,7 @@
 static int timer_prio = -1;
 void SHAREDBSS_ATTR (*pfn_timer)(void) = NULL;      /* timer callback */
 void SHAREDBSS_ATTR (*pfn_unregister)(void) = NULL; /* unregister callback */
-#ifdef CPU_COLDFIRE
-static int base_prescale;
-#elif defined CPU_PP
+#if defined CPU_PP
 static long SHAREDBSS_ATTR cycles_new = 0;
 #endif
 
@@ -51,14 +49,6 @@ void IMIA4(void)
     if (pfn_timer != NULL)
         pfn_timer();
     and_b(~0x01, &TSR4); /* clear the interrupt */
-}
-#elif defined CPU_COLDFIRE
-void TIMER1(void) __attribute__ ((interrupt_handler));
-void TIMER1(void)
-{
-    if (pfn_timer != NULL)
-        pfn_timer();
-    TER1 = 0xff; /* clear all events */
 }
 #elif defined(CPU_PP)
 void TIMER2(void)
@@ -82,21 +72,17 @@ void TIMER2(void)
 
 static bool timer_set(long cycles, bool start)
 {
-#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
+#if CONFIG_CPU == SH7034
     int phi = 0; /* bits for the prescaler */
     int prescale = 1;
 
     while (cycles > 0x10000)
     {   /* work out the smallest prescaler that makes it fit */
-#if CONFIG_CPU == SH7034
         phi++;
-#endif
         prescale <<= 1;
         cycles >>= 1;
     }
-#endif
 
-#if CONFIG_CPU == SH7034
     if (prescale > 8)
         return false;
 
@@ -120,44 +106,6 @@ static bool timer_set(long cycles, bool start)
     if (start || (TCNT4 >= GRA4))
         TCNT4 = 0;
     and_b(~0x01, &TSR4); /* clear an eventual interrupt */
-
-    return true;
-#elif defined CPU_COLDFIRE
-    if (prescale > 4096/CPUFREQ_MAX_MULT)
-        return false;
-
-    if (prescale > 256/CPUFREQ_MAX_MULT)
-    {
-        phi = 0x05;      /* prescale sysclk/16, timer enabled */
-        prescale >>= 4;
-    }
-    else
-        phi = 0x03;      /* prescale sysclk, timer enabled */
-
-    base_prescale = prescale;
-    prescale *= (cpu_frequency / CPU_FREQ);
-
-    if (start)
-    {
-        if (pfn_unregister != NULL)
-        {
-            pfn_unregister();
-            pfn_unregister = NULL;
-        }
-        phi &= ~1;       /* timer disabled at start */
-
-        /* If it is already enabled, writing a 0 to the RST bit will clear
-           the register, so we clear RST explicitly before writing the real
-           data. */
-        TMR1 = 0;
-    }
-
-    /* We are using timer 1 */
-    TMR1 = 0x0018 | (unsigned short)phi | ((unsigned short)(prescale - 1) << 8);
-    TRR1 = (unsigned short)(cycles - 1);
-    if (start || (TCN1 >= TRR1))
-        TCN1 = 0; /* reset the timer */
-    TER1 = 0xff;  /* clear all events */
 
     return true;
 #elif defined(CPU_PP)
@@ -185,25 +133,6 @@ static bool timer_set(long cycles, bool start)
 #endif /* CONFIG_CPU */
 }
 
-#ifdef CPU_COLDFIRE
-void timers_adjust_prescale(int multiplier, bool enable_irq)
-{
-    /* tick timer */
-    TMR0 = (TMR0 & 0x00ef)
-         | ((unsigned short)(multiplier - 1) << 8)
-         | (enable_irq ? 0x10 : 0);
-
-    if (pfn_timer)
-    {
-        /* user timer */
-        int prescale = base_prescale * multiplier;
-        TMR1 = (TMR1 & 0x00ef)
-             | ((unsigned short)(prescale - 1) << 8)
-             | (enable_irq ? 0x10 : 0);
-    }
-}
-#endif
-
 /* Register a user timer, called every <cycles> TIMER_FREQ cycles */
 bool timer_register(int reg_prio, void (*unregister_callback)(void),
                     long cycles, int int_prio, void (*timer_callback)(void)
@@ -227,11 +156,6 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
 #if CONFIG_CPU == SH7034
     IPRD = (IPRD & 0xFF0F) | int_prio << 4;  /* interrupt priority */
     or_b(0x10, &TSTR); /* start timer 4 */
-    return true;
-#elif defined CPU_COLDFIRE
-    ICR2 = 0x90;       /* interrupt on level 4.0 */
-    and_l(~(1<<10), &IMR);
-    TMR1 |= 1;         /* start timer */
     return true;
 #elif defined(CPU_PP)
     /* unmask interrupt source */
@@ -264,9 +188,6 @@ void timer_unregister(void)
 #if CONFIG_CPU == SH7034
     and_b(~0x10, &TSTR);    /* stop the timer 4 */
     IPRD = (IPRD & 0xFF0F); /* disable interrupt */
-#elif defined CPU_COLDFIRE
-    TMR1 = 0;               /* disable timer 1 */
-    or_l((1<<10), &IMR);    /* disable interrupt */
 #elif defined(CPU_PP)
     TIMER2_CFG = 0;         /* stop timer 2 */
     CPU_INT_DIS = TIMER2_MASK;

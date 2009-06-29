@@ -28,12 +28,10 @@
 #if defined(CPU_PP)
  /* Portalplayer chips use a microsecond timer. */
  #define TIMER_FREQ 1000000
-#elif defined(CPU_COLDFIRE)
- /* timer is based on busclk == cpuclk/2 */
- #define TIMER_FREQ (CPU_FREQ/2)
 #elif CONFIG_CPU == S3C2440 || CONFIG_CPU == DM320 || CONFIG_CPU == TCC7801 \
       || defined(CPU_TCC77X) || CONFIG_CPU == AS3525 || CONFIG_CPU == IMX31L \
-      || CONFIG_CPU == JZ4732 || CONFIG_CPU == PNX0101
+      || CONFIG_CPU == JZ4732 || CONFIG_CPU == PNX0101 \
+      || defined(CPU_COLDFIRE)
  #include "timer-target.h"
 #elif defined(SIMULATOR)
  #define TIMER_FREQ 1000000
