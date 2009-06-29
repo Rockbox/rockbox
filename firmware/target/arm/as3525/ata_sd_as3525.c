@@ -122,6 +122,10 @@ static bool sd_enabled = false;
 static struct wakeup transfer_completion_signal;
 static volatile bool retry;
 
+#define UNALIGNED_NUM_SECTORS 10
+static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SECTOR_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
+static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
+
 static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
 #ifdef HAVE_HOTSWAP
@@ -571,11 +575,6 @@ static int sd_wait_for_state(const int drive, unsigned int state)
 
 static int sd_select_bank(signed char bank)
 {
-    /* allocate card data buffer on the stack */
-    unsigned char card_data[512 + 31];
-    /* align it on cache line size */
-    unsigned char *aligned_card_data = (void*)(((int)&card_data[0] + 31) & ~31);
-    unsigned char *uncached_card_data = UNCACHED_ADDR(aligned_card_data);
     int ret;
 
     do {
@@ -596,20 +595,20 @@ static int sd_select_bank(signed char bank)
 
         mci_delay();
 
-        memset(uncached_card_data, 0, 512);
+        memset(uncached_buffer, 0, 512);
         if(bank == -1)
         {   /* enable bank switching */
-            uncached_card_data[0] = 16;
-            uncached_card_data[1] = 1;
-            uncached_card_data[2] = 10;
+            uncached_buffer[0] = 16;
+            uncached_buffer[1] = 1;
+            uncached_buffer[2] = 10;
         }
         else
-            uncached_card_data[0] = bank;
+            uncached_buffer[0] = bank;
 
         dma_retain();
-        /* we don't use the uncached card data for DMA, because we need the
+        /* we don't use the uncached buffer here, because we need the
          * physical memory address for DMA transfers */
-        dma_enable_channel(0, aligned_card_data, MCI_FIFO(INTERNAL_AS3525),
+        dma_enable_channel(0, aligned_buffer, MCI_FIFO(INTERNAL_AS3525),
             DMA_PERI_SD, DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8,
             NULL);
 
@@ -635,10 +634,6 @@ static int sd_select_bank(signed char bank)
 
     return 0;
 }
-
-#define UNALIGNED_NUM_SECTORS 10
-static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SECTOR_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
-static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
 
 static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
                                int count, void* buf, const bool write)
