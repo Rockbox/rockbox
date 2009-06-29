@@ -48,7 +48,7 @@ static void stop_timer(void)
     INTPND = TIMER0_MASK;
 }
 
-bool __timer_set(long cycles, bool start)
+bool timer_set(long cycles, bool start)
 {
     bool retval = false;
 
@@ -87,7 +87,7 @@ bool __timer_set(long cycles, bool start)
     return retval;
 }
 
-bool __timer_start(void)
+bool timer_start(void)
 {
     bool retval = true;
 
@@ -122,7 +122,7 @@ bool __timer_start(void)
     return retval;
 }
 
-void __timer_stop(void)
+void timer_stop(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     stop_timer();

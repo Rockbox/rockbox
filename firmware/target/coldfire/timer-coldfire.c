@@ -37,7 +37,7 @@ void TIMER1(void)
     TER1 = 0xff; /* clear all events */
 }
 
-bool __timer_set(long cycles, bool start)
+bool timer_set(long cycles, bool start)
 {
     int phi = 0; /* bits for the prescaler */
     int prescale = 1;
@@ -87,7 +87,7 @@ bool __timer_set(long cycles, bool start)
     return true;
 }
 
-bool __timer_start(void)
+bool timer_start(void)
 {
     ICR2 = 0x90;       /* interrupt on level 4.0 */
     and_l(~(1<<10), &IMR);
@@ -95,7 +95,7 @@ bool __timer_start(void)
     return true;
 }
 
-void __timer_stop(void)
+void timer_stop(void)
 {
     TMR1 = 0;               /* disable timer 1 */
     or_l((1<<10), &IMR);    /* disable interrupt */

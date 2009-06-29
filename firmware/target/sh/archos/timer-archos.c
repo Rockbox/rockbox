@@ -32,7 +32,7 @@ void IMIA4(void)
     and_b(~0x01, &TSR4); /* clear the interrupt */
 }
 
-bool __timer_set(long cycles, bool start)
+bool timer_set(long cycles, bool start)
 {
     int phi = 0; /* bits for the prescaler */
     int prescale = 1;
@@ -71,14 +71,14 @@ bool __timer_set(long cycles, bool start)
     return true;
 }
 
-bool __timer_start(void)
+bool timer_start(void)
 {
     IPRD = (IPRD & 0xFF0F) | 1 << 4;  /* interrupt priority */
     or_b(0x10, &TSTR); /* start timer 4 */
     return true;
 }
 
-void __timer_stop(void)
+void timer_stop(void)
 {
     and_b(~0x10, &TSTR);    /* stop the timer 4 */
     IPRD = (IPRD & 0xFF0F); /* disable interrupt */

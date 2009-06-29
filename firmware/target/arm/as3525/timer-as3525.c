@@ -31,7 +31,7 @@ void INT_TIMER1(void)
     TIMER1_INTCLR = 0; /* clear interrupt */
 }
 
-bool __timer_set(long cycles, bool start)
+bool timer_set(long cycles, bool start)
 {
     if (start)
     {
@@ -53,14 +53,14 @@ bool __timer_set(long cycles, bool start)
     return true;
 }
 
-bool __timer_start(void)
+bool timer_start(void)
 {
     CGU_PERI |= CGU_TIMER1_CLOCK_ENABLE;    /* enable peripheral */
     VIC_INT_ENABLE |= INTERRUPT_TIMER1;
     return true;
 }
 
-void __timer_stop(void)
+void timer_stop(void)
 {
     TIMER1_CONTROL &= 0x10; /* disable timer 1 (don't modify bit 4) */
     VIC_INT_EN_CLEAR = INTERRUPT_TIMER1;  /* disable interrupt */

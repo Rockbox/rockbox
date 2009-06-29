@@ -33,7 +33,7 @@ void TCU1(void)
         pfn_timer();
 }
 
-bool __timer_set(long cycles, bool start)
+bool timer_set(long cycles, bool start)
 {
     unsigned int divider = cycles, prescaler_bit = 0, prescaler = 1, old_irq;
 
@@ -79,14 +79,14 @@ bool __timer_set(long cycles, bool start)
     return true;
 }
 
-bool __timer_start(void)
+bool timer_start(void)
 {
     __tcu_start_counter(1);
 
     return true;
 }
 
-void __timer_stop(void)
+void timer_stop(void)
 {
     unsigned int old_irq = disable_irq_save();
     __tcu_stop_counter(1);

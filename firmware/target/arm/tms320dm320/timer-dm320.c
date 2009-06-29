@@ -34,7 +34,7 @@ void TIMER0(void)
         pfn_timer();
 }
 
-bool __timer_set(long cycles, bool start)
+bool timer_set(long cycles, bool start)
 {
     int oldlevel;
     unsigned int divider=cycles, prescaler=0;
@@ -82,7 +82,7 @@ static void stop_timer(void)
     IO_CLK_MOD2 &= ~CLK_MOD2_TMR0; //disable TIMER0 clock
 }
 
-bool __timer_start(void)
+bool timer_start(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     
@@ -100,7 +100,7 @@ bool __timer_start(void)
     return true;
 }
 
-void __timer_stop(void)
+void timer_stop(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     stop_timer();

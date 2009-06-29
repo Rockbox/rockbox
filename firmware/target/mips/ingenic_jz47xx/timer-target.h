@@ -26,17 +26,4 @@
 
 #define TIMER_FREQ (CFG_EXTAL) /* For full precision! */
 
-bool __timer_set(long cycles, bool set);
-bool __timer_start(void);
-void __timer_stop(void);
-
-#define __TIMER_SET(cycles, set) \
-    __timer_set(cycles, set)
-
-#define __TIMER_START() \
-    __timer_start()
-
-#define __TIMER_STOP(...) \
-    __timer_stop()
-
 #endif /* __TIMER_H_ */

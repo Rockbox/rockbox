@@ -30,11 +30,6 @@ static int timer_prio = -1;
 void SHAREDBSS_ATTR (*pfn_timer)(void) = NULL;      /* timer callback */
 void SHAREDBSS_ATTR (*pfn_unregister)(void) = NULL; /* unregister callback */
 
-static bool timer_set(long cycles, bool start)
-{
-    return __TIMER_SET(cycles, start);
-}
-
 /* Register a user timer, called every <cycles> TIMER_FREQ cycles */
 bool timer_register(int reg_prio, void (*unregister_callback)(void),
                     long cycles, void (*timer_callback)(void)
@@ -50,11 +45,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     pfn_unregister = unregister_callback;
     timer_prio = reg_prio;
 
-#if NUM_CORES > 1
-    return __TIMER_START(core);
-#else
-    return __TIMER_START();
-#endif
+    return timer_start(IF_COP(core));
 }
 
 bool timer_set_period(long cycles)
@@ -64,7 +55,7 @@ bool timer_set_period(long cycles)
 
 void timer_unregister(void)
 {
-    __TIMER_STOP();
+    timer_stop();
 
     pfn_timer = NULL;
     pfn_unregister = NULL;

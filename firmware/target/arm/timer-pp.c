@@ -44,7 +44,7 @@ void TIMER2(void)
     }
 }
 
-bool __timer_set(long cycles, bool start)
+bool timer_set(long cycles, bool start)
 {
     if (cycles > 0x20000000 || cycles < 2)
         return false;
@@ -67,7 +67,7 @@ bool __timer_set(long cycles, bool start)
     return true;
 }
 
-bool __timer_start(IF_COP_VOID(int core))
+bool timer_start(IF_COP_VOID(int core))
 {
     /* unmask interrupt source */
 #if NUM_CORES > 1
@@ -79,7 +79,7 @@ bool __timer_start(IF_COP_VOID(int core))
     return true;
 }
 
-void __timer_stop(void)
+void timer_stop(void)
 {
     TIMER2_CFG = 0;         /* stop timer 2 */
     CPU_INT_DIS = TIMER2_MASK;

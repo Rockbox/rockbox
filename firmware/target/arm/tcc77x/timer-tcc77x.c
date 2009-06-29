@@ -28,7 +28,7 @@
 /* Use the TC32 counter [sourced by Xin:12Mhz] for this timer, as it's the
    only one that allows a 32-bit counter (Timer0-5 are 16/20 bit only). */
 
-bool __timer_set(long cycles, bool start)
+bool timer_set(long cycles, bool start)
 {
     #warning function not implemented
     
@@ -37,14 +37,14 @@ bool __timer_set(long cycles, bool start)
     return false;
 }
 
-bool __timer_start(void)
+bool timer_start(void)
 {
     #warning function not implemented
     
     return false;
 }
 
-void __timer_stop(void)
+void timer_stop(void)
 {
     #warning function not implemented
 }

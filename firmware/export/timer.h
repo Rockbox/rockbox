@@ -40,6 +40,7 @@
  #warning "TIMER_FREQ not defined"
  #define TIMER_FREQ CPU_FREQ
 #endif
+
 bool timer_register(int reg_prio, void (*unregister_callback)(void),
                     long cycles, void (*timer_callback)(void)
                     IF_COP(,int core));
@@ -48,6 +49,11 @@ bool timer_set_period(long cycles);
 void timers_adjust_prescale(int multiplier, bool enable_irq);
 #endif
 void timer_unregister(void);
+
+/* target-specific interface */
+bool timer_set(long cycles, bool start);
+bool timer_start(IF_COP_VOID(int core));
+void timer_stop(void);
 
 /* For target-specific interface use */
 extern void (*pfn_timer)(void);

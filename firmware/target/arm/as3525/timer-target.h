@@ -21,19 +21,6 @@
 #ifndef TIMER_TARGET_H
 #define TIMER_TARGET_H
 
-bool __timer_set(long cycles, bool set);
-bool __timer_start(void);
-void __timer_stop(void);
-
 #define TIMER_FREQ (24000000 / 16)
-
-#define __TIMER_SET(cycles, set) \
-    __timer_set(cycles, set)
-
-#define __TIMER_START() \
-    __timer_start()
-
-#define __TIMER_STOP(...) \
-    __timer_stop()
 
 #endif /* TIMER_TARGET_H */

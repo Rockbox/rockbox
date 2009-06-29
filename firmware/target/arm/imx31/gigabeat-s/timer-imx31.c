@@ -52,7 +52,7 @@ static void stop_timer(bool clock_off)
     }
 }
 
-bool _timer_set(long cycles, bool start)
+bool timer_set(long cycles, bool start)
 {
     /* Maximum cycle count expressible in the cycles parameter is 2^31-1
      * and the modulus counter is capable of 2^32-1 and as a result there is
@@ -86,7 +86,7 @@ bool _timer_set(long cycles, bool start)
     return true;
 }
 
-bool _timer_start(void)
+bool timer_start(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
 
@@ -104,7 +104,7 @@ bool _timer_start(void)
     return true;
 }
 
-void _timer_stop(void)
+void timer_stop(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     /* Halt timer if running - stop module clock */

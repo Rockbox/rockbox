@@ -28,25 +28,7 @@
 #error "PP specific header"
 #endif
 
-bool __timer_set(long cycles, bool start);
-bool __timer_start(IF_COP_VOID(int core));
-void __timer_stop(void);
-
 /* Portalplayer chips use a microsecond timer. */
 #define TIMER_FREQ 1000000
-
-#define __TIMER_SET(cycles, set) \
-    __timer_set(cycles, set)
-
-#if NUM_CORES > 1
-#define __TIMER_START(core) \
-    __timer_start(core)
-#else
-#define __TIMER_START() \
-    __timer_start()
-#endif
-
-#define __TIMER_STOP(...) \
-    __timer_stop()
 
 #endif /* TIMER_TARGET_H */

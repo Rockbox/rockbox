@@ -27,7 +27,7 @@
 
 static const int prescale_shifts[] = {1, 2, 3, 4, 5, 10, 12};
 
-bool __timer_set(long cycles, bool start)
+bool timer_set(long cycles, bool start)
 {
     bool found = false;
  
@@ -62,7 +62,7 @@ bool __timer_set(long cycles, bool start)
     return true;
 }
 
-bool __timer_start(void)
+bool timer_start(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_STATUS);
     
@@ -73,7 +73,7 @@ bool __timer_start(void)
     return true;
 }
 
-void __timer_stop(void)
+void timer_stop(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_STATUS);
     

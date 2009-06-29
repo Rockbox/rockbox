@@ -24,17 +24,4 @@
 /* timer is based on ipg_clk */
 #define TIMER_FREQ (66000000)
 
-bool _timer_set(long cycles, bool set);
-bool _timer_start(void);
-void _timer_stop(void);
-
-#define __TIMER_SET(cycles, set) \
-    _timer_set(cycles, set)
-
-#define __TIMER_START() \
-    _timer_start()
-
-#define __TIMER_STOP(...) \
-    _timer_stop()
-
 #endif /* TIMER_TARGET_H */

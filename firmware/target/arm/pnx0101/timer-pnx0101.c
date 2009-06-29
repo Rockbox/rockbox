@@ -43,7 +43,7 @@ void TIMER1_ISR(void)
     TIMER1.clr = 1; /* clear the interrupt */
 }
 
-bool __timer_set(long cycles, bool start)
+bool timer_set(long cycles, bool start)
 {
     if (start)
     {
@@ -68,14 +68,14 @@ bool __timer_set(long cycles, bool start)
     return true;
 }
 
-bool __timer_start(void)
+bool timer_start(void)
 {
     irq_set_int_handler(IRQ_TIMER1, TIMER1_ISR);
     irq_enable_int(IRQ_TIMER1);
     return true;
 }
 
-void __timer_stop(void)
+void timer_stop(void)
 {
     TIMER1.ctrl &= ~0x80;  /* disable timer 1 */
     irq_disable_int(IRQ_TIMER1);

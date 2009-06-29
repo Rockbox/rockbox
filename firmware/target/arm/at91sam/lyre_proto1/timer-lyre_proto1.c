@@ -48,7 +48,7 @@ void pitc_handler(void)
     }
 }
 
-bool __timer_set(long cycles, bool start)
+bool timer_set(long cycles, bool start)
 {
     if (cycles < 1000) /* Max value on PITC?? */
     {
@@ -67,7 +67,7 @@ bool __timer_set(long cycles, bool start)
     return false;
 }
 
-bool __timer_start(void)
+bool timer_start(void)
 {
     bool retval = true;
     volatile unsigned long pimr = 0;
@@ -101,7 +101,7 @@ bool __timer_start(void)
     return retval;
 }
 
-void __timer_stop(void)
+void timer_stop(void)
 {
     volatile unsigned long pimr = 0;
 
