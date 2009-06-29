@@ -367,6 +367,7 @@ target/arm/s5l8700/i2c-s5l8700.c
 #if CONFIG_CPU == PNX0101
 target/arm/pnx0101/kernel-pnx0101.c
 target/arm/pnx0101/system-pnx0101.c
+target/arm/pnx0101/timer-pnx0101.c
 #endif
 
 #if CONFIG_CPU == AS3525

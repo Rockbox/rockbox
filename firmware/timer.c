@@ -31,7 +31,7 @@ void SHAREDBSS_ATTR (*pfn_timer)(void) = NULL;      /* timer callback */
 void SHAREDBSS_ATTR (*pfn_unregister)(void) = NULL; /* unregister callback */
 #ifdef CPU_COLDFIRE
 static int base_prescale;
-#elif defined CPU_PP || CONFIG_CPU == PNX0101
+#elif defined CPU_PP
 static long SHAREDBSS_ATTR cycles_new = 0;
 #endif
 
@@ -78,24 +78,6 @@ void TIMER2(void)
         cycles_new = 0;
     }
 }
-#elif CONFIG_CPU == PNX0101
-void TIMER1_ISR(void)
-{
-    if (cycles_new > 0)
-    {
-        TIMER1.load = cycles_new - 1;
-        cycles_new = 0;
-    }
-    if (pfn_timer != NULL)
-    {
-        cycles_new = -1;
-        /* "lock" the variable, in case timer_set_period()
-         * is called within pfn_timer() */
-        pfn_timer();
-        cycles_new = 0;
-    }
-    TIMER1.clr = 1; /* clear the interrupt */
-}
 #endif /* CONFIG_CPU */
 
 static bool timer_set(long cycles, bool start)
@@ -114,29 +96,7 @@ static bool timer_set(long cycles, bool start)
     }
 #endif
 
-#if CONFIG_CPU == PNX0101
-    if (start)
-    {
-        if (pfn_unregister != NULL)
-        {
-            pfn_unregister();
-            pfn_unregister = NULL;
-        }
-        TIMER1.ctrl &= ~0x80; /* disable the counter */
-        TIMER1.ctrl |= 0x40;  /* reload after counting down to zero */
-        TIMER1.ctrl &= ~0xc;  /* no prescaler */
-        TIMER1.clr = 1;       /* clear an interrupt event */
-    }
-    if (start || (cycles_new == -1)) /* within isr, cycles_new is "locked" */
-    {                                /* enable timer */
-        TIMER1.load = cycles - 1;
-        TIMER1.ctrl |= 0x80;        /* enable the counter */
-    }
-    else
-        cycles_new = cycles;
-
-    return true;
-#elif CONFIG_CPU == SH7034
+#if CONFIG_CPU == SH7034
     if (prescale > 8)
         return false;
 
@@ -282,10 +242,6 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
 #endif
         CPU_INT_EN = TIMER2_MASK;
     return true;
-#elif CONFIG_CPU == PNX0101
-    irq_set_int_handler(IRQ_TIMER1, TIMER1_ISR);
-    irq_enable_int(IRQ_TIMER1);
-    return true;
 #else
     return __TIMER_START();
 #endif
@@ -315,9 +271,6 @@ void timer_unregister(void)
     TIMER2_CFG = 0;         /* stop timer 2 */
     CPU_INT_DIS = TIMER2_MASK;
     COP_INT_DIS = TIMER2_MASK;
-#elif CONFIG_CPU == PNX0101
-    TIMER1.ctrl &= ~0x80;  /* disable timer 1 */
-    irq_disable_int(IRQ_TIMER1);
 #else
     __TIMER_STOP();
 #endif
