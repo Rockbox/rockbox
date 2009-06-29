@@ -76,28 +76,30 @@ extern unsigned int power_thread_inputs;
 
 #ifndef SIMULATOR
 
-/* Generic current values that are really rather meaningless - config header
- * should define proper numbers. */
+/* Generic current values that are intentionally meaningless - config header
+ * should define proper numbers.  Use insane values here to remind people 
+ * to define the correct values in the proper header*/
+ 
 #ifndef CURRENT_NORMAL
-#define CURRENT_NORMAL    145  /* usual current in mA */
+#define CURRENT_NORMAL    1  /* usual current in mA */
 #endif
 
 #ifndef CURRENT_BACKLIGHT
-#define CURRENT_BACKLIGHT  30  /* additional current when backlight always on */
+#define CURRENT_BACKLIGHT  1  /* additional current when backlight always on */
 #endif
 
 #ifdef HAVE_RECORDING
 #ifndef CURRENT_RECORD
-#define CURRENT_RECORD     35  /* additional recording current */
+#define CURRENT_RECORD     1  /* additional recording current */
 #endif
 #endif /* HAVE_RECORDING */
 
 #ifndef CURRENT_USB
-#define CURRENT_USB       500 /* usual current in mA in USB mode */
+#define CURRENT_USB       1 /* usual current in mA in USB mode */
 #endif
 
 #ifdef HAVE_REMOTE_LCD
-#define CURRENT_REMOTE      8  /* additional current when remote connected */
+#define CURRENT_REMOTE      1  /* additional current when remote connected */
 #endif /* HAVE_REMOTE_LCD */
 
 #if CONFIG_CHARGING
