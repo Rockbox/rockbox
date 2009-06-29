@@ -1098,13 +1098,19 @@ static void codec_advance_buffer_loc_callback(void *ptr)
 static void codec_seek_complete_callback(void)
 {
     logf("seek_complete");
-    if (pcm_is_paused())
+    /* If seeking-while-playing, pcm playback is actually paused (pcm_is_paused())
+     * but the paused flag is not set.  If seeking-while-paused, the (paused) flag is
+     * set, but pcm playback may have actually stopped due to a previous buffer clear.
+     * The buffer clear below occurs with either condition.  A seemless seek skips
+     * this section and no buffer clear occurs.
+     */
+    if (pcm_is_paused() || paused)
     {
-        /* If this is not a seamless seek, clear the buffer */
+        /* Clear the buffer */
         pcmbuf_play_stop();
         dsp_configure(ci.dsp, DSP_FLUSH, 0);
 
-        /* If playback was not 'deliberately' paused, unpause now */
+        /* If seeking-while-playing, resume pcm playback */
         if (!paused)
             pcmbuf_pause(false);
     }
