@@ -88,21 +88,17 @@ extern unsigned int power_thread_inputs;
 #define CURRENT_BACKLIGHT  1  /* additional current when backlight always on */
 #endif
 
-#ifdef HAVE_RECORDING
-#ifndef CURRENT_RECORD
+#if defined(HAVE_RECORDING) && !defined(CURRENT_RECORD)
 #define CURRENT_RECORD     1  /* additional recording current */
-#endif
-#endif /* HAVE_RECORDING */
+#endif /* HAVE_RECORDING && !CURRENT_RECORD*/
 
 #ifndef CURRENT_USB
 #define CURRENT_USB       1 /* usual current in mA in USB mode */
 #endif
 
-#ifdef HAVE_REMOTE_LCD
-#ifndef CURRENT_REMOTE
+#if defined(HAVE_REMOTE_LCD) && !defined(CURRENT_REMOTE)
 #define CURRENT_REMOTE      1  /* additional current when remote connected */
-#endif /* CURRENT_REMOTE */
-#endif /* HAVE_REMOTE_LCD */
+#endif /* CURRENT_REMOTE && !HAVE_REMOTE_LCD */
 
 #if CONFIG_CHARGING
 #ifndef CURRENT_MAX_CHG
