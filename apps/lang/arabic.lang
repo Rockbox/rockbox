@@ -4289,7 +4289,7 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
     sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
@@ -4297,7 +4297,7 @@
     h100,h120,h300: "جاري بناء قاعدة البيانات...  عثر على d% (إيقاف للعودة)"
     ipod*: "جاري بناء قاعدة البيانات...  عثر على d% (السابق للعودة)"
     x5,m5,gigabeat*,mrobe100: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
-    h10,h10_5gb,e200*,c200*: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
+    h10,h10_5gb,e200*,c200*,fuze*: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
     sa9200: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
   </dest>
   <voice>
@@ -7572,7 +7572,7 @@
     h100,h120,h300: "STOP = Revert"
     ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*: "PREV = Revert"
+    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
@@ -7584,7 +7584,7 @@
     h100,h120,h300: "عرض = إاغاء الأمر"
     ipod*,c200*: "قائمة = إاغاء الأمر"
     x5,m5: "سجل = إاغاء الأمر"
-    h10,h10_5gb,e200*: "السابق = إاغاء الأمر"
+    h10,h10_5gb,e200*,fuze*: "السابق = إاغاء الأمر"
     gigabeatf: "طاقة = إاغاء الأمر"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "خلف = إاغاء الأمر"

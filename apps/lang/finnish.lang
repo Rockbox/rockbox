@@ -4443,19 +4443,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*: "mSD:"
+    e200*,c200*,fuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*: "MSD:"
+    e200*,c200*,fuze*: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "Kiintolevy1"
-    e200*,c200*: "micro s d muistikortti"
+    e200*,c200*,fuze*: "micro s d muistikortti"
     ondio*: "m m c muistikortti"
   </voice>
 </phrase>
@@ -4590,7 +4590,7 @@
     h100,h120,h300: "STOP = Revert"
     ipod*,c200*,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*: "PREV = Revert"
+    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
@@ -4601,7 +4601,7 @@
     h100,h120,h300: "STOP = Peruuta"
     ipod*,c200*,sa9200: "MENU = Peruuta"
     x5,m5: "RECORD = Peruuta"
-    h10,h10_5gb,e200*: "PREV = Peruuta"
+    h10,h10_5gb,e200*,fuze*: "PREV = Peruuta"
     gigabeatf: "POWER = Peruuta"
     mrobe100: "DISPLAY = Peruuta"
     gigabeats: "BACK = Peruuta"
@@ -10002,17 +10002,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze,e200*: "Wheel Light Timeout"
+    fuze*,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Painikevalon aikakatkaisu"
-    fuze,e200*: "Rullavalon aikakatkaisu"
+    fuze*,e200*: "Rullavalon aikakatkaisu"
   </dest>
   <voice>
     *: none
     button_light: "Painikevalon aikakatkaisu"
-    fuze,e200*: "Rullavalon aikakatkaisu"
+    fuze*,e200*: "Rullavalon aikakatkaisu"
   </voice>
 </phrase>
 <phrase>

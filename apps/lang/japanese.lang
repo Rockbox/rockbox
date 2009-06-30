@@ -3857,17 +3857,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze,e200*: "Wheel Light Timeout"
+    fuze*,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "ボタンライトのタイムアウト"
-    fuze,e200*: "ホイールライトのタイムアウト"
+    fuze*,e200*: "ホイールライトのタイムアウト"
   </dest>
   <voice>
     *: none
     button_light: "ボタンライトのタイムアウト"
-    fuze,e200*: "ホイールライトのタイムアウト"
+    fuze*,e200*: "ホイールライトのタイムアウト"
   </voice>
 </phrase>
 <phrase>
@@ -4172,7 +4172,7 @@
     h100,h120,h300: "STOP = Revert"
     ipod*,c200*,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*: "PREV = Revert"
+    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
@@ -4183,7 +4183,7 @@
     h100,h120,h300: "STOP = 元に戻す"
     ipod*,c200*,sa9200: "MENU = 元に戻す"
     x5,m5: "RECORD = 元に戻す"
-    h10,h10_5gb,e200*: "PREV = 元に戻す"
+    h10,h10_5gb,e200*,fuze*: "PREV = 元に戻す"
     gigabeatf: "POWER = 元に戻す"
     mrobe100: "DISPLAY = 元に戻す"
     gigabeats: "BACK = 元に戻す"
@@ -6949,19 +6949,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*: "mSD:"
+    e200*,c200*,fuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*: "mSD:"
+    e200*,c200*,fuze*: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    e200*,c200*: "マイクロSD"
+    e200*,c200*,fuze*: "マイクロSD"
     ondio*: "マルチメディアカード"
   </voice>
 </phrase>

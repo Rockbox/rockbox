@@ -3838,17 +3838,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze,e200*: "Wheel Light Timeout"
+    fuze*,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "זמן תאורת כפתור"
-    fuze,e200*: "זמן תאורת הגלגל"
+    fuze*,e200*: "זמן תאורת הגלגל"
   </dest>
   <voice>
     *: none
     button_light: "Button Light Timeout"
-    fuze,e200*: "Wheel Light Timeout"
+    fuze*,e200*: "Wheel Light Timeout"
   </voice>
 </phrase>
 <phrase>
@@ -4153,7 +4153,7 @@
     h100,h120,h300: "STOP = Revert"
     ipod*,c200*,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*: "PREV = Revert"
+    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
@@ -4164,7 +4164,7 @@
     h100,h120,h300: "STOP = ביטול"
     ipod*,c200*,sa9200: "MENU = ביטול"
     x5,m5: "RECORD = ביטול"
-    h10,h10_5gb,e200*: "PREV = ביטול"
+    h10,h10_5gb,e200*,fuze*: "PREV = ביטול"
     gigabeatf: "POWER = ביטול"
     mrobe100: "DISPLAY = ביטול"
     gigabeats: "BACK = ביטול"
@@ -6930,19 +6930,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*: "mSD:"
+    e200*,c200*,fuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*: "MSD:"
+    e200*,c200*,fuze*: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    e200*,c200*: "micro S D"
+    e200*,c200*,fuze*: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>

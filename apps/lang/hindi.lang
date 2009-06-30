@@ -1270,14 +1270,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "डाटाबेस बन रहा है... %d मिले (OFF to बढ़)"
     h100,h120,h300: "डाटाबेस बन रहा है... %d मिले (STOP to बढ़)"
     ipod*: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
     x5,m5: "डाटाबेस बन रहा है... %d मिले (LEFT to बढ़)"
-    h10,h10_5gb,e200*,c200*: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
+    h10,h10_5gb,e200*,c200*,fuze*: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
   </dest>
   <voice>
     *: "entries found for database"

@@ -3924,17 +3924,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze,e200*: "Wheel Light Timeout"
+    fuze*,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Klavišų apšvietimo laikas"
-    fuze,e200*: "Rato apšvietimo laikas"
+    fuze*,e200*: "Rato apšvietimo laikas"
   </dest>
   <voice>
     *: none
     button_light: "Klavišų apšvietimo laikas"
-    fuze,e200*: "Rato apšvietimo laikas"
+    fuze*,e200*: "Rato apšvietimo laikas"
   </voice>
 </phrase>
 <phrase>
@@ -4239,7 +4239,7 @@
     h100,h120,h300: "STOP = Revert"
     ipod*,c200*,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*: "PREV = Revert"
+    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
@@ -4250,7 +4250,7 @@
     h100,h120,h300: "STOP = Atstatyti"
     ipod*,c200*,sa9200: "MENU = Atstatyti"
     x5,m5: "RECORD = Atstatyti"
-    h10,h10_5gb,e200*: "PREV = Atstatyti"
+    h10,h10_5gb,e200*,fuze*: "PREV = Atstatyti"
     gigabeatf: "POWER = Atstatyti"
     mrobe100: "DISPLAY = Atstatyti"
     gigabeats: "BACK = Atstatyti"
@@ -7015,19 +7015,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*: "mSD:"
+    e200*,c200*,fuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*: "MSD:"
+    e200*,c200*,fuze*: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    e200*,c200*: "micro S D"
+    e200*,c200*,fuze*: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>

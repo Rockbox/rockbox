@@ -3748,19 +3748,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*: "mSD:"
+    e200*,c200*,fuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*: "mSD:"
+    e200*,c200*,fuze*: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    e200*,c200*: "mikro S D"
+    e200*,c200*,fuze*: "mikro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -3895,7 +3895,7 @@
     h100,h120,h300: "STOP = Revert"
     ipod*,c200*,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*: "PREV = Revert"
+    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
@@ -3906,7 +3906,7 @@
     h100,h120,h300: "STOP = Tilbakestill"
     ipod*,c200*,sa9200: "MENU = Tilbakestill"
     x5,m5: "RECORD = Tilbakestill"
-    h10,h10_5gb,e200*: "PREV = Tilbakestill"
+    h10,h10_5gb,e200*,fuze*: "PREV = Tilbakestill"
     gigabeatf: "POWER = Tilbakestill"
     mrobe100: "DISPLAY = Tilbakestill"
     gigabeats: "BACK = Tilbakestill"
@@ -10030,17 +10030,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze,e200*: "Wheel Light Timeout"
+    fuze*,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Slukketid for knapplys"
-    fuze,e200*: "Slukketid for hjullys"
+    fuze*,e200*: "Slukketid for hjullys"
   </dest>
   <voice>
     *: none
     button_light: "Tid før lys på knapper slukker"
-    fuze,e200*: "Tid før lys på hjul slukker"
+    fuze*,e200*: "Tid før lys på hjul slukker"
   </voice>
 </phrase>
 <phrase>

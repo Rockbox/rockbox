@@ -3858,17 +3858,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze,e200*: "Wheel Light Timeout"
+    fuze*,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Wygaszanie klawiszy"
-    fuze,e200*: "Wygaszanie koła sterującego"
+    fuze*,e200*: "Wygaszanie koła sterującego"
   </dest>
   <voice>
     *: none
     button_light: "Wygaszanie klawiszy"
-    fuze,e200*: "Wygaszanie koła sterującego"
+    fuze*,e200*: "Wygaszanie koła sterującego"
   </voice>
 </phrase>
 <phrase>
@@ -4173,7 +4173,7 @@
     h100,h120,h300: "STOP = Revert"
     ipod*,c200*,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*: "PREV = Revert"
+    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
@@ -4184,7 +4184,7 @@
     h100,h120,h300: "STOP = Przywróć"
     ipod*,c200*,sa9200: "MENU = Przywróć"
     x5,m5: "RECORD = Przywróć"
-    h10,h10_5gb,e200*: "PREV = Przywróć"
+    h10,h10_5gb,e200*,fuze*: "PREV = Przywróć"
     gigabeatf: "POWER = Przywróć"
     mrobe100: "DISPLAY = Przywróć"
     gigabeats: "BACK = Przywróć"
@@ -6953,19 +6953,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*: "mSD:"
+    e200*,c200*,fuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*: "microSD:"
+    e200*,c200*,fuze*: "microSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "ha de 1"
-    e200*,c200*: "mikro es di"
+    e200*,c200*,fuze*: "mikro es di"
     ondio*: "em em ce"
   </voice>
 </phrase>
