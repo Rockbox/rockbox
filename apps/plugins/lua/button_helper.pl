@@ -56,7 +56,7 @@ int main(void)
 {
     unsigned int i;
     printf("-- Don't change this file!\\n");
-    printf("-- It is automatically generated of button-target.h \%s\\n", "$svnrev");
+    printf("-- It is automatically generated of button.h \%s\\n", "$svnrev");
     printf("rb.buttons = {\\n");
     for(i=0; i<sizeof(buttons)/sizeof(struct button); i++)
         printf("\\t\%s = \%ld,\\n", buttons[i].name, buttons[i].value);
