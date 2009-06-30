@@ -4091,13 +4091,30 @@ static bool check_deleted_files(void)
     return true;
 }
 
+
+/* Note that this function must not be inlined, otherwise the whole point
+ * of having the code in a separate function is lost.
+ */
+static void __attribute__ ((noinline)) check_ignore(const char *dirname,
+    int *ignore, int *unignore)
+{
+    char newpath[MAX_PATH];
+
+    /* check for a database.ignore file */
+    snprintf(newpath, MAX_PATH, "%s/database.ignore", dirname);
+    *ignore = file_exists(newpath);
+    /* check for a database.unignore file */
+    snprintf(newpath, MAX_PATH, "%s/database.unignore", dirname);
+    *unignore = file_exists(newpath);
+}
+
+
 static bool check_dir(const char *dirname, int add_files)
 {
     DIR *dir;
     int len;
     int success = false;
     int ignore, unignore;
-    char newpath[MAX_PATH];
 
     dir = opendir(dirname);
     if (!dir)
@@ -4106,12 +4123,8 @@ static bool check_dir(const char *dirname, int add_files)
         return false;
     }
     
-    /* check for a database.ignore file */
-    snprintf(newpath, MAX_PATH, "%s/database.ignore", dirname);
-    ignore = file_exists(newpath);
-    /* check for a database.unignore file */
-    snprintf(newpath, MAX_PATH, "%s/database.unignore", dirname);
-    unignore = file_exists(newpath);
+    /* check for a database.ignore and database.unignore */
+    check_ignore(dirname, &ignore, &unignore);
 
     /* don't do anything if both ignore and unignore are there */
     if (ignore != unignore)
