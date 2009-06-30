@@ -1653,12 +1653,16 @@ static int check_if_empty(char **tag)
     entry.tag_offset[tag] = offset; \
     entry.tag_length[tag] = check_if_empty(data); \
     offset += entry.tag_length[tag]
-    
-static void add_tagcache(char *path, unsigned long mtime
+/* GCC 3.4.6 for Coldfire can choose to inline this function. Not a good
+ * idea, as it uses lots of stack and is called from a recursive function
+ * (check_dir).
+ */
+static void __attribute__ ((noinline)) add_tagcache(char *path,
+                                                    unsigned long mtime
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-                         ,const struct dirent *dc
+                                                    ,const struct dirent *dc
 #endif
-                         )
+                                                   )
 {
     struct mp3entry id3;
     struct temp_file_entry entry;
