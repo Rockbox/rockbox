@@ -23,7 +23,7 @@ $svnrev = '$Revision$';
 print <<EOF
 #include <stdio.h>
 #include <stdbool.h>
-#include "button-target.h"
+#include "button.h"
 
 struct button
 {
@@ -45,6 +45,11 @@ while(my $line = <STDIN>)
 }
 
 print <<EOF
+{"BUTTON_REL", BUTTON_REL},
+{"BUTTON_REPEAT", BUTTON_REPEAT},
+#ifdef HAVE_TOUCHSCREEN
+{"BUTTON_TOUCHSCREEN", BUTTON_TOUCHSCREEN},
+#endif
 };
 
 int main(void)
