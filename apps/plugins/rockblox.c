@@ -723,7 +723,7 @@ figures[BLOCKS_NUM] = {
 #define MAX_HIGH_SCORES 5
 
 /* Default High Scores... */
-struct highscore Highest[MAX_HIGH_SCORES];
+struct highscore highest[MAX_HIGH_SCORES];
 
 /* get random number from (0) to (range-1) */
 static int t_rand (int range)
@@ -776,10 +776,11 @@ static void show_highscores (void)
     int i;
     char str[25];               /* for strings */
 
-    for (i = MAX_HIGH_SCORES-1; i>=0; i--)
+    for (i = 0; i<MAX_HIGH_SCORES; i++)
     {
-        rb->snprintf (str, sizeof (str), "%06d" _SPACE "L%1d",Highest[i].score, Highest[i].level);
-        rb->lcd_putsxy (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * ((MAX_HIGH_SCORES-1) - i)), str);
+        rb->snprintf (str, sizeof (str), "%06d" _SPACE "L%1d",
+                      highest[i].score, highest[i].level);
+        rb->lcd_putsxy (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * i), str);
     }
 }
 #endif
@@ -831,8 +832,17 @@ fail:
 }
 static void init_rockblox (bool resume)
 {
-    highscore_update(rockblox_status.score, rockblox_status.level, Highest,
-            MAX_HIGH_SCORES);
+    char score_name[50];
+    struct tm* tm;
+    
+    tm = rb->get_time();
+    rb->snprintf(score_name, sizeof(score_name), "%04d%02d%02d %02d%02d%02d",
+            tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+            tm->tm_hour, tm->tm_min, tm->tm_sec);
+
+    highscore_update(rockblox_status.score, rockblox_status.level,
+                     score_name, highest, MAX_HIGH_SCORES);
+
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #else  /* HAVE_LCD_CHARCELLS */
@@ -1332,7 +1342,7 @@ enum plugin_status plugin_start (const void *parameter)
     rb->srand (*rb->current_tick);
 
     /* Load HighScore if any */
-    highscore_load(HIGH_SCORE,Highest,MAX_HIGH_SCORES);
+    highscore_load(HIGH_SCORE, highest, MAX_HIGH_SCORES);
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -1357,7 +1367,7 @@ enum plugin_status plugin_start (const void *parameter)
     pgfx_release();
 #endif
     /* Save user's HighScore */
-    highscore_save(HIGH_SCORE,Highest,MAX_HIGH_SCORES);
+    highscore_save(HIGH_SCORE, highest, MAX_HIGH_SCORES);
     backlight_use_settings(); /* backlight control in lib/helper.c */
 
     dump_resume();

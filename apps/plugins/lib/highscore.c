@@ -34,8 +34,8 @@ int highscore_save(char *filename, struct highscore *scores, int num_scores)
     
     for(i = 0;i < num_scores;i++)
     {
-        rb->snprintf(buf, sizeof(buf)-1, "%s:%d:%d\n",
-                     scores[i].name, scores[i].score, scores[i].level);
+        rb->snprintf(buf, sizeof(buf), "%d:%d:%s\n",
+                     scores[i].score, scores[i].level, scores[i].name);
         rc = rb->write(fd, buf, rb->strlen(buf));
         if(rc < 0)
         {
@@ -52,72 +52,62 @@ int highscore_load(char *filename, struct highscore *scores, int num_scores)
     int i;
     int fd;
     char buf[80];
-    char *name, *score, *level;
-    char *ptr;
+    char *score, *level, *name;
+
+    rb->memset(scores, 0, sizeof(struct highscore)*num_scores);
 
     fd = rb->open(filename, O_RDONLY);
-
-    rb->memset(scores, 0, sizeof(struct highscore)*(num_scores+1));
-    
     if(fd < 0)
         return -1;
 
-    i = -1;
-    while(rb->read_line(fd, buf, sizeof(buf)-1) && i < num_scores)
+    i = 0;
+    while(rb->read_line(fd, buf, sizeof(buf)) > 0 && i < num_scores)
     {
-        i++;
-        
         DEBUGF("%s\n", buf);
-        name = buf;
-        ptr = rb->strchr(buf, ':');
-        if ( !ptr )
+
+        if ( !rb->settings_parseline(buf, &score, &level) )
             continue;
-        *ptr = 0;
-        ptr++;
-        
-        rb->strncpy(scores[i].name, name, sizeof(scores[i].name));
-        
-        DEBUGF("%s\n", scores[i].name);
-        score = ptr;
-        
-        ptr = rb->strchr(ptr, ':');
-        if ( !ptr )
+        if ( !rb->settings_parseline(level, &level, &name) )
             continue;
-        *ptr = 0;
-        ptr++;
-        
+
         scores[i].score = rb->atoi(score);
-        
-        level = ptr;
         scores[i].level = rb->atoi(level);
-    }    
+        rb->strncpy(scores[i].name, name, sizeof(scores[i].name)-1);
+        i++;
+    }
+    rb->close(fd);
     return 0;
 }
 
-int highscore_update(int score, int level, struct highscore *scores, int num_scores)
+int highscore_update(int score, int level, const char *name,
+                     struct highscore *scores, int num_scores)
 {
-	int i, j;
-	int new = 0;
-	
-	/* look through the scores and see if this one is in the top ones */
-	for(i = num_scores-1;i >= 0; i--)
+    int pos;
+    struct highscore *entry;
+    
+    if (!highscore_would_update(score, scores, num_scores))
+        return -1;
+
+    pos = num_scores-1;
+    while (pos > 0 && score > scores[pos-1].score)
     {
-		if ((score > scores[i].score))
-		{
-			/* Move the rest down one... */
-			if (i > 0)
-			{
-				for (j=1; j<=i; j++)
-				{
-					rb->memcpy((void *)&scores[j-1], (void *)&scores[j], sizeof(struct highscore));
-				}
-			}
-			scores[i].score = score;
-			scores[i].level = level;
-			/* Need to sort out entering a name... maybe old three letter arcade style */
-			new = 1;
-			break;
-		}
-	}
-	return new;
+        /* move down one */
+        rb->memcpy((void *)&scores[pos], (void *)&scores[pos-1],
+                   sizeof(struct highscore));
+        pos--;
+    }
+    
+    entry = scores + pos;
+    entry->score = score;
+    entry->level = level;
+    rb->strncpy(entry->name, name, sizeof(entry->name));
+    entry->name[sizeof(entry->name)-1] = '\0';
+
+    return pos;
+}
+
+bool highscore_would_update(int score, struct highscore *scores,
+                            int num_scores)
+{
+    return (num_scores > 0) && (score > scores[num_scores-1].score);
 }
