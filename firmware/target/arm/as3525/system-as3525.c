@@ -271,7 +271,6 @@ void system_init(void)
                   AS3525_PCLK_SEL);
 
     asm volatile(
-        "mov r0, #0               \n"
         "mrc p15, 0, r0, c1, c0   \n"      /* control register */
         "bic r0, r0, #3<<30       \n"      /* clears bus bits : sets fastbus */
         "mcr p15, 0, r0, c1, c0   \n"
@@ -295,10 +294,8 @@ void system_init(void)
     ascodec_init();
 
 #ifndef BOOTLOADER
-    /* Disable fast hardware power-off, to use power button normally
-     * We don't need the power button in the bootloader. */
-    ascodec_write(AS3514_CVDD_DCDC3, ascodec_read(AS3514_CVDD_DCDC3) & (1<<2));
-
+    /*  Initialize power management settings */
+    ascodec_write(AS3514_CVDD_DCDC3, AS314_CP_DCDC3_SETTING);
 #ifdef CONFIG_TUNER
     fmradio_i2c_init();
 #endif
@@ -331,7 +328,12 @@ void set_cpu_frequency(long frequency)
 {
     if(frequency == CPUFREQ_MAX)
     {
-
+        /* Increasing frequency so boost voltage before change */
+        ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_20));
+        /* Confirm voltage is at least 1.20v before making fclk > 200 MHz */
+        ascodec_write(AS3514_ADC_0, 4<<4);            /* ADC Source = CVDD */
+        while (ascodec_read(AS3514_ADC_1) < 0xe0);    /* 0x1e0 *.0025 = 1.20  */
+                                                      /* e0 = 8LSB's of 0x1e0 */
         asm volatile(
             "mrc p15, 0, r0, c1, c0  \n"
 
@@ -354,6 +356,9 @@ void set_cpu_frequency(long frequency)
             "bic r0, r0, #3<<30      \n"     /* fastbus clocking */
             "mcr p15, 0, r0, c1, c0  \n"
             : : : "r0" );
+
+        /* Decreasing frequency so reduce voltage after change */
+        ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_10));
 
         cpu_frequency = CPUFREQ_NORMAL;
     }
