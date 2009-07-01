@@ -18,6 +18,7 @@
 # KIND, either express or implied.
 #
 use String::Scanf;
+use Cwd;
 
 sub check_boundaries
 {
@@ -33,15 +34,59 @@ sub check_boundaries
     return 0;
 }
 
+sub dynamic_space
+{
+    my $space = $_[0], $space_array = $_[1], $ret;
+
+    printf "This address is in %s space, please select the %s which was used with this address:\n", $space, $space;
+    $count = 1;
+    foreach my $el (@$space_array)
+    {
+        printf " [%d]: %s\n", $count++, $el;
+    }
+
+    print "\n";
+    my $sel = -1;
+    do
+    {
+        print "Selection: ";
+        $sel = <STDIN>;
+    } while($sel <= 0 || $sel > $count - 1 || !($sel =~ /^[+-]?\d+$/));
+
+    my $file = sprintf("apps/%ss/%s", $space, @$space_array[$sel - 1]);
+    $ret{'library'} = sprintf("%s/%s", cwd(), $file);
+    open FILE, "$objdump -t $file |" or die "Can't open pipe: $!";
+    while(<FILE>)
+    {
+        chomp($_);
+        if(/^([0-9a-fA-F]+).+\s([0-9a-fA-F]{3,})\s(?:[^\s]+\s)?(.+)$/)
+        {
+            (my $addr) = sscanf("%lx", $1);
+            (my $size) = sscanf("%lx", $2);
+
+            if($lookaddr >= $addr && $lookaddr <= ($addr + $size))
+            {
+                my $diff = abs($lookaddr - $addr);
+                if(!defined($ret{'diff'}) || $diff <= $ret{'diff'})
+                {
+                    $ret{'diff'} = $diff;
+                    $ret{'function'} = $3;
+                }
+            }
+        }
+    }
+    close FILE;
+
+    return %ret;
+}
+
 ($lookaddr) = sscanf("0x%lx", $ARGV[0]);
 ($context_size) = $#ARGV > 0 ? $ARGV[1] : 5;
 
 if($lookaddr != 0)
 {
     # Determine the used objdump utility
-
     open MAKEFILE, "<Makefile" or die "Can't open Makefile: $!";
-    my $objdump;
     while(<MAKEFILE>)
     {
         chomp($_);
@@ -54,8 +99,29 @@ if($lookaddr != 0)
     }
     close MAKEFILE;
 
+    # Generate a list of all codecs
+    open FINDCODECS, "find apps/codecs/ -name '*.elf' 2>&1 |" or die "Can't open pipe: $!";
+    my @codecs;
+    while(<FINDCODECS>)
+    {
+        chomp($_);
+        $_ =~ s/apps\/codecs\///;
+        push(@codecs, $_);
+    }
+    close FINDCODECS;
+    # Generate a list of all plugins
+    open FINDPLUGINS, "find apps/plugins/ -name '*.elf' 2>&1 |" or die "Can't open pipe: $!";
+    my @plugins;
+    while(<FINDPLUGINS>)
+    {
+        chomp($_);
+        $_ =~ s/apps\/plugins\///;
+        push(@plugins, $_);
+    }
+    close FINDPLUGINS;
+
     open MAPFILE, "<rockbox.map" or die "Can't open rockbox.map: $!";
-    my $addr, $size, $library, $match, $prev_function;
+    my $addr, $size, $library, $match, $prev_function, $codec_addr, $plugin_addr;
     while(<MAPFILE>)
     {
         chomp($_);
@@ -64,6 +130,20 @@ if($lookaddr != 0)
         {
             $prev_function = $1;
         }
+
+        if(/^\.([^\s]+)\s*(0x[0-9a-fA-F]+)/)
+        {
+            ($addr) = sscanf("0x%lx", $2);
+            if($1 eq "plugin" || $1 eq "codec")
+            {
+                $plugin_addr = $addr;
+            }
+            elsif($1 eq "codec")
+            {
+                $codec_addr = $addr;
+            }
+        }
+
 
         if(/^.*?\s*(0x[0-9a-fA-F]+)\s*(0x[0-9a-fA-F]+)\s(.+)$/)
         {
@@ -115,6 +195,17 @@ if($lookaddr != 0)
     }
     close MAPFILE;
 
+    if($lookaddr >= $codec_addr && $lookaddr < $plugin_addr)
+    {
+        # look for codec
+        %match = dynamic_space("codec", \@codecs);
+    }
+    elsif($lookaddr >= $plugin_addr)
+    {
+        # look for plugin
+        %match = dynamic_space("plugin", \@plugins);
+    }
+
     printf "%s -> %s\n\n", $match{'library'}, $match{'function'};
 
     # Replace path/libfoo.a(bar.o) with path/libfoo.a
@@ -126,7 +217,7 @@ if($lookaddr != 0)
     {
         chomp($_);
 
-        if(/^[0-9]+ \<(.+)\>:$/)
+        if(/^[0-9a-fA-F]+\s\<(.+)\>:$/)
         {
             $found = ($1 eq $match{'function'});
         }
@@ -140,6 +231,10 @@ if($lookaddr != 0)
             {
                 ($addr) = sscanf("%lx", $1);
 
+                if($addr - $lookaddr > 0)
+                {
+                    $addr -= $lookaddr;
+                }
                 if(abs($match{'diff'} - $addr) <= $context_size * 4)
                 {
                     printf "%s%s\n", ($addr == $match{'diff'} ? ">": " "), $_;
@@ -162,7 +257,7 @@ This makes it possible to find the exact assembly instruction at the specified
 memory location (depends on Makefile, rockbox.map and the object files).
 
 Usage example:
-    mcuelenaere\@wim2160:~/rockbox/build2\$ ../utils/analysis/find_addr.pl 0x8001a434 3
+    mcuelenaere\@wim2160:~/rockbox/build2\$ ../utils/analysis/find_addr.pl 0x8001a434 1
     /home/mcuelenaere/rockbox/build2/apps/screens.o -> id3_get_info
 
       23c:  00601021    move    v0,v1
