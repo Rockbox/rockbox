@@ -29,7 +29,7 @@
 #undef luai_jmpbuf
 
 #undef LUA_PATH_DEFAULT
-#define LUA_PATH_DEFAULT  "./?.lua;" VIEWERS_DIR"/?.lua;"
+#define LUA_PATH_DEFAULT  "$/?.lua;" VIEWERS_DIR"/?.lua;"
 
 #ifndef SIMULATOR
 #include "../../codecs/lib/setjmp.h"

@@ -21,6 +21,8 @@
  ****************************************************************************/
 
 #include "plugin.h"
+#define _ROCKCONF_H_ /* Protect against unwanted include */
+#include "lua.h"
 
 #if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
 int errno = 0;
@@ -57,5 +59,36 @@ long pow(long x, long y)
 int strcoll(const char * str1, const char * str2)
 {
     return rb->strcmp(str1, str2);
+}
+
+const char* get_current_path(lua_State *L, int level)
+{
+    static char buffer[MAX_PATH];
+    lua_Debug ar;
+
+    if(lua_getstack(L, level, &ar))
+    {
+        /* Try determining the base path of the current Lua chunk
+            and write it to dest. */
+        lua_getinfo(L, "S", &ar);
+
+        char* curfile = (char*) &ar.source[1];
+        char* pos = rb->strrchr(curfile, '/');
+        if(pos != NULL)
+        {
+            unsigned int len = (unsigned int)(pos - curfile);
+            len = len + 1 > sizeof(buffer) ? sizeof(buffer) - 1 : len;
+
+            if(len > 0)
+                memcpy(buffer, curfile, len);
+
+            buffer[len] = '/';
+            buffer[len+1] = '\0';
+
+            return buffer;
+        }
+    }
+
+    return NULL;
 }
 

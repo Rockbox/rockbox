@@ -20,6 +20,7 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
+#include "rocklib.h"
 
 
 #define setprogdir(L)       ((void)0)
@@ -53,7 +54,7 @@ static const char *pushnexttemplate (lua_State *L, const char *path) {
 
 static const char *findfile (lua_State *L, const char *name,
                                            const char *pname) {
-  const char *path;
+  const char *path, *current_path = get_current_path(L, 2);
   name = luaL_gsub(L, name, ".", LUA_DIRSEP);
   lua_getfield(L, LUA_ENVIRONINDEX, pname);
   path = lua_tostring(L, -1);
@@ -63,6 +64,7 @@ static const char *findfile (lua_State *L, const char *name,
   while ((path = pushnexttemplate(L, path)) != NULL) {
     const char *filename;
     filename = luaL_gsub(L, lua_tostring(L, -1), LUA_PATH_MARK, name);
+    if(current_path != NULL) filename = luaL_gsub(L, filename, "$", current_path);
     lua_remove(L, -2);  /* remove path template */
     if (readable(filename))  /* does file exist and is readable? */
       return filename;  /* return that file name */
