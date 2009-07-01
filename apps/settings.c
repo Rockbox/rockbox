@@ -620,27 +620,35 @@ int settings_save(void)
 bool settings_save_config(int options)
 {
     char filename[MAX_PATH];
-    char *folder;
+    char *folder, *namebase;
     switch (options)
     {
         case SETTINGS_SAVE_THEME:
             folder = THEME_DIR;
+            namebase = "theme";
             break;
 #ifdef HAVE_RECORDING
         case SETTINGS_SAVE_RECPRESETS:
             folder = RECPRESETS_DIR;
+            namebase = "recording";
             break;
 #endif
 #if CONFIG_CODEC == SWCODEC
         case SETTINGS_SAVE_EQPRESET:
             folder = EQS_DIR;
+            namebase = "eq";
             break;
 #endif
         case SETTINGS_SAVE_SOUND:
+            folder = ROCKBOX_DIR;
+            namebase = "sound";
+            break;
         default:
             folder = ROCKBOX_DIR;
+            namebase = "config";
+            break;
     }
-    create_numbered_filename(filename, folder, "config", ".cfg", 2
+    create_numbered_filename(filename, folder, namebase, ".cfg", 2
                              IF_CNFN_NUM_(, NULL));
 
     /* allow user to modify filename */
