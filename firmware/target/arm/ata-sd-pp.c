@@ -1306,12 +1306,12 @@ tCardInfo *card_get_info_target(int card_no)
     for(i=0; i<4; i++)  card.cid[i] = card_info[card_no].cid[3-i];
     card.numblocks    = card_info[card_no].numblocks;
     card.blocksize    = card_info[card_no].blocksize;
-    temp              = card_extract_bits(card.csd, 29, 3);
-    card.speed        = mantissa[card_extract_bits(card.csd, 25, 4)]
+    temp              = card_extract_bits(card.csd, 98, 3);
+    card.speed        = mantissa[card_extract_bits(card.csd, 102, 4)]
                       * exponent[temp > 2 ? 7 : temp + 4];
-    card.nsac         = 100 * card_extract_bits(card.csd, 16, 8);
-    temp              = card_extract_bits(card.csd, 13, 3);
-    card.taac         = mantissa[card_extract_bits(card.csd, 9, 4)]
+    card.nsac         = 100 * card_extract_bits(card.csd, 111, 8);
+    temp              = card_extract_bits(card.csd, 114, 3);
+    card.taac         = mantissa[card_extract_bits(card.csd, 118, 4)]
                       * exponent[temp] / 10;
     card.cid[0]       = htobe32(card.cid[0]); /* ascii chars here */
     card.cid[1]       = htobe32(card.cid[1]); /* ascii chars here */

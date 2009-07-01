@@ -425,25 +425,25 @@ static int initialize_card(int card_no)
     if (rc)
         return rc * 10 - 5;
 
-    blk_exp = card_extract_bits(card->csd, 44, 4);
+    blk_exp = card_extract_bits(card->csd, 83, 4);
     if (blk_exp < 9) /* block size < 512 bytes not supported */
         return -6;
 
-    card->numblocks = (card_extract_bits(card->csd, 54, 12) + 1)
-                   << (card_extract_bits(card->csd, 78, 3) + 2 + blk_exp - 9);
+    card->numblocks = (card_extract_bits(card->csd, 73, 12) + 1)
+                   << (card_extract_bits(card->csd, 49, 3) + 2 + blk_exp - 9);
     card->blocksize = BLOCK_SIZE;
 
     /* max transmission speed, clock divider */
-    ts_exp = card_extract_bits(card->csd, 29, 3);
+    ts_exp = card_extract_bits(card->csd, 98, 3);
     ts_exp = (ts_exp > 3) ? 3 : ts_exp;
-    card->speed = mantissa[card_extract_bits(card->csd, 25, 4)]
+    card->speed = mantissa[card_extract_bits(card->csd, 102, 4)]
                 * exponent[ts_exp + 4];
     card->bitrate_register = (FREQ/4-1) / card->speed;
 
     /* NSAC, TAAC, read timeout */
-    card->nsac = 100 * card_extract_bits(card->csd, 16, 8);
-    card->taac = mantissa[card_extract_bits(card->csd, 9, 4)];
-    taac_exp = card_extract_bits(card->csd, 13, 3);
+    card->nsac = 100 * card_extract_bits(card->csd, 111, 8);
+    card->taac = mantissa[card_extract_bits(card->csd, 118, 4)];
+    taac_exp = card_extract_bits(card->csd, 114, 3);
     card->read_timeout = ((FREQ/4) / (card->bitrate_register + 1)
                          * card->taac / exponent[9 - taac_exp]
                          + (10 * card->nsac));
@@ -451,7 +451,7 @@ static int initialize_card(int card_no)
     card->taac = card->taac * exponent[taac_exp] / 10;
 
     /* r2w_factor, write timeout */
-    card->r2w_factor = BIT_N(card_extract_bits(card->csd, 99, 3));
+    card->r2w_factor = BIT_N(card_extract_bits(card->csd, 28, 3));
     card->write_timeout = card->read_timeout * card->r2w_factor;
 
     if (card->r2w_factor > 32) /* Such cards often need extra read delay */

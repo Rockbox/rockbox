@@ -1675,12 +1675,12 @@ tCardInfo* card_get_info_target(int card_no)
         card.csd[i] = ((unsigned long*)&mmcinfo.csd)[i];
     for(i=0; i<4; i++)
         card.cid[i] = ((unsigned long*)&mmcinfo.cid)[i];
-    temp              = card_extract_bits(card.csd, 29, 3);
-    card.speed        = sd_mantissa[card_extract_bits(card.csd, 25, 4)]
+    temp              = card_extract_bits(card.csd, 98, 3);
+    card.speed        = sd_mantissa[card_extract_bits(card.csd, 102, 4)]
                       * sd_exponent[temp > 2 ? 7 : temp + 4];
-    card.nsac         = 100 * card_extract_bits(card.csd, 16, 8);
-    temp              = card_extract_bits(card.csd, 13, 3);
-    card.taac         = sd_mantissa[card_extract_bits(card.csd, 9, 4)]
+    card.nsac         = 100 * card_extract_bits(card.csd, 111, 8);
+    temp              = card_extract_bits(card.csd, 114, 3);
+    card.taac         = sd_mantissa[card_extract_bits(card.csd, 118, 4)]
                       * sd_exponent[temp] / 10;
     card.numblocks = mmcinfo.block_num;
     card.blocksize = mmcinfo.block_len;

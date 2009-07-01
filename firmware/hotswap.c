@@ -33,9 +33,14 @@ unsigned long card_extract_bits(
     unsigned int start,     /* bit no. to start reading  */
     unsigned int size)      /* how many bits to read */
 {
-    unsigned int long_index = start / 32;
-    unsigned int bit_index = start % 32;
+    unsigned int long_index, bit_index;
     unsigned long result;
+
+    /* we assume words of CSD/CID are stored least significant word first */
+    start = 127 - start;
+
+    long_index = start / 32;
+    bit_index = start % 32;
     
     result = p[long_index] << bit_index;
 

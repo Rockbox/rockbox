@@ -1910,20 +1910,20 @@ static int disk_callback(int btn, struct gui_synclist *lists)
             strncpy(card_name, ((unsigned char*)card->cid) + 3, 6);
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "%s Rev %d.%d", card_name,
-                    (int) card_extract_bits(card->cid, 72, 4),
-                    (int) card_extract_bits(card->cid, 76, 4));
+                    (int) card_extract_bits(card->cid, 55, 4),
+                    (int) card_extract_bits(card->cid, 51, 4));
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Prod: %d/%d",
-                    (int) card_extract_bits(card->cid, 112, 4),
-                    (int) card_extract_bits(card->cid, 116, 4) + 1997);
+                    (int) card_extract_bits(card->cid, 15, 4),
+                    (int) card_extract_bits(card->cid, 11, 4) + 1997);
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Ser#: 0x%08lx",
-                    card_extract_bits(card->cid, 80, 32));
+                    card_extract_bits(card->cid, 47, 32));
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "M=%02x, O=%04x",
-                    (int) card_extract_bits(card->cid, 0, 8),
-                    (int) card_extract_bits(card->cid, 8, 16));
-            int temp = card_extract_bits(card->csd, 2, 4);
+                    (int) card_extract_bits(card->cid, 127, 8),
+                    (int) card_extract_bits(card->cid, 119, 16));
+            int temp = card_extract_bits(card->csd, 125, 4);
             simplelist_addline(SIMPLELIST_ADD_LINE,
                      CARDTYPE " v%s", temp < 5 ?
                             spec_vers[temp] : "?.?");
@@ -1943,12 +1943,12 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                     "R2W: *%d", card->r2w_factor);
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "IRmax: %d..%d mA",
-                    i_vmin[card_extract_bits(card->csd, 66, 3)],
-                    i_vmax[card_extract_bits(card->csd, 69, 3)]);
+                    i_vmin[card_extract_bits(card->csd, 61, 3)],
+                    i_vmax[card_extract_bits(card->csd, 58, 3)]);
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "IWmax: %d..%d mA",
-                    i_vmin[card_extract_bits(card->csd, 72, 3)],
-                    i_vmax[card_extract_bits(card->csd, 75, 3)]);
+                    i_vmin[card_extract_bits(card->csd, 55, 3)],
+                    i_vmax[card_extract_bits(card->csd, 52, 3)]);
         }
         else if (card->initialized == 0)
         {
