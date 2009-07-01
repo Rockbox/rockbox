@@ -22,6 +22,7 @@
 #include "config.h"
 #include "jz4740.h"
 #include "backlight.h"
+#include "backlight-target.h"
 #include "font.h"
 #include "lcd.h"
 #include "usb.h"
@@ -46,10 +47,7 @@ static void show_splash(int timeout, const char *msg)
 static void usb_mode(void)
 {
     int button;
-    
-    /* Init backlight */
-    backlight_init();
-    
+
     /* Init USB */
     usb_init();
     usb_start_monitoring();
@@ -88,8 +86,7 @@ static void usb_mode(void)
 
 static void boot_of(void)
 {
-    /* Init backlight */
-    backlight_init();
+    /* Do nothing atm */
 }
 
 int main(void)
@@ -99,45 +96,38 @@ int main(void)
     int dummy;
 #endif
     void (*kernel_entry)(void);
-    
+
     kernel_init();
     lcd_init();
     font_init();
     lcd_setfont(FONT_SYSFIXED);
     button_init();
     adc_init();
+    backlight_init();
 
     reset_screen();
-    
+    printf(MODEL_NAME" Rockbox Bootloader"); 	 
+    printf("Version "APPSVERSION);
+
+    rc = storage_init();
+    if(rc)
+        error(EATA, rc);
+
 #ifdef HAVE_TOUCHSCREEN
     rc = button_read_device(&dummy);
 #else
     rc = button_read_device();
 #endif
-    
+
     if(rc & BUTTON_VOL_UP)
         usb_mode();
     else if(button_hold())
         boot_of();
-    else if(rc)
-        verbose = true;
-    
-    /* Only enable backlight when button is pressed */
-    if(verbose)
-    {
-        backlight_init();
-        printf(MODEL_NAME" Rockbox Bootloader"); 	 
-	    printf("Version "APPSVERSION);
-    }
-    
-    rc = storage_init();
-    if(rc)
-        error(EATA, rc);
 
     rc = disk_mount_all();
     if (rc <= 0)
         error(EDISK,rc);
-    
+
     printf("Loading firmware");
     rc = load_firmware((unsigned char *)CONFIG_SDRAM_START, BOOTFILE, 0x400000);
     if(rc < 0)
@@ -147,14 +137,16 @@ int main(void)
     {
         printf("Starting Rockbox...");
         adc_close(); /* Disable SADC */
+        _backlight_off(); /* Force backlight off to prevent LCD 'flicker' */
+
         disable_interrupt();
         kernel_entry = (void*) CONFIG_SDRAM_START;
         kernel_entry();
     }
-    
+
     /* Halt */
     while (1)
         core_idle();
-    
+
     return 0;
 }
