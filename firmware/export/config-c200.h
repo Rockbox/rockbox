@@ -188,7 +188,7 @@
 #define HAVE_USBSTACK
 #define USE_ROCKBOX_USB
 #define USB_VENDOR_ID 0x0781
-#define USB_PRODUCT_ID 0x7450
+#define USB_PRODUCT_ID 0x7451
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
