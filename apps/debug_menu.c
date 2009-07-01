@@ -1933,10 +1933,10 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                                             kbit_units, false);
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Speed: %s", pbuf);
-            output_dyn_value(pbuf, sizeof pbuf, card->tsac,
+            output_dyn_value(pbuf, sizeof pbuf, card->taac,
                             nsec_units, false);
             simplelist_addline(SIMPLELIST_ADD_LINE,
-                    "Tsac: %s", pbuf);
+                    "Taac: %s", pbuf);
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Nsac: %d clk", card->nsac);
             simplelist_addline(SIMPLELIST_ADD_LINE,

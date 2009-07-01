@@ -1672,10 +1672,6 @@ tCardInfo* card_get_info_target(int card_no)
     (void)card_no;
     int i, temp;
     static tCardInfo card;
-    static const char mantissa[] = {  /* *10 */
-        0,  10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
-    static const int exponent[] = {  /* use varies */
-      1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000 };
     
     card.initialized = true;
     card.ocr = 0;
@@ -1684,12 +1680,12 @@ tCardInfo* card_get_info_target(int card_no)
     for(i=0; i<4; i++)
         card.cid[i] = (*((unsigned long*)&mmcinfo.cid+4*i));
     temp              = card_extract_bits(card.csd, 29, 3);
-    card.speed        = mantissa[card_extract_bits(card.csd, 25, 4)]
-                      * exponent[temp > 2 ? 7 : temp + 4];
+    card.speed        = sd_mantissa[card_extract_bits(card.csd, 25, 4)]
+                      * sd_exponent[temp > 2 ? 7 : temp + 4];
     card.nsac         = 100 * card_extract_bits(card.csd, 16, 8);
     temp              = card_extract_bits(card.csd, 13, 3);
-    card.tsac         = mantissa[card_extract_bits(card.csd, 9, 4)]
-                      * exponent[temp] / 10;
+    card.taac         = sd_mantissa[card_extract_bits(card.csd, 9, 4)]
+                      * sd_exponent[temp] / 10;
     card.numblocks = mmcinfo.block_num;
     card.blocksize = mmcinfo.block_len;
     

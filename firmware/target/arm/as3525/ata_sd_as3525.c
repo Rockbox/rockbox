@@ -99,7 +99,7 @@ static void init_pl180_controller(const int drive);
 #define SECTOR_SIZE     512
 #define BLOCKS_PER_BANK 0x7a7800
 
-static tSDCardInfo card_info[NUM_VOLUMES];
+static tCardInfo card_info[NUM_VOLUMES];
 
 /* maximum timeouts recommanded in the SD Specification v2.00 */
 #define SD_MAX_READ_TIMEOUT     ((AS3525_PCLK_FREQ) / 1000 * 100) /* 100 ms */
@@ -181,7 +181,7 @@ void INT_MCI0(void)
 #endif
 
 static bool send_cmd(const int drive, const int cmd, const int arg,
-                     const int flags, int *response)
+                     const int flags, long *response)
 {
     int val, status;
 
@@ -243,9 +243,10 @@ static int sd_init_card(const int drive)
 {
     unsigned int  c_size;
     unsigned long c_mult;
-    int response;
+    unsigned long response;
     int max_tries = 100; /* max acmd41 attemps */
     bool sdhc;
+    unsigned char temp;
 
     if(!send_cmd(drive, SD_GO_IDLE_STATE, 0, MCI_NO_FLAGS, NULL))
         return -1;
@@ -286,6 +287,15 @@ static int sd_init_card(const int drive)
                             card_info[drive].cid))
         return -5;
 
+    /* ascii chars here */
+    card_info[drive].cid[0] = htobe32(card_info[drive].cid[0]);
+    card_info[drive].cid[1] = htobe32(card_info[drive].cid[1]);
+
+    /* adjust year<=>month, 1997 <=> 2000 */
+    temp = *((char*)card_info[drive].cid+13);
+    *((char*)card_info[drive].cid+13) =
+        (unsigned char)((temp >> 4) | (temp << 4)) + 3;
+
     /* send RCA */
     if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP|MCI_ARG,
                 &card_info[drive].rca))
@@ -299,23 +309,21 @@ static int sd_init_card(const int drive)
     /* These calculations come from the Sandisk SD card product manual */
     if( (card_info[drive].csd[3]>>30) == 0)
     {
+        int max_read_bl_len;
         /* CSD version 1.0 */
         c_size = ((card_info[drive].csd[2] & 0x3ff) << 2) + (card_info[drive].csd[1]>>30) + 1;
         c_mult = 4 << ((card_info[drive].csd[1] >> 15) & 7);
-        card_info[drive].max_read_bl_len = 1 << ((card_info[drive].csd[2] >> 16) & 15);
-        card_info[drive].block_size = BLOCK_SIZE;     /* Always use 512 byte blocks */
-        card_info[drive].numblocks = c_size * c_mult * (card_info[drive].max_read_bl_len/512);
-        card_info[drive].capacity = card_info[drive].numblocks * card_info[drive].block_size;
+        max_read_bl_len = 1 << ((card_info[drive].csd[2] >> 16) & 15);
+        card_info[drive].blocksize = BLOCK_SIZE;     /* Always use 512 byte blocks */
+        card_info[drive].numblocks = c_size * c_mult * (max_read_bl_len/512);
     }
 #ifdef HAVE_MULTIVOLUME
     else if( (card_info[drive].csd[3]>>30) == 1)
     {
         /* CSD version 2.0 */
         c_size = ((card_info[drive].csd[2] & 0x3f) << 16) + (card_info[drive].csd[1]>>16) + 1;
-        card_info[drive].max_read_bl_len = 1 << ((card_info[drive].csd[2] >> 16) & 0xf);
-        card_info[drive].block_size = BLOCK_SIZE;     /* Always use 512 byte blocks */
+        card_info[drive].blocksize = BLOCK_SIZE;     /* Always use 512 byte blocks */
         card_info[drive].numblocks = c_size << 10;
-        card_info[drive].capacity = card_info[drive].numblocks * card_info[drive].block_size;
     }
 #endif
 
@@ -328,7 +336,7 @@ static int sd_init_card(const int drive)
     if(!send_cmd(drive, SD_SET_BUS_WIDTH, card_info[drive].rca | 2, MCI_ARG, NULL))
         return -11;
 
-    if(!send_cmd(drive, SD_SET_BLOCKLEN, card_info[drive].block_size, MCI_ARG,
+    if(!send_cmd(drive, SD_SET_BLOCKLEN, card_info[drive].blocksize, MCI_ARG,
                  NULL))
         return -12;
 
@@ -518,7 +526,7 @@ void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
 #ifndef HAVE_MULTIVOLUME
     const int drive=0;
 #endif
-    info->sector_size=card_info[drive].block_size;
+    info->sector_size=card_info[drive].blocksize;
     info->num_sectors=card_info[drive].numblocks;
     info->vendor="Rockbox";
     info->product = (drive == 0) ?  "Internal Storage" : "SD Card Slot";
@@ -546,7 +554,7 @@ bool sd_present(IF_MV_NONVOID(int drive))
 
 static int sd_wait_for_state(const int drive, unsigned int state)
 {
-    unsigned int response = 0;
+    unsigned long response = 0;
     unsigned int timeout = 100; /* ticks */
     long t = current_tick;
 
@@ -686,7 +694,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
         /* Only switch banks for internal storage */
         if(drive == INTERNAL_AS3525)
         {
-            int bank = start / BLOCKS_PER_BANK; /* Current bank */
+            unsigned int bank = start / BLOCKS_PER_BANK; /* Current bank */
 
             /* Switch bank if needed */
             if(card_info[INTERNAL_AS3525].current_bank != bank)
@@ -737,7 +745,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
          * Note : the OF doesn't seem to use them anyway */
         MCI_DATA_TIMER(drive) = write ?
                 SD_MAX_WRITE_TIMEOUT : SD_MAX_READ_TIMEOUT;
-        MCI_DATA_LENGTH(drive) = transfer * card_info[drive].block_size;
+        MCI_DATA_LENGTH(drive) = transfer * card_info[drive].blocksize;
         MCI_DATA_CTRL(drive) =  (1<<0) /* enable */                     |
                                 (!write<<1) /* transfer direction */    |
                                 (1<<3) /* DMA */                        |
@@ -867,35 +875,24 @@ void sd_enable(bool on)
     }
 }
 
-/* move the sd-card info to mmc struct */
 tCardInfo *card_get_info_target(int card_no)
 {
-    int i, temp;
-    static tCardInfo card;
-    static const char mantissa[] = {  /* *10 */
-        0,  10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
-    static const int exponent[] = {  /* use varies */
-      1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000 };
+    unsigned char temp;
+    tCardInfo *card = &card_info[card_no];
 
-    card.initialized  = card_info[card_no].initialized;
-    card.ocr          = card_info[card_no].ocr;
-    for(i=0; i<4; i++)  card.csd[i] = card_info[card_no].csd[i];
-    for(i=0; i<4; i++)  card.cid[i] = card_info[card_no].cid[i];
-    card.numblocks    = card_info[card_no].numblocks;
-    card.blocksize    = card_info[card_no].block_size;
-    temp              = card_extract_bits(card.csd, 29, 3);
-    card.speed        = mantissa[card_extract_bits(card.csd, 25, 4)]
-                      * exponent[temp > 2 ? 7 : temp + 4];
-    card.nsac         = 100 * card_extract_bits(card.csd, 16, 8);
-    temp              = card_extract_bits(card.csd, 13, 3);
-    card.tsac         = mantissa[card_extract_bits(card.csd, 9, 4)]
-                      * exponent[temp] / 10;
-    card.cid[0]       = htobe32(card.cid[0]); /* ascii chars here */
-    card.cid[1]       = htobe32(card.cid[1]); /* ascii chars here */
-    temp = *((char*)card.cid+13); /* adjust year<=>month, 1997 <=> 2000 */
-    *((char*)card.cid+13) = (unsigned char)((temp >> 4) | (temp << 4)) + 3;
+    temp = card->csd[3];
+    card->speed = sd_mantissa[temp & 7] * sd_exponent[(temp >> 3) & 0xf];
 
-    return &card;
+    temp = card->csd[3] >> 8;
+    card->nsac = 100 * temp;
+
+    temp = (card->csd[3] >> 16) & 0x7f;    /* bit 7 reserved */
+    card->taac = sd_mantissa[temp >> 3] * sd_exponent[temp & 7];
+
+    temp = (card->csd[0] >> 26) & 7;
+    card->r2w_factor = temp;
+
+    return card;
 }
 
 bool card_detect_target(void)

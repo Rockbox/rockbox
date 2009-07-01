@@ -26,34 +26,50 @@
 typedef struct
 {  
     bool initialized;
-    unsigned char bitrate_register;
-    unsigned long read_timeout;   /* n * 8 clock cycles */
-    unsigned long write_timeout;  /* n * 8 clock cycles */
 
-    unsigned long ocr;            /* OCR register */
-    unsigned long csd[4];         /* CSD register, 16 bytes */
-    unsigned long cid[4];         /* CID register, 16 bytes */
-    unsigned long speed;          /* bit/s */
-    unsigned int nsac;            /* clock cycles */
-    unsigned long tsac;           /* n * 0.1 ns */
+    unsigned long read_timeout;     /* n * 8 clock cycles */
+    unsigned long write_timeout;    /* n * 8 clock cycles */
+
+    unsigned long ocr;              /* OCR register */
+    unsigned long csd[4];           /* CSD register, 16 bytes */
+    unsigned long cid[4];           /* CID register, 16 bytes */
+    unsigned long speed;            /* bit/s */
+    unsigned int nsac;              /* clock cycles */
+    unsigned long taac;             /* n * 0.1 ns */
     unsigned int r2w_factor;
-    unsigned long numblocks;      /* size in flash blocks */
-    unsigned int blocksize;       /* block size in bytes */
+    unsigned long numblocks;        /* size in flash blocks */
+    unsigned int blocksize;         /* block size in bytes */
+
+#if (CONFIG_STORAGE & STORAGE_MMC)
+    unsigned char bitrate_register;
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_SD)
+    unsigned long rca;               /* RCA register */
+    unsigned int current_bank;
+#endif
 } tCardInfo;
 
 #if (CONFIG_STORAGE & STORAGE_SD)
-#include "ata-sd-target.h"
+
+#include "sd.h"
 #define card_detect            card_detect_target
 #define card_get_info          card_get_info_target
+tCardInfo *card_get_info_target(int card_no);
+
 #ifdef HAVE_HOTSWAP
 #define card_enable_monitoring card_enable_monitoring_target
 #endif
+
 #else /* STORAGE_MMC */
+
 #include "ata_mmc.h"
 #define card_detect            mmc_detect
 #define card_get_info          mmc_card_info
+tCardInfo *mmc_card_info(int card_no);
 #define card_touched           mmc_touched
 #define card_enable_monitoring mmc_enable_monitoring
+
 #endif
 
 /* helper function to extract n (<=32) bits from an arbitrary position.

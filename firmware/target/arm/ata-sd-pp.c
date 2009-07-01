@@ -21,7 +21,9 @@
 #include "config.h" /* for HAVE_MULTIVOLUME */
 #include "fat.h"
 #include "hotswap.h"
-#include "ata-sd-target.h"
+#ifdef HAVE_HOTSWAP
+#include "sd-pp-target.h"
+#endif
 #include "ata_idle_notify.h"
 #include "system.h"
 #include <string.h>
@@ -156,8 +158,8 @@ static bool initialized = false;
 static long next_yield = 0;
 #define MIN_YIELD_PERIOD 1000
 
-static tSDCardInfo card_info[2];
-static tSDCardInfo *currcard = NULL; /* current active card */
+static tCardInfo card_info[2];
+static tCardInfo *currcard = NULL; /* current active card */
 
 struct sd_card_status
 {
@@ -222,7 +224,7 @@ static bool sd_poll_status(unsigned int trigger, long timeout)
 }
 
 static int sd_command(unsigned int cmd, unsigned long arg1,
-                      unsigned int *response, unsigned int cmdat)
+                      unsigned long *response, unsigned int cmdat)
 {
     int i, words; /* Number of 16 bit words to read from MMC_RES */
     unsigned int data[9];
@@ -303,7 +305,7 @@ static int sd_command(unsigned int cmd, unsigned long arg1,
 
 static int sd_wait_for_state(unsigned int state, int id)
 {
-    unsigned int response = 0;
+    unsigned long response = 0;
     unsigned int timeout = 0x80000;
 
     check_time[id] = USEC_TIMER;
@@ -647,7 +649,7 @@ static void sd_init_device(int card_no)
 {
 /* SD Protocol registers */
 #ifdef HAVE_HOTSWAP
-    unsigned int response = 0;
+    unsigned long response = 0;
 #endif
     unsigned int  i;
     unsigned int  c_size;
@@ -746,23 +748,21 @@ static void sd_init_device(int card_no)
     /* These calculations come from the Sandisk SD card product manual */
     if( (currcard->csd[3]>>30) == 0)
     {
+        int max_read_bl_len;
         /* CSD version 1.0 */
         c_size = ((currcard->csd[2] & 0x3ff) << 2) + (currcard->csd[1]>>30) + 1;
         c_mult = 4 << ((currcard->csd[1] >> 15) & 7);
-        currcard->max_read_bl_len = 1 << ((currcard->csd[2] >> 16) & 15);
-        currcard->block_size = BLOCK_SIZE;     /* Always use 512 byte blocks */
-        currcard->numblocks = c_size * c_mult * (currcard->max_read_bl_len/512);
-        currcard->capacity = currcard->numblocks * currcard->block_size;
+        max_read_bl_len = 1 << ((currcard->csd[2] >> 16) & 15);
+        currcard->blocksize = BLOCK_SIZE;     /* Always use 512 byte blocks */
+        currcard->numblocks = c_size * c_mult * (max_read_bl_len/512);
     }
 #ifdef HAVE_HOTSWAP
     else if( (currcard->csd[3]>>30) == 1)
     {
         /* CSD version 2.0 */
         c_size = ((currcard->csd[2] & 0x3f) << 16) + (currcard->csd[1]>>16) + 1;
-        currcard->max_read_bl_len = 1 << ((currcard->csd[2] >> 16) & 0xf);
-        currcard->block_size = BLOCK_SIZE;     /* Always use 512 byte blocks */
+        currcard->blocksize = BLOCK_SIZE;     /* Always use 512 byte blocks */
         currcard->numblocks = c_size << 10;
-        currcard->capacity = currcard->numblocks * currcard->block_size;
     }
 #endif /* HAVE_HOTSWAP */
     
@@ -782,12 +782,12 @@ static void sd_init_device(int card_no)
     if (ret < 0)
         goto card_init_error;
 
-    ret = sd_command(SD_SET_BLOCKLEN, currcard->block_size, NULL,
+    ret = sd_command(SD_SET_BLOCKLEN, currcard->blocksize, NULL,
                      CMDAT_RES_TYPE1);
     if (ret < 0)
         goto card_init_error;
 
-    MMC_BLKLEN = currcard->block_size;
+    MMC_BLKLEN = currcard->blocksize;
 
     /* If this card is >4GB & not SDHC, then we need to enable bank switching */
     if( (currcard->numblocks >= BLOCKS_PER_BANK) &&
@@ -867,7 +867,7 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
 #endif
     int ret;
     unsigned char *buf, *buf_end;
-    int bank;
+    unsigned int bank;
     
     /* TODO: Add DMA support. */
 
@@ -932,7 +932,7 @@ sd_read_retry:
 
     /* TODO: Don't assume BLOCK_SIZE == SECTOR_SIZE */
 
-    buf_end = (unsigned char *)inbuf + incount * currcard->block_size;
+    buf_end = (unsigned char *)inbuf + incount * currcard->blocksize;
     for (buf = inbuf; buf < buf_end;)
     {
         /* Wait for the FIFO to be full */
@@ -987,7 +987,7 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
 #endif
     int ret;
     const unsigned char *buf, *buf_end;
-    int bank;
+    unsigned int bank;
 
     mutex_lock(&sd_mtx);
     sd_enable(true);
@@ -1048,7 +1048,7 @@ sd_write_retry:
     if (ret < 0)
         goto sd_write_error;
 
-    buf_end = outbuf + count * currcard->block_size - 2*FIFO_LEN;
+    buf_end = outbuf + count * currcard->blocksize - 2*FIFO_LEN;
 
     for (buf = outbuf; buf <= buf_end;)
     {
@@ -1305,13 +1305,13 @@ tCardInfo *card_get_info_target(int card_no)
     for(i=0; i<4; i++)  card.csd[i] = card_info[card_no].csd[3-i];
     for(i=0; i<4; i++)  card.cid[i] = card_info[card_no].cid[3-i];
     card.numblocks    = card_info[card_no].numblocks;
-    card.blocksize    = card_info[card_no].block_size;
+    card.blocksize    = card_info[card_no].blocksize;
     temp              = card_extract_bits(card.csd, 29, 3);
     card.speed        = mantissa[card_extract_bits(card.csd, 25, 4)]
                       * exponent[temp > 2 ? 7 : temp + 4];
     card.nsac         = 100 * card_extract_bits(card.csd, 16, 8);
     temp              = card_extract_bits(card.csd, 13, 3);
-    card.tsac         = mantissa[card_extract_bits(card.csd, 9, 4)]
+    card.taac         = mantissa[card_extract_bits(card.csd, 9, 4)]
                       * exponent[temp] / 10;
     card.cid[0]       = htobe32(card.cid[0]); /* ascii chars here */
     card.cid[1]       = htobe32(card.cid[1]); /* ascii chars here */
@@ -1381,7 +1381,7 @@ void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
 #ifndef HAVE_MULTIVOLUME
     const int drive=0;
 #endif
-    info->sector_size=card_info[drive].block_size;
+    info->sector_size=card_info[drive].blocksize;
     info->num_sectors=card_info[drive].numblocks;
     info->vendor="Rockbox";
     if(drive==0)

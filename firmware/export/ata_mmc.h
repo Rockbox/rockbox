@@ -20,11 +20,9 @@
  ****************************************************************************/
 #ifndef __ATA_MMC_H__
 #define __ATA_MMC_H__
-#include "hotswap.h"
 
 void mmc_enable_int_flash_clock(bool on);
 bool mmc_detect(void);
-tCardInfo *mmc_card_info(int card_no);
 bool mmc_touched(void);
 bool mmc_usb_active(int delayticks);
 

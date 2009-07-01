@@ -23,7 +23,9 @@
 #include "i2s.h"
 #include "i2c-pp.h"
 #include "as3514.h"
-#include "ata-sd-target.h"
+#ifdef HAVE_HOTSWAP
+#include "sd-pp-target.h"
+#endif
 #include "button-target.h"
 #include "usb-target.h"
 #include "usb_drv.h"

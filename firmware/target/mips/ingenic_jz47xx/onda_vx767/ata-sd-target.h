@@ -26,14 +26,6 @@
 #include "hotswap.h"
 #include "jz4740.h"
 
-tCardInfo *card_get_info_target(int card_no);
-bool       card_detect_target(void);
-
-#ifdef HAVE_HOTSWAP
-void       card_enable_monitoring_target(bool on);
-void       microsd_int(void); /* ??? */
-#endif
-
 int _sd_read_sectors(unsigned long start, int count, void* buf);
 int _sd_write_sectors(unsigned long start, int count, const void* buf);
 int _sd_init(void);

@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include "mmc.h"
 #include "ata_mmc.h"
+#include "hotswap.h"
 #include "ata_idle_notify.h"
 #include "kernel.h"
 #include "thread.h"
@@ -439,15 +440,15 @@ static int initialize_card(int card_no)
                 * exponent[ts_exp + 4];
     card->bitrate_register = (FREQ/4-1) / card->speed;
 
-    /* NSAC, TSAC, read timeout */
+    /* NSAC, TAAC, read timeout */
     card->nsac = 100 * card_extract_bits(card->csd, 16, 8);
-    card->tsac = mantissa[card_extract_bits(card->csd, 9, 4)];
+    card->taac = mantissa[card_extract_bits(card->csd, 9, 4)];
     taac_exp = card_extract_bits(card->csd, 13, 3);
     card->read_timeout = ((FREQ/4) / (card->bitrate_register + 1)
-                         * card->tsac / exponent[9 - taac_exp]
+                         * card->taac / exponent[9 - taac_exp]
                          + (10 * card->nsac));
     card->read_timeout /= 8;      /* clocks -> bytes */
-    card->tsac = card->tsac * exponent[taac_exp] / 10;
+    card->taac = card->taac * exponent[taac_exp] / 10;
 
     /* r2w_factor, write timeout */
     card->r2w_factor = BIT_N(card_extract_bits(card->csd, 99, 3));

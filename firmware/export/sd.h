@@ -44,9 +44,17 @@ void sd_get_info(IF_MV2(int drive,) struct storage_info *info);
 #ifdef HAVE_HOTSWAP
 bool sd_removable(IF_MV_NONVOID(int drive));
 bool sd_present(IF_MV_NONVOID(int drive));
+void       card_enable_monitoring_target(bool on);
 #endif
 
+bool       card_detect_target(void);
+
 long sd_last_disk_activity(void);
+
+static const unsigned char sd_mantissa[] = {  /* *10 */
+    0,  10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
+static const unsigned int sd_exponent[] = {  /* use varies */
+    1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000 };
 
 /* SD States */
 #define SD_IDLE             0
