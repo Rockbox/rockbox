@@ -70,6 +70,7 @@ long sd_last_disk_activity(void);
 #define SD_SEND_RELATIVE_ADDR    3
 #define SD_SET_DSR               4
 #define SD_SWITCH_FUNC           6
+#define SD_SET_BUS_WIDTH         6  /* acmd6 */
 #define SD_SELECT_CARD           7
 #define SD_DESELECT_CARD         7
 #define SD_SEND_IF_COND          8
@@ -87,10 +88,9 @@ long sd_last_disk_activity(void);
 #define SD_ERASE_WR_BLK_START   32
 #define SD_ERASE_WR_BLK_END     33
 #define SD_ERASE                38
+#define SD_APP_OP_COND          41
+#define SD_LOCK_UNLOCK          42
+#define SD_SEND_SCR             51  /* acmd51 */
 #define SD_APP_CMD              55
-
-/* Application Specific commands */
-#define SD_SET_BUS_WIDTH    6
-#define SD_APP_OP_COND      41
 
 #endif
