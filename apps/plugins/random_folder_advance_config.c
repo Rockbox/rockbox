@@ -31,7 +31,8 @@ static int lasttick;
 #define RFADIR_FILE ROCKBOX_DIR "/folder_advance_dir.txt"
 #define RFA_FILE_TEXT ROCKBOX_DIR "/folder_advance_list.txt"
 #define MAX_REMOVED_DIRS 10
-#define MAX_SHUFFLE_SIZE (PLUGIN_BUFFER_SIZE/4 - 10000)
+/* The plugin code fits in less than 10k */
+#define MAX_SHUFFLE_SIZE (PLUGIN_BUFFER_SIZE/4 - 2500)
 
 char *buffer = NULL;
 ssize_t buffer_size;
