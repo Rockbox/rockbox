@@ -342,7 +342,6 @@ struct mmc_request
 };
 
 #define MMC_OCR_ARG             0x00ff8000  /* Argument of OCR */
-//#define MMC_OCR_ARG 0x40300000
 
 /***********************************************************************
  *  MMC Events
@@ -978,7 +977,7 @@ static int jz_mmc_transmit_data(struct mmc_request *req)
 static inline unsigned int jz_mmc_calc_clkrt(int is_sd, unsigned int rate)
 {
     unsigned int clkrt;
-    unsigned int clk_src = is_sd ? 24000000 : 20000000;
+    unsigned int clk_src = is_sd ? (sd2_0 ? 48000000 : 24000000) : 20000000;
 
     clkrt = 0;
     while (rate < clk_src)
@@ -1002,7 +1001,8 @@ static void jz_mmc_set_clock(int sd, unsigned int rate)
     {
         __cpm_select_msc_hs_clk(sd);        /* select clock source from CPM */
         REG_CPM_CPCCR |= CPM_CPCCR_CE;
-        REG_MSC_CLKRT = 0;
+        clkrt = jz_mmc_calc_clkrt(sd, rate);
+        REG_MSC_CLKRT = clkrt;
     }
     else
     {
@@ -1439,6 +1439,7 @@ static int mmc_init_card_state(struct mmc_request *request)
             break;
 
         case SD_SEND_IF_COND:
+            retval = mmc_unpack_r1(request, &r1);
             mmc_simple_cmd(request, MMC_APP_CMD,  0, RESPONSE_R1);
             break;
 
@@ -1451,7 +1452,7 @@ static int mmc_init_card_state(struct mmc_request *request)
                 limit_41++;
                 mmc_simple_cmd(request, SD_SEND_OP_COND, ocr, RESPONSE_R3);
             } else if (limit_41 < 100) {
-                limit_41++;        
+                limit_41++;
                 mmc_simple_cmd(request, SD_SEND_OP_COND, ocr, RESPONSE_R3);
             } else{
                 /* reset the card to idle*/
@@ -1619,8 +1620,8 @@ int mmc_select_card(void)
     retval = mmc_unpack_r1(&request, &r1);
     if (retval)
         return retval;
-    
-    return retval;
+
+    return 0;
 }
 
 int sd_init(void)
@@ -1636,8 +1637,8 @@ int sd_init(void)
         inited = true;
     }
     
-    mmc_send_cmd(&init_req, MMC_CIM_RESET,    0, 0, 0, RESPONSE_NONE, NULL);
-    mmc_send_cmd(&init_req, SD_GO_IDLE_STATE, 0, 0, 0, RESPONSE_NONE, NULL);
+    mmc_simple_cmd(&init_req, MMC_CIM_RESET,    0,     RESPONSE_NONE);
+    mmc_simple_cmd(&init_req, SD_GO_IDLE_STATE, 0,     RESPONSE_NONE);
     
     while ((retval = mmc_init_card_state(&init_req)) == MMC_INIT_DOING);
 
@@ -1676,9 +1677,9 @@ tCardInfo* card_get_info_target(int card_no)
     card.initialized = true;
     card.ocr = 0;
     for(i=0; i<4; i++)
-        card.csd[i] = (*((unsigned long*)&mmcinfo.csd+4*i));
+        card.csd[i] = ((unsigned long*)&mmcinfo.csd)[i];
     for(i=0; i<4; i++)
-        card.cid[i] = (*((unsigned long*)&mmcinfo.cid+4*i));
+        card.cid[i] = ((unsigned long*)&mmcinfo.cid)[i];
     temp              = card_extract_bits(card.csd, 29, 3);
     card.speed        = sd_mantissa[card_extract_bits(card.csd, 25, 4)]
                       * sd_exponent[temp > 2 ? 7 : temp + 4];
