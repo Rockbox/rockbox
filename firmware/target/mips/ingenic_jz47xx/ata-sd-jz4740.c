@@ -309,18 +309,12 @@ struct mmc_response_r3
 /* the information structure of MMC/SD Card */
 typedef struct MMC_INFO
 {
-    int             id;     /* Card index */
-    int             sd;     /* MMC or SD card */
     int             rca;    /* RCA */
-    unsigned int    scr;    /* SCR 63:32*/        
-    int             flags;  /* Ejected, inserted */
-
-    /* Card specific information */
     struct mmc_cid  cid;
     struct mmc_csd  csd;
     unsigned int    block_num;
     unsigned int    block_len;
-    unsigned int    erase_unit;
+    unsigned int    ocr;
 } mmc_info;
 
 struct mmc_request
@@ -1470,7 +1464,8 @@ static int mmc_init_card_state(struct mmc_request *request)
             }
 
             DEBUG("mmc_init_card_state: read ocr value = 0x%08x", r3.ocr);
-            
+            mmcinfo.ocr = r3.ocr;
+
             if(!(r3.ocr & MMC_CARD_BUSY || ocr == 0)){
                 udelay(10000);
                 mmc_simple_cmd(request, MMC_APP_CMD, 0, RESPONSE_R1);
@@ -1675,7 +1670,7 @@ tCardInfo* card_get_info_target(int card_no)
     static tCardInfo card;
     
     card.initialized = true;
-    card.ocr = 0;
+    card.ocr = mmcinfo.ocr;
     for(i=0; i<4; i++)
         card.csd[i] = ((unsigned long*)&mmcinfo.csd)[i];
     for(i=0; i<4; i++)
