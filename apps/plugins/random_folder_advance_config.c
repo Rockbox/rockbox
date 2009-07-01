@@ -493,7 +493,7 @@ int start_shuffled_play(void)
     rb->srand(*rb->current_tick);
     if(list->count>(int)max_shuffle_size)
     {
-        rb->splashf(HZ*2, "Too many files: %d", list->count);
+        rb->splashf(HZ*2, "Too many folders: %d (room for %d)", list->count,(int)max_shuffle_size);
         return 0;
     }
     for(i=0;i<list->count;i++)
