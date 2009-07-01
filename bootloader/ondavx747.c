@@ -106,7 +106,6 @@ int main(void)
     lcd_setfont(FONT_SYSFIXED);
     button_init();
     adc_init();
-    storage_init();
 
     reset_screen();
     
