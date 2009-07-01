@@ -26,6 +26,7 @@
 #include "as3514.h"
 #include "power.h"
 #include "synaptics-mep.h"
+#include "lcd.h"
 #include "logf.h"
 
 void power_init(void)
@@ -71,6 +72,12 @@ void power_init(void)
 void power_off(void)
 {
     char byte;
+
+    /* Backlight off */
+    ascodec_write(AS3514_DCDC15, 0);
+
+    /* LCD off/sleep (otherwise the image slowly fades out) */
+    lcd_sleep();
 
     /* Send shutdown command to PMU */
     byte = ascodec_read(AS3514_SYSTEM);

@@ -42,18 +42,21 @@
 #define LCD_DEPTH  16   /* 65536 colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
+#ifndef BOOTLOADER
 /* define this if you have LCD enable function */
-/* #define HAVE_LCD_ENABLE */
+#define HAVE_LCD_ENABLE
 
-/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
-   should be defined as well. */
-/* #define HAVE_LCD_SLEEP */
+/* Define this if your LCD can be put to sleep.
+   HAVE_LCD_ENABLE should be defined as well. */
+#define HAVE_LCD_SLEEP
+#define HAVE_LCD_SLEEP_SETTING
+#endif
 
 /* define this if you can flip your LCD */
-/* #define HAVE_LCD_FLIP */
+#define HAVE_LCD_FLIP
 
 /* define this if you can invert the colours on your LCD */
-/* #define HAVE_LCD_INVERT */
+#define HAVE_LCD_INVERT
 
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
@@ -150,8 +153,15 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ 75000000
 
-/* Type of LCD TODO: hopefully the same as the x5 but check this*/
+/* Type of LCD */
 #define CONFIG_LCD LCD_SA9200
+
+/* Define this if your LCD can set contrast */
+#define HAVE_LCD_CONTRAST
+
+#define MIN_CONTRAST_SETTING        0
+#define MAX_CONTRAST_SETTING       31
+#define DEFAULT_CONTRAST_SETTING   22 /* Match boot contrast */
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC

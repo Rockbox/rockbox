@@ -25,6 +25,7 @@
 #include "ascodec.h"
 #include "as3514.h"
 #include "synaptics-mep.h"
+#include "lcd.h"
 
 void _backlight_set_brightness(int brightness)
 {
