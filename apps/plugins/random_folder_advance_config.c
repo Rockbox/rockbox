@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "file.h"
 
 PLUGIN_HEADER
 
@@ -30,6 +31,7 @@ static int lasttick;
 #define RFADIR_FILE ROCKBOX_DIR "/folder_advance_dir.txt"
 #define RFA_FILE_TEXT ROCKBOX_DIR "/folder_advance_list.txt"
 #define MAX_REMOVED_DIRS 10
+#define MAX_SHUFFLE_SIZE (PLUGIN_BUFFER_SIZE/4 - 10000)
 
 char *buffer = NULL;
 ssize_t buffer_size;
@@ -40,6 +42,7 @@ struct file_format {
     char folder[][MAX_PATH];
 };
 struct file_format *list = NULL;
+static int order[MAX_SHUFFLE_SIZE];
 
 void update_screen(bool clear)
 {
@@ -460,6 +463,68 @@ int import_list_from_file_text(void)
     return list->count;
 }
 
+int start_shuffled_play(void)
+{
+    int i = 0;
+    /* load the dat file if not already done */
+    if ((list == NULL || list->count == 0) && (i = load_list()) != 0)
+    {
+        rb->splashf(HZ*2, "Could not load %s, rv = %d", RFA_FILE, i);
+        return 0;
+    }
+        
+    if (list->count <= 0)
+    {
+        rb->splashf(HZ*2, "no dirs in list file: %s", RFA_FILE);
+        return 0;
+    }
+
+    /* shuffle the thing */
+    rb->srand(*rb->current_tick);
+    if(list->count>MAX_SHUFFLE_SIZE)
+    {
+        rb->splashf(HZ*2, "Too many files: %d", list->count);
+        return 0;
+    }
+    for(i=0;i<list->count;i++)
+        order[i]=i;
+    
+    for(i = list->count - 1; i >= 0; i--)
+    {
+        /* the rand is from 0 to RAND_MAX, so adjust to our value range */
+        int candidate = rb->rand() % (i + 1);
+
+        /* now swap the values at the 'i' and 'candidate' positions */
+        int store = order[candidate];
+        order[candidate] = order[i];
+        order[i] = store;
+    }
+        
+    /* We don't want whatever is playing */
+    if (!(rb->playlist_remove_all_tracks(NULL) == 0
+          && rb->playlist_create(NULL, NULL) == 0))
+    {
+        rb->splashf(HZ*2, "Could not clear playlist");
+        return 0;
+    }
+
+    /* add the lot to the playlist */
+    for (i = 0; i < list->count; i++)
+    {
+        if (list->folder[order[i]][0] != ' ')
+        {
+            rb->playlist_insert_directory(NULL,list->folder[order[i]],PLAYLIST_INSERT_LAST,false,false);
+        }
+        if (rb->action_userabort(TIMEOUT_NOBLOCK))
+        {
+           break;
+        }
+    }
+    rb->splash(HZ, "Done");
+    rb->playlist_start(0,0);
+    return 1;
+}
+
 int main_menu(void)
 {
     bool exit = false;
@@ -469,6 +534,7 @@ int main_menu(void)
                         "Edit Folder List",
                         "Export List To Textfile",
                         "Import List From Textfile",
+                        "Play Shuffled",
                         "Quit");
 
     switch (rb->do_menu(&menu, NULL, NULL, false))
@@ -527,6 +593,10 @@ int main_menu(void)
             rb->backlight_on();
             break;
         case 4:
+            start_shuffled_play();
+            exit=true;
+            break;
+        case 5:
             return 1;
     }
     return exit?1:0;

@@ -658,6 +658,7 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    playlist_insert_directory,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
