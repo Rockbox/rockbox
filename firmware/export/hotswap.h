@@ -56,6 +56,7 @@ typedef struct
 #define card_detect            card_detect_target
 #define card_get_info          card_get_info_target
 tCardInfo *card_get_info_target(int card_no);
+void sd_parse_csd(tCardInfo *card);
 
 #ifdef HAVE_HOTSWAP
 #define card_enable_monitoring card_enable_monitoring_target

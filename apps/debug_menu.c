@@ -1889,8 +1889,11 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     static const unsigned char i_vmax[] = { 1, 5, 10, 25, 35, 45, 80, 200 };
     static const unsigned char *kbit_units[] = { "kBit/s", "MBit/s", "GBit/s" };
     static const unsigned char *nsec_units[] = { "ns", "µs", "ms" };
-    static const char *spec_vers[] = { "1.0-1.2", "1.4", "2.0-2.2",
+#if (CONFIG_STORAGE & STORAGE_MMC)
+    static const char *mmc_spec_vers[] = { "1.0-1.2", "1.4", "2.0-2.2",
         "3.1-3.31", "4.0" };
+#endif
+
     if ((btn == ACTION_STD_OK) || (btn == SYS_FS_CHANGED) || (btn == ACTION_REDRAW))
     {
 #ifdef HAVE_HOTSWAP
@@ -1914,19 +1917,43 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                     (int) card_extract_bits(card->cid, 51, 4));
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Prod: %d/%d",
+#if (CONFIG_STORAGE & STORAGE_SD)
+                    (int) card_extract_bits(card->cid, 11, 3),
+                    (int) card_extract_bits(card->cid, 19, 8) + 2000
+#elif (CONFIG_STORAGE & STORAGE_MMC)
                     (int) card_extract_bits(card->cid, 15, 4),
-                    (int) card_extract_bits(card->cid, 11, 4) + 1997);
+                    (int) card_extract_bits(card->cid, 11, 4) + 1997
+#endif
+                    );
             simplelist_addline(SIMPLELIST_ADD_LINE,
+#if (CONFIG_STORAGE & STORAGE_SD)
                     "Ser#: 0x%08lx",
-                    card_extract_bits(card->cid, 47, 32));
-            simplelist_addline(SIMPLELIST_ADD_LINE,
-                    "M=%02x, O=%04x",
+                    card_extract_bits(card->cid, 55, 32)
+#elif (CONFIG_STORAGE & STORAGE_MMC)
+                    "Ser#: 0x%04lx",
+                    card_extract_bits(card->cid, 47, 16)
+#endif
+                    );
+
+            simplelist_addline(SIMPLELIST_ADD_LINE, "M=%02x, "
+#if (CONFIG_STORAGE & STORAGE_SD)
+                    "O=%c%c",
                     (int) card_extract_bits(card->cid, 127, 8),
-                    (int) card_extract_bits(card->cid, 119, 16));
+                    card_extract_bits(card->cid, 119, 8),
+                    card_extract_bits(card->cid, 111, 8)
+#elif (CONFIG_STORAGE & STORAGE_MMC)
+                    "O=%04x",
+                    (int) card_extract_bits(card->cid, 127, 8),
+                    (int) card_extract_bits(card->cid, 119, 16)
+#endif
+                    );
+
+#if (CONFIG_STORAGE & STORAGE_MMC)
             int temp = card_extract_bits(card->csd, 125, 4);
             simplelist_addline(SIMPLELIST_ADD_LINE,
-                     CARDTYPE " v%s", temp < 5 ?
-                            spec_vers[temp] : "?.?");
+                     "MMC v%s", temp < 5 ?
+                            mmc_spec_vers[temp] : "?.?");
+#endif
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Blocks: 0x%08lx", card->numblocks);
             output_dyn_value(pbuf, sizeof pbuf, card->speed / 1000,

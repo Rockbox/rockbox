@@ -41,8 +41,6 @@ static long last_disk_activity = -1;
 
 #define DEBUG(x...)         logf(x)
 
-#define BLOCK_SIZE          512
-
 #define MMC_INSERT_STATUS() __gpio_get_pin(MMC_CD_PIN)
 #define MMC_RESET()         __msc_reset()
 
@@ -1668,7 +1666,12 @@ tCardInfo* card_get_info_target(int card_no)
     (void)card_no;
     int i, temp;
     static tCardInfo card;
-    
+
+    static const unsigned char sd_mantissa[] = {  /* *10 */
+        0,  10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
+    static const unsigned int sd_exponent[] = {  /* use varies */
+        1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000 };
+
     card.initialized = true;
     card.ocr = mmcinfo.ocr;
     for(i=0; i<4; i++)
@@ -1707,22 +1710,22 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf
     if (retval && (retval != MMC_ERROR_STATE_MISMATCH))
         return retval;
     
-    mmc_simple_cmd(&request, MMC_SET_BLOCKLEN, BLOCK_SIZE, RESPONSE_R1);
+    mmc_simple_cmd(&request, MMC_SET_BLOCKLEN, SD_BLOCK_SIZE, RESPONSE_R1);
     if ((retval = mmc_unpack_r1(&request, &r1)))
         return retval;
     
     if (sd2_0)
     {
         mmc_send_cmd(&request, MMC_READ_MULTIPLE_BLOCK, start,
-                     count, BLOCK_SIZE, RESPONSE_R1, buf);
+                     count, SD_BLOCK_SIZE, RESPONSE_R1, buf);
         if ((retval = mmc_unpack_r1(&request, &r1)))
             return retval;
     }
     else
     {
         mmc_send_cmd(&request, MMC_READ_MULTIPLE_BLOCK,
-                     start * BLOCK_SIZE, count,
-                     BLOCK_SIZE, RESPONSE_R1, buf);
+                     start * SD_BLOCK_SIZE, count,
+                     SD_BLOCK_SIZE, RESPONSE_R1, buf);
         if ((retval = mmc_unpack_r1(&request, &r1)))
             return retval;
     }
@@ -1757,14 +1760,14 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const vo
     if (retval && (retval != MMC_ERROR_STATE_MISMATCH))
         return retval;
 
-    mmc_simple_cmd(&request, MMC_SET_BLOCKLEN, BLOCK_SIZE, RESPONSE_R1);
+    mmc_simple_cmd(&request, MMC_SET_BLOCKLEN, SD_BLOCK_SIZE, RESPONSE_R1);
     if ((retval = mmc_unpack_r1(&request, &r1)))
         return retval;
 
     if (sd2_0)
     {
         mmc_send_cmd(&request, MMC_WRITE_MULTIPLE_BLOCK, start,
-                 count, BLOCK_SIZE, RESPONSE_R1,
+                 count, SD_BLOCK_SIZE, RESPONSE_R1,
                  (void*)buf);
         if ((retval = mmc_unpack_r1(&request, &r1)))
             return retval;
@@ -1772,8 +1775,8 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const vo
     else
     {
         mmc_send_cmd(&request, MMC_WRITE_MULTIPLE_BLOCK,
-                 start * BLOCK_SIZE, count,
-                 BLOCK_SIZE, RESPONSE_R1, (void*)buf);
+                 start * SD_BLOCK_SIZE, count,
+                 SD_BLOCK_SIZE, RESPONSE_R1, (void*)buf);
         if ((retval = mmc_unpack_r1(&request, &r1)))
             return retval;
     }

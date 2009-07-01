@@ -36,7 +36,6 @@
 #include "sd.h"
 #include "storage.h"
 
-#define BLOCK_SIZE      512
 #define SECTOR_SIZE     512
 #define BLOCKS_PER_BANK 0x7a7800
 
@@ -552,7 +551,7 @@ static int sd_select_bank(unsigned char bank)
 
     /* Write the card data */
     write_buf = card_data;
-    for (i = 0; i < BLOCK_SIZE/2; i += FIFO_LEN)
+    for (i = 0; i < SD_BLOCK_SIZE/2; i += FIFO_LEN)
     {
         /* Wait for the FIFO to empty */
         if (sd_poll_status(STAT_XMIT_FIFO_EMPTY, 10000))
@@ -652,10 +651,9 @@ static void sd_init_device(int card_no)
     unsigned long response = 0;
 #endif
     unsigned int  i;
-    unsigned int  c_size;
-    unsigned long c_mult;
     unsigned char carddata[512];
     unsigned char *dataptr;
+    unsigned long temp_reg[4];
     int ret;
 
 /* Enable and initialise controller */
@@ -733,38 +731,25 @@ static void sd_init_device(int card_no)
         }
     }
 
-    ret = sd_command(SD_ALL_SEND_CID, 0, currcard->cid, CMDAT_RES_TYPE2);
+    ret = sd_command(SD_ALL_SEND_CID, 0, temp_reg, CMDAT_RES_TYPE2);
     if (ret < 0)
         goto card_init_error;
+
+    for(i=0; i<4; i++)
+        currcard->cid[i] = temp_reg[3-i];
 
     ret = sd_command(SD_SEND_RELATIVE_ADDR, 0, &currcard->rca, CMDAT_RES_TYPE1);
     if (ret < 0)
         goto card_init_error;
 
-    ret = sd_command(SD_SEND_CSD, currcard->rca, currcard->csd, CMDAT_RES_TYPE2);
+    ret = sd_command(SD_SEND_CSD, currcard->rca, temp_reg, CMDAT_RES_TYPE2);
     if (ret < 0)
         goto card_init_error;
 
-    /* These calculations come from the Sandisk SD card product manual */
-    if( (currcard->csd[3]>>30) == 0)
-    {
-        int max_read_bl_len;
-        /* CSD version 1.0 */
-        c_size = ((currcard->csd[2] & 0x3ff) << 2) + (currcard->csd[1]>>30) + 1;
-        c_mult = 4 << ((currcard->csd[1] >> 15) & 7);
-        max_read_bl_len = 1 << ((currcard->csd[2] >> 16) & 15);
-        currcard->blocksize = BLOCK_SIZE;     /* Always use 512 byte blocks */
-        currcard->numblocks = c_size * c_mult * (max_read_bl_len/512);
-    }
-#ifdef HAVE_HOTSWAP
-    else if( (currcard->csd[3]>>30) == 1)
-    {
-        /* CSD version 2.0 */
-        c_size = ((currcard->csd[2] & 0x3f) << 16) + (currcard->csd[1]>>16) + 1;
-        currcard->blocksize = BLOCK_SIZE;     /* Always use 512 byte blocks */
-        currcard->numblocks = c_size << 10;
-    }
-#endif /* HAVE_HOTSWAP */
+    for(i=0; i<4; i++)
+        currcard->csd[i] = temp_reg[3-i];
+
+    sd_parse_csd(currcard);
     
     MMC_CLKRT = 0;  /* switch to highest clock rate */
 
@@ -805,7 +790,7 @@ static void sd_init_device(int card_no)
         The first 512 bits contain the status information
         TODO: Do something useful with this! */
         dataptr = carddata;
-        for (i = 0; i < BLOCK_SIZE/2; i += FIFO_LEN)
+        for (i = 0; i < SD_BLOCK_SIZE/2; i += FIFO_LEN)
         {
             /* Wait for the FIFO to be full */
             if (sd_poll_status(STAT_RECV_FIFO_FULL, 100000))
@@ -924,13 +909,13 @@ sd_read_retry:
     else
 #endif
     {
-        ret = sd_command(SD_READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, NULL,
+        ret = sd_command(SD_READ_MULTIPLE_BLOCK, start * SD_BLOCK_SIZE, NULL,
                          0x1c00 | CMDAT_BUSY | CMDAT_DATA_EN | CMDAT_RES_TYPE1);
     }
     if (ret < 0)
         goto sd_read_error;
 
-    /* TODO: Don't assume BLOCK_SIZE == SECTOR_SIZE */
+    /* TODO: Don't assume SD_BLOCK_SIZE == SECTOR_SIZE */
 
     buf_end = (unsigned char *)inbuf + incount * currcard->blocksize;
     for (buf = inbuf; buf < buf_end;)
@@ -1042,7 +1027,7 @@ sd_write_retry:
     else
 #endif
     {
-        ret = sd_command(SD_WRITE_MULTIPLE_BLOCK, start*BLOCK_SIZE, NULL,
+        ret = sd_command(SD_WRITE_MULTIPLE_BLOCK, start*SD_BLOCK_SIZE, NULL,
                          CMDAT_WR_RD | CMDAT_DATA_EN | CMDAT_RES_TYPE1);
     }
     if (ret < 0)
@@ -1290,35 +1275,9 @@ int sd_init(void)
     return ret;
 }
 
-/* move the sd-card info to mmc struct */
 tCardInfo *card_get_info_target(int card_no)
 {
-    int i, temp;
-    static tCardInfo card;
-    static const char mantissa[] = {  /* *10 */
-        0,  10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
-    static const int exponent[] = {  /* use varies */
-      1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000 };
-
-    card.initialized  = card_info[card_no].initialized;
-    card.ocr          = card_info[card_no].ocr;
-    for(i=0; i<4; i++)  card.csd[i] = card_info[card_no].csd[3-i];
-    for(i=0; i<4; i++)  card.cid[i] = card_info[card_no].cid[3-i];
-    card.numblocks    = card_info[card_no].numblocks;
-    card.blocksize    = card_info[card_no].blocksize;
-    temp              = card_extract_bits(card.csd, 98, 3);
-    card.speed        = mantissa[card_extract_bits(card.csd, 102, 4)]
-                      * exponent[temp > 2 ? 7 : temp + 4];
-    card.nsac         = 100 * card_extract_bits(card.csd, 111, 8);
-    temp              = card_extract_bits(card.csd, 114, 3);
-    card.taac         = mantissa[card_extract_bits(card.csd, 118, 4)]
-                      * exponent[temp] / 10;
-    card.cid[0]       = htobe32(card.cid[0]); /* ascii chars here */
-    card.cid[1]       = htobe32(card.cid[1]); /* ascii chars here */
-    temp = *((char*)card.cid+13); /* adjust year<=>month, 1997 <=> 2000 */
-    *((char*)card.cid+13) = (unsigned char)((temp >> 4) | (temp << 4)) + 3;
-
-    return &card;
+    return &card_info[card_no];
 }
 
 bool card_detect_target(void)

@@ -134,6 +134,8 @@ target/arm/ata-nand-telechips.c
 target/arm/s5l8700/ata-nand-s5l8700.c
 #elif (CONFIG_STORAGE & STORAGE_ATA)
 drivers/ata.c
+#elif (CONFIG_STORAGE & STORAGE_SD)
+drivers/sd.c
 #elif (CONFIG_STORAGE & STORAGE_RAMDISK)
 drivers/ramdisk.c
 #endif /* CONFIG_STORAGE */

@@ -94,9 +94,7 @@ static const int pl180_base[NUM_VOLUMES] = {
 static int sd_select_bank(signed char bank);
 static int sd_init_card(const int drive);
 static void init_pl180_controller(const int drive);
-/* TODO : BLOCK_SIZE != SECTOR_SIZE ? */
-#define BLOCK_SIZE      512
-#define SECTOR_SIZE     512
+#define SECTOR_SIZE     512 /* XXX: different sector sizes ? */
 #define BLOCKS_PER_BANK 0x7a7800
 
 static tCardInfo card_info[NUM_VOLUMES];
@@ -241,12 +239,11 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
 
 static int sd_init_card(const int drive)
 {
-    unsigned int  c_size;
-    unsigned long c_mult;
     unsigned long response;
     int max_tries = 100; /* max acmd41 attemps */
     bool sdhc;
-    unsigned char temp;
+    unsigned long temp_reg[4];
+    int i;
 
     if(!send_cmd(drive, SD_GO_IDLE_STATE, 0, MCI_NO_FLAGS, NULL))
         return -1;
@@ -284,17 +281,11 @@ static int sd_init_card(const int drive)
 
     /* send CID */
     if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP|MCI_ARG,
-                            card_info[drive].cid))
+                            temp_reg))
         return -5;
 
-    /* ascii chars here */
-    card_info[drive].cid[0] = htobe32(card_info[drive].cid[0]);
-    card_info[drive].cid[1] = htobe32(card_info[drive].cid[1]);
-
-    /* adjust year<=>month, 1997 <=> 2000 */
-    temp = *((char*)card_info[drive].cid+13);
-    *((char*)card_info[drive].cid+13) =
-        (unsigned char)((temp >> 4) | (temp << 4)) + 3;
+    for(i=0; i<4; i++)
+        card_info[drive].cid[3-i] = temp_reg[i];
 
     /* send RCA */
     if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP|MCI_ARG,
@@ -303,29 +294,13 @@ static int sd_init_card(const int drive)
 
     /* send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
-                 MCI_RESP|MCI_LONG_RESP|MCI_ARG, card_info[drive].csd))
+                 MCI_RESP|MCI_LONG_RESP|MCI_ARG, temp_reg))
         return -7;
 
-    /* These calculations come from the Sandisk SD card product manual */
-    if( (card_info[drive].csd[3]>>30) == 0)
-    {
-        int max_read_bl_len;
-        /* CSD version 1.0 */
-        c_size = ((card_info[drive].csd[2] & 0x3ff) << 2) + (card_info[drive].csd[1]>>30) + 1;
-        c_mult = 4 << ((card_info[drive].csd[1] >> 15) & 7);
-        max_read_bl_len = 1 << ((card_info[drive].csd[2] >> 16) & 15);
-        card_info[drive].blocksize = BLOCK_SIZE;     /* Always use 512 byte blocks */
-        card_info[drive].numblocks = c_size * c_mult * (max_read_bl_len/512);
-    }
-#ifdef HAVE_MULTIVOLUME
-    else if( (card_info[drive].csd[3]>>30) == 1)
-    {
-        /* CSD version 2.0 */
-        c_size = ((card_info[drive].csd[2] & 0x3f) << 16) + (card_info[drive].csd[1]>>16) + 1;
-        card_info[drive].blocksize = BLOCK_SIZE;     /* Always use 512 byte blocks */
-        card_info[drive].numblocks = c_size << 10;
-    }
-#endif
+    for(i=0; i<4; i++)
+        card_info[drive].csd[3-i] = temp_reg[i];
+
+    sd_parse_csd(&card_info[drive]);
 
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
         return -9;
@@ -723,7 +698,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 
         /* Set bank_start to the correct unit (blocks or bytes) */
         if(!(card_info[drive].ocr & (1<<30)))   /* not SDHC */
-            bank_start *= BLOCK_SIZE;
+            bank_start *= SD_BLOCK_SIZE;
 
         if(!send_cmd(drive, cmd, bank_start, MCI_ARG, NULL))
         {
@@ -877,22 +852,7 @@ void sd_enable(bool on)
 
 tCardInfo *card_get_info_target(int card_no)
 {
-    unsigned char temp;
-    tCardInfo *card = &card_info[card_no];
-
-    temp = card->csd[3];
-    card->speed = sd_mantissa[temp & 7] * sd_exponent[(temp >> 3) & 0xf];
-
-    temp = card->csd[3] >> 8;
-    card->nsac = 100 * temp;
-
-    temp = (card->csd[3] >> 16) & 0x7f;    /* bit 7 reserved */
-    card->taac = sd_mantissa[temp >> 3] * sd_exponent[temp & 7];
-
-    temp = (card->csd[0] >> 26) & 7;
-    card->r2w_factor = temp;
-
-    return card;
+    return &card_info[card_no];
 }
 
 bool card_detect_target(void)

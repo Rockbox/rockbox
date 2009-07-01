@@ -25,6 +25,8 @@
 #include <stdbool.h>
 #include "mv.h" /* for HAVE_MULTIVOLUME or not */
 
+#define SD_BLOCK_SIZE 512 /* XXX : support other sizes ? */
+
 struct storage_info;
 
 void sd_enable(bool on);
@@ -50,11 +52,6 @@ void       card_enable_monitoring_target(bool on);
 bool       card_detect_target(void);
 
 long sd_last_disk_activity(void);
-
-static const unsigned char sd_mantissa[] = {  /* *10 */
-    0,  10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
-static const unsigned int sd_exponent[] = {  /* use varies */
-    1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000 };
 
 /* SD States */
 #define SD_IDLE             0

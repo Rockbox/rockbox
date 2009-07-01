@@ -36,7 +36,7 @@ unsigned long card_extract_bits(
     unsigned int long_index, bit_index;
     unsigned long result;
 
-    /* we assume words of CSD/CID are stored least significant word first */
+    /* we assume words of CSD/CID are stored most significant word first */
     start = 127 - start;
 
     long_index = start / 32;
