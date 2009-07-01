@@ -31,8 +31,6 @@ static int lasttick;
 #define RFADIR_FILE ROCKBOX_DIR "/folder_advance_dir.txt"
 #define RFA_FILE_TEXT ROCKBOX_DIR "/folder_advance_list.txt"
 #define MAX_REMOVED_DIRS 10
-/* The plugin code fits in less than 10k */
-#define MAX_SHUFFLE_SIZE (PLUGIN_BUFFER_SIZE/4 - 2500)
 
 char *buffer = NULL;
 ssize_t buffer_size;
@@ -43,7 +41,6 @@ struct file_format {
     char folder[][MAX_PATH];
 };
 struct file_format *list = NULL;
-static int order[MAX_SHUFFLE_SIZE];
 
 void update_screen(bool clear)
 {
@@ -466,7 +463,19 @@ int import_list_from_file_text(void)
 
 int start_shuffled_play(void)
 {
+    int *order;
+    size_t max_shuffle_size;
     int i = 0;
+
+    /* get memory for shuffling */
+    order=rb->plugin_get_buffer(&max_shuffle_size);
+    max_shuffle_size/=sizeof(int);
+    if (order==NULL || max_shuffle_size==0)
+    {
+        rb->splashf(HZ*2, "Not enough memory for shuffling");
+        return 0;
+    }
+ 
     /* load the dat file if not already done */
     if ((list == NULL || list->count == 0) && (i = load_list()) != 0)
     {
@@ -482,7 +491,7 @@ int start_shuffled_play(void)
 
     /* shuffle the thing */
     rb->srand(*rb->current_tick);
-    if(list->count>MAX_SHUFFLE_SIZE)
+    if(list->count>(int)max_shuffle_size)
     {
         rb->splashf(HZ*2, "Too many files: %d", list->count);
         return 0;
