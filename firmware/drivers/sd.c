@@ -62,3 +62,16 @@ void sd_parse_csd(tCardInfo *card)
 
     card->r2w_factor = card_extract_bits(card->csd, 28, 3);
 }
+
+void sd_sleep(void)
+{
+}
+
+void sd_spin(void)
+{
+}
+
+void sd_spindown(int seconds)
+{
+    (void)seconds;
+}

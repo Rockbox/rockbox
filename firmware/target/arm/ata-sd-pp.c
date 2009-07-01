@@ -1372,16 +1372,3 @@ bool sd_present(IF_MV_NONVOID(int drive))
     return (card_info[drive].initialized && card_info[drive].numblocks > 0);
 }
 #endif
-
-void sd_sleep(void)
-{
-}
-
-void sd_spin(void)
-{
-}
-
-void sd_spindown(int seconds)
-{
-    (void)seconds;
-}

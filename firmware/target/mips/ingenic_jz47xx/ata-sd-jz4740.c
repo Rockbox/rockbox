@@ -732,80 +732,76 @@ static void jz_sd_get_response(struct sd_request *request)
 }
 
 #ifdef SD_DMA_ENABLE
-static int jz_sd_receive_data_dma(struct sd_request *req)
+static void jz_sd_receive_data_dma(struct sd_request *req)
 {
-    int ch = RX_DMA_CHANNEL;
     unsigned int size = req->block_len * req->nob;
+#if MMC_DMA_INTERRUPT
     unsigned char err = 0;
+#endif
 
     /* flush dcache */
-    dma_cache_wback_inv((unsigned long) req->buffer, size);
+    //dma_cache_wback_inv((unsigned long) req->buffer, size);
     /* setup dma channel */
-    REG_DMAC_DSAR(ch) = PHYSADDR(MSC_RXFIFO);    /* DMA source addr */
-    REG_DMAC_DTAR(ch) = PHYSADDR((unsigned long) req->buffer);    /* DMA dest addr */
-    REG_DMAC_DTCR(ch) = (size + 3) / 4;    /* DMA transfer count */
-    REG_DMAC_DRSR(ch) = DMAC_DRSR_RS_MSCIN;    /* DMA request type */
+    REG_DMAC_DSAR(DMA_SD_RX_CHANNEL) = PHYSADDR(MSC_RXFIFO);    /* DMA source addr */
+    REG_DMAC_DTAR(DMA_SD_RX_CHANNEL) = PHYSADDR((unsigned long) req->buffer);    /* DMA dest addr */
+    REG_DMAC_DTCR(DMA_SD_RX_CHANNEL) = (size + 3) / 4;    /* DMA transfer count */
+    REG_DMAC_DRSR(DMA_SD_RX_CHANNEL) = DMAC_DRSR_RS_MSCIN;    /* DMA request type */
 
 #if SD_DMA_INTERRUPT
-    REG_DMAC_DCMD(ch) =
+    REG_DMAC_DCMD(DMA_SD_RX_CHANNEL) =
         DMAC_DCMD_DAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DWDH_32 |
         DMAC_DCMD_DS_32BIT | DMAC_DCMD_TIE;
-    REG_DMAC_DCCSR(ch) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
+    REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
     OSSemPend(sd_dma_rx_sem, 100, &err);
 #else
-    REG_DMAC_DCMD(ch) =
+    REG_DMAC_DCMD(DMA_SD_RX_CHANNEL) =
         DMAC_DCMD_DAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DWDH_32 |
         DMAC_DCMD_DS_32BIT;
-    REG_DMAC_DCCSR(ch) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
-    while (REG_DMAC_DTCR(ch));
+    REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
+
+    //while (REG_DMAC_DTCR(DMA_SD_RX_CHANNEL));
+    while( !(REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) & DMAC_DCCSR_TT) );
 #endif
-/* clear status and disable channel */
-    REG_DMAC_DCCSR(ch) = 0;
-#if SD_DMA_INTERRUPT
-    return (err == OS_NO_ERR);
-#else
-    return 0;
-#endif
+
+    /* clear status and disable channel */
+    REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = 0;
 }
 
-static int jz_sd_transmit_data_dma(struct sd_request *req)
+static void jz_mmc_transmit_data_dma(struct mmc_request *req)
 {
-    int ch = TX_DMA_CHANNEL;
     unsigned int size = req->block_len * req->nob;
+#if SD_DMA_INTERRUPT
     unsigned char err = 0;
+#endif
 
     /* flush dcache */
-    dma_cache_wback_inv((unsigned long) req->buffer, size);
+    //dma_cache_wback_inv((unsigned long) req->buffer, size);
     /* setup dma channel */
-    REG_DMAC_DSAR(ch) = PHYSADDR((unsigned long) req->buffer);    /* DMA source addr */
-    REG_DMAC_DTAR(ch) = PHYSADDR(MSC_TXFIFO);    /* DMA dest addr */
-    REG_DMAC_DTCR(ch) = (size + 3) / 4;    /* DMA transfer count */
-    REG_DMAC_DRSR(ch) = DMAC_DRSR_RS_MSCOUT;    /* DMA request type */
+    REG_DMAC_DSAR(DMA_SD_TX_CHANNEL) = PHYSADDR((unsigned long) req->buffer);    /* DMA source addr */
+    REG_DMAC_DTAR(DMA_SD_TX_CHANNEL) = PHYSADDR(MSC_TXFIFO);    /* DMA dest addr */
+    REG_DMAC_DTCR(DMA_SD_TX_CHANNEL) = (size + 3) / 4;    /* DMA transfer count */
+    REG_DMAC_DRSR(DMA_SD_TX_CHANNEL) = DMAC_DRSR_RS_MSCOUT;    /* DMA request type */
 
 #if SD_DMA_INTERRUPT
-    REG_DMAC_DCMD(ch) =
+    REG_DMAC_DCMD(DMA_SD_TX_CHANNEL) =
         DMAC_DCMD_SAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DWDH_32 |
         DMAC_DCMD_DS_32BIT | DMAC_DCMD_TIE;
-    REG_DMAC_DCCSR(ch) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
+    REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
     OSSemPend(sd_dma_tx_sem, 100, &err);
 #else
-    REG_DMAC_DCMD(ch) =
+    REG_DMAC_DCMD(DMA_SD_TX_CHANNEL) =
         DMAC_DCMD_SAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DWDH_32 |
         DMAC_DCMD_DS_32BIT;
-    REG_DMAC_DCCSR(ch) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
+    REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
     /* wait for dma completion */
-    while (REG_DMAC_DTCR(ch));
+    while( !(REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) & DMAC_DCCSR_TT) );
 #endif
     /* clear status and disable channel */
-    REG_DMAC_DCCSR(ch) = 0;
-#if SD_DMA_INTERRUPT
-    return (err == OS_NO_ERR);
-#else
-    return 0;
-#endif
+
+    REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) = 0;
 }
 
-#endif                /* SD_DMA_ENABLE */
+#else                /* SD_DMA_ENABLE */
 
 static int jz_sd_receive_data(struct sd_request *req)
 {
@@ -830,10 +826,9 @@ static int jz_sd_receive_data(struct sd_request *req)
             else if (stat & MSC_STAT_CRC_READ_ERROR)
                 return SD_ERROR_CRC;
             else if (!(stat & MSC_STAT_DATA_FIFO_EMPTY)
-                 || (stat & MSC_STAT_DATA_FIFO_AFULL)) {
+                 || (stat & MSC_STAT_DATA_FIFO_AFULL))
                 /* Ready to read data */
                 break;
-            }
 
             udelay(1);
         }
@@ -889,10 +884,8 @@ static int jz_sd_transmit_data(struct sd_request *req)
                  MSC_STAT_CRC_WRITE_ERROR_NOSTS))
                 return SD_ERROR_CRC;
             else if (!(stat & MSC_STAT_DATA_FIFO_FULL))
-            {
                 /* Ready to write data */
                 break;
-            }
 
             udelay(1);
         }
@@ -923,6 +916,7 @@ static int jz_sd_transmit_data(struct sd_request *req)
 
     return SD_NO_ERROR;
 }
+#endif
 
 static inline unsigned int jz_sd_calc_clkrt(int is_sd, unsigned int rate)
 {
@@ -1726,22 +1720,9 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const vo
     return retval;
 }
 
-void sd_sleep(void)
-{
-}
-
-void sd_spin(void)
-{
-}
-
 long sd_last_disk_activity(void)
 {
     return last_disk_activity;
-}
-
-void sd_spindown(int seconds)
-{
-    (void)seconds;
 }
 
 #ifdef HAVE_HOTSWAP
