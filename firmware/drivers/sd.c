@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include "hotswap.h"
+#include "storage.h"
 
 static const unsigned char sd_mantissa[] = {  /* *10 */
     0,  10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
@@ -75,3 +76,25 @@ void sd_spindown(int seconds)
 {
     (void)seconds;
 }
+
+#ifdef STORAGE_GET_INFO
+void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
+{
+#ifndef HAVE_MULTIVOLUME
+    const int drive=0;
+#endif
+
+    tCardInfo *card = card_get_info_target(drive);
+
+    info->sector_size=card->blocksize;
+    info->num_sectors=card->numblocks;
+    info->vendor="Rockbox";
+#if CONFIG_STORAGE == STORAGE_SD
+    info->product = (drive==0) ? "Internal Storage" : "SD Card Slot";
+#else   /* Internal storage is not SD */
+    info->product = "SD Card Slot";
+#endif
+    info->revision="0.00";
+}
+#endif
+

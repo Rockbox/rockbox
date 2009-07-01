@@ -495,20 +495,6 @@ int sd_init(void)
     return 0;
 }
 
-#ifdef STORAGE_GET_INFO
-void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
-{
-#ifndef HAVE_MULTIVOLUME
-    const int drive=0;
-#endif
-    info->sector_size=card_info[drive].blocksize;
-    info->num_sectors=card_info[drive].numblocks;
-    info->vendor="Rockbox";
-    info->product = (drive == 0) ?  "Internal Storage" : "SD Card Slot";
-    info->revision="0.00";
-}
-#endif
-
 #ifdef HAVE_HOTSWAP
 bool sd_removable(IF_MV_NONVOID(int drive))
 {

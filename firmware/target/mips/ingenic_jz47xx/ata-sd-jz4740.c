@@ -1743,21 +1743,3 @@ bool sd_present(IF_MV_NONVOID(int drive))
 #endif
     return (sdinfo.block_num > 0 && card_detect_target());
 }
-
-#ifdef STORAGE_GET_INFO
-void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
-{
-#ifdef HAVE_MULTIVOLUME
-    (void)drive;
-#endif
-    /* firmware version */
-    info->revision="0.00";
-
-    info->vendor="Rockbox";
-    info->product="SD Storage";
-
-    /* blocks count */
-    info->num_sectors = sdinfo.block_num;
-    info->sector_size = sdinfo.block_len;
-}
-#endif
