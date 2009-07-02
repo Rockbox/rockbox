@@ -35,14 +35,14 @@ bool display_text(short words, char** text, struct style_text* style,
     int prev_drawmode;
 #endif
 #ifdef HAVE_LCD_COLOR
-    unsigned standard_fgcolor;
+    int standard_fgcolor;
 #endif
     int space_w, width, height;
     unsigned short x , y;
     unsigned short vp_width = LCD_WIDTH;
     unsigned short vp_height = LCD_HEIGHT;
     int button;
-    short i=0;
+    unsigned short i = 0, style_index = 0;
     if (vp_text != NULL) {
         vp_width = vp_text->width;
         vp_height = vp_text->height;
@@ -85,17 +85,17 @@ bool display_text(short words, char** text, struct style_text* style,
                     || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
             rb->screens[SCREEN_MAIN]->clear_viewport();
         }
-        /* no text formations available */
-        if (style==NULL) {
+        /* no text formatting available */
+        if (style==NULL || style[style_index].index != i) {
             rb->lcd_putsxy(x, y, text[i]);
         } else {
             /* set align */
-            if (style[i].flags&TEXT_CENTER) {
+            if (style[style_index].flags&TEXT_CENTER) {
                 x = (vp_width-width)/2;
             }
             /* set font color */
 #ifdef HAVE_LCD_COLOR
-            switch (style[i].flags&TEXT_COLOR_MASK) {
+            switch (style[style_index].flags&TEXT_COLOR_MASK) {
                 case C_RED:
                     rb->lcd_set_foreground(LCD_RGBPACK(255,0,0));
                     break;
@@ -118,11 +118,16 @@ bool display_text(short words, char** text, struct style_text* style,
             }
 #endif
             rb->lcd_putsxy(x, y, text[i]);
+            /* underline the word */
 #ifdef HAVE_LCD_BITMAP
-            if (style[i].flags&TEXT_UNDERLINE) {
+            if (style[style_index].flags&TEXT_UNDERLINE) {
                 rb->lcd_hline(x, x+width, y+height-1);
             }
 #endif
+#ifdef HAVE_LCD_COLOR
+            rb->lcd_set_foreground(standard_fgcolor);
+#endif
+            style_index++;
         }
         x += width + space_w;
     }

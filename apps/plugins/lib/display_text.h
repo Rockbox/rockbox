@@ -24,9 +24,9 @@
  * basic usage:
  * #define WORDS (sizeof text / sizeof (char*))
  * char *text[] = {"normal", "centering", "red,underline"};
- * struct style_text formation[WORDS]={
- *     [1] = { TEXT_CENTER },
- *     [2] = { C_RED|TEXT_UNDERLINE },
+ * struct style_text formation[]={
+ *     { 1, TEXT_CENTER },
+ *     { 2, C_RED|TEXT_UNDERLINE },
  * };
  * if (display_text(WORDS, text, formation, NULL))
  *      return PLUGIN_USB_CONNECTED;
@@ -38,10 +38,11 @@ enum ecolor { STANDARD, C_YELLOW, C_RED, C_BLUE, C_GREEN , C_ORANGE };
 #define TEXT_UNDERLINE  0x0200
 
 struct style_text {
+    unsigned short index;
     unsigned short flags;
 };
 
-/* style and vp_text is optional.
+/* style and vp_text are optional.
  * return true if usb is connected. */
 bool display_text(short words, char** text, struct style_text* style,
                   struct viewport* vp_text);
