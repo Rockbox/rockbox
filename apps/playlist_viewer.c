@@ -418,10 +418,18 @@ static bool update_playlist(bool force)
         /* Reload tracks */
         viewer.num_tracks = nb_tracks;
         if (viewer.num_tracks <= 0)
+        {
+            global_status.resume_index = -1;
+            global_status.resume_offset = -1;
             return false;
+        }
         playlist_buffer_load_entries_screen(&viewer.buffer, FORWARD);
         if (viewer.buffer.num_loaded <= 0)
+        {
+            global_status.resume_index = -1;
+            global_status.resume_offset = -1;
             return false;
+        }
     }
     return true;
 }
@@ -716,7 +724,7 @@ bool playlist_viewer_ex(const char* filename)
                     ret = true;
                     goto exit;
                 }
-                else if (ret > 0)
+                else if (ret_val > 0)
                 {
                     /* Playlist changed */
                     gui_synclist_del_item(&playlist_lists);
