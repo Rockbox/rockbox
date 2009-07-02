@@ -548,7 +548,7 @@ int count_flags( void )
 /* welcome screen where player can chose mine percentage */
 enum minesweeper_status menu( void )
 {
-    int selection, result = MINESWEEPER_QUIT;
+    int selection = 0, result = MINESWEEPER_QUIT;
     bool menu_quit = false;
 
     MENUITEM_STRINGLIST( menu, "Minesweeper Menu", NULL, "Play Minesweeper",
