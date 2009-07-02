@@ -203,9 +203,7 @@ static void debug(const char *msg)
     mem2hex(msg, &debugbuf[1], strlen(msg));
     putpacket(debugbuf);
 }
-#endif /* SH7034 */
-
-#ifdef HAVE_GDB_API
+#elif defined(HAVE_GDB_API)
 static void *get_api_function(int n)
 {
     struct gdb_api *api = (struct gdb_api *)GDB_API_ADDRESS;
@@ -230,8 +228,17 @@ static void debug(char *msg)
 void debug_init(void)
 {
 }
+#else /* !SH7034 && !HAVE_GDB_API */
+void debug_init(void)
+{
+}
 
-#endif /* HAVE_GDB_API */
+static inline void debug(char *msg)
+{
+    (void)msg;
+}
+#endif
+
 #endif /* end of DEBUG section */
 
 #ifdef __GNUC__
