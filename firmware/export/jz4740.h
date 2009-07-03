@@ -5212,4 +5212,8 @@ struct Ration2m
 /* Timer frequency */
 #define TIMER_FREQ (CFG_EXTAL) /* For full precision! */
 
+#define CPUFREQ_NORMAL  112000000   /* CPU clock: 112 MHz */
+#define CPUFREQ_DEFAULT 112000000   /* CPU clock: 112 MHz */
+#define CPUFREQ_MAX     336000000   /* CPU clock: 336 MHz */
+
 #endif /* __JZ4740_H__ */

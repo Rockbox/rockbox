@@ -541,10 +541,11 @@ void system_reboot(void)
 void system_exception_wait(void)
 {
     /* check for power button without including any .h file */
-    while (1)
+    while(1)
     {
-        if( ~REG_GPIO_PXPIN(3) & (1 << 29) )
-            break;
+        if( (~REG_GPIO_PXPIN(3)) & (1 << 29) )
+            return;
+        asm volatile("nop");
     }
 }
 
@@ -574,3 +575,19 @@ int system_memory_guard(int newmode)
     (void)newmode;
     return 0;
 }
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+void set_cpu_frequency(long frequency)
+{
+    unsigned long cfcr = REG_CPM_CPCCR;
+    cfcr &= ~CPM_CPCCR_CDIV_MASK;
+
+    if(frequency == CPUFREQ_NORMAL)
+        cfcr |= (0 << CPM_CPCCR_CDIV_BIT);
+    else
+        cfcr |= (2 << CPM_CPCCR_CDIV_BIT);
+
+    REG_CPM_CPCCR = cfcr;
+    cpu_frequency = frequency;
+}
+#endif

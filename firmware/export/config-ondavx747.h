@@ -187,9 +187,7 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
 /* Define this if you have adjustable CPU frequency */
-/* #define HAVE_ADJUSTABLE_CPU_FREQ */
-#define CPUFREQ_NORMAL 336000000    /* CPU clock: 336 MHz */
-#define CPUFREQ_MAX 336000000       /* CPU clock: 336 MHz */
+#define HAVE_ADJUSTABLE_CPU_FREQ
 
 #ifdef ONDA_VX747P
 #define BOOTFILE_EXT "vx747p"
