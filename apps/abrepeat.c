@@ -24,12 +24,14 @@
 
 #ifdef AB_REPEAT_ENABLE
 
+unsigned int test = 1;
 unsigned int ab_A_marker IDATA_ATTR = AB_MARKER_NONE;
 unsigned int ab_B_marker IDATA_ATTR = AB_MARKER_NONE;
-
+bool foo = false;
 #if (CONFIG_CODEC == SWCODEC)
 void ab_end_of_track_report(void)
 {
+    test = 2;
     if ( ab_A_marker_set() && ! ab_B_marker_set() )
     {
         ab_jump_to_A_marker();
@@ -38,6 +40,7 @@ void ab_end_of_track_report(void)
 #else
 static int ab_audio_event_handler(unsigned short event, unsigned long data)
 {
+    foo = true;
     int rc = AUDIO_EVENT_RC_IGNORED;
     if ( ab_repeat_mode_enabled() )
     {
