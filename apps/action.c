@@ -40,6 +40,7 @@ static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
 static intptr_t last_data = 0;
 static int last_action = ACTION_NONE;
 static bool repeated = false;
+static bool wait_for_release = false;
 
 #ifdef HAVE_TOUCHSCREEN
 static bool short_press = false;
@@ -127,6 +128,16 @@ static int get_action_worker(int context, int timeout,
     /* Data from sys events can be pulled with button_get_data */
     if (button == BUTTON_NONE || button & SYS_EVENT)
         return button;
+    /* Don't send any buttons through untill we see the release event */
+    if (wait_for_release)
+    {
+        if (button&BUTTON_REL)
+        {
+            wait_for_release = false;
+        }
+        return ACTION_NONE;
+    }
+        
 
 #if CONFIG_CODEC == SWCODEC
     /* Produce keyclick */
@@ -329,3 +340,13 @@ int action_get_touchscreen_press(short *x, short *y)
     return BUTTON_TOUCHSCREEN;
 }
 #endif
+
+/* Don't let get_action*() return any ACTION_* values untill the current buttons
+ * have ben release. SYS_* and BUTTON_NONE will go through.
+ * Any actions relying on _RELEASE won't get seen
+ */
+void action_wait_for_release(void)
+{
+    wait_for_release = true;
+}
+    

@@ -135,6 +135,8 @@ static void change_dir(int direction)
         audio_prev_dir();
     else if (direction > 0)
         audio_next_dir();
+    /* prevent the next dir to immediatly start being ffw'd */    
+    action_wait_for_release();     
 }
 
 static void prev_track(unsigned long skip_thresh)

@@ -295,4 +295,10 @@ intptr_t get_action_data(void);
 int action_get_touchscreen_press(short *x, short *y);
 #endif
 
+/* Don't let get_action*() return any ACTION_* values untill the current buttons
+ * have ben release. SYS_* and BUTTON_NONE will go through.
+ * Any actions relying on _RELEASE won't get seen
+ */
+void action_wait_for_release(void);
+
 #endif /* __ACTION_H__ */
