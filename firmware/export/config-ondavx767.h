@@ -160,8 +160,7 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
 /* Define this if you have adjustable CPU frequency */
-/* #define HAVE_ADJUSTABLE_CPU_FREQ */
-#define CPUFREQ_NORMAL 336000000    /* CPU clock: 336 MHz */
+#define HAVE_ADJUSTABLE_CPU_FREQ
 
 #define BOOTFILE_EXT "vx767"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
