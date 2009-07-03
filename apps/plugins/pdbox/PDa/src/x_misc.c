@@ -4,6 +4,13 @@
 
 /* misc. */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "s_stuff.h"
+extern uint64_t runningtime;
+#else /* ROCKBOX */
 #include "m_pd.h"
 #include "s_stuff.h"
 #include <math.h>
@@ -19,6 +26,7 @@
 #include <wtypes.h>
 #include <time.h>
 #endif
+#endif /* ROCKBOX */
 
 #if defined (MACOSX) || defined (__FreeBSD__)
 #define HZ CLK_TCK
@@ -68,6 +76,9 @@ static void random_bang(t_random *x)
 
 static void random_seed(t_random *x, float f, float glob)
 {
+#ifdef ROCKBOX
+    (void) glob;
+#endif
     x->x_state = f;
 }
 
@@ -155,6 +166,10 @@ typedef struct _serial
 
 static void serial_float(t_serial *x, t_float f)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) f;
+#else /* ROCKBOX */
     int n = f;
     char message[MAXSERIAL * 4 + 100];
     if (!x->x_open)
@@ -164,6 +179,7 @@ static void serial_float(t_serial *x, t_float f)
     }
     sprintf(message, "com%d_send \"\\%3.3o\"\n", x->x_portno, n);
     sys_gui(message);
+#endif /* ROCKBOX */
 }
 
 static void *serial_new(t_floatarg fportno)
@@ -190,6 +206,9 @@ static t_class *cputime_class;
 typedef struct _cputime
 {
     t_object x_obj;
+#ifdef ROCKBOX
+    uint64_t x_runningtime;
+#endif
 #ifdef UNIX
     struct tms x_setcputime;
 #endif
@@ -202,6 +221,9 @@ typedef struct _cputime
 
 static void cputime_bang(t_cputime *x)
 {
+#ifdef ROCKBOX
+    x->x_runningtime = runningtime;
+#endif
 #ifdef UNIX
     times(&x->x_setcputime);
 #endif
@@ -221,9 +243,16 @@ static void cputime_bang(t_cputime *x)
 #endif
 }
 
+#ifndef ROCKBOX
 #define HZ 100
+#endif
 static void cputime_bang2(t_cputime *x)
 {
+#ifdef ROCKBOX
+    float elapsedcpu = 1000 *
+                       (runningtime - x->x_runningtime) / HZ;
+    outlet_float(x->x_obj.ob_outlet, elapsedcpu);
+#endif
 #ifdef UNIX
     float elapsedcpu;
     struct tms newcputime;

@@ -4,8 +4,16 @@
 
 /*  send~, receive~, throw~, catch~ */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 #include "m_pd.h"
+
+#ifndef ROCKBOX
 #include <string.h>
+#endif
 
 #define DEFSENDVS 64	/* LATER get send to get this from canvas */
 

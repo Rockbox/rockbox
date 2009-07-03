@@ -24,7 +24,11 @@ static void tabwrite_tick(t_tabwrite *x)
 
 static void tabwrite_float(t_tabwrite *x, t_float f)
 {
+#ifdef ROCKBOX
+    int vecsize;
+#else
     int i, vecsize;
+#endif
     t_garray *a;
     t_sample *vec;
 

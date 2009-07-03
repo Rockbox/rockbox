@@ -1,4 +1,7 @@
+#ifndef ROCKBOX
 #define FIXEDPOINT
+#endif
+
 #include <m_pd.h>
 #include <m_fixed.h>
 
@@ -30,7 +33,11 @@ static t_int *tabread_tilde_perform(t_int *w)
     t_sample *out = (t_sample *)(w[3]);
     int n = (int)(w[4]);    
     int maxindex;
+#ifdef ROCKBOX
+    t_sample *buf = x->x_vec;
+#else
     t_sample *buf = x->x_vec, *fp;
+#endif
     int i;
     
     maxindex = x->x_npoints - 1;
@@ -82,6 +89,9 @@ static void tabread_tilde_dsp(t_tabread_tilde *x, t_signal **sp)
 
 static void tabread_tilde_free(t_tabread_tilde *x)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
 }
 
 void tabread_tilde_setup(void)

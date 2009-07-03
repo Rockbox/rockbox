@@ -1,3 +1,8 @@
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 #include <m_pd.h>
 #include <m_fixed.h>
 
@@ -36,7 +41,9 @@ static t_int *vline_tilde_perform(t_int *w)
     t_sample f = x->x_value;
     t_sample inc = x->x_inc;
     t_time msecpersamp = x->x_msecpersamp;
+#ifndef ROCKBOX
     t_time samppermsec = x->x_samppermsec;
+#endif
     t_time timenow = clock_gettimesince(x->x_referencetime) - n * msecpersamp;
     t_vseg *s = x->x_list;
     for (i = 0; i < n; i++)
@@ -58,7 +65,7 @@ static t_int *vline_tilde_perform(t_int *w)
 		}
 		else
 		{
-		    t_time incpermsec = div((s->s_target - f),
+		    t_time incpermsec = idiv((s->s_target - f),
 		    	(s->s_targettime - s->s_starttime));
 		    f = mult(f + incpermsec,(timenext - s->s_starttime));
 		    inc = mult(incpermsec,msecpersamp);
@@ -123,7 +130,7 @@ static void vline_tilde_float(t_vline *x, t_float f)
     }
     else
     {
-    	for (s1 = x->x_list; s2 = s1->s_next; s1 = s2)
+    	for (s1 = x->x_list; (s2 = s1->s_next); s1 = s2)
 	{
     	    if (s2->s_starttime > starttime ||
     		(s2->s_starttime == starttime &&

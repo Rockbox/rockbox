@@ -10,9 +10,15 @@
  * change marked with    IOhannes
  */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#ifdef SIMULATOR
+int printf(const char *fmt, ...);
+void perror(const char*);
+#endif
+#else /* ROCKBOX */
 #include <stdlib.h>
-#include "m_pd.h"
-#include "s_stuff.h"
 #include <stdio.h>
 #ifdef UNIX
 #include <unistd.h>
@@ -21,8 +27,13 @@
 #include <io.h>
 #endif
 #include <fcntl.h>
+
 #include <string.h>
 #include <stdarg.h>
+#endif /* ROCKBOX */
+
+#include "m_pd.h"
+#include "s_stuff.h"
 
 struct _binbuf
 {
@@ -72,7 +83,9 @@ void binbuf_text(t_binbuf *x, char *text, size_t size)
     x->b_n = 0;
     while (1)
     {
+#ifndef ROCKBOX
 	int type;
+#endif
 	    /* skip leading space */
 	while ((textp != etext) && (*textp == ' ' || *textp == '\n'
 	    || *textp == '\r' || *textp == '\t')) textp++;
@@ -158,6 +171,7 @@ void binbuf_text(t_binbuf *x, char *text, size_t size)
 #if 0
 	    post("buf %s", buf);
 #endif
+
 	    if (*buf == '$' && buf[1] >= '0' && buf[1] <= '9' && !firstslash)
 	    {
 		for (bufp = buf+2; *bufp; bufp++)
@@ -219,7 +233,7 @@ void binbuf_gettext(t_binbuf *x, char **bufp, int *lengthp)
     }
     if (length && buf[length-1] == ' ')
     {
-    	if (newbuf = t_resizebytes(buf, length, length-1))
+    	if((newbuf = t_resizebytes(buf, length, length-1)))
     	{
     	    buf = newbuf;
     	    length--;
@@ -236,8 +250,8 @@ void binbuf_add(t_binbuf *x, int argc, t_atom *argv)
 {
     int newsize = x->b_n + argc, i;
     t_atom *ap;
-    if (ap = t_resizebytes(x->b_vec, x->b_n * sizeof(*x->b_vec),
-	newsize * sizeof(*x->b_vec)))
+    if((ap = t_resizebytes(x->b_vec, x->b_n * sizeof(*x->b_vec),
+	newsize * sizeof(*x->b_vec))))
 	    x->b_vec = ap;
     else
     {
@@ -310,11 +324,19 @@ void binbuf_addbinbuf(t_binbuf *x, t_binbuf *y)
     	    SETSYMBOL(ap, gensym(","));
     	    break;
     	case A_DOLLAR:
+#ifdef ROCKBOX
+            snprintf(tbuf, sizeof(tbuf)-1, "$%d", ap->a_w.w_index);
+#else /* ROCKBOX */
     	    sprintf(tbuf, "$%d", ap->a_w.w_index);
+#endif /* ROCKBOX */
     	    SETSYMBOL(ap, gensym(tbuf));
     	    break;
     	case A_DOLLSYM:
+#ifdef ROCKBOX
+            snprintf(tbuf, sizeof(tbuf)-1, "$%s", ap->a_w.w_symbol->s_name);
+#else /* ROCKBOX */
     	    sprintf(tbuf, "$%s", ap->a_w.w_symbol->s_name);
+#endif /* ROCKBOX */
     	    SETSYMBOL(ap, gensym(tbuf));
     	    break;
     	case A_SYMBOL:
@@ -346,8 +368,8 @@ void binbuf_restore(t_binbuf *x, int argc, t_atom *argv)
 {
     int newsize = x->b_n + argc, i;
     t_atom *ap;
-    if (ap = t_resizebytes(x->b_vec, x->b_n * sizeof(*x->b_vec),
-	newsize * sizeof(*x->b_vec)))
+    if((ap = t_resizebytes(x->b_vec, x->b_n * sizeof(*x->b_vec),
+	newsize * sizeof(*x->b_vec))))
 	    x->b_vec = ap;
     else
     {
@@ -374,7 +396,11 @@ void binbuf_restore(t_binbuf *x, int argc, t_atom *argv)
 		else
 		{
 		    int dollar = 0;
+#ifdef ROCKBOX
+                    dollar = atoi(argv->a_w.w_symbol->s_name + 1);
+#else
     	    	    sscanf(argv->a_w.w_symbol->s_name + 1, "%d", &dollar);
+#endif
     	    	    SETDOLLAR(ap, dollar);
     	    	}
 	    }
@@ -430,10 +456,18 @@ t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew)
     {
     	if (!tonew)
     	    return (0);
+#ifdef ROCKBOX
+        else snprintf(buf, sizeof(buf)-1, "$%d", argno);
+#else /* ROCKBOX */
 	else sprintf(buf, "$%d", argno);
+#endif /* ROCKBOX */
     }
     else if (argno == 0)
+#ifdef ROCKBOX
+        snprintf(buf, sizeof(buf)-1, "%d", canvas_getdollarzero());
+#else /* ROCKBOX */
     	sprintf(buf, "%d", canvas_getdollarzero());
+#endif /* ROCKBOX */
     else
     	atom_string(av+(argno-1), buf, MAXPDSTRING/2-1);
     strncat(buf, sp, MAXPDSTRING/2-1);
@@ -582,6 +616,10 @@ void binbuf_eval(t_binbuf *x, t_pd *target, int argc, t_atom *argv)
 		if (nargs == 1) pd_float(target, stackwas->a_w.w_float);
 		else pd_list(target, 0, nargs, stackwas);
 		break;
+#ifdef ROCKBOX
+            default:
+                break;
+#endif
 	    }
 	}
 	msp = stackwas;
@@ -606,12 +644,14 @@ static int binbuf_doopen(char *s, int mode)
     return (open(namebuf, mode));
 }
 
+#ifndef ROCKBOX
 static FILE *binbuf_dofopen(char *s, char *mode)
 {
     char namebuf[MAXPDSTRING];
     sys_bashfilename(s, namebuf);
     return (fopen(namebuf, mode));
 }
+#endif
 
 int binbuf_read(t_binbuf *b, char *filename, char *dirname, int crflag)
 {
@@ -620,30 +660,51 @@ int binbuf_read(t_binbuf *b, char *filename, char *dirname, int crflag)
     int readret;
     char *buf;
     char namebuf[MAXPDSTRING];
-    
+
     namebuf[0] = 0;
     if (*dirname)
     	strcat(namebuf, dirname), strcat(namebuf, "/");
     strcat(namebuf, filename);
-    
+
     if ((fd = binbuf_doopen(namebuf, 0)) < 0)
     {
+#ifdef ROCKBOX
+#ifdef SIMULATOR
+        printf("open: ");
+    	perror(namebuf);
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
     	fprintf(stderr, "open: ");
     	perror(namebuf);
+#endif /* ROCKBOX */
     	return (1);
     }
     if ((length = lseek(fd, 0, SEEK_END)) < 0 || lseek(fd, 0, SEEK_SET) < 0 
     	|| !(buf = t_getbytes(length)))
     {
+#ifdef ROCKBOX
+#ifdef SIMULATOR
+        printf("lseek: ");
+        perror(namebuf);
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
     	fprintf(stderr, "lseek: ");
     	perror(namebuf);
+#endif /* ROCKBOX */
     	close(fd);
     	return(1);
     }
     if ((readret = read(fd, buf, length)) < length)
     {
+#ifdef ROCKBOX
+#ifdef SIMULATOR
+    	printf("read (%d %ld) -> %d\n", fd, length, readret);
+    	perror(namebuf);
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
     	fprintf(stderr, "read (%d %ld) -> %d\n", fd, length, readret);
     	perror(namebuf);
+#endif /* ROCKBOX */
     	close(fd);
     	t_freebytes(buf, length);
     	return(1);
@@ -691,7 +752,11 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd);
     semicolons. */
 int binbuf_write(t_binbuf *x, char *filename, char *dir, int crflag)
 {
+#ifdef ROCKBOX
+    int f = 0;
+#else /* ROCKBOX */
     FILE *f = 0;
+#endif /* ROCKBOX */
     char sbuf[WBUFSIZE], fbuf[MAXPDSTRING], *bp = sbuf, *ep = sbuf + WBUFSIZE;
     t_atom *ap;
     int indx, deleteit = 0;
@@ -707,9 +772,19 @@ int binbuf_write(t_binbuf *x, char *filename, char *dir, int crflag)
 	deleteit = 1;
     }
     
+#ifdef ROCKBOX
+    if(!(f = binbuf_doopen(fbuf, O_WRONLY|O_CREAT|O_TRUNC)))
+#else /* ROCKBOX */
     if (!(f = binbuf_dofopen(fbuf, "w")))
+#endif /* ROCKBOX */
     {
+#ifdef ROCKBOX
+#ifdef SIMULATOR
+        printf("open: ");
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
     	fprintf(stderr, "open: ");
+#endif /* ROCKBOX */
     	sys_unixerror(fbuf);
     	goto fail;
     }
@@ -723,7 +798,11 @@ int binbuf_write(t_binbuf *x, char *filename, char *dir, int crflag)
     	else length = 40;
     	if (ep - bp < length)
     	{
+#ifdef ROCKBOX
+            if(write(f, sbuf, bp-sbuf) < 1)
+#else /* ROCKBOX */
     	    if (fwrite(sbuf, bp-sbuf, 1, f) < 1)
+#endif /* ROCKBOX */
     	    {
     	    	sys_unixerror(fbuf);
     	    	goto fail;
@@ -750,20 +829,32 @@ int binbuf_write(t_binbuf *x, char *filename, char *dir, int crflag)
 	    ncolumn++;
 	}
     }
+#ifdef ROCKBOX
+    if(write(f, sbuf, bp-sbuf) < 1)
+#else /* ROCKBOX */
     if (fwrite(sbuf, bp-sbuf, 1, f) < 1)
+#endif /* ROCKBOX */
     {
     	sys_unixerror(fbuf);
     	goto fail;
     }
     if (deleteit)
     	binbuf_free(x);
+#ifdef ROCKBOX
+    close(f);
+#else /* ROCKBOX */
     fclose(f);
+#endif /* ROCKBOX */
     return (0);
 fail:
     if (deleteit)
     	binbuf_free(x);
     if (f)
-    	fclose(f);
+#ifdef ROCKBOX
+        close(f);
+#else /* ROCKBOX */
+        fclose(f);
+#endif /* ROCKBOX */
     return (1);
 }
 
@@ -816,13 +907,21 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 		if (nextmess[i].a_type == A_DOLLAR)
 		{
 	    	    char buf[100];
+#ifdef ROCKBOX
+                    snprintf(buf, sizeof(buf)-1, "$%d", nextmess[i].a_w.w_index);
+#else /* ROCKBOX */
 		    sprintf(buf, "$%d", nextmess[i].a_w.w_index);
+#endif /* ROCKBOX */
 		    SETSYMBOL(nextmess+i, gensym(buf));
 		}
 		else if (nextmess[i].a_type == A_DOLLSYM)
 		{
 	    	    char buf[100];
+#ifdef ROCKBOX
+                    snprintf(buf, sizeof(buf)-1, "$%s", nextmess[i].a_w.w_symbol->s_name);
+#else /* ROCKBOX */
 		    sprintf(buf, "$%s", nextmess[i].a_w.w_symbol->s_name);
+#endif /* ROCKBOX */
 		    SETSYMBOL(nextmess+i, gensym(buf));
 		}
 	    }
@@ -846,7 +945,11 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 			    	atom_getfloatarg(2, natom, nextmess),
 			    atom_getfloatarg(5, natom, nextmess) -
 			    	atom_getfloatarg(3, natom, nextmess),
+#ifdef ROCKBOX
+                            10.0);
+#else
 			    (float)sys_defaultfont);
+#endif
 	    	}
 	    }
 	    if (!strcmp(first, "#P"))
@@ -1157,13 +1260,13 @@ int binbuf_match(t_binbuf *inbuf, t_binbuf *searchbuf)
 	    t_atom *a1 = &inbuf->b_vec[indexin + nmatched], 
 	    	*a2 = &searchbuf->b_vec[nmatched];
 	    if (a1->a_type != a2->a_type ||
-	    	a1->a_type == A_SYMBOL && a1->a_w.w_symbol != a2->a_w.w_symbol
+	    	(a1->a_type == A_SYMBOL && a1->a_w.w_symbol != a2->a_w.w_symbol)
 		    ||
-	    	a1->a_type == A_FLOAT && a1->a_w.w_float != a2->a_w.w_float
+	    	(a1->a_type == A_FLOAT && a1->a_w.w_float != a2->a_w.w_float)
 		    ||
-	    	a1->a_type == A_DOLLAR && a1->a_w.w_index != a2->a_w.w_index
+	    	(a1->a_type == A_DOLLAR && a1->a_w.w_index != a2->a_w.w_index)
 		    ||
-	    	a1->a_type == A_DOLLSYM && a1->a_w.w_symbol != a2->a_w.w_symbol)
+	    	(a1->a_type == A_DOLLSYM && a1->a_w.w_symbol != a2->a_w.w_symbol))
 	    	    goto nomatch;
 	}
 	return (1);
@@ -1183,9 +1286,12 @@ void binbuf_evalfile(t_symbol *name, t_symbol *dir)
     	/* set filename so that new canvases can pick them up */
     int dspstate = canvas_suspend_dsp();
     glob_setfilename(0, name, dir);
+
     if (binbuf_read(b, name->s_name, dir->s_name, 0))
     {
+#if !defined(ROCKBOX) || (defined(ROCKBOX) && defined(SIMULATOR))
     	perror(name->s_name);
+#endif
     }
     else
     {
@@ -1205,6 +1311,10 @@ void binbuf_evalfile(t_symbol *name, t_symbol *dir)
 void glob_evalfile(t_pd *ignore, t_symbol *name, t_symbol *dir)
 {
     t_pd *x = 0;
+
+#ifdef ROCKBOX
+    (void) ignore;
+#endif
     	/* even though binbuf_evalfile appears to take care of dspstate,
     	we have to do it again here, because canvas_startdsp() assumes
     	that all toplevel canvases are visible.  LATER check if this

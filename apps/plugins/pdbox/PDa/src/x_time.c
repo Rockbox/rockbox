@@ -266,6 +266,9 @@ static void timer_bang2(t_timer *x)
 
 static void *timer_new(t_floatarg f)
 {
+#ifdef ROCKBOX
+    (void) f;
+#endif
     t_timer *x = (t_timer *)pd_new(timer_class);
     timer_bang(x);
     outlet_new(&x->x_obj, gensym("float"));
@@ -314,6 +317,9 @@ typedef struct _pipe
 
 static void *pipe_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_pipe *x = (t_pipe *)pd_new(pipe_class);
     t_atom defarg, *ap;
     t_pipeout *vec, *vp;
@@ -412,7 +418,7 @@ static void hang_tick(t_hang *h)
     int i;
     union word *w;
     if (x->x_hang == h) x->x_hang = h->h_next;
-    else for (h2 = x->x_hang; h3 = h2->h_next; h2 = h3)
+    else for (h2 = x->x_hang; (h3 = h2->h_next); h2 = h3)
     {
     	if (h3 == h)
     	{
@@ -432,6 +438,9 @@ static void hang_tick(t_hang *h)
     	    	outlet_pointer(p->p_outlet, w->w_gpointer);
     	    else post("pipe: stale pointer");
     	    break;
+#ifdef ROCKBOX
+        default: break;
+#endif
     	}
     }
     hang_free(h);
@@ -439,6 +448,9 @@ static void hang_tick(t_hang *h)
 
 static void pipe_list(t_pipe *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_hang *h = (t_hang *)
     	getbytes(sizeof(*h) + (x->x_n - 1) * sizeof(*h->h_vec));
     t_gpointer *gp, *gp2;
@@ -465,6 +477,10 @@ static void pipe_list(t_pipe *x, t_symbol *s, int ac, t_atom *av)
     	    	if (gp->gp_stub) gp->gp_stub->gs_refcount++;
     	    }
     	    gp++;
+#ifdef ROCKBOX
+            break;
+        default: break;
+#endif
     	}
     }
     for (i = 0, gp = x->x_gp, gp2 = h->h_gp, p = x->x_vec, w = h->h_vec;
@@ -493,7 +509,7 @@ static void pipe_flush(t_pipe *x)
 static void pipe_clear(t_pipe *x)
 {
     t_hang *hang;
-    while (hang = x->x_hang)
+    while ((hang = x->x_hang))
     {
     	x->x_hang = hang->h_next;
     	hang_free(hang);

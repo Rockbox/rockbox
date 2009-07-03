@@ -83,6 +83,7 @@ void glob_init(void)
     	gensym("audiostatus"), 0);
     class_addmethod(glob_pdobject, (t_method)glob_finderror,
     	gensym("finderror"), 0);
+#ifndef ROCKBOX
     class_addmethod(glob_pdobject, (t_method)glob_audio_properties,
     	gensym("audio-properties"), A_DEFFLOAT, 0);
     class_addmethod(glob_pdobject, (t_method)glob_audio_dialog,
@@ -93,6 +94,7 @@ void glob_init(void)
     	gensym("midi-properties"), A_DEFFLOAT, 0);
     class_addmethod(glob_pdobject, (t_method)glob_midi_dialog,
     	gensym("midi-dialog"), A_GIMME, 0);
+#endif /* ROCKBOX */
     class_addmethod(glob_pdobject, (t_method)glob_start_path_dialog,
     	gensym("start-path-dialog"), A_DEFFLOAT, 0);
     class_addmethod(glob_pdobject, (t_method)glob_path_dialog,

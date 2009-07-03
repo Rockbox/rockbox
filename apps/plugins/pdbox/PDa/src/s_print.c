@@ -79,7 +79,7 @@ void poststring(char *s)
 #ifdef SIMULATOR
     printf(" %s", s);
 #else /* SIMULATOR */
-    (void)s;
+    (void) s;
 #endif /* SIMULATOR */
 #else /* ROCKBOX */
     fprintf(stderr, " %s", s);
@@ -167,7 +167,7 @@ void pd_error(void *object, char *fmt, ...)
         saidit = 1;
     }
 #else /* SIMULATOR */
-    (void)object;
+    (void) object;
     (void) fmt;
 #endif /* SIMULATOR */
 #else /* ROCKBOX */
@@ -191,7 +191,7 @@ void pd_error(void *object, char *fmt, ...)
 void glob_finderror(t_pd *dummy)
 {
 #ifdef ROCKBOX
-    (void)dummy;
+    (void) dummy;
 #endif /* ROCKBOX */
     if (!error_object)
     	post("no findable error yet.");
@@ -250,8 +250,12 @@ void sys_logerror(char *object, char *s)
 
 void sys_unixerror(char *object)
 {
+#ifdef ROCKBOX
+    (void) object;
+#else
     errobject = object;
     errstring = strerror(errno);
+#endif /* ROCKBOX */
 }
 
 void sys_ouch(void)

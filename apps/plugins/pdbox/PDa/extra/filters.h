@@ -11,14 +11,16 @@
 #ifndef __GGEE_FILTERS_H__
 #define __GGEE_FILTERS_H__
 
-
+#ifdef ROCKBOX
+#include "math.h"
+#else
+#include <math.h>
+#endif
 
 #ifndef M_PI
 #define M_PI 3.141593f
 #endif
 
-
-#include <math.h>
 #define LN2 0.69314718
 #define e_A(g) (pow(10,(g/40.)))
 #define e_omega(f,r) (2.0*M_PI*f/r)
@@ -44,6 +46,11 @@ static int check_stability(t_float fb1,
 			    t_float ff2,
 			    t_float ff3)
 {
+#ifdef ROCKBOX
+    (void) ff1;
+    (void) ff2;
+    (void) ff3;
+#endif
     float discriminant = fb1 * fb1 + 4 * fb2;
 
     if (discriminant < 0) /* imaginary roots -- resonant filter */

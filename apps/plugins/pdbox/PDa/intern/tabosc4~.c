@@ -77,7 +77,11 @@ zero:
 void tabosc4_tilde_set(t_tabosc4_tilde *x, t_symbol *s)
 {
     t_garray *a;
+#ifdef ROCKBOX
+    int pointsinarray;
+#else
     int npoints, pointsinarray;
+#endif
     x->x_arrayname = s;
 
     if (!(a = (t_garray *)pd_findbyclass(x->x_arrayname, garray_class)))
@@ -93,7 +97,9 @@ void tabosc4_tilde_set(t_tabosc4_tilde *x, t_symbol *s)
     }
     else
     {
+#ifndef ROCKBOX
         int i;
+#endif
     	x->x_fnpoints = pointsinarray;
 	x->x_lognpoints = ilog2(pointsinarray);
 	post("tabosc~: using %d (log %d) points of array",x->x_fnpoints,x->x_lognpoints);

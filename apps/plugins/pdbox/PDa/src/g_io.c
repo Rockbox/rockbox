@@ -22,9 +22,17 @@ life elsewhere. */
  *
  */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#else
 #include "m_pd.h"
 #include "g_canvas.h"
 #include <string.h>
+#endif
+
 void signal_setborrowed(t_signal *sig, t_signal *sig2);
 void signal_makereusable(t_signal *sig);
 
@@ -51,6 +59,9 @@ typedef struct _vinlet
 
 static void *vinlet_new(t_symbol *s)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_vinlet *x = (t_vinlet *)pd_new(vinlet_class);
     x->x_canvas = canvas_getcurrent();
     x->x_inlet = canvas_addinlet(x->x_canvas, &x->x_obj.ob_pd, 0);
@@ -108,7 +119,9 @@ int vinlet_issignal(t_vinlet *x)
     return (x->x_buf != 0);
 }
 
+#ifndef ROCKBOX
 static int tot;
+#endif
 
 t_int *vinlet_perform(t_int *w)
 {
@@ -176,7 +189,13 @@ void vinlet_dspprolog(t_vinlet *x, t_signal **parentsigs,
 		      int myvecsize, int phase, int period, int frequency, int downsample, int upsample/* IOhannes */, int reblock,
     	int switched)
 {
+#ifdef ROCKBOX
+    t_signal *insig;
+    (void) frequency;
+    (void) switched;
+#else
     t_signal *insig, *outsig;
+#endif
     x->x_updown.downsample = downsample;
     x->x_updown.upsample   = upsample;
 
@@ -318,6 +337,9 @@ typedef struct _voutlet
 
 static void *voutlet_new(t_symbol *s)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_voutlet *x = (t_voutlet *)pd_new(voutlet_class);
     x->x_canvas = canvas_getcurrent();
     x->x_parentoutlet = canvas_addoutlet(x->x_canvas, &x->x_obj.ob_pd, 0);
@@ -445,6 +467,12 @@ void voutlet_dspprolog(t_voutlet *x, t_signal **parentsigs,
     int myvecsize, int phase, int period, int frequency, int downsample, int upsample /* IOhannes */, int reblock,
     	int switched)
 {
+#ifdef ROCKBOX
+    (void) myvecsize;
+    (void) phase;
+    (void) period;
+    (void) frequency;
+#endif
   x->x_updown.downsample=downsample;  x->x_updown.upsample=upsample; /* IOhannes */
     x->x_justcopyout = (switched && !reblock);
     if (reblock)
@@ -488,7 +516,11 @@ void voutlet_dspepilog(t_voutlet *x, t_signal **parentsigs,
     x->x_updown.downsample=downsample;  x->x_updown.upsample=upsample; /* IOhannes */
     if (reblock)
     {
+#ifdef ROCKBOX
+        t_signal *outsig;
+#else
 	t_signal *insig, *outsig;
+#endif
 	int parentvecsize, bufsize, oldbufsize;
 	int re_parentvecsize; /* IOhannes */
 	int bigperiod, epilogphase, blockphase;

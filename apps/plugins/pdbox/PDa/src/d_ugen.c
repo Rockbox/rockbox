@@ -21,11 +21,17 @@
  *
  */
 
-
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "m_imp.h"
+#else /* ROCKBOX */
 #include "m_pd.h"
 #include "m_imp.h"
 #include <stdlib.h>
 #include <stdarg.h>
+#endif /* ROCKBOX */
 
 extern t_class *vinlet_class, *voutlet_class, *canvas_class;
 t_sample *obj_findsignalscalar(t_object *x, int m);
@@ -258,6 +264,10 @@ static t_int *block_epilog(t_int *w)
 
 static void block_dsp(t_block *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) sp;
+#endif
     /* do nothing here */
 }
 
@@ -303,6 +313,7 @@ void dsp_tick(void)
     	t_int *ip;
     	for (ip = dsp_chain; *ip; ) ip = (*(t_perfroutine)(*ip))(ip);
     	dsp_phase++;
+printf("%d\n", dsp_phase);
     }
 }
 
@@ -330,9 +341,13 @@ static t_signal *signal_usedlist;
     /* call this when DSP is stopped to free all the signals */
 void signal_cleanup(void)
 {
+#ifdef ROCKBOX
+    t_signal *sig;
+#else
     t_signal **svec, *sig, *sig2;
+#endif
     int i;
-    while (sig = signal_usedlist)
+    while((sig = signal_usedlist))
     {
     	signal_usedlist = sig->s_nextused;
     	if (!sig->s_isborrowed)
@@ -397,9 +412,15 @@ void signal_makereusable(t_signal *sig)
 
 t_signal *signal_new(int n, float sr)
 {
+#ifdef ROCKBOX
+    int logn;
+#else
     int logn, n2;
+#endif
     t_signal *ret, **whichlist;
+#ifndef ROCKBOX
     t_sample *fp;
+#endif
     logn = ilog2(n);
     if (n)
     {
@@ -413,7 +434,7 @@ t_signal *signal_new(int n, float sr)
     	whichlist = &signal_freeborrowed;
 
     	/* first try to reclaim one from the free list */
-    if (ret = *whichlist)
+    if((ret = *whichlist))
     	*whichlist = ret->s_nextfree;
     else
     {
@@ -520,8 +541,10 @@ static t_dspcontext *ugen_currentcontext;
 
 void ugen_stop(void)
 {
+#ifndef ROCKBOX
     t_signal *s;
     int i;
+#endif
     if (dsp_chain)
     {
     	freebytes(dsp_chain, dsp_chainsize * sizeof (t_int));
@@ -577,8 +600,10 @@ t_dspcontext *ugen_start_graph(int toplevel, t_signal **sp,
     int ninlets, int noutlets)
 {
     t_dspcontext *dc = (t_dspcontext *)getbytes(sizeof(*dc));
+#ifndef ROCKBOX
     float parent_srate, srate;
     int parent_vecsize, vecsize;
+#endif
 
     if (ugen_loud) post("ugen_start_graph...");
 
@@ -672,7 +697,11 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
 {
     t_sigoutlet *uout;
     t_siginlet *uin;
+#ifdef ROCKBOX
+    t_sigoutconnect *oc;
+#else
     t_sigoutconnect *oc, *oc2;
+#endif
     t_class *class = pd_class(&u->u_obj->ob_pd);
     int i, n;
     	/* suppress creating new signals for the outputs of signal
@@ -681,13 +710,13 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
 	we delay new signal creation, which will be handled by calling
 	signal_setborrowed in the ugen_done_graph routine below. */
     int nonewsigs = (class == canvas_class || 
-    	(class == vinlet_class) && !(dc->dc_reblock));
+    	((class == vinlet_class) && !(dc->dc_reblock)));
     	/* when we encounter a subcanvas or a signal outlet, suppress freeing
 	the input signals as they may be "borrowed" for the super or sub
 	patch; same exception as above, but also if we're "switched" we
 	have to do a copy rather than a borrow.  */
     int nofreesigs = (class == canvas_class || 
-    	(class == voutlet_class) &&  !(dc->dc_reblock || dc->dc_switched));
+    	((class == voutlet_class) &&  !(dc->dc_reblock || dc->dc_switched)));
     t_signal **insig, **outsig, **sig, *s1, *s2, *s3;
     t_ugenbox *u2;
     
@@ -701,7 +730,7 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
 	    s3 = signal_new(dc->dc_vecsize, dc->dc_srate);
     	    /* post("%s: unconnected signal inlet set to zero",
     	    	class_getname(u->u_obj->ob_pd)); */
-	    if (scalar = obj_findsignalscalar(u->u_obj, i))
+	    if((scalar = obj_findsignalscalar(u->u_obj, i)))
 	    	dsp_add_scalarcopy(scalar, s3->s_vec, s3->s_n);
 	    else
     	    	dsp_add_zero(s3->s_vec, s3->s_n);
@@ -781,7 +810,7 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
     	    u2 = oc->oc_who;
     	    uin = &u2->u_in[oc->oc_inno];
     	    	/* if there's already someone here, sum the two */
-    	    if (s2 = uin->i_signal)
+    	    if((s2 = uin->i_signal))
     	    {
     	    	s1->s_refcount--;
     	    	s2->s_refcount--;
@@ -825,7 +854,11 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
 
 void ugen_done_graph(t_dspcontext *dc)
 {
+#ifdef ROCKBOX
+    t_ugenbox *u;
+#else
     t_ugenbox *u, *u2;
+#endif
     t_sigoutlet *uout;
     t_siginlet *uin;
     t_sigoutconnect *oc, *oc2;
@@ -966,7 +999,11 @@ void ugen_done_graph(t_dspcontext *dc)
     for (u = dc->dc_ugenlist; u; u = u->u_next)
     {
     	t_pd *zz = &u->u_obj->ob_pd;
+#ifdef ROCKBOX
+        t_signal **outsigs = dc->dc_iosigs;
+#else
     	t_signal **insigs = dc->dc_iosigs, **outsigs = dc->dc_iosigs;
+#endif
     	if (outsigs) outsigs += dc->dc_ninlets;
 
     	if (pd_class(zz) == vinlet_class)

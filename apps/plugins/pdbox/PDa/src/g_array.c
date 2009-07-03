@@ -2,12 +2,22 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#ifdef SIMULATOR
+int printf(const char *fmt, ...);
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>  	/* for read/write to files */
 #include "m_pd.h"
 #include "g_canvas.h"
 #include <math.h>
+#endif /* ROCKBOX */
 
 /* see also the "plot" object in g_scalar.c which deals with graphing
 arrays which are fields in scalars.  Someday we should unify the
@@ -40,7 +50,9 @@ t_array *array_new(t_symbol *templatesym, t_gpointer *parent)
 {
     t_array *x = (t_array *)getbytes(sizeof (*x));
     t_template *template;
+#ifndef ROCKBOX
     t_gpointer *gp;
+#endif
     template = template_findbyname(templatesym);
     x->a_templatesym = templatesym;
     x->a_n = 1;
@@ -59,7 +71,9 @@ t_array *array_new(t_symbol *templatesym, t_gpointer *parent)
 void array_resize(t_array *x, t_template *template, int n)
 {
     int elemsize, oldn;
+#ifndef ROCKBOX
     t_gpointer *gp;
+#endif
 
     if (n < 1)
     	n = 1;
@@ -135,7 +149,11 @@ t_garray *graph_array(t_glist *gl, t_symbol *s, t_symbol *templatesym,
     if (s == &s_)
     {
     	char buf[40];
+#ifdef ROCKBOX
+        snprintf(buf, sizeof(buf)-1, "array%d", ++gcount);
+#else
     	sprintf(buf, "array%d", ++gcount);
+#endif
     	s = gensym(buf);    	
     	templatesym = &s_float;
     	n = 100;
@@ -179,7 +197,7 @@ t_garray *graph_array(t_glist *gl, t_symbol *s, t_symbol *templatesym,
     x->x_glist = gl;
     x->x_usedindsp = 0;
     x->x_saveit = (saveit != 0);
-    if (x2 = pd_findbyclass(gensym("#A"), garray_class))
+    if((x2 = pd_findbyclass(gensym("#A"), garray_class)))
     	pd_unbind(x2, gensym("#A"));
 
     pd_bind(&x->x_gobj.g_pd, gensym("#A"));
@@ -190,16 +208,23 @@ t_garray *graph_array(t_glist *gl, t_symbol *s, t_symbol *templatesym,
     /* called from array menu item to create a new one */
 void canvas_menuarray(t_glist *canvas)
 {
+#ifdef ROCKBOX
+    (void) canvas;
+#else /* ROCKBOX */
     t_glist *x = (t_glist *)canvas;
     char cmdbuf[200];
     sprintf(cmdbuf, "pdtk_array_dialog %%s array%d 100 1 1\n",
 	++gcount);
     gfxstub_new(&x->gl_pd, x, cmdbuf);
+#endif /* ROCKBOX */
 }
 
     /* called from graph_dialog to set properties */
 void garray_properties(t_garray *x)
 {
+#ifdef ROCKBOX
+    (void) x;
+#else /* ROCKBOX */
     char cmdbuf[200];
     gfxstub_deleteforkey(x);
     	/* create dialog window.  LATER fix this to escape '$'
@@ -211,6 +236,7 @@ void garray_properties(t_garray *x)
     else sprintf(cmdbuf, "pdtk_array_dialog %%s %s %d %d 0\n",
 	x->x_name->s_name, x->x_n, x->x_saveit);
     gfxstub_new(&x->x_gobj.g_pd, x, cmdbuf);
+#endif /* ROCKBOX */
 }
 
     /* this is called back from the dialog window to create a garray. 
@@ -260,10 +286,12 @@ void garray_arraydialog(t_garray *x, t_symbol *name, t_floatarg fsize,
 static void garray_free(t_garray *x)
 {
     t_pd *x2;
+#ifndef ROCKBOX
     gfxstub_deleteforkey(x);
+#endif
     pd_unbind(&x->x_gobj.g_pd, x->x_realname);
     	/* LATER find a way to get #A unbound earlier (at end of load?) */
-    while (x2 = pd_findbyclass(gensym("#A"), garray_class))
+    while((x2 = pd_findbyclass(gensym("#A"), garray_class)))
     	pd_unbind(x2, gensym("#A"));
     freebytes(x->x_vec, x->x_n * x->x_elemsize);
 }
@@ -308,7 +336,9 @@ static t_word *array_motion_wp;
 static t_template *array_motion_template;
 static int array_motion_npoints;
 static int array_motion_elemsize;
+#ifndef ROCKBOX
 static int array_motion_altkey;
+#endif
 static float array_motion_initx;
 static float array_motion_xperpix;
 static float array_motion_yperpix;
@@ -320,6 +350,9 @@ static int array_motion_fatten;
 
 static void array_motion(void *z, t_floatarg dx, t_floatarg dy)
 {
+#ifdef ROCKBOX
+    (void) z;
+#endif
     array_motion_xcumulative += dx * array_motion_xperpix;
     array_motion_ycumulative += dy * array_motion_yperpix;
     if (*array_motion_xfield->s_name)
@@ -401,6 +434,12 @@ int array_doclick(t_array *array, t_glist *glist, t_gobj *gobj,
     t_canvas *elemtemplatecanvas;
     t_template *elemtemplate;
     int elemsize, yonset, wonset, xonset, i;
+
+#ifdef ROCKBOX
+    (void) linewidth;
+    (void) shift;
+    (void) dbl;
+#endif
 
     if (!array_getfields(elemtemplatesym, &elemtemplatecanvas,
     	&elemtemplate, &elemsize, &xonset, &yonset, &wonset))
@@ -575,7 +614,11 @@ static void garray_getrect(t_gobj *z, t_glist *glist,
 	else incr = x->x_array.a_n / 300;
 	for (i = 0; i < x->x_array.a_n; i += incr)
     	{
+#ifdef ROCKBOX
+            float pxpix, pypix, pwpix;
+#else /* ROCKBOX */
 	    float pxpix, pypix, pwpix, dx, dy;
+#endif /* ROCKBOX */
     	    array_getcoordinate(glist, (char *)(x->x_array.a_vec) +
 	    	i * elemsize,
     		xonset, yonset, wonset, i, 0, 0, 1,
@@ -600,21 +643,42 @@ static void garray_getrect(t_gobj *z, t_glist *glist,
 
 static void garray_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) dx;
+    (void) dy;
+#endif
     /* refuse */
 }
 
 static void garray_select(t_gobj *z, t_glist *glist, int state)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) state;
+#else /* ROCKBOX */
     t_garray *x = (t_garray *)z;
+#endif /* ROCKBOX */
     /* fill in later */
 }
 
 static void garray_activate(t_gobj *z, t_glist *glist, int state)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) state;
+#endif
 }
 
 static void garray_delete(t_gobj *z, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+#endif
     /* nothing to do */
 }
 
@@ -633,9 +697,11 @@ static void garray_vis(t_gobj *z, t_glist *glist, int vis)
     	{
     	    error("%s: needs floating-point 'y' field",
 	    	x->x_templatesym->s_name);
+#ifndef ROCKBOX
     	    sys_vgui(".x%x.c create text 50 50 -text foo\
     	    	-tags .x%x.a%x\n",
     	    	glist_getcanvas(glist), glist_getcanvas(glist), x);
+#endif
     	}
     	else if (!template_find_field(template, gensym("x"), &xonset, &type,
 	    &arraytype) || type != DT_FLOAT)
@@ -644,7 +710,9 @@ static void garray_vis(t_gobj *z, t_glist *glist, int vis)
     	    int lastpixel = -1, ndrawn = 0;
     	    float yval = 0, xpix;
     	    int ixpix = 0;
+#ifndef ROCKBOX
     	    sys_vgui(".x%x.c create line \\\n", glist_getcanvas(glist));
+#endif
     	    for (i = 0; i < x->x_n; i++)
     	    {
     	    	yval = fixtof(*(t_sample *)(x->x_vec +
@@ -653,8 +721,10 @@ static void garray_vis(t_gobj *z, t_glist *glist, int vis)
     	    	ixpix = xpix + 0.5;
     	    	if (ixpix != lastpixel)
     	    	{
+#ifndef ROCKBOX
     	    	    sys_vgui("%d %f \\\n", ixpix,
     	    	    	glist_ytopixels(glist, yval));
+#endif
     	    	    ndrawn++;
     	    	}
     	    	lastpixel = ixpix;
@@ -662,11 +732,14 @@ static void garray_vis(t_gobj *z, t_glist *glist, int vis)
     	    	xcum += x->x_xinc;
     	    }
     	    	/* TK will complain if there aren't at least 2 points... */
+#ifndef ROCKBOX
     	    if (ndrawn == 0) sys_vgui("0 0 0 0 \\\n");
     	    else if (ndrawn == 1) sys_vgui("%d %f \\\n", ixpix,
     	    	    	glist_ytopixels(glist, yval));
     	    sys_vgui("-tags .x%x.a%x\n", glist_getcanvas(glist), x);
+#endif
     	    firsty = fixtof(*(t_sample *)(x->x_vec + yonset));
+#ifndef ROCKBOX
     	    sys_vgui(".x%x.c create text %f %f -text {%s} -anchor e\
     	    	 -font -*-courier-bold--normal--%d-* -tags .x%x.a%x\n",
     	    	glist_getcanvas(glist),
@@ -674,6 +747,7 @@ static void garray_vis(t_gobj *z, t_glist *glist, int vis)
     	    	glist_ytopixels(glist, firsty),
     	    	x->x_name->s_name, glist_getfont(glist),
     	    	    glist_getcanvas(glist), x);
+#endif
     	}
     	else
     	{
@@ -682,8 +756,10 @@ static void garray_vis(t_gobj *z, t_glist *glist, int vis)
     }
     else
     {
+#ifndef ROCKBOX
     	sys_vgui(".x%x.c delete .x%x.a%x\n",
     	    glist_getcanvas(glist), glist_getcanvas(glist), x);
+#endif
     }
 }
 
@@ -702,7 +778,13 @@ static void garray_save(t_gobj *z, t_binbuf *b)
     t_garray *x = (t_garray *)z;
     binbuf_addv(b, "sssisi;", gensym("#X"), gensym("array"),
     	x->x_name, x->x_n, x->x_templatesym, x->x_saveit);
+#ifdef ROCKBOX
+#ifdef SIMULATOR
+    printf("array save\n");
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
     fprintf(stderr,"array save\n");
+#endif /* ROCKBOX */
     if (x->x_saveit)
     {
     	int n = x->x_n, n2 = 0;
@@ -877,7 +959,11 @@ static void garray_dofo(t_garray *x, int npoints, float dcval,
 
 static void garray_sinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#else
     t_template *template = garray_template(x);
+#endif
     
     t_float *svec = (t_float *)t_getbytes(sizeof(t_float) * argc);
     int npoints, i;
@@ -902,7 +988,11 @@ static void garray_sinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv)
 
 static void garray_cosinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#else
     t_template *template = garray_template(x);
+#endif
     
     t_float *svec = (t_float *)t_getbytes(sizeof(t_float) * argc);
     int npoints, i;
@@ -928,7 +1018,11 @@ static void garray_cosinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv)
 static void garray_normalize(t_garray *x, t_float f)
 {
     t_template *template = garray_template(x);
+#ifdef ROCKBOX
+    int yonset, type, i;
+#else
     int yonset, type, npoints, i;
+#endif
     double maxv, renormer;
     t_symbol *arraytype;
     
@@ -968,6 +1062,9 @@ static void garray_list(t_garray *x, t_symbol *s, int argc, t_atom *argv)
     t_template *template = garray_template(x);
     int yonset, type, i;
     t_symbol *arraytype;
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (!template_find_field(template, gensym("y"), &yonset,
     	&type, &arraytype) || type != DT_FLOAT)
     	    error("%s: needs floating-point 'y' field",
@@ -1038,7 +1135,11 @@ static void garray_rename(t_garray *x, t_symbol *s)
 static void garray_read(t_garray *x, t_symbol *filename)
 {
     int nelem = x->x_n, filedesc;
+#ifdef ROCKBOX
+    int fd = 0;
+#else
     FILE *fd;
+#endif
     char buf[MAXPDSTRING], *bufptr;
     t_template *template = garray_template(x);
     int yonset, type, i;
@@ -1052,15 +1153,23 @@ static void garray_read(t_garray *x, t_symbol *filename)
     if ((filedesc = open_via_path(
     	canvas_getdir(glist_getcanvas(x->x_glist))->s_name,
     	    filename->s_name, "", buf, &bufptr, MAXPDSTRING, 0)) < 0 
+#ifdef ROCKBOX
+                )
+#else
 	    	|| !(fd = fdopen(filedesc, "r")))
+#endif
     {
     	error("%s: can't open", filename->s_name);
     	return;
     }
     for (i = 0; i < nelem; i++)
     {
+#ifdef ROCKBOX
+        if(rb_fscanf_f(fd, (float*)((x->x_vec + sizeof(t_word) * i) + yonset)))
+#else
     	if (!fscanf(fd, "%f", (float *)((x->x_vec + sizeof(t_word) * i) +
 	    yonset)))
+#endif
     	{
     	    post("%s: read %d elements into table of size %d",
     	    	filename->s_name, i, nelem);
@@ -1069,7 +1178,11 @@ static void garray_read(t_garray *x, t_symbol *filename)
     }
     while (i < nelem)
     	*(float *)((x->x_vec + sizeof(t_word) * i) + yonset) = 0, i++;
+#ifdef ROCKBOX
+    close(fd);
+#else
     fclose(fd);
+#endif
     garray_redraw(x);
 }
 
@@ -1090,7 +1203,11 @@ static void garray_read16(t_garray *x, t_symbol *filename,
     int skip = fskip, filedesc;
     int i, nelem;
     t_sample *vec;
+#ifdef ROCKBOX
+    int fd = 0;
+#else
     FILE *fd;
+#endif
     char buf[MAXPDSTRING], *bufptr;
     short s;
     int cpubig = garray_ambigendian(), swap = 0;
@@ -1116,25 +1233,41 @@ static void garray_read16(t_garray *x, t_symbol *filename,
     if ((filedesc = open_via_path(
     	canvas_getdir(glist_getcanvas(x->x_glist))->s_name,
     	    filename->s_name, "", buf, &bufptr, MAXPDSTRING, 1)) < 0 
+#ifdef ROCKBOX
+        )
+#else
 	    	|| !(fd = fdopen(filedesc, BINREADMODE)))
+#endif
     {
     	error("%s: can't open", filename->s_name);
     	return;
     }
     if (skip)
     {
+#ifdef ROCKBOX
+        long pos = lseek(fd, (long)skip, SEEK_SET);
+#else
     	long pos = fseek(fd, (long)skip, SEEK_SET);
+#endif
     	if (pos < 0)
     	{
     	    error("%s: can't seek to byte %d", buf, skip);
+#ifdef ROCKBOX
+            close(fd);
+#else
     	    fclose(fd);
+#endif
     	    return;
     	}
     }
 
     for (i = 0; i < nelem; i++)
     {
+#ifdef ROCKBOX
+        if(read(fd, &s, sizeof(s)) < 1)
+#else
     	if (fread(&s, sizeof(s), 1, fd) < 1)
+#endif
     	{
     	    post("%s: read %d elements into table of size %d",
     	    	filename->s_name, i, nelem);
@@ -1144,13 +1277,21 @@ static void garray_read16(t_garray *x, t_symbol *filename,
     	vec[i] = s * (1./32768.);
     }
     while (i < nelem) vec[i++] = 0;
+#ifdef ROCKBOX
+    close(fd);
+#else
     fclose(fd);
+#endif
     garray_redraw(x);
 }
 
 static void garray_write(t_garray *x, t_symbol *filename)
 {
+#ifdef ROCKBOX
+    int fd;
+#else
     FILE *fd;
+#endif
     char buf[MAXPDSTRING];
     t_template *template = garray_template(x);
     int yonset, type, i;
@@ -1164,21 +1305,33 @@ static void garray_write(t_garray *x, t_symbol *filename)
     canvas_makefilename(glist_getcanvas(x->x_glist), filename->s_name,
     	buf, MAXPDSTRING);
     sys_bashfilename(buf, buf);
+#ifdef ROCKBOX
+    if(!(fd = open(buf, O_WRONLY|O_CREAT|O_TRUNC)))
+#else
     if (!(fd = fopen(buf, "w")))
+#endif
     {
     	error("%s: can't create", buf);
     	return;
     }
     for (i = 0; i < x->x_n; i++)
     {
+#ifdef ROCKBOX
+        if(rb_fprintf_f(fd, 
+#else /* ROCKBOX */
     	if (fprintf(fd, "%g\n",
+#endif /* ROCKBOX */
     	    *(float *)((x->x_vec + sizeof(t_word) * i) + yonset)) < 1)
     	{
     	    post("%s: write error", filename->s_name);
     	    break;
     	}
     }
+#ifdef ROCKBOX
+    close(fd);
+#else
     fclose(fd);
+#endif
 }
 
 static unsigned char waveheader[] = {
@@ -1203,7 +1356,11 @@ static void garray_write16(t_garray *x, t_symbol *filename, t_symbol *format)
     t_template *template = garray_template(x);
     int yonset, type, i;
     t_symbol *arraytype;
+#ifdef ROCKBOX
+    int fd;
+#else
     FILE *fd;
+#endif
     int aiff = (format == gensym("aiff"));
     char filenamebuf[MAXPDSTRING], buf2[MAXPDSTRING];
     int swap = garray_ambigendian();	/* wave is only little endian */
@@ -1230,7 +1387,11 @@ static void garray_write16(t_garray *x, t_symbol *filename, t_symbol *format)
     canvas_makefilename(glist_getcanvas(x->x_glist), filenamebuf,
     	buf2, MAXPDSTRING);
     sys_bashfilename(buf2, buf2);
+#ifdef ROCKBOX
+    if(!(fd = open(buf2, O_WRONLY|O_CREAT|O_TRUNC)))
+#else
     if (!(fd = fopen(buf2, BINWRITEMODE)))
+#endif
     {
     	error("%s: can't create", buf2);
     	return;
@@ -1251,7 +1412,11 @@ static void garray_write16(t_garray *x, t_symbol *filename, t_symbol *format)
     	xxx = foo[1]; foo[1] = foo[2]; foo[2] = xxx;
     }
     memcpy((void *)(waveheader + 40), (void *)(&intbuf), 4);
+#ifdef ROCKBOX
+    if(write(fd, waveheader, sizeof(waveheader)) < 1)
+#else
     if (fwrite(waveheader, sizeof(waveheader), 1, fd) < 1)
+#endif
     {
     	post("%s: write error", buf2);
     	goto closeit;
@@ -1268,21 +1433,31 @@ static void garray_write16(t_garray *x, t_symbol *filename, t_symbol *format)
     	    unsigned char *foo = (unsigned char *)&sh, xxx;
     	    xxx = foo[0]; foo[0] = foo[1]; foo[1] = xxx;
     	}
+#ifdef ROCKBOX
+        if(write(fd, &sh, sizeof(sh)) < 1)
+#else
 	if (fwrite(&sh, sizeof(sh), 1, fd) < 1)
+#endif
 	{
     	    post("%s: write error", buf2);
     	    goto closeit;
 	}
     }
 closeit:
+#ifdef ROCKBOX
+    close(fd);
+#else
     fclose(fd);
+#endif
 }
 
 void garray_resize(t_garray *x, t_floatarg f)
 {
     int was = x->x_n, elemsize;
     t_glist *gl;
+#ifndef ROCKBOX
     int dspwas;
+#endif
     int n = f;
     char *nvec;
     
@@ -1309,7 +1484,9 @@ void garray_resize(t_garray *x, t_floatarg f)
     	vmess(&gl->gl_pd, gensym("bounds"), "ffff",
     	    0., gl->gl_y1, (double)(n > 1 ? n-1 : 1), gl->gl_y2);
 	    	/* close any dialogs that might have the wrong info now... */
+#ifndef ROCKBOX
     	gfxstub_deleteforkey(gl);
+#endif
     }
     else garray_redraw(x);
     if (x->x_usedindsp) canvas_update_dsp();

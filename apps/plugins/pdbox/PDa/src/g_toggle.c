@@ -6,6 +6,13 @@
 /* thanks to Miller Puckette, Guenther Geiger and Krzystof Czaja */
 
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#include "g_all_guis.h"
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -21,6 +28,7 @@
 #else
 #include <unistd.h>
 #endif
+#endif /* ROCKBOX */
 
 /* --------------- tgl     gui-toggle ------------------------- */
 
@@ -31,6 +39,10 @@ static t_class *toggle_class;
 
 void toggle_draw_update(t_toggle *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     if(glist_isvisible(glist))
     {
 	t_canvas *canvas=glist_getcanvas(glist);
@@ -40,10 +52,15 @@ void toggle_draw_update(t_toggle *x, t_glist *glist)
 	sys_vgui(".x%x.c itemconfigure %xX2 -fill #%6.6x\n", canvas, x,
 		 (x->x_on!=0.0)?x->x_gui.x_fcol:x->x_gui.x_bcol);
     }
+#endif /* ROCKBOX */
 }
 
 void toggle_draw_new(t_toggle *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int w=1, xx=text_xpix(&x->x_gui.x_obj, glist), yy=text_ypix(&x->x_gui.x_obj, glist);
 
@@ -72,10 +89,15 @@ void toggle_draw_new(t_toggle *x, t_glist *glist)
     if(!x->x_gui.x_fsf.x_rcv_able)
 	sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
 	     canvas, xx, yy, xx + IOWIDTH, yy+1, x, 0);
+#endif /* ROCKBOX */
 }
 
 void toggle_draw_move(t_toggle *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int w=1, xx=text_xpix(&x->x_gui.x_obj, glist), yy=text_ypix(&x->x_gui.x_obj, glist);
 
@@ -100,10 +122,15 @@ void toggle_draw_move(t_toggle *x, t_glist *glist)
     if(!x->x_gui.x_fsf.x_rcv_able)
 	sys_vgui(".x%x.c coords %xIN%d %d %d %d %d\n",
 	     canvas, x, 0, xx, yy, xx + IOWIDTH, yy+1);
+#endif /* ROCKBOX */
 }
 
 void toggle_draw_erase(t_toggle* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
@@ -114,10 +141,15 @@ void toggle_draw_erase(t_toggle* x, t_glist* glist)
         sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 0);
     if(!x->x_gui.x_fsf.x_rcv_able)
 	sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+#endif /* ROCKBOX */
 }
 
 void toggle_draw_config(t_toggle* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c itemconfigure %xLABEL -font {%s %d bold} -fill #%6.6x -text {%s} \n",
@@ -130,10 +162,16 @@ void toggle_draw_config(t_toggle* x, t_glist* glist)
 	     x->x_on?x->x_gui.x_fcol:x->x_gui.x_bcol);
     sys_vgui(".x%x.c itemconfigure %xX2 -fill #%6.6x\n", canvas, x,
 	     x->x_on?x->x_gui.x_fcol:x->x_gui.x_bcol);
+#endif /* ROCKBOX */
 }
 
 void toggle_draw_io(t_toggle* x, t_glist* glist, int old_snd_rcv_flags)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+    (void) old_snd_rcv_flags;
+#else /* ROCKBOX */
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     t_canvas *canvas=glist_getcanvas(glist);
@@ -151,10 +189,15 @@ void toggle_draw_io(t_toggle* x, t_glist* glist, int old_snd_rcv_flags)
 	     xpos + IOWIDTH, ypos+1, x, 0);
     if(!(old_snd_rcv_flags & IEM_GUI_OLD_RCV_FLAG) && x->x_gui.x_fsf.x_rcv_able)
 	sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+#endif /* ROCKBOX */
 }
 
 void toggle_draw_select(t_toggle* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     if(x->x_gui.x_fsf.x_selected)
@@ -167,6 +210,7 @@ void toggle_draw_select(t_toggle* x, t_glist* glist)
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_NORMAL);
 	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, x->x_gui.x_lcol);
     }
+#endif /* ROCKBOX */
 }
 
 void toggle_draw(t_toggle *x, t_glist *glist, int mode)
@@ -220,6 +264,10 @@ static void toggle_save(t_gobj *z, t_binbuf *b)
 
 static void toggle_properties(t_gobj *z, t_glist *owner)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) owner;
+#else /* ROCKBOX */
     t_toggle *x = (t_toggle *)z;
     char buf[800];
     t_symbol *srl[3];
@@ -241,6 +289,7 @@ static void toggle_properties(t_gobj *z, t_glist *owner)
 	    x->x_gui.x_fsf.x_font_style, x->x_gui.x_fontsize,
 	    0xffffff & x->x_gui.x_bcol, 0xffffff & x->x_gui.x_fcol, 0xffffff & x->x_gui.x_lcol);
     gfxstub_new(&x->x_gui.x_obj.ob_pd, x, buf);
+#endif
 }
 
 static void toggle_bang(t_toggle *x)
@@ -259,6 +308,10 @@ static void toggle_dialog(t_toggle *x, t_symbol *s, int argc, t_atom *argv)
     float nonzero = (float)atom_getfloatarg(2, argc, argv);
     int sr_flags;
 
+#ifdef ROCKBOX
+    (void) s;
+#endif
+
     if(nonzero == 0.0)
 	nonzero = 1.0;
     x->x_nonzero = nonzero;
@@ -274,10 +327,26 @@ static void toggle_dialog(t_toggle *x, t_symbol *s, int argc, t_atom *argv)
 }
 
 static void toggle_click(t_toggle *x, t_floatarg xpos, t_floatarg ypos, t_floatarg shift, t_floatarg ctrl, t_floatarg alt)
+#ifdef ROCKBOX
+{
+    (void) xpos;
+    (void) ypos;
+    (void) shift;
+    (void) alt;
+    (void) ctrl;
+
+    toggle_bang(x);
+}
+#else /* ROCKBOX */
 {toggle_bang(x);}
+#endif /* ROCKBOX */
 
 static int toggle_newclick(t_gobj *z, struct _glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
+#ifdef ROCKBOX
+    (void) glist;
+    (void) dbl;
+#endif
     if(doit)
 	toggle_click((t_toggle *)z, (t_floatarg)xpix, (t_floatarg)ypix, (t_floatarg)shift, 0, (t_floatarg)alt);
     return (1);
@@ -318,6 +387,9 @@ static void toggle_loadbang(t_toggle *x)
 
 static void toggle_size(t_toggle *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     x->x_gui.x_w = iemgui_clip_size((int)atom_getintarg(0, ac, av));
     x->x_gui.x_h = x->x_gui.x_w;
     iemgui_size((void *)x, &x->x_gui);
@@ -362,11 +434,21 @@ static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_toggle *x = (t_toggle *)pd_new(toggle_class);
     int bflcol[]={-262144, -1, -1};
+#ifdef ROCKBOX
+    int a=IEM_GUI_DEFAULTSIZE;
+#else
     int a=IEM_GUI_DEFAULTSIZE, f=0;
+#endif
     int ldx=0, ldy=-6;
     int fs=8;
     float on=0.0, nonzero=1.0;
+#ifndef ROCKBOX
     char str[144];
+#endif
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
 
     iem_inttosymargs(&x->x_gui.x_isa, 0);
     iem_inttofstyle(&x->x_gui.x_fsf, 0);
@@ -433,7 +515,9 @@ static void toggle_ff(t_toggle *x)
 {
     if(x->x_gui.x_fsf.x_rcv_able)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
+#ifndef ROCKBOX
     gfxstub_deleteforkey(x);
+#endif
 }
 
 void g_toggle_setup(void)

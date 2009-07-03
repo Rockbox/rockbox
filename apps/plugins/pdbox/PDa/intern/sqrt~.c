@@ -1,6 +1,11 @@
 #define DUMTAB1SIZE 256
 #define DUMTAB2SIZE 1024
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 #include<m_pd.h>
 #include<m_fixed.h>
 
@@ -62,6 +67,9 @@ t_int *sigsqrt_perform(t_int *w)    /* not static; also used in d_fft.c */
 
 static void sigsqrt_dsp(t_sigsqrt *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     dsp_add(sigsqrt_perform, 3, sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 

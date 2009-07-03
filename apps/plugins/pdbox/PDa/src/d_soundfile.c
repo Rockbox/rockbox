@@ -11,6 +11,10 @@ readsf~ and writesf~ are defined which confine disk operations to a separate
 thread so that they can be used in real time.  The readsf~ and writesf~
 objects use Posix-like threads.  */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#else /* ROCKBOX */
 #ifdef UNIX
 #include <unistd.h>
 #include <fcntl.h>
@@ -22,6 +26,7 @@ objects use Posix-like threads.  */
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#endif /* ROCKBOX */
 
 #include "m_pd.h"
 
@@ -198,9 +203,15 @@ int open_soundfile(const char *dirname, const char *filename, int headersize,
     long skipframes)
 {
     char buf[OBUFSIZE], *bufptr;
+#ifdef ROCKBOX
+    int fd, nchannels, bigendian, bytespersamp, swap, sysrtn;
+#else
     int fd, format, nchannels, bigendian, bytespersamp, swap, sysrtn;
+#endif
     long bytelimit = 0x7fffffff;
+#ifndef ROCKBOX
     errno = 0;
+#endif
     fd = open_via_path(dirname, filename,
     	"", buf, &bufptr, MAXPDSTRING, 1);
     if (fd < 0)
@@ -239,7 +250,9 @@ int open_soundfile(const char *dirname, const char *filename, int headersize,
     	swap = (bigendian != garray_ambigendian());
 	if (format == FORMAT_NEXT)   /* nextstep header */
 	{
+#ifndef ROCKBOX
 	    uint32 param;
+#endif
 	    if (bytesread < (int)sizeof(t_nextstep))
 	    	goto badheader;
 	    nchannels = swap4(((t_nextstep *)buf)->ns_nchans, swap);
@@ -381,7 +394,9 @@ int open_soundfile(const char *dirname, const char *filename, int headersize,
 badheader:
     	/* the header wasn't recognized.  We're threadable here so let's not
 	print out the error... */
+#ifndef ROCKBOX
     errno = EIO;
+#endif
     return (-1);
 }
 
@@ -705,7 +720,11 @@ static int create_soundfile(t_canvas *canvas, const char *filename,
 
     canvas_makefilename(canvas, filenamebuf, buf2, MAXPDSTRING);
     sys_bashfilename(buf2, buf2);
+#ifdef ROCKBOX
+    if ((fd = open(buf2, BINCREATE)) < 0)
+#else
     if ((fd = open(buf2, BINCREATE, 0666)) < 0)
+#endif
     	return (-1);
 
     if (write(fd, headerbuf, headersize) < headersize)
@@ -771,7 +790,11 @@ static void soundfile_finishwrite(void *obj, char *filename, int fd,
     }
     return;
 baddonewrite:
+#ifdef ROCKBOX
+    post("%s: error", filename);
+#else
     post("%s: %s", filename, strerror(errno));
+#endif
 }
 
 static void soundfile_xferout(int nchannels, t_sample **vecs,
@@ -920,9 +943,16 @@ static t_soundfiler *soundfiler_new(void)
 static void soundfiler_read(t_soundfiler *x, t_symbol *s,
     int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     int headersize = -1, channels = 0, bytespersamp = 0, bigendian = 0,
 	resize = 0, i, j;
+#ifdef ROCKBOX
+    long skipframes = 0, nframes = 0, finalsize = 0,
+#else
     long skipframes = 0, nframes = 0, finalsize = 0, itemsleft,
+#endif
     	maxsize = DEFMAXSIZE, itemsread = 0, bytelimit  = 0x7fffffff;
     int fd = -1;
     char endianness, *filename;
@@ -930,7 +960,11 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
     t_sample *vecs[MAXSFCHANS];
     char sampbuf[SAMPBUFSIZE];
     int bufframes, nitems;
+#ifdef ROCKBOX
+    int fp;
+#else
     FILE *fp;
+#endif
     while (argc > 0 && argv->a_type == A_SYMBOL &&
     	*argv->a_w.w_symbol->s_name == '-')
     {
@@ -1019,8 +1053,14 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
     
     if (fd < 0)
     {
+#ifdef ROCKBOX
+        pd_error(x, "soundfiler_read: %s: %s",
+                         filename,
+                         "unknown or bad header format");
+#else
 	pd_error(x, "soundfiler_read: %s: %s", filename, (errno == EIO ?
 	    "unknown or bad header format" : strerror(errno)));
+#endif
     	goto done;
     }
 
@@ -1065,14 +1105,22 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
     if (!finalsize) finalsize = 0x7fffffff;
     if (finalsize > bytelimit / (channels * bytespersamp))
     	finalsize = bytelimit / (channels * bytespersamp);
+#ifdef ROCKBOX
+    fp = open(filename, O_RDONLY);
+#else
     fp = fdopen(fd, "rb");
+#endif
     bufframes = SAMPBUFSIZE / (channels * bytespersamp);
 
     for (itemsread = 0; itemsread < finalsize; )
     {
     	int thisread = finalsize - itemsread;
     	thisread = (thisread > bufframes ? bufframes : thisread);
+#ifdef ROCKBOX
+        nitems = read(fp, sampbuf, thisread * bytespersamp * channels);
+#else
     	nitems = fread(sampbuf, channels * bytespersamp, thisread, fp);
+#endif
 	if (nitems <= 0) break;
 	soundfile_xferin(channels, argc, vecs, itemsread,
 	    (unsigned char *)sampbuf, nitems, bytespersamp, bigendian);
@@ -1082,7 +1130,11 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
 	
     for (i = 0; i < argc; i++)
     {
+#ifdef ROCKBOX
+        int vecsize;
+#else
 	int nzero, vecsize;
+#endif
 	garray_getfloatarray(garrays[i], &vecsize, &vecs[i]);
 	for (j = itemsread; j < vecsize; j++)
 	    vecs[i][j] = 0;
@@ -1099,7 +1151,11 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
     	/* do all graphics updates */
     for (i = 0; i < argc; i++)
     	garray_redraw(garrays[i]);
+#ifdef ROCKBOX
+    close(fp);
+#else
     fclose(fp);
+#endif
     fd = -1;
     goto done;
 usage:
@@ -1118,14 +1174,25 @@ done:
 long soundfiler_dowrite(void *obj, t_canvas *canvas,
     int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    int bytespersamp, bigendian,
+    	swap, filetype, normalize, i, j, nchannels;
+    long onset, nframes,
+        itemswritten = 0;
+#else
     int headersize, bytespersamp, bigendian,
     	endianness, swap, filetype, normalize, i, j, nchannels;
     long onset, nframes, itemsleft,
     	maxsize = DEFMAXSIZE, itemswritten = 0;
+#endif
     t_garray *garrays[MAXSFCHANS];
     t_sample *vecs[MAXSFCHANS];
     char sampbuf[SAMPBUFSIZE];
+#ifdef ROCKBOX
+    int bufframes;
+#else
     int bufframes, nitems;
+#endif
     int fd = -1;
     float normfactor, biggest = 0, samplerate;
     t_symbol *filesym;
@@ -1174,7 +1241,11 @@ long soundfiler_dowrite(void *obj, t_canvas *canvas,
     	nframes, bytespersamp, bigendian, nchannels,
 	    swap, samplerate)) < 0)
     {
+#ifdef ROCKBOX
+        post("%s: %s\n", filesym->s_name, "error");
+#else
     	post("%s: %s\n", filesym->s_name, strerror(errno));
+#endif
     	goto fail;
     }
     if (!normalize)
@@ -1194,14 +1265,22 @@ long soundfiler_dowrite(void *obj, t_canvas *canvas,
 
     for (itemswritten = 0; itemswritten < nframes; )
     {
+#ifdef ROCKBOX
+        int thiswrite = nframes - itemswritten, nbytes;
+#else
     	int thiswrite = nframes - itemswritten, nitems, nbytes;
+#endif
     	thiswrite = (thiswrite > bufframes ? bufframes : thiswrite);
 	soundfile_xferout(argc, vecs, (unsigned char *)sampbuf, thiswrite,
 	    onset, bytespersamp, bigendian, normfactor);
     	nbytes = write(fd, sampbuf, nchannels * bytespersamp * thiswrite);
 	if (nbytes < nchannels * bytespersamp * thiswrite)
 	{
+#ifdef ROCKBOX
+            post("%s: %s", filesym->s_name, "error");
+#else
 	    post("%s: %s", filesym->s_name, strerror(errno));
+#endif
 	    if (nbytes > 0)
 	    	itemswritten += nbytes / (nchannels * bytespersamp);
 	    break;
@@ -1230,6 +1309,9 @@ fail:
 static void soundfiler_write(t_soundfiler *x, t_symbol *s,
     int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     long bozo = soundfiler_dowrite(x, x->x_canvas,
     	argc, argv);
     outlet_float(x->x_obj.ob_outlet, (float)bozo); 

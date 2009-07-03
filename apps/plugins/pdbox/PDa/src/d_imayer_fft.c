@@ -95,7 +95,9 @@ char mtrig_algorithm[] = "Simple";
 
 #define TRIG_TAB_SIZE 22
 
+#ifndef ROCKBOX
 static long long halsec[TRIG_TAB_SIZE]= {1,2,3};
+#endif
 
 #define FFTmult(x,y) mult(x,y)
 
@@ -286,7 +288,11 @@ void imayer_ifft(int n, t_fixed *real, t_fixed *imag)
 
 void imayer_realfft(int n, t_fixed *real)
 {
+#ifdef ROCKBOX
+ t_fixed a,b;
+#else
  t_fixed a,b,c,d;
+#endif
  int i,j,k;
  imayer_fht(real,n);
  for (i=1,j=n-1,k=n/2;i<k;i++,j--) {
@@ -299,7 +305,11 @@ void imayer_realfft(int n, t_fixed *real)
 
 void imayer_realifft(int n, t_fixed *real)
 {
+#ifdef ROCKBOX
+ t_fixed a,b;
+#else
  t_fixed a,b,c,d;
+#endif
  int i,j,k;
  for (i=1,j=n-1,k=n/2;i<k;i++,j--) {
   a = real[i];

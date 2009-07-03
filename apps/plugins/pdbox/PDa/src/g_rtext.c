@@ -6,6 +6,14 @@
 /* have to insert gui-objects into editor-list */
 /* all changes are labeled with      iemlib      */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "ctype.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#define snprintf rb->snprintf
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -14,6 +22,7 @@
 #include "s_stuff.h"
 #include "g_canvas.h"
 #include "t_tk.h"
+#endif /* ROCKBOX */
 
 #define LMARGIN 1
 #define RMARGIN 1
@@ -44,7 +53,9 @@ struct _rtext
 t_rtext *rtext_new(t_glist *glist, t_text *who)
 {
     t_rtext *x = (t_rtext *)getbytes(sizeof *x);
+#ifndef ROCKBOX
     int w = 0, h = 0, indx;
+#endif
     x->x_height = -1;
     x->x_text = who;
     x->x_glist = glist;
@@ -53,8 +64,13 @@ t_rtext *rtext_new(t_glist *glist, t_text *who)
     	x->x_drawnwidth = x->x_drawnheight = 0;
     binbuf_gettext(who->te_binbuf, &x->x_buf, &x->x_bufsize);
     glist->gl_editor->e_rtext = x;
+#ifdef ROCKBOX
+    snprintf(x->x_tag, strlen(x->x_tag),
+        ".x%x.t%x", (t_int)glist_getcanvas(x->x_glist), (t_int)x);
+#else /* ROCKBOX */
     sprintf(x->x_tag, ".x%x.t%x", (t_int)glist_getcanvas(x->x_glist),
     	(t_int)x);
+#endif /* ROCKBOX */
     return (x);
 }
 
@@ -149,12 +165,18 @@ static void rtext_senditup(t_rtext *x, int action, int *widthp, int *heightp,
     char tempbuf[UPBUFSIZE], *tp = tempbuf, *bp = x->x_buf;
     int outchars, inchars = x->x_bufsize, nlines = 0, ncolumns = 0,
     	pixwide, pixhigh;
+#ifdef ROCKBOX
+    int fontwidth = 8, fontheight = 10;
+#else
     int font = glist_getfont(x->x_glist);
     int fontwidth = sys_fontwidth(font), fontheight = sys_fontheight(font);
+#endif
     int findx = (*widthp + (fontwidth/2)) / fontwidth,
     	findy = *heightp / fontheight;
     int reportedindex = 0;
+#ifndef ROCKBOX
     t_canvas *canvas = glist_getcanvas(x->x_glist);
+#endif
     int widthspec = x->x_text->te_width;
     int widthlimit = (widthspec ? widthspec : BOXWIDTH);
     while (inchars)
@@ -214,16 +236,22 @@ static void rtext_senditup(t_rtext *x, int action, int *widthp, int *heightp,
     pixhigh = nlines * fontheight + (TMARGIN + BMARGIN);
 
     if (action == SEND_FIRST)
+#ifdef ROCKBOX
+        ;
+#else /* ROCKBOX */
     	sys_vgui("pdtk_text_new .x%x.c %s %f %f {%.*s} %d %s\n",
 	    canvas, x->x_tag,
 	    dispx + LMARGIN, dispy + TMARGIN,
 	    outchars, tempbuf, sys_hostfontsize(font),
 	    (glist_isselected(x->x_glist,
 	    	&x->x_glist->gl_gobj)? "blue" : "black"));
+#endif /* ROCKBOX */
     else if (action == SEND_UPDATE)
     {
+#ifndef ROCKBOX
     	sys_vgui("pdtk_text_set .x%x.c %s {%.*s}\n",
     	    canvas, x->x_tag, outchars, tempbuf);
+#endif
     	if (pixwide != x->x_drawnwidth || pixhigh != x->x_drawnheight) 
 	    text_drawborder(x->x_text, x->x_glist, x->x_tag,
 	    	pixwide, pixhigh, 0);
@@ -231,18 +259,22 @@ static void rtext_senditup(t_rtext *x, int action, int *widthp, int *heightp,
 	{
     	    if (x->x_selend > x->x_selstart)
 	    {
+#ifndef ROCKBOX
     		sys_vgui(".x%x.c select from %s %d\n", canvas, 
     	    	    x->x_tag, x->x_selstart);
     		sys_vgui(".x%x.c select to %s %d\n", canvas, 
     	    	    x->x_tag, x->x_selend + (sys_oldtclversion ? 0 : -1));
 	    	sys_vgui(".x%x.c focus \"\"\n", canvas);	
+#endif
     	    }
 	    else
 	    {
+#ifndef ROCKBOX
     		sys_vgui(".x%x.c select clear\n", canvas);
 	    	sys_vgui(".x%x.c icursor %s %d\n", canvas, x->x_tag,
 		    x->x_selstart);
 	    	sys_vgui(".x%x.c focus %s\n", canvas, x->x_tag);	
+#endif
 	    }
 	}
     }
@@ -273,7 +305,9 @@ void rtext_retext(t_rtext *x)
 	    int wantreduce = bufsize - text->te_width;
 	    char *decimal = 0, *nextchar, *ebuf = x->x_buf + bufsize,
 		*s1, *s2;
+#ifndef ROCKBOX
 	    int ndecimals;
+#endif
 	    for (decimal = x->x_buf; decimal < ebuf; decimal++)
 	    	if (*decimal == '.')
 		    break;
@@ -339,21 +373,35 @@ void rtext_draw(t_rtext *x)
 
 void rtext_erase(t_rtext *x)
 {
+#ifdef ROCKBOX
+    (void) x;
+#else
     sys_vgui(".x%x.c delete %s\n", glist_getcanvas(x->x_glist), x->x_tag);
+#endif
 }
 
 void rtext_displace(t_rtext *x, int dx, int dy)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) dx;
+    (void) dy;
+#else /* ROCKBOX */
     sys_vgui(".x%x.c move %s %d %d\n", glist_getcanvas(x->x_glist), 
     	x->x_tag, dx, dy);
+#endif /* ROCKBOX */
 }
 
 void rtext_select(t_rtext *x, int state)
 {
     t_glist *glist = x->x_glist;
     t_canvas *canvas = glist_getcanvas(glist);
+#ifdef ROCKBOX
+    (void) state;
+#else /* ROCKBOX */
     sys_vgui(".x%x.c itemconfigure %s -fill %s\n", canvas, 
     	x->x_tag, (state? "blue" : "black"));
+#endif /* ROCKBOX */
     canvas_editing = canvas;
 }
 
@@ -361,10 +409,14 @@ void rtext_activate(t_rtext *x, int state)
 {
     int w = 0, h = 0, indx;
     t_glist *glist = x->x_glist;
+#ifndef ROCKBOX
     t_canvas *canvas = glist_getcanvas(glist);
+#endif
     if (state)
     {
+#ifndef ROCKBOX
 	sys_vgui(".x%x.c focus %s\n", canvas, x->x_tag);
+#endif
     	glist->gl_editor->e_textedfor = x;
     	glist->gl_editor->e_textdirty = 0;
 	x->x_dragfrom = x->x_selstart = 0;
@@ -373,8 +425,10 @@ void rtext_activate(t_rtext *x, int state)
     }
     else
     {
+#ifndef ROCKBOX
     	sys_vgui("selection clear .x%x.c\n", canvas);
 	sys_vgui(".x%x.c focus \"\"\n", canvas);
+#endif
     	if (glist->gl_editor->e_textedfor == x)
     	    glist->gl_editor->e_textedfor = 0;
 	x->x_active = 0;
@@ -385,7 +439,9 @@ void rtext_activate(t_rtext *x, int state)
 void rtext_key(t_rtext *x, int keynum, t_symbol *keysym)
 {
     int w = 0, h = 0, indx, i, newsize, ndel;
+#ifndef ROCKBOX
     char *s1, *s2;
+#endif
     if (keynum)
     {
     	int n = keynum;

@@ -2,9 +2,14 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-#include <stdlib.h>
 #include "m_pd.h"
 #include "m_imp.h"
+
+#ifdef ROCKBOX
+void pd_checkgui(t_pd *x, t_symbol *s);
+#else /* ROCKBOX */
+#include <stdlib.h>
+#endif /* ROCKBOX */
 
     /* FIXME no out-of-memory testing yet! */
 
@@ -166,7 +171,7 @@ void pd_unbind(t_pd *x, t_symbol *s)
     	    b->b_list = e->e_next;
     	    freebytes(e, sizeof(t_bindelem));
     	}
-    	else for (e = b->b_list; e2 = e->e_next; e = e2)
+    	else for (e = b->b_list; (e2 = e->e_next); e = e2)
     	    if (e2->e_who == x)
     	{
     	    e->e_next = e2->e_next;
@@ -194,8 +199,13 @@ t_pd *pd_findbyclass(t_symbol *s, t_class *c)
     if (*s->s_thing == bindlist_class)
     {
     	t_bindlist *b = (t_bindlist *)s->s_thing;
+#ifdef ROCKBOX
+        t_bindelem *e;
+#else /* ROCKBOX */
     	t_bindelem *e, *e2;
+#endif /* ROCKBOX */
     	int warned = 0;
+
     	for (e = b->b_list; e; e = e->e_next)
     	    if (*e->e_who == c)
     	{
@@ -288,6 +298,9 @@ void pd_symbol(t_pd *x, t_symbol *s)
 
 void pd_list(t_pd *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     (*(*x)->c_listmethod)(x, &s_list, argc, argv);
 }
 

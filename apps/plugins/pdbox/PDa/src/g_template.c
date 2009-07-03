@@ -2,6 +2,14 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "s_stuff.h"
+#include "g_canvas.h"
+#define snprintf rb->snprintf
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -9,6 +17,7 @@
 #include "m_pd.h"
 #include "s_stuff.h"  	/* for sys_hostfontsize */
 #include "g_canvas.h"
+#endif /* ROCKBOX */
 
 /*
 This file contains text objects you would put in a canvas to define a
@@ -140,7 +149,9 @@ int template_size(t_template *x)
 int template_find_field(t_template *x, t_symbol *name, int *p_onset,
     int *p_type, t_symbol **p_arraytype)
 {
+#ifndef ROCKBOX
     t_template *t;
+#endif
     int i, n;
     if (!x)
     {
@@ -262,7 +273,13 @@ elements might still be old ones.
 static void template_conformwords(t_template *tfrom, t_template *tto,
     int *conformaction, t_word *wfrom, t_word *wto)
 {
+#ifdef ROCKBOX
+    int nto = tto->t_n, i;
+
+    (void) tfrom;
+#else
     int nfrom = tfrom->t_n, nto = tto->t_n, i;
+#endif
     for (i = 0; i < nto; i++)
     {
     	if (conformaction[i] >= 0)
@@ -282,7 +299,11 @@ static t_scalar *template_conformscalar(t_template *tfrom, t_template *tto,
 {
     t_scalar *x;
     t_gpointer gp;
+#ifdef ROCKBOX
+    int i;
+#else
     int nto = tto->t_n, nfrom = tfrom->t_n, i;
+#endif
     t_template *scalartemplate;
     /* post("conform scalar"); */
     	/* possibly replace the scalar */
@@ -311,7 +332,7 @@ static t_scalar *template_conformscalar(t_template *tfrom, t_template *tto,
 	else
 	{
 	    t_gobj *y, *y2;
-	    for (y = glist->gl_list; y2 = y->g_next; y = y2)
+	    for (y = glist->gl_list; (y2 = y->g_next); y = y2)
 	    	if (y2 == &scfrom->sc_gobj)
 	    {
 	    	x->sc_gobj.g_next = y2->g_next;
@@ -447,7 +468,9 @@ void template_conform(t_template *tfrom, t_template *tto)
 
 t_template *template_findbyname(t_symbol *s)
 {
+#ifndef ROCKBOX
     int i;
+#endif
     if (s == &s_float)
     	return (&template_float);
     else return ((t_template *)pd_findbyclass(s, template_class));
@@ -477,6 +500,10 @@ static void *template_usetemplate(void *dummy, t_symbol *s,
     t_template *x;
     t_symbol *templatesym =
     	canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
+#ifdef ROCKBOX
+    (void) dummy;
+    (void) s;
+#endif
     if (!argc)
     	return (0);
     argc--; argv++;
@@ -540,7 +567,9 @@ static void *gtemplate_donew(t_symbol *sym, int argc, t_atom *argv)
     t_gtemplate *x = (t_gtemplate *)pd_new(gtemplate_class);
     t_template *t = template_findbyname(sym);
     int i;
+#ifndef ROCKBOX
     t_symbol *sx = gensym("x");
+#endif
     x->x_owner = canvas_getcurrent();
     x->x_next = 0;
     x->x_sym = sym;
@@ -559,7 +588,7 @@ static void *gtemplate_donew(t_symbol *sym, int argc, t_atom *argv)
     	if (t->t_list)
 	{
     	    t_gtemplate *x2, *x3;
-	    for (x2 = x->x_template->t_list; x3 = x2->x_next; x2 = x3)
+	    for(x2 = x->x_template->t_list; (x3 = x2->x_next); x2 = x3)
 		;
 	    x2->x_next = x;
 	    post("template %s: warning: already exists.", sym->s_name);
@@ -593,8 +622,13 @@ static void *gtemplate_donew(t_symbol *sym, int argc, t_atom *argv)
 
 static void *gtemplate_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifndef ROCKBOX
     t_gtemplate *x = (t_gtemplate *)pd_new(gtemplate_class);
+#endif
     t_symbol *sym = atom_getsymbolarg(0, argc, argv);
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (argc >= 1)
     	argc--; argv++;
     return (gtemplate_donew(canvas_makebindsym(sym), argc, argv));
@@ -603,9 +637,14 @@ static void *gtemplate_new(t_symbol *s, int argc, t_atom *argv)
     /* old version (0.34) -- delete 2003 or so */
 static void *gtemplate_new_old(t_symbol *s, int argc, t_atom *argv)
 {
+#ifndef ROCKBOX
     t_gtemplate *x = (t_gtemplate *)pd_new(gtemplate_class);
+#endif
     t_symbol *sym = canvas_makebindsym(canvas_getcurrent()->gl_name);
     static int warned;
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (!warned)
     {
     	post("warning -- 'template' (%s) is obsolete; replace with 'struct'",
@@ -643,7 +682,7 @@ static void gtemplate_free(t_gtemplate *x)
     else
     {
     	t_gtemplate *x2, *x3;
-	for (x2 = t->t_list; x3 = x2->x_next; x2 = x3)
+	for(x2 = t->t_list; (x3 = x2->x_next); x2 = x3)
 	{
 	    if (x == x3)
 	    {
@@ -829,6 +868,16 @@ static void curve_displace(t_gobj *z, t_glist *glist,
     t_word *data, t_template *template, float basex, float basey,
     int dx, int dy)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) data;
+    (void) template;
+    (void) basex;
+    (void) basey;
+    (void) dx;
+    (void) dy;
+#endif
     /* refuse */
 }
 
@@ -836,6 +885,15 @@ static void curve_select(t_gobj *z, t_glist *glist,
     t_word *data, t_template *template, float basex, float basey,
     int state)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) data;
+    (void) template;
+    (void) basex;
+    (void) basey;
+    (void) state;
+#endif
     /* fill in later */
 }
 
@@ -843,6 +901,15 @@ static void curve_activate(t_gobj *z, t_glist *glist,
     t_word *data, t_template *template, float basex, float basey,
     int state)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) data;
+    (void) template;
+    (void) basex;
+    (void) basey;
+    (void) state;
+#endif
     /* fill in later */
 }
 
@@ -861,8 +928,13 @@ static void numbertocolor(int n, char *s)
     red = n / 100;
     blue = ((n / 10) % 10);
     green = n % 10;
+#ifdef ROCKBOX
+    snprintf(s, 8, "#%2.2x%2.2x%2.2x",
+            rangecolor(red), rangecolor(blue), rangecolor(green));
+#else
     sprintf(s, "#%2.2x%2.2x%2.2x", rangecolor(red), rangecolor(blue),
     	rangecolor(green));
+#endif
 }
 
 static void curve_vis(t_gobj *z, t_glist *glist, 
@@ -872,12 +944,22 @@ static void curve_vis(t_gobj *z, t_glist *glist,
     t_curve *x = (t_curve *)z;
     int i, n = x->x_npoints;
     t_fielddesc *f = x->x_vec;
+
+#ifdef ROCKBOX
+    (void) glist;
+    (void) basex;
+    (void) basey;
+#endif
     
     if (vis)
     {
     	if (n > 1)
     	{
+#ifdef ROCKBOX
+            int flags = x->x_flags;
+#else
     	    int flags = x->x_flags, closed = (flags & CLOSED);
+#endif
     	    float width = fielddesc_getfloat(&x->x_width, template, data, 1);
     	    char outline[20], fill[20];
     	    if (width < 1) width = 1;
@@ -889,19 +971,26 @@ static void curve_vis(t_gobj *z, t_glist *glist,
     	    	numbertocolor(
     	    	    fielddesc_getfloat(&x->x_fillcolor, template, data, 1),
     	    	    fill);
+#ifndef ROCKBOX
     	    	sys_vgui(".x%x.c create polygon\\\n",
     	    	    glist_getcanvas(glist));
+#endif
     	    }
+#ifndef ROCKBOX
     	    else sys_vgui(".x%x.c create line\\\n",
     	    	    glist_getcanvas(glist));
+#endif
     	    for (i = 0, f = x->x_vec; i < n; i++, f += 2)
     	    {
+#ifndef ROCKBOX
     		float xloc = glist_xtopixels(glist,
     	    	    basex + fielddesc_getfloat(f, template, data, 1));
     		float yloc = glist_ytopixels(glist,
     	    	    basey + fielddesc_getfloat(f+1, template, data, 1));
     		sys_vgui("%d %d\\\n", (int)xloc, (int)yloc);
+#endif
     	    }
+#ifndef ROCKBOX
     	    sys_vgui("-width %f\\\n",
     	    	fielddesc_getfloat(&x->x_width, template, data, 1));
     	    if (flags & CLOSED) sys_vgui("-fill %s -outline %s\\\n",
@@ -909,13 +998,16 @@ static void curve_vis(t_gobj *z, t_glist *glist,
     	    else sys_vgui("-fill %s\\\n", outline);
     	    if (flags & BEZ) sys_vgui("-smooth 1\\\n");
     	    sys_vgui("-tags curve%x\n", data);
+#endif
     	}
     	else post("warning: curves need at least two points to be graphed");
     }
     else
     {
+#ifndef ROCKBOX
     	if (n > 1) sys_vgui(".x%x.c delete curve%x\n",
     	    glist_getcanvas(glist), data);    	
+#endif
     }
 }
 
@@ -969,6 +1061,13 @@ static int curve_click(t_gobj *z, t_glist *glist,
     int besterror = 0x7fffffff;
     t_fielddesc *f = x->x_vec;
     t_word *data = sc->sc_vec;
+
+#ifdef ROCKBOX
+    (void) shift;
+    (void) alt;
+    (void) dbl;
+#endif
+
     for (i = 0, f = x->x_vec; i < n; i++, f += 2)
     {
     	int xloc = glist_xtopixels(glist,
@@ -1060,9 +1159,16 @@ static void *plot_new(t_symbol *classsym, t_int argc, t_atom *argv)
 {
     t_plot *x = (t_plot *)pd_new(plot_class);
     int flags = 0;
+#ifndef ROCKBOX
     int nxy, i;
     t_fielddesc *fd;
+#endif
     t_symbol *firstarg = atom_getsymbolarg(0, argc, argv);
+
+#ifdef ROCKBOX
+    (void) classsym;
+#endif
+
     if (!strcmp(firstarg->s_name, "curve"))
     {
     	flags |= BEZ;
@@ -1132,7 +1238,11 @@ int array_getfields(t_symbol *elemtemplatesym,
     t_template **elemtemplatep, int *elemsizep,
     int *xonsetp, int *yonsetp, int *wonsetp)
 {
+#ifdef ROCKBOX
+    int elemsize, yonset, wonset, xonset, type;
+#else
     int arrayonset, elemsize, yonset, wonset, xonset, type;
+#endif
     t_template *elemtemplate;
     t_symbol *dummy;
     t_canvas *elemtemplatecanvas = 0;
@@ -1219,6 +1329,16 @@ static void plot_displace(t_gobj *z, t_glist *glist,
     t_word *data, t_template *template, float basex, float basey,
     int dx, int dy)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) data;
+    (void) template;
+    (void) basex;
+    (void) basey;
+    (void) dx;
+    (void) dy;
+#endif
     	/* not yet */
 }
 
@@ -1226,6 +1346,15 @@ static void plot_select(t_gobj *z, t_glist *glist,
     t_word *data, t_template *template, float basex, float basey,
     int state)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) data;
+    (void) template;
+    (void) basex;
+    (void) basey;
+    (void) state;
+#endif
     /* not yet */
 }
 
@@ -1233,6 +1362,15 @@ static void plot_activate(t_gobj *z, t_glist *glist,
     t_word *data, t_template *template, float basex, float basey,
     int state)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) data;
+    (void) template;
+    (void) basex;
+    (void) basey;
+    (void) state;
+#endif
     	/* not yet */
 }
 
@@ -1270,8 +1408,10 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     	{
     	    	/* found "w" field which controls linewidth.  The trace is
     	    	a filled polygon with 2n points. */
+#ifndef ROCKBOX
     	    sys_vgui(".x%x.c create polygon \\\n",
     	    	glist_getcanvas(glist));
+#endif
     	    
     	    for (i = 0, xsum = xloc; i < nelem; i++)
     	    {
@@ -1287,9 +1427,11 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     		ixpix = xpix + 0.5;
     		if (xonset >= 0 || ixpix != lastpixel)
     		{
+#ifndef ROCKBOX
     	    	    sys_vgui("%d %f \\\n", ixpix,
     	    		glist_ytopixels(glist,
 			    basey + yloc + yval - wval));
+#endif
     	    	    ndrawn++;
     		}
     		lastpixel = ixpix;
@@ -1310,8 +1452,10 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     		ixpix = xpix + 0.5;
     		if (xonset >= 0 || ixpix != lastpixel)
     		{
+#ifndef ROCKBOX
     	    	    sys_vgui("%d %f \\\n", ixpix, glist_ytopixels(glist,
 			    basey + yloc + yval + wval));
+#endif
     	    	    ndrawn++;
     		}
     		lastpixel = ixpix;
@@ -1321,23 +1465,31 @@ static void plot_vis(t_gobj *z, t_glist *glist,
 		should be at least two already. */
     	    if (ndrawn < 4)
 	    {
+#ifndef ROCKBOX
     	    	sys_vgui("%d %f \\\n", ixpix + 10, glist_ytopixels(glist,
 			basey + yloc + yval + wval));
     	    	sys_vgui("%d %f \\\n", ixpix + 10, glist_ytopixels(glist,
 			basey + yloc + yval - wval));
+#endif
     	    }
 	ouch:
+#ifdef ROCKBOX
+                ;
+#else /* ROCKBOX */
     	    sys_vgui(" -width 1 -fill %s -outline %s\\\n", outline, outline);
     	    if (x->x_flags & BEZ) sys_vgui("-smooth 1\\\n");
 
     	    sys_vgui("-tags plot%x\n", data);
+#endif /* ROCKBOX */
     	}
     	else if (linewidth > 0)
     	{
     	    	/* no "w" field.  If the linewidth is positive, draw a
     	    	segmented line with the requested width; otherwise don't
     	    	draw the trace at all. */
+#ifndef ROCKBOX
     	    sys_vgui(".x%x.c create line \\\n", glist_getcanvas(glist));
+#endif
 
     	    for (xsum = xloc, i = 0; i < nelem; i++)
     	    {
@@ -1352,14 +1504,17 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     		ixpix = xpix + 0.5;
     		if (xonset >= 0 || ixpix != lastpixel)
     		{
+#ifndef ROCKBOX
     	    	    sys_vgui("%d %f \\\n", ixpix,
     	    		glist_ytopixels(glist, basey + yloc + yval));
+#endif
     	    	    ndrawn++;
     		}
     		lastpixel = ixpix;
     		if (ndrawn >= 1000) break;
     	    }
     		/* TK will complain if there aren't at least 2 points... */
+#ifndef ROCKBOX
     	    if (ndrawn == 0) sys_vgui("0 0 0 0 \\\n");
     	    else if (ndrawn == 1) sys_vgui("%d %f \\\n", ixpix + 10,
     	    		glist_ytopixels(glist, basey + yloc + yval));
@@ -1369,6 +1524,7 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     	    if (x->x_flags & BEZ) sys_vgui("-smooth 1\\\n");
 
     	    sys_vgui("-tags plot%x\n", data);
+#endif
     	}
     	    /* We're done with the outline; now draw all the points.
     	    This code is inefficient since the template has to be
@@ -1413,8 +1569,10 @@ static void plot_vis(t_gobj *z, t_glist *glist,
 	    }
     	}
     	    /* and then the trace */
+#ifndef ROCKBOX
     	sys_vgui(".x%x.c delete plot%x\n",
-    	    glist_getcanvas(glist), data);    	
+    	    glist_getcanvas(glist), data);
+#endif
     }
 }
 
@@ -1526,8 +1684,12 @@ static void drawnumber_getrect(t_gobj *z, t_glist *glist,
     	basex + fielddesc_getfloat(&x->x_xloc, template, data, 0));
     int yloc = glist_ytopixels(glist,
     	basey + fielddesc_getfloat(&x->x_yloc, template, data, 0));
+#ifdef ROCKBOX
+    int fontwidth = 8, fontheight = 10;
+#else
     int font = glist_getfont(glist);
     int fontwidth = sys_fontwidth(font), fontheight = sys_fontheight(font);
+#endif
     char buf[DRAWNUMBER_BUFSIZE];
     if (x->x_flags & DRAW_SYMBOL)
     	SETSYMBOL(&at, fielddesc_getsymbol(&x->x_value, template, data, 0));
@@ -1543,6 +1705,16 @@ static void drawnumber_displace(t_gobj *z, t_glist *glist,
     t_word *data, t_template *template, float basex, float basey,
     int dx, int dy)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) data;
+    (void) template;
+    (void) basex;
+    (void) basey;
+    (void) dx;
+    (void) dy;
+#endif
     /* refuse */
 }
 
@@ -1550,6 +1722,14 @@ static void drawnumber_select(t_gobj *z, t_glist *glist,
     t_word *data, t_template *template, float basex, float basey,
     int state)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) data;
+    (void) template;
+    (void) basex;
+    (void) basey;
+#endif
     post("drawnumber_select %d", state);
     /* fill in later */
 }
@@ -1558,6 +1738,14 @@ static void drawnumber_activate(t_gobj *z, t_glist *glist,
     t_word *data, t_template *template, float basex, float basey,
     int state)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) data;
+    (void) template;
+    (void) basex;
+    (void) basey;
+#endif
     post("drawnumber_activate %d", state);
 }
 
@@ -1566,14 +1754,22 @@ static void drawnumber_vis(t_gobj *z, t_glist *glist,
     int vis)
 {
     t_drawnumber *x = (t_drawnumber *)z;
-    
+
+#ifdef ROCKBOX
+    (void) glist;
+    (void) basex;
+    (void) basey;
+#endif
+
     if (vis)
     {
     	t_atom at;
+#ifndef ROCKBOX
 	int xloc = glist_xtopixels(glist,
     	    basex + fielddesc_getfloat(&x->x_xloc, template, data, 0));
 	int yloc = glist_ytopixels(glist,
     	    basey + fielddesc_getfloat(&x->x_yloc, template, data, 0));
+#endif
 	char colorstring[20], buf[DRAWNUMBER_BUFSIZE];
     	numbertocolor(fielddesc_getfloat(&x->x_color, template, data, 1),
     	    colorstring);
@@ -1581,13 +1777,17 @@ static void drawnumber_vis(t_gobj *z, t_glist *glist,
     	    SETSYMBOL(&at, fielddesc_getsymbol(&x->x_value, template, data, 0));
 	else SETFLOAT(&at, fielddesc_getfloat(&x->x_value, template, data, 0));
 	drawnumber_sprintf(x, buf, &at);
+#ifndef ROCKBOX
 	sys_vgui(".x%x.c create text %d %d -anchor nw -fill %s -text {%s}",
     	    	glist_getcanvas(glist), xloc, yloc, colorstring, buf);
     	sys_vgui(" -font -*-courier-bold--normal--%d-*",
 	    sys_hostfontsize(glist_getfont(glist)));
 	sys_vgui(" -tags drawnumber%x\n", data);
+#endif
     }
+#ifndef ROCKBOX
     else sys_vgui(".x%x.c delete drawnumber%x\n", glist_getcanvas(glist), data);
+#endif
 }
 
 static float drawnumber_motion_ycumulative;
@@ -1604,6 +1804,9 @@ static void drawnumber_motion(void *z, t_floatarg dx, t_floatarg dy)
     t_drawnumber *x = (t_drawnumber *)z;
     t_fielddesc *f = &x->x_value;
     drawnumber_motion_ycumulative -= dy;
+#ifdef ROCKBOX
+    (void) dx;
+#endif
     template_setfloat(drawnumber_motion_template,
     	f->fd_un.fd_varsym,
 	    drawnumber_motion_wp, 
@@ -1619,6 +1822,11 @@ static int drawnumber_click(t_gobj *z, t_glist *glist,
     t_drawnumber *x = (t_drawnumber *)z;
     int x1, y1, x2, y2;
     t_word *data = sc->sc_vec;
+#ifdef ROCKBOX
+    (void) shift;
+    (void) alt;
+    (void) dbl;
+#endif
     drawnumber_getrect(z, glist,
     	sc->sc_vec, template, basex, basey,
     	&x1, &y1, &x2, &y2);
@@ -1652,6 +1860,9 @@ t_parentwidgetbehavior drawnumber_widgetbehavior =
 
 static void drawnumber_free(t_drawnumber *x)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
 }
 
 static void drawnumber_setup(void)
@@ -1676,5 +1887,6 @@ void g_template_setup(void)
     plot_setup();
     drawnumber_setup();
 }
+
 
 

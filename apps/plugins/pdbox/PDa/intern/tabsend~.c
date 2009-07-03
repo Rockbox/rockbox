@@ -54,7 +54,11 @@ bad:
 
 static void tabsend_dsp(t_tabsend *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    int vecsize;
+#else
     int i, vecsize;
+#endif
     t_garray *a;
 
     if (!(a = (t_garray *)pd_findbyclass(x->x_arrayname, garray_class)))

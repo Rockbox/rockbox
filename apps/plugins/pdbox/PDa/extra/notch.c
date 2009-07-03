@@ -10,6 +10,13 @@
 
 */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "math.h"
+#include "filters.h"
+#else /* ROCKBOX */
 #include "m_pd.h"
 #ifdef NT
 #pragma warning( disable : 4244 )
@@ -17,6 +24,7 @@
 #endif
 #include <math.h>
 #include "filters.h"
+#endif /* ROCKBOX */
 
 
 

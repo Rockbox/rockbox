@@ -51,6 +51,9 @@ void d_osc_setup(void);
 void d_soundfile_setup(void);
 void d_ugen_setup(void);
 
+/* PD anywhere specific. -- W.B. */
+void d_intern_setup(void);
+
 void conf_init(void)
 {
     g_array_setup();
@@ -81,11 +84,15 @@ void conf_init(void)
     x_time_setup();
     x_arithmetic_setup();
 
+#ifndef ROCKBOX
     x_midi_setup();
+#endif
     x_misc_setup();
     x_net_setup();
     x_qlist_setup();
+#ifndef ROCKBOX
     x_gui_setup();
+#endif
     d_arithmetic_setup();
     d_dac_setup();
     d_fft_setup();

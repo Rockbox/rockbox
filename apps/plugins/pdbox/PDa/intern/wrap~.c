@@ -40,6 +40,9 @@ static t_int *sigwrap_perform(t_int *w)
 
 static void sigwrap_dsp(t_sigwrap *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     dsp_add(sigwrap_perform, 3, sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 

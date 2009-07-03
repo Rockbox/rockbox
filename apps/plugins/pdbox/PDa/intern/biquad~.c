@@ -65,12 +65,17 @@ static t_int *sigbiquad_perform(t_int *w)
 
 static void sigbiquad_list(t_sigbiquad *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
+
     float fb1 = atom_getfloatarg(0, argc, argv);
     float fb2 = atom_getfloatarg(1, argc, argv);
     float ff1 = atom_getfloatarg(2, argc, argv);
     float ff2 = atom_getfloatarg(3, argc, argv);
     float ff3 = atom_getfloatarg(4, argc, argv);
     float discriminant = fb1 * fb1 + 4 * fb2;
+
     t_biquadctl *c = x->x_ctl;
     if (discriminant < 0) /* imaginary roots -- resonant filter */
     {
@@ -99,6 +104,9 @@ stable:
 
 static void sigbiquad_set(t_sigbiquad *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_biquadctl *c = x->x_ctl;
     c->c_x1 = atom_getfloatarg(0, argc, argv);
     c->c_x2 = atom_getfloatarg(1, argc, argv);

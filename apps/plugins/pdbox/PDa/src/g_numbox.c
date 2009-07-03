@@ -4,6 +4,13 @@
 
 /* my_numbox.c written by Thomas Musil (c) IEM KUG Graz Austria 2000-2001 */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#include "g_all_guis.h"
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -19,6 +26,7 @@
 #else
 #include <unistd.h>
 #endif
+#endif /* ROCKBOX */
 
 /*------------------ global varaibles -------------------------*/
 
@@ -76,7 +84,11 @@ void my_numbox_ftoa(t_my_numbox *x)
     double f=x->x_val;
     int bufsize, is_exp=0, i, idecimal;
 
+#ifdef ROCKBOX
+    ftoan(f, x->x_buf, 10);
+#else
     sprintf(x->x_buf, "%g", f);
+#endif
     bufsize = strlen(x->x_buf);
     if(bufsize >= 5)/* if it is in exponential mode */
     {
@@ -130,6 +142,10 @@ void my_numbox_ftoa(t_my_numbox *x)
 
 static void my_numbox_draw_update(t_my_numbox *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     if (glist_isvisible(glist))
     {
 	if(x->x_gui.x_fsf.x_change)
@@ -169,10 +185,15 @@ static void my_numbox_draw_update(t_my_numbox *x, t_glist *glist)
 	    x->x_buf[0] = 0;
 	}
     }
+#endif /* ROCKBOX */
 }
 
 static void my_numbox_draw_new(t_my_numbox *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     int half=x->x_gui.x_h/2, d=1+x->x_gui.x_h/34;
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
@@ -215,10 +236,15 @@ static void my_numbox_draw_new(t_my_numbox *x, t_glist *glist)
 	     xpos, ypos,
 	     xpos+IOWIDTH, ypos+1,
 	     x, 0);
+#endif /* ROCKBOX */
 }
 
 static void my_numbox_draw_move(t_my_numbox *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     int half = x->x_gui.x_h/2, d=1+x->x_gui.x_h/34;
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
@@ -248,10 +274,15 @@ static void my_numbox_draw_move(t_my_numbox *x, t_glist *glist)
 	     canvas, x, 0,
 	     xpos, ypos,
 	     xpos+IOWIDTH, ypos+1);
+#endif /* ROCKBOX */
 }
 
 static void my_numbox_draw_erase(t_my_numbox* x,t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c delete %xBASE1\n", canvas, x);
@@ -262,10 +293,15 @@ static void my_numbox_draw_erase(t_my_numbox* x,t_glist* glist)
         sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 0);
     if(!x->x_gui.x_fsf.x_rcv_able)
         sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+#endif /* ROCKBOX */
 }
 
 static void my_numbox_draw_config(t_my_numbox* x,t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c itemconfigure %xLABEL -font {%s %d bold} -fill #%6.6x -text {%s} \n",
@@ -279,10 +315,16 @@ static void my_numbox_draw_config(t_my_numbox* x,t_glist* glist)
 	     x, x->x_gui.x_bcol);
     sys_vgui(".x%x.c itemconfigure %xBASE2 -fill #%6.6x\n", canvas,
 	     x, x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:x->x_gui.x_fcol);
+#endif /* ROCKBOX */
 }
 
 static void my_numbox_draw_io(t_my_numbox* x,t_glist* glist, int old_snd_rcv_flags)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+    (void) old_snd_rcv_flags;
+#else /* ROCKBOX */
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     t_canvas *canvas=glist_getcanvas(glist);
@@ -303,10 +345,15 @@ static void my_numbox_draw_io(t_my_numbox* x,t_glist* glist, int old_snd_rcv_fla
 	     x, 0);
     if(!(old_snd_rcv_flags & IEM_GUI_OLD_RCV_FLAG) && x->x_gui.x_fsf.x_rcv_able)
 	sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+#endif /* ROCKBOX */
 }
 
 static void my_numbox_draw_select(t_my_numbox *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     if(x->x_gui.x_fsf.x_selected)
@@ -338,6 +385,7 @@ static void my_numbox_draw_select(t_my_numbox *x, t_glist *glist)
 	sys_vgui(".x%x.c itemconfigure %xNUMBER -fill #%6.6x\n",
 	    canvas, x, x->x_gui.x_fcol);
     }
+#endif /* ROCKBOX */
 }
 
 void my_numbox_draw(t_my_numbox *x, t_glist *glist, int mode)
@@ -440,6 +488,10 @@ int my_numbox_check_minmax(t_my_numbox *x, double min, double max)
 
 static void my_numbox_properties(t_gobj *z, t_glist *owner)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) owner;
+#else /* ROCKBOX */
     t_my_numbox *x = (t_my_numbox *)z;
     char buf[800];
     t_symbol *srl[3];
@@ -471,6 +523,7 @@ static void my_numbox_properties(t_gobj *z, t_glist *owner)
 	    0xffffff & x->x_gui.x_bcol, 0xffffff & x->x_gui.x_fcol,
 	    	0xffffff & x->x_gui.x_lcol);
     gfxstub_new(&x->x_gui.x_obj.ob_pd, x, buf);
+#endif /* ROCKBOX */
 }
 
 static void my_numbox_bang(t_my_numbox *x)
@@ -491,6 +544,10 @@ static void my_numbox_dialog(t_my_numbox *x, t_symbol *s, int argc,
     int lilo = (int)atom_getintarg(4, argc, argv);
     int log_height = (int)atom_getintarg(6, argc, argv);
     int sr_flags;
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
 
     if(lilo != 0) lilo = 1;
     x->x_lin0_log1 = lilo;
@@ -519,6 +576,10 @@ static void my_numbox_motion(t_my_numbox *x, t_floatarg dx, t_floatarg dy)
 {
     double k2=1.0;
 
+#ifdef ROCKBOX
+    (void) dx;
+#endif
+
     if(x->x_gui.x_fsf.x_finemoved)
 	k2 = 0.01;
     if(x->x_lin0_log1)
@@ -534,6 +595,11 @@ static void my_numbox_motion(t_my_numbox *x, t_floatarg dx, t_floatarg dy)
 static void my_numbox_click(t_my_numbox *x, t_floatarg xpos, t_floatarg ypos,
 			    t_floatarg shift, t_floatarg ctrl, t_floatarg alt)
 {
+#ifdef ROCKBOX
+    (void) shift;
+    (void) ctrl;
+    (void) alt;
+#endif
     glist_grab(x->x_gui.x_glist, &x->x_gui.x_obj.te_g,
     	(t_glistmotionfn)my_numbox_motion, my_numbox_key, xpos, ypos);
 }
@@ -542,6 +608,11 @@ static int my_numbox_newclick(t_gobj *z, struct _glist *glist,
     int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
     t_my_numbox* x = (t_my_numbox *)z;
+
+#ifdef ROCKBOX
+    (void) glist;
+    (void) dbl;
+#endif
 
     if(doit)
     {
@@ -603,6 +674,10 @@ static void my_numbox_size(t_my_numbox *x, t_symbol *s, int ac, t_atom *av)
 {
     int h, w;
 
+#ifdef ROCKBOX
+    (void) s;
+#endif
+
     w = (int)atom_getintarg(0, ac, av);
     if(w < 1)
 	w = 1;
@@ -626,6 +701,9 @@ static void my_numbox_pos(t_my_numbox *x, t_symbol *s, int ac, t_atom *av)
 
 static void my_numbox_range(t_my_numbox *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if(my_numbox_check_minmax(x, (double)atom_getfloatarg(0, ac, av),
 			      (double)atom_getfloatarg(1, ac, av)))
     {
@@ -742,6 +820,9 @@ static void my_numbox_key(void *z, t_floatarg fkey)
 
 static void my_numbox_list(t_my_numbox *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (IS_A_FLOAT(av,0))
     {
 	my_numbox_set(x, atom_getfloatarg(0, ac, av));
@@ -754,11 +835,21 @@ static void *my_numbox_new(t_symbol *s, int argc, t_atom *argv)
     t_my_numbox *x = (t_my_numbox *)pd_new(my_numbox_class);
     int bflcol[]={-262144, -1, -1};
     int w=5, h=14;
+#ifdef ROCKBOX
+    int lilo=0, ldx=0, ldy=-6;
+#else
     int lilo=0, f=0, ldx=0, ldy=-6;
+#endif
     int fs=10;
     int log_height=256;
     double min=-1.0e+37, max=1.0e+37,v=0.0;
+#ifndef ROCKBOX
     char str[144];
+#endif
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
 
     if((argc >= 17)&&IS_A_FLOAT(argv,0)&&IS_A_FLOAT(argv,1)
        &&IS_A_FLOAT(argv,2)&&IS_A_FLOAT(argv,3)
@@ -843,7 +934,9 @@ static void my_numbox_free(t_my_numbox *x)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     clock_free(x->x_clock_reset);
     clock_free(x->x_clock_wait);
+#ifndef ROCKBOX
     gfxstub_deleteforkey(x);
+#endif
 }
 
 void g_numbox_setup(void)

@@ -46,6 +46,9 @@ static void siglop_ft1(t_siglop *x, t_floatarg f)
 
 static void siglop_clear(t_siglop *x, t_floatarg q)
 {
+#ifdef ROCKBOX
+    (void) q;
+#endif
     x->x_cspace.c_x = 0;
 }
 

@@ -23,6 +23,11 @@ typedef struct _image
 
 void image_drawme(t_image *x, t_glist *glist, int firsttime)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+    (void) firsttime;
+#else /* ROCKBOX */
      if (firsttime) {
 	  char fname[MAXPDSTRING];
 	  canvas_makefilename(glist_getcanvas(x->x_glist), x->x_fname->s_name,
@@ -42,16 +47,20 @@ void image_drawme(t_image *x, t_glist *glist, int firsttime)
 		   glist_getcanvas(glist), x,
 		   text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
      }
-
+#endif /* ROCKBOX */
 }
 
 
 void image_erase(t_image* x,t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
      int n;
      sys_vgui(".x%x.c delete %xS\n",
 	      glist_getcanvas(glist), x);
-
+#endif /* ROCKBOX */
 }
 	
 
@@ -80,17 +89,23 @@ static void image_displace(t_gobj *z, t_glist *glist,
     t_image *x = (t_image *)z;
     x->x_obj.te_xpix += dx;
     x->x_obj.te_ypix += dy;
+#ifndef ROCKBOX
     sys_vgui(".x%x.c coords %xSEL %d %d %d %d\n",
 		   glist_getcanvas(glist), x,
 		   text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
 		   text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height);
-
+#endif
     image_drawme(x, glist, 0);
     canvas_fixlinesfor(glist_getcanvas(glist),(t_text*) x);
 }
 
 static void image_select(t_gobj *z, t_glist *glist, int state)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) state;
+#else /* ROCKBOX */
      t_image *x = (t_image *)z;
      if (state) {
 	  sys_vgui(".x%x.c create rectangle \
@@ -104,14 +119,17 @@ static void image_select(t_gobj *z, t_glist *glist, int state)
 	  sys_vgui(".x%x.c delete %xSEL\n",
 		   glist_getcanvas(glist), x);
      }
-
-
-
+#endif /* ROCKBOX */
 }
 
 
 static void image_activate(t_gobj *z, t_glist *glist, int state)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+    (void) state;
+#endif
 /*    t_text *x = (t_text *)z;
     t_rtext *y = glist_findrtext(glist, x);
     if (z->g_pd != gatom_class) rtext_activate(y, state);*/
@@ -154,6 +172,10 @@ void image_size(t_image* x,t_floatarg w,t_floatarg h) {
 
 void image_color(t_image* x,t_symbol* col)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) col;
+#endif
 /*     outlet_bang(x->x_obj.ob_outlet); only bang if there was a bang .. 
        so color black does the same as bang, but doesn't forward the bang 
 */
@@ -167,11 +189,11 @@ static void image_setwidget(void)
     image_widgetbehavior.w_activatefn =   image_activate;
     image_widgetbehavior.w_deletefn =   image_delete;
     image_widgetbehavior.w_visfn =   image_vis;
-#if (PD_VERSION_MINOR > 31) 
+#if defined(PD_VERSION_MINOR) && (PD_VERSION_MINOR > 31) 
     image_widgetbehavior.w_clickfn = NULL;
     image_widgetbehavior.w_propertiesfn = NULL; 
 #endif
-#if PD_MINOR_VERSION < 37
+#if defined(PD_VERSION_MINOR) && PD_MINOR_VERSION < 37
     image_widgetbehavior.w_savefn =   image_save;
 #endif
 }

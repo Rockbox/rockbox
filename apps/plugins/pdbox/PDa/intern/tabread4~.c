@@ -90,6 +90,9 @@ static void tabread4_tilde_dsp(t_tabread4_tilde *x, t_signal **sp)
 
 static void tabread4_tilde_free(t_tabread4_tilde *x)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
 }
 
 void tabread4_tilde_setup(void)

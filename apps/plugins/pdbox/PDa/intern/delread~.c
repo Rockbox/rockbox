@@ -1,11 +1,19 @@
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 #include <m_pd.h>
 #include <m_fixed.h>
-#include "delay.h"
 
 extern int ugen_getsortno(void);
 
+#include "delay.h"
+
 #define DEFDELVS 64	    	/* LATER get this from canvas at DSP time */
+#ifndef ROCKBOX
 static int delread_zero = 0;	/* four bytes of zero for delread~, vd~ */
+#endif
 
 static t_class *sigdelread_class;
 
@@ -36,13 +44,17 @@ static void *sigdelread_new(t_symbol *s, t_floatarg f)
 
 static void sigdelread_float(t_sigdelread *x, t_float f)
 {
+#ifndef ROCKBOX
     int samps;
+#endif
     t_sigdelwrite *delwriter =
     	(t_sigdelwrite *)pd_findbyclass(x->x_sym, sigdelwrite_class);
     x->x_deltime = f;
     if (delwriter)
     {
+#ifndef ROCKBOX
     	int delsize = delwriter->x_cspace.c_n;
+#endif
     	x->x_delsamps = (int)(0.5 + x->x_sr * x->x_deltime)
     	    + x->x_n - x->x_zerodel;
     	if (x->x_delsamps < x->x_n) x->x_delsamps = x->x_n;

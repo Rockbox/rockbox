@@ -23,7 +23,9 @@ static t_int *line_perform(t_int *w)
     t_line *x = (t_line *)(w[1]);
     t_sample *out = (t_sample *)(w[2]);
     int n = (int)(w[3]);
+#ifndef ROCKBOX
     t_sample f = x->x_value;
+#endif
 
     if (x->x_retarget)
     {

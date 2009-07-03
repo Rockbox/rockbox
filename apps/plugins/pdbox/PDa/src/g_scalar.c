@@ -19,11 +19,18 @@ control their appearances by adding stuff to draw.
  * added Krzysztof Czajas fix to avoid crashing...
  */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>  	/* for read/write to files */
 #include "m_pd.h"
 #include "g_canvas.h"
+#endif /* ROCKBOX */
 
 t_class *scalar_class;
 
@@ -139,6 +146,9 @@ void glist_scalar(t_glist *glist,
     t_binbuf *b;
     int natoms, nextmsg = 0;
     t_atom *vec;
+#ifdef ROCKBOX
+    (void) classname;
+#endif
     if (!template_findbyname(templatesym))
     {
     	pd_error(glist, "%s: no such template",
@@ -167,7 +177,9 @@ static void scalar_getrect(t_gobj *z, t_glist *owner,
     int *xp1, int *yp1, int *xp2, int *yp2)
 {
     t_scalar *x = (t_scalar *)z;
+#ifndef ROCKBOX
     int hit = 0;
+#endif
     t_template *template = template_findbyname(x->sc_template);
     t_canvas *templatecanvas = template_findcanvas(template);
     int x1 = 0x7fffffff, x2 = -0x7fffffff, y1 = 0x7fffffff, y2 = -0x7fffffff;
@@ -213,7 +225,9 @@ static void scalar_getrect(t_gobj *z, t_glist *owner,
 
 static void scalar_select(t_gobj *z, t_glist *owner, int state)
 {
+#ifndef ROCKBOX
     t_scalar *x = (t_scalar *)z;
+#endif
     /* post("scalar_select %d", state); */
     /* later */
     if (state)
@@ -221,12 +235,16 @@ static void scalar_select(t_gobj *z, t_glist *owner, int state)
     	int x1, y1, x2, y2;
     	scalar_getrect(z, owner, &x1, &y1, &x2, &y2);
 	x1--; x2++; y1--; y2++;
+#ifndef ROCKBOX
     	sys_vgui(".x%x.c create line %d %d %d %d %d %d %d %d %d %d \
 	    -width 0 -fill blue -tags select%x\n",
     	    	glist_getcanvas(owner), x1, y1, x1, y2, x2, y2, x2, y1, x1, y1,
 		x);
+#endif
     }
+#ifndef ROCKBOX
     else sys_vgui(".x%x.c delete select%x\n", glist_getcanvas(owner), x);
+#endif
 }
 
 static void scalar_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -263,12 +281,21 @@ static void scalar_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 
 static void scalar_activate(t_gobj *z, t_glist *owner, int state)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) owner;
+    (void) state;
+#endif
     /* post("scalar_activate %d", state); */
     /* later */
 }
 
 static void scalar_delete(t_gobj *z, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) glist;
+#endif
     /* nothing to do */
 }
 
@@ -285,12 +312,16 @@ static void scalar_vis(t_gobj *z, t_glist *owner, int vis)
     {
     	if (vis)
 	{
+#ifndef ROCKBOX
 	    int x1 = glist_xtopixels(owner, basex);
 	    int y1 = glist_ytopixels(owner, basey);
     	    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags scalar%x\n",
     	    	glist_getcanvas(owner), x1-1, y1-1, x1+1, y1+1, x);
+#endif
     	}
+#ifndef ROCKBOX
 	else sys_vgui(".x%x.c delete scalar%x\n", glist_getcanvas(owner), x);
+#endif
     	return;
     }
 
@@ -316,9 +347,9 @@ static int scalar_click(t_gobj *z, struct _glist *owner,
     {
 	t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
 	if (!wb) continue;
-	if (hit = (*wb->w_parentclickfn)(y, owner,
+	if((hit = (*wb->w_parentclickfn)(y, owner,
 	    x, template, basex, basey,
-	    xpix, ypix, shift, alt, dbl, doit))
+	    xpix, ypix, shift, alt, dbl, doit)))
 	    	return (hit);
     }
     return (0);
@@ -331,8 +362,10 @@ static void scalar_save(t_gobj *z, t_binbuf *b)
 {
     t_scalar *x = (t_scalar *)z;
     t_binbuf *b2 = binbuf_new();
+#ifndef ROCKBOX
     t_atom a, *argv;
     int i, argc;
+#endif
     canvas_writescalar(x->sc_template, x->sc_vec, b2, 0);
     binbuf_addv(b, "ss", &s__X, gensym("scalar"));
     binbuf_addbinbuf(b, b2);
@@ -342,6 +375,10 @@ static void scalar_save(t_gobj *z, t_binbuf *b)
 
 static void scalar_properties(t_gobj *z, struct _glist *owner)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) owner;
+#else /* ROCKBOX */
     t_scalar *x = (t_scalar *)z;
     char *buf, buf2[80];
     int bufsize;
@@ -358,6 +395,7 @@ static void scalar_properties(t_gobj *z, struct _glist *owner)
     sys_gui(buf);
     sys_gui("}\n");
     t_freebytes(buf, bufsize+1);
+#endif /* ROCKBOX */
 }
 
 static t_widgetbehavior scalar_widgetbehavior =
@@ -373,8 +411,10 @@ static t_widgetbehavior scalar_widgetbehavior =
 
 static void scalar_free(t_scalar *x)
 {
+#ifndef ROCKBOX
     int i;
     t_dataslot *datatypes, *dt;
+#endif
     t_symbol *templatesym = x->sc_template;
     t_template *template = template_findbyname(templatesym);
     if (!template)
@@ -383,7 +423,9 @@ static void scalar_free(t_scalar *x)
 	return;
     }
     word_free(x->sc_vec, template);
+#ifndef ROCKBOX
     gfxstub_deleteforkey(x);
+#endif
     	/* the "size" field in the class is zero, so Pd doesn't try to free
 	us automatically (see pd_free()) */
     freebytes(x, sizeof(t_scalar) + (template->t_n - 1) * sizeof(*x->sc_vec));

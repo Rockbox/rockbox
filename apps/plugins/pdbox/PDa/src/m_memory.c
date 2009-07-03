@@ -4,7 +4,7 @@
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#define memset rb->memset
+#include "pdbox.h"
 #else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>

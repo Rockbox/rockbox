@@ -8,18 +8,29 @@ collection of "scalar" objects.  Routines here can save collections of
 scalars into a file and reload them; also, support is included here for
 */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <stdio.h>
 #include "m_pd.h"
 #include "g_canvas.h"
 #include <string.h>
+#endif /* ROCKBOX */
 
     /* the following routines read "scalars" from a file into a canvas. */
 
 static int canvas_scanbinbuf(int natoms, t_atom *vec, int *p_indexout,
     int *p_next)
 {
+#ifdef ROCKBOX
+    int i;
+#else
     int i, j;
+#endif
     int indexwas = *p_next;
     *p_indexout = indexwas;
     if (indexwas >= natoms)
@@ -38,6 +49,9 @@ int glist_readscalar(t_glist *x, int natoms, t_atom *vec,
 static void canvas_readerror(int natoms, t_atom *vec, int message, 
     int nline, char *s)
 {
+#ifdef ROCKBOX
+    (void) natoms;
+#endif
     error(s);
     startpost("line was:");
     postatom(nline, vec + message);
@@ -49,7 +63,11 @@ static void canvas_readerror(int natoms, t_atom *vec, int message,
 static void glist_readatoms(t_glist *x, int natoms, t_atom *vec,
     int *p_nextmsg, t_symbol *templatesym, t_word *w, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    int message, n, i;
+#else
     int message, nline, n, i;
+#endif
 
     t_template *template = template_findbyname(templatesym);
     if (!template)
@@ -64,7 +82,9 @@ static void glist_readatoms(t_glist *x, int natoms, t_atom *vec,
     {
     	if (template->t_vec[i].ds_type == DT_ARRAY)
 	{
+#ifndef ROCKBOX
 	    int j;
+#endif
 	    t_array *a = w[i].w_array;
 	    int elemsize = a->a_elemsize, nitems = 0;
 	    t_symbol *arraytemplatesym = template->t_vec[i].ds_arraytemplate;
@@ -104,7 +124,11 @@ static void glist_readatoms(t_glist *x, int natoms, t_atom *vec,
 int glist_readscalar(t_glist *x, int natoms, t_atom *vec,
     int *p_nextmsg, int selectit)
 {
+#ifdef ROCKBOX
+    int message, nline;
+#else
     int message, i, j, nline;
+#endif
     t_template *template;
     t_symbol *templatesym;
     t_scalar *sc;
@@ -159,10 +183,16 @@ int glist_readscalar(t_glist *x, int natoms, t_atom *vec,
 
 void glist_readfrombinbuf(t_glist *x, t_binbuf *b, char *filename, int selectem)
 {
+#ifdef ROCKBOX
+    int natoms, nline, message, nextmsg = 0;
+#else
     t_canvas *canvas = glist_getcanvas(x);
     int cr = 0, natoms, nline, message, nextmsg = 0, i, j, nitems;
+#endif
     t_atom *vec;
+#ifndef ROCKBOX
     t_gobj *gobj;
+#endif
 
     natoms = binbuf_getnatom(b);
     vec = binbuf_getvec(b);
@@ -244,8 +274,12 @@ static void glist_doread(t_glist *x, t_symbol *filename, t_symbol *format,
     t_binbuf *b = binbuf_new();
     t_canvas *canvas = glist_getcanvas(x);
     int wasvis = glist_isvisible(canvas);
+#ifdef ROCKBOX
+    int cr = 0;
+#else
     int cr = 0, natoms, nline, message, nextmsg = 0, i, j;
     t_atom *vec;
+#endif
 
     if (!strcmp(format->s_name, "cr"))
     	cr = 1;
@@ -302,7 +336,7 @@ void canvas_dataproperties(t_canvas *x, t_scalar *sc, t_binbuf *b)
     	/* take the new object off the list */
     	if (ntotal)
 	{
-	    for (y = x->gl_list, nnew = 1; y2 = y->g_next;
+	    for(y = x->gl_list, nnew = 1; (y2 = y->g_next);
 	    	y = y2, nnew++)
 	    	    if (nnew == ntotal)
 	    {
@@ -360,7 +394,9 @@ static void glist_writelist(t_gobj *y, t_binbuf *b);
 void canvas_writescalar(t_symbol *templatesym, t_word *w, t_binbuf *b,
     int amarrayelement)
 {
+#ifndef ROCKBOX
     t_dataslot *ds;
+#endif
     t_template *template = template_findbyname(templatesym);
     t_atom *a = (t_atom *)t_getbytes(0);
     int i, n = template->t_n, natom = 0;
@@ -532,12 +568,18 @@ t_binbuf *glist_writetobinbuf(t_glist *x, int wholething)
 
 static void glist_write(t_glist *x, t_symbol *filename, t_symbol *format)
 {
+#ifdef ROCKBOX
+    int cr = 0;
+#else
     int cr = 0, i;
+#endif
     t_binbuf *b;
     char buf[MAXPDSTRING];
+#ifndef ROCKBOX
     t_symbol **templatevec = getbytes(0);
     int ntemplates = 0;
     t_gobj *y;
+#endif
     t_canvas *canvas = glist_getcanvas(x);
     canvas_makefilename(canvas, filename->s_name, buf, MAXPDSTRING);
     if (!strcmp(format->s_name, "cr"))
@@ -586,7 +628,7 @@ static void canvas_saveto(t_canvas *x, t_binbuf *b)
     	gobj_save(y, b);
 
     linetraverser_start(&t, x);
-    while (oc = linetraverser_next(&t))
+    while((oc = linetraverser_next(&t)))
     {
     	int srcno = canvas_getindex(x, &t.tr_ob->ob_g);
 	int sinkno = canvas_getindex(x, &t.tr_ob2->ob_g);
@@ -629,7 +671,9 @@ static void canvas_savetemplatesto(t_canvas *x, t_binbuf *b, int wholething)
 {
     t_symbol **templatevec = getbytes(0);
     int i, ntemplates = 0;
+#ifndef ROCKBOX
     t_gobj *y;
+#endif
     canvas_collecttemplatesfor(x, &ntemplates, &templatevec, wholething);
     for (i = 0; i < ntemplates; i++)
     {
@@ -687,9 +731,13 @@ static void canvas_savetofile(t_canvas *x, t_symbol *filename, t_symbol *dir)
 
 static void canvas_menusaveas(t_canvas *x)
 {
+#ifdef ROCKBOX
+    (void) x;
+#else /* ROCKBOX */
     t_canvas *x2 = canvas_getrootfor(x);
     sys_vgui("pdtk_canvas_saveas .x%x \"%s\" \"%s\"\n", x2,
     	x2->gl_name->s_name, canvas_getdir(x2)->s_name);
+#endif /* ROCKBOX */
 }
 
 static void canvas_menusave(t_canvas *x)

@@ -3,8 +3,14 @@
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
 #include "m_pd.h"
+
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#else /* ROCKBOX */
 #include <stdio.h>
 #include <string.h>
+#endif /* ROCKBOX */
 
     /* convenience routines for checking and getting values of
     	atoms.  There's no "pointer" version since there's nothing
@@ -23,7 +29,9 @@ t_int atom_getint(t_atom *a)
 
 t_symbol *atom_getsymbol(t_atom *a)  /* LATER think about this more carefully */
 {
+#ifndef ROCKBOX
     char buf[30];
+#endif
     if (a->a_type == A_SYMBOL) return (a->a_w.w_symbol);
     else return (&s_float);
 }
@@ -33,7 +41,11 @@ t_symbol *atom_gensym(t_atom *a)  /* this works  better for graph labels */
     char buf[30];
     if (a->a_type == A_SYMBOL) return (a->a_w.w_symbol);
     else if (a->a_type == A_FLOAT)
+#ifdef ROCKBOX
+        ftoan(a->a_w.w_float, buf, sizeof(buf)-1);
+#else
     	sprintf(buf, "%g", a->a_w.w_float);
+#endif
     else strcpy(buf, "???");
     return (gensym(buf));
 }
@@ -76,7 +88,11 @@ void atom_string(t_atom *a, char *buf, unsigned int bufsize)
     	strcpy(buf, "(pointer)");
     	break;
     case A_FLOAT:
+#ifdef ROCKBOX
+        ftoan(a->a_w.w_float, tbuf, sizeof(tbuf)-1);
+#else
     	sprintf(tbuf, "%g", a->a_w.w_float);
+#endif
     	if (strlen(tbuf) < bufsize-1) strcpy(buf, tbuf);
     	else if (a->a_w.w_float < 0) strcpy(buf, "-");
     	else  strcat(buf, "+");
@@ -118,10 +134,10 @@ void atom_string(t_atom *a, char *buf, unsigned int bufsize)
     }
     	break;
     case A_DOLLAR:
-    	sprintf(buf, "$%d", a->a_w.w_index);
+    	snprintf(buf, bufsize-1, "$%d", a->a_w.w_index);
     	break;
     case A_DOLLSYM:
-    	sprintf(buf, "$%s", a->a_w.w_symbol->s_name);
+    	snprintf(buf, bufsize-1, "$%s", a->a_w.w_symbol->s_name);
     	break;
     default:
     	bug("atom_string");

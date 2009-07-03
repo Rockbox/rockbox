@@ -394,7 +394,11 @@ void mayer_ifft(int n, REAL *real, REAL *imag)
 
 void mayer_realfft(int n, REAL *real)
 {
+#ifdef ROCKBOX
+ REAL a,b;
+#else
  REAL a,b,c,d;
+#endif
  int i,j,k;
  mayer_fht(real,n);
  for (i=1,j=n-1,k=n/2;i<k;i++,j--) {
@@ -407,7 +411,11 @@ void mayer_realfft(int n, REAL *real)
 
 void mayer_realifft(int n, REAL *real)
 {
+#ifdef ROCKBOX
+ REAL a,b;
+#else
  REAL a,b,c,d;
+#endif
  int i,j,k;
  for (i=1,j=n-1,k=n/2;i<k;i++,j--) {
   a = real[i];

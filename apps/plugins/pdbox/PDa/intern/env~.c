@@ -1,5 +1,9 @@
-
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#else /* ROCKBOX */
 #define FIXEDPOINT
+#endif /* ROCKBOX */
 #include <m_pd.h>
 #include <m_fixed.h>
 

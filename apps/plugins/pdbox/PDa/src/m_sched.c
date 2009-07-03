@@ -2,6 +2,11 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 /*  scheduling stuff  */
 
 #include "m_pd.h"
@@ -14,13 +19,21 @@
 
 
 /* T.Grill - enable PD global thread locking - sys_lock, sys_unlock, sys_trylock functions */
-#define THREAD_LOCKING  
+#ifndef ROCKBOX
+#define THREAD_LOCKING
 #include "pthread.h"
+#endif
 
 
 static int sys_quit;
-static t_time sys_time;
-static t_time sys_time_per_msec = TIMEUNITPERSEC / 1000.;
+#ifndef ROCKBOX
+static
+#endif
+t_time sys_time;
+#ifndef ROCKBOX
+static
+#endif
+t_time sys_time_per_msec = TIMEUNITPERSEC / 1000.;
 
 int sys_schedblocksize = DEFDACBLKSIZE;
 int sys_usecsincelastsleep(void);
@@ -133,9 +146,12 @@ static int sys_bin[] = {0, 2, 5, 10, 20, 30, 50, 100, 1000};
 #define NBIN (sizeof(sys_bin)/sizeof(*sys_bin))
 #define NHIST 10
 static int sys_histogram[NHIST][NBIN];
+#ifndef ROCKBOX
 static t_time sys_histtime;
+#endif
 static int sched_diddsp, sched_didpoll, sched_didnothing;
 
+#ifndef ROCKBOX
 static void sys_clearhist( void)
 {
     unsigned int i, j;
@@ -144,6 +160,7 @@ static void sys_clearhist( void)
     sys_histtime = sys_getrealtime();
     sched_diddsp = sched_didpoll = sched_didnothing = 0;
 }
+#endif
 
 void sys_printhist( void)
 {
@@ -169,10 +186,15 @@ void sys_printhist( void)
     	sched_diddsp, sched_didpoll, sched_didnothing);
 }
 
+#ifndef ROCKBOX
 static int sys_histphase;
+#endif
 
 int sys_addhist(int phase)
 {
+#ifdef ROCKBOX
+    (void) phase;
+#endif
 #ifndef FIXEDPOINT
     int i, j, phasewas = sys_histphase;
     t_time newtime = sys_getrealtime();
@@ -216,7 +238,11 @@ static char *(oss_errornames[]) = {
 
 void glob_audiostatus(void)
 {
+#ifdef ROCKBOX
+    int nresync, nresyncphase, i;
+#else
     int dev, nresync, nresyncphase, i;
+#endif
     nresync = (oss_nresync >= NRESYNC ? NRESYNC : oss_nresync);
     nresyncphase = oss_resyncphase - 1;
     post("audio I/O error history:");
@@ -251,7 +277,9 @@ void sys_log_error(int type)
     if (type != ERR_NOTHING && !sched_diored &&
     	(sched_diddsp >= sched_dioredtime))
     {
+#ifndef ROCKBOX
     	sys_vgui("pdtk_pd_dio 1\n");
+#endif
 	sched_diored = 1;
     }
     sched_dioredtime =
@@ -263,6 +291,7 @@ static int sched_lastinclip, sched_lastoutclip,
 
 void glob_ping(t_pd *dummy);
 
+#ifndef ROCKBOX
 static void sched_pollformeters( void)
 {
     int inclip, outclip, indb, outdb;
@@ -313,9 +342,13 @@ static void sched_pollformeters( void)
     sched_nextmeterpolltime =
     	sched_diddsp + (int)(sys_dacsr /(double)sys_schedblocksize);
 }
+#endif /* ROCKBOX */
 
 void glob_meters(void *dummy, float f)
 {
+#ifdef ROCKBOX
+    (void) dummy;
+#endif
     if (f == 0)
     	sys_getmeters(0, 0);
     sched_meterson = (f != 0);
@@ -335,7 +368,10 @@ void dsp_tick(void);
 
 static int sched_usedacs = 1;
 static t_time sched_referencerealtime, sched_referencelogicaltime;
-static t_time sys_time_per_dsp_tick;
+#ifndef ROCKBOX
+static
+#endif
+t_time sys_time_per_dsp_tick;
 
 void sched_set_using_dacs(int flag)
 {
@@ -344,14 +380,24 @@ void sched_set_using_dacs(int flag)
     {
     	sched_referencerealtime = sys_getrealtime();
 	sched_referencelogicaltime = clock_getlogicaltime();
+#ifndef ROCKBOX
         post("schedsetuding");
+#endif
     }
     sys_time_per_dsp_tick = (TIMEUNITPERSEC) *
     	((double)sys_schedblocksize) / sys_dacsr;
+/*
+#ifdef SIMULATOR
+printf("%f\n%f\n%f\n%f\n", (double)sys_time_per_dsp_tick, (double)TIMEUNITPERSEC, (double) sys_schedblocksize, (double)sys_dacsr);
+#endif
+*/
 }
 
     /* take the scheduler forward one DSP tick, also handling clock timeouts */
-static void sched_tick(t_time next_sys_time)
+#ifndef ROCKBOX
+static
+#endif
+void sched_tick(t_time next_sys_time)
 {
     int countdown = 5000;
     while (clock_setlist && clock_setlist->c_settime < next_sys_time)
@@ -364,7 +410,9 @@ static void sched_tick(t_time next_sys_time)
 	if (!countdown--)
 	{
 	    countdown = 5000;
+#ifndef ROCKBOX
 	    sys_pollgui();
+#endif
 	}
 	if (sys_quit)
 	    return;
@@ -388,9 +436,11 @@ the audio I/O system is still busy with previous transfers.
 void sys_pollmidiqueue( void);
 void sys_initmidiqueue( void);
 
+#ifndef ROCKBOX
 int m_scheduler_pda( void)
 {
     int idlecount = 0;
+
     sys_time_per_dsp_tick = (TIMEUNITPERSEC) *
     	((double)sys_schedblocksize) / sys_dacsr;
 
@@ -402,13 +452,18 @@ int m_scheduler_pda( void)
     	sys_sleepgrain = 100;
     else if (sys_sleepgrain > 5000)
     	sys_sleepgrain = 5000;
+
     sys_initmidiqueue();
+
     while (!sys_quit)
     {
+
     	int didsomething = 0;
+
     	int timeforward;
 
       	sys_addhist(0);
+
     waitfortick:
     	if (sched_usedacs)
     	{
@@ -564,7 +619,7 @@ int sys_trylock(void)
 
 void sys_lock(void) {}
 void sys_unlock(void) {}
-int sys_trylock(void) {}
+int sys_trylock(void) { return 0; }
 
 #endif
 
@@ -580,3 +635,4 @@ void sys_exit(void)
 	sys_quit = 1;
 }
 
+#endif /* ROCKBOX */

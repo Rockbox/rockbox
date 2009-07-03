@@ -74,7 +74,10 @@ static void *sig_tilde_new(t_floatarg f)
     return (x);
 }
 
-static void sig_tilde_setup(void)
+#ifndef ROCKBOX
+static
+#endif
+void sig_tilde_setup(void)
 {
     sig_tilde_class = class_new(gensym("sig~"), (t_newmethod)sig_tilde_new, 0,
     	sizeof(t_sig), 0, A_DEFFLOAT, 0);

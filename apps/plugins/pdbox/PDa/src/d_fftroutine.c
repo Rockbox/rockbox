@@ -84,9 +84,14 @@
 /* INCLUDE FILES                                                             */
 /*****************************************************************************/
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#else /* ROCKBOX */
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#endif /* ROCKBOX */
 
     /* the following is needed only to declare pd_fft() as exportable in MSW */
 #include "m_pd.h"
@@ -280,7 +285,7 @@ void fft_clear(void)
 	     nextnet = thisnet->next;
 	     net_dealloc(thisnet);
 	     free((char *)thisnet);
-	   } while (thisnet = nextnet);
+	   } while ((thisnet = nextnet));
 	 }
 }
 	   
@@ -485,14 +490,21 @@ void load_registers(FFT_NET *fft_net, float *buf, int buf_form,
 
 {
 	 int      *load_index = fft_net->load_index;
+#ifdef ROCKBOX
+	 SAMPLE *window = NULL;
+         int index, i = 0;
+#else
 	 SAMPLE *window;
 	 int index, i = 0, n = fft_net->n;
+#endif
 
 	 if      (trnsfrm_dir==FORWARD)   window = fft_net->window;
 	 else if (trnsfrm_dir==INVERSE)   window = fft_net->inv_window;
 	 else {
+#ifndef ROCKBOX
 		  fprintf(stderr, "load_registers:illegal transform direction\n"); 
 		  exit(0);
+#endif
 	 }
 	 fft_net->direction = trnsfrm_dir;
 
@@ -539,8 +551,10 @@ void load_registers(FFT_NET *fft_net, float *buf, int buf_form,
 	   } break;
 
 	   default: {
+#ifndef ROCKBOX
 	     fprintf(stderr, "load_registers:illegal input form\n"); 
 	     exit(0);
+#endif
 	   } break;
            }
 	 } break;
@@ -591,15 +605,19 @@ void load_registers(FFT_NET *fft_net, float *buf, int buf_form,
 	   } break;
 
 	   default: {
+#ifndef ROCKBOX
 	     fprintf(stderr, "load_registers:illegal input form\n"); 
 	     exit(0);
+#endif
 	   } break;
 	   }
 	 } break;
 
          default: {
+#ifndef ROCKBOX
 	   fprintf(stderr, "load_registers:illegal input scale\n"); 
 	   exit(0);
+#endif
 	 } break;
 	 }
 }
@@ -616,8 +634,15 @@ void store_registers(FFT_NET	*fft_net, float *buf, int buf_form,
 */
 
 {
+#ifdef ROCKBOX
+         (void) debug;
+#endif
 	 int	    i;
+#ifdef ROCKBOX
+         SAMPLE     real, imag;
+#else
 	 SAMPLE	    real, imag, mag, phase;
+#endif
 	 int	    n;
 
 	 i = 0;
@@ -661,12 +686,21 @@ void store_registers(FFT_NET	*fft_net, float *buf, int buf_form,
 	       if (real > .00001) 
 		 *buf++ = (float)atan2(imag, real);
 	       else {                          /* deal with bad case */
+#ifdef ROCKBOX
+		 if (imag > 0){      *buf++ = PI / 2.;
+                     }
+		 else if (imag < 0){ *buf++ = -PI / 2.;
+                     }
+		 else {              *buf++ = 0;
+                     }
+#else
 		 if (imag > 0){      *buf++ = PI / 2.;
 		     if(debug) fprintf(stderr,"real=0 and imag > 0\n");}
 		 else if (imag < 0){ *buf++ = -PI / 2.;
 		     if(debug) fprintf(stderr,"real=0 and imag < 0\n");}
 		 else {              *buf++ = 0;
-		     if(debug) fprintf(stderr,"real=0 and imag=0\n");}
+	     if(debug) fprintf(stderr,"real=0 and imag=0\n");}
+#endif
 	       }
 	     } while (++i < n);
 	   } break;
@@ -687,8 +721,10 @@ void store_registers(FFT_NET	*fft_net, float *buf, int buf_form,
 	   } break;
 
 	   default: {
+#ifndef ROCKBOX
 	     fprintf(stderr, "store_registers:illegal output form\n");
 	     exit(0);
+#endif
 	   } break;
 	   }
 	 } break;
@@ -753,15 +789,19 @@ void store_registers(FFT_NET	*fft_net, float *buf, int buf_form,
 	   } break;
 
   	   default: {
+#ifndef ROCKBOX
 	     fprintf(stderr, "store_registers:illegal output form\n");
 	     exit(0);
+#endif
 	   } break;
 	   } 
 	 } break;
 
          default: {
+#ifndef ROCKBOX
 	   fprintf(stderr, "store_registers:illegal output scale\n");
 	   exit(0);
+#endif
 	 } break;
          }
 }
@@ -992,7 +1032,11 @@ void short_to_float(short *short_buf, float *float_buf, int n)
 void pd_fft(float *buf, int npoints, int inverse)
 {
   double renorm;
+#ifdef ROCKBOX
+  float *fp;
+#else
   float *fp, *fp2;
+#endif
   int i;
   renorm = (inverse ? npoints : 1.);
   cfft((inverse ? INVERSE : FORWARD), npoints, RECTANGULAR, 

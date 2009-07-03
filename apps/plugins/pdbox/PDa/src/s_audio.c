@@ -6,6 +6,13 @@
     audio settings from argparse routine and from dialog window. 
 */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "s_stuff.h"
+#define snprintf rb->snprintf
+#else /* ROCKBOX */
 #include "m_pd.h"
 #include "s_stuff.h"
 #include <stdio.h>
@@ -17,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#endif /* ROCKBOX */
 
 #define SYS_DEFAULTCH 2
 #define SYS_MAXCH 100
@@ -116,7 +124,11 @@ static void sys_save_audio_params(
 void oss_init(void);
 #endif
 
+#ifdef ROCKBOX
+static void pd_audio_init(void)
+#else
 static void audio_init( void)
+#endif
 {
     static int initted = 0;
     if (initted)
@@ -131,7 +143,9 @@ static void audio_init( void)
 
 static void sys_setchsr(int chin, int chout, int sr)
 {
+#ifndef ROCKBOX
     int nblk;
+#endif
     int inbytes = (chin ? chin : 2) * (DEFDACBLKSIZE*sizeof(float));
     int outbytes = (chout ? chout : 2) * (DEFDACBLKSIZE*sizeof(float));
 
@@ -144,12 +158,20 @@ static void sys_setchsr(int chin, int chout, int sr)
 
     if (sys_soundin)
     	free(sys_soundin);
+#ifdef ROCKBOX
+    sys_soundin = (t_sample*) malloc(inbytes);
+#else
     sys_soundin = (t_float *)malloc(inbytes);
+#endif
     memset(sys_soundin, 0, inbytes);
 
     if (sys_soundout)
     	free(sys_soundout);
+#ifdef ROCKBOX
+    sys_soundout = (t_sample*) malloc(outbytes);
+#else
     sys_soundout = (t_float *)malloc(outbytes);
+#endif
     memset(sys_soundout, 0, outbytes);
 
     if (sys_verbose)
@@ -169,12 +191,20 @@ void sys_open_audio(int naudioindev, int *audioindev, int nchindev,
     int *chindev, int naudiooutdev, int *audiooutdev, int nchoutdev,
     int *choutdev, int rate, int advance, int enable)
 {
+#ifdef ROCKBOX
+    int i;
+#else
     int i, *ip;
+#endif
     int defaultchannels = SYS_DEFAULTCH;
     int inchans, outchans;
     if (rate < 1)
     	rate = SYS_DEFAULTSRATE;
+#ifdef ROCKBOX
+    pd_audio_init();
+#else
     audio_init();
+#endif
     	/* Since the channel vector might be longer than the
 	audio device vector, or vice versa, we fill the shorter one
 	in to match the longer one.  Also, if both are empty, we fill in
@@ -330,6 +360,11 @@ else
     		    naudiooutdev, audiooutdev, nchoutdev, choutdev, rate);
 	else
 #endif
+#ifdef USEAPI_ROCKBOX
+        if (sys_audioapi == API_ROCKBOX)
+            rockbox_open_audio(rate);
+        else
+#endif
     	    post("unknown audio API specified");
     }
     sys_save_audio_params(naudioindev, audioindev, chindev,
@@ -337,7 +372,9 @@ else
     if (sys_inchannels == 0 && sys_outchannels == 0)
     	enable = 0;
     audio_state = enable;
+#ifndef ROCKBOX
     sys_vgui("set pd_whichapi %d\n",  (audio_isopen() ? sys_audioapi : 0));
+#endif
     sched_set_using_dacs(enable);
 }
 
@@ -368,6 +405,11 @@ void sys_close_audio(void)
 #ifdef USEAPI_MMIO
     if (sys_audioapi == API_MMIO)
     	mmio_close_audio();
+    else
+#endif
+#ifdef USEAPI_ROCKBOX
+    if (sys_audioapi == API_ROCKBOX)
+        rockbox_close_audio();
     else
 #endif
     	post("sys_close_audio: unknown API %d", sys_audioapi);
@@ -435,6 +477,11 @@ int sys_send_dacs(void)
     	return (mmio_send_dacs());
     else
 #endif
+#ifdef USEAPI_ROCKBOX
+    if (sys_audioapi == API_ROCKBOX)
+        return (rockbox_send_dacs());
+    else
+#endif
     post("unknown API");    
     return (0);
 }
@@ -482,11 +529,17 @@ void sys_reportidle(void)
 #define MAXNDEV 20
 #define DEVDESCSIZE 80
 
+#ifndef ROCKBOX
 static void audio_getdevs(char *indevlist, int *nindevs,
     char *outdevlist, int *noutdevs, int *canmulti, 
     	int maxndev, int devdescsize)
 {
+#ifdef ROCKBOX
+    (void) maxndev;
+    pd_audio_init();
+#else
     audio_init();
+#endif /* ROCKBOX */
 #ifdef USEAPI_OSS
     if (sys_audioapi == API_OSS)
     {
@@ -519,6 +572,13 @@ static void audio_getdevs(char *indevlist, int *nindevs,
     }
     else
 #endif
+#ifdef USEAPI_ROCKBOX
+    if (sys_audioapi == API_ROCKBOX)
+    {
+        /* Rockbox devices are known in advance. (?) */
+    }
+    else
+#endif
     {
     	    /* this shouldn't happen once all the above get filled in. */
     	int i;
@@ -531,6 +591,7 @@ static void audio_getdevs(char *indevlist, int *nindevs,
 	*canmulti = 0;
     }
 }
+#endif
 
 #ifdef MSW
 #define DEVONSET 0  /* microsoft device list starts at 0 (the "mapper"). */
@@ -538,6 +599,7 @@ static void audio_getdevs(char *indevlist, int *nindevs,
 #define DEVONSET 1  /* To agree with command line flags, normally start at 1 */
 #endif
 
+#ifndef ROCKBOX
 static void sys_listaudiodevs(void )
 {
     char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
@@ -564,8 +626,10 @@ static void sys_listaudiodevs(void )
     }
     post("API number %d\n", sys_audioapi);
 }
+#endif
 
     /* start an audio settings dialog window */
+#ifndef ROCKBOX
 void glob_audio_properties(t_pd *dummy, t_floatarg flongform)
 {
     char buf[1024 + 2 * MAXNDEV*(DEVDESCSIZE+4)];
@@ -645,8 +709,10 @@ void glob_audio_properties(t_pd *dummy, t_floatarg flongform)
     gfxstub_deleteforkey(0);
     gfxstub_new(&glob_pdobject, glob_audio_properties, buf);
 }
+#endif
 
     /* new values from dialog window */
+#ifndef ROCKBOX
 void glob_audio_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
 {
     int naudioindev, audioindev[MAXAUDIOINDEV], chindev[MAXAUDIOINDEV];
@@ -696,6 +762,7 @@ void glob_audio_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
     	noutdev, newaudiooutdev, noutdev, newaudiooutchan,
 	newrate, newadvance, 1);
 }
+#endif
 
 void sys_listdevs(void )
 {
@@ -724,6 +791,13 @@ void sys_listdevs(void )
     	sys_listaudiodevs();
     else
 #endif
+#ifdef USEAPI_ROCKBOX
+    if (sys_audioapi == API_ROCKBOX)
+    {
+        /* Nothing to list, IMO. */
+    }
+    else
+#endif
     post("unknown API");    
 
     sys_listmididevs();
@@ -746,9 +820,11 @@ void sys_set_audio_api(int which)
      	post("sys_audioapi %d", sys_audioapi);
 }
 
+#ifndef ROCKBOX
 void glob_audio_setapi(void *dummy, t_floatarg f)
 {
     int newapi = f;
+
     if (newapi)
     {
     	if (newapi == sys_audioapi)
@@ -775,6 +851,7 @@ void glob_audio_setapi(void *dummy, t_floatarg f)
 	sched_set_using_dacs(0);
     }
 }
+#endif
 
     /* start or stop the audio hardware */
 void sys_set_audio_state(int onoff)
@@ -842,6 +919,10 @@ void alsa_printstate( void);
 void glob_foo(void *dummy, t_symbol *s, int argc, t_atom *argv)
 {
     t_symbol *arg = atom_getsymbolarg(0, argc, argv);
+#ifdef ROCKBOX
+    (void) dummy;
+    (void) s;
+#endif
     if (arg == gensym("restart"))
     {
 	int naudioindev, audioindev[MAXAUDIOINDEV], chindev[MAXAUDIOINDEV];

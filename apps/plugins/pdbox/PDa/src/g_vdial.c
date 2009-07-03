@@ -7,6 +7,13 @@
 /* name change to vradio by MSP (it's a radio button really) and changed to
 put out a "float" as in sliders, toggles, etc. */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#include "g_all_guis.h"
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -16,6 +23,7 @@ put out a "float" as in sliders, toggles, etc. */
 #include "t_tk.h"
 #include "g_all_guis.h"
 #include <math.h>
+#endif /* ROCKBOX */
 
 /*------------------ global variables -------------------------*/
 
@@ -34,6 +42,10 @@ static t_class *vradio_class, *vradio_old_class;
 
 void vradio_draw_update(t_vradio *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     if(glist_isvisible(glist))
     {
 	t_canvas *canvas=glist_getcanvas(glist);
@@ -45,10 +57,15 @@ void vradio_draw_update(t_vradio *x, t_glist *glist)
 		 canvas, x, x->x_on,
 		 x->x_gui.x_fcol, x->x_gui.x_fcol);
     }
+#endif /* ROCKBOX */
 }
 
 void vradio_draw_new(t_vradio *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i, dy=x->x_gui.x_h, s4=dy/4;
     int yy11b=text_ypix(&x->x_gui.x_obj, glist); 
@@ -83,10 +100,15 @@ void vradio_draw_new(t_vradio *x, t_glist *glist)
     if(!x->x_gui.x_fsf.x_rcv_able)
         sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
 	     canvas, xx11, yy11b, xx11 + IOWIDTH, yy11b+1, x, 0);
+#endif /* ROCKBOX */
 }
 
 void vradio_draw_move(t_vradio *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i, dy=x->x_gui.x_h, s4=dy/4;
     int yy11b=text_ypix(&x->x_gui.x_obj, glist);
@@ -114,10 +136,15 @@ void vradio_draw_move(t_vradio *x, t_glist *glist)
     if(!x->x_gui.x_fsf.x_rcv_able)
         sys_vgui(".x%x.c coords %xIN%d %d %d %d %d\n",
 	     canvas, x, 0, xx11, yy11b, xx11 + IOWIDTH, yy11b+1);
+#endif /* ROCKBOX */
 }
 
 void vradio_draw_erase(t_vradio* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i;
 
@@ -131,10 +158,15 @@ void vradio_draw_erase(t_vradio* x, t_glist* glist)
 	sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 0);
     if(!x->x_gui.x_fsf.x_rcv_able)
         sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+#endif /* ROCKBOX */
 }
 
 void vradio_draw_config(t_vradio* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i;
 
@@ -150,10 +182,16 @@ void vradio_draw_config(t_vradio* x, t_glist* glist)
 		 (x->x_on==i)?x->x_gui.x_fcol:x->x_gui.x_bcol,
 		 (x->x_on==i)?x->x_gui.x_fcol:x->x_gui.x_bcol);
     }
+#endif /* ROCKBOX */
 }
 
 void vradio_draw_io(t_vradio* x, t_glist* glist, int old_snd_rcv_flags)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+    (void) old_snd_rcv_flags;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
@@ -173,10 +211,15 @@ void vradio_draw_io(t_vradio* x, t_glist* glist, int old_snd_rcv_flags)
 		 x, 0);
     if(!(old_snd_rcv_flags & IEM_GUI_OLD_RCV_FLAG) && x->x_gui.x_fsf.x_rcv_able)
 	sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+#endif /* ROCKBOX */
 }
 
 void vradio_draw_select(t_vradio* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i;
 
@@ -199,6 +242,7 @@ void vradio_draw_select(t_vradio* x, t_glist* glist)
 	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x,
 		 x->x_gui.x_lcol);
     }
+#endif /* ROCKBOX */
 }
 
 void vradio_draw(t_vradio *x, t_glist *glist, int mode)
@@ -254,6 +298,10 @@ static void vradio_save(t_gobj *z, t_binbuf *b)
 
 static void vradio_properties(t_gobj *z, t_glist *owner)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) owner;
+#else /* ROCKBOX */
     t_vradio *x = (t_vradio *)z;
     char buf[800];
     t_symbol *srl[3];
@@ -278,6 +326,7 @@ static void vradio_properties(t_gobj *z, t_glist *owner)
 	    x->x_gui.x_fsf.x_font_style, x->x_gui.x_fontsize,
 	    0xffffff & x->x_gui.x_bcol, 0xffffff & x->x_gui.x_fcol, 0xffffff & x->x_gui.x_lcol);
     gfxstub_new(&x->x_gui.x_obj.ob_pd, x, buf);
+#endif /* ROCKBOX */
 }
 
 static void vradio_dialog(t_vradio *x, t_symbol *s, int argc, t_atom *argv)
@@ -287,6 +336,10 @@ static void vradio_dialog(t_vradio *x, t_symbol *s, int argc, t_atom *argv)
     int chg = (int)atom_getintarg(4, argc, argv);
     int num = (int)atom_getintarg(6, argc, argv);
     int sr_flags;
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
 
     if(chg != 0) chg = 1;
     x->x_change = chg;
@@ -463,12 +516,23 @@ static void vradio_click(t_vradio *x, t_floatarg xpos, t_floatarg ypos,
 {
     int yy =  (int)ypos - text_ypix(&x->x_gui.x_obj, x->x_gui.x_glist);
 
+#ifdef ROCKBOX
+    (void) xpos;
+    (void) shift;
+    (void) ctrl;
+    (void) alt;
+#endif
+
     vradio_fout(x, (float)(yy / x->x_gui.x_h));
 }
 
 static int vradio_newclick(t_gobj *z, struct _glist *glist,
     int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
+#ifdef ROCKBOX
+    (void) glist;
+    (void) dbl;
+#endif
     if(doit)
 	vradio_click((t_vradio *)z, (t_floatarg)xpix, (t_floatarg)ypix,
 	    (t_floatarg)shift, 0, (t_floatarg)alt);
@@ -502,6 +566,9 @@ static void vradio_number(t_vradio *x, t_floatarg num)
 
 static void vradio_size(t_vradio *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     x->x_gui.x_w = iemgui_clip_size((int)atom_getintarg(0, ac, av));
     x->x_gui.x_h = x->x_gui.x_w;
     iemgui_size((void *)x, &x->x_gui);
@@ -546,11 +613,21 @@ static void *vradio_donew(t_symbol *s, int argc, t_atom *argv, int old)
 {
     t_vradio *x = (t_vradio *)pd_new(old? vradio_old_class : vradio_class);
     int bflcol[]={-262144, -1, -1};
+#ifdef ROCKBOX
+    int a=IEM_GUI_DEFAULTSIZE, on=0;
+#else
     int a=IEM_GUI_DEFAULTSIZE, on=0, f=0;
+#endif
     int ldx=0, ldy=-6, chg=1, num=8;
     int fs=8;
+#ifndef ROCKBOX
     int ftbreak=IEM_BNG_DEFAULTBREAKFLASHTIME, fthold=IEM_BNG_DEFAULTHOLDFLASHTIME;
     char str[144];
+#endif
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
 
     if((argc == 15)&&IS_A_FLOAT(argv,0)&&IS_A_FLOAT(argv,1)&&IS_A_FLOAT(argv,2)
        &&IS_A_FLOAT(argv,3)
@@ -632,7 +709,9 @@ static void vradio_ff(t_vradio *x)
 {
     if(x->x_gui.x_fsf.x_rcv_able)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
+#ifndef ROCKBOX
     gfxstub_deleteforkey(x);
+#endif
 }
 
 void g_vradio_setup(void)

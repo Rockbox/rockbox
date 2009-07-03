@@ -26,6 +26,7 @@
 #ifdef ROCKBOX
 #include "plugin.h"
 #define memset rb->memset
+#define memcpy rb->memcpy
 #else /* ROCKBOX */
 #include <stdio.h>
 #include <string.h>

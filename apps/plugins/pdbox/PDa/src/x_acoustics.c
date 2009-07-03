@@ -5,6 +5,11 @@
 /*  utility functions for signals 
 */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 #include "m_pd.h"
 #include <math.h>
 #define LOGTEN 2.302585092994

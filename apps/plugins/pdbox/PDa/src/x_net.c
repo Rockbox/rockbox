@@ -2,11 +2,17 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 /* network */
 
 #include "m_pd.h"
 #include "s_stuff.h"
 
+#ifndef ROCKBOX
 #include <sys/types.h>
 #include <string.h>
 #ifdef UNIX
@@ -19,6 +25,7 @@
 #else
 #include <winsock.h>
 #endif
+#endif /* ROCKBOX */
 
 static t_class *netsend_class;
 
@@ -31,16 +38,27 @@ typedef struct _netsend
 
 static void *netsend_new(t_floatarg udpflag)
 {
+#ifdef ROCKBOX
+    (void) udpflag;
+#endif
+
     t_netsend *x = (t_netsend *)pd_new(netsend_class);
     outlet_new(&x->x_obj, &s_float);
     x->x_fd = -1;
+#ifndef ROCKBOX
     x->x_protocol = (udpflag != 0 ? SOCK_DGRAM : SOCK_STREAM);
+#endif
     return (x);
 }
 
 static void netsend_connect(t_netsend *x, t_symbol *hostname,
     t_floatarg fportno)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) hostname;
+    (void) fportno;
+#else /* ROCKBOX */
     struct sockaddr_in server;
     struct hostent *hp;
     int sockfd;
@@ -100,13 +118,16 @@ static void netsend_connect(t_netsend *x, t_symbol *hostname,
     }
     x->x_fd = sockfd;
     outlet_float(x->x_obj.ob_outlet, 1);
+#endif /* ROCKBOX */
 }
 
 static void netsend_disconnect(t_netsend *x)
 {
     if (x->x_fd >= 0)
     {
+#ifndef ROCKBOX
     	sys_closesocket(x->x_fd);
+#endif
     	x->x_fd = -1;
     	outlet_float(x->x_obj.ob_outlet, 0);
     }
@@ -114,6 +135,12 @@ static void netsend_disconnect(t_netsend *x)
 
 static void netsend_send(t_netsend *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) s;
+    (void) argc;
+    (void) argv;
+#else /* ROCKBOX */
     if (x->x_fd >= 0)
     {
 	t_binbuf *b = binbuf_new();
@@ -159,11 +186,16 @@ static void netsend_send(t_netsend *x, t_symbol *s, int argc, t_atom *argv)
 	binbuf_free(b);
     }
     else error("netsend: not connected");
+#endif /* ROCKBOX */
 }
 
 static void netsend_free(t_netsend *x)
 {
+#ifdef ROCKBOX
+    (void) x;
+#else
     netsend_disconnect(x);
+#endif
 }
 
 static void netsend_setup(void)
@@ -193,14 +225,23 @@ typedef struct _netreceive
     int x_udp;
 } t_netreceive;
 
+#ifdef ROCKBOX
+static t_netreceive* receiver;
+static int receiver_port;
+#endif /* ROCKBOX */
+
+#ifndef ROCKBOX
 static void netreceive_notify(t_netreceive *x)
 {
     outlet_float(x->x_connectout, --x->x_nconnections);
 }
+#endif /* ROCKBOX */
 
 static void netreceive_doit(void *z, t_binbuf *b)
 {
+#ifndef ROCKBOX
     t_atom messbuf[1024];
+#endif
     t_netreceive *x = (t_netreceive *)z;
     int msg, natom = binbuf_getnatom(b);
     t_atom *at = binbuf_getvec(b);
@@ -234,6 +275,7 @@ static void netreceive_doit(void *z, t_binbuf *b)
     }
 }
 
+#ifndef ROCKBOX
 static void netreceive_connectpoll(t_netreceive *x)
 {
     int fd = accept(x->x_connectsocket, 0, 0);
@@ -247,11 +289,41 @@ static void netreceive_connectpoll(t_netreceive *x)
     	outlet_float(x->x_connectout, ++x->x_nconnections);
     }
 }
+#endif
 
 static void *netreceive_new(t_symbol *compatflag,
     t_floatarg fportno, t_floatarg udpflag)
 {
     t_netreceive *x;
+
+#ifdef ROCKBOX
+    int portno = fportno, udp = (udpflag != 0);
+
+    (void) compatflag;
+
+    /* Look whether callback is already taken. */
+    if(receiver)
+    {
+        post("Receiver callback already taken!\n");
+        return NULL;
+    }
+
+    /* Look whether TCP sockets are thought to exist. */
+    if(!udp)
+    {
+        post("Trying to create TCP socket!\n");
+        return NULL;
+    }
+
+    x = (t_netreceive *) pd_new(netreceive_class);
+    x->x_msgout = outlet_new(&x->x_obj, &s_anything);
+    x->x_nconnections = 0;
+    x->x_udp = udp;
+
+    receiver = x;
+    receiver_port = portno;
+
+#else /* ROCKBOX */
     struct sockaddr_in server;
     int sockfd, portno = fportno, udp = (udpflag != 0);
     int old = !strcmp(compatflag->s_name , "old");
@@ -333,19 +405,61 @@ static void *netreceive_new(t_symbol *compatflag,
     x->x_connectsocket = sockfd;
     x->x_nconnections = 0;
     x->x_udp = udp;
+#endif /* ROCKBOX */
 
     return (x);
 }
 
 static void netreceive_free(t_netreceive *x)
 {
+#ifdef ROCKBOX
+    if(receiver && receiver == x)
+        receiver = NULL;
+#else /* ROCKBOX */
     	/* LATER make me clean up open connections */
     if (x->x_connectsocket >= 0)
     {
     	sys_rmpollfn(x->x_connectsocket);
     	sys_closesocket(x->x_connectsocket);
     }
+#endif /* ROCKBOX */
 }
+
+#ifdef ROCKBOX
+/* Basically a reimplementation of socketreceiver_getudp()
+   from s_inter.c */
+t_binbuf* inbinbuf;
+void outlet_setstacklim(void);
+
+void rockbox_receive_callback(struct datagram* dg)
+{
+    /* Check whether there is a receiver. */
+    if(!receiver)
+        return;
+
+    /* Limit string. */
+    dg->data[dg->size] = '\0';
+
+    /* If complete line... */
+    if(dg->data[dg->size-1] == '\n')
+    {
+        char* semi = strchr(dg->data, ';');
+
+        /* Limit message. */
+        if(semi)
+            *semi = '\0';
+
+        /* Create binary buffer. */
+        binbuf_text(inbinbuf, dg->data, strlen(dg->data));
+
+        /* Limit outlet stack. */
+        outlet_setstacklim();
+
+        /* Execute receive function. */
+        netreceive_doit(receiver, inbinbuf);
+    }
+}
+#endif /* ROCKBOX */
 
 static void netreceive_setup(void)
 {
@@ -360,5 +474,3 @@ void x_net_setup(void)
     netsend_setup();
     netreceive_setup();
 }
-
-

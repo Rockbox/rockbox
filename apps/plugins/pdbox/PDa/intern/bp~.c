@@ -81,6 +81,9 @@ static void sigbp_ft2(t_sigbp *x, t_floatarg q)
 
 static void sigbp_clear(t_sigbp *x, t_floatarg q)
 {
+#ifdef ROCKBOX
+    (void) q;
+#endif
     x->x_ctl->c_x1 = x->x_ctl->c_x2 = 0;
 }
 

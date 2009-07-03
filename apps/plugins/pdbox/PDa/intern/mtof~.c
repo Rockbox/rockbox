@@ -1,3 +1,8 @@
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 #include <m_pd.h>
 #include <m_fixed.h>
 
@@ -36,6 +41,9 @@ static t_int *mtof_tilde_perform(t_int *w)
 
 static void mtof_tilde_dsp(t_mtof_tilde *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     post("warning: %s not usable yet",__FUNCTION__);
     dsp_add(mtof_tilde_perform, 3, sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }

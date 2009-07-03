@@ -1,12 +1,14 @@
 #include <m_pd.h>
 #include <m_fixed.h>
 
-#include "delay.h"
-
 extern int ugen_getsortno(void);
 
+#include "delay.h"
+
 #define DEFDELVS 64	    	/* LATER get this from canvas at DSP time */
+#ifndef ROCKBOX
 static int delread_zero = 0;	/* four bytes of zero for delread~, vd~ */
+#endif
 
 static t_class *sigvd_class;
 
@@ -37,14 +39,18 @@ static t_int *sigvd_perform(t_int *w)
      t_sample *in = (t_sample *)(w[1]);
      t_sample *out = (t_sample *)(w[2]);
      t_delwritectl *ctl = (t_delwritectl *)(w[3]);
+#ifndef ROCKBOX
      t_sigvd *x = (t_sigvd *)(w[4]);
+#endif
      int n = (int)(w[5]);
  
      int nsamps = ctl->c_n;
      int fn = n;
      t_sample limit = nsamps - n - 1;
      t_sample *vp = ctl->c_vec, *bp, *wp = vp + ctl->c_phase;
+#ifndef ROCKBOX
      t_sample zerodel = x->x_zerodel;
+#endif
      while (n--)
      {
        t_time delsamps =  ((long long) mult((*in++),ftofix(44.1)));//- itofix(zerodel);

@@ -2,10 +2,23 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
+#if 0
+//#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 #define PD_CLASS_DEF
 #include "m_pd.h"
 #include "m_imp.h"
 #include "s_stuff.h"
+
+#ifdef ROCKBOX
+
+#include "plugin.h"
+#include "pdbox.h"
+
+#else /* ROCKBOX */
 #include <stdlib.h>
 #ifdef UNIX
 #include <unistd.h>
@@ -16,6 +29,7 @@
 
 #include <stdarg.h>
 #include <string.h>
+#endif /* ROCKBOX */
 
 static t_symbol *class_loadsym;     /* name under which an extern is invoked */
 static void pd_defaultfloat(t_pd *x, t_float f);
@@ -27,6 +41,10 @@ static t_symbol *class_extern_dir = &s_;
 
 static void pd_defaultanything(t_pd *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) argc;
+    (void) argv;
+#endif
     pd_error(x, "%s: no method for '%s'", (*x)->c_name->s_name, s->s_name);
 }
 
@@ -422,6 +440,10 @@ char *class_gethelpdir(t_class *c)
 
 static void class_nosavefn(t_gobj *z, t_binbuf *b)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) b;
+#endif
     bug("save function called but not defined");
 }
 
@@ -465,7 +487,7 @@ t_symbol *dogensym(char *s, t_symbol *oldsym)
 	s2++;
     }
     sym1 = symhash + (hash2 & (HASHSIZE-1));
-    while (sym2 = *sym1)
+    while ((sym2 = *sym1))
     {
 	if (!strcmp(sym2->s_name, s)) return(sym2);
 	sym1 = &sym2->s_next;
@@ -485,10 +507,14 @@ t_symbol *dogensym(char *s, t_symbol *oldsym)
 
 t_symbol *gensym(char *s)
 {
+printf("gensym: %s\n", s);
     return(dogensym(s, 0));
 }
 
-static t_symbol *addfileextent(t_symbol *s)
+#ifndef ROCKBOX
+static
+#endif
+t_symbol *addfileextent(t_symbol *s)
 {
     char namebuf[MAXPDSTRING], *str = s->s_name;
     int ln = strlen(str);
@@ -608,7 +634,9 @@ typedef t_pd *(*t_fun6)(t_int i1, t_int i2, t_int i3, t_int i4, t_int i5, t_int 
 
 void pd_typedmess(t_pd *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifndef ROCKBOX
     t_method *f;
+#endif
     t_class *c = *x;
     t_methodentry *m;
     t_atomtype *wp, wanttype;
@@ -617,7 +645,7 @@ void pd_typedmess(t_pd *x, t_symbol *s, int argc, t_atom *argv)
     t_floatarg ad[MAXPDARG+1], *dp = ad;
     int narg = 0;
     t_pd *bonzo;
-    
+
     	/* check for messages that are handled by fixed slots in the class
     	structure.  We don't catch "pointer" though so that sending "pointer"
 	to pd_objectmaker doesn't require that we supply a pointer value. */
@@ -658,9 +686,10 @@ void pd_typedmess(t_pd *x, t_symbol *s, int argc, t_atom *argv)
 	    else (*((t_messgimme)(m->me_fun)))(x, s, argc, argv);
 	    return;
 	}
+
 	if (argc > MAXPDARG) argc = MAXPDARG;
 	if (x != &pd_objectmaker) *(ap++) = (t_int)x, narg++;
-	while (wanttype = *wp++)
+	while((wanttype = *wp++))
 	{
 	    switch (wanttype)
 	    {
@@ -712,6 +741,11 @@ void pd_typedmess(t_pd *x, t_symbol *s, int argc, t_atom *argv)
 		}
 		narg++;
 		ap++;
+#ifdef ROCKBOX
+                break;
+            default:
+                break;
+#endif
     	    }
 	}
 	switch (narg)

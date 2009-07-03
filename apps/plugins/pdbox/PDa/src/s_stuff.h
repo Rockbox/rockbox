@@ -130,8 +130,9 @@ void sys_setvirtualalarm( void);
 #define API_MMIO 3
 #define API_PORTAUDIO 4
 #define API_JACK 5
+#define API_ROCKBOX 6
 
-#ifdef __linux__
+#if defined(__linux__) && !defined(ROCKBOX)
 #define API_DEFAULT API_OSS
 #define API_DEFSTRING "OSS"
 #endif
@@ -142,6 +143,10 @@ void sys_setvirtualalarm( void);
 #ifdef MACOSX
 #define API_DEFAULT API_PORTAUDIO
 #define API_DEFSTRING "portaudio"
+#endif
+#ifdef ROCKBOX
+#define API_DEFAULT API_ROCKBOX
+#define API_DEFSTRING "Rockbox"
 #endif
 #define DEFAULTAUDIODEV 0
 
@@ -203,6 +208,11 @@ int mmio_send_dacs(void);
 void mmio_getdevs(char *indevlist, int *nindevs,
     char *outdevlist, int *noutdevs, int *canmulti, 
     	int maxndev, int devdescsize);
+
+void rockbox_open_audio(int rate);
+void rockbox_close_audio(void);
+int  rockbox_send_dacs(void);
+void rockbox_getdevs(void);
 
 void sys_listmididevs(void);
 void sys_set_audio_api(int whichapi);

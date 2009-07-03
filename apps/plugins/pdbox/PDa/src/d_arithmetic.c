@@ -28,6 +28,9 @@ typedef struct _scalarplus
 
 static void *plus_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (argc > 1) post("+~: extra arguments ignored");
     if (argc) 
     {
@@ -115,6 +118,9 @@ void dsp_add_plus(t_sample *in1, t_sample *in2, t_sample *out, int n)
 
 static void plus_dsp(t_plus *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     dsp_add_plus(sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[0]->s_n);
 }
 
@@ -161,6 +167,9 @@ typedef struct _scalarminus
 
 static void *minus_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (argc > 1) post("-~: extra arguments ignored");
     if (argc) 
     {
@@ -240,6 +249,9 @@ t_int *scalarminus_perf8(t_int *w)
 
 static void minus_dsp(t_minus *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     if (sp[0]->s_n&7)
     	dsp_add(minus_perform, 4,
 	    sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[0]->s_n);
@@ -292,6 +304,9 @@ typedef struct _scalartimes
 
 static void *times_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (argc > 1) post("*~: extra arguments ignored");
     if (argc) 
     {
@@ -371,6 +386,9 @@ t_int *scalartimes_perf8(t_int *w)
 
 static void times_dsp(t_times *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     if (sp[0]->s_n&7)
     	dsp_add(times_perform, 4,
 	    sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[0]->s_n);
@@ -422,6 +440,9 @@ typedef struct _scalarover
 
 static void *over_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (argc > 1) post("/~: extra arguments ignored");
     if (argc) 
     {
@@ -512,6 +533,9 @@ t_int *scalarover_perf8(t_int *w)
 
 static void over_dsp(t_over *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     if (sp[0]->s_n&7)
     	dsp_add(over_perform, 4,
 	    sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[0]->s_n);
@@ -563,6 +587,9 @@ typedef struct _scalarmax
 
 static void *max_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (argc > 1) post("max~: extra arguments ignored");
     if (argc) 
     {
@@ -654,6 +681,9 @@ t_int *scalarmax_perf8(t_int *w)
 
 static void max_dsp(t_max *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     if (sp[0]->s_n&7)
     	dsp_add(max_perform, 4,
 	    sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[0]->s_n);
@@ -705,6 +735,9 @@ typedef struct _scalarmin
 
 static void *min_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (argc > 1) post("min~: extra arguments ignored");
     if (argc) 
     {
@@ -796,6 +829,9 @@ t_int *scalarmin_perf8(t_int *w)
 
 static void min_dsp(t_min *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     if (sp[0]->s_n&7)
     	dsp_add(min_perform, 4,
 	    sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[0]->s_n);

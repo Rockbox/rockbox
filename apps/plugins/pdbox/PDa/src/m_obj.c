@@ -53,9 +53,9 @@ t_inlet *inlet_new(t_object *owner, t_pd *dest, t_symbol *s1, t_symbol *s2)
     else x->i_symto = s2;
     x->i_symfrom = s1;
     x->i_next = 0;
-    if (y = owner->ob_inlet)
+    if((y = owner->ob_inlet))
     {
-    	while (y2 = y->i_next) y = y2;
+    	while((y2 = y->i_next)) y = y2;
     	y->i_next = x;
     }
     else owner->ob_inlet = x;
@@ -106,7 +106,9 @@ static void inlet_symbol(t_inlet *x, t_symbol *s)
 
 static void inlet_list(t_inlet *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifndef ROCKBOX
     t_atom at;
+#endif
     if (x->i_symfrom == &s_list || x->i_symfrom == &s_float
     	|| x->i_symfrom == &s_symbol || x->i_symfrom == &s_pointer)
 	    typedmess(x->i_dest, x->i_symto, argc, argv);
@@ -154,9 +156,9 @@ t_inlet *pointerinlet_new(t_object *owner, t_gpointer *gp)
     x->i_symfrom = &s_pointer;
     x->i_pointerslot = gp;
     x->i_next = 0;
-    if (y = owner->ob_inlet)
+    if((y = owner->ob_inlet))
     {
-    	while (y2 = y->i_next) y = y2;
+    	while((y2 = y->i_next)) y = y2;
     	y->i_next = x;
     }
     else owner->ob_inlet = x;
@@ -176,9 +178,9 @@ t_inlet *floatinlet_new(t_object *owner, t_float *fp)
     x->i_symfrom = &s_float;
     x->i_floatslot = fp;
     x->i_next = 0;
-    if (y = owner->ob_inlet)
+    if((y = owner->ob_inlet))
     {
-    	while (y2 = y->i_next) y = y2;
+    	while((y2 = y->i_next)) y = y2;
     	y->i_next = x;
     }
     else owner->ob_inlet = x;
@@ -198,9 +200,9 @@ t_inlet *symbolinlet_new(t_object *owner, t_symbol **sp)
     x->i_symfrom = &s_symbol;
     x->i_symslot = sp;
     x->i_next = 0;
-    if (y = owner->ob_inlet)
+    if((y = owner->ob_inlet))
     {
-    	while (y2 = y->i_next) y = y2;
+    	while((y2 = y->i_next)) y = y2;
     	y->i_next = x;
     }
     else owner->ob_inlet = x;
@@ -217,6 +219,11 @@ void obj_list(t_object *x, t_symbol *s, int argc, t_atom *argv)
     t_atom *ap;
     int count;
     t_inlet *ip = ((t_object *)x)->ob_inlet;
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
+
     if (!argc) return;
     for (count = argc-1, ap = argv+1; ip && count--; ap++, ip = ip->i_next)
     {
@@ -296,9 +303,9 @@ t_outlet *outlet_new(t_object *owner, t_symbol *s)
     t_outlet *x = (t_outlet *)getbytes(sizeof(*x)), *y, *y2;
     x->o_owner = owner;
     x->o_next = 0;
-    if (y = owner->ob_outlet)
+    if((y = owner->ob_outlet))
     {
-    	while (y2 = y->o_next) y = y2;
+    	while((y2 = y->o_next)) y = y2;
     	y->o_next = x;
     }
     else owner->ob_outlet = x;
@@ -474,7 +481,7 @@ doit:
     	freebytes(oc, sizeof(*oc));
     	goto done;
     }
-    while (oc2 = oc->oc_next)
+    while((oc2 = oc->oc_next))
     {
     	if (oc2->oc_to == to)
     	{

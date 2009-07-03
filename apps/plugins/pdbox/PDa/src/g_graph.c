@@ -6,12 +6,21 @@
 "graphs" inside another glist.  LATER move the inlet/outlet code of g_canvas.c 
 to this file... */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#define snprintf rb->snprintf
+#define atof rb_atof
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include "m_pd.h"
 #include "t_tk.h"
 #include "g_canvas.h"
 #include <stdio.h>
 #include <string.h>
+#endif /* ROCKBOX */
 
 /* ---------------------- forward definitions ----------------- */
 
@@ -80,7 +89,11 @@ void glist_delete(t_glist *x, t_gobj *y)
 	    if (gl->gl_isgraph)
 	    {
 	    	char tag[80];
+#ifdef ROCKBOX
+                snprintf(tag, sizeof(tag)-1, "graph%x", (int)gl);
+#else /* ROCKBOX */
 		sprintf(tag, "graph%x", (int)gl);
+#endif /* ROCKBOX */
 	    	glist_eraseiofor(x, &gl->gl_obj, tag);
 	    }
 	    else
@@ -112,16 +125,22 @@ void glist_delete(t_glist *x, t_gobj *y)
     /* remove every object from a glist.  Experimental. */
 void glist_clear(t_glist *x)
 {
+#ifdef ROCKBOX
+    t_gobj *y;
+#else
     t_gobj *y, *y2;
+#endif
     int dspstate = canvas_suspend_dsp();
-    while (y = x->gl_list)
+    while((y = x->gl_list))
     	glist_delete(x, y);
     canvas_resume_dsp(dspstate);
 }
 
 void glist_retext(t_glist *glist, t_text *y)
 {
+#ifndef ROCKBOX
     t_canvas *c = glist_getcanvas(glist);
+#endif
     	/* check that we have built rtexts yet.  LATER need a better test. */
     if (glist->gl_editor && glist->gl_editor->e_rtext)
     {
@@ -167,6 +186,9 @@ static t_gobj *glist_merge(t_glist *x, t_gobj *g1, t_gobj *g2)
 {
     t_gobj *g = 0, *g9 = 0;
     float f1 = 0, f2 = 0;
+#ifdef ROCKBOX
+    (void) x;
+#endif
     if (g1)
     	f1 = gobj_getxforsort(g1);
     if (g2)
@@ -190,7 +212,7 @@ static t_gobj *glist_merge(t_glist *x, t_gobj *g1, t_gobj *g2)
     	if (g9)
 	    g9->g_next = g1, g9 = g1;
 	else g9 = g = g1;
-	if (g1 = g1->g_next)
+	if((g1 = g1->g_next))
 	    f1 = gobj_getxforsort(g1);
     	g9->g_next = 0;
 	continue;
@@ -198,7 +220,7 @@ static t_gobj *glist_merge(t_glist *x, t_gobj *g1, t_gobj *g2)
     	if (g9)
 	    g9->g_next = g2, g9 = g2;
 	else g9 = g = g2;
-	if (g2 = g2->g_next)
+	if((g2 = g2->g_next))
 	    f2 = gobj_getxforsort(g2);
     	g9->g_next = 0;
 	continue;
@@ -333,6 +355,9 @@ void canvas_resortinlets(t_canvas *x)
 t_outlet *canvas_addoutlet(t_canvas *x, t_pd *who, t_symbol *s)
 {
     t_outlet *op = outlet_new(&x->gl_obj, s);
+#ifdef ROCKBOX
+    (void) who;
+#endif
     if (!x->gl_loading && x->gl_owner && glist_isvisible(x->gl_owner))
     {
     	gobj_vis(&x->gl_gobj, x->gl_owner, 0);
@@ -444,6 +469,9 @@ static void graph_yticks(t_glist *x,
 static void graph_xlabel(t_glist *x, t_symbol *s, int argc, t_atom *argv)
 {
     int i;
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (argc < 1) error("graph_xlabel: no y value given");
     else
     {
@@ -460,6 +488,9 @@ static void graph_xlabel(t_glist *x, t_symbol *s, int argc, t_atom *argv)
 static void graph_ylabel(t_glist *x, t_symbol *s, int argc, t_atom *argv)
 {
     int i;
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (argc < 1) error("graph_ylabel: no x value given");
     else
     {
@@ -613,10 +644,14 @@ void glist_redraw(t_glist *x)
 	    }
 	    	/* redraw all the lines */
     	    linetraverser_start(&t, x);
-    	    while (oc = linetraverser_next(&t))
+    	    while((oc = linetraverser_next(&t)))
+#ifdef ROCKBOX
+                ;
+#else /* ROCKBOX */
     		sys_vgui(".x%x.c coords l%x %d %d %d %d\n",
 		    glist_getcanvas(x), oc,
 			t.tr_lx1, t.tr_ly1, t.tr_lx2, t.tr_ly2);
+#endif /* ROCKBOX */
 	}
 	if (x->gl_owner)
 	{
@@ -651,7 +686,11 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
     if (!vis)
     	rtext_erase(glist_findrtext(parent_glist, &x->gl_obj));
 
+#ifdef ROCKBOX
+    snprintf(tag, sizeof(tag)-1, "graph%x", (int) x);
+#else
     sprintf(tag, "graph%x", (int)x);
+#endif
     if (vis)
     	glist_drawiofor(parent_glist, &x->gl_obj, 1,
 	    tag, x1, y1, x2, y2);
@@ -660,6 +699,7 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
 	just show the bounding rectangle */
     if (x->gl_havewindow)
     {
+#ifndef ROCKBOX
     	if (vis)
 	{
     	    sys_vgui(".x%x.c create polygon\
@@ -672,6 +712,7 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
     	    sys_vgui(".x%x.c delete %s\n",
     	    	glist_getcanvas(x->gl_owner), tag);
 	}
+#endif
 	return;
     }
     	/* otherwise draw (or erase) us as a graph inside another glist. */
@@ -681,10 +722,12 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
     	float f;
 
     	    /* draw a rectangle around the graph */
+#ifndef ROCKBOX
     	sys_vgui(".x%x.c create line\
     	    %d %d %d %d %d %d %d %d %d %d -tags %s\n",
 	    glist_getcanvas(x->gl_owner),
     	    x1, y1, x1, y2, x2, y2, x2, y1, x1, y1, tag);
+#endif
 
     	    /* draw ticks on horizontal borders.  If lperb field is
     	    zero, this is disabled. */
@@ -698,6 +741,7 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
     		f < 0.99 * x->gl_x2 + 0.01*x->gl_x1; i++,
     		    f += x->gl_xtick.k_inc)
     	    {
+#ifndef ROCKBOX
     		int tickpix = (i % x->gl_xtick.k_lperb ? 2 : 4);
     		sys_vgui(".x%x.c create line %d %d %d %d -tags %s\n",
 	    	    glist_getcanvas(x->gl_owner),
@@ -707,11 +751,13 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
 	    	    glist_getcanvas(x->gl_owner),
 	    	    (int)glist_xtopixels(x, f), (int)lpix,
 	    	    (int)glist_xtopixels(x, f), (int)lpix + tickpix, tag);
+#endif
     	    }
     	    for (i = 1, f = x->gl_xtick.k_point - x->gl_xtick.k_inc;
     		f > 0.99 * x->gl_x1 + 0.01*x->gl_x2;
     		    i++, f -= x->gl_xtick.k_inc)
     	    {
+#ifndef ROCKBOX
     		int tickpix = (i % x->gl_xtick.k_lperb ? 2 : 4);
     		sys_vgui(".x%x.c create line %d %d %d %d -tags %s\n",
 	    	    glist_getcanvas(x->gl_owner),
@@ -721,6 +767,7 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
 	    	    glist_getcanvas(x->gl_owner),
 	    	    (int)glist_xtopixels(x, f), (int)lpix,
 	    	    (int)glist_xtopixels(x, f), (int)lpix + tickpix, tag);
+#endif
     	    }
     	}
 
@@ -735,6 +782,7 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
     		f < 0.99 * ubound + 0.01 * lbound;
     		    i++, f += x->gl_ytick.k_inc)
     	    {
+#ifndef ROCKBOX
     		int tickpix = (i % x->gl_ytick.k_lperb ? 2 : 4);
     		sys_vgui(".x%x.c create line %d %d %d %d -tags %s\n",
 	    	    glist_getcanvas(x->gl_owner),
@@ -744,11 +792,13 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
 	    	    glist_getcanvas(x->gl_owner),
 	    	    x2, (int)glist_ytopixels(x, f), 
 	    	    x2 - tickpix, (int)glist_ytopixels(x, f), tag);
+#endif
     	    }
     	    for (i = 1, f = x->gl_ytick.k_point - x->gl_ytick.k_inc;
     		f > 0.99 * lbound + 0.01 * ubound;
     		    i++, f -= x->gl_ytick.k_inc)
     	    {
+#ifndef ROCKBOX
     		int tickpix = (i % x->gl_ytick.k_lperb ? 2 : 4);
     		sys_vgui(".x%x.c create line %d %d %d %d -tags %s\n",
 	    	    glist_getcanvas(x->gl_owner),
@@ -758,19 +808,27 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
 	    	    glist_getcanvas(x->gl_owner),
 	    	    x2, (int)glist_ytopixels(x, f), 
 	    	    x2 - tickpix, (int)glist_ytopixels(x, f), tag);
+#endif
     	    }
     	}
     	    /* draw x labels */
     	for (i = 0; i < x->gl_nxlabels; i++)
+#ifdef ROCKBOX
+            ;
+#else /* ROCKBOX */
     	    sys_vgui(".x%x.c create text\
     	%d %d -text {%s} -font -*-courier-bold--normal--%d-* -tags %s\n",
     	    	glist_getcanvas(x),
 	    	(int)glist_xtopixels(x, atof(x->gl_xlabel[i]->s_name)),
 	    	(int)glist_ytopixels(x, x->gl_xlabely), x->gl_xlabel[i]->s_name,
 	    	glist_getfont(x), tag);
+#endif /* ROCKBOX */
 
     	    /* draw y labels */
     	for (i = 0; i < x->gl_nylabels; i++)
+#ifdef ROCKBOX
+            ;
+#else /* ROCKBOX */
     	    sys_vgui(".x%x.c create text\
     	%d %d -text {%s} -font -*-courier-bold--normal--%d-* -tags %s\n",
     	    	glist_getcanvas(x),
@@ -778,6 +836,7 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
 	    	(int)glist_ytopixels(x, atof(x->gl_ylabel[i]->s_name)),
 	    	x->gl_ylabel[i]->s_name,
 	    	glist_getfont(x), tag);
+#endif /* ROCKBOX */
 
     	    /* draw contents of graph as glist */
      	for (g = x->gl_list; g; g = g->g_next)
@@ -785,8 +844,10 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
     }
     else
     {
+#ifndef ROCKBOX
     	sys_vgui(".x%x.c delete %s\n",
     	    glist_getcanvas(x->gl_owner), tag);
+#endif
      	for (g = x->gl_list; g; g = g->g_next)
      	    gobj_vis(g, x, 0);
     }
@@ -904,10 +965,12 @@ static void graph_select(t_gobj *z, t_glist *glist, int state)
 	t_rtext *y = glist_findrtext(glist, &x->gl_obj);
     	if (canvas_showtext(x))
 	    rtext_select(y, state);
+#ifndef ROCKBOX
 	sys_vgui(".x%x.c itemconfigure %sR -fill %s\n", glist, 
     	rtext_gettag(y), (state? "blue" : "black"));
     	sys_vgui(".x%x.c itemconfigure graph%x -fill %s\n",
     	    glist_getcanvas(glist), z, (state? "blue" : "black"));
+#endif
     }
 }
 
@@ -941,10 +1004,11 @@ static void graph_delete(t_gobj *z, t_glist *glist)
     t_glist *x = (t_glist *)z;
     t_gobj *y;
     text_widgetbehavior.w_deletefn(z, glist);
-    while (y = x->gl_list)
+    while((y = x->gl_list))
     	glist_delete(x, y);
 }
 
+#ifndef ROCKBOX
 static float graph_lastxpix, graph_lastypix;
 
 static void graph_motion(void *z, t_floatarg dx, t_floatarg dy)
@@ -986,6 +1050,7 @@ static void graph_motion(void *z, t_floatarg dx, t_floatarg dy)
     else vec[newx] = newy;
     garray_redraw(a);
 }
+#endif
 
 static int graph_click(t_gobj *z, struct _glist *glist,
     int xpix, int ypix, int shift, int alt, int dbl, int doit)
@@ -1037,11 +1102,16 @@ void graph_properties(t_gobj *z, t_glist *owner)
     t_glist *x = (t_glist *)z;
     {
 	t_gobj *y;
+#ifdef ROCKBOX
+        (void) owner;
+#else /* ROCKBOX */
 	char graphbuf[200];
+
 	sprintf(graphbuf, "pdtk_graph_dialog %%s %g %g %g %g %d %d\n",
 	    x->gl_x1, x->gl_y1, x->gl_x2, x->gl_y2,
 		x->gl_pixwidth, x->gl_pixheight);
 	gfxstub_new(&x->gl_pd, x, graphbuf);
+#endif /* ROCKBOX */
 
 	for (y = x->gl_list; y; y = y->g_next)
     	    if (pd_class(&y->g_pd) == garray_class) 
@@ -1071,6 +1141,9 @@ static void graph_dialog(t_glist *x, t_symbol *s, int argc, t_atom *argv)
     t_float y2 = atom_getfloatarg(3, argc, argv);
     t_float xpix = atom_getfloatarg(4, argc, argv);
     t_float ypix = atom_getfloatarg(5, argc, argv);
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (x1 != x->gl_x1 || x2 != x->gl_x2 ||
     	y1 != x->gl_y1 || y2 != x->gl_y2)
     	    graph_bounds(x, x1, y1, x2, y2);

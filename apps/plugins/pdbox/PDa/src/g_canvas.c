@@ -18,6 +18,15 @@ to be different but are now unified except for some fossilized names.) */
  * changes marked with    IOhannes
  */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "m_imp.h"
+#include "s_stuff.h"
+#include "g_canvas.h"
+#include "g_all_guis.h"
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <stdio.h>
 #include "m_pd.h"
@@ -26,6 +35,7 @@ to be different but are now unified except for some fossilized names.) */
 #include "g_canvas.h"
 #include <string.h>
 #include "g_all_guis.h"
+#endif /* ROCKBOX */
 
 struct _canvasenvironment
 {
@@ -83,7 +93,12 @@ static void glist_doupdatewindowlist(t_glist *gl, char *sbuf)
 	    if (strlen(sbuf) + strlen(gl->gl_name->s_name) + 100 <= 1024)
 	    {
 	    	char tbuf[1024];
+#ifdef ROCKBOX
+                snprintf(tbuf, sizeof(tbuf)-1,
+                    "{%s .x%x} ", gl->gl_name->s_name, (t_int)canvas);
+#else /* ROCKBOX */
 		sprintf(tbuf, "{%s .x%x} ", gl->gl_name->s_name, (t_int)canvas);
+#endif /* ROCKBOX */
 	    	strcat(sbuf, tbuf);
 	    }
 	}
@@ -107,7 +122,9 @@ void canvas_updatewindowlist( void)
     	glist_doupdatewindowlist(x, sbuf);
     /* next line updates the window menu state before -postcommand tries it */
     strcat(sbuf, "}\npdtk_fixwindowmenu\n");
+#ifndef ROCKBOX
     sys_gui(sbuf);
+#endif
 }
 
     /* add a glist the list of "root" canvases (toplevels without parents.) */
@@ -144,6 +161,9 @@ void canvas_setargs(int argc, t_atom *argv)
 
 void glob_setfilename(void *dummy, t_symbol *filesym, t_symbol *dirsym)
 {
+#ifdef ROCKBOX
+    (void) dummy;
+#endif
     canvas_newfilename = filesym;
     canvas_newdirectory = dirsym;
 }
@@ -286,7 +306,7 @@ t_outconnect *linetraverser_next(t_linetraverser *t)
     	    if (!t->tr_ob) y = t->tr_x->gl_list;
     	    else y = t->tr_ob->ob_g.g_next;
     	    for (; y; y = y->g_next)
-    		if (ob = pd_checkobject(&y->g_pd)) break;
+    		if((ob = pd_checkobject(&y->g_pd))) break;
     	    if (!ob) return (0);
     	    t->tr_ob = ob;
     	    t->tr_nout = obj_noutlets(ob);
@@ -357,7 +377,13 @@ t_canvas *canvas_new(void *dummy, t_symbol *sel, int argc, t_atom *argv)
     t_symbol *s = &s_;
     int vis = 0, width = GLIST_DEFCANVASWIDTH, height = GLIST_DEFCANVASHEIGHT;
     int xloc = 0, yloc = GLIST_DEFCANVASYLOC;
+#ifdef ROCKBOX
+    (void) dummy;
+    (void) sel;
+    int font = 10;
+#else /* ROCKBOX */
     int font = (owner ? owner->gl_font : sys_defaultfont);
+#endif /* ROCKBOX */
     glist_init(x);
     x->gl_obj.te_type = T_OBJECT;
     if (!owner)
@@ -415,7 +441,11 @@ t_canvas *canvas_new(void *dummy, t_symbol *sel, int argc, t_atom *argv)
     x->gl_loading = 1;
     x->gl_willvis = vis;
     x->gl_edit = !strncmp(x->gl_name->s_name, "Untitled", 8);
+#ifdef ROCKBOX
+    x->gl_font = 10;
+#else /* ROCKBOX */
     x->gl_font = sys_nearestfontsize(font);
+#endif /* ROCKBOX */
     pd_pushsym(&x->gl_pd);
     return(x);
 }
@@ -424,6 +454,9 @@ void canvas_setgraph(t_glist *x, int flag);
 
 static void canvas_coords(t_glist *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     x->gl_x1 = atom_getfloatarg(0, argc, argv);
     x->gl_y1 = atom_getfloatarg(1, argc, argv);
     x->gl_x2 = atom_getfloatarg(2, argc, argv);
@@ -449,7 +482,11 @@ t_glist *glist_addglist(t_glist *g, t_symbol *sym,
     if (!*sym->s_name)
     {
     	char buf[40];
+#ifdef ROCKBOX
+        snprintf(buf, sizeof(buf)-1, "graph%d", ++gcount);
+#else /* ROCKBOX */
     	sprintf(buf, "graph%d", ++gcount);
+#endif /* ROCKBOX */
     	sym = gensym(buf);
     	menu = 1;
     }
@@ -484,8 +521,12 @@ t_glist *glist_addglist(t_glist *g, t_symbol *sym,
     x->gl_obj.te_ypix = py1;
     x->gl_pixwidth = px2 - px1;
     x->gl_pixheight = py2 - py1;
+#ifdef ROCKBOX
+    x->gl_font = 10;
+#else /* ROCKBOX */
     x->gl_font =  (canvas_getcurrent() ?
     	canvas_getcurrent()->gl_font : sys_defaultfont);
+#endif /* ROCKBOX */
     x->gl_screenx1 = x->gl_screeny1 = 0;
     x->gl_screenx2 = 240;
     x->gl_screeny2 = 300;
@@ -507,6 +548,9 @@ t_glist *glist_addglist(t_glist *g, t_symbol *sym,
     /* call glist_addglist from a Pd message */
 void glist_glist(t_glist *g, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_symbol *sym = atom_getsymbolarg(0, argc, argv);   
     float x1 = atom_getfloatarg(1, argc, argv);  
     float y1 = atom_getfloatarg(2, argc, argv);  
@@ -584,9 +628,11 @@ void canvas_reflecttitle(t_canvas *x)
 	strcat(namebuf, ")");
     }
     else namebuf[0] = 0;
+#ifndef ROCKBOX
     sys_vgui("wm title .x%x {%s%c%s - %s}\n", 
     	x, x->gl_name->s_name, (x->gl_dirty? '*' : ' '), namebuf,
     	    canvas_getdir(x)->s_name);
+#endif
 }
 
 void canvas_dirty(t_canvas *x, t_int n)
@@ -624,7 +670,9 @@ void canvas_map(t_canvas *x, t_floatarg f)
     	    canvas_drawlines(x);
 	    	/* simulate a mouse up so u_main will calculate scrollbars...
 		    ugly! */
+#ifndef ROCKBOX
     	    sys_vgui("pdtk_canvas_mouseup .x%x.c 0 0 0\n", x);
+#endif
 	}
     }
     else
@@ -632,7 +680,9 @@ void canvas_map(t_canvas *x, t_floatarg f)
 	if (glist_isvisible(x))
 	{
 	    	/* just clear out the whole canvas... */
+#ifndef ROCKBOX
 	    sys_vgui(".x%x.c delete all\n", x);
+#endif
 	    	/* alternatively, we could have erased them one by one...
     	    for (y = x->gl_list; y; y = y->g_next)
 	    	gobj_vis(y, x, 0);
@@ -661,7 +711,11 @@ static t_editor *editor_new(t_glist *owner)
     x->e_connectbuf = binbuf_new();
     x->e_deleted = binbuf_new();
     x->e_glist = owner;
+#ifdef ROCKBOX
+    snprintf(buf, sizeof(buf)-1, ".x%x", (t_int)owner);
+#else /* ROCKBOX */
     sprintf(buf, ".x%x", (t_int)owner);
+#endif /* ROCKBOX */
     x->e_guiconnect = guiconnect_new(&owner->gl_pd, gensym(buf));
     return (x);
 }
@@ -689,7 +743,7 @@ void canvas_create_editor(t_glist *x, int createit)
 	{
 	    x->gl_editor = editor_new(x);
 	    for (y = x->gl_list; y; y = y->g_next)
-		if (ob = pd_checkobject(&y->g_pd))
+		if((ob = pd_checkobject(&y->g_pd)))
 	    	    rtext_new(x, ob);
 	}
     }
@@ -700,7 +754,7 @@ void canvas_create_editor(t_glist *x, int createit)
     	else
 	{
 	    for (y = x->gl_list; y; y = y->g_next)
-		if (ob = pd_checkobject(&y->g_pd))
+		if((ob = pd_checkobject(&y->g_pd)))
 	    	    rtext_free(glist_findrtext(x, ob));
 	    editor_free(x->gl_editor, x);
 	    x->gl_editor = 0;
@@ -717,7 +771,9 @@ void canvas_create_editor(t_glist *x, int createit)
     the window. */
 void canvas_vis(t_canvas *x, t_floatarg f)
 {
+#ifndef ROCKBOX
     char buf[30];
+#endif
     int flag = (f != 0);
     if (flag)
     {
@@ -728,19 +784,23 @@ void canvas_vis(t_canvas *x, t_floatarg f)
     	    canvas_vis(x, 0);
 	    canvas_vis(x, 1);
 #else
+#ifndef ROCKBOX
 	    sys_vgui("raise .x%x\n", x);
 	    sys_vgui("focus .x%x.c\n", x);
 	    sys_vgui("wm deiconify .x%x\n", x);  
+#endif /* ROCKBOX */
 #endif
 	}
 	else
 	{
     	    canvas_create_editor(x, 1);
+#ifndef ROCKBOX
     	    sys_vgui("pdtk_canvas_new .x%x %d %d +%d+%d %d\n", x,
     		(int)(x->gl_screenx2 - x->gl_screenx1),
     		(int)(x->gl_screeny2 - x->gl_screeny1),
 	    	(int)(x->gl_screenx1), (int)(x->gl_screeny1),
     		x->gl_edit);
+#endif /* ROCKBOX */
     	    canvas_reflecttitle(x);
 	    x->gl_havewindow = 1;
 	    canvas_updatewindowlist();
@@ -765,10 +825,14 @@ void canvas_vis(t_canvas *x, t_floatarg f)
     	if (glist_isvisible(x))
 	    canvas_map(x, 0);
 	canvas_create_editor(x, 0);
+#ifndef ROCKBOX
    	sys_vgui("destroy .x%x\n", x);
+#endif
     	for (i = 1, x2 = x; x2; x2 = x2->gl_next, i++)
 	    ;
+#ifndef ROCKBOX
     	sys_vgui(".mbar.find delete %d\n", i);
+#endif
 	    /* if we're a graph on our parent, and if the parent exists
 	       and is visible, show ourselves on parent. */
 	if (glist_isgraph(x) && x->gl_owner)
@@ -837,7 +901,7 @@ void canvas_free(t_canvas *x)
     if (canvas_whichfind == x)
     	canvas_whichfind = 0;
     glist_noselect(x);
-    while (y = x->gl_list)
+    while((y = x->gl_list))
     	glist_delete(x, y);
     canvas_vis(x, 0);
 
@@ -850,7 +914,9 @@ void canvas_free(t_canvas *x)
     }
     canvas_resume_dsp(dspstate);
     glist_cleanup(x);
+#ifndef ROCKBOX
     gfxstub_deleteforkey(x);	    /* probably unnecessary */
+#endif
     if (!x->gl_owner)
     	canvas_takeofflist(x);
 }
@@ -863,12 +929,16 @@ static void canvas_drawlines(t_canvas *x)
     t_outconnect *oc;
     {
     	linetraverser_start(&t, x);
-    	while (oc = linetraverser_next(&t))
+    	while((oc = linetraverser_next(&t)))
+#ifdef ROCKBOX
+            ;
+#else /* ROCKBOX */
     	    sys_vgui(".x%x.c create line %d %d %d %d -width %d -tags l%x\n",
 		    glist_getcanvas(x),
 		    	t.tr_lx1, t.tr_ly1, t.tr_lx2, t.tr_ly2, 
 			    (outlet_getsymbol(t.tr_outlet) == &s_signal ? 2:1),
 			    	oc);
+#endif /* ROCKBOX */
     }
 }
 
@@ -878,13 +948,15 @@ void canvas_fixlinesfor(t_canvas *x, t_text *text)
     t_outconnect *oc;
 
     linetraverser_start(&t, x);
-    while (oc = linetraverser_next(&t))
+    while((oc = linetraverser_next(&t)))
     {
     	if (t.tr_ob == text || t.tr_ob2 == text)
     	{
+#ifndef ROCKBOX
     	    sys_vgui(".x%x.c coords l%x %d %d %d %d\n",
 		glist_getcanvas(x), oc,
 		    t.tr_lx1, t.tr_ly1, t.tr_lx2, t.tr_ly2);
+#endif
     	}
     }
 }
@@ -895,14 +967,16 @@ void canvas_deletelinesfor(t_canvas *x, t_text *text)
     t_linetraverser t;
     t_outconnect *oc;
     linetraverser_start(&t, x);
-    while (oc = linetraverser_next(&t))
+    while((oc = linetraverser_next(&t)))
     {
     	if (t.tr_ob == text || t.tr_ob2 == text)
     	{
     	    if (x->gl_editor)
     	    {
+#ifndef ROCKBOX
     	    	sys_vgui(".x%x.c delete l%x\n",
     	    	    glist_getcanvas(x), oc);
+#endif
     	    }
     	    obj_disconnect(t.tr_ob, t.tr_outno, t.tr_ob2, t.tr_inno);
     	}
@@ -916,15 +990,17 @@ void canvas_deletelinesforio(t_canvas *x, t_text *text,
     t_linetraverser t;
     t_outconnect *oc;
     linetraverser_start(&t, x);
-    while (oc = linetraverser_next(&t))
+    while((oc = linetraverser_next(&t)))
     {
     	if ((t.tr_ob == text && t.tr_outlet == outp) ||
     	    (t.tr_ob2 == text && t.tr_inlet == inp))
     	{
 	    if (x->gl_editor)
 	    {
+#ifndef ROCKBOX
     	    	sys_vgui(".x%x.c delete l%x\n",
     	    	    glist_getcanvas(x), oc);
+#endif
     	    }
     	    obj_disconnect(t.tr_ob, t.tr_outno, t.tr_ob2, t.tr_inno);
     	}
@@ -947,6 +1023,9 @@ void canvas_objfor(t_glist *gl, t_text *x, int argc, t_atom *argv);
 void canvas_restore(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
 { /* IOhannes */
     t_pd *z;
+#ifdef ROCKBOX
+    (void) s;
+#endif
     	/* this should be unnecessary, but sometimes the canvas's name gets
 	out of sync with the owning box's argument; this fixes that */
     if (argc > 3)
@@ -992,7 +1071,9 @@ void canvas_restore(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
 static void canvas_loadbangabstractions(t_canvas *x)
 {
     t_gobj *y;
+#ifndef ROCKBOX
     t_symbol *s = gensym("loadbang");
+#endif
     for (y = x->gl_list; y; y = y->g_next)
     	if (pd_class(&y->g_pd) == canvas_class)
     {
@@ -1021,7 +1102,9 @@ void canvas_loadbangsubpatches(t_canvas *x)
 
 void canvas_loadbang(t_canvas *x)
 {
+#ifndef ROCKBOX
     t_gobj *y;
+#endif
     canvas_loadbangabstractions(x);
     canvas_loadbangsubpatches(x);
 }
@@ -1042,6 +1125,11 @@ void canvas_loadbang(t_canvas *x)
 static void canvas_relocate(t_canvas *x, t_symbol *canvasgeom,
     t_symbol *topgeom)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) canvasgeom;
+    (void) topgeom;
+#else /* ROCKBOX */
     int cxpix, cypix, cw, ch, txpix, typix, tw, th;
     if (sscanf(canvasgeom->s_name, "%dx%d+%d+%d", &cw, &ch, &cxpix, &cypix)
     	< 4 ||
@@ -1052,6 +1140,7 @@ static void canvas_relocate(t_canvas *x, t_symbol *canvasgeom,
     if (cw > 5 && ch > 5)
     	canvas_setbounds(x, txpix, typix,
     	    txpix + cw - HORIZBORDER, typix + ch - VERTBORDER);
+#endif /* ROCKBOX */
 }
 
 void canvas_popabstraction(t_canvas *x)
@@ -1065,6 +1154,9 @@ void canvas_popabstraction(t_canvas *x)
 
 void canvas_logerror(t_object *y)
 {
+#ifdef ROCKBOX
+    (void) y;
+#endif
 #ifdef LATER
     canvas_vis(x, 1);
     if (!glist_isselected(x, &y->ob_g))
@@ -1095,6 +1187,13 @@ static void canvas_click(t_canvas *x,
     t_floatarg xpos, t_floatarg ypos,
     	t_floatarg shift, t_floatarg ctrl, t_floatarg alt)
 {
+#ifdef ROCKBOX
+    (void) xpos;
+    (void) ypos;
+    (void) shift;
+    (void) ctrl;
+    (void) alt;
+#endif
     canvas_vis(x, 1);
 }
 
@@ -1103,13 +1202,22 @@ static void canvas_click(t_canvas *x,
 void canvas_fattensub(t_canvas *x,
     int *xp1, int *yp1, int *xp2, int *yp2)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) xp1;
+    (void) yp1;
+#else /* ROCKBOX */
     t_gobj *y;
+#endif /* ROCKBOX */
     *xp2 += 50;     /* fake for now */
     *yp2 += 50;
 }
 
 static void canvas_rename_method(t_canvas *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (ac && av->a_type == A_SYMBOL)
     	canvas_rename(x, av->a_w.w_symbol, 0);
     else canvas_rename(x, gensym("Pd"), 0);
@@ -1128,7 +1236,11 @@ static void *table_new(t_symbol *s, t_floatarg f)
     {
 	 char  tabname[255];
 	 t_symbol *t = gensym("table"); 
+#ifdef ROCKBOX
+        snprintf(tabname, sizeof(tabname)-1, "%s%d", t->s_name, tabcount++);
+#else /* ROCKBOX */
 	 sprintf(tabname, "%s%d", t->s_name, tabcount++);
+#endif /* ROCKBOX */
 	 s = gensym(tabname); 
     }
     if (f <= 1)
@@ -1239,7 +1351,7 @@ static void canvas_dodsp(t_canvas *x, int toplevel, t_signal **sp)
 
     	/* ... and all dsp interconnections */
     linetraverser_start(&t, x);
-    while (oc = linetraverser_next(&t))
+    while((oc = linetraverser_next(&t)))
     	if (obj_issignaloutlet(t.tr_ob, t.tr_outno))
     	    ugen_connect(dc, t.tr_ob, t.tr_outno, t.tr_ob2, t.tr_inno);
 
@@ -1252,7 +1364,9 @@ static void canvas_start_dsp(void)
 {
     t_canvas *x;
     if (canvas_dspstate) ugen_stop();
+#ifndef ROCKBOX
     else sys_gui("pdtk_pd_dsp ON\n");
+#endif
     ugen_start();
     
     for (x = canvas_list; x; x = x->gl_next)
@@ -1266,7 +1380,9 @@ static void canvas_stop_dsp(void)
     if (canvas_dspstate)
     {
     	ugen_stop();
+#ifndef ROCKBOX
     	sys_gui("pdtk_pd_dsp OFF\n");
+#endif
     	canvas_dspstate = 0;
     }
 }
@@ -1297,6 +1413,10 @@ void canvas_update_dsp(void)
 void glob_dsp(void *dummy, t_symbol *s, int argc, t_atom *argv)
 {
     int newstate;
+#ifdef ROCKBOX
+    (void) dummy;
+    (void) s;
+#endif
     if (argc)
     {
     	newstate = atom_getintarg(0, argc, argv);
@@ -1333,7 +1453,9 @@ static void glist_redrawall(t_glist *gl)
     int vis = glist_isvisible(gl);
     for (g = gl->gl_list; g; g = g->g_next)
     {
+#ifndef ROCKBOX
     	t_class *cl;
+#endif
     	if (vis && g->g_pd == scalar_class)
     	    glist_redrawitem(gl, g);
     	else if (g->g_pd == canvas_class)
@@ -1345,6 +1467,9 @@ static void glist_redrawall(t_glist *gl)
 void canvas_redrawallfortemplate(t_canvas *templatecanvas)
 {
     t_canvas *x;
+#ifdef ROCKBOX
+    (void) templatecanvas;
+#endif
     	/* find all root canvases */
     for (x = canvas_list; x; x = x->gl_next)
     	glist_redrawall(x);

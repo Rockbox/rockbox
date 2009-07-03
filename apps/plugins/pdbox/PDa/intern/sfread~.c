@@ -1,3 +1,7 @@
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#else /* ROCKBOX */
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -6,6 +10,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#endif /* ROCKBOX */
 
 #include <m_pd.h>
 #include <m_fixed.h>
@@ -40,7 +45,9 @@ typedef struct _sfread
 
 void sfread_open(t_sfread *x,t_symbol *filename)
 {
+#ifndef ROCKBOX
      struct stat  fstate;
+#endif
      char fname[MAXPDSTRING];
 
      if (filename == &s_) {
@@ -54,7 +61,11 @@ void sfread_open(t_sfread *x,t_symbol *filename)
 
      /* close the old file */
 
+#ifdef ROCKBOX
+     if (x->x_mapaddr) freebytes(x->x_mapaddr, x->x_size);
+#else
      if (x->x_mapaddr) munmap(x->x_mapaddr,x->x_size);
+#endif
      if (x->x_fd >= 0) close(x->x_fd);
 
      if ((x->x_fd = open(fname,O_RDONLY)) < 0)
@@ -66,17 +77,35 @@ void sfread_open(t_sfread *x,t_symbol *filename)
      }
 
      /* get the size */
-
+#ifdef ROCKBOX
+     x->x_size = rb->filesize(x->x_fd);
+#else
      fstat(x->x_fd,&fstate);
      x->x_size = fstate.st_size;
+#endif
 
      /* map the file into memory */
 
+#ifdef ROCKBOX
+     x->x_mapaddr = getbytes(x->x_size);
+     if (!x->x_mapaddr)
+     {
+	  error("can't mmap %s",fname);
+	  return;
+     }
+     int r = read(x->x_fd, x->x_mapaddr, x->x_size);
+     if (r != x->x_size)
+     {
+	  error("can't mmap %s",fname);
+	  return;
+     }
+#else
      if (!(x->x_mapaddr = mmap(NULL,x->x_size,PROT_READ,MAP_PRIVATE,x->x_fd,0)))
      {
 	  error("can't mmap %s",fname);
 	  return;
      }
+#endif
 }
 
 #define MAX_CHANS 4
@@ -236,6 +265,9 @@ static void sfread_offset(t_sfread* x, t_floatarg f)
 
 static void *sfread_new(t_floatarg chan,t_floatarg skip)
 {
+#ifdef ROCKBOX
+    (void) skip;
+#endif
     t_sfread *x = (t_sfread *)pd_new(sfread_class);
     t_int c = chan;
 

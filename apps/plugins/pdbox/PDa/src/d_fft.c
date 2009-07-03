@@ -67,6 +67,9 @@ static t_int *sigifft_perform(t_int *w)
 
 static void sigfft_dspx(t_sigfft *x, t_signal **sp, t_int *(*f)(t_int *w))
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     int n = sp[0]->s_n;
     t_sample *in1 = sp[0]->s_vec;
     t_sample *in2 = sp[1]->s_vec;
@@ -150,6 +153,9 @@ static t_int *sigrfft_perform(t_int *w)
 
 static void sigrfft_dsp(t_sigrfft *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     int n = sp[0]->s_n, n2 = (n>>1);
     t_sample *in1 = sp[0]->s_vec;
     t_sample *out1 = sp[1]->s_vec;
@@ -213,6 +219,9 @@ static t_int *sigrifft_perform(t_int *w)
 
 static void sigrifft_dsp(t_sigrifft *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     int n = sp[0]->s_n, n2 = (n>>1);
     t_sample *in1 = sp[0]->s_vec;
     t_sample *in2 = sp[1]->s_vec;

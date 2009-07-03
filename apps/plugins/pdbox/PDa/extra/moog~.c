@@ -2,7 +2,11 @@
 
 
 #include "math.h"
+#ifdef ROCKBOX
+#include "m_pd.h"
+#else
 #include <m_pd.h>
+#endif
 
 /* ----------------------------- moog ----------------------------- */
 static t_class *moog_class;
@@ -27,6 +31,10 @@ static void moog_reset(t_moog *x)
 
 static void *moog_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argv;
+#endif
     if (argc > 1) post("moog~: extra arguments ignored");
     {
 	t_moog *x = (t_moog *)pd_new(moog_class);
@@ -123,7 +131,9 @@ t_int *moog_perf8(t_int *w)
     t_sample ys3 = x->y_3;
     t_sample ys4 = x->y_4;
 				    
+#ifndef ROCKBOX
     t_sample temp,temp2;
+#endif
     t_sample pt,pt1;
     t_sample in;
 

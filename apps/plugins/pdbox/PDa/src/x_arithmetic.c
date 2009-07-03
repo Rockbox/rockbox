@@ -6,6 +6,11 @@
 done on floats; the logical and bitwise binops convert their
 inputs to int and their outputs back to float. */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 #include "m_pd.h"
 #include <math.h>
 

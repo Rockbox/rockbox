@@ -22,8 +22,17 @@ typedef struct _dac
 static void *dac_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_dac *x = (t_dac *)pd_new(dac_class);
+#ifdef ROCKBOX
+    t_atom defarg[2];
+#else
     t_atom defarg[2], *ap;
+#endif
     int i;
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
+
     if (!argc)
     {
     	argv = defarg;
@@ -83,8 +92,17 @@ typedef struct _adc
 static void *adc_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_adc *x = (t_adc *)pd_new(adc_class);
+#ifdef ROCKBOX
+    t_atom defarg[2];
+#else
     t_atom defarg[2], *ap;
+#endif
     int i;
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
+
     if (!argc)
     {
     	argv = defarg;

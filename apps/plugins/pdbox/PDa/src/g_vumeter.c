@@ -5,7 +5,13 @@
 /* g_7_guis.c written by Thomas Musil (c) IEM KUG Graz Austria 2000-2001 */
 /* thanks to Miller Puckette, Guenther Geiger and Krzystof Czaja */
 
-
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#include "g_all_guis.h"
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -21,6 +27,7 @@
 #else
 #include <unistd.h>
 #endif
+#endif /* ROCKBOX */
 
 /* ----- vu  gui-peak- & rms- vu-meter-display ---------- */
 
@@ -31,6 +38,10 @@ static t_class *vu_class;
 
 static void vu_update_rms(t_vu *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     if(glist_isvisible(glist))
     {
 	int w4=x->x_gui.x_w/4, off=text_ypix(&x->x_gui.x_obj, glist)-1;
@@ -40,10 +51,15 @@ static void vu_update_rms(t_vu *x, t_glist *glist)
 		 glist_getcanvas(glist), x, quad1, off, quad3,
 		 off + (x->x_led_size+1)*(IEM_VU_STEPS-x->x_rms));
     }
+#endif /* ROCKBOX */
 }
 
 static void vu_update_peak(t_vu *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     if(glist_isvisible(glist))
@@ -74,10 +90,15 @@ static void vu_update_peak(t_vu *x, t_glist *glist)
 		     mid, ypos+20);
 	}
     }
+#endif /* ROCKBOX */
 }
 
 static void vu_draw_new(t_vu *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
@@ -151,11 +172,16 @@ static void vu_draw_new(t_vu *x, t_glist *glist)
 	     xpos+x->x_gui.x_w+1, ypos-1,
 	     x, 1);
     }
+#endif /* ROCKBOX */
 }
 
 
 static void vu_draw_move(t_vu *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
@@ -212,10 +238,15 @@ static void vu_draw_move(t_vu *x, t_glist *glist)
 	     xpos+x->x_gui.x_w+1-IOWIDTH, ypos-2,
 	     xpos+x->x_gui.x_w+1, ypos-1);
     }
+#endif /* ROCKBOX */
 }
 
 static void vu_draw_erase(t_vu* x,t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     int i;
     t_canvas *canvas=glist_getcanvas(glist);
 
@@ -244,10 +275,15 @@ static void vu_draw_erase(t_vu* x,t_glist* glist)
         sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
         sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 1);
     }
+#endif /* ROCKBOX */
 }
 
 static void vu_draw_config(t_vu* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     int i;
     t_canvas *canvas=glist_getcanvas(glist);
 
@@ -277,10 +313,16 @@ static void vu_draw_config(t_vu* x, t_glist* glist)
 	     x, x->x_gui.x_bcol, x->x_gui.x_bcol);
     sys_vgui(".x%x.c itemconfigure %xPLED -width %d\n", canvas, x,
 	     x->x_led_size);
+#endif /* ROCKBOX */
 }
 
 static void vu_draw_io(t_vu* x, t_glist* glist, int old_snd_rcv_flags)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+    (void) old_snd_rcv_flags;
+#else /* ROCKBOX */
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     t_canvas *canvas=glist_getcanvas(glist);
@@ -321,10 +363,15 @@ static void vu_draw_io(t_vu* x, t_glist* glist, int old_snd_rcv_flags)
         sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
         sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 1);
     }
+#endif /* ROCKBOX */
 }
 
 static void vu_draw_select(t_vu* x,t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     int i;
     t_canvas *canvas=glist_getcanvas(glist);
 
@@ -362,6 +409,7 @@ static void vu_draw_select(t_vu* x,t_glist* glist)
 	}
 	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, x->x_gui.x_lcol);
     }
+#endif /* ROCKBOX */
 }
 
 void vu_draw(t_vu *x, t_glist *glist, int mode)
@@ -425,6 +473,10 @@ void vu_check_height(t_vu *x, int h)
 
 static void vu_scale(t_vu *x, t_floatarg fscale)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) fscale;
+#else /* ROCKBOX */
     int i, scale = (int)fscale;
 
     if(scale != 0) scale = 1;
@@ -446,7 +498,11 @@ static void vu_scale(t_vu *x, t_floatarg fscale)
     }
     if(!x->x_scale && scale)
     {
+#ifdef ROCKBOX
+        int end=text_xpix(&x->x_gui.x_obj, x->x_gui.x_glist)+x->x_gui.x_w+4;
+#else /* ROCKBOX */
 	int w4=x->x_gui.x_w/4, end=text_xpix(&x->x_gui.x_obj, x->x_gui.x_glist)+x->x_gui.x_w+4;
+#endif /* ROCKBOX */
 	int k1=x->x_led_size+1, k2=IEM_VU_STEPS+1, k3=k1/2;
 	int yyy, k4=text_ypix(&x->x_gui.x_obj, x->x_gui.x_glist)-k3;
 	t_canvas *canvas=glist_getcanvas(x->x_gui.x_glist);
@@ -471,10 +527,15 @@ static void vu_scale(t_vu *x, t_floatarg fscale)
 		     x->x_gui.x_lcol, x, i);
 	}
     }
+#endif /* ROCKBOX */
 }
 
 static void vu_properties(t_gobj *z, t_glist *owner)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) owner;
+#else /* ROCKBOX */
     t_vu *x = (t_vu *)z;
     char buf[800];
     t_symbol *srl[3];
@@ -496,6 +557,7 @@ static void vu_properties(t_gobj *z, t_glist *owner)
 	    x->x_gui.x_fsf.x_font_style, x->x_gui.x_fontsize,
 	    0xffffff & x->x_gui.x_bcol, -1/*no front-color*/, 0xffffff & x->x_gui.x_lcol);
     gfxstub_new(&x->x_gui.x_obj.ob_pd, x, buf);
+#endif /* ROCKBOX */
 }
 
 static void vu_dialog(t_vu *x, t_symbol *s, int argc, t_atom *argv)
@@ -505,6 +567,10 @@ static void vu_dialog(t_vu *x, t_symbol *s, int argc, t_atom *argv)
     int h = (int)atom_getintarg(1, argc, argv);
     int scale = (int)atom_getintarg(4, argc, argv);
     int sr_flags;
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
 
     srl[0] = gensym("empty");
     sr_flags = iemgui_dialog(&x->x_gui, srl, argc, argv);
@@ -523,6 +589,9 @@ static void vu_dialog(t_vu *x, t_symbol *s, int argc, t_atom *argv)
 
 static void vu_size(t_vu *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     x->x_gui.x_w = iemgui_clip_size((int)atom_getintarg(0, ac, av));
     if(ac > 1)
         vu_check_height(x, (int)atom_getintarg(1, ac, av));
@@ -608,9 +677,14 @@ static void *vu_new(t_symbol *s, int argc, t_atom *argv)
     t_vu *x = (t_vu *)pd_new(vu_class);
     int bflcol[]={-66577, -1, -1};
     int w=IEM_GUI_DEFAULTSIZE, h=IEM_VU_STEPS*IEM_VU_DEFAULTSIZE;
+#ifdef ROCKBOX
+    int ldx=-1, ldy=-8, fs=8, scale=1;
+    (void) s;
+#else /* ROCKBOX */
     int ldx=-1, ldy=-8, f=0, fs=8, scale=1;
     int ftbreak=IEM_BNG_DEFAULTBREAKFLASHTIME, fthold=IEM_BNG_DEFAULTHOLDFLASHTIME;
     char str[144];
+#endif /* ROCKBOX */
 
     iem_inttosymargs(&x->x_gui.x_isa, 0);
     iem_inttofstyle(&x->x_gui.x_fsf, 0);
@@ -678,7 +752,9 @@ static void vu_free(t_vu *x)
 {
     if(x->x_gui.x_fsf.x_rcv_able)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
+#ifndef ROCKBOX
     gfxstub_deleteforkey(x);
+#endif
 }
 
 void g_vumeter_setup(void)

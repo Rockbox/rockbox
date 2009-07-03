@@ -1,4 +1,7 @@
-
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#else /* ROCKBOX */
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -7,6 +10,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#endif /* ROCKBOX */
 
 #include <m_pd.h>
 #include <m_fixed.h>
@@ -87,7 +91,11 @@ static void sfwrite_open(t_sfwrite *x,t_symbol *filename)
 
      sfwrite_close(x);
 
+#ifdef ROCKBOX
+     if ((x->x_file = open(fname, O_RDWR | O_CREAT)) < 0)
+#else
      if ((x->x_file = open(fname,O_RDWR | O_CREAT,0664)) < 0)
+#endif
      {
 	  error("can't create %s",fname);
 	  return;

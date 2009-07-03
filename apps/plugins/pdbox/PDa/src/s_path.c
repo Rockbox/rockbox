@@ -14,6 +14,26 @@
 #define DEBUG(x)
 void readsf_banana( void);    /* debugging */
 
+#ifdef ROCKBOX
+
+#include "plugin.h"
+#include "pdbox.h"
+
+#include "m_pd.h"
+#include "m_imp.h"
+#include "s_stuff.h"
+
+#define open rb->open
+#define close rb->close
+#define strcpy rb->strcpy
+#define strcat rb->strcat
+#define strlen rb->strlen
+#define strcmp rb->strcmp
+#define strncpy rb->strncpy
+#define strrchr rb->strrchr
+#define strncat rb_strncat
+
+#else /* ROCKBOX */
 #include <stdlib.h>
 #ifdef UNIX
 #include <unistd.h>
@@ -29,6 +49,7 @@ void readsf_banana( void);    /* debugging */
 #include "s_stuff.h"
 #include <stdio.h>
 #include <fcntl.h>
+#endif /* ROCKBOX */
 
 static t_namelist *pd_path, *pd_helppath;
 
@@ -85,6 +106,10 @@ t_namelist *namelist_append(t_namelist *listwas, const char *s)
     char temp[MAXPDSTRING];
     t_namelist *nl = listwas, *rtn = listwas;
     
+#ifdef ROCKBOX
+    (void) rtn;
+#endif
+
     npos = s;
     do
     {
@@ -137,6 +162,10 @@ int open_via_path(const char *dir, const char *name, const char* ext,
     t_namelist *nl, thislist;
     int fd = -1;
     char listbuf[MAXPDSTRING];
+
+#ifdef ROCKBOX
+    (void) bin;
+#endif
 
     if (name[0] == '/' 
 #ifdef MSW
@@ -191,6 +220,7 @@ int open_via_path(const char *dir, const char *name, const char* ext,
 	    	char *slash;
 		if (sys_verbose) post("tried %s and succeeded", dirresult);
 		sys_unbashfilename(dirresult, dirresult);
+
 		slash = strrchr(dirresult, '/');
 		if (slash)
 		{
@@ -199,7 +229,7 @@ int open_via_path(const char *dir, const char *name, const char* ext,
 		}
 		else *nameresult = dirresult;
 		
-	    	return (fd);  
+	    	return (fd);
 	    }
 	}
 	else
@@ -245,7 +275,9 @@ static int do_open_via_helppath(const char *realname, t_namelist *listp)
 	    else
 #endif
     	    {
+#ifndef ROCKBOX
 	    	char *slash;
+#endif
 		if (sys_verbose) post("tried %s and succeeded", dirresult);
 		sys_unbashfilename(dirresult, dirresult);
 		close (fd);
@@ -266,8 +298,12 @@ static int do_open_via_helppath(const char *realname, t_namelist *listp)
     search attempts. */
 void open_via_helppath(const char *name, const char *dir)
 {
+#ifdef ROCKBOX
+    t_namelist thislist, *listp;
+#else /*ROCKBOX */
     t_namelist *nl, thislist, *listp;
     int fd = -1;
+#endif /* ROCKBOX */
     char dirbuf2[MAXPDSTRING], realname[MAXPDSTRING];
 
     	/* if directory is supplied, put it at head of search list. */
@@ -380,6 +416,10 @@ int sys_rcfile(void)
     /* start an audio settings dialog window */
 void glob_start_path_dialog(t_pd *dummy, t_floatarg flongform)
 {
+#ifdef ROCKBOX
+    (void) dummy;
+    (void) flongform;
+#else /* ROCKBOX */
     char buf[MAXPDSTRING];
     int i;
     t_namelist *nl;
@@ -391,12 +431,19 @@ void glob_start_path_dialog(t_pd *dummy, t_floatarg flongform)
 
     sprintf(buf, "pdtk_path_dialog %%s\n");
     gfxstub_new(&glob_pdobject, glob_start_path_dialog, buf);
+#endif /* ROCKBOX */
 }
 
     /* new values from dialog window */
 void glob_path_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
 {
     int i;
+
+#ifdef ROCKBOX
+    (void) dummy;
+    (void) s;
+#endif /* ROCKBOX */
+
     namelist_free(pd_path);
     pd_path = 0;
     for (i = 0; i < argc; i++)

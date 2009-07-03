@@ -5,9 +5,17 @@
 /*  miscellaneous: print~; more to come.
 */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 #include "m_pd.h"
+
+#ifndef ROCKBOX
 #include <stdio.h>
 #include <string.h>
+#endif
 
 /* ------------------------- print~ -------------------------- */
 static t_class *print_class;
@@ -69,7 +77,10 @@ static void *print_new(t_symbol *s)
     return (x);
 }
 
-static void print_setup(void)
+#ifndef ROCKBOX
+static
+#endif
+void print_setup(void)
 {
     print_class = class_new(gensym("print~"), (t_newmethod)print_new, 0,
     	sizeof(t_print), 0, A_DEFSYM, 0);
@@ -118,7 +129,11 @@ static void scope_dsp(t_scope *x, t_signal **sp)
 
 static void scope_erase(t_scope *x)
 {
+#ifdef ROCKBOX
+    (void) x;
+#else
     if (x->x_drawn) sys_vgui(".x%x.c delete gumbo\n", x->x_canvas);
+#endif
 }
 
 #define X1 10.
@@ -126,6 +141,7 @@ static void scope_erase(t_scope *x)
 #define YC 5.
 static void scope_bang(t_scope *x)
 {
+#ifndef ROCKBOX
     int n, phase;
     char hugebuf[10000], *s = hugebuf;
     scope_erase(x);
@@ -142,6 +158,7 @@ static void scope_bang(t_scope *x)
     }
     sprintf(s, "-tags gumbo\n");
     sys_gui(hugebuf);
+#endif
     x->x_drawn = 1;
 }
 
@@ -152,6 +169,9 @@ static void scope_free(t_scope *x)
 
 static void *scope_new(t_symbol *s)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_scope *x = (t_scope *)pd_new(scope_class);
     error("scope: this is now obsolete; use arrays and tabwrite~ instead");
     x->x_phase = 0;
@@ -188,6 +208,9 @@ static t_int *bang_tilde_perform(t_int *w)
 
 static void bang_tilde_dsp(t_bang *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) sp;
+#endif
     dsp_add(bang_tilde_perform, 1, x);
 }
 
@@ -203,6 +226,9 @@ static void bang_tilde_free(t_bang *x)
 
 static void *bang_tilde_new(t_symbol *s)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_bang *x = (t_bang *)pd_new(bang_tilde_class);
     x->x_clock = clock_new(x, (t_method)bang_tilde_tick);
     outlet_new(&x->x_obj, &s_bang);
@@ -233,6 +259,9 @@ static void samplerate_tilde_bang(t_samplerate *x)
 
 static void *samplerate_tilde_new(t_symbol *s)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_samplerate *x = (t_samplerate *)pd_new(samplerate_tilde_class);
     outlet_new(&x->x_obj, &s_float);
     return (x);

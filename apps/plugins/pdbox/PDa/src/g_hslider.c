@@ -6,6 +6,13 @@
 /* thanks to Miller Puckette, Guenther Geiger and Krzystof Czaja */
 
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#include "g_all_guis.h"
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -21,7 +28,7 @@
 #else
 #include <unistd.h>
 #endif
-
+#endif /* ROCKBOX */
 
 /* ------------ hsl    gui-horicontal  slider ----------------------- */
 
@@ -32,6 +39,10 @@ static t_class *hslider_class;
 
 static void hslider_draw_update(t_hslider *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
 
@@ -58,10 +69,15 @@ static void hslider_draw_update(t_hslider *x, t_glist *glist)
 	    }
 	}
     }
+#endif /* ROCKBOX */
 }
 
 static void hslider_draw_new(t_hslider *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     int r = xpos + (x->x_val + 50)/100;
@@ -88,10 +104,15 @@ static void hslider_draw_new(t_hslider *x, t_glist *glist)
 	sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
 	     canvas, xpos-3, ypos,
 	     xpos+4, ypos+1, x, 0);
+#endif /* ROCKBOX */
 }
 
 static void hslider_draw_move(t_hslider *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     int r = xpos + (x->x_val + 50)/100;
@@ -116,10 +137,15 @@ static void hslider_draw_move(t_hslider *x, t_glist *glist)
 	     canvas, x, 0,
 	     xpos-3, ypos,
 	     xpos+4, ypos+1);
+#endif /* ROCKBOX */
 }
 
 static void hslider_draw_erase(t_hslider* x,t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
@@ -129,10 +155,15 @@ static void hslider_draw_erase(t_hslider* x,t_glist* glist)
         sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 0);
     if(!x->x_gui.x_fsf.x_rcv_able)
         sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+#endif /* ROCKBOX */
 }
 
 static void hslider_draw_config(t_hslider* x,t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c itemconfigure %xLABEL -font {%s %d bold} -fill #%6.6x -text {%s} \n",
@@ -141,10 +172,16 @@ static void hslider_draw_config(t_hslider* x,t_glist* glist)
 	     strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"");
     sys_vgui(".x%x.c itemconfigure %xKNOB -fill #%6.6x\n", canvas, x, x->x_gui.x_fcol);
     sys_vgui(".x%x.c itemconfigure %xBASE -fill #%6.6x\n", canvas, x, x->x_gui.x_bcol);
+#endif /* ROCKBOX */
 }
 
 static void hslider_draw_io(t_hslider* x,t_glist* glist, int old_snd_rcv_flags)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+    (void) old_snd_rcv_flags;
+#else /* ROCKBOX */
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     t_canvas *canvas=glist_getcanvas(glist);
@@ -161,10 +198,15 @@ static void hslider_draw_io(t_hslider* x,t_glist* glist, int old_snd_rcv_flags)
 	     xpos+4, ypos+1, x, 0);
     if(!(old_snd_rcv_flags & IEM_GUI_OLD_RCV_FLAG) && x->x_gui.x_fsf.x_rcv_able)
 	sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+#endif /* ROCKBOX */
 }
 
 static void hslider_draw_select(t_hslider* x,t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     if(x->x_gui.x_fsf.x_selected)
@@ -177,6 +219,7 @@ static void hslider_draw_select(t_hslider* x,t_glist* glist)
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_NORMAL);
 	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, x->x_gui.x_lcol);
     }
+#endif /* ROCKBOX */
 }
 
 void hslider_draw(t_hslider *x, t_glist *glist, int mode)
@@ -279,6 +322,10 @@ void hslider_check_minmax(t_hslider *x, double min, double max)
 
 static void hslider_properties(t_gobj *z, t_glist *owner)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) owner;
+#else /* ROCKBOX */
     t_hslider *x = (t_hslider *)z;
     char buf[800];
     t_symbol *srl[3];
@@ -300,6 +347,7 @@ static void hslider_properties(t_gobj *z, t_glist *owner)
 	    x->x_gui.x_fsf.x_font_style, x->x_gui.x_fontsize,
 	    0xffffff & x->x_gui.x_bcol, 0xffffff & x->x_gui.x_fcol, 0xffffff & x->x_gui.x_lcol);
     gfxstub_new(&x->x_gui.x_obj.ob_pd, x, buf);
+#endif /* ROCKBOX */
 }
 
 static void hslider_set(t_hslider *x, t_floatarg f)    /* bugfix */
@@ -355,6 +403,10 @@ static void hslider_dialog(t_hslider *x, t_symbol *s, int argc, t_atom *argv)
     int steady = (int)atom_getintarg(17, argc, argv);
     int sr_flags;
 
+#ifdef ROCKBOX
+    (void) s;
+#endif
+
     if(lilo != 0) lilo = 1;
     x->x_lin0_log1 = lilo;
     if(steady)
@@ -374,6 +426,10 @@ static void hslider_dialog(t_hslider *x, t_symbol *s, int argc, t_atom *argv)
 static void hslider_motion(t_hslider *x, t_floatarg dx, t_floatarg dy)
 {
     int old = x->x_val;
+
+#ifdef ROCKBOX
+    (void) dy;
+#endif
 
     if(x->x_gui.x_fsf.x_finemoved)
 	x->x_pos += (int)dx;
@@ -402,6 +458,11 @@ static void hslider_motion(t_hslider *x, t_floatarg dx, t_floatarg dy)
 static void hslider_click(t_hslider *x, t_floatarg xpos, t_floatarg ypos,
 			  t_floatarg shift, t_floatarg ctrl, t_floatarg alt)
 {
+#ifdef ROCKBOX
+    (void) shift;
+    (void) ctrl;
+    (void) alt;
+#endif
     if(!x->x_steady)
 	x->x_val = (int)(100.0 * (xpos - text_xpix(&x->x_gui.x_obj, x->x_gui.x_glist)));
     if(x->x_val > (100*x->x_gui.x_w - 100))
@@ -420,6 +481,11 @@ static int hslider_newclick(t_gobj *z, struct _glist *glist,
 {
     t_hslider* x = (t_hslider *)z;
 
+#ifdef ROCKBOX
+    (void) glist;
+    (void) dbl;
+#endif
+
     if(doit)
     {
 	hslider_click( x, (t_floatarg)xpix, (t_floatarg)ypix, (t_floatarg)shift,
@@ -434,6 +500,9 @@ static int hslider_newclick(t_gobj *z, struct _glist *glist,
 
 static void hslider_size(t_hslider *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     hslider_check_width(x, (int)atom_getintarg(0, ac, av));
     if(ac > 1)
 	x->x_gui.x_h = iemgui_clip_size((int)atom_getintarg(1, ac, av));
@@ -448,6 +517,9 @@ static void hslider_pos(t_hslider *x, t_symbol *s, int ac, t_atom *av)
 
 static void hslider_range(t_hslider *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     hslider_check_minmax(x, (double)atom_getfloatarg(0, ac, av),
 			 (double)atom_getfloatarg(1, ac, av));
 }
@@ -525,10 +597,20 @@ static void *hslider_new(t_symbol *s, int argc, t_atom *argv)
     t_hslider *x = (t_hslider *)pd_new(hslider_class);
     int bflcol[]={-262144, -1, -1};
     int w=IEM_SL_DEFAULTSIZE, h=IEM_GUI_DEFAULTSIZE;
+#ifdef ROCKBOX
+    int lilo=0, ldx=-2, ldy=-6, v=0, steady=1;
+#else
     int lilo=0, ldx=-2, ldy=-6, f=0, v=0, steady=1;
+#endif
     int fs=8;
     double min=0.0, max=(double)(IEM_SL_DEFAULTSIZE-1);
+#ifndef ROCKBOX
     char str[144];
+#endif
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
 
     iem_inttosymargs(&x->x_gui.x_isa, 0);
     iem_inttofstyle(&x->x_gui.x_fsf, 0);
@@ -607,7 +689,9 @@ static void hslider_free(t_hslider *x)
 {
     if(x->x_gui.x_fsf.x_rcv_able)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
+#ifndef ROCKBOX
     gfxstub_deleteforkey(x);
+#endif
 }
 
 void g_hslider_setup(void)

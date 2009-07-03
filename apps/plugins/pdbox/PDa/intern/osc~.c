@@ -6,7 +6,11 @@
 
 /* ------------------------ osc~ ----------------------------- */
 
+#ifdef ROCKBOX
+static t_class *osc_class;
+#else
 static t_class *osc_class, *scalarosc_class;
+#endif
 
 typedef struct _osc
 {

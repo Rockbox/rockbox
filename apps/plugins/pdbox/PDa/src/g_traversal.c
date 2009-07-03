@@ -16,11 +16,18 @@ sublist - get a pointer into a list which is an element of another scalar
 
 */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>  	/* for read/write to files */
 #include "m_pd.h"
 #include "g_canvas.h"
+#endif /* ROCKBOX */
 
 /* ------------- gstubs and gpointers - safe pointing --------------- */
 
@@ -135,7 +142,7 @@ void gpointer_copy(const t_gpointer *gpfrom, t_gpointer *gpto)
 void gpointer_unset(t_gpointer *gp)
 {
     t_gstub *gs;
-    if (gs = gp->gp_stub)
+    if((gs = gp->gp_stub))
     {
     	gstub_dis(gs);
     	gp->gp_stub = 0;
@@ -145,7 +152,7 @@ void gpointer_unset(t_gpointer *gp)
 void gpointer_setglist(t_gpointer *gp, t_glist *glist, t_scalar *x)
 {
     t_gstub *gs;
-    if (gs = gp->gp_stub) gstub_dis(gs);
+    if((gs = gp->gp_stub)) gstub_dis(gs);
     gp->gp_stub = gs = glist->gl_stub;
     gp->gp_valid = glist->gl_valid;
     gp->gp_un.gp_scalar = x;
@@ -155,7 +162,7 @@ void gpointer_setglist(t_gpointer *gp, t_glist *glist, t_scalar *x)
 static void gpointer_setarray(t_gpointer *gp, t_array *array, t_word *w)
 {
     t_gstub *gs;
-    if (gs = gp->gp_stub) gstub_dis(gs);
+    if((gs = gp->gp_stub)) gstub_dis(gs);
     gp->gp_stub = gs = array->a_stub;
     gp->gp_valid = array->a_valid;
     gp->gp_un.gp_w = w;
@@ -194,6 +201,9 @@ static void *ptrobj_new(t_symbol *classname, int argc, t_atom *argv)
     t_ptrobj *x = (t_ptrobj *)pd_new(ptrobj_class);
     t_typedout *to;
     int n;
+#ifdef ROCKBOX
+    (void) classname;
+#endif
     gpointer_init(&x->x_gp);
     x->x_typedout = to = (t_typedout *)getbytes(argc * sizeof (*to));
     x->x_ntypedout = n = argc;
@@ -285,10 +295,14 @@ static void ptrobj_next(t_ptrobj *x)
 
 static void ptrobj_sendwindow(t_ptrobj *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#else /* ROCKBOX */
     t_scalar *sc;
     t_symbol *templatesym;
     int n;
     t_typedout *to;
+#endif /* ROCKBOX */
     t_glist *glist;
     t_pd *canvas;
     t_gstub *gs;
@@ -388,6 +402,9 @@ static void *get_new(t_symbol *why, int argc, t_atom *argv)
     int i;
     t_getvariable *sp;
     x->x_templatesym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
+#ifdef ROCKBOX
+    (void) why;
+#endif
     if (argc) argc--, argv++;
     x->x_variables
     	= (t_getvariable *)getbytes(argc * sizeof (*x->x_variables));
@@ -468,6 +485,9 @@ static void *set_new(t_symbol *why, int argc, t_atom *argv)
     int i;
     t_setvariable *sp;
     x->x_templatesym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
+#ifdef ROCKBOX
+    (void) why;
+#endif
     if (argc) argc--, argv++;
     x->x_variables
     	= (t_setvariable *)getbytes(argc * sizeof (*x->x_variables));
@@ -634,6 +654,9 @@ static void elem_float(t_elem *x, t_float f)
 
 static void elem_free(t_elem *x, t_gpointer *gp)
 {
+#ifdef ROCKBOX
+    (void) gp;
+#endif
     gpointer_unset(&x->x_gp);
     gpointer_unset(&x->x_gparent);
 }
@@ -667,13 +690,19 @@ static void *getsize_new(t_symbol *templatesym, t_symbol *fieldsym)
 
 static void getsize_pointer(t_getsize *x, t_gpointer *gp)
 {
+#ifdef ROCKBOX
+    int onset, type;
+#else /* ROCKBOX */
     int nitems, onset, type;
+#endif /* ROCKBOX */
     t_symbol *templatesym = x->x_templatesym, *fieldsym = x->x_fieldsym,
     	*elemtemplatesym;
     t_template *template = template_findbyname(templatesym);
     t_word *w;
     t_array *array;
+#ifndef ROCKBOX
     int elemsize;
+#endif
     t_gstub *gs = gp->gp_stub;
     if (!template)
     {
@@ -731,6 +760,9 @@ typedef struct _setsize
 static void *setsize_new(t_symbol *templatesym, t_symbol *fieldsym,
     t_floatarg newsize)
 {
+#ifdef ROCKBOX
+    (void) newsize;
+#endif
     t_setsize *x = (t_setsize *)pd_new(setsize_class);
     x->x_templatesym = canvas_makebindsym(templatesym);
     x->x_fieldsym = fieldsym;
@@ -748,7 +780,9 @@ static void setsize_float(t_setsize *x, t_float f)
     t_template *template = template_findbyname(templatesym);
     t_template *elemtemplate;
     t_word *w;
+#ifndef ROCKBOX
     t_atom at;
+#endif
     t_array *array;
     int elemsize;
     int newsize = f;
@@ -830,7 +864,11 @@ static void setsize_float(t_setsize *x, t_float f)
     if (newsize > nitems)
     {
     	char *newelem = ((char *)array->a_vec) + nitems * elemsize;
+#ifdef ROCKBOX
+        int nnew = newsize - nitems;
+#else /* ROCKBOX */
     	int i = 0, nnew = newsize - nitems;
+#endif /* ROCKBOX */
     	
     	while (nnew--)
     	{
@@ -896,6 +934,9 @@ static void *append_new(t_symbol *why, int argc, t_atom *argv)
     int i;
     t_appendvariable *sp;
     x->x_templatesym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
+#ifdef ROCKBOX
+    (void) why;
+#endif
     if (argc) argc--, argv++;
     x->x_variables
     	= (t_appendvariable *)getbytes(argc * sizeof (*x->x_variables));
@@ -1023,8 +1064,10 @@ static void sublist_pointer(t_sublist *x, t_gpointer *gp)
     t_symbol *templatesym = x->x_templatesym, *dummy;
     t_template *template = template_findbyname(templatesym);
     t_gstub *gs = gp->gp_stub;
-    t_word *vec; 
+#ifndef ROCKBOX
+    t_word *vec;
     t_getvariable *vp;
+#endif
     int onset, type;
     t_word *w;
 
@@ -1059,6 +1102,9 @@ static void sublist_pointer(t_sublist *x, t_gpointer *gp)
 
 static void sublist_free(t_sublist *x, t_gpointer *gp)
 {
+#ifdef ROCKBOX
+    (void) gp;
+#endif
     gpointer_unset(&x->x_gp);
 }
 

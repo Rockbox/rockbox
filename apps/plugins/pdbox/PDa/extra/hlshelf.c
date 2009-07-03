@@ -1,6 +1,12 @@
 /* (C) Guenter Geiger <geiger@epy.co.at> */
 
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "math.h"
+#else /* ROCKBOX */
 #include <m_pd.h>
 #include <math.h>
 
@@ -8,6 +14,7 @@
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
+#endif /* ROCKBOX */
 
 /* ------------------------ hlshelf ----------------------------- */
 
@@ -42,6 +49,11 @@ int hlshelf_check_stability(t_float fb1,
 			    t_float ff2,
 			    t_float ff3)
 {
+#ifdef ROCKBOX
+    (void) ff1;
+    (void) ff2;
+    (void) ff3;
+#endif
     float discriminant = fb1 * fb1 + 4 * fb2;
 
     if (discriminant < 0) /* imaginary roots -- resonant filter */
@@ -176,6 +188,10 @@ void hlshelf_float(t_hlshelf *x,t_floatarg f)
 
 static void *hlshelf_new(t_symbol* s,t_int argc, t_atom* at)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argc;
+#endif
     t_hlshelf *x = (t_hlshelf *)pd_new(hlshelf_class);
     t_float k0 = atom_getfloat(at);
     t_float k1 = atom_getfloat(at+1);

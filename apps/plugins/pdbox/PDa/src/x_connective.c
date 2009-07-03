@@ -4,10 +4,18 @@
 
 /* connective objects */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 #include "m_pd.h"
 
+#ifndef ROCKBOX
 #include <string.h>
 #include <stdio.h>
+#endif
+
 extern t_pd *newest;
 
 /* -------------------------- int ------------------------------ */
@@ -62,6 +70,9 @@ typedef struct _pdfloat
 
 static void *pdfloat_new(t_pd *dummy, t_float f)
 {
+#ifdef ROCKBOX
+    (void) dummy;
+#endif
     t_pdfloat *x = (t_pdfloat *)pd_new(pdfloat_class);
     x->x_f = f;
     outlet_new(&x->x_obj, &s_float);
@@ -105,6 +116,9 @@ typedef struct _pdsymbol
 
 static void *pdsymbol_new(t_pd *dummy, t_symbol *s)
 {
+#ifdef ROCKBOX
+    (void) dummy;
+#endif
     t_pdsymbol *x = (t_pdsymbol *)pd_new(pdsymbol_class);
     x->x_s = s;
     outlet_new(&x->x_obj, &s_symbol);
@@ -125,6 +139,10 @@ static void pdsymbol_symbol(t_pdsymbol *x, t_symbol *s)
 
 static void pdsymbol_anything(t_pdsymbol *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) ac;
+    (void) av;
+#endif
     outlet_symbol(x->x_obj.ob_outlet, x->x_s = s);
 }
 
@@ -147,6 +165,9 @@ typedef struct _bang
 
 static void *bang_new(t_pd *dummy)
 {
+#ifdef ROCKBOX
+    (void) dummy;
+#endif
     t_bang *x = (t_bang *)pd_new(bang_class);
     outlet_new(&x->x_obj, &s_bang);
     newest = &x->x_obj.ob_pd;
@@ -155,6 +176,9 @@ static void *bang_new(t_pd *dummy)
 
 static void *bang_new2(t_bang f)
 {
+#ifdef ROCKBOX
+    (void) f;
+#endif
     return (bang_new(0));
 }
 
@@ -383,6 +407,9 @@ static void sel2_free(t_sel2 *x)
 
 static void *select_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_atom a;
     if (argc == 0)
     {
@@ -484,6 +511,9 @@ static void route_anything(t_route *x, t_symbol *sel, int argc, t_atom *argv)
 
 static void route_list(t_route *x, t_symbol *sel, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) sel;
+#endif
     t_routeelement *e;
     int nelement;
     if (x->x_type == A_FLOAT)
@@ -562,6 +592,9 @@ static void route_free(t_route *x)
 
 static void *route_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     int n;
     t_routeelement *e;
     t_route *x = (t_route *)pd_new(route_class);
@@ -610,6 +643,9 @@ typedef struct _pack
 
 static void *pack_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_pack *x = (t_pack *)pd_new(pack_class);
     t_atom defarg[2], *ap, *vec, *vp;
     t_gpointer *gp;
@@ -737,6 +773,9 @@ static void pack_symbol(t_pack *x, t_symbol *s)
 
 static void pack_list(t_pack *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     obj_list(&x->x_obj, 0, ac, av);
 }
 
@@ -793,6 +832,9 @@ typedef struct _unpack
 
 static void *unpack_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_unpack *x = (t_unpack *)pd_new(unpack_class);
     t_atom defarg[2], *ap;
     t_unpackout *u;
@@ -841,6 +883,9 @@ static void *unpack_new(t_symbol *s, int argc, t_atom *argv)
 
 static void unpack_list(t_unpack *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_atom *ap;
     t_unpackout *u;
     int i;
@@ -907,6 +952,9 @@ typedef struct _trigger
 
 static void *trigger_new(t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_trigger *x = (t_trigger *)pd_new(trigger_class);
     t_atom defarg[2], *ap;
     t_triggerout *u;
@@ -953,6 +1001,9 @@ static void *trigger_new(t_symbol *s, int argc, t_atom *argv)
 
 static void trigger_list(t_trigger *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_triggerout *u;
     int i;
     t_atom at;
@@ -1204,14 +1255,22 @@ static void *makefilename_new(t_symbol *s)
 static void makefilename_float(t_makefilename *x, t_floatarg f)
 {
     char buf[MAXPDSTRING];
+#ifdef ROCKBOX
+    snprintf(buf, sizeof(buf), x->x_format->s_name, (int)f);
+#else
     sprintf(buf, x->x_format->s_name, (int)f);
+#endif
     outlet_symbol(x->x_obj.ob_outlet, gensym(buf));
 }
 
 static void makefilename_symbol(t_makefilename *x, t_symbol *s)
 {
     char buf[MAXPDSTRING];
+#ifdef ROCKBOX
+    snprintf(buf, sizeof(buf), x->x_format->s_name, s->s_name);
+#else
     sprintf(buf, x->x_format->s_name, s->s_name);
+#endif
     outlet_symbol(x->x_obj.ob_outlet, gensym(buf));
 }
 

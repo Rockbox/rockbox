@@ -2,7 +2,14 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 #include "m_pd.h"
+
+#ifndef ROCKBOX
 #include <string.h>
 #ifdef UNIX
 #include <unistd.h>
@@ -10,6 +17,7 @@
 #ifdef MSW
 #include <io.h>
 #endif
+#endif /* ROCKBOX */
 
 typedef struct _qlist
 {
@@ -32,7 +40,9 @@ static t_class *qlist_class;
 
 static void *qlist_new( void)
 {
+#ifndef ROCKBOX
     t_symbol *name, *filename = 0;
+#endif
     t_qlist *x = (t_qlist *)pd_new(qlist_class);
     x->x_binbuf = binbuf_new();
     x->x_clock = clock_new(x, (t_method)qlist_tick);
@@ -151,6 +161,9 @@ static void qlist_tick(t_qlist *x)
 
 static void qlist_add(t_qlist *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_atom a;
     SETSEMI(&a);
     binbuf_add(x->x_binbuf, ac, av);
@@ -159,6 +172,9 @@ static void qlist_add(t_qlist *x, t_symbol *s, int ac, t_atom *av)
 
 static void qlist_add2(t_qlist *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     binbuf_add(x->x_binbuf, ac, av);
 }
 
@@ -239,7 +255,9 @@ typedef t_qlist t_textfile;
 
 static void *textfile_new( void)
 {
+#ifndef ROCKBOX
     t_symbol *name, *filename = 0;
+#endif
     t_textfile *x = (t_textfile *)pd_new(textfile_class);
     x->x_binbuf = binbuf_new();
     outlet_new(&x->x_ob, &s_list);
@@ -257,7 +275,11 @@ static void *textfile_new( void)
 static void textfile_bang(t_textfile *x)
 {
     int argc = binbuf_getnatom(x->x_binbuf),
+#ifdef ROCKBOX
+        onset = x->x_onset, onset2;
+#else
     	count, onset = x->x_onset, onset2;
+#endif
     t_atom *argv = binbuf_getvec(x->x_binbuf);
     t_atom *ap = argv + onset, *ap2;
     while (onset < argc &&

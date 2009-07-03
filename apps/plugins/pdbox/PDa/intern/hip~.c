@@ -76,6 +76,9 @@ static void sighip_dsp(t_sighip *x, t_signal **sp)
 
 static void sighip_clear(t_sighip *x, t_floatarg q)
 {
+#ifdef ROCKBOX
+    (void) q;
+#endif
     x->x_cspace.c_x = 0;
 }
 

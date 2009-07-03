@@ -1,3 +1,8 @@
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#endif
+
 #include <m_pd.h>
 #include <m_fixed.h>
 
@@ -19,7 +24,11 @@ static void *ftom_tilde_new(void)
 
 static t_int *ftom_tilde_perform(t_int *w)
 {
+#ifdef ROCKBOX
+    t_sample *in = *(t_sample **)(w+1), *out = (t_sample*)*(t_float **)(w+2);
+#else
     t_sample *in = *(t_sample **)(w+1), *out = *(t_float **)(w+2);
+#endif
     t_int n = *(t_int *)(w+3);
     for (; n--; *in++, out++)
     {
@@ -31,6 +40,9 @@ static t_int *ftom_tilde_perform(t_int *w)
 
 static void ftom_tilde_dsp(t_ftom_tilde *x, t_signal **sp)
 {
+#ifdef ROCKBOX
+    (void) x;
+#endif
     post("warning: %s not usable yet",__FUNCTION__);
     dsp_add(ftom_tilde_perform, 3, sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }

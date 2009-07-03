@@ -42,6 +42,10 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 
   */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#else /* ROCKBOX */
 #ifdef WIN32
 	#include <stdlib.h>
 	#include <string.h>
@@ -52,6 +56,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 #ifdef UNIX
   #include <stdio.h>
 #endif
+#endif /* ROCKBOX */
 
 /* structure definition of your object */
 
@@ -114,6 +119,9 @@ static void StrCopyUntilSlash(char *target, const char *source);
 // free
 static void OSCroute_free(t_OSCroute *x)
 {
+#ifdef ROCKBOX
+  (void) x;
+#endif
   //    freebytes(x->x_vec, x->x_nelement * sizeof(*x->x_vec));
 }
 
@@ -154,7 +162,9 @@ void OSCroute_setup(void) {
 
 void *OSCroute_new(t_symbol *s, int argc, t_atom *argv)
 {
-
+#ifdef ROCKBOX
+  (void) s;
+#endif
   t_OSCroute *x = (t_OSCroute *)pd_new(OSCroute_class);   // get memory for a new object & initialize
 
   int i;	//{{raf}} n not used
@@ -236,6 +246,9 @@ void *OSCroute_new(t_symbol *s, int argc, t_atom *argv)
 
 
 void OSCroute_version (t_OSCroute *x) {
+#ifdef ROCKBOX
+  (void) x;
+#endif
   // EnterCallback();
   post("OSCroute Version " OSC_ROUTE_VERSION
        ", by Matt Wright. pd jdl, win32: raf.\nOSCroute Compiled " __TIME__ " " __DATE__);
@@ -248,15 +261,27 @@ void OSCroute_version (t_OSCroute *x) {
 
 void OSCroute_assist (t_OSCroute *x, void *box, long msg, long arg, 
 		      char *dstString) {
+#ifdef ROCKBOX
+  (void) box;
+#endif
   // EnterCallback();
   
   if (msg==ASSIST_INLET) {
+#ifdef ROCKBOX
+    strcpy(dstString, "Incoming OSC messages");
+#else
     sprintf(dstString, "Incoming OSC messages");
+#endif
   } else if (msg==ASSIST_OUTLET) {
     if (arg < 0 || arg >= x->x_num) {
       post("* OSCroute_assist: No outlet corresponds to arg %ld!", arg);
     } else {
+#ifdef ROCKBOX
+      strcpy(dstString, "subaddress + args for prefix ");
+      strcat(dstString, x->x_prefixes[arg]);
+#else
       sprintf(dstString, "subaddress + args for prefix %s", x->x_prefixes[arg]);
+#endif
     }
   } else {
     post("* OSCroute_assist: unrecognized message %ld", msg);
@@ -266,6 +291,9 @@ void OSCroute_assist (t_OSCroute *x, void *box, long msg, long arg,
 }
 
 void OSCroute_list(t_OSCroute *x, t_symbol *s, int argc, t_atom *argv) {
+#ifdef ROCKBOX
+  (void) s;
+#endif
   // EnterCallback();
   if (argc > 0 && argv[0].a_type == A_SYMBOL) {
     /* Ignore the fact that this is a "list" */

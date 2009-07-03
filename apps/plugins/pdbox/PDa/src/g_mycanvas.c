@@ -6,6 +6,13 @@
 /* thanks to Miller Puckette, Guenther Geiger and Krzystof Czaja */
 
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#include "g_all_guis.h"
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -21,6 +28,7 @@
 #else
 #include <unistd.h>
 #endif
+#endif /* ROCKBOX */
 
 /* ---------- cnv  my gui-canvas for a window ---------------- */
 
@@ -31,6 +39,10 @@ static t_class *my_canvas_class;
 
 void my_canvas_draw_new(t_my_canvas *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     t_canvas *canvas=glist_getcanvas(glist);
@@ -48,10 +60,15 @@ void my_canvas_draw_new(t_my_canvas *x, t_glist *glist)
 	     canvas, xpos+x->x_gui.x_ldx, ypos+x->x_gui.x_ldy,
 	     strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"",
 	     x->x_gui.x_font, x->x_gui.x_fontsize, x->x_gui.x_lcol, x);
+#endif /* ROCKBOX */
 }
 
 void my_canvas_draw_move(t_my_canvas *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     t_canvas *canvas=glist_getcanvas(glist);
@@ -65,19 +82,29 @@ void my_canvas_draw_move(t_my_canvas *x, t_glist *glist)
     sys_vgui(".x%x.c coords %xLABEL %d %d\n",
 	     canvas, x, xpos+x->x_gui.x_ldx,
 	     ypos+x->x_gui.x_ldy);
+#endif /* ROCKBOX */
 }
 
 void my_canvas_draw_erase(t_my_canvas* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
     sys_vgui(".x%x.c delete %xRECT\n", canvas, x);
     sys_vgui(".x%x.c delete %xLABEL\n", canvas, x);
+#endif /* ROCKBOX */
 }
 
 void my_canvas_draw_config(t_my_canvas* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c itemconfigure %xRECT -fill #%6.6x -outline #%6.6x\n", canvas, x,
@@ -87,10 +114,15 @@ void my_canvas_draw_config(t_my_canvas* x, t_glist* glist)
     sys_vgui(".x%x.c itemconfigure %xLABEL -font {%s %d bold} -fill #%6.6x -text {%s} \n",
 	     canvas, x, x->x_gui.x_font, x->x_gui.x_fontsize, x->x_gui.x_lcol,
 	     strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"");
+#endif /* ROCKBOX */
 }
 
 void my_canvas_draw_select(t_my_canvas* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     if(x->x_gui.x_fsf.x_selected)
@@ -101,6 +133,7 @@ void my_canvas_draw_select(t_my_canvas* x, t_glist* glist)
     {
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, x->x_gui.x_bcol);
     }
+#endif /* ROCKBOX */
 }
 
 void my_canvas_draw(t_my_canvas *x, t_glist *glist, int mode)
@@ -147,6 +180,10 @@ static void my_canvas_save(t_gobj *z, t_binbuf *b)
 
 static void my_canvas_properties(t_gobj *z, t_glist *owner)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) owner;
+#else /* ROCKBOX */
     t_my_canvas *x = (t_my_canvas *)z;
     char buf[800];
     t_symbol *srl[3];
@@ -168,6 +205,7 @@ static void my_canvas_properties(t_gobj *z, t_glist *owner)
 	    x->x_gui.x_fsf.x_font_style, x->x_gui.x_fontsize,
 	    0xffffff & x->x_gui.x_bcol, -1/*no frontcolor*/, 0xffffff & x->x_gui.x_lcol);
     gfxstub_new(&x->x_gui.x_obj.ob_pd, x, buf);
+#endif /* ROCKBOX */
 }
 
 static void my_canvas_get_pos(t_my_canvas *x)
@@ -182,11 +220,19 @@ static void my_canvas_get_pos(t_my_canvas *x)
 
 static void my_canvas_dialog(t_my_canvas *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifndef ROCKBOX
     t_symbol *srl[3];
+#endif
     int a = (int)atom_getintarg(0, argc, argv);
     int w = (int)atom_getintarg(2, argc, argv);
     int h = (int)atom_getintarg(3, argc, argv);
+#ifndef ROCKBOX
     int sr_flags = iemgui_dialog(&x->x_gui, srl, argc, argv);
+#endif
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
 
     x->x_gui.x_isa.x_loadinit = 0;
     if(a < 1)
@@ -207,6 +253,10 @@ static void my_canvas_size(t_my_canvas *x, t_symbol *s, int ac, t_atom *av)
 {
     int i = (int)atom_getintarg(0, ac, av);
 
+#ifdef ROCKBOX
+    (void) s;
+#endif
+
     if(i < 1)
 	i = 1;
     x->x_gui.x_w = i;
@@ -223,6 +273,10 @@ static void my_canvas_pos(t_my_canvas *x, t_symbol *s, int ac, t_atom *av)
 static void my_canvas_vis_size(t_my_canvas *x, t_symbol *s, int ac, t_atom *av)
 {
     int i;
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
 
     i = (int)atom_getintarg(0, ac, av);
     if(i < 1)
@@ -262,9 +316,19 @@ static void *my_canvas_new(t_symbol *s, int argc, t_atom *argv)
     t_my_canvas *x = (t_my_canvas *)pd_new(my_canvas_class);
     int bflcol[]={-233017, -1, -66577};
     int a=IEM_GUI_DEFAULTSIZE, w=100, h=60;
+#ifdef ROCKBOX
+    int ldx=20, ldy=12, i=0;
+#else
     int ldx=20, ldy=12, f=2, i=0;
+#endif
     int fs=14;
+#ifndef ROCKBOX
     char str[144];
+#endif
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
 
     iem_inttosymargs(&x->x_gui.x_isa, 0);
     iem_inttofstyle(&x->x_gui.x_fsf, 0);
@@ -350,7 +414,9 @@ static void my_canvas_ff(t_my_canvas *x)
 {
     if(x->x_gui.x_fsf.x_rcv_able)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
+#ifndef ROCKBOX
     gfxstub_deleteforkey(x);
+#endif
 }
 
 void g_mycanvas_setup(void)

@@ -2,6 +2,10 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#else /* ROCKBOX */
 #ifdef DL_OPEN
 #include <dlfcn.h>
 #endif
@@ -17,12 +21,14 @@
 #include <mach-o/dyld.h> 
 #endif
 #include <string.h>
+#include <stdio.h>
+#endif /* ROCKBOX */
 #include "m_pd.h"
 #include "s_stuff.h"
-#include <stdio.h>
 
 typedef void (*t_xxx)(void);
 
+#ifndef ROCKBOX
 static char sys_dllextent[] = 
 #ifdef __FreeBSD__
     ".pd_freebsd";
@@ -43,12 +49,22 @@ static char sys_dllextent[] =
 #ifdef MSW
     ".dll";
 #endif
+#endif /* ROCKBOX */
 
 void class_set_extern_dir(t_symbol *s);
 
 #ifdef STATIC
 int sys_load_lib(char *dirname, char *classname)
+#ifdef ROCKBOX
+{
+    (void) dirname;
+    (void) classname;
+
+    return 0;
+}
+#else /* ROCKBOX */
 { return 0;}
+#endif /* ROCKBOX */
 #else
 int sys_load_lib(char *dirname, char *classname)
 {

@@ -6,15 +6,21 @@
 /* the methods for calling the gui-objects from menu are implemented */
 /* all changes are labeled with      iemlib      */
 
-#include <stdlib.h>
 #include "m_pd.h"
 #include "m_imp.h"
 #include "s_stuff.h"
 #include "t_tk.h"
 #include "g_canvas.h"
+
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#else /* ROCKBOX */
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#endif /* ROCKBOX */
 
 static t_class *text_class;
 static t_class *message_class;
@@ -39,6 +45,11 @@ void glist_text(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
     t_text *x = (t_text *)pd_new(text_class);
     t_atom at;
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
+
     x->te_width = 0;	    	    	    	/* don't know it yet. */
     x->te_type = T_TEXT;
     x->te_binbuf = binbuf_new();
@@ -138,7 +149,12 @@ static void canvas_objtext(t_glist *gl, int xpix, int ypix, int selected,
 
 void canvas_obj(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#else
     t_text *x;
+#endif
+
     if (argc >= 2)
     {
     	t_binbuf *b = binbuf_new();
@@ -178,56 +194,111 @@ void canvas_iemguis(t_glist *gl, t_symbol *guiobjname)
 
 void canvas_bng(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argc;
+    (void) argv;
+#endif
     canvas_iemguis(gl, gensym("bng"));
 }
 
 void canvas_toggle(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argc;
+    (void) argv;
+#endif
     canvas_iemguis(gl, gensym("tgl"));
 }
 
 void canvas_vslider(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argc;
+    (void) argv;
+#endif
     canvas_iemguis(gl, gensym("vsl"));
 }
 
 void canvas_hslider(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argc;
+    (void) argv;
+#endif
     canvas_iemguis(gl, gensym("hsl"));
 }
 
 void canvas_hdial(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argc;
+    (void) argv;
+#endif
     canvas_iemguis(gl, gensym("hdl"));
 }
 
 void canvas_vdial(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argc;
+    (void) argv;
+#endif
     canvas_iemguis(gl, gensym("vdl"));
 }
 
 void canvas_hradio(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argc;
+    (void) argv;
+#endif
     canvas_iemguis(gl, gensym("hradio"));
 }
 
 void canvas_vradio(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argc;
+    (void) argv;
+#endif
     canvas_iemguis(gl, gensym("vradio"));
 }
 
 void canvas_vumeter(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argc;
+    (void) argv;
+#endif
     canvas_iemguis(gl, gensym("vu"));
 }
 
 void canvas_mycnv(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argc;
+    (void) argv;
+#endif
     canvas_iemguis(gl, gensym("cnv"));
 }
 
 void canvas_numbox(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) argc;
+    (void) argv;
+#endif
     canvas_iemguis(gl, gensym("nbx"));
 }
 
@@ -310,11 +381,17 @@ static void message_symbol(t_message *x, t_symbol *s)
 
 static void message_list(t_message *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     binbuf_eval(x->m_text.te_binbuf, &x->m_messresponder.mr_pd, argc, argv);
 }
 
 static void message_set(t_message *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     binbuf_clear(x->m_text.te_binbuf);
     binbuf_add(x->m_text.te_binbuf, argc, argv);
     glist_retext(x->m_glist, &x->m_text);
@@ -322,12 +399,18 @@ static void message_set(t_message *x, t_symbol *s, int argc, t_atom *argv)
 
 static void message_add2(t_message *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     binbuf_add(x->m_text.te_binbuf, argc, argv);
     glist_retext(x->m_glist, &x->m_text);
 }
 
 static void message_add(t_message *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     binbuf_add(x->m_text.te_binbuf, argc, argv);
     binbuf_addsemi(x->m_text.te_binbuf);
     glist_retext(x->m_glist, &x->m_text);
@@ -337,12 +420,21 @@ static void message_click(t_message *x,
     t_floatarg xpos, t_floatarg ypos, t_floatarg shift,
     	t_floatarg ctrl, t_floatarg alt)
 {
+#ifdef ROCKBOX
+    (void) xpos;
+    (void) ypos;
+    (void) shift;
+    (void) ctrl;
+    (void) alt;
+#endif
     message_float(x, 0);
     if (glist_isvisible(x->m_glist))
     {
+#ifndef ROCKBOX
     	t_rtext *y = glist_findrtext(x->m_glist, &x->m_text);
     	sys_vgui(".x%x.c itemconfigure %sR -width 5\n", 
 	    glist_getcanvas(x->m_glist), rtext_gettag(y));
+#endif
     	clock_delay(x->m_clock, 120);
     }
 }
@@ -351,9 +443,11 @@ static void message_tick(t_message *x)
 {
     if (glist_isvisible(x->m_glist))
     {
+#ifndef ROCKBOX
     	t_rtext *y = glist_findrtext(x->m_glist, &x->m_text);
     	sys_vgui(".x%x.c itemconfigure %sR -width 1\n",
 	    glist_getcanvas(x->m_glist), rtext_gettag(y));
+#endif
     }
 }
 
@@ -364,6 +458,9 @@ static void message_free(t_message *x)
 
 void canvas_msg(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_message *x = (t_message *)pd_new(message_class);
     x->m_messresponder.mr_pd = messresponder_class;
     x->m_messresponder.mr_outlet = outlet_new(&x->m_text, &s_float);
@@ -467,6 +564,9 @@ static void gatom_set(t_gatom *x, t_symbol *s, int argc, t_atom *argv)
 {
     t_atom oldatom = x->a_atom;
     int senditup = 0;
+#ifdef ROCKBOX
+    (void) s;
+#endif
     if (!argc) return;
     if (x->a_atom.a_type == A_FLOAT)
     	x->a_atom.a_w.w_float = atom_getfloat(argv),
@@ -538,6 +638,9 @@ static void gatom_symbol(t_gatom *x, t_symbol *s)
 
 static void gatom_motion(void *z, t_floatarg dx, t_floatarg dy)
 {
+#ifdef ROCKBOX
+    (void) dx;
+#endif
     t_gatom *x = (t_gatom *)z;
     if (dy == 0) return;
     if (x->a_atom.a_type == A_FLOAT)
@@ -597,7 +700,7 @@ static void gatom_key(void *z, t_floatarg f)
     {
     	    /* for numbers, only let reasonable characters through */
     	if ((x->a_atom.a_type == A_SYMBOL) ||
-	    (c >= '0' && c <= '9' || c == '.' || c == '-'
+	    ((c >= '0' && c <= '9') || c == '.' || c == '-'
 	    	|| c == 'e' || c == 'E'))
 	{
     	    x->a_buf[len] = c;
@@ -608,7 +711,11 @@ static void gatom_key(void *z, t_floatarg f)
     return;
 redraw:
     	/* LATER figure out how to avoid creating all these symbols! */
+#ifdef ROCKBOX
+    snprintf(sbuf, sizeof(sbuf)-1, "%s...", x->a_buf);
+#else /* ROCKBOX */
     sprintf(sbuf, "%s...", x->a_buf);
+#endif
     SETSYMBOL(&at, gensym(sbuf));
     binbuf_clear(x->a_text.te_binbuf);
     binbuf_add(x->a_text.te_binbuf, 1, &at);
@@ -619,6 +726,9 @@ static void gatom_click(t_gatom *x,
     t_floatarg xpos, t_floatarg ypos, t_floatarg shift, t_floatarg ctrl,
     t_floatarg alt)
 {
+#ifdef ROCKBOX
+    (void) ctrl;
+#endif
     if (x->a_text.te_width == 1)
     {
     	if (x->a_atom.a_type == A_FLOAT)
@@ -654,6 +764,10 @@ static void gatom_param(t_gatom *x, t_symbol *sel, int argc, t_atom *argv)
     t_float wherelabel = atom_getfloatarg(4, argc, argv);
     t_symbol *symfrom = gatom_unescapit(atom_getsymbolarg(5, argc, argv));
     t_symbol *symto = gatom_unescapit(atom_getsymbolarg(6, argc, argv));
+
+#ifdef ROCKBOX
+    (void) sel;
+#endif
 
     gobj_vis(&x->a_text.te_g, x->a_glist, 0);
     if (!*symfrom->s_name && *x->a_symfrom->s_name)
@@ -708,7 +822,11 @@ static void gatom_getwherelabel(t_gatom *x, t_glist *glist, int *xp, int *yp)
     {
     	*xp = x1 - 3 -
 	    strlen(canvas_realizedollar(x->a_glist, x->a_label)->s_name) *
+#ifdef ROCKBOX
+            8;
+#else
 	    sys_fontwidth(glist_getfont(glist));
+#endif
 	*yp = y1 + 2;
     }
     else if (x->a_wherelabel == ATOM_LABELRIGHT)
@@ -719,7 +837,11 @@ static void gatom_getwherelabel(t_gatom *x, t_glist *glist, int *xp, int *yp)
     else if (x->a_wherelabel == ATOM_LABELUP)
     {
     	*xp = x1 - 1;
+#ifdef ROCKBOX
+        *yp = y1 - 1 - 10;
+#else
 	*yp = y1 - 1 - sys_fontheight(glist_getfont(glist));;
+#endif
     }
     else
     {
@@ -731,10 +853,14 @@ static void gatom_getwherelabel(t_gatom *x, t_glist *glist, int *xp, int *yp)
 static void gatom_displace(t_gobj *z, t_glist *glist,
     int dx, int dy)
 {
+#ifndef ROCKBOX
     t_gatom *x = (t_gatom*)z;
+#endif
     text_displace(z, glist, dx, dy);
+#ifndef ROCKBOX
     sys_vgui(".x%x.c move %x.l %d %d\n", glist_getcanvas(glist), 
     	x, dx, dy);
+#endif
 }
 
 static void gatom_vis(t_gobj *z, t_glist *glist, int vis)
@@ -747,14 +873,18 @@ static void gatom_vis(t_gobj *z, t_glist *glist, int vis)
 	{
 	    int x1, y1;
 	    gatom_getwherelabel(x, glist, &x1, &y1);
+#ifndef ROCKBOX
     	    sys_vgui("pdtk_text_new .x%x.c %x.l %f %f {%s} %d %s\n",
 		glist_getcanvas(glist), x,
 		(double)x1, (double)y1,
 		canvas_realizedollar(x->a_glist, x->a_label)->s_name,
 		sys_hostfontsize(glist_getfont(glist)),
 		"black");
+#endif
 	}
+#ifndef ROCKBOX
 	else sys_vgui(".x%x.c delete %x.l\n", glist_getcanvas(glist), x);
+#endif
     }
 }
 
@@ -763,6 +893,11 @@ void canvas_atom(t_glist *gl, t_atomtype type,
 {
     t_gatom *x = (t_gatom *)pd_new(gatom_class);
     t_atom at;
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
+
     x->a_text.te_width = 0;	    	    	   /* don't know it yet. */
     x->a_text.te_type = T_ATOM;
     x->a_text.te_binbuf = binbuf_new();
@@ -850,11 +985,17 @@ static void gatom_free(t_gatom *x)
     if (*x->a_symfrom->s_name)
     	pd_unbind(&x->a_text.te_pd,
 	    canvas_realizedollar(x->a_glist, x->a_symfrom));
+#ifndef ROCKBOX
     gfxstub_deleteforkey(x);
+#endif
 }
 
 static void gatom_properties(t_gobj *z, t_glist *owner)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) owner;
+#else /* ROCKBOX */
     t_gatom *x = (t_gatom *)z;
     char buf[200];
     sprintf(buf, "pdtk_gatom_dialog %%s %d %g %g %d %s %s %s\n",
@@ -863,6 +1004,7 @@ static void gatom_properties(t_gobj *z, t_glist *owner)
 	    	gatom_escapit(x->a_symfrom)->s_name,
 		    gatom_escapit(x->a_symto)->s_name);
     gfxstub_new(&x->a_text.te_pd, x, buf);
+#endif /* ROCKBOX */
 }
 
 
@@ -880,8 +1022,12 @@ static void text_getrect(t_gobj *z, t_glist *glist,
     
     if (x->te_type == T_ATOM && x->te_width > 0)
     {
+#ifdef ROCKBOX
+        int fontwidth = 8, fontheight = 10;
+#else
     	int font = glist_getfont(glist);
 	int fontwidth = sys_fontwidth(font), fontheight = sys_fontheight(font);
+#endif
 	width = (x->te_width > 0 ? x->te_width : 6) * fontwidth + 2;
 	height = fontheight + 1; /* borrowed from TMARGIN, etc, in g_rtext.c */
     }
@@ -933,8 +1079,13 @@ static void text_select(t_gobj *z, t_glist *glist, int state)
     t_rtext *y = glist_findrtext(glist, x);
     rtext_select(y, state);
     if (glist_isvisible(glist) && text_shouldvis(x, glist))
+#ifdef ROCKBOX
+    {
+    }
+#else /* ROCKBOX */
 	sys_vgui(".x%x.c itemconfigure %sR -fill %s\n", glist, 
     	    rtext_gettag(y), (state? "blue" : "black"));
+#endif /* ROCKBOX */
 }
 
 static void text_activate(t_gobj *z, t_glist *glist, int state)
@@ -988,6 +1139,10 @@ static void text_vis(t_gobj *z, t_glist *glist, int vis)
 static int text_click(t_gobj *z, struct _glist *glist,
     int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
+#ifdef ROCKBOX
+    (void) glist;
+    (void) dbl;
+#endif
     t_text *x = (t_text *)z;
     if (x->te_type == T_OBJECT)
     {
@@ -1111,9 +1266,20 @@ void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     char *tag, int x1, int y1, int x2, int y2)
 {
     int n = obj_noutlets(ob), nplus = (n == 1 ? 1 : n-1), i;
+#ifdef ROCKBOX
+    (void) glist;
+    (void) firsttime;
+    (void) tag;
+    (void) x1;
+    (void) y1;
+    (void) x2;
+    (void) y2;
+#else /* ROCKBOX */
     int width = x2 - x1;
+#endif /* ROCKBOX */
     for (i = 0; i < n; i++)
     {
+#ifndef ROCKBOX
     	int onset = x1 + (width - IOWIDTH) * i / nplus;
     	if (firsttime)
     	    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %so%d\n",
@@ -1126,11 +1292,13 @@ void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     	    	glist_getcanvas(glist), tag, i,
     	    	onset, y2 - 1,
     	    	onset + IOWIDTH, y2);
+#endif /* ROCKBOX */
     }
     n = obj_ninlets(ob);
     nplus = (n == 1 ? 1 : n-1);
     for (i = 0; i < n; i++)
     {
+#ifndef ROCKBOX
     	int onset = x1 + (width - IOWIDTH) * i / nplus;
     	if (firsttime)
     	    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %si%d\n",
@@ -1143,6 +1311,7 @@ void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     	    	glist_getcanvas(glist), tag, i,
     	    	onset, y1,
     	    	onset + IOWIDTH, y1 + EXTRAPIX);
+#endif /* ROCKBOX */
     }
 }
 
@@ -1151,11 +1320,18 @@ void text_drawborder(t_text *x, t_glist *glist,
 {
     t_object *ob;
     int x1, y1, x2, y2, width, height;
+
+#ifdef ROCKBOX
+    (void) width2;
+    (void) height2;
+#endif
+
     text_getrect(&x->te_g, glist, &x1, &y1, &x2, &y2);
     width = x2 - x1;
     height = y2 - y1;
     if (x->te_type == T_OBJECT)
     {
+#ifndef ROCKBOX
 	if (firsttime)
     	    sys_vgui(".x%x.c create line\
  %d %d %d %d %d %d %d %d %d %d -tags %sR\n",
@@ -1166,9 +1342,11 @@ void text_drawborder(t_text *x, t_glist *glist,
  %d %d %d %d %d %d %d %d %d %d\n",
 		glist_getcanvas(glist), tag,
 		    x1, y1,  x2, y1,  x2, y2,  x1, y2,  x1, y1);
+#endif
     }
     else if (x->te_type == T_MESSAGE)
     {
+#ifndef ROCKBOX
 	if (firsttime)
     	    sys_vgui(".x%x.c create line\
  %d %d %d %d %d %d %d %d %d %d %d %d %d %d -tags %sR\n",
@@ -1182,9 +1360,11 @@ void text_drawborder(t_text *x, t_glist *glist,
 		glist_getcanvas(glist), tag,
 		x1, y1,  x2+4, y1,  x2, y1+4,  x2, y2-4,  x2+4, y2,
 		x1, y2,  x1, y1);
+#endif
     }
     else if (x->te_type == T_ATOM)
     {
+#ifndef ROCKBOX
 	if (firsttime)
     	    sys_vgui(".x%x.c create line\
  %d %d %d %d %d %d %d %d %d %d %d %d -tags %sR\n",
@@ -1196,31 +1376,46 @@ void text_drawborder(t_text *x, t_glist *glist,
  %d %d %d %d %d %d %d %d %d %d %d %d\n",
 		glist_getcanvas(glist), tag,
 		x1, y1,  x2-4, y1,  x2, y1+4,  x2, y2,  x1, y2,  x1, y1);
+#endif
     }
     	/* draw inlets/outlets */
     
-    if (ob = pd_checkobject(&x->te_pd))
+    if ((ob = pd_checkobject(&x->te_pd)))
     	glist_drawiofor(glist, ob, firsttime, tag, x1, y1, x2, y2);
 }
 
 void glist_eraseiofor(t_glist *glist, t_object *ob, char *tag)
 {
     int i, n;
+#ifdef ROCKBOX
+    (void) glist;
+    (void) tag;
+#endif
     n = obj_noutlets(ob);
     for (i = 0; i < n; i++)
+#ifdef ROCKBOX
+        ;
+#else /* ROCKBOX */
     	sys_vgui(".x%x.c delete %so%d\n",
     	    glist_getcanvas(glist), tag, i);
+#endif /* ROCKBOX */
     n = obj_ninlets(ob);
     for (i = 0; i < n; i++)
+#ifdef ROCKBOX
+        ;
+#else /* ROCKBOX */
     	sys_vgui(".x%x.c delete %si%d\n",
     	    glist_getcanvas(glist), tag, i);
+#endif /* ROCKBOX */
 }
 
 void text_eraseborder(t_text *x, t_glist *glist, char *tag)
 {
     if (x->te_type == T_TEXT) return;
+#ifndef ROCKBOX
     sys_vgui(".x%x.c delete %sR\n",
     	glist_getcanvas(glist), tag);
+#endif
     glist_eraseiofor(glist, x, tag);
 }
 

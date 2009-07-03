@@ -5,7 +5,13 @@
 /* g_7_guis.c written by Thomas Musil (c) IEM KUG Graz Austria 2000-2001 */
 /* thanks to Miller Puckette, Guenther Geiger and Krzystof Czaja */
 
-
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#include "g_all_guis.h"
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -21,6 +27,7 @@
 #else
 #include <unistd.h>
 #endif
+#endif /* ROCKBOX */
 
 
 /* --------------- bng     gui-bang ------------------------- */
@@ -33,15 +40,24 @@ static t_class *bng_class;
 
 void bng_draw_update(t_bng *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     if(glist_isvisible(glist))
     {
 	sys_vgui(".x%x.c itemconfigure %xBUT -fill #%6.6x\n", glist_getcanvas(glist), x,
 		 x->x_flashed?x->x_gui.x_fcol:x->x_gui.x_bcol);
     }
+#endif /* ROCKBOX */
 }
 
 void bng_draw_new(t_bng *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     t_canvas *canvas=glist_getcanvas(glist);
@@ -69,10 +85,15 @@ void bng_draw_new(t_bng *x, t_glist *glist)
         sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
 	     canvas, xpos, ypos,
 	     xpos + IOWIDTH, ypos+1, x, 0);
+#endif /* ROCKBOX */
 }
 
 void bng_draw_move(t_bng *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     t_canvas *canvas=glist_getcanvas(glist);
@@ -96,10 +117,15 @@ void bng_draw_move(t_bng *x, t_glist *glist)
         sys_vgui(".x%x.c coords %xIN%d %d %d %d %d\n",
 	     canvas, x, 0, xpos, ypos,
 	     xpos + IOWIDTH, ypos+1);
+#endif /* ROCKBOX */
 }
 
 void bng_draw_erase(t_bng* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
@@ -109,10 +135,15 @@ void bng_draw_erase(t_bng* x, t_glist* glist)
         sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 0);
     if(!x->x_gui.x_fsf.x_rcv_able)
 	sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+#endif /* ROCKBOX */
 }
 
 void bng_draw_config(t_bng* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c itemconfigure %xLABEL -font {%s %d bold} -fill #%6.6x -text {%s} \n",
@@ -122,10 +153,16 @@ void bng_draw_config(t_bng* x, t_glist* glist)
     sys_vgui(".x%x.c itemconfigure %xBASE -fill #%6.6x\n", canvas, x, x->x_gui.x_bcol);
     sys_vgui(".x%x.c itemconfigure %xBUT -fill #%6.6x\n", canvas, x,
 	     x->x_flashed?x->x_gui.x_fcol:x->x_gui.x_bcol);
+#endif /* ROCKBOX */
 }
 
 void bng_draw_io(t_bng* x, t_glist* glist, int old_snd_rcv_flags)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+    (void) old_snd_rcv_flags;
+#else /* ROCKBOX */
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     t_canvas *canvas=glist_getcanvas(glist);
@@ -143,10 +180,15 @@ void bng_draw_io(t_bng* x, t_glist* glist, int old_snd_rcv_flags)
 	     xpos + IOWIDTH, ypos+1, x, 0);
     if(!(old_snd_rcv_flags & IEM_GUI_OLD_RCV_FLAG) && x->x_gui.x_fsf.x_rcv_able)
         sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+#endif /* ROCKBOX */
 }
 
 void bng_draw_select(t_bng* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
 
     if(x->x_gui.x_fsf.x_selected)
@@ -161,6 +203,7 @@ void bng_draw_select(t_bng* x, t_glist* glist)
 	sys_vgui(".x%x.c itemconfigure %xBUT -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_NORMAL);
 	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, x->x_gui.x_lcol);
     }
+#endif /* ROCKBOX */
 }
 
 void bng_draw(t_bng *x, t_glist *glist, int mode)
@@ -232,6 +275,10 @@ void bng_check_minmax(t_bng *x, int ftbreak, int fthold)
 
 static void bng_properties(t_gobj *z, t_glist *owner)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) owner;
+#else /* ROCKBOX */
     t_bng *x = (t_bng *)z;
     char buf[800];
     t_symbol *srl[3];
@@ -253,6 +300,7 @@ static void bng_properties(t_gobj *z, t_glist *owner)
 	    x->x_gui.x_fsf.x_font_style, x->x_gui.x_fontsize,
 	    0xffffff & x->x_gui.x_bcol, 0xffffff & x->x_gui.x_fcol, 0xffffff & x->x_gui.x_lcol);
     gfxstub_new(&x->x_gui.x_obj.ob_pd, x, buf);
+#endif /* ROCKBOX */
 }
 
 static void bng_set(t_bng *x)
@@ -316,6 +364,9 @@ static void bng_bang2(t_bng *x)/*wird immer gesendet, wenn moeglich*/
 
 static void bng_dialog(t_bng *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     t_symbol *srl[3];
     int a = (int)atom_getintarg(0, argc, argv);
     int fthold = (int)atom_getintarg(2, argc, argv);
@@ -333,33 +384,84 @@ static void bng_dialog(t_bng *x, t_symbol *s, int argc, t_atom *argv)
 
 static void bng_click(t_bng *x, t_floatarg xpos, t_floatarg ypos, t_floatarg shift, t_floatarg ctrl, t_floatarg alt)
 {
+#ifdef ROCKBOX
+    (void) xpos;
+    (void) ypos;
+    (void) shift;
+    (void) ctrl;
+    (void) alt;
+#endif
     bng_set(x);
     bng_bout2(x);
 }
 
 static int bng_newclick(t_gobj *z, struct _glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
+#ifdef ROCKBOX
+    (void) glist;
+    (void) dbl;
+#endif
     if(doit)
 	bng_click((t_bng *)z, (t_floatarg)xpix, (t_floatarg)ypix, (t_floatarg)shift, 0, (t_floatarg)alt);
     return (1);
 }
 
 static void bng_float(t_bng *x, t_floatarg f)
+#ifdef ROCKBOX
+{
+    (void) f;
+
+    bng_bang2(x);
+}
+#else /* ROCKBOX */
 {bng_bang2(x);}
+#endif /* ROCKBOX */
 
 static void bng_symbol(t_bng *x, t_symbol *s)
+#ifdef ROCKBOX
+{
+    (void) s;
+
+    bng_bang2(x);
+}
+#else /* ROCKBOX */
 {bng_bang2(x);}
+#endif /* ROCKBOX */
 
 static void bng_pointer(t_bng *x, t_gpointer *gp)
+#ifdef ROCKBOX
+{
+    (void) gp;
+
+    bng_bang2(x);
+}
+#else /* ROCKBOX */
 {bng_bang2(x);}
+#endif /* ROCKBOX */
 
 static void bng_list(t_bng *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+    (void) ac;
+    (void) av;
+#endif /* ROCKBOX */
+
     bng_bang2(x);
 }
 
 static void bng_anything(t_bng *x, t_symbol *s, int argc, t_atom *argv)
+#ifdef ROCKBOX
+{
+    (void) s;
+    (void) argc;
+    (void) argv;
+
+    bng_bang2(x);
+}
+#else /* ROCKBOX */
 {bng_bang2(x);}
+#endif /* ROCKBOX */
 
 static void bng_loadbang(t_bng *x)
 {
@@ -372,6 +474,9 @@ static void bng_loadbang(t_bng *x)
 
 static void bng_size(t_bng *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     x->x_gui.x_w = iemgui_clip_size((int)atom_getintarg(0, ac, av));
     x->x_gui.x_h = x->x_gui.x_w;
     iemgui_size((void *)x, &x->x_gui);
@@ -385,6 +490,9 @@ static void bng_pos(t_bng *x, t_symbol *s, int ac, t_atom *av)
 
 static void bng_flashtime(t_bng *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     bng_check_minmax(x, (int)atom_getintarg(0, ac, av),
 		     (int)atom_getintarg(1, ac, av));
 }
@@ -437,7 +545,11 @@ static void *bng_new(t_symbol *s, int argc, t_atom *argv)
     int fs=8;
     int ftbreak=IEM_BNG_DEFAULTBREAKFLASHTIME,
     	fthold=IEM_BNG_DEFAULTHOLDFLASHTIME;
+#ifdef ROCKBOX
+    (void) s;
+#else
     char str[144];
+#endif
 
     iem_inttosymargs(&x->x_gui.x_isa, 0);
     iem_inttofstyle(&x->x_gui.x_fsf, 0);
@@ -511,7 +623,9 @@ static void bng_ff(t_bng *x)
     clock_free(x->x_clock_lck);
     clock_free(x->x_clock_brk);
     clock_free(x->x_clock_hld);
+#ifndef ROCKBOX
     gfxstub_deleteforkey(x);
+#endif
 }
 
 void g_bang_setup(void)

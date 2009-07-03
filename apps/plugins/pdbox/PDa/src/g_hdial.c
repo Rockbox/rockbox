@@ -8,6 +8,13 @@
 /* name change to hradio by MSP and changed to
 put out a "float" as in sliders, toggles, etc. */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#include "pdbox.h"
+#include "m_pd.h"
+#include "g_canvas.h"
+#include "g_all_guis.h"
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -23,6 +30,7 @@ put out a "float" as in sliders, toggles, etc. */
 #else
 #include <unistd.h>
 #endif
+#endif /* ROCKBOX */
 
 /* ------------- hdl     gui-horicontal dial ---------------------- */
 
@@ -33,6 +41,10 @@ static t_class *hradio_class, *hradio_old_class;
 
 void hradio_draw_update(t_hradio *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     if(glist_isvisible(glist))
     {
 	t_canvas *canvas=glist_getcanvas(glist);
@@ -44,17 +56,21 @@ void hradio_draw_update(t_hradio *x, t_glist *glist)
 		 canvas, x, x->x_on,
 		 x->x_gui.x_fcol, x->x_gui.x_fcol);
     }
+#endif /* ROCKBOX */
 }
 
 void hradio_draw_new(t_hradio *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i, dx=x->x_gui.x_w, s4=dx/4;
     int yy11=text_ypix(&x->x_gui.x_obj, glist), yy12=yy11+dx;
     int yy21=yy11+s4, yy22=yy12-s4;
     int xx11b=text_xpix(&x->x_gui.x_obj, glist), xx11=xx11b, xx21=xx11b+s4;
     int xx22=xx11b+dx-s4;
-
 
     for(i=0; i<n; i++)
     {
@@ -81,11 +97,15 @@ void hradio_draw_new(t_hradio *x, t_glist *glist)
     if(!x->x_gui.x_fsf.x_rcv_able)
 	sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
 	     canvas, xx11b, yy11, xx11b + IOWIDTH, yy11+1, x, 0);
-
+#endif /* ROCKBOX */
 }
 
 void hradio_draw_move(t_hradio *x, t_glist *glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i, dx=x->x_gui.x_w, s4=dx/4;
     int yy11=text_ypix(&x->x_gui.x_obj, glist), yy12=yy11+dx;
@@ -114,10 +134,15 @@ void hradio_draw_move(t_hradio *x, t_glist *glist)
     if(!x->x_gui.x_fsf.x_rcv_able)
 	sys_vgui(".x%x.c coords %xIN%d %d %d %d %d\n",
 	     canvas, x, 0, xx11b, yy11, xx11b + IOWIDTH, yy11+1);
+#endif /* ROCKBOX */
 }
 
 void hradio_draw_erase(t_hradio* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i;
 
@@ -131,10 +156,15 @@ void hradio_draw_erase(t_hradio* x, t_glist* glist)
 	sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 0);
     if(!x->x_gui.x_fsf.x_rcv_able)
     sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+#endif /* ROCKBOX */
 }
 
 void hradio_draw_config(t_hradio* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i;
 
@@ -150,10 +180,16 @@ void hradio_draw_config(t_hradio* x, t_glist* glist)
 		 (x->x_on==i)?x->x_gui.x_fcol:x->x_gui.x_bcol,
 		 (x->x_on==i)?x->x_gui.x_fcol:x->x_gui.x_bcol);
     }
+#endif
 }
 
 void hradio_draw_io(t_hradio* x, t_glist* glist, int old_snd_rcv_flags)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+    (void) old_snd_rcv_flags;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
@@ -173,10 +209,15 @@ void hradio_draw_io(t_hradio* x, t_glist* glist, int old_snd_rcv_flags)
 		 xpos + IOWIDTH, ypos+1, x, 0);
     if(!(old_snd_rcv_flags & IEM_GUI_OLD_RCV_FLAG) && x->x_gui.x_fsf.x_rcv_able)
 	sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+#endif /* ROCKBOX */
 }
 
 void hradio_draw_select(t_hradio* x, t_glist* glist)
 {
+#ifdef ROCKBOX
+    (void) x;
+    (void) glist;
+#else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i;
 
@@ -199,6 +240,7 @@ void hradio_draw_select(t_hradio* x, t_glist* glist)
 	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x,
 		 x->x_gui.x_lcol);
     }
+#endif /* ROCKBOX */
 }
 
 void hradio_draw(t_hradio *x, t_glist *glist, int mode)
@@ -254,6 +296,10 @@ static void hradio_save(t_gobj *z, t_binbuf *b)
 
 static void hradio_properties(t_gobj *z, t_glist *owner)
 {
+#ifdef ROCKBOX
+    (void) z;
+    (void) owner;
+#else /* ROCKBOX */
     t_hradio *x = (t_hradio *)z;
     char buf[800];
     t_symbol *srl[3];
@@ -278,6 +324,7 @@ static void hradio_properties(t_gobj *z, t_glist *owner)
 	    x->x_gui.x_fsf.x_font_style, x->x_gui.x_fontsize,
 	    0xffffff & x->x_gui.x_bcol, 0xffffff & x->x_gui.x_fcol, 0xffffff & x->x_gui.x_lcol);
     gfxstub_new(&x->x_gui.x_obj.ob_pd, x, buf);
+#endif /* ROCKBOX */
 }
 
 static void hradio_dialog(t_hradio *x, t_symbol *s, int argc, t_atom *argv)
@@ -287,6 +334,10 @@ static void hradio_dialog(t_hradio *x, t_symbol *s, int argc, t_atom *argv)
     int chg = (int)atom_getintarg(4, argc, argv);
     int num = (int)atom_getintarg(6, argc, argv);
     int sr_flags;
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
 
     if(chg != 0) chg = 1;
     x->x_change = chg;
@@ -462,11 +513,22 @@ static void hradio_click(t_hradio *x, t_floatarg xpos, t_floatarg ypos, t_floata
 {
     int xx = (int)xpos - (int)text_xpix(&x->x_gui.x_obj, x->x_gui.x_glist);
 
+#ifdef ROCKBOX
+    (void) ypos;
+    (void) shift;
+    (void) ctrl;
+    (void) alt;
+#endif
+
     hradio_fout(x, (float)(xx / x->x_gui.x_w));
 }
 
 static int hradio_newclick(t_gobj *z, struct _glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
+#ifdef ROCKBOX
+    (void) glist;
+    (void) dbl;
+#endif
     if(doit)
 	hradio_click((t_hradio *)z, (t_floatarg)xpix, (t_floatarg)ypix, (t_floatarg)shift, 0, (t_floatarg)alt);
     return (1);
@@ -499,6 +561,9 @@ static void hradio_number(t_hradio *x, t_floatarg num)
 
 static void hradio_size(t_hradio *x, t_symbol *s, int ac, t_atom *av)
 {
+#ifdef ROCKBOX
+    (void) s;
+#endif
     x->x_gui.x_w = iemgui_clip_size((int)atom_getintarg(0, ac, av));
     x->x_gui.x_h = x->x_gui.x_w;
     iemgui_size((void *)x, &x->x_gui);
@@ -543,11 +608,21 @@ static void *hradio_donew(t_symbol *s, int argc, t_atom *argv, int old)
 {
     t_hradio *x = (t_hradio *)pd_new(old? hradio_old_class : hradio_class);
     int bflcol[]={-262144, -1, -1};
+#ifdef ROCKBOX
+    int a=IEM_GUI_DEFAULTSIZE, on=0;
+#else
     int a=IEM_GUI_DEFAULTSIZE, on=0, f=0;
+#endif
     int ldx=0, ldy=-6, chg=1, num=8;
     int fs=8;
+#ifndef ROCKBOX
     int ftbreak=IEM_BNG_DEFAULTBREAKFLASHTIME, fthold=IEM_BNG_DEFAULTHOLDFLASHTIME;
     char str[144];
+#endif
+
+#ifdef ROCKBOX
+    (void) s;
+#endif
 
     iem_inttosymargs(&x->x_gui.x_isa, 0);
     iem_inttofstyle(&x->x_gui.x_fsf, 0);
@@ -632,7 +707,9 @@ static void hradio_ff(t_hradio *x)
 {
     if(x->x_gui.x_fsf.x_rcv_able)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
+#ifndef ROCKBOX
     gfxstub_deleteforkey(x);
+#endif
 }
 
 void g_hradio_setup(void)
