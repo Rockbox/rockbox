@@ -47,9 +47,7 @@ while(my $line = <STDIN>)
 print <<EOF
 {"BUTTON_REL", BUTTON_REL},
 {"BUTTON_REPEAT", BUTTON_REPEAT},
-#ifdef HAVE_TOUCHSCREEN
 {"BUTTON_TOUCHSCREEN", BUTTON_TOUCHSCREEN},
-#endif
 };
 
 int main(void)

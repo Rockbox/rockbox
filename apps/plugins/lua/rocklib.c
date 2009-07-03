@@ -906,9 +906,6 @@ LUALIB_API int luaopen_rock(lua_State *L)
     RB_CONSTANT(TOUCHSCREEN_BUTTON);
 #endif
 
-    RB_CONSTANT(BUTTON_REL);
-    RB_CONSTANT(BUTTON_REPEAT);
-
     rli_init(L);
 
     return 1;
