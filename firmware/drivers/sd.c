@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "config.h"
+#include "logf.h"
 #include "hotswap.h"
 #include "storage.h"
 
@@ -42,14 +43,12 @@ void sd_parse_csd(tCardInfo *card)
         max_read_bl_len = 1 << card_extract_bits(card->csd, 83, 4);
         card->numblocks = c_size * c_mult * (max_read_bl_len/512);
     }
-#ifdef HAVE_MULTIVOLUME
     else if(csd_version == 1)
     {
         /* CSD version 2.0 */
         c_size = card_extract_bits(card->csd, 69, 22) + 1;
         card->numblocks = c_size << 10;
     }
-#endif
 
     card->blocksize = 512;  /* Always use 512 byte blocks */
 
@@ -62,6 +61,9 @@ void sd_parse_csd(tCardInfo *card)
                  sd_exponent[card_extract_bits(card->csd, 114, 3)];
 
     card->r2w_factor = card_extract_bits(card->csd, 28, 3);
+
+    logf("CSD%d.0 numblocks:%d speed:%d", csd_version+1, card->numblocks, card->speed);
+    logf("nsac: %d taac: %d r2w: %d", card->nsac, card->taac, card->r2w_factor);
 }
 
 void sd_sleep(void)

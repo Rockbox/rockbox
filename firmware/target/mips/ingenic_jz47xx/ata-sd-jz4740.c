@@ -35,6 +35,7 @@
 
 static struct wakeup sd_wakeup;
 static long last_disk_activity = -1;
+static tCardInfo card;
 
 //#define SD_DMA_ENABLE
 #define SD_DMA_INTERRUPT 0
@@ -44,7 +45,7 @@ static long last_disk_activity = -1;
 #define SD_INSERT_STATUS() __gpio_get_pin(MMC_CD_PIN)
 #define SD_RESET()         __msc_reset()
 
-#define SD_IRQ_MASK()             \
+#define SD_IRQ_MASK()              \
 do {                               \
           REG_MSC_IMASK = 0xffff;  \
           REG_MSC_IREG = 0xffff;   \
@@ -80,7 +81,6 @@ enum sd_result_t
 
 /* Standard MMC/SD clock speeds */
 #define MMC_CLOCK_SLOW    400000      /* 400 kHz for initial setup */
-#define MMC_CLOCK_FAST  20000000      /* 20 MHz for maximum for normal operation */
 #define SD_CLOCK_FAST   24000000      /* 24 MHz for SD Cards */
 #define SD_CLOCK_HIGH   48000000      /* 48 MHz for SD Cards */
 
@@ -164,114 +164,12 @@ struct sd_response_r1
     unsigned int   status;
 };
 
-struct sd_cid
-{
-    unsigned char  mid;
-    unsigned short oid;
-    unsigned char  pnm[7];   /* Product name (we null-terminate) */
-    unsigned char  prv;
-    unsigned int   psn;
-    unsigned char  mdt;
-};
-
-struct sd_csd
-{
-    unsigned char  csd_structure;
-    unsigned char  spec_vers;
-    unsigned char  taac;
-    unsigned char  nsac;
-    unsigned char  tran_speed;
-    unsigned short ccc;
-    unsigned char  read_bl_len;
-    unsigned char  read_bl_partial;
-    unsigned char  write_blk_misalign;
-    unsigned char  read_blk_misalign;
-    unsigned char  dsr_imp;
-    unsigned short c_size;
-    unsigned char  vdd_r_curr_min;
-    unsigned char  vdd_r_curr_max;
-    unsigned char  vdd_w_curr_min;
-    unsigned char  vdd_w_curr_max;
-    unsigned char  c_size_mult;
-    union
-    {
-        struct /* MMC system specification version 3.1 */
-        {
-            unsigned char  erase_grp_size;  
-            unsigned char  erase_grp_mult; 
-        } v31;
-        struct /* MMC system specification version 2.2 */
-        {
-            unsigned char  sector_size;
-            unsigned char  erase_grp_size;
-        } v22;
-    } erase;
-    unsigned char  wp_grp_size;
-    unsigned char  wp_grp_enable;
-    unsigned char  default_ecc;
-    unsigned char  r2w_factor;
-    unsigned char  write_bl_len;
-    unsigned char  write_bl_partial;
-    unsigned char  file_format_grp;
-    unsigned char  copy;
-    unsigned char  perm_write_protect;
-    unsigned char  tmp_write_protect;
-    unsigned char  file_format;
-    unsigned char  ecc;
-};
-
 struct sd_response_r3
 {  
     unsigned int ocr;
 };
 
-#define SD_VDD_145_150  0x00000001    /* VDD voltage 1.45 - 1.50 */
-#define SD_VDD_150_155  0x00000002    /* VDD voltage 1.50 - 1.55 */
-#define SD_VDD_155_160  0x00000004    /* VDD voltage 1.55 - 1.60 */
-#define SD_VDD_160_165  0x00000008    /* VDD voltage 1.60 - 1.65 */
-#define SD_VDD_165_170  0x00000010    /* VDD voltage 1.65 - 1.70 */
-#define SD_VDD_17_18    0x00000020    /* VDD voltage 1.7 - 1.8 */
-#define SD_VDD_18_19    0x00000040    /* VDD voltage 1.8 - 1.9 */
-#define SD_VDD_19_20    0x00000080    /* VDD voltage 1.9 - 2.0 */
-#define SD_VDD_20_21    0x00000100    /* VDD voltage 2.0 ~ 2.1 */
-#define SD_VDD_21_22    0x00000200    /* VDD voltage 2.1 ~ 2.2 */
-#define SD_VDD_22_23    0x00000400    /* VDD voltage 2.2 ~ 2.3 */
-#define SD_VDD_23_24    0x00000800    /* VDD voltage 2.3 ~ 2.4 */
-#define SD_VDD_24_25    0x00001000    /* VDD voltage 2.4 ~ 2.5 */
-#define SD_VDD_25_26    0x00002000    /* VDD voltage 2.5 ~ 2.6 */
-#define SD_VDD_26_27    0x00004000    /* VDD voltage 2.6 ~ 2.7 */
-#define SD_VDD_27_28    0x00008000    /* VDD voltage 2.7 ~ 2.8 */
-#define SD_VDD_28_29    0x00010000    /* VDD voltage 2.8 ~ 2.9 */
-#define SD_VDD_29_30    0x00020000    /* VDD voltage 2.9 ~ 3.0 */
-#define SD_VDD_30_31    0x00040000    /* VDD voltage 3.0 ~ 3.1 */
-#define SD_VDD_31_32    0x00080000    /* VDD voltage 3.1 ~ 3.2 */
-#define SD_VDD_32_33    0x00100000    /* VDD voltage 3.2 ~ 3.3 */
-#define SD_VDD_33_34    0x00200000    /* VDD voltage 3.3 ~ 3.4 */
-#define SD_VDD_34_35    0x00400000    /* VDD voltage 3.4 ~ 3.5 */
-#define SD_VDD_35_36    0x00800000    /* VDD voltage 3.5 ~ 3.6 */
 #define SD_CARD_BUSY    0x80000000    /* Card Power up status bit */
-
-
-/* CSD field definitions */
-#define CSD_STRUCT_VER_1_0  0          /* Valid for system specification 1.0 - 1.2 */
-#define CSD_STRUCT_VER_1_1  1          /* Valid for system specification 1.4 - 2.2 */
-#define CSD_STRUCT_VER_1_2  2          /* Valid for system specification 3.1       */
-
-#define CSD_SPEC_VER_0      0          /* Implements system specification 1.0 - 1.2 */
-#define CSD_SPEC_VER_1      1          /* Implements system specification 1.4 */
-#define CSD_SPEC_VER_2      2          /* Implements system specification 2.0 - 2.2 */
-#define CSD_SPEC_VER_3      3          /* Implements system specification 3.1 */
-
-/* the information structure of SD Card */
-typedef struct SD_INFO
-{
-    int             rca;    /* RCA */
-    struct sd_cid  cid;
-    struct sd_csd  csd;
-    unsigned int    block_num;
-    unsigned int    block_len;
-    unsigned int    ocr;
-} sd_info;
 
 struct sd_request
 {
@@ -304,7 +202,6 @@ struct sd_request
 static int use_4bit = 1;        /* Use 4-bit data bus */
 static int num_6 = 0;
 static int sd2_0 = 0;
-static sd_info sdinfo;
 
 /**************************************************************************
  * Utility functions
@@ -316,197 +213,6 @@ static sd_info sdinfo;
 
 #define PARSE_U16(_buf,_index) \
     (((unsigned short)_buf[_index]) << 8) | ((unsigned short)_buf[_index+1]);
-
-int sd_unpack_csd(struct sd_request *request, struct sd_csd *csd)
-{
-    unsigned char *buf = request->response;
-    int num = 0;
-    
-    if (request->result)
-        return request->result;
-
-    csd->csd_structure      = (buf[1] & 0xc0) >> 6;
-    if (csd->csd_structure)
-        sd2_0 = 1;
-    else
-        sd2_0 = 0;
-    
-    switch (csd->csd_structure) {
-    case 0 :
-        csd->taac               = buf[2];
-        csd->nsac               = buf[3];
-        csd->tran_speed         = buf[4];
-        csd->ccc                = (((unsigned short)buf[5]) << 4) | ((buf[6] & 0xf0) >> 4);
-        csd->read_bl_len        = buf[6] & 0x0f;
-        /* for support 2GB card*/
-        if (csd->read_bl_len >= 10) 
-        {
-            num = csd->read_bl_len - 9;
-            csd->read_bl_len = 9;
-        }
-        
-        csd->read_bl_partial    = (buf[7] & 0x80) ? 1 : 0;
-        csd->write_blk_misalign = (buf[7] & 0x40) ? 1 : 0;
-        csd->read_blk_misalign  = (buf[7] & 0x20) ? 1 : 0;
-        csd->dsr_imp            = (buf[7] & 0x10) ? 1 : 0;
-        csd->c_size             = ((((unsigned short)buf[7]) & 0x03) << 10) | (((unsigned short)buf[8]) << 2) | (((unsigned short)buf[9]) & 0xc0) >> 6;
-
-        if (num)
-            csd->c_size = csd->c_size << num;
-        
-        
-        csd->vdd_r_curr_min     = (buf[9] & 0x38) >> 3;
-        csd->vdd_r_curr_max     = buf[9] & 0x07;
-        csd->vdd_w_curr_min     = (buf[10] & 0xe0) >> 5;
-        csd->vdd_w_curr_max     = (buf[10] & 0x1c) >> 2;
-        csd->c_size_mult        = ((buf[10] & 0x03) << 1) | ((buf[11] & 0x80) >> 7);
-        switch (csd->csd_structure) {
-        case CSD_STRUCT_VER_1_0:
-        case CSD_STRUCT_VER_1_1:
-            csd->erase.v22.sector_size    = (buf[11] & 0x7c) >> 2;
-            csd->erase.v22.erase_grp_size = ((buf[11] & 0x03) << 3) | ((buf[12] & 0xe0) >> 5);
-
-            break;
-        case CSD_STRUCT_VER_1_2:
-        default:
-            csd->erase.v31.erase_grp_size = (buf[11] & 0x7c) >> 2;
-            csd->erase.v31.erase_grp_mult = ((buf[11] & 0x03) << 3) | ((buf[12] & 0xe0) >> 5);
-            break;
-        }
-        csd->wp_grp_size        = buf[12] & 0x1f;
-        csd->wp_grp_enable      = (buf[13] & 0x80) ? 1 : 0;
-        csd->default_ecc        = (buf[13] & 0x60) >> 5;
-        csd->r2w_factor         = (buf[13] & 0x1c) >> 2;
-        csd->write_bl_len       = ((buf[13] & 0x03) << 2) | ((buf[14] & 0xc0) >> 6);
-        if (csd->write_bl_len >= 10)
-            csd->write_bl_len = 9;
-        
-        csd->write_bl_partial   = (buf[14] & 0x20) ? 1 : 0;
-        csd->file_format_grp    = (buf[15] & 0x80) ? 1 : 0;
-        csd->copy               = (buf[15] & 0x40) ? 1 : 0;
-        csd->perm_write_protect = (buf[15] & 0x20) ? 1 : 0;
-        csd->tmp_write_protect  = (buf[15] & 0x10) ? 1 : 0;
-        csd->file_format        = (buf[15] & 0x0c) >> 2;
-        csd->ecc                = buf[15] & 0x03;
-        
-        DEBUG("csd_structure=%d  spec_vers=%d  taac=%02x  nsac=%02x  tran_speed=%02x",
-              csd->csd_structure, csd->spec_vers, 
-              csd->taac, csd->nsac, csd->tran_speed);
-        DEBUG("ccc=%04x  read_bl_len=%d  read_bl_partial=%d  write_blk_misalign=%d",
-              csd->ccc, csd->read_bl_len, 
-              csd->read_bl_partial, csd->write_blk_misalign);
-        DEBUG("read_blk_misalign=%d  dsr_imp=%d  c_size=%d  vdd_r_curr_min=%d",
-              csd->read_blk_misalign, csd->dsr_imp, 
-              csd->c_size, csd->vdd_r_curr_min);
-        DEBUG("vdd_r_curr_max=%d  vdd_w_curr_min=%d  vdd_w_curr_max=%d  c_size_mult=%d",
-              csd->vdd_r_curr_max, csd->vdd_w_curr_min, 
-              csd->vdd_w_curr_max, csd->c_size_mult);
-        DEBUG("wp_grp_size=%d  wp_grp_enable=%d  default_ecc=%d  r2w_factor=%d",
-              csd->wp_grp_size, csd->wp_grp_enable,
-              csd->default_ecc, csd->r2w_factor);
-        DEBUG("write_bl_len=%d  write_bl_partial=%d  file_format_grp=%d  copy=%d",
-              csd->write_bl_len, csd->write_bl_partial,
-              csd->file_format_grp, csd->copy);
-        DEBUG("perm_write_protect=%d  tmp_write_protect=%d  file_format=%d  ecc=%d",
-              csd->perm_write_protect, csd->tmp_write_protect,
-              csd->file_format, csd->ecc);
-        switch (csd->csd_structure) {
-        case CSD_STRUCT_VER_1_0:
-        case CSD_STRUCT_VER_1_1:
-            DEBUG("V22 sector_size=%d erase_grp_size=%d", 
-                  csd->erase.v22.sector_size, 
-                  csd->erase.v22.erase_grp_size);
-            break;
-        case CSD_STRUCT_VER_1_2:
-        default:
-            DEBUG("V31 erase_grp_size=%d erase_grp_mult=%d", 
-                  csd->erase.v31.erase_grp_size,
-                  csd->erase.v31.erase_grp_mult);
-            break;
-            
-        }
-        break;    
-        
-    case 1 :
-        csd->taac               = 0;
-        csd->nsac               = 0;
-        csd->tran_speed         = buf[4];
-        csd->ccc                = (((unsigned short)buf[5]) << 4) | ((buf[6] & 0xf0) >> 4);
-
-        csd->read_bl_len        = 9;
-        csd->read_bl_partial    = 0;
-        csd->write_blk_misalign = 0;
-        csd->read_blk_misalign  = 0;
-        csd->dsr_imp            = (buf[7] & 0x10) ? 1 : 0;
-        csd->c_size             = ((((unsigned short)buf[8]) & 0x3f) << 16) | (((unsigned short)buf[9]) << 8) | ((unsigned short)buf[10]) ;
-        switch (csd->csd_structure) {
-        case CSD_STRUCT_VER_1_0:
-        case CSD_STRUCT_VER_1_1:
-            csd->erase.v22.sector_size    = 0x7f;
-            csd->erase.v22.erase_grp_size = 0;
-            break;
-        case CSD_STRUCT_VER_1_2:
-        default:
-            csd->erase.v31.erase_grp_size = 0x7f;
-            csd->erase.v31.erase_grp_mult = 0;
-            break;
-        }
-        csd->wp_grp_size        = 0;
-        csd->wp_grp_enable      = 0;
-        csd->default_ecc        = (buf[13] & 0x60) >> 5;
-        csd->r2w_factor         = 4;/* Unused */
-        csd->write_bl_len       = 9;
-        
-        csd->write_bl_partial   = 0;
-        csd->file_format_grp    = 0;
-        csd->copy               = (buf[15] & 0x40) ? 1 : 0;
-        csd->perm_write_protect = (buf[15] & 0x20) ? 1 : 0;
-        csd->tmp_write_protect  = (buf[15] & 0x10) ? 1 : 0;
-        csd->file_format        = 0;
-        csd->ecc                = buf[15] & 0x03;
-        
-        DEBUG("csd_structure=%d  spec_vers=%d  taac=%02x  nsac=%02x  tran_speed=%02x",
-              csd->csd_structure, csd->spec_vers, 
-              csd->taac, csd->nsac, csd->tran_speed);
-        DEBUG("ccc=%04x  read_bl_len=%d  read_bl_partial=%d  write_blk_misalign=%d",
-              csd->ccc, csd->read_bl_len, 
-              csd->read_bl_partial, csd->write_blk_misalign);
-        DEBUG("read_blk_misalign=%d  dsr_imp=%d  c_size=%d  vdd_r_curr_min=%d",
-              csd->read_blk_misalign, csd->dsr_imp, 
-              csd->c_size, csd->vdd_r_curr_min);
-        DEBUG("vdd_r_curr_max=%d  vdd_w_curr_min=%d  vdd_w_curr_max=%d  c_size_mult=%d",
-              csd->vdd_r_curr_max, csd->vdd_w_curr_min, 
-              csd->vdd_w_curr_max, csd->c_size_mult);
-        DEBUG("wp_grp_size=%d  wp_grp_enable=%d  default_ecc=%d  r2w_factor=%d",
-              csd->wp_grp_size, csd->wp_grp_enable,
-              csd->default_ecc, csd->r2w_factor);
-        DEBUG("write_bl_len=%d  write_bl_partial=%d  file_format_grp=%d  copy=%d",
-              csd->write_bl_len, csd->write_bl_partial,
-              csd->file_format_grp, csd->copy);
-        DEBUG("perm_write_protect=%d  tmp_write_protect=%d  file_format=%d  ecc=%d",
-              csd->perm_write_protect, csd->tmp_write_protect,
-              csd->file_format, csd->ecc);
-        switch (csd->csd_structure) {
-        case CSD_STRUCT_VER_1_0:
-        case CSD_STRUCT_VER_1_1:
-            DEBUG("V22 sector_size=%d erase_grp_size=%d", 
-                  csd->erase.v22.sector_size, 
-                  csd->erase.v22.erase_grp_size);
-            break;
-        case CSD_STRUCT_VER_1_2:
-        default:
-            DEBUG("V31 erase_grp_size=%d erase_grp_mult=%d", 
-                  csd->erase.v31.erase_grp_size,
-                  csd->erase.v31.erase_grp_mult);
-            break;
-        }
-    }
-
-    if (buf[0] != 0x3f)
-        return SD_ERROR_HEADER_MISMATCH;
-
-    return 0;
-}
 
 int sd_unpack_r1(struct sd_request *request, struct sd_response_r1 *r1)
 {
@@ -557,44 +263,20 @@ int sd_unpack_scr(struct sd_request *request, struct sd_response_r1 *r1, unsigne
     return sd_unpack_r1(request, r1); 
 }
 
-int sd_unpack_r6(struct sd_request *request, struct sd_response_r1 *r1, int *rca)
+static inline int sd_unpack_r6(struct sd_request *request, struct sd_response_r1 *r1, unsigned long *rca)
 {
     unsigned char *buf = request->response;
 
-    if (request->result)        return request->result;
+    if (request->result)
+        return request->result;
         
-        *rca = PARSE_U16(buf,1);  /* Save RCA returned by the SD Card */
-        
-        *(buf+1) = 0;
-        *(buf+2) = 0;
-        
-        return sd_unpack_r1(request, r1);
-}   
-
-int sd_unpack_cid(struct sd_request *request, struct sd_cid *cid)
-{
-    unsigned char *buf = request->response;
-    int i;
-
-    if (request->result) return request->result;
-
-    cid->mid = buf[1];
-    cid->oid = PARSE_U16(buf,2);
-    for (i = 0 ; i < 6 ; i++)
-        cid->pnm[i] = buf[4+i];
-    cid->pnm[6] = 0;
-    cid->prv = buf[10];
-    cid->psn = PARSE_U32(buf,11);
-    cid->mdt = buf[15];
+    *rca = PARSE_U16(buf,1);  /* Save RCA returned by the SD Card */
     
-    DEBUG("sd_unpack_cid: mid=%d oid=%d pnm=%s prv=%d.%d psn=%08x mdt=%d/%d",
-          cid->mid, cid->oid, cid->pnm, 
-          (cid->prv>>4), (cid->prv&0xf), 
-          cid->psn, (cid->mdt>>4), (cid->mdt&0xf)+1997);
-
-    if (buf[0] != 0x3f)  return SD_ERROR_HEADER_MISMATCH;
-          return 0;
-}
+    *(buf+1) = 0;
+    *(buf+2) = 0;
+    
+    return sd_unpack_r1(request, r1);
+}   
 
 int sd_unpack_r3(struct sd_request *request, struct sd_response_r3 *r3)
 {
@@ -918,10 +600,10 @@ static int jz_sd_transmit_data(struct sd_request *req)
 }
 #endif
 
-static inline unsigned int jz_sd_calc_clkrt(int is_sd, unsigned int rate)
+static inline unsigned int jz_sd_calc_clkrt(unsigned int rate)
 {
     unsigned int clkrt;
-    unsigned int clk_src = is_sd ? (sd2_0 ? 48000000 : 24000000) : 20000000;
+    unsigned int clk_src = sd2_0 ? SD_CLOCK_HIGH : SD_CLOCK_FAST;
 
     clkrt = 0;
     while (rate < clk_src)
@@ -932,31 +614,28 @@ static inline unsigned int jz_sd_calc_clkrt(int is_sd, unsigned int rate)
     return clkrt;
 }
 
-/* Set the MMC clock frequency */
-static void jz_sd_set_clock(int sd, unsigned int rate)
+static inline void cpm_select_msc_clk(unsigned int rate)
 {
-    int clkrt = 0;
+    unsigned int div = __cpm_get_pllout2() / rate;
 
-    sd = sd ? 1 : 0;
+    REG_CPM_MSCCDR = div - 1;
+}
+
+/* Set the MMC clock frequency */
+static void jz_sd_set_clock(unsigned int rate)
+{
+    int clkrt;
 
     jz_sd_stop_clock();
 
-    if (sd2_0)
-    {
-        __cpm_select_msc_hs_clk(sd);        /* select clock source from CPM */
-        REG_CPM_CPCCR |= CPM_CPCCR_CE;
-        clkrt = jz_sd_calc_clkrt(sd, rate);
-        REG_MSC_CLKRT = clkrt;
-    }
-    else
-    {
-        __cpm_select_msc_clk(sd);           /* select clock source from CPM */
-        REG_CPM_CPCCR |= CPM_CPCCR_CE;
-        clkrt = jz_sd_calc_clkrt(sd, rate);
-        REG_MSC_CLKRT = clkrt;
-    }
-    
-    DEBUG("set clock to %u Hz is_sd=%d clkrt=%d", rate, sd, clkrt);
+    /* select clock source from CPM */
+    cpm_select_msc_clk(rate);
+
+    REG_CPM_CPCCR |= CPM_CPCCR_CE;
+    clkrt = jz_sd_calc_clkrt(rate);
+    REG_MSC_CLKRT = clkrt;
+
+    DEBUG("set clock to %u Hz clkrt=%d", rate, clkrt);
 }
 
 /********************************************************************************************************************
@@ -981,7 +660,7 @@ static int jz_sd_exec_cmd(struct sd_request *request)
         __msc_reset();
 
         /* On reset, drop SD clock down */
-        jz_sd_set_clock(1, MMC_CLOCK_SLOW);
+        jz_sd_set_clock(MMC_CLOCK_SLOW);
 
         /* On reset, stop SD clock */
         jz_sd_stop_clock();
@@ -1318,49 +997,6 @@ static void sd_simple_cmd(struct sd_request *request, int cmd, unsigned int arg,
     sd_send_cmd(request, cmd, arg, 0, 0, rtype, NULL);
 }
 
-#define KBPS 1
-#define MBPS 1000
-static unsigned int ts_exp[] = { 100*KBPS, 1*MBPS, 10*MBPS, 100*MBPS, 0, 0, 0, 0 };
-static unsigned int ts_mul[] = { 0,    1000, 1200, 1300, 1500, 2000, 2500, 3000, 
-            3500, 4000, 4500, 5000, 5500, 6000, 7000, 8000 };
-
-unsigned int sd_tran_speed(unsigned char ts)
-{
-    unsigned int rate = ts_exp[(ts & 0x7)] * ts_mul[(ts & 0x78) >> 3];
-
-    if (rate <= 0)
-    {
-        DEBUG("sd_tran_speed: error - unrecognized speed 0x%02x", ts);
-        return 1;
-    }
-
-    return rate;
-}
-
-static void sd_configure_card(void)
-{
-    unsigned int rate;
-
-    /* Get card info */
-    if (sd2_0)
-        sdinfo.block_num = (sdinfo.csd.c_size + 1) << 10;
-    else
-        sdinfo.block_num = (sdinfo.csd.c_size + 1) * (1 << (sdinfo.csd.c_size_mult + 2));
-
-    sdinfo.block_len = 1 << sdinfo.csd.read_bl_len;
-
-    /* Fix the clock rate */
-    rate = sd_tran_speed(sdinfo.csd.tran_speed);
-    if (rate < MMC_CLOCK_SLOW)
-        rate = MMC_CLOCK_SLOW;
-    if (rate > SD_CLOCK_FAST)
-        rate = SD_CLOCK_FAST;
-
-    DEBUG("sd_configure_card: block_len=%d block_num=%d rate=%d", sdinfo.block_len, sdinfo.block_num, rate);
-
-    jz_sd_set_clock(1, rate);
-}
-
 #define SD_INIT_DOING   0
 #define SD_INIT_PASSED  1
 #define SD_INIT_FAILED  2
@@ -1369,9 +1005,7 @@ static int sd_init_card_state(struct sd_request *request)
 {
     struct sd_response_r1 r1;
     struct sd_response_r3 r3;
-    int retval;
-    int ocr = 0x40300000;
-    int limit_41 = 0;
+    int retval, i, ocr = 0x40300000, limit_41 = 0;
 
     switch (request->cmd)
     {
@@ -1409,7 +1043,7 @@ static int sd_init_card_state(struct sd_request *request)
             }
 
             DEBUG("sd_init_card_state: read ocr value = 0x%08x", r3.ocr);
-            sdinfo.ocr = r3.ocr;
+            card.ocr = r3.ocr;
 
             if(!(r3.ocr & SD_CARD_BUSY || ocr == 0)){
                 udelay(10000);
@@ -1423,21 +1057,18 @@ static int sd_init_card_state(struct sd_request *request)
             }
             break;
 
-        case SD_ALL_SEND_CID: 
-            retval = sd_unpack_cid( request, &sdinfo.cid );
-            
-            if ( retval && (retval != SD_ERROR_CRC)) {
-                DEBUG("sd_init_card_state: unable to ALL_SEND_CID error=%d", 
-                      retval);
-                return SD_INIT_FAILED;
-            }
+        case SD_ALL_SEND_CID:
+            for(i=0; i<4; i++)
+                card.cid[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) | 
+                              (request->response[3+i*4]<< 8) | request->response[4+i*4]);
+
+            logf("CID: %08lx%08lx%08lx%08lx", card.cid[0], card.cid[1], card.cid[2], card.cid[3]);
             sd_simple_cmd(request, SD_SEND_RELATIVE_ADDR, 0, RESPONSE_R6);
             break;
-
         case SD_SEND_RELATIVE_ADDR:
-            retval = sd_unpack_r6(request, &r1, &sdinfo.rca);
-            sdinfo.rca = sdinfo.rca << 16; 
-            DEBUG("sd_init_card_state: Get RCA from SD: 0x%04x Status: %x", sdinfo.rca, r1.status);
+            retval = sd_unpack_r6(request, &r1, &card.rca);
+            card.rca = card.rca << 16; 
+            DEBUG("sd_init_card_state: Get RCA from SD: 0x%04x Status: %x", card.rca, r1.status);
             if (retval)
             {
                 DEBUG("sd_init_card_state: unable to SET_RELATIVE_ADDR error=%d", 
@@ -1445,24 +1076,21 @@ static int sd_init_card_state(struct sd_request *request)
                 return SD_INIT_FAILED;
             }
 
-            sd_simple_cmd(request, SD_SEND_CSD, sdinfo.rca, RESPONSE_R2_CSD);
+            sd_simple_cmd(request, SD_SEND_CSD, card.rca, RESPONSE_R2_CSD);
             break;
-            
-        case SD_SEND_CSD:
-            retval = sd_unpack_csd(request, &sdinfo.csd);
 
+        case SD_SEND_CSD:
+            for(i=0; i<4; i++)
+                card.csd[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) | 
+                              (request->response[3+i*4]<< 8) | request->response[4+i*4]);
+
+            sd_parse_csd(&card);
+            sd2_0 = (card_extract_bits(card.csd, 127, 2) == 1);
+
+            logf("CSD: %08lx%08lx%08lx%08lx", card.csd[0], card.csd[1], card.csd[2], card.csd[3]);
             DEBUG("SD card is ready");
-                    
-            /*FIXME:ignore CRC error for CMD2/CMD9/CMD10 */
-            if (retval && (retval != SD_ERROR_CRC))
-            {
-                DEBUG("sd_init_card_state: unable to SEND_CSD error=%d", 
-                      retval);
-                return SD_INIT_FAILED;
-            }
-            sd_configure_card();
+            jz_sd_set_clock(SD_CLOCK_FAST);
             return SD_INIT_PASSED;
-            
         default:
             DEBUG("sd_init_card_state: error!  Illegal last cmd %d", request->cmd);
             return SD_INIT_FAILED;
@@ -1471,7 +1099,7 @@ static int sd_init_card_state(struct sd_request *request)
     return SD_INIT_DOING;
 }
 
-static int sd_sd_switch(struct sd_request *request, int mode, int group,
+static int sd_switch(struct sd_request *request, int mode, int group,
               unsigned char value, unsigned char * resp)
 {
     unsigned int arg;
@@ -1494,7 +1122,7 @@ static int sd_read_switch(struct sd_request *request)
     unsigned int status[64 / 4];
 
     memset((unsigned char *)status, 0, 64);
-    sd_sd_switch(request, 0, 0, 1, (unsigned char*) status);
+    sd_switch(request, 0, 0, 1, (unsigned char*) status);
     
     if (((unsigned char *)status)[13] & 0x02)
         return 0;
@@ -1509,7 +1137,7 @@ static int sd_switch_hs(struct sd_request *request)
 {
     unsigned int status[64 / 4];
 
-    sd_sd_switch(request, 1, 0, 1, (unsigned char*) status);
+    sd_switch(request, 1, 0, 1, (unsigned char*) status);
     return 0;
 }
 
@@ -1519,7 +1147,7 @@ int sd_select_card(void)
     struct sd_response_r1 r1;
     int retval;
 
-    sd_simple_cmd(&request, SD_SELECT_CARD, sdinfo.rca,
+    sd_simple_cmd(&request, SD_SELECT_CARD, card.rca,
                RESPONSE_R1B);
     retval = sd_unpack_r1(&request, &r1);
     if (retval)
@@ -1531,11 +1159,11 @@ int sd_select_card(void)
         if (!retval)
         {
             sd_switch_hs(&request);
-            jz_sd_set_clock(1, SD_CLOCK_HIGH);
+            jz_sd_set_clock(SD_CLOCK_HIGH);
         }
     }
     num_6 = 3;
-    sd_simple_cmd(&request, SD_APP_CMD, sdinfo.rca,
+    sd_simple_cmd(&request, SD_APP_CMD, card.rca,
                RESPONSE_R1);
     retval = sd_unpack_r1(&request, &r1);
     if (retval)
@@ -1591,34 +1219,9 @@ void card_enable_monitoring_target(bool on)
 }
 #endif
 
-/* TODO */
 tCardInfo* card_get_info_target(int card_no)
 {
     (void)card_no;
-    int i, temp;
-    static tCardInfo card;
-
-    static const unsigned char sd_mantissa[] = {  /* *10 */
-        0,  10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
-    static const unsigned int sd_exponent[] = {  /* use varies */
-        1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000 };
-
-    card.initialized = true;
-    card.ocr = sdinfo.ocr;
-    for(i=0; i<4; i++)
-        card.csd[i] = ((unsigned long*)&sdinfo.csd)[i];
-    for(i=0; i<4; i++)
-        card.cid[i] = ((unsigned long*)&sdinfo.cid)[i];
-    temp              = card_extract_bits(card.csd, 98, 3);
-    card.speed        = sd_mantissa[card_extract_bits(card.csd, 102, 4)]
-                      * sd_exponent[temp > 2 ? 7 : temp + 4];
-    card.nsac         = 100 * card_extract_bits(card.csd, 111, 8);
-    temp              = card_extract_bits(card.csd, 114, 3);
-    card.taac         = sd_mantissa[card_extract_bits(card.csd, 118, 4)]
-                      * sd_exponent[temp] / 10;
-    card.numblocks = sdinfo.block_num;
-    card.blocksize = sdinfo.block_len;
-    
     return &card;
 }
 
@@ -1633,10 +1236,10 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf
     struct sd_response_r1 r1;
     int retval; 
 
-    if (!card_detect_target() || count == 0 || start > sdinfo.block_num)
+    if (!card_detect_target() || count == 0 || start > card.numblocks)
         return -1;
     
-    sd_simple_cmd(&request, SD_SEND_STATUS, sdinfo.rca, RESPONSE_R1);
+    sd_simple_cmd(&request, SD_SEND_STATUS, card.rca, RESPONSE_R1);
     retval = sd_unpack_r1(&request, &r1);
     if (retval && (retval != SD_ERROR_STATE_MISMATCH))
         return retval;
@@ -1683,10 +1286,10 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const vo
     struct sd_response_r1 r1;
     int retval;
 
-    if (!card_detect_target() || count == 0 || start > sdinfo.block_num)
+    if (!card_detect_target() || count == 0 || start > card.numblocks)
         return -1;
 
-    sd_simple_cmd(&request, SD_SEND_STATUS, sdinfo.rca, RESPONSE_R1);
+    sd_simple_cmd(&request, SD_SEND_STATUS, card.rca, RESPONSE_R1);
     retval = sd_unpack_r1(&request, &r1);
     if (retval && (retval != SD_ERROR_STATE_MISMATCH))
         return retval;
@@ -1741,5 +1344,5 @@ bool sd_present(IF_MV_NONVOID(int drive))
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
 #endif
-    return (sdinfo.block_num > 0 && card_detect_target());
+    return (card.numblocks > 0 && card_detect_target());
 }
