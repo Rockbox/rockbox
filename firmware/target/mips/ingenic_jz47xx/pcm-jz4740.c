@@ -32,8 +32,6 @@
  ** Playback DMA transfer
  **/
 
-static bool playback_started = false;
-static void* playback_address;
 void pcm_postinit(void)
 {
     audiohw_postinit();
@@ -64,21 +62,12 @@ void pcm_dma_apply_settings(void)
     audiohw_set_frequency(pcm_sampr);
 }
 
-static void play_start_pcm(void)
-{
-    __aic_enable_transmit_dma();
-    __aic_enable_replay();
-
-    REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
-
-    playback_started = true;
-}
-
+static void* playback_address;
 static inline void set_dma(const void *addr, size_t size)
 {
     logf("%x %x %d %d %x", (unsigned int)addr, size, (REG_AIC_SR>>24) & 0x20, (REG_AIC_SR>>8) & 0x20, REG_AIC_SR & 0xF);
 
-    //__dcache_writeback_all();
+    __dcache_writeback_all();
     REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = DMAC_DCCSR_NDES;
     REG_DMAC_DSAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)addr);
     REG_DMAC_DTAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)AIC_DR);
@@ -89,27 +78,6 @@ static inline void set_dma(const void *addr, size_t size)
 
     playback_address = (void*)addr;
 }
-
-static void play_stop_pcm(void)
-{
-    REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = (REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) | DMAC_DCCSR_HLT) & ~DMAC_DCCSR_EN;
-
-    dma_disable();
-
-    __aic_disable_transmit_dma();
-    __aic_disable_replay();
-
-    playback_started = false;
-}
-
-void pcm_play_dma_start(const void *addr, size_t size)
-{
-    dma_enable();
-
-    set_dma(addr, size);
-    play_start_pcm();
-}
-
 
 static inline void play_dma_callback(void)
 {
@@ -130,6 +98,7 @@ static inline void play_dma_callback(void)
     }
 }
 
+void DMA_CALLBACK(DMA_AIC_TX_CHANNEL)(void) __attribute__ ((section(".icode")));
 void DMA_CALLBACK(DMA_AIC_TX_CHANNEL)(void)
 {
     if (REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_AR)
@@ -151,52 +120,90 @@ void DMA_CALLBACK(DMA_AIC_TX_CHANNEL)(void)
     }
 }
 
-size_t pcm_get_bytes_waiting(void)
+void pcm_play_dma_start(const void *addr, size_t size)
 {
-    if(playback_started)
-        return (REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL) * 16) & ~3;
-    else
-        return 0;
-}
+    dma_enable();
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    /* TODO */
-    if(playback_started)
-    {
-        *count = REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL) >> 2;
-        return (void*)(playback_address + ((REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)*16 + 2) & ~3));
-    }
-    else
-    {
-        *count = 0;
-        return NULL;
-    }
+    set_dma(addr, size);
+
+    __aic_enable_transmit_dma();
+    __aic_enable_replay();
+
+    REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
 }
 
 void pcm_play_dma_stop(void)
 {
-    play_stop_pcm();
+    int flags = disable_irq_save();
 
-    /* TODO */
+    REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = (REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) | DMAC_DCCSR_HLT) & ~DMAC_DCCSR_EN;
+
+    dma_disable();
+
+    __aic_disable_transmit_dma();
+    __aic_disable_replay();
+
+    restore_irq(flags);
 }
 
+static unsigned int play_lock = 0;
 void pcm_play_lock(void)
 {
-    /* TODO */
+    int flags = disable_irq_save();
+
+    if (++play_lock == 1)
+        __dmac_channel_disable_irq(DMA_AIC_TX_CHANNEL);
+
+    restore_irq(flags);
 }
 
 void pcm_play_unlock(void)
 {
-   /* TODO */
+    int flags = disable_irq_save();
+
+    if (--play_lock == 0)
+        __dmac_channel_enable_irq(DMA_AIC_TX_CHANNEL);
+
+    restore_irq(flags);
 }
 
 void pcm_play_dma_pause(bool pause)
 {
+    int flags = disable_irq_save();
+
     if(pause)
         REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) &= ~DMAC_DCCSR_EN;
     else
         REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
+
+    restore_irq(flags);
+}
+
+size_t pcm_get_bytes_waiting(void)
+{
+    return REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_EN ?
+            (REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL) * 16) & ~3 : 0;
+}
+
+const void * pcm_play_dma_get_peak_buffer(int *count)
+{
+    int flags = disable_irq_save();
+
+    const void* addr;
+    if(REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_EN)
+    {
+        *count = REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)*16 >> 2;
+        addr = (const void*)(playback_address + ((REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)*16 + 2) & ~3));
+    }
+    else
+    {
+        *count = 0;
+        addr = NULL;
+    }
+
+    restore_irq(flags);
+
+    return addr;
 }
 
 void audiohw_close(void)
