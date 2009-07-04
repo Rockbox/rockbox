@@ -1675,6 +1675,17 @@ static void __attribute__ ((noinline)) add_tagcache(char *path,
     bool has_albumartist;
     bool has_grouping;
 
+#ifdef SIMULATOR
+    /* Crude logging for the sim - to aid in debugging */
+    int logfd = open(ROCKBOX_DIR "/database.log",
+                     O_WRONLY | O_APPEND | O_CREAT);
+    if (logfd >= 0) {
+        write(logfd, path, strlen(path));
+        write(logfd, "\n", 1);
+        close(logfd);
+    }
+#endif
+
     if (cachefd < 0)
         return ;
 
