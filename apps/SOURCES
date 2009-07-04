@@ -125,6 +125,7 @@ recorder/recording.c
 #if INPUT_SRC_CAPS != 0
 audio_path.c
 #endif /* INPUT_SRC_CAPS != 0 */
+fixedpoint.c
 pcmbuf.c
 playback.c
 codecs.c

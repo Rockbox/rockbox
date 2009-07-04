@@ -33,6 +33,7 @@
 #include "misc.h"
 #include "tdspeed.h"
 #include "buffer.h"
+#include "fixedpoint.h"
 
 /* 16-bit samples are scaled based on these constants. The shift should be
  * no more than 15.
