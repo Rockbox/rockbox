@@ -67,7 +67,13 @@ void InstallTalkWindow::setTalkFolder(QString folder)
 void InstallTalkWindow::change()
 {
     Config *cw = new Config(this,4);
-    
+   
+    // make sure the current selected folder doesn't get lost on settings
+    // changes. If the current selection is invalid don't accept it so
+    // it gets reset to the old value after closing the settings dialog. 
+    QString folderToTalk = ui.lineTalkFolder->text();
+    if(QFileInfo(folderToTalk).isDir())
+        RbSettings::setValue(RbSettings::LastTalkedFolder, folderToTalk);
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
     
     cw->show();
