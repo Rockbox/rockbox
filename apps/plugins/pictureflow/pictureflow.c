@@ -56,7 +56,12 @@ PLUGIN_HEADER
 #define PF_MENU ACTION_STD_MENU
 #define PF_QUIT (LAST_ACTION_PLACEHOLDER + 1)
 
-#if !defined(HAVE_SCROLLWHEEL)
+#if defined(HAVE_SCROLLWHEEL) || CONFIG_KEYPAD == IRIVER_H10_PAD || \
+    CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define USE_CORE_PREVNEXT
+#endif
+
+#ifndef USE_CORE_PREVNEXT
     /* scrollwheel targets use the wheel, just as they do in lists,
      * so there's no need for a special context,
      * others use left/right here too (as oppsed to up/down in lists) */
@@ -92,7 +97,7 @@ const struct button_mapping pf_context_album_scroll[] =
 #endif
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_PLUGIN|1)
 };
-#endif /* !defined(HAVE_SCROLLWHEEL) */
+#endif /* !USE_CORE_PREVNEXT */
 
 const struct button_mapping pf_context_buttons[] =
 {
@@ -148,7 +153,7 @@ const struct button_mapping pf_context_buttons[] =
 };
 const struct button_mapping *pf_contexts[] =
 {
-#if !defined(HAVE_SCROLLWHEEL)
+#ifndef USE_CORE_PREVNEXT
     pf_context_album_scroll,
 #endif
     pf_context_buttons
@@ -2647,7 +2652,7 @@ int main(void)
 
         /*/ Handle buttons */
         button = rb->get_custom_action(CONTEXT_PLUGIN
-#if !defined(HAVE_SCROLLWHEEL)
+#ifndef USE_CORE_PREVNEXT
             |(pf_state == pf_show_tracks ? 1 : 0)
 #endif
             ,instant_update ? 0 : HZ/16,
