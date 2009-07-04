@@ -3984,7 +3984,8 @@ static bool load_tagcache(void)
                     {
                         logf("Entry no longer valid.");
                         logf("-> %s", buf);
-                        delete_entry(fe->idx_id);
+                        if (global_settings.tagcache_autoupdate)
+                            delete_entry(fe->idx_id);
                         continue ;
                     }
 
