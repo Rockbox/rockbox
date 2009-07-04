@@ -23,7 +23,6 @@
 #define _EQ_H
 
 #include <inttypes.h>
-#include <stdbool.h>
 
 /* These depend on the fixed point formats used by the different filter types
    and need to be changed when they change.
