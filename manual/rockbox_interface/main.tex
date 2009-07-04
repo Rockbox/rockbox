@@ -9,7 +9,12 @@
 % The extension is selected in the preamble, so no further \ifpdfoutput
 % is necessary.
 \includegraphics[height=8cm,width=10cm,keepaspectratio=true]{rockbox_interface/images/\specimg-front}
-
+\opt{m3}{% replace with HAVEREMOTEKEYMAP when the h100 file exists or change specimg
+  \end{center}
+  % spacing between the two pictures, could possibly be improved
+  \begin{center}
+    \includegraphics[height=5.6cm,width=10cm,keepaspectratio=true]{rockbox_interface/images/\specimg-remote}
+}
 \end{center}
 
 Throughout this manual, the buttons on the \dap{} are labelled according to the
@@ -22,8 +27,8 @@ described in detail in the following paragraph.
   \wikilink{BlindFAQ}.
   
   %
-  \opt{h100}{ 
-  Hold or lay the \dap{} so that the side with the joystick and LCD is facing 
+  \opt{h100}{
+  Hold or lay the \dap{} so that the side with the joystick and LCD is facing
   towards you, and the curved side is at the top. The joystick functions as
   the \ButtonUp{}, \ButtonRight{}, \ButtonLeft{}, and \ButtonDown{} buttons when
   pressed in the appropriate direction. Pressing the joystick down functions as
@@ -467,7 +472,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   performed by inserting a paperclip gently into the Reset hole.
 }%
 
-\nopt{gigabeatf,m5,x5,archos}
+\nopt{gigabeatf,m3,m5,x5,archos}
   {
   \subsection{Starting the original firmware}
   \label{ref:Dualboot}

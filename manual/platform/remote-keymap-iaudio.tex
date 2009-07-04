@@ -1,0 +1,95 @@
+% $Id$ %
+
+\newcommand{\ButtonRCLeft}{\btnfnt{Rewind}}
+\newcommand{\ButtonRCRight}{\btnfnt{Forward}}
+\newcommand{\ButtonRCUp}{\btnfnt{Volume Up}}
+\newcommand{\ButtonRCDown}{\btnfnt{Volume Down}}
+\newcommand{\ButtonRCRec}{\btnfnt{Rec}}
+\newcommand{\ButtonRCPlay}{\btnfnt{Play}}
+\newcommand{\ButtonRCMode}{\btnfnt{Mode}}
+\newcommand{\ButtonRCMenu}{\btnfnt{Menu}}
+\newcommand{\ButtonRCHold}{\btnfnt{Hold}}
+
+%Button actions, standard context
+\newcommand{\ActionRCStdPrev}{\ButtonRCUp}
+\newcommand{\ActionRCStdPrevRepeat}{Long \ButtonRCUp}
+\newcommand{\ActionRCStdNext}{\ButtonRCDown}
+\newcommand{\ActionRCStdNextRepeat}{Long \ButtonRCDown}
+\newcommand{\ActionRCStdCancel}{\ButtonLeft}
+\newcommand{\ActionRCStdContext}{Long \ButtonRCMode}
+\newcommand{\ActionRCStdQuickScreen}{Long \ButtonRCRec}
+\newcommand{\ActionRCQuickScreenExit}{\ButtonRCRec}
+\newcommand{\ActionRCStdMenu}{\ButtonRCRec}
+\newcommand{\ActionRCStdOk}{\ButtonRCPlay{} or \ButtonRCRight}
+
+%Button actions, wps context
+\newcommand{\ActionRCWpsPlay}{\ButtonRCPlay}
+\newcommand{\ActionRCWpsStop}{Long \ButtonRCPlay}
+\newcommand{\ActionRCWpsSkipNext}{\ButtonRCRight}
+\newcommand{\ActionRCWpsSkipPrev}{\ButtonRCLeft}
+\newcommand{\ActionRCWpsSeekBack}{Long \ButtonRCLeft}
+\newcommand{\ActionRCWpsSeekFwd}{Long \ButtonRCRight}
+\newcommand{\ActionRCWpsVolDown}{\ButtonRCDown}
+\newcommand{\ActionRCWpsVolUp}{\ButtonRCUp}
+\newcommand{\ActionRCWpsQuickScreen}{Long \ButtonRCMenu{} (Main: Long \ButtonRec}
+\newcommand{\ActionRCWpsMenu}{\ButtonRCMenu{} (Main: \ButtonRec)}
+\newcommand{\ActionRCWpsContext}{Long \ButtonRCMode}
+\newcommand{\ActionRCWpsBrowse}{\ButtonRCMode}
+
+%Button actions, tree context
+\newcommand{\ActionRCTreeWps}{\ButtonRCPlay}
+\newcommand{\ActionRCTreeStop}{Long \ButtonRCPlay}
+\newcommand{\ActionRCTreeEnter}{\ButtonRCPlay{} or \ButtonRCRight}
+\newcommand{\ActionRCTreeParentDirectory}{\ButtonRCLeft}
+
+%Button actions, YesNo context
+\newcommand{\ActionRCYesNoAccept}{\ButtonRCPlay}
+
+%Button actions, Setting context
+\newcommand{\ActionRCSettingInc}{\ButtonRCUp}
+\newcommand{\ActionRCSettingDec}{\ButtonRCDown}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionRCKbdLeft}{\ButtonRCLeft}
+\newcommand{\ActionRCKbdRight}{\ButtonRCRight}
+\newcommand{\ActionRCKbdUp}{\ButtonRCUp}
+\newcommand{\ActionRCKbdDown}{\ButtonRCDown}
+\newcommand{\ActionRCKbdSelect}{\ButtonRCPlay}
+\newcommand{\ActionRCKbdDone}{Long \ButtonRCPlay}
+\newcommand{\ActionRCKbdAbort}{\ButtonRec}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionRCPsToggleMode}{\ButtonRCMode}
+\newcommand{\ActionRCPsIncSmall}{\ButtonRCUp}
+\newcommand{\ActionRCPsIncBig}{Long \ButtonRCUp}
+\newcommand{\ActionRCPsDecSmall}{\ButtonRCDown}
+\newcommand{\ActionRCPsDecBig}{Long \ButtonRCDown}
+\newcommand{\ActionRCPsNudgeLeft}{\ButtonRCLeft}
+\newcommand{\ActionRCPsNudgeRight}{\ButtonRCRight}
+\newcommand{\ActionRCPsReset}{\ButtonRCRec}
+\newcommand{\ActionRCPsExit}{\ButtonRCPlay}
+
+%Button actions, Recording screen context
+\newcommand{\ActionRCRecPause}{\ButtonRCPlay}
+\newcommand{\ActionRCRecNewfile}{\ButtonRCRec}
+\newcommand{\ActionRCRecSettingsInc}{\ButtonRCRight}
+\newcommand{\ActionRCRecSettingsDec}{\ButtonRCLeft}
+\newcommand{\ActionRCRecPrev}{\ButtonRCUp}
+\newcommand{\ActionRCRecNext}{\ButtonRCDown}
+\newcommand{\ActionRCRecMenu}{\ButtonRCMenu{} (Main: Long \ButtonRec)}
+\newcommand{\ActionRCRecExit}{Long \ButtonRCPlay}
+
+%Button actions, FM radio context
+\newcommand{\ActionRCFMPreset}{\ButtonRCMode}
+\newcommand{\ActionRCFMMenu}{Long \ButtonRCMode}
+\newcommand{\ActionRCFMMode}{Long \ButtonRCRec}
+\newcommand{\ActionRCFMStop}{Long \ButtonPlay}
+\newcommand{\ActionRCFMExit}{\ButtonRCMenu{} (Main: \ButtonRec)}
+\newcommand{\ActionRCFMPlay}{\ButtonPlay}
+\newcommand{\ActionRCFMSettingsInc}{\ActionRCSettingInc}
+\newcommand{\ActionRCFMSettingsDec}{\ActionRCSettingDec}
+\newcommand{\ActionRCFMPrev}{\ButtonRCLeft}
+\newcommand{\ActionRCFMNext}{\ButtonRCRight}
+
+%Button actions, Bookmark screen context
+\newcommand{\ActionRCBmDelete}{Long \ButtonRec}

@@ -372,7 +372,7 @@ structure that Rockbox needs.\\}
   \subsubsection{Installing the bootloader}
   \opt{h100,h300}{\input{getting_started/iriver_install.tex}}
   \opt{ipod}{\input{getting_started/ipod_install.tex}}
-  \opt{m5,x5}{\input{getting_started/iaudio_install.tex}}
+  \opt{m3,m5,x5}{\input{getting_started/iaudio_install.tex}}
   \opt{h10,h10_5gb}{\input{getting_started/h10_install.tex}}
   \opt{gigabeatf}{\input{getting_started/gigabeat_install.tex}}
   \opt{sansa}{\input{getting_started/sansa_install.tex}}
@@ -394,12 +394,15 @@ structure that Rockbox needs.\\}
   \end{itemize}
 }
 
-\opt{m5,x5}{
+\opt{m3,m5,x5}{
   After installing you \emph{need} to power-cycle the 
   \dap{} by doing the following steps.
   \begin{itemize}
   \item Safely eject / unmount your \dap{} and unplug the USB cable.
-  \item Hold the \ButtonPower{} button to turn off the \dap{}. 
+  \item Hold the
+     \opt{IAUDIO_X5_PAD}{\ButtonPower}
+     \opt{IAUDIO_M3_PAD}{\ButtonPlay}
+     button to turn off the \dap{}. 
   \item Insert the charger. The Rockbox bootloader will automatically be flashed.
   \end{itemize}
 }
@@ -477,6 +480,10 @@ you turn the unit on, Rockbox should load.}
     \dap{} using Itunes can be viewed by initialising and using Rockbox's database.
     See \reference{ref:database} for more information.
   }
+}
+
+\opt{m3}{
+  \fixme{Add a note about the charging trick and place it here?}
 }
 
 \section{Updating Rockbox}
