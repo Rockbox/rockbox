@@ -480,6 +480,46 @@ RB_WRAP(current_path)
         return 0;
 }
 
+static void fill_text_message(lua_State *L, struct text_message * message,
+                              int pos)
+{
+    int i;
+    luaL_checktype(L, pos, LUA_TTABLE);
+    int n = luaL_getn(L, pos);
+    const char **lines = (const char**) dlmalloc(n * sizeof(const char*));
+    for(i=1; i<=n; i++)
+    {
+        lua_rawgeti(L, pos, i);
+        lines[i-1] = luaL_checkstring(L, -1);
+        lua_pop(L, 1);
+    }
+    message->message_lines = lines;
+    message->nb_lines = n;
+}
+
+RB_WRAP(gui_syncyesno_run)
+{
+    struct text_message main_message, yes_message, no_message;
+    struct text_message *yes = NULL, *no = NULL;
+
+    fill_text_message(L, &main_message, 1);
+    if(!lua_isnoneornil(L, 2))
+        fill_text_message(L, (yes = &yes_message), 2);
+    if(!lua_isnoneornil(L, 3))
+        fill_text_message(L, (no = &no_message), 3);
+
+    enum yesno_res result = rb->gui_syncyesno_run(&main_message, yes, no);
+
+    dlfree(main_message.message_lines);
+    if(yes)
+        dlfree(yes_message.message_lines);
+    if(no)
+        dlfree(no_message.message_lines);
+
+    lua_pushinteger(L, result);
+    return 1;
+}
+
 #define R(NAME) {#NAME, rock_##NAME}
 static const luaL_Reg rocklib[] =
 {
@@ -518,6 +558,7 @@ static const luaL_Reg rocklib[] =
     R(set_viewport),
     R(clear_viewport),
     R(current_path),
+    R(gui_syncyesno_run),
 
     {"new_image", rli_new},
 

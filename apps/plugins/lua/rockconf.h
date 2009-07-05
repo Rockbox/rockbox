@@ -44,6 +44,7 @@
 #define luai_jmpbuf jmp_buf
 
 extern char curpath[MAX_PATH];
+void* dlmalloc(size_t bytes);
 void *dlrealloc(void *ptr, size_t size);
 void dlfree(void *ptr);
 struct tm *gmtime(const time_t *timep);
