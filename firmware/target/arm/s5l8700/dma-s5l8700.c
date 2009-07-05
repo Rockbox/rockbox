@@ -83,7 +83,7 @@ void dma_setup_channel(int channel, int sel, int dir, int dsize, int blen,
                       (1 << 16) |       /* WCOMINT */
                       (0 << 0);         /* OFFSET */
     DMABASE(channel) = (unsigned int)addr;
-    DMATCNT(channel) = size;
+    DMATCNT(channel) = size - 1;
 }
 
 void dma_enable_channel(int channel)
