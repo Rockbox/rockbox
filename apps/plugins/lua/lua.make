@@ -43,7 +43,7 @@ $(LUA_BUILDDIR)/rocklib_aux.c: $(APPSDIR)/plugin.h
 	$(call PRINTS,GEN $(@F))$(CC) $(CFLAGS) $(INCLUDES) -E -include plugin.h - < /dev/null | $(LUA_SRCDIR)/rocklib_aux.pl $(LUA_SRCDIR) > $(LUA_BUILDDIR)/rocklib_aux.c
 
 $(LUA_BUILDDIR)/rocklib_aux.o: $(LUA_BUILDDIR)/rocklib_aux.c
-	$(call PRINTS,CC $(<F))$(CC) $(INCLUDES) -I $(LUA_SRCDIR) $(CFLAGS) -c $< -o $@
+	$(call PRINTS,CC $(<F))$(CC) $(INCLUDES) -DPLUGIN -I $(LUA_SRCDIR) $(CFLAGS) -c $< -o $@
 
 $(LUA_BUILDDIR)/lua.refmap: $(LUA_OBJ)
 
