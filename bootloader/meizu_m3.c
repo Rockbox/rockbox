@@ -18,12 +18,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+
+#include "config.h"
+
 #include "inttypes.h"
-#include "string.h"
 #include "cpu.h"
 #include "system.h"
 #include "lcd.h"
@@ -45,8 +48,11 @@
 #include "qt1106.h"
 #include "bitmaps/rockboxlogo.h"
 
-
-#include <stdarg.h>
+#include "i2c-s5l8700.h"
+#include "dma-target.h"
+#include "pcm.h"
+#include "audiohw.h"
+#include "rtc.h"
 
 char version[] = APPSVERSION;
 #define LONG_DELAY  200000
@@ -103,11 +109,18 @@ void bl_debug_int(unsigned int input,unsigned int count)
 void main(void)
 {
     char mystring[64];
-
+    int i;
+    unsigned short data = 0;
+    char write_data[2], read_data[16];
+    
     //Set backlight pin to output and enable
     int oldval = PCON0;
     PCON0 = ((oldval & ~(3 << 4)) | (1 << 4));
     PDAT0 |= (1 << 2);
+    
+    // Set codec reset pin inactive
+    PCON5 = (PCON5 & ~0xF) | 1;
+    PDAT5 &= ~(1 << 0);
     
     //power on
 //    oldval = PCON1;
@@ -128,10 +141,15 @@ void main(void)
     EINTMSK = 0x11;
     asm volatile("msr cpsr_c, #0x13\n\t"); // enable interrupts
         
+    system_init();
+    kernel_init();
+
     backlight_init();
     lcd_init();
     lcd_update();
 
+    i2c_init();
+    
     init_qt1106();
 
     /* Calibrate the lot */
@@ -147,19 +165,50 @@ void main(void)
 
     while(true)
     {
+#if 1   /* enable this to see info about the slider touchpad */
         qt1106_wait();
 
         int slider = qt1106_io(QT1106_MODE_FREE | QT1106_MOD_INF \
             | QT1106_DI | QT1106_SLD_SLIDER | QT1106_RES_256);
         snprintf(mystring, 64, "%x %2.2x",(slider & 0x008000)>>15, slider&0xff);
         lcd_puts(0,1,mystring);
-        lcd_update();
+        _backlight_set_brightness((slider & 0xFF) >> 4);
+        
         /*
         if(slider & 0x008000)
             bl_debug_count(((slider&0xff)) + 1);
         */
-        
-        _backlight_set_brightness(slider & 0xFF);
+#endif
+
+#if 1   /* enable this to see info about the RTC */
+        rtc_read_datetime(read_data);
+        for (i = 0; i < 7; i++) {
+            snprintf(mystring + 2 * i, 64, "%02X", read_data[i]);
+        }
+        lcd_puts(0, 10, mystring);
+#endif 
+
+#if 1   /* enable this so see info about the UDA1380 codec */
+        memset(read_data, 0, sizeof(read_data));
+        for (i = 0; i < 7; i++) {
+            write_data[0] = i;
+            i2c_read(0x30, i, 2, read_data);
+            data = read_data[0] << 8 | read_data[1];
+            snprintf(mystring + 4 * i, 64, "%04X", data);
+        }
+        lcd_puts(0, 11, mystring);
+#endif
+
+#if 1   /* enable this to see info about IODMA channel 0 (PCM) */
+        snprintf(mystring, 64, "DMA: %08X %08X", DMACADDR0, DMACTCNT0);
+        lcd_puts(0, 12, mystring);
+#endif        
+#if 1   /* enable this to see info about IIS */
+        snprintf(mystring, 64, "IIS: %08X", I2SSTATUS);
+        lcd_puts(0, 13, mystring);
+#endif        
+
+        lcd_update();
     }
 
     //power off
