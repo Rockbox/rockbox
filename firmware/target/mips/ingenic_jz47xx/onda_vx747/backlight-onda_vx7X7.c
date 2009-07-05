@@ -39,7 +39,6 @@ static void set_backlight(int val)
     if(val == old_val)
         return;
 
-    /* Clock = 32 768 Hz */
     __tcu_disable_pwm_output(BACKLIGHT_PWM);
     __tcu_stop_counter(BACKLIGHT_PWM);
 
@@ -75,8 +74,8 @@ bool _backlight_init(void)
     __tcu_set_pwm_output_shutdown_graceful(BACKLIGHT_PWM);
     __tcu_disable_pwm_output(BACKLIGHT_PWM);
 
-    __tcu_select_rtcclk(BACKLIGHT_PWM); /* 32.768 kHz */
-    __tcu_select_clk_div1(BACKLIGHT_PWM);
+    __tcu_select_extalclk(BACKLIGHT_PWM);  /* 12 MHz */
+    __tcu_select_clk_div64(BACKLIGHT_PWM); /* 187.5 kHz */
 
     __tcu_mask_half_match_irq(BACKLIGHT_PWM);
     __tcu_mask_full_match_irq(BACKLIGHT_PWM);
