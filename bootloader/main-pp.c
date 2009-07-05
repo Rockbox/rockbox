@@ -82,7 +82,7 @@ extern int show_logo(void);
 unsigned char *loadbuffer = (unsigned char *)DRAM_START;
 
 /* Bootloader version */
-char version[] = APPSVERSION;
+char version[] = "6.0";
         
 /* Locations and sizes in hidden partition on Sansa */
 #if (CONFIG_STORAGE & STORAGE_SD)

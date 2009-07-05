@@ -25,6 +25,12 @@
 #include <string.h>
 
 #include "bitmaps/rockboxlogo.h"
+#if CONFIG_CPU == PP5024 || CONFIG_CPU == PP5024 || CONFIG_CPU == PP5024
+#ifdef APPSVERSION
+#undef APPSVERSION
+#endif
+#define APPSVERSION "6.0"
+#endif
 
 #if (CONFIG_CPU == AS3525) /* for this release, hack the version number in */
 #define BOOT_VERSION ("Boot Ver. 1.0RC")
