@@ -66,8 +66,10 @@ SECTIONS
   {
      *(.stack)
      _stackbegin = .;
+     stackbegin = .;
      . += 0x2000;
      _stackend = .;
+     stackend = .;
      _irqstackbegin = .;
      . += 0x400;
      _irqstackend = .;

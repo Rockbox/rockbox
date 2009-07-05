@@ -1258,10 +1258,13 @@ target/arm/s5l8700/meizu-m6sp/lcd-m6sp.c
 
 #ifdef MEIZU_M3
 target/arm/s5l8700/backlight-meizu.c
+target/arm/s5l8700/kernel-s5l8700.c
 target/arm/s5l8700/meizu-m3/lcd-m3.c
 drivers/qt1106.c
 #ifndef SIMULATOR
 #ifndef BOOTLOADER
+target/arm/s5l8700/dma-s5l8700.c
+target/arm/s5l8700/pcm-s5l8700.c
 target/arm/s5l8700/udacodec-meizu.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
