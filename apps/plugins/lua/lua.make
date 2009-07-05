@@ -39,7 +39,7 @@ $(LUA_BUILDDIR)/buttons.lua: $(LUA_OBJ)
 	$(SILENT)$(CC) $(INCLUDES) -dM -E -include button-target.h - < /dev/null | $(LUA_SRCDIR)/button_helper.pl | $(HOSTCC) -fno-builtin $(INCLUDES) -x c -o $(LUA_BUILDDIR)/button_helper -
 	$(call PRINTS,GEN $(@F))$(LUA_BUILDDIR)/button_helper > $(LUA_BUILDDIR)/buttons.lua
 
-$(LUA_BUILDDIR)/rocklib_aux.c: $(APPSDIR)/plugin.h
+$(LUA_BUILDDIR)/rocklib_aux.c: $(APPSDIR)/plugin.h $(LUA_OBJ)
 	$(call PRINTS,GEN $(@F))$(CC) $(CFLAGS) $(INCLUDES) -E -include plugin.h - < /dev/null | $(LUA_SRCDIR)/rocklib_aux.pl $(LUA_SRCDIR) > $(LUA_BUILDDIR)/rocklib_aux.c
 
 $(LUA_BUILDDIR)/rocklib_aux.o: $(LUA_BUILDDIR)/rocklib_aux.c
