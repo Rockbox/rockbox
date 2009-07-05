@@ -56,7 +56,6 @@ static void reverse_bits(unsigned char* v, int size)
 
 void rtc_init(void)
 {
-    i2c_init();
 }
 
 int rtc_read_datetime(unsigned char* buf)
