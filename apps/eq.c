@@ -21,104 +21,10 @@
 
 #include <inttypes.h>
 #include "config.h"
-#include "dsp.h"
+#include "fixedpoint.h"
+#include "fracmul.h"
 #include "eq.h"
 #include "replaygain.h"
-
-/* Inverse gain of circular cordic rotation in s0.31 format. */
-static const long cordic_circular_gain = 0xb2458939; /* 0.607252929 */
-
-/* Table of values of atan(2^-i) in 0.32 format fractions of pi where pi = 0xffffffff / 2 */
-static const unsigned long atan_table[] = {
-    0x1fffffff, /* +0.785398163 (or pi/4) */
-    0x12e4051d, /* +0.463647609 */
-    0x09fb385b, /* +0.244978663 */
-    0x051111d4, /* +0.124354995 */
-    0x028b0d43, /* +0.062418810 */
-    0x0145d7e1, /* +0.031239833 */
-    0x00a2f61e, /* +0.015623729 */
-    0x00517c55, /* +0.007812341 */
-    0x0028be53, /* +0.003906230 */
-    0x00145f2e, /* +0.001953123 */
-    0x000a2f98, /* +0.000976562 */
-    0x000517cc, /* +0.000488281 */
-    0x00028be6, /* +0.000244141 */
-    0x000145f3, /* +0.000122070 */
-    0x0000a2f9, /* +0.000061035 */
-    0x0000517c, /* +0.000030518 */
-    0x000028be, /* +0.000015259 */
-    0x0000145f, /* +0.000007629 */
-    0x00000a2f, /* +0.000003815 */
-    0x00000517, /* +0.000001907 */
-    0x0000028b, /* +0.000000954 */
-    0x00000145, /* +0.000000477 */
-    0x000000a2, /* +0.000000238 */
-    0x00000051, /* +0.000000119 */
-    0x00000028, /* +0.000000060 */
-    0x00000014, /* +0.000000030 */
-    0x0000000a, /* +0.000000015 */
-    0x00000005, /* +0.000000007 */
-    0x00000002, /* +0.000000004 */
-    0x00000001, /* +0.000000002 */
-    0x00000000, /* +0.000000001 */
-    0x00000000, /* +0.000000000 */
-};
-
-/**
- * Implements sin and cos using CORDIC rotation.
- *
- * @param phase has range from 0 to 0xffffffff, representing 0 and
- *        2*pi respectively.
- * @param cos return address for cos
- * @return sin of phase, value is a signed value from LONG_MIN to LONG_MAX,
- *         representing -1 and 1 respectively. 
- */
-static long fsincos(unsigned long phase, long *cos) {
-    int32_t x, x1, y, y1;
-    unsigned long z, z1;
-    int i;
-
-    /* Setup initial vector */
-    x = cordic_circular_gain;
-    y = 0;
-    z = phase;
-
-    /* The phase has to be somewhere between 0..pi for this to work right */
-    if (z < 0xffffffff / 4) {
-        /* z in first quadrant, z += pi/2 to correct */
-        x = -x;
-        z += 0xffffffff / 4;
-    } else if (z < 3 * (0xffffffff / 4)) {
-        /* z in third quadrant, z -= pi/2 to correct */
-        z -= 0xffffffff / 4;
-    } else {
-        /* z in fourth quadrant, z -= 3pi/2 to correct */
-        x = -x;
-        z -= 3 * (0xffffffff / 4);
-    }
-
-    /* Each iteration adds roughly 1-bit of extra precision */
-    for (i = 0; i < 31; i++) {
-        x1 = x >> i;
-        y1 = y >> i;
-        z1 = atan_table[i];
-
-        /* Decided which direction to rotate vector. Pivot point is pi/2 */
-        if (z >= 0xffffffff / 4) {
-            x -= y1;
-            y += x1;
-            z -= z1;
-        } else {
-            x += y1;
-            y -= x1;
-            z += z1;
-        }
-    }
-
-    *cos = x;
-
-    return y;
-}
 
 /** 
  * Calculate first order shelving filter. Filter is not directly usable by the
@@ -135,16 +41,16 @@ void filter_shelf_coefs(unsigned long cutoff, long A, bool low, int32_t *c)
     int32_t b0, b1, a0, a1; /* s3.28 */
     const long g = get_replaygain_int(A*5) << 4; /* 10^(db/40), s3.28 */
 
-    sin = fsincos(cutoff/2, &cos);
+    sin = fp_sincos(cutoff/2, &cos);
     if (low) {
-        const int32_t sin_div_g = DIV64(sin, g, 25);
+        const int32_t sin_div_g = fp_div(sin, g, 25);
         cos >>= 3;
         b0 = FRACMUL(sin, g) + cos;   /* 0.25 .. 4.10 */
         b1 = FRACMUL(sin, g) - cos;   /* -1 .. 3.98 */
         a0 = sin_div_g + cos;         /* 0.25 .. 4.10 */
         a1 = sin_div_g - cos;         /* -1 .. 3.98 */
     } else {
-        const int32_t cos_div_g = DIV64(cos, g, 25);
+        const int32_t cos_div_g = fp_div(cos, g, 25);
         sin >>= 3;
         b0 = sin + FRACMUL(cos, g);   /* 0.25 .. 4.10 */
         b1 = sin - FRACMUL(cos, g);   /* -3.98 .. 1 */
@@ -152,7 +58,7 @@ void filter_shelf_coefs(unsigned long cutoff, long A, bool low, int32_t *c)
         a1 = sin - cos_div_g;         /* -3.98 .. 1 */
     }
 
-    const int32_t rcp_a0 = DIV64(1, a0, 57); /* 0.24 .. 3.98, s2.29 */
+    const int32_t rcp_a0 = fp_div(1, a0, 57); /* 0.24 .. 3.98, s2.29 */
     *c++ = FRACMUL_SHL(b0, rcp_a0, 1);       /* 0.063 .. 15.85 */
     *c++ = FRACMUL_SHL(b1, rcp_a0, 1);       /* -15.85 .. 15.85 */
     *c++ = -FRACMUL_SHL(a1, rcp_a0, 1);      /* -1 .. 1 */
@@ -220,10 +126,10 @@ void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     long cs;
     const long one = 1 << 28; /* s3.28 */
     const long A = get_replaygain_int(db*5) << 5; /* 10^(db/40), s2.29 */
-    const long alpha = fsincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
+    const long alpha = fp_sincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
     int32_t a0, a1, a2; /* these are all s3.28 format */
     int32_t b0, b1, b2;
-    const long alphadivA = DIV64(alpha, A, 27);
+    const long alphadivA = fp_div(alpha, A, 27);
 
     /* possible numerical ranges are in comments by each coef */
     b0 = one + FRACMUL(alpha, A);     /* [1 .. 5] */
@@ -233,7 +139,7 @@ void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     a2 = one - alphadivA;             /* [-3 .. 1] */
 
     /* range of this is roughly [0.2 .. 1], but we'll never hit 1 completely */
-    const long rcp_a0 = DIV64(1, a0, 59); /* s0.31 */
+    const long rcp_a0 = fp_div(1, a0, 59); /* s0.31 */
     *c++ = FRACMUL(b0, rcp_a0);         /* [0.25 .. 4] */
     *c++ = FRACMUL(b1, rcp_a0);         /* [-2 .. 2] */
     *c++ = FRACMUL(b2, rcp_a0);         /* [-2.4 .. 1] */
@@ -251,7 +157,7 @@ void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     const long one = 1 << 25; /* s6.25 */
     const long sqrtA = get_replaygain_int(db*5/2) << 2; /* 10^(db/80), s5.26 */
     const long A = FRACMUL_SHL(sqrtA, sqrtA, 8); /* s2.29 */
-    const long alpha = fsincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
+    const long alpha = fp_sincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
     const long ap1 = (A >> 4) + one;
     const long am1 = (A >> 4) - one;
     const long twosqrtalpha = 2*FRACMUL(sqrtA, alpha);
@@ -272,7 +178,7 @@ void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     a2 = ap1 + FRACMUL(am1, cs) - twosqrtalpha;
 
     /* [0.1 .. 1.99] */
-    const long rcp_a0 = DIV64(1, a0, 55);    /* s1.30 */
+    const long rcp_a0 = fp_div(1, a0, 55);    /* s1.30 */
     *c++ = FRACMUL_SHL(b0, rcp_a0, 2);       /* [0.06 .. 15.9] */
     *c++ = FRACMUL_SHL(b1, rcp_a0, 2);       /* [-2 .. 31.7] */
     *c++ = FRACMUL_SHL(b2, rcp_a0, 2);       /* [0 .. 15.9] */
@@ -290,7 +196,7 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     const long one = 1 << 25; /* s6.25 */
     const long sqrtA = get_replaygain_int(db*5/2) << 2; /* 10^(db/80), s5.26 */
     const long A = FRACMUL_SHL(sqrtA, sqrtA, 8); /* s2.29 */
-    const long alpha = fsincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
+    const long alpha = fp_sincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
     const long ap1 = (A >> 4) + one;
     const long am1 = (A >> 4) - one;
     const long twosqrtalpha = 2*FRACMUL(sqrtA, alpha);
@@ -311,7 +217,7 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     a2 = ap1 - FRACMUL(am1, cs) - twosqrtalpha;
 
     /* [0.1 .. 1.99] */
-    const long rcp_a0 = DIV64(1, a0, 55);    /* s1.30 */
+    const long rcp_a0 = fp_div(1, a0, 55);    /* s1.30 */
     *c++ = FRACMUL_SHL(b0, rcp_a0, 2);       /* [0 .. 16] */
     *c++ = FRACMUL_SHL(b1, rcp_a0, 2);       /* [-31.7 .. 2] */
     *c++ = FRACMUL_SHL(b2, rcp_a0, 2);       /* [0 .. 16] */

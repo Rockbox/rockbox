@@ -30,188 +30,11 @@
 #include "metadata.h"
 #include "debug.h"
 #include "replaygain.h"
-
-/* The fixed point math routines (with the exception of fp_atof) are based
- * on oMathFP by Dan Carter (http://orbisstudios.com).
- */
-
-/* 12 bits of precision gives fairly accurate result, but still allows a
- * compact implementation. The math code supports up to 13...
- */
+#include "fixedpoint.h"
 
 #define FP_BITS         (12)
-#define FP_MASK         ((1 << FP_BITS) - 1)
 #define FP_ONE          (1 << FP_BITS)
-#define FP_TWO          (2 << FP_BITS)
-#define FP_HALF         (1 << (FP_BITS - 1))
-#define FP_LN2          ( 45426 >> (16 - FP_BITS))
-#define FP_LN2_INV      ( 94548 >> (16 - FP_BITS))
-#define FP_EXP_ZERO     ( 10922 >> (16 - FP_BITS))
-#define FP_EXP_ONE      (  -182 >> (16 - FP_BITS))
-#define FP_EXP_TWO      (     4 >> (16 - FP_BITS))
-#define FP_INF          (0x7fffffff)
-#define FP_LN10         (150902 >> (16 - FP_BITS))
 
-#define FP_MAX_DIGITS       (4)
-#define FP_MAX_DIGITS_INT   (10000)
-
-#define FP_FAST_MUL_DIV
-
-#ifdef FP_FAST_MUL_DIV
-
-/* These macros can easily overflow, but they are good enough for our uses,
- * and saves some code.
- */
-#define fp_mul(x, y) (((x) * (y)) >> FP_BITS)
-#define fp_div(x, y) (((x) << FP_BITS) / (y))
-
-#else
-
-static long fp_mul(long x, long y)
-{
-    long x_neg = 0;
-    long y_neg = 0;
-    long rc;
-
-    if ((x == 0) || (y == 0))
-    {
-        return 0;
-    }
-
-    if (x < 0)
-    {
-        x_neg = 1;
-        x = -x;
-    }
-
-    if (y < 0)
-    {
-        y_neg = 1;
-        y = -y;
-    }
-
-    rc = (((x >> FP_BITS) * (y >> FP_BITS)) << FP_BITS)
-        + (((x & FP_MASK) * (y & FP_MASK)) >> FP_BITS)
-        + ((x & FP_MASK) * (y >> FP_BITS))
-        + ((x >> FP_BITS) * (y & FP_MASK));
-
-    if ((x_neg ^ y_neg) == 1)
-    {
-        rc = -rc;
-    }
-
-    return rc;
-}
-
-static long fp_div(long x, long y)
-{
-    long x_neg = 0;
-    long y_neg = 0;
-    long shifty;
-    long rc;
-    int msb = 0;
-    int lsb = 0;
-
-    if (x == 0)
-    {
-        return 0;
-    }
-
-    if (y == 0)
-    {
-        return (x < 0) ? -FP_INF : FP_INF;
-    }
-
-    if (x < 0)
-    {
-        x_neg = 1;
-        x = -x;
-    }
-
-    if (y < 0)
-    {
-        y_neg = 1;
-        y = -y;
-    }
-
-    while ((x & BIT_N(30 - msb)) == 0)
-    {
-        msb++;
-    }
-
-    while ((y & BIT_N(lsb)) == 0)
-    {
-        lsb++;
-    }
-
-    shifty = FP_BITS - (msb + lsb);
-    rc = ((x << msb) / (y >> lsb));
-
-    if (shifty > 0)
-    {
-        rc <<= shifty;
-    }
-    else
-    {
-        rc >>= -shifty;
-    }
-
-    if ((x_neg ^ y_neg) == 1)
-    {
-        rc = -rc;
-    }
-
-    return rc;
-}
-
-#endif /* FP_FAST_MUL_DIV */
-
-static long fp_exp(long x)
-{
-    long k;
-    long z;
-    long R;
-    long xp;
-
-    if (x == 0)
-    {
-        return FP_ONE;
-    }
-
-    k = (fp_mul(abs(x), FP_LN2_INV) + FP_HALF) & ~FP_MASK;
-
-    if (x < 0)
-    {
-        k = -k;
-    }
-
-    x -= fp_mul(k, FP_LN2);
-    z = fp_mul(x, x);
-    R = FP_TWO + fp_mul(z, FP_EXP_ZERO + fp_mul(z, FP_EXP_ONE
-        + fp_mul(z, FP_EXP_TWO)));
-    xp = FP_ONE + fp_div(fp_mul(FP_TWO, x), R - x);
-
-    if (k < 0)
-    {
-        k = FP_ONE >> (-k >> FP_BITS);
-    }
-    else
-    {
-        k = FP_ONE << (k >> FP_BITS);
-    }
-
-    return fp_mul(k, xp);
-}
-
-static long fp_exp10(long x)
-{
-    if (x == 0)
-    {
-        return FP_ONE;
-    }
-
-    return fp_exp(fp_mul(FP_LN10, x));
-}
 
 static long fp_atof(const char* s, int precision)
 {
@@ -300,7 +123,7 @@ static long convert_gain(long gain)
         gain = 17 * FP_ONE;
     }
 
-    gain = fp_exp10(gain / 20) << (24 - FP_BITS);
+    gain = fp_factor(gain, FP_BITS) << (24 - FP_BITS);
 
     return gain;
 }

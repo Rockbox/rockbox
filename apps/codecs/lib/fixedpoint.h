@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: fixedpoint.h -1   $
  *
  * Copyright (C) 2006 Jens Arnold
  *
@@ -21,7 +21,7 @@
  *
  ****************************************************************************/
 
-/** PLUGINS - FIXED POINT MATH ROUTINES - USAGE
+ /** CODECS - FIXED POINT MATH ROUTINES - USAGE
  *
  *  - x and y arguments are fixed point integers
  *  - fracbits is the number of fractional bits in the argument(s)
@@ -39,33 +39,11 @@
  *  Take square root of a fixed point number:
  *      fp_sqrt(x, fracbits)
  *
- *  Calculate sin or cos of an angle (very fast, from a table):
- *      fp14_sin(angle)
- *      fp14_cos(angle)
- *          where angle is a non-fixed point integer in degrees.  Value
- *          returned is a fixed point integer with 14 fractional bits.
- *
- *  Calculate the natural log of a positive fixed point integer
- *      fp16_log(x)
- *          where x and the value returned are fixed point integers
- *          with 16 fractional bits.
  */
-
-#ifndef _FIXEDPOINT_H_PLUGINS
-#define _FIXEDPOINT_H_PLUGINS
+#ifndef _FIXEDPOINT_H_CODECS
+#define _FIXEDPOINT_H_CODECS
 
 long fp_sincos(unsigned long phase, long *cos);
 long fp_sqrt(long a, unsigned int fracbits);
-long fp14_cos(int val);
-long fp14_sin(int val);
-long fp16_log(int x);
-
-/* fast unsigned multiplication (16x16bit->32bit or 32x32bit->32bit,
- * whichever is faster for the architecture) */
-#ifdef CPU_ARM
-#define FMULU(a, b) ((uint32_t) (((uint32_t) (a)) * ((uint32_t) (b))))
-#else /* SH1, coldfire */
-#define FMULU(a, b) ((uint32_t) (((uint16_t) (a)) * ((uint16_t) (b))))
-#endif
 
 #endif

@@ -33,6 +33,8 @@
 #include "misc.h"
 #include "tdspeed.h"
 #include "buffer.h"
+#include "fixedpoint.h"
+#include "fracmul.h"
 
 /* 16-bit samples are scaled based on these constants. The shift should be
  * no more than 15.
@@ -841,7 +843,7 @@ void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff)
      * crossfeed shelf filter and should be removed if crossfeed settings are
      * ever made incompatible for any other good reason.
      */
-    cutoff = DIV64(cutoff, get_replaygain_int(hf_gain*5), 24);
+    cutoff = fp_div(cutoff, get_replaygain_int(hf_gain*5), 24);
     filter_shelf_coefs(cutoff, hf_gain, false, c);
     /* Scale coefs by LF gain and shift them to s0.31 format. We have no gains
      * over 1 and can do this safely

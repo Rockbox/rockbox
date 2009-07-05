@@ -198,7 +198,7 @@ static void wave_table_generate(void)
     for (i=0;i<256;++i)
     {
         wave_array[i] = (unsigned char)((WAV_AMP
-                      * (sin_int((i * 360 * plasma_frequency) / 256))) / 16384);
+                      * (fp14_sin((i * 360 * plasma_frequency) / 256))) / 16384);
     }
 }
 

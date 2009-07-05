@@ -415,7 +415,7 @@ void calc_scales(void)
     for (i=1; i <= half_width; i++)
     {
         /* analog scale */
-        y = (half_width/5)*flog(i*fx_log_factor);
+        y = (half_width/5)*fp16_log(i*fx_log_factor);
 
         /* better way of checking for negative values? */
         z = y>>16;
@@ -431,7 +431,7 @@ void calc_scales(void)
         k = nh2 - ( j * j );
 
         /* fsqrt+1 seems to give a closer approximation */
-        y_values[i-1] = LCD_HEIGHT - (fsqrt(k, 16)>>8) - 1;
+        y_values[i-1] = LCD_HEIGHT - (fp_sqrt(k, 16)>>8) - 1;
         rb->yield();
     }
 }

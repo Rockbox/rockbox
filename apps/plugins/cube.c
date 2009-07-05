@@ -433,12 +433,12 @@ static void cube_rotate(int xa, int ya, int za)
     /* Just to prevent unnecessary lookups */
     long sxa, cxa, sya, cya, sza, cza;
 
-    sxa = sin_int(xa);
-    cxa = cos_int(xa);
-    sya = sin_int(ya);
-    cya = cos_int(ya);
-    sza = sin_int(za);
-    cza = cos_int(za);
+    sxa = fp14_sin(xa);
+    cxa = fp14_cos(xa);
+    sya = fp14_sin(ya);
+    cya = fp14_cos(ya);
+    sza = fp14_sin(za);
+    cza = fp14_cos(za);
 
     /* calculate overall translation matrix */
     matrice[0][0] = (cza * cya) >> 14;

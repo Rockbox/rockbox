@@ -1469,17 +1469,17 @@ static void bubbles_drawboard(struct game_context* bb) {
                   ROW_HEIGHT*(BB_HEIGHT-2)+BUBBLE_HEIGHT);
 
     /* draw arrow */
-    tipx = SHOTX+BUBBLE_WIDTH/2+(((sin_int(bb->angle)>>4)*BUBBLE_WIDTH*3/2)>>10);
-    tipy = SHOTY+BUBBLE_HEIGHT/2-(((cos_int(bb->angle)>>4)*BUBBLE_HEIGHT*3/2)>>10);
+    tipx = SHOTX+BUBBLE_WIDTH/2+(((fp14_sin(bb->angle)>>4)*BUBBLE_WIDTH*3/2)>>10);
+    tipy = SHOTY+BUBBLE_HEIGHT/2-(((fp14_cos(bb->angle)>>4)*BUBBLE_HEIGHT*3/2)>>10);
 
-    rb->lcd_drawline(SHOTX+BUBBLE_WIDTH/2+(((sin_int(bb->angle)>>4)*BUBBLE_WIDTH/2)>>10),
-                     SHOTY+BUBBLE_HEIGHT/2-(((cos_int(bb->angle)>>4)*BUBBLE_HEIGHT/2)>>10),
+    rb->lcd_drawline(SHOTX+BUBBLE_WIDTH/2+(((fp14_sin(bb->angle)>>4)*BUBBLE_WIDTH/2)>>10),
+                     SHOTY+BUBBLE_HEIGHT/2-(((fp14_cos(bb->angle)>>4)*BUBBLE_HEIGHT/2)>>10),
                      tipx, tipy);
     xlcd_filltriangle(tipx, tipy,
-                      tipx+(((sin_int(bb->angle-135)>>4)*BUBBLE_WIDTH/3)>>10),
-                      tipy-(((cos_int(bb->angle-135)>>4)*BUBBLE_HEIGHT/3)>>10),
-                      tipx+(((sin_int(bb->angle+135)>>4)*BUBBLE_WIDTH/3)>>10),
-                      tipy-(((cos_int(bb->angle+135)>>4)*BUBBLE_HEIGHT/3)>>10));
+                      tipx+(((fp14_sin(bb->angle-135)>>4)*BUBBLE_WIDTH/3)>>10),
+                      tipy-(((fp14_cos(bb->angle-135)>>4)*BUBBLE_HEIGHT/3)>>10),
+                      tipx+(((fp14_sin(bb->angle+135)>>4)*BUBBLE_WIDTH/3)>>10),
+                      tipy-(((fp14_cos(bb->angle+135)>>4)*BUBBLE_HEIGHT/3)>>10));
 
     /* draw text */
     rb->lcd_getstringsize(level, &w, &h);
@@ -1524,8 +1524,8 @@ static int bubbles_fire(struct game_context* bb) {
 
     /* get current bubble */
     bubblecur = bb->queue[bb->nextinq];
-    shotxinc = ((sin_int(bb->angle)>>4)*BUBBLE_WIDTH)/3;
-    shotyinc = ((-1*(cos_int(bb->angle)>>4))*BUBBLE_HEIGHT)/3;
+    shotxinc = ((fp14_sin(bb->angle)>>4)*BUBBLE_WIDTH)/3;
+    shotyinc = ((-1*(fp14_cos(bb->angle)>>4))*BUBBLE_HEIGHT)/3;
     shotxofs = shotyofs = 0;
 
     /* advance the queue */

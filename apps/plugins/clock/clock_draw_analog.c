@@ -41,11 +41,11 @@ void polar_to_cartesian(int a, int r, int* x, int* y)
 {
 #if CONFIG_LCD == LCD_SSD1815
     /* Correct non-square pixel aspect of archos recorder LCD */
-    *x = (sin_int(a) * 5 / 4 * r) >> 14;
+    *x = (fp14_sin(a) * 5 / 4 * r) >> 14;
 #else
-    *x = (sin_int(a) * r) >> 14;
+    *x = (fp14_sin(a) * r) >> 14;
 #endif
-    *y = (sin_int(a-90) * r) >> 14;
+    *y = (fp14_sin(a-90) * r) >> 14;
 }
 
 void polar_to_cartesian_screen_centered(struct screen * display, 

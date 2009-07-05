@@ -344,7 +344,7 @@ static void init_tables(void)
     phase = pfrac = 0;
 
     for (i = 0; i < TABLE_SIZE; i++) {
-         sin = fsincos(phase, NULL);
+         sin = fp_sincos(phase, NULL);
          xtable[i] = RADIUS_X + sin / DIV_X;
          ytable[i] = RADIUS_Y + sin / DIV_Y;
 
@@ -411,7 +411,7 @@ static void init_clock(void)
     phase = pfrac = 0;
 
     for (i = 0; i < 60; i++) {
-         sin = fsincos(phase, &cos);
+         sin = fp_sincos(phase, &cos);
          xminute[i] = LCD_WIDTH/2 + sin / DIV_MX;
          yminute[i] = LCD_HEIGHT/2 - cos / DIV_MY;
          xhour[i] = LCD_WIDTH/2 + sin / DIV_HX;
