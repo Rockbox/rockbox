@@ -24,6 +24,7 @@
 #include "system.h"
 #include "panic.h"
 #include "ascodec-target.h"
+#include "adc.h"
 #include "dma-target.h"
 #include "clock-target.h"
 #include "fmradio_i2c.h"
@@ -330,11 +331,11 @@ void set_cpu_frequency(long frequency)
     {
         /* Increasing frequency so boost voltage before change */
         ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_20));
+
         /* Wait for voltage to be at least 1.20v before making fclk > 200 MHz */
-        do
-            ascodec_write(AS3514_ADC_0, 4<<4);        /* ADC Input = CVDD */
-        while (ascodec_read(AS3514_ADC_1) < 0xe0);    /* 0x1e0 *.0025 = 1.20v */
-                                                      /* e0 = 8LSB's of 0x1e0 */
+        while(adc_read(ADC_CVDD) < 480) /* 480 * .0025 = 1.20V */
+            ;
+
         asm volatile(
             "mrc p15, 0, r0, c1, c0  \n"
 
