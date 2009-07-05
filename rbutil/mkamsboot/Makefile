@@ -2,6 +2,9 @@
 CFLAGS=-I../../tools/ucl/include -Wall
 LIBUCL=../../tools/ucl/src/libucl.a
 
+#change for releases
+APPVERSION=`../../tools/version.sh`
+
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 OUTPUT=mkamsboot.exe
 CFLAGS+=-mno-cygwin
@@ -32,7 +35,7 @@ md5.o: md5.c md5.h
 	$(CC) $(CFLAGS) -c -o md5.o -W -Wall md5.c
 
 mkamsboot.o: mkamsboot.c dualboot.h md5.h
-	$(CC) $(CFLAGS) -c -o mkamsboot.o -W -Wall mkamsboot.c
+	$(CC) $(CFLAGS) -c -o mkamsboot.o -W -Wall mkamsboot.c -DVERSION=\"$(APPVERSION)\"
 
 $(OUTPUT): mkamsboot.o md5.o dualboot.o $(LIBUCL)
 	$(CC) $(CFLAGS) -o $(OUTPUT) mkamsboot.o md5.o dualboot.o $(LIBUCL)

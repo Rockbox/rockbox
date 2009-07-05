@@ -109,8 +109,6 @@ execution to the uncompressed firmware.
 #define O_BINARY 0
 #endif
 
-#define VERSION "1.1"
-
 /* 4 for m200, 2 for e200/c200, 1 or 2 for fuze/clop */
 static const unsigned short hw_revisions[] = {
     [MODEL_FUZE]    = 1,
@@ -592,8 +590,9 @@ int main(int argc, char* argv[])
 
     sum.md5 = md5sum;
 
+/* VERSION comes frome the Makefile */
     fprintf(stderr,
-"mkamsboot v" VERSION " - (C) Dave Chapman and Rafaël Carré 2008\n"
+"mkamsboot Version " VERSION " - (C) Dave Chapman and Rafaël Carré 2008\n"
 "This is free software; see the source for copying conditions.  There is NO\n"
 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
 "\n");
