@@ -128,12 +128,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 158
+#define PLUGIN_API_VERSION 159
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 157
+#define PLUGIN_MIN_API_VERSION 159
 
 /* plugin return codes */
 enum plugin_status {
@@ -595,6 +595,9 @@ struct plugin_api {
     int (*playlist_create)(const char *dir, const char *file);
     int (*playlist_insert_track)(struct playlist_info* playlist,
             const char *filename, int position, bool queue, bool sync);
+    int (*playlist_insert_directory)(struct playlist_info* playlist,
+                              const char *dirname, int position, bool queue,
+                              bool recurse);
     int (*playlist_shuffle)(int random_seed, int start_index);
     void (*audio_play)(long offset);
     void (*audio_stop)(void);
@@ -821,9 +824,6 @@ struct plugin_api {
     const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    int (*playlist_insert_directory)(struct playlist_info* playlist,
-                              const char *dirname, int position, bool queue,
-                              bool recurse);
 };
 
 /* plugin header */

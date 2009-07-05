@@ -98,6 +98,6 @@ struct gui_syncstatusbar
 
 extern void gui_syncstatusbar_init(struct gui_syncstatusbar * bars);
 extern void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars, bool force_redraw);
-void gui_statusbar_changed(bool enabled);
+void gui_statusbar_changed(int enabled);
 
 #endif /*_GUI_STATUSBAR_H_*/

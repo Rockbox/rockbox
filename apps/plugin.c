@@ -468,6 +468,7 @@ static const struct plugin_api rockbox_api = {
     playlist_remove_all_tracks,
     playlist_create,
     playlist_insert_track,
+    playlist_insert_directory,
     playlist_shuffle,
     PREFIX(audio_play),
     audio_stop,
@@ -658,7 +659,6 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    playlist_insert_directory,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

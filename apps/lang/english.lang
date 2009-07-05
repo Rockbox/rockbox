@@ -12559,3 +12559,48 @@
     touchscreen: "Reset Calibration"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Top"
+  </dest>
+  <voice>
+    *: "Top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Bottom"
+  </dest>
+  <voice>
+    *: "Bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Remote Statusbar"
+  </dest>
+  <voice>
+    *: none
+    remote: "Remote Statusbar"
+  </voice>
+</phrase>

@@ -49,30 +49,47 @@ int viewport_get_nb_lines(struct viewport *vp)
 
 static bool showing_bars(enum screen_type screen)
 {
+    bool ignore = statusbar_enabled & VP_SB_IGNORE_SETTING(screen);
     if (statusbar_enabled & VP_SB_ONSCREEN(screen))
+    {
 #ifdef HAVE_LCD_BITMAP
-        return global_settings.statusbar ||
-               (statusbar_enabled & VP_SB_IGNORE_SETTING(screen));
+#ifdef HAVE_REMOTE_LCD
+        if (screen == SCREEN_REMOTE)
+            return global_settings.remote_statusbar || ignore;
+#endif
+        return global_settings.statusbar || ignore;
 #else
         return true;
 #endif
+    }
     return false;
 }    
 
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 {
+    bool bar_at_top = true;
     vp->x = 0;
     vp->width = screens[screen].lcdwidth;
 
 #ifdef HAVE_LCD_BITMAP
     vp->drawmode = DRMODE_SOLID;
     vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */
-
-    vp->y = showing_bars(screen)?STATUSBAR_HEIGHT:0;
+#ifdef HAVE_REMOTE_LCD
+    if (screen == SCREEN_REMOTE)
+        bar_at_top = global_settings.remote_statusbar != STATUSBAR_BOTTOM;
+    else
+#endif
+        bar_at_top = global_settings.statusbar != STATUSBAR_BOTTOM;
+        
+    vp->height = screens[screen].lcdheight;
+    if (bar_at_top && showing_bars(screen))
+        vp->y = STATUSBAR_HEIGHT;
+    else 
+        vp->y = 0;
 #else
     vp->y = 0;
 #endif
-    vp->height = screens[screen].lcdheight - vp->y;
+    vp->height = screens[screen].lcdheight - (showing_bars(screen)?STATUSBAR_HEIGHT:0);
 
 #ifdef HAVE_REMOTE_LCD
     /* We only need this test if there is a remote LCD */
@@ -136,5 +153,12 @@ void viewportmanager_draw_statusbars(void* data)
 void viewportmanager_statusbar_changed(void* data)
 {
     (void)data;
+    statusbar_enabled = 0;
+    if (global_settings.statusbar != STATUSBAR_OFF)
+        statusbar_enabled = VP_SB_ONSCREEN(SCREEN_MAIN);
+#ifdef HAVE_REMOTE_LCD
+    if (global_settings.remote_statusbar != STATUSBAR_OFF)
+        statusbar_enabled |= VP_SB_ONSCREEN(SCREEN_REMOTE);
+#endif
     viewportmanager_set_statusbar(statusbar_enabled);
 }

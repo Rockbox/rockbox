@@ -1112,14 +1112,12 @@ bool recording_screen(bool no_source)
             else
                 compact_view[i] = false;
         }
+        vp_list[i] = *v; /* get a copy now so it can be sized more easily */
         v->height = (font_get(v->font)->height)*(compact_view[i] ? 3 : 4);
 
         /* list section, rest of the screen */
-        v = &vp_list[i];
-        viewport_set_defaults(v, i);
-        v->font = vp_top[i].font;
-        v->y = vp_top[i].y + vp_top[i].height;
-        v->height = screens[i].lcdheight - v->y; /* the rest */
+        vp_list[i].y = vp_top[i].y + vp_top[i].height;
+        vp_list[i].height -= vp_list[i].y;
         screens[i].set_viewport(&vp_top[i]); /* req for next calls */
 
         screens[i].getstringsize("W", &w, &h);

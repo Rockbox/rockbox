@@ -937,7 +937,14 @@ static void statusbar_toggle_handler(void *data)
         }
         else
         {
-            vp->y      = STATUSBAR_HEIGHT;
+            bool bar_at_top = true;
+#ifdef HAVE_REMOTE_LCD
+            if (i == SCREEN_REMOTE)
+                bar_at_top = global_settings.remote_statusbar != STATUSBAR_BOTTOM;
+            else
+#endif
+                bar_at_top = global_settings.statusbar != STATUSBAR_BOTTOM;
+            vp->y      = bar_at_top?STATUSBAR_HEIGHT:0;
             vp->height = screens[i].lcdheight - STATUSBAR_HEIGHT;
         }
     }

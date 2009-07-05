@@ -149,6 +149,9 @@ enum { REPLAYGAIN_TRACK = 0, REPLAYGAIN_ALBUM, REPLAYGAIN_SHUFFLE, REPLAYGAIN_OF
 /* show path types */
 enum { SHOW_PATH_OFF = 0, SHOW_PATH_CURRENT, SHOW_PATH_FULL };
 
+/* statusbar visilibility */
+enum { STATUSBAR_OFF = 0, STATUSBAR_TOP, STATUSBAR_BOTTOM };
+
 /* Alarm settings */
 #ifdef HAVE_RTC_ALARM
 enum {  ALARM_START_WPS = 0,
@@ -535,7 +538,10 @@ struct user_settings
     int volume_type;   /* how volume is displayed: 0=graphic, 1=percent */
     int battery_display; /* how battery is displayed: 0=graphic, 1=percent */
     bool show_icons;   /* 0=hide 1=show */
-    bool statusbar;    /* 0=hide, 1=show */
+    int statusbar;    /* STATUSBAR_* enum values */
+#ifdef HAVE_REMOTE_LCD
+    int remote_statusbar;
+#endif        
 
 #if CONFIG_KEYPAD == RECORDER_PAD
     bool buttonbar;    /* 0=hide, 1=show */

@@ -591,8 +591,16 @@ const struct settings_list settings[] = {
                     ID2P(LANG_INVERT_CURSOR_POINTER),
                     ID2P(LANG_INVERT_CURSOR_BAR)),
  #endif
-    OFFON_SETTING(F_THEMESETTING|F_TEMPVAR, statusbar,
-                  LANG_STATUS_BAR, true,"statusbar", gui_statusbar_changed),
+    CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, statusbar,
+                  LANG_STATUS_BAR, STATUSBAR_TOP, "statusbar","off,top,bottom",
+                  gui_statusbar_changed, 3, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
+                  ID2P(LANG_STATUSBAR_BOTTOM)),
+#ifdef HAVE_REMOTE_LCD
+    CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, remote_statusbar,
+                  LANG_REMOTE_STATUSBAR, STATUSBAR_TOP, "remote statusbar","off,top,bottom",
+                  gui_statusbar_changed, 3, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
+                  ID2P(LANG_STATUSBAR_BOTTOM)),
+#endif
     OFFON_SETTING(0,scrollbar, LANG_SCROLL_BAR, true,"scrollbar", NULL),
 #if CONFIG_KEYPAD == RECORDER_PAD
     OFFON_SETTING(0,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),

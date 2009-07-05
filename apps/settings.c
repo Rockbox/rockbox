@@ -981,6 +981,7 @@ void settings_apply(bool read_disk)
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
     enc_global_settings_apply();
 #endif
+    send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
     list_init_viewports(NULL);
     send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
 }

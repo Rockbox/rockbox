@@ -321,6 +321,9 @@ static int statusbar_callback(int action,const struct menu_item_ex *this_item)
 }
 MENUITEM_SETTING(scrollbar_item, &global_settings.scrollbar, NULL);
 MENUITEM_SETTING(statusbar, &global_settings.statusbar, statusbar_callback);
+#ifdef HAVE_REMOTE_LCD
+MENUITEM_SETTING(remote_statusbar, &global_settings.remote_statusbar, statusbar_callback);
+#endif
 #if CONFIG_KEYPAD == RECORDER_PAD
 MENUITEM_SETTING(buttonbar, &global_settings.buttonbar, NULL);
 #endif
@@ -328,6 +331,9 @@ MENUITEM_SETTING(volume_type, &global_settings.volume_type, NULL);
 MENUITEM_SETTING(battery_display, &global_settings.battery_display, NULL);
 MAKE_MENU(bars_menu, ID2P(LANG_BARS_MENU), 0, Icon_NOICON,
           &scrollbar_item, &statusbar,
+#ifdef HAVE_REMOTE_LCD
+          &remote_statusbar,
+#endif  
 #if CONFIG_KEYPAD == RECORDER_PAD
           &buttonbar,
 #endif
