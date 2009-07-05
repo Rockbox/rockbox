@@ -26,10 +26,14 @@
 
 #include "bitmaps/rockboxlogo.h"
 
+#if (CONFIG_CPU == AS3525) /* for this release, hack the version number in */
+#define BOOT_VERSION ("Boot Ver. 1.0RC")
+#else
 #if LCD_WIDTH <= 128
 #define BOOT_VERSION ("Boot " APPSVERSION)
 #else
 #define BOOT_VERSION ("Boot Ver. " APPSVERSION)
+#endif
 #endif
 
 /* Ensure TEXT_XPOS is >= 0 */
