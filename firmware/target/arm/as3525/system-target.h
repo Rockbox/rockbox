@@ -22,6 +22,7 @@
 #define SYSTEM_TARGET_H
 
 #include "system-arm.h"
+#include "mmu-arm.h"
 
 #include "clock-target.h" /* CPUFREQ_* are defined here */
 
