@@ -46,7 +46,7 @@ the \setting{Show Files} setting to all.
 \begin{table}
     \begin{btnmap}{}{}
       \ActionStdPrev{}/\ActionStdNext{}
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCStdPrev{}/\ActionRCStdNext{}}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdPrev{}/\ActionRCStdNext{}}
          & Go to previous/next item in list. If you are on the first/last 
            entry, the cursor will wrap to the last/first entry.\\
       %
@@ -63,37 +63,37 @@ the \setting{Show Files} setting to all.
         }
       %
       \ActionTreeParentDirectory
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCTreeParentDirectory}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeParentDirectory}
       & Go to the parent directory.\\
       %
       \ActionTreeEnter
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCTreeEnter}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeEnter}
       & Executes the default action on the selected file or enters a
         directory.\\
       %
       \ActionTreeWps 
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCTreeWps}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeWps}
          & If there is an audio file playing, returns to the
          \setting{While Playing Screen} (WPS) without stopping playback.\\
       %
       \nopt{player,c200}%
         {%
           \ActionTreeStop 
-          \opt{IRIVER_RC_H100_PAD}{& \ActionRCTreeStop}
+          \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeStop}
           & Stops audio playback.\\%
         }%
       %
       \ActionStdContext{}
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCStdContext}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdContext}
       & Enter the \setting{Context Menu}\\
       %
       \ActionStdMenu{}
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCStdMenu}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdMenu}
       & Enter the \setting{Main Menu}\\
       %
       \opt{quickscreen}{
         \ActionStdQuickScreen
-        \opt{IRIVER_RC_H100_PAD}{& \ActionRCStdQuickScreen}
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdQuickScreen}
         & Switches to the \setting{Quick Screen}
         (see \reference{ref:QuickScreen}) \\
       }
@@ -199,24 +199,24 @@ can be easily changed by making a text file with the required layout.  More
   \begin{table}
     \begin{btnmap}{}{}
       \ActionKbdLeft~/ \ActionKbdRight~/ \ActionKbdUp~/ \ActionKbdDown
-      \opt{IRIVER_RC_H100_PAD}{
+      \opt{HAVEREMOTEKEYMAP}{
       &  \ActionRCKbdLeft~/ \ActionRCKbdRight~/ \ActionRCKbdUp~/ \ActionRCKbdDown}
       & Move about the virtual keyboard (moves the solid cursor) \\
       %
       \ActionKbdPageFlip
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdPageFlip}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdPageFlip}
       & Flip to the next page of characters (if there is more than one) \\
       %
       \ActionKbdCursorLeft{} / \ActionKbdCursorRight
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdCursorLeft{} / \ActionRCKbdCursorRight}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdCursorLeft{} / \ActionRCKbdCursorRight}
       & Move the line cursor within the text line \\
       %
       \ActionKbdSelect
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdSelect}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdSelect}
       & Inserts the selected keyboard letter at the current cursor position \\
       %
       \ActionKbdAbort
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdAbort}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdAbort}
       & Exits the virtual keyboard without saving any changes \\
       %
       \opt{RECORDER_PAD}{
@@ -225,19 +225,19 @@ can be easily changed by making a text file with the required layout.  More
       }
       %
       \ActionKbdDone
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdDone}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdDone}
       & Exits the virtual keyboard and saves any changes \\
       %
       \ActionKbdBackSpace
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdBackSpace}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdBackSpace}
       & Deletes the character before the line cursor \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,MROBE100_PAD}{
         \ActionKbdMorseInput
-         \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdMorseInput}
+         \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdMorseInput}
         & Enters Morse input mode \\
         \ActionKbdMorseSelect
-        \opt{IRIVER_RC_H100_PAD}{& \ActionRCKbdMorseSelect}
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdMorseSelect}
         & Tap to select a character in Morse input mode \\
       }
     \end{btnmap}

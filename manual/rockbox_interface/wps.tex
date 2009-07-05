@@ -58,40 +58,40 @@ your WPS (While Playing Screen).
 \begin{table}
   \begin{btnmap}{}{}
       \ActionWpsVolUp{} / \ActionWpsVolDown
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsVolUp{} / \ActionRCWpsVolDown}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsVolUp{} / \ActionRCWpsVolDown}
       & Volume up/down.\\
       %
       \ActionWpsSkipPrev
-       \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsSkipPrev}
+       \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsSkipPrev}
       & Go to beginning of track, or if pressed while in the
         first seconds of a track, go to previous track.\\
       %
       \ActionWpsSeekBack
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsSeekBack}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsSeekBack}
       & Rewind in track.\\
       %
       \ActionWpsSkipNext
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsSkipNext}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsSkipNext}
       & Go to next track.\\
       %
       \ActionWpsSeekFwd
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsSeekFwd}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsSeekFwd}
       & Fast forward in track.\\
       %
       \ActionWpsPlay
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsPlay}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsPlay}
       & Toggle play/pause.\\
       %
       \ActionWpsStop 
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsStop}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsStop}
       & Stop playback.\\
       %
       \ActionWpsBrowse
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsBrowse}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsBrowse}
       & Return to the \setting{File Browser}.\\
       %
       \ActionWpsContext
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsContext}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsContext}
       & Enter \setting{WPS Context Menu}.\\
       %
       \opt{ONDIO_PAD}{\ActionWpsContext{} twice}%
@@ -101,7 +101,7 @@ your WPS (While Playing Screen).
       %
       \opt{quickscreen}{%
         \ActionWpsQuickScreen
-        \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsQuickScreen}
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsQuickScreen}
           & Switches to the \setting{Quick Screen}.
           (see \reference{ref:QuickScreen}) \\}%
       %
@@ -123,14 +123,14 @@ your WPS (While Playing Screen).
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
           ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
         \ActionWpsPitchScreen
-        \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsPitchScreen}
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsPitchScreen}
          & Show \setting{Pitch Screen}
          (see \reference{sec:pitchscreen}).\\}%
       %
       \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD%
           ,MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
         \ActionWpsIdThreeScreen 
-          \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsIdThreeScreen}
+          \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsIdThreeScreen}
           & Enter \setting{ID3 Viewer}.\\%
       }%
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
@@ -138,7 +138,9 @@ your WPS (While Playing Screen).
          \ActionWpsAbSetBNextDir{} or }%
          % not all targets have the above action defined but the one below works on all
       Short \ActionWpsSkipNext{} + Long \ActionWpsSkipNext
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsAbSetBNextDir{} or
+      \opt{HAVEREMOTEKEYMAP}{
+        &
+          \opt{IRIVER_RC_H100_PAD}{\ActionRCWpsAbSetBNextDir{} or}
         Short \ActionRCWpsSkipNext{} + Long \ActionRCWpsSkipNext}
       & Skip to the next directory.\\
       %
@@ -146,13 +148,15 @@ your WPS (While Playing Screen).
          ,MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
          \ActionWpsAbSetAPrevDir{} or }%
       Short \ActionWpsSkipPrev{} + Long \ActionWpsSkipPrev
-      \opt{IRIVER_RC_H100_PAD}{& \ActionRCWpsAbSetAPrevDir{} or
+      \opt{HAVEREMOTEKEYMAP}{
+        &
+          \opt{IRIVER_RC_H100_PAD}{\ActionRCWpsAbSetAPrevDir{} or}
         Short \ActionRCWpsSkipNext{} + Long \ActionRCWpsSkipNext}
       & Skip to the previous directory.\\
       %
       \opt{SANSA_E200_PAD,SANSA_C200_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
         \ActionStdRec
-          \opt{IRIVER_RC_H100_PAD}{&} 
+          \opt{HAVEREMOTEKEYMAP}{&} 
           & Switches to the Recording screen \\
       }%
     \end{btnmap}
@@ -318,29 +322,29 @@ Delete the currently playing file.
     \begin{table}
       \begin{btnmap}{}{}
         \ActionPsToggleMode
-        \opt{IRIVER_RC_H100_PAD}{& \ActionRCPsToggleMode}
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsToggleMode}
         & Toggle pitch changing mode \\
         %
         \ActionPsIncSmall{} / \ActionPsDecSmall
-        \opt{IRIVER_RC_H100_PAD}{& \ActionRCPsIncSmall{} / \ActionRCPsDecSmall}
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsIncSmall{} / \ActionRCPsDecSmall}
         & Increase / Decrease pitch by 0.1\% (in procentual mode) or a semitone
           (in semitone mode)\\
         %
         \ActionPsIncBig{} / \ActionPsDecBig
-        \opt{IRIVER_RC_H100_PAD}{& \ActionRCPsIncBig{} / \ActionRCPsDecBig}
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsIncBig{} / \ActionRCPsDecBig}
         & Increase / Decrease pitch by 1\% (in procentual mode) or a semitone
           (in semitone mode)\\
         %
         \ActionPsNudgeLeft{} / \ActionPsNudgeRight
-        \opt{IRIVER_RC_H100_PAD}{& \ActionRCPsNudgeLeft{} / \ActionPsNudgeRight}
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsNudgeLeft{} / \ActionPsNudgeRight}
         & Temporarily change pitch by 2.0\% (beatmatch), or modify speed (in timestretch mode) \\
         %
         \ActionPsReset
-        \opt{IRIVER_RC_H100_PAD}{& \ActionRCPsReset}
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsReset}
         & Reset pitch and speed to 100\% \\
         %
         \ActionPsExit
-        \opt{IRIVER_RC_H100_PAD}{& \ActionRCPsExit}
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsExit}
         & Leave the Pitch Screen \\
         %
       \end{btnmap}
