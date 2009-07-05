@@ -34,7 +34,7 @@
 
 #include "bootimg.h"
 
-#define VERSION "0.2"
+#define VERSION "0.3"
 
 /* USB IDs for Manufacturing Mode */
 #define E200R_VENDORID    0x0781
