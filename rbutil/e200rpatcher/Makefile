@@ -40,8 +40,8 @@ e200rpatcher-ppc: e200rpatcher.c bootimg.c usb.h libusb-ppc.a
 	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -framework iokit -framework coreservices -arch ppc $(CFLAGS) -o e200rpatcher-ppc e200rpatcher.c bootimg.c -I. libusb-ppc.a
 	strip e200rpatcher-ppc
 
-bin2c: ../sansapatcher/bin2c.c
-	$(NATIVECC) $(CFLAGS) -o bin2c ../sansapatcher/bin2c.c
+bin2c: ../tools/bin2c.c
+	$(NATIVECC) $(CFLAGS) -o bin2c ../tools/bin2c.c
 
 bootimg.c: bootloader.bin bin2c
 	./bin2c bootloader.bin bootimg
