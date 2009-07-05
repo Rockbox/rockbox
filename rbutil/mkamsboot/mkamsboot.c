@@ -122,63 +122,76 @@ enum {
     MODEL_C200V2,
 };
 
+/* 4 for m200, 2 for e200/c200, 1 or 2 for fuze/clop */
+static const unsigned short hw_revisions[] = {
+    [MODEL_FUZE]    = 1,
+    [MODEL_CLIP]    = 1,
+    [MODEL_CLIPV2]  = 2,
+    [MODEL_E200V2]  = 2,
+    [MODEL_M200V4]  = 4,
+    [MODEL_C200V2]  = 2,
+};
+
+/* version 2 is used in Clipv2 and Fuzev2 firmwares */
+static const unsigned short fw_revisions[] = {
+    [MODEL_FUZE]    = 1,
+    [MODEL_CLIP]    = 1,
+    [MODEL_CLIPV2]  = 2,
+    [MODEL_E200V2]  = 1,
+    [MODEL_M200V4]  = 1,
+    [MODEL_C200V2]  = 1,
+};
+
 /* Descriptive name of these models */
 static const char* model_names[] = {
-    "Fuze",
-    "Clip",
-    "Clip v2",
-    "e200 v2",
-    "m200 v4",
-    "c200 v2"
+    [MODEL_FUZE]    = "Fuze",
+    [MODEL_CLIP]    = "Clip",
+    [MODEL_CLIPV2]  = "Clip",
+    [MODEL_E200V2]  = "e200",
+    [MODEL_M200V4]  = "m200",
+    [MODEL_C200V2]  = "c200",
 };
 
 /* Dualboot functions for these models */
 static const unsigned char* bootloaders[] = {
-    dualboot_fuze,
-    dualboot_clip,
-    dualboot_clipv2,
-    dualboot_e200v2,
-    dualboot_m200v4,
-    dualboot_c200v2,
+    [MODEL_FUZE]    = dualboot_fuze,
+    [MODEL_CLIP]    = dualboot_clip,
+    [MODEL_CLIPV2]  = dualboot_clipv2,
+    [MODEL_E200V2]  = dualboot_e200v2,
+    [MODEL_M200V4]  = dualboot_m200v4,
+    [MODEL_C200V2]  = dualboot_c200v2,
 };
 
 /* Size of dualboot functions for these models */
 static const int bootloader_sizes[] = {
-    sizeof(dualboot_fuze),
-    sizeof(dualboot_clip),
-    sizeof(dualboot_clipv2),
-    sizeof(dualboot_e200v2),
-    sizeof(dualboot_m200v4),
-    sizeof(dualboot_c200v2),
+    [MODEL_FUZE]    = sizeof(dualboot_fuze),
+    [MODEL_CLIP]    = sizeof(dualboot_clip),
+    [MODEL_CLIPV2]  = sizeof(dualboot_clipv2),
+    [MODEL_E200V2]  = sizeof(dualboot_e200v2),
+    [MODEL_M200V4]  = sizeof(dualboot_m200v4),
+    [MODEL_C200V2]  = sizeof(dualboot_c200v2),
 };
 
 /* Model names used in the Rockbox header in ".sansa" files - these match the
    -add parameter to the "scramble" tool */
 static const char* rb_model_names[] = {
-    "fuze",
-    "clip",
-    "clv2",
-    "e2v2",
-    "m2v4",
-    "c2v2",
+    [MODEL_FUZE]    = "fuze",
+    [MODEL_CLIP]    = "clip",
+    [MODEL_CLIPV2]  = "clv2",
+    [MODEL_E200V2]  = "e2v2",
+    [MODEL_M200V4]  = "m2v4",
+    [MODEL_C200V2]  = "c2v2",
 };
 
 /* Model numbers used to initialise the checksum in the Rockbox header in
    ".sansa" files - these are the same as MODEL_NUMBER in config-target.h */
 static const int rb_model_num[] = {
-    43,
-    40,
-    60,
-    41,
-    42,
-    44
-};
-
-struct md5sums {
-    int model;
-    char *version;
-    int fw_version; /* version 2 is used in Clipv2 and Fuzev2 firmwares */
-    char *md5;
+    [MODEL_FUZE]    = 43,
+    [MODEL_CLIP]    = 40,
+    [MODEL_CLIPV2]  = 60,
+    [MODEL_E200V2]  = 41,
+    [MODEL_M200V4]  = 42,
+    [MODEL_C200V2]  = 44
 };
 
 /* Checksums of unmodified original firmwares - for safety, and device
@@ -187,31 +200,31 @@ static struct md5sums sansasums[] = {
     /* NOTE: Different regional versions of the firmware normally only
              differ in the filename - the md5sums are identical */
 
-    /*   model       version    fw_version      md5                        */
-    { MODEL_E200V2, "3.01.11",      1,  "e622ca8cb6df423f54b8b39628a1f0a3" },
-    { MODEL_E200V2, "3.01.14",      1,  "2c1d0383fc3584b2cc83ba8cc2243af6" },
-    { MODEL_E200V2, "3.01.16",      1,  "12563ad71b25a1034cf2092d1e0218c4" },
+    /*   model       version    md5                        */
+    { MODEL_E200V2, "3.01.11", "e622ca8cb6df423f54b8b39628a1f0a3" },
+    { MODEL_E200V2, "3.01.14", "2c1d0383fc3584b2cc83ba8cc2243af6" },
+    { MODEL_E200V2, "3.01.16", "12563ad71b25a1034cf2092d1e0218c4" },
 
-    { MODEL_FUZE,   "1.01.11",      1,  "cac8ffa03c599330ac02c4d41de66166" },
-    { MODEL_FUZE,   "1.01.15",      1,  "df0e2c1612727f722c19a3c764cff7f2" },
-    { MODEL_FUZE,   "1.01.22",      1,  "5aff5486fe8dd64239cc71eac470af98" },
-    { MODEL_FUZE,   "1.02.26",      1,  "7c632c479461c48c8833baed74eb5e4f" },
+    { MODEL_FUZE,   "1.01.11", "cac8ffa03c599330ac02c4d41de66166" },
+    { MODEL_FUZE,   "1.01.15", "df0e2c1612727f722c19a3c764cff7f2" },
+    { MODEL_FUZE,   "1.01.22", "5aff5486fe8dd64239cc71eac470af98" },
+    { MODEL_FUZE,   "1.02.26", "7c632c479461c48c8833baed74eb5e4f" },
 
-    { MODEL_C200V2, "3.02.05",      1,  "b6378ebd720b0ade3fad4dc7ab61c1a5" },
+    { MODEL_C200V2, "3.02.05", "b6378ebd720b0ade3fad4dc7ab61c1a5" },
 
-    { MODEL_M200V4, "4.00.45",      1,  "82e3194310d1514e3bbcd06e84c4add3" },
-    { MODEL_M200V4, "4.01.08-A",    1,  "fc9dd6116001b3e6a150b898f1b091f0" },
-    { MODEL_M200V4, "4.01.08-E",    1,  "d3fb7d8ec8624ee65bc99f8dab0e2369" },
+    { MODEL_M200V4, "4.00.45", "82e3194310d1514e3bbcd06e84c4add3" },
+    { MODEL_M200V4, "4.01.08-A", "fc9dd6116001b3e6a150b898f1b091f0" },
+    { MODEL_M200V4, "4.01.08-E", "d3fb7d8ec8624ee65bc99f8dab0e2369" },
 
-    { MODEL_CLIP,   "1.01.17",      1,  "12caad785d506219d73f538772afd99e" },
-    { MODEL_CLIP,   "1.01.18",      1,  "d720b266bd5afa38a198986ef0508a45" },
-    { MODEL_CLIP,   "1.01.20",      1,  "236d8f75189f468462c03f6d292cf2ac" },
-    { MODEL_CLIP,   "1.01.29",      1,  "c12711342169c66e209540cd1f27cd26" },
-    { MODEL_CLIP,   "1.01.30",      1,  "f2974d47c536549c9d8259170f1dbe4d" },
-    { MODEL_CLIP,   "1.01.32",      1,  "d835d12342500732ffb9c4ee54abec15" },
+    { MODEL_CLIP,   "1.01.17", "12caad785d506219d73f538772afd99e" },
+    { MODEL_CLIP,   "1.01.18", "d720b266bd5afa38a198986ef0508a45" },
+    { MODEL_CLIP,   "1.01.20", "236d8f75189f468462c03f6d292cf2ac" },
+    { MODEL_CLIP,   "1.01.29", "c12711342169c66e209540cd1f27cd26" },
+    { MODEL_CLIP,   "1.01.30", "f2974d47c536549c9d8259170f1dbe4d" },
+    { MODEL_CLIP,   "1.01.32", "d835d12342500732ffb9c4ee54abec15" },
 
-    { MODEL_CLIPV2, "2.01.16",      2,  "c57fb3fcbe07c2c9b360f060938f80cb" },
-    { MODEL_CLIPV2, "2.01.32",      2,  "0ad3723e52022509089d938d0fbbf8c5" }
+    { MODEL_CLIPV2, "2.01.16", "c57fb3fcbe07c2c9b360f060938f80cb" },
+    { MODEL_CLIPV2, "2.01.32", "0ad3723e52022509089d938d0fbbf8c5" }
 };
 
 #define NUM_MD5S (sizeof(sansasums)/sizeof(sansasums[0]))
@@ -333,8 +346,8 @@ static unsigned char* uclpack(unsigned char* inbuf, int insize, int* outsize)
 
 /* Loads a Sansa AMS Original Firmware file into memory */
 unsigned char* load_of_file(
-        char* filename, off_t* bufsize, char* md5sum, int* model,
-        int* fw_version, int* firmware_size, unsigned char** of_packed,
+        char* filename, off_t* bufsize, struct md5sums *sum,
+        int* firmware_size, unsigned char** of_packed,
         int* of_packedsize, char* errstr, int errstrsize)
 {
     int fd;
@@ -363,34 +376,28 @@ unsigned char* load_of_file(
     /* check the file */
 
     /* Calculate MD5 checksum of OF */
-    calc_MD5(buf, *bufsize, md5sum);
+    calc_MD5(buf, *bufsize, sum->md5);
 
-    while ((i < NUM_MD5S) && (strcmp(sansasums[i].md5, md5sum) != 0))
+    while ((i < NUM_MD5S) && (strcmp(sansasums[i].md5, sum->md5) != 0))
         i++;
 
     if (i < NUM_MD5S) {
-        *model = sansasums[i].model;
-        *fw_version = sansasums[i].fw_version;
+        *sum = sansasums[i];
     } else {
-        if (get_uint32le(&buf[0x204])==0x0000f000) {
-            *fw_version = 2;
-            model_id = buf[0x219];
-        } else {
-            *fw_version = 1;
-            model_id = buf[0x215];
-        }
-        *model = get_model(model_id);
+        int fw_version = (get_uint32le(&buf[0x204]) == 0x0000f000) ? 2 : 1;
+        model_id = buf[(fw_version == 2) ? 0x219 : 0x215];
+        sum->model = get_model(model_id);
 
-        if (*model == MODEL_UNKNOWN)
+        if (sum->model == MODEL_UNKNOWN)
             ERROR("[ERR]  Unknown firmware model (v%d) - model id 0x%02x\n",
-                  *fw_version, model_id);
+                  fw_version, model_id);
 
 #if 1   /* comment to test new OFs */
         char tested_versions[100];
         tested_versions[0] = '\0';
 
         for (i = 0; i < NUM_MD5S ; i++)
-            if (sansasums[i].model == *model) {
+            if (sansasums[i].model == sum->model) {
                 if (tested_versions[0] != '\0') {
                     strncat(tested_versions, ", ",
                         sizeof(tested_versions) - strlen(tested_versions) - 1);
@@ -401,7 +408,7 @@ unsigned char* load_of_file(
 
         ERROR("[ERR]  Original firmware unknown, please try an other version." \
               " Tested %s versions are : %s\n",
-              model_names[*model], tested_versions);
+              model_names[sum->model], tested_versions);
 #endif
     }
 
@@ -412,14 +419,13 @@ unsigned char* load_of_file(
     if (checksum != 0xefbeadde && checksum != calc_checksum(buf, last_word))
         ERROR("%s", "[ERR]  Whole file checksum failed\n");
 
-    if (bootloaders[*model] == NULL)
-        ERROR("[ERR]  Unsupported model - \"%s\"\n", model_names[*model]);
-
+    if (bootloaders[sum->model] == NULL)
+        ERROR("[ERR]  Unsupported model - \"%s\"\n", model_names[sum->model]);
 
     /* Get the firmware size */
-    if (*fw_version == 1)
+    if (fw_revisions[sum->model] == 1)
         *firmware_size = get_uint32le(&buf[0x0c]);
-    else    /* fw_version == 2 */
+    else if (fw_revisions[sum->model] == 2)
         *firmware_size = get_uint32le(&buf[0x10]);
 
     /* Compress the original firmware image */
@@ -498,7 +504,7 @@ error:
 
 /* Patches a Sansa AMS Original Firmware file */
 void patch_firmware(
-        int model, int fw_version, int firmware_size, unsigned char* buf,
+        int model, int fw_revision, int firmware_size, unsigned char* buf,
         int len, unsigned char* of_packed, int of_packedsize,
         unsigned char* rb_packed, int rb_packedsize)
 {
@@ -548,10 +554,10 @@ void patch_firmware(
     /* Update the firmware block checksum */
     sum = calc_checksum(buf + 0x400, firmware_size);
 
-    if (fw_version == 1) {
+    if (fw_revision == 1) {
         put_uint32le(&buf[0x04], sum);
         put_uint32le(&buf[0x204], sum);
-    } else {
+    } else if (fw_revision == 2) {
         put_uint32le(&buf[0x08], sum);
         put_uint32le(&buf[0x208], sum);
 
@@ -586,15 +592,16 @@ int main(int argc, char* argv[])
     unsigned char* buf;
     int firmware_size;
     int bootloader_size;
-    int model;
     unsigned char* of_packed;
     int of_packedsize;
     unsigned char* rb_packed;
     int rb_packedsize;
-    int fw_version;
     int totalsize;
-    char md5sum[33]; /* 32 hex digits, plus terminating zero */
     char errstr[200];
+    struct md5sums sum;
+    char md5sum[33]; /* 32 digits + \0 */
+
+    sum.md5 = md5sum;
 
     fprintf(stderr,
 "mkamsboot v" VERSION " - (C) Dave Chapman and Rafaël Carré 2008\n"
@@ -612,7 +619,7 @@ int main(int argc, char* argv[])
     outfile = argv[3];
 
     /* Load original firmware file */
-    buf = load_of_file(infile, &len, md5sum, &model, &fw_version,
+    buf = load_of_file(infile, &len, &sum,
             &firmware_size, &of_packed, &of_packedsize, errstr, sizeof(errstr));
 
     if (buf == NULL) {
@@ -621,12 +628,13 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    fprintf(stderr, "[INFO] Original firmware MD5 checksum match - %s\n",
-            model_names[model]);
+    fprintf(stderr, "[INFO] Original firmware MD5 checksum match\n");
+    fprintf(stderr, "[INFO] Model: Sansa %s v%d - Firmware version: %s\n",
+            model_names[sum.model], hw_revisions[sum.model], sum.version);
 
 
     /* Load bootloader file */
-    rb_packed = load_rockbox_file(bootfile, model, &bootloader_size,
+    rb_packed = load_rockbox_file(bootfile, sum.model, &bootloader_size,
             &rb_packedsize, errstr, sizeof(errstr));
     if (rb_packed == NULL) {
         fprintf(stderr, "%s", errstr);
@@ -636,7 +644,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    printf("[INFO] Patching %s firmware\n", model_names[model]);
+    printf("[INFO] Firmware patching has begun !\n\n");
 
     fprintf(stderr, "[INFO] Original firmware size:   %d bytes\n",
             firmware_size);
@@ -647,11 +655,11 @@ int main(int argc, char* argv[])
     fprintf(stderr, "[INFO] Packed bootloader size:   %d bytes\n",
             rb_packedsize);
     fprintf(stderr, "[INFO] Dual-boot function size:  %d bytes\n",
-            bootloader_sizes[model]);
-    fprintf(stderr, "[INFO] UCL unpack function size: %d bytes\n",
+            bootloader_sizes[sum.model]);
+    fprintf(stderr, "[INFO] UCL unpack function size: %u bytes\n",
             sizeof(nrv2e_d8));
 
-    totalsize = total_size(model, of_packedsize, rb_packedsize);
+    totalsize = total_size(sum.model, of_packedsize, rb_packedsize);
 
     fprintf(stderr, "[INFO] Total size of new image:  %d bytes\n", totalsize);
 
@@ -663,8 +671,8 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    patch_firmware(model, fw_version, firmware_size, buf, len, of_packed,
-            of_packedsize, rb_packed, rb_packedsize);
+    patch_firmware(sum.model, fw_revisions[sum.model], firmware_size, buf, len,
+            of_packed, of_packedsize, rb_packed, rb_packedsize);
 
     /* Write the new firmware */
     fdout = open(outfile, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0666);
@@ -691,6 +699,7 @@ int main(int argc, char* argv[])
     free(buf);
     free(of_packed);
     free(rb_packed);
+    fprintf(stderr, "\n[INFO] Patching succeeded!\n");
 
     return 0;
 }

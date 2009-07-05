@@ -29,6 +29,13 @@
 #include <sys/types.h>
 
 
+/* Holds info about the OF */
+struct md5sums {
+    int model;
+    char *version;
+    char *md5;
+};
+
 /* load_rockbox_file()
  *
  * Loads a rockbox bootloader file into memory
@@ -77,8 +84,8 @@ unsigned char* load_rockbox_file(
  */
 
 unsigned char* load_of_file(
-        char* filename, off_t* bufsize, char* md5sum, int* model,
-        int* fw_version, int* firmware_size, unsigned char** of_packed,
+        char* filename, off_t* bufsize, struct md5sums *sum,
+        int* firmware_size, unsigned char** of_packed,
         int* of_packedsize, char* errstr, int errstrsize);
 
 
