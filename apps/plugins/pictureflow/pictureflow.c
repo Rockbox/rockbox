@@ -54,6 +54,8 @@ PLUGIN_HEADER
 #define PF_CONTEXT ACTION_STD_CONTEXT
 #define PF_BACK ACTION_STD_CANCEL
 #define PF_MENU ACTION_STD_MENU
+#define PF_WPS ACTION_TREE_WPS
+
 #define PF_QUIT (LAST_ACTION_PLACEHOLDER + 1)
 
 #if defined(HAVE_SCROLLWHEEL) || CONFIG_KEYPAD == IRIVER_H10_PAD || \
@@ -2013,6 +2015,10 @@ void update_scroll_animation(void)
 void cleanup(void *parameter)
 {
     (void) parameter;
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false);
+#endif
+    end_pf_thread();
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(); /* backlight control in lib/helper.c */
 
@@ -2141,6 +2147,7 @@ int settings_menu(void)
   Show the main menu
  */
 enum {
+    PF_GOTO_WPS,
 #if PF_PLAYBACK_CAPABLE
     PF_MENU_PLAYBACK_CONTROL,
 #endif
@@ -2159,12 +2166,15 @@ int main_menu(void)
 #endif
 
     MENUITEM_STRINGLIST(main_menu,"PictureFlow Main Menu",NULL,
+                        "Go to WPS",
 #if PF_PLAYBACK_CAPABLE
                         "Playback Control",
 #endif
                                             "Settings", "Return", "Quit");
     while (1)  {
         switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
+            case PF_GOTO_WPS: /* WPS */
+                return -2;
 #if PF_PLAYBACK_CAPABLE
             case PF_MENU_PLAYBACK_CONTROL: /* Playback Control */
                 playback_control(NULL);
@@ -2174,10 +2184,8 @@ int main_menu(void)
                 result = settings_menu();
                 if ( result != 0 ) return result;
                 break;
-
             case PF_MENU_RETURN:
                 return 0;
-
             case PF_MENU_QUIT:
                 return -1;
 
@@ -2405,6 +2413,7 @@ play:
     old_shuffle = shuffle;
 }
 #endif
+
 /**
    Draw the current album name
  */
@@ -2661,7 +2670,8 @@ int main(void)
         switch (button) {
         case PF_QUIT:
             return PLUGIN_OK;
-
+        case PF_WPS:
+            return PLUGIN_GOTO_WPS;
         case PF_BACK:
             if ( pf_state == pf_show_tracks )
             {
@@ -2673,12 +2683,12 @@ int main(void)
             if (pf_state == pf_idle || pf_state == pf_scrolling)
                 return PLUGIN_OK;
             break;
-
         case PF_MENU:
 #ifdef USEGSLIB
             grey_show(false);
 #endif
             ret = main_menu();
+            if ( ret == -2 ) return PLUGIN_GOTO_WPS;
             if ( ret == -1 ) return PLUGIN_OK;
             if ( ret != 0 ) return ret;
 #ifdef USEGSLIB
@@ -2713,7 +2723,6 @@ int main(void)
 #endif
             }
             break;
-
         default:
             if (rb->default_event_handler_ex(button, cleanup, NULL)
                 == SYS_USB_CONNECTED)
@@ -2752,9 +2761,6 @@ enum plugin_status plugin_start(const void *parameter)
 #endif
 #endif
     ret = main();
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
-#endif
     if ( ret == PLUGIN_OK ) {
         if (configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
                             CONFIG_VERSION))
@@ -2764,7 +2770,6 @@ enum plugin_status plugin_start(const void *parameter)
         }
     }
 
-    end_pf_thread();
     cleanup(NULL);
     return ret;
 }

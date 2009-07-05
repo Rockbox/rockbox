@@ -535,10 +535,8 @@ int start_shuffled_play(void)
     return 1;
 }
 
-int main_menu(void)
+enum plugin_status main_menu(void)
 {
-    bool exit = false;
-
     MENUITEM_STRINGLIST(menu, "Main Menu", NULL,
                         "Generate Folder List",
                         "Edit Folder List",
@@ -547,69 +545,72 @@ int main_menu(void)
                         "Play Shuffled",
                         "Quit");
 
-    switch (rb->do_menu(&menu, NULL, NULL, false))
+    while (true)
     {
-        case 0: /* generate */
+        switch (rb->do_menu(&menu, NULL, NULL, false))
+        {
+            case 0: /* generate */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(true);
+                rb->cpu_boost(true);
 #endif
-            generate();
+                generate();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(false);
+                rb->cpu_boost(false);
 #endif
 #ifdef HAVE_REMOTE_LCD
-            rb->remote_backlight_on();
+                rb->remote_backlight_on();
 #endif
-            rb->backlight_on();
-            break;
-        case 1:
+                rb->backlight_on();
+                break;
+            case 1:
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(true);
+                rb->cpu_boost(true);
 #endif
-            if (edit_list() < 0)
-                exit = true;
+                if (edit_list() < 0)
+                    return PLUGIN_OK;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(false);
+                rb->cpu_boost(false);
 #endif
 #ifdef HAVE_REMOTE_LCD
-            rb->remote_backlight_on();
+                rb->remote_backlight_on();
 #endif
-            rb->backlight_on();
-            break;
-        case 2: /* export to textfile */
+                rb->backlight_on();
+                break;
+            case 2: /* export to textfile */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(true);
+                rb->cpu_boost(true);
 #endif
-            export_list_to_file_text();
+                export_list_to_file_text();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(false);
+                rb->cpu_boost(false);
 #endif
 #ifdef HAVE_REMOTE_LCD
-            rb->remote_backlight_on();
+                rb->remote_backlight_on();
 #endif
-            rb->backlight_on();
-            break;
-        case 3: /* import from textfile */
+                rb->backlight_on();
+                break;
+            case 3: /* import from textfile */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(true);
+                rb->cpu_boost(true);
 #endif
-            import_list_from_file_text();
+                import_list_from_file_text();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(false);
+                rb->cpu_boost(false);
 #endif
 #ifdef HAVE_REMOTE_LCD
-            rb->remote_backlight_on();
+                rb->remote_backlight_on();
 #endif
-            rb->backlight_on();
-            break;
-        case 4:
-            start_shuffled_play();
-            exit=true;
-            break;
-        case 5:
-            return 1;
+                rb->backlight_on();
+                break;
+            case 4:
+                if (!start_shuffled_play())
+                    return PLUGIN_ERROR;
+                else
+                    return PLUGIN_GOTO_WPS;
+            case 5:
+                return PLUGIN_OK;
+        }
     }
-    return exit?1:0;
 }
 
 enum plugin_status plugin_start(const void* parameter)
@@ -618,7 +619,5 @@ enum plugin_status plugin_start(const void* parameter)
 
     abort = false;
     
-    while (!main_menu())
-        ;
-    return PLUGIN_OK;
+    return main_menu();
 }
