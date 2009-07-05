@@ -109,18 +109,7 @@ execution to the uncompressed firmware.
 #define O_BINARY 0
 #endif
 
-#define VERSION "1.0"
-
-/* Supported models */
-enum {
-    MODEL_UNKNOWN = -1,
-    MODEL_FUZE = 0,
-    MODEL_CLIP,
-    MODEL_CLIPV2,
-    MODEL_E200V2,
-    MODEL_M200V4,
-    MODEL_C200V2,
-};
+#define VERSION "1.1"
 
 /* 4 for m200, 2 for e200/c200, 1 or 2 for fuze/clop */
 static const unsigned short hw_revisions[] = {

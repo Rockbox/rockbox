@@ -28,6 +28,17 @@
 #include <stdint.h>
 #include <sys/types.h>
 
+/* Supported models */
+enum {
+    MODEL_UNKNOWN = -1,
+    MODEL_FUZE = 0,
+    MODEL_CLIP,
+    MODEL_CLIPV2,
+    MODEL_E200V2,
+    MODEL_M200V4,
+    MODEL_C200V2,
+};
+
 
 /* Holds info about the OF */
 struct md5sums {
