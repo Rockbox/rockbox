@@ -275,8 +275,9 @@ RB_WRAP(lcd_mono_bitmap_part)
     int y = luaL_checkint(L, 6);
     int width = luaL_checkint(L, 7);
     int height = luaL_checkint(L, 8);
+    int screen = luaL_optint(L, 9, SCREEN_MAIN);
 
-    rb->lcd_mono_bitmap_part((const unsigned char *)src->data, src_x, src_y, stride, x, y, width, height);
+    rb->screens[screen]->mono_bitmap_part((const unsigned char *)src->data, src_x, src_y, stride, x, y, width, height);
     return 0;
 }
 
@@ -287,8 +288,9 @@ RB_WRAP(lcd_mono_bitmap)
     int y = luaL_checkint(L, 3);
     int width = luaL_checkint(L, 4);
     int height = luaL_checkint(L, 5);
+    int screen = luaL_optint(L, 6, SCREEN_MAIN);
 
-    rb->lcd_mono_bitmap((const unsigned char *)src->data, x, y, width, height);
+    rb->screens[screen]->mono_bitmap((const unsigned char *)src->data, x, y, width, height);
     return 0;
 }
 
@@ -303,8 +305,9 @@ RB_WRAP(lcd_bitmap_part)
     int y = luaL_checkint(L, 6);
     int width = luaL_checkint(L, 7);
     int height = luaL_checkint(L, 8);
+    int screen = luaL_optint(L, 9, SCREEN_MAIN);
 
-    rb->lcd_bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
+    rb->screens[screen]->bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
     return 0;
 }
 
@@ -315,8 +318,9 @@ RB_WRAP(lcd_bitmap)
     int y = luaL_checkint(L, 3);
     int width = luaL_checkint(L, 4);
     int height = luaL_checkint(L, 5);
+    int screen = luaL_optint(L, 6, SCREEN_MAIN);
 
-    rb->lcd_bitmap(src->data, x, y, width, height);
+    rb->screens[screen]->bitmap(src->data, x, y, width, height);
     return 0;
 }
 
@@ -344,8 +348,9 @@ RB_WRAP(lcd_bitmap_transparent_part)
     int y = luaL_checkint(L, 6);
     int width = luaL_checkint(L, 7);
     int height = luaL_checkint(L, 8);
+    int screen = luaL_optint(L, 9, SCREEN_MAIN);
 
-    rb->lcd_bitmap_transparent_part(src->data, src_x, src_y, stride, x, y, width, height);
+    rb->screens[screen]->transparent_bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
     return 0;
 }
 
@@ -356,8 +361,9 @@ RB_WRAP(lcd_bitmap_transparent)
     int y = luaL_checkint(L, 3);
     int width = luaL_checkint(L, 4);
     int height = luaL_checkint(L, 5);
+    int screen = luaL_optint(L, 6, SCREEN_MAIN);
 
-    rb->lcd_bitmap_transparent(src->data, x, y, width, height);
+    rb->screens[screen]->transparent_bitmap(src->data, x, y, width, height);
     return 0;
 }
 #endif /* LCD_DEPTH == 16 */
