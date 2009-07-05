@@ -552,22 +552,35 @@ int ft_enter(struct tree_context* c)
 
                 /* plugin file */
             case FILE_ATTR_ROCK:
+            {
+                int ret;
                 if (global_settings.party_mode && audio_status()) {
                     splash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
                 }
-
-                if (plugin_load(buf,NULL) == PLUGIN_USB_CONNECTED)
+                ret = plugin_load(buf,NULL);
+                switch (ret)
                 {
-                    if(*c->dirfilter > NUM_FILTER_MODES)
-                        /* leave sub-browsers after usb, doing
-                           otherwise might be confusing to the user */
-                        exit_func = true;
-                    else
-                        reload_dir = true;
+                    case PLUGIN_GOTO_WPS:
+                        play = true;
+                        break;
+                    case PLUGIN_USB_CONNECTED:
+                        if(*c->dirfilter > NUM_FILTER_MODES)
+                            /* leave sub-browsers after usb, doing
+                               otherwise might be confusing to the user */
+                            exit_func = true;
+                        else
+                            reload_dir = true;
+                        break;
+                    /*
+                    case PLUGIN_ERROR:
+                    case PLUGIN_OK:
+                    */
+                    default:
+                        break;
                 }
                 break;
-
+            }
             case FILE_ATTR_CUE:
                 display_cuesheet_content(buf);
                 break;
@@ -584,8 +597,21 @@ int ft_enter(struct tree_context* c)
                 plugin = filetype_get_plugin(file);
                 if (plugin)
                 {
-                    if (plugin_load(plugin,buf) == PLUGIN_USB_CONNECTED)
-                        reload_dir = true;
+                    switch (plugin_load(plugin,buf))
+                    {
+                        case PLUGIN_USB_CONNECTED:
+                            reload_dir = true;
+                            break;
+                        case PLUGIN_GOTO_WPS:
+                            play = true;
+                            break;
+                        /*
+                        case PLUGIN_OK:
+                        case PLUGIN_ERROR:
+                        */
+                        default:
+                            break;
+                    }
                 }
                 break;
             }

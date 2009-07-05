@@ -664,6 +664,7 @@ static const struct plugin_api rockbox_api = {
 int plugin_load(const char* plugin, const void* parameter)
 {
     int rc;
+    int i;
     int oldbars;
     struct plugin_header *hdr;
 #ifdef SIMULATOR
@@ -804,8 +805,6 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif /* LCD_DEPTH */
 #endif /* HAVE_LCD_BITMAP */
 
-    lcd_clear_display();
-    lcd_update();
 
 #ifdef HAVE_REMOTE_LCD
 #if LCD_REMOTE_DEPTH > 1
@@ -814,32 +813,27 @@ int plugin_load(const char* plugin, const void* parameter)
 #else
     lcd_remote_set_drawmode(DRMODE_SOLID);
 #endif
-    lcd_remote_clear_display();
-
-
-    lcd_remote_update();
-
-
 #endif
+
+    if (rc != PLUGIN_GOTO_WPS)
+    {
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].clear_display();
+            screens[i].update();
+        }
+    }
+
     viewportmanager_set_statusbar(oldbars);
     if (pfn_tsr_exit == NULL)
         plugin_loaded = false;
 
     sim_plugin_close(pd);
 
-    switch (rc) {
-        case PLUGIN_OK:
-            break;
+    if (rc == PLUGIN_ERROR)
+        splash(HZ*2, str(LANG_PLUGIN_ERROR));
 
-        case PLUGIN_USB_CONNECTED:
-            return PLUGIN_USB_CONNECTED;
-
-        default:
-            splash(HZ*2, str(LANG_PLUGIN_ERROR));
-            break;
-    }
-
-    return PLUGIN_OK;
+    return rc;
 }
 
 /* Returns a pointer to the portion of the plugin buffer that is not already

@@ -139,6 +139,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 enum plugin_status {
     PLUGIN_OK = 0,
     PLUGIN_USB_CONNECTED,
+    PLUGIN_GOTO_WPS,
     PLUGIN_ERROR = -1,
 };
 
