@@ -258,160 +258,11 @@ RB_WRAP(clear_viewport)
     return 0;
 }
 
-RB_WRAP(splash)
-{
-    int ticks = luaL_checkint(L, 1);
-    const char *s = luaL_checkstring(L, 2);
-    rb->splash(ticks, s);
-    return 0;
-}
-
-RB_WRAP(lcd_update)
-{
-    (void)L;
-    rb->lcd_update();
-    return 0;
-}
-
-RB_WRAP(lcd_update_rect)
-{
-    int x = luaL_checkint(L, 1);
-    int y = luaL_checkint(L, 2);
-    int width = luaL_checkint(L, 3);
-    int height = luaL_checkint(L, 4);
-    rb->lcd_update_rect(x, y, width, height);
-    return 0;
-}
-
-RB_WRAP(lcd_clear_display)
-{
-    (void)L;
-    rb->lcd_clear_display();
-    return 0;
-}
-
-RB_WRAP(lcd_putsxy)
-{
-    int x = luaL_checkint(L, 1);
-    int y = luaL_checkint(L, 2);
-    const char* string = luaL_checkstring(L, 3);
-    rb->lcd_putsxy(x, y, string);
-    return 0;
-}
-
-RB_WRAP(lcd_puts)
-{
-    int x = luaL_checkint(L, 1);
-    int y = luaL_checkint(L, 2);
-    const char* string = luaL_checkstring(L, 3);
-    rb->lcd_puts(x, y, string);
-    return 0;
-}
-
-RB_WRAP(lcd_puts_scroll)
-{
-    int x = luaL_checkint(L, 1);
-    int y = luaL_checkint(L, 2);
-    const char* string = luaL_checkstring(L, 3);
-    rb->lcd_puts_scroll(x, y, string);
-    return 0;
-}
-
-RB_WRAP(lcd_stop_scroll)
-{
-    (void)L;
-    rb->lcd_stop_scroll();
-    return 0;
-}
-
 #ifdef HAVE_LCD_BITMAP
 RB_WRAP(lcd_framebuffer)
 {
     rli_wrap(L, rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT);
     return 1;
-}
-
-RB_WRAP(lcd_set_drawmode)
-{
-    int drawmode = luaL_checkint(L, 1);
-    rb->lcd_set_drawmode(drawmode);
-    return 0;
-}
-
-RB_WRAP(lcd_get_drawmode)
-{
-    int result = rb->lcd_get_drawmode();
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(lcd_setfont)
-{
-    int font = luaL_checkint(L, 1);
-    rb->lcd_setfont(font);
-    return 0;
-}
-
-RB_WRAP(lcd_drawpixel)
-{
-    int x = luaL_checkint(L, 1);
-    int y = luaL_checkint(L, 2);
-
-    rb->lcd_drawpixel(x, y);
-    return 0;
-}
-
-RB_WRAP(lcd_drawline)
-{
-    int x1 = luaL_checkint(L, 1);
-    int y1 = luaL_checkint(L, 2);
-    int x2 = luaL_checkint(L, 3);
-    int y2 = luaL_checkint(L, 4);
-
-    rb->lcd_drawline(x1, y1, x2, y2);
-    return 0;
-}
-
-RB_WRAP(lcd_hline)
-{
-    int x1 = luaL_checkint(L, 1);
-    int x2 = luaL_checkint(L, 2);
-    int y = luaL_checkint(L, 3);
-
-    rb->lcd_hline(x1, x2, y);
-    return 0;
-}
-
-RB_WRAP(lcd_vline)
-{
-    int x = luaL_checkint(L, 1);
-    int y1 = luaL_checkint(L, 2);
-    int y2 = luaL_checkint(L, 3);
-
-    rb->lcd_vline(x, y1, y2);
-    return 0;
-}
-
-RB_WRAP(lcd_drawrect)
-{
-    int x = luaL_checkint(L, 1);
-    int y = luaL_checkint(L, 2);
-    int width = luaL_checkint(L, 3);
-    int height = luaL_checkint(L, 4);
-
-    rb->lcd_drawrect(x, y, width, height);
-    return 0;
-}
-
-RB_WRAP(lcd_fillrect)
-{
-    int x = luaL_checkint(L, 1);
-    int y = luaL_checkint(L, 2);
-    int width = luaL_checkint(L, 3);
-    int height = luaL_checkint(L, 4);
-
-    rb->lcd_fillrect(x, y, width, height);
-    return 0;
 }
 
 RB_WRAP(lcd_mono_bitmap_part)
@@ -442,34 +293,6 @@ RB_WRAP(lcd_mono_bitmap)
 }
 
 #if LCD_DEPTH > 1
-RB_WRAP(lcd_set_foreground)
-{
-    unsigned foreground = luaL_checkint(L, 1);
-    rb->lcd_set_foreground(foreground);
-    return 0;
-}
-
-RB_WRAP(lcd_get_foreground)
-{
-    unsigned result = rb->lcd_get_foreground();
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(lcd_set_background)
-{
-    unsigned background = luaL_checkint(L, 1);
-    rb->lcd_set_background(background);
-    return 0;
-}
-
-RB_WRAP(lcd_get_background)
-{
-    unsigned result = rb->lcd_get_background();
-    lua_pushinteger(L, result);
-    return 1;
-}
-
 RB_WRAP(lcd_bitmap_part)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
@@ -541,73 +364,9 @@ RB_WRAP(lcd_bitmap_transparent)
 
 #endif /* defined(LCD_BITMAP) */
 
-RB_WRAP(yield)
-{
-    (void)L;
-    rb->yield();
-    return 0;
-}
-
-RB_WRAP(sleep)
-{
-    int ticks = luaL_checkint(L, 1);
-    rb->sleep(ticks);
-    return 0;
-}
-
 RB_WRAP(current_tick)
 {
     lua_pushinteger(L, *rb->current_tick);
-    return 1;
-}
-
-RB_WRAP(button_get)
-{
-    bool block = luaL_checkboolean(L, 1);
-    long result = rb->button_get(block);
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(button_get_w_tmo)
-{
-    int ticks = luaL_checkint(L, 1);
-    long result = rb->button_get_w_tmo(ticks);
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(button_status)
-{
-    int result = rb->button_status();
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-#ifdef HAVE_BUTTON_DATA
-RB_WRAP(button_get_data)
-{
-    int result = rb->button_get_data();
-    lua_pushinteger(L, result);
-    return 1;
-}
-#endif
-
-#ifdef HAS_BUTTON_HOLD
-RB_WRAP(button_hold)
-{
-    bool result = rb->button_hold();
-    lua_pushboolean(L, result);
-    return 1;
-}
-#endif
-
-RB_WRAP(get_action)
-{
-    int context = luaL_checkint(L, 1);
-    int timeout = luaL_checkint(L, 2);
-    int result = rb->get_action(context, timeout);
-    lua_pushinteger(L, result);
     return 1;
 }
 
@@ -623,14 +382,6 @@ RB_WRAP(action_get_touchscreen_press)
     return 3;
 }
 #endif
-
-RB_WRAP(action_userabort)
-{
-    int timeout = luaL_checkint(L, 1);
-    bool result = rb->action_userabort(timeout);
-    lua_pushboolean(L, result);
-    return 1;
-}
 
 RB_WRAP(kbd_input)
 {
@@ -654,69 +405,6 @@ RB_WRAP(touchscreen_set_mode)
     return 0;
 }
 #endif
-
-RB_WRAP(backlight_on)
-{
-    (void)L;
-    rb->backlight_on();
-    return 0;
-}
-
-RB_WRAP(backlight_off)
-{
-    (void)L;
-    rb->backlight_off();
-    return 0;
-}
-
-RB_WRAP(backlight_set_timeout)
-{
-    int val = luaL_checkint(L, 1);
-    rb->backlight_set_timeout(val);
-    return 0;
-}
-
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-RB_WRAP(backlight_set_brightness)
-{
-    int val = luaL_checkint(L, 1);
-    rb->backlight_set_brightness(val);
-    return 0;
-}
-#endif
-
-RB_WRAP(creat)
-{
-    const char* pathname = luaL_checkstring(L, 1);
-    int result = rb->creat(pathname);
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(remove)
-{
-    const char* pathname = luaL_checkstring(L, 1);
-    int result = rb->remove(pathname);
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(rename)
-{
-    const char* path = luaL_checkstring(L, 1);
-    const char* newname = luaL_checkstring(L, 2);
-    int result = rb->rename(path, newname);
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(file_exists)
-{
-    const char* path = luaL_checkstring(L, 1);
-    bool result = rb->file_exists(path);
-    lua_pushboolean(L, result);
-    return 1;
-}
 
 RB_WRAP(font_getstringsize)
 {
@@ -796,32 +484,11 @@ RB_WRAP(current_path)
 static const luaL_Reg rocklib[] =
 {
     /* Graphics */
-    R(lcd_clear_display),
-    R(lcd_update),
-    R(lcd_update_rect),
-    R(lcd_puts),
-    R(lcd_putsxy),
-    R(lcd_puts_scroll),
-    R(lcd_stop_scroll),
-    R(splash),
 #ifdef HAVE_LCD_BITMAP
     R(lcd_framebuffer),
-    R(lcd_set_drawmode),
-    R(lcd_get_drawmode),
-    R(lcd_setfont),
-    R(lcd_drawline),
-    R(lcd_drawpixel),
-    R(lcd_hline),
-    R(lcd_vline),
-    R(lcd_drawrect),
-    R(lcd_fillrect),
     R(lcd_mono_bitmap_part),
     R(lcd_mono_bitmap),
 #if LCD_DEPTH > 1
-    R(lcd_set_foreground),
-    R(lcd_get_foreground),
-    R(lcd_set_background),
-    R(lcd_get_background),
     R(lcd_get_backdrop),
     R(lcd_bitmap_part),
     R(lcd_bitmap),
@@ -836,42 +503,15 @@ static const luaL_Reg rocklib[] =
     R(lcd_rgbunpack),
 #endif
 
-    /* File handling */
-    R(creat),
-    R(remove),
-    R(rename),
-    R(file_exists),
-
     /* Kernel */
-    R(sleep),
-    R(yield),
     R(current_tick),
 
     /* Buttons */
-    R(button_get),
-    R(button_get_w_tmo),
-    R(button_status),
-#ifdef HAVE_BUTTON_DATA
-    R(button_get_data),
-#endif
-#ifdef HAS_BUTTON_HOLD
-    R(button_hold),
-#endif
-    R(get_action),
-    R(action_userabort),
 #ifdef HAVE_TOUCHSCREEN
     R(action_get_touchscreen_press),
     R(touchscreen_set_mode),
 #endif
     R(kbd_input),
-
-    /* Hardware */
-    R(backlight_on),
-    R(backlight_off),
-    R(backlight_set_timeout),
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    R(backlight_set_brightness),
-#endif
 
     R(font_getstringsize),
     R(read_bmp_file),
@@ -884,6 +524,8 @@ static const luaL_Reg rocklib[] =
     {NULL, NULL}
 };
 #undef  R
+extern const luaL_Reg rocklib_aux[];
+
 
 #define RB_CONSTANT(x) lua_pushinteger(L, x); lua_setfield(L, -2, #x);
 /*
@@ -892,6 +534,7 @@ static const luaL_Reg rocklib[] =
 LUALIB_API int luaopen_rock(lua_State *L)
 {
     luaL_register(L, LUA_ROCKLIBNAME, rocklib);
+    luaL_register(L, LUA_ROCKLIBNAME, rocklib_aux);
 
     RB_CONSTANT(HZ);
 
