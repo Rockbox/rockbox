@@ -49,10 +49,10 @@ int viewport_get_nb_lines(struct viewport *vp)
 
 static bool showing_bars(enum screen_type screen)
 {
-    bool ignore = statusbar_enabled & VP_SB_IGNORE_SETTING(screen);
     if (statusbar_enabled & VP_SB_ONSCREEN(screen))
     {
 #ifdef HAVE_LCD_BITMAP
+        bool ignore = statusbar_enabled & VP_SB_IGNORE_SETTING(screen);
 #ifdef HAVE_REMOTE_LCD
         if (screen == SCREEN_REMOTE)
             return global_settings.remote_statusbar || ignore;
@@ -67,7 +67,9 @@ static bool showing_bars(enum screen_type screen)
 
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 {
+#ifdef HAVE_LCD_BITMAP
     bool bar_at_top = true;
+#endif
     vp->x = 0;
     vp->width = screens[screen].lcdwidth;
 
