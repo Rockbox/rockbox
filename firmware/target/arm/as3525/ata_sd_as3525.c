@@ -44,6 +44,7 @@
 #include "stdbool.h"
 #include "ata_idle_notify.h"
 #include "sd.h"
+#include "usb.h"
 
 #ifdef HAVE_HOTSWAP
 #include "disk.h"
@@ -401,7 +402,7 @@ static void sd_thread(void)
                 }
             }
             break;
-#if 0
+
         case SYS_USB_CONNECTED:
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
             /* Wait until the USB cable is extracted again */
@@ -411,7 +412,6 @@ static void sd_thread(void)
         case SYS_USB_DISCONNECTED:
             usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
             break;
-#endif
         }
     }
 }
