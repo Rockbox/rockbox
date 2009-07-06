@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Karl Kurbjun
+ * Copyright (C) 2007, 2009 by Karl Kurbjun
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,6 +22,7 @@
 #define SYSTEM_TARGET_H
 
 #include "system-arm.h"
+#include "mmu-arm.h"
 
 #define CPUFREQ_SLEEP       32768
 #define CPUFREQ_DEFAULT  87500000
