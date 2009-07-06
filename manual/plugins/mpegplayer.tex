@@ -15,22 +15,24 @@ option and choose \setting{mpegplayer}.
     \nopt{GIGABEAT_S_PAD,GIGABEAT_PAD}{\ActionWpsPlay}
       \opt{IRIVER_RC_H100_PAD}{&} 
     & Pause / Resume\\
-    \ActionWpsStop \opt{IRIVER_RC_H100_PAD}{&} & Stop\\
+    \ActionWpsStop
+      \opt{HAVEREMOTEKEYPAD}{&}
+    & Stop\\
     \nopt{GIGABEAT_S_PAD,GIGABEAT_PAD}{\ActionWpsVolUp{} / \ActionWpsVolDown}
-      \opt{IRIVER_RC_H100_PAD}{&} 
-    \opt{GIGABEAT_S_PAD,GIGABEAT_PAD}{\ButtonLeft{} or  \ButtonVolDown{} / 
+    \opt{GIGABEAT_S_PAD,GIGABEAT_PAD}{\ButtonLeft{} or  \ButtonVolDown{} /
+      \opt{HAVEREMOTEKEYPAD}{&}
         \ButtonRight{} or \ButtonVolUp}
     & Adjust volume up / down\\
     \nopt{GIGABEAT_S_PAD,GIGABEAT_PAD}{\ActionWpsSkipPrev{} / \ActionWpsSkipNext}
-      \opt{IRIVER_RC_H100_PAD}{&} 
     \opt{GIGABEAT_S_PAD,GIGABEAT_PAD}{\ButtonUp{} / \ButtonDown}
-    & Rewind / Fast Forward\\ 
+      \opt{HAVEREMOTEKEYPAD}{&}
+    & Rewind / Fast Forward\\
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-      \opt{IRIVER_RC_H100_PAD}{&} 
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonMenu}
     \opt{IAUDIO_X5_PAD}{\ButtonRec}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
     \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonSelect}
+      \opt{IRIVER_RC_H100_PAD}{&}
     & Open the MPEG Player menu\\
 \end{btnmap}
 \end{table}

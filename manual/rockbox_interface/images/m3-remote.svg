@@ -17,7 +17,7 @@
    id="svg2"
    sodipodi:version="0.32"
    inkscape:version="0.46"
-   sodipodi:docname="Iaudio remote.svg"
+   sodipodi:docname="m3-remote.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"><metadata
    id="metadata184"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
@@ -35,10 +35,10 @@
    id="base"
    showgrid="false"
    inkscape:zoom="1.2062359"
-   inkscape:cx="42.780846"
-   inkscape:cy="340.44738"
-   inkscape:window-x="-4"
-   inkscape:window-y="-4"
+   inkscape:cx="-52.557056"
+   inkscape:cy="195.416"
+   inkscape:window-x="11"
+   inkscape:window-y="-7"
    inkscape:current-layer="svg2" />
  <defs
    id="defs4"><linearGradient
@@ -1013,6 +1013,7 @@
      id="tspan2610"
      x="398.13913"
      y="-261.38876">Rewind</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:266.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:center;text-decoration:none;line-height:125%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
@@ -1027,6 +1028,7 @@
      id="tspan2614"
      x="1118.828"
      y="-48.745228">Play</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:266.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:center;text-decoration:none;line-height:125%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
@@ -1041,6 +1043,7 @@
      id="tspan2618"
      x="1895.422"
      y="-254.87532">Forward</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:266.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:center;text-decoration:none;line-height:125%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
@@ -1055,6 +1058,7 @@
      id="tspan2622"
      x="1975.6992"
      y="56.956112">Mode</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:266.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:center;text-decoration:none;line-height:125%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
@@ -1069,6 +1073,7 @@
      id="tspan2626"
      x="2710.0549"
      y="57.86755">Rec</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:266.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:center;text-decoration:none;line-height:125%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
@@ -1086,7 +1091,8 @@
      sodipodi:role="line"
      x="312.92493"
      y="2852.2678"
-     id="tspan6394">Down</tspan></text>
+     id="tspan6394">Up</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:266.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:center;text-decoration:none;line-height:125%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
@@ -1104,7 +1110,8 @@
      sodipodi:role="line"
      x="1869.9259"
      y="2852.2678"
-     id="tspan6396">Up</tspan></text>
+     id="tspan6396">Down</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:266.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:center;text-decoration:none;line-height:125%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
@@ -1119,6 +1126,7 @@
      id="tspan2642"
      x="1076.5931"
      y="2286.0151">Menu</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
@@ -1129,7 +1137,8 @@
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"><tspan
      sodipodi:role="line"
-     id="tspan2646"></tspan></text>
+     id="tspan2646" /></text>
+
 <text
    xml:space="preserve"
    style="font-size:266.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:center;text-decoration:none;line-height:125%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
@@ -1144,6 +1153,7 @@
      id="tspan2650"
      x="2674.1123"
      y="2248.1252">Hold</tspan></text>
+
 <path
    style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:6.66666698;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Arrow1Lstart);marker-end:url(#Arrow1Lend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
    d="M 965.02549,-304.9395 C 1078.3835,-374.92288 1178.59,-357.22915 1273.6071,-304.9395"
@@ -1278,4 +1288,7 @@
    </g><path
    d="M 2290.1993,1988.1241 L 2713.6167,1988.1241 L 2713.6167,2011.258 L 2290.1993,2011.258 L 2290.1993,1988.1241"
    id="path9334"
-   style="fill:url(#linearGradient10487);stroke:#000000;stroke-width:7.08661461;stroke-linejoin:bevel" /></svg>
+   style="fill:url(#linearGradient10487);stroke:#000000;stroke-width:7.08661461;stroke-linejoin:bevel" /><g
+   inkscape:groupmode="layer"
+   id="layer2"
+   inkscape:label="text" /></svg>
