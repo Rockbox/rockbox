@@ -174,7 +174,7 @@
 
 #define USB_HANDLED_BY_OF
 
-#define CONFIG_USB USBOTG_AS3525
+#define CONFIG_USBOTG USBOTG_AS3525
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
