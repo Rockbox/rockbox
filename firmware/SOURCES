@@ -279,6 +279,8 @@ usbstack/usb_hid.c
 drivers/m66591.c
 #elif CONFIG_USBOTG == USBOTG_ARC
 target/arm/usb-drv-arc.c
+#elif CONFIG_USBOTG == USBOTG_AS3525
+target/arm/as3525/usb-drv-as3525.c
 #elif CONFIG_USBOTG == USBOTG_ISP1583
 drivers/isp1583.c
 #endif

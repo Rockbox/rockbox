@@ -168,17 +168,21 @@
 /* Type of LCD : Samsung S6B33B2 */
 #define CONFIG_LCD LCD_C200
 
-#define USB_HANDLED_BY_OF
-
 #ifndef BOOTLOADER
 #define HAVE_MULTIVOLUME
 #define HAVE_HOTSWAP
-#endif
+
+#define USB_HANDLED_BY_OF
+
+#define CONFIG_USB USBOTG_AS3525
 
 /* enable these for the experimental usb stack */
-//#define HAVE_USBSTACK
-//#define USB_VENDOR_ID 0x0781
-//#define USB_PRODUCT_ID 0x7452
+#define HAVE_USBSTACK
+#define USB_VENDOR_ID 0x0781
+#define USB_PRODUCT_ID 0x7452
+
+#endif /* BOOTLOADER */
+
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 

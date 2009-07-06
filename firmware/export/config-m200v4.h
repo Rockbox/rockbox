@@ -139,6 +139,19 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
+#ifndef BOOTLOADER
+
+#define USB_HANDLED_BY_OF
+
+#define CONFIG_USB USBOTG_AS3525
+
+/* enable these for the experimental usb stack */
+#define HAVE_USBSTACK
+#define USB_VENDOR_ID 0x0781
+#define USB_PRODUCT_ID 0x7431
+
+#endif /* BOOTLOADER */
+
 /* Software controlled LED */
 #define CONFIG_LED LED_VIRTUAL
 

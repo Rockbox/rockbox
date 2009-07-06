@@ -500,4 +500,8 @@ interface */
 /* Timer frequency */
 #define TIMER_FREQ (24000000 / 16)
 
+/* USB : TODO */
+#define USB_NUM_ENDPOINTS 4
+#define USB_DEVBSS_ATTR IBSS_ATTR
+
 #endif /*__AS3525_H__*/
