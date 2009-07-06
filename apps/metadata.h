@@ -61,6 +61,7 @@ enum
     AFMT_WMA,          /* WMAV1/V2 in ASF */
     AFMT_MOD,          /* Amiga MOD File Format */
     AFMT_SAP,          /* Amiga 8Bit SAP Format */
+    AFMT_COOK,         /* Cook in RM/RA */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -

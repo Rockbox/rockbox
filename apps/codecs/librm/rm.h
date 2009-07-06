@@ -22,17 +22,21 @@
 #define _RM_H
 
 #include <stdio.h>
-#include <stdint.h>
+#include <inttypes.h>
 
+enum codecs{cook};
 typedef struct rm_packet
 {
-    uint8_t  data[30000]; /* Reordered data. No malloc, hence the size */
     uint8_t *frames[100]; /* Pointers to ordered audio frames in buffer */
     uint16_t version;
     uint16_t length;
     uint32_t timestamp;
     uint16_t stream_number;
     uint8_t  flags;
+
+#ifdef TEST
+    uint8_t  data[30000]; /* Reordered data. No malloc, hence the size */
+#endif
 }RMPacket;
     
 typedef struct rm_context 
@@ -46,6 +50,7 @@ typedef struct rm_context
 
     /* Stream Variables */
     uint32_t data_offset;
+    uint32_t duration;
     uint32_t audiotimestamp; /* Audio packet timestamp*/
     uint16_t sub_packet_cnt; /* Subpacket counter, used while reading */
     uint16_t sub_packet_size, sub_packet_h, coded_framesize; /* Descrambling parameters from container */
@@ -53,6 +58,7 @@ typedef struct rm_context
     uint16_t sub_packet_lengths[16]; /* Length of each subpacket */
 
     /* Codec Context */
+    enum codecs codec_type; 
     uint16_t block_align;
     uint32_t nb_packets;
     int frame_number;
@@ -66,18 +72,26 @@ typedef struct rm_context
     uint32_t cook_version;
     uint16_t samples_pf_pc;    /* samples per frame per channel */
     uint16_t nb_subbands;      /* number of subbands in the frequency domain */
-    /* extra 8 bytes for stereo data */
+    /* extra 8 bytes for joint-stereo data */
     uint32_t unused;
     uint16_t js_subband_start; /* joint stereo subband start */
     uint16_t js_vlc_bits;    
 
 } RMContext;
 
-int open_wav(char* filename);
-void close_wav(int fd, RMContext *rmctx);
 int real_parse_header(int fd, RMContext *rmctx);
-void rm_get_packet(int fd,RMContext *rmctx, RMPacket *pkt);
-void rm_get_packet_membuf(uint8_t **filebuf,RMContext *rmctx, RMPacket *pkt);
-off_t filesize(int fd);
+
+/* Get a (sub_packet_h*frames_per_packet) number of audio frames from a memory buffer */
+int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt);
+
+#ifdef TEST
+
+int filesize(int fd);
 void advance_buffer(uint8_t **buf, int val);
-#endif
+
+/* Get a (sub_packet_h*frames_per_packet) number of audio frames from a file descriptor */
+void rm_get_packet_fd(int fd,RMContext *rmctx, RMPacket *pkt);
+
+#endif /* TEST */
+
+#endif /* _RM_H */

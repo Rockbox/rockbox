@@ -29,13 +29,6 @@
 #include "cook.h"
 
 //#define DUMP_RAW_FRAMES
-#ifndef DEBUGF
-#  if 0
-#    define DEBUGF(message,args ...) printf
-#  else
-#    define DEBUGF(...)
-#  endif
-#endif
 
 #define DATA_HEADER_SIZE 18 /* size of DATA chunk header in a rm file */
 static unsigned char wav_header[44]={
@@ -151,8 +144,8 @@ int main(int argc, char *argv[])
     
     /* copy the input rm file to a memory buffer */
     uint8_t * filebuf = (uint8_t *)calloc((int)filesize(fd),sizeof(uint8_t));
-    read(fd,filebuf,filesize(fd)); 
-
+    res = read(fd,filebuf,filesize(fd)); 
+ 
     fd_dec = open_wav("output.wav");
     if (fd_dec < 0) {
         DEBUGF("Error creating output file\n");
@@ -166,27 +159,25 @@ int main(int argc, char *argv[])
     sps= rmctx.block_align;
     h = rmctx.sub_packet_h;
     cook_decode_init(&rmctx,&q);
-    DEBUGF("nb_frames = %d\n",nb_frames);
-
+    
     /* change the buffer pointer to point at the first audio frame */
     advance_buffer(&filebuf, rmctx.data_offset+ DATA_HEADER_SIZE);
     while(packet_count)
     {  
-        rm_get_packet_membuf(&filebuf, &rmctx, &pkt);
-        DEBUGF("total frames = %d packet count = %d output counter = %d \n",rmctx.audio_pkt_cnt*(fs/sps), packet_count,rmctx.audio_pkt_cnt);
+        rm_get_packet(&filebuf, &rmctx, &pkt);
+        //DEBUGF("total frames = %d packet count = %d output counter = %d \n",rmctx.audio_pkt_cnt*(fs/sps), packet_count,rmctx.audio_pkt_cnt);
         for(i = 0; i < rmctx.audio_pkt_cnt*(fs/sps) ; i++)
         { 
             /* output raw audio frames that are sent to the decoder into separate files */
-            #ifdef DUMP_RAW_FRAMES 
+#ifdef DUMP_RAW_FRAMES 
               snprintf(filename,sizeof(filename),"dump%d.raw",++x);
               fd_out = open(filename,O_WRONLY|O_CREAT|O_APPEND);           
               write(fd_out,pkt.frames[i],sps);  
               close(fd_out);
-            #endif
-
+#endif
             nb_frames = cook_decode_frame(&rmctx,&q, outbuf, &datasize, pkt.frames[i] , rmctx.block_align);
             rmctx.frame_number++;
-            write(fd_dec,outbuf,datasize);        
+            res = write(fd_dec,outbuf,datasize);        
         }
         packet_count -= rmctx.audio_pkt_cnt;
         rmctx.audio_pkt_cnt = 0;

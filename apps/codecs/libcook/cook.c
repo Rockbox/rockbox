@@ -21,7 +21,7 @@
  */
 
 /**
- * @file libavcodec/cook.c
+ * @file cook.c
  * Cook compatible decoder. Bastardization of the G.722.1 standard.
  * This decoder handles RealNetworks, RealAudio G2 data.
  * Cook is identified by the codec name cook in RM files.
@@ -60,16 +60,15 @@
 #define SUBBAND_SIZE    20
 #define MAX_SUBPACKETS   5
 //#define COOKDEBUG
-#if 0
-#define DEBUGF(message,args ...) printf
-#else
+#ifndef COOKDEBUG
+#undef DEBUGF
 #define DEBUGF(...)
-#endif
+#endif 
 
 /**
  * Random bit stream generator.
  */
-static int inline cook_random(COOKContext *q)
+static inline int cook_random(COOKContext *q)
 {
     q->random_state =
       q->random_state * 214013 + 2531011; /* typical RNG numbers */
@@ -200,7 +199,7 @@ static void decode_gain_info(GetBitContext *gb, int *gaininfo)
     i = 0;
     while (n--) {
         int index = get_bits(gb, 3);
-        int gain = get_bits1(gb) ? get_bits(gb, 4) - 7 : -1;
+        int gain = get_bits1(gb) ? (int)get_bits(gb, 4) - 7 : -1;
 
         while (i <= index) gaininfo[i++] = gain;
     }
@@ -789,7 +788,7 @@ int cook_decode_init(RMContext *rmctx, COOKContext *q)
         return -1;
 
 
-    if(q->block_align >= UINT_MAX/2)
+    if(rmctx->block_align >= UINT16_MAX/2)
         return -1;
 
     q->gains1.now      = q->gain_1;

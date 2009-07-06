@@ -18,15 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * @file libavcodec/bitstream.h
- * bitstream api header.
- */
+#ifndef BITSTREAM_H
+#define BITSTREAM_H
 
-#ifndef AVCODEC_BITSTREAM_H
-#define AVCODEC_BITSTREAM_H
-
-#include <stdint.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -51,7 +46,7 @@
 //#define ALT_BITSTREAM_WRITER
 //#define ALIGNED_BITSTREAM_WRITER
 #if !defined(LIBMPEG2_BITSTREAM_READER) && !defined(A32_BITSTREAM_READER) && !defined(ALT_BITSTREAM_READER)
-#   if ARCH_ARM
+#   if defined(ARCH_ARM)
 #       define A32_BITSTREAM_READER
 #   else
 #       define ALT_BITSTREAM_READER
@@ -62,7 +57,7 @@
 
 extern const uint8_t ff_reverse[256];
 
-#if ARCH_X86
+#if defined(ARCH_X86)
 // avoid +32 for shift optimization (gcc should do that ...)
 static inline  int32_t NEG_SSR32( int32_t a, int8_t s){
     __asm__ ("sarl %1, %0\n\t"
@@ -226,7 +221,7 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
     } else {
         bit_buf<<=bit_left;
         bit_buf |= value >> (n - bit_left);
-#if !HAVE_FAST_UNALIGNED
+#if !defined(HAVE_FAST_UNALIGNED)
         if (3 & (intptr_t) s->buf_ptr) {
             AV_WB32(s->buf_ptr, bit_buf);
         } else
@@ -736,6 +731,7 @@ static inline unsigned int show_bits_long(GetBitContext *s, int n){
     }
 }
 
+#if 0
 static inline int check_marker(GetBitContext *s, const char *msg)
 {
     int bit= get_bits1(s);
@@ -744,6 +740,7 @@ static inline int check_marker(GetBitContext *s, const char *msg)
 
     return bit;
 }
+#endif
 
 /**
  * init GetBitContext.
@@ -963,4 +960,4 @@ static inline int decode210(GetBitContext *gb){
         return 2 - get_bits1(gb);
 }
 
-#endif /* AVCODEC_BITSTREAM_H */
+#endif /* BITSTREAM_H */

@@ -115,6 +115,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* Amiga SAP File */
     [AFMT_SAP] =
         AFMT_ENTRY("SAP",  "asap",     NULL,          "sap\0"      ),
+    /* Cook in RM/RA */
+    [AFMT_COOK] =
+        AFMT_ENTRY("Cook",  "cook",   NULL,          "rm\0ra\0"      ),
 #endif
 };
 
@@ -371,6 +374,14 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         }
         id3->filesize = filesize(fd);
         id3->genre_string = id3_get_num_genre(36);
+        break;
+
+    case AFMT_COOK:
+        if (!get_rm_metadata(fd, id3))
+        {
+            DEBUGF("get_rm_metadata error\n");
+            return false;
+        }
         break;
         
 #endif /* CONFIG_CODEC == SWCODEC */

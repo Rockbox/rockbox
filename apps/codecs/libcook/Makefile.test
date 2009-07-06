@@ -1,4 +1,4 @@
-CFLAGS = -Wall -O3
+CFLAGS = -Wall -O3 -DTEST -D"DEBUGF=printf"
 OBJS = main.o bitstream.o cook.o ../librm/rm.o
 cooktest: $(OBJS)
 	gcc -o cooktest $(OBJS)
@@ -7,4 +7,4 @@ cooktest: $(OBJS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f cooktest $(OBJS) *~
+	rm -f cooktest $(OBJS) *~ output.wav

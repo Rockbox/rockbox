@@ -22,7 +22,7 @@
 #ifndef _COOK_H
 #define _COOK_H
 
-#include <stdint.h>
+#include <inttypes.h>
 #include "bitstream.h"
 #include "../librm/rm.h"
 #include "cookdata_fixpoint.h"
@@ -99,4 +99,4 @@ int cook_decode_init(RMContext *rmctx, COOKContext *q);
 int cook_decode_frame(RMContext *rmctx,COOKContext *q,
                       int16_t *outbuffer, int *data_size,
                       const uint8_t *inbuffer, int buf_size);
-#endif
+#endif /*_COOK_H */

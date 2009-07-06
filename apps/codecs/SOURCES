@@ -9,6 +9,7 @@ wavpack.c
 #ifndef RB_PROFILE
 alac.c
 #endif
+cook.c
 mpc.c
 wma.c
 sid.c

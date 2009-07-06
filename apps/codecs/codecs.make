@@ -33,6 +33,7 @@ include $(APPSDIR)/codecs/libspeex/libspeex.make
 include $(APPSDIR)/codecs/libtremor/libtremor.make
 include $(APPSDIR)/codecs/libwavpack/libwavpack.make
 include $(APPSDIR)/codecs/libwma/libwma.make
+include $(APPSDIR)/codecs/libcook/libcook.make
 
 # compile flags for codecs
 CODECFLAGS = $(CFLAGS) -I$(APPSDIR)/codecs -I$(APPSDIR)/codecs/lib \
@@ -47,7 +48,7 @@ CODEC_CRT0 := $(CODECDIR)/codec_crt0.o
 
 CODECLIBS := $(DEMACLIB) $(A52LIB) $(ALACLIB) $(ASAPLIB) \
 	$(FAADLIB) $(FFMPEGFLACLIB) $(M4ALIB) $(MADLIB) $(MUSEPACKLIB) \
-	$(SPCLIB) $(SPEEXLIB) $(TREMORLIB) $(WAVPACKLIB) $(WMALIB) \
+	$(SPCLIB) $(SPEEXLIB) $(TREMORLIB) $(WAVPACKLIB) $(WMALIB) $(COOKLIB) \
 	$(CODECLIB)
 
 $(CODECS): $(CODEC_CRT0) $(CODECLINK_LDS) 
@@ -73,6 +74,7 @@ $(CODECDIR)/ape.codec : $(CODECDIR)/libdemac.a
 $(CODECDIR)/wma.codec : $(CODECDIR)/libwma.a
 $(CODECDIR)/wavpack_enc.codec: $(CODECDIR)/libwavpack.a
 $(CODECDIR)/asap.codec : $(CODECDIR)/libasap.a
+$(CODECDIR)/cook.codec : $(CODECDIR)/libcook.a
 
 $(CODECS): $(CODECLIB) # this must be last in codec dependency list
 

@@ -26,7 +26,7 @@
  * fixed point data types and constants
  */
 
-#include <stdint.h>
+#include <inttypes.h>
 typedef int32_t FIXP;           /* Fixed point variable type */
 typedef uint16_t FIXPU;         /* Fixed point fraction 0<=x<1 */
 
@@ -39,11 +39,11 @@ typedef FIXP REAL_T;
 typedef struct {
 } realvars_t;
 
-
+#ifdef TEST
 #define cPI1_8 0xec83  /* 1pi/8 2^16 */
 #define cPI2_8 0xb505  /* 2pi/8 2^16 */
 #define cPI3_8 0x61f8  /* 3pi/8 2^16 */
-
+#endif
 static const FIXPU sincos_lookup[2050] = {
     /* x_i = 2^16 sin(i 2pi/8192), 2^16 cos(i 2pi/8192); i=0..1024 */
     0x0000, 0xffff,  0x0032, 0xffff,  0x0065, 0xffff,  0x0097, 0xffff,

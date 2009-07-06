@@ -21,28 +21,34 @@
  ****************************************************************************/
 #include <stdio.h>
 #include <string.h>
-#include <stdint.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 
 #include "rm.h"
-
-
-#if 0
-#define DEBUG 
-#define DEBUGF printf
-#else
-#define DEBUGF(...)
+#ifdef ROCKBOX
+#include "codeclib.h"
 #endif
-           
-/* Some Rockbox-like functions (these should be implemented in metadata_common.[ch] */
+
+void advance_buffer(uint8_t **buf, int val)
+{
+    *buf += val;
+}
+
 static uint8_t get_uint8(uint8_t *buf)
 {
     return (uint8_t)buf[0];
 }
 
+#ifdef ROCKBOX_BIG_ENDIAN
+static uint16_t get_uint16be(uint8_t *buf)
+{
+    return (uint16_t)((buf[1] << 8)|buf[0]);
+}
+
+static uint32_t get_uint32be(uint8_t *buf)
+{
+    return (uint32_t)((buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0]);
+}
+
+#else          
 static uint16_t get_uint16be(uint8_t *buf)
 {
     return (uint16_t)((buf[0] << 8)|buf[1]);
@@ -51,6 +57,24 @@ static uint16_t get_uint16be(uint8_t *buf)
 static uint32_t get_uint32be(uint8_t *buf)
 {
     return (uint32_t)((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
+}
+#endif /* ROCKBOX_BIG_ENDIAN */
+
+#ifdef TEST
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+int filesize(int fd)
+{
+  struct stat buf;
+
+  if (fstat(fd,&buf) == -1) {
+    return -1;
+  } else {
+    return (int)buf.st_size;
+  }
 }
 
 static int read_uint8(int fd, uint8_t* buf)
@@ -83,23 +107,9 @@ static int read_uint32be(int fd, uint32_t* buf)
     return res;
 }
 
-off_t filesize(int fd)
-{
-  struct stat buf;
 
-  if (fstat(fd,&buf) == -1) {
-    return -1;
-  } else {
-    return buf.st_size;
-  }
-}
 
-void advance_buffer(uint8_t **buf, int val)
-{
-    *buf += val;
-}
-
-int read_cook_extradata(int fd, RMContext *rmctx) {
+static int read_cook_extradata(int fd, RMContext *rmctx) {
     read_uint32be(fd, &rmctx->cook_version);
     read_uint16be(fd, &rmctx->samples_pf_pc);
     read_uint16be(fd, &rmctx->nb_subbands);
@@ -111,14 +121,14 @@ int read_cook_extradata(int fd, RMContext *rmctx) {
     return rmctx->extradata_size; /* for 'skipped' */
 }
 
-void print_cook_extradata(RMContext *rmctx) {
+static void print_cook_extradata(RMContext *rmctx) {
 
-    printf("            cook_version = 0x%08x\n", rmctx->cook_version);
-    printf("            samples_per_frame_per_channel = %d\n", rmctx->samples_pf_pc);
-    printf("            number_of_subbands_in_freq_domain = %d\n", rmctx->nb_subbands);
+    DEBUGF("            cook_version = 0x%08x\n", rmctx->cook_version);
+    DEBUGF("            samples_per_frame_per_channel = %d\n", rmctx->samples_pf_pc);
+    DEBUGF("            number_of_subbands_in_freq_domain = %d\n", rmctx->nb_subbands);
     if(rmctx->extradata_size == 16) {
-        printf("            joint_stereo_subband_start = %d\n",rmctx->js_subband_start);
-        printf("            joint_stereo_vlc_bits = %d\n", rmctx->js_vlc_bits);
+        DEBUGF("            joint_stereo_subband_start = %d\n",rmctx->js_subband_start);
+        DEBUGF("            joint_stereo_vlc_bits = %d\n", rmctx->js_vlc_bits);
     }
 } 
 
@@ -196,7 +206,7 @@ static int real_read_audio_stream_info(int fd, RMContext *rmctx)
     read_uint32be(fd, &version);
     skipped += 4;
 
-    printf("    version=0x%04x\n",((version >> 16) & 0xff));
+    DEBUGF("    version=0x%04x\n",((version >> 16) & 0xff));
     if (((version >> 16) & 0xff) == 3) {
         /* Very old version */
     } else {
@@ -205,7 +215,7 @@ static int real_read_audio_stream_info(int fd, RMContext *rmctx)
        read_uint32be(fd, &header_size);
        skipped += 4;
        /* obj.size will be filled with an unknown value, replaced with header_size */
-       printf("    Object: %s, size: %d bytes, version: 0x%04x\n",fourcc2str(obj.fourcc),header_size,obj.version);
+       DEBUGF("    Object: %s, size: %d bytes, version: 0x%04x\n",fourcc2str(obj.fourcc),header_size,obj.version);
 
        read_uint16be(fd, &flavor);
        read_uint32be(fd, &coded_framesize);
@@ -253,20 +263,22 @@ static int real_read_audio_stream_info(int fd, RMContext *rmctx)
   
        read_uint32be(fd, &rmctx->extradata_size);
        skipped += 4;
-       if(!strncmp(fourcc2str(fourcc),"cook",4))
+       if(!strncmp(fourcc2str(fourcc),"cook",4)){
            skipped += read_cook_extradata(fd, rmctx); 
+           rmctx->codec_type = cook;
+       }
        
        
-       printf("        flavor = %d\n",flavor);
-       printf("        coded_frame_size = %d\n",coded_framesize);
-       printf("        sub_packet_h = %d\n",rmctx->sub_packet_h);
-       printf("        frame_size = %d\n",rmctx->block_align);
-       printf("        sub_packet_size = %d\n",rmctx->sub_packet_size);
-       printf("        sample_rate= %d\n",rmctx->sample_rate);
-       printf("        channels= %d\n",rmctx->nb_channels);
-       printf("        fourcc = %s\n",fourcc2str(fourcc));
-       printf("        codec_extra_data_length = %d\n",rmctx->extradata_size);
-       printf("        codec_extradata :\n");
+       DEBUGF("        flavor = %d\n",flavor);
+       DEBUGF("        coded_frame_size = %d\n",coded_framesize);
+       DEBUGF("        sub_packet_h = %d\n",rmctx->sub_packet_h);
+       DEBUGF("        frame_size = %d\n",rmctx->block_align);
+       DEBUGF("        sub_packet_size = %d\n",rmctx->sub_packet_size);
+       DEBUGF("        sample_rate= %d\n",rmctx->sample_rate);
+       DEBUGF("        channels= %d\n",rmctx->nb_channels);
+       DEBUGF("        fourcc = %s\n",fourcc2str(fourcc));
+       DEBUGF("        codec_extra_data_length = %d\n",rmctx->extradata_size);
+       DEBUGF("        codec_extradata :\n");
        print_cook_extradata(rmctx);
 
     }
@@ -327,18 +339,18 @@ int real_parse_header(int fd, RMContext *rmctx)
     read_uint32be(fd, &unknown1);
     read_uint32be(fd, &unknown2);
 
-    printf("Object: %s, size: %d bytes, version: 0x%04x, pos: %d\n",fourcc2str(obj.fourcc),(int)obj.size,obj.version,(int)curpos);
-    printf("    unknown1=%d (0x%08x)\n",unknown1,unknown1);
-    printf("    unknown2=%d (0x%08x)\n",unknown2,unknown2);
+    DEBUGF("Object: %s, size: %d bytes, version: 0x%04x, pos: %d\n",fourcc2str(obj.fourcc),(int)obj.size,obj.version,(int)curpos);
+    DEBUGF("    unknown1=%d (0x%08x)\n",unknown1,unknown1);
+    DEBUGF("    unknown2=%d (0x%08x)\n",unknown2,unknown2);
 
     res = real_read_object_header(fd, &obj);
     header_end = 0;
     while(res)
     {
-        printf("Object: %s, size: %d bytes, version: 0x%04x, pos: %d\n",fourcc2str(obj.fourcc),(int)obj.size,obj.version,(int)curpos);
+        DEBUGF("Object: %s, size: %d bytes, version: 0x%04x, pos: %d\n",fourcc2str(obj.fourcc),(int)obj.size,obj.version,(int)curpos);
         skipped = 10;
-	if(obj.fourcc == FOURCC('I','N','D','X'))
-		break;
+        if(obj.fourcc == FOURCC('I','N','D','X'))
+                break;
         switch (obj.fourcc)
         {
             case FOURCC('P','R','O','P'): /* File properties */
@@ -347,7 +359,7 @@ int real_parse_header(int fd, RMContext *rmctx)
                 read_uint32be(fd, &max_packet_size);
                 read_uint32be(fd, &avg_packet_size);
                 read_uint32be(fd, &packet_count);
-                read_uint32be(fd, &duration);
+                read_uint32be(fd, &rmctx->duration);
                 read_uint32be(fd, &preroll);
                 read_uint32be(fd, &index_offset);
                 read_uint32be(fd, &rmctx->data_offset);
@@ -355,17 +367,17 @@ int real_parse_header(int fd, RMContext *rmctx)
                 read_uint16be(fd, &rmctx->flags);
                 skipped += 40;
 
-                printf("    max_bitrate = %d\n",max_bitrate);
-                printf("    avg_bitrate = %d\n",avg_bitrate);
-                printf("    max_packet_size = %d\n",max_packet_size);
-                printf("    avg_packet_size = %d\n",avg_packet_size);
-                printf("    packet_count = %d\n",packet_count);
-                printf("    duration = %d\n",duration);
-                printf("    preroll = %d\n",preroll);
-                printf("    index_offset = %d\n",index_offset);
-                printf("    data_offset = %d\n",rmctx->data_offset);
-                printf("    num_streams = %d\n",num_streams);
-                printf("    flags=0x%04x\n",flags);
+                DEBUGF("    max_bitrate = %d\n",max_bitrate);
+                DEBUGF("    avg_bitrate = %d\n",avg_bitrate);
+                DEBUGF("    max_packet_size = %d\n",max_packet_size);
+                DEBUGF("    avg_packet_size = %d\n",avg_packet_size);
+                DEBUGF("    packet_count = %d\n",packet_count);
+                DEBUGF("    duration = %d\n",rmctx->duration);
+                DEBUGF("    preroll = %d\n",preroll);
+                DEBUGF("    index_offset = %d\n",index_offset);
+                DEBUGF("    data_offset = %d\n",rmctx->data_offset);
+                DEBUGF("    num_streams = %d\n",num_streams);
+                DEBUGF("    flags=0x%04x\n",flags);
                 break;
 
             case FOURCC('C','O','N','T'):
@@ -375,10 +387,10 @@ int real_parse_header(int fd, RMContext *rmctx)
                 skipped += read_str(fd,copyright);
                 skipped += read_str(fd,comment);
 
-                printf("    title=\"%s\"\n",title);
-                printf("    author=\"%s\"\n",author);
-                printf("    copyright=\"%s\"\n",copyright);
-                printf("    comment=\"%s\"\n",comment);
+                DEBUGF("    title=\"%s\"\n",title);
+                DEBUGF("    author=\"%s\"\n",author);
+                DEBUGF("    copyright=\"%s\"\n",copyright);
+                DEBUGF("    comment=\"%s\"\n",comment);
                 break;
 
             case FOURCC('M','D','P','R'): /* Media properties */
@@ -406,18 +418,18 @@ int real_parse_header(int fd, RMContext *rmctx)
                 read_uint32be(fd,&v);
                 skipped += 4;
 
-                printf("    stream_id = 0x%04x\n",stream_id);
-                printf("    max_bitrate = %d\n",max_bitrate);
-                printf("    avg_bitrate = %d\n",avg_bitrate);
-                printf("    max_packet_size = %d\n",max_packet_size);
-                printf("    avg_packet_size = %d\n",avg_packet_size);
-                printf("    start_time = %d\n",start_time);
-                printf("    preroll = %d\n",preroll);
-                printf("    duration = %d\n",duration);
-                printf("    desc=\"%s\"\n",desc);
-                printf("    mimetype=\"%s\"\n",mimetype);
-                printf("    codec_data_size = %d\n",codec_data_size);
-                printf("    v=\"%s\"\n", fourcc2str(v));
+                DEBUGF("    stream_id = 0x%04x\n",stream_id);
+                DEBUGF("    max_bitrate = %d\n",max_bitrate);
+                DEBUGF("    avg_bitrate = %d\n",avg_bitrate);
+                DEBUGF("    max_packet_size = %d\n",max_packet_size);
+                DEBUGF("    avg_packet_size = %d\n",avg_packet_size);
+                DEBUGF("    start_time = %d\n",start_time);
+                DEBUGF("    preroll = %d\n",preroll);
+                DEBUGF("    duration = %d\n",duration);
+                DEBUGF("    desc=\"%s\"\n",desc);
+                DEBUGF("    mimetype=\"%s\"\n",mimetype);
+                DEBUGF("    codec_data_size = %d\n",codec_data_size);
+                DEBUGF("    v=\"%s\"\n", fourcc2str(v));
 
                 if (v == FOURCC('.','r','a',0xfd))
                 {
@@ -428,10 +440,10 @@ int real_parse_header(int fd, RMContext *rmctx)
 
             case FOURCC('D','A','T','A'):    
                 
-	      read_uint32be(fd,&rmctx->nb_packets);
-	      skipped += 4;
-	      read_uint32be(fd,&next_data_off);
-	      skipped += 4;
+              read_uint32be(fd,&rmctx->nb_packets);
+              skipped += 4;
+              read_uint32be(fd,&next_data_off);
+              skipped += 4;
               if (!rmctx->nb_packets && (rmctx->flags & 4))
                   rmctx->nb_packets = 3600 * 25;		
 
@@ -445,8 +457,8 @@ int real_parse_header(int fd, RMContext *rmctx)
               if(rmctx->nb_packets % rmctx->sub_packet_h)
                   rmctx->nb_packets += rmctx->sub_packet_h - (rmctx->nb_packets % rmctx->sub_packet_h);
 
-	      printf("    data_nb_packets = %d\n",rmctx->nb_packets);
-	      printf("    next DATA offset = %d\n",next_data_off);
+              DEBUGF("    data_nb_packets = %d\n",rmctx->nb_packets);
+              DEBUGF("    next DATA offset = %d\n",next_data_off);
               header_end = 1;			
                 break; 
         }
@@ -459,7 +471,7 @@ int real_parse_header(int fd, RMContext *rmctx)
     return 0;
 }
 
-void rm_get_packet(int fd,RMContext *rmctx, RMPacket *pkt)
+void rm_get_packet_fd(int fd,RMContext *rmctx, RMPacket *pkt)
 {   
     uint8_t unknown,packet_group;
     uint16_t x, place;
@@ -467,10 +479,19 @@ void rm_get_packet(int fd,RMContext *rmctx, RMPacket *pkt)
     uint16_t h = rmctx->sub_packet_h;
     uint16_t y = rmctx->sub_packet_cnt;
     uint16_t w = rmctx->audio_framesize;
+    int res;
     do
     {
         y = rmctx->sub_packet_cnt;
         read_uint16be(fd,&pkt->version);
+
+        /* Simple error checking */
+        if(pkt->version != 0 && pkt->version != 1) 
+        {
+             DEBUGF("parsing packets failed\n");
+             return -1;
+        }
+
         read_uint16be(fd,&pkt->length);
         read_uint16be(fd,&pkt->stream_number);
         read_uint32be(fd,&pkt->timestamp);
@@ -495,22 +516,17 @@ void rm_get_packet(int fd,RMContext *rmctx, RMPacket *pkt)
 
         for(x = 0 ; x < w/sps; x++)
         {
-            place = sps*(h*x+((h+1)/2)*(y&1)+(y>>1)); 
-            read(fd,pkt->data+place, sps);
-            //DEBUGF("place = %d data[place] = %d\n",place,pkt->data[place]);
+            res = read(fd,pkt->data+(sps*(h*x+((h+1)/2)*(y&1)+(y>>1))), sps);
         }
         rmctx->audio_pkt_cnt++;
     }while(++(rmctx->sub_packet_cnt) < h);
 
-    //return pkt->data;
 }
+#endif /*TEST*/
 
-/**
- * Another version of rm_get_packet which reads from a memory buffer 
- * instead of readind from a file descriptor.
- **/
-void rm_get_packet_membuf(uint8_t **filebuf,RMContext *rmctx, RMPacket *pkt)
+int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
 {   
+    int consumed = 0;
     uint8_t unknown;
     uint16_t x, place;
     uint16_t sps = rmctx->sub_packet_size;
@@ -520,36 +536,46 @@ void rm_get_packet_membuf(uint8_t **filebuf,RMContext *rmctx, RMPacket *pkt)
     do
     {
         y = rmctx->sub_packet_cnt;
-        pkt->version       = get_uint16be(*filebuf);
-        pkt->length        = get_uint16be(*filebuf+2);
-        pkt->stream_number = get_uint16be(*filebuf+4);
-        pkt->timestamp     = get_uint32be(*filebuf+6);
-        DEBUGF("    version = %d\n"
+        pkt->version       = get_uint16be(*src);
+
+        /* Simple error checking */
+        if(pkt->version != 0 && pkt->version != 1) 
+        {
+             DEBUGF("parsing packets failed\n");
+             return -1;
+        }
+        
+        pkt->length        = get_uint16be(*src+2);
+        pkt->stream_number = get_uint16be(*src+4);
+        pkt->timestamp     = get_uint32be(*src+6);
+        /*DEBUGF("    version = %d\n"
                "    length  = %d\n"
                "    stream  = %d\n"
-               "    timestamp= %d\n",pkt->version,pkt->length,pkt->stream_number,pkt->timestamp);
-
-        unknown      = get_uint8(*filebuf+10);
-        pkt->flags   = get_uint8(*filebuf+11);
+               "    timestamp= %d\n\n",pkt->version,pkt->length,pkt->stream_number,pkt->timestamp);*/
+        unknown      = get_uint8(*src+10);
+        pkt->flags   = get_uint8(*src+11);
 
         if(pkt->version == 1)
-            unknown = get_uint8(*filebuf+10);
+            unknown = get_uint8(*src+10);
 
         if (pkt->flags & 2) /* keyframe */
             y = rmctx->sub_packet_cnt = 0;
-        if (!y) /* if keyframe update playback elapsed time */
+        if (!y)
             rmctx->audiotimestamp = pkt->timestamp;
         
-        advance_buffer(filebuf,12);
-        
+        advance_buffer(src,12);
+        consumed += 12;
         for(x = 0 ; x < w/sps; x++)
         {
             place = sps*(h*x+((h+1)/2)*(y&1)+(y>>1)); 
-            pkt->frames[place/sps] = *filebuf;
-            advance_buffer(filebuf,sps);
+            pkt->frames[place/sps] = *src;
+            advance_buffer(src,sps);
+            consumed += sps;
         }
         rmctx->audio_pkt_cnt++;
     }while(++(rmctx->sub_packet_cnt) < h);
+
+return consumed;
 }
 
 #ifdef DEBUG
