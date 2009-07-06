@@ -27,6 +27,7 @@
 #include "config.h" /* for HAVE_MULTIVOLUME & AMS_OF_SIZE */
 #include "fat.h"
 #include "thread.h"
+#include "led.h"
 #include "hotswap.h"
 #include "system.h"
 #include "cpu.h"
@@ -619,6 +620,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER
     sd_enable(true);
+    led(true);
 #endif
 
     if (card_info[drive].initialized <= 0)
@@ -742,6 +744,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
     dma_release();
 
 #ifndef BOOTLOADER
+    led(false);
     sd_enable(false);
 #endif
     mutex_unlock(&sd_mtx);

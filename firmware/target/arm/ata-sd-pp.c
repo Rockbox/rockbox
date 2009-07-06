@@ -839,11 +839,6 @@ static void sd_select_device(int card_no)
 
 /* API Functions */
 
-static void sd_led(bool onoff)
-{
-    led(onoff);
-}
-
 int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
@@ -858,7 +853,7 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
 
     mutex_lock(&sd_mtx);
     sd_enable(true);
-    sd_led(true);
+    led(true);
 
 sd_read_retry:
     if (drive != 0 && !card_detect_target())
@@ -944,7 +939,7 @@ sd_read_retry:
 
     while (1)
     {
-        sd_led(false);
+        led(false);
         sd_enable(false);
         mutex_unlock(&sd_mtx);
 
@@ -976,7 +971,7 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
 
     mutex_lock(&sd_mtx);
     sd_enable(true);
-    sd_led(true);
+    led(true);
 
 sd_write_retry:
     if (drive != 0 && !card_detect_target())
@@ -1072,7 +1067,7 @@ sd_write_retry:
 
     while (1)
     {
-        sd_led(false);
+        led(false);
         sd_enable(false);
         mutex_unlock(&sd_mtx);
 
@@ -1205,7 +1200,7 @@ int sd_init(void)
 
     mutex_lock(&sd_mtx);
 
-    sd_led(false);
+    led(false);
 
     if (!initialized)
     {
