@@ -537,6 +537,7 @@ int start_shuffled_play(void)
 
 enum plugin_status main_menu(void)
 {
+    bool exit = false;
     MENUITEM_STRINGLIST(menu, "Main Menu", NULL,
                         "Generate Folder List",
                         "Edit Folder List",
@@ -545,7 +546,7 @@ enum plugin_status main_menu(void)
                         "Play Shuffled",
                         "Quit");
 
-    while (true)
+    while (!exit)
     {
         switch (rb->do_menu(&menu, NULL, NULL, false))
         {
@@ -567,7 +568,7 @@ enum plugin_status main_menu(void)
                 rb->cpu_boost(true);
 #endif
                 if (edit_list() < 0)
-                    return PLUGIN_OK;
+                    exit = true;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost(false);
 #endif
@@ -611,6 +612,7 @@ enum plugin_status main_menu(void)
                 return PLUGIN_OK;
         }
     }
+    return PLUGIN_OK;
 }
 
 enum plugin_status plugin_start(const void* parameter)
