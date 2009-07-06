@@ -4940,7 +4940,7 @@
     *: "Pronuncia nomi file"
   </dest>
   <voice>
-    *: "Pronuncia nomi dei file"
+    *: "Pronuncia nomi file"
   </voice>
 </phrase>
 <phrase>
@@ -4993,10 +4993,10 @@
     *: ".talk mp3 clip"
   </source>
   <dest>
-    *: "Usando un clip audio"
+    *: "Clip Audio .Talk"
   </dest>
   <voice>
-    *: "usando un clip audio"
+    *: "Clip Audio .Talk"
   </voice>
 </phrase>
 <phrase>
@@ -12486,5 +12486,50 @@
   <voice>
     *: none
     touchscreen: "Ripristina Calibrazione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "In Alto"
+  </dest>
+  <voice>
+    *: "In Alto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "In Basso"
+  </dest>
+  <voice>
+    *: "In Basso"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Barra Di Stato Del Telecomando"
+  </dest>
+  <voice>
+    *: none
+    remote: "Barra Di Stato Del Telecomando"
   </voice>
 </phrase>
