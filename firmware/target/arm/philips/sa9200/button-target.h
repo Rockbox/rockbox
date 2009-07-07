@@ -43,10 +43,10 @@ void button_int(void);
 #define BUTTON_POWER        0x00000001
 #define BUTTON_PLAY         0x00000002
 #define BUTTON_MENU         0x00000004
-#define BUTTON_LEFT         0x00000008
-#define BUTTON_RIGHT        0x00000010
-#define BUTTON_REW          0x00000020
-#define BUTTON_FFWD         0x00000040
+#define BUTTON_PREV         0x00000008
+#define BUTTON_NEXT         0x00000010
+#define BUTTON_LEFT         0x00000020
+#define BUTTON_RIGHT        0x00000040
 #define BUTTON_UP           0x00000080
 #define BUTTON_DOWN         0x00000100
 #define BUTTON_VOL_UP       0x00000200

@@ -51,10 +51,10 @@ void button_int(void)
     if (val == MEP_BUTTON_HEADER)
     {
         /* Buttons packet */
-        if (data[1] & 0x1) int_btn |= BUTTON_FFWD;
-        if (data[1] & 0x2) int_btn |= BUTTON_RIGHT;
-        if (data[1] & 0x4) int_btn |= BUTTON_LEFT;
-        if (data[1] & 0x8) int_btn |= BUTTON_REW;
+        if (data[1] & 0x1) int_btn |= BUTTON_RIGHT;
+        if (data[1] & 0x2) int_btn |= BUTTON_NEXT;
+        if (data[1] & 0x4) int_btn |= BUTTON_PREV;
+        if (data[1] & 0x8) int_btn |= BUTTON_LEFT;
         if (data[2] & 0x1) int_btn |= BUTTON_MENU;
     }
     else if (val == MEP_ABSOLUTE_HEADER)
