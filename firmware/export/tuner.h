@@ -96,6 +96,11 @@ extern int (*tuner_get)(int setting);
 #include "s1a0903x01.h"
 #endif
 
+/** Philips TEA5760 **/
+#if (CONFIG_TUNER & TEA5760)
+#include "tea5760.h"
+#endif
+
 /** Philips TEA5767 **/
 #if (CONFIG_TUNER & TEA5767)
 /* Ondio FM, FM Recorder, Recorder V2, iRiver h100/h300, iAudio x5 */

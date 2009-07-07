@@ -49,6 +49,16 @@ const unsigned char lv24020lp_region_data[TUNER_NUM_REGIONS] =
 };
 #endif /* (CONFIG_TUNER & LV24020LP) */
 
+#if (CONFIG_TUNER & TEA5760)
+const struct tea5760_region_data tea5760_region_data[TUNER_NUM_REGIONS] =
+{
+    [REGION_EUROPE]    = { 1, 0 }, /* 50uS, US/Europe band */
+    [REGION_US_CANADA] = { 0, 0 }, /* 75uS, US/Europe band */
+    [REGION_JAPAN]     = { 1, 1 }, /* 50uS, Japanese band  */
+    [REGION_KOREA]     = { 1, 0 }, /* 50uS, US/Europe band */ 
+};
+#endif /* (CONFIG_TUNER & TEA5760) */
+
 #if (CONFIG_TUNER & TEA5767)
 const struct tea5767_region_data tea5767_region_data[TUNER_NUM_REGIONS] =
 {
@@ -94,6 +104,12 @@ void tuner_init(void)
                         lv24020lp_set,
                         lv24020lp_get,
                         lv24020lp_init())
+    #endif
+    #if (CONFIG_TUNER & TEA5760)
+        TUNER_TYPE_CASE(TEA5760,
+                        tea5760_set,
+                        tea5760_get,
+                        tea5760_init())
     #endif
     #if (CONFIG_TUNER & TEA5767)
         TUNER_TYPE_CASE(TEA5767,

@@ -28,10 +28,20 @@
 #include "fmradio.h"
 #include "fmradio_i2c.h" /* physical interface driver */
 
-#define I2C_ADR 0xC0
-static unsigned char write_bytes[7] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+#define I2C_ADR 0x22
 
-static void tea5760uk_set_clear(int byte, unsigned char bits, int set)
+static bool tuner_present = false;
+static unsigned char write_bytes[7] = {
+    0x00,   /* INTREG LSB */
+    0x80,   /* FRQSET MSB */
+    0x00,   /* FRQSET LSB */
+    0x08,   /* TNCTRL MSB */
+    0xD2,   /* TNCTRL LSB */
+    0x00,   /* TESTREG MSB */
+    0x40    /* TESTREG LSB */
+};
+
+static void tea5760_set_clear(int byte, unsigned char bits, int set)
 {
     write_bytes[byte] &= ~bits;
     if (set)
@@ -39,58 +49,60 @@ static void tea5760uk_set_clear(int byte, unsigned char bits, int set)
 }
 
 /* tuner abstraction layer: set something to the tuner */
-int tea5760uk_set(int setting, int value)
+int tea5760_set(int setting, int value)
 {
     switch(setting)
     {
         case RADIO_SLEEP:
-            /* init values */
-            write_bytes[0] |= (1<<7); /* mute */
-#if CONFIG_TUNER_XTAL == 32768
-            /* 32.768kHz, soft mute, stereo noise cancelling */
-            write_bytes[3] |= (1<<4) | (1<<3) | (1<<1);
-#else
-            /* soft mute, stereo noise cancelling */
-            write_bytes[3] |= (1<<3) | (1<<1); 
-#endif
-            /* sleep / standby mode */
-            tea5760uk_set_clear(3, (1<<6), value);
+            if (value) {
+                /* sleep / standby mode */
+                tea5760_set_clear(3, (1<<6), 0);
+            }
+            else {
+                /* active mode */
+                tea5760_set_clear(3, (1<<6), 1);
+                /* disable hard mute */
+                tea5760_set_clear(4, (1<<7), 0);
+            }
             break;
 
         case RADIO_FREQUENCY:
             {
                 int n;
-#if CONFIG_TUNER_XTAL == 32768
+
+                /* low side injection */
+                tea5760_set_clear(4, (1<<4), 0);
                 n = (4 * (value - 225000) + 16384) / 32768;
-#else
-                n = (4 * (value - 225000)) / 50000;
-#endif
-                write_bytes[6] = (write_bytes[6] & 0xC0) | (n >> 8);
-                write_bytes[7] = n;
+
+                /* set frequency in preset mode */
+                write_bytes[1] = (n >> 8) & 0x3F;
+                write_bytes[2] = n;
             }
             break;
 
         case RADIO_SCAN_FREQUENCY:
-            tea5760uk_set(RADIO_FREQUENCY, value);
-            sleep(HZ/30);
-            return tea5760uk_get(RADIO_TUNED);
+            tea5760_set(RADIO_FREQUENCY, value);
+            sleep(40*HZ/1000);
+            return tea5760_get(RADIO_TUNED);
 
         case RADIO_MUTE:
-            tea5760uk_set_clear(3, (1<<2), value);
+            tea5760_set_clear(3, (1<<2), value);
             break;
 
         case RADIO_REGION:
-        {
-            const struct tea5760uk_region_data *rd =
-                &tea5760uk_region_data[value];
+            {
+            const struct tea5760_region_data *rd =
+                &tea5760_region_data[value];
 
-            tea5760uk_set_clear(4, (1<<1), rd->deemphasis);
-            tea5760uk_set_clear(3, (1<<5), rd->band);
-            break;
+            tea5760_set_clear(4, (1<<1), rd->deemphasis);
+            tea5760_set_clear(3, (1<<5), rd->band);
             }
-        case RADIO_FORCE_MONO:
-            tea5760uk_set_clear(4, (1<<3), value);
             break;
+            
+        case RADIO_FORCE_MONO:
+            tea5760_set_clear(4, (1<<3), value);
+            break;
+
         default:
             return -1;
     }
@@ -100,7 +112,7 @@ int tea5760uk_set(int setting, int value)
 }
 
 /* tuner abstraction layer: read something from the tuner */
-int tea5760uk_get(int setting)
+int tea5760_get(int setting)
 {
     unsigned char read_bytes[16];
     int val = -1; /* default for unsupported query */
@@ -110,7 +122,7 @@ int tea5760uk_get(int setting)
     switch(setting)
     {
         case RADIO_PRESENT:
-            val = 1; /* true */
+            val = tuner_present ? 1 : 0;
             break;
 
         case RADIO_TUNED:
@@ -130,8 +142,31 @@ int tea5760uk_get(int setting)
     return val;
 }
 
-void tea5760uk_dbg_info(struct tea5760uk_dbg_info *info)
+void tea5760_init(void)
 {
-    fmradio_i2c_read(I2C_ADR, info->read_regs, 5);
-    memcpy(info->write_regs, write_bytes, 5);
+    unsigned char buf[16];
+    unsigned short manid, chipid;
+
+    /* read all registers */
+    fmradio_i2c_read(I2C_ADR, buf, sizeof(buf));
+    
+    /* check device id */
+    manid = (buf[12] << 8) | buf[13];
+    chipid = (buf[14] << 8) | buf[15];
+    if ((manid == 0x202B) && (chipid == 0x5760))
+    {
+        tuner_present = true;
+    }
+
+    /* write initial values */
+    tea5760_set_clear(3, (1<<1), 1);    /* soft mute on */
+    tea5760_set_clear(3, (1<<0), 1);    /* stereo noise cancellation on */
+    fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
 }
+
+void tea5760_dbg_info(struct tea5760_dbg_info *info)
+{
+    fmradio_i2c_read(I2C_ADR, info->read_regs, sizeof(info->read_regs));
+    memcpy(info->write_regs, write_bytes, sizeof(info->write_regs));
+}
+
