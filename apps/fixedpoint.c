@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: fixedpoint.c -1   $
+ * $Id$
  *
  * Copyright (C) 2006 Jens Arnold
  *
@@ -261,24 +261,18 @@ long fp16_log(int x) {
 
 #if (!defined(PLUGIN) && !defined(CODEC))
 /** MODIFIED FROM replaygain.c */
-/* These math routines have 64-bit internal precision to avoid overflows.
- * Arguments and return values are 32-bit (long) precision.
- */
  
-#define FP_MUL64(x, y) (((x) * (y)) >> (fracbits))
-#define FP_DIV64(x, y) (((x) << (fracbits)) / (y))
-
-static long long fp_exp10(long long x, unsigned int fracbits);
-/* static long long fp_log10(long long n, unsigned int fracbits); */
+#define FP_MUL_FRAC(x, y) fp_mul(x, y, fracbits)
+#define FP_DIV_FRAC(x, y) fp_div(x, y, fracbits)
 
 /* constants in fixed point format, 28 fractional bits */
-#define FP28_LN2        (186065279LL)   /* ln(2)        */
-#define FP28_LN2_INV    (387270501LL)   /* 1/ln(2)      */
-#define FP28_EXP_ZERO   (44739243LL)    /* 1/6          */
-#define FP28_EXP_ONE    (-745654LL)     /* -1/360       */
-#define FP28_EXP_TWO    (12428LL)       /* 1/21600      */
-#define FP28_LN10       (618095479LL)   /* ln(10)       */
-#define FP28_LOG10OF2   (80807124LL)    /* log10(2)     */
+#define FP28_LN2        (186065279L)    /* ln(2)        */
+#define FP28_LN2_INV    (387270501L)    /* 1/ln(2)      */
+#define FP28_EXP_ZERO   (44739243L)     /* 1/6          */
+#define FP28_EXP_ONE    (-745654L)      /* -1/360       */
+#define FP28_EXP_TWO    (12428L)        /* 1/21600      */
+#define FP28_LN10       (618095479L)    /* ln(10)       */
+#define FP28_LOG10OF2   (80807124L)     /* log10(2)     */
 
 #define TOL_BITS         2              /* log calculation tolerance */
 
@@ -290,24 +284,24 @@ static long long fp_exp10(long long x, unsigned int fracbits);
 /** FIXED POINT EXP10
  * Return 10^x as FP integer.  Argument is FP integer.
  */
-static long long fp_exp10(long long x, unsigned int fracbits)
+static long fp_exp10(long x, unsigned int fracbits)
 {
-    long long k;
-    long long z;
-    long long R;
-    long long xp;
+    long k;
+    long z;
+    long R;
+    long xp;
     
     /* scale constants */
-    const long long fp_one      = (1 << fracbits);
-    const long long fp_half     = (1 << (fracbits - 1));
-    const long long fp_two      = (2 << fracbits);
-    const long long fp_mask     = (fp_one - 1);
-    const long long fp_ln2_inv  = (FP28_LN2_INV     >> (28 - fracbits));
-    const long long fp_ln2      = (FP28_LN2         >> (28 - fracbits));
-    const long long fp_ln10     = (FP28_LN10        >> (28 - fracbits));
-    const long long fp_exp_zero = (FP28_EXP_ZERO    >> (28 - fracbits));
-    const long long fp_exp_one  = (FP28_EXP_ONE     >> (28 - fracbits));
-    const long long fp_exp_two  = (FP28_EXP_TWO     >> (28 - fracbits));
+    const long fp_one       = (1 << fracbits);
+    const long fp_half      = (1 << (fracbits - 1));
+    const long fp_two       = (2 << fracbits);
+    const long fp_mask      = (fp_one - 1);
+    const long fp_ln2_inv   = (FP28_LN2_INV     >> (28 - fracbits));
+    const long fp_ln2       = (FP28_LN2         >> (28 - fracbits));
+    const long fp_ln10      = (FP28_LN10        >> (28 - fracbits));
+    const long fp_exp_zero  = (FP28_EXP_ZERO    >> (28 - fracbits));
+    const long fp_exp_one   = (FP28_EXP_ONE     >> (28 - fracbits));
+    const long fp_exp_two   = (FP28_EXP_TWO     >> (28 - fracbits));
     
     /* exp(0) = 1 */
     if (x == 0)
@@ -316,21 +310,21 @@ static long long fp_exp10(long long x, unsigned int fracbits)
     }
     
     /* convert from base 10 to base e */
-    x = FP_MUL64(x, fp_ln10);
+    x = FP_MUL_FRAC(x, fp_ln10);
     
     /* calculate exp(x) */
-    k = (FP_MUL64(abs(x), fp_ln2_inv) + fp_half) & ~fp_mask;
+    k = (FP_MUL_FRAC(abs(x), fp_ln2_inv) + fp_half) & ~fp_mask;
     
     if (x < 0)
     {
         k = -k;
     }
     
-    x -= FP_MUL64(k, fp_ln2);
-    z = FP_MUL64(x, x);
-    R = fp_two + FP_MUL64(z, fp_exp_zero + FP_MUL64(z, fp_exp_one
-        + FP_MUL64(z, fp_exp_two)));
-    xp = fp_one + FP_DIV64(FP_MUL64(fp_two, x), R - x);
+    x -= FP_MUL_FRAC(k, fp_ln2);
+    z = FP_MUL_FRAC(x, x);
+    R = fp_two + FP_MUL_FRAC(z, fp_exp_zero + FP_MUL_FRAC(z, fp_exp_one
+        + FP_MUL_FRAC(z, fp_exp_two)));
+    xp = fp_one + FP_DIV_FRAC(FP_MUL_FRAC(fp_two, x), R - x);
     
     if (k < 0)
     {
@@ -341,7 +335,7 @@ static long long fp_exp10(long long x, unsigned int fracbits)
         k = fp_one << (k >> fracbits);
     }
     
-    return FP_MUL64(k, xp);
+    return FP_MUL_FRAC(k, xp);
 }
 
 
@@ -349,13 +343,13 @@ static long long fp_exp10(long long x, unsigned int fracbits)
 /** FIXED POINT LOG10
  * Return log10(x) as FP integer.  Argument is FP integer.
  */
-static long long fp_log10(long long n, unsigned int fracbits)
+static long fp_log10(long n, unsigned int fracbits)
 {
     /* Calculate log2 of argument */
 
-    long long log2, frac;
-    const long long fp_one  = (1 << fracbits);
-    const long long fp_two  = (2 << fracbits);
+    long log2, frac;
+    const long fp_one       = (1 << fracbits);
+    const long fp_two       = (2 << fracbits);
     const long tolerance    = (1 << ((fracbits / 2) + 2));
     
     if (n <=0) return FP_NEGINF;
@@ -378,7 +372,7 @@ static long long fp_log10(long long n, unsigned int fracbits)
     while (frac > tolerance)
     {
         frac >>= 1;
-        n = FP_MUL64(n, n);
+        n = FP_MUL_FRAC(n, n);
         if (n >= fp_two)
         {
             n >>= 1;
@@ -387,31 +381,15 @@ static long long fp_log10(long long n, unsigned int fracbits)
     }
     
     /* convert log2 to log10 */
-    return FP_MUL64(log2, (FP28_LOG10OF2 >> (28 - fracbits)));
+    return FP_MUL_FRAC(log2, (FP28_LOG10OF2 >> (28 - fracbits)));
 }
 
 
 /** CONVERT FACTOR TO DECIBELS */
 long fp_decibels(unsigned long factor, unsigned int fracbits)
 {
-    long long decibels;
-    long long f = (long long)factor;
-    bool neg;
-    
-    /* keep factor in signed long range */
-    if (f >= (1LL << 31))
-        f = (1LL << 31) - 1;
-    
     /* decibels = 20 * log10(factor) */
-    decibels = FP_MUL64((20LL << fracbits), fp_log10(f, fracbits));
-    
-    /* keep result in signed long range */
-    if ((neg = (decibels < 0)))
-        decibels = -decibels;
-    if (decibels >= (1LL << 31))
-        return neg ? FP_NEGINF : FP_INF;
-    
-    return neg ? (long)-decibels : (long)decibels;
+    return FP_MUL_FRAC((20L << fracbits), fp_log10(factor, fracbits));
 }
 #endif  /* unused code */
 
@@ -419,34 +397,7 @@ long fp_decibels(unsigned long factor, unsigned int fracbits)
 /** CONVERT DECIBELS TO FACTOR */
 long fp_factor(long decibels, unsigned int fracbits)
 {
-    bool neg;
-    long long factor;
-    long long db = (long long)decibels;
-    
-    /* if decibels is 0, factor is 1 */
-    if (db == 0)
-        return (1L << fracbits);
-    
-    /* calculate for positive decibels only */
-    if ((neg = (db < 0)))
-        db = -db;
-    
     /* factor = 10 ^ (decibels / 20) */
-    factor = fp_exp10(FP_DIV64(db, (20LL << fracbits)), fracbits);
-    
-    /* keep result in signed long range, return 0 if very small */
-    if (factor >= (1LL << 31))
-    {
-        if (neg)
-            return 0;
-        else
-            return FP_INF;
-    }
-    
-    /* if negative argument, factor is 1 / result */
-    if (neg)
-        factor = FP_DIV64((1LL << fracbits), factor);
-        
-    return (long)factor;
+    return fp_exp10(FP_DIV_FRAC(decibels, (20L << fracbits)), fracbits);
 }
 #endif  /* !PLUGIN and !CODEC */
