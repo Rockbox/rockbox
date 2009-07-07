@@ -1050,11 +1050,11 @@ void button_event(int key, bool pressed)
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
     case SDLK_KP4:
     case SDLK_LEFT:
-        new_btn = BUTTON_REW;
+        new_btn = BUTTON_LEFT;
         break;
     case SDLK_KP6:
     case SDLK_RIGHT:
-        new_btn = BUTTON_FFWD;
+        new_btn = BUTTON_RIGHT;
         break;
     case SDLK_KP8:
     case SDLK_UP:
@@ -1069,10 +1069,10 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_PLAY;
         break;
     case SDLK_KP7:
-        new_btn = BUTTON_LEFT;
+        new_btn = BUTTON_PREV;
         break;
     case SDLK_KP9:
-        new_btn = BUTTON_RIGHT;
+        new_btn = BUTTON_NEXT;
         break;
     case SDLK_KP_ENTER:
     case SDLK_RETURN:
