@@ -974,6 +974,7 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_DOWN;
         break;
     case SDLK_KP_MINUS:
+    case SDLK_KP1:
         new_btn = BUTTON_POWER;
         break;
     case SDLK_KP_MULTIPLY:
@@ -1002,20 +1003,25 @@ void button_event(int key, bool pressed)
     case SDLK_DOWN:
         new_btn = BUTTON_DOWN;
         break;
+    
     case SDLK_INSERT:
+    case SDLK_KP_MULTIPLY:
         new_btn = BUTTON_HOME;
         break;
     case SDLK_SPACE:
+    case SDLK_KP5:
         new_btn = BUTTON_SELECT;
         break;
     case SDLK_PAGEDOWN:
+    case SDLK_KP3:
         new_btn = BUTTON_VOL_DOWN;
         break;
     case SDLK_PAGEUP:
+    case SDLK_KP9:
         new_btn = BUTTON_VOL_UP;
         break;
     case SDLK_ESCAPE:
-    case SDLK_p:
+    case SDLK_KP1:
         new_btn = BUTTON_POWER;
         break;
 #elif CONFIG_KEYPAD == SANSA_M200_PAD
