@@ -106,6 +106,7 @@ char *create_numbered_filename(char *buffer, const char *path,
     int max_num;
     int pathlen;
     int prefixlen = strlen(prefix);
+    int suffixlen = strlen(suffix);
     char fmtstring[12];
 
     if (buffer != path)
@@ -131,10 +132,14 @@ char *create_numbered_filename(char *buffer, const char *path,
 
     while ((entry = readdir(dir)))
     {
-        int curr_num;
+        int curr_num, namelen;
 
-        if (strncasecmp((char *)entry->d_name, prefix, prefixlen)
-            || strcasecmp((char *)entry->d_name + prefixlen + numberlen, suffix))
+        if (strncasecmp((char *)entry->d_name, prefix, prefixlen))
+            continue;
+            
+        namelen = strlen((char *)entry->d_name);
+        if ((namelen <= prefixlen + suffixlen)
+            || strcasecmp((char *)entry->d_name + namelen - suffixlen, suffix))
             continue;
 
         curr_num = atoi((char *)entry->d_name + prefixlen);
