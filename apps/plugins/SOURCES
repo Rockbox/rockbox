@@ -56,6 +56,7 @@ wavview.c
 robotfindskitten.c
 
 #ifdef HAVE_LCD_COLOR
+clix.c
 ppmviewer.c
 #endif
 
