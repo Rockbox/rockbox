@@ -245,8 +245,8 @@ static void gwps_fix_statusbars(void)
         bool draw = false;
         if (gui_wps[i].data->wps_sb_tag)
             draw = gui_wps[i].data->show_sb_on_wps;
-        else if (global_settings.statusbar)
-            wpsbars |= VP_SB_ONSCREEN(i);
+        else if (statusbar_position(i) != STATUSBAR_OFF)
+            draw = true;
         if (draw)
             wpsbars |= (VP_SB_ONSCREEN(i) | VP_SB_IGNORE_SETTING(i));
     }
@@ -937,13 +937,7 @@ static void statusbar_toggle_handler(void *data)
         }
         else
         {
-            bool bar_at_top = true;
-#ifdef HAVE_REMOTE_LCD
-            if (i == SCREEN_REMOTE)
-                bar_at_top = global_settings.remote_statusbar != STATUSBAR_BOTTOM;
-            else
-#endif
-                bar_at_top = global_settings.statusbar != STATUSBAR_BOTTOM;
+            bool bar_at_top = statusbar_position(i) != STATUSBAR_BOTTOM;
             vp->y      = bar_at_top?STATUSBAR_HEIGHT:0;
             vp->height = screens[i].lcdheight - STATUSBAR_HEIGHT;
         }

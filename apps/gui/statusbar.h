@@ -99,5 +99,10 @@ struct gui_syncstatusbar
 extern void gui_syncstatusbar_init(struct gui_syncstatusbar * bars);
 extern void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars, bool force_redraw);
 void gui_statusbar_changed(int enabled);
+#ifndef HAVE_REMOTE_LCD
+#define statusbar_position(a) (global_settings.statusbar)
+#else
+int statusbar_position(int screen);
+#endif
 
 #endif /*_GUI_STATUSBAR_H_*/

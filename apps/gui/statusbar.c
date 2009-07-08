@@ -263,17 +263,10 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         memcmp(&(bar->info), &(bar->lastinfo), sizeof(struct status_info)))
     {
         struct viewport vp;
-        bool bar_at_top = true;
         viewport_set_defaults(&vp, display->screen_type);
         vp.height = STATUSBAR_HEIGHT;
         vp.x = STATUSBAR_X_POS;
-#ifdef HAVE_REMOTE_LCD
-        if (display->screen_type == SCREEN_REMOTE)
-            bar_at_top = global_settings.remote_statusbar != STATUSBAR_BOTTOM;
-        else
-#endif
-            bar_at_top = global_settings.statusbar != STATUSBAR_BOTTOM;
-        if (bar_at_top)    
+        if (statusbar_position(display->screen_type) != STATUSBAR_BOTTOM)    
             vp.y = 0;
         else
             vp.y = display->lcdheight - STATUSBAR_HEIGHT;    
@@ -829,3 +822,11 @@ void gui_statusbar_changed(int enabled)
     (void)enabled;
     send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
 }
+#ifdef HAVE_REMOTE_LCD
+int statusbar_position(int screen)
+{
+    if (screen == SCREEN_REMOTE)
+        return global_settings.remote_statusbar;
+    return global_settings.statusbar;
+}
+#endif

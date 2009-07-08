@@ -53,11 +53,7 @@ static bool showing_bars(enum screen_type screen)
     {
 #ifdef HAVE_LCD_BITMAP
         bool ignore = statusbar_enabled & VP_SB_IGNORE_SETTING(screen);
-#ifdef HAVE_REMOTE_LCD
-        if (screen == SCREEN_REMOTE)
-            return global_settings.remote_statusbar || ignore;
-#endif
-        return global_settings.statusbar || ignore;
+        return ignore || (statusbar_position(screen));
 #else
         return true;
 #endif
@@ -67,24 +63,15 @@ static bool showing_bars(enum screen_type screen)
 
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 {
-#ifdef HAVE_LCD_BITMAP
-    bool bar_at_top = true;
-#endif
     vp->x = 0;
     vp->width = screens[screen].lcdwidth;
 
 #ifdef HAVE_LCD_BITMAP
     vp->drawmode = DRMODE_SOLID;
     vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */
-#ifdef HAVE_REMOTE_LCD
-    if (screen == SCREEN_REMOTE)
-        bar_at_top = global_settings.remote_statusbar != STATUSBAR_BOTTOM;
-    else
-#endif
-        bar_at_top = global_settings.statusbar != STATUSBAR_BOTTOM;
         
     vp->height = screens[screen].lcdheight;
-    if (bar_at_top && showing_bars(screen))
+    if (statusbar_position(screen) != STATUSBAR_BOTTOM && showing_bars(screen))
         vp->y = STATUSBAR_HEIGHT;
     else 
         vp->y = 0;
