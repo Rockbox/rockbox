@@ -4,11 +4,15 @@
 This is a jackpot slot machine game. At the beginning of the game you
 have 20\$.  Payouts are given when three matching symbols come up.
 
+% fill out for every other target...
 \begin{table}
 \begin{btnmap}{}{}
-\ButtonPlay      \opt{IRIVER_RC_H100_PAD}{&}    & Play \\
-\ButtonStop      \opt{IRIVER_RC_H100_PAD}{&}    & Exit the game \\
+    \opt{PLAYER_PAD}{\ButtonPlay}
+          \opt{IRIVER_RC_H100_PAD}{&}
+    & Play \\
+    \opt{PLAYER_PAD}{\ButtonStop}
+          \opt{IRIVER_RC_H100_PAD}{&}
+    & Exit the game \\
 \end{btnmap}
 \end{table}
-
 
