@@ -134,7 +134,7 @@ if($lookaddr != 0)
         if(/^\.([^\s]+)\s*(0x[0-9a-fA-F]+)/)
         {
             ($addr) = sscanf("0x%lx", $2);
-            if($1 eq "plugin" || $1 eq "codec")
+            if($1 eq "plugin")
             {
                 $plugin_addr = $addr;
             }
