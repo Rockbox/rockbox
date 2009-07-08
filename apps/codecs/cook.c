@@ -34,7 +34,7 @@ COOKContext q;
 
 static void init_rm(RMContext *rmctx)
 {
-    memcpy(rmctx, ci->id3->id3v2buf, sizeof(RMContext));
+    memcpy(rmctx, (void*)(( (int)ci->id3->id3v2buf + 3 ) &~ 3), sizeof(RMContext));
 }
 
 /* this is the codec entry point */
