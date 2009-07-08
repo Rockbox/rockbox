@@ -112,6 +112,14 @@ PLUGIN_HEADER
 #define CLIX_BUTTON_UP      BUTTON_UP
 #define CLIX_BUTTON_DOWN    BUTTON_DOWN
 
+#elif (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define CLIX_BUTTON_QUIT    BUTTON_OFF
+#define CLIX_BUTTON_LEFT    BUTTON_LEFT
+#define CLIX_BUTTON_RIGHT   BUTTON_RIGHT
+#define CLIX_BUTTON_CLICK   BUTTON_SELECT
+#define CLIX_BUTTON_UP      BUTTON_UP
+#define CLIX_BUTTON_DOWN    BUTTON_DOWN
+
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 #define CLIX_BUTTON_QUIT    BUTTON_BACK
 #define CLIX_BUTTON_LEFT    BUTTON_LEFT
@@ -203,7 +211,7 @@ struct highscore highest[NUM_SCORES];
 struct clix_game_state_t {
     unsigned char level; /* current level */
     char x,y; /* current positions of the cursor */
-    char board[BOARD_WIDTH * BOARD_HEIGHT]; /* play board*/
+    int board[BOARD_WIDTH * BOARD_HEIGHT]; /* play board*/
     /* state of selected fields,maybe we can store this in the play board too */
     bool board_selected[ BOARD_WIDTH * BOARD_HEIGHT];
     char selected_count;
