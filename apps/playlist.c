@@ -3093,16 +3093,18 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
             sizeof(filename)) < 0)
         return -1;
 
+    /* We want to insert the track at the position that was specified by
+       new_index.  This may be different then new_index because of the
+       shifting that will occur after the delete.
+       We calculate this before we do the remove as it depends on the
+       size of the playlist before the track removal */
+    r = rotate_index(playlist, new_index);
+          
     /* Delete track from original position */
     result = remove_track_from_playlist(playlist, index, true);
 
     if (result != -1)
     {
-        /* We want to insert the track at the position that was specified by
-           new_index.  This may be different then new_index because of the
-           shifting that occurred after the delete */
-        r = rotate_index(playlist, new_index);
-
         if (r == 0)
             /* First index */
             new_index = PLAYLIST_PREPEND;
