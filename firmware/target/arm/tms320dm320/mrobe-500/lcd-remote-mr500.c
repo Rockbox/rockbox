@@ -26,6 +26,7 @@
 #include "scroll_engine.h"
 #include "uart-target.h"
 #include "button.h"
+#include "powermgmt.h"
 
 static enum remote_control_states
 {
@@ -35,7 +36,7 @@ static enum remote_control_states
     REMOTE_CONTROL_MASK,
     REMOTE_CONTROL_DRAW,
     REMOTE_CONTROL_SLEEP
-} remote_state_control = REMOTE_CONTROL_NOP, remote_state_control_next;
+} remote_state_control = REMOTE_CONTROL_MASK, remote_state_control_next;
 
 static enum remote_draw_states
 {
@@ -50,7 +51,6 @@ bool remote_initialized=true;
 
 static unsigned char remote_contrast=DEFAULT_REMOTE_CONTRAST_SETTING;
 static unsigned char remote_power=0x00;
-static unsigned char remote_mask=0x00;
 
 /*** hardware configuration ***/
 
@@ -120,10 +120,13 @@ unsigned char   remote_draw_x, remote_draw_y,
 static void remote_tick(void)
 {
     unsigned char i;
+    int bat_level;
     static unsigned char pause_length=0;
     
-    if(remote_state_control!=REMOTE_CONTROL_DRAW)
+    if(remote_state_control!=REMOTE_CONTROL_DRAW) {
         remote_state_control=remote_state_control_next;
+        remote_state_control_next=REMOTE_CONTROL_MASK;
+    }
     
     switch (remote_state_control)
     {
@@ -137,7 +140,7 @@ static void remote_tick(void)
             remote_payload[1]=0x30;
             
             remote_payload_size=2;
-            remote_state_control=REMOTE_CONTROL_NOP;
+            remote_state_control=REMOTE_CONTROL_MASK;
             break;
             
         case REMOTE_CONTROL_POWER:
@@ -146,15 +149,26 @@ static void remote_tick(void)
             remote_payload[2]=remote_contrast;
             
             remote_payload_size=3;
-            remote_state_control=REMOTE_CONTROL_NOP;
+            remote_state_control=REMOTE_CONTROL_MASK;
             break;
             
         case REMOTE_CONTROL_MASK:
+            bat_level=battery_level()>>5;
+            remote_payload[1]=0;
+            
+            if(bat_level&0x02) {
+                remote_payload[1] |= 0x07 << 5;
+            } else if(bat_level&0x01) {
+                remote_payload[1] |= 0x03 << 5;
+            } else {
+                remote_payload[1] |= 0x01 << 5;
+            }
+            remote_payload[1]|=1<<4;
+            
             remote_payload[0]=0x41;
-            remote_payload[1]=remote_mask;
             
             remote_payload_size=2;
-            remote_state_control=REMOTE_CONTROL_NOP;
+            remote_state_control=REMOTE_CONTROL_MASK;
             break;
             
         case REMOTE_CONTROL_DRAW:
@@ -192,7 +206,7 @@ static void remote_tick(void)
                     if(--pause_length==0)
                     {
                         if(remote_state_draw_next==DRAW_TOP)
-                            remote_state_control=REMOTE_CONTROL_NOP;
+                            remote_state_control=REMOTE_CONTROL_MASK;
                             
                         remote_state_draw=remote_state_draw_next;
                     }
