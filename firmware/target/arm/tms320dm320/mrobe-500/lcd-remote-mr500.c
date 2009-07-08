@@ -123,7 +123,7 @@ static void remote_tick(void)
     int bat_level;
     static unsigned char pause_length=0;
     
-    if(remote_state_control!=REMOTE_CONTROL_DRAW) {
+    if(remote_state_control!=REMOTE_CONTROL_DRAW && remote_state_control!=REMOTE_CONTROL_IDLE) {
         remote_state_control=remote_state_control_next;
         remote_state_control_next=REMOTE_CONTROL_MASK;
     }
@@ -131,6 +131,9 @@ static void remote_tick(void)
     switch (remote_state_control)
     {
         case REMOTE_CONTROL_IDLE:
+            /* State machine never leaves idle unless remote_state_control is
+             * manually set.
+             */
             remote_payload_size=0;
             remote_state_control=REMOTE_CONTROL_IDLE;
             break;
