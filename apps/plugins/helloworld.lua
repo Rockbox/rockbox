@@ -65,7 +65,7 @@ end
 -- Helper function which reads the contents of a file
 function file_get_contents(filename)
     local file = io.open(filename, "r")
-    if(file == nil) then
+    if not file then
         return nil
     end
 
@@ -78,11 +78,11 @@ end
 -- Helper function which saves contents to a file
 function file_put_contents(filename, contents)
     local file = io.open(filename, "w+") -- See Lua manual for more information
-    if(file == nil) then
+    if not file then
         return false
     end
 
-    local ret = file:write(contents) == 1
+    local ret = file:write(contents) == true
     file:close() -- GC takes care of this if you would've forgotten it
     return ret
 end
