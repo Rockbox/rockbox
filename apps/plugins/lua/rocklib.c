@@ -596,6 +596,11 @@ LUALIB_API int luaopen_rock(lua_State *L)
     RB_CONSTANT(TOUCHSCREEN_BUTTON);
 #endif
 
+    RB_CONSTANT(SCREEN_MAIN);
+#ifdef HAVE_REMOTE_LCD
+    RB_CONSTANT(SCREEN_REMOTE);
+#endif
+
     rli_init(L);
 
     return 1;
