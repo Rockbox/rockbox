@@ -395,7 +395,7 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
 
 bool get_rm_metadata(int fd, struct mp3entry* id3)
 {
-    RMContext *rmctx = (RMContext*) (( (int)id3->id3v2buf + 3 ) &~ 3);
+    RMContext *rmctx = (RMContext*) (( (intptr_t)id3->id3v2buf + 3 ) &~ 3);
     memset(rmctx,0,sizeof(RMContext));
     if(rm_parse_header(fd, rmctx, id3) < 0)
         return false;
