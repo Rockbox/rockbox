@@ -39,10 +39,20 @@
 */
 
 static struct mutex i2c_mtx;
+static struct wakeup i2c_wakeup;
+
+void INT_IIC(void)
+{
+    /* disable interrupt (but don't clear it yet) */
+    IICCON &= ~((1 << 4) | (1 << 5));
+
+    wakeup_signal(&i2c_wakeup);
+}
 
 void i2c_init(void)
 {
     mutex_init(&i2c_mtx);
+    wakeup_init(&i2c_wakeup);
 
     /* enable I2C pins */
     PCON10 = (2 << 2) |
@@ -61,6 +71,9 @@ void i2c_init(void)
 
     /* serial output on */
     IICSTAT = (1 << 4);
+    
+    /* enable interrupt */
+    INTMSK |= (1 << 27);
 }
 
 int i2c_write(unsigned char slave, int address, int len, const unsigned char *data)
@@ -71,20 +84,20 @@ int i2c_write(unsigned char slave, int address, int len, const unsigned char *da
     IICDS = slave & ~1;
     IICSTAT = 0xF0;
     IICCON = 0xF3;
-    while ((IICCON & (1 << 4)) == 0);
+    wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
     
     if (address >= 0) {
         /* write address */
         IICDS = address;
         IICCON = 0xF3;
-        while ((IICCON & (1 << 4)) == 0);
+        wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
     }
     
     /* write data */
     while (len--) {
         IICDS = *data++;
         IICCON = 0xF3;
-        while ((IICCON & (1 << 4)) == 0);
+        wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
     }
 
     /* STOP */
@@ -105,23 +118,23 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
         IICDS = slave & ~1;
         IICSTAT = 0xF0;
         IICCON = 0xF3;
-        while ((IICCON & (1 << 4)) == 0);
+        wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
 
         /* write address */
         IICDS = address;
         IICCON = 0xF3;
-        while ((IICCON & (1 << 4)) == 0);
+        wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
     }
     
     /* (repeated) START */
     IICDS = slave | 1;
     IICSTAT = 0xB0;
     IICCON = 0xF3;
-    while ((IICCON & (1 << 4)) == 0);
+    wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
     
     while (len--) {
         IICCON = (len == 0) ? 0x73 : 0xF3; /* NACK or ACK */
-        while ((IICCON & (1 << 4)) == 0);
+        wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
         *data++ = IICDS;
     }
 
