@@ -367,17 +367,22 @@ enum plugin_status plugin_start(const void* parameter)
     do {
         int ret=0;
         done=true;
-        for (i=0; done && i<settings.nr_timers; i++) {
+        i = nr;
+        do {
             if (!timer_holder[i].hidden)
-                done=false;
-        }
+            {
+                nr = i;
+                done = false;
+                break;
+            }
+            if (++i == settings.nr_timers)
+                i = 0;
+        } while (i != nr);
+
         if (done) {
             return PLUGIN_OK;
         }
-        if (!timer_holder[nr].hidden) {
-            done=false;
-            ret=run_timer(nr);
-        }
+        ret = run_timer(nr);
         switch (ret) {
             case -1: /* exit */
                 done=true;
@@ -390,9 +395,11 @@ enum plugin_status plugin_start(const void* parameter)
                     nr=0;
                 break;
             case 2:
-                nr--;
-                if (nr<0)
-                    nr=settings.nr_timers-1;
+                do {
+                    nr--;
+                    if (nr<0)
+                        nr=settings.nr_timers-1;
+                } while (timer_holder[nr].hidden);
                 break;
         }
     } while (!done);
@@ -521,7 +528,7 @@ static int run_timer(int nr)
                 switch(rb->do_menu(&menu, NULL, NULL, false))
                 {
                     case 0:
-                         /* delete timer */
+                         /* delete player */
                         timer_holder[nr].hidden=true;
                         retval=1;
                         done=true;
