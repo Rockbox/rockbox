@@ -554,7 +554,8 @@ Lyre prototype 1*/
 #endif /* BOOTLOADER */
 
 #if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) \
-    || (CONFIG_CPU == AS3525) || (CONFIG_CPU == S3C2440)
+    || (CONFIG_CPU == AS3525) || (CONFIG_CPU == S3C2440) \
+    || (CONFIG_CPU == S5L8700)
 #define HAVE_WAKEUP_OBJECTS
 #endif
 
