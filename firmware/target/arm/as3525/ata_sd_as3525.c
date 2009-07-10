@@ -49,6 +49,7 @@
 
 #ifdef HAVE_HOTSWAP
 #include "disk.h"
+#include "panic.h"
 #endif
 
 /* command flags */
@@ -242,7 +243,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
 static int sd_init_card(const int drive)
 {
     unsigned long response;
-    int max_tries = 100; /* max acmd41 attemps */
+    long init_timeout;
     bool sdhc;
     unsigned long temp_reg[4];
     int i;
@@ -257,29 +258,29 @@ static int sd_init_card(const int drive)
         if((response & 0xFFF) == 0x1AA)
             sdhc = true;
 
+    /* timeout for initialization is 1sec, from SD Specification 2.00 */
+    init_timeout = current_tick + HZ;
+
     do {
-        /* some MicroSD cards seems to need more delays, so play safe */
-        mci_delay();
-        mci_delay();
-        mci_delay();
-        mci_delay();
+        /* timeout */
+        if(current_tick > init_timeout)
+            return -2;
 
         /* app_cmd */
         if( !send_cmd(drive, SD_APP_CMD, 0, MCI_RESP|MCI_ARG, &response) ||
             !(response & (1<<5)) )
         {
-            return -2;
+            return -3;
         }
 
         /* acmd41 */
         if(!send_cmd(drive, SD_APP_OP_COND, (sdhc ? 0x40FF8000 : (1<<23)),
                         MCI_RESP|MCI_ARG, &card_info[drive].ocr))
-            return -3;
+        {
+            return -4;
+        }
 
-    } while(!(card_info[drive].ocr & (1<<31)) && max_tries--);
-
-    if(max_tries < 0)
-        return -4;
+    } while(!(card_info[drive].ocr & (1<<31)));
 
     /* send CID */
     if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP|MCI_ARG,
@@ -343,6 +344,9 @@ static void sd_thread(void)
 {
     struct queue_event ev;
     bool idle_notified = false;
+#ifdef HAVE_HOTSWAP
+    int microsd_init;
+#endif
 
     while (1)
     {
@@ -374,8 +378,18 @@ static void sd_thread(void)
             {
                 sd_enable(true);
                 init_pl180_controller(SD_SLOT_AS3525);
-                sd_init_card(SD_SLOT_AS3525);
-                disk_mount(SD_SLOT_AS3525);
+                microsd_init = sd_init_card(SD_SLOT_AS3525);
+                if (microsd_init < 0)
+                    panicf("microSD init failed : %d", microsd_init);
+
+                if (!disk_mount(SD_SLOT_AS3525))    /* mount failed */
+                {
+                    /* Access is now safe */
+                    mutex_unlock(&sd_mtx);
+                    fat_unlock();
+                    sd_enable(false);
+                    break;
+                }
             }
 
             queue_broadcast(SYS_FS_CHANGED, 0);
