@@ -144,9 +144,6 @@
 /* Define this if you have a TCC7801 */
 #define CONFIG_CPU TCC7801
 
-/* Define this if you have ATA power-off control */
-#define HAVE_ATA_POWER_OFF
-
 /* Define this to the CPU frequency */
 #define CPU_FREQ 48000000
 

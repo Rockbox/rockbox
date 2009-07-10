@@ -48,16 +48,6 @@ void power_init(void)
 #endif
 }
 
-void ide_power_enable(bool on)
-{
-    (void)on;
-}
-
-bool ide_powered(void)
-{
-    return true;
-}
-
 void power_off(void)
 {
     /* Forcibly cut power to SoC & peripherals by putting the PCF to sleep */
