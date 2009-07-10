@@ -258,7 +258,7 @@ static void gwps_fix_statusbars(void)
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 /*
  * If the user is unable to see the wps, because the display is deactivated,
- * we surpress updates until the wps gets actived again (the lcd driver will
+ * we surpress updates until the wps is actived again (the lcd driver will
  * call this hook to issue an instant update)
  * */
 static void wps_lcd_activation_hook(void)
@@ -315,7 +315,7 @@ int wps_get_touchaction(struct wps_data *data)
         /* reposition the touch inside the viewport */    
         vx = x - r->wvp->vp.x;
         vy = y - r->wvp->vp.y;
-        /* check if its inside this viewport */
+        /* check if it's inside this viewport */
         if (vx >= 0 && vx < r->wvp->vp.x + r->wvp->vp.width &&
             vy >= 0 && vy < r->wvp->vp.y + r->wvp->vp.height)
         {
@@ -768,8 +768,10 @@ long gui_wps_show(void)
                 audio_flush_and_reload_tracks();
             }
             break;
-#endif /* HAVE_TOUCHSCREEN */            
-            case ACTION_REDRAW: /* yes are locked, just redraw */
+#endif /* HAVE_TOUCHSCREEN */
+             /* this case is used by the softlock feature
+              * it requests a full update here */
+            case ACTION_REDRAW:
                 wps_state.do_full_update = true;
                 break;
             case ACTION_NONE: /* Timeout, do a partial update */
@@ -894,7 +896,6 @@ static void nextid3available_callback(void* param)
     wps_state.do_full_update = true;
 }
 
-/* wps_state */
 
 static void wps_state_init(void)
 {
@@ -917,7 +918,6 @@ static void wps_state_init(void)
     add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false, nextid3available_callback);
 }
 
-/* wps_state end*/
 
 #ifdef HAVE_LCD_BITMAP
 static void statusbar_toggle_handler(void *data)
@@ -960,7 +960,7 @@ void gui_sync_wps_init(void)
         gui_wps[i].data = &wps_datas[i];
         gui_wps[i].display = &screens[i];
         /* Currently no seperate wps_state needed/possible
-           so use the only aviable ( "global" ) one */
+           so use the only available ( "global" ) one */
         gui_wps[i].state = &wps_state;
     }
 #ifdef HAVE_LCD_BITMAP
