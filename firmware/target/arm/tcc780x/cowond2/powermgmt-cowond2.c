@@ -26,32 +26,32 @@
 #include "pcf50606.h"
 
 unsigned short current_voltage = 3910;
-
+   
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    /* FIXME: calibrate value */
     3380
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    /* FIXME: calibrate value */
     3300
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    /* FIXME: calibrate values. Table is "inherited" from iPod-PCF / H100 */
-    { 3370, 3650, 3700, 3740, 3780, 3820, 3870, 3930, 4000, 4080, 4160 }
+    /* Standard D2 internal battery */
+    { 3370, 3690, 3750, 3775, 3790, 3820, 3880, 3940, 3980, 4090, 4170 }
+    
+    /* TODO: DIY replacements eg. Nokia BP-4L ? */
 };
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    /* FIXME: calibrate values. Table is "inherited" from iPod-PCF / H100 */
-    3370, 3650, 3700, 3740, 3780, 3820, 3870, 3930, 4000, 4080, 4160
+    /* FIXME: voltages seem to be offset during charging (eg. 4500+) */
+    3370, 3690, 3750, 3775, 3790, 3820, 3880, 3940, 3980, 4090, 4170
 };
 #endif /* CONFIG_CHARGING */
 

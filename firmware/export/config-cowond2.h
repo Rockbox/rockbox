@@ -135,6 +135,11 @@
 /* Hardware controlled charging */
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
+/* Define current usage levels. */
+#define CURRENT_NORMAL     88 /* 18 hours from a 1600 mAh battery */  
+#define CURRENT_BACKLIGHT  30 /* TBD */ 
+#define CURRENT_RECORD     0  /* no recording yet */ 
+
 #ifndef SIMULATOR
 /* Define this if you have a TCC7801 */
 #define CONFIG_CPU TCC7801
