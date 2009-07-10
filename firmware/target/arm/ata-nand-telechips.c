@@ -27,6 +27,7 @@
 #include "nand_id.h"
 #include "storage.h"
 #include "buffer.h"
+#include "led.h"
 
 #define SECTOR_SIZE 512
 
@@ -701,7 +702,12 @@ int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
 #ifdef HAVE_MULTIVOLUME
     (void)drive; /* unused for now */
 #endif
+
+    int ret = 0;
+    
     mutex_lock(&ata_mtx);
+    
+    led(true);
 
     while (incount > 0)
     {
@@ -713,8 +719,8 @@ int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
         {
             if (!nand_read_sector_of_logical_segment(segment, secmod, inbuf))
             {
-                mutex_unlock(&ata_mtx);
-                return -1;
+                ret = -1;
+                goto nand_read_error;
             }
 
 #ifdef CPU_TCC780X /* 77x doesn't have USEC_TIMER yet */
@@ -733,14 +739,18 @@ int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     
         if (done < 0)
         {
-            mutex_unlock(&ata_mtx);
-            return -1;
+            ret = -1;
+            goto nand_read_error;
         }
         start += done;
     }
 
+nand_read_error:
+
     mutex_unlock(&ata_mtx);
-    return 0;
+    led(false);
+    
+    return ret;
 }
 
 
