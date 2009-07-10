@@ -344,9 +344,6 @@ static void sd_thread(void)
 {
     struct queue_event ev;
     bool idle_notified = false;
-#ifdef HAVE_HOTSWAP
-    int microsd_init;
-#endif
 
     while (1)
     {
@@ -357,6 +354,8 @@ static void sd_thread(void)
 #ifdef HAVE_HOTSWAP
         case SYS_HOTSWAP_INSERTED:
         case SYS_HOTSWAP_EXTRACTED:
+        {
+            int microsd_init = 1;
             fat_lock();          /* lock-out FAT activity first -
                                     prevent deadlocking via disk_mount that
                                     would cause a reverse-order attempt with
@@ -379,25 +378,23 @@ static void sd_thread(void)
                 sd_enable(true);
                 init_pl180_controller(SD_SLOT_AS3525);
                 microsd_init = sd_init_card(SD_SLOT_AS3525);
-                if (microsd_init < 0)
+                if (microsd_init < 0) /* initialisation failed */
                     panicf("microSD init failed : %d", microsd_init);
 
-                if (!disk_mount(SD_SLOT_AS3525))    /* mount failed */
-                {
-                    /* Access is now safe */
-                    mutex_unlock(&sd_mtx);
-                    fat_unlock();
-                    sd_enable(false);
-                    break;
-                }
+                microsd_init = disk_mount(SD_SLOT_AS3525); /* 0 if fail */
             }
 
-            queue_broadcast(SYS_FS_CHANGED, 0);
+            /*
+             * Mount succeeded, or this was an EXTRACTED event,
+             * in both cases notify the system about the additional filesystem
+            if (microsd_init)  
+                queue_broadcast(SYS_FS_CHANGED, 0);
 
             /* Access is now safe */
             mutex_unlock(&sd_mtx);
             fat_unlock();
             sd_enable(false);
+        }
             break;
 #endif
         case SYS_TIMEOUT:
