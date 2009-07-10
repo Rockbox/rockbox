@@ -462,11 +462,12 @@ unsigned char* get_ucs(const unsigned char* str, unsigned short* ch)
     rb->utf8decode(utf8_tmp, ch);
 
 #ifdef HAVE_LCD_BITMAP
-    if ((prefs.encoding == SJIS && *str > 0xA0 && *str < 0xE0) || prefs.encoding < SJIS)
-        return (unsigned char*)str+1;
+    if (prefs.encoding >= SJIS && *str >= 0x80
+        && !(prefs.encoding == SJIS && *str > 0xA0 && *str < 0xE0))
+        return (unsigned char*)str+2;
     else
 #endif
-        return (unsigned char*)str+2;
+        return (unsigned char*)str+1;
 }
 
 bool done = false;
