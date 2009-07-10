@@ -386,7 +386,8 @@ static void sd_thread(void)
 
             /*
              * Mount succeeded, or this was an EXTRACTED event,
-             * in both cases notify the system about the additional filesystem
+             * in both cases notify the system about the changed filesystems
+             */
             if (microsd_init)  
                 queue_broadcast(SYS_FS_CHANGED, 0);
 
