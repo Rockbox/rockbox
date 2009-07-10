@@ -429,7 +429,8 @@ STOP
     glob_copy('apps/lang/*lng', "$rbdir/langs/");
 
     # copy the .lua files
-    glob_copy('apps/plugins/lua/*.lua', "$rbdir/rocks/viewers/");
+    mkdir "$rbdir/rocks/viewers/lua/", 0777;
+    glob_copy('apps/plugins/lua/*.lua', "$rbdir/rocks/viewers/lua/");
 }
 
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
