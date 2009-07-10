@@ -258,7 +258,7 @@ static void gwps_fix_statusbars(void)
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 /*
  * If the user is unable to see the wps, because the display is deactivated,
- * we surpress updates until the wps is actived again (the lcd driver will
+ * we surpress updates until the wps is activated again (the lcd driver will
  * call this hook to issue an instant update)
  * */
 static void wps_lcd_activation_hook(void)
