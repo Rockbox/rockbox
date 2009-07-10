@@ -88,6 +88,8 @@ void i2c_init(void)
 {
    int i;
 
+   mutex_init(&i2c_mtx);
+ 
 #if CONFIG_I2C == I2C_ONDIO
    /* make PB6 & PB7 general I/O */
    PBCR2 &= ~0xf000;
