@@ -34,6 +34,11 @@ sansapatcher-rc.o: sansapatcher.rc sansapatcher.manifest
 sansapatcher-mac: sansapatcher-i386 sansapatcher-ppc
 	lipo -create sansapatcher-ppc sansapatcher-i386 -output sansapatcher-mac
 
+sansapatcher.dmg: sansapatcher-mac
+	mkdir sansapatcher-dmg
+	cp sansapatcher-mac sansapatcher-dmg/sansapatcher
+	hdiutil create -srcfolder sansapatcher-dmg sansapatcher.dmg
+
 sansapatcher-i386: main.c sansapatcher.c sansaio-posix.c parttypes.h bootimg_c200.c bootimg_e200.c
 	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 $(CFLAGS) -o sansapatcher-i386 main.c sansapatcher.c sansaio-posix.c bootimg_c200.c bootimg_e200.c
 	strip sansapatcher-i386
@@ -52,4 +57,5 @@ bootimg_e200.c: PP5022.mi4 ../tools/bin2c
 	make -C ../tools bin2c
 
 clean:
-	rm -f sansapatcher.exe sansapatcher-mac sansapatcher-i386 sansapatcher-ppc sansapatcher bootimg_c200.c bootimg_c200.h bootimg_e200.c bootimg_e200.h *~
+	rm -f sansapatcher.exe sansapatcher-mac sansapatcher-i386 sansapatcher-ppc sansapatcher bootimg_c200.c bootimg_c200.h bootimg_e200.c bootimg_e200.h *~ sansapatcher.dmg
+	rm -rf sansapatcher-dmg
