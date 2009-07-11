@@ -56,11 +56,11 @@
  *   r0 - current address
  *   r1 - word count
  *   r2 - ata port
- *   r3..r6, lr - read buffers
+ *   r3..r5, r12, lr - read buffers
  */
 
 copy_read_sectors:
-    stmfd   sp!, {r4, r5, r6, lr}
+    stmfd   sp!, {r4, r5, lr}
     ldr     r2, =.ata_port
     tst     r0, #1              /* 16 bit aligned? */
     beq     .r_aligned
@@ -92,16 +92,16 @@ copy_read_sectors:
     ldrh    r5, [r2]
     orr     r4, r4, r5, lsl #24
     mov     r5, r5, lsr #8
-    ldrh    r6, [r2]
-    orr     r5, r5, r6, lsl #8
-    ldrh    r6, [r2]
-    orr     r5, r5, r6, lsl #24
-    mov     r6, r6, lsr #8
+    ldrh    r12, [r2]
+    orr     r5, r5, r12, lsl #8
+    ldrh    r12, [r2]
+    orr     r5, r5, r12, lsl #24
+    mov     r12, r12, lsr #8
     ldrh    lr, [r2]
-    orr     r6, r6, lr, lsl #8
+    orr     r12, r12, lr, lsl #8
     ldrh    lr, [r2]
-    orr     r6, r6, lr, lsl #24
-    stmia   r0!, {r3, r4, r5, r6}
+    orr     r12, r12, lr, lsl #24
+    stmia   r0!, {r3, r4, r5, r12}
     mov     r3, lr, lsr #8
     subs    r1, r1, #8          /* 8 or more halfwords left? */
     bge     .r_loop_u
@@ -140,7 +140,7 @@ copy_read_sectors:
 
     strb    r3, [r0], #1        /* store final byte */
 
-    ldmfd   sp!, {r4, r5, r6, pc}
+    ldmfd   sp!, {r4, r5, pc}
 
     /* 16-bit aligned */
 .r_aligned:
@@ -158,12 +158,12 @@ copy_read_sectors:
     ldrh    r5, [r2]
     orr     r4, r4, r5, lsl #16
     ldrh    r5, [r2]
-    ldrh    r6, [r2]
-    orr     r5, r5, r6, lsl #16
-    ldrh    r6, [r2]
+    ldrh    r12, [r2]
+    orr     r5, r5, r12, lsl #16
+    ldrh    r12, [r2]
     ldrh    lr, [r2]
-    orr     r6, r6, lr, lsl #16
-    stmia   r0!, {r3, r4, r5, r6}
+    orr     r12, r12, lr, lsl #16
+    stmia   r0!, {r3, r4, r5, r12}
     subs    r1, r1, #8          /* 8 or more halfwords left? */
     bge     .r_loop_a
     
@@ -189,7 +189,7 @@ copy_read_sectors:
     ldrneh  r3, [r2]
     strneh  r3, [r0], #2
 
-    ldmfd   sp!, {r4, r5, r6, pc}
+    ldmfd   sp!, {r4, r5, pc}
 
 .r_end:
     .size   copy_read_sectors,.r_end-copy_read_sectors
@@ -210,11 +210,11 @@ copy_read_sectors:
  *   r0 - current address
  *   r1 - word count
  *   r2 - ata port
- *   r3..r6, lr - read buffers
+ *   r3..r5, r12, lr - read buffers
  */
 
 copy_write_sectors:
-    stmfd   sp!, {r4, r5, r6, lr}
+    stmfd   sp!, {r4, r5, lr}
     ldr     r2, =.ata_port
     tst     r0, #1              /* 16 bit aligned? */
     beq     .w_aligned
@@ -234,7 +234,7 @@ copy_write_sectors:
 
     sub     r1, r1, #8          /* adjust for zero-check and doing 8 halfwords/loop */
 .w_loop_u:
-    ldmia   r0!, {r4, r5, r6, lr}
+    ldmia   r0!, {r4, r5, r12, lr}
     orr     r3, r3, r4, lsl #8  /* Load 4 words at once and decompose them */
     strh    r3, [r2]            /*  into 8 halfwords in a way that the words */
     mov     r3, r3, lsr #16     /*  are shifted by 8 bits, putting the high */
@@ -245,15 +245,15 @@ copy_write_sectors:
     mov     r4, r4, lsr #16
     strh    r4, [r2]
     mov     r5, r5, lsr #24
-    orr     r5, r5, r6, lsl #8
+    orr     r5, r5, r12, lsl #8
     strh    r5, [r2]
     mov     r5, r5, lsr #16
     strh    r5, [r2]
-    mov     r6, r6, lsr #24
-    orr     r6, r6, lr, lsl #8
-    strh    r6, [r2]
-    mov     r6, r6, lsr #16
-    strh    r6, [r2]
+    mov     r12, r12, lsr #24
+    orr     r12, r12, lr, lsl #8
+    strh    r12, [r2]
+    mov     r12, r12, lsr #16
+    strh    r12, [r2]
     mov     r3, lr, lsr #24
     subs    r1, r1, #8          /* 8 or more halfwords left? */
     bge     .w_loop_u
@@ -294,7 +294,7 @@ copy_write_sectors:
     orr     r3, r3, r4, lsl #8
     strh    r3, [r2]            /* write final halfword */
 
-    ldmfd   sp!, {r4, r5, r6, pc}
+    ldmfd   sp!, {r4, r5, pc}
 
     /* 16-bit aligned */
 .w_aligned:
@@ -305,7 +305,7 @@ copy_write_sectors:
 
     sub     r1, r1, #8          /* adjust for zero-check and doing 8 halfwords/loop */
 .w_loop_a:
-    ldmia   r0!, {r3, r4, r5, r6}
+    ldmia   r0!, {r3, r4, r5, r12}
     strh    r3, [r2]            /* Load 4 words and decompose them into */
     mov     r3, r3, lsr #16     /*  2 halfwords each, and write those. */
     strh    r3, [r2]
@@ -315,9 +315,9 @@ copy_write_sectors:
     strh    r5, [r2]
     mov     r5, r5, lsr #16
     strh    r5, [r2]
-    strh    r6, [r2]
-    mov     r6, r6, lsr #16
-    strh    r6, [r2]
+    strh    r12, [r2]
+    mov     r12, r12, lsr #16
+    strh    r12, [r2]
     subs    r1, r1, #8          /* 8 or more halfwords left? */
     bge     .w_loop_a
 
@@ -343,7 +343,7 @@ copy_write_sectors:
     ldrneh  r3, [r0], #2
     strneh  r3, [r2]
 
-    ldmfd   sp!, {r4, r5, r6, pc}
+    ldmfd   sp!, {r4, r5, pc}
 
 .w_end:
     .size   copy_write_sectors,.w_end-copy_write_sectors

@@ -32,22 +32,22 @@
     .type   lcd_write_data, %function
                                       /* r0 = addr, must be aligned */
 lcd_write_data:                       /* r1 = pixel count, must be even */
-    stmfd   sp!, {r4-r5, lr}
+    stmfd   sp!, {r4, lr}
     mov     lr, #0x30000000           /* LCD data port */
 
     subs    r1, r1, #16
 .loop16:
-    ldmgeia r0!, {r2-r5}
-    stmgeia lr, {r2-r5}
-    ldmgeia r0!, {r2-r5}
-    stmgeia lr, {r2-r5}
+    ldmgeia r0!, {r2-r4, r12}
+    stmgeia lr, {r2-r4, r12}
+    ldmgeia r0!, {r2-r4, r12}
+    stmgeia lr, {r2-r4, r12}
     subges  r1, r1, #16
     bge     .loop16
 
     /* no need to correct the count, we're just checking bits from now */
     tst     r1, #8
-    ldmneia r0!, {r2-r5}
-    stmneia lr, {r2-r5}
+    ldmneia r0!, {r2-r4, r12}
+    stmneia lr, {r2-r4, r12}
     tst     r1, #4
     ldmneia r0!, {r2-r3}
     stmneia lr, {r2-r3}
@@ -55,7 +55,7 @@ lcd_write_data:                       /* r1 = pixel count, must be even */
     ldrne   r3, [r0], #4
     strne   r3, [lr]
 
-    ldmfd   sp!, {r4-r5, pc}
+    ldmfd   sp!, {r4, pc}
 
 /****************************************************************************
  * extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
@@ -87,10 +87,10 @@ lcd_write_yuv420_lines:
                                       /* r1 = dst = bcmaddr */
                                       /* r2 = width */
                                       /* r3 = stride */                
-    stmfd       sp!, { r4-r11, lr }   /* save non-scratch */
-    ldmia       r0, { r9-r11 }        /* r9 = yuv_src[0] = Y'_p */
+    stmfd       sp!, { r4-r10, lr }   /* save non-scratch */
+    ldmia       r0, { r9, r10, r12 }  /* r9 = yuv_src[0] = Y'_p */
                                       /* r10 = yuv_src[1] = Cb_p */
-                                      /* r11 = yuv_src[2] = Cr_p */
+                                      /* r12 = yuv_src[2] = Cr_p */
     add         r3, r9, r3            /* r3 = &ysrc[stride] */
     add         r4, r2, r2, asr #1    /* chroma buffer lenght = width/2 *3 */
     mov         r4, r4, asl #2        /*   use words for str/ldm possibility */
@@ -116,7 +116,7 @@ lcd_write_yuv420_lines:
 10:                                   /* loop start */
 
     ldrb        r0, [r10], #1         /* r0 = *usrc++ = *Cb_p++ */
-    ldrb        r1, [r11], #1         /* r1 = *vsrc++ = *Cr_p++ */
+    ldrb        r1, [r12], #1         /* r1 = *vsrc++ = *Cr_p++ */
 
     sub         r0, r0, #128          /* r0 = Cb-128 */
     sub         r1, r1, #128          /* r1 = Cr-128 */
@@ -289,7 +289,7 @@ lcd_write_yuv420_lines:
 
     ldr         r3, [sp, #12]
     add         sp, sp, r3            /* deallocate buffer */
-    ldmfd       sp!, { r4-r11, pc }   /* restore registers */
+    ldmfd       sp!, { r4-r10, pc }   /* restore registers */
 
     .ltorg
     .size   lcd_write_yuv420_lines, .-lcd_write_yuv420_lines

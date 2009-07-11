@@ -30,21 +30,20 @@
     .type       lcd_write_data,%function
 
 lcd_write_data:
-    str     lr, [sp, #-4]!
-    ldr     lr, =LCD1_BASE
+    ldr     r12, =LCD1_BASE
 
 .loop:
     ldrb    r2, [r0], #1
 1:
-    ldr     r3, [lr]
+    ldr     r3, [r12]
     tst     r3, #LCD1_BUSY_MASK
     bne     1b
-    str     r2, [lr, #0x10]
+    str     r2, [r12, #0x10]
 
     subs    r1, r1, #1
     bne     .loop
 
-    ldr     pc, [sp], #4
+    bx      lr
     .size   lcd_write_data,.-lcd_write_data
 
 
@@ -62,16 +61,16 @@ lcd_write_data:
  * Register usage:
  *   r3/r4 - current block of phases
  *   r5/r6 - current block of values
- *   r7 - lcd data accumulator
- *   r8 - phase signs mask
- *   lr - lcd bridge address
+ *   r7  - lcd data accumulator
+ *   r12 - phase signs mask
+ *   lr  - lcd bridge address
  */
  
 lcd_grey_data:
-    stmfd   sp!, {r4-r8, lr}
-    mov     r8, #0x80
-    orr     r8, r8, r8, lsl #8
-    orr     r8, r8, r8, lsl #16
+    stmfd   sp!, {r4-r7, lr}
+    mov     r12, #0x80
+    orr     r12, r12, r12, lsl #8
+    orr     r12, r12, r12, lsl #16
     ldr     lr, =LCD1_BASE
 
 .greyloop:
@@ -87,7 +86,7 @@ lcd_grey_data:
     biceq   r7, r7, #0x20
     tst     r3, #0x80000000
     biceq   r7, r7, #0x10
-    bic     r3, r3, r8
+    bic     r3, r3, r12
     add     r3, r3, r5
 
     tst     r4, #0x80
@@ -98,7 +97,7 @@ lcd_grey_data:
     biceq   r7, r7, #0x02
     tst     r4, #0x80000000
     biceq   r7, r7, #0x01
-    bic     r4, r4, r8
+    bic     r4, r4, r12
     add     r4, r4, r6
 
     stmia   r1!, {r3-r4}
@@ -112,6 +111,6 @@ lcd_grey_data:
     subs    r2, r2, #1
     bne     .greyloop
 
-    ldmfd   sp!, {r4-r8, pc}
+    ldmfd   sp!, {r4-r7, pc}
     .size   lcd_grey_data,.-lcd_grey_data
 

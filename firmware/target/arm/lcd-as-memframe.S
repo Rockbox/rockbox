@@ -37,7 +37,7 @@
                                         @ r2 = width
                                         @ r3 = height
 lcd_copy_buffer_rect:                   @
-    stmfd   sp!, { r4-r12, lr }         @ save non-scratch regs
+    stmfd   sp!, { r4-r11, lr }         @ save non-scratch regs
     mov     r5, r2                      @ r5 = cached width
     rsb     r4, r2, #LCD_WIDTH          @ r4 = LCD_WIDTH - width
 10: @ copy line                         @
@@ -101,7 +101,7 @@ lcd_copy_buffer_rect:                   @
     add     r0, r0, r4, lsl #1          @
     subs    r3, r3, #1                  @ next line
     bgt     10b @ copy line             @
-    ldmfd   sp!, { r4-r12, pc }         @ restore regs and return
+    ldmfd   sp!, { r4-r11, pc }         @ restore regs and return
     .ltorg                              @ dump constant pool
     .size   lcd_copy_buffer_rect, .-lcd_copy_buffer_rect
 
@@ -132,7 +132,7 @@ lcd_write_yuv420_lines:
                                         @ r1 = yuv_src
                                         @ r2 = width
                                         @ r3 = stride
-    stmfd       sp!, { r4-r12 }         @ save non-scratch
+    stmfd       sp!, { r4-r10, lr }     @ save non-scratch
     ldmia       r1, { r4, r5, r6 }      @ r4 = yuv_src[0] = Y'_p
                                         @ r5 = yuv_src[1] = Cb_p
                                         @ r6 = yuv_src[2] = Cr_p
@@ -155,9 +155,9 @@ lcd_write_yuv420_lines:
     add         r10, r10, r8, asl #3    @
     add         r10, r10, r8, asl #4    @
                                         @
-    add         r11, r9, r9, asl #2     @ r9 = Cr*101
-    add         r11, r11, r9, asl #5    @
-    add         r9, r11, r9, asl #6     @
+    add         lr, r9, r9, asl #2      @ r9 = Cr*101
+    add         lr, lr, r9, asl #5      @
+    add         r9, lr, r9, asl #6      @
                                         @
     add         r8, r8, #2              @ r8 = bu = (Cb*128 + 128) >> 8
     mov         r8, r8, asr #2          @
@@ -167,19 +167,19 @@ lcd_write_yuv420_lines:
     mov         r10, r10, asr #8        @
                                         @ compute R, G, and B
     add         r1, r8, r7, asr #8      @ r1  = b = (Y >> 9) + bu
-    add         r11, r9, r7, asr #8     @ r11 = r = (Y >> 9) + rv
+    add         lr, r9, r7, asr #8      @ lr = r = (Y >> 9) + rv
     add         r7, r10, r7, asr #7     @ r7  = g = (Y >> 8) + guv
                                         @
-    orr         r12, r1, r11            @ check if clamping is needed...
+    orr         r12, r1, lr             @ check if clamping is needed...
     orr         r12, r12, r7, asr #1    @ ...at all
     cmp         r12, #31                @
     bls         15f @ no clamp          @
     cmp         r1, #31                 @ clamp b
     mvnhi       r1, r1, asr #31         @
     andhi       r1, r1, #31             @
-    cmp         r11, #31                @ clamp r
-    mvnhi       r11, r11, asr #31       @
-    andhi       r11, r11, #31           @
+    cmp         lr, #31                 @ clamp r
+    mvnhi       lr, lr, asr #31         @
+    andhi       lr, lr, #31             @
     cmp         r7, #63                 @ clamp g
     mvnhi       r7, r7, asr #31         @
     andhi       r7, r7, #63             @
@@ -188,7 +188,7 @@ lcd_write_yuv420_lines:
     ldrb        r12, [r4, r3]           @ r12 = Y' = *(Y'_p + stride)
                                         @
     orr         r1, r1, r7, lsl #5      @ r4 |= (g << 5)
-    orr         r1, r1, r11, lsl #11    @ r4 = b | (r << 11)
+    orr         r1, r1, lr, lsl #11     @ r4 = b | (r << 11)
 
 #if LCD_WIDTH >= LCD_HEIGHT
     strh        r1, [r0]                @
@@ -203,19 +203,19 @@ lcd_write_yuv420_lines:
     add         r7, r12, r7, asl #5     @
                                         @ compute R, G, and B
     add         r1, r8, r7, asr #8      @ r1  = b = (Y >> 9) + bu
-    add         r11, r9, r7, asr #8     @ r11 = r = (Y >> 9) + rv
+    add         lr, r9, r7, asr #8      @ lr = r = (Y >> 9) + rv
     add         r7, r10, r7, asr #7     @ r7  = g = (Y >> 8) + guv
                                         @
-    orr         r12, r1, r11            @ check if clamping is needed...
+    orr         r12, r1, lr             @ check if clamping is needed...
     orr         r12, r12, r7, asr #1    @ ...at all
     cmp         r12, #31                @
     bls         15f @ no clamp          @
     cmp         r1, #31                 @ clamp b
     mvnhi       r1, r1, asr #31         @
     andhi       r1, r1, #31             @
-    cmp         r11, #31                @ clamp r
-    mvnhi       r11, r11, asr #31       @
-    andhi       r11, r11, #31           @
+    cmp         lr, #31                 @ clamp r
+    mvnhi       lr, lr, asr #31         @
+    andhi       lr, lr, #31             @
     cmp         r7, #63                 @ clamp g
     mvnhi       r7, r7, asr #31         @
     andhi       r7, r7, #63             @
@@ -223,7 +223,7 @@ lcd_write_yuv420_lines:
                                         @
     ldrb        r12, [r4], #1           @ r12 = Y' = *(Y'_p++)
                                         @
-    orr         r1, r1, r11, lsl #11    @ r1 = b | (r << 11)
+    orr         r1, r1, lr, lsl #11     @ r1 = b | (r << 11)
     orr         r1, r1, r7, lsl #5      @ r1 |= (g << 5)
 
 #if LCD_WIDTH >= LCD_HEIGHT
@@ -242,19 +242,19 @@ lcd_write_yuv420_lines:
     add         r7, r12, r7, asl #5     @
                                         @ compute R, G, and B
     add         r1, r8, r7, asr #8      @ r1  = b = (Y >> 9) + bu
-    add         r11, r9, r7, asr #8     @ r11 = r = (Y >> 9) + rv
+    add         lr, r9, r7, asr #8      @ lr = r = (Y >> 9) + rv
     add         r7, r10, r7, asr #7     @ r7  = g = (Y >> 8) + guv
                                         @
-    orr         r12, r1, r11            @ check if clamping is needed...
+    orr         r12, r1, lr             @ check if clamping is needed...
     orr         r12, r12, r7, asr #1    @ ...at all
     cmp         r12, #31                @
     bls         15f @ no clamp          @
     cmp         r1, #31                 @ clamp b
     mvnhi       r1, r1, asr #31         @
     andhi       r1, r1, #31             @
-    cmp         r11, #31                @ clamp r
-    mvnhi       r11, r11, asr #31       @
-    andhi       r11, r11, #31           @
+    cmp         lr, #31                 @ clamp r
+    mvnhi       lr, lr, asr #31         @
+    andhi       lr, lr, #31             @
     cmp         r7, #63                 @ clamp g
     mvnhi       r7, r7, asr #31         @
     andhi       r7, r7, #63             @
@@ -263,7 +263,7 @@ lcd_write_yuv420_lines:
     ldrb        r12, [r4, r3]           @ r12 = Y' = *(Y'_p + stride)
                                         @
     orr         r1, r1, r7, lsl #5      @ r1 = b | (g << 5)
-    orr         r1, r1, r11, lsl #11    @ r1 |= (r << 11)
+    orr         r1, r1, lr, lsl #11     @ r1 |= (r << 11)
 
 #if LCD_WIDTH >= LCD_HEIGHT
     strh        r1, [r0, #2]
@@ -278,25 +278,25 @@ lcd_write_yuv420_lines:
     add         r7, r12, r7, asl #5     @
                                         @ compute R, G, and B
     add         r1, r8, r7, asr #8      @ r1  = b = (Y >> 9) + bu
-    add         r11, r9, r7, asr #8     @ r11 = r = (Y >> 9) + rv
+    add         lr, r9, r7, asr #8      @ lr = r = (Y >> 9) + rv
     add         r7, r10, r7, asr #7     @ r7  = g = (Y >> 8) + guv
                                         @
-    orr         r12, r1, r11            @ check if clamping is needed...
+    orr         r12, r1, lr             @ check if clamping is needed...
     orr         r12, r12, r7, asr #1    @ ...at all
     cmp         r12, #31                @
     bls         15f @ no clamp          @
     cmp         r1, #31                 @ clamp b
     mvnhi       r1, r1, asr #31         @
     andhi       r1, r1, #31             @
-    cmp         r11, #31                @ clamp r
-    mvnhi       r11, r11, asr #31       @
-    andhi       r11, r11, #31           @
+    cmp         lr, #31                 @ clamp r
+    mvnhi       lr, lr, asr #31         @
+    andhi       lr, lr, #31             @
     cmp         r7, #63                 @ clamp g
     mvnhi       r7, r7, asr #31         @
     andhi       r7, r7, #63             @
 15: @ no clamp                          @
                                         @
-    orr         r12, r1, r11, lsl #11   @ r12 = b | (r << 11)
+    orr         r12, r1, lr, lsl #11    @ r12 = b | (r << 11)
     orr         r12, r12, r7, lsl #5    @ r12 |= (g << 5)
 
 #if LCD_WIDTH >= LCD_HEIGHT
@@ -320,8 +320,7 @@ lcd_write_yuv420_lines:
     subs        r2, r2, #2              @ subtract block from width
     bgt         10b @ loop line         @
                                         @
-    ldmfd       sp!, { r4-r12 }         @ restore registers and return
-    bx          lr                      @
+    ldmfd       sp!, { r4-r10, pc }     @ restore registers and return
     .ltorg                              @ dump constant pool
     .size   lcd_write_yuv420_lines, .-lcd_write_yuv420_lines
 
@@ -364,7 +363,7 @@ lcd_write_yuv420_lines_odither:
                                         @ r3 = stride
                                         @ [sp]   = x_screen
                                         @ [sp+4] = y_screen
-    stmfd       sp!, { r4-r12, lr }     @ save non-scratch
+    stmfd       sp!, { r4-r11, lr }     @ save non-scratch
     ldmia       r1, { r4, r5, r6 }      @ r4 = yuv_src[0] = Y'_p
                                         @ r5 = yuv_src[1] = Cb_p
                                         @ r6 = yuv_src[2] = Cr_p
@@ -626,6 +625,6 @@ lcd_write_yuv420_lines_odither:
     subs        r2, r2, #2              @ subtract block from width
     bgt         10b @ loop line         @
                                         @
-    ldmfd       sp!, { r4-r12, pc }     @ restore registers and return
+    ldmfd       sp!, { r4-r11, pc }     @ restore registers and return
     .ltorg                              @ dump constant pool
     .size   lcd_write_yuv420_lines_odither, .-lcd_write_yuv420_lines_odither

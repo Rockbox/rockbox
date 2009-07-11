@@ -49,7 +49,7 @@ lcd_write_yuv420_lines:
                                         @ r0 = yuv_src
                                         @ r1 = width
                                         @ r2 = stride
-    stmfd       sp!, { r4-r12, lr }     @ save non-scratch
+    stmfd       sp!, { r4-r11, lr }     @ save non-scratch
     ldmia       r0, { r4, r5, r6 }      @ r4 = yuv_src[0] = Y'_p
                                         @ r5 = yuv_src[1] = Cb_p
                                         @ r6 = yuv_src[2] = Cr_p
@@ -248,7 +248,7 @@ lcd_write_yuv420_lines:
     subs        r1, r1, #2              @ subtract block from width
     bgt         10b @ loop line         @
                                         @
-    ldmfd       sp!, { r4-r12, pc }     @ restore registers and return
+    ldmfd       sp!, { r4-r11, pc }     @ restore registers and return
     .ltorg                              @ dump constant pool
     .size   lcd_write_yuv420_lines, .-lcd_write_yuv420_lines
 
@@ -289,7 +289,7 @@ lcd_write_yuv420_lines_odither:
                                         @ r2   = stride
                                         @ r3   = x_screen
                                         @ [sp] = y_screen
-    stmfd       sp!, { r4-r12, lr }     @ save non-scratch
+    stmfd       sp!, { r4-r11, lr }     @ save non-scratch
     ldmia       r0, { r4, r5, r6 }      @ r4 = yuv_src[0] = Y'_p
                                         @ r5 = yuv_src[1] = Cb_p
                                         @ r6 = yuv_src[2] = Cr_p
@@ -565,6 +565,6 @@ lcd_write_yuv420_lines_odither:
     subs        r1, r1, #2              @ subtract block from width
     bgt         10b @ loop line         @
                                         @
-    ldmfd       sp!, { r4-r12, pc }     @ restore registers and return
+    ldmfd       sp!, { r4-r11, pc }     @ restore registers and return
     .ltorg                              @ dump constant pool
     .size   lcd_write_yuv420_lines_odither, .-lcd_write_yuv420_lines_odither
