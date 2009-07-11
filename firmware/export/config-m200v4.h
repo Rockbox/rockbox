@@ -40,7 +40,7 @@
 /* define this if you have access to the quickscreen */
 //#define HAVE_QUICKSCREEN
 /* define this if you have access to the pitchscreen */
-//#define HAVE_PITCHSCREEN
+#define HAVE_PITCHSCREEN
 
 /* define this if you would like tagcache to build on this target */
 //#define HAVE_TAGCACHE
