@@ -32,6 +32,11 @@ e200rpatcher-rc.o: e200rpatcher.rc e200rpatcher.manifest
 e200rpatcher-mac: e200rpatcher-i386 e200rpatcher-ppc
 	lipo -create e200rpatcher-ppc e200rpatcher-i386 -output e200rpatcher-mac
 
+e200rpatcher.dmg: e200rpatcher-mac
+	mkdir e200rpatcher-dmg
+	cp e200rpatcher-mac e200rpatcher-dmg
+	hdiutil create -srcfolder e200rpatcher-dmg e200rpatcher.dmg
+
 e200rpatcher-i386:  e200rpatcher.c  bootimg.c usb.h libusb-i386.a
 	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -framework iokit -framework coreservices -arch i386 $(CFLAGS) -o e200rpatcher-i386 e200rpatcher.c bootimg.c -I. libusb-i386.a
 	strip e200rpatcher-i386
@@ -47,4 +52,5 @@ bootimg.c: bootloader.bin bin2c
 	./bin2c bootloader.bin bootimg
 
 clean:
-	rm -f e200rpatcher.exe e200rpatcher-mac e200rpatcher-i386 e200rpatcher-ppc e200rpatcher bin2c bootimg.c bootimg.h *~
+	rm -f e200rpatcher.exe e200rpatcher-mac e200rpatcher-i386 e200rpatcher-ppc e200rpatcher bin2c bootimg.c bootimg.h *~ e200rpatcher.dmg
+	rm -rf e200rpatcher-dmg
