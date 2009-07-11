@@ -24,6 +24,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include "sound.h"
 #include "buffer.h"
 #include "system.h"
 #include "tdspeed.h"

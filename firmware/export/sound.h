@@ -64,4 +64,11 @@ void sound_set_pitch(int32_t pitch);
 int32_t sound_get_pitch(void);
 #endif
 
+#ifdef HAVE_PITCHSCREEN
+/* precision of the pitch and speed variables */
+/* One zero per decimal (100 means two decimal places */
+#define PITCH_SPEED_PRECISION 100L
+#define PITCH_SPEED_100 (100L * PITCH_SPEED_PRECISION)  /* 100% speed */
+#endif /* HAVE_PITCHSCREEN */
+
 #endif

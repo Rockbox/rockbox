@@ -25,8 +25,6 @@
 #include "sound.h"
 #include "logf.h"
 #include "system.h"
-/* for the pitch and speed precision #defines: */
-#include "pitchscreen.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
