@@ -346,7 +346,8 @@ struct plugin_api {
     void (*gui_synclist_limit_scroll)(struct gui_synclist * lists, bool scroll);
     bool (*gui_synclist_do_button)(struct gui_synclist * lists,
                                    int *action, enum list_wrap wrap);
-    void (*gui_synclist_set_title)(struct gui_synclist *lists, char* title, int icon);
+    void (*gui_synclist_set_title)(struct gui_synclist *lists, char* title,
+                                   enum themable_icons icon);
     enum yesno_res (*gui_syncyesno_run)(const struct text_message * main_message,
                                         const struct text_message * yes_message,
                                         const struct text_message * no_message);

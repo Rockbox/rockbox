@@ -173,7 +173,7 @@ static int tree_get_filecolor(int selected_item, void * data)
 }
 #endif
 
-static int tree_get_fileicon(int selected_item, void * data)
+static enum themable_icons tree_get_fileicon(int selected_item, void * data)
 {
     struct tree_context * local_tc=(struct tree_context *)data;
 #ifdef HAVE_TAGCACHE

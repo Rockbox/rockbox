@@ -576,7 +576,8 @@ static char *playlist_callback_name(int selected_item,
 }
 
 
-static int playlist_callback_icons(int selected_item, void *data)
+static enum themable_icons playlist_callback_icons(int selected_item,
+                                                   void *data)
 {
     struct playlist_viewer * local_viewer=(struct playlist_viewer *)data;
 

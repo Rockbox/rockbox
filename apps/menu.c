@@ -131,7 +131,7 @@ static char * get_menu_item_name(int selected_item,
     return P2STR(menu->callback_and_desc->desc);
 }
 #ifdef HAVE_LCD_BITMAP
-static int menu_get_icon(int selected_item, void * data)
+static enum themable_icons  menu_get_icon(int selected_item, void * data)
 {
     const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
     int menu_icon = Icon_NOICON;

@@ -46,9 +46,9 @@ int normalize16(const spx_sig_t *x, spx_word16_t *y, spx_sig_t max_scale, int le
          ".normalize16loop1%=: \n"
 
          "\tldr %4, [%0], #4 \n"
-         "\tcmps %4, %1 \n"
+         "\tcmp %4, %1 \n"
          "\tmovgt %1, %4 \n"
-         "\tcmps %4, %3 \n"
+         "\tcmp %4, %3 \n"
          "\tmovlt %3, %4 \n"
 
          "\tsubs %2, %2, #1 \n"
