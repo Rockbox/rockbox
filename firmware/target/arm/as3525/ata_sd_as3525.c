@@ -121,7 +121,8 @@ static bool sd_enabled = false;
 #endif
 
 static struct wakeup transfer_completion_signal;
-static volatile bool retry;
+static volatile unsigned int transfer_error[NUM_VOLUMES];
+#define PL180_MAX_TRANSFER_ERRORS 10
 
 #define UNALIGNED_NUM_SECTORS 10
 static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SECTOR_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
@@ -161,8 +162,7 @@ void INT_NAND(void)
 {
     const int status = MCI_STATUS(INTERNAL_AS3525);
 
-    if(status & MCI_ERROR)
-        retry = true;
+    transfer_error[INTERNAL_AS3525] = status & MCI_ERROR;
 
     wakeup_signal(&transfer_completion_signal);
     MCI_CLEAR(INTERNAL_AS3525) = status;
@@ -173,8 +173,7 @@ void INT_MCI0(void)
 {
     const int status = MCI_STATUS(SD_SLOT_AS3525);
 
-    if(status & MCI_ERROR)
-        retry = true;
+    transfer_error[SD_SLOT_AS3525] = status & MCI_ERROR;
 
     wakeup_signal(&transfer_completion_signal);
     MCI_CLEAR(SD_SLOT_AS3525) = status;
@@ -558,10 +557,12 @@ static int sd_wait_for_state(const int drive, unsigned int state)
 static int sd_select_bank(signed char bank)
 {
     int ret;
+    unsigned loops = 0;
 
     do {
-        /* The ISR will set this to true if an error occurred */
-        retry = false;
+        if(loops++ > PL180_MAX_TRANSFER_ERRORS)
+            panicf("SD bank %d error : 0x%x", bank,
+                    transfer_error[INTERNAL_AS3525]);
 
         ret = sd_wait_for_state(INTERNAL_AS3525, SD_TRAN);
         if (ret < 0)
@@ -610,7 +611,7 @@ static int sd_select_bank(signed char bank)
         ret = sd_wait_for_state(INTERNAL_AS3525, SD_TRAN);
         if (ret < 0)
             return ret - 4;
-    } while(retry);
+    } while(transfer_error[INTERNAL_AS3525]);
 
     card_info[INTERNAL_AS3525].current_bank = (bank == -1) ? 0 : bank;
 
@@ -624,6 +625,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
     const int drive = 0;
 #endif
     int ret = 0;
+    unsigned loops = 0;
 
     /* skip SanDisk OF */
     if (drive == INTERNAL_AS3525)
@@ -662,9 +664,6 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
         const int cmd =
             write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
         unsigned long bank_start = start;
-
-        /* The ISR will set this to true if an error occurred */
-        retry = false;
 
         /* Only switch banks for internal storage */
         if(drive == INTERNAL_AS3525)
@@ -728,14 +727,17 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 
 
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
-        if(!retry)
+        if(!transfer_error[drive])
         {
             if(!write)
                 memcpy(buf, uncached_buffer, transfer * SECTOR_SIZE);
             buf += transfer * SECTOR_SIZE;
             start += transfer;
             count -= transfer;
+            loops = 0;  /* reset errors counter */
         }
+        else if(loops++ > PL180_MAX_TRANSFER_ERRORS)
+                panicf("SD transfer error : 0x%x", transfer_error[drive]);
 
         last_disk_activity = current_tick;
 
