@@ -3547,7 +3547,7 @@ int play_file(char* filename)
     rb->lcd_puts(0, 2, buf);
     rb->lcd_update();
 
-    rb->sound_set_pitch(1000);  /* reset pitch */
+    rb->sound_set_pitch(PITCH_SPEED_100);  /* reset pitch */
     mas_download_pcm();  /* Download PCM codec */
 
     /* Configure PCM codec */

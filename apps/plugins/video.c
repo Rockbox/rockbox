@@ -882,7 +882,7 @@ int main(char* filename)
     file_size =  rb->filesize(fd);
     
     /* reset pitch value to ensure synchronous playback */
-    rb->sound_set_pitch(1000);
+    rb->sound_set_pitch(PITCH_SPEED_100);
 
     /* init statistics */
     rb->memset(&gStats, 0, sizeof(gStats));

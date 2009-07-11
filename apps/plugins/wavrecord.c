@@ -3507,7 +3507,7 @@ static int record_file(char *filename)
         return PLUGIN_ERROR;
     }
 
-    rb->sound_set_pitch(1000);  /* reset pitch */
+    rb->sound_set_pitch(PITCH_SPEED_100);  /* reset pitch */
     mas_download_pcm();
     num_rec_bytes = 0;
     bytes_written = 0;
