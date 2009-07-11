@@ -739,10 +739,12 @@ struct user_settings
     struct touchscreen_parameter ts_calibration_data;
 #endif
 
+#ifdef HAVE_PITCHSCREEN
     /* pitch screen settings */
     bool pitch_mode_semitone;
 #if CONFIG_CODEC == SWCODEC
     bool pitch_mode_timestretch;
+#endif
 #endif
     /* If values are just added to the end, no need to bump plugin API
        version. */

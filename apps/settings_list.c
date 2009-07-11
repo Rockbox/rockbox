@@ -1528,11 +1528,13 @@ const struct settings_list settings[] = {
 #endif
     OFFON_SETTING(0, prevent_skip, LANG_PREVENT_SKIPPING, false, "prevent track skip", NULL),
 
-    OFFON_SETTING(0, pitch_mode_semitone, LANG_SEMITONE, false, 
+#ifdef HAVE_PITCHSCREEN
+    OFFON_SETTING(0, pitch_mode_semitone, LANG_SEMITONE, false,
                   "Semitone pitch change", NULL),
 #if CONFIG_CODEC == SWCODEC
-    OFFON_SETTING(0, pitch_mode_timestretch, LANG_TIMESTRETCH, false, 
+    OFFON_SETTING(0, pitch_mode_timestretch, LANG_TIMESTRETCH, false,
                   "Timestretch mode", NULL),
+#endif
 #endif
 
 };
