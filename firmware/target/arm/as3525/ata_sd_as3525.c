@@ -39,6 +39,7 @@
 #include "pl081.h"  /* DMA controller */
 #include "dma-target.h" /* DMA request lines */
 #include "clock-target.h"
+#include "panic.h"
 #ifdef HAVE_BUTTON_LIGHT
 #include "backlight-target.h"
 #endif
