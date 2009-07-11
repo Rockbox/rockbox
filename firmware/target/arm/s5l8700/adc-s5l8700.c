@@ -64,7 +64,7 @@ unsigned short adc_read(int channel)
     wakeup_wait(&adc_wakeup, TIMEOUT_BLOCK);
     
     /* get the converted data */
-    data = ADCDAT0;
+    data = ADCDAT0 & 0x3FF;
     
     /* put ADC back into standby */
     ADCCON |= (1 << 2);
