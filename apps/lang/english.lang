@@ -12609,13 +12609,16 @@
   desc: 
   user: core
   <source>
-    *: "Semitone"
+    *: none
+    pitchscreen: "Semitone"
   </source>
   <dest>
-    *: "Semitone"
+    *: none
+    pitchscreen: "Semitone"
   </dest>
   <voice>
-    *: "Semitone"
+    *: none
+    pitchscreen: "Semitone"
   </voice>
 </phrase>
 <phrase>
@@ -12623,13 +12626,16 @@
   desc: "limit" in pitch screen
   user: core
   <source>
-    *: "Limit"
+    *: none
+    pitchscreen: "Limit"
   </source>
   <dest>
-    *: "Limit"
+    *: none
+    pitchscreen: "Limit"
   </dest>
   <voice>
-    *: "Limit"
+    *: none
+    pitchscreen: "Limit"
   </voice>
 </phrase>
 <phrase>
@@ -12637,12 +12643,15 @@
   desc: "rate" in pitch screen
   user: core
   <source>
-    *: "Rate"
+    *: none
+    pitchscreen: "Rate"
   </source>
   <dest>
-    *: "Rate"
+    *: none
+    pitchscreen: "Rate"
   </dest>
   <voice>
-    *: "Rate"
+    *: none
+    pitchscreen: "Rate"
   </voice>
 </phrase>
