@@ -155,7 +155,7 @@ PLUGIN_HEADER
 #define CLIX_BUTTON_RIGHT   BUTTON_MIDRIGHT
 #endif
 #ifndef CLIX_BUTTON_CLICK
-#define CLIX_BUTTON_CLICK  BUTTON_CENTER
+#define CLIX_BUTTON_CLICK   BUTTON_CENTER
 #endif
 #ifndef CLIX_BUTTON_UP
 #define CLIX_BUTTON_UP      BUTTON_TOPMIDDLE
@@ -209,14 +209,14 @@ struct highscore highest[NUM_SCORES];
 
 
 struct clix_game_state_t {
-    unsigned char level; /* current level */
-    char x,y; /* current positions of the cursor */
+    int level; /* current level */
+    int score; /* current game score */
+    int x,y; /* current positions of the cursor */
     int board[BOARD_WIDTH * BOARD_HEIGHT]; /* play board*/
     /* state of selected fields,maybe we can store this in the play board too */
     bool board_selected[ BOARD_WIDTH * BOARD_HEIGHT];
-    char selected_count;
-    unsigned short score; /* current game score */
-    char status;
+    int selected_count;
+    int status;
     bool blink; /* true if selected CELLS are currently white */
 };
 
@@ -292,7 +292,7 @@ static void clix_show_highscores(int position)
     rb->lcd_setfont(FONT_SYSFIXED);
 }
 
-/*  recursiv function to check if a neighbour cell is of the same color
+/*  recursive function to check if a neighbour cell is of the same color
     if so call the function with the neighbours position
 */
 static void clix_set_selected(struct clix_game_state_t* state,
@@ -463,7 +463,7 @@ static void clix_draw(struct clix_game_state_t* state)
 
 static void clix_move_cursor(struct clix_game_state_t* state, const bool left)
 {
-    signed char x, y;
+    int x, y;
 
     x = state->x;
     do
@@ -522,50 +522,48 @@ static int clix_clear_selected(struct clix_game_state_t* state)
         }
     }
 
+    /* count score */
+    state->score += state->selected_count * state->level;
+    state->selected_count = 0;
+
     /* let blocks falling down */
     for( i = BOARD_WIDTH - 1; i >= 0; --i)
     {
         for( j = BOARD_HEIGHT - 1; j >= 0; --j)
         {
             y = j;
-            while( state->board[ XYPOS( i, y + 1)] == CC_BLACK &&
-                   y < BOARD_HEIGHT
+            while( (y + 1) < BOARD_HEIGHT &&
+                   state->board[ XYPOS( i, y + 1)] == CC_BLACK
                  )
                     y++;
 
             if (y != j) {
-                state->board[ XYPOS(i, y)] = state->board[ XYPOS( i, j)];
+                state->board[ XYPOS( i, y)] = state->board[ XYPOS( i, j)];
                 state->board[ XYPOS( i, j)] = CC_BLACK;
             }
         }
     }
 
-    /* count score */
-    state->score += state->selected_count * state->level;
-
-    /* check every column (from right to left) if its empty,
-       if so copy the contents from the right side */
-    for( i = BOARD_WIDTH - 1; i >= 0; --i)
+    /* move columns to left side */
+    for( i = 0; i < BOARD_WIDTH; ++i)
     {
-        if (state->board[ XYPOS( i, BOARD_HEIGHT - 1)] == CC_BLACK) {
-            if( (i + 1) < BOARD_WIDTH &&
-                state->board[ XYPOS( i + 1, BOARD_HEIGHT - 1)] != CC_BLACK)
+        x = i;
+        while( (x - 1) >= 0 &&
+               state->board[ XYPOS( x - 1, BOARD_HEIGHT - 1)] == CC_BLACK
+             )
+            x--;
+        if (x != i)
+        {
+            for( j = 0; j < BOARD_HEIGHT; ++j)
             {
-                for( x = (i + 1); x < BOARD_WIDTH; ++x)
-                {
-                    for( j = 0; j < BOARD_HEIGHT; ++j)
-                    {
-                        state->board[ XYPOS( x - 1, j)] =
-                            state->board[ XYPOS( x, j)];
-
-                        state->board[ XYPOS( x, j)] = CC_BLACK;
-                    }
-                }
+                state->board[ XYPOS( x, j)] = state->board[ XYPOS( i, j)];
+                state->board[ XYPOS( i, j)] = CC_BLACK;
             }
         }
-        else
-            state->status = CLIX_CONTINUE;
     }
+
+    if(state->board[ XYPOS( 0, BOARD_HEIGHT - 1)] != CC_BLACK)
+        state->status = CLIX_CONTINUE;
 
     if (state->status != CLIX_CLEARED) {
         /*  check if a move is still possible, otherwise the game is over.
@@ -576,18 +574,15 @@ static int clix_clear_selected(struct clix_game_state_t* state)
         {
             for( j = BOARD_HEIGHT - 1; j >= 0; --j)
             {
-                if (state->board[ XYPOS( i, j)] != CC_BLACK) {
-                    if ( state->board[ XYPOS( i, j)] ==
-                            clix_get_color( state, i - 1, j) ||
-                        state->board[ XYPOS( i, j)] ==
-                            clix_get_color( state, i + 1, j) ||
-                        state->board[ XYPOS( i, j)] ==
-                            clix_get_color( state, i, j - 1) ||
-                        state->board[ XYPOS( i, j)] ==
-                            clix_get_color( state, i, j + 1)
+                int color = state->board[ XYPOS( i, j)];
+                if (color != CC_BLACK) {
+                    if (color == clix_get_color( state, i - 1, j) ||
+                        color == clix_get_color( state, i + 1, j) ||
+                        color == clix_get_color( state, i, j - 1) ||
+                        color == clix_get_color( state, i, j + 1)
                       )
                     {
-                        /* and the loop, but in a diffrent way than usually*/
+                        /* end the loop, but in a diffrent way than usually*/
                         i = BOARD_WIDTH + 1;
                         j = -2;
                     }
@@ -613,8 +608,8 @@ static int clix_help(void)
     rb->lcd_setfont(FONT_UI);
     rb->lcd_set_foreground(LCD_WHITE);
 #define WORDS (sizeof help_text / sizeof (char*))
-	char *help_text[] = {
-		"Clix", "", "Aim", "", "Remove", "all", "blocks", "from", "the",
+    static char *help_text[] = {
+        "Clix", "", "Aim", "", "Remove", "all", "blocks", "from", "the",
         "board", "to", "achieve", "the", "next", "level.", "You", "can",
         "only", "remove", "blocks,", "if", "at", "least", "two", "blocks",
         "with", "the", "same", "color", "have", "a", "direct", "connection.",
@@ -665,8 +660,7 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
                              "Quit");
 
     while (true) {
-        choice = rb->do_menu(&main_menu, &choice, NULL, false);
-        switch (choice) {
+        switch (rb->do_menu(&main_menu, &choice, NULL, false)) {
             case 0:
                 return 0;
             case 1:
@@ -773,10 +767,10 @@ static int clix_handle_game(struct clix_game_state_t* state)
                         switch( clix_clear_selected( state))
                         {
                             case CLIX_CLEARED:
+                                state->score += state->level * 100;
                                 clix_draw( state);
                                 if (state->level < NUM_LEVELS) {
                                     rb->splash(HZ*2, "Great! Next Level!");
-                                    state->score += state->level * 100;
                                     state->level++;
                                     clix_init_new_level( state);
                                     clix_update_selected( state);
@@ -797,7 +791,7 @@ static int clix_handle_game(struct clix_game_state_t* state)
                                     highest, NUM_SCORES)) {
                                     position=highscore_update(state->score,
                                                             state->level, "",
-                                                            highest,NUM_SCORES);            
+                                                            highest,NUM_SCORES);
                                     if (position == 0) {
                                         rb->splash(HZ*2, "New High Score");
                                     }
@@ -842,7 +836,6 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-#ifdef HAVE_LCD_COLOR
     rb->lcd_set_backdrop(NULL);
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);
@@ -854,10 +847,6 @@ enum plugin_status plugin_start(const void* parameter)
     clix_handle_game( &state);
 
     highscore_save(HIGHSCORE_FILE, highest, NUM_SCORES);
-    
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_setfont(FONT_UI);
-#endif
 
     return PLUGIN_OK;
 }
