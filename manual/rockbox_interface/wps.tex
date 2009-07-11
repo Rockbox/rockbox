@@ -120,13 +120,11 @@ your WPS (While Playing Screen).
       \opt{PLAYER_PAD}{%
         \ButtonMenu+\ButtonPlay & Mute on/off.\\%
       }%
-      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
-          ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+      \opt{pitchscreen}{%
         \ActionWpsPitchScreen
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsPitchScreen}
-         & Show \setting{Pitch Screen}
-         (see \reference{sec:pitchscreen}).\\}%
-      %
+         & Show \setting{Pitch Screen} (see \reference{sec:pitchscreen}).\\%
+      }%
       \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD%
           ,MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
         \ActionWpsIdThreeScreen 
@@ -270,7 +268,7 @@ function in the file browser's \setting{Context Menu}.
 \subsubsection{Delete}
 Delete the currently playing file.
 
-\nopt{player}{
+\opt{pitchscreen}{
   \subsubsection{\label{sec:pitchscreen}Pitch}
   
   The \setting{Pitch Screen} allows you to change the rate of playback
@@ -300,7 +298,7 @@ Delete the currently playing file.
   is not persisted, i.e. after the \dap\ is turned on it will
   always be set to 100\%.
 
-  \opt{masf}{
+  \nopt{swcodec}{
     \begin{table}
       \begin{btnmap}{}{}
         \ActionPsToggleMode
