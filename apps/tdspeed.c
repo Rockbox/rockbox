@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "buffer.h"
-#include "debug.h"
 #include "system.h"
 #include "tdspeed.h"
 #include "settings.h"
@@ -72,7 +71,7 @@ void tdspeed_init()
 }
 
 
-bool tdspeed_config(int samplerate, bool stereo, int factor)
+bool tdspeed_config(int samplerate, bool stereo, int32_t factor)
 {
     struct tdspeed_state_s *st = &tdspeed_state;
     int src_frame_sz;
@@ -84,7 +83,7 @@ bool tdspeed_config(int samplerate, bool stereo, int factor)
         return false;
 
     /* Check parameters */
-    if (factor == 100)
+    if (factor == PITCH_SPEED_100)
         return false;
     if (samplerate < MIN_RATE || samplerate > MAX_RATE)
         return false;
@@ -94,14 +93,14 @@ bool tdspeed_config(int samplerate, bool stereo, int factor)
     st->stereo = stereo;
     st->dst_step = samplerate / MINFREQ;
 
-    if (factor > 100)
-        st->dst_step = st->dst_step * 100 / factor;
+    if (factor > PITCH_SPEED_100)
+        st->dst_step = st->dst_step * PITCH_SPEED_100 / factor;
     st->dst_order = 1;
 
     while (st->dst_step >>= 1)
         st->dst_order++;
     st->dst_step = (1 << st->dst_order);
-    st->src_step = st->dst_step * factor / 100;
+    st->src_step = st->dst_step * factor / PITCH_SPEED_100;
     st->shift_max = (st->dst_step > st->src_step) ? st->dst_step : st->src_step;
 
     src_frame_sz = st->shift_max + st->dst_step;

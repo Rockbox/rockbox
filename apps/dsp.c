@@ -162,7 +162,7 @@ struct dsp_config
     int  sample_depth;
     int  sample_bytes;
     int  stereo_mode;
-    int  tdspeed_percent; /* Speed % */
+    int32_t  tdspeed_percent; /* Speed% * PITCH_SPEED_PRECISION */
     bool tdspeed_active;  /* Timestretch is in use */
     int  frac_bits;
 #ifdef HAVE_SW_TONE_CONTROLS
@@ -205,7 +205,7 @@ static int treble;                                  /* A/V */
 #endif
 
 /* Settings applicable to audio codec only */
-static int  pitch_ratio = 1000;
+static int32_t  pitch_ratio = PITCH_SPEED_100;
 static int  channels_mode;
        long dsp_sw_gain;
        long dsp_sw_cross;
@@ -254,14 +254,14 @@ static inline int32_t clip_sample_16(int32_t sample)
     return sample;
 }
 
-int sound_get_pitch(void)
+int32_t sound_get_pitch(void)
 {
     return pitch_ratio;
 }
 
-void sound_set_pitch(int permille)
+void sound_set_pitch(int32_t percent)
 {
-    pitch_ratio = permille;
+    pitch_ratio = percent;
     dsp_configure(&AUDIO_DSP, DSP_SWITCH_FREQUENCY,
                   AUDIO_DSP.codec_frequency);
 }
@@ -277,7 +277,7 @@ static void tdspeed_setup(struct dsp_config *dspc)
     if(!dsp_timestretch_available())
         return; /* Timestretch not enabled or buffer not allocated */
     if (dspc->tdspeed_percent == 0)
-        dspc->tdspeed_percent = 100;
+        dspc->tdspeed_percent = PITCH_SPEED_100;
     if (!tdspeed_config(
         dspc->codec_frequency == 0 ? NATIVE_FREQUENCY : dspc->codec_frequency,
         dspc->stereo_mode != STEREO_MONO,
@@ -312,13 +312,13 @@ void dsp_timestretch_enable(bool enabled)
     }
 }
 
-void dsp_set_timestretch(int percent)
+void dsp_set_timestretch(int32_t percent)
 {
     AUDIO_DSP.tdspeed_percent = percent;
     tdspeed_setup(&AUDIO_DSP);
 }
 
-int dsp_get_timestretch()
+int32_t dsp_get_timestretch()
 {
     return AUDIO_DSP.tdspeed_percent;
 }
@@ -1347,7 +1347,7 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
            not need this feature.
          */
         if (dsp == &AUDIO_DSP)
-            dsp->frequency = pitch_ratio * dsp->codec_frequency / 1000;
+            dsp->frequency = pitch_ratio * dsp->codec_frequency / PITCH_SPEED_100;
         else
             dsp->frequency = dsp->codec_frequency;
 

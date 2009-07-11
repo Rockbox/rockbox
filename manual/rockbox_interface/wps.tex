@@ -273,34 +273,52 @@ Delete the currently playing file.
 \nopt{player}{
   \subsubsection{\label{sec:pitchscreen}Pitch}
   
-  The \setting{Pitch Screen} allows you to change the pitch and the playback 
-  speed of your \dap. The pitch value can be adjusted between 50\% and 200\%.
-  50\% means half the normal playback speed and the pitch that is an octave lower 
-  than the normal pitch. 200\% means double playback speed and the pitch that 
-  is an octave higher than the normal pitch.  
+  The \setting{Pitch Screen} allows you to change the rate of playback
+  (i.e. the playback speed and at the same time the pitch) of your
+  \dap. The rate value can be adjusted between 50\% and 200\%. 50\%
+  means half the normal playback speed and a pitch that is an octave
+  lower than the normal pitch. 200\% means double playback speed and a
+  pitch that is an octave higher than the normal pitch.
+
+  The rate can be changed in two modes: procentual and semitone.
+  Initially, procentual mode is active.
+  
+  \opt{swcodec}{
+    If you've enabled the \setting{Timestretch} option in
+    \setting{Sound Settings} and have since rebooted, you can also use
+    timestretch mode. This allows you to change the playback speed
+    without affecting the pitch, and vice versa.
+    
+    In timestretch mode there are separate displays for pitch and
+    speed, and each can be altered independently.  Due to the
+    limitations of the algorithm, speed is limited to be between 35\%
+    and 250\% of the current pitch value.  Pitch must maintain the
+    same ratio as well as remain between 50\% and 200\%.
+  }
+  
+  The value of the \opt{swcodec}{rate, pitch and speed}\nopt{swcodec}{rate}
+  is not persisted, i.e. after the \dap\ is turned on it will
+  always be set to 100\%.
 
   \opt{masf}{
-    Changing the pitch can be done in two modes: procentual and semitone.
-    Initially (after the \dap{} is switched on), procentual mode is active.
-
     \begin{table}
       \begin{btnmap}{}{}
         \ActionPsToggleMode
         & Toggle pitch changing mode \\
         %
         \ActionPsIncSmall{} / \ActionPsDecSmall
-        & Increase / Decrease pitch by 0.1\% (in procentual mode) or a semitone
-          (in semitone mode)\\
+        & Increase / Decrease pitch by 0.1\% (in procentual mode) or by 0.1
+          semitone (in semitone mode)\\
         %
         \ActionPsIncBig{} / \ActionPsDecBig
         & Increase / Decrease pitch by 1\% (in procentual mode) or a semitone
           (in semitone mode)\\
         %
         \ActionPsNudgeLeft{} / \ActionPsNudgeRight
-        & Temporarily change pitch by 2.0\% (beatmatch) \\
+        & Temporarily change pitch by 2\% (beatmatch) \\
         %
         \ActionPsReset
-        & Reset pitch to 100\% \\
+        & Reset rate to 100\% \\
         %
         \ActionPsExit
         & Leave the Pitch Screen \\
@@ -312,23 +330,16 @@ Delete the currently playing file.
   }
 
   \opt{swcodec}{
-    Changing the pitch can be done in three modes: procentual, semitone and 
-    timestretch. Initially (after the \dap{} is switched on), procentual mode is active.
-
-    Timestretch mode allows you to change the playback speed of your recording without 
-    affecting the pitch, and vice versa.  To access this you must enable the \setting{Timestretch} 
-    option in \setting{Sound Settings} and reboot.
-  
     \begin{table}
       \begin{btnmap}{}{}
         \ActionPsToggleMode
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsToggleMode}
-        & Toggle pitch changing mode \\
+        & Toggle pitch changing mode (cycles through all available modes)\\
         %
         \ActionPsIncSmall{} / \ActionPsDecSmall
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsIncSmall{} / \ActionRCPsDecSmall}
-        & Increase / Decrease pitch by 0.1\% (in procentual mode) or a semitone
-          (in semitone mode)\\
+        & Increase / Decrease pitch by 0.1\% (in procentual mode) or 0.1
+          semitone (in semitone mode)\\
         %
         \ActionPsIncBig{} / \ActionPsDecBig
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsIncBig{} / \ActionRCPsDecBig}
@@ -337,7 +348,7 @@ Delete the currently playing file.
         %
         \ActionPsNudgeLeft{} / \ActionPsNudgeRight
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsNudgeLeft{} / \ActionPsNudgeRight}
-        & Temporarily change pitch by 2.0\% (beatmatch), or modify speed (in timestretch mode) \\
+        & Temporarily change pitch by 2\% (beatmatch), or modify speed (in timestretch mode) \\
         %
         \ActionPsReset
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsReset}

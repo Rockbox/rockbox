@@ -25,6 +25,8 @@
 #include "sound.h"
 #include "logf.h"
 #include "system.h"
+/* for the pitch and speed precision #defines: */
+#include "pitchscreen.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
@@ -159,6 +161,7 @@ sound_set_type* sound_get_fn(int setting)
 
 #if CONFIG_CODEC == SWCODEC
 /* Copied from dsp.h, nasty nasty, but we don't want to include dsp.h */
+
 enum {
     DSP_CALLBACK_SET_PRESCALE = 0,
     DSP_CALLBACK_SET_BASS,
@@ -698,18 +701,18 @@ int sound_val2phys(int setting, int value)
    crystal frequency than we actually have. It will adjust its internal
    parameters and the result is that the audio is played at another pitch.
 
-   The pitch value is in tenths of percent.
+   The pitch value precision is based on PITCH_SPEED_PRECISION (in dsp.h)
 */
-static int last_pitch = 1000;
+static int last_pitch = PITCH_SPEED_100;
 
-void sound_set_pitch(int pitch)
+void sound_set_pitch(int32_t pitch)
 {
     unsigned long val;
 
     if (pitch != last_pitch)
     {
         /* Calculate the new (bogus) frequency */
-        val = 18432 * 1000 / pitch;
+        val = 18432 * PITCH_SPEED_100 / pitch;
 
         mas_writemem(MAS_BANK_D0, MAS_D0_OFREQ_CONTROL, &val, 1);
 
@@ -721,19 +724,19 @@ void sound_set_pitch(int pitch)
     }
 }
 
-int sound_get_pitch(void)
+int32_t sound_get_pitch(void)
 {
     return last_pitch;
 }
 #else /* SIMULATOR */
-void sound_set_pitch(int pitch)
+void sound_set_pitch(int32_t pitch)
 {
     (void)pitch;
 }
 
-int sound_get_pitch(void)
+int32_t sound_get_pitch(void)
 {
-    return 1000;
+    return PITCH_SPEED_100;
 }
 #endif /* SIMULATOR */
 #endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */

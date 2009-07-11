@@ -12604,3 +12604,45 @@
     remote: "Remote Statusbar"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc: 
+  user: core
+  <source>
+    *: "Semitone"
+  </source>
+  <dest>
+    *: "Semitone"
+  </dest>
+  <voice>
+    *: "Semitone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: "Limit"
+  </source>
+  <dest>
+    *: "Limit"
+  </dest>
+  <voice>
+    *: "Limit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: "Rate"
+  </source>
+  <dest>
+    *: "Rate"
+  </dest>
+  <voice>
+    *: "Rate"
+  </voice>
+</phrase>

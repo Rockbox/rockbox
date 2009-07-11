@@ -60,8 +60,8 @@ void sound_set(int setting, int value);
 int sound_val2phys(int setting, int value);
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-void sound_set_pitch(int permille);
-int sound_get_pitch(void);
+void sound_set_pitch(int32_t pitch);
+int32_t sound_get_pitch(void);
 #endif
 
 #endif

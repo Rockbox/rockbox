@@ -23,15 +23,28 @@
 #ifndef _TDSPEED_H
 #define _TDSPEED_H
 
+#include "dsp.h"
+/* for the precision #defines: */
+#include "pitchscreen.h"
+
 #define TDSPEED_OUTBUFSIZE 4096
 
+/* some #define functions to get the pitch, stretch and speed values based on */
+/* two known values.  Remember that params are alphabetical.                  */
+#define GET_SPEED(pitch, stretch) \
+    ((pitch * stretch + PITCH_SPEED_100 / 2L) / PITCH_SPEED_100)
+#define GET_PITCH(speed, stretch) \
+    ((speed * PITCH_SPEED_100 + stretch / 2L) / stretch)
+#define GET_STRETCH(pitch, speed) \
+    ((speed * PITCH_SPEED_100 + pitch   / 2L) / pitch)
+
 void tdspeed_init(void);
-bool tdspeed_config(int samplerate, bool stereo, int factor);
+bool tdspeed_config(int samplerate, bool stereo, int32_t factor);
 long tdspeed_est_output_size(void);
 long tdspeed_est_input_size(long size);
 int tdspeed_doit(int32_t *src[], int count);
 
-#define STRETCH_MAX 250
-#define STRETCH_MIN 35
+#define STRETCH_MAX (250L * PITCH_SPEED_PRECISION) /* 250% */
+#define STRETCH_MIN (35L  * PITCH_SPEED_PRECISION) /* 35%  */
 
 #endif

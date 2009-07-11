@@ -33,7 +33,6 @@
 #include "settings_list.h"
 #include "sound.h"
 #include "dsp.h"
-#include "debug.h"
 #include "mpeg.h"
 #include "audio.h"
 #include "power.h"
@@ -1528,6 +1527,14 @@ const struct settings_list settings[] = {
                     tsc_is_changed, tsc_set_default),
 #endif
     OFFON_SETTING(0, prevent_skip, LANG_PREVENT_SKIPPING, false, "prevent track skip", NULL),
+
+    OFFON_SETTING(0, pitch_mode_semitone, LANG_SEMITONE, false, 
+                  "Semitone pitch change", NULL),
+#if CONFIG_CODEC == SWCODEC
+    OFFON_SETTING(0, pitch_mode_timestretch, LANG_TIMESTRETCH, false, 
+                  "Timestretch mode", NULL),
+#endif
+
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

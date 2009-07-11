@@ -83,10 +83,10 @@ void dsp_set_eq_coefs(int band);
 void dsp_dither_enable(bool enable);
 void dsp_timestretch_enable(bool enable);
 bool dsp_timestretch_available(void);
-void sound_set_pitch(int r);
-int sound_get_pitch(void);
-void dsp_set_timestretch(int percent);
-int dsp_get_timestretch(void);
+void sound_set_pitch(int32_t r);
+int32_t sound_get_pitch(void);
+void dsp_set_timestretch(int32_t percent);
+int32_t dsp_get_timestretch(void);
 int dsp_callback(int msg, intptr_t param);
 
 #endif
