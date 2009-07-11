@@ -753,17 +753,21 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
         }
     }
 
+    ret = 0;    /* success */
+
+sd_transfer_error:
+
     dma_release();
 
 #ifndef BOOTLOADER
     led(false);
     sd_enable(false);
 #endif
-    mutex_unlock(&sd_mtx);
-    return 0;
 
-sd_transfer_error:
-    card_info[drive].initialized = 0;
+    if (ret)    /* error */
+        card_info[drive].initialized = 0;
+
+    mutex_unlock(&sd_mtx);
     return ret;
 }
 
