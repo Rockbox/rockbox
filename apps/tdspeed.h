@@ -24,8 +24,6 @@
 #define _TDSPEED_H
 
 #include "dsp.h"
-/* for the precision #defines: */
-#include "pitchscreen.h"
 
 #define TDSPEED_OUTBUFSIZE 4096
 
