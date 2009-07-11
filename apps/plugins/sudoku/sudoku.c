@@ -1164,7 +1164,7 @@ enum {
     SM_QUIT,
 };
 
-bool sudoku_menu(struct sudoku_state_t* state)
+int sudoku_menu(struct sudoku_state_t* state)
 {
     int result;
 
@@ -1224,14 +1224,13 @@ bool sudoku_menu(struct sudoku_state_t* state)
 
         case SM_QUIT:
             save_sudoku(state);
-            return true;
             break;
 
         default:
             break;
     }
 
-    return (result==MENU_ATTACHED_USB);
+    return result;
 }
 
 /* Menu used when user is in edit mode - i.e. creating a new game manually */
@@ -1518,8 +1517,11 @@ enum plugin_status plugin_start(const void* parameter)
                             exit = true;
                         }
                     } else {
-                        if (sudoku_menu(&state)) {
+                        res = sudoku_menu(&state);
+                        if (res == MENU_ATTACHED_USB) {
                             rc = PLUGIN_USB_CONNECTED;
+                            exit = true;
+                        } else if (res == SM_QUIT) {
                             exit = true;
                         }
                     }
