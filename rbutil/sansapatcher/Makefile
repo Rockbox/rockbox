@@ -35,8 +35,8 @@ sansapatcher-mac: sansapatcher-i386 sansapatcher-ppc
 	lipo -create sansapatcher-ppc sansapatcher-i386 -output sansapatcher-mac
 
 sansapatcher.dmg: sansapatcher-mac
-	mkdir sansapatcher-dmg
-	cp sansapatcher-mac sansapatcher-dmg/sansapatcher
+	mkdir -p sansapatcher-dmg
+	cp -p sansapatcher-mac sansapatcher-dmg/sansapatcher
 	hdiutil create -srcfolder sansapatcher-dmg sansapatcher.dmg
 
 sansapatcher-i386: main.c sansapatcher.c sansaio-posix.c parttypes.h bootimg_c200.c bootimg_e200.c

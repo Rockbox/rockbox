@@ -33,8 +33,8 @@ e200rpatcher-mac: e200rpatcher-i386 e200rpatcher-ppc
 	lipo -create e200rpatcher-ppc e200rpatcher-i386 -output e200rpatcher-mac
 
 e200rpatcher.dmg: e200rpatcher-mac
-	mkdir e200rpatcher-dmg
-	cp e200rpatcher-mac e200rpatcher-dmg
+	mkdir -p e200rpatcher-dmg
+	cp -p e200rpatcher-mac e200rpatcher-dmg
 	hdiutil create -srcfolder e200rpatcher-dmg e200rpatcher.dmg
 
 e200rpatcher-i386:  e200rpatcher.c  bootimg.c usb.h libusb-i386.a
