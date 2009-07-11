@@ -58,7 +58,7 @@ bool __dbg_hw_info(void)
         int btn = button_get_w_tmo(HZ/10);
         if(btn == (DEBUG_CANCEL|BUTTON_REL))
             goto end;
-        else if(btn == (BUTTON_DOWN|BUTTON_REL))
+        else if(btn == (BUTTON_PLAY|BUTTON_REL))
             break;
         }
     }

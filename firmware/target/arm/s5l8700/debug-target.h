@@ -24,7 +24,7 @@
 
 #include <stdbool.h>
 
-#define DEBUG_CANCEL BUTTON_LEFT
+#define DEBUG_CANCEL BUTTON_MENU
 
 bool __dbg_hw_info(void);
 bool __dbg_ports(void);
