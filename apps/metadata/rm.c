@@ -31,7 +31,7 @@
 #include "metadata_parsers.h"
 #include "logf.h"
 
-//#define DEBUG_RM
+#define DEBUG_RM
 #ifndef DEBUG_RM
 #undef DEBUGF
 #define DEBUGF(...)
@@ -281,7 +281,7 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
                 skipped += 40;
 
                 DEBUGF("    max_bitrate = %ld\n",max_bitrate);
-                DEBUGF("    avg_bitrate = %ld\n",rmctx->bit_Rate);
+                DEBUGF("    avg_bitrate = %ld\n",rmctx->bit_rate);
                 DEBUGF("    max_packet_size = %ld\n",max_packet_size);
                 DEBUGF("    avg_packet_size = %ld\n",avg_packet_size);
                 DEBUGF("    packet_count = %ld\n",packet_count);

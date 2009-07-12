@@ -474,7 +474,7 @@ int real_parse_header(int fd, RMContext *rmctx)
 void rm_get_packet_fd(int fd,RMContext *rmctx, RMPacket *pkt)
 {   
     uint8_t unknown,packet_group;
-    uint16_t x, place;
+    uint16_t x;
     uint16_t sps = rmctx->sub_packet_size;
     uint16_t h = rmctx->sub_packet_h;
     uint16_t y = rmctx->sub_packet_cnt;
@@ -484,14 +484,6 @@ void rm_get_packet_fd(int fd,RMContext *rmctx, RMPacket *pkt)
     {
         y = rmctx->sub_packet_cnt;
         read_uint16be(fd,&pkt->version);
-
-        /* Simple error checking */
-        if(pkt->version != 0 && pkt->version != 1) 
-        {
-             DEBUGF("parsing packets failed\n");
-             return -1;
-        }
-
         read_uint16be(fd,&pkt->length);
         read_uint16be(fd,&pkt->stream_number);
         read_uint32be(fd,&pkt->timestamp);
