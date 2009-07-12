@@ -246,13 +246,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Thema laden"
+    *: "Thema bestand laden"
   </dest>
   <voice>
-    *: "Thema laden"
+    *: "Thema bestand laden"
   </voice>
 </phrase>
 <phrase>
@@ -1745,7 +1745,7 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
@@ -1761,7 +1761,7 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
     *: "Speelscherm kiezen (WPS)"
@@ -1776,7 +1776,7 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
@@ -4589,23 +4589,25 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
+    ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = terugzetten"
     h100,h120,h300: "STOP = terugzetten"
-    ipod*,c200*,sa9200: "MENU = terugzetten"
+    ipod*,c200*: "MENU = terugzetten"
     x5,m5: "RECORD = terugzetten"
     h10,h10_5gb,e200*,fuze*: "PREV = terugzetten"
     gigabeatf: "POWER = terugzetten"
     mrobe100: "DISPLAY = terugzetten"
     gigabeats: "BACK = terugzetten"
+    sa9200: "LINKS = terugzetten"
   </dest>
   <voice>
     *: ""
@@ -9962,14 +9964,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Aanmaken van database... %d gevonden (OFF = terug)"
     h100,h120,h300: "Aanmaken van database... %d gevonden (STOP = terug)"
     ipod*: "Aanmaken van database... %d gevonden (PREV = terug)"
     x5,m5,gigabeat*,mrobe100: "Aanmaken van database... %d gevonden (LINKS = terug)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Aanmaken van database... %d gevonden (PREV = terug)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Aanmaken van database... %d gevonden (PREV = terug)"
+    sa9200: "Aanmaken van database... %d gevonden (REW =  terug)"
   </dest>
   <voice>
     *: "Aanmaken van database"
@@ -10527,13 +10531,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Ja"
     h100,h120,h300: "NAVI = Ja"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Ja"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip,fuze*: "SELECT = Ja"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -10548,13 +10552,14 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
+    sa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Instellen"
     h100,h120,h300: "NAVI = Instellen"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Instellen"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Instellen"
   </dest>
   <voice>
     *: none
@@ -12481,5 +12486,101 @@
   <voice>
     *: none
     touchscreen: "Kalibratie terugzetten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Statusbalk afstandsbediening"
+  </dest>
+  <voice>
+    *: none
+    remote: "Statusbalk afstandsbediening"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Snelheid"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Snelheid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc: 
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Halve toon"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Halve toon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Limiet"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Limiet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Onderaan"
+  </dest>
+  <voice>
+    *: "Onderaan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Bovenaan"
+  </dest>
+  <voice>
+    *: "Bovenaan"
   </voice>
 </phrase>
