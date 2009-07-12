@@ -44,12 +44,33 @@
 #define OHCI_RH_STATUS          (*(volatile unsigned int *)(OHCI_BASE+0x50))
 #define OHCI_RH_PORT_STATUS_1   (*(volatile unsigned int *)(OHCI_BASE+0x54))
 #define OHCI_RH_PORT_STATUS_2   (*(volatile unsigned int *)(OHCI_BASE+0x58))
-                           
+
+/* Transfer Descriptor */
+struct ohci_td
+{
+    uint32_t td_config;
+    void *current_buffer_pointer;
+    struct ohci_td *nextTD;
+    void *buffer_end;
+};
+
+/* Endpoint Descriptor */
+struct ohci_ed
+{
+    uint32_t ep_config;
+    struct ohci_td *tail;
+    struct ohct_td *head;
+    struct ohci_ed *nextED;
+};
+
+/* Host Controller Communications Area */
 struct ohci_hcca
 {
-    int32_t interrupt_table[32];
+    struct ohci_ed (*interrupt_ed_table)[32];
     unsigned short frame_number;
     unsigned short pad1;
-    int32_t done_head;
+    uint32_t done_head;
     unsigned char reserved[116];
 };
+
+
