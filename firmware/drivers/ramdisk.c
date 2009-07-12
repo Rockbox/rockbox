@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: ramdisk.c 18965 2008-11-01 17:33:21Z gevaerts $
+ * $Id$
  *
  * Copyright (C) 2008 Frank Gevaerts
  *

@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: S5L8700X.h 2008-03-27 Marcoen Hirschberg, Bart van Adrichem $
+ * $Id$
  *
  * Copyright (C) 2008 by Marcoen Hirschberg, Bart van Adrichem
  *

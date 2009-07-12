@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: usb-mr500.c 18487 2008-09-10 20:14:22Z bertrik $
+ * $Id$
  *
  * Copyright (C) 2009 by Karl Kurbjun
  * Portions Copyright (C) 2007 by Catalin Patulea

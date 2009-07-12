@@ -114,7 +114,7 @@
 #define DBOP_TIMPOL_23    (*(volatile unsigned long *)(DBOP_BASE + 0x04))
 #define DBOP_CTRL         (*(volatile unsigned long *)(DBOP_BASE + 0x08))
 #define DBOP_STAT         (*(volatile unsigned long *)(DBOP_BASE + 0x0C))
-#define DBOP_DOUT         (*(volatile unsigned short*)(DBOP_BASE + 0x10))
+#define DBOP_DOUT         (*(volatile unsigned short *)(DBOP_BASE + 0x10))
 #define DBOP_DIN          (*(volatile unsigned short*)(DBOP_BASE + 0x14))
 
 
