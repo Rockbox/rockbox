@@ -507,7 +507,12 @@ t_symbol *dogensym(char *s, t_symbol *oldsym)
 
 t_symbol *gensym(char *s)
 {
-printf("gensym: %s\n", s);
+// printf("gensym: %s\n", s);
+#ifdef ROCKBOX
+    if(s == NULL)
+        return dogensym("/", 0);
+    else
+#endif
     return(dogensym(s, 0));
 }
 

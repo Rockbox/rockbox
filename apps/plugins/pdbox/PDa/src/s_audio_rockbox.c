@@ -25,25 +25,32 @@
 #include "m_pd.h"
 #include "s_stuff.h"
 
-/* Sound output buffer. */
-#define AUDIO_OUTPUT_BLOCKS 3
-static struct pdbox_audio_block audio_output[AUDIO_OUTPUT_BLOCKS];
-static unsigned int output_head;
-static unsigned int output_tail;
-static unsigned int output_fill;
+/* Extern variables. */
+extern float sys_dacsr;
+extern t_sample *sys_soundout;
+extern t_sample *sys_soundin;
+
+/* Output buffer. */
+#define OUTBUFSIZE 3
+static struct audio_buffer outbuf[OUTBUFSIZE];
+static unsigned int outbuf_head;
+static unsigned int outbuf_tail;
+static unsigned int outbuf_fill;
+
+/* Playing status. */
+static bool playing;
+
 
 /* Open audio. */
 void rockbox_open_audio(int rate)
 {
     unsigned int i;
 
-    /* Initialize output buffer. */
-    for(i = 0; i < AUDIO_OUTPUT_BLOCKS; i++)
-        audio_output[i].fill = 0;
+    /* No sound yet. */
+    playing = false;
 
-    output_head = 0;
-    output_tail = 0;
-    output_fill = 0;
+    /* Stop playing to reconfigure audio settings. */
+    rb->pcm_play_stop();
 
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
@@ -53,6 +60,15 @@ void rockbox_open_audio(int rate)
 
     /* Set sample rate of the audio buffer. */
     rb->pcm_set_frequency(rate);
+    rb->pcm_apply_settings();
+
+    /* Initialize output buffer. */
+    for(i = 0; i < OUTBUFSIZE; i++)
+        outbuf[i].fill = 0;
+
+    outbuf_head = 0;
+    outbuf_tail = 0;
+    outbuf_fill = 0;
 }
 
 /* Close audio. */
@@ -61,84 +77,115 @@ void rockbox_close_audio(void)
     /* Stop playback. */
     rb->pcm_play_stop();
 
+    /* Reset playing status. */
+    playing = false;
+
     /* Restore default sampling rate. */
     rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->pcm_apply_settings();
 }
 
 /* Rockbox audio callback. */
 void pdbox_get_more(unsigned char** start, size_t* size)
 {
-    if(output_fill > 0)
+    if(outbuf_fill > 0)
     {
         /* Store output data address and size. */
-        *start = (unsigned char*) audio_output[output_tail].data;
-        *size = audio_output[output_tail].fill;
+        *start = (unsigned char*) outbuf[outbuf_tail].data;
+        *size = sizeof(outbuf[outbuf_tail].data);
 
-        /* Advance tail index. */
-        audio_output[output_tail].fill = 0;
-        output_fill--;
-        if(output_tail == AUDIO_OUTPUT_BLOCKS-1)
-            output_tail = 0;
+        /* Free this part of output buffer. */
+        outbuf[outbuf_tail].fill = 0;
+
+        /* Advance to the next part of output buffer. */
+        if(outbuf_tail == OUTBUFSIZE-1)
+            outbuf_tail = 0;
         else
-            output_tail++;
+            outbuf_tail++;
+
+        /* Decrease output buffer fill. */
+        outbuf_fill--;
     }
     else
     {
+        /* Reset playing status. */
+        playing = false;
+
         /* Nothing to play. */
         *start = NULL;
         *size = 0;
-        return;
     }
 }
 
 /* Audio I/O. */
 int rockbox_send_dacs(void)
 {
+    /* Copy sys_output buffer. */
+    t_sample* left = sys_soundout + DEFDACBLKSIZE*0;
+    t_sample* right = sys_soundout + DEFDACBLKSIZE*1;
+    unsigned int samples_out = 0;
+    int16_t* out;
+    int sample;
 
+    /* Cancel if whole buffer filled. */
+    if(outbuf_fill >= OUTBUFSIZE-1)
+        return SENDDACS_NO;
 
-    /* Start playback if needed and possible. */
-    if(output_fill > 1 &&
-       audio_output[output_tail].fill == PD_AUDIO_BLOCK_SIZE)
+    /* Write the block of sound. */
+write_block:
+    for(out = outbuf[outbuf_head].data +
+              outbuf[outbuf_head].fill * PD_OUT_CHANNELS;
+        outbuf[outbuf_head].fill < (AUDIOBUFSIZE / PD_OUT_CHANNELS) &&
+            samples_out < DEFDACBLKSIZE;
+        left++, right++, samples_out++, outbuf[outbuf_head].fill++)
     {
-        /* Start playback. */
-        rb->pcm_play_data(pdbox_get_more,
-                          (unsigned char*) audio_output[output_tail].data,
-                          PD_AUDIO_BLOCK_SIZE);
+        /* Copy samples from both channels. */
+        sample = SCALE16(*left);
+        if(sample > 32767)
+            sample = 32767;
+        else if(sample < -32767)
+            sample = -32767;
+        *out++ = sample;
+        sample = SCALE16(*right);
+        if(sample > 32767)
+            sample = 32767;
+        else if(sample < -32767)
+            sample = -32767;
+        *out++ = sample;
+    }
 
-        /* Advance tail index. */
-        audio_output[output_tail].fill = PD_AUDIO_BLOCK_SIZE;
-        output_fill--;
-        if(output_tail == AUDIO_OUTPUT_BLOCKS-1)
-            output_tail = 0;
+    /* If part of output buffer filled... */
+    if(outbuf[outbuf_head].fill >= (AUDIOBUFSIZE / PD_OUT_CHANNELS))
+    {
+        /* Advance one part of output buffer. */
+        if(outbuf_head == OUTBUFSIZE-1)
+            outbuf_head = 0;
         else
-            output_tail++;
+            outbuf_head++;
+
+        /* Increase fill counter. */
+        outbuf_fill++;
     }
 
+    /* If needed, fill the next frame. */
+    if(samples_out < DEFDACBLKSIZE)
+        goto write_block;
 
+    /* Clear Pure Data output buffer. */
+    memset(sys_soundout,
+           0,
+           sizeof(t_sample) * DEFDACBLKSIZE * PD_OUT_CHANNELS);
 
-
-#if 0
-    if (sys_getrealtime() > timebefore + 0.002)
+    /* If still not playing... */
+    if(!playing && outbuf_fill > 0)
     {
-        /* post("slept"); */
-    	return (SENDDACS_SLEPT);
+        /* Start playing. */
+        rb->pcm_play_data(pdbox_get_more, NULL, 0);
+
+        /* Set status flag. */
+        playing = true;
     }
-    else 
-#endif
-    return (SENDDACS_YES);
-}
 
-/* Placeholder. */
-void rockbox_listdevs(void)
-{
+    return SENDDACS_YES;
 }
-
-#if 0
-/* Scanning for devices */
-void rockbox_getdevs(char *indevlist, int *nindevs,
-    char *outdevlist, int *noutdevs, int *canmulti, 
-    	int maxndev, int devdescsize)
-{
-}
-#endif
 

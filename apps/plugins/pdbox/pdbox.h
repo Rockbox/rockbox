@@ -37,21 +37,21 @@
 
 
 /* Audio declarations. */
-#define PD_SAMPLERATE 32000
-#define PD_SAMPLES_QUOT (PD_SAMPLERATE / HZ)
-#define PD_SAMPLES_REM  (PD_SAMPLERATE % HZ)
-#if PD_SAMPLES_REM == 0
-  #define PD_SAMPLES_PER_HZ (PD_SAMPLES_QUOT)
-#else
-  #define PD_SAMPLES_PER_HZ (PD_SAMPLES_QUOT + 1)
-#endif
+#define PD_SAMPLERATE 22050
+#define PD_SAMPLES_PER_HZ ((PD_SAMPLERATE / HZ) + \
+                           (PD_SAMPLERATE % HZ > 0 ? 1 : 0))
+#define PD_OUT_CHANNELS 2
 
-/* Audio data types. */
-#define PD_AUDIO_BLOCK_SIZE PD_SAMPLES_PER_HZ
-struct pdbox_audio_block
+/* Audio buffer part. Contains data for one HZ period. */
+#ifdef SIMULATOR
+#define AUDIOBUFSIZE (PD_SAMPLES_PER_HZ * PD_OUT_CHANNELS * 4)
+#else
+#define AUDIOBUFSIZE (PD_SAMPLES_PER_HZ * PD_OUT_CHANNELS)
+#endif
+struct audio_buffer
 {
+    int16_t data[AUDIOBUFSIZE];
     unsigned int fill;
-    int32_t data[PD_AUDIO_BLOCK_SIZE];
 };
 
 
@@ -138,6 +138,10 @@ void pd_init(void);
 
 /* Redefinitons of ANSI C functions. */
 #include "lib/wrappers.h"
+
+#define strncmp rb->strncmp
+#define atoi rb->atoi
+#define write rb->write
 
 #define strncat rb_strncat
 #define floor rb_floor

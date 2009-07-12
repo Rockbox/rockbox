@@ -2307,7 +2307,7 @@ void glob_quit(void* dummy)
         reentered = true;
 
         /* Close audio subsystem. */
-        sys_close_audio();
+        /* Will be done by the main program: sys_close_audio(); */
 
         /* Stop main loop. */
         quit = true;
@@ -2318,12 +2318,13 @@ void glob_quit(void* dummy)
 void glob_evalfile(t_pd *ignore, t_symbol *name, t_symbol *dir);
 void openit(const char *dirname, const char *filename)
 {
-    char dirbuf[MAXPDSTRING], *nameptr;
+    char* nameptr;
+    char* dirbuf = getbytes(MAXPDSTRING);
 
     /* Workaround: If the file resides in the root directory,
                    add a trailing slash to prevent directory part
-                   of the filename from being removed. */
-    char ffilename[MAXPDSTRING];
+                   of the filename from being removed -- W.B. */
+    char* ffilename = getbytes(MAXPDSTRING);
     ffilename[0] = '/';
     ffilename[1] = '\0';
     strcat(ffilename, filename);
@@ -2337,6 +2338,10 @@ void openit(const char *dirname, const char *filename)
     }
     else
     	error("%s: can't open", filename);
+
+    /* Clean up. */
+    freebytes(dirbuf, MAXPDSTRING);
+    freebytes(ffilename, MAXPDSTRING);
 }
 
 
@@ -2344,14 +2349,20 @@ void openit(const char *dirname, const char *filename)
 extern char* filename;
 char* rb_getcwd(char* buf, ssize_t size)
 {
-    char* end_of_dir = strrchr(filename, '/');
+    /* Initialize buffer. */
+    buf[0] = '\0';
 
-    /* Check whether buffer may hold enough data. */
-    if(size < end_of_dir - filename)
+    /* Search for the last slash. */
+    char* end_of_dir = strrchr(filename, '/');
+    int dirlen = end_of_dir - filename;
+
+    /* Check whether length of directory path is correct.
+       If not, abort. */
+    if(size < dirlen || dirlen == 0)
         return NULL;
 
     /* Copy current working directory to buffer. */
-    strncpy(buf, filename, end_of_dir - filename);
+    strncat(buf, filename, dirlen);
     return buf;
 }
 
@@ -2369,7 +2380,7 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
     (void) argv;
 
     t_namelist *nl;
-    char cwd[MAXPDSTRING];
+    char* cwd = getbytes(MAXPDSTRING);
 
     /* Get current working directory. */
     rb_getcwd(cwd, MAXPDSTRING);
@@ -2377,8 +2388,12 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
     /* open patches specifies with "-open" args */
     for(nl = sys_openlist; nl; nl = nl->nl_next)
         openit(cwd, nl->nl_string);
+
     namelist_free(sys_openlist);
     sys_openlist = 0;
+
+    /* Clean up. */
+    freebytes(cwd, MAXPDSTRING);
 }
 
 /* Fake GUI start. Originally in s_inter.c */
@@ -2390,7 +2405,7 @@ int sys_startgui(const char *guidir)
 {
     unsigned int i;
     t_atom zz[23];
-    char cmdbuf[4*MAXPDSTRING];
+    char* cmdbuf = getbytes(4*MAXPDSTRING);
 
     (void) guidir;
 
@@ -2398,12 +2413,15 @@ int sys_startgui(const char *guidir)
 
     if(!rb_getcwd(cmdbuf, MAXPDSTRING))
         strcpy(cmdbuf, ".");
+
     SETSYMBOL(zz, gensym(cmdbuf));
     for (i = 1; i < 22; i++)
         SETFLOAT(zz + i, defaultfontshit[i-1]);
     SETFLOAT(zz+22,0);
-
     glob_initfromgui(0, 0, 23, zz);
+
+    /* Clean up. */
+    freebytes(cmdbuf, 4*MAXPDSTRING);
 
     return 0;
 }
@@ -2418,11 +2436,14 @@ int sys_getblksize(void)
 /* Find library directory and set it. */
 void sys_findlibdir(const char* filename)
 {
-    char sbuf[MAXPDSTRING];
-
     (void) filename;
+
+    char* sbuf = getbytes(MAXPDSTRING);
 
     /* Make current working directory the system library directory. */
     rb_getcwd(sbuf, MAXPDSTRING);
     sys_libdir = gensym(sbuf);
+
+    /* Clean up. */
+    freebytes(sbuf, MAXPDSTRING);
 }

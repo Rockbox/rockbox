@@ -313,7 +313,6 @@ void dsp_tick(void)
     	t_int *ip;
     	for (ip = dsp_chain; *ip; ) ip = (*(t_perfroutine)(*ip))(ip);
     	dsp_phase++;
-printf("%d\n", dsp_phase);
     }
 }
 
