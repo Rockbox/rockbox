@@ -165,7 +165,10 @@ Still To do:
 
 #if LCD_HEIGHT <= 64
 #define CYCLETIME 100
-#define SCALE(x) ((x)==1 ? (x) : ((x) >> 1))
+static inline int SCALE(int x)
+{
+    return x == 1 ? x : x >> 1;
+}
 #define SIZE 2
 #else
 #define CYCLETIME 60
@@ -657,8 +660,6 @@ static void chopDrawScene(void)
 #elif LCD_DEPTH == 2
     rb->lcd_set_background(LCD_WHITE);
 #endif
-    rb->lcd_clear_display();
-
     chopDrawTheWorld();
     chopDrawPlayer(iPlayerPosX - iCameraPosX, iPlayerPosY);
 
@@ -801,6 +802,7 @@ static int chopGameLoop(void)
                 mParticles[i].iWorldY += mParticles[i].iSpeedY;
             }
 
+        rb->lcd_clear_display();
         /* Redraw the main window: */
         chopDrawScene();
 
