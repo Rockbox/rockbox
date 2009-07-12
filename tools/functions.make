@@ -28,17 +28,12 @@ preprocess2file = $(shell $(CC) $(PPCFLAGS) $(3) -E -P -x c -include config.h $(
 c2obj = $(addsuffix .o,$(basename $(subst $(ROOTDIR),$(BUILDDIR),$(1))))
 
 # calculate dependencies for a list of source files $(2) and output them
-# to a file $(1)
+# to a file $(1)_, to be later renamed to $(1).
 mkdepfile = $(shell \
 	$(CC) $(PPCFLAGS) $(OTHER_INC) -MG -MM -include config.h $(2) | \
-	$(TOOLSDIR)/addtargetdir.pl $(ROOTDIR) $(BUILDDIR) | \
-	sed -e "s: lang.h: $(BUILDDIR)/lang/lang_core.o:" \
-	-e "s: sysfont.h: $(BUILDDIR)/sysfont.h:" \
-	-e "s: max_language_size.h: $(BUILDDIR)/lang/max_language_size.h:" \
-	-e "s: bitmaps/: $(BUILDDIR)/bitmaps/:g" \
-	-e "s: pluginbitmaps/: $(BUILDDIR)/pluginbitmaps/:g" \
-	-e "s: lib/: $(APPSDIR)/plugins/lib/:g" \
-	-e "s: codeclib.h: $(APPSDIR)/codecs/lib/codeclib.h:g" \
+	sed -e "s: lang.h: lang/lang_core.o:" \
+	-e "s: max_language_size.h: lang/max_language_size.h:" | \
+	$(TOOLSDIR)/addtargetdir.pl $(ROOTDIR) $(BUILDDIR) \
 	>> $(1)_)
 
 # function to create .bmp dependencies

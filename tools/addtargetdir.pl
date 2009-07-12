@@ -14,30 +14,28 @@ use File::Basename;
 
 my $rbroot = $ARGV[0];
 my $builddir = $ARGV[1];
+undef $/;
 
-my $target2;
+my $target;
+my $rootlen = length $rbroot;
+my $src;
 
-for (<STDIN>) {
-    if (/^([^:]+): (\S+) (.*)/) {
-        my ($target, $src, $rest) = ($1, $2, $3);
-        my $dir = dirname $src;
-        $dir =~ s/^.*$rbroot//;
-        print "$builddir$dir/$target: $src $rest\n";
-    }
-    elsif (/^([^:]+):  \\/) {
-        # target and source on different lines
-        $target2 = $1;
-    }
-    elsif ($target2) {
-        if (/^\s+([^ ]+) (.*)/) {
-            my ($src, $rest) = ($1, $2);
+# Split the input file on any runs of '\' and whitespace.
+for (split(/[\s\\]+/m, <STDIN>)) {
+    /^(\/)?[^:]+(\:)?$/;
+# Save target and continue if this item ends in ':'
+    if (!($2 && ($target=$&))) {
+        $src = $&;
+# If $target is set, prefix it with the target path
+        if ($target) {
             my $dir = dirname $src;
-            $dir =~ s/^.*$rbroot//;
-            print "$builddir$dir/$target2: $src $rest\n";
-            $target2 = "";
+	    substr($dir, 0, $rootlen) = $builddir;
+            print "\n$dir/$target";
+            $target = "";
+# Otherwise, check for an incomplete path for the source file
+        } elsif (!$1) {
+            $src = "$builddir/$src";
         }
-    }
-    else {
-        print $_;
+        print " \\\n  $src";
     }
 }
