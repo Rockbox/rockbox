@@ -23,6 +23,8 @@
 #define REG16_PTR_T volatile uint16_t *
 #define REG32_PTR_T volatile uint32_t *
 
+#define TIMER_FREQ  50000000L
+
 /* 04. CALMADM2E */
 
 /* Following registers are mapped on IO Area in data memory area of Calm. */
