@@ -255,6 +255,9 @@ MOO
         push @out, "background color: $bgcolor\n";
     }
     if($statusbar) {
+        if($rwps && $has_remote ) {
+            push @out, "remote statusbar: $statusbar\n";
+        }
         push @out, "statusbar: $statusbar\n";
     }
     if(defined($backdrop)) {

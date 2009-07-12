@@ -61,7 +61,7 @@ Name: boxes.wps
 rwps: boxes.rwps
 Author: Christi Scarborough (after Magnus Westerlund)
 Font: 08-Schumacher-Clean.fnt
-Statusbar: on
+Statusbar: top
 # themes with colour screen versions need to set the colours too
 Foreground Color: 000000
 Background Color: B6C6E5
@@ -76,7 +76,7 @@ Name: engineeer2.wps
 RWPS: engineeer2.rwps
 Author: Magnus Westerlund
 Font: 08-Nedore.fnt
-Statusbar: on
+Statusbar: top
 backdrop:
 iconset:
 viewers iconset:
@@ -92,7 +92,7 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
-Statusbar: on
+Statusbar: top
 </wps>
 
 <wps>
@@ -100,7 +100,7 @@ Name: zezayer.wps
 RWPS: zezayer.rwps
 Author: Jake Owen
 Font: 08-Nedore.fnt
-Statusbar: on
+Statusbar: top
 backdrop:
 iconset:
 viewers iconset:
@@ -111,35 +111,35 @@ selector type: bar (inverse)
 Name: zezayer.rwps
 Author: Dominik Riebeling
 Font: 08-Nedore.fnt
-Statusbar: on
+Statusbar: top
 </rwps>
 
 <rwps>
 Name: rockbox_default.rwps
 Author: Rockbox team
 Font: 08-Schumacher-Clean.fnt
-Statusbar: on
+Statusbar: top
 </rwps>
 
 <rwps>
 Name: iAmp.rwps
 Author: Raymond Hoh
 Font: 12-Nimbus.fnt
-Statusbar: on
+Statusbar: top
 </rwps>
 
 <rwps>
 Name: boxes.rwps
 Author: Christi Scarborough
 Font: 08-Schumacher-Clean.fnt
-Statusbar: on
+Statusbar: top
 </rwps>
 
 <rwps>
 Name: engineeer2.rwps
 Author: Magnus Westerlund
 Font: 08-Nedore.fnt
-Statusbar: on
+Statusbar: top
 </rwps>
 
 <wps>
@@ -147,7 +147,7 @@ Name: marquee.wps
 RWPS: marquee.rwps
 Author: Mike Sobel
 Font: 13-Nimbus.fnt
-Statusbar: on
+Statusbar: top
 backdrop:
 iconset:
 viewers iconset:
@@ -158,7 +158,7 @@ selector type: bar (inverse)
 Name: marquee.rwps
 Author: Mike Sobel
 Font: 13-Nimbus.fnt
-Statusbar: on
+Statusbar: top
 </rwps>
 
 <wps>
@@ -166,7 +166,7 @@ Name: DancePuffDuo.wps
 RWPS: DancePuffDuo.rwps
 Author: Chris Oxtoby
 Font: 13-Nimbus.fnt
-Statusbar: on
+Statusbar: top
 Foreground Color: 000000
 Background Color: B6C6E5
 backdrop:
@@ -179,7 +179,7 @@ selector type: bar (inverse)
 Name: DancePuffDuo.rwps
 Author: Chris Oxtoby
 Font: 13-Nimbus.fnt
-Statusbar: on
+Statusbar: top
 </rwps>
 
 <wps>
@@ -201,7 +201,7 @@ Font.240x400x16: 19-Nimbus.fnt
 Font.320x240x16: 19-Nimbus.fnt
 Foreground Color: 000000
 Background Color: FFFFFF
-Statusbar: on
+Statusbar: top
 backdrop:
 iconset:
 viewers iconset:
@@ -213,7 +213,7 @@ Name: iCatcher.rwps
 Author: Ioannis Koutoulakis
 Font.160x128x2: 09-Nedore.fnt
 Font.220x176x16: 14-Nimbus.fnt
-Statusbar: on
+Statusbar: top
 </rwps>
 
 <wps>
@@ -223,7 +223,7 @@ Author: Ioannis Koutoulakis
 Font: 16-GNU-Unifont.fnt
 Foreground Color: 000000
 Background Color: FFFFFF
-Statusbar: on
+Statusbar: top
 backdrop:
 iconset:
 viewers iconset:
@@ -234,7 +234,7 @@ selector type: bar (inverse)
 Name: UniCatcher.rwps
 Author: Ioannis Koutoulakis
 Font: 16-GNU-Unifont.fnt
-Statusbar: on
+Statusbar: top
 </rwps>
 
 <wps>
@@ -256,7 +256,7 @@ Font.240x400x16: 19-Nimbus.fnt
 Font.320x240x16: 19-Nimbus.fnt
 Foreground Color: 000000
 Background Color: FFC000
-Statusbar: on
+Statusbar: top
 backdrop:
 iconset:
 viewers iconset:
@@ -351,12 +351,12 @@ viewers iconset.240x320x16: /.rockbox/icons/tango_small_viewers.bmp
 viewers iconset.240x400x16: /.rockbox/icons/tango_small_viewers.bmp 
 
 # Whether the WPS is designed to have the statusbar on or off
-Statusbar: on
+Statusbar: top
 </wps>
 
 <rwps>
 Name: cabbiev2.rwps
 Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
 Font: 12-Adobe-Helvetica.fnt
-Statusbar: on
+Statusbar: top
 </rwps>
