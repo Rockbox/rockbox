@@ -410,7 +410,7 @@
 #define MCAR1                   (*(REG32_PTR_T)(0x38800094))     /* Memory Current Address Register1 */
 #define MCAR2                   (*(REG32_PTR_T)(0x38800098))     /* Memory Current Address Register2 */
 
-/* 22. USB 1.1 HOST CONTROLER SPECIAL REGISTER */
+/* 22. USB 1.1 HOST CONTROLLER SPECIAL REGISTER */
 #define HcRevision              (*(REG32_PTR_T)(0x38600000))
 #define HcControl               (*(REG32_PTR_T)(0x38600004))
 #define HcCommandStatus         (*(REG32_PTR_T)(0x38600008))
@@ -440,25 +440,25 @@
 #define URSTCON                 (*(REG32_PTR_T)(0x3C400008))     /* USB Reset Control Register */
 #define UCLKCON                 (*(REG32_PTR_T)(0x3C400010))     /* USB Clock Control Register */
 
-/* 24. GPIO PORT CONTROLL */
+/* 24. GPIO PORT CONTROL */
 #define PCON0                   (*(REG32_PTR_T)(0x3CF00000))     /* Configures the pins of port 0 */
 #define PDAT0                   (*(REG32_PTR_T)(0x3CF00004))     /* The data register for port 0 */
-#define PCON1                   (*(REG32_PTR_T)(0x3CF00010))     /* Configures the pins of port 0 */
-#define PDAT1                   (*(REG32_PTR_T)(0x3CF00014))     /* The data register for port 0 */
-#define PCON2                   (*(REG32_PTR_T)(0x3CF00020))     /* Configures the pins of port 0 */
-#define PDAT2                   (*(REG32_PTR_T)(0x3CF00024))     /* The data register for port 0 */
-#define PCON3                   (*(REG32_PTR_T)(0x3CF00030))     /* Configures the pins of port 0 */
-#define PDAT3                   (*(REG32_PTR_T)(0x3CF00034))     /* The data register for port 0 */
-#define PCON4                   (*(REG32_PTR_T)(0x3CF00040))     /* Configures the pins of port 0 */
-#define PDAT4                   (*(REG32_PTR_T)(0x3CF00044))     /* The data register for port 0 */
-#define PCON5                   (*(REG32_PTR_T)(0x3CF00050))     /* Configures the pins of port 0 */
-#define PDAT5                   (*(REG32_PTR_T)(0x3CF00054))     /* The data register for port 0 */
-#define PCON6                   (*(REG32_PTR_T)(0x3CF00060))     /* Configures the pins of port 0 */
-#define PDAT6                   (*(REG32_PTR_T)(0x3CF00064))     /* The data register for port 0 */
-#define PCON7                   (*(REG32_PTR_T)(0x3CF00070))     /* Configures the pins of port 0 */
-#define PDAT7                   (*(REG32_PTR_T)(0x3CF00074))     /* The data register for port 0 */
-#define PCON10                  (*(REG32_PTR_T)(0x3CF000A0))     /* Configures the pins of port 0 */
-#define PDAT10                  (*(REG32_PTR_T)(0x3CF000A4))     /* The data register for port 0 */
+#define PCON1                   (*(REG32_PTR_T)(0x3CF00010))     /* Configures the pins of port 1 */
+#define PDAT1                   (*(REG32_PTR_T)(0x3CF00014))     /* The data register for port 1 */
+#define PCON2                   (*(REG32_PTR_T)(0x3CF00020))     /* Configures the pins of port 2 */
+#define PDAT2                   (*(REG32_PTR_T)(0x3CF00024))     /* The data register for port 2 */
+#define PCON3                   (*(REG32_PTR_T)(0x3CF00030))     /* Configures the pins of port 3 */
+#define PDAT3                   (*(REG32_PTR_T)(0x3CF00034))     /* The data register for port 3 */
+#define PCON4                   (*(REG32_PTR_T)(0x3CF00040))     /* Configures the pins of port 4 */
+#define PDAT4                   (*(REG32_PTR_T)(0x3CF00044))     /* The data register for port 4 */
+#define PCON5                   (*(REG32_PTR_T)(0x3CF00050))     /* Configures the pins of port 5 */
+#define PDAT5                   (*(REG32_PTR_T)(0x3CF00054))     /* The data register for port 5 */
+#define PCON6                   (*(REG32_PTR_T)(0x3CF00060))     /* Configures the pins of port 6 */
+#define PDAT6                   (*(REG32_PTR_T)(0x3CF00064))     /* The data register for port 6 */
+#define PCON7                   (*(REG32_PTR_T)(0x3CF00070))     /* Configures the pins of port 7 */
+#define PDAT7                   (*(REG32_PTR_T)(0x3CF00074))     /* The data register for port 7 */
+#define PCON10                  (*(REG32_PTR_T)(0x3CF000A0))     /* Configures the pins of port 10 */
+#define PDAT10                  (*(REG32_PTR_T)(0x3CF000A4))     /* The data register for port 10 */
 #define PCON_ASRAM              (*(REG32_PTR_T)(0x3CF000F0))     /* Configures the pins of port nor flash */
 #define PCON_SDRAM              (*(REG32_PTR_T)(0x3CF000F4))     /* Configures the pins of port sdram */
 #define PCON11                  (*(REG32_PTR_T)(0x3CF000F8))     /* Configures the pins of port 11 */

@@ -49,12 +49,19 @@ void nand_led(bool onoff)
 int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
-
+    (void)start;
+    (void)incount;
+    (void)inbuf;
+    return 0;
 }
 
 int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
+    (void)start;
+    (void)count;
+    (void)outbuf;
+    return 0;
 }
 
 void nand_spindown(int seconds)
@@ -82,8 +89,22 @@ int nand_soft_reset(void)
 
 void nand_enable(bool on)
 {
+    (void)on;
+}
+
+void nand_get_info(IF_MV2(int drive,) struct storage_info *info)
+{
+    (void)info;
+}
+
+long nand_last_disk_activity(void)
+{
+    return 0;
 }
 
 int nand_init(void)
 {
+    initialized = true;
+    return 0;
 }
+

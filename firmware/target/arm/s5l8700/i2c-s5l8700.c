@@ -33,8 +33,9 @@
     * data, pointer to data to be transfered
     A return value < 0 indicates an error.
     
-    Known issues:
-    * uses polled mode (not interrupt driven), just like the OF
+    Note:
+    * blocks the calling thread for the entire duraton of the i2c transfer but
+      uses wakeup_wait/wakeup_signal to allow other threads to run.
     * ACK from slave is not checked, so functions never return an error
 */
 

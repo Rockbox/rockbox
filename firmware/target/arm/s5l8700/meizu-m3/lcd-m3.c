@@ -72,7 +72,7 @@ static void lcd_sleep(uint32_t t)
     for(i=0;i<t;++i);
 }
 
-static uint8_t lcd_readdata()
+static uint8_t lcd_readdata(void)
 {
     LCD_RDATA = 0;
     lcd_sleep(64);
@@ -87,7 +87,7 @@ static void lcd_writereg(uint32_t reg, uint32_t data)
     LCD_WDATA = data & 0xff;
 }
 
-void lcd_on() {
+void lcd_on(void) {
     if (lcd_type == 1) {
         LCD_WCMD = 0x29;    
     } else {
@@ -101,7 +101,7 @@ void lcd_on() {
     }
 }
 
-void lcd_off() {
+void lcd_off(void) {
     /* FIXME wait for DMA to finnish */
     if (lcd_type == 1) {
         LCD_WCMD = 0x28;
@@ -303,3 +303,11 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     lcd_update();
 }
+
+void lcd_blit_yuv(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    /* stub */
+}
+
