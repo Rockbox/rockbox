@@ -18,10 +18,16 @@ static void init_rsqrt(void)
     int i;
     for (i = 0; i < DUMTAB1SIZE; i++)
     {
+#ifdef ROCKBOX
+        union f2i f2i;
+        f2i.i = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
+        rsqrt_exptab[i] = 1./sqrt(f2i.f);
+#else /* ROCKBOX */
 	float f;
 	long l = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
 	*(long *)(&f) = l;
 	rsqrt_exptab[i] = 1./sqrt(f);	
+#endif /* ROCKBOX */
     }
     for (i = 0; i < DUMTAB2SIZE; i++)
     {

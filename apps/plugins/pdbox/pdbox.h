@@ -83,6 +83,11 @@ typedef struct
 }
 div_t;
 div_t div(int x, int y);
+union f2i
+{
+    float f;
+    int32_t i;
+};
 void sys_findlibdir(const char* filename);
 int sys_startgui(const char *guidir);
 

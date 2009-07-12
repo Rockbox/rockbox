@@ -18,10 +18,16 @@ static void init_rsqrt(void)
     int i;
     for (i = 0; i < DUMTAB1SIZE; i++)
     {
+#ifdef ROCKBOX
+        union f2i f2i;
+        f2i.i = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
+        rsqrt_exptab[i] = 1./sqrt(f2i.f);
+#else /* ROCKBOX */
 	float f;
 	long l = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
 	*(long *)(&f) = l;
 	rsqrt_exptab[i] = 1./sqrt(f);	
+#endif /* ROCKBOX */
     }
     for (i = 0; i < DUMTAB2SIZE; i++)
     {
@@ -34,18 +40,42 @@ static void init_rsqrt(void)
 
 float q8_rsqrt(float f)
 {
+#ifdef ROCKBOX
+    union f2i f2i;
+    if(f < 0.0)
+        return 0.0;
+    else
+    {
+        f2i.f = f;
+        return (rsqrt_exptab[(f2i.i >> 23) & 0xff] *
+	    rsqrt_mantissatab[(f2i.i >> 13) & 0x3ff]);
+    }
+#else /* ROCKBOX */
     long l = *(long *)(&f);
     if (f < 0) return (0);
     else return (rsqrt_exptab[(l >> 23) & 0xff] *
 	    rsqrt_mantissatab[(l >> 13) & 0x3ff]);
+#endif /* ROCKBOX */
 }
 
 float q8_sqrt(float f)
 {
+#ifdef ROCKBOX
+    union f2i f2i;
+    if(f < 0.0)
+        return 0.0;
+    else
+    {
+        f2i.f = f;
+        return (f * rsqrt_exptab[(f2i.i >> 23) & 0xff] *
+	    rsqrt_mantissatab[(f2i.i >> 13) & 0x3ff]);
+    }
+#else /* ROCKBOX */
     long l = *(long *)(&f);
     if (f < 0) return (0);
     else return (f * rsqrt_exptab[(l >> 23) & 0xff] *
 	    rsqrt_mantissatab[(l >> 13) & 0x3ff]);
+#endif /* ROCKBOX */
 }
 
     /* the old names are OK unless we're in IRIX N32 */

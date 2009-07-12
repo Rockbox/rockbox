@@ -885,8 +885,14 @@ static void soundfile_xferout(int nchannels, t_sample **vecs,
 	    	for (j = 0, sp2 = sp, fp=vecs[i] + onset;
 		    j < nitems; j++, sp2 += bytesperframe, fp++)
 		{
+#ifdef ROCKBOX
+                    union f2i f2i;
+                    f2i.f = *fp * normalfactor;
+                    xx = f2i.i;
+#else /* ROCKBOX */
 		    float f2 = *fp * normalfactor;
 		    xx = *(long *)&f2;
+#endif /* ROCKBOX */
 		    sp2[0] = (xx >> 24); sp2[1] = (xx >> 16);
 		    sp2[2] = (xx >> 8); sp2[3] = xx;
 	    	}
@@ -896,8 +902,14 @@ static void soundfile_xferout(int nchannels, t_sample **vecs,
 	    	for (j = 0, sp2 = sp, fp=vecs[i] + onset;
 		    j < nitems; j++, sp2 += bytesperframe, fp++)
 		{
+#ifdef ROCKBOX
+                    union f2i f2i;
+                    f2i.f = *fp * normalfactor;
+                    xx = f2i.i;
+#else /* ROCKBOX */
 		    float f2 = *fp * normalfactor;
 		    xx = *(long *)&f2;
+#endif /* ROCKBOX */
 		    sp2[3] = (xx >> 24); sp2[2] = (xx >> 16);
 		    sp2[1] = (xx >> 8); sp2[0] = xx;
 	    	}
