@@ -120,7 +120,11 @@ your WPS (While Playing Screen).
       \opt{PLAYER_PAD}{%
         \ButtonMenu+\ButtonPlay & Mute on/off.\\%
       }%
-      \opt{pitchscreen}{%
+      % We explicitly list all the appropriate targets here and do no condition
+      % on the 'pitchscreen' feature since some players have the feature but do
+      % not have the button to go from the WPS to the pitch screen.
+      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
+	           ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
         \ActionWpsPitchScreen
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsPitchScreen}
          & Show \setting{Pitch Screen} (see \reference{sec:pitchscreen}).\\%
