@@ -302,6 +302,8 @@ Lyre prototype 1*/
 #include "config-ipod3g.h"
 #elif defined(IPOD_4G)
 #include "config-ipod4g.h"
+#elif defined(IPOD_NANO2G)
+#include "config-ipodnano2g.h"
 #elif defined(IRIVER_IFP7XX)
 #include "config-ifp7xx.h"
 #elif defined(GIGABEAT_F)

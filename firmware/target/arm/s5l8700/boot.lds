@@ -1,7 +1,11 @@
 #include "config.h"
 
 ENTRY(_start)
+#ifdef ROCKBOX_LITTLE_ENDIAN
+OUTPUT_FORMAT(elf32-littlearm)
+#else
 OUTPUT_FORMAT(elf32-bigarm)
+#endif
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/s5l8700/crt0.o)
 
@@ -28,7 +32,12 @@ MEMORY
     IRAM  : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
     FLASH : ORIGIN = FLASHORIG, LENGTH = FLASHSIZE
 }
-	
+
+#ifdef IPOD_NANO2G
+#define LOAD_AREA IRAM
+#else
+#define LOAD_AREA FLASH
+#endif
 
 SECTIONS
 {
@@ -36,19 +45,19 @@ SECTIONS
     _intvectstart = . ;
     *(.intvect)
     _intvectend = _newstart ;  
-  } >IRAM AT> FLASH
+  } >IRAM AT> LOAD_AREA
   _intvectcopy = LOADADDR(.intvect) ;
 
   .text : {
     *(.init.text)
     *(.text*)
     *(.glue_7*)
-  } > FLASH
+  } > LOAD_AREA
 
   .rodata : {
     *(.rodata*)
     . = ALIGN(0x4);
-  } > FLASH
+  } > LOAD_AREA
 
   .data : {
     _datastart = . ;
@@ -59,7 +68,7 @@ SECTIONS
     *(.ncdata*);
     . = ALIGN(0x4);
     _dataend = . ;
-   } > IRAM AT> FLASH
+   } > IRAM AT> LOAD_AREA
    _datacopy = LOADADDR(.data) ;
 
   .stack :

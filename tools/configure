@@ -275,6 +275,14 @@ arm940tbecc () {
  gccchoice="4.0.3"
 }
 
+arm940tcc () {
+ prefixtools arm-elf-
+ GCCOPTS="$CCOPTS -mcpu=arm940t -mlong-calls"
+ GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="little"
+ gccchoice="4.0.3"
+}
+
 arm946cc () {
  prefixtools arm-elf-
  GCCOPTS="$CCOPTS -mcpu=arm9e -mlong-calls"
@@ -769,27 +777,27 @@ cat <<EOF
   5) Ondio FM             15) H10 5/6Gb          25) Mini 1G
   6) AV300                                       26) Mini 2G
                           ==Toshiba==            27) 1G, 2G
- ==Cowon/iAudio==         40) Gigabeat F
- 30) X5/X5V/X5L           41) Gigabeat S         ==SanDisk==
- 31) M5/M5L                                      50) Sansa e200
- 32) 7                    ==Olympus=             51) Sansa e200R
- 33) D2                   70) M:Robe 500         52) Sansa c200
- 34) M3/M3L               71) M:Robe 100         53) Sansa m200
-                                                 54) Sansa c100
- ==Creative==             ==Philips==            55) Sansa Clip
- 90) Zen Vision:M 30GB    100) GoGear SA9200     56) Sansa e200v2
- 91) Zen Vision:M 60GB    101) GoGear HDD1630/   57) Sansa m200v4
- 92) Zen Vision                HDD1830           58) Sansa Fuze
-                                                 59) Sansa c200v2
- ==Onda==                 ==Meizu==              60) Sansa Clipv2
- 120) VX747               110) M6SL
- 121) VX767               111) M6SP              ==Logik==
- 122) VX747+              112) M3                80) DAX 1GB MP3/DAB
- 123) VX777
+ ==Cowon/iAudio==         40) Gigabeat F         28) Nano 2G
+ 30) X5/X5V/X5L           41) Gigabeat S
+ 31) M5/M5L                                      ==SanDisk==
+ 32) 7                    ==Olympus=             50) Sansa e200
+ 33) D2                   70) M:Robe 500         51) Sansa e200R
+ 34) M3/M3L               71) M:Robe 100         52) Sansa c200
+                                                 53) Sansa m200
+ ==Creative==             ==Philips==            54) Sansa c100
+ 90) Zen Vision:M 30GB    100) GoGear SA9200     55) Sansa Clip
+ 91) Zen Vision:M 60GB    101) GoGear HDD1630/   56) Sansa e200v2
+ 92) Zen Vision                HDD1830           57) Sansa m200v4
+                                                 58) Sansa Fuze
+ ==Onda==                 ==Meizu==              59) Sansa c200v2
+ 120) VX747               110) M6SL              60) Sansa Clipv2
+ 121) VX767               111) M6SP
+ 122) VX747+              112) M3                ==Logik==
+ 123) VX777                                      80) DAX 1GB MP3/DAB
 
- ==Samsung==              ==Tatung==             ==Lyre project==
- 140) YH-820              150) Elio TPJ-1022     130) Lyre proto 1
- 141) YH-920
+ ==Samsung==              ==Tatung==
+ 140) YH-820              150) Elio TPJ-1022     ==Lyre project==
+ 141) YH-920                                     130) Lyre proto 1
  142) YH-925
 EOF
 
@@ -1327,6 +1335,30 @@ fi
     t_cpu="arm"
     t_manufacturer="ipod"
     t_model="1g2g"
+    ;;
+
+   28|ipodnano2g)
+    target_id=62
+    modelname="ipodnano2g"
+    target="-DIPOD_NANO2G"
+    memory=32 # always
+    arm940tcc
+    tool="$rootdir/tools/scramble -add=nn2g"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
+    output="rockbox.ipod"
+    appextra="recorder:gui"
+    plugins="yes"
+    swcodec="yes"
+    boottool="cp"
+    bootoutput="bootloader-$modelname.bin"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$ipodbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="s5l8700"
+    t_model="ipodnano2g"
     ;;
 
    30|x5)
