@@ -29,6 +29,7 @@
 #include "cpu.h"
 #include "pl180.h"
 #include "ascodec-target.h"
+#include "adc.h"
 
 #define _DEBUG_PRINTF(a,varargs...) do { \
         snprintf(buf, sizeof(buf), (a), ##varargs); lcd_puts(0,line++,buf); \
@@ -281,10 +282,8 @@ bool __dbg_hw_info(void)
         _DEBUG_PRINTF("SD  :%3dkHz    %3dkHz", AS3525_SD_IDENT_FREQ/1000,calc_freq(CLK_SD_IDENT_NAND)/1000);
         _DEBUG_PRINTF("MSD :%3dkHz    %3dkHz", AS3525_SD_IDENT_FREQ/1000,calc_freq(CLK_SD_IDENT_MSD)/1000);
         _DEBUG_PRINTF("USB:           %3dMHz", calc_freq(CLK_USB)/1000000);
-        ascodec_write(AS3514_ADC_0, 4<<4);            /* ADC Source = CVDD */
         _DEBUG_PRINTF("MMU:   %s CVDDP:%4d", (read_cp15() & CP15_MMU) ? " op" : "nop",
-                                             ((ascodec_read(AS3514_ADC_1) |
-                                             ((ascodec_read(AS3514_ADC_0) & 3)<<8)) * 25));
+                                              adc_read(ADC_CVDD) * 25);
         _DEBUG_PRINTF("Icache:%s Dcache:%s",(read_cp15() & CP15_IC)  ? " op" : "nop",
                                             (read_cp15() & CP15_DC)  ? " op" : "nop");
 
