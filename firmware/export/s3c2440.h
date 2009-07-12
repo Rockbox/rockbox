@@ -46,33 +46,7 @@
 
 /* USB Host Controller */
 
-/* Control and status group */
-#define HcRevision (*(volatile unsigned long *)0x49000000)
-#define HcControl (*(volatile unsigned long *)0x49000004)
-#define HcCommonStatus (*(volatile unsigned long *)0x49000008)
-#define HcInterruptStatus (*(volatile unsigned long *)0x4900000C)
-#define HcInterruptEnable (*(volatile unsigned long *)0x49000010)
-#define HcInterruptDisable (*(volatile unsigned long *)0x49000014)
-/* Memory pointer group */
-#define HcHCCA (*(volatile unsigned long *)0x49000018)
-#define HcPeriodCuttentED (*(volatile unsigned long *)0x4900001C)
-#define HcControlHeadED (*(volatile unsigned long *)0x49000020)
-#define HcControlCurrentED (*(volatile unsigned long *)0x49000024)
-#define HcBulkHeadED (*(volatile unsigned long *)0x49000028)
-#define HcBulkCurrentED (*(volatile unsigned long *)0x4900002C)
-/* Frame counter group */
-#define HcDoneHead (*(volatile unsigned long *)0x49000030)
-#define HcRmInterval (*(volatile unsigned long *)0x49000034)
-#define HcFmRemaining (*(volatile unsigned long *)0x49000038)
-#define HcFmNumber (*(volatile unsigned long *)0x4900003C)
-#define HcPeriodicStart (*(volatile unsigned long *)0x49000040)
-#define HcLSThreshold (*(volatile unsigned long *)0x49000044)
-/* Root hub group */
-#define HcRhDescriptorA (*(volatile unsigned long *)0x49000048)
-#define HcRhDescriptorB (*(volatile unsigned long *)0x4900004C)
-#define HcRhStatus (*(volatile unsigned long *)0x49000050)
-#define HcRhPortStatus1 (*(volatile unsigned long *)0x49000054)
-#define HcRhPortStatus2 (*(volatile unsigned long *)0x49000058)
+#define OHCI_BASE 0x49000000
 
 /* Interrupt Controller */
 
