@@ -31,7 +31,8 @@
 #include "metadata_parsers.h"
 #include "logf.h"
 
-#define DEBUG_RM
+/* Uncomment the following line for debugging */
+//#define DEBUG_RM
 #ifndef DEBUG_RM
 #undef DEBUGF
 #define DEBUGF(...)
