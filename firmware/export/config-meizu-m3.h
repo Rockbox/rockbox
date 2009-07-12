@@ -116,8 +116,8 @@
 #define BATTERY_CAPACITY_INC    50    /* capacity increment */
 #define BATTERY_TYPES_COUNT     1     /* only one type */
 
-/* Hardware controlled charging? FIXME */
-#define CONFIG_CHARGING CHARGING_SIMPLE
+/* Hardware controlled charging, software can monitor plug and charge state */
+#define CONFIG_CHARGING CHARGING_MONITOR
 
 #ifndef SIMULATOR
 
