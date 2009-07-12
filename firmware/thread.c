@@ -696,7 +696,7 @@ static void __attribute__((naked))
      * Stack access also isn't permitted until restoring the original stack and
      * context. */
     asm volatile (
-        "stmfd  sp!, { r4-r12, lr }      \n" /* Stack all non-volatile context on current core */
+        "stmfd  sp!, { r4-r11, lr }      \n" /* Stack all non-volatile context on current core */
         "ldr    r2, =idle_stacks         \n" /* r2 = &idle_stacks[core][IDLE_STACK_WORDS] */
         "ldr    r2, [r2, r0, lsl #2]     \n"
         "add    r2, r2, %0*4             \n"
@@ -712,7 +712,7 @@ static void __attribute__((naked))
         "ldr    r0, =cpucache_invalidate \n" /* Invalidate new core's cache */
         "mov    lr, pc                   \n"
         "bx     r0                       \n"
-        "ldmfd  sp!, { r4-r12, pc }      \n" /* Restore non-volatile context to new core and return */
+        "ldmfd  sp!, { r4-r11, pc }      \n" /* Restore non-volatile context to new core and return */
         ".ltorg                          \n" /* Dump constant pool */
         : : "i"(IDLE_STACK_WORDS)
     );

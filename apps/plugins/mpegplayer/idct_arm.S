@@ -387,7 +387,7 @@ mpeg2_idct_add:
     blo    2b
     ldmfd  sp!, { r4-r11, pc }
 3:
-    stmfd  sp!, { r4-r6, lr }
+    stmfd  sp!, { r4-r5, lr }
     ldrsh  r1, [r0, #0]           /* r1 = block[0] */
     mov    r4, #0
     strh   r4, [r0, #0]           /* block[0] = 0 */
@@ -397,7 +397,7 @@ mpeg2_idct_add:
 4:
     ldrb   r4, [r2, #0]
     ldrb   r5, [r2, #1]
-    ldrb   r6, [r2, #2]
+    ldrb   r12, [r2, #2]
     ldrb   lr, [r2, #3]
     add    r4, r4, r1, asr #7
     cmp    r4, #255
@@ -407,17 +407,17 @@ mpeg2_idct_add:
     cmp    r5, #255
     mvnhi  r5, r5, asr #31
     strb   r5, [r2, #1]
-    add    r6, r6, r1, asr #7
-    cmp    r6, #255
-    mvnhi  r6, r6, asr #31
-    strb   r6, [r2, #2]
+    add    r12, r12, r1, asr #7
+    cmp    r12, #255
+    mvnhi  r12, r12, asr #31
+    strb   r12, [r2, #2]
     add    lr, lr, r1, asr #7
     cmp    lr, #255
     mvnhi  lr, lr, asr #31
     strb   lr, [r2, #3]
     ldrb   r4, [r2, #4]
     ldrb   r5, [r2, #5]
-    ldrb   r6, [r2, #6]
+    ldrb   r12, [r2, #6]
     ldrb   lr, [r2, #7]
     add    r4, r4, r1, asr #7
     cmp    r4, #255
@@ -427,10 +427,10 @@ mpeg2_idct_add:
     cmp    r5, #255
     mvnhi  r5, r5, asr #31
     strb   r5, [r2, #5]
-    add    r6, r6, r1, asr #7
-    cmp    r6, #255
-    mvnhi  r6, r6, asr #31
-    strb   r6, [r2, #6]
+    add    r12, r12, r1, asr #7
+    cmp    r12, #255
+    mvnhi  r12, r12, asr #31
+    strb   r12, [r2, #6]
     add    lr, lr, r1, asr #7
     cmp    lr, #255
     mvnhi  lr, lr, asr #31
@@ -438,4 +438,4 @@ mpeg2_idct_add:
     add    r2, r2, r3
     cmp    r2, r0
     blo    4b
-    ldmfd  sp!, { r4-r6, pc }
+    ldmfd  sp!, { r4-r5, pc }

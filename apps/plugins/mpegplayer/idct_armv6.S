@@ -290,7 +290,7 @@ mpeg2_idct_add:
     ldmfd  sp!, {r4-r11, pc}
 
 3:
-    stmfd  sp!, {r4-r6, lr}
+    stmfd  sp!, {r4-r5, lr}
     ldrsh  r1, [r0, #0]           /* r1 = block[0] */
     mov    r4, #0
     strh   r4, [r0, #0]           /* block[0] = 0 */
@@ -300,7 +300,7 @@ mpeg2_idct_add:
 4:
     ldrb   r4, [r2, #0]
     ldrb   r5, [r2, #1]
-    ldrb   r6, [r2, #2]
+    ldrb   r12, [r2, #2]
     ldrb   lr, [r2, #3]
     add    r4, r4, r1, asr #7
     usat   r4, #8, r4
@@ -308,15 +308,15 @@ mpeg2_idct_add:
     add    r5, r5, r1, asr #7
     usat   r5, #8, r5
     strb   r5, [r2, #1]
-    add    r6, r6, r1, asr #7
-    usat   r6, #8, r6
-    strb   r6, [r2, #2]
+    add    r12, r12, r1, asr #7
+    usat   r12, #8, r12
+    strb   r12, [r2, #2]
     add    lr, lr, r1, asr #7
     usat   lr, #8, lr
     strb   lr, [r2, #3]
     ldrb   r4, [r2, #4]
     ldrb   r5, [r2, #5]
-    ldrb   r6, [r2, #6]
+    ldrb   r12, [r2, #6]
     ldrb   lr, [r2, #7]
     add    r4, r4, r1, asr #7
     usat   r4, #8, r4
@@ -324,13 +324,13 @@ mpeg2_idct_add:
     add    r5, r5, r1, asr #7
     usat   r5, #8, r5
     strb   r5, [r2, #5]
-    add    r6, r6, r1, asr #7
-    usat   r6, #8, r6
-    strb   r6, [r2, #6]
+    add    r12, r12, r1, asr #7
+    usat   r12, #8, r12
+    strb   r12, [r2, #6]
     add    lr, lr, r1, asr #7
     usat   lr, #8, lr
     strb   lr, [r2, #7]
     add    r2, r2, r3
     cmp    r2, r0
     blo    4b
-    ldmfd  sp!, {r4-r6, pc}
+    ldmfd  sp!, {r4-r5, pc}
