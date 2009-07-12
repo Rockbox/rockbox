@@ -41,12 +41,12 @@ static void init_rm(RMContext *rmctx)
 enum codec_status codec_main(void)
 { 
     static size_t buff_size;
-    int datasize, res, consumed,i;
+    int datasize, res, consumed, i, j, time_offset;
     uint8_t *bit_buffer;
     int16_t outbuf[2048] __attribute__((aligned(32)));
     uint16_t fs,sps,h;
     uint32_t packet_count;
-    int scrambling_unit_size;
+    int scrambling_unit_size, flag_seek_block = 0;
 
 next_track:
     if (codec_init()) {
@@ -95,26 +95,58 @@ seek_start :
             DEBUGF("rm_get_packet failed\n");
             return CODEC_ERROR;
         }
-        /*DEBUGF("    version = %d\n"
-                 "    length  = %d\n"
-                 "    stream  = %d\n"
-                 "    timestamp= %d\n",pkt.version,pkt.length,pkt.stream_number,pkt.timestamp);*/
-
+       
         for(i = 0; i < rmctx.audio_pkt_cnt*(fs/sps) ; i++)
         { 
             ci->yield();
             if (ci->stop_codec || ci->new_track)
                 goto done;
-             if (ci->seek_time == 1) {
+
+             if (ci->seek_time) {
                 ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE);
-                ci->set_elapsed(0);
                 packet_count = rmctx.nb_packets;
                 rmctx.audio_pkt_cnt = 0;
                 rmctx.frame_number = 0;
-                ci->seek_complete();
-                goto seek_start;           
-             }
+                if (ci->seek_time == 1) {
+                    ci->set_elapsed(0);
+                    ci->seek_complete();
+                    goto seek_start;           
+                }                                
+                j = 0;
+                while(1) {
+                    rmctx.audio_pkt_cnt = 0;
+                    bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, scrambling_unit_size);                    
+                    consumed = rm_get_packet(&bit_buffer, &rmctx, &pkt);
+                    if(consumed < 0) {
+                        DEBUGF("rm_get_packet failed\n");
+                        return CODEC_ERROR;
+                    }     
+                    if(rmctx.audiotimestamp < (unsigned) ci->seek_time) {
+                        ci->advance_buffer(consumed); 
+                        packet_count -= rmctx.audio_pkt_cnt;   
+                        rmctx.frame_number += h*(fs/sps); 
+                        j+= consumed;                          
+                    }                 
+                    if(rmctx.audiotimestamp > (unsigned) ci->seek_time) {
+                        flag_seek_block = 1;
+                        rmctx.audio_pkt_cnt = 0;
+                        break;
+                    }                                                          
+                }
 
+                if(flag_seek_block) {   
+                    ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE + j - consumed);
+                    bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, scrambling_unit_size);                                      
+                    consumed = rm_get_packet(&bit_buffer, &rmctx, &pkt);
+                    packet_count += rmctx.audio_pkt_cnt;
+                    rmctx.frame_number -= h*(fs/sps);
+                    time_offset = ci->seek_time - rmctx.audiotimestamp;
+                    i = (time_offset/((sps * 8 * 1000)/rmctx.bit_rate));
+                    flag_seek_block = 0;
+                    ci->set_elapsed(rmctx.audiotimestamp+(1000*8*sps/rmctx.bit_rate)*i);
+                    ci->seek_complete();                    
+                }
+             }    
             res = cook_decode_frame(&rmctx,&q, outbuf, &datasize, pkt.frames[i], rmctx.block_align);
             rmctx.frame_number++;
 
@@ -127,7 +159,7 @@ seek_start :
             }
 
             ci->pcmbuf_insert(outbuf, NULL, rmctx.samples_pf_pc / rmctx.nb_channels);
-            ci->set_elapsed(rmctx.audiotimestamp+(1000*8*sps/rmctx.bit_rate)*i);       
+            ci->set_elapsed(rmctx.audiotimestamp+(1000*8*sps/rmctx.bit_rate)*i);  
         }
         packet_count -= rmctx.audio_pkt_cnt;
         rmctx.audio_pkt_cnt = 0;
