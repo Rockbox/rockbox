@@ -41,7 +41,7 @@ mpc_decoder_windowing_D:
     /* r2 = D[] */
     /* lr = counter */
     
-    stmfd   sp!, {r4-r12, lr}
+    stmfd   sp!, {r4-r11, lr}
     
     mov lr, #32
 .loop32:
@@ -86,7 +86,7 @@ mpc_decoder_windowing_D:
     subs lr, lr, #1
     bgt .loop32
     
-    ldmfd   sp!, {r4-r12, pc}
+    ldmfd   sp!, {r4-r11, pc}
 .mpc_dewindowing_end:
     .size   mpc_decoder_windowing_D,.mpc_dewindowing_end-mpc_decoder_windowing_D
 #else
@@ -110,55 +110,55 @@ mpc_decoder_windowing_D:
     /************************************************************************
      * Reference implementation.
      ***********************************************************************/
-    stmfd   sp!, {r4-r9, lr}
+    stmfd   sp!, {r4-r8, lr}
     
     mov lr, #32
 .loop32:
     ldmia r2!, { r3-r6 }    /* load D[00..03] */
     ldr r7, [r1]            /*  0 */
-    smull r8, r9, r7, r3
+    smull r8, r12, r7, r3
     ldr r7, [r1, #96*4]     /*  1 */
-    smlal r8, r9, r7, r4
+    smlal r8, r12, r7, r4
     ldr r7, [r1, #128*4]    /*  2 */
-    smlal r8, r9, r7, r5
+    smlal r8, r12, r7, r5
     ldr r7, [r1, #224*4]    /*  3 */
-    smlal r8, r9, r7, r6
+    smlal r8, r12, r7, r6
     ldmia r2!, { r3-r6 }    /* load D[04..07] */
     ldr r7, [r1, #256*4]    /*  4 */
-    smlal r8, r9, r7, r3
+    smlal r8, r12, r7, r3
     ldr r7, [r1, #352*4]    /*  5 */
-    smlal r8, r9, r7, r4
+    smlal r8, r12, r7, r4
     ldr r7, [r1, #384*4]    /*  6 */
-    smlal r8, r9, r7, r5
+    smlal r8, r12, r7, r5
     ldr r7, [r1, #480*4]    /*  7 */
-    smlal r8, r9, r7, r6
+    smlal r8, r12, r7, r6
     ldmia r2!, { r3-r6 }    /* load D[08..11] */
     ldr r7, [r1, #512*4]    /*  8 */
-    smlal r8, r9, r7, r3
+    smlal r8, r12, r7, r3
     ldr r7, [r1, #608*4]    /*  9 */
-    smlal r8, r9, r7, r4
+    smlal r8, r12, r7, r4
     ldr r7, [r1, #640*4]    /* 10 */
-    smlal r8, r9, r7, r5
+    smlal r8, r12, r7, r5
     ldr r7, [r1, #736*4]    /* 11 */
-    smlal r8, r9, r7, r6
+    smlal r8, r12, r7, r6
     ldmia r2!, { r3-r6 }    /* load D[12..15] */
     ldr r7, [r1, #768*4]    /* 12 */
-    smlal r8, r9, r7, r3
+    smlal r8, r12, r7, r3
     ldr r7, [r1, #864*4]    /* 13 */
-    smlal r8, r9, r7, r4
+    smlal r8, r12, r7, r4
     ldr r7, [r1, #896*4]    /* 14 */
-    smlal r8, r9, r7, r5
+    smlal r8, r12, r7, r5
     ldr r7, [r1, #992*4]    /* 15 */
-    smlal r8, r9, r7, r6
+    smlal r8, r12, r7, r6
     mov r8, r8, lsr #16
-    orr r8, r8, r9, lsl #16 /* (lo>>16) || (hi<<16) */
+    orr r8, r8, r12, lsl #16 /* (lo>>16) || (hi<<16) */
     str r8, [r0], #4        /* store Data */
     add r1, r1, #4          /* V++ */
     
     subs lr, lr, #1
     bgt .loop32
     
-    ldmfd   sp!, {r4-r9, pc}
+    ldmfd   sp!, {r4-r8, pc}
 #else
 mpc_decoder_windowing_D:
     /* r0 = Data[] */
@@ -174,7 +174,7 @@ mpc_decoder_windowing_D:
      * The row V[16] can be extracted as it has symmetries within this single
      * row. 8 smull/mlal and 8 ldr's can be saved.
      ***********************************************************************/
-    stmfd   sp!, {r4-r12, lr}
+    stmfd   sp!, {r4-r11, lr}
     
     /******************************************
      * row 0 with internal symmetry
@@ -356,7 +356,7 @@ mpc_decoder_windowing_D:
     str r8, [r0], #4            /* store Data */
     add r1, r1, #4              /* V++ */
     
-    ldmfd   sp!, {r4-r12, pc}
+    ldmfd   sp!, {r4-r11, pc}
 #endif
 .mpc_dewindowing_end:
     .size   mpc_decoder_windowing_D,.mpc_dewindowing_end-mpc_decoder_windowing_D

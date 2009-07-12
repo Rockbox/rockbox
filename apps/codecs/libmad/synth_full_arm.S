@@ -32,8 +32,8 @@
     ;; r3 = D0ptr
     ;; r4 = D1ptr
 synth_full1:
-    stmdb   sp!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, lr}
-    ldr     r4, [sp, #40]
+    stmdb   sp!, {r4-r11, lr}
+    ldr     r4, [sp, #36]
     ldr     r5, =synth_full_sp
     str     sp, [r5]
     mov     r5, #15
@@ -135,11 +135,11 @@ synth_full1:
 
     ldr     r5, =synth_full_sp
     ldr     sp, [r5]
-    ldmia   sp!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, pc}
+    ldmia   sp!, {r4-r11, pc}
 
 synth_full2:
-    stmdb   sp!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, lr}
-    ldr     r4, [sp, #40]
+    stmdb   sp!, {r4-r11, lr}
+    ldr     r4, [sp, #36]
     ldr     r5, =synth_full_sp
     str     sp, [r5]
     mov     r5, #15
@@ -241,12 +241,12 @@ synth_full2:
 
     ldr     r5, =synth_full_sp
     ldr     sp, [r5]
-    ldmia   sp!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, pc}
+    ldmia   sp!, {r4-r11, pc}
 
     .global III_aliasreduce
 
 III_aliasreduce:
-    stmdb   sp!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, lr}
+    stmdb   sp!, {r4-r11, lr}
     add     r1, r0, r1, lsl #2
     add     r0, r0, #72
 .arl1:
@@ -289,7 +289,7 @@ III_aliasreduce:
     add     r0, r0, #72
     cmp     r0, r1
     blo     .arl1
-    ldmia   sp!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, pc}
+    ldmia   sp!, {r4-r11, pc}
 
 csa:
     .word +0x0db84a81
@@ -311,14 +311,14 @@ csa:
 
     .global III_overlap
 III_overlap:
-    stmdb   sp!, {r4, r5, r6, r7, r8, lr}
+    stmdb   sp!, {r4-r7, lr}
     add     r2, r2, r3, lsl #2
     mov     r3, #6
 .ol:
     ldmia r0!, {r4, r5, r6}
-    ldmia r1!, {r7, r8, lr}
+    ldmia r1!, {r7, r12, lr}
     add   r4, r4, r7
-    add   r5, r5, r8
+    add   r5, r5, r12
     add   r6, r6, lr
     str   r4, [r2], #128
     str   r5, [r2], #128
@@ -326,13 +326,13 @@ III_overlap:
     subs  r3, r3, #1
     bne   .ol
     sub   r1, r1, #72
-    ldmia r0!, {r4, r5, r6, r7, r8, lr}
-    stmia r1!, {r4, r5, r6, r7, r8, lr}
-    ldmia r0!, {r4, r5, r6, r7, r8, lr}
-    stmia r1!, {r4, r5, r6, r7, r8, lr}
-    ldmia r0!, {r4, r5, r6, r7, r8, lr}
-    stmia r1!, {r4, r5, r6, r7, r8, lr}
-    ldmia   sp!, {r4, r5, r6, r7, r8, pc}
+    ldmia r0!, {r4, r5, r6, r7, r12, lr}
+    stmia r1!, {r4, r5, r6, r7, r12, lr}
+    ldmia r0!, {r4, r5, r6, r7, r12, lr}
+    stmia r1!, {r4, r5, r6, r7, r12, lr}
+    ldmia r0!, {r4, r5, r6, r7, r12, lr}
+    stmia r1!, {r4, r5, r6, r7, r12, lr}
+    ldmia   sp!, {r4-r7, pc}
 
     .section    IBSS_SECTION_MPA_ARM,"aw",%nobits
 synth_full_sp:

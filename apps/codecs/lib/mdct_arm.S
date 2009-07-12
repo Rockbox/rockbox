@@ -119,7 +119,7 @@ mdct_butterfly_16:
     ldr     pc, [sp], #4
 
 mdct_butterfly_32:
-    stmdb   sp!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, lr}
+    stmdb   sp!, {r4-r11, lr}
 
     add     r1, r0, #16*4
 
@@ -247,13 +247,13 @@ mdct_butterfly_32:
     add     r0, r0, #16*4
     bl      mdct_butterfly_16
 
-    ldmia   sp!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, pc}
+    ldmia   sp!, {r4-r11, pc}
 
     @ mdct_butterfly_generic_loop(x1, x2, T0, step, Ttop)
 mdct_butterfly_generic_loop:
-    stmdb   sp!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, lr}
+    stmdb   sp!, {r4-r11, lr}
     str     r2, [sp, #-4]
-    ldr     r4, [sp, #40]
+    ldr     r4, [sp, #36]
 1:
     ldmdb   r0, {r6, r7, r8, r9}
     ldmdb   r1, {r10, r11, r12, r14}
@@ -339,7 +339,7 @@ mdct_butterfly_generic_loop:
     cmp     r2, r4
     bhi     1b
 
-    ldr     r4, [sp, #40]
+    ldr     r4, [sp, #36]
 1:
     ldmdb   r0, {r6, r7, r8, r9}
     ldmdb   r1, {r10, r11, r12, r14}
@@ -425,5 +425,5 @@ mdct_butterfly_generic_loop:
     cmp     r2, r4
     bhi     1b
 
-    ldmia   sp!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, pc}
+    ldmia   sp!, {r4-r11, pc}
 

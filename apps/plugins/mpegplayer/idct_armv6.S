@@ -196,7 +196,7 @@ L_W0246:
 
 
 mpeg2_idct_copy:
-    stmfd  sp!, {r1-r2, r4-r12, lr}
+    stmfd  sp!, {r1-r2, r4-r11, lr}
     bl     .idct
     ldmfd  sp!, {r1-r2}
 
@@ -230,7 +230,7 @@ mpeg2_idct_copy:
     cmp    r0, r12
     blo    1b
 
-    ldmfd  sp!, {r4-r12, pc}
+    ldmfd  sp!, {r4-r11, pc}
 
 mpeg2_idct_add:
     cmp    r0, #129
@@ -241,7 +241,7 @@ mpeg2_idct_add:
     cmp    r1, #0x40
     bne    3f
 1:
-    stmfd  sp!, {r2-r12, lr}
+    stmfd  sp!, {r2-r11, lr}
     bl     .idct
     ldmfd  sp!, {r1-r2}
     mov    r11, #0
@@ -287,21 +287,21 @@ mpeg2_idct_add:
     add    r1, r1, r2
     cmp    r0, r12
     blo    2b
-    ldmfd  sp!, {r4-r12, pc}
+    ldmfd  sp!, {r4-r11, pc}
 
 3:
-    stmfd  sp!, {r4-r7}
+    stmfd  sp!, {r4-r6, lr}
     ldrsh  r1, [r0, #0]           /* r1 = block[0] */
-    mov    r11, #0
-    strh   r11, [r0, #0]          /* block[0] = 0 */
-    strh   r11, [r0, #126]        /* block[63] = 0 */
+    mov    r4, #0
+    strh   r4, [r0, #0]           /* block[0] = 0 */
+    strh   r4, [r0, #126]         /* block[63] = 0 */
     add    r1, r1, #64            /* r1 = DC << 7 */
     add    r0, r2, r3, asl #3
 4:
     ldrb   r4, [r2, #0]
     ldrb   r5, [r2, #1]
     ldrb   r6, [r2, #2]
-    ldrb   r7, [r2, #3]
+    ldrb   lr, [r2, #3]
     add    r4, r4, r1, asr #7
     usat   r4, #8, r4
     strb   r4, [r2, #0]
@@ -311,13 +311,13 @@ mpeg2_idct_add:
     add    r6, r6, r1, asr #7
     usat   r6, #8, r6
     strb   r6, [r2, #2]
-    add    r7, r7, r1, asr #7
-    usat   r7, #8, r7
-    strb   r7, [r2, #3]
+    add    lr, lr, r1, asr #7
+    usat   lr, #8, lr
+    strb   lr, [r2, #3]
     ldrb   r4, [r2, #4]
     ldrb   r5, [r2, #5]
     ldrb   r6, [r2, #6]
-    ldrb   r7, [r2, #7]
+    ldrb   lr, [r2, #7]
     add    r4, r4, r1, asr #7
     usat   r4, #8, r4
     strb   r4, [r2, #4]
@@ -327,11 +327,10 @@ mpeg2_idct_add:
     add    r6, r6, r1, asr #7
     usat   r6, #8, r6
     strb   r6, [r2, #6]
-    add    r7, r7, r1, asr #7
-    usat   r7, #8, r7
-    strb   r7, [r2, #7]
+    add    lr, lr, r1, asr #7
+    usat   lr, #8, lr
+    strb   lr, [r2, #7]
     add    r2, r2, r3
     cmp    r2, r0
     blo    4b
-    ldmfd  sp!, {r4-r7}
-    bx     lr
+    ldmfd  sp!, {r4-r6, pc}
