@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: $
+ * $Id$
  *
  * Originally by Joshua Oreman, improved by Prashant Varanasi
  * Ported to Rockbox by Ben Basha (Paprica)

@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: clock.c 14095 2007-07-31 10:53:53Z nls $
+ * $Id$
  *
  * Copyright (C) 2007 Kévin Ferrare, graphic design 2003 Zakk Roberts
  *

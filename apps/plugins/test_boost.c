@@ -5,7 +5,7 @@
 *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 *                     \/            \/     \/    \/            \/
-* $Id: test_scanrate.c 19673 2009-01-04 23:33:15Z saratoga $
+* $Id$
 *
 * Copyright (C) 2009 Björn Stenberg
 *

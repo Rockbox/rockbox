@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: jackpot.c 14034 2007-07-28 05:42:55Z kevin $
+ * $Id$
  *
  * Copyright (C) 2007 Copyright Kévin Ferrare
  *
