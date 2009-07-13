@@ -30,7 +30,7 @@ CODEC_HEADER
 
 RMContext rmctx;
 RMPacket pkt;
-COOKContext q;
+COOKContext q IBSS_ATTR;
 
 static void init_rm(RMContext *rmctx)
 {
