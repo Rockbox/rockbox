@@ -23,7 +23,6 @@ my $src;
 # Split the input file on any runs of '\' and whitespace.
 for (split(/[\s\\]+/m, <STDIN>)) {
     /^(\/)?[^:]+(\:)?$/;
-print ">>$& $src"
 # Save target and continue if this item ends in ':'
     if (!($2 && ($target=$&))) {
         $src = $&;
