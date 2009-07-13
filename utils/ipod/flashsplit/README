@@ -1,0 +1,8 @@
+flashsplit
+----------
+
+A simple utility to split a dump of the NOR flash on an ipod.
+
+Should work on all PortalPlayer-based ipods.
+
+See http://www.rockbox.org/wiki/IpodFlash for more information.
