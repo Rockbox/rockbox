@@ -26,17 +26,17 @@
     .section    ICODE_SECTION_MPA_ARM,"ax",%progbits
 
 dct32:
-    stmdb    r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, lr}
-    sub      r13, r13, #144
-    str      r0, [r13, #12]
-    str      r1, [r13, #8]
-    str      r2, [r13, #4]
-    str      r3, [r13]
-    add      r0, r13, #16
+    stmdb    sp!, {r4-r11, lr}
+    sub      sp, sp, #144
+    str      r0, [sp, #12]
+    str      r1, [sp, #8]
+    str      r2, [sp, #4]
+    str      r3, [sp]
+    add      r0, sp, #16
     add      r1, r0, #128
     ldr      r2, =bitrev
 .shuffle:
-    ldr      r5, [r13, #12]
+    ldr      r5, [sp, #12]
     ldr      r3, [r2], #4
     sub      r4, r5, r3, lsl #4
     add      r3, r5, r3, lsl #4
@@ -68,7 +68,7 @@ dct32:
     cmp      r0, r1
     bne      .shuffle
     ldr      r0, =189812531
-    add      r1, r13, #16
+    add      r1, sp, #16
     add      r3, r1, #128
 .l2:
     add      r2, r1, #32
@@ -119,7 +119,7 @@ dct32:
     add      r1, r1, #32
     cmp      r1, r3
     bne      .l2
-    add      r2, r13, #16
+    add      r2, sp, #16
     add      r3, r2, #64
     ldr      r0, =sincos
     add      r1, r0, #128
@@ -145,21 +145,21 @@ dct32:
     stmia    r2!, {r7, r8}
     cmp      r0, r1
     bne      .lbut8
-    add      r1, r13, #16
+    add      r1, sp, #16
     ldr      r2, =sincos
     ldr      r3, =sincos2
-    ldr      r0, [r13, #8]
+    ldr      r0, [sp, #8]
     mov      r0, r0, lsl #2
-    ldr      r4, [r13, #4]
+    ldr      r4, [sp, #4]
     add      r4, r4, r0
-    ldr      r5, [r13]
+    ldr      r5, [sp]
     add      r5, r5, #480
     add      r5, r5, r0
     mov      r0, #0
 .l4:
     rsb      r12, r0, #16
     and      r12, r12, #15
-    add      lr, r13, #16
+    add      lr, sp, #16
     add      r12, lr, r12, lsl #3
     ldmia    r1!, {r10, r11}
     ldmia    r12, {r6, r7}
@@ -219,8 +219,8 @@ dct32:
     add      r0, r0, #1
     cmp      r0, #9
     bne      .l4
-    add      r13, r13, #144
-    ldmia    r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, pc}
+    add      sp, sp, #144
+    ldmia    sp!, {r4-r11, pc}
 bitrev:
     .word 0x0
     .word 0x2
