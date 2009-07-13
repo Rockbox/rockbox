@@ -80,9 +80,9 @@ mdct_butterfly_16:
     rsb     r3, r2, r3, asl #1          @ (x1 - x9) - (x0 - x8)
 
     ldr     r12, =cPI2_8
-    smull   r8, r5, r2, r12
+    smull   r8, r5, r12, r2
+    smull   r8, r6, r12, r3
     mov     r5, r5, asl #1
-    smull   r8, r6, r3, r12
     mov     r6, r6, asl #1
 
     stmia   r0!, {r5, r6, r10, r11}
@@ -103,9 +103,9 @@ mdct_butterfly_16:
     sub     r2, r2, r3                  @ (x12 - x4) - (x13 - x5)
     add     r3, r2, r3, asl #1          @ (x12 - x4) + (x13 - x5)
 
-    smull   r8, r5, r2, r12
+    smull   r8, r5, r12, r2
+    smull   r8, r6, r12, r3
     mov     r5, r5, asl #1
-    smull   r8, r6, r3, r12
     mov     r6, r6, asl #1
     @ no stmia here, r5, r6, r10, r11 are passed to mdct_butterfly_8
 
@@ -138,11 +138,11 @@ mdct_butterfly_32:
 
     ldr     r12, =cPI1_8
     ldr     lr, =cPI3_8
-    smull   r10, r6, r2, r12
-    smlal   r10, r6, r3, lr
+    smull   r10, r6, r12, r2
     rsb     r2, r2, #0
-    smull   r10, r7, r3, r12
-    smlal   r10, r7, r2, lr
+    smlal   r10, r6, lr, r3
+    smull   r10, r7, r12, r3
+    smlal   r10, r7, lr, r2
     mov     r6, r6, asl #1
     mov     r7, r7, asl #1
 
@@ -151,8 +151,8 @@ mdct_butterfly_32:
 
     ldr     r11, =cPI2_8
     smull   r10, r8, r4, r11
-    mov     r8, r8, asl #1
     smull   r10, r9, r5, r11
+    mov     r8, r8, asl #1
     mov     r9, r9, asl #1
 
     stmia   r0!, {r6, r7, r8, r9}
@@ -170,11 +170,11 @@ mdct_butterfly_32:
 
     stmia   r1!, {r6, r7, r8, r9}
 
-    smull   r10, r6, r2, lr
-    smlal   r10, r6, r3, r12
+    smull   r10, r6, lr, r2
     rsb     r2, r2, #0
-    smull   r10, r7, r3, lr
-    smlal   r10, r7, r2, r12
+    smlal   r10, r6, r12, r3
+    smull   r10, r7, lr, r3
+    smlal   r10, r7, r12, r2
     mov     r6, r6, asl #1
     mov     r7, r7, asl #1
 
@@ -195,11 +195,11 @@ mdct_butterfly_32:
 
     stmia   r1!, {r6, r7, r8, r9}
 
-    smull   r10, r7, r2, r12
-    smlal   r10, r7, r3, lr
+    smull   r10, r7, lr, r3
     rsb     r3, r3, #0
-    smull   r10, r6, r3, r12
-    smlal   r10, r6, r2, lr
+    smlal   r10, r7, r12, r2
+    smull   r10, r6, r12, r3
+    smlal   r10, r6, lr, r2
     mov     r6, r6, asl #1
     mov     r7, r7, asl #1
 
@@ -207,9 +207,9 @@ mdct_butterfly_32:
     add     r5, r4, r5, asl #1          @ (x26 - x10) + (x27 - x11)
 
     ldr     r11, =cPI2_8
-    smull   r10, r8, r4, r11
+    smull   r10, r8, r11, r4
+    smull   r10, r9, r11, r5
     mov     r8, r8, asl #1
-    smull   r10, r9, r5, r11
     mov     r9, r9, asl #1
 
     stmia   r0!, {r6, r7, r8, r9}
@@ -227,11 +227,11 @@ mdct_butterfly_32:
 
     stmia   r1, {r6, r7, r8, r9}
 
-    smull   r10, r7, r2, lr
-    smlal   r10, r7, r3, r12
+    smull   r10, r7, r12, r3
     rsb     r3, r3, #0
-    smull   r10, r6, r3, lr
-    smlal   r10, r6, r2, r12
+    smlal   r10, r7, lr, r2
+    smull   r10, r6, lr, r3
+    smlal   r10, r6, r12, r2
     mov     r6, r6, asl #1
     mov     r7, r7, asl #1
 
@@ -270,11 +270,11 @@ mdct_butterfly_generic_loop:
     stmdb   r0!, {r6, r7, r8, r9}
 
     ldmia   r2, {r6, r7}
-    smull   r5, r8, r14, r6
-    smlal   r5, r8, r12, r7
+    smull   r5, r8, r6, r14
     rsb     r14, r14, #0
-    smull   r5, r9, r12, r6
-    smlal   r5, r9, r14, r7
+    smlal   r5, r8, r7, r12
+    smull   r5, r9, r6, r12
+    smlal   r5, r9, r7, r14
 
     mov     r8, r8, asl #1
     mov     r9, r9, asl #1
@@ -282,11 +282,11 @@ mdct_butterfly_generic_loop:
     add     r2, r2, r3, asl #2
 
     ldmia   r2, {r6, r7}
-    smull   r5, r8, r11, r6
-    smlal   r5, r8, r10, r7
+    smull   r5, r8, r6, r11
     rsb     r11, r11, #0
-    smull   r5, r9, r10, r6
-    smlal   r5, r9, r11, r7
+    smlal   r5, r8, r7, r10
+    smull   r5, r9, r6, r10
+    smlal   r5, r9, r7, r11
 
     mov     r8, r8, asl #1
     mov     r9, r9, asl #1
@@ -313,11 +313,11 @@ mdct_butterfly_generic_loop:
     stmdb   r0!, {r6, r7, r8, r9}
 
     ldmia   r2, {r6, r7}
-    smull   r5, r9, r14, r6
-    smlal   r5, r9, r12, r7
+    smull   r5, r9, r6, r14
     rsb     r14, r14, #0
-    smull   r5, r8, r12, r6
-    smlal   r5, r8, r14, r7
+    smlal   r5, r9, r7, r12
+    smull   r5, r8, r6, r12
+    smlal   r5, r8, r7, r14
 
     mov     r8, r8, asl #1
     mov     r9, r9, asl #1
@@ -325,11 +325,11 @@ mdct_butterfly_generic_loop:
     sub     r2, r2, r3, asl #2
 
     ldmia   r2, {r6, r7}
-    smull   r5, r9, r11, r6
-    smlal   r5, r9, r10, r7
+    smull   r5, r9, r6, r11
     rsb     r11, r11, #0
-    smull   r5, r8, r10, r6
-    smlal   r5, r8, r11, r7
+    smlal   r5, r9, r7, r10
+    smull   r5, r8, r6, r10
+    smlal   r5, r8, r7, r11
 
     mov     r8, r8, asl #1
     mov     r9, r9, asl #1
@@ -356,11 +356,11 @@ mdct_butterfly_generic_loop:
     stmdb   r0!, {r6, r7, r8, r9}
 
     ldmia   r2, {r6, r7}
-    smull   r5, r8, r12, r6
-    smlal   r5, r8, r14, r7
+    smull   r5, r8, r6, r12
     rsb     r12, r12, #0
-    smull   r5, r9, r14, r6
-    smlal   r5, r9, r12, r7
+    smlal   r5, r8, r7, r14
+    smull   r5, r9, r6, r14
+    smlal   r5, r9, r7, r12
 
     mov     r8, r8, asl #1
     mov     r9, r9, asl #1
@@ -368,11 +368,11 @@ mdct_butterfly_generic_loop:
     add     r2, r2, r3, asl #2
 
     ldmia   r2, {r6, r7}
-    smull   r5, r8, r10, r6
-    smlal   r5, r8, r11, r7
+    smull   r5, r8, r6, r10
     rsb     r10, r10, #0
-    smull   r5, r9, r11, r6
-    smlal   r5, r9, r10, r7
+    smlal   r5, r8, r7, r11
+    smull   r5, r9, r6, r11
+    smlal   r5, r9, r7, r10
 
     mov     r8, r8, asl #1
     mov     r9, r9, asl #1
@@ -399,11 +399,11 @@ mdct_butterfly_generic_loop:
     stmdb   r0!, {r6, r7, r8, r9}
 
     ldmia   r2, {r6, r7}
-    smull   r5, r9, r12, r6
-    smlal   r5, r9, r14, r7
+    smull   r5, r9, r6, r12
+    smlal   r5, r9, r7, r14
     rsb     r12, r12, #0
-    smull   r5, r8, r14, r6
-    smlal   r5, r8, r12, r7
+    smull   r5, r8, r6, r14
+    smlal   r5, r8, r7, r12
 
     mov     r8, r8, asl #1
     mov     r9, r9, asl #1
@@ -411,11 +411,11 @@ mdct_butterfly_generic_loop:
     sub     r2, r2, r3, asl #2
 
     ldmia   r2, {r6, r7}
-    smull   r5, r9, r10, r6
-    smlal   r5, r9, r11, r7
+    smull   r5, r9, r6, r10
     rsb     r10, r10, #0
-    smull   r5, r8, r11, r6
-    smlal   r5, r8, r10, r7
+    smlal   r5, r9, r7, r11
+    smull   r5, r8, r6, r11
+    smlal   r5, r8, r7, r10
 
     mov     r8, r8, asl #1
     mov     r9, r9, asl #1
