@@ -1,0 +1,12 @@
+bin2note
+--------
+
+bin2note implements the buffer overflow exploit documented here:
+
+http://l4n.clustur.com/index.php/Nano2G_getting_exec
+
+
+It is used to turn a blob of ARM code into an iPod notes file.  This
+ARM code will then be executed on the iPod.
+
+It is known to work on the 2nd generation Nano.
