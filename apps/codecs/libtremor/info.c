@@ -232,6 +232,31 @@ static int _vorbis_unpack_books(vorbis_info *vi,oggpack_buffer *opb){
   return(OV_EBADHEADER);
 }
 
+/* Is this packet a vorbis ID header? */
+int vorbis_synthesis_idheader(ogg_packet *op){
+  oggpack_buffer opb;
+  char buffer[6];
+
+  if(op){
+    oggpack_readinit(&opb,op->packet);
+
+    if(!op->b_o_s)
+      return(0); /* Not the initial packet */
+
+    if(oggpack_read(&opb,8) != 1)
+      return 0; /* not an ID header */
+
+    memset(buffer,0,6);
+    _v_readstring(&opb,buffer,6);
+    if(memcmp(buffer,"vorbis",6))
+      return 0; /* not vorbis */
+
+    return 1;
+  }
+
+  return 0;
+}
+
 /* The Vorbis header is in three packets; the initial small packet in
    the first page that identifies basic parameters, a second packet
    with bitstream comments and a third packet that holds the

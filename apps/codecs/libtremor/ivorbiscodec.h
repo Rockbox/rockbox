@@ -166,6 +166,7 @@ extern int      vorbis_block_clear(vorbis_block *vb);
 extern void     vorbis_dsp_clear(vorbis_dsp_state *v);
 
 /* Vorbis PRIMITIVES: synthesis layer *******************************/
+extern int      vorbis_synthesis_idheader(ogg_packet *op);
 extern int      vorbis_synthesis_headerin(vorbis_info *vi,vorbis_comment *vc,
 					  ogg_packet *op);
 
