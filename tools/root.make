@@ -51,8 +51,8 @@ endif
 
 all: $(DEPFILE) build
 
-# Subdir makefiles. their primary purpose is to populate SRC & OTHER_SRC
-# but they also define special dependencies and compile rules
+# Subdir makefiles. their primary purpose is to populate SRC, OTHER_SRC &
+# ASMDEFS_SRC but they also define special dependencies and compile rules
 include $(TOOLSDIR)/tools.make
 include $(FIRMDIR)/firmware.make
 include $(ROOTDIR)/apps/bitmaps/bitmaps.make
@@ -96,6 +96,7 @@ $(DEPFILE) dep:
 	@echo foo > /dev/null # there must be a "real" command in the rule
 	$(call mkdepfile,$(DEPFILE),$(SRC))
 	$(call mkdepfile,$(DEPFILE),$(OTHER_SRC))
+	$(call mkdepfile,$(DEPFILE),$(ASMDEFS_SRC))
 	@mv $(DEPFILE)_ $(DEPFILE)
 	$(call bmpdepfile,$(DEPFILE),$(BMP) $(PBMP))
 
@@ -316,6 +317,12 @@ $(BUILDDIR)/%.o: $(ROOTDIR)/%.c
 $(BUILDDIR)/%.o: $(ROOTDIR)/%.S
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(CFLAGS) -c $< -o $@
+
+# generated definitions for use in .S files
+$(BUILDDIR)/%_asmdefs.h: $(ROOTDIR)/%_asmdefs.c
+	$(call PRINTS,ASMDEFS $(@F))
+	$(SILENT)mkdir -p $(dir $@)
+	$(call asmdefs2file,$<,$@)
 
 # when source and object are both in BUILDDIR (generated code):
 %.o: %.c

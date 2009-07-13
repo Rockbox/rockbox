@@ -22,6 +22,7 @@
 *
 ****************************************************************************/
 #include "config.h"
+#include "apps/core_asmdefs.h"
 
     .section .text
     .align   2
@@ -130,13 +131,8 @@ jpeg_idct2h:
     mvnhi  r5,  r5,  asr #31
     cmp    r4,  #255
     mvnhi  r4,  r4,  asr #31
-#ifdef HAVE_LCD_COLOR
     strb   r5,  [r1]
-    strb   r4,  [r1, #4]
-#else
-    strb   r5,  [r1]
-    strb   r4,  [r1, #1]
-#endif
+    strb   r4,  [r1, #pix8_size]
     add    r0,  r0,  #16
     add    r1,  r1,  r3
     cmp    r0,  r2
@@ -152,13 +148,8 @@ jpeg_idct2h:
     usat   r4,  #8,  r12, asr #21
     sxth   r12, r12
     usat   r12, #8,  r12, asr #5
-#ifdef HAVE_LCD_COLOR
     strb   r4,  [r1]
-    strb   r12, [r1, #4]
-#else
-    strb   r4,  [r1]
-    strb   r12, [r1, #1]
-#endif
+    strb   r12, [r1, #pix8_size]
     add    r0,  r0,  #16
     add    r1,  r1,  r3
     cmp    r0,  r2
@@ -325,17 +316,10 @@ jpeg_idct4h:
     mvnhi  r4,  r4,  asr #31
     cmp    r5,  #255
     mvnhi  r5,  r5,  asr #31
-#ifdef HAVE_LCD_COLOR
     strb   r9,  [r1]
-    strb   r8,  [r1, #4]
-    strb   r4,  [r1, #8]
-    strb   r5,  [r1, #12]
-#else
-    strb   r9,  [r1]
-    strb   r8,  [r1, #1]
-    strb   r4,  [r1, #2]
-    strb   r5,  [r1, #3]
-#endif
+    strb   r8,  [r1, #pix8_size]
+    strb   r4,  [r1, #2*pix8_size]
+    strb   r5,  [r1, #3*pix8_size]
     add    r0,  r0,  #16
     add    r1,  r1,  r3
     cmp    r0,  r2
@@ -372,17 +356,10 @@ jpeg_idct4h:
     mvnhi  r12, r12, asr #31
     cmp    r9,  #255
     mvnhi  r9,  r9,  asr #31
-#ifdef HAVE_LCD_COLOR
     strb   r6,  [r1]
-    strb   r14, [r1, #4]
-    strb   r12, [r1, #8]
-    strb   r9,  [r1, #12]
-#else
-    strb   r6,  [r1]
-    strb   r14, [r1, #1]
-    strb   r12, [r1, #2]
-    strb   r9,  [r1, #3]
-#endif
+    strb   r14, [r1, #pix8_size]
+    strb   r12, [r1, #2*pix8_size]
+    strb   r9,  [r1, #3*pix8_size]
     add    r0,  r0,  #16
     add    r1,  r1,  r3
     cmp    r0,  r2
@@ -410,17 +387,10 @@ jpeg_idct4h:
     usat  r6,  #8,  r6,  asr #18
     usat  r12, #8,  r12, asr #18
     usat  r14, #8,  r14, asr #18
-#ifdef HAVE_LCD_COLOR
     strb   r8,  [r1]
-    strb   r6,  [r1, #12]
-    strb   r12, [r1, #4]
-    strb   r14, [r1, #8]
-#else
-    strb   r8,  [r1]
-    strb   r6,  [r1, #3]
-    strb   r12, [r1, #1]
-    strb   r14, [r1, #2]
-#endif
+    strb   r6,  [r1, #3*pix8_size]
+    strb   r12, [r1, #pix8_size]
+    strb   r14, [r1, #2*pix8_size]
     add   r0,  r0,  #16
     add   r1,  r1,  r3
     cmp    r0,  r2
@@ -645,25 +615,14 @@ jpeg_idct8h:
     mov    r8,  r8,  asr #21
     cmp    r8,  #255
     mvnhi  r8,  r8,  asr #31
-#ifdef HAVE_LCD_COLOR
     strb   r8,  [r1]
-    strb   r8,  [r1, #4]
-    strb   r8,  [r1, #8]
-    strb   r8,  [r1, #12]
-    strb   r8,  [r1, #16]
-    strb   r8,  [r1, #20]
-    strb   r8,  [r1, #24]
-    strb   r8,  [r1, #28]
-#else
-    strb   r8,  [r1]
-    strb   r8,  [r1, #1]
-    strb   r8,  [r1, #2]
-    strb   r8,  [r1, #3]
-    strb   r8,  [r1, #4]
-    strb   r8,  [r1, #5]
-    strb   r8,  [r1, #6]
-    strb   r8,  [r1, #7]
-#endif
+    strb   r8,  [r1, #pix8_size]
+    strb   r8,  [r1, #2*pix8_size]
+    strb   r8,  [r1, #3*pix8_size]
+    strb   r8,  [r1, #4*pix8_size]
+    strb   r8,  [r1, #5*pix8_size]
+    strb   r8,  [r1, #6*pix8_size]
+    strb   r8,  [r1, #7*pix8_size]
     add    r1,  r1,  r3
     cmp    r0,  r2
     bcc    1b
@@ -752,25 +711,14 @@ jpeg_idct8h:
     mov    r14, r14, asr #18
     cmp    r14, #255
     mvnhi  r14, r14, asr #31
-#ifdef HAVE_LCD_COLOR
     strb   r12, [r1]
-    strb   r4,  [r1, #4]
-    strb   r10, [r1, #8]
-    strb   r8,  [r1, #12]
-    strb   r9,  [r1, #16]
-    strb   r11, [r1, #20]
-    strb   r5,  [r1, #24]
-    strb   r14, [r1, #28]
-#else
-    strb   r12, [r1]
-    strb   r4,  [r1, #1]
-    strb   r10, [r1, #2]
-    strb   r8,  [r1, #3]
-    strb   r9,  [r1, #4]
-    strb   r11, [r1, #5]
-    strb   r5,  [r1, #6]
-    strb   r14, [r1, #7]
-#endif
+    strb   r4,  [r1, #pix8_size]
+    strb   r10, [r1, #2*pix8_size]
+    strb   r8,  [r1, #3*pix8_size]
+    strb   r9,  [r1, #4*pix8_size]
+    strb   r11, [r1, #5*pix8_size]
+    strb   r5,  [r1, #6*pix8_size]
+    strb   r14, [r1, #7*pix8_size]
 #else /* ARMv5+ */
     add    r12, r14, r4,  lsl #16
     orrs   r9,  r6,  r7
@@ -779,25 +727,14 @@ jpeg_idct8h:
     mov    r12, r12, asr #21
     cmp    r12, #255
     mvnhi  r12, r12, asr #31
-#ifdef HAVE_LCD_COLOR
     strb   r12, [r1]
-    strb   r12, [r1, #4]
-    strb   r12, [r1, #8]
-    strb   r12, [r1, #12]
-    strb   r12, [r1, #16]
-    strb   r12, [r1, #20]
-    strb   r12, [r1, #24]
-    strb   r12, [r1, #28]
-#else
-    strb   r12, [r1]
-    strb   r12, [r1, #1]
-    strb   r12, [r1, #2]
-    strb   r12, [r1, #3]
-    strb   r12, [r1, #4]
-    strb   r12, [r1, #5]
-    strb   r12, [r1, #6]
-    strb   r12, [r1, #7]
-#endif
+    strb   r12, [r1, #pix8_size]
+    strb   r12, [r1, #2*pix8_size]
+    strb   r12, [r1, #3*pix8_size]
+    strb   r12, [r1, #4*pix8_size]
+    strb   r12, [r1, #5*pix8_size]
+    strb   r12, [r1, #6*pix8_size]
+    strb   r12, [r1, #7*pix8_size]
     add    r1,  r1,  r3
     cmp    r0,  r2
     bcc    1b
@@ -869,25 +806,14 @@ jpeg_idct8h:
     mov    r11, r11, asr #18
     cmp    r11, #255
     mvnhi  r11, r11, asr #31
-#ifdef HAVE_LCD_COLOR
     strb   r10, [r1]
-    strb   r12, [r1, #4]
-    strb   r8,  [r1, #8]
-    strb   r6,  [r1, #12]
-    strb   r7,  [r1, #16]
-    strb   r9,  [r1, #20]
-    strb   r14, [r1, #24]
-    strb   r11, [r1, #28]
-#else
-    strb   r10, [r1]
-    strb   r12, [r1, #1]
-    strb   r8,  [r1, #2]
-    strb   r6,  [r1, #3]
-    strb   r7,  [r1, #4]
-    strb   r9,  [r1, #5]
-    strb   r14, [r1, #6]
-    strb   r11, [r1, #7]
-#endif
+    strb   r12, [r1, #pix8_size]
+    strb   r8,  [r1, #2*pix8_size]
+    strb   r6,  [r1, #3*pix8_size]
+    strb   r7,  [r1, #4*pix8_size]
+    strb   r9,  [r1, #5*pix8_size]
+    strb   r14, [r1, #6*pix8_size]
+    strb   r11, [r1, #7*pix8_size]
 #endif
     add    r1,  r1,  r3
     cmp    r0,  r2
@@ -1009,25 +935,14 @@ jpeg_idct8h:
     bne    2f
     sxth   r4,  r4
     usat   r4,  #8,  r4,  asr #5
-#ifdef HAVE_LCD_COLOR
     strb   r4,  [r1]
-    strb   r4,  [r1, #4]
-    strb   r4,  [r1, #8]
-    strb   r4,  [r1, #12]
-    strb   r4,  [r1, #16]
-    strb   r4,  [r1, #20]
-    strb   r4,  [r1, #24]
-    strb   r4,  [r1, #28]
-#else
-    strb   r4,  [r1]
-    strb   r4,  [r1, #1]
-    strb   r4,  [r1, #2]
-    strb   r4,  [r1, #3]
-    strb   r4,  [r1, #4]
-    strb   r4,  [r1, #5]
-    strb   r4,  [r1, #6]
-    strb   r4,  [r1, #7]
-#endif
+    strb   r4,  [r1, #pix8_size]
+    strb   r4,  [r1, #2*pix8_size]
+    strb   r4,  [r1, #3*pix8_size]
+    strb   r4,  [r1, #4*pix8_size]
+    strb   r4,  [r1, #5*pix8_size]
+    strb   r4,  [r1, #6*pix8_size]
+    strb   r4,  [r1, #7*pix8_size]
     add    r1,  r1,  r3
     cmp    r0,  r2
     bcc    1b
@@ -1083,25 +998,14 @@ jpeg_idct8h:
     usat   r10, #8,  r10, asr #18
     usat   r7,  #8,  r7,  asr #18
     usat   r8,  #8,  r8,  asr #18
-#ifdef HAVE_LCD_COLOR
     strb   r6,  [r1]
-    strb   r4,  [r1, #4]
-    strb   r9,  [r1, #8]
-    strb   r14, [r1, #12]
-    strb   r12, [r1, #16]
-    strb   r10, [r1, #20]
-    strb   r7,  [r1, #24]
-    strb   r8,  [r1, #28]
-#else
-    strb   r6,  [r1]
-    strb   r4,  [r1, #1]
-    strb   r9,  [r1, #2]
-    strb   r14, [r1, #3]
-    strb   r12, [r1, #4]
-    strb   r10, [r1, #5]
-    strb   r7,  [r1, #6]
-    strb   r8,  [r1, #7]
-#endif
+    strb   r4,  [r1, #pix8_size]
+    strb   r9,  [r1, #2*pix8_size]
+    strb   r14, [r1, #3*pix8_size]
+    strb   r12, [r1, #4*pix8_size]
+    strb   r10, [r1, #5*pix8_size]
+    strb   r7,  [r1, #6*pix8_size]
+    strb   r8,  [r1, #7*pix8_size]
     cmp    r0,  r2
     add    r1,  r1,  r3
     bcc    1b

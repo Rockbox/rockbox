@@ -25,6 +25,9 @@ preprocess = $(shell $(CC) $(PPCFLAGS) $(2) -E -P -x c -include config.h $(1) | 
 preprocess2file = $(shell $(CC) $(PPCFLAGS) $(3) -E -P -x c -include config.h $(1) | \
 		grep -v '^\#' | grep -v "^$$" > $(2))
 
+asmdefs2file = $(shell $(CC) $(PPCFLAGS) $(3) -S -x c -o - -include config.h $(1) | \
+	perl -ne 'if(/^AD_(\w+):$$/){$$var=$$1}else{/^\W\.word\W(.*)$$/ && $$var && print "\#define $$var $$1\n";$$var=0}' > $2)
+
 c2obj = $(addsuffix .o,$(basename $(subst $(ROOTDIR),$(BUILDDIR),$(1))))
 
 # calculate dependencies for a list of source files $(2) and output them
@@ -32,6 +35,7 @@ c2obj = $(addsuffix .o,$(basename $(subst $(ROOTDIR),$(BUILDDIR),$(1))))
 mkdepfile = $(shell \
 	$(CC) $(PPCFLAGS) $(OTHER_INC) -MG -MM -include config.h $(2) | \
 	sed -e "s: lang.h: lang/lang_core.o:" \
+	-e 's:_asmdefs.o:_asmdefs.h:' \
 	-e "s: max_language_size.h: lang/max_language_size.h:" | \
 	$(TOOLSDIR)/addtargetdir.pl $(ROOTDIR) $(BUILDDIR) \
 	>> $(1)_)

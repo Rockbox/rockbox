@@ -24,3 +24,5 @@ features $(BUILDDIR)/apps/features $(BUILDDIR)/apps/genlang-features: $(APPSDIR)
 		grep -v "^\#" | grep -v "^$$" > $(BUILDDIR)/apps/features; \
 		for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done ; \
 		echo "$$feat" >$(BUILDDIR)/apps/genlang-features
+
+ASMDEFS_SRC += $(APPSDIR)/core_asmdefs.c
