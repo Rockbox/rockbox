@@ -139,30 +139,19 @@ PLUGIN_HEADER
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define CLIX_BUTTON_QUIT    BUTTON_POWER
 
-#elif (CONFIG_KEYPAD == ONDAVX747_PAD) || \
-      (CONFIG_KEYPAD == MROBE500_PAD)
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#define CLIX_BUTTON_QUIT    BUTTON_POWER
+#define CLIX_BUTTON_CLICK   BUTTON_MENU
+
+#elif (CONFIG_KEYPAD == MROBE500_PAD)
 #define CLIX_BUTTON_QUIT    BUTTON_POWER
 
 #else
 #error "no keymap"
 #endif
 
-#ifdef HAVE_TOUCHSCREEN
-#ifndef CLIX_BUTTON_LEFT
-#define CLIX_BUTTON_LEFT    BUTTON_MIDLEFT
-#endif
-#ifndef CLIX_BUTTON_RIGHT
-#define CLIX_BUTTON_RIGHT   BUTTON_MIDRIGHT
-#endif
 #ifndef CLIX_BUTTON_CLICK
 #define CLIX_BUTTON_CLICK   BUTTON_CENTER
-#endif
-#ifndef CLIX_BUTTON_UP
-#define CLIX_BUTTON_UP      BUTTON_TOPMIDDLE
-#endif
-#ifndef CLIX_BUTTON_DOWN
-#define CLIX_BUTTON_DOWN    BUTTON_BOTTOMMIDDLE
-#endif
 #endif
 
 #define HIGHSCORE_FILE       PLUGIN_GAMES_DIR "/clix.score"
@@ -717,8 +706,36 @@ static int clix_handle_game(struct clix_game_state_t* state)
             rb->button_get_w_tmo(end - *rb->current_tick);
             button = rb->button_status();
             rb->button_clear_queue();
+#ifdef HAVE_TOUCHSCREEN
+            if(button & BUTTON_TOUCHSCREEN)
+            {
+                int x = rb->button_get_data() >> 16;
+                int y = rb->button_get_data() & 0xffff;
+
+                x -= XOFS;
+                y -= YOFS;
+                if(x >= 0 && y >= 0)
+                {
+                    x /= CELL_SIZE + 1;
+                    y /= CELL_SIZE + 1;
+
+                    if(x < BOARD_WIDTH && y < BOARD_HEIGHT
+                       && state->board[XYPOS(x, y)] != CC_BLACK)
+                    {
+                        if(state->x == x && state->y == y)
+                            button = CLIX_BUTTON_CLICK;
+                        else
+                        {
+                            state->x = x;
+                            state->y = y;
+                        }
+                    }
+                }
+            }
+#endif
             switch( button)
             {
+#ifndef HAVE_TOUCHSCREEN
 #ifdef CLIX_BUTTON_SCROLL_BACK
                 case CLIX_BUTTON_SCROLL_BACK:
 #endif
@@ -761,6 +778,7 @@ static int clix_handle_game(struct clix_game_state_t* state)
                     clix_move_cursor(state, true);
 
                 break;
+#endif
                 case CLIX_BUTTON_CLICK:
                 {
                     if (state->selected_count > 1) {
@@ -840,6 +858,9 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_setfont(FONT_SYSFIXED);
+#ifdef HAVE_TOUCHSCREEN
+    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+#endif
 
     highscore_load(HIGHSCORE_FILE, highest, NUM_SCORES);
 
