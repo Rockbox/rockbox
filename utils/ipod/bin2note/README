@@ -10,3 +10,8 @@ It is used to turn a blob of ARM code into an iPod notes file.  This
 ARM code will then be executed on the iPod.
 
 It is known to work on the 2nd generation Nano.
+
+
+The Makefile contains rules for compiling an ARM assembler file
+"test.S" into a notes file "test.htm".  Just put test.S in this
+directory and type "make test.htm".
