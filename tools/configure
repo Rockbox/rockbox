@@ -16,7 +16,7 @@ use_logf="#undef ROCKBOX_HAS_LOGF"
 scriptver=`echo '$Revision$' | sed -e 's:\\$::g' -e 's/Revision: //'`
 
 rbdir=".rockbox"
-
+  
 #
 # Begin Function Definitions
 #
@@ -186,7 +186,7 @@ simcc () {
    fi
 
    id=$$
-   cat >/tmp/conftest-$id.c <<EOF
+   cat >$tmpdir/conftest-$id.c <<EOF
 #include <stdio.h>
 int main(int argc, char **argv)
 {
@@ -199,9 +199,9 @@ int main(int argc, char **argv)
 }
 EOF
 
-   $CC -o /tmp/conftest-$id /tmp/conftest-$id.c 2>/dev/null
+   $CC -o $tmpdir/conftest-$id $tmpdir/conftest-$id.c 2>/dev/null
 
-   if test `/tmp/conftest-$id 2>/dev/null` -gt "1"; then
+   if test `$tmpdir/conftest-$id 2>/dev/null` -gt "1"; then
      # big endian
      endian="big"
    else
@@ -212,7 +212,7 @@ EOF
 
    # use wildcard here to make it work even if it was named *.exe like
    # on cygwin
-   rm -f /tmp/conftest-$id*
+   rm -f $tmpdir/conftest-$id*
  fi
 }
 
@@ -678,6 +678,14 @@ whichlang() {
 
 opt=$1
 
+
+if [ "$TMPDIR" != "" ]; then
+  tmpdir=$TMPDIR
+else
+  tmpdir=/tmp
+fi
+
+echo $tmpdir
 if test "$opt" = "--help"; then
   echo "Rockbox configure script."
   echo "Invoke this in a directory to generate a Makefile to build Rockbox"
