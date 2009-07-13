@@ -115,7 +115,7 @@ static const int semitone_table[] =
     TO_INT_WITH_PRECISION(200.0000000)  /* Octave higher */
 };
 
-#define NUM_SEMITONES   ((int)(sizeof(semitone_table) / sizeof(int)))
+#define NUM_SEMITONES   ((int)(sizeof(semitone_table)/sizeof(semitone_table[0])))
 #define SEMITONE_END    (NUM_SEMITONES/2)
 #define SEMITONE_START  (-SEMITONE_END)
 
@@ -140,7 +140,7 @@ static const int cent_interp[] =
 
 /* Number of cents between entries in the cent_interp table */
 #define CENT_INTERP_INTERVAL 20
-#define CENT_INTERP_NUM      ((int)(sizeof(cent_interp)/sizeof(int)))
+#define CENT_INTERP_NUM      ((int)(sizeof(cent_interp)/sizeof(cent_interp[0])))
 
 /* This stores whether the pitch and speed are at their own limits */
 /* or that of the timestretching algorithm                         */
