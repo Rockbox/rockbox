@@ -57,6 +57,7 @@
 #define PP5020       5020
 #define PP5022       5022
 #define PP5024       5024
+#define PP6100       6100
 #define PNX0101       101
 #define S3C2440      2440
 #define DSC25          25
@@ -188,7 +189,8 @@
 #define LCD_FUZE      32 /* as used by the Sansa Fuze */
 #define LCD_LYRE_PROTO1      33 /* as used by the Lyre */
 #define LCD_YH925     34 /* as used by Samsung YH-925 (similar to the H10 20GB) */
- 
+#define LCD_VIEW      35 /* as used by the Sansa View */ 
+
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
 #define VERTICAL_PACKING 2
@@ -368,6 +370,8 @@ Lyre prototype 1*/
 #include "config-fuze.h"
 #elif defined(SANSA_C200V2)
 #include "config-c200v2.h"
+#elif defined(SANSA_VIEW)
+#include "config-view.h"
 #elif defined(LYRE_PROTO1)
 #include "config-lyre_proto1.h"
 #elif defined(SAMSUNG_YH820)
@@ -576,7 +580,8 @@ Lyre prototype 1*/
 /* define for all cpus from PP family */
 #if (CONFIG_CPU == PP5002)
 #define CPU_PP
-#elif (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)  || (CONFIG_CPU == PP5024)
+#elif (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022) \
+    || (CONFIG_CPU == PP5024) || (CONFIG_CPU == PP6100)
 #define CPU_PP
 #define CPU_PP502x
 #endif
@@ -682,7 +687,7 @@ Lyre prototype 1*/
 
 /* Change this if you want to build a single-core firmware for a multicore
  * target for debugging */
-#if defined(BOOTLOADER)
+#if defined(BOOTLOADER) || (CONFIG_CPU == PP6100)
 #define FORCE_SINGLE_CORE
 #endif
 

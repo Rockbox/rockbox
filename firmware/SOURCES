@@ -561,6 +561,25 @@ target/arm/sandisk/audio-c200_e200.c
 #endif /* SIMULATOR */
 #endif /* SANSA_C200 */
 
+#ifdef SANSA_VIEW
+#ifndef SIMULATOR
+/* target/arm/ascodec-pp.c */
+target/arm/ata-sd-pp.c
+target/arm/lcd-as-memframe.S
+target/arm/i2s-pp.c
+/* target/arm/usb-fw-pp502x.c */
+target/arm/sandisk/sansa-view/backlight-view.c
+target/arm/sandisk/sansa-view/adc-view.c
+target/arm/sandisk/sansa-view/power-view.c
+target/arm/sandisk/sansa-view/lcd-view.c
+target/arm/sandisk/sansa-view/button-view.c
+target/arm/sandisk/sansa-view/powermgmt-view.c
+#ifndef BOOTLOADER
+/* target/arm/sandisk/audio-view.c */
+#endif /* BOOTLOADER */
+#endif /* SIMULATOR */
+#endif /* SANSA_VIEW */
+
 #ifdef PHILIPS_SA9200
 #ifndef SIMULATOR
 #ifndef BOOTLOADER

@@ -1024,7 +1024,8 @@ static bool dbg_spdif(void)
 #   define DEBUG_CANCEL  BUTTON_MENU
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-      (CONFIG_KEYPAD == SANSA_C200_PAD)
+      (CONFIG_KEYPAD == SANSA_C200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_FUZE_PAD)
 #   define DEBUG_CANCEL  BUTTON_LEFT
 
 /* This is temporary until the SA9200 touchpad works */

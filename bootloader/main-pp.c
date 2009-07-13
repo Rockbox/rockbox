@@ -73,6 +73,9 @@ extern int show_logo(void);
 #elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
 #define BOOTLOADER_BOOT_OF      BUTTON_LEFT
 
+#elif CONFIG_KEYPAD == SANSA_FUZE_PAD
+#define BOOTLOADER_BOOT_OF      BUTTON_LEFT
+
 #endif
 
 /* Maximum allowed firmware image size. 10MB is more than enough */
@@ -447,7 +450,8 @@ void* main(void)
     int rc;
     int num_partitions;
     struct partinfo* pinfo;
-#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
+#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200) \
+    || defined (SANSA_VIEW)
 #if !defined(USE_ROCKBOX_USB)
     int usb_retry = 0;
 #endif

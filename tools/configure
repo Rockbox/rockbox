@@ -310,6 +310,14 @@ arm1136jfscc () {
  gccchoice="4.0.3"
 }
 
+arm1176jzscc () {
+ prefixtools arm-elf-
+ GCCOPTS="$CCOPTS -mcpu=arm1176jz-s -mlong-calls"
+ GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="little"
+ gccchoice="4.0.3"
+}
+
 mipselcc () {
  prefixtools mipsel-elf-
  GCCOPTS="$CCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls"
@@ -791,10 +799,10 @@ cat <<EOF
                                                  58) Sansa Fuze
  ==Onda==                 ==Meizu==              59) Sansa c200v2
  120) VX747               110) M6SL              60) Sansa Clipv2
- 121) VX767               111) M6SP
- 122) VX747+              112) M3                ==Logik==
- 123) VX777                                      80) DAX 1GB MP3/DAB
-
+ 121) VX767               111) M6SP              61) Sansa View
+ 122) VX747+              112) M3
+ 123) VX777                                      ==Logik==
+                                                 80) DAX 1GB MP3/DAB
  ==Samsung==              ==Tatung==
  140) YH-820              150) Elio TPJ-1022     ==Lyre project==
  141) YH-920                                     130) Lyre proto 1
@@ -1911,6 +1919,30 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-clipv2"
+    ;;
+
+   61|view)
+    echo "Sansa View is net yet supported!"
+    exit 1
+    target_id=63
+    modelname="view"
+    target="-DSANSA_VIEW"
+    memory=32
+    arm1176jzscc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.mi4"
+    appextra="gui"
+    plugins=""
+    swcodec="yes"
+    boottool="$rootdir/tools/scramble -mi4v3 -model=view -type=RBBL"
+    bootoutput="firmware.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="sandisk"
+    t_model="sansa-view"
     ;;
 
    150|tpj1022)

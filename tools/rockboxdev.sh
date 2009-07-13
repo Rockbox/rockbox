@@ -183,7 +183,7 @@ case $arch in
     ;;
   [Aa])
     target="arm-elf"
-    gccpatch="rockbox-multilibs-arm-elf-gcc-4.0.3_2.diff"
+    gccpatch="rockbox-multilibs-arm-elf-gcc-4.0.3_3.diff"
     ;;
   [Ii])
     target="mipsel-elf"

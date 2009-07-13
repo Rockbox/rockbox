@@ -7,7 +7,12 @@ STARTUP(target/arm/crt0-pp-bl.o)
 
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
 
+#ifdef SANSA_VIEW
+#define DRAMORIG 0x10f00000
+#else
 #define DRAMORIG 0x10000000
+#endif
+
 #ifndef IRAMORIG
 #define IRAMORIG 0x40000000
 #endif
