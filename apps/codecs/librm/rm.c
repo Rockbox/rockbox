@@ -37,18 +37,6 @@ static uint8_t get_uint8(uint8_t *buf)
     return (uint8_t)buf[0];
 }
 
-#ifdef ROCKBOX_BIG_ENDIAN
-static uint16_t get_uint16be(uint8_t *buf)
-{
-    return (uint16_t)((buf[1] << 8)|buf[0]);
-}
-
-static uint32_t get_uint32be(uint8_t *buf)
-{
-    return (uint32_t)((buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0]);
-}
-
-#else          
 static uint16_t get_uint16be(uint8_t *buf)
 {
     return (uint16_t)((buf[0] << 8)|buf[1]);
@@ -58,7 +46,6 @@ static uint32_t get_uint32be(uint8_t *buf)
 {
     return (uint32_t)((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
 }
-#endif /* ROCKBOX_BIG_ENDIAN */
 
 #ifdef TEST
 #include <fcntl.h>
