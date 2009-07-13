@@ -84,9 +84,9 @@ enum
    the last digit).
 */
 #define TO_INT_WITH_PRECISION(x) \
-    ( (int)(((x) * PITCH_SPEED_PRECISION * 10 + 5) / 10) )
+    ( (unsigned short)(((x) * PITCH_SPEED_PRECISION * 10 + 5) / 10) )
     
-static const int semitone_table[] =
+static const unsigned short semitone_table[] =
 {
     TO_INT_WITH_PRECISION(50.00000000), /* Octave lower */
     TO_INT_WITH_PRECISION(52.97315472),
@@ -127,7 +127,7 @@ static const int semitone_table[] =
    x(n) = 100 * 2^(n * 20/1200) 
 */
 
-static const int cent_interp[] =
+static const unsigned short cent_interp[] =
 {
     TO_INT_WITH_PRECISION(100.0000000),
     TO_INT_WITH_PRECISION(101.1619440),
