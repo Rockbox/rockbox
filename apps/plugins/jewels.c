@@ -361,7 +361,6 @@ struct tile {
  * type is the game type (normal or puzzle)
  * playboard is the game playing board (first row is hidden)
  * num_jewels is the number of different jewels to use
- * playgame is true, if a game is started
  */
 struct game_context {
     unsigned int score;
@@ -371,7 +370,6 @@ struct game_context {
     unsigned int tmp_type;
     struct tile playboard[BJ_HEIGHT][BJ_WIDTH];
     unsigned int num_jewels;
-    bool playgame;
 };
 
 #define MAX_NUM_JEWELS 7
@@ -431,6 +429,7 @@ struct puzzle_level puzzle_levels[NUM_PUZZLE_LEVELS] = {
 
 #define HIGH_SCORE PLUGIN_GAMES_DIR "/jewels.score"
 struct highscore highest[NUM_SCORES];
+bool highest_updated = false;
 
 
 /*****************************************************************************
@@ -470,6 +469,8 @@ static bool jewels_loadgame(struct game_context* bj)
 
     rb->close(fd);
 
+    /* delete saved file */
+    rb->remove(SAVE_FILE);
     return loaded;
 }
 
@@ -885,8 +886,6 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
     bool undo = false;
     unsigned int points = 0;
     long lasttick, currenttick;
-    
-    bj->playgame = true;
 
     /* check for invalid parameters */
     if(x < 0 || x >= BJ_WIDTH || y < 0 || y >= BJ_HEIGHT-1 ||
@@ -1189,7 +1188,7 @@ static unsigned int jewels_initlevel(struct game_context* bj) {
         }
         break;
     }
-    
+
     jewels_drawboard(bj);
 
     /* run the play board */
@@ -1204,12 +1203,12 @@ static unsigned int jewels_initlevel(struct game_context* bj) {
 static void jewels_init(struct game_context* bj) {
     /* seed the rand generator */
     rb->srand(*rb->current_tick);
-    
+
     bj->type = bj->tmp_type;
     bj->level = 1;
     bj->score = 0;
     bj->segments = 0;
-    
+
     jewels_setcolors();
 
     /* clear playing board */
@@ -1343,31 +1342,12 @@ static int jewels_help(void)
     return 0;
 }
 
-static void jewels_choose_mode(struct game_context* bj)
-{
-    rb->button_clear_queue();
-    int choice = bj->tmp_type;
-    MENUITEM_STRINGLIST (main_menu, "Jewels Mode", NULL,
-                             "Normal",
-                             "Puzzle");
-    choice = rb->do_menu(&main_menu, &choice, NULL, false);
-    switch (choice) {
-        case 0:
-            bj->tmp_type=GAME_TYPE_NORMAL;
-            break;
-        case 1:
-            bj->tmp_type=GAME_TYPE_PUZZLE;
-            break;
-        default:
-            break;
-    }
-}
-
 static bool _ingame;
 static int jewels_menu_cb(int action, const struct menu_item_ex *this_item)
 {
+    int i = ((intptr_t)this_item);
     if(action == ACTION_REQUEST_MENUITEM
-       && !_ingame && ((intptr_t)this_item)==0)
+       && !_ingame && (i==0 || i==6))
         return ACTION_EXIT_MENUITEM;
     return action;
 }
@@ -1381,6 +1361,11 @@ static int jewels_game_menu(struct game_context* bj, bool ingame)
 
     _ingame = ingame;
 
+    static struct opt_items mode[] = {
+        { "Normal", -1 },
+        { "Puzzle", -1 },
+    };
+
     MENUITEM_STRINGLIST (main_menu, "Jewels Menu", jewels_menu_cb,
                              "Resume Game",
                              "Start New Game",
@@ -1388,8 +1373,9 @@ static int jewels_game_menu(struct game_context* bj, bool ingame)
                              "Help",
                              "High Score",
                              "Playback Control",
+                             "Save and Quit",
                              "Quit");
-                             
+
     while (1) {
         switch (rb->do_menu(&main_menu, &choice, NULL, false)) {
             case 0:
@@ -1399,7 +1385,7 @@ static int jewels_game_menu(struct game_context* bj, bool ingame)
                 jewels_init(bj);
                 return 0;
             case 2:
-                jewels_choose_mode(bj);
+                rb->set_option("Mode", &bj->tmp_type, INT, mode, 2, NULL);
                 break;
             case 3:
                 jewels_help();
@@ -1411,10 +1397,12 @@ static int jewels_game_menu(struct game_context* bj, bool ingame)
                 playback_control(NULL);
                 break;
             case 6:
-                if (bj->playgame) {
+                if (ingame) {
                     rb->splash(HZ*1, "Saving game ...");
                     jewels_savegame(bj);
                 }
+                return 1;
+            case 7:
                 return 1;
             case MENU_ATTACHED_USB:
                 return 1;
@@ -1430,15 +1418,10 @@ static int jewels_main(struct game_context* bj) {
     bool selected = false;
     bool no_movesavail;
     int x=0, y=0;
-    
-    bj->playgame = false;
-    if(!jewels_loadgame(bj)) {
-        if (jewels_game_menu(bj, false)!=0)
-            return 0;
-    } else {
-        if (jewels_game_menu(bj, true)!=0)
-            return 0;
-    }
+
+    bool loaded = jewels_loadgame(bj);
+    if (jewels_game_menu(bj, loaded)!=0)
+        return 0;
 
     while(true) {
         no_movesavail = false;
@@ -1546,7 +1529,7 @@ static int jewels_main(struct game_context* bj) {
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
-        
+
         switch(bj->type) {
             case GAME_TYPE_NORMAL:
                 if(bj->score >= LEVEL_PTS)
@@ -1576,7 +1559,8 @@ static int jewels_main(struct game_context* bj) {
                         NUM_SCORES)) {
                         position=highscore_update(bj->score,
                                                   bj->level, "",
-                                                  highest,NUM_SCORES);            
+                                                  highest,NUM_SCORES);
+                        highest_updated = true;
                         if (position == 0) {
                             rb->splash(HZ*2, "New High Score");
                         }
@@ -1601,6 +1585,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* load high scores */
     highscore_load(HIGH_SCORE,highest,NUM_SCORES);
+    highest_updated = false;
 
     rb->lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
@@ -1610,7 +1595,8 @@ enum plugin_status plugin_start(const void* parameter)
     struct game_context bj;
     bj.tmp_type = GAME_TYPE_NORMAL;
     jewels_main(&bj);
-    highscore_save(HIGH_SCORE,highest,NUM_SCORES);
+    if(highest_updated)
+        highscore_save(HIGH_SCORE,highest,NUM_SCORES);
     rb->lcd_setfont(FONT_UI);
 
     return PLUGIN_OK;
