@@ -2390,6 +2390,9 @@ static inline bool is_file_data_ok(struct enc_file_event_data *filed)
     return filed->rec_file >= 0 && (long)filed->chunk->flags >= 0;
 } /* is_event_ok */
 
+static unsigned char mp3_data[16384] __attribute__((aligned(4)));
+static unsigned int  mp3_data_len; /* current data size in buffer */
+
 /* called very often - inline */
 static inline bool on_write_chunk(struct enc_file_event_data *data) ICODE_ATTR;
 static inline bool on_write_chunk(struct enc_file_event_data *data)
@@ -2405,9 +2408,20 @@ static inline bool on_write_chunk(struct enc_file_event_data *data)
         return true;
     }
 
-    if (ci->write(data->rec_file, data->chunk->enc_data,
-                  data->chunk->enc_size) != (ssize_t)data->chunk->enc_size)
-        return false;
+    /* if current chunk doesn't fit => write collected data */
+    if (mp3_data_len + data->chunk->enc_size > sizeof(mp3_data))
+    {
+        if (ci->write(data->rec_file, mp3_data,
+                    mp3_data_len) != (ssize_t)mp3_data_len)
+            return false;
+
+        mp3_data_len = 0;
+    }
+
+    memcpy(mp3_data+mp3_data_len, data->chunk->enc_data,
+           data->chunk->enc_size);
+
+    mp3_data_len += data->chunk->enc_size;
 
     data->num_pcm_samples += data->chunk->num_pcm;
     return true;
@@ -2425,6 +2439,10 @@ static bool on_start_file(struct enc_file_event_data *data)
 
     /* reset sample count */
     data->num_pcm_samples = 0;
+
+    /* reset buffer write position */
+    mp3_data_len = 0;
+
     return true;
 } /* on_start_file */
 
@@ -2432,6 +2450,14 @@ static bool on_end_file(struct enc_file_event_data *data)
 {
     if (data->rec_file < 0)
         return false; /* file already closed, nothing more we can do */
+
+    /* write the remaining mp3_data */
+    if (ci->write(data->rec_file, mp3_data, mp3_data_len)
+                   != (ssize_t)mp3_data_len)
+        return false;
+
+    /* reset buffer write position */
+    mp3_data_len = 0;
 
     /* always _try_ to write the file header, even on error */
     if (ci->close(data->rec_file) != 0)
