@@ -12533,3 +12533,54 @@
     remote: "Barra Di Stato Del Telecomando"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc: 
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Semitono"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Semitono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Limite"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Limite"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Rate"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Rate"
+  </voice>
+</phrase>
