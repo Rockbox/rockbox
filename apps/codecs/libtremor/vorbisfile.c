@@ -1554,12 +1554,6 @@ ogg_int64_t ov_raw_tell(OggVorbis_File *vf){
   return(vf->offset);
 }
 
-/* return PCM offset (sample) of next PCM sample to be read */
-ogg_int64_t ov_pcm_tell(OggVorbis_File *vf){
-  if(vf->ready_state<OPENED)return(OV_EINVAL);
-  return(vf->pcm_offset);
-}
-
 /* return time offset (milliseconds) of next PCM sample to be read */
 ogg_int64_t ov_time_tell(OggVorbis_File *vf){
   int link=0;
