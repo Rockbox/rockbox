@@ -542,10 +542,17 @@ static void jewels_drawboard(struct game_context* bj) {
     int i, j;
     int w, h;
     unsigned int tempscore;
+    unsigned int size;
     char *title = "Level";
     char str[10];
 
-    tempscore = (bj->score>LEVEL_PTS ? LEVEL_PTS : bj->score);
+    if (bj->type == GAME_TYPE_NORMAL) {
+        tempscore = (bj->score>LEVEL_PTS ? LEVEL_PTS : bj->score);
+        size = LEVEL_PTS;
+    } else {
+        tempscore = (bj->level>NUM_PUZZLE_LEVELS ? NUM_PUZZLE_LEVELS : bj->level);
+        size = NUM_PUZZLE_LEVELS;
+    }
 
     /* clear screen */
     rb->lcd_clear_display();
@@ -575,45 +582,47 @@ static void jewels_drawboard(struct game_context* bj) {
     /* draw separator lines */
     jewels_setcolors();
     rb->lcd_vline(BJ_WIDTH*TILE_WIDTH, 0, LCD_HEIGHT-1);
+
     rb->lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH-1, 18);
     rb->lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH-1, LCD_HEIGHT-10);
-
+    
     /* draw progress bar */
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
 #endif
     rb->lcd_fillrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
                      (LCD_HEIGHT-10)-(((LCD_HEIGHT-10)-18)*
-                         tempscore/LEVEL_PTS),
+                         tempscore/size),
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2,
-                     ((LCD_HEIGHT-10)-18)*tempscore/LEVEL_PTS);
+                     ((LCD_HEIGHT-10)-18)*tempscore/size);
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(83, 44, 44));
     rb->lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4+1,
                      (LCD_HEIGHT-10)-(((LCD_HEIGHT-10)-18)*
-                         tempscore/LEVEL_PTS)+1,
+                         tempscore/size)+1,
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-2,
-                     ((LCD_HEIGHT-10)-18)*tempscore/LEVEL_PTS-1);
+                     ((LCD_HEIGHT-10)-18)*tempscore/size-1);
     jewels_setcolors();
     rb->lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
-                     (LCD_HEIGHT-10)-(((LCD_HEIGHT-10)-18)*
-                         tempscore/LEVEL_PTS),
+                     (LCD_HEIGHT-10)-(((LCD_HEIGHT-10)-18)*tempscore/size),
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2,
-                     ((LCD_HEIGHT-10)-18)*tempscore/LEVEL_PTS+1);
+                     ((LCD_HEIGHT-10)-18)*tempscore/size+1);
 #endif
 
+    if (bj->type == GAME_TYPE_NORMAL) {
+        rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
+        rb->lcd_getstringsize(str, &w, &h);
+        rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2,
+                       LCD_HEIGHT-8, str);
+    }
+    
     /* print text */
     rb->lcd_getstringsize(title, &w, &h);
     rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2, 1, title);
-
     rb->snprintf(str, 4, "%d", bj->level);
     rb->lcd_getstringsize(str, &w, &h);
     rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2, 10, str);
 
-    rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
-    rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2,
-                   LCD_HEIGHT-8, str);
 
 #elif LCD_WIDTH < LCD_HEIGHT /* vertical layout */
 
@@ -622,35 +631,38 @@ static void jewels_drawboard(struct game_context* bj) {
     rb->lcd_hline(0, LCD_WIDTH-1, 8*TILE_HEIGHT+YOFS);
     rb->lcd_hline(0, LCD_WIDTH-1, LCD_HEIGHT-14);
     rb->lcd_vline(LCD_WIDTH/2, LCD_HEIGHT-14, LCD_HEIGHT-1);
-
+    
     /* draw progress bar */
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
 #endif
     rb->lcd_fillrect(0, (8*TILE_HEIGHT+YOFS)
-                           +(LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/4,
-                     LCD_WIDTH*tempscore/LEVEL_PTS,
+                    +(LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/4,
+                     LCD_WIDTH*tempscore/size,
                      (LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/2);
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(83, 44, 44));
     rb->lcd_drawrect(1, (8*TILE_HEIGHT+YOFS)
-                           +(LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/4+1,
-                     LCD_WIDTH*tempscore/LEVEL_PTS-1,
+                    +(LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/4+1,
+                     LCD_WIDTH*tempscore/size-1,
                      (LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/2-2);
     jewels_setcolors();
     rb->lcd_drawrect(0, (8*TILE_HEIGHT+YOFS)
-                           +(LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/4,
-                     LCD_WIDTH*tempscore/LEVEL_PTS+1,
+                    +(LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/4,
+                     LCD_WIDTH*tempscore/size+1,
                      (LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/2);
 #endif
-
+    
+    if (bj->type == GAME_TYPE_NORMAL) {
+        rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
+        rb->lcd_getstringsize(str, &w, &h);
+        rb->lcd_putsxy((LCD_WIDTH-2)-w, LCD_HEIGHT-10, str);
+    }
+    
     /* print text */
     rb->snprintf(str, 10, "%s %d", title, bj->level);
     rb->lcd_putsxy(1, LCD_HEIGHT-10, str);
 
-    rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
-    rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy((LCD_WIDTH-2)-w, LCD_HEIGHT-10, str);
 
 #else /* square layout */
 
@@ -665,33 +677,34 @@ static void jewels_drawboard(struct game_context* bj) {
     rb->lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
 #endif
     rb->lcd_fillrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
-                     (8*TILE_HEIGHT+YOFS)-(8*TILE_HEIGHT+YOFS)
-                        *tempscore/LEVEL_PTS,
+                     (8*TILE_HEIGHT+YOFS)-(8*TILE_HEIGHT+YOFS)*tempscore/size,
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2,
-                     (8*TILE_HEIGHT+YOFS)*tempscore/LEVEL_PTS);
+                     (8*TILE_HEIGHT+YOFS)*tempscore/size);
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(83, 44, 44));
     rb->lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4+1,
                      (8*TILE_HEIGHT+YOFS)-(8*TILE_HEIGHT+YOFS)
-                        *tempscore/LEVEL_PTS+1,
+                        *tempscore/size+1,
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-2,
-                     (8*TILE_HEIGHT+YOFS)*tempscore/LEVEL_PTS-1);
+                     (8*TILE_HEIGHT+YOFS)*tempscore/size-1);
     jewels_setcolors();
     rb->lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
                      (8*TILE_HEIGHT+YOFS)-(8*TILE_HEIGHT+YOFS)
-                        *tempscore/LEVEL_PTS,
+                        *tempscore/size,
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2,
-                     (8*TILE_HEIGHT+YOFS)*tempscore/LEVEL_PTS+1);
+                     (8*TILE_HEIGHT+YOFS)*tempscore/size+1);
 #endif
+    
+    if (bj->type == GAME_TYPE_NORMAL) {
+        rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
+        rb->lcd_getstringsize(str, &w, &h);
+        rb->lcd_putsxy((LCD_WIDTH-2)-w,
+                       LCD_HEIGHT-(LCD_HEIGHT-(8*TILE_HEIGHT+YOFS))/2-3, str);
+    }
 
     /* print text */
     rb->snprintf(str, 10, "%s %d", title, bj->level);
     rb->lcd_putsxy(1, LCD_HEIGHT-(LCD_HEIGHT-(8*TILE_HEIGHT+YOFS))/2-3, str);
-
-    rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
-    rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy((LCD_WIDTH-2)-w,
-                   LCD_HEIGHT-(LCD_HEIGHT-(8*TILE_HEIGHT+YOFS))/2-3, str);
 
 #endif /* layout */
 
