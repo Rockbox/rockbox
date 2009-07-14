@@ -603,8 +603,7 @@ void save_snapshot_file(char *name)
 {
   int type;
 
-  rb->strncpy(filenamebuf, name, MAXFILENAME-10);
-  filenamebuf[MAXFILENAME-10] = '\0';
+  rb->strlcpy(filenamebuf, name, MAXFILENAME-10 + 1);
 
   type = SN_Z80;
   if(check_ext(filenamebuf, "z80")) type = SN_Z80;
@@ -642,8 +641,7 @@ void load_snapshot_file_type(char *name, int type)
   int snsh;
   SNFILE snfil;
 
-  rb->strncpy(filenamebuf, name, MAXFILENAME-10);
-  filenamebuf[MAXFILENAME-10] = '\0';
+  rb->strlcpy(filenamebuf, name, MAXFILENAME-10 + 1);
 
   spcf_find_file_type(filenamebuf, &filetype, &type);
   if(type < 0) type = SN_Z80;

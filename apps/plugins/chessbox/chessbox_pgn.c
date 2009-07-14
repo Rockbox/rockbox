@@ -543,7 +543,7 @@ char * get_game_text(int selected_item, void *data,
     rb->snprintf(text_buffer, 50,"%s vs. %s (%s)", temp_node->white_player,
                          temp_node->black_player, temp_node->game_date);
 
-    rb->strncpy(buffer, text_buffer, buffer_len);
+    rb->strlcpy(buffer, text_buffer, buffer_len);
     return buffer;
 }
 

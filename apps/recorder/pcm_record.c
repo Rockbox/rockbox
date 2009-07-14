@@ -529,7 +529,7 @@ static bool pcmrec_fnq_is_full(void)
 /* queue another filename - will overwrite oldest one if full */
 static bool pcmrec_fnq_add_filename(const char *filename)
 {
-    strncpy(fn_queue + fnq_wr_pos, filename, MAX_PATH);
+    strlcpy(fn_queue + fnq_wr_pos, filename, MAX_PATH);
     fnq_wr_pos = FNQ_NEXT(fnq_wr_pos);
     
     if (fnq_rd_pos != fnq_wr_pos)
@@ -550,7 +550,7 @@ static bool pcmrec_fnq_replace_tail(const char *filename)
 
     pos = FNQ_PREV(fnq_wr_pos);
 
-    strncpy(fn_queue + pos, filename, MAX_PATH);
+    strlcpy(fn_queue + pos, filename, MAX_PATH);
 
     return true;
 } /* pcmrec_fnq_replace_tail */
@@ -562,7 +562,7 @@ static bool pcmrec_fnq_get_filename(char *filename)
         return false;
 
     if (filename)
-        strncpy(filename, fn_queue + fnq_rd_pos, MAX_PATH);
+        strlcpy(filename, fn_queue + fnq_rd_pos, MAX_PATH);
     
     fnq_rd_pos = FNQ_NEXT(fnq_rd_pos);
     return true;
@@ -976,7 +976,7 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
     bool did_flush = false;                  /* did a flush occurr? */
 
     if (filename)
-        strncpy(path, filename, MAX_PATH);
+        strlcpy(path, filename, MAX_PATH);
     queue_reply(&pcmrec_queue, 0); /* We have all we need */
 
     data.pre_chunk = NULL;

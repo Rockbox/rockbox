@@ -130,7 +130,7 @@ output_header_props (void)
 {
     char buffer[128];
 
-    rb->strncpy (buffer, "GM[1]FF[4]CA[UTF-8]AP[Rockbox Goban:1.0]ST[2]\n\n",
+    rb->strlcpy (buffer, "GM[1]FF[4]CA[UTF-8]AP[Rockbox Goban:1.0]ST[2]\n\n",
                  sizeof (buffer));
     write_file (sgf_fd, buffer, rb->strlen (buffer));
 

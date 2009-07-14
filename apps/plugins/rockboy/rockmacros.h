@@ -67,7 +67,7 @@ void dynamic_recompile (struct dynarec_block *newblock);
 #define strcat(a,b)     rb->strcat((a),(b))
 #define memset(a,b,c)   rb->memset((a),(b),(c))
 #define strcpy(a,b)     rb->strcpy((a),(b))
-#define strncpy(a,b,c)  rb->strncpy((a),(b),(c))
+#define strlcpy(a,b,c)  rb->strlcpy((a),(b),(c))
 #define strlen(a)       rb->strlen((a))
 #define strcmp(a,b)     rb->strcmp((a),(b))
 #define strchr(a,b)     rb->strchr((a),(b))

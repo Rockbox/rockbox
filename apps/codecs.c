@@ -122,7 +122,6 @@ struct codec_api ci = {
 
     /* strings and memory */
     strcpy,
-    strncpy,
     strlen,
     strcmp,
     strcat,

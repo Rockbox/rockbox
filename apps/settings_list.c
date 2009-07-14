@@ -439,7 +439,7 @@ static void qs_load_from_cfg(void* var, char*value)
 static char* qs_write_to_cfg(void* setting, char*buf, int buf_len)
 {
     const struct settings_list *var = &settings[*(int*)setting];
-    strncpy(buf, var->cfg_name, buf_len);
+    strlcpy(buf, var->cfg_name, buf_len);
     return buf;
 }
 static bool qs_is_changed(void* setting, void* defaultval)

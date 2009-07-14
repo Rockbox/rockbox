@@ -1002,17 +1002,14 @@ static bool parse_bookmark(const char *bookmark,
     if (resume_file != NULL)
     {
         size_t len = (end == NULL) ? strlen(s) : (size_t) (end - s);
-
         len = MIN(resume_file_size - 1, len);
-        strncpy(resume_file, s, len);
-        resume_file[len] = 0;
+        strlcpy(resume_file, s, len + 1);
     }
 
     if (end != NULL && file_name != NULL)
     {
         end++;
-        strncpy(file_name, end, MAX_PATH - 1);
-        file_name[MAX_PATH - 1] = 0;
+        strlcpy(file_name, end, MAX_PATH);
     }
     
     return true;

@@ -139,7 +139,7 @@ int configfile_load(const char *filename, struct configdata *cfg,
                         break;
 
                     case TYPE_STRING:
-                        rb->strncpy(cfg[i].string, val, cfg[i].max);
+                        rb->strlcpy(cfg[i].string, val, cfg[i].max);
                         break;
                 }
             }

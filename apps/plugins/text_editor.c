@@ -133,7 +133,7 @@ char *list_get_name_cb(int selected_item, void* data,
         rb->snprintf(buf , buf_len, "%s ...", b);
         b[buf_len-10] = t;
     }
-    else rb->strncpy(buf, b, buf_len);
+    else rb->strlcpy(buf, b, buf_len);
     return buf;
 }
 

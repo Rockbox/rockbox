@@ -496,7 +496,7 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
         }
 
         end = strchr(s->line, '\0');
-        strncpy(end, string, utf8seek(s->line, current_vp->width));
+        strlcpy(end, string, utf8seek(s->line, current_vp->width));
 
         s->vp = current_vp;
         s->y = y;

@@ -403,7 +403,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
 #endif
     
     lseek(fd, 0, SEEK_SET);
-    strncpy(id3->path, trackname, sizeof(id3->path));
+    strlcpy(id3->path, trackname, sizeof(id3->path));
 
     return true;
 }

@@ -2203,8 +2203,7 @@ void audio_record(const char *filename)
 {
     mpeg_errno = 0;
     
-    strncpy(recording_filename, filename, MAX_PATH - 1);
-    recording_filename[MAX_PATH - 1] = 0;
+    strlcpy(recording_filename, filename, MAX_PATH);
 
     queue_post(&mpeg_queue, MPEG_RECORD, 0);
 }
@@ -2509,8 +2508,7 @@ void audio_new_file(const char *filename)
 {
     mpeg_errno = 0;
 
-    strncpy(recording_filename, filename, MAX_PATH - 1);
-    recording_filename[MAX_PATH - 1] = 0;
+    strlcpy(recording_filename, filename, MAX_PATH);
 
     queue_post(&mpeg_queue, MPEG_NEW_FILE, 0);
 }

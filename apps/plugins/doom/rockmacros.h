@@ -59,7 +59,6 @@ int my_close(int id);
 #define memcmp(a,b,c)      rb->memcmp((a),(b),(c))
 #define memchr(a,b,c)      rb->memchr((a),(b),(c))
 #define strcpy(a,b)        rb->strcpy((a),(b))
-#define strncpy(a,b,c)     rb->strncpy((a),(b),(c))
 #define strlen(a)          rb->strlen((a))
 #define strcmp(a,b)        rb->strcmp((a),(b))
 #define strncmp(a,b,c)     rb->strncmp((a),(b),(c))

@@ -86,7 +86,7 @@ void traversedir(char* location, char* name)
         /* check if path is removed directory, if so dont enter it */
         rb->snprintf(path, MAX_PATH, "%s/%s", fullpath, entry->d_name);
         while(path[0] == '/')
-            rb->strncpy(path, path + 1, rb->strlen(path));
+            rb->strlcpy(path, path + 1, sizeof(path));
         for(i = 0; i < num_replaced_dirs; i++)
         {
             if(!rb->strcmp(path, removed_dirs[i]))
@@ -141,8 +141,8 @@ bool custom_dir(void)
                      (num_replaced_dirs < MAX_REMOVED_DIRS))
             {
                 num_replaced_dirs ++;
-                rb->strncpy(removed_dirs[num_replaced_dirs - 1], line + 2,
-                                rb->strlen(line));
+                rb->strlcpy(removed_dirs[num_replaced_dirs - 1], line + 2,
+                                sizeof(line));
             }
         }
         rb->close(fd2);
@@ -157,7 +157,7 @@ bool custom_dir(void)
             {
                 /* remove preceeding '/'s from the line */
                 while(line[0] == '/')
-                    rb->strncpy(line, line + 1, rb->strlen(line));
+                    rb->strlcpy(line, line + 1, sizeof(line));
 
                 rb->snprintf(formatted_line, MAX_PATH, "/%s", line);
 
@@ -237,7 +237,7 @@ void generate(void)
 char *list_get_name_cb(int selected_item, void* data, char* buf, size_t buf_len)
 {
     (void)data;
-    rb->strncpy(buf, list->folder[selected_item], buf_len);
+    rb->strlcpy(buf, list->folder[selected_item], buf_len);
     return buf;
 }
 

@@ -533,7 +533,7 @@ void talk_init(void)
 #endif /* CONFIG_CODEC == SWCODEC */
 
     talk_initialized = true;
-    strncpy((char *) last_lang, (char *)global_settings.lang_file,
+    strlcpy((char *)last_lang, (char *)global_settings.lang_file,
         MAX_FILENAME);
 
 #if CONFIG_CODEC == SWCODEC
@@ -755,7 +755,7 @@ static int talk_spell_basename(const char *path,
     }
     char buf[MAX_PATH];
     /* Spell only the path component after the last slash */
-    strncpy(buf, path, MAX_PATH);
+    strlcpy(buf, path, sizeof(buf));
     if(strlen(buf) >1 && buf[strlen(buf)-1] == '/')
         /* strip trailing slash */
         buf[strlen(buf)-1] = '\0';

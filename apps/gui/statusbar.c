@@ -617,7 +617,7 @@ static void gui_statusbar_time(struct screen * display, struct tm *time)
         snprintf(buffer, sizeof(buffer), "%02d:%02d", hour, minute);
     }
     else {
-        strncpy(buffer, "--:--", sizeof buffer);
+        strlcpy(buffer, "--:--", sizeof(buffer));
     }
     display->setfont(FONT_SYSFIXED);
     display->getstringsize(buffer, &width, &height);
@@ -626,7 +626,6 @@ static void gui_statusbar_time(struct screen * display, struct tm *time)
                         STATUSBAR_Y_POS, buffer);
     }
     display->setfont(FONT_UI);
-
 }
 #endif
 
@@ -758,14 +757,14 @@ static void gui_statusbar_icon_recording_info(struct screen * display)
     if (global_settings.rec_source == AUDIO_SRC_SPDIF)
     {
         /* Can't measure S/PDIF sample rate on Archos/Sim yet */
-        strncpy(buffer, "--", sizeof(buffer));
+        strlcpy(buffer, "--", sizeof(buffer));
     }
     else
 #endif /* HAVE_SPDIF_IN */
     {
         static char const * const freq_strings[12] =
         { "44", "48", "32", "22", "24", "16" };
-        strncpy(buffer, freq_strings[global_settings.rec_frequency],
+        strlcpy(buffer, freq_strings[global_settings.rec_frequency],
                 sizeof(buffer));
     }
 

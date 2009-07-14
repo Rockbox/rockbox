@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+char* strncpy(char *, const char *, size_t);
 void* plugin_get_buffer(size_t *buffer_size);
 
 #ifndef __PCTOOL__
@@ -128,12 +129,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 160
+#define PLUGIN_API_VERSION 161
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 160
+#define PLUGIN_MIN_API_VERSION 161
 
 /* plugin return codes */
 enum plugin_status {
@@ -505,7 +506,7 @@ struct plugin_api {
                     ATTRIBUTE_PRINTF(3, 4);
     int (*vsnprintf)(char *buf, int size, const char *fmt, va_list ap);
     char* (*strcpy)(char *dst, const char *src);
-    char* (*strncpy)(char *dst, const char *src, size_t length);
+    size_t (*strlcpy)(char *dst, const char *src, size_t length);
     size_t (*strlen)(const char *str);
     char * (*strrchr)(const char *s, int c);
     int (*strcmp)(const char *, const char *);

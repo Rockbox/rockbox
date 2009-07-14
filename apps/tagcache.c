@@ -706,7 +706,7 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
         if (tag != tag_filename)
         {
             ep = (struct tagfile_entry *)&hdr->tags[tag][seek];
-            strncpy(buf, ep->tag_data, size-1);
+            strlcpy(buf, ep->tag_data, size);
             
             return true;
         }

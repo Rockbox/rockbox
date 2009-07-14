@@ -686,7 +686,7 @@ static bool browse( char *dst, int dst_size, const char *start )
                     if( selected < 0 || selected >= item_count )
                         break;
                     struct entry* e = &dc[indexes[selected]];
-                    rb->strncpy( bbuf_s, e->name, sizeof( bbuf_s ) );
+                    rb->strlcpy( bbuf_s, e->name, sizeof( bbuf_s ) );
                     if( !( e->attr & ATTR_DIRECTORY ) )
                     {
                         *tree = backup;

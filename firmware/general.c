@@ -110,7 +110,7 @@ char *create_numbered_filename(char *buffer, const char *path,
     char fmtstring[12];
 
     if (buffer != path)
-        strncpy(buffer, path, MAX_PATH);
+        strlcpy(buffer, path, MAX_PATH);
 
     pathlen = strlen(buffer);
 
@@ -185,7 +185,7 @@ char *create_datetime_filename(char *buffer, const char *path,
     last_tm = *tm;
 
     if (buffer != path)
-        strncpy(buffer, path, MAX_PATH);
+        strlcpy(buffer, path, MAX_PATH);
 
     pathlen = strlen(buffer);
     snprintf(buffer + pathlen, MAX_PATH - pathlen,

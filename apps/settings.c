@@ -246,8 +246,7 @@ static bool cfg_string_to_int(int setting_id, int* out, const char* str)
             }
             else return false;
         }
-        strncpy(temp, start, end-start);
-        temp[end-start] = '\0';
+        strlcpy(temp, start, end-start+1);
         if (!strcmp(str, temp))
         {
             *out = count;
@@ -331,20 +330,18 @@ bool settings_load_config(const char* file, bool apply)
                                              settings[i].filename_setting->prefix,
                                              len))
                             {
-                                strncpy(storage,&value[len],MAX_PATH);
+                                strlcpy(storage, &value[len], MAX_PATH);
                             }
-                            else strncpy(storage,value,MAX_PATH);
+                            else strlcpy(storage, value, MAX_PATH);
                         }
-                        else strncpy(storage,value,MAX_PATH);
+                        else strlcpy(storage, value, MAX_PATH);
                         if (settings[i].filename_setting->suffix)
                         {
                             char *s = strcasestr(storage,settings[i].filename_setting->suffix);
                             if (s) *s = '\0';
                         }
-                        strncpy((char*)settings[i].setting,storage,
+                        strlcpy((char*)settings[i].setting, storage,
                                 settings[i].filename_setting->max_len);
-                        ((char*)settings[i].setting)
-                            [settings[i].filename_setting->max_len-1] = '\0';
                         break;
                     }
                 }
@@ -379,12 +376,11 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
             if (value[count] == val)
             {
                 if (end == NULL)
-                    strncpy(buf, start, buf_len);
+                    strlcpy(buf, start, buf_len);
                 else 
                 {
                     int len = (buf_len > (end-start))? end-start: buf_len;
-                    strncpy(buf, start, len);
-                    buf[len] = '\0';
+                    strlcpy(buf, start, len+1);
                 }
                 return true;
             }
@@ -408,12 +404,11 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
     }
     end = strchr(start,',');
     if (end == NULL)
-        strncpy(buf, start, buf_len);
+        strlcpy(buf, start, buf_len);
     else 
     {
         int len = (buf_len > (end-start))? end-start: buf_len;
-        strncpy(buf, start, len);
-        buf[len] = '\0';
+        strlcpy(buf, start, len+1);
     }
     return true;
 }
@@ -468,7 +463,7 @@ bool cfg_to_string(int i/*setting_id*/, char* buf, int buf_len)
                     (char*)settings[i].setting,
                     settings[i].filename_setting->suffix);
             }
-            else strncpy(buf,(char*)settings[i].setting,
+            else strlcpy(buf,(char*)settings[i].setting,
                          settings[i].filename_setting->max_len);
             break;
     } /* switch () */
@@ -1011,7 +1006,7 @@ void reset_setting(const struct settings_list *setting, void *var)
         break;
     case F_T_CHARPTR:
     case F_T_UCHARPTR:
-        strncpy((char*)var, setting->default_val.charptr,
+        strlcpy((char*)var, setting->default_val.charptr,
                 setting->filename_setting->max_len);
         break;
     }
@@ -1114,7 +1109,7 @@ static void set_option_formatter(char* buf, size_t size, int item, const char* u
 {
     (void)unit;
     const unsigned char *text = set_option_options[item].string;
-    strncpy(buf, P2STR(text), size);
+    strlcpy(buf, P2STR(text), size);
 }
 static int32_t set_option_get_talk_id(int value, int unit)
 {
@@ -1173,12 +1168,11 @@ void set_file(const char* filename, char* setting, int maxlen)
     }
     if(ptr == fptr) extlen = 0;
 
-    if (strncasecmp(ROCKBOX_DIR, filename ,strlen(ROCKBOX_DIR)) ||
+    if (strncasecmp(ROCKBOX_DIR, filename, strlen(ROCKBOX_DIR)) ||
         (len-extlen > maxlen))
         return;
 
-    strncpy(setting, fptr, len-extlen);
-    setting[len-extlen]=0;
+    strlcpy(setting, fptr, len-extlen+1);
 
     settings_save();
 }

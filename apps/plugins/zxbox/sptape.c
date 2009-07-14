@@ -594,8 +594,7 @@ void start_play_file_type(char *name, int seg, int type)
 {
   int filetype = FT_TAPEFILE;
 
-  rb->strncpy(tapename, name, MAXFILENAME-10);
-  tapename[MAXFILENAME-10] = '\0';
+  rb->strlcpy(tapename, name, MAXFILENAME-10 + 1);
 
   currseg = seg;
   tapetype = type;

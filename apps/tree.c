@@ -505,7 +505,7 @@ char *getcwd(char *buf, int size)
         return tc.currdir;
     else if (size > 0)
     {
-        strncpy(buf, tc.currdir, size);
+        strlcpy(buf, tc.currdir, size);
         return buf;
     }
     else
@@ -924,7 +924,7 @@ int rockbox_browse(const char *root, int dirfilter)
             }
             else
             {
-                strncpy(current, LANG_DIR "/english.lng", sizeof(current));
+                strlcpy(current, LANG_DIR "/english.lng", sizeof(current));
             }
         }
         /* Center on currently loaded WPS */

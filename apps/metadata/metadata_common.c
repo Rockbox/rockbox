@@ -320,10 +320,9 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
 
         if (len > 0)
         {
-            strncpy(buf, value, len);
-            buf[len] = 0;
-            *p = buf;
             len++;
+            strlcpy(buf, value, len);
+            *p = buf;
         }
         else
         {

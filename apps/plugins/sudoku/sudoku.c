@@ -603,7 +603,7 @@ void default_state(struct sudoku_state_t* state)
 {
     int r,c;
 
-    rb->strncpy(state->filename,GAME_FILE,MAX_PATH);
+    rb->strlcpy(state->filename,GAME_FILE,MAX_PATH);
     for (r=0;r<9;r++) {
         for (c=0;c<9;c++) {
             state->startboard[r][c]=default_game[r][c];
@@ -626,7 +626,7 @@ void clear_state(struct sudoku_state_t* state)
 {
     int r,c;
 
-    rb->strncpy(state->filename,GAME_FILE,MAX_PATH);
+    rb->strlcpy(state->filename,GAME_FILE,MAX_PATH);
     for (r=0;r<9;r++) {
         for (c=0;c<9;c++) {
             state->startboard[r][c]='0';
@@ -719,7 +719,7 @@ bool load_sudoku(struct sudoku_state_t* state, char* filename)
         return(false);
     }
 
-    rb->strncpy(state->filename,filename,MAX_PATH);
+    rb->strlcpy(state->filename,filename,MAX_PATH);
     n=rb->read(fd,buf,300);
     if (n <= 0) {
         return(false);
@@ -1111,7 +1111,7 @@ bool sudoku_generate(struct sudoku_state_t* state)
         rb->snprintf(str,sizeof(str),"Difficulty: %s",difficulty);
         display_board(state);
         rb->splash(HZ*3, str);
-        rb->strncpy(state->filename,GAME_FILE,MAX_PATH);
+        rb->strlcpy(state->filename,GAME_FILE,MAX_PATH);
     } else {
         display_board(&new_state);
         rb->splash(HZ*2, "Aborted");

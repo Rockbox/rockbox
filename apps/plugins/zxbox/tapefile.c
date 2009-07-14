@@ -510,8 +510,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
       int blen;
       rb->snprintf(seg_desc,DESC_LEN, "Begin Group: ");
       blen = (int) rb->strlen(seg_desc);
-      rb->strncpy(seg_desc+blen, (char *) rbuf, (unsigned) csp->len);
-      seg_desc[csp->len + blen] = '\0';
+      rb->strlcpy(seg_desc+blen, (char *) rbuf, (unsigned) csp->len + 1);
     }
     break;
 
@@ -618,8 +617,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
       return 0;
     }
     csp->ptr += csp->len;
-    rb->strncpy(seg_desc, (char *) rbuf, (unsigned) csp->len);
-    seg_desc[csp->len] = '\0';
+    rb->strlcpy(seg_desc, (char *) rbuf, (unsigned) csp->len + 1);
     break;
 
   case 0x32:

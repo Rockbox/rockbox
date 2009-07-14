@@ -913,7 +913,7 @@ bool get_albumart_for_index_from_db(const int slide_index, char *buf,
 {
     if ( slide_index == -1 )
     {
-        rb->strncpy( buf, EMPTY_SLIDE, buflen );
+        rb->strlcpy( buf, EMPTY_SLIDE, buflen );
     }
 
     if (!rb->tagcache_search(&tcs, tag_filename))
@@ -930,8 +930,7 @@ bool get_albumart_for_index_from_db(const int slide_index, char *buf,
 #ifdef HAVE_TC_RAMCACHE
         if (rb->tagcache_fill_tags(&id3, tcs.result))
         {
-            rb->strncpy(id3.path, tcs.result, sizeof(id3.path));
-            id3.path[sizeof(id3.path) - 1] = 0;
+            rb->strlcpy(id3.path, tcs.result, sizeof(id3.path));
         }
         else
 #endif

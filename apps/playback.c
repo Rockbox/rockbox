@@ -617,7 +617,7 @@ struct mp3entry* audio_current_track(void)
         return write_id3;
 #endif
 
-    strncpy(write_id3->path, filename, sizeof(write_id3->path)-1);
+    strlcpy(write_id3->path, filename, sizeof(write_id3->path));
     write_id3->title = strrchr(write_id3->path, '/');
     if (!write_id3->title)
         write_id3->title = &write_id3->path[0];

@@ -1489,8 +1489,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                             break;
                         }
 
-                        strncpy(stringbuf, string_start, len);
-                        *(stringbuf + len) = '\0';
+                        strlcpy(stringbuf, string_start, len+1);
 
                         data->strings[data->num_strings] = stringbuf;
                         stringbuf += len + 1;
@@ -1781,11 +1780,9 @@ bool wps_data_load(struct wps_data *wps_data,
 #ifdef HAVE_LCD_BITMAP
         /* get the bitmap dir */
         char bmpdir[MAX_PATH];
-        size_t bmpdirlen;
         char *dot = strrchr(buf, '.');
-        bmpdirlen = dot - buf;
-        strncpy(bmpdir, buf, dot - buf);
-        bmpdir[bmpdirlen] = 0;
+
+        strlcpy(bmpdir, buf, dot - buf + 1);
 
         /* load the bitmaps that were found by the parsing */
         if (!load_wps_bitmaps(wps_data, bmpdir)) {

@@ -309,8 +309,7 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
         value_len = bufferpos - (tag - entry->id3v2buf);
         
         if (!strcasecmp(tag, "ALBUM ARTIST")) {
-            strncpy(tag, value, value_len);
-            tag[value_len - 1] = 0;
+            strlcpy(tag, value, value_len);
             entry->albumartist = tag;
 #if CONFIG_CODEC == SWCODEC
         } else {
@@ -1114,7 +1113,7 @@ bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename)
     memset(entry, 0, sizeof(struct mp3entry));
 #endif
 
-    strncpy(entry->path, filename, sizeof(entry->path));
+    strlcpy(entry->path, filename, sizeof(entry->path));
 
     entry->title = NULL;
     entry->filesize = filesize(fd);

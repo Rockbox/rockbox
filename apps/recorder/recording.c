@@ -964,7 +964,7 @@ static char * reclist_get_name(int selected_item, void * data,
             }
             else
             {
-                strncpy(buffer, str(LANG_RECORDING_FILENAME), buffer_len);
+                strlcpy(buffer, str(LANG_RECORDING_FILENAME), buffer_len);
             }
             break;
         }

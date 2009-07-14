@@ -1511,7 +1511,7 @@ void init_invadrox(void)
 
     if (highscore_load(HISCOREFILE, &hiscore, 1) < 0) {
         /* Init hiscore to 0 */
-        rb->strncpy(hiscore.name, "Invader", sizeof(hiscore.name));
+        rb->strlcpy(hiscore.name, "Invader", sizeof(hiscore.name));
         hiscore.score = 0;
         hiscore.level = 1;
     }

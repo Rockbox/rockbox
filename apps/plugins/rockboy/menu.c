@@ -162,11 +162,10 @@ static void munge_name(char *buf, const size_t bufsiz) {
  * checksum or something like that?
  */
 static void build_slot_path(char *buf, size_t bufsiz, size_t slot_id) {
-    char name_buf[40];
+    char name_buf[17];
 
     /* munge state file name */
-    strncpy(name_buf, rom.name, 40);
-    name_buf[16] = '\0';
+    strlcpy(name_buf, rom.name, sizeof(name_buf));
     munge_name(name_buf, strlen(name_buf));
 
     /* glom the whole mess together */
@@ -211,7 +210,7 @@ static bool do_file(char *path, char *desc, bool is_load) {
         /* build description buffer */
         memset(desc_buf, 0, 20);
         if (desc)
-            strncpy(desc_buf, desc, 20);
+            strlcpy(desc_buf, desc, 20);
 
         /* save state */
         write(fd, desc_buf, 20);
@@ -241,8 +240,7 @@ static bool do_slot(size_t slot_id, bool is_load) {
     if (!is_load)
         if (rb->kbd_input(desc_buf, 20) || !strlen(desc_buf))
         {
-            memset(desc_buf, 0, 20);
-            strncpy(desc_buf, "Untitled", 20);
+            strlcpy(desc_buf, "Untitled", 20);
         }
 
     /* load/save file */

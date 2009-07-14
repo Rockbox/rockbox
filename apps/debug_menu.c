@@ -1910,8 +1910,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 
         if (card->initialized > 0)
         {
-            card_name[6] = '\0';
-            strncpy(card_name, ((unsigned char*)card->cid) + 3, 6);
+            strlcpy(card_name, ((unsigned char*)card->cid) + 3, sizeof(card_name));
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "%s Rev %d.%d", card_name,
                     (int) card_extract_bits(card->cid, 55, 4),

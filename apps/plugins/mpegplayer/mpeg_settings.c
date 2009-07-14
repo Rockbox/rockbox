@@ -344,7 +344,7 @@ static void backlight_brightness_formatter(char *buf, size_t length,
                                            int value, const char *input)
 {
     if (value < 0)
-        rb->strncpy(buf, BACKLIGHT_OPTION_DEFAULT, length);
+        rb->strlcpy(buf, BACKLIGHT_OPTION_DEFAULT, length);
     else
         rb->snprintf(buf, length, "%d", value + MIN_BRIGHTNESS_SETTING);
 

@@ -1349,8 +1349,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
     
     if (playlist->in_ram && !control_file && max < 0)
     {
-        strncpy(tmp_buf, &playlist->buffer[seek], sizeof(tmp_buf));
-        tmp_buf[MAX_PATH] = '\0';
+        strlcpy(tmp_buf, &playlist->buffer[seek], sizeof(tmp_buf));
         max = strlen(tmp_buf) + 1;
     }
     else if (max < 0)
@@ -1402,8 +1401,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
         }
     }
 
-    strncpy(dir_buf, playlist->filename, playlist->dirlen-1);
-    dir_buf[playlist->dirlen-1] = 0;
+    strlcpy(dir_buf, playlist->filename, playlist->dirlen);
 
     return (format_track_path(buf, tmp_buf, buf_length, max, dir_buf));
 }
@@ -1471,8 +1469,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
     else
     {
         /* start with current directory */
-        strncpy(dir, playlist->filename, playlist->dirlen-1);
-        dir[playlist->dirlen-1] = '\0';
+        strlcpy(dir, playlist->filename, playlist->dirlen);
     }
 
     /* use the tree browser dircache to load files */
@@ -1671,13 +1668,13 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
 
     if('/' == src[0])
     {
-        strncpy(dest, src, buf_length);
+        strlcpy(dest, src, buf_length);
     }
     else
     {
         /* handle dos style drive letter */
         if (':' == src[1])
-            strncpy(dest, &src[2], buf_length);
+            strlcpy(dest, &src[2], buf_length);
         else if (!strncmp(src, "../", 3))
         {
             /* handle relative paths */
@@ -1904,7 +1901,7 @@ void playlist_init(void)
     struct playlist_info* playlist = &current_playlist;
 
     playlist->current = true;
-    strncpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
+    strlcpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
             sizeof(playlist->control_filename));
     playlist->fd = -1;
     playlist->control_fd = -1;
@@ -2721,7 +2718,7 @@ int playlist_set_current(struct playlist_info* playlist)
 
     empty_playlist(&current_playlist, false);
 
-    strncpy(current_playlist.filename, playlist->filename,
+    strlcpy(current_playlist.filename, playlist->filename,
         sizeof(current_playlist.filename));
 
     current_playlist.utf8 = playlist->utf8;
@@ -3240,7 +3237,7 @@ char *playlist_name(const struct playlist_info* playlist, char *buf,
     if (!playlist)
         playlist = &current_playlist;
 
-    strncpy(buf, playlist->filename+playlist->dirlen, buf_size);
+    strlcpy(buf, playlist->filename+playlist->dirlen, buf_size);
   
     if (!buf[0])
         return NULL;
@@ -3260,7 +3257,7 @@ char *playlist_get_name(const struct playlist_info* playlist, char *buf,
     if (!playlist)
         playlist = &current_playlist;
 
-    strncpy(buf, playlist->filename, buf_size);
+    strlcpy(buf, playlist->filename, buf_size);
 
     if (!buf[0])
         return NULL;

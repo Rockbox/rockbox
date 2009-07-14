@@ -213,8 +213,7 @@ bool parse_entry_content(char *line, sc_entry_t *entry, int last_segm)
         DEBUGF("Bad entry: pathlen=%d, displen=%d\n", path_len, disp_len);
         return false;
     }
-    rb->strncpy(entry->path, path, path_len);
-    entry->path[path_len] = '\0';
+    rb->strlcpy(entry->path, path, path_len + 1);
     rb->strcpy(entry->disp, disp); /* Safe since we've checked the length */
     entry->explicit_disp = expl;
     return true;
@@ -295,15 +294,14 @@ bool parse_name_value(char *line, char *name, int namesize,
         /* Too long name */
         return false;
     }
-    rb->strncpy(name, line, name_len);
-    name[name_len] = '\0';
+    rb->strlcpy(name, line, name_len + 1);
     
     val_len = rb->strlen(line) - name_len - NAME_VALUE_SEPARATOR_LEN;
     if (val_len >= valuesize) {
         /* Too long value */
         return false;
     }
-    rb->strncpy(value, sep+NAME_VALUE_SEPARATOR_LEN, val_len+1);
+    rb->strlcpy(value, sep+NAME_VALUE_SEPARATOR_LEN, val_len+1);
     return true;
 }
 

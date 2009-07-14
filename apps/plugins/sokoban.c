@@ -689,7 +689,8 @@ static bool redo(void)
 
 static void init_boards(void)
 {
-    rb->strncpy(buffered_boards.filename, SOKOBAN_LEVELS_FILE, MAX_PATH);
+    rb->strlcpy(buffered_boards.filename, SOKOBAN_LEVELS_FILE,
+                sizeof(buffered_boards.filename));
 
     current_info.level.index = 0;
     current_info.player.row = 0;
@@ -1026,8 +1027,8 @@ static bool save(char *filename, bool solution)
 
     /* Create dir if it doesn't exist */
     if ((loc = rb->strrchr(filename, '/')) != NULL) {
-        rb->strncpy(dirname, filename, loc - filename);
-        dirname[loc - filename] = '\0';
+        rb->strlcpy(dirname, filename, loc - filename + 1);
+
         if(!(dir = rb->opendir(dirname)))
             rb->mkdir(dirname);
         else
@@ -1082,7 +1083,9 @@ static bool load(char *filename, bool silent)
     if (rb->strncmp(buf, "Sokoban", 7) != 0) {
         rb->close(fd);
 
-        rb->strncpy(buffered_boards.filename, filename, MAX_PATH);
+        rb->strlcpy(buffered_boards.filename, filename,
+                    sizeof(buffered_boards.filename));
+
         if (!read_levels(true))
             return false;
 

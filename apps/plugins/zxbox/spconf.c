@@ -111,8 +111,7 @@ void spcf_read_command_line(const void* parameter)
       
   file_type = extensions[ix].type;
   file_subtype = extensions[ix].subtype;
-  rb->strncpy(filenamebuf, parameter, MAXFILENAME - 10);
-  filenamebuf[MAXFILENAME-10] = '\0';
+  rb->strlcpy(filenamebuf, parameter, MAXFILENAME - 10 + 1);
   if(file_type < 0) file_subtype = -1;
   if(!spcf_find_file_type(filenamebuf, &file_type, &file_subtype))
     return;

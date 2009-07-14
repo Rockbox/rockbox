@@ -321,7 +321,7 @@ void do_setting_from_menu(const struct menu_item_ex *temp,
         while (i < MAX_PATH-1)
         {
             int padlen = MIN(len, MAX_PATH-1-i);
-            strncpy(&padded_title[i], title, padlen);
+            strlcpy(&padded_title[i], title, padlen);
             i += padlen;
             if (i<MAX_PATH-1)
                 padded_title[i++] = ' ';

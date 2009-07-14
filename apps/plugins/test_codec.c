@@ -451,7 +451,6 @@ static void init_ci(void)
 
     /* strings and memory */
     ci.strcpy = rb->strcpy;
-    ci.strncpy = rb->strncpy;
     ci.strlen = rb->strlen;
     ci.strcmp = rb->strcmp;
     ci.strcat = rb->strcat;
@@ -716,7 +715,7 @@ enum plugin_status plugin_start(const void* parameter)
         /* Test all files in the same directory as the file selected by the
            user */
 
-        rb->strncpy(dirpath,parameter,sizeof(dirpath));
+        rb->strlcpy(dirpath,parameter,sizeof(dirpath));
         ch = rb->strrchr(dirpath,'/');
         ch[1]=0;
 

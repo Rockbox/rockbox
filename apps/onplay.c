@@ -532,7 +532,7 @@ static bool delete_handler(bool is_dir)
     {
         char pathname[MAX_PATH]; /* space to go deep */
         cpu_boost(true);
-        strncpy(pathname, file_to_delete, sizeof pathname);
+        strlcpy(pathname, file_to_delete, sizeof(pathname));
         res = remove_dir(pathname, sizeof(pathname));
         cpu_boost(false);
     }
@@ -578,7 +578,7 @@ static bool rename_file(void)
     char newname[MAX_PATH];
     char* ptr = strrchr(selected_file, '/') + 1;
     int pathlen = (ptr - selected_file);
-    strncpy(newname, selected_file, sizeof newname);
+    strlcpy(newname, selected_file, sizeof(newname));
     if (!kbd_input(newname + pathlen, (sizeof newname)-pathlen)) {
         if (!strlen(newname + pathlen) ||
             (rename(selected_file, newname) < 0)) {
@@ -638,7 +638,7 @@ static bool properties(void)
 static bool clipboard_clip(bool copy)
 {
     clipboard_selection[0] = 0;
-    strncpy(clipboard_selection, selected_file, sizeof(clipboard_selection));
+    strlcpy(clipboard_selection, selected_file, sizeof(clipboard_selection));
     clipboard_selection_attr = selected_file_attr;
     clipboard_is_copy = copy;
 
@@ -895,15 +895,15 @@ static bool clipboard_paste(void)
         }
         else
         {
-            strncpy(srcpath, clipboard_selection, sizeof(srcpath));
-            strncpy(targetpath, target, sizeof(targetpath));
+            strlcpy(srcpath, clipboard_selection, sizeof(srcpath));
+            strlcpy(targetpath, target, sizeof(targetpath));
     
             success = clipboard_pastedirectory(srcpath, sizeof(srcpath),
                              target, sizeof(targetpath), clipboard_is_copy);
 
             if (success && !clipboard_is_copy)
             {
-                strncpy(srcpath, clipboard_selection, sizeof(srcpath));
+                strlcpy(srcpath, clipboard_selection, sizeof(srcpath));
                 remove_dir(srcpath, sizeof(srcpath));
             }
         }
@@ -1026,7 +1026,7 @@ MENUITEM_FUNCTION(set_backdrop_item, 0, ID2P(LANG_SET_AS_BACKDROP),
 #ifdef HAVE_RECORDING
 static bool set_recdir(void)
 {
-    strncpy(global_settings.rec_directory,
+    strlcpy(global_settings.rec_directory,
             selected_file, MAX_FILENAME+1);
     settings_save();
     return false;

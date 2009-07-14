@@ -425,7 +425,7 @@ static void sleep_timer_formatter(char* buffer, size_t buffer_size, int value,
         minutes = value - (hours * 60);
         snprintf(buffer, buffer_size, "%d:%02d", hours, minutes);
    } else {
-        strncpy(buffer, str(LANG_OFF), buffer_size);
+        strlcpy(buffer, str(LANG_OFF), buffer_size);
     }
 }
 

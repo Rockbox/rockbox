@@ -63,7 +63,7 @@ long pow(long x, long y);
 #define strchr   rb->strchr
 #define strcmp   rb->strcmp
 #define strcpy   rb->strcpy
-#define strncpy  rb->strncpy
+#define strlcpy  rb->strlcpy
 #define strlen   rb->strlen
 
 #endif /* _ROCKCONF_H_ */

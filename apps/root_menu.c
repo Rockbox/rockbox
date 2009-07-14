@@ -77,7 +77,7 @@ static char current_track_path[MAX_PATH];
 static void rootmenu_track_changed_callback(void* param)
 {
     struct mp3entry *id3 = (struct mp3entry *)param;
-    strncpy(current_track_path, id3->path, MAX_PATH);
+    strlcpy(current_track_path, id3->path, MAX_PATH);
 }
 static int browser(void* param)
 {
@@ -202,7 +202,7 @@ static int browser(void* param)
 #endif
         case GO_TO_BROWSEPLUGINS:
             filter = SHOW_PLUGINS;
-            strncpy(folder, PLUGIN_DIR, MAX_PATH);
+            strlcpy(folder, PLUGIN_DIR, MAX_PATH);
         break;
     }
     ret_val = rockbox_browse(folder, filter);

@@ -381,7 +381,7 @@ static const struct plugin_api rockbox_api = {
     snprintf,
     vsnprintf,
     strcpy,
-    strncpy,
+    strlcpy,
     strlen,
     strrchr,
     strcmp,

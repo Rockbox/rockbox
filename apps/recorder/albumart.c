@@ -66,8 +66,7 @@ static char* strip_filename(char* buf, int buf_size, const char* fullpath)
     }
 
     len = MIN(sep - fullpath + 1, buf_size - 1);
-    strncpy(buf, fullpath, len);
-    buf[len] = 0;
+    strlcpy(buf, fullpath, len + 1);
     return (sep + 1);
 }
 
@@ -266,7 +265,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     if (!found)
         return false;
 
-    strncpy(buf, path, buflen);
+    strlcpy(buf, path, buflen);
     logf("Album art found: %s", path);
     return true;
 }

@@ -51,7 +51,7 @@
 #define strcpy rb->strcpy
 #define strip_extension rb->strip_extension
 #define strlen rb->strlen
-#define strncpy rb->strncpy
+#define strlcpy rb->strlcpy
 #define strrchr rb->strrchr
 
 #endif

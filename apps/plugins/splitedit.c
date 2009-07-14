@@ -780,11 +780,11 @@ static void save_editor(struct mp3entry *mp3, int splittime)
     bool part2_save = true;
 
     /* file name for left part */
-    rb->strncpy(part1_name, mp3->path, MAX_PATH);
+    rb->strlcpy(part1_name, mp3->path, MAX_PATH);
     generateFileName(part1_name, 1);
 
     /* file name for right part */
-    rb->strncpy(part2_name, mp3->path, MAX_PATH);
+    rb->strlcpy(part2_name, mp3->path, MAX_PATH);
     generateFileName(part2_name, 2);
 
     while (!exit_request)

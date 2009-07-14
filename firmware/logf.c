@@ -145,7 +145,7 @@ void _logf(const char *format, ...)
     while(len > MAX_LOGF_ENTRY)
     {
         ptr = logfbuffer[logfindex];
-        strncpy(ptr, buf + tlen, MAX_LOGF_ENTRY-1);
+        strlcpy(ptr, buf + tlen, MAX_LOGF_ENTRY);
         ptr[MAX_LOGF_ENTRY] = LOGF_TERMINATE_CONTINUE_LINE;
         logfindex++;
         check_logfindex();

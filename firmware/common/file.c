@@ -132,8 +132,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
     }
 #endif
 
-    strncpy(pathnamecopy,pathname,sizeof(pathnamecopy));
-    pathnamecopy[sizeof(pathnamecopy)-1] = 0;
+    strlcpy(pathnamecopy, pathname, sizeof(pathnamecopy));
 
     /* locate filename */
     name=strrchr(pathnamecopy+1,'/');

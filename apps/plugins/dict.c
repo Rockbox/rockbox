@@ -283,8 +283,7 @@ enum plugin_status plugin_start(const void* parameter)
     while (1)
     {
         /* copy one lcd line */
-        rb->strncpy(output, ptr, display_columns);
-        output[display_columns] = '\0';
+        rb->strlcpy(output, ptr, display_columns + 1);
 
         /* typecast to kill a warning... */
         if((int)rb->strlen(ptr) < display_columns)

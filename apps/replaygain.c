@@ -218,8 +218,7 @@ long parse_replaygain(const char* key, const char* value,
         /* A few characters just isn't interesting... */
         if (len > 1)
         {
-            strncpy(buffer, value, len);
-            buffer[len] = 0;
+            strlcpy(buffer, value, len + 1);
             *p = buffer;
             return len + 1;
         }

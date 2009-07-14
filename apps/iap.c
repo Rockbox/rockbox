@@ -495,6 +495,7 @@ void iap_handlepkt(void)
                 unsigned char data[70] = {0x04, 0x00, 0xFF};
                 struct mp3entry id3;
                 int fd;
+                size_t len;
                 long tracknum = (signed long)serbuf[4] << 24 |
                                 (signed long)serbuf[5] << 16 |
                                 (signed long)serbuf[6] << 8 | serbuf[7];
@@ -520,16 +521,16 @@ void iap_handlepkt(void)
                 switch(serbuf[3])
                 {
                     case 0x20:
-                        strncpy((char *)&data[3], id3.title, 64);
-                            iap_send_pkt(data, 4+strlen(id3.title));
+                        len = strlcpy((char *)&data[3], id3.title, 64);
+                            iap_send_pkt(data, 4+len);
                         break;
                     case 0x22:
-                        strncpy((char *)&data[3], id3.artist, 64);
-                            iap_send_pkt(data, 4+strlen(id3.artist));
+                        len = strlcpy((char *)&data[3], id3.artist, 64);
+                            iap_send_pkt(data, 4+len);
                         break;
                     case 0x24:
-                        strncpy((char *)&data[3], id3.album, 64);
-                            iap_send_pkt(data, 4+strlen(id3.album));
+                        len = strlcpy((char *)&data[3], id3.album, 64);
+                            iap_send_pkt(data, 4+len);
                         break;
                 }
                 break;

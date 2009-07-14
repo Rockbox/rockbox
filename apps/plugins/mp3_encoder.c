@@ -2399,9 +2399,8 @@ char mp3_name[80];
 
 void get_mp3_filename(const char *wav_name)
 {
-    int slen = rb->strlen(wav_name);
-    rb->strncpy(mp3_name, wav_name, 79);
-    rb->strncpy(mp3_name + slen - 4, ".mp3", 5);
+    rb->strlcpy(mp3_name, wav_name, sizeof(mp3_name));
+    rb->strlcpy(mp3_name + rb->strlen(mp3_name) - 4, ".mp3", 5);
 }
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD

@@ -76,7 +76,7 @@ char *option_get_valuestring(const struct settings_list *setting,
     if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
     {
         bool val = (bool)temp_var;
-        strncpy(buffer, str(val? setting->bool_setting->lang_yes :
+        strlcpy(buffer, str(val? setting->bool_setting->lang_yes :
                                  setting->bool_setting->lang_no), buf_len);
     }
 #if 0 /* probably dont need this one */
@@ -137,7 +137,7 @@ char *option_get_valuestring(const struct settings_list *setting,
             const struct choice_setting *info = setting->choice_setting;
             if (info->talks[(int)temp_var] < LANG_LAST_INDEX_IN_ARRAY)
             {
-                strncpy(buffer, str(info->talks[(int)temp_var]), buf_len);
+                strlcpy(buffer, str(info->talks[(int)temp_var]), buf_len);
             }
             else
             {
@@ -149,7 +149,7 @@ char *option_get_valuestring(const struct settings_list *setting,
         {
             int value= (int)temp_var;
             char *val = P2STR(setting->choice_setting->desc[value]);
-            strncpy(buffer, val, buf_len);
+            strlcpy(buffer, val, buf_len);
         }
     }
     return buffer;

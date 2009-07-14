@@ -1183,7 +1183,7 @@ static int write_long_name(struct fat_file* file,
             /* shortname entry */
             unsigned short date=0, time=0, tenth=0;
             LDEBUGF("Shortname entry: %s\n", shortname);
-            strncpy(entry + FATDIR_NAME, shortname, 11);
+            memcpy(entry + FATDIR_NAME, shortname, 11);
             entry[FATDIR_ATTR] = is_directory?FAT_ATTR_DIRECTORY:0;
             entry[FATDIR_NTRES] = 0;
 
@@ -1271,7 +1271,7 @@ static int add_dir_entry(struct fat_dir* dir,
     /* The "." and ".." directory entries must not be long names */
     if(dotdir) {
         int i;
-        strncpy(shortname, name, 12);
+        strlcpy(shortname, name, 12);
         for(i = strlen(shortname); i < 12; i++)
             shortname[i] = ' ';
 

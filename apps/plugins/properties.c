@@ -70,8 +70,7 @@ static bool file_properties(char* selected_file)
 
     char* ptr = rb->strrchr(selected_file, '/') + 1;
     int dirlen = (ptr - selected_file);
-    rb->strncpy(tstr, selected_file, dirlen);
-    tstr[dirlen] = 0;
+    rb->strlcpy(tstr, selected_file, dirlen + 1);
 
     dir = rb->opendir(tstr);
     if (dir)
@@ -212,7 +211,7 @@ static bool dir_properties(char* selected_file)
 {
     DPS dps;
     char tstr[64];
-    rb->strncpy(dps.dirname, selected_file, MAX_PATH);
+    rb->strlcpy(dps.dirname, selected_file, MAX_PATH);
     dps.len = MAX_PATH;
     dps.dc = 0;
     dps.fc = 0;
@@ -220,7 +219,7 @@ static bool dir_properties(char* selected_file)
     if(false == _dir_properties(&dps))
         return false;
 
-    rb->strncpy(str_dirname, selected_file, MAX_PATH);
+    rb->strlcpy(str_dirname, selected_file, MAX_PATH);
     rb->snprintf(str_dircount, sizeof str_dircount, "Subdirs: %d", dps.dc);
     rb->snprintf(str_filecount, sizeof str_filecount, "Files: %d", dps.fc);
     rb->snprintf(str_size, sizeof str_size, "Size: %s",
@@ -236,35 +235,35 @@ char * get_props(int selected_item, void* data, char *buffer, size_t buffer_len)
     switch(selected_item)
     {
         case 0:
-            rb->strncpy(buffer, str_dirname, buffer_len);
+            rb->strlcpy(buffer, str_dirname, buffer_len);
             break;
         case 1:
-            rb->strncpy(buffer, its_a_dir ? str_dircount : str_filename,
+            rb->strlcpy(buffer, its_a_dir ? str_dircount : str_filename,
                         buffer_len);
             break;
         case 2:
-            rb->strncpy(buffer, its_a_dir ? str_filecount : str_size, buffer_len);
+            rb->strlcpy(buffer, its_a_dir ? str_filecount : str_size, buffer_len);
             break;
         case 3:
-            rb->strncpy(buffer, its_a_dir ? str_size : str_date, buffer_len);
+            rb->strlcpy(buffer, its_a_dir ? str_size : str_date, buffer_len);
             break;
         case 4:
-            rb->strncpy(buffer, its_a_dir ? "" : str_time, buffer_len);
+            rb->strlcpy(buffer, its_a_dir ? "" : str_time, buffer_len);
             break;
         case 5:
-            rb->strncpy(buffer, its_a_dir ? "" : str_artist, buffer_len);
+            rb->strlcpy(buffer, its_a_dir ? "" : str_artist, buffer_len);
             break;
         case 6:
-            rb->strncpy(buffer, its_a_dir ? "" : str_title, buffer_len);
+            rb->strlcpy(buffer, its_a_dir ? "" : str_title, buffer_len);
             break;
         case 7:
-            rb->strncpy(buffer, its_a_dir ? "" : str_album, buffer_len);
+            rb->strlcpy(buffer, its_a_dir ? "" : str_album, buffer_len);
             break;
         case 8:
-            rb->strncpy(buffer, its_a_dir ? "" : str_duration, buffer_len);
+            rb->strlcpy(buffer, its_a_dir ? "" : str_duration, buffer_len);
             break;
         default:
-            rb->strncpy(buffer, "ERROR", buffer_len);
+            rb->strlcpy(buffer, "ERROR", buffer_len);
             break;
     }
     return buffer;
@@ -284,8 +283,7 @@ enum plugin_status plugin_start(const void* parameter)
     struct dirent* entry;
     char* ptr = rb->strrchr(file, '/') + 1;
     int dirlen = (ptr - file);
-    rb->strncpy(str_dirname, file, dirlen);
-    str_dirname[dirlen] = 0;
+    rb->strlcpy(str_dirname, file, dirlen + 1);
 
     dir = rb->opendir(str_dirname);
     if (dir)

@@ -232,11 +232,11 @@ static int dircache_scan(IF_MV2(int volume,) struct travel_data *td)
                 return -2;
             
             td->pathpos = strlen(dircache_cur_path);
-            strncpy(&dircache_cur_path[td->pathpos], "/", 
-                    sizeof(dircache_cur_path) - td->pathpos - 1);
+            strlcpy(&dircache_cur_path[td->pathpos], "/", 
+                    sizeof(dircache_cur_path) - td->pathpos);
 #ifdef SIMULATOR
-            strncpy(&dircache_cur_path[td->pathpos+1], td->entry->d_name, 
-                    sizeof(dircache_cur_path) - td->pathpos - 2);
+            strlcpy(&dircache_cur_path[td->pathpos+1], td->entry->d_name, 
+                    sizeof(dircache_cur_path) - td->pathpos - 1);
             
             td->newdir = opendir_uncached(dircache_cur_path);
             if (td->newdir == NULL)
@@ -245,8 +245,8 @@ static int dircache_scan(IF_MV2(int volume,) struct travel_data *td)
                 return -3;
             }
 #else
-            strncpy(&dircache_cur_path[td->pathpos+1], td->entry.name,
-                    sizeof(dircache_cur_path) - td->pathpos - 2);
+            strlcpy(&dircache_cur_path[td->pathpos+1], td->entry.name,
+                    sizeof(dircache_cur_path) - td->pathpos - 1);
 
             td->newdir = *td->dir;
             if (fat_opendir(IF_MV2(volume,) &td->newdir,
@@ -399,7 +399,7 @@ static struct dircache_entry* dircache_get_entry(const char *path,
     char* part;
     char* end;
 
-    strncpy(namecopy, path, sizeof(namecopy) - 1);
+    strlcpy(namecopy, path, sizeof(namecopy));
     cache_entry = dircache_root;
     before = NULL;
     
@@ -926,7 +926,7 @@ static struct dircache_entry* dircache_new_entry(const char *path, int attribute
     char *new;
     long last_cache_size = dircache_size;
 
-    strncpy(basedir, path, sizeof(basedir)-1);
+    strlcpy(basedir, path, sizeof(basedir));
     new = strrchr(basedir, '/');
     if (new == NULL)
     {
@@ -997,8 +997,8 @@ void dircache_bind(int fd, const char *path)
     {
         if (fdbind_idx >= MAX_PENDING_BINDINGS)
             return ;
-        strncpy(fdbind_cache[fdbind_idx].path, path, 
-                sizeof(fdbind_cache[fdbind_idx].path)-1);
+        strlcpy(fdbind_cache[fdbind_idx].path, path, 
+                sizeof(fdbind_cache[fdbind_idx].path));
         fdbind_cache[fdbind_idx].fd = fd;
         fdbind_idx++;
         return ;
@@ -1141,7 +1141,7 @@ void dircache_rename(const char *oldpath, const char *newpath)
     /* Generate the absolute path for destination if necessary. */
     if (newpath[0] != '/')
     {
-        strncpy(absolute_path, oldpath, sizeof(absolute_path)-1);
+        strlcpy(absolute_path, oldpath, sizeof(absolute_path));
         p = strrchr(absolute_path, '/');
         if (!p)
         {
@@ -1151,7 +1151,7 @@ void dircache_rename(const char *oldpath, const char *newpath)
         }
         
         *p = '\0';
-        strncpy(p, absolute_path, sizeof(absolute_path)-1-strlen(p));
+        strlcpy(p, absolute_path, sizeof(absolute_path)-strlen(p));
         newpath = absolute_path;
     }
     
@@ -1246,7 +1246,7 @@ struct dircache_entry* readdir_cached(DIR_CACHED* dir)
         if (regentry == NULL)
             return NULL;
 
-        strncpy(dir->secondary_entry.d_name, regentry->d_name, MAX_PATH-1);
+        strlcpy(dir->secondary_entry.d_name, regentry->d_name, MAX_PATH);
         dir->secondary_entry.size = regentry->size;
         dir->secondary_entry.startcluster = regentry->startcluster;
         dir->secondary_entry.attribute = regentry->attribute;
@@ -1268,7 +1268,7 @@ struct dircache_entry* readdir_cached(DIR_CACHED* dir)
 
     dir->entry = ce->next;
 
-    strncpy(dir->secondary_entry.d_name, ce->d_name, MAX_PATH-1);
+    strlcpy(dir->secondary_entry.d_name, ce->d_name, MAX_PATH);
     /* Can't do `dir->secondary_entry = *ce`
        because that modifies the d_name pointer. */
     dir->secondary_entry.size = ce->size;

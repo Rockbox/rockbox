@@ -330,11 +330,11 @@ static void hash_pw(union hash *out)
 static void make_key(void)
 {
     int i;
-    char buf[sizeof(master_pw) + sizeof(salt) + 1];
+    char buf[sizeof(master_pw) + sizeof(salt) + 1] = {0};
     struct md5_s key_md5;
     size_t len = rb->strlen(master_pw);
 
-    rb->strncpy(buf, master_pw, sizeof(buf));
+    rb->strlcpy(buf, master_pw, sizeof(buf));
 
     rb->memcpy(&buf[len], &salt, sizeof(salt));
 
@@ -418,7 +418,7 @@ static int parse_buffer(void)
             break;
         }
 
-        rb->strncpy(entry->title, start, FIELD_LEN);
+        rb->strlcpy(entry->title, start, FIELD_LEN);
         start = end + 1;
 
         end = rb->strchr(start, '\0'); /* find eol */
@@ -428,7 +428,7 @@ static int parse_buffer(void)
             break;
         }
 
-        rb->strncpy(entry->name, start, FIELD_LEN);
+        rb->strlcpy(entry->name, start, FIELD_LEN);
         start = end + 1;
 
         end = rb->strchr(start, '\0'); /* find eol */
@@ -437,7 +437,7 @@ static int parse_buffer(void)
         {
             break;
         }
-        rb->strncpy(entry->password, start, FIELD_LEN);
+        rb->strlcpy(entry->password, start, FIELD_LEN);
         start = end + 1;
         entry->used = true;
         if (i + 1 < MAX_ENTRIES - 1)
@@ -469,13 +469,13 @@ static void write_output(int fd)
     for (i = 0; i < pw_list.num_entries; i++)
     {
         len = rb->strlen(entry->title);
-        rb->strncpy(p, entry->title, len+1);
+        rb->strlcpy(p, entry->title, len+1);
         p += len+1;
         len = rb->strlen(entry->name);
-        rb->strncpy(p, entry->name, len+1);
+        rb->strlcpy(p, entry->name, len+1);
         p += len+1;
         len = rb->strlen(entry->password);
-        rb->strncpy(p, entry->password, len+1);
+        rb->strlcpy(p, entry->password, len+1);
         p += len+1;
         if (entry->next)
             entry = entry->next;
@@ -517,7 +517,7 @@ static int enter_pw(char *pw_buf, size_t buflen, bool new_pw)
         }
         else
         {
-            rb->strncpy(pw_buf, buf[0], buflen);
+            rb->strlcpy(pw_buf, buf[0], buflen);
             hash_pw(&pwhash);
             return 0;
         }

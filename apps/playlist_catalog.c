@@ -78,7 +78,7 @@ static int initialize_catalog(void)
 
         /* fall back to default directory if no or invalid config */
         if (default_dir)
-            strncpy(playlist_dir, PLAYLIST_CATALOG_DEFAULT_DIR,
+            strlcpy(playlist_dir, PLAYLIST_CATALOG_DEFAULT_DIR,
                 sizeof(playlist_dir));
 
         playlist_dir_length = strlen(playlist_dir);
@@ -189,7 +189,7 @@ static char* playlist_callback_name(int selected_item, void* data,
 {
     char** playlists = (char**) data;
 
-    strncpy(buffer, playlists[selected_item], buffer_len);
+    strlcpy(buffer, playlists[selected_item], buffer_len);
 
     if (buffer[0] != '.' && !(global_settings.show_filename_ext == 1
         || (global_settings.show_filename_ext == 3
@@ -478,7 +478,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
 
     if (add_to_playlist(playlist, new_playlist, sel, sel_attr) == 0)
     {
-        strncpy(most_recent_playlist, playlist+playlist_dir_length+1,
+        strlcpy(most_recent_playlist, playlist+playlist_dir_length+1,
             sizeof(most_recent_playlist));
         return true;
     }

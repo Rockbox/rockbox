@@ -72,7 +72,7 @@ int highscore_load(char *filename, struct highscore *scores, int num_scores)
 
         scores[i].score = rb->atoi(score);
         scores[i].level = rb->atoi(level);
-        rb->strncpy(scores[i].name, name, sizeof(scores[i].name)-1);
+        rb->strlcpy(scores[i].name, name, sizeof(scores[i].name));
         i++;
     }
     rb->close(fd);
@@ -100,8 +100,7 @@ int highscore_update(int score, int level, const char *name,
     entry = scores + pos;
     entry->score = score;
     entry->level = level;
-    rb->strncpy(entry->name, name, sizeof(entry->name));
-    entry->name[sizeof(entry->name)-1] = '\0';
+    rb->strlcpy(entry->name, name, sizeof(entry->name));
 
     return pos;
 }

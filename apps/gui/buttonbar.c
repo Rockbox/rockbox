@@ -86,18 +86,15 @@ void gui_buttonbar_set(struct gui_buttonbar * buttonbar,
     gui_buttonbar_unset(buttonbar);
     if(caption1)
     {
-        strncpy(buttonbar->caption[0], caption1, 7);
-        buttonbar->caption[0][7] = 0;
+        strlcpy(buttonbar->caption[0], caption1, BUTTONBAR_CAPTION_LENGTH);
     }
     if(caption2)
     {
-        strncpy(buttonbar->caption[1], caption2, 7);
-        buttonbar->caption[1][7] = 0;
+        strlcpy(buttonbar->caption[1], caption2, BUTTONBAR_CAPTION_LENGTH);
     }
     if(caption3)
     {
-        strncpy(buttonbar->caption[2], caption3, 7);
-        buttonbar->caption[2][7] = 0;
+        strlcpy(buttonbar->caption[2], caption3, BUTTONBAR_CAPTION_LENGTH);
     }
 }
 

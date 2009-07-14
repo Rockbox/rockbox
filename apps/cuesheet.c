@@ -84,7 +84,7 @@ bool look_for_cuesheet_file(const char *trackpath, char *found_cue_path)
         return false;
     }
 
-    strncpy(cuepath, trackpath, MAX_PATH);
+    strlcpy(cuepath, trackpath, MAX_PATH);
     dot = strrchr(cuepath, '.');
     strcpy(dot, ".cue");
 
@@ -103,7 +103,7 @@ bool look_for_cuesheet_file(const char *trackpath, char *found_cue_path)
     }
 
     if (found_cue_path)
-        strncpy(found_cue_path, cuepath, MAX_PATH);
+        strlcpy(found_cue_path, cuepath, MAX_PATH);
     return true;
 }
 
@@ -205,8 +205,7 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
                 }
                 else
                 {
-                    strncpy(dest, string, MAX_NAME*3);
-                    dest[MAX_NAME*3] = '\0';
+                    strlcpy(dest, string, MAX_NAME*3 + 1);
                 }
             }    
         }
@@ -218,10 +217,10 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
     for (i = 0; i < cue->track_count; i++)
     {
         if (*(cue->tracks[i].performer) == '\0')
-            strncpy(cue->tracks[i].performer, cue->performer, MAX_NAME*3);
+            strlcpy(cue->tracks[i].performer, cue->performer, MAX_NAME*3);
 
         if (*(cue->tracks[i].songwriter) == '\0')
-            strncpy(cue->tracks[i].songwriter, cue->songwriter, MAX_NAME*3);
+            strlcpy(cue->tracks[i].songwriter, cue->songwriter, MAX_NAME*3);
     }
 
     return true;
@@ -271,7 +270,7 @@ static char *list_get_name_cb(int selected_item,
     struct cuesheet *cue = (struct cuesheet *)data;
 
     if (selected_item & 1)
-        strncpy(buffer, cue->tracks[selected_item/2].title, buffer_len);
+        strlcpy(buffer, cue->tracks[selected_item/2].title, buffer_len);
     else
         snprintf(buffer, buffer_len, "%02d. %s", selected_item/2+1,
                  cue->tracks[selected_item/2].performer);

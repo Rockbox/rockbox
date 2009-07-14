@@ -58,8 +58,7 @@ int strip_volume(const char* name, char* namecopy)
             name = "/";           /* else this must be the root dir */
     }
 
-    strncpy(namecopy, name, MAX_PATH);
-    namecopy[MAX_PATH-1] = '\0';
+    strlcpy(namecopy, name, MAX_PATH);
 
     return volume;
 }
@@ -120,8 +119,7 @@ DIR_UNCACHED* opendir_uncached(const char* name)
     volume = strip_volume(name, namecopy);
     pdir->volumecounter = 0;
 #else
-    strncpy(namecopy,name,sizeof(namecopy)); /* just copy */
-    namecopy[sizeof(namecopy)-1] = '\0';
+    strlcpy(namecopy, name, sizeof(namecopy)); /* just copy */
 #endif
 
     if ( fat_opendir(IF_MV2(volume,) &pdir->fatdir, 0, NULL) < 0 ) {
@@ -204,7 +202,7 @@ struct dirent_uncached* readdir_uncached(DIR_UNCACHED* dir)
     if ( !entry.name[0] )
         return NULL;	
 
-    strncpy(theent->d_name, entry.name, sizeof( theent->d_name ) );
+    strlcpy(theent->d_name, entry.name, sizeof(theent->d_name));
     theent->attribute = entry.attr;
     theent->size = entry.filesize;
     theent->startcluster = entry.firstcluster;
@@ -230,8 +228,7 @@ int mkdir_uncached(const char *name)
         return -1;
     }
 
-    strncpy(namecopy,name,sizeof(namecopy));
-    namecopy[sizeof(namecopy)-1] = 0;
+    strlcpy(namecopy, name, sizeof(namecopy));
 
     /* Split the base name and the path */
     end = strrchr(namecopy, '/');

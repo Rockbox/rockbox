@@ -814,15 +814,13 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
     {
         len = dot - filename;
         len = MIN(len, buffer_size);
-        strncpy(buffer, filename, len);
     }
     else
     {
         len = buffer_size;
-        strncpy(buffer, filename, buffer_size);
     }
 
-    buffer[len] = 0;
+    strlcpy(buffer, filename, len + 1);
 
     return buffer;
 }

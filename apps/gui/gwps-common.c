@@ -659,8 +659,7 @@ static char* get_dir(char* buf, int buf_size, const char* path, int level)
         return NULL;
 
     len = MIN(last_sep - sep, buf_size - 1);
-    strncpy(buf, sep + 1, len);
-    buf[len] = 0;
+    strlcpy(buf, sep + 1, len + 1);
     return buf;
 }
 
@@ -1183,12 +1182,12 @@ static const char *get_token_value(struct gui_wps *gwps,
             {
                 /* we need 11 characters (full line) for
                     progress-bar */
-                strncpy(buf, "           ", buf_size);
+                strlcpy(buf, "           ", buf_size);
             }
             else
             {
                 /* Tell the user if we have an OldPlayer */
-                strncpy(buf, " <Old LCD> ", buf_size);
+                strlcpy(buf, " <Old LCD> ", buf_size);
             }
             return buf;
 #endif
@@ -1254,11 +1253,11 @@ static const char *get_token_value(struct gui_wps *gwps,
                     break;
                 case 2:
                 case 4:
-                    strncpy(buf, id3->track_gain_string, buf_size);
+                    strlcpy(buf, id3->track_gain_string, buf_size);
                     break;
                 case 3:
                 case 5:
-                    strncpy(buf, id3->album_gain_string, buf_size);
+                    strlcpy(buf, id3->album_gain_string, buf_size);
                     break;
             }
             return buf;

@@ -919,7 +919,7 @@ int bufopen(const char *file, size_t offset, enum data_type type)
         h->widx = buf_widx;
         h->available = 0;
         h->type = type;
-        strncpy(h->path, file, MAX_PATH);
+        strlcpy(h->path, file, MAX_PATH);
 
         buf_widx += sizeof(struct mp3entry);  /* safe because the handle
                                                  can't wrap */
@@ -952,7 +952,7 @@ int bufopen(const char *file, size_t offset, enum data_type type)
         return ERR_BUFFER_FULL;
     }
 
-    strncpy(h->path, file, MAX_PATH);
+    strlcpy(h->path, file, MAX_PATH);
     h->offset = adjusted_offset;
     h->ridx = buf_widx;
     h->widx = buf_widx;
