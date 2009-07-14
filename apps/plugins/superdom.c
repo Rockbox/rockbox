@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "lib/playback_control.h"
+#include "lib/display_text.h"
 PLUGIN_HEADER
 
 extern const fb_data superdom_boarditems[];
@@ -557,11 +558,9 @@ int settings_menu_function(void) {
 
 static int do_help(void) {
     int button;
-    int y = MARGIN, space_w, width, height;
-    unsigned short x = MARGIN, i = 0;
-#define WORDS (sizeof instructions / sizeof (char*))
-    static char* instructions[] = {
-        "Super", "domination", "is", "a", "turn", "based", "strategy", "game,", 
+#define WORDS (sizeof help_text / sizeof (char*))
+    static char* help_text[] = {
+        "Super", "domination", "is", "a", "turn", "based", "strategy", "game,",
         "where", "the", "aim", "is", "to", "overpower", "the", "computer",
         "player", "by", "taking", "their", "territory.", "",
         "Each", "year", "you", "are", "allocated", "an", "amount", "of", "cash",
@@ -572,49 +571,17 @@ static int do_help(void) {
         "the", "ownership", "of", "adjacent", "tiles,", "and", "the", "type",
         "and", "number", "of", "troops", "on", "them.",
     };
-    rb->lcd_clear_display();
-    rb->lcd_getstringsize(" ", &space_w, &height);
-    for (i = 0; i < WORDS; i++) {
-        rb->lcd_getstringsize(instructions[i], &width, NULL);
-        /* Skip to next line if the current one can't fit the word */
-        if (x + width > LCD_WIDTH - MARGIN) {
-            x = MARGIN;
-            y += height;
-        }
-        /* .. or if the word is the empty string */
-        if (rb->strcmp(instructions[i], "") == 0) {
-            x = MARGIN;
-            y += height;
-            continue;
-        }
-        /* We filled the screen */
-        if (y + height > LCD_HEIGHT - MARGIN) {
-            y = MARGIN;
-            rb->lcd_update();
-            do {
-                button = rb->button_get(true);
-                if (button == SYS_USB_CONNECTED) {
-                    return PLUGIN_USB_CONNECTED;
-                }
-            } while( ( button == BUTTON_NONE )
-                    || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
 
-
-            rb->lcd_clear_display();
-        }
-        rb->lcd_putsxy(x, y, instructions[i]);
-        x += width + space_w;
-    }
-    rb->lcd_update();
+    if (display_text(WORDS, help_text, NULL, NULL))
+        return PLUGIN_USB_CONNECTED;
     do {
         button = rb->button_get(true);
-        if (button == SYS_USB_CONNECTED) {
+        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
             return PLUGIN_USB_CONNECTED;
-        }
     } while( ( button == BUTTON_NONE )
             || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
 
-    return 0;
+    return PLUGIN_OK;
 }
 
 int menu(void) {
@@ -661,7 +628,7 @@ int save_game(void) {
     if(fd < 0) {
         DEBUGF("Couldn't create/open file\n");
         return -1;
-    }    
+    }
     
     rb->write(fd, "SSGv3", 5);
     rb->write(fd, &gamestate, sizeof(gamestate));
@@ -1599,7 +1566,7 @@ int killmen(int colour) {
             }
         }
     }
-        
+
     if(human)
         humanres.men -= menkilled;
     else

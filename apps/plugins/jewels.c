@@ -38,6 +38,8 @@ PLUGIN_HEADER
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_PLAY
 #define JEWELS_CANCEL BUTTON_OFF
+#define HK_SELECT "PLAY"
+#define HK_CANCEL "OFF"
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -46,6 +48,8 @@ PLUGIN_HEADER
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_OFF
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "OFF"
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -54,6 +58,8 @@ PLUGIN_HEADER
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_MENU
 #define JEWELS_CANCEL BUTTON_OFF
+#define HK_SELECT "MENU"
+#define HK_CANCEL "OFF"
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define JEWELS_UP     BUTTON_UP
@@ -63,6 +69,8 @@ PLUGIN_HEADER
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_OFF
 #define JEWELS_RC_CANCEL BUTTON_RC_STOP
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "OFF"
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
@@ -75,6 +83,8 @@ PLUGIN_HEADER
 #define JEWELS_NEXT   BUTTON_SCROLL_FWD
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL (BUTTON_SELECT | BUTTON_MENU)
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "SEL + MENU"
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define JEWELS_LEFT   BUTTON_LEFT
@@ -83,6 +93,8 @@ PLUGIN_HEADER
 #define JEWELS_DOWN   BUTTON_SCROLL_FWD
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_MENU
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "MENU"
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -91,6 +103,8 @@ PLUGIN_HEADER
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_PLAY
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "PLAY"
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -99,6 +113,8 @@ PLUGIN_HEADER
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_POWER
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "POWER"
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -107,6 +123,8 @@ PLUGIN_HEADER
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_POWER
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "POWER"
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
 #define JEWELS_SCROLLWHEEL
@@ -118,6 +136,8 @@ PLUGIN_HEADER
 #define JEWELS_NEXT   BUTTON_SCROLL_FWD
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_POWER
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "POWER"
 
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
 #define JEWELS_SCROLLWHEEL
@@ -129,6 +149,8 @@ PLUGIN_HEADER
 #define JEWELS_NEXT   BUTTON_SCROLL_FWD
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL (BUTTON_HOME|BUTTON_REPEAT)
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "HOME"
 
 #elif CONFIG_KEYPAD == SANSA_C200_PAD || \
 CONFIG_KEYPAD == SANSA_CLIP_PAD || \
@@ -139,6 +161,8 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_POWER
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "POWER"
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define JEWELS_UP     BUTTON_SCROLL_UP
@@ -147,6 +171,8 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_PLAY
 #define JEWELS_CANCEL BUTTON_POWER
+#define HK_SELECT "PLAY"
+#define HK_CANCEL "POWER"
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -155,6 +181,8 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_BACK
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "BACK"
 
 #elif CONFIG_KEYPAD == MROBE100_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -163,6 +191,8 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_POWER
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "POWER"
 
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
 #define JEWELS_UP     BUTTON_RC_VOL_UP
@@ -171,10 +201,14 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define JEWELS_RIGHT  BUTTON_RC_FF
 #define JEWELS_SELECT BUTTON_RC_PLAY
 #define JEWELS_CANCEL BUTTON_RC_REC
+#define HK_SELECT "PLAY"
+#define HK_CANCEL "REC"
+
 #define JEWELS_RC_CANCEL BUTTON_REC
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define JEWELS_CANCEL BUTTON_POWER
+#define HK_CANCEL "POWER"
 
 #elif CONFIG_KEYPAD == IAUDIO67_PAD
 #define JEWELS_UP     BUTTON_STOP
@@ -183,6 +217,8 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_MENU
 #define JEWELS_CANCEL BUTTON_POWER
+#define HK_SELECT "MENU"
+#define HK_CANCEL "POWER"
 
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -191,6 +227,8 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_BACK
+#define HK_SELECT "MIDDLE"
+#define HK_CANCEL "BACK"
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -199,10 +237,13 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_POWER
+#define HK_SELECT "SELECT"
+#define HK_CANCEL "POWER"
 
 #elif CONFIG_KEYPAD == ONDAVX747_PAD || \
 CONFIG_KEYPAD == MROBE500_PAD
 #define JEWELS_CANCEL BUTTON_POWER
+#define HK_CANCEL "POWER"
 
 #else
 #error No keymap defined!
@@ -223,9 +264,11 @@ CONFIG_KEYPAD == MROBE500_PAD
 #endif
 #ifndef JEWELS_SELECT
 #define JEWELS_SELECT BUTTON_CENTER
+#define HK_SELECT "CENTER"
 #endif
 #ifndef JEWELS_CANCEL
 #define JEWELS_CANCEL BUTTON_TOPLEFT
+#define HK_CANCEL "TOPLEFT"
 #endif
 #endif
 
@@ -1312,15 +1355,26 @@ static int jewels_help(void)
     rb->lcd_setfont(FONT_UI);
 #define WORDS (sizeof help_text / sizeof (char*))
     static char *help_text[] = {
-        "Jewels", "", "Aim", "", "Swap", "pairs", "of", "jewels", "to",
-        "form", "connected", "segments", "of", "three", "or", "more", "of",
-        "the", "same", "type.", "", "The", "goal", "of", "the", "game",
-        "is", "to", "score", "as", "many", "points", "as", "possible",
-        "before", "running", "out", "of", "available", "moves."
+        "Jewels", "", "Aim", "",
+        "Swap", "pairs", "of", "jewels", "to", "form", "connected", 
+        "segments", "of", "three", "or", "more", "of", "the", "same",
+        "type.", "",
+        "The", "goal", "of", "the", "game", "is", "to", "score", "as", "many",
+        "points", "as", "possible", "before", "running", "out", "of",
+        "available", "moves.", "", "",
+        "Controls", "",
+        "Directions",
+#ifdef JEWELS_SCROLLWHEEL
+            "or", "scroll",
+#endif
+            "to", "move", "",
+        HK_SELECT, "to", "select", "",
+        HK_CANCEL, "to", "go", "to", "menu"
     };
     static struct style_text formation[]={
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
-        { 2, C_RED }
+        { 2, C_RED },
+        { -1, 0 }
     };
 
 #ifdef HAVE_LCD_COLOR

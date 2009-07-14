@@ -30,6 +30,7 @@
 
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
+#include "lib/display_text.h"
 
 /* This macros must always be included. Should be placed at the top by
    convention, although the actual position doesn't matter */
@@ -692,7 +693,7 @@ static void play_game()
 #else
         input = rb->button_get(true);
 #endif
-    } 
+    }
     message("Bye!");
     refresh();
 }
@@ -794,7 +795,7 @@ static int validchar(char a)
   switch(a)
     {
     case '#':
-    case ' ':   
+    case ' ':
     case 127:
       return 0;
     }
@@ -850,45 +851,23 @@ static void play_animation(int input)
 
 static void instructions()
 {
-#define MARGIN 2
-  int y = MARGIN, space_w, width, height;
-  unsigned short x = MARGIN, i = 0;
-#define WORDS (sizeof instructions / sizeof (char*))
-  static char* instructions[] = {
+#define WORDS (sizeof help_text / sizeof (char*))
+  static char* help_text[] = {
 #if 0
     /* Not sure if we want to include this? */
     "robotfindskitten", RFK_VERSION, "", "",
     "By", "the", "illustrious", "Leonard", "Richardson", "(C)", "1997,", "2000", "",
     "Written", "originally", "for", "the", "Nerth", "Pork", "robotfindskitten", "contest", "", "",
 #endif
-    "In", "this", "game", "you", "are", "robot", "(#).", "Your", "job", "is", "to", "find", "kitten.", "This", "task", "is", "complicated", "by", "the", "existence", "of", "various", "things", "which", "are", "not", "kitten.", "Robot", "must", "touch", "items", "to", "determine", "if", "they", "are", "kitten", "or", "not.", "",
+    "In", "this", "game", "you", "are", "robot", "(#).", "Your", "job", "is",
+    "to", "find", "kitten.", "This", "task", "is", "complicated", "by", "the",
+    "existence", "of", "various", "things", "which", "are", "not", "kitten.",
+    "Robot", "must", "touch", "items", "to", "determine", "if", "they", "are",
+    "kitten", "or", "not.", "",
     "The", "game", "ends", "when", "robotfindskitten.", "", "",
     "Press", "any", "key", "to", "start",
   };
-  rb->lcd_clear_display();
-  rb->lcd_getstringsize(" ", &space_w, &height);
-  for (i = 0; i < WORDS; i++) {
-    rb->lcd_getstringsize(instructions[i], &width, NULL);
-    /* Skip to next line if the current one can't fit the word */
-    if (x + width > LCD_WIDTH - MARGIN) {
-      x = MARGIN;
-      y += height;
-    }
-    /* .. or if the word is the empty string */
-    if (rb->strcmp(instructions[i], "") == 0) {
-      x = MARGIN;
-      y += height;
-      continue;
-    }
-    /* We filled the screen */
-    if (y + height > LCD_HEIGHT - MARGIN) {
-      y = MARGIN;
-      pause();
-      rb->lcd_clear_display();
-    }
-    rb->lcd_putsxy(x, y, instructions[i]);
-    x += width + space_w;
-  }
+  display_text(WORDS, help_text, NULL, NULL);
   pause();
 }
 
@@ -953,7 +932,7 @@ static void initialize_kitten()
     /*Assign the kitten a character and a color.*/
     do {
         kitten.character = randchar();
-    } while (!(validchar(kitten.character))); 
+    } while (!(validchar(kitten.character)));
     screen[kitten.x][kitten.y] = KITTEN;
 
     kitten.color = colors[randcolor()];
@@ -973,7 +952,7 @@ static void initialize_bogus()
         /*Give it a character.*/
         do {
             bogus[counter].character = randchar();
-        } while (!(validchar(bogus[counter].character))); 
+        } while (!(validchar(bogus[counter].character)));
       
         /*Give it a position.*/
         do {
@@ -1059,7 +1038,7 @@ enum plugin_status plugin_start(const void* parameter)
   /*
    * Run the game
    */
-  instructions();  
+  instructions();
 
   initialize_screen();
 

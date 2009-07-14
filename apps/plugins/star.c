@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
+#include "lib/display_text.h"
 
 PLUGIN_HEADER
 
@@ -66,6 +67,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       BUTTON_F3
 #define STAR_LEVEL_DOWN     BUTTON_F1
 #define STAR_LEVEL_REPEAT   BUTTON_F2
+#define STAR_TOGGLE_CONTROL_NAME "ON"
+#define STAR_QUIT_NAME      "OFF"
+#define STAR_LEVEL_UP_NAME  "F3"
+#define STAR_LEVEL_DOWN_NAME "F1"
+#define STAR_LEVEL_REPEAT_NAME "F2"
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
 #define STAR_QUIT           BUTTON_OFF
@@ -78,6 +84,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       BUTTON_F3
 #define STAR_LEVEL_DOWN     BUTTON_F1
 #define STAR_LEVEL_REPEAT   BUTTON_F2
+#define STAR_TOGGLE_CONTROL_NAME "ON/SELECT"
+#define STAR_QUIT_NAME      "OFF"
+#define STAR_LEVEL_UP_NAME  "F3"
+#define STAR_LEVEL_DOWN_NAME "F1"
+#define STAR_LEVEL_REPEAT_NAME "F2"
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define STAR_QUIT           BUTTON_OFF
@@ -90,6 +101,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       (BUTTON_MENU | BUTTON_RIGHT)
 #define STAR_LEVEL_DOWN     (BUTTON_MENU | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT   (BUTTON_MENU | BUTTON_UP)
+#define STAR_TOGGLE_CONTROL_NAME "MODE"
+#define STAR_QUIT_NAME      "OFF"
+#define STAR_LEVEL_UP_NAME  "M >"
+#define STAR_LEVEL_DOWN_NAME "M <"
+#define STAR_LEVEL_REPEAT_NAME "M ^"
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -103,6 +119,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       (BUTTON_ON | BUTTON_RIGHT)
 #define STAR_LEVEL_DOWN     (BUTTON_ON | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT   (BUTTON_ON | BUTTON_SELECT)
+#define STAR_TOGGLE_CONTROL_NAME "MODE/SELECT"
+#define STAR_QUIT_NAME      "OFF"
+#define STAR_LEVEL_UP_NAME  "ON + RIGHT"
+#define STAR_LEVEL_DOWN_NAME "ON + LEFT"
+#define STAR_LEVEL_REPEAT_NAME "ON + NAVI"
 
 #define STAR_RC_QUIT BUTTON_RC_STOP
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
@@ -119,6 +140,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       (BUTTON_SELECT | BUTTON_RIGHT)
 #define STAR_LEVEL_DOWN     (BUTTON_SELECT | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT   (BUTTON_SELECT | BUTTON_PLAY)
+#define STAR_TOGGLE_CONTROL_NAME "SELECT"
+#define STAR_QUIT_NAME      "S + MENU"
+#define STAR_LEVEL_UP_NAME  "S >"
+#define STAR_LEVEL_DOWN_NAME "S <"
+#define STAR_LEVEL_REPEAT_NAME "S + PLAY"
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 
@@ -133,6 +159,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_DOWN_PRE BUTTON_REC
 #define STAR_LEVEL_DOWN     (BUTTON_REC|BUTTON_REPEAT)
 #define STAR_LEVEL_REPEAT   BUTTON_PLAY
+#define STAR_TOGGLE_CONTROL_NAME "SELECT"
+#define STAR_QUIT_NAME      "POWER"
+#define STAR_LEVEL_UP_NAME  "REC"
+#define STAR_LEVEL_DOWN_NAME "REC.."
+#define STAR_LEVEL_REPEAT_NAME "PLAY"
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 
@@ -145,13 +176,18 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       BUTTON_VOL_UP
 #define STAR_LEVEL_DOWN     BUTTON_VOL_DOWN
 #define STAR_LEVEL_REPEAT   BUTTON_A
+#define STAR_TOGGLE_CONTROL_NAME "SELECT"
+#define STAR_QUIT_NAME      "POWER"
+#define STAR_LEVEL_UP_NAME  "VOL UP"
+#define STAR_LEVEL_DOWN_NAME "VOL DOWN"
+#define STAR_LEVEL_REPEAT_NAME "A"
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
 (CONFIG_KEYPAD == SANSA_C200_PAD) || \
 (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
 (CONFIG_KEYPAD == SANSA_M200_PAD)
 
-#define STAR_QUIT 			BUTTON_POWER
+#define STAR_QUIT           BUTTON_POWER
 #define STAR_LEFT           BUTTON_LEFT
 #define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP             BUTTON_UP
@@ -160,11 +196,15 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP      (BUTTON_SELECT | BUTTON_RIGHT)
 #define STAR_LEVEL_DOWN    (BUTTON_SELECT | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT  (BUTTON_SELECT | BUTTON_DOWN)
-
+#define STAR_TOGGLE_CONTROL_NAME "SELECT"
+#define STAR_QUIT_NAME      "POWER"
+#define STAR_LEVEL_UP_NAME  "SELECT + RIGHT"
+#define STAR_LEVEL_DOWN_NAME "SELECT + LEFT"
+#define STAR_LEVEL_REPEAT_NAME "SELECT + DOWN"
 
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
 
-#define STAR_QUIT 			(BUTTON_HOME|BUTTON_REPEAT)
+#define STAR_QUIT           (BUTTON_HOME|BUTTON_REPEAT)
 #define STAR_LEFT           BUTTON_LEFT
 #define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP             BUTTON_UP
@@ -173,6 +213,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP      (BUTTON_SELECT | BUTTON_RIGHT)
 #define STAR_LEVEL_DOWN    (BUTTON_SELECT | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT  (BUTTON_SELECT | BUTTON_DOWN)
+#define STAR_TOGGLE_CONTROL_NAME "SELECT"
+#define STAR_QUIT_NAME      "HOME"
+#define STAR_LEVEL_UP_NAME  "SELECT + RIGHT"
+#define STAR_LEVEL_DOWN_NAME "SELECT + LEFT"
+#define STAR_LEVEL_REPEAT_NAME "SELECT + DOWN"
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 
@@ -185,6 +230,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       (BUTTON_PLAY | BUTTON_SCROLL_UP)
 #define STAR_LEVEL_DOWN     (BUTTON_PLAY | BUTTON_SCROLL_DOWN)
 #define STAR_LEVEL_REPEAT   (BUTTON_PLAY | BUTTON_RIGHT)
+#define STAR_TOGGLE_CONTROL_NAME "REW"
+#define STAR_QUIT_NAME      "POWER"
+#define STAR_LEVEL_UP_NAME  "PLAY+UP"
+#define STAR_LEVEL_DOWN_NAME "PLAY+DOWN"
+#define STAR_LEVEL_REPEAT_NAME "PLAY+RIGHT"
 
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
 
@@ -197,6 +247,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       BUTTON_VOL_UP
 #define STAR_LEVEL_DOWN     BUTTON_VOL_DOWN
 #define STAR_LEVEL_REPEAT   BUTTON_MENU
+#define STAR_TOGGLE_CONTROL_NAME "SELECT"
+#define STAR_QUIT_NAME      "BACK"
+#define STAR_LEVEL_UP_NAME  "VOL UP"
+#define STAR_LEVEL_DOWN_NAME "VOL DOWN"
+#define STAR_LEVEL_REPEAT_NAME "MENU"
 
 #elif (CONFIG_KEYPAD == MROBE100_PAD)
 
@@ -209,6 +264,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       BUTTON_PLAY
 #define STAR_LEVEL_DOWN     BUTTON_MENU
 #define STAR_LEVEL_REPEAT   BUTTON_DISPLAY
+#define STAR_TOGGLE_CONTROL_NAME "SELECT"
+#define STAR_QUIT_NAME      "POWER"
+#define STAR_LEVEL_UP_NAME  "PLAY"
+#define STAR_LEVEL_DOWN_NAME "MENU"
+#define STAR_LEVEL_REPEAT_NAME "DISPLAY"
 
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
 
@@ -221,11 +281,16 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       (BUTTON_RC_PLAY|BUTTON_RC_VOL_UP)
 #define STAR_LEVEL_DOWN     (BUTTON_RC_PLAY|BUTTON_RC_VOL_DOWN)
 #define STAR_LEVEL_REPEAT   (BUTTON_RC_PLAY|BUTTON_RC_MENU)
+#define STAR_TOGGLE_CONTROL_NAME "MODE"
+#define STAR_QUIT_NAME      "REC"
+#define STAR_LEVEL_UP_NAME  "PLAY+VOL+"
+#define STAR_LEVEL_DOWN_NAME "PLAY+VOL-"
+#define STAR_LEVEL_REPEAT_NAME "PLAY+MENU"
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 
 #define STAR_QUIT           BUTTON_POWER
-#define STAR_QUIT_NAME      "[POWER]"
+#define STAR_QUIT_NAME      "POWER"
 
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 
@@ -238,6 +303,11 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       (BUTTON_CUSTOM | BUTTON_UP)
 #define STAR_LEVEL_DOWN     (BUTTON_CUSTOM | BUTTON_DOWN)
 #define STAR_LEVEL_REPEAT   (BUTTON_CUSTOM | BUTTON_RIGHT)
+#define STAR_TOGGLE_CONTROL_NAME "PLAY"
+#define STAR_QUIT_NAME      "BACK"
+#define STAR_LEVEL_UP_NAME  "CUSTOM+UP"
+#define STAR_LEVEL_DOWN_NAME "CUSTOM+DOWN"
+#define STAR_LEVEL_REPEAT_NAME "CUSTOM+RIGHT"
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 
@@ -250,15 +320,20 @@ PLUGIN_HEADER
 #define STAR_LEVEL_UP       BUTTON_VOL_UP
 #define STAR_LEVEL_DOWN     BUTTON_VOL_DOWN
 #define STAR_LEVEL_REPEAT   BUTTON_VIEW
+#define STAR_TOGGLE_CONTROL_NAME "SELECT"
+#define STAR_QUIT_NAME      "POWER"
+#define STAR_LEVEL_UP_NAME  "VOL UP"
+#define STAR_LEVEL_DOWN_NAME "VOL DOWN"
+#define STAR_LEVEL_REPEAT_NAME "VIEW"
 
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD)
 
 #define STAR_QUIT           BUTTON_POWER
-#define STAR_QUIT_NAME      "[POWER]"
+#define STAR_QUIT_NAME      "POWER"
 
 #elif CONFIG_KEYPAD == MROBE500_PAD
 #define STAR_QUIT           BUTTON_POWER
-#define STAR_QUIT_NAME      "[POWER]"
+#define STAR_QUIT_NAME      "POWER"
 
 #else
 #error No keymap defined!
@@ -267,7 +342,7 @@ PLUGIN_HEADER
 #ifdef HAVE_TOUCHSCREEN
 //#ifndef STAR_QUIT
 //#define STAR_QUIT           BUTTON_TOPLEFT
-//#define STAR_QUIT_NAME           "[TOPLEFT]"
+//#define STAR_QUIT_NAME           "TOPLEFT"
 //#endif
 #ifndef STAR_LEFT
 #define STAR_LEFT           BUTTON_MIDLEFT
@@ -283,19 +358,19 @@ PLUGIN_HEADER
 #endif
 #ifndef STAR_TOGGLE_CONTROL
 #define STAR_TOGGLE_CONTROL BUTTON_CENTER
-#define STAR_TOGGLE_CONTROL_NAME "[CENTER]"
+#define STAR_TOGGLE_CONTROL_NAME "CENTER"
 #endif
 #ifndef STAR_LEVEL_UP
 #define STAR_LEVEL_UP       BUTTON_TOPLEFT
-#define STAR_LEVEL_UP_NAME  "[TOPLEFT]"
+#define STAR_LEVEL_UP_NAME  "TOPLEFT"
 #endif
 #ifndef STAR_LEVEL_DOWN
 #define STAR_LEVEL_DOWN     BUTTON_BOTTOMLEFT
-#define STAR_LEVEL_DOWN_NAME "[BOTTOMLEFT]"
+#define STAR_LEVEL_DOWN_NAME "BOTTOMLEFT"
 #endif
 #ifndef STAR_LEVEL_REPEAT
 #define STAR_LEVEL_REPEAT   BUTTON_BOTTOMRIGHT
-#define STAR_LEVEL_REPEAT_NAME "[BOTTOMRIGHT]"
+#define STAR_LEVEL_REPEAT_NAME "BOTTOMRIGHT"
 #endif
 #endif
 
@@ -537,104 +612,6 @@ static unsigned char* levels =
 "**...o**.*o..o**\n"
 "*........o*o...*\n"
 "****************";
-
-/**
- * Display text.
- */
-void star_display_text(char *str, bool waitkey)
-{
-    int chars_by_line;
-    int lines_by_screen;
-    int chars_for_line;
-    int current_line = 0;
-    int first_char_index = 0;
-    char *ptr_char;
-    char *ptr_line;
-    int i;
-    char line[255];
-    int key;
-    bool go_on;
-
-    rb->lcd_clear_display();
-
-    chars_by_line = LCD_WIDTH / char_width;
-    lines_by_screen = LCD_HEIGHT / char_height;
-
-    do
-    {
-        ptr_char = str + first_char_index;
-        chars_for_line = 0;
-        i = 0;
-        ptr_line = line;
-        while (i < chars_by_line)
-        {
-            switch (*ptr_char)
-            {
-                case '\t':
-                case ' ':
-                    *(ptr_line++) = ' ';
-                case '\n':
-                case '\0':
-                    chars_for_line = i;
-                    break;
-
-                default:
-                    *(ptr_line++) = *ptr_char;
-            }
-            if (*ptr_char == '\n' || *ptr_char == '\0')
-                break;
-            ptr_char++;
-            i++;
-        }
-
-        if (chars_for_line == 0)
-            chars_for_line = i;
-
-        line[chars_for_line] = '\0';
-
-        /* test if we have cut a word. If it is the case we don't have to */
-        /* skip the space */
-        if (i == chars_by_line && chars_for_line == chars_by_line)
-            first_char_index += chars_for_line;
-        else
-            first_char_index += chars_for_line + 1;
-
-        /* print the line on the screen */
-        rb->lcd_putsxy(0, current_line * char_height, line);
-
-        /* if the number of line showed on the screen is equals to the */
-        /* maximum number of line we can show, we wait for a key pressed to */
-        /* clear and show the remaining text. */
-        current_line++;
-        if (current_line == lines_by_screen || *ptr_char == '\0')
-        {
-            current_line = 0;
-            rb->lcd_update();
-            go_on = false;
-            while (waitkey && !go_on)
-            {
-                key = rb->button_get(true);
-                switch (key)
-                {
-                    case STAR_QUIT:
-                    case STAR_LEFT:
-                    case STAR_DOWN:
-                        go_on = true;
-                        break;
-
-                    default:
-                        if (rb->default_event_handler(key) == SYS_USB_CONNECTED)
-                        {
-                            usb_detected = true;
-                            go_on = true;
-                            break;
-                        }
-                }
-            }
-            rb->lcd_clear_display();
-        }
-    } while (*ptr_char != '\0');
-}
 
 /**
  * Do a pretty transition from one level to another.
@@ -986,7 +963,7 @@ static int star_run_game(int current_level)
             if (current_level == STAR_LEVEL_COUNT)
             {
                 rb->lcd_clear_display();
-                star_display_text("Congratulations!", true);
+                rb->splash(HZ*2, "Congratulations!");
                 rb->lcd_update();
 
                 /* There is no such level as STAR_LEVEL_COUNT so it can't be the
@@ -1000,6 +977,45 @@ static int star_run_game(int current_level)
 }
 
 /**
+ * Display help text.
+ */
+static bool star_help(void)
+{
+    int button;
+#define WORDS (sizeof help_text / sizeof (char*))
+    static char* help_text[] = {
+        "Star", "", "Aim", "",
+        "Take", "all", "the", "stars", "to", "go", "to", "the", "next", "level.",
+        "You", "can", "toggle", "control", "with", "the", "block", "to", "use",
+        "it", "as", "a", "mobile", "wall.", "The", "block", "cannot", "take",
+        "stars.", "", "",
+        "Controls", "",
+        STAR_TOGGLE_CONTROL_NAME":", "Toggle", "Control", "",
+        STAR_QUIT_NAME":", "", "Exit", "",
+        STAR_LEVEL_DOWN_NAME":", "Prev.", "level", "",
+        STAR_LEVEL_REPEAT_NAME":", "Reset", "level", "",
+        STAR_LEVEL_UP_NAME":", "Next", "level"
+    };
+    static struct style_text formation[]={
+        { 0, TEXT_CENTER|TEXT_UNDERLINE },
+        { 2, C_RED },
+        { 35, C_RED },
+        { -1, 0 }
+    };
+
+    if (display_text(WORDS, help_text, formation, NULL))
+        return true;
+    do {
+        button = rb->button_get(true);
+        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+            return true;
+    } while( ( button == BUTTON_NONE )
+            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+
+    return false;
+}
+
+/**
  * Display the choice menu.
  */
 static int star_menu(void)
@@ -1010,7 +1026,7 @@ static int star_menu(void)
     rb->lcd_getstringsize("a", &char_width, &char_height);
 
     MENUITEM_STRINGLIST(menu,"Star Menu",NULL,"Play","Choose Level",
-                        "Information","Keys","Quit");
+                        "Help", "Quit");
 
     while(!menu_quit)
     {
@@ -1024,80 +1040,8 @@ static int star_menu(void)
                             NULL, 1, 1, STAR_LEVEL_COUNT, NULL );
                 break;
             case 2:
-                star_display_text(
-                    "INFO\n\n"
-                    "Take all the stars to go to the next level. "
-                    "You can toggle control with the block to "
-                    "use it as a mobile wall. The block cannot "
-                    "take stars.", true);
-                    break;
-            case 3:
-#if CONFIG_KEYPAD == RECORDER_PAD
-                star_display_text("KEYS\n\n"
-                                  "[ON] Toggle Ctl.\n"
-                                  "[OFF] Exit\n"
-                                  "[F1] Prev. level\n"
-                                  "[F2] Reset level\n"
-                                  "[F3] Next level", true);
-#elif CONFIG_KEYPAD == ONDIO_PAD
-                star_display_text("KEYS\n\n"
-                                  "[MODE] Toggle Ctl\n"
-                                  "[OFF] Exit\n"
-                                  "[M <] Prev. level\n"
-                                  "[M ^] Reset level\n"
-                                  "[M >] Next level", true);
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-                star_display_text("KEYS\n\n"
-                                  "[MODE/NAVI] Toggle Ctrl\n"
-                                  "[OFF] Exit\n"
-                                  "[ON + LEFT] Prev. level\n"
-                                  "[ON + NAVI] Reset level\n"
-                                  "[ON + RIGHT] Next level", true);
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-                star_display_text("KEYS\n\n"
-                                  "[SELECT] Toggle Ctl\n"
-                                  "[S + MENU] Exit\n"
-                                  "[S <] Prev. level\n"
-                                  "[S + PLAY] Reset level\n"
-                                  "[S >] Next level", true);
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-                star_display_text("KEYS\n\n"
-                                  "[SELECT] Toggle Ctl\n"
-                                  "[POWER] Exit\n"
-                                  "[REC..] Prev. level\n"
-                                  "[PLAY] Reset level\n"
-                                  "[REC] Next level", true);
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-                star_display_text("KEYS\n\n"
-                                  "[SELECT] Toggle Control\n"
-                                  "[POWER] Exit\n"
-                                  "[VOL DOWN] Prev. level\n"
-                                  "[A] Reset level\n"
-                                  "[VOL UP] Next level", true);
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-                star_display_text("KEYS\n\n"
-                                  "[REW] Toggle Ctl\n"
-                                  "[POWER] Exit\n"
-                                  "[PLAY+DOWN] Prev. level\n"
-                                  "[PLAY+RIGHT] Reset level\n"
-                                  "[PLAY+UP] Next level", true);
-#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
-                star_display_text("KEYS\n\n"
-                                  "[SELECT] Toggle Control\n"
-                                  "[BACK] Exit\n"
-                                  "[VOL DOWN] Prev. level\n"
-                                  "[MENU] Reset level\n"
-                                  "[VOL UP] Next level", true);
-#endif
-#ifdef HAVE_TOUCHSCREEN
-                star_display_text("KEYS\n\n"
-                                  STAR_TOGGLE_CONTROL_NAME " Toggle Control\n"
-                                  STAR_QUIT_NAME " Exit\n"
-                                  STAR_LEVEL_DOWN_NAME " Prev. level\n"
-                                  STAR_LEVEL_REPEAT_NAME " Reset level\n"
-                                  STAR_LEVEL_UP_NAME " Next level", true);
-#endif
+                if(star_help())
+                    usb_detected = true;
                 break;
             default:
                 menu_quit = true;

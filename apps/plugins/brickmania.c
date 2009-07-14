@@ -22,6 +22,7 @@
 #include "plugin.h"
 #include "lib/configfile.h" /* Part of libplugin */
 #include "lib/helper.h"
+#include "lib/display_text.h"
 
 PLUGIN_HEADER
 
@@ -1130,154 +1131,84 @@ int game_menu(int when)
     }
 }
 
-int help(int when)
+int help(void)
 {
-    int w,h;
     int button;
-    int xoffset=0;
-    int yoffset=0;
-    /* set the maximum x and y in the helpscreen
-       dont forget to update, if you change text */
-    int maxY=180;
-    int maxX=215;
-
-    while(true) {
-#ifdef HAVE_LCD_COLOR
-        rb->lcd_set_background(LCD_BLACK);
-        rb->lcd_clear_display();
-        rb->lcd_set_background(LCD_BLACK);
-        rb->lcd_set_foreground(LCD_WHITE);
-#else
-        rb->lcd_clear_display();
-#endif
-
-        rb->lcd_getstringsize("BrickMania", &w, &h);
-        rb->lcd_putsxy(LCD_WIDTH/2-w/2+xoffset, 1+yoffset, "BrickMania");
-
-#ifdef HAVE_LCD_COLOR
-        rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
-        rb->lcd_putsxy(1+xoffset, 1*(h+2)+yoffset,"Aim");
-        rb->lcd_set_foreground(LCD_WHITE);
-#else
-        rb->lcd_putsxy(1+xoffset, 1*(h+2)+yoffset,"Aim");
-#endif
-        rb->lcd_putsxy(1+xoffset, 2*(h+2)+yoffset,
-                       "destroy all the bricks by bouncing");
-        rb->lcd_putsxy(1+xoffset, 3*(h+2)+yoffset,
-                       "the ball of them using the paddle.");
-#ifdef HAVE_LCD_COLOR
-        rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
-        rb->lcd_putsxy(1+xoffset, 5*(h+2)+yoffset,"Controls");
-        rb->lcd_set_foreground(LCD_WHITE);
-#else
-        rb->lcd_putsxy(1+xoffset, 5*(h+2)+yoffset,"Controls");
-#endif
-        rb->lcd_putsxy(1+xoffset, 6*(h+2)+yoffset,"< & > Move the paddle");
+#define WORDS (sizeof help_text / sizeof (char*))
+    static char* help_text[] = {
+        "BrickMania", "", "Aim", "",
+        "Destroy", "all", "the", "bricks", "by", "bouncing",
+        "the", "ball", "of", "them", "using", "the", "paddle.", "", "",
+        "Controls", "",
+        "< & >", "Move", "the", "paddle", "",
 #if CONFIG_KEYPAD == ONDIO_PAD
-        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,
-                       "MENU  Releases the ball/Fire!");
+        "MENU",
 #elif (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IAUDIO_M3_PAD)
-        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,
-                       "PLAY  Releases the ball/Fire!");
+        "PLAY",
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
-        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,
-                       "NAVI  Releases the ball/Fire!");
+        "NAVI",
 #else
-        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,
-                       "SELECT  Releases the ball/Fire!");
+        "SELECT",
 #endif
+        "Releases", "the", "ball/", "Fire!", "",
 #if CONFIG_KEYPAD == IAUDIO_M3_PAD
-        rb->lcd_putsxy(1+xoffset, 8*(h+2)+yoffset, "REC  Opens menu/Quit");
+        "REC",
+#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD) || \
+      (CONFIG_KEYPAD == CREATIVEZVM_PAD)
+        "BACK",
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+        "MENU",
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
+      (CONFIG_KEYPAD == ONDIO_PAD) || \
+      (CONFIG_KEYPAD == RECORDER_PAD) || \
+      (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
+        "STOP",
 #else
-        rb->lcd_putsxy(1+xoffset, 8*(h+2)+yoffset, "STOP  Opens menu/Quit");
+        "POWER",
 #endif
+        "Opens", "menu/", "Quit", "", "",
+        "Specials", "",
+        "N", "Normal:", "returns", "paddle", "to", "normal", "",
+        "D", "DIE!:", "loses", "a", "life", "",
+        "L", "Life:", "gains", "a", "life/", "power", "up", "",
+        "F", "Fire:", "allows", "you", "to", "shoot", "bricks", "",
+        "G", "Glue:", "ball", "sticks", "to", "paddle", "",
+        "B", "Ball:", "generates", "another", "ball", "",
+        "FL", "Flip:", "flips", "left /", "right", "movement",
+    };
+    static struct style_text formation[]={
+        { 0, TEXT_CENTER|TEXT_UNDERLINE },
+        { 2, C_RED },
+        { 19, C_RED },
+        { 38, C_RED },
+        { 40, C_BLUE },
+        { 47, C_RED },
+        { 53, C_GREEN },
+        { 61, C_ORANGE },
+        { 69, C_GREEN },
+        { 76, C_YELLOW },
+        { 82, C_RED },
+        { -1, 0 }
+    };
+
 #ifdef HAVE_LCD_COLOR
-        rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
-        rb->lcd_putsxy(1+xoffset, 10*(h+2)+yoffset, "Specials");
-        rb->lcd_set_foreground(LCD_WHITE);
-#else
-        rb->lcd_putsxy(1+xoffset, 10*(h+2)+yoffset, "Specials");
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_set_foreground(LCD_WHITE);
 #endif
-        rb->lcd_putsxy(1+xoffset, 11*(h+2)+yoffset,
-                       "N  Normal:returns paddle to normal");
-        rb->lcd_putsxy(1+xoffset, 12*(h+2)+yoffset, "D  DIE!:loses a life");
-        rb->lcd_putsxy(1+xoffset, 13*(h+2)+yoffset,
-                       "L  Life:gains a life/power up");
-        rb->lcd_putsxy(1+xoffset, 14*(h+2)+yoffset,
-                       "F  Fire:allows you to shoot bricks");
-        rb->lcd_putsxy(1+xoffset, 15*(h+2)+yoffset,
-                       "G  Glue:ball sticks to paddle");
-        rb->lcd_putsxy(1+xoffset, 16*(h+2)+yoffset,
-                       "B  Ball:generates another ball");
-        rb->lcd_putsxy(1+xoffset, 17*(h+2)+yoffset,
-                       "FL Flip:flips left / right movement");
-        rb->lcd_update();
 
-        button=rb->button_get(true);
-        switch (button) {
-#ifdef RC_QUIT
-            case RC_QUIT:
-#endif
-#ifdef HAVE_TOUCHSCREEN
-            case BUTTON_TOUCHSCREEN:
-#endif
-            case QUIT:
-                switch (game_menu(when)) {
-                    case 0:
-                        cur_level=0;
-                        life=2;
-                        int_game(1);
-                        break;
-                    case 1:
-                        con_game=1;
-                        break;
-                    case 2:
-                        if (help(when)==1)
-                            return 1;
-                        break;
-                    case 3:
-                        return 1;
-                        break;
-                }
-                return 0;
-                break;
-            case LEFT:
-            case LEFT | BUTTON_REPEAT:
-#ifdef ALTLEFT
-            case ALTLEFT:
-            case ALTLEFT | BUTTON_REPEAT:
-#endif
-                if( xoffset<0)
-                    xoffset+=2;
-                break;
-            case RIGHT:
-            case RIGHT | BUTTON_REPEAT:
-#ifdef ALTRIGHT
-            case ALTRIGHT:
-            case ALTRIGHT | BUTTON_REPEAT:
-#endif
-                if(xoffset+maxX > LCD_WIDTH)
-                    xoffset-=2;
-                break;
-            case UP:
-            case UP | BUTTON_REPEAT:
-                if(yoffset <0)
-                    yoffset+=2;
-                break;
-            case DOWN:
-            case DOWN | BUTTON_REPEAT:
-                if(yoffset+maxY > LCD_HEIGHT)
-                    yoffset-=2;
-                break;
-
-            default:
-                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    return 1;
-                break;
-        }
-
-        rb->yield();
-    }
+    rb->lcd_setfont(FONT_UI);
+    if (display_text(WORDS, help_text, formation, NULL))
+        return 1;
+    do {
+        button = rb->button_get(true);
+        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+            return 1;
+    } while( ( button == BUTTON_NONE )
+            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+    rb->lcd_setfont(FONT_SYSFIXED);
     return 0;
 }
 
@@ -1315,10 +1246,6 @@ int game_loop(void)
     int sec_count=0,num_count=10;
     int end;
 
-    rb->srand( *rb->current_tick );
-
-    configfile_load(HIGH_SCORE,config,1,0);
-
     switch(game_menu(0)) {
         case 0:
             cur_level = 0;
@@ -1329,7 +1256,7 @@ int game_loop(void)
             con_game = 1;
             break;
         case 2:
-            if (help(0) == 1) return 1;
+            return help();
             break;
         case 3:
             return 1;
@@ -1885,22 +1812,7 @@ int game_loop(void)
                         sleep(3);
                     }
 
-                    switch(game_menu(0)) {
-                        case 0:
-                            life=2;
-                            cur_level=0;
-                            int_game(1);
-                            break;
-                        case 1:
-                            con_game=1;
-                            break;
-                        case 2:
-                            if (help(0)==1) return 1;
-                            break;
-                        case 3:
-                            return 1;
-                            break;
-                    }
+                    return 0;
                 }
             }
 
@@ -2029,24 +1941,28 @@ int game_loop(void)
                 case RC_QUIT:
 #endif
                 case QUIT:
-                    switch(game_menu(1)) {
-                        case 0:
-                            life=2;
-                            cur_level=0;
-                            int_game(1);
-                            break;
-                        case 1:
-                            for(k=0;k<used_balls;k++)
-                                if (ball[k].x!=0 && ball[k].y !=0)
-                                    con_game=1;
-                            break;
-                        case 2:
-                            if (help(1)==1)
+                    while(1) {
+                        switch(game_menu(1)) {
+                            case 0:
+                                life=2;
+                                cur_level=0;
+                                int_game(1);
+                                break;
+                            case 1:
+                                for(k=0;k<used_balls;k++)
+                                    if (ball[k].x!=0 && ball[k].y !=0)
+                                        con_game=1;
+                                break;
+                            case 2:
+                                if (help()==1)
+                                    return 1;
+                                continue;
+                                break;
+                            case 3:
                                 return 1;
-                            break;
-                        case 3:
-                            return 1;
-                            break;
+                                break;
+                        }
+                        break;
                     }
 
                     for(k=0;k<used_balls;k++) {
@@ -2091,23 +2007,7 @@ int game_loop(void)
                 ball[k].y=0;
             }
 
-            switch(game_menu(0)) {
-                case 0:
-                    cur_level=0;
-                    life=2;
-                    int_game(1);
-                    break;
-                case 1:
-                    con_game=1;
-                    break;
-                case 2:
-                    if (help(0)==1)
-                        return 1;
-                    break;
-                case 3:
-                    return 1;
-                    break;
-            }
+            return 0;
         }
         if (end > *rb->current_tick)
             rb->sleep(end-*rb->current_tick);
@@ -2127,6 +2027,10 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     /* Turn off backlight timeout */
     backlight_force_on(); /* backlight control in lib/helper.c */
+
+    rb->srand( *rb->current_tick );
+
+    configfile_load(HIGH_SCORE,config,1,0);
 
     /* now go ahead and have fun! */
     while (game_loop()!=1);

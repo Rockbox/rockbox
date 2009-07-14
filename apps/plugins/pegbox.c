@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "lib/display_text.h"
 
 #include "pluginbitmaps/pegbox_header.h"
 #include "pluginbitmaps/pegbox_pieces.h"
@@ -720,111 +721,6 @@ char levels[NUM_LEVELS][ROWS][COLS] = {
 
 
 /*****************************************************************************
-* display_text() formats and outputs text.
-******************************************************************************/
-static void display_text(char *str, bool waitkey)
-{
-    int chars_by_line;
-    int lines_by_screen;
-    int chars_for_line;
-    int current_line = 0;
-    int char_width, char_height;
-    int first_char_index = 0;
-    char *ptr_char;
-    char *ptr_line;
-    int i;
-    char line[255];
-    int key;
-    bool go_on;
-
-    rb->lcd_clear_display();
-    
-    rb->lcd_getstringsize("a", &char_width, &char_height);
-
-    chars_by_line = LCD_WIDTH / char_width;
-    lines_by_screen = LCD_HEIGHT / char_height;
-
-    do
-    {
-        ptr_char = str + first_char_index;
-        chars_for_line = 0;
-        i = 0;
-        ptr_line = line;
-        while (i < chars_by_line)
-        {
-            switch (*ptr_char)
-            {
-                case '\t':
-                case ' ':
-                    *(ptr_line++) = ' ';
-                case '\n':
-                case '\0':
-                    chars_for_line = i;
-                    break;
-
-                default:
-                    *(ptr_line++) = *ptr_char;
-            }
-            if (*ptr_char == '\n' || *ptr_char == '\0')
-                break;
-            ptr_char++;
-            i++;
-        }
-
-        if (chars_for_line == 0)
-            chars_for_line = i;
-
-        line[chars_for_line] = '\0';
-
-        /* test if we have cut a word. If it is the case we don't have to */
-        /* skip the space */
-        if (i == chars_by_line && chars_for_line == chars_by_line)
-            first_char_index += chars_for_line;
-        else
-            first_char_index += chars_for_line + 1;
-
-        /* print the line on the screen */
-        rb->lcd_putsxy(0, current_line * char_height, line);
-
-        /* if the number of line showed on the screen is equals to the */
-        /* maximum number of line we can show, we wait for a key pressed to */
-        /* clear and show the remaining text. */
-        current_line++;
-        if (current_line == lines_by_screen || *ptr_char == '\0')
-        {
-            current_line = 0;
-            rb->lcd_update();
-            go_on = false;
-            while (waitkey && !go_on)
-            {
-                key = rb->button_get(true);
-                switch (key)
-                {
-#ifdef HAVE_TOUCHSCREEN
-                    case BUTTON_TOUCHSCREEN:
-#endif
-                    case PEGBOX_QUIT:
-                    case PEGBOX_LEFT:
-                    case PEGBOX_DOWN:
-                        go_on = true;
-                        break;
-
-                    default:
-                       /*if (rb->default_event_handler(key) == SYS_USB_CONNECTED)
-                        {
-                            usb_detected = true;
-                            go_on = true;
-                            break;
-                        }*/
-                        break;
-                }
-            }
-            rb->lcd_clear_display();
-        }
-    } while (*ptr_char != '\0');
-}
-
-/*****************************************************************************
 * draw_board() draws the game's current level.
 ******************************************************************************/
 static void draw_board(struct game_context* pb) {
@@ -1127,6 +1023,48 @@ static void pegbox_callback(void* param) {
     pegbox_savedata(pb);
 }
 
+/***********************************************************************
+* pegbox_help() display help text
+************************************************************************/
+static bool pegbox_help(void)
+{
+    int button;
+#define WORDS (sizeof help_text / sizeof (char*))
+    static char* help_text[] = {
+        "Pegbox", "", "Aim", "",
+        "To", "beat", "each", "level,", "you", "must", "destroy", "all", "of",
+        "the", "pegs.", "If", "two", "like", "pegs", "are", "pushed", "into",
+        "each", "other,", "they", "disappear", "except", "for", "triangles",
+        "which", "form", "a", "solid", "block", "and", "crosses", "which",
+        "allow", "you", "to", "choose", "a", "replacement", "block.", "", "",
+        "Controls", "",
+        RESTART_TEXT, "to", "restart", "level", "",
+        LVL_UP_TEXT, "to", "go", "up", "a", "level", "",
+        LVL_DOWN_TEXT, "to", "go", "down", "a", "level", "",
+        SAVE_TEXT, "to", "select/save", "",
+        QUIT_TEXT, "to", "quit"
+    };
+    static struct style_text formation[]={
+        { 0, TEXT_CENTER|TEXT_UNDERLINE },
+        { 2, C_RED },
+        { 46, C_RED },
+        { -1, 0 }
+    };
+
+    rb->lcd_setfont(FONT_UI);
+
+    if (display_text(WORDS, help_text, formation, NULL))
+        return true;
+    do {
+        button = rb->button_get(true);
+        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+            return true;
+    } while( ( button == BUTTON_NONE )
+            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+    rb->lcd_setfont(FONT_SYSFIXED);
+    return false;
+}
+
 /*****************************************************************************
 * pegbox_menu() is the initial menu at the start of the game.
 ******************************************************************************/
@@ -1251,28 +1189,12 @@ static unsigned int pegbox_menu(struct game_context* pb) {
                         pb->save_exist = false;
                     }
                     breakout = true;
-                } 
+                }
                 else if (loc == 2)
-                    display_text("How to Play\nTo beat each level, you must "
-                                 "destroy all of the pegs. If two like pegs are "
-                                 "pushed into each other they disappear except "
-                                 "for triangles which form a solid block and "
-                                 "crosses which allow you to choose a "
-                                 "replacement block.\n\n"
-                                 "Controls\n"
-#if LCD_HEIGHT > 64
-                                 RESTART_TEXT " to restart level\n"
-                                 LVL_UP_TEXT " to go up a level\n"
-                                 LVL_DOWN_TEXT " to go down a level\n"
-                                 SAVE_TEXT " to select/save\n"
-                                 QUIT_TEXT " to quit\n",true);
-#else
-                                 RESTART_TEXT ": restart\n"
-                                 LVL_UP_TEXT ": level up\n"
-                                 LVL_DOWN_TEXT " level down\n"
-                                 SAVE_TEXT " select/save\n"
-                                 QUIT_TEXT " quit\n",true);
-#endif
+                {
+                    if(pegbox_help())
+                        return PB_USB;
+                }
                 else if (loc == 3)
                     return PB_QUIT;
                 break;
@@ -1462,7 +1384,7 @@ enum plugin_status plugin_start(const void* parameter) {
     rb->lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
-#endif 
+#endif
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(BG_COLOR);

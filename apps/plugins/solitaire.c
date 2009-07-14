@@ -22,6 +22,7 @@
 #include "plugin.h"
 #include "lib/playback_control.h"
 #include "lib/configfile.h"
+#include "lib/display_text.h"
 #include "button.h"
 #include "lcd.h"
 
@@ -448,26 +449,6 @@ PLUGIN_HEADER
 #endif
 
 /**
- * Help strings
- */
-
-static int helplines;
-static int displaylines;
-
-static char helptext[] =
-    /* Use single spaces only! Close each line with one \0. */
-    "-- Navigation --\0"
-    HK_LR   ": Move the cursor to the previous/ next column.\0"
-    HK_UD   ": Move the cursor up/ down in the column.\0"
-    HK_MOVE ": Select cards, move cards, reveal hidden cards...\0"
-    HK_DRAW ": Deselect a card if it was selected. Else draw new card(s) from the remains stack.\0"
-    "-- Shortcuts --\0"
-    HK_REM2CUR   ": Put the card on top of the remains stack on top of the cursor.\0"
-    HK_CUR2STACK ": Put the card under the cursor on one of the 4 final stacks.\0"
-    HK_REM2STACK ": Put the card on top of the remains stack on one of the 4 final stacks.\0"
-;
-
-/**
  * Misc constants, graphics and other defines
  */
 
@@ -634,122 +615,41 @@ static void draw_empty_stack( int s, int x, int y, bool cursor )
     draw_card_ext( x, y, false, cursor );
 }
 
-/**
- * Help
- */
-
-static void init_help(void)
+/* Help */
+static bool solitaire_help( void )
 {
-    int lines = 0;
-    int w_space, w, h;
-    int para_len;
-    char *para = helptext;
-
-    rb->lcd_getstringsize(" ", &w_space, &h);
-    displaylines = LCD_HEIGHT / h;
-    para_len = rb->strlen(para);
-
-    while (para_len)
-    {
-        bool first = true;
-        int x = 0;
-        char *next, *store;
-
-        next = rb->strtok_r(para, " ", &store);
-        while (next)
-        {
-            rb->lcd_getstringsize(next, &w, NULL);
-            if (!first)
-            {
-                if (x + w > LCD_WIDTH)
-                {
-                    lines++;
-                    x = 0;
-                }
-                else
-                    next[-1] = ' ';  /* re-concatenate string */
-            }
-            else
-                first = false;
-
-            x += w + w_space;
-            next = rb->strtok_r(NULL, " ", &store);
-        }
-
-        lines++;
-        para += para_len + 1;
-        para_len = rb->strlen(para);
-    }
-    helplines = lines;
-}
-
-enum help { HELP_QUIT, HELP_USB };
-
-/* help for the not so intuitive interface */
-enum help solitaire_help( void )
-{
-    int start = 0;
     int button;
-    int lastbutton = BUTTON_NONE;
-    bool fixed = (displaylines >= helplines);
+#define WORDS (sizeof help_text / sizeof (char*))
+    static char* help_text[] = {
+        "Solitaire", "", "Controlls", "",
+        HK_LR   ":", "Move", "the", "cursor", "to", "the",
+            "previous/", "next", "column.", "",
+        HK_UD   ":", "Move", "the", "cursor", "up/", "down", "in", "the",
+            "column.", "",
+        HK_MOVE ":", "Select", "cards,", "move", "cards...", "",
+        HK_DRAW ":", "Deselect", "a", "card", "if", "it", "was", "selected.",
+            "Else", "draw", "new", "card(s)", "from", "the", "remains",
+            "stack.", "", "",
+        "Shortcuts", "",
+        HK_REM2CUR   ":", "Put", "the", "card", "on", "top", "of", "the",
+            "remains", "stack", "on", "top", "of", "the", "cursor.", "",
+        HK_CUR2STACK ":", "Put", "the", "card", "under", "the", "cursor",
+            "on", "one", "of", "the", "4", "final", "stacks.", "",
+        HK_REM2STACK ":", "Put", "the", "card", "on", "top", "of", "the",
+            "remains", "stack", "on", "one", "of", "the", "4", "final",
+            "stacks."
+    };
 
-    while( true )
-    {
-        char *text = helptext;
-        int line  = fixed ? (displaylines - helplines) / 2 : 0;
-        int i;
+    if (display_text(WORDS, help_text, NULL, NULL))
+        return true;
+    do {
+        button = rb->button_get(true);
+        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+            return true;
+    } while( ( button == BUTTON_NONE )
+            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
 
-        rb->lcd_clear_display();
-
-        for (i = 0; i < start + displaylines; i++)
-        {
-            if (i >= start)
-                rb->lcd_puts(0, line++, text);
-            text += rb->strlen(text) + 1;
-        }
-        rb->lcd_update();
-
-        button = rb->button_get( true );
-        switch( button )
-        {
-            case SOL_UP:
-#ifdef SOL_UP_PRE
-                if( lastbutton != SOL_UP_PRE )
-                    break;
-#else
-            case SOL_UP|BUTTON_REPEAT:
-#endif
-                if (!fixed && start > 0)
-                    start--;
-                break;
-
-            case SOL_DOWN:
-#ifdef SOL_DOWN_PRE
-                if( lastbutton != SOL_DOWN_PRE )
-                    break;
-#else
-            case SOL_DOWN|BUTTON_REPEAT:
-#endif
-                if (!fixed && start < helplines - displaylines)
-                    start++;
-                break;
-
-#ifdef SOL_RC_QUIT
-            case SOL_RC_QUIT:
-#endif
-            case SOL_QUIT:
-                return HELP_QUIT;
-
-            default:
-                if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
-                    return HELP_USB;
-                break;
-        }
-        if( button != BUTTON_NONE )
-            lastbutton = button;
-
-        rb->yield();
-    }
+    return false;
 }
 
 /**
@@ -831,7 +731,7 @@ int solitaire_menu(bool in_game)
                 break;
 
             case 3:
-                if (solitaire_help() == HELP_USB)
+                if (solitaire_help())
                     result = MENU_USB;
                 break;
 
@@ -1928,8 +1828,6 @@ enum plugin_status plugin_start(const void* parameter )
     }
     else
         result = SOLITAIRE_WIN;
-
-    init_help();
 
     /* play the game :)
      * Keep playing if a game was won (that means display the menu after

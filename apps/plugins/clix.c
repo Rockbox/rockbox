@@ -592,34 +592,34 @@ static int clix_clear_selected(struct clix_game_state_t* state)
     return state->status;
 }
 
-static int clix_help(void)
+static bool clix_help(void)
 {
-    rb->lcd_setfont(FONT_UI);
-    rb->lcd_set_foreground(LCD_WHITE);
 #define WORDS (sizeof help_text / sizeof (char*))
     static char *help_text[] = {
-        "Clix", "", "Aim", "", "Remove", "all", "blocks", "from", "the",
-        "board", "to", "achieve", "the", "next", "level.", "You", "can",
-        "only", "remove", "blocks,", "if", "at", "least", "two", "blocks",
-        "with", "the", "same", "color", "have", "a", "direct", "connection.",
-        "The", "more", "blocks", "you", "remove", "per", "turn,", "the",
-        "more", "points", "you", "get."
+        "Clix", "", "Aim", "",
+        "Remove", "all", "blocks", "from", "the", "board", "to", "achieve",
+        "the", "next", "level.", "You", "can", "only", "remove", "blocks,",
+        "if", "at", "least", "two", "blocks", "with", "the", "same", "color",
+        "have", "a", "direct", "connection.", "The", "more", "blocks", "you",
+        "remove", "per", "turn,", "the", "more", "points", "you", "get."
     };
     static struct style_text formation[]={
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
-        { 2, C_RED }
+        { 2, C_RED },
+        { -1, 0 }
     };
-    
-    if (display_text(WORDS, help_text, formation, NULL)==PLUGIN_USB_CONNECTED)
-        return PLUGIN_USB_CONNECTED;
     int button;
+    
+    rb->lcd_setfont(FONT_UI);
+    rb->lcd_set_foreground(LCD_WHITE);
+    if (display_text(WORDS, help_text, formation, NULL))
+        return true;
     do {
         button = rb->button_get(true);
-        if (button == SYS_USB_CONNECTED) {
-            return PLUGIN_USB_CONNECTED;
-        }
+        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+            return true;
     } while( ( button == BUTTON_NONE )
-        || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
     rb->lcd_setfont(FONT_SYSFIXED);
     return 0;
 }
@@ -656,7 +656,7 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
                 clix_init(state);
                 return 0;
             case 2:
-                if (clix_help()==PLUGIN_USB_CONNECTED)
+                if (clix_help())
                     return 1;
                 break;
             case 3:

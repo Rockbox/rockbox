@@ -135,10 +135,5 @@ bool display_text(short words, char** text, struct style_text* style,
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_set_drawmode(prev_drawmode);
 #endif
-#ifdef HAVE_LCD_COLOR
-    if (style!=NULL) {
-        rb->lcd_set_foreground(standard_fgcolor);
-    }
-#endif
     return false;
 }
