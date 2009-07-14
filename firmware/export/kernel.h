@@ -221,6 +221,7 @@ int tick_add_task(void (*f)(void));
 int tick_remove_task(void (*f)(void));
 extern void tick_start(unsigned int interval_in_ms);
 
+#ifdef INCLUDE_TIMEOUT_API
 struct timeout;
 
 /* timeout callback type
@@ -240,6 +241,7 @@ struct timeout
 void timeout_register(struct timeout *tmo, timeout_cb_type callback,
                       int ticks, intptr_t data);
 void timeout_cancel(struct timeout *tmo);
+#endif /* INCLUDE_TIMEOUT_API */
 
 #define STATE_NONSIGNALED 0
 #define STATE_SIGNALED    1
