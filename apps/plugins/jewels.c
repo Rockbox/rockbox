@@ -22,6 +22,8 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "lib/display_text.h"
+#include "lib/highscore.h"
 #include "lib/playback_control.h"
 
 #ifdef HAVE_LCD_BITMAP
@@ -242,78 +244,67 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define TILE_WIDTH  22
 #define TILE_HEIGHT 22
 #define YOFS 0
-#define NUM_SCORES 10
+#define NUM_SCORES 5
 
 /* use 16x16 tiles (iPod Nano) */
 #elif (LCD_HEIGHT == 132) && (LCD_WIDTH == 176)
 #define TILE_WIDTH  16
 #define TILE_HEIGHT 16
 #define YOFS 4
-#define NUM_SCORES 10
+#define NUM_SCORES 5
 
 /* use 16x16 tiles (H100, iAudio X5, iPod 3G, iPod 4G grayscale) */
 #elif (LCD_HEIGHT == 128) && (LCD_WIDTH == 160)
 #define TILE_WIDTH  16
 #define TILE_HEIGHT 16
 #define YOFS 0
-#define NUM_SCORES 10
+#define NUM_SCORES 5
 
 /* use 14x14 tiles (H10 5/6 GB) */
 #elif (LCD_HEIGHT == 128) && (LCD_WIDTH == 128)
 #define TILE_WIDTH  14
 #define TILE_HEIGHT 14
 #define YOFS 0
-#define NUM_SCORES 10
+#define NUM_SCORES 5
 
 /* use 13x13 tiles (iPod Mini) */
 #elif (LCD_HEIGHT == 110) && (LCD_WIDTH == 138)
 #define TILE_WIDTH  13
 #define TILE_HEIGHT 13
 #define YOFS 6
-#define NUM_SCORES 10
+#define NUM_SCORES 5
 
 /* use 12x12 tiles (iAudio M3) */
 #elif (LCD_HEIGHT == 96) && (LCD_WIDTH == 128)
 #define TILE_WIDTH  12
 #define TILE_HEIGHT 12
 #define YOFS 0
-#define NUM_SCORES 9
+#define NUM_SCORES 5
 
 /* use 10x10 tiles (Sansa c200) */
 #elif (LCD_HEIGHT == 80) && (LCD_WIDTH == 132)
 #define TILE_WIDTH 10
 #define TILE_HEIGHT 10
 #define YOFS 0
-#define NUM_SCORES 8
+#define NUM_SCORES 5
 
 /* use 10x8 tiles (iFP 700) */
 #elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 128)
 #define TILE_WIDTH 10
 #define TILE_HEIGHT 8
 #define YOFS 0
-#define NUM_SCORES 8
+#define NUM_SCORES 5
 
 /* use 10x8 tiles (Recorder, Ondio) */
 #elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 112)
 #define TILE_WIDTH 10
 #define TILE_HEIGHT 8
 #define YOFS 0
-#define NUM_SCORES 8
+#define NUM_SCORES 5
 
 #else
   #error JEWELS: Unsupported LCD
 #endif
-
-/* save files */
-#define SCORE_FILE PLUGIN_GAMES_DIR "/jewels.score"
-#define SAVE_FILE  PLUGIN_GAMES_DIR "/jewels.save"
-
-/* final game return status */
-#define BJ_QUIT_FROM_GAME 4
-#define BJ_END            3
-#define BJ_USB            2
-#define BJ_QUIT           1
-#define BJ_LOSE           0
 
 /* swap directions */
 #define SWAP_UP    0
@@ -330,6 +321,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 
 /* animation frame rate */
 #define MAX_FPS 20
+
+/* text margin */
+#define MARGIN 5
 
 /* Game types */
 enum game_type {
@@ -363,23 +357,21 @@ struct tile {
  * score is the current level score
  * segments is the number of cleared segments in the current run
  * level is the current level
+ * tmp_type is the select type in the menu
  * type is the game type (normal or puzzle)
- * highscores is the list of high scores
- * resume denotes whether to resume the currently loaded game
- * dirty denotes whether the high scores are out of sync with the saved file
  * playboard is the game playing board (first row is hidden)
  * num_jewels is the number of different jewels to use
+ * playgame is true, if a game is started
  */
 struct game_context {
     unsigned int score;
     unsigned int segments;
     unsigned int level;
     unsigned int type;
-    unsigned int highscores[NUM_SCORES];
-    bool resume;
-    bool dirty;
+    unsigned int tmp_type;
     struct tile playboard[BJ_HEIGHT][BJ_WIDTH];
     unsigned int num_jewels;
+    bool playgame;
 };
 
 #define MAX_NUM_JEWELS 7
@@ -435,27 +427,11 @@ struct puzzle_level puzzle_levels[NUM_PUZZLE_LEVELS] = {
               {4, 7, PUZZLE_TILE_LEFT|PUZZLE_TILE_UP} } },
 };
 
-/*****************************************************************************
-* jewels_init() initializes jewels data structures.
-******************************************************************************/
-static void jewels_init(struct game_context* bj) {
-    /* seed the rand generator */
-    rb->srand(*rb->current_tick);
+#define SAVE_FILE PLUGIN_GAMES_DIR "/jewels.save"
 
-    /* check for resumed game */
-    if(bj->resume) {
-        bj->resume = false;
-        return;
-    }
+#define HIGH_SCORE PLUGIN_GAMES_DIR "/jewels.score"
+struct highscore highest[NUM_SCORES];
 
-    /* reset scoring */
-    bj->level = 1;
-    bj->score = 0;
-    bj->segments = 0;
-
-    /* clear playing board */
-    rb->memset(bj->playboard, 0, sizeof(bj->playboard));
-}
 
 /*****************************************************************************
 * jewels_setcolors() set the foreground and background colors.
@@ -465,6 +441,54 @@ static inline void jewels_setcolors(void) {
     rb->lcd_set_background(LCD_RGBPACK(49, 26, 26));
     rb->lcd_set_foreground(LCD_RGBPACK(210, 181, 181));
 #endif
+}
+
+/*****************************************************************************
+* jewels_loadgame() loads the saved game and returns load success.
+******************************************************************************/
+static bool jewels_loadgame(struct game_context* bj)
+{
+    int fd;
+    bool loaded = false;
+
+    /* open game file */
+    fd = rb->open(SAVE_FILE, O_RDONLY);
+    if(fd < 0) return loaded;
+
+    /* read in saved game */
+    while(true) {
+        if(rb->read(fd, &bj->tmp_type, sizeof(bj->tmp_type)) <= 0) break;
+        if(rb->read(fd, &bj->type, sizeof(bj->type)) <= 0) break;
+        if(rb->read(fd, &bj->score, sizeof(bj->score)) <= 0) break;
+        if(rb->read(fd, &bj->level, sizeof(bj->level)) <= 0) break;
+        if(rb->read(fd, &bj->segments, sizeof(bj->segments)) <= 0) break;
+        if(rb->read(fd, &bj->num_jewels, sizeof(bj->num_jewels)) <= 0) break;
+        if(rb->read(fd, bj->playboard, sizeof(bj->playboard)) <= 0) break;
+        loaded = true;
+        break;
+    }
+
+    rb->close(fd);
+
+    return loaded;
+}
+
+/*****************************************************************************
+* jewels_savegame() saves the current game state.
+******************************************************************************/
+static void jewels_savegame(struct game_context* bj)
+{
+    int fd;
+    /* write out the game state to the save file */
+    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
+    rb->write(fd, &bj->tmp_type, sizeof(bj->tmp_type));
+    rb->write(fd, &bj->type, sizeof(bj->type));
+    rb->write(fd, &bj->score, sizeof(bj->score));
+    rb->write(fd, &bj->level, sizeof(bj->level));
+    rb->write(fd, &bj->segments, sizeof(bj->segments));
+    rb->write(fd, &bj->num_jewels, sizeof(bj->num_jewels));
+    rb->write(fd, bj->playboard, sizeof(bj->playboard));
+    rb->close(fd);
 }
 
 /*****************************************************************************
@@ -861,6 +885,8 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
     bool undo = false;
     unsigned int points = 0;
     long lasttick, currenttick;
+    
+    bj->playgame = true;
 
     /* check for invalid parameters */
     if(x < 0 || x >= BJ_WIDTH || y < 0 || y >= BJ_HEIGHT-1 ||
@@ -1082,17 +1108,15 @@ static bool jewels_movesavail(struct game_context* bj) {
                 }
             }
         }
-
         if(moves) break;
     }
-
     return moves;
 }
 
 /*****************************************************************************
-* jewels_puzzle_is_finished(bj) checks if the puzzle is finished.
+* jewels_puzzle_is_finished() checks if the puzzle is finished.
 ******************************************************************************/
-static int jewels_puzzle_is_finished(struct game_context* bj) {
+static bool jewels_puzzle_is_finished(struct game_context* bj) {
     unsigned int i, j;
     for(i=0; i<BJ_HEIGHT; i++) {
         for(j=0; j<BJ_WIDTH; j++) {
@@ -1103,32 +1127,32 @@ static int jewels_puzzle_is_finished(struct game_context* bj) {
                     if(i==0 || bj->playboard[i-1][j].type<=MAX_NUM_JEWELS ||
                        !((bj->playboard[i-1][j].type-MAX_NUM_JEWELS)
                          &PUZZLE_TILE_DOWN))
-                        return 0;
+                        return false;
                 }
                 if(mytype&PUZZLE_TILE_DOWN) {
                     if(i==BJ_HEIGHT-1 ||
                        bj->playboard[i+1][j].type<=MAX_NUM_JEWELS ||
                        !((bj->playboard[i+1][j].type-MAX_NUM_JEWELS)
                          &PUZZLE_TILE_UP))
-                        return 0;
+                        return false;
                 }
                 if(mytype&PUZZLE_TILE_LEFT) {
                     if(j==0 || bj->playboard[i][j-1].type<=MAX_NUM_JEWELS ||
                        !((bj->playboard[i][j-1].type-MAX_NUM_JEWELS)
                          &PUZZLE_TILE_RIGHT))
-                        return 0;
+                        return false;
                 }
                 if(mytype&PUZZLE_TILE_RIGHT) {
                     if(j==BJ_WIDTH-1 ||
                        bj->playboard[i][j+1].type<=MAX_NUM_JEWELS ||
                        !((bj->playboard[i][j+1].type-MAX_NUM_JEWELS)
                          &PUZZLE_TILE_LEFT))
-                        return 0;
+                        return false;
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 /*****************************************************************************
@@ -1165,7 +1189,7 @@ static unsigned int jewels_initlevel(struct game_context* bj) {
         }
         break;
     }
-
+    
     jewels_drawboard(bj);
 
     /* run the play board */
@@ -1175,7 +1199,28 @@ static unsigned int jewels_initlevel(struct game_context* bj) {
 }
 
 /*****************************************************************************
-* jewels_nextlevel() advances the game to the next level and returns
+* jewels_init() initializes jewels data structures.
+******************************************************************************/
+static void jewels_init(struct game_context* bj) {
+    /* seed the rand generator */
+    rb->srand(*rb->current_tick);
+    
+    bj->type = bj->tmp_type;
+    bj->level = 1;
+    bj->score = 0;
+    bj->segments = 0;
+    
+    jewels_setcolors();
+
+    /* clear playing board */
+    rb->memset(bj->playboard, 0, sizeof(bj->playboard));
+    do {
+        bj->score += jewels_initlevel(bj);
+    } while(!jewels_movesavail(bj));
+}
+
+/*****************************************************************************
+* jewels_nextlevel() advances the game to the next bj->level and returns
 *     points earned.
 ******************************************************************************/
 static void jewels_nextlevel(struct game_context* bj) {
@@ -1206,12 +1251,7 @@ static void jewels_nextlevel(struct game_context* bj) {
 
         case GAME_TYPE_PUZZLE:
             bj->level++;
-            if(bj->level>NUM_PUZZLE_LEVELS) {
-                rb->splash(HZ*2, "You win!");
-                bj->level = 1;
-            } else {
-                rb->splashf(HZ*2, "Level %d", bj->level);
-            }
+            rb->splashf(HZ*2, "Level %d", bj->level);
             break;
     }
 
@@ -1219,445 +1259,189 @@ static void jewels_nextlevel(struct game_context* bj) {
     bj->score += points;
 }
 
-/*****************************************************************************
-* jewels_recordscore() inserts a high score into the high scores list and
-*     returns the high score position.
-******************************************************************************/
-static int jewels_recordscore(struct game_context* bj) {
-    int i;
-    int position = 0;
-    unsigned int current, temp;
-
-    /* calculate total score */
-    current = (bj->level-1)*LEVEL_PTS+bj->score;
-    if(current <= 0) return 0;
-
-    /* insert the current score into the high scores */
-    for(i=0; i<NUM_SCORES; i++) {
-        if(current >= bj->highscores[i]) {
-            if(!position) {
-                position = i+1;
-                bj->dirty = true;
-            }
-            temp = bj->highscores[i];
-            bj->highscores[i] = current;
-            current = temp;
-        }
-    }
-
-    return position;
- }
-
-/*****************************************************************************
-* jewels_loadscores() loads the high scores saved file.
-******************************************************************************/
-static void jewels_loadscores(struct game_context* bj) {
-    int fd;
-
-    bj->dirty = false;
-
-    /* clear high scores */
-    rb->memset(bj->highscores, 0, sizeof(bj->highscores));
-
-    /* open scores file */
-    fd = rb->open(SCORE_FILE, O_RDONLY);
-    if(fd < 0) return;
-
-    /* read in high scores */
-    if(rb->read(fd, bj->highscores, sizeof(bj->highscores)) <= 0) {
-        /* scores are bad, reset */
-        rb->memset(bj->highscores, 0, sizeof(bj->highscores));
-    }
-
-    rb->close(fd);
-}
-
-/*****************************************************************************
-* jewels_savescores() saves the high scores saved file.
-******************************************************************************/
-static void jewels_savescores(struct game_context* bj) {
-    int fd;
-
-    /* write out the high scores to the save file */
-    fd = rb->open(SCORE_FILE, O_WRONLY|O_CREAT);
-    rb->write(fd, bj->highscores, sizeof(bj->highscores));
-    rb->close(fd);
-    bj->dirty = false;
-}
-
-/*****************************************************************************
-* jewels_loadgame() loads the saved game and returns load success.
-******************************************************************************/
-static bool jewels_loadgame(struct game_context* bj) {
-    int fd;
-    bool loaded = false;
-
-    /* open game file */
-    fd = rb->open(SAVE_FILE, O_RDONLY);
-    if(fd < 0) return loaded;
-
-    /* read in saved game */
-    while(true) {
-        if(rb->read(fd, &bj->score, sizeof(bj->score)) <= 0) break;
-        if(rb->read(fd, &bj->level, sizeof(bj->level)) <= 0) break;
-        if(rb->read(fd, &bj->type, sizeof(bj->type)) <= 0) break;
-        if(rb->read(fd, bj->playboard, sizeof(bj->playboard)) <= 0) break;
-        bj->resume = true;
-        loaded = true;
-        break;
-    }
-
-    rb->close(fd);
-
-    /* delete saved file */
-    rb->remove(SAVE_FILE);
-    return loaded;
-}
-
-/*****************************************************************************
-* jewels_savegame() saves the current game state.
-******************************************************************************/
-static void jewels_savegame(struct game_context* bj) {
-    int fd;
-
-    /* write out the game state to the save file */
-    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
-    rb->write(fd, &bj->score, sizeof(bj->score));
-    rb->write(fd, &bj->level, sizeof(bj->level));
-    rb->write(fd, &bj->type, sizeof(bj->type));
-    rb->write(fd, bj->playboard, sizeof(bj->playboard));
-    rb->close(fd);
-
-    bj->resume = true;
-}
-
-/*****************************************************************************
-* jewels_callback() is the default event handler callback which is called
-*     on usb connect and shutdown.
-******************************************************************************/
-static void jewels_callback(void* param) {
-    struct game_context* bj = (struct game_context*) param;
-    if(bj->dirty) {
-        rb->splash(HZ, "Saving high scores...");
-        jewels_savescores(bj);
-    }
-}
-
-/*****************************************************************************
-* jewels_displayscores() displays the high scores
-******************************************************************************/
-static char * scores_get_name(int selected_item, void * data,
-                             char * buffer, size_t buffer_len)
+static void jewels_show_highscores(int position)
 {
-    struct game_context* bj = (struct game_context*)data;
-    rb->snprintf(buffer, buffer_len, "#%02d: %d",
-                  selected_item+1, bj->highscores[selected_item]);
-    return buffer;
-}
-static void jewels_displayscores(struct game_context* bj)
-{
-    struct simplelist_info info;
-    rb->simplelist_info_init(&info, "High Scores", NUM_SCORES, (void*)bj);
-    info.hide_selection = true;
-    info.get_name = scores_get_name;
-    rb->simplelist_show_list(&info);
-}
+    int i, w, h;
+    char str[30];
 
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_set_foreground(LCD_WHITE);
+#endif
+    rb->button_clear_queue();
+    rb->lcd_clear_display();
 
-/*****************************************************************************
-* jewels_main() is the main game subroutine, it returns the final game status.
-******************************************************************************/
-static int jewels_main(struct game_context* bj) {
-    int w, h;
-    int button;
-    struct viewport vp[NB_SCREENS];
-    char str[18];
-    bool inmenu = true;
-    bool selected = false;
+    rb->lcd_setfont(FONT_UI);
+    rb->lcd_getstringsize("High Scores", &w, &h);
+    /* check wether it fits on screen */
+    if ((4*h + h*(NUM_SCORES-1) + MARGIN) > LCD_HEIGHT) {
+        rb->lcd_setfont(FONT_SYSFIXED);
+        rb->lcd_getstringsize("High Scores", &w, &h);
+    }
+    rb->lcd_putsxy(LCD_WIDTH/2-w/2, MARGIN, "High Scores");
+    rb->lcd_putsxy(LCD_WIDTH/4-w/4,2*h, "Score");
+    rb->lcd_putsxy(LCD_WIDTH*3/4-w/4,2*h, "Level");
 
-    /* the cursor coordinates */
-    int x=0, y=0;
-
-    /* don't resume by default */
-    bj->resume = false;
-
-    /********************
-    *       menu        *
-    ********************/
-    MENUITEM_STRINGLIST(main_menu,"Jewels",NULL,
-                        "New Game", "Puzzle", "Resume Saved Game",
-                        "High Scores", "Help", "Quit");
-    FOR_NB_SCREENS(h)
+    for (i = 0; i<NUM_SCORES; i++)
     {
-        rb->viewport_set_defaults(&vp[h], h);
-#if (LCD_DEPTH >= 16) || defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH >= 16)
-        if (rb->screens[h]->depth >= 16)
-        {
-            vp->bg_pattern = LCD_RGBPACK(49, 26, 26);
-            vp->fg_pattern = LCD_RGBPACK(210, 181, 181);
+#ifdef HAVE_LCD_COLOR
+        if (i == position) {
+            rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
         }
 #endif
-    }
-
-    while(inmenu) {
-
-        switch (rb->do_menu(&main_menu, NULL, vp, true)) {
-            case 0:
-                inmenu = false;
-                bj->type = GAME_TYPE_NORMAL;
-                break;
-
-            case 1:
-                inmenu = false;
-                bj->type = GAME_TYPE_PUZZLE;
-                break;
-
-            case 2:
-                if(!jewels_loadgame(bj)) {
-                    rb->splash(HZ*2, "Nothing to resume");
-                } else {
-                    inmenu = false;
-                }
-                break;
-
-            case 3:
-                jewels_displayscores(bj);
-                break;
-
-            case 4:
-                /* welcome screen to display key bindings */
-                rb->lcd_clear_display();
-                rb->snprintf(str, 5, "%s", "Help");
-                rb->lcd_getstringsize(str, &w, &h);
-                rb->lcd_putsxy((LCD_WIDTH-w)/2, 0, str);
-#if CONFIG_KEYPAD == RECORDER_PAD
-                rb->lcd_puts(0, 2, "Controls:");
-                rb->lcd_puts(0, 3, "Directions = move");
-                rb->lcd_puts(0, 4, "PLAY = select");
-                rb->lcd_puts(0, 5, "Long PLAY = menu");
-                rb->lcd_puts(0, 6, "OFF = cancel");
-#elif CONFIG_KEYPAD == ONDIO_PAD
-                rb->lcd_puts(0, 2, "Controls:");
-                rb->lcd_puts(0, 3, "Directions = move");
-                rb->lcd_puts(0, 4, "MENU = select");
-                rb->lcd_puts(0, 5, "Long MENU = menu");
-                rb->lcd_puts(0, 6, "OFF = cancel");
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-                rb->lcd_puts(0, 2, "Controls:");
-                rb->lcd_puts(0, 3, "Directions = move");
-                rb->lcd_puts(0, 4, "SELECT = select");
-                rb->lcd_puts(0, 5, "Long SELECT = menu");
-                rb->lcd_puts(0, 6, "PLAY = cancel");
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
-                rb->lcd_puts(0, 3, "form connected segments");
-                rb->lcd_puts(0, 4, "of three or more of the");
-                rb->lcd_puts(0, 5, "same type.");
-                rb->lcd_puts(0, 7, "Controls:");
-                rb->lcd_puts(0, 8, "Directions to move");
-                rb->lcd_puts(0, 9, "SELECT to select");
-                rb->lcd_puts(0, 10, "Long SELECT to show menu");
-                rb->lcd_puts(0, 11, "OFF to cancel");
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
-                rb->lcd_puts(0, 3, "form connected segments");
-                rb->lcd_puts(0, 4, "of three or more of the");
-                rb->lcd_puts(0, 5, "same type.");
-                rb->lcd_puts(0, 7, "Controls:");
-                rb->lcd_puts(0, 8, "Directions or scroll to move");
-                rb->lcd_puts(0, 9, "SELECT to select");
-                rb->lcd_puts(0, 10, "Long SELECT to show menu");
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
-                rb->lcd_puts(0, 3, "form connected segments");
-                rb->lcd_puts(0, 4, "of three or more of the");
-                rb->lcd_puts(0, 5, "same type.");
-                rb->lcd_puts(0, 7, "Controls:");
-                rb->lcd_puts(0, 8, "Directions to move");
-                rb->lcd_puts(0, 9, "SELECT to select");
-                rb->lcd_puts(0, 10, "Long SELECT to show menu");
-                rb->lcd_puts(0, 11, "PLAY to cancel");
-#elif CONFIG_KEYPAD == GIGABEAT_PAD \
-   || CONFIG_KEYPAD == MROBE100_PAD
-                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
-                rb->lcd_puts(0, 3, "form connected segments");
-                rb->lcd_puts(0, 4, "of three or more of the");
-                rb->lcd_puts(0, 5, "same type.");
-                rb->lcd_puts(0, 7, "Controls:");
-                rb->lcd_puts(0, 8, "Directions to move");
-                rb->lcd_puts(0, 9, "SELECT to select");
-                rb->lcd_puts(0, 10, "Long SELECT to show menu");
-                rb->lcd_puts(0, 11, "POWER to cancel");
-#elif CONFIG_KEYPAD == SANSA_E200_PAD \
-   || CONFIG_KEYPAD == SANSA_C200_PAD \
-   || CONFIG_KEYPAD == SANSA_CLIP_PAD \
-   || CONFIG_KEYPAD == SANSA_FUZE_PAD \
-   || CONFIG_KEYPAD == SANSA_M200_PAD
-                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
-                rb->lcd_puts(0, 3, "form connected segments");
-                rb->lcd_puts(0, 4, "of three or more of the");
-                rb->lcd_puts(0, 5, "same type.");
-                rb->lcd_puts(0, 7, "Controls:");
-                rb->lcd_puts(0, 8, "Directions to move");
-                rb->lcd_puts(0, 9, "SELECT to select");
-                rb->lcd_puts(0, 10, "Long SELECT to show menu");
-                rb->lcd_puts(0, 11, "POWER to cancel");
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-                rb->lcd_puts(0, 2, "Swap pairs of jewels");
-                rb->lcd_puts(0, 3, "to form connected");
-                rb->lcd_puts(0, 4, "segments of three or ");
-                rb->lcd_puts(0, 5, "more of the");
-                rb->lcd_puts(0, 6, "same type.");
-                rb->lcd_puts(0, 8, "Controls:");
-                rb->lcd_puts(0, 9, "Directions or scroll to move");
-                rb->lcd_puts(0, 10, "PLAY to select");
-                rb->lcd_puts(0, 11, "Long PLAY for menu");
-                rb->lcd_puts(0, 12, "POWER to cancel");
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-                rb->lcd_puts(0, 2, "Swap pairs of jewels");
-                rb->lcd_puts(0, 3, "to form connected");
-                rb->lcd_puts(0, 4, "segments of three or ");
-                rb->lcd_puts(0, 5, "more of the");
-                rb->lcd_puts(0, 6, "same type.");
-                rb->lcd_puts(0, 8, "Controls:");
-                rb->lcd_puts(0, 9, "Directions or scroll to move");
-                rb->lcd_puts(0, 10, "PLAY to select");
-                rb->lcd_puts(0, 11, "Long PLAY for menu");
-                rb->lcd_puts(0, 12, "REC to cancel");
-#elif CONFIG_KEYPAD == COWOND2_PAD
-                rb->lcd_puts(0, 11, "POWER to cancel");
-#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
-                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
-                rb->lcd_puts(0, 3, "form connected segments");
-                rb->lcd_puts(0, 4, "of three or more of the");
-                rb->lcd_puts(0, 5, "same type.");
-                rb->lcd_puts(0, 7, "Controls:");
-                rb->lcd_puts(0, 8, "Directions to move");
-                rb->lcd_puts(0, 9, "SELECT to select");
-                rb->lcd_puts(0, 10, "Long SELECT to show menu");
-                rb->lcd_puts(0, 11, "BACK to cancel");
-#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
-                rb->lcd_puts(0, 3, "form connected segments");
-                rb->lcd_puts(0, 4, "of three or more of the");
-                rb->lcd_puts(0, 5, "same type.");
-                rb->lcd_puts(0, 7, "Controls:");
-                rb->lcd_puts(0, 8, "Directions to move");
-                rb->lcd_puts(0, 9, "MIDDLE to select");
-                rb->lcd_puts(0, 10, "Long MIDDLE to show menu");
-                rb->lcd_puts(0, 11, "BACK to cancel");
-#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
-                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
-                rb->lcd_puts(0, 3, "form connected segments");
-                rb->lcd_puts(0, 4, "of three or more of the");
-                rb->lcd_puts(0, 5, "same type.");
-                rb->lcd_puts(0, 7, "Controls:");
-                rb->lcd_puts(0, 8, "Directions to move");
-                rb->lcd_puts(0, 9, "SELECT/PLAY to select");
-                rb->lcd_puts(0, 10, "Long SELECT to show menu");
-                rb->lcd_puts(0, 11, "POWER to cancel");
-#elif CONFIG_KEYPAD == ONDAVX747_PAD || CONFIG_KEYPAD == MROBE500_PAD
-                rb->lcd_puts(0, 11, "POWER to cancel");
+        rb->snprintf (str, sizeof (str), "%d)", i+1);
+        rb->lcd_putsxy (MARGIN,3*h + h*i, str);
+        rb->snprintf (str, sizeof (str), "%d", highest[i].score);
+        rb->lcd_putsxy (LCD_WIDTH/4-w/4,3*h + h*i, str);
+        rb->snprintf (str, sizeof (str), "%d", highest[i].level);
+        rb->lcd_putsxy (LCD_WIDTH*3/4-w/4,3*h + h*i, str);
+        if(i == position) {
+#ifdef HAVE_LCD_COLOR
+            rb->lcd_set_foreground(LCD_WHITE);
 #else
-    #warning: missing help text.
+            rb->lcd_hline(MARGIN, LCD_WIDTH-MARGIN, 3*h + h*(i+1));
 #endif
+        }
+    }
+    rb->lcd_update();
+    rb->button_get(true);
+    rb->lcd_setfont(FONT_SYSFIXED);
+}
 
-#ifdef HAVE_TOUCHSCREEN
-                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
-                rb->lcd_puts(0, 3, "form connected segments");
-                rb->lcd_puts(0, 4, "of three or more of the");
-                rb->lcd_puts(0, 5, "same type.");
-                rb->lcd_puts(0, 7, "Controls:");
-                rb->lcd_puts(0, 8, "Directions to move");
-                rb->lcd_puts(0, 9, "CENTER to select");
-                rb->lcd_puts(0, 10, "Long CENTER to show menu");
+static int jewels_help(void)
+{
+    rb->lcd_setfont(FONT_UI);
+#define WORDS (sizeof help_text / sizeof (char*))
+    static char *help_text[] = {
+        "Jewels", "", "Aim", "", "Swap", "pairs", "of", "jewels", "to",
+        "form", "connected", "segments", "of", "three", "or", "more", "of",
+        "the", "same", "type.", "", "The", "goal", "of", "the", "game",
+        "is", "to", "score", "as", "many", "points", "as", "possible",
+        "before", "running", "out", "of", "available", "moves."
+    };
+    static struct style_text formation[]={
+        { 0, TEXT_CENTER|TEXT_UNDERLINE },
+        { 2, C_RED }
+    };
+
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_set_foreground(LCD_WHITE);
 #endif
-                rb->lcd_update();
-                while(true) {
-                    button = rb->button_get(true);
-                    if(button != BUTTON_NONE && !(button&BUTTON_REL)) break;
-                }
-                rb->lcd_clear_display();
+    if (display_text(WORDS, help_text, formation, NULL)==PLUGIN_USB_CONNECTED)
+        return PLUGIN_USB_CONNECTED;
+    int button;
+    do {
+        button = rb->button_get(true);
+        if (button == SYS_USB_CONNECTED) {
+            return PLUGIN_USB_CONNECTED;
+        }
+    } while( ( button == BUTTON_NONE )
+    || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+    rb->lcd_setfont(FONT_SYSFIXED);
+
+    return 0;
+}
+
+static void jewels_choose_mode(struct game_context* bj)
+{
+    rb->button_clear_queue();
+    int choice = bj->tmp_type;
+    MENUITEM_STRINGLIST (main_menu, "Jewels Mode", NULL,
+                             "Normal",
+                             "Puzzle");
+    choice = rb->do_menu(&main_menu, &choice, NULL, false);
+    switch (choice) {
+        case 0:
+            bj->tmp_type=GAME_TYPE_NORMAL;
+            break;
+        case 1:
+            bj->tmp_type=GAME_TYPE_PUZZLE;
+            break;
+        default:
+            break;
+    }
+}
+
+static bool _ingame;
+static int jewels_menu_cb(int action, const struct menu_item_ex *this_item)
+{
+    if(action == ACTION_REQUEST_MENUITEM
+       && !_ingame && ((intptr_t)this_item)==0)
+        return ACTION_EXIT_MENUITEM;
+    return action;
+}
+/*****************************************************************************
+* jewels_game_menu() shows the game menu.
+******************************************************************************/
+static int jewels_game_menu(struct game_context* bj, bool ingame)
+{
+    rb->button_clear_queue();
+    int choice = 0;
+
+    _ingame = ingame;
+
+    MENUITEM_STRINGLIST (main_menu, "Jewels Menu", jewels_menu_cb,
+                             "Resume Game",
+                             "Start New Game",
+                             "Mode",
+                             "Help",
+                             "High Score",
+                             "Playback Control",
+                             "Quit");
+                             
+    while (1) {
+        switch (rb->do_menu(&main_menu, &choice, NULL, false)) {
+            case 0:
+                jewels_setcolors();
+                return 0;
+            case 1:
+                jewels_init(bj);
+                return 0;
+            case 2:
+                jewels_choose_mode(bj);
                 break;
-
+            case 3:
+                jewels_help();
+                break;
+            case 4:
+                jewels_show_highscores(NUM_SCORES);
+                break;
             case 5:
-                return BJ_QUIT;
- 
+                playback_control(NULL);
+                break;
+            case 6:
+                if (bj->playgame) {
+                    rb->splash(HZ*1, "Saving game ...");
+                    jewels_savegame(bj);
+                }
+                return 1;
             case MENU_ATTACHED_USB:
-                jewels_callback(bj);
-                return BJ_USB;
-
+                return 1;
             default:
-                return BJ_QUIT;
-        }
-    }
-
-    /********************
-    *       init        *
-    ********************/
-    jewels_init(bj);
-
-    /********************
-    *  setup the board  *
-    ********************/
-    bj->score += jewels_initlevel(bj);
-    if (!jewels_movesavail(bj)) {
-        switch(bj->type) {
-            case GAME_TYPE_NORMAL:
-                return BJ_LOSE;
-
-            case GAME_TYPE_PUZZLE:
-                do {
-                    rb->splash(2*HZ, "No more moves!");
-                    bj->score += jewels_initlevel(bj);
-                } while(!jewels_movesavail(bj));
                 break;
         }
     }
+}
 
-    /**********************
-    *        play         *
-    **********************/
-    MENUITEM_STRINGLIST(ingame_menu,"Menu",NULL,
-                        "Audio Playback", "Resume Game",
-                        "Save Game", "End Game", "Exit Jewels");
+static int jewels_main(struct game_context* bj) {
+    int button;
+    int position;
+    bool selected = false;
+    bool no_movesavail;
+    int x=0, y=0;
+    
+    bj->playgame = false;
+    if(!jewels_loadgame(bj)) {
+        if (jewels_game_menu(bj, false)!=0)
+            return 0;
+    } else {
+        if (jewels_game_menu(bj, true)!=0)
+            return 0;
+    }
 
-    selected = false;
     while(true) {
-        bool no_movesavail = false;
-
-        while(inmenu) {
-            switch (rb->do_menu(&ingame_menu, NULL, vp, true)) {
-                case 0:
-                    playback_control(NULL);
-                    inmenu = false;
-                    break;
-
-                case 1:
-                    inmenu = false;
-                    break;
-
-                case 2:
-                    rb->splash(HZ, "Saving game...");
-                    jewels_savegame(bj);
-                    return BJ_END;
-
-                case 3:
-                    return BJ_END;
-
-                case 4:
-                    return BJ_QUIT_FROM_GAME;
-
-                case MENU_ATTACHED_USB:
-                    jewels_callback(bj);
-                    return BJ_USB;
-
-                default:
-                    inmenu = false;
-                    break;
-            }
-        }
+        no_movesavail = false;
 
         /* refresh the board */
         jewels_drawboard(bj);
@@ -1749,127 +1533,86 @@ static int jewels_main(struct game_context* bj) {
                 selected = !selected;
                 break;
 
-#ifdef JEWELS_MENU
-            case JEWELS_MENU:
-#endif
-            case (JEWELS_SELECT|BUTTON_REPEAT): /* show menu */
-                inmenu = true;
-                selected = false;
-                break;
-
-#ifdef JEWELS_CANCEL
 #ifdef JEWELS_RC_CANCEL
             case JEWELS_RC_CANCEL:
 #endif
             case JEWELS_CANCEL:           /* end game */
-                return BJ_END;
+                if (jewels_game_menu(bj, true)!=0)
+                    return 0;
                 break;
-#endif
 
             default:
-                if(rb->default_event_handler_ex(button, jewels_callback,
-                   (void*) bj) == SYS_USB_CONNECTED)
-                    return BJ_USB;
+                if (rb->default_event_handler (button) == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
                 break;
         }
-
-        if (no_movesavail) {
-            switch(bj->type) {
-                case GAME_TYPE_NORMAL:
-                    return BJ_LOSE;
-
-                case GAME_TYPE_PUZZLE:
-                    do {
-                        rb->splash(2*HZ, "No more moves!");
-                        bj->score += jewels_initlevel(bj);
-                    } while(!jewels_movesavail(bj));
-                    break;
-            }
-        }
-
+        
         switch(bj->type) {
             case GAME_TYPE_NORMAL:
                 if(bj->score >= LEVEL_PTS)
                     jewels_nextlevel(bj);
                 break;
-
             case GAME_TYPE_PUZZLE:
-                if(jewels_puzzle_is_finished(bj))
-                    jewels_nextlevel(bj);
+                if (jewels_puzzle_is_finished(bj)) {
+                    if (bj->level < NUM_PUZZLE_LEVELS) {
+                        jewels_nextlevel(bj);
+                    } else {
+                        rb->splash(2*HZ, "Congratulations!");
+                        rb->splash(2*HZ, "You have finished the game!");
+                        if (jewels_game_menu(bj, false)!=0) {
+                            return 0;
+                        }
+                    }
                 break;
+                }
+        }
+
+        if (no_movesavail) {
+            switch(bj->type) {
+                case GAME_TYPE_NORMAL:
+                    rb->splash(HZ*2, "Game Over!");
+                    rb->lcd_clear_display();
+                    if (highscore_would_update(bj->score, highest,
+                        NUM_SCORES)) {
+                        position=highscore_update(bj->score,
+                                                  bj->level, "",
+                                                  highest,NUM_SCORES);            
+                        if (position == 0) {
+                            rb->splash(HZ*2, "New High Score");
+                        }
+                        jewels_show_highscores(position);
+                    }
+                    break;
+                case GAME_TYPE_PUZZLE:
+                    rb->splash(2*HZ, "Game Over");
+                    break;
+            }
+            if (jewels_game_menu(bj, false)!=0) {
+                return 0;
+            }
         }
     }
 }
 
-/*****************************************************************************
-* plugin entry point.
-******************************************************************************/
-enum plugin_status plugin_start(const void* parameter) {
-    struct game_context bj;
-    bool exit = false;
-    int position;
-    char str[19];
-
-    /* plugin init */
+/* this is the plugin entry point */
+enum plugin_status plugin_start(const void* parameter)
+{
     (void)parameter;
-    /* end of plugin init */
 
     /* load high scores */
-    jewels_loadscores(&bj);
+    highscore_load(HIGH_SCORE,highest,NUM_SCORES);
 
     rb->lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
-    jewels_setcolors();
 
-    while(!exit) {
-        switch(jewels_main(&bj)){
-            case BJ_LOSE:
-                rb->splash(HZ*2, "No more moves!");
-                /* fall through to BJ_END */
-
-            case BJ_END:
-                if(!bj.resume) {
-                    if((position = jewels_recordscore(&bj))) {
-                        rb->snprintf(str, 19, "New high score #%d!", position);
-                        rb->splash(HZ*2, str);
-                    }
-                }
-                break;
-
-            case BJ_USB:
-                rb->lcd_setfont(FONT_UI);
-                return PLUGIN_USB_CONNECTED;
-
-            case BJ_QUIT:
-                if(bj.dirty) {
-                    rb->splash(HZ, "Saving high scores...");
-                    jewels_savescores(&bj);
-                }
-                exit = true;
-                break;
-
-            case BJ_QUIT_FROM_GAME:
-                if(!bj.resume) {
-                    if((position = jewels_recordscore(&bj))) {
-                        rb->snprintf(str, 19, "New high score #%d!", position);
-                        rb->splash(HZ*2, str);
-                    }
-                }
-                if(bj.dirty) {
-                    rb->splash(HZ, "Saving high scores...");
-                    jewels_savescores(&bj);
-                }
-                exit = true;
-                break;
-
-            default:
-                break;
-        }
-    }
-
+    struct game_context bj;
+    bj.tmp_type = GAME_TYPE_NORMAL;
+    jewels_main(&bj);
+    highscore_save(HIGH_SCORE,highest,NUM_SCORES);
     rb->lcd_setfont(FONT_UI);
+
     return PLUGIN_OK;
 }
 
