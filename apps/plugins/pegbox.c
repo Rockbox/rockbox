@@ -19,29 +19,16 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "lib/configfile.h"
 #include "lib/display_text.h"
+#include "lib/playback_control.h"
 
 #include "pluginbitmaps/pegbox_header.h"
 #include "pluginbitmaps/pegbox_pieces.h"
 
-#if LCD_HEIGHT >= 80 /* enough space for a graphical menu */
-#include "pluginbitmaps/pegbox_menu_top.h"
-#include "pluginbitmaps/pegbox_menu_items.h"
-#define MENU_X      (LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2
-#define MENU_Y      BMPHEIGHT_pegbox_menu_top
-#define ITEM_WIDTH  BMPWIDTH_pegbox_menu_items
-#define ITEM_HEIGHT (BMPHEIGHT_pegbox_menu_items/9)
-#endif
-
 PLUGIN_HEADER
 
-/* final game return status */
-#define PB_END  3
-#define PB_USB  2
-#define PB_QUIT 1
-
-#define DATA_FILE   PLUGIN_GAMES_DIR "/pegbox.data"
-#define SAVE_FILE   PLUGIN_GAMES_DIR "/pegbox.save"
+#define CONFIG_FILE_NAME "pegbox.cfg"
 
 #define ROWS       8   /* Number of rows on each board */
 #define COLS       12  /* Number of columns on each board */
@@ -530,26 +517,6 @@ PLUGIN_HEADER
 
 #ifdef HAVE_TOUCHSCREEN
 #include "lib/touchscreen.h"
-
-static struct ts_mapping main_menu_items[5] =
-{
-{MENU_X, MENU_Y, ITEM_WIDTH,       ITEM_HEIGHT},
-{MENU_X, MENU_Y+ITEM_HEIGHT,   ITEM_WIDTH, ITEM_HEIGHT},
-{MENU_X, MENU_Y+ITEM_HEIGHT*2, ITEM_WIDTH, ITEM_HEIGHT},
-{MENU_X, MENU_Y+ITEM_HEIGHT*3, ITEM_WIDTH, ITEM_HEIGHT},
-{
-#if (LCD_WIDTH >= 138) && (LCD_HEIGHT > 110)
-0, MENU_Y+4*ITEM_HEIGHT+8, SYSFONT_WIDTH*28, SYSFONT_HEIGHT
-#elif LCD_WIDTH > 112
-0, LCD_HEIGHT - 8, SYSFONT_WIDTH*28, SYSFONT_HEIGHT
-#else
-#error "Touchscreen isn't supported on non-bitmap screens!"
-#endif
-}
-
-};
-static struct ts_mappings main_menu = {main_menu_items, 5};
-
 static struct ts_raster pegbox_raster =
     { BOARD_X, BOARD_Y, COLS*PIECE_WIDTH, ROWS*PIECE_HEIGHT,
       PIECE_WIDTH, PIECE_HEIGHT };
@@ -557,13 +524,13 @@ static struct ts_raster_button_mapping pegbox_raster_btn =
     { &pegbox_raster, false, false, true, false, true, {0, 0}, 0, 0, 0 };
 #endif
 
+
 struct game_context {
     unsigned int level;
     unsigned int highlevel;
     signed int player_row;
     signed int player_col;
     unsigned int num_left;
-    bool save_exist;
     unsigned int playboard[ROWS][COLS];
 };
 
@@ -719,11 +686,11 @@ char levels[NUM_LEVELS][ROWS][COLS] = {
      {0, 0, 4, 6, 0, 6, 0, 6, 0, 6, 0, 1,}}
 };
 
-
-/*****************************************************************************
-* draw_board() draws the game's current level.
-******************************************************************************/
-static void draw_board(struct game_context* pb) {
+/***********************************************************************
+* pegbox_draw_board() draws the game's current level.
+************************************************************************/
+static void pegbox_draw_board(struct game_context* pb)
+{
     unsigned int r, c, type;
     pb->num_left = 0;
     char str[5];
@@ -795,10 +762,11 @@ static void draw_board(struct game_context* pb) {
 }
 
 /*****************************************************************************
-* load_level() loads the player's current level from the array and sets the
+* pegbox_load_level() loads the player's current level from the array and sets the
 * player's position.
 ******************************************************************************/
-static void load_level(struct game_context* pb) {
+static void pegbox_load_level(struct game_context* pb)
+{
     int r, c;
 
     for(r = 0; r < ROWS; r++)
@@ -807,18 +775,19 @@ static void load_level(struct game_context* pb) {
 }
 
 /*****************************************************************************
-* new_piece() creates a new piece at a specified location. The player
+* pegbox_new_piece() creates a new piece at a specified location. The player
 * navigates through the pieces and selects one.
 ******************************************************************************/
-static void new_piece(struct game_context* pb, unsigned int x_loc, 
-                          unsigned int y_loc) {
+static void pegbox_new_piece(struct game_context* pb, unsigned int x_loc,
+                               unsigned int y_loc)
+{
     int button;
     bool exit = false;
 
     pb->playboard[x_loc][y_loc] = TRIANGLE;
 
     while (!exit) {
-        draw_board(pb);
+        pegbox_draw_board(pb);
         button = rb->button_get(true);
 #ifdef HAVE_TOUCHSCREEN
         if(button & BUTTON_TOUCHSCREEN)
@@ -868,17 +837,17 @@ static void new_piece(struct game_context* pb, unsigned int x_loc,
                     pb->playboard[x_loc][y_loc] = CIRCLE;
                 break;
             case PEGBOX_SAVE:
-                exit = true;
-                break;
+                exit=true;
         }
     }
 }
 
 /*****************************************************************************
-* move_player() moves the player and pieces and updates the board accordingly.
+* pegbox_move_player() moves the player and pieces and updates the board accordingly.
 ******************************************************************************/
-static void move_player(struct game_context* pb, signed int x_dir, 
-                            signed int y_dir) {
+static void pegbox_move_player(struct game_context* pb, signed int x_dir,
+                                signed int y_dir)
+{
     unsigned int type1, type2;
     signed int r,c;
     
@@ -902,9 +871,9 @@ static void move_player(struct game_context* pb, signed int x_dir,
     pb->player_col += x_dir;
 
     if (type1 == HOLE) {
-        draw_board(pb);
+        pegbox_draw_board(pb);
         rb->splash(HZ*2, "You fell down a hole!");
-        load_level(pb);
+        pegbox_load_level(pb);
     }
     else if (type1 == SPACE)
         pb->playboard[r][c] = PLAYER;
@@ -915,7 +884,7 @@ static void move_player(struct game_context* pb, signed int x_dir,
                 pb->playboard[r+y_dir][c+x_dir] = WALL;
             else if (type1 == CROSS) {
                 pb->playboard[r][c] = SPACE;
-                new_piece(pb, r+y_dir, c+x_dir);
+                pegbox_new_piece(pb, r+y_dir, c+x_dir);
                 pb->playboard[r][c] = PLAYER;
             }
             else
@@ -929,98 +898,11 @@ static void move_player(struct game_context* pb, signed int x_dir,
         }
         else {
             rb->splash(HZ*2, "Illegal Move!");
-            load_level(pb);
+            pegbox_load_level(pb);
         }
     }
 
-    draw_board(pb);
-}
-
-/*****************************************************************************
-* pegbox_loadgame() loads the saved game and returns load success.
-******************************************************************************/
-static bool pegbox_loadgame(struct game_context* pb) {
-    signed int fd;
-    bool loaded = false;
-
-    /* open game file */
-    fd = rb->open(SAVE_FILE, O_RDONLY);
-    if(fd < 0) return loaded;
-
-    /* read in saved game */
-    while(true) {
-        if(rb->read(fd, &pb->level, sizeof(pb->level)) <= 0) break;
-        if(rb->read(fd, &pb->playboard, sizeof(pb->playboard)) <= 0)
-        {
-            loaded = true;
-            break;
-        }
-        break;
-    }
-
-    rb->close(fd);
-    return loaded;
-}
-
-/*****************************************************************************
-* pegbox_savegame() saves the current game state.
-******************************************************************************/
-static void pegbox_savegame(struct game_context* pb) {
-    unsigned int fd;
-
-    /* write out the game state to the save file */
-    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
-    rb->write(fd, &pb->level, sizeof(pb->level));
-    rb->write(fd, &pb->playboard, sizeof(pb->playboard));
-    rb->close(fd);
-}
-
-/*****************************************************************************
-* pegbox_loaddata() loads the level and highlevel and returns load success.
-******************************************************************************/
-static void pegbox_loaddata(struct game_context* pb) {
-    signed int fd;
-
-    /* open game file */
-    fd = rb->open(DATA_FILE, O_RDONLY);
-    if(fd < 0) {
-        pb->level = 1;
-        pb->highlevel = 1;
-        return;
-    }
-
-    /* read in saved game */
-    while(true) {
-        if(rb->read(fd, &pb->level, sizeof(pb->level)) <= 0) break;
-        if(rb->read(fd, &pb->highlevel, sizeof(pb->highlevel)) <= 0) break;
-        break;
-    }
-
-    rb->close(fd);
-    return;
-}
-
-/*****************************************************************************
-* pegbox_savedata() saves the level and highlevel.
-******************************************************************************/
-static void pegbox_savedata(struct game_context* pb) {
-    unsigned int fd;
-
-    /* write out the game state to the save file */
-    fd = rb->open(DATA_FILE, O_WRONLY|O_CREAT);
-    rb->write(fd, &pb->level, sizeof(pb->level));
-    rb->write(fd, &pb->highlevel, sizeof(pb->highlevel));
-    rb->close(fd);
-}
-
-/*****************************************************************************
-* pegbox_callback() is the default event handler callback which is called
-*     on usb connect and shutdown.
-******************************************************************************/
-static void pegbox_callback(void* param) {
-    struct game_context* pb = (struct game_context*) param;
-    rb->splash(HZ, "Saving data...");
-    pegbox_savedata(pb);
+    pegbox_draw_board(pb);
 }
 
 /***********************************************************************
@@ -1065,216 +947,104 @@ static bool pegbox_help(void)
     return false;
 }
 
-/*****************************************************************************
-* pegbox_menu() is the initial menu at the start of the game.
-******************************************************************************/
-static unsigned int pegbox_menu(struct game_context* pb) {
-    int button;
-    char str[30];
-    unsigned int startlevel = 1, loc = 0;
-    bool breakout = false, can_resume = false;
+/***********************************************************************
+* pegbox_menu() is the game menu
+************************************************************************/
+static unsigned int pegbox_menu(struct game_context* pb, bool ingame)
+{
+    rb->button_clear_queue();
+    int choice = 0;
     
-    if (pb->num_left > 0 || pb->save_exist)
-        can_resume = true;
-        
-    while(!breakout){
-#if LCD_HEIGHT >= 80
-        rb->lcd_clear_display();
-        rb->lcd_bitmap(pegbox_menu_top,0,0,LCD_WIDTH, BMPHEIGHT_pegbox_menu_top);
-
-         /* menu bitmaps */
-        if (loc == 0) {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT, ITEM_WIDTH,
-                                MENU_X, MENU_Y, ITEM_WIDTH, ITEM_HEIGHT);
-        }
-        else {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, 0, ITEM_WIDTH,
-                                MENU_X, MENU_Y, ITEM_WIDTH, ITEM_HEIGHT);
-        }
-        if (can_resume) {
-            if (loc == 1) {
-                rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*3, ITEM_WIDTH,
-                                    MENU_X, MENU_Y+ITEM_HEIGHT, ITEM_WIDTH, ITEM_HEIGHT);
-            }
-            else {
-                rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*2, ITEM_WIDTH,
-                                    MENU_X, MENU_Y+ITEM_HEIGHT, ITEM_WIDTH, ITEM_HEIGHT);
-            }
-        }
-        else {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*4, ITEM_WIDTH,
-                                MENU_X, MENU_Y+ITEM_HEIGHT, ITEM_WIDTH, ITEM_HEIGHT);
-        }
-
-        if (loc==2) {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*6, ITEM_WIDTH,
-                                MENU_X, MENU_Y+ITEM_HEIGHT*2, ITEM_WIDTH, ITEM_HEIGHT);
-        }
-        else {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*5, ITEM_WIDTH,
-                                MENU_X, MENU_Y+ITEM_HEIGHT*2, ITEM_WIDTH, ITEM_HEIGHT);
-        }
-
-        if (loc==3) {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*8, ITEM_WIDTH,
-                                MENU_X, MENU_Y+ITEM_HEIGHT*3, ITEM_WIDTH, ITEM_HEIGHT);
-        }
-        else {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*7, ITEM_WIDTH,
-                                MENU_X, MENU_Y+ITEM_HEIGHT*3, ITEM_WIDTH, ITEM_HEIGHT);
-        }
-#else
-        unsigned int w,h;
-        rb->lcd_clear_display();
-        rb->lcd_getstringsize("PegBox", &w, &h);
-        rb->lcd_putsxy((LCD_WIDTH-w)/2, 0, "PegBox");
-        rb->lcd_putsxy((LCD_WIDTH)/4, 16, "New Game");
-        rb->lcd_putsxy((LCD_WIDTH)/4, 24, "Resume");
-        rb->lcd_putsxy((LCD_WIDTH)/4, 32, "Help");
-        rb->lcd_putsxy((LCD_WIDTH)/4, 40, "Quit");
-
-        if(!can_resume)
-            rb->lcd_hline((LCD_WIDTH)/4, (LCD_WIDTH)/4+30, 28);
-
-        rb->lcd_putsxy((LCD_WIDTH)/4-8, loc*8+16, "*");
-
-
-#endif
-        rb->snprintf(str, 28, "Start on level %d of %d", startlevel,
-                     pb->highlevel);
-#if LCD_HEIGHT > 110
-        rb->lcd_putsxy(0, MENU_Y+4*ITEM_HEIGHT+8, str);
-#elif LCD_HEIGHT > 64
-        rb->lcd_putsxy(0, LCD_HEIGHT - 8, str);
-#else
-        rb->lcd_puts_scroll(0, 7, str);
-#endif
-        rb->lcd_update();
-
-        /* handle menu button presses */
-        button = rb->button_get(true);
-
-#ifdef HAVE_TOUCHSCREEN
-        if(button & BUTTON_TOUCHSCREEN)
-        {
-            unsigned int result = touchscreen_map(&main_menu,
-                                               rb->button_get_data() >> 16,
-                                               rb->button_get_data() & 0xffff);
-            if(result != (unsigned)-1 && button & BUTTON_REL)
-            {
-                if(result == 4)
-                    button = PEGBOX_LVL_UP;
-                else
-                {
-                    if(loc == result)
-                        button = PEGBOX_RIGHT;
-                    loc = result;
-                }
+    if (ingame) {
+        MENUITEM_STRINGLIST (main_menu, "Pegbox Menu", NULL,
+                                 "Resume Game",
+                                 "Restart Level",
+                                 "Select Level",
+                                 "Help",
+                                 "Playback Control",
+                                 "Quit");
+                                 
+        while (true) {
+            switch (rb->do_menu(&main_menu, &choice, NULL, false)) {
+                case 0:
+                    pegbox_draw_board(pb);
+                    return 0;
+                case 1:
+                    pegbox_load_level(pb);
+                    pegbox_draw_board(pb);
+                    return 0;
+                case 2:
+                    rb->set_int("Select Level", "", UNIT_INT,
+                            &pb->level, NULL, 1, 1,
+                            pb->highlevel, NULL);
+                    break;
+                case 3:
+                    if (pegbox_help()==PLUGIN_USB_CONNECTED)
+                        return 1;
+                    break;
+                case 4:
+                    playback_control(NULL);
+                    break;
+                case 5:
+                    return 1;
+                case MENU_ATTACHED_USB:
+                    return 1;
+                default:
+                    break;
             }
         }
-#endif
-
-        switch(button) {
-            case PEGBOX_SAVE: /* start playing */
-            case PEGBOX_RIGHT:
-                if (loc == 0) {
-                    breakout = true;
-                    pb->level = startlevel;
-                    load_level(pb);
-                }
-                else if (loc == 1 && can_resume) {
-                    if(pb->save_exist)
-                    {
-                        rb->remove(SAVE_FILE);
-                        pb->save_exist = false;
-                    }
-                    breakout = true;
-                }
-                else if (loc == 2)
-                {
-                    if(pegbox_help())
-                        return PB_USB;
-                }
-                else if (loc == 3)
-                    return PB_QUIT;
-                break;
-
-            case PEGBOX_QUIT:  /* quit program */
-                return PB_QUIT;
-                
-            case (PEGBOX_UP|BUTTON_REPEAT):
-            case PEGBOX_UP:
-                if (loc <= 0)
-                    loc = 3;
-                else
-                    loc--;
-                if (!can_resume && loc == 1) {
-                    loc = 0;
-                }
-                break;
-
-
-            case (PEGBOX_DOWN|BUTTON_REPEAT):
-            case PEGBOX_DOWN:
-                if (loc >= 3)
-                    loc = 0;
-                else
-                    loc++;
-                if (!can_resume && loc == 1) {
-                    loc = 2;
-                }
-                break;
-
-            case (PEGBOX_LVL_UP|BUTTON_REPEAT):
-            case PEGBOX_LVL_UP:     /* increase starting level */
-                if(startlevel >= pb->highlevel) {
-                    startlevel = 1;
-                } else {
-                    startlevel++;
-                }
-                break;
-
-/* only for targets with enough buttons */
-#ifdef PEGBOX_LVL_DOWN
-            case (PEGBOX_LVL_DOWN|BUTTON_REPEAT):
-            case PEGBOX_LVL_DOWN:   /* decrease starting level */
-                if(startlevel <= 1) {
-                    startlevel = pb->highlevel;
-                } else {
-                    startlevel--;
-                }
-                break;
-#endif
-            default:
-                if(rb->default_event_handler_ex(button, pegbox_callback,
-                   (void*) pb) == SYS_USB_CONNECTED)
-                    return PB_USB;
-                break;
+    } else {
+        MENUITEM_STRINGLIST (main_menu, "Pegbox Menu", NULL,
+                                 "Start Game",
+                                 "Select Level",
+                                 "Help",
+                                 "Playback Control",
+                                 "Quit");
+                             
+        while (true) {
+            switch (rb->do_menu(&main_menu, &choice, NULL, false)) {
+                case 0:
+                    pegbox_load_level(pb);
+                    pegbox_draw_board(pb);
+                    return 0;
+                case 1:
+                    rb->set_int("Select Level", "", UNIT_INT,
+                            &pb->level, NULL, 1, 1,
+                            pb->highlevel, NULL);
+                    break;
+                case 2:
+                    if (pegbox_help()==PLUGIN_USB_CONNECTED)
+                        return 1;
+                    break;
+                case 3:
+                    playback_control(NULL);
+                    break;
+                case 4:
+                    return 1;
+                case MENU_ATTACHED_USB:
+                    return 1;
+                default:
+                    break;
+            }
         }
-
     }
-    draw_board(pb);
-
-    return 0;
 }
 
-/*****************************************************************************
-* pegbox() is the main game subroutine, it returns the final game status.
-******************************************************************************/
-static int pegbox(struct game_context* pb) {
-    int temp_var;
-  
-    /********************
-    *       menu        *
-    ********************/
-    temp_var = pegbox_menu(pb);
-    if (temp_var == PB_QUIT || temp_var == PB_USB)
-        return temp_var;
+/***********************************************************************
+* pegbox_main() is the main game subroutine
+************************************************************************/
+static int pegbox_main(struct game_context* pb)
+{
+    int button;
+
+    if (pegbox_menu(pb, false)==1) {
+        return 1;
+    }
 
     while (true) {
-        temp_var = rb->button_get(true);
+        button = rb->button_get(true);
 #ifdef HAVE_TOUCHSCREEN
-        if(temp_var & BUTTON_TOUCHSCREEN)
+        if(button & BUTTON_TOUCHSCREEN)
         {
             pegbox_raster_btn.two_d_from.y = pb->player_row;
             pegbox_raster_btn.two_d_from.x = pb->player_col;
@@ -1283,57 +1053,56 @@ static int pegbox(struct game_context* pb) {
                   touchscreen_raster_map_button(&pegbox_raster_btn,
                                                 rb->button_get_data() >> 16,
                                                 rb->button_get_data() & 0xffff,
-                                                temp_var);
+                                                button);
             if(ret.action == TS_ACTION_TWO_D_MOVEMENT)
-                move_player(pb, ret.to.x - ret.from.x, ret.to.y - ret.from.y);
+                pegbox_move_player(pb, ret.to.x - ret.from.x, ret.to.y - ret.from.y);
         }
 #endif
-        switch(temp_var){
+        switch(button){
             case PEGBOX_LEFT:             /* move cursor left */
             case (PEGBOX_LEFT|BUTTON_REPEAT):
-                move_player(pb, -1, 0);
+                pegbox_move_player(pb, -1, 0);
                 break;
 
             case PEGBOX_RIGHT:            /* move cursor right */
             case (PEGBOX_RIGHT|BUTTON_REPEAT):
-                move_player(pb, 1, 0);
+                pegbox_move_player(pb, 1, 0);
                 break;
 
             case PEGBOX_DOWN:             /* move cursor down */
             case (PEGBOX_DOWN|BUTTON_REPEAT):
-                move_player(pb, 0, 1);
+                pegbox_move_player(pb, 0, 1);
                 break;
 
             case PEGBOX_UP:               /* move cursor up */
             case (PEGBOX_UP|BUTTON_REPEAT):
-                move_player(pb, 0, -1);
+                pegbox_move_player(pb, 0, -1);
                 break;
-
-            case PEGBOX_SAVE:           /* save and end game */
-                rb->splash(HZ, "Saving game...");
-                pegbox_savegame(pb);
-                /* fall through to PEGBOX_QUIT */
 
             case PEGBOX_QUIT:
-                return PB_END;
-
+                if (pegbox_menu(pb, true)==1) {
+                    return 1;
+                }
+#ifdef PEGBOX_RESTART
             case PEGBOX_RESTART:
-                load_level(pb);
-                draw_board(pb);
+                pegbox_load_level(pb);
+                pegbox_draw_board(pb);
                 break;
+#endif
 
+#ifdef PEGBOX_LVL_UP
             case (PEGBOX_LVL_UP|BUTTON_REPEAT):
             case PEGBOX_LVL_UP:
-                if(pb->level >= pb->highlevel) {
+                if (pb->level >= pb->highlevel) {
                     pb->level = 1;
                 } else {
                     pb->level++;
                 }
-                load_level(pb);
-                draw_board(pb);
+                pegbox_load_level(pb);
+                pegbox_draw_board(pb);
                 break;
+#endif
 
-/* only for targets with enough buttons */
 #ifdef PEGBOX_LVL_DOWN
             case (PEGBOX_LVL_DOWN|BUTTON_REPEAT):
             case PEGBOX_LVL_DOWN:
@@ -1342,82 +1111,65 @@ static int pegbox(struct game_context* pb) {
                 } else {
                     pb->level--;
                 }
-                load_level(pb);
-                draw_board(pb);
+                pegbox_load_level(pb);
+                pegbox_draw_board(pb);
                 break;
 #endif
-
         }
 
-        if(pb->num_left == 0) {
+        if (pb->num_left == 0) {
             rb->splash(HZ*2, "Nice Pegging!");
-            if(pb->level == NUM_LEVELS) {
-                draw_board(pb);
-                rb->splash(HZ*2, "You Won!");
-                break;
+            if (pb->level == NUM_LEVELS) {
+                pegbox_draw_board(pb);
+                rb->splash(HZ*2, "Congratulations!");
+                rb->splash(HZ*2, "You have finished the game!");
+                if (pegbox_menu(pb,false)==1) {
+                    return 1;
+                }
             }
             else {
                 pb->level++;
-                load_level(pb);
-                draw_board(pb);
+                pegbox_load_level(pb);
+                pegbox_draw_board(pb);
             }
 
             if(pb->level > pb->highlevel)
                 pb->highlevel = pb->level;
-
+                
         }
     }
-
     return PLUGIN_OK;
 }
-
 
 /*****************************************************************************
 * plugin entry point.
 ******************************************************************************/
-enum plugin_status plugin_start(const void* parameter) {
-    bool exit = false;
-    struct game_context pb;
-
+enum plugin_status plugin_start(const void* parameter)
+{
     (void)parameter;
-
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
-#endif
+#endif 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(BG_COLOR);
 #endif
-
-    rb->splash(0, "Loading...");
-    pegbox_loaddata(&pb);
-    pb.save_exist = pegbox_loadgame(&pb);
-    pb.num_left = 0;
-   
     rb->lcd_clear_display();
 
-
-    while(!exit) {
-        switch(pegbox(&pb)){
-            case PB_END:
-                break;
-
-            case PB_USB:
-                rb->lcd_setfont(FONT_UI);
-                return PLUGIN_USB_CONNECTED;
-
-            case PB_QUIT:
-                rb->splash(HZ, "Saving data...");
-                pegbox_savedata(&pb);
-                exit = true;
-                break;
-
-            default:
-                break;
-        }
-    }
-
+    struct game_context pb;
+    pb.level=1;
+    pb.highlevel=1;
+    struct configdata config[] = {
+        {TYPE_INT, 1, NUM_LEVELS, { .int_p = &(pb.level) }, "level", NULL},
+        {TYPE_INT, 1, NUM_LEVELS, { .int_p = &(pb.highlevel) }, "highlevel", NULL},
+    };    
+    configfile_load(CONFIG_FILE_NAME,config,2,0);
+    pegbox_main(&pb);
+    configfile_save(CONFIG_FILE_NAME,config,2,0);
     rb->lcd_setfont(FONT_UI);
+#endif /* HAVE_LCD_BITMAP */
+
     return PLUGIN_OK;
 }
