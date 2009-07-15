@@ -129,7 +129,8 @@ static const struct plugin_api rockbox_api = {
 #if MEMORYSIZE > 2
     lcd_blit_yuv,
 #if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) \
-    || defined(IRIVER_H10) || defined(COWON_D2) || defined(PHILIPS_HDD1630) || defined(SANSA_FUZE) || defined(SANSA_E200V2)
+    || defined(IRIVER_H10) || defined(COWON_D2) || defined(PHILIPS_HDD1630) \
+    || defined(SANSA_FUZE) || defined(SANSA_E200V2) || defined(TOSHIBA_GIGABEAT_S)
     lcd_yuv_set_options,
 #endif
 #endif /* MEMORYSIZE > 2 */

@@ -129,12 +129,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 161
+#define PLUGIN_API_VERSION 162
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 161
+#define PLUGIN_MIN_API_VERSION 162
 
 /* plugin return codes */
 enum plugin_status {
@@ -212,7 +212,8 @@ struct plugin_api {
                          int src_x, int src_y, int stride,
                          int x, int y, int width, int height);
 #if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) \
-    || defined(IRIVER_H10) || defined(COWON_D2) || defined(PHILIPS_HDD1630) || defined(SANSA_FUZE) || defined(SANSA_E200V2)
+    || defined(IRIVER_H10) || defined(COWON_D2) || defined(PHILIPS_HDD1630) \
+    || defined(SANSA_FUZE) || defined(SANSA_E200V2) || defined(TOSHIBA_GIGABEAT_S)
     void (*lcd_yuv_set_options)(unsigned options);
 #endif
 #endif /* MEMORYSIZE > 2 */
