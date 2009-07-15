@@ -21,15 +21,19 @@
 %V|2|43|124|21|1|
 %xl|A|lock-128x64x1.bmp|1|12|2|
 %xl|B|battery-128x64x1.bmp|23|12|9|
-%xl|C|volume-128x64x1.bmp|46|12|9|
 %xl|D|shuffle-128x64x1.bmp|67|13|
 %xl|E|repeat-128x64x1.bmp|93|12|4|
 %xl|F|playmode-128x64x1.bmp|113|12|5|
-
+%?mv<%Vda|%Vdb>
 # status bar
 %?mh<%xdAa|%xdAb>
 %?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi>>
-%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi>
 %?ps<%xdD>
 %?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
 %?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
+
+%Vl|a|48|55|19|9|1|
+%pv
+%Vl|b|48|55|19|9|1|
+%xl|C|volume-128x64x1.bmp|0|0|9|
+%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi>
