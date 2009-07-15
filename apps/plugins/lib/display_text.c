@@ -62,16 +62,15 @@ bool display_text(short words, char** text, struct style_text* style,
     rb->lcd_getstringsize(" ", &space_w, &height);
     for (i = 0; i < words; i++) {
         rb->lcd_getstringsize(text[i], &width, NULL);
-        /* skip to next line if the current one can't fit the word */
-        if (x + width > vp_width - MARGIN) {
-            x = MARGIN;
-            y = y + height;
-        }
-        /* .. or if the word is the empty string */
+        /* skip to next line if the word is an empty string */
         if (rb->strcmp(text[i], "")==0) {
             x = MARGIN;
             y = y + height;
             continue;
+        /* .. or if the current one can't fit the word */
+        } else if (x + width > vp_width - MARGIN) {
+            x = MARGIN;
+            y = y + height;
         }
         /* display the remaining text by button click or exit */
         if (y + height > vp_height - MARGIN) {
