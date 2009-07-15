@@ -125,7 +125,7 @@
 //#define HAVE_LCD_CONTRAST
 
 /* Define this if you have a Motorola SCF5250 */
-#define CONFIG_CPU S5L8700
+#define CONFIG_CPU S5L8701
 
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_S5L8700

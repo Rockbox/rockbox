@@ -59,7 +59,7 @@
 #ifdef CPU_TCC780X
 #include "tcc780x.h"
 #endif
-#if CONFIG_CPU == S5L8700
+#ifdef CPU_S5L870X
 #include "s5l8700.h"
 #endif
 #if CONFIG_CPU == JZ4732

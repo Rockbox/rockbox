@@ -68,6 +68,7 @@
 #define TCC773L       773
 #define TCC7801      7801
 #define S5L8700      8700
+#define S5L8701      8701
 #define JZ4732       4732
 #define AS3525       3525
 #define AT91SAM9260  9260
@@ -387,6 +388,69 @@ Lyre prototype 1*/
 /* setup basic macros from capability masks */
 #include "config_caps.h"
 
+/* setup CPU-specific defines */
+
+/* define for all cpus from SH family */
+#if (CONFIG_CPU == SH7034)
+#define CPU_SH
+#endif
+
+/* define for all cpus from coldfire family */
+#if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
+#define CPU_COLDFIRE
+#endif
+
+/* define for all cpus from PP family */
+#if (CONFIG_CPU == PP5002)
+#define CPU_PP
+#elif (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022) \
+    || (CONFIG_CPU == PP5024) || (CONFIG_CPU == PP6100)
+#define CPU_PP
+#define CPU_PP502x
+#endif
+
+/* define for all cpus from S5L870X family */
+#if (CONFIG_CPU == S5L8700) || (CONFIG_CPU == S5L8701)
+#define CPU_S5L870X
+#endif
+
+/* define for all cpus from TCC77X family */
+#if (CONFIG_CPU == TCC771L) || (CONFIG_CPU == TCC773L) || (CONFIG_CPU == TCC770)
+#define CPU_TCC77X
+#endif
+
+/* define for all cpus from TCC780 family */
+#if (CONFIG_CPU == TCC7801)
+#define CPU_TCC780X
+#endif
+
+/* define for all cpus from ARM7TDMI family (for specific optimisations) */
+#if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == DSC25)
+#define CPU_ARM7TDMI
+#endif
+
+/* define for all cpus from ARM family */
+#if (CONFIG_CPU == IMX31L)
+#define CPU_ARM
+#define ARM_ARCH 6 /* ARMv6 */
+#endif
+
+#if defined(CPU_TCC77X) || defined(CPU_TCC780X) || (CONFIG_CPU == DM320) \
+  || (CONFIG_CPU == AT91SAM9260)
+#define CPU_ARM
+#define ARM_ARCH 5 /* ARMv5 */
+#endif
+
+#if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
+  || (CONFIG_CPU == DSC25) || defined(CPU_S5L870X) || (CONFIG_CPU == AS3525)
+#define CPU_ARM
+#define ARM_ARCH 4 /* ARMv4 */
+#endif
+
+#if (CONFIG_CPU == JZ4732)
+#define CPU_MIPS 32
+#endif
+
 /* now set any CONFIG_ defines correctly if they are not used,
    No need to do this on CONFIG_'s which are compulsory (e.g CONFIG_CODEC ) */
 
@@ -561,67 +625,11 @@ Lyre prototype 1*/
 
 #if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) \
     || (CONFIG_CPU == AS3525) || (CONFIG_CPU == S3C2440) \
-    || (CONFIG_CPU == S5L8700)
+    || defined(CPU_S5L870X)
 #define HAVE_WAKEUP_OBJECTS
 #endif
 
 #endif /*  (CONFIG_CODEC == SWCODEC) */
-
-/* define for all cpus from SH family */
-#if (CONFIG_CPU == SH7034)
-#define CPU_SH
-#endif
-
-/* define for all cpus from coldfire family */
-#if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
-#define CPU_COLDFIRE
-#endif
-
-/* define for all cpus from PP family */
-#if (CONFIG_CPU == PP5002)
-#define CPU_PP
-#elif (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022) \
-    || (CONFIG_CPU == PP5024) || (CONFIG_CPU == PP6100)
-#define CPU_PP
-#define CPU_PP502x
-#endif
-
-/* define for all cpus from TCC77X family */
-#if (CONFIG_CPU == TCC771L) || (CONFIG_CPU == TCC773L) || (CONFIG_CPU == TCC770)
-#define CPU_TCC77X
-#endif
-
-/* define for all cpus from TCC780 family */
-#if (CONFIG_CPU == TCC7801)
-#define CPU_TCC780X
-#endif
-
-/* define for all cpus from ARM7TDMI family (for specific optimisations) */
-#if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == DSC25)
-#define CPU_ARM7TDMI
-#endif
-
-/* define for all cpus from ARM family */
-#if (CONFIG_CPU == IMX31L)
-#define CPU_ARM
-#define ARM_ARCH 6 /* ARMv6 */
-#endif
-
-#if defined(CPU_TCC77X) || defined(CPU_TCC780X) || (CONFIG_CPU == DM320) \
-  || (CONFIG_CPU == AT91SAM9260)
-#define CPU_ARM
-#define ARM_ARCH 5 /* ARMv5 */
-#endif
-
-#if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
-  || (CONFIG_CPU == DSC25) || (CONFIG_CPU == S5L8700) || (CONFIG_CPU == AS3525)
-#define CPU_ARM
-#define ARM_ARCH 4 /* ARMv4 */
-#endif
-
-#if (CONFIG_CPU == JZ4732)
-#define CPU_MIPS 32
-#endif
 
 /* Determine if accesses should be strictly long aligned. */
 #if (CONFIG_CPU == SH7034) || defined(CPU_ARM) || defined(CPU_MIPS)
@@ -648,7 +656,7 @@ Lyre prototype 1*/
     (CONFIG_CPU == AS3525 && MEMORYSIZE > 2) || /* AS3525 +2MB: core, plugins, codecs */ \
     (CONFIG_CPU == AS3525 && MEMORYSIZE <= 2 && !defined(PLUGIN) && !defined(CODEC)) || /* AS3525 2MB:core only */ \
     (CONFIG_CPU == PNX0101) || \
-    (CONFIG_CPU == S5L8700)) /* Samsung S5L8700: core, plugins, codecs */ || \
+    defined(CPU_S5L870X)) || /* Samsung S5L8700: core, plugins, codecs */ \
     (CONFIG_CPU == JZ4732 && !defined(PLUGIN) && !defined(CODEC)) /* Jz4740: core only */
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))
