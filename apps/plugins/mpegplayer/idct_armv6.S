@@ -75,15 +75,17 @@
     add     r11, r11, r3        @ a1  = a1' + a2'
     sub     r3, r11, r3, lsl #1 @ a2  = a1 - 2 * a2'
     
+    @ Special store order for making the column pass calculate columns in
+    @ the order 0-2-1-3-4-6-5-7, allowing for uxtab16 use in later stages.
     sub     r2, r10, r6         @ block[7] = (a0 - b0)
     mov     r2, r2, asr #12     @            >> 12
     strh    r2, [r1, #7*16]
     sub     r2, r11, r7         @ block[6] = (a1 - b1)
     mov     r2, r2, asr #12     @            >> 12
-    strh    r2, [r1, #6*16]
+    strh    r2, [r1, #5*16]
     sub     r2, r3, r8          @ block[5] = (a2 - b2)
     mov     r2, r2, asr #12     @            >> 12
-    strh    r2, [r1, #5*16]
+    strh    r2, [r1, #6*16]
     sub     r2, r12, r9         @ block[4] = (a3 - b3)
     mov     r2, r2, asr #12     @            >> 12
     strh    r2, [r1, #4*16]
@@ -92,10 +94,10 @@
     strh    r2, [r1, #3*16]
     add     r2, r3, r8          @ block[2] = (a2 + b2)
     mov     r2, r2, asr #12     @            >> 12
-    strh    r2, [r1, #2*16]
+    strh    r2, [r1, #1*16]
     add     r2, r11, r7         @ block[1] = (a1 + b1)
     mov     r2, r2, asr #12     @            >> 12
-    strh    r2, [r1, #1*16]
+    strh    r2, [r1, #2*16]
     add     r2, r10, r6         @ block[0] = (a0 + b0)
     mov     r2, r2, asr #12     @            >> 12
     strh    r2, [r1], #2        @ advance to next temp column
@@ -200,34 +202,23 @@ mpeg2_idct_copy:
     bl     .idct
     ldmfd  sp!, {r1-r2}
 
-    add    r12, r0, #128
-    ldrd   r4, [r0]
+    add    r3, r0, #128
     mov    r8, #0
     mov    r9, #0
     mov    r10, #0
     mov    r11, #0
-1:
-    ldrd   r6, [r0, #8]
-    usat16 r4, #8, r4
-    strb   r4, [r1, #0]
-    mov    r4, r4, lsr #16
-    strb   r4, [r1, #1]
-    usat16 r5, #8, r5
-    strb   r5, [r1, #2]
-    mov    r5, r5, lsr #16
-    strb   r5, [r1, #3]
-    ldrd   r4, [r0, #16]
-    usat16 r6, #8, r6
-    strb   r6, [r1, #4]
-    mov    r6, r6, lsr #16
-    strb   r6, [r1, #5]
-    usat16 r7, #8, r7
-    strb   r7, [r1, #6]
-    mov    r7, r7, lsr #16
-    strb   r7, [r1, #7]
+1:                              @ idct data is in order 0-2-1-3-4-6-5-7,
+    ldmia  r0,  {r4-r7}         @ see above
     stmia  r0!, {r8-r11}
+    usat16 r4, #8, r4
+    usat16 r5, #8, r5
+    orr    r4, r4, r5, lsl #8
+    usat16 r6, #8, r6
+    usat16 r7, #8, r7
+    orr    r5, r6, r7, lsl #8
+    strd   r4, [r1]             @ r4, r5
     add    r1, r1, r2
-    cmp    r0, r12
+    cmp    r0, r3
     blo    1b
 
     ldmfd  sp!, {r4-r11, pc}
@@ -244,93 +235,61 @@ mpeg2_idct_add:
     stmfd  sp!, {r2-r11, lr}
     bl     .idct
     ldmfd  sp!, {r1-r2}
+
+    add    r3, r0, #128
+    mov    r10, #0
     mov    r11, #0
-    add    r12, r0, #128
-2:
-    ldmia  r0, {r3-r6}
-    ldrb   r7, [r1, #0]
-    ldrb   r8, [r1, #1]
-    ldrb   r9, [r1, #2]
-    ldrb   r10, [r1, #3]
-    str    r11, [r0], #4        
-    orr    r7, r7, r8, lsl #16
-    sadd16 r3, r3, r7
-    usat16 r3, #8, r3
-    strb   r3, [r1, #0]
-    mov    r3, r3, lsr #16
-    strb   r3, [r1, #1]
-    str    r11, [r0], #4     
-    orr    r9, r9, r10, lsl #16
-    sadd16 r4, r4, r9
+    mov    r12, #0
+    mov    lr, #0
+    ldrd   r8, [r1]             @ r8, r9
+2:                              @ idct data is in order 0-2-1-3-4-6-5-7,
+    ldmia  r0,  {r4-r7}         @ see above
+    stmia  r0!, {r10-r12, lr}
+    uxtab16 r4, r4, r8
+    uxtab16 r5, r5, r8, ror #8
     usat16 r4, #8, r4
-    strb   r4, [r1, #2]
-    mov    r4, r4, lsr #16
-    strb   r4, [r1, #3]
-    ldrb   r7, [r1, #4]
-    ldrb   r8, [r1, #5]
-    ldrb   r9, [r1, #6]
-    ldrb   r10, [r1, #7]
-    str    r11, [r0], #4
-    orr    r7, r7, r8, lsl #16
-    sadd16 r5, r5, r7
     usat16 r5, #8, r5
-    strb   r5, [r1, #4]
-    mov    r5, r5, lsr #16
-    strb   r5, [r1, #5]
-    str    r11, [r0], #4
-    orr    r9, r9, r10, lsl #16
-    sadd16 r6, r6, r9
+    orr    r4, r4, r5, lsl #8
+    uxtab16 r6, r6, r9
+    uxtab16 r7, r7, r9, ror #8
     usat16 r6, #8, r6
-    strb   r6, [r1, #6]
-    mov    r6, r6, lsr #16
-    strb   r6, [r1, #7]
+    usat16 r7, #8, r7
+    orr    r5, r6, r7, lsl #8
+    strd   r4, [r1]             @ r4, r5
     add    r1, r1, r2
-    cmp    r0, r12
+    cmp    r0, r3
+    ldrlod r8, [r1]             @ r8, r9
     blo    2b
+
     ldmfd  sp!, {r4-r11, pc}
 
 3:
-    stmfd  sp!, {r4-r5, lr}
-    ldrsh  r1, [r0, #0]           /* r1 = block[0] */
-    mov    r4, #0
-    strh   r4, [r0, #0]           /* block[0] = 0 */
-    strh   r4, [r0, #126]         /* block[63] = 0 */
-    add    r1, r1, #64            /* r1 = DC << 7 */
-    add    r0, r2, r3, asl #3
+    stmfd  sp!, {r4, lr}
+    ldrsh  r4, [r0, #0]         @ r4 = block[0]
+    mov    r12, #0
+    strh   r12, [r0, #0]        @ block[0] = 0
+    strh   r12, [r0, #126]      @ block[63] = 0
+    add    r4, r4, #64
+    mov    r4, r4, asr #7       @ r4 = DC
+    mov    r4, r4, lsl #16      @ spread to 2 halfwords
+    orr    r4, r4, r4, lsr #16
+    ldrd   r0, [r2]             @ r0, r1
+    add    r12, r2, r3, asl #3
 4:
-    ldrb   r4, [r2, #0]
-    ldrb   r5, [r2, #1]
-    ldrb   r12, [r2, #2]
-    ldrb   lr, [r2, #3]
-    add    r4, r4, r1, asr #7
-    usat   r4, #8, r4
-    strb   r4, [r2, #0]
-    add    r5, r5, r1, asr #7
-    usat   r5, #8, r5
-    strb   r5, [r2, #1]
-    add    r12, r12, r1, asr #7
-    usat   r12, #8, r12
-    strb   r12, [r2, #2]
-    add    lr, lr, r1, asr #7
-    usat   lr, #8, lr
-    strb   lr, [r2, #3]
-    ldrb   r4, [r2, #4]
-    ldrb   r5, [r2, #5]
-    ldrb   r12, [r2, #6]
-    ldrb   lr, [r2, #7]
-    add    r4, r4, r1, asr #7
-    usat   r4, #8, r4
-    strb   r4, [r2, #4]
-    add    r5, r5, r1, asr #7
-    usat   r5, #8, r5
-    strb   r5, [r2, #5]
-    add    r12, r12, r1, asr #7
-    usat   r12, #8, r12
-    strb   r12, [r2, #6]
-    add    lr, lr, r1, asr #7
-    usat   lr, #8, lr
-    strb   lr, [r2, #7]
+    uxtab16 lr, r4, r0, ror #8
+    uxtab16 r0, r4, r0
+    usat16 lr, #8, lr
+    usat16 r0, #8, r0
+    orr    r0, r0, lr, lsl #8
+    uxtab16 lr, r4, r1, ror #8
+    uxtab16 r1, r4, r1
+    usat16 lr, #8, lr
+    usat16 r1, #8, r1
+    orr    r1, r1, lr, lsl #8
+    strd   r0, [r2]             @ r0, r1
     add    r2, r2, r3
-    cmp    r2, r0
+    cmp    r2, r12
+    ldrlod r0, [r2]             @ r0, r1
     blo    4b
-    ldmfd  sp!, {r4-r5, pc}
+
+    ldmfd  sp!, {r4, pc}
