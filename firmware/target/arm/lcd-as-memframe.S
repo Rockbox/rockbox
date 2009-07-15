@@ -170,6 +170,11 @@ lcd_write_yuv420_lines:
     add         lr, r9, r7, asr #8      @ lr = r = (Y >> 9) + rv
     add         r7, r10, r7, asr #7     @ r7  = g = (Y >> 8) + guv
                                         @
+#if ARM_ARCH >= 6
+    usat        r1, #5, r1              @ clamp b
+    usat        lr, #5, lr              @ clamp r
+    usat        r7, #6, r7              @ clamp g
+#else
     orr         r12, r1, lr             @ check if clamping is needed...
     orr         r12, r12, r7, asr #1    @ ...at all
     cmp         r12, #31                @
@@ -184,6 +189,7 @@ lcd_write_yuv420_lines:
     mvnhi       r7, r7, asr #31         @
     andhi       r7, r7, #63             @
 15: @ no clamp                          @
+#endif
                                         @
     ldrb        r12, [r4, r3]           @ r12 = Y' = *(Y'_p + stride)
                                         @
@@ -206,6 +212,11 @@ lcd_write_yuv420_lines:
     add         lr, r9, r7, asr #8      @ lr = r = (Y >> 9) + rv
     add         r7, r10, r7, asr #7     @ r7  = g = (Y >> 8) + guv
                                         @
+#if ARM_ARCH >= 6
+    usat        r1, #5, r1              @ clamp b
+    usat        lr, #5, lr              @ clamp r
+    usat        r7, #6, r7              @ clamp g
+#else
     orr         r12, r1, lr             @ check if clamping is needed...
     orr         r12, r12, r7, asr #1    @ ...at all
     cmp         r12, #31                @
@@ -220,6 +231,7 @@ lcd_write_yuv420_lines:
     mvnhi       r7, r7, asr #31         @
     andhi       r7, r7, #63             @
 15: @ no clamp                          @
+#endif
                                         @
     ldrb        r12, [r4], #1           @ r12 = Y' = *(Y'_p++)
                                         @
@@ -245,6 +257,11 @@ lcd_write_yuv420_lines:
     add         lr, r9, r7, asr #8      @ lr = r = (Y >> 9) + rv
     add         r7, r10, r7, asr #7     @ r7  = g = (Y >> 8) + guv
                                         @
+#if ARM_ARCH >= 6
+    usat        r1, #5, r1              @ clamp b
+    usat        lr, #5, lr              @ clamp r
+    usat        r7, #6, r7              @ clamp g
+#else
     orr         r12, r1, lr             @ check if clamping is needed...
     orr         r12, r12, r7, asr #1    @ ...at all
     cmp         r12, #31                @
@@ -259,6 +276,7 @@ lcd_write_yuv420_lines:
     mvnhi       r7, r7, asr #31         @
     andhi       r7, r7, #63             @
 15: @ no clamp                          @
+#endif
                                         @
     ldrb        r12, [r4, r3]           @ r12 = Y' = *(Y'_p + stride)
                                         @
@@ -281,6 +299,11 @@ lcd_write_yuv420_lines:
     add         lr, r9, r7, asr #8      @ lr = r = (Y >> 9) + rv
     add         r7, r10, r7, asr #7     @ r7  = g = (Y >> 8) + guv
                                         @
+#if ARM_ARCH >= 6
+    usat        r1, #5, r1              @ clamp b
+    usat        lr, #5, lr              @ clamp r
+    usat        r7, #6, r7              @ clamp g
+#else
     orr         r12, r1, lr             @ check if clamping is needed...
     orr         r12, r12, r7, asr #1    @ ...at all
     cmp         r12, #31                @
@@ -295,6 +318,7 @@ lcd_write_yuv420_lines:
     mvnhi       r7, r7, asr #31         @
     andhi       r7, r7, #63             @
 15: @ no clamp                          @
+#endif
                                         @
     orr         r12, r1, lr, lsl #11    @ r12 = b | (r << 11)
     orr         r12, r12, r7, lsl #5    @ r12 |= (g << 5)
@@ -425,6 +449,16 @@ lcd_write_yuv420_lines_odither:
     add         r11, r11, r12, lsl #1   @ r = r11 + delta*2
     add         r7, r7, r12, lsr #1     @ g = r7 + delta/2
                                         @
+#if ARM_ARCH >= 6
+    usat        r11, #5, r11, asr #11   @ clamp r
+    usat        r7, #6, r7, asr #9      @ clamp g
+    usat        r1, #5, r1, asr #10     @ clamp b
+                                        @
+    ldrb        r12, [r4, r3]           @ r12 = Y' = *(Y'_p + stride)
+                                        @
+    orr         r1, r1, r11, lsl #11    @ r1 = b | (r << 11)
+    orr         r1, r1, r7, lsl #5      @ r1 |= (g << 5)
+#else
     orr         r12, r1, r11, asr #1    @ check if clamping is needed...
     orr         r12, r12, r7            @ ...at all
     movs        r12, r12, asr #15       @
@@ -444,6 +478,7 @@ lcd_write_yuv420_lines_odither:
     and         r7, r7, #0x7e00         @ r1 = pixel = (r & 0xf800) |
     orr         r11, r11, r7, lsr #4    @              ((g & 0x7e00) >> 4) |
     orr         r1, r11, r1, lsr #10    @              (b >> 10)
+#endif
                                         @
 #if LCD_WIDTH >= LCD_HEIGHT
     strh        r1, [r0]        @
@@ -477,6 +512,16 @@ lcd_write_yuv420_lines_odither:
     add         r11, r11, r12, lsl #1   @ r = r11 + delta*2
     add         r7, r7, r12, lsr #1     @ g = r7 + delta/2
                                         @
+#if ARM_ARCH >= 6
+    usat        r11, #5, r11, asr #11   @ clamp r
+    usat        r7, #6, r7, asr #9      @ clamp g
+    usat        r1, #5, r1, asr #10     @ clamp b
+                                        @
+    ldrb        r12, [r4], #1           @ r12 = Y' = *(Y'_p++)
+                                        @
+    orr         r1, r1, r11, lsl #11    @ r1 = b | (r << 11)
+    orr         r1, r1, r7, lsl #5      @ r1 |= (g << 5)
+#else
     orr         r12, r1, r11, asr #1    @ check if clamping is needed...
     orr         r12, r12, r7            @ ...at all
     movs        r12, r12, asr #15       @
@@ -496,6 +541,7 @@ lcd_write_yuv420_lines_odither:
     and         r7, r7, #0x7e00         @ r1 = pixel = (r & 0xf800) |
     orr         r11, r11, r7, lsr #4    @              ((g & 0x7e00) >> 4) |
     orr         r1, r11, r1, lsr #10    @              (b >> 10)
+#endif
                                         @
 #if LCD_WIDTH >= LCD_HEIGHT
     add         r0, r0, #2*LCD_WIDTH    @
@@ -534,6 +580,16 @@ lcd_write_yuv420_lines_odither:
     add         r11, r11, r12, lsl #1   @ r = r11 + delta*2
     add         r7, r7, r12, lsr #1     @ g = r7 + delta/2
                                         @
+#if ARM_ARCH >= 6
+    usat        r11, #5, r11, asr #11   @ clamp r
+    usat        r7, #6, r7, asr #9      @ clamp g
+    usat        r1, #5, r1, asr #10     @ clamp b
+                                        @
+    ldrb        r12, [r4, r3]           @ r12 = Y' = *(Y'_p + stride)
+                                        @
+    orr         r1, r1, r11, lsl #11    @ r1 = b | (r << 11)
+    orr         r1, r1, r7, lsl #5      @ r1 |= (g << 5)
+#else
     orr         r12, r1, r11, asr #1    @ check if clamping is needed...
     orr         r12, r12, r7            @ ...at all
     movs        r12, r12, asr #15       @
@@ -547,12 +603,13 @@ lcd_write_yuv420_lines_odither:
     mvnne       r7, r12, lsr #15        @
 15: @ no clamp                          @
                                         @
-    ldrb        r12, [r4, r3]           @ r12 = Y' = *(Y'_p + stride)    
+    ldrb        r12, [r4, r3]           @ r12 = Y' = *(Y'_p + stride)
                                         @
     and         r11, r11, #0xf800       @ pack pixel
     and         r7, r7, #0x7e00         @ r1 = pixel = (r & 0xf800) |
     orr         r11, r11, r7, lsr #4    @              ((g & 0x7e00) >> 4) |
     orr         r1, r11, r1, lsr #10    @              (b >> 10)
+#endif
                                         @
 #if LCD_WIDTH >= LCD_HEIGHT
     strh        r1, [r0, #2]
@@ -586,6 +643,14 @@ lcd_write_yuv420_lines_odither:
     add         r11, r11, r14, lsl #1   @ r = r11 + delta*2
     add         r7, r7, r14, lsr #1     @ g = r7 + delta/2
                                         @
+#if ARM_ARCH >= 6
+    usat        r11, #5, r11, asr #11   @ clamp r
+    usat        r7, #6, r7, asr #9      @ clamp g
+    usat        r1, #5, r1, asr #10     @ clamp b
+                                        @
+    orr         r1, r1, r11, lsl #11    @ r1 = b | (r << 11)
+    orr         r1, r1, r7, lsl #5      @ r1 |= (g << 5)
+#else
     orr         r12, r1, r11, asr #1    @ check if clamping is needed...
     orr         r12, r12, r7            @ ...at all
     movs        r12, r12, asr #15       @
@@ -603,6 +668,7 @@ lcd_write_yuv420_lines_odither:
     and         r7, r7, #0x7e00         @ r1 = pixel = (r & 0xf800) |
     orr         r11, r11, r7, lsr #4    @              ((g & 0x7e00) >> 4) |
     orr         r1, r11, r1, lsr #10    @              (b >> 10)
+#endif
                                         @
 #if LCD_WIDTH >= LCD_HEIGHT
     add         r0, r0, #2*LCD_WIDTH
