@@ -923,7 +923,7 @@ static bool pegbox_help(void)
         RESTART_TEXT, "to", "restart", "level", "",
         LVL_UP_TEXT, "to", "go", "up", "a", "level", "",
         LVL_DOWN_TEXT, "to", "go", "down", "a", "level", "",
-        SAVE_TEXT, "to", "select/save", "",
+        SAVE_TEXT, "to", "choose", "peg", "",
         QUIT_TEXT, "to", "quit"
     };
     static struct style_text formation[]={
