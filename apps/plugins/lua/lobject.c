@@ -181,7 +181,8 @@ const char *luaO_pushfstring (lua_State *L, const char *fmt, ...) {
 
 void luaO_chunkid (char *out, const char *source, size_t bufflen) {
   if (*source == '=') {
-    strlcpy(out, source+1, bufflen);  /* remove first char */
+    strncpy(out, source+1, bufflen);  /* remove first char */
+    out[bufflen-1] = '\0';  /* ensures null termination */
   }
   else {  /* out = "source", or "...source" */
     if (*source == '@') {
