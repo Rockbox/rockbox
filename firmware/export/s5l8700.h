@@ -493,7 +493,7 @@
 #define UBRDIV1                 (*(REG32_PTR_T)(0x3CC08028))     /* Baud Rate Divisor Register */
 
 /* 26. LCD INTERFACE CONTROLLER */
-#ifdef CPU_S5L8700
+#if CONFIG_CPU==S5L8700
 #define LCD_BASE 0x3C100000
 #else /* CPU_S5L8701 */
 #define LCD_BASE 0x38600000
