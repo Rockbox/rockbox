@@ -45,10 +45,12 @@ _newstart:
 newstart2:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
+#ifdef ROCKBOX_BIG_ENDIAN
     mov r1, #0x80
     mrc 15, 0, r0, c1, c0, 0
     orr r0, r0, r1
     mcr 15, 0, r0, c1, c0, 0 // set bigendian
+#endif
 			 
     ldr r1, =0x3c800000 // disable watchdog
     mov r0, #0xa5
@@ -66,7 +68,7 @@ newstart2:
     str r0, [r1] // clear pending interrupts
     ldr r1, =0x39c0001c
     str r0, [r1] // clear pending external interrupts
-									    
+
 //    ldr r1, =0x3cf00000
 //    ldr r0, [r1]
 //    mvn r2, #0x30
@@ -80,6 +82,7 @@ newstart2:
 //    orr r0, r0, r2
 //    str r0, [r1] // switch backlight on
 
+#if CONFIG_CPU==S5L8700
     ldr r1, =0x3c500000 // CLKCON
     ldr r0, =0x00800080
     str r0, [r1]
@@ -232,6 +235,7 @@ newstart2:
     ldrhi   r1, [r4], #4
     strhi   r1, [r2], #4
     bhi     1b
+#endif
 
     /* Initialise bss section to zero */
     ldr     r2, =_edata
@@ -241,7 +245,8 @@ newstart2:
     cmp     r3, r2
     strhi   r4, [r2], #4
     bhi     1b
-     
+
+#if CONFIG_CPU==S5L8700
     /* Copy icode and data to ram */
     ldr     r2, =_datastart
     ldr     r3, =_dataend
@@ -251,6 +256,7 @@ newstart2:
     ldrhi   r1, [r4], #4
     strhi   r1, [r2], #4
     bhi     1b
+#endif
     
     /* Set up some stack and munge it with 0xdeadbeef */
     ldr     sp, =_stackend
@@ -260,7 +266,7 @@ newstart2:
     cmp     sp, r2
     strhi   r3, [r2], #4
     bhi     1b
-    
+
     /* Set up stack for IRQ mode */ 
     msr     cpsr_c, #0xd2
     ldr     sp, =_irqstackend
@@ -281,6 +287,7 @@ newstart2:
 // if we did not switch remap on, device
 // would crash when MENU is pressed,
 // as that button is connected to BOOT_MODE pin
+#if CONFIG_CPU==S5L8700
     ldr r1, =0x38200000
     ldr r0, [r1]
     mvn r2, #0x10000
@@ -288,6 +295,7 @@ newstart2:
     mov r2, #0x1
     orr r0, r0, r2
     str r0, [r1] // remap iram to address 0x0
+#endif
 
     bl      main
 

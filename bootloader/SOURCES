@@ -54,4 +54,5 @@ lyre_proto1.c
 show_logo.c
 #elif defined(IPOD_NANO2G)
 ipodnano2g.c
+show_logo.c
 #endif

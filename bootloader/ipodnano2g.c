@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 by ???? [to be completed by first author]
+ * Copyright (C) 2009 by Dave Chapman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -46,8 +46,15 @@
 
 char version[] = APPSVERSION;
 
+/* Show the Rockbox logo - in show_logo.c */
+extern int show_logo(void);
+
 void main(void)
 {
+    lcd_init();
+
+    show_logo();
+
     /* Do nothing... */
     while(1);
 }
