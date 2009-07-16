@@ -291,7 +291,6 @@ static inline void output_math(COOKContext *q, int16_t *out, int chan)
     int j;
 
     for (j = 0; j < q->samples_per_channel; j++) {
-        out[chan + q->nb_channels * j] =
-          av_clip(fixp_pow2(q->mono_mdct_output[j], -11), -32768, 32767);
+        out[chan + q->nb_channels * j] = fixp_pow2(q->mono_mdct_output[j], -11);
     }
 }
