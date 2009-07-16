@@ -76,8 +76,10 @@ void power_off(void)
     /* Backlight off */
     ascodec_write(AS3514_DCDC15, 0);
 
+#ifdef HAVE_LCD_SLEEP
     /* LCD off/sleep (otherwise the image slowly fades out) */
     lcd_sleep();
+#endif
 
     /* Send shutdown command to PMU */
     byte = ascodec_read(AS3514_SYSTEM);
