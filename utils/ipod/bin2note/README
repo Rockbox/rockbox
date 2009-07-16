@@ -15,3 +15,27 @@ It is known to work on the 2nd generation Nano.
 The Makefile contains rules for compiling an ARM assembler file
 "test.S" into a notes file "test.htm".  Just put test.S in this
 directory and type "make test.htm".
+
+
+How it works
+------------
+
+When the Apple firmware boots, it scans the Notes folder and loads
+each note in turn in order to check its content.
+
+When it reaches our specially crafted note, a buffer overflows onto
+the stack, writing the entry point of our code over the top of an
+existing return address.
+
+This entry point was determined by "stooo1" as part of the
+"linux4nano" investigations into the Nano 2G.  He managed to attach a
+JTAG debugger to his Nano 2G and dump the RAM after a notes file was
+loaded.
+
+Only certain return addresses can be used, as it is converted
+internally to utf-8.  Hence we are currently using the address of the
+last instruction in the buffer, which is a branch back to our real
+entry point.
+
+You also need to ensure that there are no more than 64KB of notes in
+your Notes folder.
