@@ -188,6 +188,7 @@ TRANSLATIONS += lang/rbutil_de.ts \
  lang/rbutil_ja.ts \
  lang/rbutil_nl.ts \
  lang/rbutil_pt.ts \
+ lang/rbutil_pt_BR.ts \
  lang/rbutil_tr.ts \
  lang/rbutil_zh_CN.ts \
  lang/rbutil_zh_TW.ts \
