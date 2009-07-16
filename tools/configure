@@ -1361,7 +1361,7 @@ fi
     arm940tcc
     tool="$rootdir/tools/scramble -add=nn2g"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.ipod"
     appextra="recorder:gui"
     plugins="yes"
