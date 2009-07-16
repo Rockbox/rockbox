@@ -82,7 +82,6 @@ typedef struct cook {
 
     /* generatable tables and related variables */
     int                 gain_size_factor;
-    float               gain_table[23];
 
     /* data buffers */
 
