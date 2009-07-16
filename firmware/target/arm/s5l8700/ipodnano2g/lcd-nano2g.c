@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 by ????
+ * Copyright (C) 2009 by Dave Chapman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,6 +25,21 @@
 #include "lcd.h"
 #include "system.h"
 #include "cpu.h"
+
+/** hardware access functions */
+
+static void s5l_lcd_write_cmd(unsigned short cmd)
+{
+    while (LCD_STATUS&0x10);
+    LCD_WCMD = cmd;
+}
+
+static void s5l_lcd_write_data(int data)
+{
+    LCD_WDATA = data;
+    while (LCD_STATUS&0x10);
+}
+
 
 /** globals **/
 
@@ -105,38 +120,57 @@ void lcd_blit_grey_phase_blit(unsigned char *values, unsigned char *phases,
     (void)stride;
 }
 
+
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
-    int y;
+    int x,y;
+    fb_data* p;
+    fb_data pixel;
+
+    s5l_lcd_write_cmd(0x3a);
+    s5l_lcd_write_data(0x65);
+
+    s5l_lcd_write_cmd(0x2a);
+    s5l_lcd_write_data(0);
+    s5l_lcd_write_data(0);
+    s5l_lcd_write_data(0);
+    s5l_lcd_write_data(LCD_WIDTH-1);
+
+    s5l_lcd_write_cmd(0x2b);
+    s5l_lcd_write_data(0);
+    s5l_lcd_write_data(0);
+    s5l_lcd_write_data(0);
+    s5l_lcd_write_data(LCD_HEIGHT-1);
+
+    s5l_lcd_write_cmd(0x2c);
 
     /* Copy display bitmap to hardware */
-    for (y = 0; y < LCD_FBHEIGHT; y++)
-    {
+
+    p = &lcd_framebuffer[0][0];
+    for (y = 0; y < LCD_HEIGHT; y++) {
+        for (x = 0; x < LCD_WIDTH; x++) {
+           pixel = *(p++);
+
+           while (LCD_STATUS&0x10);
+           LCD_WDATA = (pixel & 0xff00) >> 8;
+           LCD_WDATA = pixel & 0xff;
+        }
     }
+
+    s5l_lcd_write_cmd(0x29);
 }
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    int ymax;
+    (void)x;
+    (void)y;
+    (void)width;
+    (void)height;
 
-    /* The Y coordinates have to work on even 8 pixel rows */
-    ymax = (y + height-1) >> 3;
-    y >>= 3;
-
-    if(x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (width <= 0)
-        return; /* nothing left to do, 0 is harmful to lcd_write_data() */
-    if(ymax >= LCD_FBHEIGHT)
-        ymax = LCD_FBHEIGHT-1;
-
-    /* Copy specified rectange bitmap to hardware */
-    for (; y <= ymax; y++)
-    {
-    }
+    lcd_update();
 }
