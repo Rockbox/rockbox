@@ -28,4 +28,15 @@
 #undef DRAM_START
 #define DRAM_START       0x10f00000
 
+#define GPIOM_ENABLE     (*(volatile unsigned long *)(0x6000d180))
+#define GPIOM_OUTPUT_EN  (*(volatile unsigned long *)(0x6000d190))
+#define GPIOM_OUTPUT_VAL (*(volatile unsigned long *)(0x6000d1a0))
+#define GPIOM_INPUT_VAL  (*(volatile unsigned long *)(0x6000d1b0))
+#define GPIOM_INT_STAT   (*(volatile unsigned long *)(0x6000d1c0))
+#define GPIOM_INT_EN     (*(volatile unsigned long *)(0x6000d1d0))
+#define GPIOM_INT_LEV    (*(volatile unsigned long *)(0x6000d1e0))
+#define GPIOM_INT_CLR    (*(volatile unsigned long *)(0x6000d1f0))
+
+#define GPIOM 12
+
 #endif
