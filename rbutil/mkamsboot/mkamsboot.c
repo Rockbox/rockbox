@@ -592,7 +592,7 @@ int main(int argc, char* argv[])
 
 /* VERSION comes frome the Makefile */
     fprintf(stderr,
-"mkamsboot Version " VERSION " - (C) Dave Chapman and Rafaël Carré 2008\n"
+"mkamsboot Version " VERSION "\n"
 "This is free software; see the source for copying conditions.  There is NO\n"
 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
 "\n");
@@ -645,7 +645,7 @@ int main(int argc, char* argv[])
     fprintf(stderr, "[INFO] Dual-boot function size:  %d bytes\n",
             bootloader_sizes[sum.model]);
     fprintf(stderr, "[INFO] UCL unpack function size: %u bytes\n",
-            sizeof(nrv2e_d8));
+            (unsigned int)sizeof(nrv2e_d8));
 
     totalsize = total_size(sum.model, of_packedsize, rb_packedsize);
 
