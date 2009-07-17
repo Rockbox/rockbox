@@ -81,9 +81,9 @@ struct storage_info
                 #define storage_present(drive) ata_present(IF_MV(drive))
             #endif
         #elif (CONFIG_STORAGE & STORAGE_SD)
-            #define storage_spindown(seconds) (void)0
-            #define storage_sleep() (void)0
-            #define storage_spin() (void)0
+            #define storage_spindown sd_spindown
+            #define storage_sleep sd_sleep
+            #define storage_spin sd_spin
     
             #define storage_enable(on) sd_enable(on)
             #define storage_sleepnow() sd_sleepnow()
@@ -105,9 +105,9 @@ struct storage_info
                 #define storage_present(drive) sd_present(IF_MV(drive))
             #endif
          #elif (CONFIG_STORAGE & STORAGE_MMC)
-            #define storage_spindown(seconds) (void)0
-            #define storage_sleep() (void)0
-            #define storage_spin() (void)0
+            #define storage_spindown mmc_spindown
+            #define storage_sleep mmc_sleep
+            #define storage_spin mmc_spin
     
             #define storage_enable(on) mmc_enable(on)
             #define storage_sleepnow() mmc_sleepnow()
@@ -129,9 +129,9 @@ struct storage_info
                 #define storage_present(drive) mmc_present(IF_MV(drive))
             #endif
         #elif (CONFIG_STORAGE & STORAGE_NAND)
-            #define storage_spindown(seconds) (void)0
-            #define storage_sleep() (void)0
-            #define storage_spin() (void)0
+            #define storage_spindown nand_spindown
+            #define storage_sleep nand_sleep
+            #define storage_spin nand_spin
     
             #define storage_enable(on) (void)0
             #define storage_sleepnow() nand_sleepnow()

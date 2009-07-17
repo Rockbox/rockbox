@@ -685,6 +685,34 @@ int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const 
     return -1;
 }
 
+void nand_spindown(int seconds)
+{
+    /* null */
+    (void)seconds;
+}
+
+bool nand_disk_is_active(void)
+{
+    /* null */
+    return false;
+}
+
+void nand_sleep(void)
+{
+    /* null */
+}
+
+void nand_spin(void)
+{
+    /* null */
+}
+
+int nand_soft_reset(void)
+{
+    /* null */
+    return 0;
+}
+
 void nand_enable(bool on)
 {
     /* null - flash controller is enabled/disabled as needed. */

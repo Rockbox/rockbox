@@ -3596,9 +3596,7 @@ int play_file(char* filename)
             if (free_space <= 0)
             {
                 filling = false;
-#ifdef HAVE_DISK_STORAGE
                 rb->storage_sleep();
-#endif
             }
             else
             {

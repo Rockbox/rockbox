@@ -173,9 +173,7 @@ void load_settings(void){
             draw_message(display, MESSAGE_ERRLOAD, 1);
         display->update();
     }
-#ifdef HAVE_DISK_STORAGE
     rb->storage_sleep();
-#endif
     rb->sleep(HZ);
 }
 

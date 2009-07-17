@@ -172,9 +172,7 @@ static inline void disk_buf_buffer(void)
         if (!stream_get_window(&sw))
         {
             disk_buf.state = TSTATE_DATA;
-#ifdef HAVE_DISK_STORAGE
             rb->storage_sleep();
-#endif
             break;
         }
 
@@ -189,9 +187,7 @@ static inline void disk_buf_buffer(void)
             /* Free space is less than one page */
             disk_buf.state = TSTATE_DATA;
             disk_buf.low_wm = DISK_BUF_LOW_WATERMARK;
-#ifdef HAVE_DISK_STORAGE
             rb->storage_sleep();
-#endif
             break;
         }
 
@@ -213,9 +209,7 @@ static inline void disk_buf_buffer(void)
             {
                 /* Error or end of stream */
                 disk_buf.state = TSTATE_EOS;
-#ifdef HAVE_DISK_STORAGE
                 rb->storage_sleep();
-#endif
                 break;
             }
 
