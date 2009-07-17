@@ -78,9 +78,11 @@
 
 /* choose the lcd orientation. CONFIG_ORIENTATION defined in config.h */
 #if 0
+/* This is the Portrait setup */
 #define LCD_WIDTH  LCD_NATIVE_WIDTH
 #define LCD_HEIGHT LCD_NATIVE_HEIGHT
 #else
+/* This is the Landscape setup */
 #define LCD_WIDTH  LCD_NATIVE_HEIGHT
 #define LCD_HEIGHT LCD_NATIVE_WIDTH
 #endif
@@ -116,19 +118,6 @@
 #define CONFIG_KEYPAD MROBE500_PAD
 #define HAVE_TOUCHSCREEN
 #define HAVE_BUTTON_DATA
-
-/* M66591 register base */
-#define M66591_BASE 0x60000000
-
-/* enable these for the usb stack */
-#define CONFIG_USBOTG       USBOTG_M66591
-#define USE_ROCKBOX_USB
-#define HAVE_USBSTACK
-#define USB_STORAGE
-/* usb stack and driver settings */
-#define USB_NUM_ENDPOINTS   7
-#define USB_VENDOR_ID       0x07b4
-#define USB_PRODUCT_ID      0x0281
 
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST
@@ -168,7 +157,12 @@
 #define CODEC_SIZE 0x100000
 
 /* The number of bytes reserved for loadable plugins */
+#if LCD_NATIVE_WIDTH < 480
 #define PLUGIN_BUFFER_SIZE 0x100000
+#else
+/* THe larger screen needs larger bitmaps in plugins */
+#define PLUGIN_BUFFER_SIZE 0x200000
+#endif
 
 #define HW_SAMPR_CAPS SAMPR_CAP_44
 
@@ -190,6 +184,19 @@
 #define HAVE_TSC2100
 
 #ifndef SIMULATOR
+
+/* M66591 register base */
+#define M66591_BASE 0x60000000
+
+/* enable these for the usb stack */
+#define CONFIG_USBOTG       USBOTG_M66591
+#define USE_ROCKBOX_USB
+//#define USB_ENABLE_SERIAL
+#define HAVE_USBSTACK
+/* usb stack and driver settings */
+#define USB_NUM_ENDPOINTS   7
+#define USB_VENDOR_ID       0x07b4
+#define USB_PRODUCT_ID      0x0281
 
 /* Define this if hardware supports alternate blitting */
 #define HAVE_LCD_MODES LCD_MODE_RGB565 | LCD_MODE_YUV | LCD_MODE_PAL256
