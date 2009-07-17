@@ -36,7 +36,7 @@ int ramdisk_read_sectors(IF_MV2(int drive,)
                      int count,
                      void* buf)
 {
-    if(start+count>=NUM_SECTORS)
+    if(start+count>NUM_SECTORS)
     {
         return -1;
     }
@@ -49,7 +49,7 @@ int ramdisk_write_sectors(IF_MV2(int drive,)
                       int count,
                       const void* buf)
 {
-    if(start+count>=NUM_SECTORS)
+    if(start+count>NUM_SECTORS)
     {
         return -1;
     }
