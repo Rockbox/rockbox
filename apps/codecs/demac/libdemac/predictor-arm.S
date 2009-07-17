@@ -61,13 +61,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 @ Registers must start with an even register, and must be consecutive.
 
 .macro LDR2OFS reg1, reg2, base, offset
-#if ARM_ARCH >= 5
+#if ARM_ARCH >= 6
     ldrd    \reg1, [\base, \offset]
-#else /* ARM_ARCH < 5 */
+#else /* ARM_ARCH < 6 */
 #ifdef CPU_ARM7TDMI
     add     \reg1, \base, \offset
     ldmia   \reg1, {\reg1, \reg2}
-#else
+#else /* ARM9 (v4 and v5) is faster this way */
     ldr     \reg1, [\base, \offset]
     ldr     \reg2, [\base, \offset+4]
 #endif
@@ -78,7 +78,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 @ Registers must start with an even register, and must be consecutive.
 
 .macro STR2OFS reg1, reg2, base, offset
-#if ARM_ARCH >= 5
+#if ARM_ARCH >= 6
     strd    \reg1, [\base, \offset]
 #else
     str     \reg1, [\base, \offset]
