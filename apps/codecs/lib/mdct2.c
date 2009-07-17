@@ -362,7 +362,7 @@ void mdct_backward(int n, int32_t *in, int32_t *out) {
   int step;
   for (shift=6;!(n&(1<<shift));shift++);
   shift=13-shift;
-  step=2<<shift;
+  step=2<<shift; 
 
   /* rotate */
 

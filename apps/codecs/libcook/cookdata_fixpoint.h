@@ -43,7 +43,9 @@ typedef struct {
 #define cPI1_8 0xec83  /* 1pi/8 2^16 */
 #define cPI2_8 0xb505  /* 2pi/8 2^16 */
 #define cPI3_8 0x61f8  /* 3pi/8 2^16 */
-#endif
+
+
+
 static const FIXPU sincos_lookup[2050] = {
     /* x_i = 2^16 sin(i 2pi/8192), 2^16 cos(i 2pi/8192); i=0..1024 */
     0x0000, 0xffff,  0x0032, 0xffff,  0x0065, 0xffff,  0x0097, 0xffff,
@@ -305,6 +307,8 @@ static const FIXPU sincos_lookup[2050] = {
     0xb505, 0xb505
 };
 
+#endif
+
 static const FIXPU pow128_tab[128] = {
     /* x_i = 2^(15+i/128) */
     0x8000, 0x80b2, 0x8165, 0x8219, 0x82ce, 0x8383, 0x843a, 0x84f2, 0x85ab,
@@ -323,6 +327,7 @@ static const FIXPU pow128_tab[128] = {
     0xf132, 0xf281, 0xf3d3, 0xf525, 0xf67a, 0xf7d1, 0xf929, 0xfa84, 0xfbe0,
     0xfd3e, 0xfe9e
 };
+
 
 
 /* dither_table and quant_centroid_table.

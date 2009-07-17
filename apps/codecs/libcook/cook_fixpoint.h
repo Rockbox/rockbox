@@ -73,13 +73,54 @@ static inline FIXP fixp_pow2(FIXP x, int i)
  * @param a                     fix point value
  * @param b                     fix point fraction, 0 <= b < 1
  */
+
 static inline FIXP fixp_mult_su(FIXP a, FIXPU b)
 {
+ 
     int32_t hb = (a >> 16) * b;
     uint32_t lb = (a & 0xffff) * b;
 
     return hb + (lb >> 16) + ((lb & 0x8000) >> 15);
 }
+
+/* Faster version of the above using 32x32=64 bit multiply */
+#ifdef CPU_ARM
+#define fixmul31(x, y)  \
+    ({ int32_t __hi;  \
+       uint32_t __lo;  \
+       int32_t __result;  \
+       asm ("smull   %0, %1, %3, %4\n\t"  \
+            "movs    %2, %1, lsl #1"  \
+            : "=&r" (__lo), "=&r" (__hi), "=r" (__result)  \
+            : "%r" (x), "r" (y)  \
+            : "cc");  \
+       __result;  \
+    })
+
+#elif defined(CPU_COLDFIRE)
+static inline int32_t fixmul31(int32_t x, int32_t y)
+{
+    asm (
+        "mac.l   %[x], %[y], %%acc0  \n" /* multiply */
+        "movclr.l %%acc0, %[x]  \n"     /* get higher half */
+        : [x] "+d" (x)
+        : [y] "d"  (y)
+    );
+    return x;
+}
+#else
+static inline int32_t fixmul31(int32_t x, int32_t y)
+{
+    int64_t temp;
+
+    temp = x;
+    temp *= y;
+
+    temp >>= 31;        //16+31-16 = 31 bits
+
+    return (int32_t)temp;
+}
+#endif
 
 /* math functions taken from libavutil/common.h */
 
@@ -162,7 +203,7 @@ static inline void imlt_math(COOKContext *q, FIXP *in)
     const int n = q->samples_per_channel;
     const int step = 4 << (10 - av_log2(n));
     int i = 0, j = step>>1;
-
+    
     cook_mdct_backward(2 * n, in, q->mono_mdct_output);
 
     do {
@@ -184,30 +225,35 @@ static inline void imlt_math(COOKContext *q, FIXP *in)
 }
 #else
 #include <codecs/lib/codeclib.h>
+#include <codecs/lib/mdct_lookup.h>
 
 static inline void imlt_math(COOKContext *q, FIXP *in)
 {
     const int n = q->samples_per_channel;
-    const int step = 4 << (10 - av_log2(n));
-    int i = 0, j = step>>1;
-
+    const int step = 2 << (10 - av_log2(n));
+    int i = 0, j = 0;
+    
     mdct_backward(2 * n, in, q->mono_mdct_output);
 
     do {
         FIXP tmp = q->mono_mdct_output[i];
         
         q->mono_mdct_output[i] =
-          fixp_mult_su(-q->mono_mdct_output[n + i], sincos_lookup[j]);
-        q->mono_mdct_output[n + i] = fixp_mult_su(tmp, sincos_lookup[j+1]);
+          fixmul31(-q->mono_mdct_output[n + i], (sincos_lookup0[j]));
+          
+        q->mono_mdct_output[n + i] = fixmul31(tmp, (sincos_lookup0[j+1]) );
+            
         j += step;
+        
     } while (++i < n/2);
+
     do {
         FIXP tmp = q->mono_mdct_output[i];
         
         j -= step;
         q->mono_mdct_output[i] =
-          fixp_mult_su(-q->mono_mdct_output[n + i], sincos_lookup[j+1]);
-        q->mono_mdct_output[n + i] = fixp_mult_su(tmp, sincos_lookup[j]);
+          fixmul31(-q->mono_mdct_output[n + i], (sincos_lookup0[j+1]) );
+        q->mono_mdct_output[n + i] = fixmul31(tmp, (sincos_lookup0[j]) );
     } while (++i < n);
 }
 #endif
@@ -291,6 +337,7 @@ static inline void output_math(COOKContext *q, int16_t *out, int chan)
     int j;
 
     for (j = 0; j < q->samples_per_channel; j++) {
-        out[chan + q->nb_channels * j] = fixp_pow2(q->mono_mdct_output[j], -11);
+        out[chan + q->nb_channels * j] =
+          av_clip(fixp_pow2(q->mono_mdct_output[j], -11), -32768, 32767);
     }
 }
