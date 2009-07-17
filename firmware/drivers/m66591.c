@@ -238,7 +238,7 @@ static int mxx_transmit_receive(int endpoint) {
         
         /* Start sending data in 16-bit words */
         for (i = 0; i < (length>>1); i++) { 
-            /* This wait is dangerous in the event htat something happens to 
+            /* This wait is dangerous in the event that something happens to 
              *  the PHY pipe where it never becomes ready again, should probably
              *  add a timeout, and ideally completely remove.
              */
@@ -550,17 +550,30 @@ void usb_drv_set_test_mode(int mode) {
 int usb_drv_request_endpoint(int type, int dir) {
     int ep;
     int pipecfg = 0;
-    
-    if (type != USB_ENDPOINT_XFER_BULK)
-        return -1;
 
     /* The endpoint/pipes are hard coded: This could be more flexible */
-    if (dir == USB_DIR_IN) {
-        pipecfg |= (1<<4);
-        ep = 2;
+    if (type == USB_ENDPOINT_XFER_BULK) {
+        /* Enalbe double buffer mode */
+        pipecfg |= 1<<9; 
+        
+        if (dir == USB_DIR_IN) {
+            pipecfg |= (1<<4);
+            ep = 2;
+        } else {
+            ep = 1;
+        }
+    } else if (type == USB_ENDPOINT_XFER_INT) {
+        if (dir == USB_DIR_IN) {
+            pipecfg |= (1<<4);
+            ep = 6;
+        } else {
+            ep = 5;
+        }
     } else {
-        ep = 1;
+        /* Not a supported type */
+        return -1;
     }
+        
     
     if (!M66591_eps[ep].busy) {
         M66591_eps[ep].busy = true;
@@ -572,11 +585,12 @@ int usb_drv_request_endpoint(int type, int dir) {
     
     M66591_PIPE_CFGSEL=ep;
     
-    pipecfg |= 1<<15 | 1<<9 | 1<<8;
+    /* Enable pipe (15) and continuous transfer mode (8) */
+    pipecfg |= 1<<15 | 1<<8; 
     
     pipe_handshake(ep, PIPE_SHAKE_NAK);
 
-    // Setup the flags
+    /* Setup the flags */
     M66591_PIPE_CFGWND=pipecfg;
     
     logf("mxx: ep req ep#: %d config: 0x%04x", ep, M66591_PIPE_CFGWND);

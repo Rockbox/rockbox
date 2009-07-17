@@ -788,13 +788,12 @@ Lyre prototype 1*/
 /* Define the implemented USB transport classes */
 #if CONFIG_USBOTG == USBOTG_ISP1583
 #define USB_HAS_BULK
-#elif CONFIG_USBOTG == USBOTG_ARC
+#elif (CONFIG_USBOTG == USBOTG_ARC) || \
+    (CONFIG_USBOTG == USBOTG_JZ4740) || \
+    (CONFIG_USBOTG == USBOTG_M66591)
 #define USB_HAS_BULK
 #define USB_HAS_INTERRUPT
-#elif CONFIG_USBOTG == USBOTG_JZ4740
-#define USB_HAS_BULK
-#define USB_HAS_INTERRUPT
-#elif defined(CPU_TCC780X) || defined(CPU_TCC77X) || defined(MROBE_500)
+#elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
 #define USB_HAS_BULK
 #endif /* CONFIG_USBOTG */
 
