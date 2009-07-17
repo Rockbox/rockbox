@@ -156,6 +156,8 @@ static int io_open (lua_State *L) {
             flags = O_WRONLY | O_APPEND; break;
     }
   }
+  if((*mode == 'w' || *mode == 'a') && !rb->file_exists(filename))
+    flags |= O_CREAT;
   *pf = rb->open(filename, flags);
   return (*pf < 0) ? pushresult(L, 0, filename) : 1;
 }
