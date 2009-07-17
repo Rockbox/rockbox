@@ -539,11 +539,6 @@ Lyre prototype 1*/
 #define CONFIG_TUNER_MULTI
 #endif
 
-#if (CONFIG_STORAGE & (CONFIG_STORAGE - 1)) != 0
-/* Multiple storage drivers */
-#define CONFIG_STORAGE_MULTI
-#endif
-
 /* deactivate fading in bootloader/sim */
 #if defined(BOOTLOADER) || defined(SIMULATOR)
 #undef CONFIG_BACKLIGHT_FADING
@@ -570,6 +565,37 @@ Lyre prototype 1*/
 #endif
 
 #endif /* CONFIG_BACKLIGHT_FADING */
+
+/* Storage related config handling */
+
+#if (CONFIG_STORAGE & (CONFIG_STORAGE - 1)) != 0
+/* Multiple storage drivers */
+#define CONFIG_STORAGE_MULTI
+#endif
+
+/* Explicit HAVE_MULTIVOLUME in the config file. Allow the maximum number */
+#ifdef HAVE_MULTIVOLUME
+#define NUM_VOLUMES_PER_DRIVE 4
+#else
+#define NUM_VOLUMES_PER_DRIVE 1
+#endif
+#if defined(CONFIG_STORAGE_MULTI) && !defined(HAVE_MULTIDRIVE)
+#define HAVE_MULTIDRIVE
+#endif
+
+#if defined(HAVE_MULTIDRIVE) && !defined(HAVE_MULTIVOLUME)
+#define HAVE_MULTIVOLUME
+#endif
+
+#if defined(HAVE_MULTIDRIVE) && !defined(NUM_DRIVES)
+#error HAVE_MULTIDRIVE needs to have an explicit NUM_DRIVES
+#endif
+
+#ifndef NUM_DRIVES
+#define NUM_DRIVES 1
+#endif
+
+#define NUM_VOLUMES (NUM_DRIVES * NUM_VOLUMES_PER_DRIVE)
 
 #if defined(BOOTLOADER) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
 /* Bootloaders don't use CPU frequency adjustment */

@@ -126,7 +126,7 @@ static int current_buffer = 0;
 static const unsigned char *send_block_addr = NULL;
 
 static tCardInfo card_info[2];
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
 static int current_card = 0;
 #endif
 static bool last_mmc_status = false;
@@ -602,7 +602,7 @@ static int send_block_send(unsigned char start_token, long timeout,
     return rc;
 }
 
-int mmc_read_sectors(IF_MV2(int drive,)
+int mmc_read_sectors(IF_MD2(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
@@ -611,7 +611,7 @@ int mmc_read_sectors(IF_MV2(int drive,)
     int lastblock = 0;
     unsigned long end_block;
     tCardInfo *card;
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     int drive = current_card;
 #endif
 
@@ -688,7 +688,7 @@ int mmc_read_sectors(IF_MV2(int drive,)
     return rc;
 }
 
-int mmc_write_sectors(IF_MV2(int drive,)
+int mmc_write_sectors(IF_MD2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -697,7 +697,7 @@ int mmc_write_sectors(IF_MV2(int drive,)
     int write_cmd;
     unsigned char start_token;
     tCardInfo *card;
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     int drive = current_card;
 #endif
 
@@ -920,7 +920,7 @@ int mmc_init(void)
     led(false);
 
     last_mmc_status = mmc_detect();
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     /* Use MMC if inserted, internal flash otherwise */
     current_card = last_mmc_status ? 1 : 0;
 #endif
@@ -949,7 +949,7 @@ int mmc_init(void)
         create_thread(mmc_thread, mmc_stack,
                       sizeof(mmc_stack), 0, mmc_thread_name
                       IF_PRIO(, PRIORITY_SYSTEM)
-  		              IF_COP(, CPU));
+                      IF_COP(, CPU));
         tick_add_task(mmc_tick);
         initialized = true;
     }
@@ -965,9 +965,9 @@ long mmc_last_disk_activity(void)
 }
 
 #ifdef STORAGE_GET_INFO
-void mmc_get_info(IF_MV2(int drive,) struct storage_info *info)
+void mmc_get_info(IF_MD2(int drive,) struct storage_info *info)
 {
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     const int drive=0;
 #endif
     info->sector_size=card_info[drive].blocksize;
@@ -986,17 +986,17 @@ void mmc_get_info(IF_MV2(int drive,) struct storage_info *info)
 #endif
 
 #ifdef HAVE_HOTSWAP
-bool mmc_removable(IF_MV_NONVOID(int drive))
+bool mmc_removable(IF_MD_NONVOID(int drive))
 {
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     const int drive=0;
 #endif
     return (drive==1);
 }
 
-bool mmc_present(IF_MV_NONVOID(int drive))
+bool mmc_present(IF_MD_NONVOID(int drive))
 {
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     const int drive=0;
 #endif
     return (card_info[drive].initialized && card_info[drive].numblocks > 0);
@@ -1016,3 +1016,17 @@ void mmc_spindown(int seconds)
 {
     (void)seconds;
 }
+
+#ifdef CONFIG_STORAGE_MULTI
+int mmc_num_drives(int first_drive)
+{
+    /* We don't care which logical drive number(s) we have been assigned */
+    (void)first_drive;
+    
+#ifdef HAVE_MULTIDRIVE
+    return 2;
+#else
+    return 1;
+#endif
+}
+#endif

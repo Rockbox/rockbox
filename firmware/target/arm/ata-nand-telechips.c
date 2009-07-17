@@ -696,10 +696,10 @@ static void read_inplace_writes_cache(int bank, int phys_segment)
 }
 
 
-int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
+int nand_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     (void)drive; /* unused for now */
 #endif
 
@@ -753,11 +753,10 @@ nand_read_error:
     return ret;
 }
 
-
-int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
+int nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     (void)drive; /* unused for now */
 #endif
 
@@ -770,8 +769,12 @@ int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
 
 
 #ifdef STORAGE_GET_INFO
-void nand_get_info(struct storage_info *info)
+void nand_get_info(IF_MD2(int drive,) struct storage_info *info)
 {
+#ifdef HAVE_MULTIDRIVE
+    (void)drive; /* unused for now */
+#endif
+
     /* firmware version */
     info->revision="0.00";
 
@@ -913,3 +916,39 @@ void nand_spindown(int seconds)
 {
     (void)seconds;
 }
+
+#ifdef CONFIG_STORAGE_MULTI
+
+int nand_num_drives(int first_drive)
+{
+    /* We don't care which logical drive number we have been assigned */
+    (void)first_drive;
+    
+    return 1;
+}
+
+void nand_sleepnow(void)
+{
+}
+
+bool nand_disk_is_active(void)
+{
+    return false;
+}
+
+int nand_soft_reset(void)
+{
+    return 0;
+}
+
+int nand_spinup_time(void)
+{
+    return 0;
+}
+
+void nand_enable(bool onoff)
+{
+    (void)onoff;
+}
+
+#endif /* CONFIG_STORAGE_MULTI */

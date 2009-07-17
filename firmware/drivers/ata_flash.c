@@ -384,7 +384,7 @@ int flash_disk_read_sectors(unsigned long start,
     return done;
 }
 
-int nand_read_sectors(IF_MV2(int drive,)
+int nand_read_sectors(IF_MD2(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
@@ -401,7 +401,7 @@ int nand_read_sectors(IF_MV2(int drive,)
     return 0;
 }
 
-int nand_write_sectors(IF_MV2(int drive,)
+int nand_write_sectors(IF_MD2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -469,6 +469,16 @@ void nand_get_info(struct storage_info *info)
     info->sector_size=SECTOR_SIZE;
 
     info->serial=0;
+}
+#endif
+
+#ifdef CONFIG_STORAGE_MULTI
+int nand_num_drives(int first_drive)
+{
+    /* We don't care which logical drive number(s) we have been assigned */
+    (void)first_drive;
+    
+    return 1;
 }
 #endif
 

@@ -46,7 +46,7 @@ void nand_led(bool onoff)
     led(onoff);
 }
 
-int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
+int nand_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
     (void)start;
@@ -55,7 +55,7 @@ int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     return 0;
 }
 
-int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
+int nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
     (void)start;
@@ -82,7 +82,7 @@ void nand_enable(bool on)
     (void)on;
 }
 
-void nand_get_info(IF_MV2(int drive,) struct storage_info *info)
+void nand_get_info(IF_MD2(int drive,) struct storage_info *info)
 {
     (void)info;
 }
@@ -98,3 +98,12 @@ int nand_init(void)
     return 0;
 }
 
+#ifdef CONFIG_STORAGE_MULTI
+int nand_num_drives(int first_drive)
+{
+    /* We don't care which logical drive number(s) we have been assigned */
+    (void)first_drive;
+    
+    return 1;
+}
+#endif

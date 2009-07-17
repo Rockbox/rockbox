@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h" /* for HAVE_MULTIVOLUME */
+#include "config.h" /* for HAVE_MULTIDRIVE */
 #include "fat.h"
 #include "hotswap.h"
 #ifdef HAVE_HOTSWAP
@@ -166,10 +166,10 @@ struct sd_card_status
     int retry_max;
 };
 
-static struct sd_card_status sd_status[NUM_VOLUMES] =
+static struct sd_card_status sd_status[NUM_DRIVES] =
 {
     { 0, 1  },
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     { 0, 10 }
 #endif
 };
@@ -839,10 +839,10 @@ static void sd_select_device(int card_no)
 
 /* API Functions */
 
-int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
+int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     const int drive = 0;
 #endif
     int ret;
@@ -956,13 +956,13 @@ sd_read_error:
     }
 }
 
-int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
+int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
 /* Write support is not finished yet */
 /* TODO: The standard suggests using ACMD23 prior to writing multiple blocks
    to improve performance */
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     const int drive = 0;
 #endif
     int ret;
@@ -1330,19 +1330,33 @@ long sd_last_disk_activity(void)
 }
 
 #ifdef HAVE_HOTSWAP
-bool sd_removable(IF_MV_NONVOID(int drive))
+bool sd_removable(IF_MD_NONVOID(int drive))
 {
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     const int drive=0;
 #endif
     return (drive==1);
 }
 
-bool sd_present(IF_MV_NONVOID(int drive))
+bool sd_present(IF_MD_NONVOID(int drive))
 {
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     const int drive=0;
 #endif
     return (card_info[drive].initialized && card_info[drive].numblocks > 0);
+}
+#endif
+
+#ifdef CONFIG_STORAGE_MULTI
+int sd_num_drives(int first_drive)
+{
+    /* We don't care which logical drive number(s) we have been assigned */
+    (void)first_drive;
+    
+#ifdef HAVE_MULTIDRIVE
+    return 2;
+#else
+    return 1;
+#endif
 }
 #endif

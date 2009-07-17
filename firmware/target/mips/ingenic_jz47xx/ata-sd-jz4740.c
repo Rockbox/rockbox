@@ -1328,6 +1328,31 @@ long sd_last_disk_activity(void)
     return last_disk_activity;
 }
 
+int sd_spinup_time(void)
+{
+    return 0;
+}
+
+void sd_enable(bool on)
+{
+    (void)on;
+}
+
+void sd_sleepnow(void)
+{
+}
+
+/* TODO */
+bool sd_disk_is_active(void)
+{
+    return false;
+}
+
+int sd_soft_reset(void)
+{
+    return 0;
+}
+
 #ifdef HAVE_HOTSWAP
 bool sd_removable(IF_MV_NONVOID(int drive))
 {
@@ -1346,3 +1371,13 @@ bool sd_present(IF_MV_NONVOID(int drive))
 #endif
     return (card.numblocks > 0 && card_detect_target());
 }
+
+#ifdef CONFIG_STORAGE_MULTI
+int sd_num_drives(int first_drive)
+{
+    /* We don't care which logical drive number(s) we have been assigned */
+    (void)first_drive;
+    
+    return 1;
+}
+#endif

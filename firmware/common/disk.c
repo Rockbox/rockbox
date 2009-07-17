@@ -44,8 +44,8 @@
    12-15: nr of sectors in partition
 */
 
-#define BYTES2INT32(array,pos)					\
-    ((long)array[pos] | ((long)array[pos+1] << 8 ) |		\
+#define BYTES2INT32(array,pos)                  \
+    ((long)array[pos] | ((long)array[pos+1] << 8 ) |        \
      ((long)array[pos+2] << 16 ) | ((long)array[pos+3] << 24 ))
 
 static const unsigned char fat_partition_types[] = {
@@ -58,18 +58,18 @@ static const unsigned char fat_partition_types[] = {
 #endif
 };
 
-static struct partinfo part[8]; /* space for 4 partitions on 2 drives */
+static struct partinfo part[NUM_DRIVES*4]; /* space for 4 partitions on 2 drives */
 static int vol_drive[NUM_VOLUMES]; /* mounted to which drive (-1 if none) */
 
 #ifdef MAX_LOG_SECTOR_SIZE
 int disk_sector_multiplier = 1;
 #endif
 
-struct partinfo* disk_init(IF_MV_NONVOID(int drive))
+struct partinfo* disk_init(IF_MD_NONVOID(int drive))
 {
     int i;
     unsigned char sector[512];
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     /* For each drive, start at a different position, in order not to destroy 
        the first entry of drive 0. 
        That one is needed to calculate config sector position. */
@@ -115,7 +115,7 @@ struct partinfo* disk_partinfo(int partition)
 
 int disk_mount_all(void)
 {
-    int mounted;
+    int mounted=0;
     int i;
     
 #ifdef HAVE_HOTSWAP
@@ -126,13 +126,19 @@ int disk_mount_all(void)
     for (i=0; i<NUM_VOLUMES; i++)
         vol_drive[i] = -1; /* mark all as unassigned */
 
+#ifndef HAVE_MULTIDRIVE
     mounted = disk_mount(0);
-#ifdef HAVE_HOTSWAP
-    if (card_detect())
+#else
+    for(i=0;i<NUM_DRIVES;i++)
     {
-        mounted += disk_mount(1); /* try 2nd "drive", too */
+#ifdef HAVE_HOTSWAP
+        if (storage_present(i))
+#endif
+            mounted += disk_mount(i); 
     }
+#endif
 
+#ifdef HAVE_HOTSWAP
     card_enable_monitoring(true);
 #endif
 
@@ -155,7 +161,7 @@ int disk_mount(int drive)
 {
     int mounted = 0; /* reset partition-on-drive flag */
     int volume = get_free_volume();
-    struct partinfo* pinfo = disk_init(IF_MV(drive));
+    struct partinfo* pinfo = disk_init(IF_MD(drive));
 
     if (pinfo == NULL)
     {
@@ -166,7 +172,7 @@ int disk_mount(int drive)
 #else
     int i = 0;
 #endif
-    for (; volume != -1 && i<4; i++)
+    for (; volume != -1 && i<4 && mounted<NUM_VOLUMES_PER_DRIVE; i++)
     {
         if (memchr(fat_partition_types, pinfo[i].type,
                    sizeof(fat_partition_types)) == NULL)
@@ -177,7 +183,7 @@ int disk_mount(int drive)
         
         for (j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
         {
-            if (!fat_mount(IF_MV2(volume,) IF_MV2(drive,) pinfo[i].start * j))
+            if (!fat_mount(IF_MV2(volume,) IF_MD2(drive,) pinfo[i].start * j))
             {
                 pinfo[i].start *= j;
                 pinfo[i].size *= j;
@@ -190,7 +196,7 @@ int disk_mount(int drive)
             }
         }
 #else
-        if (!fat_mount(IF_MV2(volume,) IF_MV2(drive,) pinfo[i].start))
+        if (!fat_mount(IF_MV2(volume,) IF_MD2(drive,) pinfo[i].start))
         {
             mounted++;
             vol_drive[volume] = drive; /* remember the drive for this volume */
@@ -202,7 +208,7 @@ int disk_mount(int drive)
     if (mounted == 0 && volume != -1) /* none of the 4 entries worked? */
     {   /* try "superfloppy" mode */
         DEBUGF("No partition found, trying to mount sector 0.\n");
-        if (!fat_mount(IF_MV2(volume,) IF_MV2(drive,) 0))
+        if (!fat_mount(IF_MV2(volume,) IF_MD2(drive,) 0))
         {
             mounted = 1;
             vol_drive[volume] = drive; /* remember the drive for this volume */

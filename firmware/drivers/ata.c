@@ -307,7 +307,7 @@ static int _read_sectors(unsigned long start,
                          int incount,
                          void* inbuf)
 #else
-int ata_read_sectors(IF_MV2(int drive,)
+int ata_read_sectors(IF_MD2(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
@@ -323,7 +323,7 @@ int ata_read_sectors(IF_MV2(int drive,)
 #endif
 
 #ifndef MAX_PHYS_SECTOR_SIZE
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     (void)drive; /* unused for now */
 #endif
     mutex_lock(&ata_mtx);
@@ -555,7 +555,7 @@ static int _write_sectors(unsigned long start,
                           int count,
                           const void* buf)
 #else
-int ata_write_sectors(IF_MV2(int drive,)
+int ata_write_sectors(IF_MD2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -569,7 +569,7 @@ int ata_write_sectors(IF_MV2(int drive,)
 #endif
 
 #ifndef MAX_PHYS_SECTOR_SIZE
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     (void)drive; /* unused for now */
 #endif
     mutex_lock(&ata_mtx);
@@ -728,7 +728,7 @@ static inline int flush_current_sector(void)
                           sector_cache.data);
 }
 
-int ata_read_sectors(IF_MV2(int drive,)
+int ata_read_sectors(IF_MD2(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
@@ -736,7 +736,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     int rc = 0;
     int offset;
 
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     (void)drive; /* unused for now */
 #endif
     mutex_lock(&ata_mtx);
@@ -794,7 +794,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     return rc;
 }
 
-int ata_write_sectors(IF_MV2(int drive,)
+int ata_write_sectors(IF_MD2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -802,7 +802,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     int rc = 0;
     int offset;
 
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     (void)drive; /* unused for now */
 #endif
     mutex_lock(&ata_mtx);
@@ -1503,7 +1503,7 @@ int ata_init(void)
         create_thread(ata_thread, ata_stack,
                       sizeof(ata_stack), 0, ata_thread_name
                       IF_PRIO(, PRIORITY_USER_INTERFACE)
-		              IF_COP(, CPU));
+                      IF_COP(, CPU));
         initialized = true;
 
     }
@@ -1552,12 +1552,15 @@ int ata_spinup_time(void)
 }
 
 #ifdef STORAGE_GET_INFO
-void ata_get_info(struct storage_info *info)
+void ata_get_info(IF_MD2(int drive,)struct storage_info *info)
 {
     unsigned short *src,*dest;
     static char vendor[8];
     static char product[16];
     static char revision[4];
+#ifdef HAVE_MULTIDRIVE
+    (void)drive; /* unused for now */
+#endif
     int i;
     info->sector_size = SECTOR_SIZE;
     info->num_sectors= total_sectors;
@@ -1593,5 +1596,15 @@ int ata_get_dma_mode(void)
 void ata_keep_active(void)
 {
     last_disk_activity = current_tick;
+}
+#endif
+
+#ifdef CONFIG_STORAGE_MULTI
+int ata_num_drives(int first_drive)
+{
+    /* We don't care which logical drive number(s) we have been assigned */
+    (void)first_drive;
+    
+    return 1;
 }
 #endif

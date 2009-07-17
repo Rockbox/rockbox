@@ -31,11 +31,14 @@ unsigned char ramdisk[SECTOR_SIZE * NUM_SECTORS];
 
 long last_disk_activity = -1;
 
-int ramdisk_read_sectors(IF_MV2(int drive,)
+int ramdisk_read_sectors(IF_MD2(int drive,)
                      unsigned long start,
                      int count,
                      void* buf)
 {
+#ifdef HAVE_MULTIDRIVE
+    (void)drive; /* unused for now */
+#endif
     if(start+count>NUM_SECTORS)
     {
         return -1;
@@ -44,11 +47,14 @@ int ramdisk_read_sectors(IF_MV2(int drive,)
     return 0;
 }
 
-int ramdisk_write_sectors(IF_MV2(int drive,)
+int ramdisk_write_sectors(IF_MD2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
 {
+#ifdef HAVE_MULTIDRIVE
+    (void)drive; /* unused for now */
+#endif
     if(start+count>NUM_SECTORS)
     {
         return -1;
@@ -79,13 +85,36 @@ void ramdisk_sleepnow(void)
 {
 }
 
+void ramdisk_enable(bool on)
+{
+    (void)on;
+}
+
+bool ramdisk_disk_is_active(void)
+{
+    return true;
+}
+
+int ramdisk_soft_reset(void)
+{
+    return 0;
+}
+
+int ramdisk_spinup_time(void)
+{
+    return 0;
+}
+
 void ramdisk_spindown(int seconds)
 {
     (void)seconds;
 }
 #ifdef STORAGE_GET_INFO
-void ramdisk_get_info(IF_MV2(int drive,) struct storage_info *info)
+void ramdisk_get_info(IF_MD2(int drive,) struct storage_info *info)
 {
+#ifdef HAVE_MULTIDRIVE
+    (void)drive; /* unused for now */
+#endif
     /* firmware version */
     info->revision="0.00";
 
@@ -99,4 +128,15 @@ void ramdisk_get_info(IF_MV2(int drive,) struct storage_info *info)
     info->sector_size=SECTOR_SIZE;
 }
 #endif
+
+#ifdef CONFIG_STORAGE_MULTI
+int ramdisk_num_drives(int first_drive)
+{
+    /* We don't care which logical drive number(s) we have been assigned */
+    (void)first_drive;
+    
+    return 1;
+}
+#endif
+
 

@@ -125,8 +125,8 @@ void GIO2(void)
 
 #define VFAT_SECTOR_SIZE(x) ( (x)/0x8000 ) /* 1GB array requires 80kB of RAM */
 
-extern int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
-extern int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
+extern int ata_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
+extern int ata_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);
 
 struct main_header
 {
@@ -378,14 +378,14 @@ static inline unsigned long map_sector(unsigned long sector)
     return cfs_start+sectors[sector/64]*64+sector%64;
 }
 
-int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
+int ata_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf)
 {
     if(!cfs_inited)
         cfs_init();
 
     /* Check if count is lesser than or equal to 1 native CFS sector */
     if(count <= 64)
-        return _ata_read_sectors(IF_MV2(drive,) map_sector(start), count, buf);
+        return _ata_read_sectors(IF_MD2(drive,) map_sector(start), count, buf);
     else
     {
         int i, ret;
@@ -394,7 +394,7 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* bu
         /* Read sectors in parts of 0x8000 */
         for(i=0; i<count; i+=64)
         {
-            ret = _ata_read_sectors(IF_MV2(drive,) map_sector(start+i), (count-i >= 64 ? 64 : count-i), (void*)dest);
+            ret = _ata_read_sectors(IF_MD2(drive,) map_sector(start+i), (count-i >= 64 ? 64 : count-i), (void*)dest);
             if(ret != 0)
                 return ret;
 
@@ -405,7 +405,7 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* bu
     }
 }
 
-int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
+int ata_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf)
 {
     if(!cfs_inited)
         cfs_init();
@@ -413,7 +413,7 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const v
 #if 0 /* Disabled for now */
     /* Check if count is lesser than or equal to 1 native CFS sector */
     if(count <= 64)
-        return _ata_write_sectors(IF_MV2(drive,) map_sector(start), count, buf);
+        return _ata_write_sectors(IF_MD2(drive,) map_sector(start), count, buf);
     else
     {
         int i, ret;
@@ -422,7 +422,7 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const v
         /* Read sectors in parts of 0x8000 */
         for(i=0; i<count; i+=64)
         {
-            ret = _ata_write_sectors(IF_MV2(drive,) map_sector(start+i), (count-i >= 64 ? 64 : count-i), (const void*)dest);
+            ret = _ata_write_sectors(IF_MD2(drive,) map_sector(start+i), (count-i >= 64 ? 64 : count-i), (const void*)dest);
             if(ret != 0)
                 return ret;
 

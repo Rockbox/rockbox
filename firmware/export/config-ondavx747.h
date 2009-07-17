@@ -42,14 +42,16 @@
 //#define HAVE_ATA_SD
 //#define HAVE_HOTSWAP
 
-//#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
-#define CONFIG_STORAGE STORAGE_SD
+#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
 
 /* Support FAT16 for SD cards <= 2GB */
 #define HAVE_FAT16SUPPORT
 
 /* ChinaChip NAND FTL */
 #define CONFIG_NAND NAND_CC
+
+#define HAVE_MULTIDRIVE
+#define NUM_DRIVES 2
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP

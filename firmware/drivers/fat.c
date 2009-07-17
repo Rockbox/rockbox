@@ -167,7 +167,9 @@ struct bpb
                                  * of first pseudo cluster */
 #endif /* #ifdef HAVE_FAT16SUPPORT */
 #ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     int drive; /* on which physical device is this located */
+#endif
     bool mounted; /* flag if this volume is mounted */
 #endif
 };
@@ -285,7 +287,7 @@ void fat_init(void)
 #endif
 }
 
-int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
+int fat_mount(IF_MV2(int volume,) IF_MD2(int drive,) long startsector)
 {
 #ifndef HAVE_MULTIVOLUME
     const int volume = 0;
@@ -309,7 +311,7 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
 
     memset(fat_bpb, 0, sizeof(struct bpb));
     fat_bpb->startsector    = startsector;
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     fat_bpb->drive          = drive;
 #endif
 

@@ -707,6 +707,21 @@ void nand_enable(bool on)
     (void)on;
 }
 
+/* TODO */
+long nand_last_disk_activity(void)
+{
+    return 0;
+}
+
+int nand_spinup_time(void)
+{
+    return 0;
+}
+
+void nand_sleepnow(void)
+{
+}
+
 #ifdef STORAGE_GET_INFO
 void nand_get_info(IF_MV2(int drive,) struct storage_info *info)
 {
@@ -723,5 +738,15 @@ void nand_get_info(IF_MV2(int drive,) struct storage_info *info)
     /* blocks count */
     info->num_sectors = bank_size * nr_banks;
     info->sector_size = 512;
+}
+#endif
+
+#ifdef CONFIG_STORAGE_MULTI
+int nand_num_drives(int first_drive)
+{
+    /* We don't care which logical drive number(s) we have been assigned */
+    (void)first_drive;
+    
+    return 1;
 }
 #endif

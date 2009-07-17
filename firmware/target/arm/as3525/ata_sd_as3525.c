@@ -24,7 +24,7 @@
 
 /* TODO: Find the real capacity of >2GB models (will be useful for USB) */
 
-#include "config.h" /* for HAVE_MULTIVOLUME & AMS_OF_SIZE */
+#include "config.h" /* for HAVE_MULTIDRIVE & AMS_OF_SIZE */
 #include "fat.h"
 #include "thread.h"
 #include "led.h"
@@ -88,9 +88,9 @@
 #define     INTERNAL_AS3525 0   /* embedded SD card */
 #define     SD_SLOT_AS3525   1   /* SD slot if present */
 
-static const int pl180_base[NUM_VOLUMES] = {
+static const int pl180_base[NUM_DRIVES] = {
             NAND_FLASH_BASE
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
             , SD_MCI_BASE
 #endif
 };
@@ -101,7 +101,7 @@ static void init_pl180_controller(const int drive);
 #define SECTOR_SIZE     512 /* XXX: different sector sizes ? */
 #define BLOCKS_PER_BANK 0x7a7800
 
-static tCardInfo card_info[NUM_VOLUMES];
+static tCardInfo card_info[NUM_DRIVES];
 
 /* maximum timeouts recommanded in the SD Specification v2.00 */
 #define SD_MAX_READ_TIMEOUT     ((AS3525_PCLK_FREQ) / 1000 * 100) /* 100 ms */
@@ -169,7 +169,7 @@ void INT_NAND(void)
     MCI_CLEAR(INTERNAL_AS3525) = status;
 }
 
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
 void INT_MCI0(void)
 {
     const int status = MCI_STATUS(SD_SLOT_AS3525);
@@ -436,7 +436,7 @@ static void init_pl180_controller(const int drive)
 
     MCI_MASK0(drive) = MCI_MASK1(drive) = MCI_ERROR | MCI_DATA_END;
 
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     VIC_INT_ENABLE |=
         (drive == INTERNAL_AS3525) ? INTERRUPT_NAND : INTERRUPT_MCI0;
 
@@ -478,7 +478,7 @@ int sd_init(void)
 
 
     CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
     CCU_IO &= ~(1<<3);           /* bits 3:2 = 01, xpd is SD interface */
     CCU_IO |= (1<<2);
@@ -490,7 +490,7 @@ int sd_init(void)
     ret = sd_init_card(INTERNAL_AS3525);
     if(ret < 0)
         return ret;
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     init_pl180_controller(SD_SLOT_AS3525);
 #endif
 
@@ -509,17 +509,17 @@ int sd_init(void)
 }
 
 #ifdef HAVE_HOTSWAP
-bool sd_removable(IF_MV_NONVOID(int drive))
+bool sd_removable(IF_MD_NONVOID(int drive))
 {
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     const int drive=0;
 #endif
     return (drive==1);
 }
 
-bool sd_present(IF_MV_NONVOID(int drive))
+bool sd_present(IF_MD_NONVOID(int drive))
 {
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     const int drive=0;
 #endif
     return (card_info[drive].initialized && card_info[drive].numblocks > 0);
@@ -619,10 +619,10 @@ static int sd_select_bank(signed char bank)
     return 0;
 }
 
-static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
+static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                                int count, void* buf, const bool write)
 {
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     const int drive = 0;
 #endif
     int ret = 0;
@@ -774,18 +774,18 @@ sd_transfer_error:
     return ret;
 }
 
-int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count,
+int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
                      void* buf)
 {
-    return sd_transfer_sectors(IF_MV2(drive,) start, count, buf, false);
+    return sd_transfer_sectors(IF_MD2(drive,) start, count, buf, false);
 }
 
-int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
+int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                      const void* buf)
 {
 
 #ifdef BOOTLOADER /* we don't need write support in bootloader */
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     (void) drive;
 #endif
     (void) start;
@@ -793,7 +793,7 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
     (void) buf;
     return -1;
 #else
-    return sd_transfer_sectors(IF_MV2(drive,) start, count, (void*)buf, true);
+    return sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
 #endif
 }
 
@@ -807,7 +807,7 @@ void sd_enable(bool on)
 {
     /* buttonlight AMSes need a bit of special handling for the buttonlight here,
      * due to the dual mapping of GPIOD and XPD */
-#if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIVOLUME)
+#if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
     extern int buttonlight_is_on;
 #endif
     if (sd_enabled == on)
@@ -815,7 +815,7 @@ void sd_enable(bool on)
     if(on)
     {
         CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
         CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
 #ifdef HAVE_BUTTON_LIGHT
         CCU_IO |= (1<<2);
@@ -832,7 +832,7 @@ void sd_enable(bool on)
     else
     {
         CGU_PERI &= ~CGU_NAF_CLOCK_ENABLE;
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
 #ifdef HAVE_BUTTON_LIGHT
         CCU_IO &= ~(1<<2);
         if (buttonlight_is_on)
@@ -882,3 +882,17 @@ void card_enable_monitoring_target(bool on)
 #endif
 
 #endif /* BOOTLOADER */
+
+#ifdef CONFIG_STORAGE_MULTI
+int sd_num_drives(int first_drive)
+{
+    /* We don't care which logical drive number(s) we have been assigned */
+    (void)first_drive;
+    
+#ifdef HAVE_MULTIDRIVE
+    return 2;
+#else
+    return 1;
+#endif
+}
+#endif

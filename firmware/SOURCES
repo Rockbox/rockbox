@@ -126,19 +126,28 @@ drivers/touchscreen.c
 #ifndef SIMULATOR
 #if (CONFIG_STORAGE & STORAGE_MMC)
 drivers/ata_mmc.c
-#elif (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_IFP7XX)
+#endif
+#if (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_IFP7XX)
 drivers/ata_flash.c
-#elif (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_TCC)
+#endif
+#if (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_TCC)
 target/arm/ata-nand-telechips.c
-#elif (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_SAMSUNG)
+#endif
+#if (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_SAMSUNG)
 target/arm/s5l8700/ata-nand-s5l8700.c
-#elif (CONFIG_STORAGE & STORAGE_ATA)
+#endif
+#if (CONFIG_STORAGE & STORAGE_ATA)
 drivers/ata.c
-#elif (CONFIG_STORAGE & STORAGE_SD)
+#endif
+#if (CONFIG_STORAGE & STORAGE_SD)
 drivers/sd.c
-#elif (CONFIG_STORAGE & STORAGE_RAMDISK)
+#endif
+#if (CONFIG_STORAGE & STORAGE_RAMDISK)
 drivers/ramdisk.c
-#endif /* CONFIG_STORAGE */
+#endif
+#ifdef CONFIG_STORAGE_MULTI
+storage.c
+#endif
 drivers/fat.c
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
 hotswap.c

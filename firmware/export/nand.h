@@ -23,25 +23,31 @@
 #define __NAND_H__
 
 #include <stdbool.h>
-#include "mv.h" /* for HAVE_MULTIVOLUME or not */
+#include "mv.h" /* for HAVE_MULTIDRIVE or not */
 
 struct storage_info;
 
 void nand_enable(bool on);
 void nand_spindown(int seconds);
 void nand_sleep(void);
+void nand_sleepnow(void);
 bool nand_disk_is_active(void);
-int nand_soft_reset(void);
-int nand_init(void);
+int  nand_soft_reset(void);
+int  nand_init(void);
 void nand_close(void);
-int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
-int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
+int  nand_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
+int  nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);
 void nand_spin(void);
+int  nand_spinup_time(void); /* ticks */
 
 #ifdef STORAGE_GET_INFO
-void nand_get_info(IF_MV2(int drive,) struct storage_info *info);
+void nand_get_info(IF_MD2(int drive,) struct storage_info *info);
 #endif
 
 long nand_last_disk_activity(void);
+
+#ifdef CONFIG_STORAGE_MULTI
+int nand_num_drives(int first_drive);
+#endif
 
 #endif

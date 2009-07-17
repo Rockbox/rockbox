@@ -153,8 +153,7 @@ struct inquiry_data {
 struct report_lun_data {
     unsigned int lun_list_length;
     unsigned int reserved1;
-    // TODO this should be cleaned up with the VOLUMES vs DRIVES mess
-    unsigned char luns[NUM_VOLUMES][8];
+    unsigned char luns[NUM_DRIVES][8];
 } __attribute__ ((packed));
 
 struct sense_data {
@@ -271,10 +270,10 @@ static void send_command_result(void *data,int size);
 static void send_command_failed_result(void);
 static void send_block_data(void *data,int size);
 static void receive_block_data(void *data,int size);
-static void fill_inquiry(IF_MV_NONVOID(int lun));
+static void fill_inquiry(IF_MD_NONVOID(int lun));
 static void send_and_read_next(void);
-static bool ejected[NUM_VOLUMES];
-static bool locked[NUM_VOLUMES];
+static bool ejected[NUM_DRIVES];
+static bool locked[NUM_DRIVES];
 
 static int usb_interface;
 static int ep_in, ep_out;
@@ -309,7 +308,7 @@ static void fix_mbr(unsigned char* mbr)
 }
 #endif
 
-static bool check_disk_present(IF_MV_NONVOID(int volume))
+static bool check_disk_present(IF_MD_NONVOID(int volume))
 {
 #ifdef USB_USE_RAMDISK
     return true;
@@ -325,7 +324,7 @@ void usb_storage_try_release_storage(void)
        release excusive access */
     bool canrelease=true;
     int i;
-    for(i=0;i<NUM_VOLUMES;i++) {
+    for(i=0;i<storage_num_drives();i++) {
         if(ejected[i]==false && locked[i]==true) {
             canrelease=false;
             break;
@@ -341,7 +340,7 @@ void usb_storage_try_release_storage(void)
 void usb_storage_notify_hotswap(int volume,bool inserted)
 {
     logf("notify %d",inserted);
-    if(inserted && check_disk_present(IF_MV(volume))) {
+    if(inserted && check_disk_present(IF_MD(volume))) {
         ejected[volume] = false;
     }
     else {
@@ -436,7 +435,7 @@ void usb_storage_init_connection(void)
     usb_drv_recv(ep_out, cbw_buffer, 1024);
 
     int i;
-    for(i=0;i<NUM_VOLUMES;i++) {
+    for(i=0;i<storage_num_drives();i++) {
 #ifdef TOSHIBA_GIGABEAT_S
         /* As long as the Gigabeat S is a non-removable device, we need
            to mark the device as locked to avoid usb_storage_try_release_ata()
@@ -445,7 +444,7 @@ void usb_storage_init_connection(void)
 #else
         locked[i] = false;
 #endif
-        ejected[i] = !check_disk_present(IF_MV(i));
+        ejected[i] = !check_disk_present(IF_MD(i));
         queue_broadcast(SYS_USB_LUN_LOCKED, (i<<16)+0);
     }
 }
@@ -614,10 +613,9 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req, unsigned char* des
     (void)dest;
     switch (req->bRequest) {
         case USB_BULK_GET_MAX_LUN: {
-#ifdef ONLY_EXPOSE_CARD_SLOT
-            *tb.max_lun = 0;
-#else
-            *tb.max_lun = NUM_VOLUMES - 1;
+            *tb.max_lun = storage_num_drives() - 1;
+#ifdef HIDE_FIRST_DRIVE
+            *tb.max_lun --;
 #endif
             logf("ums: getmaxlun");
             usb_drv_send(EP_CONTROL, tb.max_lun, 1);
@@ -690,12 +688,12 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     unsigned int block_size = 0;
     unsigned int block_count = 0;
     bool lun_present=true;
-#ifdef ONLY_EXPOSE_CARD_SLOT
-    unsigned char lun = cbw->lun+1;
-#else
     unsigned char lun = cbw->lun;
-#endif
     unsigned int block_size_mult = 1;
+#ifdef HIDE_FIRST_DRIVE
+    lun++;
+#endif
+
     storage_get_info(lun,&info);
 #ifdef USB_USE_RAMDISK
     block_size = SECTOR_SIZE;
@@ -747,13 +745,14 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             logf("scsi report luns %d",lun);
             int allocation_length=0;
             int i;
+            unsigned int response_length = 8+8*storage_num_drives();
             allocation_length|=(cbw->command_block[6]<<24);
             allocation_length|=(cbw->command_block[7]<<16);
             allocation_length|=(cbw->command_block[8]<<8);
             allocation_length|=(cbw->command_block[9]);
             memset(tb.lun_data,0,sizeof(struct report_lun_data));
-            tb.lun_data->lun_list_length=htobe32(8*NUM_VOLUMES);
-            for(i=0;i<NUM_VOLUMES;i++)
+            tb.lun_data->lun_list_length=htobe32(8*storage_num_drives());
+            for(i=0;i<storage_num_drives();i++)
             {
 #ifdef HAVE_HOTSWAP
                 if(storage_removable(i))
@@ -763,13 +762,13 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     tb.lun_data->luns[i][1]=0;
             }
             send_command_result(tb.lun_data,
-                                MIN(sizeof(struct report_lun_data), length));
+                                MIN(response_length, length));
             break;
         }
 
         case SCSI_INQUIRY:
             logf("scsi inquiry %d",lun);
-            fill_inquiry(IF_MV(lun));
+            fill_inquiry(IF_MD(lun));
             length = MIN(length, cbw->command_block[4]);
             send_command_result(tb.inquiry,
                                 MIN(sizeof(struct inquiry_data), length));
@@ -1136,7 +1135,7 @@ static void copy_padded(char *dest, char *src, int len)
 }
 
 /* build SCSI INQUIRY */
-static void fill_inquiry(IF_MV_NONVOID(int lun))
+static void fill_inquiry(IF_MD_NONVOID(int lun))
 {
     struct storage_info info;
     memset(tb.inquiry, 0, sizeof(struct inquiry_data));

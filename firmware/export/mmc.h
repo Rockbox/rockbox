@@ -23,7 +23,7 @@
 #define __MMC_H__
 
 #include <stdbool.h>
-#include "mv.h" /* for HAVE_MULTIVOLUME or not */
+#include "mv.h" /* for HAVE_MULTIDRIVE or not */
 
 struct storage_info;
 
@@ -35,19 +35,24 @@ bool mmc_disk_is_active(void);
 int mmc_soft_reset(void);
 int mmc_init(void);
 void mmc_close(void);
-int mmc_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
-int mmc_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
+int mmc_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
+int mmc_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);
 void mmc_spin(void);
 int mmc_spinup_time(void);
 
 #ifdef STORAGE_GET_INFO
-void mmc_get_info(IF_MV2(int drive,) struct storage_info *info);
+void mmc_get_info(IF_MD2(int drive,) struct storage_info *info);
 #endif
 #ifdef HAVE_HOTSWAP
-bool mmc_removable(IF_MV_NONVOID(int drive));
-bool mmc_present(IF_MV_NONVOID(int drive));
+bool mmc_removable(IF_MD_NONVOID(int drive));
+bool mmc_present(IF_MD_NONVOID(int drive));
 #endif
 
 long mmc_last_disk_activity(void);
+
+#ifdef CONFIG_STORAGE_MULTI
+int mmc_num_drives(int first_drive);
+#endif
+
 
 #endif

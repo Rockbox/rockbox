@@ -38,8 +38,8 @@ void copy_write_sectors(const unsigned char* buf, int wordcount);
 /* Nasty hack, but Creative is nasty... */
 #define ata_read_sectors _ata_read_sectors
 #define ata_write_sectors _ata_write_sectors
-extern int _ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
-extern int _ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
+extern int _ata_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
+extern int _ata_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);
 
 /* General purpose memory region #1 */
 #define ATA_IOBASE      0x50FEE000

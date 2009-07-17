@@ -642,7 +642,7 @@ int main(void)
 
     
 
-    i = fat_mount(IF_MV2(0,) IF_MV2(0,) part[0].start);
+    i = fat_mount(IF_MV2(0,) IF_MD2(0,) part[0].start);
 
     debugf("fat_mount() returned %d\n", i);
 

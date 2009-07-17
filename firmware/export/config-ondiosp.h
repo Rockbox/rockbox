@@ -106,7 +106,8 @@
 #define HAVE_MAS_SIBI_CONTROL
 
 /* define this if more than one device/partition can be used */
-#define HAVE_MULTIVOLUME
+#define HAVE_MULTIDRIVE
+#define NUM_DRIVES 2
 
 /* define this if media can be exchanged on the fly */
 #define HAVE_HOTSWAP
