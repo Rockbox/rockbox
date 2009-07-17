@@ -26,24 +26,57 @@
 #include "system.h"
 #include "cpu.h"
 
-/** hardware access functions */
 
-static void s5l_lcd_write_cmd(unsigned short cmd)
-{
-    while (LCD_STATUS&0x10);
-    LCD_WCMD = cmd;
-}
+/* The Nano 2G has two different LCD types.  What we call "type 0"
+   appears to be similar to the ILI9320 and "type 1" is similar to the
+   LDS176.
+*/
 
-static void s5l_lcd_write_data(int data)
-{
-    LCD_WDATA = data;
-    while (LCD_STATUS&0x10);
-}
+/* LCD type 0 register defines */
+
+#define R_ENTRY_MODE              0x03
+#define R_HORIZ_GRAM_ADDR_SET     0x20
+#define R_VERT_GRAM_ADDR_SET      0x21
+#define R_WRITE_DATA_TO_GRAM      0x22
+#define R_HORIZ_ADDR_START_POS    0x50
+#define R_HORIZ_ADDR_END_POS      0x51
+#define R_VERT_ADDR_START_POS     0x52
+#define R_VERT_ADDR_END_POS       0x53
+
+
+/* LCD type 1 register defines */
+
+#define R_COLUMN_ADDR_SET         0x2a
+#define R_ROW_ADDR_SET            0x2b
+#define R_MEMORY_WRITE            0x2c
+
 
 /** globals **/
 
 static int lcd_type;
 static int xoffset; /* needed for flip */
+
+/** hardware access functions */
+
+static inline void s5l_lcd_write_cmd_data(int cmd, int data)
+{
+    LCD_WCMD = cmd >> 8;
+    LCD_WCMD = cmd & 0xff;
+
+    LCD_WDATA = data >> 8;
+    LCD_WDATA = data & 0xff;
+}
+
+static inline void s5l_lcd_write_cmd(unsigned short cmd)
+{
+    LCD_WCMD = cmd;
+}
+
+static inline void s5l_lcd_write_data(int data)
+{
+    LCD_WDATA = data >> 8;
+    LCD_WDATA = data & 0xff;
+}
 
 /*** hardware configuration ***/
 
@@ -54,10 +87,12 @@ int lcd_default_contrast(void)
 
 void lcd_set_contrast(int val)
 {
+    (void)val;
 }
 
 void lcd_set_invert_display(bool yesno)
 {
+    (void)yesno;
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */
@@ -95,40 +130,23 @@ void lcd_init_device(void)
     PCON14 &= ~0xf0;   /* Set pin 1 to input */
 
     if (((PDAT13 & 1) == 0) && ((PDAT14 & 2) == 2))
-        lcd_type = 0;
+        lcd_type = 0;  /* Similar to ILI9320 */
     else
-        lcd_type = 1;
-}
+        lcd_type = 1;  /* Similar to LDS176 */
 
+    /* Now init according to lcd type */
+    if (lcd_type == 0) {
+        /* TODO */
 
-/*** Update functions ***/
-
-/* Performance function that works with an external buffer
-   note that by and bheight are in 8-pixel units! */
-void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
-                   int bheight, int stride)
-{
-    /* Copy display bitmap to hardware */
-    while (bheight--)
-    {
+        /* Entry Mode: AM=0, I/D1=1, I/D0=1, ORG=0, HWM=1, BGR=1 */
+        s5l_lcd_write_cmd_data(R_ENTRY_MODE, 0x1230); 
+    } else {
+        /* TODO */
     }
 }
 
 
-/* Performance function that works with an external buffer
-   note that by and bheight are in 8-pixel units! */
-void lcd_blit_grey_phase_blit(unsigned char *values, unsigned char *phases,
-                         int x, int by, int width, int bheight, int stride)
-{
-    (void)values;
-    (void)phases;
-    (void)x;
-    (void)by;
-    (void)width;
-    (void)bheight;
-    (void)stride;
-}
-
+/*** Update functions ***/
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
@@ -140,64 +158,37 @@ void lcd_update(void)
     fb_data pixel;
 
     if (lcd_type==0) {
-        s5l_lcd_write_cmd(0x50);
+        s5l_lcd_write_cmd_data(R_HORIZ_ADDR_START_POS, 0);
+        s5l_lcd_write_cmd_data(R_HORIZ_ADDR_END_POS,   LCD_WIDTH-1);
+        s5l_lcd_write_cmd_data(R_VERT_ADDR_START_POS,  0);
+        s5l_lcd_write_cmd_data(R_VERT_ADDR_END_POS,    LCD_HEIGHT-1);
+
+        s5l_lcd_write_cmd_data(R_HORIZ_GRAM_ADDR_SET,  0);
+        s5l_lcd_write_cmd_data(R_VERT_GRAM_ADDR_SET,   0);
+
+        s5l_lcd_write_cmd(R_WRITE_DATA_TO_GRAM);
+    } else {
+        s5l_lcd_write_cmd(R_COLUMN_ADDR_SET);
         s5l_lcd_write_data(0);            /* Start column */
-        s5l_lcd_write_cmd(0x51);
         s5l_lcd_write_data(LCD_WIDTH-1);  /* End column */
-        s5l_lcd_write_cmd(0x52);
+
+        s5l_lcd_write_cmd(R_ROW_ADDR_SET);
         s5l_lcd_write_data(0);            /* Start row */
-        s5l_lcd_write_cmd(0x53);
         s5l_lcd_write_data(LCD_HEIGHT-1); /* End row */
 
-        s5l_lcd_write_cmd(0x20);
-        s5l_lcd_write_data(0);
-        s5l_lcd_write_cmd(0x21);
-        s5l_lcd_write_data(0);
-        s5l_lcd_write_cmd(0x22);
-
-        /* Copy display bitmap to hardware */
-        for (y = 0; y < LCD_HEIGHT; y++) {
-            for (x = 0; x < LCD_WIDTH; x++) {
-                pixel = *(p++);
-
-                while (LCD_STATUS&0x10);
-
-                LCD_WDATA = pixel & 0xff;
-                LCD_WDATA = (pixel & 0xff00) >> 8;
-            }
-        }
-    } else {
-        s5l_lcd_write_cmd(0x3a);
-        s5l_lcd_write_data(0x65);
-
-        s5l_lcd_write_cmd(0x2a);
-        s5l_lcd_write_data(0);            /* Start column, high byte */
-        s5l_lcd_write_data(0);            /* Start column. low byte */
-        s5l_lcd_write_data(0);            /* End column, high byte */
-        s5l_lcd_write_data(LCD_WIDTH-1);  /* End column, low byte */
-
-        s5l_lcd_write_cmd(0x2b);
-        s5l_lcd_write_data(0);            /* Start row, high byte */
-        s5l_lcd_write_data(0);            /* Start row, low byte */
-        s5l_lcd_write_data(0);            /* End row, high byte */
-        s5l_lcd_write_data(LCD_HEIGHT-1); /* End row, low byte */
-
-        s5l_lcd_write_cmd(0x2c);
-
-        /* Copy display bitmap to hardware */
-        for (y = 0; y < LCD_HEIGHT; y++) {
-            for (x = 0; x < LCD_WIDTH; x++) {
-                pixel = *(p++);
-
-                while (LCD_STATUS&0x10);
-
-                LCD_WDATA = (pixel & 0xff00) >> 8;
-                LCD_WDATA = pixel & 0xff;
-            }
-        }
+        s5l_lcd_write_cmd(R_MEMORY_WRITE);
     }
 
-    s5l_lcd_write_cmd(0x29);
+
+    /* Copy display bitmap to hardware */
+    for (y = 0; y < LCD_HEIGHT; y++) {
+        for (x = 0; x < LCD_WIDTH; x++) {
+            pixel = *(p++);
+
+            LCD_WDATA = (pixel & 0xff00) >> 8;
+            LCD_WDATA = pixel & 0xff;
+        }
+    }
 }
 
 /* Update a fraction of the display. */
@@ -209,5 +200,6 @@ void lcd_update_rect(int x, int y, int width, int height)
     (void)width;
     (void)height;
 
+    /* TODO.  For now, just do a full-screen update */
     lcd_update();
 }
