@@ -34,6 +34,8 @@
 #include "string.h"
 #include "adc.h"
 
+extern int show_logo(void);
+
 static void show_splash(int timeout, const char *msg)
 {
     reset_screen();
@@ -84,9 +86,52 @@ static void usb_mode(void)
     reset_screen();
 }
 
-static void boot_of(void)
+static int boot_of(void)
 {
-    /* Do nothing atm */
+    int fd, rc, len, i, checksum = 0;
+    void (*kernel_entry)(int, void*, void*);
+
+    /* TODO: get this from the NAND flash instead of SD */
+    fd = open("/ccpmp.bin", O_RDONLY);
+    if(fd < 0)
+        return EFILE_NOT_FOUND;
+
+    lseek(fd, 4, SEEK_SET);
+    rc = read(fd, (char*)&len, 4); /* CPU is LE */
+    if(rc < 4)
+        return EREAD_IMAGE_FAILED;
+
+    len += 8;
+    printf("Reading %d bytes...", len);
+
+    lseek(fd, 0, SEEK_SET);
+    rc = read(fd, (void*)0x80004000, len);
+    if(rc < len)
+        return EREAD_IMAGE_FAILED;
+
+    close(fd);
+
+    for(i=0; i<len; i++)
+        checksum += ((unsigned char*)0x80004000)[i];
+
+    *((unsigned int*)0x80004000) = checksum;
+
+    printf("Starting the OF...");
+
+    /* OF requires all clocks on */
+    __cpm_start_all();
+
+    disable_interrupt();
+    __dcache_writeback_all();
+    __icache_invalidate_all();
+
+    for(i=8000; i>0; i--)
+        asm volatile("nop\n");
+
+    kernel_entry = (void*) 0x80004008;
+    kernel_entry(0, "Jan 10 2008", "15:34:42"); /* Reversed from the SPL */
+
+    return 0;
 }
 
 int main(void)
@@ -102,12 +147,9 @@ int main(void)
     font_init();
     lcd_setfont(FONT_SYSFIXED);
     button_init();
-    adc_init();
     backlight_init();
 
-    reset_screen();
-    printf(MODEL_NAME" Rockbox Bootloader"); 	 
-    printf("Version "APPSVERSION);
+    show_logo();
 
     rc = storage_init();
     if(rc)
@@ -119,14 +161,27 @@ int main(void)
     rc = button_read_device();
 #endif
 
+    if(rc)
+        verbose = true;
+
     if(rc & BUTTON_VOL_UP)
         usb_mode();
-    else if(button_hold())
-        boot_of();
+
+    if(verbose)
+        reset_screen();
+    printf(MODEL_NAME" Rockbox Bootloader");
+    printf("Version "APPSVERSION);
 
     rc = disk_mount_all();
     if (rc <= 0)
         error(EDISK,rc);
+
+    if(button_hold())
+    {
+        rc = boot_of();
+        if(rc < 0)
+            printf("Error: %s", strerror(rc));
+    }
 
     printf("Loading firmware");
     rc = load_firmware((unsigned char *)CONFIG_SDRAM_START, BOOTFILE, 0x400000);
@@ -136,7 +191,7 @@ int main(void)
     if (rc == EOK)
     {
         printf("Starting Rockbox...");
-        adc_close(); /* Disable SADC */
+        adc_close();      /* Disable SADC */
         _backlight_off(); /* Force backlight off to prevent LCD 'flicker' */
 
         disable_interrupt();

@@ -2105,8 +2105,8 @@ fi
     plugins="yes"
     swcodec="yes"
     toolset=$genericbitmaptools
-    boottool="cp"
-    bootoutput="rockboot.vx747"
+    boottool="$rootdir/tools/scramble -ccpmp"
+    bootoutput="ccpmp.bin"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="mips"
     t_manufacturer="ingenic_jz47xx"
@@ -2127,8 +2127,8 @@ fi
     plugins="" #FIXME
     swcodec="yes"
     toolset=$genericbitmaptools
-    boottool="cp"
-    bootoutput="rockboot.vx767"
+    boottool="$rootdir/tools/scramble -ccpmp"
+    bootoutput="ccpmp.bin"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="mips"
     t_manufacturer="ingenic_jz47xx"
@@ -2149,8 +2149,8 @@ fi
     plugins="yes"
     swcodec="yes"
     toolset=$genericbitmaptools
-    boottool="cp"
-    bootoutput="rockboot.vx747p"
+    boottool="$rootdir/tools/scramble -ccpmp"
+    bootoutput="ccpmp.bin"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="mips"
     t_manufacturer="ingenic_jz47xx"
@@ -2171,8 +2171,8 @@ fi
     plugins="" #TODO
     swcodec="yes"
     toolset=$genericbitmaptools
-    boottool="cp"
-    bootoutput="rockboot.vx777"
+    boottool="$rootdir/tools/scramble -ccpmp"
+    bootoutput="ccpmp.bin"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="mips"
     t_manufacturer="ingenic_jz47xx"

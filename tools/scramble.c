@@ -33,6 +33,7 @@
 
 int iaudio_encode(char *iname, char *oname, char *idstring);
 int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc);
+int ccpmp_encode(char *iname, char *oname);
 
 enum
 {
@@ -375,8 +376,7 @@ int main (int argc, char** argv)
         oname = argv[3];
         return ipod_encode(iname, oname, 3, true);  /* Firmware image v3 */
     }
-    else if(!strncmp(argv[1], "-creative=", 10))
-    {
+    else if(!strncmp(argv[1], "-creative=", 10)) {
         if(!strcmp(argv[2], "-no-ciff"))
         {
             creative_enable_ciff = false;
@@ -404,6 +404,11 @@ int main (int argc, char** argv)
             fprintf(stderr, "unsupported Creative device: %s\n", &argv[1][10]);
             return 2;
         }
+    }
+    else if(!strcmp(argv[1], "-ccpmp")) {
+        iname = argv[2];
+        oname = argv[3];
+        return ccpmp_encode(iname, oname);
     }
     else if(!strncmp(argv[1], "-mi4", 4)) {
         int mi4magic;
@@ -814,6 +819,61 @@ int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
     }
     
     len = fwrite(outbuf, 1, length+0x4600, file);
+    if(len < (size_t)length) {
+        perror(oname);
+        return -4;
+    }
+
+    fclose(file);
+
+    return 0;
+}
+
+#define CCPMP_SIZE 0x500000
+int ccpmp_encode(char *iname, char *oname)
+{
+    size_t len;
+    int length;
+    FILE *file;
+    unsigned char *outbuf;
+
+    file = fopen(iname, "rb");
+    if (!file) {
+       perror(iname);
+       return -1;
+    }
+    fseek(file,0,SEEK_END);
+    length = ftell(file);
+    
+    fseek(file,0,SEEK_SET);
+
+    outbuf = malloc(CCPMP_SIZE);
+
+    if ( !outbuf ) {
+       printf("out of memory!\n");
+       return -1;
+    }
+
+    len = fread(outbuf, 1, length, file);
+    if(len < (size_t)length) {
+        perror(iname);
+        return -2;
+    }
+    fclose(file);
+
+    /* Clear the tail area to 0xFF */
+    memset(&outbuf[length], 0xFF, CCPMP_SIZE - length);
+
+    /* Header */
+    int2le(length, &outbuf[0x4]);
+
+    file = fopen(oname, "wb");
+    if (!file) {
+       perror(oname);
+       return -3;
+    }
+    
+    len = fwrite(outbuf, 1, CCPMP_SIZE, file);
     if(len < (size_t)length) {
         perror(oname);
         return -4;

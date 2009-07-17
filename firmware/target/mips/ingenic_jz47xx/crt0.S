@@ -50,12 +50,12 @@
     .set    noat
 
 #ifdef BOOTLOADER
-    /* These will get filled in scramble */
-    .word 0 /* Unknown  */
+    /* These will get filled in by scramble */
+    .word 0 /* Empty    */
     .word 0 /* Filesize */
 
     /* Relocate bootloader */
-    la     t0, (_loadaddress-0x400000)
+    la     t0, (_loadaddress-0xE00000)
     la     t1, _loadaddress
     la     t2, _bootend
 _relocate_loop:

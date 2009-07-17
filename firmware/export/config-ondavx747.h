@@ -81,8 +81,13 @@
 /* LCD dimensions */
 #define CONFIG_LCD LCD_ONDAVX747
 
+#ifdef BOOTLOADER /* OF requires landscape */
+#define LCD_WIDTH  400
+#define LCD_HEIGHT 240
+#else
 #define LCD_WIDTH  240
 #define LCD_HEIGHT 400
+#endif
 
 #define LCD_DEPTH  16   /* 16bit colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
