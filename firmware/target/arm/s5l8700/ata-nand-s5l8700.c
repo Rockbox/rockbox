@@ -29,8 +29,6 @@
 #include "usb.h"
 
 /* for compatibility */
-int nand_spinup_time = 0;
-
 long last_disk_activity = -1;
 
 /** static, private data **/ 
