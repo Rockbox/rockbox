@@ -691,12 +691,6 @@ void nand_spindown(int seconds)
     (void)seconds;
 }
 
-bool nand_disk_is_active(void)
-{
-    /* null */
-    return false;
-}
-
 void nand_sleep(void)
 {
     /* null */
@@ -705,12 +699,6 @@ void nand_sleep(void)
 void nand_spin(void)
 {
     /* null */
-}
-
-int nand_soft_reset(void)
-{
-    /* null */
-    return 0;
 }
 
 void nand_enable(bool on)
