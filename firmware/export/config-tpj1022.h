@@ -83,7 +83,7 @@
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
 /* Hardware controlled charging? FIXME */
-//#define CONFIG_CHARGING CHARGING_SIMPLE
+#define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* define this if the unit can be powered or charged via USB */
 /*#define HAVE_USB_POWER*/
@@ -124,6 +124,13 @@
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
+
+/* enable these for the experimental usb stack ROOLKU */
+#define HAVE_USBSTACK
+#define USB_VENDOR_ID 0x07B4
+#define USB_PRODUCT_ID 0x0280
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 

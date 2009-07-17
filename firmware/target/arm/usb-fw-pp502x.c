@@ -82,6 +82,12 @@
 #define USB_GPIO_MASK   0x10
 #define USB_GPIO_VAL    0x10
 
+#elif defined(ELIO_TPJ1022)
+    /* GPIO ? bit ? is usb detect (dummy value)*/
+#define USB_GPIO        GPIOD
+#define USB_GPIO_MASK   0x10
+#define USB_GPIO_VAL    0x10
+
 #else
 #error No USB GPIO config specified
 #endif
