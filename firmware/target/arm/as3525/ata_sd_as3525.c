@@ -686,7 +686,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
             bank_start -= bank * BLOCKS_PER_BANK;
 
             /* Do not cross a bank boundary in a single transfer loop */
-            if((transfer + bank_start) >= BLOCKS_PER_BANK)
+            if((transfer + bank_start) > BLOCKS_PER_BANK)
                 transfer = BLOCKS_PER_BANK - bank_start;
         }
 
