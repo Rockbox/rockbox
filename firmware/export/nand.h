@@ -38,7 +38,6 @@ void nand_close(void);
 int  nand_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
 int  nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);
 void nand_spin(void);
-int  nand_spinup_time(void); /* ticks */
 
 #ifdef STORAGE_GET_INFO
 void nand_get_info(IF_MD2(int drive,) struct storage_info *info);
