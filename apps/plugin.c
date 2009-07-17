@@ -284,9 +284,11 @@ static const struct plugin_api rockbox_api = {
     fdprintf,
     read_line,
     settings_parseline,
+#ifdef HAVE_DISK_STORAGE
     storage_sleep,
     storage_spin,
     storage_spindown,
+#endif
 #if USING_STORAGE_CALLBACK
     register_storage_idle_func,
     unregister_storage_idle_func,

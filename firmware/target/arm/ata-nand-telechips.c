@@ -900,16 +900,3 @@ long nand_last_disk_activity(void)
 {
     return last_disk_activity;
 }
-
-void nand_sleep(void)
-{
-}
-
-void nand_spin(void)
-{
-}
-
-void nand_spindown(int seconds)
-{
-    (void)seconds;
-}

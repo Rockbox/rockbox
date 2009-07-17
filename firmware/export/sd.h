@@ -30,15 +30,12 @@
 struct storage_info;
 
 void sd_enable(bool on);
-void sd_spindown(int seconds);
-void sd_sleep(void);
 bool sd_disk_is_active(void);
 int sd_soft_reset(void);
 int sd_init(void);
 void sd_close(void);
 int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
 int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
-void sd_spin(void);
 
 #ifdef STORAGE_GET_INFO
 void sd_get_info(IF_MV2(int drive,) struct storage_info *info);

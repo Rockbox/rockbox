@@ -66,19 +66,6 @@ void sd_parse_csd(tCardInfo *card)
     logf("nsac: %d taac: %d r2w: %d", card->nsac, card->taac, card->r2w_factor);
 }
 
-void sd_sleep(void)
-{
-}
-
-void sd_spin(void)
-{
-}
-
-void sd_spindown(int seconds)
-{
-    (void)seconds;
-}
-
 #ifdef STORAGE_GET_INFO
 void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
 {

@@ -28,8 +28,6 @@
 struct storage_info;
 
 void mmc_enable(bool on);
-void mmc_spindown(int seconds);
-void mmc_sleep(void);
 void mmc_sleepnow(void);
 bool mmc_disk_is_active(void);
 int mmc_soft_reset(void);
@@ -37,7 +35,6 @@ int mmc_init(void);
 void mmc_close(void);
 int mmc_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
 int mmc_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
-void mmc_spin(void);
 int mmc_spinup_time(void);
 
 #ifdef STORAGE_GET_INFO

@@ -1038,7 +1038,9 @@ int load_and_show(char* filename)
     else if(immediate_ata_off)
     {
         /* running slideshow and time is long enough: power down disk */
+#ifdef HAVE_DISK_STORAGE
         rb->storage_sleep();
+#endif
     }
 #endif
 

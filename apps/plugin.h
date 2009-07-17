@@ -129,12 +129,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 162
+#define PLUGIN_API_VERSION 163
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 162
+#define PLUGIN_MIN_API_VERSION 163
 
 /* plugin return codes */
 enum plugin_status {
@@ -395,9 +395,11 @@ struct plugin_api {
     int (*fdprintf)(int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);
+#ifdef HAVE_DISK_STORAGE
     void (*storage_sleep)(void);
     void (*storage_spin)(void);
     void (*storage_spindown)(int seconds);
+#endif
 #if USING_STORAGE_CALLBACK
     void (*register_storage_idle_func)(storage_idle_notify function);
     void (*unregister_storage_idle_func)(storage_idle_notify function, bool run);
