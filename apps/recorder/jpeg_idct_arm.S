@@ -194,7 +194,8 @@ jpeg_idct4v:
 #elif ARM_ARCH < 6
     stmdb sp!, { r4-r8, lr }
     mov    r8,  #1024
-    ldrd   r4,  .Lpool4
+    ldr    r4,  .Lpool4
+    ldr    r5,  .Lpool4+4
 1:
     ldrsh  r14, [r0, #48]
     ldrsh  r3,  [r0, #16]
@@ -325,9 +326,10 @@ jpeg_idct4h:
     cmp    r0,  r2
     bcc    1b
     ldmia sp!, { r4-r10, pc }
-#elif ARM_ARCH < 6 || 1
+#elif ARM_ARCH < 6
     stmdb  sp!, { r4-r9, lr }
-    ldrd   r4,  .Lpool4
+    ldr    r4,  .Lpool4
+    ldr    r5,  .Lpool4+4
 1:
     ldrsh  r7,  [r0, #6]
     ldrsh  r14, [r0, #2]
@@ -519,7 +521,8 @@ jpeg_idct8v:
     bcc    1b
     ldmia  sp!, { r4-r11, pc }
 2:
-    ldrd   r8,  .Lpool8
+    ldr    r8,  .Lpool8
+    ldr    r9,  .Lpool8+4
     add    r12, r12, #8192
     add    r10, r5,  r7              /* r10[15:0] = d2 + d6 */
     sub    r14, r12, r6,  lsl #16    /* r14 = tmp1 << 3 = (d0 - d4) << 16 */
@@ -537,7 +540,8 @@ jpeg_idct8v:
     add    r12, r6,  r4,  asr #16    /* r12 = z4 = tmp1 + tmp3 */
     add    r14, r7,  r5,  asr #16    /* r14 = z3 = tmp0 + tmp2 */
     add    r8,  r12, r14             /* r8  = z3 + z4 */
-    ldrd   r10, .Lpool8+8
+    ldr    r10, .Lpool8+8
+    ldr    r11, .Lpool8+12
     smultb r8,  r9,  r8              /* r8  = z5 = (z3 + z4) * 9633 */
     add    r9,  r7,  r4,  asr #16    /* r9  = z1 = tmp0 + tmp3 */
     smlabb r14, r10, r14, r8         /* r14 = z3 = z5 - z3 * 16069 */
@@ -547,7 +551,8 @@ jpeg_idct8v:
     add    r10, r6,  r5,  asr #16    /* r10 = z2 = tmp1 + tmp2 */
     smlatb r12, r11, r10, r12        /* r12 = z4 - z2 * 20995 */
     smlatb r14, r11, r10, r14        /* r14 = z3 - z2 * 20995 */
-    ldrd   r10, .Lpool8+16
+    ldr    r10, .Lpool8+16
+    ldr    r11, .Lpool8+20
     smlabb r7,  r10, r7,  r8         /* r7 = tmp0 */
     smlatt r4,  r10, r4,  r9         /* r4 = tmp3 */
     smlabb r6,  r11, r6,  r12        /* r6 = tmp1 */
@@ -740,7 +745,8 @@ jpeg_idct8h:
     bcc    1b
     ldmia  sp!, { r4-r11, pc }
 2:
-    ldrd   r8,  .Lpool8
+    ldr    r8,  .Lpool8
+    ldr    r9,  .Lpool8+4
     add    r10, r5,  r7              /* r10[15:0] = d2 + d6 */
     sub    r14, r12, r6,  lsl #16    /* r14 = tmp1 << 3 = (d0 - d4) << 16 */
     smulbb r10, r8,  r10             /* r10 = z1 = (d2 + d6) * 4433 */
@@ -757,7 +763,8 @@ jpeg_idct8h:
     add    r12, r6,  r4,  asr #16    /* r12 = z4 = tmp1 + tmp3 */
     add    r14, r7,  r5,  asr #16    /* r14 = z3 = tmp0 + tmp2 */
     add    r8,  r12, r14             /* r8  = z3 + z4 */
-    ldrd   r10, .Lpool8+8
+    ldr    r10, .Lpool8+8
+    ldr    r10, .Lpool8+12
     smultb r8,  r9,  r8              /* r8  = z5 = (z3 + z4) * 9633 */
     add    r9,  r7,  r4,  asr #16    /* r9  = z1 = tmp0 + tmp3 */
     smlabb r14, r10, r14, r8         /* r14 = z3 = z5 - z3 * 16069 */
@@ -767,7 +774,8 @@ jpeg_idct8h:
     add    r10, r6,  r5,  asr #16    /* r10 = z2 = tmp1 + tmp2 */
     smlatb r12, r11, r10, r12        /* r12 = z4 - z2 * 20995 */
     smlatb r14, r11, r10, r14        /* r14 = z3 - z2 * 20995 */
-    ldrd   r10, .Lpool8+16
+    ldr    r10, .Lpool8+16
+    ldr    r11, .Lpool8+20
     smlabb r7,  r10, r7,  r8         /* r7 = tmp0 */
     smlatt r4,  r10, r4,  r9         /* r4 = tmp3 */
     smlabb r6,  r11, r6,  r12        /* r6 = tmp1 */
