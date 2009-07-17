@@ -256,7 +256,7 @@ bool storage_disk_is_active(void)
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_NAND)
-    if (nand_disk_is_active()) return true;
+    //if (nand_disk_is_active()) return true;
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
@@ -283,14 +283,14 @@ int storage_soft_reset(void)
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_NAND)
-    if ((rc=nand_soft_reset())) return rc;
+    //if ((rc=nand_soft_reset())) return rc;
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     if ((rc=ramdisk_soft_reset())) return rc;
 #endif
 
-    return 0;
+    return rc;
 }
 
 void storage_spin(void)
