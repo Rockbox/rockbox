@@ -25,6 +25,7 @@
 #include "lib/display_text.h"
 #include "lib/highscore.h"
 #include "lib/playback_control.h"
+#include "pluginbitmaps/jewels.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -272,81 +273,23 @@ CONFIG_KEYPAD == MROBE500_PAD
 #endif
 #endif
 
-/* use 30x30 tiles (iPod Video, Gigabeat, Onda VX747) */
-#if (LCD_HEIGHT == 240) && (LCD_WIDTH == 320) || \
-      ((LCD_HEIGHT == 320) && (LCD_WIDTH == 240)) || \
-      ((LCD_HEIGHT == 400) && (LCD_WIDTH == 240))
-#define TILE_WIDTH  30
-#define TILE_HEIGHT 30
-#define YOFS 0
-#define NUM_SCORES 10
-
-/* use 22x22 tiles (H300, iPod Color) */
-#elif ((LCD_HEIGHT == 176) && (LCD_WIDTH == 220)) || \
-      ((LCD_HEIGHT == 220) && (LCD_WIDTH == 176))
-#define TILE_WIDTH  22
-#define TILE_HEIGHT 22
-#define YOFS 0
-#define NUM_SCORES 5
-
-/* use 16x16 tiles (iPod Nano) */
-#elif (LCD_HEIGHT == 132) && (LCD_WIDTH == 176)
-#define TILE_WIDTH  16
-#define TILE_HEIGHT 16
-#define YOFS 4
-#define NUM_SCORES 5
-
-/* use 16x16 tiles (H100, iAudio X5, iPod 3G, iPod 4G grayscale) */
-#elif (LCD_HEIGHT == 128) && (LCD_WIDTH == 160)
-#define TILE_WIDTH  16
-#define TILE_HEIGHT 16
-#define YOFS 0
-#define NUM_SCORES 5
-
-/* use 14x14 tiles (H10 5/6 GB) */
-#elif (LCD_HEIGHT == 128) && (LCD_WIDTH == 128)
-#define TILE_WIDTH  14
-#define TILE_HEIGHT 14
-#define YOFS 0
-#define NUM_SCORES 5
-
-/* use 13x13 tiles (iPod Mini) */
-#elif (LCD_HEIGHT == 110) && (LCD_WIDTH == 138)
-#define TILE_WIDTH  13
-#define TILE_HEIGHT 13
-#define YOFS 6
-#define NUM_SCORES 5
-
-/* use 12x12 tiles (iAudio M3) */
-#elif (LCD_HEIGHT == 96) && (LCD_WIDTH == 128)
-#define TILE_WIDTH  12
-#define TILE_HEIGHT 12
-#define YOFS 0
-#define NUM_SCORES 5
-
-/* use 10x10 tiles (Sansa c200) */
-#elif (LCD_HEIGHT == 80) && (LCD_WIDTH == 132)
-#define TILE_WIDTH 10
-#define TILE_HEIGHT 10
-#define YOFS 0
-#define NUM_SCORES 5
-
 /* use 10x8 tiles (iFP 700) */
-#elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 128)
-#define TILE_WIDTH 10
-#define TILE_HEIGHT 8
-#define YOFS 0
+#if (LCD_HEIGHT == 64) && (LCD_WIDTH == 128)
 #define NUM_SCORES 5
 
 /* use 10x8 tiles (Recorder, Ondio) */
 #elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 112)
-#define TILE_WIDTH 10
-#define TILE_HEIGHT 8
-#define YOFS 0
 #define NUM_SCORES 5
+#endif
 
-#else
-  #error JEWELS: Unsupported LCD
+#define TILE_WIDTH  BMPWIDTH_jewels
+#define TILE_HEIGHT (BMPHEIGHT_jewels/23)
+
+/* This calculation assumes integer division w/ LCD_HEIGHT/TILE_HEIGHT */
+#define YOFS        LCD_HEIGHT-((LCD_HEIGHT/TILE_HEIGHT)*TILE_HEIGHT)
+
+#if !defined(NUM_SCORES)
+#define NUM_SCORES  LCD_HEIGHT/10
 #endif
 
 /* swap directions */
