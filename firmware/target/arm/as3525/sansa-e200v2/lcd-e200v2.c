@@ -89,7 +89,8 @@ static volatile bool lcd_busy = false;
 static unsigned short r_entry_mode = R_ENTRY_MODE_HORZ_NORMAL;
 #define R_ENTRY_MODE_VERT 0x7038
 #define R_ENTRY_MODE_SOLID_VERT  0x1038
-#define R_ENTRY_MODE_VIDEO 0x7020
+#define R_ENTRY_MODE_VIDEO_NORMAL 0x7020
+#define R_ENTRY_MODE_VIDEO_FLIPPED 0x7010
 
 
 /* Reverse Flag */
@@ -380,9 +381,18 @@ void lcd_yuv_set_options(unsigned options)
 
 static void lcd_window_blit(int xmin, int ymin, int xmax, int ymax)
 {
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, ((LCD_WIDTH-1 - xmin) << 8) | (LCD_WIDTH-1 - xmax));
-    lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
-    lcd_write_reg(R_RAM_ADDR_SET,       (ymin << 8) | (LCD_WIDTH-1 - xmin));
+    if (!display_flipped)
+    {
+        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, ((LCD_WIDTH-1 - xmin) << 8) | (LCD_WIDTH-1 - xmax));
+        lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
+        lcd_write_reg(R_RAM_ADDR_SET,       (ymin << 8) | (LCD_WIDTH-1 - xmin));
+    }
+    else
+    {
+        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (xmax << 8) | xmin);
+        lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
+        lcd_write_reg(R_RAM_ADDR_SET,       (ymax << 8) | xmin);
+    }
 }
 
 /* Performance function to blit a YUV bitmap directly to the LCD
@@ -407,7 +417,14 @@ void lcd_blit_yuv(unsigned char * const src[3],
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
     yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
 
-    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_VIDEO);
+    if (!display_flipped)
+    {
+        lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_VIDEO_NORMAL);
+    }
+    else
+    {
+        lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_VIDEO_FLIPPED);
+    }
 
     if (lcd_yuv_options & LCD_YUV_DITHER)
     {
