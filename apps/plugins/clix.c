@@ -170,7 +170,14 @@ struct highscore highest[NUM_SCORES];
 #define BOARD_HEIGHT 18
 #endif
 
-#if (LCD_WIDTH >= 306 && LCD_HEIGHT>= 204)
+#if (LCD_WIDTH>=480)
+#if (LCD_WIDTH/BOARD_WIDTH) > (LCD_HEIGHT/BOARD_HEIGHT)
+#define CELL_SIZE (LCD_HEIGHT/BOARD_HEIGHT)
+#else 
+#define CELL_SIZE (LCD_WIDTH/BOARD_WIDTH)
+#endif
+
+#elif (LCD_WIDTH >= 306 && LCD_HEIGHT>= 204)
 #define CELL_SIZE 16
 
 #elif (LCD_WIDTH >= 270 && LCD_HEIGHT>= 180)
