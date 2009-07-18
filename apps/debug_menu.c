@@ -2537,7 +2537,10 @@ static bool cpu_boost_log(void)
                 str = cpu_boost_log_getlog_next();
             if (str)
             {
-                lcd_puts(0, j,str);
+                if(strlen(str) > LCD_WIDTH/SYSFONT_WIDTH)
+                    lcd_puts_scroll(0, j, str);
+                else
+                    lcd_puts(0, j,str);
             }
             str = NULL;
         }
