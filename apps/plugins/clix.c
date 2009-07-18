@@ -70,9 +70,7 @@ PLUGIN_HEADER
 #define CLIX_BUTTON_DOWN        BUTTON_PLAY
 #define CLIX_BUTTON_SCROLL_FWD  BUTTON_SCROLL_FWD
 #define CLIX_BUTTON_SCROLL_BACK BUTTON_SCROLL_BACK
-#define CLIX_BUTTON_CLICK       (BUTTON_SELECT | BUTTON_REL)
-#define CLIX_BUTTON_CLICK_PRE   BUTTON_SELECT
-#define CLIX_BUTTON_CLICK_PRE2  (BUTTON_SELECT | BUTTON_REPEAT)
+#define CLIX_BUTTON_CLICK       BUTTON_SELECT
 #define CLIX_BUTTON_RIGHT       BUTTON_RIGHT
 #define CLIX_BUTTON_LEFT        BUTTON_LEFT
 
@@ -744,15 +742,6 @@ static int clix_handle_game(struct clix_game_state_t* state)
 #endif
                 case CLIX_BUTTON_CLICK:
                 {
-#ifdef CLIX_BUTTON_CLICK_PRE
-#ifdef CLIX_BUTTON_CLICK_PRE2
-                    if (lastbutton != CLIX_BUTTON_CLICK_PRE
-                        && lastbutton != CLIX_BUTTON_CLICK_PRE2)
-#else
-                    if (lastbutton != CLIX_BUTTON_CLICK_PRE)
-#endif
-                        break;
-#endif
                     if (state->selected_count > 1) {
                         switch( clix_clear_selected( state))
                         {
