@@ -3,16 +3,39 @@
 /* Brickmania */
 #ifdef HAVE_LCD_COLOR
 brickmania_gameover.112x54x16.bmp
-#if LCD_WIDTH >= 220 /* common to all big lcds */
+
+#if LCD_WIDTH >= 640 /* M:Robe 500 */
+brickmania_ball.15x15x16.bmp
+brickmania_menu_items.640x480x16.bmp
+
+brickmania_menu_bg.640x480x16.bmp
+brickmania_bricks.640x480x16.bmp
+brickmania_pads.640x480x16.bmp
+brickmania_break.640x480x16.bmp
+brickmania_powerups.640x480x16.bmp
+
+#elif LCD_WIDTH >= 480 /* M:Robe 500 */
+brickmania_ball.11x11x16.bmp
+brickmania_menu_items.480x640x16.bmp
+
+brickmania_menu_bg.480x640x16.bmp
+brickmania_bricks.480x640x16.bmp
+brickmania_pads.480x640x16.bmp
+brickmania_break.480x640x16.bmp
+brickmania_powerups.480x640x16.bmp
+
+#elif LCD_WIDTH >= 320 /* Ipod Video */
 brickmania_ball.5x5x16.bmp
 brickmania_menu_items.220x176x16.bmp
-#if LCD_WIDTH >= 320 /* Ipod Video */
 brickmania_menu_bg.320x240x16.bmp
 brickmania_bricks.320x240x16.bmp
 brickmania_pads.320x240x16.bmp
 brickmania_break.320x240x16.bmp
 brickmania_powerups.320x240x16.bmp
-#else
+
+#elif LCD_WIDTH >= 220
+brickmania_ball.5x5x16.bmp
+brickmania_menu_items.220x176x16.bmp
 brickmania_bricks.220x176x16.bmp
 brickmania_pads.220x176x16.bmp
 brickmania_break.220x176x16.bmp
@@ -22,7 +45,7 @@ brickmania_menu_bg.240x320x16.bmp
 #elif LCD_HEIGHT == 176
 brickmania_menu_bg.220x176x16.bmp
 #endif
-#endif
+
 #elif LCD_WIDTH >= 176
 brickmania_ball.5x5x16.bmp
 brickmania_menu_items.176x132x16.bmp
@@ -130,7 +153,9 @@ bubbles_emblem.112x64x1.bmp
 #endif
 
 /* ChessBox */
-#if (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 240) && (LCD_DEPTH >= 16)
+#if (LCD_WIDTH >= 480)
+chessbox_pieces.480x480x16.bmp
+#elif (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 240) && (LCD_DEPTH >= 16)
 chessbox_pieces.240x240x16.bmp
 #elif (LCD_WIDTH >= 176) && (LCD_HEIGHT >= 176) && (LCD_DEPTH >= 16)
 chessbox_pieces.176x176x16.bmp
@@ -549,6 +574,12 @@ sokoban_tiles.4x4x1.bmp
 card_back.74x98x16.bmp
 card_deck.962x392x16.bmp
 solitaire_suitsi.74x392x16.bmp
+
+#elif LCD_WIDTH >= 480
+card_back.55x73x16.bmp
+card_deck.715x291x16.bmp
+solitaire_suitsi.55x291x16.bmp
+
 #elif LCD_WIDTH >= 320
 card_back.37x49x16.bmp
 card_deck.481x196x16.bmp
