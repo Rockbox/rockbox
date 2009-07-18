@@ -114,86 +114,81 @@ PLUGIN_HEADER
 #define EMBLEM_HEIGHT (BMPHEIGHT_bubbles_emblem/8)
 
 /* bubbles will consume height of ROW_HEIGHT*(BB_HEIGHT-1)+BUBBLE_HEIGHT*3/2 */
+/* 44x44 bubbles (m:robe 500) */
+#if (LCD_WIDTH == 640) && (LCD_HEIGHT == 480)
+#define XOFS          144
+#define MAX_FPS       40
+
+#elif (LCD_WIDTH == 480) && (LCD_HEIGHT == 640)
+#define XOFS          128
+#define MAX_FPS       40
+
 /* 22x22 bubbles (iPod Video) */
-#if (LCD_HEIGHT == 240) && (LCD_WIDTH == 320)
+#elif (LCD_HEIGHT == 240) && (LCD_WIDTH == 320)
 #define XOFS          72
-#define ROW_HEIGHT    18
-#define ROW_INDENT    11
 #define MAX_FPS       40
 
 /* 22x22 bubbles (Gigabeat, Onda VX747) */
 #elif ((LCD_HEIGHT == 320) || (LCD_HEIGHT == 400)) && (LCD_WIDTH == 240)
 #define XOFS          64
-#define ROW_HEIGHT    18
-#define ROW_INDENT    11
 #define MAX_FPS       30
 
 /* 16x16 bubbles (H300, iPod Color) */
 #elif (LCD_HEIGHT == 176) && (LCD_WIDTH == 220)
 #define XOFS          46
-#define ROW_HEIGHT    14
-#define ROW_INDENT     8
 #define MAX_FPS       30
 
 /* 16x16 bubbles (Sansa E200) */
 #elif (LCD_HEIGHT == 220) && (LCD_WIDTH == 176)
 #define XOFS          48
-#define ROW_HEIGHT    14
-#define ROW_INDENT     8
 #define MAX_FPS       30
 
 /* 12x12 bubbles (iPod Nano) */
 #elif (LCD_HEIGHT == 132) && (LCD_WIDTH == 176)
 #define XOFS          40
-#define ROW_HEIGHT    10
-#define ROW_INDENT     6
 #define MAX_FPS       40
 
 /* 12x12 bubbles (H100, H10, iAudio X5, iPod 3G, iPod 4G grayscale) */
 #elif (LCD_HEIGHT == 128) && ((LCD_WIDTH == 160) || (LCD_WIDTH == 128))
 #define XOFS          33
-#define ROW_HEIGHT    10
-#define ROW_INDENT     6
 #define MAX_FPS       30
 
 /* 10x10 bubbles (iPod Mini) */
 #elif (LCD_HEIGHT == 110) && (LCD_WIDTH == 138)
 #define XOFS          33
-#define ROW_HEIGHT     8
-#define ROW_INDENT     5
 #define MAX_FPS       30
 
 /* 9x9 bubbles (iAudio M3) */
 #elif (LCD_HEIGHT == 96) && (LCD_WIDTH == 128)
 #define XOFS          45
-#define ROW_HEIGHT     7
-#define ROW_INDENT     4
 #define MAX_FPS       30
 
 /* 8x8 bubbles (Sansa C200) */
 #elif ((LCD_HEIGHT == 80) && (LCD_WIDTH == 132))
 #define XOFS          45
-#define ROW_HEIGHT     6
-#define ROW_INDENT     4
 #define MAX_FPS       30
 
 /* 7x7 bubbles (Sansa Clip/m200) */
 #elif (LCD_HEIGHT == 64 && LCD_WIDTH == 128)
 #define XOFS          33
 #define ROW_HEIGHT     5
-#define ROW_INDENT     4
 #define MAX_FPS       30
 
 /* 8x7 bubbles (Archos recorder, Ondio) */
 #elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 112)
 #define XOFS          33
 #define ROW_HEIGHT     5
-#define ROW_INDENT     4
 #define MAX_FPS       20
 
 #else
     #error BUBBLES: Unsupported LCD type
 #endif
+
+#if !defined(ROW_HEIGHT)
+#define ROW_HEIGHT    (BUBBLE_WIDTH-(BUBBLE_WIDTH-EMBLEM_WIDTH)/2)
+#endif
+
+#define ROW_INDENT    (BUBBLE_WIDTH/2)
 
 #define TEXT_LINES (LCD_HEIGHT/8)
 
