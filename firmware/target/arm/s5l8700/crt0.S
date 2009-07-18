@@ -82,7 +82,6 @@ newstart2:
 //    orr r0, r0, r2
 //    str r0, [r1] // switch backlight on
 
-#if CONFIG_CPU==S5L8700
     ldr r1, =0x3c500000 // CLKCON
     ldr r0, =0x00800080
     str r0, [r1]
@@ -90,7 +89,11 @@ newstart2:
     mov r0, #0
     str r0, [r1]
     ldr r1, =0x3c500004 // PLL0PMS
+#ifdef IPOD_NANO2G
+    ldr r0, =0x21200
+#else
     ldr r0, =0x1ad200
+#endif
     str r0, [r1]
     ldr r1, =0x3c500014 // PLL0LCNT
     ldr r0, =8100
@@ -226,6 +229,7 @@ newstart2:
     mcr 15, 0, r0, c1, c0, 0 // enable protection unit
 
     
+#if CONFIG_CPU==S5L8700
     /* Copy interrupt vectors to iram */
     ldr     r2, =_intvectstart
     ldr     r3, =_intvectend

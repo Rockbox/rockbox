@@ -60,21 +60,28 @@ static int xoffset; /* needed for flip */
 
 static inline void s5l_lcd_write_cmd_data(int cmd, int data)
 {
+    while (LCD_STATUS & 0x10);
     LCD_WCMD = cmd >> 8;
+    while (LCD_STATUS & 0x10);
     LCD_WCMD = cmd & 0xff;
 
+    while (LCD_STATUS & 0x10);
     LCD_WDATA = data >> 8;
+    while (LCD_STATUS & 0x10);
     LCD_WDATA = data & 0xff;
 }
 
 static inline void s5l_lcd_write_cmd(unsigned short cmd)
 {
+    while (LCD_STATUS & 0x10);
     LCD_WCMD = cmd;
 }
 
 static inline void s5l_lcd_write_data(int data)
 {
+    while (LCD_STATUS & 0x10);
     LCD_WDATA = data >> 8;
+    while (LCD_STATUS & 0x10);
     LCD_WDATA = data & 0xff;
 }
 
@@ -185,7 +192,9 @@ void lcd_update(void)
         for (x = 0; x < LCD_WIDTH; x++) {
             pixel = *(p++);
 
+            while (LCD_STATUS & 0x10);
             LCD_WDATA = (pixel & 0xff00) >> 8;
+            while (LCD_STATUS & 0x10);
             LCD_WDATA = pixel & 0xff;
         }
     }

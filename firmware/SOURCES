@@ -1303,6 +1303,7 @@ target/arm/s5l8700/udacodec-meizu.c
 #ifdef IPOD_NANO2G
 target/arm/s5l8700/kernel-s5l8700.c
 target/arm/s5l8700/ipodnano2g/backlight-nano2g.c
+target/arm/s5l8700/ipodnano2g/button-nano2g.c
 target/arm/s5l8700/ipodnano2g/lcd-nano2g.c
 #endif
 
