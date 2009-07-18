@@ -24,7 +24,9 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-enum codecs{cook};
+#define MAX_EXTRADATA_SIZE 16
+
+enum codecs{cook, aac};
 typedef struct rm_packet
 {
     uint8_t *frames[100]; /* Pointers to ordered audio frames in buffer */
@@ -62,20 +64,14 @@ typedef struct rm_context
     uint16_t block_align;
     uint32_t nb_packets;
     int frame_number;
-    uint32_t extradata_size;
     uint16_t sample_rate;
     uint16_t nb_channels;
     uint32_t bit_rate;
     uint16_t flags;
 
-    /*cook extradata*/
-    uint32_t cook_version;
-    uint16_t samples_pf_pc;    /* samples per frame per channel */
-    uint16_t nb_subbands;      /* number of subbands in the frequency domain */
-    /* extra 8 bytes for joint-stereo data */
-    uint32_t unused;
-    uint16_t js_subband_start; /* joint stereo subband start */
-    uint16_t js_vlc_bits;    
+    /*codec extradata*/
+    uint32_t extradata_size;
+    uint8_t  codec_extradata[MAX_EXTRADATA_SIZE];    
 
 } RMContext;
 

@@ -156,7 +156,7 @@ seek_start :
                 return CODEC_ERROR;
             }
 
-            ci->pcmbuf_insert(outbuf, NULL, rmctx.samples_pf_pc / rmctx.nb_channels);
+            ci->pcmbuf_insert(outbuf, NULL, q.samples_per_frame / rmctx.nb_channels);
             ci->set_elapsed(rmctx.audiotimestamp+(1000*8*sps/rmctx.bit_rate)*i);  
         }
         packet_count -= rmctx.audio_pkt_cnt;

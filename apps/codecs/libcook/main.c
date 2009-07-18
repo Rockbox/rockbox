@@ -58,11 +58,11 @@ int open_wav(char* filename) {
     return(fd);
 }
 
-void close_wav(int fd, RMContext *rmctx) {
+void close_wav(int fd, RMContext *rmctx, COOKContext *q) {
     int x,res;
     int filesize;
     int bytes_per_sample = 2;
-    int samples_per_frame = rmctx->samples_pf_pc;
+    int samples_per_frame = q->samples_per_frame;
     int nb_channels = rmctx->nb_channels;
     int sample_rate = rmctx->sample_rate;
     int nb_frames = rmctx->audio_framesize/rmctx->block_align * rmctx->nb_packets - 2; // first 2 frames have no valid audio; skipped in output
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
         packet_count -= rmctx.audio_pkt_cnt;
         rmctx.audio_pkt_cnt = 0;
     }
-    close_wav(fd_dec,&rmctx);
+    close_wav(fd_dec, &rmctx, &q);
     close(fd);
 
 

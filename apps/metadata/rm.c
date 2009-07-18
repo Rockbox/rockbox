@@ -38,26 +38,14 @@
 #define DEBUGF(...)
 #endif
 
-static inline int read_cook_extradata(int fd, RMContext *rmctx) {
-    read_uint32be(fd, &rmctx->cook_version);
-    read_uint16be(fd, &rmctx->samples_pf_pc);
-    read_uint16be(fd, &rmctx->nb_subbands);
-    if(rmctx->extradata_size == 16) {
-        lseek(fd, sizeof(uint32_t), SEEK_CUR); /* reserved */
-        read_uint16be(fd, &rmctx->js_subband_start);
-        read_uint16be(fd, &rmctx->js_vlc_bits);
-    }
-    return rmctx->extradata_size; /* for 'skipped' */
-}
-
 static inline void print_cook_extradata(RMContext *rmctx) {
 
-    DEBUGF("            cook_version = 0x%08lx\n", rmctx->cook_version);
-    DEBUGF("            samples_per_frame_per_channel = %d\n", rmctx->samples_pf_pc);
-    DEBUGF("            number_of_subbands_in_freq_domain = %d\n", rmctx->nb_subbands);
-    if(rmctx->extradata_size == 16) {
-        DEBUGF("            joint_stereo_subband_start = %d\n",rmctx->js_subband_start);
-        DEBUGF("            joint_stereo_vlc_bits = %d\n", rmctx->js_vlc_bits);
+    DEBUGF("            cook_version = 0x%08x\n", get_uint32be(rmctx->codec_extradata));
+    DEBUGF("            samples_per_frame_per_channel = %d\n", get_uint16be(&rmctx->codec_extradata[4]));
+    DEBUGF("            number_of_subbands_in_freq_domain = %d\n", get_uint16be(&rmctx->codec_extradata[6]));
+     if(rmctx->extradata_size == 16) {
+        DEBUGF("            joint_stereo_subband_start = %d\n",get_uint16be(&rmctx->codec_extradata[12]));
+        DEBUGF("            joint_stereo_vlc_bits = %d\n", get_uint16be(&rmctx->codec_extradata[14]));
     }
 } 
 
@@ -174,13 +162,10 @@ static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
   
        read_uint32be(fd, &rmctx->extradata_size);
        skipped += 4;
-       /*if(!strncmp(fourcc2str(fourcc),"cook",4)){
-           skipped += read_cook_extradata(fd, rmctx); 
-           rmctx->codec_type = cook;
-       }*/
+       read(fd, rmctx->codec_extradata, rmctx->extradata_size);
+       skipped += rmctx->extradata_size;
        switch(fourcc) {
-           case FOURCC('c','o','o','k'):
-               skipped += read_cook_extradata(fd, rmctx);
+           case FOURCC('c','o','o','k'):               
                rmctx->codec_type = cook;
                break;
 
