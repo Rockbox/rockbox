@@ -116,36 +116,36 @@ static int handle_usb_events(void)
 
         if (hid_enabled)
         {
-            consumer_usage_page_t cmd = UNASSIGNED;
+            int id = HID_CONSUMER_USAGE_UNASSIGNED;
             button = get_action(CONTEXT_USB_HID, HZ/4);
 
             switch (button)
             {
                 case ACTION_USB_HID_PLAY:
-                    cmd = PLAY_PAUSE;
+                    id = HID_CONSUMER_USAGE_PLAY_PAUSE;
                     break;
                 case ACTION_USB_HID_STOP:
-                    cmd = STOP;
+                    id = HID_CONSUMER_USAGE_STOP;
                     break;
                 case ACTION_USB_HID_SKIPPREV:
-                    cmd = SCAN_PREVIOUS_TRACK;
+                    id = HID_CONSUMER_USAGE_SCAN_PREVIOUS_TRACK;
                     break;
                 case ACTION_USB_HID_SKIPNEXT:
-                    cmd = SCAN_NEXT_TRACK;
+                    id = HID_CONSUMER_USAGE_SCAN_NEXT_TRACK;
                     break;
                 case ACTION_USB_HID_VOLDOWN:
-                    cmd = VOLUME_DECREMENT;
+                    id = HID_CONSUMER_USAGE_VOLUME_DECREMENT;
                     break;
                 case ACTION_USB_HID_VOLUP:
-                    cmd = VOLUME_INCREMENT;
+                    id = HID_CONSUMER_USAGE_VOLUME_INCREMENT;
                     break;
                 case ACTION_USB_HID_MUTE:
-                    cmd = MUTE;
+                    id = HID_CONSUMER_USAGE_MUTE;
                     break;
             }
 
-            if (cmd != UNASSIGNED)
-                usb_hid_send_consumer_usage(cmd);
+            if (id != HID_CONSUMER_USAGE_UNASSIGNED)
+                usb_hid_send(HID_USAGE_PAGE_CONSUMER, id);
         }
         else
 #endif

@@ -51,6 +51,10 @@
 #include "bidi.h"
 #endif
 
+#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
+#include "usbstack/usb_hid.h"
+#endif
+
 #ifdef SIMULATOR
 #define PREFIX(_x_) sim_ ## _x_
 #else
@@ -660,6 +664,10 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
+    usb_hid_send,
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

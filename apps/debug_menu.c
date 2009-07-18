@@ -112,13 +112,6 @@
 #include "as3514.h"
 #endif
 
-#ifdef HAVE_USBSTACK
-#include "usb_core.h"
-#ifdef USB_ENABLE_HID
-#include "usbstack/usb_hid.h"
-#endif
-#endif
-
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
@@ -2635,50 +2628,6 @@ static bool toggle_usb_serial(void)
 }
 #endif
 
-#ifdef USB_ENABLE_HID
-static bool hid_send_cmd(consumer_usage_page_t cmd, char *msg)
-{
-    (void)msg;
-
-    if (!usb_core_driver_enabled(USB_DRIVER_HID)) {
-        splashf(HZ, "Send failed. Driver is disabled");
-        return false;
-    }
-
-    usb_hid_send_consumer_usage(cmd);
-    logf("Sent %s command", msg);
-
-    return false;
-}
-static bool usb_hid_send_play_pause(void)
-{
-    return hid_send_cmd(PLAY_PAUSE, "Play/Pause");
-}
-static bool usb_hid_send_stop(void)
-{
-    return hid_send_cmd(STOP, "Stop");
-}
-static bool usb_hid_send_scan_previous_track(void)
-{
-    return hid_send_cmd(SCAN_PREVIOUS_TRACK, "Scan previous track");
-}
-static bool usb_hid_send_scan_next_track(void)
-{
-    return hid_send_cmd(SCAN_NEXT_TRACK, "Scan next track");
-}
-static bool usb_hid_send_mute(void)
-{
-    return hid_send_cmd(MUTE, "Mute");
-}
-static bool usb_hid_send_volume_decrement(void)
-{
-    return hid_send_cmd(VOLUME_DECREMENT, "Vol Down");
-}
-static bool usb_hid_send_volume_increment(void)
-{
-    return hid_send_cmd(VOLUME_INCREMENT, "Vol Up");
-}
-#endif
 #endif
 
 #if CONFIG_USBOTG == USBOTG_ISP1583
@@ -2818,15 +2767,6 @@ static const struct the_menu_item menuitems[] = {
 #if defined(HAVE_USBSTACK)
 #if defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL)
         {"USB Serial driver (logf)", toggle_usb_serial },
-#endif
-#if defined(USB_ENABLE_HID)
-        {"USB HID play/pause", usb_hid_send_play_pause },
-        {"USB HID stop", usb_hid_send_stop },
-        {"USB HID prev track", usb_hid_send_scan_previous_track },
-        {"USB HID next track", usb_hid_send_scan_next_track },
-        {"USB HID mute", usb_hid_send_mute },
-        {"USB HID vol down", usb_hid_send_volume_decrement },
-        {"USB HID vol up", usb_hid_send_volume_increment },
 #endif
 #endif /* HAVE_USBSTACK */
 #ifdef CPU_BOOST_LOGGING

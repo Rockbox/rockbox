@@ -22,6 +22,7 @@
 #define USB_HID_H
 
 #include "usb_ch9.h"
+#include "usb_core.h"
 #include "usb_hid_usage_tables.h"
 
 int usb_hid_request_endpoints(struct usb_class_driver *drv);
@@ -33,7 +34,7 @@ void usb_hid_disconnect(void);
 void usb_hid_transfer_complete(int ep, int dir, int status, int length);
 bool usb_hid_control_request(struct usb_ctrlrequest* req, unsigned char* dest);
 
-void usb_hid_send_consumer_usage(consumer_usage_page_t id);
+void usb_hid_send(usage_page_t usage_page, int id);
 
 #endif
 

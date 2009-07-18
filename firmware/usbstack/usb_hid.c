@@ -37,17 +37,28 @@
 
 #define HID_VER                         0x0110 /* 1.1 */
 /* Subclass Codes (HID1_11.pdf, page 18) */
+#define SUBCLASS_NONE                   0
 #define SUBCLASS_BOOT_INTERFACE         1
 /* Protocol Codes (HID1_11.pdf, page 19) */
+#define PROTOCOL_CODE_NONE              0
+#define PROTOCOL_CODE_KEYBOARD          1
 #define PROTOCOL_CODE_MOUSE             2
 /* HID main items (HID1_11.pdf, page 38) */
 #define INPUT                           0x80
-#define COLLECTION                      0xa0
+#define OUTPUT                          0x90
+#define COLLECTION                      0xA0
 #define COLLECTION_APPLICATION          0x01
-#define END_COLLECTION                  0xc0
+#define END_COLLECTION                  0xC0
 /* Parts (HID1_11.pdf, page 40) */
-#define PREFERERD                       (1 << 5)
-#define NULL_STATE                      (1 << 6)
+#define MAIN_ITEM_CONSTANT              BIT_N(0) /* 0x01 */
+#define MAIN_ITEM_VARIABLE              BIT_N(1) /* 0x02 */
+#define MAIN_ITEM_RELATIVE              BIT_N(2) /* 0x04 */
+#define MAIN_ITEM_WRAP                  BIT_N(3) /* 0x08 */
+#define MAIN_ITEM_NONLINEAR             BIT_N(4) /* 0x10 */
+#define MAIN_ITEM_NO_PREFERRED          BIT_N(5) /* 0x20 */
+#define MAIN_ITEM_NULL_STATE            BIT_N(6) /* 0x40 */
+#define MAIN_ITEM_VOLATILE              BIT_N(7) /* 0x80 */
+#define MAIN_ITEM_BUFFERED_BYTES        BIT_N(8) /* 0x0100 */
 /* HID global items (HID1_11.pdf, page 45) */
 #define USAGE_PAGE                      0x04
 #define LOGICAL_MINIMUM                 0x14
@@ -62,25 +73,43 @@
 #define USB_DT_HID                      0x21
 #define USB_DT_REPORT                   0x22
 
-/* (Hut1_12.pdf, Table 1, page 14) */
-#define USAGE_PAGE_CONSUMER             0x0c
-
 #define CONSUMER_USAGE                  0x09
 
-/* HID-only class specific requests */
+/* HID-only class specific requests (HID1_11.pdf, page 61) */
 #define USB_HID_GET_REPORT              0x01
 #define USB_HID_GET_IDLE                0x02
 #define USB_HID_GET_PROTOCOL            0x03
 #define USB_HID_SET_REPORT              0x09
-#define USB_HID_SET_IDLE                0x0a
-#define USB_HID_SET_PROTOCOL            0x0b
+#define USB_HID_SET_IDLE                0x0A
+#define USB_HID_SET_PROTOCOL            0x0B
+
+/* Get_Report and Set_Report Report Type field (HID1_11.pdf, page 61) */
+#define REPORT_TYPE_INPUT               0x01
+#define REPORT_TYPE_OUTPUT              0x02
+#define REPORT_TYPE_FEATURE             0x03
 
 #define HID_BUF_SIZE_MSG                16
-#define HID_BUF_SIZE_CMD                5
-#define HID_BUG_SIZE_REPORT             32
+#define HID_BUF_SIZE_CMD                16
+#define HID_BUF_SIZE_REPORT             96
 #define HID_NUM_BUFFERS                 5
+#define SET_REPORT_BUF_LEN 2
+
+#ifdef LOGF_ENABLE
+#define BUF_DUMP_BUF_LEN       HID_BUF_SIZE_REPORT
+#define BUF_DUMP_PREFIX_SIZE   5
+#define BUF_DUMP_LINE_SIZE     (MAX_LOGF_ENTRY - BUF_DUMP_PREFIX_SIZE)
+#define BUF_DUMP_ITEMS_IN_LINE (BUF_DUMP_LINE_SIZE / 3)
+#define BUF_DUMP_NUM_LINES     (BUF_DUMP_BUF_LEN / (BUF_DUMP_LINE_SIZE / 3))
+#endif
 
 #define HID_BUF_INC(i) do { (i) = ((i) + 1) % HID_NUM_BUFFERS; } while (0)
+
+typedef enum
+{
+    REPORT_ID_KEYBOARD = 1,
+    REPORT_ID_CONSUMER,
+    REPORT_ID_COUNT,
+} report_id_t;
 
 /* hid interface */
 static struct usb_interface_descriptor __attribute__((aligned(2)))
@@ -93,7 +122,7 @@ static struct usb_interface_descriptor __attribute__((aligned(2)))
     .bNumEndpoints      = 1,
     .bInterfaceClass    = USB_CLASS_HID,
     .bInterfaceSubClass = SUBCLASS_BOOT_INTERFACE,
-    .bInterfaceProtocol = PROTOCOL_CODE_MOUSE,
+    .bInterfaceProtocol = PROTOCOL_CODE_KEYBOARD,
     .iInterface         = 0
 };
 
@@ -129,7 +158,17 @@ static struct usb_endpoint_descriptor __attribute__((aligned(2)))
     .bInterval        = 0
 };
 
-static unsigned char report_descriptor[HID_BUG_SIZE_REPORT]
+typedef struct
+{
+    uint8_t usage_page;
+    /* Write the id into the buffer in the appropriate location, and returns the
+     * buffer length */
+    uint8_t (*buf_set)(unsigned char *buf, int id);
+} usb_hid_report_t;
+
+usb_hid_report_t usb_hid_reports[REPORT_ID_COUNT];
+
+static unsigned char report_descriptor[HID_BUF_SIZE_REPORT]
     USB_DEVBSS_ATTR __attribute__((aligned(32)));
 
 static unsigned char send_buffer[HID_NUM_BUFFERS][HID_BUF_SIZE_MSG]
@@ -138,22 +177,44 @@ size_t send_buffer_len[HID_NUM_BUFFERS];
 static int cur_buf_prepare;
 static int cur_buf_send;
 
-static uint16_t report_descriptor_len;
 static bool active = false;
 static int ep_in;
 static int usb_interface;
-static uint32_t report_id;
 
 static void usb_hid_try_send_drv(void);
 
-static void pack_parameter(unsigned char **dest, uint8_t parameter,
-        uint32_t value)
+static void pack_parameter(unsigned char **dest, bool is_signed,
+        uint8_t parameter, uint32_t value)
 {
     uint8_t size_value = 1; /* # of bytes */
     uint32_t v = value;
 
     while (v >>= 8)
         size_value++;
+
+    if (is_signed)
+    {
+        bool is_negative = 0;
+
+        switch (size_value)
+        {
+            case 1:
+                is_negative = (int8_t)value < 0;
+                break;
+            case 2:
+                is_negative = (int16_t)value < 0;
+                break;
+            case 3:
+            case 4:
+                is_negative = (int32_t)value < 0;
+                break;
+            default:
+                break;
+        }
+
+        if (is_negative)
+            size_value++;
+    }
 
     **dest = parameter | size_value;
     (*dest)++;
@@ -182,48 +243,157 @@ int usb_hid_set_first_interface(int interface)
     return interface + 1;
 }
 
-int usb_hid_get_config_descriptor(unsigned char *dest,int max_packet_size)
+#ifdef LOGF_ENABLE
+static unsigned char
+    buf_dump_ar[BUF_DUMP_NUM_LINES][BUF_DUMP_LINE_SIZE + 1]
+    USB_DEVBSS_ATTR __attribute__((aligned(32)));
+
+void buf_dump(unsigned char *buf, size_t size)
 {
-    unsigned char *report, *orig_dest = dest;
+    size_t i;
+    int line;
+    static const char v[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'A', 'B', 'C', 'D', 'E', 'F' };
+
+    for (i = 0, line = 0; i < size; line++)
+    {
+        int j, i0 = i;
+        char *b = buf_dump_ar[line];
+
+        for (j = 0; j < BUF_DUMP_ITEMS_IN_LINE && i < size; j++, i++)
+        {
+            *b++ = v[buf[i] >> 4];
+            *b++ = v[buf[i] & 0xF];
+            *b++ = ' ';
+        }
+        *b = 0;
+
+        /* Prefix must be of len BUF_DUMP_PREFIX_SIZE */
+        logf("%03d: %s", i0, buf_dump_ar[line]);
+    }
+}
+#else
+#undef buf_dump
+#define buf_dump(...)
+#endif
+
+uint8_t buf_set_keyboard(unsigned char *buf, int id)
+{
+    memset(buf, 0, 7);
+
+    if (HID_KEYBOARD_LEFT_CONTROL <= id && id <= HID_KEYBOARD_RIGHT_GUI)
+        buf[0] = (1 << (id - HID_KEYBOARD_LEFT_CONTROL));
+    else
+        buf[1] = (uint8_t)id;
+
+    return 7;
+}
+
+uint8_t buf_set_consumer(unsigned char *buf, int id)
+{
+    memset(buf, 0, 4);
+    buf[0] = (uint8_t)id;
+
+    return 4;
+}
+
+static size_t descriptor_report_get(unsigned char *dest)
+{
+    unsigned char *report = dest;
+    usb_hid_report_t *usb_hid_report;
+
+    /* Keyboard control */
+    usb_hid_report = &usb_hid_reports[REPORT_ID_KEYBOARD];
+    usb_hid_report->usage_page = HID_USAGE_PAGE_KEYBOARD_KEYPAD;
+    usb_hid_report->buf_set = buf_set_keyboard;
+
+    pack_parameter(&report, 0, USAGE_PAGE,
+            HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS);
+    PACK_VAL2(report, CONCAT(CONSUMER_USAGE, HID_GENERIC_DESKTOP_KEYBOARD));
+    pack_parameter(&report, 0, COLLECTION, COLLECTION_APPLICATION);
+    pack_parameter(&report, 0, REPORT_ID, REPORT_ID_KEYBOARD);
+    pack_parameter(&report, 0, USAGE_PAGE, HID_GENERIC_DESKTOP_KEYPAD);
+    pack_parameter(&report, 0, USAGE_MINIMUM, HID_KEYBOARD_LEFT_CONTROL);
+    pack_parameter(&report, 0, USAGE_MAXIMUM, HID_KEYBOARD_RIGHT_GUI);
+    pack_parameter(&report, 1, LOGICAL_MINIMUM, 0);
+    pack_parameter(&report, 1, LOGICAL_MAXIMUM, 1);
+    pack_parameter(&report, 0, REPORT_SIZE, 1);
+    pack_parameter(&report, 0, REPORT_COUNT, 8);
+    pack_parameter(&report, 0, INPUT, MAIN_ITEM_VARIABLE);
+    pack_parameter(&report, 0, REPORT_SIZE, 1);
+    pack_parameter(&report, 0, REPORT_COUNT, 5);
+    pack_parameter(&report, 0, USAGE_PAGE, HID_USAGE_PAGE_LEDS);
+    pack_parameter(&report, 0, USAGE_MINIMUM, HID_LED_NUM_LOCK);
+    pack_parameter(&report, 0, USAGE_MAXIMUM, HID_LED_KANA);
+    pack_parameter(&report, 0, OUTPUT, MAIN_ITEM_VARIABLE);
+    pack_parameter(&report, 0, REPORT_SIZE, 3);
+    pack_parameter(&report, 0, REPORT_COUNT, 1);
+    pack_parameter(&report, 0, OUTPUT, MAIN_ITEM_CONSTANT);
+    pack_parameter(&report, 0, REPORT_SIZE, 8);
+    pack_parameter(&report, 0, REPORT_COUNT, 6);
+    pack_parameter(&report, 1, LOGICAL_MINIMUM, 0);
+    pack_parameter(&report, 1, LOGICAL_MAXIMUM, HID_KEYBOARD_EX_SEL);
+    pack_parameter(&report, 0, USAGE_PAGE, HID_USAGE_PAGE_KEYBOARD_KEYPAD);
+    pack_parameter(&report, 0, USAGE_MINIMUM, 0);
+    pack_parameter(&report, 0, USAGE_MAXIMUM, HID_KEYBOARD_EX_SEL);
+    pack_parameter(&report, 0, INPUT, 0);
+    PACK_VAL1(report, END_COLLECTION);
+
+    /* Consumer usage controls - play/pause, stop, etc. */
+    usb_hid_report = &usb_hid_reports[REPORT_ID_CONSUMER];
+    usb_hid_report->usage_page = HID_USAGE_PAGE_CONSUMER;
+    usb_hid_report->buf_set = buf_set_consumer;
+
+    pack_parameter(&report, 0, USAGE_PAGE, HID_USAGE_PAGE_CONSUMER);
+    PACK_VAL2(report, CONCAT(CONSUMER_USAGE,
+                HID_CONSUMER_USAGE_CONSUMER_CONTROL));
+    pack_parameter(&report, 0, COLLECTION, COLLECTION_APPLICATION);
+    pack_parameter(&report, 0, REPORT_ID, REPORT_ID_CONSUMER);
+    pack_parameter(&report, 0, REPORT_SIZE, 16);
+    pack_parameter(&report, 0, REPORT_COUNT, 2);
+    pack_parameter(&report, 1, LOGICAL_MINIMUM, 1);
+    pack_parameter(&report, 1, LOGICAL_MAXIMUM, 652);
+    pack_parameter(&report, 0, USAGE_MINIMUM,
+            HID_CONSUMER_USAGE_CONSUMER_CONTROL);
+    pack_parameter(&report, 0, USAGE_MAXIMUM, HID_CONSUMER_USAGE_AC_SEND);
+    pack_parameter(&report, 0, INPUT, MAIN_ITEM_NO_PREFERRED |
+            MAIN_ITEM_NULL_STATE);
+    PACK_VAL1(report, END_COLLECTION);
+
+    return (size_t)((uint32_t)report - (uint32_t)dest);
+}
+
+static void descriptor_hid_get(unsigned char **dest)
+{
+    hid_descriptor.wDescriptorLength0 =
+        (uint16_t)descriptor_report_get(report_descriptor);
+
+    PACK_DATA(*dest, hid_descriptor);
+}
+
+int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size)
+{
+    unsigned char *orig_dest = dest;
 
     logf("hid: config desc.");
 
     /* Ignore given max_packet_size */
     (void)max_packet_size;
 
-    /* TODO: Increment report_id for each report, and send command with
-     * appropriate report id */
-    report_id = 2;
-
-    /* Initialize report descriptor */
-    report = report_descriptor;
-    pack_parameter(&report, USAGE_PAGE, USAGE_PAGE_CONSUMER);
-    PACK_VAL2(report, CONCAT(CONSUMER_USAGE, CONSUMER_CONTROL));
-    pack_parameter(&report, COLLECTION, COLLECTION_APPLICATION);
-    pack_parameter(&report, REPORT_ID, report_id);
-    pack_parameter(&report, REPORT_SIZE, 16);
-    pack_parameter(&report, REPORT_COUNT, 2);
-    pack_parameter(&report, LOGICAL_MINIMUM, 1);
-    pack_parameter(&report, LOGICAL_MAXIMUM, 652);
-    pack_parameter(&report, USAGE_MINIMUM, CONSUMER_CONTROL);
-    pack_parameter(&report, USAGE_MAXIMUM, AC_SEND);
-    pack_parameter(&report, INPUT, PREFERERD | NULL_STATE);
-    PACK_VAL1(report, END_COLLECTION);
-    report_descriptor_len = (uint16_t)((uint32_t)report -
-            (uint32_t)report_descriptor);
-
+    /* Interface descriptor */
     interface_descriptor.bInterfaceNumber = usb_interface;
     PACK_DATA(dest, interface_descriptor);
-    hid_descriptor.wDescriptorLength0 = report_descriptor_len;
-    PACK_DATA(dest, hid_descriptor);
 
+    /* HID descriptor */
+    descriptor_hid_get(&dest);
+
+    /* Endpoint descriptor */
     endpoint_descriptor.wMaxPacketSize = 8;
     endpoint_descriptor.bInterval = 8;
-
     endpoint_descriptor.bEndpointAddress = ep_in;
     PACK_DATA(dest, endpoint_descriptor);
 
-    return (dest - orig_dest);
+    return (int)(dest - orig_dest);
 }
 
 void usb_hid_init_connection(void)
@@ -263,10 +433,12 @@ void usb_hid_transfer_complete(int ep, int dir, int status, int length)
     (void)status;
     (void)length;
 
-    switch (dir) {
+    switch (dir)
+    {
         case USB_DIR_OUT:
             break;
-        case USB_DIR_IN: {
+        case USB_DIR_IN:
+        {
             if (status)
                 break;
 
@@ -278,26 +450,95 @@ void usb_hid_transfer_complete(int ep, int dir, int status, int length)
     }
 }
 
+/* The DAP is registered as a keyboard with several LEDs, therefore the OS sends
+ * LED report to notify the DAP whether Num Lock / Caps Lock etc. are enabled.
+ * In order to allow sending info to the DAP, the Set Report mechanism can be
+ * used by defining vendor specific output reports and send them from the host
+ * to the DAP using the host's custom driver */
+static int usb_hid_set_report(struct usb_ctrlrequest *req)
+{
+    static unsigned char buf[SET_REPORT_BUF_LEN]
+        USB_DEVBSS_ATTR __attribute__((aligned(32)));
+    int length;
+    int rc = 0;
+
+    if ((req->wValue >> 8) != REPORT_TYPE_OUTPUT)
+    {
+        logf("Unsopported report type");
+        rc = 1;
+        goto Exit;
+    }
+    if ((req->wValue & 0xff) != REPORT_ID_KEYBOARD)
+    {
+        logf("Wrong report id");
+        rc = 2;
+        goto Exit;
+    }
+    if (req->wIndex != (uint16_t)usb_interface)
+    {
+        logf("Wrong interface");
+        rc = 3;
+        goto Exit;
+    }
+    length = req->wLength;
+    if (length != SET_REPORT_BUF_LEN)
+    {
+        logf("Wrong length");
+        rc = 4;
+        goto Exit;
+    }
+
+    memset(buf, 0, length);
+    usb_drv_recv(EP_CONTROL, buf, length);
+
+#ifdef LOGF_ENABLE
+    if (buf[1] & 0x01)
+        logf("Num Lock enabled");
+    if (buf[1] & 0x02)
+        logf("Caps Lock enabled");
+    if (buf[1] & 0x04)
+        logf("Scroll Lock enabled");
+    if (buf[1] & 0x08)
+        logf("Compose enabled");
+    if (buf[1] & 0x10)
+        logf("Kana enabled");
+#endif
+
+    /* Defining other LEDs and setting them from the USB host (OS) can be used
+     * to send messages to the DAP */
+
+Exit:
+    return rc;
+}
+
 /* called by usb_core_control_request() */
-bool usb_hid_control_request(struct usb_ctrlrequest* req, unsigned char* dest)
+bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
 {
     bool handled = false;
 
-    switch(req->bRequestType & USB_TYPE_MASK) {
-        case USB_TYPE_STANDARD: {
+    switch (req->bRequestType & USB_TYPE_MASK)
+    {
+        case USB_TYPE_STANDARD:
+        {
             unsigned char *orig_dest = dest;
 
-            switch(req->wValue>>8) { /* type */
-                case USB_DT_HID: {
+            switch (req->wValue>>8) /* type */
+            {
+                case USB_DT_HID:
+                {
                     logf("hid: type hid");
-                    hid_descriptor.wDescriptorLength0 = report_descriptor_len;
-                    PACK_DATA(dest, hid_descriptor);
+                    descriptor_hid_get(&dest);
                     break;
                 }
-                case USB_DT_REPORT: {
+                case USB_DT_REPORT:
+                {
+                    int len;
+
                     logf("hid: type report");
-                    memcpy(dest, &report_descriptor, report_descriptor_len);
-                    dest += report_descriptor_len;
+
+                    len = descriptor_report_get(report_descriptor);
+                    memcpy(dest, &report_descriptor, len);
+                    dest += len;
                     break;
                 }
                 default:
@@ -305,26 +546,37 @@ bool usb_hid_control_request(struct usb_ctrlrequest* req, unsigned char* dest)
                     break;
             }
             if (dest != orig_dest &&
-                    !usb_drv_send(EP_CONTROL, orig_dest, dest - orig_dest)) {
+                    !usb_drv_send(EP_CONTROL, orig_dest, dest - orig_dest))
+            {
                 usb_core_ack_control(req);
                 handled = true;
             }
             break;
         }
 
-        case USB_TYPE_CLASS: {
-                switch (req->bRequest) {
-                    case USB_HID_SET_IDLE:
-                        logf("hid: set idle");
+        case USB_TYPE_CLASS:
+        {
+            switch (req->bRequest)
+            {
+                case USB_HID_SET_IDLE:
+                    logf("hid: set idle");
+                    usb_core_ack_control(req);
+                    handled = true;
+                    break;
+                case USB_HID_SET_REPORT:
+                    logf("hid: set report");
+                    if (!usb_hid_set_report(req))
+                    {
                         usb_core_ack_control(req);
                         handled = true;
-                        break;
-                    default:
-                        logf("%d: unsup. cls. req", req->bRequest);
-                        break;
-                }
-                break;
+                    }
+                    break;
+                default:
+                    logf("%d: unsup. cls. req", req->bRequest);
+                    break;
             }
+            break;
+        }
 
         case USB_TYPE_VENDOR:
             logf("hid: unsup. ven. req");
@@ -367,26 +619,42 @@ static void usb_hid_queue(unsigned char *data, int length)
     HID_BUF_INC(cur_buf_prepare);
 }
 
-void usb_hid_send_consumer_usage(consumer_usage_page_t id)
+void usb_hid_send(usage_page_t usage_page, int id)
 {
+    uint8_t report_id, length;
     static unsigned char buf[HID_BUF_SIZE_CMD] USB_DEVBSS_ATTR
         __attribute__((aligned(32)));
-    unsigned char *dest = buf;
+    usb_hid_report_t *report = NULL;
 
-    memset(buf, 0, sizeof(buf));
+    for (report_id = 1; report_id < REPORT_ID_COUNT; report_id++)
+    {
+        if (usb_hid_reports[report_id].usage_page == usage_page)
+        {
+            report = &usb_hid_reports[report_id];
+            break;
+        }
+    }
+    if (!report)
+    {
+        logf("Unsupported usage_page");
+        return;
+    }
 
-    logf("HID: Sending 0x%x", id);
-
-    pack_parameter(&dest, 0, id);
+    logf("Sending cmd 0x%x", id);
     buf[0] = report_id;
+    length = report->buf_set(&buf[1], id) + 1;
+    logf("length %u", length);
 
-   /* Key pressed */
-    usb_hid_queue(buf, HID_BUF_SIZE_CMD);
+    /* Key pressed */
+    buf_dump(buf, length);
+    usb_hid_queue(buf, length);
 
     /* Key released */
-    memset(buf, 0, sizeof(buf));
+    memset(buf, 0, length);
     buf[0] = report_id;
-    usb_hid_queue(buf, HID_BUF_SIZE_CMD);
+
+    buf_dump(buf, length);
+    usb_hid_queue(buf, length);
 
     usb_hid_try_send_drv();
 }

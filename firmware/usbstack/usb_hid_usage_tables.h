@@ -21,374 +21,685 @@
 #ifndef USB_HID_USAGE_TABLES_H
 #define USB_HID_USAGE_TABLES_H
 
-typedef enum consumer_usage_page
+typedef enum usage_page
 {
-    UNASSIGNED = 0x00,
-    CONSUMER_CONTROL = 0x1,
-    NUMERIC_KEY_PAD = 0x2,
-    PROGRAMMABLE_BUTTONS = 0x3,
-    MICROPHONE = 0x4,
-    HEADPHONE = 0x5,
-    GRAPHIC_EQUALIZER = 0x6,
-    PLUS_10 = 0x20,
-    PLUS_100 = 0x21,
-    AM_PM = 0x22,
-    POWER = 0x30,
-    RESET = 0x31,
-    SLEEP = 0x32,
-    SLEEP_AFTER = 0x33,
-    SLEEP_MODE = 0x34,
-    ILLUMINATION = 0x35,
-    FUNCTION_BUTTONS = 0x36,
-    MENU = 0x40,
-    MENU_PICK = 0x41,
-    MENU_UP = 0x42,
-    MENU_DOWN = 0x43,
-    MENU_LEFT = 0x44,
-    MENU_RIGHT = 0x45,
-    MENU_ESCAPE = 0x46,
-    MENU_VALUE_INCREASE = 0x47,
-    MENU_VALUE_DECREASE = 0x48,
-    DATA_ON_SCREEN = 0x60,
-    CLOSED_CAPTION = 0x61,
-    CLOSED_CAPTION_SELECT = 0x62,
-    VCR_TV = 0x63,
-    BROADCAST_MODE = 0x64,
-    SNAPSHOT = 0x65,
-    STILL = 0x66,
-    SELECTION = 0x80,
-    ASSIGN_SELECTION = 0x81,
-    MODE_STEP = 0x82,
-    RECALL_LAST = 0x83,
-    ENTER_CHANNEL = 0x84,
-    ORDER_MOVIE = 0x85,
-    CHANNEL = 0x86,
-    MEDIA_SELECTION = 0x87,
-    MEDIA_SELECT_COMPUTER = 0x88,
-    MEDIA_SELECT_TV = 0x89,
-    MEDIA_SELECT_WWW = 0x8A,
-    MEDIA_SELECT_DVD = 0x8B,
-    MEDIA_SELECT_TELEPHONE = 0x8C,
-    MEDIA_SELECT_PROGRAM_GUIDE = 0x8D,
-    MEDIA_SELECT_VIDEO_PHONE = 0x8E,
-    MEDIA_SELECT_GAMES = 0x8F,
-    MEDIA_SELECT_MESSAGES = 0x90,
-    MEDIA_SELECT_CD = 0x91,
-    MEDIA_SELECT_VCR = 0x92,
-    MEDIA_SELECT_TUNER = 0x93,
-    QUIT = 0x94,
-    HELP = 0x95,
-    MEDIA_SELECT_TAPE = 0x96,
-    MEDIA_SELECT_CABLE = 0x97,
-    MEDIA_SELECT_SATELLITE = 0x98,
-    MEDIA_SELECT_SECURITY = 0x99,
-    MEDIA_SELECT_HOME = 0x9A,
-    MEDIA_SELECT_CALL = 0x9B,
-    CHANNEL_INCREMENT = 0x9C,
-    CHANNEL_DECREMENT = 0x9D,
-    MEDIA_SELECT_SAP = 0x9E,
-    VCR_PLUS = 0xA0,
-    ONCE = 0xA1,
-    DAILY = 0xA2,
-    WEEKLY = 0xA3,
-    MONTHLY = 0xA4,
-    PLAY = 0xB0,
-    PAUSE = 0xB1,
-    RECORD = 0xB2,
-    FAST_FORWARD = 0xB3,
-    REWIND = 0xB4,
-    SCAN_NEXT_TRACK = 0xB5,
-    SCAN_PREVIOUS_TRACK = 0xB6,
-    STOP = 0xB7,
-    EJECT = 0xB8,
-    RANDOM_PLAY = 0xB9,
-    SELECT_DISC = 0xBA,
-    ENTER_DISC = 0xBB,
-    REPEAT = 0xBC,
-    TRACKING = 0xBD,
-    TRACK_NORMAL = 0xBE,
-    SLOW_TRACKING = 0xBF,
-    FRAME_FORWARD = 0xC0,
-    FRAME_BACK = 0xC1,
-    MARK = 0xC2,
-    CLEAR_MARK = 0xC3,
-    REPEAT_FROM_MARK = 0xC4,
-    RETURN_TO_MARK = 0xC5,
-    SEARCH_MARK_FORWARD = 0xC6,
-    SEARCH_MARK_BACKWARDS = 0xC7,
-    COUNTER_RESET = 0xC8,
-    SHOW_COUNTER = 0xC9,
-    TRACKING_INCREMENT = 0xCA,
-    TRACKING_DECREMENT = 0xCB,
-    STOP_EJECT = 0xCC,
-    PLAY_PAUSE = 0xCD,
-    PLAY_SKIP = 0xCE,
-    VOLUME = 0xE0,
-    BALANCE = 0xE1,
-    MUTE = 0xE2,
-    BASS = 0xE3,
-    TREBLE = 0xE4,
-    BASS_BOOST = 0xE5,
-    SURROUND_MODE = 0xE6,
-    LOUDNESS = 0xE7,
-    MPX = 0xE8,
-    VOLUME_INCREMENT = 0xE9,
-    VOLUME_DECREMENT = 0xEA,
-    SPEED_SELECT = 0xF0,
-    PLAYBACK_SPEED = 0xF1,
-    STANDARD_PLAY = 0xF2,
-    LONG_PLAY = 0xF3,
-    EXTENDED_PLAY = 0xF4,
-    SLOW = 0xF5,
-    FAN_ENABLE = 0x100,
-    FAN_SPEED = 0x101,
-    LIGHT_ENABLE = 0x102,
-    LIGHT_ILLUMINATION_LEVEL = 0x103,
-    CLIMATE_CONTROL_ENABLE = 0x104,
-    ROOM_TEMPERATURE = 0x105,
-    SECURITY_ENABLE = 0x106,
-    FIRE_ALARM = 0x107,
-    POLICE_ALARM = 0x108,
-    PROXIMITY = 0x109,
-    MOTION = 0x10A,
-    DURESS_ALARM = 0x10B,
-    HOLDUP_ALARM = 0x10C,
-    MEDICAL_ALARM = 0x10D,
-    BALANCE_RIGHT = 0x150,
-    BALANCE_LEFT = 0x151,
-    BASS_INCREMENT = 0x152,
-    BASS_DECREMENT = 0x153,
-    TREBLE_INCREMENT = 0x154,
-    TREBLE_DECREMENT = 0x155,
-    SPEAKER_SYSTEM = 0x160,
-    CHANNEL_LEFT = 0x161,
-    CHANNEL_RIGHT = 0x162,
-    CHANNEL_CENTER = 0x163,
-    CHANNEL_FRONT = 0x164,
-    CHANNEL_CENTER_FRONT = 0x165,
-    CHANNEL_SIDE = 0x166,
-    CHANNEL_SURROUND = 0x167,
-    CHANNEL_LOW_FREQUENCY_ENHANCEMENT = 0x168,
-    CHANNEL_TOP = 0x169,
-    CHANNEL_UNKNOWN = 0x16A,
-    SUB_CHANNEL = 0x170,
-    SUB_CHANNEL_INCREMENT = 0x171,
-    SUB_CHANNEL_DECREMENT = 0x172,
-    ALTERNATE_AUDIO_INCREMENT = 0x173,
-    ALTERNATE_AUDIO_DECREMENT = 0x174,
-    APPLICATION_LAUNCH_BUTTONS = 0x180,
-    AL_LAUNCH_BUTTON_CONFIGURATION_TOOL = 0x181,
-    AL_PROGRAMMABLE_BUTTON_CONFIGUARTION = 0x182,
-    AL_CONSUMER_CONTROL_CONFIGURATION = 0x183,
-    AL_WORD_PROCESSOR = 0x184,
-    AL_TEXT_EDITOR = 0x185,
-    AL_SPREADSHEET = 0x186,
-    AL_GRAPHICS_EDITOR = 0x187,
-    AL_PRESENTATION_APP = 0x188,
-    AL_DATABASE_APP = 0x189,
-    AL_EMAIL_READER = 0x18A,
-    AL_NEWSREADER = 0x18B,
-    AL_VOICEMAIL = 0x18C,
-    AL_CONTACTS_ADDRESS_BOOK = 0x18D,
-    AL_CALENDAR_SCHEDULE = 0x18E,
-    AL_TASK_PROJECT_MANAGER = 0x18F,
-    AL_LOG_JOURNAL_TIMECARD = 0x190,
-    AL_CHECKBOOK_FINANCE = 0x191,
-    AL_CALCULATOR = 0x192,
-    AL_A_V_CAPTURE_PLAYBACK = 0x193,
-    AL_LOCAL_MACHINE_BROWSER = 0x194,
-    AL_LAN_WAN_BROWSER = 0x195,
-    AL_INTERNET_BROWSER = 0x196,
-    AL_REMOTE_NETWORKING_ISP_CONNECT = 0x197,
-    AL_NETWORK_CONFERENCE = 0x198,
-    AL_NETWORK_CHAT = 0x199,
-    AL_TELEPHONY_DIALER = 0x19A,
-    AL_LOGON = 0x19B,
-    AL_LOGOFF = 0x19C,
-    AL_LOGON_LOGOFF = 0x19D,
-    AL_TERMINAL_LOCK_SCREENSAVER = 0x19E,
-    AL_CONTROL_PANEL = 0x19F,
-    AL_COMMAND_LINE_PROCESSOR_RUN = 0x1A0,
-    AL_PROCESS_TASK_MANAGER = 0x1A1,
-    AL_SELECT_TASK_APPLICATION = 0x1A2,
-    AL_NEXT_TASK_APPLICATION = 0x1A3,
-    AL_PREVIOUS_TASK_APPLICATION = 0x1A4,
-    AL_PREEMPTIVE_HALT_TASK_APPLICATION = 0x1A5,
-    AL_INTEGRATED_HELP_CENTER = 0x1A6,
-    AL_DOCUMENTS = 0x1A7,
-    AL_THESAURUS = 0x1A8,
-    AL_DICTIONARY = 0x1A9,
-    AL_DESKTOP = 0x1AA,
-    AL_SPELL_CHECK = 0x1AB,
-    AL_GRAMMAR_CHECK = 0x1AC,
-    AL_WIRELESS_STATUS = 0x1AD,
-    AL_KEYBOARD_LAYOUT = 0x1AE,
-    AL_VIRUS_PROTECTION = 0x1AF,
-    AL_ENCRYPTION = 0x1B0,
-    AL_SCREEN_SAVER = 0x1B1,
-    AL_ALARMS = 0x1B2,
-    AL_CLOCK = 0x1B3,
-    AL_FILE_BROWSER = 0x1B4,
-    AL_POWER_STATUS = 0x1B5,
-    AL_IMAGE_BROWSER = 0x1B6,
-    AL_AUDIO_BROWSER = 0x1B7,
-    AL_MOVIE_BROWSER = 0x1B8,
-    AL_DIGITAL_RIGHTS_MANAGER = 0x1B9,
-    AL_DIGITAL_WALLET = 0x1BA,
-    AL_INSTANT_MESSAGING = 0x1BC,
-    AL_OEM_FEATURES_TIPS_TUTORIAL_BROWSER = 0x1BD,
-    AL_OEM_HELP = 0x1BE,
-    AL_ONLINE_COMMUNITY = 0x1BF,
-    AL_ENTERTAINMENT_CONTENT_BROWSER = 0x1C0,
-    AL_ONLINE_SHOPPING_BROWSER = 0x1C1,
-    AL_SMARTCARD_INFORMATION_HELP = 0x1C2,
-    AL_MARKET_MONITOR_FINANCE_BROWSER = 0x1C3,
-    AL_CUSTOMIZED_CORPORATE_NEWS_BROWSER = 0x1C4,
-    AL_ONLINE_ACTIVITY_BROWSER = 0x1C5,
-    AL_RESEARCH_SEARCH_BROWSER = 0x1C6,
-    AL_AUDIO_PLAYER = 0x1C7,
-    GENERIC_GUI_APPLICATION_CONTROLS = 0x200,
-    AC_NEW = 0x201,
-    AC_OPEN = 0x202,
-    AC_CLOSE = 0x203,
-    AC_EXIT = 0x204,
-    AC_MAXIMIZE = 0x205,
-    AC_MINIMIZE = 0x206,
-    AC_SAVE = 0x207,
-    AC_PRINT = 0x208,
-    AC_PROPERTIES = 0x209,
-    AC_UNDO = 0x21A,
-    AC_COPY = 0x21B,
-    AC_CUT = 0x21C,
-    AC_PASTE = 0x21D,
-    AC_SELECT_ALL = 0x21E,
-    AC_FIND = 0x21F,
-    AC_FIND_AND_REPLACE = 0x220,
-    AC_SEARCH = 0x221,
-    AC_GO_TO = 0x222,
-    AC_HOME = 0x223,
-    AC_BACK = 0x224,
-    AC_FORWARD = 0x225,
-    AC_STOP = 0x226,
-    AC_REFRESH = 0x227,
-    AC_PREVIOUS_LINK = 0x228,
-    AC_NEXT_LINK = 0x229,
-    AC_BOOKMARKS = 0x22A,
-    AC_HISTORY = 0x22B,
-    AC_SUBSCRIPTIONS = 0x22C,
-    AC_ZOOM_IN = 0x22D,
-    AC_ZOOM_OUT = 0x22E,
-    AC_ZOOM = 0x22F,
-    AC_FULL_SCREEN_VIEW = 0x230,
-    AC_NORMAL_VIEW = 0x231,
-    AC_VIEW_TOGGLE = 0x232,
-    AC_SCROLL_UP = 0x233,
-    AC_SCROLL_DOWN = 0x234,
-    AC_SCROLL = 0x235,
-    AC_PAN_LEFT = 0x236,
-    AC_PAN_RIGHT = 0x237,
-    AC_PAN = 0x238,
-    AC_NEW_WINDOW = 0x239,
-    AC_TILE_HORIZONTALLY = 0x23A,
-    AC_TILE_VERTICALLY = 0x23B,
-    AC_FORMAT = 0x23C,
-    AC_EDIT = 0x23D,
-    AC_BOLD = 0x23E,
-    AC_ITALICS = 0x23F,
-    AC_UNDERLINE = 0x240,
-    AC_STRIKETHROUGH = 0x241,
-    AC_SUBSCRIPT = 0x242,
-    AC_SUPERSCRIPT = 0x243,
-    AC_ALL_CAPS = 0x244,
-    AC_ROTATE = 0x245,
-    AC_RESIZE = 0x246,
-    AC_FLIP_HORIZONTAL = 0x247,
-    AC_FLIP_VERTICAL = 0x248,
-    AC_MIRROR_HORIZONTAL = 0x249,
-    AC_MIRROR_VERTICAL = 0x24A,
-    AC_FONT_SELECT = 0x24B,
-    AC_FONT_COLOR = 0x24C,
-    AC_FONT_SIZE = 0x24D,
-    AC_JUSTIFY_LEFT = 0x24E,
-    AC_JUSTIFY_CENTER_H = 0x24F,
-    AC_JUSTIFY_RIGHT = 0x250,
-    AC_JUSTIFY_BLOCK_H = 0x251,
-    AC_JUSTIFY_TOP = 0x252,
-    AC_JUSTIFY_CENTER_V = 0x253,
-    AC_JUSTIFY_BOTTOM = 0x254,
-    AC_JUSTIFY_BLOCK_V = 0x255,
-    AC_INDENT_DECREASE = 0x256,
-    AC_INDENT_INCREASE = 0x257,
-    AC_NUMBERED_LIST = 0x258,
-    AC_RESTART_NUMBERING = 0x259,
-    AC_BULLETED_LIST = 0x25A,
-    AC_PROMOTE = 0x25B,
-    AC_DEMOTE = 0x25C,
-    AC_YES = 0x25D,
-    AC_NO = 0x25E,
-    AC_CANCEL = 0x25F,
-    AC_CATALOG = 0x260,
-    AC_BUY_CHECKOUT = 0x261,
-    AC_ADD_TO_CART = 0x262,
-    AC_EXPAND = 0x263,
-    AC_EXPAND_ALL = 0x264,
-    AC_COLLAPSE = 0x265,
-    AC_COLLAPSE_ALL = 0x266,
-    AC_PRINT_PREVIEW = 0x267,
-    AC_PASTE_SPECIAL = 0x268,
-    AC_INSERT_MODE = 0x269,
-    AC_DELETE = 0x26A,
-    AC_LOCK = 0x26B,
-    AC_UNLOCK = 0x26C,
-    AC_PROTECT = 0x26D,
-    AC_UNPROTECT = 0x26E,
-    AC_ATTACH_COMMENT = 0x26F,
-    AC_DELETE_COMMENT = 0x270,
-    AC_VIEW_COMMENT = 0x271,
-    AC_SELECT_WORD = 0x272,
-    AC_SELECT_SENTENCE = 0x273,
-    AC_SELECT_PARAGRAPH = 0x274,
-    AC_SELECT_COLUMN = 0x275,
-    AC_SELECT_ROW = 0x276,
-    AC_SELECT_TABLE = 0x277,
-    AC_SELECT_OBJECT = 0x278,
-    AC_REDO_REPEAT = 0x279,
-    AC_SORT = 0x27A,
-    AC_SORT_ASCENDING = 0x27B,
-    AC_SORT_DESCENDING = 0x27C,
-    AC_FILTER = 0x27D,
-    AC_SET_CLOCK = 0x27E,
-    AC_VIEW_CLOCK = 0x27F,
-    AC_SELECT_TIME_ZONE = 0x280,
-    AC_EDIT_TIME_ZONES = 0x281,
-    AC_SET_ALARM = 0x282,
-    AC_CLEAR_ALARM = 0x283,
-    AC_SNOOZE_ALARM = 0x284,
-    AC_RESET_ALARM = 0x285,
-    AC_SYNCHRONIZE = 0x286,
-    AC_SEND_RECEIVE = 0x287,
-    AC_SEND_TO = 0x288,
-    AC_REPLY = 0x289,
-    AC_REPLY_ALL = 0x28A,
-    AC_FORWARD_MSG = 0x28B,
-    AC_SEND = 0x28C,
-    AC_ATTACH_FILE = 0x28D,
-    AC_UPLOAD = 0x28E,
-    AC_DOWNLOAD_SAVE_TARGET_AS = 0x28F,
-    AC_SET_BORDERS = 0x290,
-    AC_INSERT_ROW = 0x291,
-    AC_INSERT_COLUMN = 0x292,
-    AC_INSERT_FILE = 0x293,
-    AC_INSERT_PICTURE = 0x294,
-    AC_INSERT_OBJECT = 0x295,
-    AC_INSERT_SYMBOL = 0x296,
-    AC_SAVE_AND_CLOSE = 0x297,
-    AC_RENAME = 0x298,
-    AC_MERGE = 0x299,
-    AC_SPLIT = 0x29A,
-    AC_DISRIBUTE_HORIZONTALLY = 0x29B,
-    AC_DISTRIBUTE_VERTICALLY = 0x29C,
-} consumer_usage_page_t;
+    HID_USAGE_PAGE_UNDEFINED                                            = 0x00,
+    HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS                             = 0x01,
+    HID_USAGE_PAGE_SIMULATION_CONTROLS                                  = 0x02,
+    HID_USAGE_PAGE_VR_CONTROLS                                          = 0x03,
+    HID_USAGE_PAGE_SPORT_CONTROLS                                       = 0x04,
+    HID_USAGE_PAGE_GAME_CONTROLS                                        = 0x05,
+    HID_USAGE_PAGE_GENERIC_DEVICE_CONTROLS                              = 0x06,
+    HID_USAGE_PAGE_KEYBOARD_KEYPAD                                      = 0x07,
+    HID_USAGE_PAGE_LEDS                                                 = 0x08,
+    HID_USAGE_PAGE_BUTTON                                               = 0x09,
+    HID_USAGE_PAGE_ORDINAL                                              = 0x0A,
+    HID_USAGE_PAGE_TELEPHONY                                            = 0x0B,
+    HID_USAGE_PAGE_CONSUMER                                             = 0x0C,
+    HID_USAGE_PAGE_DIGITIZER                                            = 0x0D,
+    HID_USAGE_PAGE_PID_PAGE                                             = 0x0F,
+    HID_USAGE_PAGE_UNICODE                                              = 0x10,
+    HID_USAGE_PAGE_ALPHANUMERIC_DISPLAY                                 = 0x14,
+    HID_USAGE_PAGE_MEDICAL_INSTRUMENTS                                  = 0x40,
+    HID_USAGE_PAGE_BAR_CODE_SCANNER_PAGE                                = 0x8C,
+    HID_USAGE_PAGE_SCALE_PAGE                                           = 0x8D,
+    HID_USAGE_PAGE_MAGNETIC_STRIPE_READING_DEVICES                      = 0x8E,
+    HID_USAGE_PAGE_CAMERA_CONTROL_PAGE                                  = 0x90,
+    HID_USAGE_PAGE_ARCADE_PAGE                                          = 0x91,
+} usage_page_t;
+
+/* Generic Desktop Page (0x01) */
+#define HID_GENERIC_DESKTOP_UNDEFINED                                     0x00
+#define HID_GENERIC_DESKTOP_POINTER                                       0x01
+#define HID_GENERIC_DESKTOP_MOUSE                                         0x02
+#define HID_GENERIC_DESKTOP_JOYSTICK                                      0x04
+#define HID_GENERIC_DESKTOP_GAME_PAD                                      0x05
+#define HID_GENERIC_DESKTOP_KEYBOARD                                      0x06
+#define HID_GENERIC_DESKTOP_KEYPAD                                        0x07
+#define HID_GENERIC_DESKTOP_MULTI_AXIS_CONTROLLER                         0x08
+#define HID_GENERIC_DESKTOP_TABLET_PC_SYSTEM_CONTROLS                     0x09
+#define HID_GENERIC_DESKTOP_X                                             0x30
+#define HID_GENERIC_DESKTOP_Y                                             0x31
+#define HID_GENERIC_DESKTOP_Z                                             0x32
+#define HID_GENERIC_DESKTOP_RX                                            0x33
+#define HID_GENERIC_DESKTOP_RY                                            0x34
+#define HID_GENERIC_DESKTOP_RZ                                            0x35
+#define HID_GENERIC_DESKTOP_SLIDER                                        0x36
+#define HID_GENERIC_DESKTOP_DIAL                                          0x37
+#define HID_GENERIC_DESKTOP_WHEEL                                         0x38
+#define HID_GENERIC_DESKTOP_HAT_SWITCH                                    0x39
+#define HID_GENERIC_DESKTOP_COUNTED_BUFFER                                0x3A
+#define HID_GENERIC_DESKTOP_BYTE_COUNT                                    0x3B
+#define HID_GENERIC_DESKTOP_MOTION_WAKEUP                                 0x3C
+#define HID_GENERIC_DESKTOP_START                                         0x3D
+#define HID_GENERIC_DESKTOP_SELECT                                        0x3E
+#define HID_GENERIC_DESKTOP_VX                                            0x40
+#define HID_GENERIC_DESKTOP_VY                                            0x41
+#define HID_GENERIC_DESKTOP_VZ                                            0x42
+#define HID_GENERIC_DESKTOP_VBRX                                          0x43
+#define HID_GENERIC_DESKTOP_VBRY                                          0x44
+#define HID_GENERIC_DESKTOP_VBRZ                                          0x45
+#define HID_GENERIC_DESKTOP_VNO                                           0x46
+#define HID_GENERIC_DESKTOP_FEATURE_NOTIFICATION                          0x47
+#define HID_GENERIC_DESKTOP_RESOLUTION_MULTIPLIER                         0x48
+#define HID_GENERIC_DESKTOP_SYSTEM_CONTROL                                0x80
+#define HID_GENERIC_DESKTOP_SYSTEM_POWER_DOWN                             0x81
+#define HID_GENERIC_DESKTOP_SYSTEM_SLEEP                                  0x82
+#define HID_GENERIC_DESKTOP_SYSTEM_WAKE_UP                                0x83
+#define HID_GENERIC_DESKTOP_SYSTEM_CONTEXT_MENU                           0x84
+#define HID_GENERIC_DESKTOP_SYSTEM_MAIN_MENU                              0x85
+#define HID_GENERIC_DESKTOP_SYSTEM_APP_MENU                               0x86
+#define HID_GENERIC_DESKTOP_SYSTEM_MENU_HELP                              0x87
+#define HID_GENERIC_DESKTOP_SYSTEM_MENU_EXIT                              0x88
+#define HID_GENERIC_DESKTOP_SYSTEM_MENU_SELECT                            0x89
+#define HID_GENERIC_DESKTOP_SYSTEM_MENU_RIGHT                             0x8A
+#define HID_GENERIC_DESKTOP_SYSTEM_MENU_LEFT                              0x8B
+#define HID_GENERIC_DESKTOP_SYSTEM_MENU_UP                                0x8C
+#define HID_GENERIC_DESKTOP_SYSTEM_MENU_DOWN                              0x8D
+#define HID_GENERIC_DESKTOP_SYSTEM_COLD_RESTART                           0x8E
+#define HID_GENERIC_DESKTOP_SYSTEM_WARM_RESTART                           0x8F
+#define HID_GENERIC_DESKTOP_D_PAD_UP                                      0x90
+#define HID_GENERIC_DESKTOP_D_PAD_DOWN                                    0x91
+#define HID_GENERIC_DESKTOP_D_PAD_RIGHT                                   0x92
+#define HID_GENERIC_DESKTOP_D_PAD_LEFT                                    0x93
+#define HID_GENERIC_DESKTOP_SYSTEM_DOCK                                   0xA0
+#define HID_GENERIC_DESKTOP_SYSTEM_UNDOCK                                 0xA1
+#define HID_GENERIC_DESKTOP_SYSTEM_SETUP                                  0xA2
+#define HID_GENERIC_DESKTOP_SYSTEM_BREAK                                  0xA3
+#define HID_GENERIC_DESKTOP_SYSTEM_DEBUGGER_BREAK                         0xA4
+#define HID_GENERIC_DESKTOP_APPLICATION_BREAK                             0xA5
+#define HID_GENERIC_DESKTOP_APPLICATION_DEBUGGER_BREAK                    0xA6
+#define HID_GENERIC_DESKTOP_SYSTEM_SPEAKER_MUTE                           0xA7
+#define HID_GENERIC_DESKTOP_SYSTEM_HIBERNATE                              0xA8
+#define HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_INVERT                         0xB0
+#define HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_INTERNAL                       0xB1
+#define HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_EXTERNAL                       0xB2
+#define HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_BOTH                           0xB3
+#define HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_DUAL                           0xB4
+#define HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_TOGGLE_INT_EXT                 0xB5
+#define HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_SWAP_PRIMARY_SECONDARY         0xB6
+#define HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_LCD_AUTOSCALE                  0xB7
+
+/* Keyboard/Keypad Page (0x07) */
+#define HID_KEYBOARD_RESERVED                                             0x00
+#define HID_KEYBOARD_ERROR_ROLLOVER                                       0x01
+#define HID_KEYBOARD_POSTFAIL                                             0x02
+#define HID_KEYBOARD_ERROR_UNDEFINED                                      0x03
+#define HID_KEYBOARD_A                                                    0x04
+#define HID_KEYBOARD_B                                                    0x05
+#define HID_KEYBOARD_C                                                    0x06
+#define HID_KEYBOARD_D                                                    0x07
+#define HID_KEYBOARD_E                                                    0x08
+#define HID_KEYBOARD_F                                                    0x09
+#define HID_KEYBOARD_G                                                    0x0A
+#define HID_KEYBOARD_H                                                    0x0B
+#define HID_KEYBOARD_I                                                    0x0C
+#define HID_KEYBOARD_J                                                    0x0D
+#define HID_KEYBOARD_K                                                    0x0E
+#define HID_KEYBOARD_L                                                    0x0F
+#define HID_KEYBOARD_M                                                    0x10
+#define HID_KEYBOARD_N                                                    0x11
+#define HID_KEYBOARD_O                                                    0x12
+#define HID_KEYBOARD_P                                                    0x13
+#define HID_KEYBOARD_Q                                                    0x14
+#define HID_KEYBOARD_R                                                    0x15
+#define HID_KEYBOARD_S                                                    0x16
+#define HID_KEYBOARD_T                                                    0x17
+#define HID_KEYBOARD_U                                                    0x18
+#define HID_KEYBOARD_V                                                    0x19
+#define HID_KEYBOARD_W                                                    0x1A
+#define HID_KEYBOARD_X                                                    0x1B
+#define HID_KEYBOARD_Y                                                    0x1C
+#define HID_KEYBOARD_Z                                                    0x1D
+#define HID_KEYBOARD_1                                                    0x1E
+#define HID_KEYBOARD_2                                                    0x1F
+#define HID_KEYBOARD_3                                                    0x20
+#define HID_KEYBOARD_4                                                    0x21
+#define HID_KEYBOARD_5                                                    0x22
+#define HID_KEYBOARD_6                                                    0x23
+#define HID_KEYBOARD_7                                                    0x24
+#define HID_KEYBOARD_8                                                    0x25
+#define HID_KEYBOARD_9                                                    0x26
+#define HID_KEYBOARD_0                                                    0x27
+#define HID_KEYBOARD_RETURN                                               0x28
+#define HID_KEYBOARD_ESCAPE                                               0x29
+#define HID_KEYBOARD_DELETE                                               0x2A
+#define HID_KEYBOARD_TAB                                                  0x2B
+#define HID_KEYBOARD_SPACEBAR                                             0x2C
+#define HID_KEYBOARD_COMMA                                                0x36
+#define HID_KEYBOARD_DOT                                                  0x37
+#define HID_KEYBOARD_F1                                                   0x3A
+#define HID_KEYBOARD_F2                                                   0x3B
+#define HID_KEYBOARD_F3                                                   0x3C
+#define HID_KEYBOARD_F4                                                   0x3D
+#define HID_KEYBOARD_F5                                                   0x3E
+#define HID_KEYBOARD_F6                                                   0x3F
+#define HID_KEYBOARD_F7                                                   0x40
+#define HID_KEYBOARD_F8                                                   0x41
+#define HID_KEYBOARD_F9                                                   0x42
+#define HID_KEYBOARD_F10                                                  0x43
+#define HID_KEYBOARD_F11                                                  0x44
+#define HID_KEYBOARD_F12                                                  0x45
+#define HID_KEYBOARD_PRINT_SCREEN                                         0x46
+#define HID_KEYBOARD_SCROLL_LOCK                                          0x47
+#define HID_KEYBOARD_PAUSE                                                0x48
+#define HID_KEYBOARD_INSERT                                               0x49
+#define HID_KEYBOARD_HOME                                                 0x4A
+#define HID_KEYBOARD_PAGE_UP                                              0x4B
+#define HID_KEYBOARD_DELETE_FORWARD                                       0x4C
+#define HID_KEYBOARD_END                                                  0x4D
+#define HID_KEYBOARD_PAGE_DOWN                                            0x4E
+#define HID_KEYBOARD_RIGHT_ARROW                                          0x4F
+#define HID_KEYBOARD_LEFT_ARROW                                           0x50
+#define HID_KEYBOARD_DOWN_ARROW                                           0x51
+#define HID_KEYBOARD_UP_ARROW                                             0x52
+#define HID_KEYPAD_NUM_LOCK_AND_CLEAR                                     0x53
+#define HID_KEYPAD_SLASH                                                  0x54
+#define HID_KEYPAD_ASTERISK                                               0x55
+#define HID_KEYPAD_MINUS                                                  0x56
+#define HID_KEYPAD_PLUS                                                   0x57
+#define HID_KEYPAD_ENTER                                                  0x58
+#define HID_KEYPAD_1_AND_END                                              0x59
+#define HID_KEYPAD_2_AND_DOWN_ARROW                                       0x5A
+#define HID_KEYPAD_3_AND_PAGE_DOWN                                        0x5B
+#define HID_KEYPAD_4_AND_LEFT_ARROW                                       0x5C
+#define HID_KEYPAD_5                                                      0x5D
+#define HID_KEYPAD_6_AND_RIGHT_ARROW                                      0x5E
+#define HID_KEYPAD_7_AND_HOME                                             0x5F
+#define HID_KEYPAD_8_AND_UP_ARROW                                         0x60
+#define HID_KEYPAD_9_AND_PAGE_UP                                          0x61
+#define HID_KEYPAD_0_AND_INSERT                                           0x62
+#define HID_KEYPAD_PERIOD_AND_DELETE                                      0x63
+#define HID_KEYBOARD_APPLICATION                                          0x65
+#define HID_KEYBOARD_POWER                                                0x66
+#define HID_KEYPAD_EQUAL                                                  0x67
+#define HID_KEYBOARD_F13                                                  0x68
+#define HID_KEYBOARD_F14                                                  0x69
+#define HID_KEYBOARD_F15                                                  0x6A
+#define HID_KEYBOARD_F16                                                  0x6B
+#define HID_KEYBOARD_F17                                                  0x6C
+#define HID_KEYBOARD_F18                                                  0x6D
+#define HID_KEYBOARD_F19                                                  0x6E
+#define HID_KEYBOARD_F20                                                  0x6F
+#define HID_KEYBOARD_F21                                                  0x70
+#define HID_KEYBOARD_F22                                                  0x71
+#define HID_KEYBOARD_F23                                                  0x72
+#define HID_KEYBOARD_F24                                                  0x73
+#define HID_KEYBOARD_EXECUTE                                              0x74
+#define HID_KEYBOARD_HELP                                                 0x75
+#define HID_KEYBOARD_MENU                                                 0x76
+#define HID_KEYBOARD_SELECT                                               0x77
+#define HID_KEYBOARD_STOP                                                 0x78
+#define HID_KEYBOARD_AGAIN                                                0x79
+#define HID_KEYBOARD_UNDO                                                 0x7A
+#define HID_KEYBOARD_CUT                                                  0x7B
+#define HID_KEYBOARD_COPY                                                 0x7C
+#define HID_KEYBOARD_PASTE                                                0x7D
+#define HID_KEYBOARD_FIND                                                 0x7E
+#define HID_KEYBOARD_MUTE                                                 0x7F
+#define HID_KEYBOARD_VOLUME_UP                                            0x80
+#define HID_KEYBOARD_VOLUME_DOWN                                          0x81
+#define HID_KEYBOARD_LOCKING_CAPS_LOCK                                    0x82
+#define HID_KEYBOARD_LOCKING_NUM_LOCK                                     0x83
+#define HID_KEYBOARD_LOCKING_SCROLL_LOCK                                  0x84
+#define HID_KEYPAD_COMMA                                                  0x85
+#define HID_KEYPAD_EQUAL_SIGN                                             0x86
+#define HID_KEYBOARD_EX_SEL                                               0xA4
+#define HID_KEYBOARD_LEFT_CONTROL                                         0xE0
+#define HID_KEYBOARD_LEFT_SHIFT                                           0xE1
+#define HID_KEYBOARD_LEFT_ALT                                             0xE2
+#define HID_KEYBOARD_LEFT_GUI                                             0xE3
+#define HID_KEYBOARD_RIGHT_CONTROL                                        0xE4
+#define HID_KEYBOARD_RIGHT_SHIFT                                          0xE5
+#define HID_KEYBOARD_RIGHT_ALT                                            0xE6
+#define HID_KEYBOARD_RIGHT_GUI                                            0xE7
+
+/* LED Page (0x08) */
+#define HID_LED_UNDEFINED                                                 0x00
+#define HID_LED_NUM_LOCK                                                  0x01
+#define HID_LED_CAPS_LOCK                                                 0x02
+#define HID_LED_SCROLL_LOCK                                               0x03
+#define HID_LED_COMPOSE                                                   0x04
+#define HID_LED_KANA                                                      0x05
+#define HID_LED_POWER                                                     0x06
+#define HID_LED_SHIFT                                                     0x07
+#define HID_LED_DO_NOT_DISTURB                                            0x08
+#define HID_LED_MUTE                                                      0x09
+#define HID_LED_TONE_ENABLE                                               0x0A
+#define HID_LED_HIGH_CUT_FILTER                                           0x0B
+#define HID_LED_LOW_CUT_FILTER                                            0x0C
+#define HID_LED_EQUALIZER_ENABLE                                          0x0D
+#define HID_LED_SOUND_FIELD_ON                                            0x0E
+#define HID_LED_SURROUND_ON                                               0x0F
+#define HID_LED_REPEAT                                                    0x10
+#define HID_LED_STEREO                                                    0x11
+#define HID_LED_SAMPLING_RATE_DETECT                                      0x12
+#define HID_LED_SPINNING                                                  0x13
+#define HID_LED_CAV                                                       0x14
+#define HID_LED_CLV                                                       0x15
+#define HID_LED_RECORDING_FORMAT_DETECT                                   0x16
+#define HID_LED_OFF_HOOK                                                  0x17
+#define HID_LED_RING                                                      0x18
+#define HID_LED_MESSAGE_WAITING                                           0x19
+#define HID_LED_DATA_MODE                                                 0x1A
+#define HID_LED_BATTERY_OPERATION                                         0x1B
+#define HID_LED_BATTERY_OK                                                0x1C
+#define HID_LED_BATTERY_LOW                                               0x1D
+#define HID_LED_SPEAKER                                                   0x1E
+#define HID_LED_HEAD_SET                                                  0x1F
+#define HID_LED_HOLD                                                      0x20
+#define HID_LED_MICROPHONE                                                0x21
+#define HID_LED_COVERAGE                                                  0x22
+#define HID_LED_NIGHT_MODE                                                0x23
+#define HID_LED_SEND_CALLS                                                0x24
+#define HID_LED_CALL_PICKUP                                               0x25
+#define HID_LED_CONFERENCE                                                0x26
+#define HID_LED_STAND_BY                                                  0x27
+#define HID_LED_CAMERA_ON                                                 0x28
+#define HID_LED_CAMERA_OFF                                                0x29
+#define HID_LED_ON_LINE                                                   0x2A
+#define HID_LED_OFF_LINE                                                  0x2B
+#define HID_LED_BUSY                                                      0x2C
+#define HID_LED_READY                                                     0x2D
+#define HID_LED_PAPER_OUT                                                 0x2E
+#define HID_LED_PAPER_JAM                                                 0x2F
+#define HID_LED_REMOTE                                                    0x30
+#define HID_LED_FORWARD                                                   0x31
+#define HID_LED_REVERSE                                                   0x32
+#define HID_LED_STOP                                                      0x33
+#define HID_LED_REWIND                                                    0x34
+#define HID_LED_FAST_FORWARD                                              0x35
+#define HID_LED_PLAY                                                      0x36
+#define HID_LED_PAUSE                                                     0x37
+#define HID_LED_RECORD                                                    0x38
+#define HID_LED_ERROR                                                     0x39
+#define HID_LED_USAGE_SELECTED_INDICATOR                                  0x3A
+#define HID_LED_USAGE_IN_USE_INDICATOR                                    0x3B
+#define HID_LED_USAGE_MULTI_MODE_INDICATOR                                0x3C
+#define HID_LED_INDICATOR_ON                                              0x3D
+#define HID_LED_INDICATOR_FLASH                                           0x3E
+#define HID_LED_INDICATOR_SLOW_BLINK                                      0x3F
+#define HID_LED_INDICATOR_FAST_BLINK                                      0x40
+#define HID_LED_INDICATOR_OFF                                             0x41
+#define HID_LED_FLASH_ON_TIME                                             0x42
+#define HID_LED_SLOW_BLINK_ON_TIME                                        0x43
+#define HID_LED_SLOW_BLINK_OFF_TIME                                       0x44
+#define HID_LED_FAST_BLINK_ON_TIME                                        0x45
+#define HID_LED_FAST_BLINK_OFF_TIME                                       0x46
+#define HID_LED_USAGE_INDICATOR_COLOR                                     0x47
+#define HID_LED_INDICATOR_RED                                             0x48
+#define HID_LED_INDICATOR_GREEN                                           0x49
+#define HID_LED_INDICATOR_AMBER                                           0x4A
+#define HID_LED_GENERIC_INDICATOR                                         0x4B
+#define HID_LED_SYSTEM_SUSPEND                                            0x4C
+#define HID_LED_EXTERNAL_POWER_CONNECTED                                  0x4D
+
+/* Consumer Page (0x0C) */
+#define HID_CONSUMER_USAGE_UNASSIGNED                                     0x00
+#define HID_CONSUMER_USAGE_CONSUMER_CONTROL                               0x1
+#define HID_CONSUMER_USAGE_NUMERIC_KEY_PAD                                0x2
+#define HID_CONSUMER_USAGE_PROGRAMMABLE_BUTTONS                           0x3
+#define HID_CONSUMER_USAGE_MICROPHONE                                     0x4
+#define HID_CONSUMER_USAGE_HEADPHONE                                      0x5
+#define HID_CONSUMER_USAGE_GRAPHIC_EQUALIZER                              0x6
+#define HID_CONSUMER_USAGE_PLUS_10                                        0x20
+#define HID_CONSUMER_USAGE_PLUS_100                                       0x21
+#define HID_CONSUMER_USAGE_AM_PM                                          0x22
+#define HID_CONSUMER_USAGE_POWER                                          0x30
+#define HID_CONSUMER_USAGE_RESET                                          0x31
+#define HID_CONSUMER_USAGE_SLEEP                                          0x32
+#define HID_CONSUMER_USAGE_SLEEP_AFTER                                    0x33
+#define HID_CONSUMER_USAGE_SLEEP_MODE                                     0x34
+#define HID_CONSUMER_USAGE_ILLUMINATION                                   0x35
+#define HID_CONSUMER_USAGE_FUNCTION_BUTTONS                               0x36
+#define HID_CONSUMER_USAGE_MENU                                           0x40
+#define HID_CONSUMER_USAGE_MENU_PICK                                      0x41
+#define HID_CONSUMER_USAGE_MENU_UP                                        0x42
+#define HID_CONSUMER_USAGE_MENU_DOWN                                      0x43
+#define HID_CONSUMER_USAGE_MENU_LEFT                                      0x44
+#define HID_CONSUMER_USAGE_MENU_RIGHT                                     0x45
+#define HID_CONSUMER_USAGE_MENU_ESCAPE                                    0x46
+#define HID_CONSUMER_USAGE_MENU_VALUE_INCREASE                            0x47
+#define HID_CONSUMER_USAGE_MENU_VALUE_DECREASE                            0x48
+#define HID_CONSUMER_USAGE_DATA_ON_SCREEN                                 0x60
+#define HID_CONSUMER_USAGE_CLOSED_CAPTION                                 0x61
+#define HID_CONSUMER_USAGE_CLOSED_CAPTION_SELECT                          0x62
+#define HID_CONSUMER_USAGE_VCR_TV                                         0x63
+#define HID_CONSUMER_USAGE_BROADCAST_MODE                                 0x64
+#define HID_CONSUMER_USAGE_SNAPSHOT                                       0x65
+#define HID_CONSUMER_USAGE_STILL                                          0x66
+#define HID_CONSUMER_USAGE_SELECTION                                      0x80
+#define HID_CONSUMER_USAGE_ASSIGN_SELECTION                               0x81
+#define HID_CONSUMER_USAGE_MODE_STEP                                      0x82
+#define HID_CONSUMER_USAGE_RECALL_LAST                                    0x83
+#define HID_CONSUMER_USAGE_ENTER_CHANNEL                                  0x84
+#define HID_CONSUMER_USAGE_ORDER_MOVIE                                    0x85
+#define HID_CONSUMER_USAGE_CHANNEL                                        0x86
+#define HID_CONSUMER_USAGE_MEDIA_SELECTION                                0x87
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_COMPUTER                          0x88
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_TV                                0x89
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_WWW                               0x8A
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_DVD                               0x8B
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_TELEPHONE                         0x8C
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_PROGRAM_GUIDE                     0x8D
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_VIDEO_PHONE                       0x8E
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_GAMES                             0x8F
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_MESSAGES                          0x90
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_CD                                0x91
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_VCR                               0x92
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_TUNER                             0x93
+#define HID_CONSUMER_USAGE_QUIT                                           0x94
+#define HID_CONSUMER_USAGE_HELP                                           0x95
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_TAPE                              0x96
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_CABLE                             0x97
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_SATELLITE                         0x98
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_SECURITY                          0x99
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_HOME                              0x9A
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_CALL                              0x9B
+#define HID_CONSUMER_USAGE_CHANNEL_INCREMENT                              0x9C
+#define HID_CONSUMER_USAGE_CHANNEL_DECREMENT                              0x9D
+#define HID_CONSUMER_USAGE_MEDIA_SELECT_SAP                               0x9E
+#define HID_CONSUMER_USAGE_VCR_PLUS                                       0xA0
+#define HID_CONSUMER_USAGE_ONCE                                           0xA1
+#define HID_CONSUMER_USAGE_DAILY                                          0xA2
+#define HID_CONSUMER_USAGE_WEEKLY                                         0xA3
+#define HID_CONSUMER_USAGE_MONTHLY                                        0xA4
+#define HID_CONSUMER_USAGE_PLAY                                           0xB0
+#define HID_CONSUMER_USAGE_PAUSE                                          0xB1
+#define HID_CONSUMER_USAGE_RECORD                                         0xB2
+#define HID_CONSUMER_USAGE_FAST_FORWARD                                   0xB3
+#define HID_CONSUMER_USAGE_REWIND                                         0xB4
+#define HID_CONSUMER_USAGE_SCAN_NEXT_TRACK                                0xB5
+#define HID_CONSUMER_USAGE_SCAN_PREVIOUS_TRACK                            0xB6
+#define HID_CONSUMER_USAGE_STOP                                           0xB7
+#define HID_CONSUMER_USAGE_EJECT                                          0xB8
+#define HID_CONSUMER_USAGE_RANDOM_PLAY                                    0xB9
+#define HID_CONSUMER_USAGE_SELECT_DISC                                    0xBA
+#define HID_CONSUMER_USAGE_ENTER_DISC                                     0xBB
+#define HID_CONSUMER_USAGE_REPEAT                                         0xBC
+#define HID_CONSUMER_USAGE_TRACKING                                       0xBD
+#define HID_CONSUMER_USAGE_TRACK_NORMAL                                   0xBE
+#define HID_CONSUMER_USAGE_SLOW_TRACKING                                  0xBF
+#define HID_CONSUMER_USAGE_FRAME_FORWARD                                  0xC0
+#define HID_CONSUMER_USAGE_FRAME_BACK                                     0xC1
+#define HID_CONSUMER_USAGE_MARK                                           0xC2
+#define HID_CONSUMER_USAGE_CLEAR_MARK                                     0xC3
+#define HID_CONSUMER_USAGE_REPEAT_FROM_MARK                               0xC4
+#define HID_CONSUMER_USAGE_RETURN_TO_MARK                                 0xC5
+#define HID_CONSUMER_USAGE_SEARCH_MARK_FORWARD                            0xC6
+#define HID_CONSUMER_USAGE_SEARCH_MARK_BACKWARDS                          0xC7
+#define HID_CONSUMER_USAGE_COUNTER_RESET                                  0xC8
+#define HID_CONSUMER_USAGE_SHOW_COUNTER                                   0xC9
+#define HID_CONSUMER_USAGE_TRACKING_INCREMENT                             0xCA
+#define HID_CONSUMER_USAGE_TRACKING_DECREMENT                             0xCB
+#define HID_CONSUMER_USAGE_STOP_EJECT                                     0xCC
+#define HID_CONSUMER_USAGE_PLAY_PAUSE                                     0xCD
+#define HID_CONSUMER_USAGE_PLAY_SKIP                                      0xCE
+#define HID_CONSUMER_USAGE_VOLUME                                         0xE0
+#define HID_CONSUMER_USAGE_BALANCE                                        0xE1
+#define HID_CONSUMER_USAGE_MUTE                                           0xE2
+#define HID_CONSUMER_USAGE_BASS                                           0xE3
+#define HID_CONSUMER_USAGE_TREBLE                                         0xE4
+#define HID_CONSUMER_USAGE_BASS_BOOST                                     0xE5
+#define HID_CONSUMER_USAGE_SURROUND_MODE                                  0xE6
+#define HID_CONSUMER_USAGE_LOUDNESS                                       0xE7
+#define HID_CONSUMER_USAGE_MPX                                            0xE8
+#define HID_CONSUMER_USAGE_VOLUME_INCREMENT                               0xE9
+#define HID_CONSUMER_USAGE_VOLUME_DECREMENT                               0xEA
+#define HID_CONSUMER_USAGE_SPEED_SELECT                                   0xF0
+#define HID_CONSUMER_USAGE_PLAYBACK_SPEED                                 0xF1
+#define HID_CONSUMER_USAGE_STANDARD_PLAY                                  0xF2
+#define HID_CONSUMER_USAGE_LONG_PLAY                                      0xF3
+#define HID_CONSUMER_USAGE_EXTENDED_PLAY                                  0xF4
+#define HID_CONSUMER_USAGE_SLOW                                           0xF5
+#define HID_CONSUMER_USAGE_FAN_ENABLE                                     0x100
+#define HID_CONSUMER_USAGE_FAN_SPEED                                      0x101
+#define HID_CONSUMER_USAGE_LIGHT_ENABLE                                   0x102
+#define HID_CONSUMER_USAGE_LIGHT_ILLUMINATION_LEVEL                       0x103
+#define HID_CONSUMER_USAGE_CLIMATE_CONTROL_ENABLE                         0x104
+#define HID_CONSUMER_USAGE_ROOM_TEMPERATURE                               0x105
+#define HID_CONSUMER_USAGE_SECURITY_ENABLE                                0x106
+#define HID_CONSUMER_USAGE_FIRE_ALARM                                     0x107
+#define HID_CONSUMER_USAGE_POLICE_ALARM                                   0x108
+#define HID_CONSUMER_USAGE_PROXIMITY                                      0x109
+#define HID_CONSUMER_USAGE_MOTION                                         0x10A
+#define HID_CONSUMER_USAGE_DURESS_ALARM                                   0x10B
+#define HID_CONSUMER_USAGE_HOLDUP_ALARM                                   0x10C
+#define HID_CONSUMER_USAGE_MEDICAL_ALARM                                  0x10D
+#define HID_CONSUMER_USAGE_BALANCE_RIGHT                                  0x150
+#define HID_CONSUMER_USAGE_BALANCE_LEFT                                   0x151
+#define HID_CONSUMER_USAGE_BASS_INCREMENT                                 0x152
+#define HID_CONSUMER_USAGE_BASS_DECREMENT                                 0x153
+#define HID_CONSUMER_USAGE_TREBLE_INCREMENT                               0x154
+#define HID_CONSUMER_USAGE_TREBLE_DECREMENT                               0x155
+#define HID_CONSUMER_USAGE_SPEAKER_SYSTEM                                 0x160
+#define HID_CONSUMER_USAGE_CHANNEL_LEFT                                   0x161
+#define HID_CONSUMER_USAGE_CHANNEL_RIGHT                                  0x162
+#define HID_CONSUMER_USAGE_CHANNEL_CENTER                                 0x163
+#define HID_CONSUMER_USAGE_CHANNEL_FRONT                                  0x164
+#define HID_CONSUMER_USAGE_CHANNEL_CENTER_FRONT                           0x165
+#define HID_CONSUMER_USAGE_CHANNEL_SIDE                                   0x166
+#define HID_CONSUMER_USAGE_CHANNEL_SURROUND                               0x167
+#define HID_CONSUMER_USAGE_CHANNEL_LOW_FREQUENCY_ENHANCEMENT              0x168
+#define HID_CONSUMER_USAGE_CHANNEL_TOP                                    0x169
+#define HID_CONSUMER_USAGE_CHANNEL_UNKNOWN                                0x16A
+#define HID_CONSUMER_USAGE_SUB_CHANNEL                                    0x170
+#define HID_CONSUMER_USAGE_SUB_CHANNEL_INCREMENT                          0x171
+#define HID_CONSUMER_USAGE_SUB_CHANNEL_DECREMENT                          0x172
+#define HID_CONSUMER_USAGE_ALTERNATE_AUDIO_INCREMENT                      0x173
+#define HID_CONSUMER_USAGE_ALTERNATE_AUDIO_DECREMENT                      0x174
+#define HID_CONSUMER_USAGE_APPLICATION_LAUNCH_BUTTONS                     0x180
+#define HID_CONSUMER_USAGE_AL_LAUNCH_BUTTON_CONFIGURATION_TOOL            0x181
+#define HID_CONSUMER_USAGE_AL_PROGRAMMABLE_BUTTON_CONFIGUARTION           0x182
+#define HID_CONSUMER_USAGE_AL_CONSUMER_CONTROL_CONFIGURATION              0x183
+#define HID_CONSUMER_USAGE_AL_WORD_PROCESSOR                              0x184
+#define HID_CONSUMER_USAGE_AL_TEXT_EDITOR                                 0x185
+#define HID_CONSUMER_USAGE_AL_SPREADSHEET                                 0x186
+#define HID_CONSUMER_USAGE_AL_GRAPHICS_EDITOR                             0x187
+#define HID_CONSUMER_USAGE_AL_PRESENTATION_APP                            0x188
+#define HID_CONSUMER_USAGE_AL_DATABASE_APP                                0x189
+#define HID_CONSUMER_USAGE_AL_EMAIL_READER                                0x18A
+#define HID_CONSUMER_USAGE_AL_NEWSREADER                                  0x18B
+#define HID_CONSUMER_USAGE_AL_VOICEMAIL                                   0x18C
+#define HID_CONSUMER_USAGE_AL_CONTACTS_ADDRESS_BOOK                       0x18D
+#define HID_CONSUMER_USAGE_AL_CALENDAR_SCHEDULE                           0x18E
+#define HID_CONSUMER_USAGE_AL_TASK_PROJECT_MANAGER                        0x18F
+#define HID_CONSUMER_USAGE_AL_LOG_JOURNAL_TIMECARD                        0x190
+#define HID_CONSUMER_USAGE_AL_CHECKBOOK_FINANCE                           0x191
+#define HID_CONSUMER_USAGE_AL_CALCULATOR                                  0x192
+#define HID_CONSUMER_USAGE_AL_A_V_CAPTURE_PLAYBACK                        0x193
+#define HID_CONSUMER_USAGE_AL_LOCAL_MACHINE_BROWSER                       0x194
+#define HID_CONSUMER_USAGE_AL_LAN_WAN_BROWSER                             0x195
+#define HID_CONSUMER_USAGE_AL_INTERNET_BROWSER                            0x196
+#define HID_CONSUMER_USAGE_AL_REMOTE_NETWORKING_ISP_CONNECT               0x197
+#define HID_CONSUMER_USAGE_AL_NETWORK_CONFERENCE                          0x198
+#define HID_CONSUMER_USAGE_AL_NETWORK_CHAT                                0x199
+#define HID_CONSUMER_USAGE_AL_TELEPHONY_DIALER                            0x19A
+#define HID_CONSUMER_USAGE_AL_LOGON                                       0x19B
+#define HID_CONSUMER_USAGE_AL_LOGOFF                                      0x19C
+#define HID_CONSUMER_USAGE_AL_LOGON_LOGOFF                                0x19D
+#define HID_CONSUMER_USAGE_AL_TERMINAL_LOCK_SCREENSAVER                   0x19E
+#define HID_CONSUMER_USAGE_AL_CONTROL_PANEL                               0x19F
+#define HID_CONSUMER_USAGE_AL_COMMAND_LINE_PROCESSOR_RUN                  0x1A0
+#define HID_CONSUMER_USAGE_AL_PROCESS_TASK_MANAGER                        0x1A1
+#define HID_CONSUMER_USAGE_AL_SELECT_TASK_APPLICATION                     0x1A2
+#define HID_CONSUMER_USAGE_AL_NEXT_TASK_APPLICATION                       0x1A3
+#define HID_CONSUMER_USAGE_AL_PREVIOUS_TASK_APPLICATION                   0x1A4
+#define HID_CONSUMER_USAGE_AL_PREEMPTIVE_HALT_TASK_APPLICATION            0x1A5
+#define HID_CONSUMER_USAGE_AL_INTEGRATED_HELP_CENTER                      0x1A6
+#define HID_CONSUMER_USAGE_AL_DOCUMENTS                                   0x1A7
+#define HID_CONSUMER_USAGE_AL_THESAURUS                                   0x1A8
+#define HID_CONSUMER_USAGE_AL_DICTIONARY                                  0x1A9
+#define HID_CONSUMER_USAGE_AL_DESKTOP                                     0x1AA
+#define HID_CONSUMER_USAGE_AL_SPELL_CHECK                                 0x1AB
+#define HID_CONSUMER_USAGE_AL_GRAMMAR_CHECK                               0x1AC
+#define HID_CONSUMER_USAGE_AL_WIRELESS_STATUS                             0x1AD
+#define HID_CONSUMER_USAGE_AL_KEYBOARD_LAYOUT                             0x1AE
+#define HID_CONSUMER_USAGE_AL_VIRUS_PROTECTION                            0x1AF
+#define HID_CONSUMER_USAGE_AL_ENCRYPTION                                  0x1B0
+#define HID_CONSUMER_USAGE_AL_SCREEN_SAVER                                0x1B1
+#define HID_CONSUMER_USAGE_AL_ALARMS                                      0x1B2
+#define HID_CONSUMER_USAGE_AL_CLOCK                                       0x1B3
+#define HID_CONSUMER_USAGE_AL_FILE_BROWSER                                0x1B4
+#define HID_CONSUMER_USAGE_AL_POWER_STATUS                                0x1B5
+#define HID_CONSUMER_USAGE_AL_IMAGE_BROWSER                               0x1B6
+#define HID_CONSUMER_USAGE_AL_AUDIO_BROWSER                               0x1B7
+#define HID_CONSUMER_USAGE_AL_MOVIE_BROWSER                               0x1B8
+#define HID_CONSUMER_USAGE_AL_DIGITAL_RIGHTS_MANAGER                      0x1B9
+#define HID_CONSUMER_USAGE_AL_DIGITAL_WALLET                              0x1BA
+#define HID_CONSUMER_USAGE_AL_INSTANT_MESSAGING                           0x1BC
+#define HID_CONSUMER_USAGE_AL_OEM_FEATURES_TIPS_TUTORIAL_BROWSER          0x1BD
+#define HID_CONSUMER_USAGE_AL_OEM_HELP                                    0x1BE
+#define HID_CONSUMER_USAGE_AL_ONLINE_COMMUNITY                            0x1BF
+#define HID_CONSUMER_USAGE_AL_ONLINE_SHOPPING_BROWSER                     0x1C1
+#define HID_CONSUMER_USAGE_AL_ENTERTAINMENT_CONTENT_BROWSER               0x1C0
+#define HID_CONSUMER_USAGE_AL_SMARTCARD_INFORMATION_HELP                  0x1C2
+#define HID_CONSUMER_USAGE_AL_MARKET_MONITOR_FINANCE_BROWSER              0x1C3
+#define HID_CONSUMER_USAGE_AL_CUSTOMIZED_CORPORATE_NEWS_BROWSER           0x1C4
+#define HID_CONSUMER_USAGE_AL_RESEARCH_SEARCH_BROWSER                     0x1C6
+#define HID_CONSUMER_USAGE_AL_ONLINE_ACTIVITY_BROWSER                     0x1C5
+#define HID_CONSUMER_USAGE_AL_AUDIO_PLAYER                                0x1C7
+#define HID_CONSUMER_USAGE_GENERIC_GUI_APPLICATION_CONTROLS               0x200
+#define HID_CONSUMER_USAGE_AC_NEW                                         0x201
+#define HID_CONSUMER_USAGE_AC_OPEN                                        0x202
+#define HID_CONSUMER_USAGE_AC_CLOSE                                       0x203
+#define HID_CONSUMER_USAGE_AC_EXIT                                        0x204
+#define HID_CONSUMER_USAGE_AC_MAXIMIZE                                    0x205
+#define HID_CONSUMER_USAGE_AC_MINIMIZE                                    0x206
+#define HID_CONSUMER_USAGE_AC_SAVE                                        0x207
+#define HID_CONSUMER_USAGE_AC_PRINT                                       0x208
+#define HID_CONSUMER_USAGE_AC_PROPERTIES                                  0x209
+#define HID_CONSUMER_USAGE_AC_UNDO                                        0x21A
+#define HID_CONSUMER_USAGE_AC_COPY                                        0x21B
+#define HID_CONSUMER_USAGE_AC_CUT                                         0x21C
+#define HID_CONSUMER_USAGE_AC_PASTE                                       0x21D
+#define HID_CONSUMER_USAGE_AC_SELECT_ALL                                  0x21E
+#define HID_CONSUMER_USAGE_AC_FIND                                        0x21F
+#define HID_CONSUMER_USAGE_AC_FIND_AND_REPLACE                            0x220
+#define HID_CONSUMER_USAGE_AC_SEARCH                                      0x221
+#define HID_CONSUMER_USAGE_AC_GO_TO                                       0x222
+#define HID_CONSUMER_USAGE_AC_HOME                                        0x223
+#define HID_CONSUMER_USAGE_AC_BACK                                        0x224
+#define HID_CONSUMER_USAGE_AC_FORWARD                                     0x225
+#define HID_CONSUMER_USAGE_AC_STOP                                        0x226
+#define HID_CONSUMER_USAGE_AC_REFRESH                                     0x227
+#define HID_CONSUMER_USAGE_AC_PREVIOUS_LINK                               0x228
+#define HID_CONSUMER_USAGE_AC_NEXT_LINK                                   0x229
+#define HID_CONSUMER_USAGE_AC_BOOKMARKS                                   0x22A
+#define HID_CONSUMER_USAGE_AC_HISTORY                                     0x22B
+#define HID_CONSUMER_USAGE_AC_SUBSCRIPTIONS                               0x22C
+#define HID_CONSUMER_USAGE_AC_ZOOM_IN                                     0x22D
+#define HID_CONSUMER_USAGE_AC_ZOOM_OUT                                    0x22E
+#define HID_CONSUMER_USAGE_AC_ZOOM                                        0x22F
+#define HID_CONSUMER_USAGE_AC_FULL_SCREEN_VIEW                            0x230
+#define HID_CONSUMER_USAGE_AC_NORMAL_VIEW                                 0x231
+#define HID_CONSUMER_USAGE_AC_VIEW_TOGGLE                                 0x232
+#define HID_CONSUMER_USAGE_AC_SCROLL_UP                                   0x233
+#define HID_CONSUMER_USAGE_AC_SCROLL_DOWN                                 0x234
+#define HID_CONSUMER_USAGE_AC_SCROLL                                      0x235
+#define HID_CONSUMER_USAGE_AC_PAN_LEFT                                    0x236
+#define HID_CONSUMER_USAGE_AC_PAN_RIGHT                                   0x237
+#define HID_CONSUMER_USAGE_AC_PAN                                         0x238
+#define HID_CONSUMER_USAGE_AC_NEW_WINDOW                                  0x239
+#define HID_CONSUMER_USAGE_AC_TILE_HORIZONTALLY                           0x23A
+#define HID_CONSUMER_USAGE_AC_TILE_VERTICALLY                             0x23B
+#define HID_CONSUMER_USAGE_AC_FORMAT                                      0x23C
+#define HID_CONSUMER_USAGE_AC_EDIT                                        0x23D
+#define HID_CONSUMER_USAGE_AC_BOLD                                        0x23E
+#define HID_CONSUMER_USAGE_AC_ITALICS                                     0x23F
+#define HID_CONSUMER_USAGE_AC_UNDERLINE                                   0x240
+#define HID_CONSUMER_USAGE_AC_STRIKETHROUGH                               0x241
+#define HID_CONSUMER_USAGE_AC_SUBSCRIPT                                   0x242
+#define HID_CONSUMER_USAGE_AC_SUPERSCRIPT                                 0x243
+#define HID_CONSUMER_USAGE_AC_ALL_CAPS                                    0x244
+#define HID_CONSUMER_USAGE_AC_ROTATE                                      0x245
+#define HID_CONSUMER_USAGE_AC_RESIZE                                      0x246
+#define HID_CONSUMER_USAGE_AC_FLIP_HORIZONTAL                             0x247
+#define HID_CONSUMER_USAGE_AC_FLIP_VERTICAL                               0x248
+#define HID_CONSUMER_USAGE_AC_MIRROR_HORIZONTAL                           0x249
+#define HID_CONSUMER_USAGE_AC_MIRROR_VERTICAL                             0x24A
+#define HID_CONSUMER_USAGE_AC_FONT_SELECT                                 0x24B
+#define HID_CONSUMER_USAGE_AC_FONT_COLOR                                  0x24C
+#define HID_CONSUMER_USAGE_AC_FONT_SIZE                                   0x24D
+#define HID_CONSUMER_USAGE_AC_JUSTIFY_LEFT                                0x24E
+#define HID_CONSUMER_USAGE_AC_JUSTIFY_CENTER_H                            0x24F
+#define HID_CONSUMER_USAGE_AC_JUSTIFY_RIGHT                               0x250
+#define HID_CONSUMER_USAGE_AC_JUSTIFY_BLOCK_H                             0x251
+#define HID_CONSUMER_USAGE_AC_JUSTIFY_TOP                                 0x252
+#define HID_CONSUMER_USAGE_AC_JUSTIFY_CENTER_V                            0x253
+#define HID_CONSUMER_USAGE_AC_JUSTIFY_BOTTOM                              0x254
+#define HID_CONSUMER_USAGE_AC_JUSTIFY_BLOCK_V                             0x255
+#define HID_CONSUMER_USAGE_AC_INDENT_DECREASE                             0x256
+#define HID_CONSUMER_USAGE_AC_INDENT_INCREASE                             0x257
+#define HID_CONSUMER_USAGE_AC_NUMBERED_LIST                               0x258
+#define HID_CONSUMER_USAGE_AC_RESTART_NUMBERING                           0x259
+#define HID_CONSUMER_USAGE_AC_BULLETED_LIST                               0x25A
+#define HID_CONSUMER_USAGE_AC_PROMOTE                                     0x25B
+#define HID_CONSUMER_USAGE_AC_DEMOTE                                      0x25C
+#define HID_CONSUMER_USAGE_AC_YES                                         0x25D
+#define HID_CONSUMER_USAGE_AC_NO                                          0x25E
+#define HID_CONSUMER_USAGE_AC_CANCEL                                      0x25F
+#define HID_CONSUMER_USAGE_AC_CATALOG                                     0x260
+#define HID_CONSUMER_USAGE_AC_BUY_CHECKOUT                                0x261
+#define HID_CONSUMER_USAGE_AC_ADD_TO_CART                                 0x262
+#define HID_CONSUMER_USAGE_AC_EXPAND                                      0x263
+#define HID_CONSUMER_USAGE_AC_EXPAND_ALL                                  0x264
+#define HID_CONSUMER_USAGE_AC_COLLAPSE                                    0x265
+#define HID_CONSUMER_USAGE_AC_COLLAPSE_ALL                                0x266
+#define HID_CONSUMER_USAGE_AC_PRINT_PREVIEW                               0x267
+#define HID_CONSUMER_USAGE_AC_PASTE_SPECIAL                               0x268
+#define HID_CONSUMER_USAGE_AC_INSERT_MODE                                 0x269
+#define HID_CONSUMER_USAGE_AC_DELETE                                      0x26A
+#define HID_CONSUMER_USAGE_AC_LOCK                                        0x26B
+#define HID_CONSUMER_USAGE_AC_UNLOCK                                      0x26C
+#define HID_CONSUMER_USAGE_AC_PROTECT                                     0x26D
+#define HID_CONSUMER_USAGE_AC_UNPROTECT                                   0x26E
+#define HID_CONSUMER_USAGE_AC_ATTACH_COMMENT                              0x26F
+#define HID_CONSUMER_USAGE_AC_DELETE_COMMENT                              0x270
+#define HID_CONSUMER_USAGE_AC_VIEW_COMMENT                                0x271
+#define HID_CONSUMER_USAGE_AC_SELECT_WORD                                 0x272
+#define HID_CONSUMER_USAGE_AC_SELECT_SENTENCE                             0x273
+#define HID_CONSUMER_USAGE_AC_SELECT_PARAGRAPH                            0x274
+#define HID_CONSUMER_USAGE_AC_SELECT_COLUMN                               0x275
+#define HID_CONSUMER_USAGE_AC_SELECT_ROW                                  0x276
+#define HID_CONSUMER_USAGE_AC_SELECT_TABLE                                0x277
+#define HID_CONSUMER_USAGE_AC_SELECT_OBJECT                               0x278
+#define HID_CONSUMER_USAGE_AC_REDO_REPEAT                                 0x279
+#define HID_CONSUMER_USAGE_AC_SORT                                        0x27A
+#define HID_CONSUMER_USAGE_AC_SORT_ASCENDING                              0x27B
+#define HID_CONSUMER_USAGE_AC_SORT_DESCENDING                             0x27C
+#define HID_CONSUMER_USAGE_AC_FILTER                                      0x27D
+#define HID_CONSUMER_USAGE_AC_SET_CLOCK                                   0x27E
+#define HID_CONSUMER_USAGE_AC_VIEW_CLOCK                                  0x27F
+#define HID_CONSUMER_USAGE_AC_SELECT_TIME_ZONE                            0x280
+#define HID_CONSUMER_USAGE_AC_EDIT_TIME_ZONES                             0x281
+#define HID_CONSUMER_USAGE_AC_SET_ALARM                                   0x282
+#define HID_CONSUMER_USAGE_AC_CLEAR_ALARM                                 0x283
+#define HID_CONSUMER_USAGE_AC_SNOOZE_ALARM                                0x284
+#define HID_CONSUMER_USAGE_AC_RESET_ALARM                                 0x285
+#define HID_CONSUMER_USAGE_AC_SYNCHRONIZE                                 0x286
+#define HID_CONSUMER_USAGE_AC_SEND_RECEIVE                                0x287
+#define HID_CONSUMER_USAGE_AC_SEND_TO                                     0x288
+#define HID_CONSUMER_USAGE_AC_REPLY                                       0x289
+#define HID_CONSUMER_USAGE_AC_REPLY_ALL                                   0x28A
+#define HID_CONSUMER_USAGE_AC_FORWARD_MSG                                 0x28B
+#define HID_CONSUMER_USAGE_AC_SEND                                        0x28C
+#define HID_CONSUMER_USAGE_AC_ATTACH_FILE                                 0x28D
+#define HID_CONSUMER_USAGE_AC_UPLOAD                                      0x28E
+#define HID_CONSUMER_USAGE_AC_DOWNLOAD_SAVE_TARGET_AS                     0x28F
+#define HID_CONSUMER_USAGE_AC_SET_BORDERS                                 0x290
+#define HID_CONSUMER_USAGE_AC_INSERT_ROW                                  0x291
+#define HID_CONSUMER_USAGE_AC_INSERT_COLUMN                               0x292
+#define HID_CONSUMER_USAGE_AC_INSERT_FILE                                 0x293
+#define HID_CONSUMER_USAGE_AC_INSERT_PICTURE                              0x294
+#define HID_CONSUMER_USAGE_AC_INSERT_OBJECT                               0x295
+#define HID_CONSUMER_USAGE_AC_INSERT_SYMBOL                               0x296
+#define HID_CONSUMER_USAGE_AC_SAVE_AND_CLOSE                              0x297
+#define HID_CONSUMER_USAGE_AC_RENAME                                      0x298
+#define HID_CONSUMER_USAGE_AC_MERGE                                       0x299
+#define HID_CONSUMER_USAGE_AC_SPLIT                                       0x29A
+#define HID_CONSUMER_USAGE_AC_DISRIBUTE_HORIZONTALLY                      0x29B
+#define HID_CONSUMER_USAGE_AC_DISTRIBUTE_VERTICALLY                       0x29C
 
 #endif
 
