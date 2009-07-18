@@ -1723,8 +1723,7 @@ enum plugin_status plugin_start(UNUSED const void* parameter)
     rb->splash(HZ * 2, "Game Over");
     if (score > hiscore.score) {
         /* Save new hiscore */
-        hiscore.score = score;
-        hiscore.level = level;
+        highscore_update(score, level, "Invader", &hiscore, 1);
         highscore_save(HISCOREFILE, &hiscore, 1);
     }
 

@@ -242,56 +242,6 @@ enum {
     CC_DARK_GREEN
 };
 
-/* display the highscore list and highlight the last one */
-static void clix_show_highscores(int position)
-{
-    int i, w, h;
-    char str[30];
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
-#endif
-    rb->button_clear_queue();
-    rb->lcd_clear_display();
-
-    rb->lcd_setfont(FONT_UI);
-    rb->lcd_getstringsize("High Scores", &w, &h);
-    /* check wether it fits on screen */
-    if ((4*h + h*(NUM_SCORES-1) + MARGIN) > LCD_HEIGHT) {
-        rb->lcd_setfont(FONT_SYSFIXED);
-        rb->lcd_getstringsize("High Scores", &w, &h);
-    }
-    rb->lcd_putsxy(LCD_WIDTH/2-w/2, MARGIN, "High Scores");
-    rb->lcd_putsxy(LCD_WIDTH/4-w/4,2*h, "Score");
-    rb->lcd_putsxy(LCD_WIDTH*3/4-w/4,2*h, "Level");
-
-    for (i = 0; i<NUM_SCORES; i++)
-    {
-#ifdef HAVE_LCD_COLOR
-        if (i == position) {
-            rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
-        }
-#endif
-        rb->snprintf (str, sizeof (str), "%d)", i+1);
-        rb->lcd_putsxy (MARGIN,3*h + h*i, str);
-        rb->snprintf (str, sizeof (str), "%d", highest[i].score);
-        rb->lcd_putsxy (LCD_WIDTH/4-w/4,3*h + h*i, str);
-        rb->snprintf (str, sizeof (str), "%d", highest[i].level);
-        rb->lcd_putsxy (LCD_WIDTH*3/4-w/4,3*h + h*i, str);
-        if(i == position) {
-#ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(LCD_WHITE);
-#else
-            rb->lcd_hline(MARGIN, LCD_WIDTH-MARGIN, 3*h + h*(i+1));
-#endif
-        }
-    }
-    rb->lcd_update();
-    rb->button_get(true);
-    rb->lcd_setfont(FONT_SYSFIXED);
-}
-
 /*  recursive function to check if a neighbour cell is of the same color
     if so call the function with the neighbours position
 */
@@ -671,7 +621,7 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
                     return 1;
                 break;
             case 3:
-                clix_show_highscores(NUM_SCORES);
+                highscore_show(NUM_SCORES, highest, NUM_SCORES);
                 break;
             case 4:
                 playback_control(NULL);
@@ -827,16 +777,14 @@ static int clix_handle_game(struct clix_game_state_t* state)
                                 clix_draw( state);
                                 rb->splash(HZ*2, "Game Over!");
                                 rb->lcd_clear_display();
-                                if (highscore_would_update(state->score,
-                                    highest, NUM_SCORES)) {
-                                    position=highscore_update(state->score,
-                                                            state->level, "",
-                                                            highest,NUM_SCORES);
-                                    if (position == 0) {
-                                        rb->splash(HZ*2, "New High Score");
-                                    }
-                                    clix_show_highscores(position);
-                                }
+                                position=highscore_update(state->score,
+                                                        state->level, "",
+                                                        highest,NUM_SCORES);
+                                if (position == 0)
+                                    rb->splash(HZ*2, "New High Score");
+                                if (position != -1)
+                                    highscore_show(position, highest,
+                                                   NUM_SCORES);
                                 if (clix_menu(state, 0))
                                     return 1;
                             break;

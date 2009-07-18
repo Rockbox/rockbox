@@ -408,7 +408,6 @@ struct puzzle_level puzzle_levels[NUM_PUZZLE_LEVELS] = {
 
 #define HIGH_SCORE PLUGIN_GAMES_DIR "/jewels.score"
 struct highscore highest[NUM_SCORES];
-bool highest_updated = false;
 
 
 /*****************************************************************************
@@ -1249,55 +1248,6 @@ static void jewels_nextlevel(struct game_context* bj) {
     bj->score += points;
 }
 
-static void jewels_show_highscores(int position)
-{
-    int i, w, h;
-    char str[30];
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
-#endif
-    rb->button_clear_queue();
-    rb->lcd_clear_display();
-
-    rb->lcd_setfont(FONT_UI);
-    rb->lcd_getstringsize("High Scores", &w, &h);
-    /* check wether it fits on screen */
-    if ((4*h + h*(NUM_SCORES-1) + MARGIN) > LCD_HEIGHT) {
-        rb->lcd_setfont(FONT_SYSFIXED);
-        rb->lcd_getstringsize("High Scores", &w, &h);
-    }
-    rb->lcd_putsxy(LCD_WIDTH/2-w/2, MARGIN, "High Scores");
-    rb->lcd_putsxy(LCD_WIDTH/4-w/4,2*h, "Score");
-    rb->lcd_putsxy(LCD_WIDTH*3/4-w/4,2*h, "Level");
-
-    for (i = 0; i<NUM_SCORES; i++)
-    {
-#ifdef HAVE_LCD_COLOR
-        if (i == position) {
-            rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
-        }
-#endif
-        rb->snprintf (str, sizeof (str), "%d)", i+1);
-        rb->lcd_putsxy (MARGIN,3*h + h*i, str);
-        rb->snprintf (str, sizeof (str), "%d", highest[i].score);
-        rb->lcd_putsxy (LCD_WIDTH/4-w/4,3*h + h*i, str);
-        rb->snprintf (str, sizeof (str), "%d", highest[i].level);
-        rb->lcd_putsxy (LCD_WIDTH*3/4-w/4,3*h + h*i, str);
-        if(i == position) {
-#ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(LCD_WHITE);
-#else
-            rb->lcd_hline(MARGIN, LCD_WIDTH-MARGIN, 3*h + h*(i+1));
-#endif
-        }
-    }
-    rb->lcd_update();
-    rb->button_get(true);
-    rb->lcd_setfont(FONT_SYSFIXED);
-}
-
 static bool jewels_help(void)
 {
     rb->lcd_setfont(FONT_UI);
@@ -1395,7 +1345,7 @@ static int jewels_game_menu(struct game_context* bj, bool ingame)
                     return 1;
                 break;
             case 4:
-                jewels_show_highscores(NUM_SCORES);
+                highscore_show(NUM_SCORES, highest, NUM_SCORES);
                 break;
             case 5:
                 playback_control(NULL);
@@ -1560,17 +1510,12 @@ static int jewels_main(struct game_context* bj) {
                     rb->splash(HZ*2, "Game Over!");
                     rb->lcd_clear_display();
                     bj->score += (bj->level-1)*LEVEL_PTS;
-                    if (highscore_would_update(bj->score, highest,
-                        NUM_SCORES)) {
-                        position=highscore_update(bj->score,
-                                                  bj->level, "",
-                                                  highest,NUM_SCORES);
-                        highest_updated = true;
-                        if (position == 0) {
-                            rb->splash(HZ*2, "New High Score");
-                        }
-                        jewels_show_highscores(position);
-                    }
+                    position=highscore_update(bj->score, bj->level, "",
+                                              highest, NUM_SCORES);
+                    if (position == 0)
+                        rb->splash(HZ*2, "New High Score");
+                    if (position != -1)
+                    highscore_show(position, highest, NUM_SCORES);
                     break;
                 case GAME_TYPE_PUZZLE:
                     rb->splash(2*HZ, "Game Over");
@@ -1590,7 +1535,6 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* load high scores */
     highscore_load(HIGH_SCORE,highest,NUM_SCORES);
-    highest_updated = false;
 
     rb->lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
@@ -1600,8 +1544,7 @@ enum plugin_status plugin_start(const void* parameter)
     struct game_context bj;
     bj.tmp_type = GAME_TYPE_NORMAL;
     jewels_main(&bj);
-    if(highest_updated)
-        highscore_save(HIGH_SCORE,highest,NUM_SCORES);
+    highscore_save(HIGH_SCORE,highest,NUM_SCORES);
     rb->lcd_setfont(FONT_UI);
 
     return PLUGIN_OK;

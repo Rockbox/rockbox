@@ -1235,7 +1235,6 @@ struct tile {
  * elapsedshot is the shot elapsed time in 1/100s of seconds
  * startedshot is when the current shot began
  * resume denotes whether to resume the currently loaded game
- * dirty denotes whether the high scores are out of sync with the saved file
  * playboard is the game playing board
  */
 struct game_context {
@@ -1254,7 +1253,6 @@ struct game_context {
     long elapsedshot;
     long startedshot;
     bool resume;
-    bool dirty;
     struct tile playboard[BB_HEIGHT][BB_WIDTH];
 };
 
@@ -1272,7 +1270,6 @@ static void bubbles_anchored(struct game_context* bb, int row, int col);
 static int  bubbles_fall(struct game_context* bb);
 static int  bubbles_checklevel(struct game_context* bb);
 static void bubbles_recordscore(struct game_context* bb);
-static void bubbles_displayscores(struct game_context* bb, int position);
 static void bubbles_savescores(struct game_context* bb);
 static bool bubbles_loadgame(struct game_context* bb);
 static void bubbles_savegame(struct game_context* bb);
@@ -1286,6 +1283,7 @@ static int  bubbles(struct game_context* bb);
 * bubbles_init() initializes bubbles data structures.
 ******************************************************************************/
 static void bubbles_init(struct game_context* bb) {
+    bubbles_setcolors();
     /* seed the rand generator */
     rb->srand(*rb->current_tick);
 
@@ -2113,23 +2111,18 @@ static void bubbles_recordscore(struct game_context* bb) {
 
     int position;
 
-    if (highscore_would_update(bb->score, bb->highscores, NUM_SCORES)) {
-        bb->dirty = true;
-        position = highscore_update(bb->score, bb->level, "",
-                                    bb->highscores, NUM_SCORES);
-        if (position==0) {
-            rb->splash(HZ*2, "New High Score");
-        }
-        bubbles_displayscores(bb, position);
-    }
+    position = highscore_update(bb->score, bb->level, "",
+                                bb->highscores, NUM_SCORES);
+    if (position==0)
+        rb->splash(HZ*2, "New High Score");
+    if (position != -1)
+        highscore_show(position, bb->highscores, NUM_SCORES);
 }
 
 /*****************************************************************************
 * bubbles_loadscores() loads the high scores saved file.
 ******************************************************************************/
 static void bubbles_loadscores(struct game_context* bb) {
-
-    bb->dirty = false;
 
     /* highlevel and highscores */
     highscore_load(SCORE_FILE, &bb->highlevel, NUM_SCORES+1);
@@ -2145,60 +2138,6 @@ static void bubbles_savescores(struct game_context* bb) {
 
     /* highlevel and highscores */
     highscore_save(SCORE_FILE, &bb->highlevel, NUM_SCORES+1);
-    bb->dirty = false;
-}
-
-/*****************************************************************************
-* bubbles_displayscores() displays the high scores
-******************************************************************************/
-#define MARGIN 5
-static void bubbles_displayscores(struct game_context* bb, int position) {
-    int i, w, h;
-    char str[30];
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
-#endif
-    rb->button_clear_queue();
-    rb->lcd_clear_display();
-
-    rb->lcd_setfont(FONT_UI);
-    rb->lcd_getstringsize("High Scores", &w, &h);
-    /* check wether it fits on screen */
-    if ((4*h + h*(NUM_SCORES-1) + MARGIN) > LCD_HEIGHT) {
-        rb->lcd_setfont(FONT_SYSFIXED);
-        rb->lcd_getstringsize("High Scores", &w, &h);
-    }
-    rb->lcd_putsxy(LCD_WIDTH/2-w/2, MARGIN, "High Scores");
-    rb->lcd_putsxy(LCD_WIDTH/4-w/4,2*h, "Score");
-    rb->lcd_putsxy(LCD_WIDTH*3/4-w/4,2*h, "Level");
-
-    for (i = 0; i<NUM_SCORES; i++)
-    {
-#ifdef HAVE_LCD_COLOR
-        if(i == position) {
-            rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
-        }
-#endif
-        rb->snprintf (str, sizeof (str), "%d)", i+1);
-        rb->lcd_putsxy (MARGIN,3*h + h*i, str);
-        rb->snprintf (str, sizeof (str), "%d", bb->highscores[i].score);
-        rb->lcd_putsxy (LCD_WIDTH/4-w/4,3*h + h*i, str);
-        rb->snprintf (str, sizeof (str), "%d", bb->highscores[i].level);
-        rb->lcd_putsxy (LCD_WIDTH*3/4-w/4,3*h + h*i, str);
-        if(i == position) {
-#ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(LCD_WHITE);
-#else
-            rb->lcd_hline(MARGIN, LCD_WIDTH-MARGIN, 3*h + h*(i+1)-1);
-#endif
-        }
-    }
-    rb->lcd_update();
-    rb->button_get(true);
-    rb->lcd_setfont(FONT_SYSFIXED);
-    bubbles_setcolors();
 }
 
 /*****************************************************************************
@@ -2277,10 +2216,7 @@ static inline void bubbles_setcolors(void) {
 ******************************************************************************/
 static void bubbles_callback(void* param) {
     struct game_context* bb = (struct game_context*) param;
-    if(bb->dirty) {
-        rb->splash(HZ/2, "Saving high scores...");
-        bubbles_savescores(bb);
-    }
+    bubbles_savescores(bb);
 }
 
 /*****************************************************************************
@@ -2376,8 +2312,6 @@ static int bubbles(struct game_context* bb) {
     bool startgame = false;
     long timeout;
 
-    bubbles_setcolors();
-
     /* don't resume by default */
     bb->resume = false;
 
@@ -2409,7 +2343,7 @@ static int bubbles(struct game_context* bb) {
                 startlevel--;
                 break;
             case 3: /* High scores */
-                bubbles_displayscores(bb, 0);
+                highscore_show(NUM_SCORES, bb->highscores, NUM_SCORES);
                 break;
             case 4: /* Playback Control */
                 playback_control(NULL);
@@ -2494,7 +2428,6 @@ enum plugin_status plugin_start(const void* parameter) {
                 /* record high level */
                 if( NUM_LEVELS-1 > bb.highlevel.level) {
                     bb.highlevel.level = NUM_LEVELS-1;
-                    bb.dirty = true;
                 }
                 /* record high score */
                 bubbles_recordscore(&bb);
@@ -2508,8 +2441,8 @@ enum plugin_status plugin_start(const void* parameter) {
                 if(!bb.resume) {
                     /* record high level */
                     if((int)bb.level-1 > bb.highlevel.level) {
-                        bb.highlevel.level = bb.level-1;
-                        bb.dirty = true;
+                        bb.highlevel.score = -1;
+                        highscore_update(0, bb.level-1, "", &bb.highlevel, 1);
                     }
                     /* record high score */
                     bubbles_recordscore(&bb);
@@ -2521,10 +2454,7 @@ enum plugin_status plugin_start(const void* parameter) {
                 return PLUGIN_USB_CONNECTED;
 
             case BB_QUIT:
-                if(bb.dirty) {
-                    rb->splash(HZ/2, "Saving high scores...");
-                    bubbles_savescores(&bb);
-                }
+                bubbles_savescores(&bb);
                 exit = true;
                 break;
 
