@@ -29,7 +29,6 @@ void readsf_banana( void);    /* debugging */
 #define strcat rb->strcat
 #define strlen rb->strlen
 #define strcmp rb->strcmp
-#define strncpy rb->strncpy
 #define strrchr rb->strrchr
 #define strncat rb_strncat
 
