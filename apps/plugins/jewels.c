@@ -273,24 +273,17 @@ CONFIG_KEYPAD == MROBE500_PAD
 #endif
 #endif
 
-/* use 10x8 tiles (iFP 700) */
-#if (LCD_HEIGHT == 64) && (LCD_WIDTH == 128)
-#define NUM_SCORES 5
-
-/* use 10x8 tiles (Recorder, Ondio) */
-#elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 112)
-#define NUM_SCORES 5
-#endif
-
 #define TILE_WIDTH  BMPWIDTH_jewels
 #define TILE_HEIGHT (BMPHEIGHT_jewels/23)
 
+#if LCD_HEIGHT < LCD_WIDTH
 /* This calculation assumes integer division w/ LCD_HEIGHT/TILE_HEIGHT */
 #define YOFS        LCD_HEIGHT-((LCD_HEIGHT/TILE_HEIGHT)*TILE_HEIGHT)
-
-#if !defined(NUM_SCORES)
-#define NUM_SCORES  LCD_HEIGHT/10
+#else
+#define YOFS        0
 #endif
+
+#define NUM_SCORES  5
 
 /* swap directions */
 #define SWAP_UP    0
