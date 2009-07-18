@@ -39,19 +39,11 @@
 #define MODEL_NUMBER 45
 #endif
 
-//#define HAVE_ATA_SD
-//#define HAVE_HOTSWAP
-
-#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
-
 /* Support FAT16 for SD cards <= 2GB */
 #define HAVE_FAT16SUPPORT
 
 /* ChinaChip NAND FTL */
 #define CONFIG_NAND NAND_CC
-
-#define HAVE_MULTIDRIVE
-#define NUM_DRIVES 2
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
@@ -168,6 +160,12 @@
 #define CFG_EXTAL 12000000    /* EXT clock: 12 Mhz */
 
 #ifndef SIMULATOR
+
+#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
+#define NUM_DRIVES 2
+
+/* Define this if media can be exchanged on the fly */
+//#define HAVE_HOTSWAP
 
 /* Define this if you have a Ingenic JZ4732 */
 #define CONFIG_CPU JZ4732
