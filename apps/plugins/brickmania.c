@@ -276,218 +276,46 @@ enum menu_items {
 
 #if LCD_DEPTH > 1 /* currently no background bmp for mono screens */
 #include "pluginbitmaps/brickmania_menu_bg.h"
-#define MENU_BGHEIGHT  BMPHEIGHT_brickmania_menu_bg
-#define MENU_BGWIDTH   BMPWIDTH_brickmania_menu_bg
+#define MENU_BGHEIGHT       BMPHEIGHT_brickmania_menu_bg
+#define MENU_BGWIDTH        BMPWIDTH_brickmania_menu_bg
 #endif
 
 #ifdef HAVE_LCD_COLOR /* currently no transparency for non-colour */
 #include "pluginbitmaps/brickmania_break.h"
 #endif
 
-#if ((LCD_WIDTH == 320) || (LCD_WIDTH == 400)) && (LCD_HEIGHT == 240)
-
 /* The time (in ms) for one iteration through the game loop - decrease this
    to speed up the game - note that current_tick is (currently) only accurate
    to 10ms.
 */
-#define CYCLETIME 30
+#define CYCLETIME           50
 
-#define TOPMARGIN 30
+#define TOPMARGIN           (BRICK_HEIGHT * 2)
 
-#define BMPYOFS_start 110
-#define HIGHSCORE_XPOS 57
-#define HIGHSCORE_YPOS 88
+#define HIGHSCORE_XPOS      (LCD_WIDTH - 60)
+#define HIGHSCORE_YPOS      0
 
-#define STRINGPOS_FINISH 140
-#define STRINGPOS_CONGRATS 157
-#define STRINGPOS_NAVI 150
-#define STRINGPOS_FLIP 150
+#define STRINGPOS_FINISH    (LCD_HEIGHT - (LCD_HEIGHT / 6))
+#define STRINGPOS_CONGRATS  (STRINGPOS_FINISH - 20)
+#define STRINGPOS_NAVI      (STRINGPOS_FINISH - 10)
+#define STRINGPOS_FLIP      (STRINGPOS_FINISH - 10)
 
-#elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
-
-/* The time (in ms) for one iteration through the game loop - decrease this
-   to speed up the game - note that current_tick is (currently) only accurate
-   to 10ms.
-*/
-#define CYCLETIME 30
-
-/* Offsets for LCDS > 220x176 */
-
-#define GAMESCREEN_HEIGHT 176
-#define TOPMARGIN 30
-
-#define XOFS ((LCD_WIDTH-220)/BRICK_WIDTH/2)*BRICK_WIDTH
-#define YOFS ((LCD_HEIGHT-176)/BRICK_HEIGHT/2)*BRICK_HEIGHT
-
-#define BMPYOFS_start (78+YOFS)
-#define HIGHSCORE_XPOS (17+XOFS)
-#define HIGHSCORE_YPOS (56+YOFS)
-
-#define STRINGPOS_FINISH 140
-#define STRINGPOS_CONGRATS 157
-#define STRINGPOS_NAVI 150
-#define STRINGPOS_FLIP 150
-
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
-/* The time (in ms) for one iteration through the game loop - decrease this
-   to speed up the game - note that current_tick is (currently) only accurate
-   to 10ms.
-*/
-#define CYCLETIME 50
-
-#define TOPMARGIN 21
-
-#if LCD_DEPTH > 2
-#define BMPYOFS_start 58
+#if LCD_WIDTH<=LCD_HEIGHT
+/* Maintain a 4/3 ratio (Width/Height) */
+#define GAMESCREEN_HEIGHT   (LCD_WIDTH * 3 / 4)
+#define BMPYOFS_start       (LCD_HEIGHT / 2)
 #else
-#define BMPYOFS_start 66
-#endif
-#define HIGHSCORE_XPOS 10
-#define HIGHSCORE_YPOS 38
-
-#define STRINGPOS_FINISH 110
-#define STRINGPOS_CONGRATS 100
-#define STRINGPOS_NAVI 100
-#define STRINGPOS_FLIP 100
-
-#elif (LCD_WIDTH == 132) && (LCD_HEIGHT == 80)
-
-/* The time (in ms) for one iteration through the game loop - decrease this
-   to speed up the game - note that current_tick is (currently) only accurate
-   to 10ms.
-*/
-#define CYCLETIME 50
-
-#define TOPMARGIN 10
-
-#define BMPYOFS_start 30
-#define HIGHSCORE_XPOS 68
-#define HIGHSCORE_YPOS 8
-
-#define STRINGPOS_FINISH 55
-#define STRINGPOS_CONGRATS 45
-#define STRINGPOS_NAVI 60
-#define STRINGPOS_FLIP 60
-
-#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128)
-
-/* The time (in ms) for one iteration through the game loop - decrease this
-   to speed up the game - note that current_tick is (currently) only accurate
-   to 10ms.
-*/
-#define CYCLETIME 50
-
-#define GAMESCREEN_HEIGHT 100
-#define TOPMARGIN 15
-
-#define BMPYOFS_start 70
-#define HIGHSCORE_XPOS 8
-#define HIGHSCORE_YPOS 36
-
-#define STRINGPOS_FINISH 55
-#define STRINGPOS_CONGRATS 45
-#define STRINGPOS_NAVI 60
-#define STRINGPOS_FLIP 60
-
-/* iPod Mini */
-#elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
-/* The time (in ms) for one iteration through the game loop - decrease this
-   to speed up the game - note that current_tick is (currently) only accurate
-   to 10ms.
-*/
-#define CYCLETIME 50
-
-#define TOPMARGIN 10
-
-#define BMPYOFS_start 51
-#define HIGHSCORE_XPOS 73
-#define HIGHSCORE_YPOS 25
-
-#define STRINGPOS_FINISH 54
-#define STRINGPOS_CONGRATS 44
-#define STRINGPOS_NAVI 44
-#define STRINGPOS_FLIP 44
-
-/* iAudio M3 */
-#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 96)
-/* The time (in ms) for one iteration through the game loop - decrease this
-   to speed up the game - note that current_tick is (currently) only accurate
-   to 10ms.
-*/
-#define CYCLETIME 50
-
-#define TOPMARGIN 10
-
-#define BMPYOFS_start 42
-#define HIGHSCORE_XPOS 65
-#define HIGHSCORE_YPOS 25
-
-#define STRINGPOS_FINISH 54
-#define STRINGPOS_CONGRATS 44
-#define STRINGPOS_NAVI 44
-#define STRINGPOS_FLIP 44
-
-/* Archos / Sansa Clip / Sansa m200 */
-#elif ((LCD_WIDTH == 112) | (LCD_WIDTH == 128)) && (LCD_HEIGHT == 64)
-/* The time (in ms) for one iteration through the game loop - decrease this
-   to speed up the game - note that current_tick is (currently) only accurate
-   to 10ms.
-*/
-#define CYCLETIME 75
-
-#define TOPMARGIN 10
-
-#define BMPYOFS_start 22
-#define HIGHSCORE_XPOS 0
-#define HIGHSCORE_YPOS 0
-
-#define STRINGPOS_FINISH 54
-#define STRINGPOS_CONGRATS 44
-#define STRINGPOS_NAVI 44
-#define STRINGPOS_FLIP 44
-
-/* nano and sansa */
-#elif (LCD_WIDTH == 176) && (LCD_HEIGHT >= 132) && (LCD_DEPTH==16)
-/* The time (in ms) for one iteration through the game loop - decrease this
-   to speed up the game - note that current_tick is (currently) only accurate
-   to 10ms.
-*/
-
-#define CYCLETIME 30
-
-#define GAMESCREEN_HEIGHT 132
-#define TOPMARGIN 21
-
-#define BMPYOFS_start 58
-#define HIGHSCORE_XPOS 7
-#define HIGHSCORE_YPOS 36
-
-#define STRINGPOS_FINISH 110
-#define STRINGPOS_CONGRATS 110
-#define STRINGPOS_NAVI 100
-#define STRINGPOS_FLIP 100
-
-#else
-#error Unsupported LCD Size
-#endif
-
-
-#ifndef GAMESCREEN_HEIGHT
-#define GAMESCREEN_HEIGHT LCD_HEIGHT
+#define GAMESCREEN_HEIGHT   LCD_HEIGHT
+#define BMPYOFS_start       (LCD_HEIGHT / 3)
 #endif
 
 /* calculate menu item offsets from the first defined and the height*/
-#define BMPYOFS_resume (BMPYOFS_start + MENU_ITEMHEIGHT)
-#define BMPYOFS_help   (BMPYOFS_start + 2*MENU_ITEMHEIGHT)
-#define BMPYOFS_quit   (BMPYOFS_start + 3*MENU_ITEMHEIGHT)
+#define BMPYOFS_resume      (BMPYOFS_start + MENU_ITEMHEIGHT)
+#define BMPYOFS_help        (BMPYOFS_start + 2*MENU_ITEMHEIGHT)
+#define BMPYOFS_quit        (BMPYOFS_start + 3*MENU_ITEMHEIGHT)
 
 /*calculate paddle y-position */
-#if GAMESCREEN_HEIGHT >= 128
-#define PAD_POS_Y GAMESCREEN_HEIGHT -PAD_HEIGHT - 2
-#else
-#define PAD_POS_Y GAMESCREEN_HEIGHT -PAD_HEIGHT - 1
-#endif
-
+#define PAD_POS_Y           (GAMESCREEN_HEIGHT - PAD_HEIGHT - 1)
 
 #ifdef HAVE_TOUCHSCREEN
 #include "lib/touchscreen.h"
@@ -1068,7 +896,10 @@ int game_menu(int when)
 #ifdef HAVE_TOUCHSCREEN
         if(button & BUTTON_TOUCHSCREEN)
         {
-            unsigned int result = touchscreen_map(&main_menu, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff);
+            unsigned int result = 
+                touchscreen_map(&main_menu, rb->button_get_data() >> 16, 
+                    rb->button_get_data() & 0xffff);
+                    
             if(result != (unsigned)-1 && button & BUTTON_REL)
             {
                 if(cur == (signed)result)
