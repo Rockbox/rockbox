@@ -1309,8 +1309,11 @@ int game_loop(void)
 #endif
                     }
 
+                    /* Somewhere in here collision checking is done b/w ball and
+                     *  brick.
+                     */
                     for(k=0;k<used_balls;k++) {
-                        if (ball[k].pos_y <160) {
+                        if (ball[k].pos_y < PAD_POS_Y) {
                             if (brick[i*10+j].used==1) {
                                 if ((ball[k].pos_x+ball[k].x+HALFBALL >=
                                      brickx &&
