@@ -189,7 +189,7 @@ static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
         if (selpos >= NUM_CORES)
             remove_thread(threads[selpos - NUM_CORES].id);
 #else
-        remove_thread(&threads[selpos]);
+        remove_thread(threads[selpos].id);
 #endif
         return ACTION_REDRAW;
     }
