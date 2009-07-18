@@ -44,13 +44,13 @@ void tick_start(unsigned int interval_in_ms)
     
     /* configure timer for 10 kHz */
     TBCMD = (1 << 1);   /* TB_CLR */
-    TBPRE = 624;        /* prescaler */
+    TBPRE = 625 - 1;    /* prescaler */
     TBCON = (0 << 13) | /* TB_INT1_EN */
             (1 << 12) | /* TB_INT0_EN */
             (0 << 11) | /* TB_START */
             (2 << 8) |  /* TB_CS = PCLK / 16 */
             (0 << 4);   /* TB_MODE_SEL = interval mode */
-    TBDATA0 = cycles-1; /* set interval period */
+    TBDATA0 = cycles;   /* set interval period */
     TBCMD = (1 << 0);   /* TB_EN */
 
     /* enable timer interrupt */

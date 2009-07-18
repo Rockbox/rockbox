@@ -75,7 +75,7 @@ void pcm_play_lock(void)
 void pcm_play_unlock(void)
 {
     if (--locked == 0) {
-        INTMSK |= ~(1 << 10);
+        INTMSK |= (1 << 10);
     }
 }
 
