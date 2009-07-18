@@ -65,12 +65,16 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define CLIX_BUTTON_QUIT       BUTTON_MENU
-#define CLIX_BUTTON_UP         BUTTON_SCROLL_BACK
-#define CLIX_BUTTON_DOWN       BUTTON_SCROLL_FWD
-#define CLIX_BUTTON_CLICK      BUTTON_SELECT
-#define CLIX_BUTTON_RIGHT      BUTTON_RIGHT
-#define CLIX_BUTTON_LEFT       BUTTON_LEFT
+#define CLIX_BUTTON_QUIT        (BUTTON_SELECT | BUTTON_MENU)
+#define CLIX_BUTTON_UP          BUTTON_MENU
+#define CLIX_BUTTON_DOWN        BUTTON_PLAY
+#define CLIX_BUTTON_SCROLL_FWD  BUTTON_SCROLL_FWD
+#define CLIX_BUTTON_SCROLL_BACK BUTTON_SCROLL_BACK
+#define CLIX_BUTTON_CLICK       (BUTTON_SELECT | BUTTON_REL)
+#define CLIX_BUTTON_CLICK_PRE   BUTTON_SELECT
+#define CLIX_BUTTON_CLICK_PRE2  (BUTTON_SELECT | BUTTON_REPEAT)
+#define CLIX_BUTTON_RIGHT       BUTTON_RIGHT
+#define CLIX_BUTTON_LEFT        BUTTON_LEFT
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #define CLIX_BUTTON_QUIT    BUTTON_POWER
@@ -694,6 +698,8 @@ static int clix_handle_game(struct clix_game_state_t* state)
     int start;
     int end;
     int oldx, oldy;
+    
+    int lastbutton = BUTTON_NONE;
 
     while(true)
     {
@@ -710,9 +716,7 @@ static int clix_handle_game(struct clix_game_state_t* state)
             oldx = state->x;
             oldy = state->y;
 
-            rb->button_get_w_tmo(end - *rb->current_tick);
-            button = rb->button_status();
-            rb->button_clear_queue();
+            button = rb->button_get_w_tmo(end - *rb->current_tick);
 #ifdef HAVE_TOUCHSCREEN
             if(button & BUTTON_TOUCHSCREEN)
             {
@@ -745,6 +749,7 @@ static int clix_handle_game(struct clix_game_state_t* state)
 #ifndef HAVE_TOUCHSCREEN
 #ifdef CLIX_BUTTON_SCROLL_BACK
                 case CLIX_BUTTON_SCROLL_BACK:
+                case CLIX_BUTTON_SCROLL_BACK|BUTTON_REPEAT:
 #endif
                 case CLIX_BUTTON_UP:
                     if( state->y == 0 ||
@@ -767,6 +772,7 @@ static int clix_handle_game(struct clix_game_state_t* state)
                 break;
 #ifdef CLIX_BUTTON_SCROLL_FWD
                 case CLIX_BUTTON_SCROLL_FWD:
+                case CLIX_BUTTON_SCROLL_FWD|BUTTON_REPEAT:
 #endif
                 case CLIX_BUTTON_DOWN:
                     if( state->y == (BOARD_HEIGHT - 1))
@@ -788,6 +794,15 @@ static int clix_handle_game(struct clix_game_state_t* state)
 #endif
                 case CLIX_BUTTON_CLICK:
                 {
+#ifdef CLIX_BUTTON_CLICK_PRE
+#ifdef CLIX_BUTTON_CLICK_PRE2
+                    if (lastbutton != CLIX_BUTTON_CLICK_PRE
+                        && lastbutton != CLIX_BUTTON_CLICK_PRE2)
+#else
+                    if (lastbutton != CLIX_BUTTON_CLICK_PRE)
+#endif
+                        break;
+#endif
                     if (state->selected_count > 1) {
                         switch( clix_clear_selected( state))
                         {
@@ -842,6 +857,9 @@ static int clix_handle_game(struct clix_game_state_t* state)
 
                 break;
             }
+            
+            if(button != BUTTON_NONE)
+                lastbutton = button;
 
             if( (oldx != state->x || oldy != state->y) &&
                 state->board_selected[ XYPOS( oldx, oldy)] !=
