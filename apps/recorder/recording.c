@@ -1116,8 +1116,8 @@ bool recording_screen(bool no_source)
         v->height = (font_get(v->font)->height)*(compact_view[i] ? 3 : 4);
 
         /* list section, rest of the screen */
-        vp_list[i].y = vp_top[i].y + vp_top[i].height;
-        vp_list[i].height -= vp_list[i].y;
+        vp_list[i].y += vp_top[i].height;
+        vp_list[i].height -= vp_top[i].height;
         screens[i].set_viewport(&vp_top[i]); /* req for next calls */
 
         screens[i].getstringsize("W", &w, &h);
