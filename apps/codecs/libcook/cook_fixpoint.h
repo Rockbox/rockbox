@@ -268,9 +268,20 @@ static inline void imlt_math(COOKContext *q, FIXP *in)
 static inline void overlap_math(COOKContext *q, int gain, FIXP buffer[])
 {
     int i;
-    for(i=0 ; i<q->samples_per_channel ; i++) {
-        q->mono_mdct_output[i] =
-          fixp_pow2(q->mono_mdct_output[i], gain) + buffer[i];
+    if(LIKELY(gain == 0)){
+        for(i=0 ; i<q->samples_per_channel ; i++) {
+            q->mono_mdct_output[i] += buffer[i];
+        }        
+        
+    } else if (gain > 0){
+        for(i=0 ; i<q->samples_per_channel ; i++) {
+            q->mono_mdct_output[i] = (q->mono_mdct_output[i]<< gain) + buffer[i];        }          
+        
+    } else {
+        for(i=0 ; i<q->samples_per_channel ; i++) {
+            q->mono_mdct_output[i] =
+              (q->mono_mdct_output[i] >> -gain) + ((q->mono_mdct_output[i] >> (-gain-1)) & 1)+ buffer[i];
+        }
     }
 }
 
