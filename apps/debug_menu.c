@@ -112,6 +112,10 @@
 #include "as3514.h"
 #endif
 
+#ifdef HAVE_USBSTACK 	 
+#include "usb_core.h" 	 
+#endif
+
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
