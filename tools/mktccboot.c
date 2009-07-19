@@ -161,7 +161,8 @@ int main(int argc, char *argv[])
     /* TODO: Verify it's a LDR instruction */
     origoffset = (ldr&0xfff) + 8;
 
-    printf("original firmware entry point: 0x%08x\n",get_uint32le(image + origoffset));
+    printf("original firmware entry point: 0x%08x\n", 
+           (unsigned int) get_uint32le(image + origoffset));
     printf("New entry point: 0x%08x\n",0x20000000 + inlength + 8);
 
     /* Save the original firmware entry point at the start of the bootloader image */
