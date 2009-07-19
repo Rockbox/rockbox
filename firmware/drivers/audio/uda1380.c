@@ -29,6 +29,17 @@
 
 #include "audiohw.h"
 
+/*  The UDA1380 requires a clock signal at a multiple of the sample rate
+    (256Fs, 384Fs, 512Fs or 768Fs, where Fs = sample rate).
+    Some targets are able to supply this clock directly to the SYSCLK input.
+    The H100 and H300 coldfire targets are limited in the selection of
+    frequencies for this clock signal so they use a PLL inside the UDA1380
+    (called the WSPLL) to regenerate it from the LRCK signal off the IIS bus.
+*/
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+#define USE_WSPLL
+#endif
+
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -84,   0, -25},
     [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0},
@@ -83,8 +94,11 @@ short recgain_line;
 #define NUM_DEFAULT_REGS 13
 unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
 {
-   REG_0,          EN_DAC | EN_INT | EN_DEC | ADC_CLK | DAC_CLK |
-                   SYSCLK_256FS | WSPLL_25_50,
+   REG_0,          EN_DAC | EN_INT | EN_DEC |
+#ifdef USE_WSPLL
+                   ADC_CLK | DAC_CLK | WSPLL_25_50 |
+#endif
+                   SYSCLK_256FS,
    REG_I2S,        I2S_IFMT_IIS,
    REG_PWR,        PON_PLL | PON_BIAS,
                    /* PON_HP & PON_DAC is enabled later */
@@ -295,7 +309,9 @@ void audiohw_close(void)
  */
 void audiohw_enable_recording(bool source_mic)
 {
+#ifdef USE_WSPLL
     uda1380_regs[REG_0] &= ~(ADC_CLK | DAC_CLK);
+#endif
     uda1380_write_reg(REG_0, uda1380_regs[REG_0] | EN_ADC);
 
     if (source_mic)
@@ -340,7 +356,9 @@ void audiohw_disable_recording(void)
     uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR]);
 
     uda1380_regs[REG_0] &= ~EN_ADC;
+#ifdef USE_WSPLL
     uda1380_write_reg(REG_0,   uda1380_regs[REG_0] | ADC_CLK | DAC_CLK);
+#endif
 
     uda1380_write_reg(REG_ADC, SKIP_DCFIL);
 }
