@@ -96,12 +96,13 @@ off_t filesize(int fd) {
 int main(int argc, char *argv[])
 {
     char *infile, *bootfile, *outfile;
-    int fdin, fdboot,fdout;
+    int fdin = -1, fdboot = -1, fdout = -1;
     int n;
     int inlength,bootlength;
     uint32_t ldr;
     unsigned char* image;
     int origoffset;
+    int ret = 0;
     
     if(argc < 3) {
         usage();
@@ -115,37 +116,44 @@ int main(int argc, char *argv[])
     if (fdin < 0)
     {
         perror(infile);
+        ret = 1;
+        goto error_exit;
     }
 
     fdboot = open(bootfile, O_RDONLY|O_BINARY);
     if (fdboot < 0)
     {
         perror(bootfile);
+        ret = 2;
+        goto error_exit;
     }
 
     inlength = filesize(fdin);
     bootlength = filesize(fdboot);
-
+    
     image = malloc(inlength + bootlength);
 
     if (image==NULL)
     {
         printf("[ERR]  Could not allocate memory, aborting\n");
-        return 1;
+        ret = 3;
+        goto error_exit;
     }
 
     n = read(fdin, image, inlength);
     if (n != inlength)
     {
         printf("[ERR] Could not read from %s\n",infile);
-        return 2;
+        ret = 4;
+        goto error_exit;
     }
 
     n = read(fdboot, image + inlength, bootlength);
     if (n != bootlength)
     {
         printf("[ERR] Could not read from %s\n",bootfile);
-        return 3;
+        ret = 5;
+        goto error_exit;
     }
 
     ldr = get_uint32le(image);
@@ -170,18 +178,28 @@ int main(int argc, char *argv[])
     if (fdout < 0)
     {
         perror(bootfile);
+        ret = 6;
+        goto error_exit;
     }
 
     n = write(fdout, image, inlength + bootlength);
     if (n != inlength + bootlength)
     {
         printf("[ERR] Could not write output file %s\n",outfile);
-        return 3;
+        ret = 7;
+        goto error_exit;
     }
 
-    close(fdin);
-    close(fdboot);
-    close(fdout);
-    
-    return 0;
+error_exit:
+
+    if (fdin >= 0)
+        close(fdin);
+
+    if (fdboot >= 0)
+        close(fdboot);
+
+    if (fdout >= 0)
+        close(fdout);
+
+    return ret;
 }
