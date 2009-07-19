@@ -53,7 +53,7 @@
 #define HAVE_PITCHSCREEN
 
 /* define this if you would like tagcache to build on this target */
-//#define HAVE_TAGCACHE
+#define HAVE_TAGCACHE
 
 /* FM Tuner */
 #define CONFIG_TUNER LV24020LP
