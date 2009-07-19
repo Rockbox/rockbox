@@ -195,7 +195,7 @@ int storage_num_drives(void);
 #ifdef STORAGE_GET_INFO
 void storage_get_info(int drive, struct storage_info *info);
 #endif
-#ifdef HOTSWAP
+#ifdef HAVE_HOTSWAP
 bool storage_removable(int drive);
 bool storage_present(int drive);
 #endif
