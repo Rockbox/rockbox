@@ -673,7 +673,7 @@ void usb_attach(void) {
 
     /* Issue a h/w reset */
     usb_init_device();
-    usb_drv_init();
+    usb_core_init();
     
     /* USB Attach Process: This follows the flow diagram in the M66591GP 
      *  Reference Manual Rev 1.00, p. 77 */
