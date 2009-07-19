@@ -63,7 +63,7 @@
 #define BCLKCTR    (*(volatile unsigned long *)0xF3000018)
 #define SWRESET    (*(volatile unsigned long *)0xF300001C)
 #define PCLKCFG0   (*(volatile unsigned long *)0xF3000020)
-#define PCLKCFG1   (*(volatile unsigned long *)0xF3000024)
+#define PCLK_SDMMC (*(volatile unsigned long *)0xF3000024)
 #define PCLKCFG2   (*(volatile unsigned long *)0xF3000028)
 #define PCLKCFG3   (*(volatile unsigned long *)0xF300002C)
 #define PCLK_LCD   (*(volatile unsigned long *)0xF3000030)
@@ -114,6 +114,7 @@
 #define MIRQ    (*(volatile unsigned long *)0xF3001028)
 #define MFIQ    (*(volatile unsigned long *)0xF300102C)
 #define TMODE   (*(volatile unsigned long *)0xF3001030)
+#define TMODEA  (*(volatile unsigned long *)0xF300103C)
 #define ALLMASK (*(volatile unsigned long *)0xF3001044)
 #define VAIRQ   (*(volatile unsigned long *)0xF3001080)
 #define VAFIQ   (*(volatile unsigned long *)0xF3001084)
@@ -123,6 +124,7 @@
 
 #define IRQ_PRIORITY_TABLE ((volatile unsigned int *)0xF30010A0)
 
+#define EXT0_IRQ_MASK   (1<<0)
 #define EXT3_IRQ_MASK   (1<<3)
 #define TIMER0_IRQ_MASK (1<<6)
 #define DAI_RX_IRQ_MASK (1<<14)
@@ -242,6 +244,39 @@
 #define ECC_ERRADDR (*(volatile unsigned long *)0xF005B050)
 #define ECC_ERRDATA (*(volatile unsigned long *)0xF005B060)
 #define ECC_ERR     (*(volatile unsigned long *)0xF005B070)
+
+/* SD/MMC Controller */
+
+#define SDICLK      (*(volatile unsigned long *)0xF0058004)
+#define SDIARGU     (*(volatile unsigned long *)0xF0058008)
+#define SDICMD      (*(volatile unsigned long *)0xF005800C)
+#define SDIRSPCMD   (*(volatile unsigned long *)0xF0058010)
+#define SDIRSPARGU0 (*(volatile unsigned long *)0xF0058014)
+#define SDIRSPARGU1 (*(volatile unsigned long *)0xF0058018)
+#define SDIRSPARGU2 (*(volatile unsigned long *)0xF005801C)
+#define SDIRSPARGU3 (*(volatile unsigned long *)0xF0058020)
+#define SDIDTIMER   (*(volatile unsigned long *)0xF0058024)
+#define SDIDCTRL2   (*(volatile unsigned long *)0xF0058028)
+#define SDIDCTRL    (*(volatile unsigned long *)0xF005802C)
+#define SDISTATUS   (*(volatile unsigned long *)0xF0058030)
+#define SDIIFLAG    (*(volatile unsigned long *)0xF0058034)
+#define SDIWDATA    (*(volatile unsigned long *)0xF0058038)
+#define SDIRDATA    (*(volatile unsigned long *)0xF005803C)
+#define SDIIENABLE  (*(volatile unsigned long *)0xF0058040)
+
+#define SDICMD_RES_TYPE1  1
+#define SDICMD_RES_TYPE1b 2
+#define SDICMD_RES_TYPE2  3
+#define SDICMD_RES_TYPE3  4
+#define SDICMD_RES_TYPE4  5
+#define SDICMD_RES_TYPE5  6
+#define SDICMD_RES_TYPE6  7
+
+#define SDISTATUS_RESP_RCVD      (1<<7)
+#define SDISTATUS_FIFO_LOAD_REQ  (1<<17)
+#define SDISTATUS_FIFO_FETCH_REQ (1<<18)
+#define SDISTATUS_CMD_PATH_RDY   (1<<21)
+#define SDISTATUS_MULTIBLOCK_END (1<<25)
 
 /* USB 2.0 device system MMR base address */
 #define USB_BASE 0xf0010000

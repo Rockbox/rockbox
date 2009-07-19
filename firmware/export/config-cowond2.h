@@ -62,7 +62,14 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
+#ifndef SIMULATOR
+#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
+#define HAVE_MULTIDRIVE
+#define HAVE_HOTSWAP
+#define NUM_DRIVES 2
+#else
 #define CONFIG_STORAGE STORAGE_NAND
+#endif
 
 #define CONFIG_NAND NAND_TCC
 
@@ -149,6 +156,8 @@
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
+
+#define INCLUDE_TIMEOUT_API
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
