@@ -180,6 +180,8 @@ static const char         sd_thread_name[] = "ata/sd";
 static struct mutex       sd_mtx SHAREDBSS_ATTR;
 static struct event_queue sd_queue;
 
+static int sd_first_drive = 0;
+
 /* Posted when card plugged status has changed */
 #define SD_HOTSWAP    1
 /* Actions taken by sd_thread when card status has changed */
@@ -1108,9 +1110,9 @@ static void sd_thread(void)
 
             /* We now have exclusive control of fat cache and ata */
 
-            disk_unmount(1);     /* release "by force", ensure file
-                                    descriptors aren't leaked and any busy
-                                    ones are invalid if mounting */
+            disk_unmount(sd_first_drive+1); /* release "by force", ensure file
+                                        descriptors aren't leaked and any busy
+                                        ones are invalid if mounting */
 
             /* Force card init for new card, re-init for re-inserted one or
              * clear if the last attempt to init failed with an error. */
@@ -1118,7 +1120,7 @@ static void sd_thread(void)
             sd_status[1].retry = 0; 
 
             if (ev.id == SYS_HOTSWAP_INSERTED)
-                disk_mount(1);
+                disk_mount(sd_first_drive+1);
 
             queue_broadcast(SYS_FS_CHANGED, 0);
 
@@ -1350,8 +1352,8 @@ bool sd_present(IF_MD_NONVOID(int drive))
 #ifdef CONFIG_STORAGE_MULTI
 int sd_num_drives(int first_drive)
 {
-    /* We don't care which logical drive number(s) we have been assigned */
-    (void)first_drive;
+    /* Store which logical drive number(s) we have been assigned */
+    sd_first_drive = first_drive;
     
 #ifdef HAVE_MULTIDRIVE
     return 2;
