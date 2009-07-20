@@ -1366,10 +1366,10 @@ bool sd_removable(IF_MV_NONVOID(int drive))
 
 bool sd_present(IF_MV_NONVOID(int drive))
 {
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     (void)drive;
 #endif
-    return (card.numblocks > 0 && card_detect_target());
+    return card_detect_target();
 }
 
 #ifdef CONFIG_STORAGE_MULTI

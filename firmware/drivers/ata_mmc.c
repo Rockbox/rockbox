@@ -999,7 +999,14 @@ bool mmc_present(IF_MD_NONVOID(int drive))
 #ifndef HAVE_MULTIDRIVE
     const int drive=0;
 #endif
-    return (card_info[drive].initialized && card_info[drive].numblocks > 0);
+    if(drive==0)
+    {
+        return true;
+    }
+    else
+    {
+        return mmc_detect();
+    }
 }
 #endif
 

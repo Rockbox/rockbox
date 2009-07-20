@@ -252,11 +252,10 @@ bool sd_removable(IF_MD_NONVOID(int card_no))
 
 bool sd_present(IF_MD_NONVOID(int card_no))
 {
-#ifndef HAVE_MULTIDRIVE
-    const int card_no = 0;
+#ifdef HAVE_MULTIDRIVE
+    (void)card_no;
 #endif
-    return (card_info[card_no].initialized &&
-            card_info[card_no].numblocks > 0);
+    return card_detect_target();
 }
 
 #else
