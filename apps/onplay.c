@@ -967,9 +967,9 @@ MENUITEM_FUNCTION(rating_item, 0, ID2P(LANG_MENU_SET_RATING),
 static bool view_cue(void)
 {
     struct mp3entry* id3 = audio_current_track();
-    if(id3 && cuesheet_is_enabled() && id3->cuesheet_type)
+    if(id3 && id3->cuesheet)
     {
-        browse_cuesheet(curr_cue);
+        browse_cuesheet(id3->cuesheet);
     }
     return false;
 }
@@ -981,8 +981,8 @@ static int view_cue_item_callback(int action,
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
-            if (!selected_file || !cuesheet_is_enabled()
-                || !id3 || !id3->cuesheet_type)
+            if (!selected_file
+                || !id3 || !id3->cuesheet)
                 return ACTION_EXIT_MENUITEM;
             break;
     }

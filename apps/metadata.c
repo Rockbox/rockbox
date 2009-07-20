@@ -394,13 +394,6 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     }
 
     /* We have successfully read the metadata from the file */
-
-#ifndef __PCTOOL__
-    if (cuesheet_is_enabled() && look_for_cuesheet_file(trackname, NULL))
-    {
-        id3->cuesheet_type = 1;
-    }
-#endif
     
     lseek(fd, 0, SEEK_SET);
     strlcpy(id3->path, trackname, sizeof(id3->path));

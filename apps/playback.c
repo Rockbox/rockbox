@@ -210,6 +210,9 @@ static struct mp3entry *thistrack_id3, /* the currently playing track */
                                          * next track otherwise */
 static struct mp3entry unbuffered_id3; /* the id3 for the first unbuffered track */
 
+/* for cuesheet support */
+static struct cuesheet *curr_cue = NULL;
+
 /* Track info structure about songs in the file buffer (A/C-) */
 struct track_info {
     int audio_hid;             /* The ID for the track's buffer handle */
@@ -218,6 +221,7 @@ struct track_info {
 #ifdef HAVE_ALBUMART
     int aa_hid;                /* The ID for the track's album art handle */
 #endif
+    int cuesheet_hid;          /* The ID for the track's parsed cueesheet handle */
 
     size_t filesize;           /* File total length */
 
@@ -383,6 +387,13 @@ static bool clear_track_info(struct track_info *track)
             return false;
     }
 #endif
+
+    if (track->cuesheet_hid >= 0) {
+        if (bufclose(track->cuesheet_hid))
+            track->cuesheet_hid = -1;
+        else
+            return false;
+    }
 
     track->filesize = 0;
     track->taginfo_ready = false;
@@ -566,6 +577,12 @@ struct mp3entry* audio_current_track(void)
     if (cur_idx == track_ridx && *thistrack_id3->path)
     {
         /* The usual case */
+        if (tracks[cur_idx].cuesheet_hid >= 0)
+        {
+            bufread(tracks[cur_idx].cuesheet_hid, sizeof(struct cuesheet), curr_cue);
+            thistrack_id3->cuesheet = curr_cue;
+            cue_spoof_id3(thistrack_id3->cuesheet, thistrack_id3);
+        }
         return thistrack_id3;
     }
     else if (automatic_skip && offset == -1 && *othertrack_id3->path)
@@ -574,6 +591,12 @@ struct mp3entry* audio_current_track(void)
              but the audio being played is still the same (now previous) track.
              othertrack_id3.elapsed is being updated in an ISR by
              codec_pcmbuf_position_callback */
+        if (tracks[cur_idx].cuesheet_hid >= 0)
+        {
+            bufread(tracks[cur_idx].cuesheet_hid, sizeof(struct cuesheet), curr_cue);
+            othertrack_id3->cuesheet = curr_cue;
+            cue_spoof_id3(othertrack_id3->cuesheet, othertrack_id3);
+        }
         return othertrack_id3;
     }
 
@@ -1826,7 +1849,21 @@ static void audio_finish_load_track(void)
 
         return;
     }
+    /* Try to load a cuesheet for the track */
+    if (curr_cue)
+    {
+        char cuepath[MAX_PATH];
 
+        struct cuesheet temp_cue;
+
+        if (look_for_cuesheet_file(track_id3->path, cuepath) &&
+            parse_cuesheet(cuepath, &temp_cue))
+        {
+            strcpy(temp_cue.audio_filename, track_id3->path);
+            tracks[track_widx].cuesheet_hid = 
+                        bufalloc(&temp_cue, sizeof(struct cuesheet), TYPE_CUESHEET);
+        }
+    }
 #ifdef HAVE_ALBUMART
     if (tracks[track_widx].aa_hid < 0 && gui_sync_wps_uses_albumart())
     {
@@ -2602,6 +2639,10 @@ void audio_init(void)
     thistrack_id3 = &mp3entry_buf[0];
     othertrack_id3 = &mp3entry_buf[1];
     
+    /* cuesheet support */
+    if (global_settings.cuesheet)
+        curr_cue = (struct cuesheet*)buffer_alloc(sizeof(struct cuesheet));
+    
     /* initialize the buffer */
     filebuf = audiobuf;
 
@@ -2648,6 +2689,7 @@ void audio_init(void)
 #ifdef HAVE_ALBUMART
         tracks[i].aa_hid = -1;
 #endif
+        tracks[i].cuesheet_hid = -1;
     }
 
     add_event(BUFFER_EVENT_REBUFFER, false, buffering_handle_rebuffer_callback);

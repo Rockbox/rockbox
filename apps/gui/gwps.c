@@ -148,7 +148,7 @@ static void prev_track(unsigned long skip_thresh)
     }
     else
     {
-        if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
+        if (wps_state.id3->cuesheet)
         {
             curr_cuesheet_skip(-1, wps_state.id3->elapsed);
             return;
@@ -173,7 +173,7 @@ static void prev_track(unsigned long skip_thresh)
 static void next_track(void)
 {
     /* take care of if we're playing a cuesheet */
-    if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
+    if (wps_state.id3->cuesheet)
     {
         if (curr_cuesheet_skip(1, wps_state.id3->elapsed))
         {
@@ -557,7 +557,7 @@ long gui_wps_show(void)
                     break;
                 if (current_tick -last_right < HZ)
                 {
-                    if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
+                    if (wps_state.id3->cuesheet)
                     {
                         audio_next();
                     }
@@ -577,7 +577,7 @@ long gui_wps_show(void)
                     break;
                 if (current_tick -last_left < HZ)
                 {
-                    if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
+                    if (wps_state.id3->cuesheet)
                     {
                         if (!wps_state.paused)
 #if (CONFIG_CODEC == SWCODEC)
@@ -870,22 +870,10 @@ static void track_changed_callback(void *param)
 {
     wps_state.id3 = (struct mp3entry*)param;
     wps_state.nid3 = audio_next_track();
-    
-    if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type
-        && strcmp(wps_state.id3->path, curr_cue->audio_filename))
+    if (wps_state.id3->cuesheet)
     {
-        /* the current cuesheet isn't the right one any more */
-        /* We need to parse the new cuesheet */
-        char cuepath[MAX_PATH];
-
-        if (look_for_cuesheet_file(wps_state.id3->path, cuepath) &&
-            parse_cuesheet(cuepath, curr_cue))
-        {
-            wps_state.id3->cuesheet_type = 1;
-            strcpy(curr_cue->audio_filename, wps_state.id3->path);
-        }
-
-        cue_spoof_id3(curr_cue, wps_state.id3);
+        cue_find_current_track(wps_state.id3->cuesheet, wps_state.id3->elapsed);
+        cue_spoof_id3(wps_state.id3->cuesheet, wps_state.id3);
     }
     wps_state.do_full_update = true;
 }

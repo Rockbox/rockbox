@@ -110,8 +110,6 @@
 #include "m5636.h"
 #endif
 
-#include "cuesheet.h"
-
 #ifdef SIMULATOR
 #include "sim_tasks.h"
 #include "system-sdl.h"
@@ -336,7 +334,6 @@ static void init(void)
 #endif /* CONFIG_CODEC != SWCODEC */
 
     scrobbler_init();
-    cuesheet_init();
 #if CONFIG_CODEC == SWCODEC
     tdspeed_init();
 #endif /* CONFIG_CODEC == SWCODEC */
@@ -552,7 +549,6 @@ static void init(void)
     tree_mem_init();
     filetype_init();
     scrobbler_init();
-    cuesheet_init();
 #if CONFIG_CODEC == SWCODEC
     tdspeed_init();
 #endif /* CONFIG_CODEC == SWCODEC */

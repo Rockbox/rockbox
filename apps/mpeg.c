@@ -40,6 +40,8 @@
 #include "sound.h"
 #include "bitswap.h"
 #include "appevents.h"
+#include "cuesheet.h"
+#include "settings.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
@@ -116,8 +118,9 @@ static int track_read_idx = 0;
 static int track_write_idx = 0;
 #endif /* !SIMULATOR */
 
-/* Cuesheet callback */
-static bool (*cuesheet_callback)(const char *filename) = NULL;
+/* Cuesheet support */
+static struct cuesheet *curr_cuesheet = NULL;
+static bool checked_for_cuesheet = false;
 
 static const char mpeg_thread_name[] = "mpeg";
 static unsigned int mpeg_errno;
@@ -265,6 +268,7 @@ static void remove_current_tag(void)
     {
         /* First move the index, so nobody tries to access the tag */
         track_read_idx = (track_read_idx+1) & MAX_TRACK_ENTRIES_MASK;
+        checked_for_cuesheet = false;
         debug_tags();
     }
     else
@@ -468,11 +472,6 @@ unsigned long mpeg_get_last_header(void)
     mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_STATUS_1, tmp, 2);
     return 0xffe00000 | ((tmp[0] & 0x7c00) << 6) | (tmp[1] & 0xffff);
 #endif /* !SIMULATOR */
-}
-
-void audio_set_cuesheet_callback(bool (*handler)(const char *filename))
-{
-    cuesheet_callback = handler;
 }
 
 #ifndef SIMULATOR
@@ -878,9 +877,6 @@ static struct trackdata *add_track_to_tag_list(const char *filename)
     if (track->id3.album)
         lcd_getstringsize(track->id3.album, NULL, NULL);
 #endif
-    if (cuesheet_callback)
-        if (cuesheet_callback(filename))
-            track->id3.cuesheet_type = 1;
 
     /* if this track is the next track then let the UI know it can get it */
     send_nid3_event = (track_write_idx == track_read_idx + 1);
@@ -2047,10 +2043,28 @@ static void mpeg_thread(void)
 struct mp3entry* audio_current_track()
 {
 #ifdef SIMULATOR
-    return &taginfo;
+    struct mp3entry *id3 = &taginfo;
 #else /* !SIMULATOR */
     if(num_tracks_in_memory())
-        return &get_trackdata(0)->id3;
+    {
+        struct mp3entry *id3 = &get_trackdata(0)->id3;
+#endif        
+        if (!checked_for_cuesheet && curr_cuesheet && id3->cuesheet == NULL)
+        {
+            checked_for_cuesheet = true; /* only check once per track */
+            char cuepath[MAX_PATH];
+
+            if (look_for_cuesheet_file(id3->path, cuepath) &&
+                parse_cuesheet(cuepath, curr_cuesheet))
+            {
+                strcpy(curr_cuesheet->audio_filename, id3->path);
+                id3->cuesheet = curr_cuesheet;
+                cue_spoof_id3(curr_cuesheet, id3);
+            }
+        }
+        return id3;
+#ifndef SIMULATOR
+    }
     else
         return NULL;
 #endif /* !SIMULATOR */
@@ -2819,6 +2833,19 @@ static void mpeg_thread(void)
             {
                 id3->elapsed+=1000;
                 id3->offset+=1000;
+                if (id3->cuesheet)
+                {
+                    struct cuesheet *cue = id3->cuesheet;
+                    unsigned elapsed = id3->elapsed;
+                    if (elapsed < cue->curr_track->offset ||
+                        (cue->curr_track_idx < cue->track_count-1 &&
+                         elapsed >= (cue->curr_track+1)->offset))
+                    {
+                        cue_find_current_track(id3->cuesheet, id3->elapsed);
+                        cue_spoof_id3(id3->cuesheet, id3);
+                        send_event(PLAYBACK_EVENT_CUESHEET_TRACK_CHANGE, id3);
+                    }
+                }
             }
             if (id3->elapsed>=id3->length)
                 audio_next();
@@ -2831,6 +2858,9 @@ static void mpeg_thread(void)
 void audio_init(void)
 {
     mpeg_errno = 0;
+    /* cuesheet support */
+    if (global_settings.cuesheet)
+        curr_cuesheet = (struct cuesheet*)buffer_alloc(sizeof(struct cuesheet));
 
 #ifndef SIMULATOR
     audiobuflen = audiobufend - audiobuf;

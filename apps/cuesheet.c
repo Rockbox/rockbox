@@ -43,33 +43,6 @@
 
 #define CUE_DIR ROCKBOX_DIR "/cue"
 
-struct cuesheet *curr_cue;
-
-#if CONFIG_CODEC != SWCODEC
-/* special trickery because the hwcodec playback engine is in firmware/ */
-static bool cuesheet_handler(const char *filename)
-{
-    return cuesheet_is_enabled() && look_for_cuesheet_file(filename, NULL);
-}
-#endif
-
-void cuesheet_init(void)
-{
-    if (global_settings.cuesheet) {
-        curr_cue = (struct cuesheet *)buffer_alloc(sizeof(struct cuesheet));
-#if CONFIG_CODEC != SWCODEC
-        audio_set_cuesheet_callback(cuesheet_handler);
-#endif
-    } else {
-        curr_cue = NULL;
-    }
-}
-
-bool cuesheet_is_enabled(void)
-{
-    return (curr_cue != NULL);
-}
-
 bool look_for_cuesheet_file(const char *trackpath, char *found_cue_path)
 {
     /* DEBUGF("look for cue file\n"); */
@@ -134,7 +107,6 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
     char *s;
     bool utf8 = false;
 
-    DEBUGF("cue parse\n");
     int fd = open_utf8(file,O_RDONLY);
     if (fd < 0)
     {
@@ -293,12 +265,8 @@ void browse_cuesheet(struct cuesheet *cue)
     gui_synclist_set_nb_items(&lists, 2*cue->track_count);
     gui_synclist_set_title(&lists, title, 0);
 
-    if (id3 && *id3->path && strcmp(id3->path, "No file!"))
-    {
-        look_for_cuesheet_file(id3->path, cuepath);
-    }
 
-    if (id3 && id3->cuesheet_type && !strcmp(cue->path, cuepath))
+    if (id3)
     {
         gui_synclist_select_item(&lists,
                                  2*cue_find_current_track(cue, id3->elapsed));
@@ -317,7 +285,7 @@ void browse_cuesheet(struct cuesheet *cue)
                 if (id3 && *id3->path && strcmp(id3->path, "No file!"))
                 {
                     look_for_cuesheet_file(id3->path, cuepath);
-                    if (id3->cuesheet_type && !strcmp(cue->path, cuepath))
+                    if (id3->cuesheet && !strcmp(cue->path, cuepath))
                     {
                         sel = gui_synclist_get_sel_pos(&lists);
                         seek(cue->tracks[sel/2].offset);
@@ -351,8 +319,9 @@ bool display_cuesheet_content(char* filename)
  */
 bool curr_cuesheet_skip(int direction, unsigned long curr_pos)
 {
+    struct cuesheet *curr_cue = audio_current_track()->cuesheet;
     int track = cue_find_current_track(curr_cue, curr_pos);
-
+    
     if (direction >= 0 && track == curr_cue->track_count - 1)
     {
         /* we want to get out of the cuesheet */
@@ -406,6 +375,7 @@ static inline void draw_veritcal_line_mark(struct screen * screen,
 void cue_draw_markers(struct screen *screen, unsigned long tracklen,
                       int x1, int x2, int y, int h)
 {
+    struct cuesheet *curr_cue = audio_current_track()->cuesheet;
     int i,xi;
     int w = x2 - x1;
     for (i=1; i < curr_cue->track_count; i++)
@@ -415,3 +385,17 @@ void cue_draw_markers(struct screen *screen, unsigned long tracklen,
     }
 }
 #endif
+
+bool cuesheet_subtrack_changed(struct mp3entry *id3)
+{
+    struct cuesheet *cue = id3->cuesheet;
+    if (cue && (id3->elapsed < cue->curr_track->offset
+            || (cue->curr_track_idx < cue->track_count - 1
+                && id3->elapsed >= (cue->curr_track+1)->offset)))
+    {
+        cue_find_current_track(cue, id3->elapsed);
+        cue_spoof_id3(cue, id3);
+        return true;
+    }
+    return false;
+}

@@ -355,18 +355,8 @@ bool gui_wps_update(struct gui_wps *gwps)
 {
     struct mp3entry *id3 = gwps->state->id3;
     bool retval;
-    if (cuesheet_is_enabled() && id3->cuesheet_type
-        && (id3->elapsed < curr_cue->curr_track->offset
-            || (curr_cue->curr_track_idx < curr_cue->track_count - 1
-                && id3->elapsed >= (curr_cue->curr_track+1)->offset)))
-    {
-        /* We've changed tracks within the cuesheet :
-           we need to update the ID3 info and refresh the WPS */
-        gwps->state->do_full_update = true;
-        cue_find_current_track(curr_cue, id3->elapsed);
-        cue_spoof_id3(curr_cue, id3);
-    }
-
+    gwps->state->do_full_update = gwps->state->do_full_update ||
+                                  cuesheet_subtrack_changed(id3);
     retval = gui_wps_redraw(gwps, 0,
                             gwps->state->do_full_update ? 
                                         WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
@@ -421,7 +411,7 @@ static void draw_progressbar(struct gui_wps *gwps,
                         pb->x, pb->x + pb->width, y, pb->height);
 #endif
 
-    if ( cuesheet_is_enabled() && state->id3->cuesheet_type )
+    if (state->id3->cuesheet)
         cue_draw_markers(display, state->id3->length,
                          pb->x, pb->x + pb->width, y+1, pb->height-2);
 }

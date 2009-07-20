@@ -52,14 +52,6 @@ struct cuesheet {
     struct cue_track_info *curr_track;
 };
 
-extern struct cuesheet *curr_cue;
-
-/* returns true if cuesheet support is initialised */
-bool cuesheet_is_enabled(void);
-
-/* allocates the cuesheet buffer */
-void cuesheet_init(void);
-
 /* looks if there is a cuesheet file that has a name matching "trackpath" */
 bool look_for_cuesheet_file(const char *trackpath, char *found_cue_path);
 
@@ -89,5 +81,8 @@ bool curr_cuesheet_skip(int direction, unsigned long curr_pos);
 void cue_draw_markers(struct screen *screen, unsigned long tracklen,
                       int x1, int x2, int y, int h);
 #endif
+
+/* check if the subtrack has changed */
+bool cuesheet_subtrack_changed(struct mp3entry *id3);
 
 #endif

@@ -239,7 +239,7 @@ struct mp3entry {
 #endif
 
     /* Cuesheet support */
-    int cuesheet_type;      /* 0: none, 1: external, 2: embedded */
+    struct cuesheet *cuesheet;
 
     /* Musicbrainz Track ID */
     char* mb_track_id;
