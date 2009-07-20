@@ -47,21 +47,21 @@ void _backlight_set_brightness(int brightness)
 
 void _backlight_on(void)
 {
-    bl_i2c_writebyte(0x2b,10);
-    bl_i2c_writebyte(0x2a,6);
-    bl_i2c_writebyte(0x28,0x2e);
-    bl_i2c_writebyte(0x29,(bl_i2c_readbyte(0x29)&0xf0)|1);
-    bl_i2c_writebyte(0x2a,7);
+    bl_i2c_writebyte(0x29,1);
 }
 
 void _backlight_off(void)
 {
-    bl_i2c_writebyte(0x2b,10);
-    bl_i2c_writebyte(0x29,bl_i2c_readbyte(0x29)&0xf0);
-    bl_i2c_writebyte(0x2a,7);
+    bl_i2c_writebyte(0x29,0);
 }
 
 bool _backlight_init(void)
 {
+    bl_i2c_writebyte(0x2a,6);
+    bl_i2c_writebyte(0x28,0x2e);
+    bl_i2c_writebyte(0x2b,20);
+
     _backlight_on();
+
+    return true;
 }
