@@ -39,7 +39,6 @@ struct cue_track_info {
 
 struct cuesheet {
     char path[MAX_PATH];
-    char audio_filename[MAX_PATH];
 
     char title[MAX_NAME*3+1];
     char performer[MAX_NAME*3+1];

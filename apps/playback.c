@@ -1853,15 +1853,22 @@ static void audio_finish_load_track(void)
     if (curr_cue)
     {
         char cuepath[MAX_PATH];
-
-        struct cuesheet temp_cue;
-
-        if (look_for_cuesheet_file(track_id3->path, cuepath) &&
-            parse_cuesheet(cuepath, &temp_cue))
+        if (look_for_cuesheet_file(track_id3->path, cuepath))
         {
-            strcpy(temp_cue.audio_filename, track_id3->path);
+            void *temp;
             tracks[track_widx].cuesheet_hid = 
-                        bufalloc(&temp_cue, sizeof(struct cuesheet), TYPE_CUESHEET);
+                        bufalloc(NULL, sizeof(struct cuesheet), TYPE_CUESHEET);
+            if (tracks[track_widx].cuesheet_hid >= 0)
+            {
+                bufgetdata(tracks[track_widx].cuesheet_hid,
+                           sizeof(struct cuesheet), &temp);
+                struct cuesheet *cuesheet = (struct cuesheet*)temp;
+                if (!parse_cuesheet(cuepath, cuesheet))
+                {
+                    bufclose(tracks[track_widx].cuesheet_hid);
+                    track_id3->cuesheet = NULL;
+                }
+            }
         }
     }
 #ifdef HAVE_ALBUMART

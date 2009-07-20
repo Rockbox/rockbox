@@ -2057,7 +2057,6 @@ struct mp3entry* audio_current_track()
             if (look_for_cuesheet_file(id3->path, cuepath) &&
                 parse_cuesheet(cuepath, curr_cuesheet))
             {
-                strcpy(curr_cuesheet->audio_filename, id3->path);
                 id3->cuesheet = curr_cuesheet;
                 cue_spoof_id3(curr_cuesheet, id3);
             }
