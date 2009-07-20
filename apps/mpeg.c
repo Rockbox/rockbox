@@ -2833,19 +2833,6 @@ static void mpeg_thread(void)
             {
                 id3->elapsed+=1000;
                 id3->offset+=1000;
-                if (id3->cuesheet)
-                {
-                    struct cuesheet *cue = id3->cuesheet;
-                    unsigned elapsed = id3->elapsed;
-                    if (elapsed < cue->curr_track->offset ||
-                        (cue->curr_track_idx < cue->track_count-1 &&
-                         elapsed >= (cue->curr_track+1)->offset))
-                    {
-                        cue_find_current_track(id3->cuesheet, id3->elapsed);
-                        cue_spoof_id3(id3->cuesheet, id3);
-                        send_event(PLAYBACK_EVENT_CUESHEET_TRACK_CHANGE, id3);
-                    }
-                }
             }
             if (id3->elapsed>=id3->length)
                 audio_next();
