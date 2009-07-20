@@ -95,8 +95,8 @@ getfile() {
 for t in $reqtools; do
   tool=`findtool $t`
   if test -z "$tool"; then
-    echo "ROCKBOXDEV: $t is required for this script to work."
-    echo "ROCKBOXDEV: Please install $t and re-run the script."
+    echo "ROCKBOXDEV: \"$t\" is required for this script to work."
+    echo "ROCKBOXDEV: Please install \"$t\" and re-run the script."
     exit
   fi
 done

@@ -26,7 +26,6 @@
 #include <stdbool.h>
 #include <fcntl.h>
 
-/* subset of global_settings needed to build checkwps. */
 struct user_settings {
     bool statusbar;
     int bg_color; /* background color native format */
