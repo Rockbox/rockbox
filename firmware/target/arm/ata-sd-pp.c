@@ -180,7 +180,9 @@ static const char         sd_thread_name[] = "ata/sd";
 static struct mutex       sd_mtx SHAREDBSS_ATTR;
 static struct event_queue sd_queue;
 
+#ifdef HAVE_HOTSWAP
 static int sd_first_drive = 0;
+#endif
 
 /* Posted when card plugged status has changed */
 #define SD_HOTSWAP    1
@@ -1359,8 +1361,12 @@ bool sd_present(IF_MD_NONVOID(int drive))
 #ifdef CONFIG_STORAGE_MULTI
 int sd_num_drives(int first_drive)
 {
+#ifdef HAVE_HOTSWAP
     /* Store which logical drive number(s) we have been assigned */
     sd_first_drive = first_drive;
+#else
+    (void)first_drive;
+#endif
     
 #ifdef HAVE_MULTIDRIVE
     return 2;
