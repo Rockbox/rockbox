@@ -24,7 +24,7 @@
 #if PLUGIN_BUFFER_SIZE > 0x45000
 #define MAX_CHARS    0x40000 /* 256 kiB */
 #else
-#define MAX_CHARS   0x6000 /* 24 kiB */
+#define MAX_CHARS   0x5FE0 /* a bit less than 24 kiB */
 #endif
 #define MAX_LINE_LEN 2048
 PLUGIN_HEADER
