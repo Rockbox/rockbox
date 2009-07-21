@@ -431,7 +431,9 @@ pegbox_pieces.9x7x1.bmp
 
 /* Rockblox */
 #if LCD_DEPTH == 16 /* colour versions*/
-#if   (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
+#if   (LCD_WIDTH == 640) && (LCD_HEIGHT == 480)
+rockblox_background.640x480x16.bmp
+#elif   (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
 rockblox_background.320x240x16.bmp
 #elif (LCD_WIDTH == 240) && (LCD_HEIGHT >= 320)
 rockblox_background.240x320x16.bmp
@@ -526,7 +528,7 @@ snake2_bottom.160x128x2.bmp
 #endif
 
 #ifdef HAVE_LCD_COLOR
-#if SOKOBAN_TILESIZE >= 14
+#if SOKOBAN_TILESIZE >= 28
 sokoban_tiles.28x28x16.bmp
 #elif SOKOBAN_TILESIZE >= 14
 sokoban_tiles.14x14x16.bmp

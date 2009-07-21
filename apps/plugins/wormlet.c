@@ -376,14 +376,16 @@ PLUGIN_HEADER
 #define ARGH_SIZE 6
 #define SPEED 4
 #define MAX_WORM_SEGMENTS 512
-#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+#elif ((LCD_WIDTH == 320) && (LCD_HEIGHT == 240)) || \
+    ((LCD_WIDTH == 240) && ((LCD_HEIGHT == 320) || (LCD_HEIGHT == 400)))
 #define FOOD_SIZE 7
 #define ARGH_SIZE 8
 #define SPEED 4
 #define MAX_WORM_SEGMENTS 512
-#elif (LCD_WIDTH == 240) && ((LCD_HEIGHT == 320) || (LCD_HEIGHT == 400))
-#define FOOD_SIZE 7
-#define ARGH_SIZE 8
+#elif   ((LCD_WIDTH == 640) && (LCD_HEIGHT == 480)) || \
+        ((LCD_WIDTH == 480) && (LCD_HEIGHT == 640))
+#define FOOD_SIZE 14
+#define ARGH_SIZE 16
 #define SPEED 4
 #define MAX_WORM_SEGMENTS 512
 #endif

@@ -329,19 +329,16 @@ PLUGIN_HEADER
 
 #if (LCD_WIDTH == 640) && (LCD_HEIGHT == 480)
 
-#define BLOCK_WIDTH 30
-#define BLOCK_HEIGHT 30
-#define BOARD_X 14
-#define BOARD_Y 2
-#define PREVIEW_X 342
-#define PREVIEW_Y 482
-#define LABEL_X 344
-#define SCORE_Y 58
-#define LEVEL_Y 142
-#define LINES_Y 218
-#define HIGH_LABEL_X   344
-#define HIGH_SCORE_Y   326
-#define HIGH_LEVEL_Y   344
+#define BLOCK_WIDTH 24
+#define BLOCK_HEIGHT 24
+#define BOARD_X 172
+#define BOARD_Y 0
+#define PREVIEW_X 24
+#define PREVIEW_Y 22
+#define LABEL_X 482
+#define SCORE_Y 50
+#define LEVEL_Y 140
+#define LINES_Y 210
 
 #elif (LCD_WIDTH == 480) && (LCD_HEIGHT == 640)
 
@@ -355,9 +352,6 @@ PLUGIN_HEADER
 #define SCORE_Y 58
 #define LEVEL_Y 142
 #define LINES_Y 218
-#define HIGH_LABEL_X   344
-#define HIGH_SCORE_Y   326
-#define HIGH_LEVEL_Y   344
 
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
 
