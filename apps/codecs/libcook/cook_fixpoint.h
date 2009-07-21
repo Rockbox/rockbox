@@ -176,7 +176,7 @@ static void scalar_dequant_math(COOKContext *q, int index,
 
 
     if(s >= 64)
-        mlt_p[i]=0;
+        memset(mlt_p, 0, sizeof(REAL_T)*SUBBAND_SIZE);
     else 
     {
         for(i=0 ; i<SUBBAND_SIZE ; i++) {
