@@ -138,6 +138,7 @@ char *list_get_name_cb(int selected_item, void* data,
 }
 
 char filename[MAX_PATH];
+bool newfile;
 int get_eol_string(char* fn)
 {
     int fd, result;
@@ -174,22 +175,27 @@ int get_eol_string(char* fn)
     return result;
 }
 
-void save_changes(int overwrite)
+bool save_changes(int overwrite)
 {
     int fd;
     int i;
 
-    if (!filename[0] || !overwrite)
+    if (newfile || !overwrite)
     {
-        rb->strcpy(filename,"/");
-        rb->kbd_input(filename,MAX_PATH);
+        if(rb->kbd_input(filename,MAX_PATH))
+        {
+            newfile = true;
+            rb->splash(HZ, "Cancelled");
+            return false;
+        }
     }
 
     fd = rb->open(filename,O_WRONLY|O_CREAT|O_TRUNC);
     if (fd < 0)
     {
+        newfile = true;
         rb->splash(HZ*2, "Changes NOT saved");
-        return;
+        return false;
     }
 
     if (!overwrite)
@@ -208,6 +214,8 @@ void save_changes(int overwrite)
     rb->cpu_boost(0);
 #endif
     rb->close(fd);
+    newfile = false;
+    return true;
 }
 
 void setup_lists(struct gui_synclist *lists, int sel)
@@ -371,11 +379,13 @@ enum plugin_status plugin_start(const void* parameter)
             }
         }
         rb->close(fd);
+        newfile = false;
     }
     else
     {
-        filename[0] = '\0';
+        rb->strcpy(filename,"/");
         rb->strcpy(eol,"\n");
+        newfile = true;
     }
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(0);
@@ -463,8 +473,8 @@ enum plugin_status plugin_start(const void* parameter)
                 switch (do_item_menu(cur_sel, copy_buffer))
                 {
                     case MENU_RET_SAVE:
-                        save_changes(1);
-                        changed = false;
+                        if(save_changes(1))
+                            changed = false;
                     break;
                     case MENU_RET_UPDATE:
                         changed = true;
@@ -490,17 +500,17 @@ enum plugin_status plugin_start(const void* parameter)
                             playback_control(NULL);
                         break;
                         case 2: //save to disk
-                            save_changes(1);
-                            changed = 0;
+                            if(save_changes(1))
+                                changed = 0;
                         break;
                         case 3:
-                            save_changes(0);
-                            changed = 0;
+                            if(save_changes(0))
+                                changed = 0;
                         break;
 
                         case 4:
-                            save_changes(1);
-                            exit=1;
+                            if(save_changes(1))
+                                exit=1;
                         break;
                         case 5:
                             exit=1;
@@ -511,6 +521,8 @@ enum plugin_status plugin_start(const void* parameter)
             break;
         }
         rb->gui_synclist_set_nb_items(&lists,line_count);
+        if(line_count > 0 && line_count <= cur_sel)
+            rb->gui_synclist_select_item(&lists,line_count-1);
     }
     return PLUGIN_OK;
 }
