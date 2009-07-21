@@ -47,8 +47,19 @@ PLUGIN_HEADER
 #define BMPWIDTH_snake2_header  BMPWIDTH_snake2_header1
 #endif
 
-
-#if (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
+#if (LCD_WIDTH >= 640) && (LCD_HEIGHT >= 480)
+    #define MULTIPLIER 20 /*Modifier for porting on other screens*/
+    #define MODIFIER_1 20
+    #define MODIFIER_2 16
+    #define CENTER_X 40
+    #define CENTER_Y 110
+    #define TOP_X1 68  /* x-coord of the upperleft item (game type) */
+    #define TOP_X2 562 /* x-coord of the upperright item (maze type) */
+    #define TOP_X3 84  /* x-coord of the lowerleft item (speed) */
+    #define TOP_X4 548 /* x-coord of the lowerright item (hi-score) */
+    #define TOP_Y1 8   /* y-coord of the top row of items */
+    #define TOP_Y2 50  /* y-coord of the bottom row of items */
+#elif (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
     #define MULTIPLIER 10 /*Modifier for porting on other screens*/
     #define MODIFIER_1 10
     #define MODIFIER_2 8
