@@ -23,15 +23,6 @@ void readsf_banana( void);    /* debugging */
 #include "m_imp.h"
 #include "s_stuff.h"
 
-#define open rb->open
-#define close rb->close
-#define strcpy rb->strcpy
-#define strcat rb->strcat
-#define strlen rb->strlen
-#define strcmp rb->strcmp
-#define strrchr rb->strrchr
-#define strncat rb_strncat
-
 #else /* ROCKBOX */
 #include <stdlib.h>
 #ifdef UNIX
