@@ -231,7 +231,10 @@ clock_messages.112x64x1.bmp
 
 /* Flipit */
 #ifdef HAVE_LCD_COLOR
-#if LCD_WIDTH >= 280 && LCD_HEIGHT >= 234
+#if LCD_WIDTH >= 480
+flipit_cursor.112x112x16.bmp
+flipit_tokens.112x224x16.bmp
+#elif LCD_WIDTH >= 280 && LCD_HEIGHT >= 234
 flipit_cursor.56x56x16.bmp
 flipit_tokens.56x112x16.bmp
 #elif LCD_WIDTH >= 200 && LCD_HEIGHT >= 170
@@ -376,7 +379,10 @@ minesweeper_tiles.8x8x1.bmp
 /* PegBox */
 #ifdef HAVE_LCD_COLOR
 /* currently only LCD_WIDTH is important, e.g. Nano and e200 use the same set */
-#if LCD_WIDTH >= 320
+#if LCD_WIDTH >= 640
+pegbox_pieces.48x48x16.bmp
+pegbox_header.640x80x16.bmp
+#elif LCD_WIDTH >= 320
 pegbox_pieces.24x24x16.bmp
 pegbox_header.320x40x16.bmp
 #elif LCD_WIDTH >= 240
@@ -521,6 +527,8 @@ snake2_bottom.160x128x2.bmp
 
 #ifdef HAVE_LCD_COLOR
 #if SOKOBAN_TILESIZE >= 14
+sokoban_tiles.28x28x16.bmp
+#elif SOKOBAN_TILESIZE >= 14
 sokoban_tiles.14x14x16.bmp
 #elif SOKOBAN_TILESIZE >= 12
 sokoban_tiles.12x12x16.bmp
@@ -598,19 +606,27 @@ solitaire_suitsi.13x52x1.bmp
 #endif
 #endif
 
+#if (LCD_HEIGHT/10) < (LCD_WIDTH/16)
+#define STAR_TILESIZE (LCD_HEIGHT/10)
+#else
+#define STAR_TILESIZE (LCD_WIDTH/16)
+#endif
+
 /* Star */
 #ifdef HAVE_LCD_COLOR
-#if LCD_WIDTH >= 320 && LCD_HEIGHT >= 188
+#if     (STAR_TILESIZE >= 40)
+star_tiles.40x40.bmp
+#elif   (STAR_TILESIZE >= 20)
 star_tiles.20x20.bmp
-#elif LCD_WIDTH >= 240 && LCD_HEIGHT >= 143
+#elif   (STAR_TILESIZE >= 15)
 star_tiles.15x15.bmp
-#elif LCD_WIDTH >= 208 && LCD_HEIGHT >= 125
+#elif   (STAR_TILESIZE >= 13)
 star_tiles.13x13.bmp
-#elif LCD_WIDTH >= 176 && LCD_HEIGHT >= 107
+#elif   (STAR_TILESIZE >= 11)
 star_tiles.11x11.bmp
-#elif LCD_WIDTH >= 160 && LCD_HEIGHT >= 98
+#elif   (STAR_TILESIZE >= 10)
 star_tiles.10x10.bmp
-#elif LCD_WIDTH >= 128 && LCD_HEIGHT >= 80
+#elif   (STAR_TILESIZE >= 8)
 star_tiles.8x8.bmp
 #endif
 #elif LCD_DEPTH > 1 /* grey */

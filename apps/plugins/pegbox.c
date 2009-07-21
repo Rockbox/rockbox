@@ -466,7 +466,11 @@ PLUGIN_HEADER
 #define BOARD_Y   HEADER_HEIGHT
 #endif
 
-#if LCD_WIDTH >= 320
+#if LCD_WIDTH >= 640
+#define LEVEL_TEXT_X   118
+#define PEGS_TEXT_X    552
+#define TEXT_Y         56
+#elif LCD_WIDTH >= 320
 #define LEVEL_TEXT_X   59
 #define PEGS_TEXT_X    276
 #define TEXT_Y         28
