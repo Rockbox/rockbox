@@ -174,14 +174,20 @@ static void scalar_dequant_math(COOKContext *q, int index,
     FIXP f;
     int i;
 
-    for(i=0 ; i<SUBBAND_SIZE ; i++) {
-        f = table[subband_coef_index[i]];
-        /* noise coding if subband_coef_index[i] == 0 */
-        if (((subband_coef_index[i] == 0) && cook_random(q)) ||
-            ((subband_coef_index[i] != 0) && subband_coef_sign[i]))
-            f = -f;
 
-        mlt_p[i] = (s >= 64) ? 0 : fixp_pow2(f, -(s/2));
+    if(s >= 64)
+        mlt_p[i]=0;
+    else 
+    {
+        for(i=0 ; i<SUBBAND_SIZE ; i++) {
+            f = table[subband_coef_index[i]];
+            /* noise coding if subband_coef_index[i] == 0 */
+            if (((subband_coef_index[i] == 0) && cook_random(q)) ||
+                ((subband_coef_index[i] != 0) && subband_coef_sign[i]))
+                f = -f;
+
+            mlt_p[i] =fixp_pow2(f, -(s/2));
+        }
     }
 }
 
