@@ -20,223 +20,161 @@
  ****************************************************************************/
 
 #include "plugin.h"
+#include "lib/display_text.h"
 #include "lib/helper.h"
+#include "lib/highscore.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
-/******************************* Globals ***********************************/
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define AST_PAUSE BUTTON_ON
 #define AST_QUIT BUTTON_OFF
-#define AST_THRUST_REP BUTTON_UP | BUTTON_REPEAT
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT 
-#define AST_LEFT_REP BUTTON_LEFT | BUTTON_REPEAT
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_PLAY
-#define AST_FIRE_REP BUTTON_PLAY | BUTTON_REPEAT
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
 #define AST_PAUSE BUTTON_ON
 #define AST_QUIT BUTTON_OFF
-#define AST_THRUST_REP BUTTON_UP | BUTTON_REPEAT
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT 
-#define AST_LEFT_REP BUTTON_LEFT | BUTTON_REPEAT
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP BUTTON_SELECT | BUTTON_REPEAT
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define AST_PAUSE (BUTTON_MENU | BUTTON_OFF)
 #define AST_QUIT BUTTON_OFF
 #define AST_THRUST BUTTON_UP
-#define AST_THRUST_REP BUTTON_UP | BUTTON_REPEAT
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT
-#define AST_LEFT_REP BUTTON_LEFT | BUTTON_REPEAT
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_MENU
-#define AST_FIRE_REP BUTTON_MENU | BUTTON_REPEAT
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define AST_PAUSE BUTTON_REC
 #define AST_QUIT BUTTON_OFF
-#define AST_THRUST_REP BUTTON_UP | BUTTON_REPEAT
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT 
-#define AST_LEFT_REP BUTTON_LEFT | BUTTON_REPEAT
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP BUTTON_SELECT | BUTTON_REPEAT
 
 #define AST_RC_QUIT BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #define AST_PAUSE BUTTON_PLAY
 #define AST_QUIT BUTTON_POWER
-#define AST_THRUST_REP BUTTON_UP | BUTTON_REPEAT
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT 
-#define AST_LEFT_REP BUTTON_LEFT | BUTTON_REPEAT
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP BUTTON_SELECT | BUTTON_REPEAT
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define AST_PAUSE (BUTTON_SELECT | BUTTON_PLAY)
 #define AST_QUIT (BUTTON_SELECT | BUTTON_MENU)
 #define AST_THRUST BUTTON_MENU
-#define AST_THRUST_REP (BUTTON_MENU | BUTTON_REPEAT)
 #define AST_HYPERSPACE BUTTON_PLAY
 #define AST_LEFT BUTTON_SCROLL_BACK
-#define AST_LEFT_REP (BUTTON_SCROLL_BACK | BUTTON_REPEAT)
 #define AST_RIGHT BUTTON_SCROLL_FWD
-#define AST_RIGHT_REP (BUTTON_SCROLL_FWD | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP (BUTTON_SELECT | BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #define AST_PAUSE BUTTON_A
 #define AST_QUIT BUTTON_POWER
-#define AST_THRUST_REP BUTTON_UP | BUTTON_REPEAT
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT 
-#define AST_LEFT_REP BUTTON_LEFT | BUTTON_REPEAT
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP BUTTON_SELECT | BUTTON_REPEAT
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
 #define AST_PAUSE BUTTON_REC
 #define AST_QUIT BUTTON_POWER
-#define AST_THRUST_REP (BUTTON_UP | BUTTON_REPEAT)
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_SCROLL_BACK
-#define AST_LEFT_REP (BUTTON_SCROLL_BACK | BUTTON_REPEAT)
 #define AST_RIGHT BUTTON_SCROLL_FWD
-#define AST_RIGHT_REP (BUTTON_SCROLL_FWD | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP (BUTTON_SELECT | BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
 #define AST_PAUSE (BUTTON_SELECT | BUTTON_UP)
 #define AST_QUIT (BUTTON_HOME|BUTTON_REPEAT)
-#define AST_THRUST_REP (BUTTON_UP | BUTTON_REPEAT)
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_SCROLL_BACK
-#define AST_LEFT_REP (BUTTON_SCROLL_BACK | BUTTON_REPEAT)
 #define AST_RIGHT BUTTON_SCROLL_FWD
-#define AST_RIGHT_REP (BUTTON_SCROLL_FWD | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP (BUTTON_SELECT | BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == SANSA_C200_PAD)
 #define AST_PAUSE BUTTON_REC
 #define AST_QUIT BUTTON_POWER
-#define AST_THRUST_REP (BUTTON_UP | BUTTON_REPEAT)
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT
-#define AST_LEFT_REP (BUTTON_LEFT | BUTTON_REPEAT)
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP (BUTTON_SELECT | BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == SANSA_CLIP_PAD)
 #define AST_PAUSE BUTTON_HOME
 #define AST_QUIT BUTTON_POWER
-#define AST_THRUST_REP (BUTTON_UP | BUTTON_REPEAT)
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT
-#define AST_LEFT_REP (BUTTON_LEFT | BUTTON_REPEAT)
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP (BUTTON_SELECT | BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == SANSA_M200_PAD)
 #define AST_PAUSE (BUTTON_SELECT | BUTTON_UP)
 #define AST_QUIT BUTTON_POWER
-#define AST_THRUST_REP (BUTTON_UP | BUTTON_REPEAT)
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT
-#define AST_LEFT_REP (BUTTON_LEFT | BUTTON_REPEAT)
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE (BUTTON_SELECT | BUTTON_REL)
-#define AST_FIRE_REP (BUTTON_SELECT | BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #define AST_PAUSE BUTTON_PLAY
 #define AST_QUIT BUTTON_POWER
-#define AST_THRUST_REP BUTTON_SCROLL_UP | BUTTON_REPEAT
 #define AST_THRUST BUTTON_SCROLL_UP
 #define AST_HYPERSPACE BUTTON_SCROLL_DOWN
 #define AST_LEFT BUTTON_LEFT 
-#define AST_LEFT_REP BUTTON_LEFT | BUTTON_REPEAT
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_REW
-#define AST_FIRE_REP BUTTON_REW | BUTTON_REPEAT
 
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
 #define AST_PAUSE BUTTON_PLAY
 #define AST_QUIT BUTTON_BACK
-#define AST_THRUST_REP BUTTON_UP | BUTTON_REPEAT
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT 
-#define AST_LEFT_REP BUTTON_LEFT | BUTTON_REPEAT
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP BUTTON_SELECT | BUTTON_REPEAT
 
 #elif (CONFIG_KEYPAD == MROBE100_PAD)
 #define AST_PAUSE BUTTON_DISPLAY
 #define AST_QUIT BUTTON_POWER
-#define AST_THRUST_REP BUTTON_UP | BUTTON_REPEAT
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT 
-#define AST_LEFT_REP BUTTON_LEFT | BUTTON_REPEAT
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP BUTTON_SELECT | BUTTON_REPEAT
 
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
 #define AST_PAUSE BUTTON_RC_PLAY
 #define AST_QUIT BUTTON_RC_REC
-#define AST_THRUST_REP BUTTON_RC_VOL_UP | BUTTON_REPEAT
 #define AST_THRUST BUTTON_RC_VOL_UP
 #define AST_HYPERSPACE BUTTON_RC_VOL_DOWN
 #define AST_LEFT BUTTON_RC_REW 
-#define AST_LEFT_REP (BUTTON_RC_REW | BUTTON_REPEAT)
 #define AST_RIGHT BUTTON_RC_FF
-#define AST_RIGHT_REP (BUTTON_RC_FF | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_RC_MODE
-#define AST_FIRE_REP (BUTTON_RC_MODE | BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 #define AST_QUIT BUTTON_POWER
@@ -244,28 +182,20 @@ PLUGIN_HEADER
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 #define AST_PAUSE BUTTON_PLAY
 #define AST_QUIT BUTTON_BACK
-#define AST_THRUST_REP (BUTTON_UP | BUTTON_REPEAT)
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT 
-#define AST_LEFT_REP (BUTTON_LEFT | BUTTON_REPEAT)
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_SELECT
-#define AST_FIRE_REP (BUTTON_SELECT | BUTTON_REPEAT)
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 #define AST_PAUSE BUTTON_VIEW
 #define AST_QUIT BUTTON_POWER
-#define AST_THRUST_REP (BUTTON_UP | BUTTON_REPEAT)
 #define AST_THRUST BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT BUTTON_LEFT
-#define AST_LEFT_REP (BUTTON_LEFT | BUTTON_REPEAT)
 #define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
 #define AST_FIRE BUTTON_PLAYLIST
-#define AST_FIRE_REP (BUTTON_PLAYLIST | BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) || CONFIG_KEYPAD == MROBE500_PAD
 #define AST_QUIT BUTTON_POWER
@@ -324,6 +254,8 @@ PLUGIN_HEADER
 #define ASTEROID_SPEED RES/20
 #define MISSILE_SURVIVAL_LENGTH 40
 
+#define CYCLETIME 30
+
 #define EXTRA_LIFE 250
 #define SPAWN_TIME 30
 #define BLINK_TIME 10
@@ -332,7 +264,6 @@ PLUGIN_HEADER
 #define WRAP_GAP                12
 #define EXPLOSION_LENGTH        20
 #define SHOW_COL 0
-#define HISCORE_FILE PLUGIN_GAMES_DIR "/astrorocks.hs"
 #define POINT_SIZE 2
 #define MAX_NUM_ASTEROIDS 25
 #define MAX_NUM_MISSILES 6
@@ -350,12 +281,9 @@ PLUGIN_HEADER
 #define NUM_ENEMY_VERTICES      6
 #define MAX_LEVEL               MAX_NUM_ASTEROIDS
 #define ENEMY_SPEED             4
-#define ENEMY_START_X           0
-#define ENEMY_START_Y           0
 #define SIZE_ENEMY_COLLISION    5*SCALE
-#define ATTRACT_FLIP_TIME       100
 #define NUM_STARS               50
-#define NUM_TRAIL_POINTS	70
+#define NUM_TRAIL_POINTS    70
 #define NUM_ROTATIONS           16
 
 #define SIN_COS_SCALE           10000
@@ -425,6 +353,13 @@ PLUGIN_HEADER
 #define SET_FG(x)
 #define SET_BG(x)
 #endif
+
+#define MARGIN 5
+
+#define HIGH_SCORE PLUGIN_GAMES_DIR "/spacerocks.score"
+#define NUM_SCORES 5
+
+struct highscore highest[NUM_SCORES];
 
 /* The array of points that make up an asteroid */
 static const short asteroid_one[NUM_ASTEROID_VERTICES*2] =
@@ -525,7 +460,6 @@ enum asteroid_type
 enum game_state
 {
     GAME_OVER,
-    ATTRACT_MODE,
     SHOW_LEVEL,
     PLAY_MODE, 
     PAUSE_MODE
@@ -597,15 +531,11 @@ static int next_thrust_count;
 static int num_lives;
 static int extra_life;
 static int show_level_timeout;
-static int attract_flip_timeout;
-static int show_game_over;
 static int current_level;
 static int current_score;
-static int high_score;
 static int space_check_size = 30*SCALE;
 
 static bool enemy_on_screen;
-static char phscore[30];
 static struct Ship ship;
 static struct Point stars[NUM_STARS];
 static struct Asteroid asteroids_array[MAX_NUM_ASTEROIDS];
@@ -649,39 +579,100 @@ void drawstars(void);
 bool is_ship_within_asteroid(struct Asteroid* asteroid);
 
 
-
-/*Hi-Score reading and writing to file - this needs moving to the hi-score plugin lib as
-a 3rd function */
-void iohiscore(void)
+void init(void)
 {
-    int fd;
-    int compare;
+    enemy.appear_probability = ENEMY_APPEAR_PROBABILITY_START;
+    enemy.appear_timing = ENEMY_APPEAR_TIMING_START;
+    enemy.size_probability = ENEMY_BIG_PROBABILITY_START;
+    current_level = START_LEVEL;
+    num_lives = START_LIVES;
+    current_score = 0;
+    initialise_ship();
+    initialise_game(current_level);
+    show_level_timeout = SHOW_LEVEL_TIME;
+    game_state = PLAY_MODE;
+}
 
-    /* clear the buffer we're about to load the highscore data into */
-    rb->memset(phscore, 0, sizeof(phscore));
-
-    fd = rb->open(HISCORE_FILE,O_RDWR | O_CREAT);
-    if(fd < 0)
-    {
-        rb->splash(HZ, "Highscore file read error");
-        return;
-    }
+static bool spacerocks_help(void)
+{
+    rb->lcd_setfont(FONT_UI);
+#define WORDS (sizeof help_text / sizeof (char*))
+    static char *help_text[] = {
+        "Spacerocks", "", "Aim", "", "The", "goal", "of", "the", "game", "is", 
+        "to", "blow", "up", "the", "asteroids", "and", "avoid", "being", "hit", "by",
+        "them.", "Also", "you'd", "better", "watch", "out", "for", "the", "UFOs!"
+    };
+    static struct style_text formation[]={
+        { 0, TEXT_CENTER|TEXT_UNDERLINE },
+        { 2, C_RED }
+    };
+    int button;
     
-    /* highscore used to %d, is now %d\n
-       Deal with no file or bad file */
-    rb->read(fd,phscore, sizeof(phscore));
+    if (display_text(WORDS, help_text, formation, NULL)==PLUGIN_USB_CONNECTED)
+        return true;
 
-    compare = rb->atoi(phscore);
+    do {
+        button = rb->button_get(true);
+        if (button == SYS_USB_CONNECTED) {
+            return true;
+        }
+    } while( ( button == BUTTON_NONE )
+            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+    rb->lcd_setfont(FONT_SYSFIXED);
 
-    if(high_score > compare)
-    {
-        rb->lseek(fd,0,SEEK_SET);
-        rb->fdprintf(fd, "%d\n", high_score);
+    return false;
+}
+
+static bool _ingame;
+static int spacerocks_menu_cb(int action, const struct menu_item_ex *this_item)
+{
+    if(action == ACTION_REQUEST_MENUITEM
+       && !_ingame && ((intptr_t)this_item)==0)
+        return ACTION_EXIT_MENUITEM;
+    return action;
+}
+
+static int spacerocks_menu(bool ingame)
+{
+    rb->button_clear_queue();
+    int choice = 0;
+
+    _ingame = ingame;
+
+    MENUITEM_STRINGLIST (main_menu, "Spacerocks Menu", spacerocks_menu_cb,
+                             "Resume Game",
+                             "Start New Game",
+                             "Help",
+                             "High Score",
+                             "Playback Control",
+                             "Quit");
+                             
+    while (1) {
+        choice = rb->do_menu(&main_menu, &choice, NULL, false);
+        switch (choice) {
+            case 0:
+                return 0;
+            case 1:
+                init();
+                return 0;
+            case 2:
+                if(spacerocks_help())
+                    return 1;
+                break;
+            case 3:
+                highscore_show(NUM_SCORES, highest, NUM_SCORES);
+                break;
+            case 4:
+                playback_control(NULL);
+                break;
+            case 5:
+                return 1;
+            case MENU_ATTACHED_USB:
+                return 1;
+            default:
+                break;
+        }
     }
-    else
-        high_score = compare;   
-    
-    rb->close(fd);
 }
 
 bool point_in_poly(struct Point* _point, int num_vertices, int x, int y)
@@ -1087,7 +1078,7 @@ void draw_and_move_enemy(void)
                 if( enemy.position.x < ship.position.x)
                     enemy_missile.position.dx = 1;
                 else 
-                    enemy_missile.position.dx = -1;	  
+                    enemy_missile.position.dx = -1;      
             }
             
             if(enemy_missile.position.dx == 0 &&
@@ -1257,13 +1248,13 @@ void check_collisions(void)
             {
                 if(is_ship_within_asteroid(asteroid))
                 {
-		    if (!ship.invulnerable)
-		    {
-                    	/*if not invulnerable, blow up ship*/
-                    	ship.explode_countdown = EXPLOSION_LENGTH;
-                    	/* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
-                    	create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
-		    }
+            if (!ship.invulnerable)
+            {
+                        /*if not invulnerable, blow up ship*/
+                        ship.explode_countdown = EXPLOSION_LENGTH;
+                        /* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
+                        create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
+            }
                 }
                 
                 /*has the enemy missile blown something up?*/
@@ -1299,12 +1290,12 @@ void check_collisions(void)
         /*has the enemy collided with the ship?*/
         if(is_point_within_enemy(&ship.position))
         {
-	    if (!ship.invulnerable)
+        if (!ship.invulnerable)
             {
-	    	ship.explode_countdown = EXPLOSION_LENGTH;
-            	/* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
-            	create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
-	    }
+            ship.explode_countdown = EXPLOSION_LENGTH;
+                /* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
+                create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
+        }
             create_trail_blaze(ENEMY_EXPLOSION_COLOUR, &enemy.position);
         }
         
@@ -1329,13 +1320,13 @@ void check_collisions(void)
                      enemy_missile.position.x - ship.position.x,
                      enemy_missile.position.y - ship.position.y))
     {
-	if (!ship.invulnerable)
-	{        
-	     ship.explode_countdown = EXPLOSION_LENGTH;
-	     /* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
-	     create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
-	}        
-	enemy_missile.survived = 0;
+    if (!ship.invulnerable)
+    {        
+         ship.explode_countdown = EXPLOSION_LENGTH;
+         /* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
+         create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
+    }        
+    enemy_missile.survived = 0;
         enemy_missile.position.x = enemy_missile.position.y = 0;
     }   
     
@@ -1690,23 +1681,23 @@ void draw_and_move_ship(void)
     int nyoffset = ship.position.y/SCALE;
     if (ship.invulnerable && (ship.spawn_time > BLINK_TIME || ship.spawn_time % 2 == 0))
     {
-	SET_FG(COL_INVULN);
+    SET_FG(COL_INVULN);
     }
     else
     {
-    	SET_FG(COL_PLAYER);
+        SET_FG(COL_PLAYER);
     }
     if(!ship.explode_countdown)
     {
-	/* make sure ship is invulnerable until spawn time over */
-	if (ship.spawn_time)
-	{
-	     ship.spawn_time--;
-	     if (ship.spawn_time <= 0)
-	     {
-	          ship.invulnerable = 0;
-	     }
-	}
+    /* make sure ship is invulnerable until spawn time over */
+    if (ship.spawn_time)
+    {
+         ship.spawn_time--;
+         if (ship.spawn_time <= 0)
+         {
+              ship.invulnerable = 0;
+         }
+    }
         if(!ship.waiting_for_space)
         {
            draw_polygon(ship.vertices, nxoffset, nyoffset, NUM_SHIP_VERTICES);
@@ -1729,7 +1720,6 @@ void draw_and_move_ship(void)
                 num_lives--;
                 if(!num_lives)
                 {
-                    show_game_over = SHOW_GAME_OVER_TIME;
                     game_state = GAME_OVER;
                 }
                 else
@@ -1752,7 +1742,7 @@ void thrust_ship(void)
           but to do this we need to ascertain if the spacehip as moved on screen
           for more than a certain amount. */
 
-	create_trail_blaze(THRUST_COLOUR, &ship.position);
+    create_trail_blaze(THRUST_COLOUR, &ship.position);
     }
 }
 
@@ -1904,165 +1894,119 @@ void initialise_game(int start_num)
     }
 }
 
-void start_attract_mode(void)
-{
-    enemy.appear_probability = ENEMY_APPEAR_PROBABILITY_START;
-    enemy.appear_timing = ENEMY_APPEAR_TIMING_START;
-    current_level = 5;
-    num_lives = START_LIVES;
-    current_score = 0;
-    attract_flip_timeout = ATTRACT_FLIP_TIME;
-    game_state = ATTRACT_MODE;
-    if(asteroid_count < 3)
-        initialise_game(current_level);
-}
-
-enum plugin_status start_game(void)
+static int spacerocks_game_loop(void)
 {
     char s[20];
     char level[10];
     int button;
     int end;
-    int CYCLETIME = 30;
-    
+    int position;
+
     /*create stars once, and once only:*/
     create_stars();
+ 
+    if (spacerocks_menu(false)!=0)
+        return 0;
 
     SET_BG(LCD_BLACK);
-    
+
     while(true)
     {
-        /*game starts with at level 1 
-          with 1 asteroid.*/
-        start_attract_mode();
-        
-        /*Main loop*/
-        while(true)
-        {
-            end = *rb->current_tick + (CYCLETIME * HZ) / 1000;
+        end = *rb->current_tick + (CYCLETIME * HZ) / 1000;
+        rb->lcd_clear_display();
+        SET_FG(COL_TEXT);
+        switch(game_state) {
+        case(GAME_OVER):
+            rb->splash (HZ * 2, "Game Over");
             rb->lcd_clear_display();
-            SET_FG(COL_TEXT);
-            switch(game_state)
-            {
-            case(ATTRACT_MODE):
-                if(attract_flip_timeout < ATTRACT_FLIP_TIME/2)
-                {
-                    rb->lcd_putsxy(CENTER_LCD_X - 39,
-                                   CENTER_LCD_Y + CENTER_LCD_Y/2 - 4,
-                                   "Fire to Start");
-                    if(!attract_flip_timeout)
-                        attract_flip_timeout = ATTRACT_FLIP_TIME;
-                }
-                else
-                {
-                    rb->snprintf(s, sizeof(s), "Hi Score %d ", high_score);
-                    rb->lcd_putsxy(CENTER_LCD_X - 30,
-                                   CENTER_LCD_Y + CENTER_LCD_Y/2 - 4, s);
-          }
-                attract_flip_timeout--;
-                break;
-                
-            case(GAME_OVER):
-                rb->lcd_putsxy(CENTER_LCD_X - 25,
-                               CENTER_LCD_Y + CENTER_LCD_Y/2 - 4, "Game Over");
-                rb->snprintf(s, sizeof(s), "score %d ", current_score);
-                rb->lcd_putsxy(1,LCD_HEIGHT-8, s);
-		show_game_over--;
-                if(!show_game_over)
-                    start_attract_mode();
-                break;
-        
-            case(PAUSE_MODE):
-                rb->snprintf(s, sizeof(s), "score %d ", current_score);
-                rb->lcd_putsxy(1,LCD_HEIGHT-8, s);
-                rb->lcd_putsxy(CENTER_LCD_X - 15,
-                               CENTER_LCD_Y + CENTER_LCD_Y/2 - 4, "pause");
-                draw_and_move_missiles();
+            position=highscore_update(current_score, current_level, "",
+                                      highest,NUM_SCORES);            
+            if (position == 0)
+                rb->splash(HZ*2, "New High Score");
+            if (position != -1)
+                highscore_show(position, highest, NUM_SCORES);
+            if (spacerocks_menu(false)!=0)
+                return 0;
+            break;
+    
+        case(PAUSE_MODE):
+            rb->snprintf(s, sizeof(s), "score %d ", current_score);
+            rb->lcd_putsxy(1,LCD_HEIGHT-8, s);
+            rb->lcd_putsxy(CENTER_LCD_X - 15,
+                           CENTER_LCD_Y + CENTER_LCD_Y/2 - 4, "pause");
+            draw_and_move_missiles();
+            draw_lives();
+            draw_and_move_ship();
+            break;
+    
+        case(PLAY_MODE):
+            rb->snprintf(s, sizeof(s), "score %d ", current_score);
+            rb->lcd_putsxy(1,LCD_HEIGHT-8, s);
+            draw_and_move_missiles();
+            draw_lives();          
+            check_collisions();
+            draw_and_move_ship();
+            break;
+
+        case(SHOW_LEVEL):
+            show_level_timeout--;
+            rb->snprintf(s, sizeof(s), "score %d ", current_score);
+            rb->lcd_putsxy(1,LCD_HEIGHT-8, s);
+            rb->snprintf(level, sizeof(level), "stage %d ", current_level);
+            rb->lcd_putsxy(CENTER_LCD_X - 20,
+                           CENTER_LCD_Y + CENTER_LCD_Y/2 - 4, level);
+            draw_and_move_ship();
+            draw_lives();
+            if(!show_level_timeout) {
+                initialise_game(current_level);
+                game_state = PLAY_MODE;
                 draw_lives();
-                draw_and_move_ship();
-                break;
-        
-            case(PLAY_MODE):
-                rb->snprintf(s, sizeof(s), "score %d ", current_score);
-                rb->lcd_putsxy(1,LCD_HEIGHT-8, s);
-                draw_and_move_missiles();
-                draw_lives();          
-                check_collisions();
-                draw_and_move_ship();
-                break;
-  
-            case(SHOW_LEVEL):
-                show_level_timeout--;
-                rb->snprintf(s, sizeof(s), "score %d ", current_score);
-                rb->lcd_putsxy(1,LCD_HEIGHT-8, s);
-                rb->snprintf(level, sizeof(level), "stage %d ", current_level);
-                rb->lcd_putsxy(CENTER_LCD_X - 20,
-                               CENTER_LCD_Y + CENTER_LCD_Y/2 - 4, level);
-                draw_and_move_ship();
-                draw_lives();
-                if(!show_level_timeout) 
-                {
-                    initialise_game(current_level);
-                    game_state = PLAY_MODE;
-                    draw_lives();
-                }
-                break;
             }
-            draw_trail_blaze();
-            drawstars();      
-            draw_and_move_asteroids();
-            draw_and_move_enemy();
-            
-            rb->lcd_update();
-            button = rb->button_get(false);
-
+            break;
+        }
+        draw_trail_blaze();
+        drawstars();      
+        draw_and_move_asteroids();
+        draw_and_move_enemy();
+        
+        rb->lcd_update();
+ 
 #ifdef HAS_BUTTON_HOLD
-            if (rb->button_hold() && game_state == PLAY_MODE)
-                game_state = PAUSE_MODE;
-#endif
+        if (rb->button_hold())
+        game_state = PAUSE_MODE;
 
-            switch(button)
-            {
-            case(AST_PAUSE):
-                if(game_state == PLAY_MODE)
-                    game_state = PAUSE_MODE;
-                else if(game_state == PAUSE_MODE)
-                    game_state = PLAY_MODE;
-                break;  
-
-#ifdef AST_RC_QUIT
-            case AST_RC_QUIT:
 #endif
+        button = rb->button_get(false);
+        switch(button) {
             case(AST_QUIT):
-                if(game_state == ATTRACT_MODE)
-                    return PLUGIN_OK;
-                else if(game_state == GAME_OVER)
-                {
-                    start_attract_mode();  
-                }
-                else
-                {
-                    show_game_over = SHOW_GAME_OVER_TIME;
-                    game_state = GAME_OVER;
-                }
+                if (spacerocks_menu(true)!=0)
+                    return 0;
                 break;
-                
-            case (AST_LEFT_REP):
+#ifdef AST_PAUSE                
+             case(AST_PAUSE):
+                 if (game_state == PAUSE_MODE) {
+                    game_state = PLAY_MODE;
+                    break;
+                 }
+                else if (game_state != PLAY_MODE)
+                     break;
+#endif                
             case (AST_LEFT):
+            case (AST_LEFT | BUTTON_REPEAT):
                 if(game_state == PLAY_MODE || game_state == SHOW_LEVEL)
                     rotate_ship(SHIP_ROT_ACW_COS, SHIP_ROT_ACW_SIN);
                 break;
                 
-            case (AST_RIGHT_REP):
             case (AST_RIGHT):
+            case (AST_RIGHT | BUTTON_REPEAT):
                 if(game_state == PLAY_MODE || game_state == SHOW_LEVEL)
                     rotate_ship(SHIP_ROT_CW_COS, SHIP_ROT_CW_SIN);
                 break;        
                 
-            case (AST_THRUST_REP):
             case (AST_THRUST):
-                if((game_state == PLAY_MODE || game_state == SHOW_LEVEL) && !next_thrust_count)
-                {
+            case (AST_THRUST | BUTTON_REPEAT):
+                if((game_state == PLAY_MODE || game_state == SHOW_LEVEL) &&
+                                                !next_thrust_count) {
                     thrust_ship();
                     next_thrust_count = 5;
                 }
@@ -2074,26 +2018,15 @@ enum plugin_status start_game(void)
                 /*maybe shield if it gets too hard  */
                 break;       
                 
-            case (AST_FIRE_REP):
             case (AST_FIRE):
-                if(game_state == ATTRACT_MODE)
-                {
-                    current_level = START_LEVEL;
-                    initialise_ship();
-                    initialise_game(current_level);
-                    show_level_timeout = SHOW_LEVEL_TIME;
-                    game_state = PLAY_MODE;
-                }
-                else if(game_state == PLAY_MODE)
-                {
-                    if(!next_missile_count)
-                    {
+            case (AST_FIRE | BUTTON_REPEAT):
+                if(game_state == PLAY_MODE) {
+                    if(!next_missile_count) {
                         fire_missile();
                         next_missile_count = 10;
                     }
                 }
-                else if(game_state == PAUSE_MODE)
-                {
+                else if(game_state == PAUSE_MODE) {
                     game_state = PLAY_MODE;
                 }
                 break;
@@ -2102,37 +2035,24 @@ enum plugin_status start_game(void)
                 if (rb->default_event_handler(button)==SYS_USB_CONNECTED) 
                     return PLUGIN_USB_CONNECTED;
                 break;
-            }
-            
-            if(!num_lives)
-            {
-                if(high_score < current_score)
-                    high_score = current_score;
-                if(!show_game_over) 
-                    break;
-            }
-            
-            if(next_missile_count)
-                next_missile_count--;
-            
-            if(next_thrust_count)
-                next_thrust_count--;
-            
-            if (end > *rb->current_tick)
-                rb->sleep(end-*rb->current_tick);
-            else
-                rb->yield();
         }
         
+        if(next_missile_count)
+            next_missile_count--;
+        
+        if(next_thrust_count)
+            next_thrust_count--;
+
+        if (end > *rb->current_tick)
+            rb->sleep(end-*rb->current_tick);
+        else
+            rb->yield();
     }
 }
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    enum plugin_status retval;
-    (void)(parameter);
-    
-    game_state = ATTRACT_MODE;
+    (void)parameter;
     
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -2141,11 +2061,12 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_setfont(FONT_SYSFIXED);
     /* Turn off backlight timeout */
     backlight_force_on(); /* backlight control in lib/helper.c */
-    iohiscore();
-    retval = start_game();  
-    iohiscore();
+    highscore_load(HIGH_SCORE,highest,NUM_SCORES);
+    spacerocks_game_loop();
     rb->lcd_setfont(FONT_UI);
+    highscore_save(HIGH_SCORE,highest,NUM_SCORES);
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(); /* backlight control in lib/helper.c */
-    return retval;
+
+    return PLUGIN_OK;
 }
