@@ -103,9 +103,22 @@ int button_read_device(int *data)
 {
     int btn = BUTTON_NONE;
     int adc;
-    *data = 0;
+
+    static bool hold_button = false;
+    bool hold_button_old;
     
-    if (button_hold()) return BUTTON_NONE;
+    *data = 0;
+
+    hold_button_old = hold_button;
+    hold_button = button_hold();
+
+#ifndef BOOTLOADER
+    if (hold_button != hold_button_old)
+        backlight_hold_changed(hold_button);
+#endif
+
+    if (hold_button)
+        return BUTTON_NONE;
 
     if (GPIOB & 0x4)
     {
