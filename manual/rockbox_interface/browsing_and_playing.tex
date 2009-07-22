@@ -53,7 +53,9 @@ the \setting{Show Files} setting to all.
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
         {
           \ButtonOn+\ButtonUp{}/ \ButtonDown
-          \opt{IRIVER_RC_H100_PAD}{& \ButtonRCSource{}/ \ButtonRCBitrate}
+           \opt{HAVEREMOTEKEYMAP}{&           
+          \opt{IRIVER_RC_H100_PAD}{\ButtonRCSource{}/ \ButtonRCBitrate}
+          }
           & Move one page up/down in the list.\\
         }
       \opt{IRIVER_H10_PAD}
@@ -248,20 +250,29 @@ can be easily changed by making a text file with the required layout.  More
   \textbf{Picker area}
   \begin{table}
     \begin{btnmap}{}{}
-      \ActionKbdUp/\ActionKbdDown & Move about the virtual keyboard.
+      \ActionKbdUp/\ActionKbdDown 
+        \opt{HAVEREMOTEKEYMAP}{& }
+        & Move about the virtual keyboard.
       If you move out of the picker area, you get to the \emph{Line edit mode}. \\
-      \ActionKbdLeft/\ActionKbdRight & (moves the solid cursor). \\
+      \ActionKbdLeft/\ActionKbdRight 
+        \opt{HAVEREMOTEKEYMAP}{& }
+         & (moves the solid cursor). \\
       \ActionKbdSelect
+        \opt{HAVEREMOTEKEYMAP}{& }
       & Inserts the currently selected keyboard letter at the current
       filename cursor position \\
       \ActionKbdDone
+        \opt{HAVEREMOTEKEYMAP}{& }
       & Exits the virtual keyboard and saves any changes \\
       \ActionKbdAbort
+        \opt{HAVEREMOTEKEYMAP}{& }
       & Exits the virtual keyboard without saving any changes\\
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}{
           \ActionKbdMorseInput
+             \opt{HAVEREMOTEKEYMAP}{& }
           & Enters Morse input mode \\
           \ActionKbdMorseSelect
+              \opt{HAVEREMOTEKEYMAP}{& }
           & Tap to select a character in Morse input mode \\
       }
     \end{btnmap}
@@ -269,9 +280,15 @@ can be easily changed by making a text file with the required layout.  More
   \textbf{Line edit mode}
   \begin{table}
     \begin{btnmap}{}{}
-      \ActionKbdLeft/\ActionKbdRight & Move left and right\\
-      \ActionKbdSelect & Deletes the letter to the left of the cursor\\
-      \ActionKbdUp/\ActionKbdDown & Returns to the picker area\\
+      \ActionKbdLeft/\ActionKbdRight
+        \opt{HAVEREMOTEKEYMAP}{& }
+        & Move left and right\\
+      \ActionKbdSelect
+        \opt{HAVEREMOTEKEYMAP}{& }
+         & Deletes the letter to the left of the cursor\\
+      \ActionKbdUp/\ActionKbdDown 
+        \opt{HAVEREMOTEKEYMAP}{& }
+        & Returns to the picker area\\
     \end{btnmap}
   \end{table}
 }

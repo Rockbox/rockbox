@@ -60,20 +60,20 @@ these markers: \\
          IAUDIO_X5_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonUp}%
         \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}%
         \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
-          \opt{IRIVER_RC_H100_PAD}{&}
+       \opt{HAVEREMOTEKEYMAP}{& }
     & Move cursor up \\
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_CLIP_PAD,SANSA_M200_PAD,SANSA_C200_PAD,%
          GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,%
          IAUDIO_X5_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonDown}%
         \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}%
         \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
-           \opt{IRIVER_RC_H100_PAD}{&}
+       \opt{HAVEREMOTEKEYMAP}{& }
     & Move cursor down \\
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_CLIP_PAD,SANSA_M200_PAD,IPOD_1G2G_PAD,%
          IPOD_3G_PAD,IPOD_4G_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H10_PAD,%
          IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,RECORDER_PAD,%
          ONDIO_PAD}{\ButtonLeft}
-           \opt{IRIVER_RC_H100_PAD}{&}
+       \opt{HAVEREMOTEKEYMAP}{& }
     & Move cursor left %
             \opt{ONDIO_PAD}{if in \emph{board} navigation mode, or %
                             retreat one node in the game tree if in %
@@ -82,7 +82,7 @@ these markers: \\
          IPOD_3G_PAD,IPOD_4G_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H10_PAD,%
          IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,RECORDER_PAD,%
          ONDIO_PAD}{\ButtonRight}
-      \opt{IRIVER_RC_H100_PAD}{&}
+       \opt{HAVEREMOTEKEYMAP}{& }
     & Move cursor right
             \opt{ONDIO_PAD}{if in \emph{board} navigation mode, or advance one node in
                             the game tree if in \emph{tree} navigation mode} \\
@@ -93,7 +93,7 @@ these markers: \\
          MROBE100_PAD,IAUDIO_X5_PAD,SANSA_CLIP_PAD,SANSA_M200_PAD}{\ButtonSelect}%
         \opt{IRIVER_H10_PAD,RECORDER_PAD}{\ButtonPlay}%
         \opt{ONDIO_PAD}{\ButtonMenu}
-      \opt{IRIVER_RC_H100_PAD}{&}
+       \opt{HAVEREMOTEKEYMAP}{& }
     & Play a move (or use a tool if play-mode has been changed). \\
     \nopt{ONDIO_PAD}{
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_1G2G_PAD,IPOD_3G_PAD,%
@@ -105,7 +105,7 @@ these markers: \\
             \opt{MROBE100_PAD}{\ButtonMenu}%
             \opt{IAUDIO_X5_PAD}{\ButtonPlay}%
             \opt{RECORDER_PAD}{\ButtonFOne}
-                \opt{IRIVER_RC_H100_PAD}{&}
+       \opt{HAVEREMOTEKEYMAP}{& }
         & Retreat one node in the game tree \\
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,%
              IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonScrollFwd}%
@@ -116,7 +116,7 @@ these markers: \\
             \opt{MROBE100_PAD}{\ButtonPlay}%
             \opt{IAUDIO_X5_PAD}{\ButtonRec}%
             \opt{RECORDER_PAD}{\ButtonFThree}
-               \opt{IRIVER_RC_H100_PAD}{&}
+       \opt{HAVEREMOTEKEYMAP}{& }
         & Advance one node in the game tree \\
     }
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_CLIP_PAD,SANSA_M200_PAD,SANSA_C200_PAD,%
@@ -127,7 +127,7 @@ these markers: \\
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}%
         \opt{RECORDER_PAD}{\ButtonFTwo}%
         \opt{ONDIO_PAD}{Long \ButtonMenu}
-            \opt{IRIVER_RC_H100_PAD}{&}
+       \opt{HAVEREMOTEKEYMAP}{& }
     & Main Menu \\
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,%
          IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,%
@@ -136,7 +136,7 @@ these markers: \\
              GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,%
              IAUDIO_X5_PAD}{Long \ButtonSelect}%
             \opt{IRIVER_H10_PAD}{Long \ButtonPlay}
-                  \opt{IRIVER_RC_H100_PAD}{&}
+       \opt{HAVEREMOTEKEYMAP}{& }
     & Context Menu \\ }
     \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,RECORDER_PAD,MROBE100_PAD,%
          GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_CLIP_PAD}{%
@@ -148,7 +148,7 @@ these markers: \\
         \opt{GIGABEAT_PAD}{\ButtonA}%
         \opt{GIGABEAT_S_PAD}{\ButtonPlay}%
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
-            \opt{IRIVER_RC_H100_PAD}{&}
+       \opt{HAVEREMOTEKEYMAP}{& }
     & Go to the next variation when at the first node in a branch \\ }
     \end{btnmap}
 \end{table}
