@@ -65,6 +65,7 @@
 #include "pcmbuf.h"
 #include "option_select.h"
 #include "dsp.h"
+#include "playlist_viewer.h"
 
 #define RESTORE_WPS_INSTANTLY       0l
 #define RESTORE_WPS_NEXT_SECOND     ((long)(HZ+current_tick))
@@ -786,7 +787,12 @@ long gui_wps_show(void)
             case SYS_POWEROFF:
                 default_event_handler(SYS_POWEROFF);
                 break;
-
+            case ACTION_WPS_VIEW_PLAYLIST:
+                gwps_leave_wps();
+                if (playlist_viewer()) /* true if USB connected */
+                    return SYS_USB_CONNECTED;
+                restore = true;
+                break;
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                     return GO_TO_ROOT;

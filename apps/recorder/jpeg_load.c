@@ -31,7 +31,7 @@
 #include "debug.h"
 #include "jpeg_load.h"
 /*#define JPEG_BS_DEBUG*/
-#define ROCKBOX_DEBUG_JPEG
+//#define ROCKBOX_DEBUG_JPEG
 /* for portability of below JPEG code */
 #define MEMSET(p,v,c) memset(p,v,c)
 #define MEMCPY(d,s,c) memcpy(d,s,c)

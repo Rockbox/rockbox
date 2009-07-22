@@ -120,6 +120,7 @@ enum {
     ACTION_WPS_CONTEXT,
     ACTION_WPS_QUICKSCREEN,/* optional */
     ACTION_WPS_MENU, /*this should be the same as ACTION_STD_MENU */
+    ACTION_WPS_VIEW_PLAYLIST,
     ACTION_WPS_REC,
 #if 0
     ACTION_WPSAB_SINGLE, /* This needs to be #defined in 

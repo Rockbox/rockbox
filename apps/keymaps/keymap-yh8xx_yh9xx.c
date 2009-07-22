@@ -89,6 +89,7 @@ static const struct button_mapping button_context_wps[]  = {
 
     /* these match context_standard */
     { ACTION_WPS_MENU,          BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_LEFT },
+    { ACTION_WPS_VIEW_PLAYLIST, BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
     { ACTION_WPS_CONTEXT,       BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_RIGHT },
     { ACTION_WPS_QUICKSCREEN,   BUTTON_FFWD|BUTTON_RIGHT,       BUTTON_FFWD },
 

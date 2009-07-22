@@ -71,6 +71,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_STOPSEEK,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT|BUTTON_REPEAT },
 
     { ACTION_WPS_PLAY,          BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY },
+    { ACTION_WPS_VIEW_PLAYLIST, BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_WPS_STOP,          BUTTON_STOP,                    BUTTON_NONE },
 
     LAST_ITEM_IN_LIST

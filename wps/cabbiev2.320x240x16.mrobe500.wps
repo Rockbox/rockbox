@@ -49,6 +49,8 @@
 %s%ac%Ia
 
 %V|0|180|-|20|1|-|-|
+#touch the X of X regions to let the playlist viewer pop up
+%T|130|0|60|20|playlist|
 %al   %pc%ac%pp of %pe%ar%pr   
 
 #viewport for the touch icons

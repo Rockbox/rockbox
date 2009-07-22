@@ -93,7 +93,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLUP,         BUTTON_VOL_UP,                  BUTTON_NONE },
 
     { ACTION_WPS_PITCHSCREEN,   BUTTON_A|BUTTON_UP,             BUTTON_A },
-    { ACTION_WPS_PITCHSCREEN,   BUTTON_A|BUTTON_DOWN,           BUTTON_A },
+    { ACTION_WPS_VIEW_PLAYLIST, BUTTON_A|BUTTON_DOWN,           BUTTON_NONE },
 
     { ACTION_WPS_QUICKSCREEN,   BUTTON_MENU|BUTTON_REPEAT,      BUTTON_MENU },
     { ACTION_WPS_MENU,          BUTTON_MENU|BUTTON_REL,         BUTTON_MENU },

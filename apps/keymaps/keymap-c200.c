@@ -81,6 +81,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_SELECT },
     { ACTION_WPS_QUICKSCREEN,   BUTTON_DOWN,                    BUTTON_NONE   },
     { ACTION_WPS_REC,           BUTTON_REC|BUTTON_REPEAT,       BUTTON_NONE   },
+    { ACTION_WPS_VIEW_PLAYLIST, BUTTON_REC|BUTTON_REL,          BUTTON_REC    },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */

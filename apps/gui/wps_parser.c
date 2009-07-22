@@ -1163,6 +1163,7 @@ static struct touchaction touchactions[] = {
     {"menu", ACTION_WPS_MENU }, {"browse", ACTION_WPS_BROWSE },
     {"shuffle", ACTION_TOUCH_SHUFFLE }, {"repmode", ACTION_TOUCH_REPMODE },
     {"quickscreen", ACTION_WPS_QUICKSCREEN },{"contextmenu", ACTION_WPS_CONTEXT },
+    {"playlist", ACTION_WPS_VIEW_PLAYLIST },
 };
 static int parse_touchregion(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
@@ -1190,6 +1191,7 @@ static int parse_touchregion(const char *wps_bufptr,
      * quickscreen - go into the quickscreen
      * contextmenu - open the context menu
     */
+
 
     if ((wps_data->touchregion_count +1 >= MAX_TOUCHREGIONS) || (*ptr != '|'))
         return WPS_ERROR_INVALID_PARAM;

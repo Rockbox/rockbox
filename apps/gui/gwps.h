@@ -378,7 +378,7 @@ struct touchregion {
     bool repeat;             /* requires the area be held for the action */
     int action;              /* action this button will return */
 };
-#define MAX_TOUCHREGIONS    12
+#define MAX_TOUCHREGIONS    15
 #endif
 /* wps_data
    this struct holds all necessary data which describes the
