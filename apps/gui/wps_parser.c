@@ -1168,7 +1168,7 @@ static int parse_touchregion(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
 {
     (void)token;
-    unsigned i;
+    unsigned i, imax;
     struct touchregion *region;
     const char *ptr = wps_bufptr;
     const char *action;
@@ -1218,11 +1218,15 @@ static int parse_touchregion(const char *wps_bufptr,
     }
     else
         region->repeat = false;
-        
+
+    imax = ARRAYLEN(touchactions);
     while ((region->action == ACTION_NONE) && 
-            (i < sizeof(touchactions)/sizeof(*touchactions)))
+            (i < imax))
     {
-        if (!strncmp(touchactions[i].s, action, strlen(touchactions[i].s)))
+        /* try to match with one of our touchregion screens */
+        int len = strlen(touchactions[i].s);
+        if (!strncmp(touchactions[i].s, action, len)
+                && *(action+len) == '|')
             region->action = touchactions[i].action;
         i++;
     }
