@@ -20,10 +20,21 @@ the \setting{Virtual Keyboard} (see \reference{sec:virtual_keyboard}).
 
 \begin{table}
     \begin{btnmap}{}{}
-    \ActionStdOk \opt{HAVEREMOTEKEYPAD}{&} & Edit Line / Select Character\\
-    \ActionStdCancel \opt{HAVEREMOTEKEYPAD}{&} & Exit / Abort Editing\\
-    \ActionStdMenu \opt{HAVEREMOTEKEYPAD}{&} & Show Item Menu\\
-    \ActionStdContext \opt{HAVEREMOTEKEYPAD}{&} & Delete Line\\
+    \ActionStdOk 
+      \opt{HAVEREMOTEKEYPAD}{& \ActionRCStdOk}
+    & Edit Line / Select Character\\
+
+    \ActionStdCancel 
+      \opt{HAVEREMOTEKEYPAD}{& \ActionRCStdCancel} 
+    & Exit / Abort Editing\\
+
+    \ActionStdMenu 
+      \opt{HAVEREMOTEKEYPAD}{& \ActionRCStdMenu} 
+    & Show Item Menu\\
+
+    \ActionStdContext 
+      \opt{HAVEREMOTEKEYPAD}{& \ActionRCStdContext} 
+    & Delete Line\\
     \end{btnmap}
 \end{table}
 
