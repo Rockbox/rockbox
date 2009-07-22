@@ -1249,7 +1249,7 @@ target/arm/lcd-as-memframe.S
 target/arm/tcc780x/adc-tcc780x.c
 target/arm/tcc780x/system-tcc780x.c
 target/arm/tcc780x/kernel-tcc780x.c
-target/arm/tcc780x/sd-tcc780x.c
+/*target/arm/tcc780x/sd-tcc780x.c*/
 target/arm/tcc780x/cowond2/button-cowond2.c
 target/arm/tcc780x/cowond2/lcd-cowond2.c
 target/arm/tcc780x/cowond2/power-cowond2.c
