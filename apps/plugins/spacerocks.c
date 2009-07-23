@@ -604,13 +604,16 @@ static bool spacerocks_help(void)
     };
     static struct style_text formation[]={
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
-        { 2, C_RED }
+        { 2, C_RED },
+        { -1, 0 }
     };
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_set_foreground(LCD_WHITE);
+#endif
     int button;
-    
     if (display_text(WORDS, help_text, formation, NULL)==PLUGIN_USB_CONNECTED)
         return true;
-
     do {
         button = rb->button_get(true);
         if (button == SYS_USB_CONNECTED) {

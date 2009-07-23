@@ -1275,12 +1275,11 @@ static bool jewels_help(void)
         { 42, C_RED },
         { -1, 0 }
     };
-    int button;
-
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
+    int button;
     if (display_text(WORDS, help_text, formation, NULL))
         return true;
     do {

@@ -990,8 +990,8 @@ static bool star_help(void)
         "it", "as", "a", "mobile", "wall.", "The", "block", "cannot", "take",
         "stars.", "", "",
         "Controls", "",
-        STAR_TOGGLE_CONTROL_NAME":", "Toggle", "Control", "",
-        STAR_QUIT_NAME":", "", "Exit", "",
+        STAR_TOGGLE_CONTROL_NAME":", "Toggle", "control", "",
+        STAR_QUIT_NAME":", "Exit", "",
         STAR_LEVEL_DOWN_NAME":", "Prev.", "level", "",
         STAR_LEVEL_REPEAT_NAME":", "Reset", "level", "",
         STAR_LEVEL_UP_NAME":", "Next", "level"
@@ -1025,7 +1025,7 @@ static int star_menu(void)
     /* get the size of char */
     rb->lcd_getstringsize("a", &char_width, &char_height);
 
-    MENUITEM_STRINGLIST(menu,"Star Menu",NULL,"Play","Choose Level",
+    MENUITEM_STRINGLIST(menu,"Star Menu",NULL,"Start Game","Choose Level",
                         "Help", "Quit");
 
     while(!menu_quit)

@@ -779,11 +779,16 @@ static int brickmania_help(void)
         { 67, C_GREEN },
         { 74, C_YELLOW },
         { 80, C_RED },
+        { -1, 0 }
     };
     
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_set_foreground(LCD_WHITE);
+#endif
+    int button;
     if (display_text(WORDS, help_text, formation, NULL)==PLUGIN_USB_CONNECTED)
         return PLUGIN_USB_CONNECTED;
-    int button;
     do {
         button = rb->button_get(true);
         if (button == SYS_USB_CONNECTED) {
