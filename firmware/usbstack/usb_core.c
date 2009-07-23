@@ -65,9 +65,6 @@
 /*-------------------------------------------------------------------------*/
 /* USB protocol descriptors: */
 
-#define USB_SC_SCSI      0x06            /* Transparent */
-#define USB_PROT_BULK    0x50            /* bulk only */
-
 static struct usb_device_descriptor __attribute__((aligned(2)))
                                           device_descriptor=
 {
