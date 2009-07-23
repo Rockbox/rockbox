@@ -693,10 +693,14 @@ sudoku_inverse.220x176x16.bmp
 sudoku_start.320x240x16.bmp
 sudoku_normal.320x240x16.bmp
 sudoku_inverse.320x240x16.bmp
-#elif (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240) && (LCD_DEPTH == 16)
 sudoku_start.320x240x16.bmp
 sudoku_normal.320x240x16.bmp
 sudoku_inverse.320x240x16.bmp
+#elif (LCD_WIDTH == 640) && (LCD_HEIGHT == 480) && (LCD_DEPTH == 16)
+sudoku_start.640x480x16.bmp
+sudoku_normal.640x480x16.bmp
+sudoku_inverse.640x480x16.bmp
 #endif
 #else
 #if ((LCD_WIDTH == 176) && (LCD_HEIGHT == 220) && (LCD_DEPTH == 16))
@@ -720,7 +724,8 @@ superdom_boarditems.220x176x16.bmp
 superdom_boarditems.176x132x16.bmp
 #elif (LCD_WIDTH == 320 && LCD_HEIGHT == 240)
 superdom_boarditems.320x240x16.bmp
-#elif (LCD_WIDTH == 240 && LCD_HEIGHT == 320)
+#elif ((LCD_WIDTH == 240) && (LCD_HEIGHT == 320)) || \
+      ((LCD_WIDTH == 240) && (LCD_HEIGHT == 400))
 superdom_boarditems.240x320x16.bmp
 #elif (LCD_WIDTH == 480 && LCD_HEIGHT == 640) 
 superdom_boarditems.480x640x16.bmp
