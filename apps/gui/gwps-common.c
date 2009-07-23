@@ -355,8 +355,8 @@ bool gui_wps_update(struct gui_wps *gwps)
 {
     struct mp3entry *id3 = gwps->state->id3;
     bool retval;
-    gwps->state->do_full_update = gwps->state->do_full_update ||
-                                  cuesheet_subtrack_changed(id3);
+    bool cuesheet_update = cuesheet_subtrack_changed(id3);
+    gwps->state->do_full_update = cuesheet_update || gwps->state->do_full_update;
     retval = gui_wps_redraw(gwps, 0,
                             gwps->state->do_full_update ? 
                                         WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
