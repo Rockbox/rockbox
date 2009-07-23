@@ -394,12 +394,22 @@ RB_WRAP(kbd_input)
     luaL_Buffer b;
     luaL_buffinit(L, &b);
 
+    const char *input = luaL_optstring(L, 1, NULL);
     char *buffer = luaL_prepbuffer(&b);
-    buffer[0] = '\0';
-    rb->kbd_input(buffer, LUAL_BUFFERSIZE);
-    luaL_addsize(&b, strlen(buffer));
 
-    luaL_pushresult(&b);
+    if(input != NULL)
+        rb->strlcpy(buffer, input, LUAL_BUFFERSIZE);
+    else
+        buffer[0] = '\0';
+
+    if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE))
+    {
+        luaL_addsize(&b, strlen(buffer));
+        luaL_pushresult(&b);
+    }
+    else
+        lua_pushnil(L);
+
     return 1;
 }
 
