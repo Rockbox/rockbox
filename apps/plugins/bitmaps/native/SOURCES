@@ -720,7 +720,7 @@ superdom_boarditems.220x176x16.bmp
 superdom_boarditems.176x132x16.bmp
 #elif (LCD_WIDTH == 320 && LCD_HEIGHT == 240)
 superdom_boarditems.320x240x16.bmp
-#elif (LCD_WIDTH == 240 && LCD_HEIGHT >= 320)
+#elif (LCD_WIDTH == 240 && LCD_HEIGHT == 320)
 superdom_boarditems.240x320x16.bmp
 #elif (LCD_WIDTH == 480 && LCD_HEIGHT == 640) 
 superdom_boarditems.480x640x16.bmp
