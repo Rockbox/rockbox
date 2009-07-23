@@ -21,6 +21,7 @@
 #include "plugin.h"
 #include "lib/playback_control.h"
 #include "lib/display_text.h"
+#include "pluginbitmaps/superdom_boarditems.h"
 PLUGIN_HEADER
 
 extern const fb_data superdom_boarditems[];
@@ -47,40 +48,23 @@ char buf[255];
 
 #endif
 
-#if LCD_WIDTH == 220 && LCD_HEIGHT == 176
-#define NUM_BOX_HEIGHT 25
-#define NUM_BOX_WIDTH 30
-#define STRIDE 14
-#define ICON_HEIGHT 7
-#define ICON_WIDTH 7
+/* NUM_BOX HEIGHT and WIDTH are used for the number pad in the game.  The height
+ *  calculation includes spacing for the text placed above and below the number
+ *  pad (it divides by 6 instead of just 4).  The width calculation gives extra
+ *  spacing on the sides of the pad too (divides by 5 instead of 3).
+ */
+#define NUM_BOX_HEIGHT  (LCD_HEIGHT/6)
+#define NUM_BOX_WIDTH   (LCD_WIDTH/5)
 
-#elif (LCD_WIDTH == 160 && LCD_HEIGHT == 128) || \
-    (LCD_WIDTH == 176 && LCD_HEIGHT == 132) || \
-    (LCD_WIDTH == 176 && LCD_HEIGHT == 220)
-#define NUM_BOX_HEIGHT 20
-#define NUM_BOX_WIDTH 24
-#define STRIDE 8
-#define ICON_HEIGHT 4
-#define ICON_WIDTH 4
+#define NUM_MARGIN_X    (LCD_WIDTH-3*NUM_BOX_WIDTH)/2
+#define NUM_MARGIN_Y    (LCD_HEIGHT-4*NUM_BOX_HEIGHT)/2
 
-#elif (LCD_WIDTH == 320 && LCD_HEIGHT == 240)
-#define NUM_BOX_HEIGHT 25
-#define NUM_BOX_WIDTH 30
-#define STRIDE 20
-#define ICON_HEIGHT 10
-#define ICON_WIDTH 10
-
-#elif (LCD_WIDTH == 240 && (LCD_HEIGHT == 320 || LCD_HEIGHT == 400))
-#define NUM_BOX_HEIGHT 25
-#define NUM_BOX_WIDTH 30
-#define STRIDE 18
-#define ICON_HEIGHT 9
-#define ICON_WIDTH 9
-
-#endif
-
-#define NUM_MARGIN_X (LCD_WIDTH-3*NUM_BOX_WIDTH)/2
-#define NUM_MARGIN_Y (LCD_HEIGHT-4*NUM_BOX_HEIGHT)/2
+/* These parameters define the piece image dimensions, Stride is the total width
+ *  of the bitmap.
+ */
+#define STRIDE          BMPWIDTH_superdom_boarditems
+#define ICON_HEIGHT     (BMPHEIGHT_superdom_boarditems/6)
+#define ICON_WIDTH      (BMPWIDTH_superdom_boarditems/2)
 
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_1G2G_PAD)
@@ -155,7 +139,7 @@ char buf[255];
 #define SUPERDOM_RIGHT BUTTON_RIGHT
 #define SUPERDOM_CANCEL BUTTON_BACK
 
-#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD) || (CONFIG_KEYPAD == MROBE500_PAD)
 #define SUPERDOM_CANCEL BUTTON_POWER
 
 #endif
