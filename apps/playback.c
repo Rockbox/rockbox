@@ -577,7 +577,7 @@ struct mp3entry* audio_current_track(void)
     if (cur_idx == track_ridx && *thistrack_id3->path)
     {
         /* The usual case */
-        if (tracks[cur_idx].cuesheet_hid >= 0)
+        if (tracks[cur_idx].cuesheet_hid >= 0 && !thistrack_id3->cuesheet)
         {
             bufread(tracks[cur_idx].cuesheet_hid, sizeof(struct cuesheet), curr_cue);
             thistrack_id3->cuesheet = curr_cue;
@@ -591,7 +591,7 @@ struct mp3entry* audio_current_track(void)
              but the audio being played is still the same (now previous) track.
              othertrack_id3.elapsed is being updated in an ISR by
              codec_pcmbuf_position_callback */
-        if (tracks[cur_idx].cuesheet_hid >= 0)
+        if (tracks[cur_idx].cuesheet_hid >= 0 && !thistrack_id3->cuesheet)
         {
             bufread(tracks[cur_idx].cuesheet_hid, sizeof(struct cuesheet), curr_cue);
             othertrack_id3->cuesheet = curr_cue;
