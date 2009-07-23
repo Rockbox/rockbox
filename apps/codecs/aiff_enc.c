@@ -262,7 +262,7 @@ static inline void sample_to_mono(uint32_t **src, uint32_t **dst)
             lr2 >>= 1;
             break;
     }
-    *(*dst)++ = swap_odd_even_be32((lr1 << 16) | (uint16_t)lr2);
+    *(*dst)++ = htobe32((lr1 << 16) | (uint16_t)lr2);
 } /* sample_to_mono */
 
 STATICIRAM void chunk_to_aiff_format(uint32_t *src, uint32_t *dst) ICODE_ATTR;
