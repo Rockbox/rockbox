@@ -164,8 +164,14 @@
 #define PAGE_SIZE (getpagesize())
 #endif
 
+#if defined(ROCKBOX) && defined(SIMULATOR) || !defined(ROCKBOX)
+int printf(char*, ...);
 #define PRINT_MSG(fmt, args...) printf(fmt, ## args)
 #define ERROR_MSG(fmt, args...) printf(fmt, ## args)
+#else
+#define PRINT_MSG(fmt, args...)
+#define ERROR_MSG(fmt, args...)
+#endif
 
 typedef unsigned int u32_t;     /* NOTE: Make sure that this type is 4 bytes long on your computer */
 typedef unsigned char u8_t;     /* NOTE: Make sure that this type is 1 byte on your computer */
@@ -567,6 +573,9 @@ size_t get_used_size(void *mem_pool)
 #if TLSF_STATISTIC
     return ((tlsf_t *) mem_pool)->used_size;
 #else
+#ifdef ROCKBOX
+    (void) mem_pool;
+#endif /* ROCKBOX */
     return 0;
 #endif
 }
@@ -578,6 +587,9 @@ size_t get_max_size(void *mem_pool)
 #if TLSF_STATISTIC
     return ((tlsf_t *) mem_pool)->max_size;
 #else
+#ifdef ROCKBOX
+    (void) mem_pool;
+#endif /* ROCKBOX */
     return 0;
 #endif
 }

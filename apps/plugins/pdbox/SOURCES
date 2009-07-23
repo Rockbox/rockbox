@@ -2,12 +2,12 @@ pdbox.c
 pdbox-net.c
 pdbox-func.c
 
-dbestfit-3.3/bmalloc.c
-dbestfit-3.3/bysize.c
-dbestfit-3.3/dmalloc.c
+TLSF-2.4.4/src/tlsf.c
+/*
+wfirstfit.c
+*/
 
 PDa/src/s_audio_rockbox.c
-
 
 PDa/src/g_canvas.c
 PDa/src/g_graph.c
@@ -130,7 +130,7 @@ PDa/intern/vline~.c
 PDa/intern/vsnapshot~.c
 PDa/intern/wrap~.c
 
-PDa/extra/OSCroute.c
+/* PDa/extra/OSCroute.c */
 PDa/extra/bandpass.c
 /* PDa/extra/dumpOSC.c Does not compile, file handling stuff */
 PDa/extra/equalizer.c

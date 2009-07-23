@@ -23,7 +23,7 @@ $(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ)
 PDBOXFLAGS = $(PLUGINFLAGS) \
              -DFIXEDPOINT -DSTATIC -DPD -DUSEAPI_ROCKBOX \
              -I$(PDBOXSRCDIR) -I$(PDBOXSRCDIR)/PDa/src \
-             -DBMALLOC -I$(PDBOXSRCDIR)/dbestfit-3.3
+             -I$(PDBOXSRCDIR)/TLSF-2.4.4/src
 
 # Compile PDBox with extra flags (adapted from ZXBox)
 $(PDBOXBUILDDIR)/%.o: $(PDBOXSRCDIR)/%.c $(PLUGINBITMAPLIB) $(PDBOXSRCDIR)/pdbox.make

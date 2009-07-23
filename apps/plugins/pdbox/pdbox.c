@@ -58,14 +58,17 @@ rates we expect to see: 32000, 44100, 48000, 88200, 96000. */
 /* Quit flag. */
 bool quit = false;
 
-/* Thread IDs. */
-unsigned int gui_thread_id;
-unsigned int time_thread_id;
+/* Stack sizes for threads. */
+#define CORESTACKSIZE (8 * 1024 * 1024)
+#define GUISTACKSIZE (512 * 1024)
 
-/* Stacks for threads. */
-#define STACK_SIZE 16384
-uint32_t gui_stack[STACK_SIZE / sizeof(uint32_t)];
-uint32_t time_stack[256 / sizeof(uint32_t)];
+/* Thread stacks. */
+void* core_stack;
+void* gui_stack;
+
+/* Thread IDs. */
+unsigned int core_thread_id;
+unsigned int gui_thread_id;
 
 
 /* GUI thread */
@@ -102,18 +105,31 @@ void gui_thread(void)
     rb->thread_exit();
 }
 
-/* Running time thread. */
-void time_thread(void)
+/* Core thread */
+void core_thread(void)
 {
+    /* Add the directory the called .pd resides in to lib directories. */
+    sys_findlibdir(filename);
+
+    /* Open the PD design file. */
+    sys_openlist = namelist_append(sys_openlist, filename);
+
+    /* Fake a GUI start. */
+    sys_startgui(NULL);
+
+    /* Core scheduler loop */
     while(!quit)
     {
-        /* Add time slice in milliseconds. */
-        runningtime += (1000 / HZ);
-        rb->sleep(1);
+        /* Use sys_send_dacs() function as timer. */
+        while(sys_send_dacs() != SENDDACS_NO)
+            sched_tick(sys_time + sys_time_per_dsp_tick);
+
+        yield();
     }
 
     rb->thread_exit();
 }
+
 
 
 /* Plug-in entry point */
@@ -133,14 +149,19 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
     }
 
-    /* Allocate memory; check it's size; add to the pool. */
+    /* Initialize memory pool. */
     mem_pool = rb->plugin_get_audio_buffer(&mem_size);
     if(mem_size < MIN_MEM_SIZE)
     {
         rb->splash(HZ, "Not enough memory!");
         return PLUGIN_ERROR;
     }
-    add_pool(mem_pool, mem_size);
+#if 1
+    init_memory_pool(mem_size, mem_pool);
+#endif
+#if 0
+    set_memory_pool(mem_pool, mem_size);
+#endif
 
     /* Initialize net. */
     net_init();
@@ -164,36 +185,36 @@ enum plugin_status plugin_start(const void* parameter)
                    DEFAULTADVANCE, /* Scheduler advance */
                    1 /* Enable */);
 
-    /* Add the directory the called .pd resides in to lib directories. */
-    sys_findlibdir(filename);
-
-    /* Open the parameter file. */
-    sys_openlist = namelist_append(sys_openlist, filename);
-
-    /* Fake a GUI start. */
-    sys_startgui(NULL);
+    /* Create stacks for threads. */
+    core_stack = getbytes(CORESTACKSIZE);
+    gui_stack = getbytes(GUISTACKSIZE);
+    if(core_stack == NULL || gui_stack == NULL)
+    {
+        rb->splash(HZ, "Not enough memory!");
+        return PLUGIN_ERROR;
+    }
 
     /* Start threads. */
-    time_thread_id =
-        rb->create_thread(&time_thread,
-                          time_stack,
-                          sizeof(time_stack),
+    core_thread_id =
+        rb->create_thread(&core_thread,
+                          core_stack,
+                          CORESTACKSIZE,
                           0, /* FIXME Which flags? */
-                          "PD running time"
+                          "PD core"
                           IF_PRIO(, PRIORITY_REALTIME)
                           IF_COP(, COP));
 
     gui_thread_id =
         rb->create_thread(&gui_thread,
                           gui_stack,
-                          sizeof(gui_stack),
+                          GUISTACKSIZE,
                           0, /* FIXME Which flags? */
                           "PD GUI"
                           IF_PRIO(, PRIORITY_USER_INTERFACE)
                           IF_COP(, CPU));
 
     /* If having an error creating threads, bail out. */
-    if(time_thread_id == 0 || gui_thread_id == 0)
+    if(core_thread_id == 0 || gui_thread_id == 0)
         return PLUGIN_ERROR;
 
     /* Initialize scheduler time variables. */
@@ -205,9 +226,8 @@ enum plugin_status plugin_start(const void* parameter)
     /* Main loop. */
     while(!quit)
     {
-        /* Use sys_send_dacs() function as timer. */
-        while(sys_send_dacs() != SENDDACS_NO)
-            sched_tick(sys_time + sys_time_per_dsp_tick);
+        /* Add time slice in milliseconds. */
+        runningtime += (1000 / HZ);
 
         /* Sleep to the next time slice. */
         rb->sleep(1);
@@ -215,7 +235,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* Wait for threads to complete. */
     rb->thread_wait(gui_thread_id);
-    rb->thread_wait(time_thread_id);
+    rb->thread_wait(core_thread_id);
 
     /* Close audio subsystem. */
     sys_close_audio();
@@ -223,6 +243,13 @@ enum plugin_status plugin_start(const void* parameter)
     /* Destroy net. */
     net_destroy();
 
+    /* Clear memory pool. */
+#if 1
+    destroy_memory_pool(mem_pool);
+#endif
+#if 0
+    clear_memory_pool();
+#endif
+
     return PLUGIN_OK;
 }
-

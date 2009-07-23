@@ -2319,12 +2319,12 @@ void glob_evalfile(t_pd *ignore, t_symbol *name, t_symbol *dir);
 void openit(const char *dirname, const char *filename)
 {
     char* nameptr;
-    char* dirbuf = getbytes(MAXPDSTRING);
+    char dirbuf[MAXPDSTRING];
 
     /* Workaround: If the file resides in the root directory,
                    add a trailing slash to prevent directory part
                    of the filename from being removed -- W.B. */
-    char* ffilename = getbytes(MAXPDSTRING);
+    char ffilename[MAXPDSTRING];
     ffilename[0] = '/';
     ffilename[1] = '\0';
     strcat(ffilename, filename);
@@ -2338,10 +2338,6 @@ void openit(const char *dirname, const char *filename)
     }
     else
     	error("%s: can't open", filename);
-
-    /* Clean up. */
-    freebytes(dirbuf, MAXPDSTRING);
-    freebytes(ffilename, MAXPDSTRING);
 }
 
 
@@ -2374,13 +2370,13 @@ char* rb_getcwd(char* buf, ssize_t size)
 extern t_namelist* sys_openlist;
 void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
 {
+    t_namelist *nl;
+    char cwd[MAXPDSTRING];
+
     (void) dummy;
     (void) s;
     (void) argc;
     (void) argv;
-
-    t_namelist *nl;
-    char* cwd = getbytes(MAXPDSTRING);
 
     /* Get current working directory. */
     rb_getcwd(cwd, MAXPDSTRING);
@@ -2391,9 +2387,6 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
 
     namelist_free(sys_openlist);
     sys_openlist = 0;
-
-    /* Clean up. */
-    freebytes(cwd, MAXPDSTRING);
 }
 
 /* Fake GUI start. Originally in s_inter.c */
@@ -2405,7 +2398,7 @@ int sys_startgui(const char *guidir)
 {
     unsigned int i;
     t_atom zz[23];
-    char* cmdbuf = getbytes(4*MAXPDSTRING);
+    char cmdbuf[4*MAXPDSTRING];
 
     (void) guidir;
 
@@ -2420,9 +2413,6 @@ int sys_startgui(const char *guidir)
     SETFLOAT(zz+22,0);
     glob_initfromgui(0, 0, 23, zz);
 
-    /* Clean up. */
-    freebytes(cmdbuf, 4*MAXPDSTRING);
-
     return 0;
 }
 
@@ -2436,14 +2426,11 @@ int sys_getblksize(void)
 /* Find library directory and set it. */
 void sys_findlibdir(const char* filename)
 {
-    (void) filename;
+    char sbuf[MAXPDSTRING];
 
-    char* sbuf = getbytes(MAXPDSTRING);
+    (void) filename;
 
     /* Make current working directory the system library directory. */
     rb_getcwd(sbuf, MAXPDSTRING);
     sys_libdir = gensym(sbuf);
-
-    /* Clean up. */
-    freebytes(sbuf, MAXPDSTRING);
 }

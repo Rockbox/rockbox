@@ -22,19 +22,50 @@
 #ifndef PDBOX_H
 #define PDBOX_H
 
-/* Use dbestfit. */
-#include "bmalloc.h"
-#include "dmalloc.h"
+
+#if 1
+/* Use TLSF. */
+#include "tlsf.h"
+#endif
 
 /* Pure Data */
 #include "m_pd.h"
 
-
-/* dbestfit declarations. */
-
 /* Minimal memory size. */
 #define MIN_MEM_SIZE (4 * 1024 * 1024)
 
+/* Memory prototypes. */
+
+#if 1
+/* Direct memory allocator functions to TLSF. */
+#define malloc(size) tlsf_malloc(size)
+#define free(ptr) tlsf_free(ptr)
+#define realloc(ptr, size) tlsf_realloc(ptr, size)
+#define calloc(elements, elem_size) tlsf_calloc(elements, elem_size)
+#endif
+
+#if 0
+extern void set_memory_pool(void* memory_pool, size_t memory_size);
+extern void clear_memory_pool(void);
+extern void* mcalloc(size_t nmemb, size_t size);
+extern void* mmalloc(size_t size);
+extern void mfree(void* ptr);
+extern void* mrealloc(void* ptr, size_t size);
+extern void print_memory_pool(void);
+
+#define malloc mmalloc
+#define free mfree
+#define realloc mrealloc
+#define calloc mcalloc
+#endif
+
+#if 0
+#include <stdlib.h>
+#define malloc malloc
+#define free free
+#define realloc realloc
+#define calloc calloc
+#endif
 
 /* Audio declarations. */
 #define PD_SAMPLERATE 22050
@@ -44,7 +75,7 @@
 
 /* Audio buffer part. Contains data for one HZ period. */
 #ifdef SIMULATOR
-#define AUDIOBUFSIZE (PD_SAMPLES_PER_HZ * PD_OUT_CHANNELS * 4)
+#define AUDIOBUFSIZE (PD_SAMPLES_PER_HZ * PD_OUT_CHANNELS * 32)
 #else
 #define AUDIOBUFSIZE (PD_SAMPLES_PER_HZ * PD_OUT_CHANNELS)
 #endif
