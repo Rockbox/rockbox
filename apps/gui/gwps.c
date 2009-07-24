@@ -151,7 +151,7 @@ static void prev_track(unsigned long skip_thresh)
     {
         if (wps_state.id3->cuesheet)
         {
-            curr_cuesheet_skip(-1, wps_state.id3->elapsed);
+            curr_cuesheet_skip(wps_state.id3->cuesheet, -1, wps_state.id3->elapsed);
             return;
         }
 
@@ -176,7 +176,7 @@ static void next_track(void)
     /* take care of if we're playing a cuesheet */
     if (wps_state.id3->cuesheet)
     {
-        if (curr_cuesheet_skip(1, wps_state.id3->elapsed))
+        if (curr_cuesheet_skip(wps_state.id3->cuesheet, 1, wps_state.id3->elapsed))
         {
             /* if the result was false, then we really want
                to skip to the next track */

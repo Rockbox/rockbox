@@ -317,12 +317,11 @@ bool display_cuesheet_content(char* filename)
  * it also returns false if we weren't in a cuesheet.
  * direction should be 1 or -1.
  */
-bool curr_cuesheet_skip(int direction, unsigned long curr_pos)
+bool curr_cuesheet_skip(struct cuesheet *cue, int direction, unsigned long curr_pos)
 {
-    struct cuesheet *curr_cue = audio_current_track()->cuesheet;
-    int track = cue_find_current_track(curr_cue, curr_pos);
+    int track = cue_find_current_track(cue, curr_pos);
     
-    if (direction >= 0 && track == curr_cue->track_count - 1)
+    if (direction >= 0 && track == cue->track_count - 1)
     {
         /* we want to get out of the cuesheet */
         return false;
@@ -332,7 +331,7 @@ bool curr_cuesheet_skip(int direction, unsigned long curr_pos)
         if (!(direction <= 0 && track == 0))
             track += direction;
 
-        seek(curr_cue->tracks[track].offset);
+        seek(cue->tracks[track].offset);
         return true;
     }
 
@@ -372,15 +371,15 @@ static inline void draw_veritcal_line_mark(struct screen * screen,
 
 /* draw the cuesheet markers for a track of length "tracklen",
    between (x1,y) and (x2,y) */
-void cue_draw_markers(struct screen *screen, unsigned long tracklen,
+void cue_draw_markers(struct screen *screen, struct cuesheet *cue,
+                      unsigned long tracklen,
                       int x1, int x2, int y, int h)
 {
-    struct cuesheet *curr_cue = audio_current_track()->cuesheet;
     int i,xi;
     int w = x2 - x1;
-    for (i=1; i < curr_cue->track_count; i++)
+    for (i=1; i < cue->track_count; i++)
     {
-        xi = x1 + (w * curr_cue->tracks[i].offset)/tracklen;
+        xi = x1 + (w * cue->tracks[i].offset)/tracklen;
         draw_veritcal_line_mark(screen, xi, y, h);
     }
 }

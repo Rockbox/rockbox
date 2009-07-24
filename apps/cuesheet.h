@@ -73,11 +73,12 @@ int cue_find_current_track(struct cuesheet *cue, unsigned long curpos);
 void cue_spoof_id3(struct cuesheet *cue, struct mp3entry *id3);
 
 /* skip to next track in the cuesheet towards "direction" (which is 1 or -1) */
-bool curr_cuesheet_skip(int direction, unsigned long curr_pos);
+bool curr_cuesheet_skip(struct cuesheet *cue, int direction, unsigned long curr_pos);
 
 #ifdef HAVE_LCD_BITMAP
 /* draw track markers on the progressbar */
-void cue_draw_markers(struct screen *screen, unsigned long tracklen,
+void cue_draw_markers(struct screen *screen, struct cuesheet *cue,
+                      unsigned long tracklen,
                       int x1, int x2, int y, int h);
 #endif
 

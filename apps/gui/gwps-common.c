@@ -412,7 +412,7 @@ static void draw_progressbar(struct gui_wps *gwps,
 #endif
 
     if (state->id3->cuesheet)
-        cue_draw_markers(display, state->id3->length,
+        cue_draw_markers(display, state->id3->cuesheet, state->id3->length,
                          pb->x, pb->x + pb->width, y+1, pb->height-2);
 }
 
