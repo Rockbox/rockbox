@@ -36,7 +36,7 @@ if (scalar @files < $cores)
 
 # fork children
 my @pids;
-my $slice = int((scalar @files / $cores) + 0.5);
+my $slice = int((scalar @files + $cores) / $cores);
 for my $i (0 .. $cores-1)
 {
     my $pid = fork;
