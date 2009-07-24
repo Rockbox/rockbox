@@ -740,7 +740,7 @@ static inline uint32_t get_uint32be(uint8_t *buf)
     q->random_state = 0;
 
     /* Initialize extradata related variables. */
-    q->samples_per_channel = q->samples_per_frame / q->nb_channels;
+    q->samples_per_channel = q->samples_per_frame >> (q->nb_channels-1);
     q->bits_per_subpacket = rmctx->block_align * 8;
 
     /* Initialize default data states. */
