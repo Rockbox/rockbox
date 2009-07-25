@@ -1301,7 +1301,7 @@ void LodePNG_decode(LodePNG_Decoder* decoder, unsigned char* in, size_t insize, 
 
     /*TODO: check if this works according to the statement in the documentation: "The converter can convert from greyscale input color type, to 8-bit greyscale or greyscale with alpha"*/
 if (!(decoder->infoRaw.color.colorType == 2 || decoder->infoRaw.color.colorType == 6) && !(decoder->infoRaw.color.bitDepth == 8)) { decoder->error = 56; return; }
-    converted_image = (fb_data *)((int)(memory + 3) & ~3);
+    converted_image = (fb_data *)((intptr_t)(memory + 3) & ~3);
     converted_image_size = FB_DATA_SZ*decoder->infoPng.width*decoder->infoPng.height;
     if ((unsigned char *)(converted_image + converted_image_size) >= decoded_image) { decoder->error = OUT_OF_MEMORY; }
     if (!decoder->error) decoder->error = LodePNG_convert(converted_image, decoded_image, &decoder->infoRaw.color, &decoder->infoPng.color, decoder->infoPng.width, decoder->infoPng.height);
@@ -1832,7 +1832,7 @@ fb_data *get_image(struct LodePNG_Decoder* decoder)
         }
         static struct bitmap bmp_src, bmp_dst;
 
-        disp[ds] = (fb_data *)((int)(previous_disp + previous_size + 3) & ~3);
+        disp[ds] = (fb_data *)((intptr_t)(previous_disp + previous_size + 3) & ~3);
 
         if ((unsigned char *)(disp[ds] + size[ds]) >= memory_max) {
             //rb->splash(HZ, "Out of Memory");
