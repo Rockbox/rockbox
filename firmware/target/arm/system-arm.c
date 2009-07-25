@@ -23,9 +23,6 @@
 #include <stdio.h>
 #include "lcd.h"
 #include "font.h"
-#ifdef HAVE_BACKLIGHT
-#include "backlight-target.h"
-#endif
 
 static const char* const uiename[] = {
     "Undefined instruction",
@@ -50,10 +47,6 @@ void __attribute__((noreturn)) UIE(unsigned int pc, unsigned int num)
              IF_COP(, CURRENT_CORE));
     lcd_puts(0, 1, str);
     lcd_update();
-
-#ifdef HAVE_BACKLIGHT
-    _backlight_on();
-#endif
 
     disable_interrupt(IRQ_FIQ_STATUS);
 
