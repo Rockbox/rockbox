@@ -22,6 +22,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
+#include "power.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -282,12 +283,16 @@ void system_reboot(void)
 #endif
 
     /* TODO: implement reboot (eg. jump to boot ROM?) */
-    while (1);
+    power_off();
 }
 
 void system_exception_wait(void)
 {
-    while ((GPIOA & 0x10) == 0); /* check for power button */
+#ifdef COWON_D2
+    while ((GPIOA & 0x4) != 0); /* check for power button */
+#else
+    #error "system_exception_wait not implemented for this target"
+#endif
 }
 
 int system_memory_guard(int newmode)
