@@ -276,6 +276,14 @@ PLUGIN_HEADER
 
 #define MAX_PLAYERS 10
 
+enum {
+    CHCL_OK,
+    CHCL_CANCEL,
+    CHCL_USB,
+    CHCL_NEXT,
+    CHCL_PREV,
+};
+
 static struct {
     int nr_timers;
     int total_time;
@@ -311,14 +319,17 @@ enum plugin_status plugin_start(const void* parameter)
     int nr;
     
     (void)parameter;
-    rb->memset(&settings, 0, sizeof(settings));
+
+    settings.nr_timers = 1;
+    settings.total_time = 10;
+    settings.round_time = 10;
     
     /* now go ahead and have fun! */
     rb->splash(HZ, "Chess Clock");
 
     rb->lcd_clear_display();
     i=0;
-    while (i>=0) {
+    while (1) {
         int res;
         switch (i) {
             case 0:
@@ -328,31 +339,30 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
             case 1:
                 res=chessclock_set_int("Total time",
-                                       &settings.total_time, 10, 0, MAX_TIME,
+                                       &settings.total_time, 10, 10, MAX_TIME,
                                        FLAGS_SET_INT_SECONDS);
                 settings.round_time=settings.total_time;
                 break;
             case 2:
                 res=chessclock_set_int("Max round time", &settings.round_time,
-                                       10, 0, settings.round_time,
+                                       10, 10, settings.round_time,
                                        FLAGS_SET_INT_SECONDS);
                 break;
             default:
-                i=-1; /* done */
-                res=-2;
+                res=-2; /* done */
                 break;
         }
-        if (res==-1) {
+        if (res==CHCL_USB) {
             return PLUGIN_USB_CONNECTED;
-        }
-        if (res==0) {
+        } else if (res==CHCL_CANCEL) {
             i--;
             if (i<0) {
                 return PLUGIN_OK;
             }
-        }
-        if (res>0) {
+        } else if (res==CHCL_OK) {
             i++;
+        } else if (res==-2) { /* done */
+            break;
         }
     }
     for (i=0; i<settings.nr_timers; i++) {
@@ -382,19 +392,20 @@ enum plugin_status plugin_start(const void* parameter)
         if (done) {
             return PLUGIN_OK;
         }
+
         ret = run_timer(nr);
         switch (ret) {
-            case -1: /* exit */
+            case CHCL_CANCEL: /* exit */
                 done=true;
                 break;
-            case 3:
+            case CHCL_USB:
                 return PLUGIN_USB_CONNECTED;
-            case 1:
+            case CHCL_NEXT:
                 nr++;
                 if (nr>=settings.nr_timers)
                     nr=0;
                 break;
-            case 2:
+            case CHCL_PREV:
                 do {
                     nr--;
                     if (nr<0)
@@ -420,30 +431,22 @@ static void show_pause_mode(bool enabled)
         rb->lcd_set_drawmode(DRMODE_SOLID);
     }
 }
+#else
+#define show_pause_mode(enabled)  rb->lcd_icon(ICON_PAUSE, enabled)
 #endif
 
-/*
-  -1= exit
-  1 = next player
-  2 = prev player
-  3 = usb connected
-*/
 static int run_timer(int nr)
 {
     char buf[40];
     char player_info[13];
     long last_tick;
     bool done=false;
-    int retval=0;
+    int retval=CHCL_OK;
     long max_ticks=timer_holder[nr].total_time*HZ-timer_holder[nr].used_time;
     long ticks=0;
     bool round_time=false;
 
-#ifdef HAVE_LCD_CHARCELLS
-    rb->lcd_icon(ICON_PAUSE, pause);
-#else
     show_pause_mode(pause);
-#endif
 
     if (settings.round_time*HZ<max_ticks) {
         max_ticks=settings.round_time*HZ;
@@ -456,21 +459,14 @@ static int run_timer(int nr)
     while (!done) {
         int button;
         long now;
-        if (ticks>max_ticks) {
-            if (round_time) 
+        if (ticks>=max_ticks) {
+            if (round_time)
                 rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)"ROUND UP!");
             else
                 rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)"TIME OUT!");
             rb->backlight_on();
+            ticks = max_ticks;
         } else {
-            /*
-            if (((int)(rb->current_tick - start_ticks)/HZ)&1) {
-                rb->lcd_puts(0, FIRST_LINE, player_info);
-            } else {
-                rb->lcd_puts(0, FIRST_LINE, player_info);
-            }
-            */
-            rb->lcd_puts(0, FIRST_LINE, (unsigned char *)player_info);
             now=*rb->current_tick;
             if (!pause) {
                 ticks+=now-last_tick;
@@ -500,16 +496,12 @@ static int run_timer(int nr)
         switch (button) {
             /* OFF/ON key to exit */
             case CHC_QUIT:
-                return -1; /* Indicate exit */
+                return CHCL_CANCEL; /* Indicate exit */
 
             /* PLAY = Stop/Start toggle */
             case CHC_STARTSTOP:
                 pause=!pause;
-#ifdef HAVE_LCD_CHARCELLS
-                rb->lcd_icon(ICON_PAUSE, pause);
-#else
                 show_pause_mode(pause);
-#endif
                 break;
 
             /* LEFT = Reset timer */
@@ -530,12 +522,13 @@ static int run_timer(int nr)
                     case 0:
                          /* delete player */
                         timer_holder[nr].hidden=true;
-                        retval=1;
+                        retval = CHCL_NEXT;
                         done=true;
                         break;
                     case 1:
                         /* restart */
                         ticks=0;
+                        last_tick=*rb->current_tick;
                         break;
                     case 2:
                         /* set round time */
@@ -544,11 +537,12 @@ static int run_timer(int nr)
                                                &val,
                                                10, 0, MAX_TIME,
                                                FLAGS_SET_INT_SECONDS);
-                        if (res==-1) { /*usb*/
-                            retval = 3;
+                        if (res==CHCL_USB) {
+                            retval = CHCL_USB;
                             done=true;
-                        } else if (res==1) {
+                        } else if (res==CHCL_OK) {
                             ticks=max_ticks-val*HZ;
+                            last_tick=*rb->current_tick;
                         }
                         break;
                     case 3:
@@ -558,37 +552,39 @@ static int run_timer(int nr)
                                                &val,
                                                10, 0, MAX_TIME,
                                                FLAGS_SET_INT_SECONDS);
-                        if (res==-1) { /*usb*/
-                            retval = 3;
+                        if (res==CHCL_USB) {
+                            retval = CHCL_USB;
                             done=true;
-                        } else if (res==1) {
+                        } else if (res==CHCL_OK) {
                             timer_holder[nr].total_time=val;
                         }
                         break;
                     case MENU_ATTACHED_USB:
-                        retval = 3;
+                        retval = CHCL_USB;
                         done=true;
                         break;
                 }
                 rb->lcd_clear_display();
+                show_pause_mode(pause);
+                rb->lcd_puts(0, FIRST_LINE, (unsigned char *)player_info);
             }
             break;
 
             /* UP (RIGHT/+) = Scroll Lap timer up */
             case CHC_SETTINGS_INC:
-                retval = 1;
+                retval = CHCL_NEXT;
                 done = true;
                 break;
 
             /* DOWN (LEFT/-) = Scroll Lap timer down */
             case CHC_SETTINGS_DEC:
-                retval = 2;
+                retval = CHCL_PREV;
                 done = true;
                 break;
 
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-                    retval = 3; /* been in usb mode */
+                    retval = CHCL_USB;
                     done = true;
                 }
                 break;
@@ -646,12 +642,12 @@ static int chessclock_set_int(char* string,
 #ifdef CHC_SETTINGS_CANCEL2
             case CHC_SETTINGS_CANCEL2:
 #endif
-                return 0; /* cancel */
+                return CHCL_CANCEL;
                 break;
 
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    return -1; /* been in usb mode */
+                    return CHCL_USB;
                 break;
 
         }
@@ -664,7 +660,7 @@ static int chessclock_set_int(char* string,
     }
     rb->lcd_stop_scroll();
 
-    return 1;
+    return CHCL_OK;
 }
 
 static char * show_time(int seconds)
