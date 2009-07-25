@@ -34,6 +34,7 @@ include $(APPSDIR)/codecs/libtremor/libtremor.make
 include $(APPSDIR)/codecs/libwavpack/libwavpack.make
 include $(APPSDIR)/codecs/libwma/libwma.make
 include $(APPSDIR)/codecs/libcook/libcook.make
+include $(APPSDIR)/codecs/librm/librm.make
 
 # compile flags for codecs
 CODECFLAGS = $(CFLAGS) -I$(APPSDIR)/codecs -I$(APPSDIR)/codecs/lib \
@@ -74,7 +75,7 @@ $(CODECDIR)/ape.codec : $(CODECDIR)/libdemac.a
 $(CODECDIR)/wma.codec : $(CODECDIR)/libwma.a
 $(CODECDIR)/wavpack_enc.codec: $(CODECDIR)/libwavpack.a
 $(CODECDIR)/asap.codec : $(CODECDIR)/libasap.a
-$(CODECDIR)/cook.codec : $(CODECDIR)/libcook.a
+$(CODECDIR)/cook.codec : $(CODECDIR)/libcook.a $(CODECDIR)/librm.a
 
 $(CODECS): $(CODECLIB) # this must be last in codec dependency list
 
