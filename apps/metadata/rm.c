@@ -401,8 +401,12 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
 
     switch(rmctx->codec_type)
     {
+        case cook:
+        /* Already set, do nothing */
+            break;
         case aac:
-            id3->codectype = AFMT_RAAC;            
+            id3->codectype = AFMT_RAAC;
+            break;
     }
     
     id3->bitrate = rmctx->bit_rate / 1000;
