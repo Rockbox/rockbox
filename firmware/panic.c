@@ -30,6 +30,9 @@
 #include "led.h"
 #include "power.h"
 #include "system.h"
+#ifdef HAVE_BACKLIGHT
+#include "backlight-target.h"
+#endif
 
 static char panic_buf[128];
 #define LINECHARS (LCD_WIDTH/SYSFONT_WIDTH)
@@ -75,8 +78,13 @@ void panicf( const char *fmt, ...)
 #else
     /* no LCD */
 #endif
+
     lcd_update();
     DEBUGF("%s", panic_buf);
+
+#ifdef HAVE_BACKLIGHT
+    _backlight_on();
+#endif
 
     set_cpu_frequency(0);
     
