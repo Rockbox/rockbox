@@ -96,15 +96,12 @@ void irq_handler(void)
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
 
     int irq_no = INTOFFSET;
-    int sources = SRCPND;
-
-    if (irq_no==10) { INTMSK &= ~(1<<10); }
     
     irqvector[irq_no]();
 
     /* clear interrupt */
-    SRCPND = sources;
-    INTPND = sources;
+    SRCPND = (1 << irq_no);
+    INTPND = INTPND;
     
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
