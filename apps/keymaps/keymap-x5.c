@@ -20,7 +20,11 @@
  ****************************************************************************/
 
 /* *
- * Button Code Definitions for iaudio x5 targets
+ * Button Code Definitions for iaudio m5/x5 targets
+ *
+ * Note that button combos are incompatible on this targets, except for those
+ * with the power button. But these are discouraged because the the power button
+ * also does the hardware poweroff
  *
  * \TODO test!
  */
@@ -367,7 +371,10 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_SELECT },
     { ACTION_WPS_MENU,          BUTTON_REC|BUTTON_REL,          BUTTON_REC },
     { ACTION_WPS_QUICKSCREEN,   BUTTON_REC|BUTTON_REPEAT,       BUTTON_REC },
-    { ACTION_WPS_VIEW_PLAYLIST, BUTTON_REC|BUTTON_SELECT,       BUTTON_NONE },
+    /*
+     * Can't really do combos on M5
+     * { ACTION_WPS_VIEW_PLAYLIST, BUTTON_REC|BUTTON_SELECT,       BUTTON_NONE },
+     */
 
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
