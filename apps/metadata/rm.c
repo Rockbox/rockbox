@@ -169,6 +169,11 @@ static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
                rmctx->codec_type = cook;
                break;
 
+           case FOURCC('r','a','a','c'):
+           case FOURCC('r','a','c','p'):
+               rmctx->codec_type = aac;
+               break;
+
            default: /* Not a supported codec */
                return -1;
        }
@@ -183,7 +188,10 @@ static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
        DEBUGF("        fourcc = %s\n",fourcc2str(fourcc));
        DEBUGF("        codec_extra_data_length = %ld\n",rmctx->extradata_size);
        DEBUGF("        codec_extradata :\n");
-       print_cook_extradata(rmctx);
+       if(rmctx->codec_type == cook) {
+           DEBUGF("        cook_extradata :\n");
+           print_cook_extradata(rmctx);
+       }
 
     }
 
@@ -391,12 +399,11 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
     id3->artist = id3->id3v1buf[1];
     id3->comment = id3->id3v1buf[3];
 
-    /*switch(rmctx->codec_type)
+    switch(rmctx->codec_type)
     {
-        case cook:
-            id3->codectype = AFMT_COOK;
-            break;
-    }*/
+        case aac:
+            id3->codectype = AFMT_RAAC;            
+    }
     
     id3->bitrate = rmctx->bit_rate / 1000;
     id3->frequency = rmctx->sample_rate;

@@ -529,13 +529,28 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
         
         advance_buffer(src,12);
         consumed += 12;
-        for(x = 0 ; x < w/sps; x++)
-        {
-            place = sps*(h*x+((h+1)/2)*(y&1)+(y>>1)); 
-            pkt->frames[place/sps] = *src;
-            advance_buffer(src,sps);
-            consumed += sps;
-        }
+        if (rmctx->codec_type == cook) {
+            for(x = 0 ; x < w/sps; x++)
+            {
+                place = sps*(h*x+((h+1)/2)*(y&1)+(y>>1)); 
+                pkt->frames[place/sps] = *src;
+                advance_buffer(src,sps);
+                consumed += sps;
+            }
+         }
+        else if (rmctx->codec_type == aac) {
+            rmctx->sub_packet_cnt = (get_uint16be(*src) & 0xf0) >> 4;
+            advance_buffer(src, 2);
+            consumed += 2;
+            if (rmctx->sub_packet_cnt) {
+                for(x = 0; x < rmctx->sub_packet_cnt; x++) {
+                    rmctx->sub_packet_lengths[x] = get_uint16be(*src);
+                    advance_buffer(src, 2);
+                    consumed += 2;
+                }                
+                rmctx->audio_pkt_cnt = --rmctx->sub_packet_cnt;
+            }
+        }        
         rmctx->audio_pkt_cnt++;
     }while(++(rmctx->sub_packet_cnt) < h);
 

@@ -10,6 +10,7 @@ wavpack.c
 alac.c
 #endif
 cook.c
+raac.c
 mpc.c
 wma.c
 sid.c

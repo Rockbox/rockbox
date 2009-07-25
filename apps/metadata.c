@@ -118,6 +118,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* Cook in RM/RA */
     [AFMT_COOK] =
         AFMT_ENTRY("Cook",  "cook",   NULL,          "rm\0ra\0"      ),
+    /* AAC in RM/RA */
+    [AFMT_RAAC] =
+        AFMT_ENTRY("RAAC",  "raac",     NULL,          NULL      ),
 #endif
 };
 
