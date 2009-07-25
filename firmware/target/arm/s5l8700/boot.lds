@@ -9,12 +9,16 @@ OUTPUT_FORMAT(elf32-bigarm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/s5l8700/crt0.o)
 
-/* DRAMORIG is in fact 0x8000000 but remapped to 0x0 */
-#define DRAMORIG 0x8000000
-#define DRAMSIZE 16M
+/* DRAMORIG is in fact 0x08000000 but remapped to 0x0 */
+#define DRAMORIG 0x08000000
+#define DRAMSIZE (MEMORYSIZE * 0x100000)
 
 #define IRAMORIG 0x22000000
+#if CONFIG_CPU==S5L8701
+#define IRAMSIZE 176K
+#else
 #define IRAMSIZE 256K
+#endif
 
 #ifdef MEIZU_M6SL
 #define DFULOADADDR IRAMORIG

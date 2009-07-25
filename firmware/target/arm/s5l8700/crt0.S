@@ -82,6 +82,9 @@ newstart2:
 //    orr r0, r0, r2
 //    str r0, [r1] // switch backlight on
 
+#ifndef IPOD_NANO2G
+/* Currently disabled for the Nano2G as it doesn't appear to be
+   correct - e.g. audio doesn't work with this code enabled. */
     ldr r1, =0x3c500000 // CLKCON
     ldr r0, =0x00800080
     str r0, [r1]
@@ -90,7 +93,7 @@ newstart2:
     str r0, [r1]
     ldr r1, =0x3c500004 // PLL0PMS
 #ifdef IPOD_NANO2G
-    ldr r0, =0x21200
+    ldr r0, =0x21200    // pdiv=2, mdiv=?? sdiv=0
 #else
     ldr r0, =0x1ad200
 #endif
@@ -123,7 +126,8 @@ newstart2:
     nop					        
     nop
     nop
-
+#endif
+	
 //    ldr r0, =0x10100000
 //    ldr r1, =0x38200034
 //    str r0, [r1] // SRAM0/1 data width 16 bit
@@ -143,7 +147,7 @@ newstart2:
     str r0, [r1, #40] // enable clock for all peripherals
     mov r0, #0  // 0x0
     str r0, [r1, #44] // do not enter any power saving mode
-
+	
     mov r1, #0x1
     mrc 15, 0, r0, c1, c0, 0
     bic r0, r0, r1
@@ -186,7 +190,7 @@ newstart2:
     mcr 15, 0, r0, c6, c0, 1
     mov r0, #0x2f
     mcr 15, 0, r0, c6, c1, 1
-    ldr r0, =0x0800002f
+    ldr r0, =0x08000031
     mcr 15, 0, r0, c6, c2, 1
     ldr r0, =0x22000023
     mcr 15, 0, r0, c6, c3, 1
@@ -196,7 +200,7 @@ newstart2:
     mcr 15, 0, r0, c6, c0, 0
     mov r0, #0x2f
     mcr 15, 0, r0, c6, c1, 0
-    ldr r0, =0x0800002f
+    ldr r0, =0x08000031
     mcr 15, 0, r0, c6, c2, 0
     ldr r0, =0x22000023
     mcr 15, 0, r0, c6, c3, 0
