@@ -24,6 +24,9 @@ jpeg
 sudoku
 reversi
 goban
+#ifdef HAVE_LCD_COLOR
+png
+#endif
 #ifndef OLYMPUS_MROBE_500
 zxbox
 #endif
