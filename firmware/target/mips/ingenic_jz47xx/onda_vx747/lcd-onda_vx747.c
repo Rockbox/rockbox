@@ -36,23 +36,24 @@ do {                                    \
     REG_GPIO_PXPES(2)  = 0x001cffff;    \
 } while (0)
 
-
 #define SLEEP(x) { register int __i; for(__i=0; __i<x; __i++) asm volatile("nop\n nop\n"); }
 #define DELAY    SLEEP(700000);
+#ifdef USB_BOOT
 static void _display_pin_init(void)
 {
     my__gpio_as_lcd_16bit();
     __gpio_as_output(PIN_CS_N);
     __gpio_as_output(PIN_RESET_N);
     __gpio_clear_pin(PIN_CS_N);
-    
+
     __gpio_set_pin(PIN_RESET_N);
-    DELAY;        
+    DELAY;
     __gpio_clear_pin(PIN_RESET_N);
     DELAY;
     __gpio_set_pin(PIN_RESET_N);
     DELAY;
 }
+#endif
 
 #define WAIT_ON_SLCD while(REG_SLCD_STATE & SLCD_STATE_BUSY);
 #define SLCD_SET_DATA(x) WAIT_ON_SLCD; REG_SLCD_DATA = (x) | SLCD_DATA_RS_DATA;
@@ -60,23 +61,28 @@ static void _display_pin_init(void)
 #define SLCD_SEND_COMMAND(cmd,val) SLCD_SET_COMMAND(cmd); SLCD_SET_DATA(val);
 static void _display_init(void)
 {
+#ifdef USB_BOOT
     SLCD_SEND_COMMAND(REG_SOFT_RESET, SOFT_RESET(1));
     SLEEP(700000);
     SLCD_SEND_COMMAND(REG_SOFT_RESET, SOFT_RESET(0));
     SLEEP(700000);
     SLCD_SEND_COMMAND(REG_ENDIAN_CTRL, 0);
-    
+
     SLCD_SEND_COMMAND(REG_DRIVER_OUTPUT, 0x100);
     SLCD_SEND_COMMAND(REG_LCD_DR_WAVE_CTRL, 0x100);
+#endif
+
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
     SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_HID));
 #else
     SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_AM));
 #endif
+
+#ifdef USB_BOOT
     SLCD_SEND_COMMAND(REG_DISP_CTRL2, 0x503);
     SLCD_SEND_COMMAND(REG_DISP_CTRL3, 1);
     SLCD_SEND_COMMAND(REG_LPCTRL, 0x10);
-    SLCD_SEND_COMMAND(REG_EXT_DISP_CTRL1, 0);
+    SLCD_SEND_COMMAND(REG_EXT_DISP_CTRL1, EXT_DISP_CTRL1_RIM(1)); /* 16-bit RGB interface */
     SLCD_SEND_COMMAND(REG_EXT_DISP_CTRL2, 0);
     SLCD_SEND_COMMAND(REG_DISP_CTRL1, DISP_CTRL1_D(1));
     SLCD_SEND_COMMAND(REG_PAN_INTF_CTRL1, 0x12);
@@ -127,7 +133,7 @@ static void _display_init(void)
     SLCD_SEND_COMMAND(0x7f4, 0x22);
     SLCD_SEND_COMMAND(0x7f5, 1);
     SLCD_SEND_COMMAND(0x7f0, 0);
-    
+
     /* LCD ON */
     SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_BASEE | DISP_CTRL1_VON |
                                        DISP_CTRL1_GON   | DISP_CTRL1_DTE | DISP_CTRL1_D(3)));
@@ -138,6 +144,7 @@ static void _display_init(void)
     SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_BASEE | DISP_CTRL1_VON |
                                        DISP_CTRL1_GON   | DISP_CTRL1_DTE | DISP_CTRL1_D(3)));
     SLEEP(3500000);
+#endif /* USB_BOOT */
 }
 
 static void _display_on(void)
@@ -168,7 +175,7 @@ static void _set_lcd_bus(void)
 {
     REG_LCD_CFG &= ~LCD_CFG_LCDPIN_MASK;
     REG_LCD_CFG |= LCD_CFG_LCDPIN_SLCD;
-    
+
     REG_SLCD_CFG = (SLCD_CFG_BURST_8_WORD | SLCD_CFG_DWIDTH_16 | SLCD_CFG_CWIDTH_16BIT |
                     SLCD_CFG_CS_ACTIVE_LOW | SLCD_CFG_RS_CMD_LOW | SLCD_CFG_CLK_ACTIVE_FALLING |
                     SLCD_CFG_TYPE_PARALLEL);
@@ -177,20 +184,22 @@ static void _set_lcd_bus(void)
 static void _set_lcd_clock(void)
 {
     unsigned int val;
-    
+
     __cpm_stop_lcd();
-    
+
     val = (__cpm_get_pllout2() / LCD_PCLK) - 1;
     if ( val > 0x1ff )
         val = 0x1ff; /* CPM_LPCDR is too large, set it to 0x1ff */
     __cpm_set_pixdiv(val);
-    
+
     __cpm_start_lcd();
 }
 
 void lcd_init_controller(void)
 {
+#ifdef USB_BOOT
     _display_pin_init();
+#endif
     _set_lcd_bus();
     _set_lcd_clock();
     SLEEP(1000);

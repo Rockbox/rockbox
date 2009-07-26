@@ -22,7 +22,6 @@
 #include "config.h"
 #include "jz4740.h"
 #include "backlight.h"
-#include "backlight-target.h"
 #include "font.h"
 #include "lcd.h"
 #include "usb.h"
@@ -192,7 +191,6 @@ int main(void)
     {
         printf("Starting Rockbox...");
         adc_close();      /* Disable SADC */
-        _backlight_off(); /* Force backlight off to prevent LCD 'flicker' */
 
         disable_interrupt();
         kernel_entry = (void*) CONFIG_SDRAM_START;
