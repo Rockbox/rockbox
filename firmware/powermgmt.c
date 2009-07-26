@@ -49,8 +49,11 @@
 #endif
 
 #if (defined(IAUDIO_X5) || defined(IAUDIO_M5)) && !defined (SIMULATOR)
-#include "pcf50606.h"
 #include "lcd-remote-target.h"
+#endif
+#if (defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(COWON_D2)) \
+    && !defined (SIMULATOR)
+#include "pcf50606.h"
 #endif
 
 /** Shared by sim **/
@@ -788,7 +791,7 @@ void sys_poweroff(void)
     /* If the main thread fails to shut down the system, we will force a
        power off after an 20 second timeout - 28 seconds if recording */
     if (shutdown_timeout == 0) {
-#if defined(IAUDIO_X5) || defined(IAUDIO_M5)
+#if defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(COWON_D2)
         pcf50606_reset_timeout(); /* Reset timer on first attempt only */
 #endif
 #ifdef HAVE_RECORDING
@@ -806,7 +809,7 @@ void cancel_shutdown(void)
 {
     logf("cancel_shutdown()");
 
-#if defined(IAUDIO_X5) || defined(IAUDIO_M5)
+#if defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(COWON_D2)
     /* TODO: Move some things to target/ tree */
     if (shutdown_timeout)
         pcf50606_reset_timeout();

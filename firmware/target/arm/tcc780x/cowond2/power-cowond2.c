@@ -25,6 +25,8 @@
 #include "pcf50606.h"
 #include "button-target.h"
 #include "tuner.h"
+#include "backlight-target.h"
+#include "powermgmt.h"
 
 void power_init(void)
 {
@@ -50,8 +52,13 @@ void power_init(void)
 
 void power_off(void)
 {
-    /* Forcibly cut power to SoC & peripherals by putting the PCF to sleep */
-    pcf50606_write(PCF5060X_OOCC1, GOSTDBY | CHGWAK | EXTONWAK);
+    /* Turn the backlight off first to avoid a bright stripe on power-off */
+    _backlight_off();
+    sleep(HZ/10);
+    
+    /* Power off the player using the same mechanism as the OF */
+    GPIOA_CLEAR = (1<<7);
+    while(true);
 }
 
 #ifndef BOOTLOADER
@@ -64,12 +71,11 @@ void EXT3(void)
 
     if (data[0] & 0x04)
     {
-        /* ONKEY1S: don't reset the timeout, because we want a way to power off
-           the player in the event of a crashed plugin or UIE/panic, etc. */
-#if 0
-        /* ONKEY1S: reset timeout as we're using SW poweroff */
-        pcf50606_write(0x08, pcf50606_read(0x08) | 0x02); /* OOCC1: TOTRST=1 */
-#endif
+        /* ONKEY1S */
+        if (!charger_inserted())
+            sys_poweroff();
+        else
+            pcf50606_reset_timeout();
     }
 
     if (data[2] & 0x08)

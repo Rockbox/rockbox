@@ -55,3 +55,10 @@ void pcf50606_init(void)
 {
     // TODO
 }
+
+void pcf50606_reset_timeout(void)
+{
+    int level = disable_irq_save();
+    pcf50606_write(PCF5060X_OOCC1, pcf50606_read(PCF5060X_OOCC1) | TOTRST);
+    restore_irq(level);
+}
