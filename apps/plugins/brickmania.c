@@ -771,6 +771,8 @@ static int brickmania_help(void)
         "G", "Glue:", "ball", "sticks", "to", "paddle", "",
         "B", "Ball:", "generates", "another", "ball", "",
         "FL", "Flip:", "flips", "left / right", "movement", "",
+        "<->", "or", "<E>:", "enlarges", "the", "paddle", "",
+        ">-<", "or", ">B<:", "shrinks", "the", "paddle", "",
     };
     static struct style_text formation[]={
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
