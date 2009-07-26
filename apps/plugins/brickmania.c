@@ -214,6 +214,8 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #endif
 
 #include "pluginbitmaps/brickmania_pads.h"
+#include "pluginbitmaps/brickmania_short_pads.h"
+#include "pluginbitmaps/brickmania_long_pads.h"
 #include "pluginbitmaps/brickmania_bricks.h"
 #include "pluginbitmaps/brickmania_powerups.h"
 #include "pluginbitmaps/brickmania_ball.h"
@@ -221,10 +223,12 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 
 #define PAD_WIDTH        BMPWIDTH_brickmania_pads
 #define PAD_HEIGHT       (BMPHEIGHT_brickmania_pads/3)
+#define SHORT_PAD_WIDTH  BMPWIDTH_brickmania_short_pads
+#define LONG_PAD_WIDTH   BMPWIDTH_brickmania_long_pads
 #define BRICK_HEIGHT     (BMPHEIGHT_brickmania_bricks/7)
 #define BRICK_WIDTH      BMPWIDTH_brickmania_bricks
 #define LEFTMARGIN       ((LCD_WIDTH-10*BRICK_WIDTH)/2)
-#define POWERUP_HEIGHT   (BMPHEIGHT_brickmania_powerups/7)
+#define POWERUP_HEIGHT   (BMPHEIGHT_brickmania_powerups/9)
 #define POWERUP_WIDTH    BMPWIDTH_brickmania_powerups
 #define BALL             BMPHEIGHT_brickmania_ball
 #define HALFBALL         ((BALL+1)/2)
@@ -585,6 +589,7 @@ int used_balls=1;
 bool saved_game=false;
 int l_score=0;
 int difficulty = EASY;
+int pad_width;
 
 typedef struct cube {
     int powertop;
@@ -642,7 +647,7 @@ static void brickmania_int_game(int new_game)
         ball[i].tempy=0;
         ball[i].tempx=0;
         ball[i].pos_y=PAD_POS_Y-BALL;
-        ball[i].pos_x=pad_pos_x+(PAD_WIDTH/2)-2;
+        ball[i].pos_x=LCD_WIDTH/2-2;
         ball[i].glue=false;
     }
 
@@ -650,7 +655,7 @@ static void brickmania_int_game(int new_game)
     start_game =1;
     con_game =0;
     pad_type=0;
-
+    pad_width=PAD_WIDTH;
     flip_sides=false;
 
     if (new_game==1) {
@@ -1029,7 +1034,7 @@ static int brickmania_game_loop(void)
             /* the bricks */
             for (i=0;i<=7;i++) {
                 for (j=0;j<=9;j++) {
-                    if (brick[i*10+j].power<7) {
+                    if (brick[i*10+j].power<9) {
                         if (brick[i*10+j].poweruse==2) {
                             if (con_game!=1)
                                 brick[i*10+j].powertop+=2;
@@ -1047,7 +1052,7 @@ static int brickmania_game_loop(void)
                     }
 
                     if ((pad_pos_x<LEFTMARGIN+j*BRICK_WIDTH+5 &&
-                         pad_pos_x+PAD_WIDTH>LEFTMARGIN+j*BRICK_WIDTH+5) &&
+                         pad_pos_x+pad_width>LEFTMARGIN+j*BRICK_WIDTH+5) &&
                         brick[i*10+j].powertop+6>=PAD_POS_Y &&
                         brick[i*10+j].poweruse==2) {
                         switch(brick[i*10+j].power) {
@@ -1078,6 +1083,8 @@ static int brickmania_game_loop(void)
                                 for(k=0;k<used_balls;k++)
                                     ball[k].glue=false;
                                 flip_sides=false;
+                                pad_pos_x+=(pad_width-PAD_WIDTH)/2;
+                                pad_width=PAD_WIDTH;
                                 break;
                             case 5:
                                 score+=23;
@@ -1091,6 +1098,31 @@ static int brickmania_game_loop(void)
                                 ball[used_balls-1].x= rb->rand()%1 == 0 ?
                                     -1 : 1;
                                 ball[used_balls-1].y= -4;
+                                break;
+                            case 7:
+                                score+=23;
+                                if (pad_width==PAD_WIDTH) {
+                                    pad_width=LONG_PAD_WIDTH;
+                                    pad_pos_x-=(LONG_PAD_WIDTH-PAD_WIDTH)/2;
+                                }
+                                else if (pad_width==SHORT_PAD_WIDTH) {
+                                    pad_width=PAD_WIDTH;
+                                    pad_pos_x-=(PAD_WIDTH-SHORT_PAD_WIDTH)/2;
+                                }
+                                if (pad_pos_x < 0)
+                                    pad_pos_x = 0;
+                                else if(pad_pos_x+pad_width > LCD_WIDTH)
+                                    pad_pos_x = LCD_WIDTH-pad_width;
+                                break;
+                            case 8:
+                                if (pad_width==PAD_WIDTH) {
+                                    pad_width=SHORT_PAD_WIDTH;
+                                    pad_pos_x+=(PAD_WIDTH-SHORT_PAD_WIDTH)/2;
+                                }
+                                else if (pad_width==LONG_PAD_WIDTH) {
+                                    pad_width=PAD_WIDTH;
+                                    pad_pos_x+=(LONG_PAD_WIDTH-PAD_WIDTH)/2;
+                                }
                                 break;
                         }
                         brick[i*10+j].poweruse=1;
@@ -1296,14 +1328,14 @@ static int brickmania_game_loop(void)
             } /* for i */
 
             /* draw the pad */
-            rb->lcd_bitmap_part(brickmania_pads,0,pad_type*PAD_HEIGHT,
-                                PAD_WIDTH,pad_pos_x, PAD_POS_Y, PAD_WIDTH,
+            rb->lcd_bitmap_part(pad_width==PAD_WIDTH?brickmania_pads:pad_width==LONG_PAD_WIDTH?brickmania_long_pads:brickmania_short_pads,0,pad_type*PAD_HEIGHT,
+                                pad_width,pad_pos_x, PAD_POS_Y, pad_width,
                                 PAD_HEIGHT);
 
             for(k=0;k<used_balls;k++) {
 
                 if ((ball[k].pos_x >= pad_pos_x &&
-                     ball[k].pos_x <= pad_pos_x+PAD_WIDTH) &&
+                     ball[k].pos_x <= pad_pos_x+pad_width) &&
                     (PAD_POS_Y-4<ball[k].pos_y+BALL &&
                      PAD_POS_Y>ball[k].pos_y+BALL) && (ball[k].y >0))
                     ball[k].tempy=PAD_POS_Y-ball[k].pos_y-BALL;
@@ -1337,7 +1369,7 @@ static int brickmania_game_loop(void)
                         ball[used_balls].tempy=0;
                         ball[used_balls].tempx=0;
                         ball[used_balls].pos_y=PAD_POS_Y-BALL;
-                        ball[used_balls].pos_x=pad_pos_x+(PAD_WIDTH/2)-2;
+                        ball[used_balls].pos_x=pad_pos_x+(pad_width/2)-2;
 
                         k--;
                         continue;
@@ -1359,65 +1391,65 @@ static int brickmania_game_loop(void)
 
                 if ((ball[k].pos_y+BALL >= PAD_POS_Y &&
                      (ball[k].pos_x >= pad_pos_x &&
-                      ball[k].pos_x <= pad_pos_x+PAD_WIDTH)) &&
+                      ball[k].pos_x <= pad_pos_x+pad_width)) &&
                     start_game != 1 && !ball[k].glue) {
 
                     if ((ball[k].pos_x+HALFBALL >= pad_pos_x &&
                          ball[k].pos_x+HALFBALL <=
-                         pad_pos_x+(PAD_WIDTH/2/4)) ||
+                         pad_pos_x+(pad_width/2/4)) ||
                         (ball[k].pos_x +HALFBALL>=
-                         pad_pos_x+(PAD_WIDTH-(PAD_WIDTH/2/4)) &&
-                         ball[k].pos_x+HALFBALL <= pad_pos_x+PAD_WIDTH)) {
+                         pad_pos_x+(pad_width-(pad_width/2/4)) &&
+                         ball[k].pos_x+HALFBALL <= pad_pos_x+pad_width)) {
 
                         ball[k].y = -2;
                         if (ball[k].pos_x != 0 &&
                             ball[k].pos_x+BALL!=LCD_WIDTH)
                             ball[k].x = brickmania_pad_check(6,0,ball[k].pos_x+2<=
-                                                  pad_pos_x+(PAD_WIDTH/2)?
+                                                  pad_pos_x+(pad_width/2)?
                                                   0:1,k);
 
                     }
                     else if ((ball[k].pos_x+HALFBALL >=
-                              pad_pos_x+(PAD_WIDTH/2/4) &&
+                              pad_pos_x+(pad_width/2/4) &&
                               ball[k].pos_x+HALFBALL <=
-                              pad_pos_x+2*(PAD_WIDTH/2/4)) ||
+                              pad_pos_x+2*(pad_width/2/4)) ||
                              (ball[k].pos_x+HALFBALL >=
-                              pad_pos_x+(PAD_WIDTH-2*(PAD_WIDTH/2/4)) &&
+                              pad_pos_x+(pad_width-2*(pad_width/2/4)) &&
                               ball[k].pos_x+HALFBALL <=
-                              pad_pos_x+(PAD_WIDTH-(PAD_WIDTH/2/4)) )) {
+                              pad_pos_x+(pad_width-(pad_width/2/4)) )) {
 
                         ball[k].y = -3;
                         if (ball[k].pos_x != 0 &&
                             ball[k].pos_x+BALL!=LCD_WIDTH)
                             ball[k].x = brickmania_pad_check(4,0,ball[k].pos_x+2<=
-                                                  pad_pos_x+(PAD_WIDTH/2)?
+                                                  pad_pos_x+(pad_width/2)?
                                                   0:1,k);
 
                     }
                     else if ((ball[k].pos_x+HALFBALL >=
-                              pad_pos_x+2*(PAD_WIDTH/2/4) &&
+                              pad_pos_x+2*(pad_width/2/4) &&
                               ball[k].pos_x+HALFBALL <=
-                              pad_pos_x+3*(PAD_WIDTH/2/4)) ||
+                              pad_pos_x+3*(pad_width/2/4)) ||
                              (ball[k].pos_x+2 >=
-                              pad_pos_x+(PAD_WIDTH-3*(PAD_WIDTH/2/4)) &&
+                              pad_pos_x+(pad_width-3*(pad_width/2/4)) &&
                               ball[k].pos_x+2 <=
-                              pad_pos_x+ ((PAD_WIDTH/2)-2*(PAD_WIDTH/2/4)) )) {
+                              pad_pos_x+ ((pad_width/2)-2*(pad_width/2/4)) )) {
 
                         ball[k].y = -4;
                         if (ball[k].pos_x != 0 &&
                             ball[k].pos_x+BALL!=LCD_WIDTH)
                             ball[k].x = brickmania_pad_check(3,0,ball[k].pos_x+2<=
-                                                  pad_pos_x+(PAD_WIDTH/2)?
+                                                  pad_pos_x+(pad_width/2)?
                                                   0:1,k);
 
                     }
                     else if ((ball[k].pos_x+HALFBALL >=
-                              pad_pos_x+3*(PAD_WIDTH/2/4) &&
+                              pad_pos_x+3*(pad_width/2/4) &&
                               ball[k].pos_x+HALFBALL <=
-                              pad_pos_x+4*(PAD_WIDTH/2/4)-2) ||
-                             (ball[k].pos_x+2 >= pad_pos_x+(PAD_WIDTH/2+2) &&
+                              pad_pos_x+4*(pad_width/2/4)-2) ||
+                             (ball[k].pos_x+2 >= pad_pos_x+(pad_width/2+2) &&
                               ball[k].pos_x+2 <=
-                              pad_pos_x+(PAD_WIDTH-3*(PAD_WIDTH/2/4)) )) {
+                              pad_pos_x+(pad_width-3*(pad_width/2/4)) )) {
 
                         ball[k].y = -4;
                         if (ball[k].pos_x != 0 &&
@@ -1441,7 +1473,7 @@ static int brickmania_game_loop(void)
                 if (ball[k].pos_y+5 >= PAD_POS_Y &&
                     (pad_type==1 && !ball[k].glue) &&
                     (ball[k].pos_x >= pad_pos_x &&
-                     ball[k].pos_x <= pad_pos_x+PAD_WIDTH)) {
+                     ball[k].pos_x <= pad_pos_x+pad_width)) {
                     ball[k].y=0;
                     ball[k].pos_y=PAD_POS_Y-BALL;
                     ball[k].glue=true;
@@ -1511,15 +1543,15 @@ static int brickmania_game_loop(void)
                 touch_y = rb->button_get_data() & 0xffff;
                 if(touch_y >= PAD_POS_Y && touch_y <= PAD_POS_Y+PAD_HEIGHT)
                 {
-                    pad_pos_x += (flip_sides ? -1 : 1) * ( (touch_x-pad_pos_x-PAD_WIDTH/2) / 4 );
+                    pad_pos_x += (flip_sides ? -1 : 1) * ( (touch_x-pad_pos_x-pad_width/2) / 4 );
                     
                     if(pad_pos_x < 0)
                         pad_pos_x = 0;
-                    else if(pad_pos_x+PAD_WIDTH > LCD_WIDTH)
-                        pad_pos_x = LCD_WIDTH-PAD_WIDTH;
+                    else if(pad_pos_x+pad_width > LCD_WIDTH)
+                        pad_pos_x = LCD_WIDTH-pad_width;
                     for(k=0;k<used_balls;k++)
                         if ((start_game==1 || ball[k].glue))
-                            ball[k].pos_x = pad_pos_x+PAD_WIDTH/2;
+                            ball[k].pos_x = pad_pos_x+pad_width/2;
                 }
                 
                 if(button & BUTTON_REL)
@@ -1540,11 +1572,11 @@ static int brickmania_game_loop(void)
                     continue;
                 if ((button_right && flip_sides==false) ||
                     (button_left && flip_sides==true)) {
-                    if (pad_pos_x+8+PAD_WIDTH > LCD_WIDTH) {
+                    if (pad_pos_x+8+pad_width > LCD_WIDTH) {
                         for(k=0;k<used_balls;k++)
                             if (start_game==1 || ball[k].glue)
-                                ball[k].pos_x+=LCD_WIDTH-pad_pos_x-PAD_WIDTH;
-                        pad_pos_x+=LCD_WIDTH-pad_pos_x-PAD_WIDTH;
+                                ball[k].pos_x+=LCD_WIDTH-pad_pos_x-pad_width;
+                        pad_pos_x+=LCD_WIDTH-pad_pos_x-pad_width;
                     }
                     else {
                         for(k=0;k<used_balls;k++)
@@ -1579,7 +1611,7 @@ static int brickmania_game_loop(void)
                     if (start_game==1 && con_game!=1 && pad_type!=1) {
                         for(k=0;k<used_balls;k++) {
                             ball[k].y=-4;
-                            ball[k].x=pad_pos_x+(PAD_WIDTH/2)-2>=
+                            ball[k].x=pad_pos_x+(pad_width/2)-2>=
                                 LCD_WIDTH/2?2:-2;
                         }
                         start_game =0;
@@ -1605,7 +1637,7 @@ static int brickmania_game_loop(void)
                         fire[tfire].left=pad_pos_x+1;
                         tfire=brickmania_fire_space();
                         fire[tfire].top=PAD_POS_Y-7;
-                        fire[tfire].left=pad_pos_x+PAD_WIDTH-1;
+                        fire[tfire].left=pad_pos_x+pad_width-1;
                     } else if (con_game==1 && start_game!=1) {
                         for(k=0;k<used_balls;k++) {
                             ball[k].x=x[k];
