@@ -29,6 +29,9 @@
 #include "button-target.h"
 #include "usb-target.h"
 #include "usb_drv.h"
+#ifdef HAVE_REMOTE_LCD
+#include "lcd-remote-target.h"
+#endif
 
 #ifndef BOOTLOADER
 extern void TIMER1(void);
@@ -121,6 +124,9 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
         else if (CPU_HI_INT_STAT & GPIO0_MASK) {
             if (GPIOD_INT_STAT & 0x02)
                 button_int();
+            if (GPIOD_INT_STAT & 0x80)
+                headphones_int();
+
         }
         else if (CPU_HI_INT_STAT & GPIO2_MASK) {
             if (GPIOL_INT_STAT & 0x04)

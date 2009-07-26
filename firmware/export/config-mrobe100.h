@@ -45,7 +45,24 @@
 
 /*#define IRAM_LCDFRAMEBUFFER IDATA_ATTR */ /* put the lcd frame buffer in IRAM */
 
-#define CONFIG_KEYPAD MROBE100_PAD
+#ifndef BOOTLOADER
+/* Define this if you have an remote lcd */
+#define HAVE_REMOTE_LCD
+
+#define LCD_REMOTE_WIDTH  79
+#define LCD_REMOTE_HEIGHT 16
+#define LCD_REMOTE_DEPTH        1
+#define LCD_REMOTE_PIXELFORMAT  VERTICAL_PACKING
+
+/* Remote display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_REMOTE_DARKCOLOR       0x000000
+#define LCD_REMOTE_BRIGHTCOLOR     0x5a915a
+#define LCD_REMOTE_BL_DARKCOLOR    0x000000
+#define LCD_REMOTE_BL_BRIGHTCOLOR  0x82b4fa
+#endif /* BOOTLOADER */
+
+#define CONFIG_KEYPAD        MROBE100_PAD
+#define CONFIG_REMOTE_KEYPAD MROBE_REMOTE
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
@@ -89,6 +106,11 @@
 #define HAVE_BUTTON_LIGHT
 
 #define HAVE_BUTTONLIGHT_BRIGHTNESS
+
+/* Remote LCD contrast range and defaults */
+#define MIN_REMOTE_CONTRAST_SETTING     0
+#define MAX_REMOTE_CONTRAST_SETTING     15
+#define DEFAULT_REMOTE_CONTRAST_SETTING 8
 
 /* Define this if your LCD can be enabled/disabled */
 /* TODO: #define HAVE_LCD_ENABLE */

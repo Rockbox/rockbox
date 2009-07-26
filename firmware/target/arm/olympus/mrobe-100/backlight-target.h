@@ -26,6 +26,11 @@ bool _backlight_init(void); /* Returns backlight current state (true=ON). */
 void _backlight_hw_on(void);
 void _backlight_hw_off(void);
 
+#ifdef HAVE_REMOTE_LCD
+void _remote_backlight_on(void);
+void _remote_backlight_off(void);
+#endif
+
 #ifdef BOOTLOADER
 #define _backlight_on() _backlight_hw_on()
 #define _backlight_off() _backlight_hw_off()

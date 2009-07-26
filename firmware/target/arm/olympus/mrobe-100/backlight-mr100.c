@@ -22,6 +22,7 @@
 #include "config.h"
 #include "system.h"
 #include "backlight-target.h"
+#include "lcd-remote-target.h"
 
 #define MIN_BRIGHTNESS 0x80ff08ff
 
@@ -62,3 +63,15 @@ void _buttonlight_off(void)
     /* turn off all touchpad leds */
     GPIOA_OUTPUT_VAL &= ~BUTTONLIGHT_ALL;
 }
+
+#ifdef HAVE_REMOTE_LCD
+void _remote_backlight_on(void)
+{
+    lcd_remote_backlight(true);
+}
+
+void _remote_backlight_off(void)
+{
+    lcd_remote_backlight(false);
+}
+#endif

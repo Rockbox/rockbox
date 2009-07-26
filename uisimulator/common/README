@@ -8,6 +8,3 @@
 This directory is for code that is shared between all versions of the
 simulator, but is not needed for the target device.
 
-The first code is for the software mpeg audio decoder.  The actual
-mpeg decoding code is here and the O/S specific sound drivers should
-be located in the x11 and win32 directories as appropriate.

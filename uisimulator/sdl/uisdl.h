@@ -163,14 +163,14 @@
 #define UI_LCD_POSY                 90 /* y position of lcd */
 
 #elif defined(MROBE_500)
-#if LCD_WIDHT==320
+#if LCD_WIDTH==320
 #define UI_TITLE                    "Olympus M:Robe 500"
 #define UI_WIDTH                    450 /* width of GUI window */
 #define UI_HEIGHT                   350 /* height of GUI window */
 #define UI_LCD_POSX                 65 /* x position of lcd */
 #define UI_LCD_POSY                 30 /* y position of lcd */
-#define UI_REMOTE_POSX              50  /* x position of remote lcd */
-#define UI_REMOTE_POSY              325 /* y position of remote lcd */
+#define UI_REMOTE_POSX              36  /* x position of remote lcd */
+#define UI_REMOTE_POSY              318 /* y position of remote lcd */
 #else
 #define UI_TITLE                    "Olympus M:Robe 500"
 #define UI_WIDTH                    900 /* width of GUI window */
@@ -235,9 +235,11 @@
 #elif defined(MROBE_100)
 #define UI_TITLE                    "Olympus M:Robe 100"
 #define UI_WIDTH                    247 /* width of GUI window */
-#define UI_HEIGHT                   416 /* height of GUI window */
+#define UI_HEIGHT                   462 /* height of GUI window */
 #define UI_LCD_POSX                 43 /* x position of lcd */
 #define UI_LCD_POSY                 25 /* y position of lcd */
+#define UI_REMOTE_POSX              34 /* x position of remote lcd */
+#define UI_REMOTE_POSY              432 /* y position of remote lcd */
 
 #elif defined(COWON_D2)
 #define UI_TITLE                    "Cowon D2"

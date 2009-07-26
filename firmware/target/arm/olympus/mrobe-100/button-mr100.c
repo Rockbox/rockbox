@@ -25,6 +25,12 @@
 #include "backlight-target.h"
 #include "synaptics-mep.h"
 
+#ifdef HAVE_REMOTE_LCD
+#include "lcd-remote-target.h"
+static bool remote_hold = false;
+static bool headphones_status = true;
+#endif
+
 #define LOGF_ENABLE
 #include "logf.h"
 
@@ -56,6 +62,13 @@ void button_init_device(void)
     {
         logf("touchpad not ready");
     }
+
+    /* headphone detection bit */
+    GPIOD_OUTPUT_EN &= ~0x80;
+    GPIOD_ENABLE |= 0x80;
+
+    /* remote detection (via headphone state) */
+    headphones_int();
 }
 
 /*
@@ -102,13 +115,35 @@ void button_init_device(void){}
  */
 int button_read_device(void)
 {
-    int btn = int_btn;
+    int btn = BUTTON_NONE;
 
-    if(button_hold())
-        return BUTTON_NONE;
-    
-    if (~GPIOA_INPUT_VAL & 0x40)
-        btn |= BUTTON_POWER;
+#ifdef HAVE_REMOTE_LCD
+    unsigned char data[5];
+
+    if (lcd_remote_read_device(data))
+    {
+        remote_hold = (data[2] & 0x80) ? true : false;
+        if (!remote_hold)
+        {
+            if (data[1] & 0x1)  btn |= BUTTON_RC_PLAY;
+            if (data[1] & 0x2)  btn |= BUTTON_RC_DOWN;
+            if (data[1] & 0x4)  btn |= BUTTON_RC_FF;
+            if (data[1] & 0x8)  btn |= BUTTON_RC_REW;
+            if (data[1] & 0x10) btn |= BUTTON_RC_VOL_UP;
+            if (data[1] & 0x20) btn |= BUTTON_RC_VOL_DOWN;
+            if (data[1] & 0x40) btn |= BUTTON_RC_MODE;
+            if (data[1] & 0x80) btn |= BUTTON_RC_HEART;
+        }
+    }
+#endif
+
+    if(!button_hold())
+    {
+        btn |= int_btn;
+
+        if (~GPIOA_INPUT_VAL & 0x40)
+            btn |= BUTTON_POWER;
+    }
 
     return btn;
 }
@@ -118,7 +153,32 @@ bool button_hold(void)
     return (GPIOD_INPUT_VAL & 0x10) ? false : true;
 }
 
+#ifdef HAVE_REMOTE_LCD
+bool remote_button_hold(void)
+{
+    return remote_hold;
+}
+
+bool headphones_inserted(void)
+{
+    return headphones_status;
+}
+
+void headphones_int(void)
+{
+    int state = 0x80 & ~GPIOD_INPUT_VAL;
+    headphones_status = (state) ? true : false;
+
+    GPIO_CLEAR_BITWISE(GPIOD_INT_EN, 0x80);
+    GPIO_WRITE_BITWISE(GPIOD_INT_LEV, state, 0x80);
+    GPIO_WRITE_BITWISE(GPIOD_INT_CLR, 0x80, 0x80);
+    GPIO_SET_BITWISE(GPIOD_INT_EN, 0x80);
+
+    lcd_remote_on();
+}
+#else
 bool headphones_inserted(void)
 {
     return (GPIOD_INPUT_VAL & 0x80) ? false : true;
 }
+#endif

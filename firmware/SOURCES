@@ -909,6 +909,7 @@ target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 #ifndef SIMULATOR
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c
+target/arm/olympus/mrobe-100/lcd-remote-mr100.c
 #endif /* BOOTLOADER */
 drivers/sw_i2c.c
 target/arm/ata-as-arm.S

@@ -760,6 +760,30 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_POWER;
         break;
 #elif CONFIG_KEYPAD == MROBE100_PAD
+    case SDLK_F9:
+        new_btn = BUTTON_RC_HEART;
+        break;
+    case SDLK_F10:
+        new_btn = BUTTON_RC_MODE;
+        break;
+    case SDLK_F11:
+        new_btn = BUTTON_RC_VOL_DOWN;
+        break;
+    case SDLK_F12:
+        new_btn = BUTTON_RC_VOL_UP;
+        break;
+    case SDLK_LEFT:
+        new_btn = BUTTON_RC_FF;
+        break;
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RC_REW;
+        break;
+    case SDLK_UP:
+        new_btn = BUTTON_RC_PLAY;
+        break;
+    case SDLK_DOWN:
+        new_btn = BUTTON_RC_DOWN;
+        break;
     case SDLK_KP1:
         new_btn = BUTTON_DISPLAY;
         break;
@@ -770,19 +794,15 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_PLAY;
         break;
     case SDLK_KP4:
-    case SDLK_LEFT:
         new_btn = BUTTON_LEFT;
         break;
     case SDLK_KP6:
-    case SDLK_RIGHT:
         new_btn = BUTTON_RIGHT;
         break;
     case SDLK_KP8:
-    case SDLK_UP:
         new_btn = BUTTON_UP;
         break;
     case SDLK_KP2:
-    case SDLK_DOWN:
         new_btn = BUTTON_DOWN;
         break;
     case SDLK_KP5:

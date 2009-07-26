@@ -27,6 +27,7 @@
 #include "power.h"
 #include "logf.h"
 #include "usb.h"
+#include "lcd-remote-target.h"
 
 void power_init(void)
 {
@@ -57,6 +58,10 @@ bool ide_powered(void)
 
 void power_off(void)
 {
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_off();
+#endif
+
     /* Disable interrupts on this core */
     disable_interrupt(IRQ_FIQ_STATUS);
 
