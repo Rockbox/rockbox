@@ -328,13 +328,8 @@ static void categorize(COOKContext *q, int* quant_index_table,
             --exp_index2[index];
         }
     }
-
-    for(i=0 ; i<q->total_subbands ; i++)
-        category[i] = exp_index2[i];
-
-    for(i=0 ; i<q->numvector_size-1 ; i++)
-        category_index[i] = tmp_categorize_array[tmp_categorize_array2_idx++];
-
+    memcpy(category, exp_index2, sizeof(int) * q->total_subbands );
+    memcpy(category_index, tmp_categorize_array+tmp_categorize_array2_idx, sizeof(int) * (q->numvector_size-1) );
 }
 
 
@@ -370,27 +365,38 @@ static int unpack_SQVH(COOKContext *q, int category, int* subband_coef_index,
 
     vd = vd_tab[category];
     result = 0;
-    for(i=0 ; i<vpr_tab[category] ; i++){
+    for(i=0 ; i<vpr_tab[category] ; i++)
+    {
         vlc = get_vlc2(&q->gb, q->sqvh[category].table, q->sqvh[category].bits, 3);
-        if (q->bits_per_subpacket < get_bits_count(&q->gb)){
+        if (q->bits_per_subpacket < get_bits_count(&q->gb))
+        {
             vlc = 0;
             result = 1;
+            memset(subband_coef_index, 0, sizeof(int)*vd);
+            memset(subband_coef_sign, 0, sizeof(int)*vd);
+            subband_coef_index+=vd;
+            subband_coef_sign+=vd;
         }
-        for(j=vd-1 ; j>=0 ; j--){
-            tmp = (vlc * invradix_tab[category])/0x100000;
-            subband_coef_index[vd*i+j] = vlc - tmp * (kmax_tab[category]+1);
-            vlc = tmp;
-        }
-        for(j=0 ; j<vd ; j++){
-            if (subband_coef_index[i*vd + j]) {
-                if(get_bits_count(&q->gb) < q->bits_per_subpacket){
-                    subband_coef_sign[i*vd+j] = get_bits1(&q->gb);
+        else
+        {
+            for(j=vd-1 ; j>=0 ; j--){
+                tmp = (vlc * invradix_tab[category])/0x100000;
+                subband_coef_index[j] = vlc - tmp * (kmax_tab[category]+1);
+                vlc = tmp;
+            }
+
+            for(j=0 ; j<vd ; j++)
+            {
+                if (*subband_coef_index++) {
+                    if(get_bits_count(&q->gb) < q->bits_per_subpacket) {
+                        *subband_coef_sign++ = get_bits1(&q->gb);
+                    } else {
+                        result=1;
+                        *subband_coef_sign++=0;
+                    }
                 } else {
-                    result=1;
-                    subband_coef_sign[i*vd+j]=0;
+                    *subband_coef_sign++=0;
                 }
-            } else {
-                subband_coef_sign[i*vd+j]=0;
             }
         }
     }
@@ -505,7 +511,7 @@ static void decouple_info(COOKContext *q, int* decouple_tab){
 
 static void joint_decode(COOKContext *q, REAL_T* mlt_buffer1,
                          REAL_T* mlt_buffer2) {
-    int i,j;
+    int i;
     int decouple_tab[SUBBAND_SIZE];
     REAL_T *decode_buffer = q->decode_buffer_0;
     int idx;
@@ -520,11 +526,14 @@ static void joint_decode(COOKContext *q, REAL_T* mlt_buffer1,
     mono_decode(q, decode_buffer);
 
     /* The two channels are stored interleaved in decode_buffer. */
-    for (i=0 ; i<q->js_subband_start ; i++) {
-        for (j=0 ; j<SUBBAND_SIZE ; j++) {
-            mlt_buffer1[i*20+j] = decode_buffer[i*40+j];
-            mlt_buffer2[i*20+j] = decode_buffer[i*40+20+j];
-        }
+    REAL_T * mlt_buffer1_end = mlt_buffer1 + (q->js_subband_start*SUBBAND_SIZE);
+    while(mlt_buffer1 < mlt_buffer1_end)
+    {
+        memcpy(mlt_buffer1,decode_buffer,sizeof(REAL_T)*SUBBAND_SIZE);
+        memcpy(mlt_buffer2,decode_buffer+20,sizeof(REAL_T)*SUBBAND_SIZE);
+        mlt_buffer1 += 20;
+        mlt_buffer2 += 20;
+        decode_buffer += 40;
     }
 
     /* When we reach js_subband_start (the higher frequencies)
@@ -533,11 +542,15 @@ static void joint_decode(COOKContext *q, REAL_T* mlt_buffer1,
     for (i=q->js_subband_start ; i<q->subbands ; i++) {
         int i1 = decouple_tab[cplband[i]];
         int i2 = idx - i1 - 1;
-        for (j=0 ; j<SUBBAND_SIZE ; j++) {
-            REAL_T x = decode_buffer[((q->js_subband_start + i)*20)+j];
-            mlt_buffer1[20*i+j] = cplscale_math(x, q->js_vlc_bits, i1);
-            mlt_buffer2[20*i+j] = cplscale_math(x, q->js_vlc_bits, i2);
+        mlt_buffer1_end = mlt_buffer1 + SUBBAND_SIZE;
+        while(mlt_buffer1 < mlt_buffer1_end)
+        {
+            *mlt_buffer1++ = cplscale_math(*decode_buffer, q->js_vlc_bits, i1);
+            *mlt_buffer2++ = cplscale_math(*decode_buffer++, q->js_vlc_bits, i2);
         }
+        mlt_buffer1 += (20-SUBBAND_SIZE);
+        mlt_buffer2 += (20-SUBBAND_SIZE);
+        decode_buffer += (20-SUBBAND_SIZE);
     }
 }
 
@@ -581,7 +594,7 @@ decode_bytes_and_gain(COOKContext *q, const uint8_t *inbuffer,
  * @param chan              0: left or single channel, 1: right channel
  */
 
-static inline void
+static void
 mlt_compensate_output(COOKContext *q, REAL_T *decode_buffer,
                       cook_gains *gains, REAL_T *previous_buffer,
                       int16_t *out, int chan)

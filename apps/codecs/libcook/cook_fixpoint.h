@@ -35,8 +35,13 @@
  *    in C using two 32 bit integer multiplications.
  */
 
+/* get definitions of MULT31, MULT31_SHIFT15, CLIP_TO_15, vect_add, from codelib */
+#include "asm_arm.h"
+#include "asm_mcf5249.h"
+#include "codeclib_misc.h"
+
 /* The following table is taken from libavutil/mathematics.c */
-const uint8_t ff_log2_tab[256]={
+const uint8_t ff_log2_tab[256] ={
         0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
         5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
         6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
@@ -67,6 +72,11 @@ static inline FIXP fixp_pow2(FIXP x, int i)
     return x << i;              /* no check for overflow */
 }
 
+static inline FIXP fixp_pow2_neg(FIXP x, int i)
+{
+  return (x >> i) + ((x >> (i-1)) & 1);
+}
+
 /**
  * Fixed point multiply by fraction.
  *
@@ -74,53 +84,10 @@ static inline FIXP fixp_pow2(FIXP x, int i)
  * @param b                     fix point fraction, 0 <= b < 1
  */
 
-static inline FIXP fixp_mult_su(FIXP a, FIXPU b)
-{
- 
-    int32_t hb = (a >> 16) * b;
-    uint32_t lb = (a & 0xffff) * b;
-
-    return hb + (lb >> 16) + ((lb & 0x8000) >> 15);
-}
+#define fixp_mult_su(x,y) (MULT31_SHIFT15(x,y))
 
 /* Faster version of the above using 32x32=64 bit multiply */
-#ifdef CPU_ARM
-#define fixmul31(x, y)  \
-    ({ int32_t __hi;  \
-       uint32_t __lo;  \
-       int32_t __result;  \
-       asm ("smull   %0, %1, %3, %4\n\t"  \
-            "movs    %2, %1, lsl #1"  \
-            : "=&r" (__lo), "=&r" (__hi), "=r" (__result)  \
-            : "%r" (x), "r" (y)  \
-            : "cc");  \
-       __result;  \
-    })
-
-#elif defined(CPU_COLDFIRE)
-static inline int32_t fixmul31(int32_t x, int32_t y)
-{
-    asm (
-        "mac.l   %[x], %[y], %%acc0  \n" /* multiply */
-        "movclr.l %%acc0, %[x]  \n"     /* get higher half */
-        : [x] "+d" (x)
-        : [y] "d"  (y)
-    );
-    return x;
-}
-#else
-static inline int32_t fixmul31(int32_t x, int32_t y)
-{
-    int64_t temp;
-
-    temp = x;
-    temp *= y;
-
-    temp >>= 31;        //16+31-16 = 31 bits
-
-    return (int32_t)temp;
-}
-#endif
+#define fixmul31(x,y) (MULT31(x,y))
 
 /* math functions taken from libavutil/common.h */
 
@@ -169,13 +136,13 @@ static void scalar_dequant_math(COOKContext *q, int index,
                                 int* subband_coef_sign, REAL_T *mlt_p)
 {
     /* Num. half bits to right shift */
-    const int s = 33 - quant_index + av_log2(q->samples_per_channel);
+    const int s = (33 - quant_index + av_log2(q->samples_per_channel)) >> 1;
     const FIXP *table = quant_tables[s & 1][index];
     FIXP f;
     int i;
 
 
-    if(s >= 64)
+    if(s >= 32)
         memset(mlt_p, 0, sizeof(REAL_T)*SUBBAND_SIZE);
     else 
     {
@@ -186,7 +153,7 @@ static void scalar_dequant_math(COOKContext *q, int index,
                 ((subband_coef_index[i] != 0) && subband_coef_sign[i]))
                 f = -f;
 
-            mlt_p[i] =fixp_pow2(f, -(s/2));
+            *mlt_p++ = fixp_pow2_neg(f, s);
         }
     }
 }
@@ -274,10 +241,9 @@ static inline void imlt_math(COOKContext *q, FIXP *in)
 static inline void overlap_math(COOKContext *q, int gain, FIXP buffer[])
 {
     int i;
-    if(LIKELY(gain == 0)){
-        for(i=0 ; i<q->samples_per_channel ; i++) {
-            q->mono_mdct_output[i] += buffer[i];
-        }        
+    if(LIKELY(gain == 0))
+    {
+        vect_add(q->mono_mdct_output, buffer, q->samples_per_channel);
         
     } else if (gain > 0){
         for(i=0 ; i<q->samples_per_channel ; i++) {
@@ -301,7 +267,7 @@ static inline void overlap_math(COOKContext *q, int gain, FIXP buffer[])
  * @param gain_index_next   index for the next block multiplier
  */
 static inline void
-interpolate_math(COOKContext *q, FIXP* buffer,
+interpolate_math(COOKContext *q, register FIXP* buffer,
                  int gain_index, int gain_index_next)
 {
     int i;
@@ -315,14 +281,17 @@ interpolate_math(COOKContext *q, FIXP* buffer,
         int step = (gain_index_next - gain_index)
                    << (7 - av_log2(gain_size_factor));
         int x = 0;
-
-        for(i = 0; i < gain_size_factor; i++) {
-            buffer[i] = fixp_mult_su(buffer[i], pow128_tab[x]);
-            buffer[i] = fixp_pow2(buffer[i], gain_index+1);
+        register FIXP* bufferend = buffer+gain_size_factor;
+        while(buffer < bufferend )
+        {
+            *buffer = fixp_pow2(
+                          fixp_mult_su(*buffer, pow128_tab[x]),
+                          gain_index+1);
+            buffer++;
 
             x += step;
-            gain_index += (x + 128) / 128 - 1;
-            x = (x + 128) % 128;
+            gain_index += ( (x + 128) >> 7 ) - 1;
+            x = ( (x + 128) & 127 );
         }
     }
 }
@@ -349,12 +318,15 @@ static inline FIXP cplscale_math(FIXP x, int table, int i)
  * @param out               pointer to the output buffer
  * @param chan              0: left or single channel, 1: right channel
  */
-static inline void output_math(COOKContext *q, int16_t *out, int chan)
+static inline void output_math(COOKContext *q, register int16_t *out, int chan)
 {
-    int j;
-
-    for (j = 0; j < q->samples_per_channel; j++) {
-        out[chan + q->nb_channels * j] =
-          av_clip(fixp_pow2(q->mono_mdct_output[j], -11), -32768, 32767);
+    register REAL_T * mono_output_ptr = q->mono_mdct_output;
+    register REAL_T * mono_output_end = mono_output_ptr + q->samples_per_channel;
+    out += chan;
+    const int STEP = q->nb_channels;
+    while( mono_output_ptr < mono_output_end )
+    {
+      *out = CLIP_TO_15(fixp_pow2_neg(*mono_output_ptr++, 11));
+      out += STEP;
     }
 }
