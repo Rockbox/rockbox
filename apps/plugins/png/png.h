@@ -299,6 +299,7 @@ You are free to name this file lodepng.cpp or lodepng.c depending on your usage.
 #define PNG_PREVIOUS   BUTTON_PLAYLIST
 
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define PNG_MENU       BUTTON_POWER
 
 #else
 #error No keymap defined!
