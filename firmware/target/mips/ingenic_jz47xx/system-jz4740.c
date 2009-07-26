@@ -29,6 +29,7 @@
 
 #define EXTENDED_EXCEPTION_DESC 0
 #if EXTENDED_EXCEPTION_DESC
+#include "backlight-target.h"
 #include "font.h"
 #include "lcd.h"
 #include "sprintf.h"
@@ -264,6 +265,7 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
     lcd_set_backdrop(NULL);
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
+    _backlight_on();
 
     snprintf(buffer, sizeof(buffer), "0x%08x at 0x%08x", read_c0_badvaddr(), epc);
     lcd_puts(0, 0, parse_exception(cause));
