@@ -46,23 +46,26 @@ bool timer_set(long cycles, bool start)
         pfn_unregister = NULL;
     }
 
-    old_irq = disable_irq_save();
-
-    __tcu_stop_counter(1);
-    __tcu_disable_pwm_output(1);
-
-    __tcu_mask_half_match_irq(1); 
-    __tcu_unmask_full_match_irq(1);
-
-    /* EXTAL clock = CFG_EXTAL (12Mhz in most targets) */
-    __tcu_select_extalclk(1);
-
     /* Increase prescale values starting from 0 to make the cycle count fit */
     while(divider > 65535 && prescaler <= 1024)
     {
         prescaler >>= 2; /* 1, 4, 16, 64, 256, 1024 */
         prescaler_bit++;
         divider = cycles / prescaler;
+    }
+
+    old_irq = disable_irq_save();
+
+    __tcu_stop_counter(1);
+    if(start)
+    {
+        __tcu_disable_pwm_output(1);
+
+        __tcu_mask_half_match_irq(1); 
+        __tcu_unmask_full_match_irq(1);
+
+        /* EXTAL clock = CFG_EXTAL (12Mhz in most targets) */
+        __tcu_select_extalclk(1);
     }
 
     REG_TCU_TCSR(1) = (REG_TCU_TCSR(1) & ~TCU_TCSR_PRESCALE_MASK) | (prescaler_bit << TCU_TCSR_PRESCALE_BIT);
@@ -72,7 +75,11 @@ bool timer_set(long cycles, bool start)
 
     __tcu_clear_full_match_flag(1);
 
-    system_enable_irq(IRQ_TCU1);
+    if(start)
+    {
+        system_enable_irq(IRQ_TCU1);
+        __tcu_start_counter(1);
+    }
 
     restore_irq(old_irq);
 
