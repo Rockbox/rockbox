@@ -55,9 +55,11 @@ SOURCES= \
         src/lcd.c \
         src/proxy.c \
         $(ROOT)/apps/gui/scrollbar.c \
-        $(ROOT)/apps/gui/gwps-common.c \
-        $(ROOT)/apps/gui/wps_parser.c \
-        $(ROOT)/apps/gui/wps_debug.c \
+        $(ROOT)/apps/gui/music_screen.c \
+	$(ROOT)/apps/gui/wps_engine/wps_display.c \
+	$(ROOT)/apps/gui/wps_engine/wps_tokens.c \
+        $(ROOT)/apps/gui/wps_engine/wps_parser.c \
+        $(ROOT)/apps/gui/wps_parser/wps_debug.c \
         $(ROOT)/apps/recorder/peakmeter.c \
         $(ROOT)/apps/recorder/icons.c \
         $(ROOT)/apps/misc.c \
