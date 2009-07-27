@@ -75,6 +75,12 @@ Example ".ss" file, and one with a saved state:
 #define BITMAP_HEIGHT (BMPHEIGHT_sudoku_normal/10)
 #define BITMAP_STRIDE BMPWIDTH_sudoku_normal
 
+#if (LCD_DEPTH>2)
+#define BITMAP_WIDTH  (BMPWIDTH_sudoku_normal/2)
+#else
+#define BITMAP_WIDTH  BMPWIDTH_sudoku_normal
+#endif
+
 PLUGIN_HEADER
 
 /* Default game - used to initialise sudoku.ss if it doesn't exist. */
@@ -97,10 +103,6 @@ static const char default_game[9][9] =
 
 #if (LCD_HEIGHT==64) && (LCD_WIDTH==112 || LCD_WIDTH==128)
 /* Archos Recorders and Ondios - 112x64, 9 cells @ 8x6 with 10 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  8
-#define CELL_HEIGHT 6
 #define SMALL_BOARD
 #define MARK_OFFS   1   /* Pixels between border and mark */
 #define MARK_SPACE  1   /* Pixels between two marks */
@@ -108,10 +110,6 @@ static const char default_game[9][9] =
 
 #elif ((LCD_HEIGHT==80) && (LCD_WIDTH==132))
 /* C200, 9 cells @ 8x8 with 8 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  8
-#define CELL_HEIGHT 8
 #define SMALL_BOARD
 #define MARK_OFFS   1   /* Pixels between border and mark */
 #define MARK_SPACE  1   /* Pixels between two marks */
@@ -119,10 +117,6 @@ static const char default_game[9][9] =
 
 #elif ((LCD_HEIGHT==96) && (LCD_WIDTH==128))
 /* iAudio M3, 9 cells @ 9x9 with 14 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  9
-#define CELL_HEIGHT 9
 #define MARK_OFFS   1   /* Pixels between border and mark */
 #define MARK_SPACE  2   /* Pixels between two marks */
 #define MARK_SIZE   1   /* Mark width and height */
@@ -131,10 +125,6 @@ static const char default_game[9][9] =
    || (LCD_HEIGHT==128) && (LCD_WIDTH==128)
 /* iPod Mini - 138x110, 9 cells @ 10x10 with 14 border lines */
 /* iriver H10 5-6GB - 128x128, 9 cells @ 10x10 with 14 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  10
-#define CELL_HEIGHT 10
 #define MARK_OFFS   1   /* Pixels between border and mark */
 #define MARK_SPACE  1   /* Pixels between two marks */
 #define MARK_SIZE   2   /* Mark width and height */
@@ -143,30 +133,24 @@ static const char default_game[9][9] =
    || ((LCD_HEIGHT==132) && (LCD_WIDTH==176))
 /* iAudio X5, Iriver H1x0, iPod G3, G4 - 160x128; */
 /* iPod Nano - 176x132, 9 cells @ 12x12 with 14 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  12
-#define CELL_HEIGHT 12
 #define MARK_OFFS   1   /* Pixels between border and mark */
 #define MARK_SPACE  2   /* Pixels between two marks */
 #define MARK_SIZE   2   /* Mark width and height */
 
 #elif ((LCD_HEIGHT==176) && (LCD_WIDTH==220))
 /* Iriver h300, iPod Color/Photo - 220x176, 9 cells @ 16x16 with 14 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  16
-#define CELL_HEIGHT 16
 #define MARK_OFFS   1   /* Pixels between border and mark */
 #define MARK_SPACE  1   /* Pixels between two marks */
 #define MARK_SIZE   4   /* Mark width and height */
 
-#elif (LCD_HEIGHT>=240) && (LCD_WIDTH>=320)
+#elif (LCD_HEIGHT==240) && (LCD_WIDTH==320)
 /* iPod Video - 320x240, 9 cells @ 24x24 with 14 border lines */
+#define MARK_OFFS   1   /* Pixels between border and mark */
+#define MARK_SPACE  2   /* Pixels between two marks */
+#define MARK_SIZE   6   /* Mark width and height */
 
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  24
-#define CELL_HEIGHT 24
+#elif (LCD_HEIGHT==480) && (LCD_WIDTH==640)
+/* M:Robe 500 - 640x480, 9 cells @ 48x48 with 14 border lines */
 #define MARK_OFFS   1   /* Pixels between border and mark */
 #define MARK_SPACE  2   /* Pixels between two marks */
 #define MARK_SIZE   6   /* Mark width and height */
@@ -180,20 +164,12 @@ static const char default_game[9][9] =
 
 #if ((LCD_HEIGHT==220) && (LCD_WIDTH==176))
 /* e200, 9 cells @ 16x16 with 14 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  16
-#define CELL_HEIGHT 16
 #define MARK_OFFS   1   /* Pixels between border and mark */
 #define MARK_SPACE  1   /* Pixels between two marks */
 #define MARK_SIZE   4   /* Mark width and height */
 
 #elif (LCD_HEIGHT>=320) && (LCD_WIDTH>=240)
 /* Gigabeat - 240x320, 9 cells @ 24x24 with 14 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  24
-#define CELL_HEIGHT 24
 #define MARK_OFFS   1   /* Pixels between border and mark */
 #define MARK_SPACE  2   /* Pixels between two marks */
 #define MARK_SIZE   6   /* Mark width and height */
@@ -203,6 +179,9 @@ static const char default_game[9][9] =
 #endif
 
 #endif /* Layout */
+
+#define CELL_WIDTH  BITMAP_WIDTH
+#define CELL_HEIGHT BITMAP_HEIGHT
 
 #ifdef SUDOKU_BUTTON_CHANGEDIR
 int invertdir=0;
@@ -263,12 +242,12 @@ struct configdata disk_config[] = {
 #ifdef SMALL_BOARD
 #define BOARD_WIDTH  (CELL_WIDTH*9+10)
 #define BOARD_HEIGHT (CELL_HEIGHT*9+10)
-static unsigned char cellxpos[9]={
+static unsigned int cellxpos[9]={
                   1,    (CELL_WIDTH+2), (2*CELL_WIDTH+3),
     (3*CELL_WIDTH+4), (4*CELL_WIDTH+5), (5*CELL_WIDTH+6),
     (6*CELL_WIDTH+7), (7*CELL_WIDTH+8), (8*CELL_WIDTH+9)
 };
-static unsigned char cellypos[9]={
+static unsigned int cellypos[9]={
                    1,    (CELL_HEIGHT+2), (2*CELL_HEIGHT+3),
     (3*CELL_HEIGHT+4), (4*CELL_HEIGHT+5), (5*CELL_HEIGHT+6),
     (6*CELL_HEIGHT+7), (7*CELL_HEIGHT+8), (8*CELL_HEIGHT+9)
@@ -276,12 +255,12 @@ static unsigned char cellypos[9]={
 #else /* !SMALL_BOARD */
 #define BOARD_WIDTH  (CELL_WIDTH*9+10+4)
 #define BOARD_HEIGHT (CELL_HEIGHT*9+10+4)
-static unsigned char cellxpos[9]={
+static unsigned int cellxpos[9]={
                    2,    (CELL_WIDTH +3), (2*CELL_WIDTH +4),
     (3*CELL_WIDTH +6), (4*CELL_WIDTH +7), (5*CELL_WIDTH +8),
     (6*CELL_WIDTH+10), (7*CELL_WIDTH+11), (8*CELL_WIDTH+12)
 };
-static unsigned char cellypos[9]={
+static unsigned int cellypos[9]={
                     2,    (CELL_HEIGHT +3), (2*CELL_HEIGHT +4),
     (3*CELL_HEIGHT +6), (4*CELL_HEIGHT +7), (5*CELL_HEIGHT +8),
     (6*CELL_HEIGHT+10), (7*CELL_HEIGHT+11), (8*CELL_HEIGHT+12)
