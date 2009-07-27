@@ -35,10 +35,12 @@
  *    in C using two 32 bit integer multiplications.
  */
 
+#ifdef ROCKBOX
 /* get definitions of MULT31, MULT31_SHIFT15, CLIP_TO_15, vect_add, from codelib */
 #include "asm_arm.h"
 #include "asm_mcf5249.h"
 #include "codeclib_misc.h"
+#endif
 
 /* The following table is taken from libavutil/mathematics.c */
 const uint8_t ff_log2_tab[256] ={
@@ -83,11 +85,34 @@ static inline FIXP fixp_pow2_neg(FIXP x, int i)
  * @param a                     fix point value
  * @param b                     fix point fraction, 0 <= b < 1
  */
-
+#ifdef ROCKBOX
 #define fixp_mult_su(x,y) (MULT31_SHIFT15(x,y))
+#else
+static inline FIXP fixp_mult_su(FIXP a, FIXPU b)
+{
+    int32_t hb = (a >> 16) * b; 	 
+    uint32_t lb = (a & 0xffff) * b; 	 
+
+    return hb + (lb >> 16) + ((lb & 0x8000) >> 15); 	 
+}
+#endif
 
 /* Faster version of the above using 32x32=64 bit multiply */
+#ifdef ROCKBOX
 #define fixmul31(x,y) (MULT31(x,y))
+#else 	 
+static inline int32_t fixmul31(int32_t x, int32_t y) 	 
+{ 	 
+    int64_t temp; 	 
+
+    temp = x; 	 
+    temp *= y; 	 
+
+    temp >>= 31;        //16+31-16 = 31 bits 	 
+    
+    return (int32_t)temp; 	 
+} 	 
+#endif
 
 /* math functions taken from libavutil/common.h */
 
@@ -241,6 +266,7 @@ static inline void imlt_math(COOKContext *q, FIXP *in)
 static inline void overlap_math(COOKContext *q, int gain, FIXP buffer[])
 {
     int i;
+#ifdef ROCKBOX
     if(LIKELY(gain == 0))
     {
         vect_add(q->mono_mdct_output, buffer, q->samples_per_channel);
@@ -255,6 +281,12 @@ static inline void overlap_math(COOKContext *q, int gain, FIXP buffer[])
               (q->mono_mdct_output[i] >> -gain) + ((q->mono_mdct_output[i] >> (-gain-1)) & 1)+ buffer[i];
         }
     }
+#else
+    for(i=0 ; i<q->samples_per_channel ; i++) {
+        q->mono_mdct_output[i] =
+          fixp_pow2(q->mono_mdct_output[i], gain) + buffer[i];
+    }
+#endif
 }
 
 
@@ -320,6 +352,7 @@ static inline FIXP cplscale_math(FIXP x, int table, int i)
  */
 static inline void output_math(COOKContext *q, register int16_t *out, int chan)
 {
+#ifdef ROCKBOX
     register REAL_T * mono_output_ptr = q->mono_mdct_output;
     register REAL_T * mono_output_end = mono_output_ptr + q->samples_per_channel;
     out += chan;
@@ -329,4 +362,11 @@ static inline void output_math(COOKContext *q, register int16_t *out, int chan)
       *out = CLIP_TO_15(fixp_pow2_neg(*mono_output_ptr++, 11));
       out += STEP;
     }
+#else
+    int j;
+    for (j = 0; j < q->samples_per_channel; j++) {
+        out[chan + q->nb_channels * j] =
+        av_clip(fixp_pow2(q->mono_mdct_output[j], -11), -32768, 32767);
+    }
+#endif
 }
