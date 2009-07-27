@@ -1002,9 +1002,11 @@ static bool star_help(void)
         { 35, C_RED },
         { -1, 0 }
     };
+#if LCD_DEPTH > 1
 #ifndef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_WHITE );
     rb->lcd_set_foreground(LCD_BLACK );
+#endif
 #endif
     if (display_text(WORDS, help_text, formation, NULL))
         return true;
@@ -1014,10 +1016,11 @@ static bool star_help(void)
             return true;
     } while( ( button == BUTTON_NONE )
             || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
-
+#if LCD_DEPTH > 1
 #ifndef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_BLACK );
     rb->lcd_set_foreground(LCD_WHITE );
+#endif
 #endif
     return false;
 }
