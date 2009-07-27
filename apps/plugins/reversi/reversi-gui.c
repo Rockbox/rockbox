@@ -54,93 +54,13 @@ PLUGIN_HEADER
 /* Thickness of the grid lines */
 #define LINE_THCK 1
 
-#if LCD_HEIGHT <= LCD_WIDTH /* Horizontal layout */
-
-#if (LCD_HEIGHT==64) && (LCD_WIDTH==112)
-/* Archos Recorders and Ondios - 112x64, 8 cells @ 8x6 with 9 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  8
-#define CELL_HEIGHT 6
-#define SMALL_BOARD
-
-#elif (LCD_HEIGHT==64) && (LCD_WIDTH==128)
-/* Sansa Clip and M200 - 128x64, 8 cells @ 9x9 with 9 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  6
-#define CELL_HEIGHT 6
-#define SMALL_BOARD
-
-#elif (LCD_HEIGHT==80) && (LCD_WIDTH==132)
-/* Sansa C200 - 132x80, 8 cells @ 9x9 with 9 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  8
-#define CELL_HEIGHT 8
-#define SMALL_BOARD
-
-#elif (LCD_HEIGHT==96) && (LCD_WIDTH==128) \
-   || (LCD_HEIGHT==110) && (LCD_WIDTH==138) \
-   || (LCD_HEIGHT==128) && (LCD_WIDTH==128)
-/* iAudio M3 - 138x110, 8 cells @ 10x10 with 9 border lines */
-/* iPod Mini - 138x110, 8 cells @ 10x10 with 9 border lines */
-/* iriver H10 5-6GB - 128x128, 8 cells @ 10x10 with 9 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  10
-#define CELL_HEIGHT 10
-
-#elif ((LCD_HEIGHT==128) && (LCD_WIDTH==160)) \
-   || ((LCD_HEIGHT==132) && (LCD_WIDTH==176))
-/* iAudio X5, Iriver H1x0, iPod G3, G4 - 160x128; */
-/* iPod Nano - 176x132, 8 cells @ 12x12 with 9 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  12
-#define CELL_HEIGHT 12
-
-#elif ((LCD_HEIGHT==176) && (LCD_WIDTH==220)) || \
-      ((LCD_HEIGHT==220) && (LCD_WIDTH==176))
-/* Iriver h300, iPod Color/Photo - 220x176, 8 cells @ 16x16 with 9 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  16
-#define CELL_HEIGHT 16
-
-#elif (LCD_HEIGHT>=240) && (LCD_WIDTH>=320)
-/* iPod Video - 320x240, 8 cells @ 24x24 with 9 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  24
-#define CELL_HEIGHT 24
-
+#if (LCD_WIDTH/12) < (LCD_HEIGHT/10)
+#define CELL_WIDTH  (LCD_WIDTH/12)
+#define CELL_HEIGHT (LCD_WIDTH/12)
 #else
-  #error REVERSI: Unsupported LCD size
+#define CELL_WIDTH  (LCD_HEIGHT/10)
+#define CELL_HEIGHT (LCD_HEIGHT/10)
 #endif
-
-#else /* Vertical layout */
-#define VERTICAL_LAYOUT
-
-#if (LCD_HEIGHT>=320) && (LCD_WIDTH>=240)
-/* Gigabeat - 240x320, 8 cells @ 24x24 with 9 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  24
-#define CELL_HEIGHT 24
-
-#elif (LCD_HEIGHT>=220) && (LCD_WIDTH>=176)
-/* e200 - 176x220, 8 cells @ 12x12 with 9 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  18
-#define CELL_HEIGHT 18
-
-#else
-  #error REVERSI: Unsupported LCD size
-#endif
-
-#endif /* Layout */
 
 
 /* Where the board begins */
