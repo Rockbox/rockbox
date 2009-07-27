@@ -117,10 +117,10 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
         AFMT_ENTRY("SAP",  "asap",     NULL,          "sap\0"      ),
     /* Cook in RM/RA */
     [AFMT_COOK] =
-        AFMT_ENTRY("Cook",  "cook",   NULL,          "rm\0ra\0"      ),
+        AFMT_ENTRY("Cook",  "cook",   NULL,          "rm\0ra\0rmvb\0"      ),
     /* AAC in RM/RA */
     [AFMT_RAAC] =
-        AFMT_ENTRY("RAAC",  "raac",     NULL,          NULL      ),
+        AFMT_ENTRY("RAAC",  "raac",     NULL,        "rm\0ra\0rmvb\0"      ),
 #endif
 };
 
