@@ -553,12 +553,49 @@ int wps_get_touchaction(struct wps_data *data)
             if (vx >= r->x && vx < r->x+r->width &&
                 vy >= r->y && vy < r->y+r->height)
             {
-                if ((repeated && r->repeat) ||
-                    (released && !r->repeat))
+                /* reposition the touch within the area */
+                vx -= r->x;
+                vy -= r->y;
+
+                switch(r->type)
                 {
-                    last_action = r->action;    
-                    return r->action;
-                }    
+                    case WPS_TOUCHREGION_ACTION:
+                        if ((repeated && r->repeat) || (released && !r->repeat))
+                        {
+                            last_action = r->action;
+                            return r->action;
+                        }
+                        break;
+                    case WPS_TOUCHREGION_SCROLLBAR:
+                        if(r->width > r->height)
+                            /* landscape */
+                            wps_state.id3->elapsed = (vx *
+                                    wps_state.id3->length) / r->width;
+                        else
+                            /* portrait */
+                            wps_state.id3->elapsed = (vy *
+                                    wps_state.id3->length) / r->height;
+
+                        audio_ff_rewind(wps_state.id3->elapsed);
+                        break;
+                    case WPS_TOUCHREGION_VOLUME:
+                    {
+                        const int min_vol = sound_min(SOUND_VOLUME);
+                        const int max_vol = sound_max(SOUND_VOLUME);
+                        if(r->width > r->height)
+                            /* landscape */
+                            global_settings.volume = (vx *
+                                            (max_vol - min_vol)) / r->width;
+                        else
+                            /* portrait */
+                            global_settings.volume = (vy *
+                                                (max_vol-min_vol)) / r->height;
+
+                        global_settings.volume += min_vol;
+                        setvol();
+                        break;
+                    }
+                }
             }    
         }
     }

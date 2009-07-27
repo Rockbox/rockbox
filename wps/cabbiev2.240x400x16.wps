@@ -9,6 +9,8 @@
 %T|182|372|18|92|repmode|
 %T|139|372|37|23|shuffle|
 %T|90|238|60|20|playlist|
+%T|22|284|199|13|progressbar|
+%T|98|372|33|23|volume|
 
 %X|wpsbackdrop-240x400x16.bmp|
 %xl|A|lock-240x320x16.bmp|11|372|2|
