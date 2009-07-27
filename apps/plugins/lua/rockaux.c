@@ -31,29 +31,41 @@ int errno = 0;
 char *strerror(int errnum)
 {
     (void) errnum;
-    
-    DEBUGF("strerror()\n");
-    
+
+    DEBUGF("strerror(%d)\n", errnum);
+
     return NULL;
 }
 
-long floor(long x)
+long rb_pow(long x, long n)
 {
-    (void) x;
-    
-    DEBUGF("floor()\n");
-    
-    return 0;
-}
+    long pow = 1;
+    unsigned long u;
 
-long pow(long x, long y)
-{
-    (void) x;
-    (void) y;
-    
-    DEBUGF("pow()\n");
-    
-    return 0;
+    if(n <= 0)
+    {
+        if(n == 0 || x == 1)
+            return 1;
+
+        if(x != -1)
+            return x != 0 ? 1/x : 0;
+
+        n = -n;
+    }
+
+    u = n;
+    while(1)
+    {
+        if(u & 01)
+            pow *= x;
+
+        if(u >>= 1)
+            x *= x;
+        else
+            break;
+    }
+
+    return pow;
 }
 
 int strcoll(const char * str1, const char * str2)
@@ -91,4 +103,3 @@ const char* get_current_path(lua_State *L, int level)
 
     return NULL;
 }
-
