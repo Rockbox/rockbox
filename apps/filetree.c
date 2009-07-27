@@ -33,7 +33,6 @@
 #include "filetypes.h"
 #include "talk.h"
 #include "playlist.h"
-#include "gwps.h"
 #include "lang.h"
 #include "language.h"
 #include "screens.h"
@@ -52,7 +51,7 @@
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
-
+#include "wps_engine/wps_internals.h" /* FIXME: REMOVE ME */
 #include "backdrop.h"
 
 static int compare_sort_dir; /* qsort key for sorting directories */

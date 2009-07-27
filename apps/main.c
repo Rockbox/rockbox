@@ -52,7 +52,7 @@
 #include "sprintf.h"
 #include "font.h"
 #include "language.h"
-#include "gwps.h"
+#include "music_screen.h"
 #include "playlist.h"
 #include "buffer.h"
 #include "rolo.h"

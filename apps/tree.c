@@ -36,7 +36,7 @@
 #include "audio.h"
 #include "playlist.h"
 #include "menu.h"
-#include "gwps.h"
+#include "wps_engine/wps_engine.h"
 #include "settings.h"
 #include "debug.h"
 #include "storage.h"
@@ -64,7 +64,6 @@
 #include "tagcache.h"
 #endif
 #include "yesno.h"
-#include "gwps-common.h"
 #include "eeprom_settings.h"
 #include "playlist_catalog.h"
 

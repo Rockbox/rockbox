@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "gwps.h"
+#include "wps_internals.h"
 #ifdef __PCTOOL__
 #ifdef WPSEDITOR
 #include "proxy.h"

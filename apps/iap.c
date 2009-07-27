@@ -36,7 +36,7 @@
 #include "audio.h"
 #include "settings.h"
 #include "metadata.h"
-#include "gwps.h"
+#include "wps_engine/wps_engine.h"
 
 #include "action.h"
 

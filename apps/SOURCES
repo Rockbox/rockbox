@@ -60,8 +60,6 @@ screen_access.c
 #ifdef HAVE_BUTTONBAR
 gui/buttonbar.c
 #endif
-gui/gwps.c
-gui/gwps-common.c
 #ifdef HAVE_LCD_BITMAP
 gui/icon.c
 #endif
@@ -78,13 +76,18 @@ gui/pitchscreen.c
 #ifdef HAVE_QUICKSCREEN
 gui/quickscreen.c
 #endif
+
+gui/music_screen.c
 gui/scrollbar.c
 gui/splash.c
 gui/statusbar.c
 gui/yesno.c
-gui/wps_debug.c
-gui/wps_parser.c
 gui/viewport.c
+
+gui/wps_engine/wps_debug.c
+gui/wps_engine/wps_display.c
+gui/wps_engine/wps_parser.c
+gui/wps_engine/wps_tokens.c
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 gui/backdrop.c

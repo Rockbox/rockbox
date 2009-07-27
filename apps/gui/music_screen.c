@@ -34,8 +34,8 @@
 #include "debug.h"
 #include "sprintf.h"
 #include "settings.h"
-#include "gwps.h"
-#include "gwps-common.h"
+#include "wps_engine/wps_engine.h"
+#include "mp3_playback.h"
 #include "audio.h"
 #include "usb.h"
 #include "status.h"
@@ -66,6 +66,7 @@
 #include "option_select.h"
 #include "dsp.h"
 #include "playlist_viewer.h"
+#include "music_screen.h"
 
 #define RESTORE_WPS_INSTANTLY       0l
 #define RESTORE_WPS_NEXT_SECOND     ((long)(HZ+current_tick))
@@ -82,6 +83,234 @@ static struct wps_data wps_datas[NB_SCREENS];
 static void wps_state_init(void);
 static void track_changed_callback(void *param);
 static void nextid3available_callback(void* param);
+
+
+
+#define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
+                                /* 3% of 30min file == 54s step size */
+#define MIN_FF_REWIND_STEP 500
+
+bool wps_fading_out = false;
+void fade(bool fade_in, bool updatewps)
+{
+    int fp_global_vol = global_settings.volume << 8;
+    int fp_min_vol = sound_min(SOUND_VOLUME) << 8;
+    int fp_step = (fp_global_vol - fp_min_vol) / 30;
+    int i;
+    wps_fading_out = !fade_in;
+    if (fade_in) {
+        /* fade in */
+        int fp_volume = fp_min_vol;
+
+        /* zero out the sound */
+        sound_set_volume(fp_min_vol >> 8);
+
+        sleep(HZ/10); /* let audio thread run */
+        audio_resume();
+        
+        while (fp_volume < fp_global_vol - fp_step) {
+            fp_volume += fp_step;
+            sound_set_volume(fp_volume >> 8);
+            if (updatewps)
+            {
+                FOR_NB_SCREENS(i)
+                    gui_wps_redraw(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
+            }
+            sleep(1);
+        }
+        sound_set_volume(global_settings.volume);
+    }
+    else {
+        /* fade out */
+        int fp_volume = fp_global_vol;
+
+        while (fp_volume > fp_min_vol + fp_step) {
+            fp_volume -= fp_step;
+            sound_set_volume(fp_volume >> 8);
+            if (updatewps)
+            {
+                FOR_NB_SCREENS(i)
+                    gui_wps_redraw(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
+            }
+            sleep(1);
+        }
+        audio_pause();
+        wps_fading_out = false;
+#if CONFIG_CODEC != SWCODEC
+#ifndef SIMULATOR
+        /* let audio thread run and wait for the mas to run out of data */
+        while (!mp3_pause_done())
+#endif
+            sleep(HZ/10);
+#endif
+
+        /* reset volume to what it was before the fade */
+        sound_set_volume(global_settings.volume);
+    }
+}
+bool is_wps_fading(void)
+{
+    return wps_fading_out;
+}
+
+bool update_onvol_change(struct gui_wps * gwps)
+{
+    gui_wps_redraw(gwps, 0, WPS_REFRESH_NON_STATIC);
+
+#ifdef HAVE_LCD_CHARCELLS
+    splashf(0, "Vol: %3d dB",
+               sound_val2phys(SOUND_VOLUME, global_settings.volume));
+    return true;
+#endif
+    return false;
+}
+
+bool ffwd_rew(int button)
+{
+    unsigned int step = 0;     /* current ff/rewind step */ 
+    unsigned int max_step = 0; /* maximum ff/rewind step */ 
+    int ff_rewind_count = 0;   /* current ff/rewind count (in ticks) */
+    int direction = -1;         /* forward=1 or backward=-1 */
+    bool exit = false;
+    bool usb = false;
+    int i = 0;
+    const long ff_rw_accel = (global_settings.ff_rewind_accel + 3);
+
+    if (button == ACTION_NONE)
+    {
+        status_set_ffmode(0);
+        return usb;
+    }
+    while (!exit)
+    {
+        switch ( button )
+        {
+            case ACTION_WPS_SEEKFWD:
+                 direction = 1;
+            case ACTION_WPS_SEEKBACK:
+                if (wps_state.ff_rewind)
+                {
+                    if (direction == 1)
+                    {
+                        /* fast forwarding, calc max step relative to end */
+                        max_step = (wps_state.id3->length - 
+                                    (wps_state.id3->elapsed +
+                                     ff_rewind_count)) *
+                                     FF_REWIND_MAX_PERCENT / 100;
+                    }
+                    else
+                    {
+                        /* rewinding, calc max step relative to start */
+                        max_step = (wps_state.id3->elapsed + ff_rewind_count) *
+                                    FF_REWIND_MAX_PERCENT / 100;
+                    }
+
+                    max_step = MAX(max_step, MIN_FF_REWIND_STEP);
+
+                    if (step > max_step)
+                        step = max_step;
+
+                    ff_rewind_count += step * direction;
+
+                    /* smooth seeking by multiplying step by: 1 + (2 ^ -accel) */
+                    step += step >> ff_rw_accel;
+                }
+                else
+                {
+                    if ( (audio_status() & AUDIO_STATUS_PLAY) &&
+                          wps_state.id3 && wps_state.id3->length )
+                    {
+                        if (!wps_state.paused)
+#if (CONFIG_CODEC == SWCODEC)
+                            audio_pre_ff_rewind();
+#else
+                            audio_pause();
+#endif
+#if CONFIG_KEYPAD == PLAYER_PAD
+                        FOR_NB_SCREENS(i)
+                            gui_wps[i].display->stop_scroll();
+#endif
+                        if (direction > 0) 
+                            status_set_ffmode(STATUS_FASTFORWARD);
+                        else
+                            status_set_ffmode(STATUS_FASTBACKWARD);
+
+                        wps_state.ff_rewind = true;
+
+                        step = 1000 * global_settings.ff_rewind_min_step;
+                    }
+                    else
+                        break;
+                }
+
+                if (direction > 0) {
+                    if ((wps_state.id3->elapsed + ff_rewind_count) >
+                        wps_state.id3->length)
+                        ff_rewind_count = wps_state.id3->length -
+                            wps_state.id3->elapsed;
+                }
+                else {
+                    if ((int)(wps_state.id3->elapsed + ff_rewind_count) < 0)
+                        ff_rewind_count = -wps_state.id3->elapsed;
+                }
+
+                FOR_NB_SCREENS(i)
+                    gui_wps_redraw(&gui_wps[i],
+                                    (wps_state.wps_time_countup == false)?
+                                    ff_rewind_count:-ff_rewind_count,
+                                    WPS_REFRESH_PLAYER_PROGRESS |
+                                    WPS_REFRESH_DYNAMIC);
+
+                break;
+
+            case ACTION_WPS_STOPSEEK:
+                wps_state.id3->elapsed = wps_state.id3->elapsed+ff_rewind_count;
+                audio_ff_rewind(wps_state.id3->elapsed);
+                ff_rewind_count = 0;
+                wps_state.ff_rewind = false;
+                status_set_ffmode(0);
+#if (CONFIG_CODEC != SWCODEC)
+                if (!wps_state.paused)
+                    audio_resume();
+#endif
+#ifdef HAVE_LCD_CHARCELLS
+                FOR_NB_SCREENS(i)
+                    gui_wps_redraw(&gui_wps[i],0, WPS_REFRESH_ALL);
+#endif
+                exit = true;
+                break;
+
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED) {
+                    status_set_ffmode(0);
+                    usb = true;
+                    exit = true;
+                }
+                break;
+        }
+        if (!exit)
+        {
+            button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,TIMEOUT_BLOCK);
+#ifdef HAVE_TOUCHSCREEN
+            if (button == ACTION_TOUCHSCREEN)
+                button = wps_get_touchaction(gui_wps[SCREEN_MAIN].data);
+#endif
+        }        
+    }
+    return usb;
+}
+
+
+void display_keylock_text(bool locked)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+        gui_wps[i].display->stop_scroll();
+
+    splash(HZ, locked ? ID2P(LANG_KEYLOCK_ON) : ID2P(LANG_KEYLOCK_OFF));
+}
+
+
 
 
 #if defined(HAVE_BACKLIGHT) || defined(HAVE_REMOTE_LCD)

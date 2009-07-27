@@ -43,7 +43,7 @@
 #include <stdbool.h>
 #include "font.h"
 
-#include "gwps.h"
+#include "wps_internals.h"
 #include "settings.h"
 #include "settings_list.h"
 

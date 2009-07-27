@@ -75,9 +75,8 @@
 #include "bmp.h"
 #include "icons.h"
 #endif /* End HAVE_LCD_BITMAP */
-#include "gui/gwps-common.h"
 #include "bookmark.h"
-
+#include "music_screen.h"
 #include "playback.h"
 
 #ifdef BOOTFILE

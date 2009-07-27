@@ -24,7 +24,6 @@
 #include "system.h"
 #include "albumart.h"
 #include "metadata.h"
-#include "gwps.h"
 #include "buffering.h"
 #include "dircache.h"
 #include "misc.h"

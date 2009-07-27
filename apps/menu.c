@@ -48,7 +48,6 @@
 #include "string.h"
 #include "root_menu.h"
 #include "bookmark.h"
-#include "gwps-common.h" /* for fade() */
 #include "audio.h"
 #include "viewport.h"
 #include "quickscreen.h"

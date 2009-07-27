@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: gwps.h 22003 2009-07-22 22:10:25Z kugel $
  *
  * Copyright (C) 2007 Nicolas Pennequin
  *
@@ -18,30 +18,32 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-#ifndef _ALBUMART_H_
-#define _ALBUMART_H_
-
-#if defined(HAVE_ALBUMART) || defined(PLUGIN)
-
+ 
+ /** Use this for stuff which external code needs to include **/
+ 
+#ifndef _WPS_ENGINE_H
+#define _WPS_ENGINE_H
 #include <stdbool.h>
-#include "metadata.h"
-#include "wps_engine/wps_engine.h"
+#include "wps_internals.h" /* TODO: remove this line.. shoudlnt be needed */
 
-/* Look for albumart bitmap in the same dir as the track and in its parent dir.
- * Stores the found filename in the buf parameter.
- * Returns true if a bitmap was found, false otherwise */
-bool find_albumart(const struct mp3entry *id3, char *buf, int buflen);
 
-/* Draw the album art bitmap from the given handle ID onto the given WPS.
-   Call with clear = true to clear the bitmap instead of drawing it. */
-void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear);
+#ifdef HAVE_TOUCHSCREEN
+int wps_get_touchaction(struct wps_data *data);
+#endif
 
-bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
-                           char *buf, int buflen);
+#ifdef HAVE_ALBUMART
+/* gives back if WPS contains an albumart tag */
+bool gui_sync_wps_uses_albumart(void);
+#endif
 
-void get_albumart_size(struct bitmap *bmp);
-
-#endif /* HAVE_ALBUMART */
-
-#endif /* _ALBUMART_H_ */
+/* setup and display a WPS for the first time */
+bool gui_wps_display(struct gui_wps *gwps);
+/* do a requested redraw */
+bool gui_wps_redraw(struct gui_wps *gwps,
+                     int ffwd_offset,
+                     unsigned refresh_mode);
+/* do a partial redraw, or full if required, also do any housekeeping
+ * which might be needed */
+bool gui_wps_update(struct gui_wps *gwps);
+ 
+#endif

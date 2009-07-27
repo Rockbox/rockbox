@@ -52,7 +52,6 @@
 #endif
 #include "lang.h"
 #include "language.h"
-#include "gwps.h"
 #include "powermgmt.h"
 #include "sprintf.h"
 #include "keyboard.h"
@@ -70,6 +69,7 @@
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
+#include "wps_engine/wps_engine.h"
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
