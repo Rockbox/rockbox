@@ -38,10 +38,10 @@
 #define I2C_SCL_PIN     4
 #define I2C_SDA_PIN     2
 
-#define SCL_DIR_MASK    (3<<(4*I2C_SCL_PIN))
+#define SCL_DIR_MASK    (0xF<<(4*I2C_SCL_PIN))
 #define SCL_DIR_OUT     (1<<(4*I2C_SCL_PIN))
 #define SCL_DIR_IN      0
-#define SDA_DIR_MASK    (3<<(4*I2C_SDA_PIN))
+#define SDA_DIR_MASK    (0xF<<(4*I2C_SDA_PIN))
 #define SDA_DIR_OUT     (1<<(4*I2C_SDA_PIN))
 #define SDA_DIR_IN      0
 
