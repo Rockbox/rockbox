@@ -81,11 +81,13 @@ static inline void set_dma(const void *addr, size_t size)
 
 static inline void play_dma_callback(void)
 {
-    unsigned char *start;
+    unsigned char *start = NULL;
     size_t size = 0;
-    pcm_callback_for_more(&start, &size);
 
-    if(LIKELY(size > 0))
+    if(pcm_callback_for_more)
+        pcm_callback_for_more(&start, &size);
+
+    if(LIKELY(size > 0 && start))
     {
         set_dma(start, size);
         REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
