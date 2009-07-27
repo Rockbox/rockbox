@@ -618,10 +618,10 @@ static void draw_empty_stack( int s, int x, int y, bool cursor )
 /* Help */
 static bool solitaire_help( void )
 {
-    int button;
+
 #define WORDS (sizeof help_text / sizeof (char*))
     static char* help_text[] = {
-        "Solitaire", "", "Controlls", "",
+        "Solitaire", "", "Controls", "",
         HK_LR   ":", "Move", "the", "cursor", "to", "the",
             "previous/", "next", "column.", "",
         HK_UD   ":", "Move", "the", "cursor", "up/", "down", "in", "the",
@@ -639,8 +639,22 @@ static bool solitaire_help( void )
             "remains", "stack", "on", "one", "of", "the", "4", "final",
             "stacks."
     };
-
-    if (display_text(WORDS, help_text, NULL, NULL))
+    static struct style_text formation[]={
+        { 0, TEXT_CENTER|TEXT_UNDERLINE },
+        { 2, C_RED },
+        { 48, C_RED },
+        { -1, 0 }
+    };
+#if LCD_DEPTH > 1
+    fb_data* backdrop = rb->lcd_get_backdrop();
+    rb->lcd_set_backdrop(NULL);
+#endif
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_set_foreground(LCD_WHITE);
+#endif
+    int button;
+    if (display_text(WORDS, help_text, formation, NULL))
         return true;
     do {
         button = rb->button_get(true);
@@ -649,6 +663,9 @@ static bool solitaire_help( void )
     } while( ( button == BUTTON_NONE )
             || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
 
+#if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(backdrop);
+#endif
     return false;
 }
 
@@ -1814,8 +1831,6 @@ enum plugin_status plugin_start(const void* parameter )
 
     /* plugin init */
     (void)parameter;
-
-    rb->splash( HZ, "Welcome to Solitaire!" );
 
     configfile_load(CONFIG_FILENAME, config,
                     sizeof(config) / sizeof(config[0]), CFGFILE_VERSION);
