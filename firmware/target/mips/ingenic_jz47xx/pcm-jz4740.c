@@ -65,16 +65,35 @@ void pcm_dma_apply_settings(void)
 static void* playback_address;
 static inline void set_dma(const void *addr, size_t size)
 {
-    logf("%x %x %d %d %x", (unsigned int)addr, size, (REG_AIC_SR>>24) & 0x20, (REG_AIC_SR>>8) & 0x20, REG_AIC_SR & 0xF);
+    int burst_size;
+    logf("%x %d %x", (unsigned int)addr, size, REG_AIC_SR);
+
+    if(size % 16)
+    {
+        if(size % 4)
+        {
+            size /= 2;
+            burst_size = DMAC_DCMD_DS_16BIT;
+        }
+        else
+        {
+            size /= 4;
+            burst_size = DMAC_DCMD_DS_32BIT;
+        }
+    }
+    else
+    {
+        size /= 16;
+        burst_size = DMAC_DCMD_DS_16BYTE;
+    }
 
     __dcache_writeback_all();
     REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = DMAC_DCCSR_NDES;
     REG_DMAC_DSAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)addr);
     REG_DMAC_DTAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)AIC_DR);
-    REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)  = size / 16;
+    REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)  = size;
     REG_DMAC_DRSR(DMA_AIC_TX_CHANNEL)  = DMAC_DRSR_RS_AICOUT;
-    REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL)  = (DMAC_DCMD_SAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DS_16BYTE | DMAC_DCMD_DWDH_16 | DMAC_DCMD_TIE |
-                                          DMAC_DCMD_RDIL_IGN);
+    REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL)  = (DMAC_DCMD_SAI | DMAC_DCMD_SWDH_32 | burst_size | DMAC_DCMD_DWDH_16 | DMAC_DCMD_TIE);
 
     playback_address = (void*)addr;
 }
@@ -181,10 +200,37 @@ void pcm_play_dma_pause(bool pause)
     restore_irq(flags);
 }
 
+static int get_dma_count(void)
+{
+    int count = REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL);
+    switch(REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL) & DMAC_DCMD_DS_MASK)
+    {
+        case DMAC_DCMD_DS_16BIT:
+            count *= 2;
+            break;
+        case DMAC_DCMD_DS_32BIT:
+            count *= 4;
+            break;
+        case DMAC_DCMD_DS_16BYTE:
+            count *= 16;
+            break;
+    }
+
+    return count;
+}
+
 size_t pcm_get_bytes_waiting(void)
 {
-    return REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_EN ?
-            (REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL) * 16) & ~3 : 0;
+    int bytes, flags = disable_irq_save();
+
+    if(REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_EN)
+        bytes = get_dma_count() & ~3;
+    else
+        bytes = 0;
+
+    restore_irq(flags);
+
+    return bytes;
 }
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
@@ -194,8 +240,9 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
     const void* addr;
     if(REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_EN)
     {
-        *count = REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)*16 >> 2;
-        addr = (const void*)(playback_address + ((REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)*16 + 2) & ~3));
+        int bytes = get_dma_count();
+        *count = bytes >> 2;
+        addr = (const void*)((int)(playback_address + bytes + 2) & ~3);
     }
     else
     {
@@ -210,6 +257,7 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 
 void audiohw_close(void)
 {
+    /* TODO: prevent pop */
 }
 
 #ifdef HAVE_RECORDING
