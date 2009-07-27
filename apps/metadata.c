@@ -80,10 +80,10 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     [AFMT_WAVPACK] =
         AFMT_ENTRY("WV",   "wavpack", "wavpack_enc", "wv\0"       ),
     /* Apple Lossless Audio Codec */
-    [AFMT_ALAC] =
+    [AFMT_MP4_ALAC] =
         AFMT_ENTRY("ALAC", "alac",    NULL,          "m4a\0m4b\0" ),
     /* Advanced Audio Coding in M4A container */
-    [AFMT_AAC] =
+    [AFMT_MP4_AAC] =
         AFMT_ENTRY("AAC",  "aac",     NULL,          "mp4\0"      ),
     /* Shorten */
     [AFMT_SHN] =
@@ -116,10 +116,10 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     [AFMT_SAP] =
         AFMT_ENTRY("SAP",  "asap",     NULL,          "sap\0"      ),
     /* Cook in RM/RA */
-    [AFMT_COOK] =
+    [AFMT_RM_COOK] =
         AFMT_ENTRY("Cook",  "cook",   NULL,          "rm\0ra\0rmvb\0"      ),
     /* AAC in RM/RA */
-    [AFMT_RAAC] =
+    [AFMT_RM_AAC] =
         AFMT_ENTRY("RAAC",  "raac",     NULL,        "rm\0ra\0rmvb\0"      ),
 #endif
 };
@@ -296,8 +296,8 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
 
         break;
 
-    case AFMT_ALAC:
-    case AFMT_AAC:
+    case AFMT_MP4_ALAC:
+    case AFMT_MP4_AAC:
         if (!get_mp4_metadata(fd, id3))
         {
             return false;
@@ -379,7 +379,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         id3->genre_string = id3_get_num_genre(36);
         break;
 
-    case AFMT_COOK:
+    case AFMT_RM_COOK:
         if (!get_rm_metadata(fd, id3))
         {
             DEBUGF("get_rm_metadata error\n");

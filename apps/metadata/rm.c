@@ -405,7 +405,7 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
         /* Already set, do nothing */
             break;
         case aac:
-            id3->codectype = AFMT_RAAC;
+            id3->codectype = AFMT_RM_AAC;
             break;
     }
     

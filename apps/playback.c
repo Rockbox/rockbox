@@ -1941,7 +1941,7 @@ static void audio_finish_load_track(void)
     case AFMT_FLAC:
     case AFMT_PCM_WAV:
     case AFMT_A52:
-    case AFMT_AAC:
+    case AFMT_MP4_AAC:
     case AFMT_MPC:
     case AFMT_APE:
     case AFMT_WMA:

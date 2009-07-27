@@ -650,7 +650,7 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
             {
                 uint32_t frequency;
 
-                id3->codectype = (type == MP4_mp4a) ? AFMT_AAC : AFMT_ALAC;
+                id3->codectype = (type == MP4_mp4a) ? AFMT_MP4_AAC : AFMT_MP4_ALAC;
                 lseek(fd, 22, SEEK_CUR);
                 read_uint32be(fd, &frequency);
                 size -= 26;

@@ -49,8 +49,8 @@ enum
     AFMT_MPC,          /* Musepack */
     AFMT_A52,          /* A/52 (aka AC3) audio */
     AFMT_WAVPACK,      /* WavPack */
-    AFMT_ALAC,         /* Apple Lossless Audio Codec */
-    AFMT_AAC,          /* Advanced Audio Coding (AAC) in M4A container */
+    AFMT_MP4_ALAC,     /* Apple Lossless Audio Codec */
+    AFMT_MP4_AAC,      /* Advanced Audio Coding (AAC) in M4A container */
     AFMT_SHN,          /* Shorten */
     AFMT_SID,          /* SID File Format */
     AFMT_ADX,          /* ADX File Format */
@@ -61,8 +61,8 @@ enum
     AFMT_WMA,          /* WMAV1/V2 in ASF */
     AFMT_MOD,          /* Amiga MOD File Format */
     AFMT_SAP,          /* Amiga 8Bit SAP Format */
-    AFMT_COOK,         /* Cook in RM/RA */
-    AFMT_RAAC,         /* AAC in RM/RA */
+    AFMT_RM_COOK,      /* Cook in RM/RA */
+    AFMT_RM_AAC,       /* AAC in RM/RA */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -
