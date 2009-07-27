@@ -166,12 +166,12 @@ static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
        skipped += rmctx->extradata_size;
        switch(fourcc) {
            case FOURCC('c','o','o','k'):               
-               rmctx->codec_type = cook;
+               rmctx->codec_type = CODEC_COOK;
                break;
 
            case FOURCC('r','a','a','c'):
            case FOURCC('r','a','c','p'):
-               rmctx->codec_type = aac;
+               rmctx->codec_type = CODEC_AAC;
                break;
 
            default: /* Not a supported codec */
@@ -188,7 +188,7 @@ static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
        DEBUGF("        fourcc = %s\n",fourcc2str(fourcc));
        DEBUGF("        codec_extra_data_length = %ld\n",rmctx->extradata_size);
        DEBUGF("        codec_extradata :\n");
-       if(rmctx->codec_type == cook) {
+       if(rmctx->codec_type == CODEC_COOK) {
            DEBUGF("        cook_extradata :\n");
            print_cook_extradata(rmctx);
        }
@@ -401,10 +401,10 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
 
     switch(rmctx->codec_type)
     {
-        case cook:
+        case CODEC_COOK:
         /* Already set, do nothing */
             break;
-        case aac:
+        case CODEC_AAC:
             id3->codectype = AFMT_RM_AAC;
             break;
     }

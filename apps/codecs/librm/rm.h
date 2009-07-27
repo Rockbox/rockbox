@@ -26,7 +26,7 @@
 
 #define MAX_EXTRADATA_SIZE 16
 
-enum codecs{cook, aac};
+enum codecs{CODEC_COOK, CODEC_AAC};
 typedef struct rm_packet
 {
     uint8_t *frames[100]; /* Pointers to ordered audio frames in buffer */
