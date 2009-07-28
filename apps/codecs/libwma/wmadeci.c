@@ -28,39 +28,29 @@
 #include "wmadec.h"
 #include "wmafixed.h"
 #include "bitstream.h"
+#include "wmadata.h"
 
-
-#define VLCBITS 7       /*7 is the lowest without glitching*/
-#define VLCMAX ((22+VLCBITS-1)/VLCBITS)
-
-#define EXPVLCBITS 7
-#define EXPMAX ((19+EXPVLCBITS-1)/EXPVLCBITS)
-
-#define HGAINVLCBITS 9
-#define HGAINMAX ((13+HGAINVLCBITS-1)/HGAINVLCBITS)
-
-
-typedef struct CoefVLCTable
-{
-    int n; /* total number of codes */
-    const uint32_t *huffcodes; /* VLC bit values */
-    const uint8_t *huffbits;   /* VLC bit size */
-    const uint16_t *levels; /* table to build run/level tables */
-}
-CoefVLCTable;
 
 static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len);
+inline void vector_fmul_add_add(fixed32 *dst, const fixed32 *data,
+                         const fixed32 *window, int n);
+inline void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, 
+                        const fixed32 *src1, int len);
+                        
+/*declarations of statically allocated variables used to remove malloc calls*/
 
 fixed32 coefsarray[MAX_CHANNELS][BLOCK_MAX_SIZE] IBSS_ATTR;
 /*decode and window into IRAM on targets with at least 80KB of codec IRAM*/
 fixed32 frame_out_buf[MAX_CHANNELS][BLOCK_MAX_SIZE * 2] IBSS_ATTR_WMA_LARGE_IRAM;
 
-//static variables that replace malloced stuff
-fixed32 stat0[2048], stat1[1024], stat2[512], stat3[256], stat4[128];    //these are the MDCT reconstruction windows
+/*MDCT reconstruction windows*/
+fixed32 stat0[2048], stat1[1024], stat2[512], stat3[256], stat4[128];    
 
-uint16_t *runtabarray[2], *levtabarray[2];                                        //these are VLC lookup tables
+/*VLC lookup tables*/
+uint16_t *runtabarray[2], *levtabarray[2];                                        
 
-uint16_t runtab0[1336], runtab1[1336], levtab0[1336], levtab1[1336];                //these could be made smaller since only one can be 1336
+/*these could be made smaller since only one can be 1336*/
+uint16_t runtab0[1336], runtab1[1336], levtab0[1336], levtab1[1336];               
 
 #define VLCBUF1SIZE 4598
 #define VLCBUF2SIZE 3574
@@ -76,141 +66,6 @@ VLC_TYPE vlcbuf4[VLCBUF4SIZE][2];
 
 
 
-#include "wmadata.h" // PJJ
-
-
-
-/*
- * Helper functions for wma_window.
- *
- *
- */
-
-#ifdef CPU_ARM
-static inline
-void vector_fmul_add_add(fixed32 *dst, const fixed32 *data,
-                         const fixed32 *window, int n)
-{
-    /* Block sizes are always power of two */
-    asm volatile (
-        "0:"
-        "ldmia %[d]!, {r0, r1};"
-        "ldmia %[w]!, {r4, r5};"
-        /* consume the first data and window value so we can use those
-         * registers again */
-        "smull r8, r9, r0, r4;"
-        "ldmia %[dst], {r0, r4};"
-        "add   r0, r0, r9, lsl #1;"  /* *dst=*dst+(r9<<1)*/
-        "smull r8, r9, r1, r5;"
-        "add   r1, r4, r9, lsl #1;"
-        "stmia %[dst]!, {r0, r1};"
-        "subs  %[n], %[n], #2;"
-        "bne   0b;"
-        : [d] "+r" (data), [w] "+r" (window), [dst] "+r" (dst), [n] "+r" (n)
-        : : "r0", "r1", "r4", "r5", "r8", "r9", "memory", "cc");
-}
-
-static inline
-void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const fixed32 *src1,
-                         int len)
-{
-    /* Block sizes are always power of two */
-    asm volatile (
-        "add   %[s1], %[s1], %[n], lsl #2;"
-        "0:"
-        "ldmia %[s0]!, {r0, r1};"
-        "ldmdb %[s1]!, {r4, r5};"
-        "smull r8, r9, r0, r5;"
-        "mov   r0, r9, lsl #1;"
-        "smull r8, r9, r1, r4;"
-        "mov   r1, r9, lsl #1;"
-        "stmia %[dst]!, {r0, r1};"
-        "subs  %[n], %[n], #2;"
-        "bne   0b;"
-        : [s0] "+r" (src0), [s1] "+r" (src1), [dst] "+r" (dst), [n] "+r" (len)
-        : : "r0", "r1", "r4", "r5", "r8", "r9", "memory", "cc");
-}
-
-#elif defined(CPU_COLDFIRE)
-
-static inline
-void vector_fmul_add_add(fixed32 *dst, const fixed32 *data,
-                         const fixed32 *window, int n)
-{
-    /* Block sizes are always power of two. Smallest block is always way bigger
-     * than four too.*/
-    asm volatile (
-        "0:"
-        "movem.l (%[d]), %%d0-%%d3;"
-        "movem.l (%[w]), %%d4-%%d5/%%a0-%%a1;"
-        "mac.l %%d0, %%d4, %%acc0;"
-        "mac.l %%d1, %%d5, %%acc1;"
-        "mac.l %%d2, %%a0, %%acc2;"
-        "mac.l %%d3, %%a1, %%acc3;"
-        "lea.l (16, %[d]), %[d];"
-        "lea.l (16, %[w]), %[w];"
-        "movclr.l %%acc0, %%d0;"
-        "movclr.l %%acc1, %%d1;"
-        "movclr.l %%acc2, %%d2;"
-        "movclr.l %%acc3, %%d3;"
-        "movem.l (%[dst]), %%d4-%%d5/%%a0-%%a1;"
-        "add.l %%d4, %%d0;"
-        "add.l %%d5, %%d1;"
-        "add.l %%a0, %%d2;"
-        "add.l %%a1, %%d3;"
-        "movem.l %%d0-%%d3, (%[dst]);"
-        "lea.l (16, %[dst]), %[dst];"
-        "subq.l #4, %[n];"
-        "jne 0b;"
-        : [d] "+a" (data), [w] "+a" (window), [dst] "+a" (dst), [n] "+d" (n)
-        : : "d0", "d1", "d2", "d3", "d4", "d5", "a0", "a1", "memory", "cc");
-}
-
-static inline
-void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const fixed32 *src1,
-                         int len)
-{
-    /* Block sizes are always power of two. Smallest block is always way bigger
-     * than four too.*/
-    asm volatile (
-        "lea.l (-16, %[s1], %[n]*4), %[s1];"
-        "0:"
-        "movem.l (%[s0]), %%d0-%%d3;"
-        "movem.l (%[s1]), %%d4-%%d5/%%a0-%%a1;"
-        "mac.l %%d0, %%a1, %%acc0;"
-        "mac.l %%d1, %%a0, %%acc1;"
-        "mac.l %%d2, %%d5, %%acc2;"
-        "mac.l %%d3, %%d4, %%acc3;"
-        "lea.l (16, %[s0]), %[s0];"
-        "lea.l (-16, %[s1]), %[s1];"
-        "movclr.l %%acc0, %%d0;"
-        "movclr.l %%acc1, %%d1;"
-        "movclr.l %%acc2, %%d2;"
-        "movclr.l %%acc3, %%d3;"
-        "movem.l %%d0-%%d3, (%[dst]);"
-        "lea.l (16, %[dst]), %[dst];"
-        "subq.l #4, %[n];"
-        "jne 0b;"
-        : [s0] "+a" (src0), [s1] "+a" (src1), [dst] "+a" (dst), [n] "+d" (len)
-        : : "d0", "d1", "d2", "d3", "d4", "d5", "a0", "a1", "memory", "cc");
-}
-
-#else
-
-static inline void vector_fmul_add_add(fixed32 *dst, const fixed32 *src0, const fixed32 *src1, int len){
-    int i;
-    for(i=0; i<len; i++)
-        dst[i] = fixmul32b(src0[i], src1[i]) + dst[i];
-}
-
-static inline void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const fixed32 *src1, int len){
-    int i;
-    src1 += len-1;
-    for(i=0; i<len; i++)
-        dst[i] = fixmul32b(src0[i], src1[-i]);
-}
-
-#endif
 
 /**
   * Apply MDCT window and add into output.
@@ -227,7 +82,9 @@ static inline void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const 
      int block_len, bsize, n;
 
      /* left part */
-     /*previous block was larger, so we'll use the size of the current block to set the window size*/
+     
+     /* previous block was larger, so we'll use the size of the current 
+      * block to set the window size*/
      if (s->block_len_bits <= s->prev_block_len_bits) {
          block_len = s->block_len;
          bsize = s->frame_len_bits - s->block_len_bits;
@@ -314,7 +171,7 @@ static void init_coef_vlc(VLC *vlc,
 
 int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 {
-    //WMADecodeContext *s = avctx->priv_data;
+    
     int i, flags1, flags2;
     fixed32 *window;
     uint8_t *extradata;
@@ -608,10 +465,11 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     }
     */
 
-    /*ffmpeg uses malloc to only allocate as many window sizes as needed.  However, we're really only interested in the worst case memory usage.
-    * In the worst case you can have 5 window sizes, 128 doubling up 2048
-    * Smaller windows are handled differently.
-    * Since we don't have malloc, just statically allocate this
+    /* ffmpeg uses malloc to only allocate as many window sizes as needed.  
+    *  However, we're really only interested in the worst case memory usage.
+    *  In the worst case you can have 5 window sizes, 128 doubling up 2048
+    *  Smaller windows are handled differently.
+    *  Since we don't have malloc, just statically allocate this
     */
     fixed32 *temp[5];
     temp[0] = stat0;
@@ -626,19 +484,15 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         int n, j;
         fixed32 alpha;
         n = 1 << (s->frame_len_bits - i);
-        //window = av_malloc(sizeof(fixed32) * n);
         window = temp[i];
-
-        //fixed32 n2 = itofix32(n<<1);        //2x the window length
-        //alpha = fixdiv32(M_PI_F, n2);        //PI / (2x Window length) == PI<<(s->frame_len_bits - i+1)
-
-        //alpha = M_PI_F>>(s->frame_len_bits - i+1);
-        alpha = (1<<15)>>(s->frame_len_bits - i+1);   /* this calculates 0.5/(2*n) */
+         
+         /* this calculates 0.5/(2*n) */
+        alpha = (1<<15)>>(s->frame_len_bits - i+1);  
         for(j=0;j<n;++j)
         {
             fixed32 j2 = itofix32(j) + 0x8000;
-            window[j] = fsincos(fixmul32(j2,alpha)<<16, 0);        //alpha between 0 and pi/2
-
+            /*alpha between 0 and pi/2*/
+            window[j] = fsincos(fixmul32(j2,alpha)<<16, 0); 
         }
         s->windows[i] = window;
 
@@ -663,6 +517,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
             s->noise_table = noisetable_exp;
         }
 #if 0
+/* We use a lookup table computered in advance, so no need to do this*/
         {
             unsigned int seed;
             fixed32 norm;
@@ -836,7 +691,9 @@ static void wma_lsp_to_curve(WMADecodeContext *s,
     *val_max_ptr = val_max;
 }
 
-/* decode exponents coded with LSP coefficients (same idea as Vorbis) */
+/* decode exponents coded with LSP coefficients (same idea as Vorbis)
+ * only used for low bitrate (< 16kbps) files
+ */
 static void decode_exp_lsp(WMADecodeContext *s, int ch)
 {
     fixed32 lsp_coefs[NB_LSP_COEFS];
@@ -858,7 +715,7 @@ static void decode_exp_lsp(WMADecodeContext *s, int ch)
                      lsp_coefs);
 }
 
-/* decode exponents coded with VLC codes */
+/* decode exponents coded with VLC codes - used for bitrate >= 32kbps*/
 static int decode_exp_vlc(WMADecodeContext *s, int ch)
 {
     int last_exp, n, code;
@@ -879,7 +736,7 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
     if (s->version == 1)        //wmav1 only
     {
         last_exp = get_bits(&s->gb, 5) + 10;
-        /* XXX: use a table */
+
         v = pow_10_to_yover16_ptr[last_exp];
         max_scale = v;
         n = *ptr++;
@@ -901,7 +758,7 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
         }
         /* NOTE: this offset is the same as MPEG4 AAC ! */
         last_exp += code - 60;
-        /* XXX: use a table */
+
         v = pow_10_to_yover16_ptr[last_exp];
         if (v > max_scale)
         {
@@ -1136,7 +993,7 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
             for(;;)
             {
                 code = get_vlc2(&s->gb, coef_vlc->table, VLCBITS, VLCMAX);
-                //code = get_vlc(&s->gb, coef_vlc);
+
                 if (code < 0)
                 {
                     return -8;
@@ -1228,7 +1085,9 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
 
 
             if (s->use_noise_coding)
-            {
+            {   
+                /*This case is only used for low bitrates (typically less then 32kbps)*/
+                
                 /*TODO:  mult should be converted to 32 bit to speed up noise coding*/
 
                 mult = fixdiv64(pow_table[total_gain+20],Fixed32To64(s->max_exponent[ch]));

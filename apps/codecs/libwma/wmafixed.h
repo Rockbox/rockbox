@@ -47,7 +47,6 @@ fixed64 IntTo64(int x);
 int IntFrom64(fixed64 x);
 fixed32 Fixed32From64(fixed64 x);
 fixed64 Fixed32To64(fixed32 x);
-fixed64 fixmul64byfixed(fixed64 x, fixed32 y);
 fixed32 fixdiv32(fixed32 x, fixed32 y);
 fixed64 fixdiv64(fixed64 x, fixed64 y);
 fixed32 fixsqrt32(fixed32 x);

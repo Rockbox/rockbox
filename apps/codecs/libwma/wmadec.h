@@ -64,6 +64,25 @@
 #endif
 #endif
 
+#define VLCBITS 7       /*7 is the lowest without glitching*/
+#define VLCMAX ((22+VLCBITS-1)/VLCBITS)
+
+#define EXPVLCBITS 7
+#define EXPMAX ((19+EXPVLCBITS-1)/EXPVLCBITS)
+
+#define HGAINVLCBITS 9
+#define HGAINMAX ((13+HGAINVLCBITS-1)/HGAINVLCBITS)
+
+
+typedef struct CoefVLCTable
+{
+    int n;                               /* total number of codes */ 
+    const uint32_t *huffcodes;           /* VLC bit values */
+    const uint8_t *huffbits;             /* VLC bit size */
+    const uint16_t *levels;              /* table to build run/level tables */
+}
+CoefVLCTable;
+
 typedef struct WMADecodeContext
 {
     GetBitContext gb;
