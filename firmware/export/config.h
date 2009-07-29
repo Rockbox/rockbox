@@ -113,6 +113,7 @@
 #define LYRE_PROTO1_PAD    37
 #define SAMSUNG_YH_PAD     38
 #define ONDAVX777_PAD      39
+#define SAMSUNG_YPS3_PAD   40
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -381,6 +382,8 @@ Lyre prototype 1*/
 #include "config-yh920.h"
 #elif defined(SAMSUNG_YH925)
 #include "config-yh925.h"
+#elif defined(SAMSUNG_YPS3)
+#include "config-yps3.h"
 #else
 /* no known platform */
 #endif

@@ -42,6 +42,8 @@ meizu_m6sl.c
 meizu_m6sp.c
 #elif defined(MEIZU_M3)
 meizu_m3.c
+#elif defined(SAMSUNG_YPS3)
+samsung_yps3.c
 #elif defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX767) || defined(ONDA_VX777)
 ondavx747.c
 show_logo.c

@@ -815,6 +815,7 @@ cat <<EOF
  140) YH-820              150) Elio TPJ-1022     ==Lyre project==
  141) YH-920                                     130) Lyre proto 1
  142) YH-925
+ 143) YP-S3
 EOF
 
   buildfor=`input`;
@@ -2274,6 +2275,29 @@ fi
     t_manufacturer="samsung"
     t_model="yh925"
     ;;
+
+   143|yps3)
+    target_id=60
+    modelname="yps3"
+    target="-DSAMSUNG_YPS3"
+    memory=16 # always
+    arm940tbecc
+    tool="cp"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.yps3"
+    appextra="recorder:gui"
+    plugins="no" #FIXME
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    boottool="cp"
+    bootoutput="rockboot.ebn"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="s5l8700"
+    t_model="yps3"
+    ;;
+    
 
    *)
     echo "Please select a supported target platform!"
