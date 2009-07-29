@@ -310,6 +310,7 @@ int button_read_device(void)
         {
             /* unlock -> enable wheel sensor */
             DEV_EN |= DEV_OPTO;
+            opto_i2c_init();
         }
     }
 
