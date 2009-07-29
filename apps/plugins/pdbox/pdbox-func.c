@@ -333,11 +333,19 @@ long rb_atol(const char* str)
 
 float rb_sin(float rad)
 {
+    int cycles;
+
     /* Trim input value to -PI..PI interval. */
-    if(rad < -3.14159265)
-        rad += 6.28318531;
-    else if(rad > 3.14159265)
-        rad -= 6.28318531;
+    if(rad > 3.14159265)
+    {
+        cycles = rad / 6.28318531;
+        rad -= (6.28318531 * (float) cycles);
+    }
+    else if(rad < -3.14159265)
+    {
+        cycles = rad / -6.28318531;
+        rad += (6.28318531 * (float) cycles);
+    }
 
     if(rad < 0)
         return (1.27323954 * rad + 0.405284735 * rad * rad);
@@ -348,11 +356,7 @@ float rb_sin(float rad)
 float rb_cos(float rad)
 {
     /* Compute cosine: sin(x + PI/2) = cos(x) */
-    rad += 1.57079632;
-    if(rad > 3.14159265)
-        rad -= 6.28318531;
-
-    return rb_sin(rad);
+    return rb_sin(rad + 1.57079632);
 }
 
 
@@ -2108,54 +2112,39 @@ union ieee754_double
     /* This is the IEEE 754 double-precision format.  */
     struct
       {
-#if	defined(ROCKBOX_BIG_ENDIAN)
+#ifdef ROCKBOX_BIG_ENDIAN
 	unsigned int negative:1;
 	unsigned int exponent:11;
 	/* Together these comprise the mantissa.  */
 	unsigned int mantissa0:20;
 	unsigned int mantissa1:32;
-#else
-# if	__FLOAT_WORD_ORDER == __BIG_ENDIAN
-	unsigned int mantissa0:20;
-	unsigned int exponent:11;
-	unsigned int negative:1;
-	unsigned int mantissa1:32;
-# else
+#else /* ROCKBOX_LITTLE_ENDIAN */
 	/* Together these comprise the mantissa.  */
 	unsigned int mantissa1:32;
 	unsigned int mantissa0:20;
 	unsigned int exponent:11;
 	unsigned int negative:1;
-# endif
-#endif				/* Little endian.  */
+#endif /* ROCKBOX_LITTLE_ENDIAN */
       } ieee;
 
     /* This format makes it easier to see if a NaN is a signalling NaN.  */
     struct
       {
-#if	defined(ROCKBOX_BIG_ENDIAN)
+#ifdef ROCKBOX_BIG_ENDIAN
 	unsigned int negative:1;
 	unsigned int exponent:11;
 	unsigned int quiet_nan:1;
 	/* Together these comprise the mantissa.  */
 	unsigned int mantissa0:19;
 	unsigned int mantissa1:32;
-#else
-# if	__FLOAT_WORD_ORDER == __BIG_ENDIAN
-	unsigned int mantissa0:19;
-	unsigned int quiet_nan:1;
-	unsigned int exponent:11;
-	unsigned int negative:1;
-	unsigned int mantissa1:32;
-# else
+#else /* ROCKBOX_LITTLE_ENDIAN */
 	/* Together these comprise the mantissa.  */
 	unsigned int mantissa1:32;
 	unsigned int mantissa0:19;
 	unsigned int quiet_nan:1;
 	unsigned int exponent:11;
 	unsigned int negative:1;
-# endif
-#endif
+#endif /* ROCKBOX_LITTLE_ENDIAN */
       } ieee_nan;
   };
 
