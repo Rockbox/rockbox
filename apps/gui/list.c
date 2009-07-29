@@ -485,6 +485,10 @@ static void gui_synclist_select_next_page(struct gui_synclist * lists,
                                    enum screen_type screen)
 {
     int nb_lines = viewport_get_nb_lines(lists->parent[screen]);
+#ifdef HAVE_LCD_BITMAP
+    if(list_display_title(lists, screen))
+        nb_lines--;
+#endif
     gui_list_select_at_offset(lists, nb_lines);
 }
 
@@ -492,6 +496,10 @@ static void gui_synclist_select_previous_page(struct gui_synclist * lists,
                                        enum screen_type screen)
 {
     int nb_lines = viewport_get_nb_lines(lists->parent[screen]);
+#ifdef HAVE_LCD_BITMAP
+    if(list_display_title(lists, screen))
+        nb_lines--;
+#endif
     gui_list_select_at_offset(lists, -nb_lines);
 }
 
@@ -942,10 +950,3 @@ void simplelist_info_init(struct simplelist_info *info, char* title,
     info->get_talk = NULL;
     info->callback_data = data;
 }
-
-
-
-
-
-
-
