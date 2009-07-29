@@ -208,7 +208,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
         icon = Icon_Submenu_Entered;
     else
         icon = menu->callback_and_desc->icon_id;
-    gui_synclist_set_title(lists, P2STR(menu->callback_and_desc->desc), icon);  
+    gui_synclist_set_title(lists, P2STR(menu->callback_and_desc->desc), icon);
     gui_synclist_set_icon_callback(lists, menu_get_icon);
 #else
     (void)icon;
@@ -320,7 +320,7 @@ void do_setting_from_menu(const struct menu_item_ex *temp,
         while (i < MAX_PATH-1)
         {
             int padlen = MIN(len, MAX_PATH-1-i);
-            strlcpy(&padded_title[i], title, padlen);
+            memcpy(&padded_title[i], title, padlen);
             i += padlen;
             if (i<MAX_PATH-1)
                 padded_title[i++] = ' ';
