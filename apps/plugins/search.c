@@ -149,6 +149,7 @@ enum plugin_status plugin_start(const void* parameter)
     int ok;
     const char *filename = parameter;
     char *p;
+    if(!parameter) return PLUGIN_ERROR;
 
     DEBUGF("%s - %s\n", (char *)parameter, &filename[rb->strlen(filename)-4]);
     /* Check the extension. We only allow .m3u files. */

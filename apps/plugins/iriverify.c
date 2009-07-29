@@ -135,6 +135,7 @@ enum plugin_status plugin_start(const void* parameter)
     char *buf;
     int rc;
     int i;
+    if(!parameter) return PLUGIN_ERROR;
     filename = (char *)parameter;
 
     buf = rb->plugin_get_audio_buffer((size_t *)&buf_size); /* start munching memory */

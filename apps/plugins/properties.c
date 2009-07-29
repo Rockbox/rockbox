@@ -275,6 +275,7 @@ enum plugin_status plugin_start(const void* parameter)
     int button;
     bool quit = false;
     char file[MAX_PATH];
+    if(!parameter) return PLUGIN_ERROR;
     rb->strcpy(file, (const char *) parameter);
 
     /* determine if it's a file or a directory */
