@@ -51,52 +51,69 @@ further options:
 
 PLUGIN_HEADER
 
-/* Thickness of the grid lines */
-#define LINE_THCK 1
-
-#if (LCD_WIDTH/12) < (LCD_HEIGHT/10)
-#define CELL_WIDTH  (LCD_WIDTH/12)
-#define CELL_HEIGHT (LCD_WIDTH/12)
-#else
-#define CELL_WIDTH  (LCD_HEIGHT/10)
-#define CELL_HEIGHT (LCD_HEIGHT/10)
-#endif
-
-
 /* Where the board begins */
 #define XOFS 4
 #define YOFS 4
 
+#if LCD_HEIGHT > LCD_WIDTH
+#define MARGIN_W    (XOFS*2+1)
+#define MARGIN_H    (YOFS*2+1)
+#define MARGIN_C_W  0
+#define MARGIN_C_H  2
+#else
+#define MARGIN_W    (XOFS*2 + 16)
+#define MARGIN_H    (YOFS*2+1)
+#define MARGIN_C_W  1
+#define MARGIN_C_H  0
+#endif
+
+#if ( (LCD_WIDTH  - MARGIN_W) / (BOARD_SIZE+MARGIN_C_W)) < \
+    ( (LCD_HEIGHT - MARGIN_H) / (BOARD_SIZE+MARGIN_C_H))
+
+#define CELL_PRE    (   ( (LCD_WIDTH * LCD_PIXEL_ASPECT_WIDTH     / \
+                            LCD_PIXEL_ASPECT_HEIGHT) - MARGIN_W)     / \
+                        (BOARD_SIZE+MARGIN_C_W) )
+                        
+#define CELL_WIDTH  (CELL_PRE*LCD_PIXEL_ASPECT_HEIGHT / LCD_PIXEL_ASPECT_WIDTH)
+#define CELL_HEIGHT (CELL_PRE) 
+#else
+#define CELL_PRE    (   ( (LCD_HEIGHT * LCD_PIXEL_ASPECT_HEIGHT     / \
+                            LCD_PIXEL_ASPECT_WIDTH) - MARGIN_H)     / \
+                        (BOARD_SIZE+MARGIN_C_H) )
+                        
+#define CELL_WIDTH  (CELL_PRE) 
+#define CELL_HEIGHT (CELL_PRE*LCD_PIXEL_ASPECT_WIDTH / LCD_PIXEL_ASPECT_HEIGHT)
+#endif
+
 /* Total width and height of the board without enclosing box */
-#define BOARD_WIDTH  (CELL_WIDTH*BOARD_SIZE + LINE_THCK*(BOARD_SIZE+1))
-#define BOARD_HEIGHT (CELL_HEIGHT*BOARD_SIZE + LINE_THCK*(BOARD_SIZE+1))
+#define BOARD_WIDTH  (CELL_WIDTH*BOARD_SIZE)
+#define BOARD_HEIGHT (CELL_HEIGHT*BOARD_SIZE)
 
 /* Thickness of the white cells' lines */
-#if (CELL_WIDTH >= 15) && (CELL_HEIGHT >= 15)
-#define CELL_LINE_THICKNESS 2
+#if (CELL_WIDTH >= 10) && (CELL_HEIGHT >= 10)
+#define CELL_LINE_THICKNESS CELL_WIDTH/5
 #else
 #define CELL_LINE_THICKNESS 1
 #endif
 
 /* Margins within a cell */
-#if (CELL_WIDTH >= 10) && (CELL_HEIGHT >= 10)
 #define STONE_MARGIN 2
-#else
-#define STONE_MARGIN 1
-#endif
 
-#define CURSOR_MARGIN (STONE_MARGIN + CELL_LINE_THICKNESS)
+#define CURSOR_MARGIN 1
 
 /* Upper left corner of a cell */
-#define CELL_X(c) (XOFS + (c)*CELL_WIDTH + ((c)+1)*LINE_THCK)
-#define CELL_Y(r) (YOFS + (r)*CELL_HEIGHT + ((r)+1)*LINE_THCK)
+#define CELL_X(c) (XOFS + (c)*CELL_WIDTH)
+#define CELL_Y(r) (YOFS + (r)*CELL_HEIGHT)
 
+/* Used for touchscreen to convert an X/Y location to a cell location */
+#define CELL_C(x) (((x)-XOFS)/CELL_WIDTH)
+#define CELL_R(y) (((y)-YOFS)/CELL_HEIGHT)
 
-#ifdef VERTICAL_LAYOUT
+#if LCD_HEIGHT > LCD_WIDTH
 #define LEGEND_X(lc) (CELL_X(lc))
-#define LEGEND_Y(lr) (CELL_Y(BOARD_SIZE+(lr)) + CELL_HEIGHT/2)
+#define LEGEND_Y(lr) (CELL_Y(BOARD_SIZE+lr) + YOFS + 1)
 #else
-#define LEGEND_X(lc) (CELL_X(BOARD_SIZE+(lc)) + CELL_WIDTH/2)
+#define LEGEND_X(lc) (CELL_X(BOARD_SIZE+lc) + XOFS + 1)
 #define LEGEND_Y(lr) (CELL_Y(lr))
 #endif
 
@@ -146,15 +163,15 @@ static void reversi_gui_display_cursor(int row, int col) {
 
     rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
     rb->lcd_drawline(x+CURSOR_MARGIN, y+CURSOR_MARGIN,
-            x+CELL_WIDTH-CURSOR_MARGIN-1, y+CELL_HEIGHT-CURSOR_MARGIN-1);
-    rb->lcd_drawline(x+CURSOR_MARGIN, y+CELL_HEIGHT-CURSOR_MARGIN-1,
-            x+CELL_WIDTH-CURSOR_MARGIN-1, y+CURSOR_MARGIN);
+            x+CELL_WIDTH-CURSOR_MARGIN, y+CELL_HEIGHT-CURSOR_MARGIN);
+    rb->lcd_drawline(x+CURSOR_MARGIN, y+CELL_HEIGHT-CURSOR_MARGIN,
+            x+CELL_WIDTH-CURSOR_MARGIN, y+CURSOR_MARGIN);
 
     /* Draw the shadows */
     rb->lcd_hline(x, x+CELL_WIDTH-1, YOFS-3);
-    rb->lcd_hline(x, x+CELL_WIDTH-1, YOFS+BOARD_HEIGHT+2);
+    rb->lcd_hline(x, x+CELL_WIDTH-1, YOFS+BOARD_HEIGHT+3);
     rb->lcd_vline(XOFS-3, y, y+CELL_HEIGHT-1);
-    rb->lcd_vline(XOFS+BOARD_WIDTH+2, y, y+CELL_HEIGHT-1);
+    rb->lcd_vline(XOFS+BOARD_WIDTH+3, y, y+CELL_HEIGHT-1);
 
     rb->lcd_set_drawmode(old_mode);
     rb->lcd_update();
@@ -168,11 +185,11 @@ static void reversi_gui_draw_cell(int x, int y, int color) {
     if (color == WHITE) {
         for (i = 0; i < CELL_LINE_THICKNESS; i++) {
             rb->lcd_drawrect(x+STONE_MARGIN+i, y+STONE_MARGIN+i,
-                    CELL_WIDTH-2*(STONE_MARGIN+i), CELL_HEIGHT-2*(STONE_MARGIN+i));
+                    CELL_WIDTH+1-2*(STONE_MARGIN+i), CELL_HEIGHT+1-2*(STONE_MARGIN+i));
         }
     } else if (color == BLACK) {
         rb->lcd_fillrect(x+STONE_MARGIN, y+STONE_MARGIN,
-                CELL_WIDTH-2*STONE_MARGIN, CELL_HEIGHT-2*STONE_MARGIN);
+                CELL_WIDTH-STONE_MARGIN-1, CELL_HEIGHT-1-STONE_MARGIN);
     } else {
         /* Cell is free -> nothing to do */
     }
@@ -189,13 +206,13 @@ static void reversi_gui_display_board(void) {
     rb->lcd_set_drawmode(DRMODE_FG);
 
     /* Thicker board box */
-    rb->lcd_drawrect(XOFS-1, YOFS-1, BOARD_WIDTH+2, BOARD_HEIGHT+2);
+    rb->lcd_drawrect(XOFS-1, YOFS-1, BOARD_WIDTH+3, BOARD_HEIGHT+3);
 
     /* Draw the gridlines */
     for (r=0, x=XOFS, y=YOFS; r<=BOARD_SIZE;
-            r++, x+=CELL_WIDTH+LINE_THCK, y+=CELL_HEIGHT+LINE_THCK) {
-        rb->lcd_hline(XOFS, XOFS+BOARD_WIDTH-1, y);
-        rb->lcd_vline(x, YOFS, YOFS+BOARD_HEIGHT-1);
+            r++, x+=CELL_WIDTH, y+=CELL_HEIGHT) {
+        rb->lcd_hline(XOFS, XOFS+BOARD_WIDTH, y);
+        rb->lcd_vline(x, YOFS, YOFS+BOARD_HEIGHT);
     }
 
     /* Draw the stones. This is not the most efficient way but more readable */
@@ -219,18 +236,18 @@ static void reversi_gui_display_board(void) {
     reversi_gui_draw_cell(x, y, BLACK);
     rb->snprintf(buf, sizeof(buf), "%d", c);
     y += (CELL_HEIGHT-x_height) / 2;
-    rb->lcd_putsxy(x + CELL_WIDTH + CELL_WIDTH/2, y, buf);
+    rb->lcd_putsxy(x + CELL_WIDTH + 2, y, buf);
 
     y = LEGEND_Y(1);
     reversi_gui_draw_cell(x, y, WHITE);
     rb->snprintf(buf, sizeof(buf), "%d", r);
     y += (CELL_HEIGHT-x_height) / 2;
-    rb->lcd_putsxy(x + CELL_WIDTH + CELL_WIDTH/2, y, buf);
+    rb->lcd_putsxy(x + CELL_WIDTH + 2, y, buf);
 
     /* Draw the box around the current player */
     r = (cur_player == BLACK ? 0 : 1);
     y = LEGEND_Y(r);
-    rb->lcd_drawrect(x-1, y-1, CELL_WIDTH+2, CELL_HEIGHT+2);
+    rb->lcd_drawrect(x, y, CELL_WIDTH+1, CELL_HEIGHT+1);
 
     /* Update the screen */
     rb->lcd_update();
@@ -466,10 +483,17 @@ static void reversi_gui_move_cursor(int new_row, int new_col) {
 enum plugin_status plugin_start(const void *parameter) {
     bool exit, draw_screen;
     int button;
+#ifdef HAVE_TOUCHSCREEN
+    int button_x, button_y;
+#endif
     int lastbutton = BUTTON_NONE;
     int row, col;
     int w_cnt, b_cnt;
     char msg_buf[30];
+    
+#ifdef HAVE_TOUCHSCREEN
+    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+#endif
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -538,6 +562,19 @@ enum plugin_status plugin_start(const void *parameter) {
             case REVERSI_BUTTON_QUIT:
                 exit = true;
                 break;
+#endif
+
+#ifdef HAVE_TOUCHSCREEN
+            case BUTTON_TOUCHSCREEN:
+                button_x = rb->button_get_data() >> 16;
+                button_y = rb->button_get_data() & 0xffff;
+                if( (CELL_R(button_y)>(BOARD_SIZE-1)) || 
+                    (CELL_C(button_x)>(BOARD_SIZE-1)) )
+                {
+                    break;
+                } else {
+                    reversi_gui_move_cursor(CELL_R(button_y), CELL_C(button_x));
+                }
 #endif
 
 #ifdef REVERSI_BUTTON_ALT_MAKE_MOVE
