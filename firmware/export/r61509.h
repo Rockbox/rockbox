@@ -121,6 +121,11 @@
 #define DISP_CTRL1_DTE                   (1 << 4)
 #define DISP_CTRL1_D(n)                  (n & 3)
 
+#define EXT_DISP_CTRL1_ENC(n)            ((n & 7) << 12)
+#define EXT_DISP_CTRL1_RM(n)             ((n & 1) << 8)
+#define EXT_DISP_CTRL1_DM(n)             ((n & 3) << 4)
+#define EXT_DISP_CTRL1_RIM(n)            (n & 3)
+
 #define PWR_CTRL1_SAP(n)                 ((n & 3) << 13)
 #define PWR_CTRL1_SAPE                   (1 << 12)
 #define PWR_CTRL1_BT(n)                  ((n & 7) << 8)
