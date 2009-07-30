@@ -29,7 +29,9 @@
 #include "s5l8700.h"
 
 /*** definitions ***/
-
+#define STAT_BUS_IDLE   (1<<8)  /* Data bus idle */
+#define STAT_FULL       (1<<4)  /* FIFO full */
+#define STAT_READON     (1<<0)  /* Read operation done */
 
 /** globals **/
 static uint8_t lcd_type;
@@ -81,9 +83,13 @@ static uint8_t lcd_readdata(void)
 
 static void lcd_writereg(uint32_t reg, uint32_t data)
 {
+    while (LCD_STATUS & STAT_FULL);
     LCD_WCMD = reg >> 8;
+    while (LCD_STATUS & STAT_FULL);
     LCD_WCMD = reg & 0xff;
+    while (LCD_STATUS & STAT_FULL);
     LCD_WDATA = data >> 8;
+    while (LCD_STATUS & STAT_FULL);
     LCD_WDATA = data & 0xff;
 }
 
@@ -290,10 +296,12 @@ void lcd_update(void)
         LCD_WCMD = 0x22;
     }
     for(p=&lcd_framebuffer[0][0], i=0;i<LCD_WIDTH*LCD_FBHEIGHT;++i, ++p) {
+        while (LCD_STATUS & STAT_FULL);
         LCD_WDATA = RGB_UNPACK_RED(*p);
+        while (LCD_STATUS & STAT_FULL);
         LCD_WDATA = RGB_UNPACK_GREEN(*p);
+        while (LCD_STATUS & STAT_FULL);
         LCD_WDATA = RGB_UNPACK_BLUE(*p);
-        lcd_sleep(3); /* if data is sent too fast to lcdif, machine freezes */
     }
 }
 
