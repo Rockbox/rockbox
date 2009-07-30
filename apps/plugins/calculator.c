@@ -101,13 +101,6 @@ PLUGIN_HEADER
 #define X_4_POS (X_3_POS + REC_WIDTH)  /* x4 = 88 */
 #define X_5_POS (X_4_POS + REC_WIDTH)  /* x5 = 110, column 111 left blank */
 
-#define TEXT_1_POS (Y_1_POS-10)  /* y1 = 2  */   /* blank height = 12 */
-#define TEXT_2_POS (Y_2_POS-8)   /* y2 = 15 */   /* blank height = 9  */
-#define TEXT_3_POS (Y_3_POS-8)   /* y3 = 25 */
-#define TEXT_4_POS (Y_4_POS-8)   /* y4 = 35 */
-#define TEXT_5_POS (Y_5_POS-8)   /* y5 = 45 */
-#define TEXT_6_POS (Y_6_POS-8)   /* y6 = 55 */
-
 #define SIGN(x) ((x)<0?-1:1)
 #define ABS(x) ((x)<0?-(x):(x))
 
@@ -373,7 +366,8 @@ PLUGIN_HEADER
 #endif
 
 #include "lib/touchscreen.h"
-static struct ts_raster calc_raster = { X_0_POS, Y_1_POS, BUTTON_COLS*REC_WIDTH, BUTTON_ROWS*REC_HEIGHT, REC_WIDTH, REC_HEIGHT };
+static struct ts_raster calc_raster = { X_0_POS, Y_1_POS,
+    BUTTON_COLS*REC_WIDTH, BUTTON_ROWS*REC_HEIGHT, REC_WIDTH, REC_HEIGHT };
 #endif
 
 enum {
@@ -387,7 +381,7 @@ unsigned char* buttonChar[2][5][5] = {
       { "4"  , "5"  , "6"   , "*"    , "x^2" },
       { "1"  , "2"  , "3"   , "-"    , "1/x" },
       { "0"  , "+/-", "."   , "+"    , "="   }  },
-    
+
     { { "n!" , "PI" , "1st" , "sin"  , "asi" },
       { "7"  , "8"  , "9"   , "cos"  , "aco" },
       { "4"  , "5"  , "6"   , "tan"  , "ata" },
@@ -652,8 +646,8 @@ void cal_initial (void)
 {
     int w,h;
 
-    rb->lcd_getstringsize("A",&w,&h);
-    if (h >= REC_HEIGHT)
+    rb->lcd_getstringsize("2nd",&w,&h);
+    if (w > REC_WIDTH || h > REC_HEIGHT)
         rb->lcd_setfont(FONT_SYSFIXED);
 
     rb->lcd_clear_display();
@@ -949,7 +943,7 @@ static void move_with_wrap_and_shift(
     int *dimen2, int dimen2_delta, int dimen2_modulo)
 {
     bool wrapped = false;
-    
+
     *dimen1 += dimen1_delta;
     if (*dimen1 < 0)
     {
@@ -961,7 +955,7 @@ static void move_with_wrap_and_shift(
         *dimen1 = 0;
         wrapped = true;
     }
-    
+
     if (wrapped)
     {
         /* Make the dividend always positive to be sure about the result.
@@ -1011,23 +1005,22 @@ pos is the position that needs animation. pos = [1~18]
 ----------------------------------------------------------------------- */
 void deleteAnimation(int pos)
 {
-    int k;
+    int k, w, h, x;
     if (pos<1 || pos >18)
         return;
-    pos--;
-    rb->lcd_fillrect(1+pos*6, TEXT_1_POS, 6, 8);
-    rb->lcd_update_rect(1+pos*6, TEXT_1_POS, 6, 8);
 
-    for (k=1;k<=4;k++){
-        rb->sleep(HZ/32);
+    rb->lcd_getstringsize("0", &w, &h);
+    x = (pos==1? 4: LCD_WIDTH - 4 - w);
+
+    for (k=0;k<4;k++){
         rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        rb->lcd_fillrect(1+pos*6, TEXT_1_POS, 6, 8);
+        rb->lcd_fillrect(x, Y_1_POS - h -1, w, h);
         rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->lcd_fillrect(1+pos*6+1+k, TEXT_1_POS+k,
-                         (5-2*k)>0?(5-2*k):1, (7-2*k)>0?(7-2*k):1 );
-        rb->lcd_update_rect(1+pos*6, TEXT_1_POS, 6, 8);
+        rb->lcd_fillrect(x + (w*k)/8, Y_1_POS - h -1 + (h*k)/8,
+                         (w*(4-k))/4, (h*(4-k))/4);
+        rb->lcd_update_rect(x, Y_1_POS - h -1, w, h);
+        rb->sleep(HZ/32);
     }
-
 }
 
 /* -----------------------------------------------------------------------
