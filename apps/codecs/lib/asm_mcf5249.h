@@ -19,8 +19,6 @@
  ****************************************************************************/
 /* asm routines for wide math on the MCF5249 */
 
-//#include "os_types.h"
-
 #if defined(CPU_COLDFIRE)
 
 /* attribute for 16-byte alignment */
@@ -43,7 +41,6 @@ static inline int32_t MULT32(int32_t x, int32_t y) {
 }
 
 static inline int32_t MULT31(int32_t x, int32_t y) {
-
   asm volatile ("mac.l %[x], %[y], %%acc0;" /* multiply */
                 "movclr.l %%acc0, %[x];"    /* move and clear */
                 : [x] "+&r" (x)
@@ -51,7 +48,6 @@ static inline int32_t MULT31(int32_t x, int32_t y) {
                 : "cc");
   return x;
 }
-
 
 static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
   int32_t r;
@@ -69,7 +65,6 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
                 : "cc");
   return r;
 }
-
 
 static inline
 void XPROD31(int32_t  a, int32_t  b,
@@ -90,7 +85,6 @@ void XPROD31(int32_t  a, int32_t  b,
                 : "cc", "memory");
 }
 
-
 static inline
 void XNPROD31(int32_t  a, int32_t  b,
               int32_t  t, int32_t  v,
@@ -109,7 +103,6 @@ void XNPROD31(int32_t  a, int32_t  b,
                   [b] "r" (b), [t] "r" (t), [v] "r" (v)
                 : "cc", "memory");
 }
-
 
 #if 0    /* canonical Tremor definition */
 #define XPROD32(_a, _b, _t, _v, _x, _y)         \
@@ -140,7 +133,7 @@ void XNPROD31(int32_t  a, int32_t  b,
 /* asm versions of vector operations for block.c, window.c */
 /* assumes MAC is initialized & accumulators cleared */
 static inline
-void vect_add(int32_t *x, int32_t *y, int n)
+void vect_add(int32_t *x, const int32_t *y, int n)
 {
   /* align to 16 bytes */
   while(n>0 && (int)x&15) {
@@ -198,7 +191,6 @@ void vect_copy(int32_t *x, int32_t *y, int n)
     n--;
   }
 }
-
 
 static inline
 void vect_mult_fw(int32_t *data, int32_t *window, int n)
@@ -325,3 +317,4 @@ static inline int32_t CLIP_TO_15(register int32_t x) {
 #else
 #define LINE_ATTR
 #endif
+
