@@ -1412,12 +1412,11 @@ target/arm/samsung/yh925/powermgmt-yh925.c
 
 #ifdef SAMSUNG_YPS3
 /* TODO: currently including all files for the bootloader DFU test program */
-drivers/generic_i2c.c
-drivers/mcs3080.c
 target/arm/s5l8700/adc-s5l8700.c
 target/arm/s5l8700/i2c-s5l8700.c
 target/arm/s5l8700/kernel-s5l8700.c
 target/arm/s5l8700/timer-s5l8700.c
+target/arm/s5l8700/yps3/button-yps3.c
 target/arm/s5l8700/yps3/lcd-yps3.c
 target/arm/s5l8700/yps3/fmradio-i2c-yps3.c
 target/arm/s5l8700/yps3/backlight-yps3.c
