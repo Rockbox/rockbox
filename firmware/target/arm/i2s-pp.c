@@ -63,9 +63,17 @@ void i2s_reset(void)
 #ifdef HAVE_AS3514
     /* AS3514 can only operate as I2S Slave */
     IISCONFIG |= IIS_MASTER;
+
     /* Set I2S to 44.1kHz */
+#ifdef PHILIPS_SA9200
+    /* values taken from the SA9200 OF */
+    IISCLK = (IISCLK & ~0x1ff) | 31;
+    IISDIV = (IISDIV & ~0xc0000000) | (2 << 30);
+    IISDIV = (IISDIV & ~0x3f) | 16;
+#else
     IISCLK = (IISCLK & ~0x1ff) | 33;
     IISDIV = 7;
+#endif
 #endif /* HAVE_AS3514 */
 
     IISCONFIG = ((IISCONFIG & ~IIS_FIFO_FORMAT_MASK) | IIS_FIFO_FORMAT_LE16_2);

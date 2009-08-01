@@ -182,8 +182,13 @@ void audiohw_preinit(void)
     as3514_write(AS3514_HPH_OUT_L,
                  HPH_OUT_L_HP_ON | HPH_OUT_L_HP_MUTE | 0x00);
 
+#ifdef PHILIPS_SA9200
+    /* LRCK 8-23kHz (there are audible clicks while reading the ADC otherwise) */
+    as3514_write(AS3514_PLLMODE, PLLMODE_LRCK_8_23);
+#else
     /* LRCK 24-48kHz */
     as3514_write(AS3514_PLLMODE, PLLMODE_LRCK_24_48);
+#endif
 
     /* DAC_Mute_off */
     as3514_set(AS3514_DAC_L, DAC_L_DAC_MUTE_off);

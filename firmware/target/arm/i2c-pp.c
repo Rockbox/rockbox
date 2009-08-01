@@ -299,6 +299,13 @@ void i2c_init(void)
     outl(0x1e, 0x600060a4);
 
     ascodec_write(AS3514_SUPERVISOR, 5);
+#elif defined(PHILIPS_SA9200)
+    outl(0x0, 0x600060a4);
+    outl(inl(0x600060a4) | 0x20, 0x600060a4);
+
+    outl(inl(0x7000c020) | 0x3, 0x7000c020);
+    outl(0x55, 0x7000c02c);
+    outl(0x54, 0x7000c030);
 #endif
 #endif
 
