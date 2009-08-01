@@ -37,22 +37,27 @@
 
 void _backlight_set_brightness(int brightness)
 {
-    /* pwm = (sqrt(2)**x)-1, where brightness level x = 0..16 */
-    static const unsigned char logtable[] =
-        {0, 1, 2, 3, 5, 7, 10, 15, 22, 31, 44, 63, 90, 127, 180, 255};
+    /* pwm = round(sqrt(2)**x), where brightness level x = 1..16 */
+    static const unsigned int logtable[] =
+        {1, 2, 3, 4, 6, 8, 11, 16, 23, 32, 45, 64, 91, 128, 181, 256};
 
     /* set PWM width */
-    TADATA0 = 255 - logtable[brightness];
+    TADATA0 = logtable[brightness];
 }
 
 void _backlight_on(void)
 {
+    /* configure backlight pin P0.0 as timer PWM output */
+    PCON0 = ((PCON0 & ~(3 << 0)) | (2 << 0));
+
     _backlight_set_brightness(backlight_brightness);
 }
 
 void _backlight_off(void)
 {
-    _backlight_set_brightness(MIN_BRIGHTNESS_SETTING);
+    /* configure backlight pin P0.0 as GPIO and switch off */
+    PCON0 = ((PCON0 & ~(3 << 0)) | (1 << 0));
+    PDAT0 &= ~(1 << 0);
 }
 
 void _buttonlight_on(void)
@@ -73,22 +78,19 @@ bool _backlight_init(void)
     PCON3 = (PCON3 & ~0x0000FF00) | 0x00001100;
     PCON4 = (PCON4 & ~0x00000F00) | 0x00000100;
 
-    /* enable backlight pin as timer output */
-    PCON0 = ((PCON0 & ~(3 << 0)) | (2 << 0));
-
     /* enable timer clock */
     PWRCON &= ~(1 << 4);
 
     /* configure timer */
-    TACMD = (1 << 1);   /* TC_CLR */
-    TACON = (0 << 13) | /* TC_INT1_EN */
-            (0 << 12) | /* TC_INT0_EN */
-            (0 << 11) | /* TC_START */
-            (3 << 8) |  /* TC_CS = PCLK / 64 */
-            (1 << 4);   /* TC_MODE_SEL = PWM mode */
-    TADATA1 = 255;      /* set PWM period */
+    TACMD = (1 << 1);   /* TA_CLR */
+    TACON = (0 << 13) | /* TA_INT1_EN */
+            (0 << 12) | /* TA_INT0_EN */
+            (1 << 11) | /* TA_START */
+            (3 << 8) |  /* TA_CS = PCLK / 64 */
+            (1 << 4);   /* TA_MODE_SEL = PWM mode */
+    TADATA1 = 256;      /* set PWM period */
     TAPRE = 20;         /* prescaler */
-    TACMD = (1 << 0);   /* TC_EN */
+    TACMD = (1 << 0);   /* TA_EN */
    
     _backlight_on();
 
