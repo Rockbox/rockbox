@@ -158,16 +158,6 @@ sound_set_type* sound_get_fn(int setting)
 }
 
 #if CONFIG_CODEC == SWCODEC
-/* Copied from dsp.h, nasty nasty, but we don't want to include dsp.h */
-
-enum {
-    DSP_CALLBACK_SET_PRESCALE = 0,
-    DSP_CALLBACK_SET_BASS,
-    DSP_CALLBACK_SET_TREBLE,
-    DSP_CALLBACK_SET_CHANNEL_CONFIG,
-    DSP_CALLBACK_SET_STEREO_WIDTH
-};
-
 static int (*dsp_callback)(int, intptr_t) = NULL;
 
 void sound_set_dsp_callback(int (*func)(int, intptr_t))
@@ -250,6 +240,10 @@ static void set_prescaled_volume(void)
     {
         r += ((r - (VOLUME_MIN - ONE_DB)) * current_balance) / VOLUME_RANGE;
     }
+
+#ifdef HAVE_SW_VOLUME_CONTROL
+    dsp_callback(DSP_CALLBACK_SET_SW_VOLUME, 0);
+#endif
 
 #if CONFIG_CODEC == MAS3507D
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);

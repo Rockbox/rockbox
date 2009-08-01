@@ -24,6 +24,19 @@
 #include <inttypes.h>
 #include <audiohw.h>
 
+#if CONFIG_CODEC == SWCODEC
+enum {
+    DSP_CALLBACK_SET_PRESCALE = 0,
+    DSP_CALLBACK_SET_BASS,
+    DSP_CALLBACK_SET_TREBLE,
+    DSP_CALLBACK_SET_CHANNEL_CONFIG,
+    DSP_CALLBACK_SET_STEREO_WIDTH,
+#ifdef HAVE_SW_VOLUME_CONTROL
+    DSP_CALLBACK_SET_SW_VOLUME,
+#endif
+};
+#endif
+
 typedef void sound_set_type(int value);
 
 const char *sound_unit(int setting);

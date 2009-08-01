@@ -890,6 +890,15 @@ static void set_gain(struct dsp_config *dsp)
             (long) (((int64_t) dsp->data.gain * eq_precut) >> 24);
     }
 
+#ifdef HAVE_SW_VOLUME_CONTROL
+    if (global_settings.volume < SW_VOLUME_MAX ||
+        global_settings.volume > SW_VOLUME_MIN)
+    {
+        int vol_gain = get_replaygain_int(global_settings.volume * 100);
+        dsp->data.gain = (long) (((int64_t) dsp->data.gain * vol_gain) >> 24);
+    }
+#endif
+
     if (dsp->data.gain == DEFAULT_GAIN)
     {
         dsp->data.gain = 0;
@@ -1149,6 +1158,11 @@ int dsp_callback(int msg, intptr_t param)
     case DSP_CALLBACK_SET_TREBLE:
         treble = param;
         break;
+#ifdef HAVE_SW_VOLUME_CONTROL
+    case DSP_CALLBACK_SET_SW_VOLUME:
+        set_gain(&AUDIO_DSP);
+        break;
+#endif
 #endif
     case DSP_CALLBACK_SET_CHANNEL_CONFIG:
         dsp_set_channel_config(param);

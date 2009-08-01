@@ -27,7 +27,8 @@
 
 /* TODO */
 const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  2,   0,   6,   0},
+    /* HAVE_SW_VOLUME_CONTROL */
+    [SOUND_VOLUME]        = {"dB", 0,  1, SW_VOLUME_MIN, 6,   0},
     /* HAVE_SW_TONE_CONTROLS */
     [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
     [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
@@ -79,7 +80,7 @@ static void i2s_codec_init(void)
 
     REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST);
 
-    REG_ICDC_CDCCR2 = ( ICDC_CDCCR2_AINVOL(14) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_44)
+    REG_ICDC_CDCCR2 = ( ICDC_CDCCR2_AINVOL(23) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_44)
                       | ICDC_CDCCR2_HPVOL(ICDC_CDCCR2_HPVOL_0));
 
     mdelay(15);
@@ -287,9 +288,14 @@ void audiohw_init(void)
 
 void audiohw_set_volume(int v)
 {
-    /* 0 <= v <= 60 */
-    unsigned int codec_volume = v / 20;
-    REG_ICDC_CDCCR2 = (REG_ICDC_CDCCR2 & ~ICDC_CDCCR2_HPVOL(0x3)) | ICDC_CDCCR2_HPVOL(codec_volume);
+    if(v >= 0)
+    {
+        /* 0 <= v <= 60 */
+        unsigned int codec_volume = ICDC_CDCCR2_HPVOL(v / 20);
+
+        if((REG_ICDC_CDCCR2 & ICDC_CDCCR2_HPVOL(0x3)) != codec_volume)
+            REG_ICDC_CDCCR2 = (REG_ICDC_CDCCR2 & ~ICDC_CDCCR2_HPVOL(0x3)) | codec_volume;
+    }
 }
 
 void audiohw_set_frequency(int freq)
@@ -329,7 +335,8 @@ void audiohw_set_frequency(int freq)
             return;
     }
 
-    REG_ICDC_CDCCR2 = (REG_ICDC_CDCCR2 & ~ICDC_CDCCR2_SMPR(0xF)) | speed;
+    if((REG_ICDC_CDCCR2 & ICDC_CDCCR2_SMPR(0xF)) != speed)
+        REG_ICDC_CDCCR2 = (REG_ICDC_CDCCR2 & ~ICDC_CDCCR2_SMPR(0xF)) | speed;
 }
 
 int audio_channels = 2;
@@ -356,20 +363,16 @@ void audio_input_mux(int source, unsigned flags)
         case AUDIO_SRC_PLAYBACK:
             audio_channels = 2;
             if(source != last_source)
-            {
                 REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_ELININ | ICDC_CDCCR1_EMIC | ICDC_CDCCR1_EADC | ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_HPMUTE))
                                     | (ICDC_CDCCR1_EDAC | ICDC_CDCCR1_SW2ON);
-            }
             break;
 
 #if INPUT_SRC_CAPS & SRC_CAP_MIC
         case AUDIO_SRC_MIC:             /* recording only */
             audio_channels = 1;
             if(source != last_source)
-            {
                 REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_ELININ | ICDC_CDCCR1_EDAC | ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_HPMUTE)) 
                                     | (ICDC_CDCCR1_EADC | ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_EMIC);
-            }
             break;
 #endif
 
@@ -383,15 +386,11 @@ void audio_input_mux(int source, unsigned flags)
             last_recording = recording;
 
             if(recording)
-            {
                 REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_EMIC | ICDC_CDCCR1_EDAC | ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_HPMUTE))
                                     | (ICDC_CDCCR1_EADC | ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_ELININ);
-            }
             else
-            {
                 REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_EMIC | ICDC_CDCCR1_EDAC | ICDC_CDCCR1_EADC |
                                    ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_HPMUTE)) | (ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_ELININ);
-            }
             break;
 #endif
     } /* end switch */

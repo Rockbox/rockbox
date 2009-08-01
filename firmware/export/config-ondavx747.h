@@ -139,6 +139,14 @@
 /* has no tone controls, so we use the software ones */
 #define HAVE_SW_TONE_CONTROLS
 
+/* has no volume control, so we use the software ones */
+#define HAVE_SW_VOLUME_CONTROL
+
+/* software controlled volume ranges from -73 -> 0 dB, other than that
+   is controlled by hardware */
+#define SW_VOLUME_MIN   -73
+#define SW_VOLUME_MAX   0
+
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_48 | SAMPR_CAP_44 | SAMPR_CAP_32 | \
                          SAMPR_CAP_24 | SAMPR_CAP_22 | SAMPR_CAP_16 | \

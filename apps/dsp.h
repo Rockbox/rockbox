@@ -56,14 +56,6 @@ enum
     DSP_CROSSFEED
 };
 
-enum {
-    DSP_CALLBACK_SET_PRESCALE = 0,
-    DSP_CALLBACK_SET_BASS,
-    DSP_CALLBACK_SET_TREBLE,
-    DSP_CALLBACK_SET_CHANNEL_CONFIG,
-    DSP_CALLBACK_SET_STEREO_WIDTH
-};
-
 struct dsp_config;
 
 int dsp_process(struct dsp_config *dsp, char *dest,
