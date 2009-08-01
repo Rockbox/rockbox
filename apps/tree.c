@@ -956,7 +956,9 @@ int rockbox_browse(const char *root, int dirfilter)
                     global_settings.fmr_file);
         }
 #endif
-        
+        else /* reset current[] */
+            current[0] = '\0';
+
         /* If we've found a file to center on, do it */
         if (current[0] == '/')
         {
