@@ -156,6 +156,7 @@ int uart1_gets_queue(char *str, int size)
 /* UART1 receive/transmit interupt handler */
 void UART1(void)
 {
+    IO_INTC_IRQ0 = INTR_IRQ0_UART1; /* Clear the interrupt first */
     while (IO_UART1_RFCR & 0x3f)
     {
         if (uart1_receive_count > RECEIVE_RING_SIZE)
@@ -176,6 +177,4 @@ void UART1(void)
         IO_UART1_DTRR=uart1_send_buffer_ring[uart1_send_read++];
         uart1_send_count--;
     }
-
-    IO_INTC_IRQ0 = INTR_IRQ0_UART1;
 }

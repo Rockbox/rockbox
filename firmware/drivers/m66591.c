@@ -41,6 +41,11 @@
 /*******************************************************************************
  *  These are the driver specific defines.
  ******************************************************************************/
+
+/* This define is primarily intended for testing, using HISPEED all the time
+ *  should be acceptable since the defice should down-train if the host does not
+ *  support HISPEED.
+ */
 #define HISPEED
 
 /* Right now sending blocks till the full transfer has completed, this needs to
@@ -134,24 +139,43 @@ static int pipe_buffer_size (int pipe) {
 }
 #endif
 
-/* This function returns the maximum packet size for each endpoint/pipe.  It is
- *  Currently only setup to support Highspeed mode. 
+/* This function returns the maximum packet size for each endpoint/pipe.  The
+ *  max packet size is dependent on whether the device is running High or Full
+ *  speed.
  */
 static int pipe_maxpack_size (int pipe) {
-    switch(pipe) {
-    case 0:
-        /* DCP max packet size is configurable */
-        return M66591_DCP_MXPKSZ;
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-        return 512;
-    case 5:
-    case 6:
-        return 64;
-    default:
-        return 0;
+    if( (M66591_HSFS & 0xFF) == 0x03 ) { /* Device is running Highspeed */
+        switch(pipe) {
+        case 0:
+            /* DCP max packet size is configurable */
+            return M66591_DCP_MXPKSZ;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            return 512;
+        case 5:
+        case 6:
+            return 64;
+        default:
+            return 0;
+        }
+    } else {            /* Device is running Full speed */
+        switch(pipe) {
+        case 0:
+            /* DCP max packet size is configurable */
+            return M66591_DCP_MXPKSZ;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            return 64;
+        case 5:
+        case 6:
+            return 64;
+        default:
+            return 0;
+        }
     }
 }
 
@@ -461,7 +485,7 @@ void USB_DEVICE(void) {
         case CTRL_RTDS: 
         case CTRL_WTDS:
         case CTRL_WTND:
-            // If data is not valid stop
+            /* If data is not valid stop */
 	        if(!(M66591_INTSTAT_MAIN & (1<<3)) ) {
 	            logf("mxx: CTRT interrupt but VALID is false");
 	            break;
@@ -471,7 +495,7 @@ void USB_DEVICE(void) {
         case CTRL_RTSS:
         case CTRL_WTSS:
             pipe_handshake(0, PIPE_SHAKE_BUF);
-            M66591_DCPCTRL |= 1<<2; // Set CCPL
+            M66591_DCPCTRL |= 1<<2; /* Set CCPL */
             break;
         default:
             logf("mxx: CTRT with unknown CTSQ");
