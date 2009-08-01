@@ -49,7 +49,7 @@ bool timer_set(long cycles, bool start)
     /* Increase prescale values starting from 0 to make the cycle count fit */
     while(divider > 65535 && prescaler <= 1024)
     {
-        prescaler >>= 2; /* 1, 4, 16, 64, 256, 1024 */
+        prescaler <<= 2; /* 1, 4, 16, 64, 256, 1024 */
         prescaler_bit++;
         divider = cycles / prescaler;
     }
