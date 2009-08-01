@@ -34,29 +34,30 @@
 
 void _backlight_set_brightness(int brightness)
 {
-    /* pwm = (sqrt(2)**x)-1, where brightness level x = 0..16 */
-    static const unsigned char logtable[] =
-        {0, 1, 2, 3, 5, 7, 10, 15, 22, 31, 44, 63, 90, 127, 180, 255};
+    /* pwm = round(sqrt(2)**x), where brightness level x = 1..16 */
+    static const unsigned int logtable[] =
+        {1, 2, 3, 4, 6, 8, 11, 16, 23, 32, 45, 64, 91, 128, 181, 256};
 
     /* set PWM width */
-    TCDATA0 = 255 - logtable[brightness];
+    TCDATA0 = logtable[brightness];
 }
 
 void _backlight_on(void)
 {
+    /* configure backlight pin P0.2 as timer PWM output */
+    PCON0 = ((PCON0 & ~(3 << 4)) | (2 << 4));
     _backlight_set_brightness(backlight_brightness);
 }
 
 void _backlight_off(void)
 {
-    _backlight_set_brightness(MIN_BRIGHTNESS_SETTING);
+    /* configure backlight pin P0.2 as GPIO and switch off */
+    PCON0 = ((PCON0 & ~(3 << 4)) | (1 << 4));
+    PDAT0 &= ~(1 << 2);
 }
 
 bool _backlight_init(void)
 {
-    /* enable backlight pin as timer output */
-    PCON0 = ((PCON0 & ~(3 << 4)) | (2 << 4));
-
     /* enable timer clock */
     PWRCON &= ~(1 << 4);
 
@@ -64,11 +65,11 @@ bool _backlight_init(void)
     TCCMD = (1 << 1);   /* TC_CLR */
     TCCON = (0 << 13) | /* TC_INT1_EN */
             (0 << 12) | /* TC_INT0_EN */
-            (0 << 11) | /* TC_START */
+            (1 << 11) | /* TC_START */
             (3 << 8) |  /* TC_CS = PCLK / 64 */
             (1 << 4);   /* TC_MODE_SEL = PWM mode */
-    TCDATA1 = 255;      /* set PWM period */
-    TCPRE = 30;         /* prescaler */
+    TCDATA1 = 256;      /* set PWM period */
+    TCPRE = 20;         /* prescaler */
     TCCMD = (1 << 0);   /* TC_EN */
    
     _backlight_on();
