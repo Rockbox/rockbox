@@ -94,18 +94,6 @@ char* id3_get_num_genre(unsigned int genre_num)
     return NULL;
 }
 
-/* True if the string is from the "genres" array */
-bool id3_is_genre_string(const char *string)
-{
-    unsigned int i;
-
-    for(i=0; i < ARRAYLEN(genres); i++)
-        if(genres[i] == string)
-            return true;
-
-    return false;
-}
-
 /*
     HOW TO ADD ADDITIONAL ID3 VERSION 2 TAGS
     Code and comments by Thomas Paul Diffenbach

@@ -458,7 +458,8 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig)
         entry->artist += offset;
     if (entry->album)
         entry->album += offset;
-    if (entry->genre_string && !id3_is_genre_string(entry->genre_string))
+    if (entry->genre_string > (char*)orig
+         && entry->genre_string < (char*)orig + sizeof(struct mp3entry))
         /* Don't adjust that if it points to an entry of the "genres" array */
         entry->genre_string += offset;
     if (entry->track_string)
