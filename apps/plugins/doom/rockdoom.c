@@ -714,7 +714,10 @@ enum plugin_status plugin_start(const void* parameter)
 
    rb->lcd_clear_display();
 
-   systemvol= rb->global_settings->volume-rb->global_settings->volume%((rb->sound_max(SOUND_VOLUME)-rb->sound_min(SOUND_VOLUME))/15);
+   int mod = (rb->sound_max(SOUND_VOLUME)-rb->sound_min(SOUND_VOLUME))/15;
+   if(mod == 0)
+       mod = rb->global_settings->volume;
+   systemvol= rb->global_settings->volume-rb->global_settings->volume;
    general_translucency = default_translucency;                    // phares
 
    backlight_force_on();
