@@ -44,7 +44,7 @@ PLUGIN_HEADER
 #define PLAYER    7
 
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define PEGBOX_SAVE     BUTTON_ON
+#define PEGBOX_SELECT   BUTTON_ON
 #define PEGBOX_QUIT     BUTTON_OFF
 #define PEGBOX_RESTART  BUTTON_F2
 #define PEGBOX_LVL_UP   BUTTON_F1
@@ -54,14 +54,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "ON"
+#define SELECT_TEXT "ON"
 #define QUIT_TEXT "OFF"
 #define RESTART_TEXT "F2"
 #define LVL_UP_TEXT "F1"
 #define LVL_DOWN_TEXT "F3"
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define PEGBOX_SAVE     BUTTON_OFF
+#define PEGBOX_SELECT   BUTTON_OFF
 #define PEGBOX_QUIT     (BUTTON_MENU | BUTTON_LEFT)
 #define PEGBOX_RESTART  (BUTTON_MENU | BUTTON_RIGHT)
 #define PEGBOX_LVL_UP   (BUTTON_MENU | BUTTON_UP)
@@ -71,7 +71,7 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "OFF"
+#define SELECT_TEXT "OFF"
 #define QUIT_TEXT "M+LEFT"
 #define RESTART_TEXT "M+RIGHT"
 #define LVL_UP_TEXT "M+UP"
@@ -79,7 +79,7 @@ PLUGIN_HEADER
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define PEGBOX_SAVE     BUTTON_SELECT
+#define PEGBOX_SELECT   BUTTON_SELECT
 #define PEGBOX_QUIT     BUTTON_OFF
 #define PEGBOX_RESTART  BUTTON_ON
 #define PEGBOX_LVL_UP   BUTTON_MODE
@@ -89,7 +89,7 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "NAVI"
+#define SELECT_TEXT "NAVI"
 #define QUIT_TEXT "OFF"
 #define RESTART_TEXT "ON"
 #define LVL_UP_TEXT "AB"
@@ -98,7 +98,7 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define PEGBOX_SAVE     (BUTTON_SELECT|BUTTON_RIGHT)
+#define PEGBOX_SELECT   (BUTTON_SELECT|BUTTON_RIGHT)
 #define PEGBOX_QUIT     (BUTTON_SELECT|BUTTON_PLAY)
 #define PEGBOX_RESTART  (BUTTON_SELECT|BUTTON_LEFT)
 #define PEGBOX_LVL_UP   (BUTTON_SELECT|BUTTON_MENU)
@@ -107,14 +107,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "SELECT+RIGHT"
+#define SELECT_TEXT "SELECT+RIGHT"
 #define QUIT_TEXT "SELECT+PLAY"
 #define RESTART_TEXT "SELECT+LEFT"
 #define LVL_UP_TEXT  "SELECT+MENU"
 #define LVL_DOWN_TEXT "-"
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-#define PEGBOX_SAVE     BUTTON_SELECT
+#define PEGBOX_SELECT   BUTTON_SELECT
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_RESTART  BUTTON_REC
 #define PEGBOX_LVL_UP   BUTTON_PLAY
@@ -123,14 +123,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "SELECT"
+#define SELECT_TEXT "SELECT"
 #define QUIT_TEXT "OFF"
 #define RESTART_TEXT "REC"
 #define LVL_UP_TEXT "PLAY"
 #define LVL_DOWN_TEXT "-"
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-#define PEGBOX_SAVE     BUTTON_MODE
+#define PEGBOX_SELECT   BUTTON_MODE
 #define PEGBOX_QUIT     BUTTON_PLAY
 #define PEGBOX_RESTART  (BUTTON_EQ|BUTTON_MODE)
 #define PEGBOX_LVL_UP   (BUTTON_EQ|BUTTON_UP)
@@ -140,14 +140,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "MODE"
+#define SELECT_TEXT "MODE"
 #define QUIT_TEXT "PLAY"
 #define RESTART_TEXT "EQ+MODE"
 #define LVL_UP_TEXT "EQ+UP"
 #define LVL_DOWN_TEXT "EQ+DOWN"
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define PEGBOX_SAVE     BUTTON_PLAY
+#define PEGBOX_SELECT   BUTTON_PLAY
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_RESTART  (BUTTON_FF|BUTTON_REPEAT)
 #define PEGBOX_LVL_UP   (BUTTON_FF|BUTTON_SCROLL_UP)
@@ -157,14 +157,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "PLAY"
+#define SELECT_TEXT "PLAY"
 #define QUIT_TEXT "OFF"
 #define RESTART_TEXT "LONG FF"
 #define LVL_UP_TEXT "FF+SCROLL_UP"
 #define LVL_DOWN_TEXT "FF+SCROLL_DOWN"
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
-#define PEGBOX_SAVE     BUTTON_SELECT
+#define PEGBOX_SELECT   BUTTON_SELECT
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_RESTART  BUTTON_REC
 #define PEGBOX_LVL_UP   BUTTON_SCROLL_BACK
@@ -174,14 +174,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "SELECT"
+#define SELECT_TEXT "SELECT"
 #define QUIT_TEXT "POWER"
 #define RESTART_TEXT "REC"
 #define LVL_UP_TEXT "SCROLL BACK"
 #define LVL_DOWN_TEXT "SCROLL FWD"
 
 #elif CONFIG_KEYPAD == SANSA_FUZE_PAD
-#define PEGBOX_SAVE     BUTTON_SELECT|BUTTON_REL
+#define PEGBOX_SELECT   BUTTON_SELECT|BUTTON_REL
 #define PEGBOX_QUIT     (BUTTON_HOME|BUTTON_REPEAT)
 #define PEGBOX_RESTART  (BUTTON_SELECT|BUTTON_LEFT)
 #define PEGBOX_LVL_UP   (BUTTON_SELECT|BUTTON_UP)
@@ -191,14 +191,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "SELECT"
+#define SELECT_TEXT "SELECT"
 #define QUIT_TEXT "HOME"
 #define RESTART_TEXT "SELECT & LEFT"
 #define LVL_UP_TEXT "SELECT & UP"
 #define LVL_DOWN_TEXT "SELECT & DOWN"
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define PEGBOX_SAVE     BUTTON_SELECT
+#define PEGBOX_SELECT   BUTTON_SELECT
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_RESTART  BUTTON_A
 #define PEGBOX_LVL_UP   BUTTON_VOL_UP
@@ -208,14 +208,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "SELECT"
+#define SELECT_TEXT "SELECT"
 #define QUIT_TEXT "POWER"
 #define RESTART_TEXT "A"
 #define LVL_UP_TEXT "VOL+"
 #define LVL_DOWN_TEXT "VOL-"
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
-#define PEGBOX_SAVE     BUTTON_SELECT
+#define PEGBOX_SELECT   BUTTON_SELECT
 #define PEGBOX_QUIT     BUTTON_BACK
 #define PEGBOX_RESTART  BUTTON_MENU
 #define PEGBOX_LVL_UP   BUTTON_VOL_UP
@@ -225,14 +225,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "SELECT"
+#define SELECT_TEXT "SELECT"
 #define QUIT_TEXT "BACK"
 #define RESTART_TEXT "MENU"
 #define LVL_UP_TEXT "VOL+"
 #define LVL_DOWN_TEXT "VOL-"
 
 #elif CONFIG_KEYPAD == MROBE100_PAD
-#define PEGBOX_SAVE     BUTTON_SELECT
+#define PEGBOX_SELECT   BUTTON_SELECT
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_RESTART  BUTTON_PLAY
 #define PEGBOX_LVL_UP   BUTTON_MENU
@@ -242,14 +242,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "SELECT"
+#define SELECT_TEXT "SELECT"
 #define QUIT_TEXT "POWER"
 #define RESTART_TEXT "PLAY"
 #define LVL_UP_TEXT "MENU"
 #define LVL_DOWN_TEXT "DISPLAY"
 
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
-#define PEGBOX_SAVE     BUTTON_SELECT
+#define PEGBOX_SELECT   BUTTON_SELECT
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_RESTART  BUTTON_REC
 #define PEGBOX_LVL_UP   BUTTON_VOL_UP
@@ -259,14 +259,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "SELECT"
+#define SELECT_TEXT "SELECT"
 #define QUIT_TEXT "POWER"
 #define RESTART_TEXT "REC"
 #define LVL_UP_TEXT "VOL+"
 #define LVL_DOWN_TEXT "VOL-"
 
 #elif CONFIG_KEYPAD == SANSA_CLIP_PAD
-#define PEGBOX_SAVE     BUTTON_SELECT
+#define PEGBOX_SELECT   BUTTON_SELECT
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_RESTART  BUTTON_HOME
 #define PEGBOX_LVL_UP   BUTTON_VOL_UP
@@ -276,14 +276,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "SELECT"
+#define SELECT_TEXT "SELECT"
 #define QUIT_TEXT "POWER"
 #define RESTART_TEXT "HOME"
 #define LVL_UP_TEXT "VOL+"
 #define LVL_DOWN_TEXT "VOL-"
 
 #elif CONFIG_KEYPAD == SANSA_M200_PAD
-#define PEGBOX_SAVE     (BUTTON_SELECT | BUTTON_REL)
+#define PEGBOX_SELECT   (BUTTON_SELECT | BUTTON_REL)
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_RESTART  (BUTTON_SELECT | BUTTON_UP)
 #define PEGBOX_LVL_UP   BUTTON_VOL_UP
@@ -293,7 +293,7 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "SELECT"
+#define SELECT_TEXT "SELECT"
 #define QUIT_TEXT "POWER"
 #define RESTART_TEXT "SELECT+UP"
 #define LVL_UP_TEXT "VOL+"
@@ -301,7 +301,7 @@ PLUGIN_HEADER
 
 
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define PEGBOX_SAVE     BUTTON_RC_PLAY
+#define PEGBOX_SELECT   BUTTON_RC_PLAY
 #define PEGBOX_QUIT     BUTTON_RC_REC
 #define PEGBOX_RESTART  BUTTON_RC_MODE
 #define PEGBOX_LVL_UP   BUTTON_VOL_UP
@@ -311,7 +311,7 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RC_FF
 #define PEGBOX_LEFT     BUTTON_RC_REW
 
-#define SAVE_TEXT "REM. PLAY"
+#define SELECT_TEXT "REM. PLAY"
 #define QUIT_TEXT "REM. REC"
 #define RESTART_TEXT "REM. MODE"
 #define LVL_UP_TEXT "VOL+"
@@ -323,7 +323,7 @@ PLUGIN_HEADER
 #define QUIT_TEXT "POWER"
 
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-#define PEGBOX_SAVE     BUTTON_CUSTOM
+#define PEGBOX_SELECT   BUTTON_CUSTOM
 #define PEGBOX_QUIT     BUTTON_BACK
 #define PEGBOX_RESTART  BUTTON_SELECT
 #define PEGBOX_LVL_UP   BUTTON_PLAY
@@ -333,14 +333,14 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "CUSTOM"
+#define SELECT_TEXT "CUSTOM"
 #define QUIT_TEXT "BACK"
 #define RESTART_TEXT "MIDDLE"
 #define LVL_UP_TEXT "SELECT"
 #define LVL_DOWN_TEXT "MENU"
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
-#define PEGBOX_SAVE     BUTTON_VIEW
+#define PEGBOX_SELECT   BUTTON_VIEW
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_RESTART  BUTTON_MENU
 #define PEGBOX_LVL_UP   BUTTON_VOL_UP
@@ -350,7 +350,7 @@ PLUGIN_HEADER
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "VIEW"
+#define SELECT_TEXT "VIEW"
 #define QUIT_TEXT "POWER"
 #define RESTART_TEXT "MENU"
 #define LVL_UP_TEXT "VOL+"
@@ -369,8 +369,8 @@ PLUGIN_HEADER
 #ifndef PEGBOX_QUIT
 #define PEGBOX_QUIT     BUTTON_TOPLEFT
 #endif
-#ifndef PEGBOX_SAVE
-#define PEGBOX_SAVE     BUTTON_CENTER
+#ifndef PEGBOX_SELECT
+#define PEGBOX_SELECT   BUTTON_CENTER
 #endif
 #ifndef PEGBOX_RESTART
 #define PEGBOX_RESTART  BUTTON_TOPRIGHT
@@ -393,8 +393,8 @@ PLUGIN_HEADER
 #ifndef PEGBOX_LEFT
 #define PEGBOX_LEFT     BUTTON_MIDLEFT
 #endif
-#ifndef SAVE_TEXT
-#define SAVE_TEXT "CENTER"
+#ifndef SELECT_TEXT
+#define SELECT_TEXT "CENTER"
 #endif
 #ifndef QUIT_TEXT
 #define QUIT_TEXT "TOPLEFT"
@@ -724,16 +724,11 @@ static void pegbox_draw_board(struct game_context* pb)
 
             type = pb->playboard[r][c];
 
-            switch(type) {
-                case SPACE:
-                    break;
-
-                default:
-                    rb->lcd_bitmap_part(pegbox_pieces, 0, (type-1)*PIECE_HEIGHT,
-                                        PIECE_WIDTH, c * PIECE_WIDTH + BOARD_X,
-                                        r * PIECE_HEIGHT + BOARD_Y, PIECE_WIDTH,
-                                        PIECE_HEIGHT);
-                    break;
+            if(type != SPACE) {
+                rb->lcd_bitmap_part(pegbox_pieces, 0, (type-1)*PIECE_HEIGHT,
+                                    PIECE_WIDTH, c * PIECE_WIDTH + BOARD_X,
+                                    r * PIECE_HEIGHT + BOARD_Y, PIECE_WIDTH,
+                                    PIECE_HEIGHT);
             }
 
             if(pb->playboard[r][c] == PLAYER) {
@@ -818,7 +813,7 @@ static void pegbox_new_piece(struct game_context* pb, unsigned int x_loc,
             else if(ret.action == TS_ACTION_CLICK
                     && (unsigned)ret.to.x == y_loc
                     && (unsigned)ret.to.y == x_loc)
-                button = PEGBOX_SAVE;
+                button = PEGBOX_SELECT;
         }
 #endif
         switch(button){
@@ -840,8 +835,9 @@ static void pegbox_new_piece(struct game_context* pb, unsigned int x_loc,
                 else
                     pb->playboard[x_loc][y_loc] = CIRCLE;
                 break;
-            case PEGBOX_SAVE:
+            case PEGBOX_SELECT:
                 exit=true;
+                break;
         }
     }
 }
@@ -853,19 +849,20 @@ static void pegbox_move_player(struct game_context* pb, signed int x_dir,
                                 signed int y_dir)
 {
     unsigned int type1, type2;
-    signed int r,c;
-    
-    r = pb->player_row+y_dir;
-    c = pb->player_col+x_dir;
-    
-    type1 = pb->playboard[r][c];
-    type2 = pb->playboard[r+y_dir][c+x_dir];
+    signed int r1,c1,r2,c2;
 
-    if (r == ROWS || c == COLS || r < 0 || c < 0 || type1 == WALL)
+    r1 = pb->player_row+y_dir;
+    c1 = pb->player_col+x_dir;
+    r2 = pb->player_row+y_dir*2;
+    c2 = pb->player_col+x_dir*2;
+
+    type1 = pb->playboard[r1][c1];
+    type2 = pb->playboard[r2][c2];
+
+    if (r1 == ROWS || c1 == COLS || r1 < 0 || c1 < 0 || type1 == WALL)
         return;
     else if(type1 != SPACE) {
-        if (type2 == WALL || r+y_dir == ROWS || c+x_dir == COLS || 
-            r+y_dir < 0 || c+x_dir < 0)
+        if (r2 == ROWS || c2 == COLS || r2 < 0 || c2 < 0 || type2 == WALL)
             return;
     }
 
@@ -880,25 +877,25 @@ static void pegbox_move_player(struct game_context* pb, signed int x_dir,
         pegbox_load_level(pb);
     }
     else if (type1 == SPACE)
-        pb->playboard[r][c] = PLAYER;
+        pb->playboard[r1][c1] = PLAYER;
     else {
-        pb->playboard[r][c] = PLAYER;
+        pb->playboard[r1][c1] = PLAYER;
         if(type1 == type2) {
             if (type1 == TRIANGLE)
-                pb->playboard[r+y_dir][c+x_dir] = WALL;
+                pb->playboard[r2][c2] = WALL;
             else if (type1 == CROSS) {
-                pb->playboard[r][c] = SPACE;
-                pegbox_new_piece(pb, r+y_dir, c+x_dir);
-                pb->playboard[r][c] = PLAYER;
+                pb->playboard[r1][c1] = SPACE;
+                pegbox_new_piece(pb, r2, c2);
+                pb->playboard[r1][c1] = PLAYER;
             }
             else
-                pb->playboard[r+y_dir][c+x_dir] = SPACE;
+                pb->playboard[r2][c2] = SPACE;
         }
         else if (type2 == SPACE)
-            pb->playboard[r+y_dir][c+x_dir] = type1;
+            pb->playboard[r2][c2] = type1;
         else if (type2 == HOLE) {
             if (type1 == SQUARE)
-                pb->playboard[r+y_dir][c+x_dir] = SPACE;
+                pb->playboard[r2][c2] = SPACE;
         }
         else {
             rb->splash(HZ*2, "Illegal Move!");
@@ -927,7 +924,7 @@ static bool pegbox_help(void)
         RESTART_TEXT, "to", "restart", "level", "",
         LVL_UP_TEXT, "to", "go", "up", "a", "level", "",
         LVL_DOWN_TEXT, "to", "go", "down", "a", "level", "",
-        SAVE_TEXT, "to", "choose", "peg", "",
+        SELECT_TEXT, "to", "choose", "peg", "",
         QUIT_TEXT, "to", "quit"
     };
     static struct style_text formation[]={
@@ -954,82 +951,60 @@ static bool pegbox_help(void)
 /***********************************************************************
 * pegbox_menu() is the game menu
 ************************************************************************/
+static bool _ingame;
+static int pegbox_menu_cb(int action, const struct menu_item_ex *this_item)
+{
+    int i = (intptr_t)this_item;
+    if( action == ACTION_REQUEST_MENUITEM )
+    {
+        if((!_ingame && (i==0 || i==1)) || ( _ingame && i==2 ))
+            return ACTION_EXIT_MENUITEM;
+    }
+    return action;
+}
+
 static unsigned int pegbox_menu(struct game_context* pb, bool ingame)
 {
+    int selected = 0;
+    int last_level = pb->level;
+
+    MENUITEM_STRINGLIST (main_menu, "Pegbox Menu", pegbox_menu_cb,
+                         "Resume Game", "Restart Level", "Start Game",
+                         "Select Level", "Help",
+                         "Playback Control", "Quit");
+    _ingame = ingame;
     rb->button_clear_queue();
-    int choice = 0;
-    
-    if (ingame) {
-        MENUITEM_STRINGLIST (main_menu, "Pegbox Menu", NULL,
-                                 "Resume Game",
-                                 "Restart Level",
-                                 "Select Level",
-                                 "Help",
-                                 "Playback Control",
-                                 "Quit");
-                                 
-        while (true) {
-            switch (rb->do_menu(&main_menu, &choice, NULL, false)) {
-                case 0:
-                    pegbox_draw_board(pb);
-                    return 0;
-                case 1:
-                    pegbox_load_level(pb);
-                    pegbox_draw_board(pb);
-                    return 0;
-                case 2:
-                    rb->set_int("Select Level", "", UNIT_INT,
-                            &pb->level, NULL, 1, 1,
-                            pb->highlevel, NULL);
-                    break;
-                case 3:
-                    if (pegbox_help()==PLUGIN_USB_CONNECTED)
-                        return 1;
-                    break;
-                case 4:
-                    playback_control(NULL);
-                    break;
-                case 5:
+
+    while (true) {
+        switch (rb->do_menu(&main_menu, &selected, NULL, false)) {
+            case 0:
+                pb->level = last_level;
+                pegbox_draw_board(pb);
+                return 0;
+            case 1:
+            case 2:
+                pegbox_load_level(pb);
+                pegbox_draw_board(pb);
+                return 0;
+            case 3:
+                if(rb->set_int("Select Level", "", UNIT_INT, &pb->level,
+                               NULL, 1, 1, pb->highlevel, NULL))
                     return 1;
-                case MENU_ATTACHED_USB:
+                break;
+            case 4:
+                if (pegbox_help())
                     return 1;
-                default:
-                    break;
-            }
-        }
-    } else {
-        MENUITEM_STRINGLIST (main_menu, "Pegbox Menu", NULL,
-                                 "Start Game",
-                                 "Select Level",
-                                 "Help",
-                                 "Playback Control",
-                                 "Quit");
-                             
-        while (true) {
-            switch (rb->do_menu(&main_menu, &choice, NULL, false)) {
-                case 0:
-                    pegbox_load_level(pb);
-                    pegbox_draw_board(pb);
-                    return 0;
-                case 1:
-                    rb->set_int("Select Level", "", UNIT_INT,
-                            &pb->level, NULL, 1, 1,
-                            pb->highlevel, NULL);
-                    break;
-                case 2:
-                    if (pegbox_help()==PLUGIN_USB_CONNECTED)
-                        return 1;
-                    break;
-                case 3:
-                    playback_control(NULL);
-                    break;
-                case 4:
+                break;
+            case 5:
+                if (playback_control(NULL))
                     return 1;
-                case MENU_ATTACHED_USB:
-                    return 1;
-                default:
-                    break;
-            }
+                break;
+            case 6:
+                return 1;
+            case MENU_ATTACHED_USB:
+                return 1;
+            default:
+                break;
         }
     }
 }
@@ -1052,7 +1027,7 @@ static int pegbox_main(struct game_context* pb)
         {
             pegbox_raster_btn.two_d_from.y = pb->player_row;
             pegbox_raster_btn.two_d_from.x = pb->player_col;
-            
+
             struct ts_raster_button_result ret =
                   touchscreen_raster_map_button(&pegbox_raster_btn,
                                                 rb->button_get_data() >> 16,
@@ -1087,6 +1062,8 @@ static int pegbox_main(struct game_context* pb)
                 if (pegbox_menu(pb, true)==1) {
                     return 1;
                 }
+                break;
+
 #ifdef PEGBOX_RESTART
             case PEGBOX_RESTART:
                 pegbox_load_level(pb);
@@ -1139,7 +1116,7 @@ static int pegbox_main(struct game_context* pb)
 
             if(pb->level > pb->highlevel)
                 pb->highlevel = pb->level;
-                
+
         }
     }
     return PLUGIN_OK;
@@ -1155,7 +1132,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
-#endif 
+#endif
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(BG_COLOR);
@@ -1168,7 +1145,7 @@ enum plugin_status plugin_start(const void* parameter)
     struct configdata config[] = {
         {TYPE_INT, 1, NUM_LEVELS, { .int_p = &(pb.level) }, "level", NULL},
         {TYPE_INT, 1, NUM_LEVELS, { .int_p = &(pb.highlevel) }, "highlevel", NULL},
-    };    
+    };
     configfile_load(CONFIG_FILE_NAME,config,2,0);
     pegbox_main(&pb);
     configfile_save(CONFIG_FILE_NAME,config,2,0);
