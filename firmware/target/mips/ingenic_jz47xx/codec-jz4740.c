@@ -27,8 +27,11 @@
 
 /* TODO */
 const struct sound_settings_info audiohw_settings[] = {
-    /* HAVE_SW_VOLUME_CONTROL */
+#ifdef HAVE_SW_VOLUME_CONTROL
     [SOUND_VOLUME]        = {"dB", 0,  1, SW_VOLUME_MIN, 6,   0},
+#else
+    [SOUND_VOLUME]        = {"dB", 0,  1,   0,   6,   0},
+#endif
     /* HAVE_SW_TONE_CONTROLS */
     [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
     [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
