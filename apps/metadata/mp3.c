@@ -89,7 +89,7 @@ static const char* const genres[] = {
 
 char* id3_get_num_genre(unsigned int genre_num)
 {
-    if (genre_num < sizeof(genres)/sizeof(char*))
+    if (genre_num < ARRAYLEN(genres))
         return (char*)genres[genre_num];
     return NULL;
 }
@@ -97,8 +97,13 @@ char* id3_get_num_genre(unsigned int genre_num)
 /* True if the string is from the "genres" array */
 bool id3_is_genre_string(const char *string)
 {
-    return ( string >= genres[0] &&
-             string <= genres[sizeof(genres)/sizeof(char*) - 1] );
+    unsigned int i;
+
+    for(i=0; i < ARRAYLEN(genres); i++)
+        if(genres[i] == string)
+            return true;
+
+    return false;
 }
 
 /*
@@ -445,7 +450,7 @@ static const struct tag_resolver taglist[] = {
     { "UFID", 4, 0, &parsembtid, false },
 };
 
-#define TAGLIST_SIZE ((int)(sizeof(taglist) / sizeof(taglist[0])))
+#define TAGLIST_SIZE ((int)ARRAYLEN(taglist))
 
 /* Get the length of an ID3 string in the given encoding. Returns the length
  * in bytes, including end nil, or -1 if the encoding is unknown.
