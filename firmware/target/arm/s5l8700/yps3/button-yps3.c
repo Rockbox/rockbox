@@ -48,6 +48,9 @@ void button_init_device(void)
     /* P0.5/P1.0 power switch input */
     PCON0 &= ~(3 << 10);    
     PCON1 &= ~0x0000000F;
+    
+    /* P1.3 headphones detect input */
+    PCON1 &= ~0x0000F000;
 
     /* P1.5 DATA, P1.6 DRDY inputs (touch key controller) */
     PCON1 &= ~0x0FF00000; 
@@ -142,5 +145,10 @@ int button_read_device(void)
 bool button_hold(void)
 {
     return (PDAT4 & (1 << 3));
+}
+
+bool headphones_inserted(void)
+{
+    return ((PDAT1 & (1 << 3)) == 0);
 }
 
