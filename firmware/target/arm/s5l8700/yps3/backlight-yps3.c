@@ -30,6 +30,9 @@
     
     The PWM duty cycle depends exponentially on the configured brightness
     level. This makes the brightness curve more linear to the human eye.
+    
+    The button LEDs are all activated at the same time (even though there
+    are three individually controllable groups: menu/back, cursor, middle).
  */
 
 void _backlight_set_brightness(int brightness)
@@ -52,8 +55,24 @@ void _backlight_off(void)
     _backlight_set_brightness(MIN_BRIGHTNESS_SETTING);
 }
 
+void _buttonlight_on(void)
+{
+    PDAT3 |= (3 << 2);
+    PDAT4 |= (1 << 2);
+}
+
+void _buttonlight_off(void)
+{
+    PDAT3 &= ~(3 << 2);
+    PDAT4 &= ~(1 << 2);
+}
+
 bool _backlight_init(void)
 {
+    /* Enable button LEDs: P3.2 (menu/back), P3.3 (cursor), P4.2 (middle) */
+    PCON3 = (PCON3 & ~0x0000FF00) | 0x00001100;
+    PCON4 = (PCON4 & ~0x00000F00) | 0x00000100;
+
     /* enable backlight pin as timer output */
     PCON0 = ((PCON0 & ~(3 << 0)) | (2 << 0));
 

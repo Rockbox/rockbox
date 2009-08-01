@@ -72,7 +72,13 @@
    should be defined as well. */
 //#define HAVE_LCD_SLEEP
 
+/* We have button lights */
+#define HAVE_BUTTON_LIGHT
+
 #define CONFIG_KEYPAD MEIZU_M3_PAD
+
+/* We have headphone detection */
+#define HAVE_HEADPHONE_DETECTION
 
 //#define AB_REPEAT_ENABLE 1
 //#define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
