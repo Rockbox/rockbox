@@ -41,7 +41,6 @@
 #include "talk.h"
 #include "viewport.h"
 
-#define SCROLLBAR_WIDTH 6
 #define ICON_PADDING 1
 
 /* these are static to make scrolling work */
