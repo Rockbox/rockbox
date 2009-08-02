@@ -49,6 +49,9 @@ further options:
 
 PLUGIN_HEADER
 
+int font_width=4;
+int font_height=8;
+
 /* Where the board begins */
 #define XOFS 4
 #define YOFS 4
@@ -59,7 +62,7 @@ PLUGIN_HEADER
 #define MARGIN_C_W  0
 #define MARGIN_C_H  2
 #else
-#define MARGIN_W    (XOFS*2 + 16)
+#define MARGIN_W    (XOFS*2 + font_width*2)
 #define MARGIN_H    (YOFS*2+1)
 #define MARGIN_C_W  1
 #define MARGIN_C_H  0
@@ -112,7 +115,7 @@ PLUGIN_HEADER
 #define LEGEND_Y(lr) (CELL_Y(BOARD_SIZE+lr) + YOFS + 1)
 #else
 #define LEGEND_X(lc) (CELL_X(BOARD_SIZE+lc) + XOFS + 1)
-#define LEGEND_Y(lr) (CELL_Y(lr))
+#define LEGEND_Y(lr) (CELL_Y(lr) > font_height*2 ? CELL_Y(lr) : font_height*(lr) + XOFS)
 #endif
 
 
@@ -571,6 +574,9 @@ enum plugin_status plugin_start(const void *parameter) {
     int row, col;
     int w_cnt, b_cnt;
     char msg_buf[30];
+    
+    /* Initialize Font Width and height */
+    rb->lcd_getstringsize("x", &font_width, &font_height);
     
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
