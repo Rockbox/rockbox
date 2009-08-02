@@ -2180,7 +2180,6 @@ static bool bubbles_loadgame(struct game_context* bb) {
         ret = false;
     }
 
-    DEBUGF("highlevel: %d\n", bb->highlevel);
     rb->close(fd);
     return ret;
 }
@@ -2204,7 +2203,7 @@ static void bubbles_savegame(struct game_context* bb) {
     {
         rb->splash(HZ/2, "Failed to save game");
     }
-    DEBUGF("highlevel: %d\n", bb->highlevel);
+
     rb->close(fd);
 
 }
