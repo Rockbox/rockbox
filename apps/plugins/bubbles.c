@@ -2185,9 +2185,9 @@ static void bubbles_loadscores(struct game_context* bb) {
 
     for (i = 0; i < NUM_SCORES; i++)
     {
-        if (highscores[i].level >= highlevel)
+        if (highscores[i].level > highlevel)
         {
-            highlevel = highscores[i].level+1;
+            highlevel = highscores[i].level;
         }
     }
 
@@ -2392,7 +2392,7 @@ static int bubbles(struct game_context* bb) {
             case 2: /* choose level */
                 startlevel++;
                 rb->set_int("Choose start level", "", UNIT_INT, &startlevel,
-                            NULL, 1, 1, bb->highlevel+1, NULL);
+                            NULL, 1, 1, MAX(NUM_LEVELS,bb->highlevel+1), NULL);
                 startlevel--;
                 break;
             case 3: /* High scores */
