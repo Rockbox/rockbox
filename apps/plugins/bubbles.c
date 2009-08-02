@@ -143,8 +143,20 @@ enum {
 
 /* 16x16 bubbles (Sansa E200) */
 #elif (LCD_HEIGHT == 220) && (LCD_WIDTH == 176)
-#define XOFS          48
-#define MAX_FPS       30
+#define XOFS            24
+#define MAX_FPS         30
+#define YOFS            45
+
+/* custom text positioning */
+#define LEVEL_TXT_X     24
+#define LEVEL_TXT_WIDTH 31
+#define LEVEL_TXT_Y      5
+#define SCORE_TXT_X     58
+#define SCORE_TXT_WIDTH 31
+#define SCORE_TXT_Y      5
+#define NEXT_BB_X      112
+#define NEXT_BB_WIDTH   31
+#define NEXT_BB_Y        3
 
 /* 12x12 bubbles (iPod Nano) */
 #elif (LCD_HEIGHT == 132) && (LCD_WIDTH == 176)
@@ -195,9 +207,13 @@ enum {
 
 #define TEXT_LINES (LCD_HEIGHT/8)
 
+#ifndef YOFS
+#define YOFS 0
+#endif
+
 /* shot position */
 #define SHOTX XOFS+ROW_INDENT+BUBBLE_WIDTH*3
-#define SHOTY ROW_HEIGHT*(BB_HEIGHT-1)+BUBBLE_HEIGHT/2
+#define SHOTY (YOFS+ROW_HEIGHT*(BB_HEIGHT-1)+BUBBLE_HEIGHT/2)
 
 /* collision distance squared */
 #define MIN_DISTANCE ((BUBBLE_WIDTH*8)/10)*((BUBBLE_HEIGHT*8)/10)
@@ -1393,7 +1409,7 @@ static void bubbles_getonboard(struct game_context* bb) {
 ******************************************************************************/
 static void bubbles_drawboard(struct game_context* bb) {
     int i, j;
-    int w, h;
+    int w1, w2, h;
     int colmax, indent;
     int tipx, tipy;
     bool evenline = false;
@@ -1405,7 +1421,8 @@ static void bubbles_drawboard(struct game_context* bb) {
 
     /* clear screen */
     rb->lcd_clear_display();
-
+    int font = rb->screens[SCREEN_MAIN]->getfont();
+    h = rb->font_get(font)->height + 1;
     /* draw background */
 #ifdef HAVE_LCD_COLOR
     rb->lcd_bitmap(bubbles_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -1427,12 +1444,12 @@ static void bubbles_drawboard(struct game_context* bb) {
                 rb->lcd_bitmap_part(bubbles_emblem,
                   0, EMBLEM_HEIGHT*bb->playboard[i][j].type, EMBLEM_WIDTH,
                   XOFS+indent+BUBBLE_WIDTH*j+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
-                  ROW_HEIGHT*i+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2+bb->compress*ROW_HEIGHT,
+                  YOFS+ROW_HEIGHT*i+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2+bb->compress*ROW_HEIGHT,
                   EMBLEM_WIDTH, EMBLEM_HEIGHT);
                 rb->lcd_set_drawmode(DRMODE_FG);
                 rb->lcd_mono_bitmap((const unsigned char *)bubbles_bubble,
                                     XOFS+indent+BUBBLE_WIDTH*j,
-                                    ROW_HEIGHT*i+bb->compress*ROW_HEIGHT,
+                                    YOFS+ROW_HEIGHT*i+bb->compress*ROW_HEIGHT,
                                     BUBBLE_WIDTH, BUBBLE_HEIGHT);
                 rb->lcd_set_drawmode(DRMODE_SOLID);
             }
@@ -1452,6 +1469,7 @@ static void bubbles_drawboard(struct game_context* bb) {
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     /* display next bubble to be shot */
+#ifndef NEXT_BB_X
     rb->lcd_bitmap_part(bubbles_emblem,
                0, EMBLEM_HEIGHT*bb->queue[(bb->nextinq+1)%NUM_QUEUE], EMBLEM_WIDTH,
                XOFS/2-BUBBLE_WIDTH/2+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
@@ -1462,15 +1480,27 @@ static void bubbles_drawboard(struct game_context* bb) {
                         XOFS/2-BUBBLE_WIDTH/2, SHOTY,
                         BUBBLE_WIDTH, BUBBLE_HEIGHT);
     rb->lcd_set_drawmode(DRMODE_SOLID);
+#else
+    rb->lcd_bitmap_part(bubbles_emblem,
+               0, EMBLEM_HEIGHT*bb->queue[(bb->nextinq+1)%NUM_QUEUE], EMBLEM_WIDTH,
+               NEXT_BB_X + NEXT_BB_WIDTH/2-BUBBLE_WIDTH/2+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
+               NEXT_BB_Y + (BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2 + h,
+               EMBLEM_WIDTH, EMBLEM_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_FG);
+    rb->lcd_mono_bitmap((const unsigned char *)bubbles_bubble,
+                        NEXT_BB_X + NEXT_BB_WIDTH/2-BUBBLE_WIDTH/2, NEXT_BB_Y + h,
+                        BUBBLE_WIDTH, BUBBLE_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
+#endif
 
     /* draw bounding lines */
 #ifndef HAVE_LCD_COLOR
     rb->lcd_vline(XOFS-1, 0, LCD_HEIGHT);
     rb->lcd_vline(XOFS+BUBBLE_WIDTH*BB_WIDTH, 0, LCD_HEIGHT);
 #endif
-    rb->lcd_hline(XOFS, XOFS+BUBBLE_WIDTH*BB_WIDTH-1, bb->compress*ROW_HEIGHT-1);
+    rb->lcd_hline(XOFS, XOFS+BUBBLE_WIDTH*BB_WIDTH-1, YOFS+bb->compress*ROW_HEIGHT-1);
     rb->lcd_hline(XOFS, XOFS+BUBBLE_WIDTH*BB_WIDTH-1,
-                  ROW_HEIGHT*(BB_HEIGHT-2)+BUBBLE_HEIGHT);
+                  YOFS+ROW_HEIGHT*(BB_HEIGHT-2)+BUBBLE_HEIGHT);
 
     /* draw arrow */
     tipx = SHOTX+BUBBLE_WIDTH/2+(((fp14_sin(bb->angle)>>4)*BUBBLE_WIDTH*3/2)>>10);
@@ -1486,26 +1516,39 @@ static void bubbles_drawboard(struct game_context* bb) {
                       tipy-(((fp14_cos(bb->angle+135)>>4)*BUBBLE_HEIGHT/3)>>10));
 
     /* draw text */
-    rb->lcd_getstringsize(level, &w, &h);
-    rb->lcd_putsxy(XOFS/2-w/2, 2, level);
-
     rb->snprintf(str, 4, "%d", bb->level);
-    rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy(XOFS/2-w/2, 11, str);
-
-    rb->lcd_getstringsize(score, &w, &h);
-    rb->lcd_putsxy(XOFS/2-w/2, 29, score);
+    rb->lcd_getstringsize(level, &w1, NULL);
+    rb->lcd_getstringsize(str, &w2, NULL);
+#ifndef LEVEL_TXT_X
+    rb->lcd_putsxy(XOFS/2-w1/2, 2, level);
+    rb->lcd_putsxy(XOFS/2-w2/2, 2+h, str);
+#else
+    rb->lcd_putsxy(LEVEL_TXT_X+(LEVEL_TXT_WIDTH/2-w1/2), LEVEL_TXT_Y, level);
+    rb->lcd_putsxy(LEVEL_TXT_X+(LEVEL_TXT_WIDTH/2-w2/2), LEVEL_TXT_Y+h, str);
+#endif
 
     rb->snprintf(str, 10, "%d", bb->score);
-    rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy(XOFS/2-w/2, 38, str);
+    rb->lcd_getstringsize(score, &w1,NULL);
+    rb->lcd_getstringsize(str, &w2, NULL);
+#ifndef SCORE_TXT_X
+    rb->lcd_putsxy(XOFS/2-w1/2, 29, score);
+    rb->lcd_putsxy(XOFS/2-w2/2, 29+h, str);
+#else
+    rb->lcd_putsxy(SCORE_TXT_X+(SCORE_TXT_WIDTH/2-w1/2), SCORE_TXT_Y, score);
+    rb->lcd_putsxy(SCORE_TXT_X+(SCORE_TXT_WIDTH/2-w2/2), SCORE_TXT_Y+h, str);
+#endif
 
-    rb->lcd_getstringsize(next, &w, &h);
-    rb->lcd_putsxy(XOFS/2-w/2, SHOTY-9, next);
+    rb->lcd_getstringsize(next, &w1, NULL);
+#ifndef NEXT_BB_X
+    rb->lcd_putsxy(XOFS/2-w/2, SHOTY-h, next);
+#else
+    rb->lcd_putsxy(NEXT_BB_X+(NEXT_BB_WIDTH/2-w1/2), NEXT_BB_Y, next);
+#endif
+    
 
     if(bb->elapsedshot >= (MAX_SHOTTIME*7)/10) {
-        rb->lcd_getstringsize(hurry, &w, &h);
-        rb->lcd_putsxy(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-h/2, hurry);
+        rb->lcd_getstringsize(hurry, &w1, &h);
+        rb->lcd_putsxy(LCD_WIDTH/2-w1/2, LCD_HEIGHT/2-h/2, hurry);
     }
 }
 
@@ -1574,7 +1617,7 @@ static int bubbles_fire(struct game_context* bb) {
 
         /* find nearest position */
         nearrow = ((SHOTY+tempyofs)-
-                      (bb->compress*ROW_HEIGHT)+
+                      (YOFS+bb->compress*ROW_HEIGHT)+
                       (ROW_HEIGHT/2))/ROW_HEIGHT;
         if(nearrow >= BB_HEIGHT) nearrow = BB_HEIGHT-1;
 
@@ -1600,14 +1643,14 @@ static int bubbles_fire(struct game_context* bb) {
         lastcol = nearcol;
 
         /* if collision with neighbor then attach shot */
-        if(bubbles_collision(bb, SHOTY+tempyofs, SHOTX+tempxofs,
+        if(bubbles_collision(bb, YOFS+SHOTY+tempyofs, SHOTX+tempxofs,
                              nearrow, nearcol)) {
             bb->playboard[nearrow][nearcol].type = bubblecur;
             break;
         }
 
         /* if at top then attach shot to the ceiling */
-        if(nearrow == 0 && SHOTY+tempyofs <= bb->compress*ROW_HEIGHT) {
+        if(nearrow == 0 && SHOTY+tempyofs <= YOFS+bb->compress*ROW_HEIGHT) {
             bb->playboard[nearrow][nearcol].type = bubblecur;
             break;
         }
@@ -1658,7 +1701,7 @@ static bool bubbles_collision(struct game_context* bb, int y, int x,
     if(nearcol-1 >= 0) {
         if(bb->playboard[nearrow][nearcol-1].type >= 0) {
             nx = XOFS+(nearrow%2 ? ROW_INDENT : 0)+BUBBLE_WIDTH*(nearcol-1);
-            ny = ROW_HEIGHT*nearrow+bb->compress*ROW_HEIGHT;
+            ny = YOFS+ROW_HEIGHT*nearrow+bb->compress*ROW_HEIGHT;
             if((x-nx)*(x-nx)+(y-ny)*(y-ny) < MIN_DISTANCE) return true;
         }
     }
@@ -1668,7 +1711,7 @@ static bool bubbles_collision(struct game_context* bb, int y, int x,
             if(bb->playboard[nearrow-1][nearcol-1+adj].type >= 0) {
                 nx = XOFS+((nearrow-1)%2 ? ROW_INDENT : 0)+
                      BUBBLE_WIDTH*(nearcol-1+adj);
-                ny = ROW_HEIGHT*(nearrow-1)+bb->compress*ROW_HEIGHT;
+                ny = YOFS+ROW_HEIGHT*(nearrow-1)+bb->compress*ROW_HEIGHT;
                 if((x-nx)*(x-nx)+(y-ny)*(y-ny) < MIN_DISTANCE) return true;
             }
         }
@@ -1677,7 +1720,7 @@ static bool bubbles_collision(struct game_context* bb, int y, int x,
             if(bb->playboard[nearrow+1][nearcol-1+adj].type >= 0) {
                 nx = XOFS+((nearrow+1)%2 ? ROW_INDENT : 0)+
                      BUBBLE_WIDTH*(nearcol-1+adj);
-                ny = ROW_HEIGHT*(nearrow+1)+bb->compress*ROW_HEIGHT;
+                ny = YOFS+ROW_HEIGHT*(nearrow+1)+bb->compress*ROW_HEIGHT;
                 if((x-nx)*(x-nx)+(y-ny)*(y-ny) < MIN_DISTANCE) return true;
             }
         }
@@ -1688,7 +1731,7 @@ static bool bubbles_collision(struct game_context* bb, int y, int x,
             if(bb->playboard[nearrow-1][nearcol+adj].type >= 0) {
                 nx = XOFS+((nearrow-1)%2 ? ROW_INDENT : 0)+
                      BUBBLE_WIDTH*(nearcol+adj);
-                ny = ROW_HEIGHT*(nearrow-1)+bb->compress*ROW_HEIGHT;
+                ny = YOFS+ROW_HEIGHT*(nearrow-1)+bb->compress*ROW_HEIGHT;
                 if((x-nx)*(x-nx)+(y-ny)*(y-ny) < MIN_DISTANCE) return true;
             }
         }
@@ -1697,7 +1740,7 @@ static bool bubbles_collision(struct game_context* bb, int y, int x,
             if(bb->playboard[nearrow+1][nearcol+adj].type >= 0) {
                 nx = XOFS+((nearrow+1)%2 ? ROW_INDENT : 0)+
                      BUBBLE_WIDTH*(nearcol+adj);
-                ny = ROW_HEIGHT*(nearrow+1)+bb->compress*ROW_HEIGHT;
+                ny = YOFS+ROW_HEIGHT*(nearrow+1)+bb->compress*ROW_HEIGHT;
                 if((x-nx)*(x-nx)+(y-ny)*(y-ny) < MIN_DISTANCE) return true;
             }
         }
@@ -1706,7 +1749,7 @@ static bool bubbles_collision(struct game_context* bb, int y, int x,
     if(nearcol+1 < BB_WIDTH-adj) {
         if(bb->playboard[nearrow][nearcol+1].type >= 0) {
             nx = XOFS+(nearrow%2 ? ROW_INDENT : 0)+BUBBLE_WIDTH*(nearcol+1);
-            ny = ROW_HEIGHT*nearrow+bb->compress*ROW_HEIGHT;
+            ny = YOFS+ROW_HEIGHT*nearrow+bb->compress*ROW_HEIGHT;
             if((x-nx)*(x-nx)+(y-ny)*(y-ny) < MIN_DISTANCE) return true;
         }
     }
@@ -2018,7 +2061,7 @@ static int bubbles_fall(struct game_context* bb) {
                            BUBBLE_HEIGHT)/20;
 
                     /* draw bubble if it is still on the screen */
-                    if(ROW_HEIGHT*i+bb->compress*ROW_HEIGHT+yofs
+                    if(YOFS+ROW_HEIGHT*i+bb->compress*ROW_HEIGHT+yofs
                        <= LCD_HEIGHT) {
                         onscreen = true;
 
@@ -2026,14 +2069,14 @@ static int bubbles_fall(struct game_context* bb) {
                                 EMBLEM_HEIGHT*bb->playboard[i][j].type, EMBLEM_WIDTH,
                                 XOFS+indent+BUBBLE_WIDTH*j+
                                     (BUBBLE_WIDTH-EMBLEM_WIDTH)/2+xofs,
-                                ROW_HEIGHT*i+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2+
+                                YOFS+ROW_HEIGHT*i+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2+
                                     bb->compress*ROW_HEIGHT+yofs,
                                 EMBLEM_WIDTH, EMBLEM_HEIGHT);
                         rb->lcd_set_drawmode(DRMODE_FG);
                         rb->lcd_mono_bitmap(
                                 (const unsigned char *)bubbles_bubble,
                                 XOFS+indent+BUBBLE_WIDTH*j+xofs,
-                                ROW_HEIGHT*i+bb->compress*ROW_HEIGHT+yofs,
+                                YOFS+ROW_HEIGHT*i+bb->compress*ROW_HEIGHT+yofs,
                                 BUBBLE_WIDTH, BUBBLE_HEIGHT);
                         rb->lcd_set_drawmode(DRMODE_SOLID);
                     }
@@ -2205,7 +2248,6 @@ static void bubbles_savegame(struct game_context* bb) {
     }
 
     rb->close(fd);
-
 }
 
 /*****************************************************************************
