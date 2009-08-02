@@ -2183,11 +2183,12 @@ static void bubbles_loadscores(struct game_context* bb) {
     /* highlevel and highscores */
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);
 
+    /* level X in the high scores means one succeeded the level before (X-1) */
     for (i = 0; i < NUM_SCORES; i++)
     {
-        if (highscores[i].level > highlevel)
+        if (highscores[i].level-1 > highlevel)
         {
-            highlevel = highscores[i].level;
+            highlevel = highscores[i].level-1;
         }
     }
 
@@ -2392,7 +2393,7 @@ static int bubbles(struct game_context* bb) {
             case 2: /* choose level */
                 startlevel++;
                 rb->set_int("Choose start level", "", UNIT_INT, &startlevel,
-                            NULL, 1, 1, MAX(NUM_LEVELS,bb->highlevel+1), NULL);
+                            NULL, 1, 1, MIN(NUM_LEVELS,bb->highlevel+1), NULL);
                 startlevel--;
                 break;
             case 3: /* High scores */
@@ -2483,9 +2484,7 @@ enum plugin_status plugin_start(const void* parameter) {
             case BB_WIN:
                 rb->splash(HZ*2, "You Win!");
                 /* record high level */
-                if( NUM_LEVELS-1 > bb.highlevel) {
-                    bb.highlevel = NUM_LEVELS-1;
-                }
+                bb.highlevel = NUM_LEVELS;
                 /* record high score */
                 bubbles_recordscore(&bb);
                 break;
