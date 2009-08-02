@@ -340,7 +340,7 @@ char str[30];
 
 #ifdef HAVE_TOUCHSCREEN
 
-#include "lib/touchscreen.h"
+#include "lib/pluginlib_touchscreen.h"
 static struct ts_raster mine_raster = { 0, 0, MAX_WIDTH, MAX_HEIGHT, TileSize, TileSize };
 #endif
 

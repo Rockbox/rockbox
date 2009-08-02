@@ -8,6 +8,7 @@
 * $Id$
 *
 * Copyright (C) 2008 by Maurus Cuelenaere
+* Copyright (C) 2009 by Karl Kurbjun
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -26,6 +27,28 @@
 
 #ifdef HAVE_TOUCHSCREEN
 
+/*******************************************************************************
+ * Touchbutton
+ ******************************************************************************/
+struct touchbutton {
+    /* Each button has it's own viewport to define colors, drawstyle, location*/
+    struct viewport vp;     
+    bool repeat;            /* requires the area be held for the action */
+    int action;             /* action this button will return */
+    bool invisible;         /* Is this an invisible button? */
+    char *title;            /* Specify a title */
+    fb_data *pixmap;        /* Currently unused, but will allow for a graphic */
+};
+
+/* Get: tests for a button press and returns action. */
+int touchbutton_get(struct touchbutton *data, int button, int num_buttons);
+/* Draw: Draws all visible buttons */
+void touchbutton_draw(struct touchbutton *data, int num_buttons);
+
+
+/*******************************************************************************
+ * Touch mapping
+ ******************************************************************************/
 struct ts_mapping
 {
     int tl_x; /* top left */

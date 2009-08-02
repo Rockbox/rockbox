@@ -520,7 +520,7 @@ PLUGIN_HEADER
 
 
 #ifdef HAVE_TOUCHSCREEN
-#include "lib/touchscreen.h"
+#include "lib/pluginlib_touchscreen.h"
 static struct ts_raster pegbox_raster =
     { BOARD_X, BOARD_Y, COLS*PIECE_WIDTH, ROWS*PIECE_HEIGHT,
       PIECE_WIDTH, PIECE_HEIGHT };

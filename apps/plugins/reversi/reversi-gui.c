@@ -32,11 +32,9 @@ Use the arrow keys to move cursor, and press TOGGLE to place a stone.
 
 At any time during the game, press MENU to bring up the game menu with
 further options:
-
   - Save
   - Reload
   - Clear
-
 */
 
 #include "plugin.h"
@@ -139,6 +137,75 @@ static cursor_wrap_mode_t cursor_wrap_mode;
 static bool quit_plugin;
 static bool game_finished;
 
+#ifdef HAVE_TOUCHSCREEN
+#include "lib/pluginlib_touchscreen.h"
+/* This uses the touchscreen library functions/structures. */
+
+/* This defines the number of buttons used; only used in this C file. */
+#define TOUCHBUTTON_COUNT 3
+
+/* Define the button locations, widths and heights */
+
+#if LCD_HEIGHT < LCD_WIDTH
+/* Define Menu button x, y, width, height */
+#define B_MENU_X    LEGEND_X(0)
+#define B_MENU_Y    (LCD_HEIGHT/4)
+#define B_MENU_W    (LCD_WIDTH-LEGEND_X(0))
+#define B_MENU_H    (LCD_HEIGHT/4)
+/* Define Quit Button x, y, width, height */
+#define B_QUIT_X    LEGEND_X(0)
+#define B_QUIT_Y    (LCD_HEIGHT/2)
+#define B_QUIT_W    (LCD_WIDTH-LEGEND_X(0))
+#define B_QUIT_H    (LCD_HEIGHT/4)
+#else
+/* Define Menu button x, y, width, height */
+#define B_MENU_X    (LCD_WIDTH/2)
+#define B_MENU_Y    LEGEND_Y(0)
+#define B_MENU_W    (LCD_WIDTH/4)
+#define B_MENU_H    (2*CELL_HEIGHT)
+/* Define Quit Button x, y, width, height */
+#define B_QUIT_X    (LCD_WIDTH-LCD_WIDTH/4)
+#define B_QUIT_Y    LEGEND_Y(0)
+#define B_QUIT_W    (LCD_WIDTH/4)
+#define B_QUIT_H    (2*CELL_HEIGHT)
+#endif
+
+/* This is the button initialization/definition.  The first element is the 
+ *  Viewport.  This is defined in lcd.h, but the elements are:
+ *      int x       - X location of button/viewport
+ *      int y       - Y location of button/viewport
+ *      int width   - Width of button/viewport
+ *      int height  - Height of button/viewport
+ *      int font    - Font to be used on button/viewport
+ *      int drawmode- Modes defined in lcd.h
+ *      unsigned fg_pattern     - foreground color
+ *      unsigned bg_pattern     - backbround color
+ *      unsigned lss_pattern    - Selector colors (currently unused)
+ *      unsigned lse_pattern    - |
+ *      unsigned lst_pattern    - \/
+ *
+ * The rest of the touch button elements are:
+ *   bool repeat    - requires the area be held for the action
+ *   int action     - action this button will return
+ *   bool invisible - Is this an invisible button?
+ *   char *title    - Specify a title 
+ *   fb_data *pixmap- Currently unused, but will allow for a graphic
+ */
+struct touchbutton reversi_buttons[TOUCHBUTTON_COUNT] = 
+  {
+    { {B_MENU_X, B_MENU_Y, B_MENU_W, B_MENU_H, FONT_UI, 
+        STYLE_DEFAULT, 0, 0xFFFF, 0, 0, 0}, 
+      false, REVERSI_BUTTON_MENU, false, "Menu", NULL },
+      
+    { {B_QUIT_X, B_QUIT_Y, B_QUIT_W, B_QUIT_H, FONT_UI, 
+        STYLE_DEFAULT, 0, 0xFFFF, 0, 0, 0}, 
+      false, REVERSI_BUTTON_QUIT, false, "Quit", NULL },
+      
+    { {0, 0, XOFS+BOARD_WIDTH, YOFS+BOARD_HEIGHT, 0, 
+        STYLE_DEFAULT, 0, 0xFFFF, 0, 0, 0}, 
+      false, REVERSI_BUTTON_MAKE_MOVE, true, NULL, NULL }
+};
+#endif
 
 /* Initialises the state of the game (starts a new game) */
 static void reversi_gui_init(void) {
@@ -184,8 +251,12 @@ static void reversi_gui_draw_cell(int x, int y, int color) {
     int i;
     if (color == WHITE) {
         for (i = 0; i < CELL_LINE_THICKNESS; i++) {
-            rb->lcd_drawrect(x+STONE_MARGIN+i, y+STONE_MARGIN+i,
-                    CELL_WIDTH+1-2*(STONE_MARGIN+i), CELL_HEIGHT+1-2*(STONE_MARGIN+i));
+            rb->lcd_drawrect(
+                    x+STONE_MARGIN+i, 
+                    y+STONE_MARGIN+i,
+                    CELL_WIDTH+1-2*(STONE_MARGIN+i), 
+                    CELL_HEIGHT+1-2*(STONE_MARGIN+i)
+                );
         }
     } else if (color == BLACK) {
         rb->lcd_fillrect(x+STONE_MARGIN, y+STONE_MARGIN,
@@ -249,6 +320,10 @@ static void reversi_gui_display_board(void) {
     y = LEGEND_Y(r);
     rb->lcd_drawrect(x, y, CELL_WIDTH+1, CELL_HEIGHT+1);
 
+#if defined(HAVE_TOUCHSCREEN)
+    touchbutton_draw(reversi_buttons, TOUCHBUTTON_COUNT);
+#endif
+
     /* Update the screen */
     rb->lcd_update();
 }
@@ -299,7 +374,10 @@ static bool reversi_gui_choose_strategy(
             break;
         }
     }
-    result = rb->set_option(prompt, &index, INT, strategy_settings, num_items, NULL);
+    
+    result = 
+        rb->set_option(prompt, &index, INT, strategy_settings, num_items, NULL);
+        
     (*player) = strategy_values[index];
 
     if((*player)->init_func)
@@ -339,7 +417,8 @@ static bool reversi_gui_menu(void) {
             break;
 
         case 4: /* Cursor wrap mode */
-            num_items = sizeof(cursor_wrap_mode_values)/sizeof(cursor_wrap_mode_values[0]);
+            num_items = sizeof(cursor_wrap_mode_values) / 
+                sizeof(cursor_wrap_mode_values[0]);
             index = 0;
             for (i = 0; i < num_items; i++) {
                 if (cursor_wrap_mode == cursor_wrap_mode_values[i]) {
@@ -372,7 +451,8 @@ static bool reversi_gui_menu(void) {
  * Returns true iff the cursor would be really moved. In any case, the
  * new cursor position is stored in (new_row, new_col).
  */
-static bool reversi_gui_cursor_pos_vmove(int row_delta, int *new_row, int *new_col) {
+static bool 
+reversi_gui_cursor_pos_vmove(int row_delta, int *new_row, int *new_col) {
     *new_row = cur_row + row_delta;
     *new_col = cur_col;
 
@@ -421,7 +501,8 @@ static bool reversi_gui_cursor_pos_vmove(int row_delta, int *new_row, int *new_c
  * Returns true iff the cursor would be really moved. In any case, the
  * new cursor position is stored in (new_row, new_col).
  */
-static bool reversi_gui_cursor_pos_hmove(int col_delta, int *new_row, int *new_col) {
+static bool 
+reversi_gui_cursor_pos_hmove(int col_delta, int *new_row, int *new_col) {
     *new_row = cur_row;
     *new_col = cur_col + col_delta;
 
@@ -554,39 +635,62 @@ enum plugin_status plugin_start(const void *parameter) {
             continue;
         }
 
+        /***********************************************************************
+         * Button handling code happens below here
+         **********************************************************************/
         button = rb->button_get(true);
+        
+        /* The touchscreen buttons can act as true buttons so OR them in */
+#ifdef HAVE_TOUCHSCREEN
+        button |= touchbutton_get(reversi_buttons, button, TOUCHBUTTON_COUNT);
+#endif
 
-        switch (button) {
+        /* All of these button presses wait for the release event */
+        if(button&BUTTON_REL) {
 #ifdef REVERSI_BUTTON_QUIT
-            /* Exit game */
-            case REVERSI_BUTTON_QUIT:
+            if(button&REVERSI_BUTTON_QUIT) {
                 exit = true;
-                break;
+            }
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-            case BUTTON_TOUCHSCREEN:
-                button_x = rb->button_get_data() >> 16;
-                button_y = rb->button_get_data() & 0xffff;
-                if( (CELL_R(button_y)>(BOARD_SIZE-1)) || 
-                    (CELL_C(button_x)>(BOARD_SIZE-1)) )
+            if(button&BUTTON_TOUCHSCREEN) {
+                button_x = rb->button_get_data();
+                button_y = button_x & 0xffff;
+                button_x >>= 16;
+
+                /* Check if the click was in the gameboard, if so move cursor.
+                 *  This has to happen before MAKE_MOVE is processed.
+                 */
+                if( (CELL_R(button_y)<BOARD_SIZE) && 
+                    (CELL_C(button_x)<BOARD_SIZE) )
                 {
-                    break;
-                } else {
                     reversi_gui_move_cursor(CELL_R(button_y), CELL_C(button_x));
                 }
+            }
 #endif
 
-#ifdef REVERSI_BUTTON_ALT_MAKE_MOVE
-            case REVERSI_BUTTON_ALT_MAKE_MOVE:
+            if( (button&REVERSI_BUTTON_MENU)
+#if defined(REVERSI_BUTTON_MENU_LONGPRESS)
+                && (lastbutton&BUTTON_REPEAT)
 #endif
-            case REVERSI_BUTTON_MAKE_MOVE:
-#ifdef REVERSI_BUTTON_MAKE_MOVE_PRE
-                if ((button == REVERSI_BUTTON_MAKE_MOVE)
-                        && (lastbutton != REVERSI_BUTTON_MAKE_MOVE_PRE))
+            ) {
+                if (reversi_gui_menu()) {
+                    return PLUGIN_USB_CONNECTED;
+                }
+                draw_screen = true;
+            }
+            
+            if(button&REVERSI_BUTTON_MAKE_MOVE
+#if defined(REVERSI_BUTTON_MAKE_MOVE_SHORTPRESS)
+                && !(lastbutton&BUTTON_REPEAT)
+#endif
+            ) {
+                /* If you touch the game board instead of hitting menu after it
+                 *  has completed the game will exit out.
+                 */
+                if (game_finished) 
                     break;
-#endif
-                if (game_finished) break;
                 if (reversi_make_move(&game, cur_row, cur_col, cur_player) > 0) {
                     /* Move was made. Global changes on the board are possible */
                     draw_screen = true; /* Redraw the screen next time */
@@ -607,66 +711,42 @@ enum plugin_status plugin_start(const void *parameter) {
                     /* Ignore any button presses during the splash */
                     rb->button_clear_queue();
                 }
-                break;
+            }
+        }
+
+        /* These button presses will run on a release or a repeat event */
+        if(button&BUTTON_REL || button&BUTTON_REPEAT) {
             /* Move cursor left */
-#ifdef REVERSI_BUTTON_ALT_LEFT
-            case REVERSI_BUTTON_ALT_LEFT:
-            case (REVERSI_BUTTON_ALT_LEFT | BUTTON_REPEAT):
-#endif
-            case REVERSI_BUTTON_LEFT:
-            case (REVERSI_BUTTON_LEFT | BUTTON_REPEAT):
+            if(button&REVERSI_BUTTON_LEFT) {
                 if (reversi_gui_cursor_pos_hmove(-1, &row, &col)) {
                     reversi_gui_move_cursor(row, col);
                 }
-                break;
-
+            }
             /* Move cursor right */
-#ifdef REVERSI_BUTTON_ALT_RIGHT
-            case REVERSI_BUTTON_ALT_RIGHT:
-            case (REVERSI_BUTTON_ALT_RIGHT | BUTTON_REPEAT):
-#endif
-            case REVERSI_BUTTON_RIGHT:
-            case (REVERSI_BUTTON_RIGHT | BUTTON_REPEAT):
+            if(button&REVERSI_BUTTON_RIGHT) {
                 if (reversi_gui_cursor_pos_hmove(1, &row, &col)) {
                     reversi_gui_move_cursor(row, col);
                 }
-                break;
-
+            }
             /* Move cursor up */
-            case REVERSI_BUTTON_UP:
-            case (REVERSI_BUTTON_UP | BUTTON_REPEAT):
+            if(button&REVERSI_BUTTON_UP) {
                 if (reversi_gui_cursor_pos_vmove(-1, &row, &col)) {
                     reversi_gui_move_cursor(row, col);
                 }
-                break;
-
+            }
             /* Move cursor down */
-            case REVERSI_BUTTON_DOWN:
-            case (REVERSI_BUTTON_DOWN | BUTTON_REPEAT):
+            if(button&REVERSI_BUTTON_DOWN) {
                 if (reversi_gui_cursor_pos_vmove(1, &row, &col)) {
                     reversi_gui_move_cursor(row, col);
                 }
-                break;
-
-            case REVERSI_BUTTON_MENU:
-#ifdef REVERSI_BUTTON_MENU_PRE
-                if (lastbutton != REVERSI_BUTTON_MENU_PRE) {
-                    break;
-                }
-#endif
-                if (reversi_gui_menu()) {
-                    return PLUGIN_USB_CONNECTED;
-                }
-                draw_screen = true;
-                break;
-
-            default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-                    /* Quit if USB has been connected */
-                    return PLUGIN_USB_CONNECTED;
-                }
-                break;
+            }
         }
+
+        if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+            /* Quit if USB has been connected */
+            return PLUGIN_USB_CONNECTED;
+        }
+
         if (button != BUTTON_NONE) {
             lastbutton = button;
         }

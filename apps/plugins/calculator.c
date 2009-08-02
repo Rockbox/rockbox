@@ -365,7 +365,7 @@ PLUGIN_HEADER
 #define CALCULATOR_CLEAR          BUTTON_TOPRIGHT
 #endif
 
-#include "lib/touchscreen.h"
+#include "lib/pluginlib_touchscreen.h"
 static struct ts_raster calc_raster = { X_0_POS, Y_1_POS,
     BUTTON_COLS*REC_WIDTH, BUTTON_ROWS*REC_HEIGHT, REC_WIDTH, REC_HEIGHT };
 #endif

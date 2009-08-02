@@ -668,6 +668,8 @@ static const struct plugin_api rockbox_api = {
 #if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
     usb_hid_send,
 #endif
+
+    lcd_set_viewport,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

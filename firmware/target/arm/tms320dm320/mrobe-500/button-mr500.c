@@ -110,16 +110,17 @@ inline bool button_hold(void)
 
 int button_read_device(int *data)
 {
+    static int old_data;
     int button_read = BUTTON_NONE;
     short touch_x, touch_y, touch_z1, touch_z2;
     static bool hold_button_old = false;
     
-    *data = 0;
+    *data = old_data;
 
     /* Handle touchscreen */
     if (tsc2100_read_touch(&touch_x, &touch_y, &touch_z1, &touch_z2))
     {
-        *data = touch_to_pixels(&touch_x, &touch_y);
+        old_data = *data = touch_to_pixels(&touch_x, &touch_y);
         button_read |= touchscreen_to_pixels(touch_x, touch_y, data);
     }
 

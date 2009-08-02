@@ -836,6 +836,8 @@ struct plugin_api {
 #if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
     void (*usb_hid_send)(usage_page_t usage_page, int id);
 #endif
+
+    void (*lcd_set_viewport)(struct viewport* vp);
 };
 
 /* plugin header */

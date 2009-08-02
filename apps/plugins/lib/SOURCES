@@ -54,7 +54,7 @@ pluginlib_albumart.c
 pluginlib_actions.c
 helper.c
 #ifdef HAVE_TOUCHSCREEN
-touchscreen.c
+pluginlib_touchscreen.c
 #endif
 md5.c
 
