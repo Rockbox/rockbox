@@ -49,8 +49,12 @@ further options:
 
 PLUGIN_HEADER
 
-int font_width=4;
-int font_height=8;
+/* This is initialized at the start of the plugin and used to determine the
+ * Appropriate game board size/legend spacing if the font is larger than a cell
+ * height/width.
+ */
+static int font_width;
+static int font_height;
 
 /* Where the board begins */
 #define XOFS 4
@@ -62,7 +66,7 @@ int font_height=8;
 #define MARGIN_C_W  0
 #define MARGIN_C_H  2
 #else
-#define MARGIN_W    (XOFS*2 + font_width*2)
+#define MARGIN_W    (XOFS*2 + 16)
 #define MARGIN_H    (YOFS*2+1)
 #define MARGIN_C_W  1
 #define MARGIN_C_H  0
@@ -112,10 +116,13 @@ int font_height=8;
 
 #if LCD_HEIGHT > LCD_WIDTH
 #define LEGEND_X(lc) (CELL_X(lc))
-#define LEGEND_Y(lr) (CELL_Y(BOARD_SIZE+lr) + YOFS + 1)
+#define LEGEND_Y(lr) ((CELL_HEIGHT > font_height) ? \
+                        CELL_Y(BOARD_SIZE+lr) + YOFS + 1 : \
+                        BOARD_HEIGHT + 2*YOFS + font_height*(lr-BOARD_SIZE))
 #else
 #define LEGEND_X(lc) (CELL_X(BOARD_SIZE+lc) + XOFS + 1)
-#define LEGEND_Y(lr) (CELL_Y(lr) > font_height*2 ? CELL_Y(lr) : font_height*(lr) + XOFS)
+#define LEGEND_Y(lr) (CELL_HEIGHT > font_height ? \
+                        CELL_Y(lr) : font_height*(lr)+YOFS)
 #endif
 
 
@@ -152,23 +159,23 @@ static bool game_finished;
 #if LCD_HEIGHT < LCD_WIDTH
 /* Define Menu button x, y, width, height */
 #define B_MENU_X    LEGEND_X(0)
-#define B_MENU_Y    (LCD_HEIGHT/4)
+#define B_MENU_Y    (LCD_HEIGHT-LCD_HEIGHT/2)
 #define B_MENU_W    (LCD_WIDTH-LEGEND_X(0))
 #define B_MENU_H    (LCD_HEIGHT/4)
 /* Define Quit Button x, y, width, height */
 #define B_QUIT_X    LEGEND_X(0)
-#define B_QUIT_Y    (LCD_HEIGHT/2)
+#define B_QUIT_Y    (LCD_HEIGHT-LCD_HEIGHT/4)
 #define B_QUIT_W    (LCD_WIDTH-LEGEND_X(0))
 #define B_QUIT_H    (LCD_HEIGHT/4)
 #else
 /* Define Menu button x, y, width, height */
 #define B_MENU_X    (LCD_WIDTH/2)
-#define B_MENU_Y    LEGEND_Y(0)
+#define B_MENU_Y    (CELL_HEIGHT*BOARD_SIZE+YOFS*2)
 #define B_MENU_W    (LCD_WIDTH/4)
 #define B_MENU_H    (2*CELL_HEIGHT)
 /* Define Quit Button x, y, width, height */
 #define B_QUIT_X    (LCD_WIDTH-LCD_WIDTH/4)
-#define B_QUIT_Y    LEGEND_Y(0)
+#define B_QUIT_Y    (CELL_HEIGHT*BOARD_SIZE+YOFS*2)
 #define B_QUIT_W    (LCD_WIDTH/4)
 #define B_QUIT_H    (2*CELL_HEIGHT)
 #endif
@@ -273,6 +280,8 @@ static void reversi_gui_draw_cell(int x, int y, int color) {
 /* Draws the complete screen */
 static void reversi_gui_display_board(void) {
     int x, y, r, c, x_width, x_height;
+    /* This viewport is used to draw a scrolling score */
+    struct viewport tempvp;
     char buf[8];
 
     /* Clear the display buffer */
@@ -307,20 +316,43 @@ static void reversi_gui_display_board(void) {
 
     x = LEGEND_X(0);
     y = LEGEND_Y(0);
-    reversi_gui_draw_cell(x, y, BLACK);
-    rb->snprintf(buf, sizeof(buf), "%d", c);
-    y += (CELL_HEIGHT-x_height) / 2;
-    rb->lcd_putsxy(x + CELL_WIDTH + 2, y, buf);
+    reversi_gui_draw_cell(x, y+(LEGEND_Y(1)-LEGEND_Y(0))/2-CELL_WIDTH/2, BLACK);
+    rb->snprintf(buf, sizeof(buf), "%01d", c);
+    
+    tempvp.x=x+CELL_WIDTH+2;
+    tempvp.y=y;
+    tempvp.width=LCD_WIDTH-tempvp.x;
+    tempvp.height=LEGEND_Y(1);
+    
+    tempvp.font=FONT_UI; 
+    tempvp.drawmode=STYLE_DEFAULT;
+#if LCD_DEPTH > 1
+    tempvp.fg_pattern=0;
+    tempvp.bg_pattern=0xFFFF;
+#ifdef HAVE_LCD_COLOR
+    tempvp.lss_pattern=0;
+    tempvp.lse_pattern=0;
+    tempvp.lst_pattern=0;
+#endif
+#endif
+
+    rb->lcd_set_viewport(&tempvp);
+    rb->lcd_puts_scroll(0, 0, buf);
+    rb->lcd_set_viewport(NULL);
 
     y = LEGEND_Y(1);
-    reversi_gui_draw_cell(x, y, WHITE);
-    rb->snprintf(buf, sizeof(buf), "%d", r);
-    y += (CELL_HEIGHT-x_height) / 2;
-    rb->lcd_putsxy(x + CELL_WIDTH + 2, y, buf);
+    
+    reversi_gui_draw_cell(x, y+(LEGEND_Y(1)-LEGEND_Y(0))/2-CELL_WIDTH/2, WHITE);
+    rb->snprintf(buf, sizeof(buf), "%01d", r);
+    
+    tempvp.y=y;
+    rb->lcd_set_viewport(&tempvp);
+    rb->lcd_puts_scroll(0, 0, buf);
+    rb->lcd_set_viewport(NULL);
 
     /* Draw the box around the current player */
     r = (cur_player == BLACK ? 0 : 1);
-    y = LEGEND_Y(r);
+    y = LEGEND_Y(r)+(LEGEND_Y(1)-LEGEND_Y(0))/2-CELL_WIDTH/2;
     rb->lcd_drawrect(x, y, CELL_WIDTH+1, CELL_HEIGHT+1);
 
 #if defined(HAVE_TOUCHSCREEN)
@@ -576,7 +608,7 @@ enum plugin_status plugin_start(const void *parameter) {
     char msg_buf[30];
     
     /* Initialize Font Width and height */
-    rb->lcd_getstringsize("x", &font_width, &font_height);
+    rb->lcd_getstringsize("0", &font_width, &font_height);
     
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
