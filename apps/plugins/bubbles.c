@@ -38,12 +38,15 @@ PLUGIN_HEADER
 #define SAVE_FILE  PLUGIN_GAMES_DIR "/bubbles.save"
 
 /* final game return status */
-#define BB_NONE 5
-#define BB_WIN  4
-#define BB_END  3
-#define BB_USB  2
-#define BB_QUIT 1
-#define BB_LOSE 0
+enum {
+    BB_LOSE,
+    BB_QUIT,
+    BB_QUIT_AND_SAVE,
+    BB_USB,
+    BB_END,
+    BB_WIN,
+    BB_NONE,
+};
 
 /* play board dimension */
 #define BB_HEIGHT 12
@@ -1223,7 +1226,6 @@ struct tile {
  * score is the current score
  * level is the current level
  * highlevel is the highest level beaten
- * highscores is the list of high scores
  * angle is the current cannon direction
  * shots is the number of shots fired since last compression
  * compress is the height of the compressor
@@ -1240,8 +1242,7 @@ struct tile {
 struct game_context {
     unsigned int score;
     unsigned int level;
-    struct highscore highlevel;
-    struct highscore highscores[NUM_SCORES];
+    unsigned int highlevel;
     int angle;
     int shots;
     int compress;
@@ -1252,9 +1253,13 @@ struct game_context {
     long elapsedlvl;
     long elapsedshot;
     long startedshot;
-    bool resume;
     struct tile playboard[BB_HEIGHT][BB_WIDTH];
 };
+
+struct highscore highscores[NUM_SCORES];
+
+/* used to denote available resume info */
+static bool resume = false;
 
 static void bubbles_init(struct game_context* bb);
 static bool bubbles_nextlevel(struct game_context* bb);
@@ -1288,8 +1293,9 @@ static void bubbles_init(struct game_context* bb) {
     rb->srand(*rb->current_tick);
 
     /* check for resumed game */
-    if(bb->resume) {
-        bb->resume = false;
+    if (resume)
+    {
+        resume = false;
         return;
     }
 
@@ -1304,10 +1310,15 @@ static void bubbles_init(struct game_context* bb) {
 static bool bubbles_nextlevel(struct game_context* bb) {
     int i, j, pos;
 
+    /* save highest level */
+    if (bb->level > bb->highlevel)
+        bb->highlevel = bb->level;
+
     bb->level++;
 
     /* check if there are no more levels */
     if(bb->level > NUM_LEVELS) return false;
+
 
     /* set up the play board */
     rb->memset(bb->playboard, 0, sizeof(bb->playboard));
@@ -2112,11 +2123,11 @@ static void bubbles_recordscore(struct game_context* bb) {
     int position;
 
     position = highscore_update(bb->score, bb->level, "",
-                                bb->highscores, NUM_SCORES);
+                                highscores, NUM_SCORES);
     if (position==0)
         rb->splash(HZ*2, "New High Score");
     if (position != -1)
-        highscore_show(position, bb->highscores, NUM_SCORES);
+        highscore_show(position, highscores, NUM_SCORES);
 }
 
 /*****************************************************************************
@@ -2124,11 +2135,21 @@ static void bubbles_recordscore(struct game_context* bb) {
 ******************************************************************************/
 static void bubbles_loadscores(struct game_context* bb) {
 
+    int i;
+    int highlevel = 0;
     /* highlevel and highscores */
-    highscore_load(SCORE_FILE, &bb->highlevel, NUM_SCORES+1);
+    highscore_load(SCORE_FILE, highscores, NUM_SCORES);
 
-    if( bb->highlevel.level >= NUM_LEVELS )
-        bb->highlevel.level = NUM_LEVELS - 1;
+    for (i = 0; i < NUM_SCORES; i++)
+    {
+        if (highscores[i].level >= highlevel)
+        {
+            highlevel = highscores[i].level+1;
+        }
+    }
+
+    if (bb->highlevel < (unsigned)highlevel)
+        bb->highlevel = highlevel;
 }
 
 /*****************************************************************************
@@ -2136,8 +2157,9 @@ static void bubbles_loadscores(struct game_context* bb) {
 ******************************************************************************/
 static void bubbles_savescores(struct game_context* bb) {
 
-    /* highlevel and highscores */
-    highscore_save(SCORE_FILE, &bb->highlevel, NUM_SCORES+1);
+    /* highscores */
+    (void)bb;
+    highscore_save(SCORE_FILE, highscores, NUM_SCORES+1);
 }
 
 /*****************************************************************************
@@ -2145,35 +2167,22 @@ static void bubbles_savescores(struct game_context* bb) {
 ******************************************************************************/
 static bool bubbles_loadgame(struct game_context* bb) {
     int fd;
-    bool loaded = false;
 
+    bool ret = true;
     /* open game file */
     fd = rb->open(SAVE_FILE, O_RDONLY);
-    if(fd < 0) return loaded;
+    if(fd < 0) return false;
 
     /* read in saved game */
-    while(true) {
-        if(rb->read(fd, &bb->score, sizeof(bb->score)) <= 0) break;
-        if(rb->read(fd, &bb->level, sizeof(bb->level)) <= 0) break;
-        if(rb->read(fd, &bb->angle, sizeof(bb->angle)) <= 0) break;
-        if(rb->read(fd, &bb->shots, sizeof(bb->shots)) <= 0) break;
-        if(rb->read(fd, &bb->compress, sizeof(bb->compress)) <= 0) break;
-        if(rb->read(fd, &bb->onboardcnt, sizeof(bb->onboardcnt)) <= 0) break;
-        if(rb->read(fd, bb->onboard, sizeof(bb->onboard)) <= 0) break;
-        if(rb->read(fd, &bb->nextinq, sizeof(bb->nextinq)) <= 0) break;
-        if(rb->read(fd, bb->queue, sizeof(bb->queue)) <= 0) break;
-        if(rb->read(fd, &bb->elapsedlvl, sizeof(bb->elapsedlvl)) <= 0) break;
-        if(rb->read(fd, bb->playboard, sizeof(bb->playboard)) <= 0) break;
-        bb->resume = true;
-        loaded = true;
-        break;
+    if(rb->read(fd, bb, sizeof(struct game_context))
+            < (long)sizeof(struct game_context))
+    {
+        ret = false;
     }
 
+    DEBUGF("highlevel: %d\n", bb->highlevel);
     rb->close(fd);
-
-    /* delete saved file */
-    rb->remove(SAVE_FILE);
-    return loaded;
+    return ret;
 }
 
 /*****************************************************************************
@@ -2182,22 +2191,22 @@ static bool bubbles_loadgame(struct game_context* bb) {
 static void bubbles_savegame(struct game_context* bb) {
     int fd;
 
+    if (!resume) /* nothing to save */
+        return;
     /* write out the game state to the save file */
     fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
-    rb->write(fd, &bb->score, sizeof(bb->score));
-    rb->write(fd, &bb->level, sizeof(bb->level));
-    rb->write(fd, &bb->angle, sizeof(bb->angle));
-    rb->write(fd, &bb->shots, sizeof(bb->shots));
-    rb->write(fd, &bb->compress, sizeof(bb->compress));
-    rb->write(fd, &bb->onboardcnt, sizeof(bb->onboardcnt));
-    rb->write(fd, bb->onboard, sizeof(bb->onboard));
-    rb->write(fd, &bb->nextinq, sizeof(bb->nextinq));
-    rb->write(fd, bb->queue, sizeof(bb->queue));
-    rb->write(fd, &bb->elapsedlvl, sizeof(bb->elapsedlvl));
-    rb->write(fd, bb->playboard, sizeof(bb->playboard));
+    if (fd < 0)
+    {
+        rb->splash(HZ/2, "Failed to save game");
+        return;
+    }
+    if (rb->write(fd, bb, sizeof(struct game_context)) <= 0)
+    {
+        rb->splash(HZ/2, "Failed to save game");
+    }
+    DEBUGF("highlevel: %d\n", bb->highlevel);
     rb->close(fd);
 
-    bb->resume = true;
 }
 
 /*****************************************************************************
@@ -2280,14 +2289,12 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
             break;
 
         case BUBBLES_RESUME: /* save and end the game */
+        case BUBBLES_QUIT:   /* end the game */
             if(!animblock) {
-                rb->splash(HZ/2, "Saving game...");
-                bubbles_savegame(bb);
+                resume = true;
                 return BB_END;
             }
             break;
-        case BUBBLES_QUIT:   /* end the game */
-            return BB_END;
 
         case ACTION_UNKNOWN:
         case ACTION_NONE:    /* no button pressed */
@@ -2312,44 +2319,51 @@ static int bubbles(struct game_context* bb) {
     bool startgame = false;
     long timeout;
 
-    /* don't resume by default */
-    bb->resume = false;
-
     /********************
     *       menu        *
     ********************/
     MENUITEM_STRINGLIST(menu,"Bubbles Menu",NULL,
-                        "Start New Game", "Resume Game",
+                         "Resume Game", "Start New Game",
                         "Level", "High Scores", "Playback Control",
-                        "Quit");
+                        "Quit", "Quit and Save");
     while(!startgame){
         switch (rb->do_menu(&menu, NULL, NULL, false))
         {
-            case 0: /* new game */
-                bb->level = startlevel;
-                startgame = true;
-                break;
-            case 1: /* resume game */
-                if(!bubbles_loadgame(bb)) {
-                    rb->splash(HZ*2, "Nothing to resume");
-                } else {
+            case 0: /* resume game */
+                if (!resume)
+                {
+                    rb->splash(HZ/2, "Nothing to resume");
+                    break;
+                }
+                else
+                {
+                    startlevel = bb->level - 1;
                     startgame = true;
                 }
+                /* delete saved file */
+                rb->remove(SAVE_FILE);
+                break;
+            case 1: /* new game */
+                bb->level = startlevel;
+                startgame = true;
+                resume = false;
                 break;
             case 2: /* choose level */
                 startlevel++;
                 rb->set_int("Choose start level", "", UNIT_INT, &startlevel,
-                            NULL, 1, 1, bb->highlevel.level+1, NULL);
+                            NULL, 1, 1, bb->highlevel+1, NULL);
                 startlevel--;
                 break;
             case 3: /* High scores */
-                highscore_show(NUM_SCORES, bb->highscores, NUM_SCORES);
+                highscore_show(NUM_SCORES, highscores, NUM_SCORES);
                 break;
             case 4: /* Playback Control */
                 playback_control(NULL);
                 break;
             case 5: /* quit */
                 return BB_QUIT;
+            case 6: /* quit and save */
+                return BB_QUIT_AND_SAVE;
             case MENU_ATTACHED_USB:
                 bubbles_callback(bb);
                 return BB_USB;
@@ -2404,14 +2418,16 @@ static int bubbles(struct game_context* bb) {
 * plugin entry point.
 ******************************************************************************/
 enum plugin_status plugin_start(const void* parameter) {
-    struct game_context bb;
+    static struct game_context bb;
     bool exit = false;
+    enum plugin_status ret = PLUGIN_OK;
 
     /* plugin init */
     (void)parameter;
     /* end of plugin init */
 
     /* load files */
+    resume = bubbles_loadgame(&bb);
     bubbles_loadscores(&bb);
     rb->lcd_clear_display();
 
@@ -2426,35 +2442,34 @@ enum plugin_status plugin_start(const void* parameter) {
             case BB_WIN:
                 rb->splash(HZ*2, "You Win!");
                 /* record high level */
-                if( NUM_LEVELS-1 > bb.highlevel.level) {
-                    bb.highlevel.level = NUM_LEVELS-1;
+                if( NUM_LEVELS-1 > bb.highlevel) {
+                    bb.highlevel = NUM_LEVELS-1;
                 }
                 /* record high score */
                 bubbles_recordscore(&bb);
                 break;
 
             case BB_LOSE:
+                resume = false;
                 rb->splash(HZ*2, "Game Over");
+                /* record high score */
+                bubbles_recordscore(&bb);
                 /* fall through to BB_END */
 
             case BB_END:
-                if(!bb.resume) {
-                    /* record high level */
-                    if((int)bb.level-1 > bb.highlevel.level) {
-                        bb.highlevel.score = -1;
-                        highscore_update(0, bb.level-1, "", &bb.highlevel, 1);
-                    }
-                    /* record high score */
-                    bubbles_recordscore(&bb);
-                }
                 break;
 
             case BB_USB:
-                rb->lcd_setfont(FONT_UI);
-                return PLUGIN_USB_CONNECTED;
+                ret = PLUGIN_USB_CONNECTED;
+                break;
+
+            case BB_QUIT_AND_SAVE:
+                rb->splash(HZ/2, "Saving Game and Scors");
+                bubbles_savescores(&bb);
+                bubbles_savegame(&bb);
+                /* fall through */
 
             case BB_QUIT:
-                bubbles_savescores(&bb);
                 exit = true;
                 break;
 
@@ -2464,7 +2479,7 @@ enum plugin_status plugin_start(const void* parameter) {
     }
 
     rb->lcd_setfont(FONT_UI);
-    return PLUGIN_OK;
+    return ret;
 }
 
 #endif
