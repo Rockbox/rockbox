@@ -37,9 +37,9 @@
 
 void _backlight_set_brightness(int brightness)
 {
-    /* pwm = round(sqrt(2)**x), where brightness level x = 1..16 */
+    /* pwm = round(16 * 16**(x/16)), where brightness level x = 1..16 */
     static const unsigned int logtable[] =
-        {1, 2, 3, 4, 6, 8, 11, 16, 23, 32, 45, 64, 91, 128, 181, 256};
+        {19, 23, 27, 32, 38, 45, 54, 64, 76, 91, 108, 128, 152, 181, 215, 256};
 
     /* set PWM width */
     TADATA0 = logtable[brightness];
@@ -77,6 +77,8 @@ bool _backlight_init(void)
     /* Enable button LEDs: P3.2 (menu/back), P3.3 (cursor), P4.2 (middle) */
     PCON3 = (PCON3 & ~0x0000FF00) | 0x00001100;
     PCON4 = (PCON4 & ~0x00000F00) | 0x00000100;
+    PDAT3 &= ~(3 << 2);
+    PDAT4 &= ~(1 << 2);
 
     /* enable timer clock */
     PWRCON &= ~(1 << 4);

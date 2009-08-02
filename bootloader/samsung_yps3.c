@@ -69,13 +69,6 @@ static inline void delay(unsigned int duration)
 // forward declaration
 static int rds_decode(int line, struct si4700_dbg_info *nfo);
 
-static int count = 0;
-
-static void timer_callback(void)
-{
-    count++;
-}
-
 void main(void)
 {
     char mystring[64];
@@ -83,9 +76,10 @@ void main(void)
     unsigned char read_data[16];
     int i;
     struct si4700_dbg_info si4700_info;
+//    unsigned int data;
+    int brightness = 0;
+    unsigned int button;
     
-    line = 1;
-
     // enable all peripherals
     PWRCON = 0;
     
@@ -119,22 +113,18 @@ void main(void)
     fmradio_i2c_init();
     adc_init();
     _backlight_init();
-
-    timer_register(1, NULL, 3 * TIMER_FREQ, timer_callback);
-
-    // LED outputs
-    PCON3 = (PCON3 & ~(0x0000FF00)) | 0x00001100;
-    PDAT3 |= (1 << 2) | (1 << 3);
-
+    
     // FM power
     si4700_init();
     tuner_power(true);
     si4700_set(RADIO_SLEEP, 0);
     si4700_set(RADIO_MUTE, 0);
     si4700_set(RADIO_FREQUENCY, 100700000);
-
+    
     lcd_puts_scroll(0,0,"+++ this is a very very long line to test scrolling. ---");
 
+    button_init_device();
+    
     while (true)
     {
         line = 1;
@@ -198,28 +188,54 @@ void main(void)
         lcd_puts(0, line++, mystring);
 #endif
 
-#if 1   /* enable to see timer/counter info */
-        snprintf(mystring, 64, "TIMER: %08X", count);
-        lcd_puts(0, line++, mystring);
-        snprintf(mystring, 64, "current_tick: %08X", current_tick);
-        lcd_puts(0, line++, mystring);
-        snprintf(mystring, 64, "TIMER %04X %04X %04X", TDCON, TDPRE, TDDATA0);
+#if 1   /* button lights controlled by keypad */
+        button = button_read_device();
+        if (button & (BUTTON_UP | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT)) {
+            PDAT3 |= (1 << 3);
+        }
+        else {
+            PDAT3 &= ~(1 << 3); 
+        }
+        if (button & (BUTTON_BACK | BUTTON_MENU)) {
+            PDAT3 |= (1 << 2);
+        }
+        else {
+            PDAT3 &= ~(1 << 2);
+        }
+        if (button & (BUTTON_SELECT)) {
+            PDAT4 |= (1 << 2);
+        }
+        else {
+            PDAT4 &= ~(1 << 2);
+        }
+#endif
+
+#if 1   /* backlight brightness controlled by up/down keys */
+        if (button_read_device() & BUTTON_UP) {
+            if (brightness < MAX_BRIGHTNESS_SETTING) {
+                brightness++;
+                _backlight_set_brightness(brightness);
+            }
+        }
+        else  if (button_read_device() & BUTTON_DOWN) {
+            if (brightness > MIN_BRIGHTNESS_SETTING) {
+                brightness--;
+                _backlight_set_brightness(brightness);
+            }
+        }
+        snprintf(mystring, 64, "bright %3d", brightness);
         lcd_puts(0, line++, mystring);
 #endif
 
-#if 1   /* enable this to control backlight brightness with the hold switch */
-        if (PDAT4 & (1 << 3)) {
-            _backlight_set_brightness(10);
-            PDAT3 &= ~(1 << 4);
-        }
-        else {
-            _backlight_set_brightness(15);
-            PDAT3 |= (1 << 4);
-        }
+
+#if 1   /* button info */
+        snprintf(mystring, 64, "BUTTONS %08X, %s", button_read_device(),
+                 headphones_inserted() ? "HP" : "hp");
+        lcd_puts(0, line++, mystring);
 #endif
 
         lcd_update();
-   }
+    }
 }
 
 
