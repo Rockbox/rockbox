@@ -334,7 +334,9 @@ $(BUILDDIR)/%_asmdefs.h: $(ROOTDIR)/%_asmdefs.c
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(CFLAGS) -c $< -o $@
 
 Makefile: $(TOOLSDIR)/configure
+ifneq (reconf,$(MAKECMDGOALS))
 	$(SILENT)echo "*** tools/configure is newer than Makefile. You should run 'make reconf'."
+endif
 
 reconf:
 	$(SILENT$)PREFIX=$(PREFIX) $(TOOLSDIR)/configure $(CONFIGURE_OPTIONS)
