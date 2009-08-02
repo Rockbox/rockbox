@@ -996,21 +996,19 @@ static int brickmania_game_loop(void)
             /* write life num */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
             rb->snprintf(s, sizeof(s), "L:%d", life);
-            rb->lcd_putsxy(0, 0, s);
 #else
             rb->snprintf(s, sizeof(s), "Life: %d", life);
-            rb->lcd_putsxy(2, 2, s);
 #endif
+            rb->lcd_putsxy(0, 0, s);
 
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
             rb->snprintf(s, sizeof(s), "L%d", level+1);
-            rb->lcd_getstringsize(s, &sw, NULL);
-            rb->lcd_putsxy(LCD_WIDTH-sw, 0, s);
 #else
             rb->snprintf(s, sizeof(s), "Level %d", level+1);
-            rb->lcd_getstringsize(s, &sw, NULL);
-            rb->lcd_putsxy(LCD_WIDTH-sw-2, 2, s);
 #endif
+
+            rb->lcd_getstringsize(s, &sw, NULL);
+            rb->lcd_putsxy(LCD_WIDTH-sw, 0, s);
 
             if (vscore<score) vscore++;
             rb->snprintf(s, sizeof(s), "%d", vscore);
@@ -1018,7 +1016,7 @@ static int brickmania_game_loop(void)
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
             rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 0, s);
 #else
-            rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 2, s);
+            rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 0, s);
 #endif
 
             /* continue game */
