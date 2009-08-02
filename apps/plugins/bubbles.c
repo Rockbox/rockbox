@@ -1540,7 +1540,7 @@ static void bubbles_drawboard(struct game_context* bb) {
 
     rb->lcd_getstringsize(next, &w1, NULL);
 #ifndef NEXT_BB_X
-    rb->lcd_putsxy(XOFS/2-w/2, SHOTY-h, next);
+    rb->lcd_putsxy(XOFS/2-w1/2, SHOTY-h, next);
 #else
     rb->lcd_putsxy(NEXT_BB_X+(NEXT_BB_WIDTH/2-w1/2), NEXT_BB_Y, next);
 #endif
