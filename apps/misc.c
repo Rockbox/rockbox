@@ -76,7 +76,7 @@
 #include "icons.h"
 #endif /* End HAVE_LCD_BITMAP */
 #include "bookmark.h"
-#include "music_screen.h"
+#include "wps.h"
 #include "playback.h"
 
 #ifdef BOOTFILE

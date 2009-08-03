@@ -26,7 +26,7 @@
 
 #include <stdbool.h>
 #include "metadata.h"
-#include "wps_engine/wps_engine.h"
+#include "skin_engine/skin_engine.h"
 
 /* Look for albumart bitmap in the same dir as the track and in its parent dir.
  * Stores the found filename in the buf parameter.

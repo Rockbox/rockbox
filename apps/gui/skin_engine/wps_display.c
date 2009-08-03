@@ -63,89 +63,52 @@
 
 
 #include "wps_internals.h"
-#include "wps_engine.h"
+#include "skin_engine.h"
+
+static bool gui_wps_redraw(struct gui_wps *gwps, unsigned refresh_mode);
+
 
 bool gui_wps_display(struct gui_wps *gwps)
 {
     struct screen *display = gwps->display;
-    struct wps_data *data = gwps->data;
-    int screen = display->screen_type;
 
     /* Update the values in the first (default) viewport - in case the user
        has modified the statusbar or colour settings */
 #if LCD_DEPTH > 1
     if (display->depth > 1)
     {
-        data->viewports[0].vp.fg_pattern = display->get_foreground();
-        data->viewports[0].vp.bg_pattern = display->get_background();
+        gwps->data->viewports[0].vp.fg_pattern = display->get_foreground();
+        gwps->data->viewports[0].vp.bg_pattern = display->get_background();
     }
 #endif
     display->clear_display();
-    if (!data->wps_loaded) {
-        if ( !data->num_tokens ) {
-            /* set the default wps for the main-screen */
-            if(screen == SCREEN_MAIN)
-            {
-#if LCD_DEPTH > 1
-                unload_wps_backdrop();
-#endif
-                wps_data_load(data,
-                              display,
-#ifdef HAVE_LCD_BITMAP
-                              "%s%?it<%?in<%in. |>%it|%fn>\n"
-                              "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
-                              "%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>\n"
-                              "\n"
-                              "%al%pc/%pt%ar[%pp:%pe]\n"
-                              "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
-                              "%pb\n"
-                              "%pm\n", false);
-#else
-                              "%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>\n"
-                              "%pc%?ps<*|/>%pt\n", false);
-#endif
-            }
-#ifdef HAVE_REMOTE_LCD
-             /* set the default wps for the remote-screen */
-             else if(screen == SCREEN_REMOTE)
-             {
-#if LCD_REMOTE_DEPTH > 1
-                 unload_remote_wps_backdrop();
-#endif
-                 wps_data_load(data,
-                               display,
-                               "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
-                               "%s%?it<%?in<%in. |>%it|%fn>\n"
-                               "%al%pc/%pt%ar[%pp:%pe]\n"
-                               "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
-                               "%pb\n", false);
-             }
-#endif
-        }
-    }
-    else
-    {
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-        if (screen == SCREEN_REMOTE)
-            show_remote_wps_backdrop();
-        else if (screen == SCREEN_MAIN)
+    if (display->screen_type == SCREEN_REMOTE)
+        show_remote_wps_backdrop();
+    else if (display->screen_type == SCREEN_MAIN)
 #endif
 #if LCD_DEPTH > 1
-            show_wps_backdrop();
+        show_wps_backdrop();
 #endif
-    }
-    return gui_wps_redraw(gwps, 0, WPS_REFRESH_ALL);
+    return gui_wps_redraw(gwps, WPS_REFRESH_ALL);
 }
 
-bool gui_wps_update(struct gui_wps *gwps)
+/* update a skinned screen, update_type is WPS_REFRESH_* values.
+ * Usually it should only be WPS_REFRESH_NON_STATIC
+ * A full update will be done if required (state.do_full_update == true)
+ */
+bool skin_update(struct gui_wps *gwps, unsigned int update_type)
 {
-    struct mp3entry *id3 = gwps->state->id3;
     bool retval;
+    /* This maybe shouldnt be here, but while the skin is only used to 
+     * display the music screen this is better than whereever we are being
+     * called from. This is also safe for skined screen which dont use the id3 */
+    struct mp3entry *id3 = gwps->state->id3;
     bool cuesheet_update = (id3 != NULL ? cuesheet_subtrack_changed(id3) : false);
     gwps->state->do_full_update = cuesheet_update || gwps->state->do_full_update;
-    retval = gui_wps_redraw(gwps, 0,
-                            gwps->state->do_full_update ? 
-                                        WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
+    
+    retval = gui_wps_redraw(gwps, gwps->state->do_full_update ? 
+                                        WPS_REFRESH_ALL : update_type);
     return retval;
 }
 
@@ -883,9 +846,7 @@ static void write_line(struct screen *display,
     }
 }
 
-bool gui_wps_redraw(struct gui_wps *gwps,
-                     int ffwd_offset,
-                     unsigned refresh_mode)
+static bool gui_wps_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 {
     struct wps_data *data = gwps->data;
     struct screen *display = gwps->display;
@@ -942,8 +903,6 @@ bool gui_wps_redraw(struct gui_wps *gwps,
            data->wps_progress_pat[i] = display->get_locked_pattern();
     }
 #endif
-
-    state->ff_rewind_count = ffwd_offset;
 
     /* disable any viewports which are conditionally displayed */
     for (v = 0; v < data->num_viewports; v++)

@@ -69,7 +69,7 @@
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
-#include "wps_engine/wps_engine.h"
+#include "skin_engine/skin_engine.h"
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
@@ -848,11 +848,12 @@ void settings_apply(bool read_disk)
             global_settings.wps_file[0] != 0xff ) {
             snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
                     global_settings.wps_file);
-            wps_data_load(gui_wps[0].data, &screens[0], buf, true);
+            skin_data_load(gui_wps[0].data, &screens[0], buf, true);
         }
         else
         {
             wps_data_init(gui_wps[0].data);
+            skin_data_load(gui_wps[0].data, &screens[0], NULL, true);
 #ifdef HAVE_REMOTE_LCD
             gui_wps[0].data->remote_wps = false;
 #endif
@@ -877,11 +878,12 @@ void settings_apply(bool read_disk)
         if ( global_settings.rwps_file[0]) {
             snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
                     global_settings.rwps_file);
-            wps_data_load(gui_wps[1].data, &screens[1], buf, true);
+            skin_data_load(gui_wps[1].data, &screens[1], buf, true);
         }
         else
         {
             wps_data_init(gui_wps[1].data);
+            skin_data_load(gui_wps[1].data, &screens[1], NULL, true);
             gui_wps[1].data->remote_wps = true;
         }
 #endif

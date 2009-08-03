@@ -77,17 +77,17 @@ gui/pitchscreen.c
 gui/quickscreen.c
 #endif
 
-gui/music_screen.c
+gui/wps.c
 gui/scrollbar.c
 gui/splash.c
 gui/statusbar.c
 gui/yesno.c
 gui/viewport.c
 
-gui/wps_engine/wps_debug.c
-gui/wps_engine/wps_display.c
-gui/wps_engine/wps_parser.c
-gui/wps_engine/wps_tokens.c
+gui/skin_engine/wps_debug.c
+gui/skin_engine/wps_display.c
+gui/skin_engine/wps_parser.c
+gui/skin_engine/wps_tokens.c
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 gui/backdrop.c

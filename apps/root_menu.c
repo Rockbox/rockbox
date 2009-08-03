@@ -53,7 +53,7 @@
 #ifdef HAVE_RECORDING
 #include "recording.h"
 #endif
-#include "music_screen.h"
+#include "wps.h"
 #include "bookmark.h"
 #include "playlist.h"
 #include "tagtree.h"

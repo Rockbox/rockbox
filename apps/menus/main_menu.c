@@ -50,7 +50,7 @@
 #endif
 #include "version.h"
 #include "time.h"
-#include "gui/wps_engine/wps_engine.h"
+#include "skin_engine/skin_engine.h"
 
 static const struct browse_folder_info config = {ROCKBOX_DIR, SHOW_CFG};
 

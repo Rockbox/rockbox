@@ -390,11 +390,6 @@ struct touchregion {
     short int y;             /* y-pos */
     short int width;         /* width */
     short int height;        /* height */
-    enum {
-        WPS_TOUCHREGION_ACTION,
-        WPS_TOUCHREGION_SCROLLBAR,
-        WPS_TOUCHREGION_VOLUME
-    } type;                  /* type of touch region */
     bool repeat;             /* requires the area be held for the action */
     int action;              /* action this button will return */
 };
@@ -478,12 +473,6 @@ struct wps_data
 /* initial setup of wps_data */
 void wps_data_init(struct wps_data *wps_data);
 
-/* to setup up the wps-data from a format-buffer (isfile = false)
-   from a (wps-)file (isfile = true)*/
-bool wps_data_load(struct wps_data *wps_data,
-                   struct screen *display,
-                   const char *buf,
-                   bool isfile);
 
 /* Redraw statusbars if necessary */
 void gwps_draw_statusbars(void);

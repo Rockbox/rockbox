@@ -36,7 +36,7 @@
 #include "audio.h"
 #include "playlist.h"
 #include "menu.h"
-#include "wps_engine/wps_engine.h"
+#include "skin_engine/skin_engine.h"
 #include "settings.h"
 #include "debug.h"
 #include "storage.h"

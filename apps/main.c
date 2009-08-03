@@ -52,7 +52,7 @@
 #include "sprintf.h"
 #include "font.h"
 #include "language.h"
-#include "music_screen.h"
+#include "wps.h"
 #include "playlist.h"
 #include "buffer.h"
 #include "rolo.h"

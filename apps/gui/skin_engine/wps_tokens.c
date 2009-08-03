@@ -55,7 +55,7 @@
 #include "viewport.h"
 
 #include "wps_internals.h"
-#include "music_screen.h"
+#include "wps.h"
 
 static char* get_codectype(const struct mp3entry* id3)
 {

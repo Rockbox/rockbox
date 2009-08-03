@@ -1173,8 +1173,6 @@ static int parse_touchregion(const char *wps_bufptr,
     struct touchregion *region;
     const char *ptr = wps_bufptr;
     const char *action;
-    const char pb_string[] = "progressbar";
-    const char vol_string[] = "volume";
     int x,y,w,h;
     
     /* format: %T|x|y|width|height|action|
@@ -1205,7 +1203,7 @@ static int parse_touchregion(const char *wps_bufptr,
     /* Check there is a terminating | */
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
-
+        
     /* should probably do some bounds checking here with the viewport... but later */
     region = &wps_data->touchregion[wps_data->touchregion_count];
     region->action = ACTION_NONE;
@@ -1214,41 +1212,28 @@ static int parse_touchregion(const char *wps_bufptr,
     region->width = w;
     region->height = h;
     region->wvp = &wps_data->viewports[wps_data->num_viewports];
-
-    if(!strncmp(pb_string, action, sizeof(pb_string)-1)
-        && *(action + sizeof(pb_string)-1) == '|')
-        region->type = WPS_TOUCHREGION_SCROLLBAR;
-    else if(!strncmp(vol_string, action, sizeof(vol_string)-1)
-        && *(action + sizeof(vol_string)-1) == '|')
-        region->type = WPS_TOUCHREGION_VOLUME;
-    else
+    i = 0;
+    if (*action == '&')
     {
-        region->type = WPS_TOUCHREGION_ACTION;
-
-        if (*action == '&')
-        {
-            action++;
-            region->repeat = true;
-        }
-        else
-            region->repeat = false;
-
-        i = 0;
-        imax = ARRAYLEN(touchactions);
-        while ((region->action == ACTION_NONE) && 
-                (i < imax))
-        {
-            /* try to match with one of our touchregion screens */
-            int len = strlen(touchactions[i].s);
-            if (!strncmp(touchactions[i].s, action, len)
-                    && *(action+len) == '|')
-                region->action = touchactions[i].action;
-            i++;
-        }
-        if (region->action == ACTION_NONE)
-            return WPS_ERROR_INVALID_PARAM;
+        action++;
+        region->repeat = true;
     }
+    else
+        region->repeat = false;
 
+    imax = ARRAYLEN(touchactions);
+    while ((region->action == ACTION_NONE) && 
+            (i < imax))
+    {
+        /* try to match with one of our touchregion screens */
+        int len = strlen(touchactions[i].s);
+        if (!strncmp(touchactions[i].s, action, len)
+                && *(action+len) == '|')
+            region->action = touchactions[i].action;
+        i++;
+    }
+    if (region->action == ACTION_NONE)
+        return WPS_ERROR_INVALID_PARAM;
     wps_data->touchregion_count++;
     return skip_end_of_line(wps_bufptr); 
 }               
@@ -1681,7 +1666,7 @@ static bool load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
 
 /* to setup up the wps-data from a format-buffer (isfile = false)
    from a (wps-)file (isfile = true)*/
-bool wps_data_load(struct wps_data *wps_data,
+static bool wps_data_load(struct wps_data *wps_data,
                    struct screen *display,
                    const char *buf,
                    bool isfile)
@@ -1827,6 +1812,55 @@ bool wps_data_load(struct wps_data *wps_data,
         }
 #endif
         return true;
+    }
+}
+
+void skin_data_load(struct wps_data *wps_data,
+                    struct screen *display,
+                    const char *buf,
+                    bool isfile)
+{
+    bool loaded_ok = buf && wps_data_load(wps_data, display, buf, isfile);
+    if (!loaded_ok) /* load the hardcoded default */
+    {
+        /* set the default wps for the main-screen */
+        if(display->screen_type == SCREEN_MAIN)
+        {
+#if LCD_DEPTH > 1
+            unload_wps_backdrop();
+#endif
+            wps_data_load(wps_data,
+                          display,
+#ifdef HAVE_LCD_BITMAP
+                          "%s%?it<%?in<%in. |>%it|%fn>\n"
+                          "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
+                          "%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>\n"
+                          "\n"
+                          "%al%pc/%pt%ar[%pp:%pe]\n"
+                          "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
+                          "%pb\n"
+                          "%pm\n", false);
+#else
+                          "%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>\n"
+                          "%pc%?ps<*|/>%pt\n", false);
+#endif
+        }
+#ifdef HAVE_REMOTE_LCD
+        /* set the default wps for the remote-screen */
+        else if(display->screen_type == SCREEN_REMOTE)
+        {
+#if LCD_REMOTE_DEPTH > 1
+            unload_remote_wps_backdrop();
+#endif
+            wps_data_load(wps_data,
+                          display,
+                          "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
+                          "%s%?it<%?in<%in. |>%it|%fn>\n"
+                          "%al%pc/%pt%ar[%pp:%pe]\n"
+                          "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
+                          "%pb\n", false);
+        }
+#endif
     }
 }
 

@@ -51,7 +51,7 @@
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
-#include "wps_engine/wps_internals.h" /* FIXME: REMOVE ME */
+#include "skin_engine/skin_engine.h"
 #include "backdrop.h"
 
 static int compare_sort_dir; /* qsort key for sorting directories */
@@ -484,7 +484,7 @@ int ft_enter(struct tree_context* c)
 #if LCD_DEPTH > 1
                 unload_wps_backdrop();
 #endif
-                wps_data_load(gui_wps[0].data, &screens[0], buf, true);
+                skin_data_load(gui_wps[0].data, &screens[0], buf, true);
                 set_file(buf, (char *)global_settings.wps_file,
                          MAX_FILENAME);
                 break;
@@ -496,7 +496,7 @@ int ft_enter(struct tree_context* c)
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 unload_remote_wps_backdrop();
 #endif
-                wps_data_load(gui_wps[1].data, &screens[1], buf, true);
+                skin_data_load(gui_wps[1].data, &screens[1], buf, true);
                 set_file(buf, (char *)global_settings.rwps_file,
                          MAX_FILENAME);
                 break;
