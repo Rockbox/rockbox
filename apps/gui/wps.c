@@ -34,7 +34,7 @@
 #include "debug.h"
 #include "sprintf.h"
 #include "settings.h"
-#include "wps_engine/wps_engine.h"
+#include "skin_engine/skin_engine.h"
 #include "mp3_playback.h"
 #include "audio.h"
 #include "usb.h"
@@ -66,7 +66,7 @@
 #include "option_select.h"
 #include "dsp.h"
 #include "playlist_viewer.h"
-#include "music_screen.h"
+#include "wps.h"
 
 #define RESTORE_WPS_INSTANTLY       0l
 #define RESTORE_WPS_NEXT_SECOND     ((long)(HZ+current_tick))
@@ -114,7 +114,7 @@ void fade(bool fade_in, bool updatewps)
             if (updatewps)
             {
                 FOR_NB_SCREENS(i)
-                    gui_wps_redraw(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
+                    skin_update(&gui_wps[i], WPS_REFRESH_NON_STATIC);
             }
             sleep(1);
         }
@@ -130,7 +130,7 @@ void fade(bool fade_in, bool updatewps)
             if (updatewps)
             {
                 FOR_NB_SCREENS(i)
-                    gui_wps_redraw(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
+                    skin_update(&gui_wps[i], WPS_REFRESH_NON_STATIC);
             }
             sleep(1);
         }
@@ -155,7 +155,7 @@ bool is_wps_fading(void)
 
 bool update_onvol_change(struct gui_wps * gwps)
 {
-    gui_wps_redraw(gwps, 0, WPS_REFRESH_NON_STATIC);
+    skin_update(gwps, WPS_REFRESH_NON_STATIC);
 
 #ifdef HAVE_LCD_CHARCELLS
     splashf(0, "Vol: %3d dB",
@@ -254,19 +254,23 @@ bool ffwd_rew(int button)
                         ff_rewind_count = -wps_state.id3->elapsed;
                 }
 
+                /* set the wps state ff_rewind_count so the progess info
+                   displays corectly */
+                wps_state.ff_rewind_count = (wps_state.wps_time_countup == false)?
+                                            ff_rewind_count:-ff_rewind_count;
                 FOR_NB_SCREENS(i)
-                    gui_wps_redraw(&gui_wps[i],
-                                    (wps_state.wps_time_countup == false)?
-                                    ff_rewind_count:-ff_rewind_count,
-                                    WPS_REFRESH_PLAYER_PROGRESS |
-                                    WPS_REFRESH_DYNAMIC);
+                {
+                    skin_update(&gui_wps[i],
+                                WPS_REFRESH_PLAYER_PROGRESS |
+                                WPS_REFRESH_DYNAMIC);
+                }
 
                 break;
 
             case ACTION_WPS_STOPSEEK:
                 wps_state.id3->elapsed = wps_state.id3->elapsed+ff_rewind_count;
                 audio_ff_rewind(wps_state.id3->elapsed);
-                ff_rewind_count = 0;
+                wps_state.ff_rewind_count = 0;
                 wps_state.ff_rewind = false;
                 status_set_ffmode(0);
 #if (CONFIG_CODEC != SWCODEC)
@@ -275,7 +279,7 @@ bool ffwd_rew(int button)
 #endif
 #ifdef HAVE_LCD_CHARCELLS
                 FOR_NB_SCREENS(i)
-                    gui_wps_redraw(&gui_wps[i],0, WPS_REFRESH_ALL);
+                    skin_update(&gui_wps[i], WPS_REFRESH_ALL);
 #endif
                 exit = true;
                 break;
@@ -553,49 +557,12 @@ int wps_get_touchaction(struct wps_data *data)
             if (vx >= r->x && vx < r->x+r->width &&
                 vy >= r->y && vy < r->y+r->height)
             {
-                /* reposition the touch within the area */
-                vx -= r->x;
-                vy -= r->y;
-
-                switch(r->type)
+                if ((repeated && r->repeat) ||
+                    (released && !r->repeat))
                 {
-                    case WPS_TOUCHREGION_ACTION:
-                        if ((repeated && r->repeat) || (released && !r->repeat))
-                        {
-                            last_action = r->action;
-                            return r->action;
-                        }
-                        break;
-                    case WPS_TOUCHREGION_SCROLLBAR:
-                        if(r->width > r->height)
-                            /* landscape */
-                            wps_state.id3->elapsed = (vx *
-                                    wps_state.id3->length) / r->width;
-                        else
-                            /* portrait */
-                            wps_state.id3->elapsed = (vy *
-                                    wps_state.id3->length) / r->height;
-
-                        audio_ff_rewind(wps_state.id3->elapsed);
-                        break;
-                    case WPS_TOUCHREGION_VOLUME:
-                    {
-                        const int min_vol = sound_min(SOUND_VOLUME);
-                        const int max_vol = sound_max(SOUND_VOLUME);
-                        if(r->width > r->height)
-                            /* landscape */
-                            global_settings.volume = (vx *
-                                            (max_vol - min_vol)) / r->width;
-                        else
-                            /* portrait */
-                            global_settings.volume = (vy *
-                                                (max_vol-min_vol)) / r->height;
-
-                        global_settings.volume += min_vol;
-                        setvol();
-                        break;
-                    }
-                }
+                    last_action = r->action;    
+                    return r->action;
+                }    
             }    
         }
     }
@@ -682,8 +649,7 @@ long gui_wps_show(void)
                     FOR_NB_SCREENS(i)
                     {
                         if(gui_wps[i].data->peak_meter_enabled)
-                            gui_wps_redraw(&gui_wps[i], 0,
-                                            WPS_REFRESH_PEAK_METER);
+                            skin_update(&gui_wps[i], WPS_REFRESH_PEAK_METER);
                         next_refresh += HZ / PEAK_METER_FPS;
                     }
                 }
@@ -1083,7 +1049,7 @@ long gui_wps_show(void)
                                                 )
 #endif
                 {
-                    gui_wps_update(&gui_wps[i]);
+                    skin_update(&gui_wps[i], WPS_REFRESH_NON_STATIC);
                 }
             }
             wps_state.do_full_update = false;
