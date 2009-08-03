@@ -130,12 +130,13 @@ static int get_file_pos(int newtime)
         return -1;
     }
 
-    pos += id3->first_frame_offset;
-
     /* Don't seek right to the end of the file so that we can
        transition properly to the next song */
     if (pos >= (int)(id3->filesize - id3->id3v1len))
         pos = id3->filesize - id3->id3v1len - 1;
+
+    /* id3->filesize excludes id3->first_frame_offset, so add it now */
+    pos += id3->first_frame_offset;
 
     return pos;
 }
@@ -492,7 +493,7 @@ next_track:
         }
 
         samplesdone += framelength;
-        ci->set_elapsed(samplesdone / (current_frequency / 1000));
+        ci->set_elapsed((samplesdone * 1000) / current_frequency);
     }
 
     /* wait for synth idle - MT only*/
