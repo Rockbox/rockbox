@@ -609,8 +609,10 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
                              "Playback Control",
                              "Quit");
 
+#ifdef HAVE_TOUCHSCREEN
     /* Entering Menu, set the touchscreen to the global setting */
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
+#endif
 
     while (!leave_menu) {
         
@@ -646,8 +648,10 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
         }
     }
     
+#ifdef HAVE_TOUCHSCREEN
     /* Leaving the menu, set back to pointer mode */
     rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+#endif
     
     return ret;
 }
