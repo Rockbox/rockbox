@@ -596,6 +596,8 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
 {
     rb->button_clear_queue();
     int choice = 0;
+    bool leave_menu=false;
+    int ret=0;
 
     _ingame = ingame;
     
@@ -607,16 +609,26 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
                              "Playback Control",
                              "Quit");
 
-    while (true) {
+    /* Entering Menu, set the touchscreen to the global setting */
+    rb->touchscreen_set_mode(rb->global_settings->touch_mode);
+
+    while (!leave_menu) {
+        
         switch (rb->do_menu(&main_menu, &choice, NULL, false)) {
             case 0:
-                return 0;
+                leave_menu=true;
+                ret = 0;
+                break;
             case 1:
                 clix_init(state);
-                return 0;
+                leave_menu=true;
+                ret = 0;
+                break;
             case 2:
-                if (clix_help())
-                    return 1;
+                if (clix_help()) {
+                    leave_menu=true;
+                    ret = 1;
+                }
                 break;
             case 3:
                 highscore_show(NUM_SCORES, highest, NUM_SCORES, true);
@@ -626,11 +638,18 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
                 break;
             case 5:
             case MENU_ATTACHED_USB:
-                return 1;
+                leave_menu=true;
+                ret = 1;
+                break;
             default:
                 break;
         }
     }
+    
+    /* Leaving the menu, set back to pointer mode */
+    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+    
+    return ret;
 }
 
 static int clix_handle_game(struct clix_game_state_t* state)
