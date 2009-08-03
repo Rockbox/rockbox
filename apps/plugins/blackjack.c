@@ -357,12 +357,13 @@ struct highscore highest[NUM_SCORES];
 
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 #define BJACK_SELECT_NAME    "SELECT"
-#define BJACK_STAY_NAME     "DOWN"
+#define BJACK_STAY_NAME     "PLAY"
 #define BJACK_RESUME_NAME   "MENU"
-#define BJACK_QUIT_NAME     "BACK"
+#define BJACK_QUIT_NAME     "POWER"
 #define BJACK_DOUBLE_NAME   "CUSTOM"
 #define BJACK_SELECT        BUTTON_SELECT
-#define BJACK_QUIT          BUTTON_BACK
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_STAY          BUTTON_PLAY
 #define BJACK_MAX           (BUTTON_CUSTOM|BUTTON_UP)
 #define BJACK_MIN           (BUTTON_CUSTOM|BUTTON_DOWN)
 #define BJACK_DOUBLEDOWN    BUTTON_CUSTOM
@@ -896,17 +897,6 @@ static void blackjack_savegame(struct game_context* bj) {
 }
 
 /*****************************************************************************
-* blackjack_callback() is the default event handler callback which is called
-*     on usb connect and shutdown.
-******************************************************************************/
-static void blackjack_callback(void* param) {
-    struct game_context* bj = (struct game_context*) param;
-    if(bj->dirty) {
-        highscore_save(HIGH_SCORE,highest,NUM_SCORES);
-    }
-}
-
-/*****************************************************************************
 * blackjack_get_yes_no() gets a yes/no answer from the user
 ******************************************************************************/
 static unsigned int blackjack_get_yes_no(char message[20]) {
@@ -1210,7 +1200,6 @@ void showhelp(void) {
 * blackjack_menu() is the initial menu at the start of the game.
 ******************************************************************************/
 static unsigned int blackjack_menu(struct game_context* bj) {
-    int button;
     int selection=0;
     bool breakout = false;
     
@@ -1242,10 +1231,11 @@ static unsigned int blackjack_menu(struct game_context* bj) {
                 break;
             case 5:
                 return BJ_QUIT;
+                
+            case MENU_ATTACHED_USB:
+                return BJ_USB;
+                
             default:
-                if(rb->default_event_handler_ex(button, blackjack_callback,
-                   (void*) bj) == SYS_USB_CONNECTED)
-                    return BJ_USB;
                 break;
         }
     }
@@ -1537,6 +1527,9 @@ enum plugin_status plugin_start(const void* parameter)
 
             case BJ_USB:
                 rb->lcd_setfont(FONT_UI);
+                if(bj.dirty) {
+                    highscore_save(HIGH_SCORE,highest,NUM_SCORES);
+                }
                 return PLUGIN_USB_CONNECTED;
 
             case BJ_QUIT:
