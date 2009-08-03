@@ -18,13 +18,17 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _MUSICSCREEN_H_
-#define _MUSICSCREEN_H_
+#ifndef _WPS_H_
+#define _WPS_H_
 #include <stdbool.h>
+#include "screen_access.h"
  
 long gui_wps_show(void);
  
- 
+/* wrapper for the wps to load the skin (.wps/.rwps) files */
+void wps_data_load(enum screen_type, const char *, bool);
+void wps_data_init(enum screen_type);
+
 void gui_sync_wps_init(void);
 
 /* fades the volume, e.g. on pause or stop */
@@ -35,9 +39,6 @@ void display_keylock_text(bool locked);
 
 bool is_wps_fading(void);
 
-/* wrapper for the wps to load the skin (.wps/.rwps) files */
-void wps_data_load(enum screen_type, const char *, bool);
-void wps_data_init(enum screen_type);
 
 #ifdef HAVE_ALBUMART
 /*
@@ -47,4 +48,10 @@ void wps_data_init(enum screen_type);
  */
 bool wps_uses_albumart(int*, int*);
 #endif
-#endif
+
+#ifdef IPOD_ACCESSORY_PROTOCOL
+/* return length of the current ff or rewin action, IAP needs this */
+int wps_get_ff_rewind_count(void);
+#endif /* IPOD_ACCESSORY_PROTOCOL */
+
+#endif /* _WPS_H_ */

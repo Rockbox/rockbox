@@ -36,7 +36,7 @@
 #include "audio.h"
 #include "settings.h"
 #include "metadata.h"
-#include "skin_engine/skin_engine.h"
+#include "wps.h"
 
 #include "action.h"
 
@@ -191,7 +191,7 @@ void iap_periodic(void)
     unsigned char data[] = {0x04, 0x00, 0x27, 0x04, 0x00, 0x00, 0x00, 0x00};
     unsigned long time_elapsed = audio_current_track()->elapsed;
 
-    time_elapsed += wps_state.ff_rewind_count;
+    time_elapsed += wps_get_ff_rewind_count();
     
     data[3] = 0x04; // playing
 
@@ -685,13 +685,13 @@ void iap_handlepkt(void)
             /* Jump to track number in current playlist */
             case 0x0037:
             {
+                int paused = (is_wps_fading() || (audio_status() & AUDIO_STATUS_PAUSE));
                 long tracknum = (signed long)serbuf[4] << 24 |
                                 (signed long)serbuf[5] << 16 |
                                 (signed long)serbuf[6] << 8 | serbuf[7];
-                if (!wps_state.paused)
-                    audio_pause();
+                audio_pause();
                 audio_skip(tracknum - playlist_next(0));
-                if (!wps_state.paused)
+                if (!paused)
                     audio_resume();
                 
                 /* respond with cmd ok packet */

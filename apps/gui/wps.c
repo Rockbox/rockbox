@@ -1232,3 +1232,11 @@ bool wps_uses_albumart(int *width, int *height)
     return false;
 }
 #endif
+
+
+#ifdef IPOD_ACCESSORY_PROTOCOL
+int wps_get_ff_rewind_count(void)
+{
+    return wps_state.ff_rewind_count;
+}
+#endif
