@@ -432,6 +432,11 @@ static bool reversi_gui_menu(void) {
                         MENU_TEXT_STRAT_BLACK, MENU_TEXT_STRAT_WHITE,
                         MENU_TEXT_WRAP_MODE, "Playback Control", "Quit");
 
+#ifdef HAVE_TOUCHSCREEN
+    /* Entering Menu, set the touchscreen to the global setting */
+    rb->touchscreen_set_mode(rb->global_settings->touch_mode);
+#endif
+
     result = rb->do_menu(&menu, NULL, NULL, false);
 
     switch (result) {
@@ -474,6 +479,11 @@ static bool reversi_gui_menu(void) {
             quit_plugin = true;
             break;
     }
+
+#ifdef HAVE_TOUCHSCREEN
+    /* Leaving the menu, set back to pointer mode */
+    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+#endif
 
     return (result == MENU_ATTACHED_USB);
 }
