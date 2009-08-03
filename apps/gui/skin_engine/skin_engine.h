@@ -1,0 +1,59 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id: wps_internals.h 22062 2009-07-27 07:21:05Z jdgordon $
+ *
+ * Copyright (C) 2007 Nicolas Pennequin
+ * Copyright (C) 2009 Jonathan Gordon
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+ 
+#ifndef _SKIN_ENGINE_H
+#define _SKIN_ENGINE_H
+
+#include "wps_internals.h" /* TODO: remove this line.. shoudlnt be needed */
+
+
+#ifdef HAVE_TOUCHSCREEN
+int wps_get_touchaction(struct wps_data *data);
+#endif
+
+#ifdef HAVE_ALBUMART
+/* gives back if WPS contains an albumart tag */
+bool gui_sync_wps_uses_albumart(void);
+#endif
+
+/* setup and display a WPS for the first time */
+bool gui_wps_display(struct gui_wps *gwps);
+ 
+
+/* Do a update_type update of the skinned screen */
+bool skin_update(struct gui_wps *gwps, unsigned int update_type);
+
+/* to setup up the wps-data from a format-buffer (isfile = false)
+   from a (wps-)file (isfile = true)
+   if buf == NULL it will load the hardcoded default
+ */
+void skin_data_load(struct wps_data *wps_data,
+                    struct screen *display,
+                    const char *buf,
+                    bool isfile);
+
+
+
+
+
+
+#endif
