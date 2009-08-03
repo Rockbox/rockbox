@@ -20,7 +20,7 @@ int my_putc(char c , int fd){
 void *my_malloc(size_t size)
 {
     static char *offset = NULL;
-    static ssize_t totalSize = 0;
+    static size_t totalSize = 0;
     char *ret;
 
     int remainder = size % 4;
@@ -29,10 +29,10 @@ void *my_malloc(size_t size)
 
     if (offset == NULL)
     {
-        offset = rb->plugin_get_audio_buffer((size_t *)&totalSize);
+        offset = rb->plugin_get_audio_buffer(&totalSize);
     }
 
-    if (size + 4 > abs(totalSize) )
+    if (size + 4 > totalSize)
     {
         /* We've made our point. */
         return NULL;
