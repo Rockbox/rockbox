@@ -336,9 +336,9 @@ static void reversi_gui_display_board(void) {
 #endif
 #endif
 
-    rb->lcd_set_viewport(&tempvp);
+    rb->screens[SCREEN_MAIN]->set_viewport(&tempvp);
     rb->lcd_puts_scroll(0, 0, buf);
-    rb->lcd_set_viewport(NULL);
+    rb->screens[SCREEN_MAIN]->set_viewport(NULL);
 
     y = LEGEND_Y(1);
     
@@ -346,9 +346,9 @@ static void reversi_gui_display_board(void) {
     rb->snprintf(buf, sizeof(buf), "%01d", r);
     
     tempvp.y=y;
-    rb->lcd_set_viewport(&tempvp);
+    rb->screens[SCREEN_MAIN]->set_viewport(&tempvp);
     rb->lcd_puts_scroll(0, 0, buf);
-    rb->lcd_set_viewport(NULL);
+    rb->screens[SCREEN_MAIN]->set_viewport(NULL);
 
     /* Draw the box around the current player */
     r = (cur_player == BLACK ? 0 : 1);

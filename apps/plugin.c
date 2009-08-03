@@ -367,6 +367,9 @@ static const struct plugin_api rockbox_api = {
     queue_reply,
 #endif
     usb_acknowledge,
+#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
+    usb_hid_send,
+#endif
 #ifdef RB_PROFILE
     profile_thread,
     profstop,
@@ -651,7 +654,6 @@ static const struct plugin_api rockbox_api = {
 #endif
 
 #ifdef HAVE_ALBUMART
-    find_albumart,
     search_albumart_files,
 #endif
 
@@ -665,11 +667,6 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
-    usb_hid_send,
-#endif
-
-    lcd_set_viewport,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

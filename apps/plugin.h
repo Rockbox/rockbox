@@ -133,12 +133,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 165
+#define PLUGIN_API_VERSION 166
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 164
+#define PLUGIN_MIN_API_VERSION 166
 
 /* plugin return codes */
 enum plugin_status {
@@ -491,6 +491,9 @@ struct plugin_api {
 #endif /* CONFIG_CODEC == SWCODEC */
 
     void (*usb_acknowledge)(long id);
+#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
+    void (*usb_hid_send)(usage_page_t usage_page, int id);
+#endif
 #ifdef RB_PROFILE
     void (*profile_thread)(void);
     void (*profstop)(void);
@@ -818,7 +821,6 @@ struct plugin_api {
 #endif
 
 #ifdef HAVE_ALBUMART
-    bool (*find_albumart)(const struct mp3entry *id3, char *buf, int buflen);
     bool (*search_albumart_files)(const struct mp3entry *id3, const char *size_string,
                                   char *buf, int buflen);
 #endif
@@ -832,12 +834,6 @@ struct plugin_api {
     const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
-    void (*usb_hid_send)(usage_page_t usage_page, int id);
-#endif
-
-    void (*lcd_set_viewport)(struct viewport* vp);
 };
 
 /* plugin header */

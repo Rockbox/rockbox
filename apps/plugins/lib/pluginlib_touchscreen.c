@@ -98,7 +98,7 @@ void touchbutton_draw(struct touchbutton *data, int num_buttons) {
             /* Set the current viewport to the button so that all drawing
              *  operations are within the button location.
              */
-            rb->lcd_set_viewport(&data[i].vp);
+            rb->screens[SCREEN_MAIN]->set_viewport(&data[i].vp);
             
             /* Get the string size so that the title can be centered. */
             rb->lcd_getstringsize(data[i].title, &title_width, &title_height);
@@ -132,7 +132,7 @@ void touchbutton_draw(struct touchbutton *data, int num_buttons) {
             rb->lcd_drawrect( 0, 0, data[i].vp.width, data[i].vp.height);
         }
     }
-    rb->lcd_set_viewport(NULL); /* Go back to the default viewport */
+    rb->screens[SCREEN_MAIN]->set_viewport(NULL); /* Go back to the default viewport */
 }
 
 /*******************************************************************************
