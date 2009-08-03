@@ -619,7 +619,7 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
                     return 1;
                 break;
             case 3:
-                highscore_show(NUM_SCORES, highest, NUM_SCORES);
+                highscore_show(NUM_SCORES, highest, NUM_SCORES, true);
                 break;
             case 4:
                 playback_control(NULL);
@@ -773,7 +773,7 @@ static int clix_handle_game(struct clix_game_state_t* state)
                                     rb->splash(HZ*2, "New High Score");
                                 if (position != -1)
                                     highscore_show(position, highest,
-                                                   NUM_SCORES);
+                                                   NUM_SCORES, true);
                                 if (clix_menu(state, 0))
                                     return 1;
                             break;

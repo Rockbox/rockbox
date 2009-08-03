@@ -17,19 +17,22 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- ****************************************************************************/            
+ ****************************************************************************/
 
 #include "plugin.h"
 #include "pluginbitmaps/card_deck.h"
 #include "pluginbitmaps/card_back.h"
+#include "lib/display_text.h"
+#include "lib/highscore.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
 /* save files */
-#define SCORE_FILE PLUGIN_GAMES_DIR "/blackjack.score"
+#define HIGH_SCORE PLUGIN_GAMES_DIR "/blackjack.score"
 #define SAVE_FILE  PLUGIN_GAMES_DIR "/blackjack.save"
-
-#define NUM_SCORES LCD_HEIGHT/8-2
+#define NUM_SCORES 5
+struct highscore highest[NUM_SCORES];
 
 /* final game return status */
 #define BJ_END  3
@@ -38,308 +41,364 @@ PLUGIN_HEADER
 #define BJ_LOSE 0
 
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define BJACK_START      BUTTON_ON
-#define BJACK_QUIT       BUTTON_OFF
-#define BJACK_MAX        (BUTTON_ON|BUTTON_UP)
-#define BJACK_MIN        (BUTTON_ON|BUTTON_DOWN)
-#define BJACK_HIT        BUTTON_F1
-#define BJACK_STAY       BUTTON_F2
-#define BJACK_DOUBLEDOWN BUTTON_F3
-#define BJACK_SCORES     BUTTON_RIGHT
-#define BJACK_RESUME     BUTTON_PLAY
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME   "PLAY"
+#define BJACK_STAY_NAME     "F1"
+#define BJACK_RESUME_NAME   "F3"
+#define BJACK_QUIT_NAME     "OFF"
+#define BJACK_DOUBLE_NAME   "F2"
+#define BJACK_SELECT        BUTTON_PLAY
+#define BJACK_QUIT          BUTTON_OFF
+#define BJACK_MAX           (BUTTON_ON|BUTTON_UP)
+#define BJACK_MIN           (BUTTON_ON|BUTTON_DOWN)
+#define BJACK_STAY          BUTTON_F1
+#define BJACK_DOUBLEDOWN    BUTTON_F2
+#define BJACK_RESUME        BUTTON_F3
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define BJACK_START      BUTTON_MENU
-#define BJACK_QUIT       BUTTON_OFF
-#define BJACK_MAX        (BUTTON_MENU|BUTTON_UP)
-#define BJACK_MIN        (BUTTON_MENU|BUTTON_DOWN)
-#define BJACK_HIT        BUTTON_LEFT
-#define BJACK_STAY       BUTTON_RIGHT
-#define BJACK_DOUBLEDOWN BUTTON_UP
-#define BJACK_SCORES     BUTTON_UP
-#define BJACK_RESUME     BUTTON_DOWN
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "MENU"
+#define BJACK_STAY_NAME     "RIGHT"
+#define BJACK_RESUME_NAME   "DOWN"
+#define BJACK_QUIT_NAME     "OFF"
+#define BJACK_DOUBLE_NAME   "UP"
+#define BJACK_SELECT        BUTTON_MENU
+#define BJACK_QUIT          BUTTON_OFF
+#define BJACK_MAX           (BUTTON_MENU|BUTTON_UP)
+#define BJACK_MIN           (BUTTON_MENU|BUTTON_DOWN)
+#define BJACK_STAY          BUTTON_RIGHT
+#define BJACK_DOUBLEDOWN    BUTTON_UP
+#define BJACK_RESUME        BUTTON_DOWN
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define BJACK_START      BUTTON_PLAY
-#define BJACK_QUIT       BUTTON_POWER
-#define BJACK_MAX        (BUTTON_PLAY|BUTTON_SCROLL_UP)
-#define BJACK_MIN        (BUTTON_PLAY|BUTTON_SCROLL_DOWN)
-#define BJACK_HIT        BUTTON_PLAY
-#define BJACK_STAY       BUTTON_FF
-#define BJACK_DOUBLEDOWN BUTTON_REW
-#define BJACK_SCORES     BUTTON_LEFT
-#define BJACK_RESUME     BUTTON_RIGHT
-#define BJACK_UP         BUTTON_SCROLL_UP
-#define BJACK_DOWN       BUTTON_SCROLL_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "PLAY"
+#define BJACK_STAY_NAME     ">>|"
+#define BJACK_RESUME_NAME   "RIGHT"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "|<<"
+#define BJACK_SELECT        BUTTON_PLAY
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           (BUTTON_PLAY|BUTTON_SCROLL_UP)
+#define BJACK_MIN           (BUTTON_PLAY|BUTTON_SCROLL_DOWN)
+#define BJACK_STAY          BUTTON_FF
+#define BJACK_DOUBLEDOWN    BUTTON_REW
+#define BJACK_RESUME        BUTTON_RIGHT
+#define BJACK_UP            BUTTON_SCROLL_UP
+#define BJACK_DOWN          BUTTON_SCROLL_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define BJACK_START      BUTTON_ON
-#define BJACK_QUIT       BUTTON_OFF
-#define BJACK_MAX        (BUTTON_ON|BUTTON_UP)
-#define BJACK_MIN        (BUTTON_ON|BUTTON_DOWN)
-#define BJACK_HIT        BUTTON_ON
-#define BJACK_STAY       BUTTON_REC
-#define BJACK_DOUBLEDOWN BUTTON_SELECT
-#define BJACK_SCORES     BUTTON_SELECT
-#define BJACK_RESUME     BUTTON_MODE
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "ON"
+#define BJACK_STAY_NAME     "REC"
+#define BJACK_RESUME_NAME   "MODE"
+#define BJACK_QUIT_NAME     "OFF"
+#define BJACK_DOUBLE_NAME   "SELECT"
+#define BJACK_SELECT        BUTTON_ON
+#define BJACK_QUIT          BUTTON_OFF
+#define BJACK_MAX           (BUTTON_ON|BUTTON_UP)
+#define BJACK_MIN           (BUTTON_ON|BUTTON_DOWN)
+#define BJACK_STAY          BUTTON_REC
+#define BJACK_DOUBLEDOWN    BUTTON_SELECT
+#define BJACK_RESUME        BUTTON_MODE
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define BJACK_START      BUTTON_SELECT
-#define BJACK_QUIT       BUTTON_MENU
-#define BJACK_MAX        (BUTTON_SELECT|BUTTON_SCROLL_FWD)
-#define BJACK_MIN        (BUTTON_SELECT|BUTTON_SCROLL_BACK)
-#define BJACK_HIT        BUTTON_SELECT
-#define BJACK_STAY       BUTTON_RIGHT
-#define BJACK_DOUBLEDOWN BUTTON_LEFT
-#define BJACK_SCORES     BUTTON_RIGHT
-#define BJACK_RESUME     BUTTON_PLAY
-#define BJACK_UP         BUTTON_SCROLL_FWD
-#define BJACK_DOWN       BUTTON_SCROLL_BACK
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "SELECT"
+#define BJACK_STAY_NAME     "RIGHT"
+#define BJACK_RESUME_NAME   "PLAY"
+#define BJACK_QUIT_NAME     "MENU"
+#define BJACK_DOUBLE_NAME   "LEFT"
+#define BJACK_SELECT        BUTTON_SELECT
+#define BJACK_QUIT          BUTTON_MENU
+#define BJACK_MAX           (BUTTON_SELECT|BUTTON_SCROLL_FWD)
+#define BJACK_MIN           (BUTTON_SELECT|BUTTON_SCROLL_BACK)
+#define BJACK_STAY          BUTTON_RIGHT
+#define BJACK_DOUBLEDOWN    BUTTON_LEFT
+#define BJACK_RESUME        BUTTON_PLAY
+#define BJACK_UP            BUTTON_SCROLL_FWD
+#define BJACK_DOWN          BUTTON_SCROLL_BACK
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-#define BJACK_START      BUTTON_PLAY
-#define BJACK_QUIT       BUTTON_POWER
-#define BJACK_MAX        (BUTTON_PLAY|BUTTON_UP)
-#define BJACK_MIN        (BUTTON_PLAY|BUTTON_DOWN)
-#define BJACK_HIT        BUTTON_SELECT
-#define BJACK_STAY       BUTTON_REC
-#define BJACK_DOUBLEDOWN BUTTON_PLAY
-#define BJACK_SCORES     BUTTON_RIGHT
-#define BJACK_RESUME     BUTTON_DOWN
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "PLAY"
+#define BJACK_STAY_NAME     "REC"
+#define BJACK_RESUME_NAME   "DOWN"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "PLAY"
+#define BJACK_SELECT        BUTTON_PLAY
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           (BUTTON_PLAY|BUTTON_UP)
+#define BJACK_MIN           (BUTTON_PLAY|BUTTON_DOWN)
+#define BJACK_STAY          BUTTON_REC
+#define BJACK_DOUBLEDOWN    BUTTON_PLAY
+#define BJACK_RESUME        BUTTON_DOWN
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-#define BJACK_START      BUTTON_MODE
-#define BJACK_QUIT       BUTTON_PLAY
-#define BJACK_MAX        (BUTTON_EQ|BUTTON_UP)
-#define BJACK_MIN        (BUTTON_EQ|BUTTON_DOWN)
-#define BJACK_HIT        BUTTON_EQ
-#define BJACK_STAY       BUTTON_MODE
-#define BJACK_DOUBLEDOWN BUTTON_SELECT
-#define BJACK_SCORES     BUTTON_SELECT
-#define BJACK_RESUME     (BUTTON_EQ|BUTTON_MODE)
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "MODE"
+#define BJACK_STAY_NAME     "MODE"
+#define BJACK_RESUME_NAME   "EQ+MODE"
+#define BJACK_QUIT_NAME     "PLAY"
+#define BJACK_DOUBLE_NAME   "SELECT"
+#define BJACK_SELECT        BUTTON_MODE
+#define BJACK_QUIT          BUTTON_PLAY
+#define BJACK_MAX           (BUTTON_EQ|BUTTON_UP)
+#define BJACK_MIN           (BUTTON_EQ|BUTTON_DOWN)
+#define BJACK_STAY          BUTTON_MODE
+#define BJACK_DOUBLEDOWN    BUTTON_SELECT
+#define BJACK_RESUME        (BUTTON_EQ|BUTTON_MODE)
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define BJACK_START      BUTTON_A
-#define BJACK_QUIT       BUTTON_POWER
-#define BJACK_MAX        BUTTON_VOL_UP
-#define BJACK_MIN        BUTTON_VOL_DOWN
-#define BJACK_HIT        BUTTON_VOL_UP
-#define BJACK_STAY       BUTTON_VOL_DOWN
-#define BJACK_DOUBLEDOWN BUTTON_SELECT
-#define BJACK_SCORES     BUTTON_RIGHT
-#define BJACK_RESUME     BUTTON_MENU
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "A"
+#define BJACK_STAY_NAME     "VOL-"
+#define BJACK_RESUME_NAME   "MENU"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "SELECT"
+#define BJACK_SELECT        BUTTON_A
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           BUTTON_VOL_UP
+#define BJACK_MIN           BUTTON_VOL_DOWN
+#define BJACK_STAY          BUTTON_VOL_DOWN
+#define BJACK_DOUBLEDOWN    BUTTON_SELECT
+#define BJACK_RESUME        BUTTON_MENU
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
-#define BJACK_START      BUTTON_SELECT
-#define BJACK_QUIT       BUTTON_POWER
-#define BJACK_MAX        (BUTTON_REC|BUTTON_UP)
-#define BJACK_MIN        (BUTTON_REC|BUTTON_DOWN)
-#define BJACK_HIT        BUTTON_SELECT
-#define BJACK_STAY       BUTTON_RIGHT
-#define BJACK_DOUBLEDOWN BUTTON_LEFT
-#define BJACK_SCORES     BUTTON_UP
-#define BJACK_RESUME     BUTTON_DOWN
-#define BJACK_UP         BUTTON_SCROLL_FWD
-#define BJACK_DOWN       BUTTON_SCROLL_BACK
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "SELECT"
+#define BJACK_STAY_NAME     "RIGHT"
+#define BJACK_RESUME_NAME   "DOWN"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "LEFT"
+#define BJACK_SELECT        BUTTON_SELECT
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           (BUTTON_REC|BUTTON_UP)
+#define BJACK_MIN           (BUTTON_REC|BUTTON_DOWN)
+#define BJACK_STAY          BUTTON_RIGHT
+#define BJACK_DOUBLEDOWN    BUTTON_LEFT
+#define BJACK_RESUME        BUTTON_DOWN
+#define BJACK_UP            BUTTON_SCROLL_FWD
+#define BJACK_DOWN          BUTTON_SCROLL_BACK
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == SANSA_FUZE_PAD
-#define BJACK_START      BUTTON_SELECT
-#define BJACK_QUIT       (BUTTON_HOME|BUTTON_REPEAT)
-#define BJACK_MAX        (BUTTON_SELECT|BUTTON_UP)
-#define BJACK_MIN        (BUTTON_SELECT|BUTTON_DOWN)
-#define BJACK_HIT        (BUTTON_SELECT|BUTTON_REL)
-#define BJACK_STAY       BUTTON_RIGHT
-#define BJACK_DOUBLEDOWN BUTTON_LEFT
-#define BJACK_SCORES     BUTTON_DOWN
-#define BJACK_RESUME     BUTTON_UP
-#define BJACK_UP         BUTTON_SCROLL_FWD
-#define BJACK_DOWN       BUTTON_SCROLL_BACK
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
-
+#define BJACK_SELECT_NAME    "SELECT"
+#define BJACK_STAY_NAME     "RIGHT"
+#define BJACK_RESUME_NAME   "UP"
+#define BJACK_QUIT_NAME     "HOME"
+#define BJACK_DOUBLE_NAME   "LEFT"
+#define BJACK_SELECT        BUTTON_SELECT
+#define BJACK_QUIT          (BUTTON_HOME|BUTTON_REPEAT)
+#define BJACK_MAX           (BUTTON_SELECT|BUTTON_UP)
+#define BJACK_MIN           (BUTTON_SELECT|BUTTON_DOWN)
+#define BJACK_STAY          BUTTON_RIGHT
+#define BJACK_DOUBLEDOWN    BUTTON_LEFT
+#define BJACK_RESUME        BUTTON_UP
+#define BJACK_UP            BUTTON_SCROLL_FWD
+#define BJACK_DOWN          BUTTON_SCROLL_BACK
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
-#define BJACK_START      BUTTON_SELECT
-#define BJACK_QUIT       BUTTON_POWER
-#define BJACK_MAX        BUTTON_VOL_UP
-#define BJACK_MIN        BUTTON_VOL_DOWN
-#define BJACK_HIT        BUTTON_SELECT
-#define BJACK_STAY       BUTTON_RIGHT
-#define BJACK_DOUBLEDOWN BUTTON_LEFT
-#define BJACK_SCORES     BUTTON_REC
-#define BJACK_RESUME     BUTTON_DOWN
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "SELECT"
+#define BJACK_STAY_NAME     "RIGHT"
+#define BJACK_RESUME_NAME   "DOWN"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "LEFT"
+#define BJACK_SELECT        BUTTON_SELECT
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           BUTTON_VOL_UP
+#define BJACK_MIN           BUTTON_VOL_DOWN
+#define BJACK_STAY          BUTTON_RIGHT
+#define BJACK_DOUBLEDOWN    BUTTON_LEFT
+#define BJACK_RESUME        BUTTON_DOWN
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == SANSA_CLIP_PAD
-#define BJACK_START      BUTTON_SELECT
-#define BJACK_QUIT       BUTTON_POWER
-#define BJACK_MAX        BUTTON_VOL_UP
-#define BJACK_MIN        BUTTON_VOL_DOWN
-#define BJACK_HIT        BUTTON_SELECT
-#define BJACK_STAY       BUTTON_RIGHT
-#define BJACK_DOUBLEDOWN BUTTON_LEFT
-#define BJACK_SCORES     BUTTON_HOME
-#define BJACK_RESUME     BUTTON_DOWN
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "SELECT"
+#define BJACK_STAY_NAME     "RIGHT"
+#define BJACK_RESUME_NAME   "DOWN"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "LEFT"
+#define BJACK_SELECT        BUTTON_SELECT
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           BUTTON_VOL_UP
+#define BJACK_MIN           BUTTON_VOL_DOWN
+#define BJACK_STAY          BUTTON_RIGHT
+#define BJACK_DOUBLEDOWN    BUTTON_LEFT
+#define BJACK_RESUME        BUTTON_DOWN
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == SANSA_M200_PAD
-#define BJACK_START      (BUTTON_SELECT | BUTTON_REL)
-#define BJACK_QUIT       BUTTON_POWER
-#define BJACK_MAX        BUTTON_VOL_UP
-#define BJACK_MIN        BUTTON_VOL_DOWN
-#define BJACK_HIT        (BUTTON_SELECT | BUTTON_REL)
-#define BJACK_STAY       BUTTON_RIGHT
-#define BJACK_DOUBLEDOWN BUTTON_LEFT
-#define BJACK_SCORES     (BUTTON_SELECT | BUTTON_UP)
-#define BJACK_RESUME     BUTTON_DOWN
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "SELECT"
+#define BJACK_STAY_NAME     "RIGHT"
+#define BJACK_RESUME_NAME   "DOWN"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "LEFT"
+#define BJACK_SELECT        (BUTTON_SELECT | BUTTON_REL)
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           BUTTON_VOL_UP
+#define BJACK_MIN           BUTTON_VOL_DOWN
+#define BJACK_STAY          BUTTON_RIGHT
+#define BJACK_DOUBLEDOWN    BUTTON_LEFT
+#define BJACK_RESUME        BUTTON_DOWN
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == ELIO_TPJ1022_PAD
-#define BJACK_START      BUTTON_MAIN
-#define BJACK_QUIT       BUTTON_POWER
-#define BJACK_MAX        (BUTTON_REC|BUTTON_UP)
-#define BJACK_MIN        (BUTTON_REC|BUTTON_DOWN)
-#define BJACK_HIT        BUTTON_MAIN
-#define BJACK_STAY       BUTTON_MENU
-#define BJACK_DOUBLEDOWN BUTTON_DOWN
-#define BJACK_SCORES     BUTTON_UP
-#define BJACK_RESUME     BUTTON_FF
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "MAIN"
+#define BJACK_STAY_NAME     "MENU"
+#define BJACK_RESUME_NAME   ">>|"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "DOWN"
+#define BJACK_SELECT        BUTTON_MAIN
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           (BUTTON_REC|BUTTON_UP)
+#define BJACK_MIN           (BUTTON_REC|BUTTON_DOWN)
+#define BJACK_STAY          BUTTON_MENU
+#define BJACK_DOUBLEDOWN    BUTTON_DOWN
+#define BJACK_RESUME        BUTTON_FF
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
-#define BJACK_START      BUTTON_PLAY
-#define BJACK_QUIT       BUTTON_BACK
-#define BJACK_MAX        BUTTON_VOL_UP
-#define BJACK_MIN        BUTTON_VOL_DOWN
-#define BJACK_HIT        BUTTON_VOL_UP
-#define BJACK_STAY       BUTTON_VOL_DOWN
-#define BJACK_DOUBLEDOWN BUTTON_SELECT
-#define BJACK_SCORES     BUTTON_RIGHT
-#define BJACK_RESUME     BUTTON_MENU
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "PLAY"
+#define BJACK_STAY_NAME     "VOL-"
+#define BJACK_RESUME_NAME   "MENU"
+#define BJACK_QUIT_NAME     "BACK"
+#define BJACK_DOUBLE_NAME   "SELECT"
+#define BJACK_SELECT        BUTTON_PLAY
+#define BJACK_QUIT          BUTTON_BACK
+#define BJACK_MAX           BUTTON_VOL_UP
+#define BJACK_MIN           BUTTON_VOL_DOWN
+#define BJACK_STAY          BUTTON_VOL_DOWN
+#define BJACK_DOUBLEDOWN    BUTTON_SELECT
+#define BJACK_RESUME        BUTTON_MENU
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == MROBE100_PAD
-
-#define BJACK_START      BUTTON_SELECT
-#define BJACK_QUIT       BUTTON_POWER
-#define BJACK_MAX        BUTTON_MENU
-#define BJACK_MIN        BUTTON_DISPLAY
-#define BJACK_HIT        BUTTON_MENU
-#define BJACK_STAY       BUTTON_DISPLAY
-#define BJACK_DOUBLEDOWN BUTTON_DOWN
-#define BJACK_SCORES     BUTTON_RIGHT
-#define BJACK_RESUME     BUTTON_PLAY
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "SELECT"
+#define BJACK_STAY_NAME     "DISPLAY"
+#define BJACK_RESUME_NAME   "PLAY"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "DOWN"
+#define BJACK_SELECT        BUTTON_SELECT
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           BUTTON_MENU
+#define BJACK_MIN           BUTTON_DISPLAY
+#define BJACK_STAY          BUTTON_DISPLAY
+#define BJACK_DOUBLEDOWN    BUTTON_DOWN
+#define BJACK_RESUME        BUTTON_PLAY
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-
-#define BJACK_START      BUTTON_RC_PLAY
-#define BJACK_QUIT       BUTTON_RC_REC
-#define BJACK_MAX        (BUTTON_RC_PLAY|BUTTON_RC_VOL_UP)
-#define BJACK_MIN        (BUTTON_RC_PLAY|BUTTON_RC_VOL_DOWN)
-#define BJACK_HIT        BUTTON_RC_PLAY
-#define BJACK_STAY       BUTTON_RC_FF
-#define BJACK_DOUBLEDOWN BUTTON_RC_REW
-#define BJACK_SCORES     BUTTON_RC_MENU
-#define BJACK_RESUME     BUTTON_RC_MODE
-#define BJACK_UP         BUTTON_RC_VOL_UP
-#define BJACK_DOWN       BUTTON_RC_VOL_DOWN
-#define BJACK_RIGHT      BUTTON_RC_FF
-#define BJACK_LEFT       BUTTON_RC_REW
+#define BJACK_SELECT_NAME    "RC","PLAY"
+#define BJACK_STAY_NAME     "RC", ">>|"
+#define BJACK_RESUME_NAME   "RC_MODE"
+#define BJACK_QUIT_NAME     "RC_REC"
+#define BJACK_DOUBLE_NAME   "RC_REW"
+#define BJACK_SELECT        BUTTON_RC_PLAY
+#define BJACK_QUIT          BUTTON_RC_REC
+#define BJACK_MAX           (BUTTON_RC_PLAY|BUTTON_RC_VOL_UP)
+#define BJACK_MIN           (BUTTON_RC_PLAY|BUTTON_RC_VOL_DOWN)
+#define BJACK_STAY          BUTTON_RC_FF
+#define BJACK_DOUBLEDOWN    BUTTON_RC_REW
+#define BJACK_RESUME        BUTTON_RC_MODE
+#define BJACK_UP            BUTTON_RC_VOL_UP
+#define BJACK_DOWN          BUTTON_RC_VOL_DOWN
+#define BJACK_RIGHT         BUTTON_RC_FF
+#define BJACK_LEFT          BUTTON_RC_REW
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
-#define BJACK_QUIT       BUTTON_POWER
-#define BJACK_DOUBLEDOWN BUTTON_MINUS
-#define BJACK_SCORES     BUTTON_MENU
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "-"
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_DOUBLEDOWN    BUTTON_MINUS
 
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-#define BJACK_START      BUTTON_SELECT
-#define BJACK_QUIT       BUTTON_BACK
-#define BJACK_MAX        (BUTTON_CUSTOM|BUTTON_UP)
-#define BJACK_MIN        (BUTTON_CUSTOM|BUTTON_DOWN)
-#define BJACK_HIT        BUTTON_UP
-#define BJACK_STAY       BUTTON_DOWN
-#define BJACK_DOUBLEDOWN BUTTON_CUSTOM
-#define BJACK_SCORES     BUTTON_RIGHT
-#define BJACK_RESUME     BUTTON_MENU
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "SELECT"
+#define BJACK_STAY_NAME     "DOWN"
+#define BJACK_RESUME_NAME   "MENU"
+#define BJACK_QUIT_NAME     "BACK"
+#define BJACK_DOUBLE_NAME   "CUSTOM"
+#define BJACK_SELECT        BUTTON_SELECT
+#define BJACK_QUIT          BUTTON_BACK
+#define BJACK_MAX           (BUTTON_CUSTOM|BUTTON_UP)
+#define BJACK_MIN           (BUTTON_CUSTOM|BUTTON_DOWN)
+#define BJACK_DOUBLEDOWN    BUTTON_CUSTOM
+#define BJACK_RESUME        BUTTON_MENU
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
-#define BJACK_START      BUTTON_MENU
-#define BJACK_QUIT       BUTTON_POWER
-#define BJACK_MAX        BUTTON_VOL_UP
-#define BJACK_MIN        BUTTON_VOL_DOWN
-#define BJACK_HIT        BUTTON_VOL_UP
-#define BJACK_STAY       BUTTON_VOL_DOWN
-#define BJACK_DOUBLEDOWN BUTTON_SELECT
-#define BJACK_SCORES     BUTTON_RIGHT
-#define BJACK_RESUME     BUTTON_VIEW
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_SELECT_NAME    "MENU"
+#define BJACK_STAY_NAME     "VOL-"
+#define BJACK_RESUME_NAME   "VIEW"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "SELECT"
+#define BJACK_SELECT        BUTTON_MENU
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           BUTTON_VOL_UP
+#define BJACK_MIN           BUTTON_VOL_DOWN
+#define BJACK_STAY          BUTTON_VOL_DOWN
+#define BJACK_DOUBLEDOWN    BUTTON_SELECT
+#define BJACK_RESUME        BUTTON_VIEW
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
-#define BJACK_QUIT       BUTTON_POWER
-#define BJACK_DOUBLEDOWN BUTTON_VOL_DOWN
-#define BJACK_SCORES     BUTTON_MENU
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "Vol-"
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_DOUBLEDOWN    BUTTON_VOL_DOWN
 
 #elif CONFIG_KEYPAD == MROBE500_PAD
-#define BJACK_QUIT       BUTTON_POWER
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_QUIT          BUTTON_POWER
 
 #else
 #error No keymap defined!
@@ -347,40 +406,38 @@ PLUGIN_HEADER
 
 #ifdef HAVE_TOUCHSCREEN
 #ifndef BJACK_DOUBLEDOWN 
-#define BJACK_DOUBLEDOWN BUTTON_MIDLEFT
+#define BJACK_DOUBLEDOWN    BUTTON_MIDLEFT
+#define BJACK_DOUBLE_NAME   "BUTTON_MIDLEFT"
 #endif
-#ifndef BJACK_SCORES
-#define BJACK_SCORES     BUTTON_MIDRIGHT
-#endif
-#ifndef BJACK_START
-#define BJACK_START      BUTTON_CENTER
-#endif
-#ifndef BJACK_HIT
-#define BJACK_HIT        BUTTON_CENTER
+#ifndef BJACK_SELECT
+#define BJACK_SELECT        BUTTON_CENTER
+#define BJACK_SELECT_NAME   "BUTTON_CENTER"
 #endif
 #ifndef BJACK_MAX
-#define BJACK_MAX        BUTTON_TOPRIGHT
+#define BJACK_MAX           BUTTON_TOPRIGHT
 #endif
 #ifndef BJACK_MIN
-#define BJACK_MIN        BUTTON_TOPLEFT
+#define BJACK_MIN           BUTTON_TOPLEFT
 #endif
 #ifndef BJACK_RESUME
-#define BJACK_RESUME     BUTTON_BOTTOMRIGHT
+#define BJACK_RESUME        BUTTON_BOTTOMRIGHT
+#define BJACK_RESUME_NAME   "BUTTON_BOTTOMRIGHT"
 #endif
 #ifndef BJACK_STAY
-#define BJACK_STAY       BUTTON_BOTTOMLEFT
+#define BJACK_STAY          BUTTON_BOTTOMLEFT
+#define BJACK_STAY_NAME     "BUTTON_BOTTOMLEFT"
 #endif
 #ifndef BJACK_UP
-#define BJACK_UP         BUTTON_TOPMIDDLE
+#define BJACK_UP            BUTTON_TOPMIDDLE
 #endif
 #ifndef BJACK_DOWN
-#define BJACK_DOWN       BUTTON_BOTTOMMIDDLE
+#define BJACK_DOWN          BUTTON_BOTTOMMIDDLE
 #endif
 #ifndef BJACK_RIGHT
-#define BJACK_RIGHT      BUTTON_MIDRIGHT
+#define BJACK_RIGHT         BUTTON_MIDRIGHT
 #endif
 #ifndef BJACK_LEFT
-#define BJACK_LEFT       BUTTON_MIDLEFT
+#define BJACK_LEFT          BUTTON_MIDLEFT
 #endif
 
 #endif
@@ -426,11 +483,10 @@ typedef struct game_context {
     unsigned int split_status; /* 0 = split hasn't been asked,         *
                                 * 1 = split did not occur              *
                                 * 2 = split occurred                   *
-                                * 3 = split occurred and 1st hand done */                                            
+                                * 3 = split occurred and 1st hand done */
     bool is_blackjack;                      
     bool end_hand;                          
-    bool asked_insurance;               
-    signed short highscores[NUM_SCORES];
+    bool asked_insurance;
     bool resume;
     bool dirty;
 } game_context;
@@ -766,72 +822,6 @@ static void finish_game(struct game_context* bj) {
 }
 
 /*****************************************************************************
-* blackjack_recordscore() inserts a high score into the high scores list and
-*     returns the high score position.
-******************************************************************************/
-static unsigned int blackjack_recordscore(struct game_context* bj) {
-    unsigned int i;
-    unsigned int position = 0;
-    signed short current, temp;
-
-    /* calculate total score */
-    current = bj->player_money;
-    if(current <= 10) return 0;
-
-    /* insert the current score into the high scores */
-    for(i=0; i<NUM_SCORES; i++) {
-        if(current >= bj->highscores[i]) {
-            if(!position) {
-                position = i+1;
-                bj->dirty = true;
-            }
-            temp = bj->highscores[i];
-            bj->highscores[i] = current;
-            current = temp;
-        }
-    }
-
-    return position;
-}
-
-/*****************************************************************************
-* blackjack_loadscores() loads the high scores saved file.
-******************************************************************************/
-static void blackjack_loadscores(struct game_context* bj) {
-    signed int fd;
-
-    bj->dirty = false;
-
-    /* clear high scores */
-    rb->memset(bj->highscores, 0, sizeof(bj->highscores));
-
-    /* open scores file */
-    fd = rb->open(SCORE_FILE, O_RDONLY);
-    if(fd < 0) return;
-
-    /* read in high scores */
-    if(rb->read(fd, bj->highscores, sizeof(bj->highscores)) <= 0) {
-        /* scores are bad, reset */
-        rb->memset(bj->highscores, 0, sizeof(bj->highscores));
-    }
-
-    rb->close(fd);
-}
-
-/*****************************************************************************
-* blackjack_savescores() saves the high scores saved file.
-******************************************************************************/
-static void blackjack_savescores(struct game_context* bj) {
-    unsigned int fd;
-
-    /* write out the high scores to the save file */
-    fd = rb->open(SCORE_FILE, O_WRONLY|O_CREAT);
-    rb->write(fd, bj->highscores, sizeof(bj->highscores));
-    rb->close(fd);
-    bj->dirty = false;
-}
-
-/*****************************************************************************
 * blackjack_loadgame() loads the saved game and returns load success.
 ******************************************************************************/
 static bool blackjack_loadgame(struct game_context* bj) {
@@ -844,21 +834,30 @@ static bool blackjack_loadgame(struct game_context* bj) {
 
     /* read in saved game */
     while(true) {
-        if(rb->read(fd, &bj->player_money, sizeof(bj->player_money)) <= 0) break;
-        if(rb->read(fd, &bj->player_total, sizeof(bj->player_total)) <= 0) break;
-        if(rb->read(fd, &bj->dealer_total, sizeof(bj->dealer_total)) <= 0) break;
+        if(rb->read(fd, &bj->player_money, sizeof(bj->player_money)) <= 0) 
+            break;
+        if(rb->read(fd, &bj->player_total, sizeof(bj->player_total)) <= 0)
+            break;
+        if(rb->read(fd, &bj->dealer_total, sizeof(bj->dealer_total)) <= 0)
+            break;
         if(rb->read(fd, &bj->num_player_cards, sizeof(bj->num_player_cards))<=0)
             break;
         if(rb->read(fd, &bj->num_dealer_cards, sizeof(bj->num_dealer_cards))<=0)
             break;
-        if(rb->read(fd, &bj->current_bet, sizeof(bj->current_bet)) <= 0) break;
-        if(rb->read(fd, &bj->is_blackjack, sizeof(bj->is_blackjack)) <= 0) break;
-        if(rb->read(fd, &bj->split_status, sizeof(bj->split_status)) <= 0) break;
+        if(rb->read(fd, &bj->current_bet, sizeof(bj->current_bet)) <= 0) 
+            break;
+        if(rb->read(fd, &bj->is_blackjack, sizeof(bj->is_blackjack)) <= 0) 
+            break;
+        if(rb->read(fd, &bj->split_status, sizeof(bj->split_status)) <= 0) 
+            break;
         if(rb->read(fd, &bj->asked_insurance, sizeof(bj->asked_insurance)) <= 0)
             break;
-        if(rb->read(fd, &bj->end_hand, sizeof(bj->end_hand)) <= 0) break;
-        if(rb->read(fd, &bj->player_cards, sizeof(bj->player_cards)) <= 0) break;
-        if(rb->read(fd, &bj->dealer_cards, sizeof(bj->dealer_cards)) <= 0) break;
+        if(rb->read(fd, &bj->end_hand, sizeof(bj->end_hand)) <= 0) 
+            break;
+        if(rb->read(fd, &bj->player_cards, sizeof(bj->player_cards)) <= 0) 
+            break;
+        if(rb->read(fd, &bj->dealer_cards, sizeof(bj->dealer_cards)) <= 0) 
+            break;
         bj->resume = true;
         loaded = true;
         break;
@@ -903,8 +902,7 @@ static void blackjack_savegame(struct game_context* bj) {
 static void blackjack_callback(void* param) {
     struct game_context* bj = (struct game_context*) param;
     if(bj->dirty) {
-        rb->splash(HZ, "Saving high scores...");
-        blackjack_savescores(bj);
+        highscore_save(HIGH_SCORE,highest,NUM_SCORES);
     }
 }
 
@@ -954,7 +952,7 @@ static unsigned int blackjack_get_yes_no(char message[20]) {
             case (BJACK_RIGHT|BUTTON_REPEAT):
                 choice ^= 1;
                 break;
-            case BJACK_START: breakout = true;
+            case BJACK_SELECT: breakout = true;
                 break;
             case BJACK_QUIT: breakout = true;
                 choice = BJ_QUIT;
@@ -972,7 +970,7 @@ static unsigned int blackjack_get_yes_no(char message[20]) {
 /*****************************************************************************
 * blackjack_get_amount() gets an amount from the player to be used
 ******************************************************************************/
-static signed int blackjack_get_amount(char message[20], signed int lower_limit, 
+static signed int blackjack_get_amount(char message[20], signed int lower_limit,
                                        signed int upper_limit, 
                                        signed int start) {
     int button;
@@ -1079,7 +1077,7 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
                 break;
             case BJACK_QUIT:
                 return 0;
-            case BJACK_START:
+            case BJACK_SELECT:
 #if LCD_DEPTH > 1
                 rb->lcd_set_foreground(FG_COLOR);
                 rb->lcd_set_background(BG_COLOR);
@@ -1165,209 +1163,66 @@ static unsigned int play_again(void) {
     return blackjack_get_yes_no("Play Again?");
 }
 
+void showhelp(void) {
+#define WORDS (sizeof help_text / sizeof (char*))
+    static char *help_text[] = {
+        "Blackjack", "",
+        "The", "goal", "is", "to", "get", "21.", "", "",
+        "Controls", "",
+        BJACK_SELECT_NAME,  ":", "hit", "/", "select", "",
+        BJACK_STAY_NAME,    ":", "stay", "",
+        BJACK_DOUBLE_NAME,  ":", "double", "down", "",
+        BJACK_QUIT_NAME,    ":", "Go", "to", "menu", "without", "save", "",
+        BJACK_RESUME_NAME,  ":", "Save", "and", "go", "to", "menu", "",
+
+    };
+    static struct style_text formation[]={
+        { 0, TEXT_CENTER|TEXT_UNDERLINE },
+        { 12, C_RED }, /* Hit/Select */
+        { 18, C_RED }, /* Stay */
+        { 22, C_RED }, /* Double Down */
+        { 27, C_RED }, /* Quit */
+        { 35, C_RED }, /* Save */
+        { -1, 0 }
+    };
+    int button;
+
+    rb->lcd_setfont(FONT_UI);
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_set_foreground(LCD_WHITE);
+#endif
+
+    if (display_text(WORDS, help_text, formation, NULL))
+        return;
+    do {
+        button = rb->button_get(true);
+        if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+            return;
+        }
+    } while( ( button == BUTTON_NONE )
+          || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+    rb->lcd_setfont(FONT_SYSFIXED);
+    return;
+}
+
 /*****************************************************************************
 * blackjack_menu() is the initial menu at the start of the game.
 ******************************************************************************/
 static unsigned int blackjack_menu(struct game_context* bj) {
     int button;
-    char *title = "Blackjack";
-    char str[18];
-    unsigned int i, w, h;
+    int selection=0;
     bool breakout = false;
-    bool showscores = false;
     
-    while(true){
-#if LCD_DEPTH > 1
-        rb->lcd_set_background(BG_COLOR);
-        rb->lcd_set_foreground(FG_COLOR);
-#endif
-        rb->lcd_clear_display();
+    MENUITEM_STRINGLIST(menu,"BlackJack Menu",NULL,"Start Game","Resume Game",
+                        "High Scores", "Help", "Playback Control", "Quit");
 
-        if(!showscores) {
-             /* welcome screen to display key bindings */
-            rb->lcd_getstringsize(title, &w, &h);
-            rb->lcd_putsxy((LCD_WIDTH-w)/2, 0, title);
-
-#if CONFIG_KEYPAD == RECORDER_PAD
-            rb->lcd_puts(0, 1, "ON: start");
-            rb->lcd_puts(0, 2, "OFF: exit");
-            rb->lcd_puts(0, 3, "F1: hit");
-            rb->lcd_puts(0, 4, "F2: stay");
-            rb->lcd_puts(0, 5, "F3: double down");
-            rb->lcd_puts(0, 6, "PLAY: save/resume");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 7, str);
-#elif CONFIG_KEYPAD == ONDIO_PAD
-            rb->lcd_puts(0, 1, "MENU: start");
-            rb->lcd_puts(0, 2, "OFF: exit");
-            rb->lcd_puts(0, 3, "LEFT: hit");
-            rb->lcd_puts(0, 4, "RIGHT: stay");
-            rb->lcd_puts(0, 5, "UP: double down");
-            rb->lcd_puts(0, 6, "DOWN: save/resume");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 7, str);
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-            rb->lcd_puts(0, 2, "PLAY to start & to hit");
-            rb->lcd_puts(0, 3, "STOP to exit");
-            rb->lcd_puts(0, 4, "REC to stay");
-            rb->lcd_puts(0, 5, "NAVI to double down ");
-            rb->lcd_puts(0, 6, "  & to view highscores");
-            rb->lcd_puts(0, 7, "AB to save/resume");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 8, str);
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-            rb->lcd_puts(0, 2, "PLAY to start & hit");
-            rb->lcd_puts(0, 3, "POWER to exit");
-            rb->lcd_puts(0, 4, ">>| to stay");
-            rb->lcd_puts(0, 5, "|<< to double down");
-            rb->lcd_puts(0, 6, "LEFT to view scores");
-            rb->lcd_puts(0, 7, "RIGHT to save/resume");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 8, str);
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#if LCD_WIDTH >=176
-            rb->lcd_puts(0, 2, "SELECT to start & to hit");
-            rb->lcd_puts(0, 3, "MENU to exit");
-            rb->lcd_puts(0, 4, ">>| to stay & to view highscores");
-            rb->lcd_puts(0, 5, "|<< to double down");
-            rb->lcd_puts(0, 6, "PLAY to save/resume");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 7, str);
-#else
-            rb->lcd_puts(0, 2, "SELECT to start & to ");
-            rb->lcd_puts(0, 3, "  hit");
-            rb->lcd_puts(0, 4, "MENU to exit");
-            rb->lcd_puts(0, 5, ">>| to stay & to view ");
-            rb->lcd_puts(0, 6, "  highscores");
-            rb->lcd_puts(0, 7, "|<< to double down");
-            rb->lcd_puts(0, 8, "PLAY to save/resume");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 9, str);
-#endif
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-            rb->lcd_puts(0, 2, "PLAY to start to hit");
-            rb->lcd_puts(0, 3, "POWER to exit");
-            rb->lcd_puts(0, 4, "SELECT to hit");
-            rb->lcd_puts(0, 5, "REC to stay");
-            rb->lcd_puts(0, 6, "PLAY to double down");
-            rb->lcd_puts(0, 7, "RIGHT to view highscores ");
-            rb->lcd_puts(0, 8, "DOWN to save/resume");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 9, str);
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-            rb->lcd_puts(0, 2, "AB to start & to");
-            rb->lcd_puts(0, 3, "  stay");
-            rb->lcd_puts(0, 4, "EQ to hit");
-            rb->lcd_puts(0, 5, "PLAY to exit");
-            rb->lcd_puts(0, 6, "CLICK to double down");
-            rb->lcd_puts(0, 7, "& to view highscores");
-            rb->lcd_puts(0, 8, "AB+EQ to save/resume");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 9, str);
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-            rb->lcd_puts(0, 2, "A to start");
-            rb->lcd_puts(0, 3, "POWER to exit");
-            rb->lcd_puts(0, 4, "VOL+ to hit");
-            rb->lcd_puts(0, 5, "VOL- to stay");
-            rb->lcd_puts(0, 6, "SELECT to double down");
-            rb->lcd_puts(0, 7, "RIGHT to view highscores ");
-            rb->lcd_puts(0, 8, "MENU to save/resume");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 9, str);
-#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
-            rb->lcd_puts(0, 2, "PLAY to start");
-            rb->lcd_puts(0, 3, "BACK to exit");
-            rb->lcd_puts(0, 4, "VOL+ to hit");
-            rb->lcd_puts(0, 5, "VOL- to stay");
-            rb->lcd_puts(0, 6, "SELECT to double down");
-            rb->lcd_puts(0, 7, "RIGHT to view highscores ");
-            rb->lcd_puts(0, 8, "MENU to save/resume");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 9, str);
-#elif CONFIG_KEYPAD == MROBE100_PAD
-            rb->lcd_puts(0, 2, "SELECT to start");
-            rb->lcd_puts(0, 3, "POWER to exit");
-            rb->lcd_puts(0, 4, "MENU to hit");
-            rb->lcd_puts(0, 5, "DISPLAY to stay");
-            rb->lcd_puts(0, 6, "DOWN to double down");
-            rb->lcd_puts(0, 7, "RIGHT to view highscores ");
-            rb->lcd_puts(0, 8, "PLAY to save/resume");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 9, str);
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-            rb->lcd_puts(0, 2, "SELECT to start & to hit");
-            rb->lcd_puts(0, 3, "POWER to exit");
-            rb->lcd_puts(0, 4, "RIGHT to stay");
-            rb->lcd_puts(0, 5, "LEFT to double down");
-            rb->lcd_puts(0, 6, "REC to save/resume");
-            rb->lcd_puts(0, 7, "UP to view scores");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 8, str);
-#elif (CONFIG_KEYPAD == SANSA_C200_PAD)
-            rb->lcd_puts(0, 2, "SELECT to start & to hit");
-            rb->lcd_puts(0, 3, "POWER to exit");
-            rb->lcd_puts(0, 4, "RIGHT to stay");
-            rb->lcd_puts(0, 5, "LEFT to double down");
-            rb->lcd_puts(0, 6, "DOWN to save/resume");
-            rb->lcd_puts(0, 7, "REC to view scores");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 9, str);
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-            rb->lcd_puts(0, 2, "PLAY to start & to");
-            rb->lcd_puts(0, 3, "  hit");
-            rb->lcd_puts(0, 4, "REC to exit");
-            rb->lcd_puts(0, 5, "FF to stay");
-            rb->lcd_puts(0, 6, "REW to double down");
-            rb->lcd_puts(0, 7, "MODE to save/resume");
-            rb->lcd_puts(0, 8, "MENU to view scores");
-            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 10, str);
-#elif CONFIG_KEYPAD == COWOND2_PAD
-            rb->lcd_puts(0, 6, "POWER           to exit");
-            rb->lcd_puts(0, 7, "MINUS           to double down");
-            rb->lcd_puts(0, 8, "MENU            to view scores");
-            rb->snprintf(str, 21, "High Score:     $%d", bj->highscores[0]);
-            rb->lcd_puts(0, 10, str);
-#endif
-
-#ifdef HAVE_TOUCHSCREEN
-            rb->lcd_puts(0, 2, "LCD CENTRE      to start & to hit");
-            rb->lcd_puts(0, 3, "LCD BOTTOMLEFT  to stay");
-            rb->lcd_puts(0, 4, "LCD BOTTOMRIGHT to save/resume");
-#endif
-        } else {
-            rb->snprintf(str, 12, "%s", "High Scores");
-            rb->lcd_getstringsize(str, &w, &h);
-            rb->lcd_putsxy((LCD_WIDTH-w)/2, 0, str);
-
-            /* print high scores */
-            for(i=0; i<NUM_SCORES; i++) {
-                rb->snprintf(str, 14, "#%02d: $%d", i+1, bj->highscores[i]);
-                rb->lcd_puts(0, i+1, str);
-            }
-        }
-
-        rb->lcd_update();
-
-        /* handle menu button presses */
-        button = rb->button_get(true);
-
-        switch(button) {
-            case BJACK_START: /* start playing */
+    while(!breakout) {
+        switch(rb->do_menu(&menu, &selection, NULL, false)) {
+            case 0:
                 breakout = true;
                 break;
-
-            case BJACK_QUIT:  /* quit program */
-                if(showscores) {
-                    showscores = 0;
-                    break;
-                }
-                return BJ_QUIT;
-
-            case BJACK_RESUME:/* resume game */
+            case 1:
                 if(!blackjack_loadgame(bj)) {
                     rb->splash(HZ*2, "Nothing to resume");
                 } else {
@@ -1375,22 +1230,27 @@ static unsigned int blackjack_menu(struct game_context* bj) {
                     breakout = true;
                 }
                 break;
-
-            case BJACK_SCORES:/* toggle high scores */
-                showscores = !showscores;
+            case 2:
+                highscore_show(NUM_SCORES, highest, NUM_SCORES, false);
                 break;
-
+            case 3:
+                showhelp();
+                break;
+            case 4:
+                if (playback_control(NULL))
+                    return 1;
+                break;
+            case 5:
+                return BJ_QUIT;
             default:
                 if(rb->default_event_handler_ex(button, blackjack_callback,
                    (void*) bj) == SYS_USB_CONNECTED)
                     return BJ_USB;
                 break;
         }
-
-        if(breakout) break;
     }
 
-    return(0);
+    return 0;
 }
 
 /*****************************************************************************
@@ -1493,7 +1353,7 @@ static int blackjack(struct game_context* bj) {
             button = rb->button_get(true);
 
             switch(button) {
-                case BJACK_HIT:
+                case BJACK_SELECT:
                     NEXT_CARD = new_card();
                     bj->player_total += NEXT_CARD.value;
                     draw_card(NEXT_CARD, true, player_x, player_y);
@@ -1520,7 +1380,7 @@ static int blackjack(struct game_context* bj) {
                     bj->end_hand = true;
                     break;
                 case BJACK_DOUBLEDOWN:
-                    if ((signed int)bj->current_bet * 2 < bj->player_money + 1 && 
+                    if ((signed int)bj->current_bet * 2 < bj->player_money + 1&&
                          bj->num_player_cards[0]==2 && todo==1) {
                         double_down(bj);
                         dbl_down = true;
@@ -1529,7 +1389,7 @@ static int blackjack(struct game_context* bj) {
                             finish_game(bj);
                         }
                     }
-                    else if((signed int)bj->current_bet * 2 > bj->player_money) {
+                    else if((signed int)bj->current_bet * 2 > bj->player_money){
                         rb->splash(HZ, "Not enough money to double down.");
                         redraw_board(bj);
                         rb->lcd_update();
@@ -1640,8 +1500,6 @@ enum plugin_status plugin_start(const void* parameter)
 {
     struct game_context bj;
     bool exit = false;
-    unsigned int position;
-    char str[19];
 
     (void)parameter;
 
@@ -1650,7 +1508,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     /* load high scores */
-    blackjack_loadscores(&bj);
+    highscore_load(HIGH_SCORE,highest,NUM_SCORES);
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
@@ -1662,9 +1520,17 @@ enum plugin_status plugin_start(const void* parameter)
 
             case BJ_END:
                 if(!bj.resume) {
-                    if((position = blackjack_recordscore(&bj))) {
-                        rb->snprintf(str, 19, "New high score #%d!", position);
-                        rb->splash(HZ*2, str);
+                    /* There is no level, so store -1 to blank column */
+                    int position = highscore_update(bj.player_money, -1, "", 
+                        highest, NUM_SCORES);
+                    if (position == 0) {
+                        rb->splash(HZ*2, "New High Score");
+                    }
+                    if (position != -1) {
+                        highscore_show(position, highest, NUM_SCORES, false);
+                        bj.dirty=true;
+                    } else {
+                        rb->sleep(3);
                     }
                 }
                 break;
@@ -1675,8 +1541,7 @@ enum plugin_status plugin_start(const void* parameter)
 
             case BJ_QUIT:
                 if(bj.dirty) {
-                    rb->splash(HZ, "Saving high scores...");
-                    blackjack_savescores(&bj);
+                    highscore_save(HIGH_SCORE,highest,NUM_SCORES);
                 }
                 exit = true;
                 break;

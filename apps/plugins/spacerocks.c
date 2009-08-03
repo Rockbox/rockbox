@@ -663,7 +663,7 @@ static int spacerocks_menu(bool ingame)
                     return 1;
                 break;
             case 3:
-                highscore_show(NUM_SCORES, highest, NUM_SCORES);
+                highscore_show(NUM_SCORES, highest, NUM_SCORES, true);
                 break;
             case 4:
                 playback_control(NULL);
@@ -1927,7 +1927,7 @@ static int spacerocks_game_loop(void)
             if (position == 0)
                 rb->splash(HZ*2, "New High Score");
             if (position != -1)
-                highscore_show(position, highest, NUM_SCORES);
+                highscore_show(position, highest, NUM_SCORES, true);
             if (spacerocks_menu(false)!=0)
                 return 0;
             break;

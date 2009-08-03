@@ -2170,7 +2170,7 @@ static void bubbles_recordscore(struct game_context* bb) {
     if (position==0)
         rb->splash(HZ*2, "New High Score");
     if (position != -1)
-        highscore_show(position, highscores, NUM_SCORES);
+        highscore_show(position, highscores, NUM_SCORES, true);
 }
 
 /*****************************************************************************
@@ -2397,7 +2397,7 @@ static int bubbles(struct game_context* bb) {
                 startlevel--;
                 break;
             case 3: /* High scores */
-                highscore_show(NUM_SCORES, highscores, NUM_SCORES);
+                highscore_show(NUM_SCORES, highscores, NUM_SCORES, true);
                 break;
             case 4: /* Playback Control */
                 playback_control(NULL);

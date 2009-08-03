@@ -120,7 +120,7 @@ bool highscore_would_update(int score, struct highscore *scores,
 }
 
 #ifdef HAVE_LCD_BITMAP
-void highscore_show(int position, struct highscore *scores, int num_scores)
+void highscore_show(int position, struct highscore *scores, int num_scores, bool show_level)
 {
     int i, w, h;
     char str[30];
@@ -141,7 +141,11 @@ void highscore_show(int position, struct highscore *scores, int num_scores)
     }
     rb->lcd_putsxy(LCD_WIDTH/2-w/2, MARGIN, "High Scores");
     rb->lcd_putsxy(LCD_WIDTH/4-w/4,2*h, "Score");
-    rb->lcd_putsxy(LCD_WIDTH*3/4-w/4,2*h, "Level");
+    
+    /* Decide whether to display the level column or not */
+    if(show_level) {
+        rb->lcd_putsxy(LCD_WIDTH*3/4-w/4,2*h, "Level");
+    }
 
     for (i = 0; i<num_scores; i++)
     {
@@ -154,8 +158,13 @@ void highscore_show(int position, struct highscore *scores, int num_scores)
         rb->lcd_putsxy (MARGIN,3*h + h*i, str);
         rb->snprintf (str, sizeof (str), "%d", scores[i].score);
         rb->lcd_putsxy (LCD_WIDTH/4-w/4,3*h + h*i, str);
-        rb->snprintf (str, sizeof (str), "%d", scores[i].level);
-        rb->lcd_putsxy (LCD_WIDTH*3/4-w/4,3*h + h*i, str);
+        
+        /* Decide whether to display the level column or not */
+        if(show_level) {
+            rb->snprintf (str, sizeof (str), "%d", scores[i].level);
+            rb->lcd_putsxy (LCD_WIDTH*3/4-w/4,3*h + h*i, str);
+        }
+        
         if(i == position) {
 #ifdef HAVE_LCD_COLOR
             rb->lcd_set_foreground(LCD_WHITE);

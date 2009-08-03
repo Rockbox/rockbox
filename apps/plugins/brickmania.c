@@ -898,7 +898,7 @@ static int brickmania_menu(void)
                     return 1;
                 break;
             case 4:
-                highscore_show(NUM_SCORES, highest, NUM_SCORES);
+                highscore_show(NUM_SCORES, highest, NUM_SCORES, true);
                 break;
             case 5:
                 if (playback_control(NULL))
@@ -1710,7 +1710,7 @@ enum plugin_status plugin_start(const void* parameter)
                 rb->splash(HZ*2, "New High Score");
             }
             if (position != -1) {
-                highscore_show(position, highest, NUM_SCORES);
+                highscore_show(position, highest, NUM_SCORES, true);
             } else {
                 brickmania_sleep(3);
             }

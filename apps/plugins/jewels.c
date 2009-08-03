@@ -1344,7 +1344,7 @@ static int jewels_game_menu(struct game_context* bj, bool ingame)
                     return 1;
                 break;
             case 4:
-                highscore_show(NUM_SCORES, highest, NUM_SCORES);
+                highscore_show(NUM_SCORES, highest, NUM_SCORES, true);
                 break;
             case 5:
                 playback_control(NULL);
@@ -1514,7 +1514,7 @@ static int jewels_main(struct game_context* bj) {
                     if (position == 0)
                         rb->splash(HZ*2, "New High Score");
                     if (position != -1)
-                    highscore_show(position, highest, NUM_SCORES);
+                    highscore_show(position, highest, NUM_SCORES, true);
                     break;
                 case GAME_TYPE_PUZZLE:
                     rb->splash(2*HZ, "Game Over");

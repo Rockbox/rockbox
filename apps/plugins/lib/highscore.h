@@ -27,7 +27,7 @@ struct highscore
 {
     char name[32];
     int score;
-    int level;
+    int level; 
 };
 
 /* Saves the scores to a file
@@ -91,6 +91,6 @@ bool highscore_would_update(int score, struct highscore *scores,
  *  - scores   : the array of existing scores
  *  - num_scores: number of elements in 'scores'
  */
-void highscore_show(int position, struct highscore *scores, int num_scores);
+void highscore_show(int position, struct highscore *scores, int num_scores, bool show_level);
 #endif
 #endif
