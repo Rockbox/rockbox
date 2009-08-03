@@ -139,7 +139,7 @@ struct highscore highest[NUM_SCORES];
 #define BJACK_RESUME_NAME   "DOWN"
 #define BJACK_QUIT_NAME     "POWER"
 #define BJACK_DOUBLE_NAME   "PLAY"
-#define BJACK_SELECT        BUTTON_PLAY
+#define BJACK_SELECT        BUTTON_SELECT
 #define BJACK_QUIT          BUTTON_POWER
 #define BJACK_MAX           (BUTTON_PLAY|BUTTON_UP)
 #define BJACK_MIN           (BUTTON_PLAY|BUTTON_DOWN)
