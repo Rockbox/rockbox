@@ -406,7 +406,7 @@ struct highscore highest[NUM_SCORES];
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-#ifndef BJACK_DOUBLEDOWN 
+#ifndef BJACK_DOUBLEDOWN
 #define BJACK_DOUBLEDOWN    BUTTON_MIDLEFT
 #define BJACK_DOUBLE_NAME   "BUTTON_MIDLEFT"
 #endif
@@ -475,27 +475,26 @@ typedef struct card {
 typedef struct game_context {
     struct card player_cards[2][22]; /* 22 Cards means the deal was all aces */
     struct card dealer_cards[22];    /* That is the worst-case scenario */
-    unsigned int player_total;              
-    unsigned int dealer_total;              
-    signed int player_money;                
-    unsigned int num_player_cards[2]; 
-    unsigned int num_dealer_cards;    
-    unsigned int current_bet;               
+    unsigned int player_total;
+    unsigned int dealer_total;
+    signed int player_money;
+    unsigned int num_player_cards[2];
+    unsigned int num_dealer_cards;
+    unsigned int current_bet;
     unsigned int split_status; /* 0 = split hasn't been asked,         *
                                 * 1 = split did not occur              *
                                 * 2 = split occurred                   *
                                 * 3 = split occurred and 1st hand done */
-    bool is_blackjack;                      
-    bool end_hand;                          
+    bool is_blackjack;
+    bool end_hand;
     bool asked_insurance;
     bool resume;
-    bool dirty;
 } game_context;
 
 /*****************************************************************************
 * blackjack_init() initializes blackjack data structures.
 ******************************************************************************/
-static void blackjack_init(struct game_context* bj) {  
+static void blackjack_init(struct game_context* bj) {
     /* seed the rand generator */
     rb->srand(*rb->current_tick);
 
@@ -504,7 +503,7 @@ static void blackjack_init(struct game_context* bj) {
     dealer_y = LCD_HEIGHT/4 - CARD_HEIGHT/2;
     player_x = 4;
     player_y = LCD_HEIGHT - LCD_HEIGHT/4 - CARD_HEIGHT/2;
-    
+
     /* check for resumed game */
     if(bj->resume) return;
 
@@ -517,7 +516,7 @@ static void blackjack_init(struct game_context* bj) {
     bj->end_hand = false;
     bj->split_status = 0;
     bj->is_blackjack = false;
-    bj->asked_insurance = false;   
+    bj->asked_insurance = false;
 }
 
 /*****************************************************************************
@@ -526,7 +525,7 @@ static void blackjack_init(struct game_context* bj) {
 static void blackjack_drawtable(struct game_context* bj) {
     unsigned int w, h, y_loc;
     char str[10];
-    
+
 #if LCD_HEIGHT <= 64
     rb->lcd_getstringsize("Bet", &w, &h);
     rb->lcd_putsxy(LCD_WIDTH - w, 2*h + 1, "Bet");
@@ -577,19 +576,19 @@ static unsigned int find_value(unsigned int number) {
 /*****************************************************************************
 * draw_card() draws a card to the screen.
 ******************************************************************************/
-static void draw_card(struct card temp_card, bool shown, unsigned int x, 
-                      unsigned int y) {
+static void draw_card(struct card temp_card, bool shown,
+                      unsigned int x, unsigned int y) {
     if(shown)
-        rb->lcd_bitmap_part(card_deck, CARD_WIDTH*temp_card.num, 
+        rb->lcd_bitmap_part(card_deck, CARD_WIDTH*temp_card.num,
                             CARD_HEIGHT*temp_card.suit, BMPWIDTH_card_deck,
                             x+1, y+1, CARD_WIDTH, CARD_HEIGHT);
     else
-        rb->lcd_bitmap(card_back, x+1, y+1,CARD_WIDTH, CARD_HEIGHT);          
+        rb->lcd_bitmap(card_back, x+1, y+1,CARD_WIDTH, CARD_HEIGHT);
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
 
-    /* Print outlines */ 
+    /* Print outlines */
 #if CARD_WIDTH >= 26
     rb->lcd_hline(x+2, x+CARD_WIDTH-1, y);
     rb->lcd_hline(x+2, x+CARD_WIDTH-1, y+CARD_HEIGHT+1);
@@ -618,7 +617,7 @@ static struct card new_card(void) {
     struct card new_card;
     new_card.suit = rb->rand()%4; /* Random number 0-3 */
     new_card.num = rb->rand()%13; /* Random number 0-12 */
-    new_card.value = find_value(new_card.num);      
+    new_card.value = find_value(new_card.num);
     new_card.is_soft_ace = new_card.num == 0 ? true : false;
     return new_card;
 }
@@ -645,7 +644,7 @@ static void deal_init_cards(struct game_context* bj) {
     bj->player_cards[0][1] = new_card();
     bj->player_total += bj->player_cards[0][1].value;
     draw_card(bj->player_cards[0][1], true, player_x, player_y);
-    player_x += CARD_WIDTH + 4;    
+    player_x += CARD_WIDTH + 4;
 }
 
 /*****************************************************************************
@@ -669,7 +668,7 @@ static void redraw_board(struct game_context* bj) {
             dealer_x += CARD_WIDTH + 4;
         }
         draw_card(bj->dealer_cards[i], true, dealer_x, dealer_y);
-        
+
         if (bj->num_dealer_cards > MAX_CARDS-1)
             dealer_x += 10;
         else
@@ -682,7 +681,7 @@ static void redraw_board(struct game_context* bj) {
             if (bj->split_status>1 || bj->num_player_cards[n]>MAX_CARDS)
                 player_x += 10;
             else
-                player_x += CARD_WIDTH + 4;                
+                player_x += CARD_WIDTH + 4;
         }
         if (bj->split_status > 1)
             player_x = LCD_WIDTH/2 + 4;
@@ -709,12 +708,11 @@ static void update_total(struct game_context* bj) {
 * check_for_aces() is passed an array of cards and returns where an ace is
 * located. Otherwise, returns -1.
 ******************************************************************************/
-static signed int check_for_aces(struct card temp_cards[], 
-                                 unsigned int size) {
+static signed int check_for_aces(struct card temp_cards[], unsigned int size) {
     unsigned int i;
     for(i = 0; i < size; i++) {
         if (temp_cards[i].is_soft_ace == true)
-          return i;
+            return i;
     }
     return -1;
 }
@@ -723,26 +721,26 @@ static signed int check_for_aces(struct card temp_cards[],
 * check_totals() compares player and dealer totals.
 * 0: bust 1: loss, 2: push, 3: win, 4: blackjack, 5: something's not right...
 ******************************************************************************/
-static unsigned int check_totals(struct game_context* bj)
-{
+static unsigned int check_totals(struct game_context* bj) {
     unsigned int temp;
     if (bj->player_total > 21)
-      temp = 0;
-    else if (bj->player_total == 21 && bj->is_blackjack)
-      if (bj->dealer_total == 21 && bj->num_dealer_cards == 2)
-        temp = 2;
-      else
-        temp = 4;
+        temp = 0;
+    else if (bj->player_total == 21 && bj->is_blackjack) {
+        if (bj->dealer_total == 21 && bj->num_dealer_cards == 2)
+            temp = 2;
+        else
+            temp = 4;
+    }
     else if (bj->player_total == bj->dealer_total)
-      temp = 2;
+        temp = 2;
     else if (bj->dealer_total > 21 && bj->player_total < 22)
-      temp = 3;
+        temp = 3;
     else if (bj->dealer_total > bj->player_total)
-      temp = 1;
+        temp = 1;
     else if (bj->player_total > bj->dealer_total)
-      temp = 3;
+        temp = 3;
     else
-      temp = 5;
+        temp = 5;
 
     return temp;
 }
@@ -752,24 +750,24 @@ static unsigned int check_totals(struct game_context* bj)
 ******************************************************************************/
 static void finish_dealer(struct game_context* bj) {
     signed int temp = 0;
-    
+
     if (bj->dealer_total > 16 && bj->dealer_total < 22)
         return;
-    
+
     while (bj->dealer_total < 17) {
-      bj->dealer_cards[bj->num_dealer_cards] = new_card();
-      bj->dealer_total += bj->dealer_cards[bj->num_dealer_cards].value;
-      bj->num_dealer_cards++;
+        bj->dealer_cards[bj->num_dealer_cards] = new_card();
+        bj->dealer_total += bj->dealer_cards[bj->num_dealer_cards].value;
+        bj->num_dealer_cards++;
     }
-    
+
     while (bj->dealer_total > 21) {
-      temp = check_for_aces(bj->dealer_cards, bj->num_dealer_cards);
-      if(temp != -1) {
-        bj->dealer_cards[temp].is_soft_ace = false;
-        bj->dealer_total -= 10;
-      }
-      else
-        return;
+        temp = check_for_aces(bj->dealer_cards, bj->num_dealer_cards);
+        if(temp != -1) {
+            bj->dealer_cards[temp].is_soft_ace = false;
+            bj->dealer_total -= 10;
+        }
+        else
+            return;
     }
 }
 
@@ -783,31 +781,31 @@ static void finish_game(struct game_context* bj) {
     do {
         finish_dealer(bj);
     } while (bj->dealer_total < 17);
-    
+
     redraw_board(bj);
     rValue = check_totals(bj);
 
     if (rValue == 0) {
-      rb->snprintf(str, sizeof(str), " Bust! ");
-      bj->player_money -= bj->current_bet;
+        rb->snprintf(str, sizeof(str), " Bust! ");
+        bj->player_money -= bj->current_bet;
     }
     else if (rValue == 1) {
-      rb->snprintf(str, sizeof(str), " Sorry, you lost. ");
-      bj->player_money -= bj->current_bet;
+        rb->snprintf(str, sizeof(str), " Sorry, you lost. ");
+        bj->player_money -= bj->current_bet;
     }
     else if (rValue == 2) {
-      rb->snprintf(str, sizeof(str), " Push ");
+        rb->snprintf(str, sizeof(str), " Push ");
     }
     else if (rValue == 3) {
-      rb->snprintf(str, sizeof(str), " You won! ");
-      bj->player_money+= bj->current_bet;
+        rb->snprintf(str, sizeof(str), " You won! ");
+        bj->player_money+= bj->current_bet;
     }
     else {
-      rb->snprintf(str, sizeof(str), " Blackjack! ");
-      bj->player_money += bj->current_bet * 3 / 2;
+        rb->snprintf(str, sizeof(str), " Blackjack! ");
+        bj->player_money += bj->current_bet * 3 / 2;
     }
     rb->lcd_getstringsize(str, &w, &h);
-    
+
 #if LCD_HEIGHT <= 64
     rb->lcd_set_drawmode(DRMODE_BG+DRMODE_INVERSEVID);
     rb->lcd_fillrect(0, LCD_HEIGHT/2, LCD_WIDTH, LCD_HEIGHT/2);
@@ -835,7 +833,7 @@ static bool blackjack_loadgame(struct game_context* bj) {
 
     /* read in saved game */
     while(true) {
-        if(rb->read(fd, &bj->player_money, sizeof(bj->player_money)) <= 0) 
+        if(rb->read(fd, &bj->player_money, sizeof(bj->player_money)) <= 0)
             break;
         if(rb->read(fd, &bj->player_total, sizeof(bj->player_total)) <= 0)
             break;
@@ -845,19 +843,19 @@ static bool blackjack_loadgame(struct game_context* bj) {
             break;
         if(rb->read(fd, &bj->num_dealer_cards, sizeof(bj->num_dealer_cards))<=0)
             break;
-        if(rb->read(fd, &bj->current_bet, sizeof(bj->current_bet)) <= 0) 
+        if(rb->read(fd, &bj->current_bet, sizeof(bj->current_bet)) <= 0)
             break;
-        if(rb->read(fd, &bj->is_blackjack, sizeof(bj->is_blackjack)) <= 0) 
+        if(rb->read(fd, &bj->is_blackjack, sizeof(bj->is_blackjack)) <= 0)
             break;
-        if(rb->read(fd, &bj->split_status, sizeof(bj->split_status)) <= 0) 
+        if(rb->read(fd, &bj->split_status, sizeof(bj->split_status)) <= 0)
             break;
         if(rb->read(fd, &bj->asked_insurance, sizeof(bj->asked_insurance)) <= 0)
             break;
-        if(rb->read(fd, &bj->end_hand, sizeof(bj->end_hand)) <= 0) 
+        if(rb->read(fd, &bj->end_hand, sizeof(bj->end_hand)) <= 0)
             break;
-        if(rb->read(fd, &bj->player_cards, sizeof(bj->player_cards)) <= 0) 
+        if(rb->read(fd, &bj->player_cards, sizeof(bj->player_cards)) <= 0)
             break;
-        if(rb->read(fd, &bj->dealer_cards, sizeof(bj->dealer_cards)) <= 0) 
+        if(rb->read(fd, &bj->dealer_cards, sizeof(bj->dealer_cards)) <= 0)
             break;
         bj->resume = true;
         loaded = true;
@@ -911,7 +909,7 @@ static unsigned int blackjack_get_yes_no(char message[20]) {
     rb->strcat(message_no, "  No");
     rb->lcd_getstringsize(message_yes, &w, &h);
     const char *stg[] = {message_yes, message_no};
-    
+
 #if LCD_HEIGHT <= 64
     b = 2*h+1;
 #else
@@ -928,10 +926,10 @@ static unsigned int blackjack_get_yes_no(char message[20]) {
     rb->lcd_set_drawmode(DRMODE_SOLID);
 #endif
     rb->lcd_drawrect(LCD_WIDTH/2 - w/2 - 1, LCD_HEIGHT/2 + b - 1, w+3, h+4);
-    
+
     while(!breakout) {
         rb->lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 + b +1, stg[choice]);
-        rb->lcd_update_rect(LCD_WIDTH/2 - w/2 - 1, LCD_HEIGHT/2 + b -1, 
+        rb->lcd_update_rect(LCD_WIDTH/2 - w/2 - 1, LCD_HEIGHT/2 + b -1,
                             w+3, h+4);
         button = rb->button_get(true);
 
@@ -949,7 +947,7 @@ static unsigned int blackjack_get_yes_no(char message[20]) {
                 break;
         }
     }
-    
+
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(FG_COLOR);
     rb->lcd_set_background(BG_COLOR);
@@ -961,16 +959,16 @@ static unsigned int blackjack_get_yes_no(char message[20]) {
 * blackjack_get_amount() gets an amount from the player to be used
 ******************************************************************************/
 static signed int blackjack_get_amount(char message[20], signed int lower_limit,
-                                       signed int upper_limit, 
+                                       signed int upper_limit,
                                        signed int start) {
     int button;
-    char str[6];
+    char str[9];
     bool changed = false;
     unsigned int w, h;
     signed int amount;
-    
+
     rb->lcd_getstringsize("A", &w, &h); /* find the size of one character */
-    
+
     if (start > upper_limit)
         amount = upper_limit;
     else if (start < lower_limit)
@@ -995,11 +993,11 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
     rb->lcd_update();
 #else
     rb->lcd_set_drawmode(DRMODE_BG+DRMODE_INVERSEVID);
-    rb->lcd_fillrect(LCD_WIDTH/2 - 9*w - 1, LCD_HEIGHT/2 - 4*h - 3, 37*w / 2, 
-                     8*h -3);
+    rb->lcd_fillrect(LCD_WIDTH/2 - 9*w - 1, LCD_HEIGHT/2 - 4*h - 3,
+                     37*w / 2, 8*h -3);
     rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_drawrect(LCD_WIDTH/2 - 9*w - 1, LCD_HEIGHT/2 - 4*h - 3, 37*w / 2, 
-                     8*h -3);
+    rb->lcd_drawrect(LCD_WIDTH/2 - 9*w - 1, LCD_HEIGHT/2 - 4*h - 3,
+                     37*w / 2, 8*h -3);
     rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 4*h - 1, message);
     rb->snprintf(str, 9, "$%d", amount);
     rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, str);
@@ -1021,21 +1019,21 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
     rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + h, "UP:   +10");
     rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + 2*h + 1, "DOWN: -10");
 #endif
-    rb->lcd_update_rect(LCD_WIDTH/2 - 9*w - 2, LCD_HEIGHT/2 - 9*h/2, 37*w/2 + 1,
-                        8*h-2);
+    rb->lcd_update_rect(LCD_WIDTH/2 - 9*w - 1, LCD_HEIGHT/2 - 4*h - 3,
+                        37*w / 2, 8*h -3);
 #endif
-    
+
     while(true) {
         button = rb->button_get(true);
 
         switch(button) {
             case BJACK_UP:
             case (BJACK_UP|BUTTON_REPEAT):
-            if (amount + 10 < upper_limit + 1) {
+                if (amount + 10 < upper_limit + 1) {
                     amount += 10;
                     changed = true;
-            }
-            break;
+                }
+                break;
             case BJACK_DOWN:
             case (BJACK_DOWN|BUTTON_REPEAT):
                 if (amount - 10 > lower_limit - 1) {
@@ -1074,9 +1072,9 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
 #endif
                 rb->lcd_clear_display();
                 return amount;
-       }
+        }
 
-       if(changed) {
+        if(changed) {
             rb->snprintf(str, 9, "$%d", amount);
 #if LCD_HEIGHT <= 64
             rb->lcd_puts(0, 2, str);
@@ -1097,7 +1095,7 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
 * blackjack_get_bet() gets the player's bet.
 ******************************************************************************/
 static void blackjack_get_bet(struct game_context* bj) {
-    bj->current_bet = blackjack_get_amount("Please enter a bet", 10, 
+    bj->current_bet = blackjack_get_amount("Please enter a bet", 10,
                                            bj->player_money, bj->current_bet);
 }
 
@@ -1133,11 +1131,11 @@ static void split(struct game_context* bj) {
 * insurance() see if the player wants to buy insurance and how much.
 ******************************************************************************/
 static unsigned int insurance(struct game_context* bj) {
-    unsigned int insurance, max_amount; 
-    
+    unsigned int insurance, max_amount;
+
     insurance = blackjack_get_yes_no("Buy Insurance?");
     bj->asked_insurance = true;
-    max_amount = bj->current_bet < (unsigned int)bj->player_money ? 
+    max_amount = bj->current_bet < (unsigned int)bj->player_money ?
                             bj->current_bet/2 : (unsigned int)bj->player_money;
     if (insurance == 1) return 0;
 
@@ -1153,7 +1151,10 @@ static unsigned int play_again(void) {
     return blackjack_get_yes_no("Play Again?");
 }
 
-void showhelp(void) {
+/*****************************************************************************
+* blackjack_help() displays help text.
+******************************************************************************/
+static bool blackjack_help(void) {
 #define WORDS (sizeof help_text / sizeof (char*))
     static char *help_text[] = {
         "Blackjack", "",
@@ -1184,16 +1185,16 @@ void showhelp(void) {
 #endif
 
     if (display_text(WORDS, help_text, formation, NULL))
-        return;
+        return true;
     do {
         button = rb->button_get(true);
         if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-            return;
+            return true;
         }
     } while( ( button == BUTTON_NONE )
           || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
     rb->lcd_setfont(FONT_SYSFIXED);
-    return;
+    return false;
 }
 
 /*****************************************************************************
@@ -1202,9 +1203,11 @@ void showhelp(void) {
 static unsigned int blackjack_menu(struct game_context* bj) {
     int selection=0;
     bool breakout = false;
-    
-    MENUITEM_STRINGLIST(menu,"BlackJack Menu",NULL,"Start Game","Resume Game",
-                        "High Scores", "Help", "Playback Control", "Quit");
+
+    MENUITEM_STRINGLIST(menu, "BlackJack Menu", NULL,
+                        "Start Game","Resume Game",
+                        "High Scores", "Help",
+                        "Playback Control", "Quit");
 
     while(!breakout) {
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
@@ -1215,7 +1218,6 @@ static unsigned int blackjack_menu(struct game_context* bj) {
                 if(!blackjack_loadgame(bj)) {
                     rb->splash(HZ*2, "Nothing to resume");
                 } else {
-                    rb->splash(HZ*2, "Loading...");
                     breakout = true;
                 }
                 break;
@@ -1223,18 +1225,19 @@ static unsigned int blackjack_menu(struct game_context* bj) {
                 highscore_show(NUM_SCORES, highest, NUM_SCORES, false);
                 break;
             case 3:
-                showhelp();
+                if(blackjack_help())
+                    return BJ_USB;
                 break;
             case 4:
                 if (playback_control(NULL))
-                    return 1;
+                    return BJ_USB;
                 break;
             case 5:
                 return BJ_QUIT;
-                
+
             case MENU_ATTACHED_USB:
                 return BJ_USB;
-                
+
             default:
                 break;
         }
@@ -1253,6 +1256,11 @@ static int blackjack(struct game_context* bj) {
     bool breakout = false;
     bool dbl_down = false;
 
+#if LCD_DEPTH > 1
+        rb->lcd_set_background(BG_COLOR);
+        rb->lcd_set_foreground(FG_COLOR);
+#endif
+
     /* don't resume by default */
     bj->resume = false;
 
@@ -1268,7 +1276,6 @@ static int blackjack(struct game_context* bj) {
     *       init        *
     ********************/
     blackjack_init(bj);
-    bj->current_bet=10;
 
     /********************
     *       play        *
@@ -1279,21 +1286,21 @@ static int blackjack(struct game_context* bj) {
         bj->resume = false;
         redraw_board(bj);
         if (bj->split_status == 2) {
-          todo=2;
-          player_x = bj->num_player_cards[0] * 10 + 4;
+            todo=2;
+            player_x = bj->num_player_cards[0] * 10 + 4;
         }
         else if (bj->split_status == 3) {
-          player_x = bj->num_player_cards[1] * 10 + LCD_WIDTH/2 + 4;
-          todo=2;
-          done=1;
+            player_x = bj->num_player_cards[1] * 10 + LCD_WIDTH/2 + 4;
+            todo=2;
+            done=1;
         }
-
     }
     else {
         bj->player_money = 1000;
+        bj->current_bet = 10;
         blackjack_get_bet(bj);
         if (bj->current_bet == 0)
-            return BJ_QUIT;
+            return -1;
         rb->lcd_clear_display();
         deal_init_cards(bj);
         blackjack_drawtable(bj);
@@ -1309,7 +1316,7 @@ static int blackjack(struct game_context* bj) {
             bj->end_hand = true;
             finish_game(bj);
         }
-        else if(bj->dealer_cards[1].is_soft_ace && !breakout && 
+        else if(bj->dealer_cards[1].is_soft_ace && !breakout &&
                 !bj->asked_insurance) {
             temp_var = insurance(bj);
             if (bj->dealer_total == 21) {
@@ -1328,7 +1335,7 @@ static int blackjack(struct game_context* bj) {
                 rb->lcd_update();
             }
         }
-        if(!bj->end_hand && bj->split_status == 0 && 
+        if(!bj->end_hand && bj->split_status == 0 &&
            bj->player_cards[0][0].num == bj->player_cards[0][1].num) {
             split(bj);
             redraw_board(bj);
@@ -1350,16 +1357,16 @@ static int blackjack(struct game_context* bj) {
                     bj->num_player_cards[done]++;
                     if (bj->num_player_cards[done] == MAX_CARDS + 1) {
                         redraw_board(bj);
-                        rb->lcd_update_rect(0, LCD_HEIGHT/2, LCD_WIDTH, 
+                        rb->lcd_update_rect(0, LCD_HEIGHT/2, LCD_WIDTH,
                                             LCD_HEIGHT/2);
                     }
                     else if (bj->num_player_cards[done]>MAX_CARDS || todo > 1) {
-                        rb->lcd_update_rect(player_x, player_y, CARD_WIDTH+2, 
+                        rb->lcd_update_rect(player_x, player_y, CARD_WIDTH+2,
                                             CARD_HEIGHT+2);
                         player_x += 10;
                     }
                     else {
-                        rb->lcd_update_rect(player_x, player_y, CARD_WIDTH+2, 
+                        rb->lcd_update_rect(player_x, player_y, CARD_WIDTH+2,
                                             CARD_HEIGHT+2);
                         player_x += CARD_WIDTH + 4;
                     }
@@ -1370,7 +1377,8 @@ static int blackjack(struct game_context* bj) {
                     bj->end_hand = true;
                     break;
                 case BJACK_DOUBLEDOWN:
-                    if ((signed int)bj->current_bet * 2 < bj->player_money + 1&&
+                    if ((signed int)bj->current_bet * 2 <
+                            bj->player_money + 1 &&
                          bj->num_player_cards[0]==2 && todo==1) {
                         double_down(bj);
                         dbl_down = true;
@@ -1379,7 +1387,8 @@ static int blackjack(struct game_context* bj) {
                             finish_game(bj);
                         }
                     }
-                    else if((signed int)bj->current_bet * 2 > bj->player_money){
+                    else if((signed int)bj->current_bet * 2 >
+                            bj->player_money){
                         rb->splash(HZ, "Not enough money to double down.");
                         redraw_board(bj);
                         rb->lcd_update();
@@ -1395,7 +1404,7 @@ static int blackjack(struct game_context* bj) {
             }
 
             while (bj->player_total > 21 && !bj->end_hand) {
-                temp = check_for_aces(bj->player_cards[done], 
+                temp = check_for_aces(bj->player_cards[done],
                                       bj->num_player_cards[done]);
                 if(temp != -1) {
                     bj->player_cards[done][temp].is_soft_ace = false;
@@ -1409,7 +1418,7 @@ static int blackjack(struct game_context* bj) {
                 else
                     bj->end_hand = true;
             }
-            
+
             if (bj->end_hand) {
                 done++;
                 if(todo > 1) {
@@ -1426,7 +1435,7 @@ static int blackjack(struct game_context* bj) {
                         bj->current_bet /= 2;
                         rb->lcd_update_rect(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
                                             w,h);
-                        rb->sleep(HZ*2);                      
+                        rb->sleep(HZ*2);
                         bj->player_total = temp_var;
                         finish_game(bj);
                         rb->lcd_getstringsize(" Split 2 ", &w, &h);
@@ -1446,7 +1455,7 @@ static int blackjack(struct game_context* bj) {
                         player_x += 10;
                         rb->lcd_update();
                     }
-                }                
+                }
                 else
                     finish_game(bj);
             }
@@ -1462,7 +1471,11 @@ static int blackjack(struct game_context* bj) {
                 return BJ_END;
             else {                              /* User keeps playing */
                 breakout = false;
+                temp = bj->current_bet;
+                bj->current_bet = 0;
                 redraw_board(bj);
+                rb->lcd_update();
+                bj->current_bet = temp;
                 if(dbl_down) {
                     bj->current_bet /= 2;
                     dbl_down = false;
@@ -1477,7 +1490,7 @@ static int blackjack(struct game_context* bj) {
                 blackjack_drawtable(bj);
                 rb->lcd_update();
             }
-        }        
+        }
     }
     /* Never reached */
     return PLUGIN_OK;
@@ -1509,33 +1522,26 @@ enum plugin_status plugin_start(const void* parameter)
                 /* fall through to BJ_END */
 
             case BJ_END:
-                if(!bj.resume) {
+                if(!bj.resume && bj.player_money > 10) {
                     /* There is no level, so store -1 to blank column */
-                    int position = highscore_update(bj.player_money, -1, "", 
+                    int position = highscore_update(bj.player_money, -1, "",
                         highest, NUM_SCORES);
                     if (position == 0) {
                         rb->splash(HZ*2, "New High Score");
                     }
                     if (position != -1) {
                         highscore_show(position, highest, NUM_SCORES, false);
-                        bj.dirty=true;
-                    } else {
-                        rb->sleep(3);
                     }
                 }
                 break;
 
             case BJ_USB:
                 rb->lcd_setfont(FONT_UI);
-                if(bj.dirty) {
-                    highscore_save(HIGH_SCORE,highest,NUM_SCORES);
-                }
+                highscore_save(HIGH_SCORE,highest,NUM_SCORES);
                 return PLUGIN_USB_CONNECTED;
 
             case BJ_QUIT:
-                if(bj.dirty) {
-                    highscore_save(HIGH_SCORE,highest,NUM_SCORES);
-                }
+                highscore_save(HIGH_SCORE,highest,NUM_SCORES);
                 exit = true;
                 break;
 

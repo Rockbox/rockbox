@@ -77,7 +77,7 @@ PLUGIN_HEADER
 #define PATTERN_GROWTH_1   1
 #define PATTERN_GROWTH_2   2
 #define PATTERN_ACORN      3
-#define PATTERN_GLIDER_GUN 4 /* not yet implemented */
+#define PATTERN_GLIDER_GUN 4
 
 const struct button_mapping *plugin_contexts[]
 = {generic_directions, generic_actions};

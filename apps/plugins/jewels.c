@@ -1323,7 +1323,7 @@ static int jewels_game_menu(struct game_context* bj, bool ingame)
                              "Start New Game",
                              "Mode",
                              "Help",
-                             "High Score",
+                             "High Scores",
                              "Playback Control",
                              "Quit without Saving",
                              "Quit");

@@ -272,7 +272,7 @@ static int is_leap_year(int yr)
     (!((yr) % 4) && ((yr) % 100)) || !((yr) % 400))  ? 1:0 ;
 }
 
-/* searches the weekday of the first day in month, 
+/* searches the weekday of the first day in month,
  * relative to the given values */
 static int calc_weekday( struct shown *shown )
 {
@@ -343,19 +343,9 @@ static void draw_calendar(struct shown *shown)
     int x,y,pos,days_per_month,j;
     char buffer[9];
     const char *monthname[] = {
-                          "Jan",
-                          "Feb",
-                          "Mar",
-                          "Apr",
-                          "May",
-                          "Jun",
-                          "Jul",
-                          "Aug",
-                          "Sep",
-                          "Oct",
-                          "Nov",
-                          "Dec"
-                        };
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
     if(use_system_font)
         rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_getstringsize("A",&w,&h);
@@ -421,7 +411,7 @@ static int memos_in_shown_memory = 0;
 
 static void load_memo(struct shown *shown)
 {
-    int i, k, fp;
+    int k, fp;
     bool exit = false;
     char temp_memo1[2];
     char temp_memo2[3];
@@ -429,18 +419,6 @@ static void load_memo(struct shown *shown)
     temp_memo1[1] = 0;
     temp_memo2[2] = 0;
     temp_memo4[4] = 0;
-    for (k = 0; k < memos_in_memory; k++)
-    {
-        memos[k].day = 0;
-        memos[k].month = 0;
-        memos[k].file_pointer_start = 0;
-        memos[k].file_pointer_end = 0;
-        memos[k].year = 0;
-        memos[k].type = 0;
-        memos[k].wday = 0;
-        for (i = 0; i < MAX_CHAR_MEMO_LEN; i++)
-            memos[k].message[i] = 0;
-    }
     for (k = 1; k < 32; k++)
         day_has_memo[k] = false;
     for (k = 0; k < 7; k++)
@@ -449,12 +427,13 @@ static void load_memo(struct shown *shown)
     fp = rb->open(ROCKBOX_DIR "/.memo",O_RDONLY);
     if (fp > -1)
     {
-        int count = rb->filesize(fp);
         rb->lseek(fp, 0, SEEK_SET);
         while (!exit)
         {
-            memos[memos_in_memory].file_pointer_start = rb->lseek(fp, 0,
-                                                                  SEEK_CUR);
+            bool load_to_memory;
+            rb->memset(&memos[memos_in_memory].message, 0, MAX_CHAR_MEMO_LEN);
+            memos[memos_in_memory].file_pointer_start =
+                                                    rb->lseek(fp, 0, SEEK_CUR);
             if (rb->read(fp, temp_memo2, 2) == 2)
                 memos[memos_in_memory].day = rb->atoi(&temp_memo2[0]);
             else
@@ -472,7 +451,7 @@ static void load_memo(struct shown *shown)
             if (memos[memos_in_memory].year > (shown->year * 10))
                 memos[memos_in_memory].year = (memos[memos_in_memory].year -
                                                memos[memos_in_memory].month) /
-                    100;
+                                               100;
             if (rb->read(fp, temp_memo1, 1) == 1)
                 memos[memos_in_memory].wday = rb->atoi(&temp_memo1[0]);
             else
@@ -481,48 +460,16 @@ static void load_memo(struct shown *shown)
                 memos[memos_in_memory].type = rb->atoi(&temp_memo1[0]);
             else
                 memos[memos_in_memory].type = 0;
-            for (k = 0; k <= count; k++)
+            load_to_memory = ((memos[memos_in_memory].type < 2) ||
+                              ((memos[memos_in_memory].type == 2) &&
+                                  (memos[memos_in_memory].month == shown->mon)) ||
+                              ((memos[memos_in_memory].type > 2) &&
+                                  (memos[memos_in_memory].month == shown->mon) &&
+                                  (memos[memos_in_memory].year == shown->year)));
+            k = 0;
+            while (1)
             {
-                if (rb->read(fp, temp_memo1, 1) == 1)
-                {
-                    if (
-                        (memos[memos_in_memory].type < 2)
-                        ||
-                        (
-                            (memos[memos_in_memory].type == 2)
-                            &&
-                            (memos[memos_in_memory].month == shown->mon)
-                        )
-                        ||
-                        (
-                            (memos[memos_in_memory].type > 2)
-                            &&
-                            (memos[memos_in_memory].month == shown->mon)
-                            &&
-                            (memos[memos_in_memory].year == shown->year)
-                        )
-                       )
-                    {
-                        if (temp_memo1[0] == '\n')
-                        {
-                            if (memos[memos_in_memory].type > 0)
-                                day_has_memo[memos[memos_in_memory].day] =
-                                    true;
-                            else
-                                wday_has_memo[memos[memos_in_memory].wday] =
-                                    true;
-                            memos[memos_in_memory++].file_pointer_end =
-                                rb->lseek(fp, 0, SEEK_CUR);
-                        }
-                        else if ( (temp_memo1[0] != '\r') &&
-                                  (temp_memo1[0] != '\t') &&
-                                  k < MAX_CHAR_MEMO_LEN-1 )
-                            memos[memos_in_memory].message[k] = temp_memo1[0];
-                    }
-                    if (temp_memo1[0] == '\n')
-                        break;
-                }
-                else
+                if (rb->read(fp, temp_memo1, 1) != 1)
                 {
                     memos[memos_in_memory].day = 0;
                     memos[memos_in_memory].month = 0;
@@ -535,6 +482,26 @@ static void load_memo(struct shown *shown)
                     exit = true;
                     break;
                 }
+                if (load_to_memory)
+                {
+                    if (temp_memo1[0] == '\n')
+                    {
+                        if (memos[memos_in_memory].type > 0)
+                            day_has_memo[memos[memos_in_memory].day] =
+                                true;
+                        else
+                            wday_has_memo[memos[memos_in_memory].wday] =
+                                true;
+                        memos[memos_in_memory++].file_pointer_end =
+                            rb->lseek(fp, 0, SEEK_CUR);
+                    }
+                    else if ( (temp_memo1[0] != '\r') &&
+                              (temp_memo1[0] != '\t') &&
+                              k < MAX_CHAR_MEMO_LEN-1 )
+                        memos[memos_in_memory].message[k++] = temp_memo1[0];
+                }
+                if (temp_memo1[0] == '\n')
+                    break;
             }
         }
     }
@@ -546,7 +513,7 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
     int fp,fq;
     fp = rb->open(ROCKBOX_DIR "/.memo",O_RDONLY | O_CREAT);
     fq = rb->creat(ROCKBOX_DIR "/~temp");
-    if ( (fq != -1) && (fp != -1) )
+    if ( (fq > -1) && (fp > -1) )
     {
         int i;
         char temp[MAX_CHAR_MEMO_LEN];
@@ -578,9 +545,9 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
         load_memo(shown);
         return true;
     }
-    else if (fp != -1)
+    else if (fp > -1)
         rb->close(fp);
-    else if (fq != -1)
+    else if (fq > -1)
         rb->close(fq);
     return false;
 }
@@ -714,7 +681,7 @@ static bool view_events(int selected, struct shown *shown)
     rb->gui_synclist_set_nb_items(&gui_memos, memos_in_shown_memory);
     rb->gui_synclist_select_item(&gui_memos, selected);
     rb->gui_synclist_draw(&gui_memos);
-     
+
     while (!exit)
     {
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
@@ -746,19 +713,10 @@ static void update_memos_shown(struct shown *shown)
     int i;
     memos_in_shown_memory = 0;
     for (i = 0; i < memos_in_memory; i++)
-        if (
-            (
-             (memos[i].type >= 1)
-             &&
-             (memos[i].day == shown->mday)
-            )
-            ||
-            (
-             (memos[i].type < 1)
-             &&
-             (memos[i].wday == shown->wday)
-            )
-           )
+        if (((memos[i].type >= 1) &&
+                (memos[i].day == shown->mday)) ||
+            ((memos[i].type < 1) &&
+                (memos[i].wday == shown->wday)))
             pointer_array[memos_in_shown_memory++] = i;
 }
 
@@ -836,7 +794,7 @@ enum plugin_status plugin_start(const void* parameter)
     struct shown shown;
     bool exit = false;
     int button;
-    
+
     (void)(parameter);
 
     calendar_init(&today, &shown);

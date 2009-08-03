@@ -605,7 +605,7 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
                              "Resume Game",
                              "Start New Game",
                              "Help",
-                             "High Score",
+                             "High Scores",
                              "Playback Control",
                              "Quit");
 

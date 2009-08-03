@@ -644,7 +644,7 @@ static int spacerocks_menu(bool ingame)
                              "Resume Game",
                              "Start New Game",
                              "Help",
-                             "High Score",
+                             "High Scores",
                              "Playback Control",
                              "Quit");
                              

@@ -129,7 +129,6 @@ void highscore_show(int position, struct highscore *scores, int num_scores, bool
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
-    rb->button_clear_queue();
     rb->lcd_clear_display();
 
     rb->lcd_setfont(FONT_UI);
@@ -174,6 +173,8 @@ void highscore_show(int position, struct highscore *scores, int num_scores, bool
         }
     }
     rb->lcd_update();
+    rb->sleep(HZ/2);
+    rb->button_clear_queue();
     rb->button_get(true);
     rb->lcd_setfont(FONT_SYSFIXED);
 }

@@ -63,10 +63,6 @@ PLUGIN_HEADER
 #define MULTIPLAYER
 #endif
 
-#define PLAYERS_TEXT "UP/DN"
-#define WORMS_TEXT "L/R"
-#define KEY_CONTROL_TEXT "F1"
-
 #elif (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
 #define BTN_DIR_UP BUTTON_UP
 #define BTN_DIR_DOWN BUTTON_DOWN
@@ -79,10 +75,6 @@ PLUGIN_HEADER
 #define BTN_STOPRESET BUTTON_ON
 #define BTN_TOGGLE_KEYS BUTTON_F1
 
-#define PLAYERS_TEXT "UP/DN"
-#define WORMS_TEXT "L/R"
-#define KEY_CONTROL_TEXT "F1"
-
 #elif (CONFIG_KEYPAD == ONDIO_PAD)
 #define BTN_DIR_UP BUTTON_UP
 #define BTN_DIR_DOWN BUTTON_DOWN
@@ -91,9 +83,6 @@ PLUGIN_HEADER
 #define BTN_STARTPAUSE (BUTTON_MENU|BUTTON_REL)
 #define BTN_QUIT (BUTTON_OFF|BUTTON_REL)
 #define BTN_STOPRESET (BUTTON_OFF|BUTTON_MENU)
-
-#define PLAYERS_TEXT "UP/DN"
-#define WORMS_TEXT "L/R"
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
@@ -105,9 +94,6 @@ PLUGIN_HEADER
 #define BTN_STARTPAUSE (BUTTON_SELECT|BUTTON_REL)
 #define BTN_QUIT (BUTTON_SELECT|BUTTON_MENU)
 #define BTN_STOPRESET (BUTTON_SELECT|BUTTON_PLAY)
-
-#define PLAYERS_TEXT "Menu/Play"
-#define WORMS_TEXT "Left/Right"
 
 #elif (CONFIG_KEYPAD == IRIVER_H300_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD)
 
@@ -121,9 +107,6 @@ PLUGIN_HEADER
 
 #define BTN_RC_QUIT BUTTON_RC_STOP
 
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
-
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 
 #define BTN_DIR_UP BUTTON_UP
@@ -134,9 +117,6 @@ PLUGIN_HEADER
 #define BTN_QUIT BUTTON_POWER
 #define BTN_STOPRESET BUTTON_REC
 
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
-
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 
 #define BTN_DIR_UP BUTTON_UP
@@ -146,10 +126,6 @@ PLUGIN_HEADER
 #define BTN_STARTPAUSE BUTTON_SELECT
 #define BTN_QUIT BUTTON_POWER
 #define BTN_STOPRESET BUTTON_A
-
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
-
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
 (CONFIG_KEYPAD == SANSA_C200_PAD)
@@ -162,9 +138,6 @@ PLUGIN_HEADER
 #define BTN_QUIT BUTTON_POWER
 #define BTN_STOPRESET BUTTON_REC
 
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
-
 #elif (CONFIG_KEYPAD == SANSA_CLIP_PAD)
 
 #define BTN_DIR_UP BUTTON_UP
@@ -174,9 +147,6 @@ PLUGIN_HEADER
 #define BTN_STARTPAUSE BUTTON_SELECT
 #define BTN_QUIT BUTTON_POWER
 #define BTN_STOPRESET BUTTON_HOME
-
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
 
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
 
@@ -188,9 +158,6 @@ PLUGIN_HEADER
 #define BTN_QUIT (BUTTON_HOME|BUTTON_REPEAT)
 #define BTN_STOPRESET (BUTTON_SELECT | BUTTON_UP)
 
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
-
 #elif (CONFIG_KEYPAD == SANSA_M200_PAD)
 
 #define BTN_DIR_UP BUTTON_UP
@@ -200,9 +167,6 @@ PLUGIN_HEADER
 #define BTN_STARTPAUSE (BUTTON_SELECT | BUTTON_REL)
 #define BTN_QUIT BUTTON_POWER
 #define BTN_STOPRESET (BUTTON_SELECT | BUTTON_UP)
-
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 
@@ -214,9 +178,6 @@ PLUGIN_HEADER
 #define BTN_QUIT BUTTON_POWER
 #define BTN_STOPRESET BUTTON_REW
 
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
-
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
 
 #define BTN_DIR_UP BUTTON_UP
@@ -226,9 +187,6 @@ PLUGIN_HEADER
 #define BTN_STARTPAUSE BUTTON_SELECT
 #define BTN_QUIT BUTTON_BACK
 #define BTN_STOPRESET BUTTON_MENU
-
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
 
 #elif (CONFIG_KEYPAD == MROBE100_PAD)
 
@@ -240,9 +198,6 @@ PLUGIN_HEADER
 #define BTN_QUIT BUTTON_POWER
 #define BTN_STOPRESET BUTTON_DISPLAY
 
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
-
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
 
 #define BTN_DIR_UP BUTTON_RC_VOL_UP
@@ -252,9 +207,6 @@ PLUGIN_HEADER
 #define BTN_STARTPAUSE BUTTON_RC_PLAY
 #define BTN_QUIT BUTTON_RC_REC
 #define BTN_STOPRESET BUTTON_RC_MODE
-
-#define PLAYERS_TEXT "VOL UP/DN"
-#define WORMS_TEXT "REW/FF"
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 
@@ -270,9 +222,6 @@ PLUGIN_HEADER
 #define BTN_QUIT BUTTON_BACK
 #define BTN_STOPRESET BUTTON_MENU
 
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
-
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 
 #define BTN_DIR_UP BUTTON_UP
@@ -282,9 +231,6 @@ PLUGIN_HEADER
 #define BTN_STARTPAUSE BUTTON_MENU
 #define BTN_QUIT BUTTON_POWER
 #define BTN_STOPRESET BUTTON_VIEW
-
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
 
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) || CONFIG_KEYPAD == MROBE500_PAD
 
@@ -315,16 +261,8 @@ PLUGIN_HEADER
 #endif
 #ifndef BTN_STOPRESET
 #define BTN_STOPRESET  BUTTON_TOPRIGHT
-
-#endif
-#ifndef PLAYERS_TEXT
-#define PLAYERS_TEXT   "Up/Down"
-#endif
-#ifndef WORMS_TEXT
-#define WORMS_TEXT     "Left/Right"
 #endif
 #endif
-
 
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 #define FOOD_SIZE 3
@@ -500,14 +438,14 @@ static int players = 1;
 
 static struct configdata config[] =
 {
-   {TYPE_INT, 0, 1024, { .int_p = &highscore }, "highscore", NULL},
-   {TYPE_INT, 0, 15, { .int_p = &arghs_per_food }, "arghs per food", NULL},
-   {TYPE_INT, 0, 15, { .int_p = &argh_size }, "argh size", NULL},
-   {TYPE_INT, 0, 15, { .int_p = &food_size }, "food size", NULL},
-   {TYPE_INT, 0, 3, { .int_p = &players }, "players", NULL},
-   {TYPE_INT, 0, 3, { .int_p = &worm_count }, "worms", NULL},
-   {TYPE_INT, 0, 20, { .int_p = &speed }, "speed", NULL},
-   {TYPE_INT, 0, 15, { .int_p = &worm_food }, "Worm Growth Per Food", NULL}
+    {TYPE_INT, 0, 1024, { .int_p = &highscore }, "highscore", NULL},
+    {TYPE_INT, 0, 15, { .int_p = &arghs_per_food }, "arghs per food", NULL},
+    {TYPE_INT, 0, 15, { .int_p = &argh_size }, "argh size", NULL},
+    {TYPE_INT, 0, 15, { .int_p = &food_size }, "food size", NULL},
+    {TYPE_INT, 0, 3, { .int_p = &players }, "players", NULL},
+    {TYPE_INT, 0, 3, { .int_p = &worm_count }, "worms", NULL},
+    {TYPE_INT, 0, 20, { .int_p = &speed }, "speed", NULL},
+    {TYPE_INT, 0, 15, { .int_p = &worm_food }, "Worm Growth Per Food", NULL}
 };
 
 #ifdef DEBUG_WORMLET
@@ -524,7 +462,8 @@ static void set_debug_out(char *str){
  * @return int A value 0 <= value < 4
  *         Note the predefined constants NORTH, SOUTH, EAST, WEST
  */
-static int get_worm_dir(struct worm *w) {
+static int get_worm_dir(struct worm *w)
+{
     int retVal ;
     if (w->dirx == 0) {
         if (w->diry == 1) {
@@ -551,13 +490,14 @@ static int get_worm_dir(struct worm *w) {
  *        dir must be  0 <= dir < 4. Use predefined constants
  *        NORTH, SOUTH, EAST, WEST
  */
-static void set_worm_dir(struct worm *w, int dir) {
+static void set_worm_dir(struct worm *w, int dir)
+{
     switch (dir) {
         case WEST:
             w->dirx = -1;
             w->diry = 0;
             break;
-         case NORTH:
+        case NORTH:
             w->dirx = 0;
             w->diry = - 1;
             break;
@@ -569,7 +509,7 @@ static void set_worm_dir(struct worm *w, int dir) {
             w->dirx = 0;
             w->diry = 1;
             break;
-   }
+    }
 }
 
 /**
@@ -577,7 +517,8 @@ static void set_worm_dir(struct worm *w, int dir) {
  * is also a value for the number of bends that are in the worm.
  * @return int a positive value with 0 <= value < MAX_WORM_SEGMENTS
  */
-static int get_worm_array_length(struct worm *w) {
+static int get_worm_array_length(struct worm *w)
+{
     /* initial simple calculation will be overwritten if wrong. */
     int retVal = w->head - w->tail;
 
@@ -596,7 +537,8 @@ static int get_worm_array_length(struct worm *w) {
  *        w must not be null.
  * @return int The length of the worm (>= 0).
  */
-static int get_score(struct worm *w) {
+static int get_score(struct worm *w)
+{
     int retval = 0;
     int length = get_worm_array_length(w);
     int i;
@@ -620,7 +562,7 @@ static int get_score(struct worm *w) {
             minimum = MIN(startx, endx);
             maximum = MAX(startx, endx);
         }
-            retval += abs(maximum - minimum);
+        retval += abs(maximum - minimum);
     }
     return retval;
 }
@@ -639,7 +581,9 @@ static int get_score(struct worm *w) {
  * @param int height The height of the rectangle.
  * @return bool Returns true if the specified line intersects with the recangle.
  */
-static bool line_in_rect(int startx, int starty, int endx, int endy, int x, int y, int width, int height) {
+static bool line_in_rect(int startx, int starty, int endx, int endy,
+                         int x, int y, int width, int height)
+{
     bool retval = false;
     int simple, simplemin, simplemax;
     int compa, compb, compmin, compmax;
@@ -687,7 +631,8 @@ static bool line_in_rect(int startx, int starty, int endx, int endy, int x, int 
  * @param int height The height of the rect
  * @return bool Returns true if the worm intersects with the rect
  */
-static bool worm_in_rect(struct worm *w, int x, int y, int width, int height) {
+static bool worm_in_rect(struct worm *w, int x, int y, int width, int height)
+{
     bool retval = false;
 
 
@@ -722,7 +667,8 @@ static bool worm_in_rect(struct worm *w, int x, int y, int width, int height) {
  * @return Returns true if the coordinate hits the food specified by
  * foodIndex.
  */
-static bool specific_food_collision(int foodIndex, int x, int y) {
+static bool specific_food_collision(int foodIndex, int x, int y)
+{
     bool retVal = false;
     if (x >= foodx[foodIndex]             &&
         x <  foodx[foodIndex] + food_size &&
@@ -740,7 +686,8 @@ static bool specific_food_collision(int foodIndex, int x, int y) {
  * -1 is returned.
  * @return int  -1 <= value < MAX_FOOD
  */
-static int food_collision(int x, int y) {
+static int food_collision(int x, int y)
+{
     int i = 0;
     int retVal = -1;
     for (i = 0; i < MAX_FOOD; i++) {
@@ -761,8 +708,8 @@ static int food_collision(int x, int y) {
  * @return Returns true if the coordinate hits the argh specified by
  * arghIndex.
  */
-static bool specific_argh_collision(int arghIndex, int x, int y) {
-
+static bool specific_argh_collision(int arghIndex, int x, int y)
+{
     if ( x >= arghx[arghIndex] &&
          y >= arghy[arghIndex] &&
          x <  arghx[arghIndex] + argh_size &&
@@ -782,7 +729,8 @@ static bool specific_argh_collision(int arghIndex, int x, int y) {
  * @param int y The y coordinate.
  * @return int  -1 <= value < argh_count <= MAX_ARGH
  */
-static int argh_collision(int x, int y) {
+static int argh_collision(int x, int y)
+{
     int i = 0;
     int retVal = -1;
 
@@ -821,7 +769,8 @@ static bool worm_food_collision(struct worm *w, int foodIndex)
  * @return Returns false if the specified argh is not hit within the next
  *         moves.
  */
-static bool worm_argh_collision_in_moves(struct worm *w, int argh_idx, int moves){
+static bool worm_argh_collision_in_moves(struct worm *w, int argh_idx, int moves)
+{
     bool retVal = false;
     int x1, y1, x2, y2;
     x1 = w->x[w->head];
@@ -857,8 +806,8 @@ static bool worm_argh_collision(struct worm *w, int arghIndex)
  * @param int index
  * Ensure that 0 <= index < MAX_FOOD.
  */
-static void make_food(int index) {
-
+static void make_food(int index)
+{
     int x = 0;
     int y = 0;
     bool collisionDetected = false;
@@ -1002,8 +951,8 @@ static void draw_argh(int index)
     rb->lcd_set_foreground(COLOR_ARGH);
 #endif
     rb->lcd_fillrect(arghx[index] + FIELD_RECT_X,
-                 arghy[index] + FIELD_RECT_Y,
-                 argh_size, argh_size);
+                     arghy[index] + FIELD_RECT_Y,
+                     argh_size, argh_size);
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(COLOR_FG);
 #endif
@@ -1020,24 +969,25 @@ static void virtual_player(struct worm *w);
  * @param int y The y coordinate at which the tail of the worm starts
  *        y must be 0 <= y < FIELD_RECT_WIDTH.
  */
-static void init_worm(struct worm *w, int x, int y){
-        /* initialize the worm size */
-        w->head = 1;
-        w->tail = 0;
+static void init_worm(struct worm *w, int x, int y)
+{
+    /* initialize the worm size */
+    w->head = 1;
+    w->tail = 0;
 
-        w->x[w->head] = x + 1;
-        w->y[w->head] = y;
+    w->x[w->head] = x + 1;
+    w->y[w->head] = y;
 
-        w->x[w->tail] = x;
-        w->y[w->tail] = y;
+    w->x[w->tail] = x;
+    w->y[w->tail] = y;
 
-        /* set the initial direction the worm creeps to */
-        w->dirx = 1;
-        w->diry = 0;
+    /* set the initial direction the worm creeps to */
+    w->dirx = 1;
+    w->diry = 0;
 
-        w->growing = INITIAL_WORM_LENGTH - 1;
-        w->alive = true;
-        w->fetch_worm_direction = virtual_player;
+    w->growing = INITIAL_WORM_LENGTH - 1;
+    w->alive = true;
+    w->fetch_worm_direction = virtual_player;
 }
 
 /**
@@ -1089,9 +1039,9 @@ static void init_wormlet(void)
     int i;
 
     for (i = 0; i< worm_count; i++) {
-            /* Initialize all the worm coordinates to center. */
-            int x = (int)(FIELD_RECT_WIDTH / 2);
-            int y = (int)((FIELD_RECT_HEIGHT - 20)/ 2) + i * 10;
+        /* Initialize all the worm coordinates to center. */
+        int x = (int)(FIELD_RECT_WIDTH / 2);
+        int y = (int)((FIELD_RECT_HEIGHT - 20)/ 2) + i * 10;
 
         init_worm(&worms[i], x, y);
     }
@@ -1223,12 +1173,12 @@ static void move_worm(struct worm *w)
  */
 static void draw_worm(struct worm *w)
 {
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(COLOR_WORM);
-#endif
     /* draw the new head */
     int x = w->x[w->head];
     int y = w->y[w->head];
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(COLOR_WORM);
+#endif
     if (x >= 0 && x < FIELD_RECT_WIDTH && y >= 0 && y < FIELD_RECT_HEIGHT) {
         rb->lcd_drawpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
     }
@@ -1325,7 +1275,8 @@ static void add_growing(struct worm *w, int len) {
  * @return struct worm*  The worm that has been hit by x,y. If no worm
  * was at the position NULL is returned.
  */
-static struct worm* worm_collision(struct worm *w, int x, int y){
+static struct worm* worm_collision(struct worm *w, int x, int y)
+{
     struct worm *retVal = NULL;
     int i;
     for (i = 0; (i < worm_count) && (retVal == NULL); i++) {
@@ -1366,7 +1317,8 @@ static bool field_collision(struct worm *w)
  * @return bool Returns false if x,y specifies a point outside the
  * field of worms.
  */
-static bool is_in_field_rect(int x, int y) {
+static bool is_in_field_rect(int x, int y)
+{
     bool retVal = false;
     retVal = (x >= 0 && x < FIELD_RECT_WIDTH &&
               y >= 0 && y < FIELD_RECT_HEIGHT);
@@ -1410,7 +1362,8 @@ static int check_collision(struct worm *w)
  * @param int y The y coordinate of the point
  * @return int A value usable as index in foodx and foody.
  */
-static int get_nearest_food(int x, int y){
+static int get_nearest_food(int x, int y)
+{
     int nearestfood = 0;
     int olddistance = FIELD_RECT_WIDTH + FIELD_RECT_HEIGHT;
     int deltax = 0;
@@ -1443,7 +1396,8 @@ static int get_nearest_food(int x, int y){
  * @return Returns true if the worm will hit the position unless
  * it change its direction before the next move.
  */
-static bool is_in_front_of_worm(struct worm *w, int x, int y) {
+static bool is_in_front_of_worm(struct worm *w, int x, int y)
+{
     bool infront = false;
     int deltax = x - w->x[w->head];
     int deltay = y - w->y[w->head];
@@ -1463,7 +1417,8 @@ static bool is_in_front_of_worm(struct worm *w, int x, int y) {
  * @return Returns true if the worm will collide with the next move
  * unless it changes its direction.
  */
-static bool will_worm_collide(struct worm *w) {
+static bool will_worm_collide(struct worm *w)
+{
     int x = w->x[w->head] + w->dirx;
     int y = w->y[w->head] + w->diry;
     bool retVal = !is_in_field_rect(x, y);
@@ -1487,7 +1442,8 @@ static bool will_worm_collide(struct worm *w) {
  * @param struct worm *w - The worm of which the direction
  * is altered.
  */
-static void virtual_player(struct worm *w) {
+static void virtual_player(struct worm *w)
+{
     bool isright;
     int plana, planb, planc;
     /* find the next lunch */
@@ -1554,7 +1510,8 @@ static void score_board(void)
     int i;
     int y = 0;
     rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(FIELD_RECT_WIDTH + 2, 0, LCD_WIDTH - FIELD_RECT_WIDTH - 2, LCD_HEIGHT);
+    rb->lcd_fillrect(FIELD_RECT_WIDTH + 2, 0,
+                     LCD_WIDTH - FIELD_RECT_WIDTH - 2, LCD_HEIGHT);
     rb->lcd_set_drawmode(DRMODE_SOLID);
     for (i = 0; i < worm_count; i++) {
         int score = get_score(&worms[i]);
@@ -1662,7 +1619,7 @@ static bool process_collisions(struct worm *w)
             else {
                 if (worm_collision(w, w->x[w->head], w->y[w->head]) != NULL) {
                     w->alive = false;
-    }
+                }
             }
         }
     }
@@ -1834,7 +1791,8 @@ static int run(void)
  * Just a test routine that checks that worm_food_collision works
  * in some typical situations.
  */
-static void test_worm_food_collision(void) {
+static void test_worm_food_collision(void)
+{
     int collision_count = 0;
     int i;
     rb->lcd_clear_display();
@@ -1892,7 +1850,8 @@ static void test_worm_food_collision(void) {
 
 }
 
-static bool expensive_worm_in_rect(struct worm *w, int rx, int ry, int rw, int rh){
+static bool expensive_worm_in_rect(struct worm *w, int rx, int ry, int rw, int rh)
+{
     int x, y;
     bool retVal = false;
     for (x = rx; x < rx + rw; x++){
@@ -1905,7 +1864,8 @@ static bool expensive_worm_in_rect(struct worm *w, int rx, int ry, int rw, int r
     return retVal;
 }
 
-static void test_worm_argh_collision(void) {
+static void test_worm_argh_collision(void)
+{
     int i;
     int dir;
     int collision_count = 0;
@@ -1955,7 +1915,8 @@ static void test_worm_argh_collision(void) {
     }
 }
 
-static int testline_in_rect(void) {
+static int testline_in_rect(void)
+{
     int testfailed = -1;
 
     int rx = 10;
@@ -2164,7 +2125,8 @@ static int testline_in_rect(void) {
 /**
  * Just a test routine to test wether specific_worm_collision might work properly
  */
-static int test_specific_worm_collision(void) {
+static int test_specific_worm_collision(void)
+{
     int collisions = 0;
     int dir;
     int x = 0;
@@ -2202,7 +2164,8 @@ static int test_specific_worm_collision(void) {
     return collisions;
 }
 
-static void test_make_argh(void){
+static void test_make_argh(void)
+{
     int dir;
     int seed = 0;
     int hit = 0;
@@ -2241,30 +2204,34 @@ static void test_make_argh(void){
         for (worm_idx = 0; worm_idx < worm_count; worm_idx++){
             if (expensive_worm_in_rect(&worms[worm_idx], x, y, argh_size, argh_size)) {
                 int tries = 0;
-            rb->srand(seed);
+                rb->srand(seed);
 
                 tries = make_argh(0);
                 if ((x == arghx[0] && y == arghy[0]) || tries < 2) {
-                failures ++;
-            }
+                    failures ++;
+                }
 
-                rb->snprintf(buf, sizeof buf, "(%d;%d) fail%d try%d", x, y, failures, tries);
-            rb->lcd_putsxy(0, LCD_HEIGHT - 8, buf);
-            rb->lcd_update();
-                rb->lcd_invertrect(x + FIELD_RECT_X, y+ FIELD_RECT_Y, argh_size, argh_size);
+                rb->snprintf(buf, sizeof buf, "(%d;%d) fail%d try%d",
+                             x, y, failures, tries);
+                rb->lcd_putsxy(0, LCD_HEIGHT - 8, buf);
+                rb->lcd_update();
+                rb->lcd_invertrect(x + FIELD_RECT_X, y+ FIELD_RECT_Y,
+                                   argh_size, argh_size);
                 rb->lcd_update();
                 draw_argh(0);
                 rb->lcd_update();
-            rb->lcd_invertrect(x + FIELD_RECT_X, y + FIELD_RECT_Y, argh_size, argh_size);
-            rb->lcd_clearrect(arghx[0] + FIELD_RECT_X, arghy[0] + FIELD_RECT_Y, argh_size, argh_size);
+                rb->lcd_invertrect(x + FIELD_RECT_X, y + FIELD_RECT_Y,
+                                   argh_size, argh_size);
+                rb->lcd_clearrect(arghx[0] + FIELD_RECT_X, arghy[0] + FIELD_RECT_Y,
+                                  argh_size, argh_size);
 
                 if (failures > last_failures) {
-                rb->button_get(true);
-            }
+                    rb->button_get(true);
+                }
                 last_failures = failures;
-            hit ++;
+                hit ++;
+            }
         }
-    }
     }
 }
 
@@ -2296,184 +2263,10 @@ static void test_worm_argh_collision_in_moves(void) {
 }
 #endif /* DEBUG_WORMLET */
 
-extern bool use_old_rect;
-
-/**
- * These are additional functions required to set various wormlet settings
- * and to enable saving of settings and high score
+/*
+ * Reverts default settings
  */
-
-/*
-Sets the total number of worms, both human and machine
-*/
-bool set_worm_num_worms(void)
-{
-    bool ret;
-    static const struct opt_items num_worms_option[3] = {
-        { "1", -1 },
-        { "2", -1 },
-        { "3", -1 },
-    };
-
-    ret = rb->set_option("Number Of Worms", &worm_count,INT, num_worms_option, 3, NULL);
-    if (worm_count < players) {
-        worm_count=players;
-        }
-    return ret;
-}
-
-/*
-Sets the number of human players
-*/
-bool set_worm_num_players(void)
-{
-    bool ret;
-    static const struct opt_items num_players_option[4] = {
-        { "0", -1 },
-        { "1", -1 },
-        { "2", -1 },
-        { "3", -1 }
-    };
-
-    ret = rb->set_option("Number of Players", &players, INT,num_players_option , 4, NULL);
-                    if (players > worm_count) {
-                        worm_count = players;
-                    }
-                    if (players > 2) {
-                        use_remote = true;
-                    }
-    return ret;
-}
-
-/*
-Sets the size of each argh block created
-*/
-bool set_worm_argh_size(void)
-{
-    static const struct opt_items argh_size_option[11] = {
-        { "0", -1 },
-        { "1", -1 },
-        { "2", -1 },
-        { "3", -1 },
-        { "4", -1 },
-        { "5", -1 },
-        { "6", -1 },
-        { "7", -1 },
-        { "8", -1 },
-        { "9", -1 },
-        { "10", -1 }
-    };
-
-    return rb->set_option("Argh Size", &argh_size,INT,argh_size_option , 11, NULL);
-}
-
-/*
-Sets the amount a worm grows per food
-*/
-bool set_worm_food(void)
-{
-    static const struct opt_items worm_food_option[11] = {
-        { "0", -1 },
-        { "1", -1 },
-        { "2", -1 },
-        { "3", -1 },
-        { "4", -1 },
-        { "5", -1 },
-        { "6", -1 },
-        { "7", -1 },
-        { "8", -1 },
-        { "9", -1 },
-        { "10", -1 }
-    };
-    return rb->set_option("Worm Growth Per Food", &worm_food,INT,worm_food_option , 11, NULL);
-}
-
-/*
-Sets the number of arghs created per food
-*/
-bool set_argh_per_food(void)
-{
-    static const struct opt_items argh_food_option[5] = {
-        { "0", -1 },
-        { "1", -1 },
-        { "2", -1 },
-        { "3", -1 },
-        { "4", -1 },
-    };
-    return rb->set_option("Arghs Per Food", &arghs_per_food,INT,argh_food_option , 5, NULL);
-}
-
-/*
-Sets the number of ticks per move
-*/
-bool set_worm_speed(void)
-{
-    bool ret;
-    static const struct opt_items speed_option[19] = {
-        { "0", -1 },
-        { "1", -1 },
-        { "2", -1 },
-        { "3", -1 },
-        { "4", -1 },
-        { "5", -1 },
-        { "6", -1 },
-        { "7", -1 },
-        { "8", -1 },
-        { "9", -1 },
-        { "10", -1 },
-        { "11", -1 },
-        { "12", -1 },
-        { "13", -1 },
-        { "14", -1 },
-        { "15", -1 },
-        { "16", -1 },
-        { "17", -1 },
-        { "18", -1 },
-    };
-
-
-    speed = 20 - speed;
-    ret = rb->set_option("Worm Speed", &speed,INT,speed_option , 19, NULL);
-    speed = 20 - speed;
-    return ret;
-}
-
-/*
-Sets the control style, which depends on the number of players,
-remote control existing, etc
-bool set_bool_options(char* string, bool* variable,
-                      char* yes_str, char* no_str, void (*function)(bool))
-*/
-bool set_worm_control_style(void)
-{
-    static const struct opt_items key1_option[2] = {
-        { "Remote Control", -1 },
-        { "No Rem. Control", -1 },
-    };
-
-    static const struct opt_items key2_option[2] = {
-        { "2 Key Control", -1 },
-        { "4 Key COntrol", -1 },
-    };
-
-    static const struct opt_items key3_option[1] = {
-        { "Out of Control", -1 },
-    };
-
-    if (players > 1) {
-        rb->set_option("Control Style",&use_remote,INT, key1_option, 2, NULL);
-    } else {
-        if (players > 0) {
-            rb->set_option("Control Style",&use_remote,INT, key2_option, 2, NULL);
-        }
-        else {
-            rb->set_option("Control Style",&use_remote,INT, key3_option, 1, NULL);
-        }
-    }
-    return false;
-}
-
-void default_settings(void)
+static void default_settings(void)
 {
     arghs_per_food = ARGHS_PER_FOOD;
     argh_size = ARGH_SIZE;
@@ -2487,9 +2280,9 @@ void default_settings(void)
 }
 
 /*
-Launches the wormlet game
-*/
-bool launch_wormlet(void)
+ * Launches the wormlet game
+ */
+static bool launch_wormlet(void)
 {
     int game_result = 1;
 
@@ -2512,8 +2305,6 @@ bool launch_wormlet(void)
     }
     return false;
 }
-
-/* End of settings/changes etc */
 
 /**
  * Main entry point
@@ -2563,104 +2354,6 @@ enum plugin_status plugin_start(const void* parameter)
         { "Yes", -1 },
     };
 
-    static const struct opt_items num_worms_option[3] = {
-        { "1", -1 },
-        { "2", -1 },
-        { "3", -1 }
-    };
-
-#ifdef MULTIPLAYER
-    static const struct opt_items num_players_option[4] = {
-#else
-    static const struct opt_items num_players_option[2] = {
-#endif
-        { "0", -1 },
-        { "1", -1 }
-#ifdef MULTIPLAYER
-        ,{ "2", -1 },
-        { "3", -1 }
-#endif
-    };
-
-    static const struct opt_items argh_size_option[9] = {
-        { "2", -1 },
-        { "3", -1 },
-        { "4", -1 },
-        { "5", -1 },
-        { "6", -1 },
-        { "7", -1 },
-        { "8", -1 },
-        { "9", -1 },
-        { "10", -1 }
-    };
-
-    static const struct opt_items food_size_option[9] = {
-        { "2", -1 },
-        { "3", -1 },
-        { "4", -1 },
-        { "5", -1 },
-        { "6", -1 },
-        { "7", -1 },
-        { "8", -1 },
-        { "9", -1 },
-        { "10", -1 }
-    };
-
-    static const struct opt_items worm_food_option[16] = {
-        { "0", -1 },
-        { "1", -1 },
-        { "2", -1 },
-        { "3", -1 },
-        { "4", -1 },
-        { "5", -1 },
-        { "6", -1 },
-        { "7", -1 },
-        { "8", -1 },
-        { "9", -1 },
-        { "10", -1 },
-        { "11", -1 },
-        { "12", -1 },
-        { "13", -1 },
-        { "14", -1 },
-        { "15", -1 }
-    };
-
-    static const struct opt_items argh_food_option[9] = {
-        { "0", -1 },
-        { "1", -1 },
-        { "2", -1 },
-        { "3", -1 },
-        { "4", -1 },
-        { "5", -1 },
-        { "6", -1 },
-        { "7", -1 },
-        { "8", -1 }
-    };
-
-    static const struct opt_items speed_option[21] = {
-        { "0", -1 },
-        { "1", -1 },
-        { "2", -1 },
-        { "3", -1 },
-        { "4", -1 },
-        { "5", -1 },
-        { "6", -1 },
-        { "7", -1 },
-        { "8", -1 },
-        { "9", -1 },
-        { "10", -1 },
-        { "11", -1 },
-        { "12", -1 },
-        { "13", -1 },
-        { "14", -1 },
-        { "15", -1 },
-        { "16", -1 },
-        { "17", -1 },
-        { "18", -1 },
-        { "19", -1 },
-        { "20", -1 }
-    };
-
     static const struct opt_items remoteonly_option[1] = {
         { "Remote Control", -1 }
     };
@@ -2701,23 +2394,20 @@ enum plugin_status plugin_start(const void* parameter)
                 launch_wormlet();
                 break;
             case 1:
-                new_setting = worm_count - 1;
-                rb->set_option("Number of Worms", &new_setting, INT, num_worms_option, 3, NULL);
-                if (new_setting != worm_count)
-                    worm_count = new_setting + 1;
+                rb->set_int("Number of Worms", "", UNIT_INT, &worm_count, NULL,
+                            1, 1, 3, NULL);
                 if (worm_count < players) {
                     worm_count = players;
                 }
                 break;
             case 2:
-                new_setting = players;
 #ifdef MULTIPLAYER
-                rb->set_option("Number of Players", &new_setting, INT, num_players_option , 4, NULL);
+                rb->set_int("Number of Players", "", UNIT_INT, &players, NULL,
+                            1, 0, 4, NULL);
 #else
-                rb->set_option("Number of Players", &new_setting, INT, num_players_option , 2, NULL);
+                rb->set_int("Number of Players", "", UNIT_INT, &players, NULL,
+                            1, 0, 2, NULL);
 #endif
-                if (new_setting != players)
-                    players = new_setting;
                 if (players > worm_count) {
                     worm_count = players;
                 }
@@ -2726,63 +2416,55 @@ enum plugin_status plugin_start(const void* parameter)
                 }
                 break;
             case 3:
-                new_setting = use_remote;
                 switch(players) {
                     case 0:
-                        rb->set_option("Control Style",&new_setting,INT, nokey_option, 1, NULL);
+                        rb->set_option("Control Style",&use_remote,INT,
+                                       nokey_option, 1, NULL);
                         break;
                     case 1:
-                        rb->set_option("Control Style",&new_setting,INT, key24_option, 2, NULL);
+                        rb->set_option("Control Style",&use_remote,INT,
+                                       key24_option, 2, NULL);
                         break;
                     case 2:
 #ifdef REMOTE
-                    rb->set_option("Control Style",&new_setting,INT, remote_option, 2, NULL);
+                        rb->set_option("Control Style",&use_remote,INT,
+                                       remote_option, 2, NULL);
 #else
-                    rb->set_option("Control Style",&new_setting,INT, key2_option, 1, NULL);
+                        rb->set_option("Control Style",&use_remote,INT,
+                                       key2_option, 1, NULL);
 #endif
                         break;
                     case 3:
-                        rb->set_option("Control Style",&new_setting,INT, remoteonly_option, 1, NULL);
+                        rb->set_option("Control Style",&use_remote,INT,
+                                       remoteonly_option, 1, NULL);
                         break;
                 }
-                if (new_setting != use_remote)
-                    use_remote = new_setting;
                 break;
             case 4:
-                new_setting = worm_food;
-                rb->set_option("Worm Growth Per Food", &new_setting,INT,worm_food_option , 16, NULL);
-                if (new_setting != worm_food)
-                    worm_food = new_setting;
+                rb->set_int("Worm Growth Per Food", "", UNIT_INT, &worm_food,
+                            NULL, 1, 0, 15, NULL);
                 break;
             case 5:
-                new_setting = speed;
-                new_setting = 20 - new_setting;
-                rb->set_option("Worm Speed", &new_setting,INT,speed_option , 21, NULL);
-                new_setting = 20 - new_setting;
-                if (new_setting != speed)
-                    speed = new_setting;
+                new_setting = 20 - speed;
+                rb->set_int("Worm Speed", "", UNIT_INT, &new_setting,
+                            NULL, 1, 0, 20, NULL);
+                speed = 20 - new_setting;
                 break;
             case 6:
-                new_setting = arghs_per_food;
-                rb->set_option("Arghs Per Food", &new_setting,INT,argh_food_option , 9, NULL);
-                if (new_setting != arghs_per_food)
-                    arghs_per_food = new_setting;
+                rb->set_int("Arghs Per Food", "", UNIT_INT, &arghs_per_food,
+                            NULL, 1, 0, 8, NULL);
                 break;
             case 7:
-                new_setting = argh_size-2;
-                rb->set_option("Argh Size", &new_setting,INT,argh_size_option , 9, NULL);
-                if (new_setting != argh_size)
-                    argh_size = new_setting+2;
+                rb->set_int("Argh Size", "", UNIT_INT, &argh_size,
+                            NULL, 1, 2, 10, NULL);
                 break;
             case 8:
-                new_setting = food_size-2;
-                rb->set_option("Food Size", &new_setting,INT,food_size_option, 9, NULL);
-                if (new_setting != food_size)
-                    food_size = new_setting+2;
+                rb->set_int("Food Size", "", UNIT_INT, &food_size,
+                            NULL, 1, 2, 10, NULL);
                 break;
             case 9:
                 new_setting = 0;
-                rb->set_option("Reset Settings?", &new_setting,INT, noyes , 2, NULL);
+                rb->set_option("Reset Settings?", &new_setting, INT, noyes , 2, NULL);
                 if (new_setting == 1)
                     default_settings();
                 break;
