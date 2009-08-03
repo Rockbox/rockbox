@@ -167,11 +167,6 @@ PLUGIN_HEADER
 #define UNUSED __attribute__ ((unused))
 #endif
 
-#ifndef ABS
-#define ABS(x) (((x) < 0) ? (-(x)) : (x))
-#endif
-
-
 /* Defines common to all models */
 #define UFO_Y (SCORENUM_Y + FONT_HEIGHT + ALIEN_HEIGHT)
 #define PLAYFIELD_Y (LCD_HEIGHT - SHIP_HEIGHT - 2)

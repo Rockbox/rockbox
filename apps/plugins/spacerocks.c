@@ -246,8 +246,6 @@ PLUGIN_HEADER
 #endif
 #endif
 
-#define ABS(x) ((x)>0?(x):-(x))
-
 #define RES MAX(LCD_WIDTH, LCD_HEIGHT)
 #define LARGE_LCD RES >= 200
 #define ENEMY_MISSILE_SURVIVAL_LENGTH RES/2

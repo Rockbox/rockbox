@@ -102,7 +102,6 @@ PLUGIN_HEADER
 #define X_5_POS (X_4_POS + REC_WIDTH)  /* x5 = 110, column 111 left blank */
 
 #define SIGN(x) ((x)<0?-1:1)
-#define ABS(x) ((x)<0?-(x):(x))
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD

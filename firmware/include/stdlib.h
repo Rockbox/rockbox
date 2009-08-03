@@ -35,7 +35,15 @@ void *realloc(void *, size_t);
 void srand(unsigned int seed);
 int rand(void);
 
-#define abs(x) ((x)>0?(x):-(x))
+#ifndef ABS
+#if defined(__GNUC__)
+#define ABS(a) ({typeof (a) ___a = (a); ___a < 0 ? -___a: ___a; })
+#else
+#define ABS(a) (((a) < 0) ? -(a) : (a))
+#endif /* __GNUC__ */
+#endif
+
+#define abs(x) (ABS(x))
 #define labs(x) abs(x)
 
 #ifdef SIMULATOR

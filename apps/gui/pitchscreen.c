@@ -23,6 +23,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h> /* for ABS() */
 #include "config.h"
 #include "sprintf.h"
 #include "action.h"
@@ -41,8 +42,6 @@
 #if CONFIG_CODEC == SWCODEC
 #include "tdspeed.h"
 #endif
-
-#define ABS(x) ((x) > 0 ? (x) : -(x))
 
 #define ICON_BORDER 12 /* icons are currently 7x8, so add ~2 pixels  */
                        /*   on both sides when drawing */

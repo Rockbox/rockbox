@@ -60,7 +60,7 @@
 #define maxdepth 30
 #define true 1
 #define false 0
-#define absv(x) ((x) < 0 ? -(x) : (x))
+#define absv(x) (ABS(x))
 #define taxicab(a,b) (abs(column[a]-column[b]) + abs(row[a]-row[b]))
 
 /* ---- Chess datatypes and variables ---- */

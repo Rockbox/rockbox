@@ -40,13 +40,6 @@
  * case that use a predefined context.
  */
 
-#define ABS(x) \
-({ \
-    typeof(x) xtmp_abs_ = x; \
-    xtmp_abs_ = xtmp_abs_ < 0 ? -xtmp_abs_ : xtmp_abs_; \
-    xtmp_abs_; \
-})
-
 /* Initialize buffer manager */
 void
 buflib_init(struct buflib_context *ctx, void *buf, size_t size)
