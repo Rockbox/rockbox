@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: iap.c 17400 2008-05-07 14:30:29Z xxxxxx $
+ * $Id$
  *
  * Copyright (C) 2002 by Alan Korr & Nick Robinson
  *
