@@ -1654,6 +1654,10 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* now go ahead and have fun! */
 
+#ifdef HAVE_TOUCHSCREEN
+    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+#endif
+
     cal_initial();
 
     while (calStatus != cal_exit ) {
