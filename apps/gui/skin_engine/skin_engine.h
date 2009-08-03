@@ -37,11 +37,11 @@ bool gui_wps_display(struct gui_wps *gwps);
 /* Do a update_type update of the skinned screen */
 bool skin_update(struct gui_wps *gwps, unsigned int update_type);
 
-/* to setup up the wps-data from a format-buffer (isfile = false)
-   from a (wps-)file (isfile = true)
-   if buf == NULL it will load the hardcoded default
+/*
+ * setup up the skin-data from a format-buffer (isfile = false)
+ * or from a skinfile (isfile = true)
  */
-void skin_data_load(struct wps_data *wps_data,
+bool skin_data_load(struct wps_data *wps_data,
                     struct screen *display,
                     const char *buf,
                     bool isfile);

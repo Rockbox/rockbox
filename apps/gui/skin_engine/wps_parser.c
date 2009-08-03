@@ -1666,7 +1666,7 @@ static bool load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
 
 /* to setup up the wps-data from a format-buffer (isfile = false)
    from a (wps-)file (isfile = true)*/
-static bool _skin_data_load(struct wps_data *wps_data,
+bool skin_data_load(struct wps_data *wps_data,
                    struct screen *display,
                    const char *buf,
                    bool isfile)
@@ -1815,54 +1815,6 @@ static bool _skin_data_load(struct wps_data *wps_data,
     }
 }
 
-void skin_data_load(struct wps_data *wps_data,
-                    struct screen *display,
-                    const char *buf,
-                    bool isfile)
-{
-    bool loaded_ok = buf && _skin_data_load(wps_data, display, buf, isfile);
-    if (!loaded_ok) /* load the hardcoded default */
-    {
-        /* set the default wps for the main-screen */
-        if(display->screen_type == SCREEN_MAIN)
-        {
-#if LCD_DEPTH > 1
-            unload_wps_backdrop();
-#endif
-            _skin_data_load(wps_data,
-                          display,
-#ifdef HAVE_LCD_BITMAP
-                          "%s%?it<%?in<%in. |>%it|%fn>\n"
-                          "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
-                          "%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>\n"
-                          "\n"
-                          "%al%pc/%pt%ar[%pp:%pe]\n"
-                          "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
-                          "%pb\n"
-                          "%pm\n", false);
-#else
-                          "%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>\n"
-                          "%pc%?ps<*|/>%pt\n", false);
-#endif
-        }
-#ifdef HAVE_REMOTE_LCD
-        /* set the default wps for the remote-screen */
-        else if(display->screen_type == SCREEN_REMOTE)
-        {
-#if LCD_REMOTE_DEPTH > 1
-            unload_remote_wps_backdrop();
-#endif
-            _skin_data_load(wps_data,
-                          display,
-                          "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
-                          "%s%?it<%?in<%in. |>%it|%fn>\n"
-                          "%al%pc/%pt%ar[%pp:%pe]\n"
-                          "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
-                          "%pb\n", false);
-        }
-#endif
-    }
-}
 
 int wps_subline_index(struct wps_data *data, int line, int subline)
 {

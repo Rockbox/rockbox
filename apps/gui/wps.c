@@ -73,6 +73,11 @@
 /* in milliseconds */
 #define DEFAULT_SKIP_TRESH          3000ul
 
+
+#define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
+                                /* 3% of 30min file == 54s step size */
+#define MIN_FF_REWIND_STEP 500
+
 static int wpsbars;
 /* currently only one wps_state is needed */
 static struct wps_state wps_state;
@@ -85,14 +90,50 @@ static void track_changed_callback(void *param);
 static void nextid3available_callback(void* param);
 
 
-
-#define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
-                                /* 3% of 30min file == 54s step size */
-#define MIN_FF_REWIND_STEP 500
-
-void wps_data_load(enum screen_type screen, const char *buf, bool is_file)
+void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
 {
-    skin_data_load(gui_wps[screen].data, &screens[screen], buf, is_file);
+    bool loaded_ok = buf && skin_data_load(gui_wps[screen].data, &screens[screen], buf, isfile);
+    if (!loaded_ok) /* load the hardcoded default */
+    {
+        char *skin_buf[NB_SCREENS] = {
+#ifdef HAVE_LCD_BITMAP
+            "%s%?it<%?in<%in. |>%it|%fn>\n"
+            "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
+            "%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>\n\n"
+            "%al%pc/%pt%ar[%pp:%pe]\n"
+            "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
+            "%pb\n%pm\n",
+#else
+            "%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>\n"
+            "%pc%?ps<*|/>%pt\n",
+#endif
+#ifdef HAVE_REMOTE_LCD
+            "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
+            "%s%?it<%?in<%in. |>%it|%fn>\n"
+            "%al%pc/%pt%ar[%pp:%pe]\n"
+            "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
+            "%pb\n",
+#endif
+        };
+        skin_data_load(gui_wps[screen].data, &screens[screen],
+                        skin_buf[screen], false);
+        /* set the default wps for the main-screen */
+        if(screen == SCREEN_MAIN)
+        {
+#if LCD_DEPTH > 1
+            unload_wps_backdrop();
+#endif
+        }
+#ifdef HAVE_REMOTE_LCD
+        /* set the default wps for the remote-screen */
+        else if(screen == SCREEN_REMOTE)
+        {
+#if LCD_REMOTE_DEPTH > 1
+            unload_remote_wps_backdrop();
+#endif
+        }
+#endif
+    }
 #ifdef HAVE_REMOVE_LCD
     gui_wps[screen].data->remote_wps = !(screen == SCREEN_MAIN);
 #endif
@@ -103,7 +144,8 @@ void wps_data_init(enum screen_type screen)
     skin_data_init(gui_wps[screen].data);
 }
 
-bool wps_fading_out = false;
+
+static bool wps_fading_out = false;
 void fade(bool fade_in, bool updatewps)
 {
     int fp_global_vol = global_settings.volume << 8;
