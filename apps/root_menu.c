@@ -436,8 +436,9 @@ static int item_callback(int action, const struct menu_item_ex *this_item)
 }
 static int get_selection(int last_screen)
 {
-    unsigned int i;
-    for(i=0; i< sizeof(root_menu__)/sizeof(*root_menu__); i++)
+    int i;
+    int len = ARRAYLEN(root_menu__);
+    for(i=0; i < len; i++)
     {
         if (((root_menu__[i]->flags&MENU_TYPE_MASK) == MT_RETURN_VALUE) && 
             (root_menu__[i]->value == last_screen))
