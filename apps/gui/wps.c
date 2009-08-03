@@ -75,8 +75,8 @@
 
 static int wpsbars;
 /* currently only one wps_state is needed */
-struct wps_state wps_state;
-struct gui_wps gui_wps[NB_SCREENS];
+static struct wps_state wps_state;
+static struct gui_wps gui_wps[NB_SCREENS];
 static struct wps_data wps_datas[NB_SCREENS];
 
 /* initial setup of wps_data  */
@@ -89,6 +89,19 @@ static void nextid3available_callback(void* param);
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
+
+void wps_data_load(enum screen_type screen, const char *buf, bool is_file)
+{
+    skin_data_load(gui_wps[screen].data, &screens[screen], buf, is_file);
+#ifdef HAVE_REMOVE_LCD
+    gui_wps[screen].data->remote_wps = !(screen == SCREEN_MAIN);
+#endif
+}
+
+void wps_data_init(enum screen_type screen)
+{
+    skin_data_init(gui_wps[screen].data);
+}
 
 bool wps_fading_out = false;
 void fade(bool fade_in, bool updatewps)
@@ -164,6 +177,7 @@ bool update_onvol_change(struct gui_wps * gwps)
 #endif
     return false;
 }
+
 
 bool ffwd_rew(int button)
 {
@@ -1176,7 +1190,7 @@ void gui_sync_wps_init(void)
     int i;
     FOR_NB_SCREENS(i)
     {
-        wps_data_init(&wps_datas[i]);
+        skin_data_init(&wps_datas[i]);
 #ifdef HAVE_ALBUMART
         wps_datas[i].wps_uses_albumart = 0;
 #endif
@@ -1201,15 +1215,19 @@ void gui_sync_wps_init(void)
 }
 
 #ifdef HAVE_ALBUMART
-/* Returns true if at least one of the gui_wps screens has an album art
-   tag in its wps structure */
-bool gui_sync_wps_uses_albumart(void)
+bool wps_uses_albumart(int *width, int *height)
 {
     int  i;
     FOR_NB_SCREENS(i) {
         struct gui_wps *gwps = &gui_wps[i];
         if (gwps->data && (gwps->data->wps_uses_albumart != WPS_ALBUMART_NONE))
+        {
+            if (width)
+                *width = gui_wps[0].data->albumart_max_width;
+            if (height)
+                *height = gui_wps[0].data->albumart_max_height;
             return true;
+        }
     }
     return false;
 }

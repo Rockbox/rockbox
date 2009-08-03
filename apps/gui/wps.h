@@ -34,4 +34,17 @@ bool ffwd_rew(int button);
 void display_keylock_text(bool locked);
 
 bool is_wps_fading(void);
+
+/* wrapper for the wps to load the skin (.wps/.rwps) files */
+void wps_data_load(enum screen_type, const char *, bool);
+void wps_data_init(enum screen_type);
+
+#ifdef HAVE_ALBUMART
+/*
+ * Returns true if at least one of the gui_wps screens has an album art
+ * tag in its wps structure and writes the width and height into the passed
+ * pointers
+ */
+bool wps_uses_albumart(int*, int*);
+#endif
 #endif

@@ -28,6 +28,7 @@
 #include "dircache.h"
 #include "misc.h"
 #include "settings.h"
+#include "wps.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
@@ -279,16 +280,16 @@ bool find_albumart(const struct mp3entry *id3, char *buf, int buflen)
         return false;
 
     char size_string[9];
-    struct wps_data *data = gui_wps[0].data;
+    int width = 0, height = 0;
 
-    if (!data)
+    if (!wps_uses_albumart(&width, &height))
         return false;
 
     logf("Looking for album art for %s", id3->path);
 
     /* Write the size string, e.g. ".100x100". */
     snprintf(size_string, sizeof(size_string), ".%dx%d",
-             data->albumart_max_width, data->albumart_max_height);
+             width, height);
 
     /* First we look for a bitmap of the right size */
     if (search_albumart_files(id3, size_string, buf, buflen))
@@ -372,9 +373,14 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
 void get_albumart_size(struct bitmap *bmp)
 {
     /* FIXME: What should we do with albumart on remote? */
-    struct wps_data *data = gui_wps[0].data;
+    int width, height;
 
-    bmp->width = data->albumart_max_width;
-    bmp->height = data->albumart_max_height;
+    if (!wps_uses_albumart(&width, &height))
+    {
+        width = 0; height = 0;
+    }
+
+    bmp->width = width;
+    bmp->height = height;
 }
 #endif /* PLUGIN */

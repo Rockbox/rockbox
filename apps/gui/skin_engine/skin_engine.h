@@ -30,11 +30,6 @@
 int wps_get_touchaction(struct wps_data *data);
 #endif
 
-#ifdef HAVE_ALBUMART
-/* gives back if WPS contains an albumart tag */
-bool gui_sync_wps_uses_albumart(void);
-#endif
-
 /* setup and display a WPS for the first time */
 bool gui_wps_display(struct gui_wps *gwps);
  
@@ -52,8 +47,6 @@ void skin_data_load(struct wps_data *wps_data,
                     bool isfile);
 
 
-
-
-
-
+/* initial setup of wps_data */
+void skin_data_init(struct wps_data *wps_data);
 #endif

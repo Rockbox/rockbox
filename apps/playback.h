@@ -49,7 +49,7 @@ void codec_thread_do_callback(void (*fn)(void),
 int audio_current_aa_hid(void);
 #endif
 
-#if CONFIG_CODEC == SWCODEC /* This #ifdef is better here than gui/gwps.c */
+#if CONFIG_CODEC == SWCODEC /* This #ifdef is better here than gui/wps.c */
 extern void audio_next_dir(void);
 extern void audio_prev_dir(void);
 #else

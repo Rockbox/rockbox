@@ -1552,7 +1552,7 @@ static void wps_images_clear(struct wps_data *data)
 #endif
 
 /* initial setup of wps_data */
-void wps_data_init(struct wps_data *wps_data)
+void skin_data_init(struct wps_data *wps_data)
 {
 #ifdef HAVE_LCD_BITMAP
     wps_images_clear(wps_data);
@@ -1581,7 +1581,7 @@ static void wps_reset(struct wps_data *data)
     bool rwps = data->remote_wps; /* remember whether the data is for a RWPS */
 #endif
     memset(data, 0, sizeof(*data));
-    wps_data_init(data);
+    skin_data_init(data);
 #ifdef HAVE_REMOTE_LCD
     data->remote_wps = rwps;
 #endif
@@ -1666,7 +1666,7 @@ static bool load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
 
 /* to setup up the wps-data from a format-buffer (isfile = false)
    from a (wps-)file (isfile = true)*/
-static bool wps_data_load(struct wps_data *wps_data,
+static bool _skin_data_load(struct wps_data *wps_data,
                    struct screen *display,
                    const char *buf,
                    bool isfile)
@@ -1820,7 +1820,7 @@ void skin_data_load(struct wps_data *wps_data,
                     const char *buf,
                     bool isfile)
 {
-    bool loaded_ok = buf && wps_data_load(wps_data, display, buf, isfile);
+    bool loaded_ok = buf && _skin_data_load(wps_data, display, buf, isfile);
     if (!loaded_ok) /* load the hardcoded default */
     {
         /* set the default wps for the main-screen */
@@ -1829,7 +1829,7 @@ void skin_data_load(struct wps_data *wps_data,
 #if LCD_DEPTH > 1
             unload_wps_backdrop();
 #endif
-            wps_data_load(wps_data,
+            _skin_data_load(wps_data,
                           display,
 #ifdef HAVE_LCD_BITMAP
                           "%s%?it<%?in<%in. |>%it|%fn>\n"
@@ -1852,7 +1852,7 @@ void skin_data_load(struct wps_data *wps_data,
 #if LCD_REMOTE_DEPTH > 1
             unload_remote_wps_backdrop();
 #endif
-            wps_data_load(wps_data,
+            _skin_data_load(wps_data,
                           display,
                           "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
                           "%s%?it<%?in<%in. |>%it|%fn>\n"

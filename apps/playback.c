@@ -1872,9 +1872,10 @@ static void audio_finish_load_track(void)
         }
     }
 #ifdef HAVE_ALBUMART
-    if (tracks[track_widx].aa_hid < 0 && gui_sync_wps_uses_albumart())
+    if (tracks[track_widx].aa_hid < 0)
     {
         char aa_path[MAX_PATH];
+        /* find_albumart will error out if the wps doesn't have AA */
         if (find_albumart(track_id3, aa_path, sizeof(aa_path)))
         {
             tracks[track_widx].aa_hid = bufopen(aa_path, 0, TYPE_BITMAP);

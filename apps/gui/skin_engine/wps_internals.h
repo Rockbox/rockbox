@@ -470,9 +470,6 @@ struct wps_data
     unsigned int button_time_volume;
 };
 
-/* initial setup of wps_data */
-void wps_data_init(struct wps_data *wps_data);
-
 
 /* Redraw statusbars if necessary */
 void gwps_draw_statusbars(void);
@@ -535,10 +532,6 @@ struct gui_wps
 
 /* gui_wps end */
 
-
-/* currently only on wps_state is needed */
-extern struct wps_state wps_state;
-extern struct gui_wps gui_wps[NB_SCREENS];
 
 /***** wps_tokens.c ******/
 
