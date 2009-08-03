@@ -1416,6 +1416,7 @@ target/arm/s5l8700/adc-s5l8700.c
 target/arm/s5l8700/i2c-s5l8700.c
 target/arm/s5l8700/kernel-s5l8700.c
 target/arm/s5l8700/timer-s5l8700.c
+target/arm/s5l8700/wmcodec-s5l8700.c
 target/arm/s5l8700/yps3/button-yps3.c
 target/arm/s5l8700/yps3/lcd-yps3.c
 target/arm/s5l8700/yps3/fmradio-i2c-yps3.c

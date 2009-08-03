@@ -54,6 +54,7 @@
 #include "tuner.h"
 #include "si4700.h"
 #include "fmradio_i2c.h"
+#include "wmcodec.h"
 
 char version[] = APPSVERSION;
 #define LONG_DELAY  200000
@@ -77,8 +78,10 @@ void main(void)
     int i;
     struct si4700_dbg_info si4700_info;
 //    unsigned int data;
-    int brightness = 0;
+    int brightness = DEFAULT_BRIGHTNESS_SETTING;
     unsigned int button;
+    unsigned int fm_frequency = 100700000;
+    int audiovol = 0x60;
     
     // enable all peripherals
     PWRCON = 0;
@@ -113,18 +116,31 @@ void main(void)
     fmradio_i2c_init();
     adc_init();
     _backlight_init();
-    
+    button_init_device();
+        
     // FM power
     si4700_init();
     tuner_power(true);
     si4700_set(RADIO_SLEEP, 0);
     si4700_set(RADIO_MUTE, 0);
-    si4700_set(RADIO_FREQUENCY, 100700000);
+    si4700_set(RADIO_FREQUENCY, fm_frequency);
     
     lcd_puts_scroll(0,0,"+++ this is a very very long line to test scrolling. ---");
 
-    button_init_device();
+    // WM1800 codec configuration
+    wmcodec_write(0x0F, 0);     // codec reset
+    wmcodec_write(0x19, 0xF0);  // pwr mgmt1: VMID = 1, VREF, AINL, AINR
+    wmcodec_write(0x1A, 0x60);  // pwr mgmt2: LOUT1, ROUT1
+    wmcodec_write(0x2F, 0x0C);  // pwr mgmt3: LOMIX, ROMIX
+    wmcodec_write(0x02, audiovol);              // LOUT1VOL
+    wmcodec_write(0x03, audiovol | (1 << 8));   // ROUT1VOL
+    wmcodec_write(0x22, (1 << 7) | (7 << 4));   // left out mix (1)
+    wmcodec_write(0x25, (1 << 7) | (7 << 4));   // right out mix (2)
     
+    // enable audio
+    PCON5 = (PCON5 & ~0x0000000F) | 0x00000001;
+    PDAT5 |= 1;
+
     while (true)
     {
         line = 1;
@@ -143,17 +159,19 @@ void main(void)
         lcd_puts(0, line++, mystring);
 #endif 
 
-#if 0   /* enable this so see info about the codec */
-        memset(read_data, 0, sizeof(read_data));
-        for (i = 0; i < 1; i++) {
-            i2c_read(0x34, i, 2, read_data);
-            data = read_data[0] << 8 | read_data[1];
-            snprintf(mystring + 4 * i, 64, "%04X", data);
-        }
-        lcd_puts(0, line++, mystring);
-#endif
-
 #if 1   /* enable this to see radio debug info */
+        button = button_read_device();
+        if (button & BUTTON_RIGHT) {
+            fm_frequency += 100000;
+            si4700_set(RADIO_FREQUENCY, fm_frequency);
+        }
+        if (button & BUTTON_LEFT) {
+            fm_frequency -= 100000;
+            si4700_set(RADIO_FREQUENCY, fm_frequency);
+        }
+        snprintf(mystring, 64, "FM frequency: %9d", fm_frequency);
+        lcd_puts(0, line++, mystring);
+
         si4700_dbg_info(&si4700_info);
         col = snprintf(mystring, 64, "FM: ");
         for (i = 0; i < 16; i++) {
@@ -164,6 +182,26 @@ void main(void)
             }
         }
         line = rds_decode(line, &si4700_info);
+#endif
+
+#if 1   /* volume control with up/down keys */
+        button = button_read_device();
+        if (button & BUTTON_UP) {
+            if (audiovol < 127) {
+                audiovol++;
+                wmcodec_write(0x02, audiovol);
+                wmcodec_write(0x03, (1 << 8) | audiovol);
+            }
+        }
+        if (button & BUTTON_DOWN) {
+            if (audiovol > 0) {
+                audiovol--;
+                wmcodec_write(0x02, audiovol);
+                wmcodec_write(0x03, (1 << 8) | audiovol);
+            }
+        }
+        snprintf(mystring, 64, "volume %3d", audiovol);
+        lcd_puts(0, line++, mystring);
 #endif
 
 #if 1   /* enable this to see ADC info */
@@ -211,13 +249,14 @@ void main(void)
 #endif
 
 #if 1   /* backlight brightness controlled by up/down keys */
-        if (button_read_device() & BUTTON_UP) {
+        button = button_read_device();
+        if (button & BUTTON_MENU) {
             if (brightness < MAX_BRIGHTNESS_SETTING) {
                 brightness++;
                 _backlight_set_brightness(brightness);
             }
         }
-        else  if (button_read_device() & BUTTON_DOWN) {
+        else  if (button & BUTTON_BACK) {
             if (brightness > MIN_BRIGHTNESS_SETTING) {
                 brightness--;
                 _backlight_set_brightness(brightness);
