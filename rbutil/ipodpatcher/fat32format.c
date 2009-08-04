@@ -54,9 +54,13 @@ static inline uint32_t swap32(uint32_t value)
 /* The following functions are not the most efficient, but are
    self-contained and don't require needing to know endianness of CPU
    at compile-time.
+
+   Note that htole16/htole32 exist on some platforms, so for
+   simplicity we use different names.
+
 */
 
-uint16_t htole16(uint16_t x)
+static uint16_t rb_htole16(uint16_t x)
 {
     uint16_t test = 0x1234;
     unsigned char* p = (unsigned char*)&test;
@@ -69,7 +73,7 @@ uint16_t htole16(uint16_t x)
     }
 }
 
-uint32_t htole32(uint32_t x)
+static uint32_t rb_htole32(uint32_t x)
 {
     uint32_t test = 0x12345678;
     unsigned char* p = (unsigned char*)&test;
@@ -306,28 +310,28 @@ static void create_boot_sector(unsigned char* buf,
     pFAT32BootSect->sJmpBoot[1]=0x5A;
     pFAT32BootSect->sJmpBoot[2]=0x90;
     strcpy( pFAT32BootSect->sOEMName, "MSWIN4.1" );
-    pFAT32BootSect->wBytsPerSec = htole16(BytesPerSect);
+    pFAT32BootSect->wBytsPerSec = rb_htole16(BytesPerSect);
     pFAT32BootSect->bSecPerClus = SectorsPerCluster ;
-    pFAT32BootSect->wRsvdSecCnt = htole16(ReservedSectCount);
+    pFAT32BootSect->wRsvdSecCnt = rb_htole16(ReservedSectCount);
     pFAT32BootSect->bNumFATs = NumFATs;
-    pFAT32BootSect->wRootEntCnt = htole16(0);
-    pFAT32BootSect->wTotSec16 = htole16(0);
+    pFAT32BootSect->wRootEntCnt = rb_htole16(0);
+    pFAT32BootSect->wTotSec16 = rb_htole16(0);
     pFAT32BootSect->bMedia = 0xF8;
-    pFAT32BootSect->wFATSz16 = htole16(0);
-    pFAT32BootSect->wSecPerTrk = htole16(ipod->sectors_per_track);
-    pFAT32BootSect->wNumHeads = htole16(ipod->num_heads);
-    pFAT32BootSect->dHiddSec = htole16(ipod->pinfo[partition].start);
-    pFAT32BootSect->dTotSec32 = htole32(TotalSectors);
-    pFAT32BootSect->dFATSz32 = htole32(FatSize);
-    pFAT32BootSect->wExtFlags = htole16(0);
-    pFAT32BootSect->wFSVer = htole16(0);
-    pFAT32BootSect->dRootClus = htole32(2);
-    pFAT32BootSect->wFSInfo = htole16(1);
-    pFAT32BootSect->wBkBootSec = htole16(BackupBootSect);
+    pFAT32BootSect->wFATSz16 = rb_htole16(0);
+    pFAT32BootSect->wSecPerTrk = rb_htole16(ipod->sectors_per_track);
+    pFAT32BootSect->wNumHeads = rb_htole16(ipod->num_heads);
+    pFAT32BootSect->dHiddSec = rb_htole16(ipod->pinfo[partition].start);
+    pFAT32BootSect->dTotSec32 = rb_htole32(TotalSectors);
+    pFAT32BootSect->dFATSz32 = rb_htole32(FatSize);
+    pFAT32BootSect->wExtFlags = rb_htole16(0);
+    pFAT32BootSect->wFSVer = rb_htole16(0);
+    pFAT32BootSect->dRootClus = rb_htole32(2);
+    pFAT32BootSect->wFSInfo = rb_htole16(1);
+    pFAT32BootSect->wBkBootSec = rb_htole16(BackupBootSect);
     pFAT32BootSect->bDrvNum = 0x80;
     pFAT32BootSect->Reserved1 = 0;
     pFAT32BootSect->bBootSig = 0x29;
-    pFAT32BootSect->dBS_VolID = htole32(VolumeId);
+    pFAT32BootSect->dBS_VolID = rb_htole32(VolumeId);
     memcpy(pFAT32BootSect->sVolLab, VolId, 11);
     memcpy(pFAT32BootSect->sBS_FilSysType, "FAT32   ", 8 );
 
@@ -340,15 +344,15 @@ static void create_fsinfo(unsigned char* buf)
     struct FAT_FSINFO* pFAT32FsInfo = (struct FAT_FSINFO*)buf;
 
     /* FSInfo sect */
-    pFAT32FsInfo->dLeadSig = htole32(0x41615252);
-    pFAT32FsInfo->dStrucSig = htole32(0x61417272);
-    pFAT32FsInfo->dFree_Count = htole32((uint32_t) -1);
-    pFAT32FsInfo->dNxt_Free = htole32((uint32_t) -1);
-    pFAT32FsInfo->dTrailSig = htole32(0xaa550000);
-    pFAT32FsInfo->dFree_Count = htole32((UserAreaSize/SectorsPerCluster)-1);
+    pFAT32FsInfo->dLeadSig = rb_htole32(0x41615252);
+    pFAT32FsInfo->dStrucSig = rb_htole32(0x61417272);
+    pFAT32FsInfo->dFree_Count = rb_htole32((uint32_t) -1);
+    pFAT32FsInfo->dNxt_Free = rb_htole32((uint32_t) -1);
+    pFAT32FsInfo->dTrailSig = rb_htole32(0xaa550000);
+    pFAT32FsInfo->dFree_Count = rb_htole32((UserAreaSize/SectorsPerCluster)-1);
 
     /* clusters 0-1 reserved, we used cluster 2 for the root dir */
-    pFAT32FsInfo->dNxt_Free = htole32(3); 
+    pFAT32FsInfo->dNxt_Free = rb_htole32(3); 
 }
 
 static void create_firstfatsector(unsigned char* buf)
@@ -356,9 +360,9 @@ static void create_firstfatsector(unsigned char* buf)
     uint32_t* p = (uint32_t*)buf;  /* We know the buffer is aligned */
 
     /* First FAT Sector */
-    p[0] = htole32(0x0ffffff8);  /* Reserved cluster 1 media id in low byte */
-    p[1] = htole32(0x0fffffff);  /* Reserved cluster 2 EOC */
-    p[2] = htole32(0x0fffffff);  /* end of cluster chain for root dir */
+    p[0] = rb_htole32(0x0ffffff8); /* Reserved cluster 1 media id in low byte */
+    p[1] = rb_htole32(0x0fffffff); /* Reserved cluster 2 EOC */
+    p[2] = rb_htole32(0x0fffffff); /* end of cluster chain for root dir */
 }
 
 int format_partition(struct ipod_t* ipod, int partition)
