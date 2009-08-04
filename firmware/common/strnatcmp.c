@@ -58,18 +58,18 @@ nat_isdigit(int a)
      return isdigit(a);
 }
 
-
+#if 0
 static inline int
 nat_isspace(int a)
 {
      return isspace(a);
 }
-
+#endif
 
 static inline int
 nat_toupper(int a)
 {
-     return toupper(a);
+     return tolower(a);
 }
 
 
@@ -139,14 +139,14 @@ static int strnatcmp0(char const *a, char const *b, int fold_case)
      while (1) {
       ca = to_int(a[ai]);
       cb = to_int(b[bi]);
-
+#if 0
 	  /* skip over leading spaces or zeros */
 	  while (nat_isspace(ca))
 	       ca = to_int(a[++ai]);
 
 	  while (nat_isspace(cb))
 	       cb = to_int(b[++bi]);
-
+#endif
 	  /* process run of digits */
 	  if (nat_isdigit(ca)  &&  nat_isdigit(cb)) {
 	       fractional = (ca == '0' || cb == '0');
