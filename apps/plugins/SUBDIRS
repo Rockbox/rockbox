@@ -53,6 +53,10 @@ midi
 #ifndef RB_PROFILE
 #if MEMORYSIZE > 2  /* mpegplayer allocates at least 2MB of RAM */
 mpegplayer
+#if defined(IRIVER_H300_SERIES)
+/* PDBox is confirmed to run on these player models. */
+pdbox
+#endif
 #endif
 #endif
 #endif
