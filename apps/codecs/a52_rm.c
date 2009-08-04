@@ -157,15 +157,16 @@ next_track:
     ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE );
 
     /* The main decoding loop */
-    while(pkt.timestamp < rmctx.duration) {
+    while(rmctx.audio_pkt_cnt < rmctx.nb_packets) {
         ci->yield();
         if (ci->stop_codec || ci->new_track)
             break;
 
         if (ci->seek_time) {
-            packet_offset = ci->seek_time / (((rmctx.block_align + PACKET_HEADER_SIZE)*8*1000)/rmctx.bit_rate);
+            packet_offset = ci->seek_time / ((rmctx.block_align*8*1000)/rmctx.bit_rate);
             ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE + packet_offset*(rmctx.block_align + PACKET_HEADER_SIZE));
-            samplesdone = A52_SAMPLESPERFRAME * packet_offset;          
+            rmctx.audio_pkt_cnt = packet_offset;
+            samplesdone = (rmctx.sample_rate/1000 * ci->seek_time);
             ci->seek_complete();
         }
 
