@@ -371,12 +371,14 @@ PLUGIN_HEADER
 #define PEGBOX_DOWN     BUTTON_DOWN
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
+#define PEGBOX_SELECT     BUTTON_PLAY
 
 #define SAVE_TEXT "REC + FFWD"
 #define QUIT_TEXT "REC + PLAY"
 #define RESTART_TEXT "REC + REW"
 #define LVL_UP_TEXT "FFWD"
 #define LVL_DOWN_TEXT "REW"
+#define SELECT_TEXT "PLAY"
 
 #else
 #error Unsupported keymap!
