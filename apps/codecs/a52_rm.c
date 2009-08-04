@@ -157,7 +157,7 @@ next_track:
     ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE );
 
     /* The main decoding loop */
-    while(rmctx.audio_pkt_cnt < rmctx.nb_packets) {
+    while((unsigned)rmctx.audio_pkt_cnt < rmctx.nb_packets) {
         ci->yield();
         if (ci->stop_codec || ci->new_track)
             break;
