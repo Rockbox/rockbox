@@ -36,8 +36,8 @@ ipodpatcher: $(SRC) ipodio-posix.c $(BOOTSRC)
 	gcc $(CFLAGS) -o ipodpatcher $(SRC) ipodio-posix.c $(BOOTSRC)
 	strip ipodpatcher
 
-ipodpatcher.exe: $(SRC) ipodio-win32.c ipodpatcher-rc.o $(BOOTSRC)
-	$(CC) $(CFLAGS) -o ipodpatcher.exe $(SRC) ipodio-win32.c ipodpatcher-rc.o $(BOOTSRC)
+ipodpatcher.exe: $(SRC) ipodio-win32.c ipodio-win32-scsi.c ipodpatcher-rc.o $(BOOTSRC)
+	$(CC) $(CFLAGS) -o ipodpatcher.exe $(SRC) ipodio-win32.c ipodio-win32-scsi.c ipodpatcher-rc.o $(BOOTSRC)
 	$(CROSS)strip ipodpatcher.exe
 
 ipodpatcher-rc.o: ipodpatcher.rc ipodpatcher.manifest

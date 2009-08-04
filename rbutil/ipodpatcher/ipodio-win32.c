@@ -32,10 +32,9 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef __WIN32__
 #include <windows.h>
+#include <stddef.h>
 #include <winioctl.h>
-#endif
 
 #include "ipodio.h"
 
@@ -201,3 +200,4 @@ ssize_t ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes)
 
     return count;
 }
+

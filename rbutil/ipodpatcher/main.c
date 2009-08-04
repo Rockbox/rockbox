@@ -50,6 +50,7 @@ enum {
    READ_PARTITION,
    WRITE_PARTITION,
    FORMAT_PARTITION,
+   DUMP_XML,
    CONVERT_TO_FAT32
 };
 
@@ -93,6 +94,7 @@ void print_usage(void)
     fprintf(stderr,"  -c,   --convert\n");
     fprintf(stderr,"        --read-aupd          filename.bin\n");
     fprintf(stderr,"        --write-aupd         filename.bin\n");
+    fprintf(stderr,"  -x    --dump-xml           filename.xml\n");
     fprintf(stderr,"\n");
 
 #ifdef __WIN32__
@@ -315,6 +317,13 @@ int main(int argc, char* argv[])
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
+        } else if ((strcmp(argv[i],"-x")==0) ||
+                   (strcmp(argv[i],"--dump-xml")==0)) {
+            action = DUMP_XML;
+            i++;
+            if (i == argc) { print_usage(); return 1; }
+            filename=argv[i];
+            i++;
         } else if ((strcmp(argv[i],"-c")==0) || 
                    (strcmp(argv[i],"--convert")==0)) {
             action = CONVERT_TO_FAT32;
@@ -361,8 +370,26 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    printf("[INFO] Ipod model: %s (\"%s\")\n",ipod.modelstr,
-           ipod.macpod ? "macpod" : "winpod");
+#ifdef __WIN32__
+    /* Windows requires the ipod in R/W mode for SCSI Inquiry */
+    if (ipod_reopen_rw(&ipod) < 0) {
+        return 5;
+    }
+#endif
+
+
+    /* Read the XML info, and if successful, look for the ramsize 
+       (only available for some models - set to 0 if not known) */
+
+    ipod.ramsize = 0;
+
+    if (ipod_get_xmlinfo(&ipod) == 0) {
+        ipod_get_ramsize(&ipod);
+    }
+
+    printf("[INFO] Ipod model: %s ",ipod.modelstr);
+    if (ipod.ramsize > 0) { printf("(%dMB RAM) ",ipod.ramsize); }
+    printf("(\"%s\")\n",ipod.macpod ? "macpod" : "winpod");
 
     if (ipod.ipod_directory[0].vers == 0x10000) {
         fprintf(stderr,"[ERR]  *** ipodpatcher does not support the 2nd Generation Nano! ***\n");
@@ -476,6 +503,24 @@ int main(int argc, char* argv[])
         } else {
             fprintf(stderr,"[ERR]  --write-aupd failed.\n");
         }
+    } else if (action==DUMP_XML) {
+        if (ipod.xmlinfo == NULL) {
+            fprintf(stderr,"[ERR]  No XML to write\n");
+            return 1;
+        }
+
+        outfile = open(filename,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,S_IREAD|S_IWRITE);
+        if (outfile < 0) {
+           perror(filename);
+           return 4;
+        }
+
+        if (write(outfile, ipod.xmlinfo, ipod.xmlinfo_len) < 0) {
+            fprintf(stderr,"[ERR]  --dump-xml failed.\n");
+        } else {
+            fprintf(stderr,"[INFO] XML info written to %s.\n",filename);
+        }
+        close(outfile);
     } else if (action==READ_PARTITION) {
         outfile = open(filename,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,S_IREAD|S_IWRITE);
         if (outfile < 0) {
@@ -570,7 +615,6 @@ int main(int argc, char* argv[])
         fgets(yesno,4,stdin);
     }
 #endif
-
 
     return 0;
 }

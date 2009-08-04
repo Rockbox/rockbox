@@ -34,6 +34,9 @@
 #if defined(linux) || defined (__linux)
 #include <sys/mount.h>
 #include <linux/hdreg.h>
+#include <scsi/scsi_ioctl.h>
+#include <scsi/sg.h>
+
 #define IPOD_SECTORSIZE_IOCTL BLKSSZGET
 
 static void get_geometry(struct ipod_t* ipod)
@@ -50,6 +53,51 @@ static void get_geometry(struct ipod_t* ipod)
     }
 }
 
+/* Linux SCSI Inquiry code based on the documentation and example code from 
+   http://www.ibm.com/developerworks/linux/library/l-scsi-api/index.html
+*/
+
+int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
+                      unsigned char* buf, int bufsize)
+{
+    unsigned char cdb[6];
+    struct sg_io_hdr hdr;
+    unsigned char sense_buffer[255];
+
+    memset(&hdr, 0, sizeof(hdr));
+
+    hdr.interface_id = 'S'; /* this is the only choice we have! */
+    hdr.flags = SG_FLAG_LUN_INHIBIT; /* this would put the LUN to 2nd byte of cdb*/
+
+    /* Set xfer data */
+    hdr.dxferp = buf;
+    hdr.dxfer_len = bufsize;
+
+    /* Set sense data */
+    hdr.sbp = sense_buffer;
+    hdr.mx_sb_len = sizeof(sense_buffer);
+
+    /* Set the cdb format */
+    cdb[0] = 0x12;
+    cdb[1] = 1;   /* Enable Vital Product Data (EVPD) */
+    cdb[2] = page_code & 0xff;
+    cdb[3] = 0;
+    cdb[4] = 0xff;
+    cdb[5] = 0; /* For control filed, just use 0 */
+    
+    hdr.dxfer_direction = SG_DXFER_FROM_DEV;
+    hdr.cmdp = cdb;
+    hdr.cmd_len = 6;
+
+    int ret = ioctl(ipod->dh, SG_IO, &hdr);
+
+    if (ret < 0) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) \
       || defined(__bsdi__) || defined(__DragonFly__)
 #include <sys/disk.h>
@@ -63,6 +111,13 @@ static void get_geometry(struct ipod_t* ipod)
     ipod->sectors_per_track = 63;
 }
 
+int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
+                      unsigned char* buf, int bufsize)
+{
+    /* TODO: Implement for BSD */
+    return -1;
+}
+
 #elif defined(__APPLE__) && defined(__MACH__)
 #include <sys/disk.h>
 #define IPOD_SECTORSIZE_IOCTL DKIOCGETBLOCKSIZE
@@ -73,6 +128,13 @@ static void get_geometry(struct ipod_t* ipod)
     /* Are these universal for all ipods? */
     ipod->num_heads = 255;
     ipod->sectors_per_track = 63;
+}
+
+int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
+                      unsigned char* buf, int bufsize)
+{
+    /* TODO: Implement for OS X */
+    return -1;
 }
 
 #else
@@ -180,3 +242,4 @@ ssize_t ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes)
 {
     return write(ipod->dh, buf, nbytes);
 }
+

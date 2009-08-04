@@ -1401,6 +1401,86 @@ int write_dos_partition_table(struct ipod_t* ipod)
     return 0;
 }
 
+/* Get the XML Device Information, as documented here:
+
+   http://www.ipodlinux.org/wiki/Device_Information
+*/
+
+int ipod_get_xmlinfo(struct ipod_t* ipod)
+{
+    unsigned char hdr[255];
+    unsigned char buf[255];
+    char* p;
+    int psize;
+    int npages;
+    int i;
+
+    if (ipod_scsi_inquiry(ipod, 0xc0, buf, sizeof(buf)) < 0)
+    {
+        fprintf(stderr,"[ERR]  Sending SCSI Command failed.\n");
+        return -1;
+    }
+
+    /* Reading directly into hdr[] causes problems (for an unknown reason) on 
+       win32 */
+    memcpy(hdr, buf, sizeof(hdr));
+
+    npages = hdr[3];
+
+    psize = npages * 0xf8; /* Hopefully this is enough. */
+
+    ipod->xmlinfo = malloc(psize); 
+    ipod->xmlinfo_len = 0;
+
+    if (ipod->xmlinfo == NULL) {
+        fprintf(stderr,"[ERR]  Could not allocate RAM for xmlinfo\n");
+        return -1;
+    }
+
+    p = ipod->xmlinfo;
+    
+    for (i=0; i < npages; i++) {
+        if (ipod_scsi_inquiry(ipod, hdr[i+4], buf, sizeof(buf)) < 0) {
+            fprintf(stderr,"[ERR]  Sending SCSI Command failed.\n");
+            return -1;
+        }
+
+        if ((buf[3] + ipod->xmlinfo_len) > psize) {
+            fprintf(stderr,"[ERR]  Ran out of memory reading xmlinfo\n");
+            free(ipod->xmlinfo);
+            ipod->xmlinfo = NULL;
+            ipod->xmlinfo_len = 0;
+            return -1;
+        }
+
+        memcpy(p, buf + 4, buf[3]);
+        p += buf[3];
+        ipod->xmlinfo_len += buf[3];        
+    }
+
+    /* NULL-terminate the XML info */
+    *p = 0;
+
+    fprintf(stderr,"[INFO] Read XML info (%d bytes)\n",ipod->xmlinfo_len);
+
+    return 0;
+}
+
+void ipod_get_ramsize(struct ipod_t* ipod)
+{
+    const char needle[] = "<key>RAM</key>\n<integer>";
+    char* p;
+
+    if (ipod->xmlinfo == NULL)
+        return;
+
+    p = strstr(ipod->xmlinfo, needle);
+
+    if (p) {
+        ipod->ramsize = atoi(p + sizeof(needle) - 1);
+    }
+}
+
 #ifndef RBUTIL
 
 static inline uint32_t getuint32le(unsigned char* buf)

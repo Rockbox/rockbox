@@ -80,6 +80,9 @@ struct ipod_t {
     char* modelstr;
     char* targetname;
     int macpod;
+    char* xmlinfo;   /* The XML Device Information (if available) */
+    int xmlinfo_len;
+    int ramsize;     /* The amount of RAM in the ipod (if available) */
 #ifdef WITH_BOOTOBJS
     unsigned char* bootloader;
     int bootloader_len;
@@ -91,6 +94,8 @@ int ipod_open(struct ipod_t* ipod, int silent);
 int ipod_reopen_rw(struct ipod_t* ipod);
 int ipod_close(struct ipod_t* ipod);
 int ipod_seek(struct ipod_t* ipod, unsigned long pos);
+int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
+                      unsigned char* buf, int bufsize);
 ssize_t ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes);
 ssize_t ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes);
 int ipod_alloc_buffer(unsigned char** sectorbuf, int bufsize);
