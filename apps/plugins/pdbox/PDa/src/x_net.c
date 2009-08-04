@@ -317,6 +317,7 @@ static void *netreceive_new(t_symbol *compatflag,
 
     x = (t_netreceive *) pd_new(netreceive_class);
     x->x_msgout = outlet_new(&x->x_obj, &s_anything);
+    x->x_connectout = 0;
     x->x_nconnections = 0;
     x->x_udp = udp;
 
@@ -428,8 +429,8 @@ static void netreceive_free(t_netreceive *x)
 #ifdef ROCKBOX
 /* Basically a reimplementation of socketreceiver_getudp()
    from s_inter.c */
-t_binbuf* inbinbuf;
-void outlet_setstacklim(void);
+extern t_binbuf* inbinbuf;
+extern void outlet_setstacklim(void);
 
 void rockbox_receive_callback(struct datagram* dg)
 {

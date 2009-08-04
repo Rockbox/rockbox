@@ -103,7 +103,12 @@ bool receive_datagram(struct event_queue* route,
     /* Copy datagram. */
     memcpy(buffer, (struct datagram*) event.data, sizeof(struct datagram));
 
-    /* Free datagram buffer. */
+    /* Clear datagram event. */
+    memset(((struct datagram*) event.data)->data,
+           0,
+           ((struct datagram*) event.data)->size);
+
+    /* Free datagram event. */
     ((struct datagram*) event.data)->used = false;
 
     /* Everything went ok. */

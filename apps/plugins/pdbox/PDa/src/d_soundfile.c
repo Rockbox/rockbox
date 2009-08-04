@@ -1118,7 +1118,9 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
     if (finalsize > bytelimit / (channels * bytespersamp))
     	finalsize = bytelimit / (channels * bytespersamp);
 #ifdef ROCKBOX
-    fp = open(filename, O_RDONLY);
+    fp = open_soundfile(canvas_getdir(x->x_canvas)->s_name, filename,
+            headersize, &bytespersamp, &bigendian, &channels, &bytelimit,
+            skipframes);
 #else
     fp = fdopen(fd, "rb");
 #endif

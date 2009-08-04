@@ -263,8 +263,14 @@ void rb_ftoan(float f, char* out, int size)
     strcat(out, ".");
     size--;
 
-    /* Calculate first rest and convert it. */
+    /* Calculate first rest. */
     float rest1 = (f - (float) int_part) * 1000000000.0;
+
+    /* If there is no fractional part, return here. */
+    if(rest1 == 0.0f)
+        return;
+
+    /* Convert the first rest to string. */
     int irest1 = (int) rest1;
     snprintf(sbuf, SBUFSIZE-1, "%09d", irest1);
 
@@ -278,8 +284,26 @@ void rb_ftoan(float f, char* out, int size)
     if(size <= 0)
         return;
 
-    /* Calculate second rest and convert it. */
+    /* Calculate second rest. */
     float rest2 = (rest1 - (float) irest1) * 1000000000.0;
+
+    /* If no second rest, check whether
+       the output string has unwanted zero trail,
+       remove it and end processing here. */
+    if(rest2 == 0.0f)
+    {
+        char* zerotrail = out + strlen(out) - 1;
+
+        for(; zerotrail >= out; zerotrail--)
+        {
+            if(*zerotrail == '0')
+                *zerotrail = '\0';
+            else
+                return;
+        }
+    }
+
+    /* Convert second rest. */
     int irest2 = (int) rest2;
     snprintf(sbuf, SBUFSIZE-1, "%09d", irest2);
 
@@ -287,6 +311,16 @@ void rb_ftoan(float f, char* out, int size)
     int rest2_len = strlen(sbuf);
     int rest2_minlen = MIN(size, rest2_len);
     strncat(out, sbuf, rest2_minlen);
+
+    /* Cut trailing zeroes. */
+    char* zerotrail = out + strlen(out) - 1;
+    for(;zerotrail >= out; zerotrail--)
+    {
+            if(*zerotrail == '0')
+                *zerotrail = '\0';
+            else
+                return;
+    }
 }
 
 
