@@ -44,6 +44,7 @@ int sys_soundindevlist[MAXAUDIOINDEV];
 int sys_chinlist[MAXAUDIOINDEV];
 int sys_soundoutdevlist[MAXAUDIOOUTDEV];
 int sys_choutlist[MAXAUDIOOUTDEV];
+t_binbuf* inbinbuf;
 
 /* References for scheduler variables and functions. */
 extern t_time sys_time;
@@ -59,7 +60,7 @@ rates we expect to see: 32000, 44100, 48000, 88200, 96000. */
 bool quit = false;
 
 /* Stack sizes for threads. */
-#define CORESTACKSIZE (8 * 1024 * 1024)
+#define CORESTACKSIZE (1 * 1024 * 1024)
 #define GUISTACKSIZE (512 * 1024)
 
 /* Thread stacks. */
@@ -74,30 +75,45 @@ unsigned int gui_thread_id;
 /* GUI thread */
 void gui_thread(void)
 {
-/*    struct datagram pong; */
+    struct pd_widget widget[128];
+    unsigned int widgets = 0;
+    struct datagram dg;
+    bool update;
+
+    /* Initialize GUI. */
+    pd_gui_init();
+
+    /* Load PD patch. */
+    widgets = pd_gui_load_patch(widget,
+                                sizeof(widget) / sizeof(struct pd_widget));
+
+    /* Draw initial state of UI. */
+    pd_gui_draw(widget, widgets);
 
     /* GUI loop */
     while(!quit)
     {
-#if 0
-        /* Send ping to the core. */
-        SEND_TO_CORE("Ping!");
-        rb->splash(HZ, "Sent ping.");
+        /* Reset update flag. */
+        update = false;
 
-        /* Wait for answer. */
-        while(!RECEIVE_FROM_CORE(&pong))
-            rb->yield();
+        /* Apply timer to widgets. */
+        update |=
+        pd_gui_apply_timeouts(widget, widgets);
 
-        /* If got a pong -- everything allright. */
-        if(memcmp("Pong!", pong.data, pong.size) == 0)
+        /* Process buttons. */
+        update |=
+        pd_gui_parse_buttons(widgets);
+
+        /* Receive and parse datagrams. */
+        while(RECEIVE_FROM_CORE(&dg))
         {
-            rb->splash(HZ, "Got pong!");
-            quit = true;
-            break;
+            update = true;
+            pd_gui_parse_message(&dg, widget, widgets);
         }
-#endif
-        if(rb->button_get(false) == BUTTON_OFF)
-            quit = true;
+
+        /* If there is something to update in GUI, do so. */
+        if(update)
+            pd_gui_draw(widget, widgets);
 
         rb->sleep(1);
     }
@@ -120,6 +136,12 @@ void core_thread(void)
     /* Core scheduler loop */
     while(!quit)
     {
+        /* Receive datagrams. */
+        struct datagram dg;
+
+        while(RECEIVE_TO_CORE(&dg))
+            rockbox_receive_callback(&dg);
+
         /* Use sys_send_dacs() function as timer. */
         while(sys_send_dacs() != SENDDACS_NO)
             sched_tick(sys_time + sys_time_per_dsp_tick);
@@ -194,6 +216,9 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
     }
 
+    /* Boost CPU. */
+    cpu_boost(true);
+
     /* Start threads. */
     core_thread_id =
         rb->create_thread(&core_thread,
@@ -236,6 +261,9 @@ enum plugin_status plugin_start(const void* parameter)
     /* Wait for threads to complete. */
     rb->thread_wait(gui_thread_id);
     rb->thread_wait(core_thread_id);
+
+    /* Unboost CPU. */
+    cpu_boost(false);
 
     /* Close audio subsystem. */
     sys_close_audio();

@@ -197,4 +197,74 @@ void pd_init(void);
 #define sinh rb_sinh
 #define tan rb_tan
 
+#define strtok_r rb->strtok_r
+#define strstr rb->strcasestr
+
+
+/* PdPod GUI declarations. */
+
+enum pd_widget_id
+{
+    PD_BANG,
+    PD_VSLIDER,
+    PD_HSLIDER,
+    PD_VRADIO,
+    PD_HRADIO,
+    PD_NUMBER,
+    PD_SYMBOL,
+    PD_TEXT
+};
+
+struct pd_widget
+{
+    enum pd_widget_id id;
+    char name[128];
+    int x;
+    int y;
+    int w;
+    int h;
+    int min;
+    int max;
+    float value;
+    int timeout;
+};
+
+enum pd_key_id
+{
+    KEY_PLAY,
+    KEY_REWIND,
+    KEY_FORWARD,
+    KEY_MENU,
+    KEY_ACTION,
+    KEY_WHEELLEFT,
+    KEY_WHEELRIGHT,
+    PD_KEYS
+};
+
+/* Map real keys to virtual ones.
+   Feel free to add your preferred keymap here. */
+#if defined(IRIVER_H300_SERIES)
+    /* Added by wincent */
+    #define PDPOD_QUIT (BUTTON_OFF)
+    #define PDPOD_PLAY (BUTTON_ON)
+    #define PDPOD_PREVIOUS (BUTTON_LEFT)
+    #define PDPOD_NEXT (BUTTON_RIGHT)
+    #define PDPOD_MENU (BUTTON_SELECT)
+    #define PDPOD_WHEELLEFT (BUTTON_DOWN)
+    #define PDPOD_WHEELRIGHT (BUTTON_UP)
+    #define PDPOD_ACTION (BUTTON_MODE)
+/* #elif defined(IRIVER_H100_SERIES) */
+#else
+    #warning "No keys defined for this architecture!"
+#endif
+
+/* Prototype of GUI functions. */
+void pd_gui_init(void);
+unsigned int pd_gui_load_patch(struct pd_widget* wg, unsigned int max_widgets);
+void pd_gui_draw(struct pd_widget* wg, unsigned int widgets);
+bool pd_gui_parse_buttons(unsigned int widgets);
+void pd_gui_parse_message(struct datagram* dg,
+                          struct pd_widget* wg, unsigned int widgets);
+bool pd_gui_apply_timeouts(struct pd_widget* wg, unsigned int widgets);
+
 #endif
