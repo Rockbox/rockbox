@@ -134,10 +134,10 @@ void atom_string(t_atom *a, char *buf, unsigned int bufsize)
     }
     	break;
     case A_DOLLAR:
-    	snprintf(buf, bufsize-1, "$%d", a->a_w.w_index);
+    	snprintf(buf, bufsize, "$%d", a->a_w.w_index);
     	break;
     case A_DOLLSYM:
-    	snprintf(buf, bufsize-1, "$%s", a->a_w.w_symbol->s_name);
+    	snprintf(buf, bufsize, "$%s", a->a_w.w_symbol->s_name);
     	break;
     default:
     	bug("atom_string");

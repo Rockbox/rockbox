@@ -90,7 +90,7 @@ static void ipod_bang(t_ipod *x)
 {
     static char sendme[200];
 #ifdef ROCKBOX
-    snprintf(sendme, sizeof(sendme)-1, "%s bang;\n", x->x_what->s_name);
+    snprintf(sendme, sizeof(sendme), "%s bang;\n", x->x_what->s_name);
     SEND_FROM_CORE(sendme);
 #else /* ROCKBOX */
     sprintf(sendme,"%s bang;\n",x->x_what->s_name);

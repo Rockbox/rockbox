@@ -929,7 +929,7 @@ static void numbertocolor(int n, char *s)
     blue = ((n / 10) % 10);
     green = n % 10;
 #ifdef ROCKBOX
-    snprintf(s, 8, "#%2.2x%2.2x%2.2x",
+    snprintf(s, 10, "#%2.2x%2.2x%2.2x",
             rangecolor(red), rangecolor(blue), rangecolor(green));
 #else
     sprintf(s, "#%2.2x%2.2x%2.2x", rangecolor(red), rangecolor(blue),

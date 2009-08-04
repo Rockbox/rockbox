@@ -203,8 +203,8 @@ t_symbol *iemgui_new_dogetname(t_iemgui *iemgui, int indx, t_atom *argv)
     {
     	char str[80];
 #ifdef ROCKBOX
-        snprintf(str, sizeof(str)-1,
-                  "%d", (int)atom_getintarg(indx, 100000, argv));
+        snprintf(str, sizeof(str), "%d",
+                                    (int) atom_getintarg(indx, 100000, argv));
 #else
 	sprintf(str, "%d", (int)atom_getintarg(indx, 100000, argv));
 #endif
@@ -623,8 +623,7 @@ int iemgui_dialog(t_iemgui *iemgui, t_symbol **srl, int argc, t_atom *argv)
     else if(IS_A_FLOAT(argv,7))
     {
 #ifdef ROCKBOX
-        snprintf(str, sizeof(str)-1,
-            "%d", (int)atom_getintarg(7, argc, argv));
+        snprintf(str, sizeof(str), "%d", (int) atom_getintarg(7, argc, argv));
 #else
 	sprintf(str, "%d", (int)atom_getintarg(7, argc, argv));
 #endif
@@ -635,8 +634,7 @@ int iemgui_dialog(t_iemgui *iemgui, t_symbol **srl, int argc, t_atom *argv)
     else if(IS_A_FLOAT(argv,8))
     {
 #ifdef ROCKBOX
-        snprintf(str, sizeof(str)-1,
-                    "%d", (int)atom_getintarg(8, argc, argv));
+        snprintf(str, sizeof(str), "%d", (int) atom_getintarg(8, argc, argv));
 #else
 	sprintf(str, "%d", (int)atom_getintarg(8, argc, argv));
 #endif
@@ -647,8 +645,7 @@ int iemgui_dialog(t_iemgui *iemgui, t_symbol **srl, int argc, t_atom *argv)
     else if(IS_A_FLOAT(argv,9))
     {
 #ifdef ROCKBOX
-        snprintf(str, sizeof(str)-1,
-                    "%d", (int)atom_getintarg(9, argc, argv));
+        snprintf(str, sizeof(str), "%d", (int) atom_getintarg(9, argc, argv));
 #else
 	sprintf(str, "%d", (int)atom_getintarg(9, argc, argv));
 #endif

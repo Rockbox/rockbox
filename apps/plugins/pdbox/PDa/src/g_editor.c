@@ -1481,7 +1481,7 @@ void canvas_key(t_canvas *x, t_symbol *s, int ac, t_atom *av)
     {
 	char buf[3];
 #ifdef ROCKBOX
-        snprintf(buf, sizeof(buf)-1, "%c", (int)(av[1].a_w.w_float));
+        snprintf(buf, sizeof(buf), "%c", (int) (av[1].a_w.w_float));
 #else /* ROCKBOX */
 	sprintf(buf, "%c", (int)(av[1].a_w.w_float));
 #endif /* ROCKBOX */

@@ -94,8 +94,8 @@ static void glist_doupdatewindowlist(t_glist *gl, char *sbuf)
 	    {
 	    	char tbuf[1024];
 #ifdef ROCKBOX
-                snprintf(tbuf, sizeof(tbuf)-1,
-                    "{%s .x%x} ", gl->gl_name->s_name, (t_int)canvas);
+                snprintf(tbuf, sizeof(tbuf),
+                    "{%s .x%x} ", gl->gl_name->s_name, (t_int) canvas);
 #else /* ROCKBOX */
 		sprintf(tbuf, "{%s .x%x} ", gl->gl_name->s_name, (t_int)canvas);
 #endif /* ROCKBOX */
@@ -483,7 +483,7 @@ t_glist *glist_addglist(t_glist *g, t_symbol *sym,
     {
     	char buf[40];
 #ifdef ROCKBOX
-        snprintf(buf, sizeof(buf)-1, "graph%d", ++gcount);
+        snprintf(buf, sizeof(buf), "graph%d", ++gcount);
 #else /* ROCKBOX */
     	sprintf(buf, "graph%d", ++gcount);
 #endif /* ROCKBOX */
@@ -712,7 +712,7 @@ static t_editor *editor_new(t_glist *owner)
     x->e_deleted = binbuf_new();
     x->e_glist = owner;
 #ifdef ROCKBOX
-    snprintf(buf, sizeof(buf)-1, ".x%x", (t_int)owner);
+    snprintf(buf, sizeof(buf), ".x%x", (t_int)owner);
 #else /* ROCKBOX */
     sprintf(buf, ".x%x", (t_int)owner);
 #endif /* ROCKBOX */
@@ -1237,7 +1237,7 @@ static void *table_new(t_symbol *s, t_floatarg f)
 	 char  tabname[255];
 	 t_symbol *t = gensym("table"); 
 #ifdef ROCKBOX
-        snprintf(tabname, sizeof(tabname)-1, "%s%d", t->s_name, tabcount++);
+        snprintf(tabname, sizeof(tabname), "%s%d", t->s_name, tabcount++);
 #else /* ROCKBOX */
 	 sprintf(tabname, "%s%d", t->s_name, tabcount++);
 #endif /* ROCKBOX */

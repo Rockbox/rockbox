@@ -150,7 +150,7 @@ t_garray *graph_array(t_glist *gl, t_symbol *s, t_symbol *templatesym,
     {
     	char buf[40];
 #ifdef ROCKBOX
-        snprintf(buf, sizeof(buf)-1, "array%d", ++gcount);
+        snprintf(buf, sizeof(buf), "array%d", ++gcount);
 #else
     	sprintf(buf, "array%d", ++gcount);
 #endif

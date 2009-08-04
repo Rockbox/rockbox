@@ -712,7 +712,7 @@ static void gatom_key(void *z, t_floatarg f)
 redraw:
     	/* LATER figure out how to avoid creating all these symbols! */
 #ifdef ROCKBOX
-    snprintf(sbuf, sizeof(sbuf)-1, "%s...", x->a_buf);
+    snprintf(sbuf, sizeof(sbuf), "%s...", x->a_buf);
 #else /* ROCKBOX */
     sprintf(sbuf, "%s...", x->a_buf);
 #endif

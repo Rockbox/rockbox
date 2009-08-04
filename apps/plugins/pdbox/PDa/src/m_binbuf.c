@@ -325,7 +325,7 @@ void binbuf_addbinbuf(t_binbuf *x, t_binbuf *y)
     	    break;
     	case A_DOLLAR:
 #ifdef ROCKBOX
-            snprintf(tbuf, sizeof(tbuf)-1, "$%d", ap->a_w.w_index);
+            snprintf(tbuf, sizeof(tbuf), "$%d", ap->a_w.w_index);
 #else /* ROCKBOX */
     	    sprintf(tbuf, "$%d", ap->a_w.w_index);
 #endif /* ROCKBOX */
@@ -333,7 +333,7 @@ void binbuf_addbinbuf(t_binbuf *x, t_binbuf *y)
     	    break;
     	case A_DOLLSYM:
 #ifdef ROCKBOX
-            snprintf(tbuf, sizeof(tbuf)-1, "$%s", ap->a_w.w_symbol->s_name);
+            snprintf(tbuf, sizeof(tbuf), "$%s", ap->a_w.w_symbol->s_name);
 #else /* ROCKBOX */
     	    sprintf(tbuf, "$%s", ap->a_w.w_symbol->s_name);
 #endif /* ROCKBOX */
@@ -457,14 +457,14 @@ t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew)
     	if (!tonew)
     	    return (0);
 #ifdef ROCKBOX
-        else snprintf(buf, sizeof(buf)-1, "$%d", argno);
+        else snprintf(buf, sizeof(buf), "$%d", argno);
 #else /* ROCKBOX */
 	else sprintf(buf, "$%d", argno);
 #endif /* ROCKBOX */
     }
     else if (argno == 0)
 #ifdef ROCKBOX
-        snprintf(buf, sizeof(buf)-1, "%d", canvas_getdollarzero());
+        snprintf(buf, sizeof(buf), "%d", canvas_getdollarzero());
 #else /* ROCKBOX */
     	sprintf(buf, "%d", canvas_getdollarzero());
 #endif /* ROCKBOX */
@@ -908,7 +908,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 		{
 	    	    char buf[100];
 #ifdef ROCKBOX
-                    snprintf(buf, sizeof(buf)-1, "$%d", nextmess[i].a_w.w_index);
+                    snprintf(buf, sizeof(buf), "$%d", nextmess[i].a_w.w_index);
 #else /* ROCKBOX */
 		    sprintf(buf, "$%d", nextmess[i].a_w.w_index);
 #endif /* ROCKBOX */
@@ -918,7 +918,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 		{
 	    	    char buf[100];
 #ifdef ROCKBOX
-                    snprintf(buf, sizeof(buf)-1, "$%s", nextmess[i].a_w.w_symbol->s_name);
+                    snprintf(buf, sizeof(buf), "$%s", nextmess[i].a_w.w_symbol->s_name);
 #else /* ROCKBOX */
 		    sprintf(buf, "$%s", nextmess[i].a_w.w_symbol->s_name);
 #endif /* ROCKBOX */
