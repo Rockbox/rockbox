@@ -291,15 +291,15 @@ flipit_tokens.16x26x1.bmp
 
 /* Invadrox */
 #if defined HAVE_LCD_COLOR
-#if LCD_WIDTH >= 480
-invadrox_aliens.24x24x16.bmp
-invadrox_alien_explode.13x7x16.bmp
-invadrox_ships.16x24x16.bmp
-invadrox_bombs.9x42x16.bmp
-invadrox_shield.22x16x16.bmp
-invadrox_ufo.16x7x16.bmp
-invadrox_ufo_explode.21x8x16.bmp
-invadrox_numbers.50x7x16.bmp
+#if LCD_WIDTH >= 640
+invadrox_alien_explode.37x20x16.bmp
+invadrox_aliens.68x68x16.bmp
+invadrox_ships.46x69x16.bmp
+invadrox_bombs.27x126x16.bmp
+invadrox_shield.64x47x16.bmp
+invadrox_ufo.46x20x16.bmp
+invadrox_ufo_explode.61x23x16.bmp
+invadrox_numbers.140x19x16.bmp
 #if LCD_WIDTH == 480
 invadrox_background.480x640x16.bmp
 #elif LCD_WIDTH == 640

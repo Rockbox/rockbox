@@ -29,6 +29,38 @@
 #include "lib/highscore.h"
 #include "lib/helper.h"
 
+/* bitmaps */
+#include "pluginbitmaps/invadrox_background.h"
+
+/* get dimensions for later use from the bitmaps */
+#include "pluginbitmaps/invadrox_aliens.h"
+#include "pluginbitmaps/invadrox_ships.h"
+#include "pluginbitmaps/invadrox_bombs.h"
+#include "pluginbitmaps/invadrox_alien_explode.h"
+#include "pluginbitmaps/invadrox_shield.h"
+#include "pluginbitmaps/invadrox_ufo.h"
+#include "pluginbitmaps/invadrox_ufo_explode.h"
+#include "pluginbitmaps/invadrox_numbers.h"
+#include "pluginbitmaps/invadrox_fire.h"
+#define ALIEN_WIDTH           (BMPWIDTH_invadrox_aliens/2)
+#define ALIEN_HEIGHT          (BMPHEIGHT_invadrox_aliens/3)
+#define SHIP_WIDTH            BMPWIDTH_invadrox_ships
+#define SHIP_HEIGHT           (BMPHEIGHT_invadrox_ships/3)
+#define BOMB_WIDTH            (BMPWIDTH_invadrox_bombs/3)
+#define BOMB_HEIGHT           (BMPHEIGHT_invadrox_bombs/6)
+#define ALIEN_EXPLODE_WIDTH   BMPWIDTH_invadrox_alien_explode
+#define ALIEN_EXPLODE_HEIGHT  BMPHEIGHT_invadrox_alien_explode
+#define SHIELD_WIDTH          BMPWIDTH_invadrox_shield
+#define SHIELD_HEIGHT         BMPHEIGHT_invadrox_shield
+#define UFO_WIDTH             BMPWIDTH_invadrox_ufo
+#define UFO_HEIGHT            BMPHEIGHT_invadrox_ufo
+#define UFO_EXPLODE_WIDTH     BMPWIDTH_invadrox_ufo_explode
+#define UFO_EXPLODE_HEIGHT    BMPHEIGHT_invadrox_ufo_explode
+#define NUMBERS_WIDTH         (BMPWIDTH_invadrox_numbers/10)
+#define FONT_HEIGHT           BMPHEIGHT_invadrox_numbers
+#define FIRE_WIDTH            BMPWIDTH_invadrox_fire
+#define FIRE_HEIGHT           BMPHEIGHT_invadrox_fire
+
 PLUGIN_HEADER
 
 /* Original graphics is only 1bpp so it should be portable
@@ -186,8 +218,30 @@ PLUGIN_HEADER
 #define MAX_LIVES 8
 
 
+/* m:robe 500 defines */
+#if ((LCD_WIDTH == 640) && (LCD_HEIGHT == 480)) || \
+    ((LCD_WIDTH == 480) && (LCD_HEIGHT == 640))
+
+/* Original arcade game size 224x240, 1bpp with
+ * red overlay at top and green overlay at bottom.
+ *
+ * M:Robe 500: 640x480x16
+ * ======================
+ */
+
+#define ARCADISH_GRAPHICS
+#define PLAYFIELD_X 48
+#define SHIP_Y (PLAYFIELD_Y - 2 * SHIP_HEIGHT)
+#define ALIEN_START_Y (UFO_Y + ALIEN_HEIGHT)
+#define SCORENUM_X (PLAYFIELD_X + NUMBERS_WIDTH)
+#define SCORENUM_Y (SCORE_Y + FONT_HEIGHT + 2)
+#define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 1 - 6 * NUMBERS_WIDTH - 5 * NUM_SPACING)
+#define SHIELD_Y (PLAYFIELD_Y - 5 * SHIP_HEIGHT)
+#define LIVES_X 10
+#define MAX_Y 18
+
 /* iPod Video defines */
-#if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
 
 /* Original arcade game size 224x240, 1bpp with
  * red overlay at top and green overlay at bottom.
@@ -226,9 +280,7 @@ PLUGIN_HEADER
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 1 - 6 * NUMBERS_WIDTH - 5 * NUM_SPACING)
 #define SHIELD_Y (PLAYFIELD_Y - 6 * SHIP_HEIGHT)
 #define LIVES_X 10
-#define MAX_X 95
 #define MAX_Y 18
-
 
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220)
 
@@ -271,7 +323,6 @@ PLUGIN_HEADER
 #define SCORENUM_Y (SCORE_Y + 2 * FONT_HEIGHT)
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 1 - 6 * NUMBERS_WIDTH - 5 * NUM_SPACING)
 #define LIVES_X 8
-#define MAX_X 75
 #define MAX_Y 18
 
 
@@ -325,7 +376,6 @@ PLUGIN_HEADER
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 4 * NUMBERS_WIDTH - 3 * NUM_SPACING)
 #define SHIELD_Y (SHIP_Y - SHIP_HEIGHT - SHIELD_HEIGHT)
 #define LIVES_X 8
-#define MAX_X 75
 #define MAX_Y 18
 
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
@@ -378,7 +428,6 @@ PLUGIN_HEADER
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 4 * NUMBERS_WIDTH - 3 * NUM_SPACING)
 #define SHIELD_Y (SHIP_Y - SHIP_HEIGHT - SHIELD_HEIGHT)
 #define LIVES_X 0
-#define MAX_X 75
 #define MAX_Y 18
 
 
@@ -421,7 +470,6 @@ PLUGIN_HEADER
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 1 - 6 * NUMBERS_WIDTH - 5 * NUM_SPACING)
 #define SHIELD_Y (PLAYFIELD_Y - 6 * SHIP_HEIGHT)
 #define LIVES_X 10
-#define MAX_X 95
 #define MAX_Y 18
 
 #elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
@@ -458,7 +506,6 @@ PLUGIN_HEADER
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 4 * NUMBERS_WIDTH - 3 * NUM_SPACING)
 #define SHIELD_Y (PLAYFIELD_Y - 5 * SHIP_HEIGHT)
 #define LIVES_X 8
-#define MAX_X 95
 #define MAX_Y 15
 
 
@@ -466,37 +513,7 @@ PLUGIN_HEADER
     #error INVADROX: Unsupported LCD type
 #endif
 
-/* bitmaps */
-#include "pluginbitmaps/invadrox_background.h"
-
-/* get dimensions for later use from the bitmaps */
-#include "pluginbitmaps/invadrox_aliens.h"
-#include "pluginbitmaps/invadrox_ships.h"
-#include "pluginbitmaps/invadrox_bombs.h"
-#include "pluginbitmaps/invadrox_alien_explode.h"
-#include "pluginbitmaps/invadrox_shield.h"
-#include "pluginbitmaps/invadrox_ufo.h"
-#include "pluginbitmaps/invadrox_ufo_explode.h"
-#include "pluginbitmaps/invadrox_numbers.h"
-#include "pluginbitmaps/invadrox_fire.h"
-#define ALIEN_WIDTH           (BMPWIDTH_invadrox_aliens/2)
-#define ALIEN_HEIGHT          (BMPHEIGHT_invadrox_aliens/3)
-#define SHIP_WIDTH            BMPWIDTH_invadrox_ships
-#define SHIP_HEIGHT           (BMPHEIGHT_invadrox_ships/3)
-#define BOMB_WIDTH            (BMPWIDTH_invadrox_bombs/3)
-#define BOMB_HEIGHT           (BMPHEIGHT_invadrox_bombs/6)
-#define ALIEN_EXPLODE_WIDTH   BMPWIDTH_invadrox_alien_explode
-#define ALIEN_EXPLODE_HEIGHT  BMPHEIGHT_invadrox_alien_explode
-#define SHIELD_WIDTH          BMPWIDTH_invadrox_shield
-#define SHIELD_HEIGHT         BMPHEIGHT_invadrox_shield
-#define UFO_WIDTH             BMPWIDTH_invadrox_ufo
-#define UFO_HEIGHT            BMPHEIGHT_invadrox_ufo
-#define UFO_EXPLODE_WIDTH     BMPWIDTH_invadrox_ufo_explode
-#define UFO_EXPLODE_HEIGHT    BMPHEIGHT_invadrox_ufo_explode
-#define NUMBERS_WIDTH         (BMPWIDTH_invadrox_numbers/10)
-#define FONT_HEIGHT           BMPHEIGHT_invadrox_numbers
-#define FIRE_WIDTH            BMPWIDTH_invadrox_fire
-#define FIRE_HEIGHT           BMPHEIGHT_invadrox_fire
+#define MAX_X ((LCD_WIDTH-LIVES_X*2-PLAYFIELD_X*2 - ALIEN_WIDTH)/2 - 1)
 
 /* Defines common to each "graphic type" */
 #ifdef ARCADISH_GRAPHICS
@@ -569,8 +586,8 @@ PLUGIN_HEADER
  * Physical y is at y * ALIEN_HEIGHT
  */
 struct alien {
-    unsigned char x;     /* x-coordinate (0 - 95) */
-    unsigned char y;     /* y-coordinate (0 - 18) */
+    int x;     /* x-coordinate (0 - 95) */
+    int y;     /* y-coordinate (0 - 18) */
     unsigned char type;  /* 0 (Kang), 1 (Kodos), 2 (Serak) */
     unsigned char state; /* Dead, alive or bomber */
 };
