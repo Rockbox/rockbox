@@ -11,7 +11,7 @@ alac.c
 #endif
 cook.c
 raac.c
-dnet.c
+a52_rm.c
 mpc.c
 wma.c
 sid.c
