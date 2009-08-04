@@ -241,6 +241,16 @@ PLUGIN_HEADER
 #define CHC_SETTINGS_DEC    BUTTON_VOL_DOWN
 #define CHC_SETTINGS_CANCEL BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define CHC_QUIT             BUTTON_REC
+#define CHC_STARTSTOP        BUTTON_PLAY
+#define CHC_RESET            BUTTON_FFWD
+#define CHC_MENU             BUTTON_LEFT
+#define CHC_SETTINGS_INC     BUTTON_UP
+#define CHC_SETTINGS_DEC     BUTTON_DOWN
+#define CHC_SETTINGS_OK      BUTTON_PLAY
+#define CHC_SETTINGS_CANCEL  BUTTON_REW
+
 #else
 #error No keymap defined!
 #endif

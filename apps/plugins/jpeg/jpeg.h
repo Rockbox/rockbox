@@ -278,6 +278,17 @@
 
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define JPEG_ZOOM_IN    (BUTTON_PLAY|BUTTON_UP)
+#define JPEG_ZOOM_OUT   (BUTTON_PLAY|BUTTON_DOWN)
+#define JPEG_UP         BUTTON_UP
+#define JPEG_DOWN       BUTTON_DOWN
+#define JPEG_LEFT       BUTTON_LEFT
+#define JPEG_RIGHT      BUTTON_RIGHT
+#define JPEG_MENU       BUTTON_PLAY
+#define JPEG_NEXT       BUTTON_FFWD
+#define JPEG_PREVIOUS   BUTTON_REW
+
 #else
 #error No keymap defined!
 #endif

@@ -227,6 +227,16 @@ enum minesweeper_status {
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) || CONFIG_KEYPAD == MROBE500_PAD
 #   define MINESWP_QUIT     BUTTON_POWER
 
+#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
+#   define MINESWP_UP       BUTTON_UP
+#   define MINESWP_DOWN     BUTTON_DOWN
+#   define MINESWP_QUIT     BUTTON_REC
+#   define MINESWP_TOGGLE   BUTTON_PLAY
+#   define MINESWP_DISCOVER BUTTON_REW
+#   define MINESWP_INFO     BUTTON_FFWD
+
 #else
 #error No keymap defined!
 #endif

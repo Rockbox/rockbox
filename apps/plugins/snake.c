@@ -178,6 +178,14 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD)
 #define SNAKE_QUIT BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define SNAKE_QUIT      BUTTON_REC
+#define SNAKE_LEFT      BUTTON_LEFT
+#define SNAKE_RIGHT     BUTTON_RIGHT
+#define SNAKE_UP        BUTTON_UP
+#define SNAKE_DOWN      BUTTON_DOWN
+#define SNAKE_PLAYPAUSE BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

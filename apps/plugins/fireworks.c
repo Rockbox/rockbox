@@ -102,6 +102,10 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD)
 #define BTN_MENU (BUTTON_MENU|BUTTON_REL)
 
+#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+#define BTN_MENU BUTTON_LEFT
+#define BTN_FIRE BUTTON_PLAY
+
 #elif defined(HAVE_TOUCHSCREEN)
     /* This is a touchscreen target */
 #else

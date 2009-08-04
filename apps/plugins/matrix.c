@@ -136,6 +136,12 @@ extern const fb_data matrix_normal[];
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) || CONFIG_KEYPAD == MROBE500_PAD
 #define MATRIX_EXIT BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define MATRIX_EXIT       BUTTON_REC
+#define MATRIX_SLEEP_MORE BUTTON_UP
+#define MATRIX_SLEEP_LESS BUTTON_DOWN
+#define MATRIX_PAUSE      BUTTON_PLAY
+
 #else
 #error Unsupported keypad
 #endif

@@ -185,6 +185,13 @@ PLUGIN_HEADER
 #define BATTERY_OFF BUTTON_POWER
 #define BATTERY_OFF_TXT "POWER"
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+      
+#define BATTERY_ON      BUTTON_LEFT
+#define BATTERY_OFF     BUTTON_RIGHT
+#define BATTERY_ON_TXT  "LEFT"
+#define BATTERY_OFF_TXT "RIGHT"
+
 #else
 #error No keymap defined!
 #endif

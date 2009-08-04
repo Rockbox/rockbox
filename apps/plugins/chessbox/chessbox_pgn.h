@@ -333,6 +333,16 @@
 #define CB_RESTART BUTTON_VOL_DOWN
 #define CB_MENU    (BUTTON_MENU|BUTTON_REL)
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define CB_SELECT  (BUTTON_FFWD|BUTTON_RIGHT)
+#define CB_UP      BUTTON_UP
+#define CB_DOWN    BUTTON_DOWN
+#define CB_LEFT    BUTTON_LEFT
+#define CB_RIGHT   BUTTON_RIGHT
+#define CB_PLAY    BUTTON_PLAY
+#define CB_LEVEL   (BUTTON_FFWD|BUTTON_UP)
+#define CB_MENU    (BUTTON_FFWD|BUTTON_LEFT)
+
 #else
 #error No keymap defined!
 #endif

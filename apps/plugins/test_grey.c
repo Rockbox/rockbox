@@ -75,6 +75,14 @@ PLUGIN_HEADER
 #define GREY_UP   BUTTON_RC_VOL_UP
 #define GREY_DOWN BUTTON_RC_VOL_DOWN
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define GREY_QUIT BUTTON_REC
+#define GREY_OK   BUTTON_PLAY
+#define GREY_PREV BUTTON_REW
+#define GREY_NEXT BUTTON_FFWD
+#define GREY_UP   BUTTON_UP
+#define GREY_DOWN BUTTON_DOWN
+
 #else
 #error unsupported keypad
 #endif

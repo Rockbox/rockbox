@@ -203,6 +203,15 @@ PLUGIN_HEADER
 
 #define QUIT BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+
+#define QUIT  BUTTON_PLAY
+#define LEFT  BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define UP    BUTTON_UP
+#define DOWN  BUTTON_DOWN
+#define PAUSE BUTTON_FFWD
+
 #else
 #error No keymap defined!
 #endif

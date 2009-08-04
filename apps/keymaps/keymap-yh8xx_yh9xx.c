@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-/* Button Code Definitions for iriver h100/h300 target */
+/* Button Code Definitions for samsung yh-820 / yh-920 / yh-925 target */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

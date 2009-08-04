@@ -137,6 +137,11 @@ Still To do:
 #elif CONFIG_KEYPAD == ONDAVX747_PAD || CONFIG_KEYPAD == MROBE500_PAD
 #define QUIT BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define QUIT        BUTTON_LEFT
+#define ACTION      BUTTON_RIGHT
+#define ACTIONTEXT "RIGHT"
+
 #else
 #error No keymap defined!
 #endif

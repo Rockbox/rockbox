@@ -186,6 +186,15 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #elif CONFIG_KEYPAD == MROBE500_PAD
 #define QUIT    BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define QUIT   BUTTON_FFWD
+#define SELECT BUTTON_PLAY
+#define LEFT   BUTTON_LEFT
+#define RIGHT  BUTTON_RIGHT
+#define UP     BUTTON_UP
+#define DOWN   BUTTON_DOWN
+
+
 #else
 #error No keymap defined!
 #endif

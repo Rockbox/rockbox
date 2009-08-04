@@ -244,7 +244,28 @@ static void setoptions (void)
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
         options.A=BUTTON_VOL_UP;
         options.B=BUTTON_VOL_DOWN;
-        options.MENU=BUTTON_MENU;
+        options.MENU=BUTTON_MENU;  
+
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_PLAY;
+        options.B=BUTTON_FFWD;
+        options.START=BUTTON_REW;
+        options.SELECT=BUTTON_RIGHT;
+        options.MENU=BUTTON_LEFT;
+
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_PLAY;
+        options.B=BUTTON_REW;
+        options.START=BUTTON_REC;
+        options.SELECT=BUTTON_FFWD;
+        options.MENU=BUTTON_NONE;        
+
 #else
 #error No Keymap Defined!
 #endif

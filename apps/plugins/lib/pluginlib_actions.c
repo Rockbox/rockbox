@@ -68,6 +68,15 @@ const struct button_mapping remote_directions[] =
     { PLA_DOWN_REPEAT,       BUTTON_RC_DOWN|BUTTON_REPEAT,     BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_RC_REW|BUTTON_REPEAT,      BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,       BUTTON_NONE},
+#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+    { PLA_UP,                BUTTON_UP,                        BUTTON_NONE},
+    { PLA_DOWN,              BUTTON_DOWN,                      BUTTON_NONE},
+    { PLA_LEFT,              BUTTON_LEFT,                      BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_RIGHT,                     BUTTON_NONE},
+    { PLA_UP_REPEAT,         BUTTON_UP|BUTTON_REW,             BUTTON_NONE},
+    { PLA_DOWN_REPEAT,       BUTTON_DOWN|BUTTON_REW,           BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REW,           BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REW,          BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported remote keypad
 #endif
@@ -163,6 +172,15 @@ const struct button_mapping generic_directions[] =
     { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE},
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) /* Touchscreen target */
+#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+    { PLA_UP,                BUTTON_UP,                         BUTTON_NONE},
+    { PLA_DOWN,              BUTTON_DOWN,                       BUTTON_NONE},
+    { PLA_LEFT,              BUTTON_LEFT,                       BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_RIGHT,                      BUTTON_NONE},
+    { PLA_UP_REPEAT,         BUTTON_UP|BUTTON_REW,              BUTTON_NONE},
+    { PLA_DOWN_REPEAT,       BUTTON_DOWN|BUTTON_REW,            BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REW,            BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REW,           BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
@@ -285,6 +303,13 @@ const struct button_mapping generic_left_right_fire[] =
     { PLA_FIRE,              BUTTON_SELECT,                BUTTON_NONE},
     { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,  BUTTON_NONE},
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) /* Touchscreen target */
+#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REW,     BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REW,    BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_UP,                  BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_UP|BUTTON_REW,       BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
@@ -446,6 +471,12 @@ const struct button_mapping generic_actions[] =
     {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
     {PLA_FIRE,          BUTTON_VOL_UP,                  BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE},
+#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+    {PLA_QUIT,          BUTTON_REW,                     BUTTON_NONE},
+    {PLA_START,         BUTTON_FFWD,                    BUTTON_NONE},
+    {PLA_MENU,          BUTTON_PLAY,                    BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_UP,                      BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_UP|BUTTON_REW,           BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
@@ -526,6 +557,11 @@ const struct button_mapping generic_increase_decrease[] =
     {PLA_DEC,             BUTTON_VOL_DOWN,                     BUTTON_NONE},
     {PLA_INC_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,         BUTTON_NONE},
     {PLA_DEC_REPEAT,      BUTTON_VOL_DOWN|BUTTON_REPEAT,       BUTTON_NONE},
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+    {PLA_INC,             BUTTON_UP,                           BUTTON_NONE},
+    {PLA_DEC,             BUTTON_DOWN,                         BUTTON_NONE},
+    {PLA_INC_REPEAT,      BUTTON_UP|BUTTON_REW,                BUTTON_NONE},
+    {PLA_DEC_REPEAT,      BUTTON_DOWN|BUTTON_REW,              BUTTON_NONE},
 #else
 #error pluginlib_actions: Unsupported keypad
 #endif

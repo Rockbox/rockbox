@@ -196,6 +196,17 @@
 
 #define PACMAN_MENU     (BUTTON_MENU|BUTTON_REL)
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+
+#define PACMAN_UP       BUTTON_UP
+#define PACMAN_DOWN     BUTTON_DOWN
+#define PACMAN_LEFT     BUTTON_LEFT
+#define PACMAN_RIGHT    BUTTON_RIGHT
+#define PACMAN_1UP      BUTTON_REC
+#define PACMAN_2UP      BUTTON_REW
+#define PACMAN_COIN     BUTTON_FFWD
+#define PACMAN_MENU     BUTTON_PLAY
+
 #else
 
 #error Keymap not defined!

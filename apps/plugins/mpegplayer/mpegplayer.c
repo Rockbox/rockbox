@@ -285,6 +285,15 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define MPEG_VOLDOWN    BUTTON_VOL_DOWN
 #define MPEG_VOLUP      BUTTON_VOL_UP
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define MPEG_MENU       BUTTON_LEFT
+#define MPEG_STOP       BUTTON_RIGHT
+#define MPEG_PAUSE      BUTTON_PLAY
+#define MPEG_VOLDOWN    BUTTON_DOWN
+#define MPEG_VOLUP      BUTTON_UP
+#define MPEG_RW         BUTTON_REW
+#define MPEG_FF         BUTTON_FFWD
+
 #else
 #error No keymap defined!
 #endif

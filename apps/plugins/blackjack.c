@@ -401,6 +401,21 @@ struct highscore highest[NUM_SCORES];
 #define BJACK_QUIT_NAME     "POWER"
 #define BJACK_QUIT          BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define BJACK_START      (BUTTON_PLAY|BUTTON_RIGHT)
+#define BJACK_QUIT       (BUTTON_PLAY|BUTTON_LEFT)
+#define BJACK_MAX        (BUTTON_PLAY|BUTTON_UP)
+#define BJACK_MIN        (BUTTON_PLAY|BUTTON_DOWN)
+#define BJACK_HIT        BUTTON_PLAY
+#define BJACK_STAY       BUTTON_REC
+#define BJACK_DOUBLEDOWN BUTTON_FFWD
+#define BJACK_SCORES     (BUTTON_PLAY|BUTTON_REW)
+#define BJACK_RESUME     BUTTON_REW
+#define BJACK_UP         BUTTON_UP
+#define BJACK_DOWN       BUTTON_DOWN
+#define BJACK_RIGHT      BUTTON_RIGHT
+#define BJACK_LEFT       BUTTON_LEFT
+
 #else
 #error No keymap defined!
 #endif

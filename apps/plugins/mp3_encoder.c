@@ -2491,6 +2491,12 @@ void get_mp3_filename(const char *wav_name)
 #elif CONFIG_KEYPAD == ONDAVX747_PAD || CONFIG_KEYPAD == MROBE500_PAD
 #define MP3ENC_DONE BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define MP3ENC_PREV   BUTTON_UP
+#define MP3ENC_NEXT   BUTTON_DOWN
+#define MP3ENC_DONE   BUTTON_PLAY
+#define MP3ENC_SELECT BUTTON_RIGHT
+
 #else
 #error No keymap defined!
 #endif

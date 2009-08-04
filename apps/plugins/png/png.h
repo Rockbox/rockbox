@@ -301,6 +301,17 @@ You are free to name this file lodepng.cpp or lodepng.c depending on your usage.
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
 #define PNG_MENU       BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define PNG_ZOOM_IN    (BUTTON_PLAY|BUTTON_UP)
+#define PNG_ZOOM_OUT   (BUTTON_PLAY|BUTTON_DOWN)
+#define PNG_UP         BUTTON_UP
+#define PNG_DOWN       BUTTON_DOWN
+#define PNG_LEFT       BUTTON_LEFT
+#define PNG_RIGHT      BUTTON_RIGHT
+#define PNG_MENU       BUTTON_PLAY
+#define PNG_NEXT       BUTTON_FFWD
+#define PNG_PREVIOUS   BUTTON_REW
+
 #else
 #error No keymap defined!
 #endif

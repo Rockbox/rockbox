@@ -142,6 +142,8 @@ long reverse (long N) {
 #define LP_QUIT BUTTON_POWER
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
 #define LP_QUIT BUTTON_POWER
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define LP_QUIT BUTTON_LEFT
 #else
 #define LP_QUIT BUTTON_OFF
 #endif

@@ -169,6 +169,14 @@ PLUGIN_IRAM_DECLARE
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
 #define BTN_QUIT         BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define BTN_QUIT         BUTTON_REW
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+#define BTN_PLAY         BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

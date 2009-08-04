@@ -86,6 +86,10 @@ PLUGIN_HEADER
 #   define LAMP_LEFT       BUTTON_VOL_DOWN
 #   define LAMP_RIGHT      BUTTON_VOL_UP
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
+
 #else
 #   error Missing key definitions for this keypad
 #endif

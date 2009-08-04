@@ -398,6 +398,27 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) || CONFIG_KEYPAD == MROBE500_PAD
 #   define SOL_QUIT          BUTTON_POWER
 
+#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+#   define SOL_QUIT          BUTTON_REC
+#   define SOL_UP            BUTTON_UP
+#   define SOL_DOWN          BUTTON_DOWN
+#   define SOL_LEFT_PRE      BUTTON_LEFT
+#   define SOL_LEFT          (BUTTON_LEFT | BUTTON_REW)
+#   define SOL_RIGHT_PRE     BUTTON_RIGHT
+#   define SOL_RIGHT         (BUTTON_RIGHT | BUTTON_REW)
+#   define SOL_MOVE          BUTTON_PLAY
+#   define SOL_DRAW_PRE      (BUTTON_PLAY | BUTTON_RIGHT)
+#   define SOL_DRAW          (BUTTON_PLAY | BUTTON_LEFT)
+#   define SOL_REM2CUR       BUTTON_FFWD
+#   define SOL_CUR2STACK     BUTTON_REW
+#   define SOL_REM2STACK_PRE (BUTTON_FFWD | BUTTON_RIGHT)
+#   define SOL_REM2STACK     (BUTTON_FFWD | BUTTON_LEFT)
+#   define HK_MOVE           "PLAY"
+#   define HK_DRAW           "REW.."
+#   define HK_REM2CUR        "FFWD"
+#   define HK_CUR2STACK      "REW"
+#   define HK_REM2STACK      "FFWD.."
+
 #else
 #error No keymap defined!
 #endif
