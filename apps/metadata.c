@@ -121,6 +121,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* AAC in RM/RA */
     [AFMT_RM_AAC] =
         AFMT_ENTRY("RAAC",  "raac",     NULL,        "rm\0ra\0rmvb\0"      ),
+    /* AC3 in RM/RA */
+    [AFMT_RM_AC3] =
+        AFMT_ENTRY("AC3",   "dnet",     NULL,        "rm\0ra\0rmvb\0"      ),
 #endif
 };
 

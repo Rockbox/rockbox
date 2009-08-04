@@ -27,6 +27,8 @@
 #include "codeclib.h"
 #endif
 
+#define SWAP(a, b) do{uint8_t SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
+
 void advance_buffer(uint8_t **buf, int val)
 {
     *buf += val;
@@ -464,7 +466,6 @@ void rm_get_packet_fd(int fd,RMContext *rmctx, RMPacket *pkt)
                "    stream  = %d\n"
                "    timestmp= %d\n",pkt->version,pkt->length,pkt->stream_number,pkt->timestamp);
 
-        //getchar();
         if(pkt->version == 0)
         {
             read_uint8(fd,&packet_group);
@@ -550,7 +551,16 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
                 }                
                 rmctx->audio_pkt_cnt = --rmctx->sub_packet_cnt;
             }
-        }        
+        } 
+
+        else if (rmctx->codec_type == CODEC_AC3) {
+        /* The byte order of the data is reversed from standard AC3 */
+            for(x = 0; x < pkt->length - PACKET_HEADER_SIZE; x+=2) {
+                SWAP((*src)[0], (*src)[1]);
+                *src += 2;                                
+            }
+            *src -= x;
+        }
         rmctx->audio_pkt_cnt++;
     }while(++(rmctx->sub_packet_cnt) < h);
 

@@ -63,6 +63,7 @@ enum
     AFMT_SAP,          /* Amiga 8Bit SAP Format */
     AFMT_RM_COOK,      /* Cook in RM/RA */
     AFMT_RM_AAC,       /* AAC in RM/RA */
+    AFMT_RM_AC3,       /* AC3 in RM/RA */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -

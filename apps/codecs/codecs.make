@@ -77,6 +77,7 @@ $(CODECDIR)/wavpack_enc.codec: $(CODECDIR)/libwavpack.a
 $(CODECDIR)/asap.codec : $(CODECDIR)/libasap.a
 $(CODECDIR)/cook.codec : $(CODECDIR)/libcook.a $(CODECDIR)/librm.a
 $(CODECDIR)/raac.codec : $(CODECDIR)/libfaad.a $(CODECDIR)/librm.a
+$(CODECDIR)/dnet.codec : $(CODECDIR)/liba52.a $(CODECDIR)/librm.a
 
 $(CODECS): $(CODECLIB) # this must be last in codec dependency list
 

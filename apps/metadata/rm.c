@@ -160,24 +160,32 @@ static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
            skipped += 1;
        }
   
-       read_uint32be(fd, &rmctx->extradata_size);
-       skipped += 4;
-       read(fd, rmctx->codec_extradata, rmctx->extradata_size);
-       skipped += rmctx->extradata_size;
        switch(fourcc) {
            case FOURCC('c','o','o','k'):               
                rmctx->codec_type = CODEC_COOK;
+               read_uint32be(fd, &rmctx->extradata_size);
+               skipped += 4;
+               read(fd, rmctx->codec_extradata, rmctx->extradata_size);
+               skipped += rmctx->extradata_size;
                break;
 
            case FOURCC('r','a','a','c'):
            case FOURCC('r','a','c','p'):
                rmctx->codec_type = CODEC_AAC;
+               read_uint32be(fd, &rmctx->extradata_size);
+               skipped += 4;
+               read(fd, rmctx->codec_extradata, rmctx->extradata_size);
+               skipped += rmctx->extradata_size;
+               break;
+
+           case FOURCC('d','n','e','t'):
+               rmctx->codec_type = CODEC_AC3;
                break;
 
            default: /* Not a supported codec */
                return -1;
        }
-
+       
        DEBUGF("        flavor = %d\n",flavor);
        DEBUGF("        coded_frame_size = %ld\n",coded_framesize);
        DEBUGF("        sub_packet_h = %d\n",rmctx->sub_packet_h);
@@ -406,6 +414,10 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
             break;
         case CODEC_AAC:
             id3->codectype = AFMT_RM_AAC;
+            break;
+
+        case CODEC_AC3:
+            id3->codectype = AFMT_RM_AC3;
             break;
     }
     

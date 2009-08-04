@@ -28,7 +28,12 @@
 #define DATA_HEADER_SIZE 18
 #define PACKET_HEADER_SIZE 12
 
-enum codecs{CODEC_COOK, CODEC_AAC};
+enum codecs {
+    CODEC_COOK, 
+    CODEC_AAC,
+    CODEC_AC3
+};
+
 typedef struct rm_packet
 {
     uint8_t *frames[100]; /* Pointers to ordered audio frames in buffer */
