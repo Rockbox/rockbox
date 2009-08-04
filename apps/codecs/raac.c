@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: aac.c 19743 2009-01-10 21:10:56Z zagor $
+ * $Id:$
  *
  * Copyright (C) 2009 Mohamed Tarek
  *
@@ -27,7 +27,7 @@
 #include "libfaad/output.h"
 
 CODEC_HEADER
-#define DATA_HEADER_SIZE 18
+
 static void init_rm(RMContext *rmctx)
 {
     memcpy(rmctx, (void*)(( (intptr_t)ci->id3->id3v2buf + 3 ) &~ 3), sizeof(RMContext));

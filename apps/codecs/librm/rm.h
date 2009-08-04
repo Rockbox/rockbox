@@ -25,6 +25,8 @@
 #include <inttypes.h>
 
 #define MAX_EXTRADATA_SIZE 16
+#define DATA_HEADER_SIZE 18
+#define PACKET_HEADER_SIZE 12
 
 enum codecs{CODEC_COOK, CODEC_AAC};
 typedef struct rm_packet

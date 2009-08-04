@@ -24,8 +24,6 @@
 #include "inttypes.h"
 #include "libcook/cook.h"
 
-#define DATA_HEADER_SIZE 18 /* size of DATA chunk header in a rm file */
-
 CODEC_HEADER
 
 RMContext rmctx;
