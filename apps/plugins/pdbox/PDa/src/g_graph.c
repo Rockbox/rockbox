@@ -90,7 +90,8 @@ void glist_delete(t_glist *x, t_gobj *y)
 	    {
 	    	char tag[80];
 #ifdef ROCKBOX
-                snprintf(tag, sizeof(tag), "graph%x", (int) gl);
+                snprintf(tag, sizeof(tag), "graph%lx",
+                                           (unsigned long) (intptr_t) gl);
 #else /* ROCKBOX */
 		sprintf(tag, "graph%x", (int)gl);
 #endif /* ROCKBOX */
@@ -689,7 +690,7 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
     	rtext_erase(glist_findrtext(parent_glist, &x->gl_obj));
 
 #ifdef ROCKBOX
-    snprintf(tag, sizeof(tag), "graph%x", (int) x);
+    snprintf(tag, sizeof(tag), "graph%lx", (unsigned long) (intptr_t) x);
 #else
     sprintf(tag, "graph%x", (int)x);
 #endif
