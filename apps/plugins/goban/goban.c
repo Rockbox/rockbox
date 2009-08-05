@@ -243,7 +243,7 @@ plugin_start (const void *parameter)
 {
     int btn;
 
-    rb->mkdir ("/sgf");
+    rb->mkdir (DEFAULT_SAVE_DIR);
 
     global_setup ();
 
