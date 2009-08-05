@@ -514,14 +514,15 @@ static void load_memo(struct shown *shown)
                     break;
             }
         }
+        rb->close(fp);
     }
-    rb->close(fp);
 }
 
 static bool save_memo(int changed, bool new_mod, struct shown *shown)
 {
     int fp,fq;
-    fp = rb->open(ROCKBOX_DIR "/.memo",O_RDONLY | O_CREAT);
+    /* use O_RDWR|O_CREAT so that file is created if it doesn't exist. */
+    fp = rb->open(ROCKBOX_DIR "/.memo", O_RDWR|O_CREAT);
     fq = rb->creat(ROCKBOX_DIR "/~temp");
     if ( (fq > -1) && (fp > -1) )
     {
