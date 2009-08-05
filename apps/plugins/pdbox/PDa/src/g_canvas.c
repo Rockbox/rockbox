@@ -95,7 +95,7 @@ static void glist_doupdatewindowlist(t_glist *gl, char *sbuf)
 	    	char tbuf[1024];
 #ifdef ROCKBOX
                 snprintf(tbuf, sizeof(tbuf),
-                    "{%s .x%x} ", gl->gl_name->s_name, (t_int) canvas);
+                    "{%s .x%x} ", gl->gl_name->s_name, (unsigned int) canvas);
 #else /* ROCKBOX */
 		sprintf(tbuf, "{%s .x%x} ", gl->gl_name->s_name, (t_int)canvas);
 #endif /* ROCKBOX */
@@ -712,7 +712,7 @@ static t_editor *editor_new(t_glist *owner)
     x->e_deleted = binbuf_new();
     x->e_glist = owner;
 #ifdef ROCKBOX
-    snprintf(buf, sizeof(buf), ".x%x", (t_int)owner);
+    snprintf(buf, sizeof(buf), ".x%x", (unsigned int) owner);
 #else /* ROCKBOX */
     sprintf(buf, ".x%x", (t_int)owner);
 #endif /* ROCKBOX */

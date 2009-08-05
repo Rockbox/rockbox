@@ -66,7 +66,8 @@ t_rtext *rtext_new(t_glist *glist, t_text *who)
     glist->gl_editor->e_rtext = x;
 #ifdef ROCKBOX
     snprintf(x->x_tag, strlen(x->x_tag),
-        ".x%x.t%x", (t_int)glist_getcanvas(x->x_glist), (t_int)x);
+        ".x%x.t%x", (unsigned int) glist_getcanvas(x->x_glist),
+                    (unsigned int) x);
 #else /* ROCKBOX */
     sprintf(x->x_tag, ".x%x.t%x", (t_int)glist_getcanvas(x->x_glist),
     	(t_int)x);

@@ -49,15 +49,23 @@ extern "C" {
 #include <stddef.h> 	/* just for size_t -- how lame! */
 #endif
 
+#ifdef ROCKBOX
+#include <inttypes.h>
+#endif
+
 #define MAXPDSTRING 1000	/* use this for anything you want */
 #define MAXPDARG 5    	    	/* max number of args we can typecheck today */
 
     /* signed and unsigned integer types the size of a pointer:  */
+#ifdef ROCKBOX
+typedef intptr_t t_int;
+#else /* ROCKBOX */
 #ifdef __alpha__
 typedef long t_int;
 #else
 typedef int t_int;
 #endif
+#endif /* ROCKBOX */
 
 typedef float t_float;	/* a floating-point number at most the same size */
 typedef float t_floatarg;  /* floating-point type for function calls */
