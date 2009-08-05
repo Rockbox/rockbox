@@ -253,7 +253,16 @@ enum pd_key_id
     #define PDPOD_WHEELLEFT (BUTTON_DOWN)
     #define PDPOD_WHEELRIGHT (BUTTON_UP)
     #define PDPOD_ACTION (BUTTON_MODE)
-/* #elif defined(IRIVER_H100_SERIES) */
+#elif defined(IRIVER_H100_SERIES)
+    /* Added by wincent */
+    #define PDPOD_QUIT (BUTTON_OFF)
+    #define PDPOD_PLAY (BUTTON_REC)
+    #define PDPOD_PREVIOUS (BUTTON_LEFT)
+    #define PDPOD_NEXT (BUTTON_RIGHT)
+    #define PDPOD_MENU (BUTTON_SELECT)
+    #define PDPOD_WHEELLEFT (BUTTON_DOWN)
+    #define PDPOD_WHEELRIGHT (BUTTON_UP)
+    #define PDPOD_ACTION (BUTTON_ON)
 #else
     #warning "No keys defined for this architecture!"
 #endif

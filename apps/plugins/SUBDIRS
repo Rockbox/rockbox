@@ -50,13 +50,13 @@ doom
 #if CONFIG_CODEC == SWCODEC
 midi
 /* beatbox */
-#ifndef RB_PROFILE
-#if MEMORYSIZE > 2  /* mpegplayer allocates at least 2MB of RAM */
-mpegplayer
-#if defined(IRIVER_H300_SERIES)
+#if defined(IRIVER_H300_SERIES) || defined(IRIVER_H100_SERIES)
 /* PDBox is confirmed to run on these player models. */
 pdbox
 #endif
+#ifndef RB_PROFILE
+#if MEMORYSIZE > 2  /* mpegplayer allocates at least 2MB of RAM */
+mpegplayer
 #endif
 #endif
 #endif
