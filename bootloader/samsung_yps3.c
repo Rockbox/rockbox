@@ -266,6 +266,12 @@ void main(void)
         lcd_puts(0, line++, mystring);
 #endif
 
+#if 1   /* power off using power button */
+        button = button_read_device();
+        if (button & BUTTON_POWER) {
+            power_off();
+        }
+#endif
 
 #if 1   /* button info */
         snprintf(mystring, 64, "BUTTONS %08X, %s", button_read_device(),

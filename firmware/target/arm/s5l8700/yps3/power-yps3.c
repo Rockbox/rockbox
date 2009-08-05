@@ -25,7 +25,8 @@
 
 /*  Power handling for the S5L8700 based Samsung YP-S3
 
-    Pins involved in with power management:
+    Pins involved in power management:
+    * P0.1: stay powered up (even with the USB cable unplugged)
     * P1.1: USB power detect
     * P4.7: tuner power/enable
     * P5.2: unknown output
@@ -36,19 +37,26 @@
 
 void power_off(void)
 {
-    /* don't know how to do this yet */
+    /* take down P0.1 to power off (plugged USB cable overrides this though) */
+    PDAT0 &= ~(1 << 1);
+
+    while(1); /* wait for system to shut down */
 }
 
 void power_init(void)
 {
-    /* configure pin P1.1 as input for USB power detect */
+    /* configure P0.1 as output for power-up and stay powered up */
+    PCON0 = (PCON0 & ~(3 << 2)) | (1 << 2);
+    PDAT0 |= (1 << 1);
+
+    /* configure P1.1 as input for USB power detect */
     PCON1 = (PCON1 & ~0x000000F0) | 0x00000000;
 
-    /* enable tuner power pin on P4.7 and turn power off */
+    /* configure P4.7 as output for tuner power and turn power off */
     PCON4 = (PCON4 & ~0xF0000000) | 0x10000000;
     PDAT4 &= ~(1 << 7);
 
-    /* configure pins P5.2 / P5.3 / P5.6 as output, P5.4 as input */
+    /* configure P5.2 / P5.3 / P5.6 as output, P5.4 as input */
     PCON5 = (PCON5 & ~0x0F0FFF00) | 0x01001100;
     PDAT5 &= ~((1 << 2) | (1 << 3) | (1 << 6));
 }
@@ -66,8 +74,9 @@ unsigned int power_input_status(void)
 
 bool charging_state(void)
 {
+    /* check if charger is enabled */
     if (PDAT5 & (1 << 6)) {
-        /* charger is enabled, check if charging is busy */
+        /* check if charging is busy */
         return (PDAT5 & (1 << 4));
     }
     return false;
