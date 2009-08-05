@@ -30,7 +30,7 @@ static t_int *ftom_tilde_perform(t_int *w)
     t_sample *in = *(t_sample **)(w+1), *out = *(t_float **)(w+2);
 #endif
     t_int n = *(t_int *)(w+3);
-    for (; n--; *in++, out++)
+    for (; n--; in++, out++)
     {
     	t_sample f = *in;
 	*out = ftofix((fixtof(f) > 0 ? 17.3123405046 * log(.12231220585 * fixtof(f)) : -1500));

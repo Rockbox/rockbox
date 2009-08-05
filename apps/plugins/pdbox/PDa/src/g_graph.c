@@ -138,7 +138,9 @@ void glist_clear(t_glist *x)
 
 void glist_retext(t_glist *glist, t_text *y)
 {
-#ifndef ROCKBOX
+#ifdef ROCKBOX
+    glist_getcanvas(glist);
+#else
     t_canvas *c = glist_getcanvas(glist);
 #endif
     	/* check that we have built rtexts yet.  LATER need a better test. */

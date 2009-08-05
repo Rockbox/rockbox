@@ -95,7 +95,8 @@ static void glist_doupdatewindowlist(t_glist *gl, char *sbuf)
 	    	char tbuf[1024];
 #ifdef ROCKBOX
                 snprintf(tbuf, sizeof(tbuf),
-                    "{%s .x%x} ", gl->gl_name->s_name, (unsigned int) canvas);
+                    "{%s .x%lx} ", gl->gl_name->s_name,
+                                  (unsigned long) (t_int) canvas);
 #else /* ROCKBOX */
 		sprintf(tbuf, "{%s .x%x} ", gl->gl_name->s_name, (t_int)canvas);
 #endif /* ROCKBOX */
@@ -712,7 +713,7 @@ static t_editor *editor_new(t_glist *owner)
     x->e_deleted = binbuf_new();
     x->e_glist = owner;
 #ifdef ROCKBOX
-    snprintf(buf, sizeof(buf), ".x%x", (unsigned int) owner);
+    snprintf(buf, sizeof(buf), ".x%lx", (unsigned long) (t_int) owner);
 #else /* ROCKBOX */
     sprintf(buf, ".x%x", (t_int)owner);
 #endif /* ROCKBOX */
@@ -1071,7 +1072,9 @@ void canvas_restore(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
 static void canvas_loadbangabstractions(t_canvas *x)
 {
     t_gobj *y;
-#ifndef ROCKBOX
+#ifdef ROCKBOX
+    gensym("loadbang");
+#else
     t_symbol *s = gensym("loadbang");
 #endif
     for (y = x->gl_list; y; y = y->g_next)
