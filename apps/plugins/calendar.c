@@ -24,6 +24,7 @@
 #if defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0)
 
 #include <timefuncs.h>
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -620,7 +621,8 @@ static bool edit_memo(int change, struct shown *shown)
     MENUITEM_STRINGLIST(edit_menu, "Edit menu", edit_menu_cb,
                         "Remove", "Edit",
                         "New Weekly", "New Monthly",
-                        "New Yearly", "New One off");
+                        "New Yearly", "New One off",
+                        "Playback Control");
 
     while (!exit)
     {
@@ -651,6 +653,10 @@ static bool edit_memo(int change, struct shown *shown)
             case 5: /* one off */
                 add_memo(shown,3);
                 return false;
+
+            case 6: /* playback control */
+                playback_control(NULL);
+                break;
 
             case GO_TO_PREVIOUS:
                 return false;

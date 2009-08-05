@@ -22,6 +22,7 @@
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/configfile.h"
+#include "lib/playback_control.h"
 
 #define MAX_DICES 12
 #define INITIAL_NB_DICES 1
@@ -79,7 +80,7 @@ enum plugin_status plugin_start(const void* parameter) {
 
     dice_init(&dice);
     rb->srand(*rb->current_tick);
-    
+
     configfile_load(CFG_FILE, config, 2, 0);
     dice.nb_sides = nb_sides_values[sides_index];
     if(!dice_menu(&dice))
@@ -171,8 +172,10 @@ bool dice_menu(struct dices * dice) {
     int selection;
     bool menu_quit = false, result = false;
 
-    MENUITEM_STRINGLIST(menu,"Dice Menu",NULL,"Roll Dice","Number of Dice",
-                        "Number of Sides","Quit");
+    MENUITEM_STRINGLIST(menu, "Dice Menu", NULL,
+                        "Roll Dice",
+                        "Number of Dice", "Number of Sides",
+                        "Playback Control", "Quit");
 
 
     while (!menu_quit) {
@@ -194,11 +197,15 @@ bool dice_menu(struct dices * dice) {
                 dice->nb_sides=nb_sides_values[sides_index];
                 break;
 
+            case 3:
+                playback_control(NULL);
+                break;
+
             default:
                 menu_quit = true;
                 result = false;
                 break;
-         }
+        }
     }
     return result;
 }

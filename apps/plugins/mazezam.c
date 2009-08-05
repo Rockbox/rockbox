@@ -224,7 +224,7 @@ static enum {
       
     STATE_FAILED,        /* The player wants to retry the level */
     STATE_GAME_MENU,     /* The player wan't to access the in-game menu */
- 
+
     STATE_IN_LEVEL,
 } state;
 
@@ -519,7 +519,7 @@ static void draw_level(
     short xOff = (LCD_WIDTH - (size*li->width))/2;
     short yOff = (LCD_HEIGHT - (size*li->height))/2;
     short i;
-    
+
     rb->lcd_clear_display();
 
     draw_walls(size,xOff,yOff,li->width, li->height, li->entrance, li->exit);
@@ -658,7 +658,7 @@ static void in_game_menu(void)
                          MAZEZAM_TEXT_RETRY_LEVEL,
                          MAZEZAM_TEXT_AUDIO_PLAYBACK,
                          MAZEZAM_TEXT_QUIT);
-    
+
     /* Don't show the status bar */
     switch(rb->do_menu(&menu, &start_selection, NULL, false)){
         case 1: /* retry */
@@ -888,6 +888,7 @@ static void main_menu(void)
     MENUITEM_STRINGLIST(menu,MAZEZAM_TEXT_MAIN_MENU,main_menu_cb,
                           MAZEZAM_TEXT_CONTINUE,
                           MAZEZAM_TEXT_PLAY_NEW_GAME,
+                          MAZEZAM_TEXT_AUDIO_PLAYBACK,
                           MAZEZAM_TEXT_QUIT);
 
     while (state >= STATE_IN_APPLICATION) {
@@ -904,6 +905,10 @@ static void main_menu(void)
                 r_data.level = 0;
                 state = STATE_IN_GAME;
                 game_loop(&r_data);
+                break;
+
+            case 2: /* Audio playback */
+                playback_control(NULL);
                 break;
 
             case MENU_ATTACHED_USB:
@@ -935,7 +940,7 @@ enum plugin_status plugin_start(const void* parameter)
     store_lcd_settings();
 
     state = STATE_MAIN_MENU;
-    main_menu();   
+    main_menu();
 
     switch (state) {
         case STATE_USB_CONNECTED:

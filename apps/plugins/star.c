@@ -21,6 +21,7 @@
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
 #include "lib/display_text.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -423,8 +424,6 @@ static char board[STAR_HEIGHT][STAR_WIDTH];
 #define BLOCK 2
 #define STAR  3
 #define BALL  4
-
-#define MENU_START 0
 
 /* char font size */
 static int char_width = -1;
@@ -1051,18 +1050,21 @@ static int star_menu(void)
 {
     int selection, level=1;
     bool menu_quit = false;
-    /* get the size of char */
-    rb->lcd_getstringsize("a", &char_width, &char_height);
 
-    MENUITEM_STRINGLIST(menu,"Star Menu",NULL,"Start Game","Choose Level",
-                        "Help", "Quit");
+    MENUITEM_STRINGLIST(menu, "Star Menu", NULL,
+                        "Start Game","Choose Level",
+                        "Help", "Playback Control", "Quit");
 
     while(!menu_quit)
     {
         switch(rb->do_menu(&menu, &selection, NULL, false))
         {
             case 0:
-                menu_quit = true;
+                /* use system font and get the size of char */
+                rb->lcd_setfont(FONT_SYSFIXED);
+                rb->lcd_getstringsize("a", &char_width, &char_height);
+                star_run_game(level-1);
+                rb->lcd_setfont(FONT_UI);
                 break;
             case 1:
                 rb->set_int("Level", "", UNIT_INT, &level,
@@ -1072,19 +1074,17 @@ static int star_menu(void)
                 if(star_help())
                     usb_detected = true;
                 break;
-            default:
+            case 3:
+                playback_control(NULL);
+                break;
+            case 4:
                 menu_quit = true;
                 break;
         }
+        if(usb_detected)
+            return PLUGIN_USB_CONNECTED;
     }
 
-    if (selection == MENU_START)
-    {
-        rb->lcd_setfont(FONT_SYSFIXED);
-        rb->lcd_getstringsize("a", &char_width, &char_height);
-        level--;
-        star_run_game(level);
-    }
     return PLUGIN_OK;
 }
 

@@ -29,6 +29,7 @@
 #include "pacbox.h"
 #include "pacbox_lcd.h"
 #include "lib/configfile.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
@@ -78,9 +79,9 @@ static bool loadFile( const char * name, unsigned char * buf, int len )
     if( fd < 0 ) {
         return false;
     }
-    
+
     int n = rb->read( fd, buf, len);
-    
+
     rb->close( fd );
 
     if( n != len ) {
@@ -174,7 +175,8 @@ static bool pacbox_menu(void)
 
     MENUITEM_STRINGLIST(menu, "Pacbox Menu", NULL,
                         "Difficulty", "Pacmen Per Game", "Bonus Life",
-                        "Ghost Names", "Display FPS", "Restart", "Quit");
+                        "Ghost Names", "Display FPS",
+                        "Playback Control", "Restart", "Quit");
 
     rb->button_clear_queue();
 
@@ -220,10 +222,13 @@ static bool pacbox_menu(void)
                 }
                 break;
             case 4: /* Show FPS */
-                rb->set_option("Display FPS",&settings.showfps,INT, 
+                rb->set_option("Display FPS",&settings.showfps,INT,
                                noyes, 2, NULL);
                 break;
-            case 5: /* Restart */
+            case 5: /* playback control */
+                playback_control(NULL);
+                break;
+            case 6: /* Restart */
                 need_restart=true;
                 menu_quit=1;
                 break;
@@ -323,7 +328,7 @@ static int gameProc( void )
                 yield_counter = 0;
                 rb->yield ();
             }
- 
+
             /* The following functions render the Pacman screen from the 
                contents of the video and color ram.  We first update the 
                background, and then draw the Sprites on top. 
@@ -343,10 +348,10 @@ static int gameProc( void )
 
             rb->lcd_update();
 
-           /* Keep the framerate at Pacman's 60fps */
+            /* Keep the framerate at Pacman's 60fps */
             end_time = start_time + (video_frames*HZ)/FPS;
             while (TIME_BEFORE(*rb->current_tick,end_time)) {
-                 rb->sleep(1);
+                rb->sleep(1);
             }
         }
     }

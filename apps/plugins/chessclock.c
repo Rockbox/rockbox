@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -327,13 +328,13 @@ enum plugin_status plugin_start(const void* parameter)
     int i;
     bool done;
     int nr;
-    
+
     (void)parameter;
 
     settings.nr_timers = 1;
     settings.total_time = 10;
     settings.round_time = 10;
-    
+
     /* now go ahead and have fun! */
     rb->splash(HZ, "Chess Clock");
 
@@ -380,7 +381,7 @@ enum plugin_status plugin_start(const void* parameter)
         timer_holder[i].used_time=0;
         timer_holder[i].hidden=false;
     }
-    
+
     pause=true; /* We start paused */
 
     nr=0;
@@ -431,7 +432,7 @@ enum plugin_status plugin_start(const void* parameter)
 static void show_pause_mode(bool enabled)
 {
     static const char pause_icon[] = {0x00,0x7f,0x7f,0x00,0x7f,0x7f,0x00};
-    
+
     if (enabled)
         rb->lcd_mono_bitmap((unsigned char *)pause_icon, 52, 0, 7, 8);
     else
@@ -524,13 +525,14 @@ static int run_timer(int nr)
             {
                 MENUITEM_STRINGLIST(menu, "Menu", NULL,
                                     "Delete player", "Restart round",
-                                    "Set round time", "Set total time");
+                                    "Set round time", "Set total time",
+                                    "Playback Control");
 
                 int val, res;
                 switch(rb->do_menu(&menu, NULL, NULL, false))
                 {
                     case 0:
-                         /* delete player */
+                        /* delete player */
                         timer_holder[nr].hidden=true;
                         retval = CHCL_NEXT;
                         done=true;
@@ -544,8 +546,7 @@ static int run_timer(int nr)
                         /* set round time */
                         val=(max_ticks-ticks)/HZ;
                         res=chessclock_set_int("Round time",
-                                               &val,
-                                               10, 0, MAX_TIME,
+                                               &val, 10, 0, MAX_TIME,
                                                FLAGS_SET_INT_SECONDS);
                         if (res==CHCL_USB) {
                             retval = CHCL_USB;
@@ -568,6 +569,9 @@ static int run_timer(int nr)
                         } else if (res==CHCL_OK) {
                             timer_holder[nr].total_time=val;
                         }
+                        break;
+                    case 4:
+                        playback_control(NULL);
                         break;
                     case MENU_ATTACHED_USB:
                         retval = CHCL_USB;

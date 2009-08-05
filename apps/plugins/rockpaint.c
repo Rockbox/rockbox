@@ -31,6 +31,7 @@
 #include "plugin.h"
 #include "lib/pluginlib_bmp.h"
 #include "lib/rgb_hsv.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -533,6 +534,7 @@ enum {
         MAIN_MENU_NEW, MAIN_MENU_LOAD, MAIN_MENU_SAVE,
         MAIN_MENU_BRUSH_SIZE, MAIN_MENU_BRUSH_SPEED, MAIN_MENU_COLOR,
         MAIN_MENU_GRID_SIZE,
+        MAIN_MENU_PLAYBACK_CONTROL,
         MAIN_MENU_EXIT,
      };
 enum {
@@ -551,7 +553,8 @@ enum {
 MENUITEM_STRINGLIST(main_menu, "RockPaint", NULL,
                     "Resume", "New", "Load", "Save",
                     "Brush Size", "Brush Speed",
-                    "Choose Color", "Grid Size", "Exit");
+                    "Choose Color", "Grid Size",
+                    "Playback Control", "Exit");
 MENUITEM_STRINGLIST(size_menu, "Choose Size", NULL,
                     "1x", "2x","4x", "8x");
 MENUITEM_STRINGLIST(speed_menu, "Choose Speed", NULL,
@@ -2525,6 +2528,10 @@ static void goto_menu(void)
                 rb->do_menu( &gridsize_menu, &multi, NULL, false );
                 if( multi >= 0 )
                     gridsize = gridsize_list[multi];
+                break;
+
+            case MAIN_MENU_PLAYBACK_CONTROL:
+                playback_control( NULL );
                 break;
 
             case MAIN_MENU_EXIT:

@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "lib/playback_control.h"
 #include "lib/md5.h"
 PLUGIN_HEADER
 
@@ -29,7 +30,6 @@ PLUGIN_HEADER
 
 /* The header begins with the unencrypted salt (4 bytes) padded with 4 bytes of
    zeroes. After that comes the encrypted hash of the master password (16 bytes) */
-   
 
 #define HEADER_LEN 24
 
@@ -106,9 +106,10 @@ static void decrypt(uint32_t* v, uint32_t* k)
 
 static int context_item_cb(int action, const struct menu_item_ex *this_item)
 {
+    int i = (intptr_t)this_item;
     if (action == ACTION_REQUEST_MENUITEM
         && pw_list.num_entries == 0
-        && ((intptr_t)this_item) != 0)
+        && (i != 0 && i != 5))
     {
         return ACTION_EXIT_MENUITEM;
     }
@@ -117,8 +118,9 @@ static int context_item_cb(int action, const struct menu_item_ex *this_item)
 
 MENUITEM_STRINGLIST(context_m, "Context menu", context_item_cb,
                     "Add entry",
-                    "Edit title", "Edit user name", "Edit password", 
-                    "Delete entry")
+                    "Edit title", "Edit user name", "Edit password",
+                    "Delete entry",
+                    "Playback Control");
 
 static char * kb_list_cb(int selected_item, void *data,
                          char *buffer, size_t buffer_len)
@@ -133,7 +135,7 @@ static char * kb_list_cb(int selected_item, void *data,
     }
     if (!entry)
         return NULL;
-    
+
     rb->snprintf(buffer, buffer_len, "%s", entry->title);
 
     return buffer;
@@ -161,7 +163,7 @@ static void delete_entry(int selected_item)
     entry2 = entry->next;
     if (!entry2)
         return;
-    
+
     entry->next = entry2->next;
 
     entry2->used = false;
@@ -288,6 +290,9 @@ static void context_menu(int selected_item)
             return;
         case 4:
             delete_entry(selected_item);
+            return;
+        case 5:
+            playback_control(NULL);
             return;
         default:
             exit = true;
@@ -610,8 +615,9 @@ static int main_menu(void)
     int selection, result, ret;
     bool exit = false;
 
-    MENUITEM_STRINGLIST(menu,"Keybox", NULL, "Enter Keybox",
-                        "Reset Keybox", "Exit");
+    MENUITEM_STRINGLIST(menu, "Keybox", NULL,
+                        "Enter Keybox", "Reset Keybox",
+                        "Playback Control", "Exit");
 
     do {
         result = rb->do_menu(&menu, &selection, NULL, false);
@@ -625,6 +631,9 @@ static int main_menu(void)
             reset();
             break;
         case 2:
+            playback_control(NULL);
+            break;
+        case 3:
             exit = true;
             break;
         }

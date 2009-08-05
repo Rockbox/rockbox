@@ -34,6 +34,7 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -393,7 +394,7 @@ void game (void) {
         rb->sleep(HZ/level);
 
         button=rb->button_get(false);
-        
+
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold())
         button = SNAKE_PLAYPAUSE;
@@ -445,23 +446,28 @@ void game_init(void) {
     apple=false;
     snakelength=4;
     score=0;
-    board[11][7]=1;   
-    
-    MENUITEM_STRINGLIST(menu,"Snake Menu",NULL,"Start New Game","Starting Level",
-                        "Quit");
-                                           
+    board[11][7]=1;
+
+    MENUITEM_STRINGLIST(menu, "Snake Menu", NULL,
+                        "Start New Game", "Starting Level",
+                        "Playback Control", "Quit");
+
     while (!menu_quit) {
         switch(rb->do_menu(&menu, &selection, NULL, false))
         {
             case 0:
                 menu_quit = true; /* start playing */
                 break;
-                
+
             case 1:
                 rb->set_int("Starting Level", "", UNIT_INT, &level, NULL,
                             1, 1, 9, NULL );
                 break;
-                
+
+            case 2:
+                playback_control(NULL);
+                break;
+
             default:
                 dead=1; /* quit program */
                 menu_quit = true;
