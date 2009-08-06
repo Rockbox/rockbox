@@ -31,6 +31,7 @@
 #include <icons.h>
 
 #include "screen_access.h"
+#include "backdrop.h"
 
 /* some helper functions to calculate metrics on the fly */
 static int screen_helper_getcharwidth(void)
@@ -197,8 +198,11 @@ struct screen screens[NB_SCREENS] =
         .backlight_off=&backlight_off,
         .is_backlight_on=&is_backlight_on,
         .backlight_set_timeout=&backlight_set_timeout,
+        .backdrop_load=&backdrop_load,
+        .backdrop_unload=&backdrop_unload,
+        .backdrop_show=&backdrop_show,
 #ifdef HAVE_BUTTONBAR
-        .has_buttonbar=false
+        .has_buttonbar=false,
 #endif
     },
 #if NB_SCREENS == 2
@@ -278,7 +282,10 @@ struct screen screens[NB_SCREENS] =
         .backlight_on=&remote_backlight_on,
         .backlight_off=&remote_backlight_off,
         .is_backlight_on=&is_remote_backlight_on,
-        .backlight_set_timeout=&remote_backlight_set_timeout
+        .backlight_set_timeout=&remote_backlight_set_timeout,
+        .backdrop_load=&remote_backdrop_load,
+        .backdrop_unload=&remote_backdrop_unload,
+        .backdrop_show=&remote_backdrop_show,
     }
 #endif /* HAVE_REMOTE_LCD */
 };

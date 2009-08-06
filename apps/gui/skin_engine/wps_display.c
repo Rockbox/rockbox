@@ -82,14 +82,7 @@ bool gui_wps_display(struct gui_wps *gwps)
     }
 #endif
     display->clear_display();
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    if (display->screen_type == SCREEN_REMOTE)
-        show_remote_wps_backdrop();
-    else if (display->screen_type == SCREEN_MAIN)
-#endif
-#if LCD_DEPTH > 1
-        show_wps_backdrop();
-#endif
+    display->backdrop_show(BACKDROP_SKIN_WPS);
     return gui_wps_redraw(gwps, WPS_REFRESH_ALL);
 }
 

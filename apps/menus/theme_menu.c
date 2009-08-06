@@ -46,8 +46,8 @@
 static int clear_main_backdrop(void)
 {
     global_settings.backdrop_file[0]=0;
-    unload_main_backdrop();
-    show_main_backdrop();
+    backdrop_unload(BACKDROP_MAIN);
+    backdrop_show(BACKDROP_MAIN);
     settings_save();
     return 0;
 }

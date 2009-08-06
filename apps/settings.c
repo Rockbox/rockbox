@@ -730,6 +730,7 @@ void settings_apply(bool read_disk)
 #if CONFIG_CODEC == SWCODEC
     int i;
 #endif
+    int screen;
 
     sound_settings_apply();
 
@@ -838,12 +839,7 @@ void settings_apply(bool read_disk)
         else
             load_kbd(NULL);
 #endif
-#if LCD_DEPTH > 1
-        unload_wps_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-        unload_remote_wps_backdrop();
-#endif
+
         if ( global_settings.wps_file[0] &&
             global_settings.wps_file[0] != 0xff ) {
             snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
@@ -861,15 +857,14 @@ void settings_apply(bool read_disk)
             global_settings.backdrop_file[0] != 0xff ) {
             snprintf(buf, sizeof buf, BACKDROP_DIR "/%s.bmp",
                     global_settings.backdrop_file);
-            load_main_backdrop(buf);
+            backdrop_load(BACKDROP_MAIN, buf);
         } else {
-            unload_main_backdrop();
+            backdrop_unload(BACKDROP_MAIN);
         }
-        show_main_backdrop();
 #endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-        show_remote_main_backdrop();
-#endif
+
+        FOR_NB_SCREENS(screen)
+            screens[screen].backdrop_show(BACKDROP_MAIN);
 
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
         if ( global_settings.rwps_file[0]) {

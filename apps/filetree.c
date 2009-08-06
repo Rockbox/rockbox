@@ -482,7 +482,7 @@ int ft_enter(struct tree_context* c)
             case FILE_ATTR_WPS:
                 splash(0, ID2P(LANG_WAIT));
 #if LCD_DEPTH > 1
-                unload_wps_backdrop();
+                backdrop_unload(BACKDROP_SKIN_WPS);
 #endif
                 wps_data_load(SCREEN_MAIN, buf, true);
                 set_file(buf, (char *)global_settings.wps_file,
@@ -494,7 +494,7 @@ int ft_enter(struct tree_context* c)
             case FILE_ATTR_RWPS:
                 splash(0, ID2P(LANG_WAIT));
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                unload_remote_wps_backdrop();
+                remote_backdrop_unload(BACKDROP_SKIN_WPS);
 #endif
                 wps_data_load(SCREEN_REMOTE, buf, true);
                 set_file(buf, (char *)global_settings.rwps_file,

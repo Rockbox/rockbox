@@ -183,14 +183,9 @@ void usb_screen(void)
     int i;
     bool statusbar = global_settings.statusbar; /* force the statusbar */
     global_settings.statusbar = true;
-#if LCD_DEPTH > 1
-    show_main_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    show_remote_main_backdrop();
-#endif
     FOR_NB_SCREENS(i)
     {
+        screens[i].backdrop_show(BACKDROP_MAIN);
         screens[i].backlight_on();
         screens[i].clear_display();
 #if NB_SCREENS > 1

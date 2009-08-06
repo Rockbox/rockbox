@@ -24,6 +24,7 @@
 
 #include "lcd.h"
 #include "buttonbar.h"
+#include "backdrop.h"
 
 enum screen_type {
     SCREEN_MAIN
@@ -152,6 +153,9 @@ struct screen
     void (*backlight_off)(void);
     bool (*is_backlight_on)(bool ignore_always_off);
     void (*backlight_set_timeout)(int index);
+    bool (*backdrop_load)(enum backdrop_type bdrop, const char* filename);
+    void (*backdrop_unload)(enum backdrop_type bdrop);
+    void (*backdrop_show)(enum backdrop_type bdrop);
 };
 
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD)

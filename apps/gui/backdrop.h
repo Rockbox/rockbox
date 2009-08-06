@@ -22,27 +22,62 @@
 #ifndef _BACKDROP_H
 #define _BACKDROP_H
 
+enum backdrop_type {
+    BACKDROP_MAIN,
+    BACKDROP_SKIN_WPS,
+};
+
 #if LCD_DEPTH > 1
 
 #include "lcd.h"
 #include "bmp.h"
 
-bool load_main_backdrop(const char* filename);
-bool load_wps_backdrop(const char* filename);
+bool backdrop_load(enum backdrop_type bdrop, const char*);
+void backdrop_unload(enum backdrop_type bdrop);
+void backdrop_show(enum backdrop_type bdrop);
 
-void unload_main_backdrop(void);
-void unload_wps_backdrop(void);
+#else /* LCD_DEPTH > 1 */
 
-void show_main_backdrop(void);
-void show_wps_backdrop(void);
+static inline
+bool backdrop_load(enum backdrop_type bdrop, const char* filename)
+{
+    (void)filename; (void)bdrop; return true;
+}
 
-#endif /* LCD_DEPTH > 1 */
+static inline void backdrop_unload(enum backdrop_type bdrop)
+{
+    (void)bdrop;
+}
+static inline void backdrop_show(enum backdrop_type bdrop)
+{
+    (void)bdrop;
+}
 
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-bool load_remote_wps_backdrop(const char* filename);
-void unload_remote_wps_backdrop(void);
-void show_remote_wps_backdrop(void);
-void show_remote_main_backdrop(void); /* only clears the wps backdrop */
+#endif
+
+#if defined(HAVE_REMOTE_LCD)
+/* no main backdrop, stubs! */
+#if LCD_REMOTE_DEPTH > 1
+bool remote_backdrop_load(enum backdrop_type bdrop,const char* filename);
+void remote_backdropunload(enum backdrop_type bdrop);
+void remote_backdrop_show(enum backdrop_type bdrop);
+#else
+static inline
+bool remote_backdrop_load(enum backdrop_type bdrop,const char* filename)
+{
+    (void)filename; (void)bdrop; return true;
+}
+
+static inline void remote_backdrop_unload(enum backdrop_type bdrop)
+{
+    (void)bdrop;
+}
+
+static inline void remote_backdrop_show(enum backdrop_type bdrop)
+{
+    (void)bdrop;
+}
+#endif
 #endif
 
 #endif /* _BACKDROP_H */

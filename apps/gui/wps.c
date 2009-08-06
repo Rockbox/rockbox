@@ -92,7 +92,8 @@ static void nextid3available_callback(void* param);
 
 void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
 {
-    bool loaded_ok = buf && skin_data_load(gui_wps[screen].data, &screens[screen], buf, isfile);
+    bool loaded_ok = buf && skin_data_load(gui_wps[screen].data,
+                                            &screens[screen], buf, isfile);
     if (!loaded_ok) /* load the hardcoded default */
     {
         char *skin_buf[NB_SCREENS] = {
@@ -115,24 +116,9 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
             "%pb\n",
 #endif
         };
+        screens[screen].backdrop_unload(BACKDROP_SKIN_WPS);
         skin_data_load(gui_wps[screen].data, &screens[screen],
                         skin_buf[screen], false);
-        /* set the default wps for the main-screen */
-        if(screen == SCREEN_MAIN)
-        {
-#if LCD_DEPTH > 1
-            unload_wps_backdrop();
-#endif
-        }
-#ifdef HAVE_REMOTE_LCD
-        /* set the default wps for the remote-screen */
-        else if(screen == SCREEN_REMOTE)
-        {
-#if LCD_REMOTE_DEPTH > 1
-            unload_remote_wps_backdrop();
-#endif
-        }
-#endif
     }
 #ifdef HAVE_REMOVE_LCD
     gui_wps[screen].data->remote_wps = !(screen == SCREEN_MAIN);
@@ -564,16 +550,13 @@ static void gwps_leave_wps(void)
     int i, oldbars = VP_SB_HIDE_ALL;
 
     FOR_NB_SCREENS(i)
+    {
         gui_wps[i].display->stop_scroll();
+        gui_wps[i].display->backdrop_show(BACKDROP_MAIN);
+    }
     if (global_settings.statusbar)
         oldbars = VP_SB_ALLSCREENS;
 
-#if LCD_DEPTH > 1
-    show_main_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    show_remote_main_backdrop();
-#endif
     viewportmanager_set_statusbar(oldbars);
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
     /* Play safe and unregister the hook */
@@ -1237,22 +1220,17 @@ void gui_sync_wps_init(void)
         wps_datas[i].wps_uses_albumart = 0;
 #endif
 #ifdef HAVE_REMOTE_LCD
-        wps_datas[i].remote_wps = (i != 0);
+        wps_datas[i].remote_wps = (i == SCREEN_REMOTE);
 #endif
         gui_wps[i].data = &wps_datas[i];
         gui_wps[i].display = &screens[i];
         /* Currently no seperate wps_state needed/possible
            so use the only available ( "global" ) one */
         gui_wps[i].state = &wps_state;
+        gui_wps[i].display->backdrop_unload(BACKDROP_SKIN_WPS);
     }
 #ifdef HAVE_LCD_BITMAP
     add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, statusbar_toggle_handler);
-#endif
-#if LCD_DEPTH > 1
-    unload_wps_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    unload_remote_wps_backdrop();
 #endif
 }
 

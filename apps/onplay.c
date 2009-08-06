@@ -560,11 +560,11 @@ static bool delete_dir(void)
 static bool set_backdrop(void)
 {
     /* load the image */
-    if(load_main_backdrop(selected_file)) {
+    if(backdrop_load(BACKDROP_MAIN, selected_file)) {
         splash(HZ, str(LANG_BACKDROP_LOADED));
         set_file(selected_file, (char *)global_settings.backdrop_file,
             MAX_FILENAME);
-        show_main_backdrop();
+        backdrop_show(BACKDROP_MAIN);
         return true;
     } else {
         splash(HZ, str(LANG_BACKDROP_FAILED));

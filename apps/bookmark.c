@@ -164,6 +164,7 @@ bool bookmark_autobookmark(void)
     char*  bookmark;
     if (!system_check())
         return false;
+    int i;
 
     audio_pause();    /* first pause playback */
     bookmark = create_bookmark();
@@ -191,12 +192,9 @@ bool bookmark_autobookmark(void)
                             str(LANG_CONFIRM_WITH_BUTTON)};
     const struct text_message message={lines, 2};
 #endif
-#if LCD_DEPTH > 1
-    show_main_backdrop(); /* switch to main backdrop as we may come from wps */
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    show_remote_main_backdrop();
-#endif
+    FOR_NB_SCREENS(i)
+        screens[i].backdrop_show(BACKDROP_MAIN);
+
     if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
     {
         if (global_settings.autocreatebookmark == BOOKMARK_RECENT_ONLY_ASK)
