@@ -34,6 +34,10 @@ PLUGIN_HEADER
 #   define MAZEZAM_LEFT     BUTTON_LEFT
 #   define MAZEZAM_UP       BUTTON_MENU
 #   define MAZEZAM_DOWN     BUTTON_PLAY
+#   define MAZEZAM_RIGHT_REPEAT (BUTTON_RIGHT|BUTTON_REPEAT)
+#   define MAZEZAM_LEFT_REPEAT  (BUTTON_LEFT|BUTTON_REPEAT)
+#   define MAZEZAM_UP_REPEAT    (BUTTON_MENU|BUTTON_REPEAT)
+#   define MAZEZAM_DOWN_REPEAT  (BUTTON_PLAY|BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD)
 #   define MAZEZAM_MENU    BUTTON_MENU
@@ -41,6 +45,10 @@ PLUGIN_HEADER
 #   define MAZEZAM_LEFT    BUTTON_LEFT
 #   define MAZEZAM_UP      BUTTON_SCROLL_BACK
 #   define MAZEZAM_DOWN    BUTTON_SCROLL_FWD
+#   define MAZEZAM_RIGHT_REPEAT (BUTTON_RIGHT|BUTTON_REPEAT)
+#   define MAZEZAM_LEFT_REPEAT  (BUTTON_LEFT|BUTTON_REPEAT)
+#   define MAZEZAM_UP_REPEAT    (BUTTON_SCROLL_BACK|BUTTON_REPEAT)
+#   define MAZEZAM_DOWN_REPEAT  (BUTTON_SCROLL_FWD|BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
 #   define MAZEZAM_MENU     (BUTTON_HOME | BUTTON_REPEAT)
@@ -48,6 +56,10 @@ PLUGIN_HEADER
 #   define MAZEZAM_LEFT     BUTTON_LEFT
 #   define MAZEZAM_UP       BUTTON_UP
 #   define MAZEZAM_DOWN     BUTTON_DOWN
+#   define MAZEZAM_RIGHT_REPEAT (BUTTON_RIGHT|BUTTON_REPEAT)
+#   define MAZEZAM_LEFT_REPEAT  (BUTTON_LEFT|BUTTON_REPEAT)
+#   define MAZEZAM_UP_REPEAT    (BUTTON_UP|BUTTON_REPEAT)
+#   define MAZEZAM_DOWN_REPEAT  (BUTTON_DOWN|BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
 #   define MAZEZAM_MENU     BUTTON_POWER
@@ -56,6 +68,10 @@ PLUGIN_HEADER
 #   define MAZEZAM_LEFT     BUTTON_LEFT
 #   define MAZEZAM_UP       BUTTON_UP
 #   define MAZEZAM_DOWN     BUTTON_DOWN
+#   define MAZEZAM_RIGHT_REPEAT (BUTTON_RIGHT|BUTTON_REPEAT)
+#   define MAZEZAM_LEFT_REPEAT  (BUTTON_LEFT|BUTTON_REPEAT)
+#   define MAZEZAM_UP_REPEAT    (BUTTON_UP|BUTTON_REPEAT)
+#   define MAZEZAM_DOWN_REPEAT  (BUTTON_DOWN|BUTTON_REPEAT)
 
 #else
 #   include "lib/pluginlib_actions.h"
@@ -64,6 +80,10 @@ PLUGIN_HEADER
 #   define MAZEZAM_LEFT     PLA_LEFT
 #   define MAZEZAM_UP       PLA_UP
 #   define MAZEZAM_DOWN     PLA_DOWN
+#   define MAZEZAM_RIGHT_REPEAT PLA_RIGHT_REPEAT
+#   define MAZEZAM_LEFT_REPEAT  PLA_LEFT_REPEAT
+#   define MAZEZAM_UP_REPEAT    PLA_UP_REPEAT
+#   define MAZEZAM_DOWN_REPEAT  PLA_DOWN_REPEAT
 const struct button_mapping *plugin_contexts[]
 = {generic_directions, generic_actions};
 #endif
@@ -221,7 +241,7 @@ static enum {
 
     STATE_COMPLETED      /* A level has been completed */
       = STATE_IN_GAME,
-      
+
     STATE_FAILED,        /* The player wants to retry the level */
     STATE_GAME_MENU,     /* The player wan't to access the in-game menu */
 
@@ -574,7 +594,7 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
 
         switch (button) {
             case MAZEZAM_UP:
-            case (MAZEZAM_UP|BUTTON_REPEAT):
+            case MAZEZAM_UP_REPEAT:
                 if ((*y > 0) && (*x >= 0) && (*x < li->width)) {
                     for (i = 0; i < li->cd.l_num[*y-1]; i++)
                         blocked = blocked ||
@@ -585,10 +605,8 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
                 }
                 break;
 
-
-
             case MAZEZAM_DOWN:
-            case (MAZEZAM_DOWN|BUTTON_REPEAT):
+            case MAZEZAM_DOWN_REPEAT:
                 if ((*y < li->height-1) && (*x >= 0) && (*x < li->width)) {
                     for (i = 0; i < li->cd.l_num[*y+1]; i++)
                         blocked = blocked ||
@@ -600,7 +618,7 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
                 break;
 
             case MAZEZAM_LEFT:
-            case (MAZEZAM_LEFT|BUTTON_REPEAT):
+            case MAZEZAM_LEFT_REPEAT:
                 if (*x > 0) {
                     for (i = 0; i < li->cd.l_num[*y]; i++)
                         blocked = blocked ||
@@ -615,7 +633,7 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
                 break;
 
             case MAZEZAM_RIGHT:
-            case (MAZEZAM_RIGHT|BUTTON_REPEAT):
+            case MAZEZAM_RIGHT_REPEAT:
                 if (*x < li->width-1) {
                     for (i = 0; i < li->cd.l_num[*y]; i++)
                         blocked = blocked ||
@@ -817,6 +835,7 @@ static void game_loop(struct resume_data *r)
             break;
 
         case STATE_WELLDONE:
+            r->level = 0;
             welldone_screen();
             break;
 
