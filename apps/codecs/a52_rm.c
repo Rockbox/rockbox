@@ -45,6 +45,7 @@ static void init_rm(RMContext *rmctx)
 /* used outside liba52 */
 static uint8_t buf[3840] IBSS_ATTR;
 
+/* The following two functions, a52_decode_data and output_audio are taken from apps/codecs/a52.c */
 static inline void output_audio(sample_t *samples)
 {
     ci->yield();
