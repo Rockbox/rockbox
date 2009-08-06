@@ -1,6 +1,7 @@
 /* A _very_ skeleton file to demonstrate building tagcache db on host. */
 
 #include <stdio.h>
+#include <sys/stat.h>
 #include "tagcache.h"
 
 int main(int argc, char **argv)
@@ -15,7 +16,8 @@ int main(int argc, char **argv)
 /* stub to avoid including all of apps/misc.c */
 bool file_exists(const char *file)
 {
-    if (!stat(file))
+    struct stat s;
+    if (!stat(file, &s))
         return true;
     return false;
 }
