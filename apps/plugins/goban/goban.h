@@ -322,7 +322,7 @@
 #define DEFAULT_SAVE_DIR PLUGIN_GAMES_DIR "/goban"
 
 /* The default file we save to */
-#define DEFAULT_SAVE (DEFAULT_SAVE_DIR "/goban_d.save")
+#define DEFAULT_SAVE (DEFAULT_SAVE_DIR "/goban_d.sgf")
 
 /* The size of the buffer we store filenames in (1 reserved for '\0') */
 #define SAVE_FILE_LENGTH 256
