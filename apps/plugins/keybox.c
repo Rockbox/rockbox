@@ -182,7 +182,7 @@ static void add_entry(int selected_item)
     for (i = 0; i < MAX_ENTRIES && pw_list.entries[i].used; i++)
         ;
 
-    if (pw_list.entries[i].used)
+    if (MAX_ENTRIES == i)
     {
         rb->splash(HZ, "Password list full");
         return;

@@ -283,7 +283,7 @@ static void matrix_loop(void)
 
                 if (i > ROWS) {
                     matrix[z][j].val = 129;
-                    matrix[ROWS][j].bold = 1;
+                    matrix[ROWS - 1][j].bold = 1;
                     matrix_blit_char(z - 1, j, matrix[z][j].val);
                     continue;
                 }
