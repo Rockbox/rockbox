@@ -247,7 +247,7 @@ static bool pacbox_menu(void)
          restart game
          usb connected
     */
-    return (result==6);
+    return (result==7);
 }
 
 
