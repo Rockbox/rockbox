@@ -186,7 +186,7 @@ bool remote_backdrop_load(enum backdrop_type bdrop,
         return false;
 }
 
-void remote_backrop_show(enum backdrop_type bdrop)
+void remote_backdrop_show(enum backdrop_type bdrop)
 {
     if (bdrop == BACKDROP_MAIN)
         show_remote_main_backdrop();
