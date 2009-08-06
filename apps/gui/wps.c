@@ -92,8 +92,12 @@ static void nextid3available_callback(void* param);
 
 void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
 {
-    bool loaded_ok = buf && skin_data_load(gui_wps[screen].data,
-                                            &screens[screen], buf, isfile);
+    bool loaded_ok;
+
+    screens[screen].backdrop_unload(BACKDROP_SKIN_WPS);
+
+    loaded_ok = buf && skin_data_load(gui_wps[screen].data,
+                                        &screens[screen], buf, isfile);
     if (!loaded_ok) /* load the hardcoded default */
     {
         char *skin_buf[NB_SCREENS] = {
@@ -116,7 +120,6 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
             "%pb\n",
 #endif
         };
-        screens[screen].backdrop_unload(BACKDROP_SKIN_WPS);
         skin_data_load(gui_wps[screen].data, &screens[screen],
                         skin_buf[screen], false);
     }
