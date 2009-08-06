@@ -21,9 +21,9 @@
 #include "config.h"
 #include "cpu.h"
 #include "kernel.h"
-#include "thread.h"
 #include "system.h"
 #include "backlight.h"
+#include "backlight-target.h"
 #include "lcd.h"
 
 /* Returns the current state of the backlight (true=ON, false=OFF). */

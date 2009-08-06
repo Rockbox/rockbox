@@ -277,7 +277,7 @@ void buf_dump(unsigned char *buf, size_t size)
 #define buf_dump(...)
 #endif
 
-uint8_t buf_set_keyboard(unsigned char *buf, int id)
+static uint8_t buf_set_keyboard(unsigned char *buf, int id)
 {
     memset(buf, 0, 7);
 
@@ -289,7 +289,7 @@ uint8_t buf_set_keyboard(unsigned char *buf, int id)
     return 7;
 }
 
-uint8_t buf_set_consumer(unsigned char *buf, int id)
+static uint8_t buf_set_consumer(unsigned char *buf, int id)
 {
     memset(buf, 0, 4);
     buf[0] = (uint8_t)id;

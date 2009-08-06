@@ -182,6 +182,11 @@ extern bool gui_synclist_do_button(struct gui_synclist * lists,
                                        int *action,
                                        enum list_wrap);
 
+#if  defined(HAVE_TOUCHSCREEN)
+/* this needs to be fixed if we ever get more than 1 touchscreen on a target */
+unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list);
+#endif
+
 /* If the list has a pending postponed scheduled announcement, that
    may become due before the next get_action tmieout. This function
    adjusts the get_action timeout appropriately. */

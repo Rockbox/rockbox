@@ -447,7 +447,7 @@ unsigned char pcf50606_i2c_inb(bool ack)
     return byte;
 }
 
-int pcf50606_i2c_write(int address, const unsigned char* buf, int count)
+static int pcf50606_i2c_write(int address, const unsigned char* buf, int count)
 {
     int i,x=0;
 

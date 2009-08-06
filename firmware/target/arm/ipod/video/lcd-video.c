@@ -123,9 +123,9 @@ unsigned flash_vmcs_length;
    Based on part of FS#6721.  This may belong elsewhere.
    (BCM initialization uploads the vmcs section to the BCM.)
  */
-bool flash_get_section(const unsigned int imageid,
-                       void **offset,
-                       unsigned int *length)
+static bool flash_get_section(const unsigned int imageid,
+                              void **offset,
+                              unsigned int *length)
 {
     unsigned long *p = (unsigned long*)(ROM_BASE + 0xffe00);
     unsigned char *csp, *csend;
@@ -505,7 +505,7 @@ static void bcm_command(unsigned cmd)
     }
 }
 
-void bcm_powerdown(void)
+static void bcm_powerdown(void)
 {
     bcm_write32(0x10001400, bcm_read32(0x10001400) & ~0xF0);
 
@@ -530,7 +530,7 @@ const unsigned char bcm_bootstrapdata[] =
     0xA1, 0x81, 0x91, 0x02, 0x12, 0x22, 0x72, 0x62
 };
 
-void bcm_init(void)
+static void bcm_init(void)
 {
     int i;
 

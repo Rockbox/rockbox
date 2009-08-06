@@ -29,7 +29,7 @@
 
 #define SWAP(a, b) do{uint8_t SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
 
-void advance_buffer(uint8_t **buf, int val)
+static void advance_buffer(uint8_t **buf, int val)
 {
     *buf += val;
 }

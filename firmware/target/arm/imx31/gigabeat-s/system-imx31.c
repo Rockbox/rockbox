@@ -41,7 +41,7 @@ unsigned int iim_system_rev(void)
     return system_rev & IIM_SREV_SREV;
 }
 
-unsigned int iim_prod_rev(void)
+static unsigned int iim_prod_rev(void)
 {
     return product_rev;
 }

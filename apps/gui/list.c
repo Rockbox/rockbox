@@ -580,11 +580,6 @@ void gui_synclist_speak_item(struct gui_synclist * lists)
     else _gui_synclist_speak_item(lists, false);
 }
 
-#if  defined(HAVE_TOUCHSCREEN)
-/* this needs to be fixed if we ever get more than 1 touchscreen on a target */
-unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list);
-#endif
-
 bool gui_synclist_do_button(struct gui_synclist * lists,
                             int *actionptr, enum list_wrap wrap)
 {

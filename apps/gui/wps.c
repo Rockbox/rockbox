@@ -197,7 +197,7 @@ bool is_wps_fading(void)
     return wps_fading_out;
 }
 
-bool update_onvol_change(struct gui_wps * gwps)
+static bool update_onvol_change(struct gui_wps * gwps)
 {
     skin_update(gwps, WPS_REFRESH_NON_STATIC);
 

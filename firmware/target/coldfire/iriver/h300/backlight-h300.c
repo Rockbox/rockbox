@@ -24,6 +24,7 @@
 #include "thread.h"
 #include "system.h"
 #include "backlight.h"
+#include "backlight-target.h"
 #include "pcf50606.h"
 #include "lcd.h"
 
