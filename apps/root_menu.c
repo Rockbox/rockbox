@@ -56,7 +56,6 @@
 #include "wps.h"
 #include "bookmark.h"
 #include "playlist.h"
-#include "tagtree.h"
 #include "menus/exported_menus.h"
 #ifdef HAVE_RTC_ALARM
 #include "rtc.h"

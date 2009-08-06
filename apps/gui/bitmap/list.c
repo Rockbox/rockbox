@@ -38,7 +38,6 @@
 #include "lang.h"
 #include "sound.h"
 #include "misc.h"
-#include "talk.h"
 #include "viewport.h"
 
 #define ICON_PADDING 1

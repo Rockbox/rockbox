@@ -30,7 +30,6 @@
 #include <stdio.h>
 #else
 #include "sprintf.h"
-#include "appevents.h"
 #include "lang.h"
 #include "dir.h"
 #include "lcd-remote.h"

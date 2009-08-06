@@ -67,7 +67,6 @@
 #include "albumart.h"
 #endif
 #include "lang.h"
-#include "bookmark.h"
 #include "misc.h"
 #include "sound.h"
 #include "metadata.h"

@@ -47,7 +47,6 @@
 #include "menus/exported_menus.h"
 #include "string.h"
 #include "root_menu.h"
-#include "bookmark.h"
 #include "audio.h"
 #include "viewport.h"
 #include "quickscreen.h"

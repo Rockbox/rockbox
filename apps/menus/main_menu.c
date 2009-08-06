@@ -36,7 +36,6 @@
 #ifdef HAVE_RECORDING
 #include "recording.h"
 #endif
-#include "bookmark.h"
 #include "yesno.h"
 #include "keyboard.h"
 #include "screens.h"

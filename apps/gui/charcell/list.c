@@ -37,7 +37,6 @@
 #include "lang.h"
 #include "sound.h"
 #include "misc.h"
-#include "talk.h"
 
 void list_draw(struct screen *display, struct gui_synclist *gui_list)
 {
