@@ -141,7 +141,7 @@ bool tidy_remove_item(char *item, int attr)
         if (file[rb->strlen(file)-1] == '*')
         {
             if (!rb->strncmp(file, item, rb->strlen(file)-1))
-                 rem = true;
+                rem = true;
         }
         else if (!rb->strcmp(file, item))
             rem = true;
@@ -192,12 +192,12 @@ enum tidy_return tidy_removedir(const char *name, int *removed)
     int button;
     DIR *dir;
     char fullname[MAX_PATH];
-    
+
     /* display status text */
     tidy_lcd_status(name, removed);
-    
+
     rb->yield();
-    
+
     dir = rb->opendir(name);
     if (dir)
     {
@@ -216,12 +216,12 @@ enum tidy_return tidy_removedir(const char *name, int *removed)
                 rb->closedir(dir);
                 return TIDY_RETURN_USB;
             }
-            
+
             rb->yield();
-            
+
             /* get absolute path */
             tidy_get_absolute_path(entry, fullname, name);
-            
+
             if (entry->attribute & ATTR_DIRECTORY)
             {
                 /* dir ignore "." and ".." */
@@ -259,12 +259,12 @@ enum tidy_return tidy_clean(const char *name, int *removed)
     int del; /* has the item been deleted */
     DIR *dir;
     char fullname[MAX_PATH];
-        
+
     /* display status text */
     tidy_lcd_status(name, removed);
-    
+
     rb->yield();
-    
+
     dir = rb->opendir(name);
     if (dir)
     {
@@ -283,9 +283,9 @@ enum tidy_return tidy_clean(const char *name, int *removed)
                 rb->closedir(dir);
                 return TIDY_RETURN_USB;
             }
-            
+
             rb->yield();
-            
+
             if (entry->attribute & ATTR_DIRECTORY)
             {
                 /* directory ignore "." and ".." */
@@ -293,17 +293,17 @@ enum tidy_return tidy_clean(const char *name, int *removed)
                     (rb->strcmp(entry->d_name, "..") != 0))
                 {
                     del = 0;
-                    
+
                     /* get absolute path */
                     tidy_get_absolute_path(entry, fullname, name);
-                    
+
                     if (tidy_remove_item(entry->d_name, entry->attribute))
                     {
                         /* delete dir */
                         tidy_removedir(fullname, removed);
                         del = 1;
                     }
-                    
+
                     if (del == 0)
                     {
                         /* dir not deleted so clean it */
@@ -318,11 +318,11 @@ enum tidy_return tidy_clean(const char *name, int *removed)
                 if (tidy_remove_item(entry->d_name, entry->attribute))
                 {
                     *removed += 1; /* increment removed files counter */
-                    
+
                     /* get absolute path */
                     char fullname[MAX_PATH];
                     tidy_get_absolute_path(entry, fullname, name);
-                    
+
                     /* delete file */
                     rb->remove(fullname);
                     del = 1;
@@ -338,23 +338,23 @@ enum tidy_return tidy_clean(const char *name, int *removed)
     }
 }
 
-enum plugin_status tidy_do(void)
+enum tidy_return tidy_do(void)
 {
     /* clean disk and display num of items removed */
     int removed = 0;
     enum tidy_return status;
     char text[24]; /* "Cleaned up nnnnn items" */
-    
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
-    
+
     status = tidy_clean("/", &removed);
-    
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
-    
+
     if ((status == TIDY_RETURN_OK) || (status == TIDY_RETURN_ABORT))
     {
         rb->lcd_clear_display();
@@ -436,29 +436,32 @@ int list_action_callback(int action, struct gui_synclist *lists)
     return action;
 }
 
-int tidy_lcd_menu(void)
+enum tidy_return tidy_lcd_menu(void)
 {
-    int selection, ret = 3;
+    int selection = 0;
+    enum tidy_return status = TIDY_RETURN_OK;
     bool menu_quit = false;
-    
-    MENUITEM_STRINGLIST(menu,"Disktidy Menu",NULL,"Start Cleaning",
-                        "Files to Clean","Quit");
-    
+
+    MENUITEM_STRINGLIST(menu, "Disktidy Menu", NULL,
+                        "Start Cleaning", "Files to Clean",
+                        "Quit");
+
     while (!menu_quit)
-    {    
+    {
         switch(rb->do_menu(&menu, &selection, NULL, false))
         {
-         
             case 0:
                 menu_quit = true;   /* start cleaning */
                 break;
-                
+
             case 1:
             {
                 bool show_icons = rb->global_settings->show_icons;
                 struct simplelist_info list;
-                rb->global_settings->show_icons = true; /* force the icons so its readable */
-                rb->simplelist_info_init(&list, "Files to Clean", tidy_type_count, NULL);
+                /* force the icons so its readable */
+                rb->global_settings->show_icons = true;
+                rb->simplelist_info_init(&list, "Files to Clean",
+                                         tidy_type_count, NULL);
                 list.get_icon = get_icon;
                 list.get_name = get_name;
                 list.action_callback = list_action_callback;
@@ -466,21 +469,20 @@ int tidy_lcd_menu(void)
                 rb->global_settings->show_icons = show_icons;
             }
             break;
-        
+
             default:
-                ret = 99;    /* exit plugin */
+                status = TIDY_RETURN_ABORT; /* exit plugin */
                 menu_quit = true;
                 break;
         }
     }
-    return ret;
+    return status;
 }
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
     enum tidy_return status;
-    int ret;
     (void)parameter;
 
     tidy_type_count = 0;
@@ -491,7 +493,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->splash(3*HZ, "Missing disktidy.config file");
         return PLUGIN_ERROR;
     }
-    ret = tidy_lcd_menu();
+    status = tidy_lcd_menu();
     if (tidy_loaded_and_changed)
     {
         int fd = rb->creat(CUSTOM_FILES);
@@ -507,7 +509,7 @@ enum plugin_status plugin_start(const void* parameter)
             rb->close(fd);
         }
     }
-    if (ret == 99)
+    if (status == TIDY_RETURN_ABORT)
         return PLUGIN_OK;
     while (true)
     {
@@ -520,17 +522,16 @@ enum plugin_status plugin_start(const void* parameter)
                 case TIDY_RETURN_ERROR:
                     return PLUGIN_ERROR;
                 case TIDY_RETURN_USB:
-                   return PLUGIN_USB_CONNECTED;
+                    return PLUGIN_USB_CONNECTED;
                 case TIDY_RETURN_ABORT:
-                    return PLUGIN_OK;                
+                    return PLUGIN_OK;
             }
     }
-        
+
     if (rb->default_event_handler(rb->button_get(false)) == SYS_USB_CONNECTED)
         return PLUGIN_USB_CONNECTED;
-        
+
     rb->yield();
 
-    
     return PLUGIN_OK;
 }

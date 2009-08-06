@@ -312,15 +312,10 @@ static void goto_menu(void);
 static int load_bitmap( const char *filename );
 static int save_bitmap( char *filename );
 static void draw_rect_full( int x1, int y1, int x2, int y2 );
-extern int errno;
 
 /***********************************************************************
  * Global variables
  ***********************************************************************/
-
-#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
-int errno;
-#endif
 
 static int drawcolor=0; /* Current color (in palette) */
 static int bgdrawcolor=9; /* Current background color (in palette) */
@@ -518,7 +513,8 @@ static void buffer_putsxyofs( fb_data *buf, int buf_width, int buf_height,
 
         bits = rb->font_get_bits( pf, ch );
 
-        buffer_mono_bitmap_part( buf, buf_width, buf_height, bits, ofs, 0, width, x, y, width - ofs, pf->height);
+        buffer_mono_bitmap_part( buf, buf_width, buf_height, bits, ofs, 0,
+                                 width, x, y, width - ofs, pf->height);
 
         x += width - ofs;
         ofs = 0;
@@ -539,9 +535,9 @@ enum {
      };
 enum {
         /* Select action menu */
-        SELECT_MENU_CUT, SELECT_MENU_COPY, SELECT_MENU_INVERT,
-        SELECT_MENU_HFLIP, SELECT_MENU_VFLIP, SELECT_MENU_ROTATE90,
-        SELECT_MENU_ROTATE180, SELECT_MENU_ROTATE270,
+        SELECT_MENU_CUT, SELECT_MENU_COPY,
+        SELECT_MENU_INVERT, SELECT_MENU_HFLIP, SELECT_MENU_VFLIP,
+        SELECT_MENU_ROTATE90, SELECT_MENU_ROTATE180, SELECT_MENU_ROTATE270,
         SELECT_MENU_CANCEL,
      };
 enum {
@@ -562,9 +558,10 @@ MENUITEM_STRINGLIST(speed_menu, "Choose Speed", NULL,
 MENUITEM_STRINGLIST(gridsize_menu, "Grid Size", NULL,
                     "No grid", "5px", "10px", "20px");
 MENUITEM_STRINGLIST(select_menu, "Select...", NULL,
-                    "Cut", "Copy", "Invert", "Horizontal Flip" ,
-                    "Vertical Flip", "Rotate 90°",
-                    "Rotate 180°", "Rotate 270°", "Cancel");
+                    "Cut", "Copy",
+                    "Invert", "Horizontal Flip", "Vertical Flip",
+                    "Rotate 90°", "Rotate 180°", "Rotate 270°",
+                    "Cancel");
 MENUITEM_STRINGLIST(text_menu, "Text", NULL,
                     "Set Text", "Change Font",
                     "Preview", "Apply", "Cancel");
@@ -1574,20 +1571,20 @@ static void draw_line( int x1, int y1, int x2, int y2 )
     int deltax = x2 - x1;
     int deltay = y2 - y1;
     int i;
-    
+
     int xerr = abs(deltax);
     int yerr = abs(deltay);
     int xstep = deltax > 0 ? 1 : -1;
     int ystep = deltay > 0 ? 1 : -1;
     int err;
-    
+
     if (yerr > xerr)
     {
         /* more vertical */
         err = yerr;
         xerr <<= 1;
         yerr <<= 1;
-        
+
         /* to leave off the last pixel of the line, leave off the "+ 1" */
         for (i = abs(deltay) + 1; i; --i)
         {
@@ -1606,7 +1603,7 @@ static void draw_line( int x1, int y1, int x2, int y2 )
         err = xerr;
         xerr <<= 1;
         yerr <<= 1;
-        
+
         for (i = abs(deltax) + 1; i; --i)
         {
             draw_pixel(x, y);
@@ -1702,7 +1699,7 @@ static void draw_curve( int x1, int y1, int x2, int y2,
                 draw_line( ((xl1>>3)+1)>>1, ((yl1>>3)+1)>>1,
                           ((xr3>>3)+1)>>1, ((yr3>>3)+1)>>1 );
             }
-       }
+        }
 #undef PUSH
 #undef POP
     }
@@ -2090,8 +2087,8 @@ static void linear_gradient( int x1, int y1, int x2, int y2 )
     rgb2hsv( r2, g2, b2, &h2, &s2, &v2 );
 
 #define PUSH( x0, y0 ) \
-    buffer.coord[i].x = (short)(x0);                                    \
-    buffer.coord[i].y = (short)(y0);                                    \
+    buffer.coord[i].x = (short)(x0); \
+    buffer.coord[i].y = (short)(y0); \
     i++;
 #define POP( a, b ) \
     i--; \
@@ -2186,8 +2183,8 @@ static void radial_gradient( int x1, int y1, int x2, int y2 )
     rgb2hsv( r2, g2, b2, &h2, &s2, &v2 );
 
 #define PUSH( x0, y0 ) \
-    buffer.coord[i].x = (short)(x0);                                    \
-    buffer.coord[i].y = (short)(y0);                                    \
+    buffer.coord[i].x = (short)(x0); \
+    buffer.coord[i].y = (short)(y0); \
     i++;
 #define POP( a, b ) \
     i--; \
@@ -2564,7 +2561,9 @@ static bool rockpaint_loop( void )
     int button=0,i,j;
     int accelaration;
 
+    x = 10;
     toolbar();
+    x = 0; y = 0;
     restore_screen();
     inv_cursor(true);
 
