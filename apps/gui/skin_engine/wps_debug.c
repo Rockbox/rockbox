@@ -531,7 +531,7 @@ static void print_line_info(struct wps_data *data)
                 {
                     DEBUGF("    Subline %d: first_token=%3d, last_token=%3d",
                            j, subline->first_token_idx,
-                           wps_last_token_index(data, i, j));
+                           skin_last_token_index(data, i, j));
 
                     if (subline->line_type & WPS_REFRESH_SCROLL)
                         DEBUGF(", scrolled");

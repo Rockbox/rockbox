@@ -44,6 +44,7 @@
 #include "font.h"
 
 #include "wps_internals.h"
+#include "skin_engine.h"
 #include "settings.h"
 #include "settings_list.h"
 
@@ -1535,46 +1536,6 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     return (fail == 0);
 }
 
-#ifdef HAVE_LCD_BITMAP
-/* Clear the WPS image cache */
-static void wps_images_clear(struct wps_data *data)
-{
-    int i;
-    /* set images to unloaded and not displayed */
-    for (i = 0; i < MAX_IMAGES; i++)
-    {
-       data->img[i].loaded = false;
-       data->img[i].display = -1;
-       data->img[i].always_display = false;
-       data->img[i].num_subimages = 1;
-    }
-}
-#endif
-
-/* initial setup of wps_data */
-void skin_data_init(struct wps_data *wps_data)
-{
-#ifdef HAVE_LCD_BITMAP
-    wps_images_clear(wps_data);
-    wps_data->wps_sb_tag = false;
-    wps_data->show_sb_on_wps = false;
-    wps_data->img_buf_ptr = wps_data->img_buf; /* where in image buffer */
-    wps_data->img_buf_free = IMG_BUFSIZE; /* free space in image buffer */
-    wps_data->peak_meter_enabled = false;
-    /* progress bars */
-    wps_data->progressbar_count = 0;
-#else /* HAVE_LCD_CHARCELLS */
-    int i;
-    for (i = 0; i < 8; i++)
-    {
-        wps_data->wps_progress_pat[i] = 0;
-    }
-    wps_data->full_line_progressbar = false;
-#endif
-    wps_data->button_time_volume = 0;
-    wps_data->wps_loaded = false;
-}
-
 static void wps_reset(struct wps_data *data)
 {
 #ifdef HAVE_REMOTE_LCD
@@ -1589,7 +1550,7 @@ static void wps_reset(struct wps_data *data)
 
 #ifdef HAVE_LCD_BITMAP
 
-static bool load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
+static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
 {
     char img_path[MAX_PATH];
     struct bitmap *bitmap;
@@ -1780,7 +1741,7 @@ bool skin_data_load(struct wps_data *wps_data,
         strlcpy(bmpdir, buf, dot - buf + 1);
 
         /* load the bitmaps that were found by the parsing */
-        if (!load_wps_bitmaps(wps_data, bmpdir)) {
+        if (!load_skin_bitmaps(wps_data, bmpdir)) {
             wps_reset(wps_data);
             return false;
         }
@@ -1801,33 +1762,5 @@ bool skin_data_load(struct wps_data *wps_data,
         }
 #endif
         return true;
-    }
-}
-
-
-int wps_subline_index(struct wps_data *data, int line, int subline)
-{
-    return data->lines[line].first_subline_idx + subline;
-}
-
-int wps_first_token_index(struct wps_data *data, int line, int subline)
-{
-    int first_subline_idx = data->lines[line].first_subline_idx;
-    return data->sublines[first_subline_idx + subline].first_token_idx;
-}
-
-int wps_last_token_index(struct wps_data *data, int line, int subline)
-{
-    int first_subline_idx = data->lines[line].first_subline_idx;
-    int idx = first_subline_idx + subline;
-    if (idx < data->num_sublines - 1)
-    {
-        /* This subline ends where the next begins */
-        return data->sublines[idx+1].first_token_idx - 1;
-    }
-    else
-    {
-        /* The last subline goes to the end */
-        return data->num_tokens - 1;
     }
 }

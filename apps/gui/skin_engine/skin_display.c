@@ -65,9 +65,50 @@
 #include "wps_internals.h"
 #include "skin_engine.h"
 
-static bool gui_wps_redraw(struct gui_wps *gwps, unsigned refresh_mode);
+static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode);
 
 
+#ifdef HAVE_LCD_BITMAP
+/* Clear the WPS image cache */
+static void wps_images_clear(struct wps_data *data)
+{
+    int i;
+    /* set images to unloaded and not displayed */
+    for (i = 0; i < MAX_IMAGES; i++)
+    {
+       data->img[i].loaded = false;
+       data->img[i].display = -1;
+       data->img[i].always_display = false;
+       data->img[i].num_subimages = 1;
+    }
+}
+#endif
+
+/* initial setup of wps_data */
+void skin_data_init(struct wps_data *wps_data)
+{
+#ifdef HAVE_LCD_BITMAP
+    wps_images_clear(wps_data);
+    wps_data->wps_sb_tag = false;
+    wps_data->show_sb_on_wps = false;
+    wps_data->img_buf_ptr = wps_data->img_buf; /* where in image buffer */
+    wps_data->img_buf_free = IMG_BUFSIZE; /* free space in image buffer */
+    wps_data->peak_meter_enabled = false;
+    /* progress bars */
+    wps_data->progressbar_count = 0;
+#else /* HAVE_LCD_CHARCELLS */
+    int i;
+    for (i = 0; i < 8; i++)
+    {
+        wps_data->wps_progress_pat[i] = 0;
+    }
+    wps_data->full_line_progressbar = false;
+#endif
+    wps_data->button_time_volume = 0;
+    wps_data->wps_loaded = false;
+}
+
+/* TODO: maybe move this whole function into wps.c instead ? */
 bool gui_wps_display(struct gui_wps *gwps)
 {
     struct screen *display = gwps->display;
@@ -83,7 +124,7 @@ bool gui_wps_display(struct gui_wps *gwps)
 #endif
     display->clear_display();
     display->backdrop_show(BACKDROP_SKIN_WPS);
-    return gui_wps_redraw(gwps, WPS_REFRESH_ALL);
+    return skin_redraw(gwps, WPS_REFRESH_ALL);
 }
 
 /* update a skinned screen, update_type is WPS_REFRESH_* values.
@@ -100,7 +141,7 @@ bool skin_update(struct gui_wps *gwps, unsigned int update_type)
     bool cuesheet_update = (id3 != NULL ? cuesheet_subtrack_changed(id3) : false);
     gwps->state->do_full_update = cuesheet_update || gwps->state->do_full_update;
     
-    retval = gui_wps_redraw(gwps, gwps->state->do_full_update ? 
+    retval = skin_redraw(gwps, gwps->state->do_full_update ? 
                                         WPS_REFRESH_ALL : update_type);
     return retval;
 }
@@ -338,6 +379,41 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
 
 #endif /* HAVE_LCD_CHARCELL */
 
+/* Returns the index of the subline in the subline array
+   line - 0-based line number
+   subline - 0-based subline number within the line
+ */
+static int subline_index(struct wps_data *data, int line, int subline)
+{
+    return data->lines[line].first_subline_idx + subline;
+}
+
+/* Returns the index of the first subline's token in the token array
+   line - 0-based line number
+   subline - 0-based subline number within the line
+ */
+static int first_token_index(struct wps_data *data, int line, int subline)
+{
+    int first_subline_idx = data->lines[line].first_subline_idx;
+    return data->sublines[first_subline_idx + subline].first_token_idx;
+}
+
+int skin_last_token_index(struct wps_data *data, int line, int subline)
+{
+    int first_subline_idx = data->lines[line].first_subline_idx;
+    int idx = first_subline_idx + subline;
+    if (idx < data->num_sublines - 1)
+    {
+        /* This subline ends where the next begins */
+        return data->sublines[idx+1].first_token_idx - 1;
+    }
+    else
+    {
+        /* The last subline goes to the end */
+        return data->num_tokens - 1;
+    }
+}
+
 /* Return the index to the end token for the conditional token at index.
    The conditional token can be either a start token or a separator
    (i.e. option) token.
@@ -448,8 +524,8 @@ static bool get_line(struct gui_wps *gwps,
     align->right = NULL;
 
     /* Process all tokens of the desired subline */
-    last_token_idx = wps_last_token_index(data, line, subline);
-    for (i = wps_first_token_index(data, line, subline);
+    last_token_idx = skin_last_token_index(data, line, subline);
+    for (i = first_token_index(data, line, subline);
          i <= last_token_idx; i++)
     {
         switch(data->tokens[i].type)
@@ -571,12 +647,12 @@ static void get_subline_timeout(struct gui_wps *gwps, int line, int subline)
 {
     struct wps_data *data = gwps->data;
     int i;
-    int subline_idx = wps_subline_index(data, line, subline);
-    int last_token_idx = wps_last_token_index(data, line, subline);
+    int subline_idx = subline_index(data, line, subline);
+    int last_token_idx = skin_last_token_index(data, line, subline);
 
     data->sublines[subline_idx].time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
 
-    for (i = wps_first_token_index(data, line, subline);
+    for (i = first_token_index(data, line, subline);
          i <= last_token_idx; i++)
     {
         switch(data->tokens[i].type)
@@ -658,7 +734,7 @@ static bool update_curr_subline(struct gui_wps *gwps, int line)
                 /* get initial time multiplier for this subline */
                 get_subline_timeout(gwps, line, data->lines[line].curr_subline);
 
-                int subline_idx = wps_subline_index(data, line,
+                int subline_idx = subline_index(data, line,
                                                data->lines[line].curr_subline);
 
                 /* only use this subline if subline time > 0 */
@@ -839,7 +915,7 @@ static void write_line(struct screen *display,
     }
 }
 
-static bool gui_wps_redraw(struct gui_wps *gwps, unsigned refresh_mode)
+static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 {
     struct wps_data *data = gwps->data;
     struct screen *display = gwps->display;
@@ -950,7 +1026,7 @@ static bool gui_wps_redraw(struct gui_wps *gwps, unsigned refresh_mode)
             /* get current subline for the line */
             new_subline_refresh = update_curr_subline(gwps, line);
 
-            subline_idx = wps_subline_index(data, line,
+            subline_idx = subline_index(data, line,
                                             data->lines[line].curr_subline);
             flags = data->sublines[subline_idx].line_type;
 

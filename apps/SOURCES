@@ -85,9 +85,9 @@ gui/yesno.c
 gui/viewport.c
 
 gui/skin_engine/wps_debug.c
-gui/skin_engine/wps_display.c
+gui/skin_engine/skin_display.c
 gui/skin_engine/wps_parser.c
-gui/skin_engine/wps_tokens.c
+gui/skin_engine/skin_tokens.c
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 gui/backdrop.c

@@ -474,23 +474,11 @@ struct wps_data
 /* Redraw statusbars if necessary */
 void gwps_draw_statusbars(void);
 
-/* Returns the index of the subline in the subline array
-   line - 0-based line number
-   subline - 0-based subline number within the line
- */
-int wps_subline_index(struct wps_data *wps_data, int line, int subline);
-
-/* Returns the index of the first subline's token in the token array
-   line - 0-based line number
-   subline - 0-based subline number within the line
- */
-int wps_first_token_index(struct wps_data *data, int line, int subline);
-
 /* Returns the index of the last subline's token in the token array.
    line - 0-based line number
    subline - 0-based subline number within the line
  */
-int wps_last_token_index(struct wps_data *data, int line, int subline);
+int skin_last_token_index(struct wps_data *data, int line, int subline);
 
 /* wps_data end */
 
