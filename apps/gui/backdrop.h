@@ -59,7 +59,7 @@ static inline void backdrop_show(enum backdrop_type bdrop)
 /* no main backdrop, stubs! */
 #if LCD_REMOTE_DEPTH > 1
 bool remote_backdrop_load(enum backdrop_type bdrop,const char* filename);
-void remote_backdropunload(enum backdrop_type bdrop);
+void remote_backdrop_unload(enum backdrop_type bdrop);
 void remote_backdrop_show(enum backdrop_type bdrop);
 #else
 static inline

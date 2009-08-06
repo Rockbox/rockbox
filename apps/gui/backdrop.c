@@ -27,9 +27,9 @@
 #endif
 #include "backdrop.h"
 
-static fb_data main_backdrop[LCD_FBHEIGHT][LCD_FBHEIGHT]
+static fb_data main_backdrop[LCD_FBHEIGHT][LCD_FBWIDTH]
                 __attribute__ ((aligned (16)));
-static fb_data skin_backdrop[LCD_FBHEIGHT][LCD_FBHEIGHT]
+static fb_data skin_backdrop[LCD_FBHEIGHT][LCD_FBWIDTH]
                 __attribute__ ((aligned (16)));
 
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
@@ -155,6 +155,11 @@ static inline void unload_remote_skin_backdrop(void)
     remote_skin_backdrop_valid = false;
 }
 
+static inline void show_remote_main_backdrop(void)
+{
+    lcd_remote_set_backdrop(NULL);
+}
+
 static inline void show_remote_skin_backdrop(void)
 {
     /* if no wps backdrop, fall back to main backdrop */
@@ -166,11 +171,6 @@ static inline void show_remote_skin_backdrop(void)
     {
         show_remote_main_backdrop();
     }
-}
-
-static line void show_remote_main_backdrop(void)
-{
-    lcd_remote_set_backdrop(NULL);
 }
 
 
