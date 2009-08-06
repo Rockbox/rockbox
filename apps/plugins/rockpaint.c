@@ -551,12 +551,6 @@ MENUITEM_STRINGLIST(main_menu, "RockPaint", NULL,
                     "Brush Size", "Brush Speed",
                     "Choose Color", "Grid Size",
                     "Playback Control", "Exit");
-MENUITEM_STRINGLIST(size_menu, "Choose Size", NULL,
-                    "1x", "2x","4x", "8x");
-MENUITEM_STRINGLIST(speed_menu, "Choose Speed", NULL,
-                    "1x", "2x","4x");
-MENUITEM_STRINGLIST(gridsize_menu, "Grid Size", NULL,
-                    "No grid", "5px", "10px", "20px");
 MENUITEM_STRINGLIST(select_menu, "Select...", NULL,
                     "Cut", "Copy",
                     "Invert", "Horizontal Flip", "Vertical Flip",
@@ -567,6 +561,12 @@ MENUITEM_STRINGLIST(text_menu, "Text", NULL,
                     "Preview", "Apply", "Cancel");
 static const int times_list[] = { 1, 2, 4, 8 };
 static const int gridsize_list[] = { 0, 5, 10, 20 };
+static const struct opt_items times_options[] = {
+    { "1x", -1 }, { "2x", -1 }, { "4x", -1 }, { "8x", -1 }
+};
+static const struct opt_items gridsize_options[] = {
+    { "No grid", -1 }, { "5px", -1 }, { "10px", -1 }, { "20px", -1 }
+};
 
 static int draw_window( int height, int width,
                          int *top, int *left,
@@ -2502,7 +2502,7 @@ static void goto_menu(void)
             case MAIN_MENU_BRUSH_SIZE:
                 for(multi = 0; multi<4; multi++)
                     if(bsize == times_list[multi]) break;
-                rb->do_menu( &size_menu, &multi, NULL, false );
+                rb->set_option( "Brush Size", &multi, INT, times_options, 4, NULL );
                 if( multi >= 0 )
                     bsize = times_list[multi];
                 break;
@@ -2510,7 +2510,7 @@ static void goto_menu(void)
             case MAIN_MENU_BRUSH_SPEED:
                 for(multi = 0; multi<3; multi++)
                     if(bspeed == times_list[multi]) break;
-                rb->do_menu( &speed_menu, &multi, NULL, false );
+                rb->set_option( "Brush Speed", &multi, INT, times_options, 3, NULL );
                 if( multi >= 0 )
                     bspeed = times_list[multi];
                 break;
@@ -2522,7 +2522,7 @@ static void goto_menu(void)
             case MAIN_MENU_GRID_SIZE:
                 for(multi = 0; multi<4; multi++)
                     if(gridsize == gridsize_list[multi]) break;
-                rb->do_menu( &gridsize_menu, &multi, NULL, false );
+                rb->set_option( "Grid Size", &multi, INT, gridsize_options, 4, NULL );
                 if( multi >= 0 )
                     gridsize = gridsize_list[multi];
                 break;

@@ -879,7 +879,7 @@ retry:
             }
             goto retry;
         }
-            
+
         avail -= len;
         tracks--;
         tracks->sort = ((disc_num - 1) << 24) + (track_num << 14) + track_count;
@@ -2053,21 +2053,6 @@ int create_empty_slide(bool force)
 }
 
 /**
-    Shows the album name setting menu
-*/
-int album_name_menu(void)
-{
-    int selection = show_album_name;
-
-    MENUITEM_STRINGLIST(album_name_menu,"Show album title",NULL,
-            "Hide album title", "Show at the bottom", "Show at the top");
-    rb->do_menu(&album_name_menu, &selection, NULL, false);
-
-    show_album_name = selection;
-    return GO_TO_PREVIOUS;
-}
-
-/**
   Shows the settings menu
  */
 int settings_menu(void)
@@ -2078,6 +2063,12 @@ int settings_menu(void)
     MENUITEM_STRINGLIST(settings_menu, "PictureFlow Settings", NULL, "Show FPS",
                         "Spacing", "Centre margin", "Number of slides", "Zoom",
                         "Show album title", "Resize Covers", "Rebuild cache");
+
+    static const struct opt_items album_name_options[] = {
+        { "Hide album title", -1 },
+        { "Show at the bottom", -1 },
+        { "Show at the top", -1 }
+    };
 
     do {
         selection=rb->do_menu(&settings_menu,&selection, NULL, false);
@@ -2117,7 +2108,8 @@ int settings_menu(void)
                 reset_slides();
                 break;
             case 5:
-                album_name_menu();
+                rb->set_option("Show album title", &show_album_name,
+                               INT, album_name_options, 3, NULL);
                 reset_track_list();
                 recalc_offsets();
                 reset_slides();
@@ -2729,8 +2721,6 @@ int main(void)
             break;
         }
     }
-
-
 }
 
 /*************************** Plugin entry point ****************************/
