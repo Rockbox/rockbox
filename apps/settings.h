@@ -83,12 +83,14 @@ struct opt_items {
 #define MAX_FILENAME 32
 
 
-#define BOOKMARK_NO  0
-#define BOOKMARK_YES 1
-#define BOOKMARK_ASK 2
-#define BOOKMARK_UNIQUE_ONLY 2
-#define BOOKMARK_RECENT_ONLY_YES 3
-#define BOOKMARK_RECENT_ONLY_ASK 4
+enum {
+    BOOKMARK_NO,
+    BOOKMARK_YES,
+    BOOKMARK_ASK,
+    BOOKMARK_UNIQUE_ONLY,
+    BOOKMARK_RECENT_ONLY_YES,
+    BOOKMARK_RECENT_ONLY_ASK,
+};
 
 enum
 {
@@ -104,14 +106,18 @@ enum
     TRIG_TYPE_NEW_FILE
 };
 
-#define CROSSFADE_ENABLE_SHUFFLE                1
-#define CROSSFADE_ENABLE_TRACKSKIP              2
-#define CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP  3
-#define CROSSFADE_ENABLE_ALWAYS                 4
+enum {
+    CROSSFADE_ENABLE_SHUFFLE,
+    CROSSFADE_ENABLE_TRACKSKIP,
+    CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP,
+    CROSSFADE_ENABLE_ALWAYS,
+};
 
-#define FOLDER_ADVANCE_OFF 0
-#define FOLDER_ADVANCE_NEXT 1
-#define FOLDER_ADVANCE_RANDOM 2
+enum {
+    FOLDER_ADVANCE_OFF,
+    FOLDER_ADVANCE_NEXT,
+    FOLDER_ADVANCE_RANDOM,
+}
 
 /* repeat mode options */
 enum
@@ -210,9 +216,9 @@ enum {  ALARM_START_WPS = 0,
 /** function prototypes **/
 
 /* argument bits for settings_load() */
-#define SETTINGS_RTC 1 /* only the settings from the RTC nonvolatile RAM */
-#define SETTINGS_HD  2 /* only the settings from the disk sector */
-#define SETTINGS_ALL 3 /* both */
+#define SETTINGS_RTC (BIT_N(0)) /* only the settings from the RTC nonvolatile RAM */
+#define SETTINGS_HD  (BIT_N(1)) /* only the settings from the disk sector */
+#define SETTINGS_ALL (SETTINGS_RTC|SETTINGS_HD) /* both */
 void settings_load(int which);
 bool settings_load_config(const char* file, bool apply);
 
