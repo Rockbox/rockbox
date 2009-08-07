@@ -199,6 +199,7 @@ DEFINES += RBUTIL _LARGEFILE64_SOURCE
 
 win32 {
     SOURCES +=  ../ipodpatcher/ipodio-win32.c
+    SOURCES +=  ../ipodpatcher/ipodio-win32-scsi.c
     SOURCES +=  ../sansapatcher/sansaio-win32.c
     RC_FILE = rbutilqt.rc
     LIBS += -lsetupapi -lnetapi32
