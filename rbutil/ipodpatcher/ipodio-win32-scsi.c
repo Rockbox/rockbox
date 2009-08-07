@@ -110,7 +110,10 @@ int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
                              FALSE);
 
     if (status) {
-        memcpy(buf, sptwb.DataBuf, returned);
+        /* W32 sometimes returns more bytes with additional garbage.
+         * Make sure to not copy that garbage. */
+        memcpy(buf, sptwb.DataBuf,
+               (DWORD)bufsize >= returned ? returned : (DWORD)bufsize);
         return 0;
     } else {
         return -1;
