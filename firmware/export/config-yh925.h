@@ -131,9 +131,9 @@
 
 #define AB_REPEAT_ENABLE 1
 
-#define BATTERY_CAPACITY_DEFAULT 1550 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 1500  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
+#define BATTERY_CAPACITY_DEFAULT 900 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 1150 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 

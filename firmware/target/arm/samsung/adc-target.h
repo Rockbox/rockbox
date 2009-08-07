@@ -28,7 +28,7 @@
 #define ADC_CHANNEL_2   2
 #define ADC_CHANNEL_3   3
 
-#define ADC_BATTERY     ADC_CHANNEL_0
+#define ADC_BATTERY     ADC_CHANNEL_1
 /*
 #define ADC_UNKNOWN_1   1
 #define ADC_REMOTE      2
