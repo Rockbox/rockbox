@@ -31,13 +31,15 @@ Head and Tail are stored
 
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
+#include "lib/highscore.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
 #define WIDTH  28
 #define HEIGHT 16
 
-#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) && (LCD_DEPTH >= 1)
+#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)
 #include "pluginbitmaps/snake2_header1.h"
 #include "pluginbitmaps/snake2_header2.h"
 #include "pluginbitmaps/snake2_left.h"
@@ -135,11 +137,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_OFF
-#define SNAKE2_LEVEL_UP BUTTON_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_F3
 #define SNAKE2_PLAYPAUSE BUTTON_PLAY
 #define SNAKE2_PLAYPAUSE_TEXT "Play"
 
@@ -149,11 +146,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_OFF
-#define SNAKE2_LEVEL_UP BUTTON_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_F3
 #define SNAKE2_PLAYPAUSE BUTTON_SELECT
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
@@ -163,10 +155,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_OFF
-#define SNAKE2_LEVEL_UP BUTTON_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_SELECT_TYPE BUTTON_LEFT
 #define SNAKE2_PLAYPAUSE BUTTON_MENU
 #define SNAKE2_PLAYPAUSE_TEXT "Menu"
 
@@ -177,15 +165,11 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_OFF
-#define SNAKE2_LEVEL_UP BUTTON_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_MODE
 #define SNAKE2_PLAYPAUSE BUTTON_ON
 #define SNAKE2_PLAYPAUSE_TEXT "Play"
 
 #define SNAKE2_RC_QUIT  BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
@@ -194,11 +178,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_MENU
 #define SNAKE2_DOWN BUTTON_PLAY
 #define SNAKE2_QUIT (BUTTON_SELECT | BUTTON_MENU)
-#define SNAKE2_LEVEL_UP BUTTON_SCROLL_FWD
-#define SNAKE2_LEVEL_DOWN BUTTON_SCROLL_BACK
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_PLAY
 #define SNAKE2_PLAYPAUSE BUTTON_SELECT
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
@@ -208,11 +187,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_POWER
-#define SNAKE2_LEVEL_UP BUTTON_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_PLAY
 #define SNAKE2_PLAYPAUSE BUTTON_SELECT
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
@@ -222,11 +196,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_POWER
-#define SNAKE2_LEVEL_UP BUTTON_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_MENU
 #define SNAKE2_PLAYPAUSE BUTTON_SELECT
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
@@ -237,11 +206,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_POWER
-#define SNAKE2_LEVEL_UP BUTTON_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_REC
 #define SNAKE2_PLAYPAUSE BUTTON_SELECT
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
@@ -252,11 +216,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_POWER
-#define SNAKE2_LEVEL_UP BUTTON_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_VOL_UP
 #define SNAKE2_PLAYPAUSE BUTTON_SELECT
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
@@ -266,11 +225,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP               BUTTON_UP
 #define SNAKE2_DOWN             BUTTON_DOWN
 #define SNAKE2_QUIT             (BUTTON_HOME|BUTTON_REPEAT)
-#define SNAKE2_LEVEL_UP         BUTTON_UP
-#define SNAKE2_LEVEL_DOWN       BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT        BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST        BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE      BUTTON_SELECT|BUTTON_REL
 #define SNAKE2_PLAYPAUSE        BUTTON_SELECT|BUTTON_REPEAT
 #define SNAKE2_PLAYPAUSE_TEXT   "Hold Select"
 
@@ -280,11 +234,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_SCROLL_UP
 #define SNAKE2_DOWN BUTTON_SCROLL_DOWN
 #define SNAKE2_QUIT BUTTON_POWER
-#define SNAKE2_LEVEL_UP BUTTON_SCROLL_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_SCROLL_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_PLAY
 #define SNAKE2_PLAYPAUSE BUTTON_FF
 #define SNAKE2_PLAYPAUSE_TEXT "FF"
 
@@ -294,11 +243,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_BACK
-#define SNAKE2_LEVEL_UP BUTTON_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_MENU
 #define SNAKE2_PLAYPAUSE BUTTON_SELECT
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
@@ -308,11 +252,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_POWER
-#define SNAKE2_LEVEL_UP BUTTON_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_MENU
 #define SNAKE2_PLAYPAUSE BUTTON_SELECT
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
@@ -322,11 +261,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_RC_VOL_UP
 #define SNAKE2_DOWN BUTTON_RC_VOL_DOWN
 #define SNAKE2_QUIT BUTTON_RC_REC
-#define SNAKE2_LEVEL_UP BUTTON_RC_VOL_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_RC_VOL_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RC_FF
-#define SNAKE2_MAZE_LAST BUTTON_RC_REW
-#define SNAKE2_SELECT_TYPE BUTTON_RC_MODE
 #define SNAKE2_PLAYPAUSE BUTTON_RC_PLAY
 #define SNAKE2_PLAYPAUSE_TEXT "Play"
 
@@ -339,11 +273,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_BACK
-#define SNAKE2_LEVEL_UP BUTTON_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_MENU
 #define SNAKE2_PLAYPAUSE BUTTON_PLAY
 #define SNAKE2_PLAYPAUSE_TEXT "Play"
 
@@ -353,11 +282,6 @@ PLUGIN_HEADER
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_POWER
-#define SNAKE2_LEVEL_UP BUTTON_UP
-#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
-#define SNAKE2_MAZE_NEXT BUTTON_RIGHT
-#define SNAKE2_MAZE_LAST BUTTON_LEFT
-#define SNAKE2_SELECT_TYPE BUTTON_MENU
 #define SNAKE2_PLAYPAUSE BUTTON_VIEW
 #define SNAKE2_PLAYPAUSE_TEXT "View"
 
@@ -370,13 +294,8 @@ PLUGIN_HEADER
 #define SNAKE2_UP          BUTTON_UP
 #define SNAKE2_DOWN        BUTTON_DOWN
 #define SNAKE2_QUIT        BUTTON_REC
-#define SNAKE2_LEVEL_UP    (BUTTON_FFWD|BUTTON_UP)
-#define SNAKE2_LEVEL_DOWN  (BUTTON_FFWD|BUTTON_DOWN)
-#define SNAKE2_MAZE_NEXT   (BUTTON_REW|BUTTON_RIGHT)
-#define SNAKE2_MAZE_LAST   (BUTTON_REW|BUTTON_LEFT)
-#define SNAKE2_SELECT_TYPE (BUTTON_PLAY|BUTTON_LEFT)
-#define SNAKE2_PLAYPAUSE   (BUTTON_PLAY|BUTTON_RIGHT)
-#define SNAKE2_PLAYPAUSE_TEXT "Play + Right"
+#define SNAKE2_PLAYPAUSE   BUTTON_PLAY
+#define SNAKE2_PLAYPAUSE_TEXT "Play"
 
 #else
 #error No keymap defined!
@@ -398,24 +317,6 @@ PLUGIN_HEADER
 #ifndef SNAKE2_QUIT
 #define SNAKE2_QUIT        BUTTON_TOPLEFT
 #endif
-#ifndef SNAKE2_LEVEL_UP
-#define SNAKE2_LEVEL_UP    BUTTON_TOPRIGHT
-#endif
-#ifndef SNAKE2_LEVEL_DOWN
-#define SNAKE2_LEVEL_DOWN  BUTTON_TOPLEFT
-#endif
-#ifndef SNAKE2_MAZE_NEXT
-#define SNAKE2_MAZE_NEXT   BUTTON_TOPMIDDLE
-#endif
-#ifndef SNAKE2_MAZE_LAST
-#define SNAKE2_MAZE_LAST   BUTTON_BOTTOMMIDDLE
-#endif
-#ifndef SNAKE2_SELECT_TYPE
-#define SNAKE2_SELECT_TYPE BUTTON_BOTTOMLEFT
-#endif
-#ifndef SNAKE2_PLAYPAUSE
-#define SNAKE2_PLAYPAUSE   BUTTON_CENTER
-#endif
 #ifndef SNAKE2_PLAYPAUSE_TEXT
 #define SNAKE2_PLAYPAUSE_TEXT "CENTER"
 #endif
@@ -431,10 +332,9 @@ static int board[WIDTH][HEIGHT];
   single frame
 */
 static int ardirectionbuffer[2];
-static unsigned int score, hiscore = 0;
+static int score;
 static int applex;
 static int appley;
-static int strwdt,strhgt; /*used for string width, height for orientation purposes*/
 static int dir;
 static int frames;
 static int apple;
@@ -447,7 +347,12 @@ static int num_apples_to_get=1;
 static int num_apples_to_got=0;
 static int game_b_level=0;
 static int applecount=0;
-static char phscore[30];
+/* used for string width, height for orientation purposes */
+static int strwdt, strhgt;
+static char strbuf[32];
+
+#define NUM_SCORES  5
+static struct highscore highscores[NUM_SCORES];
 
 #define NORTH       1
 #define EAST        2
@@ -465,8 +370,8 @@ static char phscore[30];
 #define SOUTH_EAST  2048
 #define SOUTH_WEST  4096
 
-#define LEVELS_FILE  PLUGIN_GAMES_DIR "/snake2.levels"
-#define HISCORE_FILE PLUGIN_GAMES_DIR "/snake2.hs"
+#define LEVELS_FILE PLUGIN_GAMES_DIR "/snake2.levels"
+#define SCORE_FILE  PLUGIN_GAMES_DIR "/snake2.score"
 
 int load_all_levels(void)
 {
@@ -489,7 +394,7 @@ int load_all_levels(void)
         return -1;
     }
 
-    while(rb->read_line(fd, buf, 64))
+    while(rb->read_line(fd, buf, 64) > 0)
     {
         if(rb->strlen(buf) == 0) /* Separator? */
         {
@@ -514,36 +419,9 @@ int load_all_levels(void)
     return 0;
 }
 
-/*Hi-Score reading and writing to file "/.rockbox/rocks/games/snake2.levels" function */
-void iohiscore(void)
-{
-    int fd;
-    unsigned int compare;
-
-    /* clear the buffer we're about to load the highscore data into */
-    rb->memset(phscore, 0, sizeof(phscore));
-
-    fd = rb->open(HISCORE_FILE,O_RDWR | O_CREAT);
-
-    /* highscore used to %d, is now %d\n
-       Deal with no file or bad file */
-    rb->read(fd,phscore, sizeof(phscore));
-
-    compare = rb->atoi(phscore);
-
-    if(hiscore > compare){
-        rb->lseek(fd,0,SEEK_SET);
-        rb->fdprintf(fd, "%d\n", hiscore);
-    }
-    else
-        hiscore = compare;
-
-    rb->close(fd);
-
-}
-
 /*
-** Completely clear the board of walls and/or snake     */
+** Completely clear the board of walls and/or snake
+*/
 
 void clear_board( void)
 {
@@ -853,6 +731,13 @@ void redraw (void)
 {
     int x,y;
 
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_BLACK);
+    rb->lcd_set_background(LCD_WHITE);
+#endif
+
+    rb->lcd_clear_display();
+
     for (x = 0; x < WIDTH; x++)
     {
         for (y = 0; y < HEIGHT; y++)
@@ -977,7 +862,6 @@ void die (void)
 {
     int button;
     bool done=false;
-    char pscore[20];
 
     rb->splash(HZ*2, "Oops!");
 
@@ -988,26 +872,26 @@ void die (void)
     rb->lcd_getstringsize("You died!",&strwdt,&strhgt);
     rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt,"You died!");
 
-    rb->snprintf(pscore,sizeof(pscore),"Your score: %d",score);
-    rb->lcd_getstringsize(pscore,&strwdt,&strhgt);
-    rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt * 2 + 2,pscore);
+    rb->snprintf(strbuf, sizeof(strbuf), "Your score: %d", score);
+    rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
+    rb->lcd_putsxy((LCD_WIDTH - strwdt)/2, strhgt * 2 + 2, strbuf);
 
-    if (score>hiscore)
+    if (highscore_update(score, level_from_file, game_type==0?"Type A":"Type B",
+                         highscores, NUM_SCORES) == 0)
     {
-        hiscore=score;
         rb->lcd_getstringsize("New high score!",&strwdt,&strhgt);
         rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt * 4 + 2,"New high score!");
     }
     else
     {
-        rb->snprintf(phscore,sizeof(phscore),"High score: %d",hiscore);
-        rb->lcd_getstringsize(phscore,&strwdt,&strhgt);
-        rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt * 5,phscore);
+        rb->snprintf(strbuf, sizeof(strbuf), "High score: %d", highscores[0].score);
+        rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
+        rb->lcd_putsxy((LCD_WIDTH - strwdt)/2, strhgt * 5, strbuf);
     }
 
-    rb->snprintf(phscore,sizeof(phscore),"Press %s...",SNAKE2_PLAYPAUSE_TEXT);
-    rb->lcd_getstringsize(phscore,&strwdt,&strhgt);
-    rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt * 7,phscore);
+    rb->snprintf(strbuf, sizeof(strbuf), "Press %s...", SNAKE2_PLAYPAUSE_TEXT);
+    rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
+    rb->lcd_putsxy((LCD_WIDTH - strwdt)/2, strhgt * 7, strbuf);
 
     rb->lcd_update();
 
@@ -1060,9 +944,7 @@ void collision ( int x, int y )
                         game_b_level++;
                     }
                     rb->splash(HZ, "Level Completed!");
-                    rb->lcd_clear_display();
                     new_level(level_from_file);
-                    rb->lcd_clear_display();
                     redraw();
                     rb->lcd_update();
                 }
@@ -1237,19 +1119,18 @@ void game_pause (void)
         switch (button)
         {
             case SNAKE2_PLAYPAUSE:
-                rb->lcd_clear_display();
                 redraw();
                 rb->lcd_update();
                 rb->sleep(HZ/2);
                 return;
 
 #ifdef SNAKE2_RC_QUIT
-             case SNAKE2_RC_QUIT:
+            case SNAKE2_RC_QUIT:
 #endif
-             case SNAKE2_QUIT:
-                 dead = 1;
-                 quit = 1;
-                 return;
+            case SNAKE2_QUIT:
+                dead = 1;
+                quit = 1;
+                return;
 
             default:
                 if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
@@ -1266,7 +1147,6 @@ void game (void)
 {
     int button;
 
-    rb->lcd_clear_display();
     redraw();
     rb->lcd_update();
     /*main loop:*/
@@ -1274,8 +1154,8 @@ void game (void)
     {
         if(frames==5)
         {
-           frame();
-           if(frames>0) frames=0;
+            frame();
+            if(frames > 0) frames = 0;
         }
         frames++;
 
@@ -1305,66 +1185,59 @@ void game (void)
 
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold())
-        button = SNAKE2_PLAYPAUSE;
+            button = SNAKE2_PLAYPAUSE;
 #endif
 
         switch (button)
         {
-             case SNAKE2_UP:
-             case SNAKE2_UP | BUTTON_REPEAT:
-                 if (dir != SOUTH) set_direction(NORTH);
-                 break;
+            case SNAKE2_UP:
+            case SNAKE2_UP | BUTTON_REPEAT:
+                if (dir != SOUTH) set_direction(NORTH);
+                break;
 
-             case SNAKE2_RIGHT:
-             case SNAKE2_RIGHT | BUTTON_REPEAT:
-                 if (dir != WEST) set_direction(EAST);
-                 break;
+            case SNAKE2_RIGHT:
+            case SNAKE2_RIGHT | BUTTON_REPEAT:
+                if (dir != WEST) set_direction(EAST);
+                break;
 
-             case SNAKE2_DOWN:
-             case SNAKE2_DOWN | BUTTON_REPEAT:
-                 if (dir != NORTH) set_direction(SOUTH);
-                 break;
+            case SNAKE2_DOWN:
+            case SNAKE2_DOWN | BUTTON_REPEAT:
+                if (dir != NORTH) set_direction(SOUTH);
+                break;
 
-             case SNAKE2_LEFT:
-             case SNAKE2_LEFT | BUTTON_REPEAT:
-                 if (dir != EAST) set_direction(WEST);
-                 break;
+            case SNAKE2_LEFT:
+            case SNAKE2_LEFT | BUTTON_REPEAT:
+                if (dir != EAST) set_direction(WEST);
+                break;
 
 #ifdef SNAKE2_RC_QUIT
-             case SNAKE2_RC_QUIT:
+            case SNAKE2_RC_QUIT:
 #endif
-             case SNAKE2_QUIT:
-                 dead=1;
-                 return;
+            case SNAKE2_QUIT:
+                dead=1;
+                return;
 
-             case SNAKE2_PLAYPAUSE:
-                 game_pause();
-                 break;
+            case SNAKE2_PLAYPAUSE:
+                game_pause();
+                break;
 
-             default:
-                 if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
-                     quit = 2;
-                     return;
-                 }
-                 break;
+            default:
+                if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
+                    quit = 2;
+                    return;
+                }
+                break;
         }
     }
 
 }
 
-void game_init(void)
+void select_maze(void)
 {
     int button;
-    char plevel[30];
-
-    dead=0;
-    apple=0;
-    score=0;
-    applecount=0;
 
     clear_board();
     load_level( level_from_file );
-    rb->lcd_clear_display();
     redraw();
     rb->lcd_update();
 
@@ -1377,81 +1250,40 @@ void game_init(void)
         rb->lcd_bitmap(snake2_right,LCD_WIDTH-BMPWIDTH_snake2_right,BMPHEIGHT_snake2_header,BMPWIDTH_snake2_right, BMPHEIGHT_snake2_right);
         rb->lcd_bitmap(snake2_bottom,0,BMPHEIGHT_snake2_header+BMPHEIGHT_snake2_left,BMPWIDTH_snake2_bottom, BMPHEIGHT_snake2_bottom);
 
-        rb->snprintf(plevel,sizeof(plevel),"%d",level);
-        rb->lcd_getstringsize(plevel,&strwdt,&strhgt);
-        rb->lcd_putsxy(TOP_X3-strwdt/2,TOP_Y2, plevel);
+        rb->snprintf(strbuf, sizeof(strbuf), "%d", level);
+        rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
+        rb->lcd_putsxy(TOP_X3 - strwdt/2, TOP_Y2, strbuf);
 
-        rb->snprintf(plevel,sizeof(plevel),"%d",level_from_file);
-        rb->lcd_getstringsize(plevel,&strwdt,&strhgt);
-        rb->lcd_putsxy(TOP_X2-strwdt/2,TOP_Y1, plevel);
+        rb->snprintf(strbuf, sizeof(strbuf), "%d", level_from_file);
+        rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
+        rb->lcd_putsxy(TOP_X2 - strwdt/2, TOP_Y1, strbuf);
 
-         if(game_type==0){
-             rb->lcd_getstringsize("A",&strwdt,&strhgt);
-             rb->lcd_putsxy(TOP_X1,TOP_Y1,"A");
-         }
-         else{
-             rb->lcd_getstringsize("B",&strwdt,&strhgt);
-             rb->lcd_putsxy(TOP_X1,TOP_Y1,"B");
-        }
+        rb->strcpy(strbuf, game_type==0? "A": "B");
+        rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
+        rb->lcd_putsxy(TOP_X1, TOP_Y1, strbuf);
 
-        rb->snprintf(phscore,sizeof(phscore),"%d",hiscore);
-        rb->lcd_getstringsize(phscore,&strwdt,&strhgt);
-        rb->lcd_putsxy(TOP_X4-strwdt/2,TOP_Y2, phscore);
+        rb->snprintf(strbuf, sizeof(strbuf), "%d", highscores[0].score);
+        rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
+        rb->lcd_putsxy(TOP_X4 - strwdt/2, TOP_Y2, strbuf);
 
 #else
-        rb->snprintf(plevel,sizeof(plevel),"Speed: %02d",level);
-        rb->lcd_getstringsize("Speed: 00",&strwdt,&strhgt);
-        rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt+4, plevel);
-
-        rb->snprintf(plevel,sizeof(plevel),"Maze:  %d",level_from_file);
-        rb->lcd_getstringsize(plevel,&strwdt,&strhgt);
-        rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt*2+4, plevel);
-
-        if(game_type==0){
-            rb->lcd_getstringsize("Game Type: A ",&strwdt,&strhgt);
-            rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt*3+4,"Game Type: A");
-        }
-        else{
-            rb->lcd_getstringsize("Game Type: B ",&strwdt,&strhgt);
-            rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt*3+4,"Game Type: B");
-        }
-
-        rb->snprintf(phscore,sizeof(phscore),"Hi Score: %d",hiscore);
-        rb->lcd_getstringsize(phscore,&strwdt,&strhgt);
-        rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt*4+4, phscore);
+        rb->snprintf(strbuf, sizeof(strbuf), "Maze:  %d", level_from_file);
+        rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
+        rb->lcd_putsxy((WIDTH*MULTIPLIER - strwdt)/2,
+                       (HEIGHT*MULTIPLIER - strhgt)/2, strbuf);
 #endif
 
         rb->lcd_update();
 
-        button=rb->button_get(true);
+        button = rb->button_get(true);
         switch (button)
         {
-            case SNAKE2_LEVEL_UP:
-            case SNAKE2_LEVEL_UP|BUTTON_REPEAT:
-                if (level<10)
-                    level+=1;
-                break;
-            case SNAKE2_LEVEL_DOWN:
-            case SNAKE2_LEVEL_DOWN|BUTTON_REPEAT:
-                if (level>1)
-                    level-=1;
-                break;
             case SNAKE2_QUIT:
-                quit=1;
-                return;
-                break;
             case SNAKE2_PLAYPAUSE:
-                speed = level*20;
                 return;
                 break;
-            case SNAKE2_SELECT_TYPE:
-                if(game_type==0)game_type=1; else game_type=0;
-                break;
-            case SNAKE2_MAZE_NEXT:
-                rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
-                rb->lcd_fillrect(CENTER_X, CENTER_Y, CENTER_X+WIDTH*MULTIPLIER,
-                                 CENTER_Y+HEIGHT*MULTIPLIER);
-                rb->lcd_set_drawmode(DRMODE_SOLID);
+            case SNAKE2_UP:
+            case SNAKE2_RIGHT:
                 if(level_from_file < num_levels)
                     level_from_file++;
                 else
@@ -1459,12 +1291,8 @@ void game_init(void)
                 load_level( level_from_file );
                 redraw();
                 break;
-#ifdef SNAKE2_MAZE_LAST
-            case SNAKE2_MAZE_LAST:
-                rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
-                rb->lcd_fillrect(CENTER_X, CENTER_Y, CENTER_X+WIDTH*MULTIPLIER,
-                                 CENTER_Y+HEIGHT*MULTIPLIER);
-                rb->lcd_set_drawmode(DRMODE_SOLID);
+            case SNAKE2_DOWN:
+            case SNAKE2_LEFT:
                 if(level_from_file > 0)
                     level_from_file--;
                 else
@@ -1472,7 +1300,6 @@ void game_init(void)
                 load_level( level_from_file );
                 redraw();
                 break;
-#endif
             default:
                 if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
                     quit = 2;
@@ -1484,6 +1311,63 @@ void game_init(void)
 
 }
 
+void game_init(void)
+{
+    int selection = 0;
+
+    static const struct opt_items type_options[] = {
+        { "Type A", -1 },
+        { "Type B", -1 },
+    };
+
+    MENUITEM_STRINGLIST(menu, "Snake2 Menu", NULL,
+                        "Start New Game",
+                        "Game Type", "Select Maze", "Speed",
+                        "High Scores",
+                        "Playback Control", "Quit");
+
+    rb->button_clear_queue();
+
+    dead = 0;
+    apple = 0;
+    score = 0;
+    applecount = 0;
+
+    while (1) {
+        switch (rb->do_menu(&menu, &selection, NULL, false)) {
+            case 0:
+                speed = level*20;
+                return;
+            case 1:
+                rb->set_option("Game Type", &game_type, INT,
+                               type_options, 2, NULL);
+                break;
+            case 2:
+                select_maze();
+                if(quit) return;
+                break;
+            case 3:
+                rb->set_int("Speed", "", UNIT_INT, &level,
+                            NULL, 1, 1, 10, NULL);
+                break;
+            case 4:
+                highscore_show(NUM_SCORES, highscores, NUM_SCORES, true);
+                break;
+            case 5:
+                playback_control(NULL);
+                break;
+            case 6:
+                quit = 1;
+                return;
+            case MENU_ATTACHED_USB:
+                quit = 2;
+                return;
+            default:
+                break;
+        }
+    }
+}
+
 enum plugin_status plugin_start(const void* parameter)
 {
     (void)(parameter);
@@ -1493,10 +1377,6 @@ enum plugin_status plugin_start(const void* parameter)
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_background(LCD_WHITE);
-#endif
 
     load_all_levels();
 
@@ -1505,24 +1385,25 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_OK;
     }
 
-    iohiscore();
+    highscore_load(SCORE_FILE, highscores, NUM_SCORES);
 
     while(quit==0)
     {
-      game_init();
-      rb->lcd_clear_display();
-      frames=1;
+        game_init();
+        if(quit)
+            break;
 
-      if(quit==0)
-      {
-          init_snake();
+        rb->lcd_clear_display();
+        frames=1;
 
-          /*Start Game:*/
-          game();
-      }
+        init_snake();
+
+        /*Start Game:*/
+        game();
     }
 
-    iohiscore();
+    highscore_save(SCORE_FILE, highscores, NUM_SCORES);
+
     return (quit==1) ? PLUGIN_OK : PLUGIN_USB_CONNECTED;
 }
 
