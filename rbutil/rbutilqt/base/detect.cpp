@@ -198,9 +198,7 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
     b = usb_busses;
 
     while(b) {
-        qDebug() << "bus:" << b->dirname << b->devices;
         if(b->devices) {
-            qDebug() << "devices present.";
             struct usb_device *u;
             u = b->devices;
             while(u) {
@@ -214,12 +212,14 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
                 dev = usb_open(u);
                 if(dev) {
                     if(u->descriptor.iManufacturer) {
-                        res = usb_get_string_simple(dev, u->descriptor.iManufacturer, string, sizeof(string));
+                        res = usb_get_string_simple(dev, u->descriptor.iManufacturer,
+                                                    string, sizeof(string));
                         if(res > 0)
                             name += QString::fromAscii(string) + " ";
                     }
                     if(u->descriptor.iProduct) {
-                        res = usb_get_string_simple(dev, u->descriptor.iProduct, string, sizeof(string));
+                        res = usb_get_string_simple(dev, u->descriptor.iProduct,
+                                                    string, sizeof(string));
                         if(res > 0)
                             name += QString::fromAscii(string);
                     }
@@ -227,7 +227,10 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
                 usb_close(dev);
                 if(name.isEmpty()) name = QObject::tr("(no description available)");
 
-                if(id) usbids.insert(id, name);
+                if(id) {
+                    usbids.insert(id, name);
+                    qDebug() << "[Detect] USB:" << QString("0x%1").arg(id, 8, 16) << name;
+                }
                 u = u->next;
             }
         }
@@ -300,7 +303,7 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
             uint32_t id;
             id = vid << 16 | pid;
             usbids.insert(id, description);
-            qDebug("VID: %04x, PID: %04x", vid, pid);
+            qDebug("[Detect] USB VID: %04x, PID: %04x", vid, pid);
         }
         if(buffer) free(buffer);
     }

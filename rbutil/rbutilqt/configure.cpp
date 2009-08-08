@@ -90,6 +90,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     setDevices();
 }
 
+
 void Config::accept()
 {
     qDebug() << "[Config] checking configuration";
@@ -115,7 +116,8 @@ void Config::accept()
     RbSettings::setValue(RbSettings::ProxyType, proxyType);
 
     // language
-    if(RbSettings::value(RbSettings::Language).toString() != language && !language.isEmpty()) {
+    if(RbSettings::value(RbSettings::Language).toString() != language
+            && !language.isEmpty()) {
         QMessageBox::information(this, tr("Language changed"),
             tr("You need to restart the application for the changed language to take effect."));
         RbSettings::setValue(RbSettings::Language, language);
@@ -195,6 +197,7 @@ void Config::abort()
     qDebug() << "[Config] aborted.";
     this->close();
 }
+
 
 void Config::setUserSettings()
 {
@@ -391,6 +394,7 @@ void Config::updateEncState()
     }
 }
 
+
 void Config::setNoProxy(bool checked)
 {
     bool i = !checked;
@@ -519,6 +523,7 @@ void Config::browseCache()
 
 }
 
+
 void Config::setMountpoint(QString m)
 {
     ui.mountPoint->setText(m);
@@ -622,6 +627,7 @@ void Config::autodetect()
     }
     ui.treeDevices->setEnabled(true);
 }
+
 
 void Config::cacheClear()
 {

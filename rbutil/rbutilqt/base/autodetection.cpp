@@ -74,7 +74,7 @@ bool Autodetection::detect()
     {
         // do the file checking
         QDir dir(mounts.at(i));
-        qDebug() << "paths to check for player specific files:" << mounts;
+        qDebug() << "[Autodetect] paths to check:" << mounts;
         if(dir.exists())
         {
             // check logfile first.
@@ -85,7 +85,7 @@ bool Autodetection::detect()
                     if(m_device.isEmpty())
                         m_device = log.value("platform").toString();
                     m_mountpoint = mounts.at(i);
-                    qDebug() << "rbutil.log detected:" << m_device << m_mountpoint;
+                    qDebug() << "[Autodetect] rbutil.log detected:" << m_device << m_mountpoint;
                     return true;
                 }
             }
@@ -97,12 +97,13 @@ bool Autodetection::detect()
                 if(m_device.isEmpty())
                 {
                     m_device = info.target();
-                }                
+                }
                 m_mountpoint = mounts.at(i);
-                qDebug() << "rockbox-info.txt detected:" << m_device << m_mountpoint;
+                qDebug() << "[Autodetect] rockbox-info.txt detected:"
+                         << m_device << m_mountpoint;
                 return true;
             }
-            
+
             // check for some specific files in root folder
             QDir root(mounts.at(i));
             QStringList rootentries = root.entryList(QDir::Files);
@@ -129,10 +130,10 @@ bool Autodetection::detect()
             }
             if(rootentries.contains("ajbrec.ajz", Qt::CaseInsensitive))
             {
-                qDebug() << "ajbrec.ajz found. Trying detectAjbrec()";
+                qDebug() << "[Autodetect] ajbrec.ajz found. Trying detectAjbrec()";
                 if(detectAjbrec(mounts.at(i))) {
                     m_mountpoint = mounts.at(i);
-                    qDebug() << m_device;
+                    qDebug() << "[Autodetect]" << m_device;
                     return true;
                 }
             }
@@ -167,13 +168,13 @@ bool Autodetection::detect()
     struct ipod_t ipod;
     n = ipod_scan(&ipod);
     if(n == 1) {
-        qDebug() << "Ipod found:" << ipod.modelstr << "at" << ipod.diskname;
+        qDebug() << "[Autodetect] Ipod found:" << ipod.modelstr << "at" << ipod.diskname;
         m_device = ipod.targetname;
         m_mountpoint = resolveMountPoint(ipod.diskname);
         return true;
     }
     else {
-        qDebug() << "ipodpatcher: no Ipod found." << n;
+        qDebug() << "[Autodetect] ipodpatcher: no Ipod found." << n;
     }
     free(ipod_sectorbuf);
     ipod_sectorbuf = NULL;
@@ -185,13 +186,13 @@ bool Autodetection::detect()
     struct sansa_t sansa;
     n = sansa_scan(&sansa);
     if(n == 1) {
-        qDebug() << "Sansa found:" << sansa.targetname << "at" << sansa.diskname;
+        qDebug() << "[Autodetect] Sansa found:" << sansa.targetname << "at" << sansa.diskname;
         m_device = QString("sansa%1").arg(sansa.targetname);
         m_mountpoint = resolveMountPoint(sansa.diskname);
         return true;
     }
     else {
-        qDebug() << "sansapatcher: no Sansa found." << n;
+        qDebug() << "[Autodetect] sansapatcher: no Sansa found." << n;
     }
     free(sansa_sectorbuf);
     sansa_sectorbuf = NULL;
@@ -246,7 +247,7 @@ QStringList Autodetection::mountpoints()
  */
 QString Autodetection::resolveMountPoint(QString device)
 {
-    qDebug() << "Autodetection::resolveMountPoint(QString)" << device;
+    qDebug() << "[Autodetect] resolving mountpoint:" << device;
 
 #if defined(Q_OS_LINUX)
     FILE *mn = setmntent("/etc/mtab", "r");
@@ -302,7 +303,7 @@ QString Autodetection::resolveMountPoint(QString device)
             break;
         }
     }
-    qDebug() << "Autodetection::resolveMountPoint(QString)" << "->" << result;
+    qDebug() << "[Autodetect] resolved mountpoint is:" << result;
     if(!result.isEmpty())
         return result + ":/";
 #endif
@@ -316,7 +317,7 @@ QString Autodetection::resolveMountPoint(QString device)
  */
 QString Autodetection::resolveDevicename(QString path)
 {
-    qDebug() << __func__;
+    qDebug() << "[Autodetect] resolving device name" << path;
 #if defined(Q_OS_LINUX)
     FILE *mn = setmntent("/etc/mtab", "r");
     if(!mn)
@@ -377,7 +378,7 @@ QString Autodetection::resolveDevicename(QString path)
     if(DeviceIoControl(h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
                 NULL, 0, extents, sizeof(buffer), &written, NULL)) {
         if(extents->NumberOfDiskExtents > 1) {
-            qDebug() << "volume spans multiple disks!";
+            qDebug() << "[Autodetect] resolving device name: volume spans multiple disks!";
             return "";
         }
         //qDebug() << "Disk:" << extents->Extents[0].DiskNumber;
@@ -441,8 +442,8 @@ bool Autodetection::detectAjbrec(QString root)
     // recorder v1 has the binary length in the first 4 bytes, so check
     // for them first.
     int len = (header[0]<<24) | (header[1]<<16) | (header[2]<<8) | header[3];
-    qDebug() << "possible bin length:" << len;
-    qDebug() << "file len:" << f.size();
+    qDebug() << "[Autodetect] ABJREC possible bin length:" << len
+             << "file len:" << f.size();
     if((f.size() - 6) == len)
         m_device = "recorder";
 

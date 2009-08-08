@@ -31,7 +31,7 @@ class Config : public QDialog
     Q_OBJECT
     public:
         Config(QWidget *parent = 0,int index=0);
-        
+
     signals:
         void settingsUpdated(void);
 
@@ -42,9 +42,9 @@ class Config : public QDialog
     private:
         void setUserSettings();
         void setDevices();
-    
+
         Ui::ConfigForm ui;
-               
+
         QStringList findLanguageFiles(void);
         QString languageName(const QString&);
         QMap<QString, QString> lang;
