@@ -341,6 +341,7 @@
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
     yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
+    mrobe500: "PLAY or POWER = Yes"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -4217,6 +4218,7 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
     sa9200: "PLAY = Set"
@@ -4224,6 +4226,7 @@
   <dest>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
     sa9200: "PLAY = Set"
@@ -4240,6 +4243,7 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
@@ -4252,6 +4256,7 @@
   <dest>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"

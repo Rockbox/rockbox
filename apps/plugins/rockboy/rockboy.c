@@ -196,15 +196,6 @@ static void setoptions (void)
         options.MENU=BUTTON_POWER;
         
 #elif CONFIG_KEYPAD == MROBE500_PAD
-        options.UP=BUTTON_RC_PLAY;
-        options.DOWN=BUTTON_RC_DOWN;
-        options.LEFT=BUTTON_RC_REW;
-        options.RIGHT=BUTTON_RC_FF;
-
-        options.A=BUTTON_RC_VOL_DOWN;
-        options.B=BUTTON_RC_VOL_UP;
-        options.START=BUTTON_RC_HEART;
-        options.SELECT=BUTTON_RC_MODE;
         options.MENU=BUTTON_POWER;
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
@@ -275,7 +266,10 @@ static void setoptions (void)
         options.DOWN=BUTTON_BOTTOMMIDDLE;
         options.START=BUTTON_TOPRIGHT;
         options.SELECT=BUTTON_CENTER;
-#if CONFIG_KEYPAD != COWOND2_PAD
+#if CONFIG_KEYPAD == MROBE500_PAD
+        options.A=BUTTON_BOTTOMLEFT;
+        options.B=BUTTON_BOTTOMRIGHT;
+#elif CONFIG_KEYPAD != COWOND2_PAD
         options.A=BUTTON_BOTTOMLEFT;
         options.B=BUTTON_BOTTOMRIGHT;
         options.MENU=BUTTON_TOPLEFT;
