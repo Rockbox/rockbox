@@ -96,7 +96,7 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
                 return false;
             }
 
-            id3->bitrate = (id3->filesize * 8) / id3->length;
+            id3->bitrate = ((int64_t) id3->filesize * 8) / id3->length;
         } 
         else if (type == 4)  /* 4 is the VORBIS_COMMENT block */
         {
