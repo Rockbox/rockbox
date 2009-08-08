@@ -40,7 +40,11 @@
 
 // Linux and Mac includes
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#if defined(LIBUSB1)
+#include <libusb-1.0/libusb.h>
+#else
 #include <usb.h>
+#endif
 #include <sys/utsname.h>
 #include <unistd.h>
 #include <pwd.h>
@@ -190,7 +194,45 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
 {
     QMap<uint32_t, QString> usbids;
     // usb pid detection
+    qDebug() << "[Detect] Searching for USB devices";
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#if defined(LIBUSB1)
+    libusb_device **devs;
+    int res;
+    ssize_t count;
+    res = libusb_init(NULL);
+
+    count = libusb_get_device_list(NULL, &devs);
+    libusb_device *dev;
+    int i = 0;
+    while((dev = devs[i++]) != NULL) {
+        QString name;
+        unsigned char buf[256];
+        uint32_t id;
+        struct libusb_device_descriptor descriptor;
+        if(libusb_get_device_descriptor(dev, &descriptor) == 0) {
+            id = descriptor.idVendor << 16 | descriptor.idProduct;
+
+            libusb_device_handle *dh;
+            if(libusb_open(dev, &dh) == 0) {
+                libusb_get_string_descriptor_ascii(dh, descriptor.iManufacturer, buf, 256);
+                name += QString::fromAscii((char*)buf) + " ";
+                libusb_get_string_descriptor_ascii(dh, descriptor.iProduct, buf, 256);
+                name += QString::fromAscii((char*)buf);
+                libusb_close(dh);
+            }
+            if(name.isEmpty())
+                name = QObject::tr("(no description available)");
+            if(id) {
+                usbids.insert(id, name);
+                qDebug("[Detect] USB: 0x%08x, %s", id, name.toLocal8Bit().data());
+            }
+        }
+    }
+
+    libusb_free_device_list(devs, 1);
+    libusb_exit(NULL);
+#else
     usb_init();
     usb_find_busses();
     usb_find_devices();
@@ -236,6 +278,7 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
         }
         b = b->next;
     }
+#endif
 #endif
 
 #if defined(Q_OS_WIN32)

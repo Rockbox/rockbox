@@ -209,9 +209,14 @@ unix {
     SOURCES +=  ../ipodpatcher/ipodio-posix.c
     SOURCES +=  ../sansapatcher/sansaio-posix.c
 }
-unix:!static {
+unix:!static:!libusb1 {
     LIBS += -lusb
 }
+unix:!static:libusb1 {
+    DEFINES += LIBUSB1
+    LIBS += -lusb-1.0
+}
+
 unix:static {
     # force statically linking of libusb. Libraries that are appended
     # later will get linked dynamically again.
