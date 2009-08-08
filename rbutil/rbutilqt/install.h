@@ -44,7 +44,6 @@ class Install : public QDialog
         QHttp *download;
         QFile *target;
         QString file;
-        QString fileName;
         ZipInstaller* installer;
         QMap<QString, QString> version;
         QString m_backupName;

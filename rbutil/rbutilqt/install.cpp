@@ -103,27 +103,17 @@ void Install::accept()
     QString myversion;
     QString buildname = RbSettings::value(RbSettings::CurBuildserverModel).toString();
     if(ui.radioStable->isChecked()) {
-        file = QString("%1/%2/rockbox-%3-%4.zip")
-                .arg(RbSettings::value(RbSettings::ReleaseUrl).toString(), version.value("rel_rev"),
-                    buildname, version.value("rel_rev"));
-        fileName = QString("rockbox-%1-%2.zip")
-                   .arg(version.value("rel_rev"), buildname);
+        file = RbSettings::value(RbSettings::ReleaseUrl).toString();
         RbSettings::setValue(RbSettings::Build, "stable");
         myversion = version.value("rel_rev");
     }
     else if(ui.radioArchived->isChecked()) {
-        file = QString("%1%2/rockbox-%3-%4.zip")
-            .arg(RbSettings::value(RbSettings::DailyUrl).toString(),
-            buildname, buildname, version.value("arch_date"));
-        fileName = QString("rockbox-%1-%2.zip")
-            .arg(buildname, version.value("arch_date"));
+        file = RbSettings::value(RbSettings::DailyUrl).toString();
         RbSettings::setValue(RbSettings::Build, "archived");
         myversion = "r" + version.value("arch_rev") + "-" + version.value("arch_date");
     }
     else if(ui.radioCurrent->isChecked()) {
-        file = QString("%1%2/rockbox.zip")
-            .arg(RbSettings::value(RbSettings::BleedingUrl).toString(), buildname);
-        fileName = QString("rockbox.zip");
+        file = RbSettings::value(RbSettings::BleedingUrl).toString();
         RbSettings::setValue(RbSettings::Build, "current");
         myversion = "r" + version.value("bleed_rev");
     }
@@ -131,6 +121,11 @@ void Install::accept()
         qDebug() << "[Install] no build selected -- this shouldn't happen";
         return;
     }
+    file.replace("%MODEL%", buildname);
+    file.replace("%RELVERSION%", version.value("rel_rev"));
+    file.replace("%REVISION%", version.value("arch_rev"));
+    file.replace("%DATE%", version.value("arch_date"));
+
     RbSettings::sync();
 
     QString warning = Detect::check(false);
