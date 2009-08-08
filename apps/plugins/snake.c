@@ -34,6 +34,7 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
+#include "lib/highscore.h"
 #include "lib/playback_control.h"
 
 PLUGIN_HEADER
@@ -214,11 +215,15 @@ PLUGIN_HEADER
 
 #define BOARD_WIDTH (LCD_WIDTH/4)
 #define BOARD_HEIGHT (LCD_HEIGHT/4)
+#define NUM_SCORES  5
+#define SCORE_FILE  PLUGIN_GAMES_DIR "/snake.score"
 
 static int board[BOARD_WIDTH][BOARD_HEIGHT],snakelength;
-static unsigned int score,hiscore=0,level=1;
+static int score,level=1;
 static int dir,dead=0;
 static bool apple;
+
+static struct highscore highscores[NUM_SCORES];
 
 void die (void)
 {
@@ -227,12 +232,12 @@ void die (void)
     rb->snprintf(pscore,sizeof(pscore),"Your score: %d",score);
     rb->lcd_puts(0,0,"Oops...");
     rb->lcd_puts(0,1, pscore);
-    if (score>hiscore) {
-        hiscore=score;
+    if (highscore_update(score, level, "", highscores, NUM_SCORES) == 0) {
         rb->lcd_puts(0,2,"New High Score!");
     }
     else {
-        rb->snprintf(pscore,sizeof(pscore),"High Score: %d",hiscore);
+        rb->snprintf(pscore, sizeof(pscore),
+            "High Score: %d", highscores[0].score);
         rb->lcd_puts(0,2,pscore);
     }
     rb->lcd_update();
@@ -244,7 +249,7 @@ void colission (short x, short y)
 {
     switch (board[x][y]) {
         case 0:
-            break; 
+            break;
         case -1:
             snakelength+=2;
             score+=level;
@@ -254,7 +259,7 @@ void colission (short x, short y)
             die();
             break;
     }
-    if (x==BOARD_WIDTH || x<0 || y==BOARD_HEIGHT || y<0) 
+    if (x==BOARD_WIDTH || x<0 || y==BOARD_HEIGHT || y<0)
         die();
 }
 
@@ -265,7 +270,7 @@ void move_head (short x, short y)
             y-=1;
             break;
         case 1:
-            x+=1; 
+            x+=1;
             break;
         case 2:
             y+=1;
@@ -307,7 +312,7 @@ void frame (void)
                         rb->lcd_fillrect(x*4,y*4,4,4);
                         rb->lcd_set_drawmode(DRMODE_SOLID);
                     }
-                    else 
+                    else
                         board[x][y]++;
                     break;
             }
@@ -450,7 +455,10 @@ void game_init(void) {
 
     MENUITEM_STRINGLIST(menu, "Snake Menu", NULL,
                         "Start New Game", "Starting Level",
+                        "High Scores",
                         "Playback Control", "Quit");
+
+    rb->button_clear_queue();
 
     while (!menu_quit) {
         switch(rb->do_menu(&menu, &selection, NULL, false))
@@ -465,7 +473,16 @@ void game_init(void) {
                 break;
 
             case 2:
+                highscore_show(NUM_SCORES, highscores, NUM_SCORES, true);
+                break;
+
+            case 3:
                 playback_control(NULL);
+                break;
+
+            case MENU_ATTACHED_USB:
+                dead = 2;
+                menu_quit = true;
                 break;
 
             default:
@@ -481,9 +498,16 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)(parameter);
 
-    game_init(); 
-    rb->lcd_clear_display();
-    game();
+    highscore_load(SCORE_FILE, highscores, NUM_SCORES);
+    while(dead == 0)
+    {
+        game_init();
+        if(dead)
+            break;
+        rb->lcd_clear_display();
+        game();
+    }
+    highscore_save(SCORE_FILE, highscores, NUM_SCORES);
     return (dead==1)?PLUGIN_OK:PLUGIN_USB_CONNECTED;
 }
 
