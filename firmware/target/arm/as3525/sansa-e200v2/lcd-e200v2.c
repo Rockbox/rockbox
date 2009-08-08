@@ -36,8 +36,8 @@
 static bool display_on = false; /* is the display turned on? */
 static bool display_flipped = false;
 /* we need to write a red pixel for correct button reads
- * (see lcd_button_support()), but that must not happen while the lcd is updating
- * so block lcd_button_support the during updates */
+ * (see lcd_button_support()), but that must not happen while the lcd is
+ * updating so block lcd_button_support the during updates */
 static volatile bool lcd_busy = false;
 
 /* register defines */
@@ -113,13 +113,17 @@ static void ams3525_dbop_init(void)
 
     DBOP_TIMPOL_01 = 0xe167e167;
     DBOP_TIMPOL_23 = 0xe167006e;
-    DBOP_CTRL = (1<<18)|(1<<12)|(8<<0);  /* short count, 16bit write, read-timing =8 */
+    
+    /* short count, 16bit write, read-timing =8 */
+    DBOP_CTRL = (1<<18)|(1<<12)|(8<<0);
 
     GPIOB_AFSEL = 0xfc;
     GPIOC_AFSEL = 0xff;
 
     DBOP_TIMPOL_23 = 0x6000e;
-    DBOP_CTRL = (1<<18)|(1<<16)|(1<<12)|(8<<0);/* short count,write enable, 16bit write, read-timing =8 */
+    
+    /* short count,write enable, 16bit write, read-timing =8 */
+    DBOP_CTRL = (1<<18)|(1<<16)|(1<<12)|(8<<0);
     DBOP_TIMPOL_01 = 0x6e167;
     DBOP_TIMPOL_23 = 0xa167e06f;
 
@@ -203,9 +207,12 @@ static void lcd_window(int xmin, int ymin, int xmax, int ymax)
     }
     else
     {
-        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, ((LCD_WIDTH-1 - xmin) << 8) | (LCD_WIDTH-1 - xmax));
-        lcd_write_reg(R_VERT_RAM_ADDR_POS,  ((LCD_HEIGHT-1 - ymin) << 8) | (LCD_HEIGHT-1 - ymax));
-        lcd_write_reg(R_RAM_ADDR_SET,       ((LCD_HEIGHT-1 - ymin) << 8) | (LCD_WIDTH-1 - xmin));
+        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
+            ((LCD_WIDTH-1 - xmin) << 8) | (LCD_WIDTH-1 - xmax));
+        lcd_write_reg(R_VERT_RAM_ADDR_POS, 
+            ((LCD_HEIGHT-1 - ymin) << 8) | (LCD_HEIGHT-1 - ymax));
+        lcd_write_reg(R_RAM_ADDR_SET, 
+            ((LCD_HEIGHT-1 - ymin) << 8) | (LCD_WIDTH-1 - xmin));
     }
 }
 
@@ -232,7 +239,8 @@ static void _display_on(void)
     lcd_write_reg(R_COMPARE_REG1, 0);
     lcd_write_reg(R_COMPARE_REG2, 0);
 
-    lcd_write_reg(R_DISP_CONTROL1, 0x0000 | r_disp_control_rev);  /* GON = 0, DTE = 0, D1-0 = 00b */
+    /* GON = 0, DTE = 0, D1-0 = 00b */
+    lcd_write_reg(R_DISP_CONTROL1, 0x0000 | r_disp_control_rev);
 
     /* Front porch lines: 2; Back porch lines: 2; */
     lcd_write_reg(R_DISP_CONTROL2, 0x0203);
@@ -369,10 +377,10 @@ extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
                                    int width,
                                    int stride);
 extern void lcd_write_yuv420_lines_odither(unsigned char const * const src[3],
-                                           int width,
-                                           int stride,
-                                           int x_screen, /* To align dither pattern */
-                                           int y_screen);
+                                   int width,
+                                   int stride,
+                                   int x_screen, /* To align dither pattern */
+                                   int y_screen);
 
 void lcd_yuv_set_options(unsigned options)
 {
@@ -383,9 +391,11 @@ static void lcd_window_blit(int xmin, int ymin, int xmax, int ymax)
 {
     if (!display_flipped)
     {
-        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, ((LCD_WIDTH-1 - xmin) << 8) | (LCD_WIDTH-1 - xmax));
+        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
+            ((LCD_WIDTH-1 - xmin) << 8) | (LCD_WIDTH-1 - xmax));
         lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
-        lcd_write_reg(R_RAM_ADDR_SET,       (ymin << 8) | (LCD_WIDTH-1 - xmin));
+        lcd_write_reg(R_RAM_ADDR_SET, 
+            (ymin << 8) | (LCD_WIDTH-1 - xmin));
     }
     else
     {
@@ -530,7 +540,8 @@ void lcd_update_rect(int x, int y, int width, int height)
     lcd_busy = false;
 } /* lcd_update_rect */
 
-/* writes one read pixel outside the visible area, needed for correct dbop reads */
+/* writes one red pixel outside the visible area, needed for correct
+ * dbop reads */
 bool lcd_button_support(void)
 {
     fb_data data = (0xf<<12);
