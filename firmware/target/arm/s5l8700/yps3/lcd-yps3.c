@@ -85,7 +85,7 @@ static void lcd_wcmd_data(unsigned int cmd, unsigned int data)
     lcd_wdata(data);
 }
 
-void lcd_init1(void)
+static void lcd_init1(void)
 {
     lcd_wcmd(0x11);
     lcd_delay(10000);
@@ -157,7 +157,7 @@ void lcd_init1(void)
     lcd_wcmd(0x2C);
 }
 
-void lcd_init2(void)
+static void lcd_init2(void)
 {
     lcd_wcmd_data(0x00, 0x0001);
     lcd_delay(50000);
@@ -234,7 +234,7 @@ void lcd_init2(void)
 }
 
 
-void lcd_set_window1(int x, int y, int width, int height)
+static void lcd_set_window1(int x, int y, int width, int height)
 {
     (void)x;
     (void)width;
@@ -250,7 +250,7 @@ void lcd_set_window1(int x, int y, int width, int height)
     lcd_wdata(0);
 }
 
-void lcd_set_window2(int x, int y, int width, int height)
+static void lcd_set_window2(int x, int y, int width, int height)
 {
     lcd_wcmd_data(0x50, x);
     lcd_wcmd_data(0x51, x + width - 1);

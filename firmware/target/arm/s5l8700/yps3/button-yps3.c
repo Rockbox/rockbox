@@ -24,6 +24,7 @@
 
 #include "inttypes.h"
 #include "s5l8700.h"
+#include "button.h"
 #include "button-target.h"
 
 /*  Button driver for the touch keys on the Samsung YP-S3
@@ -63,7 +64,8 @@ void button_init_device(void)
     PCON4 &= ~0x0000F000;
 }
 
-static unsigned int tkey_read(void)
+/* returns the raw 20-bit word from the touch key controller */
+static int tkey_read(void)
 {
     static int value = 0;
     int i;
@@ -103,7 +105,7 @@ static unsigned int tkey_read(void)
 int button_read_device(void)
 {
     int buttons = 0;
-    static unsigned int data;
+    int tkey_data;
 
     /* hold switch */
     if (button_hold()) {
@@ -116,26 +118,26 @@ int button_read_device(void)
     }
     
     /* touch keys */
-    data = tkey_read();
-    if (data & (1 << 9)) {
+    tkey_data = tkey_read();
+    if (tkey_data & (1 << 9)) {
         buttons |= BUTTON_BACK;
     }
-    if (data & (1 << 8)) {
+    if (tkey_data & (1 << 8)) {
         buttons |= BUTTON_UP;
     }
-    if (data & (1 << 7)) {
+    if (tkey_data & (1 << 7)) {
         buttons |= BUTTON_MENU;
     }
-    if (data & (1 << 6)) {
+    if (tkey_data & (1 << 6)) {
         buttons |= BUTTON_LEFT;
     }
-    if (data & (1 << 5)) {
+    if (tkey_data & (1 << 5)) {
         buttons |= BUTTON_SELECT;
     }
-    if (data & (1 << 4)) {
+    if (tkey_data & (1 << 4)) {
         buttons |= BUTTON_RIGHT;
     }
-    if (data & (1 << 3)) {
+    if (tkey_data & (1 << 3)) {
         buttons |= BUTTON_DOWN;
     }
     
