@@ -57,8 +57,8 @@ bool VoiceFileCreator::createVoiceFile()
     QString target = info.target();
     QString features = info.features();
     QString version = info.version();
-    version = version.left(version.indexOf("-")).remove(0,1);
-
+    version = version.left(version.indexOf("-")).remove("r");
+ 
     //prepare download url
     QUrl genlangUrl = RbSettings::value(RbSettings::GenlangUrl).toString()
             +"?lang=" + m_lang + "&t=" + target + "&rev=" + version + "&f=" + features;
