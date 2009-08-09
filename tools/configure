@@ -72,33 +72,6 @@ findtool(){
   fi
 }
 
-# parse the argument list, returns the value after the = in case of a
-# option=value type option, returns 0 in case of --ccache or --no-ccache,
-# returns 1 if the searched argument type wasn't fount in the argument list
-# Usage [var = ]`parse_args <argumenttype>`, e.g. `parse_args --target`
-
-# var definitons below are needed so that parse_args can see the arguments
-arg1=$1 arg2=$2 arg3=$3 arg4=$4 arg5=$5 arg6=$6 arg7=$7 arg8=$8 arg9=$9
-
-parse_args() {
-  ret="1"
-  for i in $arg1 $arg2 $arg3 $arg4 $arg5 $arg6 $arg7 $arg8 $arg9
-  do
-    if [ "$1" = "--ccache" ]; then
-      if [ "$i" = "--ccache" ]; then
-        ret="0"
-      fi
-    elif [ "$1" = "--no-ccache" ]; then
-      if [ "$i" = "--no-ccache" ]; then
-        ret="0"
-      fi
-    elif [ "$1" = `echo $i|cut -d'=' -f1` ]; then
-      ret=`echo $i|cut -d'=' -f2`
-    fi
-  done
-  echo "$ret"
-}
-
 simcc () {
 
  # default tool setup for native building
@@ -170,7 +143,7 @@ simcc () {
    ;;
 
    *)
-   echo "Unsupported system: $uname, fix configure and retry"
+   echo "[ERROR] Unsupported system: $uname, fix configure and retry"
    exit 2
    ;;
  esac
@@ -328,41 +301,50 @@ mipselcc () {
 }
 
 whichadvanced () {
+  atype=`echo "$1" | cut -c 2-`
   ##################################################################
   # Prompt for specific developer options
   #
-  echo ""
-  echo "Enter your developer options (press enter when done)"
-  printf "(D)EBUG, (L)ogf, (S)imulator, (P)rofiling, (V)oice"
-  if [ "$memory" = "2" ]; then
-    printf ", (8)MB MOD"
+  if [ "$atype" ]; then
+    interact=
+  else
+    interact=1
+    echo ""
+    echo "Enter your developer options (press enter when done)"
+    printf "(D)EBUG, (L)ogf, (S)imulator, (P)rofiling, (V)oice"
+    if [ "$memory" = "2" ]; then
+      printf ", (8)MB MOD"
+    fi
+    if [ "$modelname" = "player" ]; then
+      printf ", Use (A)TA poweroff"
+    fi
+    if [ "$t_model" = "ondio" ]; then
+      printf ", (B)acklight MOD"
+    fi
+    if [ "$modelname" = "m5" ]; then
+      printf ", (F)M radio MOD"
+    fi
+    if [ "$modelname" = "h120" ]; then
+      printf ", (R)TC MOD"
+    fi
+    echo ""
   fi
-  if [ "$modelname" = "player" ]; then
-    printf ", Use (A)TA poweroff"
-  fi
-  if [ "$t_model" = "ondio" ]; then
-    printf ", (B)acklight MOD"
-  fi
-  if [ "$modelname" = "m5" ]; then
-    printf ", (F)M radio MOD"
-  fi
-  if [ "$modelname" = "h120" ]; then
-    printf ", (R)TC MOD"
-  fi
-  echo ""
 
   cont=1
-
   while [ $cont = "1" ]; do
 
-    option=`input`;
+    if [ "$interact" ]; then
+      option=`input`
+    else
+      option=`echo "$atype" | cut -c 1`
+    fi
 
     case $option in
       [Dd])
         if [ "yes" = "$profile" ]; then
           echo "Debug is incompatible with profiling"
         else
-          echo "define DEBUG"
+          echo "DEBUG build enabled"
           use_debug="yes"
         fi
         ;;
@@ -390,32 +372,24 @@ whichadvanced () {
         if [ "$memory" = "2" ]; then
           memory="8"
           echo "Memory size selected: 8MB"
-        else
-          cont=0
         fi
         ;;
       [Aa])
         if [ "$modelname" = "player" ]; then
           have_ata_poweroff="#define HAVE_ATA_POWEROFF"
           echo "ATA poweroff enabled"
-        else
-          cont=0
         fi
         ;;
       [Bb])
         if [ "$t_model" = "ondio" ]; then
           have_backlight="#define HAVE_BACKLIGHT"
           echo "Backlight functions enabled"
-        else
-          cont=0
         fi
         ;;
       [Ff])
         if [ "$modelname" = "m5" ]; then
           have_fmradio_in="#define HAVE_FMRADIO_IN"
           echo "FM radio functions enabled"
-        else
-          cont=0
         fi
         ;;
       [Rr])
@@ -423,30 +397,27 @@ whichadvanced () {
           config_rtc="#define CONFIG_RTC RTC_DS1339_DS3231"
           have_rtc_alarm="#define HAVE_RTC_ALARM"
           echo "RTC functions enabled (DS1339/DS3231)"
-        else
-          cont=0
         fi
         ;;
       *)
-        cont=0
+        if [ "$interact" ]; then
+          cont=0
+        else
+          echo "[ERROR] Option $option unsupported"
+        fi
         ;;
     esac
+    if [ ! "$interact" ]; then
+      atype=`echo "$atype" | cut -c 2-`
+      [ "$atype" ] || cont=0
+    fi
   done
   echo "done"
 
   if [ "yes" = "$voice" ]; then
     # Ask about languages to build
-    echo "Select a number for the language to use (default is english)"
-    # The multiple-language feature is currently broken
-    # echo "You may enter a comma-separated list of languages to build"
-
     picklang
     voicelanguage=`whichlang`
-
-    if [ -z "$voicelanguage" ]; then
-      # pick a default
-      voicelanguage="english"
-    fi
     echo "Voice language set to $voicelanguage"
 
     # Configure encoder and TTS engine for each language
@@ -476,8 +447,10 @@ whichadvanced () {
 # Configure voice settings
 voiceconfig () {
     thislang=$1
-    echo "Building $thislang voice for $modelname. Select options"
-    echo ""
+    if [ ! "$ARG_TTS" ]; then
+        echo "Building $thislang voice for $modelname. Select options"
+        echo ""
+    fi
 
     if [ -n "`findtool flite`" ]; then
         FLITE="F(l)ite "
@@ -542,8 +515,13 @@ voiceconfig () {
         exit 3
     fi
 
-    echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${SAPI}${SWIFT}(${DEFAULT_CHOICE})?"
-    option=`input`
+    if [ "$ARG_TTS" ]; then
+        option=$ARG_TTS
+    else
+        echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${SAPI}${SWIFT}(${DEFAULT_CHOICE})?"
+        option=`input`
+    fi
+    advopts="$advopts --tts=$option"
     case "$option" in
         [Ll])
         TTS_ENGINE="flite"
@@ -579,35 +557,47 @@ voiceconfig () {
 
     # Select which voice to use for Festival
     if [ "$TTS_ENGINE" = "festival" ]; then
-        i=1
-        for voice in `echo "(voice.list)"|festival -i 2>/dev/null |tr "\n" " "|sed -e 's/.*festival> (\(.*\)) festival>/\1/'|sort`; do
-            if [ "$i" = "1" ]; then
-                TTS_FESTIVAL_VOICE="$voice" # Default choice
-            fi
-            printf "%3d. %s\n" "$i" "$voice"
-            i=`expr $i + 1`
+        voicelist=`echo "(voice.list)"|festival -i 2>/dev/null |tr "\n" " "|sed -e 's/.*festival> (\(.*\)) festival>/\1/'|sort`
+        for voice in $voicelist; do
+            TTS_FESTIVAL_VOICE="$voice" # Default choice
+            break
         done
-        printf "Please select which Festival voice to use (default is $TTS_FESTIVAL_VOICE): "
-        CHOICE=`input`
+        if [ "$ARG_VOICE" ]; then
+            CHOICE=$ARG_VOICE
+        else
+            i=1
+            for voice in $voicelist; do
+                printf "%3d. %s\n" "$i" "$voice"
+                i=`expr $i + 1`
+            done
+            printf "Please select which Festival voice to use (default is $TTS_FESTIVAL_VOICE): "
+            CHOICE=`input`
+        fi
         i=1
-        for voice in `echo "(voice.list)"|festival -i 2>/dev/null |tr "\n" " "|sed -e 's/.*festival> (\(.*\)) festival>/\1/'|sort`; do
+        for voice in $voicelist; do
             if [ "$i" = "$CHOICE" -o "$voice" = "$CHOICE" ]; then
                 TTS_FESTIVAL_VOICE="$voice"
             fi
             i=`expr $i + 1`
         done
+        advopts="$advopts --voice=$CHOICE"
         echo "Festival voice set to $TTS_FESTIVAL_VOICE"
         echo "(voice_$TTS_FESTIVAL_VOICE)" > festival-prolog.scm
     fi
 
     # Allow the user to input manual commandline options
-    printf "Enter $TTS_ENGINE options (enter for defaults \"$TTS_OPTS\"): "
-    USER_TTS_OPTS=`input`
+    if [ "$ARG_TTSOPTS" ]; then
+        USER_TTS_OPTS=$ARG_TTSOPTS
+    else
+        printf "Enter $TTS_ENGINE options (enter for defaults \"$TTS_OPTS\"): "
+        USER_TTS_OPTS=`input`
+        echo ""
+    fi
+    advopts="$advopts --ttsopts='$USER_TTS_OPTS'"
     if [ -n "$USER_TTS_OPTS" ]; then
         TTS_OPTS="$USER_TTS_OPTS"
     fi
-
-    echo ""
+    echo "$TTS_ENGINE options set to $TTS_OPTS"
 
     if [ "$swcodec" = "yes" ]; then
         ENCODER="rbspeexenc"
@@ -628,11 +618,17 @@ voiceconfig () {
     echo "Using $ENCODER for encoding voice clips"
 
     # Allow the user to input manual commandline options
-    printf "Enter $ENCODER options (enter for defaults \"$ENC_OPTS\"): "
-    USER_ENC_OPTS=`input`
+    if [ "$ARG_ENCOPTS" ]; then
+        USER_ENC_OPTS=$ARG_ENCOPTS
+    else
+        printf "Enter $ENCODER options (enter for defaults \"$ENC_OPTS\"): "
+        USER_ENC_OPTS=`input`
+    fi
+    advopts="$advopts --encopts='$USER_ENC_OPTS'"
     if [ -n "$USER_ENC_OPTS" ]; then
         ENC_OPTS=$USER_ENC_OPTS
     fi
+    echo "$ENCODER options set to $ENC_OPTS"
 
     TEMPDIR="${pwd}"
     if [ -n "`findtool cygpath`" ]; then
@@ -643,17 +639,25 @@ voiceconfig () {
 picklang() {
     # figure out which languages that are around
     for file in $rootdir/apps/lang/*.lang; do
-        clean=`echo $file | sed -e 's:.*/::g' | cut "-d." -f1`
+        clean=`basename $file .lang`
         langs="$langs $clean"
     done
 
-    num=1
-    for one in $langs; do
-        echo "$num. $one"
-        num=`expr $num + 1`
-    done
+    if [ "$ARG_LANG" ]; then
+        pick=$ARG_LANG
+    else
+        echo "Select a number for the language to use (default is english)"
+        # FIXME The multiple-language feature is currently broken
+        # echo "You may enter a comma-separated list of languages to build"
 
-    read pick
+        num=1
+        for one in $langs; do
+            echo "$num. $one"
+            num=`expr $num + 1`
+        done
+        pick=`input`
+    fi
+    advopts="$advopts --language=$pick"
 }
 
 whichlang() {
@@ -673,25 +677,19 @@ whichlang() {
             num=`expr $num + 1`
         done
     done
+    if [ -z "$output" ]; then
+      # pick a default
+      output="english"
+    fi
     echo $output
 }
 
-opt=$1
-
-
-if [ "$TMPDIR" != "" ]; then
-  tmpdir=$TMPDIR
-else
-  tmpdir=/tmp
-fi
-
-echo $tmpdir
-if test "$opt" = "--help"; then
+help() {
   echo "Rockbox configure script."
   echo "Invoke this in a directory to generate a Makefile to build Rockbox"
   echo "Do *NOT* run this within the tools directory!"
   echo ""
-cat <<EOF
+  cat <<EOF
   Usage: configure [OPTION]...
   Options:
     --target=TARGET   Sets the target, TARGET can be either the target ID or
@@ -705,8 +703,24 @@ cat <<EOF
                       without this option if you are not sure which the right
                       number is.
 
-    --type=TYPE       Sets the build type. The shortcut is also valid.
-                      Run without this option to see available types.
+    --type=TYPE       Sets the build type. Shortcuts are also valid.
+                      Run without this option to see all available types.
+                      Multiple values are allowed and managed in the input
+                      order. So --type=b stands for Bootloader build, while
+                      --type=ab stands for "Backlight MOD" build.
+
+    --language=LANG   Set the language used for voice generation (used only if
+                      TYPE is AV).
+
+    --tts=ENGINE      Set the TTS engine used for voice generation (used only
+                      if TYPE is AV).
+
+    --voice=VOICE     Set voice to use with selected TTS (used only if TYPE is
+                      AV).
+
+    --ttsopts=OPTS    Set TTS engine manual options (used only if TYPE is AV).
+
+    --encopts=OPTS    Set encoder manual options (used only if ATYPE is AV).
 
     --rbdir=dir       Use alternative rockbox directory (default: ${rbdir}).
                       This is useful for having multiple alternate builds on
@@ -721,7 +735,46 @@ cat <<EOF
 EOF
 
   exit
+}
+
+ARG_CCACHE=
+ARG_ENCOPTS=
+ARG_LANG=
+ARG_RAM=
+ARG_RBDIR=
+ARG_TARGET=
+ARG_TTS=
+ARG_TTSOPTS=
+ARG_TYPE=
+ARG_VOICE=
+err=
+for arg in "$@"; do
+	case "$arg" in
+		--ccache)     ARG_CCACHE=1;;
+		--encopts=*)  ARG_ENCOPTS=`echo "$arg" | cut -d = -f 2`;;
+		--language=*) ARG_LANG=`echo "$arg" | cut -d = -f 2`;;
+		--no-ccache)  ARG_CCACHE=0;;
+		--ram=*)      ARG_RAM=`echo "$arg" | cut -d = -f 2`;;
+		--rbdir=*)    ARG_RBDIR=`echo "$arg" | cut -d = -f 2`;;
+		--target=*)   ARG_TARGET=`echo "$arg" | cut -d = -f 2`;;
+		--tts=*)      ARG_TTS=`echo "$arg" | cut -d = -f 2`;;
+		--ttsopts=*)  ARG_TTSOPTS=`echo "$arg" | cut -d = -f 2`;;
+		--type=*)     ARG_TYPE=`echo "$arg" | cut -d = -f 2`;;
+		--voice=*)    ARG_VOICE=`echo "$arg" | cut -d = -f 2`;;
+		--help)       help;;
+		*)            err=1; echo "[ERROR] Option '$arg' unsupported";;
+	esac
+done
+[ "$err" ] && exit 1
+
+advopts=
+
+if [ "$TMPDIR" != "" ]; then
+  tmpdir=$TMPDIR
+else
+  tmpdir=/tmp
 fi
+echo Using temporary directory $tmpdir
 
 if test -r "configure"; then
  # this is a check for a configure script in the current directory, it there
@@ -779,8 +832,8 @@ toolsdir='\$(ROOTDIR)/tools'
 # Figure out target platform
 #
 
-if [ "1" != `parse_args --target` ]; then
-  buildfor=`parse_args --target`;
+if [ "$ARG_TARGET" ]; then
+  buildfor=$ARG_TARGET
 else
   echo "Enter target platform:"
 cat <<EOF
@@ -2318,10 +2371,10 @@ fi
 if [ -z "$memory" ]; then
   case $target_id in
   15)
-    echo "Enter size of your RAM (in MB): (Defaults to 32)"
-    if [ "1" != `parse_args --ram` ]; then
-      size=`parse_args --ram`;
+    if [ "$ARG_RAM" ]; then
+      size=$ARG_RAM
     else
+      echo "Enter size of your RAM (in MB): (Defaults to 32)"
       size=`input`;
     fi
     case $size in
@@ -2334,24 +2387,24 @@ if [ -z "$memory" ]; then
     esac
     ;;
   *)
-    echo "Enter size of your RAM (in MB): (Defaults to 2)"
-      if [ "1" != `parse_args --ram` ]; then
-        size=`parse_args --ram`;
-      else
-        size=`input`;
-      fi
-      case $size in
-      8)
-        memory="8"
-        ;;
-      *)
-        memory="2"
-        ;;
-      esac
+    if [ "$ARG_RAM" ]; then
+      size=$ARG_RAM
+    else
+      echo "Enter size of your RAM (in MB): (Defaults to 2)"
+      size=`input`;
+    fi
+    case $size in
+    8)
+      memory="8"
+      ;;
+    *)
+      memory="2"
+      ;;
+    esac
     ;;
   esac
   echo "Memory size selected: $memory MB"
-  echo ""
+  [ "$ARG_TYPE" ] || echo ""
 fi
 #remove end
 
@@ -2374,8 +2427,8 @@ case $modelname in
   *)
      ;;
 esac
-if [ "1" != `parse_args --type` ]; then
-  btype=`parse_args --type`;
+if [ "$ARG_TYPE" ]; then
+  btype=$ARG_TYPE
 else
   echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, $gdbstub(M)anual: (Defaults to N)"
   btype=`input`;
@@ -2436,9 +2489,9 @@ fi
       flash=""
       echo "Simulator build selected"
       ;;
-    [Aa])
+    [Aa]*)
       echo "Advanced build selected"
-      whichadvanced
+      whichadvanced $btype
       ;;
     [Gg])
       extradefines="-DSTUB" # for target makefile symbol EXTRA_DEFINES
@@ -2523,9 +2576,9 @@ else
 fi
 
 if [ -z "$gccver" ]; then
-  echo "WARNING: The compiler you must use ($CC) is not in your path!"
-  echo "WARNING: this may cause your build to fail since we cannot do the"
-  echo "WARNING: checks we want now."
+  echo "[WARNING] The compiler you must use ($CC) is not in your path!"
+  echo "[WARNING] this may cause your build to fail since we cannot do the"
+  echo "[WARNING] checks we want now."
 else
 
   # gccver should now be "3.3.5", "3.4.3", "2.95.3-6" and similar, but don't
@@ -2612,15 +2665,13 @@ if test "$CC" = "m68k-elf-gcc"; then
   GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
 fi
 
-if [ "1" != `parse_args --ccache` ]; then
+if [ "$ARG_CCACHE" = "1" ]; then
   echo "Enable ccache for building"
   ccache="ccache"
-else
-  if [ "1" = `parse_args --no-ccache` ]; then
-    ccache=`findtool ccache`
-    if test -n "$ccache"; then
-      echo "Found and uses ccache ($ccache)"
-    fi
+elif [ "$ARG_CCACHE" = "0" ]; then
+  ccache=`findtool ccache`
+  if test -n "$ccache"; then
+    echo "Found and uses ccache ($ccache)"
   fi
 fi
 
@@ -2647,8 +2698,8 @@ else
   defendian="ROCKBOX_LITTLE_ENDIAN"
 fi
 
-if [ "1" != `parse_args --rbdir` ]; then
-  rbdir=`parse_args --rbdir`;
+if [ "$ARG_RBDIR" ]; then
+  rbdir=$ARG_RBDIR
   echo "Using alternate rockbox dir: ${rbdir}"
 fi
 
@@ -2721,12 +2772,10 @@ fi
 
 #### Fix the cmdline ###
 if test -n "$ccache"; then
-  cmdline="--ccache"
+  cmdline="--ccache "
 fi
 
-cmdline="$cmdline --target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype"
-
-
+cmdline="$cmdline--target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts"
 ### end of cmdline
 
 sed > Makefile \
