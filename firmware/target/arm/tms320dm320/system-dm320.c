@@ -272,7 +272,11 @@ void system_init(void)
 #ifdef CREATIVE_ZVx
     dma_init();
 #endif
- 
+
+#define LCD_FUDGE       LCD_NATIVE_WIDTH%32
+#define LCD_BUFFER_SIZE  ((LCD_NATIVE_WIDTH+LCD_FUDGE)*LCD_NATIVE_HEIGHT*2)
+#define LCD_TTB_AREA    ((LCD_BUFFER_SIZE>>19)+1)
+
     /* MMU initialization (Starts data and instruction cache) */
     ttb_init();
     /* Make sure everything is mapped on itself */
@@ -280,7 +284,7 @@ void system_init(void)
     /* Enable caching for RAM */
     map_section(CONFIG_SDRAM_START, CONFIG_SDRAM_START, MEM, CACHE_ALL);
     /* enable buffered writing for the framebuffer */
-    map_section((int)FRAME, (int)FRAME, 1, BUFFERED);
+    map_section((int)FRAME, (int)FRAME, LCD_TTB_AREA, BUFFERED);
 #ifdef CREATIVE_ZVx
     /* mimic OF */
     map_section(0x00100000, 0x00100000,  4, CACHE_NONE);

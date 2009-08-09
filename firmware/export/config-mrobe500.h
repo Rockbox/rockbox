@@ -68,7 +68,17 @@
 /* LCD dimensions */
 #define CONFIG_LCD LCD_MROBE500
 
-#if 0
+/* These defines are used internal to this header */
+#define _LCD_RES_QVGA       1
+#define _LCD_RES_VGA        2
+#define _LCD_PORTRAIT       1
+#define _LCD_LANDSCAPE      2
+
+/* Setup the resolution and orientation */
+#define _RESOLUTION         _LCD_RES_VGA
+#define _ORIENTATION        _LCD_LANDSCAPE
+
+#if _RESOLUTION == _LCD_RES_VGA 
 #define LCD_NATIVE_WIDTH 480
 #define LCD_NATIVE_HEIGHT 640
 #else
@@ -77,7 +87,7 @@
 #endif
 
 /* choose the lcd orientation. CONFIG_ORIENTATION defined in config.h */
-#if 0
+#if _ORIENTATION == _LCD_PORTRAIT
 /* This is the Portrait setup */
 #define LCD_WIDTH  LCD_NATIVE_WIDTH
 #define LCD_HEIGHT LCD_NATIVE_HEIGHT
@@ -183,7 +193,7 @@
 /* Define this if you have a Texas Instruments TSC2100 touch screen */
 #define HAVE_TSC2100
 
-#ifndef SIMULATOR
+#if !defined(SIMULATOR)
 
 /* M66591 register base */
 #define M66591_BASE 0x60000000
