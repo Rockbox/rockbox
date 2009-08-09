@@ -2257,9 +2257,9 @@ fi
     t_model="lyre_proto1"
     ;;
 
-   140|yh_820)
+   140|yh820)
     target_id=57
-    modelname="yh_820"
+    modelname="yh820"
     target="-DSAMSUNG_YH820"
     memory=32 # always
     arm7tdmicc
@@ -2281,9 +2281,9 @@ fi
     t_model="yh820"
     ;;
 
-   141|yh_920)
+   141|yh920)
     target_id=58
-    modelname="yh_920"
+    modelname="yh920"
     target="-DSAMSUNG_YH920"
     memory=32 # always
     arm7tdmicc
@@ -2305,9 +2305,9 @@ fi
     t_model="yh920"
     ;;
 
-   142|yh_925)
+   142|yh925)
     target_id=59
-    modelname="yh_925"
+    modelname="yh925"
     target="-DSAMSUNG_YH925"
     memory=32 # always
     arm7tdmicc
