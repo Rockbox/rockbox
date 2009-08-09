@@ -55,6 +55,7 @@
 #include "si4700.h"
 #include "fmradio_i2c.h"
 #include "wmcodec.h"
+#include "nand-target.h"
 
 char version[] = APPSVERSION;
 #define LONG_DELAY  200000
@@ -82,6 +83,7 @@ void main(void)
     unsigned int button;
     unsigned int fm_frequency = 100700000;
     int audiovol = 0x60;
+    unsigned nand_ids[4];
     
     // enable all peripherals
     PWRCON = 0;
@@ -140,6 +142,11 @@ void main(void)
     // enable audio
     PCON5 = (PCON5 & ~0x0000000F) | 0x00000001;
     PDAT5 |= 1;
+
+    nand_ll_init();
+    for (i = 0; i < 4; i++) {
+        nand_ids[i] = nand_ll_read_id(i);
+    }
 
     while (true)
     {
@@ -276,6 +283,13 @@ void main(void)
 #if 1   /* button info */
         snprintf(mystring, 64, "BUTTONS %08X, %s", button_read_device(),
                  headphones_inserted() ? "HP" : "hp");
+        lcd_puts(0, line++, mystring);
+#endif
+
+#if 1   /* NAND debug */
+        snprintf(mystring, 64, "NAND ID: %08X %08X", nand_ids[0], nand_ids[1]);
+        lcd_puts(0, line++, mystring);
+        snprintf(mystring, 64, "NAND ID: %08X %08X", nand_ids[2], nand_ids[3]);
         lcd_puts(0, line++, mystring);
 #endif
 
