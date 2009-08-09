@@ -1093,6 +1093,8 @@ static int parse_touchregion(const char *wps_bufptr,
     struct touchregion *region;
     const char *ptr = wps_bufptr;
     const char *action;
+    const char pb_string[] = "progressbar";
+    const char vol_string[] = "volume";
     int x,y,w,h;
     
     /* format: %T|x|y|width|height|action|
@@ -1132,28 +1134,41 @@ static int parse_touchregion(const char *wps_bufptr,
     region->width = w;
     region->height = h;
     region->wvp = &wps_data->viewports[wps_data->num_viewports];
-    i = 0;
-    if (*action == '&')
-    {
-        action++;
-        region->repeat = true;
-    }
+    
+    if(!strncmp(pb_string, action, sizeof(pb_string)-1)
+        && *(action + sizeof(pb_string)-1) == '|')
+        region->type = WPS_TOUCHREGION_SCROLLBAR;
+    else if(!strncmp(vol_string, action, sizeof(vol_string)-1)
+        && *(action + sizeof(vol_string)-1) == '|')
+        region->type = WPS_TOUCHREGION_VOLUME;
     else
-        region->repeat = false;
-
-    imax = ARRAYLEN(touchactions);
-    while ((region->action == ACTION_NONE) && 
-            (i < imax))
     {
-        /* try to match with one of our touchregion screens */
-        int len = strlen(touchactions[i].s);
-        if (!strncmp(touchactions[i].s, action, len)
-                && *(action+len) == '|')
-            region->action = touchactions[i].action;
-        i++;
+        region->type = WPS_TOUCHREGION_ACTION;
+
+        if (*action == '&')
+        {
+            action++;
+            region->repeat = true;
+        }
+        else
+            region->repeat = false;
+
+        i = 0;
+        imax = ARRAYLEN(touchactions);
+        while ((region->action == ACTION_NONE) && 
+                (i < imax))
+        {
+            /* try to match with one of our touchregion screens */
+            int len = strlen(touchactions[i].s);
+            if (!strncmp(touchactions[i].s, action, len)
+                    && *(action+len) == '|')
+                region->action = touchactions[i].action;
+            i++;
+        }
+        if (region->action == ACTION_NONE)
+            return WPS_ERROR_INVALID_PARAM;
     }
-    if (region->action == ACTION_NONE)
-        return WPS_ERROR_INVALID_PARAM;
+
     wps_data->touchregion_count++;
     return skip_end_of_line(wps_bufptr); 
 }               

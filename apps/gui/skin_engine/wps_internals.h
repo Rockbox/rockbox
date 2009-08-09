@@ -390,6 +390,11 @@ struct touchregion {
     short int y;             /* y-pos */
     short int width;         /* width */
     short int height;        /* height */
+    enum {
+        WPS_TOUCHREGION_ACTION,
+        WPS_TOUCHREGION_SCROLLBAR,
+        WPS_TOUCHREGION_VOLUME
+    } type;                  /* type of touch region */
     bool repeat;             /* requires the area be held for the action */
     int action;              /* action this button will return */
 };
