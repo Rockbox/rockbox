@@ -187,3 +187,19 @@ QString BootloaderInstallBase::postinstallHints(QString model)
         return QString("");
 }
 
+
+//! @brief set list of possible bootloader files and pick the existing one.
+//! @param sl list of possible bootloader files.
+void BootloaderInstallBase::setBlFile(QStringList sl)
+{
+    // figue which of the possible bootloader filenames is correct.
+    for(int a = 0; a < sl.size(); a++) {
+        if(!resolvePathCase(sl.at(a)).isEmpty()) {
+            m_blfile = sl.at(a);
+        }
+    }
+    if(m_blfile.isEmpty()) {
+        m_blfile = sl.at(0);
+    }
+}
+

@@ -56,9 +56,8 @@ class BootloaderInstallBase : public QObject
         //! backup a already installed bootloader
         bool backup(QString to);
 
-        //! set the differen filenames and paths
-        void setBlFile(QString f)
-            { m_blfile = f; }
+        //! set the different filenames and paths
+        void setBlFile(QStringList f);
         void setBlUrl(QUrl u)
             { m_blurl = u; }
         void setLogfile(QString f)

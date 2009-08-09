@@ -657,20 +657,13 @@ void RbUtilQt::installBootloader()
     }
 
     // set bootloader filename. Do this now as installed() needs it.
-    QString blfile;
-    blfile = RbSettings::value(RbSettings::Mountpoint).toString()
-            + RbSettings::value(RbSettings::CurBootloaderFile).toString();
-    // special case for H10 pure: this player can have a different
-    // bootloader file filename. This is handled here to keep the install
-    // class clean, though having it here is also not the nicest solution.
-    if(RbSettings::value(RbSettings::Platform).toString() == "h10_ums"
-        || RbSettings::value(RbSettings::Platform) == "h10_mtp") {
-        if(resolvePathCase(blfile).isEmpty())
-            blfile = RbSettings::value(RbSettings::Mountpoint).toString()
-                + RbSettings::value(RbSettings::CurBootloaderName).toString()
-                    .replace("H10", "H10EMP", Qt::CaseInsensitive);
+    QStringList blfile = RbSettings::value(RbSettings::CurBootloaderFile).toStringList();
+    QStringList blfilepath;
+    for(int a = 0; a < blfile.size(); a++) {
+        blfilepath.append(RbSettings::value(RbSettings::Mountpoint).toString()
+                + blfile.at(a));
     }
-    bl->setBlFile(blfile);
+    bl->setBlFile(blfilepath);
     QUrl url(RbSettings::value(RbSettings::BootloaderUrl).toString()
             + RbSettings::value(RbSettings::CurBootloaderName).toString());
     bl->setBlUrl(url);
@@ -998,16 +991,13 @@ void RbUtilQt::uninstallBootloader(void)
         return;
     }
 
-    QString blfile = RbSettings::value(RbSettings::Mountpoint).toString()
-        + RbSettings::value(RbSettings::CurBootloaderFile).toString();
-    if(RbSettings::value(RbSettings::Platform).toString() == "h10_ums"
-        || RbSettings::value(RbSettings::Platform).toString() == "h10_mtp") {
-        if(resolvePathCase(blfile).isEmpty())
-            blfile = RbSettings::value(RbSettings::Mountpoint).toString()
-                + RbSettings::value(RbSettings::CurBootloaderName).toString()
-                    .replace("H10", "H10EMP", Qt::CaseInsensitive);
+    QStringList blfile = RbSettings::value(RbSettings::CurBootloaderFile).toStringList();
+    QStringList blfilepath;
+    for(int a = 0; a < blfile.size(); a++) {
+        blfilepath.append(RbSettings::value(RbSettings::Mountpoint).toString()
+                + blfile.at(a));
     }
-    bl->setBlFile(blfile);
+    bl->setBlFile(blfilepath);
 
     connect(bl, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
     connect(bl, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
