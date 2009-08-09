@@ -38,6 +38,13 @@ int viewport_load_config(const char *config, struct viewport *vp);
 
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen);
 
+/* parse a viewport list, which looks like
+ * X|Y|width|height|font|foregorund color|background color
+ * | is a separator */
+const char* viewport_parse_viewport(struct viewport *vp,
+                                    enum screen_type screen,
+                                    const char *bufptr,
+                                    const char separator);
 /* Used to specify which screens the statusbar (SB) should be displayed on.
  *
  * The parameter is a bit OR'ed combination of the following (screen is

@@ -25,6 +25,7 @@
 #include "file.h"
 #include "misc.h"
 #include "plugin.h"
+#include "viewport.h"
 
 #ifdef __PCTOOL__
 #ifdef WPSEDITOR
@@ -587,26 +588,12 @@ static int parse_viewport(const char *wps_bufptr,
 {
     (void)token; /* Kill warnings */
     const char *ptr = wps_bufptr;
-    struct viewport* vp;
-    int depth;
-    uint32_t set = 0;
-    enum {
-        PL_X = 0,
-        PL_Y,
-        PL_WIDTH,
-        PL_HEIGHT,
-        PL_FONT,
-        PL_FG,
-        PL_BG,
-    };
-    int lcd_width = LCD_WIDTH, lcd_height = LCD_HEIGHT;
+
+    const int screen = 
 #ifdef HAVE_REMOTE_LCD
-    if (wps_data->remote_wps)
-    {
-        lcd_width = LCD_REMOTE_WIDTH;
-        lcd_height = LCD_REMOTE_HEIGHT;
-    }
+            wps_data->remote_wps ? SCREEN_REMOTE :
 #endif
+                                                    SCREEN_MAIN;
 
     if (wps_data->num_viewports >= WPS_MAX_VIEWPORTS)
         return WPS_ERROR_INVALID_PARAM;
@@ -635,87 +622,19 @@ static int parse_viewport(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM;
     
     ptr++;
-    vp = &wps_data->viewports[wps_data->num_viewports].vp;
+    struct viewport *vp = &wps_data->viewports[wps_data->num_viewports].vp;
     /* format: %V|x|y|width|height|font|fg_pattern|bg_pattern| */
 
     /* Set the defaults for fields not user-specified */
     vp->drawmode = DRMODE_SOLID;
 
-    /* Work out the depth of this display */
-#ifdef HAVE_REMOTE_LCD
-    depth = (wps_data->remote_wps ? LCD_REMOTE_DEPTH : LCD_DEPTH);
-#else
-    depth = LCD_DEPTH;
-#endif
-
-#ifdef HAVE_LCD_COLOR
-    if (depth == 16)
-    {
-        if (!(ptr = parse_list("dddddcc", &set, '|', ptr, &vp->x, &vp->y, &vp->width,
-                    &vp->height, &vp->font, &vp->fg_pattern,&vp->bg_pattern)))
-            return WPS_ERROR_INVALID_PARAM;
-    }
-    else 
-#endif
-#if (LCD_DEPTH == 2) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 2)
-    if (depth == 2) {
-        /* Default to black on white */
-        vp->fg_pattern = 0;
-        vp->bg_pattern = 3;
-        if (!(ptr = parse_list("dddddgg", &set, '|', ptr, &vp->x, &vp->y, &vp->width,
-                    &vp->height, &vp->font, &vp->fg_pattern, &vp->bg_pattern)))
-            return WPS_ERROR_INVALID_PARAM;
-    }
-    else 
-#endif
-#if (LCD_DEPTH == 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 1)
-    if (depth == 1)
-    {
-        if (!(ptr = parse_list("ddddd", &set, '|', ptr, &vp->x, &vp->y, 
-                                    &vp->width, &vp->height, &vp->font)))
-            return WPS_ERROR_INVALID_PARAM;
-    }
-      else
-#endif
-    {}
+    if (!(ptr = viewport_parse_viewport(vp, screen, ptr, '|')))
+        return WPS_ERROR_INVALID_PARAM;
 
     /* Check for trailing | */
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
 
-    if (!LIST_VALUE_PARSED(set, PL_X) || !LIST_VALUE_PARSED(set, PL_Y))
-        return WPS_ERROR_INVALID_PARAM;
-    
-    /* fix defaults */
-    if (!LIST_VALUE_PARSED(set, PL_WIDTH))
-        vp->width = lcd_width - vp->x;
-    if (!LIST_VALUE_PARSED(set, PL_HEIGHT))
-        vp->height = lcd_height - vp->y;
-    
-    /* Default to using the user font if the font was an invalid number */
-    if (!LIST_VALUE_PARSED(set, PL_FONT) ||
-         ((vp->font != FONT_SYSFIXED) && (vp->font != FONT_UI)))
-        vp->font = FONT_UI;
-
-    /* Validate the viewport dimensions - we know that the numbers are
-       non-negative integers */
-    if ((vp->x >= lcd_width) ||
-        ((vp->x + vp->width) > lcd_width) ||
-        (vp->y >= lcd_height) ||
-        ((vp->y + vp->height) > lcd_height))
-    {
-        return WPS_ERROR_INVALID_PARAM;
-    }
-    
-#ifdef HAVE_LCD_COLOR
-    if (depth == 16)
-    {
-        if (!LIST_VALUE_PARSED(set, PL_FG))
-            vp->fg_pattern = global_settings.fg_color;
-        if (!LIST_VALUE_PARSED(set, PL_BG))
-            vp->bg_pattern = global_settings.bg_color;
-    }
-#endif
 
     wps_data->viewports[wps_data->num_viewports-1].last_line = wps_data->num_lines - 1;
 
