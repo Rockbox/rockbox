@@ -273,6 +273,11 @@ void system_init(void)
     dma_init();
 #endif
 
+#if !defined(LCD_NATIVE_WIDTH) && !defined(LCD_NATIVE_HEIGHT)
+#define LCD_NATIVE_WIDTH    LCD_WIDTH
+#define LCD_NATIVE_HEIGHT   LCD_HEIGHT
+#endif
+
 #define LCD_FUDGE       LCD_NATIVE_WIDTH%32
 #define LCD_BUFFER_SIZE  ((LCD_NATIVE_WIDTH+LCD_FUDGE)*LCD_NATIVE_HEIGHT*2)
 #define LCD_TTB_AREA    ((LCD_BUFFER_SIZE>>19)+1)
