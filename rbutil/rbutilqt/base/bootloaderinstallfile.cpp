@@ -33,7 +33,7 @@ BootloaderInstallFile::BootloaderInstallFile(QObject *parent)
 bool BootloaderInstallFile::install(void)
 {
     emit logItem(tr("Downloading bootloader"), LOGINFO);
-    qDebug() << __func__;
+    qDebug() << "[BootloaderInstallFile] installing bootloader";
     downloadBlStart(m_blurl);
     connect(this, SIGNAL(downloadDone()), this, SLOT(installStage2()));
     return true;
@@ -48,7 +48,7 @@ void BootloaderInstallFile::installStage2(void)
     QString fwfile(resolvePathCase(m_blfile));
     if(!fwfile.isEmpty()) {
         QString moved = resolvePathCase(m_blfile) + ".ORIG";
-        qDebug() << "renaming" << fwfile << "->" << moved;
+        qDebug() << "[BootloaderInstallFile] renaming" << fwfile << "to" << moved;
         QFile::rename(fwfile, moved);
     }
 
@@ -82,7 +82,7 @@ void BootloaderInstallFile::installStage2(void)
 
     // place (new) bootloader
     m_tempfile.open();
-    qDebug() << "renaming" << m_tempfile.fileName() << "->" << fwfile;
+    qDebug() << "[BootloaderInstallFile] renaming" << m_tempfile.fileName() << "to" << fwfile;
     m_tempfile.close();
     m_tempfile.rename(fwfile);
 
@@ -95,7 +95,7 @@ void BootloaderInstallFile::installStage2(void)
 
 bool BootloaderInstallFile::uninstall(void)
 {
-    qDebug() << __func__;
+    qDebug() << "[BootloaderInstallFile] Uninstalling bootloader";
     emit logItem(tr("Removing Rockbox bootloader"), LOGINFO);
     // check if a .ORIG file is present, and allow moving it back.
     QString origbl = resolvePathCase(m_blfile + ".ORIG");
@@ -127,7 +127,7 @@ bool BootloaderInstallFile::uninstall(void)
 //! @return BootloaderRockbox, BootloaderOther or BootloaderUnknown.
 BootloaderInstallBase::BootloaderType BootloaderInstallFile::installed(void)
 {
-    qDebug("%s()", __func__);
+    qDebug() << "[BootloaderInstallFile] checking installed bootloader";
     if(!resolvePathCase(m_blfile).isEmpty()
         && !resolvePathCase(m_blfile + ".ORIG").isEmpty())
         return BootloaderRockbox;
@@ -140,7 +140,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallFile::installed(void)
 
 BootloaderInstallBase::Capabilities BootloaderInstallFile::capabilities(void)
 {
-    qDebug() << __func__;
+    qDebug() << "[BootloaderInstallFile] getting capabilities";
     return Install | IsFile | CanCheckInstalled | Backup;
 }
 

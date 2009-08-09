@@ -32,7 +32,7 @@ BootloaderInstallMi4::BootloaderInstallMi4(QObject *parent)
 bool BootloaderInstallMi4::install(void)
 {
     emit logItem(tr("Downloading bootloader"), LOGINFO);
-    qDebug() << __func__;
+    qDebug() << "[BootloaderInstallMi4] installing bootloader";
     downloadBlStart(m_blurl);
     connect(this, SIGNAL(downloadDone()), this, SLOT(installStage2()));
     return true;
@@ -49,17 +49,17 @@ void BootloaderInstallMi4::installStage2(void)
     QString moved = QFileInfo(resolvePathCase(m_blfile)).absolutePath()
                         + "/OF.mi4";
     if(!QFileInfo(moved).exists()) {
-        qDebug() << "renaming" << fwfile << "->" << moved;
+        qDebug() << "[BootloaderInstallMi4] renaming" << fwfile << "to" << moved;
         oldbl.rename(moved);
     }
     else {
-        qDebug() << "OF.mi4 already present, not renaming again.";
+        qDebug() << "[BootloaderInstallMi4] OF.mi4 already present, not renaming again.";
         oldbl.remove();
     }
 
     // place new bootloader
     m_tempfile.open();
-    qDebug() << "renaming" << m_tempfile.fileName() << "->" << fwfile;
+    qDebug() << "[BootloaderInstallMi4] renaming" << m_tempfile.fileName() << "to" << fwfile;
     m_tempfile.close();
     m_tempfile.rename(fwfile);
 
@@ -72,7 +72,7 @@ void BootloaderInstallMi4::installStage2(void)
 
 bool BootloaderInstallMi4::uninstall(void)
 {
-    qDebug() << __func__;
+    qDebug() << "[BootloaderInstallMi4] Uninstalling bootloader";
 
     // check if it's actually a Rockbox bootloader
     emit logItem(tr("Checking for Rockbox bootloader"), LOGINFO);
@@ -117,7 +117,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallMi4::installed(void)
     QString resolved;
     resolved = resolvePathCase(m_blfile);
     if(resolved.isEmpty()) {
-        qDebug("%s: BootloaderNone", __func__);
+        qDebug() << "[BootloaderInstallMi4] installed: BootloaderNone";
         return BootloaderNone;
     }
 
@@ -129,11 +129,11 @@ BootloaderInstallBase::BootloaderType BootloaderInstallMi4::installed(void)
     f.close();
 
     if(!memcmp(magic, "RBBL", 4)) {
-        qDebug("%s: BootloaderRockbox", __func__);
+        qDebug() << "[BootloaderInstallMi4] installed: BootloaderRockbox";
         return BootloaderRockbox;
     }
     else {
-        qDebug("%s: BootloaderOther", __func__);
+        qDebug() << "[BootloaderInstallMi4] installed: BootloaderOther";
         return BootloaderOther;
     }
 }
@@ -141,7 +141,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallMi4::installed(void)
 
 BootloaderInstallBase::Capabilities BootloaderInstallMi4::capabilities(void)
 {
-    qDebug() << __func__;
+    qDebug() << "[BootloaderInstallMi4] getting capabilities";
     return Install | Uninstall | Backup | IsFile | CanCheckInstalled | CanCheckVersion;
 }
 

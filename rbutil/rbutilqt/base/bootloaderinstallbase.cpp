@@ -50,8 +50,8 @@ void BootloaderInstallBase::downloadBlStart(QUrl source)
 
 void BootloaderInstallBase::downloadReqFinished(int id, bool error)
 {
-    qDebug() << __FILE__ << "::" << __func__ << id << error;
-    qDebug() << "error:" << m_http.errorString();
+    qDebug() << "[BootloaderInstallBase] Download Request" << id
+             << "finished, error:" << m_http.errorString();
 
     downloadBlFinish(error);
 }
@@ -59,7 +59,8 @@ void BootloaderInstallBase::downloadReqFinished(int id, bool error)
 
 void BootloaderInstallBase::downloadBlFinish(bool error)
 {
-    qDebug() << __FILE__ << "::" << __func__ << ": error =" << error;
+    qDebug() << "[BootloaderInstallBase] Downloading bootloader finished, error:"
+             << error;
 
     // update progress bar
     emit logProgress(100, 100);
@@ -88,7 +89,7 @@ void BootloaderInstallBase::downloadBlFinish(bool error)
 
 void BootloaderInstallBase::installBlfile(void)
 {
-    qDebug() << __FILE__ << __func__;
+    qDebug() << "[BootloaderInstallBase]" << __func__;
 }
 
 
@@ -98,7 +99,7 @@ void BootloaderInstallBase::installBlfile(void)
 
 bool BootloaderInstallBase::backup(QString to)
 {
-    qDebug() << __func__;
+    qDebug() << "[BootloaderInstallBase] Backing up bootloader file";
     QDir targetDir(".");
     emit logItem(tr("Creating backup of original firmware file."), LOGINFO);
     if(!targetDir.mkpath(to)) {
@@ -106,7 +107,7 @@ bool BootloaderInstallBase::backup(QString to)
         return false;
     }
     QString tofile = to + "/" + QFileInfo(m_blfile).fileName();
-    qDebug() << "trying to backup" << m_blfile << "to" << tofile;
+    qDebug() << "[BootloaderInstallBase] trying to backup" << m_blfile << "to" << tofile;
     if(!QFile::copy(resolvePathCase(m_blfile), tofile)) {
         emit logItem(tr("Creating backup copy failed."), LOGERROR);
         return false;
@@ -128,7 +129,8 @@ int BootloaderInstallBase::logInstall(LogMode mode)
 
     if(mode == LogAdd) {
         s.setValue("Bootloader/" + section, m_blversion.toString(Qt::ISODate));
-        qDebug() << m_blversion.toString(Qt::ISODate);
+        qDebug() << "[BootloaderInstallBase] Writing log, version:"
+                 << m_blversion.toString(Qt::ISODate);
     }
     else {
         s.remove("Bootloader/" + section);

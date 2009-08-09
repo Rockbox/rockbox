@@ -49,7 +49,7 @@ class BootloaderInstallBase : public QObject
         virtual BootloaderType installed(void)=0;
         //! returns the capabilities of the bootloader class
         virtual Capabilities capabilities(void)=0;
-               //! returns a OF Firmware hint or empty if there is none
+        //! returns a OF Firmware hint or empty if there is none
         virtual QString ofHint() {return QString();}
         
         
@@ -66,8 +66,9 @@ class BootloaderInstallBase : public QObject
         void setOfFile(QString f)
             {m_offile = f;}
         
-        //!  returns a port Install Hint or empty if there is none
-        //! static and in the base class, so the installer classes dont need to be modified for new targets 
+        //! returns a port Install Hint or empty if there is none
+        //! static and in the base class, so the installer classes dont need to
+        //  be modified for new targets
         static QString postinstallHints(QString model);
 
     protected slots:

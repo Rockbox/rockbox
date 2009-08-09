@@ -125,7 +125,7 @@ void BootloaderInstallSansa::installStage2(void)
     m_tempfile.close();
     if(memcmp(sansa.targetname, magic, 4) != 0) {
         emit logItem(tr("Bootloader mismatch! Aborting."), LOGERROR);
-        qDebug("[BL-Sansa] Targetname: %s, mi4 magic: %c%c%c%c",
+        qDebug("[BootloaderInstallSansa] Targetname: %s, mi4 magic: %c%c%c%c",
                 sansa.targetname, magic[0], magic[1], magic[2], magic[3]);
         emit done(true);
         sansa_close(&sansa);
@@ -230,7 +230,8 @@ bool BootloaderInstallSansa::sansaInitialize(struct sansa_t *sansa)
         sprintf(sansa->diskname,
             qPrintable(Autodetection::resolveDevicename(m_blfile).remove(QRegExp("[0-9]+$"))));
 #endif
-        qDebug() << "sansapatcher: overriding scan, using" << sansa->diskname;
+        qDebug() << "[BootloaderInstallSansa] sansapatcher: overriding scan, using"
+                 << sansa->diskname;
     }
     else if(sansa_scan(sansa) != 1) {
         emit logItem(tr("Can't find Sansa"), LOGERROR);

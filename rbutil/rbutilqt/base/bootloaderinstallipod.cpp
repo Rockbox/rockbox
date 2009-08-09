@@ -140,7 +140,7 @@ void BootloaderInstallIpod::installStage2(void)
         emit done(true);
         return;
     }
-    qDebug() << "version installed:" << m_blversion.toString(Qt::ISODate);
+    qDebug() << "[BootloaderInstallIpod] version installed:" << m_blversion.toString(Qt::ISODate);
 }
 
 
@@ -203,17 +203,17 @@ BootloaderInstallBase::BootloaderType BootloaderInstallIpod::installed(void)
     BootloaderInstallBase::BootloaderType result = BootloaderRockbox;
 
     if(!ipodInitialize(&ipod)) {
-        qDebug() << "BootloaderInstallIpod::installed(): BootloaderUnknown";
+        qDebug() << "[BootloaderInstallIpod] installed: BootloaderUnknown";
         result = BootloaderUnknown;
     }
     else {
         read_directory(&ipod);
         if(ipod.ipod_directory[0].entryOffset == 0) {
-            qDebug() << "BootloaderInstallIpod::installed(): BootloaderOther";
+            qDebug() << "[BootloaderInstallIpod] installed: BootloaderOther";
             result = BootloaderOther;
         }
         else {
-            qDebug() << "BootloaderInstallIpod::installed(): BootloaderRockbox";
+            qDebug() << "[BootloaderInstallIpod] installed: BootloaderRockbox";
         }
     }
     ipod_close(&ipod);
@@ -243,7 +243,8 @@ bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
             qPrintable(Autodetection::resolveDevicename(m_blfile)
             .remove(QRegExp("[0-9]+$"))));
 #endif
-        qDebug() << "ipodpatcher: overriding scan, using" << ipod->diskname;
+        qDebug() << "[BootloaderInstallIpod] ipodpatcher: overriding scan, using"
+                 << ipod->diskname;
     }
     else {
         ipod_scan(ipod);
