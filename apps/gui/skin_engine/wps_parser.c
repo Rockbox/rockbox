@@ -625,9 +625,6 @@ static int parse_viewport(const char *wps_bufptr,
     struct viewport *vp = &wps_data->viewports[wps_data->num_viewports].vp;
     /* format: %V|x|y|width|height|font|fg_pattern|bg_pattern| */
 
-    /* Set the defaults for fields not user-specified */
-    vp->drawmode = DRMODE_SOLID;
-
     if (!(ptr = viewport_parse_viewport(vp, screen, ptr, '|')))
         return WPS_ERROR_INVALID_PARAM;
 

@@ -168,6 +168,12 @@ void viewportmanager_statusbar_changed(void* data)
     viewportmanager_set_statusbar(statusbar_enabled);
 }
 
+#ifdef HAVE_LCD_COLOR
+#define ARG_STRING (depth == 2 ? "dddddgg":"dddddcc")
+#else
+#define ARG_STRING "dddddcc"
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 const char* viewport_parse_viewport(struct viewport *vp,
                                     enum screen_type screen,
@@ -191,31 +197,25 @@ const char* viewport_parse_viewport(struct viewport *vp,
     
     /* Work out the depth of this display */
     depth = screens[screen].depth;
-#ifdef HAVE_LCD_COLOR
-    if (depth == 16)
-    {
-        if (!(ptr = parse_list("dddddcc", &set, separator, ptr, &vp->x, &vp->y, &vp->width,
-                    &vp->height, &vp->font, &vp->fg_pattern,&vp->bg_pattern)))
-            return VP_ERROR;
-    }
-    else 
-#endif
-#if (LCD_DEPTH == 2) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 2)
-    if (depth == 2) {
-        if (!(ptr = parse_list("dddddgg", &set, separator, ptr, &vp->x, &vp->y, &vp->width,
-                    &vp->height, &vp->font, &vp->fg_pattern, &vp->bg_pattern)))
-            return VP_ERROR;
-    }
-    else 
-#endif
 #if (LCD_DEPTH == 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 1)
     if (depth == 1)
     {
-        if (!(ptr = parse_list("ddddd", &set, separator, ptr, &vp->x, &vp->y, &vp->width,
-                &vp->height, &vp->font)))
+        if (!(ptr = parse_list("ddddd", &set, separator, ptr,
+                    &vp->x, &vp->y, &vp->width, &vp->height, &vp->font)))
             return VP_ERROR;
     }
     else
+#endif
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+    if (depth >= 2)
+    {
+        if (!(ptr = parse_list(ARG_STRING, &set, separator, ptr,
+                    &vp->x, &vp->y, &vp->width, &vp->height, &vp->font,
+                    &vp->fg_pattern,&vp->bg_pattern)))
+            return VP_ERROR;
+    }
+    else
+#undef ARG_STRING
 #endif
     {}
 
@@ -254,7 +254,8 @@ const char* viewport_parse_viewport(struct viewport *vp,
             || !LIST_VALUE_PARSED(set, PL_FONT)
             )
         vp->font = FONT_UI;
-        
+
+    /* Set the defaults for fields not user-specified */
     vp->drawmode = DRMODE_SOLID;
 
     return ptr;
