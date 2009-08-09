@@ -229,7 +229,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
     if (!LIST_VALUE_PARSED(set, PL_HEIGHT))
         vp->height = screens[screen].lcdheight - vp->y;
 
-#if LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
     if (!LIST_VALUE_PARSED(set, PL_FG))
         vp->fg_pattern = FG_FALLBACK;
     if (!LIST_VALUE_PARSED(set, PL_BG))
