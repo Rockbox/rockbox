@@ -333,12 +333,6 @@ static void do_opt_menu(void)
         { "On" , -1 },
     };
 
-    static const struct opt_items rotate[] = {
-        { "No rotation", -1 },
-        { "Rotate Right" , -1 },
-        { "Rotate Left" , -1 },
-    };
-
     static const struct opt_items frameskip[]= {
         { "0 Max", -1 },
         { "1 Max", -1 },
@@ -350,6 +344,12 @@ static void do_opt_menu(void)
     };
     
 #ifdef HAVE_LCD_COLOR
+    static const struct opt_items rotate[] = {
+        { "No rotation", -1 },
+        { "Rotate Right" , -1 },
+        { "Rotate Left" , -1 },
+    };
+
     static const struct opt_items scaling[]= {
         { "Scaled", -1 },
         { "Scaled - Maintain Ratio", -1 },

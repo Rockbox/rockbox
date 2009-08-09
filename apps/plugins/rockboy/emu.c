@@ -41,7 +41,9 @@ void emu_run(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
+#ifdef HAVE_LCD_COLOR
     set_pal();
+#endif
 
     while(!shut)
     {
