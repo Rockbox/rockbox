@@ -58,7 +58,11 @@ static int scanline_ind=0;
 
 static int dmg_pal[4][4];
 
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+unsigned char *vdest;
+#else
 fb_data *vdest;
+#endif
 
 #ifndef ASM_UPDATEPATPIX
 static void updatepatpix(void) ICODE_ATTR;
@@ -843,9 +847,12 @@ static void spr_scan(void)
 #define DYR  ((LCD_HEIGHT<<16)   /   160)
 #define DYIR ((160<<16)          /   LCD_HEIGHT)
 
-void lcd_begin(void)
-{
-
+/* Defines for scale offsets:
+ *  S2 is for scaled
+ *  S3 if scaled and maintain ratio
+ *  S1 is unscaled
+ *  R's are the rotated defines
+ */
 #if (LCD_WIDTH>=160) && (LCD_HEIGHT>=144)
 #define S1  ((LCD_HEIGHT-144)/2)*LCD_WIDTH + ((LCD_WIDTH-160)/2)
 #define S2  0
@@ -879,21 +886,31 @@ void lcd_begin(void)
 #define S3R ((LCD_HEIGHT-((160*DXR)>>16))/2)*LCD_WIDTH+LCD_WIDTH-1
 #endif
 
+void lcd_begin(void)
+{
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    vdest=(unsigned char*)rb->lcd_framebuffer;
+#else
     vdest=rb->lcd_framebuffer;
+#endif
+
 #ifdef HAVE_LCD_COLOR
-    set_pal();
     
-    if(options.rotate)
-    {
+    if(options.rotate==1) {
         if(options.scaling == 0)
-            vdest+=+S2R;
+            vdest+=S2R;
         else if (options.scaling == 1)
             vdest+=S3R;
         else
             vdest+=S1R;
-    }
-    else
-    {
+    } else if(options.rotate==2) {
+        if(options.scaling == 0)
+            vdest+=(LCD_WIDTH*LCD_HEIGHT)-S2R;
+        else if (options.scaling == 1)
+            vdest+=(LCD_WIDTH*LCD_HEIGHT)-S3R;
+        else
+            vdest+=(LCD_WIDTH*LCD_HEIGHT)-S1R-144;
+    } else {
         if(options.scaling == 0)
             vdest+=S2;
         else if (options.scaling == 1)
@@ -916,6 +933,7 @@ int sremain IDATA_ATTR=LCD_WIDTH-160;
 
 void setvidmode(void)
 {
+
 #ifdef HAVE_LCD_COLOR
     switch(options.scaling)
     {
@@ -977,12 +995,15 @@ void setvidmode(void)
             SCALEHL=1<<16;
             SCALEHS=1<<16;
     }
-    swidth=(160*SCALEWL)>>16;
+    swidth=((160*SCALEWL)>>16);
     
-    if(options.rotate)
+    if(options.rotate==1) {
         sremain=-(((160*SCALEWL)>>16)*LCD_WIDTH+1);
-    else
+    } else if(options.rotate==2) {
+        sremain=(((160*SCALEWL)>>16)*LCD_WIDTH+1);
+    } else {
         sremain=LCD_WIDTH-swidth;
+    }
 #endif
 }
 
@@ -1067,18 +1088,24 @@ void lcd_refreshline(void)
         hpt+=SCALEHS;
         register unsigned int srcpt=0x8000;
         register unsigned int wcount=swidth;
-        register unsigned int remain=sremain;
         while(wcount--)
         {
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+            *vdest = BUF[srcpt>>16];
+#else
             *vdest = PAL[BUF[srcpt>>16]];
-            if (options.rotate)
+#endif
+            if (options.rotate == 1) {
                 vdest+=LCD_WIDTH;
-            else
+            } else if (options.rotate == 2) {
+                vdest-=LCD_WIDTH;
+            } else {
                 vdest++;
+            }
 
             srcpt+=SCALEWS;
         }
-        vdest+=remain;
+        vdest+=sremain;
     }
 
     if(L==143)
@@ -1087,10 +1114,24 @@ void lcd_refreshline(void)
         {
             snprintf(frameout,sizeof(frameout),"FPS: %d Frameskip: %d ",options.fps, options.frameskip);
             rb->lcd_putsxy(0,LCD_HEIGHT-10,frameout);
+            rb->lcd_update_rect(0,LCD_HEIGHT-10, LCD_WIDTH, 10);
         }
 
         hpt=0x8000;
-        rb->lcd_update();
+
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+        if(options.scaling==3) {
+            rb->lcd_blit_pal256((unsigned char*)rb->lcd_framebuffer,(LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, (LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, 160, 144);
+        } else {
+            rb->lcd_blit_pal256((unsigned char*)rb->lcd_framebuffer,0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
+        }
+#else
+        if(options.scaling==3) {
+            rb->lcd_update_rect( (LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, 160, 144);
+        } else {
+            rb->lcd_update();
+        }
+#endif
     }
 
 #endif
@@ -1130,7 +1171,17 @@ static void updatepalette(int i)
 #elif LCD_PIXELFORMAT == RGB565SWAPPED
     c = swap16(r|g|b);
 #endif
-    PAL[i] = c;
+
+    /* updatepalette might get called, but the pallete does not necessarily
+     *  need to be updated.
+     */
+    if(PAL[i]!=c) 
+    {
+        PAL[i] = c;
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+        rb->lcd_pal256_update_pal(PAL);
+#endif
+    }
 }
 #endif /* HAVE_LCD_COLOR */
 
@@ -1170,6 +1221,7 @@ void vram_write(addr a, byte b)
     if (a >= 0x1800) return;
     patdirty[((R_VBK&1)<<9)+(a>>4)] = 1;
     anydirty = 1;
+    pal_dirty();
 }
 
 void vram_dirty(void)
@@ -1203,3 +1255,4 @@ void lcd_reset(void)
     lcd_begin();
     vram_dirty();
 }
+

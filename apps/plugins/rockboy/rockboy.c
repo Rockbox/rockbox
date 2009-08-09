@@ -385,10 +385,18 @@ enum plugin_status plugin_start(const void* parameter)
     rb->wheel_send_events(false);
 #endif
 
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_PAL256);
+#endif
+
     gnuboy_main(parameter);
 
 #ifdef HAVE_WHEEL_POSITION
     rb->wheel_send_events(true);
+#endif
+
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif
 
     if(shut&&!cleanshut)
@@ -398,6 +406,7 @@ enum plugin_status plugin_start(const void* parameter)
     }
     if(!rb->audio_status())
         pcm_close();
+        
     rb->splash(HZ/2, "Closing Rockboy");
 
     savesettings();

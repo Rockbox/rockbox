@@ -41,6 +41,7 @@ void emu_run(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
+    set_pal();
 
     while(!shut)
     {

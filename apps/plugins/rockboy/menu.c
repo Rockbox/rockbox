@@ -11,25 +11,6 @@
 #include "rtc-gb.h"
 #include "pcm.h"
 
-#if CONFIG_KEYPAD == IPOD_4G_PAD
-#define MENU_BUTTON_UP BUTTON_SCROLL_BACK
-#define MENU_BUTTON_DOWN BUTTON_SCROLL_FWD
-#define MENU_BUTTON_LEFT BUTTON_LEFT
-#define MENU_BUTTON_RIGHT BUTTON_RIGHT
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define MENU_BUTTON_UP BUTTON_SCROLL_UP
-#define MENU_BUTTON_DOWN BUTTON_SCROLL_DOWN
-#define MENU_BUTTON_LEFT BUTTON_LEFT
-#define MENU_BUTTON_RIGHT BUTTON_RIGHT
-
-#else
-#define MENU_BUTTON_UP BUTTON_UP
-#define MENU_BUTTON_DOWN BUTTON_DOWN
-#define MENU_BUTTON_LEFT BUTTON_LEFT
-#define MENU_BUTTON_RIGHT BUTTON_RIGHT
-#endif
-
 /* load/save state function declarations */
 static void do_opt_menu(void);
 static void do_slot_menu(bool is_load);
@@ -92,6 +73,10 @@ int do_user_menu(void) {
     time = rb->mktime(rb->get_time());
 #endif
 
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_RGB565);
+#endif
+
     /* Clean out the button Queue */
     while (rb->button_get(false) != BUTTON_NONE) 
         rb->yield();
@@ -135,6 +120,10 @@ int do_user_menu(void) {
     time = (rb->mktime(rb->get_time()) - time) * 60;
 #endif
     while (time-- > 0) rtc_tick();
+
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_PAL256);
+#endif
 
     return ret;
 }
@@ -344,6 +333,12 @@ static void do_opt_menu(void)
         { "On" , -1 },
     };
 
+    static const struct opt_items rotate[] = {
+        { "No rotation", -1 },
+        { "Rotate Right" , -1 },
+        { "Rotate Left" , -1 },
+    };
+
     static const struct opt_items frameskip[]= {
         { "0 Max", -1 },
         { "1 Max", -1 },
@@ -421,7 +416,8 @@ static void do_opt_menu(void)
                 setvidmode();
                 break;
             case 5: /* Screen rotate */
-                rb->set_option("Screen Rotate", &options.rotate, INT, onoff, 2, NULL );
+                rb->set_option("Screen Rotate", &options.rotate, INT, rotate,
+                    sizeof(rotate)/sizeof(*rotate), NULL );
                 setvidmode();
                 break;
             case 6: /* Palette */
