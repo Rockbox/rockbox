@@ -35,18 +35,3 @@ int read_image_file(const char* filename, struct bitmap *bm, int maxsize,
         return scaled_read_bmp_file(filename, bm, maxsize, format, cformat);
 }
 
-int read_image_file_offset(int offset, const char* filename, struct bitmap *bm,
-                           int maxsize, int format,
-                           const struct custom_format *cformat)
-{
-    int fd = rb->open(filename, O_RDONLY);
-    if (fd < 0)
-        return fd;
-    if (offset != rb->lseek(fd, offset, SEEK_SET))
-        return -1;
-    int namelen = rb->strlen(filename);
-    if (rb->strcmp(filename + namelen - 4, ".bmp"))
-        return read_jpeg_fd(fd, bm, maxsize, format, cformat);
-    else
-        return scaled_read_bmp_fd(fd, bm, maxsize, format, cformat);
-}
