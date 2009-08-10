@@ -1,0 +1,11 @@
+CFLAGS = -Wall -O3 -DTEST -D"DEBUGF=printf"
+OBJS = atrac3.o dsputil.o bitstream.o fft.o mdct.o libavutil/log.o libavutil/mem.o ../librm/rm.o
+
+atractest: $(OBJS)
+	gcc -o atractest $(OBJS) -lm
+
+.c.o :
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -f atractest $(OBJS) *~ output.wav

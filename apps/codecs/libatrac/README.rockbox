@@ -1,0 +1,20 @@
+Library: libatrac
+Imported by : Mohamed Tarek
+Import date : 10-August-2009
+
+LICENSING INFORMATION
+
+ffmpeg is licensed under the Lesser GNU General Public License.
+
+IMPORT DETAILS
+
+The decoder is based on ffmpeg-svn r18079. It still uses floating 
+point math and not suitable to be used in rockbox.
+
+TESTING
+
+The test program should compile in any Unix-like environment using the
+command "make -f Makefile.test".
+
+Running "./atractest file.rm" will decode the audio data to a WAV file
+called "output.wav" in the current directory.

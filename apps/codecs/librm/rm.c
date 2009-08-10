@@ -29,7 +29,7 @@
 
 #define SWAP(a, b) do{uint8_t SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
 
-static void advance_buffer(uint8_t **buf, int val)
+void advance_buffer(uint8_t **buf, int val)
 {
     *buf += val;
 }
@@ -237,10 +237,40 @@ static int real_read_audio_stream_info(int fd, RMContext *rmctx)
            skipped += 1;
        }
   
-       read_uint32be(fd, &rmctx->extradata_size);
-       skipped += 4;
-       read(fd, rmctx->codec_extradata, rmctx->extradata_size);
-       skipped += rmctx->extradata_size;
+       switch(fourcc) {
+           case FOURCC('c','o','o','k'):               
+               rmctx->codec_type = CODEC_COOK;
+               read_uint32be(fd, &rmctx->extradata_size);
+               skipped += 4;
+               read(fd, rmctx->codec_extradata, rmctx->extradata_size);
+               skipped += rmctx->extradata_size;
+               break;
+
+           case FOURCC('a','t','r','c'):  
+DEBUGF("WERE HERE\n");             
+               rmctx->codec_type = CODEC_ATRAC;
+               read_uint32be(fd, &rmctx->extradata_size);
+               skipped += 4;
+               read(fd, rmctx->codec_extradata, rmctx->extradata_size);
+               skipped += rmctx->extradata_size;
+               break;
+
+           case FOURCC('r','a','a','c'):
+           case FOURCC('r','a','c','p'):
+               rmctx->codec_type = CODEC_AAC;
+               read_uint32be(fd, &rmctx->extradata_size);
+               skipped += 4;
+               read(fd, rmctx->codec_extradata, rmctx->extradata_size);
+               skipped += rmctx->extradata_size;
+               break;
+
+           case FOURCC('d','n','e','t'):
+               rmctx->codec_type = CODEC_AC3;
+               break;
+
+           default: /* Not a supported codec */
+               return -1;
+       }
        
        
        DEBUGF("        flavor = %d\n",flavor);
@@ -252,8 +282,10 @@ static int real_read_audio_stream_info(int fd, RMContext *rmctx)
        DEBUGF("        channels= %d\n",rmctx->nb_channels);
        DEBUGF("        fourcc = %s\n",fourcc2str(fourcc));
        DEBUGF("        codec_extra_data_length = %d\n",rmctx->extradata_size);
-       DEBUGF("        codec_extradata :\n");
-       print_cook_extradata(rmctx);
+       if(rmctx->codec_type == CODEC_COOK) {
+           DEBUGF("        cook_extradata :\n");
+           print_cook_extradata(rmctx);
+       }
 
     }
 
@@ -530,7 +562,7 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
         
         advance_buffer(src,12);
         consumed += 12;
-        if (rmctx->codec_type == CODEC_COOK) {
+        if (rmctx->codec_type == CODEC_COOK || rmctx->codec_type == CODEC_ATRAC) {
             for(x = 0 ; x < w/sps; x++)
             {
                 place = sps*(h*x+((h+1)/2)*(y&1)+(y>>1)); 

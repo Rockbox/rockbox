@@ -31,7 +31,8 @@
 enum codecs {
     CODEC_COOK, 
     CODEC_AAC,
-    CODEC_AC3
+    CODEC_AC3,
+    CODEC_ATRAC
 };
 
 typedef struct rm_packet
