@@ -431,6 +431,10 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
         case CODEC_AC3:
             id3->codectype = AFMT_RM_AC3;
             break;
+        
+        case CODEC_ATRAC:
+        /* Not yet supported in rockbox, parsing fails before reaching here */
+            break;
     }
     
     id3->bitrate = rmctx->bit_rate / 1000;
