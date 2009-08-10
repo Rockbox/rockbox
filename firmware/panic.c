@@ -61,7 +61,7 @@ void panicf( const char *fmt, ...)
 #elif defined(HAVE_LCD_BITMAP)
     int y = 1;
 
-#ifdef LCD_DEPTH > 1
+#if LCD_DEPTH > 1
     lcd_set_backdrop(NULL);
     lcd_set_foreground(LCD_BLACK);
     lcd_set_background(LCD_WHITE);
