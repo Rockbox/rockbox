@@ -52,7 +52,7 @@
 #include <sys/mount.h>
 #endif
 
-#include "detect.h"
+#include "system.h"
 #include "utils.h"
 
 Autodetection::Autodetection(QObject* parent): QObject(parent)
@@ -404,7 +404,7 @@ bool Autodetection::detectUsb()
 
     // usb pid detection
     QList<uint32_t> attached;
-    attached = Detect::listUsbIds();
+    attached = System::listUsbIds();
 
     int i = attached.size();
     while(i--) {

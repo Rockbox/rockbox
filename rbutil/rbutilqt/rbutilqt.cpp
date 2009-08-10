@@ -33,7 +33,7 @@
 #include "utils.h"
 #include "rbzip.h"
 #include "sysinfo.h"
-#include "detect.h"
+#include "system.h"
 #include "rbsettings.h"
 
 #include "progressloggerinterface.h"
@@ -308,7 +308,7 @@ void RbUtilQt::updateSettings()
     updateDevice();
     updateManual();
     if(RbSettings::value(RbSettings::ProxyType) == "system") {
-        HttpGet::setGlobalProxy(Detect::systemProxy());
+        HttpGet::setGlobalProxy(System::systemProxy());
     }
     else if(RbSettings::value(RbSettings::ProxyType) == "manual") {
         HttpGet::setGlobalProxy(RbSettings::value(RbSettings::Proxy).toString());
@@ -526,7 +526,7 @@ bool RbUtilQt::installAuto()
     buildInfo.close();
 
     // check installed Version and Target
-    QString warning = Detect::check(false);
+    QString warning = check(false);
     if(!warning.isEmpty())
     {
         if(QMessageBox::warning(this, tr("Really continue?"), warning,
@@ -1181,7 +1181,7 @@ QUrl RbUtilQt::proxy()
     if(RbSettings::value(RbSettings::ProxyType) == "manual")
         return QUrl(RbSettings::value(RbSettings::Proxy).toString());
     else if(RbSettings::value(RbSettings::ProxyType) == "system")
-        return Detect::systemProxy();
+        return System::systemProxy();
     return QUrl("");
 }
 

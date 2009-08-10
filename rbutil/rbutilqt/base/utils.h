@@ -30,6 +30,7 @@ bool recRmdir( const QString &dirName );
 QString resolvePathCase(QString path);
 qulonglong filesystemFree(QString path);
 QString findExecutable(QString name); 
+QString check(bool permission);
 
 class RockboxInfo
 {

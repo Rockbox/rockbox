@@ -18,7 +18,7 @@
  ****************************************************************************/
 
 
-#include "detect.h"
+#include "system.h"
 
 #include <QtCore>
 #include <QDebug>
@@ -69,7 +69,7 @@
  *  @return enum userlevel.
  */
 #if defined(Q_OS_WIN32)
-enum Detect::userlevel Detect::userPermissions(void)
+enum System::userlevel System::userPermissions(void)
 {
     LPUSER_INFO_1 buf;
     NET_API_STATUS napistatus;
@@ -106,7 +106,7 @@ enum Detect::userlevel Detect::userPermissions(void)
 /** @brief detects user permissions (only Windows at moment).
  *  @return a user readable string with the permission.
  */
-QString Detect::userPermissionsString(void)
+QString System::userPermissionsString(void)
 {
     QString result;
     int perm = userPermissions();
@@ -132,7 +132,7 @@ QString Detect::userPermissionsString(void)
 /** @brief detects current Username.
  *  @return string with Username.
  */
-QString Detect::userName(void)
+QString System::userName(void)
 {
 #if defined(Q_OS_WIN32)
     wchar_t userbuf[UNLEN];
@@ -154,7 +154,7 @@ QString Detect::userName(void)
 /** @brief detects the OS Version
  *  @return String with OS Version.
  */
-QString Detect::osVersionString(void)
+QString System::osVersionString(void)
 {
     QString result;
 #if defined(Q_OS_WIN32)
@@ -182,7 +182,7 @@ QString Detect::osVersionString(void)
     return result;
 }
 
-QList<uint32_t> Detect::listUsbIds(void)
+QList<uint32_t> System::listUsbIds(void)
 {
     return listUsbDevices().keys();
 }
@@ -190,11 +190,11 @@ QList<uint32_t> Detect::listUsbIds(void)
 /** @brief detect devices based on usb pid / vid.
  *  @return list with usb VID / PID values.
  */
-QMap<uint32_t, QString> Detect::listUsbDevices(void)
+QMap<uint32_t, QString> System::listUsbDevices(void)
 {
     QMap<uint32_t, QString> usbids;
     // usb pid detection
-    qDebug() << "[Detect] Searching for USB devices";
+    qDebug() << "[System] Searching for USB devices";
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
 #if defined(LIBUSB1)
     libusb_device **devs;
@@ -225,7 +225,7 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
                 name = QObject::tr("(no description available)");
             if(id) {
                 usbids.insert(id, name);
-                qDebug("[Detect] USB: 0x%08x, %s", id, name.toLocal8Bit().data());
+                qDebug("[System] USB: 0x%08x, %s", id, name.toLocal8Bit().data());
             }
         }
     }
@@ -271,7 +271,7 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
 
                 if(id) {
                     usbids.insert(id, name);
-                    qDebug() << "[Detect] USB:" << QString("0x%1").arg(id, 8, 16) << name;
+                    qDebug() << "[System] USB:" << QString("0x%1").arg(id, 8, 16) << name;
                 }
                 u = u->next;
             }
@@ -346,7 +346,7 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
             uint32_t id;
             id = vid << 16 | pid;
             usbids.insert(id, description);
-            qDebug("[Detect] USB VID: %04x, PID: %04x", vid, pid);
+            qDebug("[System] USB VID: %04x, PID: %04x", vid, pid);
         }
         if(buffer) free(buffer);
     }
@@ -360,7 +360,7 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
 /** @brief detects current system proxy
  *  @return QUrl with proxy or empty
  */
-QUrl Detect::systemProxy(void)
+QUrl System::systemProxy(void)
 {
 #if defined(Q_OS_LINUX)
     return QUrl(getenv("http_proxy"));
@@ -393,46 +393,6 @@ QUrl Detect::systemProxy(void)
 #else
     return QUrl("");
 #endif
-}
-
-
-/** @brief checks different Enviroment things. Ask if user wants to continue.
- *  @param settings A pointer to rbutils settings class
- *  @param permission if it should check for permission
- *  @param targetId the targetID to check for. if it is -1 no check is done.
- *  @return string with error messages if problems occurred, empty strings if none.
- */
-QString Detect::check(bool permission)
-{
-    QString text = "";
-
-    // check permission
-    if(permission)
-    {
-#if defined(Q_OS_WIN32)
-        if(Detect::userPermissions() != Detect::ADMIN)
-        {
-            text += QObject::tr("<li>Permissions insufficient for bootloader "
-                    "installation.\nAdministrator priviledges are necessary.</li>");
-        }
-#endif
-    }
-
-    // Check TargetId
-    RockboxInfo rbinfo(RbSettings::value(RbSettings::Mountpoint).toString());
-    QString installed = rbinfo.target();
-    if(!installed.isEmpty() && installed != RbSettings::value(RbSettings::CurConfigureModel).toString())
-    {
-        text += QObject::tr("<li>Target mismatch detected.\n"
-                "Installed target: %1, selected target: %2.</li>")
-            .arg(installed, RbSettings::value(RbSettings::CurPlatformName).toString());
-            // FIXME: replace installed by human-friendly name
-    }
-
-    if(!text.isEmpty())
-        return QObject::tr("Problem detected:") + "<ul>" + text + "</ul>";
-    else
-        return text;
 }
 
 

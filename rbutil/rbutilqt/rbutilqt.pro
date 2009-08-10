@@ -75,7 +75,7 @@ SOURCES += rbutilqt.cpp \
  base/rbsettings.cpp \
  base/rbunzip.cpp \
  base/rbzip.cpp \
- base/detect.cpp \
+ base/system.cpp \
  sysinfo.cpp \
  base/bootloaderinstallbase.cpp \
  base/bootloaderinstallmi4.cpp \
@@ -129,7 +129,7 @@ HEADERS += rbutilqt.h \
  base/rbunzip.h \
  base/rbzip.h \
  sysinfo.h \
- base/detect.h \
+ base/system.h \
  base/bootloaderinstallbase.h \
  base/bootloaderinstallmi4.h \
  base/bootloaderinstallhex.h \

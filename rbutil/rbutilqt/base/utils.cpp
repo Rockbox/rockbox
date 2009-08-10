@@ -18,6 +18,9 @@
  ****************************************************************************/
 
 #include "utils.h"
+#include "system.h"
+#include "rbsettings.h"
+
 #ifdef UNICODE
 #define _UNICODE
 #endif
@@ -156,6 +159,46 @@ QString findExecutable(QString name)
         }
     }
     return "";
+}
+
+
+/** @brief checks different Enviroment things. Ask if user wants to continue.
+ *  @param settings A pointer to rbutils settings class
+ *  @param permission if it should check for permission
+ *  @param targetId the targetID to check for. if it is -1 no check is done.
+ *  @return string with error messages if problems occurred, empty strings if none.
+ */
+QString check(bool permission)
+{
+    QString text = "";
+
+    // check permission
+    if(permission)
+    {
+#if defined(Q_OS_WIN32)
+        if(Detect::userPermissions() != Detect::ADMIN)
+        {
+            text += QObject::tr("<li>Permissions insufficient for bootloader "
+                    "installation.\nAdministrator priviledges are necessary.</li>");
+        }
+#endif
+    }
+
+    // Check TargetId
+    RockboxInfo rbinfo(RbSettings::value(RbSettings::Mountpoint).toString());
+    QString installed = rbinfo.target();
+    if(!installed.isEmpty() && installed != RbSettings::value(RbSettings::CurConfigureModel).toString())
+    {
+        text += QObject::tr("<li>Target mismatch detected.\n"
+                "Installed target: %1, selected target: %2.</li>")
+            .arg(installed, RbSettings::value(RbSettings::CurPlatformName).toString());
+            // FIXME: replace installed by human-friendly name
+    }
+
+    if(!text.isEmpty())
+        return QObject::tr("Problem detected:") + "<ul>" + text + "</ul>";
+    else
+        return text;
 }
 
 

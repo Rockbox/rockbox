@@ -26,7 +26,7 @@
 #include "browsedirtree.h"
 #include "encoders.h"
 #include "tts.h"
-#include "detect.h"
+#include "system.h"
 #include "encttscfggui.h"
 #include "rbsettings.h"
 #include "utils.h"
@@ -420,7 +420,7 @@ void Config::setSystemProxy(bool checked)
         proxy.setHost(ui.proxyHost->text());
         proxy.setPort(ui.proxyPort->text().toInt());
         // show system values in input box
-        QUrl envproxy = Detect::systemProxy();
+        QUrl envproxy = System::systemProxy();
 
         ui.proxyHost->setText(envproxy.host());
 

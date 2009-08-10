@@ -20,7 +20,7 @@
 #include "install.h"
 #include "ui_installfrm.h"
 #include "rbzip.h"
-#include "detect.h"
+#include "system.h"
 #include "rbsettings.h"
 #include "utils.h"
 
@@ -130,7 +130,7 @@ void Install::accept()
 
     RbSettings::sync();
 
-    QString warning = Detect::check(false);
+    QString warning = check(false);
     if(!warning.isEmpty())
     {
         if(QMessageBox::warning(this, tr("Really continue?"), warning,

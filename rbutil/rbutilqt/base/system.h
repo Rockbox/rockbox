@@ -20,18 +20,18 @@
  ****************************************************************************/
 
 
-#ifndef DETECT_H
-#define DETECT_H
+#ifndef SYSTEM_H
+#define SYSTEM_H
 
 #include <inttypes.h>
 
 #include <QString>
 #include <QUrl>
 
-class Detect
+class System
 {
 public:
-    Detect() {}
+    System() {}
 
 #if defined(Q_OS_WIN32)
     enum userlevel { ERR, GUEST, USER, ADMIN };
@@ -45,8 +45,6 @@ public:
     static QMap<uint32_t, QString> listUsbDevices(void);
 
     static QUrl systemProxy(void);
-
-    static QString check(bool permission);
 
 };
 #endif
