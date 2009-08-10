@@ -17,6 +17,9 @@
  *
  ****************************************************************************/
 
+#ifndef BOOTLOADERINSTALLMI4_H
+#define BOOTLOADERINSTALLMI4_H
+
 #include <QtCore>
 #include "progressloggerinterface.h"
 #include "bootloaderinstallbase.h"
@@ -41,4 +44,6 @@ class BootloaderInstallMi4 : public BootloaderInstallBase
 
     private:
 };
+
+#endif
 

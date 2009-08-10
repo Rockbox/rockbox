@@ -17,6 +17,9 @@
  *
  ****************************************************************************/
 
+#ifndef BOOTLOADERINSTALLFILE_H
+#define BOOTLOADERINSTALLFILE_H
+
 #include <QtCore>
 #include "progressloggerinterface.h"
 #include "bootloaderinstallbase.h"
@@ -41,4 +44,6 @@ class BootloaderInstallFile : public BootloaderInstallBase
 
     private:
 };
+
+#endif
 
