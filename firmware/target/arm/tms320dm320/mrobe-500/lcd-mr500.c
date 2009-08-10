@@ -97,7 +97,7 @@ void lcd_awake(void)
 /* Note this is expecting a screen size of 480x640 or 240x320, other screen
  * sizes need to be considered for fudge factors
  */
-#define LCD_FUDGE LCD_NATIVE_WIDTH%32
+#define LCD_FUDGE       LCD_NATIVE_WIDTH%32
 
 /* LCD init - based on code from ingenient-bsp/bootloader/board/dm320/splash.c
  *  and code by Catalin Patulea from the M:Robe 500i linux port
@@ -160,7 +160,7 @@ void lcd_init_device(void)
     /* Used for 565 RGB */
     IO_OSD_OSDWINMD0    = 0x30C0;
 
-    IO_OSD_OSDWIN0OFST  = LCD_NATIVE_WIDTH / 16;
+    IO_OSD_OSDWIN0OFST  = LCD_NATIVE_WIDTH *2 / 32;
     
     IO_OSD_OSDWINADH    = addr >> 16;
     IO_OSD_OSDWIN0ADL   = addr & 0xFFFF;
@@ -189,17 +189,19 @@ void lcd_init_device(void)
     IO_OSD_OSDWIN1XL    = LCD_NATIVE_WIDTH;
     IO_OSD_OSDWIN1YL    = LCD_NATIVE_HEIGHT;
     
-    IO_OSD_VIDWINMD     = 0x0002;
+    IO_OSD_VIDWINMD     = 0x0000;
     
-    addr                = ((int)FRAME2-CONFIG_SDRAM_START) / 32;
+    addr                = ((int)FRAME2-CONFIG_SDRAM_START + 
+                            2*(LCD_NATIVE_WIDTH*(LCD_NATIVE_HEIGHT-320)/2+
+                                (LCD_NATIVE_WIDTH-240)/2))/ 32;
     
     /* This is a bit messy, the LCD transfers appear to happen in chunks of 32
      * pixels. (based on OF)
      */
 #if LCD_NATIVE_WIDTH%32!=0
-    IO_OSD_VIDWIN0OFST  = LCD_NATIVE_WIDTH / 32+1;
+    IO_OSD_VIDWIN0OFST  = LCD_NATIVE_WIDTH * 2 / 32+1;
 #else
-    IO_OSD_VIDWIN0OFST  = LCD_NATIVE_WIDTH / 32;
+    IO_OSD_VIDWIN0OFST  = LCD_NATIVE_WIDTH * 2 / 32;
 #endif
     
     IO_OSD_VIDWINADH    = addr >> 16;
@@ -229,24 +231,22 @@ void lcd_init_device(void)
 #if defined(HAVE_LCD_MODES)
 void lcd_set_mode(int mode)
 {
-	if(mode==LCD_MODE_YUV)
-	{
-		/* Turn off the RGB buffer and enable the YUV buffer */
-		IO_OSD_OSDWINMD0    |= 0x04;
-		IO_OSD_VIDWINMD     |= 0x01;
-		memset16(FRAME2, 0x0080, LCD_NATIVE_HEIGHT*(LCD_NATIVE_WIDTH+LCD_FUDGE));
-	}
-	else if(mode==LCD_MODE_RGB565)
-	{
-		/* Turn on the RGB window, set it to 16 bit and turn YUV window off */
-		IO_OSD_VIDWINMD     &= ~(0x01);
-		IO_OSD_OSDWIN0OFST  =  LCD_NATIVE_WIDTH / 16;
-    	IO_OSD_OSDWINMD0    |= (1<<13);
-    	IO_OSD_OSDWINMD0    &= ~0x04;
-    	lcd_clear_display();
-	}
-	else if(mode==LCD_MODE_PAL256)
-	{
+    if(mode==LCD_MODE_YUV) {
+        /* Turn off the RGB buffer and enable the YUV buffer with zoom */
+        IO_OSD_OSDWINMD0    |= 0x04;
+        IO_OSD_VIDWINMD     |= 0x01;
+#if LCD_NATIVE_WIDTH > 240
+        IO_OSD_VIDWINMD     |= (0x05<<2); /* This does a 2x zoom */
+#endif
+        memset16(FRAME2, 0x0080, LCD_NATIVE_HEIGHT*(LCD_NATIVE_WIDTH+LCD_FUDGE));
+    } else if(mode==LCD_MODE_RGB565) {
+        /* Turn on the RGB window, set it to 16 bit and turn YUV window off */
+        IO_OSD_VIDWINMD     &= ~(0x01);
+        IO_OSD_OSDWIN0OFST  =  LCD_NATIVE_WIDTH / 16;
+        IO_OSD_OSDWINMD0    |= (1<<13);
+        IO_OSD_OSDWINMD0    &= ~0x04;
+        lcd_clear_display();
+    } else if(mode==LCD_MODE_PAL256) {
 #if LCD_NATIVE_WIDTH%32!=0
         IO_OSD_OSDWIN0OFST  = LCD_NATIVE_WIDTH / 32+1;
 #else
@@ -255,8 +255,8 @@ void lcd_set_mode(int mode)
 
         IO_OSD_VIDWINMD     &= ~(0x01);
         IO_OSD_OSDWINMD0    &= ~(1<<13);
-		IO_OSD_OSDWINMD0    |= 0x01;
-	}
+        IO_OSD_OSDWINMD0    |= 0x01;
+    }
 }
 #endif
 
@@ -416,10 +416,8 @@ void lcd_blit_yuv(unsigned char * const src[3],
     if (!lcd_on)
         return;
 	
-    /* y has to be at multiple of 2 or else it will mess up the HW
-     * (interleaving) 
-     */
-    y &= ~1;
+    /* y has to be on a 16 pixel boundary */
+    y &= ~0xF;
 
     if(     ((y | x | height | width ) < 0) 
             || y>LCD_NATIVE_HEIGHT || x>LCD_NATIVE_WIDTH )
