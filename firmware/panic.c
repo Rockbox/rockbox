@@ -59,16 +59,24 @@ void panicf( const char *fmt, ...)
     lcd_puts(0, 0, "*PANIC*");
     lcd_puts(0, 1, panic_buf);
 #elif defined(HAVE_LCD_BITMAP)
+    int y = 1;
+
+#ifdef LCD_DEPTH > 1
+    lcd_set_backdrop(NULL);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
+#endif
+
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
-    lcd_puts(0, 0, (unsigned char *)"*PANIC*");
+    lcd_puts(1, y++, (unsigned char *)"*PANIC*");
     {
         /* wrap panic line */
-        int i, y=1, len = strlen(panic_buf);
+        int i, len = strlen(panic_buf);
         for (i=0; i<len; i+=LINECHARS) {
             unsigned char c = panic_buf[i+LINECHARS];
             panic_buf[i+LINECHARS] = 0;
-            lcd_puts(0, y++, (unsigned char *)panic_buf+i);
+            lcd_puts(1, y++, (unsigned char *)panic_buf+i);
             panic_buf[i+LINECHARS] = c;
         }
     }
