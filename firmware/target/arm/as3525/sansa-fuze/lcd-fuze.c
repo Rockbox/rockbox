@@ -175,7 +175,6 @@ void lcd_enable(bool on)
         return; /* nothing to do */
     if(on)
     {
-        int delay = 0x200000;
         lcd_write_reg(0, 1);
         lcd_write_reg(0x10, 0);
         lcd_write_reg(0x11, 0x3704);
@@ -189,8 +188,9 @@ void lcd_enable(bool on)
         display_on = true;
         /* a bit of delay before returning to
          * avoid irritating flash on backlight on */
-        while(delay--);
+        lcd_update();      /* Resync display */
         lcd_activation_call_hook();
+        sleep(0);
 
     }
     else
