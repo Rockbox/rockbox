@@ -526,13 +526,12 @@ bool RbUtilQt::installAuto()
     buildInfo.close();
 
     // check installed Version and Target
-    QString rbVersion = Detect::installedVersion(RbSettings::value(RbSettings::Mountpoint).toString());
     QString warning = Detect::check(false);
-
     if(!warning.isEmpty())
     {
         if(QMessageBox::warning(this, tr("Really continue?"), warning,
-            QMessageBox::Ok | QMessageBox::Abort, QMessageBox::Abort) == QMessageBox::Abort)
+            QMessageBox::Ok | QMessageBox::Abort, QMessageBox::Abort)
+                == QMessageBox::Abort)
         {
             logger->addItem(tr("Aborted!"), LOGERROR);
             logger->setFinished();
@@ -541,7 +540,8 @@ bool RbUtilQt::installAuto()
     }
 
     // check version
-    if(rbVersion != "")
+    RockboxInfo rbinfo(RbSettings::value(RbSettings::Mountpoint).toString());
+    if(rbinfo.version() != "")
     {
         if(QMessageBox::question(this, tr("Installed Rockbox detected"),
            tr("Rockbox installation detected. Do you want to backup first?"),
@@ -549,7 +549,7 @@ bool RbUtilQt::installAuto()
         {
             logger->addItem(tr("Starting backup..."),LOGINFO);
             QString backupName = RbSettings::value(RbSettings::Mountpoint).toString()
-                + "/.backup/rockbox-backup-" + rbVersion + ".zip";
+                + "/.backup/rockbox-backup-" + rbinfo.version() + ".zip";
 
             //! create dir, if it doesnt exist
             QFileInfo backupFile(backupName);

@@ -92,7 +92,7 @@ bool Autodetection::detect()
 
             // check rockbox-info.txt afterwards.
             RockboxInfo info(mounts.at(i));
-            if(info.open())
+            if(info.success())
             {
                 if(m_device.isEmpty())
                 {

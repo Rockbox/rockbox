@@ -396,36 +396,6 @@ QUrl Detect::systemProxy(void)
 }
 
 
-/** @brief detects the installed Rockbox version
- *  @return QString with version. Empty if not aviable
- */
-QString Detect::installedVersion(QString mountpoint)
-{
-    RockboxInfo info(mountpoint);
-    if(!info.open())
-    {
-        return "";
-    }
-
-    return info.version();
-}
-
-
-/** @brief detects installed rockbox target string
- *  @return target name (platform) of installed Rockbox, empty string on error.
- */
-QString Detect::installedTarget(QString mountpoint)
-{
-    RockboxInfo info(mountpoint);
-    if(!info.open())
-    {
-        return "";
-    }
-
-    return info.target();
-}
-
-
 /** @brief checks different Enviroment things. Ask if user wants to continue.
  *  @param settings A pointer to rbutils settings class
  *  @param permission if it should check for permission
@@ -449,7 +419,8 @@ QString Detect::check(bool permission)
     }
 
     // Check TargetId
-    QString installed = installedTarget(RbSettings::value(RbSettings::Mountpoint).toString());
+    RockboxInfo rbinfo(RbSettings::value(RbSettings::Mountpoint).toString());
+    QString installed = rbinfo.target();
     if(!installed.isEmpty() && installed != RbSettings::value(RbSettings::CurConfigureModel).toString())
     {
         text += QObject::tr("<li>Target mismatch detected.\n"

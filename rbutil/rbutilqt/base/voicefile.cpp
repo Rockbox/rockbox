@@ -47,7 +47,7 @@ bool VoiceFileCreator::createVoiceFile()
 
     // read rockbox-info.txt
     RockboxInfo info(m_mountpoint);
-    if(!info.open())
+    if(!info.success())
     {
         emit logItem(tr("could not find rockbox-info.txt"),LOGERROR);
         emit done(true);

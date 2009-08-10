@@ -22,6 +22,7 @@
 #include "rbzip.h"
 #include "detect.h"
 #include "rbsettings.h"
+#include "utils.h"
 
 Install::Install(QWidget *parent) : QDialog(parent)
 {
@@ -34,7 +35,8 @@ Install::Install(QWidget *parent) : QDialog(parent)
     connect(ui.backup, SIGNAL(stateChanged(int)), this, SLOT(backupCheckboxChanged(int)));
 
     //! check if rockbox is already installed
-    QString version = Detect::installedVersion(RbSettings::value(RbSettings::Mountpoint).toString());
+    RockboxInfo rbinfo(RbSettings::value(RbSettings::Mountpoint).toString());
+    QString version = rbinfo.version();
 
     if(version != "")
     {

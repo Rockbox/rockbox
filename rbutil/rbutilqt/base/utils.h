@@ -35,18 +35,18 @@ class RockboxInfo
 {
 public:
     RockboxInfo(QString mountpoint);
-    bool open();
     
     QString version() {return m_version;}
     QString features(){return m_features;}
     QString targetID() {return m_targetid;}
     QString target() {return m_target;}
+    bool success() { return m_success; }
 private:
-    QString m_path;
     QString m_version;
     QString m_features;
     QString m_targetid;
     QString m_target;
+    bool m_success;
 };
 
 #endif

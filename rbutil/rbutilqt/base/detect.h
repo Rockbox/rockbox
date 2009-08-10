@@ -45,8 +45,6 @@ public:
     static QMap<uint32_t, QString> listUsbDevices(void);
 
     static QUrl systemProxy(void);
-    static QString installedVersion(QString mountpoint);
-    static QString installedTarget(QString mountpoint);
 
     static QString check(bool permission);
 

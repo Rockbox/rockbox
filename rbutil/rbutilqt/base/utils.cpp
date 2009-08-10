@@ -161,17 +161,14 @@ QString findExecutable(QString name)
 
 RockboxInfo::RockboxInfo(QString mountpoint)
 {
-    m_path = mountpoint +"/.rockbox/rockbox-info.txt";
-}
-
-bool RockboxInfo::open()
-{
-    QFile file(m_path);
+    qDebug() << "[RockboxInfo] trying to find rockbox-info at" << mountpoint;
+    QFile file(mountpoint + "/.rockbox/rockbox-info.txt");
+    m_success = false;
     if(!file.exists())
-        return false;
+        return;
 
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return false;
+        return;
 
     // read file contents
     while (!file.atEnd())
@@ -195,7 +192,9 @@ bool RockboxInfo::open()
             m_targetid = line.remove("Target id:").trimmed();
         }        
     }
-    
+
     file.close();
-    return true;
+    m_success = true;
+    return;
 }
+
