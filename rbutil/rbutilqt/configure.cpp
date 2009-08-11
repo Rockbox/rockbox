@@ -367,18 +367,14 @@ void Config::updateTtsState(int index)
 
 void Config::updateEncState()
 {
-    // FIXME: this is a workaround to make the encoder follow the device selection
-    // even with the settings (and thus the device) being saved. Needs to be redone
-    // properly later by extending the settings object
     if(ui.treeDevices->selectedItems().size() == 0)
         return;
 
     QString devname = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
-    QString olddevice = RbSettings::value(RbSettings::Platform).toString();
-    RbSettings::setValue(RbSettings::Platform, devname);
-    QString encoder = RbSettings::value(RbSettings::CurEncoder).toString();
-    ui.encoderName->setText(EncBase::getEncoderName(RbSettings::value(RbSettings::CurEncoder).toString()));
-    RbSettings::setValue(RbSettings::Platform, olddevice);
+    QString encoder = RbSettings::platformValue(devname,
+                        RbSettings::CurEncoder).toString();
+    ui.encoderName->setText(EncBase::getEncoderName(RbSettings::platformValue(devname,
+                        RbSettings::CurEncoder).toString()));
 
     EncBase* enc = EncBase::getEncoder(this,encoder);
 
@@ -673,14 +669,16 @@ void Config::testTts()
     TTSBase* tts = TTSBase::getTTS(this,ui.comboTts->itemData(index).toString());
     if(!tts->configOk())
     {
-        QMessageBox::warning(this,tr("TTS configuration invalid"),tr("TTS configuration invalid. \n Please configure TTS engine."));
+        QMessageBox::warning(this,tr("TTS configuration invalid"),
+                tr("TTS configuration invalid. \n Please configure TTS engine."));
         return;
     }
     
     if(!tts->start(&errstr))
     {
-        QMessageBox::warning(this,tr("Could not start TTS engine"),tr("Could not start TTS engine.\n") + errstr 
-                        +tr("\nPlease configure TTS engine."));
+        QMessageBox::warning(this,tr("Could not start TTS engine"),
+                tr("Could not start TTS engine.\n") + errstr
+                + tr("\nPlease configure TTS engine."));
         return;
     }
     
@@ -692,11 +690,12 @@ void Config::testTts()
     if(tts->voice(tr("Rockbox Utility Voice Test"),filename,&errstr) == FatalError)
     {
         tts->stop();
-        QMessageBox::warning(this,tr("Could not voice test string"),tr("Could not voice test string.\n") + errstr 
-                        +tr("\nPlease configure TTS engine."));
+        QMessageBox::warning(this,tr("Could not voice test string"),
+                tr("Could not voice test string.\n") + errstr
+                + tr("\nPlease configure TTS engine."));
         return;
     }
-    tts->stop();    
+    tts->stop();
 #if defined(Q_OS_LINUX)
     QString exe = findExecutable("aplay");
     if(exe == "") exe = findExecutable("play");
@@ -704,25 +703,21 @@ void Config::testTts()
     {
         QProcess::execute(exe+" "+filename);
     }
-#else    
+#else
     QSound::play(filename);
-#endif    
+#endif
 }
 
 void Config::configEnc()
 {
-    // FIXME: this is a workaround to make the encoder follow the device selection
-    // even with the settings (and thus the device) being saved. Needs to be redone
-    // properly later by extending the settings object
     if(ui.treeDevices->selectedItems().size() == 0)
         return;
 
     QString devname = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
-    QString olddevice = RbSettings::value(RbSettings::CurrentPlatform).toString();
-    RbSettings::setValue(RbSettings::CurrentPlatform,devname);
-    QString encoder = RbSettings::value(RbSettings::CurEncoder).toString();
-    ui.encoderName->setText(EncBase::getEncoderName(RbSettings::value(RbSettings::CurEncoder).toString()));
-    RbSettings::setValue(RbSettings::CurrentPlatform,olddevice);
+    QString encoder = RbSettings::platformValue(devname,
+                    RbSettings::CurEncoder).toString();
+    ui.encoderName->setText(EncBase::getEncoderName(RbSettings::platformValue(devname,
+                    RbSettings::CurEncoder).toString()));
 
 
     EncBase* enc = EncBase::getEncoder(this,encoder);
@@ -732,3 +727,4 @@ void Config::configEnc()
 
     updateEncState();
 }
+

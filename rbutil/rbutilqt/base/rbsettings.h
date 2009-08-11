@@ -114,7 +114,7 @@ class RbSettings : public QObject
         static QMap<int, QString> usbIdMap(enum MapType);
         //! get a value from system settings
         static QVariant value(enum SystemSettings setting);
-        //! get a vaulue from user settings
+        //! get a value from user settings
         static QVariant value(enum UserSettings setting);
         //! set a user setting value
         static void setValue(enum UserSettings setting , QVariant value);
@@ -122,6 +122,8 @@ class RbSettings : public QObject
         static QVariant subValue(QString sub, enum UserSettings setting);
         //! set a user setting from a subvalue (ie for encoders and tts engines)
         static void setSubValue(QString sub, enum UserSettings setting, QVariant value);
+        //! get a value from system settings for a named platform.
+        static QVariant platformValue(QString platform, enum SystemSettings setting);
 
     private:
         //! you shouldnt call this, its a fully static calls
@@ -137,3 +139,4 @@ class RbSettings : public QObject
 };
 
 #endif
+

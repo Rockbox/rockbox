@@ -220,6 +220,25 @@ void RbSettings::setSubValue(QString sub, enum UserSettings setting, QVariant va
     userSettings->setValue(s, value);
 }
 
+
+QVariant RbSettings::platformValue(QString platform, enum SystemSettings setting)
+{
+    ensureRbSettingsExists();
+
+    // locate setting item
+    int i = 0;
+    while(SystemSettingsList[i].setting != setting)
+        i++;
+
+    QString s = SystemSettingsList[i].name;
+    s.replace(":platform:", platform);
+    QString d = SystemSettingsList[i].def;
+    d.replace(":platform:", platform);
+    qDebug() << "[Settings] GET P:" << s << systemSettings->value(s, d).toString();
+    return systemSettings->value(s, d);
+}
+
+
 QStringList RbSettings::platforms()
 {
     ensureRbSettingsExists();
@@ -249,6 +268,7 @@ QStringList RbSettings::languages()
     systemSettings->endGroup();
     return result;
 }
+
 
 QString RbSettings::name(QString platform)
 {
