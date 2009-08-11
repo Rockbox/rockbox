@@ -102,10 +102,12 @@ MENUITEM_SETTING(crossfade_fade_out_duration,
     &global_settings.crossfade_fade_out_duration, setcrossfadeonexit_callback);
 MENUITEM_SETTING(crossfade_fade_out_mixmode,
     &global_settings.crossfade_fade_out_mixmode,NULL);
+#if MEMORYSIZE > 2
 MAKE_MENU(crossfade_settings_menu,ID2P(LANG_CROSSFADE),0, Icon_NOICON,
           &crossfade, &crossfade_fade_in_delay, &crossfade_fade_in_duration,
           &crossfade_fade_out_delay, &crossfade_fade_out_duration,
           &crossfade_fade_out_mixmode);
+#endif
 
 /* replay gain submenu */
 
@@ -185,7 +187,7 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #endif
           &fade_on_stop, &party_mode,
           
-#if CONFIG_CODEC == SWCODEC
+#if CONFIG_CODEC == SWCODEC && MEMORYSIZE > 2
           &crossfade_settings_menu, &replaygain_settings_menu, &beep,
 #endif
 

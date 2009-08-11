@@ -1129,6 +1129,7 @@ const struct settings_list settings[] = {
                    NULL, 4, ID2P(LANG_OFF), ID2P(LANG_WEAK),
                    ID2P(LANG_MODERATE), ID2P(LANG_STRONG)),
 
+#if MEMORYSIZE > 2
     /* crossfade */
     CHOICE_SETTING(F_SOUNDSETTING, crossfade, LANG_CROSSFADE_ENABLE, 0,
                    "crossfade",
@@ -1153,6 +1154,7 @@ const struct settings_list settings[] = {
                    LANG_CROSSFADE_FADE_OUT_MODE, 0,
                    "crossfade fade out mode", "crossfade,mix", NULL, 2,
                    ID2P(LANG_CROSSFADE), ID2P(LANG_MIX)),
+#endif
 
     /* crossfeed */
     OFFON_SETTING(F_SOUNDSETTING, crossfeed, LANG_CROSSFEED, false,
