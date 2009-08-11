@@ -29,7 +29,7 @@
 struct tm *get_time(void);
 int set_time(const struct tm *tm);
 bool valid_time(const struct tm *tm);
-int day_of_week(int m, int d, int y);
+void set_day_of_week(struct tm *tm);
 void yearday_to_daymonth(int yd, int y, int *d, int *m);
 #if CONFIG_RTC
 time_t mktime(struct tm *t);

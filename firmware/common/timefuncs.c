@@ -194,12 +194,15 @@ time_t mktime(struct tm *t)
 }
 #endif
 
-int day_of_week(int m, int d, int y)
+void set_day_of_week(struct tm *tm)
 {
+        int y=tm->tm_year+1900;
+        int d=tm->tm_mday;
+        int m=tm->tm_mon;
         static const char mo[] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
 
         if(m == 0 || m == 1) y--;
-        return (d + mo[m] + y + y/4 - y/100 + y/400) % 7;
+        tm->tm_wday = (d + mo[m] + y + y/4 - y/100 + y/400) % 7;
 }
 
 void yearday_to_daymonth(int yd, int y, int *d, int *m)

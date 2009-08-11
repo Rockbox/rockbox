@@ -608,14 +608,13 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             }
             break;
         case RECEIVING_TIME:
-            tm.tm_year=(tb.transfer_buffer[0]<<8)+tb.transfer_buffer[1];
+            tm.tm_year=(tb.transfer_buffer[0]<<8)+tb.transfer_buffer[1] - 1900;
             tm.tm_yday=(tb.transfer_buffer[2]<<8)+tb.transfer_buffer[3];
             tm.tm_hour=tb.transfer_buffer[5];
             tm.tm_min=tb.transfer_buffer[6];
             tm.tm_sec=tb.transfer_buffer[7];
-            yearday_to_daymonth(tm.tm_yday,tm.tm_year,&tm.tm_mday,&tm.tm_mon);
-            tm.tm_wday=day_of_week(tm.tm_mon,tm.tm_mday,tm.tm_year);
-            tm.tm_year -= 1900;
+            yearday_to_daymonth(tm.tm_yday,tm.tm_year + 1900,&tm.tm_mday,&tm.tm_mon);
+            set_day_of_week(&tm);
             set_time(&tm);
             send_csw(UMS_STATUS_GOOD);
             break;
@@ -1081,16 +1080,19 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             break;
 
         case SCSI_WRITE_BUFFER:
-            if(cbw->command_block[1]==1
-            && cbw->command_block[2]==0
-            && cbw->command_block[3]==0x0c
+            if(cbw->command_block[1]==1 /* mode = vendor specific */
+            && cbw->command_block[2]==0 /* buffer id = 0 */
+
+            && cbw->command_block[3]==0x0c /* offset (3 bytes) */
             && cbw->command_block[4]==0
             && cbw->command_block[5]==0
-            && cbw->command_block[6]==0
+
+            /* Some versions of itunes set the parameter list length to 0.
+             * Technically it should be 0x0c, which is what libgpod sends */
+            && cbw->command_block[6]==0 /* parameter list (3 bytes) */
             && cbw->command_block[7]==0
-            /* Some versions of itunes set the next byte to 0. Technically
-             * it should be 0x0c */
             && (cbw->command_block[8]==0 || cbw->command_block[8]==0x0c)
+
             && cbw->command_block[9]==0)
             receive_time();
             break;

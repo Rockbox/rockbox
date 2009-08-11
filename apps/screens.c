@@ -511,7 +511,6 @@ bool set_time_screen(const char* title, struct tm *tm)
     int button;
     unsigned int i, j, s;
     int cursorpos = 0;
-    unsigned int julianday;
     unsigned int realyear;
     unsigned int width;
     unsigned int min, max;
@@ -556,13 +555,7 @@ bool set_time_screen(const char* title, struct tm *tm)
             tm->tm_mday = daysinmonth[tm->tm_mon];
 
         /* calculate day of week */
-        julianday = tm->tm_mday;
-        for(i = 0; (int)i < tm->tm_mon; i++) {
-           julianday += daysinmonth[i];
-        }
-
-        tm->tm_wday = (realyear + julianday + (realyear - 1) / 4 -
-                       (realyear - 1) / 100 + (realyear - 1) / 400 + 7 - 1) % 7;
+        set_day_of_week(tm);
 
         /* put all the numbers we want from the tm struct into
            an easily printable buffer */
