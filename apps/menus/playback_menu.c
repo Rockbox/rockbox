@@ -188,7 +188,11 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
           &fade_on_stop, &party_mode,
           
 #if CONFIG_CODEC == SWCODEC && defined(HAVE_CROSSFADE)
-          &crossfade_settings_menu, &replaygain_settings_menu, &beep,
+          &crossfade_settings_menu, 
+#endif
+
+#if CONFIG_CODEC == SWCODEC
+          &replaygain_settings_menu, &beep,
 #endif
 
 #ifdef HAVE_SPDIF_POWER
