@@ -193,3 +193,42 @@ time_t mktime(struct tm *t)
     return(result);
 }
 #endif
+
+int day_of_week(int m, int d, int y)
+{
+        char mo[12] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
+
+        if(m == 0 || m == 1) y--;
+        return (d + mo[m] + y + y/4 - y/100 + y/400) % 7;
+}
+
+void yearday_to_daymonth(int yd, int y, int *d, int *m)
+{
+    short t[12] = { 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
+    int i;
+
+    if((y%4 == 0 && y%100 != 0) || y%400 == 0)
+    {
+        for(i=1;i<12;i++)
+            t[i]++;
+    }
+
+    yd++;
+    if(yd <= 31)
+    {
+        *d = yd;
+        *m = 0;
+    }
+    else
+    {
+        for(i=1;i<12;i++)
+        {
+            if(yd <= t[i])
+            {
+                *d = yd - t[i-1];
+                *m = i;
+                break;
+            }
+        }
+    }
+}

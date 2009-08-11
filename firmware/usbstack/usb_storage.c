@@ -31,6 +31,7 @@
 /* Needed to get at the audio buffer */
 #include "audio.h"
 #include "usb_storage.h"
+#include "timefuncs.h"
 
 
 /* Enable the following define to export only the SD card slot. This
@@ -68,8 +69,8 @@
 #define USB_BULK_RESET_REQUEST   0xff
 #define USB_BULK_GET_MAX_LUN     0xfe
 
-#define DIRECT_ACCESS_DEVICE	 0x00    /* disks */
-#define DEVICE_REMOVABLE	 0x80
+#define DIRECT_ACCESS_DEVICE	   0x00    /* disks */
+#define DEVICE_REMOVABLE         0x80
 
 #define CBW_SIGNATURE            0x43425355
 #define CSW_SIGNATURE            0x53425355
@@ -86,6 +87,7 @@
 #define SCSI_WRITE_10             0x2a
 #define SCSI_START_STOP_UNIT      0x1b
 #define SCSI_REPORT_LUNS          0xa0
+#define SCSI_WRITE_BUFFER         0x3b
 
 #define UMS_STATUS_GOOD            0x00
 #define UMS_STATUS_FAIL            0x01
@@ -270,6 +272,7 @@ static void send_command_result(void *data,int size);
 static void send_command_failed_result(void);
 static void send_block_data(void *data,int size);
 static void receive_block_data(void *data,int size);
+static void receive_time(void);
 static void fill_inquiry(IF_MD_NONVOID(int lun));
 static void send_and_read_next(void);
 static bool ejected[NUM_DRIVES];
@@ -288,6 +291,7 @@ static enum {
     SENDING_RESULT,
     SENDING_FAILED_RESULT,
     RECEIVING_BLOCKS,
+    RECEIVING_TIME,
     SENDING_CSW
 } state = WAITING_FOR_COMMAND;
 
@@ -459,6 +463,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
 {
     (void)ep;
     struct command_block_wrapper* cbw = (void*)cbw_buffer;
+    struct tm tm;
 
     //logf("transfer result %X %d", status, length);
     switch(state) {
@@ -601,6 +606,19 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                 cur_sense_data.asc=0;
                 cur_sense_data.ascq=0;
             }
+            break;
+        case RECEIVING_TIME:
+            tm.tm_year=(tb.transfer_buffer[0]<<8)+tb.transfer_buffer[1];
+            tm.tm_yday=(tb.transfer_buffer[2]<<8)+tb.transfer_buffer[3];
+            tb.transfer_buffer[8];
+            tm.tm_hour=tb.transfer_buffer[5];
+            tm.tm_min=tb.transfer_buffer[6];
+            tm.tm_sec=tb.transfer_buffer[7];
+            yearday_to_daymonth(tm.tm_yday,tm.tm_year,&tm.tm_mday,&tm.tm_mon);
+            tm.tm_wday=day_of_week(tm.tm_mon,tm.tm_mday,tm.tm_year);
+            tm.tm_year -= 1900;
+            set_time(&tm);
+            send_csw(UMS_STATUS_GOOD);
             break;
     }
 }
@@ -1063,6 +1081,21 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             }
             break;
 
+        case SCSI_WRITE_BUFFER:
+            if(cbw->command_block[1]==1
+            && cbw->command_block[2]==0
+            && cbw->command_block[3]==0x0c
+            && cbw->command_block[4]==0
+            && cbw->command_block[5]==0
+            && cbw->command_block[6]==0
+            && cbw->command_block[7]==0
+            /* Some versions of itunes set the next byte to 0. Technically
+             * it should be 0x0c */
+            && (cbw->command_block[8]==0 || cbw->command_block[8]==0x0c)
+            && cbw->command_block[9]==0)
+            receive_time();
+            break;
+
         default:
             logf("scsi unknown cmd %x",cbw->command_block[0x0]);
             send_csw(UMS_STATUS_FAIL);
@@ -1091,6 +1124,11 @@ static void send_command_failed_result(void)
     state = SENDING_FAILED_RESULT;
 }
 
+static void receive_time(void)
+{
+    usb_drv_recv(ep_out, tb.transfer_buffer, 12);
+    state = RECEIVING_TIME;
+}
 static void receive_block_data(void *data,int size)
 {
     usb_drv_recv(ep_out, data, size);
