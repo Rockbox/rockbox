@@ -91,11 +91,13 @@ static bool crossfade_init IDATA_ATTR;
 
 /* Track the current location for processing crossfade */
 static struct pcmbufdesc *crossfade_chunk IDATA_ATTR;
+#ifdef HAVE_CROSSFADE
 static size_t crossfade_sample IDATA_ATTR;
 
 /* Counters for fading in new data */
 static size_t crossfade_fade_in_total IDATA_ATTR;
 static size_t crossfade_fade_in_rem IDATA_ATTR;
+#endif
 
 static struct pcmbufdesc *pcmbuf_read IDATA_ATTR;
 static struct pcmbufdesc *pcmbuf_read_end IDATA_ATTR;
@@ -543,6 +545,11 @@ static bool pcmbuf_flush_fillpos(void)
     return false;
 }
 
+/** 
+ * Low memory targets don't have crossfade, so don't compile crossfade
+ * specific code in order to save some memory.                         */
+
+#ifdef HAVE_CROSSFADE
 /**
  * Completely process the crossfade fade out effect with current pcm buffer.
  */
@@ -824,6 +831,7 @@ fade_done:
     }
 
 }
+#endif
 
 static bool prepare_insert(size_t length)
 {
@@ -862,8 +870,10 @@ static bool prepare_insert(size_t length)
 
 void* pcmbuf_request_buffer(int *count)
 {
+#ifdef HAVE_CROSSFADE
     if (crossfade_init)
         crossfade_start();
+#endif
 
     if (crossfade_active) {
         *count = MIN(*count, PCMBUF_MIX_CHUNK/4);
@@ -929,7 +939,7 @@ bool pcmbuf_is_crossfade_active(void)
 void pcmbuf_write_complete(int count)
 {
     size_t length = (size_t)(unsigned int)count << 2;
-
+#ifdef HAVE_CROSSFADE
     if (crossfade_active)
     {
         flush_crossfade(fadebuf, length);
@@ -937,6 +947,7 @@ void pcmbuf_write_complete(int count)
             crossfade_active = false;
     }
     else
+#endif    
     {
         audiobuffer_fillpos += length;
 

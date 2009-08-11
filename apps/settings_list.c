@@ -1129,7 +1129,7 @@ const struct settings_list settings[] = {
                    NULL, 4, ID2P(LANG_OFF), ID2P(LANG_WEAK),
                    ID2P(LANG_MODERATE), ID2P(LANG_STRONG)),
 
-#if MEMORYSIZE > 2
+#ifdef HAVE_CROSSFADE
     /* crossfade */
     CHOICE_SETTING(F_SOUNDSETTING, crossfade, LANG_CROSSFADE_ENABLE, 0,
                    "crossfade",

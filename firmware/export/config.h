@@ -139,6 +139,11 @@
  * for example in hardware, but not controllable*/
 #define BACKLIGHT_FADING_TARGET     0x8
 
+/*include support for crossfading - requires significant PCM buffer space*/
+#if MEMORYSIZE > 2
+#define HAVE_CROSSFADE
+#endif
+
 /* CONFIG_CHARGING */
 
 /* Generic types */
