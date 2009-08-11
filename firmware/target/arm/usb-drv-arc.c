@@ -826,7 +826,7 @@ int usb_drv_request_endpoint(int type, int dir)
         if (endpoint->allocated[other_dir] &&
                 endpoint->type[other_dir] != ep_type) {
             logf("ep of different type!");
-            return -1;
+            continue;
         }
 
 
