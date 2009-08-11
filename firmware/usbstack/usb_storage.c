@@ -295,6 +295,31 @@ static enum {
     SENDING_CSW
 } state = WAITING_FOR_COMMAND;
 
+static void yearday_to_daymonth(int yd, int y, int *d, int *m)
+{
+    static const char tnl[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    static const char tl[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    const char *t;
+    int i=0;
+
+    if((y%4 == 0 && y%100 != 0) || y%400 == 0)
+    {
+        t=tl;
+    }
+    else
+    {
+        t=tnl;
+    }
+
+    while(yd >= t[i] && i<12)
+    {
+        yd-=t[i];
+        i++;
+    }
+    *d = yd+1;
+    *m = i;
+}
+
 #ifdef TOSHIBA_GIGABEAT_S
 
 /* The Gigabeat S factory partition table contains invalid values for the
