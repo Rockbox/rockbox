@@ -190,8 +190,8 @@ bool logfdump(void)
             ptr = buffer;
             do {
                 tindex++;
-                memcpy(ptr, logfbuffer[tindex], MAX_LOGF_ENTRY);
-                ptr += MAX_LOGF_ENTRY;
+                memcpy(ptr, logfbuffer[tindex], MAX_LOGF_ENTRY-1);
+                ptr += MAX_LOGF_ENTRY-1;
                 if (tindex >= MAX_LOGF_LINES)
                     tindex = 0;
             } while(logfbuffer[tindex][MAX_LOGF_ENTRY] == LOGF_TERMINATE_CONTINUE_LINE);
