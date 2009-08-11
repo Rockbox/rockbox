@@ -87,6 +87,10 @@ static void UIRQ(void)
 {
     unsigned int irq_no = 0;
     int status = VIC_IRQ_STATUS;
+
+    if(status == 0)
+        panicf("Unhandled IRQ (source unknown!)");
+
     while((status >>= 1))
         irq_no++;
 
