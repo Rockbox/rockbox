@@ -176,7 +176,7 @@ QString check(bool permission)
     if(permission)
     {
 #if defined(Q_OS_WIN32)
-        if(Detect::userPermissions() != Detect::ADMIN)
+        if(System::userPermissions() != System::ADMIN)
         {
             text += QObject::tr("<li>Permissions insufficient for bootloader "
                     "installation.\nAdministrator priviledges are necessary.</li>");
