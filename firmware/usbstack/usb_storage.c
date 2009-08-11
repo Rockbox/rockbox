@@ -610,7 +610,6 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
         case RECEIVING_TIME:
             tm.tm_year=(tb.transfer_buffer[0]<<8)+tb.transfer_buffer[1];
             tm.tm_yday=(tb.transfer_buffer[2]<<8)+tb.transfer_buffer[3];
-            tb.transfer_buffer[8];
             tm.tm_hour=tb.transfer_buffer[5];
             tm.tm_min=tb.transfer_buffer[6];
             tm.tm_sec=tb.transfer_buffer[7];
