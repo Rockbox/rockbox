@@ -232,18 +232,18 @@
 
 /* ECC Controller */
 
-#define ECC_CTRL    (*(volatile unsigned long *)0xF005B000)
-    #define ECC_M4EN  (1<<6)
-    #define ECC_ENC   (1<<27)
-    #define ECC_READY (1<<26)
-#define ECC_BASE    (*(volatile unsigned long *)0xF005B004)
-#define ECC_CLR     (*(volatile unsigned long *)0xF005B00C)
-#define ECC_MLC0W   (*(volatile unsigned long *)0xF005B030)
-#define ECC_MLC1W   (*(volatile unsigned long *)0xF005B034)
-#define ECC_MLC2W   (*(volatile unsigned long *)0xF005B038)
-#define ECC_ERRADDR (*(volatile unsigned long *)0xF005B050)
-#define ECC_ERRDATA (*(volatile unsigned long *)0xF005B060)
-#define ECC_ERR     (*(volatile unsigned long *)0xF005B070)
+#define ECC_CTRL       (*(volatile unsigned long *)0xF005B000)
+    #define ECC_ENC       (1<<27)
+    #define ECC_READY     (1<<26)
+    #define ECC_M4EN      (1<<6)
+#define ECC_BASE       (*(volatile unsigned long *)0xF005B004)
+#define ECC_CLR        (*(volatile unsigned long *)0xF005B00C)
+#define MLC_ECC0W      (*(volatile unsigned long *)0xF005B030)
+#define MLC_ECC1W      (*(volatile unsigned long *)0xF005B034)
+#define MLC_ECC2W      (*(volatile unsigned long *)0xF005B038)
+#define ECC_ERRADDR(x) (*(volatile unsigned long *)(0xF005B050+4*(x)))
+#define ECC_ERRDATA(x) (*(volatile unsigned long *)(0xF005B060+4*(x)))
+#define ECC_ERR_NUM    (*(volatile unsigned long *)0xF005B070)
 
 /* SD/MMC Controller */
 

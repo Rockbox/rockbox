@@ -31,7 +31,10 @@
 
 #define SECTOR_SIZE 512
 
-/* #define USE_ECC_CORRECTION */
+/* ECC on read is implemented on the assumption that MLC-style 4-bit correction
+   is always used regardless of NAND chip type. This assumption is true for at
+   least D2 (MLC) and M200 (SLC). */
+#define USE_ECC_CORRECTION
 
 /* for compatibility */
 int ata_spinup_time = 0;
@@ -139,12 +142,6 @@ struct write_cache
 static struct write_cache write_caches[MAX_WRITE_CACHES];
 
 static int write_caches_in_use = 0;
-
-#ifdef USE_ECC_CORRECTION
-static unsigned int ecc_sectors_corrected = 0;
-static unsigned int ecc_bits_corrected = 0;
-static unsigned int ecc_fail_count = 0;
-#endif
 
 
 /* Conversion functions */
@@ -315,7 +312,7 @@ static void nand_read_uid(int bank, unsigned int* uid_buf)
 }
 
 
-static void nand_read_raw(int bank, int row, int column, int size, void* buf)
+static void nand_setup_read(int bank, int row, int column)
 {
     int i;
 
@@ -355,6 +352,23 @@ static void nand_read_raw(int bank, int row, int column, int size, void* buf)
 
     /* Wait until complete */
     while (!(NFC_CTRL & NFC_READY)) {};
+}
+
+
+static void nand_end_read(void)
+{
+    nand_chip_select(-1);
+        
+    /* Disable NFC bus clock */
+    BCLKCTR &= ~DEV_NAND;
+}
+
+
+static void nand_read_raw(int bank, int row, int column, int size, void* buf)
+{
+    int i;
+    
+    nand_setup_read(bank, row, column);
 
     /* Read data into page buffer */
     if (((unsigned int)buf & 3) || (size & 3))
@@ -374,11 +388,8 @@ static void nand_read_raw(int bank, int row, int column, int size, void* buf)
             ((unsigned int*)buf)[i] = NFC_WDATA;
         }
     }
-
-    nand_chip_select(-1);
-        
-    /* Disable NFC bus clock */
-    BCLKCTR &= ~DEV_NAND;
+    
+    nand_end_read();
 }
 
 
@@ -477,15 +488,106 @@ static void nand_get_chip_info(void)
 static bool nand_read_sector_of_phys_page(int bank, int page,
                                           int sector, void* buf)
 {
-#ifndef USE_ECC_CORRECTION
-    nand_read_raw(bank, page,
-                  sector * (SECTOR_SIZE+16),
-                  SECTOR_SIZE, buf);
-    return true;
-#else
-    /* Not yet implemented */
-    return false;
+    bool ret = true;
+    int i;
+    int page_offset = sector * (SECTOR_SIZE + 16);
+
+#ifdef USE_ECC_CORRECTION
+    unsigned long spare_buf[4];
+    
+    /* Set up the ECC controller to monitor reads from NFC_WDATA */
+    BCLKCTR |= DEV_ECC;
+    ECC_BASE = (unsigned long)&NFC_WDATA;
+    ECC_CTRL |= ECC_M4EN;
+    ECC_CTRL &= ~ECC_ENC;
+    ECC_CTRL |= ECC_READY;
+    ECC_CLR = 0;
 #endif
+
+    /* Read the sector data */
+    nand_setup_read(bank, page, page_offset);
+
+    /* Read data into page buffer */
+    if ((unsigned int)buf & 3)
+    {
+        /* If unaligned, read into a temporary buffer and copy to destination.
+           This way, reads are always done through NFC_WDATA - otherwise they
+           would not be 'seen' by the ECC controller. */
+        static char temp_buf[SECTOR_SIZE];
+        
+        unsigned int* ptr = (unsigned int*) temp_buf;
+        
+        for (i = 0; i < (SECTOR_SIZE/4); i++)
+        {
+            *ptr++ = NFC_WDATA;
+        }
+        
+        memcpy(buf, temp_buf, SECTOR_SIZE);
+    }
+    else
+    {
+        /* Use straight word copy as buffer and size are both word-aligned */
+        unsigned int* ptr = (unsigned int*) buf;
+        
+        for (i = 0; i < (SECTOR_SIZE/4); i++)
+        {
+            *ptr++ = NFC_WDATA;
+        }
+    }
+    
+#ifdef USE_ECC_CORRECTION
+    /* Stop monitoring before we read the OOB data */
+    ECC_CTRL &= ~ECC_M4EN;
+    BCLKCTR &= ~DEV_ECC;
+
+    /* Read a further 4 words (sector OOB data) */
+    spare_buf[0] = NFC_WDATA;
+    spare_buf[1] = NFC_WDATA;
+    spare_buf[2] = NFC_WDATA;
+    spare_buf[3] = NFC_WDATA;
+
+    /* Calculate MLC4 ECC using bytes 0,1,8-15 */
+    BCLKCTR |= DEV_ECC;
+    ECC_CTRL |= ECC_M4EN;
+    
+    MLC_ECC0W = *(unsigned short*)spare_buf;
+    MLC_ECC1W = spare_buf[2];
+    MLC_ECC2W = spare_buf[3];
+    
+    while (!(ECC_CTRL & ECC_READY)) {};
+
+    int errors = ECC_ERR_NUM & 7;
+    
+    switch (errors)
+    {
+        case 4:     /* nothing to correct */
+            break;
+            
+        case 7:     /* fail, can't correct */
+            ret = false;
+            break;
+            
+        default:    /* between 1 and 4 errors */
+        {
+            int i;
+            unsigned char* char_buf = (unsigned char*)buf;
+            
+            for (i = 0; i < errors + 1; i++)
+            {
+                int offset = 0x207 - ECC_ERRADDR(i);
+                char_buf[offset] ^= ECC_ERRDATA(i);
+            }
+        }
+    }
+
+    /* Disable ECC block */
+    ECC_CTRL &= ~ECC_M4EN;
+    BCLKCTR &= ~DEV_ECC;
+#endif
+    
+    nand_end_read();
+
+    return ret;
 }
 
 
