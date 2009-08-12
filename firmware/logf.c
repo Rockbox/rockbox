@@ -155,7 +155,7 @@ void _logf(const char *format, ...)
     }
 
     ptr = logfbuffer[logfindex];
-    memcpy(ptr, buf + tlen,len-tlen);
+    memcpy(ptr, buf + tlen,len);
 
     if(len < MAX_LOGF_ENTRY)
         /* pad with spaces up to the MAX_LOGF_ENTRY byte border */
