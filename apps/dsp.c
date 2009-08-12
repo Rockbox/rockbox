@@ -343,11 +343,10 @@ static void sample_input_lte_native_mono(
     int32_t *d = dst[0] = dst[1] = &sample_buf[SAMPLE_BUF_LEFT_CHANNEL];
     int scale = WORD_SHIFT;
 
-    do
+    while (s < send)
     {
         *d++ = *s++ << scale;
     }
-    while (s < send);
 
     src[0] = (char *)s;
 }
@@ -362,7 +361,7 @@ static void sample_input_lte_native_i_stereo(
     int32_t *dr = dst[1] = &sample_buf[SAMPLE_BUF_RIGHT_CHANNEL];
     int scale = WORD_SHIFT;
 
-    do
+    while (s < send)
     {
         int32_t slr = *s++;
 #ifdef ROCKBOX_LITTLE_ENDIAN
@@ -373,7 +372,6 @@ static void sample_input_lte_native_i_stereo(
         *dr++ = (slr >> 16) << scale;
 #endif
     }
-    while (s < send);
 
     src[0] = (char *)s;
 }
@@ -389,12 +387,11 @@ static void sample_input_lte_native_ni_stereo(
     int32_t *dr = dst[1] = &sample_buf[SAMPLE_BUF_RIGHT_CHANNEL];
     int scale = WORD_SHIFT;
 
-    do
+    while (sl < slend)
     {
         *dl++ = *sl++ << scale;
         *dr++ = *sr++ << scale;
     }
-    while (sl < slend);
 
     src[0] = (char *)sl;
     src[1] = (char *)sr;
@@ -417,12 +414,11 @@ static void sample_input_gt_native_i_stereo(
     int32_t *dl = dst[0] = &sample_buf[SAMPLE_BUF_LEFT_CHANNEL];
     int32_t *dr = dst[1] = &sample_buf[SAMPLE_BUF_RIGHT_CHANNEL];
 
-    do
+    while (s < send)
     {
         *dl++ = *s++;
         *dr++ = *s++;
     }
-    while (s < send);
 
     src[0] = (char *)send;
 }
@@ -451,12 +447,12 @@ static void sample_input_new_format(struct dsp_config *dsp)
 {
     static const sample_input_fn_type sample_input_functions[] =
     {
-        [SAMPLE_INPUT_LE_NATIVE_MONO]      = sample_input_lte_native_mono,
         [SAMPLE_INPUT_LE_NATIVE_I_STEREO]  = sample_input_lte_native_i_stereo,
         [SAMPLE_INPUT_LE_NATIVE_NI_STEREO] = sample_input_lte_native_ni_stereo,
-        [SAMPLE_INPUT_GT_NATIVE_MONO]      = sample_input_gt_native_mono,
+        [SAMPLE_INPUT_LE_NATIVE_MONO]      = sample_input_lte_native_mono,
         [SAMPLE_INPUT_GT_NATIVE_I_STEREO]  = sample_input_gt_native_i_stereo,
         [SAMPLE_INPUT_GT_NATIVE_NI_STEREO] = sample_input_gt_native_ni_stereo,
+        [SAMPLE_INPUT_GT_NATIVE_MONO]      = sample_input_gt_native_mono,
     };
 
     int convert = dsp->stereo_mode;
@@ -477,13 +473,12 @@ static void sample_output_mono(int count, struct dsp_data *data,
     const int scale = data->output_scale;
     const int dc_bias = 1 << (scale - 1);
 
-    do
+    while (count-- > 0)
     {
         int32_t lr = clip_sample_16((*s0++ + dc_bias) >> scale);
         *dst++ = lr;
         *dst++ = lr;
     }
-    while (--count > 0);
 }
 #endif /* DSP_HAVE_ASM_SAMPLE_OUTPUT_MONO */
 
@@ -497,12 +492,11 @@ static void sample_output_stereo(int count, struct dsp_data *data,
     const int scale = data->output_scale;
     const int dc_bias = 1 << (scale - 1);
 
-    do
+    while (count-- > 0)
     {
         *dst++ = clip_sample_16((*s0++ + dc_bias) >> scale);
         *dst++ = clip_sample_16((*s1++ + dc_bias) >> scale);
     }
-    while (--count > 0);
 }
 #endif /* DSP_HAVE_ASM_SAMPLE_OUTPUT_STEREO */
 
@@ -575,12 +569,11 @@ static void sample_output_dithered(int count, struct dsp_data *data,
        pcm buffer and hardware is interleaved stereo */
     d = &dst[0];
 
-    do
+    while (count-- > 0)
     {
         int16_t s = *d++;
         *d++ = s;
     }
-    while (--count > 0);
 }
 
 /**
@@ -1043,13 +1036,12 @@ static void channels_process_sound_chan_mono(int count, int32_t *buf[])
 {
     int32_t *sl = buf[0], *sr = buf[1];
 
-    do
+    while (count-- > 0)
     {
         int32_t lr = *sl/2 + *sr/2;
         *sl++ = lr;
         *sr++ = lr;
     }
-    while (--count > 0);
 }
 #endif /* DSP_HAVE_ASM_SOUND_CHAN_MONO */
 
@@ -1060,14 +1052,13 @@ static void channels_process_sound_chan_custom(int count, int32_t *buf[])
     const int32_t cross = dsp_sw_cross;
     int32_t *sl = buf[0], *sr = buf[1];
 
-    do
+    while (count-- > 0)
     {
         int32_t l = *sl;
         int32_t r = *sr;
         *sl++ = FRACMUL(l, gain) + FRACMUL(r, cross);
         *sr++ = FRACMUL(r, gain) + FRACMUL(l, cross);
     }
-    while (--count > 0);
 }
 #endif /* DSP_HAVE_ASM_SOUND_CHAN_CUSTOM */
 
@@ -1088,13 +1079,12 @@ static void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
 {
     int32_t *sl = buf[0], *sr = buf[1];
 
-    do
+    while (count-- > 0)
     {
         int32_t ch = *sl/2 - *sr/2;
         *sl++ = ch;
         *sr++ = -ch;
     }
-    while (--count > 0);
 }
 #endif /* DSP_HAVE_ASM_SOUND_CHAN_KARAOKE */
 
@@ -1504,7 +1494,7 @@ void dsp_set_replaygain(void)
         }
     }
 
-    /* Store in S8.23 format to simplify calculations. */
+    /* Store in S7.24 format to simplify calculations. */
     replaygain = gain;
     set_gain(&AUDIO_DSP);
 }

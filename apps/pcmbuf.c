@@ -448,7 +448,7 @@ static size_t pcmbuf_get_next_required_pcmbuf_size(void)
     /* Buffer has to be at least 2s long. */
     seconds += 2;
 #endif
-    logf("pcmbuf len: %ld", seconds);
+    logf("pcmbuf len: %ld", (long)seconds);
     return seconds * (NATIVE_FREQUENCY*4); /* 2 channels + 2 bytes/sample */
 }
 
@@ -1166,6 +1166,8 @@ bool pcmbuf_is_crossfade_enabled(void)
     return crossfade_enabled;
 }
 
+/** PLAY LAST REMAINING SAMPLES AT END OF PLAYBACK
+ *  Commit any remaining samples in the PCM buffer for playback. */
 void pcmbuf_play_remainder(void)
 {
     if (audiobuffer_fillpos)
