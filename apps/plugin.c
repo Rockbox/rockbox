@@ -465,6 +465,8 @@ static const struct plugin_api rockbox_api = {
     dsp_dither_enable,
     dsp_configure,
     dsp_process,
+    dsp_input_count,
+    dsp_output_count,
 #endif /* CONFIG_CODEC == SWCODEC */
 
     /* playback control */

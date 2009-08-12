@@ -107,6 +107,8 @@ struct test_track_info {
 static struct test_track_info track;
 static bool taginfo_ready = true;
 
+static bool use_dsp;
+
 static volatile unsigned int elapsed;
 static volatile bool codec_playing;
 static volatile long endtick;
@@ -149,6 +151,10 @@ static inline void int2le16(unsigned char* buf, int16_t x)
   buf[0] = (x & 0xff);
   buf[1] = (x & 0xff00) >> 8;
 }
+
+/* 32KB should be enough */
+static unsigned char wavbuffer[32*1024];
+static unsigned char dspbuffer[32*1024];
 
 void init_wav(char* filename)
 {
@@ -198,22 +204,48 @@ static void* codec_get_buffer(size_t *size)
    return codec_mallocbuf;
 }
 
+static int process_dsp(const void *ch1, const void *ch2, int count)
+{
+    const char *src[2] = { ch1, ch2 };
+    int written_count = 0;
+    char *dest = dspbuffer;
+    
+    while (count > 0)
+    {
+        int out_count = rb->dsp_output_count(ci.dsp, count);
+        
+        int inp_count = rb->dsp_input_count(ci.dsp, out_count);
+        
+        if (inp_count <= 0)
+            break;
+        
+        if (inp_count > count)
+            inp_count = count;
+        
+        out_count = rb->dsp_process(ci.dsp, dest, src, inp_count);
+        
+        if (out_count <= 0)
+            break;
+        
+        written_count += out_count;
+        dest += out_count * 4;
+        
+        count -= inp_count;
+    }
+    
+    return written_count;
+}
+
 /* Null output */
 static bool pcmbuf_insert_null(const void *ch1, const void *ch2, int count)
 {
-    /* Always successful - just discard data */
-    (void)ch1;
-    (void)ch2;
-    (void)count;
+    if (use_dsp) process_dsp(ch1, ch2, count);
 
     /* Prevent idle poweroff */
     rb->reset_poweroff_timer();
 
     return true;
 }
-
-/* 64KB should be enough */
-static unsigned char wavbuffer[64*1024];
 
 static inline int32_t clip_sample(int32_t sample)
 {
@@ -234,10 +266,29 @@ static bool pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
     unsigned char* p = wavbuffer;
     const int scale = wavinfo.sampledepth - 15;
     const int dc_bias = 1 << (scale - 1);
+    int channels = (wavinfo.stereomode == STEREO_MONO) ? 1 : 2;
 
     /* Prevent idle poweroff */
     rb->reset_poweroff_timer();
 
+    if (use_dsp) {
+        count = process_dsp(ch1, ch2, count);
+        wavinfo.totalsamples += count;
+        if (channels == 1)
+        {
+            unsigned char *s = dspbuffer, *d = dspbuffer;
+            int c = count;
+            while (c-- > 0)
+            {
+                *d++ = *s++;
+                *d++ = *s++;
+                s++;
+                s++;
+            }
+        }
+        rb->write(wavinfo.fd, dspbuffer, count * 2 * channels);
+    } else {
+    
     if (wavinfo.sampledepth <= 16) {
         data1_16 = ch1;
         data2_16 = ch2;
@@ -306,10 +357,10 @@ static bool pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
 
     wavinfo.totalsamples += count;
     rb->write(wavinfo.fd, wavbuffer, p - wavbuffer);
+    } /* else */
 
     return true;
 }
-
 
 /* Set song position in WPS (value in ms). */
 static void set_elapsed(unsigned int value)
@@ -401,6 +452,8 @@ static void set_offset(size_t value)
 /* Configure different codec buffer parameters. */
 static void configure(int setting, intptr_t value)
 {
+    if (use_dsp)
+        rb->dsp_configure(ci.dsp, setting, value);
     switch(setting)
     {
         case DSP_SWITCH_FREQUENCY:
@@ -444,6 +497,8 @@ static void init_ci(void)
     ci.discard_codec = discard_codec;
     ci.set_offset = set_offset;
     ci.configure = configure;
+    ci.dsp = (struct dsp_config *)rb->dsp_configure(NULL, DSP_MYDSP,
+                                                    CODEC_IDX_AUDIO);
 
     /* --- "Core" functions --- */
 
@@ -580,6 +635,9 @@ static enum plugin_status test_track(const char* filename)
     ci.new_track = 0;
     ci.seek_time = 0;
 
+    if (use_dsp)
+        rb->dsp_configure(ci.dsp, DSP_RESET, 0);
+
     starttick = *rb->current_tick;
 
     codec_playing = true;
@@ -676,14 +734,28 @@ enum plugin_status plugin_start(const void* parameter)
         "Speed test",
         "Speed test folder",
         "Write WAV",
+        "Speed test w/DSP",
+        "Speed test folder w/DSP",
+        "Write WAV w/DSP",
+        "Quit",
     );
 
+show_menu:
     rb->lcd_clear_display();
 
     result=rb->do_menu(&menu,&selection, NULL, false);
 
+    if (result == 6)
+    {
+        res = PLUGIN_OK;
+        goto exit;
+    }
+
     scandir = 0;
 
+    if ((use_dsp = ((result >= 3) && (result <=5)))) {
+        result -= 3;
+    }
     if (result==0) {
         wavinfo.fd = -1;
         log_init(false);
@@ -750,6 +822,7 @@ enum plugin_status plugin_start(const void* parameter)
 
         while (rb->button_get(true) != TESTCODEC_EXITBUTTON);
     }
+    goto show_menu;
 
 exit:
     log_close();
