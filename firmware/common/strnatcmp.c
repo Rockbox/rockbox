@@ -67,8 +67,10 @@ nat_isspace(int a)
 #endif
 
 static inline int
-nat_toupper(int a)
+nat_unify_case(int a)
 {
+     /* We use 'tolower' and not 'toupper' so that '_' gets sorted
+        before the letters */
      return tolower(a);
 }
 
@@ -170,8 +172,8 @@ static int strnatcmp0(char const *a, char const *b, int fold_case)
 	  }
 
 	  if (fold_case) {
-	       ca = nat_toupper(ca);
-	       cb = nat_toupper(cb);
+	       ca = nat_unify_case(ca);
+	       cb = nat_unify_case(cb);
 	  }
 	  
 	  if (ca < cb)
