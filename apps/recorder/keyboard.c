@@ -775,11 +775,6 @@ int kbd_input(char* text, int buflen)
             case ACTION_KBD_ABORT:
                 FOR_NB_SCREENS(l)
                     screens[l].setfont(FONT_UI);
-
-#ifdef HAVE_BUTTONBAR
-                global_settings.buttonbar=buttonbar_config;
-#endif
-                viewportmanager_set_statusbar(oldbars);
                 ret = -1; done = true;
                 break;
 
