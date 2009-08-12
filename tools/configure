@@ -1986,7 +1986,7 @@ fi
     ;;
 
    61|view)
-    echo "Sansa View is net yet supported!"
+    echo "Sansa View is not yet supported!"
     exit 1
     target_id=63
     modelname="view"
