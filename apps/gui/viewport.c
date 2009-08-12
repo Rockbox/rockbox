@@ -37,6 +37,7 @@
 
 
 
+/*some short cuts for fg/bg/line selector handling */
 #ifdef HAVE_LCD_COLOR
 #define LINE_SEL_FROM_SETTINGS(vp) \
     do { \
@@ -44,16 +45,13 @@
         vp->lse_pattern = global_settings.lse_color; \
         vp->lst_pattern = global_settings.lst_color; \
     } while (0)
-#else
-#define LINE_SEL_FROM_SETTINGS(vp)
-#endif
-
-#ifdef HAVE_LCD_COLOR
 #define FG_FALLBACK global_settings.fg_color
 #define BG_FALLBACK global_settings.bg_color
 #else
+/* mono/greyscale doesn't have most of the above */
+#define LINE_SEL_FROM_SETTINGS(vp)
 #define FG_FALLBACK LCD_DEFAULT_FG
-#define BG_FALLBACK LCD_DEFAULT_FG
+#define BG_FALLBACK LCD_DEFAULT_BG
 #endif
 
 static int statusbar_enabled = 0;
@@ -169,9 +167,9 @@ void viewportmanager_statusbar_changed(void* data)
 }
 
 #ifdef HAVE_LCD_COLOR
-#define ARG_STRING (depth == 2 ? "dddddgg":"dddddcc")
+#define ARG_STRING(_depth) ((_depth) == 2 ? "dddddgg":"dddddcc")
 #else
-#define ARG_STRING "dddddcc"
+#define ARG_STRING(_depth) "dddddgg"
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -209,7 +207,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
     if (depth >= 2)
     {
-        if (!(ptr = parse_list(ARG_STRING, &set, separator, ptr,
+        if (!(ptr = parse_list(ARG_STRING(depth), &set, separator, ptr,
                     &vp->x, &vp->y, &vp->width, &vp->height, &vp->font,
                     &vp->fg_pattern,&vp->bg_pattern)))
             return VP_ERROR;
