@@ -62,7 +62,7 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-#if 0 // #ifndef SIMULATOR
+#ifndef SIMULATOR
 #define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
 #define HAVE_MULTIDRIVE
 #define HAVE_HOTSWAP
