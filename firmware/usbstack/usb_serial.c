@@ -158,6 +158,9 @@ void usb_serial_disconnect(void)
 static void sendout(void)
 {
     buffer_transitlength = MIN(buffer_length,BUFFER_SIZE-buffer_start);
+    /* For unknown reasons packets larger than 96 bytes are not sent. We play
+     * safe and limit to 32. TODO: find the real bug */
+    buffer_transitlength = MIN(buffer_transitlength,32);
     if(buffer_transitlength > 0)
     {
         buffer_length -= buffer_transitlength;
