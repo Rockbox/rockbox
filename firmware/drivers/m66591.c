@@ -575,37 +575,41 @@ int usb_drv_request_endpoint(int type, int dir) {
     int ep;
     int pipecfg = 0;
 
-    /* The endpoint/pipes are hard coded: This could be more flexible */
     if (type == USB_ENDPOINT_XFER_BULK) {
-        /* Enalbe double buffer mode */
+        /* Enable double buffer mode (only used for ep 1 and 2) */
         pipecfg |= 1<<9; 
         
-        if (dir == USB_DIR_IN) {
-            pipecfg |= (1<<4);
-            ep = 2;
-        } else {
-            ep = 1;
+        /* Bulk endpoints must be between 1 and 4 inclusive */
+        ep=1;
+        
+        while(M66591_eps[ep].busy && ep++<5);
+        
+        /* If this reached 5 the endpoints were all busy */
+        if(ep==5) {
+            logf("mxx: ep %d busy", ep);
+            return -1;
         }
     } else if (type == USB_ENDPOINT_XFER_INT) {
-        if (dir == USB_DIR_IN) {
-            pipecfg |= (1<<4);
-            ep = 6;
-        } else {
-            ep = 5;
+        ep=5;
+        
+        while(M66591_eps[ep].busy && ep++<7);
+        
+        /* If this reached 7 the endpoints were all busy */
+        if(ep==7) {
+            logf("mxx: ep %d busy", ep);
+            return -1;
         }
     } else {
         /* Not a supported type */
         return -1;
     }
-        
-    
-    if (!M66591_eps[ep].busy) {
-        M66591_eps[ep].busy = true;
-        M66591_eps[ep].dir = dir;
-    } else {
-        logf("mxx: ep %d busy", ep);
-        return -1;
+
+    if (dir == USB_DIR_IN) {
+        pipecfg |= (1<<4);
     }
+    
+    M66591_eps[ep].busy = true;
+    M66591_eps[ep].dir = dir;
     
     M66591_PIPE_CFGSEL=ep;
     
