@@ -739,7 +739,7 @@ Misc
   int kbd_input(char *buffer, int buflen);
 
      Prompt for a string to be stored in buffer which is of length buflen.
-     Return FALSE upon success.
+     Return 0 upon success, negative on failure.
      
   struct tm *get_time(void);
 

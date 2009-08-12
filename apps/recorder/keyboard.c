@@ -297,6 +297,7 @@ int kbd_input(char* text, int buflen)
     unsigned short ch;
     unsigned char *utf8;
     bool cur_blink = true;      /* Cursor on/off flag */
+    int ret;
 #ifdef KBD_MORSE_INPUT
     bool morse_reading = false;
     unsigned char morse_code = 0;
@@ -779,7 +780,7 @@ int kbd_input(char* text, int buflen)
                 global_settings.buttonbar=buttonbar_config;
 #endif
                 viewportmanager_set_statusbar(oldbars);
-                return -1;
+                ret = -1; done = true;
                 break;
 
             case ACTION_KBD_PAGE_FLIP:
@@ -1000,6 +1001,7 @@ int kbd_input(char* text, int buflen)
 
             case ACTION_KBD_DONE:
                 /* accepts what was entered and continues */
+                ret = 0;
                 done = true;
                 break;
 
@@ -1249,5 +1251,7 @@ int kbd_input(char* text, int buflen)
         screens[l].setfont(FONT_UI);
     viewportmanager_set_statusbar(oldbars);
 
-    return 0;
+    if (ret < 0)
+        splash(HZ/2, ID2P(LANG_CANCEL));
+    return ret;
 }

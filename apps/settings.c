@@ -652,7 +652,6 @@ bool settings_save_config(int options)
             break;
         }
         else {
-            splash(HZ, ID2P(LANG_CANCEL));
             return false;
         }
     }

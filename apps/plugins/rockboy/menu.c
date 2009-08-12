@@ -227,7 +227,7 @@ static bool do_slot(size_t slot_id, bool is_load) {
 
     /* if we're saving to a slot, then get a brief description */
     if (!is_load)
-        if (rb->kbd_input(desc_buf, 20) || !strlen(desc_buf))
+        if (rb->kbd_input(desc_buf, 20) || !strlen(desc_buf) < 0)
         {
             strlcpy(desc_buf, "Untitled", 20);
         }

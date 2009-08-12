@@ -1483,7 +1483,7 @@ int tagtree_enter(struct tree_context* c)
                         else
                         {
                             rc = kbd_input(searchstring, SEARCHSTR_SIZE);
-                            if (rc == -1 || !searchstring[0])
+                            if (rc < 0 || !searchstring[0])
                             {
                                 tagtree_exit(c);
                                 return 0;

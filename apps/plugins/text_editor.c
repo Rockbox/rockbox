@@ -182,10 +182,9 @@ bool save_changes(int overwrite)
 
     if (newfile || !overwrite)
     {
-        if(rb->kbd_input(filename,MAX_PATH))
+        if(rb->kbd_input(filename,MAX_PATH) < 0)
         {
             newfile = true;
-            rb->splash(HZ, "Cancelled");
             return false;
         }
     }

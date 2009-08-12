@@ -802,7 +802,7 @@ bool search_playlist(void)
 
     if (!playlist_viewer_init(&viewer, 0, false))
         return ret;
-    if (kbd_input(search_str, sizeof(search_str)) == -1)
+    if (kbd_input(search_str, sizeof(search_str)) < 0)
         return ret;
     lcd_clear_display();
     playlist_count = playlist_amount_ex(viewer.playlist);

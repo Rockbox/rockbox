@@ -568,7 +568,7 @@ static void add_memo(struct shown *shown, int type)
 {
     bool saved = false;
     if (rb->kbd_input(memos[memos_in_memory].message,
-                      sizeof memos[memos_in_memory].message) != -1)
+                      sizeof memos[memos_in_memory].message) == 0)
     {
         if (rb->strlen(memos[memos_in_memory].message))
         {
@@ -634,7 +634,7 @@ static bool edit_memo(int change, struct shown *shown)
 
             case 1: /* edit */
                 if(rb->kbd_input(memos[pointer_array[change]].message,
-                           sizeof memos[pointer_array[change]].message) != -1)
+                           sizeof memos[pointer_array[change]].message)  == 0)
                     save_memo(pointer_array[change],true,shown);
                 return false;
 

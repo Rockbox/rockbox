@@ -112,6 +112,7 @@ int kbd_input(char* text, int buflen)
     unsigned char *utf8;
 
     int button, lastbutton = 0;
+    int ret;
 
     editpos = utf8length(text);
 
@@ -185,7 +186,7 @@ int kbd_input(char* text, int buflen)
         switch (button)
         {
             case BUTTON_STOP:  /* abort */
-                return -1;
+                ret = -1; done = true;
                 break;
             
             case BUTTON_MENU:  /* page flip */
@@ -245,7 +246,7 @@ int kbd_input(char* text, int buflen)
 
             case BUTTON_PLAY | BUTTON_REPEAT:
                 /* accepts what was entered and continues */
-                done = true;
+                ret = 0; done = true;
                 break;
 
             case BUTTON_PLAY | BUTTON_REL:
@@ -304,6 +305,8 @@ int kbd_input(char* text, int buflen)
             lastbutton = button;
     }
     
-    return 0;
+    if (ret < 0)
+        splash(HZ/2, ID2P(LANG_CANCEL));
+    return ret;
 }
 

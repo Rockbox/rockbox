@@ -851,7 +851,7 @@ int kbd_input(char* buffer, int buflen)
     \group misc
     \param buffer
     \param buflen
-    \return FALSE upon success
+    \return 0 upon success, negative upon failure
     \description Prompt for a string to be stored in =buffer= which is of length =buflen=
 
 void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
