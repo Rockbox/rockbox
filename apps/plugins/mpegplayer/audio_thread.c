@@ -643,8 +643,8 @@ static void audio_thread(void)
             struct pcm_frame_header *dst_hdr = pcm_output_get_buffer();
             const char *src[2] =
                 { (char *)synth.pcm.samples[0], (char *)synth.pcm.samples[1] };
-            int out_count = (synth.pcm.length * CLOCK_RATE
-                                + (td.samplerate - 1)) / td.samplerate;
+            int out_count = rb->dsp_output_count(td.dsp, (synth.pcm.length *
+                            CLOCK_RATE + (td.samplerate - 1)) / td.samplerate);
             ssize_t size = sizeof(*dst_hdr) + out_count*4;
 
             /* Wait for required amount of free buffer space */
@@ -657,8 +657,17 @@ static void audio_thread(void)
                     goto message_process;
             }
 
+            int inp_count = rb->dsp_input_count(td.dsp, out_count);
+
+            if (inp_count <= 0)
+                break;
+
+            /* Input size has grown, no error, just don't write more than length */
+            if (inp_count > synth.pcm.length)
+                inp_count = synth.pcm.length;
+
             out_count = rb->dsp_process(td.dsp, dst_hdr->data, src,
-                                        synth.pcm.length);
+                                        inp_count);
 
             if (out_count <= 0)
                 break;
