@@ -20,6 +20,10 @@
  *
  ****************************************************************************/
 
+#ifndef __VIEWPORT_H__
+#define __VIEWPORT_H__
+
+
 #include "config.h"
 #include "lcd.h"
 #include "system.h"
@@ -79,3 +83,5 @@ int viewportmanager_set_statusbar(int enabled);
 /* callbacks for GUI_EVENT_* events */
 void viewportmanager_draw_statusbars(void*data);
 void viewportmanager_statusbar_changed(void* data);
+
+#endif /* __VIEWPORT_H__ */
