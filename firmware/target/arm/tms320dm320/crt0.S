@@ -163,13 +163,3 @@ UIE:
     b UIE
 #endif
 
-/* Align stacks to cache line boundary */
-    .balign 16
-
-/* 256 words of IRQ stack */
-    .space 256*4
-irq_stack:
-
-/* 256 words of FIQ stack */
-    .space 256*4
-fiq_stack:

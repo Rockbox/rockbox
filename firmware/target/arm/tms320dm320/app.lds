@@ -115,6 +115,20 @@ SECTIONS
        . += 0x2000;
        stackend = .;
     } > IRAM
+
+    .irqstack (NOLOAD) :
+    {
+       *(.stack)
+       . += 0x400;
+       irq_stack = .;
+    } > IRAM
+    
+    .fiqstack (NOLOAD) :
+    {
+       *(.stack)
+       . += 0x100;
+       fiq_stack = .;
+    } > IRAM
     
     /* This overwrites the iram (in ram), so make sure that the iram is copied 
      *  out in crt0.s before the bss section and the rest are used.

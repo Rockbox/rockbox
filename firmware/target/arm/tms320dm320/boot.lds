@@ -121,6 +121,20 @@ SECTIONS
          stackend = .;
     } > IRAM
     
+    .irqstack (NOLOAD) :
+    {
+       *(.stack)
+       . += 0x400;
+       irq_stack = .;
+    } > IRAM
+    
+    .fiqstack (NOLOAD) :
+    {
+       *(.stack)
+       . += 0x100;
+       fiq_stack = .;
+    } > IRAM
+    
  	.bss (NOLOAD) :
     {
     	. = ADDR(.data) + SIZEOF(.data) + SIZEOF(.vectors) + SIZEOF(.iram);
