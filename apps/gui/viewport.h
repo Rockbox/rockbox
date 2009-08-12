@@ -28,25 +28,28 @@
 /* return the number of text lines in the vp viewport */
 int viewport_get_nb_lines(struct viewport *vp);
 
-#define VP_ERROR              0
-#define VP_DIMENSIONS       0x1
-#define VP_COLORS           0x2
-#define VP_SELECTIONCOLORS  0x4
-/* load a viewport struct from a config string.
-   returns a combination of the above to say which were loaded ok from the string */
-int viewport_load_config(const char *config, struct viewport *vp);
-
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen);
 
-/* parse a viewport list, which looks like
- * X|Y|width|height|font|foregorund color|background color
- * | is a separator */
+/* Parse a viewport definition (vp_def), which looks like:
+ *
+ * Screens with depth > 1:
+ *   X|Y|width|height|font|foregorund color|background color
+ * Screens with depth = 1:
+ *   X|Y|width|height|font
+ *
+ * | is a separator and can be specified via the parameter
+ *
+ * Returns the pointer to the char after the last character parsed
+ * if everything went OK or NULL if an error happened (some values
+ * not specified in the definition)
+ */
 #ifdef HAVE_LCD_BITMAP
 const char* viewport_parse_viewport(struct viewport *vp,
                                     enum screen_type screen,
-                                    const char *bufptr,
+                                    const char *vp_def,
                                     const char separator);
 #endif
+
 /* Used to specify which screens the statusbar (SB) should be displayed on.
  *
  * The parameter is a bit OR'ed combination of the following (screen is

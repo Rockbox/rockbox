@@ -200,7 +200,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
     {
         if (!(ptr = parse_list("ddddd", &set, separator, ptr,
                     &vp->x, &vp->y, &vp->width, &vp->height, &vp->font)))
-            return VP_ERROR;
+            return NULL;
     }
     else
 #endif
@@ -210,7 +210,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
         if (!(ptr = parse_list(ARG_STRING(depth), &set, separator, ptr,
                     &vp->x, &vp->y, &vp->width, &vp->height, &vp->font,
                     &vp->fg_pattern,&vp->bg_pattern)))
-            return VP_ERROR;
+            return NULL;
     }
     else
 #undef ARG_STRING
@@ -219,7 +219,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
 
     /* X and Y *must* be set */
     if (!LIST_VALUE_PARSED(set, PL_X) || !LIST_VALUE_PARSED(set, PL_Y))
-        return VP_ERROR;
+        return NULL;
     
     /* fix defaults */
     if (!LIST_VALUE_PARSED(set, PL_WIDTH))
@@ -244,7 +244,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
         (vp->y >= screens[screen].lcdheight) ||
         ((vp->y + vp->height) > screens[screen].lcdheight))
     {
-        return VP_ERROR;
+        return NULL;
     }
 
     /* Default to using the user font if the font was an invalid number or '-'*/
