@@ -32,6 +32,7 @@
 #include "rbunicode.h"
 #include "lang.h"
 #include "keyboard.h"
+#include "splash.h"
 
 #define KBD_BUF_SIZE  64
 #define KEYBOARD_PAGES 3
@@ -112,7 +113,7 @@ int kbd_input(char* text, int buflen)
     unsigned char *utf8;
 
     int button, lastbutton = 0;
-    int ret;
+    int ret = 0; /* assume success */
 
     editpos = utf8length(text);
 

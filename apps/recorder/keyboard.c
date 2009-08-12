@@ -38,6 +38,7 @@
 #include "keyboard.h"
 #include "viewport.h"
 #include "file.h"
+#include "splash.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -297,7 +298,7 @@ int kbd_input(char* text, int buflen)
     unsigned short ch;
     unsigned char *utf8;
     bool cur_blink = true;      /* Cursor on/off flag */
-    int ret;
+    int ret = 0; /* assume success */
 #ifdef KBD_MORSE_INPUT
     bool morse_reading = false;
     unsigned char morse_code = 0;
