@@ -247,7 +247,6 @@ static int real_read_audio_stream_info(int fd, RMContext *rmctx)
                break;
 
            case FOURCC('a','t','r','c'):  
-DEBUGF("WERE HERE\n");             
                rmctx->codec_type = CODEC_ATRAC;
                read_uint32be(fd, &rmctx->extradata_size);
                skipped += 4;
