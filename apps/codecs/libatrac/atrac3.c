@@ -118,7 +118,7 @@ typedef struct {
     //@{
     /** data buffers */
     int32_t             outSamples[2048];
-    uint8_t*            decoded_bytes_buffer;
+    uint8_t             decoded_bytes_buffer[1024];
     int32_t             tempBuf[1070];
     //@}
     //@{
@@ -132,7 +132,7 @@ typedef struct {
 
 static int32_t          qmf_window[48];
 static VLC              spectral_coeff_tab[7];
-
+static channel_unit     channel_units[32000];
 /**
  * Quadrature mirror synthesis filter.
  *
@@ -269,21 +269,7 @@ static av_cold void init_atrac3_transforms(ATRAC3Context *q) {
 }
 
 /**
- * Atrac3 uninit, free all allocated memory
- */
-
-static av_cold int atrac3_decode_close(ATRAC3Context *q)
-{
-    //ATRAC3Context *q = rmctx->priv_data;
-
-    av_free(q->pUnits);
-    av_free(q->decoded_bytes_buffer);
-
-    return 0;
-}
-
-/**
-/ * Mantissa decoding
+ * Mantissa decoding
  *
  * @param gb            the GetBit context
  * @param selector      what table is the output values coded with
@@ -1010,11 +996,6 @@ static av_cold int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
     if(rmctx->block_align >= UINT16_MAX/2)
         return -1;
 
-    /* Pad the data buffer with FF_INPUT_BUFFER_PADDING_SIZE,
-     * this is for the bitstream reader. */
-    if ((q->decoded_bytes_buffer = av_mallocz((rmctx->block_align+(4-rmctx->block_align%4) + FF_INPUT_BUFFER_PADDING_SIZE)))  == NULL)
-        return AVERROR(ENOMEM);
-
 
     /* Initialize the VLC tables. */
     if (!vlcs_initialized) {
@@ -1045,12 +1026,8 @@ static av_cold int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
         q->matrix_coeff_index_now[i] = 3;
         q->matrix_coeff_index_next[i] = 3;
     }
-
-    q->pUnits = av_mallocz(sizeof(channel_unit)*q->channels);
-    if (!q->pUnits) {
-        av_free(q->decoded_bytes_buffer);
-        return AVERROR(ENOMEM);
-    }
+   
+    q->pUnits = channel_units;
     
     return 0;
 }
@@ -1209,7 +1186,6 @@ int main(int argc, char *argv[])
         packet_count -= rmctx.audio_pkt_cnt;
         rmctx.audio_pkt_cnt = 0;
     }
-    atrac3_decode_close(&q);
     close_wav(fd_dec, &rmctx, &q);
     close(fd);
 
