@@ -121,12 +121,15 @@ size_t pcm_get_bytes_waiting(void)
     return DSP_(_sdem_dsp_size)-DSP_(_sdem_level);
 }
 
+/* Only used when debugging */
+char buffer[80];
+
+void DSPHINT(void) __attribute__ ((section(".icode")));
 void DSPHINT(void)
 {
 	register pcm_more_callback_type get_more;   /* No stack for this */
 	
     unsigned int i;
-    char buffer[80];
 
     IO_INTC_IRQ0 = 1 << 11;
     

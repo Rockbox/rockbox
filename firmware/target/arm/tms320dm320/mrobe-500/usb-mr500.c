@@ -62,6 +62,7 @@ void usb_init_device(void) {
 }
 
 /* This is the initial interupt handler routine for the USB controller */
+void GIO3 (void)  __attribute__ ((section(".icode")));
 void GIO3 (void) {
     /* Clear the interrupt, this is critical to do before running the full
      *  handler otherwise you might miss an interrupt and everything will stop

@@ -27,6 +27,7 @@
 
 /* GPB0/TOUT0 should already have been configured as output so that pin
   should not be a functional pin and TIMER0 output unseen there */
+void TIMER0(void)  __attribute__ ((section(".icode")));
 void TIMER0(void)
 {
     IO_INTC_IRQ0 = INTR_IRQ0_TMR0; /* clear TIMER0 interrupt */

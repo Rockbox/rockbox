@@ -300,7 +300,7 @@ bool remote_button_hold(void)
 
 int remote_read_device(void)
 {
-    char read_buffer[5];
+    static char read_buffer[5];
     int read_button = BUTTON_NONE;
     
     static int oldbutton=BUTTON_NONE;

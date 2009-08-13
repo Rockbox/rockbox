@@ -35,8 +35,8 @@
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
 
-void irq_handler(void) __attribute__((interrupt ("IRQ"), naked));
-void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked));
+void irq_handler(void) __attribute__((interrupt ("IRQ"), naked, section(".icode")));
+void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked, section(".icode")));
 
 default_interrupt(TIMER0);
 default_interrupt(TIMER1);
