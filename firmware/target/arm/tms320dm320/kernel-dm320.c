@@ -48,6 +48,7 @@ void tick_start(unsigned int interval_in_ms)
     IO_INTC_EINT0 |= INTR_EINT0_TMR1;
 }
 
+void TIMER1(void) __attribute__ ((section(".icode")));
 void TIMER1(void)
 {
     IO_INTC_IRQ0 = INTR_IRQ0_TMR1;
