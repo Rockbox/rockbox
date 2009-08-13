@@ -1,5 +1,5 @@
-CFLAGS = -Wall -O3 -DTEST -D"DEBUGF=printf"
-OBJS = main.o bitstream.o cook.o ../librm/rm.o
+CFLAGS = -Wall -O3 -DTEST -D"DEBUGF=printf" -D"ROCKBOX_LITTLE_ENDIAN=1" -D"ICONST_ATTR=" -D"ICODE_ATTR="
+OBJS = main.o bitstream.o cook.o ../librm/rm.o ../lib/mdct2.o ../lib/mdct_lookup.o
 cooktest: $(OBJS)
 	gcc -o cooktest $(OBJS)
 

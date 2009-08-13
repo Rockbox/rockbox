@@ -13,24 +13,6 @@ IMPORT DETAILS
 
 The decoder is based on ffmpeg-svn r18079.
 
-The file libavcodec/cook.c was modified to remove all ffmpeg-specific
-code and to use the current rm parser.
-
-In initializing random_state in COOKContext, ffmpeg used a random_seed()
-function that was weird in the way it gets the random number. So it was
-decided to not use this function at all,and the value was initialized to 1,
-because according to Benjamin Larsson random_seed() could just be 
-replaced by any value.
-
-The current files contain lots of code which is either not needed by
-the decoder or totally disabled (#if 0 .. #endif) to enable
-compiling. This was during the isolation of the decoder from ffmpeg,
-the intention was to take as few files as possible to be able to
-compile cook.c and the related files outside ffmpeg.
-
-The decoder still uses floating point and relies on dynamic allocations 
-in some parts of it. It's still not ready to be ported to rockbox.
-
 CONVERSION TO FIXED-POINT
 
 A patch from ffmpeg's mailing list was used to convert the decoder to
@@ -44,8 +26,9 @@ be done manually.  The patch was also applied to cookdata.h and was
 used to create cookdata_fixpoint.h, cook_fixpoint.h and
 cook_fixp_mdct.h.
 
-The patch used a cook_random() function for noise filling. this was
-dropped and av_lfg_get() was used instead for consistency.
+cook_fixp_mdct.h and parts from cookdata_fixpoint.h were dropped and
+rockbox's mdct library is now used in both the test program and the 
+real codec.
 
 Note : Only parts of the patch were committed to ffmpeg's repository.
 
@@ -53,6 +36,12 @@ TESTING
 
 The test program should compile in any Unix-like environment using the
 command "make -f Makefile.test".
+
+For ARM targets add -DCPU_ARM to CFLAGS in Makefile.test to make use of 
+the asm ARM optimisations in rockbox's mdct library.
+
+For Big-endian targets, change -D"ROCKBOX_LITTLE_ENDIAN=1" 
+to -D"ROCKBOX_BIG_ENDIAN=1" in Makefile.test.
 
 Running "./cooktest file.rm" will decode the audio data to a WAV file
 called "output.wav" in the current directory.

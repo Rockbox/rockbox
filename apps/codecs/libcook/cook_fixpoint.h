@@ -21,7 +21,7 @@
  */
 
 /**
- * @file cook_float.h
+ * @file cook_fixpoint.h
  *
  * Cook AKA RealAudio G2 fixed point functions.
  *
@@ -183,7 +183,6 @@ static void scalar_dequant_math(COOKContext *q, int index,
     }
 }
 
-#ifdef TEST
 /**
  * The modulated lapped transform, this takes transform coefficients
  * and transforms them into timedomain samples.
@@ -194,36 +193,8 @@ static void scalar_dequant_math(COOKContext *q, int index,
  * @param outbuffer         pointer to the timedomain buffer
  * @param mlt_tmp           pointer to temporary storage space
  */
-#include "cook_fixp_mdct.h"
-
-static inline void imlt_math(COOKContext *q, FIXP *in)
-{
-    const int n = q->samples_per_channel;
-    const int step = 4 << (10 - av_log2(n));
-    int i = 0, j = step>>1;
-    
-    cook_mdct_backward(2 * n, in, q->mono_mdct_output);
-
-    do {
-        FIXP tmp = q->mono_mdct_output[i];
-        
-        q->mono_mdct_output[i] =
-          fixp_mult_su(-q->mono_mdct_output[n + i], sincos_lookup[j]);
-        q->mono_mdct_output[n + i] = fixp_mult_su(tmp, sincos_lookup[j+1]);
-        j += step;
-    } while (++i < n/2);
-    do {
-        FIXP tmp = q->mono_mdct_output[i];
-        
-        j -= step;
-        q->mono_mdct_output[i] =
-          fixp_mult_su(-q->mono_mdct_output[n + i], sincos_lookup[j+1]);
-        q->mono_mdct_output[n + i] = fixp_mult_su(tmp, sincos_lookup[j]);
-    } while (++i < n);
-}
-#else
-#include <codecs/lib/codeclib.h>
-#include <codecs/lib/mdct_lookup.h>
+#include "../lib/mdct_lookup.h"
+#include "../lib/mdct2.h"
 
 static inline void imlt_math(COOKContext *q, FIXP *in)
 {
@@ -254,7 +225,6 @@ static inline void imlt_math(COOKContext *q, FIXP *in)
         q->mono_mdct_output[n + i] = fixmul31(tmp, (sincos_lookup0[j]) );
     } while (++i < n);
 }
-#endif
 
 /**
  * Perform buffer overlapping.
