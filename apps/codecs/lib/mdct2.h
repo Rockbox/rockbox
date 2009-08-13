@@ -28,7 +28,10 @@
 #  //define LOOKUP_T const ogg_int32_t
 #endif
 
+#ifdef ROCKBOX
 #include <codecs.h>
+#endif /* ROCKBOX */
+
 #include "asm_arm.h"
 #include "asm_mcf5249.h"
 #include "codeclib_misc.h"

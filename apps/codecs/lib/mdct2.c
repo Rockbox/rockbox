@@ -37,7 +37,9 @@
 
 #include "mdct2.h"
 #include "mdct_lookup.h"
+#ifdef ROCKBOX
 #include <codecs/lib/codeclib.h>
+#endif /* ROCKBOX */
 
 #if defined(CPU_ARM) && CONFIG_CPU != S3C2440
 /* C code is faster on S3C2440 */

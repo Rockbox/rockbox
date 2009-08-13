@@ -34,6 +34,10 @@
 #ifndef _V_WIDE_MATH
 #define _V_WIDE_MATH
 
+#ifndef ROCKBOX
+#include <inttypes.h>
+#endif /* ROCKBOX */
+
 #ifndef  _LOW_ACCURACY_
 /* 64 bit multiply */
 /* #include <sys/types.h> */
