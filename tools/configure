@@ -2668,7 +2668,7 @@ fi
 if [ "$ARG_CCACHE" = "1" ]; then
   echo "Enable ccache for building"
   ccache="ccache"
-elif [ "$ARG_CCACHE" = "0" ]; then
+elif [ "$ARG_CCACHE" != "0" ]; then
   ccache=`findtool ccache`
   if test -n "$ccache"; then
     echo "Found and uses ccache ($ccache)"
