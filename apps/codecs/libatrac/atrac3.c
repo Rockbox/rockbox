@@ -38,7 +38,6 @@
 
 #include "avcodec.h"
 #include "bitstream.h"
-#include "dsputil.h"
 #include "bytestream.h"
 
 #include <stdint.h>
@@ -50,6 +49,10 @@
 
 #include "../librm/rm.h"
 #include "atrac3data.h"
+#include "atrac3data_fixed.h"
+#include "fixp_math.h"
+//#include "fixp_mdct.h"
+#include "../lib/mdct2.h"
 
 #define JOINT_STEREO    0x12
 #define STEREO          0x2
@@ -70,23 +73,23 @@ typedef struct {
 typedef struct {
     int     pos;
     int     numCoefs;
-    float   coef[8];
+    int32_t coef[8];
 } tonal_component;
 
 typedef struct {
     int               bandsCoded;
     int               numComponents;
     tonal_component   components[64];
-    float             prevFrame[1024];
+    int32_t           prevFrame[1024];
     int               gcBlkSwitch;
     gain_block        gainBlock[2];
 
-    DECLARE_ALIGNED_16(float, spectrum[1024]);
-    DECLARE_ALIGNED_16(float, IMDCT_buf[1024]);
+    int32_t           spectrum[1024] __attribute__((aligned(16)));
+    int32_t           IMDCT_buf[1024] __attribute__((aligned(16)));
 
-    float             delayBuf1[46]; ///<qmf delay buffers
-    float             delayBuf2[46];
-    float             delayBuf3[46];
+    int32_t           delayBuf1[46]; ///<qmf delay buffers
+    int32_t           delayBuf2[46];
+    int32_t           delayBuf3[46];
 } channel_unit;
 
 typedef struct {
@@ -114,9 +117,9 @@ typedef struct {
     //@}
     //@{
     /** data buffers */
-    float               outSamples[2048];
+    int32_t             outSamples[2048];
     uint8_t*            decoded_bytes_buffer;
-    float               tempBuf[1070];
+    int32_t             tempBuf[1070];
     //@}
     //@{
     /** extradata */
@@ -127,17 +130,8 @@ typedef struct {
     //@}
 } ATRAC3Context;
 
-static DECLARE_ALIGNED_16(float,mdct_window[512]);
-static float            qmf_window[48];
+static int32_t          qmf_window[48];
 static VLC              spectral_coeff_tab[7];
-static float            SFTable[64];
-static float            gain_tab1[16];
-static float            gain_tab2[31];
-static MDCTContext      mdct_ctx;
-static DSPContext       dsp;
-
-
-/* quadrature mirror synthesis filter */
 
 /**
  * Quadrature mirror synthesis filter.
@@ -149,14 +143,12 @@ static DSPContext       dsp;
  * @param delayBuf  delayBuf buffer
  * @param temp      temp buffer
  */
-
-
-static void iqmf (float *inlo, float *inhi, unsigned int nIn, float *pOut, float *delayBuf, float *temp)
+static void iqmf (int32_t *inlo, int32_t *inhi, unsigned int nIn, int32_t *pOut, int32_t *delayBuf, int32_t *temp)
 {
     int   i, j;
-    float   *p1, *p3;
+    int32_t   *p1, *p3;
 
-    memcpy(temp, delayBuf, 46*sizeof(float));
+    memcpy(temp, delayBuf, 46*sizeof(int32_t));
 
     p3 = temp + 46;
 
@@ -171,12 +163,12 @@ static void iqmf (float *inlo, float *inhi, unsigned int nIn, float *pOut, float
     /* loop2 */
     p1 = temp;
     for (j = nIn; j != 0; j--) {
-        float s1 = 0.0;
-        float s2 = 0.0;
+        int32_t s1 = 0;
+        int32_t s2 = 0;
 
         for (i = 0; i < 48; i += 2) {
-            s1 += p1[i] * qmf_window[i];
-            s2 += p1[i+1] * qmf_window[i+1];
+            s1 += fixmul31(p1[i], qmf_window[i]);
+            s2 += fixmul31(p1[i+1], qmf_window[i+1]);
         }
 
         pOut[0] = s2;
@@ -187,7 +179,7 @@ static void iqmf (float *inlo, float *inhi, unsigned int nIn, float *pOut, float
     }
 
     /* Update the delay buffer. */
-    memcpy(delayBuf, temp + nIn*2, 46*sizeof(float));
+    memcpy(delayBuf, temp + (nIn << 1), 46*sizeof(int32_t));
 }
 
 /**
@@ -199,10 +191,9 @@ static void iqmf (float *inlo, float *inhi, unsigned int nIn, float *pOut, float
  * @param odd_band  1 if the band is an odd band
  */
 
-static void IMLT(float *pInput, float *pOutput, int odd_band)
+static void IMLT(int32_t *pInput, int32_t *pOutput, int odd_band)
 {
     int     i;
-
     if (odd_band) {
         /**
         * Reverse the odd bands before IMDCT, this is an effect of the QMF transform
@@ -214,13 +205,15 @@ static void IMLT(float *pInput, float *pOutput, int odd_band)
         */
 
         for (i=0; i<128; i++)
-            FFSWAP(float, pInput[i], pInput[255-i]);
+            FFSWAP(int32_t, pInput[i], pInput[255-i]);
     }
+ 
+    /* Apply the imdct. */
+    mdct_backward(512, pInput, pOutput);
 
-    ff_imdct_calc(&mdct_ctx,pOutput,pInput);
-
-    /* Perform windowing on the output. */
-    dsp.vector_fmul(pOutput,mdct_window,512);
+    /* Windowing. */
+    for(i = 0; i<512; i++)
+        pOutput[i] = fixmul31(pOutput[i], window_lookup[i]);
 
 }
 
@@ -259,30 +252,20 @@ static int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes){
 
 
 static av_cold void init_atrac3_transforms(ATRAC3Context *q) {
-    float enc_window[256];
-    float s;
+    int32_t s;
     int i;
 
     /* Generate the mdct window, for details see
      * http://wiki.multimedia.cx/index.php?title=RealAudio_atrc#Windows */
-    for (i=0 ; i<256; i++)
-        enc_window[i] = (sin(((i + 0.5) / 256.0 - 0.5) * M_PI) + 1.0) * 0.5;
 
-    if (!mdct_window[0])
-        for (i=0 ; i<256; i++) {
-            mdct_window[i] = enc_window[i]/(enc_window[i]*enc_window[i] + enc_window[255-i]*enc_window[255-i]);
-            mdct_window[511-i] = mdct_window[i];
-        }
+    /* mdct window had been generated and saved as a lookup table in atrac3data_fixed.h */
 
     /* Generate the QMF window. */
     for (i=0 ; i<24; i++) {
-        s = qmf_48tap_half[i] * 2.0;
+        s = qmf_48tap_half_fix[i] << 1;
         qmf_window[i] = s;
         qmf_window[47 - i] = s;
     }
-
-    /* Initialize the MDCT transform. */
-    ff_mdct_init(&mdct_ctx, 9, 1);
 }
 
 /**
@@ -367,12 +350,12 @@ static void readQuantSpectralCoeffs (GetBitContext *gb, int selector, int coding
  * @return outSubbands   subband counter, fix for broken specification/files
  */
 
-static int decodeSpectrum (GetBitContext *gb, float *pOut)
+static int decodeSpectrum (GetBitContext *gb, int32_t *pOut)
 {
     int   numSubbands, codingMode, cnt, first, last, subbWidth, *pIn;
     int   subband_vlc_index[32], SF_idxs[32];
     int   mantissas[128];
-    float SF;
+    int32_t SF;
 
     numSubbands = get_bits(gb, 5); // number of coded subbands
     codingMode = get_bits1(gb); // coding Mode: 0 - VLC/ 1-CLC
@@ -400,20 +383,20 @@ static int decodeSpectrum (GetBitContext *gb, float *pOut)
             readQuantSpectralCoeffs (gb, subband_vlc_index[cnt], codingMode, mantissas, subbWidth);
 
             /* Decode the scale factor for this subband. */
-            SF = SFTable[SF_idxs[cnt]] * iMaxQuant[subband_vlc_index[cnt]];
+            SF = fixmul31(SFTable_fixed[SF_idxs[cnt]], iMaxQuant_fix[subband_vlc_index[cnt]]);
 
             /* Inverse quantize the coefficients. */
             for (pIn=mantissas ; first<last; first++, pIn++)
-                pOut[first] = *pIn * SF;
+                pOut[first] = fixmul16(*pIn, SF);
         } else {
             /* This subband was not coded, so zero the entire subband. */
-            memset(pOut+first, 0, subbWidth*sizeof(float));
+            memset(pOut+first, 0, subbWidth*sizeof(int32_t));
         }
     }
 
     /* Clear the subbands that were not coded. */
     first = subbandTab[cnt];
-    memset(pOut+first, 0, (1024 - first) * sizeof(float));
+    memset(pOut+first, 0, (1024 - first) * sizeof(int32_t));
     return numSubbands;
 }
 
@@ -431,8 +414,8 @@ static int decodeTonalComponents (GetBitContext *gb, tonal_component *pComponent
     int   components, coding_mode_selector, coding_mode, coded_values_per_component;
     int   sfIndx, coded_values, max_coded_values, quant_step_index, coded_components;
     int   band_flags[4], mantissa[8];
-    float  *pCoef;
-    float  scalefactor;
+    int32_t  *pCoef;
+    int32_t  scalefactor;
     int   component_count = 0;
 
     components = get_bits(gb,5);
@@ -473,7 +456,7 @@ static int decodeTonalComponents (GetBitContext *gb, tonal_component *pComponent
                 coded_values = coded_values_per_component + 1;
                 coded_values = FFMIN(max_coded_values,coded_values);
 
-                scalefactor = SFTable[sfIndx] * iMaxQuant[quant_step_index];
+                scalefactor = fixmul31(SFTable_fixed[sfIndx], iMaxQuant_fix[quant_step_index]);
 
                 readQuantSpectralCoeffs(gb, quant_step_index, coding_mode, mantissa, coded_values);
 
@@ -482,7 +465,7 @@ static int decodeTonalComponents (GetBitContext *gb, tonal_component *pComponent
                 /* inverse quant */
                 pCoef = pComponent[component_count].coef;
                 for (cnt = 0; cnt < coded_values; cnt++)
-                    pCoef[cnt] = mantissa[cnt] * scalefactor;
+                    pCoef[cnt] = fixmul16(mantissa[cnt], scalefactor);
 
                 component_count++;
             }
@@ -539,21 +522,21 @@ static int decodeGainControl (GetBitContext *gb, gain_block *pGb, int numBands)
  * @param pGain2        next band gain info
  */
 
-static void gainCompensateAndOverlap (float *pIn, float *pPrev, float *pOut, gain_info *pGain1, gain_info *pGain2)
+static void gainCompensateAndOverlap (int32_t *pIn, int32_t *pPrev, int32_t *pOut, gain_info *pGain1, gain_info *pGain2)
 {
     /* gain compensation function */
-    float  gain1, gain2, gain_inc;
+    int32_t  gain1, gain2, gain_inc;
     int   cnt, numdata, nsample, startLoc, endLoc;
 
 
     if (pGain2->num_gain_data == 0)
-        gain1 = 1.0;
+        gain1 = ONE_16;
     else
         gain1 = gain_tab1[pGain2->levcode[0]];
 
     if (pGain1->num_gain_data == 0) {
         for (cnt = 0; cnt < 256; cnt++)
-            pOut[cnt] = pIn[cnt] * gain1 + pPrev[cnt];
+            pOut[cnt] = fixmul16(pIn[cnt], gain1) + pPrev[cnt];
     } else {
         numdata = pGain1->num_gain_data;
         pGain1->loccode[numdata] = 32;
@@ -570,36 +553,38 @@ static void gainCompensateAndOverlap (float *pIn, float *pPrev, float *pOut, gai
 
             /* interpolate */
             for (; nsample < startLoc; nsample++)
-                pOut[nsample] = (pIn[nsample] * gain1 + pPrev[nsample]) * gain2;
+                pOut[nsample] = fixmul16((fixmul16(pIn[nsample], gain1) + pPrev[nsample]), gain2);
 
             /* interpolation is done over eight samples */
             for (; nsample < endLoc; nsample++) {
-                pOut[nsample] = (pIn[nsample] * gain1 + pPrev[nsample]) * gain2;
-                gain2 *= gain_inc;
+                pOut[nsample] = fixmul16((fixmul16(pIn[nsample], gain1) + pPrev[nsample]),gain2);
+                gain2 = fixmul16(gain2, gain_inc);
             }
         }
 
         for (; nsample < 256; nsample++)
-            pOut[nsample] = (pIn[nsample] * gain1) + pPrev[nsample];
+            pOut[nsample] = fixmul16(pIn[nsample], gain1) + pPrev[nsample];
     }
 
     /* Delay for the overlapping part. */
-    memcpy(pPrev, &pIn[256], 256*sizeof(float));
+    memcpy(pPrev, &pIn[256], 256*sizeof(int32_t));
 }
 
 /**
  * Combine the tonal band spectrum and regular band spectrum
  * Return position of the last tonal coefficient
+
  *
  * @param pSpectrum     output spectrum buffer
  * @param numComponents amount of tonal components
  * @param pComponent    tonal components for this band
  */
 
-static int addTonalComponents (float *pSpectrum, int numComponents, tonal_component *pComponent)
+static int addTonalComponents (int32_t *pSpectrum, int numComponents, tonal_component *pComponent)
 {
     int   cnt, i, lastPos = -1;
-    float   *pIn, *pOut;
+    int32_t *pOut;
+    int32_t *pIn;
 
     for (cnt = 0; cnt < numComponents; cnt++){
         lastPos = FFMAX(pComponent[cnt].pos + pComponent[cnt].numCoefs, lastPos);
@@ -614,13 +599,13 @@ static int addTonalComponents (float *pSpectrum, int numComponents, tonal_compon
 }
 
 
-#define INTERPOLATE(old,new,nsample) ((old) + (nsample)*0.125*((new)-(old)))
+#define INTERPOLATE(old,new,nsample)  ((old*ONE_16) + fixmul16(((nsample*ONE_16)>>3), (((new) - (old))*ONE_16)))
 
-static void reverseMatrixing(float *su1, float *su2, int *pPrevCode, int *pCurrCode)
+static void reverseMatrixing(int32_t *su1, int32_t *su2, int *pPrevCode, int *pCurrCode)
 {
     int    i, band, nsample, s1, s2;
-    float    c1, c2;
-    float    mc1_l, mc1_r, mc2_l, mc2_r;
+    int32_t    c1, c2;
+    int32_t    mc1_l, mc1_r, mc2_l, mc2_r;
 
     for (i=0,band = 0; band < 4*256; band+=256,i++) {
         s1 = pPrevCode[i];
@@ -629,18 +614,18 @@ static void reverseMatrixing(float *su1, float *su2, int *pPrevCode, int *pCurrC
 
         if (s1 != s2) {
             /* Selector value changed, interpolation needed. */
-            mc1_l = matrixCoeffs[s1*2];
-            mc1_r = matrixCoeffs[s1*2+1];
-            mc2_l = matrixCoeffs[s2*2];
-            mc2_r = matrixCoeffs[s2*2+1];
+            mc1_l = matrixCoeffs_fix[s1<<1];
+            mc1_r = matrixCoeffs_fix[(s1<<1)+1];
+            mc2_l = matrixCoeffs_fix[s2<<1];
+            mc2_r = matrixCoeffs_fix[(s2<<1)+1];
 
             /* Interpolation is done over the first eight samples. */
             for(; nsample < 8; nsample++) {
                 c1 = su1[band+nsample];
                 c2 = su2[band+nsample];
-                c2 = c1 * INTERPOLATE(mc1_l,mc2_l,nsample) + c2 * INTERPOLATE(mc1_r,mc2_r,nsample);
+                c2 = fixmul16(c1, INTERPOLATE(mc1_l, mc2_l, nsample)) + fixmul16(c2, INTERPOLATE(mc1_r, mc2_r, nsample));
                 su1[band+nsample] = c2;
-                su2[band+nsample] = c1 * 2.0 - c2;
+                su2[band+nsample] = (c1 << 1) - c2;
             }
         }
 
@@ -650,8 +635,8 @@ static void reverseMatrixing(float *su1, float *su2, int *pPrevCode, int *pCurrC
                 for (; nsample < 256; nsample++) {
                     c1 = su1[band+nsample];
                     c2 = su2[band+nsample];
-                    su1[band+nsample] = c2 * 2.0;
-                    su2[band+nsample] = (c1 - c2) * 2.0;
+                    su1[band+nsample] = c2 << 1;
+                    su2[band+nsample] = (c1 - c2) << 1;
                 }
                 break;
 
@@ -659,8 +644,8 @@ static void reverseMatrixing(float *su1, float *su2, int *pPrevCode, int *pCurrC
                 for (; nsample < 256; nsample++) {
                     c1 = su1[band+nsample];
                     c2 = su2[band+nsample];
-                    su1[band+nsample] = (c1 + c2) * 2.0;
-                    su2[band+nsample] = c2 * -2.0;
+                    su1[band+nsample] = (c1 + c2) << 1;
+                    su2[band+nsample] = -1*(c2 << 1);
                 }
                 break;
             case 2:
@@ -678,24 +663,23 @@ static void reverseMatrixing(float *su1, float *su2, int *pPrevCode, int *pCurrC
     }
 }
 
-static void getChannelWeights (int indx, int flag, float ch[2]){
-
+static void getChannelWeights (int indx, int flag, int32_t ch[2]){
     if (indx == 7) {
-        ch[0] = 1.0;
-        ch[1] = 1.0;
+        ch[0] = ONE_16;
+        ch[1] = ONE_16;
     } else {
-        ch[0] = (float)(indx & 7) / 7.0;
-        ch[1] = sqrt(2 - ch[0]*ch[0]);
+        ch[0] = fixdiv16(((indx & 7)*ONE_16), 7*ONE_16);
+        ch[1] = fastSqrt((ONE_16 << 1) - fixmul16(ch[0], ch[0]));
         if(flag)
-            FFSWAP(float, ch[0], ch[1]);
+            FFSWAP(int32_t, ch[0], ch[1]);
     }
 }
 
-static void channelWeighting (float *su1, float *su2, int *p3)
+static void channelWeighting (int32_t *su1, int32_t *su2, int *p3)
 {
     int   band, nsample;
     /* w[x][y] y=0 is left y=1 is right */
-    float w[2][2];
+    int32_t w[2][2];
 
     if (p3[1] != 7 || p3[3] != 7){
         getChannelWeights(p3[1], p3[0], w[0]);
@@ -704,13 +688,13 @@ static void channelWeighting (float *su1, float *su2, int *p3)
         for(band = 1; band < 4; band++) {
             /* scale the channels by the weights */
             for(nsample = 0; nsample < 8; nsample++) {
-                su1[band*256+nsample] *= INTERPOLATE(w[0][0], w[0][1], nsample);
-                su2[band*256+nsample] *= INTERPOLATE(w[1][0], w[1][1], nsample);
+                su1[band*256+nsample] = fixmul16(su1[band*256+nsample], INTERPOLATE(w[0][0], w[0][1], nsample));
+                su2[band*256+nsample] = fixmul16(su2[band*256+nsample], INTERPOLATE(w[1][0], w[1][1], nsample));
             }
 
             for(; nsample < 256; nsample++) {
-                su1[band*256+nsample] *= w[1][0];
-                su2[band*256+nsample] *= w[1][1];
+                su1[band*256+nsample] = fixmul16(su1[band*256+nsample], w[1][0]);
+                su2[band*256+nsample] = fixmul16(su2[band*256+nsample], w[1][1]);
             }
         }
     }
@@ -728,10 +712,9 @@ static void channelWeighting (float *su1, float *su2, int *p3)
  */
 
 
-static int decodeChannelSoundUnit (ATRAC3Context *q, GetBitContext *gb, channel_unit *pSnd, float *pOut, int channelNum, int codingMode)
+static int decodeChannelSoundUnit (ATRAC3Context *q, GetBitContext *gb, channel_unit *pSnd, int32_t *pOut, int channelNum, int codingMode)
 {
     int   band, result=0, numSubbands, lastTonal, numBands;
-
     if (codingMode == JOINT_STEREO && channelNum == 1) {
         if (get_bits(gb,2) != 3) {
             av_log(NULL,AV_LOG_ERROR,"JS mono Sound Unit id != 3.\n");
@@ -771,7 +754,7 @@ static int decodeChannelSoundUnit (ATRAC3Context *q, GetBitContext *gb, channel_
         if (band <= numBands) {
             IMLT(&(pSnd->spectrum[band*256]), pSnd->IMDCT_buf, band&1);
         } else
-            memset(pSnd->IMDCT_buf, 0, 512 * sizeof(float));
+            memset(pSnd->IMDCT_buf, 0, 512 * sizeof(int32_t));
 
         /* gain compensation and overlapping */
         gainCompensateAndOverlap (pSnd->IMDCT_buf, &(pSnd->prevFrame[band*256]), &(pOut[band*256]),
@@ -795,7 +778,7 @@ static int decodeChannelSoundUnit (ATRAC3Context *q, GetBitContext *gb, channel_
 static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf)
 {
     int   result, i;
-    float   *p1, *p2, *p3, *p4;
+    int32_t   *p1, *p2, *p3, *p4;
     uint8_t *ptr1;
 
     if (q->codingMode == JOINT_STEREO) {
@@ -893,7 +876,6 @@ static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf)
 static int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
             void *data, int *data_size,
             const uint8_t *buf, int buf_size) {
-    //ATRAC3Context *q = rmctx->priv_data;
     int result = 0, i;
     const uint8_t* databuf;
     int16_t* samples = data;
@@ -919,13 +901,13 @@ static int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
     if (q->channels == 1) {
         /* mono */
         for (i = 0; i<1024; i++)
-            samples[i] = av_clip_int16(round(q->outSamples[i]));
+            samples[i] = av_clip_int16(q->outSamples[i]);
         *data_size = 1024 * sizeof(int16_t);
     } else {
         /* stereo */
         for (i = 0; i < 1024; i++) {
-            samples[i*2] = av_clip_int16(round(q->outSamples[i]));
-            samples[i*2+1] = av_clip_int16(round(q->outSamples[1024+i]));
+            samples[i*2] = av_clip_int16(q->outSamples[i]);
+            samples[i*2+1] = av_clip_int16(q->outSamples[1024+i]);
         }
         *data_size = 2048 * sizeof(int16_t);
     }
@@ -944,7 +926,6 @@ static av_cold int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
 {
     int i;
     const uint8_t *edata_ptr = rmctx->codec_extradata;
-    //ATRAC3Context *q = rmctx->priv_data;
     static VLC_TYPE atrac3_vlc_table[4096][2];
     static int vlcs_initialized = 0;
 
@@ -1051,17 +1032,6 @@ static av_cold int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
 
     init_atrac3_transforms(q);
 
-    /* Generate the scale factors. */
-    for (i=0 ; i<64 ; i++)
-        SFTable[i] = pow(2.0, (i - 15) / 3.0);
-
-    /* Generate gain tables. */
-    for (i=0 ; i<16 ; i++)
-        gain_tab1[i] = powf (2.0, (4 - i));
-
-    for (i=-15 ; i<16 ; i++)
-        gain_tab2[i+15] = powf (2.0, i * -0.125);
-
     /* init the joint-stereo decoding data */
     q->weighting_delay[0] = 0;
     q->weighting_delay[1] = 7;
@@ -1075,8 +1045,6 @@ static av_cold int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
         q->matrix_coeff_index_now[i] = 3;
         q->matrix_coeff_index_next[i] = 3;
     }
-
-    dsputil_init(&dsp);
 
     q->pUnits = av_mallocz(sizeof(channel_unit)*q->channels);
     if (!q->pUnits) {

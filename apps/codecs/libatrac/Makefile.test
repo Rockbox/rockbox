@@ -1,8 +1,8 @@
-CFLAGS = -Wall -O3 -DTEST -D"DEBUGF=printf"
-OBJS = atrac3.o dsputil.o bitstream.o fft.o mdct.o libavutil/log.o libavutil/mem.o ../librm/rm.o
+CFLAGS = -Wall -O3 -DTEST -D"DEBUGF=printf" -D"ROCKBOX_LITTLE_ENDIAN=1" -D"ICONST_ATTR=" -D"ICODE_ATTR="
+OBJS = atrac3.o bitstream.o libavutil/log.o libavutil/mem.o ../librm/rm.o fixp_math.o ../lib/mdct2.o ../lib/mdct_lookup.o
 
 atractest: $(OBJS)
-	gcc -o atractest $(OBJS) -lm
+	gcc -o atractest $(OBJS)
 
 .c.o :
 	$(CC) $(CFLAGS) -c -o $@ $<

@@ -8,13 +8,19 @@ ffmpeg is licensed under the Lesser GNU General Public License.
 
 IMPORT DETAILS
 
-The decoder is based on ffmpeg-svn r18079. It still uses floating 
-point math and not suitable to be used in rockbox.
+The decoder is based on ffmpeg-svn r18079.
+The decoder had been modified to use fixed-point arithmetic.
 
 TESTING
 
 The test program should compile in any Unix-like environment using the
 command "make -f Makefile.test".
+
+For ARM targets add -DCPU_ARM to CFLAGS in Makefile.test to make use of 
+the asm ARM optimisations in rockbox's mdct library.
+
+For Big-endian targets, change -D"ROCKBOX_LITTLE_ENDIAN=1" 
+to -D"ROCKBOX_BIG_ENDIAN=1" in Makefile.test.
 
 Running "./atractest file.rm" will decode the audio data to a WAV file
 called "output.wav" in the current directory.
