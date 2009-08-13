@@ -748,9 +748,16 @@ static int prime_transfer(int ep_num, void* ptr, int len, bool send, bool wait)
     }
 
     if (!(REG_ENDPTSTATUS & mask)) {
-        logf("no prime! %d %d %x", ep_num, pipe, qh->dtd.size_ioc_sts & 0xff);
-        rc = -3;
-        goto pt_error;
+        if(REG_ENDPTCOMPLETE & mask)
+        {
+            logf("endpoint completed fast! %d %d %x", ep_num, pipe, qh->dtd.size_ioc_sts & 0xff);
+        }
+        else
+        {
+            logf("no prime! %d %d %x", ep_num, pipe, qh->dtd.size_ioc_sts & 0xff);
+            rc = -3;
+            goto pt_error;
+        }
     }
     if(ep_num == EP_CONTROL && (REG_ENDPTSETUPSTAT & EPSETUP_STATUS_EP0)) {
         /* 32.14.3.2.2 */
