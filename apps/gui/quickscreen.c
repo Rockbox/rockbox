@@ -297,7 +297,7 @@ static int quickscreen_touchscreen_button(void)
     return ACTION_STD_CANCEL;
 }    
 #endif
-bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
+static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
 {
     int button, i;
     struct viewport vp[NB_SCREENS];

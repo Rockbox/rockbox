@@ -42,9 +42,6 @@ struct gui_quickscreen
                                                     item is changed */
 };
 
-bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter);
-
-
 #ifdef BUTTON_F3
 extern bool quick_screen_f3(int button_enter);
 #endif
