@@ -442,7 +442,7 @@ bool is_setting_quickscreenable(const struct settings_list *setting)
 }
 
 void set_as_qs_item(const struct settings_list *setting,
-                    enum QUICKSCREEN_ITEM item)
+                    enum quickscreen_item item)
 {
     int i;
     for(i=0;i<nb_settings;i++)
