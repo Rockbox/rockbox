@@ -132,7 +132,7 @@ typedef struct {
 
 static int32_t          qmf_window[48];
 static VLC              spectral_coeff_tab[7];
-static channel_unit     channel_units[32000];
+static channel_unit     channel_units[2];
 /**
  * Quadrature mirror synthesis filter.
  *
