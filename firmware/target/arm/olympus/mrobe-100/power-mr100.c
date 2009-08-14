@@ -35,6 +35,11 @@ void power_init(void)
     GPIOB_ENABLE     |=  0x80;
     GPIOB_OUTPUT_VAL &= ~0x80;
     GPIOB_OUTPUT_EN  |=  0x80;
+
+    /* IDE power */
+    GPIOC_ENABLE     |=  0x8;
+    GPIOC_OUTPUT_VAL &= ~0x8;
+    GPIOC_OUTPUT_EN  |=  0x8;
 }
 
 unsigned int power_input_status(void)
@@ -45,15 +50,22 @@ unsigned int power_input_status(void)
 
 void ide_power_enable(bool on)
 {
-    (void)on;
-    /* We do nothing */
+    if(on)
+    {
+        GPIO_CLEAR_BITWISE(GPIOC_OUTPUT_VAL, 0x08);
+        DEV_EN |= DEV_IDE0;
+    }
+    else
+    {
+        DEV_EN &= ~DEV_IDE0;
+        GPIO_SET_BITWISE(GPIOC_OUTPUT_VAL, 0x08);
+    }
 }
 
 
 bool ide_powered(void)
 {
-    /* pretend we are always powered - we don't turn it off */
-    return true;
+    return ((GPIOC_INPUT_VAL & 0x8) == 0);
 }
 
 void power_off(void)
