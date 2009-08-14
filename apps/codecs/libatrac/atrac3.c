@@ -36,7 +36,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "bytestream.h"
 #include "atrac3.h"
 #include "atrac3data.h"
 #include "atrac3data_fixed.h"
@@ -47,6 +46,20 @@
 #define STEREO          0x2
 
 #define AVERROR(...) -1
+
+/* FFMAX/MIN/SWAP and av_clip were taken from libavutil/common.h */
+#define FFMAX(a,b) ((a) > (b) ? (a) : (b))
+#define FFMIN(a,b) ((a) > (b) ? (b) : (a))
+#define FFSWAP(type,a,b) do{type SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
+
+/**
+ * Clips a signed integer value into the -32768,32767 range.
+ */
+static inline int16_t av_clip_int16(int a)
+{
+    if ((a+32768) & ~65535) return (a>>31) ^ 32767;
+    else                    return a;
+}
 
 static int32_t          qmf_window[48];
 static VLC              spectral_coeff_tab[7];
@@ -169,7 +182,7 @@ static int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes){
 }
 
 
-static av_cold void init_atrac3_transforms(ATRAC3Context *q) {
+static void init_atrac3_transforms(ATRAC3Context *q) {
     int32_t s;
     int i;
 
@@ -830,7 +843,7 @@ int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
 int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
 {
     int i;
-    const uint8_t *edata_ptr = rmctx->codec_extradata;
+    uint8_t *edata_ptr = rmctx->codec_extradata;
     static VLC_TYPE atrac3_vlc_table[4096][2];
     static int vlcs_initialized = 0;
 
@@ -844,12 +857,12 @@ int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
     /* Take care of the codec-specific extradata. */
     if (rmctx->extradata_size == 14) {
         /* Parse the extradata, WAV format */
-        DEBUGF("[0-1] %d\n",bytestream_get_le16(&edata_ptr));  //Unknown value always 1
-        q->samples_per_channel = bytestream_get_le32(&edata_ptr);
-        q->codingMode = bytestream_get_le16(&edata_ptr);
-        DEBUGF("[8-9] %d\n",bytestream_get_le16(&edata_ptr));  //Dupe of coding mode
-        q->frame_factor = bytestream_get_le16(&edata_ptr);  //Unknown always 1
-        DEBUGF("[12-13] %d\n",bytestream_get_le16(&edata_ptr));  //Unknown always 0
+        DEBUGF("[0-1] %d\n",rm_get_uint16le(&edata_ptr[0]));  //Unknown value always 1
+        q->samples_per_channel = rm_get_uint32le(&edata_ptr[2]);
+        q->codingMode = rm_get_uint16le(&edata_ptr[6]);
+        DEBUGF("[8-9] %d\n",rm_get_uint16le(&edata_ptr[8]));  //Dupe of coding mode
+        q->frame_factor = rm_get_uint16le(&edata_ptr[10]);  //Unknown always 1
+        DEBUGF("[12-13] %d\n",rm_get_uint16le(&edata_ptr[12]));  //Unknown always 0
 
         /* setup */
         q->samples_per_frame = 1024 * q->channels;
@@ -869,10 +882,10 @@ int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
 
     } else if (rmctx->extradata_size == 10) {
         /* Parse the extradata, RM format. */
-        q->atrac3version = bytestream_get_be32(&edata_ptr);
-        q->samples_per_frame = bytestream_get_be16(&edata_ptr);
-        q->delay = bytestream_get_be16(&edata_ptr);
-        q->codingMode = bytestream_get_be16(&edata_ptr);
+        q->atrac3version = rm_get_uint32be(&edata_ptr[0]);
+        q->samples_per_frame = rm_get_uint16be(&edata_ptr[4]);
+        q->delay = rm_get_uint16be(&edata_ptr[6]);
+        q->codingMode = rm_get_uint16be(&edata_ptr[8]);
 
         q->samples_per_channel = q->samples_per_frame / q->channels;
         q->scrambled_stream = 1;
