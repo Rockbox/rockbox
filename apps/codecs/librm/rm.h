@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <inttypes.h>
+#include "bytestream.h"
 
 #define MAX_EXTRADATA_SIZE 16
 #define DATA_HEADER_SIZE 18

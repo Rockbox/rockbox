@@ -29,26 +29,6 @@
 
 #define SWAP(a, b) do{uint8_t SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
 
-void advance_buffer(uint8_t **buf, int val)
-{
-    *buf += val;
-}
-
-static uint8_t get_uint8(uint8_t *buf)
-{
-    return (uint8_t)buf[0];
-}
-
-static uint16_t get_uint16be(uint8_t *buf)
-{
-    return (uint16_t)((buf[0] << 8)|buf[1]);
-}
-
-static uint32_t get_uint32be(uint8_t *buf)
-{
-    return (uint32_t)((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
-}
-
 #ifdef TEST
 #include <fcntl.h>
 #include <unistd.h>
@@ -99,12 +79,12 @@ static int read_uint32be(int fd, uint32_t* buf)
 
 static void print_cook_extradata(RMContext *rmctx) {
 
-    DEBUGF("            cook_version = 0x%08x\n", get_uint32be(rmctx->codec_extradata));
-    DEBUGF("            samples_per_frame_per_channel = %d\n", get_uint16be(&rmctx->codec_extradata[4]));
-    DEBUGF("            number_of_subbands_in_freq_domain = %d\n", get_uint16be(&rmctx->codec_extradata[6]));
+    DEBUGF("            cook_version = 0x%08x\n", rm_get_uint32be(rmctx->codec_extradata));
+    DEBUGF("            samples_per_frame_per_channel = %d\n", rm_get_uint16be(&rmctx->codec_extradata[4]));
+    DEBUGF("            number_of_subbands_in_freq_domain = %d\n", rm_get_uint16be(&rmctx->codec_extradata[6]));
      if(rmctx->extradata_size == 16) {
-        DEBUGF("            joint_stereo_subband_start = %d\n",get_uint16be(&rmctx->codec_extradata[12]));
-        DEBUGF("            joint_stereo_vlc_bits = %d\n", get_uint16be(&rmctx->codec_extradata[14]));
+        DEBUGF("            joint_stereo_subband_start = %d\n",rm_get_uint16be(&rmctx->codec_extradata[12]));
+        DEBUGF("            joint_stereo_vlc_bits = %d\n", rm_get_uint16be(&rmctx->codec_extradata[14]));
     }
 } 
 
@@ -532,7 +512,7 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
     do
     {
         y = rmctx->sub_packet_cnt;
-        pkt->version       = get_uint16be(*src);
+        pkt->version       = rm_get_uint16be(*src);
 
         /* Simple error checking */
         if(pkt->version != 0 && pkt->version != 1) 
@@ -541,18 +521,18 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
              return -1;
         }
         
-        pkt->length        = get_uint16be(*src+2);
-        pkt->stream_number = get_uint16be(*src+4);
-        pkt->timestamp     = get_uint32be(*src+6);
+        pkt->length        = rm_get_uint16be(*src+2);
+        pkt->stream_number = rm_get_uint16be(*src+4);
+        pkt->timestamp     = rm_get_uint32be(*src+6);
         /*DEBUGF("    version = %d\n"
                "    length  = %d\n"
                "    stream  = %d\n"
                "    timestamp= %d\n\n",pkt->version,pkt->length,pkt->stream_number,pkt->timestamp);*/
-        unknown      = get_uint8(*src+10);
-        pkt->flags   = get_uint8(*src+11);
+        unknown      = rm_get_uint8(*src+10);
+        pkt->flags   = rm_get_uint8(*src+11);
 
         if(pkt->version == 1)
-            unknown = get_uint8(*src+10);
+            unknown = rm_get_uint8(*src+10);
 
         if (pkt->flags & 2) /* keyframe */
             y = rmctx->sub_packet_cnt = 0;
@@ -571,12 +551,12 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
             }
          }
         else if (rmctx->codec_type == CODEC_AAC) {
-            rmctx->sub_packet_cnt = (get_uint16be(*src) & 0xf0) >> 4;
+            rmctx->sub_packet_cnt = (rm_get_uint16be(*src) & 0xf0) >> 4;
             advance_buffer(src, 2);
             consumed += 2;
             if (rmctx->sub_packet_cnt) {
                 for(x = 0; x < rmctx->sub_packet_cnt; x++) {
-                    rmctx->sub_packet_lengths[x] = get_uint16be(*src);
+                    rmctx->sub_packet_lengths[x] = rm_get_uint16be(*src);
                     advance_buffer(src, 2);
                     consumed += 2;
                 }                

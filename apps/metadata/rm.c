@@ -38,26 +38,14 @@
 #define DEBUGF(...)
 #endif
 
-#ifdef DEBUG_RM
-static uint16_t get_uint16be(uint8_t *buf)
-{
-    return (uint16_t)((buf[0] << 8)|buf[1]);
-}
-
-static uint32_t get_uint32be(uint8_t *buf)
-{
-    return (uint32_t)((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
-}
-#endif
-
 static inline void print_cook_extradata(RMContext *rmctx) {
 
-    DEBUGF("            cook_version = 0x%08lx\n", get_uint32be(rmctx->codec_extradata));
-    DEBUGF("            samples_per_frame_per_channel = %d\n", get_uint16be(&rmctx->codec_extradata[4]));
-    DEBUGF("            number_of_subbands_in_freq_domain = %d\n", get_uint16be(&rmctx->codec_extradata[6]));
+    DEBUGF("            cook_version = 0x%08lx\n", rm_get_uint32be(rmctx->codec_extradata));
+    DEBUGF("            samples_per_frame_per_channel = %d\n", rm_get_uint16be(&rmctx->codec_extradata[4]));
+    DEBUGF("            number_of_subbands_in_freq_domain = %d\n", rm_get_uint16be(&rmctx->codec_extradata[6]));
      if(rmctx->extradata_size == 16) {
-        DEBUGF("            joint_stereo_subband_start = %d\n",get_uint16be(&rmctx->codec_extradata[12]));
-        DEBUGF("            joint_stereo_vlc_bits = %d\n", get_uint16be(&rmctx->codec_extradata[14]));
+        DEBUGF("            joint_stereo_subband_start = %d\n",rm_get_uint16be(&rmctx->codec_extradata[12]));
+        DEBUGF("            joint_stereo_vlc_bits = %d\n", rm_get_uint16be(&rmctx->codec_extradata[14]));
     }
 } 
 

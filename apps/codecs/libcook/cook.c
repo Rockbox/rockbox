@@ -721,27 +721,17 @@ static void dump_cook_context(COOKContext *q)
  * Cook initialization
  */
 
-static inline uint16_t get_uint16be(uint8_t *buf)
-{
-    return (uint16_t)((buf[0] << 8)|buf[1]);
-}
-
-static inline uint32_t get_uint32be(uint8_t *buf)
-{
-    return (uint32_t)((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
-}
-
  int cook_decode_init(RMContext *rmctx, COOKContext *q)
  {   
    
     /* cook extradata */
-    q->cookversion = get_uint32be(rmctx->codec_extradata);
-    q->samples_per_frame =  get_uint16be(&rmctx->codec_extradata[4]);
-    q->subbands = get_uint16be(&rmctx->codec_extradata[6]);
+    q->cookversion = rm_get_uint32be(rmctx->codec_extradata);
+    q->samples_per_frame =  rm_get_uint16be(&rmctx->codec_extradata[4]);
+    q->subbands = rm_get_uint16be(&rmctx->codec_extradata[6]);
     q->extradata_size = rmctx->extradata_size;
     if (q->extradata_size >= 16){
-        q->js_subband_start = get_uint16be(&rmctx->codec_extradata[12]);
-        q->js_vlc_bits = get_uint16be(&rmctx->codec_extradata[14]);
+        q->js_subband_start = rm_get_uint16be(&rmctx->codec_extradata[12]);
+        q->js_vlc_bits = rm_get_uint16be(&rmctx->codec_extradata[14]);
     }
 
     /* Take data from the RMContext (RM container). */
