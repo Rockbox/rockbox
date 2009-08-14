@@ -182,6 +182,14 @@ static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
                rmctx->codec_type = CODEC_AC3;
                break;
 
+           case FOURCC('a','t','r','c'):  
+               rmctx->codec_type = CODEC_ATRAC;
+               read_uint32be(fd, &rmctx->extradata_size);
+               skipped += 4;
+               read(fd, rmctx->codec_extradata, rmctx->extradata_size);
+               skipped += rmctx->extradata_size;
+               break;
+
            default: /* Not a supported codec */
                return -1;
        }
@@ -421,7 +429,7 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
             break;
         
         case CODEC_ATRAC:
-        /* Not yet supported in rockbox, parsing fails before reaching here */
+            id3->codectype = AFMT_RM_ATRAC3;
             break;
     }
     

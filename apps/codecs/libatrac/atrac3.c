@@ -45,7 +45,10 @@
 #define JOINT_STEREO    0x12
 #define STEREO          0x2
 
-#define AVERROR(...) -1
+#ifdef ROCKBOX
+#undef DEBUGF
+#define DEBUGF(...)
+#endif /* ROCKBOX */
 
 /* FFMAX/MIN/SWAP and av_clip were taken from libavutil/common.h */
 #define FFMAX(a,b) ((a) > (b) ? (a) : (b))
@@ -76,7 +79,7 @@ static channel_unit     channel_units[2];
  */
 static void iqmf (int32_t *inlo, int32_t *inhi, unsigned int nIn, int32_t *pOut, int32_t *delayBuf, int32_t *temp)
 {
-    int   i, j;
+    unsigned int   i, j;
     int32_t   *p1, *p3;
 
     memcpy(temp, delayBuf, 46*sizeof(int32_t));
@@ -163,7 +166,7 @@ static int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes){
     const uint32_t* buf;
     uint32_t* obuf = (uint32_t*) out;
 
-#ifdef TEST
+#if ((defined(TEST) || defined(SIMULATOR)) && !defined(CPU_ARM))
     off = 0; //no check for memory alignment of inbuffer
 #else
     off = (intptr_t)inbuffer & 3;
@@ -175,14 +178,16 @@ static int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes){
     for (i = 0; i < bytes/4; i++)
         obuf[i] = c ^ buf[i];
 
-    if (off)
+    if (off) {
         DEBUGF("Offset of %d not handled, post sample on ffmpeg-dev.\n",off);
+        return off;
+    }
 
     return off;
 }
 
 
-static void init_atrac3_transforms(ATRAC3Context *q) {
+static void init_atrac3_transforms() {
     int32_t s;
     int i;
 
@@ -630,7 +635,7 @@ static void channelWeighting (int32_t *su1, int32_t *su2, int *p3)
  */
 
 
-static int decodeChannelSoundUnit (ATRAC3Context *q, GetBitContext *gb, channel_unit *pSnd, int32_t *pOut, int channelNum, int codingMode)
+static int decodeChannelSoundUnit (GetBitContext *gb, channel_unit *pSnd, int32_t *pOut, int channelNum, int codingMode)
 {
     int   band, result=0, numSubbands, lastTonal, numBands;
     if (codingMode == JOINT_STEREO && channelNum == 1) {
@@ -705,7 +710,7 @@ static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf)
         /* decode Sound Unit 1 */
         init_get_bits(&q->gb,databuf,q->bits_per_frame);
 
-        result = decodeChannelSoundUnit(q,&q->gb, q->pUnits, q->outSamples, 0, JOINT_STEREO);
+        result = decodeChannelSoundUnit(&q->gb, q->pUnits, q->outSamples, 0, JOINT_STEREO);
         if (result != 0)
             return (result);
 
@@ -746,7 +751,7 @@ static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf)
         }
 
         /* Decode Sound Unit 2. */
-        result = decodeChannelSoundUnit(q,&q->gb, &q->pUnits[1], &q->outSamples[1024], 1, JOINT_STEREO);
+        result = decodeChannelSoundUnit(&q->gb, &q->pUnits[1], &q->outSamples[1024], 1, JOINT_STEREO);
         if (result != 0)
             return (result);
 
@@ -763,7 +768,7 @@ static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf)
             /* Set the bitstream reader at the start of a channel sound unit. */
             init_get_bits(&q->gb, databuf+((i*q->bytes_per_frame)/q->channels), (q->bits_per_frame)/q->channels);
 
-            result = decodeChannelSoundUnit(q,&q->gb, &q->pUnits[i], &q->outSamples[i*1024], i, q->codingMode);
+            result = decodeChannelSoundUnit(&q->gb, &q->pUnits[i], &q->outSamples[i*1024], i, q->codingMode);
             if (result != 0)
                 return (result);
         }
@@ -943,7 +948,7 @@ int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
 
     }
 
-    init_atrac3_transforms(q);
+    init_atrac3_transforms();
 
     /* init the joint-stereo decoding data */
     q->weighting_delay[0] = 0;

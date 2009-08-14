@@ -28,7 +28,7 @@
 #ifndef AVCODEC_ATRAC3DATA_H
 #define AVCODEC_ATRAC3DATA_H
 
-#include <stdint.h>
+#include <inttypes.h>
 
 /* VLC tables */
 

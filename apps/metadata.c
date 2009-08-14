@@ -124,6 +124,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* AC3 in RM/RA */
     [AFMT_RM_AC3] =
         AFMT_ENTRY("AC3",   "a52_rm",     NULL,        "rm\0ra\0rmvb\0"      ),
+    /* ATRAC3 in RM/RA */
+    [AFMT_RM_ATRAC3] =
+        AFMT_ENTRY("ATRAC3","atrac3_rm",  NULL,        "rm\0ra\0rmvb\0"      ),
 #endif
 };
 
