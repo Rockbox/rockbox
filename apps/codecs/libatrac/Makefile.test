@@ -1,5 +1,5 @@
 CFLAGS = -Wall -O3 -DTEST -D"DEBUGF=printf" -D"ROCKBOX_LITTLE_ENDIAN=1" -D"ICONST_ATTR=" -D"ICODE_ATTR="
-OBJS = atrac3.o bitstream.o ../librm/rm.o fixp_math.o ../lib/mdct2.o ../lib/mdct_lookup.o
+OBJS = atrac3.o bitstream.o ../librm/rm.o fixp_math.o ../lib/mdct2.o ../lib/mdct_lookup.o main.o
 
 atractest: $(OBJS)
 	gcc -o atractest $(OBJS)
