@@ -103,11 +103,12 @@ int button_read_device(int *data)
 {
     int btn = BUTTON_NONE;
     int adc;
+    static int old_data = 0;
 
     static bool hold_button = false;
     bool hold_button_old;
     
-    *data = 0;
+    *data = old_data;
 
     hold_button_old = hold_button;
     hold_button = button_hold();
@@ -188,7 +189,7 @@ int button_read_device(int *data)
         {
             last_x = x;
             last_y = y;
-            *data = touch_to_pixels(x, y);
+            old_data = *data = touch_to_pixels(x, y);
             btn |= touchscreen_to_pixels((*data&0xffff0000)>>16,
                                          (*data&0x0000ffff),
                                          data);
@@ -197,12 +198,12 @@ int button_read_device(int *data)
         last_touch = current_tick;
         touch_available = false;
     }
-
+    
     if (!(GPIOA & 0x4))
         btn |= BUTTON_POWER;
         
     if(btn & BUTTON_TOUCHSCREEN && !is_backlight_on(true))
-        *data = 0;
+        old_data = *data = 0;
     
     return btn;
 }

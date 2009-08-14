@@ -158,6 +158,9 @@ bool button_hold(void)
 int button_read_device(int *data)
 {
     int ret = 0;
+    static int old_data = 0;
+    
+    data = old_data;
 
     /* Filter button events out if HOLD button is pressed at firmware/ level */
     if(button_hold())
@@ -181,6 +184,8 @@ int button_read_device(int *data)
         ret |= touchscreen_to_pixels(cur_touch >> 16, cur_touch & 0xFFFF, data);
         if( UNLIKELY(!is_backlight_on(true)) )
             *data = 0;
+            
+        old_data = data;
     }
 
     return ret;

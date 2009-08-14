@@ -108,9 +108,13 @@ inline bool button_hold(void)
     return hold_button;
 }
 
+/* Since this is a touchscreen, the expectation in higher levels is that the
+ *  previous touch location is maintained when a release occurs.  This is
+ *  intended to mimic a mouse or other similar pointing device.
+ */
 int button_read_device(int *data)
 {
-    static int old_data;
+    static int old_data = 0;
     int button_read = BUTTON_NONE;
     short touch_x, touch_y, touch_z1, touch_z2;
     static bool hold_button_old = false;
