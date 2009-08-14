@@ -160,7 +160,7 @@ int button_read_device(int *data)
     int ret = 0;
     static int old_data = 0;
     
-    data = old_data;
+    *data = old_data;
 
     /* Filter button events out if HOLD button is pressed at firmware/ level */
     if(button_hold())
@@ -185,7 +185,7 @@ int button_read_device(int *data)
         if( UNLIKELY(!is_backlight_on(true)) )
             *data = 0;
             
-        old_data = data;
+        old_data = *data;
     }
 
     return ret;
