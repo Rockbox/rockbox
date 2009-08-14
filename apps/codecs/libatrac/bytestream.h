@@ -23,7 +23,6 @@
 #define AVCODEC_BYTESTREAM_H
 
 #include <string.h>
-#include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 
 #define DEF_T(type, name, bytes, read, write)                             \

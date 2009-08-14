@@ -36,7 +36,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "avcodec.h"
 #include "bitstream.h"
 #include "bytestream.h"
 
@@ -245,7 +244,7 @@ static int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes){
         obuf[i] = c ^ buf[i];
 
     if (off)
-        av_log(NULL,AV_LOG_DEBUG,"Offset of %d not handled, post sample on ffmpeg-dev.\n",off);
+        DEBUGF("Offset of %d not handled, post sample on ffmpeg-dev.\n",off);
 
     return off;
 }
@@ -644,7 +643,8 @@ static void reverseMatrixing(int32_t *su1, int32_t *su2, int *pPrevCode, int *pC
                 }
                 break;
             default:
-                assert(0);
+                //assert(0);
+                break;
         }
     }
 }
@@ -703,12 +703,12 @@ static int decodeChannelSoundUnit (ATRAC3Context *q, GetBitContext *gb, channel_
     int   band, result=0, numSubbands, lastTonal, numBands;
     if (codingMode == JOINT_STEREO && channelNum == 1) {
         if (get_bits(gb,2) != 3) {
-            av_log(NULL,AV_LOG_ERROR,"JS mono Sound Unit id != 3.\n");
+            DEBUGF("JS mono Sound Unit id != 3.\n");
             return -1;
         }
     } else {
         if (get_bits(gb,6) != 0x28) {
-            av_log(NULL,AV_LOG_ERROR,"Sound Unit id != 0x28.\n");
+            DEBUGF("Sound Unit id != 0x28.\n");
             return -1;
         }
     }
@@ -880,7 +880,7 @@ static int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
     result = decodeFrame(q, databuf);
 
     if (result != 0) {
-        av_log(NULL,AV_LOG_ERROR,"Frame decoding error!\n");
+        DEBUGF("Frame decoding error!\n");
         return -1;
     }
 
@@ -925,12 +925,12 @@ static av_cold int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
     /* Take care of the codec-specific extradata. */
     if (rmctx->extradata_size == 14) {
         /* Parse the extradata, WAV format */
-        av_log(rmctx,AV_LOG_DEBUG,"[0-1] %d\n",bytestream_get_le16(&edata_ptr));  //Unknown value always 1
+        DEBUGF("[0-1] %d\n",bytestream_get_le16(&edata_ptr));  //Unknown value always 1
         q->samples_per_channel = bytestream_get_le32(&edata_ptr);
         q->codingMode = bytestream_get_le16(&edata_ptr);
-        av_log(rmctx,AV_LOG_DEBUG,"[8-9] %d\n",bytestream_get_le16(&edata_ptr));  //Dupe of coding mode
+        DEBUGF("[8-9] %d\n",bytestream_get_le16(&edata_ptr));  //Dupe of coding mode
         q->frame_factor = bytestream_get_le16(&edata_ptr);  //Unknown always 1
-        av_log(rmctx,AV_LOG_DEBUG,"[12-13] %d\n",bytestream_get_le16(&edata_ptr));  //Unknown always 0
+        DEBUGF("[12-13] %d\n",bytestream_get_le16(&edata_ptr));  //Unknown always 0
 
         /* setup */
         q->samples_per_frame = 1024 * q->channels;
@@ -944,7 +944,7 @@ static av_cold int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
 
         if ((q->bytes_per_frame == 96*q->channels*q->frame_factor) || (q->bytes_per_frame == 152*q->channels*q->frame_factor) || (q->bytes_per_frame == 192*q->channels*q->frame_factor)) {
         } else {
-            av_log(rmctx,AV_LOG_ERROR,"Unknown frame/channel/frame_factor configuration %d/%d/%d\n", q->bytes_per_frame, q->channels, q->frame_factor);
+            DEBUGF("Unknown frame/channel/frame_factor configuration %d/%d/%d\n", q->bytes_per_frame, q->channels, q->frame_factor);
             return -1;
         }
 
@@ -959,36 +959,36 @@ static av_cold int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
         q->scrambled_stream = 1;
 
     } else {
-        av_log(NULL,AV_LOG_ERROR,"Unknown extradata size %d.\n",rmctx->extradata_size);
+        DEBUGF("Unknown extradata size %d.\n",rmctx->extradata_size);
     }
     /* Check the extradata. */
 
     if (q->atrac3version != 4) {
-        av_log(rmctx,AV_LOG_ERROR,"Version %d != 4.\n",q->atrac3version);
+        DEBUGF("Version %d != 4.\n",q->atrac3version);
         return -1;
     }
 
     if (q->samples_per_frame != 1024 && q->samples_per_frame != 2048) {
-        av_log(rmctx,AV_LOG_ERROR,"Unknown amount of samples per frame %d.\n",q->samples_per_frame);
+        DEBUGF("Unknown amount of samples per frame %d.\n",q->samples_per_frame);
         return -1;
     }
 
     if (q->delay != 0x88E) {
-        av_log(rmctx,AV_LOG_ERROR,"Unknown amount of delay %x != 0x88E.\n",q->delay);
+        DEBUGF("Unknown amount of delay %x != 0x88E.\n",q->delay);
         return -1;
     }
 
     if (q->codingMode == STEREO) {
-        av_log(rmctx,AV_LOG_DEBUG,"Normal stereo detected.\n");
+        DEBUGF("Normal stereo detected.\n");
     } else if (q->codingMode == JOINT_STEREO) {
-        av_log(rmctx,AV_LOG_DEBUG,"Joint stereo detected.\n");
+        DEBUGF("Joint stereo detected.\n");
     } else {
-        av_log(rmctx,AV_LOG_ERROR,"Unknown channel coding mode %x!\n",q->codingMode);
+        DEBUGF("Unknown channel coding mode %x!\n",q->codingMode);
         return -1;
     }
 
     if (rmctx->nb_channels <= 0 || rmctx->nb_channels > 2 /*|| ((rmctx->channels * 1024) != q->samples_per_frame)*/) {
-        av_log(rmctx,AV_LOG_ERROR,"Channel configuration error!\n");
+        DEBUGF("Channel configuration error!\n");
         return -1;
     }
 

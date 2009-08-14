@@ -276,11 +276,4 @@ static inline av_const float av_clipf(float a, float amin, float amax)
         }\
     }
 
-#include "mem.h"
-
-//#ifdef HAVE_AV_CONFIG_H
-//#    include "ffmpeg_config.h"
-#    include "internal.h"
-//#endif /* HAVE_AV_CONFIG_H */
-
 #endif /* AVUTIL_COMMON_H */
