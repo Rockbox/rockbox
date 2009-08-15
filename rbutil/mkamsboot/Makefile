@@ -5,6 +5,10 @@ LIBUCL=../../tools/ucl/src/libucl.a
 #change for releases
 APPVERSION=`../../tools/version.sh`
 
+ifndef V
+SILENT = @
+endif
+
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 OUTPUT=mkamsboot.exe
 CFLAGS+=-mno-cygwin
@@ -50,7 +54,7 @@ $(OUT)/libmkamsboot.o: mkamsboot.c dualboot.h md5.h
 	$(CC) $(CFLAGS) -DLIB -c -o $(OUT)/libmkamsboot.o -W -Wall mkamsboot.c
 
 libmkamsboot$(RBARCH).a: $(OUT) $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
-	$(AR) ruv libmkamsboot$(RBARCH).a $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
+	$(AR) ru libmkamsboot$(RBARCH).a $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
@@ -72,4 +76,5 @@ clean:
     
 build$(RBARCH):
 	@echo MKDIR build$(RBARCH)
-	$(SILENT)mkdir build$(RBARCH)    
+	$(SILENT)mkdir build$(RBARCH)
+
