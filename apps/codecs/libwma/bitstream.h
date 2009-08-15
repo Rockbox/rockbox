@@ -33,7 +33,7 @@
 #include "ffmpeg_config.h"
 #include <stdlib.h>
 
-#include "bswap.h"
+#include "../lib/ffmpeg_bswap.h"
 
 extern const uint8_t ff_log2_tab[256];
 
