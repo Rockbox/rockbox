@@ -1,4 +1,4 @@
-#include "bitstream.h"
+#include "ffmpeg_bitstream.h"
 #include "../librm/rm.h"
 
 /* These structures are needed to store the parsed gain control data. */

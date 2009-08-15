@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "bitstream.h"
+#include "ffmpeg_bitstream.h"
 
 #ifdef ROCKBOX
 #undef DEBUGF

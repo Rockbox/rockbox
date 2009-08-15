@@ -23,7 +23,7 @@
 #define _COOK_H
 
 #include <inttypes.h>
-#include "bitstream.h"
+#include "ffmpeg_bitstream.h"
 #include "../librm/rm.h"
 #include "cookdata_fixpoint.h"
 
