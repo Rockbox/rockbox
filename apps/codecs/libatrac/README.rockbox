@@ -8,7 +8,11 @@ ffmpeg is licensed under the Lesser GNU General Public License.
 
 IMPORT DETAILS
 
-The decoder is based on ffmpeg-svn r18079.
+The decoder is based on ffmpeg-svn r18110 : Mar 21 2009.
+Some changes were done on in order to use static VLC tables
+according to this commit :
+http://git.ffmpeg.org/?p=ffmpeg;a=commit;h=4c20cf13a166577d93f5b2b0abb4609c60104d33
+
 The decoder had been modified to use fixed-point arithmetic.
 
 TESTING
