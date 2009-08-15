@@ -8,6 +8,10 @@
 #
 CFLAGS = -I../include
 
+ifndef V
+SILENT = @
+endif
+
 ifdef RBARCH
 CFLAGS += -arch $(RBARCH)
 endif
@@ -52,4 +56,5 @@ clean:
 
 build$(RBARCH):
 	@echo MKDIR build$(RBARCH)
-	$(SILENT)mkdir build$(RBARCH)    
+	$(SILENT)mkdir build$(RBARCH)
+
