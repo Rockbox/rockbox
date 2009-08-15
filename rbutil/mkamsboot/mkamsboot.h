@@ -139,4 +139,17 @@ void patch_firmware(
 
 int total_size(int model, int rb_packedsize, int of_packedsize);
 
+/* firmware_revision()
+ *
+ * returns the firmware revision for a particular model
+ *
+ * ARGUMENTS
+ *
+ * model            :   firmware model (MODEL_XXX)
+ *
+ * RETURN VALUE
+ *  firmware version
+*/
+int firmware_revision(int model);
+
 #endif

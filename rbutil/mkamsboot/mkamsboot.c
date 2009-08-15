@@ -216,6 +216,11 @@ static struct md5sums sansasums[] = {
 
 #define NUM_MD5S (sizeof(sansasums)/sizeof(sansasums[0]))
 
+int firmware_revision(int model)
+{
+    return fw_revisions[model];
+}
+
 static off_t filesize(int fd)
 {
     struct stat buf;

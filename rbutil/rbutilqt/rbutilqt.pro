@@ -42,9 +42,17 @@ QMAKE_EXTRA_TARGETS += lrelease
     PRE_TARGETDEPS += lrelease
 }
 
+#custum rules for libmkamsboot.a
+libucl.commands = @$(MAKE) -C ../../tools/ucl/src libucl.a
+QMAKE_EXTRA_TARGETS += libucl
+PRE_TARGETDEPS += libucl
+
+libmkamsboot.commands = @$(MAKE) -C ../mkamsboot libmkamsboot.a
+QMAKE_EXTRA_TARGETS += libmkamsboot
+PRE_TARGETDEPS += libmkamsboot
 
 SOURCES += rbutilqt.cpp \
-           main.cpp \
+ main.cpp \
  install.cpp \
  base/httpget.cpp \
  configure.cpp \
@@ -83,6 +91,7 @@ SOURCES += rbutilqt.cpp \
  base/bootloaderinstallipod.cpp \
  base/bootloaderinstallsansa.cpp \
  base/bootloaderinstallfile.cpp \
+ base/bootloaderinstallams.cpp \
  ../../tools/mkboot.c \
  ../../tools/iriver.c
 
@@ -136,14 +145,15 @@ HEADERS += rbutilqt.h \
  base/bootloaderinstallipod.h \
  base/bootloaderinstallsansa.h \
  base/bootloaderinstallfile.h \
+ base/bootloaderinstallams.h \
  ../../tools/mkboot.h \
- ../../tools/iriver.h
-
+ ../../tools/iriver.h 
+ 
 # Needed by QT on Win
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher ../../tools/rbspeex ../../tools
 INCLUDEPATH += base
 
-LIBS += -L../../tools/rbspeex -lrbspeex
+LIBS += -L../../tools/rbspeex -lrbspeex -L../mkamsboot -lmkamsboot -L../../tools/ucl/src/ -lucl
 
 TEMPLATE = app
 dbg {

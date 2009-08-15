@@ -44,6 +44,8 @@
 #include "bootloaderinstallipod.h"
 #include "bootloaderinstallsansa.h"
 #include "bootloaderinstallfile.h"
+#include "bootloaderinstallams.h"
+
 
 #if defined(Q_OS_LINUX)
 #include <stdio.h>
@@ -649,6 +651,9 @@ void RbUtilQt::installBootloader()
     }
     else if(type == "file") {
         bl = new BootloaderInstallFile(this);
+    }
+    else if(type == "ams") {
+        bl = new BootloaderInstallAms(this);
     }
     else {
         logger->addItem(tr("No install method known."), LOGERROR);
