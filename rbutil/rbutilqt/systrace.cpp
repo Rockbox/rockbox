@@ -55,6 +55,7 @@ void SysTrace::save(void)
 
 void SysTrace::debug(QtMsgType type, const char* msg)
 {
+    (void)type;
     debugbuffer.append(msg);
     debugbuffer.append("\n");
 #if !defined(NODEBUG)
