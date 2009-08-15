@@ -77,8 +77,7 @@ bool _backlight_init(void)
     /* Enable button LEDs: P3.2 (menu/back), P3.3 (cursor), P4.2 (middle) */
     PCON3 = (PCON3 & ~0x0000FF00) | 0x00001100;
     PCON4 = (PCON4 & ~0x00000F00) | 0x00000100;
-    PDAT3 &= ~(3 << 2);
-    PDAT4 &= ~(1 << 2);
+    _buttonlight_off();
 
     /* enable timer clock */
     PWRCON &= ~(1 << 4);
