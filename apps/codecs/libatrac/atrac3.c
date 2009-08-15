@@ -178,11 +178,6 @@ static int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes){
     for (i = 0; i < bytes/4; i++)
         obuf[i] = c ^ buf[i];
 
-    if (off) {
-        DEBUGF("Offset of %d not handled, post sample on ffmpeg-dev.\n",off);
-        return off;
-    }
-
     return off;
 }
 
@@ -698,7 +693,7 @@ static int decodeChannelSoundUnit (GetBitContext *gb, channel_unit *pSnd, int32_
  * @param databuf       the input data
  */
 
-static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf)
+static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf, int off)
 {
     int   result, i;
     int32_t   *p1, *p2, *p3, *p4;
@@ -766,7 +761,7 @@ static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf)
         for (i=0 ; i<q->channels ; i++) {
 
             /* Set the bitstream reader at the start of a channel sound unit. */
-            init_get_bits(&q->gb, databuf+((i*q->bytes_per_frame)/q->channels), (q->bits_per_frame)/q->channels);
+            init_get_bits(&q->gb, databuf+((i*q->bytes_per_frame)/q->channels)+off, (q->bits_per_frame)/q->channels);
 
             result = decodeChannelSoundUnit(&q->gb, &q->pUnits[i], &q->outSamples[i*1024], i, q->codingMode);
             if (result != 0)
@@ -799,7 +794,7 @@ static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf)
 int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
             void *data, int *data_size,
             const uint8_t *buf, int buf_size) {
-    int result = 0, i;
+    int result = 0, off = 0, i;
     const uint8_t* databuf;
     int16_t* samples = data;
 
@@ -808,13 +803,13 @@ int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
 
     /* Check if we need to descramble and what buffer to pass on. */
     if (q->scrambled_stream) {
-        decode_bytes(buf, q->decoded_bytes_buffer, rmctx->block_align);
+        off = decode_bytes(buf, q->decoded_bytes_buffer, rmctx->block_align);
         databuf = q->decoded_bytes_buffer;
     } else {
         databuf = buf;
     }
 
-    result = decodeFrame(q, databuf);
+    result = decodeFrame(q, databuf, off);
 
     if (result != 0) {
         DEBUGF("Frame decoding error!\n");
