@@ -588,14 +588,12 @@ void Config::autodetect()
         }
         if(!detector.incompatdev().isEmpty()) {
             QString text;
-            // we need to set the platform here to get the brand from the
-            // settings object
-            RbSettings::setValue(RbSettings::Platform, detector.incompatdev());
-            text = tr("Detected an unsupported %1 player variant. Sorry, "
-                      "Rockbox doesn't run on your player.")
-                      .arg(RbSettings::value(RbSettings::CurBrand).toString());
+            text = tr("Detected an unsupported player:\n%1\n"
+                      "Sorry, Rockbox doesn't run on your player.")
+                      .arg(RbSettings::platformValue(detector.incompatdev(),
+                                  RbSettings::CurName).toString());
 
-            QMessageBox::critical(this, tr("Fatal error: incompatible player found"),
+            QMessageBox::critical(this, tr("Fatal: player incompatible"),
                                   text, QMessageBox::Ok);
                 return;
             }

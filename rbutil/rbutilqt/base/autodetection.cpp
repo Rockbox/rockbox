@@ -418,8 +418,9 @@ bool Autodetection::detectUsb()
             qDebug() << "[USB] detected problem with player" << m_errdev;
             return true;
         }
-        if(usbincompat.contains(attached.at(i))) {
-            m_incompat = usbincompat.value(attached.at(i));
+        QString idstring = QString("%1").arg(attached.at(i), 8, 16, QChar('0'));
+        if(!RbSettings::platformValue(idstring, RbSettings::CurName).toString().isEmpty()) {
+            m_incompat = idstring;
             qDebug() << "[USB] detected incompatible player" << m_incompat;
             return true;
         }
