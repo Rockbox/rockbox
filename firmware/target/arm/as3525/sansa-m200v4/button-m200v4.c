@@ -23,6 +23,10 @@
 #include "cpu.h"
 #include "button.h"
 
+#ifndef BOOTLOADER
+#include "backlight.h"
+#endif
+
 void button_init_device(void)
 {
     GPIOA_DIR &= ~((1<<3) | (1<<2) | (1<<1) | (1<<0));  /* A3-A0 is input */
@@ -89,12 +93,24 @@ int button_read_device(void)
 
 bool button_hold(void)
 {
-    bool ret = false;
+#ifndef BOOTLOADER
+    static bool hold_button_old = false;
+#endif
+    bool hold_button = false;
     
     GPIOA_PIN(6) = (1<<6);
     if (GPIOA_PIN(2))
-        ret = true;
+        hold_button = true;
     GPIOA_PIN(6) = 0x00; 
-    
-    return ret;
+
+#ifndef BOOTLOADER
+    /* light handling */
+    if (hold_button != hold_button_old)
+    {
+        hold_button_old = hold_button;
+        backlight_hold_changed(hold_button);
+    }
+#endif /* BOOTLOADER */
+
+    return hold_button;
 }

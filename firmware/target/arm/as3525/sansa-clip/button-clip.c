@@ -22,6 +22,9 @@
  ****************************************************************************/
 #include "button-target.h"
 #include "as3525.h"
+#ifndef BOOTLOADER
+#include "backlight.h"
+#endif
 
 /*  The Sansa Clip uses a button matrix that is scanned by selecting one of
     three rows and reading back the button states from the columns.
@@ -124,5 +127,19 @@ int button_read_device(void)
 
 bool button_hold(void)
 {
-    return (GPIOA_PIN(3) != 0);
+#ifndef BOOTLOADER
+    static bool hold_button_old = false;
+#endif
+    bool hold_button = (GPIOA_PIN(3) != 0);
+
+#ifndef BOOTLOADER
+    /* light handling */
+    if (hold_button != hold_button_old)
+    {
+        hold_button_old = hold_button;
+        backlight_hold_changed(hold_button);
+    }
+#endif /* BOOTLOADER */
+
+    return hold_button;
 }
