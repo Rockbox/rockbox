@@ -13,7 +13,8 @@
    <string>Rockbox Utility</string>
   </property>
   <property name="windowIcon" >
-   <iconset resource="rbutilqt.qrc" >:/icons/rockbox-1.png</iconset>
+   <iconset resource="rbutilqt.qrc" >
+    <normaloff>:/icons/rockbox-1.png</normaloff>:/icons/rockbox-1.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QGridLayout" >
@@ -22,16 +23,7 @@
       <property name="spacing" >
        <number>6</number>
       </property>
-      <property name="leftMargin" >
-       <number>0</number>
-      </property>
-      <property name="topMargin" >
-       <number>0</number>
-      </property>
-      <property name="rightMargin" >
-       <number>0</number>
-      </property>
-      <property name="bottomMargin" >
+      <property name="margin" >
        <number>0</number>
       </property>
       <item>
@@ -39,7 +31,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>40</width>
           <height>20</height>
@@ -62,7 +54,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>40</width>
           <height>20</height>
@@ -103,7 +95,7 @@
          <property name="orientation" >
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>40</width>
            <height>20</height>
@@ -117,7 +109,8 @@
           <string>&amp;Change</string>
          </property>
          <property name="icon" >
-          <iconset resource="rbutilqt.qrc" >:/icons/edit-find.png</iconset>
+          <iconset resource="rbutilqt.qrc" >
+           <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
          </property>
         </widget>
        </item>
@@ -143,7 +136,8 @@
            <string>Complete Installation</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/bootloader_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >
+            <normaloff>:/icons/bootloader_btn.png</normaloff>:/icons/bootloader_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -172,7 +166,8 @@
            <string>Minimal Installation</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/rbinstall_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >
+            <normaloff>:/icons/rbinstall_btn.png</normaloff>:/icons/rbinstall_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -200,7 +195,7 @@
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
             <height>91</height>
@@ -213,7 +208,7 @@
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
             <height>81</height>
@@ -237,7 +232,8 @@
            <string>Install Bootloader</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/bootloader_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >
+            <normaloff>:/icons/bootloader_btn.png</normaloff>:/icons/bootloader_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -266,7 +262,8 @@
            <string>Install Rockbox</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/rbinstall_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >
+            <normaloff>:/icons/rbinstall_btn.png</normaloff>:/icons/rbinstall_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -297,7 +294,7 @@
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
             <height>91</height>
@@ -310,7 +307,7 @@
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
             <height>81</height>
@@ -334,7 +331,8 @@
            <string>Install Fonts package</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/font_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >
+            <normaloff>:/icons/font_btn.png</normaloff>:/icons/font_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -360,7 +358,8 @@
            <string>Install themes</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/themes_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >
+            <normaloff>:/icons/themes_btn.png</normaloff>:/icons/themes_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -386,7 +385,8 @@
            <string>Install game files</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/doom_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >
+            <normaloff>:/icons/doom_btn.png</normaloff>:/icons/doom_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -411,7 +411,7 @@
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
             <height>40</height>
@@ -424,7 +424,7 @@
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
             <height>40</height>
@@ -448,7 +448,8 @@
            <string>Install Voice files</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/talkfile_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >
+            <normaloff>:/icons/talkfile_btn.png</normaloff>:/icons/talkfile_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -474,7 +475,8 @@
            <string>Install Talk files</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/talkfile_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >
+            <normaloff>:/icons/talkfile_btn.png</normaloff>:/icons/talkfile_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -496,7 +498,7 @@
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
             <height>51</height>
@@ -509,7 +511,7 @@
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
             <height>51</height>
@@ -523,7 +525,8 @@
            <string>Create Voice files</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/talkfile_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >
+            <normaloff>:/icons/talkfile_btn.png</normaloff>:/icons/talkfile_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -560,7 +563,8 @@
            <string>Uninstall Bootloader</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/rembootloader_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >
+            <normaloff>:/icons/rembootloader_btn.png</normaloff>:/icons/rembootloader_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -586,7 +590,8 @@
            <string>Uninstall Rockbox</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/remrb_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >
+            <normaloff>:/icons/remrb_btn.png</normaloff>:/icons/remrb_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -617,7 +622,7 @@
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
             <height>40</height>
@@ -630,7 +635,7 @@
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
             <height>40</height>
@@ -663,7 +668,7 @@
               <bool>true</bool>
              </property>
              <property name="textInteractionFlags" >
-              <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::NoTextInteraction</set>
+              <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
              </property>
             </widget>
            </item>
@@ -676,7 +681,7 @@
               <bool>true</bool>
              </property>
              <property name="textInteractionFlags" >
-              <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::NoTextInteraction</set>
+              <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
              </property>
             </widget>
            </item>
@@ -712,7 +717,7 @@
              <property name="orientation" >
               <enum>Qt::Horizontal</enum>
              </property>
-             <property name="sizeHint" >
+             <property name="sizeHint" stdset="0" >
               <size>
                <width>40</width>
                <height>20</height>
@@ -735,7 +740,7 @@
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
             <height>40</height>
@@ -784,7 +789,7 @@
      <x>0</x>
      <y>0</y>
      <width>650</width>
-     <height>28</height>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File" >
@@ -800,10 +805,17 @@
     <property name="title" >
      <string>Abou&amp;t</string>
     </property>
+    <widget class="QMenu" name="menu_Troubleshoot" >
+     <property name="title" >
+      <string>&amp;Troubleshoot</string>
+     </property>
+     <addaction name="action_System_Info" />
+     <addaction name="action_Trace" />
+    </widget>
     <addaction name="action_About" />
     <addaction name="actionAbout_Qt" />
     <addaction name="separator" />
-    <addaction name="action_System_Info" />
+    <addaction name="menu_Troubleshoot" />
     <addaction name="action_Help" />
    </widget>
    <widget class="QMenu" name="menuA_ctions" >
@@ -903,7 +915,8 @@
   </action>
   <action name="actionComplete_Installation" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/bootloader_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >
+     <normaloff>:/icons/bootloader_btn.png</normaloff>:/icons/bootloader_btn.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Complete Installation</string>
@@ -911,7 +924,8 @@
   </action>
   <action name="actionSmall_Installation" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/rbinstall_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >
+     <normaloff>:/icons/rbinstall_btn.png</normaloff>:/icons/rbinstall_btn.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Minimal Installation</string>
@@ -919,7 +933,8 @@
   </action>
   <action name="actionInstall_Bootloader" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/bootloader_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >
+     <normaloff>:/icons/bootloader_btn.png</normaloff>:/icons/bootloader_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Install &amp;Bootloader</string>
@@ -927,7 +942,8 @@
   </action>
   <action name="actionInstall_Rockbox" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/rbinstall_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >
+     <normaloff>:/icons/rbinstall_btn.png</normaloff>:/icons/rbinstall_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Install &amp;Rockbox</string>
@@ -935,7 +951,8 @@
   </action>
   <action name="actionFonts_Package" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/font_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >
+     <normaloff>:/icons/font_btn.png</normaloff>:/icons/font_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Install &amp;Fonts Package</string>
@@ -943,7 +960,8 @@
   </action>
   <action name="actionInstall_Themes" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/themes_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >
+     <normaloff>:/icons/themes_btn.png</normaloff>:/icons/themes_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Install &amp;Themes</string>
@@ -951,7 +969,8 @@
   </action>
   <action name="actionInstall_Game_Files" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/doom_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >
+     <normaloff>:/icons/doom_btn.png</normaloff>:/icons/doom_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Install &amp;Game Files</string>
@@ -959,7 +978,8 @@
   </action>
   <action name="actionInstall_Voice_File" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/talkfile_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >
+     <normaloff>:/icons/talkfile_btn.png</normaloff>:/icons/talkfile_btn.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Install Voice File</string>
@@ -967,7 +987,8 @@
   </action>
   <action name="actionCreate_Talk_Files" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/talkfile_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >
+     <normaloff>:/icons/talkfile_btn.png</normaloff>:/icons/talkfile_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Create &amp;Talk Files</string>
@@ -975,7 +996,8 @@
   </action>
   <action name="actionRemove_bootloader" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/rembootloader_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >
+     <normaloff>:/icons/rembootloader_btn.png</normaloff>:/icons/rembootloader_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Remove &amp;bootloader</string>
@@ -983,7 +1005,8 @@
   </action>
   <action name="actionUninstall_Rockbox" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/remrb_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >
+     <normaloff>:/icons/remrb_btn.png</normaloff>:/icons/remrb_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Uninstall &amp;Rockbox</string>
@@ -1011,7 +1034,8 @@
   </action>
   <action name="actionCreate_Voice_File" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/talkfile_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >
+     <normaloff>:/icons/talkfile_btn.png</normaloff>:/icons/talkfile_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Create &amp;Voice File</string>
@@ -1023,6 +1047,11 @@
   <action name="action_System_Info" >
    <property name="text" >
     <string>&amp;System Info</string>
+   </property>
+  </action>
+  <action name="action_Trace" >
+   <property name="text" >
+    <string>System &amp;Trace</string>
    </property>
   </action>
  </widget>

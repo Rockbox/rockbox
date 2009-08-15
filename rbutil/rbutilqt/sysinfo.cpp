@@ -28,14 +28,18 @@
 Sysinfo::Sysinfo(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
-    this->setModal(true);
-
+   
     updateSysinfo();
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui.buttonRefresh, SIGNAL(clicked()), this, SLOT(updateSysinfo()));
 }
 
 void Sysinfo::updateSysinfo(void)
+{
+    ui.textBrowser->setHtml(getInfo());
+}
+
+QString Sysinfo::getInfo()
 {
     QString info;
     info += tr("<b>OS</b><br/>") + System::osVersionString() + "<hr/>";
@@ -67,6 +71,7 @@ void Sysinfo::updateSysinfo(void)
     }
     info += "<hr/>";
 
-    ui.textBrowser->setHtml(info);
+    return info;
 }
+
 

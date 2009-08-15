@@ -34,6 +34,7 @@
 #include "rbzip.h"
 #include "sysinfo.h"
 #include "system.h"
+#include "systrace.h"
 #include "rbsettings.h"
 
 #include "progressloggerinterface.h"
@@ -124,6 +125,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.actionRemove_bootloader, SIGNAL(triggered()), this, SLOT(uninstallBootloader()));
     connect(ui.actionUninstall_Rockbox, SIGNAL(triggered()), this, SLOT(uninstall()));
     connect(ui.action_System_Info, SIGNAL(triggered()), this, SLOT(sysinfo()));
+    connect(ui.action_Trace, SIGNAL(triggered()), this, SLOT(trace()));
 
 #if !defined(STATIC)
     ui.actionInstall_Rockbox_Utility_on_player->setEnabled(false);
@@ -134,10 +136,16 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 }
 
 
+void RbUtilQt::trace(void)
+{
+    SysTrace wnd(this);
+    wnd.exec();
+}
+
 void RbUtilQt::sysinfo(void)
 {
-    Sysinfo *info = new Sysinfo(this);
-    info->show();
+    Sysinfo info(this);
+    info.exec();
 }
 
 void RbUtilQt::updateTabs(int count)

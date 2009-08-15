@@ -42,7 +42,7 @@ QMAKE_EXTRA_TARGETS += lrelease
     PRE_TARGETDEPS += lrelease
 }
 
-#custum rules for libucl.a
+#custom rules for libucl.a
 !mac {
 libucl.commands = @$(MAKE) -C ../../tools/ucl/src libucl.a
 }
@@ -52,7 +52,7 @@ libucl.commands = @$(MAKE) -C ../../tools/ucl/src libucl-universal
 QMAKE_EXTRA_TARGETS += libucl
 PRE_TARGETDEPS += libucl
 
-#custum rules for libmkamsboot.a
+#custom rules for libmkamsboot.a
 !mac {
 libmkamsboot.commands = @$(MAKE) -C ../mkamsboot libmkamsboot.a
 }
@@ -96,6 +96,7 @@ SOURCES += rbutilqt.cpp \
  base/rbzip.cpp \
  base/system.cpp \
  sysinfo.cpp \
+ systrace.cpp \
  base/bootloaderinstallbase.cpp \
  base/bootloaderinstallmi4.cpp \
  base/bootloaderinstallhex.cpp \
@@ -150,6 +151,7 @@ HEADERS += rbutilqt.h \
  base/rbzip.h \
  sysinfo.h \
  base/system.h \
+ systrace.h \
  base/bootloaderinstallbase.h \
  base/bootloaderinstallmi4.h \
  base/bootloaderinstallhex.h \
@@ -174,7 +176,8 @@ dbg {
 }
 !dbg {
     CONFIG += release thread qt
-    DEFINES += QT_NO_DEBUG_OUTPUT
+    DEFINES -= QT_NO_DEBUG_OUTPUT
+    DEFINES += NODEBUG
     message("release")
 }
 
@@ -191,7 +194,8 @@ FORMS += rbutilqtfrm.ui \
  uninstallfrm.ui \
  previewfrm.ui \
  createvoicefrm.ui \
- sysinfofrm.ui
+ sysinfofrm.ui \
+ systracefrm.ui
 
 RESOURCES += rbutilqt.qrc
 win32 {

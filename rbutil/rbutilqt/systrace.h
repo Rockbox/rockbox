@@ -19,26 +19,28 @@
  *
  ****************************************************************************/
 
-#ifndef SYSINFO_H
-#define SYSINFO_H
+#ifndef SYSTRACE_H
+#define SYSTRACE_H
 
 #include <QtGui>
-#include "ui_sysinfofrm.h"
+#include "ui_systracefrm.h"
 
-class Sysinfo : public QDialog
+class SysTrace : public QDialog
 {
     Q_OBJECT
-
     public:
-        Sysinfo(QWidget *parent = 0);
+        SysTrace(QWidget *parent);
+        static void debug(QtMsgType type, const char* msg);
         
-        static QString getInfo();
+        static QString getTrace() {return debugbuffer;}
     private:
-        Ui::SysinfoFrm ui;
+        Ui::SysTraceFrm ui;
+        static QString debugbuffer;
 
     private slots:
-        void updateSysinfo(void);
-
+        void save(void);
+        void refresh(void);
+        
 };
 
 #endif

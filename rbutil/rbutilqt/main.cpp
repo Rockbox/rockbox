@@ -20,13 +20,17 @@
 
 #include <QtGui>
 #include "rbutilqt.h"
+#include "systrace.h"
 
 #ifdef STATIC
 #include <QtPlugin>
 Q_IMPORT_PLUGIN(qtaccessiblewidgets)
 #endif
 
+
+
 int main( int argc, char ** argv ) {
+    qInstallMsgHandler(SysTrace::debug);
     QApplication app( argc, argv );
 #if defined(Q_OS_MAC)
     QDir dir(QApplication::applicationDirPath());

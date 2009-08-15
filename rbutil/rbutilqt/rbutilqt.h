@@ -41,7 +41,7 @@ class RbUtilQt : public QMainWindow
 
     private:
         Ui::RbUtilQtFrm ui;
-    
+
         void initDeviceNames(void);
         QString deviceName(QString);
         QString platform;
@@ -67,6 +67,7 @@ class RbUtilQt : public QMainWindow
         void about(void);
         void help(void);
         void sysinfo(void);
+        void trace(void);
         void configDialog(void);
         void updateDevice(void);
         void updateSettings(void);

@@ -19,12 +19,17 @@
 
 #include "progressloggergui.h"
 
+#include "sysinfo.h"
+#include "systrace.h"
+
 ProgressLoggerGui::ProgressLoggerGui(QWidget* parent): ProgressloggerInterface(parent)
 {
     downloadProgress = new QDialog(parent);
     downloadProgress->setModal(true);
     dp.setupUi(downloadProgress);
     dp.listProgress->setAlternatingRowColors(true);
+    dp.saveLog->hide();
+    connect(dp.saveLog,SIGNAL(clicked()),this,SLOT(saveErrorLog()));
     setRunning();
 }
 
@@ -52,6 +57,7 @@ void ProgressLoggerGui::addItem(const QString &text, int flag)
             break;
         case LOGERROR:
             item->setIcon(QIcon(":/icons/dialog-error.png"));
+            dp.saveLog->show();
             break;
     }
 
@@ -133,5 +139,52 @@ void ProgressLoggerGui::show()
 {
     downloadProgress->show();
 }
+
+void ProgressLoggerGui::saveErrorLog()
+{
+    QString filename = QFileDialog::getSaveFileName(downloadProgress, tr("Save system trace log"),
+                        QDir::homePath(), "*.log");
+
+    QFile file(filename);
+    file.open(QIODevice::WriteOnly);
+
+    //Logger texts
+    QString loggerTexts = "\n*********************************************\n" 
+                          "***************  Logger   *******************\n"
+                          "*********************************************\n";
+    file.write(loggerTexts.toUtf8(), loggerTexts.size());    
+
+    
+    int i=0;
+    loggerTexts = "";    
+    while(dp.listProgress->item(i) != NULL)
+    {
+        loggerTexts.append(dp.listProgress->item(i)->text());
+        loggerTexts.append("\n");
+        i++;
+    }
+    file.write(loggerTexts.toUtf8(), loggerTexts.size());
+    
+    //systeminfo
+    QString info = "\n*********************************************\n" 
+                   "************  SYSTEMINFO  *******************\n"
+                   "*********************************************\n";
+                        
+    file.write(info.toUtf8(), info.size());
+    info = Sysinfo::getInfo();
+    info.replace(QRegExp("(<[^>]+>)+"),"\n");
+    file.write(info.toUtf8(), info.size());
+
+    // trace
+    QString trace = "\n*********************************************\n" 
+                    "***********  TRACE **************************\n"
+                    "*********************************************\n";
+    file.write(trace.toUtf8(), trace.size());
+    trace = SysTrace::getTrace(); 
+    file.write(trace.toUtf8(), trace.size());
+
+    file.close();    
+}
+
 
 

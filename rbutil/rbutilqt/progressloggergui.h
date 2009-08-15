@@ -51,6 +51,7 @@ public slots:
     virtual void setRunning();
     virtual void setFinished();
 
+    void saveErrorLog();
 private:
     Ui::ProgressLoggerFrm dp;
     QDialog *downloadProgress;
