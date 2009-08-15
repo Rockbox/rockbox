@@ -42,12 +42,23 @@ QMAKE_EXTRA_TARGETS += lrelease
     PRE_TARGETDEPS += lrelease
 }
 
-#custum rules for libmkamsboot.a
+#custum rules for libucl.a
+!mac {
 libucl.commands = @$(MAKE) -C ../../tools/ucl/src libucl.a
+}
+mac {
+libucl.commands = @$(MAKE) -C ../../tools/ucl/src libucl-universal
+}
 QMAKE_EXTRA_TARGETS += libucl
 PRE_TARGETDEPS += libucl
 
+#custum rules for libmkamsboot.a
+!mac {
 libmkamsboot.commands = @$(MAKE) -C ../mkamsboot libmkamsboot.a
+}
+mac {
+libmkamsboot.commands = @$(MAKE) -C ../mkamsboot libmkamsboot-universal
+}
 QMAKE_EXTRA_TARGETS += libmkamsboot
 PRE_TARGETDEPS += libmkamsboot
 
