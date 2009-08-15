@@ -27,7 +27,6 @@
 #include "asf.h"
 #include "wmadec.h"
 #include "wmafixed.h"
-#include "bitstream.h"
 #include "wmadata.h"
 
 static const uint8_t ff_log2_tab[256]={
