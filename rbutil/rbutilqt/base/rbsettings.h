@@ -90,7 +90,6 @@ class RbSettings : public QObject
             CurBootloaderName,
             CurBootloaderFile,
             CurEncoder,
-            CurResolution,
             CurBrand,
             CurName,
             CurBuildserverModel,

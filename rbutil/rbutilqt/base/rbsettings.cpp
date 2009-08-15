@@ -51,7 +51,6 @@ const static struct {
     { RbSettings::CurBootloaderName,    ":platform:/bootloadername", "" },
     { RbSettings::CurBootloaderFile,    ":platform:/bootloaderfile", "" },
     { RbSettings::CurEncoder,           ":platform:/encoder",   "" },
-    { RbSettings::CurResolution,        ":platform:/resolution", "" },
     { RbSettings::CurBrand,             ":platform:/brand",     "" },
     { RbSettings::CurName,              ":platform:/name",      "" },
     { RbSettings::CurBuildserverModel,  ":platform:/buildserver_modelname", "" },
