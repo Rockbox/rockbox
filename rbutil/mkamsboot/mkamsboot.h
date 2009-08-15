@@ -28,6 +28,10 @@
 #include <stdint.h>
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif 
+
 /* Supported models */
 enum {
     MODEL_UNKNOWN = -1,
@@ -151,5 +155,9 @@ int total_size(int model, int rb_packedsize, int of_packedsize);
  *  firmware version
 */
 int firmware_revision(int model);
+
+#ifdef __cplusplus
+};
+#endif 
 
 #endif

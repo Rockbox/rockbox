@@ -21,10 +21,7 @@
 #include "bootloaderinstallbase.h"
 #include "bootloaderinstallams.h"
 
-extern "C"
-{
-    #include "../mkamsboot/mkamsboot.h"
-};
+#include "../mkamsboot/mkamsboot.h"
 
 BootloaderInstallAms::BootloaderInstallAms(QObject *parent)
         : BootloaderInstallBase(parent)
