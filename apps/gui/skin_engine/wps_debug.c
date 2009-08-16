@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "wps.h"
 #include "wps_internals.h"
 #ifdef __PCTOOL__
 #ifdef WPSEDITOR
@@ -548,15 +549,18 @@ static void print_line_info(struct wps_data *data)
         DEBUGF("\n");
     }
 }
-
+#if 0
+/* NOTE: this is probaly not even needed anymore */
 static void print_wps_strings(struct wps_data *data)
 {
     int i, len, total_len = 0, buf_used = 0;
 
     if (wps_verbose_level > 1) DEBUGF("Strings:\n");
-    for (i = 0; i < data->num_strings; i++)
+    struct skin_token_list *strings = data->strings;
+    while (strings)
     {
-        len = strlen(data->strings[i]);
+        char* str = (char*)strings->token->value.data;
+        len = strlen(str);
         total_len += len;
         buf_used += len + 1;
         if (wps_verbose_level > 1)
@@ -575,6 +579,7 @@ static void print_wps_strings(struct wps_data *data)
     }
 }
 #endif
+#endif
 
 void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line)
 {
@@ -582,7 +587,7 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
     if (debug_wps && wps_verbose_level)
     {
         dump_wps_tokens(data);
-        print_wps_strings(data);
+      /*  print_wps_strings(data); */
         print_line_info(data);
     }
 #endif /* SIMULATOR */

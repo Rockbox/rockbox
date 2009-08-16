@@ -68,34 +68,16 @@
 static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode);
 
 
-#ifdef HAVE_LCD_BITMAP
-/* Clear the WPS image cache */
-static void wps_images_clear(struct wps_data *data)
-{
-    int i;
-    /* set images to unloaded and not displayed */
-    for (i = 0; i < MAX_IMAGES; i++)
-    {
-       data->img[i].loaded = false;
-       data->img[i].display = -1;
-       data->img[i].always_display = false;
-       data->img[i].num_subimages = 1;
-    }
-}
-#endif
-
 /* initial setup of wps_data */
 void skin_data_init(struct wps_data *wps_data)
 {
 #ifdef HAVE_LCD_BITMAP
-    wps_images_clear(wps_data);
     wps_data->wps_sb_tag = false;
     wps_data->show_sb_on_wps = false;
-    wps_data->img_buf_ptr = wps_data->img_buf; /* where in image buffer */
-    wps_data->img_buf_free = IMG_BUFSIZE; /* free space in image buffer */
     wps_data->peak_meter_enabled = false;
+    wps_data->images = NULL;
+    wps_data->progressbars = NULL;
     /* progress bars */
-    wps_data->progressbar_count = 0;
 #else /* HAVE_LCD_CHARCELLS */
     int i;
     for (i = 0; i < 8; i++)
@@ -191,41 +173,38 @@ static void draw_progressbar(struct gui_wps *gwps,
 }
 
 /* clears the area where the image was shown */
-static void clear_image_pos(struct gui_wps *gwps, int n)
+static void clear_image_pos(struct gui_wps *gwps, struct gui_img *img)
 {
     if(!gwps)
         return;
-    struct wps_data *data = gwps->data;
     gwps->display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    gwps->display->fillrect(data->img[n].x, data->img[n].y,
-                            data->img[n].bm.width, data->img[n].subimage_height);
+    gwps->display->fillrect(img->x, img->y, img->bm.width, img->subimage_height);
     gwps->display->set_drawmode(DRMODE_SOLID);
 }
 
-static void wps_draw_image(struct gui_wps *gwps, int n, int subimage)
+static void wps_draw_image(struct gui_wps *gwps, struct gui_img *img, int subimage)
 {
     struct screen *display = gwps->display;
-    struct wps_data *data = gwps->data;
-    if(data->img[n].always_display)
+    if(img->always_display)
         display->set_drawmode(DRMODE_FG);
     else
         display->set_drawmode(DRMODE_SOLID);
 
 #if LCD_DEPTH > 1
-    if(data->img[n].bm.format == FORMAT_MONO) {
+    if(img->bm.format == FORMAT_MONO) {
 #endif
-        display->mono_bitmap_part(data->img[n].bm.data, 
-                                  0, data->img[n].subimage_height * subimage,
-                                  data->img[n].bm.width, data->img[n].x,
-                                  data->img[n].y, data->img[n].bm.width,
-                                  data->img[n].subimage_height);
+        display->mono_bitmap_part(img->bm.data, 
+                                  0, img->subimage_height * subimage,
+                                  img->bm.width, img->x,
+                                  img->y, img->bm.width,
+                                  img->subimage_height);
 #if LCD_DEPTH > 1
     } else {
-        display->transparent_bitmap_part((fb_data *)data->img[n].bm.data,
-                                         0, data->img[n].subimage_height * subimage,
-                                         data->img[n].bm.width, data->img[n].x,
-                                         data->img[n].y, data->img[n].bm.width,
-                                         data->img[n].subimage_height);
+        display->transparent_bitmap_part((fb_data *)img->bm.data,
+                                         0, img->subimage_height * subimage,
+                                         img->bm.width, img->x,
+                                         img->y, img->bm.width,
+                                         img->subimage_height);
     }
 #endif
 }
@@ -235,22 +214,25 @@ static void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
     if(!gwps || !gwps->data || !gwps->display)
         return;
 
-    int n;
     struct wps_data *data = gwps->data;
     struct screen *display = gwps->display;
+    struct skin_token_list *list = data->images;
 
-    for (n = 0; n < MAX_IMAGES; n++)
+    while (list)
     {
-        if (data->img[n].loaded)
+        struct gui_img *img = (struct gui_img*)list->token->value.data;
+        if (img->loaded)
         {
-            if (data->img[n].display >= 0)
+            if (img->display >= 0)
             {
-                wps_draw_image(gwps, n, data->img[n].display);
-            } else if (data->img[n].always_display && data->img[n].vp == vp)
+                wps_draw_image(gwps, img, img->display);
+            }
+            else if (img->always_display && img->vp == vp)
             {
-                wps_draw_image(gwps, n, 0);
+                wps_draw_image(gwps, img, 0);
             }
         }
+        list = list->next;
     }
     display->set_drawmode(DRMODE_SOLID);
 }
@@ -484,7 +466,7 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 #ifdef HAVE_LCD_BITMAP
         /* clear all pictures in the conditional and nested ones */
         if (data->tokens[i].type == WPS_TOKEN_IMAGE_PRELOAD_DISPLAY)
-            clear_image_pos(gwps, data->tokens[i].value.i & 0xFF);
+            clear_image_pos(gwps, find_image(data->tokens[i].value.i&0xFF, gwps->data));
 #endif
 #ifdef HAVE_ALBUMART
         if (data->tokens[i].type == WPS_TOKEN_ALBUMART_DISPLAY)
@@ -494,7 +476,20 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 
     return true;
 }
-
+struct gui_img* find_image(int n, struct wps_data *data)
+{
+    struct skin_token_list *list = data->images;
+    while (list)
+    {
+        struct gui_img *img = (struct gui_img *)list->token->value.data;
+        if (img->id == n)
+            return img;
+        list = list->next;
+    }
+    return NULL;
+}    
+            
+    
 /* Read a (sub)line to the given alignment format buffer.
    linebuf is the buffer where the data is actually stored.
    align is the alignment format that'll be used to display the text.
@@ -544,12 +539,12 @@ static bool get_line(struct gui_wps *gwps,
 #ifdef HAVE_LCD_BITMAP
             case WPS_TOKEN_IMAGE_PRELOAD_DISPLAY:
             {
-                struct gui_img *img = data->img;
                 int n = data->tokens[i].value.i & 0xFF;
                 int subimage = data->tokens[i].value.i >> 8;
+                struct gui_img *img = find_image(n, data);
 
-                if (n >= 0 && n < MAX_IMAGES && img[n].loaded)
-                    img[n].display = subimage;
+                if (img && img->loaded)
+                    img->display = subimage;
                 break;
             }
 #endif
@@ -992,9 +987,12 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 
 #ifdef HAVE_LCD_BITMAP
         /* Set images to not to be displayed */
-        for (i = 0; i < MAX_IMAGES; i++)
+        struct skin_token_list *imglist = data->images;
+        while (imglist)
         {
-            data->img[i].display = -1;
+            struct gui_img *img = (struct gui_img *)imglist->token->value.data;            
+            img->display = -1;
+            imglist = imglist->next;
         }
 #endif
         /* dont redraw the viewport if its disabled */

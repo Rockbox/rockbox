@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: wps_internals.h 22062 2009-07-27 07:21:05Z jdgordon $
+ * $Id: wps_parser.c 19880 2009-01-29 20:49:43Z mcuelenaere $
  *
- * Copyright (C) 2007 Nicolas Pennequin
+ * Copyright (C) 2002 by Linus Nielsen Feltzing
  * Copyright (C) 2009 Jonathan Gordon
  *
  * This program is free software; you can redistribute it and/or
@@ -19,36 +19,33 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
-#ifndef _SKIN_ENGINE_H
-#define _SKIN_ENGINE_H
 
-#include "skin_buffer.h"
-
-#include "wps_internals.h" /* TODO: remove this line.. shoudlnt be needed */
+#ifndef _SKIN_BUFFER_H_
+#define _SKIN_BUFFER_H_
 
 
-#ifdef HAVE_TOUCHSCREEN
-int wps_get_touchaction(struct wps_data *data);
-#endif
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-/* setup and display a WPS for the first time */
-bool gui_wps_display(struct gui_wps *gwps);
- 
+/* int the global buffer */
+void skin_buffer_init(void);
 
-/* Do a update_type update of the skinned screen */
-bool skin_update(struct gui_wps *gwps, unsigned int update_type);
+/* get the number of bytes currently being used */
+size_t skin_buffer_usage(void);
 
-/*
- * setup up the skin-data from a format-buffer (isfile = false)
- * or from a skinfile (isfile = true)
+/* Allocate size bytes from the buffer */
+void* skin_buffer_alloc(size_t size);
+
+
+/* Get a pointer to the skin buffer and the count of how much is free
+ * used to do your own buffer management. 
+ * Any memory used will be overwritten next time wps_buffer_alloc()
+ * is called unless skin_buffer_increment() is called first
  */
-bool skin_data_load(struct wps_data *wps_data,
-                    struct screen *display,
-                    const char *buf,
-                    bool isfile);
+void* skin_buffer_grab(size_t *freespace);
 
+/* Use after skin_buffer_grab() to specify how much buffer was used */
+void skin_buffer_increment(size_t used);
 
-/* initial setup of wps_data */
-void skin_data_init(struct wps_data *wps_data);
-#endif
+#endif /* _SKIN_BUFFER_H_ */

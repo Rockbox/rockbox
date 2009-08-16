@@ -84,9 +84,10 @@ gui/statusbar.c
 gui/yesno.c
 gui/viewport.c
 
+gui/skin_engine/skin_buffer.c
 gui/skin_engine/wps_debug.c
 gui/skin_engine/skin_display.c
-gui/skin_engine/wps_parser.c
+gui/skin_engine/skin_parser.c
 gui/skin_engine/skin_tokens.c
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))

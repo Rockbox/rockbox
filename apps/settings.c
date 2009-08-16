@@ -70,6 +70,7 @@
 #include "radio.h"
 #endif
 #include "wps.h"
+#include "skin_engine/skin_engine.h"
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
@@ -818,6 +819,8 @@ void settings_apply(bool read_disk)
 
     if (read_disk)
     {
+        /* re-initialize the skin buffer before we start reloading skins */
+        skin_buffer_init();
         
 #ifdef HAVE_LCD_BITMAP
         /* fonts need to be loaded before the WPS */

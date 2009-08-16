@@ -167,7 +167,7 @@ const char *get_token_value(struct gui_wps *gwps,
             return &(token->value.c);
 
         case WPS_TOKEN_STRING:
-            return data->strings[token->value.i];
+            return (char*)token->value.data;
 
         case WPS_TOKEN_TRACK_TIME_ELAPSED:
             format_time(buf, buf_size,
