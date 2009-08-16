@@ -762,6 +762,13 @@ struct user_settings
     /* If values are just added to the end, no need to bump plugin API
        version. */
     /* new stuff to be added at the end */
+    
+#ifdef HAVE_LCD_BITMAP
+    unsigned char ui_vp_config[64]; /* viewport string for the lists */
+#ifdef HAVE_REMOTE_LCD
+    unsigned char remote_ui_vp_config[64]; /* viewport string for the remote lists */
+#endif
+#endif
 };
 
 /** global variables **/

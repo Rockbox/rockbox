@@ -65,12 +65,12 @@
 #include "filetypes.h"
 #include "option_select.h"
 #include "backdrop.h"
-#include "appevents.h"
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
 #include "wps.h"
 #include "skin_engine/skin_engine.h"
+#include "viewport.h"
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
@@ -761,6 +761,7 @@ void settings_apply_skins(void)
 
 void settings_apply(bool read_disk)
 {
+    
     char buf[64];
 #if CONFIG_CODEC == SWCODEC
     int i;
@@ -985,9 +986,9 @@ void settings_apply(bool read_disk)
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
     enc_global_settings_apply();
 #endif
-    send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
-    list_init_viewports(NULL);
-    send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
+#ifdef HAVE_LCD_BITMAP
+    viewportmanager_theme_changed(THEME_ALL);
+#endif
 }
 
 
@@ -1109,7 +1110,8 @@ bool set_int_ex(const unsigned char* string,
     item.lang_id = -1;
     item.cfg_vals = (char*)string;
     item.setting = (void *)variable;
-    return option_screen(&item, NULL, false, NULL);
+    return option_screen(&item,
+            viewport_get_current_vp(), false, NULL);
 }
 
 

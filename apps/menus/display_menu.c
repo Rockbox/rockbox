@@ -39,6 +39,7 @@
 #ifdef HAVE_TOUCHSCREEN
 #include "screens.h"
 #endif
+#include "viewport.h"
 
 #ifdef HAVE_BACKLIGHT
 static int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)
@@ -313,8 +314,7 @@ static int statusbar_callback(int action,const struct menu_item_ex *this_item)
     {
         case ACTION_EXIT_MENUITEM:
             send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
-            /* this should be changed so only the viewports are reloaded */
-            settings_apply(false);
+            send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
             break;
     }
     return action;

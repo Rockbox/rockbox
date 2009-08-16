@@ -180,6 +180,10 @@
                 {.custom = (void*)default}, name, NULL,                 \
             {.custom_setting = (struct custom_setting[]){               \
         {load_from_cfg, write_to_cfg, is_change, set_default}}}}
+
+#define VIEWPORT_SETTING(var,name,default)      \
+        TEXT_SETTING(0,var,name,default, NULL, NULL)
+
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
 static const char off_on_ask[] = "off,on,ask";
@@ -1539,6 +1543,13 @@ const struct settings_list settings[] = {
 #endif
 #endif
 
+    /* Customizable list */
+#ifdef HAVE_LCD_BITMAP
+    VIEWPORT_SETTING(ui_vp_config, "ui viewport", ""),
+#ifdef HAVE_REMOTE_LCD
+    VIEWPORT_SETTING(remote_ui_vp_config, "remote ui viewport", ""),
+#endif
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

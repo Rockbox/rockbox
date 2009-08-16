@@ -53,6 +53,8 @@ my $iconset;
 my $viewericon;
 my $lineselecttextcolor;
 my $filetylecolor;
+my $listviewport;
+my $remotelistviewport;
 
 # LCD sizes
 my ($main_height, $main_width, $main_depth);
@@ -293,6 +295,12 @@ MOO
     if($rwps && $has_remote ) {
         push @out, "rwps: /$rbdir/wps/$rwps\n";
     }
+    if(defined($listviewport)) {
+        push @out, "ui viewport: $listviewport\n";
+    }
+    if(defined($remotelistviewport) && $has_remote) {
+        push @out, "remote ui viewport: $listviewport\n";
+    }
     if(-f "$rbdir/wps/$cfg") {
         print STDERR "wpsbuild warning: wps/$cfg already exists!\n";
     }
@@ -347,6 +355,8 @@ while(<WPS>) {
         undef $viewericon;
         undef $lineselecttextcolor;
         undef $filetylecolor;
+        undef $listviewport;
+        undef $remotelistviewport;
 
         next;
     }
@@ -512,6 +522,12 @@ while(<WPS>) {
         }
         elsif($l =~ /^filetype colours: *(.*)/i) {
             $filetylecolor = $1;
+        }
+        elsif($l =~ /^ui viewport: *(.*)/i) {
+            $listviewport = $1;
+        }
+        elsif($l =~ /^remote ui viewport: *(.*)/i) {
+            $remotelistviewport = $1;
         }
         else{
             #print "Unknown line:  $l!\n";

@@ -72,6 +72,7 @@
 #include "eeprom_settings.h"
 #include "scrobbler.h"
 #include "icon.h"
+#include "viewport.h"
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
 #include "iap.h"
@@ -135,9 +136,8 @@ static void app_main(void)
         screens[i].update();
     }
     tree_gui_init();
-    viewportmanager_set_statusbar(VP_SB_ALLSCREENS);
-    add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, 
-              viewportmanager_statusbar_changed);
+    gui_syncstatusbar_init(&statusbars);
+    viewportmanager_init();
 #ifdef HAVE_USBSTACK
     /* All threads should be created and public queues registered by now */
     usb_start_monitoring();
@@ -296,8 +296,6 @@ static void init(void)
 #ifdef DEBUG
     debug_init();
 #endif
-    /* Must be done before any code uses the multi-screen APi */
-    gui_syncstatusbar_init(&statusbars);
     storage_init();
     settings_reset();
     settings_load(SETTINGS_ALL);
@@ -418,9 +416,6 @@ static void init(void)
 #if CONFIG_TUNER
     radio_init();
 #endif
-
-    /* Must be done before any code uses the multi-screen APi */
-    gui_syncstatusbar_init(&statusbars);
 
 #if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
     /* charger_inserted() can't be used here because power_thread()

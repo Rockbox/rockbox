@@ -34,26 +34,6 @@ int viewport_get_nb_lines(struct viewport *vp);
 
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen);
 
-/* Parse a viewport definition (vp_def), which looks like:
- *
- * Screens with depth > 1:
- *   X|Y|width|height|font|foregorund color|background color
- * Screens with depth = 1:
- *   X|Y|width|height|font
- *
- * | is a separator and can be specified via the parameter
- *
- * Returns the pointer to the char after the last character parsed
- * if everything went OK or NULL if an error happened (some values
- * not specified in the definition)
- */
-#ifdef HAVE_LCD_BITMAP
-const char* viewport_parse_viewport(struct viewport *vp,
-                                    enum screen_type screen,
-                                    const char *vp_def,
-                                    const char separator);
-#endif
-
 /* Used to specify which screens the statusbar (SB) should be displayed on.
  *
  * The parameter is a bit OR'ed combination of the following (screen is
@@ -74,14 +54,70 @@ const char* viewport_parse_viewport(struct viewport *vp,
  * Returns the status before the call. This value can be used to restore the
  * SB "displaying rules".
  */
+
+
+#define THEME_STATUSBAR     (BIT_N(0))
+#define THEME_UI_VIEWPORT   (BIT_N(1))
+#define THEME_ALL           (~(0u))
+
 #define VP_SB_HIDE_ALL 0
 #define VP_SB_ONSCREEN(screen) BIT_N(screen)
 #define VP_SB_IGNORE_SETTING(screen) BIT_N(4+screen)
 #define VP_SB_ALLSCREENS (VP_SB_ONSCREEN(0)|VP_SB_ONSCREEN(1))
+
+/*
+ * Initialize the viewportmanager, which in turns initializes the UI vp and
+ * statusbar stuff
+ */
+void viewportmanager_init(void);
+int viewportmanager_get_statusbar(void);
 int viewportmanager_set_statusbar(int enabled);
 
-/* callbacks for GUI_EVENT_* events */
-void viewportmanager_draw_statusbars(void*data);
-void viewportmanager_statusbar_changed(void* data);
+/* call this when a theme changed */
+void viewportmanager_theme_changed(int);
 
+/*
+ * Initializes the given viewport with maximum dimensions minus status- and
+ * buttonbar
+ */
+void viewport_set_fullscreen(struct viewport *vp, enum screen_type screen);
+
+#ifdef HAVE_LCD_BITMAP
+
+/*
+ * Parse a viewport definition (vp_def), which looks like:
+ *
+ * Screens with depth > 1:
+ *   X|Y|width|height|font|foregorund color|background color
+ * Screens with depth = 1:
+ *   X|Y|width|height|font
+ *
+ * | is a separator and can be specified via the parameter
+ *
+ * Returns the pointer to the char after the last character parsed
+ * if everything went OK or NULL if an error happened (some values
+ * not specified in the definition)
+ */
+const char* viewport_parse_viewport(struct viewport *vp,
+                                    enum screen_type screen,
+                                    const char *vp_def,
+                                    const char separator);
+
+/*
+ * Returns a pointer to the current viewport
+ *  - That could be the UI vp, or a viewport passed to do_menu() or the like
+ */
+struct viewport* viewport_get_current_vp(void);
+
+/*
+ * Set the UI vp pointer to a different one - NULL to reset to the UI vp
+ *
+ * This is needed since the UI viewport needs is kept in RAM.
+ */
+void viewport_set_current_vp(struct viewport* vp);
+
+#else /* HAVE_LCD_CHARCELL */
+#define viewport_set_current_vp(a)
+#define viewport_get_current_vp() NULL
+#endif
 #endif /* __VIEWPORT_H__ */

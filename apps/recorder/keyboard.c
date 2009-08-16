@@ -39,6 +39,7 @@
 #include "viewport.h"
 #include "file.h"
 #include "splash.h"
+#include "appevents.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -1243,11 +1244,13 @@ int kbd_input(char* text, int buflen)
     global_settings.buttonbar = buttonbar_config;
 #endif
 
+    if (ret < 0)
+        splash(HZ/2, ID2P(LANG_CANCEL));
+
     FOR_NB_SCREENS(l)
         screens[l].setfont(FONT_UI);
     viewportmanager_set_statusbar(oldbars);
+    send_event(GUI_EVENT_REFRESH, NULL);
 
-    if (ret < 0)
-        splash(HZ/2, ID2P(LANG_CANCEL));
     return ret;
 }

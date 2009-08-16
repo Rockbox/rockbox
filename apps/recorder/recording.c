@@ -76,6 +76,7 @@
 #include "viewport.h"
 #include "list.h"
 #include "general.h"
+#include "appevents.h"
 
 #ifdef HAVE_RECORDING
 /* This array holds the record timer interval lengths, in seconds */
@@ -1924,9 +1925,11 @@ rec_abort:
     rec_status &= ~RCSTAT_IN_RECSCREEN;
     sound_settings_apply();
 
-    viewportmanager_set_statusbar(oldbars);
     FOR_NB_SCREENS(i)
         screens[i].setfont(FONT_UI);
+        
+    viewportmanager_set_statusbar(oldbars);
+    send_event(GUI_EVENT_REFRESH, NULL);
 
     /* if the directory was created or recording happened, make sure the
        browser is updated */

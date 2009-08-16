@@ -139,8 +139,6 @@ extern void gui_list_screen_scroll_step(int ofs);
 extern void gui_list_screen_scroll_out_of_view(bool enable);
 #endif /* HAVE_LCD_BITMAP */
 
-void list_init_viewports(struct gui_synclist * lists);
-
 extern void gui_synclist_init(
     struct gui_synclist * lists,
     list_get_name callback_get_item_name,

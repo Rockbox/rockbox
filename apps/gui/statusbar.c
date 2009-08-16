@@ -263,7 +263,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         memcmp(&(bar->info), &(bar->lastinfo), sizeof(struct status_info)))
     {
         struct viewport vp;
-        viewport_set_defaults(&vp, display->screen_type);
+        viewport_set_fullscreen(&vp, display->screen_type);
         vp.height = STATUSBAR_HEIGHT;
         vp.x = STATUSBAR_X_POS;
         if (statusbar_position(display->screen_type) != STATUSBAR_BOTTOM)    

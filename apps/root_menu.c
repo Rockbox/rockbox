@@ -192,6 +192,7 @@ static int browser(void* param)
                     }
                 }
             }
+            send_event(GUI_EVENT_REFRESH, NULL);
             if (!tagcache_is_usable())
                 return GO_TO_PREVIOUS;
             filter = SHOW_ID3DB;

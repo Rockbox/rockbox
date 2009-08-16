@@ -69,6 +69,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
+ui viewport: -
+remote ui viewport: -
 </wps>
 
 <wps>
@@ -81,6 +83,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
+ui viewport: -
+remote ui viewport: -
 </wps>
 
 <wps>
@@ -93,6 +97,8 @@ iconset:
 viewers iconset:
 selector type: bar (inverse)
 Statusbar: top
+ui viewport: -
+remote ui viewport: -
 </wps>
 
 <wps>
@@ -105,6 +111,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
+ui viewport:
+remote ui viewport:
 </wps>
 
 <rwps>
@@ -152,6 +160,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
+ui viewport: -
+remote ui viewport: -
 </wps>
 
 <rwps>
@@ -159,6 +169,8 @@ Name: marquee.rwps
 Author: Mike Sobel
 Font: 13-Nimbus.fnt
 Statusbar: top
+ui viewport: -
+remote ui viewport: -
 </rwps>
 
 <wps>
@@ -173,6 +185,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
+ui viewport: -
+remote ui viewport: -
 </wps>
 
 <rwps>
@@ -206,6 +220,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
+ui viewport: -
+remote ui viewport: -
 </wps>
 
 <rwps>
@@ -228,6 +244,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
+ui viewport: -
+remote ui viewport: -
 </wps>
 
 <rwps>
@@ -261,6 +279,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
+ui viewport: -
+remote ui viewport: -
 </wps>
 
 <wps>
@@ -352,6 +372,10 @@ viewers iconset.240x400x16: /.rockbox/icons/tango_small_viewers.bmp
 
 # Whether the WPS is designed to have the statusbar on or off
 Statusbar: top
+
+# list & remote ui viewports
+ui viewport: -
+remote ui viewport: -
 </wps>
 
 <rwps>

@@ -37,6 +37,7 @@
 #include "lcd-remote.h"
 #include "backdrop.h"
 #include "exported_menus.h"
+#include "appevents.h"
 
 #if LCD_DEPTH > 1
 /**
@@ -47,6 +48,7 @@ static int clear_main_backdrop(void)
     global_settings.backdrop_file[0]=0;
     backdrop_unload(BACKDROP_MAIN);
     backdrop_show(BACKDROP_MAIN);
+    send_event(GUI_EVENT_REFRESH, NULL);
     settings_save();
     return 0;
 }

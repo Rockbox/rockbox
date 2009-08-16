@@ -100,6 +100,7 @@
 #if CONFIG_RTC == RTC_PCF50605
 #include "pcf50605.h"
 #endif
+#include "appevents.h"
 
 #if CONFIG_CPU == DM320 || CONFIG_CPU == S3C2440 || CONFIG_CPU == TCC7801 \
     || CONFIG_CPU == IMX31L || CONFIG_CPU == AS3525 || CONFIG_CPU == JZ4732
@@ -2790,6 +2791,7 @@ static int menu_action_callback(int btn, struct gui_synclist *lists)
         int oldbars = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
         menuitems[gui_synclist_get_sel_pos(lists)].function();
         btn = ACTION_REDRAW;
+        send_event(GUI_EVENT_REFRESH, NULL);
         viewportmanager_set_statusbar(oldbars);
     }
     return btn;

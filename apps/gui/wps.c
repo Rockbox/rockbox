@@ -565,6 +565,7 @@ static void gwps_leave_wps(void)
     /* Play safe and unregister the hook */
     lcd_activation_set_hook(NULL);
 #endif
+    send_event(GUI_EVENT_REFRESH, NULL);
 }
 
 void gwps_draw_statusbars(void)

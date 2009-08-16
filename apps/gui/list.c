@@ -55,29 +55,37 @@ static int offset_step = 16; /* pixels per screen scroll step */
 /* should lines scroll out of the screen */
 static bool offset_out_of_view = false;
 #endif
-static int force_list_reinit = false;
 
 static void gui_list_select_at_offset(struct gui_synclist * gui_list,
                                       int offset);
 void list_draw(struct screen *display, struct gui_synclist *list);
 
 #ifdef HAVE_LCD_BITMAP
-static struct viewport parent[NB_SCREENS];
-void list_init_viewports(struct gui_synclist *list)
+static void list_init_viewports(struct gui_synclist *list)
 {
+    struct viewport* vp;
     int i;
-    struct viewport *vp;
-    FOR_NB_SCREENS(i)
+    bool parent_used = (*list->parent != NULL);
+    if (!parent_used)
     {
-        vp = &parent[i];
-        if (!list || list->parent[i] == vp)
-            viewport_set_defaults(vp, i);
+        vp = viewport_get_current_vp();
+        FOR_NB_SCREENS(i)
+            list->parent[i] = &vp[i];
     }
 #ifdef HAVE_BUTTONBAR
-    if (list && (list->parent[0] == &parent[0]) && global_settings.buttonbar)
+    if (list && !parent_used[SCREEN_MAIN] && global_settings.buttonbar)
         list->parent[0]->height -= BUTTONBAR_HEIGHT;
 #endif
-    force_list_reinit = false;
+}
+#else
+#define list_init_viewports(a)
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+bool list_display_title(struct gui_synclist *list, enum screen_type screen)
+{
+    return list->title != NULL &&
+        viewport_get_nb_lines(list->parent[screen])>2;
 }
 #else
 static struct viewport parent[NB_SCREENS] =
@@ -90,20 +98,6 @@ static struct viewport parent[NB_SCREENS] =
         .height   = LCD_HEIGHT
     },
 };
-void list_init_viewports(struct gui_synclist *list)
-{
-    (void)list;
-    force_list_reinit = false;
-}
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-bool list_display_title(struct gui_synclist *list, enum screen_type screen)
-{
-    return list->title != NULL &&
-        viewport_get_nb_lines(list->parent[screen])>2;
-}
-#else
 #define list_display_title(l, i) false
 #endif
 
@@ -141,9 +135,12 @@ void gui_synclist_init(struct gui_synclist * gui_list,
         if (list_parent)
             gui_list->parent[i] = &list_parent[i];
         else
-        {
-            gui_list->parent[i] = &parent[i];
-        }
+            gui_list->parent[i] =
+#ifdef HAVE_LCD_BITMAP
+                                    NULL;
+#else
+                                    &parent[i];
+#endif
     }
     list_init_viewports(gui_list);
     gui_list->limit_scroll = false;
@@ -162,7 +159,6 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_list->title_color = -1;
     gui_list->callback_get_item_color = NULL;
 #endif
-    force_list_reinit = true;
 }
 
 /* this toggles the selection bar or cursor */
@@ -218,7 +214,7 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
 #ifdef HAVE_BUTTONBAR
     static bool last_buttonbar = false;
 #endif
-    if (force_list_reinit ||
+    if (
 #ifdef HAVE_BUTTONBAR
         last_buttonbar != screens[SCREEN_MAIN].has_buttonbar ||
 #endif
@@ -436,7 +432,6 @@ void gui_synclist_set_title(struct gui_synclist * gui_list,
     } else {
         gui_list->title_width = 0;
     }
-    force_list_reinit = true;
 }
 
 
