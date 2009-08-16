@@ -12429,10 +12429,10 @@
     *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "Interdire le changement de piste"
+    *: "Empêcher le changement de piste"
   </dest>
   <voice>
-    *: "Interdire le changement de piste"
+    *: "Empêcher le changement de piste"
   </voice>
 </phrase>
 <phrase>
