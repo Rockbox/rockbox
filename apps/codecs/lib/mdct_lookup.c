@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: mdct_lookup.c 21701 2009-07-07 13:36:34Z  $
+ * $Id$
  *
  * Copyright (C) 2009 Michael Giacomelli
  *
