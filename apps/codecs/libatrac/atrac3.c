@@ -64,7 +64,7 @@ static inline int16_t av_clip_int16(int a)
     else                    return a;
 }
 
-static int32_t          qmf_window[48];
+static int32_t          qmf_window[48] IBSS_ATTR;
 static VLC              spectral_coeff_tab[7];
 static channel_unit     channel_units[2];
 /**
