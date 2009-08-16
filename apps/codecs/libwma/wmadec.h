@@ -21,7 +21,7 @@
 #define _WMADEC_H
 
 #include "asf.h"
-#include "ffmpeg_bitstream.h" /* For GetBitContext */
+#include "bitstream.h" /* For GetBitContext */
 #include "types.h"
 //#include "dsputil.h"  /* For MDCTContext */
 
