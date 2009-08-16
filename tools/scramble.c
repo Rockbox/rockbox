@@ -304,8 +304,6 @@ int main (int argc, char** argv)
             modelnum = 45;
         else if (!strcmp(&argv[1][5], "747p"))
             modelnum = 54;
-        else if (!strcmp(&argv[1][5], "x777"))
-            modelnum = 61;
         else if (!strcmp(&argv[1][5], "y820")) /* Samsung YH-820 */
             modelnum = 57;
         else if (!strcmp(&argv[1][5], "y920")) /* Samsung YH-920 */
@@ -314,6 +312,10 @@ int main (int argc, char** argv)
             modelnum = 59;
         else if (!strcmp(&argv[1][5], "clv2")) /* Sansa Clipv2 */
             modelnum = 60;
+        else if (!strcmp(&argv[1][5], "x777"))
+            modelnum = 61;
+        else if (!strcmp(&argv[1][5], "x767"))
+            modelnum = 64;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

@@ -2148,7 +2148,7 @@ fi
     ;;
     
     120|ondavx747)
-    target_id=44
+    target_id=45
     modelname="ondavx747"
     target="-DONDA_VX747"
     memory=16
@@ -2170,7 +2170,7 @@ fi
     ;;
     
     121|ondavx767)
-    target_id=45
+    target_id=64
     modelname="ondavx767"
     target="-DONDA_VX767"
     memory=16 #FIXME

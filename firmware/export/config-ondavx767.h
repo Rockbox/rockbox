@@ -31,7 +31,7 @@
 #define MODEL_NAME  "Onda VX767"
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 36
+#define MODEL_NUMBER 64
 
 //#define HAVE_ATA_SD
 //#define HAVE_HOTSWAP
