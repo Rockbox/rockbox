@@ -121,9 +121,6 @@ struct align_pos {
 /* The image buffer is big enough to store one full-screen native bitmap,
    plus two full-screen mono bitmaps. */
 
-#define IMG_BUFSIZE ((LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8) \
-                   + (2*LCD_HEIGHT*LCD_WIDTH/8))
-
 #define WPS_MAX_VIEWPORTS   24
 #define WPS_MAX_LINES       ((LCD_HEIGHT/5+1) * 2)
 #define WPS_MAX_SUBLINES    (WPS_MAX_LINES*3)
