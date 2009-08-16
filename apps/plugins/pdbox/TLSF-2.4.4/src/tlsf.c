@@ -861,7 +861,8 @@ void *realloc_ex(void *ptr, size_t new_size, void *mem_pool)
         }
     }
 
-    ptr_aux = malloc_ex(new_size, mem_pool);
+    if (!(ptr_aux = malloc_ex(new_size, mem_pool)))
+        return NULL;
 
     cpsize = ((b->size & BLOCK_SIZE) > new_size) ? new_size : (b->size & BLOCK_SIZE);
 
