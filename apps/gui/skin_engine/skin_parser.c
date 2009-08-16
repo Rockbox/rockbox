@@ -884,6 +884,7 @@ static int parse_progressbar(const char *wps_bufptr,
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr)-1;
 #else
+    (void)token;
 
     if (*(wps_bufptr-1) == 'f')
         wps_data->full_line_progressbar = true;

@@ -476,6 +476,7 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 
     return true;
 }
+#ifdef HAVE_LCD_BITMAP
 struct gui_img* find_image(int n, struct wps_data *data)
 {
     struct skin_token_list *list = data->images;
@@ -487,7 +488,8 @@ struct gui_img* find_image(int n, struct wps_data *data)
         list = list->next;
     }
     return NULL;
-}    
+}   
+#endif 
             
     
 /* Read a (sub)line to the given alignment format buffer.
