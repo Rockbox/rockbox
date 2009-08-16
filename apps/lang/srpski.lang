@@ -11974,19 +11974,16 @@
 </phrase>
 <phrase>
   id: LANG_ALBUMART
-  desc: Display the expected AA size
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    albumart: "Album Art:"
   </source>
   <dest>
     *: none
-    albumart: "Омот албума:"
   </dest>
   <voice>
     *: none
-    albumart: "Омот албума:"
   </voice>
 </phrase>
 <phrase>

@@ -12162,19 +12162,16 @@
 </phrase>
 <phrase>
   id: LANG_ALBUMART
-  desc: Display the expected AA size
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    albumart: "Album Art:"
   </source>
   <dest>
     *: none
-    albumart: "Album Art:"
   </dest>
   <voice>
     *: none
-    albumart: "Album Art:"
   </voice>
 </phrase>
 <phrase>
@@ -12658,5 +12655,19 @@
   <voice>
     *: none
     pitchscreen: "Rate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Skin RAM usage:"
+  </dest>
+  <voice>
+    *: "Skin RAM usage"
   </voice>
 </phrase>

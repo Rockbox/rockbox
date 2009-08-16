@@ -12016,19 +12016,16 @@
 </phrase>
 <phrase>
   id: LANG_ALBUMART
-  desc: Display the expected AA size
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    albumart: "Album Art:"
   </source>
   <dest>
     *: none
-    albumart: "Illustration album:"
   </dest>
   <voice>
     *: none
-    albumart: "Illustration album"
   </voice>
 </phrase>
 <phrase>

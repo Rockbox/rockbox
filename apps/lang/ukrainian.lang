@@ -12085,19 +12085,16 @@
 </phrase>
 <phrase>
   id: LANG_ALBUMART
-  desc: Display the expected AA size
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    albumart: "Album Art:"
   </source>
   <dest>
     *: none
-    albumart: "Обкладинка Альбому:"
   </dest>
   <voice>
     *: none
-    albumart: "Обкладинка Альбому:"
   </voice>
 </phrase>
 <phrase>
