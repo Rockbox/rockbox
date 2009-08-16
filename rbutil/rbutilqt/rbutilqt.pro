@@ -77,6 +77,7 @@ SOURCES += rbutilqt.cpp \
  base/autodetection.cpp \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
+ ../chinachippatcher/chinachip.c \
  browsedirtree.cpp \
  themesinstallwindow.cpp \
  base/uninstall.cpp \
@@ -103,6 +104,7 @@ SOURCES += rbutilqt.cpp \
  base/bootloaderinstallipod.cpp \
  base/bootloaderinstallsansa.cpp \
  base/bootloaderinstallfile.cpp \
+ base/bootloaderinstallchinachip.cpp \
  base/bootloaderinstallams.cpp \
  ../../tools/mkboot.c \
  ../../tools/iriver.c
@@ -129,6 +131,7 @@ HEADERS += rbutilqt.h \
  ../ipodpatcher/parttypes.h \
  ../sansapatcher/sansapatcher.h \
  ../sansapatcher/sansaio.h \
+ ../chinachippatcher/chinachip.h \
  irivertools/h100sums.h \ 
  irivertools/h120sums.h \
  irivertools/h300sums.h \
@@ -158,6 +161,7 @@ HEADERS += rbutilqt.h \
  base/bootloaderinstallipod.h \
  base/bootloaderinstallsansa.h \
  base/bootloaderinstallfile.h \
+ base/bootloaderinstallchinachip.h \
  base/bootloaderinstallams.h \
  ../../tools/mkboot.h \
  ../../tools/iriver.h 

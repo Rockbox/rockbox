@@ -45,6 +45,7 @@
 #include "bootloaderinstallipod.h"
 #include "bootloaderinstallsansa.h"
 #include "bootloaderinstallfile.h"
+#include "bootloaderinstallchinachip.h"
 #include "bootloaderinstallams.h"
 
 
@@ -659,6 +660,9 @@ void RbUtilQt::installBootloader()
     else if(type == "file") {
         bl = new BootloaderInstallFile(this);
     }
+    else if(type == "chinachip") {
+        bl = new BootloaderInstallChinaChip(this);
+    }
     else if(type == "ams") {
         bl = new BootloaderInstallAms(this);
     }
@@ -1212,4 +1216,5 @@ bool RbUtilQt::chkConfig(bool warn)
     }
     return error;
 }
+
 

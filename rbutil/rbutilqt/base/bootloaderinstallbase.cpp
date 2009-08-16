@@ -155,7 +155,8 @@ QString BootloaderInstallBase::postinstallHints(QString model)
 
     msg += "<ol>";
     msg += tr("<li>Safely remove your player.</li>");
-    if(model == "h100" || model == "h120" || model == "h300") {
+    if(model == "h100" || model == "h120" || model == "h300" ||
+       model == "ondavx747") {
         hint = true;
         msg += tr("<li>Reboot your player into the original firmware.</li>"
                 "<li>Perform a firmware upgrade using the update functionality "
