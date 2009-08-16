@@ -107,6 +107,7 @@ enum
 };
 
 enum {
+    CROSSFADE_ENABLE_OFF = 0,
     CROSSFADE_ENABLE_SHUFFLE,
     CROSSFADE_ENABLE_TRACKSKIP,
     CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP,
@@ -114,7 +115,7 @@ enum {
 };
 
 enum {
-    FOLDER_ADVANCE_OFF,
+    FOLDER_ADVANCE_OFF = 0,
     FOLDER_ADVANCE_NEXT,
     FOLDER_ADVANCE_RANDOM,
 };
@@ -122,7 +123,7 @@ enum {
 /* repeat mode options */
 enum
 {
-    REPEAT_OFF,
+    REPEAT_OFF = 0,
     REPEAT_ALL,
     REPEAT_ONE,
     REPEAT_SHUFFLE,
