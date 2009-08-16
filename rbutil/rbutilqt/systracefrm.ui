@@ -13,7 +13,7 @@
    <string>System Trace</string>
   </property>
   <layout class="QGridLayout" name="gridLayout" >
-   <item row="0" column="1" colspan="4" >
+   <item row="0" column="0" colspan="5" >
     <widget class="QLabel" name="label" >
      <property name="text" >
       <string>System State trace</string>
@@ -54,6 +54,10 @@
     <widget class="QPushButton" name="buttonSave" >
      <property name="text" >
       <string>&amp;Save</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="rbutilqt.qrc" >
+       <normaloff>:/icons/document-save.png</normaloff>:/icons/document-save.png</iconset>
      </property>
     </widget>
    </item>

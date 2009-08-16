@@ -289,7 +289,6 @@ void RbUtilQt::about()
     about.browserCredits->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
     QString title = QString("<b>The Rockbox Utility</b><br/>Version %1").arg(FULLVERSION);
     about.labelTitle->setText(title);
-    about.labelHomepage->setText("<a href='http://www.rockbox.org'>http://www.rockbox.org</a>");
 
     window->show();
 
