@@ -1,3 +1,2 @@
 atrac3.c
-fixp_math.c
 ../lib/ffmpeg_bitstream.c
