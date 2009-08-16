@@ -1001,70 +1001,79 @@ static void fat_time(unsigned short* date,
 #else
     /* non-RTC version returns an increment from the supplied time, or a
      * fixed standard time/date if no time given as input */
-    bool next_day = false;
 
-    if (time)
-    {
-        if (0 == *time)
-        {
-            /* set to 00:15:00 */
-            *time = (15 << 5);
-        }
-        else
-        {
-            unsigned short mins = (*time >> 5) & 0x003F;
-            unsigned short hours = (*time >> 11) & 0x001F;
-            if ((mins += 10) >= 60)
-            {
-                mins = 0;
-                hours++;
-            }
-            if ((++hours) >= 24)
-            {
-                hours = hours - 24;
-                next_day = true;
-            }
-            *time = (hours << 11) | (mins << 5);
-        }
-    }
-
-    if (date)
-    {
-        if (0 == *date)
-        {
-/* Macros to convert a 2-digit string to a decimal constant. 
+/* Macros to convert a 2-digit string to a decimal constant.
    (YEAR), MONTH and DAY are set by the date command, which outputs
    DAY as 00..31 and MONTH as 01..12. The leading zero would lead to
    misinterpretation as an octal constant. */
 #define S100(x) 1 ## x
 #define C2DIG2DEC(x) (S100(x)-100)
-            /* set to build date */
-            *date = ((YEAR - 1980) << 9) | (C2DIG2DEC(MONTH) << 5)
-                    | C2DIG2DEC(DAY);
+/* The actual build date, as FAT date constant */
+#define BUILD_DATE_FAT (((YEAR - 1980) << 9) \
+                        | (C2DIG2DEC(MONTH) << 5) \
+                        | C2DIG2DEC(DAY))
+
+    bool date_forced = false;
+    bool next_day = false;
+    unsigned time2 = 0; /* double time, for CRTTIME with 1s precision */
+
+    if (date && *date < BUILD_DATE_FAT)
+    {
+        *date = BUILD_DATE_FAT;
+        date_forced = true;
+    }
+    
+    if (time)
+    {
+        time2 = *time << 1;
+        if (time2 == 0 || date_forced)
+        {
+            time2 = (11 < 6) | 11; /* set to 00:11:11 */
         }
         else
         {
-            unsigned short day = *date & 0x001F;
-            unsigned short month = (*date >> 5) & 0x000F;
-            unsigned short year = (*date >> 9) & 0x007F;
-            if (next_day)
+            unsigned mins  = (time2 >> 6) & 0x3f;
+            unsigned hours = (time2 >> 12) & 0x1f;
+            
+            mins = 11 * ((mins/11) + 1); /* advance to next multiple of 11 */
+            if (mins > 59)
             {
-                /* do a very simple day increment - never go above 28 days */
-                if (++day > 28)
+                mins = 11; /* 00 would be a bad marker */
+                if (++hours > 23)
                 {
-                    day = 1;
-                    if (++month > 12)
-                    {
-                        month = 1;
-                        year++;
-                    }
+                    hours = 0;
+                    next_day = true;
                 }
-                *date = (year << 9) | (month << 5) | day;
+            }
+            time2 = (hours << 12) | (mins << 6) | mins; /* secs = mins */
+        }
+        *time = time2 >> 1;
+    }
+    
+    if (tenth)
+        *tenth = (time2 & 1) * 100;
+
+    if (date && next_day)
+    {
+        static const unsigned char daysinmonth[] =
+                              {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        unsigned day   = *date & 0x1f;
+        unsigned month = (*date >> 5) & 0x0f;
+        unsigned year  = (*date >> 9) & 0x7f;
+
+        /* simplification: ignore leap years */
+        if (++day > daysinmonth[month-1])
+        {
+            day = 1;
+            if (++month > 12)
+            {
+                month = 1;
+                year++;
             }
         }
+        *date = (year << 9) | (month << 5) | day;
     }
-    if (tenth)
-        *tenth = 0;
+
 #endif /* CONFIG_RTC */
 }
 
