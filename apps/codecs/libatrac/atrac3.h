@@ -27,6 +27,7 @@ typedef struct {
     gain_block        gainBlock[2];
 
     int32_t           spectrum[1024] __attribute__((aligned(16)));
+    int32_t           IMDCT_buf[1024] __attribute__((aligned(16)));
 
     int32_t           delayBuf1[46]; ///<qmf delay buffers
     int32_t           delayBuf2[46];
