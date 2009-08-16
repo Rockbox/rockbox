@@ -33,20 +33,37 @@
  * tokens for both/all screens.
  * 
  * This is mostly just copy/paste from firmware/buffer.c
+ *
+ *
+ * MAIN_ and REMOTE_BUFFER are just for reasonable size calibration,
+ * both screens can use the whole buffer as they need; it's not split
+ * between screens
  */
 
-#define IMG_BUFSIZE (((LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8) \
-                        + (2*LCD_HEIGHT*LCD_WIDTH/8)) * NB_SCREENS)
-                        
-static unsigned char buffer_start[IMG_BUFSIZE], *buffer_pos = NULL;
-static size_t buf_size = IMG_BUFSIZE;
+
+#define MAIN_BUFFER ((LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8) \
+                            + (2*LCD_HEIGHT*LCD_WIDTH/8))
+
+#if (NB_SCREENS > 1)
+#define REMOTE_BUFFER ((LCD_REMOTE_HEIGHT*LCD_REMOTE_WIDTH*LCD_REMOTE_DEPTH/8) \
+                            + (2*LCD_REMOTE_HEIGHT*LCD_REMOTE_WIDTH/8))
+#else
+#define REMOTE_BUFFER 0
+#endif
+
+
+#define SKIN_BUFFER_SIZE (MAIN_BUFFER + REMOTE_BUFFER)
+
+
+static unsigned char buffer_start[SKIN_BUFFER_SIZE], *buffer_pos = NULL;
+static size_t buf_size = SKIN_BUFFER_SIZE;
 
 void skin_buffer_init(void)
 {
 #if 0 /* this will go in again later probably */
     if (buffer_start == NULL)
     {
-        buf_size = IMG_BUFSIZE;/* global_settings.skin_buf_size */
+        buf_size = SKIN_BUFFER_SIZE;/* global_settings.skin_buf_size */
             
         buffer_start = buffer_alloc(buf_size);
         buffer_pos = buffer_start;
