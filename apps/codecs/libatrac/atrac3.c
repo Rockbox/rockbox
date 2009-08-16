@@ -665,17 +665,18 @@ static int decodeChannelSoundUnit (GetBitContext *gb, channel_unit *pSnd, int32_
     if (lastTonal >= 0)
         numBands = FFMAX((lastTonal + 256) >> 8, numBands);
 
-
+    
     /* Reconstruct time domain samples. */
     for (band=0; band<4; band++) {
+        int32_t IMDCT_buf[1024];
         /* Perform the IMDCT step without overlapping. */
         if (band <= numBands) {
-            IMLT(&(pSnd->spectrum[band*256]), pSnd->IMDCT_buf, band&1);
+            IMLT(&(pSnd->spectrum[band*256]), IMDCT_buf, band&1);
         } else
-            memset(pSnd->IMDCT_buf, 0, 512 * sizeof(int32_t));
+            memset(IMDCT_buf, 0, 512 * sizeof(int32_t));
 
         /* gain compensation and overlapping */
-        gainCompensateAndOverlap (pSnd->IMDCT_buf, &(pSnd->prevFrame[band*256]), &(pOut[band*256]),
+        gainCompensateAndOverlap (IMDCT_buf, &(pSnd->prevFrame[band*256]), &(pOut[band*256]),
                                     &((pSnd->gainBlock[1 - (pSnd->gcBlkSwitch)]).gBlock[band]),
                                     &((pSnd->gainBlock[pSnd->gcBlkSwitch]).gBlock[band]));
     }
