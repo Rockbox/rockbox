@@ -254,8 +254,7 @@ struct wps_data
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-    struct touchregion touchregion[MAX_TOUCHREGIONS];
-    short touchregion_count;
+    struct skin_token_list *touchregions;
 #endif
     
 #ifdef HAVE_REMOTE_LCD

@@ -577,17 +577,20 @@ int wps_get_touchaction(struct wps_data *data)
     short x,y;
     short vx, vy;
     int type = action_get_touchscreen_press(&x, &y);
-    int i;
     static int last_action = ACTION_NONE;
     struct touchregion *r;
     bool repeated = (type == BUTTON_REPEAT);
     bool released = (type == BUTTON_REL);
-    for (i=0; i<data->touchregion_count; i++)
+    struct skin_token_list *regions = data->touchregions;
+    while (regions)
     {
-        r = &data->touchregion[i];
+        r = (struct touchregion *)regions->token->value.data;
         /* make sure this region's viewport is visible */
         if (r->wvp->hidden_flags&VP_DRAW_HIDDEN)
+        {
+            regions = regions->next;
             continue;
+        }
         /* reposition the touch inside the viewport */    
         vx = x - r->wvp->vp.x;
         vy = y - r->wvp->vp.y;
@@ -644,6 +647,7 @@ int wps_get_touchaction(struct wps_data *data)
                 }
             }    
         }
+        regions = regions->next;
     }
 
     if ((last_action == ACTION_WPS_SEEKBACK || last_action == ACTION_WPS_SEEKFWD))

@@ -356,7 +356,7 @@ static const struct wps_tag all_tags[] = {
 };
 
 
-/* add a wpsll item to the list chain. ALWAYS appended because some of the 
+/* add a skin_token_list item to the list chain. ALWAYS appended because some of the 
  * chains require the order to be kept.
  */
 static void add_to_ll_chain(struct skin_token_list **list, struct skin_token_list *item)
@@ -373,6 +373,8 @@ static void add_to_ll_chain(struct skin_token_list **list, struct skin_token_lis
 }     
 /* create and init a new wpsll item.
  * passing NULL to token will alloc a new one.
+ * You should only pass NULL for the token when the token type (table above)
+ * is WPS_NO_TOKEN which means it is not stored automatically in the skins token array
  */
 static struct skin_token_list *new_skin_token_list_item(struct wps_token *token,
                                                         void* token_data)
@@ -1102,7 +1104,7 @@ static int parse_touchregion(const char *wps_bufptr,
 {
     (void)token;
     unsigned i, imax;
-    struct touchregion *region;
+    struct touchregion *region = NULL;
     const char *ptr = wps_bufptr;
     const char *action;
     const char pb_string[] = "progressbar";
@@ -1127,7 +1129,7 @@ static int parse_touchregion(const char *wps_bufptr,
     */
 
 
-    if ((wps_data->touchregion_count +1 >= MAX_TOUCHREGIONS) || (*ptr != '|'))
+    if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
     ptr++;
 
@@ -1138,8 +1140,11 @@ static int parse_touchregion(const char *wps_bufptr,
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
         
+    region = skin_buffer_alloc(sizeof(struct touchregion));
+    if (!region)
+        return WPS_ERROR_INVALID_PARAM;
+        
     /* should probably do some bounds checking here with the viewport... but later */
-    region = &wps_data->touchregion[wps_data->touchregion_count];
     region->action = ACTION_NONE;
     region->x = x;
     region->y = y;
@@ -1180,8 +1185,10 @@ static int parse_touchregion(const char *wps_bufptr,
         if (region->action == ACTION_NONE)
             return WPS_ERROR_INVALID_PARAM;
     }
-
-    wps_data->touchregion_count++;
+    struct skin_token_list *item = new_skin_token_list_item(NULL, region);
+    if (!item)
+        return WPS_ERROR_INVALID_PARAM;
+    add_to_ll_chain(&wps_data->touchregions, item);
     return skip_end_of_line(wps_bufptr); 
 }               
 #endif        
