@@ -12613,3 +12613,17 @@
     pitchscreen: "Taux"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Tampon écrans de lecture:"
+  </dest>
+  <voice>
+    *: "Tampon des écrans de lecture"
+  </voice>
+</phrase>
