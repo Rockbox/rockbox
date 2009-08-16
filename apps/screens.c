@@ -517,7 +517,8 @@ bool set_time_screen(const char* title, struct tm *tm)
     unsigned int statusbar_height = 0;
     unsigned int separator_width, weekday_width;
     unsigned int prev_line_height;
-    int daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    static unsigned char daysinmonth[] = 
+                              {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     unsigned char buffer[20];
     struct viewport vp[NB_SCREENS];
     int nb_lines;
