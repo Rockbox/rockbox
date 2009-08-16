@@ -244,6 +244,12 @@ struct settings_list;
 void reset_setting(const struct settings_list *setting, void *var);
 void settings_reset(void);
 void sound_settings_apply(void);
+
+/* call this after loading a .wps/.rwps pr other skin files, so that the
+ * skin buffer is reset properly
+ */
+void settings_apply_skins(void);
+
 void settings_apply(bool read_disk);
 void settings_apply_pm_range(void);
 void settings_display(void);

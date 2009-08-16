@@ -724,6 +724,41 @@ void sound_settings_apply(void)
 #endif
 }
 
+
+
+/* call this after loading a .wps/.rwps pr other skin files, so that the
+ * skin buffer is reset properly
+ */
+void settings_apply_skins(void)
+{
+    char buf[MAX_PATH];
+    /* re-initialize the skin buffer before we start reloading skins */
+    skin_buffer_init();
+    if ( global_settings.wps_file[0] &&
+        global_settings.wps_file[0] != 0xff ) {
+        snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
+                global_settings.wps_file);
+        wps_data_load(SCREEN_MAIN, buf, true);
+    }
+    else
+    {
+        wps_data_init(SCREEN_MAIN);
+        wps_data_load(SCREEN_MAIN, NULL, true);
+    }
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
+    if ( global_settings.rwps_file[0]) {
+        snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
+                global_settings.rwps_file);
+        wps_data_load(SCREEN_REMOTE, buf, true);
+    }
+    else
+    {
+        wps_data_init(SCREEN_REMOTE);
+        wps_data_load(SCREEN_REMOTE, NULL, true);
+    }
+#endif
+}
+
 void settings_apply(bool read_disk)
 {
     char buf[64];
@@ -819,8 +854,6 @@ void settings_apply(bool read_disk)
 
     if (read_disk)
     {
-        /* re-initialize the skin buffer before we start reloading skins */
-        skin_buffer_init();
         
 #ifdef HAVE_LCD_BITMAP
         /* fonts need to be loaded before the WPS */
@@ -842,17 +875,6 @@ void settings_apply(bool read_disk)
             load_kbd(NULL);
 #endif
 
-        if ( global_settings.wps_file[0] &&
-            global_settings.wps_file[0] != 0xff ) {
-            snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
-                    global_settings.wps_file);
-            wps_data_load(SCREEN_MAIN, buf, true);
-        }
-        else
-        {
-            wps_data_init(SCREEN_MAIN);
-            wps_data_load(SCREEN_MAIN, NULL, true);
-        }
 
 #if LCD_DEPTH > 1
         if ( global_settings.backdrop_file[0] &&
@@ -868,24 +890,16 @@ void settings_apply(bool read_disk)
         FOR_NB_SCREENS(screen)
             screens[screen].backdrop_show(BACKDROP_MAIN);
 
-#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-        if ( global_settings.rwps_file[0]) {
-            snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
-                    global_settings.rwps_file);
-            wps_data_load(SCREEN_REMOTE, buf, true);
-        }
-        else
-        {
-            wps_data_init(SCREEN_REMOTE);
-            wps_data_load(SCREEN_REMOTE, NULL, true);
-        }
-#endif
         if ( global_settings.lang_file[0]) {
             snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
                      global_settings.lang_file);
             lang_load(buf);
             talk_init(); /* use voice of same language */
         }
+
+        /* reload wpses */
+        settings_apply_skins();
+
         /* load the icon set */
         icons_init();
 

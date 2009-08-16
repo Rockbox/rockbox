@@ -487,6 +487,7 @@ int ft_enter(struct tree_context* c)
                 wps_data_load(SCREEN_MAIN, buf, true);
                 set_file(buf, (char *)global_settings.wps_file,
                          MAX_FILENAME);
+                settings_apply_skins();
                 break;
 
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
@@ -499,6 +500,7 @@ int ft_enter(struct tree_context* c)
                 wps_data_load(SCREEN_REMOTE, buf, true);
                 set_file(buf, (char *)global_settings.rwps_file,
                          MAX_FILENAME);
+                settings_apply_skins();
                 break;
 #endif
 
