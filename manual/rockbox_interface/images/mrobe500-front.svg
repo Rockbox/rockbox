@@ -32,13 +32,13 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.43415836"
+     inkscape:zoom="0.69"
      inkscape:cx="490"
-     inkscape:cy="377.69669"
+     inkscape:cy="343.53542"
      inkscape:current-layer="layer1"
      id="namedview3188"
      showgrid="false"
-     inkscape:window-width="640"
+     inkscape:window-width="925"
      inkscape:window-height="661"
      inkscape:window-x="1440"
      inkscape:window-y="367" />
@@ -93,5 +93,29 @@
        inkscape:export-filename="/home/kkurbjun/Projects/rockbox/uisimulator/sdl/UI-mrobe500.png"
        inkscape:export-xdpi="89.462585"
        inkscape:export-ydpi="89.462585" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:100%;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L;-inkscape-font-specification:URW Palladio L Medium"
+       x="182.6087"
+       y="103.51478"
+       id="text2391"
+       sodipodi:linespacing="100%"><tspan
+         sodipodi:role="line"
+         id="tspan2393"
+         x="182.6087"
+         y="103.51478"
+         style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;font-family:URW Palladio L;-inkscape-font-specification:URW Palladio L Medium">Power</tspan></text>
+    <rect
+       style="fill:#999999;fill-opacity:1;stroke:none;stroke-width:3.74399996000000002;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2395"
+       width="91.304344"
+       height="14.492754"
+       x="75.36232"
+       y="129.60173" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+       d="M 117.3913,122.35535 L 178.26087,94.81912"
+       id="path3167"
+       inkscape:connector-type="polyline" />
   </g>
 </svg>
