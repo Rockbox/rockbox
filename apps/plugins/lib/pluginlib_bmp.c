@@ -35,8 +35,8 @@
  */
 int save_bmp_file( char* filename, struct bitmap *bm )
 {
-    /* I'm not really sure about this one :) */
-    int line_width = bm->width*3+((bm->width*3)%4?4-((bm->width*3)%4):0);
+    int line_width = (bm->width*3+3) & ~3;
+    int padsize = line_width - bm->width*3;
 
     const unsigned char header[] =
     {
@@ -77,10 +77,10 @@ int save_bmp_file( char* filename, struct bitmap *bm )
             };
             rb->write( fh, c, 3 );
         }
-        for( x = 0; x < 3*bm->width - line_width; x++ )
+        if(padsize != 0)
         {
-            unsigned char c = 0;
-            rb->write( fh, &c, 1 );
+            unsigned int c = 0; /* padsize is at most 3. */
+            rb->write( fh, &c, padsize );
         }
     }
     rb->close( fh );
