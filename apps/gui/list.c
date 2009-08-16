@@ -73,7 +73,7 @@ static void list_init_viewports(struct gui_synclist *list)
             list->parent[i] = &vp[i];
     }
 #ifdef HAVE_BUTTONBAR
-    if (list && !parent_used[SCREEN_MAIN] && global_settings.buttonbar)
+    if (list && !parent_used && global_settings.buttonbar)
         list->parent[0]->height -= BUTTONBAR_HEIGHT;
 #endif
 }
