@@ -604,7 +604,9 @@ const struct settings_list settings[] = {
                   gui_statusbar_changed, 3, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
                   ID2P(LANG_STATUSBAR_BOTTOM)),
 #endif
-    OFFON_SETTING(0,scrollbar, LANG_SCROLL_BAR, true,"scrollbar", NULL),
+    OFFON_SETTING(0,scrollbar, LANG_SCROLL_BAR, true, "scrollbar", NULL),
+    INT_SETTING(0, scrollbar_width, LANG_SCROLLBAR_WIDTH, 6, "scrollbar width",
+                UNIT_INT, 3, LCD_WIDTH/10, 1, NULL, NULL, NULL),
 #if CONFIG_KEYPAD == RECORDER_PAD
     OFFON_SETTING(0,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),
 #endif
@@ -1550,9 +1552,6 @@ const struct settings_list settings[] = {
     VIEWPORT_SETTING(remote_ui_vp_config, "remote ui viewport"),
 #endif
 #endif
-
-    INT_SETTING(0, scrollbar_width, LANG_SCROLLBAR_WIDTH, 6, "scrollbar width",
-                UNIT_INT, 6, 20, 1, NULL, NULL, NULL),
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

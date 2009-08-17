@@ -37,6 +37,8 @@ PLUGIN_HEADER
 #define TOP_SECTOR     buffer
 #define MID_SECTOR     (buffer + SMALL_BLOCK_SIZE)
 #define BOTTOM_SECTOR  (buffer + 2*(SMALL_BLOCK_SIZE))
+#undef SCROLLBAR_WIDTH
+#define SCROLLBAR_WIDTH rb->global_settings->scrollbar_width
 
 #define MAX_BOOKMARKED_FILES ((buffer_size/(signed)sizeof(struct bookmarked_file_info))-1)
 
