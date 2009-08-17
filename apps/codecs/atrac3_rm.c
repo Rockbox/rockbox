@@ -28,7 +28,7 @@ CODEC_HEADER
 
 RMContext rmctx;
 RMPacket pkt;
-ATRAC3Context q;
+ATRAC3Context q IBSS_ATTR;
 
 static void init_rm(RMContext *rmctx)
 {
