@@ -26,7 +26,7 @@
 #include "icon.h"
 #include "screen_access.h"
 
-#define SCROLLBAR_WIDTH 6
+#define SCROLLBAR_WIDTH global_settings.scrollbar_width
 
 enum list_wrap {
     LIST_WRAP_ON = 0,

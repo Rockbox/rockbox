@@ -12671,3 +12671,17 @@
     *: "Skin RAM usage"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: "Scroll Bar Width"
+  </dest>
+  <voice>
+    *: "Scroll bar width"
+  </voice>
+</phrase>

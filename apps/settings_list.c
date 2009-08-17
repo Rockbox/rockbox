@@ -1550,6 +1550,9 @@ const struct settings_list settings[] = {
     VIEWPORT_SETTING(remote_ui_vp_config, "remote ui viewport"),
 #endif
 #endif
+
+    INT_SETTING(0, scrollbar_width, LANG_SCROLLBAR_WIDTH, 6, "scrollbar width",
+                UNIT_INT, 6, 20, 1, NULL, NULL, NULL),
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

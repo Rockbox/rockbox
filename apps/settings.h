@@ -769,6 +769,7 @@ struct user_settings
     unsigned char remote_ui_vp_config[64]; /* viewport string for the remote lists */
 #endif
 #endif
+    int scrollbar_width;
 };
 
 /** global variables **/

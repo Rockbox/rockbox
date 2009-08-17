@@ -329,8 +329,9 @@ MENUITEM_SETTING(buttonbar, &global_settings.buttonbar, NULL);
 #endif
 MENUITEM_SETTING(volume_type, &global_settings.volume_type, NULL);
 MENUITEM_SETTING(battery_display, &global_settings.battery_display, NULL);
+MENUITEM_SETTING(scrollbar_width, &global_settings.scrollbar_width, NULL);
 MAKE_MENU(bars_menu, ID2P(LANG_BARS_MENU), 0, Icon_NOICON,
-          &scrollbar_item, &statusbar,
+          &scrollbar_item, &scrollbar_width, &statusbar,
 #ifdef HAVE_REMOTE_LCD
           &remote_statusbar,
 #endif  
