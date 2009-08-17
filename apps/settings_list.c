@@ -181,8 +181,8 @@
             {.custom_setting = (struct custom_setting[]){               \
         {load_from_cfg, write_to_cfg, is_change, set_default}}}}
 
-#define VIEWPORT_SETTING(var,name,default)      \
-        TEXT_SETTING(F_THEMESETTING,var,name,default, NULL, NULL)
+#define VIEWPORT_SETTING(var,name)      \
+        TEXT_SETTING(F_THEMESETTING,var,name,"-", NULL, NULL)
 
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
@@ -1545,9 +1545,9 @@ const struct settings_list settings[] = {
 
     /* Customizable list */
 #ifdef HAVE_LCD_BITMAP
-    VIEWPORT_SETTING(ui_vp_config, "ui viewport", ""),
+    VIEWPORT_SETTING(ui_vp_config, "ui viewport"),
 #ifdef HAVE_REMOTE_LCD
-    VIEWPORT_SETTING(remote_ui_vp_config, "remote ui viewport", ""),
+    VIEWPORT_SETTING(remote_ui_vp_config, "remote ui viewport"),
 #endif
 #endif
 };
