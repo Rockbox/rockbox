@@ -37,7 +37,6 @@ PLUGIN_HEADER
 #define TOP_SECTOR     buffer
 #define MID_SECTOR     (buffer + SMALL_BLOCK_SIZE)
 #define BOTTOM_SECTOR  (buffer + 2*(SMALL_BLOCK_SIZE))
-#define SCROLLBAR_WIDTH     6
 
 #define MAX_BOOKMARKED_FILES ((buffer_size/(signed)sizeof(struct bookmarked_file_info))-1)
 
