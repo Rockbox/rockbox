@@ -486,12 +486,14 @@ static int parse_image_display(const char *wps_bufptr,
         /* invalid picture display tag */
         return WPS_ERROR_INVALID_PARAM;
     }
+    /* sanity check */
+    img = find_image(n, wps_data);
+    if (!img)
+        return WPS_ERROR_INVALID_PARAM;
 
     if ((subimage = get_image_id(wps_bufptr[1])) != -1)
     {
-		img = find_image(n, wps_data);
-        /* Sanity check */
-        if (!img || subimage >= img->num_subimages)
+        if (subimage >= img->num_subimages)
             return WPS_ERROR_INVALID_PARAM;
 
         /* Store sub-image number to display in high bits */
