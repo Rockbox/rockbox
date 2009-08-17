@@ -195,12 +195,13 @@ if($lookaddr != 0)
     }
     close MAPFILE;
 
-    if($lookaddr >= $codec_addr && $lookaddr < $plugin_addr)
+    if($lookaddr >= $codec_addr && $lookaddr < $plugin_addr
+       && $codec_addr != 0)
     {
         # look for codec
         %match = dynamic_space("codec", \@codecs);
     }
-    elsif($lookaddr >= $plugin_addr)
+    elsif($lookaddr >= $plugin_addr && $plugin_addr != 0)
     {
         # look for plugin
         %match = dynamic_space("plugin", \@plugins);
