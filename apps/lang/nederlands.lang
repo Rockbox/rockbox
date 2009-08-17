@@ -12046,36 +12046,30 @@
 </phrase>
 <phrase>
   id: LANG_LEFT
-  desc: DEPRECATED
+  desc: Generic use of 'left'
   user: core
   <source>
-    *: none
-    quickscreen: ""
+    *: "Left"
   </source>
   <dest>
-    *: none
-    quickscreen: ""
+    *: "Links"
   </dest>
   <voice>
-    *: none
-    quickscreen: ""
+    *: "Links"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RIGHT
-  desc: DEPRECATED
+  desc: Generic use of 'right
   user: core
   <source>
-    *: none
-    quickscreen: ""
+    *: "Right"
   </source>
   <dest>
-    *: none
-    quickscreen: ""
+    *: "Rechts"
   </dest>
   <voice>
-    *: none
-    quickscreen: ""
+    *: "Rechts"
   </voice>
 </phrase>
 <phrase>
@@ -12579,5 +12573,33 @@
   </dest>
   <voice>
     *: "Bovenaan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: "Scrollbar breedte"
+  </dest>
+  <voice>
+    *: "Scroll bar breedte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: "Scrollbar positie"
+  </dest>
+  <voice>
+    *: "Scroll bar positie"
   </voice>
 </phrase>
