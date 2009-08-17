@@ -173,12 +173,12 @@
 #define UI_REMOTE_POSY              318 /* y position of remote lcd */
 #else
 #define UI_TITLE                    "Olympus M:Robe 500"
-#define UI_WIDTH                    900 /* width of GUI window */
-#define UI_HEIGHT                   748 /* height of GUI window */
-#define UI_LCD_POSX                 131 /* x position of lcd */
-#define UI_LCD_POSY                 59  /* y position of lcd */
-#define UI_REMOTE_POSX              165 /* x position of remote lcd */
-#define UI_REMOTE_POSY              718 /* y position of remote lcd */
+#define UI_WIDTH                    895 /* width of GUI window */
+#define UI_HEIGHT                   646 /* height of GUI window */
+#define UI_LCD_POSX                 129 /* x position of lcd */
+#define UI_LCD_POSY                 60  /* y position of lcd */
+#define UI_REMOTE_POSX              37 /* x position of remote lcd */
+#define UI_REMOTE_POSY              615 /* y position of remote lcd */
 #endif
 
 #elif defined(IRIVER_H10)
