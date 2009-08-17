@@ -24,9 +24,6 @@
 
 #include "lib/xlcd.h"
 
-/* Declare back- and foreground colors. */
-#define BGCOLOR (LCD_BLACK)
-#define FGCOLOR (LCD_WHITE)
 /* Button colors. */
 #define BTNCOLOR_DARK (LCD_DARKGRAY)
 #define BTNCOLOR_LIGHT (LCD_LIGHTGRAY)
@@ -37,6 +34,10 @@ extern bool quit;
 
 /* Screen multiplier. */
 static float screen_multiplier;
+
+/* Back- and foreground colors. */
+static unsigned bgcolor;
+static unsigned fgcolor;
 
 /* Displacement of the slanted corner in the contour of the number widget. */
 static int number_corner;
@@ -157,12 +158,17 @@ void pd_gui_init(void)
     screen_multiplier = ((float) LCD_WIDTH) / 160.0f;
     number_corner = 5 * screen_multiplier;
 
-    /* Set back- and foreground color. */
-    rb->lcd_set_background(BGCOLOR);
-    rb->lcd_set_foreground(FGCOLOR);
+    /* Get back- and foreground colors. */
+    bgcolor = rb->lcd_get_background();
+    fgcolor = rb->lcd_get_foreground();
 
     /* Clear background. */
     rb->lcd_clear_display();
+
+    /* Draw background of appropriate color. */
+    rb->lcd_set_foreground(bgcolor);
+    rb->lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    rb->lcd_set_foreground(fgcolor);
 
     /* Update display. */
     rb->lcd_update();
@@ -411,7 +417,7 @@ unsigned int pd_gui_load_patch(struct pd_widget* wg, unsigned int max_widgets)
 void pd_gui_draw_standard(void)
 {
     /* Draw main circle. */
-    rb->lcd_set_foreground(FGCOLOR);
+    rb->lcd_set_foreground(fgcolor);
     fillcircle(LCD_WIDTH / 2,
                LCD_HEIGHT / 2,
                2 * MIN(LCD_WIDTH, LCD_HEIGHT) / 5);
@@ -444,7 +450,7 @@ void pd_gui_draw_standard(void)
                    MIN(LCD_WIDTH, LCD_HEIGHT) / 8);
 
     /* Restore foreground color. */
-    rb->lcd_set_foreground(FGCOLOR);
+    rb->lcd_set_foreground(fgcolor);
 }
 
 /* Draw custom user interface. */
@@ -460,9 +466,9 @@ void pd_gui_draw_custom(struct pd_widget* wg, unsigned int widgets)
         {
             case PD_BANG:
                 /* Clear area to (re-)draw. */
-                rb->lcd_set_foreground(BGCOLOR);
+                rb->lcd_set_foreground(bgcolor);
                 rb->lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
-                rb->lcd_set_foreground(FGCOLOR);
+                rb->lcd_set_foreground(fgcolor);
                 /* Draw border (rectangle). */
                 rb->lcd_drawrect(wg->x, wg->y, wg->w, wg->h);
                 /* Draw button (circle), being filled depending on value. */
@@ -478,9 +484,9 @@ void pd_gui_draw_custom(struct pd_widget* wg, unsigned int widgets)
 
             case PD_VSLIDER:
                 /* Clear area to (re-)draw. */
-                rb->lcd_set_foreground(BGCOLOR);
+                rb->lcd_set_foreground(bgcolor);
                 rb->lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
-                rb->lcd_set_foreground(FGCOLOR);
+                rb->lcd_set_foreground(fgcolor);
                 /* Draw border. */
                 rb->lcd_drawrect(wg->x, wg->y, wg->w, wg->h);
                 /* Draw slider. */
@@ -491,9 +497,9 @@ void pd_gui_draw_custom(struct pd_widget* wg, unsigned int widgets)
 
             case PD_HSLIDER:
                 /* Clear area to (re-)draw. */
-                rb->lcd_set_foreground(BGCOLOR);
+                rb->lcd_set_foreground(bgcolor);
                 rb->lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
-                rb->lcd_set_foreground(FGCOLOR);
+                rb->lcd_set_foreground(fgcolor);
                 /* Draw border. */
                 rb->lcd_drawrect(wg->x, wg->y, wg->w, wg->h);
                 /* Draw slider. */
@@ -504,9 +510,9 @@ void pd_gui_draw_custom(struct pd_widget* wg, unsigned int widgets)
 
             case PD_HRADIO:
                 /* Clear area to (re-)draw. */
-                rb->lcd_set_foreground(BGCOLOR);
+                rb->lcd_set_foreground(bgcolor);
                 rb->lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
-                rb->lcd_set_foreground(FGCOLOR);
+                rb->lcd_set_foreground(fgcolor);
                 for(j = 0; j < wg->w / wg->h; j++)
                 {
                     /* Draw border. */
@@ -520,9 +526,9 @@ void pd_gui_draw_custom(struct pd_widget* wg, unsigned int widgets)
 
             case PD_VRADIO:
                 /* Clear area to (re-)draw. */
-                rb->lcd_set_foreground(BGCOLOR);
+                rb->lcd_set_foreground(bgcolor);
                 rb->lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
-                rb->lcd_set_foreground(FGCOLOR);
+                rb->lcd_set_foreground(fgcolor);
                 for(j = 0; j < wg->h / wg->w; j++)
                 {
                     /* Draw border. */
