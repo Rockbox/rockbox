@@ -770,6 +770,7 @@ struct user_settings
 #endif
 #endif
     int scrollbar_width;
+    bool scrollbar_position; /* true=left false=right */
 };
 
 /** global variables **/

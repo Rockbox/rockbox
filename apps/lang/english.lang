@@ -12224,36 +12224,30 @@
 </phrase>
 <phrase>
   id: LANG_LEFT
-  desc: DEPRECATED
+  desc: Generic use of 'left'
   user: core
   <source>
-    *: none
-    quickscreen: ""
+    *: "Left"
   </source>
   <dest>
-    *: none
-    quickscreen: ""
+    *: "Left"
   </dest>
   <voice>
-    *: none
-    quickscreen: ""
+    *: "Left"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RIGHT
-  desc: DEPRECATED
+  desc: Generic use of 'right
   user: core
   <source>
-    *: none
-    quickscreen: ""
+    *: "Right"
   </source>
   <dest>
-    *: none
-    quickscreen: ""
+    *: "Right"
   </dest>
   <voice>
-    *: none
-    quickscreen: ""
+    *: "Right"
   </voice>
 </phrase>
 <phrase>
@@ -12683,5 +12677,19 @@
   </dest>
   <voice>
     *: "Scroll bar width"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: "Scroll Bar Position"
+  </dest>
+  <voice>
+    *: "Scroll bar position"
   </voice>
 </phrase>

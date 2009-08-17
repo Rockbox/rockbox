@@ -130,10 +130,13 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         vp = list_text[screen];
         vp.width = SCROLLBAR_WIDTH;
         list_text[screen].width -= SCROLLBAR_WIDTH;
-        list_text[screen].x += SCROLLBAR_WIDTH;
+        if(global_settings.scrollbar_position) /* left */
+            list_text[screen].x += SCROLLBAR_WIDTH;
         vp.height = line_height *
                     viewport_get_nb_lines(&list_text[screen]);
         vp.x = parent->x;
+        if(!global_settings.scrollbar_position) /* right */
+            vp.x += list_text[screen].width;
         display->set_viewport(&vp);
         gui_scrollbar_draw(display, 0, 0, SCROLLBAR_WIDTH-1,
                            vp.height, list->nb_items,
@@ -144,8 +147,11 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     else if (show_title)
     {
         /* shift everything right a bit... */
-        list_text[screen].width -= SCROLLBAR_WIDTH;
-        list_text[screen].x += SCROLLBAR_WIDTH;
+        if(global_settings.scrollbar_position) /* left */
+        {
+            list_text[screen].width -= SCROLLBAR_WIDTH;
+            list_text[screen].x += SCROLLBAR_WIDTH;
+        }
     }
     
     /* setup icon placement */
@@ -284,6 +290,35 @@ void list_draw(struct screen *display, struct gui_synclist *list)
  */
 static bool scrolling=false;
 
+static int gui_synclist_touchscreen_scrollbar(struct gui_synclist * gui_list,
+                                              int y)
+{
+    int screen = screens[SCREEN_MAIN].screen_type;
+    int nb_lines = viewport_get_nb_lines(&list_text[screen]);
+    if (nb_lines <  gui_list->nb_items)
+    {
+        int scrollbar_size = nb_lines*
+            font_get(gui_list->parent[screen]->font)->height;
+        int actual_y = y - list_text[screen].y;
+
+        int new_selection = (actual_y * gui_list->nb_items)
+                / scrollbar_size;
+
+        int start_item = new_selection - nb_lines/2;
+        if(start_item < 0)
+            start_item = 0;
+        else if(start_item > gui_list->nb_items - nb_lines)
+            start_item = gui_list->nb_items - nb_lines;
+
+        gui_list->start_item[screen] = start_item;
+        gui_synclist_select_item(gui_list, new_selection);
+
+        return ACTION_REDRAW;
+    }
+
+    return ACTION_NONE;
+}
+
 unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
 {
     short x, y;
@@ -306,33 +341,15 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                 return ACTION_NONE;
         }
         /* Scroll bar */
-        else
-        {
-            int nb_lines = viewport_get_nb_lines(&list_text[screen]);
-            if (nb_lines <  gui_list->nb_items)
-            {
-                int scrollbar_size = nb_lines*
-                    font_get(gui_list->parent[screen]->font)->height;
-                int actual_y = y - list_text[screen].y;
-                
-                int new_selection = (actual_y * gui_list->nb_items)
-                        / scrollbar_size;
-                
-                int start_item = new_selection - nb_lines/2;
-                if(start_item < 0)
-                    start_item = 0;
-                else if(start_item > gui_list->nb_items - nb_lines)
-                    start_item = gui_list->nb_items - nb_lines;
-                    
-                gui_list->start_item[screen] = start_item;
-                gui_synclist_select_item(gui_list, new_selection);
-                
-                return ACTION_REDRAW;
-            }
-        }
+        else if(global_settings.scrollbar_position) /* left */
+            return gui_synclist_touchscreen_scrollbar(gui_list, y);
     }
     else
     {
+        if(x>list_text[screen].x+list_text[screen].width &&
+           !global_settings.scrollbar_position) /* right*/
+            return gui_synclist_touchscreen_scrollbar(gui_list, y);
+
         /* |--------------------------------------------------------|
          * | Description of the touchscreen list interface:         |
          * |--------------------------------------------------------|
