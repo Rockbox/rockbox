@@ -140,7 +140,9 @@
 #define HAVE_SW_TONE_CONTROLS
 
 /* has no volume control, so we use the software ones */
+#ifndef SIMULATOR
 #define HAVE_SW_VOLUME_CONTROL
+#endif
 
 /* software controlled volume ranges from -73 -> 0 dB, other than that
    is controlled by hardware */
