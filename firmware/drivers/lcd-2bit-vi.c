@@ -47,7 +47,7 @@
 
 /*** globals ***/
 
-FBFN(data) LCDFN(framebuffer)[LCDM(FBHEIGHT)][LCDM(FBWIDTH)] IBSS_ATTR;
+FBFN(data) LCDFN(framebuffer)[LCDM(FBHEIGHT)][LCDM(FBWIDTH)] IRAM_LCDFRAMEBUFFER;
 
 static const FBFN(data) patterns[4] = {0xFFFF, 0xFF00, 0x00FF, 0x0000};
 

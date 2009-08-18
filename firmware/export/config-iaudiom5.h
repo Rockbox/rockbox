@@ -192,3 +192,5 @@
 #define MIN_REMOTE_CONTRAST_SETTING     10
 #define MAX_REMOTE_CONTRAST_SETTING     35
 #define DEFAULT_REMOTE_CONTRAST_SETTING 24 /* Match boot contrast */
+
+#define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */

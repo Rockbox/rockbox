@@ -171,3 +171,5 @@
 #define MIN_CONTRAST_SETTING        10
 #define MAX_CONTRAST_SETTING        35
 #define DEFAULT_CONTRAST_SETTING    24
+
+#define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
