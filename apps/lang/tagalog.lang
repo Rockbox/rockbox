@@ -261,13 +261,13 @@
  <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
     player: "(PLAY/STOP)"
  </source>
  <dest>
     *: "PLAY = Oo"
     h100,h120,h300: "NAVI = Oo"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Oo"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Oo"
     player: "(PLAY/STOP)"
  </dest>
  <voice>
@@ -2367,21 +2367,19 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
  </source>
  <dest>
     *: "Gumawa database... %d found (OFF sa pagbalik)"
     h100,h120,h300: "Gumawa database... %d found (STOP sa pagbalik)"
     ipod*: "Gumawa database... %d found (PLAY/PAUSE sa pagbalik)"
     x5,m5,gigabeat*,mrobe100: "Gumawa database... %d found (LEFT sa pagbalik)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Gumawa database... %d found (PREV sa pagbalik)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Gumawa database... %d found (PREV sa pagbalik)"
+    sa9200: "Gumawa database... %d found (REW sa pagbalik)"
  </dest>
  <voice>
     *: "entries found for database"
-    h100,h120,h300: ""
-    ipod*: ""
-    x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200*,c200*,sa9200: ""
  </voice>
 </phrase>
 <phrase>
@@ -2561,7 +2559,7 @@
  user: core
  <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
  </source>
  <dest>
     *: none
@@ -2577,7 +2575,7 @@
  desc: in settings_menu()
  user: core
  <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
  </source>
  <dest>
     *: "Tumingin sa .wps salansan"
@@ -2592,7 +2590,7 @@
  user: core
  <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
  </source>
  <dest>
     *: none
@@ -4129,20 +4127,21 @@
  <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
+    sa9200: "PLAY = Set"
  </source>
  <dest>
     *: none
     rtc: "ON = Ilagay"
+    mrobe500: "HEART =Ilagay"
     h100,h120,h300: "NAVI = Ilagay"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Ilagay"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Ilagay"
+    sa9200: "PLAY = Ilagay"
  </dest>
  <voice>
     *: none
-    rtc: ""
-    h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: ""
  </voice>
 </phrase>
 <phrase>
@@ -4152,35 +4151,31 @@
  <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
+    ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
  </source>
  <dest>
     *: none
     rtc: "OFF = Mabalik"
+    mrobe500: "POWER = Mabalik"
     h100,h120,h300: "STOP = Mabalik"
-    ipod*,c200*,sa9200: "MENU = Mabalik"
+    ipod*,c200*: "MENU = Mabalik"
     x5,m5: "RECORD = Mabalik"
     h10,h10_5gb,e200*,fuze*: "PREV = Mabalik"
     gigabeatf: "POWER = Mabalik"
     mrobe100: "DISPLAY = Mabalik"
     gigabeats: "BACK = Mabalik"
+    sa9200: "LEFT = Mabalik"
  </dest>
  <voice>
     *: none
-    rtc: ""
-    h100,h120,h300: ""
-    ipod*,e200*,c200*,sa9200: ""
-    x5,m5: ""
-    h10,h10_5gb: ""
-    gigabeatf: ""
-    mrobe100: ""
-    gigabeats: ""
  </voice>
 </phrase>
 <phrase>
@@ -5107,7 +5102,7 @@
  desc: in the main menu
  user: core
  <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
  </source>
  <dest>
     *: "Pakita Tema"
@@ -12283,7 +12278,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_POINT
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12328,7 +12323,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_GRID
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12345,7 +12340,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_MODE
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12406,5 +12401,245 @@
   <voice>
     *: none
     swcodec: "Tulin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scroll bar position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Remote Statusbar"
+  </dest>
+  <voice>
+    *: none
+    remote: "Remote Statusbar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMITER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limiter Preamp"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limiter Preamp"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limiter Preamp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Rate"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Rate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Right"
+  </dest>
+  <voice>
+    *: "Right"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc:
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Semitone"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Semitone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Limit"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Limit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Calibrate"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Calibrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Reset Calibration"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Reset Calibration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scroll bar width"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Skin RAM usage:"
+  </dest>
+  <voice>
+    *: "Skin RAM usage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Bottom"
+  </dest>
+  <voice>
+    *: "Bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Left"
+  </dest>
+  <voice>
+    *: "Left"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Top"
+  </dest>
+  <voice>
+    *: "Top"
   </voice>
 </phrase>
