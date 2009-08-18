@@ -39,10 +39,14 @@
 #define DEFAULT_VIEWER_BMP          "viewers"
 #define DEFAULT_REMOTE_VIEWER_BMP   "remote_viewers"
 
-/* These should probably be moved to config-<target>.h */
+/* These can be defined in config-<target>.h, if it is not provide defaults */
+#if !defined(MAX_ICON_HEIGHT)
 #define MAX_ICON_HEIGHT 24
-#define MAX_ICON_WIDTH 24
+#endif
 
+#if !defined(MAX_ICON_WIDTH)
+#define MAX_ICON_WIDTH 24
+#endif
 
 /* We dont actually do anything with these pointers,
    but they need to be grouped like this to save code

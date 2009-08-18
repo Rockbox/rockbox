@@ -100,6 +100,9 @@
 #define LCD_DEPTH  16   /* 65k colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
+#define MAX_ICON_HEIGHT 35
+#define MAX_ICON_WIDTH 35
+
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well. */
 #define HAVE_LCD_SLEEP
