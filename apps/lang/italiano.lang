@@ -270,6 +270,7 @@
     *: "PLAY = Sì"
     h100,h120,h300: "NAVI = Sì"
     yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Sì"
+    mrobe500: "PLAY o POWER = Sì"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -4146,6 +4147,7 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
     sa9200: "PLAY = Set"
@@ -4153,6 +4155,7 @@
   <dest>
     *: none
     rtc: "ON = Imposta"
+    mrobe500: "HEART = Imposta"
     h100,h120,h300: "NAVI = Imposta"
     ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Imposta"
     sa9200: "PLAY = Imposta"
@@ -4169,6 +4172,7 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
@@ -4181,6 +4185,7 @@
   <dest>
     *: none
     rtc: "OFF = Annulla"
+    mrobe500: "POWER = Annulla"
     h100,h120,h300: "STOP = Annulla"
     ipod*,c200*: "MENU = Annulla"
     x5,m5: "RECORD = Annulla"
@@ -12148,36 +12153,30 @@
 </phrase>
 <phrase>
   id: LANG_LEFT
-  desc: DEPRECATED
+  desc: Generic use of 'left'
   user: core
   <source>
-    *: none
-    quickscreen: ""
+    *: "Left"
   </source>
   <dest>
-    *: none
-    quickscreen: ""
+    *: "Sinistra"
   </dest>
   <voice>
-    *: none
-    quickscreen: ""
+    *: "Sinistra"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RIGHT
-  desc: DEPRECATED
+  desc: Generic use of 'right
   user: core
   <source>
-    *: none
-    quickscreen: ""
+    *: "Right"
   </source>
   <dest>
-    *: none
-    quickscreen: ""
+    *: "Destra"
   </dest>
   <voice>
-    *: none
-    quickscreen: ""
+    *: "Destra"
   </voice>
 </phrase>
 <phrase>
@@ -12579,5 +12578,70 @@
   <voice>
     *: none
     pitchscreen: "Rate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "RAM usata per Skin:"
+  </dest>
+  <voice>
+    *: "RAM usata per Skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Larghezza Barra di Scorrimento"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Larghezza Barra di Scorrimento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Posizione Barra di Scorrimento"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Posizione Barra di Scorrimento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMITER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limiter Preamp"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limitatore Preamp"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limitatore Preamp"
   </voice>
 </phrase>
