@@ -44,11 +44,7 @@
 
 /*** globals ***/
 
-FBFN(data) LCDFN(framebuffer)[LCDM(FBHEIGHT)][LCDM(FBWIDTH)]
-#if CONFIG_CPU != SH7034
-           IBSS_ATTR
-#endif
-           ;
+FBFN(data) LCDFN(framebuffer)[LCDM(FBHEIGHT)][LCDM(FBWIDTH)] IRAM_LCDFRAMEBUFFER;
 
 static struct viewport default_vp =
 {

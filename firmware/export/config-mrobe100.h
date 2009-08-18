@@ -43,7 +43,7 @@
 /* define this if you can invert the colours on your LCD */
 #define HAVE_LCD_INVERT
 
-/*#define IRAM_LCDFRAMEBUFFER IDATA_ATTR */ /* put the lcd frame buffer in IRAM */
+#define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
 
 #ifndef BOOTLOADER
 /* Define this if you have an remote lcd */

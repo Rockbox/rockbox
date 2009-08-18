@@ -128,4 +128,6 @@
 #define ICODE_ATTR_ALAC
 #define IBSS_ATTR_SHORTEN_DECODED0
 
+#define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
+
 #endif
