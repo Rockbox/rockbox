@@ -69,6 +69,7 @@ void panicf( const char *fmt, ...)
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
+    lcd_set_viewport(NULL);
     lcd_puts(1, y++, (unsigned char *)"*PANIC*");
     {
         /* wrap panic line */
