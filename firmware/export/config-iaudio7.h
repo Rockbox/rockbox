@@ -162,4 +162,7 @@
 #ifdef BOOTLOADER
 #define TCCBOOT
 #endif
+
+#define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
+
 #endif /* SIMULATOR */
