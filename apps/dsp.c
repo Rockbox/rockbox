@@ -35,6 +35,11 @@
 #include "buffer.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
+#include "pcmbuf.h"
+
+/* Define LOGF_ENABLE to enable logf output in this file */
+/*#define LOGF_ENABLE*/
+#include "logf.h"
 
 /* 16-bit samples are scaled based on these constants. The shift should be
  * no more than 15.
@@ -149,7 +154,8 @@ typedef void (*channels_process_fn_type)(int count, int32_t *buf[]);
 /* DSP local channel processing in place */
 typedef void (*channels_process_dsp_fn_type)(int count, struct dsp_data *data,
                                              int32_t *buf[]);
-
+/* DSP processes that return a value */
+typedef int (*return_fn_type)(int count, int32_t *buf[]);
 
 /*
  ***************************************************************************/
@@ -165,6 +171,7 @@ struct dsp_config
     int32_t  tdspeed_percent; /* Speed% * PITCH_SPEED_PRECISION */
     bool tdspeed_active;  /* Timestretch is in use */
     int  frac_bits;
+    long limiter_preamp;     /* limiter amp gain in S7.24 format */
 #ifdef HAVE_SW_TONE_CONTROLS
     /* Filter struct for software bass/treble controls */
     struct eqfilter tone_filter;
@@ -180,6 +187,7 @@ struct dsp_config
     channels_process_fn_type     apply_crossfeed;
     channels_process_fn_type     eq_process;
     channels_process_fn_type     channels_process;
+    return_fn_type               limiter_process;
 };
 
 /* General DSP config */
@@ -218,6 +226,55 @@ static long track_peak;
 static long album_peak;
 static long replaygain;
 static bool crossfeed_enabled;
+
+/* limiter */
+static int      count_adjust;
+static bool     limiter_buffer_active;
+static bool     limiter_buffer_full;
+static bool     limiter_buffer_emptying;
+static int32_t  limiter_buffer[2][LIMITER_BUFFER_SIZE] IBSS_ATTR;
+static int32_t  *start_lim_buf[2] IBSS_ATTR,
+                *end_lim_buf[2] IBSS_ATTR;
+static uint16_t lim_buf_peak[LIMITER_BUFFER_SIZE] IBSS_ATTR;
+static uint16_t *start_peak IBSS_ATTR,
+                *end_peak IBSS_ATTR;
+static uint16_t out_buf_peak[LIMITER_BUFFER_SIZE] IBSS_ATTR;
+static uint16_t *out_buf_peak_index IBSS_ATTR;
+static uint16_t release_peak IBSS_ATTR;
+static int32_t  in_samp IBSS_ATTR,
+                samp0 IBSS_ATTR;
+
+static void     reset_limiter_buffer(struct dsp_config *dsp);
+static int      limiter_buffer_count(bool buf_count);
+static int      limiter_process(int count, int32_t *buf[]);
+static uint16_t get_peak_value(int32_t sample);
+
+ /* The clip_steps array essentially stores the results of fp_factor from
+ * 0 to 12 dB, in 48 equal steps, in S3.28 format. */
+const  long     clip_steps[49] ICONST_ATTR = {      0x10000000,
+    0x10779AFA, 0x10F2B409, 0x1171654C, 0x11F3C9A0, 0x1279FCAD,
+    0x13041AE9, 0x139241A2, 0x14248EF9, 0x14BB21F9, 0x15561A92,
+    0x15F599A0, 0x1699C0F9, 0x1742B36B, 0x17F094CE, 0x18A38A01,
+    0x195BB8F9, 0x1A1948C5, 0x1ADC619B, 0x1BA52CDC, 0x1C73D51D,
+    0x1D488632, 0x1E236D3A, 0x1F04B8A1, 0x1FEC982C, 0x20DB3D0E,
+    0x21D0D9E2, 0x22CDA2BE, 0x23D1CD41, 0x24DD9099, 0x25F12590,
+    0x270CC693, 0x2830AFD3, 0x295D1F37, 0x2A925471, 0x2BD0911F,
+    0x2D1818B3, 0x2E6930AD, 0x2FC42095, 0x312931EC, 0x3298B072,
+    0x3412EA24, 0x35982F3A, 0x3728D22E, 0x38C52808, 0x3A6D8847,
+    0x3C224CD9, 0x3DE3D264, 0x3FB2783F};
+/* The gain_steps array essentially stores the results of fp_factor from
+ * 0 to -12 dB, in 48 equal steps, in S3.28 format. */
+const  long     gain_steps[49] ICONST_ATTR = { 0x10000000,
+    0xF8BC9C0, 0xF1ADF94, 0xEAD2988, 0xE429058, 0xDDAFD68,
+    0xD765AC1, 0xD149309, 0xCB59186, 0xC594210, 0xBFF9112,
+    0xBA86B88, 0xB53BEF5, 0xB017965, 0xAB18964, 0xA63DDFE,
+    0xA1866BA, 0x9CF1397, 0x987D507, 0x9429BEE, 0x8FF599E,
+    0x8BDFFD3, 0x87E80B0, 0x840CEBE, 0x804DCE8, 0x7CA9E76,
+    0x792070E, 0x75B0AB0, 0x7259DB2, 0x6F1B4BF, 0x6BF44D5,
+    0x68E4342, 0x65EA5A0, 0x63061D6, 0x6036E15, 0x5D7C0D3,
+    0x5AD50CE, 0x5841505, 0x55C04B8, 0x535176A, 0x50F44D9,
+    0x4EA84FE, 0x4C6D00E, 0x4A41E78, 0x48268DF, 0x461A81C,
+    0x441D53E, 0x422E985, 0x404DE62};
 
 #define AUDIO_DSP (dsp_conf[CODEC_IDX_AUDIO])
 #define VOICE_DSP (dsp_conf[CODEC_IDX_VOICE])
@@ -869,6 +926,7 @@ static void dsp_apply_gain(int count, struct dsp_data *data, int32_t *buf[])
 /* Combine all gains to a global gain. */
 static void set_gain(struct dsp_config *dsp)
 {
+    /* gains are in S7.24 format */
     dsp->data.gain = DEFAULT_GAIN;
 
     /* Replay gain not relevant to voice */
@@ -879,8 +937,14 @@ static void set_gain(struct dsp_config *dsp)
 
     if (dsp->eq_process && eq_precut)
     {
-        dsp->data.gain =
-            (long) (((int64_t) dsp->data.gain * eq_precut) >> 24);
+        dsp->data.gain = fp_mul(dsp->data.gain, eq_precut, 24);
+    }
+
+    /* only preamp for the limiter if limiter is active and sample depth
+     * allows safe pre-amping (12 dB is OK with 29 or less frac bits) */
+    if ((dsp->limiter_preamp) && (dsp->frac_bits <= 29))
+    {
+        dsp->data.gain = fp_mul(dsp->data.gain, dsp->limiter_preamp, 24);
     }
 
 #ifdef HAVE_SW_VOLUME_CONTROL
@@ -898,7 +962,7 @@ static void set_gain(struct dsp_config *dsp)
     }
     else
     {
-        dsp->data.gain >>= 1;
+        dsp->data.gain >>= 1;   /* convert gain to S8.23 format */
     }
 
     dsp->apply_gain = dsp->data.gain != 0 ? dsp_apply_gain : NULL;
@@ -1207,7 +1271,7 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 
         if (dsp->tdspeed_active)
             samples = tdspeed_doit(tmp, samples);
-
+        
         int chunk_offset = 0;
         while (samples > 0)
         {
@@ -1239,6 +1303,9 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 
             if (dsp->channels_process)
                 dsp->channels_process(chunk, t2);
+            
+            if (dsp->limiter_process)
+                chunk = dsp->limiter_process(chunk, t2);
 
             dsp->output_samples(chunk, &dsp->data, (const int32_t **)t2, (int16_t *)dst);
 
@@ -1286,6 +1353,15 @@ int dsp_output_count(struct dsp_config *dsp, int count)
      */
     if (count > RESAMPLE_BUF_RIGHT_CHANNEL)
         count = RESAMPLE_BUF_RIGHT_CHANNEL;
+        
+    /* If the limiter buffer is filling, some or all samples will
+     * be captured by it, so expect fewer samples coming out. */
+    if (limiter_buffer_active && !limiter_buffer_full)
+    {
+        int empty_space = limiter_buffer_count(false);
+        count_adjust = MIN(empty_space, count);
+        count -= count_adjust;
+    }
 
     return count;
 }
@@ -1295,6 +1371,13 @@ int dsp_output_count(struct dsp_config *dsp, int count)
  */
 int dsp_input_count(struct dsp_config *dsp, int count)
 {
+    /* If the limiter buffer is filling, the output count was
+     * adjusted downward.  This adjusts it back so that input
+     * count is not affected.
+     */
+    if (limiter_buffer_active && !limiter_buffer_full)
+        count += count_adjust;
+
     /* count is now the number of resampled input samples. Convert to
        original input samples. */
     if (dsp->resample)
@@ -1412,6 +1495,7 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
         dsp_update_functions(dsp);
         resampler_new_delta(dsp);
         tdspeed_setup(dsp);
+        reset_limiter_buffer(dsp);
         break;
 
     case DSP_FLUSH:
@@ -1420,6 +1504,7 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
         resampler_new_delta(dsp);
         dither_init(dsp);
         tdspeed_setup(dsp);
+        reset_limiter_buffer(dsp);
         break;
 
     case DSP_SET_TRACK_GAIN:
@@ -1498,3 +1583,372 @@ void dsp_set_replaygain(void)
     replaygain = gain;
     set_gain(&AUDIO_DSP);
 }
+
+/** RESET THE LIMITER BUFFER
+ *  Force the limiter buffer to its initial state and discard
+ *  any samples held there. */
+static void reset_limiter_buffer(struct dsp_config *dsp)
+{
+    if (dsp == &AUDIO_DSP)
+    {
+        int i;
+        logf("   reset_limiter_buffer");
+        for (i = 0; i < 2; i++)
+            start_lim_buf[i] = end_lim_buf[i] = limiter_buffer[i];
+        start_peak = end_peak = lim_buf_peak;
+        limiter_buffer_full = false;
+        limiter_buffer_emptying = false;
+        release_peak = 0;
+    }
+}
+
+/** OPERATE THE LIMITER BUFFER
+ *  Handle all samples entering or exiting the limiter buffer. */
+static inline int set_limiter_buffer(int count, int32_t *buf[])
+{
+    int32_t *in_buf[]  = {buf[0], buf[1]},
+            *out_buf[] = {buf[0], buf[1]};
+    int empty_space, i, out_count;
+    const long clip_max = AUDIO_DSP.data.clip_max;
+    const int ch = AUDIO_DSP.data.num_channels - 1;
+    out_buf_peak_index = out_buf_peak;
+
+    if (limiter_buffer_emptying)
+    /** EMPTY THE BUFFER
+     *  since the empty flag has been set, assume no inbound samples and
+        return all samples in the limiter buffer to the outbound buffer */
+    {
+        count = limiter_buffer_count(true);
+        out_count = count;
+        logf("   Emptying limiter buffer: %d", count);
+        while (count-- > 0)
+        {
+            for (i = 0; i <= ch; i++)
+            {
+                /* move samples in limiter buffer to output buffer */
+                *out_buf[i]++ = *start_lim_buf[i]++;
+                if (start_lim_buf[i] == &limiter_buffer[i][LIMITER_BUFFER_SIZE])
+                    start_lim_buf[i] = limiter_buffer[i];
+                /* move limiter buffer peak values to output peak values */
+                if (i == 0)
+                {
+                    *out_buf_peak_index++ = *start_peak++;
+                    if (start_peak == &lim_buf_peak[LIMITER_BUFFER_SIZE])
+                        start_peak = lim_buf_peak;
+                }
+            }
+        }
+        reset_limiter_buffer(&AUDIO_DSP);
+    }
+    else    /* limiter buffer NOT emptying */
+    {
+        if (count <= 0) return 0;
+        
+        empty_space = limiter_buffer_count(false);
+        
+        if (empty_space > 0)
+        /** FILL BUFFER
+         *  use as many inbound samples as necessary to fill the buffer */
+        {
+            /* don't try to fill with more samples than available */
+            if (empty_space > count)
+                empty_space = count;
+            logf("   Filling limiter buffer: %d", empty_space);
+            while (empty_space-- > 0)
+            {
+                for (i = 0; i <= ch; i++)
+                {
+                    /* put inbound samples in the limiter buffer */
+                    in_samp = *in_buf[i]++;
+                    *end_lim_buf[i]++ = in_samp;
+                    if (end_lim_buf[i] == &limiter_buffer[i][LIMITER_BUFFER_SIZE])
+                        end_lim_buf[i] = limiter_buffer[i];
+                    if (in_samp < 0)       /* make positive for comparison */
+                        in_samp = -in_samp - 1;
+                    if (in_samp <= clip_max)
+                        in_samp = 0;       /* disregard if not clipped */
+                    if (i == 0)
+                        samp0 = in_samp;
+                    if (i == ch)
+                    {
+                        /* assign peak value for each inbound sample pair */
+                        *end_peak++ = ((samp0 > 0) || (in_samp > 0)) ?
+                            get_peak_value(MAX(samp0, in_samp)) : 0;
+                        if (end_peak == &lim_buf_peak[LIMITER_BUFFER_SIZE])
+                            end_peak = lim_buf_peak;
+                    }
+                }
+                count--;
+            }
+            /* after buffer fills, the remaining inbound samples are cycled */
+        }
+        
+        limiter_buffer_full = (end_lim_buf[0] == start_lim_buf[0]);
+        out_count = count;
+        
+        /** CYCLE BUFFER
+         *  return buffered samples and backfill limiter buffer with new ones.
+         *  The buffer is always full when cycling. */
+        while (count-- > 0)
+        {
+            for (i = 0; i <= ch; i++)
+            {
+                /* copy incoming sample */
+                in_samp = *in_buf[i]++;
+                /* put limiter buffer sample into outbound buffer */
+                *out_buf[i]++ = *start_lim_buf[i]++;
+                /* put incoming sample on the end of the limiter buffer */
+                *end_lim_buf[i]++ = in_samp;
+                /* ring buffer pointer wrap */
+                if (start_lim_buf[i] == &limiter_buffer[i][LIMITER_BUFFER_SIZE])
+                    start_lim_buf[i] = limiter_buffer[i];
+                if (end_lim_buf[i] == &limiter_buffer[i][LIMITER_BUFFER_SIZE])
+                    end_lim_buf[i] = limiter_buffer[i];
+                if (in_samp < 0)       /* make positive for comparison */
+                    in_samp = -in_samp - 1;
+                if (in_samp <= clip_max)
+                    in_samp = 0;       /* disregard if not clipped */
+                if (i == 0)
+                {
+                    samp0 = in_samp;
+                    /* assign outgoing sample its associated peak value */
+                    *out_buf_peak_index++ = *start_peak++;
+                    if (start_peak == &lim_buf_peak[LIMITER_BUFFER_SIZE])
+                        start_peak = lim_buf_peak;
+                }
+                if (i == ch)
+                {
+                    /* assign peak value for each inbound sample pair */
+                    *end_peak++ = ((samp0 > 0) || (in_samp > 0)) ?
+                        get_peak_value(MAX(samp0, in_samp)) : 0;
+                    if (end_peak == &lim_buf_peak[LIMITER_BUFFER_SIZE])
+                        end_peak = lim_buf_peak;
+                }
+            }
+        }
+    }   
+    
+    return out_count;
+}
+
+/** RETURN LIMITER BUFFER COUNT
+ *  If argument is true, returns number of samples in the buffer,
+ *  otherwise, returns empty space remaining */
+static int limiter_buffer_count(bool buf_count)
+{
+    int count;
+    if (limiter_buffer_full)
+        count = LIMITER_BUFFER_SIZE;
+    else if (end_lim_buf[0] >= start_lim_buf[0])
+        count = (end_lim_buf[0] - start_lim_buf[0]);
+    else
+        count = (end_lim_buf[0] - start_lim_buf[0]) + LIMITER_BUFFER_SIZE;
+    return buf_count ? count : (LIMITER_BUFFER_SIZE - count);
+}
+
+/** FLUSH THE LIMITER BUFFER
+ *  Empties the limiter buffer into the buffer pointed to by the argument
+ *  and returns the number of samples in that buffer */
+int dsp_flush_limiter_buffer(char *dest)
+{
+    if ((!limiter_buffer_active) || (limiter_buffer_count(true) <= 0))
+        return 0;
+    
+    logf("   dsp_flush_limiter_buffer");
+    int32_t flush_buf[2][LIMITER_BUFFER_SIZE];
+    int32_t *src[2] = {flush_buf[0], flush_buf[1]};
+
+    limiter_buffer_emptying = true;
+    int count = limiter_process(0, src);
+    AUDIO_DSP.output_samples(count, &AUDIO_DSP.data,
+        (const int32_t **)src, (int16_t *)dest);
+    return count;
+}
+
+/** GET PEAK VALUE
+ *  Return a small value representing how much the sample is clipped.  This
+ *  should only be called if a sample is actually clipped.  Sample is a
+ *  positive value.
+ */
+static uint16_t get_peak_value(int32_t sample)
+{
+    const int frac_bits = AUDIO_DSP.frac_bits;
+    int mid,
+        hi = 48,
+        lo = 0;
+    
+    /* shift sample into 28 frac bit range for comparison */
+    if (frac_bits > 28)
+        sample >>= (frac_bits - 28);
+    if (frac_bits < 28)
+        sample <<= (28 - frac_bits);
+    
+    /* if clipped out of range, return maximum value */
+    if (sample >= clip_steps[48])
+        return 48 * 90;
+    
+    /* find amount of sample clipping on the table */
+    do
+    {
+        mid = (hi + lo) / 2;
+        if (sample < clip_steps[mid])
+            hi = mid;
+        else if (sample > clip_steps[mid])
+            lo = mid;
+        else
+            return mid * 90;
+    }
+    while (hi > (lo + 1));
+    
+    /* interpolate linearly between steps (less accurate but faster) */
+    return ((hi-1) * 90) + (((sample - clip_steps[hi-1]) * 90) /
+        (clip_steps[hi] - clip_steps[hi-1]));
+}
+
+/** SET LIMITER
+ *  Called by the menu system to configure the limiter process */
+void dsp_set_limiter(int limiter_level)
+{
+    if (limiter_level > 0)
+    {
+        if (!limiter_buffer_active)
+        {
+            /* enable limiter process */
+            AUDIO_DSP.limiter_process = limiter_process;
+            limiter_buffer_active = true;
+        }
+        /* limiter preamp is a gain factor in S7.24 format */
+        long old_preamp = AUDIO_DSP.limiter_preamp;
+        long new_preamp = fp_factor((((long)limiter_level << 24) / 10), 24);
+        if (old_preamp != new_preamp)
+        {
+            AUDIO_DSP.limiter_preamp = new_preamp;
+            set_gain(&AUDIO_DSP);
+            logf("   Limiter enable: Yes\tLimiter amp: %.8f",
+                (float)AUDIO_DSP.limiter_preamp / (1 << 24));
+        }
+    }
+    else
+    {
+        /* disable limiter process*/
+        if (limiter_buffer_active)
+        {
+            AUDIO_DSP.limiter_preamp = (1 << 24);
+            set_gain(&AUDIO_DSP);
+            /* pcmbuf_flush_limiter_buffer(); */
+            limiter_buffer_active = false;
+            AUDIO_DSP.limiter_process = NULL;
+            reset_limiter_buffer(&AUDIO_DSP);
+            logf("   Limiter enable:  No\tLimiter amp: %.8f",
+                (float)AUDIO_DSP.limiter_preamp / (1 << 24));
+        }
+    }
+}
+
+/** LIMITER PROCESS
+ *  Checks pre-amplified signal for clipped samples and smoothly reduces gain
+ *  around the clipped samples using a preset attack/release schedule.
+ */
+static int limiter_process(int count, int32_t *buf[])
+{
+    /* Limiter process passes through if limiter buffer isn't active, or the 
+     * sample depth is too large for safe pre-amping */
+    if ((!limiter_buffer_active) || (AUDIO_DSP.frac_bits > 29))
+        return count;
+    
+    count = set_limiter_buffer(count, buf);
+    
+    if (count <= 0)
+        return 0;
+    
+    const int attack_slope = 15;    /* 15:1 ratio between attack and release */
+    const int buffer_count = limiter_buffer_count(true);
+    
+    int i, ch;
+    uint16_t max_peak = 0,
+             gain_peak,
+             gain_rem;
+    long gain;
+    
+    /* step through limiter buffer in reverse order, in order to find the
+     * appropriate max_peak for modifying the output buffer */
+    for (i = buffer_count - 1; i >= 0; i--)
+    {
+        const uint16_t peak_i = lim_buf_peak[(start_peak - lim_buf_peak + i) %
+            LIMITER_BUFFER_SIZE];
+        /* if no attack slope, nothing to do */
+        if ((peak_i == 0) && (max_peak == 0)) continue;
+        /* if new peak, start attack slope */
+        if (peak_i >= max_peak)
+        {
+            max_peak = peak_i;
+        }
+        /* keep sloping */
+        else
+        {
+            if (max_peak > attack_slope)
+                max_peak -= attack_slope;
+            else
+                max_peak = 0;
+        }
+    }
+    /* step through output buffer the same way, but this time modifying peak
+     * values to create a smooth attack slope. */
+    for (i = count - 1; i >= 0; i--)
+    {
+        /* if no attack slope, nothing to do */
+        if ((out_buf_peak[i] == 0) && (max_peak == 0)) continue;
+        /* if new peak, start attack slope */
+        if (out_buf_peak[i] >= max_peak)
+        {
+            max_peak = out_buf_peak[i];
+        }
+        /* keep sloping */
+        else
+        {
+            if (max_peak > attack_slope)
+                max_peak -= attack_slope;
+            else
+                max_peak = 0;
+            out_buf_peak[i] = max_peak;
+        }
+    }
+    /* Now step forward through the output buffer, and modify the peak values
+     * to establish a smooth, slow release slope.*/
+    for (i = 0; i < count; i++)
+    {
+        /* if no release slope, nothing to do */
+        if ((out_buf_peak[i] == 0) && (release_peak == 0)) continue;
+        /* if new peak, start release slope */
+        if (out_buf_peak[i] >= release_peak)
+        {
+            release_peak = out_buf_peak[i];
+        }
+        /* keep sloping */
+        else
+        {
+            release_peak--;
+            out_buf_peak[i] = release_peak;
+        }
+    }
+    /* Implement the limiter: adjust gain of the outbound samples by the gain
+     * amounts in the gain steps array corresponding to the peak values. */
+    for (ch = 0; ch < AUDIO_DSP.data.num_channels; ch++)
+    {
+        int32_t *d = buf[ch];
+        for (i = 0; i < count; i++)
+        {
+            if (out_buf_peak[i] > 0)
+            {
+                gain_peak = (out_buf_peak[i] + 1) / 90;
+                gain_rem  = (out_buf_peak[i] + 1) % 90;
+                gain = gain_steps[gain_peak];
+                if ((gain_peak < 48) && (gain_rem > 0))
+                    gain -= gain_rem * ((gain_steps[gain_peak] -
+                        gain_steps[gain_peak + 1]) / 90);
+                d[i] = FRACMUL_SHL(d[i], gain, 3);
+            }
+        }
+    }
+    return count;
+}   

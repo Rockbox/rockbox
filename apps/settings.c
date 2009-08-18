@@ -950,6 +950,7 @@ void settings_apply(bool read_disk)
 
     dsp_dither_enable(global_settings.dithering_enabled);
     dsp_timestretch_enable(global_settings.timestretch_enabled);
+    dsp_set_limiter(global_settings.limiter_level);
 #endif
 
 #ifdef HAVE_SPDIF_POWER

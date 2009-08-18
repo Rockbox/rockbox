@@ -836,6 +836,7 @@ struct plugin_api {
     const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    int (*dsp_flush_limiter_buffer)(char *dest);
 };
 
 /* plugin header */

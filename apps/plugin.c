@@ -668,7 +668,7 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
+    dsp_flush_limiter_buffer,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

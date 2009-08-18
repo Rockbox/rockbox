@@ -12699,3 +12699,20 @@
     lcd_bitmap: "Scroll bar position"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_LIMITER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limiter Preamp"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limiter Preamp"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limiter Preamp"
+  </voice>
+</phrase>

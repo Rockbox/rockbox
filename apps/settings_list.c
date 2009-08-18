@@ -1246,6 +1246,12 @@ const struct settings_list settings[] = {
     /* timestretch */
     OFFON_SETTING(F_SOUNDSETTING, timestretch_enabled, LANG_TIMESTRETCH, false,
                   "timestretch enabled", dsp_timestretch_enable),
+
+    /* limiter */
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, limiter_level,
+                       LANG_LIMITER, 0,
+                       "limiter level", UNIT_DB, 0, MAX_LIMITER_GAIN,
+                       5, db_format, get_dec_talkid, dsp_set_limiter),
 #endif
 #ifdef HAVE_WM8758
     SOUND_SETTING(F_NO_WRAP, bass_cutoff, LANG_BASS_CUTOFF,

@@ -771,6 +771,11 @@ struct user_settings
     int scrollbar_width;
     bool scrollbar_position; /* true=left false=right */
 #endif
+
+#if CONFIG_CODEC == SWCODEC
+    int limiter_level;
+#endif
+
 };
 
 /** global variables **/
