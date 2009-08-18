@@ -267,13 +267,15 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
+    mrobe500: "PLAY or POWER = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "SPELA = Ja"
     h100,h120,h300: "NAVI = Ja"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "VÄLJ = Ja"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "VÄLJ = Ja"
+    mrobe500: "SPELA / PÅ/AV = Ja"
     player: "SPELA/STOPP"
   </dest>
   <voice>
@@ -2390,14 +2392,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Skapar databas... %d hittade (AV = Återgå)"
     h100,h120,h300: "Skapar databas... %d hittade (STOPP = Återgå)"
     ipod*: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
     x5,m5,gigabeat*,mrobe100: "Skapar databas... %d hittade (VÄNSTER = Återgå)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
+    sa9200: "Skapar databas... %d hittade (REW = Återgå)"
   </dest>
   <voice>
     *: "objekt hittade för databasen"
@@ -2580,15 +2584,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Lista teckensnitt"
+    lcd_bitmap: "Teckensnitt"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Lista teckensnitt"
+    lcd_bitmap: "Teckensnitt"
   </voice>
 </phrase>
 <phrase>
@@ -2596,13 +2600,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Lista .wps-filer"
+    *: "Uppspelningsskärm"
   </dest>
   <voice>
-    *: "Lista .wps filer"
+    *: "Uppspelningsskärm"
   </voice>
 </phrase>
 <phrase>
@@ -2611,15 +2615,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "Lista .rwps-filer"
+    remote: "Fjärruppspelningsskärm"
   </dest>
   <voice>
     *: none
-    remote: "Lista .rwps files"
+    remote: "Fjärruppspelningsskärm"
   </voice>
 </phrase>
 <phrase>
@@ -4148,14 +4152,18 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
+    sa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "PÅ = Ställ"
+    mrobe500: "HJÄRTA = Ställ"
     h100,h120,h300: "NAVI = Ställ"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "VÄLJ = Ställ"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "VÄLJ = Ställ"
+    sa9200: "SPELA = Ställ"
   </dest>
   <voice>
     *: none
@@ -4169,24 +4177,28 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
+    ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "AV = Avbryt"
+    mrobe500: "PÅ/AV = Avbryt"
     h100,h120,h300: "STOPP = Avbryt"
-    ipod*,c200*,sa9200: "MENY = Avbryt"
+    ipod*,c200*: "MENY = Avbryt"
     x5,m5: "SPELA IN = Avbryt"
     h10,h10_5gb,e200*,fuze*: "FÖREGÅENDE = Avbryt"
     gigabeatf: "PÅ/AV = Avbryt"
     mrobe100: "VISA = Avbryt"
     gigabeats: "BAKÅT = Avbryt"
+    sa9200: "VÄNSTER = Avbryt"
   </dest>
   <voice>
     *: none
@@ -5114,13 +5126,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Lista teman"
+    *: "Lista temafiler"
   </dest>
   <voice>
-    *: "Lista teman"
+    *: "Lista temafiler"
   </voice>
 </phrase>
 <phrase>
@@ -9934,7 +9946,7 @@
     *: ""
   </dest>
   <voice>
-    *: "while-playing-screen"
+    *: "uppspelningsskärm"
   </voice>
 </phrase>
 <phrase>
@@ -10021,7 +10033,7 @@
   </dest>
   <voice>
     *: none
-    remote: "W P S fjärrenhet"
+    remote: "fjärruppspelningsskärm"
   </voice>
 </phrase>
 <phrase>
@@ -12143,6 +12155,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Vänster"
+  </dest>
+  <voice>
+    *: "Vänster"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Höger"
+  </dest>
+  <voice>
+    *: "Höger"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_BOTTOM
   desc: DEPRECATED
   user: core
@@ -12360,5 +12400,251 @@
   </dest>
   <voice>
     *: "Förhindra spårhopp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Timestretch"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Timestretch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Hastighet"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Hastighet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Pekskärm"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Pekskärm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Kalibrera"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Kalibrera"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Återställ kalibrering"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Återställ kalibrering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Längst upp"
+  </dest>
+  <voice>
+    *: "Längst upp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Längst ner"
+  </dest>
+  <voice>
+    *: "Längst ner"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Statuslist på fjärr-LCD"
+  </dest>
+  <voice>
+    *: none
+    remote: "Statuslist på fjärr-LCD"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc: 
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Halvton"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Halvton"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Gräns"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Gräns"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Hastighet"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Hastighet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Tema:"
+  </dest>
+  <voice>
+    *: "Tema"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Bredd på rullningslist"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Bredd på rullningslist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Position för rullningslist"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Position för rullningslist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMITER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limiter Preamp"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limiter-förförstärkning"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limiter-förförstärkning"
   </voice>
 </phrase>
