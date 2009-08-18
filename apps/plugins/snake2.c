@@ -543,44 +543,62 @@ void init_snake(void)
     new_level(level_from_file);
 }
 
+#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)
+void draw_frame_bitmap(int header_type)
+{
+    rb->lcd_bitmap(header_type==1? snake2_header1: snake2_header2, 0, 0,
+                   BMPWIDTH_snake2_header, BMPHEIGHT_snake2_header);
+    rb->lcd_bitmap(snake2_left, 0, BMPHEIGHT_snake2_header,
+                   BMPWIDTH_snake2_left, BMPHEIGHT_snake2_left);
+    rb->lcd_bitmap(snake2_right,
+                   LCD_WIDTH - BMPWIDTH_snake2_right, BMPHEIGHT_snake2_header,
+                   BMPWIDTH_snake2_right, BMPHEIGHT_snake2_right);
+    rb->lcd_bitmap(snake2_bottom,
+                   0, BMPHEIGHT_snake2_header + BMPHEIGHT_snake2_left,
+                   BMPWIDTH_snake2_bottom, BMPHEIGHT_snake2_bottom);
+}
+#endif
+
 /*
 ** Draws the apple. If it doesn't exist then
 ** a new one get's created.
 */
+void draw_apple_bit(int x, int y)
+{
+    rb->lcd_fillrect((CENTER_X+x*MULTIPLIER)+1, CENTER_Y+y*MULTIPLIER,
+                     MODIFIER_2, MODIFIER_1);
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, (CENTER_Y+y*MULTIPLIER)+1,
+                     MODIFIER_1, MODIFIER_2);
+}
+
 void draw_apple( void )
 {
     int x,y;
 
 #if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
-    char pscore[5], counter[4];
+    draw_frame_bitmap(2);
 
-    rb->lcd_bitmap(snake2_header2,0,0,BMPWIDTH_snake2_header, BMPHEIGHT_snake2_header);
-    rb->lcd_bitmap(snake2_left,0,BMPHEIGHT_snake2_header,BMPWIDTH_snake2_left, BMPHEIGHT_snake2_left);
-    rb->lcd_bitmap(snake2_right,LCD_WIDTH-BMPWIDTH_snake2_right,BMPHEIGHT_snake2_header,BMPWIDTH_snake2_right, BMPHEIGHT_snake2_right);
-    rb->lcd_bitmap(snake2_bottom,0,BMPHEIGHT_snake2_header+BMPHEIGHT_snake2_left,BMPWIDTH_snake2_bottom, BMPHEIGHT_snake2_bottom);
+    rb->snprintf(strbuf, sizeof(strbuf), "%d", applecount);
+    rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
+    rb->lcd_putsxy(TOP_X3 - strwdt/2, TOP_Y2, strbuf);
 
-    rb->snprintf(counter,sizeof(counter),"%d",applecount);
-    rb->lcd_getstringsize(counter,&strwdt,&strhgt);
-    rb->lcd_putsxy(TOP_X3-strwdt/2,TOP_Y2,counter);
-
-    rb->snprintf(pscore,sizeof(pscore),"%d",score);
-    rb->lcd_getstringsize(pscore,&strwdt,&strhgt);
-    rb->lcd_putsxy(TOP_X4-strwdt/2,TOP_Y2,pscore);
+    rb->snprintf(strbuf, sizeof(strbuf), "%d", score);
+    rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
+    rb->lcd_putsxy(TOP_X4 - strwdt/2, TOP_Y2, strbuf);
 #endif
 
     if (!apple)
     {
-          do
-          {
+        do
+        {
             x = (rb->rand() % (WIDTH-1))+1;
             y = (rb->rand() % (HEIGHT-1))+1;
-          } while (board[x][y]);
-          apple=1;
-          board[x][y]=-1;
-          applex = x;appley = y;
+        } while (board[x][y]);
+        apple = 1;
+        board[x][y] = -1;
+        applex = x;appley = y;
     }
-    rb->lcd_fillrect((CENTER_X+applex*MULTIPLIER)+1,CENTER_Y+appley*MULTIPLIER,MODIFIER_2,MODIFIER_1);
-    rb->lcd_fillrect(CENTER_X+applex*MULTIPLIER,(CENTER_Y+appley*MULTIPLIER)+1,MODIFIER_1,MODIFIER_2);
+    draw_apple_bit(applex, appley);
 }
 
 /*
@@ -591,7 +609,8 @@ void draw_apple( void )
 */
 void draw_vertical_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1,CENTER_Y+y*MULTIPLIER,MODIFIER_2,MODIFIER_1);
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER,
+                     MODIFIER_2, MODIFIER_1);
 }
 
 /*
@@ -602,7 +621,8 @@ void draw_vertical_bit(int x, int y)
 */
 void draw_horizontal_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER,CENTER_Y+y*MULTIPLIER+1,MODIFIER_1,MODIFIER_2);
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER+1,
+                     MODIFIER_1, MODIFIER_2);
 }
 
 /*
@@ -613,8 +633,10 @@ void draw_horizontal_bit(int x, int y)
 */
 void draw_n_to_e_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1,CENTER_Y+y*MULTIPLIER+2,MODIFIER_2,MODIFIER_2);
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+2,CENTER_Y+y*MULTIPLIER+1,MODIFIER_2,MODIFIER_2);
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER+2,
+                     MODIFIER_2, MODIFIER_2);
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+2, CENTER_Y+y*MULTIPLIER+1,
+                     MODIFIER_2, MODIFIER_2);
 }
 
 /*
@@ -636,8 +658,10 @@ void draw_w_to_s_bit(int x, int y)
 */
 void draw_n_to_w_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER,CENTER_Y+y*MULTIPLIER+1,MODIFIER_2,MODIFIER_2);
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1,CENTER_Y+y*MULTIPLIER+2,MODIFIER_2,MODIFIER_2);
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER+1,
+                     MODIFIER_2, MODIFIER_2);
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER+2,
+                     MODIFIER_2, MODIFIER_2);
 }
 
 /*
@@ -659,8 +683,10 @@ void draw_e_to_s_bit(int x, int y)
 */
 void draw_s_to_e_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1,CENTER_Y+y*MULTIPLIER,MODIFIER_2,MODIFIER_2);
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+2,CENTER_Y+y*MULTIPLIER+1,MODIFIER_2,MODIFIER_2);
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER,
+                     MODIFIER_2, MODIFIER_2);
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+2, CENTER_Y+y*MULTIPLIER+1,
+                     MODIFIER_2, MODIFIER_2);
 }
 
 /*
@@ -682,8 +708,10 @@ void draw_w_to_n_bit(int x, int y)
 */
 void draw_e_to_n_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1,CENTER_Y+y*MULTIPLIER,MODIFIER_2,MODIFIER_2);
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER,CENTER_Y+y*MULTIPLIER+1,MODIFIER_2,MODIFIER_2);
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER,
+                     MODIFIER_2, MODIFIER_2);
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER+1,
+                     MODIFIER_2, MODIFIER_2);
 }
 
 /*
@@ -695,6 +723,12 @@ void draw_e_to_n_bit(int x, int y)
 void draw_s_to_w_bit(int x, int y)
 {
     draw_e_to_n_bit(x, y);
+}
+
+void draw_head_bit(int x, int y)
+{
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER,
+                     MODIFIER_1, MODIFIER_1);
 }
 
 /*
@@ -748,8 +782,7 @@ void redraw (void)
             switch (board[x][y])
             {
                 case -1:
-                    rb->lcd_fillrect((CENTER_X+x*MULTIPLIER)+1,CENTER_Y+y*MULTIPLIER,MODIFIER_2,MODIFIER_1);
-                    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER,(CENTER_Y+y*MULTIPLIER)+1,MODIFIER_1,MODIFIER_2);
+                    draw_apple_bit(x, y);
                     break;
                 case 0:
                     break;
@@ -765,11 +798,23 @@ void redraw (void)
                     break;
 
                 default:
-                    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER,CENTER_Y+y*MULTIPLIER,MODIFIER_1,MODIFIER_1);
+                    draw_head_bit(x, y);
                     break;
             }
         }
     }
+
+#if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
+    draw_frame_bitmap(2);
+
+    rb->snprintf(strbuf, sizeof(strbuf), "%d", applecount);
+    rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
+    rb->lcd_putsxy(TOP_X3 - strwdt/2, TOP_Y2, strbuf);
+
+    rb->snprintf(strbuf, sizeof(strbuf), "%d", score);
+    rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
+    rb->lcd_putsxy(TOP_X4 - strwdt/2, TOP_Y2, strbuf);
+#endif
 }
 
 /*
@@ -779,7 +824,7 @@ void redraw (void)
 void draw_snake_bit(int currentbit, int previousbit, int x, int y)
 {
     rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER,CENTER_Y+y*MULTIPLIER,MODIFIER_1,MODIFIER_1);
+    draw_head_bit(x, y);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     switch(currentbit)
@@ -855,6 +900,50 @@ void draw_snake_bit(int currentbit, int previousbit, int x, int y)
                 break;
             }
         break;
+    }
+}
+
+void redraw_snake(void)
+{
+    int x = tailx, y = taily;
+    int olddir, newdir = board[x][y];
+
+    while (x != headx || y != heady)
+    {
+        olddir = newdir;
+
+        switch (olddir)
+        {
+            case(NORTH):
+                y--;
+            break;
+
+            case(EAST):
+                x++;
+            break;
+
+            case(SOUTH):
+                y++;
+            break;
+
+            case(WEST):
+                x--;
+            break;
+        }
+
+        if(x == WIDTH)
+            x = 0;
+        else if(x < 0)
+            x = WIDTH-1;
+
+        if(y == HEIGHT)
+            y = 0;
+        else if(y < 0)
+            y = HEIGHT-1;
+
+        newdir = board[x][y];
+        if(olddir != newdir)
+            draw_snake_bit(newdir, olddir, x, y);
     }
 }
 
@@ -1004,13 +1093,13 @@ void move( void )
     else if(heady < 0)
         heady = HEIGHT-1;
 
-    rb->lcd_fillrect(CENTER_X+headx*MULTIPLIER,CENTER_Y+heady*MULTIPLIER,MODIFIER_1,MODIFIER_1);
+    draw_head_bit(headx, heady);
 
     /*clear tail*/
     if(applecountdown <= 0)
     {
         rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        rb->lcd_fillrect(CENTER_X+tailx*MULTIPLIER,CENTER_Y+taily*MULTIPLIER,MODIFIER_1,MODIFIER_1);
+        draw_head_bit(tailx, taily);
         rb->lcd_set_drawmode(DRMODE_SOLID);
 
         taildir = board[tailx][taily];
@@ -1123,6 +1212,8 @@ void game_pause (void)
         {
             case SNAKE2_PLAYPAUSE:
                 redraw();
+                redraw_snake();
+                draw_head_bit(headx, heady);
                 rb->lcd_update();
                 rb->sleep(HZ/2);
                 return;
@@ -1217,7 +1308,7 @@ void game (void)
             case SNAKE2_RC_QUIT:
 #endif
             case SNAKE2_QUIT:
-                dead=1;
+                quit = 1;
                 return;
 
             case SNAKE2_PLAYPAUSE:
@@ -1247,11 +1338,7 @@ void select_maze(void)
     while (1)
     {
 #if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
-
-        rb->lcd_bitmap(snake2_header1,0,0,BMPWIDTH_snake2_header, BMPHEIGHT_snake2_header);
-        rb->lcd_bitmap(snake2_left,0,BMPHEIGHT_snake2_header,BMPWIDTH_snake2_left, BMPHEIGHT_snake2_left);
-        rb->lcd_bitmap(snake2_right,LCD_WIDTH-BMPWIDTH_snake2_right,BMPHEIGHT_snake2_header,BMPWIDTH_snake2_right, BMPHEIGHT_snake2_right);
-        rb->lcd_bitmap(snake2_bottom,0,BMPHEIGHT_snake2_header+BMPHEIGHT_snake2_left,BMPWIDTH_snake2_bottom, BMPHEIGHT_snake2_bottom);
+        draw_frame_bitmap(1);
 
         rb->snprintf(strbuf, sizeof(strbuf), "%d", level);
         rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
