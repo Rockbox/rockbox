@@ -88,7 +88,10 @@
                 {.sound_setting=(struct sound_setting[]){{setting}}} }
 
 /* Use for bool variables which don't use LANG_SET_BOOL_YES and LANG_SET_BOOL_NO
-                or dont save as "off" or "on" in the cfg */
+      or dont save as "off" or "on" in the cfg.
+   cfgvals are comma separated values (without spaces after the comma!) to write
+      for 'false' and 'true' (in this order)
+ */
 #define BOOL_SETTING(flags,var,lang_id,default,name,cfgvals,yes,no,cb)      \
             {flags|F_BOOL_SETTING, &global_settings.var,                    \
                 lang_id, BOOL(default),name,cfgvals,                        \
@@ -96,10 +99,8 @@
 
 /* bool setting which does use LANG_YES and _NO and save as "off,on" */
 #define OFFON_SETTING(flags,var,lang_id,default,name,cb)                    \
-            {flags|F_BOOL_SETTING, &global_settings.var,                    \
-                lang_id, BOOL(default),name,off_on,                         \
-                {.bool_setting=(struct bool_setting[])                      \
-                {{cb,LANG_SET_BOOL_YES,LANG_SET_BOOL_NO}}} }
+            BOOL_SETTING(flags,var,lang_id,default,name,off_on,               \
+                LANG_SET_BOOL_YES,LANG_SET_BOOL_NO,cb)
 
 /* int variable which is NOT saved to .cfg files,
     (Use NVRAM() in the flags to save to the nvram (or nvram.bin file) */
