@@ -170,7 +170,7 @@
     *: "Scanning disk..."
   </source>
   <dest>
-    *: "ディスクをスキャン中"
+    *: "ディスクをスキャン中..."
   </dest>
   <voice>
     *: "ディスクをスキャン中"
@@ -267,13 +267,14 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = はい"
     h100,h120,h300: "NAVI = はい"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = はい"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = はい"
+    mrobe500: "PLAY or POWER = はい"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -289,7 +290,7 @@
     player: none
   </source>
   <dest>
-    *: "[その他のボタン]:いいえ"
+    *: "[それ以外] = いいえ"
     player: none
   </dest>
   <voice>
@@ -361,10 +362,10 @@
     *: "Now Playing"
   </source>
   <dest>
-    *: "現在再生中の曲"
+    *: "再生中"
   </dest>
   <voice>
-    *: "現在再生中の曲"
+    *: "再生中"
   </voice>
 </phrase>
 <phrase>
@@ -375,10 +376,10 @@
     *: "Resume Playback"
   </source>
   <dest>
-    *: "音楽をレジュームします"
+    *: "音楽をレジューム"
   </dest>
   <voice>
-    *: "音楽をレジュームします"
+    *: "音楽をレジューム"
   </voice>
 </phrase>
 <phrase>
@@ -451,10 +452,10 @@
     *: "Plugins"
   </source>
   <dest>
-    *: "プラグインの参照"
+    *: "プラグイン"
   </dest>
   <voice>
-    *: "プラグインの参照"
+    *: "プラグイン"
   </voice>
 </phrase>
 <phrase>
@@ -549,10 +550,10 @@
     *: "Resume"
   </source>
   <dest>
-    *: "ブックマークをレジューム"
+    *: "レジューム"
   </dest>
   <voice>
-    *: "ブックマークをレジューム"
+    *: "レジューム"
   </voice>
 </phrase>
 <phrase>
@@ -577,10 +578,10 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "ブックマークを作成しますか？"
+    *: "ブックマークを作成しますか?"
   </dest>
   <voice>
-    *: "ブックマークを作成しますか？"
+    *: "ブックマークを作成しますか?"
   </voice>
 </phrase>
 <phrase>
@@ -1662,11 +1663,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "クロスフェード"
+    swcodec: "クロスフェードの有効化"
   </dest>
   <voice>
     *: none
-    swcodec: "クロスフェード"
+    swcodec: "クロスフェードの有効化"
   </voice>
 </phrase>
 <phrase>
@@ -1900,10 +1901,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "シャッフル時にトラックゲインを使用"
+    *: "シャッフル時はトラックゲイン"
   </dest>
   <voice>
-    *: "シャッフル時にトラックゲインを使用"
+    *: "シャッフル時はトラックゲイン"
   </voice>
 </phrase>
 <phrase>
@@ -2390,14 +2391,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "データベース構築中... %d 件 (OFFで戻る)"
     h100,h120,h300: "データベース構築中... %d 件 (STOPで戻る)"
     ipod*: "データベース構築中... %d 件 (PLAY/PAUSEで戻る)"
     x5,m5,gigabeat*,mrobe100: "データベース構築中... %d 件 (左で戻る)"
-    h10,h10_5gb,e200*,c200*,sa9200: "データベース構築中... %d 件 (PREVで戻る)"
+    h10,h10_5gb,e200*,c200*,fuze*: "データベース構築中... %d 件 (PREVで戻る)"
+    sa9200: "データベース構築中... %d 件 (REWで戻る)"
   </dest>
   <voice>
     *: "データベースに登録"
@@ -2580,15 +2583,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "フォントの参照"
+    lcd_bitmap: "フォント"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "フォントの参照"
+    lcd_bitmap: "フォント"
   </voice>
 </phrase>
 <phrase>
@@ -2596,13 +2599,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: ".wpsファイルの参照"
+    *: "WPS"
   </dest>
   <voice>
-    *: ".wpsファイルの参照"
+    *: "WPS"
   </voice>
 </phrase>
 <phrase>
@@ -2611,15 +2614,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: ".rwpsファイルの参照"
+    remote: "リモコンのWPS"
   </dest>
   <voice>
     *: none
-    remote: ".rwpsファイルの参照"
+    remote: "リモコンのWPS"
   </voice>
 </phrase>
 <phrase>
@@ -2906,11 +2909,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "反転表示"
+    lcd_bitmap: "バー (反転)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "反転表示"
+    lcd_bitmap: "バー 反転"
   </voice>
 </phrase>
 <phrase>
@@ -4148,14 +4151,18 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
+    sa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = 設定"
+    mrobe500: "HEART = 設定"
     h100,h120,h300: "NAVI = 設定"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = 設定"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = 設定"
+    sa9200: "PLAY = 設定"
   </dest>
   <voice>
     *: none
@@ -4169,24 +4176,28 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
+    ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = 元に戻す"
+    mrobe500: "POWER = 元に戻す"
     h100,h120,h300: "STOP = 元に戻す"
-    ipod*,c200*,sa9200: "MENU = 元に戻す"
+    ipod*,c200*: "MENU = 元に戻す"
     x5,m5: "RECORD = 元に戻す"
     h10,h10_5gb,e200*,fuze*: "PREV = 元に戻す"
     gigabeatf: "POWER = 元に戻す"
     mrobe100: "DISPLAY = 元に戻す"
     gigabeats: "BACK = 元に戻す"
+    sa9200: "LEFT = 元に戻す"
   </dest>
   <voice>
     *: none
@@ -4583,7 +4594,7 @@
     *: "プレイリスト内の最大エントリ数"
   </dest>
   <voice>
-    *: "プレイリスト内の最大ファイル数"
+    *: "プレイリスト内の最大エントリ数"
   </voice>
 </phrase>
 <phrase>
@@ -4718,10 +4729,10 @@
   </source>
   <dest>
     *: none
-    alarm: "PLAY=セット OFF=キャンセル"
-    ipod*: "SELECT=セット MENU=キャンセル"
-    h10,h10_5gb: "SELECT=セット PREV=キャンセル"
-    gigabeats: "SELECT=セット POWER=キャンセル"
+    alarm: "PLAY=設定 OFF=キャンセル"
+    ipod*: "SELECT=設定 MENU=キャンセル"
+    h10,h10_5gb: "SELECT=設定 PREV=キャンセル"
+    gigabeats: "SELECT=設定 POWER=キャンセル"
   </dest>
   <voice>
     *: none
@@ -4851,10 +4862,10 @@
     *: "Language"
   </source>
   <dest>
-    *: "表示言語の設定"
+    *: "表示言語"
   </dest>
   <voice>
-    *: "表示言語の設定"
+    *: "表示言語"
   </voice>
 </phrase>
 <phrase>
@@ -5114,7 +5125,7 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
     *: "テーマの参照"
@@ -5405,7 +5416,7 @@
   </source>
   <dest>
     *: none
-    radio: "スクリーン凍結！"
+    radio: "スクリーン凍結!"
   </dest>
   <voice>
     *: none
@@ -5439,11 +5450,11 @@
   </source>
   <dest>
     *: none
-    radio: "現在のプリセット設定を消去しますか？"
+    radio: "現在のプリセット設定を消去しますか?"
   </dest>
   <voice>
     *: none
-    radio: "現在のプリセット設定を消去しますか？"
+    radio: "現在のプリセット設定を消去しますか?"
   </voice>
 </phrase>
 <phrase>
@@ -5575,11 +5586,11 @@
   </source>
   <dest>
     *: none
-    radio: "プリセットが空なので自動スキャンしますか？"
+    radio: "プリセットが空なので自動スキャンしますか?"
   </dest>
   <voice>
     *: none
-    radio: "プリセットが から なので自動スキャンしますか？"
+    radio: "プリセットが から なので自動スキャンしますか?"
   </voice>
 </phrase>
 <phrase>
@@ -5592,11 +5603,11 @@
   </source>
   <dest>
     *: none
-    radio: "プリセットを保存しますか？"
+    radio: "プリセットを保存しますか?"
   </dest>
   <voice>
     *: none
-    radio: "プリセットを保存しますか？"
+    radio: "プリセットを保存しますか?"
   </voice>
 </phrase>
 <phrase>
@@ -6054,7 +6065,7 @@
   </source>
   <dest>
     *: none
-    recording: "分割時間："
+    recording: "分割時間"
   </dest>
   <voice>
     *: none
@@ -6156,11 +6167,11 @@
   </source>
   <dest>
     *: none
-    recording: "録音ディレクトリに設定する"
+    recording: "録音ディレクトリに設定"
   </dest>
   <voice>
     *: none
-    recording: "録音ディレクトリに設定する"
+    recording: "録音ディレクトリに設定"
   </voice>
 </phrase>
 <phrase>
@@ -6658,10 +6669,10 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "現在のプレイリストの参照"
+    *: "現在のプレイリストを表示"
   </dest>
   <voice>
-    *: "現在のプレイリストの参照"
+    *: "現在のプレイリストを表示"
   </voice>
 </phrase>
 <phrase>
@@ -6798,10 +6809,10 @@
     *: "Recursively?"
   </source>
   <dest>
-    *: "サブディレクトリも含めますか？"
+    *: "サブディレクトリも含めますか?"
   </dest>
   <voice>
-    *: "サブディレクトリも含めますか？"
+    *: "サブディレクトリも含めますか?"
   </voice>
 </phrase>
 <phrase>
@@ -7225,10 +7236,10 @@
     *: "View"
   </source>
   <dest>
-    *: "参照"
+    *: "表示"
   </dest>
   <voice>
-    *: "参照"
+    *: "表示"
   </voice>
 </phrase>
 <phrase>
@@ -7281,10 +7292,10 @@
     *: "View Catalog"
   </source>
   <dest>
-    *: "カタログの参照"
+    *: "カタログを表示"
   </dest>
   <voice>
-    *: "カタログの参照"
+    *: "カタログを表示"
   </voice>
 </phrase>
 <phrase>
@@ -7323,10 +7334,10 @@
     *: "%s doesn't exist"
   </source>
   <dest>
-    *: "%s は存在しません"
+    *: "%s が存在しません"
   </dest>
   <voice>
-    *: "プレイリストディレクトリは存在しません。"
+    *: "プレイリストディレクトリが存在しません。"
   </voice>
 </phrase>
 <phrase>
@@ -7799,10 +7810,10 @@
     *: "Delete?"
   </source>
   <dest>
-    *: "削除しますか？"
+    *: "削除しますか?"
   </dest>
   <voice>
-    *: "削除しますか？"
+    *: "削除しますか?"
   </voice>
 </phrase>
 <phrase>
@@ -8251,8 +8262,6 @@
     *: "時間"
   </voice>
 </phrase>
-/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
- * the selector should probably be usb_charging_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
   desc: in Battery menu
@@ -8411,10 +8420,10 @@
     *: "Reboot now?"
   </source>
   <dest>
-    *: "再起動しますか？"
+    *: "再起動しますか?"
   </dest>
   <voice>
-    *: "再起動しますか？"
+    *: "再起動しますか?"
   </voice>
 </phrase>
 <phrase>
@@ -8431,13 +8440,13 @@
     gigabeatf: "POWER to abort"
   </source>
   <dest>
-    *: "OFF： キャンセル"
-    player,h100,h120,h300: "STOP： キャンセル"
-    ipod*: "PLAY/PAUSE： キャンセル"
-    x5,m5: "Long PLAY： キャンセル"
-    h10,h10_5gb,e200*,c200*: "PREV： キャンセル"
-    gigabeats: "BACK： キャンセル"
-    gigabeatf: "POWER： キャンセル"
+    *: "OFF: キャンセル"
+    player,h100,h120,h300: "STOP: キャンセル"
+    ipod*: "PLAY/PAUSE: キャンセル"
+    x5,m5: "Long PLAY: キャンセル"
+    h10,h10_5gb,e200*,c200*: "PREV: キャンセル"
+    gigabeats: "BACK: キャンセル"
+    gigabeatf: "POWER: キャンセル"
   </dest>
   <voice>
     *: ""
@@ -11013,10 +11022,10 @@
     *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "拡張子を表示する"
+    *: "拡張子の表示"
   </dest>
   <voice>
-    *: "拡張子を表示する"
+    *: "拡張子の表示"
   </voice>
 </phrase>
 <phrase>
@@ -12146,36 +12155,30 @@
 </phrase>
 <phrase>
   id: LANG_LEFT
-  desc: DEPRECATED
+  desc: Generic use of 'left'
   user: core
   <source>
-    *: none
-    quickscreen: ""
+    *: "Left"
   </source>
   <dest>
-    *: none
-    quickscreen: ""
+    *: "左"
   </dest>
   <voice>
-    *: none
-    quickscreen: ""
+    *: "左"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RIGHT
-  desc: DEPRECATED
+  desc: Generic use of 'right
   user: core
   <source>
-    *: none
-    quickscreen: ""
+    *: "Right"
   </source>
   <dest>
-    *: none
-    quickscreen: ""
+    *: "右"
   </dest>
   <voice>
-    *: none
-    quickscreen: ""
+    *: "右"
   </voice>
 </phrase>
 <phrase>
@@ -12219,11 +12222,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "左クイック画面の項目として設定"
+    quickscreen: "左クイック画面の項目に設定"
   </dest>
   <voice>
     *: none
-    quickscreen: "左クイック画面の項目として設定"
+    quickscreen: "左クイック画面の項目に設定"
   </voice>
 </phrase>
 <phrase>
@@ -12236,11 +12239,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "右クイック画面の項目として設定"
+    quickscreen: "右クイック画面の項目に設定"
   </dest>
   <voice>
     *: none
-    quickscreen: "右クイック画面の項目として設定"
+    quickscreen: "右クイック画面の項目に設定"
   </voice>
 </phrase>
 <phrase>
@@ -12253,11 +12256,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "下クイック画面の項目として設定"
+    quickscreen: "下クイック画面の項目に設定"
   </dest>
   <voice>
     *: none
-    quickscreen: "下クイック画面の項目として設定"
+    quickscreen: "下クイック画面の項目に設定"
   </voice>
 </phrase>
 <phrase>
@@ -12481,5 +12484,98 @@
   <voice>
     *: none
     touchscreen: "較正のリセット"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "上"
+  </dest>
+  <voice>
+    *: "上"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "下"
+  </dest>
+  <voice>
+    *: "下"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "リモコンのステータスバー"
+  </dest>
+  <voice>
+    *: none
+    remote: "リモコンのステータスバー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "スキンのRAM使用量:"
+  </dest>
+  <voice>
+    *: "スキンのRAM使用量"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "スクロールバーの幅"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "スクロールバーの幅"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "スクロールバーの位置"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "スクロールバーの位置"
   </voice>
 </phrase>
