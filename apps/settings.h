@@ -769,7 +769,7 @@ struct user_settings
     unsigned char remote_ui_vp_config[64]; /* viewport string for the remote lists */
 #endif
     int scrollbar_width;
-    bool scrollbar_position; /* true=left false=right */
+    bool scrollbar_position; /* false=left true=right */
 #endif
 
 #if CONFIG_CODEC == SWCODEC

@@ -608,8 +608,8 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,scrollbar, LANG_SCROLL_BAR, true, "scrollbar", NULL),
     INT_SETTING(0, scrollbar_width, LANG_SCROLLBAR_WIDTH, 6, "scrollbar width",
                 UNIT_INT, 3, LCD_WIDTH/10, 1, NULL, NULL, NULL),
-    BOOL_SETTING(0, scrollbar_position, LANG_SCROLLBAR_POSITION, true,
-                 "scrollbar pos", "left,right", LANG_LEFT, LANG_RIGHT, NULL),
+    BOOL_SETTING(F_TEMPVAR, scrollbar_position, LANG_SCROLLBAR_POSITION, false,
+                 "scrollbar pos", "left,right", LANG_RIGHT, LANG_LEFT, NULL),
 #if CONFIG_KEYPAD == RECORDER_PAD
     OFFON_SETTING(0,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),
 #endif
