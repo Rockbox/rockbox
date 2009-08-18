@@ -100,8 +100,9 @@ bool gui_wps_display(struct gui_wps *gwps)
 #if LCD_DEPTH > 1
     if (display->depth > 1)
     {
-        gwps->data->viewports[0].vp.fg_pattern = display->get_foreground();
-        gwps->data->viewports[0].vp.bg_pattern = display->get_background();
+        struct viewport *vp = &find_viewport(VP_DEFAULT_LABEL, gwps->data)->vp;
+        vp->fg_pattern = display->get_foreground();
+        vp->bg_pattern = display->get_background();
     }
 #endif
     display->clear_display();
@@ -132,7 +133,7 @@ bool skin_update(struct gui_wps *gwps, unsigned int update_type)
 #ifdef HAVE_LCD_BITMAP
 
 static void draw_progressbar(struct gui_wps *gwps,
-                             struct wps_viewport *wps_vp)
+                             struct skin_viewport *wps_vp)
  {
     struct screen *display = gwps->display;
     struct wps_state *state = gwps->state;
@@ -490,6 +491,19 @@ struct gui_img* find_image(int n, struct wps_data *data)
     return NULL;
 }   
 #endif 
+
+struct skin_viewport* find_viewport(char label, struct wps_data *data)
+{
+    struct skin_token_list *list = data->viewports;
+    while (list)
+    {
+        struct skin_viewport *vp = (struct skin_viewport *)list->token->value.data;
+        if (vp->label == label)
+            return vp;
+        list = list->next;
+    }
+    return NULL;
+}  
             
     
 /* Read a (sub)line to the given alignment format buffer.
@@ -590,18 +604,13 @@ static bool get_line(struct gui_wps *gwps,
             case WPS_VIEWPORT_ENABLE:
             {
                 char label = data->tokens[i].value.i;
-                int j;
                 char temp = VP_DRAW_HIDEABLE;
-                for(j=0;j<data->num_viewports;j++)
+                struct skin_viewport *vp = find_viewport(label, data);
+                if (vp)
                 {
-                    temp = VP_DRAW_HIDEABLE;
-                    if ((data->viewports[j].hidden_flags&VP_DRAW_HIDEABLE) &&
-                        (data->viewports[j].label == label))
-                    {
-                        if (data->viewports[j].hidden_flags&VP_DRAW_WASHIDDEN)
-                            temp |= VP_DRAW_WASHIDDEN;
-                        data->viewports[j].hidden_flags = temp;
-                    }
+                    if (vp->hidden_flags&VP_DRAW_WASHIDDEN)
+                        temp |= VP_DRAW_WASHIDDEN;
+                    vp->hidden_flags = temp;
                 }
             }
                 break;
@@ -926,7 +935,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
     if (!id3)
         return false;
 
-    int v, line, i, subline_idx;
+    int line, i, subline_idx;
     unsigned flags;
     char linebuf[MAX_PATH];
 
@@ -953,7 +962,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
     /* reset to first subline if refresh all flag is set */
     if (refresh_mode == WPS_REFRESH_ALL)
     {
-        display->set_viewport(&data->viewports[0].vp);
+        display->set_viewport(&find_viewport(VP_DEFAULT_LABEL, data)->vp);
         display->clear_viewport();
 
         for (i = 0; i <= data->num_lines; i++)
@@ -971,21 +980,28 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 #endif
 
     /* disable any viewports which are conditionally displayed */
-    for (v = 0; v < data->num_viewports; v++)
+    struct skin_token_list *viewport_list;
+    for (viewport_list = data->viewports; 
+         viewport_list; viewport_list = viewport_list->next)
     {
-        if (data->viewports[v].hidden_flags&VP_DRAW_HIDEABLE)
+        struct skin_viewport *skin_viewport = 
+                        (struct skin_viewport *)viewport_list->token->value.data;
+        if (skin_viewport->hidden_flags&VP_DRAW_HIDEABLE)
         {
-            if (data->viewports[v].hidden_flags&VP_DRAW_HIDDEN)
-                data->viewports[v].hidden_flags |= VP_DRAW_WASHIDDEN;
+            if (skin_viewport->hidden_flags&VP_DRAW_HIDDEN)
+                skin_viewport->hidden_flags |= VP_DRAW_WASHIDDEN;
             else
-                data->viewports[v].hidden_flags |= VP_DRAW_HIDDEN;
+                skin_viewport->hidden_flags |= VP_DRAW_HIDDEN;
         }
     }
-    for (v = 0; v < data->num_viewports; v++)
+    
+    for (viewport_list = data->viewports; 
+         viewport_list; viewport_list = viewport_list->next)
     {
-        struct wps_viewport *wps_vp = &(data->viewports[v]);
+        struct skin_viewport *skin_viewport = 
+                        (struct skin_viewport *)viewport_list->token->value.data;
         unsigned vp_refresh_mode = refresh_mode;
-        display->set_viewport(&wps_vp->vp);
+        display->set_viewport(&skin_viewport->vp);
 
 #ifdef HAVE_LCD_BITMAP
         /* Set images to not to be displayed */
@@ -998,27 +1014,27 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
         }
 #endif
         /* dont redraw the viewport if its disabled */
-        if ((wps_vp->hidden_flags&VP_DRAW_HIDDEN))
+        if ((skin_viewport->hidden_flags&VP_DRAW_HIDDEN))
         {
-            if (!(wps_vp->hidden_flags&VP_DRAW_WASHIDDEN))
-                display->scroll_stop(&wps_vp->vp);
-            wps_vp->hidden_flags |= VP_DRAW_WASHIDDEN;
+            if (!(skin_viewport->hidden_flags&VP_DRAW_WASHIDDEN))
+                display->scroll_stop(&skin_viewport->vp);
+            skin_viewport->hidden_flags |= VP_DRAW_WASHIDDEN;
             continue;
         }
-        else if (((wps_vp->hidden_flags&
+        else if (((skin_viewport->hidden_flags&
                    (VP_DRAW_WASHIDDEN|VP_DRAW_HIDEABLE))
                     == (VP_DRAW_WASHIDDEN|VP_DRAW_HIDEABLE)))
         {
             vp_refresh_mode = WPS_REFRESH_ALL;
-            wps_vp->hidden_flags = VP_DRAW_HIDEABLE;
+            skin_viewport->hidden_flags = VP_DRAW_HIDEABLE;
         }
         if (vp_refresh_mode == WPS_REFRESH_ALL)
         {
             display->clear_viewport();
         }
             
-        for (line = wps_vp->first_line; 
-             line <= wps_vp->last_line; line++)
+        for (line = skin_viewport->first_line; 
+             line <= skin_viewport->last_line; line++)
         {
             memset(linebuf, 0, sizeof(linebuf));
             update_line = false;
@@ -1044,8 +1060,8 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
                 /* the peakmeter should be alone on its line */
                 update_line = false;
 
-                int h = font_get(wps_vp->vp.font)->height;
-                int peak_meter_y = (line - wps_vp->first_line)* h;
+                int h = font_get(skin_viewport->vp.font)->height;
+                int peak_meter_y = (line - skin_viewport->first_line)* h;
 
                 /* The user might decide to have the peak meter in the last
                     line so that it is only displayed if no status bar is
@@ -1082,17 +1098,18 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
                    viewport there will be a blank line.
                    To get around this we dont allow any actual drawing to happen in the
                    deault vp if other vp's are defined */
-                ((data->num_viewports>1 && v!=0) || data->num_viewports == 1))
+                ((skin_viewport->label != VP_DEFAULT_LABEL && viewport_list->next) ||
+                 !viewport_list->next))
             {
                 if (flags & WPS_REFRESH_SCROLL)
                 {
                     /* if the line is a scrolling one we don't want to update
                        too often, so that it has the time to scroll */
                     if ((vp_refresh_mode & WPS_REFRESH_SCROLL) || new_subline_refresh)
-                        write_line(display, &align, line - wps_vp->first_line, true);
+                        write_line(display, &align, line - skin_viewport->first_line, true);
                 }
                 else
-                    write_line(display, &align, line - wps_vp->first_line, false);
+                    write_line(display, &align, line - skin_viewport->first_line, false);
             }
         }
 
@@ -1100,13 +1117,13 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
         /* progressbar */
         if (vp_refresh_mode & WPS_REFRESH_PLAYER_PROGRESS)
         {
-            if (wps_vp->pb)
+            if (skin_viewport->pb)
             {
-                draw_progressbar(gwps, wps_vp);
+                draw_progressbar(gwps, skin_viewport);
             }
         }
         /* Now display any images in this viewport */
-        wps_display_images(gwps, &wps_vp->vp);
+        wps_display_images(gwps, &skin_viewport->vp);
 #endif
     }
 

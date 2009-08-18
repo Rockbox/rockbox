@@ -77,6 +77,9 @@ static int numoptions[WPS_MAX_COND_LEVEL];
 /* the current line in the file */
 static int line;
 
+/* the current viewport */
+static struct skin_viewport *curr_vp;
+
 #ifdef HAVE_LCD_BITMAP
 
 #if LCD_DEPTH > 1
@@ -419,10 +422,11 @@ static int parse_statusbar_enable(const char *wps_bufptr,
     (void)token; /* Kill warnings */
     wps_data->wps_sb_tag = true;
     wps_data->show_sb_on_wps = true;
-    if (wps_data->viewports[0].vp.y == 0)
+    struct skin_viewport *default_vp = find_viewport(VP_DEFAULT_LABEL, wps_data);
+    if (default_vp->vp.y == 0)
     {
-        wps_data->viewports[0].vp.y = STATUSBAR_HEIGHT;
-        wps_data->viewports[0].vp.height -= STATUSBAR_HEIGHT;
+        default_vp->vp.y = STATUSBAR_HEIGHT;
+        default_vp->vp.height -= STATUSBAR_HEIGHT;
     }
     return skip_end_of_line(wps_bufptr);
 }
@@ -434,10 +438,11 @@ static int parse_statusbar_disable(const char *wps_bufptr,
     (void)token; /* Kill warnings */
     wps_data->wps_sb_tag = true;
     wps_data->show_sb_on_wps = false;
-    if (wps_data->viewports[0].vp.y == STATUSBAR_HEIGHT)
+    struct skin_viewport *default_vp = find_viewport(VP_DEFAULT_LABEL, wps_data);
+    if (default_vp->vp.y == STATUSBAR_HEIGHT)
     {
-        wps_data->viewports[0].vp.y = 0;
-        wps_data->viewports[0].vp.height += STATUSBAR_HEIGHT;
+        default_vp->vp.y = 0;
+        default_vp->vp.height += STATUSBAR_HEIGHT;
     }
     return skip_end_of_line(wps_bufptr);
 }
@@ -556,7 +561,7 @@ static int parse_image_load(const char *wps_bufptr,
     img->always_display = false;
 
     /* save current viewport */
-    img->vp = &wps_data->viewports[wps_data->num_viewports].vp;
+    img->vp = &curr_vp->vp;
 
     if (token->type == WPS_TOKEN_IMAGE_DISPLAY)
     {
@@ -612,13 +617,13 @@ static int parse_viewport(const char *wps_bufptr,
 #endif
                                                     SCREEN_MAIN;
 
-    if (wps_data->num_viewports >= WPS_MAX_VIEWPORTS)
-        return WPS_ERROR_INVALID_PARAM;
+    struct skin_viewport *skin_vp = skin_buffer_alloc(sizeof(struct skin_viewport));
     
-    wps_data->num_viewports++;
     /* check for the optional letter to signify its a hideable viewport */
     /* %Vl|<label>|<rest of tags>| */
-    wps_data->viewports[wps_data->num_viewports].hidden_flags = 0;
+    skin_vp->hidden_flags = 0;
+    skin_vp->label = VP_NO_LABEL;
+    skin_vp->pb = NULL;
     
     if (*ptr == 'l')
     {
@@ -627,8 +632,8 @@ static int parse_viewport(const char *wps_bufptr,
             char label = *(ptr+2);
             if (label >= 'a' && label <= 'z')
             {
-                wps_data->viewports[wps_data->num_viewports].hidden_flags = VP_DRAW_HIDEABLE;
-                wps_data->viewports[wps_data->num_viewports].label = label;
+                skin_vp->hidden_flags = VP_DRAW_HIDEABLE;
+                skin_vp->label = label;
             }
             else
                 return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
@@ -639,7 +644,7 @@ static int parse_viewport(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM;
     
     ptr++;
-    struct viewport *vp = &wps_data->viewports[wps_data->num_viewports].vp;
+    struct viewport *vp = &skin_vp->vp;
     /* format: %V|x|y|width|height|font|fg_pattern|bg_pattern| */
 
     if (!(ptr = viewport_parse_viewport(vp, screen, ptr, '|')))
@@ -649,10 +654,9 @@ static int parse_viewport(const char *wps_bufptr,
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
 
+    curr_vp->last_line = wps_data->num_lines - 1;
 
-    wps_data->viewports[wps_data->num_viewports-1].last_line = wps_data->num_lines - 1;
-
-    wps_data->viewports[wps_data->num_viewports].first_line = wps_data->num_lines;
+    skin_vp->first_line = wps_data->num_lines;
   
     if (wps_data->num_sublines < WPS_MAX_SUBLINES)
     {
@@ -663,6 +667,11 @@ static int parse_viewport(const char *wps_bufptr,
             wps_data->num_tokens;
     }
 
+    struct skin_token_list *list = new_skin_token_list_item(NULL, skin_vp);
+    if (!list)
+        return WPS_ERROR_INVALID_PARAM;
+    add_to_ll_chain(&wps_data->viewports, list);
+    curr_vp = skin_vp;    
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);
 }
@@ -818,14 +827,13 @@ static int parse_progressbar(const char *wps_bufptr,
 	if (!pb || !item)
 	    return WPS_ERROR_INVALID_PARAM;
     
-    struct viewport *vp = &wps_data->viewports[wps_data->num_viewports].vp;
+    struct viewport *vp = &curr_vp->vp;
 #ifndef __PCTOOL__
     int font_height = font_get(vp->font)->height;
 #else 
     int font_height = 8;
 #endif
-    int line_num = wps_data->num_lines -
-            wps_data->viewports[wps_data->num_viewports].first_line;
+    int line_num = wps_data->num_lines - curr_vp->first_line;
     
     pb->have_bitmap_pb = false;
 	pb->bm.data = NULL; /* no bitmap specified */
@@ -837,7 +845,7 @@ static int parse_progressbar(const char *wps_bufptr,
         pb->height = SYSFONT_HEIGHT-2;
         pb->y = -line_num - 1; /* Will be computed during the rendering */
 
-        wps_data->viewports[wps_data->num_viewports].pb = pb;
+        curr_vp->pb = pb;
         add_to_ll_chain(&wps_data->progressbars, item);
         return 0;
     }
@@ -882,7 +890,7 @@ static int parse_progressbar(const char *wps_bufptr,
     else
         pb->y = -line_num - 1; /* Will be computed during the rendering */
 
-    wps_data->viewports[wps_data->num_viewports].pb = pb;
+    curr_vp->pb = pb;
     add_to_ll_chain(&wps_data->progressbars, item);
 
     /* Skip the rest of the line */
@@ -1154,7 +1162,7 @@ static int parse_touchregion(const char *wps_bufptr,
     region->y = y;
     region->width = w;
     region->height = h;
-    region->wvp = &wps_data->viewports[wps_data->num_viewports];
+    region->wvp = curr_vp;
     
     if(!strncmp(pb_string, action, sizeof(pb_string)-1)
         && *(action + sizeof(pb_string)-1) == '|')
@@ -1282,7 +1290,6 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     level = -1;
 
     while(*wps_bufptr && !fail && data->num_tokens < WPS_MAX_TOKENS - 1
-          && data->num_viewports < WPS_MAX_VIEWPORTS 
           && data->num_lines < WPS_MAX_LINES)
     {
         switch(*wps_bufptr++)
@@ -1481,10 +1488,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
         /* one of the limits of the while loop was exceeded */
         fail = PARSE_FAIL_LIMITS_EXCEEDED;
 
-    data->viewports[data->num_viewports].last_line = data->num_lines - 1;
-
-    /* We have finished with the last viewport, so increment count */
-    data->num_viewports++;
+    curr_vp->last_line = data->num_lines - 1;
 
 #if defined(DEBUG) || defined(SIMULATOR)
     print_debug_info(data, fail, line);
@@ -1611,34 +1615,46 @@ bool skin_data_load(struct wps_data *wps_data,
         return false;
 
     wps_reset(wps_data);
+    
+    curr_vp = skin_buffer_alloc(sizeof(struct skin_viewport));
+    if (!curr_vp)
+        return false;
+    struct skin_token_list *list = new_skin_token_list_item(NULL, curr_vp);
+    if (!list)
+        return false;
+    add_to_ll_chain(&wps_data->viewports, list);
+    
 
     /* Initialise the first (default) viewport */
-    wps_data->viewports[0].vp.x          = 0;
-    wps_data->viewports[0].vp.width      = display->getwidth();
-    wps_data->viewports[0].vp.height     = display->getheight();
+    curr_vp->label         = VP_DEFAULT_LABEL;
+    curr_vp->vp.x          = 0;
+    curr_vp->vp.width      = display->getwidth();
+    curr_vp->vp.height     = display->getheight();
+    curr_vp->pb            = NULL;
+    curr_vp->hidden_flags  = 0;
     switch (statusbar_position(display->screen_type))
     {
         case STATUSBAR_OFF:
-            wps_data->viewports[0].vp.y      = 0;
+            curr_vp->vp.y      = 0;
             break;
         case STATUSBAR_TOP:        
-            wps_data->viewports[0].vp.y       = STATUSBAR_HEIGHT;
-            wps_data->viewports[0].vp.height -= STATUSBAR_HEIGHT;
+            curr_vp->vp.y       = STATUSBAR_HEIGHT;
+            curr_vp->vp.height -= STATUSBAR_HEIGHT;
             break;
         case STATUSBAR_BOTTOM:
-            wps_data->viewports[0].vp.y       = 0;
-            wps_data->viewports[0].vp.height -= STATUSBAR_HEIGHT;
+            curr_vp->vp.y       = 0;
+            curr_vp->vp.height -= STATUSBAR_HEIGHT;
             break;
     }
 #ifdef HAVE_LCD_BITMAP
-    wps_data->viewports[0].vp.font       = FONT_UI;
-    wps_data->viewports[0].vp.drawmode   = DRMODE_SOLID;
+    curr_vp->vp.font       = FONT_UI;
+    curr_vp->vp.drawmode   = DRMODE_SOLID;
 #endif
 #if LCD_DEPTH > 1
     if (display->depth > 1)
     {
-        wps_data->viewports[0].vp.fg_pattern = display->get_foreground();
-        wps_data->viewports[0].vp.bg_pattern = display->get_background();
+        curr_vp->vp.fg_pattern = display->get_foreground();
+        curr_vp->vp.bg_pattern = display->get_background();
     }
 #endif
     if (!isfile)

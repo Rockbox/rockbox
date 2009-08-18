@@ -191,7 +191,9 @@ struct wps_line {
 #define VP_DRAW_HIDEABLE 0x1
 #define VP_DRAW_HIDDEN   0x2
 #define VP_DRAW_WASHIDDEN  0x4
-struct wps_viewport {
+#define VP_DEFAULT_LABEL '|'
+#define VP_NO_LABEL      '-'
+struct skin_viewport {
     struct viewport vp;   /* The LCD viewport struct */
     struct progressbar *pb;
     /* Indexes of the first and last lines belonging to this viewport in the 
@@ -203,7 +205,7 @@ struct wps_viewport {
 
 #ifdef HAVE_TOUCHSCREEN
 struct touchregion {
-    struct wps_viewport* wvp;/* The viewport this region is in */
+    struct skin_viewport* wvp;/* The viewport this region is in */
     short int x;             /* x-pos */
     short int y;             /* y-pos */
     short int width;         /* width */
@@ -262,8 +264,7 @@ struct wps_data
     int num_lines;
 
     /* Number of viewports in the WPS */
-    int num_viewports;
-    struct wps_viewport viewports[WPS_MAX_VIEWPORTS];
+    struct skin_token_list *viewports;
 
     struct wps_line lines[WPS_MAX_LINES];
 
@@ -346,5 +347,6 @@ const char *get_token_value(struct gui_wps *gwps,
 
 
 struct gui_img* find_image(int n, struct wps_data *data);
+struct skin_viewport* find_viewport(char label, struct wps_data *data);
 
 #endif

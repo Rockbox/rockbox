@@ -495,12 +495,13 @@ static void dump_wps_tokens(struct wps_data *data)
     }
 }
 
+#if 0
+/* NOTE: this is probaly not even needed anymore */
 static void print_line_info(struct wps_data *data)
 {
     int i, j, v;
     struct wps_line *line;
     struct wps_subline *subline;
-
     if (wps_verbose_level > 0)
     {
         DEBUGF("Number of viewports : %d\n", data->num_viewports);
@@ -513,7 +514,7 @@ static void print_line_info(struct wps_data *data)
         DEBUGF("Number of tokens    : %d\n", data->num_tokens);
         DEBUGF("\n");
     }
-
+    
     if (wps_verbose_level > 1)
     {
         for (v = 0; v < data->num_viewports; v++)
@@ -549,8 +550,6 @@ static void print_line_info(struct wps_data *data)
         DEBUGF("\n");
     }
 }
-#if 0
-/* NOTE: this is probaly not even needed anymore */
 static void print_wps_strings(struct wps_data *data)
 {
     int i, len, total_len = 0, buf_used = 0;
@@ -588,7 +587,7 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
     {
         dump_wps_tokens(data);
       /*  print_wps_strings(data); */
-        print_line_info(data);
+     /*   print_line_info(data); */
     }
 #endif /* SIMULATOR */
 

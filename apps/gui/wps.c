@@ -1239,7 +1239,7 @@ static void statusbar_toggle_handler(void *data)
 
     FOR_NB_SCREENS(i)
     {
-        struct viewport *vp = &gui_wps[i].data->viewports[0].vp;
+        struct viewport *vp = &find_viewport(VP_DEFAULT_LABEL, &wps_datas[i])->vp;
         bool draw = wpsbars & (VP_SB_ONSCREEN(i) | VP_SB_IGNORE_SETTING(i));
         if (!draw)
         {
