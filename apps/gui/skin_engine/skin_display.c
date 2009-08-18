@@ -478,13 +478,13 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
     return true;
 }
 #ifdef HAVE_LCD_BITMAP
-struct gui_img* find_image(int n, struct wps_data *data)
+struct gui_img* find_image(char label, struct wps_data *data)
 {
     struct skin_token_list *list = data->images;
     while (list)
     {
         struct gui_img *img = (struct gui_img *)list->token->value.data;
-        if (img->id == n)
+        if (img->label == label)
             return img;
         list = list->next;
     }
@@ -555,7 +555,7 @@ static bool get_line(struct gui_wps *gwps,
 #ifdef HAVE_LCD_BITMAP
             case WPS_TOKEN_IMAGE_PRELOAD_DISPLAY:
             {
-                int n = data->tokens[i].value.i & 0xFF;
+                char n = data->tokens[i].value.i & 0xFF;
                 int subimage = data->tokens[i].value.i >> 8;
                 struct gui_img *img = find_image(n, data);
 

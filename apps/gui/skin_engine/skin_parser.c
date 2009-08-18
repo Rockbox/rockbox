@@ -482,19 +482,17 @@ static int parse_image_display(const char *wps_bufptr,
                                struct wps_token *token,
                                struct wps_data *wps_data)
 {
-    int n = get_image_id(wps_bufptr[0]);
+    char label = wps_bufptr[0];
     int subimage;
 	struct gui_img *img;;
 
-    if (n == -1)
+    /* sanity check */
+    img = find_image(label, wps_data);
+    if (!img)
     {
-        /* invalid picture display tag */
+        token->value.i = label; /* do debug works */
         return WPS_ERROR_INVALID_PARAM;
     }
-    /* sanity check */
-    img = find_image(n, wps_data);
-    if (!img)
-        return WPS_ERROR_INVALID_PARAM;
 
     if ((subimage = get_image_id(wps_bufptr[1])) != -1)
     {
@@ -502,10 +500,10 @@ static int parse_image_display(const char *wps_bufptr,
             return WPS_ERROR_INVALID_PARAM;
 
         /* Store sub-image number to display in high bits */
-        token->value.i = n | (subimage << 8);
+        token->value.i = label | (subimage << 8);
         return 2; /* We have consumed 2 bytes */
     } else {
-        token->value.i = n;
+        token->value.i = label;
         return 1; /* We have consumed 1 byte */
     }
 }
@@ -514,7 +512,6 @@ static int parse_image_load(const char *wps_bufptr,
                             struct wps_token *token,
                             struct wps_data *wps_data)
 {
-    int n;
     const char *ptr = wps_bufptr;
     const char *pos;
     const char* filename;
@@ -540,11 +537,8 @@ static int parse_image_load(const char *wps_bufptr,
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
 
-    /* get the image ID */
-    n = get_image_id(*id);
-
     /* check the image number and load state */
-    if(n < 0 || find_image(n, wps_data))
+    if(find_image(*id, wps_data))
     {
         /* Invalid image ID */
         return WPS_ERROR_INVALID_PARAM;
@@ -554,7 +548,7 @@ static int parse_image_load(const char *wps_bufptr,
 	    return WPS_ERROR_INVALID_PARAM;
     /* save a pointer to the filename */
     img->bm.data = (char*)filename;
-    img->id = n;
+    img->label = *id;
     img->x = x;
     img->y = y;
 	img->num_subimages = 1;

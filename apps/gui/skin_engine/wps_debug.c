@@ -113,8 +113,8 @@ static char *get_token_desc(struct wps_token *token, struct wps_data *data,
             break;
 
         case WPS_TOKEN_IMAGE_PRELOAD_DISPLAY:
-            snprintf(buf, bufsize, "display preloaded image %d",
-                    token->value.i);
+            snprintf(buf, bufsize, "display preloaded image '%c'",
+                    token->value.i&0xFF);
             break;
 
         case WPS_TOKEN_IMAGE_DISPLAY:

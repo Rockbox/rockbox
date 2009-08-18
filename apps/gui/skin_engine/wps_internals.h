@@ -77,7 +77,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 struct gui_img {
-    short int id;
+    char label;
     struct bitmap bm;
     struct viewport* vp;    /* The viewport to display this image in */
     short int x;                  /* x-pos */
@@ -346,7 +346,7 @@ const char *get_token_value(struct gui_wps *gwps,
 
 
 
-struct gui_img* find_image(int n, struct wps_data *data);
+struct gui_img* find_image(char label, struct wps_data *data);
 struct skin_viewport* find_viewport(char label, struct wps_data *data);
 
 #endif
