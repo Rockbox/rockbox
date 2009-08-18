@@ -12209,40 +12209,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LEFT
-  desc: DEPRECATED
-  user: core
-  <source>
-    *: none
-    quickscreen: ""
-  </source>
-  <dest>
-    *: none
-    quickscreen: ""
-  </dest>
-  <voice>
-    *: none
-    quickscreen: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RIGHT
-  desc: DEPRECATED
-  user: core
-  <source>
-    *: none
-    quickscreen: ""
-  </source>
-  <dest>
-    *: none
-    quickscreen: ""
-  </dest>
-  <voice>
-    *: none
-    quickscreen: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BOTTOM
   desc: DEPRECATED
   user: core

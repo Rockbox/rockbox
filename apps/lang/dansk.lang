@@ -12126,23 +12126,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RIGHT
-  desc: DEPRECATED
-  user: core
-  <source>
-    *: none
-    quickscreen: ""
-  </source>
-  <dest>
-    *: none
-    quickscreen: ""
-  </dest>
-  <voice>
-    *: none
-    quickscreen: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_QS_ITEMS
   desc: DEPRECATED
   user: core
@@ -12174,23 +12157,6 @@
   <voice>
     *: none
     quickscreen: "Vælg som højre hurtigindstilling"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LEFT
-  desc: DEPRECATED
-  user: core
-  <source>
-    *: none
-    quickscreen: ""
-  </source>
-  <dest>
-    *: none
-    quickscreen: ""
-  </dest>
-  <voice>
-    *: none
-    quickscreen: ""
   </voice>
 </phrase>
 <phrase>
