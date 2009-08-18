@@ -202,4 +202,6 @@
 #define IPOD_ACCESSORY_PROTOCOL
 #define HAVE_SERIAL
 
+#define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
+
 #endif

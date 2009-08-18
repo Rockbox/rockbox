@@ -169,4 +169,6 @@
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
+#define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
+
 #endif /* SIMULATOR */
