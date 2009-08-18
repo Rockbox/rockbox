@@ -12670,13 +12670,16 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: "Scroll Bar Width"
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
   </source>
   <dest>
-    *: "Scroll Bar Width"
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
   </dest>
   <voice>
-    *: "Scroll bar width"
+    *: none
+    lcd_bitmap: "Scroll bar width"
   </voice>
 </phrase>
 <phrase>
@@ -12684,12 +12687,15 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: "Scroll Bar Position"
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
   </source>
   <dest>
-    *: "Scroll Bar Position"
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
   </dest>
   <voice>
-    *: "Scroll bar position"
+    *: none
+    lcd_bitmap: "Scroll bar position"
   </voice>
 </phrase>
