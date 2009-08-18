@@ -220,7 +220,7 @@ PLUGIN_HEADER
 
 static int board[BOARD_WIDTH][BOARD_HEIGHT],snakelength;
 static int score,level=1;
-static int dir,dead=0;
+static int dir,dead=0,quit=0;
 static bool apple;
 
 static struct highscore highscores[NUM_SCORES];
@@ -247,6 +247,12 @@ void die (void)
 
 void colission (short x, short y)
 {
+    if (x==BOARD_WIDTH || x<0 || y==BOARD_HEIGHT || y<0)
+    {
+        die();
+        return;
+    }
+
     switch (board[x][y]) {
         case 0:
             break;
@@ -259,8 +265,6 @@ void colission (short x, short y)
             die();
             break;
     }
-    if (x==BOARD_WIDTH || x<0 || y==BOARD_HEIGHT || y<0)
-        die();
 }
 
 void move_head (short x, short y)
@@ -362,6 +366,7 @@ void game_pause (void) {
 #endif
             case SNAKE_QUIT:
                 dead=1;
+                quit=1;
                 return;
             case SNAKE_PLAYPAUSE:
                 redraw();
@@ -369,7 +374,8 @@ void game_pause (void) {
                 return;
             default:
                 if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
-                    dead=2;
+                    dead = 1;
+                    quit = 2;
                     return;
                 }
                 break;
@@ -422,14 +428,14 @@ void game (void) {
              case SNAKE_RC_QUIT:
 #endif
              case SNAKE_QUIT:
-                 dead=1;
+                 quit = 1;
                  return;
              case SNAKE_PLAYPAUSE:
                  game_pause();
                  break;
              default:
                  if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
-                     dead=2;
+                     quit = 2;
                      return;
                  }
                  break;
@@ -453,6 +459,10 @@ void game_init(void) {
     score=0;
     board[11][7]=1;
 
+#if LCD_DEPTH > 1
+    fb_data *backdrop = rb->lcd_get_backdrop();
+#endif
+
     MENUITEM_STRINGLIST(menu, "Snake Menu", NULL,
                         "Start New Game", "Starting Level",
                         "High Scores",
@@ -473,7 +483,19 @@ void game_init(void) {
                 break;
 
             case 2:
+#if LCD_DEPTH > 1
+                rb->lcd_set_backdrop(NULL);
+#endif
                 highscore_show(NUM_SCORES, highscores, NUM_SCORES, true);
+
+                rb->lcd_setfont(FONT_UI);
+#if LCD_DEPTH > 1
+                rb->lcd_set_backdrop(backdrop);
+#ifdef HAVE_LCD_COLOR
+                rb->lcd_set_background(rb->global_settings->bg_color);
+                rb->lcd_set_foreground(rb->global_settings->fg_color);
+#endif
+#endif
                 break;
 
             case 3:
@@ -481,12 +503,12 @@ void game_init(void) {
                 break;
 
             case MENU_ATTACHED_USB:
-                dead = 2;
+                quit = 2;
                 menu_quit = true;
                 break;
 
             default:
-                dead=1; /* quit program */
+                quit = 1; /* quit program */
                 menu_quit = true;
                 break;
 
@@ -499,16 +521,16 @@ enum plugin_status plugin_start(const void* parameter)
     (void)(parameter);
 
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);
-    while(dead == 0)
+    while(!quit)
     {
         game_init();
-        if(dead)
+        if(quit)
             break;
         rb->lcd_clear_display();
         game();
     }
     highscore_save(SCORE_FILE, highscores, NUM_SCORES);
-    return (dead==1)?PLUGIN_OK:PLUGIN_USB_CONNECTED;
+    return (quit==1)?PLUGIN_OK:PLUGIN_USB_CONNECTED;
 }
 
 #endif
