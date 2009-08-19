@@ -18,6 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <sys/types.h>
+
 #include "config.h"
 #include "cpu.h"
 #include "lcd.h"

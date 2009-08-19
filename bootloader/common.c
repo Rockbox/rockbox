@@ -34,6 +34,7 @@
 #include "button.h"
 #include "string.h"
 #include "usb.h"
+#include "file.h"
 
 /* TODO: Other bootloaders need to be adjusted to set this variable to true
    on a button press - currently only the ipod, H10 and Sansa versions do. */

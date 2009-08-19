@@ -23,7 +23,8 @@
 #include "lcd.h"
 #include "lcd-charcell.h"
 #include "screendump.h"
-#include "general.h"          
+#include "general.h"   
+#include "file.h"       
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>

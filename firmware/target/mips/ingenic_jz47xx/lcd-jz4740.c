@@ -18,7 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+#include <sys/types.h>
+
 #include "config.h"
 #include "jz4740.h"
 #include "lcd.h"
