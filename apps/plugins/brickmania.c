@@ -765,11 +765,7 @@ static void brickmania_sleep(int secs)
                 vscore--;
             rb->snprintf(s, sizeof(s), "%d", vscore);
             rb->lcd_getstringsize(s, &sw, &w);
-#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
             rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 0, s);
-#else
-            rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 2, s);
-#endif
             rb->lcd_update_rect(0,0,LCD_WIDTH,w+2);
         }
         rb->yield();
@@ -942,7 +938,7 @@ static int brickmania_pad_check(int ballxc, int mode, int pon ,int ballnum)
         if (ball[ballnum].x > 0)
             return ballxc;
         else
-           return ballxc*-1;
+            return ballxc*-1;
     }
 }
 
@@ -1022,11 +1018,7 @@ static int brickmania_game_loop(void)
             if (vscore<score) vscore++;
             rb->snprintf(s, sizeof(s), "%d", vscore);
             rb->lcd_getstringsize(s, &sw, NULL);
-#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
             rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 0, s);
-#else
-            rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 0, s);
-#endif
 
             /* continue game */
             if (game_state==ST_PAUSE) {
