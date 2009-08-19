@@ -605,12 +605,20 @@ static bool get_line(struct gui_wps *gwps,
             {
                 char label = data->tokens[i].value.i;
                 char temp = VP_DRAW_HIDEABLE;
-                struct skin_viewport *vp = find_viewport(label, data);
-                if (vp)
+                /* viewports are allowed to share id's so find and enable
+                 * all of them */
+                struct skin_token_list *list = data->viewports;
+                while (list)
                 {
-                    if (vp->hidden_flags&VP_DRAW_WASHIDDEN)
-                        temp |= VP_DRAW_WASHIDDEN;
-                    vp->hidden_flags = temp;
+                    struct skin_viewport *vp = 
+                                (struct skin_viewport *)list->token->value.data;
+                    if (vp->label == label)
+                    {
+                        if (vp->hidden_flags&VP_DRAW_WASHIDDEN)
+                            temp |= VP_DRAW_WASHIDDEN;
+                        vp->hidden_flags = temp;
+                    }
+                    list = list->next;
                 }
             }
                 break;
