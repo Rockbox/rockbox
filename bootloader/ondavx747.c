@@ -24,6 +24,7 @@
 #include "backlight.h"
 #include "font.h"
 #include "lcd.h"
+#include "file.h"
 #include "usb.h"
 #include "system.h"
 #include "button.h"

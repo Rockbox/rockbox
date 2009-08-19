@@ -23,8 +23,7 @@
 #include "lcd.h"
 #include "lcd-charcell.h"
 #include "screendump.h"
-#include "general.h"   
-#include "file.h"       
+#include "general.h"
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -32,6 +31,11 @@
 #include "lcd-playersim.h"
 #include "uisdl.h"
 #include "lcd-sdl.h"
+
+/* can't include file.h here */
+#ifndef MAX_PATH
+#define MAX_PATH 260
+#endif
 
 /* extern functions, needed for screendump() */
 extern int sim_creat(const char *name);
