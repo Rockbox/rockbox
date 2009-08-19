@@ -76,8 +76,10 @@
     - lang_id: LANG_* id to display in menus and setting screens for the setting
     - default: the default value for the variable, set if settings are reset
     - name: the name of the setting in config files
-    - cfg_vals: comma seperated list of legal values in cfg files.
-                NULL if a number is written to the file instead.
+    - cfg_vals: comma separated list of legal values to write to cfg files.
+                The values correspond to the values 0,1,2,etc. of the setting.
+                NULL if just the number itself should be written to the file.
+                No spaces between the values and the commas!
     - cb: the callback used by the setting screen.
 */
 
@@ -91,15 +93,17 @@
       or dont save as "off" or "on" in the cfg.
    cfgvals are comma separated values (without spaces after the comma!) to write
       for 'false' and 'true' (in this order)
+   yes_id is the lang_id for the 'yes' (or 'on') option in the menu
+   no_id is the lang_id for the 'no' (or 'off') option in the menu
  */
-#define BOOL_SETTING(flags,var,lang_id,default,name,cfgvals,yes,no,cb)      \
+#define BOOL_SETTING(flags,var,lang_id,default,name,cfgvals,yes_id,no_id,cb)\
             {flags|F_BOOL_SETTING, &global_settings.var,                    \
                 lang_id, BOOL(default),name,cfgvals,                        \
-                {.bool_setting=(struct bool_setting[]){{cb,yes,no}}} }
+                {.bool_setting=(struct bool_setting[]){{cb,yes_id,no_id}}} }
 
 /* bool setting which does use LANG_YES and _NO and save as "off,on" */
 #define OFFON_SETTING(flags,var,lang_id,default,name,cb)                    \
-            BOOL_SETTING(flags,var,lang_id,default,name,off_on,               \
+            BOOL_SETTING(flags,var,lang_id,default,name,off_on,             \
                 LANG_SET_BOOL_YES,LANG_SET_BOOL_NO,cb)
 
 /* int variable which is NOT saved to .cfg files,
