@@ -135,7 +135,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         vp.height = line_height *
                     viewport_get_nb_lines(&list_text[screen]);
         vp.x = parent->x;
-        if(global_settings.scrollbar == SCROLLBAR_RIGHT) /* right */
+        if(global_settings.scrollbar == SCROLLBAR_RIGHT)
             vp.x += list_text[screen].width;
         display->set_viewport(&vp);
         gui_scrollbar_draw(display, 0, 0, SCROLLBAR_WIDTH-1,
