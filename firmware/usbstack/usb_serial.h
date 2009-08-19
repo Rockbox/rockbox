@@ -32,7 +32,7 @@ void usb_serial_disconnect(void);
 void usb_serial_transfer_complete(int ep,int dir, int status, int length);
 bool usb_serial_control_request(struct usb_ctrlrequest* req, unsigned char *dest);
 
-void usb_serial_send(unsigned char *data,int length);
+void usb_serial_send(const unsigned char *data, int length);
 
 #endif
 

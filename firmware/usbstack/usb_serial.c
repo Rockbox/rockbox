@@ -169,7 +169,7 @@ static void sendout(void)
     }
 }
 
-void usb_serial_send(unsigned char *data,int length)
+void usb_serial_send(const unsigned char *data,int length)
 {
     int freestart, available_end_space, i;
 
