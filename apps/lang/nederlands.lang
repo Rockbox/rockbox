@@ -12585,11 +12585,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Scrollbar breedte"
+    lcd_bitmap: "Scroll balk breedte"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll bar breedte"
+    lcd_bitmap: "Scroll balk breedte"
   </voice>
 </phrase>
 <phrase>
@@ -12602,10 +12602,10 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Scrollbar positie"
+    lcd_bitmap: "Scroll balk positie"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll bar positie"
+    lcd_bitmap: "Scroll balk positie"
   </voice>
 </phrase>
