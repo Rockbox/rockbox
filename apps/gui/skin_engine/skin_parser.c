@@ -99,6 +99,7 @@ static const char *bmp_names[MAX_BITMAPS];
 #if defined(DEBUG) || defined(SIMULATOR)
 /* debugging function */
 extern void print_debug_info(struct wps_data *data, int fail, int line);
+extern void debug_skin_usage(void);
 #endif
 
 static void wps_reset(struct wps_data *data);
@@ -1275,7 +1276,7 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
         It is initialised.
    wps_bufptr points to the string containing the WPS tags */
 #define TOKEN_BLOCK_SIZE 128   
-static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
+static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
 {
     if (!data || !wps_bufptr || !*wps_bufptr)
         return false;
@@ -1515,7 +1516,10 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     curr_vp->last_line = data->num_lines - 1;
 
 #if defined(DEBUG) || defined(SIMULATOR)
-    print_debug_info(data, fail, line);
+    if (debug)
+        print_debug_info(data, fail, line);
+#else
+    (void)debug;
 #endif
 
     return (fail == 0);
@@ -1683,7 +1687,7 @@ bool skin_data_load(struct wps_data *wps_data,
 #endif
     if (!isfile)
     {
-        return wps_parse(wps_data, buf);
+        return wps_parse(wps_data, buf, false);
     }
     else
     {
@@ -1744,7 +1748,7 @@ bool skin_data_load(struct wps_data *wps_data,
 #endif
 
         /* parse the WPS source */
-        if (!wps_parse(wps_data, wps_buffer)) {
+        if (!wps_parse(wps_data, wps_buffer, true)) {
             wps_reset(wps_data);
             return false;
         }
@@ -1778,6 +1782,9 @@ bool skin_data_load(struct wps_data *wps_data,
             if (!(status & AUDIO_STATUS_PAUSE))
                 audio_play(offset);
         }
+#endif
+#if defined(DEBUG) || defined(SIMULATOR)
+        debug_skin_usage();
 #endif
         return true;
     }

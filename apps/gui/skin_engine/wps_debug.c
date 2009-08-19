@@ -25,6 +25,7 @@
 #include <string.h>
 #include "wps.h"
 #include "wps_internals.h"
+#include "skin_buffer.h"
 #ifdef __PCTOOL__
 #ifdef WPSEDITOR
 #include "proxy.h"
@@ -44,8 +45,7 @@ static char *next_str(bool next) {
     return next ? "next " : "";
 }
 
-static char *get_token_desc(struct wps_token *token, struct wps_data *data,
-                            char *buf, int bufsize)
+static char *get_token_desc(struct wps_token *token, char *buf, int bufsize)
 {
     bool next = token->next;
 
@@ -66,7 +66,7 @@ static char *get_token_desc(struct wps_token *token, struct wps_data *data,
 
         case WPS_TOKEN_STRING:
             snprintf(buf, bufsize, "String '%s'",
-                     data->strings[token->value.i]);
+                     (char*)token->value.data);
             break;
 
 #ifdef HAVE_LCD_BITMAP
@@ -452,18 +452,14 @@ static void dump_wps_tokens(struct wps_data *data)
     int i, j;
     int indent = 0;
     char buf[64];
-    int num_string_tokens = 0;
 
     /* Dump parsed WPS */
     for (i = 0, token = data->tokens; i < data->num_tokens; i++, token++)
     {
-        get_token_desc(token, data, buf, sizeof(buf));
+        get_token_desc(token, buf, sizeof(buf));
 
         switch(token->type)
         {
-            case WPS_TOKEN_STRING:
-                num_string_tokens++;
-                break;
 
             case WPS_TOKEN_CONDITIONAL_START:
                 indent++;
@@ -486,29 +482,24 @@ static void dump_wps_tokens(struct wps_data *data)
             DEBUGF("[%3d] = (%2d) %s\n", i, token->type, buf);
         }
     }
-
-    if (wps_verbose_level > 0)
-    {
-        DEBUGF("\n");
-        DEBUGF("Number of string tokens: %d\n", num_string_tokens);
-        DEBUGF("\n");
-    }
 }
 
-#if 0
-/* NOTE: this is probaly not even needed anymore */
 static void print_line_info(struct wps_data *data)
 {
-    int i, j, v;
+    int i, j;
     struct wps_line *line;
     struct wps_subline *subline;
     if (wps_verbose_level > 0)
     {
-        DEBUGF("Number of viewports : %d\n", data->num_viewports);
-        for (v = 0; v < data->num_viewports; v++)
+        struct skin_token_list *viewport_list;
+        for (viewport_list = data->viewports; 
+             viewport_list; viewport_list = viewport_list->next)
         {
-            DEBUGF("vp %d: First line: %d\n", v, data->viewports[v].first_line);
-            DEBUGF("vp %d: Last line: %d\n", v, data->viewports[v].last_line);
+            struct skin_viewport *v = 
+                            (struct skin_viewport *)viewport_list->token->value.data;
+            DEBUGF("vp Label:'%c' Hidden flags:%x\n", v->label, v->hidden_flags); 
+            DEBUGF("   First line: %d\n", v->first_line);
+            DEBUGF("   Last line: %d\n", v->last_line);
         }
         DEBUGF("Number of sublines  : %d\n", data->num_sublines);
         DEBUGF("Number of tokens    : %d\n", data->num_tokens);
@@ -517,13 +508,15 @@ static void print_line_info(struct wps_data *data)
     
     if (wps_verbose_level > 1)
     {
-        for (v = 0; v < data->num_viewports; v++)
+        struct skin_token_list *viewport_list;
+        for (viewport_list = data->viewports; 
+             viewport_list; viewport_list = viewport_list->next)
         {
-            DEBUGF("Viewport %d - +%d+%d (%dx%d)\n",v,data->viewports[v].vp.x, 
-                                                      data->viewports[v].vp.y,
-                                                      data->viewports[v].vp.width,
-                                                      data->viewports[v].vp.height);
-            for (i = data->viewports[v].first_line, line = &data->lines[data->viewports[v].first_line]; i <= data->viewports[v].last_line; i++,line++)
+            struct skin_viewport *v = 
+                            (struct skin_viewport *)viewport_list->token->value.data;
+            DEBUGF("Viewport '%c' - +%d+%d (%dx%d)\n",v->label, v->vp.x, v->vp.y, 
+                                                    v->vp.width, v->vp.height);
+            for (i = v->first_line, line = &data->lines[v->first_line]; i <= v->last_line; i++,line++)
             {
                 DEBUGF("Line %2d (num_sublines=%d, first_subline=%d)\n",
                        i, line->num_sublines, line->first_subline_idx);
@@ -550,34 +543,6 @@ static void print_line_info(struct wps_data *data)
         DEBUGF("\n");
     }
 }
-static void print_wps_strings(struct wps_data *data)
-{
-    int i, len, total_len = 0, buf_used = 0;
-
-    if (wps_verbose_level > 1) DEBUGF("Strings:\n");
-    struct skin_token_list *strings = data->strings;
-    while (strings)
-    {
-        char* str = (char*)strings->token->value.data;
-        len = strlen(str);
-        total_len += len;
-        buf_used += len + 1;
-        if (wps_verbose_level > 1)
-            DEBUGF("%2d: (%2d) '%s'\n", i, len, data->strings[i]);
-    }
-    if (wps_verbose_level > 1) DEBUGF("\n");
-
-    if (wps_verbose_level > 0)
-    {
-        DEBUGF("Number of unique strings: %d (max: %d)\n",
-               data->num_strings, WPS_MAX_STRINGS);
-        DEBUGF("Total string length: %d\n", total_len);
-        DEBUGF("String buffer used: %d out of %d bytes\n",
-               buf_used, STRING_BUFFER_SIZE);
-        DEBUGF("\n");
-    }
-}
-#endif
 #endif
 
 void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line)
@@ -586,8 +551,7 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
     if (debug_wps && wps_verbose_level)
     {
         dump_wps_tokens(data);
-      /*  print_wps_strings(data); */
-     /*   print_line_info(data); */
+        print_line_info(data);
     }
 #endif /* SIMULATOR */
 
@@ -613,24 +577,21 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
             case PARSE_FAIL_INVALID_CHAR:
                 DEBUGF("ERR: Unexpected conditional char after token %d: \"%s\"",
                        data->num_tokens-1,
-                       get_token_desc(&data->tokens[data->num_tokens-1], data,
-                                      buf, sizeof(buf))
+                       get_token_desc(&data->tokens[data->num_tokens-1], buf, sizeof(buf))
                       );
                 break;
 
             case PARSE_FAIL_COND_SYNTAX_ERROR:
                 DEBUGF("ERR: Conditional syntax error after token %d: \"%s\"",
                        data->num_tokens-1,
-                       get_token_desc(&data->tokens[data->num_tokens-1], data,
-                                      buf, sizeof(buf))
+                       get_token_desc(&data->tokens[data->num_tokens-1], buf, sizeof(buf))
                       );
                 break;
 
             case PARSE_FAIL_COND_INVALID_PARAM:
                 DEBUGF("ERR: Invalid parameter list for token %d: \"%s\"",
                        data->num_tokens,
-                       get_token_desc(&data->tokens[data->num_tokens], data,
-                                      buf, sizeof(buf))
+                       get_token_desc(&data->tokens[data->num_tokens], buf, sizeof(buf))
                       );
                 break;
                 
@@ -641,5 +602,13 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
         DEBUGF("\n");
     }
 }
+
+void debug_skin_usage(void)
+{
+    if (wps_verbose_level > 1)
+        DEBUGF("Skin buffer usage: %ld/%ld\n", skin_buffer_usage(),
+                                skin_buffer_usage() + skin_buffer_freespace());
+}
+    
 
 #endif /* DEBUG || SIMULATOR */
