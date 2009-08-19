@@ -34,6 +34,7 @@
 #include "adc.h"
 
 extern int show_logo(void);
+extern void power_off(void);
 
 static void show_splash(int timeout, const char *msg)
 {
@@ -130,7 +131,89 @@ static int boot_of(void)
     kernel_entry = (void*) 0x80004008;
     kernel_entry(0, "Jan 10 2008", "15:34:42"); /* Reversed from the SPL */
 
-    return 0;
+    return 0; /* Shouldn't happen */
+}
+
+static int boot_rockbox(void)
+{
+    int rc;
+    void (*kernel_entry)(void);
+
+    printf("Loading firmware");
+    rc = load_firmware((unsigned char *)CONFIG_SDRAM_START, BOOTFILE, 0x400000);
+    if(rc < 0)
+        return rc;
+    else
+    {
+        printf("Starting Rockbox...");
+        adc_close(); /* Disable SADC, seems to fix the re-init Rockbox does */
+
+        disable_interrupt();
+        kernel_entry = (void*) CONFIG_SDRAM_START;
+        kernel_entry();
+
+        return 0; /* Shouldn't happen */
+    }
+}
+
+#define RECT_X        (LCD_WIDTH/8)
+#define RECT_Y(i)     (LCD_HEIGHT/20 + LCD_HEIGHT/10*i + RECT_HEIGHT*i)
+#define RECT_WIDTH    (LCD_WIDTH*3/4)
+#define RECT_HEIGHT   (LCD_HEIGHT/ARRAYLEN(strings) - LCD_HEIGHT/10)
+#define TEXT_X(i)     (RECT_X + RECT_WIDTH/2 - strlen(strings[i])*SYSFONT_WIDTH/2)
+#define TEXT_Y(i)     (RECT_Y(i) + RECT_HEIGHT/2 - SYSFONT_HEIGHT/2)
+static int boot_menu(void)
+{
+    const char* strings[] = {"Boot Rockbox", "Boot OF", "USB mode"};
+    int button, touch;
+    unsigned int i;
+
+    adc_init();
+
+redraw:
+    lcd_clear_display();
+    for(i=0; i<ARRAYLEN(strings); i++)
+    {
+        lcd_drawrect(RECT_X, RECT_Y(i), RECT_WIDTH, RECT_HEIGHT);
+        lcd_putsxy(TEXT_X(i), TEXT_Y(i), strings[i]);
+    }
+    lcd_update();
+
+    while(1)
+    {
+        button = button_get_w_tmo(HZ/4);
+        if(button & (BUTTON_TOUCHSCREEN|BUTTON_REPEAT))
+        {
+            touch = button_get_data();
+            unsigned int x = touch & 0xFFFF, y = touch >> 16;
+            int found = -1;
+            for(i=0; i<ARRAYLEN(strings); i++)
+            {
+                if(x > RECT_X && x < RECT_X+RECT_WIDTH &&
+                   y > RECT_Y(i) && y < RECT_Y(i)+RECT_HEIGHT)
+                {
+                    found = i;
+                    break;
+                }
+            }
+
+            switch(found)
+            {
+                case 0:
+                    return boot_rockbox();
+                case 1:
+                    return boot_of();
+                case 2:
+                    usb_mode();
+                    break;
+            }
+
+            if(found != -1)
+                goto redraw;
+        }
+        else if(button & (BUTTON_POWER|BUTTON_REPEAT))
+            power_off();
+    }
 }
 
 int main(void)
@@ -139,7 +222,6 @@ int main(void)
 #ifdef HAVE_TOUCHSCREEN
     int dummy;
 #endif
-    void (*kernel_entry)(void);
 
     kernel_init();
     lcd_init();
@@ -163,8 +245,11 @@ int main(void)
     if(rc)
         verbose = true;
 
-    if(rc & BUTTON_VOL_UP)
-        usb_mode();
+#ifdef BUTTON_VOL_UP
+    if(rc & BUTTON_VOL_UP ||
+#endif
+       0)
+        rc = boot_menu();
 
     if(verbose)
         reset_screen();
@@ -175,27 +260,15 @@ int main(void)
     if (rc <= 0)
         error(EDISK,rc);
 
+#ifdef HAS_BUTTON_HOLD
     if(button_hold())
-    {
         rc = boot_of();
-        if(rc < 0)
-            printf("Error: %s", strerror(rc));
-    }
+    else
+#endif
+        rc = boot_rockbox();
 
-    printf("Loading firmware");
-    rc = load_firmware((unsigned char *)CONFIG_SDRAM_START, BOOTFILE, 0x400000);
     if(rc < 0)
         printf("Error: %s", strerror(rc));
-
-    if (rc == EOK)
-    {
-        printf("Starting Rockbox...");
-        adc_close();      /* Disable SADC */
-
-        disable_interrupt();
-        kernel_entry = (void*) CONFIG_SDRAM_START;
-        kernel_entry();
-    }
 
     /* Halt */
     while (1)
