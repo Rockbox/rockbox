@@ -222,11 +222,11 @@ bool parse_entry_content(char *line, sc_entry_t *entry, int last_segm)
 
 char *last_segments(char *path, int nsegm)
 {
-    char *p = rb->strrchr(path, PATH_SEPARATOR[0]); /* Hack */
-    int seg_cnt;
-    if (p == NULL)
-        return path; /* No separator??? */
-    seg_cnt = 0;
+    /* don't count one trailing separator */
+    char *p = path+rb->strlen(path)-PATH_SEPARATOR_LEN;
+    int seg_cnt = 0;
+    if(p <= path)
+        return path;
     while ((p > path) && (seg_cnt < nsegm)) {
         p--;
         if (!starts_with(p, PATH_SEPARATOR)) {

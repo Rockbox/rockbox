@@ -35,32 +35,31 @@ enum sc_list_action_type
 
 static char *link_filename;
 static bool user_file;
-static int gselected_item;
 static bool usb_connected = false;
 
-enum sc_list_action_type draw_sc_list(struct gui_synclist gui_sc);
+enum sc_list_action_type draw_sc_list(struct gui_synclist *gui_sc);
 
 /* Will be passed sc_file* as data */
 char* build_sc_list(int selected_item, void *data,
                     char *buffer, size_t buffer_len);
 
 /* Returns true iff we should leave the main loop */
-bool list_sc(bool is_editable);
+bool list_sc(void);
 
 bool goto_entry(char *file_or_dir);
 bool ends_with(char *str, char *suffix);
 
 
-enum sc_list_action_type draw_sc_list(struct gui_synclist gui_sc)
+enum sc_list_action_type draw_sc_list(struct gui_synclist *gui_sc)
 {
     int button;
 
-    rb->gui_synclist_draw(&gui_sc);
+    rb->gui_synclist_draw(gui_sc);
 
     while (true) {
         /* user input */
         button = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&gui_sc, &button,
+        if (rb->gui_synclist_do_button(gui_sc, &button,
                                             LIST_WRAP_UNLESS_HELD)) {
             /* automatic handling of user input.
             * _UNLESS_HELD can be _ON or _OFF also
@@ -69,7 +68,6 @@ enum sc_list_action_type draw_sc_list(struct gui_synclist gui_sc)
         }
         switch (button) { /* process the user input */
             case ACTION_STD_OK:
-                gselected_item = rb->gui_synclist_get_sel_pos(&gui_sc);
                 return SCLA_SELECT;
             case ACTION_STD_MENU:
                 /* Only allow delete entries in the default file
@@ -77,7 +75,6 @@ enum sc_list_action_type draw_sc_list(struct gui_synclist gui_sc)
                  * to the default file only. The behaviour is thus
                  * symmetric in this respect. */
                 if (!user_file) {
-                    gselected_item = rb->gui_synclist_get_sel_pos(&gui_sc);
                     return SCLA_DELETE;
                 }
                 break;
@@ -106,33 +103,30 @@ char* build_sc_list(int selected_item, void *data,
 }
 
 
-bool list_sc(bool is_editable)
+bool list_sc(void)
 {
     int selected_item = 0;
-    char selected_dir[MAX_PATH];
     enum sc_list_action_type action = SCLA_NONE;
     struct gui_synclist gui_sc;
-
-    rb->memset(selected_dir, 0, sizeof(selected_dir));
 
     /* Setup the GUI list object, draw it to the screen,
      * and then handle the user input to it */
     rb->gui_synclist_init(&gui_sc, &build_sc_list, &sc_file, false, 1, NULL);
     rb->gui_synclist_set_title(&gui_sc,
-        (is_editable?"Shortcuts (editable)":"Shortcuts (sealed)"), NOICON);
+        (user_file?"Shortcuts (sealed)":"Shortcuts (editable)"), NOICON);
     rb->gui_synclist_set_nb_items(&gui_sc, sc_file.entry_cnt);
     rb->gui_synclist_limit_scroll(&gui_sc, false);
     rb->gui_synclist_select_item(&gui_sc, 0);
 
     /* Draw the prepared widget to the LCD now */
-    action = draw_sc_list(gui_sc);
+    action = draw_sc_list(&gui_sc);
     if (action == SCLA_USB) {
         usb_connected = true;
         return true;
     }
 
     /* which item do we action? */
-    selected_item = gselected_item;
+    selected_item = rb->gui_synclist_get_sel_pos(&gui_sc);
 
     if (!is_valid_index(&sc_file, selected_item)) {
         /* This should never happen */
@@ -230,7 +224,7 @@ enum plugin_status plugin_start(const void* void_parameter)
     
     do {
         /* Display a menu to choose between the entries */
-        leave_loop = list_sc(!user_file);
+        leave_loop = list_sc();
     } while (!leave_loop);
 
     return usb_connected ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
