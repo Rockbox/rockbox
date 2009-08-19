@@ -30,6 +30,7 @@
 #include "settings.h"
 #include "kernel.h"
 #include "system.h"
+#include "file.h"
 
 #include "action.h"
 #include "screen_access.h"

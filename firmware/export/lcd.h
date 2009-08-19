@@ -62,14 +62,6 @@ struct viewport {
 #define NUMLN_UNPACK(x)  ((unsigned char)((x) & STYLE_MAXLN_MASK))
 #endif
 
-#ifdef SIMULATOR
-#ifndef MAX_PATH
-#define MAX_PATH 260
-#endif
-#else
-#include "file.h"  /* for MAX_PATH; FIXME: Why does this not work for sims? */
-#endif /* SIMULATOR */
-
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH <=8
 #if (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED) \
@@ -112,13 +104,7 @@ extern void lcd_write_command_e(int cmd, int data);
 extern void lcd_write_command_ex(int cmd, int data1, int data2);
 extern void lcd_write_data(const fb_data* p_bytes, int count);
 extern void lcd_init(void);
-
-#ifdef SIMULATOR
-/* Define a dummy device specific init for the sims */
-#define lcd_init_device()
-#else
 extern void lcd_init_device(void);
-#endif /* SIMULATOR */
 
 extern void lcd_backlight(bool on);
 extern int  lcd_default_contrast(void);

@@ -26,6 +26,7 @@
 #define __SCROLL_ENGINE_H__
 
 #include <lcd.h>
+#include "file.h"
 
 void scroll_init(void);
 void lcd_scroll_stop(struct viewport* vp);
