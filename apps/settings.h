@@ -156,7 +156,7 @@ enum { REPLAYGAIN_TRACK = 0, REPLAYGAIN_ALBUM, REPLAYGAIN_SHUFFLE, REPLAYGAIN_OF
 /* show path types */
 enum { SHOW_PATH_OFF = 0, SHOW_PATH_CURRENT, SHOW_PATH_FULL };
 
-/* statusbar visilibility */
+/* statusbar visibility/position */
 enum { STATUSBAR_OFF = 0, STATUSBAR_TOP, STATUSBAR_BOTTOM };
 
 /* Alarm settings */
