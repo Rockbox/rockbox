@@ -38,6 +38,15 @@
  * MAIN_ and REMOTE_BUFFER are just for reasonable size calibration,
  * both screens can use the whole buffer as they need; it's not split
  * between screens
+ * 
+ * Buffer can be allocated from either "end" of the global buffer.
+ * items with unknown sizes get allocated from the start (0->)      (data)
+ * items with known sizes get allocated from the end (<-buf_size)   (tokens)
+ * After loading 2 skins the buffer will look like this:
+ *  |tokens skin1|images skin2|---SPACE---|data skin2|data skin1|
+ * Make sure to never start allocating from the beginning before letting us know
+ * how much was used. and RESPECT THE buf_free RETURN VALUES!
+ * 
  */
 
 
@@ -55,63 +64,93 @@
 #define SKIN_BUFFER_SIZE (MAIN_BUFFER + REMOTE_BUFFER)
 
 
-static unsigned char buffer_start[SKIN_BUFFER_SIZE], *buffer_pos = NULL;
+static unsigned char buffer[SKIN_BUFFER_SIZE];
+static unsigned char *buffer_front = NULL; /* start of the free space,
+                                              increases with allocation*/
+static unsigned char *buffer_back  = NULL; /* end of the free space
+                                              decreases with allocation */
 static size_t buf_size = SKIN_BUFFER_SIZE;
 
 void skin_buffer_init(void)
 {
 #if 0 /* this will go in again later probably */
-    if (buffer_start == NULL)
+    if (buffer == NULL)
     {
         buf_size = SKIN_BUFFER_SIZE;/* global_settings.skin_buf_size */
             
-        buffer_start = buffer_alloc(buf_size);
-        buffer_pos = buffer_start;
+        buffer = buffer_alloc(buf_size);
+        buffer_front = buffer;
+        buffer_back = bufer + buf_size;
     }
     else
 #endif
     {
         /* reset the buffer.... */
-        buffer_pos = buffer_start;
+        buffer_front = buffer;
+        buffer_back = buffer + buf_size;
     }
 }
 
 /* get the number of bytes currently being used */
 size_t skin_buffer_usage(void)
 {
-    return buffer_pos-buffer_start;
+    return buf_size - (buffer_back-buffer_front);
 }
 
-/* Allocate size bytes from the buffer */
+size_t skin_buffer_freespace(void)
+{
+    return buffer_back-buffer_front;
+}
+
+/* Allocate size bytes from the buffer
+ * allocates from the back end (data end)
+ */
 void* skin_buffer_alloc(size_t size)
 {
-    void* retval = buffer_pos;
-    if (skin_buffer_usage()+size >= buf_size)
+    if (skin_buffer_freespace() <= size)
     {
         return NULL;
     }
-    buffer_pos += size;
+    buffer_back -= size;
     /* 32-bit aligned */
-    buffer_pos = (void *)(((unsigned long)buffer_pos + 3) & ~3);
-    return retval;
+    buffer_back = (void *)(((unsigned long)buffer_back) & ~3);
+    return buffer_back;
 }
 
 /* Get a pointer to the skin buffer and the count of how much is free
  * used to do your own buffer management. 
  * Any memory used will be overwritten next time wps_buffer_alloc()
  * is called unless skin_buffer_increment() is called first
+ * 
+ * This is from the start of the buffer, it is YOUR responsility to make
+ * sure you dont ever use more then *freespace, and bear in mind this will only
+ * be valid untill skin_buffer_alloc() is next called...
+ * so call skin_buffer_increment() and skin_buffer_freespace() regularly
  */
 void* skin_buffer_grab(size_t *freespace)
 {
     *freespace = buf_size - skin_buffer_usage();
-    return buffer_pos;
+    return buffer_front;
 }
 
 /* Use after skin_buffer_grab() to specify how much buffer was used */
-void skin_buffer_increment(size_t used)
+void skin_buffer_increment(size_t used, bool align)
 {
-    buffer_pos += used;
-    /* 32-bit aligned */
-    buffer_pos = (void *)(((unsigned long)buffer_pos + 3) & ~3);
+    buffer_front += used;
+    if (align)
+    {
+        /* 32-bit aligned */
+        buffer_front = (void *)(((unsigned long)buffer_front + 3) & ~3);
+    }
 }
+
+/* free previously skin_buffer_increment()'ed space. This just moves the pointer
+ * back 'used' bytes so make sure you actually want to do this */
+void skin_buffer_free_from_front(size_t used)
+{
+    buffer_front -= used;
+    /* 32-bit aligned */
+    buffer_front = (void *)(((unsigned long)buffer_front + 3) & ~3);
+}
+
 

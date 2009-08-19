@@ -1274,18 +1274,44 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
    data is the pointer to the structure where the parsed WPS should be stored.
         It is initialised.
    wps_bufptr points to the string containing the WPS tags */
+#define TOKEN_BLOCK_SIZE 128   
 static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
 {
     if (!data || !wps_bufptr || !*wps_bufptr)
         return false;
     enum wps_parse_error fail = PARSE_OK;
     int ret;
+    int max_tokens = TOKEN_BLOCK_SIZE;
+    size_t buf_free = 0;
     line = 1;
     level = -1;
+    
+    /* allocate enough RAM for a reasonable skin, grow as needed. 
+     * Free any used RAM before loading the images to be 100% RAM efficient */
+    data->tokens = (struct wps_token *)skin_buffer_grab(&buf_free);
+    if (sizeof(struct wps_token)*max_tokens >= buf_free)
+        return false;
+    skin_buffer_increment(max_tokens * sizeof(struct wps_token), false);
+    data->num_tokens = 0;
 
-    while(*wps_bufptr && !fail && data->num_tokens < WPS_MAX_TOKENS - 1
+    while(*wps_bufptr && !fail
           && data->num_lines < WPS_MAX_LINES)
     {
+        /* first make sure there is enough room for tokens */
+        if (max_tokens -1 == data->num_tokens)
+        {
+            int extra_tokens = TOKEN_BLOCK_SIZE;
+            size_t needed = extra_tokens * sizeof(struct wps_token);
+            /* do some smarts here to grow the array a bit */
+            if (skin_buffer_freespace() < needed)
+            {
+                fail = PARSE_FAIL_LIMITS_EXCEEDED;
+                break;
+            }
+            skin_buffer_increment(needed, false);
+            max_tokens += extra_tokens;
+        }
+        
         switch(*wps_bufptr++)
         {
 
@@ -1482,6 +1508,10 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
         /* one of the limits of the while loop was exceeded */
         fail = PARSE_FAIL_LIMITS_EXCEEDED;
 
+    /* Success! */
+    /* freeup unused tokens */
+    skin_buffer_free_from_front(sizeof(struct wps_token) 
+                                * (max_tokens - data->num_tokens));
     curr_vp->last_line = data->num_lines - 1;
 
 #if defined(DEBUG) || defined(SIMULATOR)
@@ -1528,7 +1558,7 @@ static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char
 
     if (ret > 0)
     {
-		skin_buffer_increment(ret);
+		skin_buffer_increment(ret, true);
         loaded = true;
     }
     else

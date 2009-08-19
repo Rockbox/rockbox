@@ -276,7 +276,7 @@ struct wps_data
     /* Total number of tokens in the WPS. During WPS parsing, this is
        the index of the token being parsed. */
     int num_tokens;
-    struct wps_token tokens[WPS_MAX_TOKENS];
+    struct wps_token *tokens;
 
     struct skin_token_list *strings;
 
