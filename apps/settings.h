@@ -159,6 +159,9 @@ enum { SHOW_PATH_OFF = 0, SHOW_PATH_CURRENT, SHOW_PATH_FULL };
 /* statusbar visibility/position */
 enum { STATUSBAR_OFF = 0, STATUSBAR_TOP, STATUSBAR_BOTTOM };
 
+/* scrollbar visibility/position */
+enum { SCROLLBAR_OFF = 0, SCROLLBAR_LEFT, SCROLLBAR_RIGHT };
+
 /* Alarm settings */
 #ifdef HAVE_RTC_ALARM
 enum {  ALARM_START_WPS = 0,
@@ -560,7 +563,11 @@ struct user_settings
     bool buttonbar;    /* 0=hide, 1=show */
 #endif
 
-    bool scrollbar;    /* 0=hide, 1=show */
+#ifdef HAVE_LCD_BITMAP
+    int scrollbar;    /* SCROLLBAR_* enum values */
+    int scrollbar_width;
+#endif
+
     /* goto current song when exiting WPS */
     bool browse_current; /* 1=goto current song,
                             0=goto previous location */
@@ -768,8 +775,6 @@ struct user_settings
 #ifdef HAVE_REMOTE_LCD
     unsigned char remote_ui_vp_config[64]; /* viewport string for the remote lists */
 #endif
-    int scrollbar_width;
-    bool scrollbar_position; /* false=left true=right */
 #endif
 
 #if CONFIG_CODEC == SWCODEC

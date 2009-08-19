@@ -609,11 +609,11 @@ const struct settings_list settings[] = {
                   gui_statusbar_changed, 3, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
                   ID2P(LANG_STATUSBAR_BOTTOM)),
 #endif
-    OFFON_SETTING(0,scrollbar, LANG_SCROLL_BAR, true, "scrollbar", NULL),
+    CHOICE_SETTING(F_TEMPVAR, scrollbar,
+                  LANG_SCROLL_BAR, SCROLLBAR_LEFT, "scrollbar","off,left,right",
+                  NULL, 3, ID2P(LANG_OFF), ID2P(LANG_LEFT), ID2P(LANG_RIGHT)),
     INT_SETTING(0, scrollbar_width, LANG_SCROLLBAR_WIDTH, 6, "scrollbar width",
                 UNIT_INT, 3, LCD_WIDTH/10, 1, NULL, NULL, NULL),
-    BOOL_SETTING(F_TEMPVAR, scrollbar_position, LANG_SCROLLBAR_POSITION, false,
-                 "scrollbar pos", "left,right", LANG_RIGHT, LANG_LEFT, NULL),
 #if CONFIG_KEYPAD == RECORDER_PAD
     OFFON_SETTING(0,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),
 #endif

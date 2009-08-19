@@ -130,12 +130,12 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         vp = list_text[screen];
         vp.width = SCROLLBAR_WIDTH;
         list_text[screen].width -= SCROLLBAR_WIDTH;
-        if(!global_settings.scrollbar_position) /* left */
+        if(global_settings.scrollbar == SCROLLBAR_LEFT)
             list_text[screen].x += SCROLLBAR_WIDTH;
         vp.height = line_height *
                     viewport_get_nb_lines(&list_text[screen]);
         vp.x = parent->x;
-        if(global_settings.scrollbar_position) /* right */
+        if(global_settings.scrollbar == SCROLLBAR_RIGHT) /* right */
             vp.x += list_text[screen].width;
         display->set_viewport(&vp);
         gui_scrollbar_draw(display, 0, 0, SCROLLBAR_WIDTH-1,
@@ -147,7 +147,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     else if (show_title)
     {
         /* shift everything right a bit... */
-        if(!global_settings.scrollbar_position) /* left */
+        if(global_settings.scrollbar == SCROLLBAR_LEFT)
         {
             list_text[screen].width -= SCROLLBAR_WIDTH;
             list_text[screen].x += SCROLLBAR_WIDTH;
@@ -341,13 +341,13 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                 return ACTION_NONE;
         }
         /* Scroll bar */
-        else if(!global_settings.scrollbar_position) /* left */
+        else if(global_settings.scrollbar == SCROLLBAR_LEFT)
             return gui_synclist_touchscreen_scrollbar(gui_list, y);
     }
     else
     {
         if(x>list_text[screen].x+list_text[screen].width &&
-           global_settings.scrollbar_position) /* right*/
+           global_settings.scrollbar == SCROLLBAR_RIGHT)
             return gui_synclist_touchscreen_scrollbar(gui_list, y);
 
         /* |--------------------------------------------------------|
