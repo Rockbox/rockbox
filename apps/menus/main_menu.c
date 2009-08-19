@@ -169,9 +169,7 @@ static char* info_getname(int selected_item, void *data,
 {
     struct info_data *info = (struct info_data*)data;
     char s1[32];
-#ifdef HAVE_MULTIVOLUME
     char s2[32];
-#endif
     if (info->new_data)
     {
         fat_size(IF_MV2(0,) &info->size, &info->free);
@@ -258,7 +256,9 @@ static char* info_getname(int selected_item, void *data,
             break;
         case INFO_SKIN_USAGE:
             output_dyn_value(s1, sizeof s1, skin_buffer_usage(), byte_units, true);
-            snprintf(buffer, buffer_len, "%s %s", str(LANG_SKIN_RAM_USAGE), s1);
+            output_dyn_value(s2, sizeof s2, skin_buffer_usage()
+                                            +skin_buffer_freespace(), byte_units, true);
+            snprintf(buffer, buffer_len, "%s %s / %s", str(LANG_SKIN_RAM_USAGE), s1, s2);
             break;
     }
     return buffer;
