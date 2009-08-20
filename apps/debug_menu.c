@@ -1519,8 +1519,9 @@ static char *itob(int n, int len)
     binary[j] = '\0';
     return binary;
 }
-static char* tsc2100_debug_getname(int selected_item, void * data,
-                                   char *buffer, size_t buffer_len)
+
+static const char* tsc2100_debug_getname(int selected_item, void * data,
+                                         char *buffer, size_t buffer_len)
 {
     int *page = (int*)data;
     bool reserved = false;
@@ -2641,7 +2642,8 @@ static bool toggle_usb_serial(void)
 
 #if CONFIG_USBOTG == USBOTG_ISP1583
 extern int dbg_usb_num_items(void);
-extern char* dbg_usb_item(int selected_item, void *data, char *buffer, size_t buffer_len);
+extern const char* dbg_usb_item(int selected_item, void *data,
+                                char *buffer, size_t buffer_len);
 
 static int isp1583_action_callback(int action, struct gui_synclist *lists)
 {
@@ -2666,7 +2668,8 @@ static bool dbg_isp1583(void)
 
 #if defined(CREATIVE_ZVx) && !defined(SIMULATOR)
 extern int pic_dbg_num_items(void);
-extern char* pic_dbg_item(int selected_item, void *data, char *buffer, size_t buffer_len);
+extern const char* pic_dbg_item(int selected_item, void *data,
+                                char *buffer, size_t buffer_len);
 
 static int pic_action_callback(int action, struct gui_synclist *lists)
 {

@@ -762,7 +762,8 @@ int dbg_usb_num_items(void)
     return 2+USB_NUM_ENDPOINTS*2;
 }
 
-char* dbg_usb_item(int selected_item, void *data, char *buffer, size_t buffer_len)
+const char* dbg_usb_item(int selected_item, void *data,
+                         char *buffer, size_t buffer_len)
 {
     if(selected_item < 2)
     {

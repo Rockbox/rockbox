@@ -345,7 +345,8 @@ int pic_dbg_num_items(void)
     return 13;
 }
 
-char* pic_dbg_item(int selected_item, void *data, char *buffer, size_t buffer_len)
+const char* pic_dbg_item(int selected_item, void *data,
+                         char *buffer, size_t buffer_len)
 {
     (void)data;
     switch(selected_item)
