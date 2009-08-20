@@ -43,6 +43,9 @@ extern unsigned long _ttbstart;
 #define PHY_IO_BASE2     0x00060000
 #define DM320_REG2(addr) (*(volatile unsigned int *)(PHY_IO_BASE2 + (addr)))
 
+#define COP_IO_BASE     0x00090000
+#define DM320_COP(addr) (*(volatile unsigned short *)(COP_IO_BASE + (addr)))
+
 /* This needs to be 2048 byte aligned, but USB_QHARRAY_ATTR should take care
  * of that */
 #define USB_QHARRAY_ATTR   __attribute__((section(".qharray"),nocommon,aligned(4)))
@@ -707,6 +710,21 @@ extern unsigned long _ttbstart;
 #define VL_ENDIAN_R               DM320_REG2(0x03dc)
 #define VL_INTVEC30_R             DM320_REG2(0x03e0)
 #define VL_INTVEC74_R             DM320_REG2(0x03e4)
+
+/* Coprocessor Interface */
+#define COP_SDEM_ADDRH          DM320_COP(0xe000)
+#define COP_SDEM_ADDRL          DM320_COP(0xe002)
+#define COP_SDEM_LOFST          DM320_COP(0xe004)
+#define COP_BUF_ADDR            DM320_COP(0xe006)
+#define COP_BUF_LOFST           DM320_COP(0xe008)
+#define COP_DMA_XNUM            DM320_COP(0xe00a)
+#define COP_DMA_YNUM            DM320_COP(0xe00c)
+#define COP_DMA_CTRL            DM320_COP(0xe00e)
+#define COP_BUF_MUX0            DM320_COP(0xe010)
+#define COP_BUF_MUX1            DM320_COP(0xe012)
+#define COP_IMG_MODE            DM320_COP(0xe014)
+#define COP_CP_CLKC             DM320_COP(0xe502)
+
 
 /* Taken from linux/include/asm-arm/arch-itdm320/irqs.h
  *

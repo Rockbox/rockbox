@@ -30,6 +30,17 @@
 #include "system-target.h"
 #include "lcd.h"
 #include "lcd-target.h"
+#include "dsp-target.h"
+#include "dsp/ipc.h"
+
+#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
+#define PORTRAIT_USE_DMA
+#else
+/* Very slow - May be faster if the DSP has lower latency access to buffer.
+    Using the DSP instead of ARM to do transformation has not been tried
+*/
+//#define LANDSCAPE_USE_DMA 
+#endif
 
 /* Copies a rectangle from one framebuffer to another. Can be used in
    single transfer mode with width = num pixels, and height = 1 which
@@ -260,11 +271,206 @@ void lcd_set_mode(int mode)
 }
 #endif
 
+#if defined(PORTRAIT_USE_DMA)
+static void dma_start_transfer16(   char *src, char *dst, int stride,
+                                    int width, int height, int pix_width) 
+                                    __attribute__ ((section(".icode")));
+
+static void dma_start_transfer16(   char *src, char *dst, int stride,
+                                    int width, int height, int pix_width) {
+    int c_width = width;
+    
+    /* Addresses are relative to start of SDRAM */
+    src-=CONFIG_SDRAM_START;
+    dst-=CONFIG_SDRAM_START;
+    
+    /* Enable Clocks */
+    IO_CLK_MOD1     |= 1<<8;
+    COP_CP_CLKC     |= 0x0001;
+
+    /* ... */
+    COP_BUF_MUX1    = 0x0005;
+    /* Give the DMA access to the buffer */
+    COP_BUF_MUX0    = 0x0663;
+    
+    /* Setup buffer offsets and transfer width/height */
+    COP_BUF_LOFST   = 32;
+    COP_DMA_XNUM    = 32;
+    COP_DMA_YNUM    = 32;
+
+    /* ... */
+    COP_IMG_MODE    = 0x0000;
+    
+    /* Set the start address of buffer */
+    COP_BUF_ADDR    = 0x0000;
+    
+    /* Setup SDRAM stride */
+    COP_SDEM_LOFST  = stride;
+    do {
+        do {
+            int addr;
+            addr            = (int)src;
+            addr            >>= 1; /* Addresses are in 16-bit words */
+            
+            /* Setup the registers to initiate the read from SDRAM */
+            COP_SDEM_ADDRH  = addr >> 16;
+            COP_SDEM_ADDRL  = addr & 0xFFFF;
+            
+            /* Set direction and start */
+            COP_DMA_CTRL    = 0x0001;
+            COP_DMA_CTRL    |= 0x0003;
+            
+            /* Wait for read to finish */
+            while(COP_DMA_CTRL & 0x02) {};
+            
+            addr            = (int)dst;
+            addr            >>= 1;
+            
+            COP_SDEM_ADDRH  = addr >> 16;
+            COP_SDEM_ADDRL  = addr & 0xFFFF;
+            
+            /* Set direction and start transfer */
+            COP_DMA_CTRL    = 0x0000;
+            COP_DMA_CTRL    = 0x0002;
+            
+            /* Wait for the transfer to complete */
+            while(COP_DMA_CTRL & 0x02) {};
+
+            /* Update source and destination pointers/counters */
+            src             += 32*pix_width;
+            dst             += 32*pix_width;
+            c_width         -= 32;
+        } while (c_width>0);
+        
+        /* Reset the width, update pointers/counters */
+        c_width = width;
+        src     -= width*pix_width;
+        dst     -= width*pix_width;
+        src     += (LCD_WIDTH*32*pix_width);
+        dst     += (LCD_WIDTH*32*pix_width);
+        height  -= 32;
+    } while(height>0);
+}
+#endif
+
+#if defined(LANDSCAPE_USE_DMA)
+static void dma_start_transfer16_r( char *src, int sx, int sy, int sstride,
+                                    char *dst, int dx, int dy, int dstride,
+                                    int width, int height, int pix_width) {
+    if(sx & 0x0F) {
+        int sx2 = sx + width;
+        
+        if(sx2 & 0x0F) {
+            sx2 = (sx2 + 0x0F) & ~0x0F;
+        }
+        sx = sx & ~0x0F;
+        
+        width = sx2 - sx;
+    }
+    
+    if(sy & 0x0F) {
+        int sy2 = sy + height;
+        
+        if(sy2 & 0x0F) {
+            sy2 = (sy2 + 0x0F) & ~0x0F;
+        }
+        sy = sy & ~0x0F;
+        
+        height = sy2 - sy;
+    }
+    
+    if(dx & 0x0F) {
+        dx = dx & ~0x0F;
+    }
+    
+    if(dy & 0x0F) {
+        dy = dy & ~0x0F;
+    }
+    
+    src=src+(sy*sstride+sx)*pix_width;
+    
+    dst=dst + ((LCD_NATIVE_WIDTH*(LCD_NATIVE_HEIGHT-1)) 
+        - LCD_NATIVE_WIDTH*(dx+32) + dy)*pix_width;
+    
+    int c_width = width;
+    
+    IO_CLK_MOD1     |= 1<<8;
+    
+    COP_CP_CLKC     |= 0x0001;
+
+    COP_BUF_MUX1    = 0x0005;
+    /* Give the DMA access to the buffer */
+    COP_BUF_MUX0    = 0x0663;
+    
+    /* Set the buffer offsets and widths */
+    COP_BUF_LOFST   = 32;
+    COP_DMA_XNUM    = 32;
+    COP_DMA_YNUM    = 32;
+    COP_IMG_MODE    = 0x0000;
+    
+    do {
+        char *c_dst = dst;
+        do {
+            int addr;
+            
+            COP_BUF_ADDR    = 0x0000;
+            
+            COP_SDEM_LOFST  = sstride;
+            addr            = (int)src - CONFIG_SDRAM_START;
+            addr            >>= 1;
+            
+            COP_SDEM_ADDRH  = addr >> 16;
+            COP_SDEM_ADDRL  = addr & 0xFFFF;
+            
+            COP_DMA_CTRL    = 0x0001;
+            COP_DMA_CTRL    |= 0x0003;
+            
+            while(COP_DMA_CTRL & 0x02) {};
+            
+            /* The ARM can access the buffer after this is set */
+            COP_BUF_MUX0    = 0x0660;
+            
+            int run=1023;
+#define IMG_BUF   (*(volatile unsigned short *)(0x80000))
+#define IMG_BUF2   (*(volatile unsigned short *)(0x80000 + 2*32*32 + 32*31*2 ))
+            do {
+                *(&IMG_BUF2-((run&0x1F)<<5)+(run>>5)) = *(&IMG_BUF+run);
+            } while(run--);
+            
+            COP_BUF_MUX0    = 0x0663;
+            
+            COP_BUF_ADDR    = (32*32);
+            
+            COP_SDEM_LOFST  = LCD_NATIVE_WIDTH;
+            addr            = (int)c_dst - CONFIG_SDRAM_START;
+            addr            >>= 1;
+            
+            COP_SDEM_ADDRH  = addr >> 16;
+            COP_SDEM_ADDRL  = addr & 0xFFFF;
+            
+            COP_DMA_CTRL    = 0x0000;
+            COP_DMA_CTRL    = 0x0002;
+            
+            while(COP_DMA_CTRL & 0x02) {};
+
+            src             += 32*pix_width;
+            c_dst           -= 32*pix_width*LCD_NATIVE_WIDTH;
+            c_width         -= 32;
+        } while (c_width>0);
+        
+        c_width = width;
+        src     += (LCD_WIDTH*31*pix_width);
+        dst     += (32*pix_width);
+        height  -= 32;
+    } while(height>0);
+}
+#endif
+
 /* Update a fraction of the display. */
+void lcd_update_rect(int x, int y, int width, int height) 
+                __attribute__ ((section(".icode")));
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    register fb_data *dst, *src;
-
     if (!lcd_on)
         return;
 
@@ -281,76 +487,120 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (y < 0)
         height += y, y = 0; /* Clip top */
 
-
-    src = &lcd_framebuffer[y][x];
-
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
+#if defined(PORTRAIT_USE_DMA)
+    /* Makes sure the update is a ratio of 32x32 */
+    if(x & 0x1F) {
+        int x2 = x + width;
+        
+        if(x2 & 0x1F) {
+            x2 = (x2 + 0x1F) & ~0x1F;
+        }
+        x = x & ~0x1F;
+        
+        width = x2 - x;
+    }
+    
+    if(y & 0x1F) {
+        int y2 = y + height;
+        
+        if(y2 & 0x1F) {
+            y2 += 0x1F;
+            y2 &= ~0x1F;
+        }
+        y = y & ~0x1F;
+        
+        height = y2 - y;
+    }
+    
+    fb_data *dst;
+
+    dst = (fb_data *)FRAME + LCD_WIDTH*y + x;
+    
+    dma_start_transfer16(   (char *)&lcd_framebuffer[y][x],(char *)dst, 
+                            LCD_WIDTH, width, height, 2);
+#else
+    register fb_data *dst;
+
     dst = (fb_data *)FRAME + LCD_WIDTH*y + x;
 
     /* Copy part of the Rockbox framebuffer to the second framebuffer */
     if (width < LCD_WIDTH)
     {
         /* Not full width - do line-by-line */
-        lcd_copy_buffer_rect(dst, src, width, height);
+        lcd_copy_buffer_rect(dst, &lcd_framebuffer[y][x], width, height);
     }
     else
     {
         /* Full width - copy as one line */
-        lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
+        lcd_copy_buffer_rect(dst, &lcd_framebuffer[y][x], LCD_WIDTH*height, 1);
     }
+#endif
 #else
+#if defined(LANDSCAPE_USE_DMA)
+    dma_start_transfer16_r( (char *)lcd_framebuffer, 0, 0, LCD_WIDTH,
+                            (char *)FRAME, 0, 0, LCD_NATIVE_WIDTH,
+                            LCD_WIDTH, LCD_HEIGHT, 2);
+#else
+    register fb_data *dst, *src;
+    src = &lcd_framebuffer[y][x];
+
     dst=FRAME + (LCD_NATIVE_WIDTH*(LCD_NATIVE_HEIGHT-1)) 
         - LCD_NATIVE_WIDTH*x + y ;
 
-    while(height--)
-    {
-        register int c_width=width;
+    height--;
+    do {
+        register int c_width=width-1;
         register fb_data *c_dst=dst;
         
-        while(c_width--)
-        {
+        do {
             *c_dst=*src++;
             c_dst-=LCD_NATIVE_WIDTH;
-        }
+        } while(c_width--);
         
         src+=LCD_WIDTH-width;
         dst++;
-    }
-    
+    } while(height--);
+#endif
 #endif
 }
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
+void lcd_update(void) __attribute__ ((section(".icode")));
 void lcd_update(void)
 {
     if (!lcd_on)
         return;
-	
-#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-    lcd_copy_buffer_rect((fb_data *)FRAME, &lcd_framebuffer[0][0],
-                         LCD_WIDTH*LCD_HEIGHT, 1);
-#else
+        
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-#endif
 }
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
 void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
+	int width, int height) __attribute__ ((section(".icode")));
+void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
 	int width, int height)
 {
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-	char *dst=(char *)FRAME+x+y*(LCD_NATIVE_WIDTH+LCD_FUDGE);
-	
-	src = src+src_x+src_y*LCD_WIDTH;
-	while(height--)
-	{
-		memcpy(dst, src, width);
-		
-		dst = dst + ((LCD_WIDTH -x +LCD_FUDGE)); 
-		src = src + (LCD_WIDTH - x);
-	}
-	
+#if defined(PORTRAIT_USE_DMA)
+    src = src+src_x+src_y*LCD_WIDTH;
+    char *dst=(char *)FRAME+x+y*(LCD_NATIVE_WIDTH+LCD_FUDGE);
+                                    
+    dma_start_transfer16(   (char *)src, (char *)dst, LCD_WIDTH>>1,
+                                    width, height, 1);
+#else
+    char *dst=(char *)FRAME+x+y*(LCD_NATIVE_WIDTH+LCD_FUDGE);
+
+    src = src+src_x+src_y*LCD_WIDTH;
+    while(height--)
+    {
+        memcpy(dst, src, width);
+
+        dst = dst + ((LCD_WIDTH -x +LCD_FUDGE)); 
+        src = src + (LCD_WIDTH - x);
+    }
+#endif
 #else
     char *dst=(char *)FRAME
         + (LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)
