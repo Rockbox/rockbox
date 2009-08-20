@@ -173,7 +173,7 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
         line = 1;
     else
         line = 0;
-    
+
     if (valid_time(tm))
     {
         snprintf(time, 16, "%02d:%02d:%02d%s", 
@@ -199,7 +199,7 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
     else
         display->putsxy((vp->width - w)/2, line*font_get(vp->font)->height, time);
     line++;
-    
+
     display->getstringsize(date, &w, NULL);
     if (w > vp->width)
         display->puts_scroll(0, line, date);
@@ -217,7 +217,7 @@ static int time_menu_callback(int action,
     int i;
     static int last_redraw = 0;
     bool redraw = false;
-    
+
     if (TIME_BEFORE(last_redraw+HZ/2, current_tick))
         redraw = true;
     switch (action)
@@ -244,7 +244,7 @@ static int time_menu_callback(int action,
     }
     return action;
 }
-            
+
 
 MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), time_menu_callback, Icon_NOICON,
           &time_set, &sleep_timer_call,
@@ -255,7 +255,7 @@ MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), time_menu_callback, Icon_NOICON,
 #endif
 #endif
           &timeformat);
-            
+
 int time_screen(void* ignored)
 {
     (void)ignored;
@@ -289,12 +289,8 @@ int time_screen(void* ignored)
         }
         else /* disable the clock drawing */
             clock[i].height = 0;
-        menu[i].y = clock[i].y + clock[i].height;
-        menu[i].height = screens[i].lcdheight - menu[i].y;
-#ifdef HAVE_BUTTONBAR
-        if (global_settings.buttonbar)
-            menu[i].height -= BUTTONBAR_HEIGHT;
-#endif
+        menu[i].y += clock[i].height;
+        menu[i].height -= clock[i].height;
         draw_timedate(&clock[i], &screens[i]);
     }
     ret = do_menu(&time_menu, NULL, menu, false);
