@@ -181,8 +181,10 @@ void usb_screen(void)
     /* nothing here! */
 #else
     int i;
-    bool statusbar = global_settings.statusbar; /* force the statusbar */
-    global_settings.statusbar = true;
+    int statusbar = global_settings.statusbar; /* force the statusbar */
+    if(!global_settings.statusbar)
+        global_settings.statusbar = STATUSBAR_TOP;
+
     FOR_NB_SCREENS(i)
     {
         screens[i].backdrop_show(BACKDROP_MAIN);
@@ -402,7 +404,7 @@ static void charging_display_info(bool animate)
 
     for (i = 0; i < 4; i++)
         lcd_define_pattern(logo_chars[i], buf + 8 * i);
-        
+
     lcd_update();
 }
 #endif /* (not) HAVE_LCD_BITMAP */
@@ -925,7 +927,7 @@ bool browse_id3(void)
 static char* runtime_get_data(int selected_item, void* data,
                               char* buffer, size_t buffer_len)
 {
-    (void)data;    
+    (void)data;
     int t;
     switch (selected_item)
     {
@@ -1052,9 +1054,9 @@ int calibrate(void)
     enum touchscreen_mode old_mode = touchscreen_get_mode();
     struct touchscreen_calibration cal;
     int i, ret = 0;
-    bool statusbar = global_settings.statusbar; /* hide the statusbar */
+    int statusbar = global_settings.statusbar; /* hide the statusbar */
+    global_settings.statusbar = STATUSBAR_OFF;
 
-    global_settings.statusbar = false;
     touchscreen_disable_mapping(); /* set raw mode */
     touchscreen_set_mode(TOUCHSCREEN_POINT);
     for(i=0; i<3; i++)
