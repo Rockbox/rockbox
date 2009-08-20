@@ -954,7 +954,7 @@ static bool show_search_progress(bool init, int count)
     }
     
     /* Update progress every 1/10 of a second */
-    if (current_tick - last_tick > HZ/10)
+    if (TIME_AFTER(current_tick, last_tick + HZ/10))
     {
         splashf(0, str(LANG_PLAYLIST_SEARCH_MSG), count, str(LANG_OFF_ABORT));
         if (action_userabort(TIMEOUT_NOBLOCK))
@@ -1060,25 +1060,17 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     bool sort = false;
     int sort_limit;
     int strip;
-    
-    if (init && (tagcache_is_busy()
-#ifdef HAVE_TC_RAMCACHE
-        || !tagcache_is_ramcache()
-#endif
-        ) )
-    {
-        /* Show search progress straight away if the disk needs to spin up,
-           otherwise show it after the normal 1/2 second delay */
-        show_search_progress(
-            !tagcache_is_busy() &&
+
+    /* Show search progress straight away if the disk needs to spin up,
+       otherwise show it after the normal 1/2 second delay */
+    show_search_progress(
 #ifdef HAVE_DISK_STORAGE
-            storage_disk_is_active()
+        storage_disk_is_active()
 #else
-            true
+        true
 #endif
-            , 0);
-    }
-    
+        , 0);
+
     if (c->currtable == ALLSUBENTRIES)
     {
         tag = tag_title;
@@ -1249,7 +1241,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         if (init && !tcs.ramsearch)
         {
             if (!show_search_progress(false, total_count))
-            {
+            {   /* user aborted */
                 tagcache_search_finish(&tcs);
                 return current_entry_count;
             }
@@ -1304,6 +1296,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     }
     
     return total_count;
+    
 }
 
 static int load_root(struct tree_context *c)
@@ -1647,9 +1640,16 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     char buf[MAX_PATH];
     int dirlevel = tc->dirlevel;
 
-    /* We need to set the table to allsubentries. */
-    show_search_progress(!tagcache_is_busy(), 0);
+    show_search_progress(
+#ifdef HAVE_DISK_STORAGE
+        storage_disk_is_active()
+#else
+        true
+#endif
+        , 0);
+
     
+    /* We need to set the table to allsubentries. */
     dptr = tagtree_get_entry(tc, tc->selected_item);
     
     /* Insert a single track? */
