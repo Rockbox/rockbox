@@ -380,8 +380,8 @@ enum themable_icons get_icon(int item, void * data)
         return Icon_NOICON;
 }
 
-char * get_name(int selected_item, void * data,
-                     char * buffer, size_t buffer_len)
+static const char* get_name(int selected_item, void * data,
+                            char * buffer, size_t buffer_len)
 {
     (void)data;
     if (tidy_types[selected_item].directory)

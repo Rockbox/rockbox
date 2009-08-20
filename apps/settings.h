@@ -271,13 +271,13 @@ bool set_bool(const char* string, const bool* variable);
 bool set_int(const unsigned char* string, const char* unit, int voice_unit,
              const int* variable,
              void (*function)(int), int step, int min, int max,
-             void (*formatter)(char*, size_t, int, const char*) );
+             const char* (*formatter)(char*, size_t, int, const char*) );
 
 /* use this one if you need to create a lang from the value (i.e with TALK_ID()) */
 bool set_int_ex(const unsigned char* string, const char* unit, int voice_unit,
              const int* variable,
              void (*function)(int), int step, int min, int max,
-             void (*formatter)(char*, size_t, int, const char*),
+             const char* (*formatter)(char*, size_t, int, const char*),
              int32_t (*get_talk_id)(int, int));
 
 void set_file(const char* filename, char* setting, int maxlen);

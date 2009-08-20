@@ -550,14 +550,15 @@ static bool Doptions()
     return (1);
 }
 
-char* choice_get_name(int selected_item, void * data,
-                     char * buffer, size_t buffer_len)
+static const char* choice_get_name(int selected_item, void * data,
+                                   char * buffer, size_t buffer_len)
 {
-    char **names = (char **) data;
+    const char **names = (const char **) data;
     (void) buffer;
     (void) buffer_len;
     return names[selected_item];
 }
+
 int list_action_callback(int action, struct gui_synclist *lists)
 {
     (void) lists;
@@ -565,6 +566,7 @@ int list_action_callback(int action, struct gui_synclist *lists)
         return ACTION_STD_CANCEL;
     return action;
 }
+
 bool menuchoice(char **names, int count, int *selected)
 {
    struct simplelist_info info;

@@ -317,7 +317,7 @@ static bool mpeg_set_int(const char *string, const char *unit,
                          void (*function)(int), int step,
                          int min,
                          int max,
-                         void (*formatter)(char*, size_t, int, const char*))
+                         const char* (*formatter)(char*, size_t, int, const char*))
 {
     mpeg_menu_sysevent_clear();
 
@@ -350,15 +350,16 @@ static void backlight_brightness_function(int value)
     mpeg_backlight_update_brightness(value);
 }
 
-static void backlight_brightness_formatter(char *buf, size_t length,
-                                           int value, const char *input)
+static const char* backlight_brightness_formatter(char *buf, size_t length,
+                                                  int value, const char *input)
 {
+    (void)input;
+
     if (value < 0)
-        rb->strlcpy(buf, BACKLIGHT_OPTION_DEFAULT, length);
+        return BACKLIGHT_OPTION_DEFAULT;
     else
         rb->snprintf(buf, length, "%d", value + MIN_BRIGHTNESS_SETTING);
-
-    (void)input;
+    return buf;
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 

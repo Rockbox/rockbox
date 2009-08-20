@@ -173,7 +173,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     for (i=start; i<end && i<list->nb_items; i++)
     {
         /* do the text */
-        unsigned char *s;
+        unsigned const char *s;
         char entry_buffer[MAX_PATH];
         unsigned char *entry_name;
         int text_pos = 0;

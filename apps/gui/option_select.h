@@ -33,7 +33,7 @@ bool option_screen(const struct settings_list *setting,
 void option_select_next_val(const struct settings_list *setting,
                             bool previous, bool apply);
 #endif
-char *option_get_valuestring(const struct settings_list *setting, 
+const char *option_get_valuestring(const struct settings_list *setting, 
                              char *buffer, int buf_len,
                              intptr_t temp_var);
 void option_talk_value(const struct settings_list *setting, int value, bool enqueue);

@@ -559,10 +559,10 @@ static int get_track_num( struct playlist_viewer * local_viewer,
     return selected_item;
 }
 
-static char *playlist_callback_name(int selected_item,
-                                    void *data,
-                                    char *buffer,
-                                    size_t buffer_len)
+static const char* playlist_callback_name(int selected_item,
+                                          void *data,
+                                          char *buffer,
+                                          size_t buffer_len)
 {
     struct playlist_viewer * local_viewer = (struct playlist_viewer *)data;
 
@@ -778,15 +778,15 @@ exit:
     return ret;
 }
 
-static char *playlist_search_callback_name(int selected_item, void * data,
-                                           char *buffer, size_t buffer_len)
+static const char* playlist_search_callback_name(int selected_item, void * data,
+                                                 char *buffer, size_t buffer_len)
 {
     (void)buffer_len; /* this should probably be used */
     int *found_indicies = (int*)data;
     static struct playlist_track_info track;
     playlist_get_track_info(viewer.playlist, found_indicies[selected_item], &track);
     format_name(buffer, track.filename);
-    return(buffer);
+    return buffer;
 }
 
 bool search_playlist(void)

@@ -93,10 +93,10 @@ static int find_menu_selection(int selected)
             return i;
     return 0;
 }
-static char * get_menu_item_name(int selected_item,
-                                 void * data,
-                                 char *buffer,
-                                 size_t buffer_len)
+static const char* get_menu_item_name(int selected_item,
+                                      void * data,
+                                      char *buffer,
+                                      size_t buffer_len)
 {
     const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
     int type = (menu->flags&MENU_TYPE_MASK);
@@ -109,7 +109,7 @@ static char * get_menu_item_name(int selected_item,
         if (menu->flags&MENU_DYNAMIC_DESC)
             return menu->menu_get_name_and_icon->list_get_name(selected_item,
                     menu->menu_get_name_and_icon->list_get_name_data, buffer);
-        return (char*)menu->strings[selected_item];
+        return menu->strings[selected_item];
     }
     
     menu = menu->submenus[selected_item];

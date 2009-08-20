@@ -1347,8 +1347,8 @@ MAKE_MENU(handle_radio_preset_menu, ID2P(LANG_PRESET),
             radio_preset_callback, Icon_NOICON, &radio_edit_preset_item, 
             &radio_delete_preset_item);
 /* present a list of preset stations */
-static char * presets_get_name(int selected_item, void *data,
-                               char *buffer, size_t buffer_len)
+static const char* presets_get_name(int selected_item, void *data,
+                                    char *buffer, size_t buffer_len)
 {
     (void)data;
     struct fmstation *p = &presets[selected_item];

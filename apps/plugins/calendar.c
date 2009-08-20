@@ -669,7 +669,7 @@ static bool edit_memo(int change, struct shown *shown)
     return false;
 }
 
-static char * get_event_text(int selected, void *data,
+static const char* get_event_text(int selected, void *data,
                                   char *buffer, size_t buffer_len)
 {
     struct shown *shown = (struct shown *) data;

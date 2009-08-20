@@ -121,8 +121,8 @@ int _do_action(int action, char* str, int line)
     last_char_index = c;
     return 1;
 }
-char *list_get_name_cb(int selected_item, void* data,
-                       char* buf, size_t buf_len)
+static const char* list_get_name_cb(int selected_item, void* data,
+                                    char* buf, size_t buf_len)
 {
     (void)data;
     char *b = &buffer[do_action(ACTION_GET,0,selected_item)];

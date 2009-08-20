@@ -122,8 +122,8 @@ MENUITEM_STRINGLIST(context_m, "Context menu", context_item_cb,
                     "Delete entry",
                     "Playback Control");
 
-static char * kb_list_cb(int selected_item, void *data,
-                         char *buffer, size_t buffer_len)
+static const char* kb_list_cb(int selected_item, void *data,
+                              char *buffer, size_t buffer_len)
 {
     (void)data;
     int i;

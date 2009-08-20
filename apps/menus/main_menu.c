@@ -164,8 +164,8 @@ static const unsigned char *byte_units[] =
     ID2P(LANG_MEGABYTE)
 };
 
-static char* info_getname(int selected_item, void *data,
-                          char *buffer, size_t buffer_len)
+static const char* info_getname(int selected_item, void *data,
+                                char *buffer, size_t buffer_len)
 {
     struct info_data *info = (struct info_data*)data;
     char s1[32];
@@ -199,27 +199,27 @@ static char* info_getname(int selected_item, void *data,
 #if CONFIG_CHARGING == CHARGING_SIMPLE
             /* Only know if plugged */
             if (charger_inserted())
-                return (char *)str(LANG_BATTERY_CHARGE);
+                return str(LANG_BATTERY_CHARGE);
             else
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
 #ifdef ARCHOS_RECORDER
             /* Report the particular algorithm state */
             if (charge_state == CHARGING)
-                return (char *)str(LANG_BATTERY_CHARGE);
+                return str(LANG_BATTERY_CHARGE);
             else if (charge_state == TOPOFF)
-                return (char *)str(LANG_BATTERY_TOPOFF_CHARGE);
+                return str(LANG_BATTERY_TOPOFF_CHARGE);
             else if (charge_state == TRICKLE)
-                return (char *)str(LANG_BATTERY_TRICKLE_CHARGE);
+                return str(LANG_BATTERY_TRICKLE_CHARGE);
             else
 #else /* !ARCHOS_RECORDER */
             /* Go by what power management reports */
             if (charging_state())
-                return (char *)str(LANG_BATTERY_CHARGE);
+                return str(LANG_BATTERY_CHARGE);
             else
 #endif /* ARCHOS_RECORDER */
 #endif /* CONFIG_CHARGING = */
             if (battery_level() >= 0)
-                snprintf(buffer, buffer_len, (char *)str(LANG_BATTERY_TIME),
+                snprintf(buffer, buffer_len, str(LANG_BATTERY_TIME),
                          battery_level(), battery_time() / 60, battery_time() % 60);
             else
                 return "(n/a)";
@@ -399,19 +399,19 @@ MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_ROCKBOX_INFO),
 
 
 /* sleep Menu */
-static void sleep_timer_formatter(char* buffer, size_t buffer_size, int value,
-                                  const char* unit)
+static const char* sleep_timer_formatter(char* buffer, size_t buffer_size,
+                                         int value, const char* unit)
 {
-    int minutes, hours;
-
     (void) unit;
+    int minutes, hours;
 
     if (value) {
         hours = value / 60;
         minutes = value - (hours * 60);
         snprintf(buffer, buffer_size, "%d:%02d", hours, minutes);
-   } else {
-        strlcpy(buffer, str(LANG_OFF), buffer_size);
+        return buffer;
+    } else {
+        return str(LANG_OFF);
     }
 }
 

@@ -69,10 +69,11 @@ static const char *unit_strings[] =
 /* these two vars are needed so arbitrary values can be added to the
    TABLE_SETTING settings if the F_ALLOW_ARBITRARY_VALS flag is set */
 static int table_setting_oldval = 0, table_setting_array_position = 0;
-char *option_get_valuestring(const struct settings_list *setting, 
-                             char *buffer, int buf_len,
-                             intptr_t temp_var)
+const char *option_get_valuestring(const struct settings_list *setting, 
+                                   char *buffer, int buf_len,
+                                   intptr_t temp_var)
 {
+    const char* str = buffer;
     if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
     {
         bool val = (bool)temp_var;
@@ -93,7 +94,7 @@ char *option_get_valuestring(const struct settings_list *setting,
         const struct int_setting *int_info = setting->int_setting;
         const struct table_setting *tbl_info = setting->table_setting;
         const char *unit;
-        void (*formatter)(char*, size_t, int, const char*);
+        const char* (*formatter)(char*, size_t, int, const char*);
         if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
         {
             formatter = int_info->formatter;
@@ -105,7 +106,7 @@ char *option_get_valuestring(const struct settings_list *setting,
             unit = unit_strings[tbl_info->unit];
         }
         if (formatter)
-            formatter(buffer, buf_len, (int)temp_var, unit);
+            str = formatter(buffer, buf_len, (int)temp_var, unit);
         else
             snprintf(buffer, buf_len, "%d %s", (int)temp_var, unit?unit:"");
     }
@@ -152,7 +153,7 @@ char *option_get_valuestring(const struct settings_list *setting,
             strlcpy(buffer, val, buf_len);
         }
     }
-    return buffer;
+    return str;
 }
 void option_talk_value(const struct settings_list *setting, int value, bool enqueue)
 {
@@ -363,10 +364,11 @@ static int selection_to_val(const struct settings_list *setting, int selection)
     }
     return max- (selection * step);
 }
-static char * value_setting_get_name_cb(int selected_item, 
-                                        void * data,
-                                        char *buffer,
-                                        size_t buffer_len)
+
+static const char * value_setting_get_name_cb(int selected_item, 
+                                              void * data,
+                                              char *buffer,
+                                              size_t buffer_len)
 {
     selected_item = selection_to_val(data, selected_item);
     return option_get_valuestring(data, buffer, buffer_len, selected_item);

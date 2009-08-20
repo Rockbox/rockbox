@@ -270,10 +270,10 @@ static void slot_info(char *info_buf, size_t info_bufsiz, size_t slot_id) {
 /* 
  * slot_get_name
  */
-static char *slot_get_name(int selected_item, void * data,
-                             char * buffer, size_t buffer_len)
+static const char* slot_get_name(int selected_item, void * data,
+                                 char * buffer, size_t buffer_len)
 {
-    char (*items)[20] = data;
+    const char (*items)[20] = data;
     (void) buffer;
     (void) buffer_len;
     return items[selected_item];

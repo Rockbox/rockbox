@@ -114,37 +114,39 @@ set_defaults (void)
     autosave_time = 7;
 }
 
-static void
+static const char*
 komi_formatter (char *dest, size_t size, int menu_item, const char *unknown)
 {
     (void) unknown;
     snprint_fixed (dest, size, menu_item);
+    return dest;
 }
 
-static void
+static const char*
 ruleset_formatter (char *dest, size_t size, int menu_item, const char *unknown)
 {
-    (void) unknown;
-    rb->snprintf (dest, size, "%s", ruleset_names[menu_item]);
+    (void)dest, (void)size, (void)unknown;
+    return ruleset_names[menu_item];
 }
 
-static void
+static const char*
 autosave_formatter (char *dest, size_t size, int menu_item, const char *
 unknown)
 {
     (void) unknown;
     if (menu_item == 0)
     {
-        rb->snprintf (dest, size, "Off");
+        return "Off";
     }
     else
     {
         rb->snprintf (dest, size, "%d minute%s", menu_item,
                       menu_item == 1 ? "" : "s");
+        return dest;
     }
 }
 
-static void
+static const char*
 time_formatter (char *dest, size_t size, int menu_item, const char *unknown)
 {
     int time_values[4];         /* days hours minutes seconds */
@@ -183,8 +185,7 @@ time_formatter (char *dest, size_t size, int menu_item, const char *unknown)
 
     if (max_set == -1)
     {
-        rb->snprintf (dest, size, "0");
-        return;
+        return "0";
     }
 
     for (i = min_set; i <= 3; ++i)
@@ -236,6 +237,7 @@ time_formatter (char *dest, size_t size, int menu_item, const char *unknown)
         dest += temp;
         size -= temp;
     }
+    return dest;
 }
 
 enum plugin_status

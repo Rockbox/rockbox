@@ -435,13 +435,13 @@ static enum themable_icons openwith_get_icon(int selected_item, void * data)
     return filetypes[items[selected_item]].icon;
 }
 
-static char * openwith_get_name(int selected_item, void * data,
-                                char * buffer, size_t buffer_len)
+static const char* openwith_get_name(int selected_item, void * data,
+                                     char * buffer, size_t buffer_len)
 {
     (void)buffer; (void)buffer_len;
     struct cb_data *info = (struct cb_data *)data;
     int *items = info->items;
-    char *s = strrchr(filetypes[items[selected_item]].plugin, '/');
+    const char *s = strrchr(filetypes[items[selected_item]].plugin, '/');
     if (s)
         return s+1;
     else return filetypes[items[selected_item]].plugin;

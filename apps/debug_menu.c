@@ -141,8 +141,8 @@ static char thread_status_char(unsigned status)
     return thread_status_chars[status];
 }
 
-static char* threads_getname(int selected_item, void *data,
-                             char *buffer, size_t buffer_len)
+static const char* threads_getname(int selected_item, void *data,
+                                   char *buffer, size_t buffer_len)
 {
     (void)data;
     struct thread_entry *thread;
@@ -183,6 +183,7 @@ static char* threads_getname(int selected_item, void *data,
 
     return buffer;
 }
+
 static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
 {
     (void)lists;
@@ -783,8 +784,8 @@ static bool dbg_hw_info(void)
 #endif /* !SIMULATOR */
 
 #ifndef SIMULATOR
-static char* dbg_partitions_getname(int selected_item, void *data,
-                                    char *buffer, size_t buffer_len)
+static const char* dbg_partitions_getname(int selected_item, void *data,
+                                          char *buffer, size_t buffer_len)
 {
     (void)data;
     int partition = selected_item/2;
@@ -2796,12 +2797,14 @@ static int menu_action_callback(int btn, struct gui_synclist *lists)
     }
     return btn;
 }
-static char* dbg_menu_getname(int item, void * data,
-                              char *buffer, size_t buffer_len)
+
+static const char* dbg_menu_getname(int item, void * data,
+                                    char *buffer, size_t buffer_len)
 {
     (void)data; (void)buffer; (void)buffer_len;
     return menuitems[item].desc;
 }
+
 bool debug_menu(void)
 {
     struct simplelist_info info;

@@ -106,8 +106,8 @@ static int ft_play_dirname(char* name);
 static void ft_play_filename(char *dir, char *file);
 static void say_filetype(int attr);
 
-static char * tree_get_filename(int selected_item, void *data,
-                                char *buffer, size_t buffer_len)
+static const char* tree_get_filename(int selected_item, void *data,
+                                     char *buffer, size_t buffer_len)
 {
     struct tree_context * local_tc=(struct tree_context *)data;
     char *name;

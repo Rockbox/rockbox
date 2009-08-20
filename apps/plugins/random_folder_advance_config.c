@@ -234,7 +234,9 @@ void generate(void)
     rb->close(fd);
     rb->splash(HZ, "Done");
 }
-char *list_get_name_cb(int selected_item, void* data, char* buf, size_t buf_len)
+
+static const char* list_get_name_cb(int selected_item, void* data,
+                                    char* buf, size_t buf_len)
 {
     (void)data;
     rb->strlcpy(buf, list->folder[selected_item], buf_len);

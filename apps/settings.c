@@ -1083,7 +1083,7 @@ bool set_int(const unsigned char* string,
              int step,
              int min,
              int max,
-             void (*formatter)(char*, size_t, int, const char*) )
+             const char* (*formatter)(char*, size_t, int, const char*) )
 {
     return set_int_ex(string, unit, voice_unit, variable, function,
                       step, min, max, formatter, NULL);
@@ -1097,7 +1097,7 @@ bool set_int_ex(const unsigned char* string,
                 int step,
                 int min,
                 int max,
-                void (*formatter)(char*, size_t, int, const char*),
+                const char* (*formatter)(char*, size_t, int, const char*),
                 int32_t (*get_talk_id)(int, int))
 {
     (void)unit;
@@ -1117,17 +1117,18 @@ bool set_int_ex(const unsigned char* string,
 
 
 static const struct opt_items *set_option_options;
-static void set_option_formatter(char* buf, size_t size, int item, const char* unit)
+static const char* set_option_formatter(char* buf, size_t size, int item, const char* unit)
 {
-    (void)unit;
-    const unsigned char *text = set_option_options[item].string;
-    strlcpy(buf, P2STR(text), size);
+    (void)buf, (void)unit, (void)size;
+    return P2STR(set_option_options[item].string);
 }
+
 static int32_t set_option_get_talk_id(int value, int unit)
 {
     (void)unit;
     return set_option_options[value].voice_id;
 }
+
 bool set_option(const char* string, const void* variable, enum optiontype type,
                 const struct opt_items* options, 
                 int numoptions, void (*function)(int))

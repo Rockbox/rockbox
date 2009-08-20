@@ -40,8 +40,8 @@ static bool usb_connected = false;
 enum sc_list_action_type draw_sc_list(struct gui_synclist *gui_sc);
 
 /* Will be passed sc_file* as data */
-char* build_sc_list(int selected_item, void *data,
-                    char *buffer, size_t buffer_len);
+static const char* build_sc_list(int selected_item, void *data,
+                                 char *buffer, size_t buffer_len);
 
 /* Returns true iff we should leave the main loop */
 bool list_sc(void);
@@ -89,8 +89,8 @@ enum sc_list_action_type draw_sc_list(struct gui_synclist *gui_sc)
 }
 
 
-char* build_sc_list(int selected_item, void *data,
-                    char *buffer, size_t buffer_len)
+static const char* build_sc_list(int selected_item, void *data,
+                                 char *buffer, size_t buffer_len)
 {
     sc_file_t *file = (sc_file_t*)data;
     

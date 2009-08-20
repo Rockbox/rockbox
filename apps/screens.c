@@ -789,20 +789,22 @@ static const int id3_headers[]=
 #endif
     LANG_ID3_PATH,
 };
+
 struct id3view_info {
     struct mp3entry* id3;
     int count;
-    int info_id[sizeof(id3_headers)/sizeof(id3_headers[0])];
+    int info_id[ARRAYLEN(id3_headers)];
 };
-static char * id3_get_info(int selected_item, void* data,
-                           char *buffer, size_t buffer_len)
+
+static const char* id3_get_info(int selected_item, void* data,
+                                char *buffer, size_t buffer_len)
 {
     struct id3view_info *info = (struct id3view_info*)data;
     struct mp3entry* id3 =info->id3;
     int info_no=selected_item/2;
     if(!(selected_item%2))
     {/* header */
-        return( str(id3_headers[info->info_id[info_no]]));
+        return(str(id3_headers[info->info_id[info_no]]));
     }
     else
     {/* data */
@@ -903,7 +905,7 @@ bool browse_id3(void)
     struct id3view_info info;
     info.count = 0;
     info.id3 = id3;
-    for (i=0; i<sizeof(id3_headers)/sizeof(id3_headers[0]); i++)
+    for (i = 0; i < ARRAYLEN(id3_headers); i++)
     {
         char temp[8];
         info.info_id[i] = i;
@@ -924,8 +926,8 @@ bool browse_id3(void)
     }
 }
 
-static char* runtime_get_data(int selected_item, void* data,
-                              char* buffer, size_t buffer_len)
+static const char* runtime_get_data(int selected_item, void* data,
+                                    char* buffer, size_t buffer_len)
 {
     (void)data;
     int t;

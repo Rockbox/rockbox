@@ -147,7 +147,7 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
                 vps[screen][QUICKSCREEN_BOTTOM].y - vp_icons[screen].y;
 }
 
-static void quickscreen_draw_text(char *s, int item, bool title,
+static void quickscreen_draw_text(const char *s, int item, bool title,
                                   struct screen *display, struct viewport *vp)
 {
     int nb_lines = viewport_get_nb_lines(vp);
@@ -186,7 +186,7 @@ static void gui_quickscreen_draw(struct gui_quickscreen *qs,
 
     int i;
     char buf[MAX_PATH];
-    unsigned char *title, *value;
+    unsigned const char *title, *value;
     void *setting;
     int temp;
     display->set_viewport(parent);

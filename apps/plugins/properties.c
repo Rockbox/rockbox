@@ -228,7 +228,8 @@ static bool dir_properties(char* selected_file)
     return true;
 }
 
-char * get_props(int selected_item, void* data, char *buffer, size_t buffer_len)
+static const char * get_props(int selected_item, void* data,
+                              char *buffer, size_t buffer_len)
 {
     (void)data;
 
@@ -263,8 +264,7 @@ char * get_props(int selected_item, void* data, char *buffer, size_t buffer_len)
             rb->strlcpy(buffer, its_a_dir ? "" : str_duration, buffer_len);
             break;
         default:
-            rb->strlcpy(buffer, "ERROR", buffer_len);
-            break;
+            return "ERROR";
     }
     return buffer;
 }

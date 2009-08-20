@@ -848,8 +848,8 @@ enum rec_list_items_spdif {
 
 static int listid_to_enum[ITEM_COUNT];
 
-static char * reclist_get_name(int selected_item, void * data,
-                               char * buffer, size_t buffer_len)
+static const char* reclist_get_name(int selected_item, void * data,
+                                    char * buffer, size_t buffer_len)
 {
     char buf2[32];
 #ifdef HAVE_AGC

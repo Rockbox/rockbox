@@ -415,7 +415,7 @@ static enum themable_icons trigger_get_icon(int selected_item, void * data)
     return Icon_NOICON;
 }
 
-static char * trigger_get_name(int selected_item, void * data,
+static const char * trigger_get_name(int selected_item, void * data,
                         char * buffer, size_t buffer_len)
 {
     const struct settings_list **settings = 

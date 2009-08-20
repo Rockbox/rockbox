@@ -184,8 +184,8 @@ exit:
 }
 
 /* Callback for gui_synclist */
-static char* playlist_callback_name(int selected_item, void* data,
-                                    char* buffer, size_t buffer_len)
+static const char* playlist_callback_name(int selected_item, void* data,
+                                          char* buffer, size_t buffer_len)
 {
     char** playlists = (char**) data;
 

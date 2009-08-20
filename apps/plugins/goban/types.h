@@ -218,7 +218,7 @@ struct prop_t
 
 
 /* The names of the rulesets, ex. "AGA", "Japanese", etc. */
-extern char *ruleset_names[];
+extern const char *ruleset_names[];
 
 /* IMPORTANT! keep in sync with ruleset_names!!! */
 enum ruleset_t

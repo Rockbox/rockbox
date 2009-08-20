@@ -1251,8 +1251,8 @@ int movement_menu(void) {
     return RET_VAL_OK;
 }
 
-static char * inventory_data(int selected_item, void * data,
-                             char * buffer, size_t buffer_len) {
+static const char* inventory_data(int selected_item, void * data,
+                                  char * buffer, size_t buffer_len) {
     (void)data;
     switch(selected_item) {
         case 0:

@@ -827,10 +827,10 @@ void simplelist_addline(int line_number, const char *fmt, ...)
     va_end(ap);
 }
 
-static char* simplelist_static_getname(int item,
-                                       void * data,
-                                       char *buffer,
-                                       size_t buffer_len)
+static const char* simplelist_static_getname(int item,
+                                             void * data,
+                                             char *buffer,
+                                             size_t buffer_len)
 {
     (void)data; (void)buffer; (void)buffer_len;
     return simplelist_text[item];
@@ -841,7 +841,7 @@ bool simplelist_show_list(struct simplelist_info *info)
     struct gui_synclist lists;
     int action, old_line_count = simplelist_line_count;
     int oldbars = viewportmanager_set_statusbar(VP_SB_ALLSCREENS);
-    char* (*getname)(int item, void * data, char *buffer, size_t buffer_len);
+    const char* (*getname)(int item, void * data, char *buffer, size_t buffer_len);
     int wrap = LIST_WRAP_UNLESS_HELD;
     if (info->get_name)
         getname = info->get_name;

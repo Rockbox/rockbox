@@ -269,13 +269,14 @@ static const char graphic_numeric[] = "graphic,numeric";
 
 #endif /* HAVE_RECORDING */
 
-static void formatter_unit_0_is_off(char *buffer, size_t buffer_size,
+static const char* formatter_unit_0_is_off(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
 {
     if (val == 0)
-        strcpy(buffer, str(LANG_OFF));
+        return str(LANG_OFF);
     else
         snprintf(buffer, buffer_size, "%d %s", val, unit);
+    return buffer;
 }
 
 static int32_t getlang_unit_0_is_off(int value, int unit)
@@ -286,16 +287,17 @@ static int32_t getlang_unit_0_is_off(int value, int unit)
         return TALK_ID(value,unit);
 }
 
-static void formatter_unit_0_is_skip_track(char *buffer, size_t buffer_size,
+static const char* formatter_unit_0_is_skip_track(char *buffer, size_t buffer_size,
                                            int val, const char *unit)
 {
     (void)unit;
     if (val == 0)
-        strcpy(buffer, str(LANG_SKIP_TRACK));
+        return str(LANG_SKIP_TRACK);
     else if (val % 60 == 0)
         snprintf(buffer, buffer_size, "%d min", val/60);
     else
         snprintf(buffer, buffer_size, "%d s", val);
+    return buffer;
 }
 
 static int32_t getlang_unit_0_is_skip_track(int value, int unit)
@@ -310,15 +312,16 @@ static int32_t getlang_unit_0_is_skip_track(int value, int unit)
 }
 
 #ifdef HAVE_BACKLIGHT
-static void backlight_formatter(char *buffer, size_t buffer_size,
+static const char* backlight_formatter(char *buffer, size_t buffer_size,
                                 int val, const char *unit)
 {
     if (val == -1)
-        strcpy(buffer, str(LANG_OFF));
+        return str(LANG_OFF);
     else if (val == 0)
-        strcpy(buffer, str(LANG_ON));
+        return str(LANG_ON);
     else
         snprintf(buffer, buffer_size, "%d %s", val, unit);
+    return buffer;
 }
 static int32_t backlight_getlang(int value, int unit)
 {
@@ -332,14 +335,15 @@ static int32_t backlight_getlang(int value, int unit)
 #endif
 
 #ifndef HAVE_WHEEL_ACCELERATION
-static void scanaccel_formatter(char *buffer, size_t buffer_size,
+static const char* scanaccel_formatter(char *buffer, size_t buffer_size,
         int val, const char *unit)
 {
     (void)unit;
     if (val == 0)
-        strcpy(buffer, str(LANG_OFF));
+        return str(LANG_OFF);
     else
         snprintf(buffer, buffer_size, "2x/%ds", val);
+    return buffer;
 }
 #endif
 
@@ -352,13 +356,14 @@ static void crossfeed_cross_set(int val)
                                   global_settings.crossfeed_hf_cutoff);
 }
 
-static void db_format(char* buffer, size_t buffer_size, int value,
+static const char* db_format(char* buffer, size_t buffer_size, int value,
                       const char* unit)
 {
     int v = abs(value);
 
     snprintf(buffer, buffer_size, "%s%d.%d %s", value < 0 ? "-" : "",
              v / 10, v % 10, unit);
+    return buffer;
 }
 
 static int32_t get_dec_talkid(int value, int unit)
@@ -384,27 +389,25 @@ static void set_superbass(bool value)
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
-static void jumpscroll_format(char* buffer, size_t buffer_size, int value,
+static const char* jumpscroll_format(char* buffer, size_t buffer_size, int value,
                               const char* unit)
 {
     (void)unit;
     switch (value)
     {
         case 0:
-            strcpy(buffer, str(LANG_OFF));
-            break;
+            return str(LANG_OFF);
         case 1:
-            strcpy(buffer, str(LANG_ONE_TIME));
-            break;
+            return str(LANG_ONE_TIME);
         case 2:
         case 3:
         case 4:
             snprintf(buffer, buffer_size, "%d", value);
             break;
         case 5:
-            strcpy(buffer, str(LANG_ALWAYS));
-            break;
+            return str(LANG_ALWAYS);
     }
+    return buffer;
 }
 static int32_t jumpscroll_getlang(int value, int unit)
 {

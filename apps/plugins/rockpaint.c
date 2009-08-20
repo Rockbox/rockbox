@@ -600,8 +600,8 @@ char bbuf[MAX_PATH+1]; /* used by file and font browsers */
 char bbuf_s[MAX_PATH+1]; /* used by file and font browsers */
 struct tree_context *tree = NULL;
 
-static char * browse_get_name_cb( int selected_item, void *data,
-                                  char *buffer, size_t buffer_len )
+static const char* browse_get_name_cb(int selected_item, void *data,
+                                      char *buffer, size_t buffer_len)
 {
     int *indexes = (int *) data;
     struct entry* dc = tree->dircache;
@@ -609,7 +609,7 @@ static char * browse_get_name_cb( int selected_item, void *data,
     (void) buffer;
     (void) buffer_len;
 
-    return (e->name);
+    return e->name;
 }
 
 static bool browse( char *dst, int dst_size, const char *start )
@@ -633,8 +633,8 @@ static bool browse( char *dst, int dst_size, const char *start )
     }
     bbuf_s[0] = '\0';
 
-    rb->gui_synclist_init( &browse_list, browse_get_name_cb,
-                            (void*) indexes, false, 1, NULL );
+    rb->gui_synclist_init(&browse_list, browse_get_name_cb,
+                            (void*) indexes, false, 1, NULL);
 
     tree = rb->tree_get_context();
     backup = *tree;

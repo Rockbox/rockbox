@@ -69,7 +69,7 @@ void list_draw(struct screen *display, struct gui_synclist *gui_list)
 
     for (i = start; i < end; i++)
     {
-        unsigned char *s;
+        unsigned const char *s;
         char entry_buffer[MAX_PATH];
         unsigned char *entry_name;
         int current_item = gui_list->start_item[display->screen_type] + i;

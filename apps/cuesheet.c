@@ -234,10 +234,10 @@ int cue_find_current_track(struct cuesheet *cue, unsigned long curpos)
 }
 
 /* callback that gives list item titles for the cuesheet browser */
-static char *list_get_name_cb(int selected_item,
-                              void *data,
-                              char *buffer,
-                              size_t buffer_len)
+static const char* list_get_name_cb(int selected_item,
+                                    void *data,
+                                    char *buffer,
+                                    size_t buffer_len)
 {
     struct cuesheet *cue = (struct cuesheet *)data;
 

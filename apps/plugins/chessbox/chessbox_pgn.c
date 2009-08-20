@@ -528,11 +528,10 @@ void coords_to_pgn(struct pgn_ply_node* ply){
     }
 }
 
-char * get_game_text(int selected_item, void *data,
-                     char *buffer, size_t buffer_len){
+static const char* get_game_text(int selected_item, void *data,
+                                 char *buffer, size_t buffer_len){
     int i;
     struct pgn_game_node *temp_node = (struct pgn_game_node *)data;
-    char text_buffer[50];
 
     for (i=0;i<selected_item && temp_node != NULL;i++){
         temp_node = temp_node->next_node;
@@ -540,10 +539,9 @@ char * get_game_text(int selected_item, void *data,
     if (temp_node == NULL){
         return NULL;
     }
-    rb->snprintf(text_buffer, 50,"%s vs. %s (%s)", temp_node->white_player,
+    rb->snprintf(buffer, buffer_len,"%s vs. %s (%s)", temp_node->white_player,
                          temp_node->black_player, temp_node->game_date);
 
-    rb->strlcpy(buffer, text_buffer, buffer_len);
     return buffer;
 }
 

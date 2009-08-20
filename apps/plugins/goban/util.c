@@ -210,7 +210,7 @@ char *prop_names[] = {
 
 /* These seems to be specified by the SGF specification.  You can do free
    form ones as well, but I haven't implemented that (and don't plan to) */
-char *ruleset_names[] = { "AGA", "Japanese", "Chinese", "NZ", "GOE" };
+const char *ruleset_names[] = { "AGA", "Japanese", "Chinese", "NZ", "GOE" };
 
 
 

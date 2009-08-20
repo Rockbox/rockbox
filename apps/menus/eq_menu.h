@@ -43,7 +43,9 @@ bool eq_browse_presets(void);
 bool eq_menu_graphical(void);
 
 /* utility functions for settings_list.c */
-void eq_q_format(char* buffer, size_t buffer_size, int value, const char* unit);
-void eq_precut_format(char* buffer, size_t buffer_size, int value, const char* unit);
+const char* eq_q_format(char* buffer, size_t buffer_size, int value,
+                        const char* unit);
+const char* eq_precut_format(char* buffer, size_t buffer_size, int value,
+                             const char* unit);
 
 #endif

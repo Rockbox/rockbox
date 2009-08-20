@@ -86,10 +86,10 @@ static bool  parse_bookmark(const char *bookmark,
                             bool *shuffle,
                             char* file_name);
 static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line);
-static char* get_bookmark_info(int list_index,
-                               void* data,
-                               char *buffer,
-                               size_t buffer_len);
+static const char* get_bookmark_info(int list_index,
+                                     void* data,
+                                     char *buffer,
+                                     size_t buffer_len);
 static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resume);
 static bool  system_check(void);
 static bool  write_bookmark(bool create_bookmark_file, const char *bookmark);
@@ -515,10 +515,10 @@ static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line)
     return bookmarks->start + bookmarks->count;
 }
 
-static char* get_bookmark_info(int list_index,
-                               void* data,
-                               char *buffer,
-                               size_t buffer_len)
+static const char* get_bookmark_info(int list_index,
+                                     void* data,
+                                     char *buffer,
+                                     size_t buffer_len)
 {
     struct bookmark_list* bookmarks = (struct bookmark_list*) data;
     int     index = list_index / 2;
