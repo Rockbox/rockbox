@@ -90,11 +90,40 @@ static void track_changed_callback(void *param);
 static void nextid3available_callback(void* param);
 
 
+#define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
+#ifdef HAVE_REMOTE_LCD
+#define RWPS_DEFAULTCFG WPS_DIR "/rockbox_default.rwps"
+#define DEFAULT_WPS(screen) ((screen) == SCREEN_MAIN ? \
+                            WPS_DEFAULTCFG:RWPS_DEFAULTCFG)
+#else
+#define DEFAULT_WPS(screen) (WPS_DEFAULTCFG)
+#endif
+
 void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
 {
     bool loaded_ok;
 
     screens[screen].backdrop_unload(BACKDROP_SKIN_WPS);
+
+#ifndef __PCTOOL__
+    /*
+     * Hardcode loading WPS_DEFAULTCFG to cause a reset ideally this
+     * wants to be a virtual file.  Feel free to modify dirbrowse()
+     * if you're feeling brave.
+     */
+
+    if (! strcmp(buf, DEFAULT_WPS(screen)) )
+    {
+#ifdef HAVE_REMOTE_LCD
+        if (screen == SCREEN_REMOTE)
+            global_settings.rwps_file[0] = '\0';
+        else
+#endif
+            global_settings.wps_file[0] = '\0';
+        buf = NULL;
+    }
+
+#endif /* __PCTOOL__ */
 
     loaded_ok = buf && skin_data_load(gui_wps[screen].data,
                                         &screens[screen], buf, isfile);

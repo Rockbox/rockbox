@@ -55,9 +55,6 @@
 
 #include "backdrop.h"
 
-#define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
-#define RWPS_DEFAULTCFG WPS_DIR "/rockbox_default.rwps"
-
 #define WPS_ERROR_INVALID_PARAM         -1
 
 /* level of current conditional.
@@ -1691,27 +1688,6 @@ bool skin_data_load(struct wps_data *wps_data,
     }
     else
     {
-        /*
-         * Hardcode loading WPS_DEFAULTCFG to cause a reset ideally this
-         * wants to be a virtual file.  Feel free to modify dirbrowse()
-         * if you're feeling brave.
-         */
-#ifndef __PCTOOL__
-        if (! strcmp(buf, WPS_DEFAULTCFG) )
-        {
-            global_settings.wps_file[0] = 0;
-            return false;
-        }
-
-#ifdef HAVE_REMOTE_LCD
-        if (! strcmp(buf, RWPS_DEFAULTCFG) )
-        {
-            global_settings.rwps_file[0] = 0;
-            return false;
-        }
-#endif
-#endif /* __PCTOOL__ */
-
         int fd = open_utf8(buf, O_RDONLY);
 
         if (fd < 0)
