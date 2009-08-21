@@ -83,14 +83,17 @@ static void usb_mode(void)
             }
         }
     }
-
-    reset_screen();
 }
 
 static int boot_of(void)
 {
     int fd, rc, len, i, checksum = 0;
     void (*kernel_entry)(int, void*, void*);
+
+    printf("Mounting disk...");
+    rc = disk_mount_all();
+    if (rc <= 0)
+        error(EDISK,rc);
 
     /* TODO: get this from the NAND flash instead of SD */
     fd = open("/ccpmp.bin", O_RDONLY);
@@ -140,7 +143,12 @@ static int boot_rockbox(void)
     int rc;
     void (*kernel_entry)(void);
 
-    printf("Loading firmware");
+    printf("Mounting disk...");
+    rc = disk_mount_all();
+    if (rc <= 0)
+        error(EDISK,rc);
+
+    printf("Loading firmware...");
     rc = load_firmware((unsigned char *)CONFIG_SDRAM_START, BOOTFILE, 0x400000);
     if(rc < 0)
         return rc;
@@ -157,6 +165,20 @@ static int boot_rockbox(void)
     }
 }
 
+static void reset_configuration(void)
+{
+    int rc;
+
+    rc = disk_mount_all();
+    if (rc <= 0)
+        error(EDISK,rc);
+
+    if(rename(ROCKBOX_DIR "/config.cfg", ROCKBOX_DIR "/config.old") == 0)
+        show_splash(HZ/2, "Configuration reset successfully!");
+    else
+        show_splash(HZ/2, "Couldn't reset configuration!");
+}
+
 #define RECT_X        (LCD_WIDTH/8)
 #define RECT_Y(i)     (LCD_HEIGHT/20 + LCD_HEIGHT/10*i + RECT_HEIGHT*i)
 #define RECT_WIDTH    (LCD_WIDTH*3/4)
@@ -165,10 +187,11 @@ static int boot_rockbox(void)
 #define TEXT_Y(i)     (RECT_Y(i) + RECT_HEIGHT/2 - SYSFONT_HEIGHT/2)
 static int boot_menu(void)
 {
-    const char* strings[] = {"Boot Rockbox", "Boot OF", "USB mode"};
+    const char* strings[] = {"Boot Rockbox", "Boot OF", "USB mode", "Reset Rockbox configuration"};
     int button, touch;
     unsigned int i;
 
+    verbose = true;
     adc_init();
 
 redraw:
@@ -201,11 +224,18 @@ redraw:
             switch(found)
             {
                 case 0:
-                    return boot_rockbox();
+                    reset_screen();
+                    boot_rockbox();
+                    break;
                 case 1:
-                    return boot_of();
+                    reset_screen();
+                    boot_of();
+                    break;
                 case 2:
                     usb_mode();
+                    break;
+                case 3:
+                    reset_configuration();
                     break;
             }
 
@@ -237,6 +267,9 @@ int main(void)
     if(rc)
         error(EATA, rc);
 
+    /* Don't mount the disks yet, there could be file system/partition errors
+       which are fixable in USB mode */
+
 #ifdef HAVE_TOUCHSCREEN
     rc = button_read_device(&dummy);
 #else
@@ -249,6 +282,9 @@ int main(void)
 #ifdef BUTTON_VOL_UP
     if(rc & BUTTON_VOL_UP ||
 #endif
+#ifdef BUTTON_POWER
+       rc & BUTTON_POWER ||
+#endif
        0)
         rc = boot_menu();
 
@@ -256,10 +292,6 @@ int main(void)
         reset_screen();
     printf(MODEL_NAME" Rockbox Bootloader");
     printf("Version "APPSVERSION);
-
-    rc = disk_mount_all();
-    if (rc <= 0)
-        error(EDISK,rc);
 
 #ifdef HAS_BUTTON_HOLD
     if(button_hold())
