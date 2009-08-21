@@ -62,6 +62,8 @@ ifneq (,$(findstring bootloader,$(APPSDIR)))
 else ifneq (,$(findstring bootbox,$(APPSDIR)))
   BOOTBOXLDOPTS = -Wl,--gc-sections
   include $(APPSDIR)/bootbox.make
+else ifneq (,$(findstring checkwps,$(APPSDIR)))
+  include $(APPSDIR)/checkwps.make
 else
   include $(APPSDIR)/apps.make
   include $(APPSDIR)/lang/lang.make
