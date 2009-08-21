@@ -20,28 +20,18 @@
  ****************************************************************************/
 
 /*
- * logf() logs MAX_LOGF_ENTRY (29) bytes per entry in a circular buffer. Each
- * logged string is space- padded for easier and faster output on screen. Just
- * output MAX_LOGF_ENTRY characters on each line. MAX_LOGF_ENTRY bytes fit
- * nicely on the iRiver remote LCD (128 pixels with an 8x6 pixels font).
+ * logf() logs entries in a circular buffer. Each logged string is null-terminated.
  *
- * When the length of log exceeds MAX_LOGF_ENTRY bytes, dividing into the
- * string of length is MAX_LOGF_ENTRY-1 bytes.
+ * When the length of log exceeds MAX_LOGF_SIZE bytes, the buffer wraps.
  *
- * logfbuffer[*]:
- *
- *    |<-   MAX_LOGF_ENTRY bytes   ->|1|
- *    | log data area                |T|
- *
- *  T : log terminate flag
- *   == LOGF_TERMINATE_ONE_LINE(0x00)      : log data end (one line)
- *   == LOGF_TERMINATE_CONTINUE_LINE(0x01) : log data continues
- *   == LOGF_TERMINATE_MULTI_LINE(0x02)    : log data end (multi line)
  */
 
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <sprintf.h>
+#include <system.h>
+#include <font.h>
 #include "config.h"
 #include "lcd-remote.h"
 #include "logf.h"
@@ -56,7 +46,7 @@
 #ifdef ROCKBOX_HAS_LOGF
 
 #ifndef __PCTOOL__
-unsigned char logfbuffer[MAX_LOGF_LINES][MAX_LOGF_ENTRY+1];
+unsigned char logfbuffer[MAX_LOGF_SIZE];
 int logfindex;
 bool logfwrap;
 #endif
@@ -65,32 +55,103 @@ bool logfwrap;
 static void displayremote(void)
 {
     /* TODO: we should have a debug option that enables/disables this! */
-    int w, h;
-    int lines;
-    int columns;
-    int i;
-    int index;
-
-    lcd_remote_getstringsize("A", &w, &h);
-    lines = LCD_REMOTE_HEIGHT/h;
-    columns = LCD_REMOTE_WIDTH/w;
+    int w, h, i;
+    int fontnr;
+    int cur_x, cur_y, delta_y, delta_x;
+    struct font* font;
+    int nb_lines;
+    char buf[2];
+    /* Memorize the pointer to the beginning of the last ... lines
+       I assume delta_y >= 6 to avoid wasting memory and allocating memory dynamically
+       I hope there is no font with height < 6 ! */
+    const int NB_ENTRIES=LCD_REMOTE_HEIGHT / 6;
+    int line_start_ptr[NB_ENTRIES];
+    
+    fontnr = lcd_getfont();
+    font = font_get(fontnr);
+    
+    /* get the horizontal size of each line */
+    font_getstringsize("A", NULL, &delta_y, fontnr);
+    
+    /* font too small ? */
+    if(delta_y < 6)
+        return;
+    /* nothing to print ? */
+    if(logfindex == 0 && !logfwrap)
+        return;
+    
+    w = LCD_REMOTE_WIDTH;
+    h = LCD_REMOTE_HEIGHT;
+    nb_lines = 0;
+    
+    if(logfwrap)
+        i = logfindex;
+    else
+        i = 0;
+    
+    cur_x = 0;
+    
+    line_start_ptr[0] = i;
+    
+    do
+    {
+        if(logfbuffer[i] == '\0')
+        {
+            line_start_ptr[++nb_lines % NB_ENTRIES] = i+1;
+            cur_x = 0;
+        }
+        else
+        {
+            /* does character fit on this line ? */
+            delta_x = font_get_width(font, logfbuffer[i]);
+            
+            if(cur_x + delta_x > w)
+            {
+                cur_x = 0;
+                line_start_ptr[++nb_lines % NB_ENTRIES] = i;
+            }
+            /* update pointer */
+            cur_x += delta_x;
+        }
+        i++;
+        if(i >= MAX_LOGF_SIZE)
+            i = 0;
+    } while(i != logfindex);
+    
     lcd_remote_clear_display();
     
-    index = logfindex;
-    for(i = lines-1; i>=0; i--) {
-        unsigned char buffer[columns+1];
-
-        if(--index < 0) {
-            if(logfwrap)
-                index = MAX_LOGF_LINES-1;
-            else
-                break; /* done */
+    i = line_start_ptr[ MAX(nb_lines - h / delta_y, 0) % NB_ENTRIES];
+    cur_x = 0;
+    cur_y = 0;
+    buf[1] = '\0';
+    
+    do {
+        if(logfbuffer[i] == '\0')
+        {
+            cur_y += delta_y;
+            cur_x = 0;
+        }
+        else
+        {
+            /* does character fit on this line ? */
+            delta_x = font_get_width(font, logfbuffer[i]);
+            
+            if(cur_x + delta_x > w)
+            {
+                cur_y += delta_y;
+                cur_x = 0;
+            }
+            
+            buf[0] = logfbuffer[i];
+            lcd_remote_putsxy(cur_x, cur_y, buf);
+            cur_x += delta_x;
         }
         
-        memcpy(buffer, logfbuffer[index], columns);
-        buffer[columns]=0;
-        lcd_remote_puts(0, i, buffer);
-    }
+        i++;
+        if(i >= MAX_LOGF_SIZE)
+            i = 0;
+    } while(i != logfindex);
+    
     lcd_remote_update();   
 }
 #else
@@ -110,59 +171,62 @@ void _logf(const char *format, ...)
 #else
 static void check_logfindex(void)
 {
-    if(logfindex >= MAX_LOGF_LINES) {
+    if(logfindex >= MAX_LOGF_SIZE) 
+    {
         /* wrap */
         logfwrap = true;
         logfindex = 0;
     }
 }
 
-void _logf(const char *format, ...)
+static int logf_push(void *userp, unsigned char c)
 {
-    int len;
-    int tlen;
-    unsigned char buf[MAX_LOGF_ONE_LINE_SIZE];
-    unsigned char *ptr;
-    va_list ap;
-    bool multiline = false;
-
-    va_start(ap, format);
-    vsnprintf(buf, MAX_LOGF_ONE_LINE_SIZE, format, ap);
-    va_end(ap);
-
-    len = strlen(buf);
+    (void)userp;
+    
+    logfbuffer[logfindex++] = c;
+    check_logfindex();
+    
 #if defined(HAVE_SERIAL) && !defined(SIMULATOR)
-    serial_tx(buf);
+    if(c != '\0')
+    {
+        char buf[2];
+        buf[0] = c;
+        buf[1] = '\0';
+        serial_tx(buf);
+    }
+#endif
+    
+    return true;
+}
+
+void _logf(const char *fmt, ...)
+{
+    #ifdef USB_ENABLE_SERIAL
+    int old_logfindex = logfindex;
+    #endif
+    va_list ap;
+
+    va_start(ap, fmt);
+    vfnprintf(logf_push, NULL, fmt, ap);
+    va_end(ap);
+    
+    /* add trailing zero */
+    logf_push(NULL, '\0');
+    
+#if defined(HAVE_SERIAL) && !defined(SIMULATOR)
     serial_tx("\r\n");
 #endif
 #ifdef USB_ENABLE_SERIAL
-    usb_serial_send(buf, len);
-    usb_serial_send("\r\n", 2);
-#endif
 
-    tlen = 0;
-    check_logfindex();
-    while(len > MAX_LOGF_ENTRY)
+    if(logfindex < old_logfindex)
     {
-        ptr = logfbuffer[logfindex];
-        memcpy(ptr, buf + tlen, MAX_LOGF_ENTRY);
-        ptr[MAX_LOGF_ENTRY] = LOGF_TERMINATE_CONTINUE_LINE;
-        logfindex++;
-        check_logfindex();
-        len -= MAX_LOGF_ENTRY;
-        tlen += MAX_LOGF_ENTRY;
-        multiline = true;
+        usb_serial_send(logfbuffer + old_logfindex, MAX_LOGF_SIZE - old_logfindex);
+        usb_serial_send(logfbuffer, logfindex - 1);
     }
-
-    ptr = logfbuffer[logfindex];
-    memcpy(ptr, buf + tlen,len);
-
-    if(len < MAX_LOGF_ENTRY)
-        /* pad with spaces up to the MAX_LOGF_ENTRY byte border */
-        memset(ptr+len, ' ', MAX_LOGF_ENTRY-len);
-    ptr[MAX_LOGF_ENTRY] = (multiline)?LOGF_TERMINATE_MULTI_LINE:LOGF_TERMINATE_ONE_LINE;
-
-    logfindex++; /* leave it where we write the next time */
+    else
+        usb_serial_send(logfbuffer + old_logfindex, logfindex - old_logfindex - 1);
+    usb_serial_send("\r\n", 2);
+#endif  
 
     displayremote();
 }

@@ -28,15 +28,10 @@
 #ifdef ROCKBOX_HAS_LOGF
 
 #ifndef __PCTOOL__
-#define MAX_LOGF_LINES 1000
-#define MAX_LOGF_ENTRY 29
-#define MAX_LOGF_ONE_LINE_SIZE 200
 
-#define LOGF_TERMINATE_ONE_LINE      0x00
-#define LOGF_TERMINATE_CONTINUE_LINE 0x01
-#define LOGF_TERMINATE_MULTI_LINE    0x02
+#define MAX_LOGF_SIZE 16384
 
-extern unsigned char logfbuffer[MAX_LOGF_LINES][MAX_LOGF_ENTRY+1];
+extern unsigned char logfbuffer[MAX_LOGF_SIZE];
 extern int logfindex;
 extern bool logfwrap;
 #endif /* __PCTOOL__ */

@@ -32,4 +32,6 @@ int snprintf (char *buf, size_t size, const char *fmt, ...)
 int vsnprintf (char *buf, int size, const char *fmt, va_list ap);
 int fdprintf (int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 
+int vfnprintf(int (*push)(void *userp, unsigned char data), void *userp, const char *fmt, va_list ap);
+
 #endif /* __SPRINTF_H__ */

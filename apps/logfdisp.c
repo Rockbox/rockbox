@@ -29,6 +29,7 @@
 #include <action.h>
 
 #include <lcd.h>
+#include <font.h>
 #include "menu.h"
 #include "logf.h"
 #include "settings.h"
@@ -36,90 +37,174 @@
 #include "action.h"
 
 #ifdef HAVE_LCD_BITMAP
+int compute_nb_lines(int w, struct font* font)
+{
+    int i, nb_lines;
+    int cur_x, delta_x;
+    
+    if(logfindex == 0 && !logfwrap)
+        return 0;
+        
+    if(logfwrap)
+        i = logfindex;
+    else
+        i = 0;
+    
+    cur_x = 0;
+    nb_lines = 0;
+        
+    do {
+        if(logfbuffer[i] == '\0')
+        {
+            cur_x = 0;
+            nb_lines++;
+        }
+        else
+        {
+            /* does character fit on this line ? */
+            delta_x = font_get_width(font, logfbuffer[i]);
+            
+            if(cur_x + delta_x > w)
+            {
+                cur_x = 0;
+                nb_lines++;
+            }
+            
+            /* update pointer */
+            cur_x += delta_x;
+        }
+
+        i++;
+        if(i >= MAX_LOGF_SIZE)
+            i = 0;
+    } while(i != logfindex);
+    
+    return nb_lines;
+}
+
 bool logfdisplay(void)
 {
-    int w, h;
-    int lines;
-    int columns;
-    int i;
     int action;
-
-    bool lcd = false; /* fixed atm */
-    int index, user_index=0;
-
-    lcd_getstringsize("A", &w, &h);
-    lines = (lcd?
-#ifdef HAVE_REMOTE_LCD
-             LCD_REMOTE_HEIGHT
-#else
-             0
-#endif
-             :LCD_HEIGHT)/h;
-    columns = (lcd?
-#ifdef HAVE_REMOTE_LCD
-             LCD_REMOTE_WIDTH
-#else
-             0
-#endif
-             :LCD_WIDTH)/w;
-
-    if (columns > MAX_LOGF_ENTRY+1)
-        columns = MAX_LOGF_ENTRY+1;
-            
-    if(!lines)
-        return false;
+    int w, h, i, index;
+    int fontnr;
+    int cur_x, cur_y, delta_y, delta_x;
+    struct font* font;
+    int user_index;/* user_index will be number of the first line to display (warning: line!=logf entry) */
+    char buf[2];
+    
+    fontnr = lcd_getfont();
+    font = font_get(fontnr);
+    
+    /* get the horizontal size of each line */
+    font_getstringsize("A", NULL, &delta_y, fontnr);
+    
+    buf[1] = '\0';
+    w = LCD_WIDTH;
+    h = LCD_HEIGHT;
+    /* start at the end of the log */
+    user_index = compute_nb_lines(w, font) - h/delta_y -1; /* if negative, will be set 0 to zero later */
 
     do {
         lcd_clear_display();
         
-        index = logfindex + user_index;
-        for(i = lines-1; i>=0; i--) {
-            unsigned char buffer[columns + 1];
-
-            if(--index < 0) {
-                if(logfwrap)
-                    index = MAX_LOGF_LINES-1;
-                else
-                    break; /* done */
+        if(user_index < 0)
+            user_index = 0;
+        
+        if(logfwrap)
+            i = logfindex;
+        else
+            i = 0;
+        
+        index = 0;
+        cur_x = 0;
+        cur_y = 0;
+        
+        /* nothing to print ? */
+        if(logfindex == 0 && !logfwrap)
+            goto end_print;
+        
+        do {
+            if(logfbuffer[i] == '\0')
+            {
+                /* should be display a newline ? */
+                if(index >= user_index)
+                    cur_y += delta_y;
+                cur_x = 0;
+                index++;
             }
+            else
+            {
+                /* does character fit on this line ? */
+                delta_x = font_get_width(font, logfbuffer[i]);
+                
+                if(cur_x + delta_x > w)
+                {
+                    /* should be display a newline ? */
+                    if(index >= user_index)
+                        cur_y += delta_y;
+                    cur_x = 0;
+                    index++;
+                }
+                
+                /* should we print character ? */
+                if(index >= user_index)
+                {
+                    buf[0] = logfbuffer[i];
+                    lcd_putsxy(cur_x, cur_y, buf);
+                }
+                
+                /* update pointer */
+                cur_x += delta_x;
+            }
+            
+            /* did we fill the screen ? */
+            if(cur_y > h)
+                break;
+            
+            i++;
+            if(i >= MAX_LOGF_SIZE)
+                i = 0;
+        } while(i != logfindex);
         
-            memcpy(buffer, logfbuffer[index], columns);
-            if (logfbuffer[index][MAX_LOGF_ENTRY] == LOGF_TERMINATE_CONTINUE_LINE)
-                buffer[columns-1] = '>';
-            else if (logfbuffer[index][MAX_LOGF_ENTRY] == LOGF_TERMINATE_MULTI_LINE)
-                buffer[columns-1] = '\0';
-            buffer[columns] = '\0';
-        
-            lcd_puts(0, i, buffer);
-        }
+        end_print:
         lcd_update();
         
         action = get_action(CONTEXT_STD, HZ);
-        if(action == ACTION_STD_NEXT)
-            user_index++;
-        else if(action == ACTION_STD_PREV)
-            user_index--;
-        else if(action == ACTION_STD_OK)
-            user_index = 0;
-#ifdef HAVE_TOUCHSCREEN
-        else if(action == ACTION_TOUCHSCREEN)
+        switch( action )
         {
-            short x, y;
-            static int prev_y;
-            
-            action = action_get_touchscreen_press(&x, &y);
-            
-            if(action & BUTTON_REL)
-                prev_y = 0;
-            else
+            case ACTION_STD_NEXT:
+            case ACTION_STD_NEXTREPEAT:
+                user_index++;
+                break;
+            case ACTION_STD_PREV:
+            case ACTION_STD_PREVREPEAT:
+                user_index--;
+                break;
+            case ACTION_STD_OK:
+                user_index = 0;
+                break;
+#ifdef HAVE_TOUCHSCREEN
+            case ACTION_TOUCHSCREEN:
             {
-                if(prev_y != 0)
-                    user_index += (prev_y - y) / h;
+                short x, y;
+                static int prev_y;
                 
-                prev_y = y;
+                action = action_get_touchscreen_press(&x, &y);
+                
+                if(action & BUTTON_REL)
+                    prev_y = 0;
+                else
+                {
+                    if(prev_y != 0)
+                        user_index += (prev_y - y) / delta_y;
+                    
+                    prev_y = y;
+                }
             }
-        }
 #endif
+            default:
+                break;
+        }
     } while(action != ACTION_STD_CANCEL);
 
     return false;
@@ -140,67 +225,31 @@ bool logfdump(void)
 {
     int fd;
 
-    if(!logfindex && !logfwrap)
+    /* nothing to print ? */
+    if(logfindex == 0 && !logfwrap)
         /* nothing is logged just yet */
         return false;
     
     fd = open(ROCKBOX_DIR "/logf.txt", O_CREAT|O_WRONLY|O_TRUNC);
     if(-1 != fd) {
-        unsigned char buffer[MAX_LOGF_ONE_LINE_SIZE +1];
-        unsigned char *ptr;
-        int index = logfindex-1;
-        int stop = logfindex;
-        int tindex;
-        bool dumpwrap = false;
-        bool multiline;
-
-        while(!dumpwrap || (index >= stop)) {
-            if(index < 0) {
-                if(logfwrap)
-                {
-                    index = MAX_LOGF_LINES-1;
-                    dumpwrap = true;
-                }
-                else
-                    break; /* done */
-            }
-
-            multiline = false;
-            if (logfbuffer[index][MAX_LOGF_ENTRY] == LOGF_TERMINATE_MULTI_LINE)
-            {
-                multiline = true;
-                do {
-                    index--;
-                    if(index < 0) {
-                        if(logfwrap)
-                        {
-                            index = MAX_LOGF_LINES-1;
-                            dumpwrap = true;
-                        }
-                        else
-                            goto end_loop;
-                    }
-                } while(logfbuffer[index][MAX_LOGF_ENTRY] == LOGF_TERMINATE_CONTINUE_LINE);
-                index++;
-                if (index >= MAX_LOGF_LINES)
-                    index = 0;
-            }
-
-            tindex = index-1;
-            ptr = buffer;
-            do {
-                tindex++;
-                memcpy(ptr, logfbuffer[tindex], MAX_LOGF_ENTRY);
-                ptr += MAX_LOGF_ENTRY;
-                if (tindex >= MAX_LOGF_LINES)
-                    tindex = 0;
-            } while(logfbuffer[tindex][MAX_LOGF_ENTRY] == LOGF_TERMINATE_CONTINUE_LINE);
-            *ptr = '\0';
+        int i;
         
-            fdprintf(fd, "%s\n", buffer);
-            index--;
-        }
-end_loop:
+        if(logfwrap)
+            i = logfindex;
+        else
+            i = 0;
+        
+        do {
+            if(logfbuffer[i]=='\0')
+                fdprintf(fd, "\n");
+            else
+                fdprintf(fd, "%c", logfbuffer[i]);
+                
+            i++;
+            if(i >= MAX_LOGF_SIZE)
+                i = 0;
+        } while(i != logfindex);
+        
         close(fd);
     }
     return false;
