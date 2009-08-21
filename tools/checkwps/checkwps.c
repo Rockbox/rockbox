@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "config.h"
 #include "checkwps.h"
 #include "resize.h"
@@ -222,12 +223,13 @@ struct screen screens[NB_SCREENS] =
         .lcdheight=LCD_REMOTE_HEIGHT,
         .depth=LCD_REMOTE_DEPTH,
         .is_color=false,/* No color remotes yet */
-        .getwidth = remote_getwidth,
-        .getheight = remote_getheight,
+        .getwidth=remote_getwidth,
+        .getheight=remote_getheight,
 #if LCD_REMOTE_DEPTH > 1
         .get_foreground=dummy_func2,
         .get_background=dummy_func2,
 #endif
+        .backdrop_load=backdrop_load,
     }
 #endif
 };
@@ -356,7 +358,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
         PL_FG,
         PL_BG,
     };
-    
+
     /* Work out the depth of this display */
     depth = screens[screen].depth;
 #if (LCD_DEPTH == 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 1)
@@ -429,6 +431,7 @@ int main(int argc, char **argv)
     int filearg = 1;
 
     struct wps_data wps;
+    struct screen* wps_screen;
 
     /* No arguments -> print the help text
      * Also print the help text upon -h or --help */
@@ -460,7 +463,18 @@ int main(int argc, char **argv)
      * flawed wps */
     while (argv[filearg]) {
         printf("Checking %s...\n", argv[filearg]);
-        res = skin_data_load(&wps, &screens[SCREEN_MAIN], argv[filearg], true);
+        if(strcmp(&argv[filearg][strlen(argv[filearg])-4], "rwps") == 0)
+        {
+            wps_screen = &screens[SCREEN_REMOTE];
+            wps.remote_wps = true;
+        }
+        else
+        {
+            wps_screen = &screens[SCREEN_MAIN];
+            wps.remote_wps = false;
+        }
+
+        res = skin_data_load(&wps, wps_screen, argv[filearg], true);
 
         if (!res) {
             printf("WPS parsing failure\n");
