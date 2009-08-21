@@ -7,8 +7,6 @@
 # $Id$
 #
 
-ROOT=../..
-
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 CFLAGS+=-mno-cygwin
 EXT = .exe
@@ -19,28 +17,20 @@ CC = mingw32-gcc
 endif
 endif
 
-COMMON=$(ROOT)/apps/gui/skin_engine/wps_debug.c \
-       $(ROOT)/apps/gui/skin_engine/skin_parser.c \
-       $(ROOT)/apps/gui/skin_engine/skin_buffer.c \
-       $(ROOT)/apps/misc.c \
-       $(ROOT)/apps/recorder/bmp.c \
-       $(ROOT)/firmware/common/strlcpy.c
-
-INCLUDE=-I $(ROOT)/apps/gui \
-        -I $(ROOT)/apps/gui/skin_engine \
-        -I $(ROOT)/firmware/export \
-        -I $(ROOT)/apps \
-        -I $(ROOT)/apps/recorder \
-        -I .
-
-CFLAGS = -g -D__PCTOOL__ -DDEBUG -DROCKBOX_DIR_LEN=9 -DWPS_DIR=\".\"
+# This is a wrapper for checkwps.make
+APPSDIR=.
+ROOTDIR=../..
+BUILDDIR=.
+BINARY=checkwps.$(MODELNAME)$(EXT)
+HOSTCC=$(CC)
+TARGET=-D$(TARGETNAME)
+include checkwps.make
 
 all:
 	@echo To build, run the buildall.sh script
 
-checkwps: checkwps.c  $(COMMON)
-	@echo CC [$(TARGET)]
-	@$(CC) $(INCLUDE) $(CFLAGS) $(COMMON) -D$(TARGET) checkwps.c -o $@.$(MODEL)$(EXT)
+checkwps: $(BUILDDIR)/$(BINARY)
+	@echo foo > /dev/null
 
 clean:
-	rm -f checkwps.$(MODEL)$(EXT)
+	rm -f checkwps.$(MODELNAME)$(EXT)

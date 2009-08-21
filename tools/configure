@@ -2430,7 +2430,7 @@ esac
 if [ "$ARG_TYPE" ]; then
   btype=$ARG_TYPE
 else
-  echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, $gdbstub(M)anual: (Defaults to N)"
+  echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, (C)heckWPS, $gdbstub(M)anual: (Defaults to N)"
   btype=`input`;
 fi
 
@@ -2510,6 +2510,16 @@ fi
       toolset='';
       apps="manual"
       echo "Manual build selected"
+      ;;
+    [Cc])
+      uname=`uname`
+      simcc
+      toolset='';
+      t_cpu='';
+      GCCOPTS='';
+      appsdir='\$(ROOTDIR)/tools/checkwps';
+      output='checkwps.'${modelname};
+      echo "CheckWPS build selected"
       ;;
     *)
       if [ "$modelname" = "e200r" ]; then
