@@ -22,15 +22,14 @@
 #include "lib/playback_control.h"
 
 #if PLUGIN_BUFFER_SIZE > 0x45000
-#define MAX_CHARS    0x40000 /* 256 kiB */
+#define MAX_CHARS   0x40000 /* 256 kiB */
 #else
-#define MAX_CHARS   0x5FE0 /* a bit less than 24 kiB */
+#define MAX_CHARS   0x6000  /* 24 kiB */
 #endif
 #define MAX_LINE_LEN 2048
 PLUGIN_HEADER
 
 static char buffer[MAX_CHARS];
-static char eol[3];
 static int char_count = 0;
 static int line_count = 0;
 static int last_action_line = 0;
@@ -126,38 +125,36 @@ static const char* list_get_name_cb(int selected_item, void* data,
 {
     (void)data;
     char *b = &buffer[do_action(ACTION_GET,0,selected_item)];
-    if (rb->strlen(b) >= buf_len)
+    /* strlcpy(dst, src, siz) returns strlen(src) */
+    if (rb->strlcpy(buf, b, buf_len) >= buf_len)
     {
-        char t = b[buf_len-10];
-        b[buf_len-10] = '\0';
-        rb->snprintf(buf , buf_len, "%s ...", b);
-        b[buf_len-10] = t;
+        rb->strcpy(&buf[buf_len-10], " ...");
     }
-    else rb->strlcpy(buf, b, buf_len);
     return buf;
 }
 
 char filename[MAX_PATH];
+char eol[3];
 bool newfile;
-int get_eol_string(char* fn)
+void get_eol_string(char* fn)
 {
-    int fd, result;
+    int fd;
     char t;
-    
+
+    /* assume LF first */
+    rb->strcpy(eol,"\n");
+
     if (!fn || !fn[0])
-        return 0;
+        return;
     fd = rb->open(fn,O_RDONLY);
     if (fd<0)
-        return 0;
-        
-    eol[0] = '\0';
-    result = 1;
-    while (!eol[0])
+        return;
+
+    while (1)
     {
-        if (!rb->read(fd,&t,1))
+        if (!rb->read(fd,&t,1) || t == '\n')
         {
-            rb->strcpy(eol,"\n");
-            result = 0;
+            break;
         }
         if (t == '\r')
         {
@@ -165,14 +162,11 @@ int get_eol_string(char* fn)
                 rb->strcpy(eol,"\r\n");
             else
                 rb->strcpy(eol,"\r");
-        }
-        else if (t == '\n')
-        {
-            rb->strcpy(eol,"\n");
+            break;
         }
     }
     rb->close(fd);
-    return result;
+    return;
 }
 
 bool save_changes(int overwrite)
@@ -226,6 +220,7 @@ void setup_lists(struct gui_synclist *lists, int sel)
     rb->gui_synclist_select_item(lists, sel);
     rb->gui_synclist_draw(lists);
 }
+
 enum {
     MENU_RET_SAVE = -1,
     MENU_RET_NO_UPDATE,
@@ -234,11 +229,11 @@ enum {
 int do_item_menu(int cur_sel, char* copy_buffer)
 {
     int ret = 0;
-    MENUITEM_STRINGLIST(menu, "Line Options", NULL, 
+    MENUITEM_STRINGLIST(menu, "Line Options", NULL,
                         "Cut/Delete", "Copy",
                         "Insert Above", "Insert Below",
-                        "Concat To Above", "Save",
-                        "Show Playback Menu",);
+                        "Concat To Above",
+                        "Save", "Playback Control");
 
     switch (rb->do_menu(&menu, NULL, NULL, false))
     {
@@ -352,10 +347,7 @@ enum plugin_status plugin_start(const void* parameter)
         char *c = NULL;
 #endif
         rb->strcpy(filename,(char*)parameter);
-        if (!get_eol_string(filename))
-        {
-            rb->strcpy(eol,"\n");
-        }
+        get_eol_string(filename);
         fd = rb->open(filename,O_RDONLY);
         if (fd<0)
         {
@@ -368,7 +360,7 @@ enum plugin_status plugin_start(const void* parameter)
             edit_colors_file = true;
 #endif
         /* read in the file */
-        while (rb->read_line(fd,temp_line,MAX_LINE_LEN))
+        while (rb->read_line(fd,temp_line,MAX_LINE_LEN) > 0)
         {
             if (!do_action(ACTION_INSERT,temp_line,line_count))
             {
@@ -386,6 +378,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->strcpy(eol,"\n");
         newfile = true;
     }
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(0);
 #endif
@@ -415,14 +408,14 @@ enum plugin_status plugin_start(const void* parameter)
                     rb->settings_parseline(temp_line, &name, &value);
                     if (line_count)
                     {
-                        MENUITEM_STRINGLIST(menu, "Edit What?", NULL, 
-                                            "Extension", "Colour",);
+                        MENUITEM_STRINGLIST(menu, "Edit What?", NULL,
+                                            "Extension", "Colour");
                         rb->strcpy(extension, name);
                         if (value)
                             hex_to_rgb(value, &color);
                         else
                             color = 0;
-                        
+
                         switch (rb->do_menu(&menu, NULL, NULL, false))
                         {
                             case 0:
@@ -437,7 +430,7 @@ enum plugin_status plugin_start(const void* parameter)
                                 /* Should never happen but makes compiler happy */
                                 temp_changed = false;
                         }
-                        
+
                         if (temp_changed)
                         {
                             rb->snprintf(temp_line, MAX_LINE_LEN, "%s: %02X%02X%02X",
@@ -486,9 +479,9 @@ enum plugin_status plugin_start(const void* parameter)
             case ACTION_STD_CANCEL:
                 if (changed)
                 {
-                    MENUITEM_STRINGLIST(menu, "Do What?", NULL, 
+                    MENUITEM_STRINGLIST(menu, "Do What?", NULL,
                                         "Return",
-                                        "Show Playback Menu", "Save Changes",
+                                        "Playback Control", "Save Changes",
                                         "Save As...", "Save and Exit",
                                         "Ignore Changes and Exit");
                     switch (rb->do_menu(&menu, NULL, NULL, false))
@@ -506,7 +499,6 @@ enum plugin_status plugin_start(const void* parameter)
                             if(save_changes(0))
                                 changed = 0;
                         break;
-
                         case 4:
                             if(save_changes(1))
                                 exit=1;
