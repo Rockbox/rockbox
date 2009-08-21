@@ -32,13 +32,15 @@ PLUGIN_HEADER
 #define HIGH_SCORE PLUGIN_GAMES_DIR "/blackjack.score"
 #define SAVE_FILE  PLUGIN_GAMES_DIR "/blackjack.save"
 #define NUM_SCORES 5
-struct highscore highest[NUM_SCORES];
 
 /* final game return status */
-#define BJ_END  3
-#define BJ_USB  2
-#define BJ_QUIT 1
-#define BJ_LOSE 0
+enum {
+    BJ_LOSE,
+    BJ_QUIT,
+    BJ_SAVE_AND_QUIT,
+    BJ_USB,
+    BJ_END,
+};
 
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define BJACK_SELECT_NAME   "PLAY"
@@ -506,8 +508,10 @@ typedef struct game_context {
     bool is_blackjack;
     bool end_hand;
     bool asked_insurance;
-    bool resume;
 } game_context;
+
+static bool resume;
+static struct highscore highest[NUM_SCORES];
 
 /*****************************************************************************
 * blackjack_init() initializes blackjack data structures.
@@ -523,7 +527,7 @@ static void blackjack_init(struct game_context* bj) {
     player_y = LCD_HEIGHT - LCD_HEIGHT/4 - CARD_HEIGHT/2;
 
     /* check for resumed game */
-    if(bj->resume) return;
+    if(resume) return;
 
     /* reset scoring */
     bj->player_total = 0;
@@ -845,39 +849,17 @@ static bool blackjack_loadgame(struct game_context* bj) {
     signed int fd;
     bool loaded = false;
 
+    resume = false;
     /* open game file */
     fd = rb->open(SAVE_FILE, O_RDONLY);
     if(fd < 0) return loaded;
 
     /* read in saved game */
-    while(true) {
-        if(rb->read(fd, &bj->player_money, sizeof(bj->player_money)) <= 0)
-            break;
-        if(rb->read(fd, &bj->player_total, sizeof(bj->player_total)) <= 0)
-            break;
-        if(rb->read(fd, &bj->dealer_total, sizeof(bj->dealer_total)) <= 0)
-            break;
-        if(rb->read(fd, &bj->num_player_cards, sizeof(bj->num_player_cards))<=0)
-            break;
-        if(rb->read(fd, &bj->num_dealer_cards, sizeof(bj->num_dealer_cards))<=0)
-            break;
-        if(rb->read(fd, &bj->current_bet, sizeof(bj->current_bet)) <= 0)
-            break;
-        if(rb->read(fd, &bj->is_blackjack, sizeof(bj->is_blackjack)) <= 0)
-            break;
-        if(rb->read(fd, &bj->split_status, sizeof(bj->split_status)) <= 0)
-            break;
-        if(rb->read(fd, &bj->asked_insurance, sizeof(bj->asked_insurance)) <= 0)
-            break;
-        if(rb->read(fd, &bj->end_hand, sizeof(bj->end_hand)) <= 0)
-            break;
-        if(rb->read(fd, &bj->player_cards, sizeof(bj->player_cards)) <= 0)
-            break;
-        if(rb->read(fd, &bj->dealer_cards, sizeof(bj->dealer_cards)) <= 0)
-            break;
-        bj->resume = true;
+    if(rb->read(fd, bj, sizeof(struct game_context))
+            == (long)sizeof(struct game_context))
+    {
+        resume = true;
         loaded = true;
-        break;
     }
 
     rb->close(fd);
@@ -891,25 +873,16 @@ static bool blackjack_loadgame(struct game_context* bj) {
 * blackjack_savegame() saves the current game state.
 ******************************************************************************/
 static void blackjack_savegame(struct game_context* bj) {
-    unsigned int fd;
+    int fd;
 
+    if(!resume)
+        return;
     /* write out the game state to the save file */
     fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
-    rb->write(fd, &bj->player_money, sizeof(bj->player_money));
-    rb->write(fd, &bj->player_total, sizeof(bj->player_total));
-    rb->write(fd, &bj->dealer_total, sizeof(bj->dealer_total));
-    rb->write(fd, &bj->num_player_cards, sizeof(bj->num_player_cards));
-    rb->write(fd, &bj->num_dealer_cards, sizeof(bj->num_dealer_cards));
-    rb->write(fd, &bj->current_bet, sizeof(bj->current_bet));
-    rb->write(fd, &bj->is_blackjack, sizeof(bj->is_blackjack));
-    rb->write(fd, &bj->split_status, sizeof(bj->split_status));
-    rb->write(fd, &bj->asked_insurance, sizeof(bj->asked_insurance));
-    rb->write(fd, &bj->end_hand, sizeof(bj->end_hand));
-    rb->write(fd, &bj->player_cards, sizeof(bj->player_cards));
-    rb->write(fd, &bj->dealer_cards, sizeof(bj->dealer_cards));
+    if(fd < 0)
+        return;
+    rb->write(fd, bj, sizeof(struct game_context));
     rb->close(fd);
-
-    bj->resume = true;
 }
 
 /*****************************************************************************
@@ -1181,9 +1154,8 @@ static bool blackjack_help(void) {
         BJACK_SELECT_NAME,  ":", "hit", "/", "select", "",
         BJACK_STAY_NAME,    ":", "stay", "",
         BJACK_DOUBLE_NAME,  ":", "double", "down", "",
-        BJACK_QUIT_NAME,    ":", "Go", "to", "menu", "without", "save", "",
-        BJACK_RESUME_NAME,  ":", "Save", "and", "go", "to", "menu", "",
-
+        BJACK_QUIT_NAME,    ":", "End", "game", "and", "go", "to", "menu", "",
+        BJACK_RESUME_NAME,  ":", "Go", "to", "menu", "without", "end", "game",
     };
     static struct style_text formation[]={
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
@@ -1191,7 +1163,7 @@ static bool blackjack_help(void) {
         { 18, C_RED }, /* Stay */
         { 22, C_RED }, /* Double Down */
         { 27, C_RED }, /* Quit */
-        { 35, C_RED }, /* Save */
+        { 36, C_RED }, /* Menu */
         { -1, 0 }
     };
     int button;
@@ -1219,25 +1191,27 @@ static bool blackjack_help(void) {
 * blackjack_menu() is the initial menu at the start of the game.
 ******************************************************************************/
 static unsigned int blackjack_menu(struct game_context* bj) {
-    int selection=0;
+    int selection = resume?0:1;
     bool breakout = false;
+    (void)bj;
 
     MENUITEM_STRINGLIST(menu, "BlackJack Menu", NULL,
-                        "Start Game","Resume Game",
+                        "Resume Game", "Start New Game",
                         "High Scores", "Help",
-                        "Playback Control", "Quit");
+                        "Playback Control", "Quit", "Save and Quit");
 
     while(!breakout) {
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
             case 0:
-                breakout = true;
-                break;
-            case 1:
-                if(!blackjack_loadgame(bj)) {
+                if(!resume) {
                     rb->splash(HZ*2, "Nothing to resume");
                 } else {
                     breakout = true;
                 }
+                break;
+            case 1:
+                breakout = true;
+                resume = false;
                 break;
             case 2:
                 highscore_show(NUM_SCORES, highest, NUM_SCORES, false);
@@ -1252,6 +1226,8 @@ static unsigned int blackjack_menu(struct game_context* bj) {
                 break;
             case 5:
                 return BJ_QUIT;
+            case 6:
+                return BJ_SAVE_AND_QUIT;
 
             case MENU_ATTACHED_USB:
                 return BJ_USB;
@@ -1279,14 +1255,11 @@ static int blackjack(struct game_context* bj) {
         rb->lcd_set_foreground(FG_COLOR);
 #endif
 
-    /* don't resume by default */
-    bj->resume = false;
-
     /********************
     *       menu        *
     ********************/
     temp_var = blackjack_menu(bj);
-    if (temp_var == BJ_QUIT || temp_var == BJ_USB)
+    if (temp_var != 0)
         return temp_var;
 
 
@@ -1300,8 +1273,8 @@ static int blackjack(struct game_context* bj) {
     ********************/
 
     /* check for resumed game */
-    if(bj->resume) {
-        bj->resume = false;
+    if(resume) {
+        resume = false;
         redraw_board(bj);
         if (bj->split_status == 2) {
             todo=2;
@@ -1413,9 +1386,8 @@ static int blackjack(struct game_context* bj) {
                     }
                     break;
                 case BJACK_RESUME:           /* save and end game */
-                    rb->splash(HZ, "Saving game...");
-                    blackjack_savegame(bj);
-                    /* fall through to BJACK_QUIT */
+                    resume = true;
+                    return BJ_END;
 
                 case BJACK_QUIT:
                     return BJ_END;
@@ -1530,6 +1502,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* load high scores */
     highscore_load(HIGH_SCORE,highest,NUM_SCORES);
+    blackjack_loadgame(&bj);
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
@@ -1540,14 +1513,14 @@ enum plugin_status plugin_start(const void* parameter)
                 /* fall through to BJ_END */
 
             case BJ_END:
-                if(!bj.resume && bj.player_money > 10) {
+                if(!resume && bj.player_money > 10) {
                     /* There is no level, so store -1 to blank column */
                     int position = highscore_update(bj.player_money, -1, "",
                         highest, NUM_SCORES);
-                    if (position == 0) {
-                        rb->splash(HZ*2, "New High Score");
-                    }
                     if (position != -1) {
+                        if (position == 0) {
+                            rb->splash(HZ*2, "New High Score");
+                        }
                         highscore_show(position, highest, NUM_SCORES, false);
                     }
                 }
@@ -1557,6 +1530,13 @@ enum plugin_status plugin_start(const void* parameter)
                 rb->lcd_setfont(FONT_UI);
                 highscore_save(HIGH_SCORE,highest,NUM_SCORES);
                 return PLUGIN_USB_CONNECTED;
+
+            case BJ_SAVE_AND_QUIT:
+                if (resume) {
+                    rb->splash(HZ, "Saving game...");
+                    blackjack_savegame(&bj);
+                }
+                /* fall through */
 
             case BJ_QUIT:
                 highscore_save(HIGH_SCORE,highest,NUM_SCORES);
