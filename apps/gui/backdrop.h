@@ -27,7 +27,7 @@ enum backdrop_type {
     BACKDROP_SKIN_WPS,
 };
 
-#if LCD_DEPTH > 1
+#if LCD_DEPTH > 1 && !defined(__PCTOOL__)
 
 #include "lcd.h"
 #include "bmp.h"

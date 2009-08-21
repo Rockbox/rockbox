@@ -32,6 +32,7 @@
 #include "proxy.h"
 #include "sysfont.h"
 #else
+#include "action.h"
 #include "checkwps.h"
 #include "audio.h"
 #define DEBUGF printf

@@ -19,12 +19,15 @@ CC = mingw32-gcc
 endif
 endif
 
-COMMON=$(ROOT)/apps/gui/wps_parser.c \
-       $(ROOT)/apps/gui/wps_debug.c \
+COMMON=$(ROOT)/apps/gui/skin_engine/wps_debug.c \
+       $(ROOT)/apps/gui/skin_engine/skin_parser.c \
+       $(ROOT)/apps/gui/skin_engine/skin_buffer.c \
        $(ROOT)/apps/misc.c \
-       $(ROOT)/apps/recorder/bmp.c
+       $(ROOT)/apps/recorder/bmp.c \
+       $(ROOT)/firmware/common/strlcpy.c
 
 INCLUDE=-I $(ROOT)/apps/gui \
+        -I $(ROOT)/apps/gui/skin_engine \
         -I $(ROOT)/firmware/export \
         -I $(ROOT)/apps \
         -I $(ROOT)/apps/recorder \

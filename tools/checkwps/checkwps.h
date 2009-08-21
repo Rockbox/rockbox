@@ -24,21 +24,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <fcntl.h>
-
-/* subset of global_settings needed to build checkwps. */
-struct user_settings {
-    bool statusbar;
-    int bg_color; /* background color native format */
-    int fg_color; /* foreground color native format */
-};
-
-extern struct user_settings global_settings;
 
 #define FONT_SYSFIXED 0
 #define FONT_UI 1
 #define SYSFONT_HEIGHT 8
 
-#define MIN(x,y) ((x) > (y) ? (y) : (x))
+#ifndef MIN
+#define MIN(a, b) (((a)<(b))?(a):(b))
+#endif
+
+#ifndef BIT_N
+#define BIT_N(n) (1U << (n))
+#endif
 
 #endif

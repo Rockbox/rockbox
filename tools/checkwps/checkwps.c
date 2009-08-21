@@ -21,11 +21,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include "config.h"
-#include "gwps.h"
 #include "checkwps.h"
 #include "resize.h"
+#include "wps.h"
+#include "wps_internals.h"
+#include "settings.h"
 
 bool debug_wps = true;
 int wps_verbose_level = 0;
@@ -96,7 +97,7 @@ int read_line(int fd, char* buffer, int buffer_size)
 {
     int count = 0;
     int num_read = 0;
-    
+
     errno = 0;
 
     while (count < buffer_size)
@@ -105,9 +106,9 @@ int read_line(int fd, char* buffer, int buffer_size)
 
         if (1 != read(fd, &c, 1))
             break;
-        
+
         num_read++;
-            
+
         if ( c == '\n' )
             break;
 
@@ -137,9 +138,11 @@ int recalc_dimension(struct dim *dst, struct dim *src)
     return 0;
 }
 
-int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
-                   struct rowset *rset, unsigned char *buf, unsigned int len,
-                   const struct custom_format *format,
+int resize_on_load(struct bitmap *bm, bool dither,
+                   struct dim *src, struct rowset *tmp_row,
+                   unsigned char *buf, unsigned int len,
+                   const struct custom_format *cformat,
+                   IF_PIX_FMT(int format_index,)
                    struct img_part* (*store_part)(void *args),
                    void *args)
 {
@@ -176,6 +179,7 @@ void* plugin_get_buffer(size_t *buffer_size)
     *buffer_size = PLUGIN_BUFFER_SIZE;
     return pluginbuf;
 }
+
 struct user_settings global_settings = {
     .statusbar = true,
 #ifdef HAVE_LCD_COLOR
@@ -183,7 +187,7 @@ struct user_settings global_settings = {
     .fg_color = LCD_DEFAULT_FG,
 #endif
 };
-    
+
 int getwidth(void) { return LCD_WIDTH; }
 int getheight(void) { return LCD_HEIGHT; }
 #ifdef HAVE_REMOTE_LCD
@@ -209,6 +213,7 @@ struct screen screens[NB_SCREENS] =
         .get_foreground=dummy_func2,
         .get_background=dummy_func2,
 #endif
+        .backdrop_load=backdrop_load,
     },
 #ifdef HAVE_REMOTE_LCD
     {
@@ -237,11 +242,190 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
 }
 #endif
 
+/* From skin_display.c */
+void skin_data_init(struct wps_data *wps_data)
+{
+#ifdef HAVE_LCD_BITMAP
+    wps_data->wps_sb_tag = false;
+    wps_data->show_sb_on_wps = false;
+    wps_data->peak_meter_enabled = false;
+    wps_data->images = NULL;
+    wps_data->progressbars = NULL;
+    /* progress bars */
+#else /* HAVE_LCD_CHARCELLS */
+    int i;
+    for (i = 0; i < 8; i++)
+    {
+        wps_data->wps_progress_pat[i] = 0;
+    }
+    wps_data->full_line_progressbar = false;
+#endif
+    wps_data->button_time_volume = 0;
+    wps_data->wps_loaded = false;
+}
+
+#ifdef HAVE_LCD_BITMAP
+struct gui_img* find_image(char label, struct wps_data *data)
+{
+    struct skin_token_list *list = data->images;
+    while (list)
+    {
+        struct gui_img *img = (struct gui_img *)list->token->value.data;
+        if (img->label == label)
+            return img;
+        list = list->next;
+    }
+    return NULL;
+}   
+#endif 
+
+struct skin_viewport* find_viewport(char label, struct wps_data *data)
+{
+    struct skin_token_list *list = data->viewports;
+    while (list)
+    {
+        struct skin_viewport *vp = (struct skin_viewport *)list->token->value.data;
+        if (vp->label == label)
+            return vp;
+        list = list->next;
+    }
+    return NULL;
+}
+
+int skin_last_token_index(struct wps_data *data, int line, int subline)
+{
+    int first_subline_idx = data->lines[line].first_subline_idx;
+    int idx = first_subline_idx + subline;
+    if (idx < data->num_sublines - 1)
+    {
+        /* This subline ends where the next begins */
+        return data->sublines[idx+1].first_token_idx - 1;
+    }
+    else
+    {
+        /* The last subline goes to the end */
+        return data->num_tokens - 1;
+    }
+}
+
+/* From viewport.c & misc.h */
+#define LIST_VALUE_PARSED(setvals, position) ((setvals) & BIT_N(position))
+
+/*some short cuts for fg/bg/line selector handling */
+#ifdef HAVE_LCD_COLOR
+#define LINE_SEL_FROM_SETTINGS(vp) \
+    do { \
+        vp->lss_pattern = global_settings.lss_color; \
+        vp->lse_pattern = global_settings.lse_color; \
+        vp->lst_pattern = global_settings.lst_color; \
+    } while (0)
+#define FG_FALLBACK global_settings.fg_color
+#define BG_FALLBACK global_settings.bg_color
+#else
+/* mono/greyscale doesn't have most of the above */
+#define LINE_SEL_FROM_SETTINGS(vp)
+#define FG_FALLBACK LCD_DEFAULT_FG
+#define BG_FALLBACK LCD_DEFAULT_BG
+#endif
+
+#ifdef HAVE_LCD_COLOR
+#define ARG_STRING(_depth) ((_depth) == 2 ? "dddddgg":"dddddcc")
+#else
+#define ARG_STRING(_depth) "dddddgg"
+#endif
+
+extern const char* parse_list(const char *fmt, uint32_t *set_vals,
+                       const char sep, const char* str, ...);
+
+const char* viewport_parse_viewport(struct viewport *vp,
+                                    enum screen_type screen,
+                                    const char *bufptr,
+                                    const char separator)
+{
+    /* parse the list to the viewport struct */
+    const char *ptr = bufptr;
+    int depth;
+    uint32_t set = 0;
+
+    enum {
+        PL_X = 0,
+        PL_Y,
+        PL_WIDTH,
+        PL_HEIGHT,
+        PL_FONT,
+        PL_FG,
+        PL_BG,
+    };
+    
+    /* Work out the depth of this display */
+    depth = screens[screen].depth;
+#if (LCD_DEPTH == 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 1)
+    if (depth == 1)
+    {
+        if (!(ptr = parse_list("ddddd", &set, separator, ptr,
+                    &vp->x, &vp->y, &vp->width, &vp->height, &vp->font)))
+            return NULL;
+    }
+    else
+#endif
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+    if (depth >= 2)
+    {
+        if (!(ptr = parse_list(ARG_STRING(depth), &set, separator, ptr,
+                    &vp->x, &vp->y, &vp->width, &vp->height, &vp->font,
+                    &vp->fg_pattern,&vp->bg_pattern)))
+            return NULL;
+    }
+    else
+#endif
+    {}
+#undef ARG_STRING
+
+    /* X and Y *must* be set */
+    if (!LIST_VALUE_PARSED(set, PL_X) || !LIST_VALUE_PARSED(set, PL_Y))
+        return NULL;
+    
+    /* fix defaults */
+    if (!LIST_VALUE_PARSED(set, PL_WIDTH))
+        vp->width = screens[screen].lcdwidth - vp->x;
+    if (!LIST_VALUE_PARSED(set, PL_HEIGHT))
+        vp->height = screens[screen].lcdheight - vp->y;
+
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+    if (!LIST_VALUE_PARSED(set, PL_FG))
+        vp->fg_pattern = FG_FALLBACK;
+    if (!LIST_VALUE_PARSED(set, PL_BG))
+        vp->bg_pattern = BG_FALLBACK;
+#endif /* LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1 */
+
+    LINE_SEL_FROM_SETTINGS(vp);
+
+    /* Validate the viewport dimensions - we know that the numbers are
+       non-negative integers, ignore bars and assume the viewport takes them
+       * into account */
+    if ((vp->x >= screens[screen].lcdwidth) ||
+        ((vp->x + vp->width) > screens[screen].lcdwidth) ||
+        (vp->y >= screens[screen].lcdheight) ||
+        ((vp->y + vp->height) > screens[screen].lcdheight))
+    {
+        return NULL;
+    }
+
+    /* Default to using the user font if the font was an invalid number or '-'*/
+    if (((vp->font != FONT_SYSFIXED) && (vp->font != FONT_UI))
+            || !LIST_VALUE_PARSED(set, PL_FONT)
+            )
+        vp->font = FONT_UI;
+
+    /* Set the defaults for fields not user-specified */
+    vp->drawmode = DRMODE_SOLID;
+
+    return ptr;
+}
 
 int main(int argc, char **argv)
 {
     int res;
-    int fd;
     int filearg = 1;
 
     struct wps_data wps;
@@ -270,27 +454,21 @@ int main(int argc, char **argv)
         }
     }
 
-    fd = open(argv[filearg], O_RDONLY);
-    if (fd < 0) {
-      printf("Failed to open %s\n",argv[1]);
-      return 2;
-    }
-    close(fd);
+    skin_buffer_init();
 
     /* Go through every wps that was thrown at us, error out at the first
      * flawed wps */
     while (argv[filearg]) {
-    printf("Checking %s...\n", argv[filearg]);
-    res = wps_data_load(&wps, &screens[0], argv[filearg], true);
+        printf("Checking %s...\n", argv[filearg]);
+        res = skin_data_load(&wps, &screens[SCREEN_MAIN], argv[filearg], true);
 
-    if (!res) {
-      printf("WPS parsing failure\n");
-      return 3;
-    }
+        if (!res) {
+            printf("WPS parsing failure\n");
+            return 3;
+        }
 
-    printf("WPS parsed OK\n\n");
-    filearg++;
+        printf("WPS parsed OK\n\n");
+        filearg++;
     }
     return 0;
 }
-
