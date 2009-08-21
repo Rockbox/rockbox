@@ -463,7 +463,7 @@ int main(int argc, char **argv)
      * flawed wps */
     while (argv[filearg]) {
         printf("Checking %s...\n", argv[filearg]);
-#ifdef HAVE_REMOTE
+#ifdef HAVE_REMOTE_LCD
         if(strcmp(&argv[filearg][strlen(argv[filearg])-4], "rwps") == 0)
         {
             wps_screen = &screens[SCREEN_REMOTE];
