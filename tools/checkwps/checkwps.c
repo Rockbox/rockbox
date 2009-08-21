@@ -463,6 +463,7 @@ int main(int argc, char **argv)
      * flawed wps */
     while (argv[filearg]) {
         printf("Checking %s...\n", argv[filearg]);
+#ifdef HAVE_REMOTE
         if(strcmp(&argv[filearg][strlen(argv[filearg])-4], "rwps") == 0)
         {
             wps_screen = &screens[SCREEN_REMOTE];
@@ -473,6 +474,7 @@ int main(int argc, char **argv)
             wps_screen = &screens[SCREEN_MAIN];
             wps.remote_wps = false;
         }
+#endif
 
         res = skin_data_load(&wps, wps_screen, argv[filearg], true);
 
