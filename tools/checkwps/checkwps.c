@@ -431,7 +431,7 @@ int main(int argc, char **argv)
     int filearg = 1;
 
     struct wps_data wps;
-    struct screen* wps_screen;
+    struct screen* wps_screen = &screens[SCREEN_MAIN];
 
     /* No arguments -> print the help text
      * Also print the help text upon -h or --help */
