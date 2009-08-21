@@ -36,20 +36,25 @@
 #define BTN_HOLD     (1 << 16)
 #define BTN_MENU     (1 << 1)
 #define BTN_VOL_UP   (1 << 0)
+
+#define BTN_MASK     (BTN_OFF | BTN_VOL_DOWN | \
+                      BTN_MENU | BTN_VOL_UP)
 #elif defined(ONDA_VX747P)
 #define BTN_OFF      (1 << 29)
 #define BTN_VOL_DOWN (1 << 27)
 #define BTN_HOLD     (1 << 22)  /* on REG_GPIO_PXPIN(2) */
 #define BTN_MENU     (1 << 20)
 #define BTN_VOL_UP   (1 << 19)
-#elif defined(ONDA_VX777)
-#define BTN_OFF      (1 << 29)
-#else
-#error No buttons defined!
-#endif
 
 #define BTN_MASK     (BTN_OFF | BTN_VOL_DOWN | \
                       BTN_MENU | BTN_VOL_UP)
+#elif defined(ONDA_VX777)
+#define BTN_OFF      (1 << 29)
+
+#define BTN_MASK     (BTN_OFF)
+#else
+#error No buttons defined!
+#endif
 
 
 #define TS_AD_COUNT     3
