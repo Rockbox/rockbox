@@ -78,7 +78,7 @@
     <message>
         <location filename="../../chinachippatcher/chinachip.c" line="202"/>
         <source>Adding header to %s...</source>
-        <translation>Bezig met toevoegen vaan hoofding aan %s...</translation>
+        <translation>Bezig met toevoegen van hoofding aan %s...</translation>
     </message>
     <message>
         <location filename="../../chinachippatcher/chinachip.c" line="212"/>
@@ -98,7 +98,7 @@
     <message>
         <location filename="../../chinachippatcher/chinachip.c" line="238"/>
         <source>Writing output to %s...</source>
-        <translation>Bezig met uitvoer schrijven naar %s...</translation>
+        <translation>Bezig met schrijven van uitvoer naar %s...</translation>
     </message>
 </context>
 <context>
@@ -195,7 +195,7 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="157"/>
         <source>&lt;li&gt;Safely remove your player.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Verwijder veilig uw spaler.&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;Verwijder veilig uw speler.&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="161"/>
