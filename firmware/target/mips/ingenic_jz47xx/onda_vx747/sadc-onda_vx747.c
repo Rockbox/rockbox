@@ -43,7 +43,7 @@
 #define BTN_MENU     (1 << 20)
 #define BTN_VOL_UP   (1 << 19)
 #elif defined(ONDA_VX777)
-/* TODO */
+#define BTN_OFF      (1 << 29)
 #else
 #error No buttons defined!
 #endif
@@ -68,72 +68,70 @@ static signed int x_pos, y_pos;
 static int datacount = 0;
 static volatile int cur_touch = 0;
 static volatile bool pen_down = false;
-static volatile unsigned short bat_val;
 static struct mutex battery_mtx;
+static struct wakeup battery_wkup;
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     /* TODO */
-    1000
+    1600
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     /* TODO */
-    900
+    1500
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     /* TODO */
-    { 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000 },
+    { 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
     /* TODO */
-    1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000
+    1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400
 };
 
 /* VBAT = (BDATA/4096) * 7.5V */
-#define BATTERY_SCALE_FACTOR 1875
+#define BATTERY_SCALE_FACTOR 7500
 
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    unsigned int dummy, timeout=HZ/4;
-    
+    unsigned int dummy, bat_val;
+
     mutex_lock(&battery_mtx);
-    
+
     dummy = REG_SADC_BATDAT;
     dummy = REG_SADC_BATDAT;
-    
+
     REG_SADC_ENA |= SADC_ENA_PBATEN;
-    bat_val = 0;
-    
-    /* primitive wakeup event */
-    while(bat_val == 0 && timeout--)
-        sleep(0);
-    
-    logf("%d %d", bat_val, (bat_val*BATTERY_SCALE_FACTOR)>>10);
-    
+
+    wakeup_wait(&battery_wkup, HZ/4);
+    bat_val = REG_SADC_BATDAT;
+
+    logf("%d %d", bat_val, (bat_val * BATTERY_SCALE_FACTOR) / 4096);
+
     mutex_unlock(&battery_mtx);
-    
-    return (bat_val*BATTERY_SCALE_FACTOR)>>10;
+
+    return (bat_val * BATTERY_SCALE_FACTOR) / 4096;
 }
 
 void button_init_device(void)
 {
+    __gpio_as_input(32*3 + 29); /* VX777 and VX747(+) */
+
 #ifdef ONDA_VX747
-    __gpio_as_input(32*3 + 29);
     __gpio_as_input(32*3 + 27);
     __gpio_as_input(32*3 + 16);
     __gpio_as_input(32*3 + 1);
     __gpio_as_input(32*3 + 0);
 #elif defined(ONDA_VX747P)
-    __gpio_as_input(32*3 + 29);
     __gpio_as_input(32*3 + 27);
     __gpio_as_input(32*3 + 20);
     __gpio_as_input(32*3 + 19);
@@ -149,7 +147,7 @@ bool button_hold(void)
 #elif defined(ONDA_VX747P)
             (~REG_GPIO_PXPIN(2)) & BTN_HOLD
 #elif defined(ONDA_VX777)
-            false /* TODO */
+            false
 #endif
             ? true : false
            );
@@ -159,24 +157,24 @@ int button_read_device(int *data)
 {
     int ret = 0;
     static int old_data = 0;
-    
+
     *data = old_data;
 
     /* Filter button events out if HOLD button is pressed at firmware/ level */
     if(button_hold())
         return 0;
 
-#ifndef ONDA_VX777
     int tmp = (~REG_GPIO_PXPIN(3)) & BTN_MASK;
 
+    if(tmp & BTN_OFF)
+        ret |= BUTTON_POWER;
+#ifndef ONDA_VX777
     if(tmp & BTN_VOL_DOWN)
         ret |= BUTTON_VOL_DOWN;
     if(tmp & BTN_VOL_UP)
         ret |= BUTTON_VOL_UP;
     if(tmp & BTN_MENU)
         ret |= BUTTON_MENU;
-    if(tmp & BTN_OFF)
-        ret |= BUTTON_POWER;
 #endif
 
     if(cur_touch != 0 && pen_down)
@@ -187,7 +185,7 @@ int button_read_device(int *data)
 #endif
         if( UNLIKELY(!is_backlight_on(true)) )
             *data = 0;
-            
+
         old_data = *data;
     }
 
@@ -197,13 +195,12 @@ int button_read_device(int *data)
 /* Interrupt handler */
 void SADC(void)
 {
-    unsigned char state;
-    unsigned char sadcstate;
+    unsigned char state, sadcstate;
 
     sadcstate = REG_SADC_STATE;
-    state = REG_SADC_STATE & (~REG_SADC_CTRL);
+    state = sadcstate & (~REG_SADC_CTRL);
     REG_SADC_STATE &= sadcstate;
-    
+
     if(state & SADC_CTRL_PENDM)
     {
         /* Pen down IRQ */
@@ -211,7 +208,7 @@ void SADC(void)
         REG_SADC_CTRL |= (SADC_CTRL_PENDM);
         pen_down = true;
     }
-    
+
     if(state & SADC_CTRL_PENUM)
     {
         /* Pen up IRQ */
@@ -221,26 +218,26 @@ void SADC(void)
         datacount = 0;
         cur_touch = 0;
     }
-    
+
     if(state & SADC_CTRL_TSRDYM)
     {
         unsigned int   dat;
         unsigned short xData, yData;
         signed short   tsz1Data, tsz2Data;
-        
+
         dat = REG_SADC_TSDAT;
         xData = (dat >>  0) & 0xFFF;
         yData = (dat >> 16) & 0xFFF;
-        
+
         dat = REG_SADC_TSDAT;
         tsz1Data = (dat >>  0) & 0xFFF;
         tsz2Data = (dat >> 16) & 0xFFF;
-        
+
         if(!pen_down)
             return;
-        
+
         tsz1Data = tsz2Data - tsz1Data;
-        
+
         if((tsz1Data > 100) || (tsz1Data < -100))
         {
             if(datacount == 0)
@@ -253,9 +250,9 @@ void SADC(void)
                 x_pos += xData;
                 y_pos += yData;
             }
-            
+
             datacount++;
-            
+
             if(datacount >= TS_AD_COUNT)
             {
                 cur_touch = ((x_pos / datacount) << 16) |
@@ -266,11 +263,11 @@ void SADC(void)
         else
             datacount = 0;
     }
-    
+
     if(state & SADC_CTRL_PBATRDYM)
     {
-        bat_val = REG_SADC_BATDAT;
         /* Battery AD IRQ */
+        wakeup_signal(&battery_wkup);
     }
 }
 
@@ -280,18 +277,19 @@ void adc_init(void)
     REG_SADC_ENA = 0;
     REG_SADC_STATE &= (~REG_SADC_STATE);
     REG_SADC_CTRL = 0x1f;
-    
+
     REG_SADC_CFG = SADC_CFG_INIT;
-    
+
     system_enable_irq(IRQ_SADC);
-    
+
     REG_SADC_SAMETIME = 10;
     REG_SADC_WAITTIME = 100;
     REG_SADC_STATE &= ~REG_SADC_STATE;
     REG_SADC_CTRL = ~(SADC_CTRL_PENDM | SADC_CTRL_PENUM | SADC_CTRL_TSRDYM | SADC_CTRL_PBATRDYM);
     REG_SADC_ENA = SADC_ENA_TSEN;
-    
+
     mutex_init(&battery_mtx);
+    wakeup_init(&battery_wkup);
 }
 
 void adc_close(void)
@@ -301,4 +299,3 @@ void adc_close(void)
     sleep(20);
     __cpm_stop_sadc();
 }
-

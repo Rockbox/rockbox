@@ -23,7 +23,9 @@
 
 #include "config.h"
 
+#ifndef VX777
 #define HAS_BUTTON_HOLD
+#endif
 
 bool button_hold(void);
 void button_init_device(void);
@@ -57,11 +59,18 @@ void button_set_touch_available(void);
                                          .C=0xA22AA2C,  .D=0x23DC, .E=0x8E3E6, \
                                          .F=0x76CF88AA, .divider=0xFFAD4013}
 
+#ifdef ONDA_VX777
+#define BUTTON_MAIN (BUTTON_POWER    | BUTTON_TOPLEFT    | BUTTON_TOPMIDDLE    | \
+                     BUTTON_TOPRIGHT | BUTTON_MIDLEFT    | BUTTON_CENTER       | \
+                     BUTTON_MIDRIGHT | BUTTON_BOTTOMLEFT | BUTTON_BOTTOMMIDDLE | \
+                     BUTTON_BOTTOMRIGHT)
+#else
 #define BUTTON_MAIN (BUTTON_POWER    | BUTTON_VOL_UP     | BUTTON_VOL_DOWN     | \
                      BUTTON_MENU     | BUTTON_TOPLEFT    | BUTTON_TOPMIDDLE    | \
                      BUTTON_TOPRIGHT | BUTTON_MIDLEFT    | BUTTON_CENTER       | \
                      BUTTON_MIDRIGHT | BUTTON_BOTTOMLEFT | BUTTON_BOTTOMMIDDLE | \
                      BUTTON_BOTTOMRIGHT)
+#endif
 
 /* No remote */
 #define BUTTON_REMOTE   0
