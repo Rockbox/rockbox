@@ -370,7 +370,7 @@ extern fb_data rockpaint[];
 extern fb_data rockpaint_hsvrgb[];
 
 /* Maximum string size allowed for the text tool */
-#define MAX_TEXT 255
+#define MAX_TEXT 256
 
 static union
 {
@@ -399,9 +399,9 @@ static union
     /* Used for text mode */
     struct
     {
-        char text[MAX_TEXT+1];
-        char font[MAX_PATH+1];
-        char old_font[MAX_PATH+1];
+        char text[MAX_TEXT];
+        char font[MAX_PATH];
+        char old_font[MAX_PATH];
         int fh_buf[30];
         int fw_buf[30];
         char fontname_buf[30][MAX_PATH];
@@ -409,7 +409,7 @@ static union
 } buffer;
 
 /* Current filename */
-static char filename[MAX_PATH+1];
+static char filename[MAX_PATH];
 
 /* Font preview buffer */
 //#define FONT_PREVIEW_WIDTH ((LCD_WIDTH-30)/8)
@@ -596,9 +596,15 @@ static int draw_window( int height, int width,
  * File browser
  ***********************************************************************/
 
-char bbuf[MAX_PATH+1]; /* used by file and font browsers */
-char bbuf_s[MAX_PATH+1]; /* used by file and font browsers */
+char bbuf[MAX_PATH]; /* used by file and font browsers */
+char bbuf_s[MAX_PATH]; /* used by file and font browsers */
 struct tree_context *tree = NULL;
+
+static bool check_extention(const char *filename, const char *ext)
+{
+    const char *p = rb->strrchr( filename, '.' );
+    return ( p != NULL && !rb->strcasecmp( p, ext ) );
+}
 
 static const char* browse_get_name_cb(int selected_item, void *data,
                                       char *buffer, size_t buffer_len)
@@ -662,8 +668,7 @@ static bool browse( char *dst, int dst_size, const char *start )
                       rb->strcmp( dc[i].name, "." ) &&
                       rb->strcmp( dc[i].name, ".." )) ||
                     ( !(dc[i].attr & ATTR_DIRECTORY) &&
-                      (a = rb->strrchr( dc[i].name,'.' )) &&
-                      !rb->strcmp( a, ".bmp" ) ))
+                        check_extention( dc[i].name, ".bmp" ) ) )
                 {
                     if( !rb->strcmp( dc[i].name, bbuf_s ) )
                         selected = item_count;
@@ -816,9 +821,7 @@ static bool browse_fonts( char *dst, int dst_size )
                     li = i-1;
                     break;
                 }
-                if( rb->strlen( de->d_name ) < 4
-                    || rb->strcmp( de->d_name + rb->strlen( de->d_name ) - 4,
-                                   ".fnt" ) )
+                if( !check_extention( de->d_name, ".fnt" ) )
                     continue;
                 rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s",
                               de->d_name );
@@ -851,9 +854,7 @@ static bool browse_fonts( char *dst, int dst_size )
                 {
                     li = lvi;
                 }
-                else if( !nvih && !rb->strlen( de->d_name ) < 4
-                    && !rb->strcmp( de->d_name + rb->strlen( de->d_name ) - 4,
-                                   ".fnt" ) )
+                else if( !nvih && check_extention( de->d_name, ".fnt" ) )
                 {
                     rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s",
                           de->d_name );
@@ -1203,9 +1204,11 @@ static void color_picker( int x, int y )
         rb->lcd_set_foreground( save_buffer[ x+y*COLS ] );
 #define PSIZE 12
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-        rb->lcd_drawrect( x<COLS-PSIZE ? x + 2 : x - PSIZE, y<ROWS-PSIZE ? y + 2: y - PSIZE, PSIZE - 2, PSIZE - 2 );
+        if( x >= COLS - PSIZE ) x -= PSIZE + 2;
+        if( y >= ROWS - PSIZE ) y -= PSIZE + 2;
+        rb->lcd_drawrect( x + 2, y + 2, PSIZE - 2, PSIZE - 2 );
         rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->lcd_fillrect( x<COLS-PSIZE ? x+3 : x - PSIZE+1, y<ROWS-PSIZE ? y +3: y - PSIZE+1, PSIZE-4, PSIZE-4 );
+        rb->lcd_drawrect( x + 3, y + 3, PSIZE - 4, PSIZE - 4 );
 #undef PSIZE
         rb->lcd_set_foreground( rp_colors[ drawcolor ] );
     }
@@ -1415,7 +1418,7 @@ static void draw_rot_90_deg( int x1, int y1, int x2, int y2, int direction )
 static void draw_paste_rectangle( int src_x1, int src_y1, int src_x2,
                                   int src_y2, int x1, int y1, int mode )
 {
-    int i;
+    int i, width, height;
     if( mode == SELECT_MENU_CUT )
     {
         i = drawcolor;
@@ -1435,15 +1438,23 @@ static void draw_paste_rectangle( int src_x1, int src_y1, int src_x2,
         src_y1 = src_y2;
         src_y2 = i;
     }
+    width = src_x2 - src_x1 + 1;
+    height = src_y2 - src_y1 + 1;
+    /* clipping */
+    if( x1 + width > COLS )
+        width = COLS - x1;
+    if( y1 + height > ROWS )
+        height = ROWS - y1;
+
     rb->lcd_bitmap_part( buffer.clipboard, src_x1, src_y1, COLS,
-                         x1, y1, src_x2-src_x1+1, src_y2-src_y1+1 );
+                         x1, y1, width, height );
     if( !preview )
     {
-        for( i = 0; i <= src_y2 - src_y1; i++ )
+        for( i = 0; i < height; i++ )
         {
             rb->memcpy( save_buffer+(y1+i)*COLS+x1,
                         buffer.clipboard+(src_y1+i)*COLS+src_x1,
-                        (src_x2 - src_x1 + 1)*sizeof( fb_data ) );
+                        width*sizeof( fb_data ) );
         }
     }
 }
@@ -1787,20 +1798,18 @@ static void togglebg( void )
 static void draw_rect_full( int x1, int y1, int x2, int y2 )
 {
     /* GRUIK */
-    int x = x1;
+    int x;
     togglebg();
-    if( x < x2 )
+    if( x1 > x2 )
     {
-        do {
-            draw_line( x, y1, x, y2 );
-        } while( ++x <= x2 );
+        x = x1;
+        x1 = x2;
+        x2 = x;
     }
-    else
-    {
-        do {
-            draw_line( x, y1, x, y2 );
-        } while( --x >= x2 );
-    }
+    x = x1;
+    do {
+        draw_line( x, y1, x, y2 );
+    } while( ++x <= x2 );
     togglebg();
     draw_rect( x1, y1, x2, y2 );
 }
@@ -2474,6 +2483,7 @@ static void goto_menu(void)
                     {
                         rb->splashf( 1*HZ, "Error while loading %s",
                                     filename );
+                        clear_drawing();
                     }
                     else
                     {
@@ -2491,8 +2501,7 @@ static void goto_menu(void)
                     rb->strcpy(filename,"/");
                 if( !rb->kbd_input( filename, MAX_PATH ) )
                 {
-                    if(rb->strlen(filename) <= 4 ||
-                    rb->strcasecmp(&filename[rb->strlen(filename)-4], ".bmp"))
+                    if( !check_extention( filename, ".bmp" ) )
                         rb->strcat(filename, ".bmp");
                     save_bitmap( filename );
                     rb->splashf( 1*HZ, "File saved (%s)", filename );
@@ -2932,7 +2941,8 @@ static int load_bitmap( const char *file )
 {
     struct bitmap bm;
     bool ret;
-    int l;
+    int i, j;
+    fb_data color = rp_colors[ bgdrawcolor ];
 
     bm.data = (char*)save_buffer;
     ret = rb->read_bmp_file( file, &bm, ROWS*COLS*sizeof( fb_data ),
@@ -2941,18 +2951,15 @@ static int load_bitmap( const char *file )
     if((bm.width > COLS ) || ( bm.height > ROWS ))
         return -1;
 
-    for( l = bm.height-1; l > 0; l-- )
+    for( i = bm.height-1; i >= 0; i-- )
     {
-        rb->memmove( save_buffer+l*COLS, save_buffer+l*bm.width,
+        rb->memmove( save_buffer+i*COLS, save_buffer+i*bm.width,
                         sizeof( fb_data )*bm.width );
+        for( j = bm.width; j < COLS; j++ )
+            save_buffer[j+i*COLS] = color;
     }
-    for( l = 0; l < bm.height; l++ )
-    {
-        rb->memset( save_buffer+l*COLS+bm.width, rp_colors[ bgdrawcolor ],
-                    sizeof( fb_data )*(COLS-bm.width) );
-    }
-    rb->memset( save_buffer+COLS*bm.height, rp_colors[ bgdrawcolor ],
-                sizeof( fb_data )*COLS*(ROWS-bm.height) );
+    for( i = bm.height*COLS; i < ROWS*COLS; i++ )
+        save_buffer[i] = color;
 
     return ret;
 }
