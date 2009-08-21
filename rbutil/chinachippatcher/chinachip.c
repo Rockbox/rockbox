@@ -27,6 +27,8 @@
 #include <time.h>
 #include "chinachip.h"
 
+#define tr(x) x /* Qt translation support */
+
 /* From http://www.rockbox.org/wiki/ChinaChip */
 struct header
 {
@@ -89,42 +91,42 @@ int chinachip_patch(const char* firmware, const char* bootloader,
     fd = fopen(firmware, "rb");
     if(!fd)
     {
-        ERR("Can't open file %s!", firmware);
+        ERR(tr("Can't open file %s!"), firmware);
         goto err;
     }
     bd = fopen(bootloader, "rb");
     if(!bd)
     {
-        ERR("Can't open file %s!", bootloader);
+        ERR(tr("Can't open file %s!"), bootloader);
         goto err;
     }
 
     bsize = filesize(bd);
-    INFO("Bootloader size is %d bytes", bsize);
+    INFO(tr("Bootloader size is %d bytes"), bsize);
     FCLOSE(bd);
 
     fsize = filesize(fd);
-    INFO("Firmware size is %d bytes", fsize);
+    INFO(tr("Firmware size is %d bytes"), fsize);
 
     buf = malloc(TOTAL_SIZE);
     if(buf == NULL)
     {
-        ERR("Can't allocate %d bytes!", fsize);
+        ERR(tr("Can't allocate %d bytes!"), fsize);
         goto err;
     }
     memset(buf, 0, TOTAL_SIZE);
 
-    INFO("Reading %s into memory...", firmware);
+    INFO(tr("Reading %s into memory..."), firmware);
     if(fread(buf, fsize, 1, fd) != 1)
     {
-        ERR("Can't read file %s to memory!", firmware);
+        ERR(tr("Can't read file %s to memory!"), firmware);
         goto err;
     }
     FCLOSE(fd);
 
     if(memcmp(buf, "WADF", 4))
     {
-        ERR("File %s isn't a valid ChinaChip firmware!", firmware);
+        ERR(tr("File %s isn't a valid ChinaChip firmware!"), firmware);
         goto err;
     }
 
@@ -146,30 +148,30 @@ int chinachip_patch(const char* firmware, const char* bootloader,
 
     if(i >= fsize)
     {
-        ERR("Couldn't find ccpmp.bin in %s!", firmware);
+        ERR(tr("Couldn't find ccpmp.bin in %s!"), firmware);
         goto err;
     }
-    INFO("Found ccpmp.bin at %d bytes", ccpmp_pos);
+    INFO(tr("Found ccpmp.bin at %d bytes"), ccpmp_pos);
 
     if(ccpmp_backup)
     {
         bd = fopen(ccpmp_backup, "wb");
         if(!bd)
         {
-            ERR("Can't open file %s!", ccpmp_backup);
+            ERR(tr("Can't open file %s!"), ccpmp_backup);
             goto err;
         }
 
-        INFO("Writing %d bytes to %s...", ccpmp_size, ccpmp_backup);
+        INFO(tr("Writing %d bytes to %s..."), ccpmp_size, ccpmp_backup);
         if(fwrite(&buf[ccpmp_pos], ccpmp_size, 1, bd) != 1)
         {
-            ERR("Can't write to file %s!", ccpmp_backup);
+            ERR(tr("Can't write to file %s!"), ccpmp_backup);
             goto err;
         }
         FCLOSE(bd);
     }
 
-    INFO("Renaming it to ccpmp.old...");
+    INFO(tr("Renaming it to ccpmp.old..."));
     buf[ccpmp_pos + 6] = 'o';
     buf[ccpmp_pos + 7] = 'l';
     buf[ccpmp_pos + 8] = 'd';
@@ -177,27 +179,27 @@ int chinachip_patch(const char* firmware, const char* bootloader,
     bd = fopen(bootloader, "rb");
     if(!bd)
     {
-        ERR("Can't open file %s!", bootloader);
+        ERR(tr("Can't open file %s!"), bootloader);
         goto err;
     }
 
     /* Also include path size */
     ccpmp_pos -= sizeof(uint32_t);
 
-    INFO("Making place for ccpmp.bin...");
+    INFO(tr("Making place for ccpmp.bin..."));
     memmove(&buf[ccpmp_pos + bsize + CCPMPBIN_HEADER_SIZE],
             &buf[ccpmp_pos], fsize - ccpmp_pos);
 
-    INFO("Reading %s into memory...", bootloader);
+    INFO(tr("Reading %s into memory..."), bootloader);
     if(fread(&buf[ccpmp_pos + CCPMPBIN_HEADER_SIZE],
              bsize, 1, bd) != 1)
     {
-        ERR("Can't read file %s to memory!", bootloader);
+        ERR(tr("Can't read file %s to memory!"), bootloader);
         goto err;
     }
     FCLOSE(bd);
 
-    INFO("Adding header to %s...", bootloader);
+    INFO(tr("Adding header to %s..."), bootloader);
     int2le(&buf[ccpmp_pos            ], 9);                     /* Pathname Size */
     memcpy(&buf[ccpmp_pos + 4        ], "ccpmp.bin", 9);        /* Pathname */
     memset(&buf[ccpmp_pos + 4 + 9    ], 0x20, sizeof(uint8_t)); /* File Type */
@@ -207,7 +209,7 @@ int chinachip_patch(const char* firmware, const char* bootloader,
     time_info = localtime(&cur_time);
     if(time_info == NULL)
     {
-        ERR("Can't obtain current time!");
+        ERR(tr("Can't obtain current time!"));
         goto err;
     }
 
@@ -217,11 +219,11 @@ int chinachip_patch(const char* firmware, const char* bootloader,
                                               time_info->tm_hour,
                                               time_info->tm_min);
 
-    INFO("Computing checksum...");
+    INFO(tr("Computing checksum..."));
     for(i = sizeof(struct header); i < TOTAL_SIZE; i+=4)
         checksum += le2int(&buf[i]);
 
-    INFO("Updating main header...");
+    INFO(tr("Updating main header..."));
     memcpy(&buf[offsetof(struct header, timestamp)], header_time, 12);
     int2le(&buf[offsetof(struct header, size)     ], TOTAL_SIZE);
     int2le(&buf[offsetof(struct header, checksum) ], checksum);
@@ -229,14 +231,14 @@ int chinachip_patch(const char* firmware, const char* bootloader,
     od = fopen(output, "wb");
     if(!od)
     {
-        ERR("Can't open file %s!", output);
+        ERR(tr("Can't open file %s!"), output);
         goto err;
     }
 
-    INFO("Writing output to %s...", output);
+    INFO(tr("Writing output to %s..."), output);
     if(fwrite(buf, TOTAL_SIZE, 1, od) != 1)
     {
-        ERR("Can't write to file %s!", output);
+        ERR(tr("Can't write to file %s!"), output);
         goto err;
     }
     fclose(od);

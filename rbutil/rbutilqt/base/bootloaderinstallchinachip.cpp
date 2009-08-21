@@ -45,9 +45,9 @@ QString BootloaderInstallChinaChip::ofHint()
 
 void BootloaderInstallChinaChip::logString(char* format, va_list args, int type)
 {
-    QString buffer;
+    QString translation = QCoreApplication::translate("", format, NULL, QCoreApplication::UnicodeUTF8);
 
-    emit logItem(buffer.vsprintf(format, args), type);
+    emit logItem(QString().vsprintf(translation.toLocal8Bit(), args), type);
     QCoreApplication::processEvents();
 }
 

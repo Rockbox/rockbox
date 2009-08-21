@@ -2,86 +2,238 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="nl">
 <context>
+    <name></name>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="94"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="100"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="161"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="182"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="234"/>
+        <source>Can&apos;t open file %s!</source>
+        <translation>Kan bestand %s niet openen!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="105"/>
+        <source>Bootloader size is %d bytes</source>
+        <translation>Bootloader grootte is %d bytes</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="109"/>
+        <source>Firmware size is %d bytes</source>
+        <translation>Firmware grootte is %d bytes</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="114"/>
+        <source>Can&apos;t allocate %d bytes!</source>
+        <translation>Kan geen %d bytes alloceren!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="119"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="193"/>
+        <source>Reading %s into memory...</source>
+        <translation>Bezig met inlezen van %s...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="122"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="197"/>
+        <source>Can&apos;t read file %s to memory!</source>
+        <translation>Kan %s niet inlezen!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="129"/>
+        <source>File %s isn&apos;t a valid ChinaChip firmware!</source>
+        <translation>%s is geen geldige ChinaChip firmware!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="151"/>
+        <source>Couldn&apos;t find ccpmp.bin in %s!</source>
+        <translation>Kon ccpmp.bin niet vinden in %s!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="154"/>
+        <source>Found ccpmp.bin at %d bytes</source>
+        <translation>ccpmp.bin gevonden op %d bytes</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="165"/>
+        <source>Writing %d bytes to %s...</source>
+        <translation>Bezig met schrijven van %d bytes naar %s...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="168"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="241"/>
+        <source>Can&apos;t write to file %s!</source>
+        <translation>Kan niet schrijven naar %s!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="174"/>
+        <source>Renaming it to ccpmp.old...</source>
+        <translation>Bezig met hernoemen naar ccpmp.old...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="189"/>
+        <source>Making place for ccpmp.bin...</source>
+        <translation>Bezig met ruimte maken voor ccpmp.bin...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="202"/>
+        <source>Adding header to %s...</source>
+        <translation>Bezig met toevoegen vaan hoofding aan %s...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="212"/>
+        <source>Can&apos;t obtain current time!</source>
+        <translation>Kan de huidige tijd niet bekomen!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="222"/>
+        <source>Computing checksum...</source>
+        <translation>Bezig met berekenen van controlesom...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="226"/>
+        <source>Updating main header...</source>
+        <translation>Bezig met updaten van hoofding...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="238"/>
+        <source>Writing output to %s...</source>
+        <translation>Bezig met uitvoer schrijven naar %s...</translation>
+    </message>
+</context>
+<context>
+    <name>BootloaderInstallAms</name>
+    <message>
+        <location filename="../base/bootloaderinstallams.cpp" line="33"/>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons.Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader installatie vereist u om een firmware bestand van de Originele Firmware te voorzien (bin bestand). U moet dit bestand zelf downloaden wegens juridische redenen. Druk op Ok om verder te gaan en uw computer te doorbladeren voor dit bestand.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallams.cpp" line="47"/>
+        <source>Downloading bootloader file</source>
+        <translation>Bezig met downloaden van Bootloader</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallams.cpp" line="83"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="94"/>
+        <source>Could not load %1</source>
+        <translation>Kon %1 niet laden</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallams.cpp" line="114"/>
+        <source>Patching Firmware...</source>
+        <translation>Bezig met pachen van firmware...</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallams.cpp" line="125"/>
+        <source>Could not open %1 for writing</source>
+        <translation>Kon %1 niet openen voor schrijven</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallams.cpp" line="137"/>
+        <source>Could not write firmware file</source>
+        <translation>Kon het firmware bestand niet beschrijven</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallams.cpp" line="152"/>
+        <source>Success: modified firmware file created</source>
+        <translation>Succes: gemodificeerde Firmware aangemaakt</translation>
+    </message>
+</context>
+<context>
     <name>BootloaderInstallBase</name>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="68"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="69"/>
         <source>Download error: received HTTP error %1.</source>
         <translation>Download fout: HTTP fout %1.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="74"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="75"/>
         <source>Download error: %1</source>
         <translation>Download fout : %1</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="80"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="81"/>
         <source>Download finished (cache used).</source>
         <translation>Download voltooid (cache gebruikt).</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="82"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="83"/>
         <source>Download finished.</source>
         <translation>Download voltooid.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="103"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="104"/>
         <source>Creating backup of original firmware file.</source>
         <translation>Maak een backup van de Originele Firmware.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="105"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="106"/>
         <source>Creating backup folder failed</source>
         <translation>Aanmaken van backup map heeft gefaald</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="111"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="112"/>
         <source>Creating backup copy failed.</source>
         <translation>Aanmaken van backup kopie heeft gefaald.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="114"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="115"/>
         <source>Backup created.</source>
         <translation>Backup aangemaakt.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="127"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="128"/>
         <source>Creating installation log</source>
         <translation>Bezig met creëren van installatie log</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="150"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="152"/>
         <source>Bootloader installation is almost complete. Installation &lt;b&gt;requires&lt;/b&gt; you to perform the following steps manually:</source>
         <translation>Bootloader installatie is bijna voltooid. De installatie &lt;b&gt;vereist&lt;/b&gt; dat u de volgende stappen handmatig uitvoert:</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="155"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="157"/>
         <source>&lt;li&gt;Safely remove your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Verwijder veilig uw spaler.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="158"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="161"/>
         <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Herstart uw speler naar de Originele Firmware.&lt;/li&gt;&lt;li&gt;Voer een Firmware upgrade uit, gebruik makend van de functionaliteit van de Originele Firmware. Gelieve de handleiding van uw speler na te zien voor meer details.&lt;/li&gt;&lt;li&gt;Nadat de Firmware upgedatete is, herstart uw speler.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="167"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="170"/>
         <source>&lt;li&gt;Turn the player off&lt;/li&gt;&lt;li&gt;Insert the charger&lt;/li&gt;</source>
         <translation>&lt;li&gt;Zet de speler uit&lt;/li&gt;&lt;li&gt;Steek de oplader erin&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="172"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="175"/>
         <source>&lt;li&gt;Unplug USB and power adaptors&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to turn the player off&lt;/li&gt;&lt;li&gt;Toggle the battery switch on the player&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to boot into Rockbox&lt;/li&gt;</source>
         <translation>&lt;li&gt;Ontkoppel USB en stroomadapters&lt;/li&gt;&lt;li&gt;Hou &lt;i&gt;Power&lt;/i&gt; ingedrukt om de speler uit te schakelen&lt;/li&gt;&lt;li&gt;Zet de batterij schakelaar aan en uit op de speler&lt;/li&gt;&lt;li&gt;Hou &lt;i&gt;Power&lt;/i&gt; ingedrukt om in Rockbox op te starten&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="179"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="182"/>
         <source>&lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; You can safely install other parts first, but the above steps are &lt;b&gt;required&lt;/b&gt; to finish the installation!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Noot:&lt;/b&gt; U kan veilig andere delen eerst installeren, maar de hierboven vermelde stappen zijn &lt;b&gt;verplicht&lt;/b&gt; om de installatie te voltooien!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="138"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="140"/>
         <source>Installation log created</source>
         <translation>Installatie log aangemaakt</translation>
+    </message>
+</context>
+<context>
+    <name>BootloaderInstallChinaChip</name>
+    <message>
+        <location filename="../base/bootloaderinstallchinachip.cpp" line="34"/>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (HXF file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>De Bootloader installatie vereist u om een firmware bestand van de Originele Firmware te voorzien (HXF bestand). U moet dit bestand zelf downloaden wegens juridische redenen. Wij verwijzen u door naar de &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;handleiding&lt;/a&gt; en de &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki pagina voor meer informatie hoe dit bestand te verkrijgen.&lt;br/&gt;Druk op Ok om verder te gaan en te bladeren op uw computer naar dit bestand.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallchinachip.cpp" line="79"/>
+        <source>Downloading bootloader file</source>
+        <translation>Bezig met downloaden van Bootloader</translation>
     </message>
 </context>
 <context>
@@ -366,17 +518,17 @@ Zie http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
         <translation>Verwijderen van Bootloader faalde.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="252"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="253"/>
         <source>Could not open Ipod</source>
         <translation>Kon Ipod niet openen</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="257"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="258"/>
         <source>Error reading partition table - possibly not an Ipod</source>
         <translation>Fout tijdens lezen van de partitie tabel - mogelijks geen Ipod</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="263"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="264"/>
         <source>No firmware partition on disk</source>
         <translation>Geen Firmware partitie op de schijf</translation>
     </message>
@@ -493,22 +645,22 @@ Zie http://www.rockbox.org/wiki/SansaE200Install</translation>
         <translation>Fout tijdens installeren Bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="236"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="237"/>
         <source>Can&apos;t find Sansa</source>
         <translation>Kan Sansa niet vinden</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="241"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="242"/>
         <source>Could not open Sansa</source>
         <translation>Kon Sansa niet openen</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="246"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="247"/>
         <source>Could not read partition table</source>
         <translation>Kon de partitie tabel niet lezen</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="253"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="254"/>
         <source>Disk is not a Sansa (Error %1), aborting.</source>
         <translation>Schijf is geen Sansa (Error: %1), afbreken.</translation>
     </message>
@@ -569,30 +721,44 @@ Zie http://www.rockbox.org/wiki/SansaE200Install</translation>
 <context>
     <name>Config</name>
     <message>
-        <location filename="../configure.cpp" line="119"/>
+        <location filename="../configure.cpp" line="121"/>
         <source>Language changed</source>
         <translation>Taal veranderd</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="120"/>
+        <location filename="../configure.cpp" line="122"/>
         <source>You need to restart the application for the changed language to take effect.</source>
         <translation>U moet de applicatie herstarten om de veranderde taal in te schakelen.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="608"/>
-        <location filename="../configure.cpp" line="617"/>
+        <location filename="../configure.cpp" line="591"/>
+        <source>Detected an unsupported player:
+%1
+Sorry, Rockbox doesn&apos;t run on your player.</source>
+        <translation>Een niet-ondersteunde speler werd gedetecteerd:
+%1
+Sorry, Rockbox werkt niet op uw speler.</translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="596"/>
+        <source>Fatal: player incompatible</source>
+        <translation>Fataal: speler incompatibel</translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="607"/>
+        <location filename="../configure.cpp" line="616"/>
         <source>Autodetection</source>
         <translation>Autoherkenning</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="609"/>
+        <location filename="../configure.cpp" line="608"/>
         <source>Could not detect a Mountpoint.
 Select your Mountpoint manually.</source>
         <translation>Kon geen Mountpunt herkennen.
 Gelieve uw Mountpunt manueel te selecteren.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="618"/>
+        <location filename="../configure.cpp" line="617"/>
         <source>Could not detect a device.
 Select your device and Mountpoint manually.</source>
         <translation>Kon geen apparaat herkennen.
@@ -619,103 +785,150 @@ Selecteer uw apparaat en Mountpunt manueel.</translation>
         <translation>Het cache pad is ongeldig. Bezig met afbreken.</translation>
     </message>
     <message>
+        <location filename="../configure.cpp" line="670"/>
+        <source>TTS configuration invalid</source>
+        <translation>TTS configuratie ongeldig</translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="671"/>
+        <source>TTS configuration invalid. 
+ Please configure TTS engine.</source>
+        <translation>TTS configuratie ongeldig.
+Gelieve de TTS engine te configureren.</translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="677"/>
+        <source>Could not start TTS engine</source>
+        <translation>Kon de TTS engine niet starten</translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="678"/>
+        <source>Could not start TTS engine.
+</source>
+        <translation>Kon de TTS engine niet starten.
+</translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="679"/>
+        <location filename="../configure.cpp" line="693"/>
+        <source>
+Please configure TTS engine.</source>
+        <translation>
+Gelieve de TTS engine te configureren.</translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="688"/>
+        <source>Rockbox Utility Voice Test</source>
+        <translation>Rockbox Utility stemtest</translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="691"/>
+        <source>Could not voice test string</source>
+        <translation>Kon de test zin niet inspreken</translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="692"/>
+        <source>Could not voice test string.
+</source>
+        <translation>Kon de test zin niet inspreken.
+</translation>
+    </message>
+    <message>
         <location filename="../configure.cpp" line="488"/>
         <source>Select your device</source>
         <translation>Selecteer uw apparaat</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="578"/>
+        <location filename="../configure.cpp" line="579"/>
         <source>Sansa e200 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
         <translation>Sansa e200 in MTP modus gevonden!
 U moet uw speler in MSC modus plaatsen voor installatie.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="581"/>
+        <location filename="../configure.cpp" line="582"/>
         <source>H10 20GB in MTP mode found!
 You need to change your player to UMS mode for installation. </source>
         <translation>H10 20GB in MTP modus gevonden!
 U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="583"/>
+        <location filename="../configure.cpp" line="584"/>
         <source>Unless you changed this installation will fail!</source>
         <translation>Tenzij u dit verandert, zal de installatie falen!</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="585"/>
+        <location filename="../configure.cpp" line="586"/>
         <source>Fatal error</source>
         <translation>Fatale fout</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="264"/>
+        <location filename="../configure.cpp" line="267"/>
         <source>Current cache size is %L1 kiB.</source>
         <translation>Huidige cache grootte is %L1 kiB.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="593"/>
         <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
-        <translation>Er is een niet ondersteunde speler %1 herkend. Sorry, Rockbox werkt niet op deze speler.</translation>
+        <translation type="obsolete">Er is een niet ondersteunde speler %1 herkend. Sorry, Rockbox werkt niet op deze speler.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="597"/>
         <source>Fatal error: incompatible player found</source>
-        <translation>Fatale fout: incompatibele speler gevonden</translation>
+        <translation type="obsolete">Fatale fout: incompatibele speler gevonden</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="355"/>
-        <location filename="../configure.cpp" line="384"/>
+        <location filename="../configure.cpp" line="358"/>
+        <location filename="../configure.cpp" line="383"/>
         <source>Configuration OK</source>
         <translation>Configuratie OK</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="360"/>
-        <location filename="../configure.cpp" line="389"/>
+        <location filename="../configure.cpp" line="363"/>
+        <location filename="../configure.cpp" line="388"/>
         <source>Configuration INVALID</source>
         <translation>Configuratie ONGELDIG</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="96"/>
+        <location filename="../configure.cpp" line="97"/>
         <source>The following errors occurred:</source>
         <translation>De volgende fouten traden op:</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="127"/>
+        <location filename="../configure.cpp" line="129"/>
         <source>No mountpoint given</source>
         <translation>Geen aankoppel punt gegeven</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="131"/>
+        <location filename="../configure.cpp" line="133"/>
         <source>Mountpoint does not exist</source>
         <translation>Aankoppel punt bestaat niet</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="135"/>
+        <location filename="../configure.cpp" line="137"/>
         <source>Mountpoint is not a directory.</source>
         <translation>Aankoppel punt is geen map.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="139"/>
+        <location filename="../configure.cpp" line="141"/>
         <source>Mountpoint is not writeable</source>
         <translation>Aankoppelpunt is niet beschrijfbaar</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="153"/>
+        <location filename="../configure.cpp" line="155"/>
         <source>No player selected</source>
         <translation>Geen speler geselecteerd</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="160"/>
+        <location filename="../configure.cpp" line="162"/>
         <source>Cache path not writeable. Leave path empty to default to systems temporary path.</source>
         <translation>Cache pad is niet schrijfbaar. Laat het pad leeg om het systeemsstandaard tijdelijke pad te gebruiken.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="179"/>
+        <location filename="../configure.cpp" line="181"/>
         <source>You need to fix the above errors before you can continue.</source>
         <translation>U moet de bovenstaande fouten herstellen vooraleer verder te gaan.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="182"/>
+        <location filename="../configure.cpp" line="184"/>
         <source>Configuration error</source>
         <translation>Configuratie fout</translation>
     </message>
@@ -881,17 +1094,22 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
         <translation>Ge&amp;selecteerde TTS Engine</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="427"/>
+        <location filename="../configurefrm.ui" line="424"/>
+        <source>Test TTS</source>
+        <translation>Test TTS</translation>
+    </message>
+    <message>
+        <location filename="../configurefrm.ui" line="434"/>
         <source>Encoder Engine</source>
         <translation>Encoder Engine</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="501"/>
+        <location filename="../configurefrm.ui" line="508"/>
         <source>&amp;Ok</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="512"/>
+        <location filename="../configurefrm.ui" line="519"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Annuleren</translation>
     </message>
@@ -902,7 +1120,7 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     </message>
     <message>
         <location filename="../configurefrm.ui" line="396"/>
-        <location filename="../configurefrm.ui" line="433"/>
+        <location filename="../configurefrm.ui" line="440"/>
         <source>Configuration invalid!</source>
         <translation>Configuratie ongeldig!</translation>
     </message>
@@ -912,12 +1130,12 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
         <translation>Configureer &amp;TTS</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="450"/>
+        <location filename="../configurefrm.ui" line="457"/>
         <source>Configure &amp;Enc</source>
         <translation>Configureer &amp;Enc</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="461"/>
+        <location filename="../configurefrm.ui" line="468"/>
         <source>encoder name</source>
         <translation>encoder naam</translation>
     </message>
@@ -944,37 +1162,43 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
         <translation>Selecteer de taal waarvan u een voicebestand wilt maken:</translation>
     </message>
     <message>
-        <location filename="../createvoicefrm.ui" line="51"/>
+        <location filename="../createvoicefrm.ui" line="48"/>
+        <source>Language</source>
+        <translation>Taal</translation>
+    </message>
+    <message>
+        <location filename="../createvoicefrm.ui" line="55"/>
         <source>Generation settings</source>
         <translation>Generatie instellingen</translation>
     </message>
     <message>
-        <location filename="../createvoicefrm.ui" line="57"/>
+        <location filename="../createvoicefrm.ui" line="61"/>
         <source>Encoder profile:</source>
         <translation>Encoder profiel:</translation>
     </message>
     <message>
-        <location filename="../createvoicefrm.ui" line="64"/>
+        <location filename="../createvoicefrm.ui" line="68"/>
         <source>TTS profile:</source>
         <translation>TTS profiel:</translation>
     </message>
     <message>
-        <location filename="../createvoicefrm.ui" line="77"/>
+        <location filename="../createvoicefrm.ui" line="81"/>
         <source>Change</source>
         <translation>Veranderen</translation>
     </message>
     <message>
-        <location filename="../createvoicefrm.ui" line="128"/>
+        <location filename="../createvoicefrm.ui" line="132"/>
         <source>&amp;Install</source>
         <translation>&amp;Installeer</translation>
     </message>
     <message>
-        <location filename="../createvoicefrm.ui" line="138"/>
+        <location filename="../createvoicefrm.ui" line="142"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Annuleren</translation>
     </message>
     <message>
-        <location filename="../createvoicefrm.ui" line="152"/>
+        <location filename="../createvoicefrm.ui" line="156"/>
+        <location filename="../createvoicefrm.ui" line="163"/>
         <source>Wavtrim Threshold</source>
         <translation>Wavtrim drempel</translation>
     </message>
@@ -982,15 +1206,15 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
 <context>
     <name>CreateVoiceWindow</name>
     <message>
-        <location filename="../createvoicewindow.cpp" line="93"/>
-        <location filename="../createvoicewindow.cpp" line="96"/>
+        <location filename="../createvoicewindow.cpp" line="97"/>
+        <location filename="../createvoicewindow.cpp" line="100"/>
         <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Geselecteerde TTS engine: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../createvoicewindow.cpp" line="104"/>
-        <location filename="../createvoicewindow.cpp" line="107"/>
+        <location filename="../createvoicewindow.cpp" line="108"/>
         <location filename="../createvoicewindow.cpp" line="111"/>
+        <location filename="../createvoicewindow.cpp" line="115"/>
         <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Geselecteerde Encoder: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -1049,17 +1273,17 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
         <translation>Annuleren</translation>
     </message>
     <message>
-        <location filename="../encttscfggui.cpp" line="173"/>
+        <location filename="../encttscfggui.cpp" line="178"/>
         <source>Browse</source>
         <translation>Bladeren</translation>
     </message>
     <message>
-        <location filename="../encttscfggui.cpp" line="181"/>
+        <location filename="../encttscfggui.cpp" line="186"/>
         <source>Refresh</source>
         <translation>Vernieuwen</translation>
     </message>
     <message>
-        <location filename="../encttscfggui.cpp" line="353"/>
+        <location filename="../encttscfggui.cpp" line="358"/>
         <source>Select excutable</source>
         <translation>Selecteer uitvoerbaar bestand</translation>
     </message>
@@ -1067,72 +1291,72 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
 <context>
     <name>Install</name>
     <message>
-        <location filename="../install.cpp" line="98"/>
+        <location filename="../install.cpp" line="100"/>
         <source>Mount point is wrong!</source>
         <translation>Mount punt is verkeerd!</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="236"/>
+        <location filename="../install.cpp" line="233"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
         <translation>Dit is de meest recente Rockbox build. Een huidige build zal upgedatet worden elke keer een verandering is gemaakt. Laatste versie is  r%1 (%2).</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="252"/>
+        <location filename="../install.cpp" line="249"/>
         <source>This is the last released version of Rockbox.</source>
         <translation>Dit is de laatst gereleasede versie van Rockbox.</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="267"/>
+        <location filename="../install.cpp" line="264"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
         <translation>Deze worden elke dag automatisch gebouwd van de meest recente broncode. Deze heeft algemeen gezien meer features dan de laatst stabiele release maar kan minder stabiel zijn. Features kunnen regelmatig veranderen.</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="271"/>
+        <location filename="../install.cpp" line="268"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
         <translation>&lt;b&gt;Pas op:&lt;/b&gt; gearchiveerde versie is r%1(%2).</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="143"/>
+        <location filename="../install.cpp" line="140"/>
         <source>Aborted!</source>
         <translation>Afgebroken!</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="152"/>
+        <location filename="../install.cpp" line="149"/>
         <source>Beginning Backup...</source>
         <translation>Backup wordt gestart...</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="168"/>
+        <location filename="../install.cpp" line="165"/>
         <source>Backup successful</source>
         <translation>Backup is succesvol beëindigd</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="172"/>
+        <location filename="../install.cpp" line="169"/>
         <source>Backup failed!</source>
         <translation>Backup mislukt!</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="255"/>
+        <location filename="../install.cpp" line="252"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Note:&lt;/b&gt; The laatste versie is %1.&lt;b&gt;Dit is de aanbevolen versie.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="139"/>
+        <location filename="../install.cpp" line="136"/>
         <source>Really continue?</source>
         <translation>Wilt u zeker verdergaan?</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="68"/>
+        <location filename="../install.cpp" line="70"/>
         <source>Backup to %1</source>
         <translation>Backup naar %1</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="203"/>
+        <location filename="../install.cpp" line="200"/>
         <source>Select Backup Filename</source>
         <translation>Selecteer backup bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="241"/>
+        <location filename="../install.cpp" line="238"/>
         <source>&lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Dit is de aanbevolen versie.&lt;/b&gt;</translation>
     </message>
@@ -1238,67 +1462,72 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
         <translation>Selecteer de Map om Talk bestanden voor te genereren.</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="45"/>
+        <location filename="../installtalkfrm.ui" line="42"/>
+        <source>Talkfile Folder</source>
+        <translation>Talk bestanden map</translation>
+    </message>
+    <message>
+        <location filename="../installtalkfrm.ui" line="49"/>
         <source>&amp;Browse</source>
         <translation>&amp;Bladeren</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="56"/>
+        <location filename="../installtalkfrm.ui" line="60"/>
         <source>Generation settings</source>
         <translation>Generatie instellingen</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="62"/>
+        <location filename="../installtalkfrm.ui" line="66"/>
         <source>Encoder profile:</source>
         <translation>Encoder profiel:</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="69"/>
+        <location filename="../installtalkfrm.ui" line="73"/>
         <source>TTS profile:</source>
         <translation>TTS profiel:</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="105"/>
+        <location filename="../installtalkfrm.ui" line="109"/>
         <source>Generation options</source>
         <translation>Generatie instellingen</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="111"/>
+        <location filename="../installtalkfrm.ui" line="115"/>
         <source>Run recursive</source>
         <translation>Recursief doorlopen</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="121"/>
+        <location filename="../installtalkfrm.ui" line="125"/>
         <source>Strip Extensions</source>
         <translation>Extensies weghalen</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="131"/>
+        <location filename="../installtalkfrm.ui" line="135"/>
         <source>Overwrite Talkfiles</source>
         <translation>Overschrijf Talk bestanden</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="213"/>
+        <location filename="../installtalkfrm.ui" line="217"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Annuleren</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="202"/>
+        <location filename="../installtalkfrm.ui" line="206"/>
         <source>&amp;Install</source>
         <translation>&amp;Installeren</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="82"/>
+        <location filename="../installtalkfrm.ui" line="86"/>
         <source>Change</source>
         <translation>Veranderen</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="141"/>
+        <location filename="../installtalkfrm.ui" line="145"/>
         <source>Generate .talk files for Folders</source>
         <translation>Genereer .talk bestanden voor Mappen</translation>
     </message>
     <message>
-        <location filename="../installtalkfrm.ui" line="151"/>
+        <location filename="../installtalkfrm.ui" line="155"/>
         <source>Generate .talk files for Files</source>
         <translation>Genereer .talk bestand voor Bestanden</translation>
     </message>
@@ -1306,20 +1535,20 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
 <context>
     <name>InstallTalkWindow</name>
     <message>
-        <location filename="../installtalkwindow.cpp" line="88"/>
+        <location filename="../installtalkwindow.cpp" line="94"/>
         <source>The Folder to Talk is wrong!</source>
         <translation>De map naar Talk is verkeerd!</translation>
     </message>
     <message>
-        <location filename="../installtalkwindow.cpp" line="115"/>
-        <location filename="../installtalkwindow.cpp" line="118"/>
+        <location filename="../installtalkwindow.cpp" line="126"/>
+        <location filename="../installtalkwindow.cpp" line="129"/>
         <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Geselecteerde TTS engine: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../installtalkwindow.cpp" line="125"/>
-        <location filename="../installtalkwindow.cpp" line="128"/>
-        <location filename="../installtalkwindow.cpp" line="132"/>
+        <location filename="../installtalkwindow.cpp" line="136"/>
+        <location filename="../installtalkwindow.cpp" line="139"/>
+        <location filename="../installtalkwindow.cpp" line="143"/>
         <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Geselecteerde Encoder: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -1341,7 +1570,12 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
         <translation>Vooruitgang</translation>
     </message>
     <message>
-        <location filename="../progressloggerfrm.ui" line="68"/>
+        <location filename="../progressloggerfrm.ui" line="58"/>
+        <source>Save Log</source>
+        <translation>Log opslaan</translation>
+    </message>
+    <message>
+        <location filename="../progressloggerfrm.ui" line="82"/>
         <source>&amp;Abort</source>
         <translation>&amp;Afbreken</translation>
     </message>
@@ -1354,12 +1588,17 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
 <context>
     <name>ProgressLoggerGui</name>
     <message>
-        <location filename="../progressloggergui.cpp" line="113"/>
+        <location filename="../progressloggergui.cpp" line="122"/>
         <source>&amp;Ok</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../progressloggergui.cpp" line="95"/>
+        <location filename="../progressloggergui.cpp" line="145"/>
+        <source>Save system trace log</source>
+        <translation>Systeem trace log opslaan</translation>
+    </message>
+    <message>
+        <location filename="../progressloggergui.cpp" line="104"/>
         <source>&amp;Abort</source>
         <translation>&amp;Afbreken</translation>
     </message>
@@ -1367,46 +1606,47 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../base/detect.cpp" line="111"/>
+        <location filename="../base/system.cpp" line="115"/>
         <source>Guest</source>
         <translation>Gast</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="114"/>
+        <location filename="../base/system.cpp" line="118"/>
         <source>Admin</source>
         <translation>Hoofdgebruiker</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="117"/>
+        <location filename="../base/system.cpp" line="121"/>
         <source>User</source>
         <translation>Gebruiker</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="120"/>
+        <location filename="../base/system.cpp" line="124"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="228"/>
+        <location filename="../base/system.cpp" line="225"/>
+        <location filename="../base/system.cpp" line="270"/>
         <source>(no description available)</source>
         <translation>(geen beschrijving beschikbaar)</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="399"/>
+        <location filename="../base/utils.cpp" line="181"/>
         <source>&lt;li&gt;Permissions insufficient for bootloader installation.
 Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Uw machtigingen zijn niet voldoende om de Bootloader te installeren.
 Administrator privileges zijn nodig.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="409"/>
+        <location filename="../base/utils.cpp" line="192"/>
         <source>&lt;li&gt;Target mismatch detected.
 Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Verkeerd apparaat gevonden.
 Geïnstalleerd apparaat: %1, geselecteerd apparaat: %2.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="416"/>
+        <location filename="../base/utils.cpp" line="199"/>
         <source>Problem detected:</source>
         <translation>Probleem gevonden:</translation>
     </message>
@@ -1414,296 +1654,296 @@ Geïnstalleerd apparaat: %1, geselecteerd apparaat: %2.&lt;/li&gt;</translation>
 <context>
     <name>RbUtilQt</name>
     <message>
-        <location filename="../rbutilqt.cpp" line="84"/>
+        <location filename="../rbutilqt.cpp" line="88"/>
         <source>File</source>
         <translation>Bestand</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="84"/>
+        <location filename="../rbutilqt.cpp" line="88"/>
         <source>Version</source>
         <translation>Versie</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="250"/>
+        <location filename="../rbutilqt.cpp" line="261"/>
         <source>Network error: %1. Please check your network and proxy settings.</source>
         <translation>Netwerk fout:%1. Gelieve uw netwerk en proxy instelling te controleren.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="351"/>
+        <location filename="../rbutilqt.cpp" line="361"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%1 %2&lt;/b&gt; op &lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="370"/>
+        <location filename="../rbutilqt.cpp" line="380"/>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;PDF Handboek&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="372"/>
+        <location filename="../rbutilqt.cpp" line="382"/>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;HTML Handboek (opent in een browser)&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="376"/>
+        <location filename="../rbutilqt.cpp" line="386"/>
         <source>Select a device for a link to the correct manual</source>
         <translation>Selecteer een apparaat voor een link naar het correcte handboek</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="377"/>
+        <location filename="../rbutilqt.cpp" line="387"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Handboek overzicht&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="386"/>
-        <location filename="../rbutilqt.cpp" line="442"/>
-        <location filename="../rbutilqt.cpp" line="621"/>
-        <location filename="../rbutilqt.cpp" line="799"/>
-        <location filename="../rbutilqt.cpp" line="848"/>
-        <location filename="../rbutilqt.cpp" line="887"/>
+        <location filename="../rbutilqt.cpp" line="396"/>
+        <location filename="../rbutilqt.cpp" line="452"/>
+        <location filename="../rbutilqt.cpp" line="629"/>
+        <location filename="../rbutilqt.cpp" line="806"/>
+        <location filename="../rbutilqt.cpp" line="855"/>
+        <location filename="../rbutilqt.cpp" line="894"/>
         <source>Confirm Installation</source>
         <translation>Bevestig Installatie</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="465"/>
-        <location filename="../rbutilqt.cpp" line="1091"/>
+        <location filename="../rbutilqt.cpp" line="475"/>
+        <location filename="../rbutilqt.cpp" line="1097"/>
         <source>Mount point is wrong!</source>
         <translation>Mount punt is verkeerd!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="622"/>
+        <location filename="../rbutilqt.cpp" line="630"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>Wilt u zeker de Bootloader installeren?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="800"/>
+        <location filename="../rbutilqt.cpp" line="807"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>Wilt u zeker het lettertypen pakket installeren?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="849"/>
+        <location filename="../rbutilqt.cpp" line="856"/>
         <source>Do you really want to install the voice file?</source>
         <translation>Wilt u zeker de spraakbestanden?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="888"/>
+        <location filename="../rbutilqt.cpp" line="895"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>Wilt u zeker de spelletjes addon bestanden installeren?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="969"/>
+        <location filename="../rbutilqt.cpp" line="976"/>
         <source>Confirm Uninstallation</source>
         <translation>Bevestig Deïnstallatie</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="970"/>
+        <location filename="../rbutilqt.cpp" line="977"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Wilt u zeker de Bootloader deïnstalleren?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1028"/>
+        <location filename="../rbutilqt.cpp" line="1032"/>
         <source>Confirm download</source>
         <translation>Bevestig download</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1029"/>
+        <location filename="../rbutilqt.cpp" line="1033"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>Wilt u zeker het handboek downloaden? Dit handboek zal opgeslagen worden in de hoofdmap van uw speler.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1077"/>
+        <location filename="../rbutilqt.cpp" line="1083"/>
         <source>Confirm installation</source>
         <translation>Bevestig installatie</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1078"/>
+        <location filename="../rbutilqt.cpp" line="1084"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Wilt u zeker Rockbox Utility installeren op uw speler? Na installatie kan u het opstarten vanaf  de harde schijf van uw speler.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1087"/>
+        <location filename="../rbutilqt.cpp" line="1093"/>
         <source>Installing Rockbox Utility</source>
         <translation>Bezig met installeren van Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1105"/>
+        <location filename="../rbutilqt.cpp" line="1111"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Fout tijdens installeren van Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1109"/>
+        <location filename="../rbutilqt.cpp" line="1115"/>
         <source>Installing user configuration</source>
         <translation>Bezig met installeren van gebruikerconfiguratie</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1113"/>
+        <location filename="../rbutilqt.cpp" line="1119"/>
         <source>Error installing user configuration</source>
         <translation>Fout tijdens installeren van gebruikersconfiguratie</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1117"/>
+        <location filename="../rbutilqt.cpp" line="1123"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Rockbox Utility is succesvol geïnstalleerd.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="220"/>
-        <location filename="../rbutilqt.cpp" line="1207"/>
+        <location filename="../rbutilqt.cpp" line="231"/>
+        <location filename="../rbutilqt.cpp" line="1213"/>
         <source>Configuration error</source>
         <translation>Configuratie fout</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="882"/>
+        <location filename="../rbutilqt.cpp" line="889"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="883"/>
+        <location filename="../rbutilqt.cpp" line="890"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>Uw apparaat heeft de Doom plugin niet. Installatie wordt afgebroken.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1208"/>
+        <location filename="../rbutilqt.cpp" line="1214"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Uw configuratie is ongeldig. Gelieve naar het configuratie scherm te gaan en de juiste instellingen te gebruiken.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="213"/>
+        <location filename="../rbutilqt.cpp" line="224"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
         <translation>Dit is een nieuwe installatie van Rockbox Utility, of een nieuwe versie. Het configuratie scherm zal nu openen, zodat u het programma kan instellen, of uw instellingen nakijken.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="539"/>
+        <location filename="../rbutilqt.cpp" line="546"/>
         <source>Aborted!</source>
         <translation>Afgebroken!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="548"/>
+        <location filename="../rbutilqt.cpp" line="556"/>
         <source>Installed Rockbox detected</source>
         <translation>Geïnstalleerde Rockbox herkend</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="549"/>
+        <location filename="../rbutilqt.cpp" line="557"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>Rockbox installatie herkend. Wilt u eerst een backup maken?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="574"/>
+        <location filename="../rbutilqt.cpp" line="582"/>
         <source>Backup failed!</source>
         <translation>Backup mislukt!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="842"/>
+        <location filename="../rbutilqt.cpp" line="849"/>
         <source>Warning</source>
         <translation>Waarschuwing</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="843"/>
+        <location filename="../rbutilqt.cpp" line="850"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>Deze applicatie is nog steeds bezig met informatie over nieuwe Builds te downloaden. Gelieve binnen een korte periode opnieuw te proberen.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="552"/>
+        <location filename="../rbutilqt.cpp" line="560"/>
         <source>Starting backup...</source>
         <translation>Backup wordt gestart...</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="212"/>
+        <location filename="../rbutilqt.cpp" line="223"/>
         <source>New installation</source>
         <translation>Nieuwe installatie</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="221"/>
+        <location filename="../rbutilqt.cpp" line="232"/>
         <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
         <translation>Uw configuratie is ongeldig. Dit komt waarschijnlijk door een veranderd apparaat pad. Het configuratie scherm zal nu openen zodat u de fout kan herstellen.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="570"/>
+        <location filename="../rbutilqt.cpp" line="578"/>
         <source>Backup successful</source>
         <translation>Backup is succesvol beëindigd</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="176"/>
+        <location filename="../rbutilqt.cpp" line="187"/>
         <source>Network error</source>
         <translation>Netwerk fout</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="177"/>
+        <location filename="../rbutilqt.cpp" line="188"/>
         <source>Can&apos;t get version information.</source>
         <translation>Kan geen versie informatie ophalen.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="536"/>
+        <location filename="../rbutilqt.cpp" line="542"/>
         <source>Really continue?</source>
         <translation>Wilt u zeker verdergaan?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="656"/>
+        <location filename="../rbutilqt.cpp" line="670"/>
         <source>No install method known.</source>
         <translation>Geen installatie methode bekend.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="683"/>
+        <location filename="../rbutilqt.cpp" line="690"/>
         <source>Bootloader detected</source>
         <translation>Bootloader gevonden</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="684"/>
+        <location filename="../rbutilqt.cpp" line="691"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
         <translation>Bootloader is al geïnstalleerd. Wilt u de Bootloader herinstalleren?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="706"/>
+        <location filename="../rbutilqt.cpp" line="713"/>
         <source>Create Bootloader backup</source>
         <translation>Maak Bootloader backup</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="707"/>
+        <location filename="../rbutilqt.cpp" line="714"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
         <translation>U kan een backup maken van de Originele Bootloader. Kies &quot;Ja&quot; om de output map op uw computer te selecteren waarin het bestand zal worden opgeslagen. Dit bestand zal geplaatst worden in een nieuwe map &quot;%1&quot; die zal worden aangemaakt onder de geselecteerde map.
 Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="713"/>
+        <location filename="../rbutilqt.cpp" line="720"/>
         <source>Browse backup folder</source>
         <translation>Blader naar backup map</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="726"/>
+        <location filename="../rbutilqt.cpp" line="733"/>
         <source>Prerequisites</source>
         <translation>Vereisten</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="739"/>
+        <location filename="../rbutilqt.cpp" line="746"/>
         <source>Select firmware file</source>
         <translation>Selecteer firmware bestand</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="741"/>
+        <location filename="../rbutilqt.cpp" line="748"/>
         <source>Error opening firmware file</source>
         <translation>Fout bij openen van firmware bestand</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="759"/>
+        <location filename="../rbutilqt.cpp" line="766"/>
         <source>Backup error</source>
         <translation>Backup fout</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="760"/>
+        <location filename="../rbutilqt.cpp" line="767"/>
         <source>Could not create backup file. Continue?</source>
         <translation>Kon geen backup maken. Verdergaan?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="790"/>
+        <location filename="../rbutilqt.cpp" line="797"/>
         <source>Manual steps required</source>
         <translation>Handmatige stappen zijn genoodzaakt</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="998"/>
+        <location filename="../rbutilqt.cpp" line="1005"/>
         <source>No uninstall method known.</source>
         <translation>Geen deïnstallatie methode bekend.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="387"/>
+        <location filename="../rbutilqt.cpp" line="397"/>
         <source>Do you really want to perform a complete installation?
 
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
@@ -1711,7 +1951,7 @@ This will install Rockbox %1. To install the most recent development build avail
 Dit zal Rockbox %1 installeren. Om de meest recente ontwikkelaars build te installeren, druk op &quot;Annuleren&quot; en gebruik de &quot;Installatie&quot; tab.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="443"/>
+        <location filename="../rbutilqt.cpp" line="453"/>
         <source>Do you really want to perform a minimal installation? A minimal installation will contain only the absolutely necessary parts to run Rockbox.
 
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
@@ -1720,12 +1960,12 @@ This will install Rockbox %1. To install the most recent development build avail
 Dit zal Rockbox %1 installeren. Om de meest recente ontwikkelaars build te installeren, druk op &quot;Annuleren&quot; en gebruik de &quot;Installatie&quot; tab.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="689"/>
+        <location filename="../rbutilqt.cpp" line="696"/>
         <source>Bootloader installation skipped</source>
         <translation>Bootloader installatie overgeslagen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="732"/>
+        <location filename="../rbutilqt.cpp" line="739"/>
         <source>Bootloader installation aborted</source>
         <translation>Bootloader installatie afgebroken</translation>
     </message>
@@ -1738,82 +1978,82 @@ Dit zal Rockbox %1 installeren. Om de meest recente ontwikkelaars build te insta
         <translation>Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="78"/>
+        <location filename="../rbutilqtfrm.ui" line="70"/>
         <source>Device</source>
         <translation>Apparaat</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="90"/>
+        <location filename="../rbutilqtfrm.ui" line="82"/>
         <source>Selected device:</source>
         <translation>Geselecteerd apparaat:</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="117"/>
+        <location filename="../rbutilqtfrm.ui" line="109"/>
         <source>&amp;Change</source>
         <translation>&amp;Veranderen</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="134"/>
-        <location filename="../rbutilqtfrm.ui" line="822"/>
+        <location filename="../rbutilqtfrm.ui" line="127"/>
+        <location filename="../rbutilqtfrm.ui" line="834"/>
         <source>&amp;Quick Start</source>
         <translation>&amp;Snelle start</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="137"/>
+        <location filename="../rbutilqtfrm.ui" line="130"/>
         <source>Welcome</source>
         <translation>Welkom</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="228"/>
-        <location filename="../rbutilqtfrm.ui" line="815"/>
+        <location filename="../rbutilqtfrm.ui" line="223"/>
+        <location filename="../rbutilqtfrm.ui" line="827"/>
         <source>&amp;Installation</source>
         <translation>&amp;Installatie</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="231"/>
+        <location filename="../rbutilqtfrm.ui" line="226"/>
         <source>Basic Rockbox installation</source>
         <translation>Basis Rockbox installatie</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="237"/>
+        <location filename="../rbutilqtfrm.ui" line="232"/>
         <source>Install Bootloader</source>
         <translation>Installeer de Bootloader</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="263"/>
-        <location filename="../rbutilqtfrm.ui" line="266"/>
+        <location filename="../rbutilqtfrm.ui" line="259"/>
+        <location filename="../rbutilqtfrm.ui" line="262"/>
         <source>Install Rockbox</source>
         <translation>Installeer Rockbox</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="325"/>
-        <location filename="../rbutilqtfrm.ui" line="829"/>
+        <location filename="../rbutilqtfrm.ui" line="322"/>
+        <location filename="../rbutilqtfrm.ui" line="841"/>
         <source>&amp;Extras</source>
         <translation>&amp;Extras</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="328"/>
+        <location filename="../rbutilqtfrm.ui" line="325"/>
         <source>Install extras for Rockbox</source>
         <translation>Installeer de extra&apos;s voor Rockbox</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="334"/>
+        <location filename="../rbutilqtfrm.ui" line="331"/>
         <source>Install Fonts package</source>
         <translation>Installeer het lettertypen pakket</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="360"/>
+        <location filename="../rbutilqtfrm.ui" line="358"/>
         <source>Install themes</source>
         <translation>Thema&apos;s installeren</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="386"/>
+        <location filename="../rbutilqtfrm.ui" line="385"/>
         <source>Install game files</source>
         <translation>Spelbestanden installeren</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="439"/>
-        <location filename="../rbutilqtfrm.ui" line="837"/>
+        <location filename="../rbutilqtfrm.ui" line="849"/>
         <source>&amp;Accessibility</source>
         <translation>&amp;Toegankelijkheid</translation>
     </message>
@@ -1828,199 +2068,209 @@ Dit zal Rockbox %1 installeren. Om de meest recente ontwikkelaars build te insta
         <translation>Installeer de spraakbestanden</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="474"/>
+        <location filename="../rbutilqtfrm.ui" line="475"/>
         <source>Install Talk files</source>
         <translation>Installeer de Talk bestanden</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="551"/>
-        <location filename="../rbutilqtfrm.ui" line="845"/>
+        <location filename="../rbutilqtfrm.ui" line="554"/>
+        <location filename="../rbutilqtfrm.ui" line="857"/>
         <source>&amp;Uninstallation</source>
         <translation>&amp;Deïnstallatie</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="554"/>
-        <location filename="../rbutilqtfrm.ui" line="586"/>
+        <location filename="../rbutilqtfrm.ui" line="557"/>
+        <location filename="../rbutilqtfrm.ui" line="590"/>
         <source>Uninstall Rockbox</source>
         <translation>Deïnstalleer Rockbox</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="560"/>
+        <location filename="../rbutilqtfrm.ui" line="563"/>
         <source>Uninstall Bootloader</source>
         <translation>Deïnstalleer de Bootloader</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="645"/>
+        <location filename="../rbutilqtfrm.ui" line="650"/>
         <source>&amp;Manual</source>
         <translation>&amp;Handleiding</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="648"/>
+        <location filename="../rbutilqtfrm.ui" line="653"/>
         <source>View and download the manual</source>
         <translation>Lees en download de handleiding</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="654"/>
+        <location filename="../rbutilqtfrm.ui" line="659"/>
         <source>Read the manual</source>
         <translation>Lees de handleiding</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="660"/>
+        <location filename="../rbutilqtfrm.ui" line="665"/>
         <source>PDF manual</source>
         <translation>PDF handleiding</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="673"/>
+        <location filename="../rbutilqtfrm.ui" line="678"/>
         <source>HTML manual</source>
         <translation>HTML handleiding</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="689"/>
+        <location filename="../rbutilqtfrm.ui" line="694"/>
         <source>Download the manual</source>
         <translation>Download de handleiding</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="697"/>
+        <location filename="../rbutilqtfrm.ui" line="702"/>
         <source>&amp;PDF version</source>
         <translation>&amp;PDF versie</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="704"/>
+        <location filename="../rbutilqtfrm.ui" line="709"/>
         <source>&amp;HTML version (zip file)</source>
         <translation>&amp;HTML versie (zip bestand)</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="726"/>
+        <location filename="../rbutilqtfrm.ui" line="731"/>
         <source>Down&amp;load</source>
         <translation>Down&amp;load</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="750"/>
+        <location filename="../rbutilqtfrm.ui" line="755"/>
         <source>Inf&amp;o</source>
         <translation>Inf&amp;o</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="770"/>
+        <location filename="../rbutilqtfrm.ui" line="775"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="792"/>
+        <location filename="../rbutilqtfrm.ui" line="797"/>
         <source>&amp;File</source>
         <translation>&amp;Bestand</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="886"/>
+        <location filename="../rbutilqtfrm.ui" line="810"/>
+        <source>&amp;Troubleshoot</source>
+        <translation>&amp;Probleem oplossen</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqtfrm.ui" line="898"/>
         <source>&amp;About</source>
         <translation>&amp;Over</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="863"/>
+        <location filename="../rbutilqtfrm.ui" line="1054"/>
+        <source>System &amp;Trace</source>
+        <translation>Systeem &amp;Trace</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqtfrm.ui" line="875"/>
         <source>Empty local download cache</source>
         <translation>Ledig de lokale download cache</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="868"/>
+        <location filename="../rbutilqtfrm.ui" line="880"/>
         <source>Install Rockbox Utility on player</source>
         <translation>Installeer Rockbox utility op uw speler</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="873"/>
+        <location filename="../rbutilqtfrm.ui" line="885"/>
         <source>&amp;Configure</source>
         <translation>&amp;Configuratie</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="878"/>
+        <location filename="../rbutilqtfrm.ui" line="890"/>
         <source>E&amp;xit</source>
         <translation>&amp;Verlaten</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="881"/>
+        <location filename="../rbutilqtfrm.ui" line="893"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="891"/>
+        <location filename="../rbutilqtfrm.ui" line="903"/>
         <source>About &amp;Qt</source>
         <translation>Over &amp;Qt</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="896"/>
+        <location filename="../rbutilqtfrm.ui" line="908"/>
         <source>&amp;Help</source>
         <translation>&amp;Help</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="143"/>
+        <location filename="../rbutilqtfrm.ui" line="136"/>
         <source>Complete Installation</source>
         <translation>Complete installatie</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="811"/>
+        <location filename="../rbutilqtfrm.ui" line="823"/>
         <source>Action&amp;s</source>
         <translation>Actie&amp;s</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="901"/>
+        <location filename="../rbutilqtfrm.ui" line="913"/>
         <source>Info</source>
         <translation>Info</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1017"/>
+        <location filename="../rbutilqtfrm.ui" line="1041"/>
         <source>Create &amp;Voice File</source>
         <translation>Creëer een &amp;Voice bestand</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="994"/>
+        <location filename="../rbutilqtfrm.ui" line="1017"/>
         <source>Read PDF manual</source>
         <translation>Lees de PDF handleiding</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="999"/>
+        <location filename="../rbutilqtfrm.ui" line="1022"/>
         <source>Read HTML manual</source>
         <translation>Lees de HTML handleiding</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1004"/>
+        <location filename="../rbutilqtfrm.ui" line="1027"/>
         <source>Download PDF manual</source>
         <translation>Download de PDF handleiding</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1009"/>
+        <location filename="../rbutilqtfrm.ui" line="1032"/>
         <source>Download HTML manual (zip)</source>
         <translation>Download de HTM handleiding (zip)</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="523"/>
+        <location filename="../rbutilqtfrm.ui" line="525"/>
         <source>Create Voice files</source>
         <translation>Creëer spraakbestanden</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1020"/>
+        <location filename="../rbutilqtfrm.ui" line="1044"/>
         <source>Create Voice File</source>
         <translation>Creëer spraakbestanden</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="159"/>
+        <location filename="../rbutilqtfrm.ui" line="153"/>
         <source>&lt;b&gt;Complete Installation&lt;/b&gt;&lt;br/&gt;This installs the bootloader, a current build and the extras package. This is the recommended method for new installations.</source>
         <translation>&lt;b&gt;Complete Installatie&lt;/b&gt;&lt;br/&gt;Dit installeert de bootloader, een huidige build en het extra&apos;s pakket. Dit is aanbevolen voor nieuwe installaties.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="253"/>
+        <location filename="../rbutilqtfrm.ui" line="249"/>
         <source>&lt;b&gt;Install the bootloader&lt;/b&gt;&lt;br/&gt;Before Rockbox can be run on your audio player, you may have to install a bootloader. This is only necessary the first time Rockbox is installed.</source>
         <translation>&lt;b&gt;Installeer de bootloader&lt;/b&gt;&lt;br/&gt;Voordat Rockbox op uw speler kan gebruikt worden, moet u een bootloader installeren. Dit is enkel de eerste keer dat u Rockbox installeert nodig.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="282"/>
+        <location filename="../rbutilqtfrm.ui" line="279"/>
         <source>&lt;b&gt;Install Rockbox&lt;/b&gt; on your audio player</source>
         <translation>&lt;b&gt;Installeer Rockbox&lt;/b&gt; op uw audio player</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="350"/>
+        <location filename="../rbutilqtfrm.ui" line="348"/>
         <source>&lt;b&gt;Fonts Package&lt;/b&gt;&lt;br/&gt;The Fonts Package contains a couple of commonly used fonts. Installation is highly recommended.</source>
         <translation>&lt;b&gt;Lettertypen pakket&lt;/b&gt;&lt;br/&gt;Het lettertypen pakket bevat een aantal veelgebruikte lettertypen. Installatie is sterk aanbevolen.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="376"/>
+        <location filename="../rbutilqtfrm.ui" line="375"/>
         <source>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos; look can be customized by themes. You can choose and install several officially distributed themes.</source>
         <translation>&lt;b&gt;Installeer thema&apos;s&lt;/b&gt;&lt;br/&gt;Het uiterlijk van Rockbox kan aangepast worden met behulp van thema&apos;s. U kan kiezen uit verschillende officiëel gedistribueerde thema&apos;s en deze installeren.</translation>
     </message>
@@ -2030,151 +2280,187 @@ Dit zal Rockbox %1 installeren. Om de meest recente ontwikkelaars build te insta
         <translation>&lt;b&gt;Installeer spelbestanden&lt;/b&gt;&lt;br/&gt;Doom heeft een basis wad bestand nodig om te starten.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="464"/>
+        <location filename="../rbutilqtfrm.ui" line="465"/>
         <source>&lt;b&gt;Install Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.</source>
         <translation>&lt;b&gt;Installeer spraakbestanden&lt;/b&gt;&lt;br/&gt;Spraakbestanden zijn nodig om Rockbox de gebruikersinterface te laten spreken. Dit is standaard ingeschakeld, dus als u dit installeert zal Rockbox spreken.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="490"/>
+        <location filename="../rbutilqtfrm.ui" line="492"/>
         <source>&lt;b&gt;Create Talk Files&lt;/b&gt;&lt;br/&gt;Talkfiles are needed to let Rockbox speak File and Foldernames</source>
         <translation>&lt;b&gt;Creëer Talk bestanden&lt;/b&gt;&lt;br/&gt;Talk bestanden zijn nodig om Rockbox bestands- en mapnamen te laten spreken</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="539"/>
+        <location filename="../rbutilqtfrm.ui" line="542"/>
         <source>&lt;b&gt;Create Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the  user interface. Speaking is enabled by default, so
  if you installed the voice file Rockbox will speak.</source>
         <translation>&lt;b&gt;Creëer spraakbestanden&lt;/b&gt;&lt;br/&gt;Spraakbestanden zijn nodig om Rockbox de gebruikersinterface te laten spreken. Dit is standaard ingeschakeld, dus als u dit installeert zal Rockbox spreken.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="576"/>
+        <location filename="../rbutilqtfrm.ui" line="580"/>
         <source>&lt;b&gt;Remove the bootloader&lt;/b&gt;&lt;br/&gt;After removing the bootloader you won&apos;t be able to start Rockbox.</source>
         <translation>&lt;b&gt;Verwijder de bootloader&lt;/b&gt;&lt;br/&gt;Na het verwijderen van de bootloader zal u Rockbox niet meer kunnen opstarten.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="602"/>
+        <location filename="../rbutilqtfrm.ui" line="607"/>
         <source>&lt;b&gt;Uninstall Rockbox from your audio player.&lt;/b&gt;&lt;br/&gt;This will leave the bootloader in place (you need to remove it manually).</source>
         <translation>&lt;b&gt;Deïnstalleer Rockbox van uw audio player.&lt;/b&gt;&lt;br/&gt;Dit zal de bootloader onaangetast laten (u zal het manueel moeten verwijderen).</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="756"/>
+        <location filename="../rbutilqtfrm.ui" line="761"/>
         <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
         <translation>Huidige geïnstalleerde pakketten.&lt;br/&gt;&lt;b&gt;Pas op:&lt;/b&gt; als u manueel pakketten installeert kan dit niet correct zijn!</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="801"/>
+        <location filename="../rbutilqtfrm.ui" line="806"/>
         <source>Abou&amp;t</source>
         <translation>&amp;Over</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="925"/>
+        <location filename="../rbutilqtfrm.ui" line="940"/>
         <source>Install &amp;Bootloader</source>
         <translation>Installeer de &amp;Bootloader</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="933"/>
+        <location filename="../rbutilqtfrm.ui" line="949"/>
         <source>Install &amp;Rockbox</source>
         <translation>Installeer &amp;Rockbox</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="941"/>
+        <location filename="../rbutilqtfrm.ui" line="958"/>
         <source>Install &amp;Fonts Package</source>
         <translation>Installeer het &amp;lettertypen pakket</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="949"/>
+        <location filename="../rbutilqtfrm.ui" line="967"/>
         <source>Install &amp;Themes</source>
         <translation>Installeer &amp;thema&apos;s</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="957"/>
+        <location filename="../rbutilqtfrm.ui" line="976"/>
         <source>Install &amp;Game Files</source>
         <translation>Installeer &amp;spelbestanden</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="965"/>
+        <location filename="../rbutilqtfrm.ui" line="985"/>
         <source>&amp;Install Voice File</source>
         <translation>&amp;Installeer de spraakbestanden</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="973"/>
+        <location filename="../rbutilqtfrm.ui" line="994"/>
         <source>Create &amp;Talk Files</source>
         <translation>Creëer &amp;Talk bestanden</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="981"/>
+        <location filename="../rbutilqtfrm.ui" line="1003"/>
         <source>Remove &amp;bootloader</source>
         <translation>Verwijder de &amp;Bootloader</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="989"/>
+        <location filename="../rbutilqtfrm.ui" line="1012"/>
         <source>Uninstall &amp;Rockbox</source>
         <translation>Deïnstalleer &amp;Rockbox</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1025"/>
+        <location filename="../rbutilqtfrm.ui" line="1049"/>
         <source>&amp;System Info</source>
         <translation>&amp;Systeem Info</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="909"/>
+        <location filename="../rbutilqtfrm.ui" line="922"/>
         <source>&amp;Complete Installation</source>
         <translation>&amp;Complete installatie</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="97"/>
+        <location filename="../rbutilqtfrm.ui" line="89"/>
         <source>device / mountpoint unknown or invalid</source>
         <translation>apparaat / mountpunt is onbekend of ongeldig</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="172"/>
+        <location filename="../rbutilqtfrm.ui" line="166"/>
         <source>Minimal Installation</source>
         <translation>Minimale installatie</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="188"/>
+        <location filename="../rbutilqtfrm.ui" line="183"/>
         <source>&lt;b&gt;Minimal installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.</source>
         <translation>&lt;b&gt;Minimale installatie&lt;/b&gt;&lt;br/&gt;Dit zal de Bootloader en de huidige build van Rockbox installeren. Als u de extra pakketten niet wilt, kies dan deze optie.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="917"/>
+        <location filename="../rbutilqtfrm.ui" line="931"/>
         <source>&amp;Minimal Installation</source>
         <translation>&amp;Minimale installatie</translation>
     </message>
 </context>
 <context>
+    <name>SysTrace</name>
+    <message>
+        <location filename="../systrace.cpp" line="47"/>
+        <source>Save system trace log</source>
+        <translation>Systeem trace log opslaan</translation>
+    </message>
+</context>
+<context>
+    <name>SysTraceFrm</name>
+    <message>
+        <location filename="../systracefrm.ui" line="13"/>
+        <source>System Trace</source>
+        <translation>Systeem trace</translation>
+    </message>
+    <message>
+        <location filename="../systracefrm.ui" line="19"/>
+        <source>System State trace</source>
+        <translation>Systeem trace staat</translation>
+    </message>
+    <message>
+        <location filename="../systracefrm.ui" line="45"/>
+        <source>&amp;Close</source>
+        <translation>&amp;Sluiten</translation>
+    </message>
+    <message>
+        <location filename="../systracefrm.ui" line="56"/>
+        <source>&amp;Save</source>
+        <translation>&amp;Opslaan</translation>
+    </message>
+    <message>
+        <location filename="../systracefrm.ui" line="67"/>
+        <source>&amp;Refresh</source>
+        <translation>&amp;Vernieuwen</translation>
+    </message>
+</context>
+<context>
     <name>Sysinfo</name>
     <message>
-        <location filename="../sysinfo.cpp" line="41"/>
+        <location filename="../sysinfo.cpp" line="45"/>
         <source>&lt;b&gt;OS&lt;/b&gt;&lt;br/&gt;</source>
         <translation>&lt;b&gt;OS&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../sysinfo.cpp" line="42"/>
+        <location filename="../sysinfo.cpp" line="46"/>
         <source>&lt;b&gt;Username&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Gebruikersnaam&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../sysinfo.cpp" line="44"/>
+        <location filename="../sysinfo.cpp" line="48"/>
         <source>&lt;b&gt;Permissions&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Machtigingen&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../sysinfo.cpp" line="46"/>
+        <location filename="../sysinfo.cpp" line="50"/>
         <source>&lt;b&gt;Attached USB devices&lt;/b&gt;&lt;br/&gt;</source>
         <translation>&lt;b&gt;Aangesloten USB apparaten&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../sysinfo.cpp" line="50"/>
+        <location filename="../sysinfo.cpp" line="54"/>
         <source>VID: %1 PID: %2, %3</source>
         <translation>VID: %1 PID: %2, %3</translation>
     </message>
     <message>
-        <location filename="../sysinfo.cpp" line="59"/>
+        <location filename="../sysinfo.cpp" line="63"/>
         <source>Filesystem</source>
         <translation>Bestandssysteem</translation>
     </message>
     <message>
-        <location filename="../sysinfo.cpp" line="62"/>
+        <location filename="../sysinfo.cpp" line="66"/>
         <source>%1, %2 MiB available</source>
         <translation>%1, %2 MiB beschikbaar</translation>
     </message>
@@ -2279,80 +2565,135 @@ Dit zal Rockbox %1 installeren. Om de meest recente ontwikkelaars build te insta
 <context>
     <name>TalkFileCreator</name>
     <message>
-        <location filename="../talkfile.cpp" line="41"/>
+        <location filename="../base/talkfile.cpp" line="36"/>
         <source>Starting Talk file generation</source>
         <translation>Bezig met starten van Talk bestands generatie</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="49"/>
         <source>Init of TTS engine failed</source>
-        <translation>Initialisatie van de TTS engine is mislukt</translation>
+        <translation type="obsolete">Initialisatie van de TTS engine is mislukt</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="59"/>
         <source>Init of Encoder engine failed</source>
-        <translation>Initialisatie van de Encoder engine is mislukt</translation>
+        <translation type="obsolete">Initialisatie van de Encoder engine is mislukt</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="74"/>
-        <location filename="../talkfile.cpp" line="258"/>
-        <location filename="../talkfile.cpp" line="303"/>
-        <location filename="../talkfile.cpp" line="340"/>
-        <location filename="../talkfile.cpp" line="392"/>
+        <location filename="../base/talkfile.cpp" line="44"/>
         <source>Talk file creation aborted</source>
         <translation>Talk bestand creatie afgebroken</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="312"/>
         <source>Encoding of %1 failed</source>
-        <translation>Encoderen van %1 mislukt</translation>
+        <translation type="obsolete">Encoderen van %1 mislukt</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="146"/>
+        <location filename="../base/talkfile.cpp" line="78"/>
         <source>Finished creating Talk files</source>
         <translation>Klaar met genereren van Talk bestanden</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="71"/>
+        <location filename="../base/talkfile.cpp" line="41"/>
         <source>Reading Filelist...</source>
         <translation>Bezig met inlezen van de bestandslijst...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="106"/>
         <source>Voicing entries...</source>
-        <translation>Bezig met inspreken van items...</translation>
+        <translation type="obsolete">Bezig met inspreken van items...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="115"/>
         <source>Encoding files...</source>
-        <translation>Bezig met encoderen van bestanden...</translation>
+        <translation type="obsolete">Bezig met encoderen van bestanden...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="123"/>
         <source>Copying Talkfile for Dirs...</source>
-        <translation>Bezig met kopiëren van Talk bestanden voor mappen...</translation>
+        <translation type="obsolete">Bezig met kopiëren van Talk bestanden voor mappen...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="132"/>
         <source>Copying Talkfile for Files...</source>
-        <translation>Bezig met kopiëren van Talk bestanden voor bestanden...</translation>
+        <translation type="obsolete">Bezig met kopiëren van Talk bestanden voor bestanden...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="358"/>
-        <location filename="../talkfile.cpp" line="416"/>
+        <location filename="../base/talkfile.cpp" line="66"/>
+        <source>Copying Talkfiles...</source>
+        <translation>Bezig met kopiëren van Talk bestanden...</translation>
+    </message>
+    <message>
+        <location filename="../base/talkfile.cpp" line="202"/>
+        <source>File copy aborted</source>
+        <translation>Kopiëren afgebroken</translation>
+    </message>
+    <message>
+        <location filename="../base/talkfile.cpp" line="220"/>
         <source>Copying of %1 to %2 failed</source>
         <translation>Kopiëren van %1 naar %2 mislukt</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="438"/>
+        <location filename="../base/talkfile.cpp" line="241"/>
         <source>Cleaning up..</source>
         <translation>Bezig met opkuisen..</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="269"/>
-        <location filename="../talkfile.cpp" line="274"/>
+        <location filename="../base/talkfile.cpp" line="252"/>
+        <source>Finished</source>
+        <translation>Voltooid</translation>
+    </message>
+    <message>
+        <source>Voicing of %1 failed: %2</source>
+        <translation type="obsolete">Omzetten naar spraak van %1 mislukt: %2</translation>
+    </message>
+</context>
+<context>
+    <name>TalkGenerator</name>
+    <message>
+        <location filename="../base/talkgenerator.cpp" line="38"/>
+        <source>Starting TTS Engine</source>
+        <translation>Bezig met starten van de TTS engine</translation>
+    </message>
+    <message>
+        <location filename="../base/talkgenerator.cpp" line="43"/>
+        <source>Init of TTS engine failed</source>
+        <translation>Initialisatie van de TTS engine is mislukt</translation>
+    </message>
+    <message>
+        <location filename="../base/talkgenerator.cpp" line="50"/>
+        <source>Starting Encoder Engine</source>
+        <translation>Bezig met starten van de Encoder engine</translation>
+    </message>
+    <message>
+        <location filename="../base/talkgenerator.cpp" line="54"/>
+        <source>Init of Encoder engine failed</source>
+        <translation>Initialisatie van de Encoder engine is mislukt</translation>
+    </message>
+    <message>
+        <location filename="../base/talkgenerator.cpp" line="64"/>
+        <source>Voicing entries...</source>
+        <translation>Bezig met inspreken van items...</translation>
+    </message>
+    <message>
+        <location filename="../base/talkgenerator.cpp" line="79"/>
+        <source>Encoding files...</source>
+        <translation>Bezig met encoderen van bestanden...</translation>
+    </message>
+    <message>
+        <location filename="../base/talkgenerator.cpp" line="118"/>
+        <source>Voicing aborted</source>
+        <translation>Inspreken afgebroken</translation>
+    </message>
+    <message>
+        <location filename="../base/talkgenerator.cpp" line="153"/>
+        <location filename="../base/talkgenerator.cpp" line="158"/>
         <source>Voicing of %1 failed: %2</source>
         <translation>Omzetten naar spraak van %1 mislukt: %2</translation>
+    </message>
+    <message>
+        <location filename="../base/talkgenerator.cpp" line="196"/>
+        <source>Encoding aborted</source>
+        <translation>Encoderen afgebroken</translation>
+    </message>
+    <message>
+        <location filename="../base/talkgenerator.cpp" line="222"/>
+        <source>Encoding of %1 failed</source>
+        <translation>Encoderen van %1 mislukt</translation>
     </message>
 </context>
 <context>
@@ -2663,72 +3004,94 @@ HTTP response code: %1</source>
 <context>
     <name>VoiceFileCreator</name>
     <message>
-        <location filename="../voicefile.cpp" line="43"/>
+        <location filename="../base/voicefile.cpp" line="39"/>
         <source>Starting Voicefile generation</source>
         <translation>Bezig met starten van spraakbestanden generatie</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="104"/>
+        <location filename="../base/voicefile.cpp" line="80"/>
+        <source>Downloading voice info..</source>
+        <translation>Bezig met downloaden van spraak informatie..</translation>
+    </message>
+    <message>
+        <location filename="../base/voicefile.cpp" line="93"/>
         <source>Download error: received HTTP error %1.</source>
         <translation>Download fout: HTTP fout %1.</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="109"/>
+        <location filename="../base/voicefile.cpp" line="99"/>
         <source>Cached file used.</source>
         <translation>Gecached bestand gebruikt.</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="111"/>
+        <location filename="../base/voicefile.cpp" line="102"/>
         <source>Download error: %1</source>
         <translation>Download fout : %1</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="116"/>
+        <location filename="../base/voicefile.cpp" line="107"/>
         <source>Download finished.</source>
         <translation>Download voltooid.</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="125"/>
+        <location filename="../base/voicefile.cpp" line="115"/>
         <source>failed to open downloaded file</source>
         <translation>kon gedownload bestand niet openen</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="138"/>
+        <location filename="../base/voicefile.cpp" line="123"/>
+        <source>Reading strings...</source>
+        <translation>Bezig met inlezen van zinnen...</translation>
+    </message>
+    <message>
+        <location filename="../base/voicefile.cpp" line="190"/>
+        <source>Creating voicefiles...</source>
+        <translation>Bezig met aanmaken van spraakbestanden...</translation>
+    </message>
+    <message>
+        <location filename="../base/voicefile.cpp" line="231"/>
+        <source>Cleaning up..</source>
+        <translation>Bezig met opkuisen..</translation>
+    </message>
+    <message>
+        <location filename="../base/voicefile.cpp" line="242"/>
+        <source>Finished</source>
+        <translation>Voltooid</translation>
+    </message>
+    <message>
         <source>Init of TTS engine failed</source>
-        <translation>Initialisatie van de TTS engine is mislukt</translation>
+        <translation type="obsolete">Initialisatie van de TTS engine is mislukt</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="149"/>
         <source>Init of Encoder engine failed</source>
-        <translation>Initialisatie van de Encoder engine is mislukt</translation>
+        <translation type="obsolete">Initialisatie van de Encoder engine is mislukt</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="192"/>
+        <location filename="../base/voicefile.cpp" line="167"/>
         <source>The downloaded file was empty!</source>
         <translation>Het gedownloadede bestand was leeg!</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="231"/>
         <source>creating </source>
-        <translation>bezig met creëren</translation>
+        <translation type="obsolete">bezig met creëren</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="257"/>
+        <location filename="../base/voicefile.cpp" line="195"/>
         <source>Error opening downloaded file</source>
         <translation>Fout bij openen van gedownload bestand</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="266"/>
+        <location filename="../base/voicefile.cpp" line="204"/>
         <source>Error opening output file</source>
         <translation>Fout bij openen van output bestand</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="288"/>
+        <location filename="../base/voicefile.cpp" line="222"/>
         <source>successfully created.</source>
         <translation>succesvol gecreëerd.</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="57"/>
+        <location filename="../base/voicefile.cpp" line="52"/>
         <source>could not find rockbox-info.txt</source>
         <translation>kon het bestand rockbox-info.txt niet vinden</translation>
     </message>
@@ -2867,37 +3230,40 @@ HTTP response code: %1</source>
         <translation>Over Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../aboutbox.ui" line="34"/>
+        <location filename="../aboutbox.ui" line="35"/>
         <source>The Rockbox Utility</source>
         <translation>Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../aboutbox.ui" line="72"/>
         <source>http://www.rockbox.org</source>
-        <translation>http://www.rockbox.org</translation>
+        <translation type="obsolete">http://www.rockbox.org</translation>
+    </message>
+    <message utf8="true">
+        <location filename="../aboutbox.ui" line="57"/>
+        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2009 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
+        <translation>Installatie en schoonmaak hulpmiddel voor de Rockbox open source digitale audio speler firmware.&lt;br/&gt;© 2005 - 2009 Het Rockbox Team&lt;br/&gt;Vrijgegeven onder GNU General Public License v2.&lt;br/&gt;Gebruikt iconen van het &lt;a href=&quot;http://tango.freedesktop.org&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../aboutbox.ui" line="95"/>
+        <location filename="../aboutbox.ui" line="77"/>
         <source>&amp;Credits</source>
         <translation>&amp;Medewerkers</translation>
     </message>
     <message>
-        <location filename="../aboutbox.ui" line="127"/>
+        <location filename="../aboutbox.ui" line="109"/>
         <source>&amp;License</source>
         <translation>&amp;Licentie</translation>
     </message>
     <message>
-        <location filename="../aboutbox.ui" line="169"/>
+        <location filename="../aboutbox.ui" line="151"/>
         <source>&amp;Ok</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../aboutbox.ui" line="56"/>
         <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.
 
 © 2005 - 2009 The Rockbox Team.
 Released under the GNU General Public License v2.</source>
-        <translation>Installatie en schoonmaak hulpmiddel voor de Rockbox open source digitale audio speler firmware.
+        <translation type="obsolete">Installatie en schoonmaak hulpmiddel voor de Rockbox open source digitale audio speler firmware.
 
 © 2005 - 2009 Het Rockbox Team.
 Vrijgegeven onder GNU General Public License v2.</translation>
