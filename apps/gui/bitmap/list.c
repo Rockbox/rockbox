@@ -285,10 +285,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 }
 
 #if defined(HAVE_TOUCHSCREEN)
-/* This needs to be fixed if we ever get more than 1 touchscreen on a target.
- * This also assumes the whole screen is used, which is a bad assumption but
- * fine until customizable lists comes in...
- */
+/* This needs to be fixed if we ever get more than 1 touchscreen on a target. */
 static bool scrolling=false;
 
 static int gui_synclist_touchscreen_scrollbar(struct gui_synclist * gui_list,
@@ -400,7 +397,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
              */
             if(global_settings.scrollbar == SCROLLBAR_RIGHT &&
                x > list_text[screen].x + list_text[screen].width -
-                   global_settings.scrollbar_width)
+                   get_icon_width(SCREEN_MAIN))
                 return ACTION_NONE;
             
             if (button == (BUTTON_REPEAT|BUTTON_REL))
