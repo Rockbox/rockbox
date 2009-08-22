@@ -393,6 +393,16 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                 return ACTION_REDRAW;
             }
             
+            /* This has the same effect as the icons do when the scrollbar
+               is on the left (ie eliminate the chances an user enters/starts
+               an item when he wanted to use the scrollbar, due to touchscreen
+               dead zones)
+             */
+            if(global_settings.scrollbar == SCROLLBAR_RIGHT &&
+               x > list_text[screen].x + list_text[screen].width -
+                   global_settings.scrollbar_width)
+                return ACTION_NONE;
+            
             if (button == (BUTTON_REPEAT|BUTTON_REL))
             {
                 if(!scrolling)
