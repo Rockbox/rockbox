@@ -57,6 +57,7 @@ bool VoiceFileCreator::createVoiceFile()
     QString target = info.target();
     QString features = info.features();
     QString version = info.version();
+    m_targetid = info.targetID().toInt();
     version = version.left(version.indexOf("-")).remove("r");
  
     //prepare download url

@@ -94,7 +94,6 @@ class RbSettings : public QObject
             CurName,
             CurBuildserverModel,
             CurConfigureModel,
-            CurTargetId,
         };
         
         //! call this to flush the user Settings

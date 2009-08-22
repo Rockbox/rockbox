@@ -40,7 +40,6 @@ public:
     bool createVoiceFile();
 
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
-    void setTargetId(int id){m_targetid = id;}
     void setLang(QString name){m_lang =name;}
     void setWavtrimThreshold(int th){m_wavtrimThreshold = th;}
     

@@ -55,7 +55,6 @@ const static struct {
     { RbSettings::CurName,              ":platform:/name",      "" },
     { RbSettings::CurBuildserverModel,  ":platform:/buildserver_modelname", "" },
     { RbSettings::CurConfigureModel,    ":platform:/configure_modelname", "" },
-    { RbSettings::CurTargetId,          ":platform:/targetid",  "" },
 };
 
 // user settings

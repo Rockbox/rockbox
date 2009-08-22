@@ -55,7 +55,6 @@ void CreateVoiceWindow::accept()
     
     //configure voicecreator
     voicecreator->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
-    voicecreator->setTargetId(RbSettings::value(RbSettings::CurTargetId).toInt());
     voicecreator->setLang(lang);
     voicecreator->setWavtrimThreshold(wvThreshold);
        
