@@ -94,7 +94,7 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
     display->puts_scroll_style(0, 0, list->title, style);
     return true;
 }
-    
+
 void list_draw(struct screen *display, struct gui_synclist *list)
 {
     struct viewport list_icons;
@@ -298,6 +298,8 @@ static int gui_synclist_touchscreen_scrollbar(struct gui_synclist * gui_list,
     int nb_lines = viewport_get_nb_lines(&list_text[screen]);
     if (nb_lines <  gui_list->nb_items)
     {
+        scrolling = true;
+
         int scrollbar_size = nb_lines*
             font_get(gui_list->parent[screen]->font)->height;
         int actual_y = y - list_text[screen].y;
