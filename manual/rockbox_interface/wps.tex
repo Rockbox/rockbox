@@ -96,6 +96,7 @@ your WPS (While Playing Screen).
       %
       \opt{ONDIO_PAD}{\ActionWpsContext{} twice}%
       \nopt{ONDIO_PAD}{\ActionWpsMenu}%
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsMenu}
       & Enter \setting{Main Menu}%
       \opt{ONDIO_PAD}{ via the \setting{WPS Context Menu}}.\\%
       %
@@ -153,7 +154,7 @@ your WPS (While Playing Screen).
       \opt{HAVEREMOTEKEYMAP}{
         &
           \opt{IRIVER_RC_H100_PAD}{\ActionRCWpsAbSetAPrevDir{} or}
-        Short \ActionRCWpsSkipNext{} + Long \ActionRCWpsSkipNext}
+        Short \ActionRCWpsSkipPrev{} + Long \ActionRCWpsSkipPrev}
       & Skip to the previous directory.\\
       %
       \opt{SANSA_E200_PAD,SANSA_C200_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
