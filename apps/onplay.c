@@ -583,12 +583,8 @@ static bool rename_file(void)
     if (!kbd_input(newname + pathlen, (sizeof newname)-pathlen)) {
         if (!strlen(newname + pathlen) ||
             (rename(selected_file, newname) < 0)) {
-            lcd_clear_display();
-            lcd_puts(0,0,str(LANG_RENAME));
-            lcd_puts(0,1,str(LANG_FAILED));
-            lcd_update();
             cond_talk_ids_fq(LANG_RENAME, LANG_FAILED);
-            sleep(HZ*2);
+            splashf(HZ*2, "%s %s", str(LANG_RENAME), str(LANG_FAILED));
         }
         else
             onplay_result = ONPLAY_RELOAD_DIR;
