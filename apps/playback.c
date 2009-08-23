@@ -164,18 +164,6 @@ enum filling_state {
 /* As defined in plugins/lib/xxx2wav.h */
 #define GUARD_BUFSIZE  (32*1024)
 
-/* As defined in plugin.lds */
-#if defined(CPU_PP)
-#define CODEC_IRAM_ORIGIN   ((unsigned char *)0x4000c000)
-#define CODEC_IRAM_SIZE     ((size_t)0xc000)
-#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
-#define CODEC_IRAM_ORIGIN   ((unsigned char *)0x10010000)
-#define CODEC_IRAM_SIZE     ((size_t)0x10000)
-#else
-#define CODEC_IRAM_ORIGIN   ((unsigned char *)0x1000c000)
-#define CODEC_IRAM_SIZE     ((size_t)0xc000)
-#endif
-
 bool audio_is_initialized = false;
 static bool audio_thread_ready SHAREDBSS_ATTR = false;
 
