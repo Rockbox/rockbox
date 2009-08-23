@@ -16,6 +16,8 @@ for my $a (@ARGV) {
     push @{$list}, $a;
 }
 
+exit if (not @files);
+
 my $command = join " ", @params;
 
 # shuffle the file list to spread the load as evenly as we can
@@ -29,7 +31,7 @@ if (open CPUINFO, "</proc/cpuinfo") {
 }
 
 # don't run empty children
-if (scalar @files < $cores)
+if (scalar @files <= $cores)
 {
     $cores = 1;
 }
