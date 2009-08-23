@@ -45,7 +45,7 @@ public:
     void setStripExtensions(bool ov) {m_stripExtensions = ov;}
     void setTalkFolders(bool ov) {m_talkFolders = ov;} 
     void setTalkFiles(bool ov) {m_talkFiles = ov;}
-    
+    void setIgnoreFiles(QStringList wildcards) {m_ignoreFiles=wildcards;}
 public slots:
     void abort();
     
@@ -72,7 +72,8 @@ private:
     bool m_stripExtensions;
     bool m_talkFolders;
     bool m_talkFiles;
-
+    QStringList m_ignoreFiles;
+    
     bool m_abort;
     
     QList<TalkGenerator::TalkEntry> m_talkList;

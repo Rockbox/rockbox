@@ -108,6 +108,7 @@ void InstallTalkWindow::accept()
     talkcreator->setStripExtensions(ui.StripExtensions->isChecked());
     talkcreator->setTalkFolders(ui.talkFolders->isChecked());
     talkcreator->setTalkFiles(ui.talkFiles->isChecked());
+    talkcreator->setIgnoreFiles(ui.ignoreFiles->text().split(",",QString::SkipEmptyParts));
     
     connect(talkcreator, SIGNAL(done(bool)), logger, SLOT(setFinished()));
     connect(talkcreator, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));

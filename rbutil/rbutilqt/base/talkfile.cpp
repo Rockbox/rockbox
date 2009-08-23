@@ -159,6 +159,19 @@ bool TalkFileCreator::createTalkList(QDir startDir)
             // insert into List
             if( !fileInf.fileName().isEmpty() && !fileInf.fileName().endsWith(".talk") && m_talkFiles)
             {
+                //test if we should ignore this file
+                bool match = false;
+                for(int i=0; i < m_ignoreFiles.size();i++)
+                {
+                    QRegExp rx(m_ignoreFiles[i].trimmed());
+                    rx.setPatternSyntax(QRegExp::Wildcard);
+                    if(rx.exactMatch(fileInf.fileName()))
+                        match = true;
+                }
+                if(match)
+                    continue;
+                
+                //generate entry
                 TalkGenerator::TalkEntry entry;
                 if(m_stripExtensions)
                     entry.toSpeak = stripExtension(fileInf.fileName());
