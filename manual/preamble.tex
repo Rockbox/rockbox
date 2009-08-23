@@ -36,6 +36,8 @@
 
 \usepackage{optional}
 
+\usepackage[table]{xcolor}
+
 \input{platform/\platform.tex}
 \input{features.tex}
 
@@ -317,6 +319,7 @@
 % Main Unit Key  &  Remote Key  &  Description \\
 
 \newenvironment{btnmap}[2]{%
+  \rowcolors{1}{}{gray!30}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
     \bottomrule
@@ -328,7 +331,7 @@
   \center
   \opt{HAVEREMOTEKEYMAP}{
     % here is the table width defined for 3 columns
-    \tabularx{.9\textwidth}{>{\raggedright\arraybackslash}p{.2\textwidth}>{\raggedright\arraybackslash}p{.2\textwidth}X}\toprule 
+    \tabularx{.95\textwidth}{>{\raggedright\arraybackslash}p{.2\textwidth}>{\raggedright\arraybackslash}p{.2\textwidth}X}\toprule
   }
   \nopt{HAVEREMOTEKEYMAP}{
     % here is the table width defined for 2 columns
