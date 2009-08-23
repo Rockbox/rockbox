@@ -40,6 +40,7 @@
 #include "screens.h"
 #endif
 #include "viewport.h"
+#include "statusbar.h" /* statusbar_vals enum*/
 
 #ifdef HAVE_BACKLIGHT
 static int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)
@@ -307,23 +308,50 @@ MAKE_MENU(scroll_settings_menu, ID2P(LANG_SCROLL_MENU), 0, Icon_NOICON,
 /***********************************/
 /*    BARS MENU                    */
 #ifdef HAVE_LCD_BITMAP
-static int statusbar_callback(int action,const struct menu_item_ex *this_item)
+static int statusbar_callback_ex(int action,const struct menu_item_ex *this_item,
+                                enum screen_type screen)
 {
     (void)this_item;
+    /* we save the old statusbar value here, so the old statusbars can get
+     * removed and cleared from the display properly on exiting
+     * (in gui_statusbar_changed() ) */
+    static enum statusbar_values old_bar[NB_SCREENS];
     switch (action)
     {
+        case ACTION_ENTER_MENUITEM:
+#ifdef HAVE_REMOTE_LCD
+            if (screen == SCREEN_REMOTE)
+                old_bar[screen] = global_settings.remote_statusbar;
+            else
+#endif
+                old_bar[screen] = global_settings.statusbar;
+            break;
         case ACTION_EXIT_MENUITEM:
+            gui_statusbar_changed(screen, old_bar[screen]);
             send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
             send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
             break;
     }
     return action;
 }
+
+#ifdef HAVE_REMOTE_LCD
+static int statusbar_callback_remote(int action,const struct menu_item_ex *this_item)
+{
+    return statusbar_callback_ex(action, this_item, SCREEN_REMOTE);
+}
+#endif
+static int statusbar_callback(int action,const struct menu_item_ex *this_item)
+{
+    return statusbar_callback_ex(action, this_item, SCREEN_MAIN);
+}
 MENUITEM_SETTING(scrollbar_item, &global_settings.scrollbar, NULL);
 MENUITEM_SETTING(scrollbar_width, &global_settings.scrollbar_width, NULL);
-MENUITEM_SETTING(statusbar, &global_settings.statusbar, statusbar_callback);
+MENUITEM_SETTING(statusbar, &global_settings.statusbar,
+                                                    statusbar_callback);
 #ifdef HAVE_REMOTE_LCD
-MENUITEM_SETTING(remote_statusbar, &global_settings.remote_statusbar, statusbar_callback);
+MENUITEM_SETTING(remote_statusbar, &global_settings.remote_statusbar,
+                                                    statusbar_callback_remote);
 #endif
 #if CONFIG_KEYPAD == RECORDER_PAD
 MENUITEM_SETTING(buttonbar, &global_settings.buttonbar, NULL);

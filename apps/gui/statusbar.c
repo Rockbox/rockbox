@@ -34,6 +34,7 @@
 #include "powermgmt.h"
 #include "usb.h"
 #include "led.h"
+#include "screen_access.h"
 
 #include "status.h" /* needed for battery_state global var */
 #include "action.h" /* for keys_locked */
@@ -172,13 +173,23 @@ static void gui_statusbar_init(struct gui_statusbar * bar)
 #endif    
 }
 
+#define GET_RECT(vp, vals,display)      do {                        \
+        viewport_set_fullscreen(&(vp), (display)->screen_type);       \
+        (vp).height = STATUSBAR_HEIGHT;                             \
+        (vp).x = STATUSBAR_X_POS;                                   \
+        if ((vals) != STATUSBAR_BOTTOM)                             \
+            (vp).y = 0;                                             \
+        else                                                        \
+            (vp).y = (display)->lcdheight - STATUSBAR_HEIGHT;       \
+        } while(0)
+
 void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 {
     struct screen * display = bar->display;
 
 #ifdef HAVE_LCD_CHARCELLS
     int val;
-    (void)force_redraw; /* players always "redraw" */
+    (void)force_redraw; /* The Player always has "redraw" */
 #endif /* HAVE_LCD_CHARCELLS */
 
     bar->info.battlevel = battery_level();
@@ -263,13 +274,8 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         memcmp(&(bar->info), &(bar->lastinfo), sizeof(struct status_info)))
     {
         struct viewport vp;
-        viewport_set_fullscreen(&vp, display->screen_type);
-        vp.height = STATUSBAR_HEIGHT;
-        vp.x = STATUSBAR_X_POS;
-        if (statusbar_position(display->screen_type) != STATUSBAR_BOTTOM)    
-            vp.y = 0;
-        else
-            vp.y = display->lcdheight - STATUSBAR_HEIGHT;    
+        
+        GET_RECT(vp,statusbar_position(display->screen_type),display);
         display->set_viewport(&vp);
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         display->fillrect(0, 0, display->getwidth(), STATUSBAR_HEIGHT);
@@ -816,11 +822,33 @@ void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
     }
 }
 
-void gui_statusbar_changed(int enabled)
+#ifdef HAVE_LCD_BITMAP
+void gui_statusbar_changed( enum screen_type screen,
+                            enum statusbar_values old)
 {
-    (void)enabled;
-    send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
+    /* clear and update the statusbar area to remove old parts */
+    enum statusbar_values bar;
+#ifdef HAVE_REMOTE_LCD
+    if (screen == SCREEN_REMOTE)
+        bar = global_settings.remote_statusbar;
+    else
+#endif
+        bar = global_settings.statusbar;
+
+    struct screen *display = &screens[screen];
+    struct viewport vp;
+
+    if (old != STATUSBAR_OFF && old != bar)
+    {
+        GET_RECT(vp, old, display);
+        display->set_viewport(&vp);
+        display->clear_viewport();
+        display->update_viewport();
+        display->set_viewport(NULL);
+    }
 }
+#endif
+
 #ifdef HAVE_REMOTE_LCD
 int statusbar_position(int screen)
 {

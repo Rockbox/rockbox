@@ -54,6 +54,9 @@ struct status_info {
 
 };
 
+/* statusbar visibility/position, used for settings also */
+enum statusbar_values { STATUSBAR_OFF = 0, STATUSBAR_TOP, STATUSBAR_BOTTOM };
+
 struct gui_statusbar
 {
     long battery_icon_switch_tick;
@@ -97,8 +100,10 @@ struct gui_syncstatusbar
 };
 
 extern void gui_syncstatusbar_init(struct gui_syncstatusbar * bars);
-extern void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars, bool force_redraw);
-void gui_statusbar_changed(int enabled);
+extern void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
+                                    bool force_redraw);
+void gui_statusbar_changed(enum screen_type screen,
+                            enum statusbar_values old);
 #if !defined(HAVE_REMOTE_LCD) || defined(__PCTOOL__)
 #define statusbar_position(a) (global_settings.statusbar)
 #else

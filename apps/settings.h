@@ -26,6 +26,7 @@
 #include <stddef.h>
 #include "inttypes.h"
 #include "config.h"
+#include "statusbar.h" /* for the statusbar values */
 #include "button.h"
 #if CONFIG_CODEC == SWCODEC
 #include "audio.h"
@@ -155,9 +156,6 @@ enum { REPLAYGAIN_TRACK = 0, REPLAYGAIN_ALBUM, REPLAYGAIN_SHUFFLE, REPLAYGAIN_OF
 
 /* show path types */
 enum { SHOW_PATH_OFF = 0, SHOW_PATH_CURRENT, SHOW_PATH_FULL };
-
-/* statusbar visibility/position */
-enum { STATUSBAR_OFF = 0, STATUSBAR_TOP, STATUSBAR_BOTTOM };
 
 /* scrollbar visibility/position */
 enum { SCROLLBAR_OFF = 0, SCROLLBAR_LEFT, SCROLLBAR_RIGHT };
