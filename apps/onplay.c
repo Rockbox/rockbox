@@ -64,6 +64,7 @@
 #include "cuesheet.h"
 #include "backdrop.h"
 #include "pitchscreen.h"
+#include "viewport.h"
 
 static int context;
 static char* selected_file = NULL;
@@ -661,9 +662,10 @@ static void draw_slider(void)
     int i;
     FOR_NB_SCREENS(i)
     {
-        show_busy_slider(&screens[i], 1,
-                         LCD_HEIGHT-2*screens[i].getcharheight(),
-                         LCD_WIDTH-2, 2*screens[i].getcharheight()-1);
+        struct viewport *vp = &(viewport_get_current_vp())[i];
+        show_busy_slider(&screens[i], vp->x,
+                         (vp->y+vp->height)-2*screens[i].getcharheight(),
+                         vp->width, 2*screens[i].getcharheight()-1);
         screens[i].update();
     }
 }
