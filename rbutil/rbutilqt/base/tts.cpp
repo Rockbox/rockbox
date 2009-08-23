@@ -504,7 +504,7 @@ TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
 bool TTSFestival::configOk()
 {
     QString serverPath = RbSettings::subValue("festival-server",RbSettings::TtsPath).toString();
-    QString clientPath = RbSettings::subValue("festival-client",RbSettings::TtsVoice).toString();
+    QString clientPath = RbSettings::subValue("festival-client",RbSettings::TtsPath).toString();
 
     bool ret = QFileInfo(serverPath).isExecutable() &&
         QFileInfo(clientPath).isExecutable();
