@@ -47,47 +47,98 @@
 #include "../MTP_DLL/MTP_DLL.h"
 #endif
 
+#ifdef WITH_BOOTOBJS
 #define VERSION "1.0 with v1 bootloader"
+#else
+#define VERSION "1.0"
+#endif
 
+enum actions {
+    NONE,
+    INSTALL,
+    SEND,
+    HELP
+};
 
 static void print_usage(void)
 {
     fprintf(stderr,"Usage: beastpatcher [action]\n");
     fprintf(stderr,"\n");
     fprintf(stderr,"Where [action] is one of the following options:\n");
-    fprintf(stderr,"  -i,   --install (default)\n");
-    fprintf(stderr,"  -h,   --help\n");
+#ifdef WITH_BOOTOBJS
+    fprintf(stderr,"  -i,   --install           <bootloader.bin>\n");
+#else
+    fprintf(stderr,"  -i,   --install           bootloader.bin\n");
+#endif
     fprintf(stderr,"  -s,   --send              nk.bin\n");
+    fprintf(stderr,"  -h,   --help\n");
     fprintf(stderr,"\n");
+#ifdef WITH_BOOTOBJS
+    fprintf(stderr,"With bootloader file omitted the embedded one will be used.\n");
+    fprintf(stderr,"\n");
+#endif
 }
 
 
 int main(int argc, char* argv[])
 {
-    int res;
+    int res = 0;
     char yesno[4];
+    int i;
+    unsigned char* bootloader = NULL;
+    unsigned char* firmware = NULL;
+#ifdef WITH_BOOTOBJS
+    int action = INSTALL;
+#else
+    int action = NONE;
+#endif
 
     fprintf(stderr,"beastpatcher v" VERSION " - (C) 2009 by the Rockbox developers\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 
-    if(argc == 1 || strcmp(argv[1],"-i")==0 || strcmp(argv[1],"--install")==0) {
-        res = beastpatcher();
+    i = 1;
+    while(i < argc) {
+        if(strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+            action = HELP;
+        }
+        else if(strcmp(argv[i], "-i") == 0 || strcmp(argv[i], "--install") == 0) {
+            action = INSTALL;
+            if(((i + 1) < argc) && argv[i + 1][0] != '-') {
+                bootloader = argv[++i];
+            }
+#ifndef WITH_BOOTOBJS
+            else {
+                action = NONE;
+            }
+#endif
+        }
+        else if(((strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--send") == 0)
+            && (i + 1) < argc)) {
+            action = SEND;
+            firmware = argv[++i];
+        }
+        i++;
+    }
+
+    if(action == NONE) {
+        print_usage();
+        res = -1;
+    }
+    else if(action == HELP) {
+        print_usage();
+        res = 0;
+    }
+    else if(action == SEND) {
+        res = sendfirm(firmware);
+    }
+    else if(action == INSTALL) {
+        res = beastpatcher(bootloader);
         /* don't ask for enter if started with command line arguments */
         if(argc == 1) {
             printf("\nPress ENTER to exit beastpatcher: ");
             fgets(yesno,4,stdin);
         }
     }
-    else if((argc > 2) && ((strcmp(argv[1],"-s")==0) || (strcmp(argv[1],"--send")==0))) {
-        res = sendfirm(argv[2]);
-    }
-    else {
-        print_usage();
-        res = -1;
-    }
-
     return res;
 }
-
-

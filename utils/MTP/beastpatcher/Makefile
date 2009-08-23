@@ -1,4 +1,4 @@
-CFLAGS=-Wall -W
+CFLAGS=-Wall -W -DWITH_BOOTOBJS
 
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 OUTPUT=beastpatcher.exe

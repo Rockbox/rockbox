@@ -127,12 +127,40 @@ static void create_single_boot(unsigned char* boot, int bootlen,
     return;
 }
 
-int beastpatcher(void)
+int beastpatcher(const unsigned char* bootfile)
 {
     char yesno[4];
     unsigned char* fwbuf;
     int fwsize;
     struct mtp_info_t mtp_info;
+    unsigned char* bootloader = bootimg;
+    unsigned int len_bootloader = LEN_bootimg;
+
+    if (bootfile) {
+        int res;
+        FILE* fp;
+        size_t bread;
+#ifdef _LARGEFILE64_SOURCE
+        struct stat64 sb;
+        res = stat64(bootfile, &sb);
+#else
+        struct stat sb;
+        res = stat(bootfile, &sb);
+#endif
+        if(res == -1) {
+            fprintf(stderr, "[ERR]  Getting bootloader file size failed!\n");
+            return 1;
+        }
+        len_bootloader = sb.st_size;
+        bootloader = (unsigned char*)malloc(len_bootloader);
+        /* load bootloader binary to memory. */
+        fp = fopen(bootfile, "rb");
+        bread = fread(bootloader, sizeof(unsigned char), len_bootloader, fp);
+        if(bread * sizeof(unsigned char) != len_bootloader) {
+            fprintf(stderr, "[ERR]  Error reading firmware file!\n");
+            return 1;
+        }
+    }
 
     if (mtp_init(&mtp_info) < 0) {
         fprintf(stderr,"[ERR]  Can not init MTP\n");
@@ -158,7 +186,7 @@ int beastpatcher(void)
         if (yesno[0]=='i')
         {
             /* Create a single-boot bootloader from the embedded bootloader */
-            create_single_boot(bootimg, LEN_bootimg, &fwbuf, &fwsize);
+            create_single_boot(bootloader, len_bootloader, &fwbuf, &fwsize);
 
             if (fwbuf == NULL)
                 return 1;
@@ -179,6 +207,9 @@ int beastpatcher(void)
         {
             fprintf(stderr,"[INFO] Installation cancelled.\n");
         }
+    }
+    if(bootfile) {
+        free(bootloader);
     }
 
     mtp_finished(&mtp_info);
