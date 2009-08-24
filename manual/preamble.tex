@@ -251,7 +251,7 @@
 % Note: you still need to enclose this with \begin{table} / \end{table}
 % Cheers for the usenet helping me building this up :)
 \newenvironment{tagmap}[2]{%
-\rowcolors{1}{tbloddrowbgcolor}{tblevenrowbgcolor}
+\rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
     \bottomrule
@@ -261,7 +261,7 @@
     \endcenter%
   }
   \center
-\tabularx{\textwidth}{lX}\toprule % here is the table width defined
+\tabularx{\textwidth}{lX}\toprule\rowcolor{tblhdrbgcolor} % here is the table width defined
   \taghead
 }{%
   \endtabularx
@@ -361,7 +361,7 @@
 % Main Unit Key  &  Remote Key  &  Description \\
 
 \newenvironment{btnmap}[2]{%
-  \rowcolors{1}{tbloddrowbgcolor}{tblevenrowbgcolor}
+  \rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
     \bottomrule
@@ -373,11 +373,11 @@
   \center
   \opt{HAVEREMOTEKEYMAP}{
     % here is the table width defined for 3 columns
-    \tabularx{.95\textwidth}{>{\raggedright\arraybackslash}p{.2\textwidth}>{\raggedright\arraybackslash}p{.2\textwidth}X}\toprule
+    \tabularx{.95\textwidth}{>{\raggedright\arraybackslash}p{.2\textwidth}>{\raggedright\arraybackslash}p{.2\textwidth}X}\toprule\rowcolor{tblhdrbgcolor}
   }
   \nopt{HAVEREMOTEKEYMAP}{
     % here is the table width defined for 2 columns
-    \tabularx{.75\textwidth}{>{\raggedright\arraybackslash}p{.22\textwidth}X}\toprule
+    \tabularx{.75\textwidth}{>{\raggedright\arraybackslash}p{.22\textwidth}X}\toprule\rowcolor{tblhdrbgcolor}
   }
   \btnhead
 }{%
