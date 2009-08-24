@@ -41,8 +41,8 @@ PLUGIN_HEADER
 /* final game return status */
 enum {
     BB_LOSE,
+    BB_QUIT_WITHOUT_SAVING,
     BB_QUIT,
-    BB_SAVE_AND_QUIT,
     BB_USB,
     BB_END,
     BB_WIN,
@@ -2369,7 +2369,7 @@ static int bubbles_menu(struct game_context* bb) {
     MENUITEM_STRINGLIST(menu,"Bubbles Menu",NULL,
                         "Resume Game", "Start New Game",
                         "Level", "High Scores", "Playback Control",
-                        "Quit", "Save and Quit");
+                        "Quit without Saving", "Quit");
 
     while(!startgame){
         switch (rb->do_menu(&menu, &selected, NULL, false))
@@ -2400,10 +2400,10 @@ static int bubbles_menu(struct game_context* bb) {
             case 4: /* Playback Control */
                 playback_control(NULL);
                 break;
-            case 5: /* quit */
-                return BB_QUIT;
+            case 5: /* quit but don't save */
+                return BB_QUIT_WITHOUT_SAVING;
             case 6: /* save and quit  */
-                return BB_SAVE_AND_QUIT;
+                return BB_QUIT;
             case MENU_ATTACHED_USB:
                 bubbles_callback(bb);
                 return BB_USB;
@@ -2518,14 +2518,17 @@ enum plugin_status plugin_start(const void* parameter) {
                 exit = true;
                 break;
 
-            case BB_SAVE_AND_QUIT:
-                rb->splash(HZ/2, "Saving Game ...");
-                bubbles_savegame(&bb);
-                /* fall through */
-
             case BB_QUIT:
+                /* the first splash is to make sure it's read, but don't make it
+                 * too long to not delay the saving further */
+                rb->splash(HZ/5, "Saving Game ...");
+                rb->splash(0, "Saving Game ...");
+                bubbles_savegame(&bb);
                 bubbles_savedata();
                 highscore_save(SCORE_FILE, highscores, NUM_SCORES);
+                /* fall through */
+
+            case BB_QUIT_WITHOUT_SAVING:
                 exit = true;
                 break;
 
