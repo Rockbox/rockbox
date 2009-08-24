@@ -279,10 +279,10 @@
     *: "Are You Sure?"
   </source>
   <dest>
-    *: "Etes-Vous Sûr ?"
+    *: "Etes-vous sûr ?"
   </dest>
   <voice>
-    *: "Etes-Vous Sûr ?"
+    *: "Etes-vous sûr ?"
   </voice>
 </phrase>
 <phrase>
@@ -1596,7 +1596,7 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "AR/RR pas Minimum"
+    *: "AR/RR pas minimum"
   </dest>
   <voice>
     *: "Pas minimum d'avance ou retour rapide"
@@ -8362,10 +8362,10 @@
   </source>
   <dest>
     *: none
-    recording: "Disque Plein. Presser OFF pour continuer."
-    h100,h120,h300: "Disque Plein. Presser STOP pour continuer."
-    m5,x5: "Disque Plein. Presser POWER pour continuer."
-    e200*,c200*: "Disque Plein. Presser PREV pour continuer."
+    recording: "Disque plein. Presser OFF pour continuer."
+    h100,h120,h300: "Disque plein. Presser STOP pour continuer."
+    m5,x5: "Disque Plein. presser POWER pour continuer."
+    e200*,c200*: "Disque plein. Presser PREV pour continuer."
   </dest>
   <voice>
     *: none
