@@ -29,6 +29,7 @@
 #include "screen_access.h"
 #include "wps_internals.h"
 #include "skin_tokens.h"
+#include "skin_buffer.h"
 
 /* skin buffer management.
  * This module is used to allocate space in a single global skin buffer for
