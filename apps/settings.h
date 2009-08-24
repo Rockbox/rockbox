@@ -552,9 +552,9 @@ struct user_settings
     int volume_type;   /* how volume is displayed: 0=graphic, 1=percent */
     int battery_display; /* how battery is displayed: 0=graphic, 1=percent */
     bool show_icons;   /* 0=hide 1=show */
-    int statusbar;    /* STATUSBAR_* enum values */
+    enum statusbar_values statusbar;    /* STATUSBAR_* enum values */
 #ifdef HAVE_REMOTE_LCD
-    int remote_statusbar;
+    enum statusbar_values remote_statusbar;
 #endif        
 
 #if CONFIG_KEYPAD == RECORDER_PAD

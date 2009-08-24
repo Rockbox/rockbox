@@ -827,13 +827,7 @@ void gui_statusbar_changed( enum screen_type screen,
                             enum statusbar_values old)
 {
     /* clear and update the statusbar area to remove old parts */
-    enum statusbar_values bar;
-#ifdef HAVE_REMOTE_LCD
-    if (screen == SCREEN_REMOTE)
-        bar = global_settings.remote_statusbar;
-    else
-#endif
-        bar = global_settings.statusbar;
+    enum statusbar_values bar = statusbar_position(screen);
 
     struct screen *display = &screens[screen];
     struct viewport vp;
@@ -850,7 +844,7 @@ void gui_statusbar_changed( enum screen_type screen,
 #endif
 
 #ifdef HAVE_REMOTE_LCD
-int statusbar_position(int screen)
+enum statusbar_values statusbar_position(int screen)
 {
     if (screen == SCREEN_REMOTE)
         return global_settings.remote_statusbar;

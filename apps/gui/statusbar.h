@@ -107,7 +107,7 @@ void gui_statusbar_changed(enum screen_type screen,
 #if !defined(HAVE_REMOTE_LCD) || defined(__PCTOOL__)
 #define statusbar_position(a) (global_settings.statusbar)
 #else
-int statusbar_position(int screen);
+enum statusbar_values statusbar_position(int screen);
 #endif
 
 #endif /*_GUI_STATUSBAR_H_*/

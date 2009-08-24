@@ -319,13 +319,7 @@ static int statusbar_callback_ex(int action,const struct menu_item_ex *this_item
     switch (action)
     {
         case ACTION_ENTER_MENUITEM:
-#ifdef HAVE_REMOTE_LCD
-            if (screen == SCREEN_REMOTE)
-                old_bar[screen] = global_settings.remote_statusbar;
-            else
-#endif
-                old_bar[screen] = global_settings.statusbar;
-            break;
+            old_bar[screen] = statusbar_position(screen);
         case ACTION_EXIT_MENUITEM:
             gui_statusbar_changed(screen, old_bar[screen]);
             send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
