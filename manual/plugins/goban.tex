@@ -34,10 +34,8 @@ The information panel which displays the current move number may also contain
 these markers: \\
 
 \begin{table}
-  \begin{center}
-  \rowcolors{1}{}{tblrowbgcolor}
-    \begin{tabularx}{\textwidth}{lX}\toprule
-      \textbf{Mark} & \textbf{Meaning} \\ \midrule
+    \begin{rbtabular}{\textwidth}{lX}%
+      {\textbf{Mark} & \textbf{Meaning}}{}{}
       \emph{+ } & There are nodes after the current node in the SGF tree. \\
       \emph{* } & There are sibling variations which can be navigated to using the %
       \emph{Next Variation} menu option of the \emph{Context Menu}%
@@ -53,9 +51,7 @@ these markers: \\
          \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec} button}. \\
       \emph{C } & There is a comment at the current node.  It can be viewed/edited using
                 the \emph{Add/Edit Comment} menu option of the \emph{Context Menu}. \\
-      \bottomrule
-    \end{tabularx}
-  \end{center}
+    \end{rbtabular}
 \end{table}
 
 \subsubsection{Controls}

@@ -62,7 +62,8 @@
 
 % Colors used to typeset table headers and alternating table rows
 \colorlet{tblhdrbgcolor}{gray!60} % Background color for headers
-\colorlet{tblrowbgcolor}{gray!30} % Background color for rows
+\colorlet{tbloddrowbgcolor}{white} % Background color for odd rows (headers not included)
+\colorlet{tblevenrowbgcolor}{gray!30} % Background color for even rows (headers not included)
 
 \usepackage{fancyhdr}
 \usepackage{graphicx}
@@ -201,6 +202,43 @@
 \setcounter{totalnumber}{5}  % default: 3
 
 
+% Environment for typesetting tables in a consistent way. The header has
+% a darker background; rows are white and light gray (alternating). Top,
+% middle and bottom rules are automatically set.
+%
+% Params:
+%    #1 -- table width
+%    #2 -- column specification (as used in the package tabularx)
+%    #3 -- contents of the header row. The number of items must
+%          match the number of specs in #2
+%    #4 -- caption (optional). If used then this must be inside a floating
+%          environment, e.g. table
+%    #5 -- label (optional)
+%
+% Example:
+% \begin{rbtabular}{0.9\textwidth}{lX}{Col1 & Col2}{}{}
+% A1 & A2\\
+% B1 & B2\\
+% C1 & C2\\
+% \end{rbtabular}
+%    
+\newenvironment{rbtabular}[5]{%
+  \rowcolors{2}{tblevenrowbgcolor}{tbloddrowbgcolor}
+  \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
+  \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
+    \bottomrule
+    \SavedEndTab%
+    \if\given{#4}\caption{#4}\fi%
+    \if\given{#5}\label{#5}\fi%
+    \endcenter%
+  }
+  \center
+  \tabularx{#1}{#2}\toprule\rowcolor{tblhdrbgcolor}
+  #3\\\midrule
+}{%
+  \endtabularx
+}
+
 
 
 
@@ -214,7 +252,7 @@
 % Note: you still need to enclose this with \begin{table} / \end{table}
 % Cheers for the usenet helping me building this up :)
 \newenvironment{tagmap}[2]{%
-\rowcolors{1}{}{tblrowbgcolor}
+\rowcolors{1}{tblevenrowbgcolor}{tbloddrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
     \bottomrule
@@ -324,7 +362,7 @@
 % Main Unit Key  &  Remote Key  &  Description \\
 
 \newenvironment{btnmap}[2]{%
-  \rowcolors{1}{}{tblrowbgcolor}
+  \rowcolors{1}{tblevenrowbgcolor}{tbloddrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
     \bottomrule

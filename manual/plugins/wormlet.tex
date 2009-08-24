@@ -39,9 +39,9 @@ Game controls:}
 
 \opt{RECORDER_PAD}{
 \renewcommand{\arraystretch}{1.8}
-\begin{tabularx}{\textwidth}{c X p{3cm} p{3cm} p{3cm}}\toprule
-\textbf{Players} & \textbf{Modes} & \textbf{Player 1} & \textbf{Player 2}
-                        & \textbf{Player 3}\\\midrule
+\begin{rbtabular}{\textwidth}{c X p{3cm} p{3cm} p{3cm}}%
+{\textbf{Players} & \textbf{Modes} & \textbf{Player 1} & \textbf{Player 2}
+                        & \textbf{Player 3}}{}{}
 %
 0 & Out of control & \multicolumn{3}{p{9cm}}{With no player taking part in the
     game all worms are out of control and steered by artificial stupidity.}\\
@@ -65,7 +65,7 @@ Game controls:}
                         & on remote control VOL DOWN: turn left VOL UP: turn
                         right & on \dap\ \ButtonFTwo: turn left \ButtonFThree:
                         turn right \\
-\end{tabularx}
+\end{rbtabular}
 \renewcommand{\arraystretch}{1.0}
 }
 

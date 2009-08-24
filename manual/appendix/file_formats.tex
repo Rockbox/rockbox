@@ -2,11 +2,9 @@
 \chapter{File formats}
 \section{\label{ref:Supportedfileformats}Supported file formats}
 \begin{table}
-\begin{center}
-\rowcolors{1}{}{tblrowbgcolor}
-\begin{tabularx}{\textwidth}{clp{7em}X}\toprule
-\textbf{Icon} & \textbf{File Type} & \textbf{Extension} 
-  & \textbf{Action when selected} \\\midrule%
+\begin{rbtabular}{\textwidth}{clp{7em}X}%
+{\textbf{Icon} & \textbf{File Type} & \textbf{Extension} 
+  & \textbf{Action when selected}}{}{}
 \includegraphics[width=0.37cm]{appendix/images/icon-directory.png} 
   & Directory & \emph{none} & Enter the directory \\
 \includegraphics[width=0.37cm]{appendix/images/icon-audio-file.png} 
@@ -74,18 +72,14 @@
   & Game of Life & \fname{.cells} & Show the configuration with the
      ``Rocklife'' plugin\\}
 
-\bottomrule
-\end{tabularx}
-\end{center}
+\end{rbtabular}
 \end{table}
 
 \opt{swcodec}{
   \section{\label{ref:Supportedaudioformats}Supported audio formats}
   \begin{table}
-  \begin{center}
-  \rowcolors{1}{}{tblrowbgcolor}
-  \begin{tabularx}{\textwidth}{lp{6em}X}\toprule
-  \textbf{Format} & \textbf{Extension} & \textbf{Notes} \\\midrule
+  \begin{rbtabular}{\textwidth}{lp{6em}X}%
+  {\textbf{Format} & \textbf{Extension} & \textbf{Notes}}{}{}
     \multicolumn{2}{c}{\textbf{Lossy codecs}}\\
     \midrule
     MPEG audio & \fname{.mp1, .mpa, .mp2, .mp3} & \\
@@ -127,8 +121,6 @@
     NES Sound Format & \fname{.nsf, .nsfe} & \\
     SPC700 & \fname{.spc} & \\
     Atari SAP & \fname{.sap} & \\
-  \bottomrule
-  \end{tabularx}
-  \end{center}
+  \end{rbtabular}
   \end{table}
 }

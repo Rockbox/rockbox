@@ -113,12 +113,8 @@ to use it just do not do the initial build of the database and do not load it
 to RAM.}%
 
 \begin{table}
-\begin{center}
-\rowcolors{1}{}{tblrowbgcolor}
-  \begin{tabularx}{.75\textwidth}{XXX}%
-  \toprule%
-  \textbf{Tag}   & \textbf{Type}  & \textbf{Origin} \\
-  \midrule
+  \begin{rbtabular}{.75\textwidth}{XXX}%
+  {\textbf{Tag}   & \textbf{Type}  & \textbf{Origin}}{}{}
   filename              & string    & system \\ 
   album                 & string    & id tag \\
   albumartist           & string    & id tag \\
@@ -143,7 +139,5 @@ to RAM.}%
   length                & numeric   & system \\
   Lm (track len - min)  & numeric   & system \\
   Ls (track len - sec)  & numeric   & system \\
-  \bottomrule
-  \end{tabularx}
-\end{center}
+  \end{rbtabular}
 \end{table}

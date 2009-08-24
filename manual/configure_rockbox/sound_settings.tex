@@ -80,10 +80,8 @@ change to customise your listening experience.
   Available options are:
   %
   \begin{table}
-  \begin{center}
-  \rowcolors{1}{}{tblrowbgcolor}
-  \begin{tabularx}{\textwidth}{lX}\toprule
-      \textbf{Setting} & \textbf{Description} \\\midrule
+  \begin{rbtabular}{\textwidth}{lX}%
+      {\textbf{Setting} & \textbf{Description}}{}{}
         Stereo
         & Leave the audio signal unmodified. \\
         %
@@ -107,9 +105,7 @@ change to customise your listening experience.
           to make the singer sound centrally placed, this often (but not 
           always) has the effect of removing the voice track from a song. This 
           setting also very often has other undesirable effects on the sound.  \\
-        \bottomrule
-  \end{tabularx}
-  \end{center}
+  \end{rbtabular}
   \end{table}
 
 \section{Stereo Width}
@@ -198,16 +194,12 @@ change to customise your listening experience.
     Rockbox uses are:
     %
     \begin{table}[h!]
-      \begin{center}
-      \rowcolors{1}{}{tblrowbgcolor}
-        \begin{tabular}{@{}lc@{}}\toprule
-          Setting & Value \\\midrule
+       \begin{rbtabular}{0.5\textwidth}{Xc}{Setting & Value}{}{}
           MDB Strength & 50dB \\
           MDB Harmonics & 48\% \\
           MDB Centre Frequency & 60Hz \\
-          MDB Shape & 90Hz \\\bottomrule
-        \end{tabular}
-      \end{center}
+          MDB Shape & 90Hz \\
+       \end{rbtabular}
     \end{table}
       
   \end{description}
