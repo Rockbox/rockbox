@@ -2231,8 +2231,6 @@ static bool bubbles_loadgame(struct game_context* bb) {
 
     rb->close(fd);
 
-    /* delete saved file */
-    rb->remove(SAVE_FILE);
     return ret;
 }
 
@@ -2378,14 +2376,12 @@ static int bubbles_menu(struct game_context* bb) {
         {
             case 0: /* resume game */
                 if (!resume)
-                {
                     rb->splash(HZ/2, "Nothing to resume");
-                    break;
-                }
                 else
-                {
                     startgame = true;
-                }
+
+                if(rb->file_exists(SAVE_FILE))
+                    rb->remove(SAVE_FILE); 
                 break;
             case 1: /* new game */
                 bb->level = startlevel;
