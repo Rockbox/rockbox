@@ -83,8 +83,35 @@ customize the visual apperance of Rockbox.
     Rockbox allows you to select bitmap pictures to use as backdrops,
     see \reference{ref:LoadingBackdrops} for further information.
     This option allows you to clear the backdrops that you set.
-}%
-
+}
+%
+  \opt{lcd_bitmap}{
+    \item[Status/Scrollbar:]
+      Settings related to on screen status display and the scrollbar.
+      \begin{description}
+      \item[Scroll Bar:] Allows you to choose where the vertical scroll bar
+        should appear.
+      \item[Scroll Bar Width:] Allows you to choose the width of the
+        scroll bar (in pixels).  Default value is 6.
+      \item[Status Bar:] Allows you to choose where to display the 
+        statusbar\opt{remote}{ on the main display}. 
+      \opt{remote}{
+        \item[Remote Status Bar:] Allows you to choose where to display the 
+        statusbar on the remote display.
+      }
+      \opt{RECORDER_PAD}{
+       \item[Button Bar:] Enables or disables the button bar prompts for the
+         ``F''-keys at the bottom of the screen.
+      }
+      \item[Volume Display:] Controls whether the volume is displayed as a
+        graphic or a numeric value on the Status Bar. If you select a numeric
+        display, volume is displayed in decibels.  See \reference{ref:volume}
+        for more on the volume setting.
+      \item[Battery Display:] Controls whether the battery charge status is
+        displayed as a graphic or numerical percentage value on the Status Bar.
+      \end{description}
+    }
+%
 \opt{lcd_bitmap}{
 \item[Line Selector Type.]
   This option allows you to select which type of line selector to use.

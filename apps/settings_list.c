@@ -612,19 +612,20 @@ const struct settings_list settings[] = {
                   NULL, 3, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
                   ID2P(LANG_STATUSBAR_BOTTOM)),
 #endif
-    CHOICE_SETTING(F_TEMPVAR, scrollbar,
+    CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, scrollbar,
                   LANG_SCROLL_BAR, SCROLLBAR_LEFT, "scrollbar","off,left,right",
                   NULL, 3, ID2P(LANG_OFF), ID2P(LANG_LEFT), ID2P(LANG_RIGHT)),
-    INT_SETTING(0, scrollbar_width, LANG_SCROLLBAR_WIDTH, 6, "scrollbar width",
-                UNIT_INT, 3, LCD_WIDTH/10, 1, NULL, NULL, NULL),
+    INT_SETTING(F_THEMESETTING, scrollbar_width, LANG_SCROLLBAR_WIDTH, 6,
+                "scrollbar width",UNIT_INT, 3, MAX(LCD_WIDTH/10,25), 1,
+                NULL, NULL, NULL),
 #if CONFIG_KEYPAD == RECORDER_PAD
-    OFFON_SETTING(0,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),
+    OFFON_SETTING(F_THEMESETTING,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),
 #endif
-    CHOICE_SETTING(0, volume_type, LANG_VOLUME_DISPLAY, 0,
+    CHOICE_SETTING(F_THEMESETTING, volume_type, LANG_VOLUME_DISPLAY, 0,
                    "volume display", graphic_numeric, NULL, 2,
                    ID2P(LANG_DISPLAY_GRAPHIC),
                    ID2P(LANG_DISPLAY_NUMERIC)),
-    CHOICE_SETTING(0, battery_display, LANG_BATTERY_DISPLAY, 0,
+    CHOICE_SETTING(F_THEMESETTING, battery_display, LANG_BATTERY_DISPLAY, 0,
                    "battery display", graphic_numeric, NULL, 2,
                    ID2P(LANG_DISPLAY_GRAPHIC), ID2P(LANG_DISPLAY_NUMERIC)),
 #if CONFIG_RTC
