@@ -291,12 +291,14 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU = Yes"
     h100,h120,h300: "NAVI = Yes"
     yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Oui"
+    cowond2*: "MENU = Oui"
     h100,h120,h300: "NAVI = Oui"
     yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Oui"
     mrobe500: "PLAY ou POWER = Oui"
@@ -4216,7 +4218,7 @@
     rtc: "OFF = Annuler"
     mrobe500: "POWER = Annuler"
     h100,h120,h300: "STOP = Annuler"
-    ipod*,c200*,sa9200: "MENU = Annuler"
+    ipod*,c200*: "MENU = Annuler"
     x5,m5: "RECORD = Annuler"
     h10,h10_5gb,e200*,fuze*: "PREV = Annuler"
     gigabeatf: "POWER = Annuler"
@@ -12077,6 +12079,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Gauche"
+  </dest>
+  <voice>
+    *: "Gauche"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Droite"
+  </dest>
+  <voice>
+    *: "Droite"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_BOTTOM
   desc: DEPRECATED
   user: core
@@ -12591,5 +12621,56 @@
   </dest>
   <voice>
     *: "Tampon des écrans de lecture"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Largeur barre de défilement"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Largeur de la barre de défilement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Position barre de défilement"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Position de la barre de défilement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMITER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limiter Preamp"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limiteur préampli."
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limiteur préampli"
   </voice>
 </phrase>
