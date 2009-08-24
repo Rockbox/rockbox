@@ -61,9 +61,9 @@
 \newcommand{\fixme}[1]{\textbf{\textcolor{red}{#1}}}
 
 % Colors used to typeset table headers and alternating table rows
-\colorlet{tblhdrbgcolor}{gray!60} % Background color for headers
+\colorlet{tblhdrbgcolor}{white} % Background color for headers
 \colorlet{tbloddrowbgcolor}{white} % Background color for odd rows (headers not included)
-\colorlet{tblevenrowbgcolor}{gray!30} % Background color for even rows (headers not included)
+\colorlet{tblevenrowbgcolor}{blue!15} % Background color for even rows (headers not included)
 
 \usepackage{fancyhdr}
 \usepackage{graphicx}
@@ -222,7 +222,7 @@
 % \end{rbtabular}
 %    
 \newenvironment{rbtabular}[5]{%
-  \rowcolors{2}{tblevenrowbgcolor}{tbloddrowbgcolor}
+  \rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
     \bottomrule
@@ -251,7 +251,7 @@
 % Note: you still need to enclose this with \begin{table} / \end{table}
 % Cheers for the usenet helping me building this up :)
 \newenvironment{tagmap}[2]{%
-\rowcolors{1}{tblevenrowbgcolor}{tbloddrowbgcolor}
+\rowcolors{1}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
     \bottomrule
@@ -361,7 +361,7 @@
 % Main Unit Key  &  Remote Key  &  Description \\
 
 \newenvironment{btnmap}[2]{%
-  \rowcolors{1}{tblevenrowbgcolor}{tbloddrowbgcolor}
+  \rowcolors{1}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
     \bottomrule
