@@ -3,6 +3,7 @@
 \section{\label{ref:Supportedfileformats}Supported file formats}
 \begin{table}
 \begin{center}
+\rowcolors{1}{}{gray!30}
 \begin{tabularx}{\textwidth}{clp{7em}X}\toprule
 \textbf{Icon} & \textbf{File Type} & \textbf{Extension} 
   & \textbf{Action when selected} \\\midrule%
@@ -82,9 +83,10 @@
   \section{\label{ref:Supportedaudioformats}Supported audio formats}
   \begin{table}
   \begin{center}
+  \rowcolors{1}{}{gray!30}
   \begin{tabularx}{\textwidth}{lp{6em}X}\toprule
   \textbf{Format} & \textbf{Extension} & \textbf{Notes} \\\midrule
-    \emph{Lossy codecs} \\
+    \multicolumn{2}{c}{\textbf{Lossy codecs}}\\
     \midrule
     MPEG audio & \fname{.mp1, .mpa, .mp2, .mp3} & \\
     OGG/Vorbis & \fname{.ogg, .oga} & Some old ``floor 0'' files may crash Rockbox. \\
@@ -94,9 +96,9 @@
     ATSC A/52 & \fname{.a52, .ac3} & Supports downmixing for playback of 5.1 streams in stereo. \\
     ADX & \fname{.adx} & \\
     Speex & \fname{.spx} & \\
-    \\
+    
     \midrule
-    \emph{Lossless codecs} \\
+    \multicolumn{2}{c}{\textbf{Lossless codecs}}\\
     \midrule
     Waveform audio format & \fname{.wav} & \\
     Audio Interchange File Format & \fname{.aif, .aiff} & \\
@@ -105,20 +107,20 @@
     Wavpack & \fname{.wv} & \\
     Shorten & \fname{.shn} & Seeking not supported.\\
     \opt{h100,h300,x5,m5,m3}{
-      Monkey's Audio & \fname{.ape, .mac} & -c1000 and -c2000 files decode fast enough to be useful. \\
-    }
+      Monkey's Audio & \fname{.ape, .mac} & -c1000 and -c2000 files decode
+      fast enough to be useful.}
     \opt{gigabeatf}{
-      Monkey's Audio & \fname{.ape, .mac} & -c1000 to -c3000 files decode fast enough to be useful. \\
-    }
+      Monkey's Audio & \fname{.ape, .mac} & -c1000 to -c3000
+      files decode fast enough to be useful.}
     \opt{gigabeats}{
-      Monkey's Audio & \fname{.ape, .mac} & -c1000 to -c4000 files decode fast enough to be useful. \\
-    }
-    \nopt{h100,h300,x5,m5,m3,gigabeat}{%
-      Monkey's Audio & \fname{.ape, .mac} & Only -c1000 files decode fast enough to be useful. \\
-    }
+      Monkey's Audio & \fname{.ape, .mac} & -c1000 to -c4000 files decode
+      fast enough to be useful.}
+    \opt{ipod,h10,h10_5gb,mrobe100,sansa}{
+      Monkey's Audio & \fname{.ape, .mac} & Only -c1000 files decode fast
+      enough to be useful.}
     \\
     \midrule
-    \emph{Other codecs} \\
+    \multicolumn{2}{c}{\textbf{Other codecs}}\\
     \midrule
     Sound Interface Device & \fname{.sid} & \\
     MOD & \fname{.mod} & \\

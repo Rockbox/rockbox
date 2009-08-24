@@ -210,6 +210,7 @@
 % Note: you still need to enclose this with \begin{table} / \end{table}
 % Cheers for the usenet helping me building this up :)
 \newenvironment{tagmap}[2]{%
+\rowcolors{1}{}{gray!30}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
     \bottomrule

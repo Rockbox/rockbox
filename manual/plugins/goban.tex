@@ -32,12 +32,16 @@ is not selected.
 
 The information panel which displays the current move number may also contain
 these markers: \\
-\begin{tabularx}{\textwidth}{lX}\toprule
-\textbf{Mark} & \textbf{Meaning} \\ \midrule
-    \emph{+ } & There are nodes after the current node in the SGF tree. \\
-    \emph{* } & There are sibling variations which can be navigated to using the %
-    \emph{Next Variation} menu option of the \emph{Context Menu}%
-    \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,SANSA_CLIP_PAD,%
+
+\begin{table}
+  \begin{center}
+  \rowcolors{1}{}{gray!30}
+    \begin{tabularx}{\textwidth}{lX}\toprule
+      \textbf{Mark} & \textbf{Meaning} \\ \midrule
+      \emph{+ } & There are nodes after the current node in the SGF tree. \\
+      \emph{* } & There are sibling variations which can be navigated to using the %
+      \emph{Next Variation} menu option of the \emph{Context Menu}%
+      \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,SANSA_CLIP_PAD,%
          RECORDER_PAD,MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,%
          IRIVER_H300_PAD}{ or the %
          \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}%
@@ -47,10 +51,12 @@ these markers: \\
          \opt{GIGABEAT_PAD}{\ButtonA}%
          \opt{GIGABEAT_S_PAD}{\ButtonPlay}%
          \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec} button}. \\
-    \emph{C } & There is a comment at the current node.  It can be viewed/edited using
+      \emph{C } & There is a comment at the current node.  It can be viewed/edited using
                 the \emph{Add/Edit Comment} menu option of the \emph{Context Menu}. \\
-\bottomrule
-\end{tabularx}
+      \bottomrule
+    \end{tabularx}
+  \end{center}
+\end{table}
 
 \subsubsection{Controls}
 \begin{table}
