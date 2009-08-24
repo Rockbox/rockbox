@@ -8364,7 +8364,7 @@
     *: none
     recording: "Disque plein. Presser OFF pour continuer."
     h100,h120,h300: "Disque plein. Presser STOP pour continuer."
-    m5,x5: "Disque plein. presser POWER pour continuer."
+    m5,x5: "Disque plein. Presser POWER pour continuer."
     e200*,c200*: "Disque plein. Presser PREV pour continuer."
   </dest>
   <voice>
