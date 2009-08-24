@@ -62,6 +62,10 @@ headphone_detection
 hold_button
 #endif
 
+#if defined(HAS_REMOTE_BUTTON_HOLD)
+remote_button_hold
+#endif
+
 #if defined(HAVE_LCD_BITMAP)
 lcd_bitmap
 #endif

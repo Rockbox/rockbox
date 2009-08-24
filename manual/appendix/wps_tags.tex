@@ -142,14 +142,27 @@ produce the information for the next file to be played.
   \end{tagmap}
 \end{table}
 }
-\opt{h100,h300}{
-\section{Hold Switches}
-\begin{table}
-  \begin{tagmap}{}{}
-    \config{\%mh} & ``h'' if the main unit hold switch is on\\
-    \config{\%mr} & ``r'' if the remote hold switch is on\\
-  \end{tagmap}
-\end{table}
+
+% this will not include the "remote hold switch" tag for targets lacking 
+% a main unit hold switch
+\opt{hold_button}{
+  \opt{remote_button_hold}{
+    \section{Hold Switches}
+    \begin{table}
+      \begin{tagmap}{}{}
+        \config{\%mh} & ``h'' if the main unit hold switch is on\\
+        \config{\%mr} & ``r'' if the remote hold switch is on\\
+      \end{tagmap}
+    \end{table}
+  }
+  \nopt{remote_button_hold}{
+    \section{Hold Switch}
+    \begin{table}
+      \begin{tagmap}{}{}
+        \config{\%mh} & ``h'' if the hold switch is on\\
+      \end{tagmap}
+    \end{table}
+  }
 }
 
 \section{Virtual LED}
