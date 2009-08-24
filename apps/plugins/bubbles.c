@@ -2519,10 +2519,11 @@ enum plugin_status plugin_start(const void* parameter) {
                 break;
 
             case BB_QUIT:
+#define SAVE_MESSAGE "Saving Game and Scores..."
                 /* the first splash is to make sure it's read, but don't make it
                  * too long to not delay the saving further */
-                rb->splash(HZ/5, "Saving Game ...");
-                rb->splash(0, "Saving Game ...");
+                rb->splash(HZ/5, SAVE_MESSAGE);
+                rb->splash(0, SAVE_MESSAGE);
                 bubbles_savegame(&bb);
                 bubbles_savedata();
                 highscore_save(SCORE_FILE, highscores, NUM_SCORES);
