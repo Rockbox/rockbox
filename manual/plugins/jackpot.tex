@@ -4,19 +4,32 @@
 This is a jackpot slot machine game. At the beginning of the game you
 have 20\$.  Payouts are given when three matching symbols come up.
 
-% fill out for every other target...
 \begin{table}
 \begin{btnmap}{}{}
-    \opt{PLAYER_PAD}{\ButtonPlay}
-       \opt{HAVEREMOTEKEYMAP}{& 
+    \opt{PLAYER_PAD,RECORDER_PAD}{\ButtonPlay}
+    \opt{IRIVER_H100_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,%
+      MROBE100_PAD,SANSA_CLIP_PAD,M200,IPOD_3G_PAD,IPOD_4G_PAD,%
+      SANSA_C200_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonSelect}
+    \opt{ONDIO_PAD}{\ButtonUp}
+    \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \opt{IAUDIO_M3_PAD}{}
+      \opt{HAVEREMOTEKEYMAP}{& 
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCSelect}
+          \opt{IAUDIO_RC_PAD}{\ButtonRCMode}
         }
     & Play \\
     \opt{PLAYER_PAD}{\ButtonStop}
-       \opt{HAVEREMOTEKEYMAP}{& 
+    \opt{IRIVER_H100_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
+    \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD,GIGABEAT_PAD,SANSA_E200_PAD,SANSA_C200_PAD,%
+      SANSA_CLIP_PAD,IRIVER_H10_PAD,MROBE100_PAD}{\ButtonPower}
+    \opt{GIGABEAT_S_PAD}{\ButtonBack}
+    \opt{SANSA_FUZE_PAD}{\ButtonHome}
+    \opt{IAUDIO_M3_PAD}{}
+      \opt{HAVEREMOTEKEYMAP}{& 
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
+          \opt{IAUDIO_RC_PAD}{\ButtonRCRec}
         }
     & Exit the game \\
 \end{btnmap}
 \end{table}
-
