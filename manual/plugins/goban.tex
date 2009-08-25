@@ -2,13 +2,10 @@
 \screenshot{plugins/images/ss-goban}{Goban}{The Rockbox Goban plugin}
 Goban is a a plugin for playing, viewing and recording games of Go (also known
 as Weiqi, Baduk, Igo and Goe).  It uses standard Smart Game Format (SGF) files
-for saving and loading games.
-
-You can find a short introduction to Go at
+for saving and loading games.  You can find a short introduction to Go at
 \url{http://senseis.xmp.net/?WhatIsGo} and more information about SGF files
 can be read at \url{http://senseis.xmp.net/?SmartGameFormat} or the SGF
-specification at
-\url{http://www.red-bean.com/sgf/}.
+specification at \url{http://www.red-bean.com/sgf/}.\\
 
 This plugin can load all modern SGF files (file format 3 or 4) with few problems.
 It attempts to preserve SGF properties which it doesn't understand, and most common
@@ -17,18 +14,18 @@ Kogo's Joseki Dictionary (\url{http://waterfire.us/joseki.htm}) with this plugin
 although the load and save times can be on the order of a minute or two on
 particularly slow devices.  Large SGF files may stop audio playback for the duration
 of the plugin's run in order to free up more memory and some very large SGF files will
-not even load on devices with little available memory.
+not even load on devices with little available memory.\\
 
-\emph{Note: } The plugin does \emph{NOT} support SGF files with multiple games in
+\note{The plugin does \emph{NOT} support SGF files with multiple games in
 one file.  These are rare, but if you have one don't even try it (the file will most
-likely be corrupted if you save over it).  You have been warned.
+likely be corrupted if you save over it).  You have been warned.\\}
 
 The file \fname {"/sgf/gbn\_def.sgf"} is used by the plugin to store any unsaved
 changes in the most recently loaded game.  This means that if you forget to save your
 changes, you should load \fname {"/sgf/gbn\_def.sgf"} immediately to offload the changes
 to another file.  If you load another file first then your changes will be lost
 permanently.  The \fname {"/sgf/gbn\_def.sgf"} file is also the file loaded if another
-is not selected.
+is not selected.\\
 
 The information panel which displays the current move number may also contain
 these markers: \\

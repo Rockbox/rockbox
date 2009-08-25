@@ -16,7 +16,8 @@ in the font package at \url{http://www.rockbox.org/daily.shtml}.}
   \fname{/.rockbox/fonts} directory and the filename must be at most 24 characters
   long. You can browse the fonts in \fname{/.rockbox/fonts} under
   \setting{Settings $\rightarrow$ Theme Settings $\rightarrow$ Font}
-  in the \setting{Main Menu}.
+  in the \setting{Main Menu}.\\
+
   \note{Advanced Users Only: Any BDF font file up to 16 pixels high should
     be usable with Rockbox. To convert from \fname{.bdf} to \fname{.fnt}, use
     the \fname{convbdf} tool. This tool can be found in the \fname{tools}
@@ -28,11 +29,11 @@ in the font package at \url{http://www.rockbox.org/daily.shtml}.}
 Rockbox can load language files at runtime. Simply copy the \fname{.lng} file 
 \emph{(do not use the .lang file)} to the \dap\ and ``play'' it in the 
 Rockbox directory browser or select \setting{Settings $\rightarrow$
-General Settings $\rightarrow$ Language }from the \setting{Main Menu}.
+General Settings $\rightarrow$ Language }from the \setting{Main Menu}.\\
 
 \note{If you want a language to be loaded automatically every time you start 
 up, it must be located in the \fname{/.rockbox/langs} directory and the filename
-must be a maximum of 24 characters long.}
+must be a maximum of 24 characters long.\\}
 
 If your language is not yet supported and you want to write your own language
 file find the instructions on the Rockbox website:
@@ -220,7 +221,7 @@ plan).
 If you use the upper-case versions of the
 three tags: \config{F}, \config{I} and \config{D}, they will instead refer to 
 the next song instead of the current one. Example: \config{\%Ig} is the genre 
-name used in the next song and \config{\%Ff} is the mp3 frequency.
+name used in the next song and \config{\%Ff} is the mp3 frequency.\\
 
 \note{The next song information \emph{will not} be available at all
   times, but will most likely be available at the end of a song. We
@@ -396,7 +397,7 @@ Example of a configuration file:
   settings. Create a few different files with different settings, give 
   each file a different name (such as \fname{car.cfg}, 
   \fname{headphones.cfg}, etc.), and you can then use the \setting{Browse .cfg 
-    files} option to quickly change settings.} 
+    files} option to quickly change settings.\\} 
 
   A special case configuration file can be used to force a particular setting
   or settings every time Rockbox starts up (e.g. to set the volume to a safe
@@ -482,6 +483,7 @@ You just ``play'' a file with the extension %
 \opt{iaudio}{\fname{.iaudio}.} %
 \opt{sansa,h10,h10_5gb}{\fname{.mi4}.} %
 \opt{sansaAMS}{\fname{.sansa}.} %
+\opt{gigabeatf,gigabeats}{\fname{.gigabeat}.} %
 This can be used to test new firmware versions without deleting your
 current version.
 

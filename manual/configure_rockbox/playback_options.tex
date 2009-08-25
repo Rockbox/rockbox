@@ -71,12 +71,12 @@ you to configure settings related to audio playback.
 
     \opt{masd,masf}{
       The anti-skip buffer can be set to a value between 0 and 7
-      seconds.
+      seconds.\\
     }
 
     \opt{swcodec}{
       The anti-skip buffer can be set to various values between
-      5 seconds and 10 minutes.
+      5 seconds and 10 minutes.\\
     }
 
     \note{Having a large anti-skip buffer tends to use more power, and may
@@ -139,7 +139,7 @@ you to configure settings related to audio playback.
       \note{The rules above apply except in the instance where
           \setting{Fade Out Delay} plus \setting{Fade Out Duration} is less then
           \setting{Fade In Delay} (which would create a gap in the audio). In this case,
-          the \setting{Fade In Delay} is reduced to eliminate the gap.}
+          the \setting{Fade In Delay} is reduced to eliminate the gap.\\}
 
           The graphic below illustrates how the different settings work in practice.
 
@@ -152,8 +152,9 @@ you to configure settings related to audio playback.
     same apparent volume. This prevents sudden changes in volume when
     changing between songs recorded at different volume levels.
     For replaygain to work, the songs must have been processed by a program
-    that adds replaygain information to the ID3 tags (or Vorbis tags).
-    \note{APEv2 tags are not currently supported.}
+    that adds replaygain information to the ID3 tags (or Vorbis tags).\\
+
+    \note{APEv2 tags are not currently supported.\\}
       
     Options for replaygain are:
     \begin{description}
@@ -208,9 +209,11 @@ you to configure settings related to audio playback.
   \setting{Auto-Change Directory} is set to \setting{No}, playback will stop at
   the end of the current playlist.  Using the \setting{Random} feature requires
   you to first generate a folder list via the Random Folder Advance Configuration
-  plugin (see \reference{ref:random_folder_advance_config}).
+  plugin (see \reference{ref:random_folder_advance_config}).\\
+
   \note{You must have the \setting{Repeat} option set to \setting{No} for
-    \setting{Auto-Change Directory} to function properly.}
+    \setting{Auto-Change Directory} to function properly.\\}
+
   \note{This feature only works when songs have been played from the file
     browser.  Using it with the database may cause unexpected behavior.}
 
@@ -249,7 +252,8 @@ you to configure settings related to audio playback.
   start the logging. The log-file is called 
   \opt{rtc}{\fname{.scrobbler.log},}%
   \nopt{rtc}{\fname{.scrobbler-timeless.log},}%
-  and is to be found in the root directory of your \dap{}.
+  and is to be found in the root directory of your \dap{}.\\
+
   \note{See \wikilink{LastFMLog} for a further description, and for tools you 
     can use to submit your Last.fm log.}
 

@@ -11,7 +11,7 @@ change to customise your listening experience.
   can produce without possible distortion (clipping). All values lower than
   this reference will be negative and yield a progressively softer volume.
   \opt{player,recorder,recorderv2fm,ondio,x5,m5,ipodnano,ipodvideo,
-       ipodcolor,ipod1g2g,h10,h10_5gb,sansa,sansaAMS}{
+       ipodcolor,ipod1g2g,h10,h10_5gb,sansa,sansaAMS,gigabeats,gigabeatf}{
   Values higher than 0 dB are available and can be used to raise the
   volume more than would otherwise be possible. These volume levels will
   ordinarily lead to distorted sound, but might work nicely for music that has
@@ -25,6 +25,8 @@ change to customise your listening experience.
   \opt{ipodvideo}{minimum of -57 dB to a maximum of +6 dB.}%
   \opt{ipodcolor,ipod1g2g,h10,h10_5gb,sansa,sansaAMS}{minimum of -74 dB to a maximum
   of +6 db.}%
+  \opt{gigabeats}{minimum of -90 dB to a maximum of +6 dB.}%
+  \opt{gigabeatf}{minimum of -74 dB to a maximum of +6 dB.}%
 
 \section{Bass}
   This setting emphasises
@@ -211,7 +213,7 @@ change to customise your listening experience.
   headphones more similar to listening to music with stereo speakers. When you
   listen to music through speakers, each ear will hear sound originating from
   both speakers. However, the sound from the left speaker reaches your right
-  ear slightly later than it does your left ear, and vice versa.
+  ear slightly later than it does your left ear, and vice versa.\\
 
   The human ear and brain together are very good at interpreting the time
   differences between direct sounds and reflected sounds and using that
@@ -220,7 +222,7 @@ change to customise your listening experience.
   channel corresponding to it. The left ear hears only the left channel and
   the right ear hears only the right channel. The result is that sound from
   headphones does not provide the same spatial cues to your ear and brain as
-  speakers, and might for that reason sound unnatural to some listeners.
+  speakers, and might for that reason sound unnatural to some listeners.\\
     
   The crossfeed function uses an algorithm to feed a delayed and filtered
   portion of the signal from the right channel into the left channel and vice
@@ -229,7 +231,7 @@ change to customise your listening experience.
   result is a more natural stereo image that can be especially appreciated in
   older rock and jazz records, where one instrument is often hard-panned to
   just one of the speakers. Many people will find such records tiring to listen
-  to using earphones and no crossfeed effect.
+  to using earphones and no crossfeed effect.\\
 
   Crossfeed has the following settings:
   \begin{description}
@@ -256,7 +258,6 @@ change to customise your listening experience.
   virtual speaker placement suited to ones preference.
   % TODO: adapt the guidelines for crossfeed settings found here?
   % http://www.ohl.to/interests-in-audio/crossfeed-and-eq-for-headphones/ 
-
   Beware that the crossfeed function is capable of making the audio distort
   if you choose settings which result in a too high output level.
 }
@@ -268,7 +269,7 @@ change to customise your listening experience.
   parametric EQ lets you control several different parameters for each
   band of the EQ. In some ways the EQ is similar to the \setting{Bass}
   and \setting{Treble} settings described earlier, but the EQ allows you to
-  control the sound much more carefully.
+  control the sound much more carefully.\\
 
   Rockbox's parametric EQ is composed of five different bands:
   \begin{description}
@@ -436,10 +437,8 @@ source, and a third order noise shaper.
 
 \opt{swcodec}{
 \section{Timestretch}
-Enabling \setting{Timestretch} allows you to change the playback speed without it 
-affecting the pitch of the recording. 
-
-After enabling this feature and rebooting, you can access this via the \setting{Pitch Screen}. 
-This function is intended for speech playback and may significantly dilute your listening 
-experience with more complex audio.
-}
+Enabling \setting{Timestretch} allows you to change the playback speed without
+it affecting the pitch of the recording. After enabling this feature and
+rebooting, you can access this via the \setting{Pitch Screen}. This function is
+intended for speech playback and may significantly dilute your listening
+experience with more complex audio.}
