@@ -441,4 +441,22 @@ Enabling \setting{Timestretch} allows you to change the playback speed without
 it affecting the pitch of the recording. After enabling this feature and
 rebooting, you can access this via the \setting{Pitch Screen}. This function is
 intended for speech playback and may significantly dilute your listening
-experience with more complex audio.}
+experience with more complex audio.
+}
+
+\opt{swcodec}{
+\section{Limiter Preamp}
+The limiter preamp raises the gain of the audio by the selected amount.  The associated
+limiter function works on the resulting louder signal to reduce any peaks to below the
+maximum level.  The default selection of 0dB turns all limiter processing off.
+
+The limiter has the effect of reducing dynamic range by amplifying quiet sections while
+loud sections are kept just under maximum gain.  This allows listening to the quiet sections
+of dynamic material in noisy environments while preventing sudden loud sections from being
+overbearing.
+
+Think of this as a smart volume control.  The preamp in effect turns up the volume by the
+amount you select so that you can hear quiet passages.  But it senses when a loud section is
+about to play and quickly and smoothly lowers the volume as necessary to keep the audio
+under the maximum limit.  As the loud section fades, the volume is turned back up.
+}
