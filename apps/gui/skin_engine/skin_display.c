@@ -129,6 +129,35 @@ bool skin_update(struct gui_wps *gwps, unsigned int update_type)
     return retval;
 }
 
+void skin_statusbar_changed(struct gui_wps *skin)
+{
+    if (!skin)
+        return;
+    struct wps_data *data = skin->data;
+    const struct screen *display = skin->display;
+
+    struct viewport *vp = &find_viewport(VP_DEFAULT_LABEL, data)->vp;
+    viewport_set_fullscreen(vp, display->screen_type);
+
+    if (data->wps_sb_tag)
+    {   /* fix up the default viewport */
+        if (data->show_sb_on_wps)
+        {
+            bool bar_at_top =
+                statusbar_position(display->screen_type) != STATUSBAR_BOTTOM;
+
+            vp->y       = bar_at_top?STATUSBAR_HEIGHT:0;
+            vp->height  = display->lcdheight - STATUSBAR_HEIGHT;
+        }
+        else
+        {
+            vp->y       = 0;
+            vp->height  = display->lcdheight;
+        }
+    }
+
+    
+}
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -1141,7 +1170,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 
     if (refresh_mode & WPS_REFRESH_STATUSBAR)
     {
-        gwps_draw_statusbars();
+        viewportmanager_set_statusbar(*gwps->statusbars);
     }
     /* Restore the default viewport */
     display->set_viewport(NULL);

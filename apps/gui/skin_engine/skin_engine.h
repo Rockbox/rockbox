@@ -51,4 +51,7 @@ bool skin_data_load(struct wps_data *wps_data,
 
 /* initial setup of wps_data */
 void skin_data_init(struct wps_data *wps_data);
+
+/* call this in statusbar toggle handlers if needed */
+void skin_statusbar_changed(struct gui_wps*);
 #endif

@@ -286,10 +286,6 @@ struct wps_data
     unsigned int button_time_volume;
 };
 
-
-/* Redraw statusbars if necessary */
-void gwps_draw_statusbars(void);
-
 /* Returns the index of the last subline's token in the token array.
    line - 0-based line number
    subline - 0-based subline number within the line
@@ -332,6 +328,12 @@ struct gui_wps
     struct screen *display;
     struct wps_data *data;
     struct wps_state *state;
+
+    /* suitable for the viewportmanager, possibly only temporary here
+     * needs to be same for all screens! can't be split up for screens
+     * due to what viewportmanager_set_statusbar() accepts
+     * (FIXME?) */
+    int *statusbars;
 };
 
 /* gui_wps end */

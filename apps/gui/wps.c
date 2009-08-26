@@ -78,6 +78,7 @@
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
 
+/* this is for the viewportmanager */
 static int wpsbars;
 /* currently only one wps_state is needed */
 static struct wps_state wps_state;
@@ -88,6 +89,7 @@ static struct wps_data wps_datas[NB_SCREENS];
 static void wps_state_init(void);
 static void track_changed_callback(void *param);
 static void nextid3available_callback(void* param);
+static void statusbar_toggle_handler(void *data);
 
 
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
@@ -543,25 +545,6 @@ static void play_hop(int direction)
 #endif
 }
 
-static void gwps_fix_statusbars(void)
-{
-#ifdef HAVE_LCD_BITMAP
-    int i;  
-    wpsbars = VP_SB_HIDE_ALL;
-    FOR_NB_SCREENS(i)
-    {
-        bool draw = false;
-        if (gui_wps[i].data->wps_sb_tag)
-            draw = gui_wps[i].data->show_sb_on_wps;
-        else if (statusbar_position(i) != STATUSBAR_OFF)
-            draw = true;
-        if (draw)
-            wpsbars |= (VP_SB_ONSCREEN(i) | VP_SB_IGNORE_SETTING(i));
-    }
-#else
-    wpsbars = VP_SB_ALLSCREENS;
-#endif
-}
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 /*
@@ -585,9 +568,9 @@ static void gwps_leave_wps(void)
     {
         gui_wps[i].display->stop_scroll();
         gui_wps[i].display->backdrop_show(BACKDROP_MAIN);
+        if (statusbar_position(i) != STATUSBAR_OFF)
+            oldbars |= VP_SB_ONSCREEN(i);
     }
-    if (global_settings.statusbar)
-        oldbars = VP_SB_ALLSCREENS;
 
     viewportmanager_set_statusbar(oldbars);
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
@@ -597,10 +580,6 @@ static void gwps_leave_wps(void)
     send_event(GUI_EVENT_REFRESH, NULL);
 }
 
-void gwps_draw_statusbars(void)
-{
-    viewportmanager_set_statusbar(wpsbars);
-}
 #ifdef HAVE_TOUCHSCREEN
 int wps_get_touchaction(struct wps_data *data)
 {
@@ -721,6 +700,7 @@ long gui_wps_show(void)
     ab_reset_markers();
 #endif
     wps_state_init();
+    statusbar_toggle_handler(NULL);
 
     while ( 1 )
     {
@@ -1181,7 +1161,6 @@ long gui_wps_show(void)
         {
             restore = false;
             restoretimer = RESTORE_WPS_INSTANTLY;
-            gwps_fix_statusbars();
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
             lcd_activation_set_hook(wps_lcd_activation_hook);
 #endif
@@ -1269,23 +1248,22 @@ static void statusbar_toggle_handler(void *data)
 {
     (void)data;
     int i;
-    gwps_fix_statusbars();
 
+    wpsbars = VP_SB_HIDE_ALL;
     FOR_NB_SCREENS(i)
-    {
-        struct viewport *vp = &find_viewport(VP_DEFAULT_LABEL, &wps_datas[i])->vp;
-        bool draw = wpsbars & (VP_SB_ONSCREEN(i) | VP_SB_IGNORE_SETTING(i));
-        if (!draw)
-        {
-            vp->y = 0;
-            vp->height = screens[i].lcdheight;
-        }
-        else
-        {
-            bool bar_at_top = statusbar_position(i) != STATUSBAR_BOTTOM;
-            vp->y      = bar_at_top?STATUSBAR_HEIGHT:0;
-            vp->height = screens[i].lcdheight - STATUSBAR_HEIGHT;
-        }
+    {   /* fix viewports if needed */
+        skin_statusbar_changed(&gui_wps[i]);
+
+        bool draw = false;
+
+        /* fix up gui_wps::statusbars, so that the viewportmanager accepts it*/
+        if (gui_wps[i].data->wps_sb_tag)
+            draw = gui_wps[i].data->show_sb_on_wps;
+        else if (statusbar_position(i) != STATUSBAR_OFF)
+            draw = true;
+        if (draw)
+            wpsbars |=
+                    (VP_SB_ONSCREEN(i) | VP_SB_IGNORE_SETTING(i));
     }
 }
 #endif
@@ -1308,7 +1286,10 @@ void gui_sync_wps_init(void)
            so use the only available ( "global" ) one */
         gui_wps[i].state = &wps_state;
         gui_wps[i].display->backdrop_unload(BACKDROP_SKIN_WPS);
+        /* only one wpsbars needed/wanted */
+        gui_wps[i].statusbars = &wpsbars;
     }
+    *(gui_wps[SCREEN_MAIN].statusbars) =VP_SB_ALLSCREENS;
 #ifdef HAVE_LCD_BITMAP
     add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, statusbar_toggle_handler);
 #endif
