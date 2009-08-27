@@ -121,7 +121,7 @@
 const char appsversion[]=APPSVERSION;
 
 static void init(void);
-        
+
 #ifdef SIMULATOR
 void app_main(void)
 #else
@@ -142,6 +142,18 @@ static void app_main(void)
     /* All threads should be created and public queues registered by now */
     usb_start_monitoring();
 #endif
+
+#ifdef AUTOROCK
+    {
+        static const char filename[] = PLUGIN_APPS_DIR "/autostart.rock";
+
+        if(file_exists(filename)) /* no complaint if it doesn't exist */
+        {
+            plugin_load((char*)filename, NULL); /* start if it does */
+        }
+    }
+#endif /* #ifdef AUTOROCK */
+
     root_menu();
 }
 
@@ -202,7 +214,6 @@ static int init_dircache(bool preinit)
             splashf(0, "Dircache failed, disabled. Result: %d", result);
             global_settings.dircache = false;
         }
-            
     }
     
     if (clear)
@@ -578,17 +589,6 @@ static void init(void)
 
     /* runtime database has to be initialized after audio_init() */
     cpu_boost(false);
-
-#ifdef AUTOROCK
-    {
-        static const char filename[] = PLUGIN_APPS_DIR "/autostart.rock"; 
-
-        if(file_exists(filename)) /* no complaint if it doesn't exist */
-        {
-            plugin_load((char*)filename, NULL); /* start if it does */
-        }
-    }
-#endif /* #ifdef AUTOROCK */
 
 #if CONFIG_CHARGING
     car_adapter_mode_init();
