@@ -56,12 +56,18 @@ enum mpeg_start_id
     MPEG_START_EXIT,
 };
 
+enum mpeg_setting_id
+{
+    MPEG_SETTING_DISPLAY_SETTINGS,
+    MPEG_SETTING_AUDIO_SETTINGS,
+    MPEG_SETTING_ENABLE_START_MENU,
+    MPEG_SETTING_CLEAR_RESUMES,
+};
+
 enum mpeg_menu_id
 {
-    MPEG_MENU_DISPLAY_SETTINGS,
-    MPEG_MENU_AUDIO_SETTINGS,
-    MPEG_MENU_ENABLE_START_MENU,
-    MPEG_MENU_CLEAR_RESUMES,
+    MPEG_MENU_SETTINGS,
+    MPEG_MENU_RESUME,
     MPEG_MENU_QUIT,
 };
 
@@ -91,13 +97,8 @@ struct mpeg_settings {
 extern struct mpeg_settings settings;
 
 int mpeg_start_menu(uint32_t duration);
+int mpeg_menu(void);
 
-enum
-{
-    MPEG_MENU_HIDE_QUIT_ITEM = 0x1, /* Don't show the quit item */
-};
-
-int mpeg_menu(unsigned flags);
 void mpeg_menu_sysevent_clear(void);
 long mpeg_menu_sysevent(void);
 int mpeg_menu_sysevent_callback(int btn, const struct menu_item_ex *menu);

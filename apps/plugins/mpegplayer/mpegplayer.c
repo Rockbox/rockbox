@@ -1485,10 +1485,8 @@ static void button_loop(void)
     rb->lcd_clear_display();
     rb->lcd_update();
 
-#if defined(HAVE_LCD_MODES)
-#if (HAVE_LCD_MODES & LCD_MODE_YUV)
-	rb->lcd_set_mode(LCD_MODE_YUV);
-#endif
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_YUV)
+    rb->lcd_set_mode(LCD_MODE_YUV);
 #endif
 
     wvs_init();
@@ -1569,13 +1567,11 @@ static void button_loop(void)
             stream_show_vo(false);
             wvs_backlight_brightness_video_mode(false);
 
-#if defined(HAVE_LCD_MODES)
-#if (HAVE_LCD_MODES & LCD_MODE_YUV)
-			rb->lcd_set_mode(LCD_MODE_RGB565);
-#endif
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_YUV)
+            rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif
 
-            result = mpeg_menu(0);
+            result = mpeg_menu();
 
             /* The menu can change the font, so restore */
             rb->lcd_setfont(FONT_SYSFIXED);
@@ -1587,10 +1583,8 @@ static void button_loop(void)
                 break;
 
             default:
-#if defined(HAVE_LCD_MODES)
-#if (HAVE_LCD_MODES & LCD_MODE_YUV)
-            	rb->lcd_set_mode(LCD_MODE_YUV);
-#endif
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_YUV)
+                rb->lcd_set_mode(LCD_MODE_YUV);
 #endif
                 /* If not stopped, show video again */
                 if (state != STREAM_STOPPED) {
@@ -1751,10 +1745,8 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
     
-#if defined(HAVE_LCD_MODES)
-#if (HAVE_LCD_MODES & LCD_MODE_YUV)
-	rb->lcd_set_mode(LCD_MODE_RGB565);
-#endif
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_YUV)
+    rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif
 
     stream_exit();

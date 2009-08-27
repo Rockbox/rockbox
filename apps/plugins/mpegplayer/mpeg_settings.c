@@ -259,6 +259,7 @@ static const struct opt_items globaloff[2] = {
 #define BACKLIGHT_OPTION_DEFAULT "Use setting"
 #endif
 
+static void mpeg_settings(void);
 static long mpeg_menu_sysevent_id;
 
 void mpeg_menu_sysevent_clear(void)
@@ -831,9 +832,8 @@ static int show_start_menu(uint32_t duration)
     struct hms hms;
 
     MENUITEM_STRINGLIST(menu, "Mpegplayer Menu", mpeg_menu_sysevent_callback,
-                        "Play from beginning", resume_str,
-                        "Set start time", "Settings",
-                        "Quit mpegplayer");
+                        "Play from beginning", resume_str, "Set start time",
+                        "Settings", "Quit mpegplayer");
 
     ts_to_hms(settings.resume_time, &hms);
     hms_format(hms_str, sizeof(hms_str), &hms);
@@ -872,9 +872,9 @@ static int show_start_menu(uint32_t duration)
             break;
 
         case MPEG_START_SETTINGS:
-            if (mpeg_menu(MPEG_MENU_HIDE_QUIT_ITEM) != MPEG_MENU_QUIT)
-                break;
-            /* Fall-through */
+            mpeg_settings();
+            break;
+
         default:
             result = MPEG_START_QUIT;
             menu_quit = true;
@@ -914,6 +914,44 @@ int mpeg_start_menu(uint32_t duration)
     case MPEG_RESUME_ALWAYS:
         return MPEG_START_SEEK;
     }
+}
+
+int mpeg_menu(void)
+{
+    int result;
+
+    MENUITEM_STRINGLIST(menu, "Mpegplayer Menu", mpeg_menu_sysevent_callback,
+                        "Settings", "Resume playback", "Quit mpegplayer");
+
+    rb->button_clear_queue();
+
+    mpeg_menu_sysevent_clear();
+
+    result = rb->do_menu(&menu, NULL, NULL, false);
+
+    switch (result)
+    {
+    case MPEG_MENU_SETTINGS:
+        mpeg_settings();
+        break;
+
+    case MPEG_MENU_RESUME:
+        break;
+
+    case MPEG_MENU_QUIT:
+        break;
+
+    default:
+        break;
+    }
+
+    if (mpeg_menu_sysevent() != 0)
+        result = MPEG_MENU_QUIT;
+
+    rb->lcd_clear_display();
+    rb->lcd_update();
+
+    return result;
 }
 
 /** MPEG Menu **/
@@ -1078,25 +1116,16 @@ static void clear_resume_count(void)
     configfile_update_entry(SETTINGS_FILENAME, "Resume count", 0);
 }
 
-int mpeg_menu(unsigned flags)
+static void mpeg_settings(void)
 {
     int selected = 0;
     int result;
     bool menu_quit = false;
     static char clear_str[32];
 
-    MENUITEM_STRINGLIST(menu_with_quit, "Mpegplayer Menu",
-                        mpeg_menu_sysevent_callback,
-                        "Display Options", "Audio Options",
-                        "Resume Options", clear_str, "Quit mpegplayer");
-    MENUITEM_STRINGLIST(menu_without_quit, "Settings",
-                        mpeg_menu_sysevent_callback,
+    MENUITEM_STRINGLIST(menu, "Settings", mpeg_menu_sysevent_callback,
                         "Display Options", "Audio Options",
                         "Resume Options", clear_str);
-    const struct menu_item_ex *menu = &menu_with_quit;
-
-    if (flags & MPEG_MENU_HIDE_QUIT_ITEM)
-        menu = &menu_without_quit;
 
     rb->button_clear_queue();
 
@@ -1112,39 +1141,30 @@ int mpeg_menu(unsigned flags)
 
         switch (result)
         {
-        case MPEG_MENU_DISPLAY_SETTINGS:
+        case MPEG_SETTING_DISPLAY_SETTINGS:
             display_options();
             break;
 
-        case MPEG_MENU_AUDIO_SETTINGS:
+        case MPEG_SETTING_AUDIO_SETTINGS:
             audio_options();
             break;
 
-        case MPEG_MENU_ENABLE_START_MENU:
+        case MPEG_SETTING_ENABLE_START_MENU:
             resume_options();
             break;
 
-        case MPEG_MENU_CLEAR_RESUMES:
+        case MPEG_SETTING_CLEAR_RESUMES:
             clear_resume_count();
             break;
 
-        case MPEG_MENU_QUIT:
         default:
             menu_quit = true;
             break;
         }
 
         if (mpeg_menu_sysevent() != 0)
-        {
-            result = MPEG_MENU_QUIT;
             menu_quit = true;
-        }
     }
-
-    rb->lcd_clear_display();
-    rb->lcd_update();
-
-    return result;
 }
 
 void init_settings(const char* filename)
