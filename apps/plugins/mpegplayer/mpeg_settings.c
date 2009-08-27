@@ -1137,7 +1137,7 @@ static void mpeg_settings(void)
         rb->snprintf(clear_str, sizeof(clear_str),
                      "Clear all resumes: %u", settings.resume_count);
 
-        result = rb->do_menu(menu, &selected, NULL, false);
+        result = rb->do_menu(&menu, &selected, NULL, false);
 
         switch (result)
         {
