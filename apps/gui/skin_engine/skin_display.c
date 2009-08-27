@@ -129,6 +129,8 @@ bool skin_update(struct gui_wps *gwps, unsigned int update_type)
     return retval;
 }
 
+#ifdef HAVE_LCD_BITMAP
+
 void skin_statusbar_changed(struct gui_wps *skin)
 {
     if (!skin)
@@ -158,8 +160,6 @@ void skin_statusbar_changed(struct gui_wps *skin)
 
     
 }
-
-#ifdef HAVE_LCD_BITMAP
 
 static void draw_progressbar(struct gui_wps *gwps,
                              struct skin_viewport *wps_vp)

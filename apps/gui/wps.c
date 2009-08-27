@@ -89,8 +89,9 @@ static struct wps_data wps_datas[NB_SCREENS];
 static void wps_state_init(void);
 static void track_changed_callback(void *param);
 static void nextid3available_callback(void* param);
+#ifdef HAVE_LCD_BITMAP
 static void statusbar_toggle_handler(void *data);
-
+#endif
 
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
 #ifdef HAVE_REMOTE_LCD
@@ -693,6 +694,8 @@ long gui_wps_show(void)
 #ifdef HAVE_LCD_CHARCELLS
     status_set_audio(true);
     status_set_param(false);
+#else
+    statusbar_toggle_handler(NULL);
 #endif
 
 #ifdef AB_REPEAT_ENABLE
@@ -700,7 +703,6 @@ long gui_wps_show(void)
     ab_reset_markers();
 #endif
     wps_state_init();
-    statusbar_toggle_handler(NULL);
 
     while ( 1 )
     {
