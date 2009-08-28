@@ -239,15 +239,17 @@
   \rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
-    \rbbottomrule%
+     \ifpdfoutput{\rbbottomrule}{\bottomrule}
     \SavedEndTab%
     \if\given{#4}\caption{#4}\fi%
     \if\given{#5}\label{#5}\fi%
     \endcenter%
   }
   \center
-  \tabularx{#1}{#2}\rbtoprule\rowcolor{tblhdrbgcolor}
-  #3\\\rbmidrule
+  \ifpdfoutput{\tabularx{#1}{#2}\rbtoprule\rowcolor{tblhdrbgcolor}
+               #3\\\rbmidrule}
+              {\tabularx{#1}{#2}\toprule\rowcolor{tblhdrbgcolor}
+               \rule{0pt}{2.9ex}#3\\\midrule}
 }{%
   \endtabularx
 }
@@ -256,7 +258,8 @@
 
 
 % command to set the default table heading for button lists
-\newcommand{\taghead}{\textbf{Tag} & \textbf{Description} \\\rbmidrule}
+\ifpdfoutput{\newcommand{\taghead}{\textbf{Tag} & \textbf{Description} \\\rbmidrule}}
+  {\newcommand{\taghead}{\rule{0pt}{2.9ex}\textbf{Tag} & \textbf{Description} \\\midrule}}
 
 % environment intended to be used with tag maps (for wps)
 % usage: \begin{tagmap}{caption}{label} Tag & Description \\ \end{tagmap}
@@ -268,14 +271,15 @@
 \rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
-    \rbbottomrule%
+     \ifpdfoutput{\rbbottomrule}{\bottomrule}%
     \SavedEndTab%
     \if\given{#1}\caption{#1}\fi%
     \if\given{#2}\label{#2}\fi%
     \endcenter%
   }
   \center
-\tabularx{\textwidth}{lX}\rbtoprule\rowcolor{tblhdrbgcolor} % here is the table width defined
+\ifpdfoutput{\tabularx{\textwidth}{lX}\rbtoprule\rowcolor{tblhdrbgcolor}} % here is the table width defined
+            {\tabularx{\textwidth}{lX}\toprule\rowcolor{tblhdrbgcolor}} % here is the table width defined
   \taghead
 }{%
   \endtabularx
@@ -359,8 +363,10 @@
 \makeindex
 
 % command to set the default table heading for button lists
-\newcommand{\btnhead}{\textbf{Key} \opt{HAVEREMOTEKEYMAP}{%
-  & \textbf{Remote Key}} & \textbf{Action} \\\rbmidrule}
+\ifpdfoutput{\newcommand{\btnhead}{\textbf{Key} \opt{HAVEREMOTEKEYMAP}{%
+  & \textbf{Remote Key}} & \textbf{Action} \\\rbmidrule}}
+  {\newcommand{\btnhead}{\textbf{Key} \opt{HAVEREMOTEKEYMAP}{%
+  & \textbf{Remote Key}} & \textbf{Action} \\\midrule}}
 % environment intended to be used with button maps
 % usage: \begin{btnmap}{caption}{label} Button & ButtonAction \\ \end{btnmap}
 % Note: this automatically sets the table lines.
@@ -377,7 +383,7 @@
   \rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
-    \rbbottomrule%
+    \ifpdfoutput{\rbbottomrule}{\bottomrule}%
     \SavedEndTab%
      \if\given{#1}\caption{#1}\fi%
      \if\given{#2}\label{#2}\fi%
@@ -386,13 +392,15 @@
   \center
   \opt{HAVEREMOTEKEYMAP}{
     % here is the table width defined for 3 columns
-    \tabularx{.95\textwidth}{>{\raggedright\arraybackslash}p{.2\textwidth}>{\raggedright\arraybackslash}p{.2\textwidth}X}\rbtoprule\rowcolor{tblhdrbgcolor}
+    \ifpdfoutput{\tabularx{.95\textwidth}{>{\raggedright\arraybackslash}p{.2\textwidth}>{\raggedright\arraybackslash}p{.2\textwidth}X}\rbtoprule\rowcolor{tblhdrbgcolor}}
+    {\tabularx{.95\textwidth}{>{\raggedright\arraybackslash}p{.2\textwidth}>{\raggedright\arraybackslash}p{.2\textwidth}X}\toprule\rowcolor{tblhdrbgcolor}}
   }
   \nopt{HAVEREMOTEKEYMAP}{
     % here is the table width defined for 2 columns
-    \tabularx{.75\textwidth}{>{\raggedright\arraybackslash}p{.22\textwidth}X}\rbtoprule\rowcolor{tblhdrbgcolor}
+    \ifpdfoutput{\tabularx{.75\textwidth}{>{\raggedright\arraybackslash}p{.22\textwidth}X}\rbtoprule\rowcolor{tblhdrbgcolor}}
+    {\tabularx{.75\textwidth}{>{\raggedright\arraybackslash}p{.22\textwidth}X}\toprule\rowcolor{tblhdrbgcolor}}
   }
-  \btnhead
+  \ifpdfoutput{\btnhead}{\rule{0pt}{2.9ex}\btnhead}
 }{%
   \endtabularx
 }
