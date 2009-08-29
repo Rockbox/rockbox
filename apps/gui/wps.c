@@ -376,7 +376,7 @@ bool ffwd_rew(int button)
             if (button == ACTION_TOUCHSCREEN)
                 button = wps_get_touchaction(gui_wps[SCREEN_MAIN].data);
 #endif
-        }        
+        }
     }
     return usb;
 }
@@ -660,7 +660,7 @@ int wps_get_touchaction(struct wps_data *data)
                         return ACTION_REDRAW;
                     }
                 }
-            }    
+            }
         }
         regions = regions->next;
     }
@@ -1024,7 +1024,7 @@ long gui_wps_show(void)
             {
                 gwps_leave_wps();
                 if (quick_screen_quick(button))
-                    return SYS_USB_CONNECTED;
+                    return GO_TO_ROOT;
                 restore = true;
             }
             break;
@@ -1036,7 +1036,7 @@ long gui_wps_show(void)
             {
                 gwps_leave_wps();
                 if (quick_screen_f3(BUTTON_F3))
-                    return SYS_USB_CONNECTED;
+                    return GO_TO_ROOT;
                 restore = true;
             }
             break;
@@ -1048,7 +1048,7 @@ long gui_wps_show(void)
             {
                 gwps_leave_wps();
                 if (1 == gui_syncpitchscreen_run())
-                    return SYS_USB_CONNECTED;
+                    return GO_TO_ROOT;
                 restore = true;
             }
             break;
@@ -1076,7 +1076,8 @@ long gui_wps_show(void)
             case ACTION_WPS_ID3SCREEN:
             {
                 gwps_leave_wps();
-                browse_id3();
+                if (browse_id3())
+                    return GO_TO_ROOT;
                 restore = true;
             }
             break;
@@ -1123,12 +1124,15 @@ long gui_wps_show(void)
             case ACTION_WPS_VIEW_PLAYLIST:
                 gwps_leave_wps();
                 if (playlist_viewer()) /* true if USB connected */
-                    return SYS_USB_CONNECTED;
+                    return GO_TO_ROOT;
                 restore = true;
                 break;
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
+                {
+                    gwps_leave_wps();
                     return GO_TO_ROOT;
+                }
                 update = true;
                 break;
         }
