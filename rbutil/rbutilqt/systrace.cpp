@@ -46,9 +46,12 @@ void SysTrace::save(void)
 {
     QString fp = QFileDialog::getSaveFileName(this, tr("Save system trace log"),
                         QDir::homePath(), "*.log");
-
+    if(fp == "")
+        return;
+        
     QFile fh(fp);
-    fh.open(QIODevice::WriteOnly);
+    if(!fh.open(QIODevice::WriteOnly))
+        return;
     fh.write(debugbuffer.toUtf8(), debugbuffer.size());
     fh.close();
 }

@@ -144,9 +144,12 @@ void ProgressLoggerGui::saveErrorLog()
 {
     QString filename = QFileDialog::getSaveFileName(downloadProgress, tr("Save system trace log"),
                         QDir::homePath(), "*.log");
-
+    if(filename == "")
+        return;
+    
     QFile file(filename);
-    file.open(QIODevice::WriteOnly);
+    if(!file.open(QIODevice::WriteOnly))
+        return;
 
     //Logger texts
     QString loggerTexts = "\n*********************************************\n" 
