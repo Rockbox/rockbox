@@ -229,7 +229,11 @@ void usb_screen(void)
     status_set_usb(false);
 #endif /* HAVE_LCD_CHARCELLS */
     FOR_NB_SCREENS(i)
+    {
         screens[i].backlight_on();
+        screens[i].clear_display();
+        screens[i].update();
+    }
     global_settings.statusbar = statusbar;
 #endif /* USB_NONE */
 }
