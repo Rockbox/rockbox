@@ -23,8 +23,7 @@ static inline int32_t MULT32(int32_t x, int32_t y) {
   int lo,hi;
   asm volatile("smull\t%0, %1, %2, %3"
                : "=&r"(lo),"=&r"(hi)
-               : "%r"(x),"r"(y)
-	       : "cc");
+               : "%r"(x),"r"(y) );
   return(hi);
 }
 
@@ -39,23 +38,20 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
 	       "adc	%1, %0, %1, lsl #17\n\t"
                : "=&r"(lo),"=&r"(hi)
                : "%r"(x),"r"(y)
-	       : "cc");
+               : "cc" );
   return(hi);
 }
-
-#define MB() asm volatile ("" : : : "memory")
 
 #define XPROD32(a, b, t, v, x, y) \
 { \
   long l; \
   asm(	"smull	%0, %1, %4, %6\n\t" \
-	"smlal	%0, %1, %5, %7\n\t" \
 	"rsb	%3, %4, #0\n\t" \
+	"smlal	%0, %1, %5, %7\n\t" \
 	"smull	%0, %2, %5, %6\n\t" \
 	"smlal	%0, %2, %3, %7" \
 	: "=&r" (l), "=&r" (x), "=&r" (y), "=r" ((a)) \
-	: "3" ((a)), "r" ((b)), "r" ((t)), "r" ((v)) \
-	: "cc" ); \
+        : "3" ((a)), "r" ((b)), "r" ((t)), "r" ((v)) ); \
 }
 
 static inline void XPROD31(int32_t  a, int32_t  b,
@@ -64,15 +60,13 @@ static inline void XPROD31(int32_t  a, int32_t  b,
 {
   int x1, y1, l;
   asm(	"smull	%0, %1, %4, %6\n\t"
-	"smlal	%0, %1, %5, %7\n\t"
 	"rsb	%3, %4, #0\n\t"
+	"smlal	%0, %1, %5, %7\n\t"
 	"smull	%0, %2, %5, %6\n\t"
 	"smlal	%0, %2, %3, %7"
 	: "=&r" (l), "=&r" (x1), "=&r" (y1), "=r" (a)
-	: "3" (a), "r" (b), "r" (t), "r" (v)
-	: "cc" );
+	: "3" (a), "r" (b), "r" (t), "r" (v) );
   *x = x1 << 1;
-  MB();
   *y = y1 << 1;
 }
 
@@ -81,16 +75,14 @@ static inline void XNPROD31(int32_t  a, int32_t  b,
 			    int32_t *x, int32_t *y)
 {
   int x1, y1, l;
-  asm(	"rsb	%2, %4, #0\n\t"
-	"smull	%0, %1, %3, %5\n\t"
+  asm(	"smull	%0, %1, %3, %5\n\t"
+	"rsb	%2, %4, #0\n\t"
 	"smlal	%0, %1, %2, %6\n\t"
 	"smull	%0, %2, %4, %5\n\t"
 	"smlal	%0, %2, %3, %6"
 	: "=&r" (l), "=&r" (x1), "=&r" (y1)
-	: "r" (a), "r" (b), "r" (t), "r" (v)
-	: "cc" );
+	: "r" (a), "r" (b), "r" (t), "r" (v) );
   *x = x1 << 1;
-  MB();
   *y = y1 << 1;
 }
 
@@ -158,7 +150,7 @@ void vect_mult_fw(int32_t *data, int32_t *window, int n)
                   : [d] "+r" (data), [w] "+r" (window)
                   : : "r0", "r1", "r2", "r3",
                   "r4", "r5", "r6", "r7", "r8", "r9",
-                  "memory", "cc");
+                  "memory" );
     n -= 4;
   }
   while(n>0) {
@@ -187,7 +179,7 @@ void vect_mult_bw(int32_t *data, int32_t *window, int n)
                   : [d] "+r" (data), [w] "+r" (window)
                   : : "r0", "r1", "r2", "r3",
                   "r4", "r5", "r6", "r7", "r8", "r9",
-                  "memory", "cc");
+                  "memory" );
     n -= 4;
   }
   while(n>0) {
