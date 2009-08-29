@@ -105,13 +105,6 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
 #endif
 
 /*
- * This should be used as a memory barrier, forcing all cached values in
- * registers to wr writen back to memory.  Might or might not be beneficial
- * depending on the architecture and compiler.
- */
-#define MB()
-
-/*
  * The XPROD functions are meant to optimize the cross products found all
  * over the place in mdct.c by forcing memory operation ordering to avoid
  * unnecessary register reloads as soon as memory is being written to.

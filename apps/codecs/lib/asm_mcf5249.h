@@ -27,8 +27,6 @@
 #ifndef _V_WIDE_MATH
 #define _V_WIDE_MATH
 
-#define MB()
-
 static inline int32_t MULT32(int32_t x, int32_t y) {
 
   asm volatile ("mac.l %[x], %[y], %%acc0;"    /* multiply & shift  */
