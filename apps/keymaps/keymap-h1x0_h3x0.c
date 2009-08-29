@@ -205,8 +205,8 @@ static const struct button_mapping button_context_time[]  = {
 }; /* button_context_settings_bmark */
 
 static const struct button_mapping button_context_quickscreen[]  = {
-    { ACTION_QS_DOWNINV,    BUTTON_UP,                      BUTTON_NONE },
-    { ACTION_QS_DOWNINV,    BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_QS_TOP,    BUTTON_UP,                      BUTTON_NONE },
+    { ACTION_QS_TOP,    BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_DOWN,                    BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_LEFT,                    BUTTON_NONE },
@@ -507,8 +507,8 @@ static const struct button_mapping *button_context_bmark_h300lcdremote =
                 button_context_bmark_h100remote;
 
 static const struct button_mapping button_context_quickscreen_nonlcdremote[]  = {
-    { ACTION_QS_DOWNINV,    BUTTON_RC_VOL_UP,                 BUTTON_NONE },
-    { ACTION_QS_DOWNINV,    BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_QS_TOP,        BUTTON_RC_VOL_UP,                 BUTTON_NONE },
+    { ACTION_QS_TOP,        BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_RC_REW,                    BUTTON_NONE },
@@ -521,8 +521,8 @@ static const struct button_mapping button_context_quickscreen_nonlcdremote[]  = 
 }; /* button_context_quickscreen */
 
 static const struct button_mapping button_context_quickscreen_h100lcdremote[]  = {
-    { ACTION_QS_DOWNINV,    BUTTON_RC_VOL_UP,                   BUTTON_NONE },
-    { ACTION_QS_DOWNINV,    BUTTON_RC_VOL_UP|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_QS_TOP,        BUTTON_RC_VOL_UP,                   BUTTON_NONE },
+    { ACTION_QS_TOP,        BUTTON_RC_VOL_UP|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_RC_VOL_DOWN,                 BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_RC_REW,                      BUTTON_NONE },
@@ -539,8 +539,8 @@ static const struct button_mapping button_context_quickscreen_h100lcdremote[]  =
 }; /* button_context_quickscreen */
 
 static const struct button_mapping button_context_quickscreen_h300lcdremote[]  = {
-    { ACTION_QS_DOWNINV,    BUTTON_RC_VOL_UP,               BUTTON_NONE },
-    { ACTION_QS_DOWNINV,    BUTTON_RC_VOL_UP|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_QS_TOP,        BUTTON_RC_VOL_UP,               BUTTON_NONE },
+    { ACTION_QS_TOP,        BUTTON_RC_VOL_UP|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_RC_VOL_DOWN,             BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_RC_REW,                  BUTTON_NONE },

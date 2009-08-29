@@ -227,8 +227,8 @@ static const struct button_mapping button_context_time[]  = {
 }; /* button_context_time */
 
 static const struct button_mapping button_context_quickscreen[]  = {
-    { ACTION_QS_DOWNINV, BUTTON_UP,                  BUTTON_NONE },
-    { ACTION_QS_DOWNINV, BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_QS_TOP,     BUTTON_UP,                  BUTTON_NONE },
+    { ACTION_QS_TOP,     BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_QS_DOWN,    BUTTON_DOWN,                BUTTON_NONE },
     { ACTION_QS_DOWN,    BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_QS_LEFT,    BUTTON_LEFT,                BUTTON_NONE },
@@ -422,8 +422,8 @@ static const struct button_mapping remote_button_context_yesno[]  = {
 }; /* button_context_settings_yesno */
 
 static const struct button_mapping remote_button_context_quickscreen[]  = {
-    { ACTION_QS_DOWNINV, BUTTON_RC_VOL_UP,                 BUTTON_NONE },
-    { ACTION_QS_DOWNINV, BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_QS_TOP,     BUTTON_RC_VOL_UP,                 BUTTON_NONE },
+    { ACTION_QS_TOP,     BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_QS_DOWN,    BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
     { ACTION_QS_DOWN,    BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_QS_LEFT,    BUTTON_RC_REW,                    BUTTON_NONE },

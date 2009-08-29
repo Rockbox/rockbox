@@ -1525,6 +1525,10 @@ const struct settings_list settings[] = {
                    ID2P(LANG_NORMAL), ID2P(LANG_HIGH)),
 #endif
 #ifdef HAVE_QUICKSCREEN
+   CUSTOM_SETTING(0, qs_item_top, LANG_TOP_QS_ITEM,
+                  &global_settings.party_mode, "qs top",
+                  qs_load_from_cfg, qs_write_to_cfg,
+                  qs_is_changed, qs_set_default),
    CUSTOM_SETTING(0, qs_item_left, LANG_LEFT_QS_ITEM, 
                   &global_settings.playlist_shuffle, "qs left",
                   qs_load_from_cfg, qs_write_to_cfg,

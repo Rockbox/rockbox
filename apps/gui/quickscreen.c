@@ -38,17 +38,18 @@
 #include "talk.h"
 #include "list.h"
 #include "option_select.h"
+#include "debug.h"
 
 static struct viewport vps[NB_SCREENS][QUICKSCREEN_ITEM_COUNT];
 static struct viewport vp_icons[NB_SCREENS];
-/* vp_icons will be used like this:
-   the side icons will be aligned to the top of this vp and to their sides
-   the bottom icon will be aligned center and at the bottom of this vp */
-
-#define MIN_LINES 4
-#define MAX_NEEDED_LINES 8
-#define CENTER_MARGIN 10 /* pixels between the 2 center items minimum */
-#define CENTER_ICONAREA_WIDTH (CENTER_MARGIN+8*2)
+ /* 1 top, 1 bottom, 2 on either side, 1 for the icons
+  * if enough space, top and bottom have 2 lines */
+#define MIN_LINES 5
+#define MAX_NEEDED_LINES 10
+ /* pixels between the 2 center items minimum or between text and icons,
+  * and between text and parent boundaries */
+#define MARGIN 10
+#define CENTER_ICONAREA_SIZE (MARGIN+8*2)
 
 static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
                                       struct screen *display,
@@ -59,9 +60,8 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
 #else
     const int screen = 0;
 #endif
-
-    int char_height, i, width, pad = 0;
-    int left_width, right_width, bottom_lines = 2;
+    int char_height, width, pad = 0;
+    int left_width, right_width, vert_lines;
     unsigned char *s;
     int nb_lines = viewport_get_nb_lines(parent);
 
@@ -75,43 +75,57 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
 
     /* center the icons VP first */
     vp_icons[screen] = *parent;
-    vp_icons[screen].width = CENTER_ICONAREA_WIDTH; /* absolute smallest allowed */
-    vp_icons[screen].x = parent->x + (parent->width / 2 - CENTER_ICONAREA_WIDTH / 2);
+    vp_icons[screen].width = CENTER_ICONAREA_SIZE; /* abosulte smallest allowed */
+    vp_icons[screen].x = parent->x;
+    vp_icons[screen].x += (parent->width-CENTER_ICONAREA_SIZE)/2;
+
 
     vps[screen][QUICKSCREEN_BOTTOM] = *parent;
-    if (nb_lines <= MIN_LINES) /* make the bottom item use 1 line */
-        bottom_lines = 1;
+    vps[screen][QUICKSCREEN_TOP] = *parent;
+    /* depending on the space the top/buttom items use 1 or 2 lines */
+    if (nb_lines < MIN_LINES)
+        vert_lines = 1;
     else
-        bottom_lines = 2;
-    vps[screen][QUICKSCREEN_BOTTOM].height = bottom_lines*char_height;
-    vps[screen][QUICKSCREEN_BOTTOM].y =
-                    parent->y + parent->height - bottom_lines*char_height;
+        vert_lines = 2;
+    vps[screen][QUICKSCREEN_TOP].y = parent->y;
+    vps[screen][QUICKSCREEN_TOP].height = vps[screen][QUICKSCREEN_BOTTOM].height
+            = vert_lines*char_height;
+    vps[screen][QUICKSCREEN_BOTTOM].y
+            = parent->y + parent->height - vps[screen][QUICKSCREEN_BOTTOM].height;
+
+    /* enough space vertically, so put a nice margin */
     if (nb_lines >= MAX_NEEDED_LINES)
     {
-        vps[screen][QUICKSCREEN_BOTTOM].y -= char_height;
+        vps[screen][QUICKSCREEN_TOP].y += MARGIN;
+        vps[screen][QUICKSCREEN_BOTTOM].y -= MARGIN;
     }
+
+    vp_icons[screen].y = vps[screen][QUICKSCREEN_TOP].y
+            + vps[screen][QUICKSCREEN_TOP].height;
+    vp_icons[screen].height = parent->height - vp_icons[screen].y;
+    vp_icons[screen].height -= parent->height - vps[screen][QUICKSCREEN_BOTTOM].y;
 
     /* adjust the left/right items widths to fit the screen nicely */
     s = P2STR(ID2P(qs->items[QUICKSCREEN_LEFT]->lang_id));
     left_width = display->getstringsize(s, NULL, NULL);
     s = P2STR(ID2P(qs->items[QUICKSCREEN_RIGHT]->lang_id));
     right_width = display->getstringsize(s, NULL, NULL);
-    nb_lines -= bottom_lines;
-    
+
     width = MAX(left_width, right_width);
     if (width*2 + vp_icons[screen].width > display->lcdwidth)
         width = (display->lcdwidth - vp_icons[screen].width)/2;
     else /* add more gap in icons vp */
     {
         int excess = display->lcdwidth - vp_icons[screen].width - width*2;
-        if (excess > CENTER_MARGIN*4)
+        if (excess > MARGIN*4)
         {
-            pad = CENTER_MARGIN;
-            excess -= CENTER_MARGIN*2;
+            pad = MARGIN;
+            excess -= MARGIN*2;
         }
         vp_icons[screen].x -= excess/2;
         vp_icons[screen].width += excess;
     }
+
     vps[screen][QUICKSCREEN_LEFT] = *parent;
     vps[screen][QUICKSCREEN_LEFT].x = parent->x + pad;
     vps[screen][QUICKSCREEN_LEFT].width = width;
@@ -119,32 +133,25 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     vps[screen][QUICKSCREEN_RIGHT] = *parent;
     vps[screen][QUICKSCREEN_RIGHT].x = parent->x + parent->width - width - pad;
     vps[screen][QUICKSCREEN_RIGHT].width = width;
-    
+
+    vps[screen][QUICKSCREEN_LEFT].height = vps[screen][QUICKSCREEN_RIGHT].height
+            = 2*char_height;
+
+    vps[screen][QUICKSCREEN_LEFT].y = vps[screen][QUICKSCREEN_RIGHT].y
+            = parent->y + (parent->height/2) - char_height;
+
     /* shrink the icons vp by a few pixels if there is room so the arrows
        aren't drawn right next to the text */
-    if (vp_icons[screen].width > CENTER_ICONAREA_WIDTH+8)
+    if (vp_icons[screen].width > CENTER_ICONAREA_SIZE*2)
     {
-        vp_icons[screen].width -= 8;
-        vp_icons[screen].x += 4;
+        vp_icons[screen].width -= CENTER_ICONAREA_SIZE*2/3;
+        vp_icons[screen].x += CENTER_ICONAREA_SIZE*2/6;
     }
-    
-
-    if (nb_lines <= MIN_LINES)
-        i = 0;
-    else
-        i = nb_lines/2;
-    vps[screen][QUICKSCREEN_LEFT].y = parent->y + (i*char_height);
-    vps[screen][QUICKSCREEN_RIGHT].y = parent->y + (i*char_height);
-    if (nb_lines >= 3)
-        i = 3*char_height;
-    else
-        i = nb_lines*char_height;
-
-    vps[screen][QUICKSCREEN_LEFT].height = i;
-    vps[screen][QUICKSCREEN_RIGHT].height = i;
-    vp_icons[screen].y = vps[screen][QUICKSCREEN_LEFT].y + (char_height/2);
-    vp_icons[screen].height =
-                vps[screen][QUICKSCREEN_BOTTOM].y - vp_icons[screen].y;
+    if (vp_icons[screen].height > CENTER_ICONAREA_SIZE*2)
+    {
+        vp_icons[screen].height -= CENTER_ICONAREA_SIZE*2/3;
+        vp_icons[screen].y += CENTER_ICONAREA_SIZE*2/6;
+    }
 }
 
 static void quickscreen_draw_text(const char *s, int item, bool title,
@@ -158,6 +165,7 @@ static void quickscreen_draw_text(const char *s, int item, bool title,
         line = 1;
     switch (item)
     {
+        case QUICKSCREEN_TOP:
         case QUICKSCREEN_BOTTOM:
             x = (vp->width - w)/2;
             break;
@@ -219,13 +227,18 @@ static void gui_quickscreen_draw(struct gui_quickscreen *qs,
     }
     /* draw the icons */
     display->set_viewport(&vp_icons[screen]);
+
+    display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
+                    (vp_icons[screen].width/2) - 4, 0,      7, 8);
     display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                         vp_icons[screen].width - 8, 0, 7, 8);
-    display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 0, 0, 7, 8);
+                    vp_icons[screen].width - 8,
+                    (vp_icons[screen].height/2) - 4,        7, 8);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],   0,
+                    (vp_icons[screen].height/2) - 4,        7, 8);
+
     display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                          (vp_icons[screen].width/2) - 4, 
-                          vp_icons[screen].height - 7, 7, 8);
-    display->update_viewport();
+                          vp_icons[screen].height - 8,       7, 8);
 
     display->set_viewport(parent);
     display->update_viewport();
@@ -254,12 +267,15 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
     bool invert = false;
     switch(button)
     {
+        case ACTION_QS_TOP:
+            invert = true;
+            item = QUICKSCREEN_TOP;
+            break;
         case ACTION_QS_LEFT:
+            invert = true;
             item = QUICKSCREEN_LEFT;
             break;
 
-        case ACTION_QS_DOWNINV:
-            invert = true;      /* fallthrough */
         case ACTION_QS_DOWN:
             item = QUICKSCREEN_BOTTOM;
             break;
@@ -367,6 +383,9 @@ bool quick_screen_quick(int button_enter)
     bool oldshuffle = global_settings.playlist_shuffle;
     int oldrepeat = global_settings.repeat_mode;
 
+    qs.items[QUICKSCREEN_TOP] = 
+            get_setting(global_settings.qs_item_top,
+                        find_setting(&global_settings.party_mode, NULL));
     qs.items[QUICKSCREEN_LEFT] = 
             get_setting(global_settings.qs_item_left,
                         find_setting(&global_settings.playlist_shuffle, NULL));
@@ -452,6 +471,9 @@ void set_as_qs_item(const struct settings_list *setting,
     }
     switch (item)
     {
+        case QUICKSCREEN_TOP:
+            global_settings.qs_item_top = i;
+            break;
         case QUICKSCREEN_LEFT:
             global_settings.qs_item_left = i;
             break;
@@ -461,7 +483,7 @@ void set_as_qs_item(const struct settings_list *setting,
         case QUICKSCREEN_BOTTOM:
             global_settings.qs_item_bottom = i;
             break;
-        default: /* shut the copiler up */
+        default: /* shut the compiler up */
             break;
     }
 }

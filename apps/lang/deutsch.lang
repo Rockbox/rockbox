@@ -12464,3 +12464,20 @@
     swcodec: "Geschwindigkeit"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Als obere Schnelleinstellung verwenden"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Als obere Schnelleinstellung verwenden"
+  </voice>
+</phrase>

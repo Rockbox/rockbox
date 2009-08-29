@@ -109,8 +109,8 @@ static const struct button_mapping button_context_bmark[]  = {
 }; /* button_context_settings_bmark */
 
 static const struct button_mapping button_context_quickscreen[]  = {
-    { ACTION_QS_DOWNINV,    BUTTON_UP,                      BUTTON_NONE },
-    { ACTION_QS_DOWNINV,    BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_QS_TOP,        BUTTON_UP,                      BUTTON_NONE },
+    { ACTION_QS_TOP,        BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_DOWN,                    BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_LEFT,                    BUTTON_NONE },

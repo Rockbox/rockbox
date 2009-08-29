@@ -191,13 +191,11 @@ enum {
     /* bookmark screen */
     ACTION_BMS_DELETE,
     
-    /* alarm menu screen */    
-        
     /* quickscreen */
     ACTION_QS_LEFT,
     ACTION_QS_RIGHT,
     ACTION_QS_DOWN,
-    ACTION_QS_DOWNINV, /* why is this not called up?? :p */
+    ACTION_QS_TOP,
     
     /* pitchscreen */
     /* obviously ignore if you dont have thise screen */

@@ -164,7 +164,7 @@ static const struct button_mapping button_context_time[]  = {
 
 static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_STD_CANCEL,        BUTTON_RC_MODE,         BUTTON_NONE },
-    { ACTION_QS_DOWNINV,        BUTTON_RC_PLAY,         BUTTON_NONE },
+    { ACTION_QS_TOP,            BUTTON_RC_PLAY,         BUTTON_NONE },
     { ACTION_QS_DOWN,           BUTTON_RC_DOWN,         BUTTON_NONE },
     { ACTION_QS_LEFT,           BUTTON_RC_REW,          BUTTON_NONE },
     { ACTION_QS_RIGHT,          BUTTON_RC_FF,           BUTTON_NONE },

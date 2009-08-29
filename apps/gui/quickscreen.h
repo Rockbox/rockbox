@@ -29,7 +29,8 @@
 #include "screen_access.h"
 
 enum quickscreen_item {
-    QUICKSCREEN_LEFT = 0,
+    QUICKSCREEN_TOP = 0,
+    QUICKSCREEN_LEFT,
     QUICKSCREEN_RIGHT,
     QUICKSCREEN_BOTTOM,
     QUICKSCREEN_ITEM_COUNT,

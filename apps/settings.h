@@ -503,6 +503,7 @@ struct user_settings
 
 #ifdef HAVE_QUICKSCREEN
     /* these are split because settings_list cant handle arrays */
+    int qs_item_top;
     int qs_item_left;
     int qs_item_right;
     int qs_item_bottom;

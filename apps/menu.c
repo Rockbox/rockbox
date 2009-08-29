@@ -455,6 +455,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                     MENUITEM_STRINGLIST(quickscreen_able_option,
                                         ID2P(LANG_ONPLAY_MENU_TITLE), NULL,
                                         ID2P(LANG_RESET_SETTING),
+                                        ID2P(LANG_TOP_QS_ITEM),
                                         ID2P(LANG_LEFT_QS_ITEM),
                                         ID2P(LANG_BOTTOM_QS_ITEM),
                                         ID2P(LANG_RIGHT_QS_ITEM));
@@ -481,13 +482,16 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                                 break;
 #ifdef HAVE_QUICKSCREEN
                             break;
-                        case 1: /* set as left QS item */
+                        case 1: /* set as top QS item */
+                            set_as_qs_item(setting, QUICKSCREEN_TOP);
+                            break;
+                        case 2: /* set as left QS item */
                             set_as_qs_item(setting, QUICKSCREEN_LEFT);
                             break;
-                        case 2: /* set as bottom QS item */
+                        case 3: /* set as bottom QS item */
                             set_as_qs_item(setting, QUICKSCREEN_BOTTOM);
                             break;
-                        case 3: /* set as right QS item */
+                        case 4: /* set as right QS item */
                             set_as_qs_item(setting, QUICKSCREEN_RIGHT);
                             break;
 #endif
