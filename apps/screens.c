@@ -96,7 +96,10 @@ static int clamp_value_wrap(int value, int max, int min)
 #ifndef SIMULATOR
 static int handle_usb_events(void)
 {
+#if (CONFIG_STORAGE & STORAGE_MMC)
     int next_update=0;
+#endif /* STORAGE_MMC */
+
 #ifdef HAVE_TOUCHSCREEN
     enum touchscreen_mode old_mode = touchscreen_get_mode();
 
@@ -115,7 +118,7 @@ static int handle_usb_events(void)
         if (hid_enabled)
         {
             int id = HID_CONSUMER_USAGE_UNASSIGNED;
-            button = get_action(CONTEXT_USB_HID, HZ/4);
+            button = get_action(CONTEXT_USB_HID, HZ/2);
 
             switch (button)
             {
@@ -147,7 +150,11 @@ static int handle_usb_events(void)
         }
         else
 #endif
-            button = button_get_w_tmo(HZ/4);
+        {
+            button = button_get_w_tmo(HZ/2);
+            /* hid emits the event in get_action */
+            send_event(GUI_EVENT_ACTIONUPDATE, NULL);
+        }
 
         switch(button)
         {
@@ -158,16 +165,15 @@ static int handle_usb_events(void)
                 break;
         }
 
+#if (CONFIG_STORAGE & STORAGE_MMC) /* USB-MMC bridge can report activity */
         if(TIME_AFTER(current_tick,next_update))
         {
             if(usb_inserted()) {
-#if (CONFIG_STORAGE & STORAGE_MMC) /* USB-MMC bridge can report activity */
                 led(mmc_usb_active(HZ));
-#endif /* STORAGE_MMC */
-                gui_syncstatusbar_draw(&statusbars, false);
             }
             next_update=current_tick+HZ/2;
         }
+#endif /* STORAGE_MMC */
     }
 Exit:
 #ifdef HAVE_TOUCHSCREEN
@@ -224,7 +230,12 @@ void usb_screen(void)
     viewportmanager_set_statusbar(usb_bars);
 
 #ifdef SIMULATOR
-    while (button_get(true) & BUTTON_REL);
+    while (1)
+    {
+        if (button_get_w_tmo(HZ/2))
+            break;
+        send_event(GUI_EVENT_ACTIONUPDATE, NULL);
+    }
 #else
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
     while (handle_usb_events());
