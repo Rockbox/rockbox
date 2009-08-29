@@ -41,8 +41,7 @@
 #include <codecs/lib/codeclib.h>
 #endif /* ROCKBOX */
 
-#if defined(CPU_ARM) && CONFIG_CPU != S3C2440
-/* C code is faster on S3C2440 */
+#if defined(CPU_ARM)
 
 extern void mdct_butterfly_32(int32_t *x);
 extern void mdct_butterfly_generic_loop(int32_t *x1, int32_t *x2,
