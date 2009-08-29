@@ -65,20 +65,6 @@
 \colorlet{tbloddrowbgcolor}{blue!10} % Background color for odd rows (headers not included)
 \colorlet{tblevenrowbgcolor}{white} % Background color for even rows (headers not included)
 
-% We use or own rules to typeset tables since we want the headers to
-% be fully filled with colors
-\newcommand{\rbtoprule}{\specialrule{\heavyrulewidth}{\abovetopsep}{0pt}%
-    \arrayrulecolor{tblhdrbgcolor}\specialrule{\belowrulesep}{0pt}{0pt}%
-    \arrayrulecolor{black}}
-\newcommand{\rbmidrule}{\arrayrulecolor{tblhdrbgcolor}\specialrule{\aboverulesep}{0pt}{0pt}%
-    \arrayrulecolor{black}\specialrule{\lightrulewidth}{0pt}{0pt}%
-    \arrayrulecolor{tblevenrowbgcolor}\specialrule{\belowrulesep}{0pt}{0pt}%
-    \arrayrulecolor{black}}
-\newcommand{\rbbottomrule}{\specialrule{\heavyrulewidth}{\aboverulesep}{0pt}%
-    \arrayrulecolor{white}\specialrule{\belowbottomsep}{0pt}{0pt}%
-    \arrayrulecolor{black}}
-
-
 \usepackage{fancyhdr}
 \usepackage{graphicx}
 \usepackage{verbatim}
@@ -115,6 +101,11 @@
 \renewcommand{\footrulewidth}{\iffloatpage{0pt}{0.4pt}}
 \setlength{\headheight}{18.5pt}
 \newcounter{example}[chapter]
+
+\ifpdfoutput{%
+  \setlength{\belowrulesep}{0pt}
+  \setlength{\aboverulesep}{0pt}
+  }{}
 
 %% \newenvironment{example}
 %%     {\stepcounter{example}\paragraph{Example \theexample:}}
@@ -239,17 +230,15 @@
   \rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
-     \ifpdfoutput{\rbbottomrule}{\bottomrule}
+    \bottomrule
     \SavedEndTab%
     \if\given{#4}\caption{#4}\fi%
     \if\given{#5}\label{#5}\fi%
     \endcenter%
   }
   \center
-  \ifpdfoutput{\tabularx{#1}{#2}\rbtoprule\rowcolor{tblhdrbgcolor}
-               #3\\\rbmidrule}
-              {\tabularx{#1}{#2}\toprule\rowcolor{tblhdrbgcolor}
-               \rule{0pt}{2.9ex}#3\\\midrule}
+  \tabularx{#1}{#2}\toprule\rowcolor{tblhdrbgcolor}
+  \rule{0pt}{2.9ex}#3\\\midrule
 }{%
   \endtabularx
 }
@@ -258,8 +247,7 @@
 
 
 % command to set the default table heading for button lists
-\ifpdfoutput{\newcommand{\taghead}{\textbf{Tag} & \textbf{Description} \\\rbmidrule}}
-  {\newcommand{\taghead}{\rule{0pt}{2.9ex}\textbf{Tag} & \textbf{Description} \\\midrule}}
+\newcommand{\taghead}{\rule{0pt}{2.9ex}\textbf{Tag} & \textbf{Description} \\\midrule}
 
 % environment intended to be used with tag maps (for wps)
 % usage: \begin{tagmap}{caption}{label} Tag & Description \\ \end{tagmap}
@@ -271,15 +259,14 @@
 \rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
-     \ifpdfoutput{\rbbottomrule}{\bottomrule}%
+    \bottomrule
     \SavedEndTab%
     \if\given{#1}\caption{#1}\fi%
     \if\given{#2}\label{#2}\fi%
     \endcenter%
   }
   \center
-\ifpdfoutput{\tabularx{\textwidth}{lX}\rbtoprule\rowcolor{tblhdrbgcolor}} % here is the table width defined
-            {\tabularx{\textwidth}{lX}\toprule\rowcolor{tblhdrbgcolor}} % here is the table width defined
+\tabularx{\textwidth}{lX}\toprule\rowcolor{tblhdrbgcolor} % here is the table width defined
   \taghead
 }{%
   \endtabularx
@@ -362,11 +349,10 @@
 \usepackage{makeidx}
 \makeindex
 
+
 % command to set the default table heading for button lists
-\ifpdfoutput{\newcommand{\btnhead}{\textbf{Key} \opt{HAVEREMOTEKEYMAP}{%
-  & \textbf{Remote Key}} & \textbf{Action} \\\rbmidrule}}
-  {\newcommand{\btnhead}{\textbf{Key} \opt{HAVEREMOTEKEYMAP}{%
-  & \textbf{Remote Key}} & \textbf{Action} \\\midrule}}
+\newcommand{\btnhead}{\textbf{Key} \opt{HAVEREMOTEKEYMAP}{%
+  & \textbf{Remote Key}} & \textbf{Action} \\\midrule}
 % environment intended to be used with button maps
 % usage: \begin{btnmap}{caption}{label} Button & ButtonAction \\ \end{btnmap}
 % Note: this automatically sets the table lines.
@@ -383,7 +369,7 @@
   \rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
-    \ifpdfoutput{\rbbottomrule}{\bottomrule}%
+    \bottomrule
     \SavedEndTab%
      \if\given{#1}\caption{#1}\fi%
      \if\given{#2}\label{#2}\fi%
@@ -392,15 +378,13 @@
   \center
   \opt{HAVEREMOTEKEYMAP}{
     % here is the table width defined for 3 columns
-    \ifpdfoutput{\tabularx{.95\textwidth}{>{\raggedright\arraybackslash}p{.2\textwidth}>{\raggedright\arraybackslash}p{.2\textwidth}X}\rbtoprule\rowcolor{tblhdrbgcolor}}
-    {\tabularx{.95\textwidth}{>{\raggedright\arraybackslash}p{.2\textwidth}>{\raggedright\arraybackslash}p{.2\textwidth}X}\toprule\rowcolor{tblhdrbgcolor}}
+    \tabularx{.95\textwidth}{>{\raggedright\arraybackslash}p{.2\textwidth}>{\raggedright\arraybackslash}p{.2\textwidth}X}\toprule\rowcolor{tblhdrbgcolor}
   }
   \nopt{HAVEREMOTEKEYMAP}{
     % here is the table width defined for 2 columns
-    \ifpdfoutput{\tabularx{.75\textwidth}{>{\raggedright\arraybackslash}p{.22\textwidth}X}\rbtoprule\rowcolor{tblhdrbgcolor}}
-    {\tabularx{.75\textwidth}{>{\raggedright\arraybackslash}p{.22\textwidth}X}\toprule\rowcolor{tblhdrbgcolor}}
+    \tabularx{.75\textwidth}{>{\raggedright\arraybackslash}p{.22\textwidth}X}\toprule\rowcolor{tblhdrbgcolor}
   }
-  \ifpdfoutput{\btnhead}{\rule{0pt}{2.9ex}\btnhead}
+  \rule{0pt}{2.9ex}\btnhead
 }{%
   \endtabularx
 }
