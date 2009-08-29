@@ -1526,7 +1526,7 @@ const struct settings_list settings[] = {
 #endif
 #ifdef HAVE_QUICKSCREEN
    CUSTOM_SETTING(0, qs_item_top, LANG_TOP_QS_ITEM,
-                  &global_settings.party_mode, "qs top",
+                  &global_settings.dirfilter, "qs top",
                   qs_load_from_cfg, qs_write_to_cfg,
                   qs_is_changed, qs_set_default),
    CUSTOM_SETTING(0, qs_item_left, LANG_LEFT_QS_ITEM, 
