@@ -172,6 +172,8 @@ static void delete_entry(int selected_item)
     entry2->next = NULL;
 
     rb->gui_synclist_set_nb_items(&kb_list, --pw_list.num_entries);
+    if(!pw_list.num_entries)
+        init_ll();
     data_changed = true;
 }
 
@@ -270,7 +272,7 @@ static void edit_pw(int selected_item)
 
 static void context_menu(int selected_item)
 {
-    int selection, result;
+    int selection = 0, result;
     bool exit = false;
 
     do {
@@ -612,7 +614,7 @@ static void reset(void)
 
 static int main_menu(void)
 {
-    int selection, result, ret;
+    int selection = 0, result, ret;
     bool exit = false;
 
     MENUITEM_STRINGLIST(menu, "Keybox", NULL,
