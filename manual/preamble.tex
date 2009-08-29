@@ -103,8 +103,8 @@
 \newcounter{example}[chapter]
 
 \ifpdfoutput{%
-  \setlength{\belowrulesep}{0pt}
-  \setlength{\aboverulesep}{0pt}
+  \renewcommand{\toprule}{\specialrule{\heavyrulewidth}{\abovetopsep}{0pt}}
+  \renewcommand{\midrule}{\specialrule{\lightrulewidth}{0pt}{\belowrulesep}}
   }{}
 \newcommand{\tblhdrstrut}{\rule[-1.3ex]{0mm}{4.0ex}}
 
