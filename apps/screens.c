@@ -216,9 +216,11 @@ void usb_screen(void)
 #endif /* HAVE_LCD_BITMAP */
         }
         screens[i].update();
-    }
-    FOR_NB_SCREENS(i)
+
+        /* force statusbar by ignoring the setting */
         usb_bars |= VP_SB_IGNORE_SETTING(i);
+    }
+
     viewportmanager_set_statusbar(usb_bars);
 
 #ifdef SIMULATOR
