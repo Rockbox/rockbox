@@ -578,9 +578,9 @@ int life;
 enum { ST_READY, ST_START, ST_PAUSE } game_state = ST_READY;
 
 enum {
-    normal  = 0,
-    sticky  = 1,
-    shooter = 2
+    PLAIN   = 0,
+    STICKY  = 1,
+    SHOOTER = 2
 } pad_type;
 
 int score=0,vscore=0;
@@ -653,7 +653,7 @@ static void brickmania_init_game(int new_game)
 
     used_balls=1;
     game_state=ST_READY;
-    pad_type = normal;
+    pad_type = PLAIN;
     pad_width=PAD_WIDTH;
     flip_sides=false;
     num_count=10;
@@ -1082,17 +1082,17 @@ static int brickmania_game_loop(void)
                                 break;
                             case 2:
                                 score+=34;
-                                pad_type = sticky;
+                                pad_type = STICKY;
                                 break;
                             case 3:
                                 score+=47;
-                                pad_type = shooter;
+                                pad_type = SHOOTER;
                                 for(k=0;k<used_balls;k++)
                                     ball[k].glue=false;
                                 break;
                             case 4:
                                 score+=23;
-                                pad_type = normal;
+                                pad_type = PLAIN;
                                 for(k=0;k<used_balls;k++)
                                     ball[k].glue=false;
                                 flip_sides=false;
@@ -1149,7 +1149,7 @@ static int brickmania_game_loop(void)
 
                     brickx=LEFTMARGIN+j*BRICK_WIDTH;
                     bricky=TOPMARGIN+i*BRICK_HEIGHT;
-                    if (pad_type == shooter) {
+                    if (pad_type == SHOOTER) {
                         for (k=0;k<30;k++) {
                             if (fire[k].top+7>0) {
                                 if (brick[i*10+j].used==1 &&
@@ -1514,7 +1514,7 @@ static int brickmania_game_loop(void)
                     
                     /* Handle the sticky situation */
                     if (ball[k].pos_y + BALL >= PAD_POS_Y &&
-                        (pad_type == sticky && !ball[k].glue) &&
+                        (pad_type == STICKY && !ball[k].glue) &&
                         (ball[k].pos_x >= pad_pos_x &&
                          ball[k].pos_x <= pad_pos_x+pad_width)) {
                         ball[k].y=0;
@@ -1649,13 +1649,13 @@ static int brickmania_game_loop(void)
                     else if (game_state==ST_PAUSE) {
                         game_state=ST_START;
                     }
-                    else if (pad_type == sticky) {
+                    else if (pad_type == STICKY) {
                         for(k=0;k<used_balls;k++) {
                             if (ball[k].glue)
                                 ball[k].glue=false;
                         }
                     }
-                    else if (pad_type == shooter) {
+                    else if (pad_type == SHOOTER) {
                         k=brickmania_fire_space();
                         fire[k].top=PAD_POS_Y-7;
                         fire[k].left=pad_pos_x+1;
