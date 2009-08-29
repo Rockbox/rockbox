@@ -67,6 +67,101 @@ static inline int16_t av_clip_int16(int a)
 static int32_t          qmf_window[48] IBSS_ATTR;
 static VLC              spectral_coeff_tab[7];
 static channel_unit     channel_units[2];
+
+/**
+ * Matrixing within quadrature mirror synthesis filter.
+ *
+ * @param p3        output buffer
+ * @param inlo      lower part of spectrum
+ * @param inhi      higher part of spectrum
+ * @param nIn       size of spectrum buffer
+ */
+ 
+#if defined(CPU_ARM)
+    extern void 
+    atrac3_iqmf_matrixing(int32_t *p3,
+                          int32_t *inlo,
+                          int32_t *inhi,
+                          unsigned int nIn);
+#else
+    static inline void
+    atrac3_iqmf_matrixing(int32_t *p3,
+                          int32_t *inlo,
+                          int32_t *inhi,
+                          unsigned int nIn)
+    {
+        for(i=0; i<nIn; i+=2){
+            p3[2*i+0] = inlo[i  ] + inhi[i  ];
+            p3[2*i+1] = inlo[i  ] - inhi[i  ];
+            p3[2*i+2] = inlo[i+1] + inhi[i+1];
+            p3[2*i+3] = inlo[i+1] - inhi[i+1];
+        }
+    }
+#endif
+
+/**
+ * Matrixing within quadrature mirror synthesis filter.
+ *
+ * @param out       output buffer
+ * @param in        input buffer
+ * @param win       windowing coefficients
+ * @param nIn       size of spectrum buffer
+ */
+ 
+#if defined(CPU_ARM)
+    extern void
+    atrac3_iqmf_dewindowing(int32_t *out,
+                            int32_t *in,
+                            int32_t *win,
+                            unsigned int nIn);
+#else
+    static inline void
+    atrac3_iqmf_dewindowing(int32_t *out,
+                            int32_t *in,
+                            int32_t *win,
+                            unsigned int nIn)
+    {
+        int32_t i, j, s1, s2;
+        
+        for (j = nIn; j != 0; j--) {
+            /* i=0 */
+            s1 = fixmul31(win[0], in[0]);
+            s2 = fixmul31(win[1], in[1]);
+    
+            /* i=2..46 */
+            for (i = 2; i < 48; i += 2) {
+                s1 += fixmul31(win[i  ], in[i  ]);
+                s2 += fixmul31(win[i+1], in[i+1]);
+            }
+    
+            out[0] = s2;
+            out[1] = s1;
+    
+            in += 2;
+            out += 2;
+        }
+    }
+#endif
+
+/**
+ * IMDCT windowing.
+ *
+ * @param buffer        sample buffer
+ * @param win           window coefficients
+ */
+ 
+static inline void
+atrac3_imdct_windowing(int32_t *buffer,
+                       const int32_t *win)
+{
+    int32_t i;
+    /* win[0..127] = win[511..384], win[128..383] = 1 */
+    for(i = 0; i<128; i++) {
+        buffer[    i] = fixmul31(win[i], buffer[    i]);
+        buffer[511-i] = fixmul31(win[i], buffer[511-i]);
+    }
+}
+
 /**
  * Quadrature mirror synthesis filter.
  *
@@ -77,42 +172,19 @@ static channel_unit     channel_units[2];
  * @param delayBuf  delayBuf buffer
  * @param temp      temp buffer
  */
+ 
 static void iqmf (int32_t *inlo, int32_t *inhi, unsigned int nIn, int32_t *pOut, int32_t *delayBuf, int32_t *temp)
 {
-    unsigned int   i, j;
-    int32_t   *p1, *p3;
-
+    /* Restore the delay buffer */
     memcpy(temp, delayBuf, 46*sizeof(int32_t));
 
-    p3 = temp + 46;
+    /* loop1: matrixing */
+    atrac3_iqmf_matrixing(temp + 46, inlo, inhi, nIn);
 
-    /* loop1 */
-    for(i=0; i<nIn; i+=2){
-        p3[2*i+0] = inlo[i  ] + inhi[i  ];
-        p3[2*i+1] = inlo[i  ] - inhi[i  ];
-        p3[2*i+2] = inlo[i+1] + inhi[i+1];
-        p3[2*i+3] = inlo[i+1] - inhi[i+1];
-    }
+    /* loop2: dewindowing */
+    atrac3_iqmf_dewindowing(pOut, temp, qmf_window, nIn);
 
-    /* loop2 */
-    p1 = temp;
-    for (j = nIn; j != 0; j--) {
-        int32_t s1 = 0;
-        int32_t s2 = 0;
-
-        for (i = 0; i < 48; i += 2) {
-            s1 += fixmul31(p1[i], qmf_window[i]);
-            s2 += fixmul31(p1[i+1], qmf_window[i+1]);
-        }
-
-        pOut[0] = s2;
-        pOut[1] = s1;
-
-        p1 += 2;
-        pOut += 2;
-    }
-
-    /* Update the delay buffer. */
+    /* Save the delay buffer */
     memcpy(delayBuf, temp + (nIn << 1), 46*sizeof(int32_t));
 }
 
@@ -146,9 +218,7 @@ static void IMLT(int32_t *pInput, int32_t *pOutput, int odd_band)
     mdct_backward(512, pInput, pOutput);
 
     /* Windowing. */
-    for(i = 0; i<512; i++)
-        pOutput[i] = fixmul31(pOutput[i], window_lookup[i]);
-
+    atrac3_imdct_windowing(pOutput, window_lookup);
 }
 
 

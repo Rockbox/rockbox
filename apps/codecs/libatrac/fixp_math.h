@@ -10,27 +10,77 @@
 
 /* Fixed point math routines for use in atrac3.c */
 
-static inline int32_t fixmul16(int32_t x, int32_t y)
-{
-    int64_t temp;
-    temp = x;
-    temp *= y;
-
-    temp >>= 16;
-
-    return (int32_t)temp;
-}
-
-static inline int32_t fixmul31(int32_t x, int32_t y)
-{
-    int64_t temp;
-    temp = x;
-    temp *= y;
-
-    temp >>= 31;        //16+31-16 = 31 bits
-
-    return (int32_t)temp;
-}
+#if defined(CPU_ARM)
+    #define fixmul16(X,Y) \
+     ({ \
+        int32_t low; \
+        int32_t high; \
+        asm volatile (                   /* calculates: result = (X*Y)>>16 */ \
+           "smull  %0,%1,%2,%3 \n\t"     /* 64 = 32x32 multiply */ \
+           "mov %0, %0, lsr #16 \n\t"    /* %0 = %0 >> 16 */ \
+           "orr %0, %0, %1, lsl #16 \n\t"/* result = %0 OR (%1 << 16) */ \
+           : "=&r"(low), "=&r" (high) \
+           : "r"(X),"r"(Y)); \
+        low; \
+     })
+     
+    #define fixmul31(X,Y) \
+     ({ \
+        int32_t low; \
+        int32_t high; \
+        asm volatile (                   /* calculates: result = (X*Y)>>31 */ \
+           "smull  %0,%1,%2,%3 \n\t"     /* 64 = 32x32 multiply */ \
+           "mov %0, %0, lsr #31 \n\t"    /* %0 = %0 >> 31 */ \
+           "orr %0, %0, %1, lsl #1 \n\t" /* result = %0 OR (%1 << 1) */ \
+           : "=&r"(low), "=&r" (high) \
+           : "r"(X),"r"(Y)); \
+        low; \
+     })
+     
+    #define fixmul32(X,Y) \
+     ({ \
+        int32_t low; \
+        int32_t high; \
+        asm volatile (                   /* calculates: result = (X*Y)>>32 */ \
+           "smull  %0,%1,%2,%3 \n\t"     /* 64 = 32x32 multiply */ \
+           : "=&r"(low), "=&r" (high) \
+           : "r"(X),"r"(Y)); \
+        high; \
+     })
+#else
+    static inline int32_t fixmul16(int32_t x, int32_t y)
+    {
+        int64_t temp;
+        temp = x;
+        temp *= y;
+    
+        temp >>= 16;
+    
+        return (int32_t)temp;
+    }
+    
+    static inline int32_t fixmul31(int32_t x, int32_t y)
+    {
+        int64_t temp;
+        temp = x;
+        temp *= y;
+    
+        temp >>= 31;        //16+31-16 = 31 bits
+    
+        return (int32_t)temp;
+    }
+    
+    static inline int32_t fixmul32(int32_t x, int32_t y)
+    {
+        int64_t temp;
+        temp = x;
+        temp *= y;
+    
+        temp >>= 32;        //16+31-16 = 31 bits
+    
+        return (int32_t)temp;
+    }
+#endif
 
 static inline int32_t fixdiv16(int32_t x, int32_t y)
 {
