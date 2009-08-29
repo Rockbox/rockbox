@@ -237,6 +237,9 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #endif
 #endif
 
+#define MEMO_FILE PLUGIN_APPS_DIR "/.memo"
+#define TEMP_FILE PLUGIN_APPS_DIR "/~temp"
+
 #define X_OFFSET ((LCD_WIDTH%7)/2)
 #if LCD_HEIGHT <= 80
 #define Y_OFFSET 1
@@ -435,7 +438,7 @@ static void load_memo(struct shown *shown)
     for (k = 0; k < 7; k++)
         wday_has_memo[k] = false;
     memos_in_memory = 0;
-    fp = rb->open(ROCKBOX_DIR "/.memo",O_RDONLY);
+    fp = rb->open(MEMO_FILE, O_RDONLY);
     if (fp > -1)
     {
         rb->lseek(fp, 0, SEEK_SET);
@@ -523,8 +526,8 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
 {
     int fp,fq;
     /* use O_RDWR|O_CREAT so that file is created if it doesn't exist. */
-    fp = rb->open(ROCKBOX_DIR "/.memo", O_RDWR|O_CREAT);
-    fq = rb->creat(ROCKBOX_DIR "/~temp");
+    fp = rb->open(MEMO_FILE, O_RDWR|O_CREAT);
+    fq = rb->creat(TEMP_FILE);
     if ( (fq > -1) && (fp > -1) )
     {
         int i;
@@ -552,8 +555,8 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
         }
         rb->close(fp);
         rb->close(fq);
-        rb->remove(ROCKBOX_DIR "/.memo");
-        rb->rename(ROCKBOX_DIR "/~temp", ROCKBOX_DIR "/.memo");
+        rb->remove(MEMO_FILE);
+        rb->rename(TEMP_FILE, MEMO_FILE);
         load_memo(shown);
         return true;
     }
@@ -824,7 +827,8 @@ enum plugin_status plugin_start(const void* parameter)
         switch (button)
         {
             case CALENDAR_QUIT:
-                return PLUGIN_OK;
+                exit = true;
+                break;
 
             case CALENDAR_NEXT_MONTH:
             case CALENDAR_NEXT_MONTH | BUTTON_REPEAT:
