@@ -62,7 +62,7 @@ char buf[255];
 /* These parameters define the piece image dimensions, Stride is the total width
  *  of the bitmap.
  */
-#define STRIDE          BMPWIDTH_superdom_boarditems
+#define ICON_STRIDE      BMPWIDTH_superdom_boarditems
 #define ICON_HEIGHT     (BMPHEIGHT_superdom_boarditems/6)
 #define ICON_WIDTH      (BMPWIDTH_superdom_boarditems/2)
 
@@ -301,7 +301,7 @@ void draw_board(void) {
 #endif
             if(board[i][j].ind) {
                 MY_BITMAP_PART(superdom_boarditems,
-                                board[i][j].colour?ICON_WIDTH:0, 0, STRIDE, 
+                                board[i][j].colour?ICON_WIDTH:0, 0, ICON_STRIDE, 
 #if LCD_WIDTH > LCD_HEIGHT
                                 MARGIN+(BOX_WIDTH*(i-1))+1, 
                                 MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1, 
@@ -314,14 +314,14 @@ void draw_board(void) {
             if(board[i][j].farm) {
                 MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT, 
-                                STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1, 
+                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1, 
                                 MARGIN+(BOX_HEIGHT*(j-1))+1, 
                                 ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].tank) {
                 MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*2,
-                                STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1, 
+                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1, 
                                 MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1, 
                                 ICON_WIDTH, ICON_HEIGHT);
             }
@@ -329,10 +329,10 @@ void draw_board(void) {
                 MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*3,
 #if LCD_WIDTH > LCD_HEIGHT
-                                STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
+                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
                                 MARGIN+(BOX_HEIGHT*(j-1))+1, 
 #else
-                                STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1,
+                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1,
                                 MARGIN+(BOX_HEIGHT*(j-1))+1+ICON_HEIGHT,
 #endif
                                 ICON_WIDTH, ICON_HEIGHT);
@@ -341,10 +341,10 @@ void draw_board(void) {
                 MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*4,
 #if LCD_WIDTH > LCD_HEIGHT
-                                STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH*2+1,
+                                ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH*2+1,
                                 MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1,
 #else
-                                STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
+                                ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
                                 MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT*2+1,
 #endif
                                 ICON_WIDTH, ICON_HEIGHT);
@@ -353,10 +353,10 @@ void draw_board(void) {
                 MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*5,
 #if LCD_WIDTH > LCD_HEIGHT
-                                STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH*2+1,
+                                ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH*2+1,
                                 MARGIN+(BOX_HEIGHT*(j-1))+1, 
 #else
-                                STRIDE,MARGIN+(BOX_WIDTH*(i-1))+1,
+                                ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+1,
                                 MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT*2+1,
 #endif
                                 ICON_WIDTH, ICON_HEIGHT);
