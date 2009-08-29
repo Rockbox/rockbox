@@ -139,7 +139,7 @@ void viewport_set_fullscreen(struct viewport *vp, enum screen_type screen)
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 {
 #ifdef HAVE_LCD_BITMAP
-    if (ui_vp_info.active)
+    if (ui_vp_info.active[screen])
         *vp = custom_vp[screen];
     else
 #endif
