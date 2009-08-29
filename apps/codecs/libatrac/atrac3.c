@@ -90,6 +90,7 @@ static channel_unit     channel_units[2];
                           int32_t *inhi,
                           unsigned int nIn)
     {
+        uint32_t i;
         for(i=0; i<nIn; i+=2){
             p3[2*i+0] = inlo[i  ] + inhi[i  ];
             p3[2*i+1] = inlo[i  ] - inhi[i  ];
