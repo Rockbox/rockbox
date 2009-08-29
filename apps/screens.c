@@ -63,6 +63,8 @@
 #include "yesno.h"
 #include "backdrop.h"
 #include "viewport.h"
+#include "appevents.h"
+#include "statusbar.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bitmaps/usblogo.h"
@@ -181,16 +183,15 @@ void usb_screen(void)
     /* nothing here! */
 #else
     int i;
-    int statusbar = global_settings.statusbar; /* force the statusbar */
-    if(!global_settings.statusbar)
-        global_settings.statusbar = STATUSBAR_TOP;
+    int usb_bars = VP_SB_ALLSCREENS; /* force statusbars */
+    int old_bars  = viewportmanager_get_statusbar();
 
     FOR_NB_SCREENS(i)
     {
         screens[i].backdrop_show(BACKDROP_MAIN);
         screens[i].backlight_on();
         screens[i].clear_display();
-#if NB_SCREENS > 1
+#ifdef HAVE_REMOTE_LCD
         if (i == SCREEN_REMOTE)
         {
             screens[i].bitmap(remote_usblogo,
@@ -199,8 +200,8 @@ void usb_screen(void)
                       BMPWIDTH_remote_usblogo, BMPHEIGHT_remote_usblogo);
         }
         else 
-        {
 #endif
+        {
 #ifdef HAVE_LCD_BITMAP
             screens[i].transparent_bitmap(usblogo, 
                         (LCD_WIDTH-BMPWIDTH_usblogo),
@@ -213,11 +214,12 @@ void usb_screen(void)
             status_set_audio(false);
             status_set_usb(true);
 #endif /* HAVE_LCD_BITMAP */
-#if NB_SCREENS > 1
         }
-#endif
         screens[i].update();
     }
+    FOR_NB_SCREENS(i)
+        usb_bars |= VP_SB_IGNORE_SETTING(i);
+    viewportmanager_set_statusbar(usb_bars);
 
 #ifdef SIMULATOR
     while (button_get(true) & BUTTON_REL);
@@ -231,10 +233,10 @@ void usb_screen(void)
     FOR_NB_SCREENS(i)
     {
         screens[i].backlight_on();
-        screens[i].clear_display();
-        screens[i].update();
     }
-    global_settings.statusbar = statusbar;
+    viewportmanager_set_statusbar(old_bars);
+    send_event(GUI_EVENT_REFRESH, NULL);
+    
 #endif /* USB_NONE */
 }
 
