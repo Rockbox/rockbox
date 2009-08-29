@@ -106,6 +106,8 @@
   \setlength{\belowrulesep}{0pt}
   \setlength{\aboverulesep}{0pt}
   }{}
+\newcommand{\tblhdrstrut}{\rule[-1.3ex]{0mm}{4.0ex}}
+
 
 %% \newenvironment{example}
 %%     {\stepcounter{example}\paragraph{Example \theexample:}}
@@ -238,7 +240,7 @@
   }
   \center
   \tabularx{#1}{#2}\toprule\rowcolor{tblhdrbgcolor}
-  \rule{0pt}{2.9ex}#3\\\midrule
+  \tblhdrstrut#3\\\midrule
 }{%
   \endtabularx
 }
@@ -247,7 +249,7 @@
 
 
 % command to set the default table heading for button lists
-\newcommand{\taghead}{\rule{0pt}{2.9ex}\textbf{Tag} & \textbf{Description} \\\midrule}
+\newcommand{\taghead}{\tblhdrstrut\textbf{Tag} & \textbf{Description} \\\midrule}
 
 % environment intended to be used with tag maps (for wps)
 % usage: \begin{tagmap}{caption}{label} Tag & Description \\ \end{tagmap}
@@ -384,7 +386,7 @@
     % here is the table width defined for 2 columns
     \tabularx{.75\textwidth}{>{\raggedright\arraybackslash}p{.22\textwidth}X}\toprule\rowcolor{tblhdrbgcolor}
   }
-  \rule{0pt}{2.9ex}\btnhead
+  \tblhdrstrut\btnhead
 }{%
   \endtabularx
 }
