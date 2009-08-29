@@ -60,7 +60,7 @@ static int statusbar_enabled = 0;
 
 static struct {
     struct  viewport* vp;
-    int     active;
+    int     active[NB_SCREENS];
 } ui_vp_info;
 
 static struct viewport custom_vp[NB_SCREENS];
@@ -68,7 +68,7 @@ static struct viewport custom_vp[NB_SCREENS];
 /* callbacks for GUI_EVENT_* events */
 static void viewportmanager_ui_vp_changed(void *param);
 static void statusbar_toggled(void* param);
-static int viewport_init_ui_vp(void);
+static unsigned viewport_init_ui_vp(void);
 #endif
 static void viewportmanager_redraw(void* data);
 
@@ -148,12 +148,15 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 
 void viewportmanager_init(void)
 {
-    viewportmanager_set_statusbar(VP_SB_ALLSCREENS);
 #ifdef HAVE_LCD_BITMAP
+    int retval, i;
     add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, statusbar_toggled);
-    ui_vp_info.active = viewport_init_ui_vp();
+    retval = viewport_init_ui_vp();
+    FOR_NB_SCREENS(i)
+        ui_vp_info.active[i] = retval & BIT_N(i);
     ui_vp_info.vp = custom_vp;
 #endif
+    viewportmanager_set_statusbar(VP_SB_ALLSCREENS);
 }
 
 int viewportmanager_get_statusbar(void)
@@ -204,10 +207,15 @@ static void statusbar_toggled(void* param)
 
 void viewportmanager_theme_changed(int which)
 {
+    int i;
     if (which & THEME_UI_VIEWPORT)
     {
+        int retval = viewport_init_ui_vp();
         /* reset the ui viewport */
-        if ((ui_vp_info.active = viewport_init_ui_vp()))
+        FOR_NB_SCREENS(i)
+            ui_vp_info.active[i] = retval & BIT_N(i);
+
+        if (retval != 0)
             add_event(GUI_EVENT_REFRESH, false, viewportmanager_ui_vp_changed);
         else
             remove_event(GUI_EVENT_REFRESH, viewportmanager_ui_vp_changed);
@@ -216,23 +224,24 @@ void viewportmanager_theme_changed(int which)
     }
     if (which & THEME_STATUSBAR)
     {
-        statusbar_enabled = 0;
-        if (global_settings.statusbar != STATUSBAR_OFF)
-            statusbar_enabled = VP_SB_ONSCREEN(SCREEN_MAIN);
-#ifdef HAVE_REMOTE_LCD
-        if (global_settings.remote_statusbar != STATUSBAR_OFF)
-            statusbar_enabled |= VP_SB_ONSCREEN(SCREEN_REMOTE);
-#endif
-        if (statusbar_enabled)
+        statusbar_enabled = VP_SB_HIDE_ALL;
+
+        FOR_NB_SCREENS(i)
+        {
+            if (statusbar_position(i) != STATUSBAR_OFF)
+                statusbar_enabled  |= VP_SB_ONSCREEN(i);
+        }
+
+        if (statusbar_enabled != VP_SB_HIDE_ALL)
             add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
         else
             remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
 
         /* reposition viewport to fit statusbar, only if not using the ui vp */
-        if (!ui_vp_info.active)
+        
+        FOR_NB_SCREENS(i)
         {
-            int i;
-            FOR_NB_SCREENS(i)
+            if (!ui_vp_info.active[i])
                 viewport_set_fullscreen(&custom_vp[i], i);
         }
     }
@@ -365,35 +374,29 @@ const char* viewport_parse_viewport(struct viewport *vp,
 /*
  * (re)parse the UI vp from the settings
  *  - Returns
- *          0 if no UI vp is used
- *          >0 if it's used at least partly (on multiscreen targets)
- *          NB_SCREENS if all screens have a UI vp
+ *          0 if no UI vp is used at all
+ *          else the bit for the screen (1<<screen) is set
  */
-static int viewport_init_ui_vp(void)
+static unsigned viewport_init_ui_vp(void)
 {
-    int screen, ret = NB_SCREENS;
+    int screen;
+    unsigned ret = 0;
+    char *setting;
     FOR_NB_SCREENS(screen)
     {
 #ifdef HAVE_REMOTE_LCD
         if ((screen == SCREEN_REMOTE))
-        {
-            if(!(viewport_parse_viewport(&custom_vp[screen], screen,
-                     global_settings.remote_ui_vp_config, ',')))
-            {
-                viewport_set_fullscreen(&custom_vp[screen], screen);
-                ret--;
-            }
-        }
+            setting = global_settings.remote_ui_vp_config;
         else
 #endif
-        {
-            if (!(viewport_parse_viewport(&custom_vp[screen], screen,
-                     global_settings.ui_vp_config, ',')))
-            {
-                viewport_set_fullscreen(&custom_vp[screen], screen);
-                ret--;
-            }
-        }
+            setting = global_settings.ui_vp_config;
+
+            
+        if (!(viewport_parse_viewport(&custom_vp[screen], screen,
+                 setting, ',')))
+            viewport_set_fullscreen(&custom_vp[screen], screen);
+        else
+            ret |= BIT_N(screen);
     }
     return ret;
 }
