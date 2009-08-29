@@ -38,16 +38,14 @@
 #define _ogg_malloc  ogg_malloc
 #define _ogg_calloc  ogg_calloc
 #define _ogg_realloc ogg_realloc
-#define _ogg_free(x) do { } while(0)
+#define _ogg_free    ogg_free
 
 void ogg_malloc_init(void);
+void ogg_malloc_destroy(void);
 void *ogg_malloc(size_t size);
-void *ogg_tmpmalloc(size_t size);
 void *ogg_calloc(size_t nmemb, size_t size);
-void *ogg_tmpcalloc(size_t nmemb, size_t size);
 void *ogg_realloc(void *ptr, size_t size);
-long ogg_tmpmalloc_pos(void);
-void ogg_tmpmalloc_free(long pos);
+void ogg_free(void *ptr);
 void iram_malloc_init(void);
 void *iram_malloc(size_t size);
 

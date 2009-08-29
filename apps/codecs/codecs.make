@@ -14,6 +14,9 @@ OTHER_SRC += $(CODECS_SRC)
 CODECS := $(CODECS_SRC:.c=.codec)
 CODECS := $(subst $(ROOTDIR),$(BUILDDIR),$(CODECS))
 
+# TLSF memory allocator library
+include $(APPSDIR)/codecs/lib/tlsf/libtlsf.make
+
 # the codec helper library
 include $(APPSDIR)/codecs/lib/libcodec.make
 OTHER_INC += -I$(APPSDIR)/codecs/lib
@@ -66,7 +69,7 @@ $(CODECDIR)/spc.codec : $(CODECDIR)/libspc.a
 $(CODECDIR)/mpa.codec : $(CODECDIR)/libmad.a
 $(CODECDIR)/a52.codec : $(CODECDIR)/liba52.a
 $(CODECDIR)/flac.codec : $(CODECDIR)/libffmpegFLAC.a
-$(CODECDIR)/vorbis.codec : $(CODECDIR)/libtremor.a
+$(CODECDIR)/vorbis.codec : $(CODECDIR)/libtremor.a $(TLSFLIB)
 $(CODECDIR)/speex.codec : $(CODECDIR)/libspeex.a
 $(CODECDIR)/mpc.codec : $(CODECDIR)/libmusepack.a
 $(CODECDIR)/wavpack.codec : $(CODECDIR)/libwavpack.a

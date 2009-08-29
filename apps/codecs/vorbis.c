@@ -22,10 +22,13 @@
 #include "codeclib.h"
 #include "libtremor/ivorbisfile.h"
 #include "libtremor/ogg.h"
+#ifdef SIMULATOR
+#include "lib/tlsf/src/tlsf.h"
+#endif
 
 CODEC_HEADER
 
-#if defined(CPU_ARM) || defined(CPU_COLDFIRE)
+#if defined(CPU_ARM) || defined(CPU_COLDFIRE) || defined(CPU_MIPS)
 #include <setjmp.h>
 jmp_buf rb_jump_buf;
 #endif
@@ -76,8 +79,7 @@ static long tell_handler(void *datasource)
 }
 
 /* This sets the DSP parameters based on the current logical bitstream
- * (sampling rate, number of channels, etc).  It also tries to guess
- * reasonable buffer parameters based on the current quality setting.
+ * (sampling rate, number of channels, etc).
  */
 static bool vorbis_set_codec_parameters(OggVorbis_File *vf)
 {
@@ -86,7 +88,6 @@ static bool vorbis_set_codec_parameters(OggVorbis_File *vf)
     vi = ov_info(vf, -1);
 
     if (vi == NULL) {
-        //ci->splash(HZ*2, "Vorbis Error");
         return false;
     }
 
@@ -120,27 +121,23 @@ enum codec_status codec_main(void)
     ogg_int64_t vf_pcmlengths[2];
 
     ci->configure(DSP_SET_SAMPLE_DEPTH, 24);
-    /* Note: These are sane defaults for these values.  Perhaps
-     * they should be set differently based on quality setting
-     */
 
-#if defined(CPU_ARM) || defined(CPU_COLDFIRE)
-    if (setjmp(rb_jump_buf) != 0)
-    {
+    if (codec_init()) {
+        error = CODEC_ERROR;
+        goto exit;
+    }
+
+    ogg_malloc_init();
+
+#if defined(CPU_ARM) || defined(CPU_COLDFIRE) || defined(CPU_MIPS)
+    if (setjmp(rb_jump_buf) != 0) {
         /* malloc failed; skip to next track */
         error = CODEC_ERROR;
         goto done;
     }
 #endif
 
-/* We need to flush reserver memory every track load. */
 next_track:
-    if (codec_init()) {
-        error = CODEC_ERROR;
-        goto exit;
-    }
-    ogg_malloc_init();
-
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
 
@@ -166,6 +163,10 @@ next_track:
      * get here.
      */
     if (!error) {
+    	 ogg_free(vf.offsets);
+    	 ogg_free(vf.dataoffsets);
+    	 ogg_free(vf.serialnos);
+
          vf.offsets = vf_offsets;
          vf.dataoffsets = &vf_dataoffsets;
          vf.serialnos = &vf_serialnos;
@@ -183,7 +184,7 @@ next_track:
          vf.ready_state = OPENED;
          vf.links = 1;
     } else {
-         //ci->logf("ov_open: %d", error);
+         DEBUGF("Vorbis: ov_open failed: %d", error);
          error = CODEC_ERROR;
          goto done;
     }
@@ -225,7 +226,7 @@ next_track:
         if (n == 0) {
             eof = 1;
         } else if (n < 0) {
-            DEBUGF("Error decoding frame\n");
+            DEBUGF("Vorbis: Error decoding frame\n");
         } else {
             ci->pcmbuf_insert(pcm[0], pcm[1], n);
             ci->set_offset(ov_raw_tell(&vf));
@@ -235,6 +236,15 @@ next_track:
     error = CODEC_OK;
     
 done:
+#if 0 /* defined(SIMULATOR) */
+    {
+        size_t bufsize;
+        void* buf = ci->codec_get_buffer(&bufsize);
+
+        DEBUGF("Vorbis: Memory max: %u\n", get_max_size(buf));
+    }
+#endif
+
     if (ci->request_next_track()) {
         /* Clean things up for the next track */
         vf.dataoffsets = NULL;
@@ -246,6 +256,6 @@ done:
     }
         
 exit:
+    ogg_malloc_destroy();
     return error;
 }
-

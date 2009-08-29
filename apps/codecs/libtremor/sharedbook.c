@@ -71,7 +71,7 @@ static ogg_int32_t _float32_unpack(long val,int *point){
 static ogg_uint32_t *_make_words(long *l,long n,long sparsecount){
   long i,j,count=0;
   ogg_uint32_t marker[33];
-  ogg_uint32_t *r=(ogg_uint32_t *)ogg_tmpmalloc((sparsecount?sparsecount:n)*sizeof(*r));
+  ogg_uint32_t *r=(ogg_uint32_t *)_ogg_malloc((sparsecount?sparsecount:n)*sizeof(*r));
   memset(marker,0,sizeof(marker));
 
   for(i=0;i<n;i++){
@@ -87,7 +87,7 @@ static ogg_uint32_t *_make_words(long *l,long n,long sparsecount){
       /* update ourself */
       if(length<32 && (entry>>length)){
 	/* error condition; the lengths must specify an overpopulated tree */
-	/* _ogg_free(r); */
+	_ogg_free(r);
 	return(NULL);
       }
       r[count++]=entry;
@@ -188,9 +188,8 @@ static ogg_int32_t *_book_unquantize(const static_codebook *b,int n,
     ogg_int32_t mindel=_float32_unpack(b->q_min,&minpoint);
     ogg_int32_t delta=_float32_unpack(b->q_delta,&delpoint);
     ogg_int32_t *r=(ogg_int32_t *)_ogg_calloc(n*b->dim,sizeof(*r));
-    int *rp=(int *)ogg_tmpcalloc(n*b->dim,sizeof(*rp));
+    int *rp=(int *)_ogg_calloc(n*b->dim,sizeof(*rp));
 
-    memset(rp, 0, n*b->dim*sizeof(*rp));
     *maxpoint=minpoint;
 
     /* maptype 1 and 2 both use a quantized value vector, but
@@ -277,7 +276,7 @@ static ogg_int32_t *_book_unquantize(const static_codebook *b,int n,
       if(rp[j]<*maxpoint)
 	r[j]>>=*maxpoint-rp[j];
 	    
-    /* _ogg_free(rp); */
+    _ogg_free(rp);
     return(r);
   }
   return(NULL);
@@ -325,7 +324,6 @@ static int sort32a(const void *a,const void *b){
 int vorbis_book_init_decode(codebook *c,const static_codebook *s){
   int i,j,n=0,tabn;
   int *sortindex;
-  long pos = ogg_tmpmalloc_pos();
   memset(c,0,sizeof(*c));
   
   /* count actually used entries */
@@ -350,9 +348,13 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
     
     /* perform sort */
     ogg_uint32_t *codes=_make_words(s->lengthlist,s->entries,c->used_entries);
-    ogg_uint32_t **codep=(ogg_uint32_t **)ogg_tmpmalloc(sizeof(*codep)*n);
+    ogg_uint32_t **codep=(ogg_uint32_t **)_ogg_malloc(sizeof(*codep)*n);
     
-    if(codes==NULL||codep==NULL)goto err_out;
+    if(codes==NULL||codep==NULL){
+        _ogg_free(codep);
+        _ogg_free(codes);
+        goto err_out;
+    }
 
     for(i=0;i<n;i++){
       codes[i]=bitreverse(codes[i]);
@@ -361,7 +363,7 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
 
     qsort(codep,n,sizeof(*codep),sort32a);
 
-    sortindex=(int *)ogg_tmpmalloc(n*sizeof(*sortindex));
+    sortindex=(int *)_ogg_malloc(n*sizeof(*sortindex));
     c->codelist=(ogg_uint32_t *)_ogg_malloc(n*sizeof(*c->codelist));
     /* the index is a reverse index */
     for(i=0;i<n;i++){
@@ -371,7 +373,8 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
 
     for(i=0;i<n;i++)
       c->codelist[sortindex[i]]=codes[i];
-    /* _ogg_free(codes); */
+    _ogg_free(codep);
+    _ogg_free(codes);
     
     
     
@@ -387,6 +390,7 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
       if(s->lengthlist[i]>0)
 	c->dec_codelengths[sortindex[n++]]=s->lengthlist[i];
     
+    _ogg_free(sortindex);
     c->dec_firsttablen=_ilog(c->used_entries)-4; /* this is magic */
     if(c->dec_firsttablen<5)c->dec_firsttablen=5;
     if(c->dec_firsttablen>8)c->dec_firsttablen=8;
@@ -434,10 +438,8 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
     }
   }
 
-  ogg_tmpmalloc_free(pos);
   return(0);
  err_out:
-  ogg_tmpmalloc_free(pos);
   vorbis_book_clear(c);
   return(-1);
 }

@@ -283,7 +283,7 @@ void vorbis_dsp_clear(vorbis_dsp_state *v){
     codec_setup_info *ci=(codec_setup_info *)(vi?vi->codec_setup:NULL);
     private_state *b=(private_state *)v->backend_state;
 
-    if(NULL == v->iram_double_pcm)
+    if(NULL == v->iram_double_pcm && vi != NULL)
     {
       /* pcm buffer came from oggmalloc rather than iram */
       for(i=0;i<vi->channels;i++)
