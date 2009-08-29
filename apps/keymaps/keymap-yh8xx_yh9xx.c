@@ -49,6 +49,7 @@ CONTEXT_CUSTOM|CONTEXT_SETTINGS = the direction keys for the eq/col picker scree
 static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_OK,            BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
     { ACTION_STD_CANCEL,        BUTTON_LEFT,                    BUTTON_NONE },
+    { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
 
     { ACTION_STD_PREV,          BUTTON_UP,                      BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,    BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
