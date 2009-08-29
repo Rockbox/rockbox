@@ -306,6 +306,13 @@ static inline unsigned lcd_color_to_native(unsigned color)
 
 #endif /* HAVE_LCD_COLOR */
 
+/* Frame buffer stride */
+#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#define STRIDE(w, h)    (h)
+#else
+#define STRIDE(w, h)    (w)
+#endif
+
 /* Frame buffer dimensions */
 #if LCD_DEPTH == 1
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING

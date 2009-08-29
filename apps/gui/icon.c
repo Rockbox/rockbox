@@ -124,6 +124,7 @@ void screen_put_iconxy(struct screen * display,
     int screen = display->screen_type;
     int width = ICON_WIDTH(screen);
     int height = ICON_HEIGHT(screen);
+    int stride;
     screen_bitmap_part_func *draw_func = NULL;
     
     if (icon == Icon_NOICON)
@@ -142,15 +143,20 @@ void screen_put_iconxy(struct screen * display,
             screen_put_iconxy(display, xpos, ypos, Icon_Questionmark);
             return;
         }
-        data = viewer_iconset[screen].data;
+        data    = viewer_iconset[screen].data;
+        stride  = STRIDE(   viewer_iconset[screen].width, 
+                            viewer_iconset[screen].height);
     }
     else if (custom_icons_loaded[screen])
     {
-        data = user_iconset[screen].data;
+        data    = user_iconset[screen].data;
+        stride  = STRIDE(   user_iconset[screen].width, 
+                            user_iconset[screen].height);
     }
     else
     {
-        data = inbuilt_icons[screen];
+        data    = inbuilt_icons[screen];
+        stride  = STRIDE(BMPWIDTH_default_icons, BMPHEIGHT_default_icons);
     }
     /* add some left padding to the icons if they are on the edge */
     if (xpos == 0)
@@ -158,12 +164,12 @@ void screen_put_iconxy(struct screen * display,
     
 #if (LCD_DEPTH == 16) || defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH == 16)
     if (display->depth == 16)
-        draw_func = display->transparent_bitmap_part;
+        draw_func   = display->transparent_bitmap_part;
     else
 #endif
-        draw_func = display->bitmap_part;
+        draw_func   = display->bitmap_part;
 
-    draw_func(data, 0, height * icon, width, xpos, ypos, width, height);
+    draw_func(data, 0, height * icon, stride, xpos, ypos, width, height);
 }
 
 void screen_put_cursorxy(struct screen * display, int x, int y, bool on)

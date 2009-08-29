@@ -232,8 +232,8 @@ static void wps_draw_image(struct gui_wps *gwps, struct gui_img *img, int subima
     } else {
         display->transparent_bitmap_part((fb_data *)img->bm.data,
                                          0, img->subimage_height * subimage,
-                                         img->bm.width, img->x,
-                                         img->y, img->bm.width,
+                                         STRIDE(img->bm.width, img->bm.height), 
+                                         img->x, img->y, img->bm.width,
                                          img->subimage_height);
     }
 #endif

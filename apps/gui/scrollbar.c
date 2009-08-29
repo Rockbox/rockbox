@@ -202,7 +202,8 @@ void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap bm, int x, 
 #if LCD_DEPTH > 1
       else
         screen->transparent_bitmap_part((fb_data *)bm.data, 0, 0,
-                                        bm.width, x + start, y, size, height);
+                                        STRIDE(bm.width, bm.height), 
+                                        x + start, y, size, height);
 #endif
     } else {
 #if LCD_DEPTH > 1
@@ -213,7 +214,8 @@ void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap bm, int x, 
 #if LCD_DEPTH > 1
       else
         screen->transparent_bitmap_part((fb_data *)bm.data, 0, 0,
-                                        bm.width, x, y + start, width, size);
+                                        STRIDE(bm.width, bm.height), 
+                                        x, y + start, width, size);
 #endif
     }
 }
