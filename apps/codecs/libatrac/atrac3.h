@@ -1,6 +1,14 @@
 #include "ffmpeg_bitstream.h"
 #include "../librm/rm.h"
 
+#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == MCF5250)
+/* PP5022/24 and MCF5250 have larger IRAM */
+#define IBSS_ATTR_LARGE_IRAM IBSS_ATTR
+#else
+/* other CPUs IRAM is not large enough */
+#define IBSS_ATTR_LARGE_IRAM
+#endif
+
 /* These structures are needed to store the parsed gain control data. */
 typedef struct {
     int   num_gain_data;
@@ -75,6 +83,5 @@ typedef struct {
 int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx);
 
 int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
-                        void *data, int *data_size, 
-                        const uint8_t *buf, int buf_size);
+                        int *data_size, const uint8_t *buf, int buf_size);
 

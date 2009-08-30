@@ -41,7 +41,6 @@ enum codec_status codec_main(void)
     static size_t buff_size;
     int datasize, res, consumed, i, time_offset;
     uint8_t *bit_buffer;
-    int16_t outbuf[2048] __attribute__((aligned(32)));
     uint16_t fs,sps,h;
     uint32_t packet_count;
     int scrambling_unit_size, num_units, elapsed = 0;
@@ -62,9 +61,9 @@ next_track:
     init_rm(&rmctx);
  
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 17); /* Remark: atrac3 uses s15.0 by default, s15.2 was hacked. */
     ci->configure(DSP_SET_STEREO_MODE, rmctx.nb_channels == 1 ?
-                  STEREO_MONO : STEREO_INTERLEAVED);
+        STEREO_MONO : STEREO_NONINTERLEAVED);
 
     packet_count = rmctx.nb_packets;
     rmctx.audio_framesize = rmctx.block_align;
@@ -145,7 +144,7 @@ seek_start :
                 ci->seek_complete(); 
             }
             if(pkt.length)    
-                res = atrac3_decode_frame(&rmctx,&q, outbuf, &datasize, pkt.frames[i], rmctx.block_align);
+                res = atrac3_decode_frame(&rmctx, &q, &datasize, pkt.frames[i], rmctx.block_align);
             else /* indicates that there are no remaining frames */
                 goto done;
 
@@ -155,7 +154,7 @@ seek_start :
             }
 
             if(datasize)
-                ci->pcmbuf_insert(outbuf, NULL, q.samples_per_frame / rmctx.nb_channels);
+                ci->pcmbuf_insert(q.outSamples, q.outSamples + 1024, q.samples_per_frame / rmctx.nb_channels);
             elapsed = rmctx.audiotimestamp+(1000*8*sps/rmctx.bit_rate)*i;
             ci->set_elapsed(elapsed);
             rmctx.frame_number++;

@@ -55,18 +55,9 @@
 #define FFMIN(a,b) ((a) > (b) ? (b) : (a))
 #define FFSWAP(type,a,b) do{type SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
 
-/**
- * Clips a signed integer value into the -32768,32767 range.
- */
-static inline int16_t av_clip_int16(int a)
-{
-    if ((a+32768) & ~65535) return (a>>31) ^ 32767;
-    else                    return a;
-}
-
 static int32_t          qmf_window[48] IBSS_ATTR;
 static VLC              spectral_coeff_tab[7];
-static channel_unit     channel_units[2];
+static channel_unit     channel_units[2] IBSS_ATTR_LARGE_IRAM;
 
 /**
  * Matrixing within quadrature mirror synthesis filter.
@@ -516,7 +507,6 @@ static void gainCompensateAndOverlap (int32_t *pIn, int32_t *pPrev, int32_t *pOu
     int32_t  gain1, gain2, gain_inc;
     int   cnt, numdata, nsample, startLoc, endLoc;
 
-
     if (pGain2->num_gain_data == 0)
         gain1 = ONE_16;
     else
@@ -735,7 +725,16 @@ static int decodeChannelSoundUnit (GetBitContext *gb, channel_unit *pSnd, int32_
     numBands = (subbandTab[numSubbands] - 1) >> 8;
     if (lastTonal >= 0)
         numBands = FFMAX((lastTonal + 256) >> 8, numBands);
-
+        
+    /* Remark: Hardcoded hack to add 2 bits (empty) fract part to internal sample
+     * representation. Needed for higher accuracy in internal calculations as
+     * well as for DSP configuration. See also: ../atrac3_rm.c, DSP_SET_SAMPLE_DEPTH 
+     * Todo: Check spectral requantisation for using and outputting samples with 
+     * fract part. */
+    int32_t i;
+    for (i=0; i<1024; ++i) {
+        pSnd->spectrum[i] <<= 2;
+    }
 
     /* Reconstruct time domain samples. */
     for (band=0; band<4; band++) {
@@ -863,11 +862,9 @@ static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf, int off)
  */
 
 int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
-            void *data, int *data_size,
-            const uint8_t *buf, int buf_size) {
-    int result = 0, off = 0, i;
+            int *data_size, const uint8_t *buf, int buf_size) {
+    int result = 0, off = 0;
     const uint8_t* databuf;
-    int16_t* samples = data;
 
     if (buf_size < rmctx->block_align)
         return buf_size;
@@ -887,19 +884,10 @@ int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
         return -1;
     }
 
-    if (q->channels == 1) {
-        /* mono */
-        for (i = 0; i<1024; i++)
-            samples[i] = av_clip_int16(q->outSamples[i]);
-        *data_size = 1024 * sizeof(int16_t);
-    } else {
-        /* stereo */
-        for (i = 0; i < 1024; i++) {
-            samples[i*2] = av_clip_int16(q->outSamples[i]);
-            samples[i*2+1] = av_clip_int16(q->outSamples[1024+i]);
-        }
-        *data_size = 2048 * sizeof(int16_t);
-    }
+    if (q->channels == 1)
+        *data_size = 1024 * sizeof(int32_t);
+    else
+        *data_size = 2048 * sizeof(int32_t);
 
     return rmctx->block_align;
 }

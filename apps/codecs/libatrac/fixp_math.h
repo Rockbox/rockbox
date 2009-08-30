@@ -36,17 +36,38 @@
            : "r"(X),"r"(Y)); \
         low; \
      })
-     
-    #define fixmul32(X,Y) \
-     ({ \
-        int32_t low; \
-        int32_t high; \
-        asm volatile (                   /* calculates: result = (X*Y)>>32 */ \
-           "smull  %0,%1,%2,%3 \n\t"     /* 64 = 32x32 multiply */ \
-           : "=&r"(low), "=&r" (high) \
-           : "r"(X),"r"(Y)); \
-        high; \
-     })
+#elif defined(CPU_COLDFIRE)
+    #define fixmul16(X,Y) \
+    ({ \
+        int32_t t1, t2; \
+        asm volatile ( \
+            "mac.l   %[x],%[y],%%acc0\n\t" /* multiply */ \
+            "mulu.l  %[y],%[x]   \n\t"     /* get lower half, avoid emac stall */ \
+            "movclr.l %%acc0,%[t1]   \n\t" /* get higher half */ \
+            "moveq.l #15,%[t2]   \n\t" \
+            "asl.l   %[t2],%[t1] \n\t"     /* hi <<= 15, plus one free */ \
+            "moveq.l #16,%[t2]   \n\t" \
+            "lsr.l   %[t2],%[x]  \n\t"     /* (unsigned)lo >>= 16 */ \
+            "or.l    %[x],%[t1]  \n\t"     /* combine result */ \
+            : /* outputs */ \
+            [t1]"=&d"(t1), \
+            [t2]"=&d"(t2) \
+            : /* inputs */ \
+            [x] "d" ((X)), \
+            [y] "d" ((Y))); \
+        t1; \
+    })
+
+    #define fixmul31(X,Y) \
+    ({ \
+       int32_t t; \
+       asm volatile ( \
+          "mac.l %[x], %[y], %%acc0\n\t"   /* multiply */ \
+          "movclr.l %%acc0, %[t]\n\t"      /* get higher half as result */ \
+          : [t] "=d" (t) \
+          : [x] "r" ((X)), [y] "r" ((Y))); \
+       t; \
+    })
 #else
     static inline int32_t fixmul16(int32_t x, int32_t y)
     {
@@ -66,17 +87,6 @@
         temp *= y;
     
         temp >>= 31;        //16+31-16 = 31 bits
-    
-        return (int32_t)temp;
-    }
-    
-    static inline int32_t fixmul32(int32_t x, int32_t y)
-    {
-        int64_t temp;
-        temp = x;
-        temp *= y;
-    
-        temp >>= 32;        //16+31-16 = 31 bits
     
         return (int32_t)temp;
     }
@@ -104,13 +114,13 @@ static inline int32_t fastSqrt(int32_t n)
    /*
     * Logically, these are unsigned. 
     * We need the sign bit to test
-    *	whether (op - res - one) underflowed.
+    * whether (op - res - one) underflowed.
     */
     int32_t op, res, one;
     op = n;
     res = 0;
     /* "one" starts at the highest power of four <= than the argument. */
-    one = 1 << 30;	/* second-to-top bit set */
+    one = 1 << 30; /* second-to-top bit set */
     while (one > op) one >>= 2;
     while (one != 0) 
     {
