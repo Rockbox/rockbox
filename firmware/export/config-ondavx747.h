@@ -206,6 +206,8 @@
 
 #ifdef ONDA_VX747P
 #define BOOTFILE_EXT "vx747p"
+#elif defined(ONDA_VX777)
+#define BOOTFILE_EXT "vx777"
 #else
 #define BOOTFILE_EXT "vx747"
 #endif
