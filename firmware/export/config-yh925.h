@@ -58,7 +58,7 @@
 #define DEFAULT_CONTRAST_SETTING    14 /* Match boot contrast */
 
 /* define this if you can flip your LCD */
-/* todo #define HAVE_LCD_FLIP */
+#define HAVE_LCD_FLIP
 
 /* define this if you can invert the colours on your LCD */
 /* todo #define HAVE_LCD_INVERT */

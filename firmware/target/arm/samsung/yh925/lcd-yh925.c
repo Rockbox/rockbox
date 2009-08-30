@@ -30,7 +30,8 @@ static bool power_on;
 /* Is the display turned on? */
 static bool display_on;
 /* Amount of vertical offset. Used for flip offset correction/detection. */
-static int y_offset;
+static int y_offset = 4;
+static int x_offset = 16;
 /* Reverse flag. Must be remembered when display is turned off. */
 static unsigned short disp_control_rev;
 /* Contrast setting << 8 */
@@ -78,6 +79,8 @@ static void lcd_display_off(void);
 #define R_GAMMA_AMP_ADJ_POS     0x3a
 #define R_GAMMA_AMP_ADJ_NEG     0x3b
 
+#define R_DRV_OUTPUT_CONTROL_NORMAL     (1<<9|1<<4|1<<2|1<<0)
+#define R_DRV_OUTPUT_CONTROL_FLIPPED    (1<<11|1<<8|1<<5|1<<4|1<<3)
 static inline void lcd_wait_write(void)
 {
     while (LCD2_PORT & LCD2_BUSY_MASK);
@@ -156,26 +159,35 @@ void lcd_set_invert_display(bool yesno)
     lcd_write_reg(R_DISP_CONTROL, 0x0033 | disp_control_rev);
 }
 
-
 /* turn the display upside down (call lcd_update() afterwards) */
-void lcd_set_flip(bool yesno)
+void lcd_set_flip(bool flip)
 {
-    /* NOT MODIFIED FOR THE YH-925 */
-
-    if (yesno == (y_offset != 0))
+    int r_drv_output_control;
+    if (yesno == (y_offset != 4))
         return;
-
     /* The LCD controller is 132x160 while the LCD itself is 128x160, so we need
-     * to shift the origin by 4 when we flip the LCD */
-    y_offset = yesno ? 4 : 0;
+     * to shift the origin by 4 when we flip the LCD
+     *
+     * the higher bits are the key bits for flipping */
+    if (flip)
+    {
+        x_offset = 0; y_offset = 0;
+        r_drv_output_control = R_DRV_OUTPUT_CONTROL_FLIPPED;
+    }
+    else
+    {
+        x_offset = 16; y_offset = 4;
+        r_drv_output_control = R_DRV_OUTPUT_CONTROL_NORMAL;
+    }
 
     if (!power_on)
         return;
 
-    /* SCN4-0=000x0 (G1/G160) */
-    lcd_write_reg(R_GATE_SCAN_START_POS, yesno ? 0x0002 : 0x0000);
-    /* SM=0, GS=x, SS=x, NL4-0=10011 (G1-G160) */
-    lcd_write_reg(R_DRV_OUTPUT_CONTROL, yesno ? 0x0213 : 0x0113);
+    lcd_write_reg(R_1ST_SCR_DRV_POS, ( (LCD_WIDTH + x_offset - 1) << 8) | x_offset);
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (LCD_HEIGHT - 1) << 8 | 0);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, ((LCD_WIDTH + x_offset- 1) << 8) | x_offset);
+    lcd_write_reg(R_DRV_OUTPUT_CONTROL, r_drv_output_control );
+    lcd_write_reg(R_ENTRY_MODE, 0x1028);
 }
 
 /* LCD init */
@@ -226,10 +238,10 @@ void lcd_init_device(void)
     lcd_write_reg(R_GAMMA_GRAD_ADJ_NEG, 0x0001);
     lcd_write_reg(R_GATE_SCAN_START_POS, 0x0000);
     lcd_write_reg(R_VERT_SCROLL_CONTROL, 0x0000);
-    lcd_write_reg(R_1ST_SCR_DRV_POS, 0xaf10);
+    lcd_write_reg(R_1ST_SCR_DRV_POS, ( (LCD_WIDTH + 16 - 1) << 8) | 16);
     lcd_write_reg(R_2ND_SCR_DRV_POS, 0x0000);
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 0x7f00); /* ((LCD_HEIGHT - 1) << 8 | 0 */
-    lcd_write_reg(R_VERT_RAM_ADDR_POS, 0xaf10);  /* ((LCD_WIDTH + 16 - 1) << 8) | 16 */
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (LCD_HEIGHT - 1) << 8 | 0);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, ((LCD_WIDTH + 16- 1) << 8) | 16);
     lcd_write_reg(R_GAMMA_AMP_ADJ_POS, 0x1600);
     lcd_write_reg(R_GAMMA_AMP_ADJ_NEG, 0x0006);
     lcd_write_reg(R_DISP_CONTROL, 0x0104);
@@ -266,12 +278,11 @@ void lcd_init_device(void)
 #endif
 
     /* only these bits are needed from the OF init */
-    lcd_write_reg(R_DRV_OUTPUT_CONTROL, 0x0215);
+    lcd_write_reg(R_DRV_OUTPUT_CONTROL, R_DRV_OUTPUT_CONTROL_NORMAL);
     lcd_write_reg(R_ENTRY_MODE, 0x1028);
 
     power_on = true;
     display_on = true;
-    y_offset = 0;
     disp_control_rev = 0x0004;
     lcd_contrast     = DEFAULT_CONTRAST_SETTING << 8;
 }
@@ -599,10 +610,10 @@ void lcd_update_rect(int x0, int y0, int width, int height)
         y1 = LCD_HEIGHT-1;
         
     /* The LCD is actually 128x160 rotated 90 degrees */
-    lcd_x0 = (LCD_HEIGHT - 1) - y1 + 4;
-    lcd_x1 = (LCD_HEIGHT - 1) - y0 + 4;
-    lcd_y0 = x0 + 16;
-    lcd_y1 = x1 + 16;
+    lcd_x0 = (LCD_HEIGHT - 1) - y1 + y_offset;
+    lcd_x1 = (LCD_HEIGHT - 1) - y0 + y_offset;
+    lcd_y0 = x0 + x_offset;
+    lcd_y1 = x1 + x_offset;
 
     /* set the drawing window */
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (lcd_x1 << 8) | lcd_x0);
