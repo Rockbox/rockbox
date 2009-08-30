@@ -319,6 +319,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
 
       case 4: /* 16-bit packed RGB (5-6-5) */
       case 5: /* 16-bit packed and byte-swapped RGB (5-6-5) */
+      case 8: /* 16-bit packed RGB (5-6-5) vertical stride*/
         dst_w = width;
         dst_h = height;
         dst_d = 16;
@@ -423,6 +424,19 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
 
                 data = (data | (data << 7)) & 0x0101;
                 (*dest)[(row/8) * dst_w + col] |= data << (row & 7);
+            }
+        break;
+        
+      case 8: /* 16-bit packed RGB (5-6-5) vertical stride*/
+        for (row = 0; row < height; row++)
+            for (col = 0; col < width; col++)
+            {
+                unsigned short rgb =
+                    (((src[row * width + col].rgbRed >> 3) << 11) |
+                     ((src[row * width + col].rgbGreen >> 2) << 5) |
+                     ((src[row * width + col].rgbBlue >> 3)));
+                     
+                (*dest)[col * dst_h + row] = rgb;
             }
         break;
     }
@@ -569,7 +583,8 @@ void print_usage(void)
            "\t         4  16-bit packed 5-6-5 RGB (iriver H300)\n"
            "\t         5  16-bit packed and byte-swapped 5-6-5 RGB (iPod)\n"
            "\t         6  Greyscale iPod 4-grey\n"
-           "\t         7  Greyscale X5 remote 4-grey\n");
+           "\t         7  Greyscale X5 remote 4-grey\n"
+           "\t         8  16-bit packed 5-6-5 RGB with a vertical stride\n");
     printf("build date: " __DATE__ "\n\n");
 }
 

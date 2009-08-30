@@ -6,7 +6,7 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-CFLAGS := -O -g -W -Wall -Wshadow -pedantic
+CFLAGS := -g -W -Wall -Wshadow -pedantic
 LDFLAGS := -g
 
 .PHONY: rbspeexenc uclpack
@@ -16,7 +16,7 @@ CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
  lngdump telechips gigabeats creative hmac-sha1 mktccboot mknkboot rbspeexenc mkzenboot
 
 all: scramble descramble sh2d rdf2binary mkboot mktccboot mknkboot mkzenboot \
-	convbdf codepages uclpack rbspeexenc voicefont
+	convbdf codepages uclpack rbspeexenc voicefont mk500boot
 
 scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o iaudio_bl_flash.o creative.o hmac-sha1.o
 descramble: descramble.o iriver.o gigabeat.o
@@ -47,7 +47,10 @@ mkboot:	mkboot.c
 
 mktccboot: mktccboot.c telechips.o
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
-
+	
+mk500boot: mk500boot.c mr500.c
+	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
+	
 mknkboot: mknkboot.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
 
