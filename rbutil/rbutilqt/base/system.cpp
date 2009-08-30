@@ -341,8 +341,9 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
             }
         }
 
-        unsigned int vid, pid, rev;
-        if(_stscanf(buffer, _TEXT("USB\\Vid_%x&Pid_%x&Rev_%x"), &vid, &pid, &rev) == 3) {
+        unsigned int vid, pid;
+        qDebug() << QString::fromWCharArray(buffer);
+        if(_stscanf(buffer, _TEXT("USB\\Vid_%x&Pid_%x"), &vid, &pid) == 2) {
             uint32_t id;
             id = vid << 16 | pid;
             usbids.insert(id, description);
