@@ -172,6 +172,7 @@ metadata/wavpack.c
 metadata/a52.c
 metadata/asap.c
 metadata/rm.c
+metadata/nsf.c
 #endif
 #ifdef HAVE_TAGCACHE
 tagcache.c

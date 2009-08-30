@@ -215,10 +215,6 @@ bool mp3info(struct mp3entry *entry, const char *filename)
  */
 bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
 {
-#if CONFIG_CODEC == SWCODEC
-    unsigned char* buf;
-#endif
-
     /* Clear the mp3entry to avoid having bogus pointers appear */
     memset(id3, 0, sizeof(struct mp3entry));
 
@@ -356,15 +352,11 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         break;
 
     case AFMT_NSF:
-        buf = (unsigned char *)id3->path;
-        if ((lseek(fd, 0, SEEK_SET) < 0) || ((read(fd, buf, 8)) < 8))
+        if (!get_nsf_metadata(fd, id3))
         {
-            DEBUGF("lseek or read failed\n");
+            DEBUGF("get_nsf_metadata error\n");
             return false;
         }
-        id3->vbr = false;
-        id3->filesize = filesize(fd);
-        if (memcmp(buf,"NESM",4) && memcmp(buf,"NSFE",4)) return false;
         break;
 
     case AFMT_AIFF:
