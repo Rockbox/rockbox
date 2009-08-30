@@ -163,7 +163,7 @@ void lcd_set_invert_display(bool yesno)
 void lcd_set_flip(bool flip)
 {
     int r_drv_output_control;
-    if (yesno == (y_offset != 4))
+    if (flip == (y_offset != 4))
         return;
     /* The LCD controller is 132x160 while the LCD itself is 128x160, so we need
      * to shift the origin by 4 when we flip the LCD
