@@ -6,7 +6,7 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-CFLAGS := -g -W -Wall -Wshadow -pedantic
+CFLAGS := -O -g -W -Wall -Wshadow -pedantic
 LDFLAGS := -g
 
 .PHONY: rbspeexenc uclpack
