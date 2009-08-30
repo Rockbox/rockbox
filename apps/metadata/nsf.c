@@ -28,13 +28,16 @@ bool get_nsf_metadata(int fd, struct mp3entry* id3)
     id3->vbr = false;
     id3->filesize = filesize(fd);
 
-    if (memcmp(buf,"NESM",4) && memcmp(buf,"NSFE",4))
-    {
-        return false;
-    }
-    else if (memcmp(buf, "NESM",4))  /* only NESM contain metadata */
+    if (memcmp(buf,"NSFE",4) == 0) /* only NESM contain metadata */
     {
         return true;
+    }
+    else
+    { 
+        if (memcmp(buf, "NESM",4) != 0)  /* not a valid format*/
+        {
+            return false;
+        }
     }
 
     p = id3->id3v2buf;
