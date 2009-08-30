@@ -531,6 +531,8 @@ void lcd_blit_yuv(unsigned char * const src[3],
     width &= ~1;
     height &= ~1;
 
+    x += x_offset;
+
     /* calculate the drawing region */
 
     /* The 20GB LCD is actually 128x160 but rotated 90 degrees so the origin
