@@ -12674,3 +12674,20 @@
     swcodec: "Limiteur préampli"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Ajouter aux raccourcis comme item du haut"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Ajouter aux raccourcis comme item du haut"
+  </voice>
+</phrase>
