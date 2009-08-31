@@ -764,7 +764,7 @@ jpeg_idct8h:
     add    r14, r7,  r5,  asr #16    /* r14 = z3 = tmp0 + tmp2 */
     add    r8,  r12, r14             /* r8  = z3 + z4 */
     ldr    r10, .Lpool8+8
-    ldr    r10, .Lpool8+12
+    ldr    r11, .Lpool8+12
     smultb r8,  r9,  r8              /* r8  = z5 = (z3 + z4) * 9633 */
     add    r9,  r7,  r4,  asr #16    /* r9  = z1 = tmp0 + tmp3 */
     smlabb r14, r10, r14, r8         /* r14 = z3 = z5 - z3 * 16069 */
