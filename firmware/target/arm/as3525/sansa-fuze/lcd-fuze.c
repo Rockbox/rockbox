@@ -44,7 +44,7 @@ static bool display_on = false; /* is the display turned on? */
 static bool display_flipped = false;
 static int xoffset = 20; /* needed for flip */
 /* we need to write a red pixel for correct button reads
- * (see lcd_button_support()), but that must not happen while the lcd is updating
+ * (see lcd_button_support()),but that must not happen while the lcd is updating
  * so block lcd_button_support the during updates */
 static bool lcd_busy = false;
 
@@ -54,29 +54,35 @@ static void as3525_dbop_init(void)
 
     DBOP_TIMPOL_01 = 0xe167e167;
     DBOP_TIMPOL_23 = 0xe167006e;
-    DBOP_CTRL = 0x41008;
+
+    /* short count: 16 | output data width: 16 | readstrobe line */
+    DBOP_CTRL = (1<<18|1<<12|1<<3);
 
     GPIOB_AFSEL = 0xfc;
     GPIOC_AFSEL = 0xff;
 
     DBOP_TIMPOL_23 = 0x6000e;
-    DBOP_CTRL = 0x51008;
+    /* short count: 16|enable write|output data width: 16|read strobe line */
+    DBOP_CTRL = (1<<18|1<<16|1<<12|1<<3);
     DBOP_TIMPOL_01 = 0x6e167;
     DBOP_TIMPOL_23 = 0xa167e06f;
 
     /* TODO: The OF calls some other functions here, but maybe not important */
 }
 
+#define lcd_write_single_data16(value) do {\
+        DBOP_CTRL &= ~(1<<14|1<<13); \
+        DBOP_DOUT16 = (fb_data)(value); \
+    } while(0)
+    
+
 static void lcd_write_cmd(int cmd)
 {
     int x;
 
     /* Write register */
-    DBOP_CTRL &= ~(1<<14);
-
     DBOP_TIMPOL_23 = 0xa167006e;
-
-    DBOP_DOUT = cmd;
+    lcd_write_single_data16(cmd);
 
     /* Wait for fifo to empty */
     while ((DBOP_STAT & (1<<10)) == 0);
@@ -93,13 +99,33 @@ static void lcd_write_cmd(int cmd)
 
 void lcd_write_data(const fb_data* p_bytes, int count)
 {
-    while (count--)
+    const long *data;
+    if ((int)p_bytes & 0x3)
+    {   /* need to do a single 16bit write beforehand if the address is
+         * not word aligned*/
+        lcd_write_single_data16(*p_bytes);
+        count--;p_bytes++;
+    }
+    /* from here, 32bit transfers are save */
+    /* set it to transfer 4*(outputwidth) units at a time,
+     * if bit 12 is set it only does 2 halfwords though */
+    DBOP_CTRL |= (1<<13|1<<14);
+    data = (long*)p_bytes;
+    while (count > 1)
     {
-        DBOP_DOUT = *p_bytes++;
+        DBOP_DOUT32 = *data++;
+        count -= 2;
 
         /* Wait for fifo to empty */
+        /* TODO: We should normally fill the fifo until it's full
+         * instead of waiting after each word,
+         * but that causes blue lines on the display */
         while ((DBOP_STAT & (1<<10)) == 0);
     }
+    /* due to the 32bit alignment requirement, we possibly need to do a
+     * 16bit transfer at the end also */
+    if (count > 0)
+        lcd_write_single_data16(*(fb_data*)data);
 }
 
 static void lcd_write_reg(int reg, int value)
@@ -107,7 +133,7 @@ static void lcd_write_reg(int reg, int value)
     unsigned short data = value;
 
     lcd_write_cmd(reg);
-    lcd_write_data(&data, 1);
+    lcd_write_single_data16(data);
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */
@@ -239,8 +265,8 @@ extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
 extern void lcd_write_yuv420_lines_odither(unsigned char const * const src[3],
                                            int width,
                                            int stride,
-                                           int x_screen, /* To align dither pattern */
-                                           int y_screen);
+                                           int x_screen, /* To align dither */
+                                           int y_screen); /*  pattern */
 /* Performance function to blit a YUV bitmap directly to the LCD */
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
@@ -319,7 +345,6 @@ void lcd_update(void)
 {
     if (!display_on)
         return;
-
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
     lcd_busy = true;
@@ -338,10 +363,11 @@ void lcd_update(void)
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int xmax, ymax;
-    const unsigned short *ptr;
+    const fb_data *ptr;
 
     if (!display_on)
         return;
+
 
     xmax = x + width;
     if (xmax >= LCD_WIDTH)
@@ -370,7 +396,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     /* Start write to GRAM */
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
-    ptr = (unsigned short *)&lcd_framebuffer[y][x];
+    ptr = &lcd_framebuffer[y][x];
 
     do
     {
@@ -394,7 +420,7 @@ bool lcd_button_support(void)
     lcd_window_y(-1, 0);
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
-    lcd_write_data(&data, 1);
+    lcd_write_single_data16(data);
 
     return true;
 }
