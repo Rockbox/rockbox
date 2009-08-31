@@ -482,7 +482,12 @@ PLUGIN_HEADER
 #define CARD_WIDTH      (BMPWIDTH_card_back+2)
 #define CARD_HEIGHT     (BMPHEIGHT_card_back+2)
 
-#if LCD_WIDTH >= 320
+#if LCD_WIDTH >= 640
+#   define MARGIN 4
+#   define LARGE_CARD
+#   define SYMBOL_HEIGHT 24
+
+#elif LCD_WIDTH >= 320
 #   define MARGIN 4
 #   define LARGE_CARD
 #   define SYMBOL_HEIGHT 12
@@ -615,7 +620,8 @@ static void draw_card( card_t *card, int x, int y,
     if( card->known )
     {
         rb->lcd_bitmap_part( card_deck, CARD_GFX_WIDTH * card->num,
-                             CARD_GFX_HEIGHT * card->suit, BMPWIDTH_card_deck,
+                             CARD_GFX_HEIGHT * card->suit, 
+                             STRIDE(BMPWIDTH_card_deck, BMPHEIGHT_card_deck),
                              x+1, y+1, CARD_GFX_WIDTH, CARD_GFX_HEIGHT );
     }
     else
@@ -630,8 +636,9 @@ static void draw_card( card_t *card, int x, int y,
 static void draw_empty_stack( int s, int x, int y, bool cursor )
 {
     rb->lcd_bitmap_part( solitaire_suitsi, 0,
-                         CARD_GFX_HEIGHT * s, BMPWIDTH_solitaire_suitsi,
-                         x+1, y+1, CARD_GFX_WIDTH, CARD_GFX_HEIGHT );
+                 CARD_GFX_HEIGHT * s, 
+                 STRIDE(BMPWIDTH_solitaire_suitsi, BMPHEIGHT_solitaire_suitsi),
+                 x+1, y+1, CARD_GFX_WIDTH, CARD_GFX_HEIGHT );
 
     draw_card_ext( x, y, false, cursor );
 }

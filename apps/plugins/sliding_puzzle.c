@@ -404,8 +404,9 @@ static void draw_spot(int p, int x, int y)
         /* the bottom-right cell of the default sliding_puzzle image is
            an appropriate hole graphic */
         rb->lcd_bitmap_part(sliding_puzzle, ((p-1)%SPOTS_X)*SPOTS_WIDTH,
-                                 ((p-1)/SPOTS_X)*SPOTS_HEIGHT,
-                                IMAGE_WIDTH, x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
+                    ((p-1)/SPOTS_X)*SPOTS_HEIGHT,
+                    STRIDE(BMPWIDTH_sliding_puzzle, BMPHEIGHT_sliding_puzzle),
+                    x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
 #else
         /* just draw a black rectangle */
         int old_fg = rb->lcd_get_foreground();
@@ -417,8 +418,9 @@ static void draw_spot(int p, int x, int y)
     else if (picmode != PICMODE_NUMERALS)
     {
         rb->lcd_bitmap_part( puzzle_bmp_ptr, ((p-1)%SPOTS_X)*SPOTS_WIDTH,
-                             ((p-1)/SPOTS_X)*SPOTS_HEIGHT,
-                             IMAGE_WIDTH, x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
+                     ((p-1)/SPOTS_X)*SPOTS_HEIGHT,
+                     STRIDE(BMPWIDTH_sliding_puzzle, BMPHEIGHT_sliding_puzzle), 
+                     x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
     } else {
         rb->lcd_drawrect(x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
         rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
