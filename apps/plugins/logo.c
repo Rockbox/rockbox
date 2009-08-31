@@ -169,6 +169,8 @@ const unsigned char rockbox16x7[] = {
 
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
 #define LP_QUIT BUTTON_POWER
+#elif CONFIG_KEYPAD == ONDAVX777_PAD
+#define LP_QUIT BUTTON_POWER
 
 #elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
 #define LP_QUIT  BUTTON_PLAY

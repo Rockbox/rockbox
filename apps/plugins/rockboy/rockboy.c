@@ -237,6 +237,9 @@ static void setoptions (void)
         options.B=BUTTON_VOL_DOWN;
         options.MENU=BUTTON_MENU;  
 
+#elif CONFIG_KEYPAD == ONDAVX777_PAD
+        options.MENU=BUTTON_POWER;
+
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
         options.UP=BUTTON_UP;
         options.DOWN=BUTTON_DOWN;

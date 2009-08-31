@@ -1166,6 +1166,10 @@ void button_event(int key, bool pressed)
     case SDLK_RETURN:
         new_btn = BUTTON_MENU;
         break;
+#elif CONFIG_KEYPAD == ONDAVX777_PAD
+    case SDLK_ESCAPE:
+        new_btn = BUTTON_POWER;
+        break;
 #elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
     case SDLK_KP4:
     case SDLK_LEFT:

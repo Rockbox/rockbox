@@ -2224,7 +2224,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.vx777"
     appextra="recorder:gui"
-    plugins="" #TODO
+    plugins="yes"
     swcodec="yes"
     toolset=$genericbitmaptools
     boottool="$rootdir/tools/scramble -ccpmp"

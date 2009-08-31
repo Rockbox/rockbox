@@ -300,6 +300,8 @@ You are free to name this file lodepng.cpp or lodepng.c depending on your usage.
 
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
 #define PNG_MENU       BUTTON_POWER
+#elif CONFIG_KEYPAD == ONDAVX777_PAD
+#define PNG_MENU       BUTTON_POWER
 
 #elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
 #define PNG_ZOOM_IN    (BUTTON_PLAY|BUTTON_UP)

@@ -315,11 +315,13 @@
 #define UI_LCD_POSX                 42 /* x position of lcd */
 #define UI_LCD_POSY                 55 /* y position of lcd */
 
-#elif defined(ONDA_VX747) || defined(ONDA_VX747P)
+#elif defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX777)
 #ifdef ONDA_VX747
 #define UI_TITLE                    "Onda VX747"
-#else
+#elif defined(ONDA_VX747P)
 #define UI_TITLE                    "Onda VX747+"
+#else
+#define UI_TITLE                    "Onda VX777"
 #endif
 #define UI_WIDTH                    340 /* width of GUI window */
 #define UI_HEIGHT                   601 /* height of GUI window */

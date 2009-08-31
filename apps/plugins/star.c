@@ -332,6 +332,10 @@ PLUGIN_HEADER
 #define STAR_QUIT           BUTTON_POWER
 #define STAR_QUIT_NAME      "POWER"
 
+#elif (CONFIG_KEYPAD == ONDAVX777_PAD)
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_QUIT_NAME      "POWER"
+
 #elif CONFIG_KEYPAD == MROBE500_PAD
 #define STAR_QUIT           BUTTON_POWER
 #define STAR_QUIT_NAME      "POWER"
