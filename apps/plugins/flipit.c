@@ -349,7 +349,8 @@ static int cursor_pos, moves;
 /* draw a spot at the coordinates (x,y), range of p is 0-19 */
 static void draw_spot(int p)
 {
-    rb->lcd_bitmap_part( flipit_tokens, 0, spots[p] * TK_HEIGHT, TK_WIDTH,
+    rb->lcd_bitmap_part( flipit_tokens, 0, spots[p] * TK_HEIGHT, 
+                         STRIDE(BMPWIDTH_flipit_tokens, BMPHEIGHT_flipit_tokens),
                          GRID_LEFT + (p%5) * (TK_WIDTH+TK_SPACE),
                          GRID_TOP + (p/5) * (TK_HEIGHT+TK_SPACE),
                          TK_WIDTH, TK_HEIGHT );
