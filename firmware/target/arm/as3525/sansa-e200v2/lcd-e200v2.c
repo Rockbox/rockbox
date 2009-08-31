@@ -130,15 +130,16 @@ static void ams3525_dbop_init(void)
     /* TODO: The OF calls some other functions here, but maybe not important */
 }
 
+#define lcd_write_single_data16(value) do {\
+        DBOP_CTRL &= ~(1<<14|1<<13); \
+        DBOP_DOUT16 = (fb_data)(value); \
+    } while(0)
 
 static void lcd_write_cmd(int cmd)
 {
     /* Write register */
-    DBOP_CTRL &= ~(1<<14);
-
     DBOP_TIMPOL_23 = 0xa167006e;
-
-    DBOP_DOUT = cmd;
+    lcd_write_single_data16(cmd);
 
     /* Wait for fifo to empty */
     while ((DBOP_STAT & (1<<10)) == 0);
@@ -152,13 +153,33 @@ static void lcd_write_cmd(int cmd)
 
 void lcd_write_data(const fb_data* p_bytes, int count)
 {
-    while (count--)
+    const long *data;
+    if ((int)p_bytes & 0x3)
+    {   /* need to do a single 16bit write beforehand if the address is */
+        /* not word aligned*/
+        lcd_write_single_data16(*p_bytes);
+        count--;p_bytes++;
+    }
+    /* from here, 32bit transfers are save */
+    /* set it to transfer 4*(outputwidth) units at a time, */
+    /* if bit 12 is set it only does 2 halfwords though */
+    DBOP_CTRL |= (1<<13|1<<14);
+    data = (long*)p_bytes;
+    while (count > 1)
     {
-        DBOP_DOUT = *p_bytes++;
+        DBOP_DOUT32 = *data++;
+        count -= 2;
 
-        /* Wait for fifo to empty */
+        /* TODO: We should normally fill the fifo until it's full
+ 	  	* instead of waiting after each word,
+                    * but that causes blue lines on the display */                    
         while ((DBOP_STAT & (1<<10)) == 0);
     }
+    
+    /* due to the 32bit alignment requirement, we possibly need to do a
+        * 16bit transfer at the end also */
+    if (count > 0)
+        lcd_write_single_data16(*(fb_data*)data);
 }
 
 static void lcd_write_reg(int reg, int value)
@@ -166,7 +187,7 @@ static void lcd_write_reg(int reg, int value)
     fb_data data = value;
 
     lcd_write_cmd(reg);
-    lcd_write_data(&data, 1);
+    lcd_write_single_data16(data);
 }
 
 /*** hardware configuration ***/
@@ -555,6 +576,6 @@ bool lcd_button_support(void)
 
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
-    lcd_write_data(&data, 1);
+    lcd_write_single_data16(data);
     return true;
 }
