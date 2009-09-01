@@ -188,7 +188,7 @@ static void reset_configuration(void)
 static int boot_menu(void)
 {
     const char* strings[] = {"Boot Rockbox", "Boot OF", "USB mode", "Reset Rockbox configuration"};
-    int button, touch;
+    int button, touch, poweroff_repeat = 0;
     unsigned int i;
 
     verbose = true;
@@ -206,7 +206,7 @@ redraw:
     while(1)
     {
         button = button_get_w_tmo(HZ/4);
-        if(button & (BUTTON_TOUCHSCREEN|BUTTON_REPEAT))
+        if(button & BUTTON_TOUCHSCREEN)
         {
             touch = button_get_data();
             unsigned int x = touch & 0xFFFF, y = touch >> 16;
@@ -242,8 +242,13 @@ redraw:
             if(found != -1)
                 goto redraw;
         }
-        else if(button & (BUTTON_POWER|BUTTON_REPEAT))
-            power_off();
+        else if(button & BUTTON_POWER)
+	{
+	    if(poweroff_repeat++ > 8)
+		power_off();
+	}
+	else
+	    poweroff_repeat = 0;
     }
 }
 
