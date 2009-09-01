@@ -66,6 +66,11 @@ void audiohw_init(void)
     GPIOL_OUTPUT_VAL &= ~0x20;
     GPIOL_OUTPUT_EN  |=  0x20;
 
+#ifdef SAMSUNG_YH920
+    GPO32_ENABLE     |=  0x00000002;
+    GPO32_VAL        &= ~0x00000002;
+#endif
+
     GPO32_VAL        |=  0x00000020;
     GPO32_ENABLE     |=  0x00000020;
 
