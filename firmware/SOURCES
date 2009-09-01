@@ -89,7 +89,11 @@ drivers/lcd-2bit-vert.c
 drivers/lcd-2bit-vi.c
 #endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 16
+#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+drivers/lcd-16bit-vert.c
+#else
 drivers/lcd-16bit.c
+#endif
 #endif /* LCD_DEPTH */
 #endif /* HAVE_LCD_BITMAP */
 
