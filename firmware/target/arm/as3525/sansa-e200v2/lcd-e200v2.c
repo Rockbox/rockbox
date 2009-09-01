@@ -173,13 +173,13 @@ void lcd_write_data(const fb_data* p_bytes, int count)
         /* Wait if push fifo is full */
         while ((DBOP_STAT & (1<<6)) != 0);
     }
-    /* due to the 32bit alignment requirement, we possibly need to do a
-        * 16bit transfer at the end also */
-    if (count > 0)
-        lcd_write_single_data16(*(fb_data*)data);
-
     /* While push fifo is not empty */
     while ((DBOP_STAT & (1<<10)) == 0);
+
+    /* due to the 32bit alignment requirement or uneven count,
+     * we possibly need to do a 16bit transfer at the end also */
+    if (count > 0)
+        lcd_write_single_data16(*(fb_data*)data);
 }
 
 static void lcd_write_reg(int reg, int value)
