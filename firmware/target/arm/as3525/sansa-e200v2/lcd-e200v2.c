@@ -170,16 +170,16 @@ void lcd_write_data(const fb_data* p_bytes, int count)
         DBOP_DOUT32 = *data++;
         count -= 2;
 
-        /* TODO: We should normally fill the fifo until it's full
- 	  	* instead of waiting after each word,
-                    * but that causes blue lines on the display */                    
-        while ((DBOP_STAT & (1<<10)) == 0);
+        /* Wait if push fifo is full */
+        while ((DBOP_STAT & (1<<6)) != 0);
     }
-    
     /* due to the 32bit alignment requirement, we possibly need to do a
         * 16bit transfer at the end also */
     if (count > 0)
         lcd_write_single_data16(*(fb_data*)data);
+
+    /* While push fifo is not empty */
+    while ((DBOP_STAT & (1<<10)) == 0);
 }
 
 static void lcd_write_reg(int reg, int value)

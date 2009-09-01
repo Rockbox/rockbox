@@ -32,7 +32,7 @@
 #define WHEEL_COUNTER_DIV       4
 #define ACCEL_INCREMENT         2
 #define ACCEL_SHIFT             2
-#define BUTTON_DELAY            45
+#define BUTTON_DELAY            30
 #endif
 
 #ifdef SANSA_E200V2
@@ -246,6 +246,11 @@ static int button_gpio(void)
     int btn = BUTTON_NONE;
     if(hold_button)
         return btn;
+
+    /* disable DBOP output while changing GPIO pins that share lines with it */
+    DBOP_CTRL &= ~(1<<16);
+    button_delay();
+    
     /* set afsel, so that we can read our buttons */
     GPIOC_AFSEL &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);
     /* set dir so we can read our buttons (but reset the C pins first) */
@@ -276,7 +281,8 @@ static int button_gpio(void)
     /* return to settings needed for lcd */
     GPIOC_DIR |= (1<<2|1<<3|1<<4|1<<5|1<<6);
     GPIOC_AFSEL |= (1<<2|1<<3|1<<4|1<<5|1<<6);
-
+    
+    DBOP_CTRL |= (1<<16);               /* enable output again */
     return btn;
 }
 
