@@ -743,6 +743,29 @@ static void output_row_32_native(uint32_t row, void * row_in,
                 }
 #endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 16
+
+#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+                /* M:Robe 500 */
+                (void) fb_width;
+                fb_data *dest = (fb_data *)ctx->bm->data + row;
+                int delta = 127;
+                unsigned r, g, b;
+                struct uint32_rgb q0;
+                
+                for (col = 0; col < ctx->bm->width; col++) {
+                    if (ctx->dither)
+                        delta = DITHERXDY(col,dy);
+                    q0 = *qp++;
+                    r = SC_OUT(q0.r, ctx);
+                    g = SC_OUT(q0.g, ctx);
+                    b = SC_OUT(q0.b, ctx);
+                    r = (31 * r + (r >> 3) + delta) >> 8;
+                    g = (63 * g + (g >> 2) + delta) >> 8;
+                    b = (31 * b + (b >> 3) + delta) >> 8;
+                    *dest = LCD_RGBPACK_LCD(r, g, b);
+                    dest += ctx->bm->height;
+                }
+#else
                 /* iriver h300, colour iPods, X5 */
                 fb_data *dest = (fb_data *)ctx->bm->data + fb_width * row;
                 int delta = 127;
@@ -761,6 +784,8 @@ static void output_row_32_native(uint32_t row, void * row_in,
                     b = (31 * b + (b >> 3) + delta) >> 8;
                     *dest++ = LCD_RGBPACK_LCD(r, g, b);
                 }
+#endif
+
 #endif /* LCD_DEPTH */
 }
 #endif
