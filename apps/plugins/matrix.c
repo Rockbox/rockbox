@@ -37,9 +37,9 @@
 PLUGIN_HEADER
 
 /* Images */
+#include "pluginbitmaps/matrix_bold.h"
+#include "pluginbitmaps/matrix_normal.h"
 #define MAXCHARS 27 - 1
-extern const fb_data matrix_bold[];
-extern const fb_data matrix_normal[];
 #define COL_W 14
 #define COL_H 15
 
@@ -212,11 +212,13 @@ static void matrix_blit_char(const int row, const int col, int cha)
         cha = 0;
 
     if (matrix[row][col].bold == 1) {
-        rb->lcd_bitmap_part(matrix_bold, cha*COL_W, 0, 392,
+        rb->lcd_bitmap_part(matrix_bold, cha*COL_W, 0, 
+                STRIDE(BMPWIDTH_matrix_bold, BMPHEIGHT_matrix_bold),
                 col*COL_W + LEFTMARGIN, row*COL_H + TOPMARGIN, COL_W, COL_H);
     }
     else {
-        rb->lcd_bitmap_part(matrix_normal, cha*COL_W, 0, 392,
+        rb->lcd_bitmap_part(matrix_normal, cha*COL_W, 0, 
+                STRIDE(BMPWIDTH_matrix_normal, BMPHEIGHT_matrix_normal),
                 col*COL_W + LEFTMARGIN, row*COL_H + TOPMARGIN, COL_W, COL_H);
     }
 }
