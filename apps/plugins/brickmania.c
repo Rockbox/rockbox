@@ -270,9 +270,32 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define STRINGPOS_NAVI      (STRINGPOS_FINISH - 10)
 #define STRINGPOS_FLIP      (STRINGPOS_FINISH - 10)
 
+/* Brickmania was originally designed for the H300, other targets should scale
+ *  up/down as needed based on the screen height.
+ */
+#define SPEED_SCALE *GAMESCREEN_HEIGHT/176
+
+/* These are all used as ball speeds depending on where the ball hit the
+ *  paddle.
+ */
+#define SPEED_1Q_X  ( 6 SPEED_SCALE)
+#define SPEED_1Q_Y  (-2 SPEED_SCALE)
+#define SPEED_2Q_X  ( 4 SPEED_SCALE)
+#define SPEED_2Q_Y  (-3 SPEED_SCALE)
+#define SPEED_3Q_X  ( 3 SPEED_SCALE)
+#define SPEED_3Q_Y  (-4 SPEED_SCALE)
+#define SPEED_4Q_X  ( 2 SPEED_SCALE)
+#define SPEED_4Q_Y  (-4 SPEED_SCALE)
+
+/* This is used to determine the speed of the paddle */
+#define SPEED_PAD   ( 8 SPEED_SCALE)
+
+#define SPEED_POWER ( 2 SPEED_SCALE)
+
+#define SPEED_FIRE  ( 4 SPEED_SCALE)
+
 /*calculate paddle y-position */
 #define PAD_POS_Y           (GAMESCREEN_HEIGHT - PAD_HEIGHT - 1)
-
 
 int levels_num = 29;
 
@@ -1042,7 +1065,7 @@ static int brickmania_game_loop(void)
             for(i=0;i<30;i++) {
                 if (fire[i].top+7>0) {
                     if (game_state!=ST_PAUSE)
-                        fire[i].top-=4;
+                        fire[i].top -= SPEED_FIRE;
                     rb->lcd_vline(fire[i].left, fire[i].top, fire[i].top+7);
                 }
             }
@@ -1053,7 +1076,7 @@ static int brickmania_game_loop(void)
                     if (brick[i*10+j].power<9) {
                         if (brick[i*10+j].poweruse==2) {
                             if (game_state!=ST_PAUSE)
-                                brick[i*10+j].powertop+=2;
+                                brick[i*10+j].powertop+=SPEED_POWER;
                             rb->lcd_bitmap_part(brickmania_powerups,0,
                                                 POWERUP_HEIGHT*brick[i*10+j
                                                     ].power,
@@ -1066,6 +1089,7 @@ static int brickmania_game_loop(void)
                         }
                     }
 
+                    /* Did the brick hit the pad */
                     if ((pad_pos_x<LEFTMARGIN+j*BRICK_WIDTH+5 &&
                          pad_pos_x+pad_width>LEFTMARGIN+j*BRICK_WIDTH+5) &&
                         brick[i*10+j].powertop+6>=PAD_POS_Y &&
@@ -1472,35 +1496,36 @@ static int brickmania_game_loop(void)
                         {
                         /* Ball hit the outer edge of the paddle */
                         case 0:
-                            ball[k].y = -2;
-                            ball[k].x = 6 * x_direction;
+                            ball[k].y = SPEED_1Q_Y;
+                            ball[k].x = SPEED_1Q_X * x_direction;
                             break;
                         /* Ball hit the next fourth of the paddle */
                         case 1:
-                            ball[k].y = -3;
-                            ball[k].x = 4 * x_direction;
+                            ball[k].y = SPEED_2Q_Y;
+                            ball[k].x = SPEED_2Q_X * x_direction;
                             break;
                         /* Ball hit the third fourth of the paddle */
                         case 2:
-                            ball[k].y = -4;
-                            ball[k].x = 3 * x_direction;
+                            ball[k].y = SPEED_3Q_Y;
+                            ball[k].x = SPEED_3Q_X * x_direction;
                             break;
                         /* Ball hit the fourth fourth of the paddle or dead
                          *  center.
                          */
                         case 3:
                         case 4:
-                            ball[k].y = -4;
+                            ball[k].y = SPEED_4Q_Y;
                             /* Since this is the middle we don't want to
                              *  force the ball in a different direction.
                              *  Just keep it going in the same direction
                              *  with a specific speed.
                              */
-                            ball[k].x = (ball[k].x > 0) ? 2: -2;
+                            ball[k].x = (ball[k].x > 0) ? 
+                                    SPEED_4Q_X: -SPEED_4Q_X;
                             break;
 
                         default:
-                            ball[k].y = -4;
+                            ball[k].y = SPEED_4Q_Y;
                             break;
                         }
                     }
@@ -1604,7 +1629,7 @@ static int brickmania_game_loop(void)
                     continue;
                 if ((button_right && flip_sides==false) ||
                     (button_left && flip_sides==true)) {
-                    if (pad_pos_x+8+pad_width > LCD_WIDTH) {
+                    if (pad_pos_x+SPEED_PAD+pad_width > LCD_WIDTH) {
                         for(k=0;k<used_balls;k++)
                             if (game_state==ST_READY || ball[k].glue)
                                 ball[k].pos_x+=LCD_WIDTH-pad_pos_x-pad_width;
@@ -1613,13 +1638,13 @@ static int brickmania_game_loop(void)
                     else {
                         for(k=0;k<used_balls;k++)
                             if ((game_state==ST_READY || ball[k].glue))
-                                ball[k].pos_x+=8;
-                        pad_pos_x+=8;
+                                ball[k].pos_x+=SPEED_PAD;
+                        pad_pos_x+=SPEED_PAD;
                     }
                 }
                 else if ((button_left && flip_sides==false) ||
                          (button_right && flip_sides==true)) {
-                    if (pad_pos_x-8 < 0) {
+                    if (pad_pos_x-SPEED_PAD < 0) {
                         for(k=0;k<used_balls;k++)
                             if (game_state==ST_READY || ball[k].glue)
                                 ball[k].pos_x-=pad_pos_x;
@@ -1628,8 +1653,8 @@ static int brickmania_game_loop(void)
                     else {
                         for(k=0;k<used_balls;k++)
                             if (game_state==ST_READY || ball[k].glue)
-                                ball[k].pos_x-=8;
-                        pad_pos_x-=8;
+                                ball[k].pos_x-=SPEED_PAD;
+                        pad_pos_x-=SPEED_PAD;
                     }
                 }
 #ifdef HAVE_TOUCHSCREEN
