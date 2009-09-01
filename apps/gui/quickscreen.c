@@ -335,6 +335,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
        queued up, but can be interrupted as soon as a setting is
        changed. */
     cond_talk_ids(VOICE_QUICKSCREEN);
+    talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_TOP], true);
     talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_LEFT], true);
     talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_BOTTOM], true);
     talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_RIGHT], true);
