@@ -50,6 +50,7 @@
 #define EC_TRAN_WRITE_ENTRY      9
 #define EC_TRAN_WRITE_EXIT       10
 #define EC_COMMAND               11
+#define EC_WRITE_PROTECT         12
 
 /* for compatibility */
 static long last_disk_activity = -1;
@@ -535,6 +536,12 @@ int sd_write_sectors(IF_MD2(int card_no,) unsigned long start, int count,
     int ret;
     const unsigned char *buf_end;
     bool aligned;
+
+    if ((card_no == CARD_NUM_SLOT) && (GPIOA & 0x10))
+    {
+        /* write protect tab set */
+        return -EC_WRITE_PROTECT;
+    }
 
     mutex_lock(&sd_mtx);
     sd_enable(true);
