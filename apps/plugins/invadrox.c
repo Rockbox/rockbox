@@ -635,10 +635,17 @@ bool aliens_down, aliens_right, hit_left_border, hit_right_border;
 /* No standard get_pixel function yet, use this hack instead */
 #if (LCD_DEPTH >= 8)
 
+#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+inline fb_data get_pixel(int x, int y)
+{
+    return rb->lcd_framebuffer[LCD_HEIGHT*(LCD_WIDTH-1)-x*LCD_HEIGHT+y];
+}
+#else
 inline fb_data get_pixel(int x, int y)
 {
     return rb->lcd_framebuffer[ytab[y] + x];
 }
+#endif
 
 #elif (LCD_DEPTH == 2)
 
@@ -677,7 +684,8 @@ void draw_number(int x, int y, int num, int digits)
         d = num % 10;
         num = num / 10;
         rb->lcd_bitmap_part(invadrox_numbers, d * NUMBERS_WIDTH, 0,
-                            BMPWIDTH_invadrox_numbers,
+                            STRIDE( BMPWIDTH_invadrox_numbers, 
+                                    BMPHEIGHT_invadrox_numbers),
                             x + i * (NUMBERS_WIDTH + NUM_SPACING), y,
                             NUMBERS_WIDTH, FONT_HEIGHT);
     }
@@ -707,12 +715,16 @@ void draw_lives(void)
     int i;
     /* Lives num */
     rb->lcd_bitmap_part(invadrox_numbers, lives * NUMBERS_WIDTH, 0,
-                        BMPWIDTH_invadrox_numbers, PLAYFIELD_X + LIVES_X, PLAYFIELD_Y + 2,
+                        STRIDE( BMPWIDTH_invadrox_numbers, 
+                                BMPHEIGHT_invadrox_numbers), 
+                        PLAYFIELD_X + LIVES_X, PLAYFIELD_Y + 2,
                         NUMBERS_WIDTH, FONT_HEIGHT);
 
     /* Ships */
     for (i = 0; i < (lives - 1); i++) {
-        rb->lcd_bitmap_part(invadrox_ships, 0, 0, BMPWIDTH_invadrox_ships,
+        rb->lcd_bitmap_part(invadrox_ships, 0, 0, 
+                            STRIDE( BMPWIDTH_invadrox_ships, 
+                                    BMPHEIGHT_invadrox_ships),
                             PLAYFIELD_X + LIVES_X + SHIP_WIDTH + i * (SHIP_WIDTH + NUM_SPACING),
                             PLAYFIELD_Y + 1, SHIP_WIDTH, SHIP_HEIGHT);
     }
@@ -733,8 +745,11 @@ inline void draw_aliens(void)
     int i;
 
     for (i = 0; i < 5 * ALIENS; i++) {
-        rb->lcd_bitmap_part(invadrox_aliens, aliens[i].x & 1 ? ALIEN_WIDTH : 0, aliens[i].type * ALIEN_HEIGHT,
-                            BMPWIDTH_invadrox_aliens, PLAYFIELD_X + LIVES_X + aliens[i].x * ALIEN_SPEED,
+        rb->lcd_bitmap_part(invadrox_aliens, aliens[i].x & 1 ? ALIEN_WIDTH : 0, 
+                            aliens[i].type * ALIEN_HEIGHT,
+                            STRIDE( BMPWIDTH_invadrox_aliens, 
+                                    BMPHEIGHT_invadrox_aliens), 
+                            PLAYFIELD_X + LIVES_X + aliens[i].x * ALIEN_SPEED,
                             ALIEN_START_Y + aliens[i].y * ALIEN_HEIGHT,
                             ALIEN_WIDTH, ALIEN_HEIGHT);
     }
@@ -871,8 +886,11 @@ bool move_aliens(void)
     x = PLAYFIELD_X + LIVES_X + aliens[curr_alien].x * ALIEN_SPEED;
     y = ALIEN_START_Y + aliens[curr_alien].y * ALIEN_HEIGHT;
     rb->lcd_bitmap_part(invadrox_aliens,
-                        aliens[curr_alien].x & 1 ? ALIEN_WIDTH : 0, aliens[curr_alien].type * ALIEN_HEIGHT,
-                        BMPWIDTH_invadrox_aliens, x, y, ALIEN_WIDTH, ALIEN_HEIGHT);
+                        aliens[curr_alien].x & 1 ? ALIEN_WIDTH : 0, 
+                        aliens[curr_alien].type * ALIEN_HEIGHT,
+                        STRIDE( BMPWIDTH_invadrox_aliens,
+                                BMPHEIGHT_invadrox_aliens), 
+                        x, y, ALIEN_WIDTH, ALIEN_HEIGHT);
 
     if (!next_alien()) {
         /* Round finished. Set curr_alien to first alive from bottom. */
@@ -900,7 +918,9 @@ inline void draw_ship(void)
 
     /* Draw ship */
     rb->lcd_bitmap_part(invadrox_ships, 0, ship_frame * SHIP_HEIGHT,
-                        BMPWIDTH_invadrox_ships, ship_x, SHIP_Y, SHIP_WIDTH, SHIP_HEIGHT);
+                        STRIDE( BMPWIDTH_invadrox_ships,
+                                BMPHEIGHT_invadrox_ships), 
+                        ship_x, SHIP_Y, SHIP_WIDTH, SHIP_HEIGHT);
     if (ship_hit) {
         /* Alternate between frame 1 and 2 during hit */
         ship_frame_counter++;
@@ -1140,7 +1160,9 @@ inline void draw_bomb(int i)
 {
     rb->lcd_bitmap_part(invadrox_bombs, bombs[i].type * BOMB_WIDTH,
                         bombs[i].frame * BOMB_HEIGHT,
-                        BMPWIDTH_invadrox_bombs, bombs[i].x, bombs[i].y,
+                        STRIDE( BMPWIDTH_invadrox_bombs,
+                                BMPHEIGHT_invadrox_bombs), 
+                        bombs[i].x, bombs[i].y,
                         BOMB_WIDTH, BOMB_HEIGHT);
     /* Advance frame */
     bombs[i].frame++;
@@ -1240,7 +1262,9 @@ void move_bombs(void)
                         bombs[i].state = S_EXPLODE * 4;
                         bombs[i].target = TARGET_SHIP;
                         rb->lcd_bitmap_part(invadrox_ships, 0, 1 * SHIP_HEIGHT,
-                                            BMPWIDTH_invadrox_ships, ship_x, SHIP_Y,
+                                            STRIDE( BMPWIDTH_invadrox_ships,
+                                                    BMPHEIGHT_invadrox_ships), 
+                                            ship_x, SHIP_Y,
                                             SHIP_WIDTH, SHIP_HEIGHT);
                         break;
                     }
