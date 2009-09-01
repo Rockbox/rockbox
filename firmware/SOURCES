@@ -1264,6 +1264,7 @@ target/arm/tcc780x/cowond2/power-cowond2.c
 target/arm/tcc780x/cowond2/powermgmt-cowond2.c
 target/arm/tcc780x/cowond2/backlight-cowond2.c
 target/arm/usb-tcc.c
+target/arm/mmu-arm.S
 #ifndef BOOTLOADER
 target/arm/tcc780x/timer-tcc780x.c
 target/arm/wmcodec-telechips.c

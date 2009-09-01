@@ -22,6 +22,7 @@
 #define SYSTEM_TARGET_H
 
 #include "system-arm.h"
+#include "mmu-arm.h"
 
 #define CPUFREQ_DEFAULT 32000000
 #define CPUFREQ_NORMAL  48000000
