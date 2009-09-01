@@ -7,28 +7,28 @@
 # $Id$
 #
 
-FLAGS=-g -D__PCTOOL__ -DDEBUG -DROCKBOX_DIR_LEN=9 -DWPS_DIR=\".\"
+FLAGS=-g -D__PCTOOL__ -DDEBUG -DROCKBOX_DIR_LEN=9 -DWPS_DIR=\".\" $(TARGET)
 
-COMMON = $(ROOTDIR)/apps/gui/skin_engine/wps_debug.c \
-         $(ROOTDIR)/apps/gui/skin_engine/skin_parser.c \
-         $(ROOTDIR)/apps/gui/skin_engine/skin_buffer.c \
-         $(ROOTDIR)/apps/misc.c \
-         $(ROOTDIR)/apps/recorder/bmp.c \
-         $(ROOTDIR)/firmware/common/strlcpy.c
+SRC = $(ROOTDIR)/apps/gui/skin_engine/wps_debug.c \
+      $(ROOTDIR)/apps/gui/skin_engine/skin_parser.c \
+      $(ROOTDIR)/apps/gui/skin_engine/skin_buffer.c \
+      $(ROOTDIR)/apps/misc.c \
+      $(ROOTDIR)/apps/recorder/bmp.c \
+      $(ROOTDIR)/firmware/common/strlcpy.c \
+      $(APPSDIR)/checkwps.c
 
-INCLUDE = -I $(ROOTDIR)/apps/gui \
-          -I $(ROOTDIR)/apps/gui/skin_engine \
-          -I $(ROOTDIR)/firmware/export \
-          -I $(ROOTDIR)/apps \
-          -I $(ROOTDIR)/apps/recorder \
-          -I $(APPSDIR)
+INCLUDES = -I$(ROOTDIR)/apps/gui \
+           -I$(ROOTDIR)/apps/gui/skin_engine \
+           -I$(ROOTDIR)/firmware/export \
+           -I$(ROOTDIR)/apps \
+           -I$(ROOTDIR)/apps/recorder \
+           -I$(APPSDIR)
 
 # Makes mkdepfile happy
 GCCOPTS+=-D__PCTOOL__
-SRC=$(APPSDIR)/checkwps.c $(COMMON)
-OTHER_SRC=$(SRC)
-ASMDEFS_SRC=$(SRC)
 
-$(BUILDDIR)/$(BINARY): $(APPSDIR)/checkwps.c  $(COMMON)
-	@echo CC $(BINARY)
-	@$(HOSTCC) $(INCLUDE) $(FLAGS) $(COMMON) $(TARGET) $(APPSDIR)/checkwps.c -o $@
+.SECONDEXPANSION: # $$(OBJ) is not populated until after this
+
+$(BUILDDIR)/$(BINARY): $$(OBJ)
+	@echo LD $(BINARY)
+	$(SILENT)$(HOSTCC) $(INCLUDE) $(FLAGS) -o $@ $+

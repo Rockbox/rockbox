@@ -54,8 +54,11 @@ all: $(DEPFILE) build
 # Subdir makefiles. their primary purpose is to populate SRC, OTHER_SRC &
 # ASMDEFS_SRC but they also define special dependencies and compile rules
 include $(TOOLSDIR)/tools.make
-include $(FIRMDIR)/firmware.make
-include $(ROOTDIR)/apps/bitmaps/bitmaps.make
+
+ifeq (,$(findstring checkwps,$(APPSDIR)))
+  include $(FIRMDIR)/firmware.make
+  include $(ROOTDIR)/apps/bitmaps/bitmaps.make
+endif
 
 ifneq (,$(findstring bootloader,$(APPSDIR)))
   include $(APPSDIR)/bootloader.make
