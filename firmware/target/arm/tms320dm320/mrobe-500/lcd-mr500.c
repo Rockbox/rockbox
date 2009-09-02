@@ -33,7 +33,11 @@
 #include "dsp-target.h"
 #include "dsp/ipc.h"
 
+#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
 #define LCD_USE_DMA
+#elif defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#define LCD_USE_DMA
+#endif
 
 /* Copies a rectangle from one framebuffer to another. Can be used in
    single transfer mode with width = num pixels, and height = 1 which
