@@ -111,6 +111,9 @@ void color_palette_init(fb_data* palette)
         palette[i + 192]=LCD_RGBPACK(255, 255, 192 + i);
         palette[i + 224]=LCD_RGBPACK(255, 255, 224 + i);
     }
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+        rb->lcd_pal256_update_pal(palette);
+#endif
 }
 
 #endif
@@ -227,8 +230,12 @@ static void fire_init(struct fire* fire)
 
 static inline void fire_draw(struct fire* fire)
 {
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_blit_pal256((unsigned char*)&fire->fire[0][0],0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
+#else
     int y;
     unsigned char *src = &fire->fire[0][0];
+
 #ifndef HAVE_LCD_COLOR
     unsigned char *dest, *end;
 #else
@@ -252,6 +259,8 @@ static inline void fire_draw(struct fire* fire)
     }
 #ifdef HAVE_LCD_COLOR
     rb->lcd_update();
+#endif
+
 #endif
 }
 
@@ -355,7 +364,15 @@ enum plugin_status plugin_start(const void* parameter)
     /* Turn off backlight timeout */
     backlight_force_on(); /* backlight control in lib/helper.c */
 
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_PAL256);
+#endif
+
     ret = main();
+    
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_RGB565);
+#endif
 
     return ret;
 }
