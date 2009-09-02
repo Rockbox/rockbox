@@ -21,6 +21,7 @@
 #include "config.h"
 #include "cpu.h"
 #include "button.h"
+#include "backlight.h"
 #include "adc.h"
 
 #include "button-target.h"
@@ -42,9 +43,20 @@ void button_init_device(void)
 
 int button_read_device(void)
 {
+    static bool hold_button = false;
+    bool hold_button_old;
+
     int btn = BUTTON_NONE;
     int adc;
     int sensor;
+
+    hold_button_old = hold_button;
+    hold_button = button_hold();
+
+#ifndef BOOTLOADER
+    if (hold_button != hold_button_old)
+        backlight_hold_changed(hold_button);
+#endif
 
     if (button_hold())
         return BUTTON_NONE;
