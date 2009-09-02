@@ -1733,7 +1733,7 @@ void render_slide(struct slide_data *slide, const int alpha)
         
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #define PIXELSTEP_Y   1
-#define LCDADDR(x, y) (&buffer[LCD_HEIGHT*(x) + (y)])
+#define LCDADDR(x, y) (&buffer[BUFFER_HEIGHT*(x) + (y)])
 #else
 #define PIXELSTEP_Y   BUFFER_WIDTH
 #define LCDADDR(x, y) (&buffer[(y)*BUFFER_WIDTH + (x)])
