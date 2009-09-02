@@ -182,6 +182,8 @@ static const struct button_mapping button_context_time[]  = {
 }; /* button_context_time */
 
 static const struct button_mapping button_context_quickscreen[]  = {
+    /* override ACTION_STD_CANCEL from standard context */
+    { ACTION_NONE,       BUTTON_MIDLEFT,                    BUTTON_NONE },
 
     { ACTION_STD_CANCEL, BUTTON_CENTER|BUTTON_REL,          BUTTON_NONE },
     { ACTION_QS_TOP,     BUTTON_TOPMIDDLE|BUTTON_REL,       BUTTON_NONE },
