@@ -118,6 +118,8 @@ void* skin_buffer_alloc(size_t size)
     buffer_back -= size;
     /* 32-bit aligned */
     buffer_back = (void *)(((unsigned long)buffer_back) & ~3);
+    
+    memset(buffer_back, 0, size);
     return buffer_back;
 }
 

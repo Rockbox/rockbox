@@ -391,41 +391,6 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
 
 #endif /* HAVE_LCD_CHARCELL */
 
-/* Returns the index of the subline in the subline array
-   line - 0-based line number
-   subline - 0-based subline number within the line
- */
-static int subline_index(struct wps_data *data, int line, int subline)
-{
-    return data->lines[line].first_subline_idx + subline;
-}
-
-/* Returns the index of the first subline's token in the token array
-   line - 0-based line number
-   subline - 0-based subline number within the line
- */
-static int first_token_index(struct wps_data *data, int line, int subline)
-{
-    int first_subline_idx = data->lines[line].first_subline_idx;
-    return data->sublines[first_subline_idx + subline].first_token_idx;
-}
-
-int skin_last_token_index(struct wps_data *data, int line, int subline)
-{
-    int first_subline_idx = data->lines[line].first_subline_idx;
-    int idx = first_subline_idx + subline;
-    if (idx < data->num_sublines - 1)
-    {
-        /* This subline ends where the next begins */
-        return data->sublines[idx+1].first_token_idx - 1;
-    }
-    else
-    {
-        /* The last subline goes to the end */
-        return data->num_tokens - 1;
-    }
-}
-
 /* Return the index to the end token for the conditional token at index.
    The conditional token can be either a start token or a separator
    (i.e. option) token.
@@ -541,7 +506,7 @@ struct skin_viewport* find_viewport(char label, struct wps_data *data)
    The return value indicates whether the line needs to be updated.
 */
 static bool get_line(struct gui_wps *gwps,
-                     int line, int subline,
+                     struct wps_subline *subline,
                      struct align_pos *align,
                      char *linebuf,
                      int linebuf_size)
@@ -551,8 +516,8 @@ static bool get_line(struct gui_wps *gwps,
     char temp_buf[128];
     char *buf = linebuf;  /* will always point to the writing position */
     char *linebuf_end = linebuf + linebuf_size - 1;
-    int i, last_token_idx;
     bool update = false;
+    int i;
 
     /* alignment-related variables */
     int cur_align;
@@ -562,11 +527,9 @@ static bool get_line(struct gui_wps *gwps,
     align->left = NULL;
     align->center = NULL;
     align->right = NULL;
-
     /* Process all tokens of the desired subline */
-    last_token_idx = skin_last_token_index(data, line, subline);
-    for (i = first_token_index(data, line, subline);
-         i <= last_token_idx; i++)
+    for (i = subline->first_token_idx;
+         i <= subline->last_token_idx; i++)
     {
         switch(data->tokens[i].type)
         {
@@ -685,18 +648,14 @@ static bool get_line(struct gui_wps *gwps,
 
     return update;
 }
-
-static void get_subline_timeout(struct gui_wps *gwps, int line, int subline)
+static void get_subline_timeout(struct gui_wps *gwps, struct wps_subline *subline)
 {
     struct wps_data *data = gwps->data;
     int i;
-    int subline_idx = subline_index(data, line, subline);
-    int last_token_idx = skin_last_token_index(data, line, subline);
+    subline->time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
 
-    data->sublines[subline_idx].time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
-
-    for (i = first_token_index(data, line, subline);
-         i <= last_token_idx; i++)
+    for (i = subline->first_token_idx;
+         i <= subline->last_token_idx; i++)
     {
         switch(data->tokens[i].type)
         {
@@ -712,7 +671,7 @@ static void get_subline_timeout(struct gui_wps *gwps, int line, int subline)
                 break;
 
             case WPS_TOKEN_SUBLINE_TIMEOUT:
-                data->sublines[subline_idx].time_mult = data->tokens[i].value.i;
+                subline->time_mult = data->tokens[i].value.i;
                 break;
 
             default:
@@ -723,77 +682,37 @@ static void get_subline_timeout(struct gui_wps *gwps, int line, int subline)
 
 /* Calculates which subline should be displayed for the specified line
    Returns true iff the subline must be refreshed */
-static bool update_curr_subline(struct gui_wps *gwps, int line)
+static bool update_curr_subline(struct gui_wps *gwps, struct wps_line *line)
 {
-    struct wps_data *data = gwps->data;
-
-    int search, search_start, num_sublines;
-    bool reset_subline;
-    bool new_subline_refresh;
-    bool only_one_subline;
-
-    num_sublines = data->lines[line].num_sublines;
-    reset_subline = (data->lines[line].curr_subline == SUBLINE_RESET);
-    new_subline_refresh = false;
-    only_one_subline = false;
-
-    /* if time to advance to next sub-line  */
-    if (TIME_AFTER(current_tick, data->lines[line].subline_expire_time - 1) ||
-        reset_subline)
+    /* shortcut this whole thing if we need to reset the line completly */
+    if (line->curr_subline == NULL)
     {
-        /* search all sublines until the next subline with time > 0
-            is found or we get back to the subline we started with */
-        if (reset_subline)
-            search_start = 0;
-        else
-            search_start = data->lines[line].curr_subline;
-
-        for (search = 0; search < num_sublines; search++)
-        {
-            data->lines[line].curr_subline++;
-
-            /* wrap around if beyond last defined subline or WPS_MAX_SUBLINES */
-            if (data->lines[line].curr_subline == num_sublines)
-            {
-                if (data->lines[line].curr_subline == 1)
-                    only_one_subline = true;
-                data->lines[line].curr_subline = 0;
-            }
-
-            /* if back where we started after search or
-                only one subline is defined on the line */
-            if (((search > 0) &&
-                 (data->lines[line].curr_subline == search_start)) ||
-                only_one_subline)
-            {
-                /* no other subline with a time > 0 exists */
-                data->lines[line].subline_expire_time = (reset_subline ?
-                    current_tick :
-                    data->lines[line].subline_expire_time) + 100 * HZ;
-                break;
-            }
-            else
-            {
-                /* get initial time multiplier for this subline */
-                get_subline_timeout(gwps, line, data->lines[line].curr_subline);
-
-                int subline_idx = subline_index(data, line,
-                                               data->lines[line].curr_subline);
-
-                /* only use this subline if subline time > 0 */
-                if (data->sublines[subline_idx].time_mult > 0)
-                {
-                    new_subline_refresh = true;
-                    data->lines[line].subline_expire_time = (reset_subline ?
-                        current_tick : data->lines[line].subline_expire_time) +
-                        TIMEOUT_UNIT*data->sublines[subline_idx].time_mult;
-                    break;
-                }
-            }
-        }
+        int next_refresh = current_tick;
+        line->curr_subline = &line->sublines;
+        if (!line->curr_subline->next)
+            next_refresh += 100*HZ;
+        line->subline_expire_time = next_refresh;
+        return true;
     }
-
-    return new_subline_refresh;
+    /* if time to advance to next sub-line  */
+    if (TIME_AFTER(current_tick, line->subline_expire_time - 1))
+    {
+        /* if there is only one subline, there is no need to search for a new one */
+        if (&line->sublines == line->curr_subline &&
+             line->curr_subline->next == NULL)
+        {
+            line->subline_expire_time += 100 * HZ;
+            return true;
+        }
+        if (line->curr_subline->next)
+            line->curr_subline = line->curr_subline->next;
+        else
+            line->curr_subline = &line->sublines;
+        get_subline_timeout(gwps, line->curr_subline);
+        line->subline_expire_time += TIMEOUT_UNIT*line->curr_subline->time_mult;
+        return true;
+    }
+    return false;
 }
 
 /* Display a line appropriately according to its alignment format.
@@ -971,8 +890,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 
     if (!id3)
         return false;
-
-    int line, i, subline_idx;
+    
     unsigned flags;
     char linebuf[MAX_PATH];
 
@@ -980,6 +898,9 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
     align.left = NULL;
     align.center = NULL;
     align.right = NULL;
+    
+    
+    struct skin_token_list *viewport_list;
 
     bool update_line, new_subline_refresh;
 
@@ -999,12 +920,20 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
     /* reset to first subline if refresh all flag is set */
     if (refresh_mode == WPS_REFRESH_ALL)
     {
+        struct wps_line *line;
+        
         display->set_viewport(&find_viewport(VP_DEFAULT_LABEL, data)->vp);
         display->clear_viewport();
-
-        for (i = 0; i <= data->num_lines; i++)
+        
+        for (viewport_list = data->viewports; 
+             viewport_list; viewport_list = viewport_list->next)
         {
-            data->lines[i].curr_subline = SUBLINE_RESET;
+            struct skin_viewport *skin_viewport = 
+                            (struct skin_viewport *)viewport_list->token->value.data;
+            for(line = skin_viewport->lines; line; line = line->next)
+            {
+                line->curr_subline = NULL;
+            }
         }
     }
 
@@ -1017,7 +946,6 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 #endif
 
     /* disable any viewports which are conditionally displayed */
-    struct skin_token_list *viewport_list;
     for (viewport_list = data->viewports; 
          viewport_list; viewport_list = viewport_list->next)
     {
@@ -1069,25 +997,27 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
         {
             display->clear_viewport();
         }
+        
+        /* loop over the lines for this viewport */
+        struct wps_line *line;
+        int line_count = 0;
             
-        for (line = skin_viewport->first_line; 
-             line <= skin_viewport->last_line; line++)
+        for (line = skin_viewport->lines; line; line = line->next, line_count++)
         {
+            struct wps_subline *subline;
             memset(linebuf, 0, sizeof(linebuf));
             update_line = false;
 
             /* get current subline for the line */
             new_subline_refresh = update_curr_subline(gwps, line);
-
-            subline_idx = subline_index(data, line,
-                                            data->lines[line].curr_subline);
-            flags = data->sublines[subline_idx].line_type;
+            subline = line->curr_subline;
+            flags = line->curr_subline->line_type;
 
             if (vp_refresh_mode == WPS_REFRESH_ALL || (flags & vp_refresh_mode)
                 || new_subline_refresh)
             {
                 /* get_line tells us if we need to update the line */
-                update_line = get_line(gwps, line, data->lines[line].curr_subline,
+                update_line = get_line(gwps, subline,
                                        &align, linebuf, sizeof(linebuf));
             }
 #ifdef HAVE_LCD_BITMAP
@@ -1098,19 +1028,19 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
                 update_line = false;
 
                 int h = font_get(skin_viewport->vp.font)->height;
-                int peak_meter_y = (line - skin_viewport->first_line)* h;
+                int peak_meter_y = line_count* h;
 
                 /* The user might decide to have the peak meter in the last
                     line so that it is only displayed if no status bar is
                     visible. If so we neither want do draw nor enable the
                     peak meter. */
-                if (peak_meter_y + h <= display->getheight()) {
+                if (peak_meter_y + h <= skin_viewport->vp.y+skin_viewport->vp.height) {
                     /* found a line with a peak meter -> remember that we must
                         enable it later */
                     enable_pm = true;
                     peak_meter_enabled = true;
                     peak_meter_screen(gwps->display, 0, peak_meter_y,
-                                      MIN(h, display->getheight() - peak_meter_y));
+                                      MIN(h, skin_viewport->vp.y+skin_viewport->vp.height - peak_meter_y));
                 }
                 else
                 {
@@ -1143,10 +1073,10 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
                     /* if the line is a scrolling one we don't want to update
                        too often, so that it has the time to scroll */
                     if ((vp_refresh_mode & WPS_REFRESH_SCROLL) || new_subline_refresh)
-                        write_line(display, &align, line - skin_viewport->first_line, true);
+                        write_line(display, &align, line_count, true);
                 }
                 else
-                    write_line(display, &align, line - skin_viewport->first_line, false);
+                    write_line(display, &align, line_count, false);
             }
         }
 

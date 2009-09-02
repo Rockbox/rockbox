@@ -164,6 +164,8 @@ const char *get_token_value(struct gui_wps *gwps,
     switch (token->type)
     {
         case WPS_TOKEN_CHARACTER:
+            if (token->value.c == '\n')
+                return NULL;
             return &(token->value.c);
 
         case WPS_TOKEN_STRING:

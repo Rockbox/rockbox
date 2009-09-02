@@ -160,12 +160,16 @@ struct wps_subline {
        Tokens of this subline end where tokens for the next subline
        begin. */
     unsigned short first_token_idx;
+    unsigned short last_token_idx;
 
     /* Bit or'ed WPS_REFRESH_xxx */
     unsigned char line_type;
 
     /* How long the subline should be displayed, in 10ths of sec */
     unsigned char time_mult;
+    
+    /* pointer to the next subline in this line */
+    struct wps_subline *next;
 };
 
 /* Description of a line on the WPS. A line is a set of sublines.
@@ -173,19 +177,18 @@ struct wps_subline {
    the next subline of the line is displayed. And so on. */
 struct wps_line {
 
-    /* Number of sublines in this line */
-    signed char num_sublines;
-
-    /* Number (0-based) of the subline within this line currently being displayed */
-    signed char curr_subline;
-
-    /* Index of the first subline of this line in the subline array.
-       Sublines for this line end where sublines for the next line begin. */
-    unsigned short first_subline_idx;
+    /* Linked list of all the sublines on this line,
+     * a line *must* have at least one subline so no need to add an extra pointer */
+    struct wps_subline sublines;
+    /* pointer to the current subline */
+    struct wps_subline *curr_subline;
 
     /* When the next subline of this line should be displayed
        (absolute time value in ticks) */
     long subline_expire_time;
+    
+    /* pointer to the next line */
+    struct wps_line *next;
 };
 
 #define VP_DRAW_HIDEABLE 0x1
@@ -196,9 +199,7 @@ struct wps_line {
 struct skin_viewport {
     struct viewport vp;   /* The LCD viewport struct */
     struct progressbar *pb;
-    /* Indexes of the first and last lines belonging to this viewport in the 
-       lines[] array */
-    int first_line, last_line;
+    struct wps_line *lines;
     char hidden_flags;
     char label;
 };
@@ -259,19 +260,7 @@ struct wps_data
     bool remote_wps;
 #endif
 
-    /* Number of lines in the WPS. During WPS parsing, this is
-       the index of the line being parsed. */
-    int num_lines;
-
-    /* Number of viewports in the WPS */
     struct skin_token_list *viewports;
-
-    struct wps_line lines[WPS_MAX_LINES];
-
-    /* Total number of sublines in the WPS. During WPS parsing, this is
-       the index of the subline where the parsed tokens are added to. */
-    int num_sublines;
-    struct wps_subline sublines[WPS_MAX_SUBLINES];
 
     /* Total number of tokens in the WPS. During WPS parsing, this is
        the index of the token being parsed. */
@@ -285,12 +274,6 @@ struct wps_data
     /* tick the volume button was last pressed */
     unsigned int button_time_volume;
 };
-
-/* Returns the index of the last subline's token in the token array.
-   line - 0-based line number
-   subline - 0-based subline number within the line
- */
-int skin_last_token_index(struct wps_data *data, int line, int subline);
 
 /* wps_data end */
 

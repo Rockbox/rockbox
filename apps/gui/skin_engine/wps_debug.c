@@ -60,8 +60,11 @@ static char *get_token_desc(struct wps_token *token, char *buf, int bufsize)
             break;
 
         case WPS_TOKEN_CHARACTER:
-            snprintf(buf, bufsize, "Character '%c'",
-                    token->value.c);
+            if (token->value.c == '\n')
+                snprintf(buf, bufsize, "Character '\\n'");
+            else    
+                snprintf(buf, bufsize, "Character '%c'",
+                        token->value.c);
             break;
 
         case WPS_TOKEN_STRING:
@@ -486,7 +489,6 @@ static void dump_wps_tokens(struct wps_data *data)
 
 static void print_line_info(struct wps_data *data)
 {
-    int i, j;
     struct wps_line *line;
     struct wps_subline *subline;
     if (wps_verbose_level > 0)
@@ -498,16 +500,14 @@ static void print_line_info(struct wps_data *data)
             struct skin_viewport *v = 
                             (struct skin_viewport *)viewport_list->token->value.data;
             DEBUGF("vp Label:'%c' Hidden flags:%x\n", v->label, v->hidden_flags); 
-            DEBUGF("   First line: %d\n", v->first_line);
-            DEBUGF("   Last line: %d\n", v->last_line);
         }
-        DEBUGF("Number of sublines  : %d\n", data->num_sublines);
         DEBUGF("Number of tokens    : %d\n", data->num_tokens);
         DEBUGF("\n");
     }
     
     if (wps_verbose_level > 1)
     {
+        int line_number = 0;
         struct skin_token_list *viewport_list;
         for (viewport_list = data->viewports; 
              viewport_list; viewport_list = viewport_list->next)
@@ -516,17 +516,15 @@ static void print_line_info(struct wps_data *data)
                             (struct skin_viewport *)viewport_list->token->value.data;
             DEBUGF("Viewport '%c' - +%d+%d (%dx%d)\n",v->label, v->vp.x, v->vp.y, 
                                                     v->vp.width, v->vp.height);
-            for (i = v->first_line, line = &data->lines[v->first_line]; i <= v->last_line; i++,line++)
+            for (line = v->lines; line; line = line->next, line_number++)
             {
-                DEBUGF("Line %2d (num_sublines=%d, first_subline=%d)\n",
-                       i, line->num_sublines, line->first_subline_idx);
-
-                for (j = 0, subline = data->sublines + line->first_subline_idx;
-                     j < line->num_sublines; j++, subline++)
+                DEBUGF("Line %2d\n", line_number);
+                int subline_number = 0;
+                subline = &line->sublines;
+                while (subline)
                 {
                     DEBUGF("    Subline %d: first_token=%3d, last_token=%3d",
-                           j, subline->first_token_idx,
-                           skin_last_token_index(data, i, j));
+                           subline_number, subline->first_token_idx,subline->last_token_idx);
 
                     if (subline->line_type & WPS_REFRESH_SCROLL)
                         DEBUGF(", scrolled");
@@ -536,6 +534,8 @@ static void print_line_info(struct wps_data *data)
                         DEBUGF(", peakmeter");
 
                     DEBUGF("\n");
+                    subline = subline->next;
+                    subline_number++;
                 }
             }
         }
