@@ -154,7 +154,7 @@ enum wps_parse_error {
 
 
 /* Description of a subline on the WPS */
-struct wps_subline {
+struct skin_subline {
 
     /* Index of the first token for this subline in the token array.
        Tokens of this subline end where tokens for the next subline
@@ -169,26 +169,26 @@ struct wps_subline {
     unsigned char time_mult;
     
     /* pointer to the next subline in this line */
-    struct wps_subline *next;
+    struct skin_subline *next;
 };
 
 /* Description of a line on the WPS. A line is a set of sublines.
    A subline is displayed for a certain amount of time. After that,
    the next subline of the line is displayed. And so on. */
-struct wps_line {
+struct skin_line {
 
     /* Linked list of all the sublines on this line,
      * a line *must* have at least one subline so no need to add an extra pointer */
-    struct wps_subline sublines;
+    struct skin_subline sublines;
     /* pointer to the current subline */
-    struct wps_subline *curr_subline;
+    struct skin_subline *curr_subline;
 
     /* When the next subline of this line should be displayed
        (absolute time value in ticks) */
     long subline_expire_time;
     
     /* pointer to the next line */
-    struct wps_line *next;
+    struct skin_line *next;
 };
 
 #define VP_DRAW_HIDEABLE 0x1
@@ -199,7 +199,7 @@ struct wps_line {
 struct skin_viewport {
     struct viewport vp;   /* The LCD viewport struct */
     struct progressbar *pb;
-    struct wps_line *lines;
+    struct skin_line *lines;
     char hidden_flags;
     char label;
 };

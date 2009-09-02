@@ -506,7 +506,7 @@ struct skin_viewport* find_viewport(char label, struct wps_data *data)
    The return value indicates whether the line needs to be updated.
 */
 static bool get_line(struct gui_wps *gwps,
-                     struct wps_subline *subline,
+                     struct skin_subline *subline,
                      struct align_pos *align,
                      char *linebuf,
                      int linebuf_size)
@@ -648,7 +648,7 @@ static bool get_line(struct gui_wps *gwps,
 
     return update;
 }
-static void get_subline_timeout(struct gui_wps *gwps, struct wps_subline *subline)
+static void get_subline_timeout(struct gui_wps *gwps, struct skin_subline *subline)
 {
     struct wps_data *data = gwps->data;
     int i;
@@ -682,7 +682,7 @@ static void get_subline_timeout(struct gui_wps *gwps, struct wps_subline *sublin
 
 /* Calculates which subline should be displayed for the specified line
    Returns true iff the subline must be refreshed */
-static bool update_curr_subline(struct gui_wps *gwps, struct wps_line *line)
+static bool update_curr_subline(struct gui_wps *gwps, struct skin_line *line)
 {
     /* shortcut this whole thing if we need to reset the line completly */
     if (line->curr_subline == NULL)
@@ -920,7 +920,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
     /* reset to first subline if refresh all flag is set */
     if (refresh_mode == WPS_REFRESH_ALL)
     {
-        struct wps_line *line;
+        struct skin_line *line;
         
         display->set_viewport(&find_viewport(VP_DEFAULT_LABEL, data)->vp);
         display->clear_viewport();
@@ -1000,12 +1000,12 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
         }
         
         /* loop over the lines for this viewport */
-        struct wps_line *line;
+        struct skin_line *line;
         int line_count = 0;
             
         for (line = skin_viewport->lines; line; line = line->next, line_count++)
         {
-            struct wps_subline *subline;
+            struct skin_subline *subline;
             memset(linebuf, 0, sizeof(linebuf));
             update_line = false;
 

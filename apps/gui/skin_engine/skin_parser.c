@@ -78,7 +78,7 @@ static int line_number;
 /* the current viewport */
 static struct skin_viewport *curr_vp;
 /* the current line, linked to the above viewport */
-static struct wps_line *curr_line;
+static struct skin_line *curr_line;
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -407,9 +407,9 @@ static int skip_end_of_line(const char *wps_bufptr)
 }
 
 /* Starts a new subline in the current line during parsing */
-static bool wps_start_new_subline(struct wps_line *line, int curr_token)
+static bool skin_start_new_subline(struct skin_line *line, int curr_token)
 {
-    struct wps_subline *subline = skin_buffer_alloc(sizeof(struct wps_subline));
+    struct skin_subline *subline = skin_buffer_alloc(sizeof(struct skin_subline));
     if (!subline)
         return false;
 
@@ -425,10 +425,10 @@ static bool wps_start_new_subline(struct wps_line *line, int curr_token)
     return true;
 }
 
-static bool wps_start_new_line(struct skin_viewport *vp, int curr_token)
+static bool skin_start_new_line(struct skin_viewport *vp, int curr_token)
 {
-    struct wps_line *line = skin_buffer_alloc(sizeof(struct wps_line));
-    struct wps_subline *subline = NULL;
+    struct skin_line *line = skin_buffer_alloc(sizeof(struct skin_line));
+    struct skin_subline *subline = NULL;
     if (!line)
         return false;
     
@@ -670,7 +670,7 @@ static int parse_viewport(const char *wps_bufptr,
     skin_vp->lines  = NULL;
     
     curr_line = NULL;
-    if (!wps_start_new_line(skin_vp, wps_data->num_tokens))
+    if (!skin_start_new_line(skin_vp, wps_data->num_tokens))
         return WPS_ERROR_INVALID_PARAM;
         
     
@@ -873,7 +873,7 @@ static int parse_progressbar(const char *wps_bufptr,
     /* we need to know what line number (viewport relative) this pb is,
      * so count them... */
     int line_num = -1;
-    struct wps_line *line = curr_vp->lines;
+    struct skin_line *line = curr_vp->lines;
     while (line)
     {
         line_num++;
@@ -1386,7 +1386,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                     break;
                 }
 
-                if (!wps_start_new_subline(curr_line, data->num_tokens))
+                if (!skin_start_new_subline(curr_line, data->num_tokens))
                     fail = PARSE_FAIL_LIMITS_EXCEEDED;
 
                 break;
@@ -1472,7 +1472,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                 data->tokens[data->num_tokens].next = false;
                 data->num_tokens++;
 
-                if (!wps_start_new_line(curr_vp, data->num_tokens))
+                if (!skin_start_new_line(curr_vp, data->num_tokens))
                 {    
                     fail = PARSE_FAIL_LIMITS_EXCEEDED;
                     break;
@@ -1706,7 +1706,7 @@ bool skin_data_load(struct wps_data *wps_data,
     curr_vp->lines         = NULL;
     
     curr_line = NULL;
-    if (!wps_start_new_line(curr_vp, 0))
+    if (!skin_start_new_line(curr_vp, 0))
         return false;
     
     switch (statusbar_position(display->screen_type))

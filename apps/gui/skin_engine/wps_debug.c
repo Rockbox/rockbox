@@ -489,8 +489,8 @@ static void dump_wps_tokens(struct wps_data *data)
 
 static void print_line_info(struct wps_data *data)
 {
-    struct wps_line *line;
-    struct wps_subline *subline;
+    struct skin_line *line;
+    struct skin_subline *subline;
     if (wps_verbose_level > 0)
     {
         struct skin_token_list *viewport_list;
