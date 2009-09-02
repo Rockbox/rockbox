@@ -938,6 +938,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
     }
 
 #ifdef HAVE_LCD_CHARCELLS
+    int i;
     for (i = 0; i < 8; i++)
     {
        if (data->wps_progress_pat[i] == 0)
