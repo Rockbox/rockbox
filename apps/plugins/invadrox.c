@@ -638,7 +638,7 @@ bool aliens_down, aliens_right, hit_left_border, hit_right_border;
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 inline fb_data get_pixel(int x, int y)
 {
-    return rb->lcd_framebuffer[LCD_HEIGHT*(LCD_WIDTH-1)-x*LCD_HEIGHT+y];
+    return rb->lcd_framebuffer[x*LCD_HEIGHT+y];
 }
 #else
 inline fb_data get_pixel(int x, int y)
