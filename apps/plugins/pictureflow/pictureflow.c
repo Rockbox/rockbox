@@ -1730,42 +1730,49 @@ void render_slide(struct slide_data *slide, const int alpha)
             dy = (CAM_DIST_R + zo + fmul(xs, sinr)) / CAM_DIST;
 
         const pix_t *ptr = &src[column * bmp->height];
-        const int pixelstep = BUFFER_WIDTH;
+        
+#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#define PIXELSTEP_Y   1
+#define LCDADDR(x, y) (&buffer[LCD_HEIGHT*(x) + (y)])
+#else
+#define PIXELSTEP_Y   BUFFER_WIDTH
+#define LCDADDR(x, y) (&buffer[(y)*BUFFER_WIDTH + (x)])
+#endif
 
         int p = (bmp->height-1-DISPLAY_OFFS) * PFREAL_ONE;
         int plim = MAX(0, p - (LCD_HEIGHT/2-1) * dy);
-        pix_t *pixel = &buffer[((LCD_HEIGHT/2)-1)*BUFFER_WIDTH + x];
+        pix_t *pixel = LCDADDR(x, (LCD_HEIGHT/2)-1 );
 
         if (alpha == 256) {
             while (p >= plim) {
                 *pixel = ptr[((unsigned)p) >> PFREAL_SHIFT];
                 p -= dy;
-                pixel -= pixelstep;
+                pixel -= PIXELSTEP_Y;
             }
         } else {
             while (p >= plim) {
                 *pixel = fade_color(ptr[((unsigned)p) >> PFREAL_SHIFT], alpha);
                 p -= dy;
-                pixel -= pixelstep;
+                pixel -= PIXELSTEP_Y;
             }
         }
         p = (bmp->height-DISPLAY_OFFS) * PFREAL_ONE;
         plim = MIN(sh * PFREAL_ONE, p + (LCD_HEIGHT/2) * dy);
         int plim2 = MIN(MIN(sh + REFLECT_HEIGHT, sh * 2) * PFREAL_ONE,
                         p + (LCD_HEIGHT/2) * dy);
-        pixel = &buffer[(LCD_HEIGHT/2)*BUFFER_WIDTH + x];
+        pixel = LCDADDR(x, (LCD_HEIGHT/2) );
 
         if (alpha == 256) {
             while (p < plim) {
                 *pixel = ptr[((unsigned)p) >> PFREAL_SHIFT];
                 p += dy;
-                pixel += pixelstep;
+                pixel += PIXELSTEP_Y;
             }
         } else {
             while (p < plim) {
                 *pixel = fade_color(ptr[((unsigned)p) >> PFREAL_SHIFT], alpha);
                 p += dy;
-                pixel += pixelstep;
+                pixel += PIXELSTEP_Y;
             }
         }
         while (p < plim2) {
@@ -1773,7 +1780,7 @@ void render_slide(struct slide_data *slide, const int alpha)
             int lalpha = reftab[ty];
             *pixel = fade_color(ptr[sh - 1 - ty], lalpha);
             p += dy;
-            pixel += pixelstep;
+            pixel += PIXELSTEP_Y;
         }
 
         if (zo || slide->angle)
@@ -1789,7 +1796,6 @@ void render_slide(struct slide_data *slide, const int alpha)
     rb->yield();
     return;
 }
-
 
 /**
   Jump the the given slide_index
