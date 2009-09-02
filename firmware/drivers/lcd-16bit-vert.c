@@ -207,10 +207,7 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 
 /*** low-level drawing functions ***/
 
-#define LCDADDR(x, y) (&lcd_framebuffer[0][0] + (LCD_HEIGHT*(LCD_WIDTH-1)) \
-                                                    - LCD_HEIGHT*(x) + (y))
-
-#define LCDBACKADDR(x, y) (lcd_backdrop + LCD_HEIGHT*(x) + (y))
+#define LCDADDR(x, y) (&lcd_framebuffer[0][0] + LCD_HEIGHT*(x) + (y))
                                                     
 static void ICODE_ATTR setpixel(fb_data *address)
 {
@@ -277,16 +274,16 @@ void lcd_clear_viewport(void)
     fb_data *dst, *dst_end;
 
     dst = LCDADDR(current_vp->x, current_vp->y);
-    dst_end = dst - current_vp->width * LCD_HEIGHT;
+    dst_end = dst + current_vp->width * LCD_HEIGHT;
 
     if (current_vp->drawmode & DRMODE_INVERSEVID)
     {
         do
         {
             memset16(dst, current_vp->fg_pattern, current_vp->height);
-            dst -= LCD_HEIGHT;
+            dst += LCD_HEIGHT;
         }
-        while (dst > dst_end);
+        while (dst < dst_end);
     }
     else
     {
@@ -295,9 +292,9 @@ void lcd_clear_viewport(void)
             do
             {
                 memset16(dst, current_vp->bg_pattern, current_vp->height);
-                dst -= LCD_HEIGHT;
+                dst += LCD_HEIGHT;
             }
-            while (dst > dst_end);
+            while (dst < dst_end);
         }
         else
         {
@@ -305,9 +302,9 @@ void lcd_clear_viewport(void)
             {
                 memcpy(dst, (void *)((long)dst + lcd_backdrop_offset),
                        current_vp->height * sizeof(fb_data));
-                dst -= LCD_HEIGHT;
+                dst += LCD_HEIGHT;
             }
-            while (dst > dst_end);
+            while (dst < dst_end);
         }
     }
 
@@ -452,14 +449,14 @@ void lcd_hline(int x1, int x2, int y)
         x2 = current_vp->width-1;
 
     dst = LCDADDR(x1 + current_vp->x, y + current_vp->y);
-    dst_end = dst - (x2 - x1) * LCD_HEIGHT;
+    dst_end = dst + (x2 - x1) * LCD_HEIGHT;
 
     do
     {
         pfunc(dst);
-        dst -= LCD_HEIGHT;
+        dst += LCD_HEIGHT;
     }
-    while (dst >= dst_end);
+    while (dst <= dst_end);
 }
 
 /* Draw a vertical line (optimised) */
@@ -612,7 +609,7 @@ void lcd_fillrect(int x, int y, int width, int height)
         height = current_vp->height - y;
 
     dst = LCDADDR(current_vp->x + x, current_vp->y + y);
-    dst_end = dst - width * LCD_HEIGHT;
+    dst_end = dst + width * LCD_HEIGHT;
 
     do
     {
@@ -637,9 +634,9 @@ void lcd_fillrect(int x, int y, int width, int height)
             while (++dst_col < col_end);
             break;
         }
-        dst-=LCD_HEIGHT;
+        dst+=LCD_HEIGHT;
     }
-    while (dst > dst_end);
+    while (dst < dst_end);
 }
 
 /* About Rockbox' internal monochrome bitmap format:
@@ -800,8 +797,8 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             break;
         }
         
-        dst -= LCD_HEIGHT;
-        dst_end -= LCD_HEIGHT;
+        dst += LCD_HEIGHT;
+        dst_end += LCD_HEIGHT;
     } while (src < src_end);
 }
 /* Draw a full monochrome bitmap */
@@ -842,15 +839,15 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
 
     src += stride * src_x + src_y; /* move starting point */
     dst = LCDADDR(current_vp->x + x, current_vp->y + y);
-    dst_end = dst - width * LCD_HEIGHT;
+    dst_end = dst + width * LCD_HEIGHT;
 
     do
     {
         memcpy(dst, src, height * sizeof(fb_data));
         src += stride;
-        dst -= LCD_HEIGHT;
+        dst += LCD_HEIGHT;
     }
-    while (dst > dst_end);
+    while (dst < dst_end);
 }
 
 /* Draw a full native bitmap */
@@ -893,7 +890,7 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
 
     src += stride * src_x + src_y; /* move starting point */
     dst = LCDADDR(current_vp->x + x, current_vp->y + y);
-    dst_end = dst - width * LCD_HEIGHT;
+    dst_end = dst + width * LCD_HEIGHT;
 
     do
     {
@@ -906,9 +903,9 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
                 dst[i] = src[i];
         }
         src += stride;
-        dst -= LCD_HEIGHT;
+        dst += LCD_HEIGHT;
     }
-    while (dst > dst_end);
+    while (dst < dst_end);
 }
 #endif /* !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR) */
 
