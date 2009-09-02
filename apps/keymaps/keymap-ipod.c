@@ -124,13 +124,15 @@ static const struct button_mapping button_context_bmark[]  = {
 }; /* button_context_settings_bmark */
 
 static const struct button_mapping button_context_quickscreen[]  = {
+    { ACTION_QS_TOP,        BUTTON_MENU,                    BUTTON_NONE },
+    { ACTION_QS_TOP,        BUTTON_MENU|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_PLAY,                    BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
-    { ACTION_STD_CANCEL,    BUTTON_MENU,                    BUTTON_NONE },
+    { ACTION_STD_CANCEL,    BUTTON_SELECT,                  BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
