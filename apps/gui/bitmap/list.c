@@ -112,7 +112,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     line_height = font_get(parent->font)->height;
     display->set_viewport(parent);
     display->clear_viewport();
-    display->stop_scroll();
+    display->scroll_stop(parent);
     list_text[screen] = *parent;
     if ((show_title = draw_title(display, list)))
     {
