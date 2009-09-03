@@ -449,8 +449,6 @@ int get_mp3file_info(int fd, struct mp3info *info)
             else
                 info->bitrate = info->byte_count / (info->file_time >> 3);
         }
-        else
-            info->bitrate = 0;
 
         if (vbrheader[7] & VBR_TOC_FLAG) /* Is table-of-contents there? */
         {
