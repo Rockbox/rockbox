@@ -668,7 +668,8 @@ static int parse_viewport(const char *wps_bufptr,
     skin_vp->label = VP_NO_LABEL;
     skin_vp->pb = NULL;
     skin_vp->lines  = NULL;
-    
+    if (curr_line)
+        curr_line->curr_subline->last_token_idx = wps_data->num_tokens;
     curr_line = NULL;
     if (!skin_start_new_line(skin_vp, wps_data->num_tokens))
         return WPS_ERROR_INVALID_PARAM;
@@ -1346,7 +1347,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
     while (*wps_bufptr && !fail)
     {
         /* first make sure there is enough room for tokens */
-        if (max_tokens -1 == data->num_tokens)
+        if (max_tokens <= data->num_tokens + 5)
         {
             int extra_tokens = TOKEN_BLOCK_SIZE;
             size_t needed = extra_tokens * sizeof(struct wps_token);
@@ -1552,12 +1553,12 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
         fail = PARSE_FAIL_LIMITS_EXCEEDED;
 
     /* Success! */
+    curr_line->curr_subline->last_token_idx = data->num_tokens;
+    data->tokens[data->num_tokens++].type = WPS_NO_TOKEN;
     /* freeup unused tokens */
     skin_buffer_free_from_front(sizeof(struct wps_token) 
                                 * (max_tokens - data->num_tokens));
-    /* close the last subline */
-    curr_line->curr_subline->last_token_idx = data->num_tokens;
-
+    
 #if defined(DEBUG) || defined(SIMULATOR)
     if (debug)
         print_debug_info(data, fail, line_number);
