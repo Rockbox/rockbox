@@ -1,6 +1,7 @@
 # We use the UCL code available in the Rockbox tools/ directory
 CFLAGS=-I../../tools/ucl/include -Wall
 LIBUCL=../../tools/ucl/src/libucl.a
+CC = gcc
 
 #change for releases
 APPVERSION=`../../tools/version.sh`
