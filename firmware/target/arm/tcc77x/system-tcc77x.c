@@ -187,6 +187,14 @@ static void clock_init(void)
         "nop      \n\t"
         "nop      \n\t"
     );
+
+    /* Enable Z-Clock */
+    PCLKCFG5 |= (1<<31) | (4<<28); /* Timer Z-Clock enable, XIN direct*/
+
+    /* Set TC32 timer to be our USEC_TIMER (Xin divided by 12 = 1MHz) */
+    TC32MCNT = 0;
+    TC32LDV = 0;
+    TC32EN = (1<<24) | 11;
 }
 
 static void cpu_init(void)

@@ -82,13 +82,6 @@ static int fd_log = -1;
 #define FM_CLOCK_PIN    5
 #define FM_DATA_PIN     6
 #define FM_NRW_PIN      7
-/* Remove hack when i7 has udelay */
-static void udelay(int usecs)
-{
-    while (usecs--)
-    asm("nop;nop;");
-}
-
 #elif defined(COWON_D2)
 #define TUNER_GPIO_OUTPUT_EN  GPIOC_DIR
 #define TUNER_GPIO_OUTPUT_VAL GPIOC
