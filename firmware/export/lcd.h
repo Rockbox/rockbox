@@ -46,6 +46,68 @@ struct viewport {
 #endif
 };
 
+/* Frame buffer stride
+ *
+ * Stride describes the amount that you need to increment to get to the next
+ *  line.  For screens that have the pixels in contiguous horizontal strips
+ *  stride should be equal to the image width.
+ *  
+ *      For example, if the screen pixels are layed out as follows:
+ *
+ *                  width0  width1  width2                      widthX-1
+ *                  ------  ------  ------  ------------------  --------
+ *      height0 |   pixel0  pixel1  pixel2  ---------------->   pixelX-1
+ *      height1 |   pixelX
+ *
+ *      then you need to add X pixels to get to the next line. (the next line
+ *      in this case is height1).
+ *
+ * Similarly, if the screens is has the pixels in contiguous vertical strips
+ *  the stride would be equal to the image height.
+ *
+ *      For example if the screen pixels are layed out as follows:
+ *
+ *                      width0  width1
+ *                      ------  ------
+ *      height0     |   pixel0  pixelY
+ *      height1     |   pixel1
+ *      height2     |   pixel2
+ *         |        |     |
+ *        \|/       |    \|/
+ *      heightY-1   |   pixelY-1 
+ *
+ *      then you would need to add Y pixels to get to the next line (the next 
+ *      line in this case is from width0 to width1).
+ *
+ * The remote might have a different stride than the main screen so the screen
+ *  number needs to be passed to the STRIDE macro so that the appropriate height
+ *  or width can be passed to the lcd_bitmap, or lcd_remote_bitmap calls.
+ *
+ * STRIDE_REMOTE and STRIDE_MAIN should never used when it is not clear whether
+ *  lcd_remote_bitmap calls or lcd_bitmap calls are being made (for example the
+ *  screens api).
+ *
+ * Screen should always use the screen_type enum that is at the top of this
+ *  header.
+ */
+enum screen_type {
+    SCREEN_MAIN
+#ifdef HAVE_REMOTE_LCD
+    ,SCREEN_REMOTE
+#endif
+};
+
+#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#define STRIDE_MAIN(w, h)   (h)
+#else
+#define STRIDE_MAIN(w, h)   (w)
+#endif
+
+#define STRIDE_REMOTE(w, h) (w)
+
+#define STRIDE(screen, w, h) (screen==SCREEN_MAIN?STRIDE_MAIN((w), \
+                                        (h)):STRIDE_REMOTE((w),(h)))
+
 #define STYLE_DEFAULT    0x00000000
 #define STYLE_COLORED    0x10000000
 #define STYLE_INVERT     0x20000000
@@ -305,25 +367,6 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define LCD_DEFAULT_BG LCD_WHITE
 
 #endif /* HAVE_LCD_COLOR */
-
-enum screen_type {
-    SCREEN_MAIN
-#ifdef HAVE_REMOTE_LCD
-    ,SCREEN_REMOTE
-#endif
-};
-
-/* Frame buffer stride */
-#define STRIDE_REMOTE(w, h)    (w)
-
-#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
-#define STRIDE_MAIN(w, h)    (h)
-#else
-#define STRIDE_MAIN(w, h)    (w)
-#endif
-
-#define STRIDE(screen, w, h) (screen==SCREEN_MAIN?STRIDE_MAIN((w), \
-                                        (h)):STRIDE_REMOTE((w),(h)))
 
 /* Frame buffer dimensions */
 #if LCD_DEPTH == 1
