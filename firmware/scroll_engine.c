@@ -85,7 +85,7 @@ void lcd_stop_scroll(void)
 }
 
 /* Stop scrolling line y in the specified viewport, or all lines if y < 0 */
-void lcd_scroll_stop_line(struct viewport* current_vp, int y)
+void lcd_scroll_stop_line(const struct viewport* current_vp, int y)
 {
     int i = 0;
 
@@ -98,7 +98,8 @@ void lcd_scroll_stop_line(struct viewport* current_vp, int y)
                the last item to position i */
             if ((i + 1) != lcd_scroll_info.lines)
             {
-                lcd_scroll_info.scroll[i] = lcd_scroll_info.scroll[lcd_scroll_info.lines-1];
+                lcd_scroll_info.scroll[i] =
+                    lcd_scroll_info.scroll[lcd_scroll_info.lines-1];
             }
             lcd_scroll_info.lines--;
 
@@ -115,7 +116,7 @@ void lcd_scroll_stop_line(struct viewport* current_vp, int y)
 }
 
 /* Stop all scrolling lines in the specified viewport */
-void lcd_scroll_stop(struct viewport* vp)
+void lcd_scroll_stop(const struct viewport* vp)
 {
     lcd_scroll_stop_line(vp, -1);
 }
@@ -161,7 +162,7 @@ void lcd_remote_stop_scroll(void)
 }
 
 /* Stop scrolling line y in the specified viewport, or all lines if y < 0 */
-void lcd_remote_scroll_stop_line(struct viewport* current_vp, int y)
+void lcd_remote_scroll_stop_line(const struct viewport* current_vp, int y)
 {
     int i = 0;
 
@@ -174,7 +175,8 @@ void lcd_remote_scroll_stop_line(struct viewport* current_vp, int y)
                the last item to position i */
             if ((i + 1) != lcd_remote_scroll_info.lines)
             {
-                lcd_remote_scroll_info.scroll[i] = lcd_remote_scroll_info.scroll[lcd_remote_scroll_info.lines-1];
+                lcd_remote_scroll_info.scroll[i] = 
+                    lcd_remote_scroll_info.scroll[lcd_remote_scroll_info.lines-1];
             }
             lcd_remote_scroll_info.lines--;
 
@@ -191,7 +193,7 @@ void lcd_remote_scroll_stop_line(struct viewport* current_vp, int y)
 }
 
 /* Stop all scrolling lines in the specified viewport */
-void lcd_remote_scroll_stop(struct viewport* vp)
+void lcd_remote_scroll_stop(const struct viewport* vp)
 {
     lcd_remote_scroll_stop_line(vp, -1);
 }
@@ -346,3 +348,4 @@ void scroll_init(void)
                   IF_PRIO(, PRIORITY_USER_INTERFACE)
                   IF_COP(, CPU));
 }
+

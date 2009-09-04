@@ -29,13 +29,13 @@
 #include "file.h"
 
 void scroll_init(void);
-void lcd_scroll_stop(struct viewport* vp);
-void lcd_scroll_stop_line(struct viewport* vp, int y);
+void lcd_scroll_stop(const struct viewport* vp);
+void lcd_scroll_stop_line(const struct viewport* vp, int y);
 void lcd_scroll_fn(void);
 #ifdef HAVE_REMOTE_LCD
 void lcd_remote_scroll_fn(void);
-void lcd_remote_scroll_stop(struct viewport* vp);
-void lcd_remote_scroll_stop_line(struct viewport* vp, int y);
+void lcd_remote_scroll_stop(const struct viewport* vp);
+void lcd_remote_scroll_stop_line(const struct viewport* vp, int y);
 #endif
 
 /* internal usage, but in multiple drivers */
