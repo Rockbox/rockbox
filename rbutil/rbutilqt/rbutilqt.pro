@@ -1,3 +1,6 @@
+
+
+# ccache
 unix:!mac {
     CCACHE = $$system(which ccache)
     !isEmpty(CCACHE) {
@@ -7,10 +10,10 @@ unix:!mac {
     }
 }
 
-OBJECTS_DIR = build/o
-UI_DIR = build/ui
-MOC_DIR = build/moc
-RCC_DIR = build/rcc
+OBJECTS_DIR = $$OUT_PWD/build/o
+UI_DIR = $$OUT_PWD/build/ui
+MOC_DIR = $$OUT_PWD/build/moc
+RCC_DIR = $$OUT_PWD/build/rcc
 
 # check version of Qt installation
 VER = $$find(QT_VERSION, ^4\.[3-9]+.*)
@@ -20,12 +23,17 @@ isEmpty(VER) {
 }
 message("Qt version used:" $$VER)
 
+RBBASE_DIR = $$_PRO_FILE_PWD_
+RBBASE_DIR = $$replace(RBBASE_DIR,/rbutil/rbutilqt,)
+
+message("Rockbox Base dir: "$$RBBASE_DIR)
+
 # add a custom rule for pre-building librbspeex
 !mac {
-rbspeex.commands = @$(MAKE) -C ../../tools/rbspeex librbspeex.a
+rbspeex.commands = @$(MAKE) TARGET_DIR=$$OUT_PWD/ -C $$RBBASE_DIR/tools/rbspeex librbspeex.a
 }
 mac {
-rbspeex.commands = @$(MAKE) -C ../../tools/rbspeex librbspeex-universal
+rbspeex.commands = @$(MAKE) TARGET_DIR=$$OUT_PWD/ -C $$RBBASE_DIR/tools/rbspeex librbspeex-universal
 }
 QMAKE_EXTRA_TARGETS += rbspeex
 PRE_TARGETDEPS += rbspeex
@@ -36,7 +44,7 @@ tags.depends = $(SOURCES)
 QMAKE_EXTRA_TARGETS += tags
 
 # add a custom rule for making the translations
-lrelease.commands = $$[QT_INSTALL_BINS]/lrelease -silent rbutilqt.pro
+lrelease.commands = $$[QT_INSTALL_BINS]/lrelease -silent $$_PRO_FILE_
 QMAKE_EXTRA_TARGETS += lrelease
 !dbg {
     PRE_TARGETDEPS += lrelease
@@ -44,20 +52,20 @@ QMAKE_EXTRA_TARGETS += lrelease
 
 #custom rules for libucl.a
 !mac {
-libucl.commands = @$(MAKE) -C ../../tools/ucl/src libucl.a
+libucl.commands = @$(MAKE) TARGET_DIR=$$OUT_PWD/ -C $$RBBASE_DIR/tools/ucl/src libucl.a
 }
 mac {
-libucl.commands = @$(MAKE) -C ../../tools/ucl/src libucl-universal
+libucl.commands = @$(MAKE) TARGET_DIR=$$OUT_PWD/ -C $$RBBASE_DIR/tools/ucl/src libucl-universal
 }
 QMAKE_EXTRA_TARGETS += libucl
 PRE_TARGETDEPS += libucl
 
 #custom rules for libmkamsboot.a
 !mac {
-libmkamsboot.commands = @$(MAKE) -C ../mkamsboot libmkamsboot.a
+libmkamsboot.commands = @$(MAKE) TARGET_DIR=$$OUT_PWD/ -C $$RBBASE_DIR/rbutil/mkamsboot libmkamsboot.a
 }
 mac {
-libmkamsboot.commands = @$(MAKE) -C ../mkamsboot libmkamsboot-universal
+libmkamsboot.commands = @$(MAKE) TARGET_DIR=$$OUT_PWD/ -C $$RBBASE_DIR/rbutil/mkamsboot libmkamsboot-universal
 }
 QMAKE_EXTRA_TARGETS += libmkamsboot
 PRE_TARGETDEPS += libmkamsboot
@@ -167,10 +175,10 @@ HEADERS += rbutilqt.h \
  ../../tools/iriver.h 
  
 # Needed by QT on Win
-INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher ../../tools/rbspeex ../../tools
-INCLUDEPATH += base
+INCLUDEPATH = $$_PRO_FILE_PWD_ $$_PRO_FILE_PWD_/irivertools $$_PRO_FILE_PWD_/zip $$_PRO_FILE_PWD_/zlib $$_PRO_FILE_PWD_/base
+INCLUDEPATH += $$RBBASE_DIR/rbutil/ipodpatcher $$RBBASE_DIR/rbutil/sansapatcher $$RBBASE_DIR/tools/rbspeex $$RBBASE_DIR/tools
 
-LIBS += -L../../tools/rbspeex -lrbspeex -L../mkamsboot -lmkamsboot -L../../tools/ucl/src/ -lucl
+LIBS += -L$$OUT_PWD -lrbspeex -lmkamsboot -lucl
 
 TEMPLATE = app
 dbg {
@@ -201,12 +209,12 @@ FORMS += rbutilqtfrm.ui \
  sysinfofrm.ui \
  systracefrm.ui
 
-RESOURCES += rbutilqt.qrc
+RESOURCES += $$_PRO_FILE_PWD_/rbutilqt.qrc
 win32 {
-    RESOURCES += rbutilqt-win.qrc
+    RESOURCES += $$_PRO_FILE_PWD_/rbutilqt-win.qrc
 }
 !dbg {
-    RESOURCES += rbutilqt-lang.qrc
+    RESOURCES += $$_PRO_FILE_PWD_/rbutilqt-lang.qrc
 }
 
 TRANSLATIONS += lang/rbutil_de.ts \

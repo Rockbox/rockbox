@@ -25,18 +25,17 @@ endif
 endif
 endif
 
-CC?= gcc
 
 ifdef RBARCH
 CFLAGS += -arch $(RBARCH)
 endif
 
-OUT = build$(RBARCH)
+OUT = $(TARGET_DIR)build$(RBARCH)
 
 all: $(OUTPUT)
 
 $(LIBUCL):
-	make -C ../../tools/ucl/src libucl.a
+	make -C ../../tools/ucl/src $(TARGET_DIR)libucl.a
 
 # This file can be generated in the dualboot/ directory
 $(OUT)/dualboot.o: dualboot.c
@@ -55,27 +54,27 @@ $(OUT)/libmkamsboot.o: mkamsboot.c dualboot.h md5.h
 	$(CC) $(CFLAGS) -DLIB -c -o $(OUT)/libmkamsboot.o -W -Wall mkamsboot.c
 
 libmkamsboot$(RBARCH).a: $(OUT) $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
-	$(AR) ru libmkamsboot$(RBARCH).a $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
+	$(AR) ru $(TARGET_DIR)libmkamsboot$(RBARCH).a $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
 libmkamsbooti386.a:
-	make RBARCH=i386 libmkamsbooti386.a
+	make RBARCH=i386 TARGET_DIR=$(TARGET_DIR) libmkamsbooti386.a
 
 libmkamsbootppc.a:
-	make RBARCH=ppc libmkamsbootppc.a
+	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) libmkamsbootppc.a
 endif    
     
 libmkamsboot-universal: libmkamsbooti386.a libmkamsbootppc.a
-	@echo lipo libmkamsboot.a
-	$(SILENT) rm -f libmkamsboot.a
-	lipo -create libmkamsbootppc.a libmkamsbooti386.a -output libmkamsboot.a    
+	@echo lipo $(TARGET_DIR)libmkamsboot.a
+	$(SILENT) rm -f $(TARGET_DIR)libmkamsboot.a
+	lipo -create $(TARGET_DIR)libmkamsbootppc.a $(TARGET_DIR)libmkamsbooti386.a -output $(TARGET_DIR)libmkamsboot.a    
     
 clean:
-	rm -f $(OUTPUT) libmkamsboot.o libmkamsboot*.a
+	rm -f $(OUTPUT) libmkamsboot.o $(TARGET_DIR)libmkamsboot*.a
 	rm -rf build*
     
-build$(RBARCH):
-	@echo MKDIR build$(RBARCH)
-	$(SILENT)mkdir build$(RBARCH)
+$(OUT):
+	@echo MKDIR $(OUT)
+	$(SILENT)mkdir $(OUT)
 

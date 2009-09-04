@@ -35,7 +35,7 @@ endif
 # This sets up 'SRC' based on the files mentioned in SOURCES
 SRC := $(shell cat $(SPEEXSRC)/SOURCES | $(CC) $(CFLAGS) -E -P - | grep -v "^\#" | grep -v "^$$")
 
-OUT = build$(RBARCH)
+OUT = $(TARGET_DIR)build$(RBARCH)
 SOURCES = $(SRC:%.c=$(SPEEXSRC)/%.c) rbspeex.c rbspeexenc.c rbspeexdec.c
 OBJS = $(addprefix $(OUT)/,$(SRC:%.c=%.o))
 DEPFILE = $(OUT)/dep-speex
@@ -46,8 +46,8 @@ DIRS =
 all: ../rbspeexenc ../rbspeexdec
 
 $(DEPFILE): $(SOURCES)
-	@echo MKDIR build$(RBARCH)
-	$(SILENT)mkdir -p build$(RBARCH)
+	@echo MKDIR $(OUT)
+	$(SILENT)mkdir -p $(OUT)
 	@echo Creating dependencies
 	$(SILENT)rm -f $(DEPFILE)
 	$(SILENT)(for each in $(SOURCES) x; do \
@@ -69,7 +69,7 @@ $(OUT)/librbspeex.a: $(OBJS) $(DEPFILE) $(OUT)/rbspeex.o
 	$(SILENT)$(AR) ruv $@ $+ > /dev/null 2>&1
 
 librbspeex$(RBARCH).a: $(OUT)/librbspeex.a
-	$(SILENT)cp $(OUT)/librbspeex.a librbspeex$(RBARCH).a
+	$(SILENT)cp $(OUT)/librbspeex.a $(TARGET_DIR)librbspeex$(RBARCH).a
 
 ../rbspeexenc: $(OBJS) $(OUT)/rbspeexenc.o librbspeex$(RBARCH).a
 	@echo Linking ../rbspeexenc
@@ -86,22 +86,22 @@ librbspeex$(RBARCH).a: $(OUT)/librbspeex.a
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
 librbspeexi386.a:
-	make RBARCH=i386 librbspeexi386.a
+	make RBARCH=i386 TARGET_DIR=$(TARGET_DIR) librbspeexi386.a
 
 librbspeexppc.a:
-	make RBARCH=ppc librbspeexppc.a
+	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) librbspeexppc.a
 endif
 
 librbspeex-universal: librbspeexi386.a librbspeexppc.a
 	@echo lipo librbspeex.a
-	$(SILENT) rm -f librbspeex.a
-	lipo -create librbspeexppc.a librbspeexi386.a -output librbspeex.a
+	$(SILENT) rm -f $(TARGET_DIR)librbspeex.a
+	lipo -create $(TARGET_DIR)librbspeexppc.a $(TARGET_DIR)librbspeexi386.a -output $(TARGET_DIR)librbspeex.a
 
 clean:
-	rm -f $(OBJS) librbspeex* ../rbspeexenc ../rbspeexdec dep-speex
+	rm -f $(OBJS) $(TARGET_DIR)librbspeex* ../rbspeexenc ../rbspeexdec $(TARGET_DIR)dep-speex
 	rm -rf build*
 
-build$(RBARCH):
-	@echo MKDIR build$(RBARCH)
-	$(SILENT)mkdir build$(RBARCH)
+$(OUT):
+	@echo MKDIR $(OUT)
+	$(SILENT)mkdir $(OUT)
 

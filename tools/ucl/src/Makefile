@@ -17,7 +17,8 @@ ifdef RBARCH
 CFLAGS += -arch $(RBARCH)
 endif
 
-OUT = build$(RBARCH)
+
+OUT = $(TARGET_DIR)build$(RBARCH)
 
 SOURCES = alloc.c io.c n2b_99.c n2b_d.c n2b_ds.c n2b_to.c n2d_99.c	\
 	n2d_d.c n2d_ds.c n2d_to.c n2e_99.c n2e_d.c n2e_ds.c n2e_to.c ucl_crc.c	\
@@ -30,8 +31,8 @@ OBJS = $(OUT)/alloc.o $(OUT)/io.o $(OUT)/n2b_99.o $(OUT)/n2b_d.o $(OUT)/n2b_ds.o
 # we don't use $(AR) and $(RANLIB) below since we want the _native_ tools
 # not the cross-compiler tools
 libucl$(RBARCH).a: $(OUT) $(OBJS)
-	$(SILENT)ar ruv $@ $(OBJS) >/dev/null 2>&1
-	$(SILENT)ranlib $@
+	$(SILENT)ar ruv $(TARGET_DIR)$@ $(OBJS) >/dev/null 2>&1
+	$(SILENT)ranlib $(TARGET_DIR)$@
 
 $(OUT)/%.o: %.c
 	@echo CC $<
@@ -40,22 +41,22 @@ $(OUT)/%.o: %.c
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
 libucli386.a:
-	make RBARCH=i386 libucli386.a
+	make RBARCH=i386 TARGET_DIR=$(TARGET_DIR) libucli386.a
 
 libuclppc.a:
-	make RBARCH=ppc libuclppc.a
+	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) libuclppc.a
 endif    
     
 libucl-universal: libucli386.a libuclppc.a
-	@echo lipo libucl.a
-	$(SILENT) rm -f libucl.a
-	lipo -create libuclppc.a libucli386.a -output libucl.a    
+	@echo lipo $(TARGET_DIR)libucl.a
+	$(SILENT) rm -f $(TARGET_DIR)libucl.a
+	lipo -create $(TARGET_DIR)libuclppc.a $(TARGET_DIR)libucli386.a -output $(TARGET_DIR)libucl.a    
     
 clean:
-	rm -f libucl*.a
+	rm -f $(TARGET_DIR)libucl*.a
 	rm -rf build*
 
-build$(RBARCH):
-	@echo MKDIR build$(RBARCH)
-	$(SILENT)mkdir build$(RBARCH)
+$(OUT):
+	@echo MKDIR $(OUT)
+	$(SILENT)mkdir $(OUT)
 
