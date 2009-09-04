@@ -294,22 +294,6 @@ struct skin_viewport* find_viewport(char label, struct wps_data *data)
     return NULL;
 }
 
-int skin_last_token_index(struct wps_data *data, int line, int subline)
-{
-    int first_subline_idx = data->lines[line].first_subline_idx;
-    int idx = first_subline_idx + subline;
-    if (idx < data->num_sublines - 1)
-    {
-        /* This subline ends where the next begins */
-        return data->sublines[idx+1].first_token_idx - 1;
-    }
-    else
-    {
-        /* The last subline goes to the end */
-        return data->num_tokens - 1;
-    }
-}
-
 /* From viewport.c & misc.h */
 #define LIST_VALUE_PARSED(setvals, position) ((setvals) & BIT_N(position))
 
