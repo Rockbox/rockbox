@@ -105,7 +105,11 @@ static unsigned long get_lcd_pixel(int x, int y)
     unsigned bits = lcd_framebuffer[y][x];
     return (bits >> 8) | (bits << 8);
 #else
+#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+    return *(&lcd_framebuffer[0][0]+LCD_HEIGHT*x+y);
+#else
     return lcd_framebuffer[y][x];
+#endif
 #endif
 #endif
 }
