@@ -62,7 +62,7 @@ struct viewport {
  *      then you need to add X pixels to get to the next line. (the next line
  *      in this case is height1).
  *
- * Similarly, if the screens is has the pixels in contiguous vertical strips
+ * Similarly, if the screen has the pixels in contiguous vertical strips
  *  the stride would be equal to the image height.
  *
  *      For example if the screen pixels are layed out as follows:
@@ -83,7 +83,7 @@ struct viewport {
  *  number needs to be passed to the STRIDE macro so that the appropriate height
  *  or width can be passed to the lcd_bitmap, or lcd_remote_bitmap calls.
  *
- * STRIDE_REMOTE and STRIDE_MAIN should never used when it is not clear whether
+ * STRIDE_REMOTE and STRIDE_MAIN should never be used when it is not clear whether
  *  lcd_remote_bitmap calls or lcd_bitmap calls are being made (for example the
  *  screens api).
  *
