@@ -115,7 +115,7 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
      * if you're feeling brave.
      */
 
-    if (! strcmp(buf, DEFAULT_WPS(screen)) )
+    if (buf && ! strcmp(buf, DEFAULT_WPS(screen)) )
     {
 #ifdef HAVE_REMOTE_LCD
         if (screen == SCREEN_REMOTE)
