@@ -72,14 +72,14 @@ void digital_clock_draw(struct screen* display,
         getstringsize(digits_bitmaps, buffer, &str_w, &str_h);
         draw_string(display, digits_bitmaps, buffer,
                     (display->getwidth()-str_w)/2,
-                    digits_bitmaps->height);
+                    digits_bitmaps->slide_height);
     }
     if(settings->general.date_format!=NONE){
         format_date(buffer, time, settings->general.date_format);
         getstringsize(smalldigits_bitmaps, buffer, &str_w, &str_h);
         draw_string(display, smalldigits_bitmaps, buffer,
                     (display->getwidth()-str_w)/2,
-                    display->getheight()-smalldigits_bitmaps->height*2);
+                    display->getheight()-smalldigits_bitmaps->slide_height*2);
     }
     if(counter){
         struct time counter_time;

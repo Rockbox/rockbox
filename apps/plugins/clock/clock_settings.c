@@ -144,11 +144,12 @@ void draw_logo(struct screen* display){
 void draw_message(struct screen* display, int msg, int y){
     const struct picture* message = &(messages[display->screen_type]);
     display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    display->fillrect(0, display->getheight()-message->height,
-                      display->getwidth(), message->height);
+    display->fillrect(0, display->getheight()-message->slide_height,
+                      display->getwidth(), message->slide_height);
     display->set_drawmode(DRMODE_SOLID);
     vertical_picture_draw_sprite(display, message, msg,
-                                 0, display->getheight()-(message->height*y));
+                                 0, display->getheight() - 
+                                    (message->slide_height*y));
 }
 
 void load_settings(void){
