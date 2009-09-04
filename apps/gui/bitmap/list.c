@@ -104,6 +104,9 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     const bool show_cursor = !global_settings.cursor_style &&
                         list->show_selection_marker;
     struct viewport *parent = (list->parent[screen]);
+    /* the below returns a pointer to a viewport array which is
+     * NB_SCREENS long */
+    struct viewport *ui_vp  = viewport_get_current_vp();
 #ifdef HAVE_LCD_COLOR
     unsigned char cur_line = 0;
 #endif
@@ -112,7 +115,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     line_height = font_get(parent->font)->height;
     display->set_viewport(parent);
     display->clear_viewport();
-    display->scroll_stop(parent);
+    display->scroll_stop(&ui_vp[screen]);
     list_text[screen] = *parent;
     if ((show_title = draw_title(display, list)))
     {
