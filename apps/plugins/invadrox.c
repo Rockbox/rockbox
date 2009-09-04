@@ -684,7 +684,8 @@ void draw_number(int x, int y, int num, int digits)
         d = num % 10;
         num = num / 10;
         rb->lcd_bitmap_part(invadrox_numbers, d * NUMBERS_WIDTH, 0,
-                            STRIDE( BMPWIDTH_invadrox_numbers, 
+                            STRIDE( SCREEN_MAIN, 
+                                    BMPWIDTH_invadrox_numbers, 
                                     BMPHEIGHT_invadrox_numbers),
                             x + i * (NUMBERS_WIDTH + NUM_SPACING), y,
                             NUMBERS_WIDTH, FONT_HEIGHT);
@@ -715,7 +716,8 @@ void draw_lives(void)
     int i;
     /* Lives num */
     rb->lcd_bitmap_part(invadrox_numbers, lives * NUMBERS_WIDTH, 0,
-                        STRIDE( BMPWIDTH_invadrox_numbers, 
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_invadrox_numbers, 
                                 BMPHEIGHT_invadrox_numbers), 
                         PLAYFIELD_X + LIVES_X, PLAYFIELD_Y + 2,
                         NUMBERS_WIDTH, FONT_HEIGHT);
@@ -723,7 +725,8 @@ void draw_lives(void)
     /* Ships */
     for (i = 0; i < (lives - 1); i++) {
         rb->lcd_bitmap_part(invadrox_ships, 0, 0, 
-                            STRIDE( BMPWIDTH_invadrox_ships, 
+                            STRIDE( SCREEN_MAIN, 
+                                    BMPWIDTH_invadrox_ships, 
                                     BMPHEIGHT_invadrox_ships),
                             PLAYFIELD_X + LIVES_X + SHIP_WIDTH + i * (SHIP_WIDTH + NUM_SPACING),
                             PLAYFIELD_Y + 1, SHIP_WIDTH, SHIP_HEIGHT);
@@ -747,7 +750,8 @@ inline void draw_aliens(void)
     for (i = 0; i < 5 * ALIENS; i++) {
         rb->lcd_bitmap_part(invadrox_aliens, aliens[i].x & 1 ? ALIEN_WIDTH : 0, 
                             aliens[i].type * ALIEN_HEIGHT,
-                            STRIDE( BMPWIDTH_invadrox_aliens, 
+                            STRIDE( SCREEN_MAIN, 
+                                    BMPWIDTH_invadrox_aliens, 
                                     BMPHEIGHT_invadrox_aliens), 
                             PLAYFIELD_X + LIVES_X + aliens[i].x * ALIEN_SPEED,
                             ALIEN_START_Y + aliens[i].y * ALIEN_HEIGHT,
@@ -888,7 +892,8 @@ bool move_aliens(void)
     rb->lcd_bitmap_part(invadrox_aliens,
                         aliens[curr_alien].x & 1 ? ALIEN_WIDTH : 0, 
                         aliens[curr_alien].type * ALIEN_HEIGHT,
-                        STRIDE( BMPWIDTH_invadrox_aliens,
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_invadrox_aliens,
                                 BMPHEIGHT_invadrox_aliens), 
                         x, y, ALIEN_WIDTH, ALIEN_HEIGHT);
 
@@ -918,7 +923,8 @@ inline void draw_ship(void)
 
     /* Draw ship */
     rb->lcd_bitmap_part(invadrox_ships, 0, ship_frame * SHIP_HEIGHT,
-                        STRIDE( BMPWIDTH_invadrox_ships,
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_invadrox_ships,
                                 BMPHEIGHT_invadrox_ships), 
                         ship_x, SHIP_Y, SHIP_WIDTH, SHIP_HEIGHT);
     if (ship_hit) {
@@ -1160,7 +1166,8 @@ inline void draw_bomb(int i)
 {
     rb->lcd_bitmap_part(invadrox_bombs, bombs[i].type * BOMB_WIDTH,
                         bombs[i].frame * BOMB_HEIGHT,
-                        STRIDE( BMPWIDTH_invadrox_bombs,
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_invadrox_bombs,
                                 BMPHEIGHT_invadrox_bombs), 
                         bombs[i].x, bombs[i].y,
                         BOMB_WIDTH, BOMB_HEIGHT);
@@ -1262,7 +1269,8 @@ void move_bombs(void)
                         bombs[i].state = S_EXPLODE * 4;
                         bombs[i].target = TARGET_SHIP;
                         rb->lcd_bitmap_part(invadrox_ships, 0, 1 * SHIP_HEIGHT,
-                                            STRIDE( BMPWIDTH_invadrox_ships,
+                                            STRIDE( SCREEN_MAIN, 
+                                                    BMPWIDTH_invadrox_ships,
                                                     BMPHEIGHT_invadrox_ships), 
                                             ship_x, SHIP_Y,
                                             SHIP_WIDTH, SHIP_HEIGHT);

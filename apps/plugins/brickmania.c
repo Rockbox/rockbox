@@ -1081,7 +1081,8 @@ static int brickmania_game_loop(void)
                                 brick[i*10+j].powertop+=SPEED_POWER;
                             rb->lcd_bitmap_part(brickmania_powerups,0,
                                 POWERUP_HEIGHT*brick[i*10+j].power,
-                                STRIDE( BMPWIDTH_brickmania_powerups,
+                                STRIDE( SCREEN_MAIN, 
+                                        BMPWIDTH_brickmania_powerups,
                                         BMPHEIGHT_brickmania_powerups),
                                 LEFTMARGIN+j*BRICK_WIDTH+
                                     (BRICK_WIDTH/2-POWERUP_WIDTH/2),
@@ -1205,7 +1206,8 @@ static int brickmania_game_loop(void)
                     if (brick[i*10+j].used==1) {
                         rb->lcd_bitmap_part(brickmania_bricks,0,
                             BRICK_HEIGHT*brick[i*10+j].color,
-                            STRIDE( BMPWIDTH_brickmania_bricks,
+                            STRIDE( SCREEN_MAIN, 
+                                    BMPWIDTH_brickmania_bricks,
                                     BMPHEIGHT_brickmania_bricks),
                             LEFTMARGIN+j*BRICK_WIDTH,
                             TOPMARGIN+i*BRICK_HEIGHT,
@@ -1214,7 +1216,8 @@ static int brickmania_game_loop(void)
                         if (brick[i*10+j].hiteffect>0)
                             rb->lcd_bitmap_transparent_part(brickmania_break,0,
                                 BRICK_HEIGHT*brick[i*10+j].hiteffect,
-                                STRIDE( BMPWIDTH_brickmania_break, 
+                                STRIDE( SCREEN_MAIN, 
+                                        BMPWIDTH_brickmania_break, 
                                         BMPHEIGHT_brickmania_break),
                                 LEFTMARGIN+j*BRICK_WIDTH,
                                 TOPMARGIN+i*BRICK_HEIGHT,
@@ -1377,7 +1380,8 @@ static int brickmania_game_loop(void)
                 rb->lcd_bitmap_part(
                     brickmania_pads,
                     0, pad_type*PAD_HEIGHT,
-                    STRIDE(BMPWIDTH_brickmania_pads, BMPHEIGHT_brickmania_pads),
+                    STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_pads, 
+                            BMPHEIGHT_brickmania_pads),
                     pad_pos_x, PAD_POS_Y, pad_width, PAD_HEIGHT);
             }
             else if( pad_width == LONG_PAD_WIDTH ) /* Long Pad */
@@ -1385,7 +1389,7 @@ static int brickmania_game_loop(void)
                 rb->lcd_bitmap_part(
                     brickmania_long_pads,
                     0,pad_type*PAD_HEIGHT,
-                    STRIDE( BMPWIDTH_brickmania_long_pads, 
+                    STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_long_pads, 
                             BMPHEIGHT_brickmania_long_pads),
                     pad_pos_x, PAD_POS_Y, pad_width, PAD_HEIGHT);
             }
@@ -1394,7 +1398,7 @@ static int brickmania_game_loop(void)
                 rb->lcd_bitmap_part(
                     brickmania_short_pads,
                     0,pad_type*PAD_HEIGHT,
-                    STRIDE( BMPWIDTH_brickmania_short_pads, 
+                    STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_short_pads, 
                             BMPHEIGHT_brickmania_short_pads),
                     pad_pos_x, PAD_POS_Y, pad_width, PAD_HEIGHT);
             }

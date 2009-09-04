@@ -144,19 +144,20 @@ void screen_put_iconxy(struct screen * display,
             return;
         }
         data    = viewer_iconset[screen].data;
-        stride  = STRIDE(   viewer_iconset[screen].width, 
+        stride  = STRIDE(   display->screen_type, viewer_iconset[screen].width, 
                             viewer_iconset[screen].height);
     }
     else if (custom_icons_loaded[screen])
     {
         data    = user_iconset[screen].data;
-        stride  = STRIDE(   user_iconset[screen].width, 
+        stride  = STRIDE(   display->screen_type, user_iconset[screen].width, 
                             user_iconset[screen].height);
     }
     else
     {
         data    = inbuilt_icons[screen];
-        stride  = STRIDE(BMPWIDTH_default_icons, BMPHEIGHT_default_icons);
+        stride  = STRIDE(   display->screen_type, BMPWIDTH_default_icons,
+                            BMPHEIGHT_default_icons);
     }
     /* add some left padding to the icons if they are on the edge */
     if (xpos == 0)

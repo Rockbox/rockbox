@@ -112,7 +112,7 @@ void color_palette_init(fb_data* palette)
         palette[i + 224]=LCD_RGBPACK(255, 255, 224 + i);
     }
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-        rb->lcd_pal256_update_pal(palette);
+    rb->lcd_pal256_update_pal(palette);
 #endif
 }
 

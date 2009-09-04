@@ -27,6 +27,7 @@ struct picture{
     const void* data;
     int width;
     int height;
+    int slide_height;
 };
 
 void picture_draw(struct screen* display, const struct picture* picture,

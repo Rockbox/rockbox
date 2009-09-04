@@ -607,7 +607,8 @@ static void draw_card(struct card temp_card, bool shown,
     if(shown)
         rb->lcd_bitmap_part(card_deck, CARD_WIDTH*temp_card.num,
                             CARD_HEIGHT*temp_card.suit, 
-                            STRIDE(BMPWIDTH_card_deck, BMPHEIGHT_card_deck),
+                            STRIDE( SCREEN_MAIN, BMPWIDTH_card_deck, 
+                                    BMPHEIGHT_card_deck),
                             x+1, y+1, CARD_WIDTH, CARD_HEIGHT);
     else
         rb->lcd_bitmap(card_back, x+1, y+1,CARD_WIDTH, CARD_HEIGHT);

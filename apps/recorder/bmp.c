@@ -425,6 +425,7 @@ void output_row_8_native(uint32_t row, void * row_in,
 #elif LCD_DEPTH == 16
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
                 /* M:Robe 500 */
+                (void) fb_width;
                 fb_data *dest = (fb_data *)ctx->bm->data + row;
                 int delta = 127;
                 unsigned r, g, b;

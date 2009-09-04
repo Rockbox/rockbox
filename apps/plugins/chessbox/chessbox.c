@@ -134,7 +134,8 @@ static void cb_drawboard (void) {
             if ( piece == no_piece ) {
                 rb->lcd_bitmap_part ( chessbox_pieces , 0 ,
                                       TILE_HEIGHT * b_color ,
-                                      STRIDE(   BMPWIDTH_chessbox_pieces, 
+                                      STRIDE(   SCREEN_MAIN, 
+                                                BMPWIDTH_chessbox_pieces, 
                                                 BMPHEIGHT_chessbox_pieces) ,
                                       XOFS + x*TILE_WIDTH ,
                                       YOFS + ( 7 - y )*TILE_HEIGHT ,
@@ -147,7 +148,8 @@ static void cb_drawboard (void) {
                                           4 * TILE_HEIGHT * ( piece - 1 ) +
                                           2 * TILE_HEIGHT * p_color +
                                           TILE_HEIGHT * b_color ,
-                                      STRIDE(   BMPWIDTH_chessbox_pieces, 
+                                      STRIDE(   SCREEN_MAIN, 
+                                                BMPWIDTH_chessbox_pieces, 
                                                 BMPHEIGHT_chessbox_pieces) ,
                                       XOFS + x*TILE_WIDTH ,
                                       YOFS + (7 - y)*TILE_HEIGHT ,

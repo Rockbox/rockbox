@@ -982,43 +982,57 @@ static void update_screen(void)
 
                 case ' ': /* floor */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 0*SOKOBAN_TILESIZE,
-                        STRIDE(BMPWIDTH_sokoban_tiles, BMPHEIGHT_sokoban_tiles), 
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_sokoban_tiles,
+                                BMPHEIGHT_sokoban_tiles), 
                         c, r, SOKOBAN_TILESIZE, SOKOBAN_TILESIZE);
                     break;
 
                 case '#': /* wall */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 1*SOKOBAN_TILESIZE,
-                        STRIDE(BMPWIDTH_sokoban_tiles, BMPHEIGHT_sokoban_tiles),
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_sokoban_tiles, 
+                                BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE, SOKOBAN_TILESIZE);
                     break;
 
                 case '$': /* box */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 2*SOKOBAN_TILESIZE,
-                        STRIDE(BMPWIDTH_sokoban_tiles, BMPHEIGHT_sokoban_tiles),
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_sokoban_tiles, 
+                                BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE,SOKOBAN_TILESIZE);
                     break;
 
                 case '*': /* box on goal */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 3*SOKOBAN_TILESIZE,
-                        STRIDE(BMPWIDTH_sokoban_tiles, BMPHEIGHT_sokoban_tiles),
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_sokoban_tiles, 
+                                BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE, SOKOBAN_TILESIZE);
                     break;
 
                 case '.': /* goal */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 4*SOKOBAN_TILESIZE,
-                        STRIDE(BMPWIDTH_sokoban_tiles, BMPHEIGHT_sokoban_tiles),
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_sokoban_tiles, 
+                                BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE, SOKOBAN_TILESIZE);
                     break;
 
                 case '@': /* player */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 5*SOKOBAN_TILESIZE,
-                        STRIDE(BMPWIDTH_sokoban_tiles, BMPHEIGHT_sokoban_tiles),
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_sokoban_tiles, 
+                                BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE, SOKOBAN_TILESIZE);
                     break;
 
                 case '+': /* player on goal */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 6*SOKOBAN_TILESIZE,
-                        STRIDE(BMPWIDTH_sokoban_tiles, BMPHEIGHT_sokoban_tiles),
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_sokoban_tiles, 
+                                BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE, SOKOBAN_TILESIZE);
                     break;
             }

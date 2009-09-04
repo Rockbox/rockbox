@@ -407,7 +407,8 @@ static void draw_spot(int p, int x, int y)
            an appropriate hole graphic */
         rb->lcd_bitmap_part(sliding_puzzle, ((p-1)%SPOTS_X)*SPOTS_WIDTH,
                     ((p-1)/SPOTS_X)*SPOTS_HEIGHT,
-                    STRIDE(BMPWIDTH_sliding_puzzle, BMPHEIGHT_sliding_puzzle),
+                    STRIDE( SCREEN_MAIN, 
+                            BMPWIDTH_sliding_puzzle, BMPHEIGHT_sliding_puzzle),
                     x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
 #else
         /* just draw a black rectangle */
@@ -421,7 +422,8 @@ static void draw_spot(int p, int x, int y)
     {
         rb->lcd_bitmap_part( puzzle_bmp_ptr, ((p-1)%SPOTS_X)*SPOTS_WIDTH,
                      ((p-1)/SPOTS_X)*SPOTS_HEIGHT,
-                     STRIDE(BMPWIDTH_sliding_puzzle, BMPHEIGHT_sliding_puzzle), 
+                     STRIDE( SCREEN_MAIN, 
+                             BMPWIDTH_sliding_puzzle, BMPHEIGHT_sliding_puzzle), 
                      x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
     } else {
         rb->lcd_drawrect(x, y, SPOTS_WIDTH, SPOTS_HEIGHT);

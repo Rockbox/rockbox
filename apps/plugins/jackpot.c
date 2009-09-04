@@ -62,9 +62,11 @@ static unsigned long char_patterns[NB_SLOTS];
 #endif
 
 const struct picture jackpot_pictures[]={
-    {jackpot_slots, BMPWIDTH_jackpot_slots,PICTURE_HEIGHT},
+    {jackpot_slots, BMPWIDTH_jackpot_slots, BMPHEIGHT_jackpot_slots, 
+            PICTURE_HEIGHT},
 #if NB_SCREENS==2
-    {jackpot_slots_remote,BMPWIDTH_jackpot_slots_remote,REMOTE_PICTURE_HEIGHT}
+    {jackpot_slots_remote,BMPWIDTH_jackpot_slots_remote, 
+            BMPHEIGHT_jackpot_slots_remote, REMOTE_PICTURE_HEIGHT}
 #endif
 };
 
@@ -172,7 +174,7 @@ void jackpot_display_slot_machine(struct jackpot* game, struct screen* display)
 #else
     const struct picture* picture= &(jackpot_pictures[display->screen_type]);
     int pos_x=(display->getwidth()-NB_SLOTS*(picture->width+1))/2;
-    int pos_y=(display->getheight()-(picture->height))/2;
+    int pos_y=(display->getheight()-(picture->slide_height))/2;
 #endif /* HAVE_LCD_CHARCELLS */
     for(i=0;i<NB_SLOTS;i++)
     {
@@ -181,7 +183,7 @@ void jackpot_display_slot_machine(struct jackpot* game, struct screen* display)
         int state_y=(game->slot_state[i]*7)/PICTURE_ROTATION_STEPS;
 #else
         int state_y=
-                (picture->height*game->slot_state[i])/PICTURE_ROTATION_STEPS;
+                (picture->slide_height*game->slot_state[i])/PICTURE_ROTATION_STEPS;
 #endif /* HAVE_LCD_CHARCELLS */
         int previous_state_y=game->state_y[display->screen_type][i];
         if(state_y==previous_state_y)

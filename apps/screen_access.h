@@ -26,13 +26,6 @@
 #include "buttonbar.h"
 #include "backdrop.h"
 
-enum screen_type {
-    SCREEN_MAIN
-#ifdef HAVE_REMOTE_LCD
-    ,SCREEN_REMOTE
-#endif
-};
-
 #if defined(HAVE_REMOTE_LCD) && !defined (ROCKBOX_HAS_LOGF)
 #define NB_SCREENS 2
 #else

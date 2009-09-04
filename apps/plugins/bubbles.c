@@ -1441,7 +1441,8 @@ static void bubbles_drawboard(struct game_context* bb) {
             if(bb->playboard[i][j].type >= 0 && !bb->playboard[i][j].delete) {
                 rb->lcd_bitmap_part(bubbles_emblem,
                   0, EMBLEM_HEIGHT*bb->playboard[i][j].type, 
-                  STRIDE(BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
+                  STRIDE(   SCREEN_MAIN, 
+                            BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
                   XOFS+indent+BUBBLE_WIDTH*j+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                   YOFS+ROW_HEIGHT*i+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2+bb->compress*ROW_HEIGHT,
                   EMBLEM_WIDTH, EMBLEM_HEIGHT);
@@ -1458,7 +1459,8 @@ static void bubbles_drawboard(struct game_context* bb) {
     /* display bubble to be shot */
     rb->lcd_bitmap_part(bubbles_emblem,
                0, EMBLEM_HEIGHT*bb->queue[bb->nextinq], 
-               STRIDE(BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
+               STRIDE(  SCREEN_MAIN, 
+                        BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
                SHOTX+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                SHOTY+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2,
                EMBLEM_WIDTH, EMBLEM_HEIGHT);
@@ -1472,7 +1474,8 @@ static void bubbles_drawboard(struct game_context* bb) {
 #ifndef NEXT_BB_X
     rb->lcd_bitmap_part(bubbles_emblem,
                0, EMBLEM_HEIGHT*bb->queue[(bb->nextinq+1)%NUM_QUEUE], 
-               STRIDE(BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
+               STRIDE(  SCREEN_MAIN, 
+                        BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
                XOFS/2-BUBBLE_WIDTH/2+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                SHOTY+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2,
                EMBLEM_WIDTH, EMBLEM_HEIGHT);
@@ -1484,7 +1487,8 @@ static void bubbles_drawboard(struct game_context* bb) {
 #else
     rb->lcd_bitmap_part(bubbles_emblem,
                0, EMBLEM_HEIGHT*bb->queue[(bb->nextinq+1)%NUM_QUEUE], 
-               STRIDE(BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
+               STRIDE(  SCREEN_MAIN, 
+                        BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
                NEXT_BB_X + NEXT_BB_WIDTH/2-BUBBLE_WIDTH/2+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                NEXT_BB_Y + (BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2 + h,
                EMBLEM_WIDTH, EMBLEM_HEIGHT);
@@ -1607,7 +1611,9 @@ static int bubbles_fire(struct game_context* bb) {
         /* display shot */
         bubbles_drawboard(bb);
         rb->lcd_bitmap_part(bubbles_emblem, 0, EMBLEM_HEIGHT*bubblecur, 
-                       STRIDE(BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
+                       STRIDE(  SCREEN_MAIN, 
+                                BMPWIDTH_bubbles_emblem, 
+                                BMPHEIGHT_bubbles_emblem),
                        SHOTX+tempxofs+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                        SHOTY+tempyofs+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2,
                        EMBLEM_WIDTH, EMBLEM_HEIGHT);
@@ -2070,7 +2076,9 @@ static int bubbles_fall(struct game_context* bb) {
 
                         rb->lcd_bitmap_part(bubbles_emblem, 0,
                                 EMBLEM_HEIGHT*bb->playboard[i][j].type, 
-                                STRIDE(BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
+                                STRIDE( SCREEN_MAIN, 
+                                        BMPWIDTH_bubbles_emblem, 
+                                        BMPHEIGHT_bubbles_emblem),
                                 XOFS+indent+BUBBLE_WIDTH*j+
                                     (BUBBLE_WIDTH-EMBLEM_WIDTH)/2+xofs,
                                 YOFS+ROW_HEIGHT*i+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2+

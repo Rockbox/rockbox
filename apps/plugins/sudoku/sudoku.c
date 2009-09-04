@@ -73,7 +73,7 @@ Example ".ss" file, and one with a saved state:
 #include "pluginbitmaps/sudoku_start.h"
 
 #define BITMAP_HEIGHT (BMPHEIGHT_sudoku_normal/10)
-#define BITMAP_STRIDE STRIDE(BMPWIDTH_sudoku_normal, BMPHEIGHT_sudoku_normal)
+#define BITMAP_STRIDE STRIDE(SCREEN_MAIN, BMPWIDTH_sudoku_normal, BMPHEIGHT_sudoku_normal)
 
 #if (LCD_DEPTH>2)
 #define BITMAP_WIDTH  (BMPWIDTH_sudoku_normal/2)

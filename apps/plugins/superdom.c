@@ -62,7 +62,7 @@ char buf[255];
 /* These parameters define the piece image dimensions, Stride is the total width
  *  of the bitmap.
  */
-#define ICON_STRIDE     STRIDE(BMPWIDTH_superdom_boarditems, BMPHEIGHT_superdom_boarditems)
+#define ICON_STRIDE     STRIDE(SCREEN_MAIN, BMPWIDTH_superdom_boarditems, BMPHEIGHT_superdom_boarditems)
 #define ICON_HEIGHT     (BMPHEIGHT_superdom_boarditems/6)
 #define ICON_WIDTH      (BMPWIDTH_superdom_boarditems/2)
 

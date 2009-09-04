@@ -351,7 +351,9 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
     if (!clear)
     {
         /* Draw the bitmap */
-        gwps->display->bitmap_part((fb_data*)bmp->data, 0, 0, bmp->width,
+        gwps->display->bitmap_part((fb_data*)bmp->data, 0, 0, 
+                                    STRIDE(gwps->display->screen_type, 
+                                        bmp->width, bmp->height),
                                    x, y, width, height);
 #ifdef HAVE_LCD_INVERT
         if (global_settings.invert) {

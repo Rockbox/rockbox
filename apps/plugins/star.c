@@ -729,7 +729,8 @@ static void star_display_board_info(int current_level)
 
     rb->lcd_bitmap_part(star_tiles, 0, control == STAR_CONTROL_BALL ?
                         BALL*TILE_HEIGHT : BLOCK*TILE_HEIGHT, 
-                        STRIDE(BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         STAR_OFFSET_X + (STAR_WIDTH-1) * TILE_WIDTH,
                         tile_pos_y, TILE_WIDTH, TILE_HEIGHT);
 
@@ -768,7 +769,8 @@ static int star_load_level(int current_level)
 #   define DRAW_TILE( a )                                   \
     rb->lcd_bitmap_part( star_tiles, 0,                     \
                          a*TILE_HEIGHT,                     \
-                         STRIDE(    BMPWIDTH_star_tiles,    \
+                         STRIDE(    SCREEN_MAIN,            \
+                                    BMPWIDTH_star_tiles,    \
                                     BMPHEIGHT_star_tiles),  \
                          STAR_OFFSET_X + x * TILE_WIDTH,    \
                          STAR_OFFSET_Y + y * TILE_HEIGHT,   \
@@ -820,10 +822,12 @@ static void star_animate_tile(int tile_no, int start_x, int start_y,
         {
             STAR_SLEEP
             rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT, 
-                        STRIDE(BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x, start_y, TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT,
-                        STRIDE(BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x + delta_x * i, start_y, TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_update_rect(start_x + delta_x * i - (delta_x>0?1:0),
                                 start_y, TILE_WIDTH + 1, TILE_HEIGHT);
@@ -835,10 +839,12 @@ static void star_animate_tile(int tile_no, int start_x, int start_y,
         {
             STAR_SLEEP
             rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT, 
-                        STRIDE(BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x, start_y, TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT, 
-                        STRIDE(BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
+                        STRIDE( SCREEN_MAIN, 
+                                BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x, start_y + delta_y * i, TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_update_rect(start_x, start_y + delta_y * i - (delta_y>0?1:0),
                                 TILE_WIDTH, TILE_HEIGHT + 1);

@@ -512,13 +512,15 @@ static void jewels_drawboard(struct game_context* bj) {
                                 TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_bitmap_transparent_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[i+1][j].type),
-                           STRIDE(BMPWIDTH_jewels, BMPHEIGHT_jewels), 
+                           STRIDE(  SCREEN_MAIN, 
+                                    BMPWIDTH_jewels, BMPHEIGHT_jewels), 
                            j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
 #else
             rb->lcd_bitmap_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[i+1][j].type),
-                           STRIDE(BMPWIDTH_jewels, BMPHEIGHT_jewels),
+                           STRIDE(  SCREEN_MAIN, 
+                                    BMPWIDTH_jewels, BMPHEIGHT_jewels),
                            j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
 #endif
@@ -730,7 +732,9 @@ static void jewels_putjewels(struct game_context* bj){
 #ifdef HAVE_LCD_COLOR
                         rb->lcd_bitmap_transparent_part(jewels, 0,
                                        TILE_HEIGHT*(bj->playboard[i][j].type),
-                                       STRIDE(BMPWIDTH_jewels, BMPHEIGHT_jewels),
+                                       STRIDE(  SCREEN_MAIN, 
+                                                BMPWIDTH_jewels, 
+                                                BMPHEIGHT_jewels),
                                        j*TILE_WIDTH,
                                        (i-1)*TILE_HEIGHT+YOFS+
                                            ((((TILE_HEIGHT<<10)*k)/8)>>10),
@@ -738,7 +742,9 @@ static void jewels_putjewels(struct game_context* bj){
 #else
                         rb->lcd_bitmap_part(jewels, 0,
                                        TILE_HEIGHT*(bj->playboard[i][j].type),
-                                       STRIDE(BMPWIDTH_jewels, BMPHEIGHT_jewels),
+                                       STRIDE(  SCREEN_MAIN, 
+                                                BMPWIDTH_jewels, 
+                                                BMPHEIGHT_jewels),
                                        j*TILE_WIDTH,
                                        (i-1)*TILE_HEIGHT+YOFS+
                                            ((((TILE_HEIGHT<<10)*k)/8)>>10),
@@ -958,7 +964,8 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
             rb->lcd_bitmap_transparent_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard
                                [y+1+vertmod][x+horzmod].type),
-                           STRIDE(BMPWIDTH_jewels, BMPHEIGHT_jewels),
+                           STRIDE(  SCREEN_MAIN, 
+                                    BMPWIDTH_jewels, BMPHEIGHT_jewels),
                            (x+horzmod)*TILE_WIDTH-horzmod*
                                ((((movelen<<10)*k)/8)>>10),
                            (y+vertmod)*TILE_HEIGHT-vertmod*
@@ -966,7 +973,8 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
                            TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_bitmap_transparent_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[y+1][x].type),
-                           STRIDE(BMPWIDTH_jewels, BMPHEIGHT_jewels),
+                           STRIDE(  SCREEN_MAIN, 
+                                    BMPWIDTH_jewels, BMPHEIGHT_jewels),
                            x*TILE_WIDTH+horzmod*
                                ((((movelen<<10)*k)/8)>>10),
                            y*TILE_HEIGHT+vertmod*
@@ -976,7 +984,8 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
             rb->lcd_bitmap_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard
                                [y+1+vertmod][x+horzmod].type),
-                           STRIDE(BMPWIDTH_jewels, BMPHEIGHT_jewels),
+                           STRIDE(  SCREEN_MAIN, 
+                                    BMPWIDTH_jewels, BMPHEIGHT_jewels),
                            (x+horzmod)*TILE_WIDTH-horzmod*
                                ((((movelen<<10)*k)/8)>>10),
                            (y+vertmod)*TILE_HEIGHT-vertmod*
@@ -985,7 +994,8 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
             rb->lcd_set_drawmode(DRMODE_FG);
             rb->lcd_bitmap_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[y+1][x].type),
-                           STRIDE(BMPWIDTH_jewels, BMPHEIGHT_jewels),
+                           STRIDE(  SCREEN_MAIN, 
+                                    BMPWIDTH_jewels, BMPHEIGHT_jewels),
                            x*TILE_WIDTH+horzmod*
                                ((((movelen<<10)*k)/8)>>10),
                            y*TILE_HEIGHT+vertmod*

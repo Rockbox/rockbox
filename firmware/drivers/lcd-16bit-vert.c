@@ -69,7 +69,7 @@ static struct viewport default_vp =
 
 /* The Gigabeat target build requires access to the current fg_pattern
    in lcd-meg-fx.c */
-#if (!defined(TOSHIBA_GIGABEAT_F)&& !defined(TOSHIBA_GIGABEAT_S)) || defined(SIMULATOR)
+#if defined(SIMULATOR)
 static struct viewport* current_vp IDATA_ATTR = &default_vp;
 #else
 struct viewport* current_vp IDATA_ATTR = &default_vp;
@@ -853,7 +853,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
 /* Draw a full native bitmap */
 void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
 {
-    lcd_bitmap_part(src, 0, 0, STRIDE(width, height), x, y, width, height);
+    lcd_bitmap_part(src, 0, 0, STRIDE(SCREEN_MAIN, width, height), x, y, width, height);
 }
 
 #if !defined(TOSHIBA_GIGABEAT_F) && !defined(TOSHIBA_GIGABEAT_S) \
@@ -914,7 +914,7 @@ void lcd_bitmap_transparent(const fb_data *src, int x, int y,
                             int width, int height)
 {
     lcd_bitmap_transparent_part(src, 0, 0, 
-                                STRIDE(width, height), x, y, width, height);
+                                STRIDE(SCREEN_MAIN, width, height), x, y, width, height);
 }
 
 #include "lcd-bitmap-common.c"

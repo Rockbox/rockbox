@@ -306,12 +306,24 @@ static inline unsigned lcd_color_to_native(unsigned color)
 
 #endif /* HAVE_LCD_COLOR */
 
-/* Frame buffer stride */
-#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
-#define STRIDE(w, h)    (h)
-#else
-#define STRIDE(w, h)    (w)
+enum screen_type {
+    SCREEN_MAIN
+#ifdef HAVE_REMOTE_LCD
+    ,SCREEN_REMOTE
 #endif
+};
+
+/* Frame buffer stride */
+#define STRIDE_REMOTE(w, h)    (w)
+
+#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#define STRIDE_MAIN(w, h)    (h)
+#else
+#define STRIDE_MAIN(w, h)    (w)
+#endif
+
+#define STRIDE(screen, w, h) (screen==SCREEN_MAIN?STRIDE_MAIN((w), \
+                                        (h)):STRIDE_REMOTE((w),(h)))
 
 /* Frame buffer dimensions */
 #if LCD_DEPTH == 1
