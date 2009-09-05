@@ -48,6 +48,13 @@ static int xoffset = 20; /* needed for flip */
  * so block lcd_button_support the during updates */
 static bool lcd_busy = false;
 
+static inline void lcd_delay(int x)
+{
+    do {
+        asm volatile ("nop\n");
+    } while (x--);
+}
+    
 static void as3525_dbop_init(void)
 {
     CGU_DBOP = (1<<3) | AS3525_DBOP_DIV;
@@ -70,29 +77,25 @@ static void as3525_dbop_init(void)
     /* TODO: The OF calls some other functions here, but maybe not important */
 }
 
-#define lcd_write_single_data16(value) do {\
-        DBOP_CTRL &= ~(1<<14|1<<13); \
-        DBOP_DOUT16 = (fb_data)(value); \
-    } while(0)
-    
+static void lcd_write_value16(unsigned short value)
+{
+    DBOP_CTRL &= ~(1<<14|1<<13);
+    lcd_delay(10);
+    DBOP_DOUT16 = value;
+    while ((DBOP_STAT & (1<<10)) == 0);
+}
 
 static void lcd_write_cmd(int cmd)
 {
-    int x;
-
     /* Write register */
     DBOP_TIMPOL_23 = 0xa167006e;
-    lcd_write_single_data16(cmd);
+    lcd_write_value16(cmd);
 
     /* Wait for fifo to empty */
     while ((DBOP_STAT & (1<<10)) == 0);
 
     /* This loop is unique to the Fuze */
-    x = 0;
-    do {
-        asm volatile ("nop\n");
-    } while (x++ < 4);
-
+    lcd_delay(4);
 
     DBOP_TIMPOL_23 = 0xa167e06f;
 }
@@ -103,13 +106,14 @@ void lcd_write_data(const fb_data* p_bytes, int count)
     if ((int)p_bytes & 0x3)
     {   /* need to do a single 16bit write beforehand if the address is
          * not word aligned*/
-        lcd_write_single_data16(*p_bytes);
+        lcd_write_value16(*p_bytes);
         count--;p_bytes++;
     }
     /* from here, 32bit transfers are save */
     /* set it to transfer 4*(outputwidth) units at a time,
      * if bit 12 is set it only does 2 halfwords though */
     DBOP_CTRL |= (1<<13|1<<14);
+    lcd_delay(10);
     data = (long*)p_bytes;
     while (count > 1)
     {
@@ -125,7 +129,7 @@ void lcd_write_data(const fb_data* p_bytes, int count)
     /* due to the 32bit alignment requirement or uneven count,
      * we possibly need to do a 16bit transfer at the end also */
     if (count > 0)
-        lcd_write_single_data16(*(fb_data*)data);
+        lcd_write_value16(*(unsigned short*)data);
 }
 
 static void lcd_write_reg(int reg, int value)
@@ -133,7 +137,7 @@ static void lcd_write_reg(int reg, int value)
     unsigned short data = value;
 
     lcd_write_cmd(reg);
-    lcd_write_single_data16(data);
+    lcd_write_value16(data);
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */
@@ -420,7 +424,7 @@ bool lcd_button_support(void)
     lcd_window_y(-1, 0);
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
-    lcd_write_single_data16(data);
+    lcd_write_value16(data);
 
     return true;
 }
