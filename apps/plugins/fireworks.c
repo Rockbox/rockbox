@@ -137,22 +137,22 @@ PLUGIN_HEADER
 #define FIREWORK_SIZE  2
 
 /* position, speed, "phase" (age), color of all fireworks */
-int firework_xpoints[MAX_ROCKETS+1][MAX_FIREWORKS];
-int firework_ypoints[MAX_ROCKETS+1][MAX_FIREWORKS];
-int firework_xspeed[MAX_ROCKETS+1][MAX_FIREWORKS];
-int firework_yspeed[MAX_ROCKETS+1][MAX_FIREWORKS];
-int firework_phase[MAX_ROCKETS+1];
+int firework_xpoints[MAX_ROCKETS][MAX_FIREWORKS];
+int firework_ypoints[MAX_ROCKETS][MAX_FIREWORKS];
+int firework_xspeed[MAX_ROCKETS][MAX_FIREWORKS];
+int firework_yspeed[MAX_ROCKETS][MAX_FIREWORKS];
+int firework_phase[MAX_ROCKETS];
 #ifdef HAVE_LCD_COLOR
-int firework_color[MAX_ROCKETS+1][MAX_FIREWORKS];
+int firework_color[MAX_ROCKETS][MAX_FIREWORKS];
 #endif
 
 /* position, speed, "phase" (age) of all rockets */
-int rocket_xpos[MAX_ROCKETS+1];
-int rocket_ypos[MAX_ROCKETS+1];
-int rocket_xspeed[MAX_ROCKETS+1];
-int rocket_yspeed[MAX_ROCKETS+1];
-int rocket_phase[MAX_ROCKETS+1];
-int rocket_targetphase[MAX_ROCKETS+1];
+int rocket_xpos[MAX_ROCKETS];
+int rocket_ypos[MAX_ROCKETS];
+int rocket_xspeed[MAX_ROCKETS];
+int rocket_yspeed[MAX_ROCKETS];
+int rocket_phase[MAX_ROCKETS];
+int rocket_targetphase[MAX_ROCKETS];
 
 /* settings values. these should eventually be saved to
  * disk. maybe a preset loading/saving system? */
@@ -301,7 +301,10 @@ void init_all(void)
     int j;
 
     for(j=0; j<MAX_ROCKETS; j++)
+    {
+        rocket_phase[j] = -1;
         firework_phase[j] = -1;
+    }
 }
 
 /* called when a rocket hits its destination height.
@@ -317,8 +320,10 @@ void init_explode(int x, int y, int firework, int points)
         firework_xpoints[firework][i] = x;
         firework_ypoints[firework][i] = y;
 
-        firework_xspeed[firework][i] = (rb->rand() % FIREWORK_MOVEMENT_RANGE) - FIREWORK_MOVEMENT_RANGE/2;
-        firework_yspeed[firework][i] = (rb->rand() % FIREWORK_MOVEMENT_RANGE) - FIREWORK_MOVEMENT_RANGE/2;
+        firework_xspeed[firework][i] = (rb->rand() % FIREWORK_MOVEMENT_RANGE)
+                                            - FIREWORK_MOVEMENT_RANGE/2;
+        firework_yspeed[firework][i] = (rb->rand() % FIREWORK_MOVEMENT_RANGE)
+                                            - FIREWORK_MOVEMENT_RANGE/2;
 
 #ifdef HAVE_LCD_COLOR
         firework_color[firework][i] = rb->rand() % 7;
@@ -335,10 +340,13 @@ void init_rocket(int rocket)
     rocket_xpos[rocket] = rb->rand() % LCD_WIDTH;
     rocket_ypos[rocket] = LCD_HEIGHT;
 
-    rocket_xspeed[rocket] = (rb->rand() % ROCKET_MOVEMENT_RANGE) - ROCKET_MOVEMENT_RANGE/2;
+    rocket_xspeed[rocket] = (rb->rand() % ROCKET_MOVEMENT_RANGE)
+                                - ROCKET_MOVEMENT_RANGE/2;
     rocket_yspeed[rocket] = 3;
 
-    rocket_targetphase[rocket] = (ROCKET_LIFE + (rb->rand() % ROCKET_LIFE_VAR)) / rocket_yspeed[rocket];
+    rocket_phase[rocket] = 0;
+    rocket_targetphase[rocket] = (ROCKET_LIFE + (rb->rand() % ROCKET_LIFE_VAR))
+                                    / rocket_yspeed[rocket];
 }
 
 /* startup/configuration menu. */
@@ -379,27 +387,33 @@ void fireworks_menu(void)
                 break;
 
             case 1:
-                rb->set_option("Auto-Fire", &autofire_delay, INT, autofire_delay_settings, 15, NULL);
+                rb->set_option("Auto-Fire", &autofire_delay, INT,
+                                autofire_delay_settings, 15, NULL);
                 break;
 
             case 2:
-                rb->set_option("Particles Per Firework", &particles_per_firework, INT, particle_settings, 8, NULL);
+                rb->set_option("Particles Per Firework", &particles_per_firework,
+                                INT, particle_settings, 8, NULL);
                 break;
 
             case 3:
-                rb->set_option("Particle Life", &particle_life, INT, particle_life_settings, 9, NULL);
+                rb->set_option("Particle Life", &particle_life, INT,
+                                particle_life_settings, 9, NULL);
                 break;
 
             case 4:
-                rb->set_option("Gravity", &gravity, INT, gravity_settings, 4, NULL);
+                rb->set_option("Gravity", &gravity, INT,
+                                gravity_settings, 4, NULL);
                 break;
 
             case 5:
-                rb->set_option("Show Rockets", &show_rockets, INT, rocket_settings, 3, NULL);
+                rb->set_option("Show Rockets", &show_rockets, INT,
+                                rocket_settings, 3, NULL);
                 break;
 
             case 6:
-                rb->set_option("FPS (Speed)", &frames_per_second, INT, fps_settings, 9, NULL);
+                rb->set_option("FPS (Speed)", &frames_per_second, INT,
+                                fps_settings, 9, NULL);
                 break;
 
             case 7:
@@ -419,7 +433,7 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-    int j, i, autofire=0;
+    int j, i;
     int thisrocket=0;
     int start_tick, elapsed_tick;
     int button;
@@ -459,7 +473,8 @@ enum plugin_status plugin_start(const void* parameter)
                     rb->lcd_fillrect(rocket_xpos[j], rocket_ypos[j],
                                      ROCKET_SIZE, ROCKET_SIZE);
                     rb->lcd_set_foreground(LCD_RGBPACK(64,64,64));
-                    rb->lcd_fillrect(rocket_xpos[j]-rocket_xspeed[j], rocket_ypos[j]+rocket_yspeed[j],
+                    rb->lcd_fillrect(rocket_xpos[j]-rocket_xspeed[j],
+                                     rocket_ypos[j]+rocket_yspeed[j],
                                      ROCKET_SIZE, ROCKET_SIZE);
                 }
 #endif
@@ -484,7 +499,8 @@ enum plugin_status plugin_start(const void* parameter)
                     rocket_phase[j] = -1;
 
                     firework_phase[j] = 0;
-                    init_explode(rocket_xpos[j], rocket_ypos[j], j, particle_values[particles_per_firework]);
+                    init_explode(rocket_xpos[j], rocket_ypos[j], j,
+                                particle_values[particles_per_firework]);
                 }
             }
 
@@ -497,22 +513,30 @@ enum plugin_status plugin_start(const void* parameter)
                     firework_ypoints[j][i] += firework_yspeed[j][i];
 
                     if(gravity != 0)
-                        firework_ypoints[j][i] += firework_phase[j]/gravity_values[gravity];
+                        firework_ypoints[j][i] += firework_phase[j]
+                                                    /gravity_values[gravity];
 
 #ifdef HAVE_LCD_COLOR
-                    rb->lcd_set_foreground(firework_darkest_colors[firework_color[j][i]]);
+                    rb->lcd_set_foreground(
+                        firework_darkest_colors[firework_color[j][i]]);
                     rb->lcd_fillrect(firework_xpoints[j][i]-1,
                                      firework_ypoints[j][i]-1,
                                      FIREWORK_SIZE+2, FIREWORK_SIZE+2);
 
-                    if(firework_phase[j] < particle_life_values[particle_life]-10)
-                        rb->lcd_set_foreground(firework_colors[firework_color[j][i]]);
-                    else if(firework_phase[j] < particle_life_values[particle_life]-7)
-                        rb->lcd_set_foreground(firework_dark_colors[firework_color[j][i]]);
-                    else if(firework_phase[j] < particle_life_values[particle_life]-3)
-                        rb->lcd_set_foreground(firework_darker_colors[firework_color[j][i]]);
+                    int phase_left = particle_life_values[particle_life]
+                                        - firework_phase[j];
+                    if(phase_left > 10)
+                        rb->lcd_set_foreground(
+                            firework_colors[firework_color[j][i]]);
+                    else if(phase_left > 7)
+                        rb->lcd_set_foreground(
+                            firework_dark_colors[firework_color[j][i]]);
+                    else if(phase_left > 3)
+                        rb->lcd_set_foreground(
+                            firework_darker_colors[firework_color[j][i]]);
                     else
-                        rb->lcd_set_foreground(firework_darkest_colors[firework_color[j][i]]);
+                        rb->lcd_set_foreground(
+                            firework_darkest_colors[firework_color[j][i]]);
 #endif
                     rb->lcd_fillrect(firework_xpoints[j][i],
                                      firework_ypoints[j][i],
@@ -549,15 +573,11 @@ enum plugin_status plugin_start(const void* parameter)
 
             if(elapsed_tick > autofire_delay_values[autofire_delay])
             {
-                rocket_phase[autofire] = 0;
-                init_rocket(autofire);
+                init_rocket(thisrocket);
+                if(++thisrocket == MAX_ROCKETS)
+                    thisrocket = 0;
 
                 start_tick = *rb->current_tick;
-
-                if(autofire < MAX_ROCKETS)
-                    autofire++;
-                else
-                    autofire = 0;
             }
         }
 
@@ -572,13 +592,9 @@ enum plugin_status plugin_start(const void* parameter)
 
             case BTN_FIRE: /* fire off rockets manually */
             case BTN_FIRE|BUTTON_REPEAT:
-                if(thisrocket < MAX_ROCKETS)
-                    thisrocket++;
-                else
-                    thisrocket=0;
-
-                rocket_phase[thisrocket] = 0;
                 init_rocket(thisrocket);
+                if(++thisrocket == MAX_ROCKETS)
+                    thisrocket=0;
                 break;
         }
     }
