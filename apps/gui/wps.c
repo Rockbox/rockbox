@@ -601,13 +601,12 @@ int wps_get_touchaction(struct wps_data *data)
             regions = regions->next;
             continue;
         }
-        /* reposition the touch inside the viewport */    
-        vx = x - r->wvp->vp.x;
-        vy = y - r->wvp->vp.y;
         /* check if it's inside this viewport */
-        if (vx >= 0 && vx < r->wvp->vp.x + r->wvp->vp.width &&
-            vy >= 0 && vy < r->wvp->vp.y + r->wvp->vp.height)
-        {
+        if (viewport_point_within_vp(&(r->wvp->vp), x, y))
+        {   /* reposition the touch inside the viewport since touchregions
+             * are relative to a preceding viewport */
+            vx = x - r->wvp->vp.x;
+            vy = y - r->wvp->vp.y;
             /* now see if the point is inside this region */
             if (vx >= r->x && vx < r->x+r->width &&
                 vy >= r->y && vy < r->y+r->height)

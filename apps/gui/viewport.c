@@ -401,4 +401,13 @@ static unsigned viewport_init_ui_vp(void)
     return ret;
 }
 
+#ifdef HAVE_TOUCHSCREEN
+/* check if a point (x and y coordinates) are within a viewport */
+bool viewport_point_within_vp(const struct viewport *vp, int x, int y)
+{
+    bool is_x = (x >= vp->x && x < (vp->x + vp->width));
+    bool is_y = (y >= vp->y && y < (vp->y + vp->height));
+    return (is_x && is_y);
+}
+#endif /* HAVE_TOUCHSCREEN */
 #endif /* HAVE_LCD_BITMAP */

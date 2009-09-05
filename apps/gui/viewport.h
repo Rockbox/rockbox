@@ -116,6 +116,10 @@ struct viewport* viewport_get_current_vp(void);
  */
 void viewport_set_current_vp(struct viewport* vp);
 
+#ifdef HAVE_TOUCHSCREEN
+bool viewport_point_within_vp(const struct viewport *vp, int x, int y);
+#endif
+
 #else /* HAVE_LCD_CHARCELL */
 #define viewport_set_current_vp(a)
 #define viewport_get_current_vp() NULL
