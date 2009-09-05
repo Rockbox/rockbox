@@ -1083,7 +1083,8 @@ int radio_screen(void)
 #ifndef HAVE_NOISY_IDLE_MODE
     cpu_idle_mode(false);
 #endif
-
+    FOR_NB_SCREENS(i)
+        screens[i].scroll_stop(&vp[i]);
     viewportmanager_set_statusbar(oldbars);
     in_screen = false;
 #if CONFIG_CODEC != SWCODEC
