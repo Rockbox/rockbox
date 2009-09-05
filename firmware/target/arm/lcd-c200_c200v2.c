@@ -29,6 +29,7 @@
 #ifdef SANSA_C200V2
 /* button driver needs to know if a lcd operation is in progress */
 static bool lcd_busy = false;
+static unsigned short dbop_input = 0xFFFF;
 #endif
 
 /* Display status */
@@ -182,24 +183,45 @@ static inline void as3525_dbop_init(void)
     lcd_delay(20);
 }
 
-/* we need to set the DBOP_DOUT pins high, for correct dbop reads */
-bool lcd_button_support(void)
+static unsigned short lcd_dbop_read(void)
 {
-    const fb_data data = 0xffff;
+    unsigned int dbop_ctrl_old = DBOP_CTRL;
+    unsigned int dbop_timpol23_old = DBOP_TIMPOL_23;
+    unsigned int value;
+    
+    /* make sure that the DBOP FIFO is empty */
+    while ((DBOP_STAT & (1<<10)) == 0);
 
-    if (lcd_busy)       /* we can't use dbop for reading if we are in the */
-        return false;   /* middle of a write operation */
+    /* write DBOP_DOUT to pre-charge DBOP data lines with a high level */
+    DBOP_TIMPOL_23 = 0xe167e167;    /* no strobe towards lcd */
+    DBOP_CTRL = (1 << 16) |         /* enw=1 (enable write) */
+                (1 << 12);          /* ow=1 (16-bit data width) */
+    DBOP_DOUT = 0xFFFF;             /* all pins high */
+    while ((DBOP_STAT & (1<<10)) == 0);
 
-    /* use out of screen coordinates */
-    lcd_send_command(R_X_ADDR_AREA, 0);
-    lcd_send_command(1, 0);
-    lcd_send_command(R_Y_ADDR_AREA, 0);
-    lcd_send_command(1, 0);
-
-    lcd_write_data(&data, 1);
-
-    return true;
+    /* perform a DBOP read */
+    DBOP_CTRL = (1 << 15) |         /* strd=1 (start read) */
+                (1 << 12) |         /* ow=1 (16-bit data width) */
+                (31 << 0);          /* rs_t=31 (read DBOP at end of cycle) */
+    while ((DBOP_STAT & (1<<16)) == 0);
+    value = DBOP_DIN;
+    
+    /* restore previous values */
+    DBOP_TIMPOL_23 = dbop_timpol23_old;
+    DBOP_CTRL = dbop_ctrl_old;
+    
+    return value;
 }
+
+/* get the DBOP input value, either directly or cached if DBOP is busy */
+unsigned short int lcd_dbop_input(void)
+{
+    if (!lcd_busy) {
+        dbop_input = lcd_dbop_read();
+    }
+    return dbop_input;
+}
+
 #endif
 
 /* LCD init */
@@ -430,6 +452,8 @@ void lcd_update_rect(int x, int y, int width, int height)
 
 #ifdef SANSA_C200V2
     lcd_busy = true;
+    /* perform a dbop read before doing a potentially lengthy lcd update */
+    dbop_input = lcd_dbop_read();
 #endif
 
     if (width <= 1) {
