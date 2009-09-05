@@ -112,11 +112,13 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     right_width = display->getstringsize(s, NULL, NULL);
 
     width = MAX(left_width, right_width);
-    if (width*2 + vp_icons[screen].width > display->lcdwidth)
-        width = (display->lcdwidth - vp_icons[screen].width)/2;
-    else /* add more gap in icons vp */
-    {
-        int excess = display->lcdwidth - vp_icons[screen].width - width*2;
+    if (width*2 + vp_icons[screen].width > parent->width)
+    {   /* crop text viewports */
+        width = (parent->width - vp_icons[screen].width)/2;
+    }
+    else
+    {   /* add more gap in icons vp */
+        int excess = parent->width - vp_icons[screen].width - width*2;
         if (excess > MARGIN*4)
         {
             pad = MARGIN;
@@ -315,7 +317,7 @@ static int quickscreen_touchscreen_button(void)
 #endif
 static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
 {
-    int button, i;
+    int button, i, j;
     struct viewport vp[NB_SCREENS];
     bool changed = false;
     /* To quit we need either :
@@ -367,6 +369,12 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
     }
     /* Notify that we're exiting this screen */
     cond_talk_ids_fq(VOICE_OK);
+    FOR_NB_SCREENS(i)
+    {   /* stop scrolling before exiting */
+        for (j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
+            screens[i].scroll_stop(&vps[i][j]);
+    }
+    
     return changed;
 }
 
