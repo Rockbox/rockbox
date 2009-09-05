@@ -185,5 +185,8 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
     }
     if(result_displayed)
         sleep(HZ);
+
+    FOR_NB_SCREENS(i) /* stop scrolling before getting out */
+        screens[i].scroll_stop(yn[i].vp);
     return(result);
 }
