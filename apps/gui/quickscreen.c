@@ -286,24 +286,28 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
     return true;
 }
 #ifdef HAVE_TOUCHSCREEN
-/* figure out which button was pressed...
- * top is exit, left/right/botton are the respective actions
- */
+/* figure out which button was pressed... */
+static bool xy_is_within_viewport(int x, int y, const struct viewport *vp)
+{
+    bool is_x = (x > vp->x && x < (vp->x + vp->width));
+    bool is_y = (y > vp->y && y < (vp->y + vp->height));
+    return (is_x && is_y);
+}
+
 static int quickscreen_touchscreen_button(const struct viewport
                                                     vps[QUICKSCREEN_ITEM_COUNT])
 {
     short x,y;
+    /* only hitting the text counts, everything else is exit */
     if (action_get_touchscreen_press(&x, &y) != BUTTON_REL)
         return ACTION_NONE;
-    if (y < vps[QUICKSCREEN_LEFT].y)
-        return ACTION_STD_CANCEL;
-    else if (y > vps[QUICKSCREEN_LEFT].y +
-                 vps[QUICKSCREEN_LEFT].height)
+    else if (xy_is_within_viewport(x,y,&vps[QUICKSCREEN_TOP]))
+        return ACTION_QS_TOP;
+    else if (xy_is_within_viewport(x,y,&vps[QUICKSCREEN_BOTTOM]))
         return ACTION_QS_DOWN;
-    else if (x < vps[QUICKSCREEN_LEFT].x +
-                 vps[QUICKSCREEN_LEFT].width)
+    else if (xy_is_within_viewport(x,y,&vps[QUICKSCREEN_LEFT]))
         return ACTION_QS_LEFT;
-    else if (x >= vps[QUICKSCREEN_RIGHT].x)
+    else if (xy_is_within_viewport(x,y,&vps[QUICKSCREEN_RIGHT]))
         return ACTION_QS_RIGHT;
     return ACTION_STD_CANCEL;
 }    
