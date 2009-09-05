@@ -281,7 +281,7 @@ void lcd_update_rect(int x0, int y, int width, int height)
         addr = &lcd_framebuffer[y][x0];
 
         lcd_send_cmd(LCD_CNTL_DATA_WRITE);
-        for (x = x0; x < width; x++)
+        for (x = 0; x < width; x++)
             lcd_send_data(*addr++);
     }
 }
