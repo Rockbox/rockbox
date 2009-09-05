@@ -289,20 +289,21 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
 /* figure out which button was pressed...
  * top is exit, left/right/botton are the respective actions
  */
-static int quickscreen_touchscreen_button(void)
+static int quickscreen_touchscreen_button(const struct viewport
+                                                    vps[QUICKSCREEN_ITEM_COUNT])
 {
     short x,y;
     if (action_get_touchscreen_press(&x, &y) != BUTTON_REL)
         return ACTION_NONE;
-    if (y < vps[SCREEN_MAIN][QUICKSCREEN_LEFT].y)
+    if (y < vps[QUICKSCREEN_LEFT].y)
         return ACTION_STD_CANCEL;
-    else if (y > vps[SCREEN_MAIN][QUICKSCREEN_LEFT].y +
-                 vps[SCREEN_MAIN][QUICKSCREEN_LEFT].height)
+    else if (y > vps[QUICKSCREEN_LEFT].y +
+                 vps[QUICKSCREEN_LEFT].height)
         return ACTION_QS_DOWN;
-    else if (x < vps[SCREEN_MAIN][QUICKSCREEN_LEFT].x +
-                 vps[SCREEN_MAIN][QUICKSCREEN_LEFT].width)
+    else if (x < vps[QUICKSCREEN_LEFT].x +
+                 vps[QUICKSCREEN_LEFT].width)
         return ACTION_QS_LEFT;
-    else if (x >= vps[SCREEN_MAIN][QUICKSCREEN_RIGHT].x)
+    else if (x >= vps[QUICKSCREEN_RIGHT].x)
         return ACTION_QS_RIGHT;
     return ACTION_STD_CANCEL;
 }    
@@ -339,7 +340,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
         button = get_action(CONTEXT_QUICKSCREEN,HZ/5);
 #ifdef HAVE_TOUCHSCREEN
         if (button == ACTION_TOUCHSCREEN)
-            button = quickscreen_touchscreen_button();
+            button = quickscreen_touchscreen_button(vps[SCREEN_MAIN]);
 #endif
         if(default_event_handler(button) == SYS_USB_CONNECTED)
             return(true);
