@@ -39,22 +39,28 @@ $(LIBUCL):
 
 # This file can be generated in the dualboot/ directory
 $(OUT)/dualboot.o: dualboot.c
-	$(CC) $(CFLAGS) -c -o $(OUT)/dualboot.o dualboot.c
+	@echo CC $<
+	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/dualboot.o dualboot.c
 
 $(OUT)/md5.o: md5.c md5.h
-	$(CC) $(CFLAGS) -c -o $(OUT)/md5.o -W -Wall md5.c
+	@echo CC $<
+	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/md5.o -W -Wall md5.c
 
 $(OUT)/mkamsboot.o: mkamsboot.c dualboot.h md5.h
-	$(CC) $(CFLAGS) -c -o $(OUT)/mkamsboot.o -W -Wall mkamsboot.c -DVERSION=\"$(APPVERSION)\"
+	@echo CC $<
+	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/mkamsboot.o -W -Wall mkamsboot.c -DVERSION=\"$(APPVERSION)\"
 
 $(OUTPUT):  $(OUT) $(OUT)/mkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o $(LIBUCL)
-	$(CC) $(CFLAGS) -o $(OUTPUT) $(OUT)/mkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o $(LIBUCL)
+	@echo CC $<
+	$(SILENT)$(CC) $(CFLAGS) -o $(OUTPUT) $(OUT)/mkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o $(LIBUCL)
 
 $(OUT)/libmkamsboot.o: mkamsboot.c dualboot.h md5.h
-	$(CC) $(CFLAGS) -DLIB -c -o $(OUT)/libmkamsboot.o -W -Wall mkamsboot.c
+	@echo CC $<
+	$(SILENT)$(CC) $(CFLAGS) -DLIB -c -o $(OUT)/libmkamsboot.o -W -Wall mkamsboot.c
 
 libmkamsboot$(RBARCH).a: $(OUT) $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
-	$(AR) ru $(TARGET_DIR)libmkamsboot$(RBARCH).a $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
+	@echo AR $@
+	$(SILENT)$(AR) ru $(TARGET_DIR)libmkamsboot$(RBARCH).a $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
@@ -68,7 +74,7 @@ endif
 libmkamsboot-universal: libmkamsbooti386.a libmkamsbootppc.a
 	@echo lipo $(TARGET_DIR)libmkamsboot.a
 	$(SILENT) rm -f $(TARGET_DIR)libmkamsboot.a
-	lipo -create $(TARGET_DIR)libmkamsbootppc.a $(TARGET_DIR)libmkamsbooti386.a -output $(TARGET_DIR)libmkamsboot.a    
+	lipo -create $(TARGET_DIR)libmkamsbootppc.a $(TARGET_DIR)libmkamsbooti386.a -output $(TARGET_DIR)libmkamsboot.a
     
 clean:
 	rm -f $(OUTPUT) libmkamsboot.o $(TARGET_DIR)libmkamsboot*.a
