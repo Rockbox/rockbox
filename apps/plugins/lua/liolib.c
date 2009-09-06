@@ -151,7 +151,7 @@ static int io_open (lua_State *L) {
         case 'r':
             flags = O_RDONLY; break;
         case 'w':
-            flags = O_WRONLY; break;
+            flags = O_WRONLY | O_TRUNC; break;
         case 'a':
             flags = O_WRONLY | O_APPEND; break;
     }
