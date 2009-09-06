@@ -275,8 +275,6 @@ static const struct wps_tag all_tags[] = {
 #endif
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     { WPS_TOKEN_VLED_HDD,                 "lh",  WPS_REFRESH_DYNAMIC, NULL },
-#else
-    #error why doesnt this target enable vled?
 #endif
 
     { WPS_TOKEN_MAIN_HOLD,                "mh",  WPS_REFRESH_DYNAMIC, NULL },
