@@ -131,8 +131,6 @@
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x07B4
 #define USB_PRODUCT_ID 0x0280
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ

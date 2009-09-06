@@ -479,7 +479,7 @@ Lyre prototype 1*/
 #endif
 
 #ifndef CONFIG_LED
-#define CONFIG_LED 0
+#define CONFIG_LED LED_VIRTUAL
 #endif
 
 #ifndef CONFIG_CHARGING

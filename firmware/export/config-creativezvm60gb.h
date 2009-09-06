@@ -146,9 +146,6 @@
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
 
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL
-
 /* define this if the backlight can be set to a brightness */
 //#define __BACKLIGHT_INIT
 

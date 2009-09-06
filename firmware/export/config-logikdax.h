@@ -129,9 +129,6 @@
 /* #define ROM_START 0x11010 for behind original Archos */
 #define ROM_START 0x7010 /* for behind BootBox */
 
-/* Software controlled LED */
-#define CONFIG_LED LED_VIRTUAL
-
 #define CONFIG_LCD LCD_SSD1815
 
 #define BOOTFILE_EXT "logik"

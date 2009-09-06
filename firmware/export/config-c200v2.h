@@ -184,9 +184,6 @@
 
 #endif /* BOOTLOADER */
 
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL
-
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 

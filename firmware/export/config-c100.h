@@ -114,10 +114,7 @@
 
 /* The start address index for ROM builds */
 /* #define ROM_START 0x11010 for behind original Archos */
-#define ROM_START 0x7010 /* for behind BootBox */        
-
-/* Software controlled LED */
-#define CONFIG_LED LED_VIRTUAL
+#define ROM_START 0x7010 /* for behind BootBox */      
 
 #define CONFIG_LCD LCD_S6B33B2 
 

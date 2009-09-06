@@ -58,9 +58,6 @@
 /* Define this if you have the WM8975 audio codec */
 /* #define HAVE_WM8975 */
 
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL
-
 #define HAVE_LCD_CONTRAST
 
 #define MIN_CONTRAST_SETTING        5

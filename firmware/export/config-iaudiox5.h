@@ -162,9 +162,6 @@
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
 
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL
-
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
 

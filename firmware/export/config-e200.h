@@ -203,9 +203,6 @@
 
 /** Port-specific settings **/
 
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL
-
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING      1
 #define MAX_BRIGHTNESS_SETTING     12

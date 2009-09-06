@@ -153,9 +153,6 @@
 #define USE_ROCKBOX_USB
 #define USB_VENDOR_ID 0x0B70
 #define USB_PRODUCT_ID 0x00BA
- 
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ

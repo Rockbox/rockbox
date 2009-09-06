@@ -152,9 +152,6 @@
 
 #endif /* BOOTLOADER */
 
-/* Software controlled LED */
-#define CONFIG_LED LED_VIRTUAL
-
 #define CONFIG_LCD LCD_SSD1815
 
 #define BOOTFILE_EXT "sansa"

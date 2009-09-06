@@ -192,9 +192,6 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL
-
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC  0
 

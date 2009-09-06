@@ -187,10 +187,6 @@
 #define USB_VENDOR_ID 0x05ac
 #define USB_PRODUCT_ID 0x1205
 
-
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL
-
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 

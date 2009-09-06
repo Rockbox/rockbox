@@ -150,9 +150,6 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
-/* Software controlled LED */
-#define CONFIG_LED LED_VIRTUAL
-
 #define CONFIG_LCD LCD_IAUDIO67
 
 #define BOOTFILE_EXT "iaudio"

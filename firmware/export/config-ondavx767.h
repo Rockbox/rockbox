@@ -148,9 +148,6 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL
-
 /* define this if the backlight can be set to a brightness */
 #define __BACKLIGHT_INIT
 
