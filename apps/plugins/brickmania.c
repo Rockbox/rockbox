@@ -619,6 +619,7 @@ int difficulty = NORMAL;
 int pad_width;
 int num_count;
 bool resume = false;
+bool resume_file = false;
 
 typedef struct cube {
     int powertop;
@@ -751,8 +752,6 @@ static void brickmania_loadgame(void)
 
     rb->close(fd);
 
-    /* delete saved file */
-    rb->remove(SAVE_FILE);
     return;
 }
 
@@ -922,6 +921,8 @@ static int brickmania_menu(void)
             case 0:
                 if(game_state!=ST_READY)
                     game_state = ST_PAUSE;
+                if(resume_file)
+                    rb->remove(SAVE_FILE);
                 return 0;
             case 1:
                 score=0;
@@ -982,6 +983,7 @@ static int brickmania_game_loop(void)
         return 1;
     }
     resume = false;
+    resume_file = false;
 
     while(true) {
         /* Convert CYCLETIME (in ms) to HZ */
@@ -1778,6 +1780,7 @@ enum plugin_status plugin_start(const void* parameter)
     /* now go ahead and have fun! */
     rb->srand( *rb->current_tick );
     brickmania_loadgame();
+    resume_file = resume;
     while(brickmania_game_loop() == 0) {
         if(!resume) {
             int position = highscore_update(score, level+1, "", highest, NUM_SCORES);

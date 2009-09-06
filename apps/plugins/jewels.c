@@ -420,6 +420,7 @@ struct puzzle_level puzzle_levels[NUM_PUZZLE_LEVELS] = {
 #define HIGH_SCORE PLUGIN_GAMES_DIR "/jewels.score"
 struct highscore highest[NUM_SCORES];
 
+static bool resume_file = false;
 
 /*****************************************************************************
 * jewels_setcolors() set the foreground and background colors.
@@ -458,8 +459,6 @@ static bool jewels_loadgame(struct game_context* bj)
 
     rb->close(fd);
 
-    /* delete saved file */
-    rb->remove(SAVE_FILE);
     return loaded;
 }
 
@@ -1361,6 +1360,8 @@ static int jewels_game_menu(struct game_context* bj, bool ingame)
         switch (rb->do_menu(&main_menu, &choice, NULL, false)) {
             case 0:
                 jewels_setcolors();
+                if(resume_file)
+                    rb->remove(SAVE_FILE);
                 return 0;
             case 1:
                 jewels_init(bj);
@@ -1402,9 +1403,11 @@ static int jewels_main(struct game_context* bj) {
     int x=0, y=0;
 
     bool loaded = jewels_loadgame(bj);
+    resume_file = loaded;
     if (jewels_game_menu(bj, loaded)!=0)
         return 0;
 
+    resume_file = false;
     while(true) {
         no_movesavail = false;
 

@@ -1274,6 +1274,7 @@ struct highscore highscores[NUM_SCORES];
 
 /* used to denote available resume info */
 static bool resume = false;
+static bool resume_file = false;
 static unsigned int highlevel = 0; /* the highest level beaten */
 static unsigned int last_highlevel = 0;
 
@@ -2393,14 +2394,15 @@ static int bubbles_menu(struct game_context* bb) {
                     rb->splash(HZ/2, "Nothing to resume");
                 else
                     startgame = true;
-
-                if(rb->file_exists(SAVE_FILE))
-                    rb->remove(SAVE_FILE); 
+                if(resume_file)
+                    rb->remove(SAVE_FILE);
+                resume_file = false;
                 break;
             case 1: /* new game */
                 bb->level = startlevel;
                 startgame = true;
                 resume = false;
+                resume_file = false;
                 break;
             case 2: /* choose level */
                 startlevel++;
@@ -2497,6 +2499,7 @@ enum plugin_status plugin_start(const void* parameter) {
 
     /* load files */
     resume = bubbles_loadgame(&bb);
+    resume_file = resume;
     bubbles_loaddata();
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);
     rb->lcd_clear_display();

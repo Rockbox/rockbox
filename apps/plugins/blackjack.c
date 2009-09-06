@@ -36,8 +36,8 @@ PLUGIN_HEADER
 /* final game return status */
 enum {
     BJ_LOSE,
+    BJ_QUIT_WITHOUT_SAVING,
     BJ_QUIT,
-    BJ_SAVE_AND_QUIT,
     BJ_USB,
     BJ_END,
 };
@@ -514,7 +514,8 @@ typedef struct game_context {
     bool asked_insurance;
 } game_context;
 
-static bool resume;
+static bool resume = false;
+static bool resume_file = false;
 static struct highscore highest[NUM_SCORES];
 
 /*****************************************************************************
@@ -855,23 +856,19 @@ static bool blackjack_loadgame(struct game_context* bj) {
     signed int fd;
     bool loaded = false;
 
-    resume = false;
     /* open game file */
     fd = rb->open(SAVE_FILE, O_RDONLY);
-    if(fd < 0) return loaded;
+    if(fd < 0) return false;
 
     /* read in saved game */
     if(rb->read(fd, bj, sizeof(struct game_context))
             == (long)sizeof(struct game_context))
     {
-        resume = true;
         loaded = true;
     }
 
     rb->close(fd);
 
-    /* delete saved file */
-    rb->remove(SAVE_FILE);
     return loaded;
 }
 
@@ -1204,7 +1201,8 @@ static unsigned int blackjack_menu(struct game_context* bj) {
     MENUITEM_STRINGLIST(menu, "BlackJack Menu", NULL,
                         "Resume Game", "Start New Game",
                         "High Scores", "Help",
-                        "Playback Control", "Quit", "Save and Quit");
+                        "Playback Control",
+                        "Quit without Saving", "Quit");
 
     while(!breakout) {
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
@@ -1213,6 +1211,8 @@ static unsigned int blackjack_menu(struct game_context* bj) {
                     rb->splash(HZ*2, "Nothing to resume");
                 } else {
                     breakout = true;
+                    if(resume_file)
+                        rb->remove(SAVE_FILE);
                 }
                 break;
             case 1:
@@ -1231,9 +1231,9 @@ static unsigned int blackjack_menu(struct game_context* bj) {
                     return BJ_USB;
                 break;
             case 5:
-                return BJ_QUIT;
+                return BJ_QUIT_WITHOUT_SAVING;
             case 6:
-                return BJ_SAVE_AND_QUIT;
+                return BJ_QUIT;
 
             case MENU_ATTACHED_USB:
                 return BJ_USB;
@@ -1278,6 +1278,7 @@ static int blackjack(struct game_context* bj) {
     *       play        *
     ********************/
 
+    resume_file = false;
     /* check for resumed game */
     if(resume) {
         resume = false;
@@ -1508,7 +1509,8 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* load high scores */
     highscore_load(HIGH_SCORE,highest,NUM_SCORES);
-    blackjack_loadgame(&bj);
+    resume = blackjack_loadgame(&bj);
+    resume_file = resume;
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
@@ -1537,15 +1539,13 @@ enum plugin_status plugin_start(const void* parameter)
                 highscore_save(HIGH_SCORE,highest,NUM_SCORES);
                 return PLUGIN_USB_CONNECTED;
 
-            case BJ_SAVE_AND_QUIT:
-                if (resume) {
-                    rb->splash(HZ, "Saving game...");
-                    blackjack_savegame(&bj);
-                }
+            case BJ_QUIT:
+                rb->splash(HZ/5, "Saving Game and Scores...");
+                blackjack_savegame(&bj);
+                highscore_save(HIGH_SCORE,highest,NUM_SCORES);
                 /* fall through */
 
-            case BJ_QUIT:
-                highscore_save(HIGH_SCORE,highest,NUM_SCORES);
+            case BJ_QUIT_WITHOUT_SAVING:
                 exit = true;
                 break;
 
