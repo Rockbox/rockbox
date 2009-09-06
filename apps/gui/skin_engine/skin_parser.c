@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "config.h"
 #include "file.h"
 #include "misc.h"
 #include "plugin.h"
@@ -272,9 +273,10 @@ static const struct wps_tag all_tags[] = {
 #if (CONFIG_CODEC != MAS3507D)
     { WPS_TOKEN_SOUND_PITCH,              "Sp",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
-
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     { WPS_TOKEN_VLED_HDD,                 "lh",  WPS_REFRESH_DYNAMIC, NULL },
+#else
+    #error why doesnt this target enable vled?
 #endif
 
     { WPS_TOKEN_MAIN_HOLD,                "mh",  WPS_REFRESH_DYNAMIC, NULL },
