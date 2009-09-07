@@ -179,6 +179,10 @@ static bool pacbox_menu(void)
                         "Playback Control", "Restart", "Quit");
 
     rb->button_clear_queue();
+    
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_RGB565);
+#endif
 
     while (!menu_quit) {
         result=rb->do_menu(&menu, &selected, NULL, false);
@@ -237,6 +241,10 @@ static bool pacbox_menu(void)
                 break;
         }
     }
+    
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_PAL256);
+#endif
 
     if (need_restart) {
         init_PacmanMachine(settings_to_dip(settings));
@@ -337,7 +345,12 @@ static int gameProc( void )
             renderBackground( video_buffer );
             renderSprites( video_buffer );
 
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+            rb->lcd_blit_pal256(    video_buffer, 0, 0, XOFS, YOFS, 
+                                    ScreenWidth, ScreenHeight);
+#else
             blit_display(rb->lcd_framebuffer,video_buffer);
+#endif
 
             if (settings.showfps) {
                 fps = (video_frames*HZ*100) / (*rb->current_tick-start_time);
@@ -346,7 +359,10 @@ static int gameProc( void )
                 rb->lcd_putsxy(0,0,str);
             }
 
+#if !defined(HAVE_LCD_MODES) || \
+    defined(HAVE_LCD_MODES) && !(HAVE_LCD_MODES & LCD_MODE_PAL256)
             rb->lcd_update();
+#endif
 
             /* Keep the framerate at Pacman's 60fps */
             end_time = start_time + (video_frames*HZ)/FPS;
@@ -398,6 +414,10 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* Initialise the hardware */
     init_PacmanMachine(settings_to_dip(settings));
+    
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_PAL256);
+#endif
 
     /* Load the romset */
     if (loadROMS()) {
@@ -415,6 +435,10 @@ enum plugin_status plugin_start(const void* parameter)
     } else {
         rb->splashf(HZ*2, "No ROMs in %s/pacman/", ROCKBOX_DIR);
     }
+    
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_RGB565);
+#endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);

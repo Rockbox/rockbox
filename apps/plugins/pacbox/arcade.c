@@ -304,6 +304,10 @@ void decodeROMs(void)
                                  (unsigned char) (c >> 16) );
 #endif
     }
+    
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_pal256_update_pal(palette);
+#endif
 }
 
 void getDeviceInfo( enum InputDevice device, unsigned char * mask, unsigned char ** port )
