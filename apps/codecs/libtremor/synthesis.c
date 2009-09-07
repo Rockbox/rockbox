@@ -70,26 +70,17 @@ int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep){
   if(decodep && vi->channels<=CHANNELS){
     vb->pcm = ipcm_vect;
 
-    /* alloc pcm passback storage */
+    /* set pcm end point */
     vb->pcmend=ci->blocksizes[vb->W];
-    if (vd->iram_pcm_storage >= vb->pcmend) { 
-      /* use statically allocated iram buffer */
-      if(vd->reset_pcmb || vb->pcm[0]==NULL)
-      {
-        /* one-time initialisation at codec start
-           NOT for every block synthesis start
-           allows us to flip between buffers once initialised
-           by simply flipping pointers */
-        for(i=0; i<vi->channels; i++)
-          vb->pcm[i] = &vd->iram_pcm[i*vd->iram_pcm_storage];
-      }
-    } else {
-      if(vd->reset_pcmb || vb->pcm[0]==NULL)
-      {
-        /* dynamic allocation (slower) */
-        for(i=0;i<vi->channels;i++)
-          vb->pcm[i]=(ogg_int32_t *)_vorbis_block_alloc(vb,vb->pcmend*sizeof(*vb->pcm[i]));
-      }
+    /* use statically allocated buffer */
+    if(vd->reset_pcmb || vb->pcm[0]==NULL)
+    {
+      /* one-time initialisation at codec start
+         NOT for every block synthesis start
+         allows us to flip between buffers once initialised
+         by simply flipping pointers */
+      for(i=0; i<vi->channels; i++)
+        vb->pcm[i] = &vd->first_pcm[i*ci->blocksizes[1]];
     }
     vd->reset_pcmb = false;
       
