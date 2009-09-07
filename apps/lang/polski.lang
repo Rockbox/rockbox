@@ -23,6 +23,7 @@
 # - Mateusz Kubica
 # - Maciej Adamczak
 # - Marcin Łukasik
+# - Tomasz Kowalczyk
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -267,14 +268,17 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Tak"
+    covond2*: "MENU = Tak"
     h100,h120,h300: "NAVI = Tak"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Tak"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Tak"
+    mrobe500: "PLAY lub POWER = Tak"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -1927,15 +1931,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Głośność brzęczyka"
+    swcodec: "Brzęczyk przy przejściu"
   </dest>
   <voice>
     *: none
-    swcodec: "Głośność brzęczyka"
+    swcodec: "Brzęczyk przy przejściu"
   </voice>
 </phrase>
 <phrase>
@@ -1948,11 +1952,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Mała"
+    swcodec: "Cichy"
   </dest>
   <voice>
     *: none
-    swcodec: "Mała"
+    swcodec: "Cichy"
   </voice>
 </phrase>
 <phrase>
@@ -1965,11 +1969,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Średnia"
+    swcodec: "Średni"
   </dest>
   <voice>
     *: none
-    swcodec: "Średnia"
+    swcodec: "Średni"
   </voice>
 </phrase>
 <phrase>
@@ -1982,11 +1986,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Duża"
+    swcodec: "Głośny"
   </dest>
   <voice>
     *: none
-    swcodec: "Duża"
+    swcodec: "Głośny"
   </voice>
 </phrase>
 <phrase>
@@ -2391,14 +2395,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Budowanie biblioteki... %d znalezionych (OFF żeby wrócić)"
     h100,h120,h300: "Budowanie biblioteki... %d znalezionych (STOP żeby wrócić)"
     ipod*: "Budowanie biblioteki... %d znalezionych (PREV żeby wrócić)"
     x5,m5,gigabeat*,mrobe100: "Budowanie biblioteki... %d znalezionych (LEFT żeby wrócić)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Budowanie biblioteki... %d znalezionych (PREV żeby wrócić)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Budowanie biblioteki... %d znalezionych (PREV żeby wrócić)"
+    sa9200: "Budowanie biblioteki... %d znalezionych (REW żeby wrócić)"
   </dest>
   <voice>
     *: "Znaleziono wpisy do biblioteki"
@@ -2581,15 +2587,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Przeglądaj czcionki"
+    lcd_bitmap: "Czcionka"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Przeglądaj czcionki"
+    lcd_bitmap: "Czcionka"
   </voice>
 </phrase>
 <phrase>
@@ -2597,13 +2603,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Przeglądaj pliki .wps"
+    *: "Ekran odtwarzania"
   </dest>
   <voice>
-    *: "Przeglądaj pliki wyglądu ekranu odtwarzania"
+    *: "Ekran odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -2612,15 +2618,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "Przeglądaj pliki .rwps"
+    remote: "Ekran odtwarzania na pilocie"
   </dest>
   <voice>
     *: none
-    remote: "Przeglądaj pliki wyglądu zdalnego ekranu odtwarzania"
+    remote: "Ekran odtwarzania na pilocie"
   </voice>
 </phrase>
 <phrase>
@@ -4149,14 +4155,18 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
+    sa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Ustaw"
+    mrobe500: = "Serce = Ustaw"
     h100,h120,h300: "NAVI = Ustaw"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Ustaw"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Ustaw"
+    sa9200:"PLAY = Ustaw"
   </dest>
   <voice>
     *: none
@@ -4170,24 +4180,28 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
+    ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = Przywróć"
+    mrobe500: "POWER = Przywróć"
     h100,h120,h300: "STOP = Przywróć"
-    ipod*,c200*,sa9200: "MENU = Przywróć"
+    ipod*,c200*: "MENU = Przywróć"
     x5,m5: "RECORD = Przywróć"
     h10,h10_5gb,e200*,fuze*: "PREV = Przywróć"
     gigabeatf: "POWER = Przywróć"
     mrobe100: "DISPLAY = Przywróć"
     gigabeats: "BACK = Przywróć"
+    sa9200: "LEFT = Przywróć"
   </dest>
   <voice>
     *: none
@@ -5118,7 +5132,7 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
     *: "Przeglądaj style"
@@ -12147,6 +12161,35 @@
   </voice>
 </phrase>
 <phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Lewo"
+  </dest>
+  <voice>
+    *: "Lewo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Prawo"
+  </dest>
+  <voice>
+    *: "Prawo"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_BOTTOM
   desc: DEPRECATED
   user: core
@@ -12187,7 +12230,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Ustaw lewy element Szybkiego Dostępu"
+    quickscreen: "Ustaw jako lewy element Szybkiego Dostępu"
   </dest>
   <voice>
     *: none
@@ -12204,7 +12247,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Ustaw prawy element Szybkiego Dostępu"
+    quickscreen: "Ustaw jako prawy element Szybkiego Dostępu"
   </dest>
   <voice>
     *: none
@@ -12221,7 +12264,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Ustaw dolny element Szybkiego Dostępu"
+    quickscreen: "Ustaw jako dolny element Szybkiego Dostępu"
   </dest>
   <voice>
     *: none
@@ -12299,5 +12342,333 @@
   <voice>
     *: none
     speaker: "Włącz głośnik"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Tryb ekranu dotykowego"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Tryb ekranu dotykowego"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Siatka 3x3"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Siatka 3 na 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Tryb współrzędnych"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Tryb współrzędnych"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Blokuj przejście"
+  </dest>
+  <voice>
+    *: "Blokuj przejście"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Szybciej/Wolniej"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Szybciej/Wolniej"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Prędkość"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Prędkość"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Ustawienia ekranu dotykowego"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Ustawienia ekranu dotykowego"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Kalibruj"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Kalibruj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Usuń kalibrację"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Usuń kalibrację"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Na górze"
+  </dest>
+  <voice>
+    *: "Na górze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Na dole"
+  </dest>
+  <voice>
+    *: "Na dole"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Pasek statusu na pilocie"
+  </dest>
+  <voice>
+    *: none
+    remote: "Pasek statusu na pilocie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc: 
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Półton"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Półton"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Limit"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Limit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Prędkość"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Prędkość"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Pamięć zajmowana przez styl:"
+  </dest>
+  <voice>
+    *: "Pamięć zajmowana przez styl"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Szerokość paska przewijania"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Szerokość paska przewijania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Pozycja paska przewijania"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Pozycja paska przewijania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMITER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limiter Preamp"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Wzmacnianie cichych fragmentów"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Wzmacnianie cichych fragmentów"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Ustaw jako górny element Szybkiego Dostępu"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Ustaw jako górny element Szybkiego Dostępu"
   </voice>
 </phrase>
