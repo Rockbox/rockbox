@@ -45,7 +45,8 @@ static char *next_str(bool next) {
     return next ? "next " : "";
 }
 
-static char *get_token_desc(struct wps_token *token, char *buf, int bufsize)
+static char *get_token_desc(struct wps_token *token, char *buf,
+                            int bufsize, struct wps_data *data)
 {
     bool next = token->next;
 
@@ -116,8 +117,15 @@ static char *get_token_desc(struct wps_token *token, char *buf, int bufsize)
             break;
 
         case WPS_TOKEN_IMAGE_PRELOAD_DISPLAY:
-            snprintf(buf, bufsize, "display preloaded image '%c'",
-                    token->value.i&0xFF);
+        {
+            char subimage = '\0';
+            char label = token->value.i&0xFF;
+            struct gui_img *img = find_image(label, data);
+            if (img && img->num_subimages > 1)
+                subimage = 'a' + (token->value.i>>8);
+            snprintf(buf, bufsize, "display preloaded image '%c%c'",
+                    label, subimage);
+        }
             break;
 
         case WPS_TOKEN_IMAGE_DISPLAY:
@@ -465,7 +473,7 @@ static void dump_wps_tokens(struct wps_data *data)
     /* Dump parsed WPS */
     for (i = 0, token = data->tokens; i < data->num_tokens; i++, token++)
     {
-        get_token_desc(token, buf, sizeof(buf));
+        get_token_desc(token, buf, sizeof(buf), data);
 
         switch(token->type)
         {
@@ -583,21 +591,21 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
             case PARSE_FAIL_INVALID_CHAR:
                 DEBUGF("ERR: Unexpected conditional char after token %d: \"%s\"",
                        data->num_tokens-1,
-                       get_token_desc(&data->tokens[data->num_tokens-1], buf, sizeof(buf))
+                       get_token_desc(&data->tokens[data->num_tokens-1], buf, sizeof(buf), data)
                       );
                 break;
 
             case PARSE_FAIL_COND_SYNTAX_ERROR:
                 DEBUGF("ERR: Conditional syntax error after token %d: \"%s\"",
                        data->num_tokens-1,
-                       get_token_desc(&data->tokens[data->num_tokens-1], buf, sizeof(buf))
+                       get_token_desc(&data->tokens[data->num_tokens-1], buf, sizeof(buf), data)
                       );
                 break;
 
             case PARSE_FAIL_COND_INVALID_PARAM:
                 DEBUGF("ERR: Invalid parameter list for token %d: \"%s\"",
                        data->num_tokens,
-                       get_token_desc(&data->tokens[data->num_tokens], buf, sizeof(buf))
+                       get_token_desc(&data->tokens[data->num_tokens], buf, sizeof(buf), data)
                       );
                 break;
                 

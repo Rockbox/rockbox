@@ -538,7 +538,7 @@ static int parse_image_display(const char *wps_bufptr,
     img = find_image(label, wps_data);
     if (!img)
     {
-        token->value.i = label; /* do debug works */
+        token->value.i = label; /* so debug works */
         return WPS_ERROR_INVALID_PARAM;
     }
 
