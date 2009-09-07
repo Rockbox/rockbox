@@ -97,6 +97,7 @@ static void list_init_viewports(struct gui_synclist *list)
 #endif
         }
     }
+    list_need_reinit = false;
 }
 #else
 #define list_init_viewports(a)
