@@ -27,6 +27,7 @@
 #include "string.h"
 #include "kernel.h"
 #include "memory.h"
+#include "mmu-arm.h"
 #include "system-target.h"
 #include "lcd.h"
 #include "lcd-target.h"
@@ -280,9 +281,15 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
     char *dst;
     
     /* Addresses are relative to start of SDRAM */
-    src     =  src + (src_y*LCD_HEIGHT + src_x) * pix_width - CONFIG_SDRAM_START;
-    dst     =   (char *)FRAME + (y * LCD_HEIGHT + x) * pix_width 
-                    - CONFIG_SDRAM_START;
+    src     =  src + (src_y*LCD_HEIGHT + src_x) * pix_width;
+    dst     =   (char *)FRAME + (y * LCD_HEIGHT + x) * pix_width;
+                    
+    /* Flush the area that is being copied from. */
+    clean_dcache_range(src, (stride*pix_width*width));
+    
+    /* Addresses are relative to start of SDRAM */
+    src     -=  CONFIG_SDRAM_START;
+    dst     -=  CONFIG_SDRAM_START;
     
     /* Enable Clocks */
     IO_CLK_MOD1     |= 1<<8;
@@ -346,10 +353,18 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
                                     int x, int y,
                                     int width, int height, int pix_width) {
     char *dst;
-    /* Addresses are relative to start of SDRAM */
-    src     =  src + (src_x*LCD_HEIGHT + src_y) * pix_width - CONFIG_SDRAM_START;
+    
+    /* Calculate starting place */
+    src     =  src + (src_x*LCD_HEIGHT + src_y) * pix_width;
     dst     =   (char *)FRAME + (LCD_HEIGHT*(LCD_WIDTH-1) - x * LCD_HEIGHT + y) 
-                * pix_width - CONFIG_SDRAM_START;
+                * pix_width;
+    
+    /* Flush the area that is being copied from. */
+    clean_dcache_range(src, (stride*pix_width*width));
+    
+    /* Addresses are relative to start of SDRAM */
+    src     -=  CONFIG_SDRAM_START;
+    dst     -=  CONFIG_SDRAM_START;
     
     /* Enable Clocks */
     IO_CLK_MOD1     |= 1<<8;
@@ -458,8 +473,24 @@ void lcd_update_rect(int x, int y, int width, int height)
 #else
 
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+
+#if defined(LCD_USE_DMA)
     dma_start_transfer16( (char *)lcd_framebuffer, x, y, LCD_HEIGHT, 
         x, y, width, height, 2);
+#else
+    fb_data *src;
+    fb_data *dst;
+    src     =  &lcd_framebuffer[0][0] + (x*LCD_HEIGHT + y);
+    dst     =  FRAME + (LCD_HEIGHT*(LCD_WIDTH-1) - x * LCD_HEIGHT + y);
+
+    while(width > 0) {
+        memcpy(src, dst, height);
+        src += LCD_HEIGHT;
+        dst -= LCD_HEIGHT;
+        width--;
+    }
+#endif
+
 #else
     register fb_data *dst, *src;
     src = &lcd_framebuffer[y][x];
