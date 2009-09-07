@@ -140,7 +140,7 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 {
 #ifdef HAVE_LCD_BITMAP
     if (ui_vp_info.active[screen])
-        *vp = custom_vp[screen];
+        *vp = ui_vp_info.vp[screen];
     else
 #endif
         viewport_set_fullscreen(vp, screen);
@@ -280,6 +280,9 @@ void viewport_set_current_vp(struct viewport* vp)
         ui_vp_info.vp = vp;
     else
         ui_vp_info.vp = custom_vp;
+
+    /* must be done after the assignment above or event handler get old vps */
+    send_event(GUI_EVENT_THEME_CHANGED, NULL);
 }
 
 struct viewport* viewport_get_current_vp(void)
