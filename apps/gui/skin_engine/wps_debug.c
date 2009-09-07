@@ -48,6 +48,9 @@ static char *next_str(bool next) {
 static char *get_token_desc(struct wps_token *token, char *buf,
                             int bufsize, struct wps_data *data)
 {
+#ifndef HAVE_LCD_BITMAP    
+    (void)data; /* kill charcell warning */
+#endif
     bool next = token->next;
 
     switch(token->type)
