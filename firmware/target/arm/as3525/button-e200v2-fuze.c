@@ -32,7 +32,7 @@
 #define WHEEL_COUNTER_DIV       4
 #define ACCEL_INCREMENT         2
 #define ACCEL_SHIFT             2
-#define BUTTON_DELAY            40
+#define BUTTON_DELAY            60
 #endif
 
 #ifdef SANSA_E200V2
