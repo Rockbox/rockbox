@@ -132,6 +132,7 @@ struct gui_synclist
 
 
 #ifdef HAVE_LCD_BITMAP
+extern void list_init(void);
 /* parse global setting to static int */
 extern void gui_list_screen_scroll_step(int ofs);
 

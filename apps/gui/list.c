@@ -38,6 +38,7 @@
 #include "misc.h"
 #include "talk.h"
 #include "viewport.h"
+#include "appevents.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 #define SCROLL_LIMIT 1
@@ -61,21 +62,41 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
 void list_draw(struct screen *display, struct gui_synclist *list);
 
 #ifdef HAVE_LCD_BITMAP
+static int list_need_reinit = false;
+static struct viewport parent[NB_SCREENS];
+
+static void list_force_reinit(void *param)
+{
+    (void)param;
+    list_need_reinit = true;
+}
+
+void list_init(void)
+{
+    add_event(GUI_EVENT_THEME_CHANGED, false, list_force_reinit);
+}
+
 static void list_init_viewports(struct gui_synclist *list)
 {
-    struct viewport* vp;
-    int i;
-    bool parent_used = (*list->parent != NULL);
+    int i, parent_used;
+
+    if (!list)
+        return;
+
+    parent_used = (*list->parent != &parent[SCREEN_MAIN]);
+
     if (!parent_used)
     {
-        vp = viewport_get_current_vp();
         FOR_NB_SCREENS(i)
-            list->parent[i] = &vp[i];
-    }
+        {
+            list->parent[i] = &parent[i];
+            viewport_set_defaults(&parent[i], i);
 #ifdef HAVE_BUTTONBAR
-    if (list && !parent_used && global_settings.buttonbar)
-        list->parent[0]->height -= BUTTONBAR_HEIGHT;
+        if (screens[i].has_buttonbar && !viewport_ui_vp_get_state(i))
+            list->parent[i]->height -= BUTTONBAR_HEIGHT;
 #endif
+        }
+    }
 }
 #else
 #define list_init_viewports(a)
@@ -135,12 +156,7 @@ void gui_synclist_init(struct gui_synclist * gui_list,
         if (list_parent)
             gui_list->parent[i] = &list_parent[i];
         else
-            gui_list->parent[i] =
-#ifdef HAVE_LCD_BITMAP
-                                    NULL;
-#else
-                                    &parent[i];
-#endif
+            gui_list->parent[i] = &parent[i];
     }
     list_init_viewports(gui_list);
     gui_list->limit_scroll = false;
@@ -209,26 +225,13 @@ int gui_list_get_item_offset(struct gui_synclist * gui_list,
 void gui_synclist_draw(struct gui_synclist *gui_list)
 {
     int i;
-    static struct gui_synclist *last_list = NULL;
-    static int last_count = -1;
-#ifdef HAVE_BUTTONBAR
-    static bool last_buttonbar = false;
-#endif
-    if (
-#ifdef HAVE_BUTTONBAR
-        last_buttonbar != screens[SCREEN_MAIN].has_buttonbar ||
-#endif
-        last_list != gui_list ||
-        gui_list->nb_items != last_count)
+#ifdef HAVE_LCD_BITMAP
+    if (list_need_reinit)
     {
         list_init_viewports(gui_list);
         gui_synclist_select_item(gui_list, gui_list->selected_item);
     }
-#ifdef HAVE_BUTTONBAR
-    last_buttonbar = screens[SCREEN_MAIN].has_buttonbar;
 #endif
-    last_count = gui_list->nb_items;
-    last_list = gui_list;
     FOR_NB_SCREENS(i)
     {
         list_draw(&screens[i], gui_list);

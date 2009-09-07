@@ -56,7 +56,7 @@ static int screen_helper_getnblines(void)
 {
     int height=screens[0].lcdheight;
 #ifdef HAVE_LCD_BITMAP
-    if(global_settings.statusbar)
+    if(global_settings.statusbar != STATUSBAR_OFF)
         height -= STATUSBAR_HEIGHT;
 #ifdef HAVE_BUTTONBAR
     if(global_settings.buttonbar && screens[0].has_buttonbar)
@@ -89,10 +89,10 @@ static int screen_helper_remote_getnblines(void)
 {
     int height=screens[1].lcdheight;
 #ifdef HAVE_LCD_BITMAP
-    if(global_settings.statusbar)
+    if(global_settings.statusbar != STATUSBAR_OFF)
         height -= STATUSBAR_HEIGHT;
 #ifdef HAVE_BUTTONBAR
-    if(global_settings.buttonbar && screens[0].has_buttonbar)
+    if(global_settings.buttonbar && screens[1].has_buttonbar)
         height -= BUTTONBAR_HEIGHT;
 #endif
 #endif
@@ -286,6 +286,9 @@ struct screen screens[NB_SCREENS] =
         .backdrop_load=&remote_backdrop_load,
         .backdrop_unload=&remote_backdrop_unload,
         .backdrop_show=&remote_backdrop_show,
+#ifdef HAVE_BUTTONBAR
+        .has_buttonbar=false,
+#endif
     }
 #endif /* HAVE_REMOTE_LCD */
 };

@@ -58,6 +58,7 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen);
 
 #define THEME_STATUSBAR     (BIT_N(0))
 #define THEME_UI_VIEWPORT   (BIT_N(1))
+#define THEME_BUTTONBAR     (BIT_N(2))
 #define THEME_ALL           (~(0u))
 
 #define VP_SB_HIDE_ALL 0
@@ -116,6 +117,10 @@ struct viewport* viewport_get_current_vp(void);
  */
 void viewport_set_current_vp(struct viewport* vp);
 
+/*
+ * returns true if the ui viewport is active on the screen
+ */
+bool viewport_ui_vp_get_state(enum screen_type screen);
 #ifdef HAVE_TOUCHSCREEN
 bool viewport_point_within_vp(const struct viewport *vp, int x, int y);
 #endif

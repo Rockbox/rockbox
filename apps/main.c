@@ -135,6 +135,9 @@ static void app_main(void)
         screens[i].clear_display();
         screens[i].update();
     }
+#ifdef HAVE_LCD_BITMAP
+    list_init();
+#endif
     tree_gui_init();
     gui_syncstatusbar_init(&statusbars);
     viewportmanager_init();

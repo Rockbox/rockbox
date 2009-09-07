@@ -208,6 +208,13 @@ static void statusbar_toggled(void* param)
 void viewportmanager_theme_changed(int which)
 {
     int i;
+#ifdef HAVE_BUTTONBAR
+    if (which & THEME_BUTTONBAR)
+    {   /* don't handle further, the custom ui viewport ignores the buttonbar,
+         * as does viewport_set_defaults(), since only lists use it*/
+        screens[SCREEN_MAIN].has_buttonbar = global_settings.buttonbar;
+    }
+#endif
     if (which & THEME_UI_VIEWPORT)
     {
         int retval = viewport_init_ui_vp();
@@ -245,6 +252,7 @@ void viewportmanager_theme_changed(int which)
                 viewport_set_fullscreen(&custom_vp[i], i);
         }
     }
+    send_event(GUI_EVENT_THEME_CHANGED, NULL);
 }
 
 static void viewportmanager_ui_vp_changed(void *param)
@@ -277,6 +285,11 @@ void viewport_set_current_vp(struct viewport* vp)
 struct viewport* viewport_get_current_vp(void)
 {
     return ui_vp_info.vp;
+}
+
+bool viewport_ui_vp_get_state(enum screen_type screen)
+{
+    return ui_vp_info.active[screen];
 }
 
 #ifdef HAVE_LCD_COLOR
