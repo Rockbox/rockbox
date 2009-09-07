@@ -1280,7 +1280,7 @@ void gui_sync_wps_init(void)
     {
         skin_data_init(&wps_datas[i]);
 #ifdef HAVE_ALBUMART
-        wps_datas[i].wps_uses_albumart = 0;
+        wps_datas[i].albumart = NULL;
 #endif
 #ifdef HAVE_REMOTE_LCD
         wps_datas[i].remote_wps = (i == SCREEN_REMOTE);
@@ -1306,12 +1306,13 @@ bool wps_uses_albumart(int *width, int *height)
     int  i;
     FOR_NB_SCREENS(i) {
         struct gui_wps *gwps = &gui_wps[i];
-        if (gwps->data && (gwps->data->wps_uses_albumart != WPS_ALBUMART_NONE))
+        struct skin_albumart *aa = gwps->data->albumart;
+        if (aa && (aa->wps_uses_albumart != WPS_ALBUMART_NONE))
         {
             if (width)
-                *width = gui_wps[0].data->albumart_max_width;
+                *width = aa->albumart_max_width;
             if (height)
-                *height = gui_wps[0].data->albumart_max_height;
+                *height = aa->albumart_max_height;
             return true;
         }
     }

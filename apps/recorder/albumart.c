@@ -308,6 +308,7 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
         return;
 
     struct wps_data *data = gwps->data;
+    struct skin_albumart *aa = data->albumart;
 
 #ifdef HAVE_REMOTE_LCD
     /* No album art on RWPS */
@@ -315,37 +316,40 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
         return;
 #endif
 
+    if (!aa)
+        return;
+        
     struct bitmap *bmp;
     if (bufgetdata(handle_id, 0, (void *)&bmp) <= 0)
         return;
 
-    short x = data->albumart_x;
-    short y = data->albumart_y;
+    short x = aa->albumart_x;
+    short y = aa->albumart_y;
     short width = bmp->width;
     short height = bmp->height;
 
-    if (data->albumart_max_width > 0)
+    if (aa->albumart_max_width > 0)
     {
         /* Crop if the bitmap is too wide */
-        width = MIN(bmp->width, data->albumart_max_width);
+        width = MIN(bmp->width, aa->albumart_max_width);
 
         /* Align */
-        if (data->albumart_xalign & WPS_ALBUMART_ALIGN_RIGHT)
-            x += data->albumart_max_width - width;
-        else if (data->albumart_xalign & WPS_ALBUMART_ALIGN_CENTER)
-            x += (data->albumart_max_width - width) / 2;
+        if (aa->albumart_xalign & WPS_ALBUMART_ALIGN_RIGHT)
+            x += aa->albumart_max_width - width;
+        else if (aa->albumart_xalign & WPS_ALBUMART_ALIGN_CENTER)
+            x += (aa->albumart_max_width - width) / 2;
     }
 
-    if (data->albumart_max_height > 0)
+    if (aa->albumart_max_height > 0)
     {
         /* Crop if the bitmap is too high */
-        height = MIN(bmp->height, data->albumart_max_height);
+        height = MIN(bmp->height, aa->albumart_max_height);
 
         /* Align */
-        if (data->albumart_yalign & WPS_ALBUMART_ALIGN_BOTTOM)
-            y += data->albumart_max_height - height;
-        else if (data->albumart_yalign & WPS_ALBUMART_ALIGN_CENTER)
-            y += (data->albumart_max_height - height) / 2;
+        if (aa->albumart_yalign & WPS_ALBUMART_ALIGN_BOTTOM)
+            y += aa->albumart_max_height - height;
+        else if (aa->albumart_yalign & WPS_ALBUMART_ALIGN_CENTER)
+            y += (aa->albumart_max_height - height) / 2;
     }
 
     if (!clear)

@@ -319,13 +319,13 @@ const char *get_token_value(struct gui_wps *gwps,
 
 #ifdef HAVE_ALBUMART
         case WPS_TOKEN_ALBUMART_DISPLAY:
-            draw_album_art(gwps, audio_current_aa_hid(), false);
-            return NULL;
-
-        case WPS_TOKEN_ALBUMART_FOUND:
+            if (!data->albumart)
+                return NULL;
             if (audio_current_aa_hid() >= 0) {
+                data->albumart->draw = true;
                 return "C";
             }
+            data->albumart->draw = false;
             return NULL;
 #endif
 

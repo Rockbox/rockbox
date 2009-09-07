@@ -220,6 +220,24 @@ struct touchregion {
     int action;              /* action this button will return */
 };
 #endif
+
+
+#ifdef HAVE_ALBUMART
+struct skin_albumart {
+    /* Album art support */
+    struct viewport *vp;/* The viewport this is in */
+    unsigned char wps_uses_albumart; /* WPS_ALBUMART_NONE, _CHECK, _LOAD */
+    short albumart_x;
+    short albumart_y;
+    unsigned char albumart_xalign; /* WPS_ALBUMART_ALIGN_LEFT, _CENTER, _RIGHT */
+    unsigned char albumart_yalign; /* WPS_ALBUMART_ALIGN_TOP, _CENTER, _BOTTOM */
+    short albumart_max_width;
+    short albumart_max_height;
+
+    bool draw;
+};
+#endif
+
 /* wps_data
    this struct holds all necessary data which describes the
    viewable content of a wps */
@@ -233,18 +251,8 @@ struct wps_data
     struct skin_token_list *progressbars;
     
     bool peak_meter_enabled;
-
 #ifdef HAVE_ALBUMART
-    /* Album art support */
-    unsigned char wps_uses_albumart; /* WPS_ALBUMART_NONE, _CHECK, _LOAD */
-    short albumart_x;
-    short albumart_y;
-    unsigned char albumart_xalign; /* WPS_ALBUMART_ALIGN_LEFT, _CENTER, _RIGHT */
-    unsigned char albumart_yalign; /* WPS_ALBUMART_ALIGN_TOP, _CENTER, _BOTTOM */
-    short albumart_max_width;
-    short albumart_max_height;
-
-    int albumart_cond_index;
+    struct skin_albumart *albumart;
 #endif
 
 #else /*HAVE_LCD_CHARCELLS */

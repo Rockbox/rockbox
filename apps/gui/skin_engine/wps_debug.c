@@ -431,6 +431,12 @@ static char *get_token_desc(struct wps_token *token, char *buf, int bufsize)
             snprintf(buf, bufsize, "pitch value");
             break;
 #endif
+
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
+        case WPS_TOKEN_VLED_HDD:
+            snprintf(buf, bufsize, "display virtual HDD LED");
+            break;
+#endif
         case WPS_VIEWPORT_ENABLE:
             snprintf(buf, bufsize, "enable VP:%d",
                      token->value.i);

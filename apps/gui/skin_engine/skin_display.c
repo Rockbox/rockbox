@@ -77,6 +77,9 @@ void skin_data_init(struct wps_data *wps_data)
     wps_data->peak_meter_enabled = false;
     wps_data->images = NULL;
     wps_data->progressbars = NULL;
+#ifdef HAVE_ALBUMART
+    wps_data->albumart = NULL;
+#endif
     /* progress bars */
 #else /* HAVE_LCD_CHARCELLS */
     int i;
@@ -265,6 +268,14 @@ static void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
         }
         list = list->next;
     }
+#ifdef HAVE_ALBUMART    
+    /* now draw the AA */
+    if (data->albumart && data->albumart->vp == vp && data->albumart->draw)
+    {
+        draw_album_art(gwps, audio_current_aa_hid(), false);
+    }
+#endif
+    
     display->set_drawmode(DRMODE_SOLID);
 }
 
@@ -465,8 +476,11 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
             clear_image_pos(gwps, find_image(data->tokens[i].value.i&0xFF, gwps->data));
 #endif
 #ifdef HAVE_ALBUMART
-        if (data->tokens[i].type == WPS_TOKEN_ALBUMART_DISPLAY)
+        if (data->albumart && data->tokens[i].type == WPS_TOKEN_ALBUMART_DISPLAY)
+        {
             draw_album_art(gwps, audio_current_aa_hid(), true);
+            data->albumart->draw = false;
+        }
 #endif
     }
 
@@ -961,9 +975,9 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
                 skin_viewport->hidden_flags |= VP_DRAW_HIDDEN;
         }
     }
-    
+    int viewport_count = 0;
     for (viewport_list = data->viewports; 
-         viewport_list; viewport_list = viewport_list->next)
+         viewport_list; viewport_list = viewport_list->next, viewport_count++)
     {
         struct skin_viewport *skin_viewport = 
                         (struct skin_viewport *)viewport_list->token->value.data;
