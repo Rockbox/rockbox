@@ -236,6 +236,9 @@ void shades_generate(int time)
 
         r++; g++; b++;
     }
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_pal256_update_pal(colours);
+#endif
 }
 #else
 /* Make a smooth shade from black into white and back into black again. */
@@ -275,7 +278,11 @@ int main(void)
     int button, x, y;
     unsigned char p1,p2,p3,p4,t1,t2,t3,t4, z;
 #ifdef HAVE_LCD_COLOR
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    unsigned char *ptr;
+#else
     fb_data *ptr;
+#endif
     int time=0;
 #else
     unsigned char *ptr;
@@ -303,7 +310,12 @@ int main(void)
     {
 #ifdef HAVE_LCD_COLOR
         shades_generate(time++); /* dynamically */
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+        ptr = (unsigned char*)rb->lcd_framebuffer;
+#else
         ptr = rb->lcd_framebuffer;
+#endif
+
 #else
         ptr = greybuffer;
 #endif
@@ -317,7 +329,11 @@ int main(void)
             {
                 z = wave_array[t1] + wave_array[t2] + wave_array[t3]
                   + wave_array[t4];  
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+                *ptr++ = z;
+#else
                 *ptr++ = colours[z];
+#endif
                 t3+=1;
                 t4+=2;
             }
@@ -330,7 +346,12 @@ int main(void)
         p3+=sp3;
         p4-=sp4;
 #ifdef HAVE_LCD_COLOR
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+        rb->lcd_blit_pal256(    (unsigned char*)rb->lcd_framebuffer,
+                                0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
+#else
         rb->lcd_update();
+#endif
 #else
         grey_ub_gray_bitmap(greybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
@@ -392,7 +413,15 @@ enum plugin_status plugin_start(const void* parameter)
     /* Turn off backlight timeout */
     backlight_force_on(); /* backlight control in lib/helper.c */
 
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_PAL256);
+#endif
+
     ret = main();
+
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_RGB565);
+#endif
 
     return ret;
 }
