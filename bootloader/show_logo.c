@@ -25,7 +25,7 @@
 #include <string.h>
 
 #include "bitmaps/rockboxlogo.h"
-#if CONFIG_CPU == PP5024 || CONFIG_CPU == PP5024 || CONFIG_CPU == PP5024
+#if CONFIG_CPU == PP5024 || CONFIG_CPU == PP5022 || CONFIG_CPU == PP5020
 #ifdef APPSVERSION
 #undef APPSVERSION
 #endif
