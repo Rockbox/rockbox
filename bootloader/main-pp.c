@@ -47,6 +47,11 @@
 #include "usb.h"
 #include "usb_drv.h"
 #endif
+#if defined(SAMSUNG_YH925)
+/* this function (in lcd-yh925.c) resets the screen orientation for the OF
+ * for use with dualbooting */
+void lcd_reset(void);
+#endif
 
 /* Show the Rockbox logo - in show_logo.c */
 extern int show_logo(void);
@@ -575,7 +580,7 @@ void* main(void)
            The rest of the loading is done in crt0.S.
            1) First try reading from the hidden partition (on Sansa only).
            2) Next try a decrypted mi4 file in /System/OF.mi4
-           3) Finally, try a raw firmware binary in /System/OF.mi4. It should be
+           3) Finally, try a raw firmware binary in /System/OF.bin. It should be
               a mi4 firmware decrypted and header stripped using mi4code.
         */
         printf("Loading original firmware...");
@@ -615,6 +620,9 @@ void* main(void)
             printf("Can't load /System/OF.mi4");
             printf(strerror(rc));
         } else {
+#if defined(SAMSUNG_YH925)
+            lcd_reset();
+#endif
             return (void*)loadbuffer;
         }
 
@@ -624,6 +632,9 @@ void* main(void)
             printf("Can't load /System/OF.bin");
             printf(strerror(rc));
         } else {
+#if defined(SAMSUNG_YH925)
+            lcd_reset();
+#endif
             return (void*)loadbuffer;
         }
         
