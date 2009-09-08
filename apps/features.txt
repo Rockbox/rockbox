@@ -132,6 +132,12 @@ recording_swcodec
 #else
 recording_hwcodec
 #endif
+#if defined(HAVE_LINE_IN)
+recording_linein
+#endif
+#if defined(HAVE_MIC_IN)
+recording_mic
+#endif
 #endif
 
 #if defined(HAVE_REMOTE_LCD)
