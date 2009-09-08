@@ -178,6 +178,18 @@ void lcd_set_flip(bool yesno)
     lcd_write_reg(R_DRV_OUTPUT_CONTROL, yesno ? 0x0213 : 0x0113);
 }
 
+/* Reset the LCD prior to booting the OF */
+#ifdef BOOTLOADER
+void lcd_reset(void)
+{
+    lcd_write_reg(R_DRV_OUTPUT_CONTROL, 0x0315);
+    lcd_write_reg(R_ENTRY_MODE, 0x1028);
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 0x7f00);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, 0xaf10);
+    lcd_write_reg(R_RAM_ADDR_SET, 0x0000);
+}
+#endif
+
 /* LCD init */
 void lcd_init_device(void)
 {
