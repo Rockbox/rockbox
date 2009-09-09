@@ -702,11 +702,17 @@ static bool update_curr_subline(struct gui_wps *gwps, struct skin_line *line)
     /* shortcut this whole thing if we need to reset the line completly */
     if (line->curr_subline == NULL)
     {
-        int next_refresh = current_tick;
+        line->subline_expire_time = current_tick;
         line->curr_subline = &line->sublines;
         if (!line->curr_subline->next)
-            next_refresh += 100*HZ;
-        line->subline_expire_time = next_refresh;
+        {
+            line->subline_expire_time += 100*HZ;
+        }
+        else
+        {
+            get_subline_timeout(gwps, line->curr_subline);
+            line->subline_expire_time += TIMEOUT_UNIT*line->curr_subline->time_mult;
+        }
         return true;
     }
     /* if time to advance to next sub-line  */
