@@ -1246,6 +1246,7 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
     int skip = 0, taglen = 0, ret;
     struct wps_token *token = wps_data->tokens + wps_data->num_tokens;
     const struct wps_tag *tag;
+    memset(token, 0, sizeof(*token));
 
     switch(*wps_bufptr)
     {
