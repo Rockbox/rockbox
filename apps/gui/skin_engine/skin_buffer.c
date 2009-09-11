@@ -53,6 +53,7 @@
  */
 
 
+#ifdef HAVE_LCD_BITMAP
 #define MAIN_BUFFER ((LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8) \
                             + (2*LCD_HEIGHT*LCD_WIDTH/8))
 
@@ -66,7 +67,12 @@
 
 #define SKIN_BUFFER_SIZE (MAIN_BUFFER + REMOTE_BUFFER) + \
 						 (WPS_MAX_TOKENS * sizeof(struct wps_token))
+#endif
 
+#ifdef HAVE_LCD_CHARCELLS
+#define SKIN_BUFFER_SIZE (LCD_HEIGHT * LCD_WIDTH) * 64 + \
+                         (WPS_MAX_TOKENS * sizeof(struct wps_token)) 
+#endif
 
 static unsigned char buffer[SKIN_BUFFER_SIZE];
 static unsigned char *buffer_front = NULL; /* start of the free space,
