@@ -466,100 +466,70 @@ static char *get_token_desc(struct wps_token *token, char *buf,
 }
 
 #if defined(SIMULATOR) || defined(__PCTOOL__)
-static void dump_wps_tokens(struct wps_data *data)
+static void dump_skin(struct wps_data *data)
 {
-    struct wps_token *token;
-    int i, j;
     int indent = 0;
     char buf[64];
-
-    /* Dump parsed WPS */
-    for (i = 0, token = data->tokens; i < data->num_tokens; i++, token++)
-    {
-        get_token_desc(token, buf, sizeof(buf), data);
-
-        switch(token->type)
-        {
-
-            case WPS_TOKEN_CONDITIONAL_START:
-                indent++;
-                break;
-
-            case WPS_TOKEN_CONDITIONAL_END:
-                indent--;
-                break;
-
-            default:
-                break;
-        }
-
-        if (wps_verbose_level > 2)
-        {
-            for(j = 0; j < indent; j++) {
-                DEBUGF("\t");
-            }
-
-            DEBUGF("[%3d] = (%2d) %s\n", i, token->type, buf);
-        }
-    }
-}
-
-static void print_line_info(struct wps_data *data)
-{
-    struct skin_line *line;
-    struct skin_subline *subline;
-    if (wps_verbose_level > 0)
-    {
-        struct skin_token_list *viewport_list;
-        for (viewport_list = data->viewports; 
-             viewport_list; viewport_list = viewport_list->next)
-        {
-            struct skin_viewport *v = 
-                            (struct skin_viewport *)viewport_list->token->value.data;
-            DEBUGF("vp Label:'%c' Hidden flags:%x\n", v->label, v->hidden_flags); 
-        }
-        DEBUGF("Number of tokens    : %d\n", data->num_tokens);
-        DEBUGF("\n");
-    }
+    int i, j;
     
-    if (wps_verbose_level > 1)
+    struct skin_token_list *viewport_list;
+    for (viewport_list = data->viewports; 
+         viewport_list; viewport_list = viewport_list->next)
     {
-        int line_number = 0;
-        struct skin_token_list *viewport_list;
-        for (viewport_list = data->viewports; 
-             viewport_list; viewport_list = viewport_list->next)
+        struct skin_viewport *skin_viewport = 
+                        (struct skin_viewport *)viewport_list->token->value.data;
+        indent = 0;
+        DEBUGF("Viewport: '%c'\n", skin_viewport->label); 
+        struct skin_line *line;            
+        for (line = skin_viewport->lines; line; line = line->next)
         {
-            struct skin_viewport *v = 
-                            (struct skin_viewport *)viewport_list->token->value.data;
-            DEBUGF("Viewport '%c' - +%d+%d (%dx%d)\n",v->label, v->vp.x, v->vp.y, 
-                                                    v->vp.width, v->vp.height);
-            for (line = v->lines; line; line = line->next, line_number++)
+            struct skin_subline *subline;
+            indent = 1;
+            for(subline = &line->sublines; subline; subline = subline->next)
             {
-                DEBUGF("Line %2d\n", line_number);
-                int subline_number = 0;
-                subline = &line->sublines;
-                while (subline)
+                DEBUGF("  Subline: tokens %d => %d",
+                       subline->first_token_idx,subline->last_token_idx);
+                if (subline->line_type & WPS_REFRESH_SCROLL)
+                    DEBUGF(", scrolled");
+                else if (subline->line_type & WPS_REFRESH_PLAYER_PROGRESS)
+                    DEBUGF(", progressbar");
+                else if (subline->line_type & WPS_REFRESH_PEAK_METER)
+                    DEBUGF(", peakmeter");
+                DEBUGF("\n");
+
+                for (i = subline->first_token_idx; i <= subline->last_token_idx; i++)
                 {
-                    DEBUGF("    Subline %d: first_token=%3d, last_token=%3d",
-                           subline_number, subline->first_token_idx,subline->last_token_idx);
+                    struct wps_token *token = &data->tokens[i];
+                    get_token_desc(token, buf, sizeof(buf), data);
 
-                    if (subline->line_type & WPS_REFRESH_SCROLL)
-                        DEBUGF(", scrolled");
-                    else if (subline->line_type & WPS_REFRESH_PLAYER_PROGRESS)
-                        DEBUGF(", progressbar");
-                    else if (subline->line_type & WPS_REFRESH_PEAK_METER)
-                        DEBUGF(", peakmeter");
+                    switch(token->type)
+                    {
 
-                    DEBUGF("\n");
-                    subline = subline->next;
-                    subline_number++;
+                        case WPS_TOKEN_CONDITIONAL_START:
+                            indent++;
+                            break;
+
+                        case WPS_TOKEN_CONDITIONAL_END:
+                            indent--;
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    if (wps_verbose_level > 2)
+                    {
+                        for(j = 0; j < indent; j++) {
+                            DEBUGF("\t");
+                        }
+
+                        DEBUGF("[%3d] = (%2d) %s\n", i, token->type, buf);
+                    }
                 }
             }
         }
-
-        DEBUGF("\n");
     }
-}
+}                        
 #endif
 
 void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line)
@@ -567,8 +537,7 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
 #if defined(SIMULATOR) || defined(__PCTOOL__)
     if (debug_wps && wps_verbose_level)
     {
-        dump_wps_tokens(data);
-        print_line_info(data);
+        dump_skin(data);
     }
 #endif /* SIMULATOR */
 
