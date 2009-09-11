@@ -2519,6 +2519,7 @@ fi
       GCCOPTS='';
       appsdir='\$(ROOTDIR)/tools/checkwps';
       output='checkwps.'${modelname};
+      archosrom='';
       echo "CheckWPS build selected"
       ;;
     *)

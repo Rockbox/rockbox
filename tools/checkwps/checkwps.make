@@ -9,13 +9,7 @@
 
 FLAGS=-g -D__PCTOOL__ -DDEBUG -DROCKBOX_DIR_LEN=9 -DWPS_DIR=\".\" $(TARGET)
 
-SRC = $(ROOTDIR)/apps/gui/skin_engine/wps_debug.c \
-      $(ROOTDIR)/apps/gui/skin_engine/skin_parser.c \
-      $(ROOTDIR)/apps/gui/skin_engine/skin_buffer.c \
-      $(ROOTDIR)/apps/misc.c \
-      $(ROOTDIR)/apps/recorder/bmp.c \
-      $(ROOTDIR)/firmware/common/strlcpy.c \
-      $(APPSDIR)/checkwps.c
+SRC= $(call preprocess, $(TOOLSDIR)/checkwps/SOURCES)
 
 INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(ROOTDIR)/apps/gui/skin_engine \

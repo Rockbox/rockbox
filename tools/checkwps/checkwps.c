@@ -348,9 +348,11 @@ const char* viewport_parse_viewport(struct viewport *vp,
 #if (LCD_DEPTH == 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 1)
     if (depth == 1)
     {
+#ifdef HAVE_LCD_BITMAP
         if (!(ptr = parse_list("ddddd", &set, separator, ptr,
                     &vp->x, &vp->y, &vp->width, &vp->height, &vp->font)))
             return NULL;
+#endif
     }
     else
 #endif
@@ -397,6 +399,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
         return NULL;
     }
 
+#ifdef HAVE_LCD_BITMAP
     /* Default to using the user font if the font was an invalid number or '-'*/
     if (((vp->font != FONT_SYSFIXED) && (vp->font != FONT_UI))
             || !LIST_VALUE_PARSED(set, PL_FONT)
@@ -405,6 +408,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
 
     /* Set the defaults for fields not user-specified */
     vp->drawmode = DRMODE_SOLID;
+#endif
 
     return ptr;
 }
