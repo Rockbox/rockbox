@@ -55,8 +55,8 @@
 #define CLK_I2SI             8
 #define CLK_I2SO             9
 #define CLK_DBOP             10
-#define CLK_SD_IDENT_NAND    11
-#define CLK_SD_IDENT_MSD     12
+#define CLK_SD_MCLK_NAND    11
+#define CLK_SD_MCLK_MSD     12
 #define CLK_USB              13
 
 #define I2C2_CPSR0      *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x1C))
@@ -94,24 +94,24 @@ int calc_freq(int clk)
                 return 0;
 
                  /*assume 24MHz oscillator only input available */
-            out_div = ((CGU_PLLA>>13) & 0x3);           /* bits 13:14 */
-            if (out_div == 3)                           /* for 11 NO=4  */
+            out_div = ((CGU_PLLA>>13) & 0x3);         /* bits 13:14 */
+            if (out_div == 3)                         /* for 11 NO=4  */
                 out_div=4;
-            if(out_div)                                 /*  NO = 0 not allowed */
+            if(out_div)                               /*  NO = 0 not allowed */
                 return ((2 * (CGU_PLLA & 0xff))*CLK_MAIN)/
-                       (((CGU_PLLA>>8) & 0x1f)*out_div);
+                                               (((CGU_PLLA>>8) & 0x1f)*out_div);
             return 0;
        case CLK_PLLB:
             if(CGU_PLLBSUP & (1<<3))
                 return 0;
 
                  /*assume 24MHz oscillator only input available */
-            out_div = ((CGU_PLLB>>13) & 0x3);           /* bits 13:14 */
-            if (out_div == 3)                           /* for 11 NO=4  */
+            out_div = ((CGU_PLLB>>13) & 0x3);         /* bits 13:14 */
+            if (out_div == 3)                         /* for 11 NO=4  */
                 out_div=4;
-            if(out_div)                                 /*  NO = 0 not allowed */
+            if(out_div)                               /*  NO = 0 not allowed */
                 return ((2 * (CGU_PLLB & 0xff))*CLK_MAIN)/
-                       (((CGU_PLLB>>8) & 0x1f)*out_div);
+                                               (((CGU_PLLB>>8) & 0x1f)*out_div);
             return 0;
         case CLK_922T:
             if (!(read_cp15()>>30))                 /* fastbus */
@@ -121,11 +121,13 @@ int calc_freq(int clk)
         case CLK_FCLK:
             switch(CGU_PROC & 3) {
                 case 0:
-                    return (CLK_MAIN * (8 - prediv)) / (8*(postdiv + 1));
+                    return (CLK_MAIN * (8 - prediv)) / (8 * (postdiv + 1));
                 case 1:
-                    return (calc_freq(CLK_PLLA) * (8 - prediv)) / (8*(postdiv + 1));
+                    return (calc_freq(CLK_PLLA) * (8 - prediv)) /
+                                                            (8 * (postdiv + 1));
                 case 2:
-                    return (calc_freq(CLK_PLLB) * (8 - prediv)) / (8*(postdiv + 1));
+                    return (calc_freq(CLK_PLLB) * (8 - prediv)) /
+                                                            (8 * (postdiv + 1));
                 default:
                     return 0;
             }
@@ -181,20 +183,20 @@ int calc_freq(int clk)
             }
         case CLK_DBOP:
             return calc_freq(CLK_PCLK)/((CGU_DBOP & 7)+1);
-        case CLK_SD_IDENT_NAND:
+        case CLK_SD_MCLK_NAND:
             if(!(MCI_NAND & (1<<8)))
                 return 0;
             else if(MCI_NAND & (1<<10))
                 return calc_freq(CLK_PCLK);
             else
-                return calc_freq(CLK_PCLK)/(((MCI_NAND & 0xff)*2)+1);
-        case CLK_SD_IDENT_MSD:
+                return calc_freq(CLK_PCLK)/(((MCI_NAND & 0xff)+1)*2);
+        case CLK_SD_MCLK_MSD:
             if(!(MCI_SD & (1<<8)))
                 return 0;
             else if(MCI_SD & (1<<10))
                 return calc_freq(CLK_PCLK);
             else
-            return calc_freq(CLK_PCLK)/(((MCI_SD & 0xff)*2)+1);
+            return calc_freq(CLK_PCLK)/(((MCI_SD & 0xff)+1)*2);
         case CLK_USB:
             switch(CGU_USB & 3) {     /* 0-> div=1  other->div=1/(2*n)  */
                 case 0:
@@ -224,6 +226,10 @@ bool __dbg_hw_info(void)
 {
     char buf[50];
     int line;
+    int last_nand = 0;
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
+    int last_sd = 0;
+#endif
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
@@ -236,10 +242,12 @@ bool __dbg_hw_info(void)
         line = 0;
         _DEBUG_PRINTF("[Clock Frequencies:]");
         _DEBUG_PRINTF("      SET       ACTUAL");
-        _DEBUG_PRINTF("922T:%s     %3dMHz", (!(read_cp15()>>30)) ? "FAST " :
-                                              (read_cp15()>>31) ? "ASYNC" : "SYNC " ,
-                                               calc_freq(CLK_922T)/1000000);
-        _DEBUG_PRINTF("PLLA:%3dMHz    %3dMHz", AS3525_PLLA_FREQ/1000000, calc_freq(CLK_PLLA)/1000000);
+        _DEBUG_PRINTF("922T:%s     %3dMHz",
+                                        (!(read_cp15()>>30)) ? "FAST " :
+                                        (read_cp15()>>31) ? "ASYNC" : "SYNC ",
+                                         calc_freq(CLK_922T)/1000000);
+        _DEBUG_PRINTF("PLLA:%3dMHz    %3dMHz", AS3525_PLLA_FREQ/1000000,
+                                                   calc_freq(CLK_PLLA)/1000000);
         _DEBUG_PRINTF("PLLB:          %3dMHz", calc_freq(CLK_PLLB)/1000000);
         _DEBUG_PRINTF("FCLK:          %3dMHz", calc_freq(CLK_FCLK)/1000000);
 
@@ -257,12 +265,18 @@ bool __dbg_hw_info(void)
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
 
-        _DEBUG_PRINTF("DRAM:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000, calc_freq(CLK_EXTMEM)/1000000);
-        _DEBUG_PRINTF("PCLK:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000, calc_freq(CLK_PCLK)/1000000);
-        _DEBUG_PRINTF("IDE :%3dMHz    %3dMHz", AS3525_IDE_FREQ/1000000,calc_freq(CLK_IDE)/1000000);
-        _DEBUG_PRINTF("DBOP:%3dMHz    %3dMHz", AS3525_DBOP_FREQ/1000000,calc_freq(CLK_DBOP)/1000000);
-        _DEBUG_PRINTF("I2C :%3dkHz    %3dkHz", AS3525_I2C_FREQ/1000,calc_freq(CLK_I2C)/1000);
-        _DEBUG_PRINTF("I2SI: %s      %3dMHz", (CGU_AUDIO & (1<<23)) ? "on " : "off" ,calc_freq(CLK_I2SI)/1000000);
+        _DEBUG_PRINTF("DRAM:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
+                                                 calc_freq(CLK_EXTMEM)/1000000);
+        _DEBUG_PRINTF("PCLK:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
+                                                   calc_freq(CLK_PCLK)/1000000);
+        _DEBUG_PRINTF("IDE :%3dMHz    %3dMHz", AS3525_IDE_FREQ/1000000,
+                                                    calc_freq(CLK_IDE)/1000000);
+        _DEBUG_PRINTF("DBOP:%3dMHz    %3dMHz", AS3525_DBOP_FREQ/1000000,
+                                                   calc_freq(CLK_DBOP)/1000000);
+        _DEBUG_PRINTF("I2C :%3dkHz    %3dkHz", AS3525_I2C_FREQ/1000,
+                                                       calc_freq(CLK_I2C)/1000);
+        _DEBUG_PRINTF("I2SI: %s      %3dMHz", (CGU_AUDIO & (1<<23)) ?
+                                   "on " : "off" , calc_freq(CLK_I2SI)/1000000);
 
 #if LCD_HEIGHT < 176  /* clip  */
         lcd_update();
@@ -278,14 +292,29 @@ bool __dbg_hw_info(void)
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
 
-        _DEBUG_PRINTF("I2SO: %s      %3dMHz", (CGU_AUDIO & (1<<11)) ? "on " : "off", calc_freq(CLK_I2SO)/1000000);
-        _DEBUG_PRINTF("SD  :%3dkHz    %3dkHz", AS3525_SD_IDENT_FREQ/1000,calc_freq(CLK_SD_IDENT_NAND)/1000);
-        _DEBUG_PRINTF("MSD :%3dkHz    %3dkHz", AS3525_SD_IDENT_FREQ/1000,calc_freq(CLK_SD_IDENT_MSD)/1000);
-        _DEBUG_PRINTF("USB:           %3dMHz", calc_freq(CLK_USB)/1000000);
-        _DEBUG_PRINTF("MMU:   %s CVDDP:%4d", (read_cp15() & CP15_MMU) ? " op" : "nop",
-                                              adc_read(ADC_CVDD) * 25);
-        _DEBUG_PRINTF("Icache:%s Dcache:%s",(read_cp15() & CP15_IC)  ? " op" : "nop",
-                                            (read_cp15() & CP15_DC)  ? " op" : "nop");
+        _DEBUG_PRINTF("I2SO: %s      %3dMHz", (CGU_AUDIO & (1<<11)) ?
+                                    "on " : "off", calc_freq(CLK_I2SO)/1000000);
+        if(MCI_NAND)
+            last_nand = MCI_NAND;
+                                                /*  MCLK == PCLK  */
+        _DEBUG_PRINTF("SD  :%3dMHz    %3dMHz",
+            ((last_nand ? (AS3525_PCLK_FREQ/ 1000000): 0) /
+            ((last_nand & MCI_CLOCK_BYPASS)? 1:(((last_nand & 0xff)+1) * 2))),
+            calc_freq(CLK_SD_MCLK_NAND)/1000000);
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
+        if(MCI_SD)
+            last_sd = MCI_SD;
+        _DEBUG_PRINTF("uSD :%3dMHz    %3dMHz",
+            ((last_sd ? (AS3525_PCLK_FREQ/ 1000000): 0) /
+            ((last_sd & MCI_CLOCK_BYPASS) ? 1: (((last_sd & 0xff) + 1) * 2))),
+            calc_freq(CLK_SD_MCLK_MSD)/1000000);
+#endif
+        _DEBUG_PRINTF("USB :          %3dMHz", calc_freq(CLK_USB)/1000000);
+        _DEBUG_PRINTF("MMU :  %s CVDDP:%4d", (read_cp15() & CP15_MMU) ?
+                                        " on" : "off", adc_read(ADC_CVDD) * 25);
+        _DEBUG_PRINTF("Icache:%s Dcache:%s",
+                                      (read_cp15() & CP15_IC)  ? " on" : "off",
+                                      (read_cp15() & CP15_DC)  ? " on" : "off");
 
         lcd_update();
         int btn = button_get_w_tmo(HZ/10);
@@ -322,7 +351,8 @@ bool __dbg_hw_info(void)
 
         _DEBUG_PRINTF("CGU_AUDIO :%8x", (unsigned int)(CGU_AUDIO));
         _DEBUG_PRINTF("CGU_USB   :%8x", (unsigned int)(CGU_USB));
-        _DEBUG_PRINTF("I2C2_CPSR :%8x", (unsigned int)(I2C2_CPSR1<<8 | I2C2_CPSR0));
+        _DEBUG_PRINTF("I2C2_CPSR :%8x", (unsigned int)(I2C2_CPSR1<<8 |
+                                                       I2C2_CPSR0));
         _DEBUG_PRINTF("MCI_NAND  :%8x", (unsigned int)(MCI_NAND));
         _DEBUG_PRINTF("MCI_SD    :%8x", (unsigned int)(MCI_SD));
 
