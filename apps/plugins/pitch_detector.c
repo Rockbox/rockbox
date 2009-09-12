@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:$    
+ * $Id$    
  *
  * Copyright (C) 2008    Lechner Michael / smoking gnu
  *
@@ -29,7 +29,6 @@
  *   recording code to use proper, gapless recording with a callback function
  *   that provides new buffer, instead of stopping and restarting recording
  *   everytime the buffer is full
- * - Convert all floating point operations to fixed-point
  * - Adapt the Yin FFT algorithm, which would reduce complexity from O(n^2)
  *   to O(nlogn), theoretically reducing latency by a factor of ~10. -David
  * 
@@ -68,6 +67,8 @@
  
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
+#include "lib/picture.h"
+#include "pluginbitmaps/pitch_notes.h"
 
 PLUGIN_HEADER
 
@@ -120,9 +121,10 @@ typedef struct _fixed fixed;
 #define FP_LOW       ((fixed){1})
 
 /* Some defines for converting between period and frequency  */
+
 /* I introduce some divisors in this because the fixed point */
 /* variables aren't big enough to hold higher than a certain */
-/* vallue.  This loses a bit of precision but it means we    */
+/* value.  This loses a bit of precision but it means we     */
 /* don't have to use 32.32 variables (yikes).                */
 /* With an 18-bit decimal precision, the max value in the    */
 /* integer part is 8192.  Divide 44100 by 7 and it'll fit in */
@@ -157,7 +159,24 @@ typedef struct _fixed fixed;
 
 #define LCD_FACTOR (fp_div(int2fixed(LCD_WIDTH), int2fixed(100)))
 /* The threshold for the YIN algorithm */
-#define YIN_THRESHOLD float2fixed(0.05f)
+#define DEFAULT_YIN_THRESHOLD 5  /* 0.10 */
+const fixed yin_threshold_table[] =
+{
+    float2fixed(0.01),
+    float2fixed(0.02),
+    float2fixed(0.03),
+    float2fixed(0.04),
+    float2fixed(0.05),
+    float2fixed(0.10),
+    float2fixed(0.15),
+    float2fixed(0.20),
+    float2fixed(0.25),
+    float2fixed(0.30),
+    float2fixed(0.35),
+    float2fixed(0.40),
+    float2fixed(0.45),
+    float2fixed(0.50),
+};
 
 /* How loud the audio has to be to start displaying pitch  */
 /* Must be between 0 and 100                               */
@@ -167,6 +186,40 @@ typedef struct _fixed fixed;
 
 /* How many decimal places to display for the Hz value */
 #define DISPLAY_HZ_PRECISION 100
+
+/* Where to put the various GUI elements */
+int note_y;
+int bar_grad_y;
+#define LCD_RES_MIN (LCD_HEIGHT < LCD_WIDTH ? LCD_HEIGHT : LCD_WIDTH)
+#define BAR_PADDING (LCD_RES_MIN / 32)
+#define BAR_Y       (LCD_HEIGHT * 3 / 4)
+#define BAR_HEIGHT  (LCD_RES_MIN / 4 - BAR_PADDING)
+#define BAR_HLINE_Y (BAR_Y - BAR_PADDING)
+#define BAR_HLINE_Y2 (BAR_Y + BAR_HEIGHT + BAR_PADDING - 1)
+#define HZ_Y        0
+#define GRADUATION  10       /* Subdivisions of the whole 100-cent scale */
+
+/* Bitmaps for drawing the note names.  These need to have height 
+   <= (bar_grad_y - note_y), or 15/32 * LCD_HEIGHT
+ */
+#define NUM_NOTE_IMAGES  9
+#define NOTE_INDEX_A     0
+#define NOTE_INDEX_B     1
+#define NOTE_INDEX_C     2
+#define NOTE_INDEX_D     3
+#define NOTE_INDEX_E     4
+#define NOTE_INDEX_F     5
+#define NOTE_INDEX_G     6
+#define NOTE_INDEX_SHARP 7
+#define NOTE_INDEX_FLAT  8
+const struct picture note_bitmaps =
+{
+    pitch_notes,
+    BMPWIDTH_pitch_notes,
+    BMPHEIGHT_pitch_notes,
+    BMPHEIGHT_pitch_notes/NUM_NOTE_IMAGES
+};
+
 
 typedef signed short audio_sample_type;
 /* It's stereo, so make the buffer twice as big */
@@ -209,21 +262,12 @@ static const fixed lfreqs[12] =
 
 /* GUI */
 static unsigned back_color, front_color;            
-static int font_w, font_h;
-static int bar_x_minus_50, bar_x_minus_20, bar_x_0, bar_x_20, bar_x_50;
-static int letter_y;     /* y of the notes letters */
-static int note_bar_y;   /* y of the yellow bars (under the notes) */
-static int bar_h;        /* height of the yellow (note) and red (error) bars */
-static int freq_y;       /* y of the line with the frequency */
-static int error_ticks_y; /* y of the error values (-50, -20, ...) */
-static int error_hline_y; /* y of the top line for error bar */
-static int error_hline_y2;/* y of the bottom line for error bar */
-static int error_bar_y;   /* y of the error bar */
-static int error_bar_margin; /* distance between the error bar and the hline  */
+static int font_w,font_h;
+static int bar_x_0;
+static int lbl_x_minus_50, lbl_x_minus_20, lbl_x_0, lbl_x_20, lbl_x_50;
 
-static const char *english_notes[12] = {"A","A#","B","C","C#","D","D#","E",
-                                        "F","F#", "G", "G#"};
-static const char gui_letters[8] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', '#'};
+static const char *english_notes[] = {"A","A#","B","C","C#","D","D#","E",
+                                        "F","F#","G","G#"};
 static const char **notes = english_notes;
 
 /*Settings for the plugin */
@@ -235,136 +279,9 @@ struct tuner_settings
     unsigned sample_size;
     unsigned lowest_freq;
     unsigned yin_threshold;
+    bool use_sharps;
+    bool display_hz;
 } tuner_settings;
-
-/*=================================================================*/
-/* MENU                                                            */
-/*=================================================================*/
-
-/* Keymaps */
-const struct button_mapping* plugin_contexts[]={
-    generic_actions,
-    generic_increase_decrease,
-    generic_directions,
-#if NB_SCREENS == 2
-    remote_directions
-#endif
-};
-#define PLA_ARRAY_COUNT sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
-
-fixed yin_threshold_table[] =
-{
-    float2fixed(0.01),
-    float2fixed(0.02),
-    float2fixed(0.03),
-    float2fixed(0.04),
-    float2fixed(0.05),
-    float2fixed(0.10),
-    float2fixed(0.15),
-    float2fixed(0.20),
-    float2fixed(0.25),
-    float2fixed(0.30),
-    float2fixed(0.35),
-    float2fixed(0.40),
-    float2fixed(0.45),
-    float2fixed(0.50),
-};
-
-#define DEFAULT_YIN_THRESHOLD 5  /* 0.10 */
-
-/* Option strings */
-static const struct opt_items yin_threshold_text[] = 
-{
-    { "0.01", -1 },
-    { "0.02", -1 },
-    { "0.03", -1 },
-    { "0.04", -1 },
-    { "0.05", -1 },
-    { "0.10", -1 },
-    { "0.15", -1 },
-    { "0.20", -1 },
-    { "0.25", -1 },
-    { "0.30", -1 },
-    { "0.35", -1 },
-    { "0.40", -1 },
-    { "0.45", -1 },
-    { "0.50", -1 },
-};
-
-void set_min_freq(int new_freq)
-{
-    tuner_settings.sample_size = freq2period(new_freq) * 4;
-
-    /* clamp the sample size between min and max */
-    if(tuner_settings.sample_size <= SAMPLE_SIZE_MIN)
-        tuner_settings.sample_size = SAMPLE_SIZE_MIN;
-    else if(tuner_settings.sample_size >= BUFFER_SIZE)
-        tuner_settings.sample_size = BUFFER_SIZE;
-    /* sample size must be divisible by 4 */
-    else if(tuner_settings.sample_size % 4 != 0)
-        tuner_settings.sample_size += 4 - (tuner_settings.sample_size % 4);
-}
-
-bool main_menu(void)
-{
-    int selection=0;
-    bool done = false;
-    bool exit_tuner=false;
-    int choice;
-
-    MENUITEM_STRINGLIST(menu,"Tuner Settings",NULL,
-                        "Return to Tuner",
-                        "Volume Threshold",
-                        "Listening Volume",
-                        "Lowest Frequency",
-                        "Algorithm Pickiness",
-                        "Quit");
-
-    while(!done)
-    {
-        choice = rb->do_menu(&menu, &selection, NULL, false);
-        switch(choice)
-        {
-            case 1:
-                rb->set_int("Volume Threshold", "%", UNIT_INT,
-                               &tuner_settings.volume_threshold,
-                               NULL, 5, 5, 95, NULL);
-                break;
-            case 2:
-                rb->set_int("Listening Volume", "%", UNIT_INT,
-                               &tuner_settings.record_gain,
-                               NULL, 1, rb->sound_min(SOUND_MIC_GAIN), 
-                               rb->sound_max(SOUND_MIC_GAIN), NULL);
-                break;
-            case 3:
-                rb->set_int("Lowest Frequency", "Hz", UNIT_INT,
-                               &tuner_settings.lowest_freq, set_min_freq, 1,
-                               /* Range depends on the size of the buffer */
-                               SAMPLE_RATE / (BUFFER_SIZE / 4), 
-                               SAMPLE_RATE / (SAMPLE_SIZE_MIN / 4), NULL);
-                break;
-            case 4:
-                rb->set_option(
-                    "Algorithm Pickiness (Lower -> more discriminating)",
-                    &tuner_settings.yin_threshold,
-                    INT, yin_threshold_text, 
-                    sizeof(yin_threshold_text) / 
-                    sizeof(yin_threshold_text[0]), 
-                    NULL);
-                break;
-            case 5:
-                exit_tuner = true;
-                done = true;
-                break;
-            case 0:
-            default: /* Return to the tuner */
-                done = true;
-                break;
-
-        }
-    }
-    return(exit_tuner);
-}
 
 /*=================================================================*/
 /* Settings loading and saving(adapted from the clock plugin)      */
@@ -408,6 +325,16 @@ void tuner_settings_reset(struct tuner_settings* settings)
     settings->sample_size = BUFFER_SIZE;
     settings->lowest_freq = period2freq(BUFFER_SIZE / 4);
     settings->yin_threshold = DEFAULT_YIN_THRESHOLD;
+    settings->use_sharps = true;
+    settings->display_hz = false;
+}
+
+/*---------------------------------------------------------------------*/
+
+void tuner_settings_reset_query(int yes)
+{
+    if(yes)
+        tuner_settings_reset(&tuner_settings);
 }
 
 /*---------------------------------------------------------------------*/
@@ -461,6 +388,147 @@ void save_settings(void)
         return;
 
     tuner_settings_save(&tuner_settings, SETTINGS_FILENAME);
+}
+
+/*=================================================================*/
+/* MENU                                                            */
+/*=================================================================*/
+
+/* Keymaps */
+const struct button_mapping* plugin_contexts[]={
+    generic_actions,
+    generic_increase_decrease,
+    generic_directions,
+#if NB_SCREENS == 2
+    remote_directions
+#endif
+};
+#define PLA_ARRAY_COUNT sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
+
+/* Option strings */
+
+/* This has to match yin_threshold_table */
+static const struct opt_items yin_threshold_text[] = 
+{
+    { "0.01", -1 },
+    { "0.02", -1 },
+    { "0.03", -1 },
+    { "0.04", -1 },
+    { "0.05", -1 },
+    { "0.10", -1 },
+    { "0.15", -1 },
+    { "0.20", -1 },
+    { "0.25", -1 },
+    { "0.30", -1 },
+    { "0.35", -1 },
+    { "0.40", -1 },
+    { "0.45", -1 },
+    { "0.50", -1 },
+};
+
+static const struct opt_items accidental_text[] = 
+{
+    { "Flat", -1 },
+    { "Sharp", -1 },
+};
+
+static const struct opt_items noyes_text[] = 
+{
+    { "No", -1 },
+    { "Yes", -1 }
+};
+
+void set_min_freq(int new_freq)
+{
+    tuner_settings.sample_size = freq2period(new_freq) * 4;
+
+    /* clamp the sample size between min and max */
+    if(tuner_settings.sample_size <= SAMPLE_SIZE_MIN)
+        tuner_settings.sample_size = SAMPLE_SIZE_MIN;
+    else if(tuner_settings.sample_size >= BUFFER_SIZE)
+        tuner_settings.sample_size = BUFFER_SIZE;
+    /* sample size must be divisible by 4 */
+    else if(tuner_settings.sample_size % 4 != 0)
+        tuner_settings.sample_size += 4 - (tuner_settings.sample_size % 4);
+}
+
+bool main_menu(void)
+{
+    int selection=0;
+    bool done = false;
+    bool exit_tuner=false;
+    int choice;
+    bool reset = false;
+
+    MENUITEM_STRINGLIST(menu,"Tuner Settings",NULL,
+                        "Return to Tuner",
+                        "Volume Threshold",
+                        "Listening Volume",
+                        "Lowest Frequency",
+                        "Algorithm Pickiness",
+                        "Accidentals",
+                        "Display Frequency (Hz)",
+                        "Reset Settings",
+                        "Quit");
+
+    while(!done)
+    {
+        choice = rb->do_menu(&menu, &selection, NULL, false);
+        switch(choice)
+        {
+            case 1:
+                rb->set_int("Volume Threshold", "%", UNIT_INT,
+                               &tuner_settings.volume_threshold,
+                               NULL, 5, 5, 95, NULL);
+                break;
+            case 2:
+                rb->set_int("Listening Volume", "%", UNIT_INT,
+                               &tuner_settings.record_gain,
+                               NULL, 1, rb->sound_min(SOUND_MIC_GAIN), 
+                               rb->sound_max(SOUND_MIC_GAIN), NULL);
+                break;
+            case 3:
+                rb->set_int("Lowest Frequency", "Hz", UNIT_INT,
+                               &tuner_settings.lowest_freq, set_min_freq, 1,
+                               /* Range depends on the size of the buffer */
+                               SAMPLE_RATE / (BUFFER_SIZE / 4), 
+                               SAMPLE_RATE / (SAMPLE_SIZE_MIN / 4), NULL);
+                break;
+            case 4:
+                rb->set_option(
+                    "Algorithm Pickiness (Lower -> more discriminating)",
+                    &tuner_settings.yin_threshold,
+                    INT, yin_threshold_text, 
+                    sizeof(yin_threshold_text) / 
+                    sizeof(yin_threshold_text[0]), 
+                    NULL);
+                break;
+            case 5:
+                rb->set_option("Display Accidentals As",
+                               &tuner_settings.use_sharps,
+                               BOOL, accidental_text, 2, NULL);
+                break;
+            case 6:
+                rb->set_option("Display Frequency (Hz)",
+                               &tuner_settings.display_hz,
+                               BOOL, noyes_text, 2, NULL);
+                break;
+            case 7:
+                rb->set_option("Reset Tuner Settings?",
+                               &reset,
+                               BOOL, noyes_text, 2, tuner_settings_reset_query);
+                break;
+            case 8:
+                exit_tuner = true;
+            case 0: 
+            default:
+                /* Return to the tuner */
+                done = true;
+                break;
+
+        }
+    }
+    return(exit_tuner);
 }
 
 /*=================================================================*/
@@ -525,15 +593,13 @@ void print_int_xy(int x, int y, int v)
     rb->lcd_set_foreground(front_color);
     rb->snprintf(temp,20,"%d",v);
     rb->lcd_putsxy(x,y,temp);
-    rb->lcd_update();
 }
 
-/* Print out the frequency etc - will be removed later on */
+/* Print out the frequency etc */
 void print_str(char* s)
 {
     rb->lcd_set_foreground(front_color);
-    rb->lcd_putsxy(0, freq_y, s);
-    rb->lcd_update();
+    rb->lcd_putsxy(0, HZ_Y, s);
 }
 
 /* What can I say? Read the function name... */
@@ -548,9 +614,67 @@ void print_char_xy(int x, int y, char c)
     rb->lcd_putsxy(x, y, temp);
 }
 
+/* Draw the note bitmap */
+void draw_note(const char *note)
+{
+    int i;
+    int note_x = (LCD_WIDTH - BMPWIDTH_pitch_notes) / 2;
+    int accidental_index = NOTE_INDEX_SHARP;
+    
+    i = note[0]-'A';
+
+    if(note[1] == '#')
+    {
+        if(!(tuner_settings.use_sharps))
+        {
+            i = (i + 1) % 7;
+            accidental_index = NOTE_INDEX_FLAT;
+        }
+
+        vertical_picture_draw_sprite(rb->screens[0], 
+                                     &note_bitmaps, 
+                                     accidental_index,
+                                     LCD_WIDTH / 2,
+                                     note_y);
+        note_x = LCD_WIDTH / 2 - BMPWIDTH_pitch_notes;
+    }
+
+    vertical_picture_draw_sprite(rb->screens[0], &note_bitmaps, i,
+                                 note_x,
+                                 note_y);
+}
 /* Draw the red bar and the white lines */
 void draw_bar(fixed wrong_by_cents)
 { 
+    unsigned n;
+    int x;
+
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_RGBPACK(255,255,255));	/* Color screens */
+#elif LCD_DEPTH > 1
+    rb->lcd_set_foreground(LCD_BLACK);      /* Greyscale screens */
+#else
+    rb->lcd_set_foreground(LCD_BLACK);		/* Black and white screens */
+#endif
+
+    rb->lcd_hline(0,LCD_WIDTH-1, BAR_HLINE_Y);
+    rb->lcd_hline(0,LCD_WIDTH-1, BAR_HLINE_Y2);
+
+    /* Draw graduation lines on the off-by readout */
+    for(n = 0; n <= GRADUATION; n++)
+    {
+        x = (LCD_WIDTH * n + GRADUATION / 2) / GRADUATION;
+        if (x >= LCD_WIDTH)
+            x = LCD_WIDTH - 1;
+        rb->lcd_vline(x, BAR_HLINE_Y, BAR_HLINE_Y2);
+    }
+
+    print_int_xy(lbl_x_minus_50    ,bar_grad_y, -50);
+    print_int_xy(lbl_x_minus_20    ,bar_grad_y, -20);
+    print_int_xy(lbl_x_0           ,bar_grad_y,   0);
+    print_int_xy(lbl_x_20          ,bar_grad_y,  20);
+    print_int_xy(lbl_x_50          ,bar_grad_y,  50);
+
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(255,0,0));   /* Color screens */
 #elif LCD_DEPTH > 1
@@ -561,66 +685,16 @@ void draw_bar(fixed wrong_by_cents)
 
     if (fp_gt(wrong_by_cents, FP_ZERO))
     {
-        rb->lcd_fillrect(bar_x_0, error_bar_y, 
-            fixed2int(fp_mul(wrong_by_cents, LCD_FACTOR)), bar_h);
+        rb->lcd_fillrect(bar_x_0, BAR_Y, 
+            fixed2int(fp_mul(wrong_by_cents, LCD_FACTOR)), BAR_HEIGHT);
     }
     else
     {
         rb->lcd_fillrect(bar_x_0 + fixed2int(fp_mul(wrong_by_cents,LCD_FACTOR)),
-                         error_bar_y,
+                         BAR_Y,
                          fixed2int(fp_mul(wrong_by_cents, LCD_FACTOR)) * -1, 
-                         bar_h);
+                         BAR_HEIGHT);
     }
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(255,255,255));   /* Color screens */
-#elif LCD_DEPTH > 1
-    rb->lcd_set_foreground(LCD_BLACK);      /* Greyscale screens */
-#else
-    rb->lcd_set_foreground(LCD_BLACK);      /* Black and white screens */
-#endif
-
-    rb->lcd_hline(0,LCD_WIDTH-1, error_hline_y);
-    rb->lcd_hline(0,LCD_WIDTH-1, error_hline_y2);
-    rb->lcd_vline(LCD_WIDTH / 2, error_hline_y, error_hline_y2);
-    
-    print_int_xy(bar_x_minus_50    , error_ticks_y, -50);
-    print_int_xy(bar_x_minus_20    , error_ticks_y, -20);
-    print_int_xy(bar_x_0           , error_ticks_y,   0);
-    print_int_xy(bar_x_20          , error_ticks_y,  20);
-    print_int_xy(bar_x_50          , error_ticks_y,  50);
-}
-
-/* Print the letters A-G and the # on the screen */
-void draw_letters(void)
-{
-    int i;
-
-    rb->lcd_set_foreground(front_color);
-    
-    for (i=0; i<8; i++)
-    {
-        print_char_xy(i*(LCD_WIDTH / 8 ) + font_w, letter_y, gui_letters[i]);
-    }
-}
-
-/* Draw the yellow point(s) below the letters and the '#' */
-void draw_points(const char *s)
-{
-    int i;
-    
-    i = s[0]-'A';
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(255,255,0));     /* Color screens */
-#elif LCD_DEPTH > 1
-    rb->lcd_set_foreground(LCD_DARKGRAY);           /* Grey screens */
-#else
-    rb->lcd_set_foreground(LCD_BLACK);      /* Black and White screens */
-#endif
-    
-    rb->lcd_fillrect(i*(LCD_WIDTH / 8 ) + font_w, note_bar_y, font_w, font_h);
-    
-    if (s[1] == '#')
-        rb->lcd_fillrect(7*(LCD_WIDTH / 8 ) + font_w, note_bar_y, font_w, font_h);
 }
 
 /* Calculate how wrong the note is and draw the GUI */
@@ -629,7 +703,6 @@ void display_frequency (fixed freq)
     fixed ldf, mldf;
     fixed lfreq, nfreq;
     int i, note = 0;
-    bool draw_freq;
     char str_buf[30];
 
     if (fp_lt(freq, FP_LOW))
@@ -663,26 +736,19 @@ void display_frequency (fixed freq)
     
     ldf=fp_mul(int2fixed(1200), log(fp_div(freq,nfreq)));
 
-    draw_freq = (fp_round(freq) != 0);
-    if (draw_freq)
-    { 
-        rb->snprintf(str_buf,30, "%s : %d cents (%d.%dHz)", 
-                     notes[note], fp_round(ldf) ,fixed2int(freq),
-                     fp_round(fp_mul(fp_frac(freq), 
-                                     int2fixed(DISPLAY_HZ_PRECISION))));
-    }
-    else
-    {
-        ldf = FP_ZERO;      /* prevents red bar at -32 cents when freq= 0*/
-    }
-
     rb->lcd_clear_display();
     draw_bar(ldf);                /* The red bar */
-    draw_letters();               /* The A-G letters and the # */
-    if (draw_freq)
+    if(fp_round(freq) != 0)
     {
-        draw_points(notes[note]);     /* The yellow point(s) */
-        print_str(str_buf);
+        draw_note(notes[note]);
+        if(tuner_settings.display_hz)
+        {
+            rb->snprintf(str_buf,30, "%s : %d cents (%d.%02dHz)", 
+                         notes[note], fp_round(ldf) ,fixed2int(freq),
+                         fp_round(fp_mul(fp_frac(freq), 
+                                         int2fixed(DISPLAY_HZ_PRECISION))));
+            print_str(str_buf);
+        }
     }
     rb->lcd_update();
 }
@@ -796,7 +862,7 @@ fixed vec_quadint_min(fixed *x, unsigned bufsize, unsigned pos, unsigned span)
                 resold = res;
             } 
             else 
-            {   
+            {
                 /* exactpos += (frac-QUADINT_STEP)*span - span/2.0f; */
                 exactpos = fp_add(exactpos, 
                                   fp_sub(
@@ -898,20 +964,28 @@ void record_and_get_pitch(void)
     long timer;
     char debug_string[20];
     */
+#ifndef SIMULATOR
     fixed period;
     bool waiting = false;
+#endif
 
     while(!quit) 
     {
+#ifndef SIMULATOR
                                         /* Start recording */
         rb->pcm_record_data(recording_callback, (void *) audio_data, 
                             (size_t) tuner_settings.sample_size * 
                                      sizeof(audio_sample_type));
+#endif
         recording=1;    
         
         while (recording && !quit)      /* wait for the buffer to be filled */
         {        
             rb->yield();
+#ifdef SIMULATOR
+            /* Only do this loop once if this is the simulator */
+            recording = 0;
+#endif
             button=pluginlib_getaction(0, plugin_contexts, PLA_ARRAY_COUNT);
             switch(button) 
             {
@@ -923,8 +997,8 @@ void record_and_get_pitch(void)
                 case PLA_MENU:
                     if(main_menu())
                         quit=true;
+                    else redraw = true;
                     rb->yield();
-                    redraw = true;
                     break;
                 
                 default:
@@ -934,11 +1008,9 @@ void record_and_get_pitch(void)
             }
         } 
         
-        /* Let's keep track of how long this takes */
-        /* timer = *(rb->current_tick); */
-
         if(!quit)
         {
+#ifndef SIMULATOR
             /* Only do the heavy lifting if the volume is high enough */
             if(buffer_magnitude(audio_data) > 
                 sqr(tuner_settings.volume_threshold * 
@@ -946,9 +1018,9 @@ void record_and_get_pitch(void)
             {
                 if(waiting)
                 {
-    #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
                     rb->cpu_boost(true);
-    #endif
+#endif
                     waiting = false;
                 }
                 
@@ -971,26 +1043,16 @@ void record_and_get_pitch(void)
             {
                 waiting = true;
                 redraw = false;
-    #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost(false);
-    #endif
+#endif
                 /*rb->backlight_off();*/
                 display_frequency(FP_ZERO);
             }
-
-            /*rb->snprintf(debug_string, 20, "%x,%x", 
-                           audio_data[50], audio_data[52]);
-            rb->lcd_putsxy(0, 40, debug_string);
-            rb->lcd_update();
-            */
-
-            /* Print out how long it took to find the pitch */
-            /*
-            rb->snprintf(debug_string, 20, "latency: %ld", 
-                         *(rb->current_tick) - timer);
-            rb->lcd_putsxy(0, 40, debug_string);
-            rb->lcd_update();
-            */
+#else /* SIMULATOR */
+            /* Display a preselected frequency */
+            display_frequency(int2fixed(445));
+#endif
         }
     }
     rb->pcm_close_recording();
@@ -1023,23 +1085,18 @@ void init_everything(void)
     front_color = rb->lcd_get_foreground();
     rb->lcd_getstringsize("X", &font_w, &font_h);
     
-    bar_x_minus_50 = 0;
-    bar_x_minus_20 = (LCD_WIDTH / 2) - 
+    bar_x_0  = LCD_WIDTH / 2;
+    lbl_x_minus_50 = 0;
+    lbl_x_minus_20 = (LCD_WIDTH / 2) -
                      fixed2int(fp_mul(LCD_FACTOR, int2fixed(20))) - font_w;
-    bar_x_0  = LCD_WIDTH / 2; 
-    bar_x_20 = (LCD_WIDTH / 2) + 
-               fixed2int(fp_mul(LCD_FACTOR, int2fixed(20))) - font_w; 
-    bar_x_50 = LCD_WIDTH - 2 * font_w;
-    
-    letter_y = 10;
-    note_bar_y = letter_y + font_h;
-    bar_h = font_h;
-    freq_y = note_bar_y + bar_h + 3;
-    error_ticks_y = freq_y + font_h + 8;
-    error_hline_y = error_ticks_y + font_h + 2;
-    error_bar_margin = 2;
-    error_bar_y = error_hline_y + error_bar_margin;
-    error_hline_y2 = error_bar_y + bar_h + error_bar_margin;
+    lbl_x_0  = (LCD_WIDTH - font_w) / 2;
+    lbl_x_20 = (LCD_WIDTH / 2) +
+               fixed2int(fp_mul(LCD_FACTOR, int2fixed(20))) - font_w;
+    lbl_x_50 = LCD_WIDTH - 2 * font_w;
+
+    bar_grad_y = BAR_Y - BAR_PADDING - font_h;
+    /* Put the note right between the top and bottom text elements */
+    note_y = ((font_h + bar_grad_y - note_bitmaps.slide_height) / 2);
 }
 
 
