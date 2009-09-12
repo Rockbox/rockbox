@@ -31,6 +31,97 @@
 static const unsigned short patterns[4] = {0xFFFF, 0xFF00, 0x00FF, 0x0000};
 #endif
 
+#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+void xlcd_scroll_left(int count)
+{
+    int length, oldmode;
+
+    if ((unsigned)count >= LCD_WIDTH)
+        return;
+
+    length = (LCD_WIDTH-count)*LCD_FBHEIGHT;
+
+    rb->memmove(rb->lcd_framebuffer, rb->lcd_framebuffer + LCD_HEIGHT*count, 
+                length * sizeof(fb_data));
+
+    oldmode = rb->lcd_get_drawmode();
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(LCD_WIDTH-count, 0, count, LCD_HEIGHT);
+    rb->lcd_set_drawmode(oldmode);
+}
+
+/* Scroll right */
+void xlcd_scroll_right(int count)
+{
+    int length, oldmode;
+
+    if ((unsigned)count >= LCD_WIDTH)
+        return;
+
+    length = (LCD_WIDTH-count)*LCD_FBHEIGHT;
+
+    rb->memmove(rb->lcd_framebuffer + LCD_HEIGHT*count, 
+                rb->lcd_framebuffer, length * sizeof(fb_data));
+
+    oldmode = rb->lcd_get_drawmode();
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(0, 0, count, LCD_HEIGHT);
+    rb->lcd_set_drawmode(oldmode);
+}
+
+/* Scroll up */
+void xlcd_scroll_up(int count)
+{
+    int width, length, oldmode;
+    
+    fb_data *data;
+
+    if ((unsigned)count >= LCD_HEIGHT)
+        return;
+
+    length = LCD_HEIGHT - count;
+    
+    width = LCD_WIDTH;
+    data = rb->lcd_framebuffer;
+    
+    do {
+        rb->memmove(data,data + count,length * sizeof(fb_data));
+        data += LCD_HEIGHT;
+    } while(width--);
+
+    oldmode = rb->lcd_get_drawmode();
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(0, length, LCD_WIDTH, count);
+    rb->lcd_set_drawmode(oldmode);
+}
+
+/* Scroll down */
+void xlcd_scroll_down(int count)
+{
+    int width, length, oldmode;
+    
+    fb_data *data;
+
+    if ((unsigned)count >= LCD_HEIGHT)
+        return;
+
+    length = LCD_HEIGHT - count;
+
+    width = LCD_WIDTH;
+    data = rb->lcd_framebuffer;
+    
+    do {
+        rb->memmove(data + count, data, length * sizeof(fb_data));
+        data += LCD_HEIGHT;
+    } while(width--);
+
+    oldmode = rb->lcd_get_drawmode();
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(0, 0, LCD_WIDTH, count);
+    rb->lcd_set_drawmode(oldmode);
+}
+#else
+
 #if (LCD_PIXELFORMAT == HORIZONTAL_PACKING) && (LCD_DEPTH < 8)
 
 /* Scroll left */
@@ -629,5 +720,6 @@ void xlcd_scroll_down(int count)
 }
 
 #endif /* LCD_PIXELFORMAT, LCD_DEPTH */
+#endif /* defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE */
 
 #endif /* HAVE_LCD_BITMAP */
