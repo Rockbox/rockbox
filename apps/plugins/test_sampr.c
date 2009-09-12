@@ -180,11 +180,13 @@ static void set_volume(int value)
     rb->sound_set(SOUND_VOLUME, value);
 }
 
-static void format_volume(char *buf, size_t len, int value, const char *unit)
+static const char *format_volume(char *buf, size_t len, int value,
+                                 const char *unit)
 {
+    (void)unit;
     rb->snprintf(buf, len, "%d %s", rb->sound_val2phys(SOUND_VOLUME, value),
                  rb->sound_unit(SOUND_VOLUME));
-    (void)unit;
+    return buf;
 }
 #endif /* HAVE_VOLUME_IN_LIST */
 
