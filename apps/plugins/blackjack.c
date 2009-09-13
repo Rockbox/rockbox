@@ -172,17 +172,17 @@ enum {
 #define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define BJACK_SELECT_NAME    "A"
+#define BJACK_SELECT_NAME    "SELECT"
 #define BJACK_STAY_NAME     "VOL-"
 #define BJACK_RESUME_NAME   "MENU"
 #define BJACK_QUIT_NAME     "POWER"
-#define BJACK_DOUBLE_NAME   "SELECT"
-#define BJACK_SELECT        BUTTON_A
+#define BJACK_DOUBLE_NAME   "A"
+#define BJACK_SELECT        BUTTON_SELECT
 #define BJACK_QUIT          BUTTON_POWER
 #define BJACK_MAX           BUTTON_VOL_UP
 #define BJACK_MIN           BUTTON_VOL_DOWN
 #define BJACK_STAY          BUTTON_VOL_DOWN
-#define BJACK_DOUBLEDOWN    BUTTON_SELECT
+#define BJACK_DOUBLEDOWN    BUTTON_A
 #define BJACK_RESUME        BUTTON_MENU
 #define BJACK_UP            BUTTON_UP
 #define BJACK_DOWN          BUTTON_DOWN
