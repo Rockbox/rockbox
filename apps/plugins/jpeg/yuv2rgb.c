@@ -236,7 +236,20 @@ static fb_data (* const pixel_funcs[COLOUR_NUM_MODES][DITHER_NUM_MODES])(void) =
         [DITHER_DIFFUSION] = pixel_fsdither_to_lcd,
     },
 };
- 
+
+/* These defines are used fornormal horizontal strides and vertical strides. */
+#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#define LCDADDR(x, y)   (rb->lcd_framebuffer + LCD_HEIGHT*(x) + (y))
+#define ROWENDOFFSET    (width*LCD_HEIGHT)
+#define ROWOFFSET       (1)
+#define COLOFFSET       (LCD_HEIGHT)
+#else
+#define LCDADDR(x, y) (rb->lcd_framebuffer + LCD_WIDTH*(y) + (x))
+#define ROWENDOFFSET    (width)
+#define ROWOFFSET       (LCD_WIDTH)
+#define COLOFFSET       (1)
+#endif
+
 /**
  * Draw a partial YUV colour bitmap
  *
@@ -251,6 +264,7 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
     fb_data *dst, *dst_end;
     fb_data (*pixel_func)(void);
     struct rgb_pixel px;
+    int dst_inc;
 
     if (x + width > LCD_WIDTH)
         width = LCD_WIDTH - x; /* Clip right */
@@ -268,8 +282,8 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
 
     pixel = &px;
 
-    dst = rb->lcd_framebuffer + LCD_WIDTH * y + x;
-    dst_end = dst + LCD_WIDTH * height;
+    dst = LCDADDR(x, y);
+    dst_end = LCDADDR(x, y+height);
 
     if (colour_mode == COLOURMODE_GRAY)
         csub_y = 0; /* Ignore Cb, Cr */
@@ -304,15 +318,17 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
         if (px.inc == 1)
         {
             /* Scan is L->R */
+            dst_inc = COLOFFSET;
             dst_row = dst;
-            row_end = dst_row + width;
+            row_end = dst_row + ROWENDOFFSET;
             px.col  = src_x;
         }
         else
         {
             /* Scan is R->L */
-            row_end = dst - 1;
-            dst_row = row_end + width;
+            dst_inc = -COLOFFSET;
+            row_end = dst + dst_inc;
+            dst_row = row_end + ROWENDOFFSET;
             px.col  = src_x + width - 1;
         }
 
@@ -350,7 +366,7 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
                 px.b  = y + bu;
 
                 *dst_row = pixel_func();
-                dst_row += px.inc;
+                dst_row += dst_inc;
 
                 if (dst_row == row_end)
                     break;
@@ -379,13 +395,13 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
                 px.g  = px.r = px.b = YFAC*(*ysrc);
                 *dst_row = pixel_func();
                 ysrc    += px.inc;
-                dst_row += px.inc;
+                dst_row += dst_inc;
             }
             while (dst_row != row_end);
         }
 
         src_y++;
-        dst += LCD_WIDTH;
+        dst += ROWOFFSET;
     }
     while (dst < dst_end);
 }
