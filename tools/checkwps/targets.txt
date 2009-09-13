@@ -26,9 +26,9 @@ GIGABEAT_S gigabeats
 MROBE_500 mrobe500
 MROBE_100 mrobe100
 LOGIK_DAX logikdax
-CREATIVE_ZVM creativezvm
-CREATIVE_ZVM60GB creativezvm60
-CREATIVE_ZV creativezv
+CREATIVE_ZVM creativezvm30gb
+CREATIVE_ZVM60GB creativezvm60gb
+CREATIVE_ZV creativezenvision
 SANSA_E200 e200
 SANSA_E200 e200r
 SANSA_C200 c200
