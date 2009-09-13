@@ -12631,7 +12631,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LIMITER
+  id: LANG_COMPRESSOR
   desc: in sound settings
   user: core
   <source>

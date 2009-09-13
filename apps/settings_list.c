@@ -1258,7 +1258,7 @@ const struct settings_list settings[] = {
 
     /* limiter */
     INT_SETTING_NOWRAP(F_SOUNDSETTING, limiter_level,
-                       LANG_LIMITER, 0,
+                       LANG_COMPRESSOR, 0,
                        "limiter level", UNIT_DB, 0, MAX_LIMITER_GAIN,
                        5, db_format, get_dec_talkid, dsp_set_limiter),
 #endif
