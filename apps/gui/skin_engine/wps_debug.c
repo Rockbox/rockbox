@@ -48,7 +48,7 @@ static char *next_str(bool next) {
 static char *get_token_desc(struct wps_token *token, char *buf,
                             int bufsize, struct wps_data *data)
 {
-#ifndef HAVE_LCD_BITMAP    
+#ifndef HAVE_LCD_BITMAP
     (void)data; /* kill charcell warning */
 #endif
     bool next = token->next;
@@ -66,7 +66,7 @@ static char *get_token_desc(struct wps_token *token, char *buf,
         case WPS_TOKEN_CHARACTER:
             if (token->value.c == '\n')
                 snprintf(buf, bufsize, "Character '\\n'");
-            else    
+            else
                 snprintf(buf, bufsize, "Character '%c'",
                         token->value.c);
             break;
@@ -471,16 +471,16 @@ static void dump_skin(struct wps_data *data)
     int indent = 0;
     char buf[64];
     int i, j;
-    
+
     struct skin_token_list *viewport_list;
-    for (viewport_list = data->viewports; 
+    for (viewport_list = data->viewports;
          viewport_list; viewport_list = viewport_list->next)
     {
-        struct skin_viewport *skin_viewport = 
+        struct skin_viewport *skin_viewport =
                         (struct skin_viewport *)viewport_list->token->value.data;
         indent = 0;
-        DEBUGF("Viewport: '%c'\n", skin_viewport->label); 
-        struct skin_line *line;            
+        DEBUGF("Viewport: '%c'\n", skin_viewport->label);
+        struct skin_line *line;
         for (line = skin_viewport->lines; line; line = line->next)
         {
             struct skin_subline *subline;
@@ -529,7 +529,7 @@ static void dump_skin(struct wps_data *data)
             }
         }
     }
-}                        
+}
 #endif
 
 void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line)
@@ -555,7 +555,7 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
         {
             case PARSE_OK:
                 break;
-                
+
             case PARSE_FAIL_UNCLOSED_COND:
                 DEBUGF("ERR: Unclosed conditional");
                 break;
@@ -580,7 +580,7 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
                        get_token_desc(&data->tokens[data->num_tokens], buf, sizeof(buf), data)
                       );
                 break;
-                
+
             case PARSE_FAIL_LIMITS_EXCEEDED:
                 DEBUGF("ERR: Limits exceeded");
                 break;
@@ -595,6 +595,6 @@ void debug_skin_usage(void)
         DEBUGF("Skin buffer usage: %lu/%lu\n", (unsigned long)skin_buffer_usage(),
                                 (unsigned long)(skin_buffer_usage() + skin_buffer_freespace()));
 }
-    
+
 
 #endif /* DEBUG || SIMULATOR */

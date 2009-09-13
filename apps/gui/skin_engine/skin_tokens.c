@@ -465,7 +465,7 @@ const char *get_token_value(struct gui_wps *gwps,
             int mode = 1;
             if (status == AUDIO_STATUS_PLAY)
                 mode = 2;
-            if (is_wps_fading() || 
+            if (is_wps_fading() ||
                (status & AUDIO_STATUS_PAUSE && !status_get_ffmode()))
                 mode = 3;
             if (status_get_ffmode() == STATUS_FASTFORWARD)
@@ -486,7 +486,7 @@ const char *get_token_value(struct gui_wps *gwps,
                 *intval = global_settings.repeat_mode + 1;
             snprintf(buf, buf_size, "%d", global_settings.repeat_mode);
             return buf;
-            
+
         case WPS_TOKEN_RTC_PRESENT:
 #if CONFIG_RTC
                 return "c";
@@ -744,7 +744,7 @@ const char *get_token_value(struct gui_wps *gwps,
                 return NULL;
 #endif
         case WPS_TOKEN_BUTTON_VOLUME:
-            if (data->button_time_volume && 
+            if (data->button_time_volume &&
                 TIME_BEFORE(current_tick, data->button_time_volume +
                                           token->value.i * TIMEOUT_UNIT))
                 return "v";

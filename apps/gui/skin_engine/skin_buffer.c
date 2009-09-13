@@ -34,14 +34,14 @@
 /* skin buffer management.
  * This module is used to allocate space in a single global skin buffer for
  * tokens for both/all screens.
- * 
+ *
  * This is mostly just copy/paste from firmware/buffer.c
  *
  *
  * MAIN_ and REMOTE_BUFFER are just for reasonable size calibration,
  * both screens can use the whole buffer as they need; it's not split
  * between screens
- * 
+ *
  * Buffer can be allocated from either "end" of the global buffer.
  * items with unknown sizes get allocated from the start (0->)      (data)
  * items with known sizes get allocated from the end (<-buf_size)   (tokens)
@@ -49,7 +49,7 @@
  *  |tokens skin1|images skin2|---SPACE---|data skin2|data skin1|
  * Make sure to never start allocating from the beginning before letting us know
  * how much was used. and RESPECT THE buf_free RETURN VALUES!
- * 
+ *
  */
 
 
@@ -71,7 +71,7 @@
 
 #ifdef HAVE_LCD_CHARCELLS
 #define SKIN_BUFFER_SIZE (LCD_HEIGHT * LCD_WIDTH) * 64 + \
-                         (WPS_MAX_TOKENS * sizeof(struct wps_token)) 
+                         (WPS_MAX_TOKENS * sizeof(struct wps_token))
 #endif
 
 static unsigned char buffer[SKIN_BUFFER_SIZE];
@@ -87,7 +87,7 @@ void skin_buffer_init(void)
     if (buffer == NULL)
     {
         buf_size = SKIN_BUFFER_SIZE;/* global_settings.skin_buf_size */
-            
+
         buffer = buffer_alloc(buf_size);
         buffer_front = buffer;
         buffer_back = bufer + buf_size;
@@ -124,16 +124,16 @@ void* skin_buffer_alloc(size_t size)
     buffer_back -= size;
     /* 32-bit aligned */
     buffer_back = (void *)(((unsigned long)buffer_back) & ~3);
-    
+
     memset(buffer_back, 0, size);
     return buffer_back;
 }
 
 /* Get a pointer to the skin buffer and the count of how much is free
- * used to do your own buffer management. 
+ * used to do your own buffer management.
  * Any memory used will be overwritten next time wps_buffer_alloc()
  * is called unless skin_buffer_increment() is called first
- * 
+ *
  * This is from the start of the buffer, it is YOUR responsility to make
  * sure you dont ever use more then *freespace, and bear in mind this will only
  * be valid untill skin_buffer_alloc() is next called...
