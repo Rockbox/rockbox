@@ -668,12 +668,15 @@ static int parse_viewport(const char *wps_bufptr,
     skin_vp->pb = NULL;
     skin_vp->lines  = NULL;
     if (curr_line)
-        curr_line->curr_subline->last_token_idx = wps_data->num_tokens - 1;
+    {
+        curr_line->curr_subline->last_token_idx = wps_data->num_tokens
+                        - (wps_data->num_tokens > 0 ? 1 : 0);
+    }
+
     curr_line = NULL;
     if (!skin_start_new_line(skin_vp, wps_data->num_tokens))
         return WPS_ERROR_INVALID_PARAM;
-        
-    
+
     if (*ptr == 'l')
     {
         if (*(ptr+1) == '|')
