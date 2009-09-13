@@ -827,6 +827,10 @@ rockboxlogo.91x32x1.bmp
 #endif
 
 /* Pitch detector */
+/* The following preprocessor condition must match the condition */
+/* for pitch detector from plugins/SOURCES                       */
+#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && \
+    (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN))
 #if (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240) && (LCD_DEPTH >= 16)
 pitch_notes.320x240x16.bmp
 #elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH >= 16)
@@ -845,9 +849,10 @@ pitch_notes.160x128x2.bmp
 pitch_notes.132x80x16.bmp
 #elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 96) && (LCD_DEPTH >= 2)
 pitch_notes.128x96x2.bmp
-#elif (LCD_WIDTH >= 112) && (LCD_HEIGHT >= 64) && (LCD_DEPTH >= 1)
-/* There isn't a target currently with this screen and recording ability */
+#else
+#error Pitch Detector: unsupported LCD
 #endif
+#endif /* Complex condition for pitch detector */
 
 
 #endif /* HAVE_LCD_BITMAP */
