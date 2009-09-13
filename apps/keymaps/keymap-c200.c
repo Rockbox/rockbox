@@ -98,9 +98,11 @@ static const struct button_mapping button_context_settings[] = {
    
     { ACTION_STD_PREV,          BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_NONE,              BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
     
     { ACTION_STD_NEXT,          BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_NONE,              BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings */
@@ -165,9 +167,11 @@ static const struct button_mapping button_context_quickscreen[]  = {
 static const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_SETTINGS_INC,      BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_NONE,              BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
     
     { ACTION_SETTINGS_DEC,      BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_NONE,              BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
 
     { ACTION_STD_CANCEL,        BUTTON_POWER,                   BUTTON_NONE },
 
