@@ -24,18 +24,10 @@
 #include "lcd.h"
 #include "lcd-remote.h"
 #include "font.h"
-#include "sprintf.h"
-#include "string.h"
-#include "settings.h"
-#include "kernel.h"
-#include "system.h"
-#include "misc.h"
 #include "viewport.h"
-#include "statusbar.h"
 #include "screen_access.h"
-#include "appevents.h"
-
-
+#include "settings.h"
+#include "misc.h"
 
 /*some short cuts for fg/bg/line selector handling */
 #ifdef HAVE_LCD_COLOR
@@ -53,6 +45,17 @@
 #define FG_FALLBACK LCD_DEFAULT_FG
 #define BG_FALLBACK LCD_DEFAULT_BG
 #endif
+
+/* all below isn't needed for pc tools (i.e. checkwps/wps editor)
+ * only viewport_parse_viewport() is */
+#ifndef __PCTOOL__
+#include "sprintf.h"
+#include "string.h"
+#include "kernel.h"
+#include "system.h"
+#include "statusbar.h"
+#include "appevents.h"
+
 
 static int statusbar_enabled = 0;
 
@@ -295,12 +298,55 @@ bool viewport_ui_vp_get_state(enum screen_type screen)
     return ui_vp_info.active[screen];
 }
 
+/*
+ * (re)parse the UI vp from the settings
+ *  - Returns
+ *          0 if no UI vp is used at all
+ *          else the bit for the screen (1<<screen) is set
+ */
+static unsigned viewport_init_ui_vp(void)
+{
+    int screen;
+    unsigned ret = 0;
+    char *setting;
+    FOR_NB_SCREENS(screen)
+    {
+#ifdef HAVE_REMOTE_LCD
+        if ((screen == SCREEN_REMOTE))
+            setting = global_settings.remote_ui_vp_config;
+        else
+#endif
+            setting = global_settings.ui_vp_config;
+
+            
+        if (!(viewport_parse_viewport(&custom_vp[screen], screen,
+                 setting, ',')))
+            viewport_set_fullscreen(&custom_vp[screen], screen);
+        else
+            ret |= BIT_N(screen);
+    }
+    return ret;
+}
+
+#ifdef HAVE_TOUCHSCREEN
+/* check if a point (x and y coordinates) are within a viewport */
+bool viewport_point_within_vp(const struct viewport *vp, int x, int y)
+{
+    bool is_x = (x >= vp->x && x < (vp->x + vp->width));
+    bool is_y = (y >= vp->y && y < (vp->y + vp->height));
+    return (is_x && is_y);
+}
+#endif /* HAVE_TOUCHSCREEN */
+#endif /* HAVE_LCD_BITMAP */
+#endif /* __PCTOOL__ */
+
 #ifdef HAVE_LCD_COLOR
 #define ARG_STRING(_depth) ((_depth) == 2 ? "dddddgg":"dddddcc")
 #else
 #define ARG_STRING(_depth) "dddddgg"
 #endif
 
+#ifdef HAVE_LCD_BITMAP
 const char* viewport_parse_viewport(struct viewport *vp,
                                     enum screen_type screen,
                                     const char *bufptr,
@@ -386,44 +432,4 @@ const char* viewport_parse_viewport(struct viewport *vp,
 
     return ptr;
 }
-
-/*
- * (re)parse the UI vp from the settings
- *  - Returns
- *          0 if no UI vp is used at all
- *          else the bit for the screen (1<<screen) is set
- */
-static unsigned viewport_init_ui_vp(void)
-{
-    int screen;
-    unsigned ret = 0;
-    char *setting;
-    FOR_NB_SCREENS(screen)
-    {
-#ifdef HAVE_REMOTE_LCD
-        if ((screen == SCREEN_REMOTE))
-            setting = global_settings.remote_ui_vp_config;
-        else
 #endif
-            setting = global_settings.ui_vp_config;
-
-            
-        if (!(viewport_parse_viewport(&custom_vp[screen], screen,
-                 setting, ',')))
-            viewport_set_fullscreen(&custom_vp[screen], screen);
-        else
-            ret |= BIT_N(screen);
-    }
-    return ret;
-}
-
-#ifdef HAVE_TOUCHSCREEN
-/* check if a point (x and y coordinates) are within a viewport */
-bool viewport_point_within_vp(const struct viewport *vp, int x, int y)
-{
-    bool is_x = (x >= vp->x && x < (vp->x + vp->width));
-    bool is_y = (y >= vp->y && y < (vp->y + vp->height));
-    return (is_x && is_y);
-}
-#endif /* HAVE_TOUCHSCREEN */
-#endif /* HAVE_LCD_BITMAP */

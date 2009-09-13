@@ -66,6 +66,7 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen);
 #define VP_SB_IGNORE_SETTING(screen) BIT_N(4+screen)
 #define VP_SB_ALLSCREENS (VP_SB_ONSCREEN(0)|VP_SB_ONSCREEN(1))
 
+#ifndef __PCTOOL__
 /*
  * Initialize the viewportmanager, which in turns initializes the UI vp and
  * statusbar stuff
@@ -84,25 +85,6 @@ void viewportmanager_theme_changed(int);
 void viewport_set_fullscreen(struct viewport *vp, enum screen_type screen);
 
 #ifdef HAVE_LCD_BITMAP
-
-/*
- * Parse a viewport definition (vp_def), which looks like:
- *
- * Screens with depth > 1:
- *   X|Y|width|height|font|foregorund color|background color
- * Screens with depth = 1:
- *   X|Y|width|height|font
- *
- * | is a separator and can be specified via the parameter
- *
- * Returns the pointer to the char after the last character parsed
- * if everything went OK or NULL if an error happened (some values
- * not specified in the definition)
- */
-const char* viewport_parse_viewport(struct viewport *vp,
-                                    enum screen_type screen,
-                                    const char *vp_def,
-                                    const char separator);
 
 /*
  * Returns a pointer to the current viewport
@@ -129,4 +111,28 @@ bool viewport_point_within_vp(const struct viewport *vp, int x, int y);
 #define viewport_set_current_vp(a)
 #define viewport_get_current_vp() NULL
 #endif
+
+#endif /* __PCTOOL__ */
+
+#ifdef HAVE_LCD_BITMAP
+
+/*
+ * Parse a viewport definition (vp_def), which looks like:
+ *
+ * Screens with depth > 1:
+ *   X|Y|width|height|font|foregorund color|background color
+ * Screens with depth = 1:
+ *   X|Y|width|height|font
+ *
+ * | is a separator and can be specified via the parameter
+ *
+ * Returns the pointer to the char after the last character parsed
+ * if everything went OK or NULL if an error happened (some values
+ * not specified in the definition)
+ */
+const char* viewport_parse_viewport(struct viewport *vp,
+                                    enum screen_type screen,
+                                    const char *vp_def,
+                                    const char separator);
+#endif /* HAVE_LCD_BITMAP */
 #endif /* __VIEWPORT_H__ */

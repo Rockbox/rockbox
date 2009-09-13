@@ -25,8 +25,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define FONT_SYSFIXED 0
-#define FONT_UI 1
 #define SYSFONT_HEIGHT 8
 
 #ifndef MIN

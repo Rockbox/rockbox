@@ -28,6 +28,7 @@
 #include "wps.h"
 #include "wps_internals.h"
 #include "settings.h"
+#include "viewport.h"
 
 bool debug_wps = true;
 int wps_verbose_level = 0;
@@ -292,125 +293,6 @@ struct skin_viewport* find_viewport(char label, struct wps_data *data)
         list = list->next;
     }
     return NULL;
-}
-
-/* From viewport.c & misc.h */
-#define LIST_VALUE_PARSED(setvals, position) ((setvals) & BIT_N(position))
-
-/*some short cuts for fg/bg/line selector handling */
-#ifdef HAVE_LCD_COLOR
-#define LINE_SEL_FROM_SETTINGS(vp) \
-    do { \
-        vp->lss_pattern = global_settings.lss_color; \
-        vp->lse_pattern = global_settings.lse_color; \
-        vp->lst_pattern = global_settings.lst_color; \
-    } while (0)
-#define FG_FALLBACK global_settings.fg_color
-#define BG_FALLBACK global_settings.bg_color
-#else
-/* mono/greyscale doesn't have most of the above */
-#define LINE_SEL_FROM_SETTINGS(vp)
-#define FG_FALLBACK LCD_DEFAULT_FG
-#define BG_FALLBACK LCD_DEFAULT_BG
-#endif
-
-#ifdef HAVE_LCD_COLOR
-#define ARG_STRING(_depth) ((_depth) == 2 ? "dddddgg":"dddddcc")
-#else
-#define ARG_STRING(_depth) "dddddgg"
-#endif
-
-extern const char* parse_list(const char *fmt, uint32_t *set_vals,
-                       const char sep, const char* str, ...);
-
-const char* viewport_parse_viewport(struct viewport *vp,
-                                    enum screen_type screen,
-                                    const char *bufptr,
-                                    const char separator)
-{
-    /* parse the list to the viewport struct */
-    const char *ptr = bufptr;
-    int depth;
-    uint32_t set = 0;
-
-    enum {
-        PL_X = 0,
-        PL_Y,
-        PL_WIDTH,
-        PL_HEIGHT,
-        PL_FONT,
-        PL_FG,
-        PL_BG,
-    };
-
-    /* Work out the depth of this display */
-    depth = screens[screen].depth;
-#if (LCD_DEPTH == 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 1)
-    if (depth == 1)
-    {
-#ifdef HAVE_LCD_BITMAP
-        if (!(ptr = parse_list("ddddd", &set, separator, ptr,
-                    &vp->x, &vp->y, &vp->width, &vp->height, &vp->font)))
-            return NULL;
-#endif
-    }
-    else
-#endif
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
-    if (depth >= 2)
-    {
-        if (!(ptr = parse_list(ARG_STRING(depth), &set, separator, ptr,
-                    &vp->x, &vp->y, &vp->width, &vp->height, &vp->font,
-                    &vp->fg_pattern,&vp->bg_pattern)))
-            return NULL;
-    }
-    else
-#endif
-    {}
-#undef ARG_STRING
-
-    /* X and Y *must* be set */
-    if (!LIST_VALUE_PARSED(set, PL_X) || !LIST_VALUE_PARSED(set, PL_Y))
-        return NULL;
-    
-    /* fix defaults */
-    if (!LIST_VALUE_PARSED(set, PL_WIDTH))
-        vp->width = screens[screen].lcdwidth - vp->x;
-    if (!LIST_VALUE_PARSED(set, PL_HEIGHT))
-        vp->height = screens[screen].lcdheight - vp->y;
-
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
-    if (!LIST_VALUE_PARSED(set, PL_FG))
-        vp->fg_pattern = FG_FALLBACK;
-    if (!LIST_VALUE_PARSED(set, PL_BG))
-        vp->bg_pattern = BG_FALLBACK;
-#endif /* LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1 */
-
-    LINE_SEL_FROM_SETTINGS(vp);
-
-    /* Validate the viewport dimensions - we know that the numbers are
-       non-negative integers, ignore bars and assume the viewport takes them
-       * into account */
-    if ((vp->x >= screens[screen].lcdwidth) ||
-        ((vp->x + vp->width) > screens[screen].lcdwidth) ||
-        (vp->y >= screens[screen].lcdheight) ||
-        ((vp->y + vp->height) > screens[screen].lcdheight))
-    {
-        return NULL;
-    }
-
-#ifdef HAVE_LCD_BITMAP
-    /* Default to using the user font if the font was an invalid number or '-'*/
-    if (((vp->font != FONT_SYSFIXED) && (vp->font != FONT_UI))
-            || !LIST_VALUE_PARSED(set, PL_FONT)
-            )
-        vp->font = FONT_UI;
-
-    /* Set the defaults for fields not user-specified */
-    vp->drawmode = DRMODE_SOLID;
-#endif
-
-    return ptr;
 }
 
 int main(int argc, char **argv)

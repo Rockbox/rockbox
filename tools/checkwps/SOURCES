@@ -7,4 +7,5 @@ checkwps.c
 
 #ifdef HAVE_LCD_BITMAP
 ../../apps/recorder/bmp.c
+../../apps/gui/viewport.c
 #endif
