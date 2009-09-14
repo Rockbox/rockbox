@@ -155,6 +155,7 @@ int chinachip_patch(const char* firmware, const char* bootloader,
 
     if(ccpmp_backup)
     {
+        int ccpmp_data_pos = ccpmp_pos + 9;
         bd = fopen(ccpmp_backup, "wb");
         if(!bd)
         {
@@ -163,7 +164,7 @@ int chinachip_patch(const char* firmware, const char* bootloader,
         }
 
         INFO(tr("Writing %d bytes to %s..."), ccpmp_size, ccpmp_backup);
-        if(fwrite(&buf[ccpmp_pos], ccpmp_size, 1, bd) != 1)
+        if(fwrite(&buf[ccpmp_data_pos], ccpmp_size, 1, bd) != 1)
         {
             ERR(tr("Can't write to file %s!"), ccpmp_backup);
             goto err;
