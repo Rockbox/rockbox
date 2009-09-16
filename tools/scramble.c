@@ -125,7 +125,7 @@ void usage(void)
            "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2,\n");
     printf("\t                   9200, 1630, ldax, m200, c100, clip, e2v2, m2v4,\n"
            "\t                   fuze, c2v2, clv2, y820, y920, y925, x747, 747p, \n"
-           "\t                   x777)\n");
+           "\t                   x777, nn2g)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -314,6 +314,8 @@ int main (int argc, char** argv)
             modelnum = 60;
         else if (!strcmp(&argv[1][5], "x777"))
             modelnum = 61;
+        else if (!strcmp(&argv[1][5], "nn2g")) /* iPod Nano 2nd Gen */
+            modelnum = 62;
         else if (!strcmp(&argv[1][5], "x767"))
             modelnum = 64;
         else {
