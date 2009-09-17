@@ -140,40 +140,36 @@ static off_t filesize(int fd) {
 }
 
 
-int main(int argc, char *argv[])
+int mknkboot(const char* infile, const char* bootfile, const char* outfile)
 {
-    char *infile, *bootfile, *outfile;
-    int fdin, fdboot,fdout;
+    int fdin, fdboot = -1, fdout = -1;
     int i,n;
     int inlength,bootlength,newlength;
-    unsigned char* buf;
+    unsigned char* buf = NULL;
     unsigned char* boot;
     unsigned char* boot2;
     unsigned char* disable;
     uint32_t sum;
-    
-    if(argc < 3) {
-        usage();
-    }
-
-    infile = argv[1];
-    bootfile = argv[2];
-    outfile = argv[3];
+    int result = 0;
 
     fdin = open(infile, O_RDONLY|O_BINARY);
     if (fdin < 0)
     {
         perror(infile);
+        result = 1;
+        goto quit;
     }
 
     fdboot = open(bootfile, O_RDONLY|O_BINARY);
     if (fdboot < 0)
     {
         perror(bootfile);
+        close(fdin);
+        result = 2;
+        goto quit;
     }
 
     inlength = filesize(fdin);
-
     bootlength = filesize(fdboot);
 
     /* Create buffer for original nk.bin, plus our bootloader (with 12
@@ -185,7 +181,8 @@ int main(int argc, char *argv[])
     if (buf==NULL)
     {
         printf("[ERR]  Could not allocate memory, aborting\n");
-        return 1;
+        result = 3;
+        goto quit;
     }
 
     /****** STEP 1 - Read original nk.bin into buffer */
@@ -194,7 +191,8 @@ int main(int argc, char *argv[])
     if (n != inlength)
     {
         printf("[ERR] Could not read from %s\n",infile);
-        return 2;
+        result = 4;
+        goto quit;
     }
 
     /****** STEP 2 - Move EOF record to the new EOF */
@@ -218,7 +216,8 @@ int main(int argc, char *argv[])
     if (n != bootlength)
     {
         printf("[ERR] Could not read from %s\n",bootfile);
-        return 3;
+        result = 5;
+        goto quit;
     }
 
     /****** STEP 5 - Create header for bootloader record */
@@ -257,18 +256,41 @@ int main(int argc, char *argv[])
     if (fdout < 0)
     {
         perror(outfile);
+        result = 6;
+        goto quit;
     }
 
     n = write(fdout, buf, newlength);
     if (n != newlength)
     {
         printf("[ERR] Could not write output file %s\n",outfile);
-        return 3;
+        result = 7;
+        goto quit;
     }
 
+quit:
+    if(buf != NULL)
+        free(buf);
     close(fdin);
     close(fdboot);
     close(fdout);
     
-    return 0;
+    return result;
 }
+
+
+int main(int argc, char* argv[])
+{
+    char *infile, *bootfile, *outfile;
+    if(argc < 4) {
+        usage();
+    }
+
+    infile = argv[1];
+    bootfile = argv[2];
+    outfile = argv[3];
+
+    return mknkboot(infile, bootfile, outfile);
+
+}
+
