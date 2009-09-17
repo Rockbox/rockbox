@@ -634,7 +634,17 @@ int wps_get_touchaction(struct wps_data *data)
                             wps_state.id3->elapsed = (vy *
                                     wps_state.id3->length) / r->height;
 
+                        if (!wps_state.paused)
+#if (CONFIG_CODEC == SWCODEC)
+                            audio_pre_ff_rewind();
+#else
+                            audio_pause();
+#endif
                         audio_ff_rewind(wps_state.id3->elapsed);
+#if (CONFIG_CODEC != SWCODEC)
+                        if (!wps_state.paused)
+                            audio_resume();
+#endif
                         break;
                     case WPS_TOUCHREGION_VOLUME:
                     {
