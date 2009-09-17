@@ -34,7 +34,7 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
-#include "lib/highscore.h"
+#include "lib/configfile.h"
 #include "lib/playback_control.h"
 
 PLUGIN_HEADER
@@ -154,9 +154,6 @@ PLUGIN_HEADER
 
 #define SNAKE_RC_QUIT BUTTON_REC
 
-#elif (CONFIG_KEYPAD == COWOND2_PAD)
-#define SNAKE_QUIT BUTTON_POWER
-
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 #define SNAKE_QUIT BUTTON_BACK
 #define SNAKE_LEFT BUTTON_LEFT
@@ -173,6 +170,14 @@ PLUGIN_HEADER
 #define SNAKE_DOWN BUTTON_DOWN
 #define SNAKE_PLAYPAUSE BUTTON_MENU
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define SNAKE_QUIT      BUTTON_REC
+#define SNAKE_LEFT      BUTTON_LEFT
+#define SNAKE_RIGHT     BUTTON_RIGHT
+#define SNAKE_UP        BUTTON_UP
+#define SNAKE_DOWN      BUTTON_DOWN
+#define SNAKE_PLAYPAUSE BUTTON_PLAY
+
 #elif CONFIG_KEYPAD == MROBE500_PAD
 #define SNAKE_QUIT BUTTON_POWER
 #define SNAKE_RC_QUIT BUTTON_RC_DOWN
@@ -183,13 +188,8 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == ONDAVX777_PAD)
 #define SNAKE_QUIT BUTTON_POWER
 
-#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
-#define SNAKE_QUIT      BUTTON_REC
-#define SNAKE_LEFT      BUTTON_LEFT
-#define SNAKE_RIGHT     BUTTON_RIGHT
-#define SNAKE_UP        BUTTON_UP
-#define SNAKE_DOWN      BUTTON_DOWN
-#define SNAKE_PLAYPAUSE BUTTON_PLAY
+#elif CONFIG_KEYPAD == COWOND2_PAD
+#define SNAKE_QUIT BUTTON_POWER
 
 #else
 #error No keymap defined!
@@ -218,44 +218,44 @@ PLUGIN_HEADER
 
 #define BOARD_WIDTH (LCD_WIDTH/4)
 #define BOARD_HEIGHT (LCD_HEIGHT/4)
-#define NUM_SCORES  5
-#define SCORE_FILE  PLUGIN_GAMES_DIR "/snake.score"
 
 static int board[BOARD_WIDTH][BOARD_HEIGHT],snakelength;
-static int score,level=1;
-static int dir,dead=0,quit=0;
-static bool apple;
+static unsigned int score,hiscore=0,level=1;
+static int dir;
+static bool apple, dead;
 
-static struct highscore highscores[NUM_SCORES];
+#define CONFIG_FILE_NAME "snake.cfg"
+static struct configdata config[] = {
+   {TYPE_INT, 0, 10, { .int_p = &level }, "level", NULL},
+   {TYPE_INT, 0, 10000, { .int_p = &hiscore }, "hiscore", NULL},
+};
 
-void die (void)
+static void snake_die (void)
 {
     char pscore[17];
     rb->lcd_clear_display();
     rb->snprintf(pscore,sizeof(pscore),"Your score: %d",score);
     rb->lcd_puts(0,0,"Oops...");
     rb->lcd_puts(0,1, pscore);
-    if (highscore_update(score, level, "", highscores, NUM_SCORES) == 0) {
+    if (score>hiscore) {
+        hiscore=score;
         rb->lcd_puts(0,2,"New High Score!");
     }
     else {
-        rb->snprintf(pscore, sizeof(pscore),
-            "High Score: %d", highscores[0].score);
+        rb->snprintf(pscore,sizeof(pscore),"High Score: %d",hiscore);
         rb->lcd_puts(0,2,pscore);
     }
     rb->lcd_update();
     rb->sleep(3*HZ);
-    dead=1;
+    dead=true;
 }
 
-void colission (short x, short y)
+static void snake_colission (short x, short y)
 {
-    if (x==BOARD_WIDTH || x<0 || y==BOARD_HEIGHT || y<0)
-    {
-        die();
+    if (x==BOARD_WIDTH || x<0 || y==BOARD_HEIGHT || y<0) {
+        snake_die();
         return;
     }
-
     switch (board[x][y]) {
         case 0:
             break;
@@ -265,12 +265,12 @@ void colission (short x, short y)
             apple=false;
             break;
         default:
-            die();
+            snake_die();
             break;
     }
 }
 
-void move_head (short x, short y)
+static void snake_move_head (short x, short y)
 {
     switch (dir) {
         case 0:
@@ -286,14 +286,36 @@ void move_head (short x, short y)
             x-=1;
             break;
     }
-    colission (x,y);
+    snake_colission (x,y);
     if (dead)
         return;
     board[x][y]=1;
     rb->lcd_fillrect(x*4,y*4,4,4);
 }
 
-void frame (void)
+static void snake_redraw (void)
+{
+    short x,y;
+    rb->lcd_clear_display();
+    for (x=0; x<BOARD_WIDTH; x++) {
+        for (y=0; y<BOARD_HEIGHT; y++) {
+            switch (board[x][y]) {
+                case -1:
+                    rb->lcd_fillrect((x*4)+1,y*4,2,4);
+                    rb->lcd_fillrect(x*4,(y*4)+1,4,2);
+                    break;
+                case 0:
+                    break;
+                default:
+                    rb->lcd_fillrect(x*4,y*4,4,4);
+                    break;
+            }
+        }
+    }
+    rb->lcd_update();
+}
+
+static void snake_frame (void)
 {
     short x,y,head=0;
     for (x=0; x<BOARD_WIDTH; x++) {
@@ -301,7 +323,7 @@ void frame (void)
             switch (board[x][y]) {
                 case 1:
                     if (!head) {
-                        move_head(x,y);
+                        snake_move_head(x,y);
                         if (dead)
                             return;
                         board[x][y]++;
@@ -328,92 +350,116 @@ void frame (void)
     rb->lcd_update();
 }
 
-void redraw (void)
-{
+static void snake_game_init(void) {
     short x,y;
     rb->lcd_clear_display();
+
     for (x=0; x<BOARD_WIDTH; x++) {
         for (y=0; y<BOARD_HEIGHT; y++) {
-            switch (board[x][y]) {
-                case -1:
-                    rb->lcd_fillrect((x*4)+1,y*4,2,4);
-                    rb->lcd_fillrect(x*4,(y*4)+1,4,2);
-                    break;
-                case 0:
-                    break;
-                default:
-                    rb->lcd_fillrect(x*4,y*4,4,4);
-                    break;
-            }
+            board[x][y]=0;
         }
     }
-    rb->lcd_update();
+    apple=false;
+    dead=false;
+    snakelength=4;
+    score=0;
+    board[11][7]=1;   
 }
 
-void game_pause (void) {
-    int button;
-    rb->lcd_clear_display();
-    rb->lcd_putsxy(3,12,"Game Paused");
-#if CONFIG_KEYPAD == RECORDER_PAD
-    rb->lcd_putsxy(3,22,"[Play] to resume");
-#elif CONFIG_KEYPAD == ONDIO_PAD
-    rb->lcd_putsxy(3,22,"[Mode] to resume");
-#endif
-    rb->lcd_putsxy(3,32,"[Off] to quit");
-    rb->lcd_update();
-    while (1) {
-        button=rb->button_get(true);
-        switch (button) {
-#ifdef SNAKE_RC_QUIT
-            case SNAKE_RC_QUIT:
-#endif
-            case SNAKE_QUIT:
-                dead=1;
-                quit=1;
-                return;
-            case SNAKE_PLAYPAUSE:
-                redraw();
-                rb->sleep(HZ/2);
-                return;
+static void snake_choose_level(void)
+{
+    rb->set_int("Snake Speed", "", UNIT_INT, &level, NULL, 1, 1, 9, NULL);
+}
+
+static bool _ingame;
+static int snake_menu_cb(int action, const struct menu_item_ex *this_item)
+{
+    if(action == ACTION_REQUEST_MENUITEM
+       && !_ingame && ((intptr_t)this_item)==0)
+        return ACTION_EXIT_MENUITEM;
+    return action;
+}
+
+static int snake_game_menu(bool ingame)
+{
+    rb->button_clear_queue();
+    int choice = 0;
+    
+    _ingame = ingame;
+
+    MENUITEM_STRINGLIST(main_menu,"Snake Menu",snake_menu_cb,
+                        "Resume Game",
+                        "Start New Game",
+                        "Snake Speed",
+                        "High Score",
+                        "Playback Control",
+                        "Quit");
+                             
+    while (true) {
+        choice = rb->do_menu(&main_menu, &choice, NULL, false);
+        switch (choice) {
+            case 0:
+                snake_redraw();
+                return 0;
+            case 1:
+                snake_game_init();
+                return 0;
+            case 2:
+                snake_choose_level();
+                break;
+            case 3:
+                rb->splashf(HZ*2, "High Score: %d", hiscore);
+                break;
+            case 4:
+                playback_control(NULL);
+                break;
+            case 5:
+                return 1;
+            case MENU_ATTACHED_USB:
+                return 1;
             default:
-                if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
-                    dead = 1;
-                    quit = 2;
-                    return;
-                }
                 break;
         }
     }
 }
 
-
-void game (void) {
+static int snake_game_loop (void) {
     int button;
     short x,y;
-    while (1) {
-        frame();
-        if (dead)
-            return;
-        if (!apple) {
-            do {
-                x=rb->rand() % BOARD_WIDTH;
-                y=rb->rand() % BOARD_HEIGHT;
-            } while (board[x][y]);
-            apple=true;
-            board[x][y]=-1;
-            rb->lcd_fillrect((x*4)+1,y*4,2,4);
-            rb->lcd_fillrect(x*4,(y*4)+1,4,2);
+    bool pause = false; 
+    
+    if (snake_game_menu(false)==1)
+        return 1;
+
+    while (true) {
+        if (!pause) {
+            snake_frame();
+            if (dead) {
+                if (snake_game_menu(false)==1)
+                    return 1;
+            }
+            if (!apple) {
+                do {
+                    x=rb->rand() % BOARD_WIDTH;
+                    y=rb->rand() % BOARD_HEIGHT;
+                } while (board[x][y]);
+                apple=true;
+                board[x][y]=-1;
+                rb->lcd_fillrect((x*4)+1,y*4,2,4);
+                rb->lcd_fillrect(x*4,(y*4)+1,4,2);
+            }
+
+            rb->sleep(HZ/level);
         }
 
-        rb->sleep(HZ/level);
-
         button=rb->button_get(false);
-
+        
 #ifdef HAS_BUTTON_HOLD
-        if (rb->button_hold())
-        button = SNAKE_PLAYPAUSE;
+        if (rb->button_hold()) {
+            pause = true;
+            rb->splash (HZ, "Paused");
+        }
 #endif
-
         switch (button) {
              case SNAKE_UP:
                  if (dir!=2) dir=0;
@@ -427,113 +473,37 @@ void game (void) {
              case SNAKE_LEFT:
                  if (dir!=1) dir=3;
                  break;
+            case SNAKE_PLAYPAUSE:
+                pause = !pause;
+                if (pause)
+                    rb->splash (HZ, "Paused");
+                else
+                    snake_redraw();
+                break;
 #ifdef SNAKE_RC_QUIT
              case SNAKE_RC_QUIT:
 #endif
              case SNAKE_QUIT:
-                 quit = 1;
-                 return;
-             case SNAKE_PLAYPAUSE:
-                 game_pause();
-                 break;
-             default:
-                 if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
-                     quit = 2;
-                     return;
-                 }
-                 break;
-        }
-    }
-}
-
-void game_init(void) {
-    int selection=0;
-    short x,y;
-    bool menu_quit = false;
-
-    for (x=0; x<BOARD_WIDTH; x++) {
-        for (y=0; y<BOARD_HEIGHT; y++) {
-            board[x][y]=0;
-        }
-    }
-    dead=0;
-    apple=false;
-    snakelength=4;
-    score=0;
-    board[11][7]=1;
-
-#if LCD_DEPTH > 1
-    fb_data *backdrop = rb->lcd_get_backdrop();
-#endif
-
-    MENUITEM_STRINGLIST(menu, "Snake Menu", NULL,
-                        "Start New Game", "Starting Level",
-                        "High Scores",
-                        "Playback Control", "Quit");
-
-    rb->button_clear_queue();
-
-    while (!menu_quit) {
-        switch(rb->do_menu(&menu, &selection, NULL, false))
-        {
-            case 0:
-                menu_quit = true; /* start playing */
+                    pause = false;
+                    if (snake_game_menu(true)==1)
+                        return 1;
                 break;
-
-            case 1:
-                rb->set_int("Starting Level", "", UNIT_INT, &level, NULL,
-                            1, 1, 9, NULL );
-                break;
-
-            case 2:
-#if LCD_DEPTH > 1
-                rb->lcd_set_backdrop(NULL);
-#endif
-                highscore_show(NUM_SCORES, highscores, NUM_SCORES, true);
-
-                rb->lcd_setfont(FONT_UI);
-#if LCD_DEPTH > 1
-                rb->lcd_set_backdrop(backdrop);
-#ifdef HAVE_LCD_COLOR
-                rb->lcd_set_background(rb->global_settings->bg_color);
-                rb->lcd_set_foreground(rb->global_settings->fg_color);
-#endif
-#endif
-                break;
-
-            case 3:
-                playback_control(NULL);
-                break;
-
-            case MENU_ATTACHED_USB:
-                quit = 2;
-                menu_quit = true;
-                break;
-
             default:
-                quit = 1; /* quit program */
-                menu_quit = true;
+                if (rb->default_event_handler (button) == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
                 break;
-
         }
     }
 }
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    (void)(parameter);
+    (void)parameter;
 
-    highscore_load(SCORE_FILE, highscores, NUM_SCORES);
-    while(!quit)
-    {
-        game_init();
-        if(quit)
-            break;
-        rb->lcd_clear_display();
-        game();
-    }
-    highscore_save(SCORE_FILE, highscores, NUM_SCORES);
-    return (quit==1)?PLUGIN_OK:PLUGIN_USB_CONNECTED;
+    configfile_load(CONFIG_FILE_NAME,config,2,0);
+    rb->lcd_clear_display();
+    snake_game_loop();
+    configfile_save(CONFIG_FILE_NAME,config,2,0);
+    return PLUGIN_OK;
 }
-
 #endif
