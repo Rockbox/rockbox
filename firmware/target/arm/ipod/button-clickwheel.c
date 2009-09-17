@@ -42,7 +42,7 @@
 
 #define WHEEL_FAST_OFF_TIMEOUT   250000 /* timeout for acceleration = 250ms */
 #define WHEEL_REPEAT_TIMEOUT     250000 /* timeout for button repeat = 250ms */
-#define WHEEL_UNTOUCH_TIMEOUT    150000 /* timeout for untouching wheel = 100ms */
+#define WHEEL_UNTOUCH_TIMEOUT    150000 /* timeout for untouching wheel = 150ms */
 #define WHEELCLICKS_PER_ROTATION     96 /* wheelclicks per full rotation */
 
 /* This amount of clicks is needed for at least scrolling 1 item. Choose small values 
