@@ -137,9 +137,9 @@ void lcd_init_device(void)
     PCON14 &= ~0xf0;   /* Set pin 1 to input */
 
     if (((PDAT13 & 1) == 0) && ((PDAT14 & 2) == 2))
-        lcd_type = 0;  /* Similar to ILI9320 */
+        lcd_type = 0;  /* Similar to ILI9320 - aka "type 2" */
     else
-        lcd_type = 1;  /* Similar to LDS176 */
+        lcd_type = 1;  /* Similar to LDS176 - aka "type 7" */
 
     /* Now init according to lcd type */
     if (lcd_type == 0) {
@@ -173,6 +173,7 @@ void lcd_update(void)
         s5l_lcd_write_cmd_data(R_HORIZ_GRAM_ADDR_SET,  0);
         s5l_lcd_write_cmd_data(R_VERT_GRAM_ADDR_SET,   0);
 
+        s5l_lcd_write_cmd(0);
         s5l_lcd_write_cmd(R_WRITE_DATA_TO_GRAM);
     } else {
         s5l_lcd_write_cmd(R_COLUMN_ADDR_SET);
@@ -211,4 +212,19 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     /* TODO.  For now, just do a full-screen update */
     lcd_update();
+}
+
+/* Performance function to blit a YUV bitmap directly to the LCD */
+void lcd_blit_yuv(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    (void)src;
+    (void)src_x;
+    (void)src_y;
+    (void)stride;
+    (void)x;
+    (void)y;
+    (void)width;
+    (void)height;
 }
