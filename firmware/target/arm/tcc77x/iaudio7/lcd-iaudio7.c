@@ -128,7 +128,7 @@ static void _display_on(void)
 void lcd_init_device(void)
 {
     /* Configure external memory banks */
-    CSCFG1 = 0x3d500023;
+    CSCFG1 = 0x2d500023 | (((MCFG >> 11) & 1) << 28);
 
     /* may be reset */
     GPIOA |= 0x8000;
