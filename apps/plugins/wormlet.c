@@ -348,6 +348,8 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define COLOR_BG   LCD_RGBPACK(181, 199, 231)
 #endif
 
+#define CHECK_SQUARE_COLLISION(x1,y1,s1,x2,y2,s2) (x1+s1>x2)&&(x2+s2>x1)&&(y1+s1>y2)&&(y2+s2>y1)
+
 /**
  * All the properties that a worm has.
  */
@@ -830,21 +832,19 @@ static void make_food(int index)
            the entire food lies within the FIELD */
         x = rb->rand() % (FIELD_RECT_WIDTH  - food_size);
         y = rb->rand() % (FIELD_RECT_HEIGHT - food_size);
-
+        collisionDetected = false;
         /* Ensure that the new food doesn't collide with any
            existing foods or arghs.
-           If one or more corners of the new food hit any existing
+           If the new food hit any existing
            argh or food a collision is detected.
         */
-        collisionDetected =
-            food_collision(x                , y                ) >= 0 ||
-            food_collision(x                , y + food_size - 1) >= 0 ||
-            food_collision(x + food_size - 1, y                ) >= 0 ||
-            food_collision(x + food_size - 1, y + food_size - 1) >= 0 ||
-            argh_collision(x                , y                ) >= 0 ||
-            argh_collision(x                , y + food_size - 1) >= 0 ||
-            argh_collision(x + food_size - 1, y                ) >= 0 ||
-            argh_collision(x + food_size - 1, y + food_size - 1) >= 0;
+
+        for (i=0; i<MAX_FOOD && !collisionDetected; i++) {
+            collisionDetected = CHECK_SQUARE_COLLISION(x,y,food_size,foodx[i],foody[i],food_size);
+        }
+        for (i=0; i<argh_count && !collisionDetected; i++) {
+            collisionDetected = CHECK_SQUARE_COLLISION(x,y,food_size,arghx[i],arghy[i],argh_size);
+        }
 
         /* use coordinates for further testing */
         foodx[index] = x;
@@ -853,7 +853,9 @@ static void make_food(int index)
         /* now test wether we accidently hit the worm with food ;) */
         i = 0;
         for (i = 0; i < worm_count && !collisionDetected; i++) {
-            collisionDetected |= worm_food_collision(&worms[i], index);
+
+            collisionDetected = worm_food_collision(&worms[i], index);
+
         }
     }
     while (collisionDetected);
@@ -919,21 +921,19 @@ static void make_argh(int index)
            the entire food lies within the FIELD */
         x = rb->rand() % (FIELD_RECT_WIDTH  - argh_size);
         y = rb->rand() % (FIELD_RECT_HEIGHT - argh_size);
-
+        collisionDetected = false;
         /* Ensure that the new argh doesn't intersect with any
            existing foods or arghs.
-           If one or more corners of the new argh hit any existing
+           If the new argh hit any existing
            argh or food an intersection is detected.
         */
-        collisionDetected =
-            food_collision(x                , y                ) >= 0 ||
-            food_collision(x                , y + argh_size - 1) >= 0 ||
-            food_collision(x + argh_size - 1, y                ) >= 0 ||
-            food_collision(x + argh_size - 1, y + argh_size - 1) >= 0 ||
-            argh_collision(x                , y                ) >= 0 ||
-            argh_collision(x                , y + argh_size - 1) >= 0 ||
-            argh_collision(x + argh_size - 1, y                ) >= 0 ||
-            argh_collision(x + argh_size - 1, y + argh_size - 1) >= 0;
+
+        for (i=0; i<MAX_FOOD && !collisionDetected; i++) {
+            collisionDetected = CHECK_SQUARE_COLLISION(x,y,argh_size,foodx[i],foody[i],food_size);
+        }
+        for (i=0; i<argh_count && !collisionDetected; i++) {
+            collisionDetected = CHECK_SQUARE_COLLISION(x,y,argh_size,arghx[i],arghy[i],argh_size);
+        }
 
         /* use the candidate coordinates to make a real argh */
         arghx[index] = x;
