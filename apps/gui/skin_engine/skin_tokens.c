@@ -322,7 +322,6 @@ const char *get_token_value(struct gui_wps *gwps,
             if (!data->albumart)
                 return NULL;
             if (audio_current_aa_hid() >= 0) {
-                data->albumart->draw = true;
                 return "C";
             }
             data->albumart->draw = false;

@@ -475,13 +475,6 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
         if (data->tokens[i].type == WPS_TOKEN_IMAGE_PRELOAD_DISPLAY)
             clear_image_pos(gwps, find_image(data->tokens[i].value.i&0xFF, gwps->data));
 #endif
-#ifdef HAVE_ALBUMART
-        if (data->albumart && data->tokens[i].type == WPS_TOKEN_ALBUMART_DISPLAY)
-        {
-            draw_album_art(gwps, audio_current_aa_hid(), true);
-            data->albumart->draw = false;
-        }
-#endif
     }
 
     return true;
@@ -629,6 +622,14 @@ static bool get_line(struct gui_wps *gwps,
                 }
             }
                 break;
+#ifdef HAVE_ALBUMART
+            case WPS_TOKEN_ALBUMART_DISPLAY:
+                if (data->albumart)
+                {
+                    data->albumart->draw = true;
+                }
+                break;
+#endif
             default:
             {
                 /* get the value of the tag and copy it to the buffer */
