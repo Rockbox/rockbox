@@ -108,8 +108,10 @@
 #define CLKCON                  (*(REG32_PTR_T)(0x3C500000))     /* Clock control Register */
 #define PLL0PMS                 (*(REG32_PTR_T)(0x3C500004))     /* PLL PMS value Register */
 #define PLL1PMS                 (*(REG32_PTR_T)(0x3C500008))     /* PLL PMS value Register */
+#define PLL2PMS                 (*(REG32_PTR_T)(0x3C50000C))     /* PLL PMS value Register  - S5L8701 only? */
 #define PLL0LCNT                (*(REG32_PTR_T)(0x3C500014))     /* PLL0 lock count register */
 #define PLL1LCNT                (*(REG32_PTR_T)(0x3C500018))     /* PLL1 lock count register */
+#define PLL2LCNT                (*(REG32_PTR_T)(0x3C50001C))     /* PLL2 lock count register - S5L8701 only? */
 #define PLLLOCK                 (*(REG32_PTR_T)(0x3C500020))     /* PLL lock status register */
 #define PLLCON                  (*(REG32_PTR_T)(0x3C500024))     /* PLL control register */
 #define PWRCON                  (*(REG32_PTR_T)(0x3C500028))     /* Clock power control register */

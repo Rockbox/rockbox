@@ -197,6 +197,7 @@
 #define LCD_LYRE_PROTO1      33 /* as used by the Lyre */
 #define LCD_YH925     34 /* as used by Samsung YH-925 (similar to the H10 20GB) */
 #define LCD_VIEW      35 /* as used by the Sansa View */ 
+#define LCD_NANO2G    36 /* as used by the iPod Nano 2nd Generation */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1

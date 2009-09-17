@@ -9,11 +9,11 @@
 #define MODEL_NAME   "Apple iPod Nano 2g"
 
 /* define this if you have recording possibility */
-//#define HAVE_RECORDING
+#define HAVE_RECORDING
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
-#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_FMRADIO)
+#define INPUT_SRC_CAPS (SRC_CAP_LINEIN)
 
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
@@ -86,7 +86,7 @@
 #define CONFIG_LCD LCD_NANO2G
 
 /* Define the type of audio codec */
-#define HAVE_UDA1380
+#define HAVE_WM8975
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
@@ -101,14 +101,6 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
-/* FM Tuner */
-#define CONFIG_TUNER       TEA5760
-#define CONFIG_TUNER_XTAL  32768
-
-//#define HAVE_TLV320
-
-/* TLV320 has no tone controls, so we use the software ones */
-#define HAVE_SW_TONE_CONTROLS
 
 #define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN    500   /* min. capacity selectable */
@@ -124,10 +116,10 @@
 /* Define this if your LCD can set contrast */
 //#define HAVE_LCD_CONTRAST
 
-/* Define this if you have a Motorola SCF5250 */
+/* The exact type of CPU */
 #define CONFIG_CPU S5L8701
 
-/* Define this if you want to use coldfire's i2c interface */
+/* I2C interface */
 #define CONFIG_I2C I2C_S5L8700
 
 /* define this if the hardware can be powered off while charging */
@@ -137,7 +129,7 @@
 #define FLASH_SIZE 0x400000
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ      11289600
+#define CPU_FREQ      200000000
 
 /* Define this if you have ATA power-off control */
 //#define HAVE_ATA_POWER_OFF
