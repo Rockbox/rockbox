@@ -125,6 +125,11 @@
 #define SRCPND                  (*(REG32_PTR_T)(0x39C00000))     /* Indicates the interrupt request status. */
 #define INTMOD                  (*(REG32_PTR_T)(0x39C00004))     /* Interrupt mode register. */
 #define INTMSK                  (*(REG32_PTR_T)(0x39C00008))     /* Determines which interrupt source is masked. The */
+#if CONFIG_CPU==S5L8701
+#define    INTMSK_TIMERB        (1<<5)
+#else
+#define    INTMSK_TIMERB        (1<<7)
+#endif
 #define PRIORITY                (*(REG32_PTR_T)(0x39C0000C))     /* IRQ priority control register */
 #define INTPND                  (*(REG32_PTR_T)(0x39C00010))     /* Indicates the interrupt request status. */
 #define INTOFFSET               (*(REG32_PTR_T)(0x39C00014))     /* Indicates the IRQ interrupt request source */

@@ -54,6 +54,6 @@ void tick_start(unsigned int interval_in_ms)
     TBCMD = (1 << 0);   /* TB_EN */
 
     /* enable timer interrupt */
-    INTMSK |= (1 << 7);
+    INTMSK |= INTMSK_TIMERB;
 }
 
