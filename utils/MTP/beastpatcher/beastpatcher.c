@@ -127,7 +127,7 @@ static void create_single_boot(unsigned char* boot, int bootlen,
     return;
 }
 
-int beastpatcher(const unsigned char* bootfile)
+int beastpatcher(const char* bootfile)
 {
     char yesno[4];
     unsigned char* fwbuf;

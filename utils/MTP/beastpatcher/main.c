@@ -85,8 +85,8 @@ int main(int argc, char* argv[])
     int res = 0;
     char yesno[4];
     int i;
-    unsigned char* bootloader = NULL;
-    unsigned char* firmware = NULL;
+    char* bootloader = NULL;
+    char* firmware = NULL;
 #ifdef WITH_BOOTOBJS
     int action = INSTALL;
 #else

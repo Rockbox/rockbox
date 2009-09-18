@@ -40,7 +40,7 @@
 #ifndef BEASTPATCHER_H
 #define BEASTPATCHER_H
 
-int beastpatcher(const unsigned char* bootfile);
+int beastpatcher(const char* bootfile);
 int sendfirm(const char* filename);
 
 #endif
