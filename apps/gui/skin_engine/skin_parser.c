@@ -1120,13 +1120,10 @@ static int parse_albumart_display(const char *wps_bufptr,
                                       struct wps_data *wps_data)
 {
     (void)wps_bufptr;
-    if (wps_data->num_tokens > 1)
+    struct wps_token *prev = token-1;
+    if ((wps_data->num_tokens > 1) && (prev->type == WPS_TOKEN_CONDITIONAL))
     {
-        struct wps_token *prev = token-1;
-        if (prev->type == WPS_TOKEN_CONDITIONAL)
-        {
-            token->type = WPS_TOKEN_ALBUMART_FOUND;
-        }
+        token->type = WPS_TOKEN_ALBUMART_FOUND;
     }
     else if (wps_data->albumart)
     {
