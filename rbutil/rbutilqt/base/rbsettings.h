@@ -83,6 +83,7 @@ class RbSettings : public QObject
             ServerConfUrl,
             GenlangUrl,
             ThemesUrl,
+            RbutilUrl,
             BleedingInfo,
             CurPlatformName,
             CurManual,

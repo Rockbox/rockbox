@@ -212,7 +212,7 @@ void RbUtilQt::downloadDone(bool error)
     bleeding = new HttpGet(this);
     connect(bleeding, SIGNAL(done(bool)), this, SLOT(downloadBleedingDone(bool)));
     connect(bleeding, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
-    connect(qApp, SIGNAL(lastWindowClosed()), daily, SLOT(abort()));
+    connect(qApp, SIGNAL(lastWindowClosed()), bleeding, SLOT(abort()));
     if(RbSettings::value(RbSettings::CacheOffline).toBool())
         bleeding->setCache(true);
     bleeding->setFile(&bleedingInfo);
@@ -251,6 +251,9 @@ void RbUtilQt::downloadBleedingDone(bool error)
         qDebug() << "[RbUtil] version map:" << versmap;
 
         m_gotInfo = true;
+        
+        //start check for updates
+        checkUpdate();
     }
 }
 
@@ -1217,4 +1220,138 @@ bool RbUtilQt::chkConfig(bool warn)
     return error;
 }
 
+void RbUtilQt::checkUpdate(void)
+{
+    QString url = RbSettings::value(RbSettings::RbutilUrl).toString();
+#if defined(Q_OS_WIN32)   
+    url += "win32/";
+#elif defined(Q_OS_LINUX)
+    url += "linux/";
+#elif defined(Q_OS_MACX)
+    url += "macosx/";
+#endif
+    
+    update = new HttpGet(this);
+    connect(update, SIGNAL(done(bool)), this, SLOT(downloadUpdateDone(bool)));
+    connect(update, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
+    connect(qApp, SIGNAL(lastWindowClosed()), update, SLOT(abort()));
+    if(RbSettings::value(RbSettings::CacheOffline).toBool())
+        update->setCache(true);
+   
+    update->getFile(QUrl(url));
+}
 
+void RbUtilQt::downloadUpdateDone(bool error)
+{
+    if(error) {
+        qDebug() << "[RbUtil] network error:" << update->error();
+    }
+    else {
+        QString toParse(update->readAll());
+        qDebug() << "[Checkupdate] " << toParse;
+        
+        QRegExp searchString("<a[^>]*>(rbutilqt[^<]*)</a>");
+        QStringList rbutilList;
+        int pos = 0;
+        while ((pos = searchString.indexIn(toParse, pos)) != -1) 
+        {
+            rbutilList << searchString.cap(1);
+            pos += searchString.matchedLength();
+        }
+        
+        QString newVersion ="";
+        //check if there is a binary with higher version in this list
+        for(int i=0; i < rbutilList.size(); i++)
+        {
+#if defined(Q_OS_LINUX) 
+#if defined(__amd64__)
+            //skip if it isnt a 64bit build
+            if( !rbutilList.at(i).contains("64bit"))
+                continue;
+#else
+            //skip if it is a 64bit build
+            if(rbutilList.at(i).contains("64bit"))
+                continue;
+#endif                
+#endif            
+            //check if it is newer, and remember newest
+            if(newerVersion(VERSION,rbutilList.at(i)))
+            {
+                if(newVersion == "" || newerVersion(newVersion,rbutilList.at(i)))
+                {
+                    newVersion = rbutilList.at(i);
+                }
+            }
+        }
+
+        // if we found something newer, display info
+        if(newVersion != "")
+        {
+            QString url = RbSettings::value(RbSettings::RbutilUrl).toString();
+#if defined(Q_OS_WIN32)   
+            url += "win32/";
+#elif defined(Q_OS_LINUX)
+            url += "linux/";
+#elif defined(Q_OS_MACX)
+            url += "macosx/";
+#endif
+            url += newVersion;
+            
+            QMessageBox::information(this,tr("RockboxUtility Update available"),
+                        tr("<b>New RockboxUtility Version available.</b> <br><br>"
+                        "Download it from here: <a href='%1'>%2</a>").arg(url).arg(newVersion) );
+        }
+    }
+}
+
+bool RbUtilQt::newerVersion(QString versionOld,QString versionNew)
+{
+   QRegExp chars("\\d*(\\D)");
+   
+   //strip non-number from beginning
+   versionOld = versionOld.remove(0,versionOld.indexOf(QRegExp("\\d")));
+   versionNew = versionNew.remove(0,versionNew.indexOf(QRegExp("\\d")));
+
+   // split versions by "."
+   QStringList versionListOld = versionOld.split(".");
+   QStringList versionListNew = versionNew.split(".");
+   
+   QStringListIterator iteratorOld(versionListOld);
+   QStringListIterator iteratorNew(versionListNew);
+   
+   //check every section
+   while(iteratorOld.hasNext() && iteratorNew.hasNext())
+   {
+      QString newPart = iteratorNew.next();
+      QString oldPart = iteratorOld.next();
+      QString newPartChar = "", oldPartChar = "";
+      int newPartInt = 0, oldPartInt =0;
+
+      //convert to int, if it contains chars, put into seperated variable
+      if(newPart.contains(chars))
+      {
+        newPartChar = chars.cap(1);
+        newPart = newPart.remove(newPartChar);
+      }
+      newPartInt = newPart.toInt();
+      //convert to int, if it contains chars, put into seperated variable
+      if(oldPart.contains(chars))
+      {
+        oldPartChar = chars.cap(1);
+        oldPart = oldPart.remove(oldPartChar);
+      }
+      oldPartInt = oldPart.toInt();
+            
+      if(newPartInt > oldPartInt)  // this section int is higher -> true
+        return true;
+      else if(newPartInt < oldPartInt)  //this section int is lower -> false
+        return false;
+      else if(newPartChar > oldPartChar)  //ints are the same, chars is higher -> true
+        return true;
+      else if(newPartChar < oldPartChar)  //ints are the same, chars is lower -> false
+        return false;
+      //all the same, next section  
+   }
+   // all the same -> false
+   return false;
+}

@@ -44,6 +44,7 @@ const static struct {
     { RbSettings::ServerConfUrl,        "server_conf_url",      "" },
     { RbSettings::GenlangUrl,           "genlang_url",          "" },
     { RbSettings::ThemesUrl,            "themes_url",           "" },
+    { RbSettings::RbutilUrl,            "rbutil_url",           "" },
     { RbSettings::BleedingInfo,         "bleeding_info",        "" },
     { RbSettings::CurPlatformName,      ":platform:/name",      "" },
     { RbSettings::CurManual,            ":platform:/manualname","rockbox-:platform:" },

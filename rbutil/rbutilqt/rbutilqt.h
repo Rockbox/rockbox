@@ -47,6 +47,7 @@ class RbUtilQt : public QMainWindow
         QString platform;
         HttpGet *daily;
         HttpGet *bleeding;
+        HttpGet *update;
         QString absolutePath;
         QTemporaryFile buildInfo;
         QTemporaryFile bleedingInfo;
@@ -110,6 +111,10 @@ class RbUtilQt : public QMainWindow
         void installPortable(void);
         void updateInfo(void);
         void updateTabs(int);
+        
+        void checkUpdate(void);
+        void downloadUpdateDone(bool errror);
+        bool newerVersion(QString versionOld,QString versionNew);
 };
 
 #endif
