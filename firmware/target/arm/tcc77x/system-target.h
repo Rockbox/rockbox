@@ -43,4 +43,17 @@ static inline void udelay(unsigned usecs)
     while (TIME_BEFORE(USEC_TIMER, stop));
 }
 
+
+#define TCC77X_CSCFG_BW8       0
+#define TCC77X_CSCFG_BW16      1
+
+/* Due to hardware bug or "feature" this hack is needed to set bus width bits */
+static inline
+unsigned long tcc77x_cscfg_bw(int bw) {
+    if (bw == TCC77X_CSCFG_BW8)
+        return (((MCFG >> 11) & 3) ^ 3) << 28;
+    else
+        return (((MCFG >> 11) & 3) ^ 2) << 28;
+}
+
 #endif /* SYSTEM_TARGET_H */
