@@ -1638,7 +1638,8 @@ static inline int set_limiter_buffer(int count, int32_t *buf[])
                 }
             }
         }
-        reset_limiter_buffer(&AUDIO_DSP);
+        limiter_buffer_full = false;
+        limiter_buffer_emptying = false;
     }
     else    /* limiter buffer NOT emptying */
     {
