@@ -449,11 +449,11 @@ static char *get_token_desc(struct wps_token *token, char *buf,
             break;
 #endif
         case WPS_VIEWPORT_ENABLE:
-            snprintf(buf, bufsize, "enable VP:%d",
-                     token->value.i);
+            snprintf(buf, bufsize, "enable VP: %c",
+                     (char)token->value.i);
             break;
         case WPS_TOKEN_BUTTON_VOLUME:
-            snprintf(buf, bufsize, "Volume button timeout:%d",
+            snprintf(buf, bufsize, "Volume button timeout: %d",
                      token->value.i);
             break;
         default:
