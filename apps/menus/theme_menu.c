@@ -95,6 +95,7 @@ static int set_color_func(void* color)
                          colors[c].setting, banned_color);
     settings_save();
     settings_apply(false);
+    send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
     return res;
 }
 
