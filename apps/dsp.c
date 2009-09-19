@@ -1934,21 +1934,18 @@ static int limiter_process(int count, int32_t *buf[])
     }
     /* Implement the limiter: adjust gain of the outbound samples by the gain
      * amounts in the gain steps array corresponding to the peak values. */
-    for (ch = 0; ch < AUDIO_DSP.data.num_channels; ch++)
+    for (i = 0; i < count; i++)
     {
-        int32_t *d = buf[ch];
-        for (i = 0; i < count; i++)
+        if (out_buf_peak[i] > 0)
         {
-            if (out_buf_peak[i] > 0)
-            {
-                gain_peak = (out_buf_peak[i] + 1) / 90;
-                gain_rem  = (out_buf_peak[i] + 1) % 90;
-                gain = gain_steps[gain_peak];
-                if ((gain_peak < 48) && (gain_rem > 0))
-                    gain -= gain_rem * ((gain_steps[gain_peak] -
-                        gain_steps[gain_peak + 1]) / 90);
-                d[i] = FRACMUL_SHL(d[i], gain, 3);
-            }
+            gain_peak = (out_buf_peak[i] + 1) / 90;
+            gain_rem  = (out_buf_peak[i] + 1) % 90;
+            gain = gain_steps[gain_peak];
+            if ((gain_peak < 48) && (gain_rem > 0))
+                gain -= gain_rem * ((gain_steps[gain_peak] -
+                    gain_steps[gain_peak + 1]) / 90);
+            for (ch = 0; ch < AUDIO_DSP.data.num_channels; ch++)
+                buf[ch][i] = FRACMUL_SHL(buf[ch][i], gain, 3);
         }
     }
     return count;
