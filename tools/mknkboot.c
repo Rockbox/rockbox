@@ -45,6 +45,8 @@
 #include <unistd.h>
 #include <inttypes.h>
 
+#include "mknkboot.h"
+
 /* New entry point for nk.bin - where our dualboot code is inserted */
 #define NK_ENTRY_POINT 0x88200000
 
@@ -113,19 +115,13 @@ static uint32_t dualboot[] =
     BL_ENTRY_POINT   /* RB bootloader load address/entry point */
 };
 
+
 static void put_uint32le(uint32_t x, unsigned char* p)
 {
     p[0] = x & 0xff;
     p[1] = (x >> 8) & 0xff;
     p[2] = (x >> 16) & 0xff;
     p[3] = (x >> 24) & 0xff;
-}
-
-static void usage(void)
-{
-    printf("Usage: mknkboot <firmware file> <boot file> <output file>\n");
-
-    exit(1);
 }
 
 static off_t filesize(int fd) {
@@ -140,100 +136,62 @@ static off_t filesize(int fd) {
 }
 
 
-int mknkboot(const char* infile, const char* bootfile, const char* outfile)
+int mknkboot(const struct filebuf *indata, const struct filebuf *bootdata,
+             struct filebuf *outdata)
 {
-    int fdin, fdboot = -1, fdout = -1;
-    int i,n;
-    int inlength,bootlength,newlength;
-    unsigned char* buf = NULL;
+    int i;
     unsigned char* boot;
     unsigned char* boot2;
     unsigned char* disable;
     uint32_t sum;
-    int result = 0;
-
-    fdin = open(infile, O_RDONLY|O_BINARY);
-    if (fdin < 0)
-    {
-        perror(infile);
-        result = 1;
-        goto quit;
-    }
-
-    fdboot = open(bootfile, O_RDONLY|O_BINARY);
-    if (fdboot < 0)
-    {
-        perror(bootfile);
-        close(fdin);
-        result = 2;
-        goto quit;
-    }
-
-    inlength = filesize(fdin);
-    bootlength = filesize(fdboot);
 
     /* Create buffer for original nk.bin, plus our bootloader (with 12
        byte header), plus the 16-byte "disable record", plus our dual-boot code */
+    outdata->len = indata->len + (bootdata->len + 12) + 16 + (12 + 28);
+    outdata->buf = malloc(outdata->len);
 
-    newlength = inlength + (bootlength + 12) + 16 + (12 + 28);
-    buf = malloc(newlength);
-
-    if (buf==NULL)
+    if (outdata->buf==NULL)
     {
         printf("[ERR]  Could not allocate memory, aborting\n");
-        result = 3;
-        goto quit;
+        return -1;
     }
 
     /****** STEP 1 - Read original nk.bin into buffer */
-
-    n = read(fdin, buf, inlength);
-    if (n != inlength)
-    {
-        printf("[ERR] Could not read from %s\n",infile);
-        result = 4;
-        goto quit;
-    }
+    memcpy(outdata->buf, indata->buf, indata->len);
 
     /****** STEP 2 - Move EOF record to the new EOF */
-    memcpy(buf + newlength - 12, buf + inlength - 12, 12);
+    memcpy(outdata->buf + outdata->len - 12, outdata->buf + indata->len - 12, 12);
 
     /* Overwrite default entry point with NK_ENTRY_POINT */
-    put_uint32le(NK_ENTRY_POINT, buf + newlength - 8);
+    put_uint32le(NK_ENTRY_POINT, outdata->buf + outdata->len - 8);
 
     /****** STEP 3 - Create a record to disable the firmware signature
                 check in EBoot */
-    disable = buf + inlength - 12;
+    disable = outdata->buf + indata->len - 12;
 
     put_uint32le(DISABLE_ADDR, disable);
     put_uint32le(4,            disable + 4);
     put_uint32le(DISABLE_SUM,  disable + 8);
     put_uint32le(DISABLE_INSN, disable + 12);
 
-    /****** STEP 4 - Read the bootloader binary */
+    /****** STEP 4 - Append the bootloader binary */
     boot = disable + 16;
-    n = read(fdboot, boot + 12, bootlength);
-    if (n != bootlength)
-    {
-        printf("[ERR] Could not read from %s\n",bootfile);
-        result = 5;
-        goto quit;
-    }
+    memcpy(boot + 12, bootdata->buf, bootdata->len);
 
     /****** STEP 5 - Create header for bootloader record */
 
     /* Calculate checksum */
     sum = 0;
-    for (i = 0; i < bootlength; i++) {
+    for (i = 0; i < bootdata->len; i++) {
         sum += boot[12 + i];
     }
     
     put_uint32le(BL_ENTRY_POINT, boot); /* Our entry point */
-    put_uint32le(bootlength, boot + 4);
+    put_uint32le(bootdata->len, boot + 4);
     put_uint32le(sum, boot + 8);
 
     /****** STEP 6 -  Insert our dual-boot code */
-    boot2 = boot + bootlength + 12;
+    boot2 = boot + bootdata->len + 12;
 
     /* Copy dual-boot code in an endian-safe way */
     for (i = 0; i < (signed int)sizeof(dualboot) / 4; i++) {
@@ -250,38 +208,26 @@ int mknkboot(const char* infile, const char* bootfile, const char* outfile)
     put_uint32le(sizeof(dualboot), boot2 + 4);
     put_uint32le(sum, boot2 + 8);
 
-    /****** STEP 7 -  Now write the output file */
+    return 0;
+}
 
-    fdout = open(outfile, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
-    if (fdout < 0)
-    {
-        perror(outfile);
-        result = 6;
-        goto quit;
-    }
+#if !defined(BEASTPATCHER)
+static void usage(void)
+{
+    printf("Usage: mknkboot <firmware file> <boot file> <output file>\n");
 
-    n = write(fdout, buf, newlength);
-    if (n != newlength)
-    {
-        printf("[ERR] Could not write output file %s\n",outfile);
-        result = 7;
-        goto quit;
-    }
-
-quit:
-    if(buf != NULL)
-        free(buf);
-    close(fdin);
-    close(fdboot);
-    close(fdout);
-    
-    return result;
+    exit(1);
 }
 
 
 int main(int argc, char* argv[])
 {
     char *infile, *bootfile, *outfile;
+    int fdin = -1, fdboot = -1, fdout = -1;
+    int n;
+    struct filebuf indata = {0, NULL}, bootdata = {0, NULL}, outdata = {0, NULL};
+    int result = 0;
+
     if(argc < 4) {
         usage();
     }
@@ -290,7 +236,79 @@ int main(int argc, char* argv[])
     bootfile = argv[2];
     outfile = argv[3];
 
-    return mknkboot(infile, bootfile, outfile);
+    fdin = open(infile, O_RDONLY|O_BINARY);
+    if (fdin < 0)
+    {
+        perror(infile);
+        result = 2;
+        goto quit;
+    }
+
+    fdboot = open(bootfile, O_RDONLY|O_BINARY);
+    if (fdboot < 0)
+    {
+        perror(bootfile);
+        close(fdin);
+        result = 3;
+        goto quit;
+    }
+
+    indata.len = filesize(fdin);
+    bootdata.len = filesize(fdboot);
+    indata.buf = (unsigned char*)malloc(indata.len);
+    bootdata.buf = (unsigned char*)malloc(bootdata.len);
+    if(indata.buf == NULL || bootdata.buf == NULL)
+    {
+        printf("[ERR]  Could not allocate memory, aborting\n");
+        result = 4;
+        goto quit;
+    }
+    n = read(fdin, indata.buf, indata.len);
+    if (n != indata.len)
+    {
+        printf("[ERR]  Could not read from %s\n",infile);
+        result = 5;
+        goto quit;
+    }
+    n = read(fdboot, bootdata.buf, bootdata.len);
+    if (n != bootdata.len)
+    {
+        printf("[ERR]  Could not read from %s\n",bootfile);
+        result = 6;
+        goto quit;
+    }
+
+    result = mknkboot(&indata, &bootdata, &outdata);
+    if(result != 0)
+    {
+        goto quit;
+    }
+    fdout = open(outfile, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+    if (fdout < 0)
+    {
+        perror(outfile);
+        result = 7;
+        goto quit;
+    }
+
+    n = write(fdout, outdata.buf, outdata.len);
+    if (n != outdata.len)
+    {
+        printf("[ERR] Could not write output file %s\n",outfile);
+        result = 8;
+        goto quit;
+    }
+
+quit:
+    free(bootdata.buf);
+    free(indata.buf);
+    free(outdata.buf);
+    close(fdin);
+    close(fdboot);
+    close(fdout);
+
+    return result;
 
 }
+#endif
 
