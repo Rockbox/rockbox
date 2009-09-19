@@ -390,22 +390,24 @@ void HttpGet::httpResponseHeader(const QHttpResponseHeader &resp)
     // if there is a network error abort all scheduled requests for
     // this download
     m_response = resp.statusCode();
-    if(m_response != 200) {
-        // abort old request first.
-        http.abort();
-    }
+   
     // 301 -- moved permanently
     // 302 -- found
     // 303 -- see other
     // 307 -- moved temporarily
     // in all cases, header: location has the correct address so we can follow.
     if(m_response == 301 || m_response == 302 || m_response == 303 || m_response == 307) {
+        //abort without sending any signals
+        http.blockSignals(true);
+        http.abort();
+        http.blockSignals(false);
         // start new request with new url
         qDebug() << "[HTTP] response =" << m_response << "- following";
         getFile(resp.value("location") + m_query);
     }
     else if(m_response != 200) {
         // all other errors are fatal.
+        http.abort();
         qDebug() << "[HTTP] Response error:" << m_response << resp.reasonPhrase();
     }
 
