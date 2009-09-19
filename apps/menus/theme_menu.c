@@ -109,6 +109,7 @@ static int reset_color(void)
     
     settings_save();
     settings_apply(false);
+    send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
     return 0;
 }
 MENUITEM_FUNCTION(set_bg_col, MENU_FUNC_USEPARAM, ID2P(LANG_BACKGROUND_COLOR),
