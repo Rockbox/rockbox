@@ -109,9 +109,6 @@
 /* Define this if the display is mounted upside down */
 #define HAVE_DISPLAY_FLIPPED
 
-/* Define this for different I2C pinout */
-#define HAVE_ONDIO_I2C
-
 /* Define this for different ADC channel assignment */
 #define HAVE_ONDIO_ADC
 

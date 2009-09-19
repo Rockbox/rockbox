@@ -77,8 +77,6 @@
 #define HAVE_HEADPHONE_DETECTION
 //#define HAVE_TOUCHPAD
 
-#define CONFIG_I2C  I2C_DM320
-
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
