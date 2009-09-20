@@ -27,9 +27,6 @@
 #include "sound.h"
 #include "pcm.h"
 
-/* Just for tests enable it to play simple tone */
-//#define PCM_TELECHIPS_TEST
-
 struct dma_data
 {
 /* NOTE: The order of size and p is important if you use assembler
@@ -80,13 +77,14 @@ void pcm_play_dma_init(void)
     BCLKCTR &= ~DEV_DAI;
     PCLK_DAI = (1<<28) | 61682;  /* DCO mode */
     BCLKCTR |= DEV_DAI;
-    
+
     /* Enable DAI block in Master mode, 256fs->32fs, 16bit LSB */
     DAMR = 0x3c8e80;
 #elif defined(IAUDIO_7)
     BCLKCTR &= ~DEV_DAI;
-    PCLK_DAI = (0x800b << 16) | (PCLK_DAI & 0xffff);
+    PCLK_DAI = (0x800a << 16) | (PCLK_DAI & 0xffff);
     BCLKCTR |= DEV_DAI;
+
     /* Master mode, 256->64fs, 16bit LSB*/
     DAMR = 0x3cce20;
 #elif defined(LOGIK_DAX)
@@ -94,16 +92,16 @@ void pcm_play_dma_init(void)
 #elif defined(SANSA_M200)
     /* TODO */
 #elif defined(SANSA_C100)
-    /* TODO */    
+    /* TODO */
 #else
 #error "Target isn't supported"
 #endif
     /* Set DAI interrupts as FIQs */
     IRQSEL = ~(DAI_RX_IRQ_MASK | DAI_TX_IRQ_MASK);
-    
+
     /* Initialize default register values. */
     audiohw_init();
-   
+
     dma_play_data.size = 0;
 #if NUM_CORES > 1
     dma_play_data.core = 0; /* no core in control */
@@ -254,7 +252,7 @@ void fiq_handler(void)
      * r8 and r9 contains local copies of p and size respectively.
      * r0-r3 and r12 is a working register.
      */
-    asm volatile (        
+    asm volatile (
 #if defined(CPU_TCC780X)
         "mov     r8, #0xc000         \n" /* DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK */
         "ldr     r9, =0xf3001004     \n" /* CREQ */
@@ -317,7 +315,7 @@ void fiq_handler(void)
 {
     asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
-                    
+
     register pcm_more_callback_type get_more;
 
     if (dma_play_data.size < 16)
@@ -350,78 +348,18 @@ void fiq_handler(void)
         pcm_play_dma_stop();
         pcm_play_dma_stopped_callback();
     }
-    
+
     /* Clear FIQ status */
     CREQ = DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK;
-    
+
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
                     "subs  pc, lr, #4           \n"); /* Return from FIQ */
 }
 #endif
 
-/* TODO: required by wm8531 codec, why not to implement  */
+/* TODO: required by wm8731 codec */
 void i2s_reset(void)
 {
-/* DAMR = 0; */
+    /* DAMR = 0; */
 }
-
-#ifdef PCM_TELECHIPS_TEST
-#include "lcd.h"
-#include "sprintf.h"
-#include "backlight-target.h"
-
-static int frame = 0;
-static void test_callback_for_more(unsigned char **start, size_t *size)
-{
-    static unsigned short data[8];
-    static int cntr = 0;
-    int i;
-
-    for (i = 0; i < 8; i ++) {
-        unsigned short val;
-
-        if (0x100 == (cntr & 0x100))
-            val = 0x0fff;
-        else
-            val = 0x0000;
-        data[i] = val;
-        cntr++;
-    }
-
-    *start = data;
-    *size = sizeof(data);
-
-    frame++;
-}
-
-void pcm_telechips_test(void)
-{
-    static char buf[100];
-    unsigned char *data;
-    size_t size;
-    
-    _backlight_on();
-
-    audiohw_preinit();
-    pcm_play_dma_init();
-    pcm_postinit();
-
-    audiohw_mute(false);
-    audiohw_set_master_vol(0x7f, 0x7f);
-
-    pcm_callback_for_more = test_callback_for_more;    
-    test_callback_for_more(&data, &size);
-    pcm_play_dma_start(data, size);
-
-    while (1) {
-        int line = 0;
-        lcd_clear_display();
-        lcd_puts(0, line++, __func__);
-        snprintf(buf, sizeof(buf), "frame: %d", frame);
-        lcd_puts(0, line++, buf);
-        lcd_update();
-        sleep(1);
-    }
-}
-#endif
