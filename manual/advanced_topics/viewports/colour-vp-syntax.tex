@@ -1,0 +1,26 @@
+\subsubsection{Viewport Declaration Syntax}
+
+{\config{\%V}}{\textbar}x{\textbar}y{\textbar}[width]{\textbar}[height]{\textbar}[font]{\textbar}[fgcolour]{\textbar}[bgcolour]{\textbar}%
+
+    \begin{itemize}
+      \item 'fgcolour' and 'bgcolour' are 6-digit RGB888 colours - e.g. FF00FF.
+      \item 'font' is a number - '0' is the built-in system font, '1' is the
+      user-selected font.
+      \item Only the coordinates \emph{have} to be specified. Leaving the other
+      definitions blank will set them to their default values.
+      \note{The correct number of {\textbar}s with hyphens in blank fields
+      are still needed in any case.}
+    \end{itemize}
+
+\begin{example}
+    %V|12|20|-|-|1|-|-|
+    %sThis viewport is displayed permanently. It starts 12px from the left and
+    %s20px from the top of the screen, and fills the rest of the screen from
+    %sthat point. The lines will scroll if this text does not fit in the viewport.
+    %sThe user font is used, as are the default foreground/background colours.
+\end{example}
+\begin{rbtabular}{.75\textwidth}{XX}{Viewport definition & Default value}{}{}
+  width/height & remaining part of screen \\
+  font & user defined \\
+  forground/background colours & defined by theme \\
+\end{rbtabular}

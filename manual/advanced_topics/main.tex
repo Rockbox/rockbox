@@ -132,6 +132,42 @@ file find the instructions on the Rockbox website:
   the \fname{/.rockbox/backdrops} directory.
 }%
 
+\nopt{lcd_charcell}{
+  \subsection{UI Viewport}
+  By default, the UI is drawn on the whole screen. This can be changed so that
+  the UI is confined to a specific area of the screen, by use of a UI
+  viewport. This is done by adding the following line to the 
+  \fname{.cfg} file for a theme:\\*
+
+  \nopt{lcd_non-mono}{\config{ui viewport: X,Y,[width],[height],[font]}}
+  \nopt{lcd_color}{\opt{lcd_non-mono}{
+      \config{ui viewport: X,Y,[width],[height],[font],[fgshade],[bgshade]}}}
+  \opt{lcd_color}{
+      \config{ui viewport: X,Y,[width],[height],[font],[fgcolour],[bgcolour]}}
+  \\*
+
+  \opt{HAVE_REMOTE_LCD}{
+    The dimensions of the menu that is displayed on the remote control of your
+    \dap\ can be set in the same way.  The line to be added to the theme
+    \fname{.cfg} is the following:\\*
+
+    \nopt{lcd_non-mono}{\config{remote ui viewport: X,Y,[width],[height],[font]}}
+    \nopt{lcd_color}{\opt{lcd_non-mono}{
+      \config{remote ui viewport: X,Y,[width],[height],[font],[fgshade],[bgshade]}}}
+    \opt{lcd_color}{
+      \config{remote ui viewport: X,Y,[width],[height],[font],[fgcolour],[bgcolour]}}
+  \\*
+  }
+
+  Only the first two parameters \emph{have} to be specified, the others can
+  be omitted using '-' as a placeholder. The syntax is very similar to WPS 
+  viewports (see \reference{ref:Viewports}).  Briefly:
+
+  \nopt{lcd_non-mono}{\input{advanced_topics/viewports/mono-uivp-syntax.tex}}
+  \nopt{lcd_color}{\opt{lcd_non-mono}{\input{advanced_topics/viewports/grayscale-uivp-syntax.tex}}}
+  \opt{lcd_color}{\input{advanced_topics/viewports/colour-uivp-syntax.tex}}
+}
+
 \section{\label{ref:ConfiguringtheWPS}Configuring the WPS}
 
 \subsection{WPS -- General Info}
@@ -171,11 +207,6 @@ all the tags that are available.
 \begin{itemize}
 \item All characters not preceded by \% are displayed as typed.
 \item Lines beginning with \# are comments and will be ignored.
-\item Maximum file size used is 
-  \opt{lcd_bitmap}{1600}
-  \opt{player}{400} bytes.
-  If you have a bigger WPS file, only the first part of it will be 
-  loaded and used.
 \end{itemize}
 
 \note{Keep in mind that your \dap{} resolution is \genericimg{} (with
@@ -183,6 +214,66 @@ all the tags that are available.
   designing your own WPS, or if you use a WPS designed for another target.
   \opt{HAVE_REMOTE_LCD}{The resolution of the remote is
   \opt{h100,h300}{128x64x1}\opt{x5,m5}{128x96x2} pixels.}}
+
+\nopt{lcd_charcell}{
+\subsubsection{\label{ref:Viewports}Viewports}
+
+By default, a viewport filling the whole screen contains all the elements
+defined in the \fname(.wps) file. The 
+\opt{lcd_non-mono}{elements in this viewport are displayed
+  with the same background/foreground
+  \opt{lcd_color}{colours}\nopt{lcd_color}{shades} and the}
+text is rendered in the
+same font as in the main menu. To change this behaviour a custom viewport can
+be defined. A viewport is a rectangular window on the screen% 
+\opt{lcd_non-mono}{ with its own foreground/background
+\opt{lcd_color}{colours}\nopt{lcd_color}{shades}}.
+This window also has variable dimensions. To
+define a viewport a line starting \config{{\%V{\textbar}\dots}} has to be
+present in the \fname{.wps} file. The full syntax will be explained later in
+this section. All elements placed before the 
+line defining a viewport are displayed in the default viewport. Elements
+defined after a viewport declaration are drawn within that viewport.
+\opt{lcd_bitmap}{Loading images (see Appendix \reference{ref:wps_images})
+  should be done within the default viewport.}
+A viewport ends either with the end of the file, or with the next viewport
+declaration line. Viewports sharing the same
+coordinates and dimensions cannot be displayed at the same time. Viewports
+cannot be layered \emph{transparently} over one another. Subsequent viewports
+will be drawn over any other viewports already drawn onto that
+area of the screen.
+
+\nopt{lcd_non-mono}{\input{advanced_topics/viewports/mono-vp-syntax.tex}}
+\nopt{lcd_color}{\opt{lcd_non-mono}{\input{advanced_topics/viewports/grayscale-vp-syntax.tex}}}
+\opt{lcd_color}{\input{advanced_topics/viewports/colour-vp-syntax.tex}}
+
+
+\subsubsection{Conditional Viewports}
+
+Any viewport can be displayed either permanently or conditionally.
+Defining a viewport as \config{{\%V{\textbar}\dots}}
+will display it permanently.
+
+\begin{itemize}
+\item {\config{\%Vl{\textbar}'identifier'{\textbar}\dots{\textbar}}}
+This tag preloads a viewport for later display. 'identifier' is a single
+lowercase letter (a-z) and the '\dots' parameters use the same logic as
+the \config{\%V} tag explained above.
+\item {\config{\%Vd'identifier'}} Display the 'identifier' viewport.
+\end{itemize}
+
+Viewports can share identifiers so that you can display multiple viewports
+with one \%Vd line.
+
+\nopt{lcd_non-mono}{\input{advanced_topics/viewports/mono-conditional.tex}}
+\nopt{lcd_color}{%
+  \opt{lcd_non-mono}{\input{advanced_topics/viewports/grayscale-conditional.tex}}}
+\opt{lcd_color}{\input{advanced_topics/viewports/colour-conditional.tex}}
+\\*
+
+\note{The tag to display conditional viewports must come before the tag to
+preload the viewport in the \fname{.wps} file.}
+}
 
 \subsubsection{Conditional Tags}
 

@@ -27,7 +27,33 @@ Remember that this information is not always available, so use the
 conditionals to show alternate information in preference to assuming.
 
 These tags, when written with a capital ``I'' (e.g. \config{\%Ia} or \config{\%Ic}),
-produce the information for the next song to be played.
+show the information for the next song to be played.
+
+\nopt{lcd_charcell}{
+  \section{Viewports}
+  \begin{table}
+    \begin{tagmap}{}{}
+      \nopt{lcd_non-mono}{~%
+        \config{\%V{\textbar}x{\textbar}y{\textbar}[width]{\textbar}%
+        [height]{\textbar}[font]{\textbar}}
+        & (see section \ref{ref:Viewports})\\}
+
+      \nopt{lcd_color}{\opt{lcd_non-mono}{%
+        \config{\%V{\textbar}x{\textbar}y{\textbar}[width]{\textbar}%
+        [height]{\textbar}[font]{\textbar}[fgshade]{\textbar}[bgshade]{\textbar}}
+        & (see section \ref{ref:Viewports})\\}}
+
+      \opt{lcd_color}{%
+        \config{\%V{\textbar}x{\textbar}y{\textbar}[width]{\textbar}%
+        [height]{\textbar}[font]{\textbar}[fgcolour]{\textbar}[bgcolour]{\textbar}}
+        & (see section \ref{ref:Viewports})\\}
+
+      \config{\%Vd'identifier'} & Display the 'identifier' viewport. E.g.
+      \config{\%?C{\textless}\%C\%Vda{\textbar}\%Vdb{\textgreater}}
+      will show viewport 'a' if album art is found, and 'b' if it isn't.\\
+    \end{tagmap}
+  \end{table}
+}
 
 \section{Power Related Information}
 \begin{table}
@@ -91,9 +117,9 @@ produce the information for the next file to be played.
             that empties as the time progresses.}
     \opt{lcd_bitmap}{
          & This will replace the entire line with a progress bar. \\
-         & You can set the height, position and width of the progressbar %
-           (in pixels): \config{\%pb{\textbar}height{\textbar}leftpos%
-           {\textbar}rightpos{\textbar}toppos{\textbar}}} \\
+         & You can set the position, width and height of the progressbar %
+           (in pixels) and load a custom image for it: %
+           \config{\%pb{\textbar}image.bmp{\textbar}x{\textbar}y{\textbar}width{\textbar}height{\textbar}}} \\
     \opt{player}{%
     \config{\%pf} & Full-line progress bar \& time display\\
     }%
@@ -231,7 +257,7 @@ Examples:
 
 
 \opt{lcd_bitmap}{
-\section{Images}
+\section{\label{ref:wps_images}Images}
 \begin{table}
   \begin{tagmap}{}{}
     \nopt{archos}{%
@@ -239,9 +265,6 @@ Examples:
         & Load and set a backdrop image for the WPS.
           This image must be exactly the same size as your LCD.\\
     }%
-    \config{\%P{\textbar}filename.bmp{\textbar}}
-        & Load a Progress Bar image for the WPS. Use \config{\%pb} tag to show the 
-          progress bar\\
     \config{\%x{\textbar}n{\textbar}filename{\textbar}x{\textbar}y{\textbar}}
         & Load and display an image\\
         & \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\\
