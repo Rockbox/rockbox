@@ -72,6 +72,7 @@
 #include "splash.h"
 #include "buttonbar.h"
 #include "quickscreen.h"
+#include "appevents.h"
 
 #include "root_menu.h"
 
@@ -300,6 +301,12 @@ void tree_gui_init(void)
 #endif
 }
 
+
+/* drawer function for the GUI_EVENT_REDRAW callback */
+void tree_drawlists(void)
+{
+    gui_synclist_draw(&tree_lists);
+}
 
 
 struct tree_context* tree_get_context(void)
@@ -778,6 +785,7 @@ static int dirbrowse()
                     }
                     onplay_result = onplay(buf, attr, curr_context);
                 }
+                send_event(GUI_EVENT_REFRESH, tree_drawlists);
                 switch (onplay_result)
                 {
                     case ONPLAY_MAINMENU:

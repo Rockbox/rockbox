@@ -181,11 +181,6 @@ static void check_file_thumbnails(struct tree_context* c)
     closedir(dir);
 }
 
-static void filetree_drawlists(void)
-{
-    gui_synclist_draw(&tree_lists);
-}
-
 /* support function for qsort() */
 static int compare(const void* p1, const void* p2)
 {
@@ -519,7 +514,7 @@ int ft_enter(struct tree_context* c)
                 send_event(GUI_EVENT_REFRESH, NULL);
                 /* for the statusbar */
                 send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
-                filetree_drawlists();
+                tree_drawlists();
                 splash(HZ, ID2P(LANG_SETTINGS_LOADED));
                 break;
 
@@ -629,7 +624,7 @@ int ft_enter(struct tree_context* c)
             }
         }
 
-        send_event(GUI_EVENT_REFRESH, filetree_drawlists);
+        send_event(GUI_EVENT_REFRESH, tree_drawlists);
 
         if ( play ) {
             /* the resume_index must always be the index in the
