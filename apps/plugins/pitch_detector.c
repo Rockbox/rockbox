@@ -178,6 +178,37 @@ const fixed yin_threshold_table[] =
     float2fixed(0.50),
 };
 
+/* Structure for the reference frequency (frequency of A)
+ * It's used for scaling the frequency before finding out
+ * the note. The frequency is scaled in a way that the main
+ * algorithm can assume the frequency of A to be 440 Hz.
+ */
+struct freq_A_entry
+{
+    const int frequency;  /* Frequency in Hz */
+    const fixed ratio;    /* 440/frequency   */
+    const fixed logratio; /* log2(factor)    */
+};
+
+const struct freq_A_entry freq_A[] =
+{
+    {435, float2fixed(1.011363636), float2fixed( 0.016301812)},
+    {436, float2fixed(1.009090909), float2fixed( 0.013056153)},
+    {437, float2fixed(1.006818182), float2fixed( 0.009803175)},
+    {438, float2fixed(1.004545455), float2fixed( 0.006542846)},
+    {439, float2fixed(1.002272727), float2fixed( 0.003275132)},
+    {440, float2fixed(1.000000000), float2fixed( 0.000000000)},
+    {441, float2fixed(0.997727273), float2fixed(-0.003282584)},
+    {442, float2fixed(0.995454545), float2fixed(-0.006572654)},
+    {443, float2fixed(0.993181818), float2fixed(-0.009870244)},
+    {444, float2fixed(0.990909091), float2fixed(-0.013175389)},
+    {445, float2fixed(0.988636364), float2fixed(-0.016488123)},
+};
+
+/* Index of the entry for 440 Hz in the table (default frequency for A) */
+#define DEFAULT_FREQ_A 5
+#define NUM_FREQ_A (sizeof(freq_A)/sizeof(freq_A[0]))
+
 /* How loud the audio has to be to start displaying pitch  */
 /* Must be between 0 and 100                               */
 #define VOLUME_THRESHOLD (50)
@@ -279,8 +310,9 @@ struct tuner_settings
     unsigned sample_size;
     unsigned lowest_freq;
     unsigned yin_threshold;
-    bool use_sharps;
-    bool display_hz;
+    int      freq_A;        /* Index of the frequency of A */
+    bool     use_sharps;
+    bool     display_hz;
 } tuner_settings;
 
 /*=================================================================*/
@@ -325,6 +357,7 @@ void tuner_settings_reset(struct tuner_settings* settings)
     settings->sample_size = BUFFER_SIZE;
     settings->lowest_freq = period2freq(BUFFER_SIZE / 4);
     settings->yin_threshold = DEFAULT_YIN_THRESHOLD;
+    settings->freq_A = DEFAULT_FREQ_A;
     settings->use_sharps = true;
     settings->display_hz = false;
 }
@@ -454,11 +487,12 @@ void set_min_freq(int new_freq)
 
 bool main_menu(void)
 {
-    int selection=0;
+    int selection = 0;
     bool done = false;
-    bool exit_tuner=false;
+    bool exit_tuner = false;
     int choice;
-    bool reset = false;
+    int freq_val;
+    bool reset;
 
     MENUITEM_STRINGLIST(menu,"Tuner Settings",NULL,
                         "Return to Tuner",
@@ -468,6 +502,7 @@ bool main_menu(void)
                         "Algorithm Pickiness",
                         "Accidentals",
                         "Display Frequency (Hz)",
+                        "Frequency of A (Hz)",
                         "Reset Settings",
                         "Quit");
 
@@ -514,21 +549,31 @@ bool main_menu(void)
                                BOOL, noyes_text, 2, NULL);
                 break;
             case 7:
+                freq_val = freq_A[tuner_settings.freq_A].frequency;
+                rb->set_int("Frequency of A (Hz)",
+                    "Hz", UNIT_INT, &freq_val, NULL,
+                    1, freq_A[0].frequency, freq_A[NUM_FREQ_A-1].frequency,
+                    NULL);
+                tuner_settings.freq_A = freq_val - freq_A[0].frequency;
+                break;
+            case 8:
+                reset = false;
                 rb->set_option("Reset Tuner Settings?",
                                &reset,
                                BOOL, noyes_text, 2, tuner_settings_reset_query);
                 break;
-            case 8:
+            case 9:
                 exit_tuner = true;
+                done = true;
+                break;
             case 0: 
             default:
                 /* Return to the tuner */
                 done = true;
                 break;
-
         }
     }
-    return(exit_tuner);
+    return exit_tuner;
 }
 
 /*=================================================================*/
@@ -650,11 +695,11 @@ void draw_bar(fixed wrong_by_cents)
     int x;
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(255,255,255));	/* Color screens */
+    rb->lcd_set_foreground(LCD_RGBPACK(255,255,255)); /* Color screens */
 #elif LCD_DEPTH > 1
     rb->lcd_set_foreground(LCD_BLACK);      /* Greyscale screens */
 #else
-    rb->lcd_set_foreground(LCD_BLACK);		/* Black and white screens */
+    rb->lcd_set_foreground(LCD_BLACK);      /* Black and white screens */
 #endif
 
     rb->lcd_hline(0,LCD_WIDTH-1, BAR_HLINE_Y);
@@ -702,14 +747,22 @@ void display_frequency (fixed freq)
 {                                                     
     fixed ldf, mldf;
     fixed lfreq, nfreq;
+    fixed orig_freq;
     int i, note = 0;
     char str_buf[30];
 
     if (fp_lt(freq, FP_LOW))
         freq = FP_LOW;
-    lfreq = log(freq);
+    
+    /* We calculate the frequency and its log as if */
+    /* the reference frequency of A were 440 Hz.    */
+    orig_freq = freq;
+    lfreq = fp_add(log(freq), freq_A[tuner_settings.freq_A].logratio);
+    freq = fp_mul(freq, freq_A[tuner_settings.freq_A].ratio);
 
-    /* Get the frequency to within the range of our reference table */
+    /* This calculates a log freq offset for note A */
+    /* Get the frequency to within the range of our reference table, */
+    /* i.e. into the right octave.                                   */
     while (fp_lt(lfreq, fp_sub(lfreqs[0], fp_shr(LOG_D_NOTE, 1))))
         lfreq = fp_add(lfreq, LOG_2);
     while (fp_gte(lfreq, fp_sub(fp_add(lfreqs[0], LOG_2), 
@@ -722,19 +775,19 @@ void display_frequency (fixed freq)
                  fp_sub(lfreq,lfreqs[i]) : fp_neg(fp_sub(lfreq,lfreqs[i]));
         if (fp_lt(ldf, mldf)) 
         {
-              mldf = ldf;
-              note = i;
+            mldf = ldf;
+            note = i;
         }
     }
     nfreq = freqs[note];
-    while (fp_gt(fp_div(nfreq, freq), D_NOTE_SQRT)) 
+    while (fp_gt(fp_div(nfreq, freq), D_NOTE_SQRT))
         nfreq = fp_shr(nfreq, 1);
     while (fp_gt(fp_div(freq, nfreq), D_NOTE_SQRT))
     {
         nfreq = fp_shl(nfreq, 1);
     }
     
-    ldf=fp_mul(int2fixed(1200), log(fp_div(freq,nfreq)));
+    ldf = fp_mul(int2fixed(1200), log(fp_div(freq,nfreq)));
 
     rb->lcd_clear_display();
     draw_bar(ldf);                /* The red bar */
@@ -744,8 +797,8 @@ void display_frequency (fixed freq)
         if(tuner_settings.display_hz)
         {
             rb->snprintf(str_buf,30, "%s : %d cents (%d.%02dHz)", 
-                         notes[note], fp_round(ldf) ,fixed2int(freq),
-                         fp_round(fp_mul(fp_frac(freq), 
+                         notes[note], fp_round(ldf) ,fixed2int(orig_freq),
+                         fp_round(fp_mul(fp_frac(orig_freq),
                                          int2fixed(DISPLAY_HZ_PRECISION))));
             print_str(str_buf);
         }
