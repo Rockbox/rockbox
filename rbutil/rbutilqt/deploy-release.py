@@ -34,6 +34,7 @@ import shutil
 import subprocess
 import getopt
 import which
+import time
 
 # == Global stuff ==
 # Windows nees some special treatment. Differentiate between program name
@@ -170,8 +171,9 @@ def tarball(versionstring):
 
 
 def main():
+    startup = time.time()
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "qh", ["qmake=", "help"])
+        opts, args = getopt.getopt(sys.argv[1:], "q:h", ["qmake=", "help"])
     except getopt.GetoptError, err:
         print str(err)
         usage(sys.argv[0])
@@ -206,6 +208,10 @@ def main():
     else:
         tarball(ver)
     print "done."
+    duration = time.time() - startup
+    durmins = (int)(duration / 60)
+    dursecs = (int)(duration - durmins)
+    print "Building took %smin %ssec." % (durmins, dursecs)
 
 
 if __name__ == "__main__":
