@@ -258,37 +258,29 @@ audio_sample_type audio_data[BUFFER_SIZE];
 fixed yin_buffer[YIN_BUFFER_SIZE];
 static int recording=0;
 
-/* Frequencies of all the notes of the scale */
-static const fixed freqs[12] = 
+/* Description of a note of scale */
+struct note_entry
 {
-    float2fixed(440.0f),        /* A */
-    float2fixed(466.1637615f),  /* A# */
-    float2fixed(493.8833013f),  /* etc... */
-    float2fixed(523.2511306f),
-    float2fixed(554.3652620f),
-    float2fixed(587.3295358f),
-    float2fixed(622.2539674f),
-    float2fixed(659.2551138f),
-    float2fixed(698.4564629f),
-    float2fixed(739.9888454f),
-    float2fixed(783.9908720f),
-    float2fixed(830.6093952f),
+    const char *name;    /* Name of the note, e.g. "A#" */
+    const fixed freq;    /* Note frequency              */
+    const fixed logfreq; /* log2(frequency)             */
 };
-/* logarithm of all the notes of the scale */
-static const fixed lfreqs[12] =
+
+/* Notes within one (reference) scale */
+static const struct note_entry notes[] =
 {
-    float2fixed(8.781359714f),
-    float2fixed(8.864693047f),
-    float2fixed(8.948026380f),
-    float2fixed(9.031359714f),
-    float2fixed(9.114693047f),
-    float2fixed(9.198026380f),
-    float2fixed(9.281359714f),
-    float2fixed(9.364693047f),
-    float2fixed(9.448026380f),
-    float2fixed(9.531359714f),
-    float2fixed(9.614693047f),
-    float2fixed(9.698026380f),
+    {"A" , float2fixed(440.0000000f), float2fixed(8.781359714f)},
+    {"A#", float2fixed(466.1637615f), float2fixed(8.864693047f)},
+    {"B" , float2fixed(493.8833013f), float2fixed(8.948026380f)},
+    {"C" , float2fixed(523.2511306f), float2fixed(9.031359714f)},
+    {"C#", float2fixed(554.3652620f), float2fixed(9.114693047f)},
+    {"D" , float2fixed(587.3295358f), float2fixed(9.198026380f)},
+    {"D#", float2fixed(622.2539674f), float2fixed(9.281359714f)},
+    {"E" , float2fixed(659.2551138f), float2fixed(9.364693047f)},
+    {"F" , float2fixed(698.4564629f), float2fixed(9.448026380f)},
+    {"F#", float2fixed(739.9888454f), float2fixed(9.531359714f)},
+    {"G" , float2fixed(783.9908720f), float2fixed(9.614693047f)},
+    {"G#", float2fixed(830.6093952f), float2fixed(9.698026380f)},
 };
 
 /* GUI */
@@ -297,12 +289,7 @@ static int font_w,font_h;
 static int bar_x_0;
 static int lbl_x_minus_50, lbl_x_minus_20, lbl_x_0, lbl_x_20, lbl_x_50;
 
-static const char *english_notes[] = {"A","A#","B","C","C#","D","D#","E",
-                                        "F","F#","G","G#"};
-static const char **notes = english_notes;
-
-/*Settings for the plugin */
-
+/* Settings for the plugin */
 struct tuner_settings
 {
     unsigned volume_threshold;
@@ -747,23 +734,23 @@ void display_frequency (fixed freq)
     /* This calculates a log freq offset for note A */
     /* Get the frequency to within the range of our reference table, */
     /* i.e. into the right octave.                                   */
-    while (fp_lt(lfreq, fp_sub(lfreqs[0], fp_shr(LOG_D_NOTE, 1))))
+    while (fp_lt(lfreq, fp_sub(notes[0].logfreq, fp_shr(LOG_D_NOTE, 1))))
         lfreq = fp_add(lfreq, LOG_2);
-    while (fp_gte(lfreq, fp_sub(fp_add(lfreqs[0], LOG_2), 
+    while (fp_gte(lfreq, fp_sub(fp_add(notes[0].logfreq, LOG_2), 
            fp_shr(LOG_D_NOTE, 1))))
         lfreq = fp_sub(lfreq, LOG_2);
     mldf = LOG_D_NOTE;
     for (i=0; i<12; i++) 
     {
-        ldf = fp_gt(fp_sub(lfreq,lfreqs[i]), FP_ZERO) ? 
-                 fp_sub(lfreq,lfreqs[i]) : fp_neg(fp_sub(lfreq,lfreqs[i]));
+        ldf = fp_gt(fp_sub(lfreq,notes[i].logfreq), FP_ZERO) ? 
+                 fp_sub(lfreq,notes[i].logfreq) : fp_neg(fp_sub(lfreq,notes[i].logfreq));
         if (fp_lt(ldf, mldf)) 
         {
             mldf = ldf;
             note = i;
         }
     }
-    nfreq = freqs[note];
+    nfreq = notes[note].freq;
     while (fp_gt(fp_div(nfreq, freq), D_NOTE_SQRT))
         nfreq = fp_shr(nfreq, 1);
     while (fp_gt(fp_div(freq, nfreq), D_NOTE_SQRT))
@@ -777,11 +764,11 @@ void display_frequency (fixed freq)
     draw_bar(ldf);                /* The red bar */
     if(fp_round(freq) != 0)
     {
-        draw_note(notes[note]);
+        draw_note(notes[note].name);
         if(tuner_settings.display_hz)
         {
             rb->snprintf(str_buf,30, "%s : %d cents (%d.%02dHz)", 
-                         notes[note], fp_round(ldf) ,fixed2int(orig_freq),
+                         notes[note].name, fp_round(ldf) ,fixed2int(orig_freq),
                          fp_round(fp_mul(fp_frac(orig_freq),
                                          int2fixed(DISPLAY_HZ_PRECISION))));
             print_str(str_buf);
