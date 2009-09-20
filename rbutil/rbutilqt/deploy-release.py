@@ -210,7 +210,7 @@ def main():
     print "done."
     duration = time.time() - startup
     durmins = (int)(duration / 60)
-    dursecs = (int)(duration - durmins)
+    dursecs = (int)(duration - (durmins * 60))
     print "Building took %smin %ssec." % (durmins, dursecs)
 
 
