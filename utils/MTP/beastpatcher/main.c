@@ -56,6 +56,7 @@
 enum actions {
     NONE,
     INSTALL,
+    DUALBOOT,
     SEND,
     HELP
 };
@@ -66,11 +67,13 @@ static void print_usage(void)
     fprintf(stderr,"\n");
     fprintf(stderr,"Where [action] is one of the following options:\n");
 #ifdef WITH_BOOTOBJS
-    fprintf(stderr,"  -i,   --install           <bootloader.bin>\n");
+    fprintf(stderr,"  -i,   --install           [bootloader.bin]\n");
+    fprintf(stderr,"  -d,   --dual-boot         <nk.bin> [bootloader.bin]\n");
 #else
-    fprintf(stderr,"  -i,   --install           bootloader.bin\n");
+    fprintf(stderr,"  -i,   --install           <bootloader.bin>\n");
+    fprintf(stderr,"  -d    --dual-boot         <nk.bin> <bootloader.bin>\n");
 #endif
-    fprintf(stderr,"  -s,   --send              nk.bin\n");
+    fprintf(stderr,"  -s,   --send              <nk.bin>\n");
     fprintf(stderr,"  -h,   --help\n");
     fprintf(stderr,"\n");
 #ifdef WITH_BOOTOBJS
@@ -88,9 +91,9 @@ int main(int argc, char* argv[])
     char* bootloader = NULL;
     char* firmware = NULL;
 #ifdef WITH_BOOTOBJS
-    int action = INSTALL;
+    enum actions action = INSTALL;
 #else
-    int action = NONE;
+    enum actions action = NONE;
 #endif
 
     fprintf(stderr,"beastpatcher v" VERSION " - (C) 2009 by the Rockbox developers\n");
@@ -113,6 +116,20 @@ int main(int argc, char* argv[])
             }
 #endif
         }
+        else if(strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "--dual-boot") == 0) {
+            action = DUALBOOT;
+            if(((i + 1) < argc) && argv[i + 1][0] != '-') {
+                firmware = argv[++i];
+#ifndef WITH_BOOTOBJS
+                if(((i + 1) < argc) && argv[i + 1][0] != '-') {
+                    bootloader = argv[++i];
+                }
+#endif
+            }
+            else {
+                action = NONE;
+            }
+        }
         else if(((strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--send") == 0)
             && (i + 1) < argc)) {
             action = SEND;
@@ -132,8 +149,11 @@ int main(int argc, char* argv[])
     else if(action == SEND) {
         res = sendfirm(firmware);
     }
+    else if(action == DUALBOOT) {
+        res = beastpatcher(bootloader, firmware);
+    }
     else if(action == INSTALL) {
-        res = beastpatcher(bootloader);
+        res = beastpatcher(bootloader, NULL);
         /* don't ask for enter if started with command line arguments */
         if(argc == 1) {
             printf("\nPress ENTER to exit beastpatcher: ");
@@ -142,3 +162,4 @@ int main(int argc, char* argv[])
     }
     return res;
 }
+

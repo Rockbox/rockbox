@@ -124,6 +124,7 @@ static void put_uint32le(uint32_t x, unsigned char* p)
     p[3] = (x >> 24) & 0xff;
 }
 
+#if !defined(BEASTPATCHER)
 static off_t filesize(int fd) {
     struct stat buf;
 
@@ -134,6 +135,7 @@ static off_t filesize(int fd) {
         return(buf.st_size);
     }
 }
+#endif
 
 
 int mknkboot(const struct filebuf *indata, const struct filebuf *bootdata,

@@ -54,6 +54,7 @@
 
 #include "mtp_common.h"
 #include "bootimg.h"
+#include "mknkboot.h"
 
 /* Code to create a single-boot bootloader.
    Based on tools/gigabeats.c by Will Robertson.
@@ -79,7 +80,7 @@ static uint32_t calc_csum(const unsigned char* pb, int cb)
 }
 
 static void create_single_boot(unsigned char* boot, int bootlen,
-                               unsigned char** fwbuf, int* fwsize)
+                               unsigned char** fwbuf, off_t* fwsize)
 {
     unsigned char* buf;
 
@@ -127,37 +128,53 @@ static void create_single_boot(unsigned char* boot, int bootlen,
     return;
 }
 
-int beastpatcher(const char* bootfile)
+static int readfile(const char* filename, struct filebuf *buf)
+{
+    int res;
+    FILE* fp;
+    size_t bread;
+#ifdef _LARGEFILE64_SOURCE
+    struct stat64 sb;
+    res = stat64(filename, &sb);
+#else
+    struct stat sb;
+    res = stat(filename, &sb);
+#endif
+    if(res == -1) {
+        fprintf(stderr, "[ERR]  Getting firmware file size failed!\n");
+        return 1;
+    }
+    buf->len = sb.st_size;
+    buf->buf = (unsigned char*)malloc(buf->len);
+    /* load firmware binary to memory. */
+    fp = fopen(filename, "rb");
+    bread = fread(buf->buf, sizeof(unsigned char), buf->len, fp);
+    if((off_t)(bread * sizeof(unsigned char)) != buf->len) {
+        fprintf(stderr, "[ERR]  Error reading  file %s!\n", filename);
+        return 1;
+    }
+    fclose(fp);
+    return 0;
+}
+
+
+int beastpatcher(const char* bootfile, const char* firmfile)
 {
     char yesno[4];
-    unsigned char* fwbuf;
-    int fwsize;
     struct mtp_info_t mtp_info;
-    unsigned char* bootloader = bootimg;
-    unsigned int len_bootloader = LEN_bootimg;
+    struct filebuf bootloader;
+    struct filebuf firmware;
+    struct filebuf fw;
+    bootloader.buf = bootimg;
+    bootloader.len = LEN_bootimg;
 
     if (bootfile) {
-        int res;
-        FILE* fp;
-        size_t bread;
-#ifdef _LARGEFILE64_SOURCE
-        struct stat64 sb;
-        res = stat64(bootfile, &sb);
-#else
-        struct stat sb;
-        res = stat(bootfile, &sb);
-#endif
-        if(res == -1) {
-            fprintf(stderr, "[ERR]  Getting bootloader file size failed!\n");
+        if(readfile(bootfile, &bootloader) != 0) {
             return 1;
         }
-        len_bootloader = sb.st_size;
-        bootloader = (unsigned char*)malloc(len_bootloader);
-        /* load bootloader binary to memory. */
-        fp = fopen(bootfile, "rb");
-        bread = fread(bootloader, sizeof(unsigned char), len_bootloader, fp);
-        if(bread * sizeof(unsigned char) != len_bootloader) {
-            fprintf(stderr, "[ERR]  Error reading firmware file!\n");
+    }
+    if (firmfile) {
+        if(readfile(firmfile, &firmware) != 0) {
             return 1;
         }
     }
@@ -178,20 +195,30 @@ int beastpatcher(const char* bootfile)
                                                 mtp_info.modelname);
     printf("[INFO] Device version: \"%s\"\n",mtp_info.version);
 
-
-    printf("\nEnter i to install the Rockbox bootloader or c to cancel and do nothing (i/c): ");
+    if(firmfile) {
+        printf("\nEnter i to install the Rockbox dualboot bootloader or c to cancel and do nothing (i/c): ");
+    }
+    else {
+        printf("\nEnter i to install the Rockbox bootloader or c to cancel and do nothing (i/c): ");
+    }
 
     if (fgets(yesno,4,stdin))
     {
         if (yesno[0]=='i')
         {
+            if(firmfile) {
+                /* if a firmware file is given create a dualboot image. */
+                mknkboot(&firmware, &bootloader, &fw);
+            }
+            else {
             /* Create a single-boot bootloader from the embedded bootloader */
-            create_single_boot(bootloader, len_bootloader, &fwbuf, &fwsize);
+            create_single_boot(bootloader.buf, bootloader.len, &fw.buf, &fw.len);
+            }
 
-            if (fwbuf == NULL)
+            if (fw.buf == NULL)
                 return 1;
 
-            if (mtp_send_firmware(&mtp_info, fwbuf, fwsize) == 0)
+            if (mtp_send_firmware(&mtp_info, fw.buf, fw.len) == 0)
             {
                 fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
             }
@@ -201,7 +228,7 @@ int beastpatcher(const char* bootfile)
             }
 
             /* We are now done with the firmware image */
-            free(fwbuf);
+            free(fw.buf);
         }
         else
         {
@@ -209,7 +236,10 @@ int beastpatcher(const char* bootfile)
         }
     }
     if(bootfile) {
-        free(bootloader);
+        free(bootloader.buf);
+    }
+    if(firmfile) {
+        free(firmware.buf);
     }
 
     mtp_finished(&mtp_info);
