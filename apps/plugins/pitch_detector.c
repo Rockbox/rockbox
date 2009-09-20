@@ -364,14 +364,6 @@ void tuner_settings_reset(struct tuner_settings* settings)
 
 /*---------------------------------------------------------------------*/
 
-void tuner_settings_reset_query(int yes)
-{
-    if(yes)
-        tuner_settings_reset(&tuner_settings);
-}
-
-/*---------------------------------------------------------------------*/
-
 enum settings_file_status tuner_settings_load(struct tuner_settings* settings,
                                               char* filename)
 {
@@ -465,12 +457,6 @@ static const struct opt_items accidental_text[] =
     { "Sharp", -1 },
 };
 
-static const struct opt_items noyes_text[] = 
-{
-    { "No", -1 },
-    { "Yes", -1 }
-};
-
 void set_min_freq(int new_freq)
 {
     tuner_settings.sample_size = freq2period(new_freq) * 4;
@@ -533,9 +519,8 @@ bool main_menu(void)
                 rb->set_option(
                     "Algorithm Pickiness (Lower -> more discriminating)",
                     &tuner_settings.yin_threshold,
-                    INT, yin_threshold_text, 
-                    sizeof(yin_threshold_text) / 
-                    sizeof(yin_threshold_text[0]), 
+                    INT, yin_threshold_text,
+                    sizeof(yin_threshold_text) / sizeof(yin_threshold_text[0]),
                     NULL);
                 break;
             case 5:
@@ -544,9 +529,8 @@ bool main_menu(void)
                                BOOL, accidental_text, 2, NULL);
                 break;
             case 6:
-                rb->set_option("Display Frequency (Hz)",
-                               &tuner_settings.display_hz,
-                               BOOL, noyes_text, 2, NULL);
+                rb->set_bool("Display Frequency (Hz)",
+                             &tuner_settings.display_hz);
                 break;
             case 7:
                 freq_val = freq_A[tuner_settings.freq_A].frequency;
@@ -558,9 +542,9 @@ bool main_menu(void)
                 break;
             case 8:
                 reset = false;
-                rb->set_option("Reset Tuner Settings?",
-                               &reset,
-                               BOOL, noyes_text, 2, tuner_settings_reset_query);
+                rb->set_bool("Reset Tuner Settings?", &reset);
+                if (reset)
+                    tuner_settings_reset(&tuner_settings);
                 break;
             case 9:
                 exit_tuner = true;
