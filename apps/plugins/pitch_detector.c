@@ -262,7 +262,7 @@ static int recording=0;
 struct note_entry
 {
     const char *name;    /* Name of the note, e.g. "A#" */
-    const fixed freq;    /* Note frequency              */
+    const fixed freq;    /* Note frequency, Hz          */
     const fixed logfreq; /* log2(frequency)             */
 };
 
