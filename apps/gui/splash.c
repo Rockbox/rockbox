@@ -34,15 +34,16 @@
 
 #define MAXLINES  (LCD_HEIGHT/6)
 #define MAXBUFFER 512
+#define RECT_SPACING 2
 
 #else /* HAVE_LCD_CHARCELLS */
 
 #define MAXLINES  2
 #define MAXBUFFER 64
+#define RECT_SPACING 0
 
 #endif
 
-#define RECT_SPACING 2
 
 static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 {
