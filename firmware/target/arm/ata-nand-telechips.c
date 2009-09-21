@@ -825,13 +825,11 @@ int nand_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
                 goto nand_read_error;
             }
 
-#ifdef CPU_TCC780X /* 77x doesn't have USEC_TIMER yet */
             if (TIME_AFTER(USEC_TIMER, next_yield))
             {
                 next_yield = USEC_TIMER + MIN_YIELD_PERIOD;
                 yield();
             }
-#endif
 
             inbuf += SECTOR_SIZE;
             incount--;
