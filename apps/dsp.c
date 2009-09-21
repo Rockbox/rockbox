@@ -227,7 +227,37 @@ static long album_peak;
 static long replaygain;
 static bool crossfeed_enabled;
 
+#define AUDIO_DSP (dsp_conf[CODEC_IDX_AUDIO])
+#define VOICE_DSP (dsp_conf[CODEC_IDX_VOICE])
+
+/* The internal format is 32-bit samples, non-interleaved, stereo. This
+ * format is similar to the raw output from several codecs, so the amount
+ * of copying needed is minimized for that case.
+ */
+
+#define RESAMPLE_RATIO          4 /* Enough for 11,025 Hz -> 44,100 Hz */
+
+static int32_t small_sample_buf[SMALL_SAMPLE_BUF_COUNT] IBSS_ATTR;
+static int32_t small_resample_buf[SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO] IBSS_ATTR;
+
+static int32_t *big_sample_buf = NULL;
+static int32_t *big_resample_buf = NULL;
+static int big_sample_buf_count = -1;  /* -1=unknown, 0=not available */
+
+static int sample_buf_count;
+static int32_t *sample_buf;
+static int32_t *resample_buf;
+
+#define SAMPLE_BUF_LEFT_CHANNEL 0
+#define SAMPLE_BUF_RIGHT_CHANNEL (sample_buf_count/2)
+#define RESAMPLE_BUF_LEFT_CHANNEL 0
+#define RESAMPLE_BUF_RIGHT_CHANNEL (sample_buf_count/2 * RESAMPLE_RATIO)
+
 /* limiter */
+/* MAX_COUNT is largest possible sample count in limiter_process.  This is
+   needed in case time stretch makes the count in dsp_process larger than
+   the limiter buffer. */
+#define MAX_COUNT  MAX(SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO / 2, LIMITER_BUFFER_SIZE)
 static int      count_adjust;
 static bool     limiter_buffer_active;
 static bool     limiter_buffer_full;
@@ -238,7 +268,7 @@ static int32_t  *start_lim_buf[2] IBSS_ATTR,
 static uint16_t lim_buf_peak[LIMITER_BUFFER_SIZE] IBSS_ATTR;
 static uint16_t *start_peak IBSS_ATTR,
                 *end_peak IBSS_ATTR;
-static uint16_t out_buf_peak[LIMITER_BUFFER_SIZE] IBSS_ATTR;
+static uint16_t out_buf_peak[MAX_COUNT] IBSS_ATTR;
 static uint16_t *out_buf_peak_index IBSS_ATTR;
 static uint16_t release_peak IBSS_ATTR;
 static int32_t  in_samp IBSS_ATTR,
@@ -275,32 +305,6 @@ const  long     gain_steps[49] ICONST_ATTR = { 0x10000000,
     0x5AD50CE, 0x5841505, 0x55C04B8, 0x535176A, 0x50F44D9,
     0x4EA84FE, 0x4C6D00E, 0x4A41E78, 0x48268DF, 0x461A81C,
     0x441D53E, 0x422E985, 0x404DE62};
-
-#define AUDIO_DSP (dsp_conf[CODEC_IDX_AUDIO])
-#define VOICE_DSP (dsp_conf[CODEC_IDX_VOICE])
-
-/* The internal format is 32-bit samples, non-interleaved, stereo. This
- * format is similar to the raw output from several codecs, so the amount
- * of copying needed is minimized for that case.
- */
-
-#define RESAMPLE_RATIO          4 /* Enough for 11,025 Hz -> 44,100 Hz */
-
-static int32_t small_sample_buf[SMALL_SAMPLE_BUF_COUNT] IBSS_ATTR;
-static int32_t small_resample_buf[SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO] IBSS_ATTR;
-
-static int32_t *big_sample_buf = NULL;
-static int32_t *big_resample_buf = NULL;
-static int big_sample_buf_count = -1;  /* -1=unknown, 0=not available */
-
-static int sample_buf_count;
-static int32_t *sample_buf;
-static int32_t *resample_buf;
-
-#define SAMPLE_BUF_LEFT_CHANNEL 0
-#define SAMPLE_BUF_RIGHT_CHANNEL (sample_buf_count/2)
-#define RESAMPLE_BUF_LEFT_CHANNEL 0
-#define RESAMPLE_BUF_RIGHT_CHANNEL (sample_buf_count/2 * RESAMPLE_RATIO)
 
 
 /* Clip sample to signed 16 bit range */
