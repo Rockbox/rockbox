@@ -268,7 +268,7 @@ static int32_t  *start_lim_buf[2] IBSS_ATTR,
 static uint16_t lim_buf_peak[LIMITER_BUFFER_SIZE] IBSS_ATTR;
 static uint16_t *start_peak IBSS_ATTR,
                 *end_peak IBSS_ATTR;
-static uint16_t out_buf_peak[MAX_COUNT] IBSS_ATTR;
+static uint16_t out_buf_peak[MAX_COUNT];
 static uint16_t *out_buf_peak_index IBSS_ATTR;
 static uint16_t release_peak IBSS_ATTR;
 static int32_t  in_samp IBSS_ATTR,
