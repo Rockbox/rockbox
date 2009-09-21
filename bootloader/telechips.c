@@ -177,11 +177,13 @@ void* main(void)
     }
     else if (rc == EOK)
     {
-        int(*kernel_entry)(void);
+        int(*kernel_entry)(void) = (void *) loadbuffer;
 
-        kernel_entry = (void*) loadbuffer;
+        disable_irq();
         rc = kernel_entry();
     }
+
+    panicf("Boot failed!");
 #else
     show_debug_screen();
 #endif
