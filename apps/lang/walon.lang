@@ -19,7 +19,7 @@
 #
 #    Fitchî e walon ki rote avou tolminme kéne éndjolreye
 #
-#    Stéphane QUERTINMONT <stefane AT walon.org> - May 2009
+#    Stéphane QUERTINMONT <stefane AT walon.org> - Awousse 2009
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -265,14 +265,17 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Oyi"
+    cowond2*: "MENU = Oyi"
     h100,h120,h300: "NAVI = Oyi"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Oyi"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Oyi"
+    mrobe500: "PLAY or POWER = Oyi"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -2389,14 +2392,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Bastixhaedje del båze di dnêyes... %d di trovés (OFF po-z eraler en erî)"
     h100,h120,h300: "Bastixhaedje del båze di dnêyes... %d di trovés (STOP po-z eraler en erî)"
     ipod*: "Bastixhaedje del båze di dnêyes... %d di trovés (PREV po-z eraler en erî)"
     x5,m5,gigabeat*,mrobe100: "Bastixhaedje del båze di dnêyes... %d di trovés (LEFT po-z eraler en erî)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Bastixhaedje del båze di dnêyes... %d di trovés (PREV po-z eraler en erî)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Bastixhaedje del båze di dnêyes... %d di trovés (PREV po-z eraler en erî)"
+    sa9200: "Bastixhaedje del båze di dnêyes... %d di trovés (REW po-z eraler en erî)"
   </dest>
   <voice>
     *: "intrêyes trovêyes pol båze di dnêyes"
@@ -2579,7 +2584,7 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
@@ -2595,7 +2600,7 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
     *: "Tcherdjî ls apont. waitroûle di lijhaedje LCD principå"
@@ -2610,7 +2615,7 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
@@ -4147,14 +4152,18 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
+    sa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Eployî"
+    mrobe500: "HEART = Eployî"
     h100,h120,h300: "NAVI = Eployî"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Eployî"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Eployî"
+    sa9200: "PLAY = Eployî"
   </dest>
   <voice>
     *: none
@@ -4168,24 +4177,28 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
+    ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = Rinoncî"
+    mrobe500: "POWER = Rinoncî"
     h100,h120,h300: "STOP = Rinoncî"
-    ipod*,c200*,sa9200: "MENU = Rinoncî"
+    ipod*,c200*: "MENU = Rinoncî"
     x5,m5: "RECORD = Rinoncî"
     h10,h10_5gb,e200*,fuze*: "PREV = Rinoncî"
     gigabeatf: "POWER = Rinoncî"
     mrobe100: "DISPLAY = Rinoncî"
     gigabeats: "BACK = Rinoncî"
+    sa9200: "LEFT = Rinoncî"
   </dest>
   <voice>
     *: none
@@ -5113,7 +5126,7 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
     *: "Djivêye des tinmes"
@@ -12142,6 +12155,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Hintche"
+  </dest>
+  <voice>
+    *: "Hintche"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Droete"
+  </dest>
+  <voice>
+    *: "Droete"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_BOTTOM
   desc: DEPRECATED
   user: core
@@ -12298,7 +12339,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_MODE
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12315,7 +12356,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_GRID
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12332,7 +12373,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_POINT
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12359,5 +12400,251 @@
   </dest>
   <voice>
     *: "Espaitchî d' passer les bokets"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Stindaedje do tins"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Stindaedje do tins"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Radisté"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Radisté"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Tchuzes del waitroûle-taprece"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Tchuzes del waitroûle-taprece"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Calibrer"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Calibrer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Rimete li calibraedje a zero"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Rimete li calibraedje a zero"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Copete"
+  </dest>
+  <voice>
+    *: "Copete"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Al valeye"
+  </dest>
+  <voice>
+    *: "Al valeye"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Bår ås messaedjes då lon"
+  </dest>
+  <voice>
+    *: none
+    remote: "Bår ås messaedjes då lon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc: 
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Dmey-ton"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Dmey-ton"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Aschate"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Aschate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Debit"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Debit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Memwere eployeye pol pea:"
+  </dest>
+  <voice>
+    *: "Memwere eployeye pol pea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Lårdjeu del bår d' acinseur"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Lårdjeu del bår d' acinseur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Eplaeçmint del bår d' acinseur"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Eplaeçmint del bår d' acinseur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMITER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limiter Preamp"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Aschatrece Preamp"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Aschatrece Preamp"
   </voice>
 </phrase>

@@ -256,13 +256,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Vis temaer"
+    *: "Vis temafiler"
   </dest>
   <voice>
-    *: "Vis temaer"
+    *: "Vis temafiler"
   </voice>
 </phrase>
 <phrase>
@@ -1384,15 +1384,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Vis skrifttyper"
+    lcd_bitmap: "Skrifttype"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Vis skrifttyper"
+    lcd_bitmap: "Skrifttype"
   </voice>
 </phrase>
 <phrase>
@@ -1400,13 +1400,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Vis afspilnings-skærm filer"
+    *: "Afspilnings-skærm"
   </dest>
   <voice>
-    *: "Vis afspilnings-skærm filer"
+    *: "Afspilnings-skærm"
   </voice>
 </phrase>
 <phrase>
@@ -1415,15 +1415,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "Vis fjernbetjenings afspilnings-skærm filer"
+    remote: "Fjernbetjenings afspilnings-skærm"
   </dest>
   <voice>
     *: none
-    remote: "Vis fjernbetjenings afspilnings-skærm filer"
+    remote: "Fjernbetjenings afspilnings-skærm"
   </voice>
 </phrase>
 <phrase>
@@ -3888,6 +3888,7 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
     ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
@@ -3900,6 +3901,7 @@
   <dest>
     *: none
     rtc: "SLUK = Fortryd"
+    mrobe500: "TÆND/SLUK = Fortryd"
     h100,h120,h300: "STOP = Fortryd"
     ipod*,c200*: "MENU = Fortryd"
     x5,m5: "OPTAG = Fortryd"
@@ -3911,14 +3913,6 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
-    h100,h120,h300: ""
-    ipod*,e200*,c200*,sa9200: ""
-    x5,m5: ""
-    h10,h10_5gb: ""
-    gigabeatf: ""
-    mrobe100: ""
-    gigabeats: ""
   </voice>
 </phrase>
 <phrase>
@@ -10560,12 +10554,14 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU = Yes"
     h100,h120,h300: "NAVI = Yes"
     yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "SPIL = Ja"
+    cowond2*: "MENU = Ja"
     h100,h120,h300: "NAVI = Ja"
     yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "VÆLG = Ja"
     player: "(SPIL/STOP)"
@@ -10581,6 +10577,7 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
     ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
     sa9200: "PLAY = Set"
@@ -10588,15 +10585,13 @@
   <dest>
     *: none
     rtc: "Tænd = Indstil"
+    mrobe500: "HJERTE = Indstil"
     h100,h120,h300: "NAVI = Indstil"
     ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "VÆLG = Indstil"
     sa9200: "SPIL = Indstil"
   </dest>
   <voice>
     *: none
-    rtc: ""
-    h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -12375,11 +12370,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "3x3 net"
+    touchscreen: "3x3 gitter"
   </dest>
   <voice>
     *: none
-    touchscreen: "3 gange 3 net"
+    touchscreen: "3 gange 3 gitter"
   </voice>
 </phrase>
 <phrase>
@@ -12482,5 +12477,211 @@
   <voice>
     *: none
     swcodec: "Hastighed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Rullebjælkens position"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Rullebjælkens position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Statusbjælke på fjernbetjening"
+  </dest>
+  <voice>
+    *: none
+    remote: "Statusbjælke på fjernbetjening"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Vælg som øverste hurtigindstilling"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Vælg som øverste hurtigindstilling"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Hastighed"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Hastighed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Højre"
+  </dest>
+  <voice>
+    *: "Højre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc:
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Semitone"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Semitone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Grænse"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Grænse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Rullebjælkens bredde"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Rullebjælkens bredde"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Temas RAM-forbrug:"
+  </dest>
+  <voice>
+    *: "Temas RAM-forbrug"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Nederst"
+  </dest>
+  <voice>
+    *: "Nederst"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limiter Preamp"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Begrænser forforstærkning"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Begrænser for-forstærkning"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Venstre"
+  </dest>
+  <voice>
+    *: "Venstre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Øverst"
+  </dest>
+  <voice>
+    *: "Øverst"
   </voice>
 </phrase>
