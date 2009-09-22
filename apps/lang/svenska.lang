@@ -266,16 +266,16 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU = Yes"
     h100,h120,h300: "NAVI = Yes"
     yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
-    mrobe500: "PLAY or POWER = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "SPELA = Ja"
+    cowond2*: "MENY = Ja"
     h100,h120,h300: "NAVI = Ja"
     yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "VÄLJ = Ja"
-    mrobe500: "SPELA / PÅ/AV = Ja"
     player: "SPELA/STOPP"
   </dest>
   <voice>
@@ -12339,7 +12339,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_MODE
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12356,7 +12356,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_GRID
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12373,7 +12373,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_POINT
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12646,5 +12646,22 @@
   <voice>
     *: none
     swcodec: "Limiter-förförstärkning"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Sätt som övre snabbmenyval"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Sätt som övre snabbmenyval"
   </voice>
 </phrase>
