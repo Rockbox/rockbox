@@ -281,14 +281,14 @@
     *: "PLAY = Yes"
     cowond2*: "MENU = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Ja"
     cowond2*: "MENU = Ja"
     h100,h120,h300: "NAVI = Ja"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Ja"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Ja"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -2388,14 +2388,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Erstelle Datenbank... %d gefunden (OFF zum Abbrechen)"
     h100,h120,h300: "Erstelle Datenbank... %d gefunden (STOP zum Abbrechen)"
     ipod*: "Erstelle Datenbank... %d gefunden (PLAY/PAUSE zum Abbrechen)"
     x5,m5,gigabeat*,mrobe100: "Erstelle Datenbank... %d gefunden (LEFT zum Abbrechen)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Erstelle Datenbank... %d gefunden (PREV zum Abbrechen)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Erstelle Datenbank... %d gefunden (PREV zum Abbrechen)"
+    sa9200: "Erstelle Datenbank... %d gefunden (REW zum Abbrechen)"
   </dest>
   <voice>
     *: "Erstelle Datenbank"
@@ -2578,15 +2580,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Zeige Schriftarten"
+    lcd_bitmap: "Schriftarten"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Zeige Schriftarten"
+    lcd_bitmap: "Schriftarten"
   </voice>
 </phrase>
 <phrase>
@@ -2594,13 +2596,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Zeige .wps-Dateien"
+    *: "WPS-Dateien"
   </dest>
   <voice>
-    *: "Zeige WPS-Dateien"
+    *: "WPS-Dateien"
   </voice>
 </phrase>
 <phrase>
@@ -2609,15 +2611,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "Zeige .rwps-Dateien"
+    remote: "RWPS-Dateien"
   </dest>
   <voice>
     *: none
-    remote: "Zeige RWPS-Dateien"
+    remote: "RWPS-Dateien"
   </voice>
 </phrase>
 <phrase>
@@ -4148,14 +4150,18 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
+    sa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Speichern"
+    mrobe500: "HEART = Speichern"
     h100,h120,h300: "NAVI = Speichern"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Speichern"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Speichern"
+    sa9200: "PLAY = Speichern"
   </dest>
   <voice>
     *: none
@@ -4169,24 +4175,28 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
+    ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = Abbrechen"
+    mrobe500: "POWER = Abbrechen"
     h100,h120,h300: "STOP = Abbrechen"
-    ipod*,c200*,sa9200: "MENU = Abbrechen"
+    ipod*,c200*: "MENU = Abbrechen"
     x5,m5: "RECORD = Abbrechen"
     h10,h10_5gb,e200*,fuze*: "PREV = Abbrechen"
     gigabeatf: "POWER = Abbrechen"
     mrobe100: "DISPLAY = Abbrechen"
     gigabeats: "BACK = Abbrechen"
+    sa9200: "LEFT = Abbrechen"
   </dest>
   <voice>
     *: none
@@ -5114,13 +5124,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Zeige Themen"
+    *: "Zeige Themen-Dateien"
   </dest>
   <voice>
-    *: "Zeige Themen"
+    *: "Zeige Themen-Dateien"
   </voice>
 </phrase>
 <phrase>
@@ -12479,5 +12489,194 @@
   <voice>
     *: none
     quickscreen: "Als obere Schnelleinstellung verwenden"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Bildlaufleisten-Position"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Bildlaufleisten-Position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Fernbedienungs-Statusleiste"
+  </dest>
+  <voice>
+    *: none
+    remote: "Fernbedienungs-Statusleiste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Rate"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Rate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Rechts"
+  </dest>
+  <voice>
+    *: "Rechts"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc: 
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Halbton"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Halbton"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Grenze"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Grenze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Bildlaufleisten-Breite"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Bildlaufleisten-Breite"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Themen-Speicher:"
+  </dest>
+  <voice>
+    *: "Themen-Speicher"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Unten"
+  </dest>
+  <voice>
+    *: "Unten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limiter Preamp"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Begrenzer-Vorverstärkung"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Begrenzer-Vorverstärkung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Links"
+  </dest>
+  <voice>
+    *: "Links"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Oben"
+  </dest>
+  <voice>
+    *: "Oben"
   </voice>
 </phrase>
