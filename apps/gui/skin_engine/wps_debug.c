@@ -26,6 +26,7 @@
 #include "wps.h"
 #include "wps_internals.h"
 #include "skin_buffer.h"
+#include "settings_list.h"
 #ifdef __PCTOOL__
 #ifdef WPSEDITOR
 #include "proxy.h"
@@ -457,7 +458,8 @@ static char *get_token_desc(struct wps_token *token, char *buf,
                      token->value.i);
             break;
         case WPS_TOKEN_SETTING:
-            snprintf(buf, bufsize, "Setting value");
+            snprintf(buf, bufsize, "Setting value: '%s'",
+                 settings[token->value.i].cfg_name);
             break;
         default:
             snprintf(buf, bufsize, "FIXME (code: %d)",
