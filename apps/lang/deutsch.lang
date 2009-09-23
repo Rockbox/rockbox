@@ -2584,11 +2584,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Schriftarten"
+    lcd_bitmap: "Schriftart"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Schriftarten"
+    lcd_bitmap: "Schriftart"
   </voice>
 </phrase>
 <phrase>
@@ -2599,10 +2599,10 @@
     *: "While Playing Screen"
   </source>
   <dest>
-    *: "WPS-Dateien"
+    *: "WPS-Datei"
   </dest>
   <voice>
-    *: "WPS-Dateien"
+    *: "WPS-Datei"
   </voice>
 </phrase>
 <phrase>
@@ -2615,11 +2615,11 @@
   </source>
   <dest>
     *: none
-    remote: "RWPS-Dateien"
+    remote: "RWPS-Datei"
   </dest>
   <voice>
     *: none
-    remote: "RWPS-Dateien"
+    remote: "RWPS-Datei"
   </voice>
 </phrase>
 <phrase>
