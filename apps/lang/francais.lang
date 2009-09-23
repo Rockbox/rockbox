@@ -12617,10 +12617,10 @@
     *: "Skin RAM usage:"
   </source>
   <dest>
-    *: "Tampon écrans de lecture:"
+    *: "Tampon du thème:"
   </dest>
   <voice>
-    *: "Tampon des écrans de lecture"
+    *: "Tampon du thème utilisé"
   </voice>
 </phrase>
 <phrase>
