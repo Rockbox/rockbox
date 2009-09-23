@@ -734,9 +734,9 @@ enum plugin_status plugin_start(const void* parameter)
         "Speed test",
         "Speed test folder",
         "Write WAV",
-        "Speed test w/DSP",
-        "Speed test folder w/DSP",
-        "Write WAV w/DSP",
+        "Speed test with DSP",
+        "Speed test folder with DSP",
+        "Write WAV with DSP",
         "Quit",
     );
 
