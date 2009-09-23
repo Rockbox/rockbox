@@ -42,11 +42,17 @@ crosswincc () {
  # naive approach to selecting a mingw cross-compiler on linux/*nix
  echo "Enabling win32 crosscompiling"
 
+ sdl=`findtool sdl-config`
+ sdl_cflags=""
+ sdl_libs=""
  prefixtools i586-mingw32msvc-
-
+ if [ $1 = "sdl" -a -z "$sdl"]; then
+   sdl_cflags="`sdl-config --cflags`"
+   sdl_libs="`sdl-config --libs`"
+ fi
  # add cross-compiler option(s)
- GCCOPTS="$GCCOPTS `sdl-config --cflags`"
- LDOPTS="`sdl-config --libs` -mconsole"
+ GCCOPTS="$GCCOPTS " + $sdl_cflags
+ LDOPTS="-mconsole" + $sdl_libs
 
  output="rockboxui.exe" # use this as output binary name
  crosscompile="yes"
@@ -81,15 +87,21 @@ simcc () {
  GCCOPTS='-W -Wall -g -fno-builtin'
 
  output="rockboxui" # use this as default output binary name
-
- # generic sdl-config checker
  sdl=`findtool sdl-config`
+ sdl_cflags=""
+ sdl_libs=""
 
- if [ -z "$sdl" ]; then
-     echo "configure didn't find sdl-config, which indicates that you"
-     echo "don't have SDL (properly) installed. Please correct and"
-     echo "re-run configure!"
-     exit 1
+ if [ $1 = "sdl" ]; then
+    if [ -z "$sdl" ]; then
+        echo "configure didn't find sdl-config, which indicates that you"
+        echo "don't have SDL (properly) installed. Please correct and"
+        echo "re-run configure!"
+        exit 1
+    else 
+        # generic sdl-config checker
+        sdl_cflags=`sdl-config --cflags`
+        sdl_libs=`sdl-config --libs`
+    fi
  fi
 
  # default share option, override below if needed
@@ -100,8 +112,8 @@ simcc () {
    echo "Cygwin host detected"
 
    # sdl version
-   GCCOPTS="$GCCOPTS `sdl-config --cflags`"
-   LDOPTS="`sdl-config --libs` -mconsole"
+   GCCOPTS="$GCCOPTS $sdl_cflags"
+   LDOPTS="-mconsole $sdl_libs"
 
    output="rockboxui.exe" # use this as output binary name
    ;;
@@ -110,35 +122,38 @@ simcc () {
    echo "MinGW host detected"
 
    # sdl version
-   GCCOPTS="$GCCOPTS `sdl-config --cflags`"
-   LDOPTS="`sdl-config --libs` -mconsole"
+   GCCOPTS="$GCCOPTS $sdl_cflags"
+   LDOPTS="-mconsole $sdl_libs"
 
    output="rockboxui.exe" # use this as output binary name
    ;;
 
    Linux)
    echo "Linux host detected"
-   if [ "0" != `sdl-config --libs |grep -c mwindows` ]; then
+   GCCOPTS="$GCCOPTS $sdl_cflags"
+   LDOPTS="$sdl_libs"
+   # cannot crosscompile without SDL installed
+   if [ -n "$sdl" ]; then
+     if [ "0" != `sdl-config --libs |grep -c mwindows` ]; then
        # Enable crosscompiling if sdl-config is from Windows SDL
-       crosswincc
-   else
-       GCCOPTS="$GCCOPTS `sdl-config --cflags`"
-       LDOPTS="`sdl-config --libs`"
+       # overrides GCCOPTS and LDOPTS
+       crosswincc $1
+     fi
    fi
    ;;
 
    FreeBSD)
    echo "FreeBSD host detected"
    # sdl version
-   GCCOPTS="$GCCOPTS `sdl-config --cflags`"
-   LDOPTS="`sdl-config --libs`"
+   GCCOPTS="$GCCOPTS $sdl_cflags"
+   LDOPTS="$sdl_libs"
    ;;
 
    Darwin)
    echo "Darwin host detected"
    # sdl version
-   GCCOPTS="$GCCOPTS `sdl-config --cflags`"
-   LDOPTS="`sdl-config --libs`"
+   GCCOPTS="$GCCOPTS $sdl_cflags"
+   LDOPTS="$sdl_libs"
    SHARED_FLAG="-dynamiclib -Wl\,-single_module"
    ;;
 
@@ -181,7 +196,12 @@ EOF
      # little endian
      endian="little"
    fi
-   echo "Simulator environment deemed $endian endian"
+
+   if [ $1 = "sdl" ]; then
+     echo "Simulator environment deemed $endian endian"
+   elif [ $1 = "checkwps" ]; then
+     echo "CheckWPS environment deemed $endian endian"
+   fi
 
    # use wildcard here to make it work even if it was named *.exe like
    # on cygwin
@@ -2513,7 +2533,7 @@ fi
       ;;
     [Cc])
       uname=`uname`
-      simcc
+      simcc "checkwps"
       toolset='';
       t_cpu='';
       GCCOPTS='';
@@ -2565,7 +2585,7 @@ uname=`uname`
 
 if [ "yes" = "$simulator" ]; then
   # setup compiler and things for simulator
-  simcc
+  simcc "sdl"
 
   if [ -d "simdisk" ]; then
     echo "Subdirectory 'simdisk' already present"
