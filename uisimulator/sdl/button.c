@@ -28,15 +28,13 @@
 #include "backlight.h"
 #include "misc.h"
 #include "sim_tasks.h"
+#include "button-sdl.h"
 
 #include "debug.h"
-
-static intptr_t button_data; /* data value from last message dequeued */
 
 #ifdef HAVE_TOUCHSCREEN
 #include "touchscreen.h"
 static int mouse_coords = 0;
-static int last_touchscreen_touch = 0xffff;
 #endif
 /* how long until repeat kicks in */
 #define REPEAT_START      6
@@ -91,23 +89,9 @@ bool remote_button_hold(void) {
 }
 #endif
 
-static int lastbtn;
 void button_event(int key, bool pressed)
 {
     int new_btn = 0;
-    int diff = 0;
-    int data = 0;
-    static int count = 0;
-    static int repeat_speed = REPEAT_INTERVAL_START;
-    static int repeat_count = 0;
-    static bool repeat = false;
-    static bool post = false;
-#ifdef HAVE_BACKLIGHT
-    static bool skip_release = false;
-#ifdef HAVE_REMOTE_LCD
-    static bool skip_remote_release = false;
-#endif
-#endif 
     static bool usb_connected = false;
     if (usb_connected && key != SDLK_u)
         return;
@@ -116,7 +100,6 @@ void button_event(int key, bool pressed)
 
 #ifdef HAVE_TOUCHSCREEN
     case BUTTON_TOUCHSCREEN:
-        data = mouse_coords;
         switch (touchscreen_get_mode())
         {
             case TOUCHSCREEN_POINT:
@@ -129,7 +112,8 @@ void button_event(int key, bool pressed)
                     {BUTTON_MIDLEFT, BUTTON_CENTER, BUTTON_MIDRIGHT},
                     {BUTTON_BOTTOMLEFT, BUTTON_BOTTOMMIDDLE, BUTTON_BOTTOMRIGHT},
                 };
-                int px_x = ((data&0xffff0000)>>16), px_y = ((data&0x0000ffff));
+                int px_x = ((mouse_coords&0xffff0000)>>16);
+                int px_y = ((mouse_coords&0x0000ffff));
                 new_btn = touchscreen_buttons[px_y/(LCD_HEIGHT/3)][px_x/(LCD_WIDTH/3)];
                 break;
             }
@@ -1223,177 +1207,30 @@ void button_event(int key, bool pressed)
         btn |= new_btn;
     else
         btn &= ~new_btn;
-
-    /* Lots of stuff copied from real button.c. Not good, I think... */
-
-    /* Find out if a key has been released */
-    diff = btn ^ lastbtn;
-    if(diff && (btn & diff) == 0)
-    {
-#ifdef HAVE_BACKLIGHT
-#ifdef HAVE_REMOTE_LCD
-        if(diff & BUTTON_REMOTE)
-            if(!skip_remote_release)
-                queue_post(&button_queue, BUTTON_REL | diff, data);
-            else
-                skip_remote_release = false;
-        else
-#endif
-            if(!skip_release)
-                queue_post(&button_queue, BUTTON_REL | diff, data);
-            else
-                skip_release = false;
+}
+#ifdef HAVE_BUTTON_DATA
+int button_read_device(int* data)
+{
+    (void)data;
 #else
-        queue_post(&button_queue, BUTTON_REL | diff, data);
+int button_read_device(void)
+{
 #endif
-    }
-
-    else
+    static int hold_button_old = false;
+    int hold_button = button_hold();
+    /* light handling */
+    if (hold_button != hold_button_old)
     {
-        if ( btn )
-        {
-            /* normal keypress */
-            if ( btn != lastbtn )
-            {
-                post = true;
-                repeat = false;
-                repeat_speed = REPEAT_INTERVAL_START;
-
-            }
-            else /* repeat? */
-            {
-                if ( repeat )
-                {
-                    if (!post)
-                        count--;
-                    if (count == 0)
-                    {
-                        post = true;
-                        /* yes we have repeat */
-                        repeat_speed--;
-                        if (repeat_speed < REPEAT_INTERVAL_FINISH)
-                            repeat_speed = REPEAT_INTERVAL_FINISH;
-                        count = repeat_speed;
-
-                        repeat_count++;
-                    }
-                }
-                else
-                {
-                    if (count++ > REPEAT_START)
-                    {
-                        post = true;
-                        repeat = true;
-                        repeat_count = 0;
-                        /* initial repeat */
-                        count = REPEAT_INTERVAL_START;
-                    }
-                }
-            }
-            if ( post )
-            {
-                if(repeat)
-                {
-                    if (queue_empty(&button_queue))
-                    {
-                        queue_post(&button_queue, BUTTON_REPEAT | btn, data);
-#ifdef HAVE_BACKLIGHT
-#ifdef HAVE_REMOTE_LCD
-                            if(btn & BUTTON_REMOTE)
-                            {
-                                if(skip_remote_release)
-                                    skip_remote_release = false;
-                            }
-                            else
-#endif                                    
-                                if(skip_release)
-                                    skip_release = false;
-#endif
-                        post = false;
-                    }
-                }
-                else
-                {
-#ifdef HAVE_BACKLIGHT
-#ifdef HAVE_REMOTE_LCD
-                        if (btn & BUTTON_REMOTE) {
-                            if (!remote_filter_first_keypress 
-                                || is_remote_backlight_on(false))
-                                queue_post(&button_queue, btn, data);
-                            else
-                                skip_remote_release = true;
-                        }
-                        else
-#endif                                    
-                            if (!filter_first_keypress 
-                                || is_backlight_on(false))
-                                queue_post(&button_queue, btn, data);
-                            else
-                                skip_release = true;
-#else /* no backlight, nothing to skip */
-                        queue_post(&button_queue, btn, data);
-#endif
-                    post = false;
-                }    
-
-#ifdef HAVE_REMOTE_LCD
-                if(btn & BUTTON_REMOTE)
-                    remote_backlight_on();
-                else
-#endif
-                    backlight_on();
-
-            }
-        }
-        else
-        {
-            repeat = false;
-            count = 0;
-        }
+        hold_button_old = hold_button;
+        backlight_hold_changed(hold_button);
     }
-    lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
+
+    if (hold_button)
+        return BUTTON_NONE;
+
+    return btn;
 }
 
-/* Again copied from real button.c... */
-
-int button_queue_count( void )
-{
-    return queue_count(&button_queue);
-}
-
-long button_get(bool block)
-{
-    struct queue_event ev;
-
-    if ( block || !queue_empty(&button_queue) ) {
-        queue_wait(&button_queue, &ev);
-        button_data = ev.data;
-        return ev.id;
-    }
-    return BUTTON_NONE;
-}
-
-long button_get_w_tmo(int ticks)
-{
-    struct queue_event ev;
-    queue_wait_w_tmo(&button_queue, &ev, ticks);
-    if (ev.id == SYS_TIMEOUT)
-        ev.id = BUTTON_NONE;
-    else
-        button_data = ev.data;
-
-    return ev.id;
-}
-
-intptr_t button_get_data(void)
-{
-#ifdef HAVE_TOUCHSCREEN
-    return button_data;
-#else
-    /* Needed by the accelerating wheel driver for Sansa e200 */
-    return 1 << 24;
-#endif
-}
 
 #ifdef HAVE_TOUCHSCREEN
 extern bool debug_wps;
@@ -1416,31 +1253,29 @@ void mouse_tick_task(void)
         }
         
         mouse_coords = (x<<16)|y;
-        last_touchscreen_touch = current_tick;
         button_event(BUTTON_TOUCHSCREEN, true);
         if (debug_wps)
             printf("Mouse at: (%d, %d)\n", x, y);
     }
 }
-int touchscreen_last_touch(void)
-{
-    return last_touchscreen_touch;
-}
+
 #endif
-void button_init(void)
+
+intptr_t button_get_data_sdl(void)
+{
+#ifdef HAVE_TOUCHSCREEN
+    /* pass the mouse coordinates to the button driver */
+    return mouse_coords;
+#else
+    /* pass scrollwheel acceleration to the button driver */
+    return 1<<24;
+#endif
+}
+
+void button_init_sdl(void)
 {
 #ifdef HAVE_TOUCHSCREEN
     tick_add_task(mouse_tick_task);
 #endif
-}
-
-int button_status(void)
-{
-    return btn;
-}
-
-void button_clear_queue(void)
-{
-    queue_clear(&button_queue);
 }
 

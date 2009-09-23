@@ -33,13 +33,16 @@
 #include "serial.h"
 #include "power.h"
 #include "powermgmt.h"
+#ifdef SIMULATOR
+#include "button-sdl.h"
+#else
 #include "button-target.h"
+#endif
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
 
-#ifndef SIMULATOR
 #if 0
 /* Older than MAX_EVENT_AGE button events are going to be ignored.
  * Used to prevent for example volume going up uncontrollable when events
@@ -82,9 +85,9 @@ static int button_read(void);
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-    int last_touchscreen_touch;
+static int last_touchscreen_touch;
 #endif    
-#if defined(HAVE_HEADPHONE_DETECTION)
+#if defined(HAVE_HEADPHONE_DETECTION) && !defined(SIMULATOR)
 static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
 /* This callback can be used for many different functions if needed -
    just check to which object tmo points */
@@ -211,8 +214,10 @@ static void button_tick(void)
 
                             /* Safety net for players without hardware
                                poweroff */
+#ifndef SIMULATOR
                             if(repeat_count > POWEROFF_COUNT * 10)
                                 power_off();
+#endif
                         }
 #endif
                     }
@@ -376,7 +381,11 @@ long button_get_w_tmo(int ticks)
 
 intptr_t button_get_data(void)
 {
+#if defined(SIMULATOR)
+    return button_get_data_sdl();
+#else
     return button_data;
+#endif
 }
 
 void button_init(void)
@@ -416,6 +425,7 @@ void button_init(void)
     tick_add_task(button_tick);
 }
 
+#ifndef SIMULATOR
 #ifdef BUTTON_DRIVER_CLOSE
 void button_close(void)
 {
@@ -423,7 +433,7 @@ void button_close(void)
 }
 #endif /* BUTTON_DRIVER_CLOSE */
 
-#ifdef HAVE_LCD_BITMAP /* only bitmap displays can be flipped */
+#ifdef HAVE_LCD_FLIP
 /*
  * helper function to swap LEFT/RIGHT, UP/DOWN (if present), and F1/F3 (Recorder)
  */
@@ -508,7 +518,7 @@ void button_set_flip(bool flip)
         restore_irq(oldlevel);
     }
 }
-#endif /* HAVE_LCD_BITMAP */
+#endif /* HAVE_LCD_FLIP */
 
 #ifdef HAVE_BACKLIGHT
 void set_backlight_filter_keypress(bool value)
@@ -523,6 +533,7 @@ void set_remote_backlight_filter_keypress(bool value)
 #endif
 #endif
 
+#endif /* SIMULATOR */
 /*
  * Get button pressed from hardware
  */
@@ -537,10 +548,11 @@ static int button_read(void)
 #endif
     int retval;
 
-#ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_FLIP
     if (btn && flipped)
         btn = button_flip(btn); /* swap upside down */
-#endif
+#endif /* HAVE_LCD_FLIP */
+
 #ifdef HAVE_TOUCHSCREEN
     if (btn & BUTTON_TOUCHSCREEN)
         last_touchscreen_touch = current_tick;
@@ -574,7 +586,6 @@ int touchscreen_last_touch(void)
     return last_touchscreen_touch;
 }
 #endif
-#endif /* SIMULATOR */
 
 #ifdef HAVE_WHEEL_ACCELERATION
 /* WHEEL_ACCEL_FACTOR = 2^16 / WHEEL_ACCEL_START */
