@@ -87,7 +87,7 @@ static int button_read(void);
 #ifdef HAVE_TOUCHSCREEN
 static int last_touchscreen_touch;
 #endif    
-#if defined(HAVE_HEADPHONE_DETECTION) && !defined(SIMULATOR)
+#if defined(HAVE_HEADPHONE_DETECTION)
 static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
 /* This callback can be used for many different functions if needed -
    just check to which object tmo points */

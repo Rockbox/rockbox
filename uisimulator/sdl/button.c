@@ -1216,17 +1216,23 @@ int button_read_device(int* data)
 int button_read_device(void)
 {
 #endif
-    static int hold_button_old = false;
+
+#ifdef HAS_BUTTON_HOLD
     int hold_button = button_hold();
+
+#ifdef HAVE_BACKLIGHT
     /* light handling */
+    static int hold_button_old = false;
     if (hold_button != hold_button_old)
     {
         hold_button_old = hold_button;
         backlight_hold_changed(hold_button);
     }
+#endif
 
     if (hold_button)
         return BUTTON_NONE;
+#endif
 
     return btn;
 }

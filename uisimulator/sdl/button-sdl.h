@@ -27,7 +27,6 @@
 #include "config.h"
 #include "button-target.h"
 
-#define HAS_BUTTON_HOLD
 #undef HAVE_LCD_FLIP
 
 #undef button_init_device
