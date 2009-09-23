@@ -122,7 +122,7 @@ static void button_tick(void)
     const int data = 0;
 #endif
 
-#ifdef HAS_SERIAL_REMOTE
+#if defined(HAS_SERIAL_REMOTE) && !defined(SIMULATOR)
     /* Post events for the remote control */
     btn = remote_control_rx();
     if(btn)
