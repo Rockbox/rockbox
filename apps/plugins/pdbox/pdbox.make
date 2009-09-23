@@ -18,7 +18,7 @@ PDBOX_OBJ := $(call c2obj, $(PDBOX_SRC))
 # add source files to OTHERSRC to get automatic dependencies
 OTHERSRC += $(PDBOX_SRC)
 
-$(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ)
+$(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ) $(MPEG_OBJ) $(CODECDIR)/libtlsf.a
 
 PDBOXFLAGS = $(PLUGINFLAGS) \
              -DFIXEDPOINT -DSTATIC -DPD -DUSEAPI_ROCKBOX \

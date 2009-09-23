@@ -25,7 +25,7 @@
 
 #if 1
 /* Use TLSF. */
-#include "tlsf.h"
+#include "codecs/lib/tlsf/src/tlsf.h"
 #endif
 
 /* Pure Data */
