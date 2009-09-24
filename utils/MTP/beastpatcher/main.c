@@ -92,13 +92,18 @@ int main(int argc, char* argv[])
     char* firmware = NULL;
 #ifdef WITH_BOOTOBJS
     enum actions action = INSTALL;
+    int interactive = 1;
 #else
     enum actions action = NONE;
+    int interactive = 0;
 #endif
 
     fprintf(stderr,"beastpatcher v" VERSION " - (C) 2009 by the Rockbox developers\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
+    if(argc > 1) {
+        interactive = 0;
+    }
 
     i = 1;
     while(i < argc) {
@@ -150,12 +155,12 @@ int main(int argc, char* argv[])
         res = sendfirm(firmware);
     }
     else if(action == DUALBOOT) {
-        res = beastpatcher(bootloader, firmware);
+        res = beastpatcher(bootloader, firmware, interactive);
     }
     else if(action == INSTALL) {
-        res = beastpatcher(bootloader, NULL);
+        res = beastpatcher(bootloader, NULL, interactive);
         /* don't ask for enter if started with command line arguments */
-        if(argc == 1) {
+        if(interactive) {
             printf("\nPress ENTER to exit beastpatcher: ");
             fgets(yesno,4,stdin);
         }

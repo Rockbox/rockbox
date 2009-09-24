@@ -40,7 +40,7 @@
 #ifndef BEASTPATCHER_H
 #define BEASTPATCHER_H
 
-int beastpatcher(const char* bootfile, const char* firmfile);
+int beastpatcher(const char* bootfile, const char* firmfile, int interactive);
 int sendfirm(const char* filename);
 
 #endif

@@ -158,7 +158,7 @@ static int readfile(const char* filename, struct filebuf *buf)
 }
 
 
-int beastpatcher(const char* bootfile, const char* firmfile)
+int beastpatcher(const char* bootfile, const char* firmfile, int interactive)
 {
     char yesno[4];
     struct mtp_info_t mtp_info;
@@ -195,45 +195,47 @@ int beastpatcher(const char* bootfile, const char* firmfile)
                                                 mtp_info.modelname);
     printf("[INFO] Device version: \"%s\"\n",mtp_info.version);
 
-    if(firmfile) {
-        printf("\nEnter i to install the Rockbox dualboot bootloader or c to cancel and do nothing (i/c): ");
-    }
-    else {
-        printf("\nEnter i to install the Rockbox bootloader or c to cancel and do nothing (i/c): ");
+    if (interactive) {
+        if(firmfile) {
+            printf("\nEnter i to install the Rockbox dualboot bootloader or c "
+                    "to cancel and do nothing (i/c): ");
+        }
+        else {
+            printf("\nEnter i to install the Rockbox bootloader or c to cancel "
+                    "and do nothing (i/c): ");
+        }
+        fgets(yesno,4,stdin);
     }
 
-    if (fgets(yesno,4,stdin))
+    if (!interactive || yesno[0]=='i')
     {
-        if (yesno[0]=='i')
-        {
-            if(firmfile) {
-                /* if a firmware file is given create a dualboot image. */
-                mknkboot(&firmware, &bootloader, &fw);
-            }
-            else {
+        if(firmfile) {
+            /* if a firmware file is given create a dualboot image. */
+            mknkboot(&firmware, &bootloader, &fw);
+        }
+        else {
             /* Create a single-boot bootloader from the embedded bootloader */
             create_single_boot(bootloader.buf, bootloader.len, &fw.buf, &fw.len);
-            }
+        }
 
-            if (fw.buf == NULL)
-                return 1;
+        if (fw.buf == NULL)
+            return 1;
 
-            if (mtp_send_firmware(&mtp_info, fw.buf, fw.len) == 0)
-            {
-                fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
-            }
-            else
-            {
-                fprintf(stderr,"[ERR]  Bootloader install failed.\n");
-            }
-
-            /* We are now done with the firmware image */
-            free(fw.buf);
+        if (mtp_send_firmware(&mtp_info, fw.buf, fw.len) == 0)
+        {
+            fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
         }
         else
         {
-            fprintf(stderr,"[INFO] Installation cancelled.\n");
+            fprintf(stderr,"[ERR]  Bootloader install failed.\n");
         }
+
+        /* We are now done with the firmware image */
+        free(fw.buf);
+    }
+    else
+    {
+        fprintf(stderr,"[INFO] Installation cancelled.\n");
     }
     if(bootfile) {
         free(bootloader.buf);
