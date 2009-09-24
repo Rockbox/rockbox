@@ -46,13 +46,13 @@ crosswincc () {
  sdl_cflags=""
  sdl_libs=""
  prefixtools i586-mingw32msvc-
- if [ $1 = "sdl" -a -z "$sdl"]; then
+ if [ $1 = "sdl" -a -n "$sdl" ]; then
    sdl_cflags="`sdl-config --cflags`"
    sdl_libs="`sdl-config --libs`"
  fi
  # add cross-compiler option(s)
- GCCOPTS="$GCCOPTS " + $sdl_cflags
- LDOPTS="-mconsole" + $sdl_libs
+ GCCOPTS="$GCCOPTS $sdl_cflags"
+ LDOPTS="-mconsole $sdl_libs"
 
  output="rockboxui.exe" # use this as output binary name
  crosscompile="yes"
