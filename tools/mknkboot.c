@@ -42,8 +42,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#if defined(_MSC_VER)
+#include "pstdint.h"
+#else
 #include <unistd.h>
 #include <inttypes.h>
+#endif
 
 #include "mknkboot.h"
 
@@ -118,10 +122,10 @@ static uint32_t dualboot[] =
 
 static void put_uint32le(uint32_t x, unsigned char* p)
 {
-    p[0] = x & 0xff;
-    p[1] = (x >> 8) & 0xff;
-    p[2] = (x >> 16) & 0xff;
-    p[3] = (x >> 24) & 0xff;
+    p[0] = (unsigned char)(x & 0xff);
+    p[1] = (unsigned char)((x >> 8) & 0xff);
+    p[2] = (unsigned char)((x >> 16) & 0xff);
+    p[3] = (unsigned char)((x >> 24) & 0xff);
 }
 
 #if !defined(BEASTPATCHER)

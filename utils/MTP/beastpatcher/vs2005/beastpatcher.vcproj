@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\wmsdk\wmfsdk95\include;c:\wmsdk\wmfsdk95\wmdm\inc"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;MTP_NODLL;WITH_BOOTOBJS"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..&quot;;&quot;$(ProjectDir)..\..\..\..\tools&quot;;c:\wmsdk\wmfsdk95\include;c:\wmsdk\wmfsdk95\wmdm\inc"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;MTP_NODLL;WITH_BOOTOBJS;BEASTPATCHER"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="0"
@@ -120,8 +120,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="c:\wmsdk\wmfsdk95\include;c:\wmsdk\wmfsdk95\wmdm\inc"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;MTP_NODLL"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..&quot;;&quot;$(ProjectDir)..\..\..\..\tools&quot;;c:\wmsdk\wmfsdk95\include;c:\wmsdk\wmfsdk95\wmdm\inc"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;MTP_NODLL;BEASTPATCHER"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\tools\mknkboot.c"
+				>
+			</File>
+			<File
 				RelativePath="..\mtp_win32.c"
 				>
 			</File>
@@ -222,6 +226,10 @@
 			>
 			<File
 				RelativePath="..\beastpatcher.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\tools\mknkboot.h"
 				>
 			</File>
 			<File
