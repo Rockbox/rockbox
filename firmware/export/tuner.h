@@ -58,6 +58,8 @@ enum
     REGION_US_CANADA,
     REGION_JAPAN,
     REGION_KOREA,
+    REGION_ITALY,
+    REGION_OTHER,
 
     /* Add new regions above this line */
     TUNER_NUM_REGIONS

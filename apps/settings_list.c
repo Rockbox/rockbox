@@ -1376,9 +1376,10 @@ const struct settings_list settings[] = {
 #endif
 #if CONFIG_TUNER
     CHOICE_SETTING(0, fm_region, LANG_FM_REGION, 0,
-                   "fm_region", "eu,us,jp,kr", set_radio_region, 4,
+                   "fm_region", "eu,us,jp,kr,it,wo", set_radio_region, 6,
                    ID2P(LANG_FM_EUROPE), ID2P(LANG_FM_US),
-                   ID2P(LANG_FM_JAPAN), ID2P(LANG_FM_KOREA)),
+                   ID2P(LANG_FM_JAPAN), ID2P(LANG_FM_KOREA),
+                   ID2P(LANG_FM_ITALY), ID2P(LANG_FM_OTHER)),
 #endif
 
     OFFON_SETTING(F_BANFROMQS, audioscrobbler, LANG_AUDIOSCROBBLER, false,
