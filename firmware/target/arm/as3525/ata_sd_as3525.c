@@ -735,6 +735,14 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
 
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+
+        /* Higher speed class cards need a write delay here for some reason */
+        if((drive == SD_SLOT_AS3525) && write)
+        {
+            int delay = 3500;
+            while(delay--)  asm volatile ("nop\n");
+        }
+
         if(!transfer_error[drive])
         {
             if(!write)
