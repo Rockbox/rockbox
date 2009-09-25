@@ -254,7 +254,7 @@ CONFIG_KEYPAD == SANSA_M200_PAD
    to speed up the game - note that current_tick is (currently) only accurate
    to 10ms.
 */
-#define CYCLETIME           50
+#define CYCLETIME           30
 
 #define TOPMARGIN           (BRICK_HEIGHT * 2)
 
