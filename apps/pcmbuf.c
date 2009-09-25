@@ -1170,30 +1170,6 @@ bool pcmbuf_is_crossfade_enabled(void)
  *  Commit any remaining samples in the PCM buffer for playback. */
 void pcmbuf_play_remainder(void)
 {
-    pcmbuf_flush_limiter_buffer();
-    
     if (audiobuffer_fillpos)
         pcmbuf_flush_fillpos();
-}
-
-/** FLUSH LIMITER BUFFER
- *  Empty the limiter buffer and commit its contents
- *  to the PCM buffer for playback. */
-void pcmbuf_flush_limiter_buffer(void)
-{
-    char *dest;
-    int out_count = LIMITER_BUFFER_SIZE;
-    
-    /* create room at the end of the PCM buffer for any
-       samples that may be held back in the limiter buffer */
-    while ((dest = pcmbuf_request_buffer(&out_count)) == NULL)
-    {
-        cancel_cpu_boost();
-        sleep(1);
-    }
-
-    /* flush the limiter buffer into the PCM buffer */
-    out_count = dsp_flush_limiter_buffer(dest);
-    if (out_count > 0)
-        pcmbuf_write_complete(out_count);
 }

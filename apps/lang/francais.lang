@@ -12663,15 +12663,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Limiter Preamp"
+    swcodec: "Compressor"
   </source>
   <dest>
     *: none
-    swcodec: "Limiteur préampli."
+    swcodec: "Compressor"
   </dest>
   <voice>
     *: none
-    swcodec: "Limiteur préampli"
+    swcodec: "Compressor"
   </voice>
 </phrase>
 <phrase>

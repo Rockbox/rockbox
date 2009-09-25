@@ -26,8 +26,7 @@
 #include <stdbool.h>
 
 #define NATIVE_FREQUENCY       44100
-#define LIMITER_BUFFER_SIZE      288    /* ~6.5 ms */
-#define MAX_LIMITER_GAIN          80    /*    8 dB */
+
 enum
 {
     STEREO_INTERLEAVED = 0,
@@ -82,7 +81,7 @@ int32_t sound_get_pitch(void);
 void dsp_set_timestretch(int32_t percent);
 int32_t dsp_get_timestretch(void);
 int dsp_callback(int msg, intptr_t param);
-int dsp_flush_limiter_buffer(char *dest);
-void dsp_set_limiter(int limiter_level);
+void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
+                        int c_knee, int c_release);
 
 #endif

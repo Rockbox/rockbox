@@ -12641,15 +12641,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Limiter Preamp"
+    swcodec: "Compressor"
   </source>
   <dest>
     *: none
-    swcodec: "Begrenzer-Vorverstärkung"
+    swcodec: "Compressor"
   </dest>
   <voice>
     *: none
-    swcodec: "Begrenzer-Vorverstärkung"
+    swcodec: "Compressor"
   </voice>
 </phrase>
 <phrase>

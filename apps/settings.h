@@ -777,7 +777,11 @@ struct user_settings
 #endif
 
 #if CONFIG_CODEC == SWCODEC
-    int limiter_level;
+    int compressor_threshold;
+    int compressor_ratio;
+    int compressor_makeup_gain;
+    int compressor_knee;
+    int compressor_release_time;
 #endif
 
 };

@@ -810,33 +810,9 @@ show_menu:
             
             rb->closedir(dir);
         }
-        /* process last samples */
-        if (use_dsp)
-            rb->dsp_flush_limiter_buffer(dspbuffer);
     } else {
         /* Just test the file */
         res = test_track(parameter);
-
-        /* process last samples */
-        if (use_dsp)
-        {
-            int channels = (wavinfo.stereomode == STEREO_MONO) ? 1 : 2;
-            int count = rb->dsp_flush_limiter_buffer(dspbuffer);
-            if (channels == 1)
-            {
-                unsigned char *s = dspbuffer, *d = dspbuffer;
-                int c = count;
-                while (c-- > 0)
-                {
-                    *d++ = *s++;
-                    *d++ = *s++;
-                    s++;
-                    s++;
-                }
-            }
-            if (wavinfo.fd >= 0)
-                rb->write(wavinfo.fd, dspbuffer, count * 2 * channels);
-        }
 
         /* Close WAV file (if there was one) */
         if (wavinfo.fd >= 0) {

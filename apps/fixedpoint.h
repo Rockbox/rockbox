@@ -61,7 +61,7 @@ long fp_sincos(unsigned long phase, long *cos);
 #define FP_NEGINF      -(0x7fffffff)
 
 /* fracbits in range 12 - 22 work well. Higher is better for
- * calculating dB, lower is better for calculating ratio.
+ * calculating dB, lower is better for calculating factor.
  */
 /* long fp_decibels(unsigned long factor, unsigned int fracbits); */
 long fp_factor(long decibels, unsigned int fracbits);

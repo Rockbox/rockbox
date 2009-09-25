@@ -105,8 +105,21 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
                      &global_settings.timestretch_enabled, timestretch_callback);
     MENUITEM_SETTING(dithering_enabled,
                      &global_settings.dithering_enabled, lowlatency_callback);
-    MENUITEM_SETTING(limiter_level,
-                     &global_settings.limiter_level, lowlatency_callback);
+
+    /* compressor submenu */
+    MENUITEM_SETTING(compressor_threshold,
+                     &global_settings.compressor_threshold, lowlatency_callback);
+    MENUITEM_SETTING(compressor_ratio,
+                     &global_settings.compressor_ratio, lowlatency_callback);
+    MENUITEM_SETTING(compressor_gain,
+                     &global_settings.compressor_makeup_gain, lowlatency_callback);
+    MENUITEM_SETTING(compressor_knee,
+                     &global_settings.compressor_knee, lowlatency_callback);
+    MENUITEM_SETTING(compressor_release,
+                     &global_settings.compressor_release_time, lowlatency_callback);
+    MAKE_MENU(compressor_menu,ID2P(LANG_COMPRESSOR), NULL, Icon_NOICON,
+              &compressor_threshold, &compressor_ratio, &compressor_gain,
+              &compressor_knee, &compressor_release);
 #endif
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
@@ -140,7 +153,7 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #if CONFIG_CODEC == SWCODEC
           ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
           ,&timestretch_enabled
-          ,&limiter_level
+          ,&compressor_menu
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
          ,&loudness,&avc,&superbass,&mdb_enable,&mdb_strength
