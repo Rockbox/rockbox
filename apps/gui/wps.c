@@ -1317,12 +1317,12 @@ bool wps_uses_albumart(int *width, int *height)
     FOR_NB_SCREENS(i) {
         struct gui_wps *gwps = &gui_wps[i];
         struct skin_albumart *aa = gwps->data->albumart;
-        if (aa && (aa->wps_uses_albumart != WPS_ALBUMART_NONE))
+        if (aa && (aa->state != WPS_ALBUMART_NONE))
         {
             if (width)
-                *width = aa->albumart_max_width;
+                *width = aa->width;
             if (height)
-                *height = aa->albumart_max_height;
+                *height = aa->height;
             return true;
         }
     }

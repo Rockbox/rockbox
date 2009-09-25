@@ -226,15 +226,15 @@ struct touchregion {
 struct skin_albumart {
     /* Album art support */
     struct viewport *vp;/* The viewport this is in */
-    int albumart_x;
-    int albumart_y;
-    int albumart_max_width;
-    int albumart_max_height;
+    int x;
+    int y;
+    int width;
+    int height;
 
     bool draw;
-    unsigned char albumart_xalign; /* WPS_ALBUMART_ALIGN_LEFT, _CENTER, _RIGHT */
-    unsigned char albumart_yalign; /* WPS_ALBUMART_ALIGN_TOP, _CENTER, _BOTTOM */
-    unsigned char wps_uses_albumart; /* WPS_ALBUMART_NONE, _CHECK, _LOAD */
+    unsigned char xalign; /* WPS_ALBUMART_ALIGN_LEFT, _CENTER, _RIGHT */
+    unsigned char yalign; /* WPS_ALBUMART_ALIGN_TOP, _CENTER, _BOTTOM */
+    unsigned char state; /* WPS_ALBUMART_NONE, _CHECK, _LOAD */
 };
 #endif
 
