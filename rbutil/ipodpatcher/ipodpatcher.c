@@ -1234,7 +1234,12 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelstr="Video (aka 5th Generation)";
             ipod->modelnum = 5;
             ipod->modelname = "ipvd";
-            ipod->targetname = "ipodvideo";
+            if(ipod->ramsize == 64) {
+                ipod->targetname = "ipodvideo64mb";
+            }
+            else {
+                ipod->targetname = "ipodvideo";
+            }
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipodvideo;
             ipod->bootloader_len = LEN_ipodvideo;
@@ -1312,6 +1317,11 @@ int ipod_scan(struct ipod_t* ipod)
          }
 
          ipod_version=(ipod->ipod_directory[0].vers>>8);
+         /* Windows requires the ipod in R/W mode for SCSI Inquiry */
+         ipod->ramsize = 0;
+         ipod_reopen_rw(ipod);
+         ipod_get_xmlinfo(ipod);
+         ipod_get_ramsize(ipod);
          if (getmodel(ipod,ipod_version) < 0) {
              ipod_close(ipod);
              continue;
