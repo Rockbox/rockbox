@@ -1559,9 +1559,13 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
         changed = true;
         c_menu.ratio = new_ratio;
         if (c_menu.ratio)
+        {
             logf("   Compressor Ratio: %d:1", c_menu.ratio);
+        }
         else
+        {
             logf("   Compressor Ratio: Limit");
+        }
     }
     
     if (c_menu.gain != c_gain)
@@ -1569,9 +1573,13 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
         changed = true;
         c_menu.gain = c_gain;
         if (c_menu.gain >= 0)
+        {
             logf("   Compressor Makeup Gain: %d dB", c_menu.gain);
+        }
         else
+        {
             logf("   Compressor Makeup Gain: Auto");
+        }
     }
     
     if (c_menu.soft_knee != new_knee)
