@@ -28,7 +28,7 @@ EncTtsCfgGui::EncTtsCfgGui(QDialog* parent,EncTtsSettingInterface* interface,QSt
     
     m_busyCnt=0; 
     // create a busy Dialog
-    m_busyDlg= new QProgressDialog(tr(""), tr(""), 0, 0,this);
+    m_busyDlg= new QProgressDialog("", "", 0, 0,this);
     m_busyDlg->setWindowTitle(tr("Waiting for engine..."));
     m_busyDlg->setModal(true);
     m_busyDlg->setLabel(0);

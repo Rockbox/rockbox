@@ -674,7 +674,7 @@ void Config::testTts()
     
     if(!tts->start(&errstr))
     {
-        QMessageBox::warning(this,tr("Could not start TTS engine"),
+        QMessageBox::warning(this,tr("Could not start TTS engine."),
                 tr("Could not start TTS engine.\n") + errstr
                 + tr("\nPlease configure TTS engine."));
         return;
@@ -688,7 +688,7 @@ void Config::testTts()
     if(tts->voice(tr("Rockbox Utility Voice Test"),filename,&errstr) == FatalError)
     {
         tts->stop();
-        QMessageBox::warning(this,tr("Could not voice test string"),
+        QMessageBox::warning(this,tr("Could not voice test string."),
                 tr("Could not voice test string.\n") + errstr
                 + tr("\nPlease configure TTS engine."));
         return;

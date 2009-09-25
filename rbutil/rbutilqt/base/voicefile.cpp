@@ -78,7 +78,7 @@ bool VoiceFileCreator::createVoiceFile()
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(getter, SIGNAL(dataReadProgress(int, int)), this, SIGNAL(logProgress(int, int)));
     connect(this, SIGNAL(aborted()), getter, SLOT(abort()));
-    emit logItem(tr("Downloading voice info.."),LOGINFO);
+    emit logItem(tr("Downloading voice info..."),LOGINFO);
     getter->getFile(genlangUrl);
     return true;
  }
@@ -229,7 +229,7 @@ void VoiceFileCreator::downloadDone(bool error)
 //!
 void VoiceFileCreator::cleanup()
 {
-    emit logItem(tr("Cleaning up.."),LOGINFO);
+    emit logItem(tr("Cleaning up..."),LOGINFO);
 
     for(int i=0; i < m_talkList.size(); i++)
     {
