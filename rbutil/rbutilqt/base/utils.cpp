@@ -233,7 +233,11 @@ RockboxInfo::RockboxInfo(QString mountpoint)
         else if(line.contains("Target id:"))
         {
             m_targetid = line.remove("Target id:").trimmed();
-        }        
+        }
+        else if(line.contains("Memory:"))
+        {
+            m_ram = line.remove("Memory:").trimmed().toInt();
+        }
     }
 
     file.close();

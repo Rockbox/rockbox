@@ -41,12 +41,14 @@ public:
     QString features(){return m_features;}
     QString targetID() {return m_targetid;}
     QString target() {return m_target;}
+    int ram() { return m_ram; }
     bool success() { return m_success; }
 private:
     QString m_version;
     QString m_features;
     QString m_targetid;
     QString m_target;
+    int m_ram;
     bool m_success;
 };
 
