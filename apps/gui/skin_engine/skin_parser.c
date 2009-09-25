@@ -983,9 +983,18 @@ static int parse_albumart_load(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
 
     _pos = wps_bufptr + 1;
-    _pos = parse_list("dd", NULL, '|', _pos, &aa->albumart_x, &aa->albumart_y);
+    if (!isdigit(*_pos))
+        return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl|@  */
+    aa->albumart_x = atoi(_pos);
 
-    if (!_pos || _pos > newline || *_pos != '|')
+    _pos = strchr(_pos, '|');
+    if (!_pos || _pos > newline || !isdigit(*(++_pos)))
+        return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl|7\n or %Cl|7|@ */
+
+    aa->albumart_y = atoi(_pos);
+
+    _pos = strchr(_pos, '|');
+    if (!_pos || _pos > newline)
         return WPS_ERROR_INVALID_PARAM;  /* malformed token: no | after y coordinate
                                             e.g. %Cl|7|59\n */
 
