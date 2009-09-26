@@ -502,9 +502,10 @@ void lcd_update(void)
     if (!display_on)
         return;
 
+    lcd_busy = true;
+
     lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
 
-    lcd_busy = true;
     /* Set start position and window */
     lcd_window(0, 0, LCD_WIDTH-1, LCD_HEIGHT-1);
 
@@ -544,8 +545,10 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (y >= ymax)
         return; /* nothing left to do */
 
-    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
     lcd_busy = true;
+
+    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
+    
     lcd_window(x, y, xmax, ymax);
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
