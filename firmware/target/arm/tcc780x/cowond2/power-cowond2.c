@@ -81,7 +81,7 @@ void EXT3(void)
     if (data[2] & 0x08)
     {
         /* Touchscreen event, do something about it */
-        button_set_touch_available();
+        button_read_touch();
     }
 }
 #endif

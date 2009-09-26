@@ -26,15 +26,65 @@
 #include "pcf50606.h"
 #include "backlight.h"
 #include "touchscreen.h"
+#include "stdlib.h"
 
-#define TOUCH_MARGIN 8
+#define NO_OF_TOUCH_DATA 5
 
-static short last_x, last_y;
 static bool touch_available = false;
+static short x[NO_OF_TOUCH_DATA], y[NO_OF_TOUCH_DATA];
 
-void button_set_touch_available(void)
+/* comparator for qsort */
+static int short_cmp(const void *a, const void *b)
 {
-    touch_available = true;
+    return *(short*)a - *(short*)b;
+}
+
+void button_read_touch()
+{
+    unsigned char buf[3];
+    
+    static long last_touch_interrupt = 0;
+    static int touch_data_index = 0;
+
+    /* put the touchscreen into idle mode */
+    pcf50606_write(PCF5060X_ADCC1, 0);
+
+    /* here the touch coordinates are read 5 times            */
+    /* they will be sorted and the middle one will be used    */
+    pcf50606_write(PCF5060X_ADCC2, (0xE<<1) | 1); /* ADC start X+Y */
+
+    do {
+        buf[1] = pcf50606_read(PCF5060X_ADCS2);
+    } while (!(buf[1] & 0x80));        /* Busy wait on ADCRDY flag */
+
+    buf[0] = pcf50606_read(PCF5060X_ADCS1);
+    buf[2] = pcf50606_read(PCF5060X_ADCS3);
+
+    pcf50606_write(PCF5060X_ADCC2, 0);            /* ADC stop */
+
+    if (TIME_AFTER(current_tick, last_touch_interrupt + 1))
+    {
+        /* resets the index if the last touch could not be read 5 times */
+        touch_data_index = 0;
+    }
+
+    x[touch_data_index] = (buf[0] << 2) | (buf[1] & 3);
+    y[touch_data_index] = (buf[2] << 2) | ((buf[1] & 0xC) >> 2);
+
+    touch_data_index++;
+
+    if (touch_data_index > NO_OF_TOUCH_DATA - 1)
+    {
+        /* coordinates 5 times read */
+        touch_available = true;
+        touch_data_index = 0;
+    }
+    else
+    {
+        /* put the touchscreen back into the interrupt mode */
+        pcf50606_write(PCF5060X_ADCC1, 1);
+    }
+    last_touch_interrupt = current_tick;
 }
 
 struct touch_calibration_point {
@@ -107,7 +157,9 @@ int button_read_device(int *data)
 
     static bool hold_button = false;
     bool hold_button_old;
-    
+    static bool touch_hold = false;
+    static long last_touch = 0;
+
     *data = old_data;
 
     hold_button_old = hold_button;
@@ -143,66 +195,45 @@ int button_read_device(int *data)
         }
     }
 
-    if (touch_available)
+    if (touch_available || touch_hold)
     {
-        short x = 0, y = 0;
-        static long last_touch = 0;
-        bool send_touch = false;
+        short x_touch, y_touch;
+        static short last_x = 0, last_y = 0;
 
-        int irq_level = disable_irq_save();
-        if (pcf50606_read(PCF5060X_ADCC1) & 0x80) /* Pen down */
+        if (touch_hold)
         {
-            unsigned char buf[3];
-
-            pcf50606_write(PCF5060X_ADCC2, (0xE<<1) | 1); /* ADC start X+Y */
-
-            do {
-                buf[1] = pcf50606_read(PCF5060X_ADCS2);
-            } while (!(buf[1] & 0x80));        /* Busy wait on ADCRDY flag */
-
-            buf[0] = pcf50606_read(PCF5060X_ADCS1);
-            buf[2] = pcf50606_read(PCF5060X_ADCS3);
-
-            pcf50606_write(PCF5060X_ADCC2, 0);            /* ADC stop */
-
-            x = (buf[0] << 2) | (buf[1] & 3);
-            y = (buf[2] << 2) | ((buf[1] & 0xC) >> 2);
-
-            if (TIME_BEFORE(last_touch + HZ/5, current_tick))
-            {
-                if ((x > last_x + TOUCH_MARGIN) ||
-                    (x < last_x - TOUCH_MARGIN) ||
-                    (y > last_y + TOUCH_MARGIN) ||
-                    (y < last_y - TOUCH_MARGIN))
-                {
-                    send_touch = true;
-                }
-            }
-            else
-            {
-                send_touch = true;
-            }
+            /* get rid of very fast unintended double touches */
+            x_touch = last_x;
+            y_touch = last_y;
         }
-        restore_irq(irq_level);
-
-        if (send_touch)
+        else
         {
-            last_x = x;
-            last_y = y;
-            old_data = *data = touch_to_pixels(x, y);
-            btn |= touchscreen_to_pixels((*data&0xffff0000)>>16,
-                                         (*data&0x0000ffff),
-                                         data);
+            /* sort the 5 data taken and use the median value */
+            qsort(x, NO_OF_TOUCH_DATA, sizeof(short), short_cmp);
+            qsort(y, NO_OF_TOUCH_DATA, sizeof(short), short_cmp);
+            x_touch = last_x = x[(NO_OF_TOUCH_DATA - 1)/2];
+            y_touch = last_y = y[(NO_OF_TOUCH_DATA - 1)/2];
+            last_touch = current_tick;
+            touch_hold = true;
+            touch_available = false;
         }
+        old_data = *data = touch_to_pixels(x_touch, y_touch);
+        btn |= touchscreen_to_pixels((*data&0xffff0000)>>16,
+                                     (*data&0x0000ffff),
+                                     data);
+    }
 
-        last_touch = current_tick;
-        touch_available = false;
+    if (TIME_AFTER(current_tick, last_touch + 10))
+    {
+        /* put the touchscreen back into interrupt mode */
+        touch_hold = false;
+        pcf50606_write(PCF5060X_ADCC1, 1);
     }
     
     if (!(GPIOA & 0x4))
         btn |= BUTTON_POWER;
         
-    if(btn & BUTTON_TOUCHSCREEN && !is_backlight_on(true))
+    if (btn & BUTTON_TOUCHSCREEN && !is_backlight_on(true))
         old_data = *data = 0;
     
     return btn;
