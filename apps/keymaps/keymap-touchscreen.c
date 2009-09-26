@@ -127,8 +127,6 @@ static const struct button_mapping button_context_settings[]  = {
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_TOPMIDDLE|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_BOTTOMMIDDLE,                BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_STD_OK,                BUTTON_CENTER,                      BUTTON_NONE },
-    { ACTION_STD_CANCEL,            BUTTON_MIDLEFT,                     BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_SETTINGS)
 }; /* button_context_settings */
@@ -142,7 +140,6 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_MIDRIGHT|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_MIDLEFT,                 BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_MIDLEFT|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_STD_OK,                BUTTON_CENTER,                  BUTTON_NONE },
     { ACTION_STD_CANCEL,            BUTTON_TOPLEFT,                 BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_CUSTOM|CONTEXT_SETTINGS)
@@ -159,6 +156,9 @@ static const struct button_mapping button_context_colorchooser[]  = {
 }; /* button_context_colorchooser */
 
 static const struct button_mapping button_context_eq[]  = {
+    /* override the std context since we're using MIDRIGHT for settings inc */
+    { ACTION_NONE,          BUTTON_MIDRIGHT|BUTTON_REL,        BUTTON_MIDRIGHT },
+    { ACTION_NONE,          BUTTON_MIDRIGHT|BUTTON_REPEAT,     BUTTON_MIDRIGHT },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_SETTINGS_EQ),
 }; /* button_context_eq */
 
