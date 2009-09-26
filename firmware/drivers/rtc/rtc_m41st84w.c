@@ -111,8 +111,8 @@ void rtc_set_alarm(int h, int m)
     /* for daily alarm, RPT5=RPT4=on, RPT1=RPT2=RPT3=off */
     
     rtc_write(0x0e, 0x00);      /* seconds 0 and RTP1 */
-    rtc_write(0x0d, DEC2BCD(m); /* minutes and RPT2 */
-    rtc_write(0x0c, DEC2BCD(h); /* hour and RPT3 */
+    rtc_write(0x0d, DEC2BCD(m)); /* minutes and RPT2 */
+    rtc_write(0x0c, DEC2BCD(h)); /* hour and RPT3 */
     rtc_write(0x0b, 0xc1);      /* set date 01 and RPT4 and RTP5 */
     
     /* set month to 1, if it's invalid, the rtc does an alarm every second instead */
