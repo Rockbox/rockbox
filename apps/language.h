@@ -27,4 +27,7 @@ void lang_init(void);
 /* load a given language file */
 int lang_load(const char *filename);
 
+/* get the ID of an english string so it can be localised */
+int lang_english_to_id(const char* english);
+
 #endif

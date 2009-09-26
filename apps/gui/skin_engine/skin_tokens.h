@@ -32,6 +32,7 @@ enum wps_token_type {
     /* Markers */
     WPS_TOKEN_CHARACTER,
     WPS_TOKEN_STRING,
+    WPS_TOKEN_TRANSLATEDSTRING,
 
     /* Alignment */
     WPS_TOKEN_ALIGN_LEFT,

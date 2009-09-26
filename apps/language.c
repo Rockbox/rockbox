@@ -98,3 +98,16 @@ int lang_load(const char *filename)
     close(fd);
     return retcode;
 }
+
+int lang_english_to_id(const char* english)
+{
+    int i;
+    unsigned char *ptr = (unsigned char *) language_builtin;
+    
+    for (i = 0; i < LANG_LAST_INDEX_IN_ARRAY; i++) {
+        if (!strcmp(ptr, english))
+            return i;
+        ptr += strlen((char *)ptr) + 1; /* advance pointer to next string */
+    }
+    return -1;
+}

@@ -76,6 +76,9 @@ static char *get_token_desc(struct wps_token *token, char *buf,
             snprintf(buf, bufsize, "String '%s'",
                      (char*)token->value.data);
             break;
+        case WPS_TOKEN_TRANSLATEDSTRING:
+            snprintf(buf, bufsize, "String ID '%d'", token->value.i);
+            break;
 
 #ifdef HAVE_LCD_BITMAP
         case WPS_TOKEN_ALIGN_LEFT:

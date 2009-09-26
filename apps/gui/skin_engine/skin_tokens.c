@@ -170,6 +170,9 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case WPS_TOKEN_STRING:
             return (char*)token->value.data;
+            
+        case WPS_TOKEN_TRANSLATEDSTRING:
+            return (char*)P2STR(ID2P(token->value.i));
 
         case WPS_TOKEN_TRACK_TIME_ELAPSED:
             format_time(buf, buf_size,

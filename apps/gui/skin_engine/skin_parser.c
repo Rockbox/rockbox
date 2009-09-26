@@ -40,6 +40,7 @@
 #endif /*WPSEDITOR*/
 #else
 #include "debug.h"
+#include "language.h"
 #endif /*__PCTOOL__*/
 
 #include <ctype.h>
@@ -132,7 +133,7 @@ static int parse_progressbar(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_dir_level(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
-static int parse_setting(const char *wps_bufptr,
+static int parse_setting_and_lang(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 
 #ifdef HAVE_LCD_BITMAP
@@ -349,8 +350,11 @@ static const struct wps_tag all_tags[] = {
 #endif
 #endif
 
-    { WPS_TOKEN_SETTING,                  "St",  WPS_REFRESH_DYNAMIC, parse_setting },
-
+    { WPS_TOKEN_SETTING,                  "St",  WPS_REFRESH_DYNAMIC,
+                                                    parse_setting_and_lang },    
+    { WPS_TOKEN_TRANSLATEDSTRING,         "Sx",  WPS_REFRESH_STATIC,
+                                                    parse_setting_and_lang },
+                                                    
     { WPS_TOKEN_LASTTOUCH,                "Tl",  WPS_REFRESH_DYNAMIC, parse_timeout },
     { WPS_NO_TOKEN,                       "T",   0,    parse_touchregion      },
 
@@ -746,14 +750,20 @@ static int parse_image_special(const char *wps_bufptr,
 
 #endif /* HAVE_LCD_BITMAP */
 
-static int parse_setting(const char *wps_bufptr,
-                         struct wps_token *token,
-                         struct wps_data *wps_data)
+static int parse_setting_and_lang(const char *wps_bufptr,
+                                 struct wps_token *token,
+                                 struct wps_data *wps_data)
 {
+    /* NOTE: both the string validations that happen in here will
+     * automatically PASS on checkwps because its too hard to get
+     * settings_list.c and englinsh.lang built for it. 
+     * If that ever changes remove the #ifndef __PCTOOL__'s here 
+     */
     (void)wps_data;
     const char *ptr = wps_bufptr;
     const char *end;
-    int i;
+    int i = 0;
+    char temp[64];
 
     /* Find the setting's cfg_name */
     if (*ptr != '|')
@@ -762,17 +772,30 @@ static int parse_setting(const char *wps_bufptr,
     end = strchr(ptr,'|');
     if (!end)
         return WPS_ERROR_INVALID_PARAM;
-
-    /* Find the setting */
-    for (i=0; i<nb_settings; i++)
-        if (settings[i].cfg_name &&
-            !strncmp(settings[i].cfg_name,ptr,end-ptr) &&
-            /* prevent matches on cfg_name prefixes */
-            strlen(settings[i].cfg_name)==(size_t)(end-ptr))
-            break;
-    if (i == nb_settings)
-        return WPS_ERROR_INVALID_PARAM;
-
+    strlcpy(temp, ptr,end-ptr+1);
+    
+    if (token->type == WPS_TOKEN_TRANSLATEDSTRING)
+    {
+#ifndef __PCTOOL__
+        i = lang_english_to_id(temp);
+        if (i < 0)
+            return WPS_ERROR_INVALID_PARAM;
+#endif
+    }
+    else
+    {
+        /* Find the setting */
+        for (i=0; i<nb_settings; i++)
+            if (settings[i].cfg_name &&
+                !strncmp(settings[i].cfg_name,ptr,end-ptr) &&
+                /* prevent matches on cfg_name prefixes */
+                strlen(settings[i].cfg_name)==(size_t)(end-ptr))
+                break;
+#ifndef __PCTOOL__
+        if (i == nb_settings)
+            return WPS_ERROR_INVALID_PARAM;
+#endif
+    }
     /* Store the setting number */
     token->value.i = i;
 
