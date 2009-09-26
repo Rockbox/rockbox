@@ -24,13 +24,19 @@
 #include <stdbool.h> 
 #include "system.h"
 #include "config.h"
+#include "time.h"
+
+/* Macros used to convert to and from BCD, used in various rtc drivers
+   this is the wrong place but misc.h is in apps... */
+#define BCD2DEC(X) (((((X)>>4) & 0x0f) * 10) + ((X) & 0xf))
+#define DEC2BCD(X) ((((X)/10)<<4) | ((X)%10))
 
 #if CONFIG_RTC
 
 /* Common functions for all targets */
 void rtc_init(void);
-int rtc_read_datetime(unsigned char* buf);
-int rtc_write_datetime(unsigned char* buf);
+int rtc_read_datetime(struct tm *tm);
+int rtc_write_datetime(const struct tm *tm);
 
 #if CONFIG_RTC == RTC_M41ST84W
 
@@ -53,3 +59,4 @@ bool rtc_check_alarm_flag(void);
 #endif /* CONFIG_RTC */
 
 #endif
+

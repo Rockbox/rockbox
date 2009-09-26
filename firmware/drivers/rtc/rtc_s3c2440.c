@@ -30,28 +30,28 @@ void rtc_init(void)
     RTCCON |= 1;
 }
 
-int rtc_read_datetime(unsigned char* buf)
+int rtc_read_datetime(struct tm *tm)
 {
-    buf[0] = BCDSEC;
-    buf[1] = BCDMIN;
-    buf[2] = BCDHOUR;
-    buf[3] = BCDDAY-1;	/* timefuncs wants 0..6 for wday */
-    buf[4] = BCDDATE;
-    buf[5] = BCDMON;
-    buf[6] = BCDYEAR;
+    tm->tm_sec = BCD2DEC(BCDSEC);
+    tm->tm_min = BCD2DEC(BCDMIN);
+    tm->tm_hour = BCD2DEC(BCDHOUR);
+    tm->tm_wday = BCD2DEC(BCDDAY) - 1; /* timefuncs wants 0..6 for wday */
+    tm->tm_mday = BCD2DEC(BCDDATE);
+    tm->tm_mon = BCD2DEC(BCDMON) - 1;
+    tm->tm_year = BCD2DEC(BCDYEAR) + 100;
 
     return 1;
 }
 
-int rtc_write_datetime(unsigned char* buf)
+int rtc_write_datetime(const struct tm *tm)
 {
-    BCDSEC  = buf[0];
-    BCDMIN  = buf[1];
-    BCDHOUR = buf[2];
-    BCDDAY  = buf[3]+1; /* chip wants 1..7 for wday */
-    BCDDATE = buf[4];
-    BCDMON  = buf[5];
-    BCDYEAR = buf[6];
+    BCDSEC  = DEC2BCD(tm->tm_sec);
+    BCDMIN  = DEC2BCD(tm->tm_min);
+    BCDHOUR = DEC2BCD(tm->tm_hour);
+    BCDDAY  = DEC2BCD(tm->tm_wday) + 1; /* chip wants 1..7 for wday */
+    BCDDATE = DEC2BCD(tm->tm_mday);
+    BCDMON  = DEC2BCD(tm->tm_mon + 1);
+    BCDYEAR = DEC2BCD(tm->tm_year - 100);
 
     return 1;
 }
@@ -88,15 +88,15 @@ bool rtc_check_alarm_flag(void)
 /* set alarm time registers to the given time (repeat once per day) */
 void rtc_set_alarm(int h, int m)
 {
-    ALMMIN=(((m / 10) << 4) | (m % 10)) & 0x7f; /* minutes */
-    ALMHOUR=(((h / 10) << 4) | (h % 10)) & 0x3f; /* hour */
+    ALMMIN = DEC2BCD(m); /* minutes */
+    ALMHOUR = DEC2BCD(h); /* hour */
 }
 
 /* read out the current alarm time */
 void rtc_get_alarm(int *h, int *m)
 {
-    *m=((ALMMIN & 0x70) >> 4) * 10 + (ALMMIN & 0x0f);
-    *h=((ALMHOUR & 0x30) >> 4) * 10 + (ALMHOUR & 0x0f);
+    *m = BCD2DEC(ALMMIN);
+    *h = BCD2DEC(ALMHOUR);
 }
 
 /* turn alarm on or off by setting the alarm flag enable

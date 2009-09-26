@@ -124,31 +124,49 @@ void rtc_init(void)
 
 }
 
-int rtc_read_datetime(unsigned char* buf)
+int rtc_read_datetime(struct tm *tm)
 {
-    int i;
-    unsigned char v[7];
+    unsigned int i;
+    int rc;
+    unsigned char buf[7];
 
-    i = sw_i2c(SW_I2C_READ, RTC_CMD_DATA, v, 7);
+    rc = sw_i2c(SW_I2C_READ, RTC_CMD_DATA, buf, sizeof(buf));
 
-    v[4] &= 0x3f; /* mask out p.m. flag */
+    buf[4] &= 0x3f; /* mask out p.m. flag */
     
-    for(i=0; i<7; i++) 
-        buf[i] = v[6-i];
-    
-    return i;
+    for (i = 0; i < sizeof(buf); i++)
+        buf[i] = BCD2DEC(buf[i]);
+
+    tm->tm_sec = buf[6];
+    tm->tm_min = buf[5];
+    tm->tm_hour = buf[4];
+    tm->tm_wday = buf[3];
+    tm->tm_mday = buf[2];
+    tm->tm_mon = buf[1] - 1;
+    tm->tm_year = buf[0] + 100;
+
+    return rc;
 }
 
-int rtc_write_datetime(unsigned char* buf)
+int rtc_write_datetime(const struct tm *tm)
 {
-    int i;
-    unsigned char v[7];
+    unsigned int i;
+    int rc;
+    unsigned char buf[7];
 
-    for(i=0; i<7; i++) 
-        v[i]=buf[6-i];
-        
-    i = sw_i2c(SW_I2C_WRITE, RTC_CMD_DATA, v, 7);
-    
-    return i;
+    buf[6] = tm->tm_sec;
+    buf[5] = tm->tm_min;
+    buf[4] = tm->tm_hour;
+    buf[3] = tm->tm_wday;
+    buf[2] = tm->tm_mday;
+    buf[1] = tm->tm_mon + 1;
+    buf[0] = tm->tm_year - 100;
+
+    for (i = 0; i < sizeof(buf); i++)
+        buf[i] = DEC2BCD(buf[i]);
+
+    rc = sw_i2c(SW_I2C_WRITE, RTC_CMD_DATA, buf, sizeof(buf));
+
+    return rc;
 }
 

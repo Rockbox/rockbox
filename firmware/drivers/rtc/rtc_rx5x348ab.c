@@ -22,31 +22,60 @@
 #include "config.h"
 #include "spi.h"
 #include "rtc.h"
-#include <stdbool.h>
+
 /* Choose one of: */
 #define ADDR_READ       0x04
 #define ADDR_WRITE      0x00
 /* and one of: */
 #define ADDR_ONE        0x08
 #define ADDR_BURST      0x00
+
 void rtc_init(void)
 {
 }
     
-int rtc_read_datetime(unsigned char* buf)
+int rtc_read_datetime(struct tm *tm)
 {
+    unsigned int i;
+    unsigned char buf[7];
     char command = ADDR_READ|ADDR_BURST; /* burst read from the start of the time/date reg */
-    spi_block_transfer(SPI_target_RX5X348AB, &command, 1, buf, 7);
+
+    spi_block_transfer(SPI_target_RX5X348AB, &command, 1, buf, sizeof(buf));
+
+    for (i = 0; i < sizeof(buf); i++)
+        buf[i] = BCD2DEC(buf[i]);
+
+    tm->tm_sec = buf[0];
+    tm->tm_min = buf[1];
+    tm->tm_hour = buf[2];
+    tm->tm_wday = buf[3];
+    tm->tm_mday = buf[4];
+    tm->tm_mon = buf[5] - 1;
+    tm->tm_year = buf[6] + 100;
+
     return 1;
 }
-int rtc_write_datetime(unsigned char* buf)
+
+int rtc_write_datetime(const struct tm *tm)
 {
+    unsigned int i;
     char command = ADDR_WRITE|ADDR_BURST; /* burst read from the start of the time/date reg */
-    char data[8];
-    int i;
-    data[0] = command;
-    for (i=1;i<8;i++)
-        data[i] = buf[i-1];
-    spi_block_transfer(SPI_target_RX5X348AB, data, 8, NULL, 0);
+    unsigned char buf[8];
+
+    buf[0] = command;
+    buf[1] = tm->tm_sec;
+    buf[2] = tm->tm_min;
+    buf[3] = tm->tm_hour;
+    buf[4] = tm->tm_wday;
+    buf[5] = tm->tm_mday;
+    buf[6] = tm->tm_mon + 1;
+    buf[7] = tm->tm_year - 100;
+
+    /* don't encode the comand byte */
+    for (i = 1; i < sizeof(buf); i++)
+        buf[i] = DEC2BCD(buf[i]);
+
+    spi_block_transfer(SPI_target_RX5X348AB, buf, sizeof(buf), NULL, 0);
     return 1;
 }
+

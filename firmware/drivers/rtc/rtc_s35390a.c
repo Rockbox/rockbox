@@ -58,35 +58,49 @@ void rtc_init(void)
 {
 }
 
-int rtc_read_datetime(unsigned char* buf)
+int rtc_read_datetime(struct tm *tm)
 {
-    unsigned char data[7];
+    unsigned char buf[7];
     int i, ret;
 
-    ret = i2c_read(RTC_ADDR | (REALTIME_DATA1 << 1), -1, sizeof(data), data);
-    reverse_bits(data, sizeof(data));
+    ret = i2c_read(RTC_ADDR | (REALTIME_DATA1 << 1), -1, sizeof(buf), buf);
+    reverse_bits(buf, sizeof(buf));
 
     buf[4] &= 0x3f; /* mask out p.m. flag */
-    
-    for (i = 0; i < 7; i++) {
-        buf[i] = data[6 - i];
-    }
+
+    for (i = 0; i < sizeof(buf); i++)
+        BCD2DEC(buf[i]);
+
+    tm->tm_sec = buf[6];
+    tm->tm_min = buf[5];
+    tm->tm_hour = buf[4];
+    tm->tm_wday = buf[3];
+    tm->tm_mday = buf[2];
+    tm->tm_mon = buf[1] - 1;
+    tm->tm_year = buf[0] + 100;
     
     return ret;
 }
 
-int rtc_write_datetime(unsigned char* buf)
+int rtc_write_datetime(const struct tm *tm)
 {
-    unsigned char data[7];
+    unsigned char buf[7];
     int i, ret;
 
-    for (i = 0; i < 7; i++) {
-        data[i] = buf[6 - i];
-    }
-        
-    reverse_bits(data, sizeof(data));
-    ret = i2c_write(RTC_ADDR | (REALTIME_DATA1 << 1), -1, sizeof(data), data);
-    
+    buf[6] = tm->tm_sec;
+    buf[5] = tm->tm_min;
+    buf[4] = tm->tm_hour;
+    buf[3] = tm->tm_wday;
+    buf[2] = tm->tm_mday;
+    buf[1] = tm->tm_mon + 1;
+    buf[0] = tm->tm_year - 100;
+
+    for (i = 0; i < sizeof(buf); i++)
+        DEC2BCD(buf[i]);
+
+    reverse_bits(buf, sizeof(buf));
+    ret = i2c_write(RTC_ADDR | (REALTIME_DATA1 << 1), -1, sizeof(buf), buf);
+
     return ret;
 }
 

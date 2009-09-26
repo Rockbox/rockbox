@@ -46,18 +46,6 @@
     #define RTC_BASE_YEAR       1970
 #endif
 
-enum rtc_buffer_field_indexes
-{
-    RTC_I_SECONDS = 0,
-    RTC_I_MINUTES,
-    RTC_I_HOURS,
-    RTC_I_WEEKDAY,
-    RTC_I_DAY,
-    RTC_I_MONTH,
-    RTC_I_YEAR,
-    RTC_NUM_FIELDS,
-};
-
 enum rtc_registers_indexes
 {
     RTC_REG_TIME = 0,
@@ -81,26 +69,6 @@ static const unsigned char month_table[2][12] =
     { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },
     { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },
 };
-
-static inline void to_bcd(unsigned char *bcd, const unsigned char *buf,
-                          int len)
-{
-    while (len-- > 0)
-    {
-        unsigned char d = *buf++;
-        *bcd++ = ((d / 10) << 4) | (d % 10);
-    }
-}
-
-static inline void from_bcd(unsigned char *buf, const unsigned char *bcd,
-                            int len)
-{
-    while (len-- > 0)
-    {
-        unsigned char d = *bcd++;
-        *buf++ = ((d >> 4) & 0x0f) * 10 + (d & 0xf);
-    }
-}
 
 /* Get number of leaps since the reference date of 1601/01/01 */
 static int get_leap_count(int d)
@@ -127,10 +95,10 @@ void rtc_init(void)
     }
 }
 
-int rtc_read_datetime(unsigned char* buf)
+int rtc_read_datetime(struct tm *tm)
 {
     uint32_t regs[RTC_NUM_REGS];
-    int year, leap, month, day;
+    int year, leap, month, day, hour, min;
 
     /* Read time, day, time - 2nd read of time should be the same or
      * greater */
@@ -147,19 +115,21 @@ int rtc_read_datetime(unsigned char* buf)
     while (regs[RTC_REG_TIME2] < regs[RTC_REG_TIME]);
 
     /* TOD: = 0 to 86399 */
-    buf[RTC_I_HOURS] = regs[RTC_REG_TIME] / 3600;
-    regs[RTC_REG_TIME] -= buf[RTC_I_HOURS]*3600;
+    hour = regs[RTC_REG_TIME] / 3600;
+    regs[RTC_REG_TIME] -= hour*3600;
+    tm->tm_hour = hour;
 
-    buf[RTC_I_MINUTES] = regs[RTC_REG_TIME] / 60;
-    regs[RTC_REG_TIME] -= buf[RTC_I_MINUTES]*60;
+    min = regs[RTC_REG_TIME] / 60;
+    regs[RTC_REG_TIME] -= min*60;
+    tm->tm_min = min;
 
-    buf[RTC_I_SECONDS] = regs[RTC_REG_TIME];
+    tm->tm_sec = regs[RTC_REG_TIME];
 
     /* DAY: 0 to 32767 */
     day = regs[RTC_REG_DAY] + RTC_BASE_DAY_COUNT;
 
     /* Weekday */
-    buf[RTC_I_WEEKDAY] = (day + 1) % 7; /* 1601/01/01 = Monday */
+    tm->tm_wday = (day + 1) % 7; /* 1601/01/01 = Monday */
 
     /* Get number of leaps for today */
     leap = get_leap_count(day);
@@ -186,28 +156,23 @@ int rtc_read_datetime(unsigned char* buf)
         day -= days;
     }
 
-    buf[RTC_I_DAY] = day + 1; /* 1 to 31 */
-    buf[RTC_I_MONTH] = month + 1; /* 1 to 12 */
-    buf[RTC_I_YEAR] = year % 100;
-
-    to_bcd(buf, buf, RTC_NUM_FIELDS);
+    tm->tm_mday = day + 1; /* 1 to 31 */
+    tm->tm_mon = month; /* 0 to 11 */
+    tm->tm_year = year % 100 + 100;
 
     return 7;
 }
 
-int rtc_write_datetime(unsigned char* buf)
+int rtc_write_datetime(const struct tm *tm)
 {
     uint32_t regs[2];
-    unsigned char fld[RTC_NUM_FIELDS];
     int year, leap, month, day, i, base_yearday;
 
-    from_bcd(fld, buf, RTC_NUM_FIELDS);
+    regs[RTC_REG_TIME] = tm->tm_sec +
+                         tm->tm_min*60 +
+                         tm->tm_hour*3600;
 
-    regs[RTC_REG_TIME] = fld[RTC_I_SECONDS] +
-                         fld[RTC_I_MINUTES]*60 +
-                         fld[RTC_I_HOURS]*3600;
-
-    year = fld[RTC_I_YEAR];
+    year = tm->tm_year - 100;
 
     if (year < RTC_BASE_YEAR - 1900)
         year += 2000;
@@ -230,18 +195,18 @@ int rtc_write_datetime(unsigned char* buf)
     /* Find the number of days passed this year up to the 1st of the
      * month. */
     leap = is_leap_year(year);
-    month = fld[RTC_I_MONTH] - 1;
+    month = tm->tm_mon;
 
     for (i = 0; i < month; i++)
     {
         day += month_table[leap][i];
     }
 
-    regs[RTC_REG_DAY] = day + fld[RTC_I_DAY] - 1 - base_yearday;
+    regs[RTC_REG_DAY] = day + tm->tm_mday - 1 - base_yearday;
 
     if (mc13783_write_regset(rtc_registers, regs, 2) == 2)
     {
-        return RTC_NUM_FIELDS;
+        return 7;
     }
 
     return 0;

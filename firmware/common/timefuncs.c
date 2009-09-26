@@ -27,9 +27,7 @@
 #include "timefuncs.h"
 #include "debug.h"
 
-#if !defined SIMULATOR || !CONFIG_RTC
 static struct tm tm;
-#endif /* !defined SIMULATOR || !CONFIG_RTC */
 
 #if !CONFIG_RTC
 static void fill_default_tm(struct tm *tm)
@@ -62,7 +60,6 @@ bool valid_time(const struct tm *tm)
 
 struct tm *get_time(void)
 {
-#ifndef SIMULATOR
 #if CONFIG_RTC
     static long timeout = 0;
 
@@ -71,76 +68,25 @@ struct tm *get_time(void)
     {
         /* Once per second, 1/10th of a second off */
         timeout = HZ * (current_tick / HZ + 1) + HZ / 5;
-#if CONFIG_RTC != RTC_JZ47XX
-        char rtcbuf[7];
-        rtc_read_datetime(rtcbuf);
-
-        tm.tm_sec = ((rtcbuf[0] & 0x70) >> 4) * 10 + (rtcbuf[0] & 0x0f);
-        tm.tm_min = ((rtcbuf[1] & 0x70) >> 4) * 10 + (rtcbuf[1] & 0x0f);
-        tm.tm_hour = ((rtcbuf[2] & 0x30) >> 4) * 10 + (rtcbuf[2] & 0x0f);
-        tm.tm_wday = rtcbuf[3] & 0x07;
-        tm.tm_mday = ((rtcbuf[4] & 0x30) >> 4) * 10 + (rtcbuf[4] & 0x0f);
-        tm.tm_mon = ((rtcbuf[5] & 0x10) >> 4) * 10 + (rtcbuf[5] & 0x0f) - 1;
-#ifdef IRIVER_H300_SERIES 
-     /* Special kludge to coexist with the iriver firmware. The iriver firmware
-        stores the date as 1965+nn, and allows a range of 1980..2064. We use
-        1964+nn here to make leap years work correctly, so the date will be one
-        year off in the iriver firmware but at least won't be reset anymore. */
-        tm.tm_year = ((rtcbuf[6] & 0xf0) >> 4) * 10 + (rtcbuf[6] & 0x0f) + 64;
-#else /* Not IRIVER_H300_SERIES */
-        tm.tm_year = ((rtcbuf[6] & 0xf0) >> 4) * 10 + (rtcbuf[6] & 0x0f) + 100;
-#endif /* IRIVER_H300_SERIES */
+        rtc_read_datetime(&tm);
 
         tm.tm_yday = 0; /* Not implemented for now */
         tm.tm_isdst = -1; /* Not implemented for now */
-#else /* CONFIG_RTC == RTC_JZ47XX */
-        rtc_read_datetime((unsigned char*)&tm);
-#endif /* CONFIG_RTC */
     }
 #else /* No RTC */
     fill_default_tm(&tm);
 #endif /* RTC */
     return &tm;
-
-#else /* SIMULATOR */
-#if CONFIG_RTC
-    time_t now = time(NULL);
-    return localtime(&now);
-#else /* Simulator, no RTC */
-    fill_default_tm(&tm);
-    return &tm;
-#endif
-#endif /* SIMULATOR */
 }
 
 int set_time(const struct tm *tm)
 {
 #if CONFIG_RTC
     int rc;
-#if CONFIG_RTC != RTC_JZ47XX
-    char rtcbuf[7];
-#endif
-    
+
     if (valid_time(tm))
     {
-#if CONFIG_RTC != RTC_JZ47XX
-        rtcbuf[0]=((tm->tm_sec/10) << 4) | (tm->tm_sec%10);
-        rtcbuf[1]=((tm->tm_min/10) << 4) | (tm->tm_min%10);
-        rtcbuf[2]=((tm->tm_hour/10) << 4) | (tm->tm_hour%10);
-        rtcbuf[3]=tm->tm_wday;
-        rtcbuf[4]=((tm->tm_mday/10) << 4) | (tm->tm_mday%10);
-        rtcbuf[5]=(((tm->tm_mon+1)/10) << 4) | ((tm->tm_mon+1)%10);
-#ifdef IRIVER_H300_SERIES
-        /* Iriver firmware compatibility kludge, see get_time(). */
-        rtcbuf[6]=(((tm->tm_year-64)/10) << 4) | ((tm->tm_year-64)%10);
-#else
-        rtcbuf[6]=(((tm->tm_year-100)/10) << 4) | ((tm->tm_year-100)%10);
-#endif
-
-        rc = rtc_write_datetime(rtcbuf);
-#else
-        rc = rtc_write_datetime((unsigned char*)tm);
-#endif
+        rc = rtc_write_datetime(tm);
 
         if (rc < 0)
             return -1;
@@ -151,10 +97,10 @@ int set_time(const struct tm *tm)
     {
         return -2;
     }
-#else
+#else /* No RTC */
     (void)tm;
     return 0;
-#endif
+#endif /* RTC */
 }
 
 #if CONFIG_RTC
@@ -196,11 +142,12 @@ time_t mktime(struct tm *t)
 
 void set_day_of_week(struct tm *tm)
 {
-        int y=tm->tm_year+1900;
-        int d=tm->tm_mday;
-        int m=tm->tm_mon;
-        static const char mo[] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
+    int y=tm->tm_year+1900;
+    int d=tm->tm_mday;
+    int m=tm->tm_mon;
+    static const char mo[] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
 
-        if(m == 0 || m == 1) y--;
-        tm->tm_wday = (d + mo[m] + y + y/4 - y/100 + y/400) % 7;
+    if(m == 0 || m == 1) y--;
+    tm->tm_wday = (d + mo[m] + y + y/4 - y/100 + y/400) % 7;
 }
+

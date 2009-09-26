@@ -116,11 +116,10 @@ static void jz_gettime(unsigned int rtc, int *year, int *mon, int *day,
     *year += 2000;
 }
 
-int rtc_read_datetime(unsigned char* buf)
+int rtc_read_datetime(struct tm *tm)
 {
-    struct tm rtc_tm;
     unsigned int sec,mon,mday,wday,year,hour,min;
-    
+
     /*
      * Only the values that we read from the RTC are set. We leave
      * tm_wday, tm_yday and tm_isdst untouched. Even though the
@@ -131,37 +130,32 @@ int rtc_read_datetime(unsigned char* buf)
 
     year -= 2000;
 
-    rtc_tm.tm_sec = sec;
-    rtc_tm.tm_min = min;
-    rtc_tm.tm_hour = hour;
-    rtc_tm.tm_mday = mday;
-    rtc_tm.tm_wday = wday;
+    tm->tm_sec = sec;
+    tm->tm_min = min;
+    tm->tm_hour = hour;
+    tm->tm_mday = mday;
+    tm->tm_wday = wday;
     /* Don't use centry, but start from year 1970 */
-    rtc_tm.tm_mon = mon;
+    tm->tm_mon = mon;
     if (year <= 69)
         year += 100;
-    rtc_tm.tm_year = year;
-    
-    rtc_tm.tm_yday = 0; /* Not implemented for now */
-    rtc_tm.tm_isdst = -1; /* Not implemented for now */
-    
-    (*((struct tm*)buf)) = rtc_tm;
+    tm->tm_year = year;
+
     return 1;
 }
 
-int rtc_write_datetime(unsigned char* buf)
+int rtc_write_datetime(const struct tm *tm)
 {
-    struct tm *rtc_tm = (struct tm*)buf;
     unsigned int year, lval;
     
-    year = rtc_tm->tm_year;
+    year = tm->tm_year;
     /* Don't use centry, but start from year 1970 */
     if (year > 69)
         year -= 100;
     year += 2000;
     
-    lval = jz_mktime(year, rtc_tm->tm_mon, rtc_tm->tm_mday, rtc_tm->tm_hour,
-                     rtc_tm->tm_min, rtc_tm->tm_sec);
+    lval = jz_mktime(year, tm->tm_mon, tm->tm_mday, tm->tm_hour,
+                     tm->tm_min, tm->tm_sec);
 
     __cpm_start_rtc();
     udelay(100);

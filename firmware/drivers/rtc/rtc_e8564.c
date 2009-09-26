@@ -27,6 +27,9 @@
 #include "i2c-pp.h"
 #include <stdbool.h>
 
+/*RTC_E8564's slave address is 0x51*/
+#define RTC_ADDR   0x51
+
 /* RTC registers */
 #define RTC_CTRL1          0x00
 #define RTC_CTRL2          0x01
@@ -59,94 +62,96 @@ void rtc_init(void)
     
     /* initialize Control 1 register */
     tmp = 0;
-    pp_i2c_send(0x51, RTC_CTRL1,tmp);
+    pp_i2c_send(RTC_ADDR, RTC_CTRL1, tmp);
     
     /* read value of the Control 2 register - we'll need it to preserve alarm and timer interrupt assertion flags */
-    rv = i2c_readbytes(0x51,RTC_CTRL2,1,&tmp);
+    rv = i2c_readbytes(RTC_ADDR, RTC_CTRL2, 1, &tmp);
     /* preserve alarm and timer interrupt flags */
     tmp &= (RTC_TF | RTC_AF | RTC_TIE | RTC_AIE);
-    pp_i2c_send(0x51, RTC_CTRL2,tmp);
+    pp_i2c_send(RTC_ADDR, RTC_CTRL2, tmp);
 }
 
-int rtc_read_datetime(unsigned char* buf)
+int rtc_read_datetime(struct tm *tm)
 {
-    unsigned char tmp;
     int read;
-    
-    /*RTC_E8564's slave address is 0x51*/
-    read = i2c_readbytes(0x51,0x02,7,buf);
+    unsigned char buf[7];
 
-    /* swap wday and mday to be compatible with
-     * get_time() from firmware/common/timefuncs.c */
-    tmp=buf[3];
-    buf[3]=buf[4];
-    buf[4]=tmp;
-    
+    read = i2c_readbytes(RTC_ADDR, 0x02, sizeof(buf), buf);
+
+    /* convert from bcd, avoid getting extra bits */
+    tm->tm_sec  = BCD2DEC(buf[0] & 0x7f);
+    tm->tm_min  = BCD2DEC(buf[1] & 0x7f);
+    tm->tm_hour = BCD2DEC(buf[2] & 0x3f);
+    tm->tm_mday = BCD2DEC(buf[3] & 0x3f);
+    tm->tm_wday = BCD2DEC(buf[4] & 0x3);
+    tm->tm_mon  = BCD2DEC(buf[5] & 0x1f) - 1;
+    tm->tm_year = BCD2DEC(buf[6]) + 100;
+
     return read;
 }
 
-int rtc_write_datetime(unsigned char* buf)
+int rtc_write_datetime(const struct tm *tm)
 {
-    int i;
-    unsigned char tmp;
-    
-    /* swap wday and mday to be compatible with
-     * set_time() in firmware/common/timefuncs.c */
-    tmp=buf[3];
-    buf[3]=buf[4];
-    buf[4]=tmp;
+    unsigned int i;
+    unsigned char buf[7];
 
-    for (i=0;i<7;i++){
-        pp_i2c_send(0x51, 0x02+i,buf[i]);
-    }
+    buf[0] = tm->tm_sec;
+    buf[1] = tm->tm_min;
+    buf[2] = tm->tm_hour;
+    buf[3] = tm->tm_mday;
+    buf[4] = tm->tm_wday;
+    buf[5] = tm->tm_mon + 1;
+    buf[6] = tm->tm_year - 100;
+
+    for (i = 0; i < sizeof(buf); i++)
+        pp_i2c_send(RTC_ADDR, 0x02 + i, DEC2BCD(buf[i]));
+
     return 1;
 }
 
 void rtc_set_alarm(int h, int m)
 {
-    unsigned char buf[4]={0};
-    int rv=0;
-    int i=0;
-    
+    unsigned char buf[4] = {0};
+    int i, rv;
+
     /* clear alarm interrupt */
-    rv = i2c_readbytes(0x51,RTC_CTRL2,1,buf);
+    rv = i2c_readbytes(RTC_ADDR, RTC_CTRL2, 1, buf);
     buf[0] &= RTC_AF;
-    pp_i2c_send(0x51, RTC_CTRL2,buf[0]);
-    
+    pp_i2c_send(RTC_ADDR, RTC_CTRL2, buf[0]);
+
     /* prepare new alarm */
     if( m >= 0 )
-        buf[0] = (((m/10) << 4) | m%10);
+        buf[0] = DEC2BCD(m);
     else
         /* ignore minutes comparison query */
         buf[0] = RTC_AE;
     
     if( h >= 0 )
-        buf[1] = (((h/10) << 4) | h%10);
+        buf[1] = DEC2BCD(h);
     else
         /* ignore hours comparison query */
         buf[1] = RTC_AE;
-    
+
     /* ignore day and wday */
     buf[2] = RTC_AE;
     buf[3] = RTC_AE;
-    
+
     /* write new alarm */
-    for(;i<4;i++)
-        pp_i2c_send(0x51, RTC_ALARM_MINUTES+i,buf[i]);
-    
+    for(i = 0; i < 4; i++)
+        pp_i2c_send(RTC_ADDR, RTC_ALARM_MINUTES + i, buf[i]);
+
     /* note: alarm is not enabled at the point */
 }
 
 void rtc_get_alarm(int *h, int *m)
 {
     unsigned char buf[4]={0};
-    
+
     /* get alarm preset */
-    i2c_readbytes(0x51, RTC_ALARM_MINUTES,4,buf);
+    i2c_readbytes(RTC_ADDR, RTC_ALARM_MINUTES, 4 ,buf);
 
-    *m = ((buf[0] >> 4) & 0x7)*10 + (buf[0] & 0x0f);
-    *h = ((buf[1] >> 4) & 0x3)*10 + (buf[1] & 0x0f);
-
+    *m = BCD2DEC(buf[0] & 0x7f);
+    *h = BCD2DEC(buf[0] & 0x3f);
 }
 
 bool rtc_enable_alarm(bool enable)
@@ -157,10 +162,10 @@ bool rtc_enable_alarm(bool enable)
     if(enable)
     {
         /* enable alarm interrupt */
-        rv = i2c_readbytes(0x51,RTC_CTRL2,1,&tmp);
+        rv = i2c_readbytes(RTC_ADDR, RTC_CTRL2, 1, &tmp);
         tmp |= RTC_AIE;
         tmp &= ~RTC_AF;
-        pp_i2c_send(0x51, RTC_CTRL2,tmp);
+        pp_i2c_send(RTC_ADDR, RTC_CTRL2, tmp);
     }
     else
     {
@@ -168,9 +173,9 @@ bool rtc_enable_alarm(bool enable)
         if(rtc_lock_alarm_clear)
             /* lock disabling alarm before it was checked whether or not the unit was started by RTC alarm */
             return false;        
-        rv = i2c_readbytes(0x51,RTC_CTRL2,1,&tmp);
+        rv = i2c_readbytes(RTC_ADDR, RTC_CTRL2, 1, &tmp);
         tmp &= ~(RTC_AIE | RTC_AF);
-        pp_i2c_send(0x51, RTC_CTRL2,tmp);
+        pp_i2c_send(RTC_ADDR, RTC_CTRL2, tmp);
     }
     
     return false;
@@ -186,21 +191,21 @@ bool rtc_check_alarm_started(bool release_alarm)
     if (run_before)
     {
         started = alarm_state;
-        alarm_state &= ~release_alarm;         
+        alarm_state &= ~release_alarm;
     } 
     else 
     { 
         /* read Control 2 register which contains alarm flag */
-        rv = i2c_readbytes(0x51,RTC_CTRL2,1,&tmp);
+        rv = i2c_readbytes(RTC_ADDR, RTC_CTRL2, 1, &tmp);
 
         alarm_state = started = ( (tmp & RTC_AF) && (tmp & RTC_AIE) );
         
         if(release_alarm && started)
         {
-            rv = i2c_readbytes(0x51,RTC_CTRL2,1,&tmp);
+            rv = i2c_readbytes(RTC_ADDR, RTC_CTRL2, 1, &tmp);
             /* clear alarm interrupt enable and alarm flag */
             tmp &= ~(RTC_AF | RTC_AIE);
-            pp_i2c_send(0x51, RTC_CTRL2,tmp);
+            pp_i2c_send(RTC_ADDR, RTC_CTRL2, tmp);
         }
         run_before = true;
         rtc_lock_alarm_clear = false;
@@ -215,7 +220,8 @@ bool rtc_check_alarm_flag(void)
     int rv=0;
     
     /* read Control 2 register which contains alarm flag */
-    rv = i2c_readbytes(0x51,RTC_CTRL2,1,&tmp);
+    rv = i2c_readbytes(RTC_ADDR, RTC_CTRL2, 1, &tmp);
 
     return (tmp & RTC_AF);
 }
+

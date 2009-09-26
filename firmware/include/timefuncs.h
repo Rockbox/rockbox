@@ -35,3 +35,4 @@ time_t mktime(struct tm *t);
 #endif
 
 #endif /* _TIMEFUNCS_H_ */
+

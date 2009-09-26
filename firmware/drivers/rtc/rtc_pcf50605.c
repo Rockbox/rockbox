@@ -36,14 +36,45 @@ void rtc_init(void)
     rtc_check_alarm_started(false);
 }
 
-int rtc_read_datetime(unsigned char* buf)
+int rtc_read_datetime(struct tm *tm)
 {
-    return pcf50605_read_multiple(0x0a, buf, 7);
+    unsigned int i;
+    int rc;
+    unsigned char buf[7];
+    rc = pcf50605_read_multiple(0x0a, buf, sizeof(buf));
+
+    for (i = 0; i < sizeof(buf); i++)
+        buf[i] = BCD2DEC(buf[i]);
+
+    tm->tm_sec  = buf[0];
+    tm->tm_min  = buf[1];
+    tm->tm_hour = buf[2];
+    tm->tm_wday = buf[3];
+    tm->tm_mday = buf[4];
+    tm->tm_mon  = buf[5] - 1;
+    tm->tm_year = buf[6] + 100;
+
+    return rc;
 }
 
-int rtc_write_datetime(unsigned char* buf)
+int rtc_write_datetime(const struct tm *tm)
 {
-    pcf50605_write_multiple(0x0a, buf, 7);
+    unsigned int i;
+    unsigned char buf[7];
+
+    buf[0] = tm->tm_sec;
+    buf[1] = tm->tm_min;
+    buf[2] = tm->tm_hour;
+    buf[3] = tm->tm_wday;
+    buf[4] = tm->tm_mday;
+    buf[5] = tm->tm_mon + 1;
+    buf[6] = tm->tm_year - 100;
+
+    for (i = 0; i < sizeof(buf); i++)
+        buf[i] = DEC2BCD(buf[i]);
+
+    pcf50605_write_multiple(0x0a, buf, sizeof(buf));
+
     return 1;
 }
 
@@ -121,17 +152,17 @@ void rtc_set_alarm(int h, int m)
     /* Set us to wake at the first second of the specified time */
     pcf50605_write(0x11, 0);
     /* Convert to BCD */
-    pcf50605_write(0x12, ((m/10) << 4) | m%10);
-    pcf50605_write(0x13, ((h/10) << 4) | h%10);
+    pcf50605_write(0x12, DEC2BCD(m));
+    pcf50605_write(0x13, DEC2BCD(h));
 }
 
 void rtc_get_alarm(int *h, int *m)
 {
     char buf[2];
 
-    pcf50605_read_multiple(0x12, buf, 2);
+    pcf50605_read_multiple(0x12, buf, sizeof(buf));
     /* Convert from BCD */
-    *m = ((buf[0] >> 4) & 0x7)*10 + (buf[0] & 0x0f);
-    *h = ((buf[1] >> 4) & 0x3)*10 + (buf[1] & 0x0f);
+    *m = BCD2DEC(buf[0]);
+    *h = BCD2DEC(buf[1]);
 }
 

@@ -24,27 +24,70 @@
 #include "kernel.h"
 #include "system.h"
 #include "pcf50606.h"
-#include <stdbool.h>
 
 void rtc_init(void)
 {
 }
 
-int rtc_read_datetime(unsigned char* buf) {
-    int rc;
-    int oldlevel = disable_irq_save();
-    
-    rc = pcf50606_read_multiple(0x0a, buf, 7);
+int rtc_read_datetime(struct tm *tm)
+{
+    unsigned int i;
+    int rc, oldlevel;
+    unsigned char buf[7];
+
+    oldlevel = disable_irq_save();
+
+    rc = pcf50606_read_multiple(0x0a, buf, sizeof(buf));
 
     restore_irq(oldlevel);
+
+    for (i = 0; i < sizeof(buf); i++)
+        buf[i] = BCD2DEC(buf[i]);
+
+    tm->tm_sec = buf[0];
+    tm->tm_min = buf[1];
+    tm->tm_hour = buf[2];
+    tm->tm_wday = buf[3];
+    tm->tm_mday = buf[4];
+    tm->tm_mon = buf[5] - 1;
+#ifdef IRIVER_H300_SERIES 
+    /* Special kludge to coexist with the iriver firmware. The iriver firmware
+       stores the date as 1965+nn, and allows a range of 1980..2064. We use
+       1964+nn here to make leap years work correctly, so the date will be one
+       year off in the iriver firmware but at least won't be reset anymore. */
+    tm->tm_year = buf[6] + 64;
+#else /* Not IRIVER_H300_SERIES */
+    tm->tm_year = buf[6] + 100;
+#endif /* IRIVER_H300_SERIES */
+
     return rc;
 }
 
-int rtc_write_datetime(unsigned char* buf) {
-    int rc;
-    int oldlevel = disable_irq_save();
-    
-    rc = pcf50606_write_multiple(0x0a, buf, 7);
+int rtc_write_datetime(const struct tm *tm)
+{
+    unsigned int i;
+    int rc, oldlevel;
+    unsigned char buf[7];
+
+    buf[0] = tm->tm_sec;
+    buf[1] = tm->tm_min;
+    buf[2] = tm->tm_hour;
+    buf[3] = tm->tm_wday;
+    buf[4] = tm->tm_mday;
+    buf[5] = tm->tm_mon + 1;
+#ifdef IRIVER_H300_SERIES
+    /* Iriver firmware compatibility kludge, see rtc_read_datetime(). */
+    buf[6] = tm->tm_year - 64;
+#else /* Not IRIVER_H300_SERIES */
+    buf[6] = tm->tm_year - 100;
+#endif /* IRIVER_H300_SERIES */
+
+    for (i = 0; i < sizeof(buf); i++)
+         buf[i] = DEC2BCD(buf[i]);
+
+    oldlevel = disable_irq_save();
+
+    rc = pcf50606_write_multiple(0x0a, buf, sizeof(buf));
 
     restore_irq(oldlevel);
 

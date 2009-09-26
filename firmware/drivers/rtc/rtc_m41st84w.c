@@ -110,10 +110,10 @@ void rtc_set_alarm(int h, int m)
 
     /* for daily alarm, RPT5=RPT4=on, RPT1=RPT2=RPT3=off */
     
-    rtc_write(0x0e, 0x00);                       /* seconds 0 and RTP1 */
-    rtc_write(0x0d, ((m / 10) << 4) | (m % 10)); /* minutes and RPT2 */
-    rtc_write(0x0c, ((h / 10) << 4) | (h % 10)); /* hour and RPT3 */
-    rtc_write(0x0b, 0xc1);                       /* set date 01 and RPT4 and RTP5 */
+    rtc_write(0x0e, 0x00);      /* seconds 0 and RTP1 */
+    rtc_write(0x0d, DEC2BCD(m); /* minutes and RPT2 */
+    rtc_write(0x0c, DEC2BCD(h); /* hour and RPT3 */
+    rtc_write(0x0b, 0xc1);      /* set date 01 and RPT4 and RTP5 */
     
     /* set month to 1, if it's invalid, the rtc does an alarm every second instead */
     data = rtc_read(0x0a);
@@ -128,10 +128,10 @@ void rtc_get_alarm(int *h, int *m)
     unsigned char data;
 
     data = rtc_read(0x0c);
-    *h = ((data & 0x30) >> 4) * 10 + (data & 0x0f);
+    *h = BCD2DEC(data & 0x3f);
     
     data = rtc_read(0x0d);
-    *m = ((data & 0x70) >> 4) * 10 + (data & 0x0f);
+    *m = BCD2DEC(data & 0x7f);
 }
 
 /* turn alarm on or off by setting the alarm flag enable */
@@ -250,31 +250,53 @@ int rtc_read_multiple(unsigned char address, unsigned char *buf, int numbytes)
     return ret;
 }
 
-int rtc_read_datetime(unsigned char* buf) {
+int rtc_read_datetime(struct tm *tm)
+{
     int rc;
+    unsigned char buf[7];
 
-    rc = rtc_read_multiple(1, buf, 7);
+    rc = rtc_read_multiple(1, buf, sizeof(buf));
+
+    /* convert from bcd, avoid getting extra bits */
+    tm->tm_sec  = BCD2DEC(buf[0] & 0x7f);
+    tm->tm_min  = BCD2DEC(buf[1] & 0x7f);
+    tm->tm_hour = BCD2DEC(buf[2] & 0x3f);
+    tm->tm_wday = BCD2DEC(buf[3] & 0x3);
+    tm->tm_mday = BCD2DEC(buf[4] & 0x3f);
+    tm->tm_mon  = BCD2DEC(buf[5] & 0x1f) - 1;
+    tm->tm_year = BCD2DEC(buf[6]) + 100;
 
     /* Adjust weekday */
-    if(buf[3] == 7)
-        buf[3]=0;
+    if (tm->tm_wday == 7)
+        tm->tm_wday = 0;
 
     return rc;
 }
 
-int rtc_write_datetime(unsigned char* buf) {
-    int i;
+int rtc_write_datetime(const struct tm *tm)
+{
+    unsigned int i;
     int rc = 0;
-    
+    unsigned char buf[7];
+
+    buf[0] = tm->tm_sec;
+    buf[1] = tm->tm_min;
+    buf[2] = tm->tm_hour;
+    buf[3] = tm->tm_wday;
+    buf[4] = tm->tm_mday;
+    buf[5] = tm->tm_mon + 1;
+    buf[6] = tm->tm_year - 100;
+
     /* Adjust weekday */
-    if(buf[3] == 0)
+    if (buf[3] == 0)
         buf[3] = 7;
 
-    for (i = 0; i < 7 ; i++)
+    for (i = 0; i < sizeof(buf) ;i++)
     {
-        rc |= rtc_write(i+1, buf[i]);
+        rc |= rtc_write(i + 1, DEC2BCD(buf[i]));
     }
     rc |= rtc_write(8, 0x80); /* Out=1, calibration = 0 */
 
     return rc;
 }
+

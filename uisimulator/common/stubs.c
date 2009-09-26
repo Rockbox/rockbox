@@ -142,25 +142,17 @@ int rtc_write(int address, int value)
     return 0;
 }
 
-int rtc_read_datetime(unsigned char* buf)
+int rtc_read_datetime(struct tm *tm)
 {
     time_t now = time(NULL);
-    struct tm *teem = localtime(&now);
-
-    buf[0] = (teem->tm_sec%10) | ((teem->tm_sec/10) << 4);
-    buf[1] = (teem->tm_min%10) | ((teem->tm_min/10) << 4);
-    buf[2] = (teem->tm_hour%10) | ((teem->tm_hour/10) << 4);
-    buf[3] = (teem->tm_wday);
-    buf[4] = (teem->tm_mday%10) | ((teem->tm_mday/10) << 4);
-    buf[5] = ((teem->tm_year-100)%10) | (((teem->tm_year-100)/10) << 4);
-    buf[6] = ((teem->tm_mon+1)%10) | (((teem->tm_mon+1)/10) << 4);
+    *tm = *localtime(&now);
 
     return 0;
 }
 
-int rtc_write_datetime(unsigned char* buf)
+int rtc_write_datetime(const struct tm *tm)
 {
-    (void)buf;
+    (void)tm;
     return 0;
 }
 

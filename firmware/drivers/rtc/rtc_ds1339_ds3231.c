@@ -115,26 +115,46 @@ bool rtc_enable_alarm(bool enable)
 
 #endif /* HAVE_RTC_ALARM */ 
 
-int rtc_read_datetime(unsigned char* buf)
+int rtc_read_datetime(struct tm *tm)
 {
-    int i;
+    int rc;
+    unsigned char buf[7];
 
-    i = sw_i2c_read(RTC_ADDR, 0, buf, 7);        
-    
-    buf[3]--; /* timefuncs wants 0..6 for wday */
+    rc = sw_i2c_read(RTC_ADDR, 0, buf, sizeof(buf));        
 
-    return i;
+    /* convert from bcd, avoid getting extra bits */
+    tm->tm_sec  = BCD2DEC(buf[0] & 0x7f);
+    tm->tm_min  = BCD2DEC(buf[1] & 0x7f);
+    tm->tm_hour = BCD2DEC(buf[2] & 0x3f);
+    tm->tm_wday = BCD2DEC(buf[3] & 0x3) - 1; /* timefuncs wants 0..6 for wday */
+    tm->tm_mday = BCD2DEC(buf[4] & 0x3f);
+    tm->tm_mon  = BCD2DEC(buf[5] & 0x1f) - 1;
+    tm->tm_year = BCD2DEC(buf[6]) + 100;
+
+    return rc;
 }
 
-int rtc_write_datetime(unsigned char* buf)
+int rtc_write_datetime(const struct tm *tm)
 {
-    int i;
+    unsigned int i;
+    int rc;
+    unsigned char buf[7];
 
-    buf[3]++;       /* chip wants 1..7 for wday */
-    buf[5]|=0x80;   /* chip wants century (always 20xx) */
+    buf[0] = tm->tm_sec;
+    buf[1] = tm->tm_min;
+    buf[2] = tm->tm_hour;
+    buf[3] = tm->tm_wday + 1; /* chip wants 1..7 for wday */
+    buf[4] = tm->tm_mday;
+    buf[5] = tm->tm_mon + 1;
+    buf[6] = tm->tm_year - 100;
 
-    i = sw_i2c_write(RTC_ADDR, 0, buf, 7);
+    for (i = 0; i < sizeof(buf); i++)
+        buf[i] = DEC2BCD(buf[i]);
 
-    return i;
+    buf[5] |= 0x80; /* chip wants century (always 20xx) */
+
+    rc = sw_i2c_write(RTC_ADDR, 0, buf, sizeof(buf));
+
+    return rc;
 }
 
