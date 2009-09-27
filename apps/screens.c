@@ -64,7 +64,6 @@
 #include "backdrop.h"
 #include "viewport.h"
 #include "appevents.h"
-#include "statusbar.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bitmaps/usblogo.h"

@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "helpers.h"
-#include "zxconfig.h"
 #define DIR_SEP_CHAR '/'
 
 char *get_base_name(char *fname)

@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#include "screen_access.h"
+#include "config.h"
 #include "font.h"
 #include "kernel.h"
 #include "string.h" /* for memcmp oO*/

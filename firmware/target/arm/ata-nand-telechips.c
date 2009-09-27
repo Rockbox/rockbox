@@ -27,7 +27,6 @@
 #include "nand_id.h"
 #include "storage.h"
 #include "buffer.h"
-#include "led.h"
 
 #define SECTOR_SIZE 512
 

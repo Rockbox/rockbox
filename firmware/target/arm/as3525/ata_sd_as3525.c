@@ -50,7 +50,6 @@
 
 #ifdef HAVE_HOTSWAP
 #include "disk.h"
-#include "panic.h"
 #endif
 
 /* command flags */

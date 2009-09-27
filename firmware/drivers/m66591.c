@@ -31,7 +31,6 @@
 #include "usb_drv.h"
 #include "logf.h"
 
-#include "config.h"
 #include "cpu.h"
 #include "ata.h"
 #include "usb.h"
