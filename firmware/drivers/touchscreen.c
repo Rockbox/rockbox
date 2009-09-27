@@ -27,8 +27,8 @@
 #include "logf.h"
 
 /* Size of the 'dead zone' around each 3x3 button */
-#define BUTTON_MARGIN_X LCD_WIDTH * 0.03
-#define BUTTON_MARGIN_Y LCD_HEIGHT * 0.03
+#define BUTTON_MARGIN_X (int)(LCD_WIDTH * 0.03)
+#define BUTTON_MARGIN_Y (int)(LCD_HEIGHT * 0.03)
 
 static enum touchscreen_mode current_mode = TOUCHSCREEN_POINT;
 static const int touchscreen_buttons[3][3] =
