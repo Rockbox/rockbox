@@ -195,8 +195,6 @@ void usb_screen(void)
             else
 #endif
             {
-                char mode_name[MODE_NAME_LEN];
-
 #ifdef HAVE_LCD_BITMAP
                 screens[i].transparent_bitmap(usblogo,
                         (LCD_WIDTH-BMPWIDTH_usblogo),
@@ -204,6 +202,7 @@ void usb_screen(void)
                         BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
 
 #ifdef USB_ENABLE_HID
+                char mode_name[MODE_NAME_LEN];
                 int y, w, h;
 
                 screens[i].getstringsize(str(LANG_USB_KEYPAD_MODE), &w, &h);
