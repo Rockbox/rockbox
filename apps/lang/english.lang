@@ -12658,13 +12658,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "USB Keypad Mode:"
+    *: none
+    usb_hid: "USB Keypad Mode:"
   </source>
   <dest>
-    *: "USB Keypad Mode:"
+    *: none
+    usb_hid: "USB Keypad Mode:"
   </dest>
   <voice>
-    *: "USB Keypad Mode"
+    *: none
+    usb_hid: "USB Keypad Mode"
   </voice>
 </phrase>
 <phrase>
@@ -12672,13 +12675,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Multimedia"
+    *: none
+    usb_hid: "Multimedia"
   </source>
   <dest>
-    *: "Multimedia"
+    *: none
+    usb_hid: "Multimedia"
   </dest>
   <voice>
-    *: "Multimedia"
+    *: none
+    usb_hid: "Multimedia"
   </voice>
 </phrase>
 <phrase>
@@ -12686,13 +12692,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Presentation"
+    *: none
+    usb_hid: "Presentation"
   </source>
   <dest>
-    *: "Presentation"
+    *: none
+    usb_hid: "Presentation"
   </dest>
   <voice>
-    *: "Presentation"
+    *: none
+    usb_hid: "Presentation"
   </voice>
 </phrase>
 <phrase>
@@ -12700,13 +12709,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Browser"
+    *: none
+    usb_hid: "Browser"
   </source>
   <dest>
-    *: "Browser"
+    *: none
+    usb_hid: "Browser"
   </dest>
   <voice>
-    *: "Browser"
+    *: none
+    usb_hid: "Browser"
   </voice>
 </phrase>
 <phrase>
@@ -12714,13 +12726,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Mouse"
+    *: none
+    usb_hid: "Mouse"
   </source>
   <dest>
-    *: "Mouse"
+    *: none
+    usb_hid: "Mouse"
   </dest>
   <voice>
-    *: "Mouse"
+    *: none
+    usb_hid: "Mouse"
   </voice>
 </phrase>
 <phrase>

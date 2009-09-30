@@ -196,6 +196,9 @@ usb_charging
 
 #if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
 usbstack
+#if defined(USB_ENABLE_HID)
+usb_hid
+#endif
 #endif
 
 #if defined(HAVE_WHEEL_ACCELERATION)
