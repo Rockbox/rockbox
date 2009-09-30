@@ -171,6 +171,7 @@
 #define USE_ROCKBOX_USB
 #define USB_VENDOR_ID 0x0471
 #define USB_PRODUCT_ID 0x014f
+#define HAVE_USB_HID_MOUSE
 
 /* WARNING! Enable Rockbox USB mass storage. */
 #ifndef BOOTLOADER

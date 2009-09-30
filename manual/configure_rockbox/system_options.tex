@@ -182,3 +182,266 @@ this option \setting{On}. If it is not required, then turning this setting
       Changes the brightness of the button lights.
   }
 }
+\opt{USB_ENABLE_HID}{
+  \subsection{USB keypad Mode}
+    This setting control the keypad mode when the \dap{} is attached to a
+    computer through USB. The \dap{} registers itself as a USB keyboard (in
+    addition to being identified as a mass-storage device). Pressing a button
+    on the \dap{} sends a keystroke the computer the \dap{} is attached to,
+    according to the mapping set by the keypad mode.
+    The \dap{}'s keys can be mapped in different sets (modes) to achieve
+    different functionality. The following modes are available:
+    \begin{description}
+
+      \item [Multimedia: ]This mode lets you control the volume, playback, and
+        skips tracks on the host computer. It is equivalent for the multimedia
+        keys found on top of some multimedia keyboards.
+        \begin{table}
+          \begin{btnmap}{}{}
+            \opt{SANSA_E200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonScrollBack / \ButtonScrollFwd}
+            \opt{GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
+              {\ButtonVolUp / \ButtonVolDown}
+            \opt{IRIVER_H10_PAD}{\ButtonScrollUp / \ButtonScrollDown}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp / \ButtonRCVolDown}%
+            }
+            & Volume up / down, respectively \\
+            %
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
+                ,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonSelect}
+            \opt{GIGABEAT_S_PAD}{\ButtonSelect; \ButtonBack}
+            \opt{IRIVER_H10_PAD}{\ButtonFF}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{Long \ButtonRCFF}%
+            }
+            & Volume mute \\
+            %
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonUp}
+            \opt{GIGABEAT_S_PAD,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
+                ,IPOD_1G2G_PAD}
+              {\ButtonPlay}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{\ButtonRCPlay}%
+            }
+            & Play / Pause \\
+            %
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
+            \opt{GIGABEAT_S_PAD}{\ButtonMenu}
+            \opt{SANSA_CLIP_PAD}{\ButtonHome}
+            \opt{IRIVER_H10_PAD}{\ButtonRew}
+            \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{Long \ButtonPlay}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{Long \ButtonRCPlay}%
+            }
+            & Stop \\
+            %
+            \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
+                ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonLeft / \ButtonRight}
+            \opt{SANSA_E200_PAD}{\ButtonMenu}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{\ButtonRCRew / \ButtonRCFF}%
+            }
+            & Scan previous / next track \\
+          \end{btnmap}
+        \end{table}
+
+      \item [Presentation: ]This mode lets you control a presentation program
+        (e.g. OpenOffice Impress, and some other popular application), making
+        the \dap{} a wired remote control device. This mode is can be useful
+        for lecturers who does not have a wireless remote control for this
+        purpose.
+        \begin{table}
+          \begin{btnmap}{}{}
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonUp / \ButtonPower}
+            \opt{GIGABEAT_S_PADIRIVER_H10_PAD}{\ButtonPlay / \ButtonMenu}
+            \opt{SANSA_CLIP_PAD}{\ButtonUp / \ButtonHome}
+            \opt{IRIVER_H10_PAD}{\ButtonPlay / \ButtonRew}
+            \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonPlay / Long \ButtonPlay}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{\ButtonRCPlay / Long \ButtonRCPlay}%
+            }
+            & Slideshow start / leave, respectively \\
+            %
+            \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
+            ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonLeft / \ButtonRight}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{\ButtonRCRew / \ButtonRCFF}%
+            }
+            & Slide previous / next, respectively \\
+            %
+            \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
+            ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {Long \ButtonLeft / Long \ButtonRight}
+            \opt{HAVEREMOTEKEYMAP}{& }
+            & Slide first / last, respectively \\
+            %
+            \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
+              {\ButtonDown}
+            \opt{IRIVER_H10_PAD}{\ButtonPower}
+            \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu}
+            \opt{HAVEREMOTEKEYMAP}{& }
+            & Blank screen \\
+            %
+            \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
+              {Long \ButtonDown}
+            \opt{HAVEREMOTEKEYMAP}{& }
+            & White screen \\
+            %
+            \opt{SANSA_E200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonScrollBack / \ButtonScrollFwd}
+            \opt{GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
+              {\ButtonVolUp / \ButtonVolDown}
+            \opt{IRIVER_H10_PAD}{\ButtonScrollUp / \ButtonScrollDown}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp / \ButtonRCVolDown}%
+            }
+            & Previous / next link in slide, respectively \\
+            %
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
+                ,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonSelect}
+            \opt{GIGABEAT_S_PAD}{\ButtonSelect; \ButtonBack}
+            \opt{IRIVER_H10_PAD}{\ButtonFF}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{Long \ButtonRCFF}%
+            }
+            & Perform a 'mouse click' over a link \\
+            %
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
+                ,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {Long \ButtonSelect}
+            \opt{GIGABEAT_S_PAD}{Long \ButtonSelect; Long \ButtonBack}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{Long \ButtonRCRew}%
+            }
+            & Perform a 'mouse over' over a link \\
+          \end{btnmap}
+        \end{table}
+
+      \item [Browser: ]This mode lets you control a web browser (e.g. Firefox).
+        It uses the \dap{}'s keys to navigate through the web page and
+        different tabs, navigate through history, and to control zoom.
+        \begin{table}
+          \begin{btnmap}{}{}
+            \opt{SANSA_E200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonScrollBack / \ButtonScrollFwd}
+            \opt{GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
+              {\ButtonVolUp / \ButtonVolDown}
+            \opt{IRIVER_H10_PAD}{\ButtonScrollUp / \ButtonScrollDown}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp / \ButtonRCVolDown}%
+            }
+            & Scroll up / down, respectively \\
+            %
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
+              {\ButtonUp / \ButtonDown}
+            \opt{GIGABEAT_S_PAD}{\ButtonPlay / \ButtonDown}
+            \opt{IRIVER_H10_PAD}{\ButtonPlay / \ButtonPower}
+            \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonPlay / \ButtonMenu}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{\ButtonRCPlay / Long \ButtonRCDsp}%
+            }
+            & Scroll page up / down, respectively \\
+            %
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
+              {Long \ButtonUp / Long \ButtonDown}
+            \opt{GIGABEAT_S_PAD}{Long \ButtonPlay / Long \ButtonPower}
+            \opt{HAVEREMOTEKEYMAP}{& }
+            & Zoom in / out, respectively \\
+            %
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
+              {Long \ButtonSelect}
+            \opt{GIGABEAT_S_PAD}{Long \ButtonSelect; Long \ButtonBack}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{Long \ButtonRCRew}%
+            }
+            & Zoom reset \\
+            %
+            \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
+                ,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonLeft / \ButtonRight}
+            \opt{IRIVER_H10_PAD}{\ButtonRew / \ButtonFF}
+            \opt{HAVEREMOTEKEYMAP}{& }
+            & Tab previous / next, respectively \\
+            %
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD}{Long \ButtonPower}
+            \opt{GIGABEAT_S_PAD}{Long \ButtonMenu}
+            \opt{SANSA_CLIP_PAD}{Long \ButtonHome}
+            \opt{HAVEREMOTEKEYMAP}{& }
+            & Tab close \\
+            %
+            \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
+            ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {Long \ButtonLeft / Long \ButtonRight}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{\ButtonRCRew / \ButtonRCFF}%
+            }
+            & History back / forward \\
+            %
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
+                ,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonSelect}
+            \opt{GIGABEAT_S_PAD}{Long \ButtonSelect; Long \ButtonBack}
+            \opt{IRIVER_H10_PAD}{\ButtonFF}
+            \opt{HAVEREMOTEKEYMAP}{
+              &
+              \opt{GIGABEAT_RC_PAD}{Long \ButtonRCRew}%
+            }
+            & View full screen toggle \\
+          \end{btnmap}
+        \end{table}
+
+      \item [Mouse: ]This mode emulates a mouse. Features supported: Mouse
+        movement; left and right button clicking; and dragging and dropping.
+        \begin{table}
+          \begin{btnmap}{}{}
+            \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
+              {\ButtonUp / \ButtonDown / \ButtonLeft / \ButtonRight}
+            \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonMenu / \ButtonPlay / \ButtonLeft / \ButtonRight}
+            \opt{HAVEREMOTEKEYMAP}{& }
+            & Move cursor up / down / left / right, respectively \\
+            %
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
+                ,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonSelect}
+            \opt{GIGABEAT_S_PAD}{\ButtonSelect; \ButtonBack}
+            \opt{HAVEREMOTEKEYMAP}{& }
+            & Left mouse button click \\
+            %
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
+            \opt{GIGABEAT_S_PAD}{\ButtonMenu}
+            \opt{SANSA_CLIP_PAD}{\ButtonHome}
+            \opt{HAVEREMOTEKEYMAP}{& }
+            & Right mouse button click \\
+            %
+            \opt{SANSA_E200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+              {\ButtonScrollBack / \ButtonScrollFwd}
+            \opt{GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
+              {\ButtonVolUp / \ButtonVolDown}
+            \opt{HAVEREMOTEKEYMAP}{& }
+            & Mouse wheel scroll up / down, respectively \\
+          \end{btnmap}
+        \end{table}
+    \end{description}
+}

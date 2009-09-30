@@ -252,6 +252,9 @@ MENUITEM_SETTING(serial_bitrate, &global_settings.serial_bitrate, NULL);
 MENUITEM_SETTING(accessory_supply, &global_settings.accessory_supply, NULL);
 #endif
 MENUITEM_SETTING(start_screen, &global_settings.start_in_screen, NULL);
+#ifdef USB_ENABLE_HID
+MENUITEM_SETTING(usb_keypad_mode, &global_settings.usb_keypad_mode, NULL);
+#endif
 
 #ifdef HAVE_BUTTON_LIGHT
 MENUITEM_SETTING(buttonlight_timeout, &global_settings.buttonlight_timeout, NULL);
@@ -299,6 +302,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
             &touchpad_sensitivity,
+#endif
+#ifdef USB_ENABLE_HID
+            &usb_keypad_mode,
 #endif
          );
 

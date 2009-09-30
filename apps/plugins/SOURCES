@@ -169,6 +169,6 @@ md5sum.c
 lua.c
 #endif
 
-#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
+#ifdef USB_ENABLE_HID
 remote_control.c
 #endif

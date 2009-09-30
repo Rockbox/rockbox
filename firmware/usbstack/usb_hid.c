@@ -28,11 +28,6 @@
 //#define LOGF_ENABLE
 #include "logf.h"
 
-#define CONCAT(low, high)               ((high << 8) | low)
-#define PACK_VAL1(dest, val)            *(dest)++ = (val) & 0xff
-#define PACK_VAL2(dest, val)            PACK_VAL1((dest), (val)); \
-                                        PACK_VAL1((dest), (val >> 8))
-
 /* Documents avaiable here: http://www.usb.org/developers/devclass_docs/ */
 
 #define HID_VER                         0x0110 /* 1.1 */
@@ -47,6 +42,7 @@
 #define INPUT                           0x80
 #define OUTPUT                          0x90
 #define COLLECTION                      0xA0
+#define COLLECTION_PHYSICAL             0x00
 #define COLLECTION_APPLICATION          0x01
 #define END_COLLECTION                  0xC0
 /* Parts (HID1_11.pdf, page 40) */
@@ -90,24 +86,30 @@
 
 #define HID_BUF_SIZE_MSG                16
 #define HID_BUF_SIZE_CMD                16
-#define HID_BUF_SIZE_REPORT             96
+#define HID_BUF_SIZE_REPORT             160
 #define HID_NUM_BUFFERS                 5
 #define SET_REPORT_BUF_LEN 2
 
+//#ifdef LOGF_ENABLE
 #ifdef LOGF_ENABLE
+
 #define BUF_DUMP_BUF_LEN       HID_BUF_SIZE_REPORT
 #define BUF_DUMP_PREFIX_SIZE   5
-#define BUF_DUMP_LINE_SIZE     (MAX_LOGF_ENTRY - BUF_DUMP_PREFIX_SIZE)
-#define BUF_DUMP_ITEMS_IN_LINE (BUF_DUMP_LINE_SIZE / 3)
-#define BUF_DUMP_NUM_LINES     (BUF_DUMP_BUF_LEN / (BUF_DUMP_LINE_SIZE / 3))
+#define BUF_DUMP_ITEMS_IN_LINE 8
+#define BUF_DUMP_LINE_SIZE     (BUF_DUMP_ITEMS_IN_LINE * 3)
+#define BUF_DUMP_NUM_LINES     (BUF_DUMP_BUF_LEN / BUF_DUMP_ITEMS_IN_LINE)
 #endif
 
 #define HID_BUF_INC(i) do { (i) = ((i) + 1) % HID_NUM_BUFFERS; } while (0)
+#define PACK_VAL(dest, val) *(dest)++ = (val) & 0xff
 
 typedef enum
 {
     REPORT_ID_KEYBOARD = 1,
     REPORT_ID_CONSUMER,
+#ifdef HAVE_USB_HID_MOUSE
+    REPORT_ID_MOUSE,
+#endif
     REPORT_ID_COUNT,
 } report_id_t;
 
@@ -164,6 +166,7 @@ typedef struct
     /* Write the id into the buffer in the appropriate location, and returns the
      * buffer length */
     uint8_t (*buf_set)(unsigned char *buf, int id);
+    bool is_key_released;
 } usb_hid_report_t;
 
 usb_hid_report_t usb_hid_reports[REPORT_ID_COUNT];
@@ -183,7 +186,7 @@ static int usb_interface;
 
 static void usb_hid_try_send_drv(void);
 
-static void pack_parameter(unsigned char **dest, bool is_signed,
+static void pack_parameter(unsigned char **dest, bool is_signed, bool mark_size,
         uint8_t parameter, uint32_t value)
 {
     uint8_t size_value = 1; /* # of bytes */
@@ -216,7 +219,7 @@ static void pack_parameter(unsigned char **dest, bool is_signed,
             size_value++;
     }
 
-    **dest = parameter | size_value;
+    **dest = parameter | (mark_size ? size_value : 0);
     (*dest)++;
 
     while (size_value--)
@@ -244,11 +247,10 @@ int usb_hid_set_first_interface(int interface)
 }
 
 #ifdef LOGF_ENABLE
-static unsigned char
-    buf_dump_ar[BUF_DUMP_NUM_LINES][BUF_DUMP_LINE_SIZE + 1]
+static unsigned char buf_dump_ar[BUF_DUMP_NUM_LINES][BUF_DUMP_LINE_SIZE + 1]
     USB_DEVBSS_ATTR __attribute__((aligned(32)));
 
-void buf_dump(unsigned char *buf, size_t size)
+void buf_dump(unsigned char *buf, size_t size, char *msg)
 {
     size_t i;
     int line;
@@ -269,7 +271,7 @@ void buf_dump(unsigned char *buf, size_t size)
         *b = 0;
 
         /* Prefix must be of len BUF_DUMP_PREFIX_SIZE */
-        logf("%03d: %s", i0, buf_dump_ar[line]);
+        logf("%03d: %s %s", i0, buf_dump_ar[line], msg);
     }
 }
 #else
@@ -277,25 +279,177 @@ void buf_dump(unsigned char *buf, size_t size)
 #define buf_dump(...)
 #endif
 
+#define BUF_LEN_KEYBOARD 7
 static uint8_t buf_set_keyboard(unsigned char *buf, int id)
 {
-    memset(buf, 0, 7);
+    memset(buf, 0, BUF_LEN_KEYBOARD);
+    int key, i = 1;
 
-    if (HID_KEYBOARD_LEFT_CONTROL <= id && id <= HID_KEYBOARD_RIGHT_GUI)
-        buf[0] = (1 << (id - HID_KEYBOARD_LEFT_CONTROL));
-    else
-        buf[1] = (uint8_t)id;
+    /* Each key is a word in id (up to 4 keys supported) */
+    while ((key = id & 0xff))
+    {
+        /* Each modifier key is a bit in the first byte */
+        if (HID_KEYBOARD_LEFT_CONTROL <= key && key <= HID_KEYBOARD_RIGHT_GUI)
+            buf[0] |= (1 << (key - HID_KEYBOARD_LEFT_CONTROL));
+        else /* Any other key should be set in a separate byte */
+            buf[i++] = (uint8_t)key;
 
-    return 7;
+        id >>= 8;
+    }
+
+    return BUF_LEN_KEYBOARD;
 }
 
+#define BUF_LEN_CONSUMER 4
 static uint8_t buf_set_consumer(unsigned char *buf, int id)
 {
-    memset(buf, 0, 4);
+    memset(buf, 0, BUF_LEN_CONSUMER);
     buf[0] = (uint8_t)id;
 
-    return 4;
+    return BUF_LEN_CONSUMER;
 }
+
+#ifdef HAVE_USB_HID_MOUSE
+#define MOUSE_WHEEL_STEP       1
+#define MOUSE_STEP             8
+#define MOUSE_BUTTON_LEFT    0x1
+#define MOUSE_BUTTON_RIGHT   0x2
+//#define MOUSE_BUTTON_MIDDLE  0x4
+#define MOUSE_BUTTON           0
+#define MOUSE_X                1
+#define MOUSE_Y                2
+#define MOUSE_WHEEL            3
+#define BUF_LEN_MOUSE          4
+#define MOUSE_ACCEL_FACTOR(count) ((count) / 2)
+#define MOUSE_DO(item, step) (buf[(item)] = ((uint8_t)(step)))
+
+static uint8_t buf_set_mouse(unsigned char *buf, int id)
+{
+    static int count = 0;
+    int step = MOUSE_STEP;
+
+    memset(buf, 0, BUF_LEN_MOUSE);
+
+    /* Set proper button */
+    switch (id)
+    {
+        case HID_MOUSE_BUTTON_LEFT:
+        case HID_MOUSE_LDRAG_UP:
+        case HID_MOUSE_LDRAG_UP_REP:
+        case HID_MOUSE_LDRAG_DOWN:
+        case HID_MOUSE_LDRAG_DOWN_REP:
+        case HID_MOUSE_LDRAG_LEFT:
+        case HID_MOUSE_LDRAG_LEFT_REP:
+        case HID_MOUSE_LDRAG_RIGHT:
+        case HID_MOUSE_LDRAG_RIGHT_REP:
+            MOUSE_DO(MOUSE_BUTTON, MOUSE_BUTTON_LEFT);
+            break;
+        case HID_MOUSE_BUTTON_RIGHT:
+        case HID_MOUSE_RDRAG_UP:
+        case HID_MOUSE_RDRAG_UP_REP:
+        case HID_MOUSE_RDRAG_DOWN:
+        case HID_MOUSE_RDRAG_DOWN_REP:
+        case HID_MOUSE_RDRAG_LEFT:
+        case HID_MOUSE_RDRAG_LEFT_REP:
+        case HID_MOUSE_RDRAG_RIGHT:
+        case HID_MOUSE_RDRAG_RIGHT_REP:
+            MOUSE_DO(MOUSE_BUTTON, MOUSE_BUTTON_RIGHT);
+            break;
+        case HID_MOUSE_BUTTON_LEFT_REL:
+        case HID_MOUSE_BUTTON_RIGHT_REL:
+            /* Keep buf empty, to mark mouse button release */
+            break;
+        default:
+            break;
+    }
+
+    /* Handle mouse accelarated movement */
+    switch (id)
+    {
+        case HID_MOUSE_UP:
+        case HID_MOUSE_DOWN:
+        case HID_MOUSE_LEFT:
+        case HID_MOUSE_RIGHT:
+        case HID_MOUSE_LDRAG_UP:
+        case HID_MOUSE_LDRAG_DOWN:
+        case HID_MOUSE_LDRAG_LEFT:
+        case HID_MOUSE_LDRAG_RIGHT:
+        case HID_MOUSE_RDRAG_UP:
+        case HID_MOUSE_RDRAG_DOWN:
+        case HID_MOUSE_RDRAG_LEFT:
+        case HID_MOUSE_RDRAG_RIGHT:
+            count = 0;
+            break;
+        case HID_MOUSE_UP_REP:
+        case HID_MOUSE_DOWN_REP:
+        case HID_MOUSE_LEFT_REP:
+        case HID_MOUSE_RIGHT_REP:
+        case HID_MOUSE_LDRAG_UP_REP:
+        case HID_MOUSE_LDRAG_DOWN_REP:
+        case HID_MOUSE_LDRAG_LEFT_REP:
+        case HID_MOUSE_LDRAG_RIGHT_REP:
+        case HID_MOUSE_RDRAG_UP_REP:
+        case HID_MOUSE_RDRAG_DOWN_REP:
+        case HID_MOUSE_RDRAG_LEFT_REP:
+        case HID_MOUSE_RDRAG_RIGHT_REP:
+            count++;
+            /* TODO: Find a better mouse accellaration algorithm */
+            step *= 1 + MOUSE_ACCEL_FACTOR(count);
+            if (step > 255)
+                step = 255;
+            break;
+        default:
+            break;
+    }
+
+    /* Move/scroll mouse */
+    switch (id)
+    {
+        case HID_MOUSE_UP:
+        case HID_MOUSE_UP_REP:
+        case HID_MOUSE_LDRAG_UP:
+        case HID_MOUSE_LDRAG_UP_REP:
+        case HID_MOUSE_RDRAG_UP:
+        case HID_MOUSE_RDRAG_UP_REP:
+            MOUSE_DO(MOUSE_Y, -step);
+            break;
+        case HID_MOUSE_DOWN:
+        case HID_MOUSE_DOWN_REP:
+        case HID_MOUSE_LDRAG_DOWN:
+        case HID_MOUSE_LDRAG_DOWN_REP:
+        case HID_MOUSE_RDRAG_DOWN:
+        case HID_MOUSE_RDRAG_DOWN_REP:
+            MOUSE_DO(MOUSE_Y, step);
+            break;
+        case HID_MOUSE_LEFT:
+        case HID_MOUSE_LEFT_REP:
+        case HID_MOUSE_LDRAG_LEFT:
+        case HID_MOUSE_LDRAG_LEFT_REP:
+        case HID_MOUSE_RDRAG_LEFT:
+        case HID_MOUSE_RDRAG_LEFT_REP:
+            MOUSE_DO(MOUSE_X, -step);
+            break;
+        case HID_MOUSE_RIGHT:
+        case HID_MOUSE_RIGHT_REP:
+        case HID_MOUSE_LDRAG_RIGHT:
+        case HID_MOUSE_LDRAG_RIGHT_REP:
+        case HID_MOUSE_RDRAG_RIGHT:
+        case HID_MOUSE_RDRAG_RIGHT_REP:
+            MOUSE_DO(MOUSE_X, step);
+            break;
+        case HID_MOUSE_SCROLL_UP:
+            MOUSE_DO(MOUSE_WHEEL, MOUSE_WHEEL_STEP);
+            break;
+        case HID_MOUSE_SCROLL_DOWN:
+            MOUSE_DO(MOUSE_WHEEL, -MOUSE_WHEEL_STEP);
+            break;
+        default:
+            break;
+    }
+
+    return BUF_LEN_MOUSE;
+}
+#endif /* HAVE_USB_HID_MOUSE */
 
 static size_t descriptor_report_get(unsigned char *dest)
 {
@@ -306,59 +460,97 @@ static size_t descriptor_report_get(unsigned char *dest)
     usb_hid_report = &usb_hid_reports[REPORT_ID_KEYBOARD];
     usb_hid_report->usage_page = HID_USAGE_PAGE_KEYBOARD_KEYPAD;
     usb_hid_report->buf_set = buf_set_keyboard;
+    usb_hid_report->is_key_released = 1;
 
-    pack_parameter(&report, 0, USAGE_PAGE,
+    pack_parameter(&report, 0, 1, USAGE_PAGE,
             HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS);
-    PACK_VAL2(report, CONCAT(CONSUMER_USAGE, HID_GENERIC_DESKTOP_KEYBOARD));
-    pack_parameter(&report, 0, COLLECTION, COLLECTION_APPLICATION);
-    pack_parameter(&report, 0, REPORT_ID, REPORT_ID_KEYBOARD);
-    pack_parameter(&report, 0, USAGE_PAGE, HID_GENERIC_DESKTOP_KEYPAD);
-    pack_parameter(&report, 0, USAGE_MINIMUM, HID_KEYBOARD_LEFT_CONTROL);
-    pack_parameter(&report, 0, USAGE_MAXIMUM, HID_KEYBOARD_RIGHT_GUI);
-    pack_parameter(&report, 1, LOGICAL_MINIMUM, 0);
-    pack_parameter(&report, 1, LOGICAL_MAXIMUM, 1);
-    pack_parameter(&report, 0, REPORT_SIZE, 1);
-    pack_parameter(&report, 0, REPORT_COUNT, 8);
-    pack_parameter(&report, 0, INPUT, MAIN_ITEM_VARIABLE);
-    pack_parameter(&report, 0, REPORT_SIZE, 1);
-    pack_parameter(&report, 0, REPORT_COUNT, 5);
-    pack_parameter(&report, 0, USAGE_PAGE, HID_USAGE_PAGE_LEDS);
-    pack_parameter(&report, 0, USAGE_MINIMUM, HID_LED_NUM_LOCK);
-    pack_parameter(&report, 0, USAGE_MAXIMUM, HID_LED_KANA);
-    pack_parameter(&report, 0, OUTPUT, MAIN_ITEM_VARIABLE);
-    pack_parameter(&report, 0, REPORT_SIZE, 3);
-    pack_parameter(&report, 0, REPORT_COUNT, 1);
-    pack_parameter(&report, 0, OUTPUT, MAIN_ITEM_CONSTANT);
-    pack_parameter(&report, 0, REPORT_SIZE, 8);
-    pack_parameter(&report, 0, REPORT_COUNT, 6);
-    pack_parameter(&report, 1, LOGICAL_MINIMUM, 0);
-    pack_parameter(&report, 1, LOGICAL_MAXIMUM, HID_KEYBOARD_EX_SEL);
-    pack_parameter(&report, 0, USAGE_PAGE, HID_USAGE_PAGE_KEYBOARD_KEYPAD);
-    pack_parameter(&report, 0, USAGE_MINIMUM, 0);
-    pack_parameter(&report, 0, USAGE_MAXIMUM, HID_KEYBOARD_EX_SEL);
-    pack_parameter(&report, 0, INPUT, 0);
-    PACK_VAL1(report, END_COLLECTION);
+    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DESKTOP_KEYBOARD);
+    pack_parameter(&report, 0, 1, COLLECTION, COLLECTION_APPLICATION);
+    pack_parameter(&report, 0, 1, REPORT_ID, REPORT_ID_KEYBOARD);
+    pack_parameter(&report, 0, 1, USAGE_PAGE, HID_GENERIC_DESKTOP_KEYPAD);
+    pack_parameter(&report, 0, 1, USAGE_MINIMUM, HID_KEYBOARD_LEFT_CONTROL);
+    pack_parameter(&report, 0, 1, USAGE_MAXIMUM, HID_KEYBOARD_RIGHT_GUI);
+    pack_parameter(&report, 1, 1, LOGICAL_MINIMUM, 0);
+    pack_parameter(&report, 1, 1, LOGICAL_MAXIMUM, 1);
+    pack_parameter(&report, 0, 1, REPORT_SIZE, 1);
+    pack_parameter(&report, 0, 1, REPORT_COUNT, 8);
+    pack_parameter(&report, 0, 1, INPUT, MAIN_ITEM_VARIABLE);
+    pack_parameter(&report, 0, 1, REPORT_SIZE, 1);
+    pack_parameter(&report, 0, 1, REPORT_COUNT, 5);
+    pack_parameter(&report, 0, 1, USAGE_PAGE, HID_USAGE_PAGE_LEDS);
+    pack_parameter(&report, 0, 1, USAGE_MINIMUM, HID_LED_NUM_LOCK);
+    pack_parameter(&report, 0, 1, USAGE_MAXIMUM, HID_LED_KANA);
+    pack_parameter(&report, 0, 1, OUTPUT, MAIN_ITEM_VARIABLE);
+    pack_parameter(&report, 0, 1, REPORT_SIZE, 3);
+    pack_parameter(&report, 0, 1, REPORT_COUNT, 1);
+    pack_parameter(&report, 0, 1, OUTPUT, MAIN_ITEM_CONSTANT);
+    pack_parameter(&report, 0, 1, REPORT_SIZE, 8);
+    pack_parameter(&report, 0, 1, REPORT_COUNT, 6);
+    pack_parameter(&report, 1, 1, LOGICAL_MINIMUM, 0);
+    pack_parameter(&report, 1, 1, LOGICAL_MAXIMUM, HID_KEYBOARD_EX_SEL);
+    pack_parameter(&report, 0, 1, USAGE_PAGE, HID_USAGE_PAGE_KEYBOARD_KEYPAD);
+    pack_parameter(&report, 0, 1, USAGE_MINIMUM, 0);
+    pack_parameter(&report, 0, 1, USAGE_MAXIMUM, HID_KEYBOARD_EX_SEL);
+    pack_parameter(&report, 0, 1, INPUT, 0);
+    PACK_VAL(report, END_COLLECTION);
 
     /* Consumer usage controls - play/pause, stop, etc. */
     usb_hid_report = &usb_hid_reports[REPORT_ID_CONSUMER];
     usb_hid_report->usage_page = HID_USAGE_PAGE_CONSUMER;
     usb_hid_report->buf_set = buf_set_consumer;
+    usb_hid_report->is_key_released = 1;
 
-    pack_parameter(&report, 0, USAGE_PAGE, HID_USAGE_PAGE_CONSUMER);
-    PACK_VAL2(report, CONCAT(CONSUMER_USAGE,
-                HID_CONSUMER_USAGE_CONSUMER_CONTROL));
-    pack_parameter(&report, 0, COLLECTION, COLLECTION_APPLICATION);
-    pack_parameter(&report, 0, REPORT_ID, REPORT_ID_CONSUMER);
-    pack_parameter(&report, 0, REPORT_SIZE, 16);
-    pack_parameter(&report, 0, REPORT_COUNT, 2);
-    pack_parameter(&report, 1, LOGICAL_MINIMUM, 1);
-    pack_parameter(&report, 1, LOGICAL_MAXIMUM, 652);
-    pack_parameter(&report, 0, USAGE_MINIMUM,
+    pack_parameter(&report, 0, 1, USAGE_PAGE, HID_USAGE_PAGE_CONSUMER);
+    pack_parameter(&report, 0, 0, CONSUMER_USAGE,
             HID_CONSUMER_USAGE_CONSUMER_CONTROL);
-    pack_parameter(&report, 0, USAGE_MAXIMUM, HID_CONSUMER_USAGE_AC_SEND);
-    pack_parameter(&report, 0, INPUT, MAIN_ITEM_NO_PREFERRED |
+    pack_parameter(&report, 0, 1, COLLECTION, COLLECTION_APPLICATION);
+    pack_parameter(&report, 0, 1, REPORT_ID, REPORT_ID_CONSUMER);
+    pack_parameter(&report, 0, 1, REPORT_SIZE, 16);
+    pack_parameter(&report, 0, 1, REPORT_COUNT, 2);
+    pack_parameter(&report, 1, 1, LOGICAL_MINIMUM, 1);
+    pack_parameter(&report, 1, 1, LOGICAL_MAXIMUM, 652);
+    pack_parameter(&report, 0, 1, USAGE_MINIMUM,
+            HID_CONSUMER_USAGE_CONSUMER_CONTROL);
+    pack_parameter(&report, 0, 1, USAGE_MAXIMUM, HID_CONSUMER_USAGE_AC_SEND);
+    pack_parameter(&report, 0, 1, INPUT, MAIN_ITEM_NO_PREFERRED |
             MAIN_ITEM_NULL_STATE);
-    PACK_VAL1(report, END_COLLECTION);
+    PACK_VAL(report, END_COLLECTION);
+
+#ifdef HAVE_USB_HID_MOUSE
+    /* Mouse control */
+    usb_hid_report = &usb_hid_reports[REPORT_ID_MOUSE];
+    usb_hid_report->usage_page = HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS;
+    usb_hid_report->buf_set = buf_set_mouse;
+    usb_hid_report->is_key_released = 0;
+
+    pack_parameter(&report, 0, 1, USAGE_PAGE,
+            HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS);
+    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DESKTOP_MOUSE);
+    pack_parameter(&report, 0, 1, COLLECTION, COLLECTION_APPLICATION);
+    pack_parameter(&report, 0, 1, REPORT_ID, REPORT_ID_MOUSE);
+    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DESKTOP_POINTER);
+    pack_parameter(&report, 0, 1, COLLECTION, COLLECTION_PHYSICAL);
+    pack_parameter(&report, 0, 1, USAGE_PAGE, HID_USAGE_PAGE_BUTTON);
+    pack_parameter(&report, 0, 1, USAGE_MINIMUM, 1);
+    pack_parameter(&report, 0, 1, USAGE_MAXIMUM, 8);
+    pack_parameter(&report, 1, 1, LOGICAL_MINIMUM, 0);
+    pack_parameter(&report, 1, 1, LOGICAL_MAXIMUM, 1);
+    pack_parameter(&report, 0, 1, REPORT_SIZE, 1);
+    pack_parameter(&report, 0, 1, REPORT_COUNT, 8);
+    pack_parameter(&report, 0, 1, INPUT, MAIN_ITEM_VARIABLE);
+    pack_parameter(&report, 0, 1, USAGE_PAGE,
+            HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS);
+    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DESKTOP_X);
+    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DESKTOP_Y);
+    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DESKTOP_WHEEL);
+    pack_parameter(&report, 0, 1, LOGICAL_MINIMUM, -127 & 0xFF);
+    pack_parameter(&report, 0, 1, LOGICAL_MAXIMUM, 127);
+    pack_parameter(&report, 0, 1, REPORT_SIZE, 8);
+    pack_parameter(&report, 0, 1, REPORT_COUNT, 3);
+    pack_parameter(&report, 0, 1, INPUT, MAIN_ITEM_VARIABLE | MAIN_ITEM_RELATIVE);
+    PACK_VAL(report, END_COLLECTION);
+    PACK_VAL(report, END_COLLECTION);
+#endif /* HAVE_USB_HID_MOUSE */
 
     return (size_t)((uint32_t)report - (uint32_t)dest);
 }
@@ -367,6 +559,9 @@ static void descriptor_hid_get(unsigned char **dest)
 {
     hid_descriptor.wDescriptorLength0 =
         (uint16_t)descriptor_report_get(report_descriptor);
+
+    logf("hid: desc len %u", hid_descriptor.wDescriptorLength0);
+    buf_dump(report_descriptor, hid_descriptor.wDescriptorLength0, "desc");
 
     PACK_DATA(*dest, hid_descriptor);
 }
@@ -457,8 +652,8 @@ void usb_hid_transfer_complete(int ep, int dir, int status, int length)
  * to the DAP using the host's custom driver */
 static int usb_hid_set_report(struct usb_ctrlrequest *req)
 {
-    static unsigned char buf[SET_REPORT_BUF_LEN]
-        USB_DEVBSS_ATTR __attribute__((aligned(32)));
+    static unsigned char buf[SET_REPORT_BUF_LEN] USB_DEVBSS_ATTR
+        __attribute__((aligned(32)));
     int length;
     int rc = 0;
 
@@ -645,16 +840,22 @@ void usb_hid_send(usage_page_t usage_page, int id)
     length = report->buf_set(&buf[1], id) + 1;
     logf("length %u", length);
 
+    if (!length)
+        return;
+
     /* Key pressed */
-    buf_dump(buf, length);
+    buf_dump(buf, length, "key press");
     usb_hid_queue(buf, length);
 
-    /* Key released */
-    memset(buf, 0, length);
-    buf[0] = report_id;
+    if (report->is_key_released)
+    {
+        /* Key released */
+        memset(buf, 0, length);
+        buf[0] = report_id;
 
-    buf_dump(buf, length);
-    usb_hid_queue(buf, length);
+        buf_dump(buf, length, "key release");
+        usb_hid_queue(buf, length);
+    }
 
     usb_hid_try_send_drv();
 }

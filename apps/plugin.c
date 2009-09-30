@@ -51,7 +51,7 @@
 #include "bidi.h"
 #endif
 
-#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
+#ifdef USB_ENABLE_HID
 #include "usbstack/usb_hid.h"
 #endif
 
@@ -367,7 +367,7 @@ static const struct plugin_api rockbox_api = {
     queue_reply,
 #endif
     usb_acknowledge,
-#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
+#ifdef USB_ENABLE_HID
     usb_hid_send,
 #endif
 #ifdef RB_PROFILE

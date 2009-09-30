@@ -315,7 +315,7 @@ static const struct button_mapping remote_button_context_tree[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 };
 
-#ifdef HAVE_USBSTACK
+#ifdef USB_ENABLE_HID
 static const struct button_mapping button_context_usb_hid[] = {
     { ACTION_USB_HID_PLAY,     BUTTON_PLAY,                      BUTTON_NONE },
     { ACTION_USB_HID_STOP,     BUTTON_POWER,                     BUTTON_NONE },
@@ -357,7 +357,7 @@ static const struct button_mapping* get_context_mapping_remote( int context )
         case CONTEXT_MAINMENU:
         case CONTEXT_TREE:
             return remote_button_context_tree;
-#ifdef HAVE_USBSTACK
+#ifdef USB_ENABLE_HID
         case CONTEXT_USB_HID:
             return remote_button_context_usb_hid;
 #endif
@@ -411,7 +411,7 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_pitchscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
-#ifdef HAVE_USBSTACK
+#ifdef USB_ENABLE_HID
         case CONTEXT_USB_HID:
             return button_context_usb_hid;
 #endif

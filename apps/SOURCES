@@ -150,6 +150,9 @@ dsp_arm.S
 eq_arm.S
 #endif
 #endif
+#ifdef USB_ENABLE_HID
+usb_keymaps.c
+#endif
 metadata.c
 metadata/mp3.c
 #if CONFIG_CODEC == SWCODEC

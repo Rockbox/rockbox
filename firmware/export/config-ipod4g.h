@@ -183,6 +183,7 @@
 #define USE_ROCKBOX_USB
 #define USB_VENDOR_ID 0x05ac
 #define USB_PRODUCT_ID 0x1203
+#define HAVE_USB_HID_MOUSE
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL

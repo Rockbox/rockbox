@@ -701,5 +701,39 @@ typedef enum usage_page
 #define HID_CONSUMER_USAGE_AC_DISRIBUTE_HORIZONTALLY                      0x29B
 #define HID_CONSUMER_USAGE_AC_DISTRIBUTE_VERTICALLY                       0x29C
 
-#endif
+#ifdef HAVE_USB_HID_MOUSE
+/* Mouse defines (custom made - Rockbox specific) */
+#define HID_MOUSE_NONE                                                    0x00
+#define HID_MOUSE_UP                                                      0x01
+#define HID_MOUSE_UP_REP                                                  0x02
+#define HID_MOUSE_DOWN                                                    0x03
+#define HID_MOUSE_DOWN_REP                                                0x04
+#define HID_MOUSE_LEFT                                                    0x05
+#define HID_MOUSE_LEFT_REP                                                0x06
+#define HID_MOUSE_RIGHT                                                   0x07
+#define HID_MOUSE_RIGHT_REP                                               0x08
+#define HID_MOUSE_LDRAG_UP                                                0x09
+#define HID_MOUSE_LDRAG_UP_REP                                            0x0A
+#define HID_MOUSE_LDRAG_DOWN                                              0x0B
+#define HID_MOUSE_LDRAG_DOWN_REP                                          0x0C
+#define HID_MOUSE_LDRAG_LEFT                                              0x0D
+#define HID_MOUSE_LDRAG_LEFT_REP                                          0x0E
+#define HID_MOUSE_LDRAG_RIGHT                                             0x0F
+#define HID_MOUSE_LDRAG_RIGHT_REP                                         0x10
+#define HID_MOUSE_RDRAG_UP                                                0x11
+#define HID_MOUSE_RDRAG_UP_REP                                            0x12
+#define HID_MOUSE_RDRAG_DOWN                                              0x13
+#define HID_MOUSE_RDRAG_DOWN_REP                                          0x14
+#define HID_MOUSE_RDRAG_LEFT                                              0x15
+#define HID_MOUSE_RDRAG_LEFT_REP                                          0x16
+#define HID_MOUSE_RDRAG_RIGHT                                             0x17
+#define HID_MOUSE_RDRAG_RIGHT_REP                                         0x18
+#define HID_MOUSE_SCROLL_UP                                               0x19
+#define HID_MOUSE_SCROLL_DOWN                                             0x1A
+#define HID_MOUSE_BUTTON_LEFT                                             0x1B
+#define HID_MOUSE_BUTTON_LEFT_REL                                         0x1C
+#define HID_MOUSE_BUTTON_RIGHT                                            0x1D
+#define HID_MOUSE_BUTTON_RIGHT_REL                                        0x1E
+#endif /* HAVE_USB_HID_MOUSE */
 
+#endif

@@ -190,6 +190,7 @@
 #define USE_ROCKBOX_USB
 #define USB_VENDOR_ID 0x0781
 #define USB_PRODUCT_ID 0x7451
+#define HAVE_USB_HID_MOUSE
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ

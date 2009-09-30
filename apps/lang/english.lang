@@ -12654,6 +12654,76 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_USB_KEYPAD_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "USB Keypad Mode:"
+  </source>
+  <dest>
+    *: "USB Keypad Mode:"
+  </dest>
+  <voice>
+    *: "USB Keypad Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIMEDIA
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Multimedia"
+  </source>
+  <dest>
+    *: "Multimedia"
+  </dest>
+  <voice>
+    *: "Multimedia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESENTATION
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Presentation"
+  </source>
+  <dest>
+    *: "Presentation"
+  </dest>
+  <voice>
+    *: "Presentation"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Browser"
+  </source>
+  <dest>
+    *: "Browser"
+  </dest>
+  <voice>
+    *: "Browser"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOUSE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Mouse"
+  </source>
+  <dest>
+    *: "Mouse"
+  </dest>
+  <voice>
+    *: "Mouse"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SKIN_RAM_USAGE
   desc: how much RAM the skins are using
   user: core

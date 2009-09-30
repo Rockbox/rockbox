@@ -273,21 +273,62 @@ static const struct button_mapping button_context_bmark[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_bmark */
 
-#ifdef HAVE_USBSTACK
+#ifdef USB_ENABLE_HID
 static const struct button_mapping button_context_usb_hid[] = {
-    { ACTION_USB_HID_PLAY,     BUTTON_UP,                        BUTTON_NONE },
-    { ACTION_USB_HID_STOP,     BUTTON_POWER,                     BUTTON_NONE },
-    { ACTION_USB_HID_SKIPPREV, BUTTON_LEFT,                      BUTTON_NONE },
-    { ACTION_USB_HID_SKIPNEXT, BUTTON_RIGHT,                     BUTTON_NONE },
-    { ACTION_USB_HID_VOLUP,    BUTTON_VOL_UP,                    BUTTON_NONE },
-    { ACTION_USB_HID_VOLUP,    BUTTON_VOL_UP|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_USB_HID_VOLDOWN,  BUTTON_VOL_DOWN,                  BUTTON_NONE },
-    { ACTION_USB_HID_VOLDOWN,  BUTTON_VOL_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_USB_HID_MUTE,     BUTTON_SELECT,                    BUTTON_NONE },
-    { ACTION_USB_HID_MENU,     BUTTON_DOWN,                      BUTTON_NONE },
+    { ACTION_USB_HID_INC,         BUTTON_VOL_UP,                 BUTTON_NONE },
+    { ACTION_USB_HID_INC,         BUTTON_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_USB_HID_DEC,         BUTTON_VOL_DOWN,               BUTTON_NONE },
+    { ACTION_USB_HID_DEC,         BUTTON_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_USB_HID_START,       BUTTON_UP|BUTTON_REL,          BUTTON_UP },
+    { ACTION_USB_HID_START_LONG,  BUTTON_UP|BOTTOM_REPEAT,       BUTTON_UP },
+    { ACTION_USB_HID_QUIT,        BUTTON_HOME|BUTTON_REL,        BUTTON_HOME },
+    { ACTION_USB_HID_QUIT_LONG,   BUTTON_HOME|BUTTON_REPEAT,     BUTTON_HOME },
+    { ACTION_USB_HID_LEFT,        BUTTON_LEFT|BUTTON_REL,        BUTTON_LEFT },
+    { ACTION_USB_HID_LEFT_LONG,   BUTTON_LEFT|BUTTON_REPEAT,     BUTTON_LEFT },
+    { ACTION_USB_HID_RIGHT,       BUTTON_RIGHT|BUTTON_REL,       BUTTON_RIGHT },
+    { ACTION_USB_HID_RIGHT_LONG,  BUTTON_RIGHT|BUTTON_REPEAT,    BUTTON_RIGHT },
+    { ACTION_USB_HID_SELECT,      BUTTON_SELECT|BUTTON_REL,      BUTTON_SELECT },
+    { ACTION_USB_HID_SELECT_LONG, BUTTON_SELECT|BUTTON_REPEAT,   BUTTON_SELECT },
+    { ACTION_USB_HID_MENU,        BUTTON_DOWN|BUTTON_REL,        BUTTON_DOWN },
+    { ACTION_USB_HID_MENU_LONG,   BUTTON_DOWN|BUTTON_REPEAT,     BUTTON_DOWN },
+    { ACTION_USB_HID_MODE,        BUTTON_POWER|BUTTON_REL,       BUTTON_POWER },
+    { ACTION_USB_HID_MODE_LONG,   BUTTON_POWER|BUTTON_REPEAT,    BUTTON_POWER },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_usb_hid */
+
+static const struct button_mapping button_context_usb_hid_mouse[] = {
+    { ACTION_USB_HID_MOUSE_UP,               BUTTON_UP,                                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_UP_REP,           BUTTON_UP|BUTTON_REPEAT,                  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN,             BUTTON_DOWN,                              BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN_REP,         BUTTON_DOWN|BUTTON_REPEAT,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LEFT,             BUTTON_LEFT,                              BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LEFT_REP,         BUTTON_LEFT|BUTTON_REPEAT,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RIGHT,            BUTTON_RIGHT,                             BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RIGHT_REP,        BUTTON_RIGHT|BUTTON_REPEAT,               BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_UP,         BUTTON_SELECT|BUTTON_UP,                  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_UP_REP,     BUTTON_SELECT|BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_DOWN,       BUTTON_SELECT|BUTTON_DOWN,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_DOWN_REP,   BUTTON_SELECT|BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_LEFT,       BUTTON_SELECT|BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_LEFT_REP,   BUTTON_SELECT|BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_RIGHT,      BUTTON_SELECT|BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_RIGHT_REP,  BUTTON_SELECT|BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_UP,         BUTTON_HOME|BUTTON_UP,                    BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_UP_REP,     BUTTON_HOME|BUTTON_UP|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_DOWN,       BUTTON_HOME|BUTTON_DOWN,                  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_DOWN_REP,   BUTTON_HOME|BUTTON_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_LEFT,       BUTTON_HOME|BUTTON_LEFT,                  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_LEFT_REP,   BUTTON_HOME|BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_RIGHT,      BUTTON_HOME|BUTTON_RIGHT,                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_RIGHT_REP,  BUTTON_HOME|BUTTON_RIGHT|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_LEFT,      BUTTON_SELECT,                            BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_LEFT_REL,  BUTTON_SELECT|BUTTON_REL,                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_RIGHT,     BUTTON_HOME,                              BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_RIGHT_REL, BUTTON_HOME|BUTTON_REL,                   BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
+}; /* button_context_usb_hid_mouse */
 #endif
 
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */
@@ -337,9 +378,11 @@ const struct button_mapping* get_context_mapping(int context)
 #endif
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
-#ifdef HAVE_USBSTACK
+#ifdef USB_ENABLE_HID
         case CONTEXT_USB_HID:
             return button_context_usb_hid;
+        case CONTEXT_USB_HID_MOUSE:
+            return button_context_usb_hid_mouse;
 #endif
         default:
             return button_context_standard;

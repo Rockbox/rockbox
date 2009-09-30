@@ -187,6 +187,7 @@
 #define USB_PORTSCX_PHY_TYPE PORTSCX_PTS_ULPI
 #define USB_VENDOR_ID 0x0930
 #define USB_PRODUCT_ID 0x0010
+#define HAVE_USB_HID_MOUSE
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF

@@ -105,7 +105,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 
 #include "yesno.h"
 
-#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
+#ifdef USB_ENABLE_HID
 #include "usbstack/usb_hid_usage_tables.h"
 #endif
 
@@ -491,7 +491,7 @@ struct plugin_api {
 #endif /* CONFIG_CODEC == SWCODEC */
 
     void (*usb_acknowledge)(long id);
-#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
+#ifdef USB_ENABLE_HID
     void (*usb_hid_send)(usage_page_t usage_page, int id);
 #endif
 #ifdef RB_PROFILE

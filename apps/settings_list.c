@@ -1613,6 +1613,13 @@ const struct settings_list settings[] = {
 #endif
 #endif
 
+#ifdef USB_ENABLE_HID
+    CHOICE_SETTING(0, usb_keypad_mode, LANG_USB_KEYPAD_MODE, 0,
+            "usb keypad mode", "multimedia,presentation,browser,mouse",
+            NULL, 3, ID2P(LANG_MULTIMEDIA), ID2P(LANG_PRESENTATION),
+            ID2P(LANG_BROWSER), ID2P(LANG_MOUSE)),
+#endif
+
     /* Customizable list */
 #ifdef HAVE_LCD_BITMAP
     VIEWPORT_SETTING(ui_vp_config, "ui viewport"),

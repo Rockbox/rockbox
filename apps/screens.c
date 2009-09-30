@@ -37,7 +37,7 @@
 #if defined(HAVE_USBSTACK)
 #include "usb_core.h"
 #ifdef USB_ENABLE_HID
-#include "usbstack/usb_hid.h"
+#include "usb_keymaps.h"
 #endif
 #endif
 #include "settings.h"
@@ -93,59 +93,32 @@ static int clamp_value_wrap(int value, int max, int min)
 #endif
 
 #ifndef SIMULATOR
+
+#ifdef USB_ENABLE_HID
+int usb_keypad_mode;
+#endif
+
 static int handle_usb_events(void)
 {
 #if (CONFIG_STORAGE & STORAGE_MMC)
     int next_update=0;
 #endif /* STORAGE_MMC */
 
-#ifdef HAVE_TOUCHSCREEN
-    enum touchscreen_mode old_mode = touchscreen_get_mode();
-
-    /* TODO: Paint buttons on screens OR switch to point mode and use
-     * touchscreen as a touchpad to move the host's mouse cursor */
-    touchscreen_set_mode(TOUCHSCREEN_BUTTON);
-#endif
-
     /* Don't return until we get SYS_USB_DISCONNECTED or SYS_TIMEOUT */
     while(1)
     {
         int button;
-#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
-        bool hid_enabled = usb_core_driver_enabled(USB_DRIVER_HID);
-
-        if (hid_enabled)
+#ifdef USB_ENABLE_HID
+        if (usb_core_driver_enabled(USB_DRIVER_HID))
         {
-            int id = HID_CONSUMER_USAGE_UNASSIGNED;
-            button = get_action(CONTEXT_USB_HID, HZ/2);
+            button = get_hid_usb_action();
 
-            switch (button)
+            /* On mode change, we need to refresh the screen */
+            if (button == ACTION_USB_HID_MODE ||
+                    button == ACTION_USB_HID_MODE_LONG)
             {
-                case ACTION_USB_HID_PLAY:
-                    id = HID_CONSUMER_USAGE_PLAY_PAUSE;
-                    break;
-                case ACTION_USB_HID_STOP:
-                    id = HID_CONSUMER_USAGE_STOP;
-                    break;
-                case ACTION_USB_HID_SKIPPREV:
-                    id = HID_CONSUMER_USAGE_SCAN_PREVIOUS_TRACK;
-                    break;
-                case ACTION_USB_HID_SKIPNEXT:
-                    id = HID_CONSUMER_USAGE_SCAN_NEXT_TRACK;
-                    break;
-                case ACTION_USB_HID_VOLDOWN:
-                    id = HID_CONSUMER_USAGE_VOLUME_DECREMENT;
-                    break;
-                case ACTION_USB_HID_VOLUP:
-                    id = HID_CONSUMER_USAGE_VOLUME_INCREMENT;
-                    break;
-                case ACTION_USB_HID_MUTE:
-                    id = HID_CONSUMER_USAGE_MUTE;
-                    break;
+                break;
             }
-
-            if (id != HID_CONSUMER_USAGE_UNASSIGNED)
-                usb_hid_send(HID_USAGE_PAGE_CONSUMER, id);
         }
         else
 #endif
@@ -159,7 +132,7 @@ static int handle_usb_events(void)
         {
             case SYS_USB_DISCONNECTED:
                 usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
-                goto Exit;
+                return 1;
             case SYS_TIMEOUT:
                 break;
         }
@@ -174,14 +147,12 @@ static int handle_usb_events(void)
         }
 #endif /* STORAGE_MMC */
     }
-Exit:
-#ifdef HAVE_TOUCHSCREEN
-    touchscreen_set_mode(old_mode);
-#endif
+
     return 0;
 }
 #endif
 
+#define MODE_NAME_LEN 32
 void usb_screen(void)
 {
 #ifdef USB_NONE
@@ -190,55 +161,107 @@ void usb_screen(void)
     int i;
     int usb_bars = VP_SB_ALLSCREENS; /* force statusbars */
     int old_bars  = viewportmanager_get_statusbar();
+#if defined HAVE_TOUCHSCREEN
+    enum touchscreen_mode old_mode = touchscreen_get_mode();
 
-    FOR_NB_SCREENS(i)
-    {
-        screens[i].backdrop_show(BACKDROP_MAIN);
-        screens[i].backlight_on();
-        screens[i].clear_display();
-#ifdef HAVE_REMOTE_LCD
-        if (i == SCREEN_REMOTE)
-        {
-            screens[i].bitmap(remote_usblogo,
-                      (LCD_REMOTE_WIDTH-BMPWIDTH_remote_usblogo),
-                      (LCD_REMOTE_HEIGHT-BMPHEIGHT_remote_usblogo)/2,
-                      BMPWIDTH_remote_usblogo, BMPHEIGHT_remote_usblogo);
-        }
-        else 
+    /* TODO: Paint buttons on screens OR switch to point mode and use
+     * touchscreen as a touchpad to move the host's mouse cursor */
+    touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
-        {
-#ifdef HAVE_LCD_BITMAP
-            screens[i].transparent_bitmap(usblogo, 
-                        (LCD_WIDTH-BMPWIDTH_usblogo),
-                        (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
-                         BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
-#else
-            screens[i].double_height(false);
-            screens[i].puts_scroll(0, 0, "[USB Mode]");
-            status_set_param(false);
-            status_set_audio(false);
-            status_set_usb(true);
-#endif /* HAVE_LCD_BITMAP */
-        }
-        screens[i].update();
 
-        /* force statusbar by ignoring the setting */
-        usb_bars |= VP_SB_IGNORE_SETTING(i);
-    }
+#ifndef SIMULATOR
+    usb_acknowledge(SYS_USB_CONNECTED_ACK);
+#endif
 
-    viewportmanager_set_statusbar(usb_bars);
+#ifdef USB_ENABLE_HID
+    usb_keypad_mode = global_settings.usb_keypad_mode;
+#endif
 
-#ifdef SIMULATOR
     while (1)
     {
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].backdrop_show(BACKDROP_MAIN);
+            screens[i].backlight_on();
+            screens[i].clear_display();
+#ifdef HAVE_REMOTE_LCD
+            if (i == SCREEN_REMOTE)
+            {
+                screens[i].bitmap(remote_usblogo,
+                        (LCD_REMOTE_WIDTH-BMPWIDTH_remote_usblogo),
+                        (LCD_REMOTE_HEIGHT-BMPHEIGHT_remote_usblogo)/2,
+                        BMPWIDTH_remote_usblogo, BMPHEIGHT_remote_usblogo);
+            }
+            else
+#endif
+            {
+                char mode_name[MODE_NAME_LEN];
+
+#ifdef HAVE_LCD_BITMAP
+                screens[i].transparent_bitmap(usblogo,
+                        (LCD_WIDTH-BMPWIDTH_usblogo),
+                        (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
+                        BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
+
+#ifdef USB_ENABLE_HID
+                int y, w, h;
+
+                screens[i].getstringsize(str(LANG_USB_KEYPAD_MODE), &w, &h);
+
+                y = (LCD_HEIGHT - BMPHEIGHT_usblogo) / 2 + BMPHEIGHT_usblogo + h;
+                screens[i].putsxy((LCD_WIDTH - w) / 2, y,
+                        str(LANG_USB_KEYPAD_MODE));
+                y += 3 * h / 2;
+
+                snprintf(mode_name, MODE_NAME_LEN, "%s",
+                        str(keypad_mode_name_get()));
+                screens[i].getstringsize(mode_name, &w, &h);
+                screens[i].putsxy((LCD_WIDTH - w) / 2, y, mode_name);
+#endif /* HID */
+#else /* HAVE_LCD_BITMAP */
+                screens[i].double_height(false);
+#ifdef USB_ENABLE_HID
+                snprintf(mode_name, MODE_NAME_LEN, "[USB Mode; %s]",
+                        str(keypad_mode_name_get()));
+                screens[i].puts_scroll(0, 0, mode_name);
+#else
+                screens[i].puts_scroll(0, 0, "[USB Mode]");
+#endif
+                status_set_param(false);
+                status_set_audio(false);
+                status_set_usb(true);
+#endif /* HAVE_LCD_BITMAP */
+            }
+            screens[i].update();
+
+            /* force statusbar by ignoring the setting */
+            usb_bars |= VP_SB_IGNORE_SETTING(i);
+        }
+
+        viewportmanager_set_statusbar(usb_bars);
+
+#ifdef SIMULATOR
         if (button_get_w_tmo(HZ/2))
             break;
         send_event(GUI_EVENT_ACTIONUPDATE, NULL);
-    }
 #else
-    usb_acknowledge(SYS_USB_CONNECTED_ACK);
-    while (handle_usb_events());
+        if (handle_usb_events())
+            break;
 #endif /* SIMULATOR */
+    }
+
+#ifdef USB_ENABLE_HID
+    if (global_settings.usb_keypad_mode != usb_keypad_mode)
+    {
+        global_settings.usb_keypad_mode = usb_keypad_mode;
+        settings_save();
+    }
+#endif
+
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_set_mode(old_mode);
+#endif
+
 #ifdef HAVE_LCD_CHARCELLS
     status_set_usb(false);
 #endif /* HAVE_LCD_CHARCELLS */
@@ -248,7 +271,7 @@ void usb_screen(void)
     }
     viewportmanager_set_statusbar(old_bars);
     send_event(GUI_EVENT_REFRESH, NULL);
-    
+
 #endif /* USB_NONE */
 }
 

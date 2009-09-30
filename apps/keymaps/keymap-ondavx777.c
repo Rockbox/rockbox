@@ -110,7 +110,7 @@ static const struct button_mapping button_context_keyboard[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_keyboard */
 
-#ifdef HAVE_USBSTACK
+#ifdef USB_ENABLE_HID
 static const struct button_mapping button_context_usb_hid[] = {
     LAST_ITEM_IN_LIST
 }; /* button_context_usb_hid */
@@ -162,7 +162,7 @@ const struct button_mapping* target_get_context_mapping(int context)
             return button_context_pitchscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
-#ifdef HAVE_USBSTACK
+#ifdef USB_ENABLE_HID
         case CONTEXT_USB_HID:
             return button_context_usb_hid;
 #endif
