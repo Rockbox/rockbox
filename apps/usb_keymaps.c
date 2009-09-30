@@ -59,9 +59,9 @@ static const hid_key_mapping_t hid_key_mapping_multimedia = {
         { ACTION_USB_HID_INC,    HID_CONSUMER_USAGE_VOLUME_INCREMENT },
         /* Volume mute */
         { ACTION_USB_HID_SELECT, HID_CONSUMER_USAGE_MUTE },
-        /* Play / pause */
+        /* Playback play / pause */
         { ACTION_USB_HID_START,  HID_CONSUMER_USAGE_PLAY_PAUSE },
-        /* Stop */
+        /* Playback stop */
         { ACTION_USB_HID_QUIT,   HID_CONSUMER_USAGE_STOP },
         /* Scan previous track */
         { ACTION_USB_HID_LEFT,   HID_CONSUMER_USAGE_SCAN_PREVIOUS_TRACK },
@@ -85,19 +85,19 @@ static const hid_key_mapping_t hid_key_mapping_presentation = {
         { ACTION_USB_HID_RIGHT,       HID_KEYBOARD_N },
         /* Slide first */
         { ACTION_USB_HID_LEFT_LONG,   HID_KEYBOARD_HOME },
-        /* Slide Last */
+        /* Slide last */
         { ACTION_USB_HID_RIGHT_LONG,  HID_KEYBOARD_END },
-        /* Black screen */
+        /* Screen black */
         { ACTION_USB_HID_MENU,        HID_KEYBOARD_DOT },
-        /* White screen */
+        /* Screen white*/
         { ACTION_USB_HID_MENU_LONG,   HID_KEYBOARD_COMMA },
         /* Link previous */
         { ACTION_USB_HID_DEC,         SHIFT(HID_KEYBOARD_TAB) },
         /* Link next */
         { ACTION_USB_HID_INC,         HID_KEYBOARD_TAB },
-        /* 'Mouse click' */
+        /* Mouse click */
         { ACTION_USB_HID_SELECT,      HID_KEYBOARD_RETURN },
-        /* 'Mouse over' */
+        /* Mouse over */
         { ACTION_USB_HID_SELECT_LONG, SHIFT(HID_KEYBOARD_RETURN) },
         { 0,                          0 },
     }
@@ -131,7 +131,7 @@ static const hid_key_mapping_t hid_key_mapping_browser = {
         { ACTION_USB_HID_LEFT_LONG,   ALT(HID_KEYBOARD_LEFT_ARROW) },
         /* History forward */
         { ACTION_USB_HID_RIGHT_LONG,  ALT(HID_KEYBOARD_RIGHT_ARROW) },
-        /* Full-Screen */
+        /* View full-screen */
         { ACTION_USB_HID_SELECT,      HID_KEYBOARD_F11 },
         { 0,                          0 },
     }
@@ -142,37 +142,38 @@ static const hid_key_mapping_t hid_key_mapping_mouse = {
     LANG_MOUSE,
     HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS,
     {
-        /* Mouse up */
+        /* Cursor move up */
         { ACTION_USB_HID_MOUSE_UP,               HID_MOUSE_UP },
         { ACTION_USB_HID_MOUSE_UP_REP,           HID_MOUSE_UP_REP },
         { ACTION_USB_HID_MOUSE_LDRAG_UP,         HID_MOUSE_LDRAG_UP },
         { ACTION_USB_HID_MOUSE_LDRAG_UP_REP,     HID_MOUSE_LDRAG_UP_REP },
         { ACTION_USB_HID_MOUSE_RDRAG_UP,         HID_MOUSE_RDRAG_UP },
         { ACTION_USB_HID_MOUSE_RDRAG_UP_REP,     HID_MOUSE_RDRAG_UP_REP },
-        /* Mouse down */
+        /* Cursor move down */
         { ACTION_USB_HID_MOUSE_DOWN,             HID_MOUSE_DOWN },
         { ACTION_USB_HID_MOUSE_DOWN_REP,         HID_MOUSE_DOWN_REP },
         { ACTION_USB_HID_MOUSE_LDRAG_DOWN,       HID_MOUSE_LDRAG_DOWN },
         { ACTION_USB_HID_MOUSE_LDRAG_DOWN_REP,   HID_MOUSE_LDRAG_DOWN_REP },
         { ACTION_USB_HID_MOUSE_RDRAG_DOWN,       HID_MOUSE_RDRAG_DOWN },
         { ACTION_USB_HID_MOUSE_RDRAG_DOWN_REP,   HID_MOUSE_RDRAG_DOWN_REP },
-        /* Mouse left */
+        /* Cursor move left */
         { ACTION_USB_HID_MOUSE_LEFT,             HID_MOUSE_LEFT },
         { ACTION_USB_HID_MOUSE_LEFT_REP,         HID_MOUSE_LEFT_REP },
         { ACTION_USB_HID_MOUSE_LDRAG_LEFT,       HID_MOUSE_LDRAG_LEFT },
         { ACTION_USB_HID_MOUSE_LDRAG_LEFT_REP,   HID_MOUSE_LDRAG_LEFT_REP },
         { ACTION_USB_HID_MOUSE_RDRAG_LEFT,       HID_MOUSE_RDRAG_LEFT },
         { ACTION_USB_HID_MOUSE_RDRAG_LEFT_REP,   HID_MOUSE_RDRAG_LEFT_REP },
-        /* Mouse right */
+        /* Cursor move right */
         { ACTION_USB_HID_MOUSE_RIGHT,            HID_MOUSE_RIGHT },
         { ACTION_USB_HID_MOUSE_RIGHT_REP,        HID_MOUSE_RIGHT_REP },
         { ACTION_USB_HID_MOUSE_LDRAG_RIGHT,      HID_MOUSE_LDRAG_RIGHT },
         { ACTION_USB_HID_MOUSE_LDRAG_RIGHT_REP,  HID_MOUSE_LDRAG_RIGHT_REP },
         { ACTION_USB_HID_MOUSE_RDRAG_RIGHT,      HID_MOUSE_RDRAG_RIGHT },
         { ACTION_USB_HID_MOUSE_RDRAG_RIGHT_REP,  HID_MOUSE_RDRAG_RIGHT_REP },
-        /* Mouse buttons */
+        /* Mouse button left-click */
         { ACTION_USB_HID_MOUSE_BUTTON_LEFT,      HID_MOUSE_BUTTON_LEFT },
         { ACTION_USB_HID_MOUSE_BUTTON_LEFT_REL,  HID_MOUSE_BUTTON_LEFT_REL },
+        /* Mouse button right-click */
         { ACTION_USB_HID_MOUSE_BUTTON_RIGHT,     HID_MOUSE_BUTTON_RIGHT },
         { ACTION_USB_HID_MOUSE_BUTTON_RIGHT_REL, HID_MOUSE_BUTTON_RIGHT_REL },
         /* Mouse wheel scroll up */

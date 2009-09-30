@@ -198,19 +198,23 @@ this option \setting{On}. If it is not required, then turning this setting
         keys found on top of some multimedia keyboards.
         \begin{table}
           \begin{btnmap}{}{}
+            %
+            % Volume up / down
             \opt{SANSA_E200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
               {\ButtonScrollBack / \ButtonScrollFwd}
             \opt{GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
               {\ButtonVolUp / \ButtonVolDown}
             \opt{IRIVER_H10_PAD}{\ButtonScrollUp / \ButtonScrollDown}
+            \opt{MROBE100_PAD}{\ButtonUp / \ButtonDown}
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp / \ButtonRCVolDown}%
             }
             & Volume up / down, respectively \\
             %
+            % Volume mute
             \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
-                ,IPOD_3G_PAD,IPOD_1G2G_PAD}
+                ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
               {\ButtonSelect}
             \opt{GIGABEAT_S_PAD}{\ButtonSelect; \ButtonBack}
             \opt{IRIVER_H10_PAD}{\ButtonFF}
@@ -220,9 +224,10 @@ this option \setting{On}. If it is not required, then turning this setting
             }
             & Volume mute \\
             %
+            % Playback play / pause
             \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonUp}
             \opt{GIGABEAT_S_PAD,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
-                ,IPOD_1G2G_PAD}
+                ,IPOD_1G2G_PAD,MROBE100_PAD}
               {\ButtonPlay}
             \opt{HAVEREMOTEKEYMAP}{
               &
@@ -230,19 +235,23 @@ this option \setting{On}. If it is not required, then turning this setting
             }
             & Play / Pause \\
             %
+            % Playback stop
             \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
             \opt{GIGABEAT_S_PAD}{\ButtonMenu}
             \opt{SANSA_CLIP_PAD}{\ButtonHome}
             \opt{IRIVER_H10_PAD}{\ButtonRew}
             \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{Long \ButtonPlay}
+            \opt{MROBE100_PAD}{\ButtonDisplay}
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{Long \ButtonRCPlay}%
             }
             & Stop \\
             %
+            % Scan previous / next track
             \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
-                ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+                ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD%
+                ,MROBE100_PAD}
               {\ButtonLeft / \ButtonRight}
             \opt{SANSA_E200_PAD}{\ButtonMenu}
             \opt{HAVEREMOTEKEYMAP}{
@@ -260,20 +269,24 @@ this option \setting{On}. If it is not required, then turning this setting
         purpose.
         \begin{table}
           \begin{btnmap}{}{}
+            %
+            % Slideshow start / leave
             \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonUp / \ButtonPower}
             \opt{GIGABEAT_S_PADIRIVER_H10_PAD}{\ButtonPlay / \ButtonMenu}
             \opt{SANSA_CLIP_PAD}{\ButtonUp / \ButtonHome}
             \opt{IRIVER_H10_PAD}{\ButtonPlay / \ButtonRew}
             \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
               {\ButtonPlay / Long \ButtonPlay}
+            \opt{MROBE100_PAD}{\ButtonPlay / \ButtonDisplay}
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{\ButtonRCPlay / Long \ButtonRCPlay}%
             }
             & Slideshow start / leave, respectively \\
             %
+            % Slide previous / next
             \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
-            ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+            ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
               {\ButtonLeft / \ButtonRight}
             \opt{HAVEREMOTEKEYMAP}{
               &
@@ -281,37 +294,44 @@ this option \setting{On}. If it is not required, then turning this setting
             }
             & Slide previous / next, respectively \\
             %
+            % Slide first / last
             \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
-            ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+            ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
               {Long \ButtonLeft / Long \ButtonRight}
             \opt{HAVEREMOTEKEYMAP}{& }
             & Slide first / last, respectively \\
             %
+            % Screen black
             \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
               {\ButtonDown}
             \opt{IRIVER_H10_PAD}{\ButtonPower}
-            \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu}
+            \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}{\ButtonMenu}
             \opt{HAVEREMOTEKEYMAP}{& }
             & Blank screen \\
             %
+            % Screen white
             \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
               {Long \ButtonDown}
+            \opt{MROBE100_PAD}{Long \ButtonMenu}
             \opt{HAVEREMOTEKEYMAP}{& }
             & White screen \\
             %
+            % Link previous / next
             \opt{SANSA_E200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
               {\ButtonScrollBack / \ButtonScrollFwd}
             \opt{GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
               {\ButtonVolUp / \ButtonVolDown}
             \opt{IRIVER_H10_PAD}{\ButtonScrollUp / \ButtonScrollDown}
+            \opt{MROBE100_PAD}{\ButtonUp / \ButtonDown}
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp / \ButtonRCVolDown}%
             }
             & Previous / next link in slide, respectively \\
             %
+            % Mouse click
             \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
-                ,IPOD_3G_PAD,IPOD_1G2G_PAD}
+                ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
               {\ButtonSelect}
             \opt{GIGABEAT_S_PAD}{\ButtonSelect; \ButtonBack}
             \opt{IRIVER_H10_PAD}{\ButtonFF}
@@ -321,8 +341,9 @@ this option \setting{On}. If it is not required, then turning this setting
             }
             & Perform a 'mouse click' over a link \\
             %
+            % Mouse over
             \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
-                ,IPOD_3G_PAD,IPOD_1G2G_PAD}
+                ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
               {Long \ButtonSelect}
             \opt{GIGABEAT_S_PAD}{Long \ButtonSelect; Long \ButtonBack}
             \opt{HAVEREMOTEKEYMAP}{
@@ -338,36 +359,43 @@ this option \setting{On}. If it is not required, then turning this setting
         different tabs, navigate through history, and to control zoom.
         \begin{table}
           \begin{btnmap}{}{}
+            %
+            % Scroll up / down
             \opt{SANSA_E200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
               {\ButtonScrollBack / \ButtonScrollFwd}
             \opt{GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
               {\ButtonVolUp / \ButtonVolDown}
             \opt{IRIVER_H10_PAD}{\ButtonScrollUp / \ButtonScrollDown}
+            \opt{MROBE100_PAD}{\ButtonUp / \ButtonDown}
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp / \ButtonRCVolDown}%
             }
             & Scroll up / down, respectively \\
             %
+            % Scroll page up / page down
             \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
               {\ButtonUp / \ButtonDown}
             \opt{GIGABEAT_S_PAD}{\ButtonPlay / \ButtonDown}
             \opt{IRIVER_H10_PAD}{\ButtonPlay / \ButtonPower}
-            \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+            \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
               {\ButtonPlay / \ButtonMenu}
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{\ButtonRCPlay / Long \ButtonRCDsp}%
             }
-            & Scroll page up / down, respectively \\
+            & Scroll page up / page down, respectively \\
             %
+            % Zoom in / out
             \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
               {Long \ButtonUp / Long \ButtonDown}
             \opt{GIGABEAT_S_PAD}{Long \ButtonPlay / Long \ButtonPower}
+            \opt{MROBE100_PAD}{Long \ButtonPlay / Long \ButtonMenu}
             \opt{HAVEREMOTEKEYMAP}{& }
             & Zoom in / out, respectively \\
             %
-            \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
+            % Zoom reset
+            \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,MROBE100_PAD}
               {Long \ButtonSelect}
             \opt{GIGABEAT_S_PAD}{Long \ButtonSelect; Long \ButtonBack}
             \opt{HAVEREMOTEKEYMAP}{
@@ -376,21 +404,25 @@ this option \setting{On}. If it is not required, then turning this setting
             }
             & Zoom reset \\
             %
+            % Tab previous / next
             \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
-                ,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+                ,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
               {\ButtonLeft / \ButtonRight}
             \opt{IRIVER_H10_PAD}{\ButtonRew / \ButtonFF}
             \opt{HAVEREMOTEKEYMAP}{& }
             & Tab previous / next, respectively \\
             %
+            % Tab close
             \opt{SANSA_E200_PAD,SANSA_C200_PAD}{Long \ButtonPower}
             \opt{GIGABEAT_S_PAD}{Long \ButtonMenu}
             \opt{SANSA_CLIP_PAD}{Long \ButtonHome}
+            \opt{MROBE100_PAD}{Long \ButtonDisplay}
             \opt{HAVEREMOTEKEYMAP}{& }
             & Tab close \\
             %
+            % History back / forward
             \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
-            ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
+            ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
               {Long \ButtonLeft / Long \ButtonRight}
             \opt{HAVEREMOTEKEYMAP}{
               &
@@ -398,8 +430,9 @@ this option \setting{On}. If it is not required, then turning this setting
             }
             & History back / forward \\
             %
+            % View full-screen
             \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
-                ,IPOD_3G_PAD,IPOD_1G2G_PAD}
+                ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
               {\ButtonSelect}
             \opt{GIGABEAT_S_PAD}{Long \ButtonSelect; Long \ButtonBack}
             \opt{IRIVER_H10_PAD}{\ButtonFF}
@@ -407,7 +440,7 @@ this option \setting{On}. If it is not required, then turning this setting
               &
               \opt{GIGABEAT_RC_PAD}{Long \ButtonRCRew}%
             }
-            & View full screen toggle \\
+            & View full-screen toggle \\
           \end{btnmap}
         \end{table}
 
@@ -415,26 +448,33 @@ this option \setting{On}. If it is not required, then turning this setting
         movement; left and right button clicking; and dragging and dropping.
         \begin{table}
           \begin{btnmap}{}{}
-            \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
+            %
+            % Cursor move up / down / left / right
+            \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
+                ,MROBE100_PAD}
               {\ButtonUp / \ButtonDown / \ButtonLeft / \ButtonRight}
             \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
               {\ButtonMenu / \ButtonPlay / \ButtonLeft / \ButtonRight}
             \opt{HAVEREMOTEKEYMAP}{& }
-            & Move cursor up / down / left / right, respectively \\
+            & Cursor move up / down / left / right, respectively \\
             %
+            % Mouse button left-click
             \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
                 ,IPOD_3G_PAD,IPOD_1G2G_PAD}
               {\ButtonSelect}
             \opt{GIGABEAT_S_PAD}{\ButtonSelect; \ButtonBack}
+            \opt{MROBE100_PAD}{\ButtonSelect; \ButtonMenu}
             \opt{HAVEREMOTEKEYMAP}{& }
             & Left mouse button click \\
             %
+            % Mouse button right-click
             \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
             \opt{GIGABEAT_S_PAD}{\ButtonMenu}
             \opt{SANSA_CLIP_PAD}{\ButtonHome}
+            \opt{MROBE100_PAD}{\ButtonPlay}
             \opt{HAVEREMOTEKEYMAP}{& }
             & Right mouse button click \\
-            %
+            % Mouse wheel scroll up / down
             \opt{SANSA_E200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
               {\ButtonScrollBack / \ButtonScrollFwd}
             \opt{GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
