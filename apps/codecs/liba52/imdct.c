@@ -46,7 +46,7 @@ typedef struct complex_s {
     sample_t imag;
 } complex_t;
 
-static uint8_t fftorder[] = {
+static const uint8_t fftorder[] = {
       0,128, 64,192, 32,160,224, 96, 16,144, 80,208,240,112, 48,176,
       8,136, 72,200, 40,168,232,104,248,120, 56,184, 24,152,216, 88,
       4,132, 68,196, 36,164,228,100, 20,148, 84,212,244,116, 52,180,
@@ -192,7 +192,7 @@ static inline void ifft8 (complex_t * buf)
     BUTTERFLY_HALF (buf[1], buf[3], buf[5], buf[7], roots16[1]);
 }
 
-static void ifft_pass (complex_t * buf, sample_t * weight, int n)
+static void ifft_pass (complex_t * buf, const sample_t * weight, int n)
 {
     complex_t * buf1;
     complex_t * buf2;
