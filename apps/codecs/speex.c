@@ -117,7 +117,7 @@ static spx_int64_t seek_backwards(spx_ogg_sync_state *oy, spx_ogg_page *og,
                 begin = 0;
                 time++;
             } else {
-                LOGF("Can't seek that early:%d\n",begin);
+                LOGF("Can't seek that early:%lld\n",begin);
                 return -3;  /* too early */
             }
         }
@@ -156,7 +156,7 @@ static spx_int64_t seek_backwards(spx_ogg_sync_state *oy, spx_ogg_page *og,
 
                 } else if (lastgranule > wantedpos) {  /*too late, seek more*/
                     if (offset != -1) {
-                        LOGF("Toolate, returnanyway:%d,%d,%d,%d\n",
+                        LOGF("Toolate, returnanyway:%lld,%lld,%lld,%lld\n",
                              ret,lastgranule,wantedpos,avgpagelen);
                         return ret;
                     }
@@ -221,7 +221,7 @@ static int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
         offset = get_next_page(oy,&og,-1);
 
         if (offset < 0) { /* could not find new page,use old offset */
-            LOGF("Seek/guess/fault:%d->-<-%d,%d:%d,%d,%d\n",
+            LOGF("Seek/guess/fault:%lld->-<-%d,%lld:%lld,%d,%ld,%d\n",
                  curpos,0,pos,offset,0,
                  ci->curpos,/*stream_length*/0);
 
@@ -232,7 +232,7 @@ static int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
             spx_ogg_sync_reset(oy);
         } else {
             if (spx_ogg_page_granulepos(&og) == 0 && pos > 5000) {
-                LOGF("SEEK/guess/fault:%d->-<-%d,%d:%d,%d,%d\n",
+                LOGF("SEEK/guess/fault:%lld->-<-%lld,%lld:%lld,%d,%ld,%d\n",
                      curpos,spx_ogg_page_granulepos(&og),pos,
                      offset,0,ci->curpos,/*stream_length*/0);
 
@@ -287,7 +287,7 @@ static int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
 
     spx_ogg_sync_reset(oy);
 
-    LOGF("Seek failed:%d\n", offset);
+    LOGF("Seek failed:%lld\n", offset);
 
     return -1;
 }
@@ -421,7 +421,7 @@ next_track:
         /*seek (seeks to the page before the position) */
         if (ci->seek_time) {
             if(samplerate!=0&&packet_count>1){
-                LOGF("Speex seek page:%d,%d,%d,%d\n",
+                LOGF("Speex seek page:%lld,%lld,%ld,%lld,%d\n",
                      ((spx_int64_t)ci->seek_time/1000) *
                      (spx_int64_t)samplerate,
                      page_granule, ci->seek_time,

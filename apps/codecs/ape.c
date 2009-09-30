@@ -281,7 +281,7 @@ frame_start:
                                     blockstodecode)) < 0)
             {
                 /* Frame decoding error, abort */
-                LOGF("APE: Frame %d, error %d\n",currentframe,res);
+                LOGF("APE: Frame %lu, error %d\n",currentframe,res);
                 retval = CODEC_ERROR;
                 goto done;
             }
