@@ -98,12 +98,11 @@ static unsigned short r_entry_mode = R_ENTRY_MODE_HORZ_NORMAL;
 #define R_DISP_CONTROL_REV    0x0000
 static unsigned short r_disp_control_rev = R_DISP_CONTROL_NORMAL;
 
-/* TODO: Implement this function */
-static void lcd_delay(int x)
+static inline void lcd_delay(int x)
 {
-    /* This is just arbitrary - the OF does something more complex */
-    x *= 1024;
-    while (x--);
+    do {
+        asm volatile ("nop\n");
+    } while (x--);
 }
 
 /* DBOP initialisation, do what OF does */
@@ -130,10 +129,13 @@ static void ams3525_dbop_init(void)
     /* TODO: The OF calls some other functions here, but maybe not important */
 }
 
-#define lcd_write_single_data16(value) do {\
-        DBOP_CTRL &= ~(1<<14|1<<13); \
-        DBOP_DOUT16 = (fb_data)(value); \
-    } while(0)
+static void lcd_write_single_data16(unsigned short value)
+{
+    DBOP_CTRL &= ~(1<<14|1<<13);
+    lcd_delay(10);
+    DBOP_DOUT16 = value;
+    while ((DBOP_STAT & (1<<10)) == 0);
+}
 
 static void lcd_write_cmd(int cmd)
 {
