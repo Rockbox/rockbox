@@ -42,7 +42,7 @@
 }
 
   \section{Frequency}
-   \nopt{sansa}{
+   \nopt{sansa,sansaAMS}{
     Choose the recording frequency (sample rate).
     \opt{masf}{48kHz, 44.1kHz, 32kHz, 24kHz, 22.05kHz, 16kHz}
     \opt{h100,h300}{44.1kHz, 22.05kHz and 11.025kHz}
@@ -62,7 +62,7 @@
       {\note{You cannot change the sample rate for digital recordings.}
     }
    } % nopt e200  
-   \opt{e200}{ 
+   \opt{e200,e200v2}{ 
        Recordings can only be made at a 22.05kHz frequency (sample rate)
          on this \dap. 
     } % opt e200
@@ -71,7 +71,7 @@
   Choose the source of the recording. The options are: 
   \opt{recorder,recorderv2fm,h100}{\setting{SPDIF (digital)}, }%
   \nopt{ipodnano,ipodvideo}{\setting{Mic}}%
-  \nopt{sansa}{, and {\setting{Line In}}}. %
+  \nopt{sansa}{\nopt{sansaAMS}{, and {\setting{Line In}}}}. %
   \opt{radio}{For recording from the radio see \reference{ref:FMradio}.}
 
 \section{Channels}

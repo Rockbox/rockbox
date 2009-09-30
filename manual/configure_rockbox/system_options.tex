@@ -8,7 +8,7 @@
     screen it was when the \dap{} was shut off.
 
 \nopt{sansa}%will probably be there on Sansas one day -  exclude it the simple way without specific option
-{
+{\nopt{sansaAMS}{
   \subsection{Battery}
   Options relating to the \opt{archos}{batteries}\nopt{archos}{battery}
   in the \dap.
@@ -56,7 +56,7 @@
       }
 
      \end{description}
-}
+}}
 \opt{dircache,HAVE_DISK_STORAGE}{
 \subsection{Disk}
     Options relating to the hard disk.
@@ -161,7 +161,7 @@ this option \setting{On}. If it is not required, then turning this setting
 } 
 
 \opt{HAVE_BUTTON_LIGHTS}{
-  \opt{e200}{
+  \opt{e200,e200v2}{
   \subsection{Wheel Light Timeout}
     This setting controls the amount of time the wheel lights shine after a
     button press or wheel turn. If set to \setting{Off}, the LEDs will not
@@ -169,7 +169,7 @@ this option \setting{On}. If it is not required, then turning this setting
     never shut off. If set to a time (1 to 120 seconds), the wheel will stay
     lit for that amount of time after a button press or wheel turn.
   }
-  \nopt{e200}{
+  \nopt{e200,e200v2}{
   \subsection{Button Light Timeout}
     This setting controls the amount of time the button lights shine after a
     button press. If set to \setting{Off}, the LEDs will not light when a

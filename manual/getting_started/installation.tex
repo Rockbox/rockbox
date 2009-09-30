@@ -11,7 +11,7 @@ before beginning there are a few things it is important to know.
 follow the instructions at 
 \url{http://www.rockbox.org/twiki/bin/view/Main/SansaE200RInstallation}.}}
 
-\opt{ipodnano,ipodvideo,e200,c200}{
+\opt{ipodnano,ipodvideo,e200,c200,e200v2}{
 \begin{description}  
 \item[Supported hardware versions.] 
     \opt{ipodnano}{
@@ -28,7 +28,7 @@ follow the instructions at
     For information on identifying which Ipod you own, see this page on Apple's 
     website: \url{http://www.info.apple.com/kbnum/n61688}.
   }
-  \opt{e200,c200}{
+  \opt{c200}{
     The \playertype{} is available in multiple versions, not
     all of which run Rockbox.  Rockbox doesn't run on the
     newer v2 models. They can be identified
@@ -36,6 +36,13 @@ follow the instructions at
     Settings $\rightarrow$ Info. The v1
     firmware is named 01.xx.xx, while the v2 firmware begins with 03.
   }
+  \opt{e200,e200v2}{
+    The \playertype{} is available in multiple versions, and you need to make
+    sure which you have by checking the Sandisk firmware version number under 
+    Settings $\rightarrow$ Info. The v1 firmware is named 01.xx.xx, while the
+    v2 firmware begins with 03. Make sure that you are following the
+    instructions from the correct manual.
+}  
 \end{description}
 }
 
@@ -43,6 +50,14 @@ follow the instructions at
 \begin{description}  
   \item[DRM capability.] If your \dap{} has a US firmware, then by installing Rockbox you will
   \emph{permanently} lose the ability to playback files with DRM.
+\end{description}
+}
+
+\opt{sansaAMS}{
+\begin{description}  
+  \item[DRM capability.] It is possible that installation of the bootloader
+  may lead to you \emph{permanently} losing the ability to playback files
+  with DRM.
 \end{description}
 }
 
@@ -83,11 +98,12 @@ follow the instructions at
     is intended to be used for USB OTG connections only (digital cameras, memory
     sticks, etc.).
   }    
-  \opt{sansa}{The following steps require you to change the setting in
+  \opt{sansa,e200v2}{
+    \note{The following steps require you to change the setting in
     \setting{Settings $\rightarrow$ USB Mode} to \setting{MSC} from within the
-    original firmware.
+    original firmware.}
 
-    \warn{Never extract files to your \dap{} while it is in recovery mode.}
+    \nopt{e200v2}{\warn{Never extract files to your \dap{} while it is in recovery mode.}}
   }
   \opt{h10,h10_5gb}{
     The installation requires you to use UMS mode and so
@@ -338,8 +354,9 @@ data partiton.}}
 60GB/80GB models.  You must ensure you download the correct version for your 
 \dap{}.}}
 
-\item Connect your \dap{} to the computer via USB
-  \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire} as described in
+\item Connect your \dap{} to the computer via USB 
+  \opt{sansa,sansaAMS,h10,h10_5gb}{ in MSC mode }
+  \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire }as described in
   the manual that came with your \dap{}.
 
 \item Take the \fname{.zip} file that you downloaded and use
@@ -376,6 +393,7 @@ structure that Rockbox needs.\\}
   \opt{h10,h10_5gb}{\input{getting_started/h10_install.tex}}
   \opt{gigabeatf}{\input{getting_started/gigabeat_install.tex}}
   \opt{sansa}{\input{getting_started/sansa_install.tex}}
+  \opt{sansaAMS}{\input{getting_started/sansaAMS_install.tex}}
   \opt{mrobe100}{\input{getting_started/mrobe100_install.tex}}
 }}
 
@@ -591,6 +609,10 @@ completely follow the manual uninstallation instructions below.}}
       Although if you retain the Rockbox bootloader, you will need to hold the
       \ButtonRec{} button each time you want to start the original firmware.
     }
+}
+
+    \opt{sansaAMS}{
+      Copy an unmodified original firmware to your player and update it.
 }
 
 \nopt{gigabeats}{
