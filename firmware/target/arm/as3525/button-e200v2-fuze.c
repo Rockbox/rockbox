@@ -69,8 +69,8 @@ void button_init_device(void)
 static void scrollwheel(unsigned short dbop_din)
 {
     /* current wheel values, parsed from dbop and the resulting button */
-    unsigned        wheel_value     = 0;
-    unsigned        btn             = BUTTON_NONE;
+    unsigned         wheel_value     = 0;
+    unsigned         btn             = BUTTON_NONE;
     /* old wheel values */
     static unsigned old_wheel_value = 0;
     static unsigned old_btn         = BUTTON_NONE;
@@ -80,7 +80,7 @@ static void scrollwheel(unsigned short dbop_din)
      * posted to the button_queue last, and if it was recent enough, generate
      * BUTTON_REPEAT
      */
-    static long last_wheel_post = 0;
+    static long      last_wheel_post = 0;
 
     /*
      *  Providing wheel acceleration works as follows: We increment accel
@@ -88,14 +88,17 @@ static void scrollwheel(unsigned short dbop_din)
      * (no matter if it was turned), that means: the longer and faster you turn,
      * the higher accel will be. accel>>2 will actually posted to the button_queue
      */
-    static int accel = 0;
+    static int        accel = 0;
     /* We only post every 4th action, as this matches better with the physical
      * clicks of the wheel */
-    static int counter = 0;
+    static int        counter = 0;
     /* Read wheel 
      * Bits 13 and 14 of DBOP_DIN change as follows:
      * Clockwise rotation   00 -> 01 -> 11 -> 10 -> 00
      * Counter-clockwise    00 -> 10 -> 11 -> 01 -> 00
+     *
+     * For easy look-up, actual wheel values act as indicies also,
+     * which is why the table seems to be not ordered correctly
      */
     static const unsigned char wheel_tbl[2][4] =
     {
@@ -109,18 +112,24 @@ static void scrollwheel(unsigned short dbop_din)
         return;
     }
 
-    wheel_value = dbop_din & (1<<13|1<<14);
-    wheel_value >>= 13;
+    wheel_value = (dbop_din >> 13) & (1<<1|1<<0);
 
     if (old_wheel_value == wheel_tbl[0][wheel_value])
         btn = BUTTON_SCROLL_FWD;
     else if (old_wheel_value == wheel_tbl[1][wheel_value])
         btn = BUTTON_SCROLL_BACK;
+    else if (old_btn != BUTTON_NONE)
+    {   /* if no button is read, assume old_btn, but only once to not have
+         * wrong readings */
+        btn = old_btn;
+        old_btn = BUTTON_NONE;
+    }
+    /* else btn = BUTTON_NONE */
 
     if (btn != BUTTON_NONE)
     {
-        if (btn != old_btn)
-        {
+        if (btn != old_btn && old_btn != BUTTON_NONE)
+        {   /* don't do this if we assumned old_btn */
             /* direction reversals nullify acceleration and counters */
             old_btn =  btn;
             accel  =  counter  = 0;
