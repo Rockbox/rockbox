@@ -19,7 +19,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "usb_ch9.h"
 #include "usb_drv.h"
@@ -92,8 +92,8 @@ static inline void usb_select_endpoint(int idx)
     /* Select the endpoint */
     ISP1583_DFLOW_EPINDEX = idx;
     /* The delay time from the Write Endpoint Index register to the Read Data Port register must be at least 190 ns.
-    * The delay time from the Write Endpoint Index register to the Write Data Port register must be at least 100 ns.
-    */
+     * The delay time from the Write Endpoint Index register to the Write Data Port register must be at least 100 ns.
+     */
     NOP;
 }
 
@@ -102,26 +102,26 @@ static inline void usb_select_setup_endpoint(void)
     /* Select the endpoint */
     ISP1583_DFLOW_EPINDEX = DFLOW_EPINDEX_EP0SETUP;
     /* The delay time from the Write Endpoint Index register to the Read Data Port register must be at least 190 ns.
-    * The delay time from the Write Endpoint Index register to the Write Data Port register must be at least 100 ns.
-    */
+     * The delay time from the Write Endpoint Index register to the Write Data Port register must be at least 100 ns.
+     */
     NOP;
 }
 
 static void usb_setup_endpoint(int idx, int max_pkt_size, int type)
 {
-    if(epidx_n(idx)!=0)
+    if(epidx_n(idx)!=EP_CONTROL)
     {
         usb_select_endpoint(idx);
         ISP1583_DFLOW_MAXPKSZ = max_pkt_size & 0x7FF;
         ISP1583_DFLOW_EPTYPE = (DFLOW_EPTYPE_NOEMPKT | DFLOW_EPTYPE_DBLBUF | (type & 0x3));
-        
+
         /* clear buffer ... */
         ISP1583_DFLOW_CTRLFUN |= DFLOW_CTRLFUN_CLBUF;
         /* ... twice because of double buffering */
         usb_select_endpoint(idx);
         ISP1583_DFLOW_CTRLFUN |= DFLOW_CTRLFUN_CLBUF;
     }
-    
+
     struct usb_endpoint *ep;
     ep = &(endpoints[epidx_n(idx)]);
     ep->halt[epidx_dir(idx)] = 0;
@@ -135,7 +135,7 @@ static void usb_setup_endpoint(int idx, int max_pkt_size, int type)
 
 static void usb_enable_endpoint(int idx)
 {
-    if(epidx_n(idx)!=0)
+    if(epidx_n(idx)!=EP_CONTROL)
     {
         usb_select_endpoint(idx);
         /* Enable interrupt */
@@ -143,7 +143,7 @@ static void usb_enable_endpoint(int idx)
         /* Enable endpoint */
         ISP1583_DFLOW_EPTYPE |= DFLOW_EPTYPE_ENABLE;
     }
-    
+
     endpoints[epidx_n(idx)].enabled[epidx_dir(idx)] = 1;
 }
 /*
@@ -152,7 +152,7 @@ static void usb_disable_endpoint(int idx, bool set_struct)
     usb_select_endpoint(idx);
     ISP1583_DFLOW_EPTYPE &= ~DFLOW_EPTYPE_ENABLE;
     bc_int_value(&ISP1583_INIT_INTEN_A, &ISP1583_INIT_INTEN_B, ISP1583_INIT_INTEN_READ, 1 << (10 + idx));
-    
+
     if(set_struct)
         endpoints[epidx_n(idx)].enabled[epidx_dir(idx)] = 0;
 }
@@ -197,7 +197,7 @@ static int usb_receive(int n)
     len = usb_get_packet(endpoints[n].in_buf + endpoints[n].in_ptr,
                          endpoints[n].in_max_len - endpoints[n].in_ptr);
     endpoints[n].in_ptr += len;
-    
+
     if (endpoints[n].in_ptr >= endpoints[n].in_min_len)
     {
         endpoints[n].in_min_len = -1;
@@ -242,22 +242,22 @@ static int usb_send(int n)
         logf("ALREADY SENT TO EP!");
         return -1;
     }
-    
+
     if (usb_out_buffer_full(n))
     {
         logf("BUFFER FULL!");
         return -1;
     }
-    
+
     usb_select_endpoint(ep_index(n, DIR_TX));
     max_pkt_size = endpoints[n].max_pkt_size[DIR_TX];
     len = endpoints[n].out_len - endpoints[n].out_ptr;
     if (len > max_pkt_size)
         len = max_pkt_size;
-    
+
     if(len < max_pkt_size)
         ISP1583_DFLOW_BUFLEN = len;
-    
+
     p = endpoints[n].out_buf + endpoints[n].out_ptr;
     i = 0;
     while (len - i >= 2)
@@ -276,7 +276,7 @@ static int usb_send(int n)
 */
     if (endpoints[n].out_ptr == endpoints[n].out_len)
         endpoints[n].out_ptr = -1;
-    
+
     logf("send_end");
     return 0;
 }
@@ -312,7 +312,7 @@ static void usb_status_ack(int ep, int dir)
         usb_select_setup_endpoint();
     else
         usb_select_endpoint(ep_index(ep, dir));
-    
+
     ISP1583_DFLOW_CTRLFUN |= DFLOW_CTRLFUN_STATUS;
 }
 
@@ -336,12 +336,12 @@ static void usb_handle_setup_rx(void)
     }
     else
     {
-        usb_drv_stall(0, true, false);
-        usb_drv_stall(0, true, true);
+        usb_drv_stall(EP_CONTROL, true, false);
+        usb_drv_stall(EP_CONTROL, true, true);
         logf("usb_handle_setup_rx() failed");
         return;
     }
-    
+
     logf("usb_handle_setup_rx(): %02x %02x %02x %02x %02x %02x %02x %02x", setup_pkt_buf[0], setup_pkt_buf[1], setup_pkt_buf[2], setup_pkt_buf[3], setup_pkt_buf[4], setup_pkt_buf[5], setup_pkt_buf[6], setup_pkt_buf[7]);
 }
 
@@ -369,25 +369,31 @@ bool usb_drv_powered(void)
 
 static void setup_endpoints(void)
 {
-    usb_setup_endpoint(ep_index(0, DIR_RX), 64, 0);
-    usb_setup_endpoint(ep_index(0, DIR_TX), 64, 0);
-    
     int i;
+    int max_pkt_size = (high_speed_mode ? 512 : 64);
+
+    usb_setup_endpoint(ep_index(EP_CONTROL, DIR_RX), 64,
+            USB_ENDPOINT_XFER_CONTROL);
+    usb_setup_endpoint(ep_index(EP_CONTROL, DIR_TX), 64,
+            USB_ENDPOINT_XFER_CONTROL);
+
     for(i = 1; i < USB_NUM_ENDPOINTS-1; i++)
     {
-        usb_setup_endpoint(ep_index(i, DIR_RX), (high_speed_mode ? 512 : 64), 2); /* 2 = TYPE_BULK */
-        usb_setup_endpoint(ep_index(i, DIR_TX), (high_speed_mode ? 512 : 64), 2);
+        usb_setup_endpoint(ep_index(i, DIR_RX), max_pkt_size,
+                USB_ENDPOINT_XFER_BULK);
+        usb_setup_endpoint(ep_index(i, DIR_TX), max_pkt_size,
+                USB_ENDPOINT_XFER_BULK);
     }
-    
-    usb_enable_endpoint(ep_index(0, DIR_RX));
-    usb_enable_endpoint(ep_index(0, DIR_TX));
-    
+
+    usb_enable_endpoint(ep_index(EP_CONTROL, DIR_RX));
+    usb_enable_endpoint(ep_index(EP_CONTROL, DIR_TX));
+
     for (i = 1; i < USB_NUM_ENDPOINTS-1; i++)
     {
         usb_enable_endpoint(ep_index(i, DIR_RX));
         usb_enable_endpoint(ep_index(i, DIR_TX));
     }
-    
+
     ZVM_SPECIFIC;
 }
 
@@ -414,45 +420,45 @@ void usb_drv_init(void)
     sleep(10);
     /* Enable CLKAON & GLINTENA */
     ISP1583_INIT_MODE = STANDARD_INIT_MODE;
-    
+
     /* Disable all OTG functions */
     ISP1583_INIT_OTG = 0;
 
-    #ifdef DEBUG
+#ifdef DEBUG
     logf("BUS_CONF/DA0:%d MODE0/DA1: %d MODE1: %d", (bool)(ISP1583_INIT_MODE & INIT_MODE_TEST0), (bool)(ISP1583_INIT_MODE & INIT_MODE_TEST1), (bool)(ISP1583_INIT_MODE & INIT_MODE_TEST2));
     logf("Chip ID: 0x%x", ISP1583_GEN_CHIPID);
     //logf("INV0: 0x% IRQEDGE: 0x%x IRQPORT: 0x%x", IO_GIO_INV0, IO_GIO_IRQEDGE, IO_GIO_IRQPORT);
-    #endif
+#endif
 
     /*Set interrupt generation to target-specific mode +
-    * Set the control pipe to ACK only interrupt +
-    * Set the IN pipe to ACK only interrupt +
-    * Set OUT pipe to ACK and NYET interrupt
-    */
-    
+     * Set the control pipe to ACK only interrupt +
+     * Set the IN pipe to ACK only interrupt +
+     * Set OUT pipe to ACK and NYET interrupt
+     */
+
     ISP1583_INIT_INTCONF = 0x54 | INT_CONF_TARGET;
     /* Clear all interrupts */
     set_int_value(ISP1583_GEN_INT_A, ISP1583_GEN_INT_B, 0xFFFFFFFF);
     /* Enable USB interrupts */
     set_int_value(ISP1583_INIT_INTEN_A, ISP1583_INIT_INTEN_B, STANDARD_INTEN);
-    
+
     ZVM_SPECIFIC;
-    
+
     /* Enable interrupt at CPU level */
     EN_INT_CPU_TARGET;
-    
+
     setup_endpoints();
-    
+
     /* Clear device address and disable it */
     ISP1583_INIT_ADDRESS = 0;
-    
+
     /* Turn SoftConnect on */
     ISP1583_INIT_MODE |= INIT_MODE_SOFTCT;
-    
+
     ZVM_SPECIFIC;
-    
+
     //tick_add_task(usb_helper);
-    
+
     logf("usb_init_device() finished");
 }
 
@@ -460,7 +466,7 @@ int usb_drv_port_speed(void)
 {
     return (int)high_speed_mode;
 }
- 
+
 void usb_drv_exit(void)
 {
     logf("usb_drv_exit()");
@@ -468,7 +474,7 @@ void usb_drv_exit(void)
     /* Disable device */
     ISP1583_INIT_MODE &= ~INIT_MODE_SOFTCT;
     ISP1583_INIT_ADDRESS = 0;
-    
+
     /* Disable interrupts */
     set_int_value(ISP1583_INIT_INTEN_A, ISP1583_INIT_INTEN_B, 0);
     /* and the CPU's one... */
@@ -478,9 +484,9 @@ void usb_drv_exit(void)
     /* Send usb controller to suspend mode */
     ISP1583_INIT_MODE = INIT_MODE_GOSUSP;
     ISP1583_INIT_MODE = 0;
-    
+
     //tick_remove_task(usb_helper);
-    
+
     ZVM_SPECIFIC;
 }
 
@@ -517,7 +523,7 @@ static void in_callback(int ep, unsigned char *buf, int len)
 int usb_drv_recv(int ep, void* ptr, int length)
 {
     logf("usb_drv_recv(%d, 0x%x, %d)", ep, (int)ptr, length);
-    if(ep == 0 && length == 0 && ptr == NULL)
+    if(ep == EP_CONTROL && length == 0 && ptr == NULL)
     {
         usb_status_ack(ep, DIR_TX);
         return 0;
@@ -527,7 +533,7 @@ int usb_drv_recv(int ep, void* ptr, int length)
     endpoints[ep].in_max_len = length;
     endpoints[ep].in_min_len = length;
     endpoints[ep].in_ptr = 0;
-    if(ep == 0)
+    if(ep == EP_CONTROL)
     {
         usb_data_stage_enable(ep, DIR_RX);
         return usb_receive(ep);
@@ -560,7 +566,7 @@ static void usb_drv_wait(int ep, bool send)
 int usb_drv_send(int ep, void* ptr, int length)
 {
     logf("usb_drv_send_nb(%d, 0x%x, %d)", ep, (int)ptr, length);
-    if(ep == 0 && length == 0 && ptr == NULL)
+    if(ep == EP_CONTROL && length == 0 && ptr == NULL)
     {
         usb_status_ack(ep, DIR_RX);
         return 0;
@@ -572,7 +578,7 @@ int usb_drv_send(int ep, void* ptr, int length)
     endpoints[ep].out_len = length;
     endpoints[ep].out_ptr = 0;
     endpoints[ep].out_in_progress = 1;
-    if(ep == 0)
+    if(ep == EP_CONTROL)
     {
         int rc = usb_send(ep);
         usb_data_stage_enable(ep, DIR_TX);
@@ -602,7 +608,7 @@ void usb_drv_cancel_all_transfers(void)
 int usb_drv_request_endpoint(int type, int dir)
 {
     int i, bit;
- 
+
     if (type != USB_ENDPOINT_XFER_BULK)
         return -1;
 
@@ -631,13 +637,13 @@ static void bus_reset(void)
     /* Enable USB interrupts */
     ISP1583_INIT_INTCONF = 0x54 | INT_CONF_TARGET;
     set_int_value(ISP1583_INIT_INTEN_A, ISP1583_INIT_INTEN_B, STANDARD_INTEN);
-    
+
     /* Disable all OTG functions */
     ISP1583_INIT_OTG = 0;
-    
+
     /* Clear device address and enable it */
     ISP1583_INIT_ADDRESS = INIT_ADDRESS_DEVEN;
-    
+
     ZVM_SPECIFIC;
 
     /* Reset endpoints to default */
@@ -651,13 +657,13 @@ void IRAM_ATTR usb_drv_int(void)
 {
     unsigned long ints;
     ints = ISP1583_GEN_INT_READ & ISP1583_INIT_INTEN_READ;
-    
+
     if(!ints)
         return;
-    
+
     /* Unlock the device's registers */
     ISP1583_GEN_UNLCKDEV = ISP1583_UNLOCK_CODE;
-    
+
     //logf(" handling int [0x%lx & 0x%lx = 0x%x]", ISP1583_GEN_INT_READ, ISP1583_INIT_INTEN_READ, (int)ints);
 
     if(ints & INT_IEBRST) /* Bus reset */
@@ -690,7 +696,7 @@ void IRAM_ATTR usb_drv_int(void)
         {
             if(i>25)
                 break;
-            
+
             if(ep_event & (1 << i))
             {
                 logf("EP%d %s interrupt", (i - 10) / 2, i % 2 ? "RX" : "TX");
@@ -718,7 +724,7 @@ void IRAM_ATTR usb_drv_int(void)
     }
     /* Mask all (enabled) interrupts */
     set_int_value(ISP1583_GEN_INT_A, ISP1583_GEN_INT_B, ints);
-    
+
     ZVM_SPECIFIC;
 }
 
@@ -726,7 +732,7 @@ void usb_drv_set_address(int address)
 {
     logf("usb_drv_set_address(0x%x)", address);
     ISP1583_INIT_ADDRESS = (address & 0x7F) | INIT_ADDRESS_DEVEN;
-    
+
     ZVM_SPECIFIC;
 }
 
