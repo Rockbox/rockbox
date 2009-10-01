@@ -342,7 +342,7 @@ static bool check_disk_present(IF_MD_NONVOID(int volume))
 #ifdef USB_USE_RAMDISK
     return true;
 #else
-    unsigned char sector[512];
+    unsigned char sector[SECTOR_SIZE];
     return storage_read_sectors(volume,0,1,sector) == 0;
 #endif
 }
