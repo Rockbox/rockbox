@@ -31,7 +31,7 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1,-100,  12, -25},
     [SOUND_BASS]          = {"dB", 0,  1, -12,  12,   6},
     [SOUND_TREBLE]        = {"dB", 0,  1, -12,  12,   6},
-#else /* MAS3507D */
+#elif CONFIG_CODEC == MAS3507D
     [SOUND_VOLUME]        = {"dB", 0,  1, -78,  18, -18},
     [SOUND_BASS]          = {"dB", 0,  1, -15,  15,   7},
     [SOUND_TREBLE]        = {"dB", 0,  1, -15,  15,   7},
@@ -68,6 +68,7 @@ static void set_channel_config(void)
     unsigned long val_lr = 0;
     unsigned long val_rl = 0;
     unsigned long val_rr = 0x80000;
+    int bank;
 
     switch(channel_configuration)
     {
@@ -127,16 +128,15 @@ static void set_channel_config(void)
     }
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_LL, &val_ll, 1); /* LL */
-    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_LR, &val_lr, 1); /* LR */
-    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_RL, &val_rl, 1); /* RL */
-    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_RR, &val_rr, 1); /* RR */
+    bank = MAS_BANK_D0;
 #elif CONFIG_CODEC == MAS3507D
-    mas_writemem(MAS_BANK_D1, 0x7f8, &val_ll, 1); /* LL */
-    mas_writemem(MAS_BANK_D1, 0x7f9, &val_lr, 1); /* LR */
-    mas_writemem(MAS_BANK_D1, 0x7fa, &val_rl, 1); /* RL */
-    mas_writemem(MAS_BANK_D1, 0x7fb, &val_rr, 1); /* RR */
+    bank = MAS_BANK_D1;
 #endif
+
+    mas_writemem(bank, MAS_D0_OUT_LL, &val_ll, 1); /* LL */
+    mas_writemem(bank, MAS_D0_OUT_LR, &val_lr, 1); /* LR */
+    mas_writemem(bank, MAS_D0_OUT_RL, &val_rl, 1); /* RL */
+    mas_writemem(bank, MAS_D0_OUT_RR, &val_rr, 1); /* RR */
 }
 
 void audiohw_set_channel(int val)
@@ -157,7 +157,7 @@ void audiohw_set_bass(int val)
 {
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     unsigned tmp = ((unsigned)(val * 8) & 0xff) << 8;
-    mas_codec_writereg(0x14, tmp);
+    mas_codec_writereg(MAS_REG_KBASS, tmp);
 #elif CONFIG_CODEC == MAS3507D
     mas_writereg(MAS_REG_KBASS, bass_table[val+15]);
 #endif
@@ -174,7 +174,7 @@ void audiohw_set_treble(int val)
 {
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     unsigned tmp = ((unsigned)(val * 8) & 0xff) << 8;
-    mas_codec_writereg(0x15, tmp);
+    mas_codec_writereg(MAS_REG_KTREBLE, tmp);
 #elif CONFIG_CODEC == MAS3507D
     mas_writereg(MAS_REG_KTREBLE, treble_table[val+15]);
 #endif
@@ -183,11 +183,11 @@ void audiohw_set_treble(int val)
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 void audiohw_set_volume(int val) {
     unsigned tmp = ((unsigned)(val + 115) & 0xff) << 8;
-    mas_codec_writereg(0x10, tmp);
+    mas_codec_writereg(MAS_REG_VOLUME_CONTROL, tmp);
 }
 
 void audiohw_set_balance(int val) {
     unsigned tmp = ((unsigned)(val * 127 / 100) & 0xff) << 8;
-    mas_codec_writereg(0x11, tmp);
+    mas_codec_writereg(MAS_REG_BALANCE, tmp);
 }
 #endif

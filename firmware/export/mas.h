@@ -33,7 +33,8 @@
 #define MAS_ADR         0x3c
 #define	MAS_DEV_WRITE   (MAS_ADR | 0x00)
 #define	MAS_DEV_READ    (MAS_ADR | 0x01)
-#else
+
+#elif CONFIG_CODEC == MAS3507D
 #define MAS_ADR         0x3a
 #define	MAS_DEV_WRITE   (MAS_ADR | 0x00)
 #define	MAS_DEV_READ    (MAS_ADR | 0x01)
@@ -48,7 +49,8 @@
 #define	MAS_CONTROL      0x6a
 #define	MAS_DCCF         0x76
 #define	MAS_DCFR         0x77
-#else
+
+#elif CONFIG_CODEC == MAS3507D
 #define	MAS_DATA_WRITE   0x68
 #define MAS_DATA_READ    0x69
 #define	MAS_CONTROL      0x6a
@@ -62,8 +64,6 @@
 #define	MAS_REG_PIODATA         0xc8
 #define	MAS_REG_StartUpConfig   0xe6
 #define	MAS_REG_KPRESCALE       0xe7
-#define	MAS_REG_KBASS           0x6b
-#define	MAS_REG_KTREBLE         0x6f
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #define MAS_REG_KMDB_SWITCH     0x21
 #define MAS_REG_KMDB_STR        0x22
@@ -74,7 +74,15 @@
 #define MAS_REG_QPEAK_R         0x0b
 #define MAS_REG_DQPEAK_L        0x0c
 #define MAS_REG_DQPEAK_R        0x0d
+#define MAS_REG_VOLUME_CONTROL  0x10
+#define MAS_REG_BALANCE         0x11
 #define MAS_REG_KAVC            0x12
+#define	MAS_REG_KBASS           0x14
+#define	MAS_REG_KTREBLE         0x15
+
+#elif CONFIG_CODEC == MAS3507D
+#define	MAS_REG_KBASS           0x6b
+#define	MAS_REG_KTREBLE         0x6f
 #endif
 
 /*
@@ -90,7 +98,8 @@
 #define MAS_CMD_READ_D1_MEM     0xd0
 #define MAS_CMD_WRITE_D0_MEM    0xe0
 #define MAS_CMD_WRITE_D1_MEM    0xf0
-#else
+
+#elif CONFIG_CODEC == MAS3507D
 #define MAS_CMD_READ_ANCILLARY  0x30
 #define MAS_CMD_WRITE_REG       0x90
 #define MAS_CMD_WRITE_D0_MEM    0xa0
@@ -141,11 +150,15 @@
 #define MAS_D0_MPEG_STATUS_2     0xfd2
 #define MAS_D0_CRC_ERROR_COUNT   0xfd3
 
-#else /* MAS3507D */
+#elif CONFIG_CODEC == MAS3507D
 #define MAS_D0_MPEG_FRAME_COUNT  0x300
 #define MAS_D0_MPEG_STATUS_1     0x301
 #define MAS_D0_MPEG_STATUS_2     0x302
 #define MAS_D0_CRC_ERROR_COUNT   0x303
+#define MAS_D0_OUT_LL            0x7f8
+#define MAS_D0_OUT_LR            0x7f9
+#define MAS_D0_OUT_RL            0x7fa
+#define MAS_D0_OUT_RR            0x7fb
 
 #endif
 
