@@ -611,9 +611,10 @@ static int sd_select_bank(signed char bank)
 
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
-        dma_release();
+        /*  Wait for FIFO to empty  */
+        while(MCI_STATUS(INTERNAL_AS3525) & (MCI_TX_ACTIVE | MCI_RX_ACTIVE));
 
-        mci_delay();
+        dma_release();
 
         ret = sd_wait_for_state(INTERNAL_AS3525, SD_TRAN);
         if (ret < 0)
