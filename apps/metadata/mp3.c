@@ -429,6 +429,7 @@ static const struct tag_resolver taglist[] = {
     { "TIT1", 4, offsetof(struct mp3entry, grouping), NULL, false },
     { "TT1",  3, offsetof(struct mp3entry, grouping), NULL, false },
     { "COMM", 4, offsetof(struct mp3entry, comment), NULL, false }, 
+    { "COM",  3, offsetof(struct mp3entry, comment), NULL, false }, 
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre, false },
     { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre, false },
     { "TXXX", 4, 0, &parseuser, false },
@@ -890,7 +891,8 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                  * remove them so unicode_munge can work correctly
                  */
                  
-                if(!memcmp( header, "COMM", 4 )) {
+                if((tr->tag_length == 4 && !memcmp( header, "COMM", 4)) ||
+                   (tr->tag_length == 3 && !memcmp( header, "COM", 3))) {
                     int offset;
                     /* ignore comments with iTunes 7 soundcheck/gapless data */
                     if(!strncmp(tag+4, "iTun", 4))
