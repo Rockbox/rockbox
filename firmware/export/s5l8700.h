@@ -127,6 +127,7 @@
 #define INTMSK                  (*(REG32_PTR_T)(0x39C00008))     /* Determines which interrupt source is masked. The */
 #if CONFIG_CPU==S5L8701
 #define    INTMSK_TIMERB        (1<<5)
+#define    INTMSK_ECC           (1<<19)
 #else
 #define    INTMSK_TIMERB        (1<<7)
 #endif
@@ -192,7 +193,58 @@
 #define DMACADDR3               (*(REG32_PTR_T)(0x3840006C))     /* Current memory address register for channel 3 */
 #define DMACTCNT3               (*(REG32_PTR_T)(0x38400070))     /* Current transfer count register for channel 3 */
 #define DMACOM3                 (*(REG32_PTR_T)(0x38400074))     /* Channel 3 command register */
+#if CONFIG_CPU==S5L8701
+#define DMABASE4                (*(REG32_PTR_T)(0x38400080))     /* Base address register for channel 4 */
+#define DMACON4                 (*(REG32_PTR_T)(0x38400084))     /* Configuration register for channel 4 */
+#define DMATCNT4                (*(REG32_PTR_T)(0x38400088))     /* Transfer count register for channel 4 */
+#define DMACADDR4               (*(REG32_PTR_T)(0x3840008C))     /* Current memory address register for channel 4 */
+#define DMACTCNT4               (*(REG32_PTR_T)(0x38400090))     /* Current transfer count register for channel 4 */
+#define DMACOM4                 (*(REG32_PTR_T)(0x38400094))     /* Channel 4 command register */
+#define DMABASE5                (*(REG32_PTR_T)(0x384000A0))     /* Base address register for channel 5 */
+#define DMACON5                 (*(REG32_PTR_T)(0x384000A4))     /* Configuration register for channel 5 */
+#define DMATCNT5                (*(REG32_PTR_T)(0x384000A8))     /* Transfer count register for channel 5 */
+#define DMACADDR5               (*(REG32_PTR_T)(0x384000AC))     /* Current memory address register for channel 5 */
+#define DMACTCNT5               (*(REG32_PTR_T)(0x384000B0))     /* Current transfer count register for channel 5 */
+#define DMACOM5                 (*(REG32_PTR_T)(0x384000B4))     /* Channel 5 command register */
+#define DMABASE6                (*(REG32_PTR_T)(0x384000C0))     /* Base address register for channel 6 */
+#define DMACON6                 (*(REG32_PTR_T)(0x384000C4))     /* Configuration register for channel 6 */
+#define DMATCNT6                (*(REG32_PTR_T)(0x384000C8))     /* Transfer count register for channel 6 */
+#define DMACADDR6               (*(REG32_PTR_T)(0x384000CC))     /* Current memory address register for channel 6 */
+#define DMACTCNT6               (*(REG32_PTR_T)(0x384000D0))     /* Current transfer count register for channel 6 */
+#define DMACOM6                 (*(REG32_PTR_T)(0x384000D4))     /* Channel 6 command register */
+#define DMABASE7                (*(REG32_PTR_T)(0x384000E0))     /* Base address register for channel 7 */
+#define DMACON7                 (*(REG32_PTR_T)(0x384000E4))     /* Configuration register for channel 7 */
+#define DMATCNT7                (*(REG32_PTR_T)(0x384000E8))     /* Transfer count register for channel 7 */
+#define DMACADDR7               (*(REG32_PTR_T)(0x384000EC))     /* Current memory address register for channel 7 */
+#define DMACTCNT7               (*(REG32_PTR_T)(0x384000F0))     /* Current transfer count register for channel 7 */
+#define DMACOM7                 (*(REG32_PTR_T)(0x384000F4))     /* Channel 7 command register */
+#define DMAALLST                (*(REG32_PTR_T)(0x38400180))     /* All channel status register */
+#else
 #define DMAALLST                (*(REG32_PTR_T)(0x38400100))     /* All channel status register */
+#endif
+#define DMACON_DEVICE_SHIFT    30
+#define DMACON_DIRECTION_SHIFT 29
+#define DMACON_DATA_SIZE_SHIFT 22
+#define DMACON_BURST_LEN_SHIFT 19
+#define DMACOM_START           4
+#define DMACOM_CLEARBOTHDONE   7
+#define DMAALLST_WCOM0         (1 << 0)
+#define DMAALLST_HCOM0         (1 << 1)
+#define DMAALLST_DMABUSY0      (1 << 2)
+#define DMAALLST_HOLD_SKIP     (1 << 3)
+#define DMAALLST_WCOM1         (1 << 4)
+#define DMAALLST_HCOM1         (1 << 5)
+#define DMAALLST_DMABUSY1      (1 << 6)
+#define DMAALLST_WCOM2         (1 << 8)
+#define DMAALLST_HCOM2         (1 << 9)
+#define DMAALLST_DMABUSY2      (1 << 10)
+#define DMAALLST_WCOM3         (1 << 12)
+#define DMAALLST_HCOM3         (1 << 13)
+#define DMAALLST_DMABUSY3      (1 << 14)
+#define DMAALLST_CHAN0_MASK    (0xF << 0)
+#define DMAALLST_CHAN1_MASK    (0xF << 4)
+#define DMAALLST_CHAN2_MASK    (0xF << 8)
+#define DMAALLST_CHAN3_MASK    (0xF << 12)
 
 /* 10. REAL TIMER CLOCK (RTC) */
 #define RTCCON                  (*(REG32_PTR_T)(0x3D200000))     /* RTC Control Register */
@@ -246,59 +298,79 @@
 #define TDCNT                   (*(REG32_PTR_T)(0x3C700074))     /* Counter register */
 
 /* 12. NAND FLASH CONTROLER */
-#define FMCTRL0                 (*(REG32_PTR_T)(0x3C200000))     /* Control Register0 */
-#define FMCTRL1                 (*(REG32_PTR_T)(0x3C200004))     /* Control Register1 */
-#define FMCMD                   (*(REG32_PTR_T)(0x3C200008))     /* Command Register */
-#define FMADDR0                 (*(REG32_PTR_T)(0x3C20000C))     /* Address Register0 */
-#define FMADDR1                 (*(REG32_PTR_T)(0x3C200010))     /* Address Register1 */
-#define FMADDR2                 (*(REG32_PTR_T)(0x3C200014))     /* Address Register2 */
-#define FMADDR3                 (*(REG32_PTR_T)(0x3C200018))     /* Address Register3 */
-#define FMADDR4                 (*(REG32_PTR_T)(0x3C20001C))     /* Address Register4 */
-#define FMADDR5                 (*(REG32_PTR_T)(0x3C200020))     /* Address Register5 */
-#define FMADDR6                 (*(REG32_PTR_T)(0x3C200024))     /* Address Register6 */
-#define FMADDR7                 (*(REG32_PTR_T)(0x3C200028))     /* Address Register7 */
-#define FMANUM                  (*(REG32_PTR_T)(0x3C20002C))     /* Address Counter Register */
-#define FMDNUM                  (*(REG32_PTR_T)(0x3C200030))     /* Data Counter Register */
-#define FMDATAW0                (*(REG32_PTR_T)(0x3C200034))     /* Write Data Register0 */
-#define FMDATAW1                (*(REG32_PTR_T)(0x3C200038))     /* Write Data Register1 */
-#define FMDATAW2                (*(REG32_PTR_T)(0x3C20003C))     /* Write Data Register2 */
-#define FMDATAW3                (*(REG32_PTR_T)(0x3C200040))     /* Write Data Register3 */
-#define FMCSTAT                 (*(REG32_PTR_T)(0x3C200048))     /* Status Register */
-#define FMSYND0                 (*(REG32_PTR_T)(0x3C20004C))     /* Hamming Syndrome0 */
-#define FMSYND1                 (*(REG32_PTR_T)(0x3C200050))     /* Hamming Syndrome1 */
-#define FMSYND2                 (*(REG32_PTR_T)(0x3C200054))     /* Hamming Syndrome2 */
-#define FMSYND3                 (*(REG32_PTR_T)(0x3C200058))     /* Hamming Syndrome3 */
-#define FMSYND4                 (*(REG32_PTR_T)(0x3C20005C))     /* Hamming Syndrome4 */
-#define FMSYND5                 (*(REG32_PTR_T)(0x3C200060))     /* Hamming Syndrome5 */
-#define FMSYND6                 (*(REG32_PTR_T)(0x3C200064))     /* Hamming Syndrome6 */
-#define FMSYND7                 (*(REG32_PTR_T)(0x3C200068))     /* Hamming Syndrome7 */
-#define FMFIFO                  (*(REG32_PTR_T)(0x3C200080))     /* WRITE/READ FIFO FIXME */
-#define RSCRTL                  (*(REG32_PTR_T)(0x3C200100))     /* Reed-Solomon Control Register */
-#define RSPaity0_0              (*(REG32_PTR_T)(0x3C200110))     /* On-the-fly Parity Register0[31:0] */
-#define RSPaity0_1              (*(REG32_PTR_T)(0x3C200114))     /* On-the-fly Parity Register0[63:32] */
-#define RSPaity0_2              (*(REG32_PTR_T)(0x3C200118))     /* On-the-fly Parity Register0[71:64] */
-#define RSPaity1_0              (*(REG32_PTR_T)(0x3C200120))     /* On-the-fly Parity Register1[31:0] */
-#define RSPaity1_1              (*(REG32_PTR_T)(0x3C200124))     /* On-the-fly Parity Register1[63:32] */
-#define RSPaity1_2              (*(REG32_PTR_T)(0x3C200128))     /* On-the-fly Parity Register1[71:64] */
-#define RSPaity2_0              (*(REG32_PTR_T)(0x3C200130))     /* On-the-fly Parity Register2[31:0] */
-#define RSPaity2_1              (*(REG32_PTR_T)(0x3C200134))     /* On-the-fly Parity Register2[63:32] */
-#define RSPaity2_2              (*(REG32_PTR_T)(0x3C200138))     /* On-the-fly Parity Register2[71:64] */
-#define RSPaity3_0              (*(REG32_PTR_T)(0x3C200140))     /* On-the-fly Parity Register3[31:0] */
-#define RSPaity3_1              (*(REG32_PTR_T)(0x3C200144))     /* On-the-fly Parity Register3[63:32] */
-#define RSPaity3_2              (*(REG32_PTR_T)(0x3C200148))     /* On-the-fly Parity Register3[71:64] */
-#define RSSynd0_0               (*(REG32_PTR_T)(0x3C200150))     /* On-the-fly Synd Register0[31:0] */
-#define RSSynd0_1               (*(REG32_PTR_T)(0x3C200154))     /* On-the-fly Synd Register0[63:32] */
-#define RSSynd0_2               (*(REG32_PTR_T)(0x3C200158))     /* On-the-fly Synd Register0[71:64] */
-#define RSSynd1_0               (*(REG32_PTR_T)(0x3C200160))     /* On-the-fly Synd Register1[31:0] */
-#define RSSynd1_1               (*(REG32_PTR_T)(0x3C200164))     /* On-the-fly Synd Register1[63:32] */
-#define RSSynd1_2               (*(REG32_PTR_T)(0x3C200168))     /* On-the-fly Synd Register1[71:64] */
-#define RSSynd2_0               (*(REG32_PTR_T)(0x3C200170))     /* On-the-fly Synd Register2[31:0] */
-#define RSSynd2_1               (*(REG32_PTR_T)(0x3C200174))     /* On-the-fly Synd Register2[63:32] */
-#define RSSynd2_2               (*(REG32_PTR_T)(0x3C200178))     /* On-the-fly Synd Register2[71:64] */
-#define RSSynd3_0               (*(REG32_PTR_T)(0x3C200180))     /* On-the-fly Synd Register3[31:0] */
-#define RSSynd3_1               (*(REG32_PTR_T)(0x3C200184))     /* On-the-fly Synd Register3[63:32] */
-#define RSSynd3_2               (*(REG32_PTR_T)(0x3C200188))     /* On-the-fly Synd Register3[71:64] */
-#define FlagSynd                (*(REG32_PTR_T)(0x3C200190))     /* On-the-fly ECC Result Flag */
+#if CONFIG_CPU==S5L8701
+#define FMC_BASE 0x39400000
+#else
+#define FMC_BASE 0x3C200000
+#endif
+#define FMCTRL0                 (*(REG32_PTR_T)(FMC_BASE + 0x0000))     /* Control Register0 */
+#define FMCTRL1                 (*(REG32_PTR_T)(FMC_BASE + 0x0004))     /* Control Register1 */
+#define FMCMD                   (*(REG32_PTR_T)(FMC_BASE + 0x0008))     /* Command Register */
+#define FMADDR0                 (*(REG32_PTR_T)(FMC_BASE + 0x000C))     /* Address Register0 */
+#define FMADDR1                 (*(REG32_PTR_T)(FMC_BASE + 0x0010))     /* Address Register1 */
+#define FMADDR2                 (*(REG32_PTR_T)(FMC_BASE + 0x0014))     /* Address Register2 */
+#define FMADDR3                 (*(REG32_PTR_T)(FMC_BASE + 0x0018))     /* Address Register3 */
+#define FMADDR4                 (*(REG32_PTR_T)(FMC_BASE + 0x001C))     /* Address Register4 */
+#define FMADDR5                 (*(REG32_PTR_T)(FMC_BASE + 0x0020))     /* Address Register5 */
+#define FMADDR6                 (*(REG32_PTR_T)(FMC_BASE + 0x0024))     /* Address Register6 */
+#define FMADDR7                 (*(REG32_PTR_T)(FMC_BASE + 0x0028))     /* Address Register7 */
+#define FMANUM                  (*(REG32_PTR_T)(FMC_BASE + 0x002C))     /* Address Counter Register */
+#define FMDNUM                  (*(REG32_PTR_T)(FMC_BASE + 0x0030))     /* Data Counter Register */
+#define FMDATAW0                (*(REG32_PTR_T)(FMC_BASE + 0x0034))     /* Write Data Register0 */
+#define FMDATAW1                (*(REG32_PTR_T)(FMC_BASE + 0x0038))     /* Write Data Register1 */
+#define FMDATAW2                (*(REG32_PTR_T)(FMC_BASE + 0x003C))     /* Write Data Register2 */
+#define FMDATAW3                (*(REG32_PTR_T)(FMC_BASE + 0x0040))     /* Write Data Register3 */
+#define FMCSTAT                 (*(REG32_PTR_T)(FMC_BASE + 0x0048))     /* Status Register */
+#define FMSYND0                 (*(REG32_PTR_T)(FMC_BASE + 0x004C))     /* Hamming Syndrome0 */
+#define FMSYND1                 (*(REG32_PTR_T)(FMC_BASE + 0x0050))     /* Hamming Syndrome1 */
+#define FMSYND2                 (*(REG32_PTR_T)(FMC_BASE + 0x0054))     /* Hamming Syndrome2 */
+#define FMSYND3                 (*(REG32_PTR_T)(FMC_BASE + 0x0058))     /* Hamming Syndrome3 */
+#define FMSYND4                 (*(REG32_PTR_T)(FMC_BASE + 0x005C))     /* Hamming Syndrome4 */
+#define FMSYND5                 (*(REG32_PTR_T)(FMC_BASE + 0x0060))     /* Hamming Syndrome5 */
+#define FMSYND6                 (*(REG32_PTR_T)(FMC_BASE + 0x0064))     /* Hamming Syndrome6 */
+#define FMSYND7                 (*(REG32_PTR_T)(FMC_BASE + 0x0068))     /* Hamming Syndrome7 */
+#define FMFIFO                  (*(REG32_PTR_T)(FMC_BASE + 0x0080))     /* WRITE/READ FIFO FIXME */
+#define RSCRTL                  (*(REG32_PTR_T)(FMC_BASE + 0x0100))     /* Reed-Solomon Control Register */
+#define RSPARITY0_0             (*(REG32_PTR_T)(FMC_BASE + 0x0110))     /* On-the-fly Parity Register0[31:0] */
+#define RSPARITY0_1             (*(REG32_PTR_T)(FMC_BASE + 0x0114))     /* On-the-fly Parity Register0[63:32] */
+#define RSPARITY0_2             (*(REG32_PTR_T)(FMC_BASE + 0x0118))     /* On-the-fly Parity Register0[71:64] */
+#define RSPARITY1_0             (*(REG32_PTR_T)(FMC_BASE + 0x0120))     /* On-the-fly Parity Register1[31:0] */
+#define RSPARITY1_1             (*(REG32_PTR_T)(FMC_BASE + 0x0124))     /* On-the-fly Parity Register1[63:32] */
+#define RSPARITY1_2             (*(REG32_PTR_T)(FMC_BASE + 0x0128))     /* On-the-fly Parity Register1[71:64] */
+#define RSPARITY2_0             (*(REG32_PTR_T)(FMC_BASE + 0x0130))     /* On-the-fly Parity Register2[31:0] */
+#define RSPARITY2_1             (*(REG32_PTR_T)(FMC_BASE + 0x0134))     /* On-the-fly Parity Register2[63:32] */
+#define RSPARITY2_2             (*(REG32_PTR_T)(FMC_BASE + 0x0138))     /* On-the-fly Parity Register2[71:64] */
+#define RSPARITY3_0             (*(REG32_PTR_T)(FMC_BASE + 0x0140))     /* On-the-fly Parity Register3[31:0] */
+#define RSPARITY3_1             (*(REG32_PTR_T)(FMC_BASE + 0x0144))     /* On-the-fly Parity Register3[63:32] */
+#define RSPARITY3_2             (*(REG32_PTR_T)(FMC_BASE + 0x0148))     /* On-the-fly Parity Register3[71:64] */
+#define RSSYND0_0               (*(REG32_PTR_T)(FMC_BASE + 0x0150))     /* On-the-fly Synd Register0[31:0] */
+#define RSSYND0_1               (*(REG32_PTR_T)(FMC_BASE + 0x0154))     /* On-the-fly Synd Register0[63:32] */
+#define RSSYND0_2               (*(REG32_PTR_T)(FMC_BASE + 0x0158))     /* On-the-fly Synd Register0[71:64] */
+#define RSSYND1_0               (*(REG32_PTR_T)(FMC_BASE + 0x0160))     /* On-the-fly Synd Register1[31:0] */
+#define RSSYND1_1               (*(REG32_PTR_T)(FMC_BASE + 0x0164))     /* On-the-fly Synd Register1[63:32] */
+#define RSSYND1_2               (*(REG32_PTR_T)(FMC_BASE + 0x0168))     /* On-the-fly Synd Register1[71:64] */
+#define RSSYND2_0               (*(REG32_PTR_T)(FMC_BASE + 0x0170))     /* On-the-fly Synd Register2[31:0] */
+#define RSSYND2_1               (*(REG32_PTR_T)(FMC_BASE + 0x0174))     /* On-the-fly Synd Register2[63:32] */
+#define RSSYND2_2               (*(REG32_PTR_T)(FMC_BASE + 0x0178))     /* On-the-fly Synd Register2[71:64] */
+#define RSSYND3_0               (*(REG32_PTR_T)(FMC_BASE + 0x0180))     /* On-the-fly Synd Register3[31:0] */
+#define RSSYND3_1               (*(REG32_PTR_T)(FMC_BASE + 0x0184))     /* On-the-fly Synd Register3[63:32] */
+#define RSSYND3_2               (*(REG32_PTR_T)(FMC_BASE + 0x0188))     /* On-the-fly Synd Register3[71:64] */
+#define FLAGSYND                (*(REG32_PTR_T)(FMC_BASE + 0x0190))     /* On-the-fly ECC Result Flag */
+#define FMCTRL0_ENABLEDMA       (1 << 10)
+#define FMCTRL0_UNK1            (1 << 11)
+#define FMCTRL1_DOTRANSADDR     (1 << 0)
+#define FMCTRL1_DOREADDATA      (1 << 1)
+#define FMCTRL1_DOWRITEDATA     (1 << 2)
+#define FMCTRL1_CLEARWFIFO      (1 << 6)
+#define FMCTRL1_CLEARRFIFO      (1 << 7)
+#define FMCSTAT_RBB             (1 << 0)
+#define FMCSTAT_RBBDONE         (1 << 1)
+#define FMCSTAT_CMDDONE         (1 << 2)
+#define FMCSTAT_ADDRDONE        (1 << 3)
+#define FMCSTAT_BANK0READY      (1 << 4)
+#define FMCSTAT_BANK1READY      (1 << 5)
+#define FMCSTAT_BANK2READY      (1 << 6)
+#define FMCSTAT_BANK3READY      (1 << 7)
 
 /* 13. SECURE DIGITAL CARD INTERFACE (SDCI) */
 #define SDCI_CTRL               (*(REG32_PTR_T)(0x3C300000))     /* Control Register */
@@ -335,21 +407,25 @@
 #define SPDCNT                  (*(REG32_PTR_T)(0x3CB00014))     /* Repetition Count Register */
 
 /* 16. REED-SOLOMON ECC CODEC */
-#define DATA_PTR                (*(REG32_PTR_T)(0x39E00004))     /* Data Area Start Pointer */
-#define SPARE_PTR               (*(REG32_PTR_T)(0x39E00008))     /* Spare Area Start Pointer */
+#define ECC_DATA_PTR            (*(REG32_PTR_T)(0x39E00004))     /* Data Area Start Pointer */
+#define ECC_SPARE_PTR           (*(REG32_PTR_T)(0x39E00008))     /* Spare Area Start Pointer */
 #define ECC_CTRL                (*(REG32_PTR_T)(0x39E0000C))     /* ECC Control Register */
 #define ECC_RESULT              (*(REG32_PTR_T)(0x39E00010))     /* ECC Result */
+#define ECC_UNK1                (*(REG32_PTR_T)(0x39E00014))     /* No idea what this is, but the OFW uses it on S5L8701 */
 #define ECC_EVAL0               (*(REG32_PTR_T)(0x39E00020))     /* Error Eval0 Poly */
 #define ECC_EVAL1               (*(REG32_PTR_T)(0x39E00024))     /* Error Eval1 Poly */
 #define ECC_LOC0                (*(REG32_PTR_T)(0x39E00028))     /* Error Loc0 Poly */
 #define ECC_LOC1                (*(REG32_PTR_T)(0x39E0002C))     /* Error Loc1 Poly */
-#define PARITY0                 (*(REG32_PTR_T)(0x39E00030))     /* Encode Parity0 Poly */
-#define PARITY1                 (*(REG32_PTR_T)(0x39E00034))     /* Encode Pariyt1 Poly */
-#define PARITY2                 (*(REG32_PTR_T)(0x39E00038))     /* Encode Parity2 Poly */
-#define INT_CLR                 (*(REG32_PTR_T)(0x39E00040))     /* Interrupt Clear Register */
-#define SYND0                   (*(REG32_PTR_T)(0x39E00044))     /* Syndrom0 Poly */
-#define SYND1                   (*(REG32_PTR_T)(0x39E00048))     /* Syndrom1 Poly */
-#define SYND2                   (*(REG32_PTR_T)(0x39E0004C))     /* Syndrom2 Poly */
+#define ECC_PARITY0             (*(REG32_PTR_T)(0x39E00030))     /* Encode Parity0 Poly */
+#define ECC_PARITY1             (*(REG32_PTR_T)(0x39E00034))     /* Encode Pariyt1 Poly */
+#define ECC_PARITY2             (*(REG32_PTR_T)(0x39E00038))     /* Encode Parity2 Poly */
+#define ECC_INT_CLR             (*(REG32_PTR_T)(0x39E00040))     /* Interrupt Clear Register */
+#define ECC_SYND0               (*(REG32_PTR_T)(0x39E00044))     /* Syndrom0 Poly */
+#define ECC_SYND1               (*(REG32_PTR_T)(0x39E00048))     /* Syndrom1 Poly */
+#define ECC_SYND2               (*(REG32_PTR_T)(0x39E0004C))     /* Syndrom2 Poly */
+#define ECCCTRL_STARTDECODING  (1 << 0)
+#define ECCCTRL_STARTENCODING  (1 << 1)
+#define ECCCTRL_STARTDECNOSYND (1 << 2)
 
 /* 17. IIS Tx/Rx INTERFACE */
 #define I2SCLKCON               (*(REG32_PTR_T)(0x3CA00000))     /* Clock Control Register */
