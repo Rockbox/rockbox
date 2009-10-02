@@ -23,10 +23,10 @@
 #include "cpu.h"
 
     .section .intvect,"ax",%progbits
-    .global    _start
+    .global    start
     .global    _newstart
     /* Exception vectors */
-_start:
+start:
     b _newstart
     ldr pc, =undef_instr_handler
     ldr pc, =software_int_handler
@@ -82,9 +82,14 @@ newstart2:
 //    orr r0, r0, r2
 //    str r0, [r1] // switch backlight on
 
-#ifndef IPOD_NANO2G
-/* Currently disabled for the Nano2G as it doesn't appear to be
-   correct - e.g. audio doesn't work with this code enabled. */
+#if CONFIG_CPU==S5L8701
+    ldr r1, =0x38200000
+    ldr r2, [r1]
+    orr r2, r2, #1
+    bic r2, r2, #0x10000
+    str r2, [r1] // remap iram to address 0x0
+#endif
+
     ldr r1, =0x3c500000 // CLKCON
     ldr r0, =0x00800080
     str r0, [r1]
@@ -126,7 +131,6 @@ newstart2:
     nop					        
     nop
     nop
-#endif
 	
 //    ldr r0, =0x10100000
 //    ldr r1, =0x38200034
@@ -231,9 +235,8 @@ newstart2:
     mrc 15, 0, r0, c1, c0, 0
     orr r0, r0, r1
     mcr 15, 0, r0, c1, c0, 0 // enable protection unit
-
     
-#if CONFIG_CPU==S5L8700
+#if CONFIG_CPU==S5L8700 || !defined(BOOTLOADER)
     /* Copy interrupt vectors to iram */
     ldr     r2, =_intvectstart
     ldr     r3, =_intvectend
@@ -254,7 +257,7 @@ newstart2:
     strhi   r4, [r2], #4
     bhi     1b
 
-#if CONFIG_CPU==S5L8700
+#if CONFIG_CPU==S5L8700 && defined(BOOTLOADER)
     /* Copy icode and data to ram */
     ldr     r2, =_datastart
     ldr     r3, =_dataend
@@ -265,10 +268,31 @@ newstart2:
     strhi   r1, [r2], #4
     bhi     1b
 #endif
-    
+
+#ifndef BOOTLOADER
+    /* Copy icode and data to ram */
+    ldr     r2, =_iramstart
+    ldr     r3, =_iramend
+    ldr     r4, =_iramcopy
+1:
+    cmp     r3, r2
+    ldrhi   r1, [r4], #4
+    strhi   r1, [r2], #4
+    bhi     1b
+	
+    /* Initialise ibss section to zero */
+    ldr     r2, =_iedata
+    ldr     r3, =_iend
+    mov     r4, #0
+1:
+    cmp     r3, r2
+    strhi   r4, [r2], #4
+    bhi     1b
+#endif
+
     /* Set up some stack and munge it with 0xdeadbeef */
-    ldr     sp, =_stackend
-    ldr     r2, =_stackbegin
+    ldr     sp, =stackend
+    ldr     r2, =stackbegin
     ldr     r3, =0xdeadbeef
 1:
     cmp     sp, r2

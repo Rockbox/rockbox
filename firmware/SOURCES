@@ -1277,6 +1277,11 @@ target/arm/tcc780x/cowond2/audio-cowond2.c
 
 #ifdef CPU_S5L870X
 target/arm/s5l8700/system-s5l8700.c
+#ifndef SIMULATOR
+#ifndef BOOTLOADER
+target/arm/s5l8700/timer-s5l8700.c
+#endif /* BOOTLOADER */
+#endif /* SIMULATOR */
 #endif
 
 #ifdef MEIZU_M6SL
@@ -1311,10 +1316,20 @@ target/arm/s5l8700/udacodec-meizu.c
 #endif /* MEIZU_M3 */
 
 #ifdef IPOD_NANO2G
+drivers/audio/wm8975.c
 target/arm/ipod/button-clickwheel.c
 target/arm/s5l8700/kernel-s5l8700.c
+target/arm/s5l8700/wmcodec-s5l8700.c
+target/arm/s5l8700/pcm-s5l8700.c
+target/arm/s5l8700/adc-s5l8700.c
+target/arm/s5l8700/debug-s5l8700.c
+target/arm/s5l8700/dma-s5l8700.c
+target/arm/s5l8700/usb-s5l8700.c
 target/arm/s5l8700/ipodnano2g/backlight-nano2g.c
 target/arm/s5l8700/ipodnano2g/lcd-nano2g.c
+target/arm/s5l8700/ipodnano2g/powermgmt-nano2g.c
+target/arm/s5l8700/ipodnano2g/power-nano2g.c
+target/arm/s5l8700/ipodnano2g/audio-nano2g.c
 #endif
 
 #ifndef SIMULATOR
