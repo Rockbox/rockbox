@@ -40,15 +40,36 @@
 #include "power.h"
 #include "powermgmt.h"
 
+#ifdef CPU_PP
+/* PortalPlayer uses the USEC timer */
 #define WHEEL_FAST_OFF_TIMEOUT   250000 /* timeout for acceleration = 250ms */
 #define WHEEL_REPEAT_TIMEOUT     250000 /* timeout for button repeat = 250ms */
 #define WHEEL_UNTOUCH_TIMEOUT    150000 /* timeout for untouching wheel = 150ms */
+#else
+/* Other targets use current_tick */
+#define WHEEL_FAST_OFF_TIMEOUT   (HZ/4) /* timeout for acceleration = 250ms */
+#define WHEEL_REPEAT_TIMEOUT     (HZ/4) /* timeout for button repeat = 250ms */
+#define WHEEL_UNTOUCH_TIMEOUT    ((HZ*15)/100) /* timeout for untouching wheel = 150ms */
+
+#endif
+
+#ifdef CPU_PP
+#define CLICKWHEEL_DATA   (*(volatile unsigned long*)(0x7000c140))
+#elif CONFIG_CPU==S5L8701
+#define CLICKWHEEL00      (*(volatile unsigned long*)(0x3c200000))
+#define CLICKWHEEL10      (*(volatile unsigned long*)(0x3c200010))
+#define CLICKWHEELINT     (*(volatile unsigned long*)(0x3c200014))
+#define CLICKWHEEL_DATA   (*(volatile unsigned long*)(0x3c200018))
+#else
+#error CPU architecture not supported!
+#endif
+
 #define WHEELCLICKS_PER_ROTATION     96 /* wheelclicks per full rotation */
 
 /* This amount of clicks is needed for at least scrolling 1 item. Choose small values 
  * to have high sensitivity but few precision, choose large values to have less 
  * sensitivity and good precision. */
-#if defined(IPOD_NANO)
+#if defined(IPOD_NANO) || defined(IPOD_NANO2G)
 #define WHEEL_SENSITIVITY 6 /* iPod nano has smaller wheel, lower sensitivity needed */
 #else
 #define WHEEL_SENSITIVITY 4 /* default sensitivity */
@@ -71,6 +92,7 @@ int int_btn = BUTTON_NONE;
     static bool send_events = true;
 #endif
 
+#ifdef CPU_PP
 static void opto_i2c_init(void)
 {
     DEV_EN |= DEV_OPTO;
@@ -82,19 +104,18 @@ static void opto_i2c_init(void)
     outl(0xc00a1f00, 0x7000c100);
     outl(0x01000000, 0x7000c104);
 }
+#endif
 
 static inline int ipod_4g_button_read(void)
 {
     int whl = -1;
     int btn = BUTTON_NONE;
-    
-    /* The following delay was 250 in the ipodlinux source, but 50 seems to 
-       work fine - tested on Nano, Color/Photo and Video. */
-    udelay(50);
 
+#ifdef CPU_PP    
     if ((inl(0x7000c104) & 0x04000000) != 0) 
     {
-        unsigned status = inl(0x7000c140);
+#endif
+        unsigned status = CLICKWHEEL_DATA;
 
         if ((status & 0x800000ff) == 0x8000001a) 
         {
@@ -110,7 +131,11 @@ static inline int ipod_4g_button_read(void)
                 btn |= BUTTON_MENU;
             if (status & 0x40000000) 
             {
+#ifdef CPU_PP
                 unsigned long usec = USEC_TIMER;
+#else
+                unsigned long usec = current_tick;
+#endif
                 
                 /* Highest wheel = 0x5F, clockwise increases */
                 new_wheel_value = (status >> 16) & 0x7f;
@@ -239,7 +264,9 @@ static inline int ipod_4g_button_read(void)
             }
 
         }
+#ifdef CPU_PP    
     }
+#endif
 
 #ifdef HAVE_WHEEL_POSITION
     /* Save the new absolute wheel position */
@@ -260,9 +287,14 @@ void wheel_send_events(bool send)
 }
 #endif
 
+#ifdef CPU_PP
 void ipod_4g_button_int(void)
 {
     CPU_HI_INT_DIS = I2C_MASK;
+
+    /* The following delay was 250 in the ipodlinux source, but 50 seems to 
+       work fine - tested on Nano, Color/Photo and Video. */
+    udelay(50);
 
     int_btn = ipod_4g_button_read();
     
@@ -285,6 +317,43 @@ void button_init_device(void)
     CPU_HI_INT_EN = I2C_MASK;
 }
 
+bool button_hold(void)
+{
+    return (GPIOA_INPUT_VAL & 0x20)?false:true;
+}
+
+bool headphones_inserted(void)
+{
+    return (GPIOA_INPUT_VAL & 0x80)?true:false;
+}
+#else
+void INT_SPI(void)
+{
+    int clickwheel_events = CLICKWHEELINT;
+
+    /* Clear interrupts */
+    if (clickwheel_events & 4) CLICKWHEELINT = 4;
+    if (clickwheel_events & 2) CLICKWHEELINT = 2;
+    if (clickwheel_events & 1) CLICKWHEELINT = 1;
+
+    int_btn = ipod_4g_button_read();
+}
+
+void button_init_device(void)
+{
+    CLICKWHEEL00 = 0x280000;
+    CLICKWHEEL10 = 3;
+    INTMOD = 0;
+    INTMSK |= (1<<26);
+    PCON10 &= ~0xF00;
+}
+
+bool button_hold(void)
+{
+    return ((PDAT14 & (1 << 6)) == 0);
+}
+#endif
+
 /*
  * Get button pressed from hardware
  */
@@ -303,14 +372,18 @@ int button_read_device(void)
         
         if (hold_button)
         {
+#ifdef CPU_PP
             /* lock -> disable wheel sensor */
             DEV_EN &= ~DEV_OPTO;
+#endif
         }
         else
         {
+#ifdef CPU_PP
             /* unlock -> enable wheel sensor */
             DEV_EN |= DEV_OPTO;
             opto_i2c_init();
+#endif
         }
     }
 
@@ -320,14 +393,4 @@ int button_read_device(void)
 #else
     return int_btn;
 #endif
-}
-
-bool button_hold(void)
-{
-    return (GPIOA_INPUT_VAL & 0x20)?false:true;
-}
-
-bool headphones_inserted(void)
-{
-    return (GPIOA_INPUT_VAL & 0x80)?true:false;
 }
