@@ -767,11 +767,12 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
         v = pow_10_to_yover16_ptr[last_exp];
         max_scale = v;
         n = *ptr++;
-        do
-        {
-            *q++ = v;
-        }
-        while (--n);
+        switch (n & 3) do {
+            case 0: *q++ = v;
+            case 3: *q++ = v;
+            case 2: *q++ = v;
+            case 1: *q++ = v;
+        } while ((n -= 4) > 0);
     } else {
        last_exp = 36;
     }
@@ -792,12 +793,12 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
             max_scale = v;
         }
         n = *ptr++;
-        do
-        {
-            *q++ = v;
-
-        }
-        while (--n);
+        switch (n & 3) do {
+            case 0: *q++ = v;
+            case 3: *q++ = v;
+            case 2: *q++ = v;
+            case 1: *q++ = v;
+        } while ((n -= 4) > 0);
     }
 
     s->max_exponent[ch] = max_scale;
