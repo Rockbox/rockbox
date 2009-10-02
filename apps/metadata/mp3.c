@@ -44,6 +44,9 @@
 #include "replaygain.h"
 #include "rbunicode.h"
 #include "metadata_parsers.h"
+#if CONFIG_CODEC == SWCODEC
+#include "metadata_common.h"
+#endif
 
 static unsigned long unsync(unsigned long b0,
                             unsigned long b1,
@@ -655,6 +658,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     bool unsynch = false;
     int i, j;
     int rc;
+#if CONFIG_CODEC == SWCODEC
+    bool itunes_gapless = false;
+#endif
 
     global_ff_found = false;
 
@@ -862,13 +868,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 continue;
             }
 
-            /* Note that parser functions sometimes set *ptag to NULL, so
-             * the "!*ptag" check here doesn't always have the desired
-             * effect. Should the parser functions (parsegenre in
-             * particular) be updated to handle the case of being called
-             * multiple times, or should the "*ptag" check be removed?
-             */
-            if( (!ptag || !*ptag) && !memcmp( header, tr->tag, tr->tag_length ) ) {
+            if( !memcmp( header, tr->tag, tr->tag_length ) ) {
 
                 /* found a tag matching one in tagList, and not yet filled */
                 tag = buffer + bufferpos;
@@ -894,9 +894,17 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 if((tr->tag_length == 4 && !memcmp( header, "COMM", 4)) ||
                    (tr->tag_length == 3 && !memcmp( header, "COM", 3))) {
                     int offset;
-                    /* ignore comments with iTunes 7 soundcheck/gapless data */
-                    if(!strncmp(tag+4, "iTun", 4))
+                    if(!strncmp(tag+4, "iTun", 4)) {
+#if CONFIG_CODEC == SWCODEC
+                        /* check for iTunes gapless information */
+                        if(!strncmp(tag+4, "iTunSMPB", 8))
+                            itunes_gapless = true;
+                        else
+#endif
+                        /* ignore other with iTunes tags */
                         break;
+                    }
+
                     offset = 3 + unicode_len(*tag, tag + 4);
                     if(bytesread > offset) {
                         bytesread -= offset;
@@ -927,7 +935,23 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 tag[bytesread] = 0;
                 bufferpos += bytesread + 1;
 
-                if (ptag)
+#if CONFIG_CODEC == SWCODEC
+                /* parse the tag if it contains iTunes gapless info */
+                if (itunes_gapless)
+                {
+                    itunes_gapless = false;
+                    entry->lead_trim = get_itunes_int32(tag, 1);
+                    entry->tail_trim = get_itunes_int32(tag, 2);
+                }
+#endif
+
+                /* Note that parser functions sometimes set *ptag to NULL, so
+                 * the "!*ptag" check here doesn't always have the desired
+                 * effect. Should the parser functions (parsegenre in
+                 * particular) be updated to handle the case of being called
+                 * multiple times, or should the "*ptag" check be removed?
+                 */
+                if (ptag && !*ptag)
                     *ptag = tag;
 
                 if( tr->ppFunc )
@@ -1082,8 +1106,10 @@ static int getsonglength(int fd, struct mp3entry *entry)
     entry->has_toc = info.has_toc;
 
 #if CONFIG_CODEC==SWCODEC
-    entry->lead_trim = info.enc_delay;
-    entry->tail_trim = info.enc_padding;
+    if (!entry->lead_trim)
+        entry->lead_trim = info.enc_delay;
+    if (!entry->tail_trim)
+        entry->tail_trim = info.enc_padding;
 #endif
 
     memcpy(entry->toc, info.toc, sizeof(info.toc));
