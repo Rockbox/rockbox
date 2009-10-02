@@ -178,13 +178,6 @@ void lcd_init_device(void)
 void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
                    int bheight, int stride)
 {
-    (void)data;
-    (void)x;
-    (void)by;
-    (void)width;
-    (void)bheight;
-    (void)stride;
-
     const unsigned char *src, *src_end;
     unsigned char *dst_u, *dst_l;
     static unsigned char upper[LCD_WIDTH] IBSS_ATTR;
@@ -230,14 +223,6 @@ void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
 void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int x, int by, int width, int bheight, int stride)
 {
-    (void)values;
-    (void)phases;
-    (void)x;
-    (void)by;
-    (void)width;
-    (void)bheight;
-    (void)stride;
-
     stride <<= 2; /* 4 pixels per block */
     while (bheight--)
     {
