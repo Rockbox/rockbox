@@ -52,6 +52,9 @@
 #define LCD_CNTL_COLUMN                 0x13
 #define LCD_CNTL_DATA_WRITE             0x1d
 
+/*** shared semi-private declarations ***/
+extern const unsigned char lcd_dibits[16] ICONST_ATTR;
+
 /* lcd commands */
 static void lcd_send_data(unsigned byte)
 {
@@ -182,8 +185,6 @@ void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
     (void)bheight;
     (void)stride;
 
-#if 0
-    /* This is from the h100 lcd code, perhaps we can adapt */
     const unsigned char *src, *src_end;
     unsigned char *dst_u, *dst_l;
     static unsigned char upper[LCD_WIDTH] IBSS_ATTR;
@@ -219,11 +220,10 @@ void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
 
         data += stride;
     }
-#endif
 }
 
 /* Helper function for lcd_grey_phase_blit(). */
-/* void lcd_grey_data(unsigned char *values, unsigned char *phases, int count); */
+void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
 
 /* Performance function that works with an external buffer
    note that by and bheight are in 4-pixel units! */
@@ -238,8 +238,6 @@ void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
     (void)bheight;
     (void)stride;
 
-#if 0
-    /* This is from the h100 lcd code, perhaps we can adapt */
     stride <<= 2; /* 4 pixels per block */
     while (bheight--)
     {
@@ -250,7 +248,6 @@ void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
         values += stride;
         phases += stride;
     }
-#endif
 }
 
 /* Update a fraction of the display. */
