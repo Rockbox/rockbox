@@ -68,7 +68,7 @@ int disk_sector_multiplier = 1;
 struct partinfo* disk_init(IF_MD_NONVOID(int drive))
 {
     int i;
-    unsigned char sector[512];
+    unsigned char sector[SECTOR_SIZE];
 #ifdef HAVE_MULTIDRIVE
     /* For each drive, start at a different position, in order not to destroy 
        the first entry of drive 0. 

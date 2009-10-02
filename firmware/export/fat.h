@@ -26,7 +26,11 @@
 #include "mv.h" /* for volume definitions */
 #include "config.h"
 
+/* This value can be overwritten by a target in config-[target].h, but
+   that behaviour is still experimental */
+#ifndef SECTOR_SIZE
 #define SECTOR_SIZE 512
+#endif
 
 /* Number of bytes reserved for a file name (including the trailing \0).
    Since names are stored in the entry as UTF-8, we won't be able to
