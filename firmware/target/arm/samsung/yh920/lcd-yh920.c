@@ -237,11 +237,10 @@ void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
 
 /* Update a fraction of the display. */
 /* void lcd_update_rect(int, int, int, int) ICODE_ATTR; */
-void lcd_update_rect(int x0, int y, int width, int height)
+void lcd_update_rect(int x, int y, int width, int height)
 {
     const fb_data *addr;
     int ymax;
-    int x = x0;
 
     /* The Y coordinates have to work on even 8 pixel rows */
     ymax = (y + height-1) >> 2;
@@ -258,13 +257,12 @@ void lcd_update_rect(int x0, int y, int width, int height)
     for (; y <= ymax; y++)
     {
         lcd_write_reg(LCD_CNTL_PAGE, y);
-        lcd_write_reg(LCD_CNTL_COLUMN, x0);
+        lcd_write_reg(LCD_CNTL_COLUMN, x);
 
-        addr = &lcd_framebuffer[y][x0];
+        addr = &lcd_framebuffer[y][x];
 
         lcd_send_cmd(LCD_CNTL_DATA_WRITE);
-        for (x = 0; x < width; x++)
-            lcd_send_data(*addr++);
+        lcd_write_data(addr, width);
     }
 }
 

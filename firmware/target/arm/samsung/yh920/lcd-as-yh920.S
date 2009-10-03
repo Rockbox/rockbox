@@ -56,41 +56,6 @@ lcd_write_data:
     .size   lcd_write_data,.-lcd_write_data
 
 
-    .global     lcd_mono_data
-    .type       lcd_mono_data,%function
-
-lcd_mono_data:
-    stmfd   sp!, {r4, lr}
-    ldr     lr, =LCD1_BASE
-    ldr     r12, =lcd_dibits
-
-.mloop:
-    ldrb    r2, [r0], #1
-    mov     r3, r2, lsr #4
-    ldrb    r4, [r12, r3]
-
-1:
-    ldr     r3, [lr]
-    tst     r3, #LCD1_BUSY_MASK
-    bne     1b
-    str     r4, [lr, #0x10]
-
-    and     r3, r2, #0x0f
-    ldrb    r4, [r12, r3]
-1:
-    ldr     r3, [lr]
-    tst     r3, #LCD1_BUSY_MASK
-    bne     1b
-    str     r4, [lr, #0x10]
-
-    subs    r1, r1, #1
-    bne     .mloop
-
-    ldmfd   sp!, {r4, pc}
-
-    .size   lcd_mono_data,.-lcd_mono_data
-
-
     .global     lcd_grey_data
     .type       lcd_grey_data,%function
 
