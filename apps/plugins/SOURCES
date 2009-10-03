@@ -21,8 +21,10 @@ viewer.c
 #ifdef HAVE_BACKLIGHT
 lamp.c
 #endif /* HAVE_BACKLIGHT */
-#ifndef SIMULATOR
+#if USING_STORAGE_CALLBACK
 battery_bench.c
+#endif
+#ifndef SIMULATOR
 firmware_flash.c
 #endif /* SIMULATOR */
 #if (CONFIG_CPU == SH7034)
