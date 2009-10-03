@@ -12588,11 +12588,11 @@
   user: core
   <source>
     *: none
-    usb_hid: "USB Keypad Mode:"
+    usb_hid: "USB Keypad Mode"
   </source>
   <dest>
     *: none
-    usb_hid: "Modo Tasti USB:"
+    usb_hid: "Modo Tasti USB"
   </dest>
   <voice>
     *: none
