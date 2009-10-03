@@ -74,12 +74,17 @@ def findqt():
     '''Search for Qt4 installation. Return path to qmake.'''
     print "Searching for Qt"
     bins = ["qmake", "qmake-qt4"]
-    result = ""
     for binary in bins:
-        q = which.which(binary)
-        if len(q) > 0:
-            result = checkqt(q)
-    return result
+        try:
+            q = which.which(binary)
+            if len(q) > 0:
+                result = checkqt(q)
+                if not result == "":
+                    return result
+        except:
+            print sys.exc_value
+
+    return ""
 
 
 def checkqt(qmakebin):
