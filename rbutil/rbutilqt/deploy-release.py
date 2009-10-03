@@ -40,6 +40,7 @@ import time
 # Windows nees some special treatment. Differentiate between program name
 # and executable filename.
 program = "rbutilqt"
+project = "rbutilqt.pro"
 if sys.platform == "win32":
     progexe = "Release/rbutilqt.exe"
 else:
@@ -52,6 +53,7 @@ programfiles = [ progexe ]
 def usage(myself):
     print "Usage: %s [options]" % myself
     print "       -q, --qmake=<qmake>   path to qmake"
+    print "       -p, --project=<pro>   path to .pro file for building out-of-tree"
     print "       -h, --help            this help"
 
 
@@ -121,9 +123,9 @@ def removedir(folder):
     os.rmdir(folder)
 
 
-def qmake(qmake="qmake"):
+def qmake(qmake="qmake", projfile=project):
     print "Running qmake ..."
-    output = subprocess.Popen([qmake, "-config", "static", "-config", "release"],
+    output = subprocess.Popen([qmake, "-config", "static", "-config", "release", projfile],
                 stdout=subprocess.PIPE)
     output.communicate()
     if not output.returncode == 0:
@@ -210,15 +212,18 @@ def tarball(versionstring):
 def main():
     startup = time.time()
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "q:h", ["qmake=", "help"])
+        opts, args = getopt.getopt(sys.argv[1:], "q:p:h", ["qmake=", "project=", "help"])
     except getopt.GetoptError, err:
         print str(err)
         usage(sys.argv[0])
         sys.exit(1)
     qt = ""
+    proj = project
     for o, a in opts:
         if o in ("-q", "--qmake"):
             qt = a
+        if o in ("-p", "--project"):
+            proj = a
         if o in ("-h", "--help"):
             usage(sys.argv[0])
             sys.exit(0)
@@ -231,15 +236,21 @@ def main():
     if qm == "":
         print "ERROR: No suitable Qt installation found."
         sys.exit(1)
+    # check project file
+    if not os.path.exists(proj):
+        print "ERROR: path to project file wrong. You need to specify the path " \
+              "when building out-of-tree."
+        sys.exit(1)
 
-    # figure version from sources
-    ver = findversion("version.h")
+    # figure version from sources. Need to take path to project file into account.
+    versionfile = re.subn('[\w\.]+$', "version.h", proj)[0]
+    ver = findversion(versionfile)
     header = "Building %s %s" % (program, ver)
     print header
     print len(header) * "="
 
     # build it.
-    if not qmake(qm) == 0:
+    if not qmake(qm, proj) == 0:
         os.exit(1)
     if not build() == 0:
         sys.exit(1)
