@@ -31,7 +31,7 @@
     *: "כן"
   </dest>
   <voice>
-    *: "Yes"
+    *: "כן"
   </voice>
 </phrase>
 <phrase>
@@ -45,7 +45,7 @@
     *: "לא"
   </dest>
   <voice>
-    *: "No"
+    *: "לא"
   </voice>
 </phrase>
 <phrase>
@@ -59,7 +59,7 @@
     *: "פועל"
   </dest>
   <voice>
-    *: "On"
+    *: "פועל"
   </voice>
 </phrase>
 <phrase>
@@ -73,7 +73,7 @@
     *: "כבוי"
   </dest>
   <voice>
-    *: "Off"
+    *: "כבוי"
   </voice>
 </phrase>
 <phrase>
@@ -87,7 +87,7 @@
     *: "שאל"
   </dest>
   <voice>
-    *: "Ask"
+    *: "שאל"
   </voice>
 </phrase>
 <phrase>
@@ -101,7 +101,7 @@
     *: "תמיד"
   </dest>
   <voice>
-    *: "Always"
+    *: "תמיד"
   </voice>
 </phrase>
 <phrase>
@@ -115,7 +115,7 @@
     *: "רגיל"
   </dest>
   <voice>
-    *: "Normal"
+    *: "רגיל"
   </voice>
 </phrase>
 <phrase>
@@ -129,7 +129,7 @@
     *: "הגברה"
   </dest>
   <voice>
-    *: "Gain"
+    *: "הגברה"
   </voice>
 </phrase>
 <phrase>
@@ -143,7 +143,7 @@
     *: "...טוען"
   </dest>
   <voice>
-    *: "Loading"
+    *: "טוען"
   </voice>
 </phrase>
 <phrase>
@@ -171,7 +171,7 @@
     *: "סורק כונן..."
   </dest>
   <voice>
-    *: "Scanning disk"
+    *: "סורק כונן"
   </voice>
 </phrase>
 <phrase>
@@ -185,7 +185,7 @@
     *: "...מכבה"
   </dest>
   <voice>
-    *: "Shutting down"
+    *: "מכבה"
   </voice>
 </phrase>
 <phrase>
@@ -213,7 +213,7 @@
     *: "מבוטל"
   </dest>
   <voice>
-    *: "Cancelled"
+    *: "מבוטל"
   </voice>
 </phrase>
 <phrase>
@@ -227,7 +227,7 @@
     *: "נכשל"
   </dest>
   <voice>
-    *: "Failed"
+    *: "נכשל"
   </voice>
 </phrase>
 <phrase>
@@ -241,7 +241,7 @@
     *: "ערוצים"
   </dest>
   <voice>
-    *: "Channels"
+    *: "ערוצים"
   </voice>
 </phrase>
 <phrase>
@@ -255,7 +255,7 @@
     *: "האם את/ה בטוח/ה?"
   </dest>
   <voice>
-    *: "Are You Sure?"
+    *: "האם אתה בטוח?"
   </voice>
 </phrase>
 <phrase>
@@ -264,14 +264,17 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
-    *: "PLAY = כן"
-    h100,h120,h300: "NAVI = כן"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = כן"
+    *: "כן = PLAY"
+    cowond2*: "כן = MENU"
+    h100,h120,h300: "כן = NAVI"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "כן = SELECT"
+    mrobe500: "כן = POWER או PLAY"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -287,7 +290,7 @@
     player: none
   </source>
   <dest>
-    *: "אחר = לא"
+    *: "כל כפתור אחר = לא"
     player: none
   </dest>
   <voice>
@@ -320,7 +323,7 @@
     *: "סימניות אחרונות"
   </dest>
   <voice>
-    *: "Recent Bookmarks"
+    *: "סימניות אחרונות"
   </voice>
 </phrase>
 <phrase>
@@ -334,7 +337,7 @@
     *: "קבצים"
   </dest>
   <voice>
-    *: "Files"
+    *: "קבצים"
   </voice>
 </phrase>
 <phrase>
@@ -348,7 +351,7 @@
     *: "מסד נתונים"
   </dest>
   <voice>
-    *: "Database"
+    *: "מסד נתונים"
   </voice>
 </phrase>
 <phrase>
@@ -359,10 +362,10 @@
     *: "Now Playing"
   </source>
   <dest>
-    *: "מנגן עכשיו"
+    *: "מתנגן כעת"
   </dest>
   <voice>
-    *: "Now Playing"
+    *: "מתנגן כעת"
   </voice>
 </phrase>
 <phrase>
@@ -376,7 +379,7 @@
     *: "המשך השמעה"
   </dest>
   <voice>
-    *: "Resume Playback"
+    *: "המשך השמעה"
   </voice>
 </phrase>
 <phrase>
@@ -387,10 +390,10 @@
     *: "Settings"
   </source>
   <dest>
-    *: "אפשרויות"
+    *: "הגדרות"
   </dest>
   <voice>
-    *: "Settings"
+    *: "הגדרות"
   </voice>
 </phrase>
 <phrase>
@@ -407,7 +410,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Recording"
+    recording: "הקלטה"
   </voice>
 </phrase>
 <phrase>
@@ -424,7 +427,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM Radio"
+    radio: "FM רדיו"
   </voice>
 </phrase>
 <phrase>
@@ -438,7 +441,7 @@
     *: "רשימות שירים"
   </dest>
   <voice>
-    *: "Playlists"
+    *: "רשימות שירים"
   </voice>
 </phrase>
 <phrase>
@@ -449,10 +452,10 @@
     *: "Plugins"
   </source>
   <dest>
-    *: "התקנים"
+    *: "תוספים"
   </dest>
   <voice>
-    *: "Plugins"
+    *: "תוספים"
   </voice>
 </phrase>
 <phrase>
@@ -466,7 +469,7 @@
     *: "מערכת"
   </dest>
   <voice>
-    *: "System"
+    *: "מערכת"
   </voice>
 </phrase>
 <phrase>
@@ -480,7 +483,7 @@
     *: "בחר סימניה"
   </dest>
   <voice>
-    *: "Select Bookmark"
+    *: "בחר סימניה"
   </voice>
 </phrase>
 <phrase>
@@ -494,7 +497,7 @@
     *: "<אל תמשיך>"
   </dest>
   <voice>
-    *: "Do not resume"
+    *: "אל תמשיך"
   </voice>
 </phrase>
 <phrase>
@@ -522,7 +525,7 @@
     *: "<סימניה פגומה>"
   </dest>
   <voice>
-    *: "Invalid Bookmark"
+    *: "סימניה פגומה"
   </voice>
 </phrase>
 <phrase>
@@ -536,7 +539,7 @@
     *: "פעולות סימניה"
   </dest>
   <voice>
-    *: "Bookmark Actions"
+    *: "פעולות סימניה"
   </voice>
 </phrase>
 <phrase>
@@ -550,7 +553,7 @@
     *: "המשך"
   </dest>
   <voice>
-    *: "Resume"
+    *: "המשך"
   </voice>
 </phrase>
 <phrase>
@@ -564,7 +567,7 @@
     *: "מחק"
   </dest>
   <voice>
-    *: "Delete"
+    *: "מחק"
   </voice>
 </phrase>
 <phrase>
@@ -578,7 +581,7 @@
     *: "?ליצור סימניה"
   </dest>
   <voice>
-    *: "Create a Bookmark?"
+    *: "?ליצור סימניה"
   </voice>
 </phrase>
 <phrase>
@@ -592,7 +595,7 @@
     *: "סימניה נוצרה"
   </dest>
   <voice>
-    *: "Bookmark Created"
+    *: "סימניה נוצרה"
   </voice>
 </phrase>
 <phrase>
@@ -606,7 +609,7 @@
     *: "יצירת סימניה נכשלה!"
   </dest>
   <voice>
-    *: "Bookmark Failed!"
+    *: "יצירת סימניה נכשלה!"
   </voice>
 </phrase>
 <phrase>
@@ -617,10 +620,10 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "אין סימניות"
+    *: "סימניה ריקה"
   </dest>
   <voice>
-    *: "Bookmark Empty"
+    *: "סימניה ריקה"
   </voice>
 </phrase>
 <phrase>
@@ -634,7 +637,7 @@
     *: "הגדרות צליל"
   </dest>
   <voice>
-    *: "Sound Settings"
+    *: "הגדרות צליל"
   </voice>
 </phrase>
 <phrase>
@@ -648,7 +651,7 @@
     *: "עוצמת קול"
   </dest>
   <voice>
-    *: "Volume"
+    *: "עוצמת קול"
   </voice>
 </phrase>
 <phrase>
@@ -662,7 +665,7 @@
     *: "בס"
   </dest>
   <voice>
-    *: "Bass"
+    *: "בס"
   </voice>
 </phrase>
 <phrase>
@@ -676,7 +679,7 @@
     *: "טרבל"
   </dest>
   <voice>
-    *: "Treble"
+    *: "טרבל"
   </voice>
 </phrase>
 <phrase>
@@ -687,10 +690,10 @@
     *: "Balance"
   </source>
   <dest>
-    *: "איזון לצדדים"
+    *: "באלאנס"
   </dest>
   <voice>
-    *: "Balance"
+    *: "באלאנס"
   </voice>
 </phrase>
 <phrase>
@@ -704,7 +707,7 @@
     *: "אפשרויות הערוצים"
   </dest>
   <voice>
-    *: "Channel Configuration"
+    *: "אפשרויות הערוצים"
   </voice>
 </phrase>
 <phrase>
@@ -718,7 +721,7 @@
     *: "סטריאו"
   </dest>
   <voice>
-    *: "Stereo"
+    *: "סטריאו"
   </voice>
 </phrase>
 <phrase>
@@ -732,7 +735,7 @@
     *: "מונו"
   </dest>
   <voice>
-    *: "Mono"
+    *: "מונו"
   </voice>
 </phrase>
 <phrase>
@@ -746,7 +749,7 @@
     *: "מותאם אישית"
   </dest>
   <voice>
-    *: "Custom"
+    *: "מותאם אישית"
   </voice>
 </phrase>
 <phrase>
@@ -760,7 +763,7 @@
     *: "מונו שמאלי"
   </dest>
   <voice>
-    *: "Mono Left"
+    *: "מונו שמאלי"
   </voice>
 </phrase>
 <phrase>
@@ -774,7 +777,24 @@
     *: "מונו ימני"
   </dest>
   <voice>
-    *: "Mono Right"
+    *: "מונו ימני"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "מונו ימין + שמאל"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "מונו ימין ושמאל"
   </voice>
 </phrase>
 <phrase>
@@ -788,7 +808,7 @@
     *: "קריוקי"
   </dest>
   <voice>
-    *: "Karaoke"
+    *: "קריוקי"
   </voice>
 </phrase>
 <phrase>
@@ -802,7 +822,7 @@
     *: "רוחב סטריאו"
   </dest>
   <voice>
-    *: "Stereo Width"
+    *: "רוחב סטריאו"
   </voice>
 </phrase>
 <phrase>
@@ -815,7 +835,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "הזנה הפוכה"
+    swcodec: "Crossfeed"
   </dest>
   <voice>
     *: none
@@ -836,7 +856,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Direct gain"
+    swcodec: "הגברה ישירה"
   </voice>
 </phrase>
 <phrase>
@@ -853,7 +873,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Cross gain"
+    swcodec: "הגברה הפוכה"
   </voice>
 </phrase>
 <phrase>
@@ -870,7 +890,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "High-frequency attenuation"
+    swcodec: "הנמכת צלילים בתדירות גבוהה"
   </voice>
 </phrase>
 <phrase>
@@ -887,7 +907,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "High-frequency cutoff"
+    swcodec: "חיתוך צלילים בתדירות גבוהה"
   </voice>
 </phrase>
 <phrase>
@@ -904,7 +924,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Equalizer"
+    swcodec: "אקולייזר"
   </voice>
 </phrase>
 <phrase>
@@ -921,7 +941,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Enable equalizer"
+    swcodec: "הפעל אקולייזר"
   </voice>
 </phrase>
 <phrase>
@@ -938,7 +958,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Graphical equalizer"
+    swcodec: "אקולייזר גרפי"
   </voice>
 </phrase>
 <phrase>
@@ -955,7 +975,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Pre-cut"
+    swcodec: "חיתוך מראש"
   </voice>
 </phrase>
 <phrase>
@@ -972,7 +992,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Simple equalizer settings"
+    swcodec: "הגדרות אקולייזר פשוטות"
   </voice>
 </phrase>
 <phrase>
@@ -989,7 +1009,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Advanced equalizer settings"
+    swcodec: "הגדרות אקולייזר מתקדמות"
   </voice>
 </phrase>
 <phrase>
@@ -1006,7 +1026,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Save equalizer preset"
+    swcodec: "שמור הגדרות אקולייזר"
   </voice>
 </phrase>
 <phrase>
@@ -1019,11 +1039,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "הצג קבצי הגדרות אקולייזר"
+    swcodec: "דפדף בהגדרות אקולייזר"
   </dest>
   <voice>
     *: none
-    swcodec: "Browse equalizer presets"
+    swcodec: "דפדף בהגדרות אקולייזר"
   </voice>
 </phrase>
 <phrase>
@@ -1057,7 +1077,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "hertz band gain"
+    swcodec: "הרץ רצועה מוגברת"
   </voice>
 </phrase>
 <phrase>
@@ -1070,11 +1090,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "מסנן רף תחתון"
+    swcodec: "מסנך רף נמוך"
   </dest>
   <voice>
     *: none
-    swcodec: "Low shelf filter"
+    swcodec: "מסנך רף נמוך"
   </voice>
 </phrase>
 <phrase>
@@ -1091,7 +1111,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Peak filter"
+    swcodec: "מסנן פסגה"
   </voice>
 </phrase>
 <phrase>
@@ -1104,11 +1124,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "מסנן רף עליון"
+    swcodec: "מסנן רף גבוה"
   </dest>
   <voice>
     *: none
-    swcodec: "High shelf filter"
+    swcodec: "מסנן רף גבוה"
   </voice>
 </phrase>
 <phrase>
@@ -1125,7 +1145,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "תדירות חיתוך צליל"
   </voice>
 </phrase>
 <phrase>
@@ -1142,7 +1162,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Center frequency"
+    swcodec: "תדירות מרכזית"
   </voice>
 </phrase>
 <phrase>
@@ -1257,7 +1277,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "מיזוג צלילים"
+    swcodec: "Dithering"
   </dest>
   <voice>
     *: none
@@ -1274,11 +1294,11 @@
   </source>
   <dest>
     *: none
-    masf: "עוצמה"
+    masf: "עוצמה מוגברת"
   </dest>
   <voice>
     *: none
-    masf: "Loudness"
+    masf: "עוצמה מוגברת"
   </voice>
 </phrase>
 <phrase>
@@ -1295,7 +1315,7 @@
   </dest>
   <voice>
     *: none
-    masf: "Auto Volume"
+    masf: "עוצמת קול אוטומטית"
   </voice>
 </phrase>
 <phrase>
@@ -1325,11 +1345,11 @@
   </source>
   <dest>
     *: none
-    masf: "סופר באס"
+    masf: "סופר-בס"
   </dest>
   <voice>
     *: none
-    masf: "Super Bass"
+    masf: "סופר-בס"
   </voice>
 </phrase>
 <phrase>
@@ -1346,7 +1366,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Enable"
+    masf: "MDB פעיל"
   </voice>
 </phrase>
 <phrase>
@@ -1363,7 +1383,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Strength"
+    masf: "חוזק MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1380,7 +1400,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Harmonics"
+    masf: "הרמוניות MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1397,7 +1417,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Center Frequency"
+    masf: "תדירות מרכזית MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1410,11 +1430,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB צורת"
+    masf: "צורת MDB"
   </dest>
   <voice>
     *: none
-    masf: "MDB Shape"
+    masf: "צורת MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1428,7 +1448,7 @@
     *: "הגדרות כלליות"
   </dest>
   <voice>
-    *: "General Settings"
+    *: "הגדרות כלליות"
   </voice>
 </phrase>
 <phrase>
@@ -1442,7 +1462,7 @@
     *: "הגדרות השמעה"
   </dest>
   <voice>
-    *: "Playback Settings"
+    *: "הגדרות השמעה"
   </voice>
 </phrase>
 <phrase>
@@ -1456,7 +1476,7 @@
     *: "ערבוב"
   </dest>
   <voice>
-    *: "Shuffle"
+    *: "ערבוב"
   </voice>
 </phrase>
 <phrase>
@@ -1470,7 +1490,7 @@
     *: "חזרה"
   </dest>
   <voice>
-    *: "Repeat"
+    *: "חזרה"
   </voice>
 </phrase>
 <phrase>
@@ -1484,7 +1504,7 @@
     *: "הכל"
   </dest>
   <voice>
-    *: "All"
+    *: "הכל"
   </voice>
 </phrase>
 <phrase>
@@ -1498,7 +1518,7 @@
     *: "אחד"
   </dest>
   <voice>
-    *: "One"
+    *: "אחד"
   </voice>
 </phrase>
 <phrase>
@@ -1523,10 +1543,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "נגן את הקובץ הנבחר ראשון"
+    *: "נגן קודם את הנבחר"
   </dest>
   <voice>
-    *: "Play Selected File First"
+    *: "נגן קודם את הקובץ הנבחר"
   </voice>
 </phrase>
 <phrase>
@@ -1537,10 +1557,10 @@
     *: "Fast-Forward/Rewind"
   </source>
   <dest>
-    *: "הילוך מהיר קדימה ואחורה"
+    *: "העברה מהירה קדימה/אחורה"
   </dest>
   <voice>
-    *: "Fast forward and Rewind"
+    *: "העברה מהירה קדימה ואחורה"
   </voice>
 </phrase>
 <phrase>
@@ -1554,7 +1574,7 @@
     *: "צעד מינימלי בהעברה מהירה"
   </dest>
   <voice>
-    *: "Minimum Step"
+    *: "צעד מינימלי בהעברה מהירה"
   </voice>
 </phrase>
 <phrase>
@@ -1565,10 +1585,10 @@
     *: "FF/RW Accel"
   </source>
   <dest>
-    *: "תאוצה קדימה/אחורה"
+    *: "תאוצת העברה מהירה"
   </dest>
   <voice>
-    *: "Acceleration"
+    *: "תאוצת העברה מהירה"
   </voice>
 </phrase>
 <phrase>
@@ -1584,7 +1604,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: "Anti-Skip Buffer"
+    *: "זיכרון נגד קפיצות"
     flash_storage: none
   </voice>
 </phrase>
@@ -1596,10 +1616,10 @@
     *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "עמעום צליל בעצירה"
+    *: "עמעום צליל בעצירה/הפסקה"
   </dest>
   <voice>
-    *: "Fade On Stop and Pause"
+    *: "עמעום צליל בעצירה והפסקה"
   </voice>
 </phrase>
 <phrase>
@@ -1613,7 +1633,7 @@
     *: "מצב מסיבה"
   </dest>
   <voice>
-    *: "Party Mode"
+    *: "מצב מסיבה"
   </voice>
 </phrase>
 <phrase>
@@ -1630,7 +1650,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Crossfade"
+    swcodec: "מעבר ביניים"
   </voice>
 </phrase>
 <phrase>
@@ -1647,7 +1667,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Enable Crossfade"
+    swcodec: "הפעל מעבר ביניים"
   </voice>
 </phrase>
 <phrase>
@@ -1664,7 +1684,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Track Skip Only"
+    swcodec: "רק בדילוג על שיר"
   </voice>
 </phrase>
 <phrase>
@@ -1681,7 +1701,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Shuffle and Track Skip"
+    swcodec: "בערבוב ובדילוג על שיר"
   </voice>
 </phrase>
 <phrase>
@@ -1694,11 +1714,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "השהיית הגברת צליל"
+    swcodec: "השהיית גאייה"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-In Delay"
+    swcodec: "השהיית גאייה"
   </voice>
 </phrase>
 <phrase>
@@ -1711,11 +1731,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "משך זמן הגברת צליל הדרגתית"
+    swcodec: "משך זמן גאייה"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-In Duration"
+    swcodec: "משך זמן גאייה"
   </voice>
 </phrase>
 <phrase>
@@ -1728,11 +1748,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "השהיית דעיכת צליל"
+    swcodec: "השהיית דעיכה"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Delay"
+    swcodec: "השהיית דעיכה"
   </voice>
 </phrase>
 <phrase>
@@ -1745,11 +1765,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "משך זמן דעיכת צליל הדרגתית"
+    swcodec: "משך זמן דעיכה"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Duration"
+    swcodec: "משך זמן דעיכה"
   </voice>
 </phrase>
 <phrase>
@@ -1762,11 +1782,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "מצב דעיכת צליל"
+    swcodec: "מצב דעיכה"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Mode"
+    swcodec: "מצב דעיכה"
   </voice>
 </phrase>
 <phrase>
@@ -1779,11 +1799,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "מיזוג"
+    swcodec: "מיקס"
   </dest>
   <voice>
     *: none
-    swcodec: "Mix"
+    swcodec: "מיקס"
   </voice>
 </phrase>
 <phrase>
@@ -1794,7 +1814,7 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "הגברה חוזרת"
+    *: "Replaygain"
   </dest>
   <voice>
     *: "Replaygain"
@@ -1828,7 +1848,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Prevent Clipping"
+    swcodec: "מנע עיוותים"
   </voice>
 </phrase>
 <phrase>
@@ -1842,7 +1862,7 @@
     *: "סוג הגברה חוזרת"
   </dest>
   <voice>
-    *: "Replaygain Type"
+    *: "סוג הגברה חוזרת"
   </voice>
 </phrase>
 <phrase>
@@ -1853,10 +1873,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "הגברה חוזרת לפי אלבום"
+    *: "הגברת אלבום"
   </dest>
   <voice>
-    *: "Album Gain"
+    *: "הגברת אלבום"
   </voice>
 </phrase>
 <phrase>
@@ -1867,10 +1887,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "הגברה חוזרת לפי שיר"
+    *: "הגברת שיר"
   </dest>
   <voice>
-    *: "Track Gain"
+    *: "הגברת שיר"
   </voice>
 </phrase>
 <phrase>
@@ -1881,10 +1901,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "הגברה חוזרת לפי שיר אם ערבוב שירים פעיל"
+    *: "הגברת שיר אם ערבוב פעיל"
   </dest>
   <voice>
-    *: "Track Gain if Shuffling"
+    *: "הגברת שיר אם ערבוב פעיל"
   </voice>
 </phrase>
 <phrase>
@@ -1898,7 +1918,7 @@
     *: "קדם-מגבר"
   </dest>
   <voice>
-    *: "Preamp"
+    *: "קדם-מגבר"
   </voice>
 </phrase>
 <phrase>
@@ -1915,7 +1935,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "צפצוף מעבר שיר"
   </voice>
 </phrase>
 <phrase>
@@ -1932,7 +1952,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Weak"
+    swcodec: "חלש"
   </voice>
 </phrase>
 <phrase>
@@ -1949,7 +1969,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Moderate"
+    swcodec: "בינוני"
   </voice>
 </phrase>
 <phrase>
@@ -1966,7 +1986,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Strong"
+    swcodec: "חזק"
   </voice>
 </phrase>
 <phrase>
@@ -1983,7 +2003,7 @@
   </dest>
   <voice>
     *: none
-    spdif_power: "Optical Output"
+    spdif_power: "יציאה אופטית"
   </voice>
 </phrase>
 <phrase>
@@ -2036,10 +2056,10 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "מעבר לספריה הבאה"
+    *: "החלף ספריות אוטומאטית"
   </dest>
   <voice>
-    *: "Auto-Change Directory"
+    *: "החלף ספריות אוטומאטית"
   </voice>
 </phrase>
 <phrase>
@@ -2053,7 +2073,7 @@
     *: "אקראי"
   </dest>
   <voice>
-    *: "Random"
+    *: "אקראי"
   </voice>
 </phrase>
 <phrase>
@@ -2067,7 +2087,7 @@
     *: "Last.fm יומן"
   </dest>
   <voice>
-    *: "Last.fm Log"
+    *: "Last.fm יומן"
   </voice>
 </phrase>
 <phrase>
@@ -2081,7 +2101,7 @@
     *: "תמיכה בגליונות סימנים"
   </dest>
   <voice>
-    *: "Cuesheet Support"
+    *: "תמיכה בגליונות סימנים"
   </voice>
 </phrase>
 <phrase>
@@ -2094,11 +2114,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "עצור בעת ניתוק אוזניות"
+    headphone_detection: "הפסק בעת ניתוק אוזניות"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause on Headphone Unplug"
+    headphone_detection: "הפסק בעת ניתוק אוזניות"
   </voice>
 </phrase>
 <phrase>
@@ -2115,7 +2135,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause and Resume"
+    headphone_detection: "הפסק והמשך"
   </voice>
 </phrase>
 <phrase>
@@ -2128,11 +2148,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "משך זמן לחזור אחורה"
+    headphone_detection: "משך זמן להעברה מהירה אחורה"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Duration to Rewind"
+    headphone_detection: "משך זמן להעברה מהירה אחורה"
   </voice>
 </phrase>
 <phrase>
@@ -2149,7 +2169,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Disable resume on startup if phones unplugged"
+    headphone_detection: "בטל המשך השמעה לאחר אתחול אם האוזניות מנותקות"
   </voice>
 </phrase>
 <phrase>
@@ -2163,7 +2183,7 @@
     *: "תצוגת קבצים"
   </dest>
   <voice>
-    *: "File View"
+    *: "תצוגת קבצים"
   </voice>
 </phrase>
 <phrase>
@@ -2174,10 +2194,10 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "סדר לפי אותיות גדולות"
+    *: "מיון לפי אותיות גדולות"
   </dest>
   <voice>
-    *: "Sort Case Sensitive"
+    *: "מיון לפי אותיות גדולות"
   </voice>
 </phrase>
 <phrase>
@@ -2188,10 +2208,10 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "סידור ספריות"
+    *: "מיון ספריות"
   </dest>
   <voice>
-    *: "sort directories"
+    *: "מיון ספריות"
   </voice>
 </phrase>
 <phrase>
@@ -2202,10 +2222,10 @@
     *: "Sort Files"
   </source>
   <dest>
-    *: "סידור קבצים"
+    *: "מיון קבצים"
   </dest>
   <voice>
-    *: "sort files"
+    *: "מיון קבצים"
   </voice>
 </phrase>
 <phrase>
@@ -2219,7 +2239,7 @@
     *: "אלפבתית"
   </dest>
   <voice>
-    *: "Alphabetical"
+    *: "אלפבתית"
   </voice>
 </phrase>
 <phrase>
@@ -2233,7 +2253,7 @@
     *: "לפי תאריך"
   </dest>
   <voice>
-    *: "By Date"
+    *: "לפי תאריך"
   </voice>
 </phrase>
 <phrase>
@@ -2247,7 +2267,7 @@
     *: "לפי התאריך החדש ביותר"
   </dest>
   <voice>
-    *: "By Newest Date"
+    *: "לפי התאריך החדש ביותר"
   </voice>
 </phrase>
 <phrase>
@@ -2261,7 +2281,7 @@
     *: "לפי סוג"
   </dest>
   <voice>
-    *: "By Type"
+    *: "לפי סוג"
   </voice>
 </phrase>
 <phrase>
@@ -2275,7 +2295,7 @@
     *: "הצג קבצים"
   </dest>
   <voice>
-    *: "Show Files"
+    *: "הצג קבצים"
   </voice>
 </phrase>
 <phrase>
@@ -2289,7 +2309,7 @@
     *: "נתמכים"
   </dest>
   <voice>
-    *: "Supported"
+    *: "נתמכים"
   </voice>
 </phrase>
 <phrase>
@@ -2303,7 +2323,7 @@
     *: "מוסיקה"
   </dest>
   <voice>
-    *: "Music"
+    *: "מוסיקה"
   </voice>
 </phrase>
 <phrase>
@@ -2317,7 +2337,7 @@
     *: "עקוב אחר רשימת השירים"
   </dest>
   <voice>
-    *: "Follow Playlist"
+    *: "עקוב אחר רשימת השירים"
   </voice>
 </phrase>
 <phrase>
@@ -2331,7 +2351,7 @@
     *: "הצג נתיב"
   </dest>
   <voice>
-    *: "Show Path"
+    *: "הצג נתיב"
   </voice>
 </phrase>
 <phrase>
@@ -2356,10 +2376,10 @@
     *: "Full Path"
   </source>
   <dest>
-    *: "כל הכתובת"
+    *: "נתיב מלא"
   </dest>
   <voice>
-    *: "Full Path"
+    *: "נתיב מלא"
   </voice>
 </phrase>
 <phrase>
@@ -2371,17 +2391,19 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
-    *: " בונה מסד נתונים... %d (OFF כדי לחזור) נמצאו"
-    h100,h120,h300: "בונה מסד נתונים... %d (STOP כדי לחזור) נמצאו"
-    ipod*: " בונה מסד נתונים... %d (PREV כדי לחזור) נמצאו"
-    x5,m5,gigabeat*,mrobe100: " בונה מסד נתונים... %d (LEFT כדי לחזור) נמצאו"
-    h10,h10_5gb,e200*,c200*,sa9200: " בונה מסד נתונים... %d (PREV כדי לחזור) נמצאו"
+    *: "בונה מסד נתונים... %d נמצאו (OFF כדי לחזור)"
+    h100,h120,h300: "בונה מסד נתונים... %d נמצאו (STOP כדי לחזור)"
+    ipod*: "בונה מסד נתונים... %d נמצאו (PREV כדי לחזור)"
+    x5,m5,gigabeat*,mrobe100: "בונה מסד נתונים... %d נמצאו (LEFT כדי לחזור)"
+    h10,h10_5gb,e200*,c200*,fuze*: "בונה מסד נתונים... %d נמצאו (PREV כדי לחזור)"
+    sa9200: "בונה מסד נתונים... %d נמצאו (REW כדי לחזור)"
   </dest>
   <voice>
-    *: "entries found for database"
+    *: "רשומות נמצאו עבור מסד הנתונים"
   </voice>
 </phrase>
 <phrase>
@@ -2394,11 +2416,11 @@
   </source>
   <dest>
     *: none
-    tc_ramcache: "טען לזיכרון מהיר"
+    tc_ramcache: "RAM טען לזיכרון"
   </dest>
   <voice>
     *: none
-    tc_ramcache: "Load to RAM"
+    tc_ramcache: "טען לזיכרון RAM"
   </voice>
 </phrase>
 <phrase>
@@ -2412,7 +2434,7 @@
     *: "עדכון אוטומטי"
   </dest>
   <voice>
-    *: "Auto Update"
+    *: "עדכון אוטומטי"
   </voice>
 </phrase>
 <phrase>
@@ -2426,7 +2448,7 @@
     *: "אתחל עכשיו"
   </dest>
   <voice>
-    *: "Initialize Now"
+    *: "אתחל עכשיו"
   </voice>
 </phrase>
 <phrase>
@@ -2440,7 +2462,7 @@
     *: "עדכן עכשיו"
   </dest>
   <voice>
-    *: "Update Now"
+    *: "עדכן עכשיו"
   </voice>
 </phrase>
 <phrase>
@@ -2454,7 +2476,7 @@
     *: "אסוף נתוני ריצה"
   </dest>
   <voice>
-    *: "Gather Runtime Data"
+    *: "אסוף נתוני ריצה"
   </voice>
 </phrase>
 <phrase>
@@ -2468,7 +2490,7 @@
     *: "ייצא שינויים"
   </dest>
   <voice>
-    *: "Export Modifications"
+    *: "ייצא שינויים"
   </voice>
 </phrase>
 <phrase>
@@ -2482,7 +2504,7 @@
     *: "טען שינויים"
   </dest>
   <voice>
-    *: "Import Modifications"
+    *: "טען שינויים"
   </voice>
 </phrase>
 <phrase>
@@ -2496,7 +2518,7 @@
     *: "מעדכן ברקע"
   </dest>
   <voice>
-    *: "Updating in background"
+    *: "מעדכן ברקע"
   </voice>
 </phrase>
 <phrase>
@@ -2507,10 +2529,10 @@
     *: "Committing database"
   </source>
   <dest>
-    *: "מפענח זיכרון תוויות שם"
+    *: "מאחסן את מסד הנתונים"
   </dest>
   <voice>
-    *: "Committing database"
+    *: "מאחסן את מסד הנתונים"
   </voice>
 </phrase>
 <phrase>
@@ -2521,10 +2543,10 @@
     *: "Database is not ready"
   </source>
   <dest>
-    *: "זיכרון תוויות השם אינו מוכן"
+    *: "מסד נתונים אינו מוכן"
   </dest>
   <voice>
-    *: "Database is not ready"
+    *: "מסד נתונים אינו מוכן"
   </voice>
 </phrase>
 <phrase>
@@ -2538,7 +2560,7 @@
     *: "<כל השירים>"
   </dest>
   <voice>
-    *: "All tracks"
+    *: "כל השירים"
   </voice>
 </phrase>
 <phrase>
@@ -2552,7 +2574,7 @@
     *: "תצוגה"
   </dest>
   <voice>
-    *: "Display"
+    *: "תצוגה"
   </voice>
 </phrase>
 <phrase>
@@ -2561,15 +2583,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "הצג גופנים"
+    lcd_bitmap: "גופנים"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "גופנים"
   </voice>
 </phrase>
 <phrase>
@@ -2577,13 +2599,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: ".wps הצג קבצי"
+    *: "מסך בזמן נגינה"
   </dest>
   <voice>
-    *: "Browse while-playing-screen files"
+    *: "מסך בזמן נגינה"
   </voice>
 </phrase>
 <phrase>
@@ -2592,15 +2614,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: ".rwps הצג קבצי"
+    remote: "מסך שלט בזמן נגינה"
   </dest>
   <voice>
     *: none
-    remote: "Browse remote while-playing-screen files"
+    remote: "מסך שלט בזמן נגינה"
   </voice>
 </phrase>
 <phrase>
@@ -2614,7 +2636,7 @@
     *: "הגדרות מסך"
   </dest>
   <voice>
-    *: "LCD Settings"
+    *: "הגדרות מסך"
   </voice>
 </phrase>
 <phrase>
@@ -2625,10 +2647,10 @@
     *: "Backlight"
   </source>
   <dest>
-    *: "תאורה"
+    *: "תאורת מסך"
   </dest>
   <voice>
-    *: "Backlight"
+    *: "תאורת מסך"
   </voice>
 </phrase>
 <phrase>
@@ -2641,11 +2663,11 @@
   </source>
   <dest>
     *: none
-    charging: "תאורה דולקת (כשמחובר למטען)"
+    charging: "תאורת מסך (כשמחובר)"
   </dest>
   <voice>
     *: none
-    charging: "Backlight (While Plugged In)"
+    charging: "תאורת מסך (כשמחובר)"
   </voice>
 </phrase>
 <phrase>
@@ -2658,11 +2680,11 @@
   </source>
   <dest>
     *: none
-    hold_button: "(תאורה (במצב נעול"
+    hold_button: "תאורת מסך בנעילת מקשים"
   </dest>
   <voice>
     *: none
-    hold_button: "Backlight on hold"
+    hold_button: "תאורת מסך בנעילת מקשים"
   </voice>
 </phrase>
 <phrase>
@@ -2673,10 +2695,10 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "הפעלת תאורה במעבר שיר"
+    *: "תאורת מסך כותרת"
   </dest>
   <voice>
-    *: "Caption Backlight"
+    *: "תאורת מסך כותרת"
   </voice>
 </phrase>
 <phrase>
@@ -2689,11 +2711,11 @@
   </source>
   <dest>
     *: none
-    backlight_fade*: "הגברה הדרגתית של תאורת המסך"
+    backlight_fade*: "גאיית תאורת המסך"
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Backlight Fade In"
+    backlight_fade*: "גאיית תאורת המסך"
   </voice>
 </phrase>
 <phrase>
@@ -2710,7 +2732,7 @@
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Backlight Fade Out"
+    backlight_fade*: "עמעום תאורת המסך"
   </voice>
 </phrase>
 <phrase>
@@ -2721,10 +2743,10 @@
     *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
-    *: "לחיצה ראשונה מפעילה תאורה בלבד"
+    *: "לחיצה ראשונה מפעילה תאורת מסך בלבד"
   </dest>
   <voice>
-    *: "First Buttonpress Enables Backlight Only"
+    *: "לחיצה ראשונה מפעילה תאורת מסך בלבד"
   </voice>
 </phrase>
 <phrase>
@@ -2737,11 +2759,11 @@
   </source>
   <dest>
     *: none
-    lcd_sleep: "שינה (אחרי כיבוי תאורה)"
+    lcd_sleep: "שינה (אחרי כיבוי תאורת מסך)"
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Sleep after backlight off"
+    lcd_sleep: "שינה (אחרי כיבוי תאורת מסך)"
   </voice>
 </phrase>
 <phrase>
@@ -2758,7 +2780,7 @@
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: "אף פעם"
   </voice>
 </phrase>
 <phrase>
@@ -2775,7 +2797,7 @@
   </dest>
   <voice>
     *: none
-    backlight_brightness: "Brightness"
+    backlight_brightness: "בהירות"
   </voice>
 </phrase>
 <phrase>
@@ -2789,7 +2811,7 @@
     *: "ניגודיות"
   </dest>
   <voice>
-    *: "Contrast"
+    *: "ניגודיות"
   </voice>
 </phrase>
 <phrase>
@@ -2806,7 +2828,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "מצב המסך"
   </voice>
 </phrase>
 <phrase>
@@ -2819,11 +2841,11 @@
   </source>
   <dest>
     *: none
-    lcd_invert,remote_lcd_invert: "הפוך"
+    lcd_invert,remote_lcd_invert: "נגדי"
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "נגדי"
   </voice>
 </phrase>
 <phrase>
@@ -2836,11 +2858,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "היפוך מעלה-מטה"
+    lcd_bitmap: "במהופך"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: "במהופך"
   </voice>
 </phrase>
 <phrase>
@@ -2853,11 +2875,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "בורר השורה"
+    lcd_bitmap: "סוג בורר השורה"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Line Selector Type"
+    lcd_bitmap: "סוג בורר השורה"
   </voice>
 </phrase>
 <phrase>
@@ -2874,7 +2896,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Pointer"
+    lcd_bitmap: "מצביע"
   </voice>
 </phrase>
 <phrase>
@@ -2887,11 +2909,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "שורה (בצבע נגדי)"
+    lcd_bitmap: "שורה (נגדי)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Inverse Bar"
+    lcd_bitmap: "שורה נגדית"
   </voice>
 </phrase>
 <phrase>
@@ -2908,7 +2930,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Clear Backdrop"
+    lcd_non-mono: "נקה תמונת רקע"
   </voice>
 </phrase>
 <phrase>
@@ -2925,7 +2947,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Background Colour"
+    lcd_non-mono: "צבע רקע"
   </voice>
 </phrase>
 <phrase>
@@ -2942,7 +2964,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Foreground Colour"
+    lcd_non-mono: "צבע ראשי"
   </voice>
 </phrase>
 <phrase>
@@ -2959,7 +2981,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Reset Colours"
+    lcd_non-mono: "אפס צבעים"
   </voice>
 </phrase>
 <phrase>
@@ -3055,10 +3077,10 @@
     *: "Show Icons"
   </source>
   <dest>
-    *: "הצג סמלים"
+    *: "הצג סמלילים"
   </dest>
   <voice>
-    *: "Show Icons"
+    *: "הצג סמלילים"
   </voice>
 </phrase>
 <phrase>
@@ -3069,10 +3091,10 @@
     *: "Scrolling"
   </source>
   <dest>
-    *: "גלילת מילים"
+    *: "גלילה"
   </dest>
   <voice>
-    *: "Scrolling"
+    *: "גלילה"
   </voice>
 </phrase>
 <phrase>
@@ -3083,7 +3105,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "דוגמה ארוכה במיוחד להגדרת קצב הגלילה"
+    *: "טקסט דוגמה להגדרת מהירות גלילה"
   </dest>
   <voice>
     *: ""
@@ -3111,10 +3133,10 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "השהיה לפני הגלילה"
+    *: "השהיה לפני גלילה"
   </dest>
   <voice>
-    *: "Scroll Start Delay"
+    *: "השהיה לפני גלילה"
   </voice>
 </phrase>
 <phrase>
@@ -3125,10 +3147,10 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "גודל השלב בגלילה"
+    *: "גודל צעד גלילה"
   </dest>
   <voice>
-    *: "Scroll Step Size"
+    *: "גודל צעד גלילה"
   </voice>
 </phrase>
 <phrase>
@@ -3139,7 +3161,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "דוגמה ארוכה במיוחד לגודל השלב בגלילה בטקסט"
+    *: "טקסט דוגמה לגודל צעד גלילה"
   </dest>
   <voice>
     *: ""
@@ -3153,10 +3175,10 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "גבול גלילה דו-כיווני"
+    *: "גבול גלילה דו-כיוונית"
   </dest>
   <voice>
-    *: "Bidirectional Scroll Limit"
+    *: "גבול גלילה דו-כיוונית"
   </voice>
 </phrase>
 <phrase>
@@ -3169,11 +3191,11 @@
   </source>
   <dest>
     *: none
-    remote: "גלילת מילים בשלט"
+    remote: "אפשרויות גלילה בשלט"
   </dest>
   <voice>
     *: none
-    remote: "Remote Scrolling Options"
+    remote: "אפשרויות גלילה בשלט"
   </voice>
 </phrase>
 <phrase>
@@ -3184,10 +3206,10 @@
     *: "Jump Scroll"
   </source>
   <dest>
-    *: "קפיצת גלילה"
+    *: "גלילת קפיצה"
   </dest>
   <voice>
-    *: "Jump Scroll"
+    *: "גלילת קפיצה"
   </voice>
 </phrase>
 <phrase>
@@ -3201,7 +3223,7 @@
     *: "פעם אחת"
   </dest>
   <voice>
-    *: "One time"
+    *: "פעם אחת"
   </voice>
 </phrase>
 <phrase>
@@ -3212,10 +3234,10 @@
     *: "Jump Scroll Delay"
   </source>
   <dest>
-    *: "השהיה בתחילת קפיצת הגלילה"
+    *: "השהיה לפני גלילה"
   </dest>
   <voice>
-    *: "Jump Scroll Delay"
+    *: "השהיה לפני גלילה"
   </voice>
 </phrase>
 <phrase>
@@ -3226,10 +3248,10 @@
     *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: "גלילת המסך מחוץ לתצוגה"
+    *: "מסך נגלל מחוץ לתצוגה"
   </dest>
   <voice>
-    *: "Screen Scrolls Out Of View"
+    *: "מסך נגלל מחוץ לתצוגה"
   </voice>
 </phrase>
 <phrase>
@@ -3240,10 +3262,10 @@
     *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: "גודל השלב בגלילת כל המסך"
+    *: "גודל צעד בגלילת מסך"
   </dest>
   <voice>
-    *: "Screen Scroll Step Size"
+    *: "גודל צעד בגלילת מסך"
   </voice>
 </phrase>
 <phrase>
@@ -3254,10 +3276,10 @@
     *: "Paged Scrolling"
   </source>
   <dest>
-    *: "גלילה לפי עמודים"
+    *: "גלילת עמודים"
   </dest>
   <voice>
-    *: "Paged scrolling"
+    *: "גלילת עמודים"
   </voice>
 </phrase>
 <phrase>
@@ -3269,11 +3291,11 @@
     wheel_acceleration: none
   </source>
   <dest>
-    *: "השהיה לפי האצה בגלילת רשימות"
+    *: "השהיה לפי האצת רשימה"
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "List Acceleration Start Delay"
+    *: "השהיה לפי האצת רשימה"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -3286,11 +3308,11 @@
     wheel_acceleration: none
   </source>
   <dest>
-    *: "מהירות האצה בגלילת רשימות"
+    *: "מהירות האצה רשימה"
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "List Acceleration Speed"
+    *: "מהירות האצה רשימה"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -3304,11 +3326,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "שורת מצב ושורת גלילה"
+    lcd_bitmap: "שורת מצב/פס גלילה"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status- and Scrollbar"
+    lcd_bitmap: "שורת מצב ופס גלילה"
   </voice>
 </phrase>
 <phrase>
@@ -3321,11 +3343,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "שורת גלילה"
+    lcd_bitmap: "פס גלילה"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: "פס גלילה"
   </voice>
 </phrase>
 <phrase>
@@ -3342,7 +3364,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: "שורת מצב"
   </voice>
 </phrase>
 <phrase>
@@ -3359,7 +3381,7 @@
   </dest>
   <voice>
     *: none
-    recorder_pad: "Button Bar"
+    recorder_pad: "שורת כפתורים"
   </voice>
 </phrase>
 <phrase>
@@ -3376,7 +3398,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Volume Display"
+    lcd_bitmap: "תצוגת עוצמת קול"
   </voice>
 </phrase>
 <phrase>
@@ -3393,7 +3415,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Battery Display"
+    lcd_bitmap: "תצוגת סוללה"
   </voice>
 </phrase>
 <phrase>
@@ -3410,7 +3432,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Graphic"
+    lcd_bitmap: "גרפית"
   </voice>
 </phrase>
 <phrase>
@@ -3427,7 +3449,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Numeric"
+    lcd_bitmap: "מספרית"
   </voice>
 </phrase>
 <phrase>
@@ -3443,7 +3465,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Peak Meter"
+    *: "מחוון עוצמה"
     masd: none
   </voice>
 </phrase>
@@ -3460,7 +3482,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Clip Hold Time"
+    *: "זמן החזקה לאחר עיוות"
     masd: none
   </voice>
 </phrase>
@@ -3477,7 +3499,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Peak Hold Time"
+    *: "זמן החזקה על שיא העוצמה"
     masd: none
   </voice>
 </phrase>
@@ -3494,7 +3516,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Eternal"
+    *: "אין-סופי"
     masd: none
   </voice>
 </phrase>
@@ -3511,7 +3533,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Peak Release"
+    *: "שחרור משיא העוצמה"
     masd: none
   </voice>
 </phrase>
@@ -3542,7 +3564,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Scale"
+    *: "קנה מידה"
     masd: none
   </voice>
 </phrase>
@@ -3559,7 +3581,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Logarithmic decibel"
+    *: "לוגריתמי דציבל"
     masd: none
   </voice>
 </phrase>
@@ -3576,7 +3598,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Linear percent"
+    *: "ליניארי אחוזים"
     masd: none
   </voice>
 </phrase>
@@ -3593,7 +3615,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Minimum Of Range"
+    *: "מינימום בטווח"
     masd: none
   </voice>
 </phrase>
@@ -3610,7 +3632,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Maximum Of Range"
+    *: "מקסימום בטווח"
     masd: none
   </voice>
 </phrase>
@@ -3622,10 +3644,10 @@
     *: "Default Codepage"
   </source>
   <dest>
-    *: "שיטת קידוד מועדפת"
+    *: "קידוד תווים ברירת מחדל"
   </dest>
   <voice>
-    *: "Default codepage"
+    *: "קידוד תווים ברירת מחדל"
   </voice>
 </phrase>
 <phrase>
@@ -3639,7 +3661,7 @@
     *: "לטינית1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: "Latin 1"
+    *: "לטינית1"
   </voice>
 </phrase>
 <phrase>
@@ -3653,7 +3675,7 @@
     *: "יוונית (ISO-8859-7)"
   </dest>
   <voice>
-    *: "Greek"
+    *: "יוונית"
   </voice>
 </phrase>
 <phrase>
@@ -3670,7 +3692,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Hebrew"
+    lcd_bitmap: "עברית"
   </voice>
 </phrase>
 <phrase>
@@ -3684,7 +3706,7 @@
     *: "קירילית (CP1251)"
   </dest>
   <voice>
-    *: "Cyrillic"
+    *: "קירילית"
   </voice>
 </phrase>
 <phrase>
@@ -3701,7 +3723,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Thai"
+    lcd_bitmap: "תאילנדית"
   </voice>
 </phrase>
 <phrase>
@@ -3718,7 +3740,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Arabic"
+    lcd_bitmap: "ערבית"
   </voice>
 </phrase>
 <phrase>
@@ -3732,7 +3754,7 @@
     *: "טורקית (ISO-8859-9)"
   </dest>
   <voice>
-    *: "Turkish"
+    *: "טורקית"
   </voice>
 </phrase>
 <phrase>
@@ -3743,10 +3765,10 @@
     *: "Latin Extended (ISO-8859-2)"
   </source>
   <dest>
-    *: "לטינית נרחבת (ISO-8859-2)"
+    *: "לטינית מורחבת (ISO-8859-2)"
   </dest>
   <voice>
-    *: "Latin extended"
+    *: "לטינית מורחבת"
   </voice>
 </phrase>
 <phrase>
@@ -3763,7 +3785,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Japanese"
+    lcd_bitmap: "יפנית"
   </voice>
 </phrase>
 <phrase>
@@ -3780,7 +3802,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Simplified Chinese"
+    lcd_bitmap: "סינית מפושטת"
   </voice>
 </phrase>
 <phrase>
@@ -3797,7 +3819,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Korean"
+    lcd_bitmap: "קוריאנית"
   </voice>
 </phrase>
 <phrase>
@@ -3814,7 +3836,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Traditional Chinese"
+    lcd_bitmap: "סינית מסורתית"
   </voice>
 </phrase>
 <phrase>
@@ -3828,7 +3850,7 @@
     *: "יוניקוד (UTF-8)"
   </dest>
   <voice>
-    *: "Unicode"
+    *: "יוניקוד"
   </voice>
 </phrase>
 <phrase>
@@ -3842,13 +3864,13 @@
   </source>
   <dest>
     *: none
-    button_light: "זמן תאורת כפתור"
-    fuze*,e200*: "זמן תאורת הגלגל"
+    button_light: "זמן תאורת כפתורים"
+    fuze*,e200*: "זמן תאורת גלגל"
   </dest>
   <voice>
     *: none
-    button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    button_light: "זמן תאורת כפתורים"
+    fuze*,e200*: "זמן תאורת גלגל"
   </voice>
 </phrase>
 <phrase>
@@ -3865,7 +3887,7 @@
   </dest>
   <voice>
     *: none
-    buttonlight_brightness: "Button Light Brightness"
+    buttonlight_brightness: "בהירות תאורת כפתור"
   </voice>
 </phrase>
 <phrase>
@@ -3879,7 +3901,7 @@
     *: "מסך פתיחה"
   </dest>
   <voice>
-    *: "Start Screen"
+    *: "מסך פתיחה"
   </voice>
 </phrase>
 <phrase>
@@ -3893,7 +3915,7 @@
     *: "תפריט ראשי"
   </dest>
   <voice>
-    *: "Main Menu"
+    *: "תפריט ראשי"
   </voice>
 </phrase>
 <phrase>
@@ -3907,7 +3929,7 @@
     *: "מסך קודם"
   </dest>
   <voice>
-    *: "Previous Screen"
+    *: "מסך קודם"
   </voice>
 </phrase>
 <phrase>
@@ -3921,7 +3943,7 @@
     *: "סוללה"
   </dest>
   <voice>
-    *: "Battery"
+    *: "סוללה"
   </voice>
 </phrase>
 <phrase>
@@ -3935,7 +3957,7 @@
     *: "קיבולת סוללה"
   </dest>
   <voice>
-    *: "Battery Capacity"
+    *: "קיבולת סוללה"
   </voice>
 </phrase>
 <phrase>
@@ -3952,7 +3974,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Battery type"
+    battery_types: "סוג סוללה"
   </voice>
 </phrase>
 <phrase>
@@ -3969,7 +3991,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Alkaline"
+    battery_types: "אלקליין"
   </voice>
 </phrase>
 <phrase>
@@ -3982,11 +4004,11 @@
   </source>
   <dest>
     *: none
-    battery_types: "ניקל מטאל היידריד"
+    battery_types: "NiMH"
   </dest>
   <voice>
     *: none
-    battery_types: "Nickel metal hydride"
+    battery_types: "ניקל מטאל היידריד"
   </voice>
 </phrase>
 <phrase>
@@ -4000,7 +4022,7 @@
     *: "כונן"
   </dest>
   <voice>
-    *: "Disk"
+    *: "כונן"
   </voice>
 </phrase>
 <phrase>
@@ -4016,7 +4038,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: "Disk Spindown"
+    *: "הפסקת סיבוב הכונן"
     flash_storage: none
   </voice>
 </phrase>
@@ -4030,11 +4052,11 @@
   </source>
   <dest>
     *: none
-    dircache: "זיכרון ספריות"
+    dircache: "זיכרון מטמון לספריות"
   </dest>
   <voice>
     *: none
-    dircache: "Directory Cache"
+    dircache: "זיכרון מטמון לספריות"
   </voice>
 </phrase>
 <phrase>
@@ -4047,11 +4069,11 @@
   </source>
   <dest>
     *: none
-    rtc: "תאריך וזמן"
+    rtc: "זמן ותאריך"
   </dest>
   <voice>
     *: none
-    rtc: "Time and Date"
+    rtc: "זמן ותאריך"
   </voice>
 </phrase>
 <phrase>
@@ -4064,11 +4086,11 @@
   </source>
   <dest>
     *: none
-    rtc: "כוון תאריך/זמן"
+    rtc: "כוון זמן/תאריך"
   </dest>
   <voice>
     *: none
-    rtc: "Set Time and Date"
+    rtc: "כוון זמן ותאריך"
   </voice>
 </phrase>
 <phrase>
@@ -4081,11 +4103,11 @@
   </source>
   <dest>
     *: none
-    rtc: "מבנה תצוגת זמן"
+    rtc: "תבנית תצוגת זמן"
   </dest>
   <voice>
     *: none
-    rtc: "Time Format"
+    rtc: "תבנית תצוגת זמן"
   </voice>
 </phrase>
 <phrase>
@@ -4098,11 +4120,11 @@
   </source>
   <dest>
     *: none
-    rtc: "שעות 12 שעון של"
+    rtc: "שעות 12 שעון"
   </dest>
   <voice>
     *: none
-    rtc: "12 Hour Clock"
+    rtc: "שעות 12 שעון"
   </voice>
 </phrase>
 <phrase>
@@ -4115,11 +4137,11 @@
   </source>
   <dest>
     *: none
-    rtc: "שעות 24 שעון של"
+    rtc: "שעות 24 שעון"
   </dest>
   <voice>
     *: none
-    rtc: "24 Hour Clock"
+    rtc: "שעות 24 שעון"
   </voice>
 </phrase>
 <phrase>
@@ -4129,14 +4151,18 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
+    sa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
-    rtc: "ON = כוון"
-    h100,h120,h300: "NAVI = כוון"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = כוון"
+    rtc: "קבע = ON"
+    mrobe500: "קבע = HEART"
+    h100,h120,h300: "קבע = NAVI"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "קבע = SELECT"
+    sa9200: "קבע = PLAY"
   </dest>
   <voice>
     *: none
@@ -4150,24 +4176,28 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
+    ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
-    rtc: "OFF = ביטול"
-    h100,h120,h300: "STOP = ביטול"
-    ipod*,c200*,sa9200: "MENU = ביטול"
-    x5,m5: "RECORD = ביטול"
-    h10,h10_5gb,e200*,fuze*: "PREV = ביטול"
-    gigabeatf: "POWER = ביטול"
-    mrobe100: "DISPLAY = ביטול"
-    gigabeats: "BACK = ביטול"
+    rtc: "החזר = OFF"
+    mrobe500: "החזר = POWER"
+    h100,h120,h300: "החזר = STOP"
+    ipod*,c200*: "החזר = MENU"
+    x5,m5: "החזר = RECORD"
+    h10,h10_5gb,e200*,fuze*: "החזר = PREV"
+    gigabeatf: "החזר = POWER"
+    mrobe100: "החזר = DISPLAY"
+    gigabeats: "החזר = BACK"
+    sa9200: "החזר = LEFT"
   </dest>
   <voice>
     *: none
@@ -4184,7 +4214,7 @@
   </source>
   <dest>
     *: none
-    rtc: "א' "
+    rtc: "א'"
   </dest>
   <voice>
     *: none
@@ -4201,7 +4231,7 @@
   </source>
   <dest>
     *: none
-    rtc: "ב' "
+    rtc: "ב'"
   </dest>
   <voice>
     *: none
@@ -4235,7 +4265,7 @@
   </source>
   <dest>
     *: none
-    rtc: "ד' "
+    rtc: "ד'"
   </dest>
   <voice>
     *: none
@@ -4252,7 +4282,7 @@
   </source>
   <dest>
     *: none
-    rtc: "ה' "
+    rtc: "ה'"
   </dest>
   <voice>
     *: none
@@ -4269,7 +4299,7 @@
   </source>
   <dest>
     *: none
-    rtc: "ו' "
+    rtc: "ו'"
   </dest>
   <voice>
     *: none
@@ -4307,7 +4337,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "January"
+    rtc: "ינואר"
   </voice>
 </phrase>
 <phrase>
@@ -4324,7 +4354,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "February"
+    rtc: "פברואר"
   </voice>
 </phrase>
 <phrase>
@@ -4341,7 +4371,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "March"
+    rtc: "מרץ"
   </voice>
 </phrase>
 <phrase>
@@ -4358,7 +4388,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "April"
+    rtc: "אפריל"
   </voice>
 </phrase>
 <phrase>
@@ -4375,7 +4405,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "May"
+    rtc: "מאי"
   </voice>
 </phrase>
 <phrase>
@@ -4392,7 +4422,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "June"
+    rtc: "יוני"
   </voice>
 </phrase>
 <phrase>
@@ -4409,7 +4439,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "July"
+    rtc: "יולי"
   </voice>
 </phrase>
 <phrase>
@@ -4426,7 +4456,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "August"
+    rtc: "אוגוס"
   </voice>
 </phrase>
 <phrase>
@@ -4443,7 +4473,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "September"
+    rtc: "ספטמבר"
   </voice>
 </phrase>
 <phrase>
@@ -4460,7 +4490,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "October"
+    rtc: "אוקטובר"
   </voice>
 </phrase>
 <phrase>
@@ -4477,7 +4507,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "November"
+    rtc: "נובמבר"
   </voice>
 </phrase>
 <phrase>
@@ -4494,7 +4524,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "December"
+    rtc: "דצמבר"
   </voice>
 </phrase>
 <phrase>
@@ -4505,10 +4535,10 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "כיבוי במצב המתנה"
+    *: "כיבוי במצב סרק"
   </dest>
   <voice>
-    *: "Idle Poweroff"
+    *: "כיבוי במצב סרק"
   </voice>
 </phrase>
 <phrase>
@@ -4519,10 +4549,10 @@
     *: "Sleep Timer"
   </source>
   <dest>
-    *: "שעון שינה"
+    *: "טיימר שינה"
   </dest>
   <voice>
-    *: "Sleep Timer"
+    *: "טיימר שינה"
   </voice>
 </phrase>
 <phrase>
@@ -4533,10 +4563,10 @@
     *: "Limits"
   </source>
   <dest>
-    *: "גבולות"
+    *: "מגבלות"
   </dest>
   <voice>
-    *: "Limits"
+    *: "מגבלות"
   </voice>
 </phrase>
 <phrase>
@@ -4547,10 +4577,10 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "מספר קבצים מקסימלי בספריה"
+    *: "מספר רשומות מקסימלי בסייר קבצים"
   </dest>
   <voice>
-    *: "Maximum entries in file browser"
+    *: "מספר רשומות מקסימלי בסייר קבצים"
   </voice>
 </phrase>
 <phrase>
@@ -4561,10 +4591,10 @@
     *: "Max Playlist Size"
   </source>
   <dest>
-    *: "מספר קבצים מקסימלי ברשימת שירים"
+    *: "גודל רשימת שירים מכסימלי"
   </dest>
   <voice>
-    *: "Maximum playlist size"
+    *: "גודל רשימת שירים מכסימלי"
   </voice>
 </phrase>
 <phrase>
@@ -4577,11 +4607,11 @@
   </source>
   <dest>
     *: none
-    charging: "מצב מכונית"
+    charging: "מצב מתאם רכב"
   </dest>
   <voice>
     *: none
-    charging: "Car Adapter Mode"
+    charging: "מצב מתאם רכב"
   </voice>
 </phrase>
 <phrase>
@@ -4598,7 +4628,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Wake-Up Alarm"
+    alarm: "שעון מעורר"
   </voice>
 </phrase>
 <phrase>
@@ -4615,7 +4645,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Wake up Screen"
+    alarm: "מסך שעון מעורר"
   </voice>
 </phrase>
 <phrase>
@@ -4628,7 +4658,7 @@
   </source>
   <dest>
     *: none
-    alarm: "שעון מעורר: %02d:%02d"
+    alarm: "זמן השכמה: %02d:%02d"
   </dest>
   <voice>
     *: none
@@ -4645,11 +4675,11 @@
   </source>
   <dest>
     *: none
-    alarm: "מתעורר ב: %d:%02d"
+    alarm: "השכמה בעוד: %d:%02d"
   </dest>
   <voice>
     *: none
-    alarm: "Waking up in"
+    alarm: "השכמה בעוד"
   </voice>
 </phrase>
 <phrase>
@@ -4662,11 +4692,11 @@
   </source>
   <dest>
     *: none
-    alarm: "שעון מעורר מוגדר"
+    alarm: "שעון מעורר נקבע"
   </dest>
   <voice>
     *: none
-    alarm: "Alarm set"
+    alarm: "שעון מעורר נקבע"
   </voice>
 </phrase>
 <phrase>
@@ -4679,11 +4709,11 @@
   </source>
   <dest>
     *: none
-    alarm: "!השעה בשעון המעורר מוקדמת מדי"
+    alarm: "שעת ההשכמה מוקדמת מדי!"
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Time Is Too Soon!"
+    alarm: "שעת ההשכמה מוקדמת מדי!"
   </voice>
 </phrase>
 <phrase>
@@ -4699,10 +4729,10 @@
   </source>
   <dest>
     *: none
-    alarm: "PLAY=אישור OFF=ביטול"
-    ipod*: "SELECT=אישור MENU=ביטול"
-    h10,h10_5gb: "SELECT=אישור PREV=ביטול"
-    gigabeats: "SELECT=אישור POWER=ביטול"
+    alarm: "ביטול=OFF קבע=PLAY"
+    ipod*: "ביטול=MENU קבע=SELECT"
+    h10,h10_5gb: "ביטול=PREV קבע=SELECT"
+    gigabeats: "ביטול=POWER קבע=SELECT"
   </dest>
   <voice>
     *: none
@@ -4723,7 +4753,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Disabled"
+    alarm: "שעון מעורר מבוטל"
   </voice>
 </phrase>
 <phrase>
@@ -4737,7 +4767,7 @@
     *: "סימניות"
   </dest>
   <voice>
-    *: "Bookmarking"
+    *: "סימניות"
   </voice>
 </phrase>
 <phrase>
@@ -4751,7 +4781,7 @@
     *: "יצירת סימניה בעצירה"
   </dest>
   <voice>
-    *: "Bookmark on Stop"
+    *: "יצירת סימניה בעצירה"
   </voice>
 </phrase>
 <phrase>
@@ -4765,7 +4795,7 @@
     *: "כן - אחרונות בלבד"
   </dest>
   <voice>
-    *: "Yes - Recent only"
+    *: "כן - אחרונות בלבד"
   </voice>
 </phrase>
 <phrase>
@@ -4779,7 +4809,7 @@
     *: "שאל - אחרונות בלבד"
   </dest>
   <voice>
-    *: "Ask - Recent only"
+    *: "שאל - אחרונות בלבד"
   </voice>
 </phrase>
 <phrase>
@@ -4793,7 +4823,7 @@
     *: "טעינת סימניה אחרונה"
   </dest>
   <voice>
-    *: "Load Last Bookmark"
+    *: "טעינת סימניה אחרונה"
   </voice>
 </phrase>
 <phrase>
@@ -4804,10 +4834,10 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "יצירת רשימת סימניות אחרונות"
+    *: "ליצור רשימה של סימניות אחרונות?"
   </dest>
   <voice>
-    *: "Maintain a List of Recent Bookmarks?"
+    *: "ליצור רשימה של סימניות אחרונות?"
   </voice>
 </phrase>
 <phrase>
@@ -4818,10 +4848,10 @@
     *: "Unique only"
   </source>
   <dest>
-    *: "מיוחדים בלבד"
+    *: "יחודי בלבד"
   </dest>
   <voice>
-    *: "Unique only"
+    *: "יחודי בלבד"
   </voice>
 </phrase>
 <phrase>
@@ -4835,7 +4865,7 @@
     *: "שפה"
   </dest>
   <voice>
-    *: "Language"
+    *: "שפה"
   </voice>
 </phrase>
 <phrase>
@@ -4849,7 +4879,7 @@
     *: "שפה חדשה"
   </dest>
   <voice>
-    *: "New Language"
+    *: "שפה חדשה"
   </voice>
 </phrase>
 <phrase>
@@ -4860,10 +4890,10 @@
     *: "Voice"
   </source>
   <dest>
-    *: "קול"
+    *: "הקראה"
   </dest>
   <voice>
-    *: "Voice"
+    *: "הקראה"
   </voice>
 </phrase>
 <phrase>
@@ -4874,10 +4904,10 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "תפריטי קול"
+    *: "תפריטי הקראה"
   </dest>
   <voice>
-    *: "Voice Menus"
+    *: "תפריטי הקראה"
   </voice>
 </phrase>
 <phrase>
@@ -4888,10 +4918,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "ספריות קוליות"
+    *: "הקראת ספריות"
   </dest>
   <voice>
-    *: "Voice Directories"
+    *: "הקראת ספריות"
   </voice>
 </phrase>
 <phrase>
@@ -4905,7 +4935,7 @@
     *: "השתמש בקטעי דיבור עבור ספריות"
   </dest>
   <voice>
-    *: "Use Directory .talk Clips"
+    *: "השתמש בקטעי דיבור עבור ספריות"
   </voice>
 </phrase>
 <phrase>
@@ -4916,10 +4946,10 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "קבצים קוליים"
+    *: "הקראת קבצים"
   </dest>
   <voice>
-    *: "Voice Filenames"
+    *: "הקראת קבצים"
   </voice>
 </phrase>
 <phrase>
@@ -4933,7 +4963,7 @@
     *: "השתמש בקטעי דיבור עבור קבצים"
   </dest>
   <voice>
-    *: "Use File .talk Clips"
+    *: "השתמש בקטעי דיבור עבור קבצים"
   </voice>
 </phrase>
 <phrase>
@@ -4947,7 +4977,7 @@
     *: "מספרים"
   </dest>
   <voice>
-    *: "Numbers"
+    *: "מספרים"
   </voice>
 </phrase>
 <phrase>
@@ -4958,10 +4988,10 @@
     *: "Spell"
   </source>
   <dest>
-    *: "איית"
+    *: "איות"
   </dest>
   <voice>
-    *: "Spell"
+    *: "איות"
   </voice>
 </phrase>
 <phrase>
@@ -4975,7 +5005,7 @@
     *: ".mp3 הקרא קטעי"
   </dest>
   <voice>
-    *: "talk mp3 clip"
+    *: ".mp3 הקרא קטעי"
   </voice>
 </phrase>
 <phrase>
@@ -4989,7 +5019,7 @@
     *: "ניהול הגדרות"
   </dest>
   <voice>
-    *: "Manage Settings"
+    *: "ניהול הגדרות"
   </voice>
 </phrase>
 <phrase>
@@ -5000,10 +5030,10 @@
     *: "Browse .cfg Files"
   </source>
   <dest>
-    *: ".cfg הצג קבצי"
+    *: ".cfg סייר בקבצי"
   </dest>
   <voice>
-    *: "Browse configuration files"
+    *: "סייר בקבצי קונפיגורציה"
   </voice>
 </phrase>
 <phrase>
@@ -5014,10 +5044,10 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "נטענו הגדרות"
+    *: "הגדרות נטענו"
   </dest>
   <voice>
-    *: "Settings Loaded"
+    *: "הגדרות נטענו"
   </voice>
 </phrase>
 <phrase>
@@ -5031,7 +5061,7 @@
     *: "אפס הגדרות"
   </dest>
   <voice>
-    *: "Reset Settings"
+    *: "אפס הגדרות"
   </voice>
 </phrase>
 <phrase>
@@ -5042,10 +5072,10 @@
     *: "Cleared"
   </source>
   <dest>
-    *: "מאופס"
+    *: "אופס"
   </dest>
   <voice>
-    *: "Settings Cleared"
+    *: "הגדרות אופסו"
   </voice>
 </phrase>
 <phrase>
@@ -5056,10 +5086,10 @@
     *: "Save .cfg File"
   </source>
   <dest>
-    *: ".cfg יצירת קובץ"
+    *: ".cfg שמור קובץ"
   </dest>
   <voice>
-    *: "Save configuration file"
+    *: "שמור קובץ קונפיגורציה"
   </voice>
 </phrase>
 <phrase>
@@ -5073,7 +5103,7 @@
     *: "הגדרות נשמרו"
   </dest>
   <voice>
-    *: "Settings Saved"
+    *: "הגדרות נשמרו"
   </voice>
 </phrase>
 <phrase>
@@ -5084,10 +5114,10 @@
     *: "Save Theme Settings"
   </source>
   <dest>
-    *: "שמור הגדרות תצורת נושא"
+    *: "שמור הגדרות ערכת נושא"
   </dest>
   <voice>
-    *: "Save Theme Settings"
+    *: "שמור הגדרות ערכת נושא"
   </voice>
 </phrase>
 <phrase>
@@ -5095,13 +5125,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "הצג תצורות נושא"
+    *: "סייר בקבצי תצורות נושא"
   </dest>
   <voice>
-    *: "Browse Themes"
+    *: "סייר בקבצי תצורות נושא"
   </voice>
 </phrase>
 <phrase>
@@ -5118,7 +5148,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Recording Settings"
+    recording: "הגדרות הקלטה"
   </voice>
 </phrase>
 <phrase>
@@ -5131,11 +5161,11 @@
   </source>
   <dest>
     *: none
-    radio: "תפריט רדיו"
+    radio: "FM תפריט רדיו"
   </dest>
   <voice>
     *: none
-    radio: "FM Radio Menu"
+    radio: "FM תפריט רדיו"
   </voice>
 </phrase>
 <phrase>
@@ -5148,7 +5178,7 @@
   </source>
   <dest>
     *: none
-    radio: "תחנה: %d.%02d MHz"
+    radio: "%d.%02d MHZ :תחנה"
   </dest>
   <voice>
     *: none
@@ -5169,7 +5199,7 @@
   </dest>
   <voice>
     *: none
-    radio: "No presets"
+    radio: "אין תחנות קבועות"
   </voice>
 </phrase>
 <phrase>
@@ -5186,7 +5216,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Add Preset"
+    radio: "הוסף תחנה קבועה"
   </voice>
 </phrase>
 <phrase>
@@ -5203,7 +5233,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Edit Preset"
+    radio: "ערוך תחנה קבועה"
   </voice>
 </phrase>
 <phrase>
@@ -5220,7 +5250,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Remove Preset"
+    radio: "הסר תחנה קבועה"
   </voice>
 </phrase>
 <phrase>
@@ -5233,11 +5263,11 @@
   </source>
   <dest>
     *: none
-    radio: "שמירת התחנה הקבועה נכשלה"
+    radio: "שמירת תחנה קבועה נכשלה"
   </dest>
   <voice>
     *: none
-    radio: "Preset Save Failed"
+    radio: "שמירת תחנה קבועה נכשלה"
   </voice>
 </phrase>
 <phrase>
@@ -5250,11 +5280,11 @@
   </source>
   <dest>
     *: none
-    radio: "רשימת התחנות הקבועות מראש מלאה"
+    radio: "רשימת התחנות הקבועות מלאה"
   </dest>
   <voice>
     *: none
-    radio: "The Preset List is Full"
+    radio: "רשימת התחנות הקבועות מלאה"
   </voice>
 </phrase>
 <phrase>
@@ -5322,7 +5352,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset"
+    radio: "תחנה קבועה"
   </voice>
 </phrase>
 <phrase>
@@ -5352,7 +5382,7 @@
   </source>
   <dest>
     *: none
-    radio_screen_button_bar: "הקלטה"
+    radio_screen_button_bar: "הקלט"
   </dest>
   <voice>
     *: none
@@ -5369,11 +5399,11 @@
   </source>
   <dest>
     *: none
-    radio: "כפה מצב מונו"
+    radio: "כפה מונו"
   </dest>
   <voice>
     *: none
-    radio: "Force Mono"
+    radio: "כפה מונו"
   </voice>
 </phrase>
 <phrase>
@@ -5386,7 +5416,7 @@
   </source>
   <dest>
     *: none
-    radio: "המסך קפוא!"
+    radio: "!המסך קפוא"
   </dest>
   <voice>
     *: none
@@ -5407,7 +5437,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Auto scan presets"
+    radio: "סרוק תחנות אוטומטית"
   </voice>
 </phrase>
 <phrase>
@@ -5420,11 +5450,11 @@
   </source>
   <dest>
     *: none
-    radio: "נקה רשימת התחנות הקבועות מראש?"
+    radio: "לנקות תחנות קבועות נוכחיות?"
   </dest>
   <voice>
     *: none
-    radio: "Clear Current Presets?"
+    radio: "לנקות תחנות קבועות נוכחיות?"
   </voice>
 </phrase>
 <phrase>
@@ -5437,7 +5467,7 @@
   </source>
   <dest>
     *: none
-    radio: "סורק %d.%02d MHz"
+    radio: "%d.%02d MHz סורק"
   </dest>
   <voice>
     *: none
@@ -5475,7 +5505,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Scan"
+    radio: "סריקה"
   </voice>
 </phrase>
 <phrase>
@@ -5492,7 +5522,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Load Preset List"
+    radio: "טען רשימת תחנות קבועות"
   </voice>
 </phrase>
 <phrase>
@@ -5509,7 +5539,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Save Preset List"
+    radio: "שמור רשימת תחנות קבועות"
   </voice>
 </phrase>
 <phrase>
@@ -5526,7 +5556,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Clear Preset List"
+    radio: "מחק רשימת תחנות קבועות"
   </voice>
 </phrase>
 <phrase>
@@ -5543,7 +5573,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset List"
+    radio: "רשימת תחנות קבועות"
   </voice>
 </phrase>
 <phrase>
@@ -5556,11 +5586,11 @@
   </source>
   <dest>
     *: none
-    radio: "לא נמצאו תחנות מוגדרות. סרוק אוטומטית?"
+    radio: "?לא נמצאו הגדרות. האם לסרוק אוטומטית"
   </dest>
   <voice>
     *: none
-    radio: "No settings found. Autoscan?"
+    radio: "לא נמצאו הגדרות. האם לסרוק אוטומטית"
   </voice>
 </phrase>
 <phrase>
@@ -5573,11 +5603,11 @@
   </source>
   <dest>
     *: none
-    radio: "לשמור שינויים?"
+    radio: "?לשמור שינויים"
   </dest>
   <voice>
     *: none
-    radio: "Save Changes?"
+    radio: "לשמור שינויים?"
   </voice>
 </phrase>
 <phrase>
@@ -5594,7 +5624,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Region"
+    radio: "אזור"
   </voice>
 </phrase>
 <phrase>
@@ -5611,7 +5641,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Europe"
+    radio: "אירופה"
   </voice>
 </phrase>
 <phrase>
@@ -5628,7 +5658,7 @@
   </dest>
   <voice>
     *: none
-    radio: "US and Canada"
+    radio: "ארה''ב וקנדה"
   </voice>
 </phrase>
 <phrase>
@@ -5645,7 +5675,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Japan"
+    radio: "יפן"
   </voice>
 </phrase>
 <phrase>
@@ -5662,7 +5692,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Korea"
+    radio: "קוריאה"
   </voice>
 </phrase>
 <phrase>
@@ -5679,7 +5709,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Format"
+    recording: "תבנית"
   </voice>
 </phrase>
 <phrase>
@@ -5764,7 +5794,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Encoder Settings"
+    recording: "הגדרות מקודד"
   </voice>
 </phrase>
 <phrase>
@@ -5777,7 +5807,7 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: "איכות"
+    recording_swcodec: "Bitrate"
   </dest>
   <voice>
     *: none
@@ -5798,7 +5828,7 @@
   </dest>
   <voice>
     *: none
-    recording: "No settings available"
+    recording: "אין הגדרות זמינות"
   </voice>
 </phrase>
 <phrase>
@@ -5815,7 +5845,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Quality"
+    recording_hwcodec: "איכות"
   </voice>
 </phrase>
 <phrase>
@@ -5832,7 +5862,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Frequency"
+    recording: "תדירות"
   </voice>
 </phrase>
 <phrase>
@@ -5849,7 +5879,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Same As Source"
+    recording: "כמו המקור"
   </voice>
 </phrase>
 <phrase>
@@ -5866,7 +5896,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Source"
+    recording: "מקור"
   </voice>
 </phrase>
 <phrase>
@@ -5885,8 +5915,8 @@
   </dest>
   <voice>
     *: none
-    recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    recording: "מיקרופון"
+    h100,h120,h300: "מיקרופון פנימי"
   </voice>
 </phrase>
 <phrase>
@@ -5899,11 +5929,11 @@
   </source>
   <dest>
     *: none
-    recording: "כניסת שמע דיגיטלית"
+    recording: "דיגיטלי"
   </dest>
   <voice>
     *: none
-    recording: "Digital"
+    recording: "דיגיטלי"
   </voice>
 </phrase>
 <phrase>
@@ -5916,7 +5946,7 @@
   </source>
   <dest>
     *: none
-    recording,player: "כניסת שמע"
+    recording,player: "Line In"
   </dest>
   <voice>
     *: none
@@ -5933,7 +5963,7 @@
   </source>
   <dest>
     *: none
-    recording_hwcodec: "מסגרות נפרדות"
+    recording_hwcodec: "Independent Frames"
   </dest>
   <voice>
     *: none
@@ -5954,7 +5984,7 @@
   </dest>
   <voice>
     *: none
-    recording: "File Split Options"
+    recording: "אפשרויות פיצול לקבצים"
   </voice>
 </phrase>
 <phrase>
@@ -5967,11 +5997,11 @@
   </source>
   <dest>
     *: none
-    recording: "מדידת הפיצול"
+    recording: "אמת-מידה לפיצול"
   </dest>
   <voice>
     *: none
-    recording: "Split Measure"
+    recording: "אמת-מידה לפיצול"
   </voice>
 </phrase>
 <phrase>
@@ -5988,7 +6018,7 @@
   </dest>
   <voice>
     *: none
-    recording: "What to do when Splitting"
+    recording: "מה לעשות בעת פיצול"
   </voice>
 </phrase>
 <phrase>
@@ -6005,7 +6035,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Start new file"
+    recording: "התחל קובץ חדש"
   </voice>
 </phrase>
 <phrase>
@@ -6022,7 +6052,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop recording"
+    recording: "הפסק הקלטה"
   </voice>
 </phrase>
 <phrase>
@@ -6035,11 +6065,11 @@
   </source>
   <dest>
     *: none
-    recording: "זמן הפיצול"
+    recording: "זמן פיצול"
   </dest>
   <voice>
     *: none
-    recording: "Split Time"
+    recording: "זמן פיצול"
   </voice>
 </phrase>
 <phrase>
@@ -6052,11 +6082,11 @@
   </source>
   <dest>
     *: none
-    recording: "פיצול לפי גודל קובץ"
+    recording: "גודל קובץ מפוצל"
   </dest>
   <voice>
     *: none
-    recording: "Split Filesize"
+    recording: "גודל קובץ מפוצל"
   </voice>
 </phrase>
 <phrase>
@@ -6073,7 +6103,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Filesize"
+    recording: "גודל קובץ"
   </voice>
 </phrase>
 <phrase>
@@ -6090,7 +6120,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Pre-Record time"
+    recording: "זמן הקלטה מראש"
   </voice>
 </phrase>
 <phrase>
@@ -6107,7 +6137,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Directory"
+    recording: "ספריה"
   </voice>
 </phrase>
 <phrase>
@@ -6137,11 +6167,11 @@
   </source>
   <dest>
     *: none
-    recording: "בחר כספרית הקלטות"
+    recording: "קבע כספרית הקלטות"
   </dest>
   <voice>
     *: none
-    recording: "Set As Recording Directory"
+    recording: "קבע כספרית הקלטות"
   </voice>
 </phrase>
 <phrase>
@@ -6158,7 +6188,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clear Recording Directory"
+    recording: "נקה את ספרית ההקלטות"
   </voice>
 </phrase>
 <phrase>
@@ -6171,11 +6201,11 @@
   </source>
   <dest>
     *: none
-    recording: "לא ניתן לכתוב לספרית ההקלטות!"
+    recording: "לא ניתן לכתוב לספרית ההקלטות"
   </dest>
   <voice>
     *: none
-    recording: "Can't write to recording directory"
+    recording: "לא ניתן לכתוב לספרית ההקלטות"
   </voice>
 </phrase>
 <phrase>
@@ -6188,11 +6218,11 @@
   </source>
   <dest>
     *: none
-    recording: "עיוותי צליל מפעילים תאורה"
+    recording: "תאורה בעת עיוותי צליל"
   </dest>
   <voice>
     *: none
-    recording: "Clipping Light"
+    recording: "תאורה בעת עיוותי צליל"
   </voice>
 </phrase>
 <phrase>
@@ -6209,7 +6239,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Main unit only"
+    remote: "יחידה מרכזית בלבד"
   </voice>
 </phrase>
 <phrase>
@@ -6226,7 +6256,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote unit only"
+    remote: "יחידת שלט בלבד"
   </voice>
 </phrase>
 <phrase>
@@ -6239,11 +6269,11 @@
   </source>
   <dest>
     *: none
-    remote: "יחידה מרכזית והשלט"
+    remote: "יחידה מרכזית ושלט"
   </dest>
   <voice>
     *: none
-    remote: "Main and remote unit"
+    remote: "יחידה מרכזית ושלט"
   </voice>
 </phrase>
 <phrase>
@@ -6256,11 +6286,11 @@
   </source>
   <dest>
     *: none
-    recording: "גורם הפעלה"
+    recording: "הדק"
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "הדק"
   </voice>
 </phrase>
 <phrase>
@@ -6277,7 +6307,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Once"
+    recording: "פעם אחת"
   </voice>
 </phrase>
 <phrase>
@@ -6290,11 +6320,11 @@
   </source>
   <dest>
     *: none
-    recording: "סוג ההפעלה"
+    recording: "סוג הדק"
   </dest>
   <voice>
     *: none
-    recording: "Trigger type"
+    recording: "סוג הדק"
   </voice>
 </phrase>
 <phrase>
@@ -6311,7 +6341,7 @@
   </dest>
   <voice>
     *: none
-    recording: "New file"
+    recording: "קובץ חדש"
   </voice>
 </phrase>
 <phrase>
@@ -6328,7 +6358,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop"
+    recording: "עצירה"
   </voice>
 </phrase>
 <phrase>
@@ -6341,11 +6371,11 @@
   </source>
   <dest>
     *: none
-    recording: "התחל לפני"
+    recording: "התחל מעל"
   </dest>
   <voice>
     *: none
-    recording: "Start Above"
+    recording: "התחל מעל"
   </voice>
 </phrase>
 <phrase>
@@ -6362,7 +6392,7 @@
   </dest>
   <voice>
     *: none
-    recording: "for at least"
+    recording: "למשך לפחות"
   </voice>
 </phrase>
 <phrase>
@@ -6375,11 +6405,11 @@
   </source>
   <dest>
     *: none
-    recording: "עצור אחרי"
+    recording: "עצור מתחת"
   </dest>
   <voice>
     *: none
-    recording: "Stop Below"
+    recording: "עצור מתחת"
   </voice>
 </phrase>
 <phrase>
@@ -6392,11 +6422,11 @@
   </source>
   <dest>
     *: none
-    recording: "חלק מראש את הרווח"
+    recording: "רווח לפני פיצול"
   </dest>
   <voice>
     *: none
-    recording: "Presplit Gap"
+    recording: "רווח לפני פיצול"
   </voice>
 </phrase>
 <phrase>
@@ -6481,7 +6511,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: "(ביטחון (עיוות"
   </voice>
 </phrase>
 <phrase>
@@ -6498,7 +6528,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: "(חי (איטי"
   </voice>
 </phrase>
 <phrase>
@@ -6515,7 +6545,7 @@
   </dest>
   <voice>
     *: none
-    agc: "DJ set (slow)"
+    agc: "(מערכת ד'י-ג'יי (איטי"
   </voice>
 </phrase>
 <phrase>
@@ -6532,7 +6562,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: "בינוני"
   </voice>
 </phrase>
 <phrase>
@@ -6549,7 +6579,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
+    agc: "(קול (מהיר"
   </voice>
 </phrase>
 <phrase>
@@ -6583,7 +6613,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Display OFF"
+    remote: "תצוגת השלט כבויה"
   </voice>
 </phrase>
 <phrase>
@@ -6596,11 +6626,11 @@
   </source>
   <dest>
     *: none
-    remote: "(Vol-: התחל מחדש)"
+    remote: "(התחל מחדש :Vol-)"
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Re-enable)"
+    remote: "(Vol-: התחל מחדש)"
   </voice>
 </phrase>
 <phrase>
@@ -6611,10 +6641,10 @@
     *: "Create Playlist"
   </source>
   <dest>
-    *: "יצירת רשימת שירים"
+    *: "צור רשימת שירים"
   </dest>
   <voice>
-    *: "Create Playlist"
+    *: "צור רשימת שירים"
   </voice>
 </phrase>
 <phrase>
@@ -6628,7 +6658,7 @@
     *: "הגדרות רשימת שירים"
   </dest>
   <voice>
-    *: "Playlist Viewer Settings"
+    *: "הגדרות רשימת שירים"
   </voice>
 </phrase>
 <phrase>
@@ -6642,7 +6672,7 @@
     *: "הצג רשימת שירים נוכחית"
   </dest>
   <voice>
-    *: "View Current Playlist"
+    *: "הצג רשימת שירים נוכחית"
   </voice>
 </phrase>
 <phrase>
@@ -6656,7 +6686,7 @@
     *: "העבר"
   </dest>
   <voice>
-    *: "Move"
+    *: "העבר"
   </voice>
 </phrase>
 <phrase>
@@ -6670,7 +6700,7 @@
     *: "הצג סימני מפתח"
   </dest>
   <voice>
-    *: "Show Indices"
+    *: "הצג סימני מפתח"
   </voice>
 </phrase>
 <phrase>
@@ -6684,7 +6714,7 @@
     *: "הצגת שיר"
   </dest>
   <voice>
-    *: "Track Display"
+    *: "הצגת שיר"
   </voice>
 </phrase>
 <phrase>
@@ -6698,7 +6728,7 @@
     *: "שם השיר בלבד"
   </dest>
   <voice>
-    *: "Track Name Only"
+    *: "שם השיר בלבד"
   </voice>
 </phrase>
 <phrase>
@@ -6712,7 +6742,7 @@
     *: "הסר"
   </dest>
   <voice>
-    *: "Remove"
+    *: "הסר"
   </voice>
 </phrase>
 <phrase>
@@ -6726,7 +6756,7 @@
     *: "שמור רשימת שירים נוכחית"
   </dest>
   <voice>
-    *: "Save Current Playlist"
+    *: "שמור רשימת שירים נוכחית"
   </voice>
 </phrase>
 <phrase>
@@ -6737,10 +6767,10 @@
     *: "Saved %d tracks (%s)"
   </source>
   <dest>
-    *: "שירים %d נשמרו (%s)"
+    *: "נשמרו %d שירים (%s)"
   </dest>
   <voice>
-    *: "tracks saved"
+    *: "שירים נשמעו"
   </voice>
 </phrase>
 <phrase>
@@ -6754,6 +6784,7 @@
     *: "קטלוג רשימות שירים"
   </dest>
   <voice>
+    *: "קטלוג רשימות שירים"
     *: "Playlist Catalog"
   </voice>
 </phrase>
@@ -6768,7 +6799,7 @@
     *: "הכנס את כל תתי-הספריות"
   </dest>
   <voice>
-    *: "Recursively Insert Directories"
+    *: "הכנס את כל תתי-הספריות"
   </voice>
 </phrase>
 <phrase>
@@ -6782,7 +6813,7 @@
     *: "את כל תתי-הספריות?"
   </dest>
   <voice>
-    *: "Recursively?"
+    *: "את כל תתי-הספריות?"
   </voice>
 </phrase>
 <phrase>
@@ -6796,7 +6827,7 @@
     *: "הזהר לפני מחיקת רשימת השירים הדינאמית"
   </dest>
   <voice>
-    *: "Warn When Erasing Dynamic Playlist"
+    *: "הזהר לפני מחיקת רשימת השירים הדינאמית"
   </voice>
 </phrase>
 <phrase>
@@ -6807,10 +6838,10 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "למחוק רשימת שירים דינאמית?"
+    *: "למחוק את רשימת השירים הדינאמית?"
   </dest>
   <voice>
-    *: "Erase dynamic playlist?"
+    *: "למחוק את רשימת השירים הדינאמית?"
   </voice>
 </phrase>
 <phrase>
@@ -6827,7 +6858,7 @@
   </dest>
   <voice>
     *: none
-    soft_shutdown: "Shut down"
+    soft_shutdown: "כיבוי"
   </voice>
 </phrase>
 <phrase>
@@ -6838,10 +6869,10 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: ":מידע על רוקבוקס"
+    *: "מידע על רוקבוקס"
   </dest>
   <voice>
-    *: "Rockbox Info"
+    *: "מידע על רוקבוקס"
   </voice>
 </phrase>
 <phrase>
@@ -6857,7 +6888,7 @@
     player: "חצץ:"
   </dest>
   <voice>
-    *: "Buffer size"
+    *: "גודל חוצץ"
   </voice>
 </phrase>
 <phrase>
@@ -6875,7 +6906,7 @@
     h10,ipodmini,ipodmini2g: "סולל: %d%% %dh %dm"
   </dest>
   <voice>
-    *: "Battery level"
+    *: "רמת סוללה"
   </voice>
 </phrase>
 <phrase>
@@ -6889,7 +6920,7 @@
     *: "כונן:"
   </dest>
   <voice>
-    *: "Disk size"
+    *: "גודל כונן"
   </voice>
 </phrase>
 <phrase>
@@ -6903,7 +6934,7 @@
     *: "מקום פנוי:"
   </dest>
   <voice>
-    *: "Free diskspace:"
+    *: "מקום פנוי בדיסק"
   </voice>
 </phrase>
 <phrase>
@@ -6920,7 +6951,7 @@
   </dest>
   <voice>
     *: none
-    multivolume: "Internal"
+    multivolume: "פנימי"
   </voice>
 </phrase>
 <phrase>
@@ -6954,10 +6985,10 @@
     *: "Version"
   </source>
   <dest>
-    *: "גרסה"
+    *: "גירסה"
   </dest>
   <voice>
-    *: "Version"
+    *: "גירסה"
   </voice>
 </phrase>
 <phrase>
@@ -6971,7 +7002,7 @@
     *: "זמן פעולה"
   </dest>
   <voice>
-    *: "Running Time"
+    *: "זמן פעולה"
   </voice>
 </phrase>
 <phrase>
@@ -6999,7 +7030,7 @@
     *: "הזמן הממושך ביותר"
   </dest>
   <voice>
-    *: "Top Time"
+    *: "הזמן הממושך ביותר"
   </voice>
 </phrase>
 <phrase>
@@ -7010,10 +7041,10 @@
     *: "Clear Time?"
   </source>
   <dest>
-    *: "?לאפס זמנים"
+    *: "לאפס זמנים?"
   </dest>
   <voice>
-    *: "Clear Time?"
+    *: "?לאפס זמנים"
   </voice>
 </phrase>
 <phrase>
@@ -7027,6 +7058,7 @@
     *: "(!איתור שגיאות (לא להכנס"
   </dest>
   <voice>
+    *: "!איתור שגיאות, לא להכנס"
     *: "Debug, keep out!"
   </voice>
 </phrase>
@@ -7041,7 +7073,7 @@
     *: "רשימת שירים"
   </dest>
   <voice>
-    *: "Playlist"
+    *: "רשימת שירים"
   </voice>
 </phrase>
 <phrase>
@@ -7055,7 +7087,7 @@
     *: "הכנס"
   </dest>
   <voice>
-    *: "Insert"
+    *: "הכנס"
   </voice>
 </phrase>
 <phrase>
@@ -7066,10 +7098,10 @@
     *: "Insert Next"
   </source>
   <dest>
-    *: "הכנס הבא בתור"
+    *: "הכנס הבא"
   </dest>
   <voice>
-    *: "Insert Next"
+    *: "הכנס הבא"
   </voice>
 </phrase>
 <phrase>
@@ -7083,7 +7115,7 @@
     *: "הכנס אחרון"
   </dest>
   <voice>
-    *: "Insert Last"
+    *: "הכנס אחרון"
   </voice>
 </phrase>
 <phrase>
@@ -7097,7 +7129,7 @@
     *: "הכנס במעורבב"
   </dest>
   <voice>
-    *: "Insert Shuffled"
+    *: "הכנס במעורבב"
   </voice>
 </phrase>
 <phrase>
@@ -7108,10 +7140,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "העמד בתור"
+    *: "הכנס לתור"
   </dest>
   <voice>
-    *: "Queue"
+    *: "הכנס לתור"
   </voice>
 </phrase>
 <phrase>
@@ -7122,10 +7154,10 @@
     *: "Queue Next"
   </source>
   <dest>
-    *: "העמד הבא בתור"
+    *: "הכנס הבא לתור"
   </dest>
   <voice>
-    *: "Queue Next"
+    *: "הכנס הבא לתור"
   </voice>
 </phrase>
 <phrase>
@@ -7136,10 +7168,10 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "העמד אחרון בתור"
+    *: "הכנס אחרון לתור"
   </dest>
   <voice>
-    *: "Queue Last"
+    *: "הכנס אחרון לתור"
   </voice>
 </phrase>
 <phrase>
@@ -7150,10 +7182,10 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "העמד בתור במעורבב"
+    *: "הכנס לתור במעורבב"
   </dest>
   <voice>
-    *: "Queue Shuffled"
+    *: "הכנס לתור במעורבב"
   </voice>
 </phrase>
 <phrase>
@@ -7167,7 +7199,7 @@
     *: "נגן הבא"
   </dest>
   <voice>
-    *: "Play Next"
+    *: "נגן הבא"
   </voice>
 </phrase>
 <phrase>
@@ -7178,10 +7210,10 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "שירים %d הוכנסו (%s)"
+    *: "הוכנסו %d שירים (%s)"
   </dest>
   <voice>
-    *: "tracks inserted"
+    *: "שירים הוכנסו"
   </voice>
 </phrase>
 <phrase>
@@ -7192,10 +7224,10 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "שירים הועמדו בתור %d (%s)"
+    *: "הוכנסו %d שירים לתור (%s)"
   </dest>
   <voice>
-    *: "tracks queued"
+    *: "שירים הוכנסו לתור"
   </voice>
 </phrase>
 <phrase>
@@ -7209,7 +7241,7 @@
     *: "הצגה"
   </dest>
   <voice>
-    *: "View"
+    *: "הצגה"
   </voice>
 </phrase>
 <phrase>
@@ -7223,7 +7255,7 @@
     *: "חפש ברשימת שירים"
   </dest>
   <voice>
-    *: "Search In Playlist"
+    *: "חפש ברשימת שירים"
   </voice>
 </phrase>
 <phrase>
@@ -7251,7 +7283,7 @@
     *: "ערבוב מחדש"
   </dest>
   <voice>
-    *: "Reshuffle"
+    *: "ערבוב מחדש"
   </voice>
 </phrase>
 <phrase>
@@ -7265,7 +7297,7 @@
     *: "הצג קטלוג"
   </dest>
   <voice>
-    *: "View Catalog"
+    *: "הצג קטלוג"
   </voice>
 </phrase>
 <phrase>
@@ -7279,7 +7311,7 @@
     *: "הוסף לרשימת שירים"
   </dest>
   <voice>
-    *: "Add to playlist"
+    *: "הוסף לרשימת שירים"
   </voice>
 </phrase>
 <phrase>
@@ -7293,7 +7325,7 @@
     *: "הוסף לרשימת שירים חדשה"
   </dest>
   <voice>
-    *: "Add to New Playlist"
+    *: "הוסף לרשימת שירים חדשה"
   </voice>
 </phrase>
 <phrase>
@@ -7304,10 +7336,10 @@
     *: "%s doesn't exist"
   </source>
   <dest>
-    *: "%s קיים לא"
+    *: "%s לא קיים"
   </dest>
   <voice>
-    *: "Playlist directory doesn't exist"
+    *: "ספריית רשימת השירים אינה קיימת"
   </voice>
 </phrase>
 <phrase>
@@ -7321,7 +7353,7 @@
     *: "אין רשימות שירים"
   </dest>
   <voice>
-    *: "No Playlists"
+    *: "אין רשימות שירים"
   </voice>
 </phrase>
 <phrase>
@@ -7335,7 +7367,7 @@
     *: "סימניות"
   </dest>
   <voice>
-    *: "Bookmarks"
+    *: "סימניות"
   </voice>
 </phrase>
 <phrase>
@@ -7349,7 +7381,7 @@
     *: "צור סימניה"
   </dest>
   <voice>
-    *: "Create Bookmark"
+    *: "צור סימניה"
   </voice>
 </phrase>
 <phrase>
@@ -7363,7 +7395,7 @@
     *: "רשימת סימניות"
   </dest>
   <voice>
-    *: "List Bookmarks"
+    *: "רשימת סימניות"
   </voice>
 </phrase>
 <phrase>
@@ -7377,7 +7409,7 @@
     *: "תפריט הקשר"
   </dest>
   <voice>
-    *: "Context Menu"
+    *: "תפריט הקשר"
   </voice>
 </phrase>
 <phrase>
@@ -7391,7 +7423,7 @@
     *: "קבע דירוג שיר"
   </dest>
   <voice>
-    *: "Set Song Rating"
+    *: "קבע דירוג שיר"
   </voice>
 </phrase>
 <phrase>
@@ -7405,7 +7437,7 @@
     *: "הצג גליונות סימנים"
   </dest>
   <voice>
-    *: "Browse Cuesheet"
+    *: "הצג גליונות סימנים"
   </voice>
 </phrase>
 <phrase>
@@ -7419,7 +7451,7 @@
     *: "הצג מידע שיר"
   </dest>
   <voice>
-    *: "Show Track Info"
+    *: "הצג מידע שיר"
   </voice>
 </phrase>
 <phrase>
@@ -7542,7 +7574,7 @@
     *: "[Bitrate]"
   </source>
   <dest>
-    *: "[איכות]"
+    *: "[Bitrate]"
   </dest>
   <voice>
     *: ""
@@ -7626,7 +7658,7 @@
     *: "[Track Gain]"
   </source>
   <dest>
-    *: "[הגברה שיר]"
+    *: "[הגברת שיר]"
   </dest>
   <voice>
     *: ""
@@ -7640,7 +7672,7 @@
     *: "[Album Gain]"
   </source>
   <dest>
-    *: "[הגברה אלבום]"
+    *: "[הגברת אלבום]"
   </dest>
   <voice>
     *: ""
@@ -7685,7 +7717,7 @@
     *: "שנה שם"
   </dest>
   <voice>
-    *: "Rename"
+    *: "שנה שם"
   </voice>
 </phrase>
 <phrase>
@@ -7699,7 +7731,7 @@
     *: "גזור"
   </dest>
   <voice>
-    *: "Cut"
+    *: "גזור"
   </voice>
 </phrase>
 <phrase>
@@ -7713,7 +7745,7 @@
     *: "העתק"
   </dest>
   <voice>
-    *: "Copy"
+    *: "העתק"
   </voice>
 </phrase>
 <phrase>
@@ -7727,7 +7759,7 @@
     *: "הדבק"
   </dest>
   <voice>
-    *: "Paste"
+    *: "הדבק"
   </voice>
 </phrase>
 <phrase>
@@ -7738,10 +7770,10 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "הקובץ\ספריה כבר קיימים. לדרוס אותם?"
+    *: "?הקובץ\ספריה כבר קיימים. לדרוס אותם"
   </dest>
   <voice>
-    *: "File or directory exists. Overwrite?"
+    *: "הקובץ או ספריה כבר קיימים. לדרוס אותם?"
   </voice>
 </phrase>
 <phrase>
@@ -7755,7 +7787,7 @@
     *: "מחק"
   </dest>
   <voice>
-    *: "Delete"
+    *: "מחק"
   </voice>
 </phrase>
 <phrase>
@@ -7769,7 +7801,7 @@
     *: "מחק ספריה"
   </dest>
   <voice>
-    *: "delete directory"
+    *: "מחק ספריה"
   </voice>
 </phrase>
 <phrase>
@@ -7780,10 +7812,10 @@
     *: "Delete?"
   </source>
   <dest>
-    *: "למחוק?"
+    *: "?למחוק"
   </dest>
   <voice>
-    *: "Really delete?"
+    *: "באמת למחוק?"
   </voice>
 </phrase>
 <phrase>
@@ -7794,10 +7826,10 @@
     *: "Copying..."
   </source>
   <dest>
-    *: "מעתיק..."
+    *: "...מעתיק"
   </dest>
   <voice>
-    *: "Copying"
+    *: "מעתיק"
   </voice>
 </phrase>
 <phrase>
@@ -7808,10 +7840,10 @@
     *: "Deleting..."
   </source>
   <dest>
-    *: "מוחק..."
+    *: "...מוחק"
   </dest>
   <voice>
-    *: "Deleting"
+    *: "מוחק"
   </voice>
 </phrase>
 <phrase>
@@ -7822,10 +7854,10 @@
     *: "Moving..."
   </source>
   <dest>
-    *: "מעביר..."
+    *: "...מעביר"
   </dest>
   <voice>
-    *: "Moving"
+    *: "מעביר"
   </voice>
 </phrase>
 <phrase>
@@ -7852,11 +7884,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "הגדר כתמונת רקע"
+    lcd_non-mono: "קבע כתמונת רקע"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Set As Backdrop"
+    lcd_non-mono: "קבע כתמונת רקע"
   </voice>
 </phrase>
 <phrase>
@@ -7901,10 +7933,10 @@
     *: "Open With..."
   </source>
   <dest>
-    *: "פתיחה באמצעות..."
+    *: "...פתיחה באמצעות"
   </dest>
   <voice>
-    *: "open with"
+    *: "פתיחה באמצעות"
   </voice>
 </phrase>
 <phrase>
@@ -7918,7 +7950,7 @@
     *: "יצירת ספריה"
   </dest>
   <voice>
-    *: "Create Directory"
+    *: "יצירת ספריה"
   </voice>
 </phrase>
 <phrase>
@@ -7932,7 +7964,7 @@
     *: "מאפיינים"
   </dest>
   <voice>
-    *: "Properties"
+    *: "מאפיינים"
   </voice>
 </phrase>
 <phrase>
@@ -7946,7 +7978,7 @@
     *: "הוסף לקיצורים"
   </dest>
   <voice>
-    *: "Add to Shortcuts"
+    *: "הוסף לקיצורים"
   </voice>
 </phrase>
 <phrase>
@@ -7963,7 +7995,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Pitch"
+    pitchscreen: "גובה צליל"
   </voice>
 </phrase>
 <phrase>
@@ -8045,7 +8077,7 @@
     *: "חוצץ רשימת השירים מלא"
   </dest>
   <voice>
-    *: "Playlist Buffer Full"
+    *: "חוצץ רשימת השירים מלא"
   </voice>
 </phrase>
 <phrase>
@@ -8061,8 +8093,7 @@
     player: "סוף הרשימה"
   </dest>
   <voice>
-    *: "End of Song List"
-    player: "End of List"
+    *: "סוף רשימת השירים"
   </voice>
 </phrase>
 <phrase>
@@ -8090,7 +8121,7 @@
     *: "אין רשימת שירים לחזור אליה"
   </dest>
   <voice>
-    *: "Nothing to resume"
+    *: "אין רשימת שירים לחזור אליה"
   </voice>
 </phrase>
 <phrase>
@@ -8104,7 +8135,7 @@
     *: "שגיאה בעדכון קובץ שליטה ברשימת השירים"
   </dest>
   <voice>
-    *: "Error updating playlist control file"
+    *: "שגיאה בעדכון קובץ שליטה ברשימת השירים"
   </voice>
 </phrase>
 <phrase>
@@ -8118,7 +8149,7 @@
     *: "שגיאה בגישה לקובץ רשימת השירים"
   </dest>
   <voice>
-    *: "Error accessing playlist file"
+    *: "שגיאה בגישה לקובץ רשימת השירים"
   </voice>
 </phrase>
 <phrase>
@@ -8132,7 +8163,7 @@
     *: "שגיאה בגישה לקובץ השליטה ברשימת השירים"
   </dest>
   <voice>
-    *: "Error accessing playlist control file"
+    *: "שגיאה בגישה לקובץ השליטה ברשימת השירים"
   </voice>
 </phrase>
 <phrase>
@@ -8146,7 +8177,7 @@
     *: "שגיאה בגישה לספריה"
   </dest>
   <voice>
-    *: "Error accessing directory"
+    *: "שגיאה בגישה לספריה"
   </voice>
 </phrase>
 <phrase>
@@ -8160,7 +8191,7 @@
     *: "קובץ השליטה ברשימת השירים פגום"
   </dest>
   <voice>
-    *: "Playlist control file is invalid"
+    *: "קובץ השליטה ברשימת השירים פגום"
   </voice>
 </phrase>
 <phrase>
@@ -8199,10 +8230,10 @@
     *: "Pause"
   </source>
   <dest>
-    *: "עצירה"
+    *: "הפסקה"
   </dest>
   <voice>
-    *: "Pause"
+    *: "הפסקה"
   </voice>
 </phrase>
 <phrase>
@@ -8230,9 +8261,11 @@
     *: "זמן"
   </dest>
   <voice>
-    *: "Time"
+    *: "זמן"
   </voice>
 </phrase>
+/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
+ * the selector should probably be usb_charging_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
   desc: in Battery menu
@@ -8243,11 +8276,11 @@
   </source>
   <dest>
     *: none
-    usb_charging: "USB הטען בזמן חיבור"
+    usb_charging: "USB הטען סוללה בזמן חיבור"
   </dest>
   <voice>
     *: none
-    usb_charging: "Charge During U S B Connection"
+    usb_charging: "הטען סוללה בזמן חיבור U S B"
   </voice>
 </phrase>
 <phrase>
@@ -8288,7 +8321,7 @@
   </source>
   <dest>
     *: none
-    recording: "זמן:"
+    recording: ":זמן"
   </dest>
   <voice>
     *: none
@@ -8315,6 +8348,7 @@
   </dest>
   <voice>
     *: none
+    recording,h100,h120,h300,m5,x5,e200*,c200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8327,11 +8361,11 @@
   </source>
   <dest>
     *: none
-    recording: "מינוס אינסוף"
+    recording: "-inf"
   </dest>
   <voice>
     *: none
-    recording: "minus infinity"
+    recording: "מינוס אינסוף"
   </voice>
 </phrase>
 <phrase>
@@ -8361,11 +8395,11 @@
   </source>
   <dest>
     *: none
-    ondio*: "אנא הסר כרטיס MMC"
+    ondio*: "MMC אנא הסר כרטיס"
   </dest>
   <voice>
     *: none
-    ondio*: "Please remove multimedia card"
+    ondio*: "אנא הסר כרטיס מולטימדיה"
   </voice>
 </phrase>
 <phrase>
@@ -8379,7 +8413,7 @@
     *: "קובץ האיתחול השתנה"
   </dest>
   <voice>
-    *: "Boot changed"
+    *: "קובץ האיתחול השתנה"
   </voice>
 </phrase>
 <phrase>
@@ -8390,10 +8424,10 @@
     *: "Reboot now?"
   </source>
   <dest>
-    *: "לאתחל עכשיו?"
+    *: "?לאתחל עכשיו"
   </dest>
   <voice>
-    *: "Reboot now?"
+    *: "לאתחל עכשיו?"
   </voice>
 </phrase>
 <phrase>
@@ -8410,13 +8444,13 @@
     gigabeatf: "POWER to abort"
   </source>
   <dest>
-    *: "OFF כדי לבטל"
-    player,h100,h120,h300: "STOP כדי לבטל"
-    ipod*: "PLAY/PAUSE כדי לבטל"
+    *: "כדי לבטל OFF"
+    player,h100,h120,h300: "כדי לבטל STOP"
+    ipod*: "כדי לבטל PLAY/PAUSE"
     x5,m5: "PLAY ארוך כדי לבטל"
-    h10,h10_5gb,e200*,c200*: "PREV כדי לבטל"
-    gigabeats: "BACK כדי לבטל"
-    gigabeatf: "POWER כדי לבטל"
+    h10,h10_5gb,e200*,c200*: "כדי לבטל PREV"
+    gigabeats: "כדי לבטל BACK"
+    gigabeatf: "כדי לבטל POWER"
   </dest>
   <voice>
     *: ""
@@ -8433,7 +8467,7 @@
     *: "אין קבצים"
   </dest>
   <voice>
-    *: "No files"
+    *: "אין קבצים"
   </voice>
 </phrase>
 <phrase>
@@ -8447,7 +8481,7 @@
     *: "מקלדת חדשה"
   </dest>
   <voice>
-    *: "New Keyboard"
+    *: "מקלדת חדשה"
   </voice>
 </phrase>
 <phrase>
@@ -8458,7 +8492,7 @@
     *: "Can't open %s"
   </source>
   <dest>
-    *: "לא ניתן לפתוח את %s"
+    *: "%s לא ניתן לפתוח את"
   </dest>
   <voice>
     *: ""
@@ -8472,7 +8506,7 @@
     *: "Failed reading %s"
   </source>
   <dest>
-    *: "נכשלה הקריאה של %s"
+    *: "%s נכשלה הקריאה של"
   </dest>
   <voice>
     *: ""
@@ -8531,7 +8565,7 @@
     *: "מערך הסיומות מלא"
   </dest>
   <voice>
-    *: "Extension array full"
+    *: "מערך הסיומות מלא"
   </voice>
 </phrase>
 <phrase>
@@ -8545,7 +8579,7 @@
     *: "מערך סוגי הקבצים מלא"
   </dest>
   <voice>
-    *: "Filetype array full"
+    *: "מערך סוגי הקבצים מלא"
   </voice>
 </phrase>
 <phrase>
@@ -8556,10 +8590,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "חוצץ התיקיות מלא!"
+    *: "!חוצץ התיקיות מלא"
   </dest>
   <voice>
-    *: "Directory Buffer is Full!"
+    *: "חוצץ התיקיות מלא!"
   </voice>
 </phrase>
 <phrase>
@@ -8570,10 +8604,10 @@
     *: "Invalid Filename!"
   </source>
   <dest>
-    *: "שם קובץ שגוי!"
+    *: "!שם קובץ שגוי"
   </dest>
   <voice>
-    *: "Invalid Filename"
+    *: "שם קובץ שגוי"
   </voice>
 </phrase>
 <phrase>
@@ -8584,10 +8618,10 @@
     *: "Plugin name too long"
   </source>
   <dest>
-    *: "שם התוסף ארוך מידיי"
+    *: "שם התוסף ארוך מדיי"
   </dest>
   <voice>
-    *: "Plugin name too long"
+    *: "שם התוסף ארוך מדיי"
   </voice>
 </phrase>
 <phrase>
@@ -8618,7 +8652,7 @@
     *: "אנא אתחל כדי להשתמש באפשרות זו"
   </dest>
   <voice>
-    *: "Please reboot to enable"
+    *: "אנא אתחל כדי להשתמש באפשרות זו"
   </voice>
 </phrase>
 <phrase>
@@ -8631,11 +8665,11 @@
   </source>
   <dest>
     *: none
-    charging: "סוללה: טעינה"
+    charging: "סוללה: טוען"
   </dest>
   <voice>
     *: none
-    charging: "Battery: Charging"
+    charging: "סוללה: טוען"
   </voice>
 </phrase>
 <phrase>
@@ -8648,7 +8682,7 @@
   </source>
   <dest>
     *: none
-    recorder: "סוללה: כיבוי במקסימום"
+    recorder: "סוללה: Top-Off Chg"
   </dest>
   <voice>
     *: none
@@ -8665,7 +8699,7 @@
   </source>
   <dest>
     *: none
-    charging: "סוללה: טפטוף טעינה"
+    charging: "סוללה: Trickle Chg"
   </dest>
   <voice>
     *: none
@@ -8680,10 +8714,10 @@
     *: "WARNING! Low Battery!"
   </source>
   <dest>
-    *: "אזהרה! הסוללה חלשה!"
+    *: "!אזהרה! הסוללה חלשה"
   </dest>
   <voice>
-    *: "WARNING! Low Battery!"
+    *: "אזהרה! הסוללה חלשה!"
   </voice>
 </phrase>
 <phrase>
@@ -8694,10 +8728,10 @@
     *: "Battery empty! RECHARGE!"
   </source>
   <dest>
-    *: "הסוללה ריקה! טען מחדש!"
+    *: "!הסוללה ריקה! טען מחדש"
   </dest>
   <voice>
-    *: "Battery empty! RECHARGE!"
+    *: "הסוללה ריקה! טען מחדש!"
   </voice>
 </phrase>
 <phrase>
@@ -8725,7 +8759,7 @@
     *: "KB"
   </dest>
   <voice>
-    *: "kilobyte"
+    *: "קילו-בית"
   </voice>
 </phrase>
 <phrase>
@@ -8739,7 +8773,7 @@
     *: "MB"
   </dest>
   <voice>
-    *: "megabyte"
+    *: "מגה-בית"
   </voice>
 </phrase>
 <phrase>
@@ -8753,7 +8787,7 @@
     *: "GB"
   </dest>
   <voice>
-    *: "gigabyte"
+    *: "ג'יגה-בית"
   </voice>
 </phrase>
 <phrase>
@@ -8767,7 +8801,7 @@
     *: "."
   </dest>
   <voice>
-    *: "point"
+    *: "נקודה"
   </voice>
 </phrase>
 <phrase>
@@ -9173,7 +9207,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hundred"
+    *: "מאות"
   </voice>
 </phrase>
 <phrase>
@@ -9187,7 +9221,7 @@
     *: ""
   </dest>
   <voice>
-    *: "thousand"
+    *: "אלפים"
   </voice>
 </phrase>
 <phrase>
@@ -9201,7 +9235,7 @@
     *: ""
   </dest>
   <voice>
-    *: "million"
+    *: "מיליון"
   </voice>
 </phrase>
 <phrase>
@@ -9215,7 +9249,7 @@
     *: ""
   </dest>
   <voice>
-    *: "billion"
+    *: "מליארד"
   </voice>
 </phrase>
 <phrase>
@@ -9229,7 +9263,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minus"
+    *: "מינוס"
   </voice>
 </phrase>
 <phrase>
@@ -9243,7 +9277,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "פלוס"
   </voice>
 </phrase>
 <phrase>
@@ -9257,7 +9291,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milliseconds"
+    *: "מילי-שניות"
   </voice>
 </phrase>
 <phrase>
@@ -9271,7 +9305,7 @@
     *: ""
   </dest>
   <voice>
-    *: "second"
+    *: "שניה"
   </voice>
 </phrase>
 <phrase>
@@ -9285,7 +9319,7 @@
     *: ""
   </dest>
   <voice>
-    *: "seconds"
+    *: "שניות"
   </voice>
 </phrase>
 <phrase>
@@ -9299,7 +9333,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minute"
+    *: "דקה"
   </voice>
 </phrase>
 <phrase>
@@ -9313,7 +9347,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minutes"
+    *: "דקות"
   </voice>
 </phrase>
 <phrase>
@@ -9327,7 +9361,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hour"
+    *: "שעה"
   </voice>
 </phrase>
 <phrase>
@@ -9341,7 +9375,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hours"
+    *: "שעות"
   </voice>
 </phrase>
 <phrase>
@@ -9355,7 +9389,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohertz"
+    *: "קילו-הרץ"
   </voice>
 </phrase>
 <phrase>
@@ -9369,7 +9403,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibel"
+    *: "דציבל"
   </voice>
 </phrase>
 <phrase>
@@ -9383,7 +9417,7 @@
     *: ""
   </dest>
   <voice>
-    *: "percent"
+    *: "אחוז"
   </voice>
 </phrase>
 <phrase>
@@ -9397,7 +9431,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milli-amp hours"
+    *: "מילי-אמפר שעות"
   </voice>
 </phrase>
 <phrase>
@@ -9411,7 +9445,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "פיקסל"
   </voice>
 </phrase>
 <phrase>
@@ -9425,7 +9459,7 @@
     *: ""
   </dest>
   <voice>
-    *: "per second"
+    *: "בשנייה"
   </voice>
 </phrase>
 <phrase>
@@ -9439,7 +9473,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "בשנייה"
   </voice>
 </phrase>
 <phrase>
@@ -9453,7 +9487,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilobits per second"
+    *: "קילוביט בשנייה"
   </voice>
 </phrase>
 <phrase>
@@ -9831,7 +9865,7 @@
     *: ""
   </dest>
   <voice>
-    *: "dot"
+    *: "נקודה"
   </voice>
 </phrase>
 <phrase>
@@ -9859,7 +9893,7 @@
     *: ""
   </dest>
   <voice>
-    *: "file"
+    *: "קובץ"
   </voice>
 </phrase>
 <phrase>
@@ -9873,7 +9907,7 @@
     *: ""
   </dest>
   <voice>
-    *: "folder"
+    *: "ספרייה"
   </voice>
 </phrase>
 <phrase>
@@ -9887,7 +9921,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "אודיו"
   </voice>
 </phrase>
 <phrase>
@@ -9901,7 +9935,7 @@
     *: ""
   </dest>
   <voice>
-    *: "configuration"
+    *: "הגדרות"
   </voice>
 </phrase>
 <phrase>
@@ -9915,7 +9949,7 @@
     *: ""
   </dest>
   <voice>
-    *: "while-playing-screen"
+    *: "מסך-בזמן-נגינה"
   </voice>
 </phrase>
 <phrase>
@@ -9943,7 +9977,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plugin"
+    *: "תוסף"
   </voice>
 </phrase>
 <phrase>
@@ -9957,7 +9991,7 @@
     *: ""
   </dest>
   <voice>
-    *: "font"
+    *: "גופן"
   </voice>
 </phrase>
 <phrase>
@@ -9971,7 +10005,7 @@
     *: ""
   </dest>
   <voice>
-    *: "bookmark"
+    *: "סימנייה"
   </voice>
 </phrase>
 <phrase>
@@ -9985,7 +10019,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "קושחה"
   </voice>
 </phrase>
 <phrase>
@@ -10002,7 +10036,7 @@
   </dest>
   <voice>
     *: none
-    remote: "remote while-playing-screen"
+    remote: "מסך-בזמן-נגינה בשלט"
   </voice>
 </phrase>
 <phrase>
@@ -10016,7 +10050,7 @@
     *: ""
   </dest>
   <voice>
-    *: "keyboard"
+    *: "מקלדת"
   </voice>
 </phrase>
 <phrase>
@@ -10030,7 +10064,7 @@
      *: ""
   </dest>
   <voice>
-    *: "cuesheet"
+    *: "גליון סימנים"
   </voice>
 </phrase>
 <phrase>
@@ -10044,7 +10078,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "אינדקס"
   </voice>
 </phrase>
 <phrase>
@@ -10061,7 +10095,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Current time:"
+    rtc: "זמן נוכחי:"
   </voice>
 </phrase>
 <phrase>
@@ -10159,11 +10193,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "קיטעון"
+    swcodec: "חיתוך"
   </dest>
   <voice>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "תדירות חיתוך"
   </voice>
 </phrase>
 <phrase>
@@ -10176,11 +10210,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "הגבר"
+    lcd_bitmap: "הגברה"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Gain"
+    lcd_bitmap: "הגברה"
   </voice>
 </phrase>
 <phrase>
@@ -10397,7 +10431,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "מצב:"
+    lcd_bitmap: ":מצב"
   </dest>
   <voice>
     *: none
@@ -10448,7 +10482,7 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "LCD"
+    recorder_pad: "מסך"
   </dest>
   <voice>
     *: none
@@ -10503,7 +10537,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stereo"
+    recording: "סטריאו"
   </voice>
 </phrase>
 <phrase>
@@ -10520,7 +10554,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Mono"
+    recording: "מונו"
   </voice>
 </phrase>
 <phrase>
@@ -10537,7 +10571,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Quality"
+    recording_hwcodec: "איכות"
   </voice>
 </phrase>
 <phrase>
@@ -10554,7 +10588,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Frequency"
+    recording: "תדירות"
   </voice>
 </phrase>
 <phrase>
@@ -10571,7 +10605,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Source"
+    recording: "מקור"
   </voice>
 </phrase>
 <phrase>
@@ -10588,7 +10622,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Internal Microphone"
+    recording: "מיקרופון פנימי"
   </voice>
 </phrase>
 <phrase>
@@ -10601,7 +10635,7 @@
   </source>
   <dest>
     *: none
-    recording: "כניסת שמע"
+    recording: "Line In"
   </dest>
   <voice>
     *: none
@@ -10622,7 +10656,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Digital"
+    recording: "דיגיטלי"
   </voice>
 </phrase>
 <phrase>
@@ -10639,7 +10673,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Channels"
+    recording: "ערוצים"
   </voice>
 </phrase>
 <phrase>
@@ -10652,11 +10686,11 @@
   </source>
   <dest>
     *: none
-    recording: "הדק הפעלה"
+    recording: "הדק"
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "הדק"
   </voice>
 </phrase>
 <phrase>
@@ -10737,7 +10771,7 @@
   </source>
   <dest>
     *: none
-    recording: "הגבר שמאל"
+    recording: "הגברה שמאל"
   </dest>
   <voice>
     *: none
@@ -10754,7 +10788,7 @@
   </source>
   <dest>
     *: none
-    recording: "הגבר ימין"
+    recording: "הגברה ימין"
   </dest>
   <voice>
     *: none
@@ -10939,7 +10973,7 @@
     *: "משחקים"
   </dest>
   <voice>
-    *: "Games"
+    *: "משחקים"
   </voice>
 </phrase>
 <phrase>
@@ -10953,7 +10987,7 @@
     *: "יישומים"
   </dest>
   <voice>
-    *: "Applications"
+    *: "יישומים"
   </voice>
 </phrase>
 <phrase>
@@ -10967,7 +11001,7 @@
     *: "הדגמות"
   </dest>
   <voice>
-    *: "Demos"
+    *: "הדגמות"
   </voice>
 </phrase>
 <phrase>
@@ -11054,7 +11088,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "o'clock"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -11118,11 +11152,11 @@
   </source>
   <dest>
     *: none
-    recording: "סופר עיוותים"
+    recording: "מונה עיוותים"
   </dest>
   <voice>
     *: none
-    recording: "Clip Counter"
+    recording: "מונה עיוותים"
   </voice>
 </phrase>
 <phrase>
@@ -11226,7 +11260,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Primary Colour"
+    lcd_color: "צבע ראשי"
   </voice>
 </phrase>
 <phrase>
@@ -11243,7 +11277,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Secondary Colour"
+    lcd_color: "צבע משני"
   </voice>
 </phrase>
 <phrase>
@@ -11260,7 +11294,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Text Colour"
+    lcd_color: "צבע הטקסט"
   </voice>
 </phrase>
 <phrase>
@@ -11273,11 +11307,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "שורה (צבע אחד)"
+    lcd_color: "שורה (צבע אחיד)"
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Solid Colour)"
+    lcd_color: "שורה (צבע אחיד)"
   </voice>
 </phrase>
 <phrase>
@@ -11294,7 +11328,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Gradient Colour)"
+    lcd_color: "שורה (מעבר בין צבעים)"
   </voice>
 </phrase>
 <phrase>
@@ -11308,7 +11342,7 @@
     *: "מרכז-אירופה (CP1250)"
   </dest>
   <voice>
-    *: "Central European"
+    *: "מרכז-אירופה"
   </voice>
 </phrase>
 <phrase>
@@ -11319,10 +11353,10 @@
     *: "Theme Settings"
   </source>
   <dest>
-    *: "אפשרויות ערכת-צבע"
+    *: "אפשרויות ערכת-נושא"
   </dest>
   <voice>
-    *: "Theme Settings"
+    *: "אפשרויות ערכת-נושא"
   </voice>
 </phrase>
 <phrase>
@@ -11339,7 +11373,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Colours"
+    lcd_color: "צבעים"
   </voice>
 </phrase>
 <phrase>
@@ -11352,11 +11386,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "צבעי שורת הסימון"
+    lcd_color: "צבעי סימון שורה"
   </dest>
   <voice>
     *: none
-    lcd_color: "Line Selector Colours"
+    lcd_color: "צבעי סימון שורה"
   </voice>
 </phrase>
 <phrase>
@@ -11370,7 +11404,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Edit"
+    *: "עריכה"
   </voice>
 </phrase>
 <phrase>
@@ -11384,7 +11418,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Blank"
+    *: "ריק"
   </voice>
 </phrase>
 <phrase>
@@ -11398,7 +11432,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Empty list"
+    *: "רשימה ריקה"
   </voice>
 </phrase>
 <phrase>
@@ -11415,7 +11449,7 @@
   </dest>
   <voice>
     *: none
-    multivolume: "Not present"
+    multivolume: "לא קיים"
   </voice>
 </phrase>
 <phrase>  
@@ -11426,10 +11460,10 @@
     *: "Announce Battery Level"
   </source>
   <dest>
-    *: "הכרז מצב סוללה"
+    *: "הכרז רמת סוללה"
   </dest>
   <voice>
-    *: "Announce Battery Level"
+    *: "הכרז רמת סוללה"
   </voice>
 </phrase>
 <phrase>
@@ -11440,10 +11474,10 @@
     *: "Say File Type"
   </source>
   <dest>
-    *: "אמור שם קובץ"
+    *: "הקרא סוג קובץ"
   </dest>
   <voice>
-    *: "Say File Type"
+    *: "הקרא סוג קובץ"
   </voice>
 </phrase>
 <phrase>
@@ -11456,11 +11490,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo: "חיתוך בס"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo: "חיתוך בס"
   </voice>
 </phrase>
 <phrase>
@@ -11473,11 +11507,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo: "חיתוך טרבל"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo: "חיתוך טרבל"
   </voice>
 </phrase>
 <phrase>
@@ -11491,7 +11525,7 @@
     *: "<אקראי>"
   </dest>
   <voice>
-    *: "Random"
+    *: "אקראי"
   </voice>
 </phrase>
 <phrase>
@@ -11502,10 +11536,10 @@
     *: "Save Sound Settings"
   </source>
   <dest>
-    *: "שמור הגדרות קול"
+    *: "שמור הגדרות צליל"
   </dest>
   <voice>
-    *: "Save Sound Settings"
+    *: "שמור הגדרות צליל"
   </voice>
 </phrase>
 <phrase>
@@ -11518,11 +11552,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "לחיצה"
+    swcodec: "קליק לחיצה"
   </dest>
   <voice>
     *: none
-    swcodec: "Keyclick"
+    swcodec: "קליק לחיצה"
   </voice>
 </phrase>
 <phrase>
@@ -11535,11 +11569,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "לחיצות חוזרות"
+    swcodec: "חזרה על צליל לחיצה"
   </dest>
   <voice>
     *: none
-    swcodec: "Keyclick Repeats"
+    swcodec: "חזרה על צליל לחיצה"
   </voice>
 </phrase>
 <phrase>
@@ -11556,7 +11590,7 @@
   </dest>
   <voice>
     *: none
-    accessory_supply: "Accessory Power Supply"
+    accessory_supply: "ספק כוח של התקן עזר"
   </voice>
 </phrase>
 <phrase>
@@ -11570,7 +11604,7 @@
     *: "לא ידוע"
   </dest>
   <voice>
-    *: "Unknown"
+    *: "לא ידוע"
   </voice>
 </phrase>
 <phrase>
@@ -11640,7 +11674,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Quick screen"
+    *: "מסך מהיר"
   </voice>
 </phrase>
 <phrase>
@@ -11654,7 +11688,7 @@
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: "אישור"
   </voice>
 </phrase>
 <phrase>
@@ -11671,7 +11705,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop Recording And Shutdown"
+    recording: "הפסק הקלטה וכבה"
   </voice>
 </phrase>
 <phrase>
@@ -11688,7 +11722,7 @@
   </dest>
   <voice>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatf: "רגישות משטח מגע"
   </voice>
 </phrase>
 <phrase>
@@ -11705,7 +11739,109 @@
   </dest>
   <voice>
     *: none
-    gigabeatf: "High"
+    gigabeatf: "גבוה"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "קצב סיביות טורי"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "קצב סיביות טורי"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "אוטו"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "אוטומאטית"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "57600"
   </voice>
 </phrase>
 <phrase>
@@ -11719,7 +11855,7 @@
     *: "לאט מאד"
   </dest>
   <voice>
-    *: "Very slow"
+    *: "לאט מאד"
   </voice>
 </phrase>
 <phrase>
@@ -11733,7 +11869,7 @@
     *: "לאט"
   </dest>
   <voice>
-    *: "Slow"
+    *: "לאט"
   </voice>
 </phrase>
 <phrase>
@@ -11747,7 +11883,7 @@
     *: "מהר מאד"
   </dest>
   <voice>
-    *: "Very fast"
+    *: "מהר מאד"
   </voice>
 </phrase>
 <phrase>
@@ -11761,7 +11897,7 @@
     *: "מהר"
   </dest>
   <voice>
-    *: "Fast"
+    *: "מהר"
   </voice>
 </phrase>
 <phrase>
@@ -11775,7 +11911,7 @@
     *: "דלג אורך"
   </dest>
   <voice>
-    *: "Skip Length"
+    *: "דלג אורך"
   </voice>
 </phrase>
 <phrase>
@@ -11789,7 +11925,7 @@
     *: "דלג שיר"
   </dest>
   <voice>
-    *: "Skip Track"
+    *: "דלג שיר"
   </voice>
 </phrase>
 <phrase>
@@ -11803,7 +11939,7 @@
     *: ""
   </dest>
   <voice>
-    *: "slash"
+    *: "קו אלכסוני"
   </voice>
 </phrase>
 <phrase>
@@ -11816,11 +11952,11 @@
   </source>
   <dest>
     *: none
-    recording: "הגבר שמאל"
+    recording: "הגברה שמאל"
   </dest>
   <voice>
     *: none
-    recording: "Gain Left"
+    recording: "הגברה שמאל"
   </voice>
 </phrase>
 <phrase>
@@ -11833,11 +11969,11 @@
   </source>
   <dest>
     *: none
-    recording: "הגבר ימין"
+    recording: "הגברה ימין"
   </dest>
   <voice>
     *: none
-    recording: "Gain Right"
+    recording: "הגברה ימין"
   </voice>
 </phrase>
 <phrase>
@@ -11974,85 +12110,34 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHANNEL_LEFTRIGHT
-  desc: in sound_settings
+  id: LANG_RECORDING_MONO_MODE
+  desc: in the recording settings
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording_swcodec: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "מונו ימין + שמאל"
+    recording_swcodec: "מצב מונו"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono Left plus Right"
+    recording_swcodec: "מצב מונו"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LEFT_QS_ITEM
-  desc: used for the submenu name for the quickscreen items
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
   user: core
   <source>
-    *: none
-    quickscreen: "Set as Left Quickscreen Item"
+    *: "Search Results"
   </source>
   <dest>
-    *: none
-    quickscreen: "קבע כפריט מסך מהיר שמאלי"
+    *: "תוצאות חיפוש"
   </dest>
   <voice>
-    *: none
-    quickscreen: "Set as Left Quickscreen Item"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_SETTING
-  desc: used in the settings context menu
-  user: core
-  <source>
-    *: "Reset Setting"
-  </source>
-  <dest>
-    *: "אפס הגדרות"
-  </dest>
-  <voice>
-    *: "Reset Setting"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOTTOM
-  desc: DEPRECATED
-  user: core
-  <source>
-    *: none
-    quickscreen: ""
-  </source>
-  <dest>
-    *: none
-    quickscreen: ""
-  </dest>
-  <voice>
-    *: none
-    quickscreen: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOTTOM_QS_ITEM
-  desc: used for the submenu name for the quickscreen items
-  user: core
-  <source>
-    *: none
-    quickscreen: "Set as Bottom Quickscreen Item"
-  </source>
-  <dest>
-    *: none
-    quickscreen: "קבע כפריט מסך מהיר תחתון"
-  </dest>
-  <voice>
-    *: none
-    quickscreen: "Set as Bottom Quickscreen Item"
+    *: "תוצאות חיפוש"
   </voice>
 </phrase>
 <phrase>
@@ -12073,6 +12158,82 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "שמאל"
+  </dest>
+  <voice>
+    *: "שמאל"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "ימין"
+  </dest>
+  <voice>
+    *: "ימין"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user: core
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "אפס הגדרות"
+  </dest>
+  <voice>
+    *: "אפס הגדרות"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "קבע כפריט מסך מהיר שמאלי"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "קבע כפריט מסך מהיר שמאלי"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_RIGHT_QS_ITEM
   desc: used for the submenu name for the quickscreen items
   user: core
@@ -12086,55 +12247,80 @@
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Right Quickscreen Item"
+    quickscreen: "קבע כפריט מסך מהיר ימני"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SEARCH_RESULTS
-  desc: title for the list of results displayed after searching in a playlist
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
   user: core
   <source>
-    *: "Search Results"
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
   </source>
   <dest>
-    *: "תוצאות חיפוש"
+    *: none
+    quickscreen: "קבע כפריט מסך מהיר תחתון"
   </dest>
   <voice>
-    *: "Search Results"
+    *: none
+    quickscreen: "קבע כפריט מסך מהיר תחתון"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_MONO_MODE
-  desc: in the recording settings
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
   user: core
   <source>
-    *: none
-    recording_swcodec: "Mono mode"
+    *: "Credits"
   </source>
   <dest>
-    *: none
-    recording_swcodec: "מצב מונו"
+    *: "תודות"
   </dest>
   <voice>
-    *: none
-    recording_swcodec: "Mono mode"
+    *: "תודות"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SERIAL_BITRATE_19200
-  desc: in system settings menu
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
   user: core
   <source>
-    *: none
-    serial_port: "19200"
+    *: "Interpret numbers when sorting"
   </source>
   <dest>
-    *: none
-    serial_port: "19200"
+    *: "פרש מספרים במיון"
   </dest>
   <voice>
-    *: none
-    serial_port: "19200"
+    *: "פרש מספרים במיון"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "כספרות"
+  </dest>
+  <voice>
+    *: "כספרות"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "כמספרים שלמים"
+  </dest>
+  <voice>
+    *: "כמספרים שלמים"
   </voice>
 </phrase>
 <phrase>
@@ -12155,158 +12341,37 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SORT_INTERPRET_NUMBERS
-  desc: in Settings -> File view
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
-    *: "Interpret numbers when sorting"
+    *: none
+    touchscreen: "Touchscreen Mode"
   </source>
   <dest>
-    *: "פרש מספרים במיון"
+    *: none
+    touchscreen: "מצב מסך-מגע"
   </dest>
   <voice>
-    *: "פרש מספרים במיון"
+    *: none
+    touchscreen: "מצב מסך מגע"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SERIAL_BITRATE
-  desc: in system settings menu
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
-    serial_port: "Serial Bitrate"
+    touchscreen: "3x3 Grid"
   </source>
   <dest>
     *: none
-    serial_port: "קצב סיביות טורי"
+    touchscreen: "רשת 3x3"
   </dest>
   <voice>
     *: none
-    serial_port: "קצב סיביות טורי"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SERIAL_BITRATE_9600
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    serial_port: "9600"
-  </source>
-  <dest>
-    *: none
-    serial_port: "9600"
-  </dest>
-  <voice>
-    *: none
-    serial_port: "9600"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SERIAL_BITRATE_38400
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    serial_port: "38400"
-  </source>
-  <dest>
-    *: none
-    serial_port: "38400"
-  </dest>
-  <voice>
-    *: none
-    serial_port: "38400"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SERIAL_BITRATE_57600
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    serial_port: "57600"
-  </source>
-  <dest>
-    *: none
-    serial_port: "57600"
-  </dest>
-  <voice>
-    *: none
-    serial_port: "57600"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SORT_INTERPRET_AS_NUMBERS
-  desc: in Settings -> File view
-  user: core
-  <source>
-    *: "As whole numbers"
-  </source>
-  <dest>
-    *: "כמספרים שלמים"
-  </dest>
-  <voice>
-    *: "כמספרים שלמים"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CREDITS
-  desc: in the Main Menu -> System screen
-  user: core
-  <source>
-    *: "Credits"
-  </source>
-  <dest>
-    *: "תודות"
-  </dest>
-  <voice>
-    *: "תודות"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SORT_INTERPRET_AS_DIGIT
-  desc: in Settings -> File view
-  user: core
-  <source>
-    *: "As digits"
-  </source>
-  <dest>
-    *: "כספרות"
-  </dest>
-  <voice>
-    *: "כספרות"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SERIAL_BITRATE_AUTO
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    serial_port: "Auto"
-  </source>
-  <dest>
-    *: none
-    serial_port: "אוטומטית"
-  </dest>
-  <voice>
-    *: none
-    serial_port: "אוטומטית"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PREVENT_SKIPPING
-  desc: in Settings -> Playback Settings
-  user: core
-  <source>
-    *: "Prevent Track Skipping"
-  </source>
-  <dest>
-    *: "מנע דילוג שירים"
-  </dest>
-  <voice>
-    *: "מנע דילוג שירים"
+    touchscreen: "רשת 3 על 3"
   </voice>
 </phrase>
 <phrase>
@@ -12324,6 +12389,71 @@
   <voice>
     *: none
     touchscreen: "נקודה מוחלטת"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "מנע דילוג שירים"
+  </dest>
+  <voice>
+    *: "מנע דילוג שירים"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "מתיחת זמן"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "מתיחת זמן"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "מהירות"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "מהירות"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "הגדרות מסך-מגע"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "הגדרות מסך מגע"
   </voice>
 </phrase>
 <phrase>
@@ -12361,86 +12491,520 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TOUCHSCREEN_GRID
-  desc: in Settings -> General -> Display -> Touchscreen Settings
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
   user: core
   <source>
-    *: none
-    touchscreen: "3x3 Grid"
+    *: "Top"
   </source>
   <dest>
-    *: none
-    touchscreen: "רשת 3x3"
+    *: "למעלה"
   </dest>
   <voice>
-    *: none
-    touchscreen: "רשת 3 על 3"
+    *: "למעלה"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TOUCHSCREEN_MODE
-  desc: in Settings -> General -> Display -> Touchscreen Settings
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
   user: core
   <source>
-    *: none
-    touchscreen: "Touchscreen Mode"
+    *: "Bottom"
   </source>
   <dest>
-    *: none
-    touchscreen: "מצב מסך-מגע"
+    *: "למטה"
+  </dest>
   <voice>
-    *: none
-    touchscreen: "מצב מסך מגע"
+    *: "למטה"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TIMESTRETCH
-  desc: timestretch enable
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
   user: core
   <source>
     *: none
-    swcodec: "Timestretch"
+    remote: "Remote Statusbar"
   </source>
   <dest>
     *: none
-    swcodec: "מתיחת זמן"
+    remote: "שורת מצב בשלט"
   </dest>
   <voice>
     *: none
-    swcodec: "מתיחת זמן"
+    remote: "שורת מצב בשלט"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TOUCHSCREEN_SETTINGS
-  desc: in Settings -> General -> Display menu
+  id: LANG_SEMITONE
+  desc: 
   user: core
   <source>
     *: none
-    touchscreen: "Touchscreen Settings"
+    pitchscreen: "Semitone"
   </source>
   <dest>
     *: none
-    touchscreen: "הגדרות מסך-מגע"
+    pitchscreen: "חצי טון"
   </dest>
   <voice>
     *: none
-    touchscreen: "הגדרות מסך מגע"
+    pitchscreen: "חצי טון"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SPEED
-  desc: timestretch speed
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
   user: core
   <source>
     *: none
-    swcodec: "Speed"
+    pitchscreen: "Limit"
   </source>
   <dest>
     *: none
-    swcodec: "מהירות"
+    pitchscreen: "גבול"
   </dest>
   <voice>
     *: none
-    swcodec: "מהירות"
+    pitchscreen: "גבול"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "קצב"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "קצב"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_KEYPAD_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB Keypad Mode:"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB -מצב מקשים ב"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "מצב מקשים בחיבור USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIMEDIA
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Multimedia"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "מולטימדיה"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "מולטימדיה"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESENTATION
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Presentation"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "מצגת"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "מצגת"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Browser"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "דפדפן"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "דפדפן"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOUSE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Mouse"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "עכבר"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "עכבר"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Skin RAM usage:"
+  </dest>
+  <voice>
+    *: "Skin RAM usage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "רוחב פס גלילה"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "רוחב פס גלילה"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "מיקום פס גלילה"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "מיקום פס גלילה"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Compressor"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Compressor"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Compressor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "קבע כפריט מסך מהיר עליון"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "קבע כפריט מסך מהיר עליון"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ITALY
+  desc: fm region Italy
+  user: core
+  <source>
+    *: none
+    radio: "Italy"
+  </source>
+  <dest>
+    *: none
+    radio: "איטליה"
+  </dest>
+  <voice>
+    *: none
+    radio: "איטליה"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_OTHER
+  desc: Catch-all FM region. Select if none of the others work
+  user: core
+  <source>
+    *: none
+    radio: "Other"
+  </source>
+  <dest>
+    *: none
+    radio: "אחר"
+  </dest>
+  <voice>
+    *: none
+    radio: "אחר"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Threshold"
+  </source>
+  <dest>
+    *: none
+    swcodec: "רמת סף"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "רמת סף"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Ratio"
+  </source>
+  <dest>
+    *: none
+    swcodec: "יחס"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "יחס"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "2:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "2:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "2 ל- 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_4
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "4:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "4:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "4 ל- 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_6
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "6:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "6:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "6 ל- 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_10
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "10:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "10:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "10 ל- 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_LIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit"
+  </source>
+  <dest>
+    *: none
+    swcodec: "גבול"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "גבול"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Makeup Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "הגברת פיצוי"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "הגברת פיצוי"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto"
+  </source>
+  <dest>
+    *: none
+    swcodec: "אוטו"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "אוטו"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ברך"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "ברך"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Hard Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ברך קשה"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "ברך קשה"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Soft Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ברך רכה"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "ברך רכה"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Release Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "זמן שחרור"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "זמן שחרור"
   </voice>
 </phrase>
