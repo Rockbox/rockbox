@@ -1622,12 +1622,10 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
                    [2] = top of knee
                    [3] = 0 db input */
         db_curve[1].db = c_menu.threshold << 16;
-        db_curve[1].offset = 0;
         if (c_menu.soft_knee)
         {
             /* bottom of knee is 3dB below the threshold for soft knee*/
             db_curve[0].db = db_curve[1].db - (3 << 16);
-            db_curve[0].offset = 0;
             /* top of knee is 3dB above the threshold for soft knee */
             db_curve[2].db = db_curve[1].db + (3 << 16);
             if (c_menu.ratio)
@@ -1642,13 +1640,11 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
         {
             /* bottom of knee is at the threshold for hard knee */
             db_curve[0].db = c_menu.threshold << 16;
-            db_curve[0].offset = 0;
             /* top of knee is at the threshold for hard knee */
             db_curve[2].db = c_menu.threshold << 16;
             db_curve[2].offset = 0;
         }
         /* 0db input is also max offset point (most compression) */
-        db_curve[3].db = 0;
         if (c_menu.ratio)
             /* offset = threshold * (ratio - 1) / ratio */
             db_curve[3].offset = (int32_t)((long long)(c_menu.threshold << 16)
@@ -1679,7 +1675,13 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
         }
         comp_curve[64] = fp_factor(db_curve[3].offset, 16) << 8;
 
+#if defined(SIMULATOR) && defined(LOGF_ENABLE)
         logf("\n   *** Compression Offsets ***");
+        /* some settings for display only, not used in calculations */
+        db_curve[0].offset = 0;
+        db_curve[1].offset = 0;
+        db_curve[3].db = 0;
+        
         for (i = 0; i <= 3; i++)
         {
             logf("Curve[%d]: db: % .1f\toffset: % .4f", i, (float)db_curve[i].db / (1 << 16),
@@ -1692,6 +1694,7 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
             debugf("%02d: %.6f  ", i, (float)comp_curve[i] / (1 << 24));
             if (i % 4 == 0) debugf("\n");
         }
+#endif
         
         /* if using auto peak, then makeup gain is max offset - .1dB headroom */
         int32_t db_makeup = (c_menu.gain == -1) ?
