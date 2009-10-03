@@ -78,42 +78,82 @@ def findqt():
     for binary in bins:
         q = which.which(binary)
         if len(q) > 0:
-            output = subprocess.Popen([q, "-version"], stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE).communicate()
-            for ou in output:
-                r = re.compile("Qt[^0-9]+([0-9\.]+[a-z]*)")
-                m = re.search(r, ou)
-                if not m == None:
-                    print "Qt found: %s" % m.group(1)
-                    s = re.compile("4\..*")
-                    n = re.search(s, m.group(1))
-                    if not n == None:
-                        result = q
-    if result == "":
-        print "ERROR: No suitable Qt found!"
-
+            result = checkqt(q)
     return result
+
+
+def checkqt(qmakebin):
+    '''Check if given path to qmake exists and is a suitable version.'''
+    result = ""
+    # check if binary exists
+    if not os.path.exists(qmakebin):
+        print "Specified qmake path does not exist!"
+        return result
+    # check version
+    output = subprocess.Popen([qmakebin, "-version"], stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+    cmdout = output.communicate()
+    # don't check the qmake return code here, Qt3 doesn't return 0 on -version.
+    for ou in cmdout:
+        r = re.compile("Qt[^0-9]+([0-9\.]+[a-z]*)")
+        m = re.search(r, ou)
+        if not m == None:
+            print "Qt found: %s" % m.group(1)
+            s = re.compile("4\..*")
+            n = re.search(s, m.group(1))
+            if not n == None:
+                result = qmakebin
+    return result
+
+
+def removedir(folder):
+    # remove output folder
+    for root, dirs, files in os.walk(folder, topdown=False):
+        for name in files:
+            os.remove(os.path.join(root, name))
+        for name in dirs:
+            os.rmdir(os.path.join(root, name))
+    os.rmdir(folder)
 
 
 def qmake(qmake="qmake"):
     print "Running qmake ..."
     output = subprocess.Popen([qmake, "-config", "static", "-config", "release"],
-                stdout=subprocess.PIPE).communicate()
+                stdout=subprocess.PIPE)
+    output.communicate()
+    if not output.returncode == 0:
+        print "qmake returned an error!"
+        return -1
+    return 0
 
 
 def build():
     # make
     print "Building ..."
-    output = subprocess.Popen(["make"], stdout=subprocess.PIPE).communicate()
+    output = subprocess.Popen(["make"], stdout=subprocess.PIPE)
+    output.communicate()
+    if not output.returncode == 0:
+        print "Build failed!"
+        return -1
     # strip
     print "Stripping binary."
-    output = subprocess.Popen(["strip", progexe], stdout=subprocess.PIPE).communicate()
+    output = subprocess.Popen(["strip", progexe], stdout=subprocess.PIPE)
+    output.communicate()
+    if not output.returncode == 0:
+        print "Stripping failed!"
+        return -1
+    return 0
 
 
 def upxfile():
     # run upx on binary
     print "UPX'ing binary ..."
-    output = subprocess.Popen(["upx", progexe], stdout=subprocess.PIPE).communicate()
+    output = subprocess.Popen(["upx", progexe], stdout=subprocess.PIPE)
+    output.communicate()
+    if not output.returncode == 0:
+        print "UPX'ing failed!"
+        return -1
+    return 0
 
 
 def zipball(versionstring):
@@ -135,14 +175,10 @@ def zipball(versionstring):
             zf.write(os.path.join(root, name))
     zf.close()
     # remove output folder
-    for root, dirs, files in os.walk(outfolder, topdown=False):
-        for name in files:
-            os.remove(os.path.join(root, name))
-        for name in dirs:
-            os.rmdir(os.path.join(root, name))
-    os.rmdir(outfolder)
+    removedir(outfolder)
     st = os.stat(archivename)
     print "done: %s, %i bytes" % (archivename, st.st_size)
+    return archivename
 
 
 def tarball(versionstring):
@@ -160,14 +196,10 @@ def tarball(versionstring):
     tf.add(outfolder)
     tf.close()
     # remove output folder
-    for root, dirs, files in os.walk(outfolder, topdown=False):
-        for name in files:
-            os.remove(os.path.join(root, name))
-        for name in dirs:
-            os.rmdir(os.path.join(root, name))
-    os.rmdir(outfolder)
+    removedir(outfolder)
     st = os.stat(archivename)
     print "done: %s, %i bytes" % (archivename, st.st_size)
+    return archivename
 
 
 def main():
@@ -188,10 +220,12 @@ def main():
 
     # qmake path
     if qt == "":
-        qt = findqt()
-    if qt == "":
+        qm = findqt()
+    else:
+        qm = checkqt(qt)
+    if qm == "":
         print "ERROR: No suitable Qt installation found."
-        os.exit(1)
+        sys.exit(1)
 
     # figure version from sources
     ver = findversion("version.h")
@@ -200,17 +234,20 @@ def main():
     print len(header) * "="
 
     # build it.
-    qmake(qt)
-    build()
+    if not qmake(qm) == 0:
+        os.exit(1)
+    if not build() == 0:
+        sys.exit(1)
     if sys.platform == "win32":
-        upxfile()
+        if not upxfile() == 0:
+            sys.exit(1)
         zipball(ver)
     else:
         tarball(ver)
     print "done."
     duration = time.time() - startup
     durmins = (int)(duration / 60)
-    dursecs = (int)(duration - (durmins * 60))
+    dursecs = (int)(duration % 60)
     print "Building took %smin %ssec." % (durmins, dursecs)
 
 
