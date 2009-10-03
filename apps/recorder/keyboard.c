@@ -98,6 +98,7 @@ struct keyboard_parameters
     int nchars;
     int font_w;
     int font_h;
+    int text_w;
     struct font* font;
     int curfont;
     int main_x;
@@ -144,6 +145,12 @@ int load_kbd(unsigned char* filename)
     int i = 0;
     unsigned char buf[4];
 
+    FOR_NB_SCREENS(l)
+    {
+        struct keyboard_parameters *pm = &kbd_param[l];
+        pm->x = pm->y = pm->page = 0;
+    }
+
     if (filename == NULL)
     {
         kbd_loaded = false;
@@ -159,6 +166,7 @@ int load_kbd(unsigned char* filename)
         /* check how many bytes to read for this character */
         static const unsigned char sizes[4] = { 0x80, 0xe0, 0xf0, 0xf5 };
         size_t count;
+        unsigned short ch;
 
         for (count = 0; count < ARRAYLEN(sizes); count++)
         {
@@ -176,11 +184,11 @@ int load_kbd(unsigned char* filename)
             return 1;
         }
 
+        utf8decode(buf, &ch);
         FOR_NB_SCREENS(l)
-            utf8decode(buf, &kbd_param[l].kbd_buf[i]);
+            kbd_param[l].kbd_buf[i] = ch;
 
-        if (kbd_param[0].kbd_buf[i] != 0xFEFF &&
-            kbd_param[0].kbd_buf[i] != '\r') /*skip BOM & carriage returns */
+        if (ch != 0xFEFF && ch != '\r') /*skip BOM & carriage returns */
         {
             i++;
         }
@@ -276,9 +284,10 @@ static void kbd_delchar(unsigned char* text, int* editpos)
 }
 
 /* Lookup k value based on state of param (pm) */
-static int get_param_k(const struct keyboard_parameters *pm)
+static unsigned short get_kbd_ch(const struct keyboard_parameters *pm)
 {
-    return (pm->page*pm->lines + pm->y)*pm->max_chars + pm->x;
+    int k = (pm->page*pm->lines + pm->y)*pm->max_chars + pm->x;
+    return (k < pm->nchars)? pm->kbd_buf[k]: ' ';
 }
 
 int kbd_input(char* text, int buflen)
@@ -291,7 +300,6 @@ int kbd_input(char* text, int buflen)
     struct keyboard_parameters * const param = kbd_param;
 #endif
     int l; /* screen loop variable */
-    int text_w = 0;
     int editpos;                /* Edit position on all screens */
     const int statusbar_size = 0;
     unsigned short ch;
@@ -406,9 +414,12 @@ int kbd_input(char* text, int buflen)
         /* find max width of keyboard glyphs */
         for (i = 0; i < pm->nchars; i++)
         {
-            w = font_get_width(pm->font, pm->kbd_buf[i]);
-            if ( w > pm->font_w )
-                pm->font_w = w;
+            if (pm->kbd_buf[i] != '\n')
+            {
+                w = font_get_width(pm->font, pm->kbd_buf[i]);
+                if ( w > pm->font_w )
+                    pm->font_w = w;
+            }
         }
 
         /* Since we're going to be adding spaces, make sure that we check
@@ -424,16 +435,17 @@ int kbd_input(char* text, int buflen)
         struct screen *sc = &screens[l];
         int i = 0;
 
+        pm->max_chars = sc->getwidth() / pm->font_w;
+
         /* Pad lines with spaces */
         while (i < pm->nchars)
         {
             if (pm->kbd_buf[i] == '\n')
             {
-                int k = sc->getwidth() / pm->font_w
-                        - i % ( sc->getwidth() / pm->font_w ) - 1;
+                int k = pm->max_chars - i % ( pm->max_chars ) - 1;
                 int j;
 
-                if (k == sc->getwidth() / pm->font_w - 1)
+                if (k == pm->max_chars - 1)
                 {
                     pm->nchars--;
 
@@ -471,27 +483,24 @@ int kbd_input(char* text, int buflen)
     }
 
     /* Find max width for text string */
-    utf8 = text;
     FOR_NB_SCREENS(l)
     {
         struct keyboard_parameters *pm = &param[l];
         struct screen *sc = &screens[l];
 
-        text_w = pm->font_w;
+        pm->text_w = pm->font_w;
 
+        utf8 = text;
         while (*utf8)
         {
-            int w = font_get_width(pm->font, ch);
+            int w;
             utf8 = (unsigned char*)utf8decode(utf8, &ch);
-
-            if (w > text_w)
-                text_w = w;
+            w = font_get_width(pm->font, ch);
+            if (w > pm->text_w)
+                pm->text_w = w;
         }
 
-        pm->max_chars_text = sc->getwidth() / text_w - 2;
-
-        /* Calculate keyboard grid size */
-        pm->max_chars = sc->getwidth() / pm->font_w;
+        pm->max_chars_text = sc->getwidth() / pm->text_w - 2;
 
         if (!kbd_loaded)
         {
@@ -644,6 +653,7 @@ int kbd_input(char* text, int buflen)
             struct keyboard_parameters *pm = &param[l];
             struct screen *sc = &screens[l];
             int i = 0, j = 0;
+            int text_w = pm->text_w;
 
             /* Clear text area one pixel above separator line so any overdraw
                doesn't collide */
@@ -661,8 +671,6 @@ int kbd_input(char* text, int buflen)
                                 - MIN(len_utf8 - editpos, 2));
             pm->leftpos = editpos - pm->curpos;
             utf8 = text + utf8seek(text, pm->leftpos);
-
-            text_w = pm->font_w;
 
             while (*utf8 && i < pm->max_chars_text)
             {
@@ -780,7 +788,6 @@ int kbd_input(char* text, int buflen)
 
             case ACTION_KBD_PAGE_FLIP:
             {
-                int k;
 #ifdef KBD_MORSE_INPUT
                 if (morse_mode)
                     break;
@@ -788,8 +795,8 @@ int kbd_input(char* text, int buflen)
                 if (++pm->page >= pm->pages)
                      pm->page = 0;
 
-                k = get_param_k(pm);
-                kbd_spellchar(pm->kbd_buf[k]);
+                ch = get_kbd_ch(pm);
+                kbd_spellchar(ch);
                 break;
                 }
 
@@ -843,7 +850,6 @@ int kbd_input(char* text, int buflen)
                 else
 #endif /* KBD_MODES */
                 {
-                    int k;
 #ifdef KBD_MORSE_INPUT
                     if (morse_mode)
                         break;
@@ -858,8 +864,8 @@ int kbd_input(char* text, int buflen)
                         pm->x = 0;
                     }
 
-                    k = get_param_k(pm);
-                    kbd_spellchar(pm->kbd_buf[k]);
+                    ch = get_kbd_ch(pm);
+                    kbd_spellchar(ch);
                 }
                 break;
 
@@ -888,7 +894,6 @@ int kbd_input(char* text, int buflen)
                 else
 #endif /* KBD_MODES */
                 {
-                    int k;
 #ifdef KBD_MORSE_INPUT
                     if (morse_mode)
                         break;
@@ -903,8 +908,8 @@ int kbd_input(char* text, int buflen)
                         pm->x = pm->max_chars - 1;
                     }
 
-                    k = get_param_k(pm);
-                    kbd_spellchar(pm->kbd_buf[k]);
+                    ch = get_kbd_ch(pm);
+                    kbd_spellchar(ch);
                 }
                 break;
 
@@ -946,8 +951,8 @@ int kbd_input(char* text, int buflen)
                 if (!pm->line_edit)
 #endif
                 {
-                    int k = get_param_k(pm);
-                    kbd_spellchar(pm->kbd_buf[k]);
+                    ch = get_kbd_ch(pm);
+                    kbd_spellchar(ch);
                 }
                 break;
 
@@ -989,8 +994,8 @@ int kbd_input(char* text, int buflen)
                 if (!pm->line_edit)
 #endif
                 {
-                    int k = get_param_k(pm);
-                    kbd_spellchar(pm->kbd_buf[k]);
+                    ch = get_kbd_ch(pm);
+                    kbd_spellchar(ch);
                 }
                 break;
 
@@ -1061,8 +1066,7 @@ int kbd_input(char* text, int buflen)
 #endif /* KBD_MODES */
                 {
                     /* find input char */
-                    int k = get_param_k(pm);
-                    ch = (k < pm->nchars) ? pm->kbd_buf[k] : ' ';
+                    ch = get_kbd_ch(pm);
 
                     /* check for hangul input */
                     if (ch >= 0x3131 && ch <= 0x3163)
