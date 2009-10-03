@@ -103,66 +103,47 @@ lcd_mono_data:
  *   r2 - pixel block count
  *
  * Register usage:
- *   r3/r4 - current block of phases
- *   r5/r6 - current block of values
- *   r7 - lcd data accumulator
- *   r8 - phase signs mask
+ *   r3 - current block of phases
+ *   r4 - current block of values
+ *   r5 - lcd data accumulator
+ *   r12 - phase signs mask
  *   lr - lcd bridge address
  */
 
 lcd_grey_data:
-    stmfd   sp!, {r4-r7, lr}
+    stmfd   sp!, {r4-r5, lr}
     mov     r12, #0x80
     orr     r12, r12, r12, lsl #8
     orr     r12, r12, r12, lsl #16
     ldr     lr, =LCD1_BASE
 
 .greyloop:
-    ldmia   r1, {r3-r4}         /* Fetch 8 pixel phases */
-    ldmia   r0!, {r5-r6}        /* Fetch 8 pixel values */
+    ldr     r3, [r1]            /* Fetch 4 pixel phases */
+    ldr     r4, [r0], #4        /* Fetch 4 pixel values */
 
-    mov     r7, #0
+    mov     r5, #0
     tst     r3, #0x80
-    orreq   r7, r7, #0xc0
+    orreq   r5, r5, #0xc0
     tst     r3, #0x8000
-    orreq   r7, r7, #0x30
+    orreq   r5, r5, #0x30
     tst     r3, #0x800000
-    orreq   r7, r7, #0x0c
+    orreq   r5, r5, #0x0c
     tst     r3, #0x80000000
-    orreq   r7, r7, #0x03
+    orreq   r5, r5, #0x03
     bic     r3, r3, r12
-    add     r3, r3, r5
+    add     r3, r3, r4
+    str     r3, [r1], #4
 
 1:
-    ldr     r5, [lr]
-    tst     r5, #LCD1_BUSY_MASK
+    ldr     r3, [lr]
+    tst     r3, #LCD1_BUSY_MASK
     bne     1b
 
-    str     r7, [lr, #0x10]
-    mov     r7, #0
-
-    tst     r4, #0x80
-    orreq   r7, r7, #0xc0
-    tst     r4, #0x8000
-    orreq   r7, r7, #0x30
-    tst     r4, #0x800000
-    orreq   r7, r7, #0x0c
-    tst     r4, #0x80000000
-    orreq   r7, r7, #0x03
-    bic     r4, r4, r12
-    add     r4, r4, r6
-
-    stmia   r1!, {r3-r4}
-
-1:
-    ldr     r5, [lr]
-    tst     r5, #LCD1_BUSY_MASK
-    bne     1b
-    str     r7, [lr, #0x10]
+    str     r5, [lr, #0x10]
 
     subs    r2, r2, #1
     bne     .greyloop
 
-    ldmfd   sp!, {r4-r7, pc}
+    ldmfd   sp!, {r4-r5, pc}
     .size   lcd_grey_data,.-lcd_grey_data
 
