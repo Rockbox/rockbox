@@ -240,21 +240,20 @@ void option_select_next_val(const struct settings_list *setting,
     else if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
     {
         struct int_setting *info = (struct int_setting *)setting->int_setting;
-        int step = info->step;
-        if (step < 0)
-            step = -step;
+        bool neg_step = (info->step < 0);
         if (!previous)
         {
-            val = *value + step;
-            if (val > info->max)
+            val = *value + info->step;
+            if (neg_step ? (val < info->max) : (val > info->max))
                 val = info->min;
         }
         else
         {
-            val = *value - step;
-            if (val < info->min)
+            val = *value - info->step;
+            if (neg_step ? (val > info->min) : (val < info->min))
                 val = info->max;
         }
+        *value = val;
         if (apply && info->option_callback)
             info->option_callback(val);
     }
@@ -276,6 +275,7 @@ void option_select_next_val(const struct settings_list *setting,
             if (val < min)
                 val = max;
         }
+        *value = val;
     }
     else if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
     {
@@ -293,6 +293,7 @@ void option_select_next_val(const struct settings_list *setting,
             if (val < 0)
                 val = info->count-1;
         }
+        *value = val;
         if (apply && info->option_callback)
             info->option_callback(val);
     }
@@ -311,8 +312,8 @@ void option_select_next_val(const struct settings_list *setting,
                 break;
             }
         }
+        *value = val;
     }
-    *value = val;
 }
 #endif
 
