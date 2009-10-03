@@ -262,13 +262,6 @@ static const int days_in_month[2][13] = {
 static const char *dayname_long[7] = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
 static const char *dayname_short[7] = {"M","T","W","T","F","S","S"};
 
-struct today {
-    int     mday;        /* day of the month */
-    int     mon;         /* month */
-    int     year;        /* year since 1900 */
-    int     wday;        /* day of the week */
-};
-
 struct shown {
     int     mday;        /* day of the month */
     int     mon;         /* month */
@@ -297,13 +290,11 @@ static int calc_weekday( struct shown *shown )
 
 }
 
-static void calendar_init(struct today *today, struct shown *shown)
+static void calendar_init(struct shown *shown)
 {
     int w,h;
 #if CONFIG_RTC
     struct tm *tm;
-#else
-    (void)today;
 #endif
     rb->lcd_getstringsize("A",&w,&h);
     if ( ((w * 14) > LCD_WIDTH) || ((h * 7) > LCD_HEIGHT) )
@@ -314,14 +305,10 @@ static void calendar_init(struct today *today, struct shown *shown)
     rb->lcd_clear_display();
 #if CONFIG_RTC
     tm = rb->get_time();
-    today->mon = tm->tm_mon +1;
-    today->year = 2000+tm->tm_year%100;
-    today->wday = tm->tm_wday-1;
-    today->mday = tm->tm_mday;
-    shown->mday = today->mday;
-    shown->mon = today->mon;
-    shown->year = today->year;
-    shown->wday = today->wday;
+    shown->mday = tm->tm_mday;
+    shown->mon = tm->tm_mon +1;
+    shown->year = 2000+tm->tm_year%100;
+    shown->wday = tm->tm_wday-1;
 #endif
     shown->firstday = calc_weekday(shown);
     leap_year = is_leap_year(shown->year);
@@ -813,14 +800,13 @@ static void prev_day(struct shown *shown, int step)
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    struct today today;
     struct shown shown;
     bool exit = false;
     int button;
 
     (void)(parameter);
 
-    calendar_init(&today, &shown);
+    calendar_init(&shown);
     load_memo(&shown);
     any_events(&shown, false);
     draw_calendar(&shown);
