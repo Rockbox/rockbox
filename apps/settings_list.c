@@ -1615,9 +1615,21 @@ const struct settings_list settings[] = {
 
 #ifdef USB_ENABLE_HID
     CHOICE_SETTING(0, usb_keypad_mode, LANG_USB_KEYPAD_MODE, 0,
-            "usb keypad mode", "multimedia,presentation,browser,mouse",
-            NULL, 3, ID2P(LANG_MULTIMEDIA), ID2P(LANG_PRESENTATION),
-            ID2P(LANG_BROWSER), ID2P(LANG_MOUSE)),
+            "usb keypad mode", "multimedia,presentation,browser"
+#ifdef HAVE_USB_HID_MOUSE
+            ",mouse"
+#endif
+            , NULL,
+#ifdef HAVE_USB_HID_MOUSE
+            4,
+#else
+            3,
+#endif
+            ID2P(LANG_MULTIMEDIA), ID2P(LANG_PRESENTATION), ID2P(LANG_BROWSER)
+#ifdef HAVE_USB_HID_MOUSE
+            , ID2P(LANG_MOUSE)
+#endif
+    ), /* CHOICE_SETTING( usb_keypad_mode ) */
 #endif
 
     /* Customizable list */
