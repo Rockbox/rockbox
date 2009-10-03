@@ -44,6 +44,7 @@ enum codec_status codec_main(void)
     uint16_t fs,sps,h;
     uint32_t packet_count;
     int scrambling_unit_size, num_units, elapsed = 0;
+    int playback_on = -1;
 
 next_track:
     if (codec_init()) {
@@ -88,9 +89,14 @@ seek_start :
     {  
         bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, scrambling_unit_size);
         consumed = rm_get_packet(&bit_buffer, &rmctx, &pkt);
-        if(consumed < 0) {
-            DEBUGF("rm_get_packet failed\n");
-            return CODEC_ERROR;
+        if(consumed < 0 && playback_on != 0) {
+            if(playback_on == -1) {
+            /* Error only if packet-parsing failed and playback hadn't started */
+                DEBUGF("rm_get_packet failed\n");
+                return CODEC_ERROR;
+            }
+            else
+                goto done;
         }
        
         for(i = 0; i < rmctx.audio_pkt_cnt*(fs/sps) ; i++)
@@ -123,10 +129,16 @@ seek_start :
                 ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE + consumed * num_units);
                 bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, scrambling_unit_size);
                 consumed = rm_get_packet(&bit_buffer, &rmctx, &pkt);
-                if(consumed < 0) {
-                     DEBUGF("rm_get_packet failed\n");
-                     return CODEC_ERROR;
-                } 
+                if(consumed < 0 && playback_on != 0) {
+                    if(playback_on == -1) {
+                    /* Error only if packet-parsing failed and playback hadn't started */
+                        DEBUGF("rm_get_packet failed\n");
+                        return CODEC_ERROR;
+                    }
+                    else
+                        goto done;
+                }
+
                 packet_count = rmctx.nb_packets - rmctx.audio_pkt_cnt * num_units;
                 rmctx.frame_number = ((ci->seek_time)/(sps*1000*8/rmctx.bit_rate)); 
                 while(rmctx.audiotimestamp > (unsigned) ci->seek_time) {
@@ -155,6 +167,7 @@ seek_start :
 
             if(datasize)
                 ci->pcmbuf_insert(q.outSamples, q.outSamples + 1024, q.samples_per_frame / rmctx.nb_channels);
+            playback_on = 1;
             elapsed = rmctx.audiotimestamp+(1000*8*sps/rmctx.bit_rate)*i;
             ci->set_elapsed(elapsed);
             rmctx.frame_number++;

@@ -130,7 +130,8 @@ enum codec_status codec_main(void)
 {
     size_t n;
     uint8_t *filebuf;
-    int retval, consumed, packet_offset;    
+    int retval, consumed, packet_offset;
+    int playback_on = -1;  
 
     /* Generic codec initialisation */
     ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
@@ -173,10 +174,20 @@ next_track:
 
         filebuf = ci->request_buffer(&n, rmctx.block_align + PACKET_HEADER_SIZE);
         consumed = rm_get_packet(&filebuf, &rmctx, &pkt);
-        if(consumed < 0) {
-            DEBUGF("rm_get_packet failed\n");
-            return CODEC_ERROR;
+
+        if(consumed < 0 && playback_on != 0) {
+            if(playback_on == -1) {
+            /* Error only if packet-parsing failed and playback hadn't started */
+                DEBUGF("rm_get_packet failed\n");
+                return CODEC_ERROR;
+            }
+            else {
+                retval = CODEC_OK;
+                goto exit;
+            }
         }
+
+        playback_on = 1;
         a52_decode_data(filebuf, filebuf + rmctx.block_align);
         ci->advance_buffer(pkt.length);
     }

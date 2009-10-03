@@ -47,6 +47,8 @@ enum codec_status codec_main(void)
     int err, consumed, pkt_offset, skipped = 0;
     uint32_t s = 0; /* sample rate */
     unsigned char c = 0; /* channels */
+    int playback_on = -1;
+
     /* Generic codec initialisation */
     ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
@@ -123,9 +125,14 @@ seek_start:
                 buffer = ci->request_buffer(&n,rmctx.audio_framesize + 1000);               
                 pkt_offset = skipped - pkt.length;
                 consumed = rm_get_packet(&buffer, &rmctx, &pkt);
-                if(consumed < 0) {
-                     DEBUGF("rm_get_packet failed\n");
-                     return CODEC_ERROR;
+                if(consumed < 0 && playback_on != 0) {
+                    if(playback_on == -1) {
+                    /* Error only if packet-parsing failed and playback hadn't started */
+                        DEBUGF("rm_get_packet failed\n");
+                        return CODEC_ERROR;
+                    }
+                    else
+                        goto done;
                 }
                 skipped += pkt.length;
                 if(pkt.timestamp > (unsigned)ci->seek_time) break;                
@@ -139,11 +146,18 @@ seek_start:
         /* Request the required number of bytes from the input buffer */ 
         buffer=ci->request_buffer(&n,rmctx.audio_framesize + 1000);        
         consumed = rm_get_packet(&buffer, &rmctx, &pkt);
-        if(consumed < 0) {
-             DEBUGF("rm_get_packet failed\n");
-             return CODEC_ERROR;
-        }
 
+        if(consumed < 0 && playback_on != 0) {
+            if(playback_on == -1) {
+            /* Error only if packet-parsing failed and playback hadn't started */
+                DEBUGF("rm_get_packet failed\n");
+                return CODEC_ERROR;
+            }
+            else
+                goto done;
+        }
+        
+        playback_on = 1;
         if (pkt.timestamp >= ci->id3->length)
             goto done;
         /* Decode one block - returned samples will be host-endian */                           
