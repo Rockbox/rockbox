@@ -22,7 +22,7 @@ rm -rf bootloader firmware fonts icons uisimulator wps backdrops docs flash gdb 
 
 # Clean out tools and restore the bits that we need
 rm -rf tools/*
-svn update tools/{iriver.c,Makefile,mkboot.h,voicefont.c,VOICE_PAUSE.wav,wavtrim.h,iriver.h,mkboot.c,rbspeex,voicefont.h,wavtrim.c}
+svn update tools/{iriver.c,Makefile,mkboot.h,voicefont.c,VOICE_PAUSE.wav,wavtrim.h,iriver.h,mkboot.c,rbspeex,ucl,voicefont.h,wavtrim.c}
 # Just in case
 mkdir -p tools/rbspeex/build
 
