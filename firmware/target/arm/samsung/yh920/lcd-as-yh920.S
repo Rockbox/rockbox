@@ -27,27 +27,31 @@
     .align      2
 
 
+/* Writes an array of pixels of specified width (in 8 bits unit)
+ *
+ * Arguments:
+ *  r0 : pixels array
+ *  r1 : number of pixels in 8 bits unit
+ *
+ * Register usage:
+ *  r2 : LCD_CONTROL value / pixel value
+ *  r3 : lcd bridge address
+ */
+
     .global     lcd_write_data
     .type       lcd_write_data,%function
 
 lcd_write_data:
-    ldr     r12, =LCD1_BASE
+    ldr     r3, =LCD1_BASE
 
 .loop:
-    ldrb    r2, [r0], #1
-
 1:
-    ldr     r3, [r12]
-    tst     r3, #LCD1_BUSY_MASK
+    ldr     r2, [r3]
+    tst     r2, #LCD1_BUSY_MASK
     bne     1b
-    str     r2, [r12, #0x10]
 
     ldrb    r2, [r0], #1
-1:
-    ldr     r3, [r12]
-    tst     r3, #LCD1_BUSY_MASK
-    bne     1b
-    str     r2, [r12, #0x10]
+    str     r2, [r3, #0x10]
 
     subs    r1, r1, #1
     bne     .loop
