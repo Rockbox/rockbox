@@ -139,7 +139,6 @@ static void app_main(void)
     list_init();
 #endif
     tree_gui_init();
-    gui_syncstatusbar_init(&statusbars);
     viewportmanager_init();
 #ifdef HAVE_USBSTACK
     /* All threads should be created and public queues registered by now */
@@ -310,6 +309,8 @@ static void init(void)
 #ifdef DEBUG
     debug_init();
 #endif
+    /* Must be done before any code uses the multi-screen API */
+    gui_syncstatusbar_init(&statusbars);
     storage_init();
     settings_reset();
     settings_load(SETTINGS_ALL);
@@ -430,6 +431,9 @@ static void init(void)
 #if CONFIG_TUNER
     radio_init();
 #endif
+
+    /* Must be done before any code uses the multi-screen API */
+    gui_syncstatusbar_init(&statusbars);
 
 #if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
     /* charger_inserted() can't be used here because power_thread()
