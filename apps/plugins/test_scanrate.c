@@ -93,6 +93,8 @@ PLUGIN_HEADER
 #define DEFAULT_SCAN_RATE 700
 #elif defined SANSA_CLIP
 #define DEFAULT_SCAN_RATE 780
+#elif defined SAMSUNG_YH920
+#define DEFAULT_SCAN_RATE 700
 #else
 #define DEFAULT_SCAN_RATE 700
 #warning Generic default scanrate
