@@ -161,6 +161,9 @@ void usb_screen(void)
     int i;
     int usb_bars = VP_SB_ALLSCREENS; /* force statusbars */
     int old_bars  = viewportmanager_get_statusbar();
+#ifdef USB_ENABLE_HID
+    char mode_name[MODE_NAME_LEN];
+#endif
 #if defined HAVE_TOUCHSCREEN
     enum touchscreen_mode old_mode = touchscreen_get_mode();
 
@@ -195,7 +198,6 @@ void usb_screen(void)
             else
 #endif
             {
-                char mode_name[MODE_NAME_LEN];
 #ifdef HAVE_LCD_BITMAP
                 screens[i].transparent_bitmap(usblogo,
                         (LCD_WIDTH-BMPWIDTH_usblogo),

@@ -90,7 +90,6 @@
 #define HID_NUM_BUFFERS                 5
 #define SET_REPORT_BUF_LEN 2
 
-//#ifdef LOGF_ENABLE
 #ifdef LOGF_ENABLE
 
 #define BUF_DUMP_BUF_LEN       HID_BUF_SIZE_REPORT
