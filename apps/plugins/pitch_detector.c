@@ -212,8 +212,13 @@ const struct freq_A_entry freq_A[] =
 /* How loud the audio has to be to start displaying pitch  */
 /* Must be between 0 and 100                               */
 #define VOLUME_THRESHOLD (50)
+
 /* Change to AUDIO_SRC_LINEIN if you want to record from line-in */
+#ifdef HAVE_MIC_IN
 #define INPUT_TYPE AUDIO_SRC_MIC
+#else
+#define INPUT_TYPE AUDIO_SRC_LINEIN
+#endif
 
 /* How many decimal places to display for the Hz value */
 #define DISPLAY_HZ_PRECISION 100
