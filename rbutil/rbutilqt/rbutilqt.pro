@@ -1,7 +1,7 @@
 
 
 # ccache
-unix:!mac {
+unix:!mac:!noccache {
     CCACHE = $$system(which ccache)
     !isEmpty(CCACHE) {
         message("using ccache")
