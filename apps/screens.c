@@ -200,22 +200,16 @@ void usb_screen(void)
                         (LCD_WIDTH-BMPWIDTH_usblogo),
                         (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
                         BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
-
 #ifdef USB_ENABLE_HID
                 char mode_name[MODE_NAME_LEN];
-                int y, w, h;
-
-                screens[i].getstringsize(str(LANG_USB_KEYPAD_MODE), &w, &h);
-
-                y = (LCD_HEIGHT - BMPHEIGHT_usblogo) / 2 + BMPHEIGHT_usblogo + h;
-                screens[i].putsxy((LCD_WIDTH - w) / 2, y,
-                        str(LANG_USB_KEYPAD_MODE));
-                y += 3 * h / 2;
+                int w, h;
 
                 snprintf(mode_name, MODE_NAME_LEN, "%s",
                         str(keypad_mode_name_get()));
+
                 screens[i].getstringsize(mode_name, &w, &h);
-                screens[i].putsxy((LCD_WIDTH - w) / 2, y, mode_name);
+                screens[i].putsxy((LCD_WIDTH - w) / 2, BMPHEIGHT_usblogo +
+                        (LCD_HEIGHT - BMPHEIGHT_usblogo + h) / 2, mode_name);
 #endif /* HID */
 #else /* HAVE_LCD_BITMAP */
                 screens[i].double_height(false);

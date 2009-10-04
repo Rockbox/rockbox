@@ -1625,9 +1625,10 @@ const struct settings_list settings[] = {
 #else
             3,
 #endif
-            ID2P(LANG_MULTIMEDIA), ID2P(LANG_PRESENTATION), ID2P(LANG_BROWSER)
+            ID2P(LANG_MULTIMEDIA_MODE), ID2P(LANG_PRESENTATION_MODE),
+            ID2P(LANG_BROWSER_MODE)
 #ifdef HAVE_USB_HID_MOUSE
-            , ID2P(LANG_MOUSE)
+            , ID2P(LANG_MOUSE_MODE)
 #endif
     ), /* CHOICE_SETTING( usb_keypad_mode ) */
 #endif

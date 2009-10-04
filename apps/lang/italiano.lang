@@ -12600,71 +12600,71 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MULTIMEDIA
+  id: LANG_MULTIMEDIA_MODE
   desc: in settings_menu
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "Multimedia Mode"
   </source>
   <dest>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "Modo Multimedia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "Modo Multimedia"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PRESENTATION
+  id: LANG_PRESENTATION_MODE
   desc: in settings_menu
   user: core
   <source>
     *: none
-    usb_hid: "Presentation"
+    usb_hid: "Presentation Mode"
   </source>
   <dest>
     *: none
-    usb_hid: "Presentazione"
+    usb_hid: "Modo Presentazione"
   </dest>
   <voice>
     *: none
-    usb_hid: "Presentazione"
+    usb_hid: "Modo Presentazione"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BROWSER
+  id: LANG_BROWSER_MODE
   desc: in settings_menu
   user: core
   <source>
     *: none
-    usb_hid: "Browser"
+    usb_hid: "Browser Mode"
   </source>
   <dest>
     *: none
-    usb_hid: "Sfoglia"
+    usb_hid: "Modo Sfoglia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Sfoglia"
+    usb_hid: "Modo Sfoglia"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MOUSE
+  id: LANG_MOUSE_MODE
   desc: in settings_menu
   user: core
   <source>
     *: none
-    usb_hid: "Mouse"
+    usb_hid: "Mouse Mode"
   </source>
   <dest>
     *: none
-    usb_hid: "Mouse"
+    usb_hid: "Modo Mouse"
   </dest>
   <voice>
     *: none
-    usb_hid: "Mouse"
+    usb_hid: "Modo Mouse"
   </voice>
 </phrase>
 <phrase>

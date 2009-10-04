@@ -12671,71 +12671,71 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MULTIMEDIA
+  id: LANG_MULTIMEDIA_MODE
   desc: in settings_menu
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "Multimedia Mode"
   </source>
   <dest>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "Multimedia Mode"
   </dest>
   <voice>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "Multimedia Mode"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PRESENTATION
+  id: LANG_PRESENTATION_MODE
   desc: in settings_menu
   user: core
   <source>
     *: none
-    usb_hid: "Presentation"
+    usb_hid: "Presentation Mode"
   </source>
   <dest>
     *: none
-    usb_hid: "Presentation"
+    usb_hid: "Presentation Mode"
   </dest>
   <voice>
     *: none
-    usb_hid: "Presentation"
+    usb_hid: "Presentation Mode"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BROWSER
+  id: LANG_BROWSER_MODE
   desc: in settings_menu
   user: core
   <source>
     *: none
-    usb_hid: "Browser"
+    usb_hid: "Browser Mode"
   </source>
   <dest>
     *: none
-    usb_hid: "Browser"
+    usb_hid: "Browser Mode"
   </dest>
   <voice>
     *: none
-    usb_hid: "Browser"
+    usb_hid: "Browser Mode"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MOUSE
+  id: LANG_MOUSE_MODE
   desc: in settings_menu
   user: core
   <source>
     *: none
-    usb_hid: "Mouse"
+    usb_hid: "Mouse Mode"
   </source>
   <dest>
     *: none
-    usb_hid: "Mouse"
+    usb_hid: "Mouse Mode"
   </dest>
   <voice>
     *: none
-    usb_hid: "Mouse"
+    usb_hid: "Mouse Mode"
   </voice>
 </phrase>
 <phrase>

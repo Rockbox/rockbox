@@ -50,7 +50,7 @@ typedef struct
 } hid_key_mapping_t;
 
 static const hid_key_mapping_t hid_key_mapping_multimedia = {
-    LANG_MULTIMEDIA,
+    LANG_MULTIMEDIA_MODE,
     HID_USAGE_PAGE_CONSUMER,
     {
         /* Volume up */
@@ -72,7 +72,7 @@ static const hid_key_mapping_t hid_key_mapping_multimedia = {
 };
 
 static const hid_key_mapping_t hid_key_mapping_presentation = {
-    LANG_PRESENTATION,
+    LANG_PRESENTATION_MODE,
     HID_USAGE_PAGE_KEYBOARD_KEYPAD,
     {
         /* Slideshow start */
@@ -104,7 +104,7 @@ static const hid_key_mapping_t hid_key_mapping_presentation = {
 };
 
 static const hid_key_mapping_t hid_key_mapping_browser = {
-    LANG_BROWSER,
+    LANG_BROWSER_MODE,
     HID_USAGE_PAGE_KEYBOARD_KEYPAD,
     {
         /* Scroll up */
@@ -139,7 +139,7 @@ static const hid_key_mapping_t hid_key_mapping_browser = {
 
 #ifdef HAVE_USB_HID_MOUSE
 static const hid_key_mapping_t hid_key_mapping_mouse = {
-    LANG_MOUSE,
+    LANG_MOUSE_MODE,
     HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS,
     {
         /* Cursor move up */

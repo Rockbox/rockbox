@@ -12602,7 +12602,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MULTIMEDIA
+  id: LANG_MULTIMEDIA_MODE
   desc: in settings_menu
   user: core
   <source>
@@ -12611,15 +12611,15 @@
   </source>
   <dest>
     *: none
-    usb_hid: "מולטימדיה"
+    usb_hid: "מצב מולטימדיה"
   </dest>
   <voice>
     *: none
-    usb_hid: "מולטימדיה"
+    usb_hid: "מצב מולטימדיה"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PRESENTATION
+  id: LANG_PRESENTATION_MODE
   desc: in settings_menu
   user: core
   <source>
@@ -12628,15 +12628,15 @@
   </source>
   <dest>
     *: none
-    usb_hid: "מצגת"
+    usb_hid: "מצב מצגת"
   </dest>
   <voice>
     *: none
-    usb_hid: "מצגת"
+    usb_hid: "מצב מצגת"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BROWSER
+  id: LANG_BROWSER_MODE
   desc: in settings_menu
   user: core
   <source>
@@ -12645,15 +12645,15 @@
   </source>
   <dest>
     *: none
-    usb_hid: "דפדפן"
+    usb_hid: "מצב דפדפן"
   </dest>
   <voice>
     *: none
-    usb_hid: "דפדפן"
+    usb_hid: "מצב דפדפן"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MOUSE
+  id: LANG_MOUSE_MODE
   desc: in settings_menu
   user: core
   <source>
@@ -12662,11 +12662,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "עכבר"
+    usb_hid: "מצב עכבר"
   </dest>
   <voice>
     *: none
-    usb_hid: "עכבר"
+    usb_hid: "מצב עכבר"
   </voice>
 </phrase>
 <phrase>
