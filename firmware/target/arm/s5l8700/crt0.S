@@ -62,12 +62,12 @@ newstart2:
     ldr r1, =0x39c00020
     str r0, [r1] // mask all external interrupts
     mvn r0, #0
+    ldr r1, =0x39c0001c
+    str r0, [r1] // clear pending external interrupts
     mov r1, #0x39c00000
     str r0, [r1] // irq priority
     ldr r1, =0x39c00010
     str r0, [r1] // clear pending interrupts
-    ldr r1, =0x39c0001c
-    str r0, [r1] // clear pending external interrupts
 
 //    ldr r1, =0x3cf00000
 //    ldr r0, [r1]
@@ -146,12 +146,80 @@ newstart2:
 //    nop
 //    nop
 
+/* The following two sections of code (i.e. Nano2G and Meizus) should
+   be unified at some point. */
+#ifdef IPOD_NANO2G
+    mrc 15, 0, r0, c1, c0, 0
+    bic r0, r0, #0x1000
+    bic r0, r0, #0x5
+    mcr 15, 0, r0, c1, c0, 0 // disable caches and protection unit
+
+    mov r1, #0
+1:
+    mov r0, #0
+2:
+    orr r2, r1, r0
+    mcr 15, 0, r2, c7, c14, 2 // clean and flush dcache single entry
+    add r0, r0, #0x10
+    cmp r0, #0x40
+    bne 2b
+    add r1, r1, #0x4000000
+    cmp r1, #0x0
+    bne 1b
+    nop
+    nop
+    mov r0, #0
+    mcr 15, 0, r0, c7, c10, 4 // clean and flush whole dcache
+    mcr 15, 0, r0, c7, c5, 0 // flush icache
+    mcr 15, 0, r0, c7, c6, 0 // flush dcache
+
+    mov r0, #0x3f
+    mcr 15, 0, r0, c6, c0, 1 // CS0: 4GB at offset 0 - everything
+    mcr 15, 0, r0, c6, c0, 0 // DS0: 4GB at offset 0 - everything
+#ifdef IPOD_NANO2G
+    mov r0, #0x31 // FIXME: calculate that from MEMORYSIZE
+#else
+    mov r0, #0x2f // FIXME: calculate that from MEMORYSIZE
+#endif
+    mcr 15, 0, r0, c6, c1, 1 // CS1: SRAM/SDRAM mirror
+    mcr 15, 0, r0, c6, c1, 0 // DS1: SRAM/SDRAM mirror
+    add r0, r0, #0x08000000
+    mcr 15, 0, r0, c6, c2, 1 // CS2: SDRAM
+    mcr 15, 0, r0, c6, c2, 0 // DS2: SDRAM
+    ldr r0, =0x22000023
+    mcr 15, 0, r0, c6, c3, 1 // CS3: SRAM
+    mcr 15, 0, r0, c6, c3, 0 // DS3: SRAM
+    ldr r0, =0x24000027
+    mcr 15, 0, r0, c6, c4, 1 // CS4: NOR flash
+    mcr 15, 0, r0, c6, c4, 0 // DS4: NOR flash
+    mov r0, #0
+    mcr 15, 0, r0, c6, c5, 1 // CS5: unused
+    mcr 15, 0, r0, c6, c5, 0 // DS5: unused
+    mcr 15, 0, r0, c6, c6, 1 // CS6: unused
+    mcr 15, 0, r0, c6, c6, 0 // DS6: unused
+    mcr 15, 0, r0, c6, c7, 1 // CS7: unused
+    mcr 15, 0, r0, c6, c7, 0 // DS7: unused
+    mov r0, #0x1e
+    mcr 15, 0, r0, c2, c0, 1 // CS1-4: cacheable
+    mcr 15, 0, r0, c2, c0, 0 // DS1-4: cacheable
+    mcr 15, 0, r0, c3, c0, 0 // DS1-4: write cacheable
+    ldr r0, =0x000003ff
+    mcr 15, 0, r0, c5, c0, 1 // CS0-4: full access
+    mcr 15, 0, r0, c5, c0, 0 // DS0-4: full access
+
+    mrc 15, 0, r0, c1, c0, 0
+    orr r0, r0, #0x5
+    orr r0, r0, #0x1000
+    mcr 15, 0, r0, c1, c0, 0 // re-enable protection unit and caches
+
+#else
+
     ldr r1, =0x3c500000
     mov r0, #0  // 0x0
     str r0, [r1, #40] // enable clock for all peripherals
     mov r0, #0  // 0x0
     str r0, [r1, #44] // do not enter any power saving mode
-	
+
     mov r1, #0x1
     mrc 15, 0, r0, c1, c0, 0
     bic r0, r0, r1
@@ -183,13 +251,13 @@ newstart2:
     nop
     mov r0, #0
     mcr 15, 0, r0, c7, c10, 4 // clean and flush whole dcache
-									    
+
     mov r0, #0
     mcr 15, 0, r0, c7, c5, 0 // flush icache
     
     mov r0, #0
     mcr 15, 0, r0, c7, c6, 0 // flush dcache
-			       
+
     mov r0, #0x3f
     mcr 15, 0, r0, c6, c0, 1
     mov r0, #0x2f
@@ -220,22 +288,23 @@ newstart2:
     mcr 15, 0, r0, c5, c0, 1
     ldr r0, =0x0000ffff
     mcr 15, 0, r0, c5, c0, 0 // set up protection and caching
-				    					
+
     mov r1, #0x4
     mrc 15, 0, r0, c1, c0, 0
     orr r0, r0, r1
     mcr 15, 0, r0, c1, c0, 0 // dcache enable
-    
+
     mov r1, #0x1000
     mrc 15, 0, r0, c1, c0, 0
     orr r0, r0, r1
     mcr 15, 0, r0, c1, c0, 0 // icache enable
-						   
+
     mov r1, #0x1
     mrc 15, 0, r0, c1, c0, 0
     orr r0, r0, r1
     mcr 15, 0, r0, c1, c0, 0 // enable protection unit
-    
+#endif
+
 #if CONFIG_CPU==S5L8700 || !defined(BOOTLOADER)
     /* Copy interrupt vectors to iram */
     ldr     r2, =_intvectstart
