@@ -31,10 +31,12 @@
    language! */
 #include "max_language_size.h"
 
-/* both these must match the two initial bytes in the binary lang file */
-#define LANGUAGE_COOKIE  0x1a
-#define LANGUAGE_VERSION 0x04
+/* These defines must match the initial bytes in the binary lang file */
+/* See tools/genlang (TODO: Use common include for both) */
+#define LANGUAGE_COOKIE   0x1a
+#define LANGUAGE_VERSION  0x04
 
+#define HEADER_SIZE 3
 
 static unsigned char language_buffer[MAX_LANGUAGE_SIZE];
 
@@ -54,12 +56,12 @@ int lang_load(const char *filename)
     int fsize;
     int fd = open(filename, O_RDONLY);
     int retcode=0;
-    unsigned char lang_header[3];
+    unsigned char lang_header[HEADER_SIZE];
     if(fd < 0)
         return 1;
-    fsize = filesize(fd) - 2;
+    fsize = filesize(fd) - HEADER_SIZE;
     if(fsize <= MAX_LANGUAGE_SIZE) {
-        read(fd, lang_header, 3);
+        read(fd, lang_header, HEADER_SIZE);
         if((lang_header[0] == LANGUAGE_COOKIE) &&
            (lang_header[1] == LANGUAGE_VERSION) &&
            (lang_header[2] == TARGET_ID)) {

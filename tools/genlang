@@ -10,8 +10,10 @@
 # Copyright (C) 2006 - 2008 by Daniel Stenberg
 #
 
-# binary version for the binary lang file
-my $langversion = 4; # 3 was the latest one used in the v1 format
+# See apps/language.c (TODO: Use common include for both)
+# Cookie and binary version for the binary lang file
+my $LANGUAGE_COOKIE   = 0x1a;
+my $LANGUAGE_VERSION  = 0x04;
 
 # A note for future users and readers: The original v1 language system allowed
 # the build to create and use a different language than english built-in. We
@@ -26,7 +28,7 @@ my %user2num =
 
 if(!$ARGV[0]) {
     print <<MOO
-Usage: genlang [options] <langv2 file>
+Usage: genlang [options] <langv4 file>
 
  -p=<prefix>
     Make the tool create a [prefix].c and [prefix].h file.
@@ -659,7 +661,7 @@ elsif($binary) {
 
     open(OUTF, ">$binary") or die "Error: Can't create $binary";
     binmode OUTF;
-    printf OUTF ("\x1a%c%c", $langversion, $target_id); # magic lang file header
+    printf OUTF ("%c%c%c", $LANGUAGE_COOKIE, $LANGUAGE_VERSION, $target_id); # magic lang file header
 
     # loop over the target phrases
     for $i (1 .. $idcount) {
