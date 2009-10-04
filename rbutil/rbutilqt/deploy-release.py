@@ -17,11 +17,20 @@
 #
 #
 # Automate building releases for deployment.
-# Run from source folder. Error checking / handling rather is limited.
+# Run from any folder to build
+# - trunk
+# - any tag (using the -t option)
+# - any local folder (using the -p option)
+# Will build a binary archive (tar.bz2 / zip) and source archive.
+# The source archive won't be built for local builds. Trunk and
+# tag builds will retrieve the sources directly from svn and build
+# below the systems temporary folder.
+#
 # If the required Qt installation isn't in PATH use --qmake option.
 # Tested on Linux and MinGW / W32
 #
 # requires python which package (http://code.google.com/p/which/)
+# requires pysvn package.
 # requires upx.exe in PATH on Windows.
 #
 
@@ -35,12 +44,15 @@ import subprocess
 import getopt
 import which
 import time
+import hashlib
+import pysvn
+import tempfile
 
 # == Global stuff ==
 # Windows nees some special treatment. Differentiate between program name
 # and executable filename.
 program = "rbutilqt"
-project = "rbutilqt.pro"
+project = "rbutil/rbutilqt/rbutilqt.pro"
 if sys.platform == "win32":
     progexe = "Release/rbutilqt.exe"
 else:
@@ -48,13 +60,57 @@ else:
 
 programfiles = [ progexe ]
 
+svnserver = "svn://svn.rockbox.org/rockbox/"
+# Paths and files to retrieve from svn when creating a tarball.
+# This is a mixed list, holding both paths and filenames.
+svnpaths = [ "rbutil/",
+             "tools/ucl",
+             "tools/rbspeex",
+             "apps/codecs/libspeex",
+             "tools/iriver.c",
+             "tools/Makefile",
+             "tools/mkboot.h",
+             "tools/voicefont.c",
+             "tools/VOICE_PAUSE.wav",
+             "tools/wavtrim.h",
+             "tools/iriver.h",
+             "tools/mkboot.c",
+             "tools/voicefont.h",
+             "tools/wavtrim.c",
+             "tools/sapi_voice.vbs" ]
 
 # == Functions ==
 def usage(myself):
     print "Usage: %s [options]" % myself
     print "       -q, --qmake=<qmake>   path to qmake"
-    print "       -p, --project=<pro>   path to .pro file for building out-of-tree"
+    print "       -p, --project=<pro>   path to .pro file for building with local tree"
+    print "       -t, --tag=<tag>       use specified tag from svn"
     print "       -h, --help            this help"
+    print "  If neither a project file nor tag is specified trunk will get downloaded"
+    print "  from svn."
+
+def getsources(svnsrv, filelist, dest):
+    '''Get the files listed in filelist from svnsrv and put it at dest.'''
+    client = pysvn.Client()
+    print "Checking out sources from %s, please wait." % svnsrv
+
+    for elem in filelist:
+        url = re.subn('/$', '', svnsrv + elem)[0]
+        destpath = re.subn('/$', '', dest + elem)[0]
+        try:
+            client.export(url, destpath)
+        except:
+            print "SVN client error: %s" % sys.exc_value
+            return -1
+    print "Checkout finished."
+    return 0
+
+
+def gettrunkrev(svnsrv):
+    '''Get the revision of trunk for svnsrv'''
+    client = pysvn.Client()
+    entries = client.info2(svnsrv, recurse=False)
+    return entries[0][1].rev.number
 
 
 def findversion(versionfile):
@@ -113,20 +169,11 @@ def checkqt(qmakebin):
     return result
 
 
-def removedir(folder):
-    # remove output folder
-    for root, dirs, files in os.walk(folder, topdown=False):
-        for name in files:
-            os.remove(os.path.join(root, name))
-        for name in dirs:
-            os.rmdir(os.path.join(root, name))
-    os.rmdir(folder)
-
-
-def qmake(qmake="qmake", projfile=project):
-    print "Running qmake ..."
-    output = subprocess.Popen([qmake, "-config", "static", "-config", "release", projfile],
-                stdout=subprocess.PIPE)
+def qmake(qmake="qmake", projfile=project, wd="."):
+    print "Running qmake in %s..." % wd
+    output = subprocess.Popen([qmake, "-config", "static",
+        "-config", "release", "-config", "noccache", projfile],
+                stdout=subprocess.PIPE, cwd=wd)
     output.communicate()
     if not output.returncode == 0:
         print "qmake returned an error!"
@@ -134,17 +181,17 @@ def qmake(qmake="qmake", projfile=project):
     return 0
 
 
-def build():
+def build(wd="."):
     # make
     print "Building ..."
-    output = subprocess.Popen(["make"], stdout=subprocess.PIPE)
+    output = subprocess.Popen(["make"], stdout=subprocess.PIPE, cwd=wd)
     output.communicate()
     if not output.returncode == 0:
         print "Build failed!"
         return -1
     # strip
     print "Stripping binary."
-    output = subprocess.Popen(["strip", progexe], stdout=subprocess.PIPE)
+    output = subprocess.Popen(["strip", progexe], stdout=subprocess.PIPE, cwd=wd)
     output.communicate()
     if not output.returncode == 0:
         print "Stripping failed!"
@@ -152,10 +199,10 @@ def build():
     return 0
 
 
-def upxfile():
+def upxfile(wd="."):
     # run upx on binary
     print "UPX'ing binary ..."
-    output = subprocess.Popen(["upx", progexe], stdout=subprocess.PIPE)
+    output = subprocess.Popen(["upx", progexe], stdout=subprocess.PIPE, cwd=wd)
     output.communicate()
     if not output.returncode == 0:
         print "UPX'ing failed!"
@@ -163,72 +210,110 @@ def upxfile():
     return 0
 
 
-def zipball(versionstring):
+def zipball(versionstring, buildfolder):
     '''package created binary'''
     print "Creating binary zipball."
-    outfolder = program + "-v" + versionstring
-    archivename = outfolder + ".zip"
+    archivebase = program + "-" + versionstring
+    outfolder = buildfolder + "/" + archivebase
+    archivename = archivebase + ".zip"
     # create output folder
     os.mkdir(outfolder)
     # move program files to output folder
     for f in programfiles:
-        shutil.copy(f, outfolder)
+        shutil.copy(buildfolder + "/" + f, outfolder)
     # create zipball from output folder
     zf = zipfile.ZipFile(archivename, mode='w', compression=zipfile.ZIP_DEFLATED)
     for root, dirs, files in os.walk(outfolder):
         for name in files:
-            zf.write(os.path.join(root, name))
+            physname = os.path.join(root, name)
+            filename = re.sub("^" + buildfolder, "", physname)
+            zf.write(physname, filename)
         for name in dirs:
-            zf.write(os.path.join(root, name))
+            physname = os.path.join(root, name)
+            filename = re.sub("^" + buildfolder, "", physname)
+            zf.write(physname, filename)
     zf.close()
     # remove output folder
-    removedir(outfolder)
-    st = os.stat(archivename)
-    print "done: %s, %i bytes" % (archivename, st.st_size)
+    shutil.rmtree(outfolder)
     return archivename
 
 
-def tarball(versionstring):
+def tarball(versionstring, buildfolder):
     '''package created binary'''
     print "Creating binary tarball."
-    outfolder = program + "-v" + versionstring
-    archivename = outfolder + ".tar.bz2"
+    archivebase = program + "-" + versionstring
+    outfolder = buildfolder + "/" + archivebase
+    archivename = archivebase + ".tar.bz2"
     # create output folder
     os.mkdir(outfolder)
     # move program files to output folder
     for f in programfiles:
-        shutil.copy(f, outfolder)
+        shutil.copy(buildfolder + "/" + f, outfolder)
     # create tarball from output folder
     tf = tarfile.open(archivename, mode='w:bz2')
-    tf.add(outfolder)
+    tf.add(outfolder, archivebase)
     tf.close()
     # remove output folder
-    removedir(outfolder)
-    st = os.stat(archivename)
-    print "done: %s, %i bytes" % (archivename, st.st_size)
+    shutil.rmtree(outfolder)
     return archivename
+
+
+def filehashes(filename):
+    '''Calculate md5 and sha1 hashes for a given file.'''
+    if not os.path.exists(filename):
+        return ["", ""]
+    m = hashlib.md5()
+    s = hashlib.sha1()
+    f = open(filename, 'rb')
+    while True:
+        d = f.read(65536)
+        if d == "":
+            break
+        m.update(d)
+        s.update(d)
+    return [m.hexdigest(), s.hexdigest()]
+
+
+def filestats(filename):
+    if not os.path.exists(filename):
+        return
+    st = os.stat(filename)
+    print filename, "\n", "-" * len(filename)
+    print "Size:    %i bytes" % st.st_size
+    h = filehashes(filename)
+    print "md5sum:  %s" % h[0]
+    print "sha1sum: %s" % h[1]
+    print "-" * len(filename), "\n"
 
 
 def main():
     startup = time.time()
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "q:p:h", ["qmake=", "project=", "help"])
+        opts, args = getopt.getopt(sys.argv[1:], "q:p:t:h",
+                ["qmake=", "project=", "tag=", "help"])
     except getopt.GetoptError, err:
         print str(err)
         usage(sys.argv[0])
         sys.exit(1)
     qt = ""
-    proj = project
+    proj = ""
+    svnbase = svnserver + "trunk/"
+    tag = ""
+    cleanup = True
     for o, a in opts:
         if o in ("-q", "--qmake"):
             qt = a
         if o in ("-p", "--project"):
             proj = a
+            cleanup = False
+        if o in ("-t", "--tag"):
+            tag = a
+            svnbase = svnserver + "tags/" + tag + "/"
         if o in ("-h", "--help"):
             usage(sys.argv[0])
             sys.exit(0)
 
-    # qmake path
+    # search for qmake
     if qt == "":
         qm = findqt()
     else:
@@ -236,38 +321,88 @@ def main():
     if qm == "":
         print "ERROR: No suitable Qt installation found."
         sys.exit(1)
+
+    # create working folder. Use current directory if -p option used.
+    if proj == "":
+        w = tempfile.mkdtemp()
+        # make sure the path doesn't contain backslashes to prevent issues
+        # later when running on windows.
+        workfolder = re.sub(r'\\', '/', w)
+        if not tag == "":
+            sourcefolder = workfolder + "/" + tag + "/"
+            archivename = tag + "-src.tar.bz2"
+            # get numeric version part from tag
+            ver = "v" + re.sub('^[^\d]+', '', tag)
+        else:
+            trunk = gettrunkrev(svnbase)
+            sourcefolder = workfolder + "/rbutil-r" + str(trunk) + "/"
+            archivename = "rbutil-r" + str(trunk) + "-src.tar.bz2"
+            ver = "r" + str(trunk)
+        os.mkdir(sourcefolder)
+    else:
+        workfolder = "."
+        sourcefolder = "."
+        archivename = ""
+    # check if project file explicitly given. If yes, don't get sources from svn
+    if proj == "":
+        proj = sourcefolder + project
+        # get sources and pack source tarball
+        if not getsources(svnbase, svnpaths, sourcefolder) == 0:
+            sys.exit(1)
+
+        tf = tarfile.open(archivename, mode='w:bz2')
+        tf.add(sourcefolder, os.path.basename(re.subn('/$', '', sourcefolder)[0]))
+        tf.close()
+    else:
+        # figure version from sources. Need to take path to project file into account.
+        versionfile = re.subn('[\w\.]+$', "version.h", proj)[0]
+        ver = findversion(versionfile)
+
     # check project file
     if not os.path.exists(proj):
-        print "ERROR: path to project file wrong. You need to specify the path " \
-              "when building out-of-tree."
+        print "ERROR: path to project file wrong."
         sys.exit(1)
 
-    # figure version from sources. Need to take path to project file into account.
-    versionfile = re.subn('[\w\.]+$', "version.h", proj)[0]
-    ver = findversion(versionfile)
+    buildstart = time.time()
     header = "Building %s %s" % (program, ver)
     print header
     print len(header) * "="
 
     # build it.
-    if not qmake(qm, proj) == 0:
-        os.exit(1)
-    if not build() == 0:
+    if not qmake(qm, proj, sourcefolder) == 0:
+        sys.exit(1)
+    if not build(sourcefolder) == 0:
         sys.exit(1)
     if sys.platform == "win32":
-        if not upxfile() == 0:
+        if not upxfile(sourcefolder) == 0:
             sys.exit(1)
-        zipball(ver)
+        archive = zipball(ver, sourcefolder)
     else:
-        tarball(ver)
-    print "done."
+        archive = tarball(ver, sourcefolder)
+
+    # remove temporary files
+    print "Cleaning up working folder %s" % workfolder
+    if cleanup == True:
+        shutil.rmtree(workfolder)
+    else:
+        print "Project file specified, not cleaning up!"
+
+    # display summary
+    headline = "Build Summary for %s" % program
+    print "\n", headline, "\n", "=" * len(headline)
+    if not archivename == "":
+        filestats(archivename)
+    filestats(archive)
     duration = time.time() - startup
+    building = time.time() - buildstart
     durmins = (int)(duration / 60)
     dursecs = (int)(duration % 60)
-    print "Building took %smin %ssec." % (durmins, dursecs)
+    buildmins = (int)(building / 60)
+    buildsecs = (int)(building % 60)
+    print "Overall time %smin %ssec, building took %smin %ssec." % \
+        (durmins, dursecs, buildmins, buildsecs)
 
 
 if __name__ == "__main__":
     main()
-
 
