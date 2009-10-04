@@ -276,9 +276,9 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #endif
 
 /* The time (in ms) for one iteration through the game loop - decrease this
-   to speed up the game - note that current_tick is (currently) only accurate
-   to 10ms.
-*/
+ *  to speed up the game - note that current_tick is (currently) only accurate
+ *  to 10ms.
+ */
 #define CYCLETIME           30
 
 #define TOPMARGIN           MAX(BRICK_HEIGHT, FIXED3(8))
@@ -291,10 +291,8 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 /* Brickmania was originally designed for the H300, other targets should scale
  *  the speed up/down as needed based on the screen height.
  */
-#define SPEED_SCALE_H(y)    \
-        FIXED3_DIV(GAMESCREEN_HEIGHT, FIXED3(176)/(y) )
-#define SPEED_SCALE_W(x)    \
-        FIXED3_DIV(GAMESCREEN_WIDTH, FIXED3(220)/(x) )
+#define SPEED_SCALE_H(y)    FIXED3_DIV(GAMESCREEN_HEIGHT, FIXED3(176)/(y) )
+#define SPEED_SCALE_W(x)    FIXED3_DIV(GAMESCREEN_WIDTH, FIXED3(220)/(x) )
 
 /* These are all used as ball speeds depending on where the ball hit the
  *  paddle.  
@@ -1368,7 +1366,8 @@ static int brickmania_game_loop(void)
                                 for(k=0;k<used_balls;k++)
                                     ball[k].glue=false;
                                 flip_sides=false;
-                                pad_pos_x += pad_width - (PAD_WIDTH/2);
+
+                                pad_pos_x += (pad_width-PAD_WIDTH)/2;
                                 pad_width = PAD_WIDTH;
                                 break;
                             case 5: /* Flip the paddle */
