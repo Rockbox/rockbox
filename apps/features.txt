@@ -198,6 +198,9 @@ usb_charging
 usbstack
 #if defined(USB_ENABLE_HID)
 usb_hid
+#if defined(HAVE_USB_HID_MOUSE)
+usb_hid_mouse
+#endif
 #endif
 #endif
 
