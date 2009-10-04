@@ -18,15 +18,17 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "nand.h"
+#include "config.h"
 #include "ata_idle_notify.h"
 #include "system.h"
 #include <string.h>
 #include "thread.h"
 #include "led.h"
 #include "disk.h"
+#include "storage.h"
 #include "panic.h"
 #include "usb.h"
+#include "ftl-target.h"
 
 /* for compatibility */
 long last_disk_activity = -1;
@@ -47,19 +49,13 @@ void nand_led(bool onoff)
 int nand_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
-    (void)start;
-    (void)incount;
-    (void)inbuf;
-    return 0;
+    return ftl_read(start, incount, inbuf);
 }
 
 int nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
-    (void)start;
-    (void)count;
-    (void)outbuf;
-    return 0;
+    return ftl_write(start, count, outbuf);
 }
 
 void nand_spindown(int seconds)
@@ -92,6 +88,8 @@ long nand_last_disk_activity(void)
 
 int nand_init(void)
 {
+    if (ftl_init()) return 1;
+
     initialized = true;
     return 0;
 }
