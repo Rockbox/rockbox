@@ -45,7 +45,7 @@ enum {
 
 #define USING_STORAGE_CALLBACK  !defined(SIMULATOR)             \
                             && ! ((CONFIG_STORAGE & STORAGE_NAND) \
-                               && (CONFIG_NAND & NAND_IFP7XX)) \
+                               && (CONFIG_NAND == NAND_IFP7XX)) \
                             && !defined(BOOTLOADER)
 
 typedef bool (*storage_idle_notify)(void);
