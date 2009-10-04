@@ -205,13 +205,54 @@ void lcd_update(void)
 void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
+    int xx,yy;
+    int y0, x0, y1, x1;
+    fb_data* p;
+    fb_data pixel;
 
-    /* TODO.  For now, just do a full-screen update */
-    lcd_update();
+    x0 = x;                         /* start horiz */
+    y0 = y;                         /* start vert */
+    x1 = (x + width) - 1;           /* max horiz */
+    y1 = (y + height) - 1;          /* max vert */
+
+    if (lcd_type==0) {
+        s5l_lcd_write_cmd_data(R_HORIZ_ADDR_START_POS, x0);
+        s5l_lcd_write_cmd_data(R_HORIZ_ADDR_END_POS,   x1);
+        s5l_lcd_write_cmd_data(R_VERT_ADDR_START_POS,  y0);
+        s5l_lcd_write_cmd_data(R_VERT_ADDR_END_POS,    y1);
+
+        s5l_lcd_write_cmd_data(R_HORIZ_GRAM_ADDR_SET,  (x1 << 8) | x0);
+        s5l_lcd_write_cmd_data(R_VERT_GRAM_ADDR_SET,   (y1 << 8) | y0);
+
+        s5l_lcd_write_cmd(0);
+        s5l_lcd_write_cmd(R_WRITE_DATA_TO_GRAM);
+    } else {
+        s5l_lcd_write_cmd(R_COLUMN_ADDR_SET);
+        s5l_lcd_write_data(x0);            /* Start column */
+        s5l_lcd_write_data(x1);            /* End column */
+
+        s5l_lcd_write_cmd(R_ROW_ADDR_SET);
+        s5l_lcd_write_data(y0);            /* Start row */
+        s5l_lcd_write_data(y1);            /* End row */
+
+        s5l_lcd_write_cmd(R_MEMORY_WRITE);
+    }
+
+
+    /* Copy display bitmap to hardware */
+    p = &lcd_framebuffer[y0][x0];
+    yy = height;
+    for (yy = y0; yy <= y1; yy++) {
+        for (xx = x0; xx <= x1; xx++) {
+            pixel = *(p++);
+
+            while (LCD_STATUS & 0x10);
+            LCD_WDATA = (pixel & 0xff00) >> 8;
+            while (LCD_STATUS & 0x10);
+            LCD_WDATA = pixel & 0xff;
+        }
+        p += LCD_WIDTH - width;
+    }
 }
 
 /* Performance function to blit a YUV bitmap directly to the LCD */
