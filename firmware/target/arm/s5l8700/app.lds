@@ -27,7 +27,11 @@ STARTUP(target/arm/s5l8700/crt0.o)
 
 #define DRAMSIZE (DRAM_SIZE - STUBOFFSET - PLUGINSIZE - CODECSIZE)
 #define CODECORIG (ENDAUDIOADDR)
-#define IRAMSIZE (0x20000)
+#if CONFIG_CPU==S5L8700
+#define IRAMSIZE (64*1024)  /* 128KB total - 64KB for core, 64KB for plugins */
+#else /* S5L8701 */
+#define IRAMSIZE (96*1024)  /* 176KB total - 96KB for core, 80KB for plugins */
+#endif
 
 /* Where the codec buffer ends, and the plugin buffer starts */
 #define ENDADDR (ENDAUDIOADDR + CODECSIZE)
