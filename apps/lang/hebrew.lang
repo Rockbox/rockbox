@@ -2365,7 +2365,7 @@
     *: "הספריה הנוכחית בלבד"
   </dest>
   <voice>
-    *: "Current Directory Only"
+    *: "הספריה הנוכחית בלבד"
   </voice>
 </phrase>
 <phrase>
@@ -3122,7 +3122,7 @@
     *: "מהירות גלילה"
   </dest>
   <voice>
-    *: "Scroll Speed"
+    *: "מהירות גלילה"
   </voice>
 </phrase>
 <phrase>
@@ -6785,7 +6785,6 @@
   </dest>
   <voice>
     *: "קטלוג רשימות שירים"
-    *: "Playlist Catalog"
   </voice>
 </phrase>
 <phrase>
@@ -7058,8 +7057,7 @@
     *: "(!איתור שגיאות (לא להכנס"
   </dest>
   <voice>
-    *: "!איתור שגיאות, לא להכנס"
-    *: "Debug, keep out!"
+    *: "איתור שגיאות, לא להכנס!"
   </voice>
 </phrase>
 <phrase>
@@ -7871,7 +7869,7 @@
     *: "נמחק"
   </dest>
   <voice>
-    *: "Deleted"
+    *: "נמחק"
   </voice>
 </phrase>
 <phrase>
@@ -10959,7 +10957,7 @@
     *: ""
   </dest>
   <voice>
-    *: "of"
+    *: "חלקי"
   </voice>
 </phrase>
 <phrase>
@@ -11029,7 +11027,7 @@
     *: "הראה סיומות קבצים"
   </dest>
   <voice>
-    *: "Show Filename Extensions"
+    *: "הראה סיומות קבצים"
   </voice>
 </phrase>
 <phrase>
@@ -11043,7 +11041,7 @@
     *: "רק סוגים לא מוכרים"
   </dest>
   <voice>
-    *: "Only Unknown Types"
+    *: "רק סוגים לא מוכרים"
   </voice>
 </phrase>
 <phrase>
@@ -11057,7 +11055,7 @@
     *: "רק כשמציגים את כל הסוגים"
   </dest>
   <voice>
-    *: "Only When Viewing All Types"
+    *: "רק כשמציגים את כל הסוגים"
   </voice>
 </phrase>
 <phrase>
