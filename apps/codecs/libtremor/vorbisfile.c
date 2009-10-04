@@ -684,10 +684,10 @@ static void _decode_clear(OggVorbis_File *vf){
             1) got a packet 
 */
 
-static int _fetch_and_process_packet(OggVorbis_File *vf,
+STATICIRAM_NOT_MDCT int _fetch_and_process_packet(OggVorbis_File *vf,
                                      int readp,
                                      int spanp) ICODE_ATTR_TREMOR_NOT_MDCT;
-static int _fetch_and_process_packet(OggVorbis_File *vf,
+STATICIRAM_NOT_MDCT int _fetch_and_process_packet(OggVorbis_File *vf,
                                      int readp,
                                      int spanp){
   ogg_page og={0,0,0,0};

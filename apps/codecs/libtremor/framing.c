@@ -104,9 +104,9 @@ static ogg_buffer *_fetch_buffer(ogg_buffer_state *bs,long bytes){
   return ob;
 }
 
-static ogg_reference *_fetch_ref(ogg_buffer_state *bs)
+STATICIRAM_NOT_MDCT ogg_reference *_fetch_ref(ogg_buffer_state *bs)
     ICODE_ATTR_TREMOR_NOT_MDCT;
-static ogg_reference *_fetch_ref(ogg_buffer_state *bs){
+STATICIRAM_NOT_MDCT ogg_reference *_fetch_ref(ogg_buffer_state *bs){
   ogg_reference *or;
   bs->outstanding++;
 
@@ -789,8 +789,9 @@ static void _next_lace(oggbyte_buffer *ob,ogg_stream_state *os){
   }
 }
 
-static void _span_queued_page(ogg_stream_state *os) ICODE_ATTR_TREMOR_NOT_MDCT;
-static void _span_queued_page(ogg_stream_state *os){ 
+STATICIRAM_NOT_MDCT void _span_queued_page(ogg_stream_state *os)
+    ICODE_ATTR_TREMOR_NOT_MDCT;
+STATICIRAM_NOT_MDCT void _span_queued_page(ogg_stream_state *os){ 
   while( !(os->body_fill&FINFLAG) ){
     
     if(!os->header_tail)break;
@@ -948,9 +949,9 @@ int ogg_stream_reset_serialno(ogg_stream_state *os,int serialno){
   return OGG_SUCCESS;
 }
 
-static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv)
+STATICIRAM_NOT_MDCT int _packetout(ogg_stream_state *os,ogg_packet *op,int adv)
     ICODE_ATTR_TREMOR_NOT_MDCT;
-static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
+STATICIRAM_NOT_MDCT int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
 
   ogg_packet_release(op);
   _span_queued_page(os);
@@ -1028,10 +1029,14 @@ static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
   return 1;
 }
 
+int ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op)
+    ICODE_ATTR_TREMOR_NOT_MDCT;
 int ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op){
   return _packetout(os,op,1);
 }
 
+int ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op)
+    ICODE_ATTR_TREMOR_NOT_MDCT;
 int ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op){
   return _packetout(os,op,0);
 }

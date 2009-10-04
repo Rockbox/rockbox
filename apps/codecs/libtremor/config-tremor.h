@@ -1,4 +1,8 @@
+#ifndef _CONFIG_TREMOR_H
+#define _CONFIG_TREMOR_H
+
 #include "codeclib.h" 
+
 #ifdef CPU_ARM
 #define _ARM_ASSEM_
 #endif
@@ -15,6 +19,14 @@
 
 #ifndef ICODE_ATTR_TREMOR_MDCT
 #define ICODE_ATTR_TREMOR_MDCT ICODE_ATTR
+#endif
+
+/* Workaround for gcc bug where all static functions are called with short 
+   calls */
+#if !defined(ICODE_ATTR_TREMOR_NOT_MDCT) && (CONFIG_CPU==S5L8701)
+#define STATICIRAM_NOT_MDCT 
+#else
+#define STATICIRAM_NOT_MDCT static
 #endif
 
 #ifndef ICODE_ATTR_TREMOR_NOT_MDCT
@@ -47,3 +59,5 @@
 #define CHANNELS 2
 
 // #define _LOW_ACCURACY_
+
+#endif /*  _CONFIG_TREMOR_H */
