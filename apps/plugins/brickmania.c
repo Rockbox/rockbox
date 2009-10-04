@@ -1055,6 +1055,11 @@ static int brickmania_menu(void)
         { "Normal", -1 },
     };
 
+#ifdef HAVE_TOUCHSCREEN
+    /* Entering Menu, set the touchscreen to the global setting */
+    rb->touchscreen_set_mode(rb->global_settings->touch_mode);
+#endif
+
     MENUITEM_STRINGLIST(main_menu, "Brickmania Menu", brickmania_menu_cb,
                         "Resume Game", "Start New Game",
                         "Difficulty", "Help", "High Scores",
@@ -1106,6 +1111,9 @@ static int brickmania_menu(void)
                 break;
         }
     }
+#ifdef HAVE_TOUCHSCREEN
+    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+#endif
 }
 
 /* Find an unused fire position */
@@ -1795,12 +1803,12 @@ static int brickmania_game_loop(void)
             if(button & BUTTON_TOUCHSCREEN)
             {
                 short touch_x, touch_y;
-                touch_x = rb->button_get_data() >> 16;
-                touch_y = rb->button_get_data() & 0xffff;
-                if(touch_y >= PAD_POS_Y && touch_y <= PAD_POS_Y+PAD_HEIGHT)
+                touch_x = FIXED3(rb->button_get_data() >> 16);
+                touch_y = FIXED3(rb->button_get_data() & 0xffff);
+                if(touch_y >= (GAMESCREEN_HEIGHT-GAMESCREEN_HEIGHT/4) && touch_y <= GAMESCREEN_HEIGHT)
                 {
-                    pad_pos_x += (flip_sides ? -1 : 1) * 
-                                    ( (touch_x-pad_pos_x-pad_width/2) / 4 );
+                    pad_pos_x = (flip_sides ? -1 : 1) * 
+                                    (touch_x - pad_width/2);
 
                     if(pad_pos_x < 0)
                         pad_pos_x = 0;
@@ -1962,6 +1970,10 @@ enum plugin_status plugin_start(const void* parameter)
     highscore_load(HIGH_SCORE,highest,NUM_SCORES);
     configfile_load(CONFIG_FILE_NAME,config,1,0);
     last_difficulty = difficulty;
+    
+#ifdef HAVE_TOUCHSCREEN
+    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+#endif
 
     rb->lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
