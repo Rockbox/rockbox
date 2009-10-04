@@ -38,16 +38,34 @@
 #ifdef HAVE_LCD_BITMAP
  
 enum codepages {
-    ISO_8859_1 = 0, ISO_8859_7, ISO_8859_8, WIN_1251,
-    ISO_8859_11, WIN_1256, ISO_8859_9, ISO_8859_2, WIN_1250,
-    SJIS, GB_2312, KSX_1001, BIG_5, UTF_8, NUM_CODEPAGES
+    ISO_8859_1 = 0, /* Latin1 */
+    ISO_8859_7,     /* Greek */
+    ISO_8859_8,     /* Hebrew */
+    WIN_1251,       /* Cyrillic */
+    ISO_8859_11,    /* Thai */
+    WIN_1256,       /* Arabic */
+    ISO_8859_9,     /* Turkish */
+    ISO_8859_2,     /* Latin Extended */
+    WIN_1250,       /* Central European */
+    SJIS,           /* Japanese */
+    GB_2312,        /* Simp. Chinese */
+    KSX_1001,       /* Korean */
+    BIG_5,          /* Trad. Chinese */
+    UTF_8,          /* Unicode */
+    NUM_CODEPAGES
 };
 
 #else /* !HAVE_LCD_BITMAP, reduced support */
 
 enum codepages {
-    ISO_8859_1 = 0, ISO_8859_7, WIN_1251, ISO_8859_9,
-    ISO_8859_2, WIN_1250, UTF_8, NUM_CODEPAGES
+    ISO_8859_1 = 0, /* Latin1 */
+    ISO_8859_7,     /* Greek */
+    WIN_1251,       /* Cyrillic */
+    ISO_8859_9,     /* Turkish */
+    ISO_8859_2,     /* Latin Extended */
+    WIN_1250,       /* Central European */
+    UTF_8,          /* Unicode */
+    NUM_CODEPAGES
 };
 
 #endif
