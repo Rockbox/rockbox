@@ -85,6 +85,7 @@ def usage(myself):
     print "       -q, --qmake=<qmake>   path to qmake"
     print "       -p, --project=<pro>   path to .pro file for building with local tree"
     print "       -t, --tag=<tag>       use specified tag from svn"
+    print "       -a, --add=<file>      add file to build folder before building"
     print "       -h, --help            this help"
     print "  If neither a project file nor tag is specified trunk will get downloaded"
     print "  from svn."
@@ -289,8 +290,8 @@ def filestats(filename):
 def main():
     startup = time.time()
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "q:p:t:h",
-                ["qmake=", "project=", "tag=", "help"])
+        opts, args = getopt.getopt(sys.argv[1:], "q:p:t:a:h",
+                ["qmake=", "project=", "tag=", "add=", "help"])
     except getopt.GetoptError, err:
         print str(err)
         usage(sys.argv[0])
@@ -299,6 +300,7 @@ def main():
     proj = ""
     svnbase = svnserver + "trunk/"
     tag = ""
+    addfiles = []
     cleanup = True
     for o, a in opts:
         if o in ("-q", "--qmake"):
@@ -309,6 +311,8 @@ def main():
         if o in ("-t", "--tag"):
             tag = a
             svnbase = svnserver + "tags/" + tag + "/"
+        if o in ("-a", "--add"):
+            addfiles.append(a)
         if o in ("-h", "--help"):
             usage(sys.argv[0])
             sys.exit(0)
@@ -363,6 +367,9 @@ def main():
         print "ERROR: path to project file wrong."
         sys.exit(1)
 
+    # copy specified (--add) files to working folder
+    for f in addfiles:
+        shutil.copy(f, sourcefolder)
     buildstart = time.time()
     header = "Building %s %s" % (program, ver)
     print header
