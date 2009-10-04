@@ -461,39 +461,39 @@
 #define ADCUPDN                 (*(REG32_PTR_T)(0x3CE00014))     /* Stylus Up or Down Interrpt Register */
 
 /* 21. USB 2.0 FUNCTION CONTROLER SPECIAL REGISTER */
-#define IR                      (*(REG32_PTR_T)(0x38800000))     /* Index Register */
-#define EIR                     (*(REG32_PTR_T)(0x38800004))     /* Endpoint Interrupt Register */
-#define EIER                    (*(REG32_PTR_T)(0x38800008))     /* Endpoint Interrupt Enable Register */
-#define FAR                     (*(REG32_PTR_T)(0x3880000C))     /* Function Address Register */
-#define FNR                     (*(REG32_PTR_T)(0x38800010))     /* Frame Number Register */
-#define EDR                     (*(REG32_PTR_T)(0x38800014))     /* Endpoint Direction Register */
-#define TR                      (*(REG32_PTR_T)(0x38800018))     /* Test Register */
-#define SSR                     (*(REG32_PTR_T)(0x3880001C))     /* System Status Register */
-#define SCR                     (*(REG32_PTR_T)(0x38800020))     /* System Control Register */
-#define EP0SR                   (*(REG32_PTR_T)(0x38800024))     /* EP0 Status Register */
-#define EP0CR                   (*(REG32_PTR_T)(0x38800028))     /* EP0 Control Register */
-#define ESR                     (*(REG32_PTR_T)(0x3880002C))     /* Endpoints Status Register */
-#define ECR                     (*(REG32_PTR_T)(0x38800030))     /* Endpoints Control Register */
-#define BRCR                    (*(REG32_PTR_T)(0x38800034))     /* Byte Read Count Register */
-#define BWCR                    (*(REG32_PTR_T)(0x38800038))     /* Byte Write Count Register */
-#define MPR                     (*(REG32_PTR_T)(0x3880003C))     /* Max Packet Register */
-#define MCR                     (*(REG32_PTR_T)(0x38800040))     /* Master Control Register */
-#define MTCR                    (*(REG32_PTR_T)(0x38800044))     /* Master Transfer Counter Register */
-#define MFCR                    (*(REG32_PTR_T)(0x38800048))     /* Master FIFO Counter Register */
-#define MTTCR1                  (*(REG32_PTR_T)(0x3880004C))     /* Master Total Transfer Counter1 Register */
-#define MTTCR2                  (*(REG32_PTR_T)(0x38800050))     /* Master Total Transfer Counter2 Register */
-#define EP0BR                   (*(REG32_PTR_T)(0x38800060))     /* EP0 Buffer Register */
-#define EP1BR                   (*(REG32_PTR_T)(0x38800064))     /* EP1 Buffer Register */
-#define EP2BR                   (*(REG32_PTR_T)(0x38800068))     /* EP2 Buffer Register */
-#define EP3BR                   (*(REG32_PTR_T)(0x3880006C))     /* EP3 Buffer Register */
-#define EP4BR                   (*(REG32_PTR_T)(0x38800070))     /* EP4 Buffer Register */
-#define EP5BR                   (*(REG32_PTR_T)(0x38800074))     /* EP5 Buffer Register */
-#define EP6BR                   (*(REG32_PTR_T)(0x38800078))     /* EP6 Buffer Register */
-#define MICR                    (*(REG32_PTR_T)(0x38800084))     /* Master Interface Counter Register */
-#define MBAR1                   (*(REG32_PTR_T)(0x38800088))     /* Memory Base Address Register1 */
-#define MBAR2                   (*(REG32_PTR_T)(0x3880008C))     /* Memory Base Address Register2 */
-#define MCAR1                   (*(REG32_PTR_T)(0x38800094))     /* Memory Current Address Register1 */
-#define MCAR2                   (*(REG32_PTR_T)(0x38800098))     /* Memory Current Address Register2 */
+#define USB_IR                  (*(REG32_PTR_T)(0x38800000))     /* Index Register */
+#define USB_EIR                 (*(REG32_PTR_T)(0x38800004))     /* Endpoint Interrupt Register */
+#define USB_EIER                (*(REG32_PTR_T)(0x38800008))     /* Endpoint Interrupt Enable Register */
+#define USB_FAR                 (*(REG32_PTR_T)(0x3880000C))     /* Function Address Register */
+#define USB_FNR                 (*(REG32_PTR_T)(0x38800010))     /* Frame Number Register */
+#define USB_EDR                 (*(REG32_PTR_T)(0x38800014))     /* Endpoint Direction Register */
+#define USB_TR                  (*(REG32_PTR_T)(0x38800018))     /* Test Register */
+#define USB_SSR                 (*(REG32_PTR_T)(0x3880001C))     /* System Status Register */
+#define USB_SCR                 (*(REG32_PTR_T)(0x38800020))     /* System Control Register */
+#define USB_EP0SR               (*(REG32_PTR_T)(0x38800024))     /* EP0 Status Register */
+#define USB_EP0CR               (*(REG32_PTR_T)(0x38800028))     /* EP0 Control Register */
+#define USB_ESR                 (*(REG32_PTR_T)(0x3880002C))     /* Endpoints Status Register */
+#define USB_ECR                 (*(REG32_PTR_T)(0x38800030))     /* Endpoints Control Register */
+#define USB_BRCR                (*(REG32_PTR_T)(0x38800034))     /* Byte Read Count Register */
+#define USB_BWCR                (*(REG32_PTR_T)(0x38800038))     /* Byte Write Count Register */
+#define USB_MPR                 (*(REG32_PTR_T)(0x3880003C))     /* Max Packet Register */
+#define USB_MCR                 (*(REG32_PTR_T)(0x38800040))     /* Master Control Register */
+#define USB_MTCR                (*(REG32_PTR_T)(0x38800044))     /* Master Transfer Counter Register */
+#define USB_MFCR                (*(REG32_PTR_T)(0x38800048))     /* Master FIFO Counter Register */
+#define USB_MTTCR1              (*(REG32_PTR_T)(0x3880004C))     /* Master Total Transfer Counter1 Register */
+#define USB_MTTCR2              (*(REG32_PTR_T)(0x38800050))     /* Master Total Transfer Counter2 Register */
+#define USB_EP0BR               (*(REG32_PTR_T)(0x38800060))     /* EP0 Buffer Register */
+#define USB_EP1BR               (*(REG32_PTR_T)(0x38800064))     /* EP1 Buffer Register */
+#define USB_EP2BR               (*(REG32_PTR_T)(0x38800068))     /* EP2 Buffer Register */
+#define USB_EP3BR               (*(REG32_PTR_T)(0x3880006C))     /* EP3 Buffer Register */
+#define USB_EP4BR               (*(REG32_PTR_T)(0x38800070))     /* EP4 Buffer Register */
+#define USB_EP5BR               (*(REG32_PTR_T)(0x38800074))     /* EP5 Buffer Register */
+#define USB_EP6BR               (*(REG32_PTR_T)(0x38800078))     /* EP6 Buffer Register */
+#define USB_MICR                (*(REG32_PTR_T)(0x38800084))     /* Master Interface Counter Register */
+#define USB_MBAR1               (*(REG32_PTR_T)(0x38800088))     /* Memory Base Address Register1 */
+#define USB_MBAR2               (*(REG32_PTR_T)(0x3880008C))     /* Memory Base Address Register2 */
+#define USB_MCAR1               (*(REG32_PTR_T)(0x38800094))     /* Memory Current Address Register1 */
+#define USB_MCAR2               (*(REG32_PTR_T)(0x38800098))     /* Memory Current Address Register2 */
 
 /* 22. USB 1.1 HOST CONTROLLER SPECIAL REGISTER */
 #define HcRevision              (*(REG32_PTR_T)(0x38600000))
