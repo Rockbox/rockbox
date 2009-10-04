@@ -23,6 +23,10 @@
 #include "inttypes.h"
 #include "s5l8700.h"
 #include "power.h"
+#include "ftl-target.h"
+#include <string.h>
+#include "panic.h"
+
 
 /*  Power handling for S5L8700 based Meizu players
 
@@ -32,7 +36,10 @@
 
 void power_off(void)
 {
-    /* TODO */
+    if (ftl_sync() != 0) panicf("Failed to unmount flash!");
+
+    /* TODO: Really power-off */
+    panicf("Poweroff not implemented yet.");
     while(1);
 }
 

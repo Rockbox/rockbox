@@ -22,6 +22,9 @@
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
+#ifdef IPOD_NANO2G
+#include "ftl-target.h"
+#endif
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -151,6 +154,24 @@ void system_init(void)
 
 void system_reboot(void)
 {
+#ifdef IPODNANO2G
+    if (ftl_sync() != 0) panicf("Failed to unmount flash!");
+
+    /* Reset the SoC */
+    asm volatile(" \
+        msr CPSR_c, #0xd3 \
+        mov r5, #0x110000 \
+        add r5, r5, #0xff \
+        add r6, r5, #0xa00 \
+        mov r10, #0x3c800000 \
+        str r6, [r10] \
+        mov r6, #0xff0 \
+        str r6, [r10,#4] \
+        str r5, [r10]")
+
+    /* Wait for reboot to kick in */
+    while(1);
+#endif
 }
 
 void system_exception_wait(void)
