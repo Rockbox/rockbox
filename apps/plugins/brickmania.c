@@ -1805,19 +1805,23 @@ static int brickmania_game_loop(void)
                 short touch_x, touch_y;
                 touch_x = FIXED3(rb->button_get_data() >> 16);
                 touch_y = FIXED3(rb->button_get_data() & 0xffff);
-                if(touch_y >= (GAMESCREEN_HEIGHT-GAMESCREEN_HEIGHT/4) && touch_y <= GAMESCREEN_HEIGHT)
+                
+                if(flip_sides)
                 {
-                    pad_pos_x = (flip_sides ? -1 : 1) * 
-                                    (touch_x - pad_width/2);
-
-                    if(pad_pos_x < 0)
-                        pad_pos_x = 0;
-                    else if(pad_pos_x+pad_width > GAMESCREEN_WIDTH)
-                        pad_pos_x = GAMESCREEN_WIDTH-pad_width;
-                    for(k=0;k<used_balls;k++)
-                        if (game_state==ST_READY || ball[k].glue)
-                            ball[k].pos_x = pad_pos_x+pad_width/2;
+                    pad_pos_x = GAMESCREEN_WIDTH - (touch_x - pad_width/2);
                 }
+                else
+                {
+                    pad_pos_x = (touch_x - pad_width/2);
+                }
+
+                if(pad_pos_x < 0)
+                    pad_pos_x = 0;
+                else if(pad_pos_x+pad_width > GAMESCREEN_WIDTH)
+                    pad_pos_x = GAMESCREEN_WIDTH-pad_width;
+                for(k=0;k<used_balls;k++)
+                    if (game_state==ST_READY || ball[k].glue)
+                        ball[k].pos_x = pad_pos_x+pad_width/2;
 
                 if(button & BUTTON_REL)
                     button = SELECT;
