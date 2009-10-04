@@ -161,9 +161,6 @@ void usb_screen(void)
     int i;
     int usb_bars = VP_SB_ALLSCREENS; /* force statusbars */
     int old_bars  = viewportmanager_get_statusbar();
-#ifdef USB_ENABLE_HID
-    char mode_name[MODE_NAME_LEN];
-#endif
 #if defined HAVE_TOUCHSCREEN
     enum touchscreen_mode old_mode = touchscreen_get_mode();
 
@@ -206,21 +203,14 @@ void usb_screen(void)
 #ifdef USB_ENABLE_HID
                 int w, h;
 
-                snprintf(mode_name, MODE_NAME_LEN, "%s",
-                        str(keypad_mode_name_get()));
-                screens[i].getstringsize(mode_name, &w, &h);
+                screens[i].getstringsize(str(keypad_mode_name_get()), &w, &h);
                 screens[i].putsxy((LCD_WIDTH - w) / 2, BMPHEIGHT_usblogo +
-                        (LCD_HEIGHT - BMPHEIGHT_usblogo + h) / 2, mode_name);
+                        (LCD_HEIGHT - BMPHEIGHT_usblogo + h) / 2,
+                        str(keypad_mode_name_get()));
 #endif /* USB_ENABLE_HID */
 #else /* HAVE_LCD_BITMAP */
                 screens[i].double_height(false);
-#ifdef USB_ENABLE_HID
-                snprintf(mode_name, MODE_NAME_LEN, "[USB Mode; %s]",
-                        str(keypad_mode_name_get()));
-                screens[i].puts_scroll(0, 0, mode_name);
-#else
                 screens[i].puts_scroll(0, 0, "[USB Mode]");
-#endif /* USB_ENABLE_HID */
                 status_set_param(false);
                 status_set_audio(false);
                 status_set_usb(true);
