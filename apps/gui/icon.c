@@ -122,10 +122,11 @@ void screen_put_iconxy(struct screen * display,
                        int xpos, int ypos, enum themable_icons icon)
 {
     const void *data;
-    int screen = display->screen_type;
-    int width = ICON_WIDTH(screen);
-    int height = ICON_HEIGHT(screen);
+    const int screen = display->screen_type;
+    const int width = ICON_WIDTH(screen);
+    const int height = ICON_HEIGHT(screen);
     int stride;
+    const struct bitmap *iconset;
     screen_bitmap_part_func *draw_func = NULL;
     
     if (icon == Icon_NOICON)
@@ -135,24 +136,23 @@ void screen_put_iconxy(struct screen * display,
     }
     else if (icon >= Icon_Last_Themeable)
     {
+        iconset = &viewer_iconset[screen];
         icon -= Icon_Last_Themeable;
         if (!viewer_icons_loaded[screen] || 
-           (global_status.viewer_icon_count*height
-             > viewer_iconset[screen].height) ||
-           (icon * height > viewer_iconset[screen].height))
+           (global_status.viewer_icon_count * height > iconset->height) ||
+           (icon * height > iconset->height))
         {
             screen_put_iconxy(display, xpos, ypos, Icon_Questionmark);
             return;
         }
-        data    = viewer_iconset[screen].data;
-        stride  = STRIDE(   display->screen_type, viewer_iconset[screen].width, 
-                            viewer_iconset[screen].height);
+        data = iconset->data;
+        stride = STRIDE(display->screen_type, iconset->width, iconset->height);
     }
     else if (custom_icons_loaded[screen])
     {
-        data    = user_iconset[screen].data;
-        stride  = STRIDE(   display->screen_type, user_iconset[screen].width, 
-                            user_iconset[screen].height);
+        iconset = &user_iconset[screen];
+        data = iconset->data;
+        stride = STRIDE(display->screen_type, iconset->width, iconset->height);
     }
     else
     {
@@ -163,7 +163,10 @@ void screen_put_iconxy(struct screen * display,
     /* add some left padding to the icons if they are on the edge */
     if (xpos == 0)
         xpos++;
-    
+
+    if (lang_is_rtl())
+        xpos = display->getwidth() - xpos - width;
+
 #if (LCD_DEPTH == 16) || defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH == 16)
     if (display->depth == 16)
         draw_func   = display->transparent_bitmap_part;
@@ -171,8 +174,6 @@ void screen_put_iconxy(struct screen * display,
 #endif
         draw_func   = display->bitmap_part;
 
-    if (lang_is_rtl())
-        xpos = display->getwidth() - xpos - width;
     draw_func(data, 0, height * icon, stride, xpos, ypos, width, height);
 }
 
