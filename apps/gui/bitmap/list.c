@@ -110,7 +110,7 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
 void list_draw(struct screen *display, struct gui_synclist *list)
 {
     struct viewport list_icons;
-    int start, end, line_height, style, i;
+    int start, end, line_height, style, i, scrollbar_in_left;
     const int screen = display->screen_type;
     const int icon_width = get_icon_width(screen) + ICON_PADDING;
     const bool show_cursor = !global_settings.cursor_style &&
@@ -134,7 +134,10 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 
     start = list->start_item[screen];
     end = start + viewport_get_nb_lines(&list_text[screen]);
-    
+
+    scrollbar_in_left  =
+        (!is_rtl && global_settings.scrollbar == SCROLLBAR_SHOW) ||
+        (is_rtl && global_settings.scrollbar == SCROLLBAR_SHOW_OPPOSITE);
     /* draw the scrollbar if its needed */
     if (global_settings.scrollbar &&
         viewport_get_nb_lines(&list_text[screen]) < list->nb_items)
@@ -146,15 +149,10 @@ void list_draw(struct screen *display, struct gui_synclist *list)
                     viewport_get_nb_lines(&list_text[screen]);
         vp.x = parent->x;
         list_text[screen].width -= SCROLLBAR_WIDTH;
-        if (!is_rtl && global_settings.scrollbar == SCROLLBAR_SHOW ||
-                is_rtl && global_settings.scrollbar == SCROLLBAR_SHOW_OPPOSITE)
-        {
+        if (scrollbar_in_left)
             list_text[screen].x += SCROLLBAR_WIDTH;
-        }
         else
-        {
             vp.x += list_text[screen].width;
-        }
         display->set_viewport(&vp);
         gui_scrollbar_draw(display, 0, 0, SCROLLBAR_WIDTH-1,
                            vp.height, list->nb_items,
@@ -164,9 +162,8 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     }
     else if (show_title)
     {
-        /* shift everything right a bit... */
-        if (!is_rtl && global_settings.scrollbar == SCROLLBAR_SHOW ||
-                is_rtl && global_settings.scrollbar == SCROLLBAR_SHOW_OPPOSITE)
+        /* shift everything a bit in relation to the title... */
+        if (scrollbar_in_left)
         {
             list_text[screen].width -= SCROLLBAR_WIDTH;
             list_text[screen].x += SCROLLBAR_WIDTH;
