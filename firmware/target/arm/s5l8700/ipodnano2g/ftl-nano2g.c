@@ -26,6 +26,35 @@
 #include <nand-target.h>
 #include <ftl-target.h>
 #include <string.h>
+#include "kernel.h"
+#include "panic.h"
+
+
+
+//#define FTL_FORCEMOUNT
+
+
+
+#ifdef FTL_FORCEMOUNT
+#ifndef FTL_READONLY
+#define FTL_READONLY
+#endif
+#endif
+
+
+#ifdef FTL_READONLY
+uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
+{
+    (void)sector;
+    (void)count;
+    (void)buffer;
+    return 1;
+}
+uint32_t ftl_sync(void)
+{
+    return 0;
+}
+#endif
 
 
 
@@ -371,6 +400,8 @@ uint8_t ftl_erasectr_dirt[8];
 
 #endif
 
+static struct mutex ftl_mtx;
+
 
 
 /* Finds a device info page for the specified bank and returns its number.
@@ -653,6 +684,7 @@ void ftl_vfl_schedule_block_for_remap(uint32_t bank, uint32_t block)
 {
     if (ftl_vfl_check_remap_scheduled(bank, block) == 1)
         return;
+    panicf("FTL: Scheduling bank %d block %d for remap!", bank, block);
     if (ftl_vfl_cxt[bank].scheduledstart == ftl_vfl_cxt[bank].spareused)
         return;
     ftl_vfl_cxt[bank].remaptable[--ftl_vfl_cxt[bank].scheduledstart] = block;
@@ -738,6 +770,7 @@ uint32_t ftl_vfl_remap_block(uint32_t bank, uint32_t block)
 {
     uint32_t i;
     uint32_t newblock = 0, newidx;
+    panicf("FTL: Remapping bank %d block %d!", bank, block);
     if (bank >= ftl_banks || block >= (*ftl_nand_type).blocks) return 0;
     for (i = 0; i < ftl_vfl_cxt[bank].sparecount; i++)
         if (ftl_vfl_cxt[bank].remaptable[i] == 0)
@@ -949,7 +982,9 @@ uint32_t ftl_open(void)
         else
         {
             /* This will trip if there was an unclean unmount before. */
+#ifndef FTL_FORCEMOUNT
             break;
+#endif
         }
     }
 
@@ -1030,6 +1065,8 @@ uint32_t ftl_read(uint32_t sector, uint32_t count, void* buffer)
 
     if (count == 0) return 0;
 
+    mutex_lock(&ftl_mtx);
+
     for (i = 0; i < count; i++)
     {
         uint32_t block = (sector + i) / ppb;
@@ -1054,6 +1091,9 @@ uint32_t ftl_read(uint32_t sector, uint32_t count, void* buffer)
             memset(&((uint8_t*)buffer)[i << 11], 0, 0x800);
         }
     }
+
+    mutex_unlock(&ftl_mtx);
+
     return error;
 }
 
@@ -1609,11 +1649,17 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
 
     if (count == 0) return 0;
 
+    mutex_lock(&ftl_mtx);
+
     if (ftl_cxt.clean_flag == 1)
     {
         for (i = 0; i < 3; i++)
         {
-            if (ftl_next_ctrl_pool_page() != 0) return 1;
+            if (ftl_next_ctrl_pool_page() != 0)
+            {
+                mutex_unlock(&ftl_mtx);
+                return 1;
+            }
             memset(ftl_buffer, 0xFF, 0x800);
             memset(&ftl_sparebuffer, 0xFF, 0x40);
             ftl_sparebuffer.meta.usn = ftl_cxt.usn;
@@ -1622,7 +1668,11 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
                               &ftl_sparebuffer) == 0)
                 break;
         }
-        if (i == 3) return 1;
+        if (i == 3)
+        {
+            mutex_unlock(&ftl_mtx);
+            return 1;
+        }
         ftl_cxt.clean_flag = 0;
     }
 
@@ -1632,7 +1682,11 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
         uint32_t page = (sector + i) % ppb;
 
         struct ftl_log_type* logentry = ftl_allocate_log_entry(block);
-        if (logentry == (struct ftl_log_type*)0) return 1;
+        if (logentry == (struct ftl_log_type*)0)
+        {
+            mutex_unlock(&ftl_mtx);
+            return 1;
+        }
         if (page == 0 && count - i >= ppb)
         {
             uint32_t vblock = (*logentry).scatteredvblock;
@@ -1641,7 +1695,11 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
             {
                 ftl_release_pool_block(vblock);
                 vblock = ftl_allocate_pool_block();
-                if (vblock == 0) return 1;
+                if (vblock == 0)
+                {
+                    mutex_unlock(&ftl_mtx);
+                    return 1;
+                }
             }
             ftl_cxt.nextblockusn++;
             for (j = 0; j < ppb; j++)
@@ -1665,7 +1723,11 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
             {
                 ftl_remove_scattered_block(logentry);
                 logentry = ftl_allocate_log_entry(block);
-                if (logentry == (struct ftl_log_type*)0) return 1;
+                if (logentry == (struct ftl_log_type*)0)
+                {
+                    mutex_unlock(&ftl_mtx);
+                    return 1;
+                }
             }
             memset(&ftl_sparebuffer, 0xFF, 0x40);
             ftl_sparebuffer.user.lpn = sector + i;
@@ -1699,6 +1761,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
                 ftl_save_erasectr_page(i);
             }
     }
+    mutex_unlock(&ftl_mtx);
     return 0;
 }
 #endif
@@ -1745,6 +1808,7 @@ uint32_t ftl_sync(void)
    which will just do nothing if everything was already clean. */
 uint32_t ftl_init(void)
 {
+    mutex_init(&ftl_mtx);
     uint32_t i;
 	uint32_t result = 0;
     uint32_t foundsignature, founddevinfo, blockwiped, repaired, skip;
@@ -1755,6 +1819,7 @@ uint32_t ftl_init(void)
     ftl_nand_type = nand_get_device_type(0);
     foundsignature = 0;
     blockwiped = 1;
+            mutex_unlock(&ftl_mtx);
     for (i = 0; i < (*ftl_nand_type).pagesperblock; i++)
     {
         result = nand_read_page(0, i, ftl_buffer, (uint32_t*)0, 1, 1);
@@ -1772,10 +1837,23 @@ uint32_t ftl_init(void)
 
     repaired = 0;
     skip = 0;
-    if (founddevinfo == 0) return 1;
-    if (foundsignature != 0 && (result & 0x11F) != 0) return 1;
+    if (founddevinfo == 0)
+    {
+        mutex_unlock(&ftl_mtx);
+        return 1;
+    }
+    if (foundsignature != 0 && (result & 0x11F) != 0)
+    {
+        mutex_unlock(&ftl_mtx);
+        return 1;
+    }
     if (ftl_vfl_open() == 0)
-        if (ftl_open() == 0) return 0;
+        if (ftl_open() == 0)
+        {
+            mutex_unlock(&ftl_mtx);
+            return 0;
+        }
+
 
 /*  Something went terribly wrong. We may want to allow the user to erase
     block zero in that condition, to make norboot reinitialize the FTL.
@@ -1785,5 +1863,7 @@ uint32_t ftl_init(void)
     nand_block_erase(0, 0); 
 */
 
+
+    mutex_unlock(&ftl_mtx);
     return 1;
 }
