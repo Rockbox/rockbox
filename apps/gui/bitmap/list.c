@@ -411,7 +411,8 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                an item when he wanted to use the scrollbar, due to touchscreen
                dead zones)
              */
-            if(global_settings.scrollbar == SCROLLBAR_RIGHT &&
+            /* TODO: Support RTL mode */
+            if(global_settings.scrollbar == SCROLLBAR_SHOW_OPPOSITE &&
                x > list_text[screen].x + list_text[screen].width -
                    get_icon_width(SCREEN_MAIN))
                 return ACTION_NONE;
