@@ -641,8 +641,9 @@ const struct settings_list settings[] = {
                   ID2P(LANG_STATUSBAR_BOTTOM)),
 #endif
     CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, scrollbar,
-                  LANG_SCROLL_BAR, SCROLLBAR_LEFT, "scrollbar","off,left,right",
-                  NULL, 3, ID2P(LANG_OFF), ID2P(LANG_LEFT), ID2P(LANG_RIGHT)),
+                  LANG_SCROLL_BAR, SCROLLBAR_SHOW,
+                  "scrollbar","hide,show,show_opposite", NULL, 3,
+                  ID2P(LANG_HIDE), ID2P(LANG_SHOW), ID2P(LANG_SHOW_OPPOSITE)),
     INT_SETTING(F_THEMESETTING, scrollbar_width, LANG_SCROLLBAR_WIDTH, 6,
                 "scrollbar width",UNIT_INT, 3, MAX(LCD_WIDTH/10,25), 1,
                 NULL, NULL, NULL),

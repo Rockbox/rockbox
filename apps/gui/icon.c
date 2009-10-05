@@ -29,6 +29,7 @@
 #include "settings.h"
 #include "bmp.h"
 #include "filetypes.h"
+#include "language.h"
 
 #include "bitmaps/default_icons.h"
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
@@ -170,6 +171,8 @@ void screen_put_iconxy(struct screen * display,
 #endif
         draw_func   = display->bitmap_part;
 
+    if (lang_is_rtl())
+        xpos = display->getwidth() - xpos - width;
     draw_func(data, 0, height * icon, stride, xpos, ypos, width, height);
 }
 

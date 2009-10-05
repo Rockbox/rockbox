@@ -20,6 +20,10 @@
 # - Rani Hod
 # - Tomer Shalev
 # - Sasha Khamkov
+
+<options>
+  rtl: 1
+</options>
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation

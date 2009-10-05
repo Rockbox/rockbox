@@ -40,6 +40,7 @@
 #include "sound.h"
 #include "misc.h"
 #include "viewport.h"
+#include "language.h"
 
 #define ICON_PADDING 1
 
@@ -61,6 +62,9 @@ bool list_display_title(struct gui_synclist *list, enum screen_type screen);
         | | | items      |   I - icons
         | | |            |
         ------------------
+
+        Note: This image is flipped horizontally when the language is a
+        right-to-left one (Hebrew, Arabic)
 */
 static bool draw_title(struct screen *display, struct gui_synclist *list)
 {
@@ -77,10 +81,17 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
         struct viewport title_icon = title_text[screen];
         title_icon.width = get_icon_width(screen)
                           + ICON_PADDING*2;
-        title_icon.x += ICON_PADDING;
-
+        if (lang_is_rtl())
+        {
+            title_icon.x = title_text[screen].width - ICON_PADDING -
+                get_icon_width(screen);
+        }
+        else
+        {
+            title_icon.x = ICON_PADDING;
+            title_text[screen].x += title_icon.width;
+        }
         title_text[screen].width -= title_icon.width;
-        title_text[screen].x += title_icon.width;
 
         display->set_viewport(&title_icon);
         screen_put_icon(display, 0, 0, list->title_icon);
@@ -108,7 +119,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 #ifdef HAVE_LCD_COLOR
     unsigned char cur_line = 0;
 #endif
-    int item_offset;
+    int item_offset, is_rtl = lang_is_rtl();
     bool show_title;
     line_height = font_get(parent->font)->height;
     display->set_viewport(parent);
@@ -132,12 +143,12 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         vp = list_text[screen];
         vp.width = SCROLLBAR_WIDTH;
         list_text[screen].width -= SCROLLBAR_WIDTH;
-        if(global_settings.scrollbar == SCROLLBAR_LEFT)
+        if (global_settings.scrollbar == SCROLLBAR_SHOW)
             list_text[screen].x += SCROLLBAR_WIDTH;
         vp.height = line_height *
                     viewport_get_nb_lines(&list_text[screen]);
         vp.x = parent->x;
-        if(global_settings.scrollbar == SCROLLBAR_RIGHT)
+        if (global_settings.scrollbar == SCROLLBAR_SHOW_OPPOSITE)
             vp.x += list_text[screen].width;
         display->set_viewport(&vp);
         gui_scrollbar_draw(display, 0, 0, SCROLLBAR_WIDTH-1,
@@ -149,7 +160,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     else if (show_title)
     {
         /* shift everything right a bit... */
-        if(global_settings.scrollbar == SCROLLBAR_LEFT)
+        if (global_settings.scrollbar == SCROLLBAR_SHOW)
         {
             list_text[screen].width -= SCROLLBAR_WIDTH;
             list_text[screen].x += SCROLLBAR_WIDTH;
@@ -167,8 +178,10 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         list_icons.width = icon_width * icon_count;
         list_text[screen].width -= 
                 list_icons.width + ICON_PADDING;
-        list_text[screen].x += 
-                list_icons.width + ICON_PADDING;
+        if (is_rtl)
+            list_icons.x += list_text[screen].width;
+        else
+            list_text[screen].x += list_icons.width + ICON_PADDING;
     }
     
     for (i=start; i<end && i<list->nb_items; i++)

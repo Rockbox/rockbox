@@ -34,9 +34,10 @@
 /* These defines must match the initial bytes in the binary lang file */
 /* See tools/genlang (TODO: Use common include for both) */
 #define LANGUAGE_COOKIE   0x1a
-#define LANGUAGE_VERSION  0x04
+#define LANGUAGE_VERSION  0x05
+#define LANGUAGE_FLAG_RTL 0x01
 
-#define HEADER_SIZE 3
+#define HEADER_SIZE 4
 
 static unsigned char language_buffer[MAX_LANGUAGE_SIZE];
 
@@ -49,6 +50,13 @@ void lang_init(void)
         language_strings[i] = ptr;
         ptr += strlen((char *)ptr) + 1; /* advance pointer to next string */
     }
+}
+
+static unsigned char lang_options = 0;
+
+int lang_is_rtl(void)
+{
+    return (lang_options & LANGUAGE_FLAG_RTL) != 0;
 }
 
 int lang_load(const char *filename)
@@ -98,6 +106,7 @@ int lang_load(const char *filename)
         retcode = 3;
     }
     close(fd);
+    lang_options = (retcode ? 0 : lang_header[3]);
     return retcode;
 }
 

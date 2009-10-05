@@ -17,6 +17,9 @@
 # Arabic language file, translated by:
 # - Mohamed Tarek
 # - Raafat Akkad
+<options>
+  rtl: 1
+</options>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
   desc: deprecated

@@ -13,7 +13,8 @@
 # See apps/language.c (TODO: Use common include for both)
 # Cookie and binary version for the binary lang file
 my $LANGUAGE_COOKIE   = 0x1a;
-my $LANGUAGE_VERSION  = 0x04;
+my $LANGUAGE_VERSION  = 0x05;
+my $LANGUAGE_FLAG_RTL = 0x01;
 
 # A note for future users and readers: The original v1 language system allowed
 # the build to create and use a different language than english built-in. We
@@ -165,6 +166,12 @@ my %phrase;
 sub phrase {
     my ($full, $n, $v)=@_;
     $phrase{$n}=$v;
+}
+
+my %options;
+sub options {
+    my ($full, $n, $v)=@_;
+    $options{$n}=$v;
 }
 
 sub parsetarget {
@@ -381,6 +388,8 @@ my $voiceid=0x8000; # counter for voice-only ID numbers
 open(LANG, "<$input") || die "Error: couldn't read language file named $input\n";
 my @phrase;
 my $header = 1;
+my $langoptions = 0;
+
 while(<LANG>) {
 
     $line++;
@@ -510,9 +519,15 @@ while(<LANG>) {
                         print "### $idstr: The phrase is not used. Skipped\n";
                     }
                 }
-                undef @phrase;
-
             } # end of </phrase>
+            elsif($part eq "/options") {
+                # closing the options
+                if ($options{'rtl'}) {
+                    $langoptions |= $LANGUAGE_FLAG_RTL;
+                }
+            } # end of </options>
+
+           undef @phrase;
 
             # starts with a slash, this _ends_ this section
             $m = pop @m; # get back old value, the previous level's tag
@@ -661,7 +676,8 @@ elsif($binary) {
 
     open(OUTF, ">$binary") or die "Error: Can't create $binary";
     binmode OUTF;
-    printf OUTF ("%c%c%c", $LANGUAGE_COOKIE, $LANGUAGE_VERSION, $target_id); # magic lang file header
+    printf OUTF ("%c%c%c%c", $LANGUAGE_COOKIE, $LANGUAGE_VERSION, $target_id,
+      $langoptions); # magic lang file header
 
     # loop over the target phrases
     for $i (1 .. $idcount) {

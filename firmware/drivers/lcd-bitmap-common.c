@@ -27,6 +27,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "language.h"
 
 #ifndef LCDFN /* Not compiling for remote - define macros for main LCD. */
 #define LCDFN(fn) lcd_ ## fn
@@ -170,11 +171,16 @@ void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
                               int style, int offset)
 {
     int xpos, ypos, w, h;
+    unsigned long chars_in_str;
     LCDFN(scroll_stop_line)(current_vp, y);
     if(!str || !str[0])
         return;
+
+    chars_in_str = utf8length((char *)str);
     LCDFN(getstringsize)(str, &w, &h);
-    xpos = x * w / utf8length((char *)str);
+    xpos = x * w / chars_in_str;
+    if (lang_is_rtl())
+        xpos = current_vp->width - w - xpos;
     ypos = y * h;
     LCDFN(putsxyofs_style)(xpos, ypos, str, style, w, h, offset);
 }
