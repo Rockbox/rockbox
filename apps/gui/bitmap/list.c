@@ -274,23 +274,17 @@ void list_draw(struct screen *display, struct gui_synclist *list)
                         style, item_offset);
         }
         /* do the icon */
+        display->set_viewport(&list_icons);
         if (list->callback_get_item_icon && global_settings.show_icons)
         {
-            display->set_viewport(&list_icons);
             screen_put_icon_with_offset(display, show_cursor?1:0,
                                     (i-start),show_cursor?ICON_PADDING:0,0,
                                     list->callback_get_item_icon(i, list->data));
-            if (show_cursor && i >= list->selected_item &&
-                i <  list->selected_item + list->selected_size)
-            {
-                screen_put_icon(display, 0, i-start, Icon_Cursor);
-            }
         }
-        else if (show_cursor && i >= list->selected_item &&
+        if (show_cursor && i >= list->selected_item &&
                 i <  list->selected_item + list->selected_size)
         {
-            display->set_viewport(&list_icons);
-            screen_put_icon(display, 0, (i-start), Icon_Cursor);
+            screen_put_icon(display, 0, i-start, Icon_Cursor);
         }
     }
     display->set_viewport(parent);
