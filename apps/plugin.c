@@ -668,8 +668,9 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-       
+#ifdef HAVE_BUTTON_DATA
     button_status_wdata,
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

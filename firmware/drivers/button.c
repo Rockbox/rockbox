@@ -305,7 +305,9 @@ static void button_tick(void)
         }
     }
     lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
+#ifdef HAVE_BUTTON_DATA
     lastdata = data;
+#endif
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

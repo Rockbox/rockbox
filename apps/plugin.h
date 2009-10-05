@@ -837,7 +837,9 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
        
+#ifdef HAVE_BUTTON_DATA
     int (*button_status_wdata)(int *pdata);
+#endif
 };
 
 /* plugin header */
