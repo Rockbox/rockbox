@@ -86,6 +86,9 @@ def usage(myself):
     print "       -p, --project=<pro>   path to .pro file for building with local tree"
     print "       -t, --tag=<tag>       use specified tag from svn"
     print "       -a, --add=<file>      add file to build folder before building"
+    print "       -s, --source-only     only create source archive"
+    print "       -b, --binary-only     only create binary archive"
+    print "       -d, --dynamic         link dynamically instead of static"
     print "       -h, --help            this help"
     print "  If neither a project file nor tag is specified trunk will get downloaded"
     print "  from svn."
@@ -170,11 +173,14 @@ def checkqt(qmakebin):
     return result
 
 
-def qmake(qmake="qmake", projfile=project, wd="."):
+def qmake(qmake="qmake", projfile=project, wd=".", static=True):
     print "Running qmake in %s..." % wd
-    output = subprocess.Popen([qmake, "-config", "static",
-        "-config", "release", "-config", "noccache", projfile],
-                stdout=subprocess.PIPE, cwd=wd)
+    command = [qmake, "-config", "release", "-config", "noccache"]
+    if static == True:
+        command.append("-config")
+        command.append("static")
+    command.append(projfile)
+    output = subprocess.Popen(command, stdout=subprocess.PIPE, cwd=wd)
     output.communicate()
     if not output.returncode == 0:
         print "qmake returned an error!"
@@ -290,8 +296,8 @@ def filestats(filename):
 def main():
     startup = time.time()
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "q:p:t:a:h",
-                ["qmake=", "project=", "tag=", "add=", "help"])
+        opts, args = getopt.getopt(sys.argv[1:], "q:p:t:a:sbdh",
+            ["qmake=", "project=", "tag=", "add=", "source-only", "binary-only", "dynamic", "help"])
     except getopt.GetoptError, err:
         print str(err)
         usage(sys.argv[0])
@@ -302,6 +308,9 @@ def main():
     tag = ""
     addfiles = []
     cleanup = True
+    binary = True
+    source = True
+    static = True
     for o, a in opts:
         if o in ("-q", "--qmake"):
             qt = a
@@ -313,9 +322,19 @@ def main():
             svnbase = svnserver + "tags/" + tag + "/"
         if o in ("-a", "--add"):
             addfiles.append(a)
+        if o in ("-s", "--source-only"):
+            binary = False
+        if o in ("-b", "--binary-only"):
+            source = False
+        if o in ("-d", "--dynamic"):
+            static = False
         if o in ("-h", "--help"):
             usage(sys.argv[0])
             sys.exit(0)
+
+    if source == False and binary == False:
+        print "Building build neither source nor binary means nothing to do. Exiting."
+        sys.exit(1)
 
     # search for qmake
     if qt == "":
@@ -354,9 +373,13 @@ def main():
         if not getsources(svnbase, svnpaths, sourcefolder) == 0:
             sys.exit(1)
 
-        tf = tarfile.open(archivename, mode='w:bz2')
-        tf.add(sourcefolder, os.path.basename(re.subn('/$', '', sourcefolder)[0]))
-        tf.close()
+        if source == True:
+            tf = tarfile.open(archivename, mode='w:bz2')
+            tf.add(sourcefolder, os.path.basename(re.subn('/$', '', sourcefolder)[0]))
+            tf.close()
+            if binary == False:
+                shutil.rmtree(workfolder)
+                sys.exit(0)
     else:
         # figure version from sources. Need to take path to project file into account.
         versionfile = re.subn('[\w\.]+$', "version.h", proj)[0]
@@ -376,7 +399,7 @@ def main():
     print len(header) * "="
 
     # build it.
-    if not qmake(qm, proj, sourcefolder) == 0:
+    if not qmake(qm, proj, sourcefolder, static) == 0:
         sys.exit(1)
     if not build(sourcefolder) == 0:
         sys.exit(1)
