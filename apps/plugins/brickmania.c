@@ -942,13 +942,15 @@ static void brickmania_sleep(int secs)
     int count=0;
     int sw, w;
 
-    while (!done) {
-        if (vscore == score) {
-            if (count==0)
-                count=*rb->current_tick+HZ*secs;
-            if (*rb->current_tick>=count)
-                done=true;
-        } else {
+    while (!done) 
+    {
+        if (count == 0)
+            count = *rb->current_tick + HZ*secs;
+        if ( (*rb->current_tick >= count) && (vscore == score) )
+            done = true;
+
+        if(vscore != score)
+        {
             if (vscore<score)
                 vscore++;
             if (vscore>score)
@@ -1272,9 +1274,9 @@ static int brickmania_game_loop(void)
             pad_line.p2.y = PAD_POS_Y;
 
             /* handle all of the bricks */
-            for (i=0;i<=7;i++) 
+            for (i=0; i<=7; i++) 
             {
-                for (j=0;j<=9;j++) 
+                for (j=0; j<=9 ;j++) 
                 {
                     int brickx;
                     int bnum = i*10+j;
@@ -1628,6 +1630,7 @@ static int brickmania_game_loop(void)
                                 /* No lives left reset game */
                                 brickmania_init_game(false);
                                 brickmania_sleep(2);
+                                rb->button_clear_queue();
                             }
                         }
                     }
@@ -1769,6 +1772,7 @@ static int brickmania_game_loop(void)
                         score+=100;
                     brickmania_init_game(true);
                     brickmania_sleep(2);
+                    rb->button_clear_queue();
                 }
                 else 
                 {
@@ -1792,9 +1796,8 @@ static int brickmania_game_loop(void)
                 }
             }
 
-            int move_button,button;
-            int button_right,button_left;
-            button=rb->button_get(false);
+            int button=rb->button_get(false);
+            int move_button = rb->button_status();
 
 #if defined(HAS_BUTTON_HOLD) && !defined(HAVE_REMOTE_LCD_AS_MAIN)
             /* FIXME: Should probably check remote hold here */
@@ -1803,11 +1806,13 @@ static int brickmania_game_loop(void)
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-            if(button & BUTTON_TOUCHSCREEN)
+            if( move_button & BUTTON_TOUCHSCREEN)
             {
+                int data;
                 short touch_x, touch_y;
-                touch_x = FIXED3(rb->button_get_data() >> 16);
-                touch_y = FIXED3(rb->button_get_data() & 0xffff);
+                rb->button_status_wdata(&data);
+                touch_x = FIXED3(data >> 16);
+                touch_y = FIXED3(data & 0xffff);
                 
                 if(flip_sides)
                 {
@@ -1820,31 +1825,27 @@ static int brickmania_game_loop(void)
 
                 if(pad_pos_x < 0)
                     pad_pos_x = 0;
-                else if(pad_pos_x+pad_width > GAMESCREEN_WIDTH)
+                else if(pad_pos_x + pad_width > GAMESCREEN_WIDTH)
                     pad_pos_x = GAMESCREEN_WIDTH-pad_width;
-                for(k=0;k<used_balls;k++)
+                for(k=0; k<used_balls; k++)
                     if (game_state==ST_READY || ball[k].glue)
-                        ball[k].pos_x = pad_pos_x+pad_width/2;
-
-                if(button & BUTTON_REL)
-                    button = SELECT;
+                        ball[k].pos_x = pad_pos_x + pad_width/2 - HALFBALL;
             }
             else
-            {
 #endif
-                move_button=rb->button_status();
+            {
+                int button_right, button_left;
 #ifdef ALTRIGHT
-                button_right=(  (move_button & RIGHT) || 
-                                (move_button & ALTRIGHT));
-                button_left=((move_button & LEFT) || (move_button & ALTLEFT));
+                button_right =  move_button & (RIGHT | ALTRIGHT);
+                button_left  =  move_button & (LEFT | ALTLEFT);
 #else
-                button_right=((move_button & RIGHT) || (SCROLL_FWD(button)));
-                button_left=((move_button & LEFT) || (SCROLL_BACK(button)));
+                button_right =((move_button & RIGHT)|| SCROLL_FWD(move_button));
+                button_left  =((move_button & LEFT) ||SCROLL_BACK(move_button));
 #endif
                 if ((game_state==ST_PAUSE) && (button_right || button_left))
                     continue;
-                if ((button_right && flip_sides==false) ||
-                    (button_left && flip_sides==true)) 
+                if ((button_right && !flip_sides) ||
+                    (button_left && flip_sides)) 
                 {
                     if (pad_pos_x+SPEED_PAD+pad_width > GAMESCREEN_WIDTH) 
                     {
@@ -1861,8 +1862,8 @@ static int brickmania_game_loop(void)
                         pad_pos_x+=SPEED_PAD;
                     }
                 }
-                else if ((button_left && flip_sides==false) ||
-                         (button_right && flip_sides==true)) 
+                else if ((button_left && !flip_sides) ||
+                         (button_right && flip_sides)) 
                 {
                     if (pad_pos_x-SPEED_PAD < 0) 
                     {
@@ -1879,17 +1880,20 @@ static int brickmania_game_loop(void)
                         pad_pos_x-=SPEED_PAD;
                     }
                 }
-#ifdef HAVE_TOUCHSCREEN
             }
+            
+            switch(button) 
+            {
+#if defined(HAVE_TOUCHSCREEN)
+                case (BUTTON_REL | BUTTON_TOUCHSCREEN):
 #endif
-
-
-            switch(button) {
                 case UP:
                 case SELECT:
-                    if (game_state==ST_READY) {
+                    if (game_state==ST_READY) 
+                    {
                         /* Initialize used balls starting speed */
-                        for(k=0 ; k < used_balls ; k++) {
+                        for(k=0 ; k < used_balls ; k++) 
+                        {
                             ball[k].speedy = SPEED_4Q_Y;
                             if(pad_pos_x + (pad_width/2) >= GAMESCREEN_WIDTH/2)
                             {
@@ -1955,15 +1959,17 @@ static int brickmania_game_loop(void)
                            INT3(GAMESCREEN_HEIGHT - GAMEOVER_HEIGHT)/2,
                            INT3(GAMEOVER_WIDTH),INT3(GAMEOVER_HEIGHT) );
 #endif
-            rb->splash(HZ*2, s);
             rb->lcd_update();
             brickmania_sleep(2);
             return 0;
         }
+        
+        /* Game always needs to yield for other threads */
+        rb->yield();
+        
+        /* Sleep for a bit if there is time to spare */
         if (end > *rb->current_tick)
             rb->sleep(end-*rb->current_tick);
-        else
-            rb->yield();
     }
     return 0;
 }
