@@ -44,6 +44,10 @@
 
 #define ICON_PADDING 1
 
+#define UPDATE_RTL(vp) \
+        (vp)->flags &= ~VP_IS_RTL; \
+        (vp)->flags |= lang_is_rtl() ? VP_IS_RTL : 0;
+
 /* these are static to make scrolling work */
 static struct viewport list_text[NB_SCREENS], title_text[NB_SCREENS];
 
@@ -76,12 +80,14 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
     if (!list_display_title(list, screen))
         return false;
     *title_text_vp = *(list->parent[screen]);
+    UPDATE_RTL(title_text_vp);
     title_text_vp->height = font_get(title_text_vp->font)->height;
 
     if (list->title_icon != Icon_NOICON && global_settings.show_icons)
     {
         struct viewport title_icon = *title_text_vp;
 
+        UPDATE_RTL(&title_icon);
         title_icon.width = get_icon_width(screen) + ICON_PADDING * 2;
         if (lang_is_rtl())
         {
@@ -132,6 +138,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     display->clear_viewport();
     display->scroll_stop(list_text_vp);
     *list_text_vp = *parent;
+    UPDATE_RTL(list_text_vp);
     if ((show_title = draw_title(display, list)))
     {
         list_text_vp->y += line_height;
@@ -172,6 +179,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 
     /* setup icon placement */
     list_icons = *list_text_vp;
+    UPDATE_RTL(&list_icons);
     int icon_count = global_settings.show_icons &&
             (list->callback_get_item_icon != NULL) ? 1 : 0;
     if (show_cursor)

@@ -26,12 +26,15 @@
 #include "cpu.h"
 #include "config.h"
 
+#define VP_IS_RTL 0x01
+
 struct viewport {
     int x;
     int y;
     int width;
     int height;
 #ifdef HAVE_LCD_BITMAP
+    int flags;
     int font;
     int drawmode;
 #endif
