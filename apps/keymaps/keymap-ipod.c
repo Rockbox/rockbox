@@ -213,28 +213,34 @@ static const struct button_mapping button_context_usb_hid[] = {
     LAST_ITEM_IN_LIST
 }; /* button_context_usb_hid */
 
+#ifdef HAVE_USB_HID_MOUSE
 static const struct button_mapping button_context_usb_hid_mouse[] = {
-    { ACTION_USB_HID_MOUSE_UP,              BUTTON_MENU,                              BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_UP_REP,          BUTTON_MENU|BUTTON_REPEAT,                BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_DOWN,            BUTTON_PLAY,                              BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_DOWN_REP,        BUTTON_PLAY|BUTTON_REPEAT,                BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_LEFT,            BUTTON_LEFT,                              BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_LEFT_REP,        BUTTON_LEFT|BUTTON_REPEAT,                BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_RIGHT,           BUTTON_RIGHT,                             BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_RIGHT_REP,       BUTTON_RIGHT|BUTTON_REPEAT,               BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_LDRAG_UP,        BUTTON_SELECT|BUTTON_MENU,                BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_LDRAG_UP_REP,    BUTTON_SELECT|BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_LDRAG_DOWN,      BUTTON_SELECT|BUTTON_PLAY,                BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_LDRAG_DOWN_REP,  BUTTON_SELECT|BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_LDRAG_LEFT,      BUTTON_SELECT|BUTTON_LEFT,                BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_LDRAG_LEFT_REP,  BUTTON_SELECT|BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_LDRAG_RIGHT,     BUTTON_SELECT|BUTTON_RIGHT,               BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_LDRAG_RIGHT_REP, BUTTON_SELECT|BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_BUTTON_LEFT,     BUTTON_SELECT,                            BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_BUTTON_LEFT_REL, BUTTON_SELECT|BUTTON_REL,                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_UP,                BUTTON_MENU,                              BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_UP_REP,            BUTTON_MENU|BUTTON_REPEAT,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN,              BUTTON_PLAY,                              BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN_REP,          BUTTON_PLAY|BUTTON_REPEAT,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LEFT,              BUTTON_LEFT,                              BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LEFT_REP,          BUTTON_LEFT|BUTTON_REPEAT,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RIGHT,             BUTTON_RIGHT,                             BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RIGHT_REP,         BUTTON_RIGHT|BUTTON_REPEAT,               BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_LEFT,       BUTTON_SELECT,                            BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_LEFT_REL,   BUTTON_SELECT|BUTTON_REL,                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_UP,          BUTTON_SELECT|BUTTON_MENU,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_UP_REP,      BUTTON_SELECT|BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_DOWN,        BUTTON_SELECT|BUTTON_PLAY,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_DOWN_REP,    BUTTON_SELECT|BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_LEFT,        BUTTON_SELECT|BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_LEFT_REP,    BUTTON_SELECT|BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_RIGHT,       BUTTON_SELECT|BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_RIGHT_REP,   BUTTON_SELECT|BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_UP,   BUTTON_SCROLL_BACK,                       BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_UP,   BUTTON_SCROLL_BACK|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_DOWN, BUTTON_SCROLL_FWD,                        BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_DOWN, BUTTON_SCROLL_FWD|BUTTON_REPEAT,          BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
 }; /* button_context_usb_hid_mouse */
+#endif
 #endif
 
 #if BUTTON_REMOTE != 0
@@ -284,6 +290,37 @@ static const struct button_mapping remote_button_context_usb_hid[] = {
 
     LAST_ITEM_IN_LIST
 }; /* remote_button_context_usb_hid */
+
+#if 0 /* Pending P#10623: Improved accessory support and detection for Ipod */
+#ifdef HAVE_USB_HID_MOUSE
+static const struct button_mapping remote_button_context_usb_hid_mouse[] = {
+    { ACTION_USB_HID_MOUSE_UP,                BUTTON_RC_MENU,                                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_UP_REP,            BUTTON_RC_MENU|BUTTON_REPEAT,                   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN,              BUTTON_RC_PLAY,                                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN_REP,          BUTTON_RC_PLAY|BUTTON_REPEAT,                   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LEFT,              BUTTON_RC_LEFT,                                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LEFT_REP,          BUTTON_RC_LEFT|BUTTON_REPEAT,                   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RIGHT,             BUTTON_RC_RIGHT,                                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RIGHT_REP,         BUTTON_RC_RIGHT|BUTTON_REPEAT,                  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_LEFT,       BUTTON_RC_SELECT,                               BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_LEFT_REL,   BUTTON_RC_SELECT|BUTTON_REL,                    BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_UP,          BUTTON_RC_SELECT|BUTTON_RC_MENU,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_UP_REP,      BUTTON_RC_SELECT|BUTTON_RC_MENU|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_DOWN,        BUTTON_RC_SELECT|BUTTON_RC_PLAY,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_DOWN_REP,    BUTTON_RC_SELECT|BUTTON_RC_PLAY|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_LEFT,        BUTTON_RC_SELECT|BUTTON_RC_LEFT,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_LEFT_REP,    BUTTON_RC_SELECT|BUTTON_RC_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_RIGHT,       BUTTON_RC_SELECT|BUTTON_RC_RIGHT,               BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_RIGHT_REP,   BUTTON_RC_SELECT|BUTTON_RC_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_UP,   BUTTON_RC_VOL_UP,                               BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_UP,   BUTTON_RC_VOL_UP|BUTTON_REPEAT,                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_DOWN, BUTTON_RC_VOL_DOWN,                             BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_DOWN, BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,               BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
+}; /* remote_button_context_usb_hid_mouse */
+#endif
+#endif /* if 0 */
 #endif
 
 static const struct button_mapping* get_context_mapping_remote( int context )
@@ -297,6 +334,12 @@ static const struct button_mapping* get_context_mapping_remote( int context )
 #ifdef USB_ENABLE_HID
         case CONTEXT_USB_HID:
             return remote_button_context_usb_hid;
+#if 0 /* Pending P#10623: Improved accessory support and detection for Ipod */
+#ifdef HAVE_USB_HID_MOUSE
+        case CONTEXT_USB_HID_MOUSE:
+            return remote_button_context_usb_hid_mouse;
+#endif
+#endif /* If 0 */
 #endif
         default:
             return remote_button_context_standard;
@@ -353,8 +396,10 @@ const struct button_mapping* get_context_mapping(int context)
 #ifdef USB_ENABLE_HID
         case CONTEXT_USB_HID:
             return button_context_usb_hid;
+#ifdef HAVE_USB_HID_MOUSE
         case CONTEXT_USB_HID_MOUSE:
             return button_context_usb_hid_mouse;
+#endif
 #endif
         default:
             return button_context_standard;

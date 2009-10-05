@@ -357,6 +357,41 @@ static const struct button_mapping button_context_usb_hid[] = {
     LAST_ITEM_IN_LIST
 }; /* button_context_usb_hid */
 
+#ifdef HAVE_USB_HID_MOUSE
+static const struct button_mapping button_context_usb_hid_mouse[] = {
+    { ACTION_USB_HID_MOUSE_UP,               BUTTON_SCROLL_UP,                              BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_UP_REP,           BUTTON_SCROLL_UP|BUTTON_REPEAT,                BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN,             BUTTON_SCROLL_DOWN,                            BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN_REP,         BUTTON_SCROLL_DOWN|BUTTON_REPEAT,              BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LEFT,             BUTTON_LEFT,                                   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LEFT_REP,         BUTTON_LEFT|BUTTON_REPEAT,                     BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RIGHT,            BUTTON_RIGHT,                                  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RIGHT_REP,        BUTTON_RIGHT|BUTTON_REPEAT,                    BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_LEFT,      BUTTON_POWER,                                  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_LEFT_REL,  BUTTON_POWER|BUTTON_REL,                       BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_UP,         BUTTON_POWER|BUTTON_SCROLL_UP,                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_UP_REP,     BUTTON_POWER|BUTTON_SCROLL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_DOWN,       BUTTON_POWER|BUTTON_SCROLL_DOWN,               BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_DOWN_REP,   BUTTON_POWER|BUTTON_SCROLL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_LEFT,       BUTTON_POWER|BUTTON_LEFT,                      BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_LEFT_REP,   BUTTON_POWER|BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_RIGHT,      BUTTON_POWER|BUTTON_RIGHT,                     BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_RIGHT_REP,  BUTTON_POWER|BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_RIGHT,     BUTTON_PLAY,                                   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_RIGHT_REL, BUTTON_PLAY|BUTTON_REL,                        BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_UP,         BUTTON_PLAY|BUTTON_UP,                         BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_UP_REP,     BUTTON_PLAY|BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_DOWN,       BUTTON_PLAY|BUTTON_DOWN,                       BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_DOWN_REP,   BUTTON_PLAY|BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_LEFT,       BUTTON_PLAY|BUTTON_LEFT,                       BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_LEFT_REP,   BUTTON_PLAY|BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_RIGHT,      BUTTON_PLAY|BUTTON_RIGHT,                      BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RDRAG_RIGHT_REP,  BUTTON_PLAY|BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
+}; /* button_context_usb_hid_mouse */
+#endif
+
 static const struct button_mapping remote_button_context_usb_hid[] = {
     { ACTION_USB_HID_INC,        BUTTON_RC_VOL_UP,                 BUTTON_NONE },
     { ACTION_USB_HID_INC,        BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
@@ -463,6 +498,10 @@ const struct button_mapping* get_context_mapping(int context)
 #ifdef USB_ENABLE_HID
         case CONTEXT_USB_HID:
             return button_context_usb_hid;
+#ifdef HAVE_USB_HID_MOUSE
+        case CONTEXT_USB_HID_MOUSE:
+            return button_context_usb_hid_mouse;
+#endif
 #endif
         default:
             return button_context_standard;
