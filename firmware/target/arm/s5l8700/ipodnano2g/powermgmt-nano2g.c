@@ -20,9 +20,8 @@
  ****************************************************************************/
 
 #include "config.h"
-#include "adc.h"
-#include "adc-target.h"
 #include "powermgmt.h"
+#include "pmu-target.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
@@ -52,14 +51,14 @@ const unsigned short percent_to_volt_charge[11] =
 };
 #endif /* CONFIG_CHARGING */
 
-/* ADC should read 0x3ff=5.12V */
-#define BATTERY_SCALE_FACTOR 5125       
+/* ADC should read 0x3ff=6.00V */
+#define BATTERY_SCALE_FACTOR 6000
 /* full-scale ADC readout (2^10) in millivolt */
 
 
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    return 4000;
+    return pmu_read_battery_voltage();
 }
 

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 by Dave Chapman
+ * Copyright © 2009 Michael Sparmann
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,36 +18,18 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdbool.h>
+
+#ifndef __PMU_NANO2G_H__
+#define __PMU_NANO2G_H__
 
 #include "config.h"
-#include "backlight.h"
-#include "backlight-target.h"
-#include "pmu-target.h"
 
+unsigned char pmu_read(int address);
+void pmu_write(int address, unsigned char val);
+void pmu_read_multiple(int address, int count, unsigned char* buffer);
+void pmu_write_multiple(int address, int count, unsigned char* buffer);
+int pmu_read_battery_voltage(void);
+int pmu_read_battery_current(void);
+void pmu_init(void);
 
-void _backlight_set_brightness(int brightness)
-{
-    (void)brightness;
-}
-
-void _backlight_on(void)
-{
-    pmu_write(0x29, 1);
-}
-
-void _backlight_off(void)
-{
-    pmu_write(0x29, 0);
-}
-
-bool _backlight_init(void)
-{
-    pmu_write(0x2a, 6);
-    pmu_write(0x28, 0x2e);
-    pmu_write(0x2b, 20);
-
-    _backlight_on();
-
-    return true;
-}
+#endif
