@@ -185,12 +185,35 @@ this option \setting{On}. If it is not required, then turning this setting
 \opt{usb_hid}{
   \subsection{USB keypad Mode}
     This setting control the keypad mode when the \dap{} is attached to a
-    computer through USB. The \dap{} registers itself as a USB keyboard (in
-    addition to being identified as a mass-storage device). Pressing a button
-    on the \dap{} sends a keystroke the computer the \dap{} is attached to,
-    according to the mapping set by the keypad mode.
-    The \dap{}'s keys can be mapped in different sets (modes) to achieve
-    different functionality. The following modes are available:
+    computer through USB. Pressing a key on the \dap{} sends a keystroke the
+    computer the \dap{} is attached to, according to the mapping set by the
+    keypad mode.  There are different modes which provide different
+    functionality.
+    \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
+        ,MROBE100_PAD}{%
+    Switching modes back and forth is done by pressing the
+        \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec} %
+        \opt{GIGABEAT_S_PAD,SANSA_CLIP_PAD,MROBE100_PAD}{\ButtonPower} %
+    and %
+        \opt{SANSA_E200_PAD,SANSA_C200_PAD}{Long \ButtonRec} %
+        \opt{GIGABEAT_S_PAD,SANSA_CLIP_PAD,MROBE100_PAD}{Long \ButtonPower} %
+    keys, respectively.%
+    }%
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H10_PAD}{%
+    Switching modes is done by pressing the
+        \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu} %
+        \opt{IRIVER_H10_PAD}{Long \ButtonPower} %
+    key.%
+    }%
+    \opt{HAVEREMOTEKEYMAP}{
+    Remote %
+        \opt{GIGABEAT_S_PAD}{\ButtonRCDsp} %
+        % XXX: mr100 doesn't have manual/platform/remote-keymap-mrobe100.tex
+        \opt{MROBE100_PAD}{\btnfnt{Mode} and Long \btnfnt{Mode}} %
+    can also be used to switch modes.%
+    }%
+    \newline\newline
+    The following modes are available:
     \begin{description}
 
       \item [Multimedia: ]This mode lets you control the volume, playback, and
