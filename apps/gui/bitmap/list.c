@@ -355,13 +355,15 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                 return ACTION_NONE;
         }
         /* Scroll bar */
-        else if(global_settings.scrollbar == SCROLLBAR_LEFT)
+        /* TODO: Support RTL mode */
+        else if(global_settings.scrollbar == SCROLLBAR_SHOW)
             return gui_synclist_touchscreen_scrollbar(gui_list, y);
     }
     else
     {
+        /* TODO: Support RTL mode */
         if(x>list_text[screen].x+list_text[screen].width &&
-           global_settings.scrollbar == SCROLLBAR_RIGHT)
+           global_settings.scrollbar == SCROLLBAR_SHOW_OPPOSITE)
             return gui_synclist_touchscreen_scrollbar(gui_list, y);
 
         /* |--------------------------------------------------------|
