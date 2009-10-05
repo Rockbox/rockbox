@@ -450,7 +450,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                 return ACTION_NONE;
         }
         /* Everything above the items is cancel */
-        else if (y < list_text_vp->.y && button == BUTTON_REL)
+        else if (y < list_text_vp->y && button == BUTTON_REL)
             return ACTION_STD_CANCEL;
     }
     return ACTION_NONE;
