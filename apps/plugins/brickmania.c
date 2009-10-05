@@ -1141,6 +1141,9 @@ static int brickmania_find_empty_fire(void)
 
 void brick_hit(int brick_number)
 {
+    if(!brick[brick_number].used)
+        return;
+
     /* if this is a crackable brick hits starts as
      * greater than 0.
      */
@@ -1150,7 +1153,7 @@ void brick_hit(int brick_number)
         score+=2;
     }
     else {
-        brick[brick_number].used=0;
+        brick[brick_number].used=false;
         /* Was there a powerup on the brick? */
         if (brick[brick_number].power<10) {
             /* Activate the powerup */
