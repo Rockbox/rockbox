@@ -28,7 +28,7 @@ my %user2num =
 
 if(!$ARGV[0]) {
     print <<MOO
-Usage: genlang [options] <langv4 file>
+Usage: genlang [options] <langv2 file>
 
  -p=<prefix>
     Make the tool create a [prefix].c and [prefix].h file.
