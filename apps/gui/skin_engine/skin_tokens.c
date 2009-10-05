@@ -329,8 +329,9 @@ const char *get_token_value(struct gui_wps *gwps,
             
         case WPS_TOKEN_ALBUMART_DISPLAY:
             if (!data->albumart)
-                return NULL;            
-            data->albumart->draw = true;
+                return NULL;        
+			if (!data->albumart->draw)
+				data->albumart->draw = true;
             return NULL;
 #endif
 

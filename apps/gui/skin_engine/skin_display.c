@@ -270,9 +270,11 @@ static void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
     }
 #ifdef HAVE_ALBUMART
     /* now draw the AA */
-    if (data->albumart && data->albumart->vp == vp && data->albumart->draw)
+    if (data->albumart && data->albumart->vp == vp 
+	    && data->albumart->draw)
     {
         draw_album_art(gwps, audio_current_aa_hid(), false);
+		data->albumart->draw = false;
     }
 #endif
 
