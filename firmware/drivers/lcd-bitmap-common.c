@@ -27,7 +27,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifdef BOOTLOADER
+static int lang_is_rtl(void)
+{
+    return 0;
+}
+#else
 #include "language.h"
+#endif
 
 #ifndef LCDFN /* Not compiling for remote - define macros for main LCD. */
 #define LCDFN(fn) lcd_ ## fn
