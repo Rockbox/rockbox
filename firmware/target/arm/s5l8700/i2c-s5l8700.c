@@ -85,20 +85,20 @@ int i2c_write(unsigned char slave, int address, int len, const unsigned char *da
     IICDS = slave & ~1;
     IICSTAT = 0xF0;
     IICCON = 0xF3;
-    wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
+    while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
     
     if (address >= 0) {
         /* write address */
         IICDS = address;
         IICCON = 0xF3;
-        wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
+        while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
     }
     
     /* write data */
     while (len--) {
         IICDS = *data++;
         IICCON = 0xF3;
-        wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
+        while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
     }
 
     /* STOP */
@@ -119,23 +119,23 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
         IICDS = slave & ~1;
         IICSTAT = 0xF0;
         IICCON = 0xF3;
-        wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
+        while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
 
         /* write address */
         IICDS = address;
         IICCON = 0xF3;
-        wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
+        while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
     }
     
     /* (repeated) START */
     IICDS = slave | 1;
     IICSTAT = 0xB0;
     IICCON = 0xF3;
-    wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
+    while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
     
     while (len--) {
         IICCON = (len == 0) ? 0x73 : 0xF3; /* NACK or ACK */
-        wakeup_wait(&i2c_wakeup, TIMEOUT_BLOCK);
+        while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
         *data++ = IICDS;
     }
 
