@@ -125,12 +125,15 @@ void screen_put_iconxy(struct screen * display,
     const int screen = display->screen_type;
     const int width = ICON_WIDTH(screen);
     const int height = ICON_HEIGHT(screen);
+    const int is_rtl = lang_is_rtl();
     int stride;
     const struct bitmap *iconset;
     screen_bitmap_part_func *draw_func = NULL;
     
     if (icon == Icon_NOICON)
     {
+        if (is_rtl)
+            xpos = display->getwidth() - xpos - width;
         screen_clear_area(display, xpos, ypos, width, height);
         return;
     }
@@ -164,7 +167,7 @@ void screen_put_iconxy(struct screen * display,
     if (xpos == 0)
         xpos++;
 
-    if (lang_is_rtl())
+    if (is_rtl)
         xpos = display->getwidth() - xpos - width;
 
 #if (LCD_DEPTH == 16) || defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH == 16)
