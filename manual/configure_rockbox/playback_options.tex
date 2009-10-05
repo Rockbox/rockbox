@@ -16,22 +16,22 @@ you to configure settings related to audio playback.
   \setting{A-B}:
   \begin{description}
     %
-  \item[Off]The current playlist will not repeat when it is finished.
+  \item[Off.] The current playlist will not repeat when it is finished.
     \note{If you have the \setting{Auto-Change Directory} option set to
       \setting{Yes}, Rockbox will move on to the next directory on your
       hard drive. If the \setting{Auto-Change Directory} option is set to
       \setting{No}, playback will stop when the current directory or
       playlist is finished.}
     %
-  \item[All]The current playlist will repeat when it is finished.
+  \item[All.] The current playlist will repeat when it is finished.
 
     %
-  \item[One]Repeat one track over and over.
+  \item[One. ]Repeat one track over and over.
     %
-  \item[Shuffle]When the current playlist has finished playing, it will
+  \item[Shuffle.] When the current playlist has finished playing, it will
     be shuffled and then repeated.
     %
-  \item[A-B]Repeats between two user defined points within a track,
+  \item[A-B.] Repeats between two user defined points within a track,
     typically used by musicians when attempting to learn a piece of music.
     This option is more complicated to use than the others as the \dap\
     must first be placed into A-B repeat mode and then the start and end
@@ -105,7 +105,7 @@ you to configure settings related to audio playback.
 
     Options for crossfade settings are:
     \begin{description}
-      \item[Enable Crossfade]If set to \setting{Off}, crossfade is disabled.
+      \item[Enable Crossfade.] If set to \setting{Off}, crossfade is disabled.
         If set to \setting{Shuffle}, crossfade is enabled when the
         shuffle feature is set to \setting{Yes}, but disabled otherwise. If set
         to \setting{Track Skip Only}, tracks will only crossfade when manually
@@ -114,21 +114,21 @@ you to configure settings related to audio playback.
         \setting{Yes} and the track is manually skipped. If set to
         \setting{Always}, tracks will always crossfade into one another.
         %
-      \item[Fade In Delay]The ``fade in delay'' is the length of time between
+      \item[Fade In Delay.] The ``fade in delay'' is the length of time between
         when the crossfade process begins and when the new track begins to fade
         in.
         %
-      \item[Fade In Duration]The length of time, in seconds, that it takes
+      \item[Fade In Duration.] The length of time, in seconds, that it takes
         your music to fade in once the \setting{Fade In Delay} has ended.
         %
-      \item[Fade Out Delay]The ``fade out delay'' is the length of time
+      \item[Fade Out Delay.] The ``fade out delay'' is the length of time
         between when the crossfade process begins and when the old track begins
         to fade out.
         %
-      \item[Fade Out Duration]The length of time, in seconds, that it takes
+      \item[Fade Out Duration.] The length of time, in seconds, that it takes
         your music to fade out once the \setting{Fade Out Delay} has ended.
         %
-      \item[Fade Out Mode]If set to \setting{Crossfade}, one song will fade
+      \item[Fade Out Mode.] If set to \setting{Crossfade}, one song will fade
         out and the next song will simultaneously fade in. If set to 
         \setting{Mix}, the ending song will continue to play as normal until 
         its end, while the starting song will fade in from under it. 
@@ -158,30 +158,30 @@ you to configure settings related to audio playback.
       
     Options for replaygain are:
     \begin{description}
-      \item[Replaygain Type]Choose the type of replaygain to apply:
+      \item[Replaygain Type.] Choose the type of replaygain to apply:
         \begin{description}
-        \item[Album Gain]Maintain a constant volume level between
+        \item[Album Gain.] Maintain a constant volume level between
           albums, but keep any intentional volume variations between 
           songs in an album. (If album gain value is not available,
           uses track gain information).
           %
-        \item[Track Gain]Maintain a constant volume level between
+        \item[Track Gain.] Maintain a constant volume level between
           tracks. If track gain value is not available, no replaygain 
           is applied.
           %
-        \item[Track Gain If Shuffling]Maintains a constant volume
+        \item[Track Gain If Shuffling.] Maintains a constant volume
           between tracks if \setting{Shuffle} is set to \setting{Yes}.
           Reverts to album mode if \setting{Shuffle} is set to \setting{No}.
           %
-        \item[Off]Do not process replaygain information, i.e. turn off
+        \item[Off.] Do not process replaygain information, i.e. turn off
           the replaygain function.
         \end{description}
         %
-      \item[Prevent Clipping]Avoid clipping of a song's waveform.
+      \item[Prevent Clipping.] Avoid clipping of a song's waveform.
         If a song would clip during playback, the volume is lowered for 
         that song. Replaygain information is needed for this to work.
         %
-      \item[Pre-amp]This allows you to adjust the volume when replaygain
+      \item[Pre-amp.] This allows you to adjust the volume when replaygain
         is applied. Replaygain often lowers the volume, sometimes quite
         much, so here you can compensate for that. Please note that a
         (large) positive pre-amp setting can cause clipping, unless
@@ -225,7 +225,7 @@ you to configure settings related to audio playback.
   socket.
   %
   \begin{description}
-  \item[Pause on Headphone Unplug]Options for automatic pause:
+  \item[Pause on Headphone Unplug.] Options for automatic pause:
     \begin{description}
     \item[Off.] Disables automatic pause.
       %
@@ -234,10 +234,10 @@ you to configure settings related to audio playback.
     \item[Pause and Resume.] Pauses when the headphones are removed, and 
       resumes playback when they are reconnected.
   \end{description}
-  \item[Duration to Rewind] Number of seconds (between 0 and 15) to rewind 
+  \item[Duration to Rewind.] Number of seconds (between 0 and 15) to rewind 
     playback when the headphones are removed.
     %
-  \item[Disable Auto-Resume If Phones Not Present] This option will disable 
+  \item[Disable Auto-Resume If Phones Not Present.] This option will disable 
     the automatic resumption of playback at startup if the headphones are not 
     connected to the \dap{}.
     \note{This requires \setting{Resume on Startup} to be enabled.}

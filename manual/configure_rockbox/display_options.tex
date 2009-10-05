@@ -3,38 +3,38 @@
   
   \begin{description}
 
-  \item[LCD Settings:]
+  \item[LCD Settings.]
     This sub menu contains settings that relate to the display of the \dap.
     \begin{description}
     \opt{HAVE_BACKLIGHT}{
-      \item[Backlight:]
+      \item[Backlight.]
       The amount of time the backlight shines after a key press. If set to
       \setting{Off}, the backlight will not light when a button is pressed. If
       set to \setting{On}, the backlight will never shut off. If set to a time
       (1 to 90 seconds), the backlight will stay lit for that amount of time
       after a button press.
-      \item[Backlight (While Plugged In):]
+      \item[Backlight (While Plugged In).]
       This setting is equivalent to the \setting{Backlight} setting except it
       applies when the \dap{} is plugged into the charger.
-      \item[Backlight on Hold:]
+      \item[Backlight on Hold.]
       This setting controls the behavior of the backlight when the Hold switch
       is toggled. If set to \setting{Normal} the backlight will behave as usual.
       If set to \setting{Off} the backlight will be turned off immediately when
       the Hold switch is engaged and if set to \setting{On} the backlight will
       be turned on and stay on while the Hold switch is engaged.
-      \item[Caption Backlight:]
+      \item[Caption Backlight.]
       This option turns on the backlight a number of seconds before the start
       of a new track, and keeps it on for the same number of seconds after the
       beginning so that the display can be read to see song information. The
       amount of time is determined by the value of the backlight timeout
       setting, but is no less than 5 seconds.
       \opt{backlight_fade_int}{
-        \item[Backlight Fade In:]
+        \item[Backlight Fade In.]
         The amount of time that the backlight will take to fade from off to on
         after a button is pressed. If set to \setting{Off} the backlight will
         turn on immediately, with no fade in. Can also be set to \setting{500ms},
         \setting{1s} or \setting{2s}.
-        \item[Backlight Fade Out:]
+        \item[Backlight Fade Out.]
         Like Backlight fade in, this controls the amount of time that the
         backlight will take to fade from on to off after a button is pressed. If
         set to \setting{Off} the backlight will turn off immediately, with no
@@ -42,22 +42,22 @@
         \setting{2s}, \setting{3s}, \setting{4s}, \setting{5s} or \setting{10s}.
       }
       \opt{backlight_fade_bool}{
-        \item[Backlight Fade In:]
+        \item[Backlight Fade In.]
         This options turns on smooth backlight fading when the backlight is
         turning on. The fading time may dependent on the brightness level you
         have chosen. If it is turned off, the backlight will turn on immediately.
-        \item[Backlight Fade Out:]
+        \item[Backlight Fade Out.]
         This options turns on smooth backlight fading when the backlight is
         turning off. The fading time may dependent on the brightness level you
         have chosen. If it is turned off, the backlight will turn off immediately.
       }
-      \item[First Keypress Enables Backlight Only:]
+      \item[First Keypress Enables Backlight Only.]
       With this option enabled the first keypress while the backlight is turned
       off will only turn the backlight on without having any other effect. When
       disabled the first keypress will \emph{also} perform its appropriate action.
       
       \opt{lcd_sleep}{
-        \item[Sleep (After Backlight Off):]
+        \item[Sleep (After Backlight Off).]
         This setting controls how long rockbox will wait before turning off the
         display after the backlight is turned off. Turning off the display
         saves a little bit of battery power but turning on the display takes
@@ -65,25 +65,25 @@
       }
       
       \opt{backlight_brightness}{
-        \item[Brightness:]
+        \item[Brightness.]
         Changes the brightness of your LCD display.
       }
     } % \opt{HAVE_BACKLIGHT}
     
     \opt{archos,h100,ipodmini,ipod3g,ipod4g,x5}{
-      \item[Contrast:]
+      \item[Contrast.]
       Changes the contrast of your LCD display.
       \warn{Setting the contrast too dark or too light can make it hard to
         find this menu option again!}
     } % \opt{archos,h100,ipodmini,ipod4g,x5}
 
     \opt{lcd_invert}{
-      \item[LCD Mode:]
+      \item[LCD Mode.]
       This setting lets you invert the colours of the display.
     }
 
     \opt{lcd_flip}{
-      \item[Upside Down:]
+      \item[Upside Down.]
       Displays the screen so that the top of the display is nearest the buttons.
       This is sometimes useful when carrying the \dap{} in a pocket for easy
       access to the headphone socket.
@@ -91,68 +91,68 @@
     \end{description}
 %
   \opt{HAVE_REMOTE_LCD}{
-    \item[Remote-LCD Settings:]
+    \item[Remote-LCD Settings.]
     This sub menu contains settings that relate to the display of the remote.
       \begin{description}
-      \item[Backlight:]
+      \item[Backlight.]
         Similar to the main unit backlight this option controls the backlight
         timeout for the remote control. The remote backlight is independent
         from the main unit backlight.
-      \item[Backlight on When Plugged:]
+      \item[Backlight on When Plugged.]
         This controls the backlight when the \dap\ is plugged into the charger.
-      \item[Caption Backlight:]
+      \item[Caption Backlight.]
         This option turns on the backlight a number of seconds before the start
         of a new track, and keeps it on for the same number of seconds after the
         beginning so that the display can be read to see song information. The
         amount of time is determined by the value of the backlight timeout
         setting, but is no less than 5 seconds.
-        \item[First Keypress Enables Backlight Only:]
+        \item[First Keypress Enables Backlight Only.]
           This controls what happens when you press a button on your remote
           while the backlight is turned off. Like for the main unit, if this
           setting is set to \setting{Yes}, the first keypress will light up the
           remote backlight, but have no other effect. If set to \setting{No},
           the first keypress will light up the remote backlight
           \emph{and} engage the function of the key that is pressed.
-       \item[Contrast:]
+       \item[Contrast.]
          Changes the contrast of your remote's LCD display.
          \warn{Setting the contrast too dark or too light can make it hard to
            find this menu option again!}
-       \item[LCD Mode:]
+       \item[LCD Mode.]
          This setting lets you invert the whole screen, so now you get a
          black background and light text and graphics.
-       \item[Upside Down:]
+       \item[Upside Down.]
          Displays the screen so that the top of the display is nearest 
          the buttons. This is sometimes useful when carrying the \dap\ in a
          pocket for easy access to the headphone socket.
        \opt{h100,h300}{
-         \item[Reduce Ticking:]
+         \item[Reduce Ticking.]
            Enable this option if you can hear a ticking sound in your headphones
            when using your remote.
        }
     \end{description}
   }
 %
-  \item[Scrolling]
+  \item[Scrolling.]
     This feature controls how text will scroll in Rockbox. You can configure
     the following parameters:
     \begin{description}
-    \item[Scroll Speed:]
+    \item[Scroll Speed.]
       Sets how many times per second the automatic horizontal scrolling text 
       will move a step.
-    \item[Scroll Start Delay:]
+    \item[Scroll Start Delay.]
       Controls how many milliseconds Rockbox should wait before a new
       text begins automatically scrolling.
     \opt{lcd_bitmap}{
-      \item[Scroll Step Size:]
+      \item[Scroll Step Size.]
         Defines the number of pixels the text should move for each step, as used
         by the Scroll Speed setting.
     }
     \opt{HAVE_REMOTE_LCD}{
-      \item[Remote Scrolling Options:]
+      \item[Remote Scrolling Options.]
         The options here have the same effect on the remote LCD as the options
         mentioned above have on the main LCD.
     }
-    \item[Bidirectional Scroll Limit:]
+    \item[Bidirectional Scroll Limit.]
       Rockbox has two different automatic horizontal scrolling methods: 1) always
       scrolling the text to the left until the line has ended and then beginning
       again at the start, and 2) moving to the left until you can read the end of
@@ -161,7 +161,7 @@
       scroll to the left. This setting lets you tell Rockbox where that limit
       is, expressed in percentage of the line length.
     \opt{lcd_bitmap}{
-      \item[Screen Scrolls Out of View:]
+      \item[Screen Scrolls Out of View.]
         Screens can be manually scrolled horizontally by pressing
         \opt{recorder,recorderv2fm}{\ButtonOn+\ButtonRight/\ButtonLeft}
         \opt{ondio}{\ButtonMenu+\ButtonRight/\ButtonLeft}
@@ -172,50 +172,50 @@
         will keep the list entries at their fixed positions and allow them to be
         scrolled out of view, whereas \setting{No} will only scroll those entries
         which surpass the right margin.
-      \item[Screen Scroll Step Size:]
+      \item[Screen Scroll Step Size.]
         Defines the number of pixels the horizontal manual screen scroll should move
         for each step.
     }
     \opt{player}{
-      \item[Jump Scroll:]
+      \item[Jump Scroll.]
         This setting makes text scroll a page at a time instead of a character
         at a time. If set to \setting{One time}, \setting{2}, \setting{3} or
         \setting{4} it will scroll a line in paged mode that many times and
         then scroll it a character at a time. If set to \setting{Always} lines
         will always scroll in paged mode.
-      \item[Jump Scroll Delay:]
+      \item[Jump Scroll Delay.]
         Controls how long the delay is before a page is scrolled.
     }
-    \item[Paged Scrolling:]
+    \item[Paged Scrolling.]
       When set to \setting{Yes} scrolling vertically on pages that surpass the
       screen size will page up/down instead of simply changing lines. This can be
       useful on slow displays.
     \end{description}
 %
   \opt{lcd_bitmap}{
-    \item[Peak Meter:]
+    \item[Peak Meter.]
       The peak meter can be configured with a number of parameters. 
       \begin{description}
-      \item[Peak Release:]
+      \item[Peak Release.]
         This determines how fast the bar shrinks when the music becomes
         softer. Lower values make the peak meter look smoother.
         Expressed in scale units per 10ms.
-      \item[Peak Hold Time:]
+      \item[Peak Hold Time.]
         Specifies the time after which the peak indicator will reset.
         For example, if you set this value to 5s, the peak indicator displays
         the loudest volume value that occurred within the last 5 seconds.
         Larger values are useful if you want to find the peak level of a song,
         which might be of interest when copying music from the \dap\ via the
         analogue output to some other recording device.
-      \item[Clip Hold Time:]
+      \item[Clip Hold Time.]
         The number of seconds that the clipping indicator will be visible
         after clipping is detected.
       \opt{recording}{  
-        \item[Clip Counter:]
+        \item[Clip Counter.]
           Show the number of times the clip indicator went active during
           recording in front of the peak meters.
       }
-      \item[\label{ref:Peakmetersetting}Scale:]
+      \item[\label{ref:Peakmetersetting}Scale.]
         Select whether the peak meter displays linear or logarithmic values.
         The human ear perceives loudness on a logarithmic scale. If the Scale
         setting is set to \setting{Logarithmic} (dB) scale, the volume values
@@ -225,7 +225,7 @@
         you should choose \setting{Linear} display. This setting cannot be
         displayed in units like volts or watts because such units depend
         on your headphones.
-      \item[Minimum and maximum range:]
+      \item[Minimum and maximum range.]
         These two options define the full value range that the peak meter
         displays. Recommended values for the \setting{Logarithmic} (dB) setting
         are {}-40 dB for minimum and 0 dB for maximum. Recommended values
@@ -236,7 +236,7 @@
         into the peak meter.
       \end{description}
     }
-    \item[\label{ref:Defaultcodepage}Default Codepage:]
+    \item[\label{ref:Defaultcodepage}Default Codepage.]
       A codepage describes the way extended characters that are not available
       within the ASCII character set are encoded. ID3v1 tags do not have a
       codepage encoding contained so Rockbox needs to know what encoding has
