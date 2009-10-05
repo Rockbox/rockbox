@@ -1816,7 +1816,7 @@ static int brickmania_game_loop(void)
                 
                 if(flip_sides)
                 {
-                    pad_pos_x = GAMESCREEN_WIDTH - (touch_x - pad_width/2);
+                    pad_pos_x = GAMESCREEN_WIDTH - (touch_x + pad_width/2);
                 }
                 else
                 {
