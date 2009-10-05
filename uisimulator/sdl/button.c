@@ -1211,7 +1211,13 @@ void button_event(int key, bool pressed)
 #ifdef HAVE_BUTTON_DATA
 int button_read_device(int* data)
 {
-    (void)data;
+#if defined(HAVE_TOUCHSCREEN)
+    *data=mouse_coords;
+#else
+    /* pass scrollwheel acceleration to the button driver */
+    *data = 1<<24;
+#endif
+
 #else
 int button_read_device(void)
 {
@@ -1264,19 +1270,7 @@ void mouse_tick_task(void)
             printf("Mouse at: (%d, %d)\n", x, y);
     }
 }
-
 #endif
-
-intptr_t button_get_data_sdl(void)
-{
-#ifdef HAVE_TOUCHSCREEN
-    /* pass the mouse coordinates to the button driver */
-    return mouse_coords;
-#else
-    /* pass scrollwheel acceleration to the button driver */
-    return 1<<24;
-#endif
-}
 
 void button_init_sdl(void)
 {

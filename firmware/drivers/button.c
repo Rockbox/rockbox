@@ -385,11 +385,7 @@ long button_get_w_tmo(int ticks)
 
 intptr_t button_get_data(void)
 {
-#if defined(SIMULATOR)
-    return button_get_data_sdl();
-#else
     return button_data;
-#endif
 }
 
 void button_init(void)
