@@ -34,6 +34,9 @@
 #include "settings.h"
 #include "pcmbuf.h"
 #include "misc.h"
+#if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
+#include "language.h"
+#endif
 
 static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
                                                     work on startup */
@@ -55,6 +58,20 @@ static bool keys_locked = false;
 static int unlock_combo = BUTTON_NONE;
 static bool screen_has_lock = false;
 #endif /* HAVE_SOFTWARE_KEYLOCK */
+
+#if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
+/*
+ * checks whether the given language and context combination require that the
+ * button is horizontally inverted to support RTL language
+ *
+ */
+static bool rtl_button_flip_needed(int context)
+{
+    return lang_is_rtl() && ((context == CONTEXT_STD) ||
+            (context & CONTEXT_TREE) || (context & CONTEXT_MAINMENU) ||
+            (context & CONTEXT_TREE));
+}
+#endif
 
 /*
  * do_button_check is the worker function for get_default_action.
@@ -200,6 +217,11 @@ static int get_action_worker(int context, int timeout,
     }
     context &= ~ALLOW_SOFTLOCK;
 #endif /* HAS_BUTTON_HOLD */
+
+#if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
+        if (rtl_button_flip_needed(context))
+            button = button_flip_horizontally(button);
+#endif
 
     /*   logf("%x,%x",last_button,button); */
     while (1)
