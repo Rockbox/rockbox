@@ -55,7 +55,7 @@
 #include "system.h"
 #include "statusbar.h"
 #include "appevents.h"
-
+#include "language.h"
 
 static int statusbar_enabled = 0;
 
@@ -147,6 +147,9 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
     else
 #endif
         viewport_set_fullscreen(vp, screen);
+
+    vp->flags &= ~VP_IS_RTL;
+    vp->flags |= lang_is_rtl() ? VP_IS_RTL : 0;
 }
 
 void viewportmanager_init(void)
