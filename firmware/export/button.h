@@ -37,6 +37,9 @@ long button_get (bool block);
 long button_get_w_tmo(int ticks);
 intptr_t button_get_data(void);
 int button_status(void);
+#ifdef HAVE_BUTTON_DATA
+int button_status_wdata(int *pdata);
+#endif
 void button_clear_queue(void);
 #ifdef HAVE_LCD_BITMAP
 void button_set_flip(bool flip); /* turn 180 degrees */

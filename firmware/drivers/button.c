@@ -86,6 +86,7 @@ static int button_read(void);
 
 #ifdef HAVE_TOUCHSCREEN
 static int last_touchscreen_touch;
+static int lastdata = 0;
 #endif    
 #if defined(HAVE_HEADPHONE_DETECTION)
 static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
@@ -304,6 +305,7 @@ static void button_tick(void)
         }
     }
     lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
+    lastdata = data;
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -574,6 +576,14 @@ int button_status(void)
 {
     return lastbtn;
 }
+
+#ifdef HAVE_BUTTON_DATA
+int button_status_wdata(int *pdata)
+{
+    *pdata = lastdata;
+    return lastbtn;
+}
+#endif
 
 void button_clear_queue(void)
 {

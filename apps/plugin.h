@@ -836,6 +836,8 @@ struct plugin_api {
     const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+       
+    int (*button_status_wdata)(int *pdata);
 };
 
 /* plugin header */
