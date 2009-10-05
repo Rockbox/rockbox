@@ -135,9 +135,8 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     start = list->start_item[screen];
     end = start + viewport_get_nb_lines(&list_text[screen]);
 
-    scrollbar_in_left  =
-        (!is_rtl && global_settings.scrollbar == SCROLLBAR_SHOW) ||
-        (is_rtl && global_settings.scrollbar == SCROLLBAR_SHOW_OPPOSITE);
+    scrollbar_in_left  = (global_settings.scrollbar == SCROLLBAR_LEFT);
+
     /* draw the scrollbar if its needed */
     if (global_settings.scrollbar &&
         viewport_get_nb_lines(&list_text[screen]) < list->nb_items)
@@ -358,15 +357,13 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                 return ACTION_NONE;
         }
         /* Scroll bar */
-        /* TODO: Support RTL mode */
-        else if(global_settings.scrollbar == SCROLLBAR_SHOW)
+        else if(global_settings.scrollbar == SCROLLBAR_LEFT)
             return gui_synclist_touchscreen_scrollbar(gui_list, y);
     }
     else
     {
-        /* TODO: Support RTL mode */
         if(x>list_text[screen].x+list_text[screen].width &&
-           global_settings.scrollbar == SCROLLBAR_SHOW_OPPOSITE)
+           global_settings.scrollbar == SCROLLBAR_RIGHT)
             return gui_synclist_touchscreen_scrollbar(gui_list, y);
 
         /* |--------------------------------------------------------|
@@ -414,8 +411,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                an item when he wanted to use the scrollbar, due to touchscreen
                dead zones)
              */
-            /* TODO: Support RTL mode */
-            if(global_settings.scrollbar == SCROLLBAR_SHOW_OPPOSITE &&
+            if(global_settings.scrollbar == SCROLLBAR_RIGHT &&
                x > list_text[screen].x + list_text[screen].width -
                    get_icon_width(SCREEN_MAIN))
                 return ACTION_NONE;
