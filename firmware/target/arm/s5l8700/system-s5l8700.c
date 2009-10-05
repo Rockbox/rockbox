@@ -154,20 +154,19 @@ void system_init(void)
 
 void system_reboot(void)
 {
-#ifdef IPODNANO2G
+#ifdef IPOD_NANO2G
     if (ftl_sync() != 0) panicf("Failed to unmount flash!");
 
     /* Reset the SoC */
-    asm volatile(" \
-        msr CPSR_c, #0xd3 \
-        mov r5, #0x110000 \
-        add r5, r5, #0xff \
-        add r6, r5, #0xa00 \
-        mov r10, #0x3c800000 \
-        str r6, [r10] \
-        mov r6, #0xff0 \
-        str r6, [r10,#4] \
-        str r5, [r10]")
+    asm volatile("msr CPSR_c, #0xd3    \n"
+                 "mov r5, #0x110000    \n"
+                 "add r5, r5, #0xff    \n"
+                 "add r6, r5, #0xa00   \n"
+                 "mov r10, #0x3c800000 \n"
+                 "str r6, [r10]        \n"
+                 "mov r6, #0xff0       \n"
+                 "str r6, [r10,#4]     \n"
+                 "str r5, [r10]        \n");
 
     /* Wait for reboot to kick in */
     while(1);
