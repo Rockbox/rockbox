@@ -192,12 +192,17 @@ enum {  ALARM_START_WPS = 0,
    This helps to save space for menus and options. */
 
 #define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
+#if CONFIG_CPU==S5L8701
+/* the S5L8700 has IRAM at 0, so we use 0xffff bytes right after that */
+#define VIRT_PTR ((unsigned char*)0x2C000)
+#else
 #if CONFIG_CPU==DM320
 /* the DM320 has IRAM at 0, so we use 0xffff bytes right after that */
 #define VIRT_PTR ((unsigned char*)0x4000)
 #else
 /* a location where we won't store strings, 0 is the fastest */
 #define VIRT_PTR ((unsigned char*)0)
+#endif
 #endif
 
 /* form a "virtual pointer" out of a language ID */
