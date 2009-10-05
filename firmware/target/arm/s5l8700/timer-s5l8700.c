@@ -35,10 +35,10 @@
     TODO: investigate why the timer seems to count twice as fast as expected
 */
 
-void INT_TIMERD(void)
+void INT_TIMERC(void)
 {
     /* clear interrupt */
-    TDCON = TDCON;
+    TCCON = TCCON;
     
     if (pfn_timer != NULL) {
         pfn_timer();
@@ -52,7 +52,7 @@ bool timer_set(long cycles, bool start)
     long count;
 
     /* stop and clear timer */
-    TDCMD = (1 << 1);   /* TD_CLR */
+    TCCMD = (1 << 1);   /* TD_CLR */
 
     /* optionally unregister any previously registered timer user */
     if (start) {
@@ -78,27 +78,27 @@ bool timer_set(long cycles, bool start)
     }
 
     /* configure timer */
-    TDCON = (1 << 12) |     /* TD_INT0_EN */
+    TCCON = (1 << 12) |     /* TD_INT0_EN */
             (cs << 8) |     /* TS_CS */
             (0 << 4);       /* TD_MODE_SEL, 0 = interval mode */
-    TDPRE = prescale - 1;
-    TDDATA0 = count;
-    TDCMD = (1 << 0);       /* TD_ENABLE */
+    TCPRE = prescale - 1;
+    TCDATA0 = count;
+    TCCMD = (1 << 0);       /* TD_ENABLE */
 
     /* enable interrupt */
-    INTMSK |= (1 << 9);
+    INTMSK |=  INTMSK_TIMERC;
     
     return true;
 }
 
 bool timer_start(void)
 {
-    TDCMD = (1 << 0);       /* TD_ENABLE */
+    TCCMD = (1 << 0);       /* TD_ENABLE */
     return true;
 }
 
 void timer_stop(void)
 {
-    TDCMD = (0 << 0);       /* TD_ENABLE */
+    TCCMD = (0 << 0);       /* TD_ENABLE */
 }
 

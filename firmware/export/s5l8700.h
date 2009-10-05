@@ -126,10 +126,16 @@
 #define INTMOD                  (*(REG32_PTR_T)(0x39C00004))     /* Interrupt mode register. */
 #define INTMSK                  (*(REG32_PTR_T)(0x39C00008))     /* Determines which interrupt source is masked. The */
 #if CONFIG_CPU==S5L8701
+#define    INTMSK_TIMERA        (1<<5)
 #define    INTMSK_TIMERB        (1<<5)
+#define    INTMSK_TIMERC        (1<<5)
+#define    INTMSK_TIMERD        (1<<5)
 #define    INTMSK_ECC           (1<<19)
 #else
+#define    INTMSK_TIMERA        (1<<5)
 #define    INTMSK_TIMERB        (1<<7)
+#define    INTMSK_TIMERC        (1<<8)
+#define    INTMSK_TIMERD        (1<<9)
 #endif
 #define PRIORITY                (*(REG32_PTR_T)(0x39C0000C))     /* IRQ priority control register */
 #define INTPND                  (*(REG32_PTR_T)(0x39C00010))     /* Indicates the interrupt request status. */

@@ -64,14 +64,25 @@ default_interrupt(RESERVED2);
 default_interrupt(INT_MSTICK);
 default_interrupt(INT_ADC_WAKEUP);
 default_interrupt(INT_ADC);
+default_interrupt(INT_UNK1);
+default_interrupt(INT_UNK2);
+default_interrupt(INT_UNK3);
 
+
+void INT_TIMER(void)
+{
+    if (TACON & 0x00038000) INT_TIMERA();
+    if (TBCON & 0x00038000) INT_TIMERB();
+    if (TCCON & 0x00038000) INT_TIMERC();
+    if (TDCON & 0x00038000) INT_TIMERD();
+}
 
 
 #if CONFIG_CPU==S5L8701
 static void (* const irqvector[])(void) =
 { /* still 90% unverified and probably incorrect */
-    EXT0,EXT1,EXT2,EINT_VBUS,EINTG,INT_TIMERB,INT_WDT,INT_TIMERA,
-    INT_TIMERC,INT_TIMERD,INT_DMA,INT_ALARM_RTC,INT_PRI_RTC,RESERVED1,INT_UART,INT_USB_HOST,
+    EXT0,EXT1,EXT2,EINT_VBUS,EINTG,INT_TIMER,INT_WDT,INT_UNK1,
+    INT_UNK2,INT_UNK3,INT_DMA,INT_ALARM_RTC,INT_PRI_RTC,RESERVED1,INT_UART,INT_USB_HOST,
     INT_USB_FUNC,INT_LCDC_0,INT_LCDC_1,INT_CALM,INT_ATA,INT_UART0,INT_SPDIF_OUT,INT_ECC,
     INT_SDCI,INT_LCD,INT_SPI,INT_IIC,RESERVED2,INT_MSTICK,INT_ADC_WAKEUP,INT_ADC
 };
@@ -88,8 +99,8 @@ static void (* const irqvector[])(void) =
 #if CONFIG_CPU==S5L8701
 static const char * const irqname[] =
 { /* still 90% unverified and probably incorrect */
-    "EXT0","EXT1","EXT2","EINT_VBUS","EINTG","INT_TIMERB","INT_WDT","INT_TIMERA",
-    "INT_TIMERC","INT_TIMERD","INT_DMA","INT_ALARM_RTC","INT_PRI_RTC","Reserved","INT_UART","INT_USB_HOST",
+    "EXT0","EXT1","EXT2","EINT_VBUS","EINTG","INT_TIMER","INT_WDT","INT_UNK1",
+    "INT_UNK2","INT_UNK3","INT_DMA","INT_ALARM_RTC","INT_PRI_RTC","Reserved","INT_UART","INT_USB_HOST",
     "INT_USB_FUNC","INT_LCDC_0","INT_LCDC_1","INT_CALM","INT_ATA","INT_UART0","INT_SPDIF_OUT","INT_ECC",
     "INT_SDCI","INT_LCD","INT_SPI","INT_IIC","Reserved","INT_MSTICK","INT_ADC_WAKEUP","INT_ADC"
 };
