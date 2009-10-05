@@ -42,10 +42,7 @@ int button_status_wdata(int *pdata);
 #endif
 void button_clear_queue(void);
 #ifdef HAVE_LCD_BITMAP
-void button_set_flip_vertically(bool flip); /* turn 180 degrees */
-#ifndef BOOTLOADER
-int button_flip_horizontally(int button); /* for RTL mode */
-#endif
+void button_set_flip(bool flip); /* turn 180 degrees */
 #endif
 #ifdef HAVE_BACKLIGHT
 void set_backlight_filter_keypress(bool value);

@@ -846,7 +846,7 @@ void settings_apply(bool read_disk)
 #endif
 #ifdef HAVE_LCD_FLIP
     lcd_set_flip(global_settings.flip_display);
-    button_set_flip_vertically(global_settings.flip_display);
+    button_set_flip(global_settings.flip_display);
 #endif
     lcd_update(); /* refresh after flipping the screen */
     settings_apply_pm_range();

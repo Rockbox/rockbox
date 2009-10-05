@@ -437,7 +437,7 @@ void button_close(void)
 /*
  * helper function to swap LEFT/RIGHT, UP/DOWN (if present), and F1/F3 (Recorder)
  */
-static int button_flip_vertically(int button)
+static int button_flip(int button)
 {
     int newbutton;
 
@@ -507,48 +507,18 @@ static int button_flip_vertically(int button)
  * set the flip attribute
  * better only call this when the queue is empty
  */
-void button_set_flip_vertically(bool flip)
+void button_set_flip(bool flip)
 {
     if (flip != flipped) /* not the current setting */
     {
         /* avoid race condition with the button_tick() */
         int oldlevel = disable_irq_save();
-        lastbtn = button_flip_vertically(lastbtn);
+        lastbtn = button_flip(lastbtn);
         flipped = flip;
         restore_irq(oldlevel);
     }
 }
 #endif /* HAVE_LCD_FLIP */
-
-#if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
-/*
- * helper function to swap LEFT/RIGHT sides (for RTL mode)
- */
-int button_flip_horizontally(int button)
-{
-    int newbutton;
-
-    newbutton = button &
-        ~(BUTTON_LEFT | BUTTON_RIGHT
-#if defined(BUTTON_SCROLL_BACK) && defined(BUTTON_SCROLL_FWD)
-        | BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD
-#endif
-        );
-
-    if (button & BUTTON_LEFT)
-        newbutton |= BUTTON_RIGHT;
-    if (button & BUTTON_RIGHT)
-        newbutton |= BUTTON_LEFT;
-#if defined(BUTTON_SCROLL_BACK) && defined(BUTTON_SCROLL_FWD)
-    if (button & BUTTON_SCROLL_BACK)
-        newbutton |= BUTTON_SCROLL_FWD;
-    if (button & BUTTON_SCROLL_FWD)
-        newbutton |= BUTTON_SCROLL_BACK;
-#endif
-
-    return newbutton;
-}
-#endif
 
 #ifdef HAVE_BACKLIGHT
 void set_backlight_filter_keypress(bool value)
@@ -580,7 +550,7 @@ static int button_read(void)
 
 #ifdef HAVE_LCD_FLIP
     if (btn && flipped)
-        btn = button_flip_vertically(btn); /* swap upside down */
+        btn = button_flip(btn); /* swap upside down */
 #endif /* HAVE_LCD_FLIP */
 
 #ifdef HAVE_TOUCHSCREEN

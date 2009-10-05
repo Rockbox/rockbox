@@ -59,20 +59,6 @@ static int unlock_combo = BUTTON_NONE;
 static bool screen_has_lock = false;
 #endif /* HAVE_SOFTWARE_KEYLOCK */
 
-#if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
-/*
- * checks whether the given language and context combination require that the
- * button is horizontally inverted to support RTL language
- *
- */
-static bool rtl_button_flip_needed(int context)
-{
-    return lang_is_rtl() && ((context == CONTEXT_STD) ||
-            (context & CONTEXT_TREE) || (context & CONTEXT_MAINMENU) ||
-            (context & CONTEXT_TREE));
-}
-#endif
-
 /*
  * do_button_check is the worker function for get_default_action.
  * returns ACTION_UNKNOWN or the requested return value from the list.
@@ -99,6 +85,44 @@ static inline int do_button_check(const struct button_mapping *items,
     *start = i;
     return ret;
 }
+
+#if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
+/*
+ * button is horizontally inverted to support RTL language if the given language
+ * and context combination require that
+ */
+static int button_flip_horizontally(int context, int button)
+{
+    int newbutton;
+
+    if (!(lang_is_rtl() && ((context == CONTEXT_STD) ||
+        (context & CONTEXT_TREE) || (context & CONTEXT_MAINMENU) ||
+        (context & CONTEXT_TREE))))
+    {
+        return button;
+    }
+
+    newbutton = button &
+        ~(BUTTON_LEFT | BUTTON_RIGHT
+#if defined(BUTTON_SCROLL_BACK) && defined(BUTTON_SCROLL_FWD)
+        | BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD
+#endif
+        );
+
+    if (button & BUTTON_LEFT)
+        newbutton |= BUTTON_RIGHT;
+    if (button & BUTTON_RIGHT)
+        newbutton |= BUTTON_LEFT;
+#if defined(BUTTON_SCROLL_BACK) && defined(BUTTON_SCROLL_FWD)
+    if (button & BUTTON_SCROLL_BACK)
+        newbutton |= BUTTON_SCROLL_FWD;
+    if (button & BUTTON_SCROLL_FWD)
+        newbutton |= BUTTON_SCROLL_BACK;
+#endif
+
+    return newbutton;
+}
+#endif
 
 static inline int get_next_context(const struct button_mapping *items, int i)
 {
@@ -219,8 +243,7 @@ static int get_action_worker(int context, int timeout,
 #endif /* HAS_BUTTON_HOLD */
 
 #if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
-        if (rtl_button_flip_needed(context))
-            button = button_flip_horizontally(button);
+    button = button_flip_horizontally(context, button);
 #endif
 
     /*   logf("%x,%x",last_button,button); */
