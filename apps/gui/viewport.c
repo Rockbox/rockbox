@@ -55,7 +55,9 @@
 #include "system.h"
 #include "statusbar.h"
 #include "appevents.h"
+#ifdef HAVE_LCD_BITMAP
 #include "language.h"
+#endif
 
 static int statusbar_enabled = 0;
 
@@ -148,8 +150,10 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 #endif
         viewport_set_fullscreen(vp, screen);
 
+#ifdef HAVE_LCD_BITMAP
     vp->flags &= ~VP_IS_RTL;
     vp->flags |= lang_is_rtl() ? VP_IS_RTL : 0;
+#endif
 }
 
 void viewportmanager_init(void)
