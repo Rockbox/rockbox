@@ -47,12 +47,24 @@ static volatile int     locked = 0;
 static const struct div_entry {
     int             pdiv, mdiv, sdiv, cdiv;
 } div_table[HW_NUM_FREQ] = {
-    [HW_FREQ_11] = {  26,  189,    3,    8},
 #ifdef IPOD_NANO2G
-    [HW_FREQ_22] = {  5,   6,    3,    4},
-#else
-    [HW_FREQ_22] = {  50,   98,    2,    8},
+    [HW_FREQ_11] = {   2,   41,    5,    4},
+    [HW_FREQ_22] = {   2,   41,    4,    4},
+    [HW_FREQ_44] = {   2,   41,    3,    4},
+    [HW_FREQ_88] = {   2,   41,    2,    4},
+#if 0   /* disabled because the codec driver does not support it (yet) */
+    [HW_FREQ_8 ] = {   2,   12,    3,    9}
+    [HW_FREQ_16] = {   2,   12,    2,    9},
+    [HW_FREQ_32] = {   2,   12,    1,    9},
+    
+    [HW_FREQ_12] = {   2,   12,    4,    3},
+    [HW_FREQ_24] = {   2,   12,    3,    3},
+    [HW_FREQ_48] = {   2,   12,    2,    3},
+    [HW_FREQ_96] = {   2,   12,    1,    3},
 #endif
+#else
+    [HW_FREQ_11] = {  26,  189,    3,    8},
+    [HW_FREQ_22] = {  50,   98,    2,    8},
     [HW_FREQ_44] = {  37,  151,    1,    9},
     [HW_FREQ_88] = {  50,   98,    1,    4},
 #if 0   /* disabled because the codec driver does not support it (yet) */
@@ -64,6 +76,7 @@ static const struct div_entry {
     [HW_FREQ_24] = {  28,  192,    2,    8},
     [HW_FREQ_48] = {  28,  192,    2,    4},
     [HW_FREQ_96] = {  28,  192,    1,    4},
+#endif
 #endif
 };
 
@@ -121,6 +134,9 @@ void pcm_play_dma_start(const void *addr, size_t size)
                       dma_callback);
 
 #ifdef IPOD_NANO2G
+    PCON5 = (PCON5 & ~(0xFFFF0000)) | 0x77720000;
+    PCON6 = (PCON6 & ~(0x0F000000)) | 0x02000000;
+
     I2STXCON = (0x10 << 16) |  /* burst length */
                (0 << 15) |  /* 0 = falling edge */
                (0 << 13) |  /* 0 = basic I2S format */
@@ -186,7 +202,7 @@ void pcm_play_dma_init(void)
 {
     /* configure IIS pins */
 #ifdef IPOD_NANO2G
-    PCON5 = (PCON5 & ~(0xFFFFF000)) | 0x22220000;
+    PCON5 = (PCON5 & ~(0xFFFF0000)) | 0x22220000;
     PCON6 = (PCON6 & ~(0x0F000000)) | 0x02000000;
 #else
     PCON7 = (PCON7 & ~(0x0FFFFF00)) | 0x02222200;
@@ -216,17 +232,10 @@ void pcm_dma_apply_settings(void)
     PLLCON |= 4;
 
     /* configure PLL1 and MCLK for the desired sample rate */
-#ifdef IPOD_NANO2G
-    PLL1PMS = (2 << 16) | /* PDIV */
-              (12 << 8) | /* MDIV */
-              (2 << 0);   /* SDIV */
-    PLL1LCNT = 0x4d2;
-#else
     PLL1PMS = (div.pdiv << 16) |
               (div.mdiv << 8) |
               (div.sdiv << 0);
     PLL1LCNT = 7500;    /* no idea what to put here */
-#endif
 
     /* enable PLL1 and wait for lock */
     PLLCON |= (1 << 1);
@@ -237,16 +246,12 @@ void pcm_dma_apply_settings(void)
              (0 << 7) |         /* MCLK_MASK */
              (2 << 5) |         /* MCLK_SEL = PLL2 */
              (1 << 4) |         /* MCLK_DIV_ON */
-#ifdef IPOD_NANO2G
-             (3 - 1);           /* MCLK_DIV_VAL */
-#else
              (div.cdiv - 1);    /* MCLK_DIV_VAL */
-#endif
 }
 
 size_t pcm_get_bytes_waiting(void)
 {
-    return DMATCNT0 * 2;
+    return DMACTCNT0 * 2;
 }
 
 const void * pcm_play_dma_get_peak_buffer(int *count)

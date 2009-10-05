@@ -145,7 +145,12 @@ void audiohw_preinit(void)
 
     wm8975_write(DAPCTRL, wm8975_regs[DAPCTRL] );
 
+/* Still need to find out why this is neccessary */
+#ifdef IPOD_NANO2G
+    wmcodec_write(SAMPCTRL, 0);
+#else
     wmcodec_write(SAMPCTRL, WM8975_44100HZ);
+#endif
 
     /* set the volume to -6dB */
     wmcodec_write(LOUT1VOL, LOUT1VOL_LO1ZC | IPOD_PCM_LEVEL);
