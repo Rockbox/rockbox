@@ -4218,7 +4218,7 @@
   </source>
   <dest>
     *: none
-    rtc: "א'"
+    rtc: "'א"
   </dest>
   <voice>
     *: none
@@ -4235,7 +4235,7 @@
   </source>
   <dest>
     *: none
-    rtc: "ב'"
+    rtc: "'ב"
   </dest>
   <voice>
     *: none
@@ -4252,7 +4252,7 @@
   </source>
   <dest>
     *: none
-    rtc: "ג'"
+    rtc: "'ג"
   </dest>
   <voice>
     *: none
@@ -4269,7 +4269,7 @@
   </source>
   <dest>
     *: none
-    rtc: "ד'"
+    rtc: "'ד"
   </dest>
   <voice>
     *: none
@@ -4286,7 +4286,7 @@
   </source>
   <dest>
     *: none
-    rtc: "ה'"
+    rtc: "'ה"
   </dest>
   <voice>
     *: none
@@ -4303,7 +4303,7 @@
   </source>
   <dest>
     *: none
-    rtc: "ו'"
+    rtc: "'ו"
   </dest>
   <voice>
     *: none
