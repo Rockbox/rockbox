@@ -124,6 +124,21 @@ int read_uint32be(int fd, uint32_t* buf)
   *buf = betoh32(*buf);
   return n;
 }
+/* Read an unsigned 64-bit integer from a big-endian file. */
+int read_uint64be(int fd, uint64_t* buf)
+{
+  size_t n;
+  uint8_t data[8];
+  int i;
+
+  n = read(fd, data, 8);
+
+  for (i=0, *buf=0; i<=7; i++) {
+       *buf <<= 8;
+       *buf |= data[i];
+  }
+  return n;
+}
 #else
 /* Read unsigned integers from a little-endian file. */
 int read_uint16le(int fd, uint16_t* buf)

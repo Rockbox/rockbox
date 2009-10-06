@@ -42,6 +42,7 @@
 #define MP4_cART MP4_ID(0xa9, 'A', 'R', 'T')
 #define MP4_cgrp MP4_ID(0xa9, 'g', 'r', 'p')
 #define MP4_cgen MP4_ID(0xa9, 'g', 'e', 'n')
+#define MP4_chpl MP4_ID('c', 'h', 'p', 'l')
 #define MP4_cnam MP4_ID(0xa9, 'n', 'a', 'm')
 #define MP4_cwrt MP4_ID(0xa9, 'w', 'r', 't')
 #define MP4_ccmt MP4_ID(0xa9, 'c', 'm', 't')
@@ -679,6 +680,26 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
 
         case MP4_mdat:
             id3->filesize = size;
+            break;
+
+        case MP4_chpl:
+            {
+                /* ADDME: add support for real chapters. Right now it's only
+                 * used for Nero's gapless hack */
+                uint8_t chapters;
+                uint64_t timestamp;
+
+                lseek(fd, 8, SEEK_CUR);
+                read_uint8(fd, &chapters);
+                size -= 9;
+
+                /* the first chapter will be used as the lead_trim */
+                if (chapters > 0) {
+                    read_uint64be(fd, &timestamp);
+                    id3->lead_trim = (timestamp * id3->frequency) / 10000000;
+                    size -= 8;
+                }
+            }
             break;
 
         default:

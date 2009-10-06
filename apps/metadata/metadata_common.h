@@ -42,12 +42,14 @@ int read_uint8(int fd, uint8_t* buf);
 #ifdef ROCKBOX_BIG_ENDIAN
 #define read_uint16be(fd,buf) read((fd), (buf), 2)
 #define read_uint32be(fd,buf) read((fd), (buf), 4)
+#define read_uint64be(fd,buf) read((fd), (buf), 8)
 int read_uint16le(int fd, uint16_t* buf);
 int read_uint32le(int fd, uint32_t* buf);
 int read_uint64le(int fd, uint64_t* buf);
 #else
 int read_uint16be(int fd, uint16_t* buf);
 int read_uint32be(int fd, uint32_t* buf);
+int read_uint64be(int fd, uint64_t* buf);
 #define read_uint16le(fd,buf) read((fd), (buf), 2)
 #define read_uint32le(fd,buf) read((fd), (buf), 4)
 #define read_uint64le(fd,buf) read((fd), (buf), 8)
