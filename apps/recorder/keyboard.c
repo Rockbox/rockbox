@@ -408,7 +408,6 @@ int kbd_input(char* text, int buflen)
             pm->curfont = FONT_SYSFIXED;
         }
 
-        sc->setfont(pm->curfont);
         /* find max width of keyboard glyphs.
          * since we're going to be adding spaces,
          * max width is at least their width */
@@ -482,7 +481,7 @@ int kbd_input(char* text, int buflen)
     {
         struct keyboard_parameters *pm = &param[l];
         struct screen *sc = &screens[l];
-        int icon_w;
+        int icon_w, sc_w, sc_h;
 
         pm->text_w = pm->font_w;
 
@@ -497,10 +496,11 @@ int kbd_input(char* text, int buflen)
         }
 
         icon_w = get_icon_width(l);
-        pm->max_chars_text = (sc->getwidth() - icon_w * 2)
-                                / pm->text_w;
+        sc_w = sc->getwidth();
+        sc_h = sc->getheight();
+        pm->max_chars_text = (sc_w - icon_w * 2 - 2) / pm->text_w;
         if(pm->max_chars_text < 3 && icon_w > pm->text_w)
-            pm->max_chars_text = sc->getwidth() / pm->text_w - 2;
+            pm->max_chars_text = sc_w / pm->text_w - 2;
 
         if (!kbd_loaded)
         {
@@ -509,10 +509,10 @@ int kbd_input(char* text, int buflen)
         }
         else
         {
-            pm->lines = (sc->getheight() - BUTTONBAR_HEIGHT - statusbar_size)
+            pm->lines = (sc_h - BUTTONBAR_HEIGHT - statusbar_size)
                             / pm->font_h - 1;
-            pm->keyboard_margin = sc->getheight() - BUTTONBAR_HEIGHT -
-                                    statusbar_size - (pm->lines+1)*pm->font_h;
+            pm->keyboard_margin = sc_h - BUTTONBAR_HEIGHT - statusbar_size
+                                    - (pm->lines+1)*pm->font_h;
 
             if (pm->keyboard_margin < 3)
             {
@@ -537,7 +537,7 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_MORSE_INPUT
         pm->old_main_y = pm->main_y;
         if (morse_mode)
-            pm->main_y = sc->getheight() - pm->font_h;
+            pm->main_y = sc_h - pm->font_h;
 #endif
     }
 
@@ -729,8 +729,7 @@ int kbd_input(char* text, int buflen)
                 sc->vline(i, pm->main_y, pm->main_y + pm->font_h - 1);
 
             if (pm->hangul) /* draw underbar */
-                sc->hline(pm->curpos*text_w, (pm->curpos+1)*text_w,
-                          pm->main_y + pm->font_h - 1);
+                sc->hline(i - text_w, i, pm->main_y + pm->font_h - 1);
         }
 
         cur_blink = !cur_blink;
