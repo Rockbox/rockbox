@@ -544,10 +544,10 @@ bool set_time_screen(const char* title, struct tm *tm)
     unsigned int statusbar_height = 0;
     unsigned int separator_width, weekday_width;
     unsigned int prev_line_height;
-    static unsigned char daysinmonth[] = 
+    static unsigned char daysinmonth[] =
                               {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     unsigned char buffer[20];
-    struct viewport vp[NB_SCREENS];
+    struct viewport viewports[NB_SCREENS];
     int nb_lines;
 
     /* 6 possible cursor possitions, 2 values stored for each: x, y */
@@ -602,17 +602,19 @@ bool set_time_screen(const char* title, struct tm *tm)
 
         FOR_NB_SCREENS(s)
         {
-            viewport_set_defaults(&vp[s], s);
-            screens[s].set_viewport(&vp[s]);
-            nb_lines = viewport_get_nb_lines(&vp[s]);
-            
+            struct viewport *vp = &viewports[s];
+
+            viewport_set_defaults(vp, s);
+            screens[s].set_viewport(vp);
+            nb_lines = viewport_get_nb_lines(vp);
+
             /* minimum lines needed is 2 + title line */
             if (nb_lines < 4)
             {
-                vp[s].font = FONT_SYSFIXED;
-                nb_lines = viewport_get_nb_lines(&vp[s]);
+                vp->font = FONT_SYSFIXED;
+                nb_lines = viewport_get_nb_lines(vp);
             }
-            
+
             /* recalculate the positions and offsets */
             if (nb_lines >= 3)
                 screens[s].getstringsize(title, NULL, &prev_line_height);
@@ -640,7 +642,7 @@ bool set_time_screen(const char* title, struct tm *tm)
             }
 
             /* draw the screen */
-            screens[s].set_viewport(&vp[s]);
+            screens[s].set_viewport(vp);
             screens[s].clear_viewport();
             /* display the screen title */
             screens[s].puts_scroll(0, 0, title);
@@ -656,12 +658,12 @@ bool set_time_screen(const char* title, struct tm *tm)
             for(i=0; i<6; i++)
             {
                 if (cursorpos == (int)i)
-                    vp[s].drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
+                    vp->drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
 
-                screens[s].putsxy(cursor[i][INDEX_X], 
+                screens[s].putsxy(cursor[i][INDEX_X],
                                   cursor[i][INDEX_Y], ptr[i]);
 
-                vp[s].drawmode = DRMODE_SOLID;
+                vp->drawmode = DRMODE_SOLID;
 
                 screens[s].putsxy(cursor[i/4 +1][INDEX_X] - separator_width,
                                   cursor[0][INDEX_Y], SEPARATOR);
