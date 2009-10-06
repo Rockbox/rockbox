@@ -85,6 +85,14 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 
     ucs = bidi_l2v(str, 1);
 
+    if (VP_IS_RTL(current_vp))
+    {
+        int w;
+
+        LCDFN(getstringsize)(str, &w, NULL);
+        x = current_vp->width - w - x;
+    }
+
     while ((ch = *ucs++) != 0 && x < current_vp->width)
     {
         int width;
@@ -177,8 +185,6 @@ void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
     chars_in_str = utf8length((char *)str);
     LCDFN(getstringsize)(str, &w, &h);
     xpos = x * w / chars_in_str;
-    if (VP_IS_RTL(current_vp))
-        xpos = current_vp->width - w - xpos;
     ypos = y * h;
     LCDFN(putsxyofs_style)(xpos, ypos, str, style, w, h, offset);
 }
