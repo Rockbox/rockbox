@@ -121,10 +121,9 @@ int get_cpu_boost_counter(void);
     ptr = (typeof(ptr))tmp_ptr1; \
 }
 
-#ifndef __PCTOOL__
 
 /* newer? SDL includes endian.h, So we ignore it */
-#ifdef SIMULATOR
+#if defined(SIMULATOR) || defined(__PCTOOL__)
 #undef letoh16
 #undef letoh32
 #undef htole16
@@ -160,7 +159,6 @@ int get_cpu_boost_counter(void);
 #define swap_odd_even_le32(x) (x)
 #endif
 
-#endif
 
 /* static endianness conversion */
 #define SWAP_16(x) ((typeof(x))(unsigned short)(((unsigned short)(x) >> 8) | \
