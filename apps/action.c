@@ -96,15 +96,15 @@ static int button_flip_horizontally(int context, int button)
     int newbutton;
 
     if (!(lang_is_rtl() && ((context == CONTEXT_STD) ||
-        (context & CONTEXT_TREE) || (context & CONTEXT_MAINMENU) ||
-        (context & CONTEXT_TREE))))
+        (context & CONTEXT_TREE) || (context & CONTEXT_MAINMENU))))
     {
         return button;
     }
 
     newbutton = button &
         ~(BUTTON_LEFT | BUTTON_RIGHT
-#if defined(BUTTON_SCROLL_BACK) && defined(BUTTON_SCROLL_FWD)
+#if defined(BUTTON_SCROLL_BACK) && defined(BUTTON_SCROLL_FWD) && \
+    !defined(SIMULATOR)
         | BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD
 #endif
         );
@@ -113,7 +113,8 @@ static int button_flip_horizontally(int context, int button)
         newbutton |= BUTTON_RIGHT;
     if (button & BUTTON_RIGHT)
         newbutton |= BUTTON_LEFT;
-#if defined(BUTTON_SCROLL_BACK) && defined(BUTTON_SCROLL_FWD)
+#if defined(BUTTON_SCROLL_BACK) && defined(BUTTON_SCROLL_FWD) && \
+    !defined(SIMULATOR)
     if (button & BUTTON_SCROLL_BACK)
         newbutton |= BUTTON_SCROLL_FWD;
     if (button & BUTTON_SCROLL_FWD)
