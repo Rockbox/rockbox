@@ -160,10 +160,25 @@ static void talk_timedate(void)
     }
 }
 
+static void vp_puts_center(struct viewport *vp, struct screen *display, int line,
+        char *str)
+{
+    int w, offset;
+
+    display->getstringsize(str, &w, NULL);
+    if (w > vp->width)
+        display->puts_scroll(0, line, str);
+    else
+    {
+        offset = (vp->width - w)/2;
+        display->putsxy(offset, line * font_get(vp->font)->height, str);
+    }
+}
+
 static void draw_timedate(struct viewport *vp, struct screen *display)
 {
     struct tm *tm = get_time();
-    int w, line;
+    int line;
     char time[16], date[16];
     if (vp->height == 0)
         return;
@@ -193,18 +208,11 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
         snprintf(time, 16, "%s", "--:--:--");
         snprintf(date, 16, "%s", str(LANG_UNKNOWN));
     }
-    display->getstringsize(time, &w, NULL);
-    if (w > vp->width)
-        display->puts_scroll(0, line, time);
-    else
-        display->putsxy((vp->width - w)/2, line*font_get(vp->font)->height, time);
-    line++;
 
-    display->getstringsize(date, &w, NULL);
-    if (w > vp->width)
-        display->puts_scroll(0, line, date);
-    else
-        display->putsxy((vp->width - w)/2, line*font_get(vp->font)->height, date);
+    vp_puts_center(vp, display, line, time);
+    line++;
+    vp_puts_center(vp, display, line, date);
+
     display->update_viewport();
 }
 
