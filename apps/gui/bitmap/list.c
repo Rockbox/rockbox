@@ -84,11 +84,10 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
         title_icon.width = get_icon_width(screen) + ICON_PADDING * 2;
         if (VP_IS_RTL(&title_icon))
         {
-            title_icon.x = title_text_vp->width - title_icon.width;
+            title_icon.x += title_text_vp->width - title_icon.width;
         }
         else
         {
-            title_icon.x = ICON_PADDING;
             title_text_vp->x += title_icon.width;
         }
         title_text_vp->width -= title_icon.width;
