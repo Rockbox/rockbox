@@ -151,8 +151,8 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
         viewport_set_fullscreen(vp, screen);
 
 #ifdef HAVE_LCD_BITMAP
-    vp->flags &= ~VP_IS_RTL;
-    vp->flags |= lang_is_rtl() ? VP_IS_RTL : 0;
+    vp->flags &= ~VP_FLAG_IS_RTL;
+    vp->flags |= lang_is_rtl() ? VP_FLAG_IS_RTL : 0;
 #endif
 }
 

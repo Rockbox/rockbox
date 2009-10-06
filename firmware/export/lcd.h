@@ -26,7 +26,9 @@
 #include "cpu.h"
 #include "config.h"
 
-#define VP_IS_RTL 0x01
+#define VP_FLAG_IS_RTL 0x01
+
+#define VP_IS_RTL(vp) (((vp)->flags & VP_FLAG_IS_RTL) != 0)
 
 struct viewport {
     int x;

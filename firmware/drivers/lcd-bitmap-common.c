@@ -177,7 +177,7 @@ void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
     chars_in_str = utf8length((char *)str);
     LCDFN(getstringsize)(str, &w, &h);
     xpos = x * w / chars_in_str;
-    if (current_vp->flags & VP_IS_RTL)
+    if (VP_IS_RTL(current_vp))
         xpos = current_vp->width - w - xpos;
     ypos = y * h;
     LCDFN(putsxyofs_style)(xpos, ypos, str, style, w, h, offset);

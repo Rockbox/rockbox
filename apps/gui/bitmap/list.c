@@ -42,7 +42,6 @@
 #include "viewport.h"
 
 #define ICON_PADDING 1
-#define IS_RTL(vp) (((vp)->flags & VP_IS_RTL) != 0)
 
 /* these are static to make scrolling work */
 static struct viewport list_text[NB_SCREENS], title_text[NB_SCREENS];
@@ -83,7 +82,7 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
         struct viewport title_icon = *title_text_vp;
 
         title_icon.width = get_icon_width(screen) + ICON_PADDING * 2;
-        if (IS_RTL(&title_icon))
+        if (VP_IS_RTL(&title_icon))
         {
             title_icon.x = title_text_vp->width - title_icon.width;
         }
@@ -155,19 +154,19 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         else
             vp.x += list_text_vp->width;
         display->set_viewport(&vp);
-        gui_scrollbar_draw(display, IS_RTL(&vp) ? 1 : 0, 0, SCROLLBAR_WIDTH-1, vp.height,
+        gui_scrollbar_draw(display, VP_IS_RTL(&vp) ? 1 : 0, 0, SCROLLBAR_WIDTH-1, vp.height,
                 list->nb_items, list_start_item, list_start_item + end-start,
                 VERTICAL);
     }
     else if (show_title)
     {
         /* shift everything a bit in relation to the title... */
-        if (!IS_RTL(list_text_vp) && scrollbar_in_left)
+        if (!VP_IS_RTL(list_text_vp) && scrollbar_in_left)
         {
             list_text_vp->width -= SCROLLBAR_WIDTH;
             list_text_vp->x += SCROLLBAR_WIDTH;
         }
-        else if (IS_RTL(list_text_vp) && !scrollbar_in_left)
+        else if (VP_IS_RTL(list_text_vp) && !scrollbar_in_left)
         {
             list_text_vp->width -= SCROLLBAR_WIDTH;
         }
@@ -183,7 +182,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     {
         list_icons.width = icon_width * icon_count;
         list_text_vp->width -= list_icons.width + ICON_PADDING;
-        if (IS_RTL(&list_icons))
+        if (VP_IS_RTL(&list_icons))
             list_icons.x += list_text_vp->width + ICON_PADDING;
         else
             list_text_vp->x += list_icons.width + ICON_PADDING;
