@@ -1203,21 +1203,28 @@ void button_event(int key, bool pressed)
         break;
     }
     
+    /* Call to make up for scrollwheel target implementation.  This is
+     * not handled in the main button.c driver, but on the target
+     * implementation (look at button-e200.c for example if you are trying to 
+     * figure out why using button_get_data needed a hack before).
+     */
+#if defined(BUTTON_SCROLL_FWD) && defined(BUTTON_SCROLL_BACK)
+    if((new_btn == BUTTON_SCROLL_FWD || new_btn == BUTTON_SCROLL_BACK) && 
+        pressed)
+    {
+        queue_post(&button_queue, new_btn, 1<<24);
+    }
+#endif
+
     if (pressed)
         btn |= new_btn;
     else
         btn &= ~new_btn;
 }
-#ifdef HAVE_BUTTON_DATA
+#if defined(HAVE_BUTTON_DATA) && defined(HAVE_TOUCHSCREEN)
 int button_read_device(int* data)
 {
-#if defined(HAVE_TOUCHSCREEN)
-    *data=mouse_coords;
-#else
-    /* pass scrollwheel acceleration to the button driver */
-    *data = 1<<24;
-#endif
-
+    *data = mouse_coords;
 #else
 int button_read_device(void)
 {

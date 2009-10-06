@@ -34,7 +34,6 @@
 
 bool button_hold(void);
 void button_init_sdl(void);
-intptr_t button_get_data_sdl(void);
 #undef button_init_device
 #define button_init_device() button_init_sdl()
 
