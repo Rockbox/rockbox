@@ -603,9 +603,10 @@ bool set_time_screen(const char* title, struct tm *tm)
         FOR_NB_SCREENS(s)
         {
             struct viewport *vp = &viewports[s];
+            struct screen *screen = &screens[s];
 
             viewport_set_defaults(vp, s);
-            screens[s].set_viewport(vp);
+            screen->set_viewport(vp);
             nb_lines = viewport_get_nb_lines(vp);
 
             /* minimum lines needed is 2 + title line */
@@ -617,16 +618,16 @@ bool set_time_screen(const char* title, struct tm *tm)
 
             /* recalculate the positions and offsets */
             if (nb_lines >= 3)
-                screens[s].getstringsize(title, NULL, &prev_line_height);
+                screen->getstringsize(title, NULL, &prev_line_height);
             else
                 prev_line_height = 0;
 
-            screens[s].getstringsize(SEPARATOR, &separator_width, NULL);
+            screen->getstringsize(SEPARATOR, &separator_width, NULL);
 
             /* weekday */
-            screens[s].getstringsize(str(LANG_WEEKDAY_SUNDAY + tm->tm_wday),
+            screen->getstringsize(str(LANG_WEEKDAY_SUNDAY + tm->tm_wday),
                                      &weekday_width, NULL);
-            screens[s].getstringsize(" ", &separator_width, NULL);
+            screen->getstringsize(" ", &separator_width, NULL);
 
             for(i=0, j=0; i < 6; i++)
             {
@@ -635,21 +636,21 @@ bool set_time_screen(const char* title, struct tm *tm)
                     j = weekday_width + separator_width;
                     prev_line_height *= 2;
                 }
-                screens[s].getstringsize(ptr[i], &width, NULL);
+                screen->getstringsize(ptr[i], &width, NULL);
                 cursor[i][INDEX_Y] = prev_line_height + statusbar_height;
                 cursor[i][INDEX_X] = j;
                 j += width + separator_width;
             }
 
             /* draw the screen */
-            screens[s].set_viewport(vp);
-            screens[s].clear_viewport();
+            screen->set_viewport(vp);
+            screen->clear_viewport();
             /* display the screen title */
-            screens[s].puts_scroll(0, 0, title);
+            screen->puts_scroll(0, 0, title);
 
             /* these are not selectable, so we draw them outside the loop */
             /* name of the week day */
-            screens[s].putsxy(0, cursor[3][INDEX_Y],
+            screen->putsxy(0, cursor[3][INDEX_Y],
                               str(LANG_WEEKDAY_SUNDAY + tm->tm_wday));
 
             /* draw the selected item with drawmode set to
@@ -660,22 +661,22 @@ bool set_time_screen(const char* title, struct tm *tm)
                 if (cursorpos == (int)i)
                     vp->drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
 
-                screens[s].putsxy(cursor[i][INDEX_X],
+                screen->putsxy(cursor[i][INDEX_X],
                                   cursor[i][INDEX_Y], ptr[i]);
 
                 vp->drawmode = DRMODE_SOLID;
 
-                screens[s].putsxy(cursor[i/4 +1][INDEX_X] - separator_width,
+                screen->putsxy(cursor[i/4 +1][INDEX_X] - separator_width,
                                   cursor[0][INDEX_Y], SEPARATOR);
             }
 
             /* print help text */
             if (nb_lines > 4)
-                screens[s].puts(0, 4, str(LANG_TIME_SET_BUTTON));
+                screen->puts(0, 4, str(LANG_TIME_SET_BUTTON));
             if (nb_lines > 5)
-                screens[s].puts(0, 5, str(LANG_TIME_REVERT));
-            screens[s].update_viewport();
-            screens[s].set_viewport(NULL);
+                screen->puts(0, 5, str(LANG_TIME_REVERT));
+            screen->update_viewport();
+            screen->set_viewport(NULL);
         }
 
         /* set the most common numbers */
