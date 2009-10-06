@@ -190,18 +190,19 @@ this option \setting{On}. If it is not required, then turning this setting
     keypad mode.  There are different modes which provide different
     functionality.
     \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
-        ,MROBE100_PAD}{%
+        ,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}{%
     Switching modes back and forth is done by pressing the
         \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec} %
         \opt{GIGABEAT_S_PAD,SANSA_CLIP_PAD,MROBE100_PAD}{\ButtonPower} %
+        \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonSelect+\ButtonRight} %
     and %
         \opt{SANSA_E200_PAD,SANSA_C200_PAD}{Long \ButtonRec} %
         \opt{GIGABEAT_S_PAD,SANSA_CLIP_PAD,MROBE100_PAD}{Long \ButtonPower} %
+        \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonSelect+\ButtonLeft} %
     keys, respectively.%
     }%
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H10_PAD}{%
+    \opt{IRIVER_H10_PAD}{%
     Switching modes is done by pressing the
-        \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu} %
         \opt{IRIVER_H10_PAD}{Long \ButtonPower} %
     key.%
     }%
@@ -334,7 +335,8 @@ this option \setting{On}. If it is not required, then turning this setting
             % Screen white
             \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
               {Long \ButtonDown}
-            \opt{MROBE100_PAD}{Long \ButtonMenu}
+            \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
+              {Long \ButtonMenu}
             \opt{HAVEREMOTEKEYMAP}{& }
             & White screen \\
             %
