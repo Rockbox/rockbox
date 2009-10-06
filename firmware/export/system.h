@@ -230,10 +230,9 @@ enum {
     MAXMEMGUARD
 };
 
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) && !defined(__PCTOOL__) 
 #include "system-target.h"
 #else /* SIMULATOR */
-
 static inline uint16_t swap16(uint16_t value)
     /*
       result[15..8] = value[ 7..0];

@@ -42,6 +42,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "inttypes.h"
+#include "system.h"
 #ifndef PLUGIN
 #include "debug.h"
 #endif
@@ -58,10 +59,8 @@
 #endif
 #ifndef __PCTOOL__
 #include "config.h"
-#include "system.h"
 #include "resize.h"
 #else
-#include "checkwps.h"
 #undef DEBUGF
 #define DEBUGF(...)
 #endif

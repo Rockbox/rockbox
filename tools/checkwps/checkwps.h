@@ -27,12 +27,4 @@
 
 #define SYSFONT_HEIGHT 8
 
-#ifndef MIN
-#define MIN(a, b) (((a)<(b))?(a):(b))
-#endif
-
-#ifndef BIT_N
-#define BIT_N(n) (1U << (n))
-#endif
-
 #endif
