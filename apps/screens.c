@@ -64,6 +64,7 @@
 #include "backdrop.h"
 #include "viewport.h"
 #include "appevents.h"
+#include "language.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bitmaps/usblogo.h"
@@ -532,29 +533,35 @@ static void say_time(int cursorpos, const struct tm *tm)
 #define INDEX_Y 1
 
 #define SEPARATOR ":"
+
+#define IDX_HOURS   0
+#define IDX_MINUTES 1
+#define IDX_SECONDS 2
+#define IDX_YEAR    3
+#define IDX_MONTH   4
+#define IDX_DAY     5
+
+#define OFF_HOURS   0
+#define OFF_MINUTES 3
+#define OFF_SECONDS 6
+#define OFF_YEAR    9
+#define OFF_DAY     14
+
 bool set_time_screen(const char* title, struct tm *tm)
 {
     bool done = false;
-    int button;
-    unsigned int i, j, s;
     int cursorpos = 0;
-    unsigned int realyear;
-    unsigned int width;
-    unsigned int min, max;
     unsigned int statusbar_height = 0;
-    unsigned int separator_width, weekday_width;
-    unsigned int prev_line_height;
-    static unsigned char daysinmonth[] =
-                              {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    unsigned char buffer[20];
-    struct viewport viewports[NB_SCREENS];
-    int nb_lines;
+    unsigned char offsets_ptr[] =
+        { OFF_HOURS, OFF_MINUTES, OFF_SECONDS, OFF_YEAR, 0, OFF_DAY };
 
-    /* 6 possible cursor possitions, 2 values stored for each: x, y */
-    unsigned int cursor[6][2];
-
-    int *valptr = NULL;
-    unsigned char *ptr[6];
+    if (lang_is_rtl())
+    {
+        offsets_ptr[IDX_HOURS] = OFF_SECONDS;
+        offsets_ptr[IDX_SECONDS] = OFF_HOURS;
+        offsets_ptr[IDX_YEAR] = OFF_DAY;
+        offsets_ptr[IDX_DAY] = OFF_YEAR;
+    }
 
     if(global_settings.statusbar)
         statusbar_height = STATUSBAR_HEIGHT;
@@ -563,13 +570,18 @@ bool set_time_screen(const char* title, struct tm *tm)
     say_time(cursorpos, tm);
 
     while (!done) {
+        int button;
+        unsigned int i, s, realyear, min, max;
+        unsigned char *ptr[6];
+        unsigned char buffer[20];
+        int *valptr = NULL;
+        static unsigned char daysinmonth[] =
+            {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
         /* for easy acess in the drawing loop */
-        ptr[0] = buffer;                     /* hours */
-        ptr[1] = buffer + 3;                 /* minutes */
-        ptr[2] = buffer + 6;                 /* seconds */
-        ptr[3] = buffer + 9;                 /* year */
-        ptr[4] = str(LANG_MONTH_JANUARY + tm->tm_mon); /* monthname */
-        ptr[5] = buffer + 14;                /* day of month */
+        for (i = 0; i < 6; i++)
+            ptr[i] = buffer + offsets_ptr[i];
+        ptr[IDX_MONTH] = str(LANG_MONTH_JANUARY + tm->tm_mon); /* month name */
 
         /* calculate the number of days in febuary */
         realyear = tm->tm_year + 1900;
@@ -602,8 +614,16 @@ bool set_time_screen(const char* title, struct tm *tm)
 
         FOR_NB_SCREENS(s)
         {
+            int pos, nb_lines;
+            unsigned int separator_width, weekday_width;
+            unsigned int j, width, prev_line_height;
+            struct viewport viewports[NB_SCREENS];
+            /* 6 possible cursor possitions, 2 values stored for each: x, y */
+            unsigned int cursor[6][2];
             struct viewport *vp = &viewports[s];
             struct screen *screen = &screens[s];
+            static unsigned char rtl_idx[] =
+                { IDX_SECONDS, IDX_MINUTES, IDX_HOURS, IDX_DAY, IDX_MONTH, IDX_YEAR };
 
             viewport_set_defaults(vp, s);
             screen->set_viewport(vp);
@@ -653,12 +673,13 @@ bool set_time_screen(const char* title, struct tm *tm)
             screen->putsxy(0, cursor[3][INDEX_Y],
                               str(LANG_WEEKDAY_SUNDAY + tm->tm_wday));
 
+            pos = lang_is_rtl() ? rtl_idx[cursorpos] : cursorpos;
             /* draw the selected item with drawmode set to
                 DRMODE_SOLID|DRMODE_INVERSEVID, all other selectable
                 items with drawmode DRMODE_SOLID */
             for(i=0; i<6; i++)
             {
-                if (cursorpos == (int)i)
+                if (pos == (int)i)
                     vp->drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
 
                 screen->putsxy(cursor[i][INDEX_X],
