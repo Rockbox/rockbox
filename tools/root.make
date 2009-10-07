@@ -67,6 +67,8 @@ else ifneq (,$(findstring bootbox,$(APPSDIR)))
   include $(APPSDIR)/bootbox.make
 else ifneq (,$(findstring checkwps,$(APPSDIR)))
   include $(APPSDIR)/checkwps.make
+else ifneq (,$(findstring database,$(APPSDIR)))
+  include $(APPSDIR)/database.make
 else
   include $(APPSDIR)/apps.make
   include $(APPSDIR)/lang/lang.make

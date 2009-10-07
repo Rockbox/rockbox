@@ -1,5 +1,6 @@
 /* A _very_ skeleton file to demonstrate building tagcache db on host. */
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <sys/stat.h>
 #include "tagcache.h"

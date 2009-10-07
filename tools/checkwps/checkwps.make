@@ -16,7 +16,8 @@ INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(ROOTDIR)/firmware/export \
            -I$(ROOTDIR)/apps \
            -I$(ROOTDIR)/apps/recorder \
-           -I$(APPSDIR)
+           -I$(APPSDIR) \
+           -I$(BUILDDIR)
 
 # Makes mkdepfile happy
 GCCOPTS+=-D__PCTOOL__

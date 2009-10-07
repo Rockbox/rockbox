@@ -22,9 +22,7 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#ifndef __PCTOOL__
 #include "autoconf.h"
-#endif
 
 /* symbolic names for multiple choice configurations: */
 
@@ -620,7 +618,7 @@ Lyre prototype 1*/
 /* Enable the directory cache and tagcache in RAM if we have
  * plenty of RAM. Both features can be enabled independently. */
 #if ((defined(MEMORYSIZE) && (MEMORYSIZE >= 8)) || MEM >= 8) && \
- !defined(BOOTLOADER)
+ !defined(BOOTLOADER) && !defined(__PCTOOL__)
 #define HAVE_DIRCACHE
 #ifdef HAVE_TAGCACHE
 #define HAVE_TC_RAMCACHE

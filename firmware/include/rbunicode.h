@@ -28,9 +28,7 @@
 #ifndef _RBUNICODE_H_
 #define _RBUNICODE_H_
  
-#ifndef __PCTOOL__
 #include "config.h"
-#endif
 
 #define MASK   0xC0 /* 11000000 */
 #define COMP   0x80 /* 10x      */

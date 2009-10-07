@@ -2,7 +2,7 @@
    non-reentrant.  Instead, its address is returned by the function
    __errno.  */
    
-#if defined(SIMULATOR) && !defined(__MINGW32__) && !defined(__CYGWIN__)
+#if (defined(SIMULATOR)||defined(__PCTOOL__)) && !defined(__MINGW32__) && !defined(__CYGWIN__)
 
 #include "/usr/include/errno.h"  /* use the host system implementation */
 

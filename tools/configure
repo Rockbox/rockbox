@@ -2451,7 +2451,7 @@ esac
 if [ "$ARG_TYPE" ]; then
   btype=$ARG_TYPE
 else
-  echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, (C)heckWPS, $gdbstub(M)anual: (Defaults to N)"
+  echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, (C)heckWPS, (D)atabase tool, $gdbstub(M)anual: (Defaults to N)"
   btype=`input`;
 fi
 
@@ -2542,6 +2542,17 @@ fi
       output='checkwps.'${modelname};
       archosrom='';
       echo "CheckWPS build selected"
+      ;;
+    [Dd])
+      uname=`uname`
+      simcc "database"
+      toolset='';
+      t_cpu='';
+      GCCOPTS='';
+      appsdir='\$(ROOTDIR)/tools/database';
+      output='database.'${modelname};
+      archosrom='';
+      echo "Database tool build selected"
       ;;
     *)
       if [ "$modelname" = "e200r" ]; then
