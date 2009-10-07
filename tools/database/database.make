@@ -35,8 +35,12 @@ $(BUILDDIR)/$(BINARY): $$(OBJ)
 	@echo LD $(BINARY)
 	$(SILENT)$(HOSTCC) $(INCLUDE) $(FLAGS) -ldl -o $@ $+
 
-SIMFLAGS += $(SIMINCLUDES) $(DBDEFINES) -DHAVE_CONFIG_H $(OLDGCCOPTS)
+SIMFLAGS += $(SIMINCLUDES) $(DBDEFINES) -DHAVE_CONFIG_H $(OLDGCCOPTS) $(INCLUDES)
 
 $(BUILDDIR)/tools/database/../../uisimulator/%.o: $(ROOTDIR)/uisimulator/%.c
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(SIMFLAGS) -c $< -o $@
+
+$(BUILDDIR)/tools/database/database.o: $(APPSDIR)/database.c
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(SIMFLAGS) -c $< -o $@
