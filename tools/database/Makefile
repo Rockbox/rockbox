@@ -9,13 +9,13 @@ DEFINES = -D__PCTOOL__ -DHAVE_TAGCACHE -DSIMULATOR -DCONFIG_CODEC=1 \
 	-DCONFIG_CODEC=1
 CFLAGS = -g $(INCLUDE) $(DEFINES) -Wno-pointer-sign 
 
-SRC = database.o tagcache.o replaygain.o \
-	metadata.o metadata_common.o mp3data.o \
-	a52.o mp3.o adx.o mp4.o aiff.o mpc.o ape.o ogg.o \
-	asap.o sid.o asf.o spc.o flac.o vorbis.o wave.o \
-	mod.o wavpack.o monkeys.o rm.o nsf.c\
-	logf.o unicode.o ctype.o structec.o crc32.o io.o \
-	misc.o strlcpy.o fixedpoint.o
+SRC = database.c tagcache.c replaygain.c \
+	metadata.c metadata_common.c mp3data.c \
+	a52.c mp3.c adx.c mp4.c aiff.c mpc.c ape.c ogg.c \
+	asap.c sid.c asf.c spc.c flac.c vorbis.c wave.c \
+	mod.c wavpack.c monkeys.c rm.c nsf.c\
+	logf.c unicode.c ctype.c structec.c crc32.c io.c \
+	misc.c strlcpy.c fixedpoint.c
 
 OBJ = $(SRC:.c=.o)
 
