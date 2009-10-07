@@ -266,8 +266,7 @@ static int sd_init_card(const int drive)
             return -2;
 
         /* app_cmd */
-        if( !send_cmd(drive, SD_APP_CMD, 0, MCI_RESP|MCI_ARG, &response) ||
-            !(response & (1<<5)) )
+        if( !send_cmd(drive, SD_APP_CMD, 0, MCI_RESP|MCI_ARG, &response) )
         {
             return -3;
         }
