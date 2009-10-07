@@ -48,7 +48,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
     (void)sector;
     (void)count;
     (void)buffer;
-    return 1;
+    return -1;
 }
 uint32_t ftl_sync(void)
 {
