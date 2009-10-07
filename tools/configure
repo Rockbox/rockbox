@@ -85,6 +85,7 @@ simcc () {
 
  simver=sdl
  GCCOPTS='-W -Wall -g -fno-builtin'
+ GCCOPTIMIZE=''
 
  output="rockboxui" # use this as default output binary name
  sdl=`findtool sdl-config`
