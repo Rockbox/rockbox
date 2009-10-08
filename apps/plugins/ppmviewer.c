@@ -193,12 +193,23 @@ void read_ppm_init(int fd,
     }
 }
 
+#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#define BUFADDR(x, y, width, height) ( buffer + height*(x) + (y))
+#else
+#define BUFADDR(x, y, width, height) ( buffer + width*(y) + (x))
+#endif
+
 int read_ppm_row(int fd, 
                  int const row, 
                  int const cols, 
+                 int const rows,
                  int const maxval, 
                  int const format)
 {
+#if   !(defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE)
+    (void) rows;
+#endif
+
     int col;
     int r, g, b;
     switch (format) {
@@ -213,7 +224,7 @@ int read_ppm_row(int fd,
                 {
                     return PLUGIN_ERROR;
                 } 
-                buffer[(cols * row) + col] = LCD_RGBPACK(
+                *BUFADDR(col, row, cols, rows) = LCD_RGBPACK(
                     (255 / maxval) * r,
                     (255 / maxval) * g,
                     (255 / maxval) * b);
@@ -231,7 +242,7 @@ int read_ppm_row(int fd,
                 {
                     return PLUGIN_ERROR;
                 } 
-                buffer[(cols * row) + col] = LCD_RGBPACK(
+                *BUFADDR(col, row, cols, rows) = LCD_RGBPACK(
                     (255 / maxval) * r,
                     (255 / maxval) * g,
                     (255 / maxval) * b);
@@ -260,7 +271,7 @@ int read_ppm(int fd,
     }
     
     for (row = 0; row < *rows; ++row) {
-        if( read_ppm_row(fd, row, *cols, *maxval, format) == PLUGIN_ERROR) {
+        if( read_ppm_row(fd, row, *cols, *rows, *maxval, format) == PLUGIN_ERROR) {
             return PLUGIN_ERROR;
         }
     }
