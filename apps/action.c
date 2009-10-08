@@ -96,7 +96,8 @@ static int button_flip_horizontally(int context, int button)
     int newbutton;
 
     if (!(lang_is_rtl() && ((context == CONTEXT_STD) ||
-        (context & CONTEXT_TREE) || (context & CONTEXT_MAINMENU))))
+        (context == CONTEXT_TREE) || (context == CONTEXT_LIST) ||
+        (context == CONTEXT_MAINMENU))))
     {
         return button;
     }
