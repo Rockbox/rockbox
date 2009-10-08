@@ -81,7 +81,7 @@ void xlcd_scroll_up(int count)
 
     length = LCD_HEIGHT - count;
     
-    width = LCD_WIDTH;
+    width = LCD_WIDTH-1;
     data = rb->lcd_framebuffer;
     
     do {
@@ -107,7 +107,7 @@ void xlcd_scroll_down(int count)
 
     length = LCD_HEIGHT - count;
 
-    width = LCD_WIDTH;
+    width = LCD_WIDTH-1;
     data = rb->lcd_framebuffer;
     
     do {
