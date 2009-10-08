@@ -31,9 +31,19 @@ ifdef RBARCH
 CFLAGS += -arch $(RBARCH)
 endif
 
+# don't try to use the systems libspeex when building a static binary.
+ifndef STATIC
+SYS_SPEEX = $(shell pkg-config --libs speex)
+endif
 
+# fall back to our own librbspeex if no suitable found.
+ifeq ($(SYS_SPEEX),)
 # This sets up 'SRC' based on the files mentioned in SOURCES
 SRC := $(shell cat $(SPEEXSRC)/SOURCES | $(CC) $(CFLAGS) -E -P - | grep -v "^\#" | grep -v "^$$")
+LIBS = $(TARGET_DIR)librbspeex$(RBARCH).a
+else
+LIBS = $(SYS_SPEEX)
+endif
 
 OUT = $(TARGET_DIR)build$(RBARCH)
 SOURCES = $(SRC:%.c=$(SPEEXSRC)/%.c) rbspeex.c rbspeexenc.c rbspeexdec.c
@@ -73,11 +83,11 @@ librbspeex$(RBARCH).a: $(OUT)/librbspeex.a
 
 ../rbspeexenc: $(OBJS) $(OUT)/rbspeexenc.o librbspeex$(RBARCH).a
 	@echo Linking ../rbspeexenc
-	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexenc $(OUT)/rbspeexenc.o librbspeex$(RBARCH).a -lm
+	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexenc $(OUT)/rbspeexenc.o $(LIBS) -lm $(TARGET_DIR)librbspeex$(RBARCH).a
 
 ../rbspeexdec: $(OBJS) librbspeex$(RBARCH).a $(OUT)/rbspeexdec.o 
 	@echo Linking ../rbspeexdec
-	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexdec $(OUT)/rbspeexdec.o librbspeex$(RBARCH).a -lm 
+	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexdec $(OUT)/rbspeexdec.o $(LIBS) -lm $(TARGET_DIR)librbspeex$(RBARCH).a
 
 %.o:
 	@echo CC $<

@@ -1,5 +1,4 @@
 
-
 # ccache
 unix:!mac:!noccache {
     CCACHE = $$system(which ccache)
@@ -28,7 +27,11 @@ RBBASE_DIR = $$replace(RBBASE_DIR,/rbutil/rbutilqt,)
 
 message("Rockbox Base dir: "$$RBBASE_DIR)
 
-# add a custom rule for pre-building librbspeex
+# check for system speex. Add a custom rule for pre-building librbspeex if not found.
+LIBSPEEX = $$system(pkg-config --libs speex)
+!static:!isEmpty(LIBSPEEX) {
+    LIBS += $$LIBSPEEX
+}
 !mac {
 rbspeex.commands = @$(MAKE) TARGET_DIR=$$OUT_PWD/ -C $$RBBASE_DIR/tools/rbspeex librbspeex.a
 }
