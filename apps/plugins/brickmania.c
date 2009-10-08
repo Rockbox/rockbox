@@ -1571,18 +1571,37 @@ static int brickmania_game_loop(void)
                 } /* for j */
             } /* for i */
 
-            /* draw the pad */
-            rb->lcd_bitmap_part(
-                /* Figure out which paddle to draw */
-                (pad_width == PAD_WIDTH) ? brickmania_pads : 
-                    (pad_width == LONG_PAD_WIDTH) ? brickmania_long_pads :
+            /* draw the paddle according to the PAD_WIDTH */
+            if( pad_width == PAD_WIDTH ) /* Normal width */
+            {
+                rb->lcd_bitmap_part(
+                    brickmania_pads,
+                    0, pad_type*PAD_HEIGHT,
+                    STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_pads, 
+                            BMPHEIGHT_brickmania_pads),
+                    INT3(pad_pos_x), INT3(PAD_POS_Y), 
+                    INT3(pad_width), INT3(PAD_HEIGHT) );
+            }
+            else if( pad_width == LONG_PAD_WIDTH ) /* Long Pad */
+            {
+                rb->lcd_bitmap_part(
+                    brickmania_long_pads,
+                    0,pad_type*PAD_HEIGHT,
+                    STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_long_pads, 
+                            BMPHEIGHT_brickmania_long_pads),
+                    INT3(pad_pos_x), INT3(PAD_POS_Y), 
+                    INT3(pad_width), INT3(PAD_HEIGHT) );
+            }
+            else /* Short pad */
+            {
+                rb->lcd_bitmap_part(
                     brickmania_short_pads,
-                    
-                0, pad_type*INT3(PAD_HEIGHT),
-                STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_pads, 
-                        BMPHEIGHT_brickmania_pads),
-                INT3(pad_pos_x), INT3(PAD_POS_Y), 
-                INT3(pad_width), INT3(PAD_HEIGHT) );
+                    0,pad_type*PAD_HEIGHT,
+                    STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_short_pads, 
+                            BMPHEIGHT_brickmania_short_pads),
+                    INT3(pad_pos_x), INT3(PAD_POS_Y), 
+                    INT3(pad_width), INT3(PAD_HEIGHT) );
+            }
 
             /* If the game is not paused continue */
             if (game_state!=ST_PAUSE)
