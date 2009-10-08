@@ -1576,7 +1576,7 @@ static int brickmania_game_loop(void)
             {
                 rb->lcd_bitmap_part(
                     brickmania_pads,
-                    0, pad_type*PAD_HEIGHT,
+                    0, pad_type*INT3(PAD_HEIGHT),
                     STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_pads, 
                             BMPHEIGHT_brickmania_pads),
                     INT3(pad_pos_x), INT3(PAD_POS_Y), 
@@ -1586,7 +1586,7 @@ static int brickmania_game_loop(void)
             {
                 rb->lcd_bitmap_part(
                     brickmania_long_pads,
-                    0,pad_type*PAD_HEIGHT,
+                    0,pad_type*INT3(PAD_HEIGHT),
                     STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_long_pads, 
                             BMPHEIGHT_brickmania_long_pads),
                     INT3(pad_pos_x), INT3(PAD_POS_Y), 
@@ -1596,7 +1596,7 @@ static int brickmania_game_loop(void)
             {
                 rb->lcd_bitmap_part(
                     brickmania_short_pads,
-                    0,pad_type*PAD_HEIGHT,
+                    0,pad_type*INT3(PAD_HEIGHT),
                     STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_short_pads, 
                             BMPHEIGHT_brickmania_short_pads),
                     INT3(pad_pos_x), INT3(PAD_POS_Y), 
