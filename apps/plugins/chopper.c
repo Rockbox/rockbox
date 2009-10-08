@@ -1022,7 +1022,6 @@ void chopper_load(bool newgame)
         /* mirror the sky if we've changed the ground */
         chopCopyTerrain(&mGround, &mRoof, 0, - ( (iScreenY * 3) / 4));
 
-    iLevelMode = LEVEL_MODE_NORMAL;
     if (iLevelMode == LEVEL_MODE_NORMAL)
         /* make it a bit more exciting, cause it's easy terrain... */
         iPlayerSpeedX *= 2;
