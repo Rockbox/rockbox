@@ -41,26 +41,11 @@ static int short_cmp(const void *a, const void *b)
 
 void button_read_touch()
 {
-    unsigned char buf[3];
-    
     static long last_touch_interrupt = 0;
     static int touch_data_index = 0;
 
     /* put the touchscreen into idle mode */
     pcf50606_write(PCF5060X_ADCC1, 0);
-
-    /* here the touch coordinates are read 5 times            */
-    /* they will be sorted and the middle one will be used    */
-    pcf50606_write(PCF5060X_ADCC2, (0xE<<1) | 1); /* ADC start X+Y */
-
-    do {
-        buf[1] = pcf50606_read(PCF5060X_ADCS2);
-    } while (!(buf[1] & 0x80));        /* Busy wait on ADCRDY flag */
-
-    buf[0] = pcf50606_read(PCF5060X_ADCS1);
-    buf[2] = pcf50606_read(PCF5060X_ADCS3);
-
-    pcf50606_write(PCF5060X_ADCC2, 0);            /* ADC stop */
 
     if (TIME_AFTER(current_tick, last_touch_interrupt + 1))
     {
@@ -68,8 +53,10 @@ void button_read_touch()
         touch_data_index = 0;
     }
 
-    x[touch_data_index] = (buf[0] << 2) | (buf[1] & 3);
-    y[touch_data_index] = (buf[2] << 2) | ((buf[1] & 0xC) >> 2);
+    /* here the touch coordinates are read 5 times */
+    /* they will be sorted and the middle one will be used */
+    pcf50606_read_adc(PCF5060X_ADC_TSC_XY,
+                      &x[touch_data_index], &y[touch_data_index]);
 
     touch_data_index++;
 
@@ -126,7 +113,7 @@ void button_init_device(void)
 {
     /* Configure GPIOA 4 (POWER) and 8 (HOLD) for input */
     GPIOA_DIR &= ~0x110;
-    
+
     /* Configure GPIOB 4 (button pressed) for input */
     GPIOB_DIR &= ~0x10;
 
@@ -229,12 +216,12 @@ int button_read_device(int *data)
         touch_hold = false;
         pcf50606_write(PCF5060X_ADCC1, 1);
     }
-    
+
     if (!(GPIOA & 0x4))
         btn |= BUTTON_POWER;
-        
+
     if (btn & BUTTON_TOUCHSCREEN && !is_backlight_on(true))
         old_data = *data = 0;
-    
+
     return btn;
 }

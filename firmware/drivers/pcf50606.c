@@ -62,3 +62,26 @@ void pcf50606_reset_timeout(void)
     pcf50606_write(PCF5060X_OOCC1, pcf50606_read(PCF5060X_OOCC1) | TOTRST);
     restore_irq(level);
 }
+
+void pcf50606_read_adc(int adc, short* res1, short* res2)
+{
+    int adcs1 = 0, adcs2 = 0, adcs3 = 0;
+
+    int level = disable_irq_save();
+
+    pcf50606_write(PCF5060X_ADCC2, (adc<<1) | 1); /* ADC start */
+
+    do {
+        adcs2 = pcf50606_read(PCF5060X_ADCS2);
+    } while (!(adcs2 & 0x80));        /* Busy wait on ADCRDY flag */
+
+    adcs1 = pcf50606_read(PCF5060X_ADCS1);
+    if (res2 != NULL) adcs3 = pcf50606_read(PCF5060X_ADCS3);
+
+    pcf50606_write(PCF5060X_ADCC2, 0);            /* ADC stop */
+
+    restore_interrupt(level);
+
+    if (res1 != NULL) *res1 = (adcs1 << 2) | (adcs2 & 3);
+    if (res2 != NULL) *res2 = (adcs3 << 2) | ((adcs2 & 0xC) >> 2);
+}

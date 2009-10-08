@@ -26,7 +26,7 @@
 #include "pcf50606.h"
 
 unsigned short current_voltage = 3910;
-   
+
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     3380
@@ -42,7 +42,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     /* Standard D2 internal battery */
     { 3370, 3690, 3750, 3775, 3790, 3820, 3880, 3940, 3980, 4090, 4170 }
-    
+
     /* TODO: DIY replacements eg. Nokia BP-4L ? */
 };
 
@@ -65,15 +65,9 @@ unsigned int battery_adc_voltage(void)
 
     if (TIME_BEFORE(last_tick+HZ, current_tick))
     {
-        int adc_val, irq_status;
-        unsigned char buf[2];
+        short adc_val;
+        pcf50606_read_adc(PCF5060X_ADC_BATVOLT_RES, &adc_val, NULL);
 
-        irq_status = disable_irq_save();
-        pcf50606_write(PCF5060X_ADCC2, 0x1);
-        pcf50606_read_multiple(PCF5060X_ADCS1, buf, 2);
-        restore_interrupt(irq_status);
-
-        adc_val = (buf[0]<<2) | (buf[1] & 3); //ADCDAT1H+ADCDAT1L
         current_voltage = (adc_val * BATTERY_SCALE_FACTOR) >> 10;
 
         last_tick = current_tick;

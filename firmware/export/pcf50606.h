@@ -52,4 +52,6 @@ unsigned char pcf50606_i2c_inb(bool ack);
 void pcf50606_reset_timeout(void);
 #endif
 
+void pcf50606_read_adc(int adc, short* res1, short* res2);
+
 #endif /* PCF50606_H */

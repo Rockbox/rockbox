@@ -92,4 +92,21 @@
 #define PCF5060X_GPOC4   0x3b
 #define PCF5060X_GPOC5   0x3c
 
+/* ADCC2 mux values */
+#define PCF5060X_ADC_BATVOLT_RES     0x0
+#define PCF5060X_ADC_BATVOLT_SUBTR   0x1
+#define PCF5060X_ADC_ADCIN1_RES      0x2
+#define PCF5060X_ADC_ADCIN1_SUBTR    0x3
+#define PCF5060X_ADC_BATTEMP         0x4
+#define PCF5060X_ADC_ADCIN2          0x5
+#define PCF5060X_ADC_ADCIN3          0x6
+#define PCF5060X_ADC_ADCIN3_RATIO    0x7
+#define PCF5060X_ADC_TSC_X           0x8
+#define PCF5060X_ADC_TSC_Y           0x9
+#define PCF5060X_ADC_TSC_P1          0xa
+#define PCF5060X_ADC_TSC_P2          0xb
+#define PCF5060X_ADC_BATVOLT_ADCIN1  0xc
+#define PCF5060X_ADC_TSC_XY          0xe
+#define PCF5060X_ADC_TSC_P1P2        0xf
+
 #endif /* PCF5060X_H */
