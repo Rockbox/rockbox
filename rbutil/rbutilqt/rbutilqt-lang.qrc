@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/" >
+        <file>lang/rbutil_cs.qm</file>
         <file>lang/rbutil_de.qm</file>
         <file>lang/rbutil_fi.qm</file>
         <file>lang/rbutil_tr.qm</file>
