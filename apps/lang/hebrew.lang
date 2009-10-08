@@ -2667,7 +2667,7 @@
   </source>
   <dest>
     *: none
-    charging: "תאורת מסך (כשמחובר)"
+    charging: "(תאורת מסך(כשמחובר"
   </dest>
   <voice>
     *: none
@@ -2763,7 +2763,7 @@
   </source>
   <dest>
     *: none
-    lcd_sleep: "שינה (אחרי כיבוי תאורת מסך)"
+    lcd_sleep: "(שינה (אחרי כיבוי תאורת מסך"
   </dest>
   <voice>
     *: none
@@ -2913,7 +2913,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "שורה (נגדי)"
+    lcd_bitmap: "(שורה (נגדי"
   </dest>
   <voice>
     *: none
@@ -11309,7 +11309,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "שורה (צבע אחיד)"
+    lcd_color: "(שורה (צבע אחיד"
   </dest>
   <voice>
     *: none
@@ -11326,7 +11326,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "שורה (מעבר בין צבעים)"
+    lcd_color: "(שורה (מעבר בין צבעים"
   </dest>
   <voice>
     *: none
