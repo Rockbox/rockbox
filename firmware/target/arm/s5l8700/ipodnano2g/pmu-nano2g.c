@@ -24,21 +24,7 @@
 #include "i2c-s5l8700.h"
 
 static struct mutex pmu_adc_mutex;
-int pmu_initialized;
-
-unsigned char pmu_read(int address)
-{
-    unsigned char tmp;
-
-    i2c_read(0xe6, address, 1, &tmp);
-
-    return tmp;
-}
-
-void pmu_write(int address, unsigned char val)
-{
-    i2c_write(0xe6, address, 1, &val);
-}
+int pmu_initialized = 0;
 
 void pmu_read_multiple(int address, int count, unsigned char* buffer)
 {
@@ -48,6 +34,20 @@ void pmu_read_multiple(int address, int count, unsigned char* buffer)
 void pmu_write_multiple(int address, int count, unsigned char* buffer)
 {
     i2c_write(0xe6, address, count, buffer);
+}
+
+unsigned char pmu_read(int address)
+{
+    unsigned char tmp;
+
+    pmu_read_multiple(address, 1, &tmp);
+
+    return tmp;
+}
+
+void pmu_write(int address, unsigned char val)
+{
+    pmu_write_multiple(address, 1, &val);
 }
 
 void pmu_init(void)
@@ -87,4 +87,20 @@ int pmu_read_battery_current(void)
     int milliamps = (pmu_read(0x55) << 2) | (data & 3);
     mutex_unlock(&pmu_adc_mutex);
     return milliamps;
+}
+
+void pmu_switch_power(int gate, int onoff)
+{
+    if (gate < 4)
+    {
+        unsigned char newval = pmu_read(0x3B) & ~(1 << (2 * gate));
+        if (onoff) newval |= 1 << (2 * gate);
+        pmu_write(0x3B, newval);
+    }
+    else if (gate < 7)
+    {
+        unsigned char newval = pmu_read(0x3C) & ~(1 << (2 * (gate - 4)));
+        if (onoff) newval |= 1 << (2 * (gate - 4));
+        pmu_write(0x3C, newval);
+    }
 }

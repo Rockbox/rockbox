@@ -26,20 +26,32 @@
 #include "ftl-target.h"
 #include <string.h>
 #include "panic.h"
+#include "pmu-target.h"
+#include "lcd.h"
 
-
-/*  Power handling for S5L8700 based Meizu players
-
-    The M3 and M6 players appear to use the same pins for power, USB detection
-    and charging status.
-*/
 
 void power_off(void)
 {
     if (ftl_sync() != 0) panicf("Failed to unmount flash!");
 
-    /* TODO: Really power-off */
-    panicf("Poweroff not implemented yet.");
+    pmu_write(0x2b, 0);  /* Kill the backlight, instantly. */
+    pmu_write(0x29, 0);
+
+    lcd_off();
+
+    pmu_switch_power(0, 0);
+    pmu_switch_power(2, 0);
+    pmu_switch_power(3, 0);
+    pmu_switch_power(4, 0);
+    pmu_switch_power(6, 0);
+    pmu_switch_power(7, 0);
+
+    pmu_write(0x36, pmu_read(0x36) & 0xF0);
+    pmu_write(0x34, pmu_read(0x34) & 0xF0);
+    pmu_write(0xD, pmu_read(0xD) | 0x40);
+    pmu_write(0xD, pmu_read(0xD) | 0x02);
+    pmu_write(0xC, 1);
+
     while(1);
 }
 

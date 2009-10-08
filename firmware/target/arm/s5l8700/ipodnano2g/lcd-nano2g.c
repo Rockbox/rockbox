@@ -35,6 +35,10 @@
 /* LCD type 0 register defines */
 
 #define R_ENTRY_MODE              0x03
+#define R_DISPLAY_CONTROL_1       0x07
+#define R_POWER_CONTROL_1         0x10
+#define R_POWER_CONTROL_2         0x12
+#define R_POWER_CONTROL_3         0x13
 #define R_HORIZ_GRAM_ADDR_SET     0x20
 #define R_VERT_GRAM_ADDR_SET      0x21
 #define R_WRITE_DATA_TO_GRAM      0x22
@@ -46,6 +50,8 @@
 
 /* LCD type 1 register defines */
 
+#define R_SLEEP_IN                0x10
+#define R_DISPLAY_OFF             0x28
 #define R_COLUMN_ADDR_SET         0x2a
 #define R_ROW_ADDR_SET            0x2b
 #define R_MEMORY_WRITE            0x2c
@@ -122,6 +128,27 @@ void lcd_set_flip(bool yesno)
 
 void lcd_off(void)
 {
+    if (lcd_type == 0)
+    {
+        s5l_lcd_write_cmd_data(R_DISPLAY_CONTROL_1, 0x232);
+        s5l_lcd_write_cmd_data(R_POWER_CONTROL_3, 0x1137); 
+        s5l_lcd_write_cmd_data(R_DISPLAY_CONTROL_1, 0x201);
+        s5l_lcd_write_cmd_data(R_POWER_CONTROL_3, 0x137);
+        s5l_lcd_write_cmd_data(R_DISPLAY_CONTROL_1, 0x200);
+        s5l_lcd_write_cmd_data(R_POWER_CONTROL_1, 0x680);
+        s5l_lcd_write_cmd_data(R_POWER_CONTROL_2, 0x160);
+        s5l_lcd_write_cmd_data(R_POWER_CONTROL_3, 0x127);
+        s5l_lcd_write_cmd_data(R_POWER_CONTROL_1, 0x600);
+    }
+    else
+    {
+        s5l_lcd_write_cmd(R_DISPLAY_OFF);
+        s5l_lcd_write_data(0);
+        s5l_lcd_write_data(0);
+        s5l_lcd_write_cmd(R_SLEEP_IN);
+        s5l_lcd_write_data(0);
+        s5l_lcd_write_data(0);
+    }
 }
 
 void lcd_on(void)

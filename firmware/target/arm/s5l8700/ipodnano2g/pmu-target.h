@@ -31,5 +31,6 @@ void pmu_write_multiple(int address, int count, unsigned char* buffer);
 int pmu_read_battery_voltage(void);
 int pmu_read_battery_current(void);
 void pmu_init(void);
+void pmu_switch_power(int gate, int onoff);
 
 #endif
