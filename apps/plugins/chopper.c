@@ -171,17 +171,20 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LEVEL_MODE_STEEP 1
 
 #if LCD_HEIGHT <= 64
-#define CYCLETIME 100
+#define CYCLES 100
 static inline int SCALE(int x)
 {
     return x == 1 ? x : x >> 1;
 }
 #define SIZE 2
 #else
-#define CYCLETIME 60
+#define CYCLES 60
 #define SCALE(x) (x)
 #define SIZE 1
 #endif
+
+/* in 10 milisecond (ticks) */
+#define CYCLETIME ((CYCLES*HZ)/1000)
 
 /*Chopper's local variables to track the terrain position etc*/
 static int chopCounter;
@@ -792,7 +795,7 @@ static int chopGameLoop(void)
 
     while (!exit) {
 
-        end = *rb->current_tick + (CYCLETIME * HZ) / 1000;
+        end = *rb->current_tick + CYCLETIME;
 
         if(chopUpdateTerrainRecycling(&mGround) == 1)
             /* mirror the sky if we've changed the ground */
@@ -907,8 +910,8 @@ static int chopGameLoop(void)
                         return ret;
                 }
 
-        if (end > *rb->current_tick)
-            rb->sleep(end-*rb->current_tick);
+        if (TIME_BEFORE(*rb->current_tick, end))
+            rb->sleep(end - *rb->current_tick); /* wait until time is over */
         else
             rb->yield();
 
