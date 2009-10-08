@@ -55,9 +55,7 @@ void button_read_touch(void);
 #define BUTTON_BOTTOMMIDDLE 0x00000800
 #define BUTTON_BOTTOMRIGHT  0x00001000
 
-#define BUTTON_TOUCH        0x00002000
-
-#define BUTTON_MAIN 0x3FFF
+#define BUTTON_MAIN 0x1FFF
 
 /* No remote */
 #define BUTTON_REMOTE 0
