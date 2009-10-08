@@ -63,6 +63,7 @@
 #ifdef HAVE_TAGCACHE
 #include "tagcache.h"
 #endif
+#include "language.h"
 
 struct root_items {
     int (*function)(void* param);
@@ -181,9 +182,18 @@ static int browser(void* param)
                     }
                     if (stat->commit_step > 0)
                     {
-                        splashf(0, "%s [%d/%d]",
-                            str(LANG_TAGCACHE_INIT), stat->commit_step, 
-                            tagcache_get_max_commit_step());
+                        if (lang_is_rtl())
+                        {
+                            splashf(0, "[%d/%d] %s", stat->commit_step,
+                                tagcache_get_max_commit_step(),
+                                str(LANG_TAGCACHE_INIT));
+                        }
+                        else
+                        {
+                            splashf(0, "%s [%d/%d]", str(LANG_TAGCACHE_INIT),
+                                stat->commit_step,
+                                tagcache_get_max_commit_step());
+                        }
                     }
                     else
                     {

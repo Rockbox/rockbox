@@ -265,9 +265,16 @@ static void init_tagcache(void)
             }
 #endif
 #ifdef HAVE_LCD_BITMAP
-            splashf(0, "%s [%d/%d]",
-                str(LANG_TAGCACHE_INIT), ret, 
-                tagcache_get_max_commit_step());
+            if (lang_is_rtl())
+            {
+                splashf(0, "[%d/%d] %s", ret, tagcache_get_max_commit_step(),
+                    str(LANG_TAGCACHE_INIT));
+            }
+            else
+            {
+                splashf(0, "%s [%d/%d]", str(LANG_TAGCACHE_INIT), ret,
+                    tagcache_get_max_commit_step());
+            }
 #else
             lcd_double_height(false);
             snprintf(buf, sizeof(buf), " DB [%d/%d]", ret, 
