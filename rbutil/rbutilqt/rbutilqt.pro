@@ -222,7 +222,8 @@ win32 {
     RESOURCES += $$_PRO_FILE_PWD_/rbutilqt-lang.qrc
 }
 
-TRANSLATIONS += lang/rbutil_de.ts \
+TRANSLATIONS += lang/rbutil_cs.ts \
+ lang/rbutil_de.ts \
  lang/rbutil_fi.ts \
  lang/rbutil_fr.ts \
  lang/rbutil_gr.ts \
