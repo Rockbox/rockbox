@@ -3,7 +3,7 @@ CFLAGS=-I../../tools/ucl/include -Wall
 LIBUCL=../../tools/ucl/src/libucl$(RBARCH).a
 
 #change for releases
-APPVERSION=1.1RC
+APPVERSION=1.1
 
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 OUTPUT=mkamsboot.exe

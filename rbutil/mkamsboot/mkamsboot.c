@@ -655,7 +655,7 @@ int main(int argc, char* argv[])
             rb_packedsize);
     fprintf(stderr, "[INFO] Dual-boot function size:  %d bytes\n",
             bootloader_sizes[sum.model]);
-    fprintf(stderr, "[INFO] UCL unpack function size: %u bytes\n",
+    fprintf(stderr, "[INFO] UCL unpack function size: %lu bytes\n",
             sizeof(nrv2e_d8));
 
     totalsize = total_size(sum.model, of_packedsize, rb_packedsize);
