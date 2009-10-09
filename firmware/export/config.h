@@ -722,7 +722,7 @@ Lyre prototype 1*/
 #endif
 
 #if defined(SIMULATOR) && defined(__APPLE__)
-#define DATA_ATTR       __attribute__ ((section(".section __DATA, __data")))
+#define DATA_ATTR       __attribute__ ((section("__DATA, .data")))
 #else
 #define DATA_ATTR       __attribute__ ((section(".data")))
 #endif

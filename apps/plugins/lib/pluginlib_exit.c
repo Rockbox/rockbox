@@ -21,5 +21,5 @@
 
 #include "pluginlib_exit.h"
 
-jmp_buf __exit_env;
+jmp_buf __exit_env DATA_ATTR;
 
