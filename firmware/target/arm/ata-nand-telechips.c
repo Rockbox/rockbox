@@ -866,6 +866,12 @@ int nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
     return -1;
 }
 
+#ifdef HAVE_STORAGE_FLUSH
+int nand_flush(void)
+{
+    return 0;
+}
+#endif
 
 #ifdef STORAGE_GET_INFO
 void nand_get_info(IF_MD2(int drive,) struct storage_info *info)

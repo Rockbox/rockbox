@@ -685,6 +685,13 @@ int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const 
     return -1;
 }
 
+#ifdef HAVE_STORAGE_FLUSH
+int nand_flush(void)
+{
+    return 0;
+}
+#endif
+
 void nand_spindown(int seconds)
 {
     /* null */

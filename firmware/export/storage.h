@@ -69,6 +69,9 @@ struct storage_info
 		#define storage_close() ata_close()
 		#define storage_read_sectors(drive, start, count, buf) ata_read_sectors(IF_MD2(drive,) start, count, buf)
 		#define storage_write_sectors(drive, start, count, buf) ata_write_sectors(IF_MD2(drive,) start, count, buf)
+        #ifdef HAVE_STORAGE_FLUSH
+            #define storage_flush() (void)0
+        #endif
 		#define storage_last_disk_activity() ata_last_disk_activity()
 		#define storage_spinup_time() ata_spinup_time()
 		#define storage_get_identify() ata_get_identify()
@@ -92,6 +95,9 @@ struct storage_info
 		#define storage_init() sd_init()
 		#define storage_read_sectors(drive, start, count, buf) sd_read_sectors(IF_MD2(drive,) start, count, buf)
 		#define storage_write_sectors(drive, start, count, buf) sd_write_sectors(IF_MD2(drive,) start, count, buf)
+        #ifdef HAVE_STORAGE_FLUSH
+            #define storage_flush() (void)0
+        #endif
 		#define storage_last_disk_activity() sd_last_disk_activity()
 		#define storage_spinup_time() 0
 		#define storage_get_identify() sd_get_identify()
@@ -115,6 +121,9 @@ struct storage_info
 		#define storage_init() mmc_init()
 		#define storage_read_sectors(drive, start, count, buf) mmc_read_sectors(IF_MD2(drive,) start, count, buf)
 		#define storage_write_sectors(drive, start, count, buf) mmc_write_sectors(IF_MD2(drive,) start, count, buf)
+        #ifdef HAVE_STORAGE_FLUSH
+            #define storage_flush() (void)0
+        #endif
 		#define storage_last_disk_activity() mmc_last_disk_activity()
 		#define storage_spinup_time() 0
 		#define storage_get_identify() mmc_get_identify()
@@ -138,6 +147,9 @@ struct storage_info
 		#define storage_init() nand_init()
 		#define storage_read_sectors(drive, start, count, buf) nand_read_sectors(IF_MD2(drive,) start, count, buf)
 		#define storage_write_sectors(drive, start, count, buf) nand_write_sectors(IF_MD2(drive,) start, count, buf)
+        #ifdef HAVE_STORAGE_FLUSH
+		    #define storage_flush() nand_flush()
+        #endif
 		#define storage_last_disk_activity() nand_last_disk_activity()
 		#define storage_spinup_time() 0
 		#define storage_get_identify() nand_get_identify()
@@ -161,6 +173,9 @@ struct storage_info
 		#define storage_init() ramdisk_init()
 		#define storage_read_sectors(drive, start, count, buf) ramdisk_read_sectors(IF_MD2(drive,) start, count, buf)
 		#define storage_write_sectors(drive, start, count, buf) ramdisk_write_sectors(IF_MD2(drive,) start, count, buf)
+        #ifdef HAVE_STORAGE_FLUSH
+            #define storage_flush() (void)0
+        #endif
 		#define storage_last_disk_activity() ramdisk_last_disk_activity()
 		#define storage_spinup_time() 0
 		#define storage_get_identify() ramdisk_get_identify()
@@ -187,6 +202,7 @@ int storage_soft_reset(void);
 int storage_init(void);
 int storage_read_sectors(int drive, unsigned long start, int count, void* buf);
 int storage_write_sectors(int drive, unsigned long start, int count, const void* buf);
+int storage_flush(void);
 void storage_spin(void);
 void storage_spindown(int seconds);
 long storage_last_disk_activity(void);

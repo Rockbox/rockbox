@@ -749,6 +749,14 @@ void shutdown_hw(void)
 #ifdef HAVE_LCD_BITMAP
         glyph_cache_save();
 #endif
+
+/* Commit pending writes if needed. Even though we don't do write caching,
+   things like flash translation layers may need this to commit scattered
+   pages to there final locations. So far only used for iPod Nano 2G. */
+#ifdef HAVE_STORAGE_FLUSH
+        storage_flush();
+#endif
+
         if (storage_disk_is_active())
             storage_spindown(1);
     }

@@ -39,6 +39,9 @@
 /* define this to enable JPEG decoding */
 #define HAVE_JPEG
 
+/* define this if the LCD can shut down */
+#define HAVE_LCD_SHUTDOWN
+
 /* define this if you can invert the colours on your LCD */
 //#define HAVE_LCD_INVERT
 
@@ -57,6 +60,10 @@
 #define CONFIG_STORAGE STORAGE_NAND
 
 #define CONFIG_NAND NAND_SAMSUNG
+
+/* define this if at least one storage driver
+   needs to do cleanup on shutdown */
+#define HAVE_STORAGE_FLUSH
 
 /* The NAND flash has 2048-byte sectors, and is our only storage */
 #define SECTOR_SIZE 2048

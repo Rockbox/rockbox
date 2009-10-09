@@ -32,13 +32,6 @@
 
 void power_off(void)
 {
-    if (ftl_sync() != 0) panicf("Failed to unmount flash!");
-
-    pmu_write(0x2b, 0);  /* Kill the backlight, instantly. */
-    pmu_write(0x29, 0);
-
-    lcd_off();
-
     pmu_switch_power(0, 0);
     pmu_switch_power(2, 0);
     pmu_switch_power(3, 0);

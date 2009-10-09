@@ -36,9 +36,6 @@ long last_disk_activity = -1;
 /** static, private data **/ 
 static bool initialized = false;
 
-static long next_yield = 0;
-#define MIN_YIELD_PERIOD 2000
-
 /* API Functions */
 
 void nand_led(bool onoff)
@@ -67,6 +64,10 @@ void nand_sleep(void)
 {
 }
 
+void nand_sleepnow(void)
+{
+}
+
 void nand_spin(void)
 {
 }
@@ -85,6 +86,13 @@ long nand_last_disk_activity(void)
 {
     return 0;
 }
+
+#ifdef HAVE_STORAGE_FLUSH
+int nand_flush(void)
+{
+    return ftl_sync();
+}
+#endif
 
 int nand_init(void)
 {

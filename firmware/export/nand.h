@@ -37,6 +37,9 @@ int  nand_init(void);
 void nand_close(void);
 int  nand_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
 int  nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);
+#ifdef HAVE_STORAGE_FLUSH
+int  nand_flush(void);
+#endif
 void nand_spin(void);
 int  nand_spinup_time(void); /* ticks */
 

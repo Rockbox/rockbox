@@ -25,6 +25,7 @@
 #include "lcd.h"
 #include "system.h"
 #include "cpu.h"
+#include "pmu-target.h"
 
 
 /* The Nano 2G has two different LCD types.  What we call "type 0"
@@ -124,10 +125,11 @@ void lcd_set_flip(bool yesno)
     }
 }
 
-
-
-void lcd_off(void)
+void lcd_shutdown(void)
 {
+    pmu_write(0x2b, 0);  /* Kill the backlight, instantly. */
+    pmu_write(0x29, 0);
+
     if (lcd_type == 0)
     {
         s5l_lcd_write_cmd_data(R_DISPLAY_CONTROL_1, 0x232);
@@ -149,6 +151,11 @@ void lcd_off(void)
         s5l_lcd_write_data(0);
         s5l_lcd_write_data(0);
     }
+}
+
+
+void lcd_off(void)
+{
 }
 
 void lcd_on(void)

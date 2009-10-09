@@ -293,6 +293,35 @@ int storage_soft_reset(void)
     return rc;
 }
 
+#ifdef HAVE_STORAGE_FLUSH
+int storage_flush(void)
+{
+    int rc=0;
+    
+#if (CONFIG_STORAGE & STORAGE_ATA)
+    //if ((rc=ata_flush())) return rc;
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_MMC)
+    //if ((rc=mmc_flush())) return rc;
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_SD)
+    //if ((rc=sd_flush())) return rc;
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_NAND)
+    if ((rc=nand_flush())) return rc;
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_RAMDISK)
+    //if ((rc=ramdisk_flush())) return rc;
+#endif
+
+    return rc;
+}
+#endif
+
 void storage_spin(void)
 {
 #if (CONFIG_STORAGE & STORAGE_ATA)

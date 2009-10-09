@@ -52,7 +52,6 @@ int rtc_read_datetime(struct tm *tm)
 int rtc_write_datetime(const struct tm *tm)
 {
     unsigned int i;
-    int rc, oldlevel;
     unsigned char buf[7];
 
     buf[0] = tm->tm_sec;
