@@ -1,6 +1,6 @@
 # We use the UCL code available in the Rockbox tools/ directory
 CFLAGS=-I../../tools/ucl/include -Wall
-LIBUCL=../../tools/ucl/src/libucl.a
+LIBUCL=../../tools/ucl/src/libucl$(RBARCH).a
 
 #change for releases
 APPVERSION=1.1RC
@@ -25,7 +25,7 @@ CC?= gcc
 all: $(OUTPUT)
 
 $(LIBUCL):
-	make -C ../../tools/ucl/src libucl.a
+	make -C ../../tools/ucl/src $(TARGET_DIR)libucl$(RBARCH).a
 
 # This file can be generated in the dualboot/ directory
 dualboot.o: dualboot.c
@@ -47,5 +47,21 @@ libmkamsboot.a: libmkamsboot.o md5.o dualboot.o
 	$(AR) ruv libmkamsboot.a libmkamsboot.o md5.o dualboot.o
 
 clean:
-	rm -f $(OUTPUT) mkamsboot.o *~ md5.o dualboot.o \
-	libmkamsboot.o libmkamsboot.a
+	rm -f $(OUTPUT) libmkamsboot.o $(TARGET_DIR)libmkamsboot*.a mkamsboot.dmg
+	rm -rf build* mkamsboot-*
+
+mkamsboot-i386:
+	$(MAKE) RBARCH=i386
+	mv mkamsboot mkamsboot-i386
+
+mkamsboot-ppc:
+	make RBARCH=ppc
+	mv mkamsboot mkamsboot-ppc
+
+mkamsboot-mac: mkamsboot-i386 mkamsboot-ppc
+	lipo -create mkamsboot-ppc mkamsboot-i386 -output mkamsboot-mac
+
+mkamsboot.dmg: mkamsboot-mac
+	mkdir -p mkamsboot-dmg
+	cp -p mkamsboot-mac mkamsboot-dmg
+	hdiutil create -srcfolder mkamsboot-dmg mkamsboot.dmg
