@@ -18,7 +18,7 @@ visit
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
         ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_C200_PAD}
       {\ButtonUp{} / \ButtonDown}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
     / \ButtonLeft{} / \ButtonRight
        \opt{HAVEREMOTEKEYMAP}{& }
@@ -27,7 +27,8 @@ visit
     \opt{RECORDER_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonMenu}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD%
-      ,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}
+      ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
+      ,MROBE100_PAD}
       {\ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonPlay}
        \opt{HAVEREMOTEKEYMAP}{& }
@@ -41,6 +42,7 @@ visit
     \opt{IAUDIO_X5_PAD}{\ButtonPlay}
     \opt{IRIVER_H10_PAD}{Long \ButtonLeft}
     \opt{SANSA_E200_PAD}{\ButtonRec}
+    \opt{SANSA_FUZE_PAD}{\ButtonHome}
     \opt{SANSA_C200_PAD}{\ButtonVolDown}
        \opt{HAVEREMOTEKEYMAP}{& }
       & If a card was selected -- unselect it, else\\
@@ -52,7 +54,7 @@ visit
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn{} + \ButtonLeft}
     \opt{IAUDIO_X5_PAD}{Long \ButtonPlay}
     \opt{IRIVER_H10_PAD}{\ButtonFF}
-    \opt{SANSA_E200_PAD}{\ButtonLeft}
+    \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonLeft}
     \opt{SANSA_C200_PAD}{\ButtonRec}
     \opt{GIGABEAT_PAD}{\ButtonA{} + \ButtonLeft}
     \opt{GIGABEAT_S_PAD}{\ButtonSelect{} + \ButtonLeft}
@@ -68,6 +70,7 @@ visit
     \opt{IAUDIO_X5_PAD}{Long \ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
     \opt{SANSA_E200_PAD}{\ButtonRec{} + \ButtonRight}
+    \opt{SANSA_FUZE_PAD}{\ButtonRight}
        \opt{HAVEREMOTEKEYMAP}{& }
       & Put the card under the cursor on one of the 4 final colour stacks.\\
     %
@@ -76,6 +79,7 @@ visit
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn{} + \ButtonRight}
     \opt{IAUDIO_X5_PAD}{\ButtonRec}
     \opt{SANSA_E200_PAD}{\ButtonRight}
+    \opt{SANSA_FUZE_PAD}{Long \ButtonLeft}
     \opt{GIGABEAT_PAD}{\ButtonA{} + \ButtonRight}
     \opt{GIGABEAT_S_PAD}{\ButtonSelect{} + \ButtonRight}
     \opt{MROBE100_PAD}{\ButtonDisplay{} + \ButtonRight}
@@ -86,6 +90,7 @@ visit
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H300_PAD,IRIVER_H100_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu{} + \ButtonSelect}
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
+    \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
        \opt{HAVEREMOTEKEYMAP}{& 
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}

@@ -16,7 +16,7 @@ being played.
     \opt{RECORDER_PAD}{\ButtonFOne}
     \opt{ONDIO_PAD}{\ButtonMenu}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
-      ,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonSelect}
+      ,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonSelect}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
     \opt{GIGABEAT_S_PAD}{\ButtonPrev}
@@ -29,6 +29,7 @@ being played.
     \opt{IAUDIO_X5_PAD}{\ButtonRec}
     \opt{IRIVER_H10_PAD}{\ButtonFF}
     \opt{SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonDown}
+    \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonRight}
     \opt{GIGABEAT_S_PAD}{\ButtonNext}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Toggle whether to scroll or not \\
@@ -39,6 +40,7 @@ being played.
     \opt{IAUDIO_X5_PAD}{Long \ButtonSelect}
     \opt{IRIVER_H10_PAD}{Long \ButtonRew}
     \opt{SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonUp}
+    \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonLeft}
     \opt{GIGABEAT_S_PAD}{\ButtonMenu}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Toggle drawing orientation \\
@@ -47,13 +49,14 @@ being played.
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonOff}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
     \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}
+    \opt{SANSA_FUZE_PAD}{\ButtonUp}
     \opt{GIGABEAT_PAD}{\ButtonA}
     \opt{MROBE100_PAD}{\ButtonDisplay}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Pause the demo \\
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
         {\ButtonUp{} / \ButtonDown}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
     \opt{SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}
         {\ButtonVolUp{} / \ButtonVolDown}
@@ -66,6 +69,7 @@ being played.
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}
         {\ButtonPower}
+    \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
        \opt{HAVEREMOTEKEYMAP}{&
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}

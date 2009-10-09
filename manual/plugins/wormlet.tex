@@ -78,14 +78,16 @@ Game controls:}
         \ButtonRight
              \opt{HAVEREMOTEKEYMAP}{& }
         & Turn right\\
-        \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
-            ,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonUp}
+        \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+            ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
+            ,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonUp}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
         \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
             \opt{HAVEREMOTEKEYMAP}{& }
         & Turn Up\\
-        \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
-            ,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonDown}
+        \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+            ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
+            ,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonDown}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}
         \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
            \opt{HAVEREMOTEKEYMAP}{& }
@@ -130,13 +132,13 @@ game.
 Press
 \opt{RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay}%
 \opt{ONDIO_PAD}{\ButtonMenu}%
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,SANSA_E200_PAD,GIGABEAT_PAD%
-  ,GIGABEAT_S_PAD}{\ButtonSelect}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD%
+  ,GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonSelect}
 to pause the game. Press
 \opt{RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay}%
 \opt{ONDIO_PAD}{\ButtonMenu}%
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,SANSA_E200_PAD,GIGABEAT_PAD%
-  ,GIGABEAT_S_PAD}{\ButtonSelect}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD%
+  ,GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonSelect}
 again to resume the game.
 
 \item[Stop the game.]
@@ -147,13 +149,15 @@ There are two ways to stop a running game.
 \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}%
 \opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonPower}%
+\opt{SANSA_FUZE_PAD}{Long \ButtonHome}
 \opt{GIGABEAT_S_PAD}{\ButtonBack}.
 The game will stop immediately and you will return to the game menu. 
 \item If you want to stop the game and still see the screen hit 
 \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
 \opt{ONDIO_PAD}{\ButtonOff+\ButtonMenu}%
-\opt{IPOD_4G_PAD}{\ButtonSelect+ButtonPlay}%
+\opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonPlay}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}%
+\opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}%
 \opt{GIGABEAT_PAD}{\ButtonA}%
 \opt{GIGABEAT_S_PAD}{\ButtonMenu}.
 This freezes the game. If you hit
@@ -161,6 +165,7 @@ This freezes the game. If you hit
 \opt{ONDIO_PAD}{\ButtonOff+\ButtonMenu}%
 \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonPlay}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}%
+\opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}%
 \opt{GIGABEAT_PAD}{\ButtonA}%
 \opt{GIGABEAT_S_PAD}{\ButtonMenu}
 button again a new game starts with the same configuration. To return to the
@@ -168,6 +173,7 @@ games menu you can hit
 \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}%
 \opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonPower}%
+\opt{SANSA_FUZE_PAD}{Long \ButtonHome}
 \opt{GIGABEAT_S_PAD}{\ButtonBack}. A stopped game can not be resumed. 
 \end{itemize}
 \end{description}
