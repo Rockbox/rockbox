@@ -93,7 +93,7 @@ static void scrollwheel(unsigned short dbop_din)
      * clicks of the wheel */
     static int        counter = 0;
     /* Read wheel 
-     * Bits 13 and 14 of DBOP_DIN change as follows:
+     * Bits 13 and 14 of DBOP_DIN change as follows (Gray Code):
      * Clockwise rotation   00 -> 01 -> 11 -> 10 -> 00
      * Counter-clockwise    00 -> 10 -> 11 -> 01 -> 00
      *
@@ -118,18 +118,16 @@ static void scrollwheel(unsigned short dbop_din)
         btn = BUTTON_SCROLL_FWD;
     else if (old_wheel_value == wheel_tbl[1][wheel_value])
         btn = BUTTON_SCROLL_BACK;
-    else if (old_btn != BUTTON_NONE)
-    {   /* if no button is read, assume old_btn, but only once to not have
-         * wrong readings */
+    else if (old_wheel_value != wheel_value && accel > ACCEL_INCREMENT)
+    {   /* if no button is read and wheel_value changed, assume old_btn */
         btn = old_btn;
-        old_btn = BUTTON_NONE;
     }
     /* else btn = BUTTON_NONE */
 
     if (btn != BUTTON_NONE)
     {
-        if (btn != old_btn && old_btn != BUTTON_NONE)
-        {   /* don't do this if we assumned old_btn */
+        if (btn != old_btn)
+        {
             /* direction reversals nullify acceleration and counters */
             old_btn =  btn;
             accel  =  counter  = 0;
