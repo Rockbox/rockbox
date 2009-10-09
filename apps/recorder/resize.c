@@ -649,15 +649,22 @@ static inline bool scale_v_linear(struct rowset *rset,
 static void output_row_32_native_fromyuv(uint32_t row, void * row_in,
                                struct scaler_context *ctx)
 {
+#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#define DEST_STEP   (ctx->bm->height)
+#define Y_STEP      (1)
+#else
+#define DEST_STEP   (1)
+#define Y_STEP      (BM_WIDTH(ctx->bm->width,FORMAT_NATIVE,0))
+#endif
+
     int col;
-    int fb_width = BM_WIDTH(ctx->bm->width,FORMAT_NATIVE,0);
     uint8_t dy = DITHERY(row);
     struct uint32_rgb *qp = (struct uint32_rgb *)row_in;
     SDEBUGF("output_row: y: %lu in: %p\n",row, row_in);
-    fb_data *dest = (fb_data *)ctx->bm->data + fb_width * row;
+    fb_data *dest = (fb_data *)ctx->bm->data + Y_STEP * row;
     int delta = 127;
     unsigned r, g, b, y, u, v;
-
+    
     for (col = 0; col < ctx->bm->width; col++) {
         if (ctx->dither)
             delta = DITHERXDY(col,dy);
@@ -669,7 +676,8 @@ static void output_row_32_native_fromyuv(uint32_t row, void * row_in,
         r = (31 * r + (r >> 3) + delta) >> 8;
         g = (63 * g + (g >> 2) + delta) >> 8;
         b = (31 * b + (b >> 3) + delta) >> 8;
-        *dest++ = LCD_RGBPACK_LCD(r, g, b);
+        *dest = LCD_RGBPACK_LCD(r, g, b);
+        dest += DEST_STEP;
     }
 }
 #endif
