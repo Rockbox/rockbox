@@ -706,6 +706,7 @@ static int parse_viewport(const char *wps_bufptr,
     if (!(ptr = viewport_parse_viewport(vp, screen, ptr, '|')))
         return WPS_ERROR_INVALID_PARAM;
 
+    vp->flags &= ~VP_FLAG_IS_RTL; /* ignore rright-to-left languages */
     /* Check for trailing | */
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;

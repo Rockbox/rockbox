@@ -59,6 +59,7 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen);
 #define THEME_STATUSBAR     (BIT_N(0))
 #define THEME_UI_VIEWPORT   (BIT_N(1))
 #define THEME_BUTTONBAR     (BIT_N(2))
+#define THEME_LANGUAGE      (BIT_N(3))
 #define THEME_ALL           (~(0u))
 
 #define VP_SB_HIDE_ALL 0

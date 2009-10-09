@@ -60,6 +60,7 @@
 #endif
 
 static int statusbar_enabled = 0;
+static void viewport_rtl_handler(struct viewport *vp);
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -107,6 +108,7 @@ void viewport_set_fullscreen(struct viewport *vp, enum screen_type screen)
     vp->width = screens[screen].lcdwidth;
 
 #ifdef HAVE_LCD_BITMAP
+    viewport_rtl_handler(vp);
     vp->drawmode = DRMODE_SOLID;
     vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */
         
@@ -139,6 +141,7 @@ void viewport_set_fullscreen(struct viewport *vp, enum screen_type screen)
         vp->bg_pattern = LCD_REMOTE_DEFAULT_BG;
     }
 #endif
+
 }
 
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
@@ -150,10 +153,6 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 #endif
         viewport_set_fullscreen(vp, screen);
 
-#ifdef HAVE_LCD_BITMAP
-    vp->flags &= ~VP_FLAG_IS_RTL;
-    vp->flags |= lang_is_rtl() ? VP_FLAG_IS_RTL : 0;
-#endif
 }
 
 void viewportmanager_init(void)
@@ -238,6 +237,11 @@ void viewportmanager_theme_changed(int which)
             remove_event(GUI_EVENT_REFRESH, viewportmanager_ui_vp_changed);
         /* and point to it */
         ui_vp_info.vp = custom_vp;
+    }
+    else if (which & THEME_LANGUAGE)
+    {   /* THEME_UI_VIEWPORT handles rtl already */
+        FOR_NB_SCREENS(i)
+            viewport_rtl_handler(&custom_vp[i]);
     }
     if (which & THEME_STATUSBAR)
     {
@@ -354,6 +358,17 @@ bool viewport_point_within_vp(const struct viewport *vp, int x, int y)
 #endif
 
 #ifdef HAVE_LCD_BITMAP
+
+static void viewport_rtl_handler(struct viewport *vp)
+{
+#ifndef __PCTOOL__
+    if (UNLIKELY(lang_is_rtl()))
+        vp->flags |= VP_FLAG_IS_RTL;
+    else
+#endif
+        vp->flags &= ~VP_FLAG_IS_RTL;
+}
+
 const char* viewport_parse_viewport(struct viewport *vp,
                                     enum screen_type screen,
                                     const char *bufptr,
@@ -436,6 +451,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
 
     /* Set the defaults for fields not user-specified */
     vp->drawmode = DRMODE_SOLID;
+    viewport_rtl_handler(vp);
 
     return ptr;
 }

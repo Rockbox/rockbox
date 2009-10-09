@@ -174,7 +174,8 @@ static void gui_statusbar_init(struct gui_statusbar * bar)
 }
 
 #define GET_RECT(vp, vals,display)      do {                        \
-        viewport_set_fullscreen(&(vp), (display)->screen_type);       \
+        viewport_set_fullscreen(&(vp), (display)->screen_type);     \
+        (vp).flags &= ~VP_FLAG_IS_RTL;                              \
         (vp).height = STATUSBAR_HEIGHT;                             \
         (vp).x = STATUSBAR_X_POS;                                   \
         if ((vals) != STATUSBAR_BOTTOM)                             \
