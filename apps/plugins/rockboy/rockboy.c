@@ -162,8 +162,6 @@ static void setoptions (void)
         options.START=BUTTON_SCROLL_BACK;
         options.SELECT=BUTTON_SCROLL_FWD;
         options.MENU=BUTTON_POWER;
-        options.LEFT=BUTTON_LEFT;
-        options.RIGHT=BUTTON_RIGHT;
 
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
         options.UP=BUTTON_UP;
