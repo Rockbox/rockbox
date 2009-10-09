@@ -344,7 +344,7 @@ int levels_num = 40;
 /* change the first number in [ ] to however many levels there are (levels_num) */
 static unsigned char levels[40][8][10] =
 /* You can set up new levels with the level editor
-   ( http://plugbox.rockbox-lounge.de/brickmania.htm ).
+   ( http://plugbox.rockbox-lounge.com/brickmania.htm ).
    With 0x1, it refers to the first brick in the bitmap, 0x2 would refer to the
    second, ect., 0x0 leaves a empty space. If you add a 2 before the 2nd number,
    it will take two hits to break, and 3 hits if you add a 3. That is 0x24, will
