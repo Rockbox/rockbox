@@ -92,6 +92,9 @@
 #define LCD_WIDTH  LCD_NATIVE_WIDTH
 #define LCD_HEIGHT LCD_NATIVE_HEIGHT
 #else
+/* Frame buffer stride */
+#define LCD_STRIDEFORMAT    VERTICAL_STRIDE
+
 /* This is the Landscape setup */
 #define LCD_WIDTH  LCD_NATIVE_HEIGHT
 #define LCD_HEIGHT LCD_NATIVE_WIDTH
@@ -206,6 +209,9 @@
 #define USE_ROCKBOX_USB
 //#define USB_ENABLE_SERIAL
 #define HAVE_USBSTACK
+//#define HAVE_USB_POWER
+//#define USBPOWER_BUTTON     BUTTON_POWER
+//#define USBPOWER_BTN_IGNORE BUTTON_TOUCH
 /* usb stack and driver settings */
 #define USB_NUM_ENDPOINTS   7
 #define USB_VENDOR_ID       0x07b4
