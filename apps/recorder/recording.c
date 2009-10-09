@@ -1518,19 +1518,13 @@ bool recording_screen(bool no_source)
                 break;
 #endif
             case ACTION_REC_NEWFILE:
-            
-                /* Only act if in the middle of recording. */
+                /* start recording or start a new file */
                 if(audio_stat & AUDIO_STATUS_RECORD)
                 {
                     rec_command(RECORDING_CMD_START_NEWFILE);
                     last_seconds = 0;
                 }
-                break;
-        
-            case ACTION_REC_PAUSE:
-            
-                /* Only act if the mpeg is stopped */
-                if(!(audio_stat & AUDIO_STATUS_RECORD))
+                else
                 {
                     /* is this manual or triggered recording? */
                     if ((global_settings.rec_trigger_mode == TRIG_MODE_OFF) ||
@@ -1556,8 +1550,11 @@ bool recording_screen(bool no_source)
                         peak_meter_set_trigger_listener(&trigger_listener);
                     }
                 }
-                /* If we're in the middle of recording */
-                else
+                update_countdown = 0; /* Update immediately */
+                break;
+            case ACTION_REC_PAUSE:
+                /* Only act if a recording is ongoing (paused or not) */
+                if(audio_stat & AUDIO_STATUS_RECORD)
                 {
                     /* if pause button pressed, pause or resume */
                     if(audio_stat & AUDIO_STATUS_PAUSE)
