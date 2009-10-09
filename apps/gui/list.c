@@ -409,10 +409,7 @@ void gui_list_screen_scroll_step(int ofs)
 
 void gui_list_screen_scroll_out_of_view(bool enable)
 {
-    if (enable)
-        offset_out_of_view = true;
-    else
-        offset_out_of_view = false;
+    offset_out_of_view = enable;
 }
 #endif /* HAVE_LCD_BITMAP */
 
