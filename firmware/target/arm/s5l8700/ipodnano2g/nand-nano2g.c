@@ -128,7 +128,7 @@ uint32_t nand_timeout(long timeout)
 
 uint32_t nand_wait_rbbdone(void)
 {
-    long timeout = current_tick + HZ / 1;
+    long timeout = current_tick + HZ / 50;
     while ((FMCSTAT & FMCSTAT_RBBDONE) == 0)
         if (nand_timeout(timeout)) return 1;
     FMCSTAT = FMCSTAT_RBBDONE;
@@ -137,7 +137,7 @@ uint32_t nand_wait_rbbdone(void)
 
 uint32_t nand_wait_cmddone(void)
 {
-    long timeout = current_tick + HZ / 1;
+    long timeout = current_tick + HZ / 50;
     while ((FMCSTAT & FMCSTAT_CMDDONE) == 0)
         if (nand_timeout(timeout)) return 1;
     FMCSTAT = FMCSTAT_CMDDONE;
@@ -146,7 +146,7 @@ uint32_t nand_wait_cmddone(void)
 
 uint32_t nand_wait_addrdone(void)
 {
-    long timeout = current_tick + HZ / 1;
+    long timeout = current_tick + HZ / 50;
     while ((FMCSTAT & FMCSTAT_ADDRDONE) == 0)
         if (nand_timeout(timeout)) return 1;
     FMCSTAT = FMCSTAT_ADDRDONE;
@@ -155,7 +155,7 @@ uint32_t nand_wait_addrdone(void)
 
 uint32_t nand_wait_chip_ready(uint32_t bank)
 {
-    long timeout = current_tick + HZ / 1;
+    long timeout = current_tick + HZ / 50;
     while ((FMCSTAT & (FMCSTAT_BANK0READY << bank)) == 0)
         if (nand_timeout(timeout)) return 1;
     FMCSTAT = (FMCSTAT_BANK0READY << bank);
@@ -194,7 +194,7 @@ uint32_t nand_reset(uint32_t bank)
 
 uint32_t nand_wait_status_ready(uint32_t bank)
 {
-    long timeout = current_tick + HZ / 1;
+    long timeout = current_tick + HZ / 50;
     nand_set_fmctrl0(bank, 0);
     if ((FMCSTAT & (FMCSTAT_BANK0READY << bank)) != 0)
         FMCSTAT = (FMCSTAT_BANK0READY << bank);
@@ -216,7 +216,7 @@ uint32_t nand_wait_status_ready(uint32_t bank)
 uint32_t nand_transfer_data(uint32_t bank, uint32_t direction,
                             void* buffer, uint32_t size)
 {
-    long timeout = current_tick + HZ / 1;
+    long timeout = current_tick + HZ / 50;
     nand_set_fmctrl0(bank, FMCTRL0_ENABLEDMA);
     FMDNUM = size - 1;
     FMCTRL1 = FMCTRL1_DOREADDATA << direction;
@@ -239,7 +239,7 @@ uint32_t nand_transfer_data(uint32_t bank, uint32_t direction,
 uint32_t ecc_decode(uint32_t size, void* databuffer, void* sparebuffer)
 {
     mutex_lock(&ecc_mtx);
-    long timeout = current_tick + HZ / 1;
+    long timeout = current_tick + HZ / 50;
     ECC_INT_CLR = 1;
     SRCPND = INTMSK_ECC;
     ECC_UNK1 = size;
@@ -256,7 +256,7 @@ uint32_t ecc_decode(uint32_t size, void* databuffer, void* sparebuffer)
 uint32_t ecc_encode(uint32_t size, void* databuffer, void* sparebuffer)
 {
     mutex_lock(&ecc_mtx);
-    long timeout = current_tick + HZ / 1;
+    long timeout = current_tick + HZ / 50;
     ECC_INT_CLR = 1;
     SRCPND = INTMSK_ECC;
     ECC_UNK1 = size;
