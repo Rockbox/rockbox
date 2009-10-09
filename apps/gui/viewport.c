@@ -60,9 +60,9 @@
 #endif
 
 static int statusbar_enabled = 0;
-static void viewport_rtl_handler(struct viewport *vp);
 
 #ifdef HAVE_LCD_BITMAP
+static void viewport_rtl_handler(struct viewport *vp);
 
 static struct {
     struct  viewport* vp;

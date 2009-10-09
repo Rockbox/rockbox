@@ -116,9 +116,6 @@ int lang_load(const char *filename)
     else
     {
         lang_options = lang_header[3];
-#ifdef HAVE_LCD_BITMAP
-        viewportmanager_theme_changed(THEME_UI_VIEWPORT);
-#endif
     }
     return retcode;
 }

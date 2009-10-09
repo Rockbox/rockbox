@@ -76,8 +76,6 @@ void viewportmanager_init(void);
 int viewportmanager_get_statusbar(void);
 int viewportmanager_set_statusbar(int enabled);
 
-/* call this when a theme changed */
-void viewportmanager_theme_changed(int);
 
 /*
  * Initializes the given viewport with maximum dimensions minus status- and
@@ -86,6 +84,9 @@ void viewportmanager_theme_changed(int);
 void viewport_set_fullscreen(struct viewport *vp, enum screen_type screen);
 
 #ifdef HAVE_LCD_BITMAP
+
+/* call this when a theme changed */
+void viewportmanager_theme_changed(int);
 
 /*
  * Returns a pointer to the current viewport
@@ -111,6 +112,7 @@ bool viewport_point_within_vp(const struct viewport *vp, int x, int y);
 #else /* HAVE_LCD_CHARCELL */
 #define viewport_set_current_vp(a)
 #define viewport_get_current_vp() NULL
+#define viewportmanager_theme_changed(a)
 #endif
 
 #endif /* __PCTOOL__ */

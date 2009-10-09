@@ -997,9 +997,7 @@ void settings_apply(bool read_disk)
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
     enc_global_settings_apply();
 #endif
-#ifdef HAVE_LCD_BITMAP
     viewportmanager_theme_changed(THEME_ALL);
-#endif
 }
 
 
