@@ -149,7 +149,7 @@ int rtc_write_datetime(const struct tm *tm)
     }
     
     /* Number of days in years gone by since 1-Jan-1980 */
-    year_days = 365*(tm->tm_year+20) + (tm->tm_year-1)/4 + 6;
+    year_days = 365*(tm->tm_year-100+20) + (tm->tm_year-100-1)/4 + 6;
 
     /* Convert to seconds since 1-Jan-1980 */
     seconds = tm->tm_sec
