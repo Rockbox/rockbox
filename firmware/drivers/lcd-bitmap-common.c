@@ -302,7 +302,8 @@ void LCDFN(scroll_fn)(void)
 
         LCDFN(set_viewport)(s->vp);
 
-        if (s->backward)
+        if (s->backward ^ VP_IS_RTL(current_vp))
+        /* contrary to LTR, this is "forward" in RTL */
             s->offset -= LCDFN(scroll_info).step;
         else
             s->offset += LCDFN(scroll_info).step;
@@ -312,13 +313,13 @@ void LCDFN(scroll_fn)(void)
         ypos = s->y * pf->height;
 
         if (s->bidir) { /* scroll bidirectional */
-            if (s->offset <= 0) {
+            if (abs(s->offset) <= 0) {
                 /* at beginning of line */
                 s->offset = 0;
                 s->backward = false;
                 s->start_tick = current_tick + LCDFN(scroll_info).delay * 2;
             }
-            if (s->offset >= s->width - (current_vp->width - xpos)) {
+            if (abs(s->offset) >= s->width - (current_vp->width - xpos)) {
                 /* at end of line */
                 s->offset = s->width - (current_vp->width - xpos);
                 s->backward = true;
@@ -327,7 +328,7 @@ void LCDFN(scroll_fn)(void)
         }
         else {
             /* scroll forward the whole time */
-            if (s->offset >= s->width)
+            if (abs(s->offset) >= s->width)
                 s->offset %= s->width;
         }
         LCDFN(putsxyofs_style)(xpos, ypos, s->line, s->style, s->width,
