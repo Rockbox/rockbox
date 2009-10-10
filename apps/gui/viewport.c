@@ -78,7 +78,7 @@ static unsigned viewport_init_ui_vp(void);
 #endif
 static void viewportmanager_redraw(void* data);
 
-int viewport_get_nb_lines(struct viewport *vp)
+int viewport_get_nb_lines(const struct viewport *vp)
 {
 #ifdef HAVE_LCD_BITMAP
     return vp->height/font_get(vp->font)->height;

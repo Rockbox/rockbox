@@ -1,4 +1,3 @@
-
 /***************************************************************************
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
@@ -30,7 +29,7 @@
 #include "screen_access.h"
 
 /* return the number of text lines in the vp viewport */
-int viewport_get_nb_lines(struct viewport *vp);
+int viewport_get_nb_lines(const struct viewport *vp);
 
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen);
 
