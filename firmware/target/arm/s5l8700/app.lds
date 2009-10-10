@@ -107,6 +107,9 @@ SECTIONS
        *(.stack)
        stackbegin = .;
        _stackbegin = .;
+#ifdef IPOD_NANO2G
+       . += 0x4000;
+#endif
        . += 0x2000;
        stackend = .;
        _stackend = .;
