@@ -3,6 +3,8 @@
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
+#define IPOD_ARCH 1
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 62
 
@@ -151,6 +153,9 @@
 
 /* USB On-the-go */
 //#define CONFIG_USBOTG USBOTG_M5636
+
+/* We reboot into the OF to handle USB */
+#define USB_HANDLED_BY_OF
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
