@@ -114,6 +114,10 @@
 #include "as3514.h"
 #endif
 
+#ifdef IPOD_NANO2G
+#include "pmu-target.h"
+#endif
+
 #ifdef HAVE_USBSTACK 	 
 #include "usb_core.h" 	 
 #endif
@@ -1793,6 +1797,10 @@ static bool view_battery(void)
                 snprintf(buf, sizeof(buf), "CHARGER: %02X", 
                          ascodec_read(AS3514_CHARGER));
                 lcd_puts(0, 5, buf);
+#elif defined(IPOD_NANO2G)
+                y = pmu_read_battery_current();
+                snprintf(buf, 30, "Battery current: %d mA", y);
+                lcd_puts(0, 2, buf);
 #else
                 snprintf(buf, 30, "Charger: %s",
                          charger_inserted() ? "present" : "absent");
