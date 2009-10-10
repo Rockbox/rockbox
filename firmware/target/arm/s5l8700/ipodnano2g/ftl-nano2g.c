@@ -1778,6 +1778,8 @@ uint32_t ftl_sync(void)
     uint32_t ppb = (*ftl_nand_type).pagesperblock * ftl_banks;
     if (ftl_cxt.clean_flag == 1) return 0;
 
+    mutex_lock(&ftl_mtx);
+
     if (ftl_cxt.swapcounter >= 20)
         for (i = 0; i < 4; i++)
             if (ftl_swap_blocks() == 0)
@@ -1793,10 +1795,19 @@ uint32_t ftl_sync(void)
             rc |= ftl_commit_sequential(&ftl_log[i]);
         else rc |= ftl_commit_scattered(&ftl_log[i]);
     }
-    if (rc != 0) return 1;
+    if (rc != 0)
+    {
+        mutex_unlock(&ftl_mtx);
+        return 1;
+    }
     for (i = 0; i < 5; i++)
-        if (ftl_commit_cxt() == 0) return 0;
+        if (ftl_commit_cxt() == 0)
+        {
+            mutex_unlock(&ftl_mtx);
+            return 0;
+        }
         else ftl_cxt.ftlctrlpage |= ppb - 1;
+    mutex_unlock(&ftl_mtx);
     return 1;
 }
 #endif

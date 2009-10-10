@@ -312,6 +312,7 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
     if (databuffer != 0)
         if (nand_transfer_data(bank, 0, nand_uncached_data, 0x800) != 0)
             return nand_unlock(1);
+    rc = 0;
     if (doecc == 0)
     {
         memcpy(databuffer, nand_uncached_data, 0x800);
@@ -321,11 +322,10 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
                 return nand_unlock(1);
             memcpy(sparebuffer, nand_uncached_spare, 0x800);
             if (checkempty != 0)
-                return nand_check_empty((uint8_t*)sparebuffer) << 1;
+                rc = nand_check_empty((uint8_t*)sparebuffer) << 1;
         }
-        return nand_unlock(0);
+        return nand_unlock(rc);
     }
-    rc = 0;
     if (nand_transfer_data(bank, 0, nand_uncached_spare, 0x40) != 0)
         return nand_unlock(1);
     memcpy(nand_uncached_ecc, &nand_uncached_spare[0xC], 0x28);
@@ -377,7 +377,7 @@ uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
         if (nand_transfer_data(bank, 1, nand_uncached_spare, 0x40) != 0)
             return nand_unlock(1);
     if (nand_send_cmd(NAND_CMD_PROGCNFRM) != 0) return nand_unlock(1);
-    return nand_wait_status_ready(bank);
+    return nand_unlock(nand_wait_status_ready(bank));
 }
 
 uint32_t nand_block_erase(uint32_t bank, uint32_t page)
