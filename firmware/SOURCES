@@ -1253,6 +1253,7 @@ target/arm/tcc77x/iaudio7/audio-iaudio7.c
 #ifndef SIMULATOR
 drivers/nand_id.c
 drivers/pcf50606.c
+drivers/pcf50635.c
 target/arm/lcd-as-memframe.S
 target/arm/tcc780x/adc-tcc780x.c
 target/arm/tcc780x/system-tcc780x.c

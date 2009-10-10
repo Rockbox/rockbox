@@ -53,7 +53,17 @@ int pcf50606_read_multiple(int address, unsigned char* buf, int count)
 
 void pcf50606_init(void)
 {
-    // TODO
+#ifdef COWON_D2
+        /* Set outputs as per OF - further investigation required. */
+        pcf50606_write(PCF5060X_DCDEC1,  0xe4);
+        pcf50606_write(PCF5060X_IOREGC,  0xf5);
+        pcf50606_write(PCF5060X_D1REGC1, 0xf5);
+        pcf50606_write(PCF5060X_D2REGC1, 0xe9);
+        pcf50606_write(PCF5060X_D3REGC1, 0xf8); /* WM8985 3.3v */
+        pcf50606_write(PCF5060X_DCUDC1,  0xe7);
+        pcf50606_write(PCF5060X_LPREGC1, 0x0);
+        pcf50606_write(PCF5060X_LPREGC2, 0x2);
+#endif
 }
 
 void pcf50606_reset_timeout(void)

@@ -23,7 +23,9 @@
 #include "adc.h"
 #include "powermgmt.h"
 #include "kernel.h"
+#include "power-target.h"
 #include "pcf50606.h"
+#include "pcf50635.h"
 
 unsigned short current_voltage = 3910;
 
@@ -66,7 +68,11 @@ unsigned int battery_adc_voltage(void)
     if (TIME_BEFORE(last_tick+HZ, current_tick))
     {
         short adc_val;
-        pcf50606_read_adc(PCF5060X_ADC_BATVOLT_RES, &adc_val, NULL);
+        
+        if (get_pmu_type() == PCF50606)
+            pcf50606_read_adc(PCF5060X_ADC_BATVOLT_RES, &adc_val, NULL);
+        else
+            pcf50635_read_adc(PCF5063X_ADCC1_MUX_BATSNS_RES, &adc_val, NULL);
 
         current_voltage = (adc_val * BATTERY_SCALE_FACTOR) >> 10;
 
@@ -75,4 +81,3 @@ unsigned int battery_adc_voltage(void)
 
     return current_voltage;
 }
-

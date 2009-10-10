@@ -22,7 +22,9 @@
 #include "system.h"
 #include "backlight.h"
 #include "pcf50606.h"
+#include "pcf50635.h"
 #include "tcc780x.h"
+#include "power-target.h"
 
 int _backlight_init(void)
 {
@@ -35,17 +37,49 @@ int _backlight_init(void)
 void _backlight_set_brightness(int brightness)
 {
     int level = disable_irq_save();
-    pcf50606_write(PCF5060X_PWMC1, 0xe1 | (MAX_BRIGHTNESS_SETTING-brightness)<<1);
-    pcf50606_write(PCF5060X_GPOC1, 0x3);
+    
+    if (get_pmu_type() == PCF50606)
+    {
+        pcf50606_write(PCF5060X_PWMC1,
+                       0xe1 | (MAX_BRIGHTNESS_SETTING-brightness)<<1);
+        pcf50606_write(PCF5060X_GPOC1, 0x3);
+    }
+    else
+    {
+        static const int brightness_lookup[MAX_BRIGHTNESS_SETTING+1] =
+            {0x1, 0x8, 0xa, 0xe, 0x12, 0x16, 0x19, 0x1b, 0x1e,
+             0x21, 0x24, 0x26, 0x28, 0x2a, 0x2c};
+
+        pcf50635_write(PCF5063X_REG_LEDOUT, brightness_lookup[brightness]);
+    }
+    
     restore_irq(level);
 }
 
 void _backlight_on(void)
 {
-    GPIOA_SET = (1<<6);
+    if (get_pmu_type() == PCF50606)
+    {
+        GPIOA_SET = (1<<6);
+    }
+    else
+    {
+        int level = disable_irq_save();
+        pcf50635_write(PCF5063X_REG_LEDENA, 1);
+        restore_irq(level);
+    }
 }
 
 void _backlight_off(void)
 {
-    GPIOA_CLEAR = (1<<6);
+    if (get_pmu_type() == PCF50606)
+    {
+        GPIOA_CLEAR = (1<<6);
+    }
+    else
+    {
+        int level = disable_irq_save();
+        pcf50635_write(PCF5063X_REG_LEDENA, 0);
+        restore_irq(level);
+    }
 }

@@ -23,31 +23,51 @@
 #include "system.h"
 #include "power.h"
 #include "pcf50606.h"
+#include "pcf50635.h"
 #include "button-target.h"
 #include "tuner.h"
 #include "backlight-target.h"
 #include "powermgmt.h"
+#include "power-target.h"
+
+static enum pmu_type pmu;
+
+enum pmu_type get_pmu_type()
+{
+    return pmu;
+}
 
 void power_init(void)
 {
-    unsigned char data[3]; /* 0 = INT1, 1 = INT2, 2 = INT3 */
+    /* Configure GPA6 as input and wait a short while */
+    GPIOA_DIR &= ~(1<<6);
 
-    /* Clear pending interrupts from pcf50606 */
-    pcf50606_read_multiple(0x02, data, 3);
-    
-    /* Set outputs as per OF - further investigation required. */
-    pcf50606_write(PCF5060X_DCDEC1,  0xe4);
-    pcf50606_write(PCF5060X_IOREGC,  0xf5);
-    pcf50606_write(PCF5060X_D1REGC1, 0xf5);
-    pcf50606_write(PCF5060X_D2REGC1, 0xe9);
-    pcf50606_write(PCF5060X_D3REGC1, 0xf8); /* WM8985 3.3v */
-    pcf50606_write(PCF5060X_DCUDC1,  0xe7);
-    pcf50606_write(PCF5060X_LPREGC1, 0x0);
-    pcf50606_write(PCF5060X_LPREGC2, 0x2);
+    udelay(10);
+
+    /* Value of GPA6 determines PMU chip type */
+    if (GPIOA & (1<<6))
+    {
+        pmu = PCF50635;
+
+        pcf50635_init();
+    }
+    else
+    {
+        pmu = PCF50606;
+
+        /* Configure GPA6 for output (backlight enable) */
+        GPIOA_DIR |= (1<<6);
+
+        pcf50606_init();
+
+        /* Clear pending interrupts */
+        unsigned char data[3]; /* 0 = INT1, 1 = INT2, 2 = INT3 */
+        pcf50606_read_multiple(0x02, data, 3);
 
 #ifndef BOOTLOADER
-    IEN |= EXT3_IRQ_MASK;   /* Unmask EXT3 */
+        IEN |= EXT3_IRQ_MASK;   /* Unmask EXT3 */
 #endif
+    }
 }
 
 void power_off(void)
@@ -55,7 +75,7 @@ void power_off(void)
     /* Turn the backlight off first to avoid a bright stripe on power-off */
     _backlight_off();
     sleep(HZ/10);
-    
+
     /* Power off the player using the same mechanism as the OF */
     GPIOA_CLEAR = (1<<7);
     while(true);
@@ -114,15 +134,15 @@ bool tuner_power(bool status)
                in host read mode: */
 
             /* 1. Set direction of the DATA-line to input-mode. */
-            GPIOC_DIR &= ~(1 << 30); 
+            GPIOC_DIR &= ~(1 << 30);
 
             /* 2. Drive NR_W low */
-            GPIOC_CLEAR = (1 << 31); 
-            GPIOC_DIR |= (1 << 31); 
+            GPIOC_CLEAR = (1 << 31);
+            GPIOC_DIR |= (1 << 31);
 
             /* 3. Drive CLOCK high */
-            GPIOC_SET = (1 << 29); 
-            GPIOC_DIR |= (1 << 29); 
+            GPIOC_SET = (1 << 29);
+            GPIOC_DIR |= (1 << 29);
 
             lv24020lp_power(true);
         }
