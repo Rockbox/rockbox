@@ -820,7 +820,9 @@ uint32_t ftl_vfl_read(uint32_t vpage, void* buffer, void* sparebuffer,
         nand_reset(bank);
         ret = nand_read_page(bank, physpage, buffer,
                              sparebuffer, 1, checkempty);
-#ifndef FTL_READONLY
+#ifdef FTL_READONLY
+        (void)remaponfail;
+#else
         if (remaponfail == 1 &&(ret & 0x11D) != 0 && (ret & 2) == 0)
             ftl_vfl_schedule_block_for_remap(bank, block);
 #endif
