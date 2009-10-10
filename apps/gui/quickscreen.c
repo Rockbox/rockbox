@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 
-
 #include <stdio.h>
 #include "config.h"
 #include "system.h"
@@ -64,7 +63,7 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     /* nb_lines only returns the number of fully visible lines, small screens
         or really large fonts could cause problems with the calculation below.
      */
-    if(nb_lines==0)
+    if (nb_lines == 0)
         nb_lines++;
         
     char_height = parent->height/nb_lines;
@@ -193,7 +192,7 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
     int temp;
     display->set_viewport(parent);
     display->clear_viewport();
-    for (i=0; i<QUICKSCREEN_ITEM_COUNT; i++)
+    for (i = 0; i < QUICKSCREEN_ITEM_COUNT; i++)
     {
         if (!qs->items[i])
             continue;
@@ -242,7 +241,7 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
 static void talk_qs_option(struct settings_list *opt, bool enqueue)
 {
     if (global_settings.talk_menu) {
-        if(!enqueue)
+        if (!enqueue)
             talk_shutup();
         talk_id(opt->lang_id, true);
         option_talk_value(opt, option_value_as_int(opt), true);
@@ -335,29 +334,30 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
     talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_BOTTOM], true);
     talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_RIGHT], true);
     while (true) {
-        button = get_action(CONTEXT_QUICKSCREEN,HZ/5);
+        button = get_action(CONTEXT_QUICKSCREEN, HZ/5);
 #ifdef HAVE_TOUCHSCREEN
         if (button == ACTION_TOUCHSCREEN)
             button = quickscreen_touchscreen_button(vps[SCREEN_MAIN]);
 #endif
-        if(default_event_handler(button) == SYS_USB_CONNECTED)
+        if (default_event_handler(button) == SYS_USB_CONNECTED)
             return(true);
-        if(gui_quickscreen_do_button(qs, button))
+        if (gui_quickscreen_do_button(qs, button))
         {
             changed = true;
-            can_quit=true;
+            can_quit = true;
             FOR_NB_SCREENS(i)
-                gui_quickscreen_draw(qs, &screens[i], &parent[i], vps[i],&vp_icons[i]);
+                gui_quickscreen_draw(qs, &screens[i], &parent[i],
+                                     vps[i], &vp_icons[i]);
             if (qs->callback)
                 qs->callback(qs);
         }
-        else if(button==button_enter)
-            can_quit=true;
+        else if (button == button_enter)
+            can_quit = true;
             
-        if((button == button_enter) && can_quit)
+        if ((button == button_enter) && can_quit)
             break;
             
-        if(button==ACTION_STD_CANCEL)
+        if (button == ACTION_STD_CANCEL)
             break;
     }
     /* Notify that we're exiting this screen */
@@ -371,7 +371,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
     return changed;
 }
 
-static inline const struct settings_list *get_setting(int gs_value,
+static const struct settings_list *get_setting(int gs_value,
                                         const struct settings_list *defaultval)
 {
     if (gs_value != -1 && gs_value < nb_settings &&
@@ -379,6 +379,7 @@ static inline const struct settings_list *get_setting(int gs_value,
         return &settings[gs_value];
     return defaultval;
 }
+
 bool quick_screen_quick(int button_enter)
 {
     struct gui_quickscreen qs;
@@ -393,10 +394,10 @@ bool quick_screen_quick(int button_enter)
                         find_setting(&global_settings.playlist_shuffle, NULL));
     qs.items[QUICKSCREEN_RIGHT] = 
             get_setting(global_settings.qs_item_right,
-                    find_setting(&global_settings.repeat_mode, NULL));
+                        find_setting(&global_settings.repeat_mode, NULL));
     qs.items[QUICKSCREEN_BOTTOM] = 
             get_setting(global_settings.qs_item_bottom,
-                    find_setting(&global_settings.dirfilter, NULL));
+                        find_setting(&global_settings.dirfilter, NULL));
 
     qs.callback = NULL;
     if (gui_syncquickscreen_run(&qs, button_enter))
@@ -466,7 +467,7 @@ void set_as_qs_item(const struct settings_list *setting,
                     enum quickscreen_item item)
 {
     int i;
-    for(i=0;i<nb_settings;i++)
+    for (i = 0; i < nb_settings; i++)
     {
         if (&settings[i] == setting)
             break;
