@@ -199,7 +199,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
 #endif
                              )
 {
-    unsigned char* ptr;
+    const char* ptr;
     char buf[32];
     int w, h;
     bool show_lang_pitch;
@@ -318,10 +318,10 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     {
         if(at_limit)
         {
-            snprintf(buf, sizeof(buf), "%s", str(LANG_STRETCH_LIMIT));
-            display->getstringsize(buf, &w, &h);
+            const char * const p = str(LANG_STRETCH_LIMIT);
+            display->getstringsize(p, &w, &h);
             display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
-                            (pitch_viewports[PITCH_MID].height / 2) + h, buf);
+                            (pitch_viewports[PITCH_MID].height / 2) + h, p);
             if (w > width_used)
                 width_used = w;
         }
