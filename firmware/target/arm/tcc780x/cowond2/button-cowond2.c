@@ -43,6 +43,9 @@ void button_read_touch()
 {
     static long last_touch_interrupt = 0;
     static int touch_data_index = 0;
+    
+    /* don't read the coordinates when hold is enabled */
+    if (button_hold()) return;
 
     /* put the touchscreen into idle mode */
     pcf50606_write(PCF5060X_ADCC1, 0);
