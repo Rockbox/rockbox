@@ -1248,7 +1248,6 @@ void RbUtilQt::downloadUpdateDone(bool error)
     }
     else {
         QString toParse(update->readAll());
-        qDebug() << "[Checkupdate] " << toParse;
         
         QRegExp searchString("<a[^>]*>(rbutilqt[^<]*)</a>");
         QStringList rbutilList;
@@ -1258,6 +1257,7 @@ void RbUtilQt::downloadUpdateDone(bool error)
             rbutilList << searchString.cap(1);
             pos += searchString.matchedLength();
         }
+        qDebug() << "[Checkupdate] " << rbutilList;
         
         QString newVersion ="";
         //check if there is a binary with higher version in this list
