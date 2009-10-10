@@ -56,6 +56,9 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
+/* Define this if you can detect headphones */
+#define HAVE_HEADPHONE_DETECTION
+
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 

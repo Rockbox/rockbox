@@ -352,6 +352,11 @@ bool button_hold(void)
 {
     return ((PDAT14 & (1 << 6)) == 0);
 }
+
+bool headphones_inserted(void)
+{
+    return ((PDAT14 & (1 << 5)) != 0);
+}
 #endif
 
 /*
