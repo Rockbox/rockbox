@@ -112,8 +112,8 @@ const char *option_get_valuestring(const struct settings_list *setting,
     }
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
-        char sign = ' ', *unit;
-        unit = (char*)sound_unit(setting->sound_setting->setting);
+        char sign = ' ';
+        const char *unit = sound_unit(setting->sound_setting->setting);
         if (sound_numdecimals(setting->sound_setting->setting))
         {
             int integer, dec;
@@ -124,7 +124,8 @@ const char *option_get_valuestring(const struct settings_list *setting,
                 sign = '-';
                 val = abs(val);
             }
-            integer = val / 10; dec = val % 10;
+            integer = val / 10;
+            dec = val % 10;
             snprintf(buffer, buf_len, "%c%d.%d %s", sign, integer, dec, unit);
         }
         else
@@ -148,7 +149,7 @@ const char *option_get_valuestring(const struct settings_list *setting,
         }
         else
         {
-            int value= (int)temp_var;
+            int value = (int)temp_var;
             char *val = P2STR(setting->choice_setting->desc[value]);
             strlcpy(buffer, val, buf_len);
         }
