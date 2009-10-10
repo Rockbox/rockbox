@@ -70,18 +70,28 @@ end:
 
 bool __dbg_ports(void)
 {
-    char buf[50];
+    char buf[32];
     int line;
 
-    lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
     while(1)
     {
+        lcd_clear_display();
         line = 0;
         
-        /* _DEBUG_PRINTF statements can be added here to show debug info */
-        _DEBUG_PRINTF("__dbg_ports");
+        _DEBUG_PRINTF("GPIO  0: %08x",(unsigned int)PDAT0);
+        _DEBUG_PRINTF("GPIO  1: %08x",(unsigned int)PDAT1);
+        _DEBUG_PRINTF("GPIO  2: %08x",(unsigned int)PDAT2);
+        _DEBUG_PRINTF("GPIO  3: %08x",(unsigned int)PDAT3);
+        _DEBUG_PRINTF("GPIO  4: %08x",(unsigned int)PDAT4);
+        _DEBUG_PRINTF("GPIO  5: %08x",(unsigned int)PDAT5);
+        _DEBUG_PRINTF("GPIO  6: %08x",(unsigned int)PDAT6);
+        _DEBUG_PRINTF("GPIO  7: %08x",(unsigned int)PDAT7);
+        _DEBUG_PRINTF("GPIO 10: %08x",(unsigned int)PDAT10);
+        _DEBUG_PRINTF("GPIO 11: %08x",(unsigned int)PDAT11);
+        _DEBUG_PRINTF("GPIO 13: %08x",(unsigned int)PDAT13);
+        _DEBUG_PRINTF("GPIO 14: %08x",(unsigned int)PDAT14);
 
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))

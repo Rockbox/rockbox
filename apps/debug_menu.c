@@ -103,7 +103,8 @@
 #include "appevents.h"
 
 #if CONFIG_CPU == DM320 || CONFIG_CPU == S3C2440 || CONFIG_CPU == TCC7801 \
-    || CONFIG_CPU == IMX31L || CONFIG_CPU == AS3525 || CONFIG_CPU == JZ4732
+    || CONFIG_CPU == IMX31L || CONFIG_CPU == AS3525 || CONFIG_CPU == JZ4732 \
+    || defined(CPU_S5L870X)
 #include "debug-target.h"
 #endif
 
@@ -2705,7 +2706,7 @@ static const struct the_menu_item menuitems[] = {
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) \
     || CONFIG_CPU == S3C2440 || CONFIG_CPU == IMX31L || CONFIG_CPU == AS3525 \
-    || CONFIG_CPU == DM320
+    || CONFIG_CPU == DM320 || defined(CPU_S5L870X)
         { "View I/O ports", dbg_ports },
 #endif
 #if (CONFIG_RTC == RTC_PCF50605) && !defined(SIMULATOR)
