@@ -54,7 +54,7 @@ private:
     //! creates all dynamic window content
     void setUpWindow();
     //! creates the Widgets needed for one setting. returns a Layout with the widgets
-    QLayout* createWidgets(EncTtsSetting* setting);
+    QWidget* createWidgets(EncTtsSetting* setting);
     //! creates a button when needed by the setting.
     QWidget* createButton(EncTtsSetting* setting);
     //! name of the Encoder or TTS for which this UI is

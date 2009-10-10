@@ -46,18 +46,32 @@ void EncTtsCfgGui::setUpWindow()
 {
     m_settingsList = m_settingInterface->getSettings();
     
-    //layout
+    // layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
     
-      // groupbox
+    // groupbox
     QGroupBox *groupBox = new QGroupBox(this);
-    QFormLayout *formlayout = new QFormLayout;
+    QGridLayout *gridLayout = new QGridLayout(groupBox);
     // setting widgets
     for(int i = 0; i < m_settingsList.size(); i++)
     {
-        formlayout->addRow(m_settingsList.at(i)->name(),createWidgets(m_settingsList.at(i)));
+        QLabel *label = new QLabel(m_settingsList.at(i)->name());
+        gridLayout->addWidget(label, i, 0);
+        QWidget *widget = createWidgets(m_settingsList.at(i));
+        gridLayout->addWidget(widget, i, 1);
+        QWidget *btn = createButton(m_settingsList.at(i));
+        if(btn != NULL)
+        {
+            gridLayout->addWidget(btn, i, 2);
+        }
     }
-    groupBox->setLayout(formlayout);
+    // add hidden spacers to make the dialog scale properly
+    QSpacerItem* spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    gridLayout->addItem(spacer, m_settingsList.size(), 0);
+    spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    gridLayout->addItem(spacer, m_settingsList.size(), 1);
+
+    groupBox->setLayout(gridLayout);
     mainLayout->addWidget(groupBox);
     
     // connect browse btn
@@ -82,7 +96,7 @@ void EncTtsCfgGui::setUpWindow()
     this->setLayout(mainLayout);
 }
 
-QLayout* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
+QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
 {
     // value display
     QWidget* value = NULL;
@@ -152,23 +166,14 @@ QLayout* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
         }
     }
     
-    // remeber widget
+    // remember widget
     if(value != NULL)
     {    
         m_settingsWidgetsMap.insert(setting,value);
         connect(setting,SIGNAL(updateGui()),this,SLOT(updateWidget()));
     }
     
-     // buttons ?
-    QWidget* btn = createButton(setting);
-    
-    // add to layout
-    QHBoxLayout *hbox = new QHBoxLayout;
-    if(value != NULL)hbox->addWidget(value); 
-    if(btn != NULL) hbox->addWidget(btn);  
-  
-    return hbox;
-    
+    return value;
 }
 
 QWidget* EncTtsCfgGui::createButton(EncTtsSetting* setting)
@@ -176,7 +181,7 @@ QWidget* EncTtsCfgGui::createButton(EncTtsSetting* setting)
     if(setting->button() == EncTtsSetting::eBROWSEBTN)
     {
         QPushButton* browsebtn = new QPushButton(tr("Browse"),this);
-        browsebtn->setFixedWidth(50);  //all buttons the same size, or it looks ugly
+        browsebtn->setIcon(QIcon(":/icons/system-search.png"));
         m_browseBtnMap.setMapping(browsebtn,setting);
         connect(browsebtn,SIGNAL(clicked()),&m_browseBtnMap,SLOT(map()));
         return browsebtn;
@@ -184,7 +189,7 @@ QWidget* EncTtsCfgGui::createButton(EncTtsSetting* setting)
     else if(setting->button() == EncTtsSetting::eREFRESHBTN)
     {
         QPushButton* refreshbtn = new QPushButton(tr("Refresh"),this);
-        refreshbtn->setFixedWidth(50); //all buttons the same size, or it looks ugly
+        refreshbtn->setIcon(QIcon(":/icons/view-refresh.png"));
         connect(refreshbtn,SIGNAL(clicked()),setting,SIGNAL(refresh()));
         return refreshbtn;
     }
