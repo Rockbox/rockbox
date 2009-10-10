@@ -771,7 +771,8 @@ static void gui_statusbar_icon_recording_info(struct screen * display)
     else
 #endif /* HAVE_SPDIF_IN */
     {
-        static const char *freq_strings[] = {"44", "48", "32", "22", "24", "16"};
+        static const char * const freq_strings[] =
+           {"44", "48", "32", "22", "24", "16"};
         p = freq_strings[global_settings.rec_frequency];
     }
 
