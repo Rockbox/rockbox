@@ -62,9 +62,6 @@ void i2c_init(void)
 
     /* serial output on */
     IICSTAT = (1 << 4);
-    
-    /* enable interrupt */
-    INTMSK |= (1 << 27);
 }
 
 int i2c_write(unsigned char slave, int address, int len, const unsigned char *data)
