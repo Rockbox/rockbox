@@ -40,20 +40,10 @@
 */
 
 static struct mutex i2c_mtx;
-static struct wakeup i2c_wakeup;
-
-void INT_IIC(void)
-{
-    /* disable interrupt (but don't clear it yet) */
-    IICCON &= ~((1 << 4) | (1 << 5));
-
-    wakeup_signal(&i2c_wakeup);
-}
 
 void i2c_init(void)
 {
     mutex_init(&i2c_mtx);
-    wakeup_init(&i2c_wakeup);
 
     /* enable I2C pins */
     PCON10 = (2 << 2) |
@@ -65,10 +55,10 @@ void i2c_init(void)
     /* initial config */
     IICADD = 0;
     IICCON = (1 << 7) | /* ACK_GEN */
-             (1 << 6) | /* CLKSEL = PCLK/512 */
+             (0 << 6) | /* CLKSEL = PCLK/16 */
              (1 << 5) | /* INT_EN */
              (1 << 4) | /* IRQ clear */
-             (3 << 0);  /* CK_REG */
+             (7 << 0);  /* CK_REG */
 
     /* serial output on */
     IICSTAT = (1 << 4);
@@ -84,26 +74,26 @@ int i2c_write(unsigned char slave, int address, int len, const unsigned char *da
     /* START */
     IICDS = slave & ~1;
     IICSTAT = 0xF0;
-    IICCON = 0xF3;
-    while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
+    IICCON = 0xB7;
+    while ((IICCON & 0x10) == 0);
     
     if (address >= 0) {
         /* write address */
         IICDS = address;
-        IICCON = 0xF3;
-        while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
+        IICCON = 0xB7;
+        while ((IICCON & 0x10) == 0);
     }
     
     /* write data */
     while (len--) {
         IICDS = *data++;
-        IICCON = 0xF3;
-        while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
+        IICCON = 0xB7;
+        while ((IICCON & 0x10) == 0);
     }
 
     /* STOP */
     IICSTAT = 0xD0;
-    IICCON = 0xF3;
+    IICCON = 0xB7;
     while ((IICSTAT & (1 << 5)) != 0);
     
     mutex_unlock(&i2c_mtx);
@@ -118,30 +108,30 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
         /* START */
         IICDS = slave & ~1;
         IICSTAT = 0xF0;
-        IICCON = 0xF3;
-        while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
+        IICCON = 0xB7;
+        while ((IICCON & 0x10) == 0);
 
         /* write address */
         IICDS = address;
-        IICCON = 0xF3;
-        while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
+        IICCON = 0xB7;
+        while ((IICCON & 0x10) == 0);
     }
     
     /* (repeated) START */
     IICDS = slave | 1;
     IICSTAT = 0xB0;
-    IICCON = 0xF3;
-    while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
+    IICCON = 0xB7;
+    while ((IICCON & 0x10) == 0);
     
     while (len--) {
-        IICCON = (len == 0) ? 0x73 : 0xF3; /* NACK or ACK */
-        while ((IICCON & 0x10) == 0) wakeup_wait(&i2c_wakeup, 1);
+        IICCON = (len == 0) ? 0x37 : 0xB7; /* NACK or ACK */
+        while ((IICCON & 0x10) == 0);
         *data++ = IICDS;
     }
 
     /* STOP */
     IICSTAT = 0x90;
-    IICCON = 0xF3;
+    IICCON = 0xB7;
     while ((IICSTAT & (1 << 5)) != 0);
     
     mutex_unlock(&i2c_mtx);
