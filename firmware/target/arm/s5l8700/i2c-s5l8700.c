@@ -67,31 +67,53 @@ void i2c_init(void)
 int i2c_write(unsigned char slave, int address, int len, const unsigned char *data)
 {
     mutex_lock(&i2c_mtx);
+    long timeout = current_tick + HZ / 50;
 
     /* START */
     IICDS = slave & ~1;
     IICSTAT = 0xF0;
     IICCON = 0xB7;
-    while ((IICCON & 0x10) == 0);
+    while ((IICCON & 0x10) == 0)
+        if (TIME_AFTER(current_tick, timeout))
+        {
+            mutex_unlock(&i2c_mtx);
+            return 1;
+        }
+
     
     if (address >= 0) {
         /* write address */
         IICDS = address;
         IICCON = 0xB7;
-        while ((IICCON & 0x10) == 0);
+        while ((IICCON & 0x10) == 0)
+            if (TIME_AFTER(current_tick, timeout))
+            {
+                mutex_unlock(&i2c_mtx);
+                return 2;
+            }
     }
     
     /* write data */
     while (len--) {
         IICDS = *data++;
         IICCON = 0xB7;
-        while ((IICCON & 0x10) == 0);
+        while ((IICCON & 0x10) == 0)
+            if (TIME_AFTER(current_tick, timeout))
+            {
+                mutex_unlock(&i2c_mtx);
+                return 4;
+            }
     }
 
     /* STOP */
     IICSTAT = 0xD0;
     IICCON = 0xB7;
-    while ((IICSTAT & (1 << 5)) != 0);
+    while ((IICSTAT & (1 << 5)) != 0)
+        if (TIME_AFTER(current_tick, timeout))
+        {
+            mutex_unlock(&i2c_mtx);
+            return 5;
+        }
     
     mutex_unlock(&i2c_mtx);
     return 0;
@@ -100,36 +122,62 @@ int i2c_write(unsigned char slave, int address, int len, const unsigned char *da
 int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
 {
     mutex_lock(&i2c_mtx);
+    long timeout = current_tick + HZ / 50;
 
     if (address >= 0) {
         /* START */
         IICDS = slave & ~1;
         IICSTAT = 0xF0;
         IICCON = 0xB7;
-        while ((IICCON & 0x10) == 0);
+        while ((IICCON & 0x10) == 0)
+            if (TIME_AFTER(current_tick, timeout))
+            {
+                mutex_unlock(&i2c_mtx);
+                return 1;
+            }
 
         /* write address */
         IICDS = address;
         IICCON = 0xB7;
-        while ((IICCON & 0x10) == 0);
+        while ((IICCON & 0x10) == 0)
+            if (TIME_AFTER(current_tick, timeout))
+            {
+                mutex_unlock(&i2c_mtx);
+                return 2;
+            }
     }
     
     /* (repeated) START */
     IICDS = slave | 1;
     IICSTAT = 0xB0;
     IICCON = 0xB7;
-    while ((IICCON & 0x10) == 0);
+    while ((IICCON & 0x10) == 0)
+        if (TIME_AFTER(current_tick, timeout))
+        {
+            mutex_unlock(&i2c_mtx);
+            return 3;
+        }
     
     while (len--) {
         IICCON = (len == 0) ? 0x37 : 0xB7; /* NACK or ACK */
-        while ((IICCON & 0x10) == 0);
+        while ((IICCON & 0x10) == 0)
+            if (TIME_AFTER(current_tick, timeout))
+            {
+                mutex_unlock(&i2c_mtx);
+                return 4;
+            }
         *data++ = IICDS;
     }
 
     /* STOP */
     IICSTAT = 0x90;
     IICCON = 0xB7;
-    while ((IICSTAT & (1 << 5)) != 0);
+    while ((IICSTAT & (1 << 5)) != 0)
+        if (TIME_AFTER(current_tick, timeout))
+        {
+            mutex_unlock(&i2c_mtx);
+            return 5;
+        }
     
     mutex_unlock(&i2c_mtx);
     return 0;
