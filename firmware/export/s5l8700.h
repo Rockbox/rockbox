@@ -120,6 +120,7 @@
 #define RSTSR                   (*(REG32_PTR_T)(0x3C500034))     /* Reset status register */
 #define DSPCLKMD                (*(REG32_PTR_T)(0x3C500038))     /* DSP clock mode register */
 #define CLKCON2                 (*(REG32_PTR_T)(0x3C50003C))     /* clock control register 2 */
+#define PWRCONEXT               (*(REG32_PTR_T)(0x3C500040))
 
 /* 06. INTERRUPT CONTROLLER UNIT */
 #define SRCPND                  (*(REG32_PTR_T)(0x39C00000))     /* Indicates the interrupt request status. */
@@ -670,3 +671,28 @@
 #define REG_ONE                 (*(REG32_PTR_T)(0x3D100000))     /* Receive the first 32 bits from a fuse box */
 #define REG_TWO                 (*(REG32_PTR_T)(0x3D100004))     /* Receive the other 8 bits from a fuse box */
 
+
+/* Hardware AES crypto unit - S5L8701 only */
+#if CONFIG_CPU==S5L8701
+
+#define ICONSRCPND              (*(REG32_PTR_T)(0x39C00000))
+#define ICONINTPND              (*(REG32_PTR_T)(0x39C00010))
+#define AESCONTROL              (*(REG32_PTR_T)(0x39800000))
+#define AESGO                   (*(REG32_PTR_T)(0x39800004))
+#define AESUNKREG0              (*(REG32_PTR_T)(0x39800008))
+#define AESSTATUS               (*(REG32_PTR_T)(0x3980000C))
+#define AESUNKREG1              (*(REG32_PTR_T)(0x39800010))
+#define AESKEYLEN               (*(REG32_PTR_T)(0x39800014))
+#define AESOUTSIZE              (*(REG32_PTR_T)(0x39800018))
+#define AESOUTADDR              (*(REG32_PTR_T)(0x39800020))
+#define AESINSIZE               (*(REG32_PTR_T)(0x39800024))
+#define AESINADDR               (*(REG32_PTR_T)(0x39800028))
+#define AESAUXSIZE              (*(REG32_PTR_T)(0x3980002C))
+#define AESAUXADDR              (*(REG32_PTR_T)(0x39800030))
+#define AESSIZE3                (*(REG32_PTR_T)(0x39800034))
+#define AESTYPE                 (*(REG32_PTR_T)(0x3980006C))
+#define HASHCTRL                (*(REG32_PTR_T)(0x3C600000))
+#define HASHRESULT               ((REG32_PTR_T)(0x3C600020))
+#define HASHDATAIN               ((REG32_PTR_T)(0x3C600040))
+
+#endif /* CONFIG_CPU==S5L8701 */

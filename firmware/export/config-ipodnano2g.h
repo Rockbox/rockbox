@@ -159,6 +159,9 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
+/* Alternative bootfile extension - this is for encrypted images */
+#define BOOTFILE_EXT2 "ipodx"
+
 #define BOOTLOADER_ENTRYPOINT  0x001F0000
 #define FLASH_ENTRYPOINT       0x00001000
 #define FLASH_MAGIC            0xfbfbfbf1

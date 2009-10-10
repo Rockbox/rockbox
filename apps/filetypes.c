@@ -111,6 +111,9 @@ static const struct filetype inbuilt_filetypes[] = {
 #ifdef BOOTFILE_EXT
     { BOOTFILE_EXT, FILE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },
 #endif
+#ifdef BOOTFILE_EXT2
+    { BOOTFILE_EXT2, FILE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },
+#endif
 };
 
 void tree_get_filetypes(const struct filetype** types, int* count)
