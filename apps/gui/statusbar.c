@@ -610,6 +610,7 @@ static void gui_statusbar_led(struct screen * display)
 static void gui_statusbar_time(struct screen * display, struct tm *time)
 {
     unsigned char buffer[6];
+    const unsigned char *p = buffer;
     unsigned int width, height;
     int hour, minute;
     if ( valid_time(time) ) {
@@ -624,13 +625,13 @@ static void gui_statusbar_time(struct screen * display, struct tm *time)
         snprintf(buffer, sizeof(buffer), "%02d:%02d", hour, minute);
     }
     else {
-        strlcpy(buffer, "--:--", sizeof(buffer));
+        p = "--:--";
     }
     display->setfont(FONT_SYSFIXED);
-    display->getstringsize(buffer, &width, &height);
+    display->getstringsize(p, &width, &height);
     if (height <= STATUSBAR_HEIGHT) {
         display->putsxy(STATUSBAR_TIME_X_END(display->getwidth()) - width,
-                        STATUSBAR_Y_POS, buffer);
+                        STATUSBAR_Y_POS, p);
     }
     display->setfont(FONT_UI);
 }
@@ -736,6 +737,7 @@ static void gui_statusbar_icon_recording_info(struct screen * display)
 {
 #if CONFIG_CODEC != SWCODEC
     char buffer[3];
+    const char *p = buffer;
     int width, height;
     display->setfont(FONT_SYSFIXED);
 #endif /* CONFIG_CODEC != SWCODEC */
@@ -764,21 +766,19 @@ static void gui_statusbar_icon_recording_info(struct screen * display)
     if (global_settings.rec_source == AUDIO_SRC_SPDIF)
     {
         /* Can't measure S/PDIF sample rate on Archos/Sim yet */
-        strlcpy(buffer, "--", sizeof(buffer));
+        p = "--";
     }
     else
 #endif /* HAVE_SPDIF_IN */
     {
-        static char const * const freq_strings[12] =
-        { "44", "48", "32", "22", "24", "16" };
-        strlcpy(buffer, freq_strings[global_settings.rec_frequency],
-                sizeof(buffer));
+        static const char *freq_strings[] = {"44", "48", "32", "22", "24", "16"};
+        p = freq_strings[global_settings.rec_frequency];
     }
 
-    display->getstringsize(buffer, &width, &height);
+    display->getstringsize(p, &width, &height);
 
     if (height <= STATUSBAR_HEIGHT)
-        display->putsxy(STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS, buffer);
+        display->putsxy(STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS, p);
 
     display->setfont(FONT_UI);
 #endif /* CONFIG_CODEC == SWCODEC */
