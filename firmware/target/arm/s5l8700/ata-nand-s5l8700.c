@@ -37,6 +37,8 @@ long last_disk_activity = -1;
 /** static, private data **/ 
 static bool initialized = false;
 
+static long nand_stack[20];
+
 /* API Functions */
 
 void nand_led(bool onoff)
@@ -47,13 +49,17 @@ void nand_led(bool onoff)
 int nand_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
-    return ftl_read(start, incount, inbuf);
+    int rc = ftl_read(start, incount, inbuf);
+    last_disk_activity = current_tick;
+    return rc;
 }
 
 int nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
-    return ftl_write(start, count, outbuf);
+    int rc = ftl_write(start, count, outbuf);
+    last_disk_activity = current_tick;
+    return rc;
 }
 
 void nand_spindown(int seconds)
@@ -73,6 +79,7 @@ void nand_sleepnow(void)
 
 void nand_spin(void)
 {
+    last_disk_activity = current_tick;
     nand_power_up();
 }
 
@@ -88,19 +95,37 @@ void nand_get_info(IF_MD2(int drive,) struct storage_info *info)
 
 long nand_last_disk_activity(void)
 {
-    return 0;
+    return last_disk_activity;
 }
 
 #ifdef HAVE_STORAGE_FLUSH
 int nand_flush(void)
 {
+    last_disk_activity = current_tick;
     return ftl_sync();
 }
 #endif
 
+static void nand_thread(void)
+{
+    while (1)
+    {
+        if (TIME_AFTER(current_tick, last_disk_activity + HZ / 5))
+            nand_power_down();
+        sleep(HZ / 10);
+    }
+}
+
 int nand_init(void)
 {
     if (ftl_init()) return 1;
+
+    last_disk_activity = current_tick;
+
+    create_thread(nand_thread, nand_stack,
+                  sizeof(nand_stack), 0, "nand"
+                  IF_PRIO(, PRIORITY_USER_INTERFACE)
+                  IF_COP(, CPU));
 
     initialized = true;
     return 0;
