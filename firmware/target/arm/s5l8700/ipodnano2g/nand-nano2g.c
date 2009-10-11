@@ -301,9 +301,8 @@ uint32_t nand_get_chip_type(uint32_t bank)
 
 void nand_power_up(void)
 {
-    unsigned char powerup[2] = {0x15, 1};
     uint32_t i;
-    mutex_lock(&ecc_mtx);
+    mutex_lock(&nand_mtx);
     PWRCONEXT &= ~0x40;
     PWRCON &= ~0x100000;
     PCON2 = 0x33333333;
@@ -314,18 +313,18 @@ void nand_power_up(void)
     PDAT4 = 0;
     PCON5 = (PCON5 & ~0xF) | 3;
     PUNK5 = 1;
-    pmu_write_multiple(0x35, 2, powerup);
-    sleep(HZ / 50);
+    pmu_ldo_set_voltage(4, 0x15);
+    pmu_ldo_power_on(4);
+    sleep(HZ / 20);
     for (i = 0; i < 4; i++) nand_reset(i);
     nand_powered = 1;
-    mutex_unlock(&ecc_mtx);
+    mutex_unlock(&nand_mtx);
 }
 
 void nand_power_down(void)
 {
-    unsigned char powerdown[2] = {0x15, 0};
-    mutex_lock(&ecc_mtx);
-    pmu_write_multiple(0x35, 2, powerdown);
+    mutex_lock(&nand_mtx);
+    pmu_ldo_power_off(4);
     PCON2 = 0x11111111;
     PDAT2 = 0;
     PCON3 = 0x11111111;
@@ -337,7 +336,7 @@ void nand_power_down(void)
     PWRCONEXT |= 0x40;
     PWRCON |= 0x100000;
     nand_powered = 0;
-    mutex_unlock(&ecc_mtx);
+    mutex_unlock(&nand_mtx);
 }
 
 uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
