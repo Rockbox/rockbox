@@ -1191,7 +1191,7 @@ uint32_t ftl_allocate_pool_block(void)
 /* Releases a vBlock back into the pool */
 void ftl_release_pool_block(uint32_t block)
 {
-    if (block >= (*ftl_nand_type).userblocks + 0x17) return;
+    if (block >= (uint32_t)(*ftl_nand_type).userblocks + 0x17) return;
     uint32_t idx = ftl_cxt.nextfreeidx + ftl_cxt.freecount++;
     if (idx >= 0x14) idx -= 0x14;
     ftl_cxt.blockpool[idx] = block;
