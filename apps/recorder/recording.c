@@ -965,7 +965,7 @@ static const char* reclist_get_name(int selected_item, void * data,
             }
             else
             {
-                strlcpy(buffer, str(LANG_RECORDING_FILENAME), buffer_len);
+                return str(LANG_RECORDING_FILENAME);
             }
             break;
         }
@@ -1970,7 +1970,7 @@ static bool f2_rec_screen(void)
     }
 
     while (!exit) {
-        const char* ptr=NULL;
+        const char* ptr;
 
         FOR_NB_SCREENS(i)
         {
@@ -2090,7 +2090,7 @@ static bool f3_rec_screen(void)
     bool used = false;
     int w, h, i;
     int button;
-    char *src_str[] =
+    const char *src_str[] =
     {
         str(LANG_SYSFONT_RECORDING_SRC_MIC),
         str(LANG_SYSFONT_LINE_IN),
@@ -2105,8 +2105,7 @@ static bool f3_rec_screen(void)
     }
 
     while (!exit) {
-        char* ptr=NULL;
-        ptr = src_str[global_settings.rec_source];
+        const char* ptr = src_str[global_settings.rec_source];
         FOR_NB_SCREENS(i)
         {
             screens[i].clear_display();

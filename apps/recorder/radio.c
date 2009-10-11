@@ -951,11 +951,11 @@ int radio_screen(void)
                          freq / 100, freq % 100);
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen + 1, buf);
-
-                snprintf(buf, 128, "%s", stereo?str(LANG_CHANNEL_STEREO):
-                                                str(LANG_CHANNEL_MONO));
+                                                
                 FOR_NB_SCREENS(i)
-                    screens[i].puts_scroll(0, top_of_screen + 2, buf);
+                    screens[i].puts_scroll(0, top_of_screen + 2,
+                                           stereo ? str(LANG_CHANNEL_STEREO) :
+                                                    str(LANG_CHANNEL_MONO));
 
                 snprintf(buf, 128, "%s %s", str(LANG_MODE),
                          radio_mode ? str(LANG_PRESET) :
