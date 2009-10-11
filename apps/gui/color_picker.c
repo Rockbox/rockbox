@@ -110,14 +110,10 @@ static inline unsigned get_black_or_white(const struct rgb_pick *rgb)
         LCD_BLACK : LCD_WHITE;
 }
 
-#define MARGIN_LEFT             0 /* Left margin of screen                */
 #define MARGIN_TOP              2 /* Top margin of screen                 */
-#define MARGIN_RIGHT            0 /* Right margin of screen               */
 #define MARGIN_BOTTOM           6 /* Bottom margin of screen              */
-#define SLIDER_MARGIN_LEFT      2 /* Gap to left of sliders               */
-#define SLIDER_MARGIN_RIGHT     2 /* Gap to right of sliders              */
+#define SLIDER_TEXT_MARGIN      2 /* Gap between text and sliders         */
 #define TITLE_MARGIN_BOTTOM     4 /* Space below title bar                */
-#define SELECTOR_LR_MARGIN      0 /* Margin between ">" and text          */
 #define SELECTOR_TB_MARGIN      1 /* Margin on top and bottom of selector */
 #define SWATCH_TOP_MARGIN       4 /* Space between last slider and swatch */
 #define SELECTOR_WIDTH          get_icon_width(display->screen_type)
@@ -135,15 +131,33 @@ static void set_drawinfo(struct screen *display, int mode,
     }
 }
 
+/* Figure out widest label character in case they vary -
+   this function assumes labels are one character */
+static int label_get_max_width(struct screen *display)
+{
+    int max_width, i;
+    char buf[4];
+    for (i = 0, max_width = 0; i < 3; i++)
+    {
+        int width;
+        buf[0] = str(LANG_COLOR_RGB_LABELS)[i];
+        buf[1] = '\0';
+        width = display->getstringsize(buf, NULL, NULL);
+        if (width > max_width)
+            max_width = width;
+    }
+    return max_width;
+}
+
 static void draw_screen(struct screen *display, char *title,
                         struct rgb_pick *rgb, int row)
 {
     unsigned  text_color       = LCD_BLACK;
     unsigned  background_color = LCD_WHITE;
     char      buf[32];
-    int       i, x, y;
+    int       i, text_x, y, line_height;
     int       text_top;
-    int       slider_left, slider_width;
+    int       slider_x, slider_width;
     bool      display_three_rows;
     int       max_label_width;
     struct viewport vp;
@@ -159,40 +173,30 @@ static void draw_screen(struct screen *display, char *title,
         background_color = display->get_background();
     }
 
+    max_label_width = label_get_max_width(display);
+
+    /* Draw title string */
+    set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
+    vp.flags |= VP_FLAG_CENTER_ALIGN;
+    display->getstringsize(title, NULL, &y);
+    display->putsxy(0, MARGIN_TOP, title);
+
+    /* Get slider positions and top starting position */
+    text_top     = MARGIN_TOP + y + TITLE_MARGIN_BOTTOM + SELECTOR_TB_MARGIN;
+    text_x       = SELECTOR_WIDTH;
+    slider_x     = text_x + max_label_width + SLIDER_TEXT_MARGIN;
+    slider_width = vp.width - slider_x*2 - max_label_width;
+    line_height  = display->getcharheight() + 2*SELECTOR_TB_MARGIN;
+
     /* Find out if there's enough room for three sliders or just
        enough to display the selected slider - calculate total height
        of display with three sliders present */
     display_three_rows =
         vp.height >=
-            MARGIN_TOP                 +
-            display->getcharheight()*4 + /* Title + 3 sliders */
-            TITLE_MARGIN_BOTTOM        +
-            SELECTOR_TB_MARGIN*6       + /* 2 margins/slider  */
-            MARGIN_BOTTOM;
-
-    /* Figure out widest label character in case they vary -
-       this function assumes labels are one character */
-    for (i = 0, max_label_width = 0; i < 3; i++)
-    {
-        buf[0] = str(LANG_COLOR_RGB_LABELS)[i];
-        buf[1] = '\0';
-        x = display->getstringsize(buf, NULL, NULL);
-        if (x > max_label_width)
-            max_label_width = x;
-    }
-
-    /* Draw title string */
-    set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
-    display->getstringsize(title, &x, &y);
-    display->putsxy((vp.width - x) / 2, MARGIN_TOP, title);
-
-    /* Get slider positions and top starting position */
-    text_top     = MARGIN_TOP + y + TITLE_MARGIN_BOTTOM + SELECTOR_TB_MARGIN;
-    slider_left  = MARGIN_LEFT + SELECTOR_WIDTH + SELECTOR_LR_MARGIN +
-                   max_label_width + SLIDER_MARGIN_LEFT;
-    slider_width = vp.width - slider_left - SLIDER_MARGIN_RIGHT -
-                   display->getcharwidth()*2 - SELECTOR_LR_MARGIN -
-                   SELECTOR_WIDTH - MARGIN_RIGHT;
+            text_top + line_height*3    + /* Title + 3 sliders */
+            SWATCH_TOP_MARGIN           +  /* at least 2 lines */
+            display->getcharheight()*2 + /*  + margins for bottom */
+            MARGIN_BOTTOM;                /* colored rectangle */
 
     for (i = 0; i < 3; i++)
     {
@@ -200,9 +204,6 @@ static void draw_screen(struct screen *display, char *title,
         int      mode     = DRMODE_SOLID;
         unsigned fg       = text_color;
         unsigned bg       = background_color;
-
-        if (!display_three_rows)
-            i = row;
 
         if (i == row)
         {
@@ -229,9 +230,9 @@ static void draw_screen(struct screen *display, char *title,
                 /* Draw ">    <" around sliders */
                 int top = text_top + (display->getcharheight() -
                                       SELECTOR_HEIGHT) / 2;
-                screen_put_iconxy(display, MARGIN_LEFT, top, Icon_Cursor);
+                screen_put_iconxy(display, 0, top, Icon_Cursor);
                 screen_put_iconxy(display, 
-                                  vp.width - MARGIN_RIGHT -
+                                  vp.width -
                                           get_icon_width(display->screen_type),
                                           top, Icon_Cursor);
             }
@@ -244,85 +245,77 @@ static void draw_screen(struct screen *display, char *title,
                 bg        = prim_rgb[SB_FILL][i];
             }
         }
+        else if (!display_three_rows)
+            continue;
 
         set_drawinfo(display, mode, fg, bg);
 
         /* Draw label */
         buf[0] = str(LANG_COLOR_RGB_LABELS)[i];
         buf[1] = '\0';
-        display->putsxy(slider_left - max_label_width -
-                        SLIDER_MARGIN_LEFT, text_top, buf);
-
+        vp.flags &= ~VP_FLAG_ALIGNMENT_MASK;
+        display->putsxy(text_x, text_top, buf);
         /* Draw color value */
         snprintf(buf, 3, "%02d", rgb->rgb_val[i]);
-        display->putsxy(slider_left + slider_width + SLIDER_MARGIN_RIGHT,
-                        text_top, buf);
+        vp.flags |= VP_FLAG_IS_RTL;
+        display->putsxy(text_x, text_top, buf);
 
         /* Draw scrollbar */
-        gui_scrollbar_draw(display,
-                           slider_left,
-                           text_top + display->getcharheight() / 4,
-                           slider_width,
-                           display->getcharheight() / 2,
-                           rgb_max[i],
-                           0,
-                           rgb->rgb_val[i],
-                           sb_flags);
+        gui_scrollbar_draw(display,                               /* screen */
+                           slider_x,                                /* x */
+                           text_top + display->getcharheight() / 4,/* y */
+                           slider_width,                            /* width */
+                           display->getcharheight() / 2,          /* height */
+                           rgb_max[i],                             /* items */
+                           0,                                   /* min_shown */
+                           rgb->rgb_val[i],                     /* max_shown */
+                           sb_flags);                           /* flags */
 
         /* Advance to next line */
-        text_top += display->getcharheight() + 2*SELECTOR_TB_MARGIN;
-
-        if (!display_three_rows)
-            break;
+        text_top += line_height;
     } /* end for */
 
     /* Format RGB: #rrggbb */
     snprintf(buf, sizeof(buf), str(LANG_COLOR_RGB_VALUE),
                                rgb->red, rgb->green, rgb->blue);
-
+    vp.flags |= VP_FLAG_CENTER_ALIGN;
     if (display->depth >= 16)
     {
         /* Display color swatch on color screens only */
-        int left   = MARGIN_LEFT + SELECTOR_WIDTH + SELECTOR_LR_MARGIN;
         int top    = text_top + SWATCH_TOP_MARGIN;
-        int width  = vp.width - left - SELECTOR_LR_MARGIN -
-                     SELECTOR_WIDTH - MARGIN_RIGHT;
+        int width  = vp.width - text_x*2;
         int height = vp.height - top - MARGIN_BOTTOM;
 
         /* Only draw if room */
         if (height >= display->getcharheight() + 2)
         {
+            /* draw the big rectangle */
             display->set_foreground(rgb->color);
-            display->fillrect(left, top, width, height);
+            display->fillrect(text_x, top, width, height);
 
             /* Draw RGB: #rrggbb in middle of swatch */
-            display->set_drawmode(DRMODE_FG);
-            display->getstringsize(buf, &x, &y);
-            display->set_foreground(get_black_or_white(rgb));
+            set_drawinfo(display, DRMODE_FG, get_black_or_white(rgb),
+                         background_color);
+            display->getstringsize(buf, NULL, &y);
 
-            x = left + (width  - x) / 2;
-            y = top  + (height - y) / 2;
+            display->putsxy(0, top  + (height - y) / 2, buf);
 
-            display->putsxy(x, y, buf);
-            display->set_drawmode(DRMODE_SOLID);
-
-            /* Draw border */
-            display->set_foreground(text_color);
-            display->drawrect(left, top, width, height);
+            /* Draw border around the rect */
+            set_drawinfo(display, DRMODE_SOLID, text_color,
+                         background_color);
+            display->drawrect(text_x, top, width, height);
         }
     }
     else
     {
         /* Display RGB value only centered on remaining display if room */
-        display->getstringsize(buf, &x, &y);
+        display->getstringsize(buf, NULL, &y);
         i = text_top + SWATCH_TOP_MARGIN;
 
         if (i + y <= display->getheight() - MARGIN_BOTTOM)
         {
             set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
-            x = (vp.width - x) / 2;
-            y = (i + vp.height - MARGIN_BOTTOM - y) / 2;
-            display->putsxy(x, y, buf);
+            display->putsxy(0, (i + vp.height - MARGIN_BOTTOM - y) / 2, buf);
         }
     }
 
@@ -335,53 +328,55 @@ static void draw_screen(struct screen *display, char *title,
 }
 
 #ifdef HAVE_TOUCHSCREEN
-static int touchscreen_slider(struct rgb_pick *rgb, int *selected_slider)
+static int touchscreen_slider(struct screen *display,
+                                struct rgb_pick *rgb,
+                                const char* title,
+                                int *selected_slider)
 {
     short     x,y;
-    int       text_top,i,x1;
-    int       slider_left, slider_width;
+    int       text_top, slider_x, slider_width, title_height;
     unsigned  button = action_get_touchscreen_press(&x, &y);
     bool      display_three_rows;
     int       max_label_width;
-    struct screen *display = &screens[SCREEN_MAIN];
     int      pressed_slider;
-    char buf[2];
+    struct viewport vp;
+    int line_height;
+
+    viewport_set_defaults(&vp, display->screen_type);
 
     if (button == BUTTON_NONE)
         return ACTION_NONE;
-    /* same logic as draw_screen */
-    /* Figure out widest label character in case they vary -
-       this function assumes labels are one character */
-    for (i = 0, max_label_width = 0; i < 3; i++)
-    {
-        buf[0] = str(LANG_COLOR_RGB_LABELS)[i];
-        buf[1] = '\0';
-        x1 = display->getstringsize(buf, NULL, NULL);
-        if (x1 > max_label_width)
-            max_label_width = x1;
-    }
-    /* Get slider positions and top starting position */
-    text_top     = MARGIN_TOP + display->getcharheight() + TITLE_MARGIN_BOTTOM +
+
+    max_label_width =  label_get_max_width(display);
+    display->getstringsize(title, NULL, &title_height);
+
+    /* Get slider positions and top starting position
+     * need vp.y here, because of the statusbar, since touchscreen
+     * coordinates are absolute */
+    text_top     = vp.y + MARGIN_TOP + title_height + TITLE_MARGIN_BOTTOM +
                    SELECTOR_TB_MARGIN;
-    slider_left  = MARGIN_LEFT + SELECTOR_WIDTH + SELECTOR_LR_MARGIN +
-                   max_label_width + SLIDER_MARGIN_LEFT;
-    slider_width = display->getwidth() - slider_left - SLIDER_MARGIN_RIGHT -
-                   display->getcharwidth()*2 - SELECTOR_LR_MARGIN -
-                   SELECTOR_WIDTH - MARGIN_RIGHT;
+    slider_x     = SELECTOR_WIDTH + max_label_width + SLIDER_TEXT_MARGIN;
+    slider_width = vp.width - slider_x*2 - max_label_width;
+    line_height  = display->getcharheight() + 2*SELECTOR_TB_MARGIN;
+
+    /* same logic as in draw_screen */
+    /* Find out if there's enough room for three sliders or just
+       enough to display the selected slider - calculate total height
+       of display with three sliders present */
     display_three_rows =
-        display->getheight() >=
-            MARGIN_TOP                 +
-            display->getcharheight()*4 + /* Title + 3 sliders */
-            TITLE_MARGIN_BOTTOM        +
-            SELECTOR_TB_MARGIN*6       + /* 2 margins/slider  */
-            MARGIN_BOTTOM;
-    if (y < MARGIN_TOP+display->getcharheight())
+        vp.height >=
+            text_top + title_height*3    + /* Title + 3 sliders */
+            SWATCH_TOP_MARGIN           +  /* at least 2 lines */
+            display->getcharheight()*2 + /*  + margins for bottom */
+            MARGIN_BOTTOM;                /* colored rectangle */
+
+    if (y < text_top)
     {
         if (button == BUTTON_REL)
             return ACTION_STD_CANCEL;
     }
-    y -= text_top;
-    pressed_slider = y/display->getcharheight();
+
+    pressed_slider = (y - text_top)/line_height;
     if (pressed_slider > (display_three_rows?2:0))
     {
         if (button == BUTTON_REL)
@@ -389,12 +384,16 @@ static int touchscreen_slider(struct rgb_pick *rgb, int *selected_slider)
     }
     if (pressed_slider != *selected_slider)
         *selected_slider = pressed_slider;
-    if (x < slider_left+slider_width && 
-        x > slider_left)
+    /* add max_label_width to overcome integer division limits,
+     * cap value later since that may lead to an overflow */
+    if (x < slider_x+(slider_width+max_label_width) && 
+        x > slider_x)
     {
-        x -= slider_left;
-        rgb->rgb_val[pressed_slider] = 
-            (x*rgb_max[pressed_slider]/(slider_width-slider_left));
+        char computed_val;
+        x -= slider_x;
+        computed_val = (x*rgb_max[pressed_slider]/(slider_width));
+        rgb->rgb_val[pressed_slider] =
+                        MIN(computed_val,rgb_max[pressed_slider]);
         pack_rgb(rgb);
     }
     return ACTION_NONE;
@@ -433,8 +432,9 @@ bool set_color(struct screen *display, char *title, unsigned *color,
 
         button = get_action(CONTEXT_SETTINGS_COLOURCHOOSER, TIMEOUT_BLOCK);
 #ifdef HAVE_TOUCHSCREEN
-        if (button == ACTION_TOUCHSCREEN)
-            button = touchscreen_slider(&rgb, &slider);
+        if (button == ACTION_TOUCHSCREEN
+                && display->screen_type == SCREEN_MAIN)
+            button = touchscreen_slider(display, &rgb, title, &slider);
 #endif
 
         switch (button)
