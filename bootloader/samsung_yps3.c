@@ -226,10 +226,10 @@ void main(void)
         snprintf(mystring, 64, "%04X %04X %04X %04X", PHYCTRL, PHYPWR, URSTCON, UCLKCON);
         lcd_puts(0, line++, mystring);
 
-        snprintf(mystring, 64, "SCR %04X SSR %04X EIR %04X", SCR, SSR, EIR);
+        snprintf(mystring, 64, "SCR %04X SSR %04X EIR %04X", USB_SCR, USB_SSR, USB_EIR);
         lcd_puts(0, line++, mystring);
 
-        snprintf(mystring, 64, "FAR %04X FNR %04X EP0 %04X", FAR, FNR, EP0SR);
+        snprintf(mystring, 64, "FAR %04X FNR %04X EP0 %04X", USB_FAR, USB_FNR, USB_EP0SR);
         lcd_puts(0, line++, mystring);
 #endif
 
