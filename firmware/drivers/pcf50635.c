@@ -55,56 +55,84 @@ int pcf50635_read_multiple(int address, unsigned char* buf, int count)
 void pcf50635_init(void)
 {
 #ifdef COWON_D2
-    /* Configure outputs as per OF */
-    pcf50635_write(PCF5063X_REG_DOWN1OUT, 0x13);  /* DOWN1 = 1.2V */
-    pcf50635_write(PCF5063X_REG_DOWN1CTL, 0x1e);  /* DOWN1 DVM step = max */
-    pcf50635_write(PCF5063X_REG_DOWN1ENA, 0x1);   /* DOWN1 enable */
-    pcf50635_write(PCF5063X_REG_DOWN2OUT, 0x2f);  /* DOWN2 = 1.8V */
-    pcf50635_write(PCF5063X_REG_DOWN2CTL, 0x1e);  /* DOWN2 DVM step = max */
-    pcf50635_write(PCF5063X_REG_DOWN2ENA, 0x1);   /* DOWN2 enable */
-    pcf50635_write(PCF5063X_REG_AUTOOUT,  0x5f);  /* AUTO = 3.0V */
-    pcf50635_write(PCF5063X_REG_AUTOENA,  0x1);   /* AUTO enable */
-    pcf50635_write(PCF5063X_REG_LDO1OUT,  0x18);  /* LDO1 = 3.3V */
-    pcf50635_write(PCF5063X_REG_LDO1ENA,  0x1);   /* LDO1 enable */
-    pcf50635_write(PCF5063X_REG_LDO2OUT,  0x15);  /* LDO2 = 3.0V */
-    pcf50635_write(PCF5063X_REG_LDO2ENA,  0x1);   /* LDO2 enable */
-    pcf50635_write(PCF5063X_REG_LDO3ENA,  0x0);   /* LDO3 disable */
-    pcf50635_write(PCF5063X_REG_LDO4OUT,  0x15);  /* LDO4 = 3.0V */
-    pcf50635_write(PCF5063X_REG_LDO4ENA,  0x1);   /* LDO4 enable */
-    pcf50635_write(PCF5063X_REG_LDO5OUT,  0x9);   /* LDO5 = 1.8V */
-    pcf50635_write(PCF5063X_REG_LDO5ENA,  0x1);   /* LDO4 enable */
-    pcf50635_write(PCF5063X_REG_LDO6OUT,  0xc);   /* LDO6 = 2.1V */
-    pcf50635_write(PCF5063X_REG_LDO6ENA,  0x1);   /* LDO4 enable */
-    pcf50635_write(PCF5063X_REG_HCLDOENA, 0x0);   /* HCLDO disable */
+    static const char init_data[] = 
+    {
+        /* DOWN1: 1.2V, max DVM step, enabled */
+        PCF5063X_REG_DOWN1OUT, 0x13,
+        PCF5063X_REG_DOWN1CTL, 0x1e,
+        PCF5063X_REG_DOWN1ENA, 0x1,
 
-    /* Configure automatic battery charging as per OF */
+        /* DOWN2: 1.8V, max DVM step, enabled */
+        PCF5063X_REG_DOWN2OUT, 0x2f,  
+        PCF5063X_REG_DOWN2CTL, 0x1e,
+        PCF5063X_REG_DOWN2ENA, 0x1,
+        
+        /* AUTO: 3.0V, enabled */
+        PCF5063X_REG_AUTOOUT,  0x5f,
+        PCF5063X_REG_AUTOENA,  0x1,
+        
+        /* LDO1: 3.3V, enabled */
+        PCF5063X_REG_LDO1OUT,  0x18,
+        PCF5063X_REG_LDO1ENA,  0x1,
+        
+        /* LDO2: 3.0V, enabled */
+        PCF5063X_REG_LDO2OUT,  0x15,
+        PCF5063X_REG_LDO2ENA,  0x1,
+        
+        /* LDO4: 3.0V, enabled */
+        PCF5063X_REG_LDO4OUT,  0x15,
+        PCF5063X_REG_LDO4ENA,  0x1,
+        
+        /* LDO5: 1.8V, enabled */
+        PCF5063X_REG_LDO5OUT,  0x9,
+        PCF5063X_REG_LDO5ENA,  0x1,
+        
+        /* LDO6: 2.1V, enabled */
+        PCF5063X_REG_LDO6OUT,  0xc,
+        PCF5063X_REG_LDO6ENA,  0x1,
+        
+        /* LDO3 and HCLDO disabled */
+        PCF5063X_REG_LDO3ENA,  0x0,
+        PCF5063X_REG_HCLDOENA, 0x0,
+        
+        /* Disable GPIOs */
+        PCF5063X_REG_GPIOCTL,  0x0,
+        PCF5063X_REG_GPIO1CFG, 0x0,
+        PCF5063X_REG_GPIO2CFG, 0x0,
+        PCF5063X_REG_GPIO3CFG, 0x0,
+        
+        /* IRQ masks (OF values in brackets) */
+        PCF5063X_REG_INT1M,    0xff, /* (0x8a enable alarm, usbins, adpins) */
+        PCF5063X_REG_INT2M,    0xff, /* (0xff all masked) */
+        PCF5063X_REG_INT3M,    0xff, /* (0x7f enable onkey1s) */
+        PCF5063X_REG_INT4M,    0xff, /* (0xfd enable lowbat) */
+        PCF5063X_REG_INT5M,    0xff, /* (0xff all masked) */
+        
+        /* Wakeup mode */
+        PCF5063X_REG_OOCMODE,  0x0,  /* onkey falling edge */
+        PCF5063X_REG_OOCCTL,   0x2,  /* actphrst = phase 3 */
+        PCF5063X_REG_OOCWAKE,  0xc1, /* wakeup on adapter, usb, onkey */
+        
+        /* Configure battery charger as per OF */
+        PCF5063X_REG_MBCC2,    0xa8, /* Vmax = 4.2V, Vbatcond = 2.7V, long debounce */
+        PCF5063X_REG_MBCC3,    0x2a, /* precharge level = 16% */
+        PCF5063X_REG_MBCC4,    0x94, /* fastcharge level = 58% */
+        PCF5063X_REG_MBCC5,    0xff, /* fastcharge level (usb) = 100%  */
+        PCF5063X_REG_MBCC6,    0x4,  /* cutoff level = 12.5% */
+        PCF5063X_REG_MBCC7,    0xc1, /* bat-sysImax = 2.2A, USB = 500mA */
+        PCF5063X_REG_BVMCTL,   0xe,  /* batok level = 3.4V */
+
+        /* end marker */
+        0};
+
+    const char* ptr;
+    for (ptr = init_data; *ptr != 0; ptr += 2)
+        pcf50635_write(ptr[0], ptr[1]);
+
+    /* Enable automatic charging, preserving default values */
     pcf50635_write(PCF5063X_REG_MBCC1,
-        pcf50635_read(PCF5063X_REG_MBCC1) | 7);   /* auto charge termination & resume */
-    pcf50635_write(PCF5063X_REG_MBCC2,    0xa8);  /* Vmax = 4.2V, Vbatcond = 2.7V, long debounce */
-    pcf50635_write(PCF5063X_REG_MBCC3,    0x2a);  /* precharge level = 16% */
-    pcf50635_write(PCF5063X_REG_MBCC4,    0x94);  /* fastcharge level = 58% */
-    pcf50635_write(PCF5063X_REG_MBCC5,    0xff);  /* fastcharge level (usb) = 100%  */
-    pcf50635_write(PCF5063X_REG_MBCC6,    0x4);   /* cutoff level = 12.5% */
-    pcf50635_write(PCF5063X_REG_MBCC7,    0xc1);  /* bat-sysimax = 2.2A, USB = 500mA */
-    pcf50635_write(PCF5063X_REG_BVMCTL,   0xe);   /* batok level = 3.4V */
+        pcf50635_read(PCF5063X_REG_MBCC1) | 7);
     
-    /* IRQ masks */
-    pcf50635_write(PCF5063X_REG_INT1M,    0x8a);  /* enable alarm, usbins, adpins */
-    pcf50635_write(PCF5063X_REG_INT2M,    0xff);  /* mask all */
-    pcf50635_write(PCF5063X_REG_INT3M,    0x7f);  /* enable onkey1s */
-    pcf50635_write(PCF5063X_REG_INT4M,    0xfd);  /* enable lowbat */
-    pcf50635_write(PCF5063X_REG_INT5M,    0xff);  /* mask all */
-
-    pcf50635_write(PCF5063X_REG_OOCMODE,  0x0);
-    pcf50635_write(PCF5063X_REG_OOCCTL,   0x2);   /* actphrst = phase 3 */
-    pcf50635_write(PCF5063X_REG_OOCWAKE,          /* adapter, usb, (rtc) wake */
-        (pcf50635_read(PCF5063X_REG_OOCWAKE) & 0x10) | 0xc1);
-
-    /* We don't care about the GPIOs, disable them */
-    pcf50635_write(PCF5063X_REG_GPIOCTL,  0x0);
-    pcf50635_write(PCF5063X_REG_GPIO1CFG, 0x0);
-    pcf50635_write(PCF5063X_REG_GPIO2CFG, 0x0);
-    pcf50635_write(PCF5063X_REG_GPIO3CFG, 0x0);
 #endif
 }
 
