@@ -180,7 +180,7 @@
 #define PLUGIN_BUFFER_SIZE 0x200000
 #endif
 
-#define HW_SAMPR_CAPS SAMPR_CAP_44
+#define HW_SAMPR_CAPS SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11 | SAMPR_CAP_8
 
 #define BATTERY_CAPACITY_DEFAULT 1500 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 1000        /* min. capacity selectable */

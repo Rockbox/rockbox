@@ -28,6 +28,15 @@
 
 void adc_init(void)
 {
+    /* Pin 15 appears to be the nPWD pin - make sure it is high otherwise the
+     *  touchscreen does not work, audio has not been tested, but it is
+     *  expected that is will also not work when low.
+     */
+    IO_GIO_DIR0     &= ~(1<<15);     /* output */
+    IO_GIO_INV0     &= ~(1<<15);     /* non-inverted */
+    IO_GIO_FSEL0    &= ~(0x03<<12);  /* normal pin */
+    IO_GIO_BITSET0  =   (1<<15);
+
     /* Initialize the touchscreen and the battery readout */
     tsc2100_adc_init();
     
