@@ -129,6 +129,9 @@ void audiohw_set_frequency(int fsel)
     case HW_FREQ_11:
         reg_val |= (0x04<<3);
         break;
+    case HW_FREQ_22:
+        reg_val |= (0x02<<3);
+        break;
     case HW_FREQ_44:
     default:
         break;
