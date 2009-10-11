@@ -121,8 +121,11 @@
 #define BATTERY_CAPACITY_INC    50    /* capacity increment */
 #define BATTERY_TYPES_COUNT     1     /* only one type */
 
-/* Hardware controlled charging? */
-#define CONFIG_CHARGING CHARGING_SIMPLE
+/* Hardware controlled charging with monitoring */
+#define CONFIG_CHARGING CHARGING_MONITOR
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
 
 #ifndef SIMULATOR
 
@@ -134,9 +137,6 @@
 
 /* I2C interface */
 #define CONFIG_I2C I2C_S5L8700
-
-/* define this if the hardware can be powered off while charging */
-#define HAVE_POWEROFF_WHILE_CHARGING
 
 /* The size of the flash ROM */
 #define FLASH_SIZE 0x400000
