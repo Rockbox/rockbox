@@ -128,45 +128,6 @@ uint32_t nand_timeout(long timeout)
     }
 }
 
-void nand_power_up(void)
-{
-    unsigned char powerup[2] = {0x15, 1};
-    mutex_lock(&ecc_mtx);
-    PWRCONEXT &= ~0x40;
-    PWRCON &= ~0x100000;
-    PCON2 = 0x33333333;
-    PDAT2 = 0;
-    PCON3 = 0x11113333;
-    PDAT3 = 0;
-    PCON4 = 0x33333333;
-    PDAT4 = 0;
-    PCON5 = (PCON5 & ~0xF) | 3;
-    PUNK5 = 1;
-    pmu_write_multiple(0x35, 2, powerup);
-    sleep(HZ / 50);
-    nand_powered = 1;
-    mutex_unlock(&ecc_mtx);
-}
-
-void nand_power_down(void)
-{
-    unsigned char powerdown[2] = {0x15, 0};
-    mutex_lock(&ecc_mtx);
-    pmu_write_multiple(0x35, 2, powerdown);
-    PCON2 = 0x11111111;
-    PDAT2 = 0;
-    PCON3 = 0x11111111;
-    PDAT3 = 0;
-    PCON4 = 0x11111111;
-    PDAT4 = 0;
-    PCON5 = (PCON5 & ~0xF) | 1;
-    PUNK5 = 1;
-    PWRCONEXT |= 0x40;
-    PWRCON |= 0x100000;
-    nand_powered = 0;
-    mutex_unlock(&ecc_mtx);
-}
-
 uint32_t nand_wait_rbbdone(void)
 {
     long timeout = current_tick + HZ / 50;
@@ -336,6 +297,47 @@ uint32_t nand_get_chip_type(uint32_t bank)
     result = FMFIFO;
     FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
     return nand_unlock(result);
+}
+
+void nand_power_up(void)
+{
+    unsigned char powerup[2] = {0x15, 1};
+    uint32_t i;
+    mutex_lock(&ecc_mtx);
+    PWRCONEXT &= ~0x40;
+    PWRCON &= ~0x100000;
+    PCON2 = 0x33333333;
+    PDAT2 = 0;
+    PCON3 = 0x11113333;
+    PDAT3 = 0;
+    PCON4 = 0x33333333;
+    PDAT4 = 0;
+    PCON5 = (PCON5 & ~0xF) | 3;
+    PUNK5 = 1;
+    pmu_write_multiple(0x35, 2, powerup);
+    sleep(HZ / 50);
+    for (i = 0; i < 4; i++) nand_reset(i);
+    nand_powered = 1;
+    mutex_unlock(&ecc_mtx);
+}
+
+void nand_power_down(void)
+{
+    unsigned char powerdown[2] = {0x15, 0};
+    mutex_lock(&ecc_mtx);
+    pmu_write_multiple(0x35, 2, powerdown);
+    PCON2 = 0x11111111;
+    PDAT2 = 0;
+    PCON3 = 0x11111111;
+    PDAT3 = 0;
+    PCON4 = 0x11111111;
+    PDAT4 = 0;
+    PCON5 = (PCON5 & ~0xF) | 1;
+    PUNK5 = 1;
+    PWRCONEXT |= 0x40;
+    PWRCON |= 0x100000;
+    nand_powered = 0;
+    mutex_unlock(&ecc_mtx);
 }
 
 uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
