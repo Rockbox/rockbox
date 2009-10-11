@@ -102,7 +102,8 @@ static bool showing_bars(enum screen_type screen)
     return false;
 }
 
-void viewport_set_fullscreen(struct viewport *vp, enum screen_type screen)
+void viewport_set_fullscreen(struct viewport *vp,
+                              const enum screen_type screen)
 {
     vp->x = 0;
     vp->width = screens[screen].lcdwidth;
@@ -113,14 +114,16 @@ void viewport_set_fullscreen(struct viewport *vp, enum screen_type screen)
     vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */
         
     vp->height = screens[screen].lcdheight;
-    if (statusbar_position(screen) != STATUSBAR_BOTTOM && showing_bars(screen))
+    if (statusbar_position(screen) != STATUSBAR_BOTTOM
+            && showing_bars(screen))
         vp->y = STATUSBAR_HEIGHT;
     else 
         vp->y = 0;
 #else
     vp->y = 0;
 #endif
-    vp->height = screens[screen].lcdheight - (showing_bars(screen)?STATUSBAR_HEIGHT:0);
+    vp->height = screens[screen].lcdheight
+                        - (showing_bars(screen)?STATUSBAR_HEIGHT:0);
 
 #if LCD_DEPTH > 1
 #ifdef HAVE_REMOTE_LCD
@@ -144,7 +147,8 @@ void viewport_set_fullscreen(struct viewport *vp, enum screen_type screen)
 
 }
 
-void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
+void viewport_set_defaults(struct viewport *vp,
+                            const enum screen_type screen)
 {
 #ifdef HAVE_LCD_BITMAP
     if (ui_vp_info.active[screen])
@@ -173,7 +177,7 @@ int viewportmanager_get_statusbar(void)
     return statusbar_enabled;
 }
 
-int viewportmanager_set_statusbar(int enabled)
+int viewportmanager_set_statusbar(const int enabled)
 {
     int old = statusbar_enabled;
     statusbar_enabled = enabled;
@@ -214,7 +218,7 @@ static void statusbar_toggled(void* param)
     viewportmanager_theme_changed(THEME_STATUSBAR);
 }
 
-void viewportmanager_theme_changed(int which)
+void viewportmanager_theme_changed(const int which)
 {
     int i;
 #ifdef HAVE_BUTTONBAR
@@ -341,7 +345,8 @@ static unsigned viewport_init_ui_vp(void)
 
 #ifdef HAVE_TOUCHSCREEN
 /* check if a point (x and y coordinates) are within a viewport */
-bool viewport_point_within_vp(const struct viewport *vp, int x, int y)
+bool viewport_point_within_vp(const struct viewport *vp,
+                               const int x, const int y)
 {
     bool is_x = (x >= vp->x && x < (vp->x + vp->width));
     bool is_y = (y >= vp->y && y < (vp->y + vp->height));

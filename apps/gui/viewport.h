@@ -31,7 +31,8 @@
 /* return the number of text lines in the vp viewport */
 int viewport_get_nb_lines(const struct viewport *vp);
 
-void viewport_set_defaults(struct viewport *vp, enum screen_type screen);
+void viewport_set_defaults(struct viewport *vp,
+                            const enum screen_type screen);
 
 /* Used to specify which screens the statusbar (SB) should be displayed on.
  *
@@ -73,19 +74,20 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen);
  */
 void viewportmanager_init(void);
 int viewportmanager_get_statusbar(void);
-int viewportmanager_set_statusbar(int enabled);
+int viewportmanager_set_statusbar(const int enabled);
 
 
 /*
  * Initializes the given viewport with maximum dimensions minus status- and
  * buttonbar
  */
-void viewport_set_fullscreen(struct viewport *vp, enum screen_type screen);
+void viewport_set_fullscreen(struct viewport *vp,
+                              const  enum screen_type screen);
 
 #ifdef HAVE_LCD_BITMAP
 
 /* call this when a theme changed */
-void viewportmanager_theme_changed(int);
+void viewportmanager_theme_changed(const int);
 
 /*
  * Returns a pointer to the current viewport
@@ -103,9 +105,10 @@ void viewport_set_current_vp(struct viewport* vp);
 /*
  * returns true if the ui viewport is active on the screen
  */
-bool viewport_ui_vp_get_state(enum screen_type screen);
+bool viewport_ui_vp_get_state(const enum screen_type screen);
 #ifdef HAVE_TOUCHSCREEN
-bool viewport_point_within_vp(const struct viewport *vp, int x, int y);
+bool viewport_point_within_vp(const struct viewport *vp,
+                               const int x, const int y);
 #endif
 
 #else /* HAVE_LCD_CHARCELL */
