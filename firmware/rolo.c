@@ -172,7 +172,8 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         "mov   pc, r0            \n"
     );
 
-#elif defined(CPU_TCC780X) || (CONFIG_CPU == S3C2440) || (CONFIG_CPU==DM320)
+#elif defined(CPU_TCC780X) || (CONFIG_CPU == S3C2440) || \
+      (CONFIG_CPU==DM320) || defined(CPU_S5L870X)
     /* Flush and invalidate caches */
     cpucache_invalidate();
 
@@ -237,7 +238,7 @@ int rolo_load(const char* filename)
 
 #if defined(CPU_COLDFIRE) || defined(CPU_PP) || (CONFIG_CPU==DM320) \
     || defined(CPU_TCC780X) || (CONFIG_CPU==IMX31L) || (CONFIG_CPU == S3C2440) \
-    || (CONFIG_CPU==AS3525) || (CONFIG_CPU==JZ4732)
+    || (CONFIG_CPU==AS3525) || (CONFIG_CPU==JZ4732) || defined(CPU_S5L870X)
     /* Read and save checksum */
     lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
     if (read(fd, &file_checksum, 4) != 4) {
