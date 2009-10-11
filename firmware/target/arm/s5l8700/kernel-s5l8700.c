@@ -37,7 +37,7 @@ void INT_TIMERB(void)
 
 void tick_start(unsigned int interval_in_ms)
 {
-    int cycles = 10 * interval_in_ms;
+    int cycles = 5 * interval_in_ms;
     
     /* enable timer clock */
     PWRCON &= ~(1 << 4);

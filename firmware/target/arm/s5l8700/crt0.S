@@ -123,7 +123,7 @@ start_loc:
     ldr r0, [r1,#0x20]  // PLLLOCK
     tst r0, #1
     beq 1b
-    mov r0, #0x80
+    mov r0, #0x280
     str r0, [r1,#0x3c]  // CLKCON2
     ldr r0, =0x20803180 // FCLK_CPU = 200MHz, HCLK = 100MHz, PCLK = 50MHz, other clocks off
     str r0, [r1]        // CLKCON

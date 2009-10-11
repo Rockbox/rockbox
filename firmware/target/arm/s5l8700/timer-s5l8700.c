@@ -31,8 +31,6 @@
     The S5L8700 timer resolution is only 16-bit. Larger counts are done by using
     both the clock-select and the clock prescaler to bring the count down into
     the range of the 16-bit counter.
-    
-    TODO: investigate why the timer seems to count twice as fast as expected
 */
 
 void INT_TIMERC(void)
