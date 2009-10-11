@@ -33,6 +33,7 @@
 #include "adc.h"
 #include "string.h"
 #include "buffer.h"
+#include "storage.h"
 #include "rolo.h"
 
 #ifdef MI4_FORMAT
@@ -362,6 +363,9 @@ int rolo_load(const char* filename)
     defined(ARCHOS_FMRECORDER)
     PAIOR = 0x0FA0;
 #endif
+#endif
+#ifdef HAVE_STORAGE_FLUSH
+    storage_flush();
 #endif
     rolo_restart(audiobuf, ramstart, length);
 
