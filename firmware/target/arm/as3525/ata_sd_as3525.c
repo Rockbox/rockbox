@@ -94,6 +94,7 @@ static const int pl180_base[NUM_DRIVES] = {
 #endif
 };
 
+static int sd_wait_for_state(const int drive, unsigned int state);
 static int sd_select_bank(signed char bank);
 static int sd_init_card(const int drive);
 static void init_pl180_controller(const int drive);
@@ -321,6 +322,15 @@ static int sd_init_card(const int drive)
     MCI_CLOCK(drive) |= MCI_CLOCK_BYPASS; /* full speed for controller clock */
     mci_delay();
 
+    /* If card is HS capable switch to HS timings */
+    if(card_info[drive].speed > 125000)
+    {
+        if(sd_wait_for_state(drive, SD_TRAN))
+            return -13;
+        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_ARG, NULL))
+            return -14;
+    }
+
     /*
      * enable bank switching 
      * without issuing this command, we only have access to 1/4 of the blocks
@@ -331,7 +341,7 @@ static int sd_init_card(const int drive)
     {
         const int ret = sd_select_bank(-1);
         if(ret < 0)
-            return ret - 13;
+            return ret - 15;
     }
 
     return 0;
