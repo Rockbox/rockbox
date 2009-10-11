@@ -19,8 +19,8 @@
  *
  ****************************************************************************/
 
-#ifndef __FTL_H__
-#define __FTL_H__
+#ifndef __FTL_TARGET_H__
+#define __FTL_TARGET_H__
 
 #include "config.h"
 #include "inttypes.h"
