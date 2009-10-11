@@ -118,7 +118,7 @@ struct gui_synclist
     /* The data that will be passed to the callback function YOU implement */
     void * data;
     /* The optional title, set to NULL for none */
-    char * title;
+    const char * title;
     /* Optional title icon */
     enum themable_icons title_icon;
     bool show_selection_marker; /* set to true by default */
@@ -166,7 +166,7 @@ extern void gui_synclist_add_item(struct gui_synclist * lists);
 extern void gui_synclist_del_item(struct gui_synclist * lists);
 extern void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll);
 extern void gui_synclist_flash(struct gui_synclist * lists);
-extern void gui_synclist_set_title(struct gui_synclist * lists, char * title,
+extern void gui_synclist_set_title(struct gui_synclist * lists, const char * title,
                                    enum themable_icons icon);
 extern void gui_synclist_hide_selection_marker(struct gui_synclist *lists,
                                                 bool hide);

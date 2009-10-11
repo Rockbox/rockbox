@@ -418,7 +418,7 @@ void gui_list_screen_scroll_out_of_view(bool enable)
  * both the title and icon. Use NOICON if there is no icon.
  */
 void gui_synclist_set_title(struct gui_synclist * gui_list, 
-                               char * title, enum themable_icons icon)
+                            const char * title, enum themable_icons icon)
 {
     gui_list->title = title;
     gui_list->title_icon = icon;
