@@ -326,6 +326,7 @@ void LCDFN(scroll_fn)(void)
             }
             if (abs(s->offset) >= s->width - (current_vp->width - xpos)) {
                 /* at end of line */
+                s->offset = s->width - (current_vp->width - xpos);
                 s->backward = true;
                 s->start_tick = current_tick + LCDFN(scroll_info).delay * 2;
             }
