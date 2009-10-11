@@ -61,17 +61,13 @@ newstart2:
     str r0, [r1]
 
     mov r0, #0
-    ldr r1, =0x39c00008
-    str r0, [r1] // mask all interrupts
-    ldr r1, =0x39c00020
-    str r0, [r1] // mask all external interrupts
-    mvn r0, #0
-    ldr r1, =0x39c0001c
-    str r0, [r1] // clear pending external interrupts
     mov r1, #0x39c00000
+    str r0, [r1,#0x08] // mask all interrupts
+    str r0, [r1,#0x20] // mask all external interrupts
+    mvn r0, #0
+    str r0, [r1,#0x1c] // clear pending external interrupts
     str r0, [r1] // irq priority
-    ldr r1, =0x39c00010
-    str r0, [r1] // clear pending interrupts
+    str r0, [r1,#0x10] // clear pending interrupts
 
 //    ldr r1, =0x3cf00000
 //    ldr r0, [r1]
@@ -80,11 +76,10 @@ newstart2:
 //    mov r2, #0x10
 //    orr r0, r0, r2
 //    str r0, [r1]
-//    ldr r1, =0x3cf00004
-//    ldr r0, [r1]
+//    ldr r0, [r1,#0x04]
 //    mov r2, #4
 //    orr r0, r0, r2
-//    str r0, [r1] // switch backlight on
+//    str r0, [r1,#0x04] // switch backlight on
 
 #if CONFIG_CPU==S5L8701
     ldr r1, =0x38200000
@@ -109,36 +104,29 @@ start_loc:
 #endif /* BOOTLOADER */
 #endif /* CONFIG_CPU==S5L8701 */
 
-    ldr r1, =0x3c500000 // CLKCON
+    ldr r1, =0x3c500000 
     ldr r0, =0x00800080
-    str r0, [r1]
-    ldr r1, =0x3c500024 // PLLCON
+    str r0, [r1]		// CLKCON
     mov r0, #0
-    str r0, [r1]
-    ldr r1, =0x3c500004 // PLL0PMS
+    str r0, [r1,#0x24]  // PLLCON
 #ifdef IPOD_NANO2G
-    ldr r0, =0x21200    // pdiv=2, mdiv=?? sdiv=0
+    ldr r0, =0x21200    // pdiv=2, mdiv=0x12 sdiv=0
 #else
-    ldr r0, =0x1ad200
+    ldr r0, =0x1ad200   // pdiv=0x1a, mdiv=0xd2 sdiv=0
 #endif
-    str r0, [r1]
-    ldr r1, =0x3c500014 // PLL0LCNT
+    str r0, [r1,#0x04]  // PLL0PMS
     ldr r0, =8100
-    str r0, [r1]
-    ldr r1, =0x3c500024 // PLLCON
+    str r0, [r1,#0x14]  // PLL0LCNT
     mov r0, #1
-    str r0, [r1]
-    ldr r1, =0x3c500020 // PLLLOCK
+    str r0, [r1,#0x24]  // PLLCON
 1:
-    ldr r0, [r1]
+    ldr r0, [r1,#0x20]  // PLLLOCK
     tst r0, #1
     beq 1b
-    ldr r1, =0x3c50003c // CLKCON2
     mov r0, #0x80
-    str r0, [r1]
-    ldr r1, =0x3c500000 // CLKCON
-    ldr r0, =0x20803180
-    str r0, [r1] // FCLK_CPU = 200MHz, HCLK = 100MHz, PCLK = 50MHz, other clocks off
+    str r0, [r1,#0x3c]  // CLKCON2
+    ldr r0, =0x20803180 // FCLK_CPU = 200MHz, HCLK = 100MHz, PCLK = 50MHz, other clocks off
+    str r0, [r1]        // CLKCON
 
     ldr r2, =0xc0000078
     mrc 15, 0, r0, c1, c0, 0
@@ -168,6 +156,13 @@ start_loc:
 /* The following two sections of code (i.e. Nano2G and Meizus) should
    be unified at some point. */
 #ifdef IPOD_NANO2G
+
+    ldr r1, =0x3c500000 
+    ldr r0, =0xffdff7ff
+    str r0, [r1,#0x28]  // PWRCON
+    ldr r0, =0xffffef7e
+    str r0, [r1,#0x40]  // PWRCONEXT
+
     mrc 15, 0, r0, c1, c0, 0
     bic r0, r0, #0x1000
     bic r0, r0, #0x5
