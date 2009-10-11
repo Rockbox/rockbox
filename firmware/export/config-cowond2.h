@@ -90,8 +90,8 @@
 #define HAVE_TOUCHSCREEN
 #define HAVE_BUTTON_DATA
 
-/* define this if you have a real-time clock */
-#define CONFIG_RTC RTC_PCF50606
+/* The D2 has either a PCF50606 or PCF50635, RTC_D2 handles both */
+#define CONFIG_RTC RTC_D2
 
 /* define this if you have RTC RAM available for settings */
 //#define HAVE_RTC_RAM
