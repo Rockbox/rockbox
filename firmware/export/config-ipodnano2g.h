@@ -104,7 +104,7 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
-#define HAVE_BACKLIGHT_BRIGHTNESS
+/* #define HAVE_BACKLIGHT_BRIGHTNESS - not yet */
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
@@ -115,14 +115,13 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
-
-#define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN    500   /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX    2250  /* max. capacity selectable */
+#define BATTERY_CAPACITY_DEFAULT 400 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN    400   /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX    400  /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC    50    /* capacity increment */
 #define BATTERY_TYPES_COUNT     1     /* only one type */
 
-/* Hardware controlled charging? FIXME */
+/* Hardware controlled charging? */
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
 #ifndef SIMULATOR
@@ -161,7 +160,7 @@
 #define USB_HANDLED_BY_OF
 
 /* Define this if you have adjustable CPU frequency */
-#define HAVE_ADJUSTABLE_CPU_FREQ
+/* #define HAVE_ADJUSTABLE_CPU_FREQ - not yet */
 
 #define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
@@ -170,9 +169,11 @@
 /* Alternative bootfile extension - this is for encrypted images */
 #define BOOTFILE_EXT2 "ipodx"
 
+#if 0
 #define BOOTLOADER_ENTRYPOINT  0x001F0000
 #define FLASH_ENTRYPOINT       0x00001000
 #define FLASH_MAGIC            0xfbfbfbf1
+#endif
 
 #endif /* SIMULATOR */
 
@@ -181,6 +182,7 @@
 
 /** Port-specific settings **/
 
+#if 0
 /* Main LCD contrast range and defaults */
 #define MIN_CONTRAST_SETTING        1
 #define MAX_CONTRAST_SETTING        30
@@ -188,6 +190,6 @@
 
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING      0
-#define MAX_BRIGHTNESS_SETTING      15
-#define DEFAULT_BRIGHTNESS_SETTING  10
-
+#define MAX_BRIGHTNESS_SETTING      31
+#define DEFAULT_BRIGHTNESS_SETTING  20
+#endif
