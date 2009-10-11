@@ -37,6 +37,7 @@
 #if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
 #include "language.h"
 #endif
+#include "viewport.h"
 
 static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
                                                     work on startup */
@@ -385,6 +386,24 @@ int action_get_touchscreen_press(short *x, short *y)
     if (last_button & BUTTON_REL)
         return BUTTON_REPEAT|BUTTON_REL;
     return BUTTON_TOUCHSCREEN;
+}
+
+int action_get_touchscreen_press_in_vp(short *x1, short *y1, struct viewport *vp)
+{
+    short x, y;
+    int ret;
+
+    ret = action_get_touchscreen_press(&x, &y);
+
+    if (ret != BUTTON_NONE && viewport_point_within_vp(vp, x, y))
+    {
+        *x1 = x - vp->x;
+        *y1 = y - vp->y;
+        return ret;
+    }
+    if (ret & BUTTON_TOUCHSCREEN)
+        return ACTION_UNKNOWN;
+    return BUTTON_NONE;
 }
 #endif
 

@@ -22,6 +22,7 @@
 
 #include "stdbool.h"
 #include "button.h"
+#include "viewport.h"
 
 #define TIMEOUT_BLOCK   -1
 #define TIMEOUT_NOBLOCK  0
@@ -327,12 +328,25 @@ int get_action_statuscode(int *button);
 intptr_t get_action_data(void);
 
 #ifdef HAVE_TOUCHSCREEN
-/* return BUTTON_NONE on error
-          BUTTON_REPEAT if repeated press
-          BUTTON_REL    if its a short press
-          BUTTON_TOUCHSCREEN   otherwise
-*/
+/* return BUTTON_NONE               on error
+ *        BUTTON_REPEAT             if repeated press
+ *        BUTTON_REPEAT|BUTTON_REL  if release after repeated press
+ *        BUTTON_REL                if its a short press = release after press
+ *        BUTTON_TOUCHSCREEN        if press
+ */
 int action_get_touchscreen_press(short *x, short *y);
+
+/*
+ * wrapper action_get_touchscreen_press()
+ * to filter the touchscreen coordinates through a viewport
+ *
+ * returns the action and x1, y1 relative to the viewport if
+ * the press was within the viewport,
+ * ACTION_UNKNOWN (and x1, y1 untouched) if the press was outside
+ * BUTTON_NONE else
+ * 
+ **/
+int action_get_touchscreen_press_in_vp(short *x1, short *y1, struct viewport *vp);
 #endif
 
 /* Don't let get_action*() return any ACTION_* values untill the current buttons

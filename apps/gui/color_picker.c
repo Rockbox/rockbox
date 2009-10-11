@@ -335,7 +335,7 @@ static int touchscreen_slider(struct screen *display,
 {
     short     x,y;
     int       text_top, slider_x, slider_width, title_height;
-    unsigned  button = action_get_touchscreen_press(&x, &y);
+    int       button;
     bool      display_three_rows;
     int       max_label_width;
     int      pressed_slider;
@@ -344,16 +344,15 @@ static int touchscreen_slider(struct screen *display,
 
     viewport_set_defaults(&vp, display->screen_type);
 
-    if (button == BUTTON_NONE)
-        return ACTION_NONE;
-
     max_label_width =  label_get_max_width(display);
     display->getstringsize(title, NULL, &title_height);
-
+    button = action_get_touchscreen_press_in_vp(&x, &y, &vp);
+    if (button == ACTION_UNKNOWN || button == BUTTON_NONE)
+        return ACTION_NONE;
     /* Get slider positions and top starting position
      * need vp.y here, because of the statusbar, since touchscreen
      * coordinates are absolute */
-    text_top     = vp.y + MARGIN_TOP + title_height + TITLE_MARGIN_BOTTOM +
+    text_top     = MARGIN_TOP + title_height + TITLE_MARGIN_BOTTOM +
                    SELECTOR_TB_MARGIN;
     slider_x     = SELECTOR_WIDTH + max_label_width + SLIDER_TEXT_MARGIN;
     slider_width = vp.width - slider_x*2 - max_label_width;
@@ -376,12 +375,15 @@ static int touchscreen_slider(struct screen *display,
             return ACTION_STD_CANCEL;
     }
 
-    pressed_slider = (y - text_top)/line_height;
-    if (pressed_slider > (display_three_rows?2:0))
-    {
+    vp.y += text_top;
+    vp.height = line_height * (display_three_rows ? 3:1);
+    if (!viewport_point_within_vp(&vp, x, y))
+    {   /* touching the color area means accept */
         if (button == BUTTON_REL)
             return ACTION_STD_OK;
     }
+    /* y is relative to the original viewport */
+    pressed_slider = (y - text_top)/line_height;
     if (pressed_slider != *selected_slider)
         *selected_slider = pressed_slider;
     /* add max_label_width to overcome integer division limits,
