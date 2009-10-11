@@ -23,6 +23,7 @@
 #include "audio.h"
 #include "sound.h"
 
+#if INPUT_SRC_CAPS != 0
 void audio_set_output_source(int source)
 {
     if ((unsigned)source >= AUDIO_NUM_SOURCES)
@@ -40,12 +41,15 @@ void audio_input_mux(int source, unsigned flags)
         default:                        /* playback - no recording */
             source = AUDIO_SRC_PLAYBACK;
         case AUDIO_SRC_PLAYBACK:
+#ifdef HAVE_RECORDING
             if (source != last_source)
             {
                 audiohw_set_monitor(false);
                 audiohw_disable_recording();
             }
+#endif
         break;
+#ifdef HAVE_LINE_REC
         case AUDIO_SRC_LINEIN:          /* recording only */
             if (source != last_source)
             {
@@ -53,7 +57,9 @@ void audio_input_mux(int source, unsigned flags)
                 audiohw_enable_recording(false); /* source line */
             }
         break;
+#endif
     } /* end switch */
 
     last_source = source;
 } /* audio_input_mux */
+#endif /* INPUT_SRC_CAPS != 0 */
