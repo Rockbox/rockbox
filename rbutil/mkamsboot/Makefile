@@ -4,7 +4,9 @@ LIBUCL=../../tools/ucl/src/libucl$(RBARCH).a
 CC = gcc
 
 #change for releases
+ifndef APPVERSION
 APPVERSION=`../../tools/version.sh`
+endif
 
 ifndef V
 SILENT = @
