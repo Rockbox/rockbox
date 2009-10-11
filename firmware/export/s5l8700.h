@@ -545,6 +545,7 @@
 #define PDAT4                   (*(REG32_PTR_T)(0x3CF00044))     /* The data register for port 4 */
 #define PCON5                   (*(REG32_PTR_T)(0x3CF00050))     /* Configures the pins of port 5 */
 #define PDAT5                   (*(REG32_PTR_T)(0x3CF00054))     /* The data register for port 5 */
+#define PUNK5                   (*(REG32_PTR_T)(0x3CF0005C))     /* Unknown thing for port 5 */
 #define PCON6                   (*(REG32_PTR_T)(0x3CF00060))     /* Configures the pins of port 6 */
 #define PDAT6                   (*(REG32_PTR_T)(0x3CF00064))     /* The data register for port 6 */
 #define PCON7                   (*(REG32_PTR_T)(0x3CF00070))     /* Configures the pins of port 7 */

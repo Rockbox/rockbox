@@ -20,9 +20,6 @@
  ****************************************************************************/
 #include "config.h"
 #include "usb.h"
-#include "cpu.h"
-#include "system.h"
-#include "string.h"
 
 void usb_init_device(void)
 {
@@ -30,27 +27,21 @@ void usb_init_device(void)
 
 void usb_enable(bool on)
 {
-    /* This device specific code will eventually give way to proper USB
-       handling, which should be the same for all S5L870x targets. */
-    if (on)
-    {
-#ifdef IPOD_ARCH
-        /* For iPod, we can only do one thing with USB mode atm - reboot
-           into the flash-based disk-mode.  This does not return. */
-
-        memcpy((void *)0x0002bf00, "diskmodehotstuff\1\0\0\0", 20);
-
-        system_reboot(); /* Reboot */
-#endif
-    }
+    (void)on;
 }
 
+void usb_attach(void)
+{
+
+}
+
+static bool usb_pin_state(void)
+{
+    return false;
+}
+
+/* detect host or charger (INSERTED or EXTRACTED) */
 int usb_detect(void)
 {
-#if defined(IPOD_NANO2G)
-    if ((PDAT14 & 0x8) == 0x0)
-        return USB_INSERTED;
-#endif
-
-    return USB_EXTRACTED;
+    return usb_pin_state() ? USB_INSERTED : USB_EXTRACTED;
 }

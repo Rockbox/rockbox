@@ -26,6 +26,7 @@
 #include "cpu.h"
 #include "inttypes.h"
 #include "nand-target.h"
+#include <pmu-target.h>
 #include <string.h>
 
 
@@ -84,6 +85,7 @@ uint8_t nand_twp[4];
 uint8_t nand_tunk2[4];
 uint8_t nand_tunk3[4];
 uint32_t nand_type[4];
+int nand_powered = 0;
 
 static struct mutex nand_mtx;
 static struct wakeup nand_wakeup;
@@ -124,6 +126,45 @@ uint32_t nand_timeout(long timeout)
         yield();
         return 0;
     }
+}
+
+void nand_power_up(void)
+{
+    unsigned char powerup[2] = {0x15, 1};
+    mutex_lock(&ecc_mtx);
+    PWRCONEXT &= ~0x40;
+    PWRCON &= ~0x100000;
+    PCON2 = 0x33333333;
+    PDAT2 = 0;
+    PCON3 = 0x11113333;
+    PDAT3 = 0;
+    PCON4 = 0x33333333;
+    PDAT4 = 0;
+    PCON5 = (PCON5 & ~0xF) | 3;
+    PUNK5 = 1;
+    pmu_write_multiple(0x35, 2, powerup);
+    sleep(HZ / 50);
+    nand_powered = 1;
+    mutex_unlock(&ecc_mtx);
+}
+
+void nand_power_down(void)
+{
+    unsigned char powerdown[2] = {0x15, 0};
+    mutex_lock(&ecc_mtx);
+    pmu_write_multiple(0x35, 2, powerdown);
+    PCON2 = 0x11111111;
+    PDAT2 = 0;
+    PCON3 = 0x11111111;
+    PDAT3 = 0;
+    PCON4 = 0x11111111;
+    PDAT4 = 0;
+    PCON5 = (PCON5 & ~0xF) | 1;
+    PUNK5 = 1;
+    PWRCONEXT |= 0x40;
+    PWRCON |= 0x100000;
+    nand_powered = 0;
+    mutex_unlock(&ecc_mtx);
 }
 
 uint32_t nand_wait_rbbdone(void)
@@ -302,6 +343,7 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
                         uint32_t checkempty)
 {
     mutex_lock(&nand_mtx);
+    if (!nand_powered) nand_power_up();
     uint32_t rc, eccresult;
     nand_set_fmctrl0(bank, FMCTRL0_ENABLEDMA);
     if (nand_send_cmd(NAND_CMD_READ) != 0) return nand_unlock(1);
@@ -351,6 +393,7 @@ uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
                          void* sparebuffer, uint32_t doecc)
 {
     mutex_lock(&nand_mtx);
+    if (!nand_powered) nand_power_up();
     if (sparebuffer != 0) memcpy(nand_uncached_spare, sparebuffer, 0x40);
     else memset(nand_uncached_spare, 0xFF, 0x40);
     if (doecc != 0)
@@ -383,6 +426,7 @@ uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
 uint32_t nand_block_erase(uint32_t bank, uint32_t page)
 {
     mutex_lock(&nand_mtx);
+    if (!nand_powered) nand_power_up();
     nand_set_fmctrl0(bank, 0);
     if (nand_send_cmd(NAND_CMD_BLOCKERASE) != 0) return nand_unlock(1);
     FMANUM = 2;
@@ -410,12 +454,7 @@ uint32_t nand_device_init(void)
 
     uint32_t type;
     uint32_t i, j;
-    PCON2 = 0x33333333;
-    PDAT2 = 0;
-    PCON3 = 0x11113333;
-    PDAT3 = 0;
-    PCON4 = 0x33333333;
-    PDAT4 = 0;
+    if (!nand_powered) nand_power_up();
     for (i = 0; i < 4; i++)
     {
         nand_tunk1[i] = 7;

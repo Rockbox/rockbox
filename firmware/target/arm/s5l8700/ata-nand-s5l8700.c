@@ -29,6 +29,7 @@
 #include "panic.h"
 #include "usb.h"
 #include "ftl-target.h"
+#include "nand-target.h"
 
 /* for compatibility */
 long last_disk_activity = -1;
@@ -62,14 +63,17 @@ void nand_spindown(int seconds)
 
 void nand_sleep(void)
 {
+    nand_power_down();
 }
 
 void nand_sleepnow(void)
 {
+    nand_power_down();
 }
 
 void nand_spin(void)
 {
+    nand_power_up();
 }
 
 void nand_enable(bool on)
