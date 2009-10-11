@@ -369,7 +369,7 @@ static void set_default_align_flags(struct viewport *vp)
     vp->flags &= ~VP_FLAG_ALIGNMENT_MASK;
 #ifndef __PCTOOL__
     if (UNLIKELY(lang_is_rtl()))
-        vp->flags |= VP_FLAG_IS_RTL;
+        vp->flags |= VP_FLAG_ALIGN_RIGHT;
 #endif
 }
 

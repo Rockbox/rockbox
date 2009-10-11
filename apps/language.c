@@ -109,14 +109,7 @@ int lang_load(const char *filename)
         retcode = 3;
     }
     close(fd);
-    if (retcode)
-    {
-        lang_options = 0;
-    }
-    else
-    {
-        lang_options = lang_header[3];
-    }
+    lang_options = retcode ? 0 : lang_header[3];
     return retcode;
 }
 

@@ -177,7 +177,7 @@ static void draw_screen(struct screen *display, char *title,
 
     /* Draw title string */
     set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
-    vp.flags |= VP_FLAG_CENTER_ALIGN;
+    vp.flags |= VP_FLAG_ALIGN_CENTER;
     display->getstringsize(title, NULL, &y);
     display->putsxy(0, MARGIN_TOP, title);
 
@@ -257,7 +257,7 @@ static void draw_screen(struct screen *display, char *title,
         display->putsxy(text_x, text_top, buf);
         /* Draw color value */
         snprintf(buf, 3, "%02d", rgb->rgb_val[i]);
-        vp.flags |= VP_FLAG_IS_RTL;
+        vp.flags |= VP_FLAG_ALIGN_RIGHT;
         display->putsxy(text_x, text_top, buf);
 
         /* Draw scrollbar */
@@ -278,7 +278,7 @@ static void draw_screen(struct screen *display, char *title,
     /* Format RGB: #rrggbb */
     snprintf(buf, sizeof(buf), str(LANG_COLOR_RGB_VALUE),
                                rgb->red, rgb->green, rgb->blue);
-    vp.flags |= VP_FLAG_CENTER_ALIGN;
+    vp.flags |= VP_FLAG_ALIGN_CENTER;
     if (display->depth >= 16)
     {
         /* Display color swatch on color screens only */

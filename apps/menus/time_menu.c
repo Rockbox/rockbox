@@ -268,7 +268,7 @@ int time_screen(void* ignored)
 
         menu[i] = clock[i];
         /* force time to be drawn centered */
-        clock[i].flags |= VP_FLAG_CENTER_ALIGN;
+        clock[i].flags |= VP_FLAG_ALIGN_CENTER;
 
         font_h = font_get(clock[i].font)->height;
         if (nb_lines > 3)

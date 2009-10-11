@@ -92,7 +92,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 
         LCDFN(getstringsize)(str, &w, NULL);
         /* center takes precedence */
-        if (vp_flags & VP_FLAG_CENTER_ALIGN)
+        if (vp_flags & VP_FLAG_ALIGN_CENTER)
             x = ((current_vp->width - w)/ 2) + x;
         else
             x = current_vp->width - w - x;
