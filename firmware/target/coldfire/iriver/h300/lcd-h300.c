@@ -32,9 +32,14 @@
 #include "font.h"
 #include "bidi.h"
 
-static bool display_on = false; /* is the display turned on? */
+static bool display_on = false; /* Is the display turned on? */
 static bool display_flipped = false;
-static int xoffset = 0; /* needed for flip */
+static int xoffset = 0;         /* Needed for flip */
+static struct mutex lcd_mtx;    /* The update functions use DMA and yield */
+
+unsigned long dma_addr IBSS_ATTR;
+unsigned int dma_len IBSS_ATTR;
+volatile int dma_count IBSS_ATTR;
 
 /* register defines */
 #define R_START_OSC             0x00
@@ -133,7 +138,11 @@ void lcd_set_flip(bool yesno)
     xoffset = yesno ? 4 : 0;
 
     if (display_on)
+    {
+        mutex_lock(&lcd_mtx);
         flip_lcd(yesno);
+        mutex_unlock(&lcd_mtx);
+    }
 }
 
 static void _display_on(void)
@@ -253,14 +262,22 @@ void lcd_init_device(void)
     or_l(0x00004000, &GPIO1_OUT);
     sleep(1);
 
+    DAR3 = 0xf0000002; /* Configure DMA channel 3 */
+    DSR3 = 1;
+    DIVR3 = 57;        /* DMA3 is mapped into vector 57 in system.c */
+    ICR9 = (6 << 2);   /* Enable DMA3 interrupt at level 6, priority 0 */
+    and_l(~(1<<17), &IMR);
+
+    mutex_init(&lcd_mtx);
     _display_on();
 }
 
 void lcd_enable(bool on)
 {
-    if(display_on!=on)
+    if (display_on != on)
     {
-        if(on)
+        mutex_lock(&lcd_mtx);
+        if (on)
         {
             _display_on();
             lcd_activation_call_hook();
@@ -287,6 +304,7 @@ void lcd_enable(bool on)
 
             display_on=false;
         }
+        mutex_unlock(&lcd_mtx);
     }
 }
 
@@ -322,6 +340,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
     if (!display_on)
         return;
 
+    mutex_lock(&lcd_mtx);
     width &= ~1;  /* stay on the safe side */
     height &= ~1;
 
@@ -353,14 +372,33 @@ void lcd_blit_yuv(unsigned char * const src[3],
         vsrc += stride >> 1;
     }
     while (ysrc < ysrc_max);
+    mutex_unlock(&lcd_mtx);
 }
+
+/* LCD DMA ISR */
+void DMA3(void) __attribute__ ((interrupt_handler, section(".icode")));
+void DMA3(void)
+{
+    DSR3 = 1;
+    if (--dma_count > 0)
+    {
+        dma_addr += LCD_WIDTH*sizeof(fb_data);
+        SAR3 = dma_addr;
+        BCR3 = dma_len;
+        DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)
+             | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE) 
+             | DMA_DSIZE(DMA_SIZE_WORD) | DMA_START;
+    }
+}      
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
-void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
-    if(display_on){
+    if (display_on)
+    {
+        mutex_lock(&lcd_mtx);
+
         lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_VERT);
         /* set start position window */
         lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 175 << 8);
@@ -369,57 +407,62 @@ void lcd_update(void)
 
         lcd_begin_write_gram();
 
-        DAR3 = 0xf0000002;
+        dma_count = 1;
         SAR3 = (unsigned long)lcd_framebuffer;
-        BCR3 = LCD_WIDTH*LCD_HEIGHT*2;
-        DCR3 = DMA_AA | DMA_BWC(1)
+        BCR3 = LCD_WIDTH*LCD_HEIGHT*sizeof(fb_data);
+        DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)
              | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE) 
              | DMA_DSIZE(DMA_SIZE_WORD) | DMA_START;
 
-        while (!(DSR3 & 1));
-        DSR3 = 1;
+        while (dma_count > 0)
+            yield();
+
+        mutex_unlock(&lcd_mtx);
     }
 }
 
-
 /* Update a fraction of the display. */
-void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    unsigned long dma_addr;
-
-    if(display_on) {
-
-        if(x + width > LCD_WIDTH)
+    if (display_on)
+    {
+        if (x + width > LCD_WIDTH)
             width = LCD_WIDTH - x;
-        if(width <= 0) /* nothing to do */
-            return;
-        if(y + height > LCD_HEIGHT)
+        if (y + height > LCD_HEIGHT)
             height = LCD_HEIGHT - y;
+
+        if (width <= 0 || height <= 0) /* nothing to do */
+            return;
+
+        mutex_lock(&lcd_mtx);
 
         lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_VERT);
         /* set update window */
         lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 175 << 8);
         lcd_write_reg(R_VERT_RAM_ADDR_POS,((x+xoffset+width-1) << 8) | (x+xoffset));
         lcd_write_reg(R_RAM_ADDR_SET, ((x+xoffset) << 8) | y);
+
         lcd_begin_write_gram();
         
-        DAR3 = 0xf0000002;
-        dma_addr = (unsigned long)&lcd_framebuffer[y][x];
-        width *= 2;
-
-        for (; height > 0; height--)
+        if (width == LCD_WIDTH)
         {
-            SAR3 = dma_addr;
-            BCR3 = width;
-            DCR3 = DMA_AA | DMA_BWC(1)
-                 | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)
-                 | DMA_DSIZE(DMA_SIZE_WORD) | DMA_START;
-
-            dma_addr += LCD_WIDTH*2;
-
-            while (!(DSR3 & 1));
-            DSR3 = 1;
+            dma_count = 1;
+            SAR3 = (unsigned long)lcd_framebuffer[y];
+            BCR3 = (LCD_WIDTH*sizeof(fb_data)) * height;
         }
+        else
+        {
+            dma_count = height;
+            SAR3 = dma_addr = (unsigned long)&lcd_framebuffer[y][x];
+            BCR3 = dma_len  = width * sizeof(fb_data);
+        }
+        DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)
+             | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)
+             | DMA_DSIZE(DMA_SIZE_WORD) | DMA_START;
+
+        while (dma_count > 0)
+            yield();
+
+        mutex_unlock(&lcd_mtx);
     }
 }
