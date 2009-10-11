@@ -25,6 +25,11 @@
 #include "config.h"
 #include "inttypes.h"
 
+#ifdef BOOTLOADER
+/* Bootloaders don't need write access */
+#define FTL_READONLY
+#endif
+
 uint32_t ftl_init(void);
 uint32_t ftl_read(uint32_t sector, uint32_t count, void* buffer);
 uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer);

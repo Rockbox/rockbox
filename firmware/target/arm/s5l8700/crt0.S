@@ -27,7 +27,11 @@
     .global    _newstart
     /* Exception vectors */
 start:
+#if CONFIG_CPU==S5L8701 && defined(BOOTLOADER)
+    b newstart2
+#else
     b _newstart
+#endif
     ldr pc, =undef_instr_handler
     ldr pc, =software_int_handler
     ldr pc, =prefetch_abort_handler
@@ -88,7 +92,22 @@ newstart2:
     orr r2, r2, #1
     bic r2, r2, #0x10000
     str r2, [r1] // remap iram to address 0x0
-#endif
+
+#ifdef BOOTLOADER
+    /* Relocate ourself to IRAM - we have been loaded to DRAM */
+    mov    r0, #0x08000000   /* source (DRAM) */
+    mov    r1, #0x00000000   /* dest (IRAM) */
+    ldr    r2, =_dataend
+1:
+    cmp    r2, r1
+    ldrhi  r3, [r0], #4
+    strhi  r3, [r1], #4
+    bhi    1b
+
+    ldr    pc, =start_loc    /* jump to the relocated start_loc:  */
+start_loc:
+#endif /* BOOTLOADER */
+#endif /* CONFIG_CPU==S5L8701 */
 
     ldr r1, =0x3c500000 // CLKCON
     ldr r0, =0x00800080

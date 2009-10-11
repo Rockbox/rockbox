@@ -9,14 +9,14 @@ OUTPUT_FORMAT(elf32-bigarm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/s5l8700/crt0.o)
 
-/* DRAMORIG is in fact 0x08000000 but remapped to 0x0 */
 #define DRAMORIG 0x08000000
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
 
-#define IRAMORIG 0x22000000
 #if CONFIG_CPU==S5L8701
+#define IRAMORIG 0x0
 #define IRAMSIZE 176K
 #else
+#define IRAMORIG 0x22000000
 #define IRAMSIZE 256K
 #endif
 
@@ -91,7 +91,11 @@ SECTIONS
      _fiqstackend = .;
   } > IRAM
 
-  .bss : {
+  /* The bss section is too large for IRAM - we just move it 12MB into the
+     DRAM */
+
+  . = DRAMORIG;
+  .bss . + (12*1024*1024): {
      _edata = .;
      *(.bss*);
      *(.ibss);
@@ -99,5 +103,5 @@ SECTIONS
      *(COMMON);
     . = ALIGN(0x4);
      _end = .;
-   } > IRAM
+  } > DRAM
 }

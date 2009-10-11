@@ -1,6 +1,8 @@
 common.c
 
-#if defined(IPOD_ARCH)
+#if defined(IPOD_NANO2G)
+ipodnano2g.c
+#elif defined(IPOD_ARCH)
 ipod.c
 #elif defined(GIGABEAT_F)
 gigabeat.c
@@ -54,8 +56,5 @@ sansa_as3525.c
 show_logo.c
 #elif defined(LYRE_PROTO1)
 lyre_proto1.c
-show_logo.c
-#elif defined(IPOD_NANO2G)
-ipodnano2g.c
 show_logo.c
 #endif

@@ -45,56 +45,127 @@
 #include "file.h"
 #include "common.h"
 
+/* Safety measure - maximum allowed firmware image size. 
+   The largest known current (October 2009) firmware is about 6.2MB so 
+   we set this to 8MB. 
+*/
+#define MAX_LOADSIZE (8*1024*1024)
+
+/* The buffer to load the firmware into */
+unsigned char *loadbuffer = (unsigned char *)0x08000000;
+
+/* Bootloader version */
 char version[] = APPSVERSION;
 
-/* Show the Rockbox logo - in show_logo.c */
-extern int show_logo(void);
-
 extern int line;
+
+void fatal_error(void)
+{
+    extern int line;
+    bool holdstatus=false;
+
+    /* System font is 6 pixels wide */
+    printf("Hold MENU+SELECT to");
+    printf("reboot then SELECT+PLAY");
+    printf("for disk mode");
+    lcd_update();
+
+    while (1) {
+        if (button_hold() != holdstatus) {
+            if (button_hold()) {
+                holdstatus=true;
+                lcd_puts(0, line, "Hold switch on!");
+            } else {
+                holdstatus=false;
+                lcd_puts(0, line, "               ");
+            }
+            lcd_update();
+        }
+    }
+}
 
 void main(void)
 {
     int i;
+    int btn;
+    int rc;
+    bool button_was_held;
+
+    /* Check the button hold status as soon as possible - to 
+       give the user maximum chance to turn it on in order to
+       reset the settings in rockbox. */
+    button_was_held = button_hold();
 
     system_init();
-    i2c_init();
     kernel_init();
+
+    i2c_init();
 
     enable_irq();
 
+    backlight_init(); /* Turns on the backlight */
+
     lcd_init();
+    font_init();
 
-    _backlight_init();
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
+    lcd_clear_display();
 
-    lcd_puts_scroll(0,0,"+++ this is a very very long line to test scrolling. ---");
-    verbose = 0;
-    i = 0;
-    while (!button_hold()) {
-        line = 1;
+//    button_init();
 
-        printf("i=%d",i++);
-        printf("TBCNT:   %08x",TBCNT);
-        printf("GPIO  0: %08x",PDAT0);
-        printf("GPIO  1: %08x",PDAT1);
-        printf("GPIO  2: %08x",PDAT2);
-        printf("GPIO  3: %08x",PDAT3);
-        printf("GPIO  4: %08x",PDAT4);
-        printf("GPIO  5: %08x",PDAT5);
-        printf("GPIO  6: %08x",PDAT6);
-        printf("GPIO  7: %08x",PDAT7);
-        printf("GPIO 10: %08x",PDAT10);
-        printf("GPIO 11: %08x",PDAT11);
-        printf("GPIO 13: %08x",PDAT13);
-        printf("GPIO 14: %08x",PDAT14);
+    btn=0; /* TODO */
 
-        lcd_update();
+    /* Enable bootloader messages */
+    if (btn==BUTTON_RIGHT)
+        verbose = true;
+
+    lcd_setfont(FONT_SYSFIXED);
+
+    printf("Rockbox boot loader");
+    printf("Version: %s", version);
+
+    i = storage_init();
+
+    if (i != 0) {
+        printf("ATA error: %d", i);
+        fatal_error();
     }
+
+    disk_init();
+    rc = disk_mount_all();
+    if (rc<=0)
+    {
+        printf("No partition found");
+        fatal_error();
+    }
+
+    if (button_was_held || (btn==BUTTON_MENU)) {
+        /* If either the hold switch was on, or the Menu button was held, then 
+           try the Apple firmware */
+
+        printf("Loading original firmware...");
+
+        /* TODO */
+        fatal_error();
+    } else {
+        printf("Loading Rockbox...");
+        rc=load_firmware(loadbuffer, BOOTFILE, MAX_LOADSIZE);
+
+        if (rc != EOK) {
+            printf("Error!");
+            printf("Can't load " BOOTFILE ": ");
+            printf(strerror(rc));
+            fatal_error();
+        }
+
+        printf("Rockbox loaded.");
+    }
+
+    /* If we get here, we have a new firmware image at 0x08000000, run it */
 
     disable_irq();
 
-    /* Branch back to iBugger entry point */
-    asm volatile("ldr pc, =0x08640568");
-
-    /* We never reach here */
-    while(1);
+    /* Branch to start of DRAM */
+    asm volatile("ldr pc, =0x08000000");
 }

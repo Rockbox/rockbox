@@ -1441,8 +1441,7 @@ fi
     appextra="recorder:gui"
     plugins="yes"
     swcodec="yes"
-    boottool="cp"
-    bootoutput="bootloader-$modelname.bin"
+    bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
