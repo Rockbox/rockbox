@@ -32,18 +32,16 @@
 
 void power_off(void)
 {
-    pmu_switch_power(0, 0);
-    pmu_switch_power(2, 0);
-    pmu_switch_power(3, 0);
-    pmu_switch_power(4, 0);
-    pmu_switch_power(6, 0);
-    pmu_switch_power(7, 0);
-
-    pmu_write(0x36, pmu_read(0x36) & 0xF0);
-    pmu_write(0x34, pmu_read(0x34) & 0xF0);
-    pmu_write(0xD, pmu_read(0xD) | 0x40);
-    pmu_write(0xD, pmu_read(0xD) | 0x02);
-    pmu_write(0xC, 1);
+    pmu_ldo_on_in_standby(0, 0);
+    pmu_ldo_on_in_standby(1, 0);
+    pmu_ldo_on_in_standby(2, 0);
+    pmu_ldo_on_in_standby(3, 0);
+    pmu_ldo_on_in_standby(4, 0);
+    pmu_ldo_on_in_standby(5, 0);
+    pmu_ldo_on_in_standby(6, 0);
+    pmu_ldo_on_in_standby(7, 0);
+    pmu_set_wake_condition(0x42); /* USB inserted or EXTON1 */
+    pmu_enter_standby();
 
     while(1);
 }
@@ -54,15 +52,27 @@ void power_init(void)
 }
 
 #if CONFIG_CHARGING
+
+#ifdef HAVE_USB_CHARGING_ENABLE
+bool usb_charging_enable(bool on)
+{
+    PDAT11 = (PDAT11 & ~1) | (on ? 1 : 0);
+    return on;
+}
+
+bool usb_charging_enabled(void)
+{
+    return PDAT11 & 1;
+}
+#endif
+
 unsigned int power_input_status(void)
 {
-    /* TODO */
-    return POWER_INPUT_NONE;
+    return (PDAT14 & 0x80) ? POWER_INPUT_NONE : POWER_INPUT_MAIN;
 }
 
 bool charging_state(void)
 {
-    /* TODO */
-    return false;
+    return (PDAT14 & 0x80) ? false : true;
 }
 #endif /* CONFIG_CHARGING */

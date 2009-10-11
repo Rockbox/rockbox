@@ -28,7 +28,7 @@
 
 void _backlight_set_brightness(int brightness)
 {
-    (void)brightness;
+    pmu_write(0x28, brightness);
 }
 
 void _backlight_on(void)

@@ -104,7 +104,7 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
-/* #define HAVE_BACKLIGHT_BRIGHTNESS - not yet */
+#define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
@@ -137,6 +137,8 @@
 
 /* I2C interface */
 #define CONFIG_I2C I2C_S5L8700
+
+#define HAVE_USB_CHARGING_ENABLE
 
 /* The size of the flash ROM */
 #define FLASH_SIZE 0x400000
@@ -187,9 +189,9 @@
 #define MIN_CONTRAST_SETTING        1
 #define MAX_CONTRAST_SETTING        30
 #define DEFAULT_CONTRAST_SETTING    19 /* Match boot contrast */
+#endif
 
 /* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING      0
-#define MAX_BRIGHTNESS_SETTING      31
-#define DEFAULT_BRIGHTNESS_SETTING  20
-#endif
+#define MIN_BRIGHTNESS_SETTING      1
+#define MAX_BRIGHTNESS_SETTING      0x2e
+#define DEFAULT_BRIGHTNESS_SETTING  0x20

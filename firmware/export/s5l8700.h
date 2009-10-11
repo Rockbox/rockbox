@@ -552,14 +552,14 @@
 #define PDAT7                   (*(REG32_PTR_T)(0x3CF00074))     /* The data register for port 7 */
 #define PCON10                  (*(REG32_PTR_T)(0x3CF000A0))     /* Configures the pins of port 10 */
 #define PDAT10                  (*(REG32_PTR_T)(0x3CF000A4))     /* The data register for port 10 */
+#define PCON11                  (*(REG32_PTR_T)(0x3CF000B0))     /* Configures the pins of port 11 */
+#define PDAT11                  (*(REG32_PTR_T)(0x3CF000B4))     /* The data register for port 11 */
 #define PCON13                  (*(REG32_PTR_T)(0x3CF000D0))     /* Configures the pins of port 13 */
 #define PDAT13                  (*(REG32_PTR_T)(0x3CF000D4))     /* The data register for port 13 */
 #define PCON14                  (*(REG32_PTR_T)(0x3CF000E0))     /* Configures the pins of port 14 */
 #define PDAT14                  (*(REG32_PTR_T)(0x3CF000E4))     /* The data register for port 14 */
 #define PCON_ASRAM              (*(REG32_PTR_T)(0x3CF000F0))     /* Configures the pins of port nor flash */
 #define PCON_SDRAM              (*(REG32_PTR_T)(0x3CF000F4))     /* Configures the pins of port sdram */
-#define PCON11                  (*(REG32_PTR_T)(0x3CF000F8))     /* Configures the pins of port 11 */
-#define PDAT11                  (*(REG32_PTR_T)(0x3CF000FC))     /* The data register for port 11 */
 
 /* 25. UART */
 

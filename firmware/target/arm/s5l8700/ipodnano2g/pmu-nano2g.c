@@ -57,50 +57,84 @@ void pmu_init(void)
     pmu_initialized = 1;
 }
 
+int pmu_read_adc(unsigned int adc)
+{
+    int data = 0;
+    if (!pmu_initialized) pmu_init();
+    mutex_lock(&pmu_adc_mutex);
+    pmu_write(0x54, 5 | (adc << 4));
+    while ((data & 0x80) == 0)
+    {
+        yield();
+        data = pmu_read(0x57);
+    }
+    int value = (pmu_read(0x55) << 2) | (data & 3);
+    mutex_unlock(&pmu_adc_mutex);
+    return value;
+}
+
+/* millivolts */
 int pmu_read_battery_voltage(void)
 {
-    int data = 0;
-    if (!pmu_initialized) pmu_init();
-    mutex_lock(&pmu_adc_mutex);
-    pmu_write(0x54, 0x05);
-    while ((data & 0x80) == 0)
-    {
-        yield();
-        data = pmu_read(0x57);
-    }
-    int millivolts = ((pmu_read(0x55) << 2) | (data & 3)) * 6;
-    mutex_unlock(&pmu_adc_mutex);
-    return millivolts;
+    return pmu_read_adc(0) * 6;
 }
 
+/* milliamps */
 int pmu_read_battery_current(void)
 {
-    int data = 0;
-    if (!pmu_initialized) pmu_init();
-    mutex_lock(&pmu_adc_mutex);
-    pmu_write(0x54, 0x25);
-    while ((data & 0x80) == 0)
-    {
-        yield();
-        data = pmu_read(0x57);
-    }
-    int milliamps = (pmu_read(0x55) << 2) | (data & 3);
-    mutex_unlock(&pmu_adc_mutex);
-    return milliamps;
+    return pmu_read_adc(2);
 }
 
-void pmu_switch_power(int gate, int onoff)
+void pmu_ldo_on_in_standby(unsigned int ldo, int onoff)
 {
-    if (gate < 4)
+    if (ldo < 4)
     {
-        unsigned char newval = pmu_read(0x3B) & ~(1 << (2 * gate));
-        if (onoff) newval |= 1 << (2 * gate);
+        unsigned char newval = pmu_read(0x3B) & ~(1 << (2 * ldo));
+        if (onoff) newval |= 1 << (2 * ldo);
         pmu_write(0x3B, newval);
     }
-    else if (gate < 7)
+    else if (ldo < 8)
     {
-        unsigned char newval = pmu_read(0x3C) & ~(1 << (2 * (gate - 4)));
-        if (onoff) newval |= 1 << (2 * (gate - 4));
+        unsigned char newval = pmu_read(0x3C) & ~(1 << (2 * (ldo - 4)));
+        if (onoff) newval |= 1 << (2 * (ldo - 4));
         pmu_write(0x3C, newval);
     }
+}
+
+void pmu_ldo_set_voltage(unsigned int ldo, unsigned char voltage)
+{
+    if (ldo > 6) return;
+    pmu_write(0x2d + (ldo << 1), voltage);
+}
+
+void pmu_ldo_power_on(unsigned int ldo)
+{
+    if (ldo > 6) return;
+    pmu_write(0x2e + (ldo << 1), 1);
+}
+
+void pmu_ldo_power_off(unsigned int ldo)
+{
+    if (ldo > 6) return;
+    pmu_write(0x2e + (ldo << 1), 0);
+}
+
+void pmu_set_wake_condition(unsigned char condition)
+{
+    pmu_write(0xd, condition);
+}
+
+void pmu_enter_standby(void)
+{
+    pmu_write(0xc, 1);
+}
+
+void pmu_read_rtc(unsigned char* buffer)
+{
+    pmu_read_multiple(0x59, 7, buffer);
+}
+
+void pmu_write_rtc(unsigned char* buffer)
+{
+    pmu_write_multiple(0x59, 7, buffer);
 }

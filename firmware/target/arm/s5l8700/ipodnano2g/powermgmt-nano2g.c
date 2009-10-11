@@ -61,4 +61,3 @@ unsigned int battery_adc_voltage(void)
 {
     return pmu_read_battery_voltage();
 }
-
