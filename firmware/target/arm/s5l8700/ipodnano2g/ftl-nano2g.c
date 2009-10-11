@@ -684,7 +684,7 @@ void ftl_vfl_schedule_block_for_remap(uint32_t bank, uint32_t block)
 {
     if (ftl_vfl_check_remap_scheduled(bank, block) == 1)
         return;
-    panicf("FTL: Scheduling bank %d block %d for remap!", bank, block);
+    panicf("FTL: Scheduling bank %u block %u for remap!", (unsigned)bank, (unsigned)block);
     if (ftl_vfl_cxt[bank].scheduledstart == ftl_vfl_cxt[bank].spareused)
         return;
     ftl_vfl_cxt[bank].remaptable[--ftl_vfl_cxt[bank].scheduledstart] = block;
@@ -770,7 +770,7 @@ uint32_t ftl_vfl_remap_block(uint32_t bank, uint32_t block)
 {
     uint32_t i;
     uint32_t newblock = 0, newidx;
-    panicf("FTL: Remapping bank %d block %d!", bank, block);
+    panicf("FTL: Remapping bank %u block %u!", (unsigned)bank, (unsigned)block);
     if (bank >= ftl_banks || block >= (*ftl_nand_type).blocks) return 0;
     for (i = 0; i < ftl_vfl_cxt[bank].sparecount; i++)
         if (ftl_vfl_cxt[bank].remaptable[i] == 0)
