@@ -26,9 +26,13 @@
 #include "cpu.h"
 #include "config.h"
 
-#define VP_FLAG_IS_RTL 0x01
+#define VP_FLAG_IS_RTL       0x01
+#define VP_FLAG_CENTER_ALIGN 0x02
 
-#define VP_IS_RTL(vp) (((vp)->flags & VP_FLAG_IS_RTL) != 0)
+#define VP_FLAG_ALIGNMENT_MASK \
+        (VP_FLAG_IS_RTL|VP_FLAG_CENTER_ALIGN)
+
+#define VP_IS_RTL(vp) (((vp)->flags & VP_FLAG_ALIGNMENT_MASK) == VP_FLAG_IS_RTL)
 
 struct viewport {
     int x;

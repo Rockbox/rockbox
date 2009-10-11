@@ -48,7 +48,6 @@
 static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 {
     char splash_buf[MAXBUFFER];
-    short widths[MAXLINES];
     char *lines[MAXLINES];
 
     char *next;
@@ -95,7 +94,6 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
             if (x + (next - lastbreak) * space_w + w
                     > screen->lcdwidth - RECT_SPACING*2)
             {   /* too wide, wrap */
-                widths[line] = x;
 #ifdef HAVE_LCD_BITMAP
                 if (x > maxw)
                     maxw = x;
@@ -118,7 +116,6 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
         next = strtok_r(NULL, " ", &store);
         if (!next)
         {   /* no more words */
-            widths[line] = x;
 #ifdef HAVE_LCD_BITMAP
             if (x > maxw)
                 maxw = x;
@@ -149,7 +146,8 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
         vp.width = screen->lcdwidth;
     if (vp.height > screen->lcdheight)
         vp.height = screen->lcdheight;
-    
+
+    vp.flags |=  VP_FLAG_CENTER_ALIGN;
 #if LCD_DEPTH > 1
     if (screen->depth > 1)
     {
@@ -179,7 +177,6 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     y = RECT_SPACING;
 #else /* HAVE_LCD_CHARCELLS */
     y = 0;    /* vertical centering on 2 lines would be silly */
-    x = 0;
     screen->clear_display();
 #endif
 
@@ -187,19 +184,10 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     for (i = 0; i <= line; i++, y+=h)
     {
 #ifdef HAVE_LCD_BITMAP
-#define W (vp.width - RECT_SPACING*2)
+        screen->putsxy(0, y, lines[i]);
 #else
-#define W (screens->lcdwidth)
+        screen->puts(0, y, lines[i]);
 #endif
-        x = (W - widths[i])/2;
-        if (x < 0)
-            x = 0;
-#ifdef HAVE_LCD_BITMAP
-        screen->putsxy(x+RECT_SPACING, y, lines[i]);
-#else
-        screen->puts(x, y, lines[i]);
-#endif
-#undef W
     }
     screen->update_viewport();
 end:

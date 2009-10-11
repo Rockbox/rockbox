@@ -46,11 +46,9 @@
 
 static int timedate_set(void)
 {
-    struct tm tm;
-    int result;
-
     /* Make a local copy of the time struct */
-    memcpy(&tm, get_time(), sizeof(struct tm));
+    struct tm tm = *get_time();
+    int result;
 
     /* do some range checks */
     /* This prevents problems with time/date setting after a power loss */
@@ -160,21 +158,6 @@ static void talk_timedate(void)
     }
 }
 
-static void vp_puts_center(struct viewport *vp, struct screen *display,
-                           int line, const char *str)
-{
-    int w, offset;
-
-    display->getstringsize(str, &w, NULL);
-    if (w > vp->width)
-        display->puts_scroll(0, line, str);
-    else
-    {
-        offset = (vp->width - w)/2;
-        display->putsxy(offset, line * font_get(vp->font)->height, str);
-    }
-}
-
 static void draw_timedate(struct viewport *vp, struct screen *display)
 {
     struct tm *tm = get_time();
@@ -210,12 +193,13 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
         d = str(LANG_UNKNOWN);
     }
 
-    vp_puts_center(vp, display, line, t);
-    line++;
-    vp_puts_center(vp, display, line, d);
+    display->puts_scroll(0, line++, time);
+    display->puts_scroll(0, line, date);
 
     display->update_viewport();
+    display->set_viewport(NULL);
 }
+
 
 static struct viewport clock[NB_SCREENS], menu[NB_SCREENS];
 static bool menu_was_pressed;
@@ -281,7 +265,11 @@ int time_screen(void* ignored)
         }
 #endif
         nb_lines = viewport_get_nb_lines(&clock[i]);
+
         menu[i] = clock[i];
+        /* force time to be drawn centered */
+        clock[i].flags |= VP_FLAG_CENTER_ALIGN;
+
         font_h = font_get(clock[i].font)->height;
         if (nb_lines > 3)
         {
@@ -302,6 +290,7 @@ int time_screen(void* ignored)
         menu[i].height -= clock[i].height;
         draw_timedate(&clock[i], &screens[i]);
     }
+
     ret = do_menu(&time_menu, NULL, menu, false);
     /* see comments above in the button callback */
     if (!menu_was_pressed && ret == GO_TO_PREVIOUS)

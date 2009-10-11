@@ -82,15 +82,20 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
     unsigned short ch;
     unsigned short *ucs;
     struct font* pf = font_get(current_vp->font);
+    int vp_flags = current_vp->flags;
 
     ucs = bidi_l2v(str, 1);
 
-    if (VP_IS_RTL(current_vp))
+    if ((vp_flags & VP_FLAG_ALIGNMENT_MASK) != 0)
     {
         int w;
 
         LCDFN(getstringsize)(str, &w, NULL);
-        x = current_vp->width - w - x;
+        /* center takes precedence */
+        if (vp_flags & VP_FLAG_CENTER_ALIGN)
+            x = ((current_vp->width - w)/ 2) + x;
+        else
+            x = current_vp->width - w - x;
     }
 
     while ((ch = *ucs++) != 0 && x < current_vp->width)

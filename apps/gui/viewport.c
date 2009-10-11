@@ -62,7 +62,7 @@
 static int statusbar_enabled = 0;
 
 #ifdef HAVE_LCD_BITMAP
-static void viewport_rtl_handler(struct viewport *vp);
+static void set_default_align_flags(struct viewport *vp);
 
 static struct {
     struct  viewport* vp;
@@ -109,7 +109,7 @@ void viewport_set_fullscreen(struct viewport *vp,
     vp->width = screens[screen].lcdwidth;
 
 #ifdef HAVE_LCD_BITMAP
-    viewport_rtl_handler(vp);
+    set_default_align_flags(vp);
     vp->drawmode = DRMODE_SOLID;
     vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */
         
@@ -245,7 +245,7 @@ void viewportmanager_theme_changed(const int which)
     else if (which & THEME_LANGUAGE)
     {   /* THEME_UI_VIEWPORT handles rtl already */
         FOR_NB_SCREENS(i)
-            viewport_rtl_handler(&custom_vp[i]);
+            set_default_align_flags(&custom_vp[i]);
     }
     if (which & THEME_STATUSBAR)
     {
@@ -364,14 +364,13 @@ bool viewport_point_within_vp(const struct viewport *vp,
 
 #ifdef HAVE_LCD_BITMAP
 
-static void viewport_rtl_handler(struct viewport *vp)
+static void set_default_align_flags(struct viewport *vp)
 {
+    vp->flags &= ~VP_FLAG_ALIGNMENT_MASK;
 #ifndef __PCTOOL__
     if (UNLIKELY(lang_is_rtl()))
         vp->flags |= VP_FLAG_IS_RTL;
-    else
 #endif
-        vp->flags &= ~VP_FLAG_IS_RTL;
 }
 
 const char* viewport_parse_viewport(struct viewport *vp,
@@ -456,7 +455,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
 
     /* Set the defaults for fields not user-specified */
     vp->drawmode = DRMODE_SOLID;
-    viewport_rtl_handler(vp);
+    set_default_align_flags(vp);
 
     return ptr;
 }
