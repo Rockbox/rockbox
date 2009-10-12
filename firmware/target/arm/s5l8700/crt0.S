@@ -91,7 +91,7 @@ newstart2:
 #ifdef BOOTLOADER
     /* Relocate ourself to IRAM - we have been loaded to DRAM */
     mov    r0, #0x08000000   /* source (DRAM) */
-    mov    r1, #0x00000000   /* dest (IRAM) */
+    mov    r1, #0x22000000   /* dest (IRAM) */
     ldr    r2, =_dataend
 1:
     cmp    r2, r1

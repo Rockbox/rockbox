@@ -12,11 +12,10 @@ STARTUP(target/arm/s5l8700/crt0.o)
 #define DRAMORIG 0x08000000
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
 
+#define IRAMORIG 0x22000000
 #if CONFIG_CPU==S5L8701
-#define IRAMORIG 0x0
 #define IRAMSIZE 176K
 #else
-#define IRAMORIG 0x22000000
 #define IRAMSIZE 256K
 #endif
 

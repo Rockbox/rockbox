@@ -51,8 +51,8 @@
 */
 #define MAX_LOADSIZE (8*1024*1024)
 
-/* The buffer to load the firmware into */
-unsigned char *loadbuffer = (unsigned char *)0x08000000;
+/* The buffer to load the firmware into - use an uncached alias of 0x08000000 */
+unsigned char *loadbuffer = (unsigned char *)0x48000000;
 
 /* Bootloader version */
 char version[] = APPSVERSION;
@@ -229,11 +229,9 @@ void main(void)
     if (button_was_held || (btn==BUTTON_MENU)) {
         /* If either the hold switch was on, or the Menu button was held, then 
            try the Apple firmware */
-
-        verbose = true;
         printf("Loading original firmware...");
 
-        if ((rc = readfw("DNANkbso", (void*)0x08000000, &size)) < 0) {
+        if ((rc = readfw("DNANkbso", loadbuffer, &size)) < 0) {
             printf("readfw error %d",rc);
             fatal_error();
         }
@@ -241,7 +239,7 @@ void main(void)
         /* Now we need to decrypt it */
         printf("Decrypting %d bytes...",size);
 
-        aes_decrypt((void*)0x08000000, size);
+        aes_decrypt(loadbuffer, size);
     } else {
         printf("Loading Rockbox...");
         rc=load_firmware(loadbuffer, BOOTFILE, MAX_LOADSIZE);
@@ -265,8 +263,15 @@ void main(void)
     /* Remap the bootrom back to zero - that's how the NOR bootloader leaves
        it.
      */
-    // This won't work, as we are running from IRAM mapped to 0x0...
-    //MIUCON &= ~1;
+    MIUCON &= ~1;
+
+    /* Disable caches and protection unit */
+    asm volatile(
+        "mrc 15, 0, r0, c1, c0, 0 \n"
+        "bic r0, r0, #0x1000      \n"
+        "bic r0, r0, #0x5         \n"
+        "mcr 15, 0, r0, c1, c0, 0 \n"
+    );
 
     /* Branch to start of DRAM */
     asm volatile("ldr pc, =0x08000000");
