@@ -84,10 +84,96 @@ void fatal_error(void)
     }
 }
 
+/* aes_decrypt() and readfw() functions taken from iloader - (C)
+   Michael Sparmann and licenced under GPL v2 or later. 
+*/
+
+static void aes_decrypt(void* data, uint32_t size)
+{
+    uint32_t ptr, i;
+    uint32_t go = 1;
+
+    PWRCONEXT &= ~0x400;
+    AESTYPE = 1;
+    AESUNKREG0 = 1;
+    AESUNKREG0 = 0;
+    AESCONTROL = 1;
+    AESKEYLEN = 8;
+    AESOUTSIZE = size;
+    AESAUXSIZE = 0x10;
+    AESINSIZE = 0x10;
+    AESSIZE3 = 0x10;
+    for (ptr = (size >> 2) - 4; ; ptr -= 4)
+    {
+        AESOUTADDR = (uint32_t)data + (ptr << 2);
+        AESINADDR = (uint32_t)data + (ptr << 2);
+        AESAUXADDR = (uint32_t)data + (ptr << 2);
+        AESSTATUS = 6;
+        AESGO = go;
+        go = 3;
+        while ((AESSTATUS & 6) == 0);
+        if (ptr == 0) break;
+        for (i = 0; i < 4; i++)
+            ((uint32_t*)data)[ptr + i] ^= ((uint32_t*)data)[ptr + i - 4];
+    }
+    AESCONTROL = 0;
+    PWRCONEXT |= 0x400;
+}
+
+static int readfw(char* filename, void* address, int* size)
+{
+    int i;
+    uint32_t startsector = 0;
+    uint32_t buffer[0x200];
+
+    if (nand_read_sectors(0, 1, buffer) != 0) 
+        return -1;
+
+    if (*((uint16_t*)((uint32_t)buffer + 0x1FE)) != 0xAA55) 
+        return -2;
+
+    for (i = 0x1C2; i < 0x200; i += 0x10) {
+        if (((uint8_t*)buffer)[i] == 0) {
+            startsector = *((uint16_t*)((uint32_t)buffer + i + 4))
+                        | (*((uint16_t*)((uint32_t)buffer + i + 6)) << 16);
+            break;
+        }
+    }
+
+    if (startsector == 0)
+        return -3;
+
+    if (nand_read_sectors(startsector, 1, buffer) != 0) 
+        return -4;
+
+    if (buffer[0x40] != 0x5B68695D) 
+        return -5;
+
+    if (nand_read_sectors(startsector + 1 + (buffer[0x41] >> 11), 1, buffer) != 0) 
+        return -6;
+
+    for (i = 0; i < 0x1FE; i += 10) {
+        if (memcmp(&buffer[i], filename, 8) == 0) {
+            uint32_t filesector = startsector + 1 + (buffer[i + 3] >> 11);
+            *size = buffer[i + 4];
+
+            if (nand_read_sectors(filesector, ((*size + 0x7FF) >> 11), address) != 0) 
+                return -7;
+
+            /* Success! */
+            return 0;
+        }
+    }
+
+    /* Nothing found */
+    return -8;
+}
+
 void main(void)
 {
     int i;
     int btn;
+    int size;
     int rc;
     bool button_was_held;
 
@@ -144,10 +230,18 @@ void main(void)
         /* If either the hold switch was on, or the Menu button was held, then 
            try the Apple firmware */
 
+        verbose = true;
         printf("Loading original firmware...");
 
-        /* TODO */
-        fatal_error();
+        if ((rc = readfw("DNANkbso", (void*)0x08000000, &size)) < 0) {
+            printf("readfw error %d",rc);
+            fatal_error();
+        }
+
+        /* Now we need to decrypt it */
+        printf("Decrypting %d bytes...",size);
+
+        aes_decrypt((void*)0x08000000, size);
     } else {
         printf("Loading Rockbox...");
         rc=load_firmware(loadbuffer, BOOTFILE, MAX_LOADSIZE);
@@ -162,9 +256,17 @@ void main(void)
         printf("Rockbox loaded.");
     }
 
+
     /* If we get here, we have a new firmware image at 0x08000000, run it */
+    printf("Executing...");
 
     disable_irq();
+
+    /* Remap the bootrom back to zero - that's how the NOR bootloader leaves
+       it.
+     */
+    // This won't work, as we are running from IRAM mapped to 0x0...
+    //MIUCON &= ~1;
 
     /* Branch to start of DRAM */
     asm volatile("ldr pc, =0x08000000");
