@@ -38,27 +38,6 @@ prefixtools () {
  OC=${prefix}objcopy
 }
 
-crosswincc () {
- # naive approach to selecting a mingw cross-compiler on linux/*nix
- echo "Enabling win32 crosscompiling"
-
- sdl=`findtool sdl-config`
- sdl_cflags=""
- sdl_libs=""
- prefixtools i586-mingw32msvc-
- if [ $1 = "sdl" -a -n "$sdl" ]; then
-   sdl_cflags="`sdl-config --cflags`"
-   sdl_libs="`sdl-config --libs`"
- fi
- # add cross-compiler option(s)
- GCCOPTS="$GCCOPTS $sdl_cflags"
- LDOPTS="-mconsole $sdl_libs"
-
- output="rockboxui.exe" # use this as output binary name
- crosscompile="yes"
- endian="little" # windows is little endian
-}
-
 # scan the $PATH for the given command
 findtool(){
   file="$1"
@@ -78,6 +57,29 @@ findtool(){
   fi
 }
 
+# scan the $PATH for sdl-config - if crosscompiling, require that it is
+# a mingw32 sdl-config
+findsdl(){
+  file="sdl-config"
+
+  IFS=":"
+  for path in $PATH
+  do
+    #echo "checks for $file in $path" >&2
+    if test -f "$path/$file"; then
+      if [ "yes" = "${crosscompile}" ]; then
+        if [ "0" != `$path/$file --libs |grep -c mwindows` ]; then
+          echo "$path/$file"
+          return
+        fi
+      else
+        echo "$path/$file"
+        return
+      fi
+    fi
+  done
+}
+
 simcc () {
 
  # default tool setup for native building
@@ -88,7 +90,7 @@ simcc () {
  GCCOPTIMIZE=''
 
  output="rockboxui" # use this as default output binary name
- sdl=`findtool sdl-config`
+ sdl=`findsdl`
  sdl_cflags=""
  sdl_libs=""
 
@@ -100,8 +102,8 @@ simcc () {
         exit 1
     else 
         # generic sdl-config checker
-        sdl_cflags=`sdl-config --cflags`
-        sdl_libs=`sdl-config --libs`
+        sdl_cflags=`$sdl --cflags`
+        sdl_libs=`$sdl --libs`
     fi
  fi
 
@@ -133,14 +135,6 @@ simcc () {
    echo "Linux host detected"
    GCCOPTS="$GCCOPTS $sdl_cflags"
    LDOPTS="$sdl_libs"
-   # cannot crosscompile without SDL installed
-   if [ -n "$sdl" ]; then
-     if [ "0" != `sdl-config --libs |grep -c mwindows` ]; then
-       # Enable crosscompiling if sdl-config is from Windows SDL
-       # overrides GCCOPTS and LDOPTS
-       crosswincc $1
-     fi
-   fi
    ;;
 
    FreeBSD)
@@ -207,6 +201,13 @@ EOF
    # use wildcard here to make it work even if it was named *.exe like
    # on cygwin
    rm -f $tmpdir/conftest-$id*
+ else
+   # We are crosscompiling
+   # add cross-compiler option(s)
+   prefixtools i586-mingw32msvc-
+   LDOPTS="-mconsole $sdl_libs"
+   output="rockboxui.exe" # use this as output binary name
+   endian="little" # windows is little endian
  fi
 }
 
@@ -332,7 +333,7 @@ whichadvanced () {
     interact=1
     echo ""
     echo "Enter your developer options (press enter when done)"
-    printf "(D)EBUG, (L)ogf, (S)imulator, (P)rofiling, (V)oice"
+    printf "(D)EBUG, (L)ogf, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile"
     if [ "$memory" = "2" ]; then
       printf ", (8)MB MOD"
     fi
@@ -419,6 +420,10 @@ whichadvanced () {
           have_rtc_alarm="#define HAVE_RTC_ALARM"
           echo "RTC functions enabled (DS1339/DS3231)"
         fi
+        ;;
+      [Ww])
+        echo "Enabling Windows 32 cross-compiling"
+        crosscompile="yes"
         ;;
       *)
         if [ "$interact" ]; then
