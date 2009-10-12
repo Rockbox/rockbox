@@ -151,29 +151,6 @@ Statusbar: top
 </rwps>
 
 <wps>
-Name: marquee.wps
-RWPS: marquee.rwps
-Author: Mike Sobel
-Font: 13-Nimbus.fnt
-Statusbar: top
-backdrop:
-iconset:
-viewers iconset:
-selector type: bar (inverse)
-ui viewport: -
-remote ui viewport: -
-</wps>
-
-<rwps>
-Name: marquee.rwps
-Author: Mike Sobel
-Font: 13-Nimbus.fnt
-Statusbar: top
-ui viewport: -
-remote ui viewport: -
-</rwps>
-
-<wps>
 Name: DancePuffDuo.wps
 RWPS: DancePuffDuo.rwps
 Author: Chris Oxtoby
