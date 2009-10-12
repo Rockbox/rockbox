@@ -222,7 +222,7 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
     /* remove any previously scrolling line at the same location */
     lcd_scroll_stop_line(current_vp, y);
 
-    if (LCDFN(scroll_info.lines) >= LCDM(SCROLLABLE_LINES)) return;
+    if (LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES)) return;
     if (!string)
         return;
     LCDFN(puts_style_offset)(x, y, string, style, offset);
