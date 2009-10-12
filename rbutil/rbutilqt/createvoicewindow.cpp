@@ -49,7 +49,7 @@ void CreateVoiceWindow::accept()
     int wvThreshold = ui.wavtrimthreshold->value();
     
     //safe selected language
-    RbSettings::setValue(RbSettings::Language, lang);
+    RbSettings::setValue(RbSettings::VoiceLanguage, lang);
     RbSettings::setValue(RbSettings::WavtrimThreshold, wvThreshold);
     RbSettings::sync();
     
