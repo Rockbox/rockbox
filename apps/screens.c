@@ -295,36 +295,35 @@ static void charging_display_info(bool animate)
     const int pox_y = 32;
     static unsigned phase = 3;
     unsigned i;
-    char buf[32];
-    (void)buf;
+    const char *s;
 
 #ifdef NEED_ATA_POWER_BATT_MEASURE
     if (ide_powered()) /* FM and V2 can only measure when ATA power is on */
 #endif
     {
+        char buf[32];
         int battv = battery_voltage();
         snprintf(buf, 32, "  Batt: %d.%02dV %d%%  ", battv / 1000,
                  (battv % 1000) / 10, battery_level());
         lcd_puts(0, 7, buf);
     }
 
-#ifdef ARCHOS_RECORER
-    snprintf(buf, 32, "Charge mode:");
-    lcd_puts(0, 2, buf);
+#ifdef ARCHOS_RECORDER
+    lcd_puts(0, 2, "Charge mode:");
 
     if (charge_state == CHARGING)
-        snprintf(buf, 32, str(LANG_BATTERY_CHARGE));
+        s = str(LANG_BATTERY_CHARGE);
     else if (charge_state == TOPOFF)
-        snprintf(buf, 32, str(LANG_BATTERY_TOPOFF_CHARGE));
+        s = str(LANG_BATTERY_TOPOFF_CHARGE);
     else if (charge_state == TRICKLE)
-        snprintf(buf, 32, str(LANG_BATTERY_TRICKLE_CHARGE));
+        s = str(LANG_BATTERY_TRICKLE_CHARGE);
     else
-        snprintf(buf, 32, "not charging");
+        s = "not charging";
 
-    lcd_puts(0, 3, buf);
+    lcd_puts(0, 3, s);
     if (!charger_enabled())
         animate = false;
-#endif /* ARCHOS_RECORER */
+#endif /* ARCHOS_RECORDER */
 
     /* middle part */
     memset(charging_logo+3, 0x00, 32);
