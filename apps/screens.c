@@ -295,7 +295,6 @@ static void charging_display_info(bool animate)
     const int pox_y = 32;
     static unsigned phase = 3;
     unsigned i;
-    const char *s;
 
 #ifdef NEED_ATA_POWER_BATT_MEASURE
     if (ide_powered()) /* FM and V2 can only measure when ATA power is on */
@@ -311,6 +310,7 @@ static void charging_display_info(bool animate)
 #ifdef ARCHOS_RECORDER
     lcd_puts(0, 2, "Charge mode:");
 
+    const char *s;
     if (charge_state == CHARGING)
         s = str(LANG_BATTERY_CHARGE);
     else if (charge_state == TOPOFF)
