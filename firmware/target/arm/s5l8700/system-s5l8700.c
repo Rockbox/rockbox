@@ -150,15 +150,6 @@ void fiq_handler(void)
 }
 
 
-static void gpio_init(void)
-{
-}
-
-static void clock_init(void)
-{
-}
-
-
 void system_init(void)
 {
 }
