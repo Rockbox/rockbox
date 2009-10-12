@@ -380,6 +380,9 @@ int button_read_device(void)
 #ifdef CPU_PP
             /* lock -> disable wheel sensor */
             DEV_EN &= ~DEV_OPTO;
+#elif CONFIG_CPU==S5L8701
+            CLICKWHEEL00 = 0;
+            CLICKWHEEL10 = 0;
 #endif
         }
         else
@@ -388,6 +391,9 @@ int button_read_device(void)
             /* unlock -> enable wheel sensor */
             DEV_EN |= DEV_OPTO;
             opto_i2c_init();
+#elif CONFIG_CPU==S5L8701
+            CLICKWHEEL00 = 0x280000;
+            CLICKWHEEL10 = 3;
 #endif
         }
     }
