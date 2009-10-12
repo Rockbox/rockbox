@@ -23,7 +23,7 @@
 #include "system.h"
 #include "panic.h"
 #ifdef IPOD_NANO2G
-#include "ftl-target.h"
+#include "storage.h"
 #endif
 
 #define default_interrupt(name) \
@@ -150,6 +150,15 @@ void fiq_handler(void)
 }
 
 
+static void gpio_init(void)
+{
+}
+
+static void clock_init(void)
+{
+}
+
+
 void system_init(void)
 {
 }
@@ -157,7 +166,9 @@ void system_init(void)
 void system_reboot(void)
 {
 #ifdef IPOD_NANO2G
-    if (ftl_sync() != 0) panicf("Failed to unmount flash!");
+#ifdef HAVE_STORAGE_FLUSH
+    storage_flush();
+#endif
 
     /* Reset the SoC */
     asm volatile("msr CPSR_c, #0xd3    \n"

@@ -102,7 +102,9 @@ long nand_last_disk_activity(void)
 int nand_flush(void)
 {
     last_disk_activity = current_tick;
-    return ftl_sync();
+    int rc = ftl_sync();
+    if (rc != 0) panicf("Failed to unmount flash: %X", rc);
+    return rc;
 }
 #endif
 
