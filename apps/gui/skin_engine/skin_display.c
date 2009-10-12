@@ -725,7 +725,7 @@ static bool update_curr_subline(struct gui_wps *gwps, struct skin_line *line)
              line->curr_subline->next == NULL)
         {
             line->subline_expire_time += 100 * HZ;
-            return true;
+            return false;
         }
         if (line->curr_subline->next)
             line->curr_subline = line->curr_subline->next;
