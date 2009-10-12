@@ -37,9 +37,9 @@ int rtc_read_datetime(struct tm *tm)
     oldlevel = disable_irq_save();
 
     if (get_pmu_type() == PCF50606)
-        rc = pcf50606_read_multiple(0x0a, buf, sizeof(buf));
+        rc = pcf50606_read_multiple(PCF5060X_RTCSC, buf, sizeof(buf));
     else
-        rc = pcf50635_read_multiple(0x59, buf, sizeof(buf));
+        rc = pcf50635_read_multiple(PCF5063X_REG_RTCSC, buf, sizeof(buf));
 
     restore_irq(oldlevel);
 
@@ -77,9 +77,9 @@ int rtc_write_datetime(const struct tm *tm)
     oldlevel = disable_irq_save();
 
     if (get_pmu_type() == PCF50606)
-        rc = pcf50606_write_multiple(0x0a, buf, sizeof(buf));
+        rc = pcf50606_write_multiple(PCF5060X_RTCSC, buf, sizeof(buf));
     else
-        rc = pcf50635_write_multiple(0x59, buf, sizeof(buf));
+        rc = pcf50635_write_multiple(PCF5063X_REG_RTCSC, buf, sizeof(buf));
 
     restore_irq(oldlevel);
 
