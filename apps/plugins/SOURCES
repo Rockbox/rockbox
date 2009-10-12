@@ -16,6 +16,7 @@ snow.c
 sort.c
 stats.c
 stopwatch.c
+theme_remove.c
 vbrfix.c
 viewer.c
 #ifdef HAVE_BACKLIGHT

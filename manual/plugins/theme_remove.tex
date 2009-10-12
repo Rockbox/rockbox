@@ -1,0 +1,77 @@
+% $Id $ %
+\subsection{\label{ref:ThemeRemove}Theme Remove}
+This plugin offers a way to remove a theme. Open the \setting{Context Menu} (see \reference{ref:Contextmenu}) 
+upon a theme\fname{.cfg} file and select \setting{Open With... $\rightarrow$ theme\_remove}.
+Some files are not removed regardless of the \setting{Remove Options} such as
+\fname{rockbox\_default.wps}\opt{lcd_bitmap}{ and the font file currently in use}.
+
+\subsubsection{Theme Remove menu}
+\begin{description}
+  \item[Remove Theme.]
+  Selecting this will delete the files specified in the \setting{Remove Options}.
+  After a theme has been succesfully removed, a log message is displayed listing 
+  which items have been deleted and which are being kept. Exit this screen by 
+  pressing any key. A file called \fname{theme\_remove\_log.txt} is created in 
+  the root directory of your \dap{} listing all the changes.
+
+  \item[Remove Options.]
+  This menu specifies which items are removed if
+  \setting{Remove Theme} is selected in the menu.
+
+  One of the following options can be chosen for each setting.
+  \begin{description}
+    \item[Ask for Removal.]
+    Selecting this option brings up a dialogue with two options:
+    press \ActionYesNoAccept{} to confirm deletion or any other key to cancel.
+    \item[Remove if not Used.]
+    Selecting this option will remove the file automatically, if it is not 
+    used by another theme in the theme directory and not currently used.
+    \item[Never Remove.]
+    Selecting this option will always skip deleting the file.
+    \item[Always Remove.]
+    Selecting this option will remove the file with no regard to
+    whether it's used by another theme or not.
+  \end{description}
+
+  \begin{description}
+\opt{lcd_bitmap}{
+    \item[Font.]
+    Specifies how the \fname{.fnt} file belonging to a theme \fname{.cfg} file is handled.
+    If this option is set to \setting{Remove if not Used}, the fonts came from rockbox-fonts.zip
+    will not be removed as themes may depend on those fonts.
+}%
+    \item[WPS.]
+    Specifies how the \fname{.wps} file belonging to a theme \fname{.cfg} file is handled.
+\opt{HAVE_REMOTE_LCD}{
+    \item[Remote WPS.]
+    Specifies how the \fname{.rwps} file belonging to a theme \fname{.cfg} file is handled.
+}%
+\opt{lcd_non-mono}{
+    \item[Backdrop.]
+    Specifies how the backdrop \fname{.bmp} file belonging to a theme \fname{.cfg} file is handled.
+}%
+\opt{lcd_bitmap}{
+    \item[Iconset.]
+    Specifies how the iconset \fname{.bmp} file belonging to a theme \fname{.cfg} file is handled.
+    \item[Viewers Iconset.]
+    Specifies how the viewers iconset \fname{.bmp} file belonging to a theme \fname{.cfg} file is handled.
+}%
+\opt{HAVE_REMOTE_LCD}{
+    \item[Remote Iconset.]
+    Specifies how the remote iconset \fname{.bmp} file belonging to 
+    a theme \fname{.cfg} file is handled.
+    \item[Remote Viewers Iconset.]
+    Specifies how the remote viewers iconset \fname{.bmp} file belonging to 
+    a theme \fname{.cfg} file is handled.
+}% HAVE_REMOTE_LCD
+\opt{lcd_color}{
+    \item[Filetype Colours.]
+     Specifies how the colours \fname{.colours} file belonging to a theme \fname{.cfg} file is handled.
+}%
+
+    \item[Create Log File.]
+    Setting this to \setting{No} prevents the log file from being created.
+  \end{description}
+  \item[Quit.]
+  Exits this plugin.
+\end{description}

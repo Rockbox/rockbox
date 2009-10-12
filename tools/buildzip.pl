@@ -357,6 +357,7 @@ STOP
     if($bitmap) {
         copy("$ROOT/apps/plugins/sokoban.levels", "$rbdir/rocks/games/sokoban.levels"); # sokoban levels
         copy("$ROOT/apps/plugins/snake2.levels", "$rbdir/rocks/games/snake2.levels"); # snake2 levels
+        copy("$ROOT/apps/plugins/rockbox-fonts.config", "$rbdir/rocks/viewers/");
     }
 
     if(-e "$rbdir/rocks/demos/pictureflow.rock") {

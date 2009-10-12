@@ -103,6 +103,7 @@ test_touchscreen,apps
 test_viewports,apps
 test_greylib_bitmap_scale,viewers
 text_editor,apps
+theme_remove,viewers
 vbrfix,viewers
 video,viewers
 viewer,viewers
