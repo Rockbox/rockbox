@@ -281,6 +281,9 @@ static int sd_init_card(const int drive)
 
     } while(!(card_info[drive].ocr & (1<<31)));
 
+    MCI_CLOCK(drive) |= MCI_CLOCK_BYPASS; /* full speed for controller clock */
+    mci_delay();
+
     /* send CID */
     if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP|MCI_ARG,
                             temp_reg))
@@ -294,42 +297,37 @@ static int sd_init_card(const int drive)
                 &card_info[drive].rca))
         return -6;
 
+    /*  Select card to put it in TRAN state */
+    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
+        return -7;
+
+    /* Try to switch V2 cards to HS timings, non HS seem to ignore this */
+    if(sd_v2)
+    {
+        if(sd_wait_for_state(drive, SD_TRAN))
+            return -8;
+        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_ARG, NULL))
+            return -9;
+        mci_delay();
+    }
+
+    /*  go back to STBY state so we can read csd */
+    if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_ARG, NULL))
+        return -10;
+
     /* send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
                  MCI_RESP|MCI_LONG_RESP|MCI_ARG, temp_reg))
-        return -7;
+        return -11;
 
     for(i=0; i<4; i++)
         card_info[drive].csd[3-i] = temp_reg[i];
 
     sd_parse_csd(&card_info[drive]);
 
+    /*  Select card to put back in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
-        return -9;
-
-    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_ARG, NULL))
-        return -10;
-
-    if(!send_cmd(drive, SD_SET_BUS_WIDTH, card_info[drive].rca | 2, MCI_ARG, NULL))
-        return -11;
-
-    if(!send_cmd(drive, SD_SET_BLOCKLEN, card_info[drive].blocksize, MCI_ARG,
-                 NULL))
         return -12;
-
-    card_info[drive].initialized = 1;
-
-    MCI_CLOCK(drive) |= MCI_CLOCK_BYPASS; /* full speed for controller clock */
-    mci_delay();
-
-    /* If card is HS capable switch to HS timings */
-    if(card_info[drive].speed > 125000)
-    {
-        if(sd_wait_for_state(drive, SD_TRAN))
-            return -13;
-        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_ARG, NULL))
-            return -14;
-    }
 
     /*
      * enable bank switching 
@@ -341,8 +339,10 @@ static int sd_init_card(const int drive)
     {
         const int ret = sd_select_bank(-1);
         if(ret < 0)
-            return ret - 15;
+            return ret - 13;
     }
+
+    card_info[drive].initialized = 1;
 
     return 0;
 }
