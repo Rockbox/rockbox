@@ -256,9 +256,8 @@ size_t pcm_get_bytes_waiting(void)
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
-    /* currently not supported */
-    *count = 0;
-    return 0;
+    *count = DMACTCNT0 >> 1;
+    return (void *)((DMACADDR0 + 2) & ~3);
 }
 
 #ifdef HAVE_PCM_DMA_ADDRESS
