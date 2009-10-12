@@ -214,6 +214,8 @@ void LCDFN(puts_offset)(int x, int y, const unsigned char *str, int offset)
 void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
                                      int style, int offset)
 {
+    struct scrollinfo* s;
+    char *end;
     int w, h;
 
     if ((unsigned)y >= (unsigned)current_vp->height)
@@ -229,48 +231,46 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
 
     LCDFN(getstringsize)(string, &w, &h);
 
-    if (current_vp->width - x * 8 < w) {
-        /* prepare scroll line */
-        struct scrollinfo* s;
-        s = &LCDFN(scroll_info).scroll[LCDFN(scroll_info).lines];
-        s->start_tick = current_tick + LCDFN(scroll_info).delay;
-        s->style = style;
+    if (current_vp->width - x * 8 >= w)
+        return;
 
-        char *end;
+    /* prepare scroll line */
+    s = &LCDFN(scroll_info).scroll[LCDFN(scroll_info).lines];
+    s->start_tick = current_tick + LCDFN(scroll_info).delay;
+    s->style = style;
 
-        memset(s->line, 0, sizeof s->line);
-        strcpy(s->line, string);
+    memset(s->line, 0, sizeof s->line);
+    strcpy(s->line, string);
 
-        /* get width */
-        s->width = LCDFN(getstringsize)(s->line, &w, &h);
+    /* get width */
+    s->width = LCDFN(getstringsize)(s->line, &w, &h);
 
-        /* scroll bidirectional or forward only depending on the string
-           width */
-        if ( LCDFN(scroll_info).bidir_limit ) {
-            s->bidir = s->width < (current_vp->width) *
-                (100 + LCDFN(scroll_info).bidir_limit) / 100;
-        }
-        else
-            s->bidir = false;
-
-        if (!s->bidir) { /* add spaces if scrolling in the round */
-            strcat(s->line, "   ");
-            /* get new width incl. spaces */
-            s->width = LCDFN(getstringsize)(s->line, &w, &h);
-        }
-
-        end = strchr(s->line, '\0');
-        strlcpy(end, string, current_vp->width/2);
-
-        s->vp = current_vp;
-        s->y = y;
-        s->len = utf8length(string);
-        s->offset = offset;
-        s->startx = x * s->width / s->len;
-        s->backward = false;
-
-        LCDFN(scroll_info).lines++;
+    /* scroll bidirectional or forward only depending on the string
+       width */
+    if ( LCDFN(scroll_info).bidir_limit ) {
+        s->bidir = s->width < (current_vp->width) *
+            (100 + LCDFN(scroll_info).bidir_limit) / 100;
     }
+    else
+        s->bidir = false;
+
+    if (!s->bidir) { /* add spaces if scrolling in the round */
+        strcat(s->line, "   ");
+        /* get new width incl. spaces */
+        s->width = LCDFN(getstringsize)(s->line, &w, &h);
+    }
+
+    end = strchr(s->line, '\0');
+    strlcpy(end, string, current_vp->width/2);
+
+    s->vp = current_vp;
+    s->y = y;
+    s->len = utf8length(string);
+    s->offset = offset;
+    s->startx = x * s->width / s->len;
+    s->backward = false;
+
+    LCDFN(scroll_info).lines++;
 }
 
 void LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
