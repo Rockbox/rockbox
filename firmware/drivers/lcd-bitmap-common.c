@@ -93,9 +93,15 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         LCDFN(getstringsize)(str, &w, NULL);
         /* center takes precedence */
         if (vp_flags & VP_FLAG_ALIGN_CENTER)
+        {
             x = ((current_vp->width - w)/ 2) + x;
+        }
         else
+        {
             x = current_vp->width - w - x;
+            x += ofs;
+            ofs = 0;
+        }
     }
 
     while ((ch = *ucs++) != 0 && x < current_vp->width)
@@ -133,6 +139,7 @@ static void LCDFN(putsxyofs_style)(int xpos, int ypos,
 {
     int lastmode = current_vp->drawmode;
     int xrect = xpos + MAX(w - offset, 0);
+    int x = VP_IS_RTL(current_vp) ? xpos : xrect;
 #if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
     int oldfgcolor = current_vp->fg_pattern;
     int oldbgcolor = current_vp->bg_pattern;
@@ -158,7 +165,7 @@ static void LCDFN(putsxyofs_style)(int xpos, int ypos,
         current_vp->fg_pattern = current_vp->lst_pattern;
     }
     else {
-        lcd_fillrect(xrect, ypos, current_vp->width - xrect, h);
+        lcd_fillrect(x, ypos, current_vp->width - xrect, h);
         current_vp->drawmode = (style & STYLE_INVERT) ?
         (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     }
@@ -168,7 +175,7 @@ static void LCDFN(putsxyofs_style)(int xpos, int ypos,
 #else
     current_vp->drawmode = DRMODE_SOLID | ((style & STYLE_INVERT) ?
                                            0 : DRMODE_INVERSEVID);
-    LCDFN(fillrect)(xrect, ypos, current_vp->width - xrect, h);
+    LCDFN(fillrect)(x, ypos, current_vp->width - xrect, h);
     current_vp->drawmode ^= DRMODE_INVERSEVID;
     LCDFN(putsxyofs)(xpos, ypos, offset, str);
 #endif
@@ -307,8 +314,7 @@ void LCDFN(scroll_fn)(void)
 
         LCDFN(set_viewport)(s->vp);
 
-        if (s->backward ^ VP_IS_RTL(current_vp))
-        /* contrary to LTR, this is "forward" in RTL */
+        if (s->backward)
             s->offset -= LCDFN(scroll_info).step;
         else
             s->offset += LCDFN(scroll_info).step;
@@ -318,13 +324,13 @@ void LCDFN(scroll_fn)(void)
         ypos = s->y * pf->height;
 
         if (s->bidir) { /* scroll bidirectional */
-            if (abs(s->offset) <= 0) {
+            if (s->offset <= 0) {
                 /* at beginning of line */
                 s->offset = 0;
                 s->backward = false;
                 s->start_tick = current_tick + LCDFN(scroll_info).delay * 2;
             }
-            if (abs(s->offset) >= s->width - (current_vp->width - xpos)) {
+            if (s->offset >= s->width - (current_vp->width - xpos)) {
                 /* at end of line */
                 s->offset = s->width - (current_vp->width - xpos);
                 s->backward = true;
@@ -333,7 +339,7 @@ void LCDFN(scroll_fn)(void)
         }
         else {
             /* scroll forward the whole time */
-            if (abs(s->offset) >= s->width)
+            if (s->offset >= s->width)
                 s->offset %= s->width;
         }
         LCDFN(putsxyofs_style)(xpos, ypos, s->line, s->style, s->width,
