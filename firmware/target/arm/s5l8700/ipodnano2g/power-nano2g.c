@@ -68,11 +68,11 @@ bool usb_charging_enabled(void)
 
 unsigned int power_input_status(void)
 {
-    return (PDAT14 & 0x80) ? POWER_INPUT_NONE : POWER_INPUT_MAIN;
+    return (PDAT14 & 8) ? POWER_INPUT_NONE : POWER_INPUT_MAIN_CHARGER;
 }
 
 bool charging_state(void)
 {
-    return (PDAT14 & 0x80) ? false : true;
+    return (PDAT14 & 8) ? false : true;
 }
 #endif /* CONFIG_CHARGING */
