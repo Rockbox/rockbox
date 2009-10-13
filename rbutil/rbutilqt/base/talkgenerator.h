@@ -27,7 +27,7 @@
 #include "progressloggerinterface.h"
 
 #include "encoders.h"
-#include "tts.h"
+#include "ttsbase.h"
 
 //! \brief Talk generator, generates .wav and .talk files out of a list.
 class TalkGenerator :public QObject

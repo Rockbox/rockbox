@@ -25,7 +25,7 @@
 #include "ui_configurefrm.h"
 #include "browsedirtree.h"
 #include "encoders.h"
-#include "tts.h"
+#include "ttsbase.h"
 #include "system.h"
 #include "encttscfggui.h"
 #include "rbsettings.h"

@@ -98,7 +98,10 @@ SOURCES += rbutilqt.cpp \
  base/encoders.cpp \
  encttscfggui.cpp \
  base/encttssettings.cpp \
- base/tts.cpp \
+ base/ttsbase.cpp \
+ base/ttsexes.cpp \
+ base/ttssapi.cpp \
+ base/ttsfestival.cpp \
  ../../tools/wavtrim.c \
  ../../tools/voicefont.c \
  base/voicefile.cpp \
@@ -155,7 +158,10 @@ HEADERS += rbutilqt.h \
  base/encoders.h \
  encttscfggui.h \
  base/encttssettings.h \
- base/tts.h \
+ base/ttsbase.h \
+ base/ttsexes.h \
+ base/ttsfestival.h \
+ base/ttssapi.h \
  ../../tools/wavtrim.h \
  ../../tools/voicefont.h \
  base/voicefile.h \
