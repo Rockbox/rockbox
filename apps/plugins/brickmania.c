@@ -273,7 +273,8 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define BRICK_HEIGHT     FIXED3(BMPHEIGHT_brickmania_bricks/7)
 #define BRICK_WIDTH      FIXED3(BMPWIDTH_brickmania_bricks)
 #define LEFTMARGIN       ((GAMESCREEN_WIDTH-10*BRICK_WIDTH)/2)
-#define POWERUP_HEIGHT   FIXED3(BMPHEIGHT_brickmania_powerups/9)
+#define NUMBER_OF_POWERUPS 9
+#define POWERUP_HEIGHT   FIXED3(BMPHEIGHT_brickmania_powerups/NUMBER_OF_POWERUPS)
 #define POWERUP_WIDTH    FIXED3(BMPWIDTH_brickmania_powerups)
 #define BALL             FIXED3(BMPHEIGHT_brickmania_ball)
 #define HALFBALL         (BALL / 2)
@@ -1275,7 +1276,7 @@ void brick_hit(int brick_number)
     else {
         brick[brick_number].used=false;
         /* Was there a powerup on the brick? */
-        if (brick[brick_number].power<10) {
+        if (brick[brick_number].power<NUMBER_OF_POWERUPS) {
             /* Activate the powerup */
             brick[brick_number].poweruse = true;
         }
