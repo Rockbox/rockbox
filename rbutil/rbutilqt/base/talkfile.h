@@ -40,7 +40,7 @@ public:
     void setDir(QDir dir){m_dir = dir; }
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
 
-    void setOverwriteTalk(bool ov) {m_overwriteTalk = ov;}
+    void setGenerateOnlyNew(bool ov) {m_generateOnlyNew = ov;}
     void setRecursive(bool ov) {m_recursive = ov;}
     void setStripExtensions(bool ov) {m_stripExtensions = ov;}
     void setTalkFolders(bool ov) {m_talkFolders = ov;} 
@@ -67,7 +67,7 @@ private:
     QDir   m_dir;
     QString m_mountpoint;
  
-    bool m_overwriteTalk;
+    bool m_generateOnlyNew;
     bool m_recursive;
     bool m_stripExtensions;
     bool m_talkFolders;

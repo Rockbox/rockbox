@@ -33,7 +33,7 @@ InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
     connect(ui.change,SIGNAL(clicked()),this,SLOT(change()));
 
     ui.recursive->setChecked(true);
-    ui.OverwriteTalk->setChecked(true);
+    ui.GenerateOnlyNew->setChecked(true);
     ui.StripExtensions->setChecked(true);
     
     updateSettings();
@@ -103,7 +103,7 @@ void InstallTalkWindow::accept()
     talkcreator->setDir(QDir(folderToTalk));
     talkcreator->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
     
-    talkcreator->setOverwriteTalk(ui.OverwriteTalk->isChecked());
+    talkcreator->setGenerateOnlyNew(ui.GenerateOnlyNew->isChecked());
     talkcreator->setRecursive(ui.recursive->isChecked());
     talkcreator->setStripExtensions(ui.StripExtensions->isChecked());
     talkcreator->setTalkFolders(ui.talkFolders->isChecked());

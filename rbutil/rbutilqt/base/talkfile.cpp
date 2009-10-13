@@ -140,6 +140,13 @@ bool TalkFileCreator::createTalkList(QDir startDir)
             // insert into List
             if(!dir.dirName().isEmpty() && m_talkFolders)
             {
+                // check if we should ignore it
+                if(m_generateOnlyNew && QFileInfo(dir.path() + "/_dirname.talk").exists())
+                {
+                    continue;
+                }
+                
+                //generate entry
                 TalkGenerator::TalkEntry entry;                
                 entry.toSpeak = dir.dirName();
                 entry.wavfilename = QDir::tempPath()+ "/talkfiles/" + QCryptographicHash::hash(entry.toSpeak.toUtf8(),
@@ -150,7 +157,7 @@ bool TalkFileCreator::createTalkList(QDir startDir)
                 entry.voiced = false;
                 entry.encoded = false;
                 qDebug() << "toSpeak: " << entry.toSpeak << " target: " << entry.target << " intermediates: " << 
-                            entry.wavfilename << entry.talkfilename;
+                        entry.wavfilename << entry.talkfilename;
                 m_talkList.append(entry);
             }
         }
@@ -170,6 +177,12 @@ bool TalkFileCreator::createTalkList(QDir startDir)
                 }
                 if(match)
                     continue;
+                
+                // check if we should ignore it
+                if(m_generateOnlyNew && QFileInfo(fileInf.path() + "/" + fileInf.fileName() + ".talk").exists())
+                {
+                    continue;
+                }
                 
                 //generate entry
                 TalkGenerator::TalkEntry entry;
@@ -223,7 +236,7 @@ bool TalkFileCreator::copyTalkFiles(QString* errString)
             continue; // this file was skipped in one of the previous steps
         }
         // remove target if it exists, and if we should overwrite it
-        if(m_overwriteTalk && QFile::exists(m_talkList[i].target))
+        if(QFile::exists(m_talkList[i].target))
             QFile::remove(m_talkList[i].target);
 
         // copying
