@@ -567,7 +567,7 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req)
                     }
                 }
                 config_descriptor.bNumInterfaces = usb_core_num_interfaces;
-                config_descriptor.wTotalLength = size;
+                config_descriptor.wTotalLength = (uint16_t)size;
                 memcpy(&response_data[0],&config_descriptor,
                         sizeof(struct usb_config_descriptor));
 
