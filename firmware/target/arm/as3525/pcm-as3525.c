@@ -150,9 +150,14 @@ void pcm_dma_apply_settings(void)
     if(divider < 0 || divider > 511)
         panicf("unsupported frequency %ld", frequency);
 
-    CGU_AUDIO &= ~(((511 ^ divider) << 2) /* I2SOUT */
-            /*| ((511 ^ divider) << 14) */ /* I2SIN */
-            );
+    int cgu_audio = CGU_AUDIO;  /* read register */
+    cgu_audio &= ~(511 << 2);   /* clear i2sout divider */
+    cgu_audio |= divider << 2;  /* set new i2sout divider */
+#if 0
+    cgu_audio &= ~(511 << 14);  /* clear i2sin divider */
+    cgu_audio |= divider << 14; /* set new i2sin divider */
+#endif
+    CGU_AUDIO = cgu_audio;      /* write back register */
 }
 
 size_t pcm_get_bytes_waiting(void)
