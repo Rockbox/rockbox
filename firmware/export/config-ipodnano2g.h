@@ -56,6 +56,9 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
+/* define this if the unit uses a scrollwheel for navigation */
+#define HAVE_SCROLLWHEEL
+
 /* Define this if you can detect headphones */
 #define HAVE_HEADPHONE_DETECTION
 
