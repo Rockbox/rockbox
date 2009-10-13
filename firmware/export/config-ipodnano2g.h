@@ -164,6 +164,9 @@
 /* We reboot into the OF to handle USB */
 #define USB_HANDLED_BY_OF
 
+/* Define this if you can read an absolute wheel position */
+#define HAVE_WHEEL_POSITION
+
 /* Define this if you have adjustable CPU frequency */
 /* #define HAVE_ADJUSTABLE_CPU_FREQ - not yet */
 
