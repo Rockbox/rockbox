@@ -11,6 +11,7 @@ IRIVER_H10 h10
 IRIVER_H10_5GB h10_5gb
 IPOD_COLOR ipodcolor
 IPOD_NANO ipodnano
+IPOD_NANO2G ipodnano2g
 IPOD_VIDEO ipodvideo
 IPOD_3G ipod3g
 IPOD_4G ipod4g
