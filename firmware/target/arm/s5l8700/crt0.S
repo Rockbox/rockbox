@@ -104,6 +104,7 @@ start_loc:
 #endif /* BOOTLOADER */
 #endif /* CONFIG_CPU==S5L8701 */
 
+#if !(CONFIG_CPU==S5L8701 && defined(BOOTLOADER))
     ldr r1, =0x3c500000 
     ldr r0, =0x00800080
     str r0, [r1]		// CLKCON
@@ -138,7 +139,8 @@ start_loc:
     nop					        
     nop
     nop
-	
+#endif
+
 //    ldr r0, =0x10100000
 //    ldr r1, =0x38200034
 //    str r0, [r1] // SRAM0/1 data width 16 bit
