@@ -1320,6 +1320,7 @@ target/arm/s5l8700/udacodec-meizu.c
 #endif /* MEIZU_M3 */
 
 #ifdef IPOD_NANO2G
+#ifndef SIMULATOR
 drivers/audio/wm8975.c
 target/arm/ipod/button-clickwheel.c
 target/arm/s5l8700/kernel-s5l8700.c
@@ -1338,6 +1339,7 @@ target/arm/s5l8700/ipodnano2g/ftl-nano2g.c
 target/arm/s5l8700/ipodnano2g/nand-nano2g.c
 target/arm/s5l8700/ipodnano2g/pmu-nano2g.c
 target/arm/s5l8700/ipodnano2g/rtc-nano2g.c
+#endif
 #endif
 
 #ifndef SIMULATOR

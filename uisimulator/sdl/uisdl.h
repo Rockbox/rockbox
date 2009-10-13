@@ -116,6 +116,13 @@
 #define UI_LCD_POSX                 13 /* x position of lcd */
 #define UI_LCD_POSY                 14 /* y position of lcd */
 
+#elif defined(IPOD_NANO2G)
+#define UI_TITLE                    "iPod Nano 2G"
+#define UI_WIDTH                    199 /* width of GUI window */
+#define UI_HEIGHT                   421 /* height of GUI window */
+#define UI_LCD_POSX                 13 /* x position of lcd */
+#define UI_LCD_POSY                 14 /* y position of lcd */
+
 #elif defined(IPOD_VIDEO)
 #define UI_TITLE                    "iPod Video"
 #define UI_WIDTH                    350 /* width of GUI window */
