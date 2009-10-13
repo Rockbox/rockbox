@@ -39,7 +39,8 @@ enum firmwaretype_t {
    FTYPE_OSOS = 0,
    FTYPE_RSRC,
    FTYPE_AUPD,
-   FTYPE_HIBE
+   FTYPE_HIBE,
+   FTYPE_OSBK
 };
 
 struct ipod_directory_t {
@@ -71,6 +72,7 @@ struct ipod_t {
     int num_heads;
     struct ipod_directory_t ipod_directory[MAX_IMAGES];
     int nimages;
+    int ososimage;
     off_t diroffset;
     off_t start;  /* Offset in bytes of firmware partition from start of disk */
     off_t fwoffset; /* Offset in bytes of start of firmware images from start of disk */

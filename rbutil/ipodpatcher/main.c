@@ -31,7 +31,11 @@
 #include "ipodpatcher.h"
 #include "ipodio.h"
 
-#define VERSION "3.0 with v3.0 bootloaders"
+#ifdef RELEASE
+#undef VERSION
+#define VERSION "4.0 with v3.0 bootloaders (v1.0 for 2nd Gen Nano)"
+#endif
+
 
 enum {
    NONE,
@@ -80,14 +84,14 @@ void print_usage(void)
     fprintf(stderr,"  -l,   --list\n");
     fprintf(stderr,"  -r,   --read-partition     bootpartition.bin\n");
     fprintf(stderr,"  -w,   --write-partition    bootpartition.bin\n");
-    fprintf(stderr,"  -rf,  --read-firmware      filename.ipod\n");
+    fprintf(stderr,"  -rf,  --read-firmware      filename.ipod[x]\n");
     fprintf(stderr,"  -rfb, --read-firmware-bin  filename.bin\n");
-    fprintf(stderr,"  -wf,  --write-firmware     filename.ipod\n");
+    fprintf(stderr,"  -wf,  --write-firmware     filename.ipod[x]\n");
     fprintf(stderr,"  -wfb, --write-firmware-bin filename.bin\n");
 #ifdef WITH_BOOTOBJS
     fprintf(stderr,"  -we,  --write-embedded\n");
 #endif
-    fprintf(stderr,"  -a,   --add-bootloader     filename.ipod\n");
+    fprintf(stderr,"  -a,   --add-bootloader     filename.ipod[x]\n");
     fprintf(stderr,"  -ab,  --add-bootloader-bin filename.bin\n");
     fprintf(stderr,"  -d,   --delete-bootloader\n");
     fprintf(stderr,"  -f,   --format\n");
@@ -96,6 +100,8 @@ void print_usage(void)
     fprintf(stderr,"        --write-aupd         filename.bin\n");
     fprintf(stderr,"  -x    --dump-xml           filename.xml\n");
     fprintf(stderr,"\n");
+
+    fprintf(stderr,"The .ipodx extension is used for encrypted images for the 2nd Gen Nano.\n\n");
 
 #ifdef __WIN32__
     fprintf(stderr,"DISKNO is the number (e.g. 2) Windows has assigned to your ipod's hard disk.\n");
@@ -148,7 +154,8 @@ int main(int argc, char* argv[])
     int type;
     struct ipod_t ipod;
 
-    fprintf(stderr,"ipodpatcher v" VERSION " - (C) Dave Chapman 2006-2007\n");
+    fprintf(stderr,"ipodpatcher " VERSION "\n");
+    fprintf(stderr,"(C) Dave Chapman 2006-2009\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 
@@ -364,9 +371,9 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    if (getmodel(&ipod,(ipod.ipod_directory[0].vers>>8)) < 0) {
+    if (getmodel(&ipod,(ipod.ipod_directory[ipod.ososimage].vers>>8)) < 0) {
         fprintf(stderr,"[ERR] Unknown version number in firmware (%08x)\n",
-                       ipod.ipod_directory[0].vers);
+                       ipod.ipod_directory[ipod.ososimage].vers);
         return -1;
     }
 
@@ -391,7 +398,7 @@ int main(int argc, char* argv[])
     if (ipod.ramsize > 0) { printf("(%dMB RAM) ",ipod.ramsize); }
     printf("(\"%s\")\n",ipod.macpod ? "macpod" : "winpod");
 
-    if (ipod.ipod_directory[0].vers == 0x10000) {
+    if (ipod.ipod_directory[ipod.ososimage].vers == 0x10000) {
         fprintf(stderr,"[ERR]  *** ipodpatcher does not support the 2nd Generation Nano! ***\n");
 #ifdef WITH_BOOTOBJS
         printf("Press ENTER to exit ipodpatcher :");

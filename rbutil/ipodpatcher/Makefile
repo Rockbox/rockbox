@@ -2,13 +2,26 @@ CFLAGS=-Wall -W
 
 BOOT_H = ipod1g2g.h ipod3g.h ipod4g.h ipodcolor.h ipodmini.h ipodmini2g.h ipodnano.h ipodvideo.h
 
-# Uncomment the next two lines to build with embedded bootloaders and the 
+# Enable the next two lines to build with embedded bootloaders and the 
 # --install option and interactive mode.  You need the full set of Rockbox 
 # bootloaders in this directory - download them from
 # http://download.rockbox.org/bootloader/ipod/bootloaders.zip
 
-#BOOTSRC = ipod1g2g.c ipod3g.c ipod4g.c ipodcolor.c ipodmini.c ipodmini2g.c ipodnano.c ipodvideo.c
-#CFLAGS += -DWITH_BOOTOBJS
+ifdef RELEASE
+CFLAGS+=-DRELEASE
+BOOTOBJS=1
+endif
+
+ifdef BOOTOBJS
+BOOTSRC = ipod1g2g.c ipod3g.c ipod4g.c ipodcolor.c ipodmini.c ipodmini2g.c ipodnano.c ipodvideo.c ipodnano2g.c
+CFLAGS += -DWITH_BOOTOBJS
+endif
+
+ifndef VERSION
+VERSION=$(shell ../../tools/version.sh)
+endif
+
+CFLAGS+=-DVERSION=\"$(VERSION)\"
 
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 OUTPUT=ipodpatcher.exe
@@ -80,6 +93,9 @@ ipodnano.c: bootloader-ipodnano.ipod ipod2c
 
 ipodvideo.c: bootloader-ipodvideo.ipod ipod2c
 	./ipod2c bootloader-ipodvideo.ipod ipodvideo
+
+ipodnano2g.c: bootloader-ipodnano2g.ipodx ipod2c
+	./ipod2c bootloader-ipodnano2g.ipodx ipodnano2g
 
 
 clean:

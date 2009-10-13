@@ -42,6 +42,7 @@
 #include "ipodcolor.h"
 #include "ipodnano.h"
 #include "ipodvideo.h"
+#include "ipodnano2g.h"
 #endif
 
 #ifndef RBUTIL
@@ -389,7 +390,7 @@ int write_partition(struct ipod_t* ipod, int infile)
     return 0;
 }
 
-char* ftypename[] = { "OSOS", "RSRC", "AUPD", "HIBE" };
+char* ftypename[] = { "OSOS", "RSRC", "AUPD", "HIBE", "OSBK" };
 
 int diskmove(struct ipod_t* ipod, int delta)
 {
@@ -470,6 +471,409 @@ int diskmove(struct ipod_t* ipod, int delta)
     return 0;
 }
 
+static int rename_image(struct ipod_t* ipod, char* from, char* to)
+{
+    int n;
+    int x;
+    int found;
+    int i;
+    unsigned char* p;
+
+    /* diroffset may not be sector-aligned */
+    x = ipod->diroffset % ipod->sector_size;
+
+    /* Read directory */
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { 
+        fprintf(stderr,"[ERR]  Seek to diroffset (%08x) failed.\n",(unsigned)ipod->diroffset);
+        return -1;
+    }
+
+    n=ipod_read(ipod, ipod_sectorbuf, ipod->sector_size);
+    if (n < 0) { 
+        fprintf(stderr,"[ERR]  Read of directory failed.\n");
+        return -1;
+    }
+
+    p = ipod_sectorbuf + x;
+
+    /* A hack to detect 2nd gen Nanos - maybe there is a better way? */
+    if (p[0] == 0)
+    {
+        /* Adjust diroffset */
+        ipod->diroffset += ipod->sector_size - x;
+
+        n=ipod_read(ipod, ipod_sectorbuf, ipod->sector_size);
+        if (n < 0) { 
+            fprintf(stderr,"[ERR]  Read of directory failed.\n");
+            return -1;
+        }
+        p = ipod_sectorbuf;
+    }
+
+    found = 0;
+    for (i=0 ; !found && i < MAX_IMAGES; i++) {
+       if (memcmp(p + 4, from, 4) == 0) {
+           memcpy(p + 4, to, 4);
+
+           found = 1;
+       }
+       p += 40;
+    }
+
+    if (!found) {
+        fprintf(stderr,"[ERR]  Unexpected error - no \"%s\" image!\n", from);
+        return -1;
+    }
+
+    /* Write directory back to disk */
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { 
+        fprintf(stderr,"[ERR]  Seek to diroffset (%08x) failed.\n",(unsigned)ipod->diroffset);
+        return -1;
+    }
+
+    n=ipod_write(ipod, ipod_sectorbuf, ipod->sector_size);
+    if (n < 0) { 
+        fprintf(stderr,"[ERR]  Write of directory failed in rename_image.\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+static int delete_image(struct ipod_t* ipod, char* name)
+{
+    int n;
+    int x;
+    int found;
+    int i;
+    unsigned char* p;
+
+    /* diroffset may not be sector-aligned */
+    x = ipod->diroffset % ipod->sector_size;
+
+    /* Read directory */
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { 
+        fprintf(stderr,"[ERR]  Seek to diroffset (%08x) failed.\n",(unsigned)ipod->diroffset);
+        return -1;
+    }
+
+    n=ipod_read(ipod, ipod_sectorbuf, ipod->sector_size);
+    if (n < 0) { 
+        fprintf(stderr,"[ERR]  Read of directory failed.\n");
+        return -1;
+    }
+
+    p = ipod_sectorbuf + x;
+
+    /* A hack to detect 2nd gen Nanos - maybe there is a better way? */
+    if (p[0] == 0)
+    {
+        /* Adjust diroffset */
+        ipod->diroffset += ipod->sector_size - x;
+
+        n=ipod_read(ipod, ipod_sectorbuf, ipod->sector_size);
+        if (n < 0) { 
+            fprintf(stderr,"[ERR]  Read of directory failed.\n");
+            return -1;
+        }
+        p = ipod_sectorbuf;
+    }
+
+    found = 0;
+    for (i=0 ; !found && i < MAX_IMAGES; i++) {
+       if (memcmp(p + 4, name, 4) == 0) {
+           memset(p, 0, 40);  /* Delete directory entry */
+           found = 1;
+       }
+       p += 40;
+    }
+
+    if (!found) {
+        fprintf(stderr,"[ERR]  Unexpected error - no \"%s\" image!\n", name);
+        return -1;
+    }
+
+    /* Write directory back to disk */
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { 
+        fprintf(stderr,"[ERR]  Seek to diroffset (%08x) failed.\n",(unsigned)ipod->diroffset);
+        return -1;
+    }
+
+    n=ipod_write(ipod, ipod_sectorbuf, ipod->sector_size);
+    if (n < 0) { 
+        fprintf(stderr,"[ERR]  Write of directory failed in delete_image.\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+int add_new_image(struct ipod_t* ipod, char* imagename, char* filename, int type)
+{
+    int length;
+    int found;
+    int i;
+    int x;
+    int n;
+    int infile;
+    int newsize;
+    unsigned long chksum=0;
+    unsigned long filechksum=0;
+    unsigned long offset;
+    unsigned char header[8];  /* Header for .ipod file */
+    unsigned char* p;
+
+#ifdef WITH_BOOTOBJS
+    if (type == FILETYPE_INTERNAL) {
+        fprintf(stderr,"[INFO] Using internal bootloader - %d bytes\n",ipod->bootloader_len);
+        length = ipod->bootloader_len;
+        infile = -1;
+    } 
+    else 
+#endif
+    {
+        /* First check that the input file is the correct type for this ipod. */
+        infile=open(filename,O_RDONLY);
+        if (infile < 0) {
+            fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
+            return -1;
+        }
+    
+        if (type==FILETYPE_DOT_IPOD) {
+            n = read(infile,header,8);
+            if (n < 8) {
+                fprintf(stderr,"[ERR]  Failed to read header from %s\n",filename);
+                close(infile);
+                return -1;
+            }
+    
+            if (memcmp(header+4, ipod->modelname,4)!=0) {
+                fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
+                        header[4],header[5],header[6],header[7], ipod->modelname);
+                close(infile);
+                return -1;
+            }
+    
+            filechksum = be2int(header);
+    
+            length = filesize(infile)-8;
+        } else {
+            length = filesize(infile);
+        }
+    }
+
+    newsize=(length+ipod->sector_size-1)&~(ipod->sector_size-1);
+
+    fprintf(stderr,"[INFO] Padding input file from 0x%08x to 0x%08x bytes\n",
+            length,newsize);
+
+    if (newsize > BUFFER_SIZE) {
+        fprintf(stderr,"[ERR]  Input file too big for buffer\n");
+        if (infile >= 0) close(infile);
+        return -1;
+    }
+
+    /* TODO: Check if we have enough space in the partition for the new image */
+
+#ifdef WITH_BOOTOBJS
+    if (type == FILETYPE_INTERNAL) {
+        memcpy(ipod_sectorbuf,ipod->bootloader,ipod->bootloader_len);
+    } 
+    else
+#endif
+    {
+        fprintf(stderr,"[INFO] Reading input file...\n");
+
+        n = read(infile,ipod_sectorbuf,length);
+        if (n < 0) {
+            fprintf(stderr,"[ERR]  Couldn't read input file\n");
+            close(infile);
+            return -1;
+        }
+        close(infile);
+    }
+
+    /* Pad the data with zeros */
+    memset(ipod_sectorbuf+length,0,newsize-length);
+
+    if (type==FILETYPE_DOT_IPOD) {
+        chksum = ipod->modelnum;
+        for (i = 0; i < length; i++) {
+            /* add 8 unsigned bits but keep a 32 bit sum */
+            chksum += ipod_sectorbuf[i];
+        }
+
+        if (chksum == filechksum) {
+            fprintf(stderr,"[INFO] Checksum OK in %s\n",filename);
+        } else {
+            fprintf(stderr,"[ERR]  Checksum in %s failed check\n",filename);
+            return -1;
+        }
+    }
+
+
+    offset = ipod->fwoffset + ipod->ipod_directory[ipod->nimages - 1].devOffset +
+             ipod->ipod_directory[ipod->nimages - 1].len + ipod->sector_size;
+
+    /* 2nd Gen Nano has encrypted firmware, and the sector
+       preceeding the firmware contains hashes that need to be
+       preserved.  Nano 2G images include these extra 2048 (0x800)
+       bytes 
+     */
+    if (ipod_seek(ipod, offset - (ipod->modelnum == 62 ? 0x800 : 0)) < 0) {
+        fprintf(stderr,"[ERR]  Seek failed\n");
+        return -1;
+    }
+
+    if ((n = ipod_write(ipod,ipod_sectorbuf,newsize)) < 0) {
+        perror("[ERR]  Write failed\n");
+        return -1;
+    }
+
+    if (n < newsize) {
+        fprintf(stderr,"[ERR]  Short write - requested %d bytes, received %d\n"
+                      ,newsize,n);
+        return -1;
+    }
+    fprintf(stderr,"[INFO]  Wrote %d bytes to firmware partition\n",n);
+
+    /* Now we need to create a new directory entry 
+
+       NOTE: On the Nano 2G, the checksum is the checksum of the
+             unencrypted firmware.  But this isn't checked by the NOR
+             bootloader (there are cryptographic hashes in the
+             firmware itself), so it doesn't matter that this is
+             wrong.
+      */
+    chksum = 0;
+    for (i = 0; i < length; i++) {
+         /* add 8 unsigned bits but keep a 32 bit sum */
+         chksum += ipod_sectorbuf[i];
+    }
+
+    x = ipod->diroffset % ipod->sector_size;
+
+    /* Read directory */
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { return -1; }
+
+    n=ipod_read(ipod, ipod_sectorbuf, ipod->sector_size);
+    if (n < 0) { return -1; }
+
+    /* Create a new directory entry */
+
+    /* Copy OSOS or OSBK details - we assume one of them exists */
+    p = ipod_sectorbuf + x;
+    found = 0;
+    for (i = 0; !found && i < ipod->nimages; i++) {
+        if ((memcmp(p + 4, "soso", 4)==0) || (memcmp(p + 4, "kbso", 4)==0)) {
+            found = 1;
+        } else {
+            p += 40;
+        }
+    }
+
+    if (!found) {
+        fprintf(stderr,"[ERR]  No OSOS or OSBK image to copy directory from\n");
+        return -1;
+    }
+
+    /* Copy directory image */
+    memcpy(ipod_sectorbuf + x + (ipod->nimages * 40), p, 40);
+    p = ipod_sectorbuf + x + (ipod->nimages * 40);
+
+    /* Modify directory. */
+    memcpy(p + 4, imagename, 4);
+    int2le(offset - ipod->fwoffset, p + 12);                     /* devOffset */
+    int2le(length - (ipod->modelnum==62 ? 0x800: 0), p + 16);    /* len */
+    int2le(chksum, p + 28);                                      /* checksum */
+
+    /* Write directory */    
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { return -1; }
+    n=ipod_write(ipod, ipod_sectorbuf, ipod->sector_size);
+    if (n < 0) { return -1; }
+
+    return 0;
+}
+
+
+/*
+    Bootloader installation on the Nano2G consists of renaming the
+    OSOS image to OSBK and then writing the Rockbox bootloader as a
+    new OSOS image.
+
+    Maybe this approach can/should be adapted for other ipods, as it
+    prevents the Apple bootloader loading the original firmware into
+    RAM along with the Rockbox bootloader (and hence will give a
+    faster boot when the user just wants to start Rockbox).
+
+*/
+
+static int add_bootloader_nano2g(struct ipod_t* ipod, char* filename, int type)
+{
+    int i;
+    int has_osbk = 0;
+
+    /* Check if we already have an OSBK image */
+    for (i = 0; i < ipod->nimages; i++) {
+        if (ipod->ipod_directory[i].ftype==FTYPE_OSBK) {
+            has_osbk = 1;
+        }
+    }
+
+    if (has_osbk == 0) {
+        /* First-time install - rename OSOS to OSBK and create new OSOS for bootloader */
+        fprintf(stderr,"[INFO] Creating OSBK backup image of original firmware\n");
+
+        if  (rename_image(ipod, "soso", "kbso") < 0) {
+            fprintf(stderr,"[ERR]  Could not rename OSOS image\n");
+            return -1;
+        }
+
+        /* Add our bootloader as a brand new image */
+        return add_new_image(ipod, "soso", filename, type);
+    } else {
+        /* This is an update, just replace OSOS with our bootloader */
+
+        return write_firmware(ipod, filename, type);
+    }
+}
+
+
+static int delete_bootloader_nano2g(struct ipod_t* ipod)
+{
+    int i;
+    int has_osbk = 0;
+
+    /* Check if we have an OSBK image */
+    for (i = 0; i < ipod->nimages; i++) {
+        if (ipod->ipod_directory[i].ftype==FTYPE_OSBK) {
+            has_osbk = 1;
+        }
+    }
+
+    if (has_osbk == 0) {
+        fprintf(stderr,"[ERR]  No OSBK image found - nothing to uninstall\n");
+        return -1;
+    } else {
+        /* Delete our bootloader image */
+        if (delete_image(ipod, "soso") < 0) {
+            fprintf(stderr,"[WARN] Could not delete OSOS image\n");
+        } else {
+            fprintf(stderr,"[INFO] OSOS image deleted\n");
+        }
+
+        if  (rename_image(ipod, "kbso", "soso") < 0) {
+            fprintf(stderr,"[ERR]  Could not rename OSBK image\n");
+            return -1;
+        }
+
+
+        fprintf(stderr,"[INFO] OSBK image renamed to OSOS - bootloader uninstalled.\n");
+        return 0;
+    }
+}
+
+
 int add_bootloader(struct ipod_t* ipod, char* filename, int type)
 {
     int length;
@@ -484,6 +888,11 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
     unsigned long filechksum=0;
     unsigned char header[8];  /* Header for .ipod file */
     unsigned char* bootloader_buf;
+
+    /* The 2nd gen Nano is installed differently */
+    if (ipod->modelnum == 62) {
+        return add_bootloader_nano2g(ipod, filename, type);
+    }
 
     /* Calculate the position in the OSOS image where our bootloader will go. */
     if (ipod->ipod_directory[0].entryOffset>0) {
@@ -698,6 +1107,11 @@ int delete_bootloader(struct ipod_t* ipod)
     int n;
     unsigned long chksum=0;   /* 32 bit checksum - Rockbox .ipod style*/
 
+    /* The 2nd gen Nano is installed differently */
+    if (ipod->modelnum == 62) {
+        return delete_bootloader_nano2g(ipod);
+    }
+
     /* Removing the bootloader involves adjusting the "length",
        "chksum" and "entryOffset" values in the osos image's directory
        entry. */
@@ -774,7 +1188,9 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
     int bytesavailable;
     unsigned long chksum=0;
     unsigned long filechksum=0;
+    unsigned long offset;
     unsigned char header[8];  /* Header for .ipod file */
+    unsigned char* p;
 
 #ifdef WITH_BOOTOBJS
     if (type == FILETYPE_INTERNAL) {
@@ -876,7 +1292,23 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
         }
     }
 
-    if (ipod_seek(ipod, ipod->fwoffset+ipod->ipod_directory[0].devOffset) < 0) {
+
+    offset = ipod->fwoffset+ipod->ipod_directory[ipod->ososimage].devOffset;
+
+    if (ipod->modelnum==62) {
+
+        /* 2nd Gen Nano has encrypted firmware, and the sector
+           preceeding the firmware contains hashes that need to be
+           preserved.  Nano 2G images include these extra 2048 (0x800)
+           bytes 
+        */
+
+        offset -= 0x800;
+
+       /* TODO: The above checks need to take into account this 0x800 bytes */
+    }
+
+    if (ipod_seek(ipod, offset) < 0) {
         fprintf(stderr,"[ERR]  Seek failed\n");
         return -1;
     }
@@ -893,7 +1325,14 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
     }
     fprintf(stderr,"[INFO]  Wrote %d bytes to firmware partition\n",n);
 
-    /* Now we need to update the "len", "entryOffset" and "chksum" fields */
+    /* Now we need to update the "len", "entryOffset" and "chksum" fields
+
+       NOTE: On the Nano 2G, the checksum is the checksum of the
+             unencrypted firmware.  But this isn't checked by the NOR
+             bootloader (there are cryptographic hashes in the
+             firmware itself), so it doesn't matter that this is
+             wrong.
+      */
     chksum = 0;
     for (i = 0; i < length; i++) {
          /* add 8 unsigned bits but keep a 32 bit sum */
@@ -908,10 +1347,11 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
     n=ipod_read(ipod, ipod_sectorbuf, ipod->sector_size);
     if (n < 0) { return -1; }
 
-    /* Update entries for image 0 */
-    int2le(length,ipod_sectorbuf+x+16);
-    int2le(0,ipod_sectorbuf+x+24);
-    int2le(chksum,ipod_sectorbuf+x+28);
+    /* Update entries for image */
+    p = ipod_sectorbuf + x + (ipod->ososimage * 40);    
+    int2le(length - (ipod->modelnum==62 ? 0x800: 0), p + 16);
+    int2le(0, p + 24);
+    int2le(chksum, p + 28);
 
     /* Write directory */    
     if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { return -1; }
@@ -927,25 +1367,35 @@ int read_firmware(struct ipod_t* ipod, char* filename, int type)
     int i;
     int outfile;
     int n;
+    unsigned long offset;
     unsigned long chksum=0;   /* 32 bit checksum - Rockbox .ipod style*/
     unsigned char header[8];  /* Header for .ipod file */
 
-    if (ipod->ipod_directory[0].entryOffset != 0) {
+    if (ipod->ipod_directory[ipod->ososimage].entryOffset != 0) {
         /* We have a bootloader... */
-        length = ipod->ipod_directory[0].entryOffset;
+        length = ipod->ipod_directory[ipod->ososimage].entryOffset;
     } else {
-        length = ipod->ipod_directory[0].len;
+        length = ipod->ipod_directory[ipod->ososimage].len;
     }
 
     fprintf(stderr,"[INFO] Reading firmware (%d bytes)\n",length);
 
-    if (ipod_seek(ipod, ipod->fwoffset+ipod->ipod_directory[0].devOffset) < 0) {
-        return -1;
-    }
-
+    offset = ipod->fwoffset + ipod->ipod_directory[ipod->ososimage].devOffset;
     i = (length+ipod->sector_size-1) & ~(ipod->sector_size-1);
     fprintf(stderr,"[INFO] Padding read from 0x%08x to 0x%08x bytes\n",
             length,i);
+
+    if (ipod->modelnum==62) {
+        /* 2nd Gen Nano has encrypted firmware, and we need to dump the
+           sector preceeding the image - it contains hashes */
+        offset -= 0x800;
+        length += 0x800;
+        i += 0x800;
+    }
+
+    if (ipod_seek(ipod, offset)) {
+        return -1;
+    }
 
     if ((n = ipod_read(ipod,ipod_sectorbuf,i)) < 0) {
         return -1;
@@ -1049,6 +1499,9 @@ int read_directory(struct ipod_t* ipod)
     /* A hack to detect 2nd gen Nanos - maybe there is a better way? */
     if (p[0] == 0)
     {
+        /* Adjust diroffset */
+        ipod->diroffset += ipod->sector_size - x;
+
         n=ipod_read(ipod, ipod_sectorbuf, ipod->sector_size);
         if (n < 0) { 
             fprintf(stderr,"[ERR]  Read of directory failed.\n");
@@ -1057,15 +1510,19 @@ int read_directory(struct ipod_t* ipod)
         p = ipod_sectorbuf;
     }
 
+    ipod->ososimage = -1;
     while ((ipod->nimages < MAX_IMAGES) && (p < (ipod_sectorbuf + x + 400)) && 
            ((memcmp(p,"!ATA",4)==0) || (memcmp(p,"DNAN",4)==0))) {
         p+=4;
         if (memcmp(p,"soso",4)==0) {
             ipod->ipod_directory[ipod->nimages].ftype=FTYPE_OSOS;
+            ipod->ososimage = ipod->nimages;
         } else if (memcmp(p,"crsr",4)==0) {
             ipod->ipod_directory[ipod->nimages].ftype=FTYPE_RSRC;
         } else if (memcmp(p,"dpua",4)==0) {
             ipod->ipod_directory[ipod->nimages].ftype=FTYPE_AUPD;
+        } else if (memcmp(p,"kbso",4)==0) {
+            ipod->ipod_directory[ipod->nimages].ftype=FTYPE_OSBK;
         } else if (memcmp(p,"ebih",4)==0) {
             ipod->ipod_directory[ipod->nimages].ftype=FTYPE_HIBE;
         } else {
@@ -1092,12 +1549,17 @@ int read_directory(struct ipod_t* ipod)
         ipod->nimages++;
     }
 
+    if (ipod->ososimage < 0) {
+        fprintf(stderr,"[ERR]  No OSOS image found.\n");
+        return -1;
+    }
+
     if ((ipod->nimages > 1) && (version==2)) {
         /* The 3g firmware image doesn't appear to have a version, so
            let's make one up... Note that this is never written back to the
            ipod, so it's OK to do. */
 
-        if (ipod->ipod_directory[0].vers == 0) { ipod->ipod_directory[0].vers = 3; }
+        if (ipod->ipod_directory[ipod->ososimage].vers == 0) { ipod->ipod_directory[ipod->ososimage].vers = 3; }
 
         ipod->fwoffset = ipod->start;
     } else {
@@ -1247,11 +1709,12 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             break;
         case 0x100:
             ipod->modelstr="2nd Generation Nano";
-            ipod->modelnum = 0;
-            ipod->targetname = NULL;
+            ipod->modelnum = 62;
+            ipod->modelname = "nn2x";
+            ipod->targetname = "ipodnano2g";
 #ifdef WITH_BOOTOBJS
-            ipod->bootloader = NULL;
-            ipod->bootloader_len = 0;
+            ipod->bootloader = ipodnano2g;
+            ipod->bootloader_len = LEN_ipodnano2g;
 #endif
             break;
         default:
@@ -1316,7 +1779,7 @@ int ipod_scan(struct ipod_t* ipod)
              continue;
          }
 
-         ipod_version=(ipod->ipod_directory[0].vers>>8);
+         ipod_version=(ipod->ipod_directory[ipod->ososimage].vers>>8);
          /* Windows requires the ipod in R/W mode for SCSI Inquiry */
          ipod->ramsize = 0;
          ipod_reopen_rw(ipod);
