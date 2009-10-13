@@ -1,0 +1,23 @@
+% $Id$ %
+\def\UseOption{ipodnano2g}
+\edef\UseOption{\UseOption,HAVE_RB_BL_ON_DISK}
+\edef\UseOption{\UseOption,IPOD_4G_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,ipod}
+
+\newcommand{\playerman}{Ipod}
+\newcommand{\playertype}{Nano}
+\newcommand{\playerlongtype}{\playertype{} 2nd generation}
+\newcommand{\genericimg}{176x132x16}
+\newcommand{\specimg}{ipodnano2g}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.ipod}}
+\newcommand{\firmwareextension}{\fname{ipod}}
+\newcommand{\screenshotsize}{4cm}
+\newcommand{\disk}{flash storage}
+
+% link external keymap file
+\input{platform/keymap-ipod4g.tex}
