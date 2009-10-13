@@ -33,7 +33,10 @@ endif
 
 # don't try to use the systems libspeex when building a static binary.
 ifndef STATIC
-SYS_SPEEX = $(shell pkg-config --libs speex)
+SYS_SPEEX = $(shell pkg-config --silence-errors --libs speex)
+ifneq ($(SYS_SPEEX),)
+SYS_SPEEX += $(shell pkg-config --silence-errors --libs speexdsp)
+endif
 endif
 
 # fall back to our own librbspeex if no suitable found.
