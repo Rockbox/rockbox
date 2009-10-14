@@ -82,9 +82,9 @@
 static int wpsbars = 0;
 
 /* currently only one wps_state is needed, initialize to 0 */
-static struct wps_state     wps_state               = { .id3 = NULL};
-static struct gui_wps       gui_wps[NB_SCREENS]     = {{ 0 }};
-static struct wps_data      wps_datas[NB_SCREENS]   = {{ 0 }};
+static struct wps_state     wps_state               = { .id3 = NULL };
+static struct gui_wps       gui_wps[NB_SCREENS]     = {{ .data = NULL }};
+static struct wps_data      wps_datas[NB_SCREENS]   = {{ .wps_loaded = 0 }};
 
 /* initial setup of wps_data  */
 static void wps_state_init(void);
