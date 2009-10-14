@@ -68,31 +68,6 @@
 static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode);
 
 
-/* initial setup of wps_data */
-void skin_data_init(struct wps_data *wps_data)
-{
-#ifdef HAVE_LCD_BITMAP
-    wps_data->wps_sb_tag = false;
-    wps_data->show_sb_on_wps = false;
-    wps_data->peak_meter_enabled = false;
-    wps_data->images = NULL;
-    wps_data->progressbars = NULL;
-#ifdef HAVE_ALBUMART
-    wps_data->albumart = NULL;
-#endif
-    /* progress bars */
-#else /* HAVE_LCD_CHARCELLS */
-    int i;
-    for (i = 0; i < 8; i++)
-    {
-        wps_data->wps_progress_pat[i] = 0;
-    }
-    wps_data->full_line_progressbar = false;
-#endif
-    wps_data->button_time_volume = 0;
-    wps_data->wps_loaded = false;
-}
-
 /* TODO: maybe move this whole function into wps.c instead ? */
 bool gui_wps_display(struct gui_wps *gwps)
 {

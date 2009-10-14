@@ -244,43 +244,38 @@ struct skin_albumart {
 struct wps_data
 {
 #ifdef HAVE_LCD_BITMAP
-    bool wps_sb_tag;
-    bool show_sb_on_wps;
-
     struct skin_token_list *images;
     struct skin_token_list *progressbars;
-    
-    bool peak_meter_enabled;
-#ifdef HAVE_ALBUMART
-    struct skin_albumart *albumart;
-#endif
-
-#else /*HAVE_LCD_CHARCELLS */
-    unsigned short wps_progress_pat[8];
-    bool full_line_progressbar;
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
     struct skin_token_list *touchregions;
 #endif
-    
-#ifdef HAVE_REMOTE_LCD
-    bool remote_wps;
-#endif
-
     struct skin_token_list *viewports;
-
+    struct skin_token_list *strings;
+#ifdef HAVE_ALBUMART
+    struct skin_albumart *albumart;
+#endif
+    struct wps_token *tokens;
     /* Total number of tokens in the WPS. During WPS parsing, this is
        the index of the token being parsed. */
     int num_tokens;
-    struct wps_token *tokens;
-
-    struct skin_token_list *strings;
-
-    bool wps_loaded;
-    
     /* tick the volume button was last pressed */
     unsigned int button_time_volume;
+
+#ifdef HAVE_LCD_BITMAP
+    bool peak_meter_enabled;
+    bool wps_sb_tag;
+    bool show_sb_on_wps;
+#else /*HAVE_LCD_CHARCELLS */
+    unsigned short wps_progress_pat[8];
+    bool full_line_progressbar;
+#endif
+    bool wps_loaded;
+#ifdef HAVE_REMOTE_LCD
+    /* this must not be reset on skin loading */
+    bool remote_wps;
+#endif
 };
 
 /* wps_data end */

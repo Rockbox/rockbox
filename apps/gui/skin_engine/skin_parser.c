@@ -104,8 +104,6 @@ extern void print_debug_info(struct wps_data *data, int fail, int line);
 extern void debug_skin_usage(void);
 #endif
 
-static void wps_reset(struct wps_data *data);
-
 /* Function for parsing of details for a token. At the moment the
    function is called, the token type has already been set. The
    function must fill in the details and possibly add more tokens
@@ -1582,16 +1580,45 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
     return (fail == 0);
 }
 
-static void wps_reset(struct wps_data *data)
+
+/*
+ * initial setup of wps_data; does reset everything
+ * except fields which need to survive, i.e.
+ * 
+ *  wps_data->remote_wps
+ **/
+void skin_data_reset(struct wps_data *wps_data)
 {
-#ifdef HAVE_REMOTE_LCD
-    bool rwps = data->remote_wps; /* remember whether the data is for a RWPS */
+#ifdef HAVE_LCD_BITMAP
+    wps_data->images = NULL;
+    wps_data->progressbars = NULL;
 #endif
-    memset(data, 0, sizeof(*data));
-    skin_data_init(data);
-#ifdef HAVE_REMOTE_LCD
-    data->remote_wps = rwps;
+#ifdef HAVE_TOUCHSCREEN
+    wps_data->touchregions = NULL;
 #endif
+    wps_data->viewports = NULL;
+    wps_data->strings = NULL;
+#ifdef HAVE_ALBUMART
+    wps_data->albumart = NULL;
+#endif
+    wps_data->tokens = NULL;
+    wps_data->num_tokens = 0;
+    wps_data->button_time_volume = 0;
+
+#ifdef HAVE_LCD_BITMAP
+    wps_data->peak_meter_enabled = false;
+    wps_data->wps_sb_tag = false;
+    wps_data->show_sb_on_wps = false;
+#else /* HAVE_LCD_CHARCELLS */
+    /* progress bars */
+    int i;
+    for (i = 0; i < 8; i++)
+    {
+        wps_data->wps_progress_pat[i] = 0;
+    }
+    wps_data->full_line_progressbar = false;
+#endif
+    wps_data->wps_loaded = false;
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -1704,7 +1731,7 @@ bool skin_data_load(struct wps_data *wps_data,
     }
 #endif
 
-    wps_reset(wps_data);
+    skin_data_reset(wps_data);
 
     curr_vp = skin_buffer_alloc(sizeof(struct skin_viewport));
     if (!curr_vp)
@@ -1796,7 +1823,7 @@ bool skin_data_load(struct wps_data *wps_data,
 
         /* parse the WPS source */
         if (!wps_parse(wps_data, wps_buffer, true)) {
-            wps_reset(wps_data);
+            skin_data_reset(wps_data);
             return false;
         }
 
@@ -1811,7 +1838,7 @@ bool skin_data_load(struct wps_data *wps_data,
 
         /* load the bitmaps that were found by the parsing */
         if (!load_skin_bitmaps(wps_data, bmpdir)) {
-            wps_reset(wps_data);
+            skin_data_reset(wps_data);
             return false;
         }
 #endif

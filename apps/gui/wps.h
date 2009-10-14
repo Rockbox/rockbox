@@ -27,7 +27,6 @@ long gui_wps_show(void);
  
 /* wrapper for the wps to load the skin (.wps/.rwps) files */
 void wps_data_load(enum screen_type, const char *, bool);
-void wps_data_init(enum screen_type);
 
 void gui_sync_wps_init(void);
 

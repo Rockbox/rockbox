@@ -741,25 +741,25 @@ void settings_apply_skins(void)
     /* re-initialize the skin buffer before we start reloading skins */
     skin_buffer_init();
     if ( global_settings.wps_file[0] &&
-        global_settings.wps_file[0] != 0xff ) {
+        global_settings.wps_file[0] != 0xff )
+    {
         snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
                 global_settings.wps_file);
         wps_data_load(SCREEN_MAIN, buf, true);
     }
     else
     {
-        wps_data_init(SCREEN_MAIN);
         wps_data_load(SCREEN_MAIN, NULL, true);
     }
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-    if ( global_settings.rwps_file[0]) {
+    if ( global_settings.rwps_file[0])
+    {
         snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
                 global_settings.rwps_file);
         wps_data_load(SCREEN_REMOTE, buf, true);
     }
     else
     {
-        wps_data_init(SCREEN_REMOTE);
         wps_data_load(SCREEN_REMOTE, NULL, true);
     }
 #endif

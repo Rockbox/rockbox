@@ -79,11 +79,12 @@
 #define MIN_FF_REWIND_STEP 500
 
 /* this is for the viewportmanager */
-static int wpsbars;
-/* currently only one wps_state is needed */
-static struct wps_state wps_state;
-static struct gui_wps gui_wps[NB_SCREENS];
-static struct wps_data wps_datas[NB_SCREENS];
+static int wpsbars = 0;
+
+/* currently only one wps_state is needed, initialize to 0 */
+static struct wps_state     wps_state               = { .id3 = NULL};
+static struct gui_wps       gui_wps[NB_SCREENS]     = {{ 0 }};
+static struct wps_data      wps_datas[NB_SCREENS]   = {{ 0 }};
 
 /* initial setup of wps_data  */
 static void wps_state_init(void);
@@ -159,12 +160,6 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
     gui_wps[screen].data->remote_wps = !(screen == SCREEN_MAIN);
 #endif
 }
-
-void wps_data_init(enum screen_type screen)
-{
-    skin_data_init(gui_wps[screen].data);
-}
-
 
 static bool wps_fading_out = false;
 void fade(bool fade_in, bool updatewps)
@@ -1288,7 +1283,6 @@ void gui_sync_wps_init(void)
     int i;
     FOR_NB_SCREENS(i)
     {
-        skin_data_init(&wps_datas[i]);
 #ifdef HAVE_ALBUMART
         wps_datas[i].albumart = NULL;
 #endif
