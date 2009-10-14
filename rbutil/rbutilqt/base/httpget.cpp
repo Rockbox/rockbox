@@ -240,6 +240,7 @@ bool HttpGet::getFile(const QUrl &url)
 void HttpGet::getFileFinish()
 {
     m_cachefile = m_cachedir.absolutePath() + "/rbutil-cache/" + m_hash;
+    QString indexFile = m_cachedir.absolutePath() + "/rbutil-cache/cache.txt";
     if(m_usecache) {
         // check if the file is present in cache
         QFileInfo cachefile = QFileInfo(m_cachefile);
@@ -279,6 +280,23 @@ void HttpGet::getFileFinish()
                          << cachefile.lastModified();
             }
             qDebug() << "[HTTP] Cache: caching as" << m_cachefile;
+            // update cache index file
+            QFile idxFile(indexFile);
+            idxFile.open(QIODevice::ReadOnly);
+            QByteArray currLine;
+            do {
+                QByteArray currLine = idxFile.readLine(1000);
+                if(currLine.startsWith(m_hash.toUtf8()))
+                    break;
+            } while(!currLine.isEmpty());
+            idxFile.close();
+            if(currLine.isEmpty()) {
+                idxFile.open(QIODevice::Append);
+                QString outline = m_hash + "\t" + m_header.value("Host") + "\t"
+                    + m_path + "\t" + m_query + "\n";
+                idxFile.write(outline.toUtf8());
+                idxFile.close();
+            }
         }
 
     }
