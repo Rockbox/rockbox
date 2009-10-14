@@ -151,7 +151,8 @@ void RbSettings::sync()
             // chown is attribute warn_unused_result, but in case this fails
             // we can't do anything useful about it. Notifying the user
             // is somewhat pointless. Add hack to suppress compiler warning.
-            if(chown(qPrintable(userSettings->fileName()), realuid, realgid));
+            if(chown(qPrintable(userSettings->fileName()), realuid, realgid))
+            { }
         }
     }
 #endif
