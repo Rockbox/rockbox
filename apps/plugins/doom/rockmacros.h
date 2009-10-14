@@ -72,9 +72,6 @@ int my_close(int id);
 #define strcat(a,b)        rb->strcat((a),(b))
 #define snprintf           rb->snprintf
 
-/* Using #define isn't enough with GCC 4.0.1 */
-inline void* memcpy(void* dst, const void* src, size_t size);
-
 #define PACKEDATTR __attribute__((packed)) // Needed for a few things
 #define GAMEBASE ROCKBOX_DIR "/doom/"
 //#define SIMPLECHECKS

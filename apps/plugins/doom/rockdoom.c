@@ -181,11 +181,6 @@ cont:
     /* NOTREACHED */
 }
 
-inline void* memcpy(void* dst, const void* src, size_t size)
-{
-   return rb->memcpy(dst, src, size);
-}
-
 struct argvlist
 {
    int timedemo;        // 1 says there's a timedemo
