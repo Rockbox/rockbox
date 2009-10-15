@@ -717,9 +717,10 @@ const char *get_token_value(struct gui_wps *gwps,
 #if (CONFIG_CODEC != MAS3507D)
         case WPS_TOKEN_SOUND_PITCH:
         {
-            int val = sound_get_pitch();
-            snprintf(buf, buf_size, "%d.%d",
-                    val / 10, val % 10);
+            int32_t pitch = sound_get_pitch();
+            snprintf(buf, buf_size, "%ld.%ld",
+                     pitch / PITCH_SPEED_PRECISION,
+		     (pitch  % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
             return buf;
         }
 #endif
