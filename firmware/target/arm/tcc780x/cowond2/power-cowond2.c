@@ -25,6 +25,7 @@
 #include "pcf50606.h"
 #include "pcf50635.h"
 #include "button-target.h"
+#include "touchscreen-target.h"
 #include "tuner.h"
 #include "backlight-target.h"
 #include "powermgmt.h"
@@ -101,7 +102,7 @@ void EXT3(void)
     if (data[2] & 0x08)
     {
         /* Touchscreen event, do something about it */
-        button_read_touch();
+        touchscreen_handle_device_irq();
     }
 }
 #endif

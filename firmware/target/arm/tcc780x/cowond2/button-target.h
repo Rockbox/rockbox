@@ -30,7 +30,6 @@
 bool button_hold(void);
 void button_init_device(void);
 int button_read_device(int *data);
-void button_read_touch(void);
 
 /* Main unit's buttons */
 #define BUTTON_POWER      0x00000001

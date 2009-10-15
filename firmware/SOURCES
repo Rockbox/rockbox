@@ -1256,12 +1256,14 @@ target/arm/tcc77x/iaudio7/audio-iaudio7.c
 drivers/nand_id.c
 drivers/pcf50606.c
 drivers/pcf50635.c
+drivers/tsc200x.c
 target/arm/lcd-as-memframe.S
 target/arm/tcc780x/adc-tcc780x.c
 target/arm/tcc780x/system-tcc780x.c
 target/arm/tcc780x/kernel-tcc780x.c
 target/arm/tcc780x/sd-tcc780x.c
 target/arm/tcc780x/cowond2/button-cowond2.c
+target/arm/tcc780x/cowond2/touchscreen-cowond2.c
 target/arm/tcc780x/cowond2/lcd-cowond2.c
 target/arm/tcc780x/cowond2/power-cowond2.c
 target/arm/tcc780x/cowond2/powermgmt-cowond2.c
