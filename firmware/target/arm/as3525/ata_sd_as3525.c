@@ -132,7 +132,6 @@ static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
 static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
 #ifdef HAVE_HOTSWAP
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
 static int sd1_oneshot_callback(struct timeout *tmo)
 {
     (void)tmo;
@@ -152,11 +151,10 @@ static int sd1_oneshot_callback(struct timeout *tmo)
 void INT_GPIOA(void)
 {
     static struct timeout sd1_oneshot;
-    /* reset irq */
+    /* acknowledge interrupt */
     GPIOA_IC = (1<<2);
     timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
 }
-#endif  /* defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2) */
 #endif  /* HAVE_HOTSWAP */
 
 void INT_NAND(void)
@@ -448,7 +446,6 @@ static void init_pl180_controller(const int drive)
     VIC_INT_ENABLE |=
         (drive == INTERNAL_AS3525) ? INTERRUPT_NAND : INTERRUPT_MCI0;
 
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
     /* setup isr for microsd monitoring */
     VIC_INT_ENABLE |= (INTERRUPT_GPIOA);
     /* clear previous irq */
@@ -457,8 +454,6 @@ static void init_pl180_controller(const int drive)
     GPIOA_IS &= ~(1<<2);
     /* detect both raising and falling edges */
     GPIOA_IBE |= (1<<2);
-
-#endif
 
 #else
     VIC_INT_ENABLE |= INTERRUPT_NAND;
@@ -519,27 +514,14 @@ int sd_init(void)
 #ifdef HAVE_HOTSWAP
 bool sd_removable(IF_MD_NONVOID(int drive))
 {
-#ifndef HAVE_MULTIDRIVE
-    const int drive=0;
-#endif
     return (drive==1);
 }
 
 bool sd_present(IF_MD_NONVOID(int drive))
 {
-#ifndef HAVE_MULTIDRIVE
-    const int drive=0;
-#endif
-    if(drive==0)
-    {
-        return true;
-    }
-    else
-    {
-        return card_detect_target();
-    }
+    return (drive == 0) ? true : card_detect_target();
 }
-#endif
+#endif /* HAVE_HOTSWAP */
 
 static int sd_wait_for_state(const int drive, unsigned int state)
 {
@@ -825,7 +807,7 @@ long sd_last_disk_activity(void)
 
 void sd_enable(bool on)
 {
-    /* buttonlight AMSes need a bit of special handling for the buttonlight here,
+    /* buttonlight AMSes need a bit of special handling for the buttonlight here
      * due to the dual mapping of GPIOD and XPD */
 #if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
     extern int buttonlight_is_on;
@@ -843,8 +825,8 @@ void sd_enable(bool on)
             GPIOD_DIR &= ~(1<<7);
         else
             _buttonlight_off();
-#endif
-#endif
+#endif /* HAVE_BUTTON_LIGHT */
+#endif /* HAVE_MULTIDRIVE */
         CGU_IDE |= (1<<7)  /* AHB interface enable */  |
                    (1<<6)  /* interface enable */;
         sd_enabled = true;
@@ -857,9 +839,9 @@ void sd_enable(bool on)
         CCU_IO &= ~(1<<2);
         if (buttonlight_is_on)
             _buttonlight_on();
-#endif
+#endif /* HAVE_BUTTON_LIGHT */
         CGU_PERI &= ~CGU_MCI_CLOCK_ENABLE;
-#endif
+#endif /* HAVE_MULTIDRIVE */
         CGU_IDE &= ~((1<<7)|(1<<6));
         sd_enabled = false;
     }
@@ -872,8 +854,7 @@ tCardInfo *card_get_info_target(int card_no)
 
 bool card_detect_target(void)
 {
-#if defined(HAVE_HOTSWAP) && \
-    (defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2))
+#if defined(HAVE_MULTIDRIVE)
     return !(GPIOA_PIN(2));
 #else
     return false;
@@ -883,36 +864,21 @@ bool card_detect_target(void)
 #ifdef HAVE_HOTSWAP
 void card_enable_monitoring_target(bool on)
 {
-    if (on)
-    {
-    /* add e200v2/c200v2 here */
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
-        /* enable isr*/
+    if (on) /* enable interrupt */
         GPIOA_IE |= (1<<2);
-#endif
-    }
-    else
-    {
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
-        /* edisable isr*/
+    else    /* disable interrupt */
         GPIOA_IE &= ~(1<<2);
-#endif
-    }
 }
-#endif
+#endif /* HAVE_HOTSWAP */
 
-#endif /* BOOTLOADER */
+#endif /* !BOOTLOADER */
 
 #ifdef CONFIG_STORAGE_MULTI
 int sd_num_drives(int first_drive)
 {
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
-    
-#ifdef HAVE_MULTIDRIVE
-    return 2;
-#else
-    return 1;
-#endif
+
+    return NUM_DRIVES;
 }
-#endif
+#endif /* CONFIG_STORAGE_MULTI */
