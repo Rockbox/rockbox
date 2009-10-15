@@ -623,10 +623,11 @@ int gui_syncpitchscreen_run(void)
     /* initialize pitchscreen vps */
     FOR_NB_SCREENS(i)
     {
-        screens[i].clear_display();
         viewport_set_defaults(&parent[i], i);
         max_lines[i] = viewport_get_nb_lines(&parent[i]);
         pitchscreen_fix_viewports(&parent[i], pitch_viewports[i]);
+        screens[i].set_viewport(&parent[i]);
+        screens[i].clear_viewport();
 
         /* also, draw the icons now, it's only needed once */
         pitchscreen_draw_icons(&screens[i], &parent[i]);
