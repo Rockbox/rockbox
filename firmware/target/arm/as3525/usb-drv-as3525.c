@@ -26,6 +26,10 @@
 #include "ascodec.h"
 #include "as3514.h"
 #include <stdbool.h>
+#include "panic.h"
+//#define LOGF_ENABLE
+#include "logf.h"
+
 
 /* 4 input endpoints */
 #define USB_IEP_CTRL(i)     *((volatile unsigned long*) USB_BASE + 0x0000 + (i*0x20))
@@ -120,11 +124,6 @@ void usb_drv_init(void)
     ascodec_write(AS3514_CVDD_DCDC3, ascodec_read(AS3514_CVDD_DCDC3) | 1<<2);
     ascodec_write(AS3514_USB_UTIL, ascodec_read(AS3514_USB_UTIL) & ~(1<<4));
 
-    USB_GPIO_CSR |= 0x1C00000; //sleep(3)
-    sleep(1);
-    USB_GPIO_CSR |= 0x200000; //sleep(10)
-    sleep(1);
-
     /* PHY part */
     CGU_USB = 1<<5 /* enable */
         | (CLK_DIV(AS3525_PLLA_FREQ, 48000000) / 2) << 2
@@ -133,37 +132,33 @@ void usb_drv_init(void)
     /* AHB part */
     CGU_PERI |= CGU_USB_CLOCK_ENABLE;
 
+    USB_GPIO_CSR = 0x6180000;
+    USB_DEV_CFG = (USB_DEV_CFG & ~3) | 1; /* full speed */
+    USB_DEV_CTRL |= 0x400; /* soft disconnect */
+
     /* UVDD */
     ascodec_write(AS3514_USB_UTIL, ascodec_read(AS3514_USB_UTIL) | (1<<4));
-
-    sleep(10);
-
-    USB_DEV_CFG |= (1<<31); /* soft reset */
-    volatile int tmp = USB_DEV_CFG;
-    (void)tmp;
+    sleep(10); //msleep(100)
 
     USB_GPIO_CSR = 0x6180000;
 
-    USB_DEV_CFG = (USB_DEV_CFG & ~3) | 1; /* full speed */
+    USB_GPIO_CSR |= 0x1C00000;
+    sleep(1); //msleep(3)
+    USB_GPIO_CSR |= 0x200000;
+    sleep(1); //msleep(10)
 
     USB_DEV_CTRL |= 0x400; /* soft disconnect */
 
+    USB_GPIO_CSR &= ~0x1C00000;
+    sleep(1); //msleep(3)
+    USB_GPIO_CSR &= ~0x200000;
+    sleep(1); //msleep(10)
+    USB_DEV_CTRL &= ~0x400; /* clear soft disconnect */
 
-    USB_GPIO_CSR |= 0x1C00000; //sleep(3)
-    sleep(1);
-    USB_GPIO_CSR |= 0x200000; //sleep(10)
-    sleep(1);
-
-    USB_DEV_CTRL |= 0x400; /* soft disconnect */
-
-    USB_GPIO_CSR &= ~0x1C00000; //sleep(3)
-    sleep(1);
-    USB_GPIO_CSR &= ~0x200000; //sleep(10)
-    sleep(1);
-    USB_DEV_CTRL &= ~0x400; /* soft disconnect */
-
+    /* note : this pin might be Clip specific */
     GPIOA_DIR |= (1<<6);
     GPIOA_PIN(6) = (1<<6);
+    GPIOA_DIR &= ~(1<<6);   /* restore direction for usb_detect() */
 
 #if 0 /* linux */
     USB_DEV_CFG |= (1<<17)  /* csr programming */
@@ -260,6 +255,7 @@ int usb_drv_send_nonblocking(int ep, void *ptr, int len)
 /* interrupt service routine */
 void INT_USB(void)
 {
+    panicf("USB interrupt !");
 }
 
 /* (not essential? , not implemented in usb-tcc.c) */
