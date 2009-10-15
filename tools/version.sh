@@ -61,6 +61,30 @@ gitversion() {
     fi
 }
 
+# Work out the latest svn id and also the latest bzr revno
+bzrversion() {
+
+    # look for a svn revno in the current head
+    svnver=`LANG=C bzr log -l1 $1 | grep '^ *svn revno: ' | cut -d : -f2 | cut -d ' ' -f 2`
+
+    if [ -n "$svnver" ]; then
+        # current head is a svn version so we don't care about bzr
+        version="r$svnver"
+    else
+        # look for a svn revno anywhere in history including in merges
+        svnver=`LANG=C bzr log -n0 $1 | grep '^ *svn revno: ' | head -n 1 | cut -d : -f2 | cut -d ' ' -f 2`
+        if [ -n "$svnver" ]; then
+            version="r$svnver+bzr`bzr revno $1`"
+        else
+            version="bzr`bzr revno $1`"
+        fi
+    fi
+    if ! bzr diff $1 >/dev/null; then
+        mod="M"
+    fi
+    echo "${version}${mod}"
+}
+
 #
 # First locate the top of the src tree (passed in usually)
 #
@@ -73,6 +97,8 @@ else
     # Ok, we need to derive it from the Version Control system
     if [ -d "$TOP/.git" ]; then
 	VER=`gitversion $TOP`
+    elif [ -d "$TOP/.bzr" ]; then
+	VER=`bzrversion $TOP`
     else
 	VER=`svnversion_safe $TOP`;
 	if [ "$VER" = "unknown" ]; then
