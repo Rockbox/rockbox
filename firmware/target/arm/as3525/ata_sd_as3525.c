@@ -812,6 +812,11 @@ void sd_enable(bool on)
 #if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
     extern int buttonlight_is_on;
 #endif
+
+#ifdef HAVE_HOTSWAP
+    static bool cpu_boosted = false;
+#endif
+
     if (sd_enabled == on)
         return; /* nothing to do */
     if(on)
@@ -830,6 +835,14 @@ void sd_enable(bool on)
         CGU_IDE |= (1<<7)  /* AHB interface enable */  |
                    (1<<6)  /* interface enable */;
         sd_enabled = true;
+
+#ifdef HAVE_HOTSWAP
+        if(card_detect_target())  /* If SD card present Boost cpu for voltage */
+        {
+            cpu_boosted = true;
+            cpu_boost(true);
+        }
+#endif
     }
     else
     {
@@ -844,6 +857,14 @@ void sd_enable(bool on)
 #endif /* HAVE_MULTIDRIVE */
         CGU_IDE &= ~((1<<7)|(1<<6));
         sd_enabled = false;
+
+#ifdef HAVE_HOTSWAP
+        if(cpu_boosted)
+        {
+            cpu_boost(false);
+            cpu_boosted = false;
+        }
+#endif
     }
 }
 

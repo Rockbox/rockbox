@@ -335,14 +335,13 @@ void set_cpu_frequency(long frequency)
 {
     if(frequency == CPUFREQ_MAX)
     {
-#ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
         /* Increasing frequency so boost voltage before change */
         ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_20));
 
         /* Wait for voltage to be at least 1.20v before making fclk > 200 MHz */
         while(adc_read(ADC_CVDD) < 480) /* 480 * .0025 = 1.20V */
             ;
-#endif
+
         asm volatile(
             "mrc p15, 0, r0, c1, c0  \n"
 
@@ -365,10 +364,10 @@ void set_cpu_frequency(long frequency)
             "bic r0, r0, #3<<30      \n"     /* fastbus clocking */
             "mcr p15, 0, r0, c1, c0  \n"
             : : : "r0" );
-#ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
+
         /* Decreasing frequency so reduce voltage after change */
         ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_10));
-#endif
+
         cpu_frequency = CPUFREQ_NORMAL;
     }
 }
