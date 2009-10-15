@@ -154,6 +154,9 @@ static void pitchscreen_fix_viewports(struct viewport *parent,
     {
         pitch_viewports[i] = *parent;
         pitch_viewports[i].height = font_height;
+
+        if (i == PITCH_TOP || i == PITCH_BOTTOM)
+            pitch_viewports[i].flags |= VP_FLAG_ALIGN_CENTER;
     }
     pitch_viewports[PITCH_TOP].y += ICON_BORDER;
 
@@ -204,7 +207,8 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     int w, h;
     bool show_lang_pitch;
 
-     /* "Pitch up/Pitch down" - hide for a small screen */
+     /* "Pitch up/Pitch down" - hide for a small screen,
+      * the text is drawn centered automatically */
     if (max_lines >= 5)
     {
         /* UP: Pitch Up */
@@ -213,11 +217,9 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
             ptr = str(LANG_PITCH_UP_SEMITONE);
         else
             ptr = str(LANG_PITCH_UP);
-        display->getstringsize(ptr, &w, &h);
         display->clear_viewport();
         /* draw text */
-        display->putsxy((pitch_viewports[PITCH_TOP].width / 2) -
-                (w / 2), 0, ptr);
+        display->putsxy(0, 0, ptr);
         display->update_viewport();
 
         /* DOWN: Pitch Down */
@@ -226,11 +228,9 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
             ptr = str(LANG_PITCH_DOWN_SEMITONE);
         else
             ptr = str(LANG_PITCH_DOWN);
-        display->getstringsize(ptr, &w, &h);
         display->clear_viewport();
         /* draw text */
-        display->putsxy((pitch_viewports[PITCH_BOTTOM].width / 2) -
-                (w / 2), 0, ptr);
+        display->putsxy(0, 0, ptr);
         display->update_viewport();
     }
 
