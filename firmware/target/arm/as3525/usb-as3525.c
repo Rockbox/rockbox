@@ -22,7 +22,9 @@
 #include <stdbool.h>
 #include "config.h"
 #include "usb.h"
+#ifdef HAVE_USBSTACK
 #include "usb_core.h"
+#endif
 #include "usb-target.h"
 #include "power.h"
 #include "as3525.h"
@@ -39,10 +41,14 @@
 
 void usb_enable(bool on)
 {
+#ifdef HAVE_USBSTACK
     if (on)
         usb_core_init();
     else
         usb_core_exit();
+#else
+    (void)on;
+#endif
 }
 
 void usb_init_device(void)
