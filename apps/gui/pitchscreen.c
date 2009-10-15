@@ -897,7 +897,7 @@ int gui_syncpitchscreen_run(void)
             new_speed = 0;
         }
 #endif
-}
+    }
 #if CONFIG_CODEC == SWCODEC
     pcmbuf_set_low_latency(false);
 #endif
