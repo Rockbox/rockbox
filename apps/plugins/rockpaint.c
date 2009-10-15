@@ -322,6 +322,8 @@ static void draw_rect_full( int x1, int y1, int x2, int y2 );
 
 static int drawcolor=0; /* Current color (in palette) */
 static int bgdrawcolor=9; /* Current background color (in palette) */
+static int img_height = ROWS;
+static int img_width = COLS;
 bool isbg = false; /* gruik ugly hack alert */
 
 static int preview=false; /* Is preview mode on ? */
@@ -531,6 +533,7 @@ enum {
         /* Main menu */
         MAIN_MENU_RESUME,
         MAIN_MENU_NEW, MAIN_MENU_LOAD, MAIN_MENU_SAVE,
+        MAIN_MENU_SET_WIDTH, MAIN_MENU_SET_HEIGHT,
         MAIN_MENU_BRUSH_SIZE, MAIN_MENU_BRUSH_SPEED, MAIN_MENU_COLOR,
         MAIN_MENU_GRID_SIZE,
         MAIN_MENU_PLAYBACK_CONTROL,
@@ -551,6 +554,7 @@ enum {
 
 MENUITEM_STRINGLIST(main_menu, "RockPaint", NULL,
                     "Resume", "New", "Load", "Save",
+                    "Set Width", "Set Height",
                     "Brush Size", "Brush Speed",
                     "Choose Color", "Grid Size",
                     "Playback Control", "Exit");
@@ -1468,13 +1472,13 @@ static void show_grid( bool update )
     if( gridsize > 0 )
     {
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-        for( i = gridsize; i < COLS; i+= gridsize )
+        for( i = gridsize; i < img_width; i+= gridsize )
         {
-            rb->lcd_vline( i, 0, ROWS-1 );
+            rb->lcd_vline( i, 0, img_height-1 );
         }
-        for( i = gridsize; i < ROWS; i+= gridsize )
+        for( i = gridsize; i < img_height; i+= gridsize )
         {
-            rb->lcd_hline( 0, COLS-1, i );
+            rb->lcd_hline( 0, img_width-1, i );
         }
         rb->lcd_set_drawmode(DRMODE_SOLID);
         if( update ) rb->lcd_update();
@@ -2443,10 +2447,8 @@ static void inv_cursor(bool update)
     rb->lcd_set_foreground(COLOR_BLACK);
     rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
     /* cross painting */
-    rb->lcd_hline(x-4,x-1,y);
-    rb->lcd_hline(x+1,x+4,y);
-    rb->lcd_vline(x,y-4,y-1);
-    rb->lcd_vline(x,y+1,y+4);
+    rb->lcd_hline(x-4,x+4,y);
+    rb->lcd_vline(x,y-4,y+4);
     rb->lcd_set_foreground(rp_colors[drawcolor]);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
@@ -2456,11 +2458,18 @@ static void inv_cursor(bool update)
 static void restore_screen(void)
 {
     rb->lcd_bitmap( save_buffer, 0, 0, COLS, ROWS );
+    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+    rb->lcd_vline( img_width, 0, ROWS );
+    rb->lcd_hline( 0, COLS, img_height );
+    rb->lcd_drawpixel( img_width, img_height );
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 static void clear_drawing(void)
 {
     init_buffer();
+    img_height = ROWS;
+    img_width = COLS;
     rb->lcd_set_foreground( rp_colors[ bgdrawcolor ] );
     rb->lcd_fillrect( 0, 0, COLS, ROWS );
     rb->lcd_update();
@@ -2511,6 +2520,14 @@ static void goto_menu(void)
                 }
                 break;
 
+            case MAIN_MENU_SET_WIDTH:
+                rb->set_int( "Set Width", "px", UNIT_INT, &img_width,
+                             NULL, 1, 1, COLS, NULL );
+                break;
+            case MAIN_MENU_SET_HEIGHT:
+                rb->set_int( "Set Height", "px", UNIT_INT, &img_height,
+                             NULL, 1, 1, ROWS, NULL );
+                break;
             case MAIN_MENU_BRUSH_SIZE:
                 for(multi = 0; multi<4; multi++)
                     if(bsize == times_list[multi]) break;
@@ -2742,11 +2759,13 @@ static bool rockpaint_loop( void )
                                     break;
                             }
                             reset_tool();
+                            restore_screen();
                         }
                         break;
 
                     case Fill:
                         draw_fill( x, y );
+                        restore_screen();
                         break;
 
                     case ColorPicker:
@@ -2954,6 +2973,8 @@ static int load_bitmap( const char *file )
     if((bm.width > COLS ) || ( bm.height > ROWS ))
         return -1;
 
+    img_width = bm.width;
+    img_height = bm.height;
     for( i = bm.height-1; i >= 0; i-- )
     {
         rb->memmove( save_buffer+i*COLS, save_buffer+i*bm.width,
@@ -2970,9 +2991,15 @@ static int load_bitmap( const char *file )
 static int save_bitmap( char *file )
 {
     struct bitmap bm;
-    bm.data = (char*)save_buffer;
-    bm.height = ROWS;
-    bm.width = COLS;
+    int i;
+    for(i = 0; i < img_height; i++)
+    {
+        rb->memcpy( buffer.clipboard+i*img_width, save_buffer+i*COLS,
+                        sizeof( fb_data )*img_width );
+    }
+    bm.data = (char*)buffer.clipboard;
+    bm.height = img_height;
+    bm.width = img_width;
     bm.format = FORMAT_NATIVE;
     return save_bmp_file( file, &bm );
 }
