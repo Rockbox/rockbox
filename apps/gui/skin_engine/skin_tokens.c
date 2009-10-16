@@ -467,17 +467,31 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case WPS_TOKEN_PLAYBACK_STATUS:
         {
-            int status = audio_status();
-            int mode = 1;
-            if (status == AUDIO_STATUS_PLAY)
-                mode = 2;
-            if (is_wps_fading() ||
-               (status & AUDIO_STATUS_PAUSE && !status_get_ffmode()))
-                mode = 3;
-            if (status_get_ffmode() == STATUS_FASTFORWARD)
-                mode = 4;
-            if (status_get_ffmode() == STATUS_FASTBACKWARD)
-                mode = 5;
+            int status = current_playmode();
+            /* music */
+            int mode = 1; /* stop */
+            if (status == STATUS_PLAY)
+                mode = 2; /* play */
+            if (is_wps_fading() || 
+               (status == STATUS_PAUSE  && !status_get_ffmode()))
+                mode = 3; /* pause */
+            else
+            {   /* ff / rwd */
+                if (status_get_ffmode() == STATUS_FASTFORWARD)
+                    mode = 4;
+                if (status_get_ffmode() == STATUS_FASTBACKWARD)
+                    mode = 5;
+            }
+            /* recording */
+            if (status == STATUS_RECORD)
+                mode = 6;
+            else if (status == STATUS_RECORD_PAUSE)
+                mode = 7;
+            /* radio */
+            if (status == STATUS_RADIO)
+                mode = 8;
+            else if (status == STATUS_RADIO_PAUSE)
+                mode = 9;
 
             if (intval) {
                 *intval = mode;

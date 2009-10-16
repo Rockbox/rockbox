@@ -564,7 +564,6 @@ static void init(void)
         eeprom_settings_store();
     }
 #endif
-    status_init();
     playlist_init();
     tree_mem_init();
     filetype_init();

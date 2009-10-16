@@ -27,12 +27,7 @@
 #include "radio.h"
 #endif
 
-static enum playmode ff_mode;
-
-void status_init(void)
-{
-    ff_mode = 0;
-}
+static enum playmode ff_mode = 0;
 
 void status_set_ffmode(enum playmode mode)
 {
