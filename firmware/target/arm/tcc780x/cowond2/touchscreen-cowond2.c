@@ -148,13 +148,13 @@ static int touchscreen_read_tsc200x(int *data, int *old_data)
             btn = touchscreen_to_pixels((*data & 0xffff0000) >> 16,
                                         (*data & 0x0000ffff),
                                         data);
-
-            last_btn = btn;
         }
     }
 
     last_read = current_tick;
-    
+
+    last_btn = btn;
+
     return btn;
 }
 
