@@ -337,8 +337,8 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
     int elapsed, length;
     if (LIKELY(state->id3))
     {
-        elapsed = id3->elapsed;
-        length = id3->length;
+        elapsed = state->id3->elapsed;
+        length = state->id3->length;
     }
     else
     {

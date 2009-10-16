@@ -19,6 +19,7 @@ FIRMINC = -I$(ROOTDIR)/firmware/include -fno-builtin
 INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(ROOTDIR)/firmware/export \
            -I$(ROOTDIR)/apps \
+           -I$(ROOTDIR)/apps/recorder \
            -I$(APPSDIR) \
            -I$(BUILDDIR) \
 

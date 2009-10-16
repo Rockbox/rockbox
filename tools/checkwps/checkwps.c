@@ -140,6 +140,18 @@ int recalc_dimension(struct dim *dst, struct dim *src)
     return 0;
 }
 
+#ifdef HAVE_ALBUMART
+int playback_claim_aa_slot(struct dim *dim)
+{
+    return 0;
+}
+
+void playback_release_aa_slot(int slot)
+{
+    return;
+}
+#endif
+
 int resize_on_load(struct bitmap *bm, bool dither,
                    struct dim *src, struct rowset *tmp_row,
                    unsigned char *buf, unsigned int len,
