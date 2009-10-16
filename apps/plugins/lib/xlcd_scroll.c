@@ -37,7 +37,10 @@ void xlcd_scroll_left(int count)
     int length, oldmode;
 
     if ((unsigned)count >= LCD_WIDTH)
+    {
+        rb->lcd_clear_display();
         return;
+    }
 
     length = (LCD_WIDTH-count)*LCD_FBHEIGHT;
 
@@ -56,7 +59,10 @@ void xlcd_scroll_right(int count)
     int length, oldmode;
 
     if ((unsigned)count >= LCD_WIDTH)
+    {
+        rb->lcd_clear_display();
         return;
+    }
 
     length = (LCD_WIDTH-count)*LCD_FBHEIGHT;
 
@@ -77,7 +83,10 @@ void xlcd_scroll_up(int count)
     fb_data *data;
 
     if ((unsigned)count >= LCD_HEIGHT)
+    {
+        rb->lcd_clear_display();
         return;
+    }
 
     length = LCD_HEIGHT - count;
     
@@ -103,7 +112,10 @@ void xlcd_scroll_down(int count)
     fb_data *data;
 
     if ((unsigned)count >= LCD_HEIGHT)
+    {
+        rb->lcd_clear_display();
         return;
+    }
 
     length = LCD_HEIGHT - count;
 
@@ -131,7 +143,10 @@ void xlcd_scroll_left(int count)
     int blockcount, blocklen;
 
     if ((unsigned) count >= LCD_WIDTH)
+    {
+        rb->lcd_clear_display();
         return;
+    }
         
 #if LCD_DEPTH == 2
     blockcount = count >> 2;
@@ -186,7 +201,10 @@ void xlcd_scroll_right(int count)
     int blockcount, blocklen;
 
     if ((unsigned) count >= LCD_WIDTH)
+    {
+        rb->lcd_clear_display();
         return;
+    }
         
 #if LCD_DEPTH == 2
     blockcount = count >> 2;
@@ -243,7 +261,10 @@ void xlcd_scroll_left(int count)
     int length, oldmode;
 
     if ((unsigned)count >= LCD_WIDTH)
+    {
+        rb->lcd_clear_display();
         return;
+    }
 
     data = rb->lcd_framebuffer;
     data_end = data + LCD_WIDTH*LCD_FBHEIGHT;
@@ -269,7 +290,10 @@ void xlcd_scroll_right(int count)
     int length, oldmode;
 
     if ((unsigned)count >= LCD_WIDTH)
+    {
+        rb->lcd_clear_display();
         return;
+    }
 
     data = rb->lcd_framebuffer;
     data_end = data + LCD_WIDTH*LCD_FBHEIGHT;
@@ -298,7 +322,10 @@ void xlcd_scroll_up(int count)
     int length, oldmode;
 
     if ((unsigned)count >= LCD_HEIGHT)
+    {
+        rb->lcd_clear_display();
         return;
+    }
 
     length = LCD_HEIGHT - count;
 
@@ -318,7 +345,10 @@ void xlcd_scroll_down(int count)
     int length, oldmode;
 
     if ((unsigned)count >= LCD_HEIGHT)
+    {
+        rb->lcd_clear_display();
         return;
+    }
 
     length = LCD_HEIGHT - count;
 
@@ -342,7 +372,10 @@ void xlcd_scroll_up(int count)
     int blockcount, blocklen;
 
     if ((unsigned) count >= LCD_HEIGHT)
+    {
+        rb->lcd_clear_display();
         return;
+    }
         
 #if (LCD_DEPTH == 1) \
  || (LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
@@ -536,7 +569,10 @@ void xlcd_scroll_down(int count)
     int blockcount, blocklen;
 
     if ((unsigned) count >= LCD_HEIGHT)
+    {
+        rb->lcd_clear_display();
         return;
+    }
         
 #if (LCD_DEPTH == 1) \
  || (LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)

@@ -37,7 +37,10 @@ void grey_scroll_left(int count)
     int length, blank;
 
     if ((unsigned)count >= (unsigned)_grey_info.width)
+    {
+        grey_clear_display();
         return;
+    }
 
     data = _grey_info.buffer;
     data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
@@ -62,7 +65,10 @@ void grey_scroll_right(int count)
     int length, blank;
 
     if ((unsigned)count >= (unsigned)_grey_info.width)
+    {
+        grey_clear_display();
         return;
+    }
 
     data = _grey_info.buffer;
     data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
@@ -86,7 +92,10 @@ void grey_scroll_up(int count)
     int blank;
 
     if ((unsigned)count >= (unsigned)_grey_info.height)
+    {
+        grey_clear_display();
         return;
+    }
 
     shift = _GREY_MULUQ(_grey_info.width, count);
     length = _GREY_MULUQ(_grey_info.width, _grey_info.height - count);
@@ -105,7 +114,10 @@ void grey_scroll_down(int count)
     int blank;
 
     if ((unsigned)count >= (unsigned)_grey_info.height)
+    {
+        grey_clear_display();
         return;
+    }
 
     shift = _GREY_MULUQ(_grey_info.width, count);
     length = _GREY_MULUQ(_grey_info.width, _grey_info.height - count);
@@ -126,7 +138,10 @@ void grey_ub_scroll_left(int count)
     int blank, length;
 
     if ((unsigned)count >= (unsigned)_grey_info.width)
+    {
+        grey_ub_clear_display();
         return;
+    }
 
     data = _grey_info.values;
     data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
@@ -156,7 +171,10 @@ void grey_ub_scroll_right(int count)
     int blank, length;
 
     if ((unsigned)count >= (unsigned)_grey_info.width)
+    {
+        grey_ub_clear_display();
         return;
+    }
 
     data = _grey_info.values;
     data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
@@ -185,7 +203,10 @@ void grey_ub_scroll_up(int count)
     int blank;
 
     if ((unsigned)count >= (unsigned)_grey_info.height)
+    {
+        grey_ub_clear_display();
         return;
+    }
 
     dst   = _grey_info.values;
     end   = dst + _GREY_MULUQ(_grey_info.height, _grey_info.width);
@@ -257,7 +278,10 @@ void grey_ub_scroll_down(int count)
     int blank;
 
     if ((unsigned)count >= (unsigned)_grey_info.height)
+    {
+        grey_ub_clear_display();
         return;
+    }
 
     start = _grey_info.values;
     dst   = start + _GREY_MULUQ(_grey_info.height, _grey_info.width);
