@@ -70,11 +70,14 @@ struct root_items {
     void* param;
     const struct menu_item_ex *context_menu;
 };
+static int next_screen = GO_TO_ROOT; /* holding info about the upcoming screen
+                                        * which is the current screen for the
+                                        * rest of the code after load_screen
+                                        * is called */
 static int last_screen = GO_TO_ROOT; /* unfortunatly needed so we can resume
                                         or goto current track based on previous
                                         screen */
                                         
-int next_screen = GO_TO_ROOT;
 
 static char current_track_path[MAX_PATH];
 static void rootmenu_track_changed_callback(void* param)
