@@ -189,8 +189,7 @@ int viewportmanager_set_statusbar(const int enabled)
             if (showing_bars(i))
                 gui_statusbar_draw(&statusbars.statusbars[i], true);
         }
-        if (!sb_skin_active())
-            add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
+        add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
     }
     else
     {
@@ -251,13 +250,14 @@ void viewportmanager_theme_changed(const int which)
     if (which & THEME_STATUSBAR)
     {
         statusbar_enabled = VP_SB_HIDE_ALL;
-        if (global_settings.statusbar != STATUSBAR_OFF)
-            statusbar_enabled = VP_SB_ONSCREEN(SCREEN_MAIN);
-#ifdef HAVE_REMOTE_LCD
-        if (global_settings.remote_statusbar != STATUSBAR_OFF)
-            statusbar_enabled |= VP_SB_ONSCREEN(SCREEN_REMOTE);
-#endif
-        if (statusbar_enabled && !sb_skin_active())
+
+        FOR_NB_SCREENS(i)
+        {
+            if (statusbar_position(i) != STATUSBAR_OFF)
+                statusbar_enabled  |= VP_SB_ONSCREEN(i);
+        }
+
+        if (statusbar_enabled != VP_SB_HIDE_ALL)
             add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
         else
             remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);

@@ -32,18 +32,9 @@ my $cppdef = $target;
 my @depthlist = ( 16, 8, 4, 2, 1 );
 
 # These parameters are filled in as we parse wpslist
-my $req_size;
-my $req_g_wps;
-my $req_t;
-my $req_t_wps;
 my $wps;
 my $wps_prefix;
-my $sb_prefix;
 my $rwps;
-my $sb;
-my $sb_w_size;
-my $rsb;
-my $rsb_w_size;
 my $width;
 my $height;
 my $font;
@@ -51,6 +42,9 @@ my $fgcolor;
 my $bgcolor;
 my $statusbar;
 my $author;
+my $req_g;
+my $req_g_wps;
+my $req_t_wps;
 my $backdrop;
 my $lineselectstart;
 my $lineselectend;
@@ -197,26 +191,12 @@ sub copywps
     my $dir;
     my @filelist;
     my $file;
-    my $__sb;
 
     if($wpslist =~ /(.*)WPSLIST/) {
         $dir = $1;
-        $__sb = $sb_prefix . "." . $req_size . ".sb";
-        print "$req_t_wps $req_g_wps $sb_prefix\n";
-        print "$dir/$__sb\n";
-
 #        system("cp $dir/$wps .rockbox/wps/");
-        # check for <name>.WIDTHxHEIGHTxDEPTH.sb
-        if (-e "$dir/$__sb") {
-            system("cp $dir/$__sb $rbdir/wps/$sb");
-        }
-        # check for <name>.WIDTHxHEIGHTxDEPTH.<model>.sb and overwrite the
-        # previous sb if needed
-        $__sb = $sb_prefix . "." . $req_size . "." . $modelname . ".sb";
-        if (-e "$dir/$__sb") {
-            system("cp $dir/$__sb $rbdir/wps/$sb");
-        }
-        
+        #print "$req_t_wps $req_g_wps\n";
+
         if (-e "$dir/$req_t_wps" ) {
           system("cp $dir/$req_t_wps $rbdir/wps/$wps");
 
@@ -230,9 +210,9 @@ sub copywps
            close(WPSFILE);
 
            if ($#filelist >= 0) {
-              if (-e "$dir/$wps_prefix/$req_size") {
+              if (-e "$dir/$wps_prefix/$req_g") {
                  foreach $file (@filelist) {
-                     system("cp $dir/$wps_prefix/$req_size/$file $rbdir/wps/$wps_prefix/");
+                     system("cp $dir/$wps_prefix/$req_g/$file $rbdir/wps/$wps_prefix/");
                  }
               }
               elsif (-e "$dir/$wps_prefix") {
@@ -255,7 +235,7 @@ sub copywps
 
 sub buildcfg {
     my $cfg = $wps;
-    my @out;    
+    my @out;
 
     $cfg =~ s/\.(r|)wps/.cfg/;
 
@@ -358,8 +338,6 @@ while(<WPS>) {
         undef $wps;
         undef $wps_prefix;
         undef $rwps;
-        undef $sb;
-        undef $rsb;
         undef $width;
         undef $height;
         undef $font;
@@ -408,24 +386,23 @@ while(<WPS>) {
             foreach my $d (@depthlist) {
                 next if ($d > $rdepth);
 
-                $req_size = $rwidth . "x" . $rheight . "x" . $d;
+                $req_g = $rwidth . "x" . $rheight . "x" . $d;
 
                 # check for model specific wps
-                $req_g_wps = $wps_prefix . "." . $req_size . "." . $modelname . ".wps";
+                $req_g_wps = $wps_prefix . "." . $req_g . "." . $modelname . ".wps";
                 last if (-e "$wpsdir/$req_g_wps");
 
-                # check for normal wps (with WIDTHxHEIGHTxDEPTH)
-                $req_g_wps = $wps_prefix . "." . $req_size . ".wps";
+                $req_g_wps = $wps_prefix . "." . $req_g . ".wps";
                 last if (-e "$wpsdir/$req_g_wps");
 
                 if ($isrwps) {
-                    $req_size = $req_size . "." . $main_width . "x" . $main_height . "x" . "$main_depth";
+                    $req_g = $req_g . "." . $main_width . "x" . $main_height . "x" . "$main_depth";
 
-                    $req_g_wps = $wps_prefix . "." . $req_size . ".wps";
+                    $req_g_wps = $wps_prefix . "." . $req_g . ".wps";
                     last if (-e "$wpsdir/$req_g_wps");
                 }
             }
-            $req_t_wps = $wps_prefix . $req_t . ".wps";
+            $req_t_wps = $wps_prefix . ".txt" . ".wps";
 
             #print "LCD: $wps wants $width x $height\n";
             #print "LCD: is $rwidth x $rheight\n";
@@ -476,19 +453,6 @@ while(<WPS>) {
         }
         elsif($l =~ /^RWPS\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $rwps = $1;
-        }
-        elsif($l =~ /^SB: *(.*)/i) {
-            $sb = $sb_prefix = $1;
-            $sb_prefix =~ s/\.(r|)sb//;
-        }
-        elsif($l =~ /^SB\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $sb = $1;
-        }
-        elsif($l =~ /^RSB: *(.*)/i) {
-            $rsb = $1;
-        }
-        elsif($l =~ /^RSB\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $rsb = $1;
         }
         elsif($l =~ /^Author: *(.*)/i) {
             $author = $1;
@@ -562,13 +526,7 @@ while(<WPS>) {
         elsif($l =~ /^ui viewport: *(.*)/i) {
             $listviewport = $1;
         }
-        elsif($l =~ /^ui viewport\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $listviewport = $1;
-        }
         elsif($l =~ /^remote ui viewport: *(.*)/i) {
-            $remotelistviewport = $1;
-        }
-        elsif($l =~ /^remote ui viewport\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $remotelistviewport = $1;
         }
         else{

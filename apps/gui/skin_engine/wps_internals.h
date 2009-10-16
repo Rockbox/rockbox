@@ -263,6 +263,7 @@ struct wps_data
     int num_tokens;
     /* tick the volume button was last pressed */
     unsigned int button_time_volume;
+
 #ifdef HAVE_LCD_BITMAP
     bool peak_meter_enabled;
     bool wps_sb_tag;
@@ -276,7 +277,6 @@ struct wps_data
     /* this must not be reset on skin loading */
     bool remote_wps;
 #endif
-    bool debug;
 };
 
 /* wps_data end */

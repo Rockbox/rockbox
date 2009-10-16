@@ -268,8 +268,6 @@ Author: Jens Arnold
 <wps>
 Name: cabbiev2.wps
 RWPS: cabbiev2.rwps
-SB: cabbiev2.sb
-RSB: cabbiev2.rsb
 # Real name of the creator of the WPS
 Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
 
@@ -354,7 +352,6 @@ Statusbar: top
 
 # list & remote ui viewports
 ui viewport: -
-ui viewport.176x220x16: 0,0,-,180,-,-,-
 remote ui viewport: -
 </wps>
 

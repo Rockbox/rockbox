@@ -78,7 +78,6 @@ gui/quickscreen.c
 #endif
 
 gui/wps.c
-gui/statusbar-skinned.c
 gui/scrollbar.c
 gui/splash.c
 gui/statusbar.c

@@ -322,7 +322,6 @@ static void init(void)
     settings_reset();
     settings_load(SETTINGS_ALL);
     gui_sync_wps_init();
-    sb_skin_init();
     settings_apply(true);
     init_dircache(true);
     init_dircache(false);

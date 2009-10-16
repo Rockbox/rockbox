@@ -60,7 +60,6 @@ struct opt_items {
 #define FONT_DIR    ROCKBOX_DIR "/fonts"
 #define LANG_DIR    ROCKBOX_DIR "/langs"
 #define WPS_DIR     ROCKBOX_DIR "/wps"
-#define SB_DIR      ROCKBOX_DIR "/statusbar"
 #define THEME_DIR   ROCKBOX_DIR "/themes"
 #define ICON_DIR    ROCKBOX_DIR "/icons"
 
@@ -549,7 +548,6 @@ struct user_settings
     int peak_meter_max; /* range maximum */
 
     unsigned char wps_file[MAX_FILENAME+1];  /* last wps */
-    unsigned char sb_file[MAX_FILENAME+1];  /* last wps */
     unsigned char lang_file[MAX_FILENAME+1]; /* last language */
     unsigned char playlist_catalog_dir[MAX_FILENAME+1];
     int skip_length; /* skip length */
