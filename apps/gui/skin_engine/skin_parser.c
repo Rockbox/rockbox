@@ -354,6 +354,7 @@ static const struct wps_tag all_tags[] = {
                                                     parse_setting_and_lang },
                                                     
     { WPS_TOKEN_LASTTOUCH,                "Tl",  WPS_REFRESH_DYNAMIC, parse_timeout },
+    { WPS_TOKEN_CURRENT_SCREEN,           "cs",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_NO_TOKEN,                       "T",   0,    parse_touchregion      },
 
     { WPS_TOKEN_UNKNOWN,                  "",    0, NULL }

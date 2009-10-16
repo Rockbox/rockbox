@@ -73,6 +73,9 @@ struct root_items {
 static int last_screen = GO_TO_ROOT; /* unfortunatly needed so we can resume
                                         or goto current track based on previous
                                         screen */
+                                        
+int next_screen = GO_TO_ROOT;
+
 static char current_track_path[MAX_PATH];
 static void rootmenu_track_changed_callback(void* param)
 {
@@ -504,10 +507,14 @@ void previous_music_is_wps(void)
     previous_music = GO_TO_WPS;
 }
 
+int current_screen(void)
+{
+    return next_screen;
+}
+
 void root_menu(void)
 {
     int previous_browser = GO_TO_FILEBROWSER;
-    int next_screen = GO_TO_ROOT;
     int selected = 0;
 
     if (global_settings.start_in_screen == 0)

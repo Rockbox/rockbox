@@ -192,6 +192,7 @@ enum wps_token_type {
 
     /* Setting option */
     WPS_TOKEN_SETTING,
+    WPS_TOKEN_CURRENT_SCREEN,
 };
 
 struct wps_token {

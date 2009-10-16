@@ -56,6 +56,10 @@
 
 #include "wps_internals.h"
 #include "wps.h"
+#include "root_menu.h"
+#ifdef HAVE_RECORDING
+#include "recording.h"
+#endif
 
 static char* get_codectype(const struct mp3entry* id3)
 {
@@ -482,16 +486,20 @@ const char *get_token_value(struct gui_wps *gwps,
                 if (status_get_ffmode() == STATUS_FASTBACKWARD)
                     mode = 5;
             }
+#ifdef HAVE_RECORDING
             /* recording */
             if (status == STATUS_RECORD)
                 mode = 6;
             else if (status == STATUS_RECORD_PAUSE)
                 mode = 7;
+#endif
+#if CONFIG_TUNER
             /* radio */
             if (status == STATUS_RADIO)
                 mode = 8;
             else if (status == STATUS_RADIO_PAUSE)
                 mode = 9;
+#endif
 
             if (intval) {
                 *intval = mode;
@@ -821,6 +829,44 @@ const char *get_token_value(struct gui_wps *gwps,
                 }
             }
             cfg_to_string(token->value.i,buf,buf_size);
+            return buf;
+        }
+        case WPS_TOKEN_CURRENT_SCREEN:
+        {
+            int curr_screen = current_screen();
+
+#ifdef HAVE_RECORDING
+            /* override current_screen() for recording screen since it may
+             * be entered from the radio screen */
+            if (in_recording_screen())
+                curr_screen = GO_TO_RECSCREEN;
+#endif
+            
+            switch (curr_screen)
+            {
+                case GO_TO_WPS:
+                    curr_screen = 2;
+                    break;
+#ifdef HAVE_RECORDING
+                case GO_TO_RECSCREEN:
+                    curr_screen = 3;
+                    break;
+#endif
+#if CONFIG_TUNER
+                case GO_TO_FM:
+                    curr_screen = 4;
+                    break;
+#endif
+                default: /* lists */
+                    curr_screen = 1;
+                    break;
+            }
+            if (intval)
+            {
+                
+                *intval = curr_screen;
+            }
+            snprintf(buf, buf_size, "%d", curr_screen);
             return buf;
         }
 
