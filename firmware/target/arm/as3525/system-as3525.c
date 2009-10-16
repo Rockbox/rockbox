@@ -338,9 +338,9 @@ void set_cpu_frequency(long frequency)
         /* Increasing frequency so boost voltage before change */
         ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_20));
 
-        /* Wait for voltage to be at least 1.20v before making fclk > 200 MHz */
-        while(adc_read(ADC_CVDD) < 480) /* 480 * .0025 = 1.20V */
-            ;
+        /* Some players run a bit low so use 1.175 volts instead of 1.20  */
+        /* Wait for voltage to be at least 1.175v before making fclk > 200 MHz */
+        while(adc_read(ADC_CVDD) < 470); /* 470 * .0025 = 1.175V */
 
         asm volatile(
             "mrc p15, 0, r0, c1, c0  \n"
