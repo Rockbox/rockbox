@@ -54,6 +54,7 @@
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
 #include "jpeg_load.h"
+#include "bmp.h"
 #endif
 
 #define GUARD_BUFSIZE   (32*1024)
@@ -843,10 +844,13 @@ static bool fill_buffer(void)
 /* Given a file descriptor to a bitmap file, write the bitmap data to the
    buffer, with a struct bitmap and the actual data immediately following.
    Return value is the total size (struct + data). */
-static int load_image(int fd, const char *path)
+static int load_image(int fd, const char *path, struct dim *dim)
 {
     int rc;
     struct bitmap *bmp = (struct bitmap *)&buffer[buf_widx];
+
+    /* get the desired image size */
+    bmp->width = dim->width, bmp->height = dim->height;
     /* FIXME: alignment may be needed for the data buffer. */
     bmp->data = &buffer[buf_widx + sizeof(struct bitmap)];
 #ifndef HAVE_JPEG
@@ -858,8 +862,6 @@ static int load_image(int fd, const char *path)
 
     int free = (int)MIN(buffer_len - BUF_USED, buffer_len - buf_widx)
                                - sizeof(struct bitmap);
-
-    get_albumart_size(bmp);
 
 #ifdef HAVE_JPEG
     int pathlen = strlen(path);
@@ -897,11 +899,19 @@ management functions for all the actual handle management work.
    filename: name of the file to open
    offset: offset at which to start buffering the file, useful when the first
            (offset-1) bytes of the file aren't needed.
+   type: one of the data types supported (audio, image, cuesheet, others
+   user_data: user data passed possibly passed in subcalls specific to a
+              data_type (only used for image (albumart) buffering so far )
    return value: <0 if the file cannot be opened, or one file already
    queued to be opened, otherwise the handle for the file in the buffer
 */
-int bufopen(const char *file, size_t offset, enum data_type type)
+int bufopen(const char *file, size_t offset, enum data_type type,
+            void *user_data)
 {
+#ifndef HAVE_ALBUMART
+    /* currently only used for aa loading */
+    (void)user_data;
+#endif
     if (type == TYPE_ID3)
     {
         /* ID3 case: allocate space, init the handle and return. */
@@ -967,7 +977,7 @@ int bufopen(const char *file, size_t offset, enum data_type type)
         /* Bitmap file: we load the data instead of the file */
         int rc;
         mutex_lock(&llist_mod_mutex); /* Lock because load_bitmap yields */
-        rc = load_image(fd, file);
+        rc = load_image(fd, file, (struct dim*)user_data);
         mutex_unlock(&llist_mod_mutex);
         if (rc <= 0)
         {

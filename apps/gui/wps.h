@@ -38,16 +38,6 @@ void display_keylock_text(bool locked);
 
 bool is_wps_fading(void);
 
-
-#ifdef HAVE_ALBUMART
-/*
- * Returns true if at least one of the gui_wps screens has an album art
- * tag in its wps structure and writes the width and height into the passed
- * pointers
- */
-bool wps_uses_albumart(int*, int*);
-#endif
-
 #ifdef IPOD_ACCESSORY_PROTOCOL
 /* return length of the current ff or rewin action, IAP needs this */
 int wps_get_ff_rewind_count(void);

@@ -1278,6 +1278,7 @@ static void statusbar_toggle_handler(void *data)
 }
 #endif
 
+
 void gui_sync_wps_init(void)
 {
     int i;
@@ -1285,6 +1286,7 @@ void gui_sync_wps_init(void)
     {
 #ifdef HAVE_ALBUMART
         wps_datas[i].albumart = NULL;
+        wps_datas[i].playback_aa_slot = -1;
 #endif
 #ifdef HAVE_REMOTE_LCD
         wps_datas[i].remote_wps = (i == SCREEN_REMOTE);
@@ -1303,26 +1305,6 @@ void gui_sync_wps_init(void)
     add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, statusbar_toggle_handler);
 #endif
 }
-
-#ifdef HAVE_ALBUMART
-bool wps_uses_albumart(int *width, int *height)
-{
-    int  i;
-    FOR_NB_SCREENS(i) {
-        struct gui_wps *gwps = &gui_wps[i];
-        struct skin_albumart *aa = gwps->data->albumart;
-        if (aa && (aa->state != WPS_ALBUMART_NONE))
-        {
-            if (width)
-                *width = aa->width;
-            if (height)
-                *height = aa->height;
-            return true;
-        }
-    }
-    return false;
-}
-#endif
 
 
 #ifdef IPOD_ACCESSORY_PROTOCOL

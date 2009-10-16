@@ -56,6 +56,10 @@
 #include "bmp.h"
 #endif
 
+#ifdef HAVE_ALBUMART
+#include "playback.h"
+#endif
+
 #include "backdrop.h"
 
 #define WPS_ERROR_INVALID_PARAM         -1
@@ -985,6 +989,8 @@ static int parse_albumart_load(const char *wps_bufptr,
 {
     const char *_pos, *newline;
     bool parsing;
+    struct dim dimensions;
+    int albumart_slot;
     struct skin_albumart *aa = skin_buffer_alloc(sizeof(struct skin_albumart));
     (void)token; /* silence warning */
     if (!aa)
@@ -1124,6 +1130,16 @@ static int parse_albumart_load(const char *wps_bufptr,
     aa->state = WPS_ALBUMART_LOAD;
     aa->draw = false;
     wps_data->albumart = aa;
+
+    dimensions.width = aa->width;
+    dimensions.height = aa->height;
+
+    albumart_slot = playback_claim_aa_slot(&dimensions);
+
+    if (albumart_slot < 0) /* didn't get a slot ? */
+        return skip_end_of_line(wps_bufptr);
+    else
+        wps_data->playback_aa_slot = albumart_slot;
 
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);
@@ -1601,6 +1617,11 @@ void skin_data_reset(struct wps_data *wps_data)
     wps_data->strings = NULL;
 #ifdef HAVE_ALBUMART
     wps_data->albumart = NULL;
+    if (wps_data->playback_aa_slot >= 0)
+    {
+        playback_release_aa_slot(wps_data->playback_aa_slot);
+        wps_data->playback_aa_slot = -1;
+    }
 #endif
     wps_data->tokens = NULL;
     wps_data->num_tokens = 0;

@@ -74,7 +74,8 @@ bool buffering_reset(char *buf, size_t buflen);
 
 #define BUF_MAX_HANDLES         256
 
-int bufopen(const char *file, size_t offset, enum data_type type);
+int bufopen(const char *file, size_t offset, enum data_type type,
+            void *user_data);
 int bufalloc(const void *src, size_t size, enum data_type type);
 bool bufclose(int handle_id);
 int bufseek(int handle_id, size_t newpos);

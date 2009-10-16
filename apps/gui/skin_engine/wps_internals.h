@@ -255,6 +255,7 @@ struct wps_data
     struct skin_token_list *strings;
 #ifdef HAVE_ALBUMART
     struct skin_albumart *albumart;
+    int    playback_aa_slot;
 #endif
     struct wps_token *tokens;
     /* Total number of tokens in the WPS. During WPS parsing, this is

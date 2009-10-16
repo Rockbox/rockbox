@@ -25,6 +25,32 @@
 #include <stdbool.h>
 #include "config.h"
 
+#ifdef HAVE_ALBUMART
+
+#include "bmp.h"
+/*
+ * Returns the handle id of the buffered albumart for the given slot id
+ **/
+int playback_current_aa_hid(int slot);
+
+/*
+ * Hands out an albumart slot for buffering albumart using the size
+ * int the passed dim struct, it copies the data of dim in order to
+ * be safe to be reused for other code
+ *
+ * The slot may be reused if other code calls this with the same dimensions
+ * in dim, so if you change dim release and claim a new slot
+ *
+ * Save to call from other threads */
+int playback_claim_aa_slot(struct dim *dim);
+
+/*
+ * Releases the albumart slot with given id
+ * 
+ * Save to call from other threads */
+void playback_release_aa_slot(int slot);
+#endif
+
 /* Functions */
 const char *get_codec_filename(int cod_spec);
 void voice_wait(void);
@@ -45,9 +71,6 @@ bool audio_restore_playback(int type); /* Restores the audio buffer to handle th
 void codec_thread_do_callback(void (*fn)(void),
                               unsigned int *codec_thread_id);
 
-#ifdef HAVE_ALBUMART
-int audio_current_aa_hid(void);
-#endif
 
 #if CONFIG_CODEC == SWCODEC /* This #ifdef is better here than gui/wps.c */
 extern void audio_next_dir(void);

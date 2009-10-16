@@ -259,7 +259,8 @@ static void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
     if (data->albumart && data->albumart->vp == vp 
 	    && data->albumart->draw)
     {
-        draw_album_art(gwps, audio_current_aa_hid(), false);
+        draw_album_art(gwps, playback_current_aa_hid(data->playback_aa_slot),
+                        false);
 		data->albumart->draw = false;
     }
 #endif
@@ -486,7 +487,8 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 #ifdef HAVE_ALBUMART
         if (data->albumart && data->tokens[i].type == WPS_TOKEN_ALBUMART_DISPLAY)
         {
-            draw_album_art(gwps, audio_current_aa_hid(), true);
+            draw_album_art(gwps,
+                    playback_current_aa_hid(data->playback_aa_slot), true);
             data->albumart->draw = false;
         }
 #endif

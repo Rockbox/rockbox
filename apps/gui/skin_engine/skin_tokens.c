@@ -368,8 +368,9 @@ const char *get_token_value(struct gui_wps *gwps,
 
 #ifdef HAVE_ALBUMART
         case WPS_TOKEN_ALBUMART_FOUND:
-            if (data->albumart && audio_current_aa_hid() >= 0) {
-                return "C";
+            if (data->albumart) {
+                if (playback_current_aa_hid(data->playback_aa_slot) >= 0)
+                    return "C";
             }
             return NULL;
             

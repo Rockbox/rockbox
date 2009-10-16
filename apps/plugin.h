@@ -789,7 +789,8 @@ struct plugin_api {
 
 #if (CONFIG_CODEC == SWCODEC)
     /* buffering API */
-    int (*bufopen)(const char *file, size_t offset, enum data_type type);
+    int (*bufopen)(const char *file, size_t offset, enum data_type type,
+                   void *user_data);
     int (*bufalloc)(const void *src, size_t size, enum data_type type);
     bool (*bufclose)(int handle_id);
     int (*bufseek)(int handle_id, size_t newpos);

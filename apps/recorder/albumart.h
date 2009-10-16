@@ -29,9 +29,11 @@
 #include "skin_engine/skin_engine.h"
 
 /* Look for albumart bitmap in the same dir as the track and in its parent dir.
+ * Calls size_func to get the dimensions to look for
  * Stores the found filename in the buf parameter.
  * Returns true if a bitmap was found, false otherwise */
-bool find_albumart(const struct mp3entry *id3, char *buf, int buflen);
+bool find_albumart(const struct mp3entry *id3, char *buf, int buflen,
+                    struct dim *dim);
 
 /* Draw the album art bitmap from the given handle ID onto the given WPS.
    Call with clear = true to clear the bitmap instead of drawing it. */

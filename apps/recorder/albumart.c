@@ -274,22 +274,18 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
 /* Look for albumart bitmap in the same dir as the track and in its parent dir.
  * Stores the found filename in the buf parameter.
  * Returns true if a bitmap was found, false otherwise */
-bool find_albumart(const struct mp3entry *id3, char *buf, int buflen)
+bool find_albumart(const struct mp3entry *id3, char *buf, int buflen,
+                    struct dim *dim)
 {
     if (!id3 || !buf)
         return false;
 
     char size_string[9];
-    int width = 0, height = 0;
-
-    if (!wps_uses_albumart(&width, &height))
-        return false;
-
     logf("Looking for album art for %s", id3->path);
 
     /* Write the size string, e.g. ".100x100". */
     snprintf(size_string, sizeof(size_string), ".%dx%d",
-             width, height);
+              dim->width, dim->height);
 
     /* First we look for a bitmap of the right size */
     if (search_albumart_files(id3, size_string, buf, buflen))
@@ -376,17 +372,4 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
     }
 }
 
-void get_albumart_size(struct bitmap *bmp)
-{
-    /* FIXME: What should we do with albumart on remote? */
-    int width, height;
-
-    if (!wps_uses_albumart(&width, &height))
-    {
-        width = 0; height = 0;
-    }
-
-    bmp->width = width;
-    bmp->height = height;
-}
 #endif /* PLUGIN */

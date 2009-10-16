@@ -64,7 +64,10 @@
 #include "icons.h"
 #include "peakmeter.h"
 #include "action.h"
+#ifdef HAVE_ALBUMART
 #include "albumart.h"
+#include "bmp.h"
+#endif
 #endif
 #include "lang.h"
 #include "misc.h"
@@ -158,6 +161,7 @@ enum filling_state {
 };
 
 #define MAX_TRACK       128
+#define MAX_MULTIPLE_AA 1
 
 #define MAX_TRACK_MASK  (MAX_TRACK-1)
 
@@ -206,7 +210,7 @@ struct track_info {
     int id3_hid;               /* The ID for the track's metadata handle */
     int codec_hid;             /* The ID for the track's codec handle */
 #ifdef HAVE_ALBUMART
-    int aa_hid;                /* The ID for the track's album art handle */
+    int aa_hid[MAX_MULTIPLE_AA];/* The ID for the track's album art handle */
 #endif
     int cuesheet_hid;          /* The ID for the track's parsed cueesheet handle */
 
@@ -214,6 +218,16 @@ struct track_info {
 
     bool taginfo_ready;        /* Is metadata read */
 };
+
+
+#ifdef HAVE_ALBUMART
+struct albumart_slot {
+    struct dim dim;     /* holds width, height of the albumart */
+    int used;           /* counter, increments if something uses it */
+} albumart_slots[MAX_MULTIPLE_AA];
+
+#define FOREACH_ALBUMART(i) for(i = 0;i < MAX_MULTIPLE_AA; i++)
+#endif
 
 static struct track_info tracks[MAX_TRACK];
 static volatile int track_ridx = 0;  /* Track being decoded (A/C-) */
@@ -367,11 +381,17 @@ static bool clear_track_info(struct track_info *track)
     }
 
 #ifdef HAVE_ALBUMART
-    if (track->aa_hid >= 0) {
-        if (bufclose(track->aa_hid))
-            track->aa_hid = -1;
-        else
-            return false;
+    {
+        int i;
+        FOREACH_ALBUMART(i)
+        {
+            if (track->aa_hid[i] >= 0) {
+                if (bufclose(track->aa_hid[i]))
+                    track->aa_hid[i] = -1;
+                else
+                    return false;
+            }   
+        }
     }
 #endif
 
@@ -538,18 +558,6 @@ void audio_remove_encoder(void)
 
 #endif /* HAVE_RECORDING */
 
-#ifdef HAVE_ALBUMART
-int audio_current_aa_hid(void)
-{
-    int cur_idx;
-    int offset = ci.new_track + wps_offset;
-
-    cur_idx = track_ridx + offset;
-    cur_idx &= MAX_TRACK_MASK;
-
-    return tracks[cur_idx].aa_hid;
-}
-#endif
 
 struct mp3entry* audio_current_track(void)
 {
@@ -673,6 +681,58 @@ struct mp3entry* audio_next_track(void)
     return NULL;
 }
 
+#ifdef HAVE_ALBUMART
+int playback_current_aa_hid(int slot)
+{
+    if (slot < 0)
+        return -1;
+    int cur_idx;
+    int offset = ci.new_track + wps_offset;
+
+    cur_idx = track_ridx + offset;
+    cur_idx &= MAX_TRACK_MASK;
+
+    return tracks[cur_idx].aa_hid[slot];
+}
+
+int playback_claim_aa_slot(struct dim *dim)
+{
+    int i;
+    /* first try to find a slot already having the size to reuse it
+     * since we don't want albumart of the same size buffered multiple times */
+    FOREACH_ALBUMART(i)
+    {
+        struct albumart_slot *slot = &albumart_slots[i];
+        if (slot->dim.width == dim->width
+                && slot->dim.height == dim->height)
+        {
+            slot->used++;
+            return i;
+        }
+    }
+    /* size is new, find a free slot */
+    FOREACH_ALBUMART(i)
+    {
+        if (!albumart_slots[i].used)
+        {
+            albumart_slots[i].used++;
+            albumart_slots[i].dim = *dim;
+            return i;
+        }
+    }
+    /* sorry, no free slot */
+    return -1;
+}
+
+void playback_release_aa_slot(int slot)
+{
+    /* invalidate the albumart_slot */
+    struct albumart_slot *aa_slot = &albumart_slots[slot];
+    if (aa_slot->used > 0)
+        aa_slot->used--;
+}
+
+#endif
 void audio_play(long offset)
 {
     logf("audio_play");
@@ -1671,7 +1731,7 @@ static bool audio_loadcodec(bool start_play)
 
     codec_get_full_path(codec_path, codec_fn);
 
-    tracks[track_widx].codec_hid = bufopen(codec_path, 0, TYPE_CODEC);
+    tracks[track_widx].codec_hid = bufopen(codec_path, 0, TYPE_CODEC, NULL);
     if (tracks[track_widx].codec_hid < 0)
         return false;
 
@@ -1757,7 +1817,7 @@ static bool audio_load_track(size_t offset, bool start_play)
     /* Get track metadata if we don't already have it. */
     if (tracks[track_widx].id3_hid < 0)
     {
-        tracks[track_widx].id3_hid = bufopen(trackname, 0, TYPE_ID3);
+        tracks[track_widx].id3_hid = bufopen(trackname, 0, TYPE_ID3, NULL);
 
         if (tracks[track_widx].id3_hid < 0)
         {
@@ -1859,26 +1919,37 @@ static void audio_finish_load_track(void)
         }
     }
 #ifdef HAVE_ALBUMART
-    if (tracks[track_widx].aa_hid < 0)
     {
+        int i;
         char aa_path[MAX_PATH];
-        /* find_albumart will error out if the wps doesn't have AA */
-        if (find_albumart(track_id3, aa_path, sizeof(aa_path)))
+        FOREACH_ALBUMART(i)
         {
-            tracks[track_widx].aa_hid = bufopen(aa_path, 0, TYPE_BITMAP);
+            /* albumart_slots may change during a yield of bufopen,
+             * but that's no problem */
+            if (tracks[track_widx].aa_hid[i] >= 0 || !albumart_slots[i].used)
+                continue;
+            /* find_albumart will error out if the wps doesn't have AA */
+            if (find_albumart(track_id3, aa_path, sizeof(aa_path),
+                               &(albumart_slots[i].dim)))
+            {
+                int aa_hid = bufopen(aa_path, 0, TYPE_BITMAP,
+                                                &(albumart_slots[i].dim));
 
-            if(tracks[track_widx].aa_hid == ERR_BUFFER_FULL)
-            {
-                filling = STATE_FULL;
-                logf("buffer is full for now");
-                return;  /* No space for track's album art, not an error */
-            }
-            else if (tracks[track_widx].aa_hid < 0)
-            {
-                /* another error, ignore AlbumArt */
-                logf("Album art loading failed");
+                if(aa_hid == ERR_BUFFER_FULL)
+                {
+                    filling = STATE_FULL;
+                    logf("buffer is full for now");
+                    return;  /* No space for track's album art, not an error */
+                }
+                else if (aa_hid < 0)
+                {
+                    /* another error, ignore AlbumArt */
+                    logf("Album art loading failed");
+                }
+                tracks[track_widx].aa_hid[i] = aa_hid;
             }
         }
+        
     }
 #endif
 
@@ -1954,7 +2025,8 @@ static void audio_finish_load_track(void)
     else
         file_offset = 0;
 
-    tracks[track_widx].audio_hid = bufopen(track_id3->path, file_offset, type);
+    tracks[track_widx].audio_hid = bufopen(track_id3->path, file_offset, type,
+                                            NULL);
 
     /* No space left, not an error */
     if (tracks[track_widx].audio_hid == ERR_BUFFER_FULL)
@@ -2558,7 +2630,6 @@ static void audio_thread(void)
                 LOGFQUEUE("audio < Q_AUDIO_TRACK_CHANGED");
                 audio_finalise_track_change();
                 break;
-
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED:
                 LOGFQUEUE("audio < SYS_USB_CONNECTED");
@@ -2681,11 +2752,18 @@ void audio_init(void)
         tracks[i].audio_hid = -1;
         tracks[i].id3_hid = -1;
         tracks[i].codec_hid = -1;
-#ifdef HAVE_ALBUMART
-        tracks[i].aa_hid = -1;
-#endif
         tracks[i].cuesheet_hid = -1;
     }
+#ifdef HAVE_ALBUMART
+    FOREACH_ALBUMART(i)
+    {
+        int j;
+        for (j = 0; j < MAX_TRACK; j++)
+        {
+            tracks[j].aa_hid[i] = -1;
+        }
+    }
+#endif
 
     add_event(BUFFER_EVENT_REBUFFER, false, buffering_handle_rebuffer_callback);
     add_event(BUFFER_EVENT_FINISHED, false, buffering_handle_finished_callback);
