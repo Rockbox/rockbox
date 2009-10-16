@@ -145,6 +145,7 @@ static void draw_progressbar(struct gui_wps *gwps,
     struct screen *display = gwps->display;
     struct wps_state *state = gwps->state;
     struct progressbar *pb = wps_vp->pb;
+    struct mp3entry *id3 = state->id3;
     int y = pb->y;
 
     if (y < 0)
@@ -156,27 +157,37 @@ static void draw_progressbar(struct gui_wps *gwps,
         y = (-y -1)*line_height + (0 > center ? 0 : center);
     }
 
+    int elapsed, length;
+    if (id3)
+    {
+        elapsed = id3->elapsed;
+        length = id3->length;
+    }
+    else
+    {
+        elapsed = 0;
+        length = 0;
+    }
+    
     if (pb->have_bitmap_pb)
         gui_bitmap_scrollbar_draw(display, pb->bm,
-                                  pb->x, y, pb->width, pb->bm.height,
-                                  state->id3->length ? state->id3->length : 1, 0,
-                                  state->id3->length ? state->id3->elapsed
-                                          + state->ff_rewind_count : 0,
-                                          HORIZONTAL);
+                                pb->x, y, pb->width, pb->bm.height,
+                                length ? length : 1, 0,
+                                length ? elapsed + state->ff_rewind_count : 0,
+                                HORIZONTAL);
     else
         gui_scrollbar_draw(display, pb->x, y, pb->width, pb->height,
-                           state->id3->length ? state->id3->length : 1, 0,
-                           state->id3->length ? state->id3->elapsed
-                                   + state->ff_rewind_count : 0,
-                                   HORIZONTAL);
+                           length ? length : 1, 0,
+                           length ? elapsed + state->ff_rewind_count : 0,
+                           HORIZONTAL);
 #ifdef AB_REPEAT_ENABLE
-    if ( ab_repeat_mode_enabled() && state->id3->length != 0 )
-        ab_draw_markers(display, state->id3->length,
+    if ( ab_repeat_mode_enabled() && length != 0 )
+        ab_draw_markers(display, length,
                         pb->x, pb->x + pb->width, y, pb->height);
 #endif
 
-    if (state->id3->cuesheet)
-        cue_draw_markers(display, state->id3->cuesheet, state->id3->length,
+    if (id3 && id3->cuesheet)
+        cue_draw_markers(display, state->id3->cuesheet, length,
                          pb->x, pb->x + pb->width, y+1, pb->height-2);
 }
 
@@ -266,12 +277,20 @@ static bool draw_player_progress(struct gui_wps *gwps)
     int pos = 0;
     int i;
 
-    if (!state->id3)
-        return false;
+    int elapsed, length;
+    if (LIKELY(state->id3))
+    {
+        elapsed = state->id3->elapsed;
+        length = state->id3->length;
+    }
+    else
+    {
+        elapsed = 0;
+        length = 0;
+    }
 
-    if (state->id3->length)
-        pos = 36 * (state->id3->elapsed + state->ff_rewind_count)
-              / state->id3->length;
+    if (length)
+        pos = 36 * (elapsed + state->ff_rewind_count) / length;
 
     for (i = 0; i < 7; i++, pos -= 5)
     {
@@ -314,12 +333,24 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
     int digit, i, j;
     bool softchar;
 
-    if (!state->id3 || buf_size < 34) /* worst case: 11x UTF-8 char + \0 */
+    int elapsed, length;
+    if (LIKELY(state->id3))
+    {
+        elapsed = id3->elapsed;
+        length = id3->length;
+    }
+    else
+    {
+        elapsed = 0;
+        length = 0;
+    }
+
+    if (buf_size < 34) /* worst case: 11x UTF-8 char + \0 */
         return;
 
-    time = state->id3->elapsed + state->ff_rewind_count;
-    if (state->id3->length)
-        pos = 55 * time / state->id3->length;
+    time = elapsed + state->ff_rewind_count;
+    if (length)
+        pos = 55 * time / length;
 
     memset(timestr, 0, sizeof(timestr));
     format_time(timestr, sizeof(timestr)-2, time);
@@ -879,14 +910,8 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 {
     struct wps_data *data = gwps->data;
     struct screen *display = gwps->display;
-    struct wps_state *state = gwps->state;
 
-    if (!data || !state || !display)
-        return false;
-
-    struct mp3entry *id3 = state->id3;
-
-    if (!id3)
+    if (!data || !display || !gwps->state)
         return false;
 
     unsigned flags;
