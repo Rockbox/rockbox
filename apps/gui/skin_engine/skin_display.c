@@ -168,7 +168,7 @@ static void draw_progressbar(struct gui_wps *gwps,
         elapsed = 0;
         length = 0;
     }
-    
+
     if (pb->have_bitmap_pb)
         gui_bitmap_scrollbar_draw(display, pb->bm,
                                 pb->x, y, pb->width, pb->bm.height,
@@ -482,7 +482,12 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 #ifdef HAVE_LCD_BITMAP
         /* clear all pictures in the conditional and nested ones */
         if (data->tokens[i].type == WPS_TOKEN_IMAGE_PRELOAD_DISPLAY)
-            clear_image_pos(gwps, find_image(data->tokens[i].value.i&0xFF, gwps->data));
+        {
+            struct gui_img *tmp = find_image(data->tokens[i].value.i&0xFF,
+                                                data);
+            if (tmp)
+                clear_image_pos(gwps, tmp);
+        }
 #endif
 #ifdef HAVE_ALBUMART
         if (data->albumart && data->tokens[i].type == WPS_TOKEN_ALBUMART_DISPLAY)
@@ -499,17 +504,35 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 #ifdef HAVE_LCD_BITMAP
 struct gui_img* find_image(char label, struct wps_data *data)
 {
+    static int i = 0;
+    struct gui_img *ret = NULL;
     struct skin_token_list *list = data->images;
+    if (data->debug)
+    {
+        DEBUGF("%s >> requesting image (id: %d)\n", __func__, n);
+        DEBUGF("%s >> first list data (p: %p\n", __func__, data->images);
+    }
     while (list)
     {
         struct gui_img *img = (struct gui_img *)list->token->value.data;
         if (img->label == label)
-            return img;
+        {
+            i = 0;
+            ret = img; goto end;
+        }
         list = list->next;
+/*
+        if (!list && data->debug)
+            DEBUGF("failed to find: %s\n", img->bm.data);
+*/
     }
-    return NULL;
-}
-#endif
+    i = 0;
+end:
+    if (data->debug)
+    DEBUGF("%s >> returning %p\n", __func__, ret);
+    return ret;
+}   
+#endif 
 
 struct skin_viewport* find_viewport(char label, struct wps_data *data)
 {
@@ -523,7 +546,6 @@ struct skin_viewport* find_viewport(char label, struct wps_data *data)
     }
     return NULL;
 }
-
 
 /* Read a (sub)line to the given alignment format buffer.
    linebuf is the buffer where the data is actually stored.

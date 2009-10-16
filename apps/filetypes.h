@@ -41,6 +41,8 @@
 #define FILE_ATTR_KBD   0x0C00 /* keyboard file */
 #define FILE_ATTR_FMR   0x0D00 /* preset file */
 #define FILE_ATTR_CUE   0x0E00 /* cuesheet file */
+#define FILE_ATTR_SB    0x0F00 /* cuesheet file */
+#define FILE_ATTR_RSB   0x1000 /* cuesheet file */
 #define FILE_ATTR_MASK  0xFF00 /* which bits tree.c uses for file types */
 
 struct filetype {

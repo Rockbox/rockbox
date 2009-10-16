@@ -740,6 +740,7 @@ void settings_apply_skins(void)
     char buf[MAX_PATH];
     /* re-initialize the skin buffer before we start reloading skins */
     skin_buffer_init();
+    sb_skin_data_init(SCREEN_MAIN);
     if ( global_settings.wps_file[0] &&
         global_settings.wps_file[0] != 0xff )
     {
@@ -750,6 +751,17 @@ void settings_apply_skins(void)
     else
     {
         wps_data_load(SCREEN_MAIN, NULL, true);
+    }
+    if ( global_settings.sb_file[0] &&
+        global_settings.sb_file[0] != 0xff ) {
+        snprintf(buf, sizeof buf, WPS_DIR "/%s.sb",
+                global_settings.sb_file);
+        sb_skin_data_load(SCREEN_MAIN, buf, true);
+    }
+    else
+    {
+        sb_skin_data_init(SCREEN_MAIN);
+        sb_skin_data_load(SCREEN_MAIN, NULL, true);
     }
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
     if ( global_settings.rwps_file[0])

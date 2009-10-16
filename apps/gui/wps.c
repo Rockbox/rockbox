@@ -131,6 +131,7 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
 
     loaded_ok = buf && skin_data_load(gui_wps[screen].data,
                                         &screens[screen], buf, isfile);
+    DEBUGF("%s >> wps loading\n", __func__);
     if (!loaded_ok) /* load the hardcoded default */
     {
         char *skin_buf[NB_SCREENS] = {
@@ -1291,6 +1292,7 @@ void gui_sync_wps_init(void)
 #ifdef HAVE_REMOTE_LCD
         wps_datas[i].remote_wps = (i == SCREEN_REMOTE);
 #endif
+        wps_datas[i].debug = false;
         gui_wps[i].data = &wps_datas[i];
         gui_wps[i].display = &screens[i];
         /* Currently no seperate wps_state needed/possible

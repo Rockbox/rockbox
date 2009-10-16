@@ -1440,6 +1440,8 @@ const struct settings_list settings[] = {
 #endif
     TEXT_SETTING(F_THEMESETTING,wps_file, "wps",
                      DEFAULT_WPSNAME, WPS_DIR "/", ".wps"),
+    TEXT_SETTING(F_THEMESETTING,sb_file, "sb",
+                     DEFAULT_WPSNAME, WPS_DIR "/", ".sb"),
     TEXT_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng"),
 #ifdef HAVE_REMOTE_LCD
     TEXT_SETTING(F_THEMESETTING,rwps_file,"rwps",

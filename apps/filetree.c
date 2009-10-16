@@ -477,7 +477,22 @@ int ft_enter(struct tree_context* c)
                 break;
 #endif
 
-
+#ifdef HAVE_LCD_BITMAP
+            case FILE_ATTR_SB:
+                splash(0, ID2P(LANG_WAIT));
+                set_file(buf, (char *)global_settings.sb_file,
+                         MAX_FILENAME);
+                settings_apply_skins();
+                break;
+#endif
+#ifdef HAVE_REMOTE_LCD
+            case FILE_ATTR_RSB:
+                splash(0, ID2P(LANG_WAIT));
+                set_file(buf, (char *)global_settings.rsb_file,
+                         MAX_FILENAME);
+                settings_apply_skins();
+                break;
+#endif
                 /* wps config file */
             case FILE_ATTR_WPS:
                 splash(0, ID2P(LANG_WAIT));

@@ -603,6 +603,8 @@ static int parse_image_load(const char *wps_bufptr,
 	    return WPS_ERROR_INVALID_PARAM;
     /* save a pointer to the filename */
     img->bm.data = (char*)filename;
+    if (wps_data->debug)
+        DEBUGF("%s >> image parsed (label: %c)\n", __func__, *id);
     img->label = *id;
     img->x = x;
     img->y = y;
@@ -1639,8 +1641,13 @@ void skin_data_reset(struct wps_data *wps_data)
         wps_data->wps_progress_pat[i] = 0;
     }
     wps_data->full_line_progressbar = false;
+
+#ifdef HAVE_REMOTE_LCD
+    data->remote_wps = rwps;
 #endif
     wps_data->wps_loaded = false;
+    if (wps_data->debug)
+        DEBUGF("%s >> wps_data trashed (%p)\n", __func__, data);
 }
 
 #ifdef HAVE_LCD_BITMAP

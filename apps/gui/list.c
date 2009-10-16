@@ -29,6 +29,7 @@
 #include "kernel.h"
 #include "system.h"
 
+#include "appevents.h"
 #include "action.h"
 #include "screen_access.h"
 #include "list.h"
