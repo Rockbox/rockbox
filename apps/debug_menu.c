@@ -2373,6 +2373,20 @@ static bool dbg_save_roms(void)
 
     return false;
 }
+#elif CONFIG_CPU == IMX31L
+static bool dbg_save_roms(void)
+{
+    int fd;
+
+    fd = creat("/flash_rom_A0000000-A01FFFFF.bin");
+    if (fd >= 0)
+    {
+        write(fd, (void*)0xa0000000, FLASH_SIZE);
+        close(fd);
+    }
+
+    return false;
+}
 #endif /* CPU */
 
 #ifndef SIMULATOR
@@ -2709,7 +2723,8 @@ struct the_menu_item {
 };
 static const struct the_menu_item menuitems[] = {
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
-    (defined(CPU_PP) && !(CONFIG_STORAGE & STORAGE_SD))
+    (defined(CPU_PP) && !(CONFIG_STORAGE & STORAGE_SD)) || \
+    CONFIG_CPU == IMX31L
         { "Dump ROM contents", dbg_save_roms },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) \

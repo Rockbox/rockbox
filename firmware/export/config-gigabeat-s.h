@@ -162,7 +162,7 @@
 #define HAVE_POWEROFF_WHILE_CHARGING
 
 /* The size of the flash ROM */
-#define FLASH_SIZE 0x400000
+#define FLASH_SIZE 0x200000
 
 /* Define this to the CPU frequency */
 /* TODO */
