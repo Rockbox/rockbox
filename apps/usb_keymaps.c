@@ -45,94 +45,66 @@ typedef struct
 typedef struct
 {
     int lang_name;
+    int context;
     usage_page_t usage_page;
     mapping_t mapping[];
 } hid_key_mapping_t;
 
 static const hid_key_mapping_t hid_key_mapping_multimedia = {
     LANG_MULTIMEDIA_MODE,
+    CONTEXT_USB_HID_MODE_MULTIMEDIA,
     HID_USAGE_PAGE_CONSUMER,
     {
-        /* Volume up */
-        { ACTION_USB_HID_DEC,    HID_CONSUMER_USAGE_VOLUME_DECREMENT },
-        /* Volume down */
-        { ACTION_USB_HID_INC,    HID_CONSUMER_USAGE_VOLUME_INCREMENT },
-        /* Volume mute */
-        { ACTION_USB_HID_SELECT, HID_CONSUMER_USAGE_MUTE },
-        /* Playback play / pause */
-        { ACTION_USB_HID_START,  HID_CONSUMER_USAGE_PLAY_PAUSE },
-        /* Playback stop */
-        { ACTION_USB_HID_QUIT,   HID_CONSUMER_USAGE_STOP },
-        /* Scan previous track */
-        { ACTION_USB_HID_LEFT,   HID_CONSUMER_USAGE_SCAN_PREVIOUS_TRACK },
-        /* Scan next track */
-        { ACTION_USB_HID_RIGHT,  HID_CONSUMER_USAGE_SCAN_NEXT_TRACK },
+        { ACTION_USB_HID_MULTIMEDIA_VOLUME_UP,           HID_CONSUMER_USAGE_VOLUME_INCREMENT },
+        { ACTION_USB_HID_MULTIMEDIA_VOLUME_DOWN,         HID_CONSUMER_USAGE_VOLUME_DECREMENT },
+        { ACTION_USB_HID_MULTIMEDIA_VOLUME_MUTE,         HID_CONSUMER_USAGE_MUTE },
+        { ACTION_USB_HID_MULTIMEDIA_PLAYBACK_PLAY_PAUSE, HID_CONSUMER_USAGE_PLAY_PAUSE },
+        { ACTION_USB_HID_MULTIMEDIA_PLAYBACK_STOP,       HID_CONSUMER_USAGE_STOP },
+        { ACTION_USB_HID_MULTIMEDIA_PLAYBACK_TRACK_PREV, HID_CONSUMER_USAGE_SCAN_PREVIOUS_TRACK },
+        { ACTION_USB_HID_MULTIMEDIA_PLAYBACK_TRACK_NEXT, HID_CONSUMER_USAGE_SCAN_NEXT_TRACK },
         { 0,                     0 },
     }
 };
 
 static const hid_key_mapping_t hid_key_mapping_presentation = {
     LANG_PRESENTATION_MODE,
+    CONTEXT_USB_HID_MODE_PRESENTATION,
     HID_USAGE_PAGE_KEYBOARD_KEYPAD,
     {
-        /* Slideshow start */
-        { ACTION_USB_HID_START,       HID_KEYBOARD_F5 },
-        /* Slideshow leave */
-        { ACTION_USB_HID_QUIT,        HID_KEYBOARD_ESCAPE },
-        /* Slide previous */
-        { ACTION_USB_HID_LEFT,        HID_KEYBOARD_P },
-        /* Slide next */
-        { ACTION_USB_HID_RIGHT,       HID_KEYBOARD_N },
-        /* Slide first */
-        { ACTION_USB_HID_LEFT_LONG,   HID_KEYBOARD_HOME },
-        /* Slide last */
-        { ACTION_USB_HID_RIGHT_LONG,  HID_KEYBOARD_END },
-        /* Screen black */
-        { ACTION_USB_HID_MENU,        HID_KEYBOARD_DOT },
-        /* Screen white*/
-        { ACTION_USB_HID_MENU_LONG,   HID_KEYBOARD_COMMA },
-        /* Link previous */
-        { ACTION_USB_HID_DEC,         SHIFT(HID_KEYBOARD_TAB) },
-        /* Link next */
-        { ACTION_USB_HID_INC,         HID_KEYBOARD_TAB },
-        /* Mouse click */
-        { ACTION_USB_HID_SELECT,      HID_KEYBOARD_RETURN },
-        /* Mouse over */
-        { ACTION_USB_HID_SELECT_LONG, SHIFT(HID_KEYBOARD_RETURN) },
+        { ACTION_USB_HID_PRESENTATION_SLIDESHOW_START, HID_KEYBOARD_F5 },
+        { ACTION_USB_HID_PRESENTATION_SLIDESHOW_LEAVE, HID_KEYBOARD_ESCAPE },
+        { ACTION_USB_HID_PRESENTATION_SLIDE_PREV,      HID_KEYBOARD_P },
+        { ACTION_USB_HID_PRESENTATION_SLIDE_NEXT,      HID_KEYBOARD_N },
+        { ACTION_USB_HID_PRESENTATION_SLIDE_FIRST,     HID_KEYBOARD_HOME },
+        { ACTION_USB_HID_PRESENTATION_SLIDE_LAST,      HID_KEYBOARD_END },
+        { ACTION_USB_HID_PRESENTATION_SCREEN_BLACK,    HID_KEYBOARD_DOT },
+        { ACTION_USB_HID_PRESENTATION_SCREEN_WHITE,    HID_KEYBOARD_COMMA },
+        { ACTION_USB_HID_PRESENTATION_LINK_PREV,       SHIFT(HID_KEYBOARD_TAB) },
+        { ACTION_USB_HID_PRESENTATION_LINK_NEXT,       HID_KEYBOARD_TAB },
+        { ACTION_USB_HID_PRESENTATION_MOUSE_CLICK,     HID_KEYBOARD_RETURN },
+        { ACTION_USB_HID_PRESENTATION_MOUSE_OVER,      SHIFT(HID_KEYBOARD_RETURN) },
         { 0,                          0 },
     }
 };
 
 static const hid_key_mapping_t hid_key_mapping_browser = {
     LANG_BROWSER_MODE,
+    CONTEXT_USB_HID_MODE_BROWSER,
     HID_USAGE_PAGE_KEYBOARD_KEYPAD,
     {
-        /* Scroll up */
-        { ACTION_USB_HID_DEC,         HID_KEYBOARD_UP_ARROW },
-        /* Scroll down */
-        { ACTION_USB_HID_INC,         HID_KEYBOARD_DOWN_ARROW },
-        /* Scroll page up */
-        { ACTION_USB_HID_START,       HID_KEYBOARD_PAGE_UP },
-        /* Scroll page down */
-        { ACTION_USB_HID_MENU,        HID_KEYBOARD_PAGE_DOWN },
-        /* Zoom in */
-        { ACTION_USB_HID_START_LONG,  CTRL(HID_KEYPAD_PLUS) },
-        /* Zoom out */
-        { ACTION_USB_HID_MENU_LONG,   CTRL(HID_KEYPAD_MINUS) },
-        /* Zoom reset */
-        { ACTION_USB_HID_SELECT_LONG, CTRL(HID_KEYPAD_0_AND_INSERT) },
-        /* Tab previous */
-        { ACTION_USB_HID_LEFT,        CTRL(HID_KEYBOARD_PAGE_UP) },
-        /* Tab next */
-        { ACTION_USB_HID_RIGHT,       CTRL(HID_KEYBOARD_PAGE_DOWN) },
-        /* Tab close */
-        { ACTION_USB_HID_QUIT_LONG,   CTRL(HID_KEYBOARD_W) },
-        /* History back */
-        { ACTION_USB_HID_LEFT_LONG,   ALT(HID_KEYBOARD_LEFT_ARROW) },
-        /* History forward */
-        { ACTION_USB_HID_RIGHT_LONG,  ALT(HID_KEYBOARD_RIGHT_ARROW) },
-        /* View full-screen */
-        { ACTION_USB_HID_SELECT,      HID_KEYBOARD_F11 },
+        { ACTION_USB_HID_BROWSER_SCROLL_UP,        HID_KEYBOARD_UP_ARROW },
+        { ACTION_USB_HID_BROWSER_SCROLL_DOWN,      HID_KEYBOARD_DOWN_ARROW },
+        { ACTION_USB_HID_BROWSER_SCROLL_UP,        HID_KEYBOARD_PAGE_UP },
+        { ACTION_USB_HID_BROWSER_SCROLL_DOWN,      HID_KEYBOARD_PAGE_DOWN },
+        { ACTION_USB_HID_BROWSER_ZOOM_IN,          CTRL(HID_KEYPAD_PLUS) },
+        { ACTION_USB_HID_BROWSER_ZOOM_OUT,         CTRL(HID_KEYPAD_MINUS) },
+        { ACTION_USB_HID_BROWSER_ZOOM_RESET,       CTRL(HID_KEYPAD_0_AND_INSERT) },
+        { ACTION_USB_HID_BROWSER_TAB_PREV,         CTRL(HID_KEYBOARD_PAGE_UP) },
+        { ACTION_USB_HID_BROWSER_TAB_NEXT,         CTRL(HID_KEYBOARD_PAGE_DOWN) },
+        { ACTION_USB_HID_BROWSER_TAB_CLOSE,        CTRL(HID_KEYBOARD_W) },
+        { ACTION_USB_HID_BROWSER_HISTORY_BACK,     ALT(HID_KEYBOARD_LEFT_ARROW) },
+        { ACTION_USB_HID_BROWSER_HISTORY_FORWARD,  ALT(HID_KEYBOARD_RIGHT_ARROW) },
+        { ACTION_USB_HID_BROWSER_VIEW_FULL_SCREEN, HID_KEYBOARD_F11 },
         { 0,                          0 },
     }
 };
@@ -140,6 +112,7 @@ static const hid_key_mapping_t hid_key_mapping_browser = {
 #ifdef HAVE_USB_HID_MOUSE
 static const hid_key_mapping_t hid_key_mapping_mouse = {
     LANG_MOUSE_MODE,
+    CONTEXT_USB_HID_MODE_MOUSE,
     HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS,
     {
         /* Cursor move up */
@@ -201,21 +174,19 @@ extern int usb_keypad_mode;
 
 int get_hid_usb_action(void)
 {
-    int action, context = CONTEXT_USB_HID;
+    int action;
+    const hid_key_mapping_t *key_mapping = hid_key_mappings[usb_keypad_mode];
 
-#ifdef HAVE_USB_HID_MOUSE
-    if (usb_keypad_mode == USB_KEYPAD_MODE_MOUSE)
-        context = CONTEXT_USB_HID_MOUSE;
-#endif
-
-    action = get_action(context, HZ/4);
+    action = get_action(key_mapping->context, HZ/4);
     /* Skip key mappings in a cyclic way */
-    if (action == ACTION_USB_HID_MODE)
+    if (action == ACTION_USB_HID_MODE_SWITCH_NEXT)
     {
+        /* TODO: Use clamp_value_wrap() */
         usb_keypad_mode = (usb_keypad_mode + 1) % NUM_KEY_MAPPINGS;
     }
-    else if (action == ACTION_USB_HID_MODE_LONG)
+    else if (action == ACTION_USB_HID_MODE_SWITCH_PREV)
     {
+        /* TODO: Use clamp_value_wrap() */
         usb_keypad_mode = (usb_keypad_mode - 1) % NUM_KEY_MAPPINGS;
     }
     else if (action > ACTION_USB_HID_FIRST && action < ACTION_USB_HID_LAST)

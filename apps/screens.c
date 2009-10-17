@@ -115,8 +115,8 @@ static int handle_usb_events(void)
             button = get_hid_usb_action();
 
             /* On mode change, we need to refresh the screen */
-            if (button == ACTION_USB_HID_MODE ||
-                    button == ACTION_USB_HID_MODE_LONG)
+            if (button == ACTION_USB_HID_MODE_SWITCH_NEXT ||
+                    button == ACTION_USB_HID_MODE_SWITCH_PREV)
             {
                 break;
             }
