@@ -123,7 +123,7 @@
 #endif
 
 /* wrapper function to format a string and print it */
-static void debug_printf(int y, const unsigned char *fmt, ...)
+void debug_printf(int y, const unsigned char *fmt, ...)
 {
     va_list ap;
     char buf[128];
@@ -2456,7 +2456,7 @@ static bool dbg_scrollwheel(void)
 
         /* show effective accelerated scrollspeed */
         speed = button_apply_acceleration( (1<<31)|(1<<24)|wheel_velocity);
-        debug_printf(6 "accel. speed: %4d", speed);
+        debug_printf(6, "accel. speed: %4d", speed);
 
         lcd_update();
     }
