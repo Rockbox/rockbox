@@ -37,7 +37,6 @@ bool __dbg_hw_info(void)
 
 bool __dbg_ports(void)
 {
-    char buf[50];
     int line;
 
     lcd_clear_display();
@@ -53,7 +52,7 @@ bool __dbg_ports(void)
         lcd_putsf(0, line++, "GPAUP:  %08lx GPBUP:  %08lx", 0ul, GPBUP);
         lcd_putsf(0, line++, "GPCCON: %08lx GPDCON: %08lx", GPCCON, GPDCON);
         lcd_putsf(0, line++, "GPCDAT: %08lx GPDDAT: %08lx", GPCDAT, GPDDAT);
-        lcd_putsf(0, line++, "GPCUP:  %08lx GPDUP:  %08lx", GPCUP, GPDUP)
+        lcd_putsf(0, line++, "GPCUP:  %08lx GPDUP:  %08lx", GPCUP, GPDUP);
 
         lcd_putsf(0, line++, "GPCCON: %08lx GPDCON: %08lx", GPCCON, GPDCON);
         lcd_putsf(0, line++, "GPCDAT: %08lx GPDDAT: %08lx", GPCDAT, GPDDAT);
