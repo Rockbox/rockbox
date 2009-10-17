@@ -182,6 +182,7 @@ struct screen screens[NB_SCREENS] =
 
         .putsxy=&lcd_putsxy,
         .puts=&lcd_puts,
+        .putsf=&lcd_putsf,
         .puts_offset=&lcd_puts_offset,
         .puts_scroll=&lcd_puts_scroll,
         .puts_scroll_offset=&lcd_puts_scroll_offset,
@@ -267,6 +268,7 @@ struct screen screens[NB_SCREENS] =
 #endif /* 0 */
         .putsxy=&lcd_remote_putsxy,
         .puts=&lcd_remote_puts,
+        .putsf=&lcd_remote_putsf,
         .puts_offset=&lcd_remote_puts_offset,
         .puts_scroll=&lcd_remote_puts_scroll,
         .puts_scroll_offset=&lcd_remote_puts_scroll_offset,

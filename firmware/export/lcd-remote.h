@@ -121,6 +121,7 @@ extern void lcd_remote_set_viewport(struct viewport* vp);
 extern void lcd_remote_clear_display(void);
 extern void lcd_remote_clear_viewport(void);
 extern void lcd_remote_puts(int x, int y, const unsigned char *str);
+extern void lcd_remote_putsf(int x, int y, const unsigned char *fmt, ...);
 extern void lcd_remote_puts_style(int x, int y, const unsigned char *str,
                                   int style);
 extern void lcd_remote_puts_offset(int x, int y, const unsigned char *str,

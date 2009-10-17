@@ -27,6 +27,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "stdarg.h"
+#include "sprintf.h"
+
 #ifndef LCDFN /* Not compiling for remote - define macros for main LCD. */
 #define LCDFN(fn) lcd_ ## fn
 #define FBFN(fn)  fb_ ## fn
@@ -204,6 +207,17 @@ void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
 void LCDFN(puts)(int x, int y, const unsigned char *str)
 {
     LCDFN(puts_style_offset)(x, y, str, STYLE_DEFAULT, 0);
+}
+
+/* Formatting version of LCDFN(puts) */
+void LCDFN(putsf)(int x, int y, const unsigned char *fmt, ...)
+{
+    va_list ap;
+    char buf[256];
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof (buf), fmt, ap);
+    va_end(ap);
+    LCDFN(puts)(x, y, buf);
 }
 
 void LCDFN(puts_style)(int x, int y, const unsigned char *str, int style)

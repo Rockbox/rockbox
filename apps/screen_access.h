@@ -129,6 +129,7 @@ struct screen
 #endif
     void (*putsxy)(int x, int y, const unsigned char *str);
     void (*puts)(int x, int y, const unsigned char *str);
+    void (*putsf)(int x, int y, const unsigned char *str, ...);
     void (*puts_offset)(int x, int y, const unsigned char *str, int offset);
     void (*puts_scroll)(int x, int y, const unsigned char *string);
     void (*puts_scroll_offset)(int x, int y, const unsigned char *string,

@@ -31,10 +31,6 @@
 #include "ascodec-target.h"
 #include "adc.h"
 
-#define _DEBUG_PRINTF(a,varargs...) do { \
-        snprintf(buf, sizeof(buf), (a), ##varargs); lcd_puts(0,line++,buf); \
-        } while(0)
-
 #define ON "Enabled"
 #define OFF "Disabled"
 
@@ -224,7 +220,6 @@ int calc_freq(int clk)
 
 bool __dbg_hw_info(void)
 {
-    char buf[50];
     int line;
     int last_nand = 0;
 #if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
@@ -240,16 +235,16 @@ bool __dbg_hw_info(void)
         {
         lcd_clear_display();
         line = 0;
-        _DEBUG_PRINTF("[Clock Frequencies:]");
-        _DEBUG_PRINTF("      SET       ACTUAL");
-        _DEBUG_PRINTF("922T:%s     %3dMHz",
+        lcd_puts(0, line++, "[Clock Frequencies:]");
+        lcd_puts(0, line++, "      SET       ACTUAL");
+        lcd_putsf(0, line++, "922T:%s     %3dMHz",
                                         (!(read_cp15()>>30)) ? "FAST " :
                                         (read_cp15()>>31) ? "ASYNC" : "SYNC ",
                                          calc_freq(CLK_922T)/1000000);
-        _DEBUG_PRINTF("PLLA:%3dMHz    %3dMHz", AS3525_PLLA_FREQ/1000000,
+        lcd_putsf(0, line++, "PLLA:%3dMHz    %3dMHz", AS3525_PLLA_FREQ/1000000,
                                                    calc_freq(CLK_PLLA)/1000000);
-        _DEBUG_PRINTF("PLLB:          %3dMHz", calc_freq(CLK_PLLB)/1000000);
-        _DEBUG_PRINTF("FCLK:          %3dMHz", calc_freq(CLK_FCLK)/1000000);
+        lcd_putsf(0, line++, "PLLB:          %3dMHz", calc_freq(CLK_PLLB)/1000000);
+        lcd_putsf(0, line++, "FCLK:          %3dMHz", calc_freq(CLK_FCLK)/1000000);
 
 #if LCD_HEIGHT < 176  /* clip  */
         lcd_update();
@@ -265,17 +260,17 @@ bool __dbg_hw_info(void)
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
 
-        _DEBUG_PRINTF("DRAM:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
+        lcd_putsf(0, line++, "DRAM:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
                                                  calc_freq(CLK_EXTMEM)/1000000);
-        _DEBUG_PRINTF("PCLK:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
+        lcd_putsf(0, line++, "PCLK:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
                                                    calc_freq(CLK_PCLK)/1000000);
-        _DEBUG_PRINTF("IDE :%3dMHz    %3dMHz", AS3525_IDE_FREQ/1000000,
+        lcd_putsf(0, line++, "IDE :%3dMHz    %3dMHz", AS3525_IDE_FREQ/1000000,
                                                     calc_freq(CLK_IDE)/1000000);
-        _DEBUG_PRINTF("DBOP:%3dMHz    %3dMHz", AS3525_DBOP_FREQ/1000000,
+        lcd_putsf(0, line++, "DBOP:%3dMHz    %3dMHz", AS3525_DBOP_FREQ/1000000,
                                                    calc_freq(CLK_DBOP)/1000000);
-        _DEBUG_PRINTF("I2C :%3dkHz    %3dkHz", AS3525_I2C_FREQ/1000,
+        lcd_putsf(0, line++, "I2C :%3dkHz    %3dkHz", AS3525_I2C_FREQ/1000,
                                                        calc_freq(CLK_I2C)/1000);
-        _DEBUG_PRINTF("I2SI: %s      %3dMHz", (CGU_AUDIO & (1<<23)) ?
+        lcd_putsf(0, line++, "I2SI: %s      %3dMHz", (CGU_AUDIO & (1<<23)) ?
                                    "on " : "off" , calc_freq(CLK_I2SI)/1000000);
 
 #if LCD_HEIGHT < 176  /* clip  */
@@ -292,27 +287,27 @@ bool __dbg_hw_info(void)
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
 
-        _DEBUG_PRINTF("I2SO: %s      %3dMHz", (CGU_AUDIO & (1<<11)) ?
+        lcd_putsf(0, line++, "I2SO: %s      %3dMHz", (CGU_AUDIO & (1<<11)) ?
                                     "on " : "off", calc_freq(CLK_I2SO)/1000000);
         if(MCI_NAND)
             last_nand = MCI_NAND;
                                                 /*  MCLK == PCLK  */
-        _DEBUG_PRINTF("SD  :%3dMHz    %3dMHz",
+        lcd_putsf(0, line++, "SD  :%3dMHz    %3dMHz",
             ((last_nand ? (AS3525_PCLK_FREQ/ 1000000): 0) /
             ((last_nand & MCI_CLOCK_BYPASS)? 1:(((last_nand & 0xff)+1) * 2))),
             calc_freq(CLK_SD_MCLK_NAND)/1000000);
 #if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
         if(MCI_SD)
             last_sd = MCI_SD;
-        _DEBUG_PRINTF("uSD :%3dMHz    %3dMHz",
+        lcd_putsf(0, line++, "uSD :%3dMHz    %3dMHz",
             ((last_sd ? (AS3525_PCLK_FREQ/ 1000000): 0) /
             ((last_sd & MCI_CLOCK_BYPASS) ? 1: (((last_sd & 0xff) + 1) * 2))),
             calc_freq(CLK_SD_MCLK_MSD)/1000000);
 #endif
-        _DEBUG_PRINTF("USB :          %3dMHz", calc_freq(CLK_USB)/1000000);
-        _DEBUG_PRINTF("MMU :  %s CVDDP:%4d", (read_cp15() & CP15_MMU) ?
+        lcd_putsf(0, line++, "USB :          %3dMHz", calc_freq(CLK_USB)/1000000);
+        lcd_putsf(0, line++, "MMU :  %s CVDDP:%4d", (read_cp15() & CP15_MMU) ?
                                         " on" : "off", adc_read(ADC_CVDD) * 25);
-        _DEBUG_PRINTF("Icache:%s Dcache:%s",
+        lcd_putsf(0, line++, "Icache:%s Dcache:%s",
                                       (read_cp15() & CP15_IC)  ? " on" : "off",
                                       (read_cp15() & CP15_DC)  ? " on" : "off");
 
@@ -328,12 +323,12 @@ bool __dbg_hw_info(void)
         lcd_clear_display();
         line = 0;
 
-        _DEBUG_PRINTF("CGU_PLLA  :%8x", (unsigned int)(CGU_PLLA));
-        _DEBUG_PRINTF("CGU_PLLB  :%8x", (unsigned int)(CGU_PLLB));
-        _DEBUG_PRINTF("CGU_PROC  :%8x", (unsigned int)(CGU_PROC));
-        _DEBUG_PRINTF("CGU_PERI  :%8x", (unsigned int)(CGU_PERI));
-        _DEBUG_PRINTF("CGU_IDE   :%8x", (unsigned int)(CGU_IDE));
-        _DEBUG_PRINTF("CGU_DBOP  :%8x", (unsigned int)(CGU_DBOP));
+        lcd_putsf(0, line++, "CGU_PLLA  :%8x", (unsigned int)(CGU_PLLA));
+        lcd_putsf(0, line++, "CGU_PLLB  :%8x", (unsigned int)(CGU_PLLB));
+        lcd_putsf(0, line++, "CGU_PROC  :%8x", (unsigned int)(CGU_PROC));
+        lcd_putsf(0, line++, "CGU_PERI  :%8x", (unsigned int)(CGU_PERI));
+        lcd_putsf(0, line++, "CGU_IDE   :%8x", (unsigned int)(CGU_IDE));
+        lcd_putsf(0, line++, "CGU_DBOP  :%8x", (unsigned int)(CGU_DBOP));
 
 #if LCD_HEIGHT < 176  /* clip  */
         lcd_update();
@@ -349,12 +344,12 @@ bool __dbg_hw_info(void)
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
 
-        _DEBUG_PRINTF("CGU_AUDIO :%8x", (unsigned int)(CGU_AUDIO));
-        _DEBUG_PRINTF("CGU_USB   :%8x", (unsigned int)(CGU_USB));
-        _DEBUG_PRINTF("I2C2_CPSR :%8x", (unsigned int)(I2C2_CPSR1<<8 |
+        lcd_putsf(0, line++, "CGU_AUDIO :%8x", (unsigned int)(CGU_AUDIO));
+        lcd_putsf(0, line++, "CGU_USB   :%8x", (unsigned int)(CGU_USB));
+        lcd_putsf(0, line++, "I2C2_CPSR :%8x", (unsigned int)(I2C2_CPSR1<<8 |
                                                        I2C2_CPSR0));
-        _DEBUG_PRINTF("MCI_NAND  :%8x", (unsigned int)(MCI_NAND));
-        _DEBUG_PRINTF("MCI_SD    :%8x", (unsigned int)(MCI_SD));
+        lcd_putsf(0, line++, "MCI_NAND  :%8x", (unsigned int)(MCI_NAND));
+        lcd_putsf(0, line++, "MCI_SD    :%8x", (unsigned int)(MCI_SD));
 
         lcd_update();
         int btn = button_get_w_tmo(HZ/10);
@@ -372,7 +367,6 @@ end:
 
 bool __dbg_ports(void)
 {
-    char buf[50];
     int line;
 
     lcd_clear_display();
@@ -381,19 +375,19 @@ bool __dbg_ports(void)
     while(1)
     {
         line = 0;
-        _DEBUG_PRINTF("[GPIO Values and Directions]");
-        _DEBUG_PRINTF("GPIOA: %2x DIR: %2x", GPIOA_DATA, GPIOA_DIR);
-        _DEBUG_PRINTF("GPIOB: %2x DIR: %2x", GPIOB_DATA, GPIOB_DIR);
-        _DEBUG_PRINTF("GPIOC: %2x DIR: %2x", GPIOC_DATA, GPIOC_DIR);
-        _DEBUG_PRINTF("GPIOD: %2x DIR: %2x", GPIOD_DATA, GPIOD_DIR);
+        lcd_puts(0, line++, "[GPIO Values and Directions]");
+        lcd_putsf(0, line++, "GPIOA: %2x DIR: %2x", GPIOA_DATA, GPIOA_DIR);
+        lcd_putsf(0, line++, "GPIOB: %2x DIR: %2x", GPIOB_DATA, GPIOB_DIR);
+        lcd_putsf(0, line++, "GPIOC: %2x DIR: %2x", GPIOC_DATA, GPIOC_DIR);
+        lcd_putsf(0, line++, "GPIOD: %2x DIR: %2x", GPIOD_DATA, GPIOD_DIR);
 #ifdef DEBUG_DBOP
         line++;
-        _DEBUG_PRINTF("[DBOP_DIN]");
-        _DEBUG_PRINTF("DBOP_DIN: %4x", button_dbop_data());
+        lcd_puts(0, line++, "[DBOP_DIN]");
+        lcd_putsf(0, line++, "DBOP_DIN: %4x", button_dbop_data());
 #endif
         line++;
-        _DEBUG_PRINTF("[CP15]");
-        _DEBUG_PRINTF("CP15: 0x%8x", read_cp15());
+        lcd_puts(0, line++, "[CP15]");
+        lcd_putsf(0, line++, "CP15: 0x%8x", read_cp15());
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
             break;

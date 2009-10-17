@@ -46,40 +46,39 @@ bool __dbg_ports(void)
     while(1)
     {
         line = 0;
-        snprintf(buf, sizeof(buf), "[Ports and Registers]");
-        lcd_puts(0, line++, buf);
+        lcd_puts(0, line++, "[Ports and Registers]");
 
-        snprintf(buf, sizeof(buf), "GPACON: %08lx GPBCON: %08lx", GPACON, GPBCON);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPADAT: %08lx GPBDAT: %08lx", GPADAT, GPBDAT);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPAUP:  %08lx GPBUP:  %08lx", 0ul, GPBUP);      lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPCCON: %08lx GPDCON: %08lx", GPCCON, GPDCON);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPCDAT: %08lx GPDDAT: %08lx", GPCDAT, GPDDAT);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPCUP:  %08lx GPDUP:  %08lx", GPCUP, GPDUP);    lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "GPACON: %08lx GPBCON: %08lx", GPACON, GPBCON);
+        lcd_putsf(0, line++, "GPADAT: %08lx GPBDAT: %08lx", GPADAT, GPBDAT);
+        lcd_putsf(0, line++, "GPAUP:  %08lx GPBUP:  %08lx", 0ul, GPBUP);
+        lcd_putsf(0, line++, "GPCCON: %08lx GPDCON: %08lx", GPCCON, GPDCON);
+        lcd_putsf(0, line++, "GPCDAT: %08lx GPDDAT: %08lx", GPCDAT, GPDDAT);
+        lcd_putsf(0, line++, "GPCUP:  %08lx GPDUP:  %08lx", GPCUP, GPDUP)
 
-        snprintf(buf, sizeof(buf), "GPCCON: %08lx GPDCON: %08lx", GPCCON, GPDCON);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPCDAT: %08lx GPDDAT: %08lx", GPCDAT, GPDDAT);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPCUP:  %08lx GPDUP:  %08lx", GPCUP, GPDUP);    lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "GPCCON: %08lx GPDCON: %08lx", GPCCON, GPDCON);
+        lcd_putsf(0, line++, "GPCDAT: %08lx GPDDAT: %08lx", GPCDAT, GPDDAT);
+        lcd_putsf(0, line++, "GPCUP:  %08lx GPDUP:  %08lx", GPCUP, GPDUP);
 
-        snprintf(buf, sizeof(buf), "GPECON: %08lx GPFCON: %08lx", GPECON, GPFCON);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPEDAT: %08lx GPFDAT: %08lx", GPEDAT, GPFDAT);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPEUP:  %08lx GPFUP:  %08lx", GPEUP, GPFUP);    lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "GPECON: %08lx GPFCON: %08lx", GPECON, GPFCON);
+        lcd_putsf(0, line++, "GPEDAT: %08lx GPFDAT: %08lx", GPEDAT, GPFDAT);
+        lcd_putsf(0, line++, "GPEUP:  %08lx GPFUP:  %08lx", GPEUP, GPFUP);
 
-        snprintf(buf, sizeof(buf), "GPGCON: %08lx GPHCON: %08lx", GPGCON, GPHCON);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPGDAT: %08lx GPHDAT: %08lx", GPGDAT, GPHDAT);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPGUP:  %08lx GPHUP:  %08lx", GPGUP, GPHUP);    lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "GPGCON: %08lx GPHCON: %08lx", GPGCON, GPHCON);
+        lcd_putsf(0, line++, "GPGDAT: %08lx GPHDAT: %08lx", GPGDAT, GPHDAT);
+        lcd_putsf(0, line++, "GPGUP:  %08lx GPHUP:  %08lx", GPGUP, GPHUP);
 
-        snprintf(buf, sizeof(buf), "GPJCON: %08lx", GPJCON);                        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPJDAT: %08lx", GPJDAT);                        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPJUP:  %08lx", GPJUP);                         lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "GPJCON: %08lx", GPJCON);
+        lcd_putsf(0, line++, "GPJDAT: %08lx", GPJDAT);
+        lcd_putsf(0, line++, "GPJUP:  %08lx", GPJUP);
         
         line++;
 
-        snprintf(buf, sizeof(buf), "SRCPND:  %08lx INTMOD:  %08lx", SRCPND, INTMOD);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "INTMSK:  %08lx INTPND:  %08lx", INTMSK, INTPND);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "CLKCON:  %08lx CLKSLOW: %08lx", CLKCON, CLKSLOW); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "MPLLCON: %08lx UPLLCON: %08lx", MPLLCON, UPLLCON); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "CLKDIVN: %08lx CAMDIVN: %08lx", CLKDIVN, CAMDIVN); lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "BWSCON:  %08lx TCONSEL: %08lx", BWSCON, TCONSEL);  lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "SRCPND:  %08lx INTMOD:  %08lx", SRCPND, INTMOD);
+        lcd_putsf(0, line++, "INTMSK:  %08lx INTPND:  %08lx", INTMSK, INTPND);
+        lcd_putsf(0, line++, "CLKCON:  %08lx CLKSLOW: %08lx", CLKCON, CLKSLOW);
+        lcd_putsf(0, line++, "MPLLCON: %08lx UPLLCON: %08lx", MPLLCON, UPLLCON);
+        lcd_putsf(0, line++, "CLKDIVN: %08lx CAMDIVN: %08lx", CLKDIVN, CAMDIVN);
+        lcd_putsf(0, line++, "BWSCON:  %08lx TCONSEL: %08lx", BWSCON, TCONSEL);
 
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))

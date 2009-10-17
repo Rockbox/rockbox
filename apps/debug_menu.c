@@ -122,17 +122,6 @@
 #include "usb_core.h" 	 
 #endif
 
-/* wrapper function to format a string and print it */
-void debug_printf(int y, const unsigned char *fmt, ...)
-{
-    va_list ap;
-    char buf[128];
-    va_start(ap, fmt);
-    vsnprintf(buf, sizeof (buf), fmt, ap);
-    va_end(ap);
-    lcd_puts(0, y, buf);
-}
-
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
@@ -258,12 +247,12 @@ static bool dbg_audio_thread(void)
 
         lcd_clear_display();
 
-        debug_printf(0, "read: %x", d.audiobuf_read);
-        debug_printf(1, "write: %x", d.audiobuf_write);
-        debug_printf(2, "swap: %x", d.audiobuf_swapwrite);
-        debug_printf(3, "playing: %d", d.playing);
-        debug_printf(4, "playable: %x", d.playable_space);
-        debug_printf(5, "unswapped: %x", d.unswapped_space);
+        lcd_putsf(0, 0, "read: %x", d.audiobuf_read);
+        lcd_putsf(0, 1, "write: %x", d.audiobuf_write);
+        lcd_putsf(0, 2, "swap: %x", d.audiobuf_swapwrite);
+        lcd_putsf(0, 3, "playing: %d", d.playing);
+        lcd_putsf(0, 4, "playable: %x", d.playable_space);
+        lcd_putsf(0, 5, "unswapped: %x", d.unswapped_space);
 
         /* Playable space left */
         gui_scrollbar_draw(&screens[SCREEN_MAIN],0, 6*8, 112, 4, d.audiobuflen, 0,
@@ -273,7 +262,7 @@ static bool dbg_audio_thread(void)
         gui_scrollbar_draw(&screens[SCREEN_MAIN],0, 6*8+4, 112, 4, d.audiobuflen, 0,
                   d.low_watermark_level, HORIZONTAL);
 
-        debug_printf(7, "wm: %x - %x",
+        lcd_putsf(0, 7, "wm: %x - %x",
                     d.low_watermark_level, d.lowest_watermark_level);
 
         lcd_update();
@@ -336,13 +325,13 @@ static bool dbg_buffering_thread(void)
 
         bufused = bufsize - pcmbuf_free();
 
-        debug_printf(line++, "pcm: %6ld/%ld", (long) bufused, (long) bufsize);
+        lcd_putsf(0, line++, "pcm: %6ld/%ld", (long) bufused, (long) bufsize);
 
         gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6,
                            bufsize, 0, bufused, HORIZONTAL);
         line++;
 
-        debug_printf(line++, "alloc: %6ld/%ld", audio_filebufused(),
+        lcd_putsf(0, line++, "alloc: %6ld/%ld", audio_filebufused(),
                  (long) filebuflen);
 
 #if LCD_HEIGHT > 80
@@ -350,7 +339,7 @@ static bool dbg_buffering_thread(void)
                            filebuflen, 0, audio_filebufused(), HORIZONTAL);
         line++;
 
-        debug_printf(line++, "real:  %6ld/%ld", (long)d.buffered_data,
+        lcd_putsf(0, line++, "real:  %6ld/%ld", (long)d.buffered_data,
                  (long)filebuflen);
 
         gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6,
@@ -358,7 +347,7 @@ static bool dbg_buffering_thread(void)
         line++;
 #endif
 
-        debug_printf(line++, "usefl: %6ld/%ld", (long)(d.useful_data),
+        lcd_putsf(0, line++, "usefl: %6ld/%ld", (long)(d.useful_data),
                                                        (long)filebuflen);
 
 #if LCD_HEIGHT > 80
@@ -367,14 +356,14 @@ static bool dbg_buffering_thread(void)
         line++;
 #endif
 
-        debug_printf(line++, "data_rem: %ld", (long)d.data_rem);
+        lcd_putsf(0, line++, "data_rem: %ld", (long)d.data_rem);
 
-        debug_printf(line++, "track count: %2d", audio_track_count());
+        lcd_putsf(0, line++, "track count: %2d", audio_track_count());
 
-        debug_printf(line++, "handle count: %d", (int)d.num_handles);
+        lcd_putsf(0, line++, "handle count: %d", (int)d.num_handles);
 
 #ifndef SIMULATOR
-        debug_printf(line++, "cpu freq: %3dMHz",
+        lcd_putsf(0, line++, "cpu freq: %3dMHz",
                  (int)((FREQ + 500000) / 1000000));
 #endif
 
@@ -382,13 +371,13 @@ static bool dbg_buffering_thread(void)
         {
             int boostquota = boost_ticks * 1000 / ticks; /* in 0.1 % */
             int avgclock   = freq_sum * 10 / ticks;      /* in 100 kHz */
-            debug_printf(line++, "boost:%3d.%d%% (%d.%dMHz)",
+            lcd_putsf(0, line++, "boost:%3d.%d%% (%d.%dMHz)",
                      boostquota/10, boostquota%10, avgclock/10, avgclock%10);
         }
 
-        debug_printf(line++, "pcmbufdesc: %2d/%2d",
+        lcd_putsf(0, line++, "pcmbufdesc: %2d/%2d",
                 pcmbuf_used_descs(), pcmbufdescs);
-        debug_printf(line++, "watermark: %6d",
+        lcd_putsf(0, line++, "watermark: %6d",
                 (int)(d.watermark));
 
         lcd_update();
@@ -530,12 +519,12 @@ static bool dbg_hw_info(void)
 
     lcd_puts(0, 0, "[Hardware info]");
 
-    debug_printf(1, "ROM: %d.%02d", rom_version/100, rom_version%100);
+    lcd_putsf(0, 1, "ROM: %d.%02d", rom_version/100, rom_version%100);
 
-    debug_printf(2, "Mask: 0x%04x", bitmask);
+    lcd_putsf(0, 2, "Mask: 0x%04x", bitmask);
 
     if (got_id)
-        debug_printf(3, "Flash: M=%02x D=%02x", manu, id);
+        lcd_putsf(0, 3, "Flash: M=%02x D=%02x", manu, id);
     else
         lcd_puts(0, 3, "Flash: M=?? D=??"); /* unknown, sorry */
 
@@ -544,7 +533,7 @@ static bool dbg_hw_info(void)
         if (rom_crc == 0x56DBA4EE) /* known Version 1 */
             lcd_puts(0, 4, "Boot ROM: V1");
         else
-            debug_printf(4, "ROMcrc: 0x%08x", rom_crc);
+            lcd_putsf(0, 4, "ROMcrc: 0x%08x", rom_crc);
     }
     else
     {
@@ -576,7 +565,7 @@ static bool dbg_hw_info(void)
     lcd_puts(0, line++, "[Hardware info]");
 
     if (got_id)
-        debug_printf(line++, "Flash: M=%04x D=%04x", manu, id);
+        lcd_putsf(0, line++, "Flash: M=%04x D=%04x", manu, id);
     else
         lcd_puts(0, line++, "Flash: M=???? D=????"); /* unknown, sorry */
 
@@ -590,15 +579,15 @@ static bool dbg_hw_info(void)
 
         if (got_id == DS2411_OK)
         {
-            debug_printf(++line, "  FC=%02x", (unsigned)id.family_code);
-            debug_printf(++line, "  ID=%02X %02X %02X %02X %02X %02X",
+            lcd_putsf(0, ++line, "  FC=%02x", (unsigned)id.family_code);
+            lcd_putsf(0, ++line, "  ID=%02X %02X %02X %02X %02X %02X",
                 (unsigned)id.uid[0], (unsigned)id.uid[1], (unsigned)id.uid[2],
                 (unsigned)id.uid[3], (unsigned)id.uid[4], (unsigned)id.uid[5]);
-            debug_printf(++line, "  CRC=%02X", (unsigned)id.crc);
+            lcd_putsf(0, ++line, "  CRC=%02X", (unsigned)id.crc);
         }
         else
         {
-            debug_printf(++line, "READ ERR=%d", got_id);
+            lcd_putsf(0, ++line, "READ ERR=%d", got_id);
         }
     }
 #endif
@@ -620,18 +609,18 @@ static bool dbg_hw_info(void)
     lcd_puts(0, line++, "[Hardware info]");
 
 #ifdef IPOD_ARCH
-    debug_printf(line++, "HW rev: 0x%08lx", IPOD_HW_REVISION);
+    lcd_putsf(0, line++, "HW rev: 0x%08lx", IPOD_HW_REVISION);
 #endif
 
 #ifdef IPOD_COLOR
     extern int lcd_type; /* Defined in lcd-colornano.c */
 
-    debug_printf(line++, "LCD type: %d", lcd_type);
+    lcd_putsf(0, line++, "LCD type: %d", lcd_type);
 #endif
 
-    debug_printf(line++, "PP version: %s", pp_version);
+    lcd_putsf(0, line++, "PP version: %s", pp_version);
 
-    debug_printf(line++, "Est. clock (kHz): %d", perfcheck());
+    lcd_putsf(0, line++, "Est. clock (kHz): %d", perfcheck());
 
     lcd_update();
 
@@ -651,12 +640,12 @@ static bool dbg_hw_info(void)
     lcd_puts(0, line++, "[Hardware info]");
 
 #ifdef IPOD_ARCH
-    debug_printf(line++, "HW rev: 0x%08lx", IPOD_HW_REVISION);
+    lcd_putsf(0, line++, "HW rev: 0x%08lx", IPOD_HW_REVISION);
 #endif
 
-    debug_printf(line++, "PP version: %s", pp_version);
+    lcd_putsf(0, line++, "PP version: %s", pp_version);
 
-    debug_printf(line++, "Est. clock (kHz): %d", perfcheck());
+    lcd_putsf(0, line++, "Est. clock (kHz): %d", perfcheck());
 
     lcd_update();
 
@@ -706,12 +695,12 @@ static bool dbg_hw_info(void)
         switch(currval)
         {
             case 0:
-                debug_printf(1, "ROM: %d.%02d",
+                lcd_putsf(0, 1, "ROM: %d.%02d",
                          rom_version/100, rom_version%100);
                 break;
             case 1:
                 if (got_id)
-                    debug_printf(1, "Flash:%02x,%02x", manu, id);
+                    lcd_putsf(0, 1, "Flash:%02x,%02x", manu, id);
                 else
                     lcd_puts(0, 1, "Flash:??,??"); /* unknown, sorry */
                 break;
@@ -724,7 +713,7 @@ static bool dbg_hw_info(void)
                         lcd_puts(0, 1, "BootROM: V2");
                         /* alternative boot ROM found in one single player so far */
                     else
-                        debug_printf(1, "R: %08x", rom_crc);
+                        lcd_putsf(0, 1, "R: %08x", rom_crc);
                 }
                 else
                     lcd_puts(0, 1, "BootROM: no");
@@ -822,25 +811,25 @@ static bool dbg_spdif(void)
         symbolerr = (interruptstat & 0x00800000)?true:false;
         parityerr = (interruptstat & 0x00400000)?true:false;
 
-        debug_printf(line++, "Val: %s Sym: %s Par: %s",
+        lcd_putsf(0, line++, "Val: %s Sym: %s Par: %s",
                  valnogood?"--":"OK",
                  symbolerr?"--":"OK",
                  parityerr?"--":"OK");
 
-        debug_printf(line++, "Status word: %08x", (int)control);
+        lcd_putsf(0, line++, "Status word: %08x", (int)control);
 
         line++;
 
         x = control >> 31;
-        debug_printf(line++, "PRO: %d (%s)",
+        lcd_putsf(0, line++, "PRO: %d (%s)",
                  x, x?"Professional":"Consumer");
 
         x = (control >> 30) & 1;
-        debug_printf(line++, "Audio: %d (%s)",
+        lcd_putsf(0, line++, "Audio: %d (%s)",
                  x, x?"Non-PCM":"PCM");
 
         x = (control >> 29) & 1;
-        debug_printf(line++, "Copy: %d (%s)",
+        lcd_putsf(0, line++, "Copy: %d (%s)",
                  x, x?"Permitted":"Inhibited");
 
         x = (control >> 27) & 7;
@@ -856,10 +845,10 @@ static bool dbg_spdif(void)
             s = "Reserved";
             break;
         }
-        debug_printf(line++, "Preemphasis: %d (%s)", x, s);
+        lcd_putsf(0, line++, "Preemphasis: %d (%s)", x, s);
 
         x = (control >> 24) & 3;
-        debug_printf(line++, "Mode: %d", x);
+        lcd_putsf(0, line++, "Mode: %d", x);
 
         category = (control >> 17) & 127;
         switch(category)
@@ -873,7 +862,7 @@ static bool dbg_spdif(void)
         default:
             s = "Unknown";
         }
-        debug_printf(line++, "Category: 0x%02x (%s)", category, s);
+        lcd_putsf(0, line++, "Category: 0x%02x (%s)", category, s);
 
         x = (control >> 16) & 1;
         generation = x;
@@ -883,11 +872,11 @@ static bool dbg_spdif(void)
         {
             generation = !generation;
         }
-        debug_printf(line++, "Generation: %d (%s)",
+        lcd_putsf(0, line++, "Generation: %d (%s)",
                  x, generation?"Original":"No ind.");
 
         x = (control >> 12) & 15;
-        debug_printf(line++, "Source: %d", x);
+        lcd_putsf(0, line++, "Source: %d", x);
 
 
         x = (control >> 8) & 15;
@@ -906,7 +895,7 @@ static bool dbg_spdif(void)
             s = "";
             break;
         }
-        debug_printf(line++, "Channel: %d (%s)", x, s);
+        lcd_putsf(0, line++, "Channel: %d (%s)", x, s);
 
         x = (control >> 4) & 15;
         switch(x)
@@ -921,14 +910,14 @@ static bool dbg_spdif(void)
             s = "32kHz";
             break;
         }
-        debug_printf(line++, "Frequency: %d (%s)", x, s);
+        lcd_putsf(0, line++, "Frequency: %d (%s)", x, s);
 
         x = (control >> 2) & 3;
-        debug_printf(line++, "Clock accuracy: %d", x);
+        lcd_putsf(0, line++, "Clock accuracy: %d", x);
         line++;
 
 #ifndef SIMULATOR
-        debug_printf(line++, "Measured freq: %ldHz",
+        lcd_putsf(0, line++, "Measured freq: %ldHz",
                  spdif_measure_frequency());
 #endif
 
@@ -1008,16 +997,16 @@ bool dbg_ports(void)
 
     while(1)
     {
-        debug_printf(0, "PADR: %04x", (unsigned short)PADR);
-        debug_printf(1, "PBDR: %04x", (unsigned short)PBDR);
+        lcd_putsf(0, 0, "PADR: %04x", (unsigned short)PADR);
+        lcd_putsf(0, 1, "PBDR: %04x", (unsigned short)PBDR);
 
-        debug_printf(2, "AN0: %03x AN4: %03x", adc_read(0), adc_read(4));
-        debug_printf(3, "AN1: %03x AN5: %03x", adc_read(1), adc_read(5));
-        debug_printf(4, "AN2: %03x AN6: %03x", adc_read(2), adc_read(6));
-        debug_printf(5, "AN3: %03x AN7: %03x", adc_read(3), adc_read(7));
+        lcd_putsf(0, 2, "AN0: %03x AN4: %03x", adc_read(0), adc_read(4));
+        lcd_putsf(0, 3, "AN1: %03x AN5: %03x", adc_read(1), adc_read(5));
+        lcd_putsf(0, 4, "AN2: %03x AN6: %03x", adc_read(2), adc_read(6));
+        lcd_putsf(0, 5, "AN3: %03x AN7: %03x", adc_read(3), adc_read(7));
 
         battery_read_info(&adc_battery_voltage, &adc_battery_level);
-        debug_printf(6, "Batt: %d.%03dV %d%%  ", adc_battery_voltage / 1000,
+        lcd_putsf(0, 6, "Batt: %d.%03dV %d%%  ", adc_battery_voltage / 1000,
                  adc_battery_voltage % 1000, adc_battery_level);
 
         lcd_update();
@@ -1055,41 +1044,41 @@ bool dbg_ports(void)
         gpio_enable = GPIO_ENABLE;
         gpio1_enable = GPIO1_ENABLE;
 
-        debug_printf(line++, "GPIO_READ: %08x", gpio_read);
-        debug_printf(line++, "GPIO_OUT:  %08x", gpio_out);
-        debug_printf(line++, "GPIO_FUNC: %08x", gpio_function);
-        debug_printf(line++, "GPIO_ENA:  %08x", gpio_enable);
+        lcd_putsf(0, line++, "GPIO_READ: %08x", gpio_read);
+        lcd_putsf(0, line++, "GPIO_OUT:  %08x", gpio_out);
+        lcd_putsf(0, line++, "GPIO_FUNC: %08x", gpio_function);
+        lcd_putsf(0, line++, "GPIO_ENA:  %08x", gpio_enable);
 
-        debug_printf(line++, "GPIO1_READ: %08x", gpio1_read);
-        debug_printf(line++, "GPIO1_OUT:  %08x", gpio1_out);
-        debug_printf(line++, "GPIO1_FUNC: %08x", gpio1_function);
-        debug_printf(line++, "GPIO1_ENA:  %08x", gpio1_enable);
+        lcd_putsf(0, line++, "GPIO1_READ: %08x", gpio1_read);
+        lcd_putsf(0, line++, "GPIO1_OUT:  %08x", gpio1_out);
+        lcd_putsf(0, line++, "GPIO1_FUNC: %08x", gpio1_function);
+        lcd_putsf(0, line++, "GPIO1_ENA:  %08x", gpio1_enable);
 
         adc_buttons = adc_read(ADC_BUTTONS);
         adc_remote  = adc_read(ADC_REMOTE);
         battery_read_info(&adc_battery_voltage, &adc_battery_level);
 #if defined(IAUDIO_X5) ||  defined(IAUDIO_M5) || defined(IRIVER_H300_SERIES)
-        debug_printf(line++, "ADC_BUTTONS (%c): %02x",
+        lcd_putsf(0, line++, "ADC_BUTTONS (%c): %02x",
             button_scan_enabled() ? '+' : '-', adc_buttons);
 #else
-        debug_printf(line++, "ADC_BUTTONS: %02x", adc_buttons);
+        lcd_putsf(0, line++, "ADC_BUTTONS: %02x", adc_buttons);
 #endif
 #if defined(IAUDIO_X5) || defined(IAUDIO_M5)
-        debug_printf(line++, "ADC_REMOTE  (%c): %02x",
+        lcd_putsf(0, line++, "ADC_REMOTE  (%c): %02x",
             remote_detect() ? '+' : '-', adc_remote);
 #else
-        debug_printf(line++, "ADC_REMOTE:  %02x", adc_remote);
+        lcd_putsf(0, line++, "ADC_REMOTE:  %02x", adc_remote);
 #endif
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-        debug_printf(line++, "ADC_REMOTEDETECT: %02x",
+        lcd_putsf(0, line++, "ADC_REMOTEDETECT: %02x",
                  adc_read(ADC_REMOTEDETECT));
 #endif
 
-        debug_printf(line++, "Batt: %d.%03dV %d%%  ", adc_battery_voltage / 1000,
+        lcd_putsf(0, line++, "Batt: %d.%03dV %d%%  ", adc_battery_voltage / 1000,
                  adc_battery_voltage % 1000, adc_battery_level);
 
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-        debug_printf(line++, "remotetype: %d", remote_type());
+        lcd_putsf(0, line++, "remotetype: %d", remote_type());
 #endif
 
         lcd_update();
@@ -1110,66 +1099,66 @@ bool dbg_ports(void)
     {
         line = 0;
         lcd_puts(0, line++, "GPIO STATES:");
-        debug_printf(line++, "A: %02x  E: %02x  I: %02x",
+        lcd_putsf(0, line++, "A: %02x  E: %02x  I: %02x",
                                (unsigned int)GPIOA_INPUT_VAL,
                                (unsigned int)GPIOE_INPUT_VAL,
                                (unsigned int)GPIOI_INPUT_VAL);
-        debug_printf(line++, "B: %02x  F: %02x  J: %02x",
+        lcd_putsf(0, line++, "B: %02x  F: %02x  J: %02x",
                                (unsigned int)GPIOB_INPUT_VAL,
                                (unsigned int)GPIOF_INPUT_VAL,
                                (unsigned int)GPIOJ_INPUT_VAL);
-        debug_printf(line++, "C: %02x  G: %02x  K: %02x",
+        lcd_putsf(0, line++, "C: %02x  G: %02x  K: %02x",
                                (unsigned int)GPIOC_INPUT_VAL,
                                (unsigned int)GPIOG_INPUT_VAL,
                                (unsigned int)GPIOK_INPUT_VAL);
-        debug_printf(line++, "D: %02x  H: %02x  L: %02x",
+        lcd_putsf(0, line++, "D: %02x  H: %02x  L: %02x",
                                (unsigned int)GPIOD_INPUT_VAL,
                                (unsigned int)GPIOH_INPUT_VAL,
                                (unsigned int)GPIOL_INPUT_VAL);
         line++;
-        debug_printf(line++, "GPO32_VAL: %08lx", GPO32_VAL);
-        debug_printf(line++, "GPO32_EN:  %08lx", GPO32_ENABLE);
-        debug_printf(line++, "DEV_EN:    %08lx", DEV_EN);
-        debug_printf(line++, "DEV_EN2:   %08lx", DEV_EN2);
-        debug_printf(line++, "DEV_EN3:   %08lx", inl(0x60006044)); /* to be verified */
-        debug_printf(line++, "DEV_INIT1: %08lx", DEV_INIT1);
-        debug_printf(line++, "DEV_INIT2: %08lx", DEV_INIT2);
+        lcd_putsf(0, line++, "GPO32_VAL: %08lx", GPO32_VAL);
+        lcd_putsf(0, line++, "GPO32_EN:  %08lx", GPO32_ENABLE);
+        lcd_putsf(0, line++, "DEV_EN:    %08lx", DEV_EN);
+        lcd_putsf(0, line++, "DEV_EN2:   %08lx", DEV_EN2);
+        lcd_putsf(0, line++, "DEV_EN3:   %08lx", inl(0x60006044)); /* to be verified */
+        lcd_putsf(0, line++, "DEV_INIT1: %08lx", DEV_INIT1);
+        lcd_putsf(0, line++, "DEV_INIT2: %08lx", DEV_INIT2);
 #ifdef ADC_ACCESSORY
-        debug_printf(line++, "ACCESSORY: %d", adc_read(ADC_ACCESSORY));
+        lcd_putsf(0, line++, "ACCESSORY: %d", adc_read(ADC_ACCESSORY));
 #endif
 
 #if defined(IPOD_ACCESSORY_PROTOCOL)
 extern unsigned char serbuf[];
-        debug_printf(line++, "IAP PACKET: %02x %02x %02x %02x %02x %02x %02x %02x", 
+        lcd_putsf(0, line++, "IAP PACKET: %02x %02x %02x %02x %02x %02x %02x %02x", 
 		 serbuf[0], serbuf[1], serbuf[2], serbuf[3], serbuf[4], serbuf[5],
 		 serbuf[6], serbuf[7]);
 #endif
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         line++;
-        debug_printf(line++, "BATT: %03x UNK1: %03x",
+        lcd_putsf(0, line++, "BATT: %03x UNK1: %03x",
                                 adc_read(ADC_BATTERY), adc_read(ADC_UNKNOWN_1));
-        debug_printf(line++, "REM:  %03x PAD: %03x",
+        lcd_putsf(0, line++, "REM:  %03x PAD: %03x",
                                  adc_read(ADC_REMOTE), adc_read(ADC_SCROLLPAD));
 #elif defined(PHILIPS_HDD1630)
         line++;
-        debug_printf(line++, "BATT: %03x UNK1: %03x",
+        lcd_putsf(0, line++, "BATT: %03x UNK1: %03x",
                                 adc_read(ADC_BATTERY), adc_read(ADC_UNKNOWN_1));
 #elif defined(SANSA_E200) || defined(PHILIPS_SA9200)
-        debug_printf(line++, "ADC_BVDD:     %4d", adc_read(ADC_BVDD));
-        debug_printf(line++, "ADC_RTCSUP:   %4d", adc_read(ADC_RTCSUP));
-        debug_printf(line++, "ADC_UVDD:     %4d", adc_read(ADC_UVDD));
-        debug_printf(line++, "ADC_CHG_IN:   %4d", adc_read(ADC_CHG_IN));
-        debug_printf(line++, "ADC_CVDD:     %4d", adc_read(ADC_CVDD));
-        debug_printf(line++, "ADC_BATTEMP:  %4d", adc_read(ADC_BATTEMP));
-        debug_printf(line++, "ADC_MICSUP1:  %4d", adc_read(ADC_MICSUP1));
-        debug_printf(line++, "ADC_MICSUP2:  %4d", adc_read(ADC_MICSUP2));
-        debug_printf(line++, "ADC_VBE1:     %4d", adc_read(ADC_VBE1));
-        debug_printf(line++, "ADC_VBE2:     %4d", adc_read(ADC_VBE2));
-        debug_printf(line++, "ADC_I_MICSUP1:%4d", adc_read(ADC_I_MICSUP1));
+        lcd_putsf(0, line++, "ADC_BVDD:     %4d", adc_read(ADC_BVDD));
+        lcd_putsf(0, line++, "ADC_RTCSUP:   %4d", adc_read(ADC_RTCSUP));
+        lcd_putsf(0, line++, "ADC_UVDD:     %4d", adc_read(ADC_UVDD));
+        lcd_putsf(0, line++, "ADC_CHG_IN:   %4d", adc_read(ADC_CHG_IN));
+        lcd_putsf(0, line++, "ADC_CVDD:     %4d", adc_read(ADC_CVDD));
+        lcd_putsf(0, line++, "ADC_BATTEMP:  %4d", adc_read(ADC_BATTEMP));
+        lcd_putsf(0, line++, "ADC_MICSUP1:  %4d", adc_read(ADC_MICSUP1));
+        lcd_putsf(0, line++, "ADC_MICSUP2:  %4d", adc_read(ADC_MICSUP2));
+        lcd_putsf(0, line++, "ADC_VBE1:     %4d", adc_read(ADC_VBE1));
+        lcd_putsf(0, line++, "ADC_VBE2:     %4d", adc_read(ADC_VBE2));
+        lcd_putsf(0, line++, "ADC_I_MICSUP1:%4d", adc_read(ADC_I_MICSUP1));
 #if !defined(PHILIPS_SA9200)
-        debug_printf(line++, "ADC_I_MICSUP2:%4d", adc_read(ADC_I_MICSUP2));
-        debug_printf(line++, "ADC_VBAT:     %4d", adc_read(ADC_VBAT));
+        lcd_putsf(0, line++, "ADC_I_MICSUP2:%4d", adc_read(ADC_I_MICSUP2));
+        lcd_putsf(0, line++, "ADC_VBAT:     %4d", adc_read(ADC_VBAT));
 #endif
 #endif
         lcd_update();
@@ -1189,19 +1178,19 @@ extern unsigned char serbuf[];
     while(1)
     {
         line = 0;
-        debug_printf(line++, "GPIO_A: %02x GPIO_B: %02x",
+        lcd_putsf(0, line++, "GPIO_A: %02x GPIO_B: %02x",
                  (unsigned int)GPIOA_INPUT_VAL, (unsigned int)GPIOB_INPUT_VAL);
-        debug_printf(line++, "GPIO_C: %02x GPIO_D: %02x",
+        lcd_putsf(0, line++, "GPIO_C: %02x GPIO_D: %02x",
                  (unsigned int)GPIOC_INPUT_VAL, (unsigned int)GPIOD_INPUT_VAL);
 
-        debug_printf(line++, "DEV_EN:       %08lx", DEV_EN);
-        debug_printf(line++, "CLOCK_ENABLE: %08lx", CLOCK_ENABLE);
-        debug_printf(line++, "CLOCK_SOURCE: %08lx", CLOCK_SOURCE);
-        debug_printf(line++, "PLL_CONTROL:  %08lx", PLL_CONTROL);
-        debug_printf(line++, "PLL_DIV:      %08lx", PLL_DIV);
-        debug_printf(line++, "PLL_MULT:     %08lx", PLL_MULT);
-        debug_printf(line++, "TIMING1_CTL:  %08lx", TIMING1_CTL);
-        debug_printf(line++, "TIMING2_CTL:  %08lx", TIMING2_CTL);
+        lcd_putsf(0, line++, "DEV_EN:       %08lx", DEV_EN);
+        lcd_putsf(0, line++, "CLOCK_ENABLE: %08lx", CLOCK_ENABLE);
+        lcd_putsf(0, line++, "CLOCK_SOURCE: %08lx", CLOCK_SOURCE);
+        lcd_putsf(0, line++, "PLL_CONTROL:  %08lx", PLL_CONTROL);
+        lcd_putsf(0, line++, "PLL_DIV:      %08lx", PLL_DIV);
+        lcd_putsf(0, line++, "PLL_MULT:     %08lx", PLL_MULT);
+        lcd_putsf(0, line++, "TIMING1_CTL:  %08lx", TIMING1_CTL);
+        lcd_putsf(0, line++, "TIMING2_CTL:  %08lx", TIMING2_CTL);
 
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
@@ -1264,7 +1253,7 @@ bool dbg_ports(void)
         lcd_puts(0, 0, buf);
 
         battery_read_info(&adc_battery_voltage, NULL);
-        debug_printf(1, "Batt: %d.%03dV", adc_battery_voltage / 1000,
+        lcd_putsf(0, 1, "Batt: %d.%03dV", adc_battery_voltage / 1000,
                  adc_battery_voltage % 1000);
         lcd_update();
 
@@ -1307,19 +1296,19 @@ static bool dbg_pcf(void)
     {
         line = 0;
 
-        debug_printf(line++, "DCDC1:  %02x", pcf50605_read(0x1b));
-        debug_printf(line++, "DCDC2:  %02x", pcf50605_read(0x1c));
-        debug_printf(line++, "DCDC3:  %02x", pcf50605_read(0x1d));
-        debug_printf(line++, "DCDC4:  %02x", pcf50605_read(0x1e));
-        debug_printf(line++, "DCDEC1: %02x", pcf50605_read(0x1f));
-        debug_printf(line++, "DCDEC2: %02x", pcf50605_read(0x20));
-        debug_printf(line++, "DCUDC1: %02x", pcf50605_read(0x21));
-        debug_printf(line++, "DCUDC2: %02x", pcf50605_read(0x22));
-        debug_printf(line++, "IOREGC: %02x", pcf50605_read(0x23));
-        debug_printf(line++, "D1REGC: %02x", pcf50605_read(0x24));
-        debug_printf(line++, "D2REGC: %02x", pcf50605_read(0x25));
-        debug_printf(line++, "D3REGC: %02x", pcf50605_read(0x26));
-        debug_printf(line++, "LPREG1: %02x", pcf50605_read(0x27));
+        lcd_putsf(0, line++, "DCDC1:  %02x", pcf50605_read(0x1b));
+        lcd_putsf(0, line++, "DCDC2:  %02x", pcf50605_read(0x1c));
+        lcd_putsf(0, line++, "DCDC3:  %02x", pcf50605_read(0x1d));
+        lcd_putsf(0, line++, "DCDC4:  %02x", pcf50605_read(0x1e));
+        lcd_putsf(0, line++, "DCDEC1: %02x", pcf50605_read(0x1f));
+        lcd_putsf(0, line++, "DCDEC2: %02x", pcf50605_read(0x20));
+        lcd_putsf(0, line++, "DCUDC1: %02x", pcf50605_read(0x21));
+        lcd_putsf(0, line++, "DCUDC2: %02x", pcf50605_read(0x22));
+        lcd_putsf(0, line++, "IOREGC: %02x", pcf50605_read(0x23));
+        lcd_putsf(0, line++, "D1REGC: %02x", pcf50605_read(0x24));
+        lcd_putsf(0, line++, "D2REGC: %02x", pcf50605_read(0x25));
+        lcd_putsf(0, line++, "D3REGC: %02x", pcf50605_read(0x26));
+        lcd_putsf(0, line++, "LPREG1: %02x", pcf50605_read(0x27));
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
         {
@@ -1348,8 +1337,8 @@ static bool dbg_cpufreq(void)
     {
         line = 0;
 
-        debug_printf(line++, "Frequency: %ld", FREQ);
-        debug_printf(line++, "boost_counter: %d", get_cpu_boost_counter());
+        lcd_putsf(0, line++, "Frequency: %ld", FREQ);
+        lcd_putsf(0, line++, "boost_counter: %d", get_cpu_boost_counter());
 
         lcd_update();
         button = get_action(CONTEXT_STD,HZ/10);
@@ -1484,9 +1473,9 @@ static bool view_battery(void)
                         minv = power_history[i];
                 }
 
-                debug_printf(0, "Battery %d.%03d", power_history[0] / 1000,
+                lcd_putsf(0, 0, "Battery %d.%03d", power_history[0] / 1000,
                          power_history[0] % 1000);
-                debug_printf(1, "scale %d.%03d-%d.%03dV",
+                lcd_putsf(0, 1, "scale %d.%03d-%d.%03dV",
                          minv / 1000, minv % 1000, maxv / 1000, maxv % 1000);
 
                 x = 0;
@@ -1506,23 +1495,23 @@ static bool view_battery(void)
                 lcd_puts(0, 0, "Power status:");
 
                 battery_read_info(&y, NULL);
-                debug_printf(1, "Battery: %d.%03d V", y / 1000, y % 1000);
+                lcd_putsf(0, 1, "Battery: %d.%03d V", y / 1000, y % 1000);
 #ifdef ADC_EXT_POWER
                 y = (adc_read(ADC_EXT_POWER) * EXT_SCALE_FACTOR) / 1000;
-                debug_printf(2, "External: %d.%03d V", y / 1000, y % 1000);
+                lcd_putsf(0, 2, "External: %d.%03d V", y / 1000, y % 1000);
 #endif
 #if CONFIG_CHARGING
 #if defined ARCHOS_RECORDER
-                debug_printf(3, "Chgr: %s %s",
+                lcd_putsf(0, 3, "Chgr: %s %s",
                          charger_inserted() ? "present" : "absent",
                          charger_enabled() ? "on" : "off");
-                debug_printf(5, "short delta: %d", short_delta);
-                debug_printf(6, "long delta: %d", long_delta);
+                lcd_putsf(0, 5, "short delta: %d", short_delta);
+                lcd_putsf(0, 6, "long delta: %d", long_delta);
                 lcd_puts(0, 7, power_message);
-                debug_printf(8, "USB Inserted: %s",
+                lcd_putsf(0, 8, "USB Inserted: %s",
                          usb_inserted() ? "yes" : "no");
 #elif defined IRIVER_H300_SERIES
-                debug_printf(9, "USB Charging Enabled: %s",
+                lcd_putsf(0, 9, "USB Charging Enabled: %s",
                          usb_charging_enabled() ? "yes" : "no");
 #elif defined IPOD_NANO || defined IPOD_VIDEO
                 int usb_pwr  = (GPIOL_INPUT_VAL & 0x10)?true:false;
@@ -1531,15 +1520,15 @@ static bool view_battery(void)
                 int charging = (GPIOB_INPUT_VAL & 0x01)?false:true;
                 int headphone= (GPIOA_INPUT_VAL & 0x80)?true:false;
 
-                debug_printf(3, "USB pwr:   %s",
+                lcd_putsf(0, 3, "USB pwr:   %s",
                             usb_pwr ? "present" : "absent");
-                debug_printf(4, "EXT pwr:   %s",
+                lcd_putsf(0, 4, "EXT pwr:   %s",
                             ext_pwr ? "present" : "absent");
-                debug_printf(5, "Battery:   %s",
+                lcd_putsf(0, 5, "Battery:   %s",
                     charging ? "charging" : (usb_pwr||ext_pwr) ? "charged" : "discharging");
-                debug_printf(6, "Dock mode: %s",
+                lcd_putsf(0, 6, "Dock mode: %s",
                          dock    ? "enabled" : "disabled");
-                debug_printf(7, "Headphone: %s",
+                lcd_putsf(0, 7, "Headphone: %s",
                          headphone ? "connected" : "disconnected");
 #elif defined TOSHIBA_GIGABEAT_S
                 int line = 3;
@@ -1556,16 +1545,16 @@ static bool view_battery(void)
                     "<unknown>",
                 };
 
-                debug_printf(line++, "Charger: %s",
+                lcd_putsf(0, line++, "Charger: %s",
                          charger_inserted() ? "present" : "absent");
 
                 st = power_input_status() &
                      (POWER_INPUT_CHARGER | POWER_INPUT_BATTERY);
-                debug_printf(line++, "%s%s",
+                lcd_putsf(0, line++, "%s%s",
                          (st & POWER_INPUT_MAIN_CHARGER) ? " Main" : "",
                          (st & POWER_INPUT_USB_CHARGER) ? " USB" : "");
 
-                debug_printf(line++, "IUSB Max: %d", usb_allowed_current());
+                lcd_putsf(0, line++, "IUSB Max: %d", usb_allowed_current());
 
                 y = ARRAYLEN(chrgstate_strings) - 1;
 
@@ -1580,36 +1569,36 @@ static bool view_battery(void)
                 default:;
                 }
 
-                debug_printf(line++, "State: %s", chrgstate_strings[y]);
+                lcd_putsf(0, line++, "State: %s", chrgstate_strings[y]);
 
-                debug_printf(line++, "Battery Switch: %s",
+                lcd_putsf(0, line++, "Battery Switch: %s",
                          (st & POWER_INPUT_BATTERY) ? "On" : "Off");
 
                 y = chrgraw_adc_voltage();
-                debug_printf(line++, "CHRGRAW: %d.%03d V",
+                lcd_putsf(0, line++, "CHRGRAW: %d.%03d V",
                          y / 1000, y % 1000);
 
                 y = application_supply_adc_voltage();
-                debug_printf(line++, "BP     : %d.%03d V",
+                lcd_putsf(0, line++, "BP     : %d.%03d V",
                          y / 1000, y % 1000);
 
                 y = battery_adc_charge_current();
                 if (y < 0) x = '-', y = -y;
                 else       x = ' ';
-                debug_printf(line++, "CHRGISN:%c%d mA", x, y);
+                lcd_putsf(0, line++, "CHRGISN:%c%d mA", x, y);
 
                 y = cccv_regulator_dissipation();
-                debug_printf(line++, "P CCCV : %d mW", y);
+                lcd_putsf(0, line++, "P CCCV : %d mW", y);
 
                 y = battery_charge_current();
                 if (y < 0) x = '-', y = -y;
                 else       x = ' ';
-                debug_printf(line++, "I Charge:%c%d mA", x, y);
+                lcd_putsf(0, line++, "I Charge:%c%d mA", x, y);
 
                 y = battery_adc_temp();
 
                 if (y != INT_MIN) {
-                    debug_printf(line++, "T Battery: %dC (%dF)", y,
+                    lcd_putsf(0, line++, "T Battery: %dC (%dF)", y,
                                (9*y + 160) / 5);
                 } else {
                     /* Conversion disabled */
@@ -1627,23 +1616,23 @@ static bool view_battery(void)
                 };
                 const char *str = NULL;
 
-                debug_printf(3, "Charger: %s",
+                lcd_putsf(0, 3, "Charger: %s",
                          charger_inserted() ? "present" : "absent");
 
                 y = charge_state - first;
                 if ((unsigned)y < ARRAYLEN(chrgstate_strings))
                     str = chrgstate_strings[y];
 
-                debug_printf(4, "State: %s",
+                lcd_putsf(0, 4, "State: %s",
                          str ? str : "<unknown>");
 
-                debug_printf(5, "CHARGER: %02X", 
+                lcd_putsf(0, 5, "CHARGER: %02X", 
                          ascodec_read(AS3514_CHARGER));
 #elif defined(IPOD_NANO2G)
                 y = pmu_read_battery_current();
-                debug_printf(2, "Battery current: %d mA", y);
+                lcd_putsf(0, 2, "Battery current: %d mA", y);
 #else
-                debug_printf(3, "Charger: %s",
+                lcd_putsf(0, 3, "Charger: %s",
                          charger_inserted() ? "present" : "absent");
 #endif /* target type */
 #endif /* CONFIG_CHARGING */
@@ -1654,7 +1643,7 @@ static bool view_battery(void)
 
                 for (i = 0; i <= 6; i++) {
                     y = power_history[i] - power_history[i+1];
-                    debug_printf(i+1, "-%d min: %s%d.%03d V", i,
+                    lcd_putsf(0, i+1, "-%d min: %s%d.%03d V", i,
                              (y < 0) ? "-" : "", ((y < 0) ? y * -1 : y) / 1000,
                              ((y < 0) ? y * -1 : y ) % 1000);
                 }
@@ -1663,24 +1652,24 @@ static bool view_battery(void)
             case 3: /* remaining time estimation: */
 
 #ifdef ARCHOS_RECORDER
-                debug_printf(0, "charge_state: %d", charge_state);
+                lcd_putsf(0, 0, "charge_state: %d", charge_state);
 
-                debug_printf(1, "Cycle time: %d m", powermgmt_last_cycle_startstop_min);
+                lcd_putsf(0, 1, "Cycle time: %d m", powermgmt_last_cycle_startstop_min);
 
-                debug_printf(2, "Lvl@cyc st: %d%%", powermgmt_last_cycle_level);
+                lcd_putsf(0, 2, "Lvl@cyc st: %d%%", powermgmt_last_cycle_level);
 
-                debug_printf(3, "P=%2d I=%2d", pid_p, pid_i);
+                lcd_putsf(0, 3, "P=%2d I=%2d", pid_p, pid_i);
 
-                debug_printf(4, "Trickle sec: %d/60", trickle_sec);
+                lcd_putsf(0, 4, "Trickle sec: %d/60", trickle_sec);
 #endif /* ARCHOS_RECORDER */
 
-                debug_printf(5, "Last PwrHist: %d.%03dV",
+                lcd_putsf(0, 5, "Last PwrHist: %d.%03dV",
                     power_history[0] / 1000,
                     power_history[0] % 1000);
 
-                debug_printf(6, "battery level: %d%%", battery_level());
+                lcd_putsf(0, 6, "battery level: %d%%", battery_level());
 
-                debug_printf(7, "Est. remain: %d m", battery_time());
+                lcd_putsf(0, 7, "Est. remain: %d m", battery_time());
                 break;
         }
 
@@ -2447,16 +2436,16 @@ static bool dbg_scrollwheel(void)
         lcd_clear_display();
 
         /* show internal variables of scrollwheel driver */
-        debug_printf(0, "wheel touched: %s", (wheel_is_touched) ? "true" : "false");
-        debug_printf(1, "new position: %2d", new_wheel_value);
-        debug_printf(2, "old position: %2d", old_wheel_value);
-        debug_printf(3, "wheel delta: %2d", wheel_delta);
-        debug_printf(4, "accumulated delta: %2d", accumulated_wheel_delta);
-        debug_printf(5, "velo [deg/s]: %4d", (int)wheel_velocity);
+        lcd_putsf(0, 0, "wheel touched: %s", (wheel_is_touched) ? "true" : "false");
+        lcd_putsf(0, 1, "new position: %2d", new_wheel_value);
+        lcd_putsf(0, 2, "old position: %2d", old_wheel_value);
+        lcd_putsf(0, 3, "wheel delta: %2d", wheel_delta);
+        lcd_putsf(0, 4, "accumulated delta: %2d", accumulated_wheel_delta);
+        lcd_putsf(0, 5, "velo [deg/s]: %4d", (int)wheel_velocity);
 
         /* show effective accelerated scrollspeed */
         speed = button_apply_acceleration( (1<<31)|(1<<24)|wheel_velocity);
-        debug_printf(6, "accel. speed: %4d", speed);
+        lcd_putsf(0, 6, "accel. speed: %4d", speed);
 
         lcd_update();
     }

@@ -32,7 +32,6 @@
 
 bool __dbg_hw_info(void)
 {
-    char buf[50];
     int line;
     unsigned int pllref;
     unsigned int mcu_pllfreq, ser_pllfreq, usb_pllfreq;
@@ -46,9 +45,8 @@ bool __dbg_hw_info(void)
     while (1)
     {
         line = 0;
-        snprintf(buf, sizeof (buf), "Sys Rev Code: 0x%02X",
-                 iim_system_rev());
-        lcd_puts(0, line++, buf); line++;
+        lcd_putsf(0, line++, "Sys Rev Code: 0x%02X", iim_system_rev());
+        line++;
 
         mpctl = CCM_MPCTL;
         spctl = CCM_SPCTL;
@@ -60,69 +58,55 @@ bool __dbg_hw_info(void)
         ser_pllfreq = ccm_get_pll(PLL_SERIAL);
         usb_pllfreq = ccm_get_pll(PLL_USB);
 
-        snprintf(buf, sizeof (buf), "pll_ref_clk: %u", pllref);
-        lcd_puts(0, line++, buf); line++;
+        lcd_putsf(0, line++, "pll_ref_clk: %u", pllref);
+        line++;
 
         /* MCU clock domain */
-        snprintf(buf, sizeof (buf), "MPCTL: %08lX", mpctl);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "MPCTL: %08lX", mpctl);
 
-        snprintf(buf, sizeof (buf), " mpl_dpdgck_clk: %u", mcu_pllfreq);
-        lcd_puts(0, line++, buf); line++;
+        lcd_putsf(0, line++, " mpl_dpdgck_clk: %u", mcu_pllfreq);
+        line++;
 
         regval = CCM_PDR0;
-        snprintf(buf, sizeof (buf), "  PDR0: %08lX", regval);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "  PDR0: %08lX", regval);
 
         freq = mcu_pllfreq / (((regval & 0x7) + 1));
-        snprintf(buf, sizeof (buf), "   mcu_clk:      %u", freq);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "   mcu_clk:      %u", freq);
 
         freq = mcu_pllfreq / (((regval >> 11) & 0x7) + 1);
-        snprintf(buf, sizeof (buf), "   hsp_clk:      %u", freq);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "   hsp_clk:      %u", freq);
 
         freq = mcu_pllfreq / (((regval >> 3) & 0x7) + 1);
-        snprintf(buf, sizeof (buf), "   hclk_clk:     %u", freq);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "   hclk_clk:     %u", freq);
 
-        snprintf(buf, sizeof (buf), "   ipg_clk:      %u",
+        lcd_putsf(0, line++, "   ipg_clk:      %u",
             freq / (unsigned)(((regval >> 6) & 0x3) + 1));
-        lcd_puts(0, line++, buf);
 
-        snprintf(buf, sizeof (buf), "   nfc_clk:      %u",
+        lcd_putsf(0, line++, "   nfc_clk:      %u",
             freq / (unsigned)(((regval >> 8) & 0x7) + 1));
-        lcd_puts(0, line++, buf);
 
         line++;
 
         /* Serial clock domain */
-        snprintf(buf, sizeof (buf), "SPCTL: %08lX", spctl);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof (buf), " spl_dpdgck_clk: %u", ser_pllfreq);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "SPCTL: %08lX", spctl);
+        lcd_putsf(0, line++, " spl_dpdgck_clk: %u", ser_pllfreq);
 
         line++;
 
         /* USB clock domain */
-        snprintf(buf, sizeof (buf), "UPCTL: %08lX", upctl);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "UPCTL: %08lX", upctl);
 
-        snprintf(buf, sizeof (buf), " upl_dpdgck_clk: %u", usb_pllfreq);
-        lcd_puts(0, line++, buf); line++;
+        lcd_putsf(0, line++, " upl_dpdgck_clk: %u", usb_pllfreq);
 
         regval = CCM_PDR1;
-        snprintf(buf, sizeof (buf), "  PDR1: %08lX", regval);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "  PDR1: %08lX", regval);
 
         freq = usb_pllfreq /
             ((((regval >> 30) & 0x3) + 1) * (((regval >> 27) & 0x7) + 1));
-        snprintf(buf, sizeof (buf), "   usb_clk:       %u", freq);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "   usb_clk:       %u", freq);
 
         freq = usb_pllfreq / (((CCM_PDR0 >> 16) & 0x1f) + 1);
-        snprintf(buf, sizeof (buf), "   ipg_per_baud:  %u", freq);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "   ipg_per_baud:  %u", freq);
           
         lcd_update();
 
@@ -133,7 +117,6 @@ bool __dbg_hw_info(void)
 
 bool __dbg_ports(void)
 {
-    char buf[50];
     int line;
     int i;
 
@@ -171,71 +154,62 @@ bool __dbg_ports(void)
     while(1)
     {
         line = 0;
-        snprintf(buf, sizeof(buf), "[Ports and Registers]");
-        lcd_puts(0, line++, buf); line++;
+        lcd_puts(0, line++, "[Ports and Registers]");
+        line++;
 
         /* GPIO1 */
-        snprintf(buf, sizeof(buf), "GPIO1: DR:   %08lx GDIR: %08lx", GPIO1_DR, GPIO1_GDIR);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "GPIO1: DR:   %08lx GDIR: %08lx", GPIO1_DR, GPIO1_GDIR);
 
-        snprintf(buf, sizeof(buf), "       PSR:  %08lx ICR1: %08lx", GPIO1_PSR, GPIO1_ICR1);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "       PSR:  %08lx ICR1: %08lx", GPIO1_PSR, GPIO1_ICR1);
 
-        snprintf(buf, sizeof(buf), "       ICR2: %08lx IMR:  %08lx", GPIO1_ICR2, GPIO1_IMR);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "       ICR2: %08lx IMR:  %08lx", GPIO1_ICR2, GPIO1_IMR);
 
-        snprintf(buf, sizeof(buf), "       ISR:  %08lx",             GPIO1_ISR);
-        lcd_puts(0, line++, buf); line++;
+        lcd_putsf(0, line++, "       ISR:  %08lx",             GPIO1_ISR);
+        line++;
 
         /* GPIO2 */
-        snprintf(buf, sizeof(buf), "GPIO2: DR:   %08lx GDIR: %08lx", GPIO2_DR, GPIO2_GDIR);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "GPIO2: DR:   %08lx GDIR: %08lx", GPIO2_DR, GPIO2_GDIR);
 
-        snprintf(buf, sizeof(buf), "       PSR:  %08lx ICR1: %08lx", GPIO2_PSR, GPIO2_ICR1);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "       PSR:  %08lx ICR1: %08lx", GPIO2_PSR, GPIO2_ICR1);
 
-        snprintf(buf, sizeof(buf), "       ICR2: %08lx IMR:  %08lx", GPIO2_ICR2, GPIO2_IMR);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "       ICR2: %08lx IMR:  %08lx", GPIO2_ICR2, GPIO2_IMR);
 
-        snprintf(buf, sizeof(buf), "       ISR:  %08lx",             GPIO2_ISR);
-        lcd_puts(0, line++, buf); line++;
+        lcd_putsf(0, line++, "       ISR:  %08lx",             GPIO2_ISR);
+        line++;
 
         /* GPIO3 */
-        snprintf(buf, sizeof(buf), "GPIO3: DR:   %08lx GDIR: %08lx", GPIO3_DR, GPIO3_GDIR);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "GPIO3: DR:   %08lx GDIR: %08lx", GPIO3_DR, GPIO3_GDIR);
 
-        snprintf(buf, sizeof(buf), "       PSR:  %08lx ICR1: %08lx", GPIO3_PSR, GPIO3_ICR1);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "       PSR:  %08lx ICR1: %08lx", GPIO3_PSR, GPIO3_ICR1);
 
-        snprintf(buf, sizeof(buf), "       ICR2: %08lx IMR:  %08lx", GPIO3_ICR2, GPIO3_IMR);
-        lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "       ICR2: %08lx IMR:  %08lx", GPIO3_ICR2, GPIO3_IMR);
 
-        snprintf(buf, sizeof(buf), "       ISR:  %08lx",             GPIO3_ISR);
-        lcd_puts(0, line++, buf); line++;
+        lcd_putsf(0, line++, "       ISR:  %08lx",             GPIO3_ISR);
+        line++;
 
-        lcd_puts(0, line++, "PMIC Registers"); line++;
+        lcd_puts(0, line++, "PMIC Registers");
+        line++;
 
         mc13783_read_regset(pmic_regset, pmic_regs, ARRAYLEN(pmic_regs));
 
         for (i = 0; i < (int)ARRAYLEN(pmic_regs); i++)
         {
-            snprintf(buf, sizeof(buf), "%s: %08lx", pmic_regnames[i], pmic_regs[i]);
-            lcd_puts(0, line++, buf);
+            lcd_putsf(0, line++, "%s: %08lx", pmic_regnames[i], pmic_regs[i]);
         }
 
         line++;
 
-        lcd_puts(0, line++, "ADC"); line++;
+        lcd_puts(0, line++, "ADC");
+        line++;
 
         for (i = 0; i < NUM_ADC_CHANNELS; i += 4)
         {
-            snprintf(buf, sizeof(buf),
+            lcd_putsf(0, line++,
                      "CH%02d:%04u CH%02d:%04u CH%02d:%04u CH%02d:%04u",
                      i+0, adc_read(i+0),
                      i+1, adc_read(i+1),
                      i+2, adc_read(i+2),
                      i+3, adc_read(i+3));
-            lcd_puts(0, line++, buf);
         }
 
         lcd_update();

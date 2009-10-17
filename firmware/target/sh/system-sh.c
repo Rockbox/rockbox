@@ -295,22 +295,19 @@ void UIE (unsigned int pc) __attribute__((section(".text")));
 void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 {
     unsigned int n;
-    char str[32];
 
     asm volatile ("sts\tpr,%0" : "=r"(n));
 
     /* clear screen */
-    lcd_clear_display ();
+    lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_SYSFIXED);
 #endif
     /* output exception */
     n = (n - (unsigned)UIE4 + 12)>>2; /* get exception or interrupt number */
-    snprintf(str,sizeof(str),"I%02x:%s",n,irqname[n]);
-    lcd_puts(0,0,str);
-    snprintf(str,sizeof(str),"at %08x",pc);
-    lcd_puts(0,1,str);
-    lcd_update ();
+    lcd_putsf(0, 0, "I%02x:%s", n, irqname[n]);
+    lcd_putsf(0, 1, "at %08x", pc);
+    lcd_update();
 
      /* try to restart firmware if ON is pressed */
     system_exception_wait();

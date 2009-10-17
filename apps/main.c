@@ -242,9 +242,6 @@ static void init_tagcache(void)
     
     while (!tagcache_is_initialized())
     {
-#ifdef HAVE_LCD_CHARCELLS
-        char buf[32];
-#endif
         int ret = tagcache_get_commit_step();
 
         if (ret > 0)
@@ -277,9 +274,8 @@ static void init_tagcache(void)
             }
 #else
             lcd_double_height(false);
-            snprintf(buf, sizeof(buf), " DB [%d/%d]", ret, 
+            lcd_putsf(0, 1, " DB [%d/%d]", ret, 
                 tagcache_get_max_commit_step());
-            lcd_puts(0, 1, buf);
             lcd_update();
 #endif
             clear = true;
@@ -464,10 +460,8 @@ static void init(void)
     if(rc)
     {
 #ifdef HAVE_LCD_BITMAP
-        char str[32];
         lcd_clear_display();
-        snprintf(str, 31, "ATA error: %d", rc);
-        lcd_puts(0, 1, str);
+        lcd_putsf(0, 1, "ATA error: %d", rc);
         lcd_puts(0, 3, "Press ON to debug");
         lcd_update();
         while(!(button_get(true) & BUTTON_REL)); /*DO NOT CHANGE TO ACTION SYSTEM */

@@ -41,14 +41,14 @@
 #include "splash.h"
 #include "viewport.h"
 
-static void speak_time(int hours, int minutes, bool speak_hours)
+static void speak_time(int hours, int minutes, bool speak_hours, bool enqueue)
 {
     if (global_settings.talk_menu){
         if(speak_hours) {
-            talk_value(hours, UNIT_HOUR, false);
+            talk_value(hours, UNIT_HOUR, enqueue);
             talk_value(minutes, UNIT_MIN, true);
         } else {
-            talk_value(minutes, UNIT_MIN, false);
+            talk_value(minutes, UNIT_MIN, enqueue);
         }
     }
 }
@@ -56,8 +56,7 @@ static void speak_time(int hours, int minutes, bool speak_hours)
 bool alarm_screen(void)
 {
     int h, m;
-    bool done=false;
-    char buf[32];
+    bool done = false;
     struct tm *tm;
     int togo;
     int button;
@@ -90,19 +89,14 @@ bool alarm_screen(void)
                 screens[i].puts(0, 3, str(LANG_ALARM_MOD_KEYS));
             }
             /* Talk when entering the wakeup screen */
-            if (global_settings.talk_menu)
-            {
-                talk_value(h, UNIT_HOUR, true);
-                talk_value(m, UNIT_MIN, true);
-            }
+            speak_time(h, m, true, true);
             update = false;
         }
 
-        snprintf(buf, 32, str(LANG_ALARM_MOD_TIME), h, m);
         FOR_NB_SCREENS(i)
         {
             screens[i].set_viewport(&vp[i]);
-            screens[i].puts(0, 1, buf);
+            screens[i].putsf(0, 1, str(LANG_ALARM_MOD_TIME), h, m);
             screens[i].update_viewport();
             screens[i].set_viewport(NULL);
         }
@@ -147,7 +141,7 @@ bool alarm_screen(void)
             if (h == 24)
                 h = 0;
 
-            speak_time(h, m, hour_wrapped);
+            speak_time(h, m, hour_wrapped, false);
             break;
 
          /* dec(m) */
@@ -162,7 +156,7 @@ bool alarm_screen(void)
              if (h == -1)
                  h = 23;
 
-             speak_time(h, m, hour_wrapped);
+             speak_time(h, m, hour_wrapped, false);
              break;
 
          /* inc(h) */

@@ -165,16 +165,13 @@ static void system_display_exception_info(unsigned long format,
                                           unsigned long pc)
 {
     int vector = (format >> 18) & 0xff;
-    char str[32];
 
     /* clear screen */
     lcd_clear_display ();
     lcd_setfont(FONT_SYSFIXED);
 
-    snprintf(str, sizeof(str), "I%02x:%s", vector, irqname[vector]);
-    lcd_puts(0, 0, str);
-    snprintf(str, sizeof(str), "at %08x", pc);
-    lcd_puts(0, 1, str);
+    lcd_putsf(0, 0, "I%02x:%s", vector, irqname[vector]);
+    lcd_putsf(0, 1, "at %08x", pc);
     lcd_update();
 
     system_exception_wait();

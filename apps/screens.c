@@ -300,11 +300,9 @@ static void charging_display_info(bool animate)
     if (ide_powered()) /* FM and V2 can only measure when ATA power is on */
 #endif
     {
-        char buf[32];
         int battv = battery_voltage();
-        snprintf(buf, 32, "  Batt: %d.%02dV %d%%  ", battv / 1000,
+        lcd_putsf(0, 7, "  Batt: %d.%02dV %d%%  ", battv / 1000,
                  (battv % 1000) / 10, battery_level());
-        lcd_puts(0, 7, buf);
     }
 
 #ifdef ARCHOS_RECORDER
@@ -400,8 +398,7 @@ static void charging_display_info(bool animate)
     char buf[32];
 
     battv = battery_voltage();
-    snprintf(buf, sizeof(buf), " %d.%02dV", battv / 1000, (battv % 1000) / 10);
-    lcd_puts(4, 1, buf);
+    lcd_putsf(4, 1, " %d.%02dV", battv / 1000, (battv % 1000) / 10);
 
     memcpy(buf, logo_pattern, 32); /* copy logo patterns */
 

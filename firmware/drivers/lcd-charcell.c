@@ -21,7 +21,8 @@
  ****************************************************************************/
 #include "config.h"
 #include "hwcompat.h"
-
+#include "stdarg.h"
+#include "sprintf.h"
 #include "lcd.h"
 #include "kernel.h"
 #include "thread.h"
@@ -425,6 +426,17 @@ void lcd_putsxy(int x, int y, const unsigned char *str)
 void lcd_puts(int x, int y, const unsigned char *str)
 {
     lcd_puts_offset(x, y, str, 0);
+}
+
+/* Formatting version of lcd_puts */
+void lcd_putsf(int x, int y, const unsigned char *fmt, ...)
+{
+    va_list ap;
+    char buf[256];
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof (buf), fmt, ap);
+    va_end(ap);
+    lcd_puts(x, y, buf);
 }
 
 /* Put a string at a given char position,  skipping first offset chars */

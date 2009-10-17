@@ -36,16 +36,13 @@ static const char* const uiename[] = {
  */
 void __attribute__((noreturn)) UIE(unsigned int pc, unsigned int num)
 {
-    char str[32];
-
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_SYSFIXED);
 #endif
     lcd_puts(0, 0, uiename[num]);
-    snprintf(str, sizeof(str), "at %08x" IF_COP(" (%d)"), pc
+    lcd_putsf(0, 1, "at %08x" IF_COP(" (%d)"), pc
              IF_COP(, CURRENT_CORE));
-    lcd_puts(0, 1, str);
     lcd_update();
 
     disable_interrupt(IRQ_FIQ_STATUS);

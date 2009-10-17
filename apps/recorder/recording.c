@@ -1786,13 +1786,16 @@ bool recording_screen(bool no_source)
             /* draw the clipcounter just in front of the peakmeter */
             if(global_settings.peak_meter_clipcounter)
             {
-                char clpstr[32];
-                snprintf(clpstr, 32, "%4d", pm_get_clipcount());
+                int clipcount = pm_get_clipcount();
                 FOR_NB_ACTIVE_SCREENS(i)
                 {
                     if(!compact_view[i])
-                        screens[i].puts(0, 2,str(LANG_PM_CLIPCOUNT));
-                    screens[i].puts(0, compact_view[i] ? 2 : 3, clpstr);
+                    {
+                        screens[i].puts(0, 2, str(LANG_PM_CLIPCOUNT));
+                        screens[i].putsf(0, 3, "%4d", clipcount);
+                    }
+                    else
+                        screens[i].putsf(0, 2, "%4d", clipcount);
                 }
             }
 
