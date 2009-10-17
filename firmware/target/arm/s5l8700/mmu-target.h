@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Dave Chapman
+ * Copyright (C) 2006,2007 by Greg White
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,21 +18,26 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef SYSTEM_TARGET_H
-#define SYSTEM_TARGET_H
 
-#include "system-arm.h"
-#include "mmu-target.h"
+/*  This file MUST be included in your system-target.h file if you want arm
+ *  cache coherence functions to be called (I.E. during codec load, etc).   
+ */
 
-#define CPUFREQ_DEFAULT 32000000
-#define CPUFREQ_NORMAL  48000000
-#define CPUFREQ_MAX    192000000
+#ifndef MMU_S5L8700_H
+#define MMU_S5L8700_H
 
-#define inl(a) (*(volatile unsigned long *) (a))
-#define outl(a,b) (*(volatile unsigned long *) (b) = (a))
-#define inb(a) (*(volatile unsigned char *) (a))
-#define outb(a,b) (*(volatile unsigned char *) (b) = (a))
-#define inw(a) (*(volatile unsigned short *) (a))
-#define outw(a,b) (*(volatile unsigned short *) (b) = (a))
+/* Cleans entire DCache */
+void clean_dcache(void);
 
-#endif /* SYSTEM_TARGET_H */
+/* Invalidate entire DCache */
+/* will do writeback */
+void invalidate_dcache(void);
+
+/* Invalidate entire ICache and DCache */
+/* will do writeback */
+void invalidate_idcache(void);
+
+#define HAVE_CPUCACHE_INVALIDATE
+#define HAVE_CPUCACHE_FLUSH
+
+#endif /* MMU_S5L8700_H */

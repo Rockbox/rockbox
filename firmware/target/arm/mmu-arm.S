@@ -156,8 +156,6 @@ cpucache_invalidate:
 
 #else /* !IMX31L */
 
-/* S5L870X doesn't have a MMU */
-#ifndef CPU_S5L870X
 /** MMU setup **/
 
 /*
@@ -247,8 +245,6 @@ enable_mmu:
     .size   enable_mmu, .-enable_mmu
     .ltorg
     
-#endif /* S5L870X */
-
 /** Cache coherency **/
 
 /*
