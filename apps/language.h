@@ -22,13 +22,13 @@
  ****************************************************************************/
 
 /* Initialize language array with the builtin strings */
-void lang_init(void);
+void lang_init(const unsigned char *builtin, unsigned char **dest, int count);
 
 /* load a given language file */
 int lang_load(const char *filename);
 
 /* get the ID of an english string so it can be localised */
-int lang_english_to_id(const char* english);
+int lang_english_to_id(const char *english);
 
 /* returns whether the loaded language is a right-to-left language */
 int lang_is_rtl(void);

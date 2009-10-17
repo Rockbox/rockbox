@@ -43,23 +43,15 @@
 #define HEADER_SIZE 4
 
 static unsigned char language_buffer[MAX_LANGUAGE_SIZE];
-
-void lang_init(void)
-{
-    int i;
-    unsigned char *ptr = (unsigned char *) language_builtin;
-    
-    for (i = 0; i < LANG_LAST_INDEX_IN_ARRAY; i++) {
-        language_strings[i] = ptr;
-        ptr += strlen((char *)ptr) + 1; /* advance pointer to next string */
-    }
-}
-
 static unsigned char lang_options = 0;
 
-int lang_is_rtl(void)
+void lang_init(const unsigned char *builtin, unsigned char **dest, int count)
 {
-    return (lang_options & LANGUAGE_FLAG_RTL) != 0;
+    while(count--) {
+        *dest++ = (unsigned char *)builtin;
+        /* advance pointer to next string */
+        builtin += strlen((char *)builtin) + 1;
+    }
 }
 
 int lang_load(const char *filename)
@@ -79,7 +71,9 @@ int lang_load(const char *filename)
             read(fd, language_buffer, MAX_LANGUAGE_SIZE);
             unsigned char *ptr = language_buffer;
             int id;
-            lang_init();                    /* initialize with builtin */
+            /* initialize with builtin */
+            lang_init(language_builtin, language_strings, 
+                      LANG_LAST_INDEX_IN_ARRAY);
 
             while(fsize>3) {
                 id = (ptr[0]<<8) | ptr[1];  /* get two-byte id */
@@ -113,7 +107,7 @@ int lang_load(const char *filename)
     return retcode;
 }
 
-int lang_english_to_id(const char* english)
+int lang_english_to_id(const char *english)
 {
     int i;
     unsigned char *ptr = (unsigned char *) language_builtin;
@@ -124,4 +118,9 @@ int lang_english_to_id(const char* english)
         ptr += strlen((char *)ptr) + 1; /* advance pointer to next string */
     }
     return -1;
+}
+
+int lang_is_rtl(void)
+{
+    return (lang_options & LANGUAGE_FLAG_RTL) != 0;
 }

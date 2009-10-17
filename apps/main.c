@@ -312,7 +312,7 @@ static void init(void)
     button_init();
     backlight_init();
     sim_tasks_init();
-    lang_init();
+    lang_init(language_builtin, language_strings, LANG_LAST_INDEX_IN_ARRAY);
 #ifdef DEBUG
     debug_init();
 #endif
@@ -403,7 +403,7 @@ static void init(void)
     font_init();
 
     show_logo();
-    lang_init();
+    lang_init(language_builtin, language_strings, LANG_LAST_INDEX_IN_ARRAY);
 
 #ifdef DEBUG
     debug_init();
