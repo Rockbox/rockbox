@@ -291,7 +291,9 @@ static const char* formatter_unit_0_is_skip_track(char *buffer, size_t buffer_si
                                            int val, const char *unit)
 {
     (void)unit;
-    if (val == 0)
+    if (val == -1)
+        return str(LANG_SKIP_OUTRO);
+    else if (val == 0)
         return str(LANG_SKIP_TRACK);
     else if (val % 60 == 0)
         snprintf(buffer, buffer_size, "%d min", val/60);
@@ -1459,10 +1461,10 @@ const struct settings_list settings[] = {
                   NULL),
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, skip_length,
                   LANG_SKIP_LENGTH, 0, "skip length",
-                  "track,1s,2s,3s,5s,7s,10s,15s,20s,30s,45s,1min,90s,2min,3min,5min,10min,15min",
+                  "outro,track,1s,2s,3s,5s,7s,10s,15s,20s,30s,45s,1min,90s,2min,3min,5min,10min,15min",
                   UNIT_SEC, formatter_unit_0_is_skip_track,
                   getlang_unit_0_is_skip_track, NULL,
-                  18, 0,1,2,3,5,7,10,15,20,30,45,60,90,120,180,300,600,900),
+                  19, -1,0,1,2,3,5,7,10,15,20,30,45,60,90,120,180,300,600,900),
     CHOICE_SETTING(0, start_in_screen, LANG_START_SCREEN, 1, 
                    "start in screen", "previous,root,files,"
 #ifdef HAVE_TAGCACHE 

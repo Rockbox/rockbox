@@ -71,7 +71,7 @@
 #define RESTORE_WPS_INSTANTLY       0l
 #define RESTORE_WPS_NEXT_SECOND     ((long)(HZ+current_tick))
 /* in milliseconds */
-#define DEFAULT_SKIP_TRESH          3000ul
+#define DEFAULT_SKIP_TRESH          3000l
 
 
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
@@ -494,11 +494,26 @@ static void next_track(void)
 
 static void play_hop(int direction)
 {
-    unsigned long step = ((unsigned long)global_settings.skip_length)*1000;
-    unsigned long elapsed = wps_state.id3->elapsed;
-    unsigned long remaining = wps_state.id3->length - elapsed;
+    long step = global_settings.skip_length*1000;
+    long elapsed = wps_state.id3->elapsed;
+    long remaining = wps_state.id3->length - elapsed;
 
-    if (!global_settings.prevent_skip &&
+    if (step < 0)
+    {
+        if (direction < 0)
+        {
+            prev_track(DEFAULT_SKIP_TRESH);
+            return;
+        }
+        else if (remaining < DEFAULT_SKIP_TRESH*2)
+        {
+            next_track();
+            return;
+        }
+        else
+            elapsed += (remaining - DEFAULT_SKIP_TRESH*2);
+    }
+    else if (!global_settings.prevent_skip &&
            (!step ||
             (direction > 0 && step >= remaining) ||
             (direction < 0 && elapsed < DEFAULT_SKIP_TRESH)))
@@ -509,8 +524,7 @@ static void play_hop(int direction)
             prev_track(DEFAULT_SKIP_TRESH);
         return;
     }
-
-    if (direction == 1 && step >= remaining)
+    else if (direction == 1 && step >= remaining)
     {
 #if CONFIG_CODEC == SWCODEC
         if(global_settings.beep)

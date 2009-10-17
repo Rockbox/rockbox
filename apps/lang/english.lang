@@ -13075,3 +13075,17 @@
     swcodec: "Release Time"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Skip to Outro"
+  </dest>
+  <voice>
+    *: "Skip to Outro"
+  </voice>
+</phrase>
