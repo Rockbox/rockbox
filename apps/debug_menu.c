@@ -1728,8 +1728,8 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     char *title = lists->title;
     static const unsigned char i_vmin[] = { 0, 1, 5, 10, 25, 35, 60, 100 };
     static const unsigned char i_vmax[] = { 1, 5, 10, 25, 35, 45, 80, 200 };
-    static const unsigned char *kbit_units[] = { "kBit/s", "MBit/s", "GBit/s" };
-    static const unsigned char *nsec_units[] = { "ns", "µs", "ms" };
+    static const unsigned char * const kbit_units[] = { "kBit/s", "MBit/s", "GBit/s" };
+    static const unsigned char * const nsec_units[] = { "ns", "µs", "ms" };
 #if (CONFIG_STORAGE & STORAGE_MMC)
     static const char * const mmc_spec_vers[] = { "1.0-1.2", "1.4", "2.0-2.2",
         "3.1-3.31", "4.0" };

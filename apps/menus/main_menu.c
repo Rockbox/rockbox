@@ -150,20 +150,6 @@ enum infoscreenorder
     INFO_COUNT
 };
 
-static const unsigned char *kbyte_units[] =
-{
-    ID2P(LANG_KILOBYTE),
-    ID2P(LANG_MEGABYTE),
-    ID2P(LANG_GIGABYTE)
-};
-
-static const unsigned char *byte_units[] =
-{
-    ID2P(LANG_BYTE),
-    ID2P(LANG_KILOBYTE),
-    ID2P(LANG_MEGABYTE)
-};
-
 static const char* info_getname(int selected_item, void *data,
                                 char *buffer, size_t buffer_len)
 {
@@ -315,8 +301,7 @@ static int info_speak_item(int selected_item, void * data)
             break;
         case INFO_DISK1: /* disk 1 */
 #ifdef HAVE_MULTIVOLUME
-            talk_id(LANG_DISK_NAME_INTERNAL, false);
-            talk_id(LANG_DISK_FREE_INFO, true);
+            talk_ids(false, LANG_DISK_NAME_INTERNAL, LANG_DISK_FREE_INFO);
             output_dyn_value(NULL, 0, info->free, kbyte_units, true);
             talk_id(LANG_DISK_SIZE_INFO, true);
             output_dyn_value(NULL, 0, info->size, kbyte_units, true);

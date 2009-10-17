@@ -26,13 +26,16 @@
 #include "config.h"
 #include "system.h"
 
+extern const unsigned char * const byte_units[];
+extern const unsigned char * const * const kbyte_units;
+
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is
  * given, the result is snprintf()'d into that buffer, otherwise the result is
  * voiced.*/
 char *output_dyn_value(char *buf, int buf_size, int value,
-                      const unsigned char **units, bool bin_scale);
+                      const unsigned char * const *units, bool bin_scale);
 
 /* Format time into buf.
  *

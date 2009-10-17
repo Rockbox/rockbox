@@ -84,13 +84,24 @@
 #endif
 #endif
 
+/* units used with output_dyn_value */
+const unsigned char * const byte_units[] =
+{
+    ID2P(LANG_BYTE),
+    ID2P(LANG_KILOBYTE),
+    ID2P(LANG_MEGABYTE),
+    ID2P(LANG_GIGABYTE)
+};
+
+const unsigned char * const * const kbyte_units = &byte_units[1];
+
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is
  * given, the result is snprintf()'d into that buffer, otherwise the result is
  * voiced.*/
 char *output_dyn_value(char *buf, int buf_size, int value,
-                       const unsigned char **units, bool bin_scale)
+                       const unsigned char * const *units, bool bin_scale)
 {
     int scale = bin_scale ? 1024 : 1000;
     int fraction = 0;
@@ -827,9 +838,9 @@ char* skip_whitespace(char* const str)
 {
     char *s = str;
 
-    while (isspace(*s)) 
+    while (isspace(*s))
         s++;
-    
+
     return s;
 }
 

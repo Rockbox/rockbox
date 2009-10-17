@@ -1035,13 +1035,6 @@ bool recording_screen(bool no_source)
     int prev_rec_source = global_settings.rec_source; /* detect source change */
 #endif
 
-    static const unsigned char *byte_units[] = {
-        ID2P(LANG_BYTE),
-        ID2P(LANG_KILOBYTE),
-        ID2P(LANG_MEGABYTE),
-        ID2P(LANG_GIGABYTE)
-    };
-
     struct audio_recording_options rec_options;
     rec_status = RCSTAT_IN_RECSCREEN;
 
