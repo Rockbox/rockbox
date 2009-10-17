@@ -29,6 +29,7 @@
 #include "pcm.h"
 #include "pcm_sampr.h"
 #include "dma-target.h"
+#include "mmu-target.h"
 
 /*  Driver for the IIS/PCM part of the s5l8700 using DMA
 
@@ -104,6 +105,7 @@ static void play_next(void *addr, size_t size)
                       dma_callback);
     
     /* DMA channel on */
+    clean_dcache();
     dma_enable_channel(DMA_IISOUT_CHANNEL);
 }
 
@@ -160,6 +162,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 #endif
     
     /* S3: DMA channel 0 on */
+    clean_dcache();
     dma_enable_channel(DMA_IISOUT_CHANNEL);
 
     /* S4: IIS Tx clock on */
@@ -314,4 +317,3 @@ const void * pcm_rec_dma_get_peak_buffer(int *count)
 }
 
 #endif /* HAVE_RECORDING */
-
