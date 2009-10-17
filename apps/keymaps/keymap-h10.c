@@ -398,6 +398,35 @@ static const struct button_mapping button_context_usb_hid_mode_browser[] = {
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
 }; /* button_context_usb_hid_mode_browser */
+
+#ifdef HAVE_USB_HID_MOUSE
+static const struct button_mapping button_context_usb_hid_mode_mouse[] = {
+    { ACTION_USB_HID_MOUSE_UP,                BUTTON_SCROLL_UP,                             BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_UP_REP,            BUTTON_SCROLL_UP|BUTTON_REPEAT,               BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN,              BUTTON_SCROLL_DOWN,                           BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN_REP,          BUTTON_SCROLL_DOWN|BUTTON_REPEAT,             BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LEFT,              BUTTON_LEFT,                                  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LEFT_REP,          BUTTON_LEFT|BUTTON_REPEAT,                    BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RIGHT,             BUTTON_RIGHT,                                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RIGHT_REP,         BUTTON_RIGHT|BUTTON_REPEAT,                   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_LEFT,       BUTTON_PLAY,                                  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_LEFT_REL,   BUTTON_PLAY|BUTTON_REL,                       BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_UP,          BUTTON_PLAY|BUTTON_SCROLL_UP,                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_UP_REP,      BUTTON_PLAY|BUTTON_SCROLL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_DOWN,        BUTTON_PLAY|BUTTON_SCROLL_DOWN,               BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_DOWN_REP,    BUTTON_PLAY|BUTTON_SCROLL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_LEFT,        BUTTON_PLAY|BUTTON_LEFT,                      BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_LEFT_REP,    BUTTON_PLAY|BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_RIGHT,       BUTTON_PLAY|BUTTON_RIGHT,                     BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LDRAG_RIGHT_REP,   BUTTON_PLAY|BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_UP,   BUTTON_REW,                                   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_UP,   BUTTON_REW|BUTTON_REPEAT,                     BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_DOWN, BUTTON_FF,                                    BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_DOWN, BUTTON_FF|BUTTON_REPEAT,                      BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
+}; /* button_context_usb_hid_mode_mouse */
+#endif
 #endif
 
 static const struct button_mapping* get_context_mapping_remote( int context )
@@ -485,6 +514,16 @@ const struct button_mapping* get_context_mapping(int context)
 #ifdef USB_ENABLE_HID
         case CONTEXT_USB_HID:
             return button_context_usb_hid;
+        case CONTEXT_USB_HID_MODE_MULTIMEDIA:
+            return button_context_usb_hid_mode_multimedia;
+        case CONTEXT_USB_HID_MODE_PRESENTATION:
+            return button_context_usb_hid_mode_presentation;
+        case CONTEXT_USB_HID_MODE_BROWSER:
+            return button_context_usb_hid_mode_browser;
+#ifdef HAVE_USB_HID_MOUSE
+        case CONTEXT_USB_HID_MODE_MOUSE:
+            return button_context_usb_hid_mode_mouse;
+#endif
 #endif
         default:
             return button_context_standard;
