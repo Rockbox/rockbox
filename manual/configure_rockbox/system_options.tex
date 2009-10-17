@@ -205,7 +205,8 @@ this option \setting{On}. If it is not required, then turning this setting
     }%
     \opt{HAVEREMOTEKEYMAP}{
     Remote %
-        \opt{GIGABEAT_RC_PAD}{\ButtonRCDsp / Long \ButtonRCDsp}
+        \opt{GIGABEAT_RC_PAD}{\ButtonRCDsp / Long \ButtonRCDsp}%
+        \opt{MROBE100_RC_PAD}{\ButtonRCMode / Long \ButtonRCMode}
     can also be used to switch modes.%
     }%
     \newline\newline
@@ -227,7 +228,8 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{MROBE100_PAD}{\ButtonUp / \ButtonDown}
             \opt{HAVEREMOTEKEYMAP}{
               &
-              \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp / \ButtonRCVolDown}%
+              \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}
+                {\ButtonRCVolUp / \ButtonRCVolDown}%
             }
             & Volume up / down, respectively \\
             %
@@ -239,6 +241,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{Long \ButtonRCFF}%
+              \opt{MROBE100_RC_PAD}{\ButtonRCHeart}%
             }
             & Volume mute \\
             %
@@ -250,6 +253,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{\ButtonRCPlay}%
+              \opt{MROBE100_RC_PAD}{\ButtonRCPlay}%
             }
             & Play / Pause \\
             %
@@ -264,6 +268,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{Long \ButtonRCPlay}%
+              \opt{MROBE100_RC_PAD}{\ButtonRCDisplay; Long \ButtonRCPlay}%
             }
             & Stop \\
             %
@@ -274,6 +279,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{GIGABEAT_RC_PAD}{\ButtonPrev; \ButtonLeft}%
             \opt{HAVEREMOTEKEYMAP}{
               &
+              \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{\ButtonRCRew}%
             }
             & Scan previous track \\
             %
@@ -284,7 +290,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{GIGABEAT_RC_PAD}{\ButtonNext; \ButtonRight}%
             \opt{HAVEREMOTEKEYMAP}{
               &
-              \opt{GIGABEAT_RC_PAD}{\ButtonRCFF}%
+              \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{\ButtonRCFF}%
             }
             & Scan next track \\
           \end{btnmap}
@@ -305,7 +311,7 @@ this option \setting{On}. If it is not required, then turning this setting
                 ,MROBE100_PAD}{\ButtonPlay}
             \opt{HAVEREMOTEKEYMAP}{
               &
-              \opt{GIGABEAT_RC_PAD}{\ButtonRCPlay}%
+              \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{\ButtonRCPlay}%
             }
             & Slideshow start \\
             %
@@ -318,7 +324,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{MROBE100_PAD}{\ButtonDisplay; Long \ButtonPlay}
             \opt{HAVEREMOTEKEYMAP}{
               &
-              \opt{GIGABEAT_RC_PAD}{Long \ButtonRCPlay}%
+              \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{Long \ButtonRCPlay}%
             }
             & Slideshow leave \\
             %
@@ -329,7 +335,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{IRIVER_H10_PAD}{\ButtonRew}
             \opt{HAVEREMOTEKEYMAP}{
               &
-              \opt{GIGABEAT_RC_PAD}{\ButtonRCRew}%
+              \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{\ButtonRCRew}%
             }
             & Slide previous \\
             %
@@ -340,7 +346,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{IRIVER_H10_PAD}{\ButtonFF}
             \opt{HAVEREMOTEKEYMAP}{
               &
-              \opt{GIGABEAT_RC_PAD}{\ButtonRCFF}%
+              \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{\ButtonRCFF}%
             }
             & Slide next \\
             %
@@ -351,6 +357,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{IRIVER_H10_PAD}{Long \ButtonRew}
             \opt{HAVEREMOTEKEYMAP}{
                 &
+                \opt{MROBE100_RC_PAD}{Long \ButtonRCRew}%
             }
             & Slide first \\
             %
@@ -361,6 +368,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{IRIVER_H10_PAD}{Long \ButtonFF}
             \opt{HAVEREMOTEKEYMAP}{
                 &
+                \opt{MROBE100_RC_PAD}{Long \ButtonRCFF}%
             }
             & Slide last \\
             %
@@ -372,6 +380,7 @@ this option \setting{On}. If it is not required, then turning this setting
               {\ButtonMenu}
             \opt{HAVEREMOTEKEYMAP}{
                 &
+                \opt{MROBE100_RC_PAD}{\ButtonRCDisplay}%
             }
             & Blank screen \\
             %
@@ -383,6 +392,7 @@ this option \setting{On}. If it is not required, then turning this setting
               {Long \ButtonMenu}
             \opt{HAVEREMOTEKEYMAP}{
                 &
+                \opt{MROBE100_RC_PAD}{Long \ButtonRCDisplay}%
             }
             & White screen \\
             %
@@ -395,7 +405,8 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{MROBE100_PAD}{\ButtonUp / \ButtonDown}
             \opt{HAVEREMOTEKEYMAP}{
               &
-              \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp / \ButtonRCVolDown}%
+              \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}
+                {\ButtonRCVolUp / \ButtonRCVolDown}%
             }
             & Previous / next link in slide, respectively \\
             %
@@ -408,6 +419,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{Long \ButtonRCFF}%
+              \opt{MROBE100_RC_PAD}{\ButtonRCHeart}%
             }
             & Perform a 'mouse click' over a link \\
             %
@@ -420,6 +432,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{Long \ButtonRCRew}%
+              \opt{MROBE100_RC_PAD}{Long \ButtonRCHeart}%
             }
             & Perform a 'mouse over' over a link \\
           \end{btnmap}
@@ -441,7 +454,8 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{MROBE100_PAD}{\ButtonUp / \ButtonDown}
             \opt{HAVEREMOTEKEYMAP}{
               &
-              \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp / \ButtonRCVolDown}%
+              \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}
+                {\ButtonRCVolUp / \ButtonRCVolDown}%
             }
             & Scroll up / down, respectively \\
             %
@@ -454,6 +468,7 @@ this option \setting{On}. If it is not required, then turning this setting
               {\ButtonPlay / \ButtonMenu}
             \opt{HAVEREMOTEKEYMAP}{
               &
+              \opt{MROBE100_RC_PAD}{\ButtonRCPlay / \ButtonRCDisplay}%
             }
             & Scroll page up / page down, respectively \\
             %
@@ -467,6 +482,8 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{HAVEREMOTEKEYMAP}{
                 &
                 \opt{GIGABEAT_RC_PAD}{Long \ButtonRCFF / Long \ButtonRCRew}%
+                \opt{MROBE100_RC_PAD}
+                  {Long \ButtonRCPlay / Long \ButtonRCDisplay}%
             }
             & Zoom in / out, respectively \\
             %
@@ -482,6 +499,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{Long \ButtonRCFF+\ButtonRCRew}%
+              \opt{MROBE100_RC_PAD}{Long \ButtonRCHeart}%
             }
             & Zoom reset \\
             %
@@ -492,7 +510,8 @@ this option \setting{On}. If it is not required, then turning this setting
               {\ButtonLeft / \ButtonRight}
             \opt{HAVEREMOTEKEYMAP}{
                 &
-                \opt{GIGABEAT_RC_PAD}{\ButtonRCRew / \ButtonRCFF}%
+                \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}
+                  {\ButtonRCRew / \ButtonRCFF}%
             }
             & Tab previous / next, respectively \\
             %
@@ -516,6 +535,8 @@ this option \setting{On}. If it is not required, then turning this setting
               {Long \ButtonLeft / Long \ButtonRight}
             \opt{HAVEREMOTEKEYMAP}{
               &
+              \opt{MROBE100_RC_PAD}
+                {Long \ButtonRCRew / Long \ButtonRCFF}%
             }
             & History back / forward \\
             %
@@ -529,6 +550,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{HAVEREMOTEKEYMAP}{
               &
               \opt{GIGABEAT_RC_PAD}{\ButtonRCPlay}%
+              \opt{MROBE100_RC_PAD}{\ButtonRCHeart}%
             }
             & View full-screen toggle \\
           \end{btnmap}
@@ -548,6 +570,7 @@ this option \setting{On}. If it is not required, then turning this setting
               {\ButtonMenu / \ButtonPlay / \ButtonLeft / \ButtonRight}
             \opt{HAVEREMOTEKEYMAP}{
                 &
+                \opt{MROBE100_RC_PAD}{\ButtonRCPlay / \ButtonRCDisplay / \ButtonRCRew / \ButtonRCFF}%
             }
             & Cursor move up / down / left / right, respectively \\
             %
@@ -559,6 +582,7 @@ this option \setting{On}. If it is not required, then turning this setting
             \opt{MROBE100_PAD}{\ButtonMenu}
             \opt{HAVEREMOTEKEYMAP}{
                 &
+                \opt{MROBE100_RC_PAD}{\ButtonRCHeart}%
             }
             & Left mouse button click \\
             %
@@ -580,6 +604,7 @@ this option \setting{On}. If it is not required, then turning this setting
               {\ButtonVolUp / \ButtonVolDown}
             \opt{HAVEREMOTEKEYMAP}{
                 &
+                \opt{MROBE100_RC_PAD}{\ButtonRCVolUp / \ButtonRCVolDown}%
             }
             & Mouse wheel scroll up / down, respectively \\
           \end{btnmap}
