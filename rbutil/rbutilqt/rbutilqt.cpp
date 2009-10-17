@@ -703,6 +703,7 @@ void RbUtilQt::installBootloader()
                     logger->close();
                     installBootloaderPost(true);
                 }
+                delete bl;
                 return;
         }
     }
