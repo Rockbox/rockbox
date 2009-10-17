@@ -147,7 +147,7 @@
 #define FLASH_SIZE 0x400000
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ      200000000
+#define CPU_FREQ      192000000
 
 /* Define this if you have ATA power-off control */
 //#define HAVE_ATA_POWER_OFF

@@ -24,7 +24,7 @@
 
 /*  S5L8700 driver for the kernel timer
 
-    Timer B is configured as a 10 kHz timer (assuming PCLK = 100 MHz)
+    Timer B is configured as a 10 kHz timer (assuming PCLK = 48 MHz)
  */
 
 void INT_TIMERB(void)
@@ -37,14 +37,14 @@ void INT_TIMERB(void)
 
 void tick_start(unsigned int interval_in_ms)
 {
-    int cycles = 5 * interval_in_ms;
+    int cycles = 10 * interval_in_ms;
     
     /* enable timer clock */
     PWRCON &= ~(1 << 4);
     
     /* configure timer for 10 kHz */
     TBCMD = (1 << 1);   /* TB_CLR */
-    TBPRE = 625 - 1;    /* prescaler */
+    TBPRE = 300 - 1;    /* prescaler */
     TBCON = (0 << 13) | /* TB_INT1_EN */
             (1 << 12) | /* TB_INT0_EN */
             (0 << 11) | /* TB_START */

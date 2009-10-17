@@ -25,7 +25,7 @@
 #define REG16_PTR_T volatile uint16_t *
 #define REG32_PTR_T volatile uint32_t *
 
-#define TIMER_FREQ  50000000L
+#define TIMER_FREQ  48000000L
 
 /* 04. CALMADM2E */
 
@@ -132,6 +132,7 @@
 #define    INTMSK_TIMERC        (1<<5)
 #define    INTMSK_TIMERD        (1<<5)
 #define    INTMSK_ECC           (1<<19)
+#define    INTMSK_USB_OTG       (1<<16)
 #else
 #define    INTMSK_TIMERA        (1<<5)
 #define    INTMSK_TIMERB        (1<<7)
