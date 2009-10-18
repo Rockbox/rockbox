@@ -368,10 +368,10 @@ struct ftl_vfl_cxt_type ftl_vfl_cxt[4];
 struct ftl_cxt_type ftl_cxt;                   
 
 /* Temporary data buffer for internal use by the FTL */
-uint8_t ftl_buffer[0x800];            
+uint8_t ftl_buffer[0x800] __attribute__((aligned(16)));            
 
 /* Temporary spare byte buffer for internal use by the FTL */
-union ftl_spare_data_type ftl_sparebuffer;     
+union ftl_spare_data_type ftl_sparebuffer __attribute__((aligned(16)));     
 
 
 #ifndef FTL_READONLY

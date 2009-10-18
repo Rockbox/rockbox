@@ -27,6 +27,7 @@
 #include "inttypes.h"
 #include "nand-target.h"
 #include <pmu-target.h>
+#include <mmu-target.h>
 #include <string.h>
 
 
@@ -92,18 +93,10 @@ static struct wakeup nand_wakeup;
 static struct mutex ecc_mtx;
 static struct wakeup ecc_wakeup;
 
-static uint8_t nand_aligned_data[0x800] __attribute__((aligned(32)));
-static uint8_t nand_aligned_ctrl[0x200] __attribute__((aligned(32)));
-static uint8_t nand_aligned_spare[0x40] __attribute__((aligned(32)));
-static uint8_t nand_aligned_ecc[0x28] __attribute__((aligned(32)));
-#define nand_uncached_data \
-        ((uint8_t*)(((uint32_t)nand_aligned_data) | 0x40000000))
-#define nand_uncached_ctrl \
-        ((uint8_t*)(((uint32_t)nand_aligned_ctrl) | 0x40000000))
-#define nand_uncached_spare \
-        ((uint8_t*)(((uint32_t)nand_aligned_spare) | 0x40000000))
-#define nand_uncached_ecc \
-        ((uint8_t*)(((uint32_t)nand_aligned_ecc) | 0x40000000))
+static uint8_t nand_data[0x800] __attribute__((aligned(16)));
+static uint8_t nand_ctrl[0x200] __attribute__((aligned(16)));
+static uint8_t nand_spare[0x40] __attribute__((aligned(16)));
+static uint8_t nand_ecc[0x30] __attribute__((aligned(16)));
 
 
 uint32_t nand_unlock(uint32_t rc)
@@ -131,7 +124,7 @@ uint32_t nand_timeout(long timeout)
 uint32_t nand_wait_rbbdone(void)
 {
     long timeout = current_tick + HZ / 50;
-    while ((FMCSTAT & FMCSTAT_RBBDONE) == 0)
+    while (!(FMCSTAT & FMCSTAT_RBBDONE))
         if (nand_timeout(timeout)) return 1;
     FMCSTAT = FMCSTAT_RBBDONE;
     return 0;
@@ -140,7 +133,7 @@ uint32_t nand_wait_rbbdone(void)
 uint32_t nand_wait_cmddone(void)
 {
     long timeout = current_tick + HZ / 50;
-    while ((FMCSTAT & FMCSTAT_CMDDONE) == 0)
+    while (!(FMCSTAT & FMCSTAT_CMDDONE))
         if (nand_timeout(timeout)) return 1;
     FMCSTAT = FMCSTAT_CMDDONE;
     return 0;
@@ -149,7 +142,7 @@ uint32_t nand_wait_cmddone(void)
 uint32_t nand_wait_addrdone(void)
 {
     long timeout = current_tick + HZ / 50;
-    while ((FMCSTAT & FMCSTAT_ADDRDONE) == 0)
+    while (!(FMCSTAT & FMCSTAT_ADDRDONE))
         if (nand_timeout(timeout)) return 1;
     FMCSTAT = FMCSTAT_ADDRDONE;
     return 0;
@@ -158,7 +151,7 @@ uint32_t nand_wait_addrdone(void)
 uint32_t nand_wait_chip_ready(uint32_t bank)
 {
     long timeout = current_tick + HZ / 50;
-    while ((FMCSTAT & (FMCSTAT_BANK0READY << bank)) == 0)
+    while (!(FMCSTAT & (FMCSTAT_BANK0READY << bank)))
         if (nand_timeout(timeout)) return 1;
     FMCSTAT = (FMCSTAT_BANK0READY << bank);
     return 0;
@@ -188,8 +181,8 @@ uint32_t nand_send_address(uint32_t page, uint32_t offset)
 uint32_t nand_reset(uint32_t bank)
 {
     nand_set_fmctrl0(bank, 0);
-    if (nand_send_cmd(NAND_CMD_RESET) != 0) return 1;
-    if (nand_wait_chip_ready(bank) != 0) return 1;
+    if (nand_send_cmd(NAND_CMD_RESET)) return 1;
+    if (nand_wait_chip_ready(bank)) return 1;
     FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
     return 0;
 }
@@ -198,17 +191,17 @@ uint32_t nand_wait_status_ready(uint32_t bank)
 {
     long timeout = current_tick + HZ / 50;
     nand_set_fmctrl0(bank, 0);
-    if ((FMCSTAT & (FMCSTAT_BANK0READY << bank)) != 0)
+    if ((FMCSTAT & (FMCSTAT_BANK0READY << bank)))
         FMCSTAT = (FMCSTAT_BANK0READY << bank);
     FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
-    if (nand_send_cmd(NAND_CMD_GET_STATUS) != 0) return 1;
+    if (nand_send_cmd(NAND_CMD_GET_STATUS)) return 1;
     while (1)
     {
         if (nand_timeout(timeout)) return 1;
         FMDNUM = 0;
         FMCTRL1 = FMCTRL1_DOREADDATA;
-        if (nand_wait_addrdone() != 0) return 1;
-        if ((FMFIFO & NAND_STATUS_READY) != 0) break;
+        if (nand_wait_addrdone()) return 1;
+        if ((FMFIFO & NAND_STATUS_READY)) break;
         FMCTRL1 = FMCTRL1_CLEARRFIFO;
     }
     FMCTRL1 = FMCTRL1_CLEARRFIFO;
@@ -226,15 +219,17 @@ uint32_t nand_transfer_data(uint32_t bank, uint32_t direction,
             | (direction << DMACON_DIRECTION_SHIFT)
             | (2 << DMACON_DATA_SIZE_SHIFT)
             | (3 << DMACON_BURST_LEN_SHIFT);
-    while ((DMAALLST & DMAALLST_CHAN3_MASK) != 0)
+    while ((DMAALLST & DMAALLST_CHAN3_MASK))
         DMACOM3 = DMACOM_CLEARBOTHDONE;
     DMABASE3 = (uint32_t)buffer;
     DMATCNT3 = (size >> 4) - 1;
+    clean_dcache();
     DMACOM3 = 4;
-    while ((DMAALLST & DMAALLST_DMABUSY3) != 0)
+    while ((DMAALLST & DMAALLST_DMABUSY3))
         if (nand_timeout(timeout)) return 1;
-    if (nand_wait_addrdone() != 0) return 1;
-    if (direction == 0) FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
+    if (!direction) invalidate_dcache();
+    if (nand_wait_addrdone()) return 1;
+    if (!direction) FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
     return 0;
 }
 
@@ -247,9 +242,11 @@ uint32_t ecc_decode(uint32_t size, void* databuffer, void* sparebuffer)
     ECC_UNK1 = size;
     ECC_DATA_PTR = (uint32_t)databuffer;
     ECC_SPARE_PTR = (uint32_t)sparebuffer;
+    clean_dcache();
     ECC_CTRL = ECCCTRL_STARTDECODING;
-    while ((SRCPND & INTMSK_ECC) == 0)
+    while (!(SRCPND & INTMSK_ECC))
         if (nand_timeout(timeout)) return ecc_unlock(1);
+    invalidate_dcache();
     ECC_INT_CLR = 1;
     SRCPND = INTMSK_ECC;
     return ecc_unlock(ECC_RESULT);
@@ -264,9 +261,11 @@ uint32_t ecc_encode(uint32_t size, void* databuffer, void* sparebuffer)
     ECC_UNK1 = size;
     ECC_DATA_PTR = (uint32_t)databuffer;
     ECC_SPARE_PTR = (uint32_t)sparebuffer;
+    clean_dcache();
     ECC_CTRL = ECCCTRL_STARTENCODING;
-    while ((SRCPND & INTMSK_ECC) == 0)
+    while (!(SRCPND & INTMSK_ECC))
         if (nand_timeout(timeout)) return ecc_unlock(1);
+    invalidate_dcache();
     ECC_INT_CLR = 1;
     SRCPND = INTMSK_ECC;
     return ecc_unlock(0);
@@ -285,15 +284,15 @@ uint32_t nand_get_chip_type(uint32_t bank)
 {
     mutex_lock(&nand_mtx);
     uint32_t result;
-    if (nand_reset(bank) != 0) return nand_unlock(0xFFFFFFFF);
-    if (nand_send_cmd(0x90) != 0) return nand_unlock(0xFFFFFFFF);
+    if (nand_reset(bank)) return nand_unlock(0xFFFFFFFF);
+    if (nand_send_cmd(0x90)) return nand_unlock(0xFFFFFFFF);
     FMANUM = 0;
     FMADDR0 = 0;
     FMCTRL1 = FMCTRL1_DOTRANSADDR;
-    if (nand_wait_cmddone() != 0) return nand_unlock(0xFFFFFFFF);
+    if (nand_wait_cmddone()) return nand_unlock(0xFFFFFFFF);
     FMDNUM = 4;
     FMCTRL1 = FMCTRL1_DOREADDATA;
-    if (nand_wait_addrdone() != 0) return nand_unlock(0xFFFFFFFF);
+    if (nand_wait_addrdone()) return nand_unlock(0xFFFFFFFF);
     result = FMFIFO;
     FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
     return nand_unlock(result);
@@ -343,49 +342,55 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
                         void* sparebuffer, uint32_t doecc,
                         uint32_t checkempty)
 {
+	uint8_t* data = nand_data;
+	uint8_t* spare = nand_spare;
+	if (databuffer && !((uint32_t)databuffer & 0xf))
+        data = (uint8_t*)databuffer;
+	if (sparebuffer && !((uint32_t)sparebuffer & 0xf))
+        spare = (uint8_t*)sparebuffer;
     mutex_lock(&nand_mtx);
     if (!nand_powered) nand_power_up();
     uint32_t rc, eccresult;
     nand_set_fmctrl0(bank, FMCTRL0_ENABLEDMA);
-    if (nand_send_cmd(NAND_CMD_READ) != 0) return nand_unlock(1);
-    if (nand_send_address(page, (databuffer == 0) ? 0x800 : 0) != 0)
+    if (nand_send_cmd(NAND_CMD_READ)) return nand_unlock(1);
+    if (nand_send_address(page, databuffer ? 0 : 0x800))
         return nand_unlock(1);
-    if (nand_send_cmd(NAND_CMD_READ2) != 0) return nand_unlock(1);
-    if (nand_wait_status_ready(bank) != 0) return nand_unlock(1);
-    if (databuffer != 0)
-        if (nand_transfer_data(bank, 0, nand_uncached_data, 0x800) != 0)
+    if (nand_send_cmd(NAND_CMD_READ2)) return nand_unlock(1);
+    if (nand_wait_status_ready(bank)) return nand_unlock(1);
+    if (databuffer)
+        if (nand_transfer_data(bank, 0, data, 0x800))
             return nand_unlock(1);
     rc = 0;
-    if (doecc == 0)
+    if (!doecc)
     {
-        memcpy(databuffer, nand_uncached_data, 0x800);
-        if (sparebuffer != 0)
+        if (databuffer && data != databuffer) memcpy(databuffer, data, 0x800);
+        if (sparebuffer)
         {
-            if (nand_transfer_data(bank, 0, nand_uncached_spare, 0x40) != 0)
+            if (nand_transfer_data(bank, 0, spare, 0x40))
                 return nand_unlock(1);
-            memcpy(sparebuffer, nand_uncached_spare, 0x800);
-            if (checkempty != 0)
+			if (sparebuffer && spare != sparebuffer) 
+                memcpy(sparebuffer, spare, 0x800);
+            if (checkempty)
                 rc = nand_check_empty((uint8_t*)sparebuffer) << 1;
         }
         return nand_unlock(rc);
     }
-    if (nand_transfer_data(bank, 0, nand_uncached_spare, 0x40) != 0)
-        return nand_unlock(1);
-    memcpy(nand_uncached_ecc, &nand_uncached_spare[0xC], 0x28);
-    rc |= (ecc_decode(3, nand_uncached_data, nand_uncached_ecc) & 0xF) << 4;
-    if (databuffer != 0) memcpy(databuffer, nand_uncached_data, 0x800);
-    memset(nand_uncached_ctrl, 0xFF, 0x200);
-    memcpy(nand_uncached_ctrl, nand_uncached_spare, 0xC);
-    memcpy(nand_uncached_ecc, &nand_uncached_spare[0x34], 0xC);
-    eccresult = ecc_decode(0, nand_uncached_ctrl, nand_uncached_ecc);
+    if (nand_transfer_data(bank, 0, spare, 0x40)) return nand_unlock(1);
+    memcpy(nand_ecc, &spare[0xC], 0x28);
+    rc |= (ecc_decode(3, data, nand_ecc) & 0xF) << 4;
+    if (databuffer && data != databuffer) memcpy(databuffer, data, 0x800);
+    memset(nand_ctrl, 0xFF, 0x200);
+    memcpy(nand_ctrl, spare, 0xC);
+    memcpy(nand_ecc, &spare[0x34], 0xC);
+    eccresult = ecc_decode(0, nand_ctrl, nand_ecc);
     rc |= (eccresult & 0xF) << 8;
-    if (sparebuffer != 0)
+    if (sparebuffer)
     {
-        memcpy(sparebuffer, nand_uncached_spare, 0x40);
-        if ((eccresult & 1) != 0) memset(sparebuffer, 0xFF, 0xC);
-        else memcpy(sparebuffer, nand_uncached_ctrl, 0xC);
+        if (spare != sparebuffer) memcpy(sparebuffer, spare, 0x40);
+        if (eccresult & 1) memset(sparebuffer, 0xFF, 0xC);
+        else memcpy(sparebuffer, nand_ctrl, 0xC);
     }
-    if (checkempty != 0) rc |= nand_check_empty(nand_uncached_spare) << 1;
+    if (checkempty) rc |= nand_check_empty(spare) << 1;
 
     return nand_unlock(rc);
 }
@@ -393,34 +398,40 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
 uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
                          void* sparebuffer, uint32_t doecc)
 {
+	uint8_t* data = nand_data;
+	uint8_t* spare = nand_spare;
+	if (databuffer && !((uint32_t)databuffer & 0xf))
+        data = (uint8_t*)databuffer;
+	if (sparebuffer && !((uint32_t)sparebuffer & 0xf))
+        spare = (uint8_t*)sparebuffer;
     mutex_lock(&nand_mtx);
     if (!nand_powered) nand_power_up();
-    if (sparebuffer != 0) memcpy(nand_uncached_spare, sparebuffer, 0x40);
-    else memset(nand_uncached_spare, 0xFF, 0x40);
-    if (doecc != 0)
+    if (sparebuffer)
+	{
+	    if (spare != sparebuffer) memcpy(spare, sparebuffer, 0x40);
+	}
+    else memset(spare, 0xFF, 0x40);
+    if (doecc)
     {
-        memcpy(nand_uncached_data, databuffer, 0x800);
-        if (ecc_encode(3, nand_uncached_data, nand_uncached_ecc) != 0)
-            return nand_unlock(1);
-        memcpy(&nand_uncached_spare[0xC], nand_uncached_ecc, 0x28);
-        memset(nand_uncached_ctrl, 0xFF, 0x200);
-        memcpy(nand_uncached_ctrl, nand_uncached_spare, 0xC);
-        if (ecc_encode(0, nand_uncached_ctrl, nand_uncached_ecc) != 0)
-            return nand_unlock(1);
-        memcpy(&nand_uncached_spare[0x34], nand_uncached_ecc, 0xC);
+        if (databuffer && data != databuffer) memcpy(data, databuffer, 0x800);
+        if (ecc_encode(3, data, nand_ecc)) return nand_unlock(1);
+        memcpy(&spare[0xC], nand_ecc, 0x28);
+        memset(nand_ctrl, 0xFF, 0x200);
+        memcpy(nand_ctrl, spare, 0xC);
+        if (ecc_encode(0, nand_ctrl, nand_ecc)) return nand_unlock(1);
+        memcpy(&spare[0x34], nand_ecc, 0xC);
     }
     nand_set_fmctrl0(bank, FMCTRL0_ENABLEDMA);
-    if (nand_send_cmd(NAND_CMD_PROGRAM) != 0)
+    if (nand_send_cmd(NAND_CMD_PROGRAM)) return nand_unlock(1);
+    if (nand_send_address(page, databuffer ? 0 : 0x800))
         return nand_unlock(1);
-    if (nand_send_address(page, (databuffer == 0) ? 0x800 : 0) != 0)
-        return nand_unlock(1);
-    if (databuffer != 0)
-        if (nand_transfer_data(bank, 1, nand_uncached_data, 0x800) != 0)
+    if (databuffer)
+        if (nand_transfer_data(bank, 1, data, 0x800))
             return nand_unlock(1);
-    if (sparebuffer != 0 || doecc != 0)
-        if (nand_transfer_data(bank, 1, nand_uncached_spare, 0x40) != 0)
+    if (sparebuffer || doecc)
+        if (nand_transfer_data(bank, 1, spare, 0x40))
             return nand_unlock(1);
-    if (nand_send_cmd(NAND_CMD_PROGCNFRM) != 0) return nand_unlock(1);
+    if (nand_send_cmd(NAND_CMD_PROGCNFRM)) return nand_unlock(1);
     return nand_unlock(nand_wait_status_ready(bank));
 }
 
@@ -429,13 +440,13 @@ uint32_t nand_block_erase(uint32_t bank, uint32_t page)
     mutex_lock(&nand_mtx);
     if (!nand_powered) nand_power_up();
     nand_set_fmctrl0(bank, 0);
-    if (nand_send_cmd(NAND_CMD_BLOCKERASE) != 0) return nand_unlock(1);
+    if (nand_send_cmd(NAND_CMD_BLOCKERASE)) return nand_unlock(1);
     FMANUM = 2;
     FMADDR0 = page;
     FMCTRL1 = FMCTRL1_DOTRANSADDR;
-    if (nand_wait_cmddone() != 0) return nand_unlock(1);
-    if (nand_send_cmd(NAND_CMD_ERASECNFRM) != 0) return nand_unlock(1);
-    if (nand_wait_status_ready(bank) != 0) return nand_unlock(1);
+    if (nand_wait_cmddone()) return nand_unlock(1);
+    if (nand_send_cmd(NAND_CMD_ERASECNFRM)) return nand_unlock(1);
+    if (nand_wait_status_ready(bank)) return nand_unlock(1);
     return nand_unlock(0);
 }
 
