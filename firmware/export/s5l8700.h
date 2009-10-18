@@ -631,11 +631,11 @@
 #define LCDF1SADDR3             (*(REG32_PTR_T)(0x39200048))     /* Virtual screen address set for Fore-Ground(OSD) buffer 1 */
 #define LCDF2SADDR3             (*(REG32_PTR_T)(0x3920004C))     /* Virtual screen address set for Fore-Ground(OSD) buffer 2 */
 #define LCDINTCON               (*(REG32_PTR_T)(0x39200050))     /* Indicate the LCD interrupt control register */
-#define KEYCON                  (*(REG32_PTR_T)(0x39200054))     /* Color key control register */
-#define COLVAL                  (*(REG32_PTR_T)(0x39200058))     /* Color key value ( transparent value) register */
-#define BGCON                   (*(REG32_PTR_T)(0x3920005C))     /* Back-Ground color control */
-#define FGCON                   (*(REG32_PTR_T)(0x39200060))     /* Fore-Ground color control */
-#define DITHMODE                (*(REG32_PTR_T)(0x39200064))     /* Dithering mode register. */
+#define LCDKEYCON               (*(REG32_PTR_T)(0x39200054))     /* Color key control register */
+#define LCDCOLVAL               (*(REG32_PTR_T)(0x39200058))     /* Color key value ( transparent value) register */
+#define LCDBGCON                (*(REG32_PTR_T)(0x3920005C))     /* Back-Ground color control */
+#define LCDFGCON                (*(REG32_PTR_T)(0x39200060))     /* Fore-Ground color control */
+#define LCDDITHMODE             (*(REG32_PTR_T)(0x39200064))     /* Dithering mode register. */
 
 /* 28. ATA CONTROLLER */
 #define ATA_CONTROL             (*(REG32_PTR_T)(0x38E00000))     /* Enable and clock down status */
