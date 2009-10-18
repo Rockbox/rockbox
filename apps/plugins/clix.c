@@ -684,7 +684,7 @@ static int clix_handle_game(struct clix_game_state_t* state)
 
     while(true)
     {
-        if (blink_tick < *rb->current_tick) {
+        if (TIME_AFTER(*rb->current_tick, blink_tick)) {
             state->blink = state->blink ? false : true;
             blink_tick = *rb->current_tick + BLINK_TICKCOUNT;
         }
@@ -692,7 +692,7 @@ static int clix_handle_game(struct clix_game_state_t* state)
         time = 6; /* number of ticks this function will loop reading keys */
         start = *rb->current_tick;
         end = start + time;
-        while(end > *rb->current_tick)
+        while(TIME_BEFORE(*rb->current_tick, end))
         {
             oldx = state->x;
             oldy = state->y;

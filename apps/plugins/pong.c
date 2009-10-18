@@ -450,21 +450,21 @@ int keys(struct pong *p)
     int start = *rb->current_tick;
     int end = start + time;
 
-    while(end > *rb->current_tick) {
+    while(TIME_BEFORE(*rb->current_tick, end)) {
         key = rb->button_get_w_tmo(end - *rb->current_tick);
         
 #ifdef HAVE_TOUCHSCREEN
-    short touch_x, touch_y;
-    if(key & BUTTON_TOUCHSCREEN)
-    {
-        touch_x = rb->button_get_data() >> 16;
-        touch_y = rb->button_get_data() & 0xFFFF;
-        if(touch_x >= xpos[0] && touch_x <= xpos[0]+(PAD_WIDTH*4))
-            padmove(&p->w_pad[0], touch_y-(p->e_pad[0]*2+PAD_HEIGHT)/2);
-        
-        if(touch_x >= xpos[1]-(PAD_WIDTH*4) && touch_x <= xpos[1])
-            padmove(&p->w_pad[1], touch_y-(p->e_pad[1]*2+PAD_HEIGHT)/2);
-    }
+        short touch_x, touch_y;
+        if(key & BUTTON_TOUCHSCREEN)
+        {
+            touch_x = rb->button_get_data() >> 16;
+            touch_y = rb->button_get_data() & 0xFFFF;
+            if(touch_x >= xpos[0] && touch_x <= xpos[0]+(PAD_WIDTH*4))
+                padmove(&p->w_pad[0], touch_y-(p->e_pad[0]*2+PAD_HEIGHT)/2);
+            
+            if(touch_x >= xpos[1]-(PAD_WIDTH*4) && touch_x <= xpos[1])
+                padmove(&p->w_pad[1], touch_y-(p->e_pad[1]*2+PAD_HEIGHT)/2);
+        }
 #endif
 
 #ifdef HAS_BUTTON_HOLD

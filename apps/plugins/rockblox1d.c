@@ -302,7 +302,7 @@ enum plugin_status plugin_start(const void* parameter)
             ++pos_cur_brick;
         }
 
-        if (end > *rb->current_tick)
+        if (TIME_BEFORE(*rb->current_tick, end))
             rb->sleep(end-*rb->current_tick);
         else
             rb->yield();

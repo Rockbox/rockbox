@@ -64,7 +64,7 @@ struct tm *get_time(void)
     static long timeout = 0;
 
     /* Don't read the RTC more than once per second */
-    if (current_tick > timeout)
+    if (TIME_AFTER(current_tick, timeout))
     {
         /* Once per second, 1/10th of a second off */
         timeout = HZ * (current_tick / HZ + 1) + HZ / 5;

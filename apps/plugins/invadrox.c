@@ -1751,7 +1751,7 @@ void game_loop(void)
 
         /* Wait until next frame */
         DBG("%ld (%d)\n", end - *rb->current_tick, (CYCLETIME * HZ) / 1000);
-        if (end > *rb->current_tick) {
+        if (TIME_BEFORE(*rb->current_tick, end)) {
             rb->sleep(end - *rb->current_tick);
         } else {
             rb->yield();

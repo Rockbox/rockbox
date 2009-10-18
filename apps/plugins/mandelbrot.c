@@ -643,7 +643,7 @@ void calc_mandelbrot_low_prec(void)
 
             /* be nice to other threads:
              * if at least one tick has passed, yield */
-            if  (*rb->current_tick > last_yield) {
+            if  (TIME_AFTER(*rb->current_tick, last_yield)) {
                 rb->yield();
                 last_yield = *rb->current_tick;
             }
@@ -706,7 +706,7 @@ void calc_mandelbrot_high_prec(void)
 
             /* be nice to other threads:
              * if at least one tick has passed, yield */
-            if  (*rb->current_tick > last_yield) {
+            if  (TIME_AFTER(*rb->current_tick, last_yield)) {
                 rb->yield();
                 last_yield = *rb->current_tick;
             }

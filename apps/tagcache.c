@@ -352,7 +352,7 @@ static bool do_timed_yield(void)
 {
     /* Sorting can lock up for quite a while, so yield occasionally */
     static long wakeup_tick = 0;
-    if (current_tick >= wakeup_tick)
+    if (TIME_AFTER(current_tick, wakeup_tick))
     {
         wakeup_tick = current_tick + (HZ/4);
         yield();

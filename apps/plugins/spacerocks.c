@@ -2059,7 +2059,7 @@ static int spacerocks_game_loop(void)
         if(next_thrust_count)
             next_thrust_count--;
 
-        if (end > *rb->current_tick)
+        if (TIME_BEFORE(*rb->current_tick, end))
             rb->sleep(end-*rb->current_tick);
         else
             rb->yield();

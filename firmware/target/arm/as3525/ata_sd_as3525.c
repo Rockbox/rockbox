@@ -261,7 +261,7 @@ static int sd_init_card(const int drive)
 
     do {
         /* timeout */
-        if(current_tick > init_timeout)
+        if(TIME_AFTER(current_tick, init_timeout))
             return -2;
 
         /* app_cmd */

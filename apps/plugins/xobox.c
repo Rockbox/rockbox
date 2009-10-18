@@ -1045,7 +1045,7 @@ static int xobox_loop (void)
             }
         }
 
-        if (end > *rb->current_tick)
+        if (TIME_BEFORE(*rb->current_tick, end))
             rb->sleep (end - *rb->current_tick);
         else
             rb->yield ();

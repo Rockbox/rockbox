@@ -1067,7 +1067,7 @@ static void brickmania_sleep(int secs)
     {
         if (count == 0)
             count = *rb->current_tick + HZ*secs;
-        if ( (*rb->current_tick >= count) && (vscore == score) )
+        if ( (TIME_AFTER(*rb->current_tick, count)) && (vscore == score) )
             done = true;
 
         if(vscore != score)
@@ -1323,7 +1323,7 @@ static int brickmania_game_loop(void)
 
             if (flip_sides) 
             {
-                if (*rb->current_tick>=sec_count) 
+                if (TIME_AFTER(*rb->current_tick, sec_count))
                 {
                     sec_count=*rb->current_tick+HZ;
                     if (num_count!=0)
@@ -2111,7 +2111,7 @@ static int brickmania_game_loop(void)
         rb->yield();
         
         /* Sleep for a bit if there is time to spare */
-        if (end > *rb->current_tick)
+        if (TIME_BEFORE(*rb->current_tick, end))
             rb->sleep(end-*rb->current_tick);
     }
     return 0;

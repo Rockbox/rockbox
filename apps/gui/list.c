@@ -599,8 +599,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
         {
             if (!last_accel_tick)
                 last_accel_tick = current_tick + start_delay;
-            else if (current_tick >= 
-                        last_accel_tick + accel_wait)
+            else if (TIME_AFTER(current_tick, last_accel_tick + accel_wait))
             {
                 last_accel_tick = current_tick;
                 next_item_modifier++;

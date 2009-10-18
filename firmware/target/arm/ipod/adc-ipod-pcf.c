@@ -39,7 +39,7 @@ static struct adc_struct adcdata[NUM_ADC_CHANNELS] IDATA_ATTR;
 
 static unsigned short _adc_read(struct adc_struct *adc)
 {
-    if (adc->timeout < current_tick) {
+    if (TIME_AFTER(current_tick, adc->timeout)) {
         unsigned char data[2];
         unsigned short value;
 
