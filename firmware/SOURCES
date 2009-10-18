@@ -831,7 +831,7 @@ target/arm/s3c2440/gigabeat-fx/wmcodec-meg-fx.c
 #ifdef GIGABEAT_S
 #ifndef SIMULATOR
 target/arm/lcd-as-memframe.S
-target/arm/mmu-arm.S
+target/arm/mmu-armv6.S
 target/arm/imx31/ccm-imx31.c
 target/arm/imx31/debug-imx31.c
 target/arm/imx31/rolo_restart.S
