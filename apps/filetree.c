@@ -526,7 +526,7 @@ int ft_enter(struct tree_context* c)
 
             case FILE_ATTR_LNG:
                 splash(0, ID2P(LANG_WAIT));
-                if(!lang_load(buf)) {
+                if(!lang_core_load(buf)) {
                     set_file(buf, (char *)global_settings.lang_file,
                              MAX_FILENAME);
                     talk_init(); /* use voice of same language */

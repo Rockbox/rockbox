@@ -900,7 +900,7 @@ void settings_apply(bool read_disk)
         if ( global_settings.lang_file[0]) {
             snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
                      global_settings.lang_file);
-            lang_load(buf);
+            lang_core_load(buf);
             talk_init(); /* use voice of same language */
         }
 

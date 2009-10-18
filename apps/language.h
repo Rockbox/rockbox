@@ -25,7 +25,12 @@
 void lang_init(const unsigned char *builtin, unsigned char **dest, int count);
 
 /* load a given language file */
-int lang_load(const char *filename);
+int lang_core_load(const char *filename);
+
+int lang_load(const char *filename, const unsigned char *builtin, 
+              unsigned char **dest, unsigned char *buffer, 
+              unsigned int user_num, int max_lang_size,
+              unsigned int max_id);
 
 /* get the ID of an english string so it can be localised */
 int lang_english_to_id(const char *english);

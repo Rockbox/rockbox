@@ -13,8 +13,11 @@
 # See apps/language.c (TODO: Use common include for both)
 # Cookie and binary version for the binary lang file
 my $LANGUAGE_COOKIE   = 0x1a;
-my $LANGUAGE_VERSION  = 0x05;
+my $LANGUAGE_VERSION  = 0x06;
 my $LANGUAGE_FLAG_RTL = 0x01;
+
+my $HEADER_SIZE       = 4;
+my $SUBHEADER_SIZE    = 6;
 
 # A note for future users and readers: The original v1 language system allowed
 # the build to create and use a different language than english built-in. We
@@ -385,7 +388,7 @@ sub compare {
 my @idcount;           # counter for lang ID numbers
 my @voiceid;           # counter for voice-only ID numbers
 
-foreach $i (keys %users) {
+for (keys %users) {
     push @idcount, 0;
     push @voiceid, 0x8000;
 }
@@ -613,7 +616,7 @@ if($prefix) {
    It will be initialized at runtime. */
 extern unsigned char *language_strings[];
 /* this contains the concatenation of all strings, separated by \\0 chars */
-extern const unsigned char language_builtin[];
+extern const unsigned char core_language_builtin[];
 
 /* The enum below contains all available strings */
 enum \{
@@ -627,18 +630,18 @@ MOO
 #include "$headername"
 
 unsigned char *language_strings[LANG_LAST_INDEX_IN_ARRAY];
-const unsigned char language_builtin[] =
+const unsigned char core_language_builtin[] =
 MOO
 ;
 
     # Output the ID names for the enum in the header file
     my $i;
-    for $i (1 .. $idcount[$users{"core"}]) {
-        my $name=$idnum[$users{"core"}][$i - 1]; # get the ID name
+    for $i (0 .. $idcount[$users{"core"}]-1) {
+        my $name=$idnum[$users{"core"}][$i]; # get the ID name
         
         $name =~ s/\"//g; # cut off the quotes
         
-        printf HFILE_CORE ("    %s, /* %d */\n", $name, $i-1);
+        printf HFILE_CORE ("    %s, /* %d */\n", $name, $i);
     }
 
 # Output separation marker for last string ID and the upcoming voice IDs
@@ -663,8 +666,8 @@ MOO
     print HFILE_CORE "\n};\n/* end of generated enum list */\n";
 
     # Output the target phrases for the source file
-    for $i (1 .. $idcount[$users{"core"}]) {
-        my $name=$idnum[$users{"core"}][$i - 1]; # get the ID
+    for $i (0 .. $idcount[$users{"core"}]-1) {
+        my $name=$idnum[$users{"core"}][$i]; # get the ID
         my $dest = $dest{$name}; # get the destination phrase
         
         $dest =~ s:\"$:\\0\":; # insert a \0 before the second quote
@@ -700,18 +703,32 @@ elsif($binary) {
     printf OUTF ("%c%c%c%c", $LANGUAGE_COOKIE, $LANGUAGE_VERSION, $target_id,
       $langoptions); # magic lang file header
 
-    # loop over the target phrases
-    for $i (1 .. $idcount[$users{"core"}]) {
-        my $name=$idnum[$users{"core"}][$i - 1]; # get the ID
-        my $dest = $dest{$name}; # get the destination phrase
+    # output the number of strings for each user
+    my $foffset = $HEADER_SIZE + $SUBHEADER_SIZE * keys(%users);
+    for (keys %users) {
+        my $size;
+        for $n (0 .. $idcount[$_]-1) {
+            $size += length(trim($dest{$idnum[$_][$n]})) + 1;
+        }
+        printf OUTF ("%c%c%c%c%c%c", ($idcount[$_] >> 8), ($idcount[$_] & 0xff),
+                     ($size >> 8), ($size & 0xff), ($foffset >> 8), ($foffset & 0xff));
+        $foffset += $size;
+    }
 
-        if($dest) {
-            $dest =~ s/^\"(.*)\"\s*$/$1/g; # cut off quotes
+    for (keys %users) {
+        # loop over the target phrases
+        for $n (0 .. $idcount[$_]-1) {
+            my $name=$idnum[$_][$n]; # get the ID
+            my $dest = $dest{$name}; # get the destination phrase
 
-            # Now, make sure we get the number from the english sort order:
-            $idnum = $idmap[$users{"core"}]{$name};
+            if($dest) {
+                $dest =~ s/^\"(.*)\"\s*$/$1/g; # cut off quotes
 
-            printf OUTF ("%c%c%s\x00", ($idnum>>8), ($idnum&0xff), $dest);
+                # Now, make sure we get the number from the english sort order:
+                $idnum = $idmap[$_]{$name};
+
+                printf OUTF ("%c%c%s\x00", ($idnum>>8), ($idnum&0xff), $dest);
+            }
         }
     }
 }
@@ -770,7 +787,13 @@ elsif($voiceout) {
 
 
 if($verbose) {
-    printf("%d ID strings scanned\n", $idcount[$users{"core"}]);
+    my $num_str = 0;
+    
+    for (keys %users) {
+        $num_str += $idcount[$_];
+    }
+    
+    printf("%d ID strings scanned\n", $num_str);
 
     print "* head *\n";
     for(keys %head) {

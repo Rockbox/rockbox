@@ -37,10 +37,11 @@
 /* These defines must match the initial bytes in the binary lang file */
 /* See tools/genlang (TODO: Use common include for both) */
 #define LANGUAGE_COOKIE   0x1a
-#define LANGUAGE_VERSION  0x05
+#define LANGUAGE_VERSION  0x06
 #define LANGUAGE_FLAG_RTL 0x01
 
 #define HEADER_SIZE 4
+#define SUBHEADER_SIZE 6
 
 static unsigned char language_buffer[MAX_LANGUAGE_SIZE];
 static unsigned char lang_options = 0;
@@ -54,52 +55,62 @@ void lang_init(const unsigned char *builtin, unsigned char **dest, int count)
     }
 }
 
-int lang_load(const char *filename)
+int lang_load(const char *filename, const unsigned char *builtin, 
+              unsigned char **dest, unsigned char *buffer, 
+              unsigned int user_num, int max_lang_size,
+              unsigned int max_id)
 {
-    int fsize;
+    int lang_size;
     int fd = open(filename, O_RDONLY);
     int retcode=0;
     unsigned char lang_header[HEADER_SIZE];
+    unsigned char sub_header[SUBHEADER_SIZE];
+    unsigned int id, num_strings, foffset;
+
     if(fd < 0)
         return 1;
-    fsize = filesize(fd) - HEADER_SIZE;
-    if(fsize <= MAX_LANGUAGE_SIZE) {
-        read(fd, lang_header, HEADER_SIZE);
-        if((lang_header[0] == LANGUAGE_COOKIE) &&
-           (lang_header[1] == LANGUAGE_VERSION) &&
-           (lang_header[2] == TARGET_ID)) {
-            read(fd, language_buffer, MAX_LANGUAGE_SIZE);
-            unsigned char *ptr = language_buffer;
-            int id;
+    read(fd, lang_header, HEADER_SIZE);
+    if((lang_header[0] == LANGUAGE_COOKIE) &&
+       (lang_header[1] == LANGUAGE_VERSION) &&
+       (lang_header[2] == TARGET_ID)) {
+        /* jump to the proper entry in the table of subheaders */
+        lseek(fd, user_num * SUBHEADER_SIZE, SEEK_CUR);
+        read(fd, sub_header, SUBHEADER_SIZE);
+        /* read in information about the requested lang */
+        num_strings = (sub_header[0]<<8) | sub_header[1];
+        lang_size = (sub_header[2]<<8) | sub_header[3];
+        foffset = (sub_header[4]<<8) | sub_header[5];
+        if(lang_size <= max_lang_size) {
             /* initialize with builtin */
-            lang_init(language_builtin, language_strings, 
-                      LANG_LAST_INDEX_IN_ARRAY);
+            lang_init(builtin, dest, num_strings);
+            lseek(fd, foffset, SEEK_SET);
+            read(fd, buffer, lang_size);
 
-            while(fsize>3) {
-                id = (ptr[0]<<8) | ptr[1];  /* get two-byte id */
-                ptr+=2;                     /* pass the id */
-                if(id < LANG_LAST_INDEX_IN_ARRAY) {
+            while(lang_size>3) {
+                id = ((buffer[0]<<8) | buffer[1]); /* get two-byte id */
+                buffer += 2;                       /* pass the id */
+                if(id < max_id) {
 #if 0
-                    DEBUGF("%2x New: %30s ", id, ptr);
-                    DEBUGF("Replaces: %s\n", language_strings[id]);
+                    DEBUGF("%2x New: %30s ", id, buffer);
+                    DEBUGF("Replaces: %s\n", dest[id]);
 #endif
-                    language_strings[id] = ptr; /* point to this string */
+                    dest[id] = buffer; /* point to this string */
                 }
-                while(*ptr) {               /* pass the string */
-                    fsize--;
-                    ptr++;
-                }
-                fsize-=3; /* the id and the terminating zero */
-                ptr++;       /* pass the terminating zero-byte */
+                while(*buffer) {               /* pass the string */
+                    lang_size--;
+                    buffer++;
+                 }
+                lang_size-=3; /* the id and the terminating zero */
+                buffer++;     /* pass the terminating zero-byte */
             }
         }
         else {
-            DEBUGF("Illegal language file\n");
+            DEBUGF("Language %s too large: %d\n", filename, lang_size);
             retcode = 2;
         }
     }
     else {
-        DEBUGF("Language %s too large: %d\n", filename, fsize);
+        DEBUGF("Illegal language file\n");
         retcode = 3;
     }
     close(fd);
@@ -107,10 +118,17 @@ int lang_load(const char *filename)
     return retcode;
 }
 
+int lang_core_load(const char *filename)
+{
+    return lang_load(filename, core_language_builtin, language_strings,
+                     language_buffer, 0, MAX_LANGUAGE_SIZE,
+                     LANG_LAST_INDEX_IN_ARRAY);
+}
+
 int lang_english_to_id(const char *english)
 {
     int i;
-    unsigned char *ptr = (unsigned char *) language_builtin;
+    unsigned char *ptr = (unsigned char *) core_language_builtin;
     
     for (i = 0; i < LANG_LAST_INDEX_IN_ARRAY; i++) {
         if (!strcmp(ptr, english))
