@@ -182,13 +182,15 @@ void usb_screen(void)
     {
         FOR_NB_SCREENS(i)
         {
-            screens[i].backdrop_show(BACKDROP_MAIN);
-            screens[i].backlight_on();
-            screens[i].clear_display();
+            struct screen *screen = &screens[i];
+
+            screen->backdrop_show(BACKDROP_MAIN);
+            screen->backlight_on();
+            screen->clear_display();
 #ifdef HAVE_REMOTE_LCD
             if (i == SCREEN_REMOTE)
             {
-                screens[i].bitmap(remote_usblogo,
+                screen->bitmap(remote_usblogo,
                         (LCD_REMOTE_WIDTH-BMPWIDTH_remote_usblogo),
                         (LCD_REMOTE_HEIGHT-BMPHEIGHT_remote_usblogo)/2,
                         BMPWIDTH_remote_usblogo, BMPHEIGHT_remote_usblogo);
@@ -197,27 +199,27 @@ void usb_screen(void)
 #endif
             {
 #ifdef HAVE_LCD_BITMAP
-                screens[i].transparent_bitmap(usblogo,
+                screen->transparent_bitmap(usblogo,
                         (LCD_WIDTH-BMPWIDTH_usblogo),
                         (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
                         BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
 #ifdef USB_ENABLE_HID
                 int w, h;
 
-                screens[i].getstringsize(str(keypad_mode_name_get()), &w, &h);
-                screens[i].putsxy((LCD_WIDTH - w) / 2, BMPHEIGHT_usblogo +
+                screen->getstringsize(str(keypad_mode_name_get()), &w, &h);
+                screen->putsxy((LCD_WIDTH - w) / 2, BMPHEIGHT_usblogo +
                         (LCD_HEIGHT - BMPHEIGHT_usblogo + h) / 2,
                         str(keypad_mode_name_get()));
 #endif /* USB_ENABLE_HID */
 #else /* HAVE_LCD_BITMAP */
-                screens[i].double_height(false);
-                screens[i].puts_scroll(0, 0, "[USB Mode]");
+                screen->double_height(false);
+                screen->puts_scroll(0, 0, "[USB Mode]");
                 status_set_param(false);
                 status_set_audio(false);
                 status_set_usb(true);
 #endif /* HAVE_LCD_BITMAP */
             }
-            screens[i].update();
+            screen->update();
 
             /* force statusbar by ignoring the setting */
             usb_bars |= VP_SB_IGNORE_SETTING(i);
