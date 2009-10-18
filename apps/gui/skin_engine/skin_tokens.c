@@ -123,7 +123,7 @@ static char* get_dir(char* buf, int buf_size, const char* path, int level)
 /* a few convinience macros for the id3 == NULL case
  * depends on a few variable names in get_token_value() */
 
-#define HANDLE_NULL_ID3(id3field) (LIKELY(id3) ? (id3field) : na_str)
+#define HANDLE_NULL_ID3(id3field) (LIKELY(id3) ? (id3field) : NULL)
 
 #define HANDLE_NULL_ID3_NUM_ZERO { if (UNLIKELY(!id3)) return zero_str; }
 
@@ -151,7 +151,6 @@ const char *get_token_value(struct gui_wps *gwps,
     struct wps_data *data = gwps->data;
     struct wps_state *state = gwps->state;
     int elapsed, length;
-    static const char * const na_str = "n/a";
     static const char * const zero_str = "0";
 
     if (!data || !state)
@@ -418,8 +417,7 @@ const char *get_token_value(struct gui_wps *gwps,
             return buf;
 
         case WPS_TOKEN_FILE_NAME:
-            if (!id3) return na_str;
-            if (get_dir(buf, buf_size, id3->path, 0)) {
+            if (LIKELY(id3) && get_dir(buf, buf_size, id3->path, 0)) {
                 /* Remove extension */
                 char* sep = strrchr(buf, '.');
                 if (NULL != sep) {
@@ -432,8 +430,9 @@ const char *get_token_value(struct gui_wps *gwps,
             }
 
         case WPS_TOKEN_FILE_NAME_WITH_EXTENSION:
-            if (!id3) return na_str;
-            return get_dir(buf, buf_size, id3->path, 0);
+            if (LIKELY(id3))
+                return get_dir(buf, buf_size, id3->path, 0);
+            return NULL;
 
         case WPS_TOKEN_FILE_PATH:
             return HANDLE_NULL_ID3(id3->path);
@@ -449,7 +448,7 @@ const char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_FILE_DIRECTORY:
             if (LIKELY(id3))
                 return get_dir(buf, buf_size, id3->path, token->value.i);
-            return na_str;
+            return NULL;
 
         case WPS_TOKEN_BATTERY_PERCENT:
         {
