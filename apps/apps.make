@@ -23,7 +23,7 @@ features $(BUILDDIR)/apps/features $(BUILDDIR)/apps/genlang-features: $(APPSDIR)
 	$(call PRINTS,PP $(<F))
 	$(SILENT)$(CC) $(PPCFLAGS) \
                  -E -P -imacros "config.h" -imacros "button.h" -x c $< | \
-		grep -v "^\#" | grep -v "^$$" > $(BUILDDIR)/apps/features; \
+		grep -v "^\#" | grep -v "^ *$$" > $(BUILDDIR)/apps/features; \
 		for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done ; \
 		echo "$$feat" >$(BUILDDIR)/apps/genlang-features
 
