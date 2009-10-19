@@ -56,9 +56,6 @@
 #include "viewport.h"
 #include "language.h"
 
-#if (CONFIG_STORAGE & STORAGE_MMC)
-#include "ata_mmc.h"
-#endif
 #if CONFIG_CODEC == SWCODEC
 #include "dsp.h"
 #endif
