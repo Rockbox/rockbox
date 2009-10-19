@@ -36,6 +36,7 @@
 #include "errno.h"
 #include "system.h"
 #include "timefuncs.h"
+#include "screens.h"
 #include "usb_screen.h"
 #include "talk.h"
 #include "mpeg.h"

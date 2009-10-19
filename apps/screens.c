@@ -30,6 +30,7 @@
 #include "font.h"
 #include "audio.h"
 #include "mp3_playback.h"
+#include "usb.h"
 #include "settings.h"
 #include "status.h"
 #include "playlist.h"
