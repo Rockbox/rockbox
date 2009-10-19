@@ -547,7 +547,7 @@ int ft_enter(struct tree_context* c)
                 splash(0, ID2P(LANG_WAIT));
                 if (lang_core_load(buf))
                 {
-                    splash(HZ, ID2P(LANG_LANGUAGE_LOAD_FAILED));
+                    splash(HZ, ID2P(LANG_FAILED));
                     break;
                 }
                 set_file(buf, (char *)global_settings.lang_file,
