@@ -246,12 +246,22 @@ static int sd_init_card(const int drive)
     unsigned long temp_reg[4];
     int i;
 
+
+    /* 100 - 400kHz clock required for Identification Mode  */
+    MCI_CLOCK(drive) = (MCI_CLOCK(drive) & 0xf00) | AS3525_SD_IDENT_DIV;
+
+
+    /*  Start of Card Identification Mode ************************************/
+
+
+    /* CMD0 Go Idle  */
     if(!send_cmd(drive, SD_GO_IDLE_STATE, 0, MCI_NO_FLAGS, NULL))
         return -1;
 
     mci_delay();
 
-    /*  CMD8  Check for v2 sd card */
+    /* CMD8 Check for v2 sd card.  Must be sent before using ACMD41
+      Non v2 cards will not respond to this command*/
     if(send_cmd(drive, SD_SEND_IF_COND, 0x1AA, MCI_RESP|MCI_ARG, &response))
         if((response & 0xFFF) == 0x1AA)
             sd_v2 = true;
@@ -270,7 +280,7 @@ static int sd_init_card(const int drive)
             return -3;
         }
 
-        /* acmd41 If we have a v2 sd card set HCS bit[30] with voltage range */
+        /* ACMD41 For v2 cards set HCS bit[30] & send host voltage range to all */
         if(!send_cmd(drive, SD_APP_OP_COND, (0x00FF8000 | (sd_v2 ? 1<<30 : 0)),
                         MCI_RESP|MCI_ARG, &card_info[drive].ocr))
         {
@@ -279,10 +289,7 @@ static int sd_init_card(const int drive)
 
     } while(!(card_info[drive].ocr & (1<<31)));
 
-    MCI_CLOCK(drive) |= MCI_CLOCK_BYPASS; /* full speed for controller clock */
-    mci_delay();
-
-    /* send CID */
+    /* CMD2 send CID */
     if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP|MCI_ARG,
                             temp_reg))
         return -5;
@@ -290,12 +297,20 @@ static int sd_init_card(const int drive)
     for(i=0; i<4; i++)
         card_info[drive].cid[3-i] = temp_reg[i];
 
-    /* send RCA */
+    /* CMD3 send RCA */
     if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP|MCI_ARG,
                 &card_info[drive].rca))
         return -6;
 
-    /*  Select card to put it in TRAN state */
+
+    /*  End of Card Identification Mode   ************************************/
+
+
+    /* full speed for controller clock  MCICLK = MCLK = PCLK = 62 MHz */
+    MCI_CLOCK(drive) |= MCI_CLOCK_BYPASS;   /*  FIXME: 50 MHz is spec limit  */
+    mci_delay();
+
+    /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
         return -7;
 
@@ -304,16 +319,18 @@ static int sd_init_card(const int drive)
     {
         if(sd_wait_for_state(drive, SD_TRAN))
             return -8;
+        /* CMD6 */
         if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_ARG, NULL))
             return -9;
         mci_delay();
     }
 
     /*  go back to STBY state so we can read csd */
+    /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
     if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_ARG, NULL))
         return -10;
 
-    /* send CSD */
+    /* CMD9 send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
                  MCI_RESP|MCI_LONG_RESP|MCI_ARG, temp_reg))
         return -11;
@@ -323,7 +340,7 @@ static int sd_init_card(const int drive)
 
     sd_parse_csd(&card_info[drive]);
 
-    /*  Select card to put back in TRAN state */
+    /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
         return -12;
 
@@ -440,8 +457,8 @@ static void init_pl180_controller(const int drive)
     MCI_COMMAND(drive) = MCI_DATA_CTRL(drive) = 0;
     MCI_CLEAR(drive) = 0x7ff;
 
-    MCI_MASK0(drive) = MCI_MASK1(drive) = MCI_ERROR | MCI_DATA_END;
-
+    MCI_MASK0(drive) = MCI_ERROR | MCI_DATA_END;
+    MCI_MASK1(drive) = 0;
 #ifdef HAVE_MULTIDRIVE
     VIC_INT_ENABLE |=
         (drive == INTERNAL_AS3525) ? INTERRUPT_NAND : INTERRUPT_MCI0;
@@ -459,7 +476,7 @@ static void init_pl180_controller(const int drive)
     VIC_INT_ENABLE |= INTERRUPT_NAND;
 #endif
 
-    MCI_POWER(drive) = MCI_POWER_UP|(10 /*voltage*/ << 2); /* use OF voltage */
+    MCI_POWER(drive) = MCI_POWER_UP | (MCI_VDD_3_0);  /*  OF Setting  */
     mci_delay();
 
     MCI_POWER(drive) |= MCI_POWER_ON;
@@ -467,7 +484,7 @@ static void init_pl180_controller(const int drive)
 
     MCI_SELECT(drive) = 0;
 
-    MCI_CLOCK(drive) = MCI_CLOCK_ENABLE | AS3525_SD_IDENT_DIV;
+    MCI_CLOCK(drive) = MCI_CLOCK_ENABLE;
     mci_delay();
 }
 
