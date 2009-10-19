@@ -2,9 +2,14 @@
 
 \warn{Before starting this procedure, ensure that you have a copy
 of the original \playerman{} firmware. Without this, it is
-\emph{not} possible to uninstall Rockbox. The \playerman{}
+\emph{not} possible to uninstall Rockbox. It is also needed if you want to
+install the dual-boot bootloader. The \playerman{}
 firmware can be downloaded from
 \url{http://www.tacp.toshiba.com/tacpassets-images/firmware/MESV12US.zip}.\\}
+The single-boot bootloader can only boot Rockbox, whereas the dual-boot
+bootloader can boot both Rockbox and the \playerman{} firmware.
+The single-boot bootloader boots Rockbox more quickly if you no longer need
+access to the \playerman{} firmware.\\
 
 Installing the bootloader is only needed once. It involves replacing the
 existing firmware file on your \dap{} with another version.
@@ -26,13 +31,29 @@ bootloader) and executed when your \dap{} is powered on.
 \item Attach your \dap{} to your computer.
 
 \item Download \fname{beastpatcher.exe} from
-\fixme{add download location}
-and run it.
+\download{bootloader/toshiba/gigabeat-s/beastpatcher/win32/beastpatcher.exe}
+and then perform one of the following, depending on whether you want single
+or dual-boot.
 
-\item You should see some information displayed about
+\item[Single Boot.] Run \fname{beastpatcher.exe}. You should see some
+information displayed about
 your \dap{} and a message asking you if you wish to install the Rockbox
 bootloader. Press i followed by ENTER, and beastpatcher will
 install the bootloader. After a short time you should see the message
+``[INFO] Bootloader installed successfully'' followed by some error
+messages that you can safely ignore. Press ENTER again to exit
+beastpatcher.
+
+\item[Dual Boot.]  Extract the \playerman{} firmware file \fname{nk.bin} from
+the archive you downloaded earlier (linked above) and place it in the same
+directory as \fname{beastpatcher.exe}.  Open a command prompt and navigate
+to this directory, and then type the following commands:
+
+\begin{code} 
+    beastpatcher -d nk.bin
+\end{code}
+
+After a short time you should see the message
 ``[INFO] Bootloader installed successfully'' followed by some error
 messages that you can safely ignore. Press ENTER again to exit
 beastpatcher.
@@ -49,18 +70,27 @@ as a standard USB Mass Storage device.
 \item Attach your \dap{} to your computer.
 
 \item Download and open beastpatcher.dmg from 
-\fixme{add download location}
-and then double-click on the beastpatcher icon inside. You can also
-drag the beastpatcher icon to a location on your hard drive and launch
-it from the Terminal.
+\fixme{add download location} and then perform one of the following,
+depending on whether you want single or dual-boot.
 
-\item If all has gone well, you should see some 
+\item [Single Boot.] Double-click on the beastpatcher icon. You can also
+drag the beastpatcher icon to a location on your hard drive and launch
+it from the Terminal. If all has gone well, you should see some 
 information displayed about your \dap{} and a message asking you if you 
 wish to install the Rockbox bootloader. Press i followed by ENTER, and 
 beastpatcher will now install the bootloader. After a short time you 
 should see the message ``[INFO] Bootloader installed successfully''
 followed by some error messages that you can safely ignore. Press 
 ENTER again to exit beastpatcher and then quit the Terminal application.
+
+\item [Dual Boot.] Extract the \playerman{} firmware file \fname{nk.bin}
+from the archive you downloaded earlier (linked above) and place it in the
+same directory as \fname{beastpatcher}.  Open a terminal window and type the
+following command:
+
+\begin{code} 
+    ./beastpatcher -d nk.bin
+\end{code}
 
 \item After a successful installation, your \dap{} will immediately turn off.
 Turn it on again, and (because it is still connected to your Mac)
@@ -74,14 +104,16 @@ as a standard USB Mass Storage device.
 \begin{enumerate}
 
 \item Download beastpatcher from
-\fixme{add download location} (32-bit x86 
-binary) or \fixme{add download location} 
+\download{bootloader/toshiba/gigabeat-s/beastpatcher/linux32x86/beastpatcher}
+(32-bit x86 binary) or 
+\download{bootloader/toshiba/gigabeat-s/beastpatcher/linux64amd64/beastpatcher}
 (64-bit amd64 binary). You can save this anywhere you wish, but the next 
 steps will assume you have saved it in your home directory.
 
-\item Attach your \dap{} to your computer.
+\item Attach your \dap{} to your computer and then perform one of the following,
+depending on whether you want single or dual-boot.
 
-\item Open up a terminal window and type the following commands:
+\item [Single Boot.] Open up a terminal window and type the following commands:
 
 \begin{code} 
     cd $HOME
@@ -89,12 +121,28 @@ steps will assume you have saved it in your home directory.
     ./beastpatcher
 \end{code}
 
-\item If all has gone well, you should see some information displayed about
+If all has gone well, you should see some information displayed about
 your \dap{} and a message asking you if you wish to install the Rockbox
 bootloader. Press i followed by ENTER, and beastpatcher will now install the
 bootloader. After a short time you should see the message ``[INFO] Bootloader
 installed successfully'' followed by some error
 messages that you can safely ignore. Press ENTER again to exit beastpatcher.
+
+\item [Dual Boot.] Extract the \playerman{} firmware file \fname{nk.bin} from
+the archive you downloaded earlier (linked above) and place it in the same
+directory as \fname{beastpatcher}.  Open a terminal window and type the
+following commands:
+
+\begin{code} 
+    cd $HOME
+    chmod +x beastpatcher
+    ./beastpatcher -d nk.bin
+\end{code}
+
+After a short time you should see the message
+``[INFO] Bootloader installed successfully'' followed by some error
+messages that you can safely ignore. Press ENTER again to exit
+beastpatcher.
 
 \item After a successful installation, your \dap{} will immediately turn off.
 Turn it on again, and (because it is still connected to your PC)
