@@ -38,10 +38,6 @@ void charging_splash(void);
 int mmc_remove_request(void);
 #endif
 
-#ifdef HAVE_PITCHSCREEN
-bool pitch_screen(void);
-#endif
-
 #if CONFIG_RTC
 bool set_time_screen(const char* title, struct tm *tm);
 #endif
