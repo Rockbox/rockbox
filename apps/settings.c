@@ -745,7 +745,7 @@ void settings_apply_skins(void)
     if ( global_settings.sbs_file[0] &&
         global_settings.sbs_file[0] != 0xff )
     {
-        snprintf(buf, sizeof buf, WPS_DIR "/%s.sbs",
+        snprintf(buf, sizeof buf, SBS_DIR "/%s.sbs",
                 global_settings.sbs_file);
         sb_skin_data_load(SCREEN_MAIN, buf, true);
     }
@@ -768,7 +768,7 @@ void settings_apply_skins(void)
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
     if ( global_settings.rsbs_file[0] &&
         global_settings.rsbs_file[0] != 0xff ) {
-        snprintf(buf, sizeof buf, WPS_DIR "/%s.rsbs",
+        snprintf(buf, sizeof buf, SBS_DIR "/%s.rsbs",
                 global_settings.rsbs_file);
         sb_skin_data_load(SCREEN_REMOTE, buf, true);
     }

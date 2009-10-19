@@ -488,7 +488,6 @@ int ft_enter(struct tree_context* c)
                          MAX_FILENAME);
                 global_settings.statusbar = STATUSBAR_CUSTOM;
                 settings_apply_skins();
-                viewportmanager_theme_changed(THEME_STATUSBAR);
                 break;
 #endif
 #ifdef HAVE_REMOTE_LCD
@@ -498,7 +497,6 @@ int ft_enter(struct tree_context* c)
                          MAX_FILENAME);
                 global_settings.remote_statusbar = STATUSBAR_CUSTOM;
                 settings_apply_skins();
-                viewportmanager_theme_changed(THEME_STATUSBAR);
                 break;
 #endif
                 /* wps config file */
@@ -507,7 +505,6 @@ int ft_enter(struct tree_context* c)
 #if LCD_DEPTH > 1
                 backdrop_unload(BACKDROP_SKIN_WPS);
 #endif
-                wps_data_load(SCREEN_MAIN, buf, true);
                 set_file(buf, (char *)global_settings.wps_file,
                          MAX_FILENAME);
                 settings_apply_skins();
@@ -520,7 +517,6 @@ int ft_enter(struct tree_context* c)
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 remote_backdrop_unload(BACKDROP_SKIN_WPS);
 #endif
-                wps_data_load(SCREEN_REMOTE, buf, true);
                 set_file(buf, (char *)global_settings.rwps_file,
                          MAX_FILENAME);
                 settings_apply_skins();
