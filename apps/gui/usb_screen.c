@@ -42,6 +42,10 @@
 #include "bitmaps/remote_usblogo.h"
 #endif
 
+#if (CONFIG_STORAGE & STORAGE_MMC)
+#include "ata_mmc.h"
+#endif
+
 #ifndef SIMULATOR
 
 #ifdef USB_ENABLE_HID
