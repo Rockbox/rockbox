@@ -545,13 +545,16 @@ int ft_enter(struct tree_context* c)
 
             case FILE_ATTR_LNG:
                 splash(0, ID2P(LANG_WAIT));
-                if(!lang_core_load(buf)) {
-                    set_file(buf, (char *)global_settings.lang_file,
-                             MAX_FILENAME);
-                    talk_init(); /* use voice of same language */
-                    viewportmanager_theme_changed(THEME_LANGUAGE);
-                    splash(HZ, ID2P(LANG_LANGUAGE_LOADED));
+                if (lang_core_load(buf))
+                {
+                    splash(HZ, ID2P(LANG_LANGUAGE_LOAD_FAILED));
+                    break;
                 }
+                set_file(buf, (char *)global_settings.lang_file,
+                        MAX_FILENAME);
+                talk_init(); /* use voice of same language */
+                viewportmanager_theme_changed(THEME_LANGUAGE);
+                splash(HZ, ID2P(LANG_LANGUAGE_LOADED));
                 break;
 
 #ifdef HAVE_LCD_BITMAP

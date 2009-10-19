@@ -4952,6 +4952,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_LANGUAGE_LOAD_FAILED
+  desc: shown when a language has failed to be loaded from the dir browser
+  user: core
+  <source>
+    *: "Language Load Failed"
+  </source>
+  <dest>
+    *: "Language Load Failed"
+  </dest>
+  <voice>
+    *: "Language Load Failed"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_VOICE
   desc: root of voice menu
   user: core
