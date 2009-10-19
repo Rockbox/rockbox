@@ -659,8 +659,8 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req, unsigned char* des
             *tb.max_lun --;
 #endif
             logf("ums: getmaxlun");
-            usb_drv_send(EP_CONTROL, tb.max_lun, 1);
             usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
+            usb_drv_send(EP_CONTROL, tb.max_lun, 1);
             handled = true;
             break;
         }

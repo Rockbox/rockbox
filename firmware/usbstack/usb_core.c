@@ -507,6 +507,15 @@ static void allocate_interfaces_and_endpoints(void)
     usb_core_num_interfaces = interface;
 }
 
+static int usb_core_ack_control(struct usb_ctrlrequest* req)
+{
+    if (req->bRequestType & USB_DIR_IN)
+        return usb_drv_recv(EP_CONTROL,NULL,0);
+    else
+        return usb_drv_send(EP_CONTROL,NULL,0);
+}
+
+
 static void control_request_handler_drivers(struct usb_ctrlrequest* req)
 {
     int i, interface = req->wIndex;
@@ -608,11 +617,9 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req)
             memcpy(response_data,ptr,length);
         }
 
-        if(usb_drv_send(EP_CONTROL,response_data,length))
-            return;
+        usb_drv_recv(EP_CONTROL,NULL,0);
+        usb_drv_send(EP_CONTROL,response_data,length);
     }
-    if (handled)
-        usb_core_ack_control(req);
 }
 
 static void request_handler_device(struct usb_ctrlrequest* req)
@@ -623,8 +630,8 @@ static void request_handler_device(struct usb_ctrlrequest* req)
         case USB_REQ_GET_CONFIGURATION: {
                 logf("usb_core: GET_CONFIG");
                 response_data[0] = (usb_state == ADDRESS ? 0 : 1);
-                if(!usb_drv_send(EP_CONTROL, response_data, 1))
-                    usb_core_ack_control(req);
+                usb_drv_recv(EP_CONTROL,NULL,0);
+                usb_drv_send(EP_CONTROL, response_data, 1);
                 break;
             }
         case USB_REQ_SET_CONFIGURATION: {
@@ -640,14 +647,13 @@ static void request_handler_device(struct usb_ctrlrequest* req)
                 else {
                     usb_state = ADDRESS;
                 }
-                usb_core_ack_control(req);
+                usb_drv_send(EP_CONTROL,NULL,0);
                 break;
             }
         case USB_REQ_SET_ADDRESS: {
                 unsigned char address = req->wValue;
                 logf("usb_core: SET_ADR %d", address);
-                if(usb_core_ack_control(req))
-                    break;
+                usb_drv_send(EP_CONTROL,NULL,0);
                 usb_drv_cancel_all_transfers();
                 usb_address = address;
                 usb_drv_set_address(usb_address);
@@ -663,15 +669,15 @@ static void request_handler_device(struct usb_ctrlrequest* req)
         case USB_REQ_SET_FEATURE:
             if(req->wValue==USB_DEVICE_TEST_MODE) {
                 int mode=req->wIndex>>8;
-                usb_core_ack_control(req);
+                usb_drv_send(EP_CONTROL,NULL,0);
                 usb_drv_set_test_mode(mode);
             }
             break;
         case USB_REQ_GET_STATUS:
             response_data[0]= 0;
             response_data[1]= 0;
-            if(!usb_drv_send(EP_CONTROL, response_data, 2))
-                usb_core_ack_control(req);
+            usb_drv_recv(EP_CONTROL,NULL,0);
+            usb_drv_send(EP_CONTROL, response_data, 2);
             break;
         default:
             break;
@@ -684,14 +690,14 @@ static void request_handler_interface_standard(struct usb_ctrlrequest* req)
     {
         case USB_REQ_SET_INTERFACE:
             logf("usb_core: SET_INTERFACE");
-            usb_core_ack_control(req);
+            usb_drv_send(EP_CONTROL,NULL,0);
             break;
 
         case USB_REQ_GET_INTERFACE:
             logf("usb_core: GET_INTERFACE");
             response_data[0]=0;
-            if(!usb_drv_send(EP_CONTROL,response_data,1))
-                usb_core_ack_control(req);
+            usb_drv_recv(EP_CONTROL,NULL,0);
+            usb_drv_send(EP_CONTROL,response_data,1);
             break;
         case USB_REQ_CLEAR_FEATURE:
             break;
@@ -700,8 +706,8 @@ static void request_handler_interface_standard(struct usb_ctrlrequest* req)
         case USB_REQ_GET_STATUS:
             response_data[0]=0;
             response_data[1]=0;
-            if(!usb_drv_send(EP_CONTROL, response_data, 2))
-                usb_core_ack_control(req);
+            usb_drv_recv(EP_CONTROL,NULL,0);
+            usb_drv_send(EP_CONTROL, response_data, 2);
             break;
         default:
             control_request_handler_drivers(req);
@@ -730,13 +736,13 @@ static void request_handler_endpoint(struct usb_ctrlrequest* req)
             if (req->wValue==USB_ENDPOINT_HALT) {
                 usb_drv_stall(EP_NUM(req->wIndex), false, EP_DIR(req->wIndex));
             }
-            usb_core_ack_control(req);
+            usb_drv_send(EP_CONTROL,NULL,0);
             break;
         case USB_REQ_SET_FEATURE:
             if (req->wValue==USB_ENDPOINT_HALT) {
                usb_drv_stall(EP_NUM(req->wIndex), true, EP_DIR(req->wIndex));
             }
-            usb_core_ack_control(req);
+            usb_drv_send(EP_CONTROL,NULL,0);
             break;
         case USB_REQ_GET_STATUS:
             response_data[0]=0;
@@ -746,8 +752,8 @@ static void request_handler_endpoint(struct usb_ctrlrequest* req)
                 response_data[0]=usb_drv_stalled(EP_NUM(req->wIndex),
                         EP_DIR(req->wIndex));
             }
-            if(!usb_drv_send(EP_CONTROL,response_data,2))
-                usb_core_ack_control(req);
+            usb_drv_recv(EP_CONTROL,NULL,0);
+            usb_drv_send(EP_CONTROL,response_data,2);
             break;
         default: {
                 bool handled;
@@ -841,14 +847,6 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
     completion_event->length=0;
     logf("ctrl received %ld",current_tick);
     usb_signal_transfer_completion(completion_event);
-}
-
-int usb_core_ack_control(struct usb_ctrlrequest* req)
-{
-    if (req->bRequestType & USB_DIR_IN)
-        return usb_drv_recv(EP_CONTROL,NULL,0);
-    else
-        return usb_drv_send(EP_CONTROL,NULL,0);
 }
 
 #ifdef HAVE_USB_POWER

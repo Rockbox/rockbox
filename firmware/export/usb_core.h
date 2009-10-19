@@ -51,7 +51,6 @@ void usb_core_enable_driver(int driver,bool enabled);
 bool usb_core_driver_enabled(int driver);
 void usb_core_handle_transfer_completion(
         struct usb_transfer_completion_event_data* event);
-int usb_core_ack_control(struct usb_ctrlrequest* req);
 
 int usb_core_request_endpoint(int type, int dir,struct usb_class_driver* drv);
 void usb_core_release_endpoint(int dir);
