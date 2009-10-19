@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: screens.h 21312 2009-06-16 17:04:47Z mcuelenaere $
  *
  * Copyright (C) 2002 Björn Stenberg
  *
@@ -18,37 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _SCREENS_H_
-#define _SCREENS_H_
+#ifndef _USB_SCREEN_H_
+#define _USB_SCREEN_H_
 
-#include "config.h"
-#include "timefuncs.h"
-
-struct screen;
-
-#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING) && defined(CPU_SH)
-int charging_screen(void);
-#endif
-#if CONFIG_CHARGING || defined(SIMULATOR)
-void charging_splash(void);
-#endif
-
-#if (CONFIG_STORAGE & STORAGE_MMC)
-int mmc_remove_request(void);
-#endif
-
-#if CONFIG_RTC
-bool set_time_screen(const char* title, struct tm *tm);
-#endif
-
-bool shutdown_screen(void);
-bool browse_id3(void);
-bool view_runtime(void);
-
-#ifdef HAVE_TOUCHSCREEN
-int calibrate(void);
-int reset_mapping(void);
-#endif
+extern void gui_usb_screen_run(void);
 
 #endif
 

@@ -56,7 +56,7 @@
 #include "playlist.h"
 #include "buffer.h"
 #include "rolo.h"
-#include "screens.h"
+#include "usb_screen.h"
 #include "power.h"
 #include "talk.h"
 #include "plugin.h"
@@ -492,7 +492,7 @@ static void init(void)
                 (mmc_remove_request() == SYS_HOTSWAP_EXTRACTED))
 #endif
             {
-                usb_screen();
+                gui_usb_screen_run();
                 mounted = true; /* mounting done @ end of USB mode */
             }
 #ifdef HAVE_USB_POWER
@@ -517,7 +517,7 @@ static void init(void)
             lcd_update();
 
             while(button_get(true) != SYS_USB_CONNECTED) {};
-            usb_screen();
+            gui_usb_screen_run();
             system_reboot();
         }
     }

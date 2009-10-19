@@ -417,7 +417,7 @@ Kernel
      time". This function is the entire foundation that our "cooperative
      multitasking" is based on. Use it.
 
-  void usb_screen(void);
+  void gui_usb_screen_run(void);
 
      Show the usb connection screen.
      
@@ -427,7 +427,7 @@ Kernel
      
   int default_event_handler(int event);
 
-     If event == SYS_USB_CONNECTED, call usb_screen and return
+     If event == SYS_USB_CONNECTED, call gui_usb_screen_run and return
      SYS_USB_CONNECTED. Else do nothing and return 0.
      
   int create_thread(void* function, void* stack, int stack_size,

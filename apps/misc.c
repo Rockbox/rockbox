@@ -36,7 +36,7 @@
 #include "errno.h"
 #include "system.h"
 #include "timefuncs.h"
-#include "screens.h"
+#include "usb_screen.h"
 #include "talk.h"
 #include "mpeg.h"
 #include "audio.h"
@@ -580,7 +580,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
                 check_bootfile(false); /* gets initial size */
 #endif
 #endif
-                usb_screen();
+                gui_usb_screen_run();
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF)
                 check_bootfile(true);
