@@ -149,34 +149,13 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
         vp_icons->height -= CENTER_ICONAREA_SIZE*2/3;
         vp_icons->y += CENTER_ICONAREA_SIZE*2/6;
     }
-}
 
-static void quickscreen_draw_text(const char *s, int item, bool title,
-                                  struct screen *display, struct viewport *vp)
-{
-    int nb_lines = viewport_get_nb_lines(vp);
-    int w, h, line = 0, x = 0;
-    display->getstringsize(s, &w, &h);
-
-    if (nb_lines > 1 && !title)
-        line = 1;
-    switch (item)
-    {
-        case QUICKSCREEN_TOP:
-        case QUICKSCREEN_BOTTOM:
-            x = (vp->width - w)/2;
-            break;
-        case QUICKSCREEN_LEFT:
-            x = 0;
-            break;
-        case QUICKSCREEN_RIGHT:
-            x = vp->width - w;
-            break;
-    }
-    if (w>vp->width)
-        display->puts_scroll(0, line, s);
-    else
-        display->putsxy(x, line*h, s);
+    /* text alignment */
+    vps[QUICKSCREEN_LEFT].flags &= ~VP_FLAG_ALIGNMENT_MASK; /* left-aligned */
+    vps[QUICKSCREEN_TOP].flags    |= VP_FLAG_ALIGN_CENTER;  /* centered */
+    vps[QUICKSCREEN_BOTTOM].flags |= VP_FLAG_ALIGN_CENTER;  /* centered */
+    vps[QUICKSCREEN_RIGHT].flags  &= ~VP_FLAG_ALIGNMENT_MASK;/* right aligned*/
+    vps[QUICKSCREEN_RIGHT].flags  |= VP_FLAG_ALIGN_RIGHT;
 }
 
 static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
@@ -194,10 +173,11 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
     display->clear_viewport();
     for (i = 0; i < QUICKSCREEN_ITEM_COUNT; i++)
     {
+        struct viewport *vp = &vps[i];
         if (!qs->items[i])
             continue;
-        display->set_viewport(&vps[i]);
-        display->scroll_stop(&vps[i]);
+        display->set_viewport(vp);
+        display->scroll_stop(vp);
 
         title = P2STR(ID2P(qs->items[i]->lang_id));
         setting = qs->items[i]->setting;
@@ -205,16 +185,16 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
         value = option_get_valuestring((struct settings_list*)qs->items[i],
                                        buf, MAX_PATH, temp);
 
-        if (vps[i].height < display->getcharheight()*2)
+        if (viewport_get_nb_lines(vp) < 2)
         {
             char text[MAX_PATH];
             snprintf(text, MAX_PATH, "%s: %s", title, value);
-            quickscreen_draw_text(text, i, true, display, &vps[i]);
+            display->puts_scroll(0, 0, text);
         }
         else
         {
-            quickscreen_draw_text(title, i, true, display, &vps[i]);
-            quickscreen_draw_text(value, i, false, display, &vps[i]);
+            display->puts_scroll(0, 0, title);
+            display->puts_scroll(0, 1, value);
         }
         display->update_viewport();
     }
