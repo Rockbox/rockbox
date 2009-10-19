@@ -389,7 +389,7 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="215"/>
         <source>Success: modified firmware file created</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">הצלחה: קובץ קושחה מוסגל נוצר</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="246"/>
@@ -793,14 +793,14 @@ Sorry, Rockbox doesn&apos;t run on your player.</source>
     <message>
         <location filename="../configure.cpp" line="670"/>
         <source>TTS configuration invalid</source>
-        <translation type="unfinished">הגדרות מנוע דיבור אינן תקינות</translation>
+        <translation>הגדרות מנוע דיבור אינן תקינות</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="671"/>
         <source>TTS configuration invalid. 
  Please configure TTS engine.</source>
-        <translation type="unfinished">הגדרות מנוע דיבור אינן תקינות.
-אנא הגדר תצורת מנוע הדיבור.</translation>
+        <translation>הגדרות מנוע דיבור אינן תקינות.
+אנא הגדר את תצורת מנוע הדיבור.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="677"/>
@@ -875,7 +875,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../configure.cpp" line="629"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
-        <translation>האם באמת ברצונך למחוק את המטמון? היה בטוח לגמרי שהגדרה זו הינה נכונה, כיוון שהיא תמחק את &lt;b&gt;כל&lt;/b&gt; הקבצים בספרייה זו!</translation>
+        <translation>האם באמת ברצונך למחוק את המטמון? אנא וודא שברצונך לבצע פעולה זו נכונה, כיוון שהיא תמחק את &lt;b&gt;כל&lt;/b&gt; הקבצים בספרייה זו!</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="637"/>
@@ -1718,7 +1718,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="390"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
-        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;רשימת כל מדריכי המשתמש&lt;/a&gt;</translation>
+        <translation>&lt;a href=&apos;%1&apos;&gt;רשימת כל מדריכי המשתמש&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="399"/>
@@ -1965,7 +1965,7 @@ Press &quot;No&quot; to skip this step.</source>
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
         <translation>האם באמת ברצונך לבצע התקנה אוטומאטית?
 
-דבר זה יתקין את רוקבוקס %1. להתקין את גירסת הפיתוח המעודכנת ביותר לחץ &quot;ביטול&quot; והשתמש בלשונית ה&quot;התקנה&quot;.</translation>
+דבר זה יתקין את רוקבוקס %1. על מנת להתקין את גירסת הפיתוח המעודכנת ביותר לחץ &quot;ביטול&quot; והשתמש בלשונית ה&quot;התקנה&quot;.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="456"/>
@@ -1974,7 +1974,7 @@ This will install Rockbox %1. To install the most recent development build avail
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
         <translation>האם באמת ברצונך לבצע התקנה מינימאלית? התקנה זו מכילה אך ורק את החלקים ההכרחיים ביותר להפעלת רוקבוקס.
 
-דבר זה יתקין את רוקבוקס %1. להתקין את גירסת הפיתוח המעודכנת ביותר לחץ &quot;ביטול&quot; והשתמש בלשונית ה&quot;התקנה&quot;.</translation>
+דבר זה יתקין את רוקבוקס %1. על מנת להתקין את גירסת הפיתוח המעודכנת ביותר לחץ &quot;ביטול&quot; והשתמש בלשונית ה&quot;התקנה&quot;.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="699"/>
@@ -2210,12 +2210,12 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../rbutilqtfrm.ui" line="702"/>
         <source>&amp;PDF version</source>
-        <translation>PDF &amp;גירסת</translation>
+        <translation>&amp;גירסת PDF</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="709"/>
         <source>&amp;HTML version (zip file)</source>
-        <translation>(קובץ מכווץ) HTML ג&amp;ירסת</translation>
+        <translation>&amp;גירסת HTML (קובץ מכווץ)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="731"/>
@@ -2464,7 +2464,7 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../sysinfo.cpp" line="50"/>
         <source>&lt;b&gt;Attached USB devices&lt;/b&gt;&lt;br/&gt;</source>
-        <translation type="unfinished">&lt;b&gt;מחוברים USB התקני&lt;/b&gt;&lt;br/&gt;</translation>
+        <translation>&lt;b&gt;התקני USB מחוברים&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="54"/>
@@ -2740,7 +2740,8 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../themesinstallfrm.ui" line="93"/>
         <source>Hold Ctrl to select multiple item, Shift for a range</source>
-        <translation>בשביל לבחור טווח Shift ,בשביל לבחור מספר פריטים Ctrl לחץ על</translation>
+        <translatorcomment>בשביל לבחור טווח Shift ,בשביל לבחור מספר פריטים Ctrl לחץ על</translatorcomment>
+        <translation>לחץ על Ctrl בשביל לבחור מספר פריטים, או על Shift בשביל לבחור טווח</translation>
     </message>
 </context>
 <context>
@@ -2772,12 +2773,12 @@ Please check your network and proxy settings.</source>
     <message>
         <location filename="../themesinstallwindow.cpp" line="187"/>
         <source>fetching details for %1</source>
-        <translation>מושך פרטים עבור %1</translation>
+        <translation>טוען פרטים עבור %1</translation>
     </message>
     <message>
         <location filename="../themesinstallwindow.cpp" line="190"/>
         <source>fetching preview ...</source>
-        <translation>מושך תצוגה מקדימה...</translation>
+        <translation>טוען תצוגה מקדימה...</translation>
     </message>
     <message>
         <location filename="../themesinstallwindow.cpp" line="203"/>
@@ -2813,7 +2814,7 @@ Please check your network and proxy settings.</source>
     <message>
         <location filename="../themesinstallwindow.cpp" line="282"/>
         <source>getting themes information ...</source>
-        <translation>מושך מידע על ערכות הנושא...</translation>
+        <translation>מוריד מידע על ערכות הנושא...</translation>
     </message>
     <message>
         <location filename="../themesinstallwindow.cpp" line="330"/>
@@ -2833,9 +2834,9 @@ Please check your network and proxy settings.</source>
     <message numerus="yes">
         <location filename="../themesinstallwindow.cpp" line="174"/>
         <source>Download size %L1 kiB (%n item(s))</source>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation type="unfinished">
+            <numerusform>גודל הורדה kiB %L1 (פריט אחד)</numerusform>
+            <numerusform>גודל הורדה kiB %L1 (%n פריטים)</numerusform>
         </translation>
     </message>
     <message>
@@ -3179,7 +3180,7 @@ HTTP response code: %1</translation>
     <message>
         <location filename="../base/zipinstaller.cpp" line="114"/>
         <source>Download error: received HTTP error %1.</source>
-        <translation>שגיאת הורדה: התקבלה שגיאת HTTP %1.</translation>
+        <translation>שגיאת הורדה: התקבלה שגיאת %1 HTTP.</translation>
     </message>
     <message>
         <location filename="../base/zipinstaller.cpp" line="120"/>
