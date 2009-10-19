@@ -163,8 +163,6 @@ typedef void (*channels_process_fn_type)(int count, int32_t *buf[]);
 /* DSP local channel processing in place */
 typedef void (*channels_process_dsp_fn_type)(int count, struct dsp_data *data,
                                              int32_t *buf[]);
-/* DSP processes that return a value */
-typedef int (*return_fn_type)(int count, int32_t *buf[]);
 
 /*
  ***************************************************************************/
@@ -195,7 +193,7 @@ struct dsp_config
     channels_process_fn_type     apply_crossfeed;
     channels_process_fn_type     eq_process;
     channels_process_fn_type     channels_process;
-    return_fn_type               compressor_process;
+    channels_process_fn_type     compressor_process;
 };
 
 /* General DSP config */
@@ -262,16 +260,13 @@ static int32_t *resample_buf;
 #define RESAMPLE_BUF_RIGHT_CHANNEL (sample_buf_count/2 * RESAMPLE_RATIO)
 
 /* compressor */
-/* MAX_COUNT is largest possible sample count in compressor_process */
-#define MAX_COUNT (SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO / 2)
 static struct   compressor_menu c_menu;
-static int32_t  comp_rel_slope IBSS_ATTR;   /* S7.24 format */
-static int32_t  comp_makeup_gain IBSS_ATTR; /* S7.24 format */
-static int32_t  comp_curve[65] IBSS_ATTR;   /* S7.24 format */
-static int32_t  gain_buffer[MAX_COUNT] IBSS_ATTR;
-static int32_t  release_gain IBSS_ATTR;
-
-static int      compressor_process(int count, int32_t *buf[]);
+static int32_t comp_rel_slope IBSS_ATTR;   /* S7.24 format */
+static int32_t comp_makeup_gain IBSS_ATTR; /* S7.24 format */
+static int32_t comp_curve[66] IBSS_ATTR;   /* S7.24 format */
+static int32_t release_gain IBSS_ATTR;     /* S7.24 format */
+#define UNITY (1L << 24)                   /* unity gain in S7.24 format */
+static void     compressor_process(int count, int32_t *buf[]);
 
 
 /* Clip sample to signed 16 bit range */
@@ -1269,7 +1264,7 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
                 dsp->channels_process(chunk, t2);
             
             if (dsp->compressor_process)
-                chunk = dsp->compressor_process(chunk, t2);
+                dsp->compressor_process(chunk, t2);
 
             dsp->output_samples(chunk, &dsp->data, (const int32_t **)t2, (int16_t *)dst);
 
@@ -1444,7 +1439,7 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
         resampler_new_delta(dsp);
         tdspeed_setup(dsp);
         if (dsp == &AUDIO_DSP)
-            release_gain = (1 << 24);
+            release_gain = UNITY;
         break;
 
     case DSP_FLUSH:
@@ -1454,7 +1449,7 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
         dither_init(dsp);
         tdspeed_setup(dsp);
         if (dsp == &AUDIO_DSP)
-            release_gain = (1 << 24);
+            release_gain = UNITY;
         break;
 
     case DSP_SET_TRACK_GAIN:
@@ -1614,13 +1609,15 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
         {
             int32_t db;     /* S15.16 format */
             int32_t offset; /* S15.16 format */
-        } db_curve[4];
+        } db_curve[5];
         
         /** Set up the shape of the compression curve first as decibel values*/
         /* db_curve[0] = bottom of knee
                    [1] = threshold
                    [2] = top of knee
-                   [3] = 0 db input */
+                   [3] = 0 db input
+                   [4] = ~+12db input (2 bits clipping overhead) */
+        
         db_curve[1].db = c_menu.threshold << 16;
         if (c_menu.soft_knee)
         {
@@ -1644,37 +1641,61 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
             db_curve[2].db = c_menu.threshold << 16;
             db_curve[2].offset = 0;
         }
-        /* 0db input is also max offset point (most compression) */
+        
+        /* Calculate 0db and ~+12db offsets */
+        db_curve[4].db = 0xC0A8C; /* db of 2 bits clipping */
         if (c_menu.ratio)
+        {
             /* offset = threshold * (ratio - 1) / ratio */
             db_curve[3].offset = (int32_t)((long long)(c_menu.threshold << 16)
                 * (c_menu.ratio - 1) / c_menu.ratio);
+            db_curve[4].offset = (int32_t)((long long)-db_curve[4].db
+                * (c_menu.ratio - 1) / c_menu.ratio) + db_curve[3].offset;
+        }
         else
+        {
             /* offset = threshold for hard limit */
             db_curve[3].offset = (c_menu.threshold << 16);
+            db_curve[4].offset = -db_curve[4].db + db_curve[3].offset;
+        }
         
-        /* Now set up the comp_curve table with compression offsets in the form
-           of gain factors in S7.24 format */
-        comp_curve[0]  = (1 << 24);
+        /** Now set up the comp_curve table with compression offsets in the form
+            of gain factors in S7.24 format */
+        /* comp_curve[0] is 0 (-infinity db) input */
+        comp_curve[0] = UNITY;
+        /* comp_curve[1 to 63] are intermediate compression values corresponding
+           to the 6 MSB of the input values of a non-clipped signal */
         for (i = 1; i < 64; i++)
         {
+            /* db constants are stored as positive numbers;
+               make them negative here */
             int32_t this_db = -db[i];
+            
             /* no compression below the knee */
             if (this_db <= db_curve[0].db)
-                comp_curve[i] = (1 << 24);
+                comp_curve[i] = UNITY;
             
-            /* if soft knee and below top of knee, interpolate along soft knee slope */
+            /* if soft knee and below top of knee,
+               interpolate along soft knee slope */
             else if (c_menu.soft_knee && (this_db <= db_curve[2].db))
-                comp_curve[i] = fp_factor(fp_mul(((this_db - db_curve[0].db) / 6),
+                comp_curve[i] = fp_factor(fp_mul(
+                    ((this_db - db_curve[0].db) / 6),
                     db_curve[2].offset, 16), 16) << 8;
             
             /* interpolate along ratio slope above the knee */
             else
-                comp_curve[i] = fp_factor(fp_mul(fp_div((this_db - db_curve[1].db),
-                    -db_curve[1].db, 16), db_curve[3].offset, 16), 16) << 8;
+                comp_curve[i] = fp_factor(fp_mul(
+                    fp_div((db_curve[1].db - this_db), db_curve[1].db, 16),
+                    db_curve[3].offset, 16), 16) << 8;
         }
+        /* comp_curve[64] is the compression level of a maximum level,
+           non-clipped signal */
         comp_curve[64] = fp_factor(db_curve[3].offset, 16) << 8;
-
+        
+        /* comp_curve[65] is the compression level of a maximum level,
+           clipped signal */
+        comp_curve[65] = fp_factor(db_curve[4].offset, 16) << 8;
+        
 #if defined(SIMULATOR) && defined(LOGF_ENABLE)
         logf("\n   *** Compression Offsets ***");
         /* some settings for display only, not used in calculations */
@@ -1682,31 +1703,33 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
         db_curve[1].offset = 0;
         db_curve[3].db = 0;
         
-        for (i = 0; i <= 3; i++)
+        for (i = 0; i <= 4; i++)
         {
-            logf("Curve[%d]: db: % .1f\toffset: % .4f", i, (float)db_curve[i].db / (1 << 16),
+            logf("Curve[%d]: db: % 6.2f\toffset: % 6.2f", i,
+                (float)db_curve[i].db / (1 << 16),
                 (float)db_curve[i].offset / (1 << 16));
         }
         
         logf("\nGain factors:");
-        for (i = 1; i <= 64; i++)
+        for (i = 1; i <= 65; i++)
         {
-            debugf("%02d: %.6f  ", i, (float)comp_curve[i] / (1 << 24));
+            debugf("%02d: %.6f  ", i, (float)comp_curve[i] / UNITY);
             if (i % 4 == 0) debugf("\n");
         }
+        debugf("\n");
 #endif
         
         /* if using auto peak, then makeup gain is max offset - .1dB headroom */
         int32_t db_makeup = (c_menu.gain == -1) ?
             -(db_curve[3].offset) - 0x199A : c_menu.gain << 16;
         comp_makeup_gain = fp_factor(db_makeup, 16) << 8;
-        logf("Makeup gain:\t%.6f", (float)comp_makeup_gain / (1 << 24));
+        logf("Makeup gain:\t%.6f", (float)comp_makeup_gain / UNITY);
 
         /* calculate per-sample gain change a rate of 10db over release time */
         comp_rel_slope = 0xAF0BB2 / c_menu.release;
-        logf("Release slope:\t%.6f", (float)comp_rel_slope / (1 << 24));
+        logf("Release slope:\t%.6f", (float)comp_rel_slope / UNITY);
         
-        release_gain = (1 << 24);
+        release_gain = UNITY;
     }
     
     /* enable/disable the compressor */
@@ -1719,83 +1742,100 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
  */
 static inline int32_t get_compression_gain(int32_t sample)
 {
-    const int frac_bits = AUDIO_DSP.frac_bits;
+    const int frac_bits_offset = AUDIO_DSP.frac_bits - 15;
     
     /* sample must be positive */
     if (sample < 0)
-        sample = -sample - 1;
-
-    /* shift sample into 22 frac bit range */
-    if (frac_bits > 22)
-        sample >>= (frac_bits - 22);
-    if (frac_bits < 22)
-        sample <<= (22 - frac_bits);
+        sample = -(sample + 1);
+        
+    /* shift sample into 15 frac bit range */
+    if (frac_bits_offset > 0)
+        sample >>= frac_bits_offset;
+    if (frac_bits_offset < 0)
+        sample <<= -frac_bits_offset;
     
-    /* index is 6 MSB, rem is 16 LSB */
-    int index = sample >> 16;
-    int rem = (sample & 0xFFFF) << 8;
+    /* normal case: sample isn't clipped */
+    if (sample < (1 << 15))
+    {
+        /* index is 6 MSB, rem is 9 LSB */
+        int index = sample >> 9;
+        int32_t rem = (sample & 0x1FF) << 22;
+        
+        /* interpolate from the compression curve:
+            higher gain - ((rem / (1 << 31)) * (higher gain - lower gain)) */
+        return comp_curve[index] - (FRACMUL(rem,
+            (comp_curve[index] - comp_curve[index + 1])));
+    }
+    /* sample is somewhat clipped, up to 2 bits of overhead */
+    if (sample < (1 << 17))
+    {
+        /* straight interpolation:
+            higher gain - ((clipped portion of sample * 4/3
+            / (1 << 31)) * (higher gain - lower gain)) */
+        return comp_curve[64] - (FRACMUL(((sample - (1 << 15)) / 3) << 16,
+            (comp_curve[64] - comp_curve[65])));
+    }
     
-    /* interpolate from the compression curve */
-    return comp_curve[index] + (int32_t)FRACMUL_SHL((comp_curve[index + 1] 
-        - comp_curve[index]), rem, 7);
+    /* sample is too clipped, return invalid value */
+    return -1;
 }
 
 /** COMPRESSOR PROCESS
  *  Changes the gain of the samples according to the compressor curve
  */
-static int compressor_process(int count, int32_t *buf[])
+static void compressor_process(int count, int32_t *buf[])
 {
     const int num_chan = AUDIO_DSP.data.num_channels;
-    const int32_t fp_one = (1 << 24);
+    int32_t *in_buf[2] = {buf[0], buf[1]};
     
-    int32_t sample_gain,      /* S7.24 format */
-            this_gain;        /* S7.24 format */
-    int i, ch;
-    
-    /* Step forward through the output buffer, and modify the offset values
-     * to establish a smooth, slow release slope.*/
-    for (i = 0; i < count; i++)
+    while (count-- > 0)
     {
-        sample_gain = fp_one;
+        int ch;
+        /* use lowest (most compressed) gain factor of the output buffer
+           sample pair for both samples (mono is also handled correctly here) */
+        int32_t sample_gain = UNITY;
         for (ch = 0; ch < num_chan; ch++)
         {
-            this_gain = get_compression_gain(buf[ch][i]);
+            int32_t this_gain = get_compression_gain(*in_buf[ch]);
             if (this_gain < sample_gain)
                 sample_gain = this_gain;
         }
-        /* if no release slope, only apply makeup gain */
-        if ((sample_gain == fp_one) && (release_gain == fp_one))
-            gain_buffer[i] = comp_makeup_gain;
-        else
+        
+        /* perform release slope; skip if no compression and no release slope */
+        if ((sample_gain != UNITY) || (release_gain != UNITY))
         {
-            /* if larger offset, start release slope */
-            if (sample_gain <= release_gain)
-                release_gain = sample_gain;
-            else    /* keep sloping */
+            /* if larger offset than previous slope, start new release slope */
+            if ((sample_gain <= release_gain) && (sample_gain > 0))
             {
-                if (release_gain < (fp_one - comp_rel_slope))
-                    release_gain += comp_rel_slope;
-                else
-                    release_gain = fp_one;
+                release_gain = sample_gain;
             }
-            /* store offset with release and also apply makeup gain */
-            if ((release_gain == fp_one) && (comp_makeup_gain == fp_one))
-                gain_buffer[i] = fp_one;
             else
-                gain_buffer[i] = FRACMUL_SHL(release_gain, comp_makeup_gain, 7);
+            /* keep sloping towards unity gain (and ignore invalid value) */
+            {
+                release_gain += comp_rel_slope;
+                if (release_gain > UNITY)
+                {
+                    release_gain = UNITY;
+                }
+            }
         }
-    }
-    
-    /* Implement the compressor: apply those gain factors to the output
-     * buffer samples */
-
-    for (i = 0; i < count; i++)
-    {
-        if (gain_buffer[i] != fp_one)
+        
+        /* total gain factor is the product of release gain and makeup gain,
+           but avoid computation if possible */
+        int32_t total_gain = ((release_gain == UNITY) ? comp_makeup_gain :
+            (comp_makeup_gain == UNITY) ? release_gain :
+                FRACMUL_SHL(release_gain, comp_makeup_gain, 7));
+        
+        /* Implement the compressor: apply total gain factor (if any) to the
+           output buffer sample pair/mono sample */
+        if (total_gain != UNITY)
         {
             for (ch = 0; ch < num_chan; ch++)
-                buf[ch][i] = FRACMUL_SHL(buf[ch][i], gain_buffer[i], 7);
+            {
+                *in_buf[ch] = FRACMUL_SHL(total_gain, *in_buf[ch], 7);
+            }
         }
+        in_buf[0]++;
+        in_buf[1]++;
     }
-    return count;
 }
