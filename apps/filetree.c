@@ -330,8 +330,13 @@ int ft_load(struct tree_context* c, const char* tempdir)
              (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) ||
             (*c->dirfilter == SHOW_SUPPORTED && !filetype_supported(dptr->attr)))) ||
             (*c->dirfilter == SHOW_WPS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_WPS) ||
+#ifdef HAVE_LCD_BITMAP
+            (*c->dirfilter == SHOW_FONT && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FONT) ||
+            (*c->dirfilter == SHOW_SBS  && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_SBS) ||
+#endif
 #ifdef HAVE_REMOTE_LCD
             (*c->dirfilter == SHOW_RWPS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_RWPS) ||
+            (*c->dirfilter == SHOW_RSBS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_RSBS) ||
 #endif
 #if CONFIG_TUNER
             (*c->dirfilter == SHOW_FMR && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FMR) ||
@@ -339,7 +344,6 @@ int ft_load(struct tree_context* c, const char* tempdir)
             (*c->dirfilter == SHOW_CFG && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_CFG) ||
             (*c->dirfilter == SHOW_LNG && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LNG) ||
             (*c->dirfilter == SHOW_MOD && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_MOD) ||
-            (*c->dirfilter == SHOW_FONT && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FONT) ||
             (*c->dirfilter == SHOW_PLUGINS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_ROCK))
         {
             i--;

@@ -947,6 +947,11 @@ int rockbox_browse(const char *root, int dirfilter)
             snprintf(current, sizeof(current), WPS_DIR "/%s.rwps",
                     global_settings.rwps_file);
         }
+        else if (dirfilter == SHOW_RSBS)
+        {
+            snprintf(current, sizeof(current), SBS_DIR "/%s.rsbs",
+                    global_settings.rsbs_file);
+        }
 #endif
 #ifdef HAVE_LCD_BITMAP
         /* Center on the currently loaded font when browsing fonts */
@@ -954,6 +959,11 @@ int rockbox_browse(const char *root, int dirfilter)
         {
             snprintf(current, sizeof(current), FONT_DIR "/%s.fnt",
                     global_settings.font_file);
+        }
+        else if (dirfilter == SHOW_SBS)
+        {
+            snprintf(current, sizeof(current), SBS_DIR "/%s.sbs",
+                    global_settings.sbs_file);
         }
 #endif
 #if CONFIG_TUNER

@@ -13131,3 +13131,37 @@
     *: "remote statusbar skin"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CUSTOM_STATUSBAR
+  desc: browse for custom statusbar in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Custom Statusbar"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Custom Statusbar"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Custom Statusbar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CUSTOM_STATUSBAR
+  desc: browse for remote custom statusbar in theme settings
+  user: core
+  <source>
+    *:none
+    remote: "Remote Custom Statusbar"
+  </source>
+  <dest>
+    *:none
+    remote: "Remote Custom Statusbar"
+  </dest>
+  <voice>
+    *:none
+    remote: "Remote Custom Statusbar"
+  </voice>
+</phrase>
