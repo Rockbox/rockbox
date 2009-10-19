@@ -214,8 +214,9 @@
 
 /* Cache Control */
 #define CACHE_CTL        (*(volatile unsigned long *)(0xcf004024))
-#define CACHE_RUN        0x1
-#define CACHE_INIT       0x2
+#define CACHE_CTL_DISABLE  0x0
+#define CACHE_CTL_RUN    0x1
+#define CACHE_CTL_INIT   0x2
 
 #define CACHE_MASK       (*(volatile unsigned long *)(0xf000f020))
 #define CACHE_OPERATION  (*(volatile unsigned long *)(0xf000f024))
@@ -239,6 +240,8 @@
 #define PLL_MULT         (*(volatile unsigned long *)(0xcf00501c))
 #define PLL_UNLOCK       (*(volatile unsigned long *)(0xcf005038))
 
+#define MMAP_FIRST       (*(volatile unsigned long *)(0xf000f000))
+#define MMAP_LAST        (*(volatile unsigned long *)(0xf000f01c))
 #define MMAP0_LOGICAL    (*(volatile unsigned long *)(0xf000f000))
 #define MMAP0_PHYSICAL   (*(volatile unsigned long *)(0xf000f004))
 #define MMAP1_LOGICAL    (*(volatile unsigned long *)(0xf000f008))

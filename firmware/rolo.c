@@ -44,9 +44,8 @@
 #define FIRMWARE_OFFSET_FILE_DATA    0x200
 #endif
 
-#if !defined(IRIVER_IFP7XX_SERIES) && \
-    (CONFIG_CPU != PP5002)
-/* FIX: this doesn't work on iFP, 3rd Gen ipods */
+#if !defined(IRIVER_IFP7XX_SERIES)
+/* FIX: this doesn't work on iFP */
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
@@ -92,8 +91,9 @@ void rolo_restart_cop(void)
     cpu_reply = 2;
 
     asm volatile(
-        "mov   r0, #0x10000000   \n"
-        "mov   pc, r0            \n"
+        "mov   r0, %0   \n"
+        "mov   pc, r0   \n"
+        : : "I"(DRAM_START)
     );
 }
 #endif /* NUM_CORES > 1 */
@@ -144,7 +144,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         "jmp     (%0)        \n"
         : : "a"(dest)
     );
-#elif defined(CPU_PP502x)
+#elif defined(CPU_PP)
     CPU_INT_DIS = -1;
 
     /* Flush cache */
@@ -169,8 +169,9 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
 #endif
 
     asm volatile(
-        "mov   r0, #0x10000000   \n"
-        "mov   pc, r0            \n"
+        "mov   r0, %0   \n"
+        "mov   pc, r0   \n"
+        : : "I"(DRAM_START)
     );
 
 #elif defined(CPU_ARM)

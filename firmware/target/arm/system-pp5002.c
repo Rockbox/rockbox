@@ -97,7 +97,7 @@ static void ipod_init_cache(void)
     PROC_STAT &= ~0x700;
     outl(0x4000, 0xcf004020);
 
-    CACHE_CTL = CACHE_INIT;
+    CACHE_CTL = CACHE_CTL_INIT;
 
     for (b = (intptr_t)&CACHE_INVALIDATE_BASE, e = b + CACHE_SIZE;
          b < e; b += 16) {
@@ -113,7 +113,7 @@ static void ipod_init_cache(void)
     CACHE_MASK = 0x00001c00;
     CACHE_OPERATION = 0x3fc0;
 
-    CACHE_CTL = CACHE_INIT | CACHE_RUN;
+    CACHE_CTL = CACHE_CTL_INIT | CACHE_CTL_RUN;
 }
     
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

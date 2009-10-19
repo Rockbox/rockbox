@@ -45,7 +45,7 @@ start:
     .equ    CPUSLEEPING, 0x8000
     .equ    COPSLEEPING, 0x4000
     .equ    CACHE_CTRL,  0xcf004024
-    .equ    CACHE_ENAB,  0x2 /* Actually the CACHE_INIT flag */
+    .equ    CACHE_ENAB,  0x2 /* Actually the CACHE_CTL_INIT flag */
 #else
     .equ    PROC_ID,     0x60000000
     .equ    CPU_CTRL,    0x60007000
