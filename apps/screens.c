@@ -153,15 +153,138 @@ static int handle_usb_events(void)
 }
 #endif
 
-#define MODE_NAME_LEN 32
+#ifdef USB_NONE
 void usb_screen(void)
 {
-#ifdef USB_NONE
-    /* nothing here! */
+}
 #else
+#define MODE_NAME_LEN 32
+
+struct usb_screen_vps_t
+{
+    struct viewport parent;
+#ifdef HAVE_LCD_BITMAP
+    struct viewport logo;
+#ifdef USB_ENABLE_HID
+    struct viewport title;
+#endif
+#endif
+};
+
+#ifdef HAVE_LCD_BITMAP
+static void usb_screen_fix_viewports(struct screen *screen,
+        struct usb_screen_vps_t *usb_screen_vps)
+{
+    int logo_width, logo_height;
+    struct viewport *parent = &usb_screen_vps->parent;
+    struct viewport *logo = &usb_screen_vps->logo;
+
+#ifdef HAVE_REMOTE_LCD
+    if (screen->screen_type == SCREEN_REMOTE)
+    {
+        logo_width = BMPWIDTH_remote_usblogo;
+        logo_height = BMPHEIGHT_remote_usblogo;
+    }
+    else
+#endif
+    {
+        logo_width = BMPWIDTH_usblogo;
+        logo_height = BMPHEIGHT_usblogo;
+    }
+
+    viewport_set_defaults(parent, screen->screen_type);
+    if (parent->width < logo_width || parent->height < logo_height)
+        viewport_set_fullscreen(parent, screen->screen_type);
+
+    *logo = *parent;
+    logo->x = parent->width - logo_width;
+    logo->y = (parent->height - logo_height) / 2;
+    logo->width = logo_width;
+    logo->height = logo_height;
+
+#ifdef USB_ENABLE_HID
+    struct viewport *title = &usb_screen_vps->title;
+    int char_height, nb_lines;
+
+    /* nb_lines only returns the number of fully visible lines, small screens
+       or really large fonts could cause problems with the calculation below.
+       */
+    nb_lines = viewport_get_nb_lines(parent);
+    if (nb_lines == 0)
+        nb_lines++;
+
+    char_height = parent->height/nb_lines;
+
+    *title = *parent;
+    title->y = logo->y + logo->height + char_height;
+#endif
+}
+#endif
+
+static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
+{
     int i;
     int usb_bars = VP_SB_ALLSCREENS; /* force statusbars */
+
+    FOR_NB_SCREENS(i)
+    {
+        struct screen *screen = &screens[i];
+
+        struct usb_screen_vps_t *usb_screen_vps = &usb_screen_vps_ar[i];
+        struct viewport *parent = &usb_screen_vps->parent;
+#ifdef HAVE_LCD_BITMAP
+        struct viewport *logo = &usb_screen_vps->logo;
+#endif
+
+        screen->set_viewport(parent);
+        screen->backdrop_show(BACKDROP_MAIN);
+        screen->backlight_on();
+        screen->clear_viewport();
+
+#ifdef HAVE_LCD_BITMAP
+        screen->set_viewport(logo);
+#ifdef HAVE_REMOTE_LCD
+        if (i == SCREEN_REMOTE)
+        {
+            screen->bitmap(remote_usblogo, 0, 0, logo->width,
+                logo->height);
+        }
+        else
+#endif
+        {
+            screen->transparent_bitmap(usblogo, 0, 0, logo->width,
+                logo->height);
+#ifdef USB_ENABLE_HID
+            screen->set_viewport(&usb_screen_vps->title);
+            usb_screen_vps->title.flags |= VP_FLAG_ALIGN_CENTER;
+            screen->puts_scroll(0, 0, str(keypad_mode_name_get()));
+#endif /* USB_ENABLE_HID */
+        }
+        screen->set_viewport(parent);
+
+#else /* HAVE_LCD_BITMAP */
+        screen->double_height(false);
+        screen->puts_scroll(0, 0, "[USB Mode]");
+        status_set_param(false);
+        status_set_audio(false);
+        status_set_usb(true);
+#endif /* HAVE_LCD_BITMAP */
+
+        screen->update_viewport();
+        screen->set_viewport(NULL);
+
+        /* force statusbar by ignoring the setting */
+        usb_bars |= VP_SB_IGNORE_SETTING(i);
+    }
+
+    viewportmanager_set_statusbar(usb_bars);
+}
+
+void usb_screen(void)
+{
+    int i;
     int old_bars  = viewportmanager_get_statusbar();
+    struct usb_screen_vps_t usb_screen_vps_ar[NB_SCREENS];
 #if defined HAVE_TOUCHSCREEN
     enum touchscreen_mode old_mode = touchscreen_get_mode();
 
@@ -178,55 +301,19 @@ void usb_screen(void)
     usb_keypad_mode = global_settings.usb_keypad_mode;
 #endif
 
+    FOR_NB_SCREENS(i)
+    {
+        struct screen *screen = &screens[i];
+
+        screen->set_viewport(NULL);
+#ifdef HAVE_LCD_BITMAP
+        usb_screen_fix_viewports(screen, &usb_screen_vps_ar[i]);
+#endif
+    }
+
     while (1)
     {
-        FOR_NB_SCREENS(i)
-        {
-            struct screen *screen = &screens[i];
-
-            screen->backdrop_show(BACKDROP_MAIN);
-            screen->backlight_on();
-            screen->clear_display();
-#ifdef HAVE_REMOTE_LCD
-            if (i == SCREEN_REMOTE)
-            {
-                screen->bitmap(remote_usblogo,
-                        (LCD_REMOTE_WIDTH-BMPWIDTH_remote_usblogo),
-                        (LCD_REMOTE_HEIGHT-BMPHEIGHT_remote_usblogo)/2,
-                        BMPWIDTH_remote_usblogo, BMPHEIGHT_remote_usblogo);
-            }
-            else
-#endif
-            {
-#ifdef HAVE_LCD_BITMAP
-                screen->transparent_bitmap(usblogo,
-                        (LCD_WIDTH-BMPWIDTH_usblogo),
-                        (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
-                        BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
-#ifdef USB_ENABLE_HID
-                int w, h;
-
-                screen->getstringsize(str(keypad_mode_name_get()), &w, &h);
-                screen->putsxy((LCD_WIDTH - w) / 2, BMPHEIGHT_usblogo +
-                        (LCD_HEIGHT - BMPHEIGHT_usblogo + h) / 2,
-                        str(keypad_mode_name_get()));
-#endif /* USB_ENABLE_HID */
-#else /* HAVE_LCD_BITMAP */
-                screen->double_height(false);
-                screen->puts_scroll(0, 0, "[USB Mode]");
-                status_set_param(false);
-                status_set_audio(false);
-                status_set_usb(true);
-#endif /* HAVE_LCD_BITMAP */
-            }
-            screen->update();
-
-            /* force statusbar by ignoring the setting */
-            usb_bars |= VP_SB_IGNORE_SETTING(i);
-        }
-
-        viewportmanager_set_statusbar(usb_bars);
-
+        usb_screens_draw(usb_screen_vps_ar);
 #ifdef SIMULATOR
         if (button_get_w_tmo(HZ/2))
             break;
@@ -237,6 +324,18 @@ void usb_screen(void)
 #endif /* SIMULATOR */
     }
 
+    FOR_NB_SCREENS(i)
+    {
+        const struct viewport* vp = NULL;
+
+#if defined(HAVE_LCD_BITMAP) && defined(USB_ENABLE_HID)
+        vp = &usb_screen_vps_ar[i].title;
+#elif !defined(HAVE_LCD_BITMAP)
+        vp = &usb_screen_vps_ar[i].parent;
+#endif
+        if (vp)
+            screens[i].scroll_stop(vp);
+    }
 #ifdef USB_ENABLE_HID
     if (global_settings.usb_keypad_mode != usb_keypad_mode)
     {
@@ -259,8 +358,8 @@ void usb_screen(void)
     viewportmanager_set_statusbar(old_bars);
     send_event(GUI_EVENT_REFRESH, NULL);
 
-#endif /* USB_NONE */
 }
+#endif /* !defined(USB_NONE) */
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
 int mmc_remove_request(void)
