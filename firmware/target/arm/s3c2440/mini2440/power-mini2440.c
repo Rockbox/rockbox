@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ * Copyright (C) 2009 by Bob Cousins
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,13 +18,38 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
+#include "cpu.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include "kernel.h"
+#include "system.h"
+#include "power.h"
+#include "led-mini2440.h"
 
-#ifdef GIGABEAT_F
-#define DEBUG_CANCEL  BUTTON_POWER
-#elif defined(MINI2440)
-#define DEBUG_CANCEL  BUTTON_MENU
-#endif
+void power_init(void)
+{
+    /* Nothing to do */
+}
 
-bool __dbg_hw_info(void);
-bool __dbg_ports(void);
+unsigned int power_input_status(void)
+{
+    unsigned int status = 0;
 
+    /* Always on*/
+    status = POWER_INPUT_MAIN;
+    return status;
+}
+
+/* Returns true if the unit is charging the batteries. */
+bool charging_state(void)
+{
+    return false;
+}
+
+void power_off(void)
+{
+    /* we don't have any power control, user must do it */
+    led_flash (LED_NONE, LED_ALL);
+    while (1);
+}

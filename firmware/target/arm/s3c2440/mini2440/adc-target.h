@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ * Copyright (C) 2009 by Bob Cousins
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,13 +18,25 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _ADC_TARGET_H_
+#define _ADC_TARGET_H_
 
-#ifdef GIGABEAT_F
-#define DEBUG_CANCEL  BUTTON_POWER
-#elif defined(MINI2440)
-#define DEBUG_CANCEL  BUTTON_MENU
+/*  Channel 0 is connected to an on board pot for testing
+    Channels 0-3 are available via expansion connector CON4
+    Channels 4-7 are routed to LCD connector for touchscreen operation if
+        supported by display panel. 
+*/
+#define NUM_ADC_CHANNELS 8
+
+#define ADC_ONBOARD     0
+#define ADC_SPARE_1     1
+#define ADC_SPARE_2     2
+#define ADC_SPARE_3     3
+#define ADC_TSYM        4
+#define ADC_TSYP        5
+#define ADC_TSXM        6
+#define ADC_TSXP        7
+
+#define ADC_READ_ERROR 0xFFFF
+
 #endif
-
-bool __dbg_hw_info(void);
-bool __dbg_ports(void);
-

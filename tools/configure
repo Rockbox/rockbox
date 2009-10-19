@@ -893,7 +893,7 @@ cat <<EOF
  ==Samsung==              ==Tatung==
  140) YH-820              150) Elio TPJ-1022     ==Lyre project==
  141) YH-920                                     130) Lyre proto 1
- 142) YH-925
+ 142) YH-925                                     131) Mini2440
  143) YP-S3
 EOF
 
@@ -2280,6 +2280,28 @@ fi
     t_cpu="arm"
     t_manufacturer="at91sam"
     t_model="lyre_proto1"
+    ;;
+    
+   131|mini2440)
+    target_id=99
+    modelname="mini2440"
+    target="-DMINI2440"
+    memory=64
+    arm9tdmicc
+    tool="$rootdir/tools/scramble -add=m244"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.mini2440"
+    appextra="recorder:gui"
+    plugins=""
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    boottool="cp"
+    bootoutput="bootloader-mini2440.lyre"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="s3c2440"
+    t_model="mini2440"
     ;;
 
    140|yh820)

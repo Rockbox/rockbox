@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Greg White
+ * Copyright (C) 2009 by Bob Cousins
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,27 +18,29 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef SYSTEM_TARGET_H
-#define SYSTEM_TARGET_H
 
-#include "system-arm.h"
-#include "mmu-arm.h"
+#ifndef _LED_MINI2440_H_
+#define _LED_MINI2440_H_
 
-#define CPUFREQ_DEFAULT 98784000
-#define CPUFREQ_NORMAL  98784000
-#define CPUFREQ_MAX    296352000
+/* LED functions for debug etc */
 
-void system_prepare_fw_start(void);
-void tick_stop(void);
+#define LED1        0x0020      /* GPB5 */
+#define LED2        0x0040      /* GPB6 */
+#define LED3        0x0080      /* GPB7 */
+#define LED4        0x0100      /* GPB8 */
 
-/* Functions to set and clear regiser bits atomically */
+#define LED_NONE    0x0000
+#define LED_ALL (LED1|LED2|LED3|LED4)
 
-/* Set and clear register bits */
-void s3c_regmod32(volatile unsigned long *reg, unsigned long bits,
-                  unsigned long mask);
-/* Set register bits */
-void s3c_regset32(volatile unsigned long *reg, unsigned long bits);
-/* Clear register bits */
-void s3c_regclr32(volatile unsigned long *reg, unsigned long bits);
+void led_init (void);
 
-#endif /* SYSTEM_TARGET_H */
+/* Turn on one or more LEDS */
+void set_leds (int led_mask);
+
+/* Turn off one or more LEDS */
+void clear_leds (int led_mask);
+
+/* Alternate flash of pattern1 and pattern2 - never returns */
+void led_flash (int led_pattern1, int led_pattern2);
+
+#endif /* _LED_MINI2440_H_ */

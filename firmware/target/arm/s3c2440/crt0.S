@@ -26,6 +26,149 @@
 #include "config.h"
 #include "cpu.h"
 
+/****************************************************************************/
+#ifdef TOSHIBA_GIGABEAT_F
+
+/* Clock and Power Management setup values */
+#define VAL_CLKDIV  0x7
+#define VAL_UPLLCON 0x0003C042
+#define VAL_MPLLCON 0x000C9042
+
+/* Memory Controller setup */
+    /* Memory setup (taken from 0x5070) */
+    /* BWSCON
+     *      Reserved 0
+     * Bank 0:
+     *      Bus width 01 (16 bit)
+     * Bank 1:
+     *      Buswidth 00 (8 bit)
+     *      Disable wait 0
+     *      Not using UB/LB 0
+     * Bank 2:
+     *      Buswidth 10 (32 bit)
+     *      Disable wait 0
+     *      Not using UB/LB 0
+     * Bank 3:
+     *      Buswidth 10 (32 bit)
+     *      Disable wait 0
+     *      Use UB/LB 1
+     * Bank 4:
+     *      Buswidth 10 (32 bit)
+     *      Disable wait 0
+     *      Use UB/LB 1
+     * Bank 5: 
+     *      Buswidth 00 (8 bit)
+     *      Disable wait 0
+     *      Not using UB/LB 0
+     * Bank 6:
+     *      Buswidth 10 (32 bit)
+     *      Disable wait 0
+     *      Not using UB/LB 0
+     * Bank 7:
+     *      Buswidth 00 (8 bit)
+     *      Disable wait 0
+     *      Not using UB/LB 0
+     */
+#define VAL_BWSCON    0x01055102    
+    /* BANKCON0 
+     *      Pagemode: normal (1 data) 00
+     *      Pagemode access cycle: 2 clocks 00
+     *      Address hold: 2 clocks 10
+     *      Chip selection hold time: 1 clock 10
+     *      Access cycle: 8 clocks 101
+     *      Chip select setup time: 1 clock 01
+     *      Address setup time: 0 clock 00
+     */
+#define VAL_BANKCON0  0x00000D60
+    /* BANKCON1 
+     *      Pagemode: normal (1 data) 00
+     *      Pagemode access cycle: 2 clocks 00
+     *      Address hold: 0 clocks 00
+     *      Chip selection hold time: 0 clock 00
+     *      Access cycle: 1 clocks 000
+     *      Chip select setup time: 0 clocks 00
+     *      Address setup time: 0 clocks 00
+     */
+#define VAL_BANKCON1  0x00000000
+    /* BANKCON2 
+     *      Pagemode: normal (1 data) 00
+     *      Pagemode access cycle: 2 clocks 00
+     *      Address hold: 2 clocks 10
+     *      Chip selection hold time: 2 clocks 10
+     *      Access cycle: 14 clocks 111
+     *      Chip select setup time: 4 clocks 11
+     *      Address setup time: 0 clocks 00
+     */
+#define VAL_BANKCON2  0x00001FA0
+#define VAL_BANKCON3  0x00001D80
+#define VAL_BANKCON4  0x00001D80
+#define VAL_BANKCON5  0x00000000
+    /* BANKCON6/7
+     *      SCAN:   9 bit       01
+     *      Trcd:   3 clocks    01
+     *      Tcah:   0 clock     00
+     *      Tcoh:   0 clock     00
+     *      Tacc:   1 clock     000
+     *      Tcos:   0 clock     00
+     *      Tacs:   0 clock     00
+     *      MT:     Sync DRAM   11
+     */
+#define VAL_BANKCON6  0x00018005
+#define VAL_BANKCON7  0x00018005
+
+#define VAL_REFRESH   0x00980501
+    /* BANKSIZE
+     *      BK76MAP: 32M/32M    000
+     *      Reserved: 0         0 (was 1)
+     *      SCLK_EN: always     1 (was 0)
+     *      SCKE_EN: disable    0
+     *      Reserved: 0         0
+     *      BURST_EN: enabled   1
+     */
+#define VAL_BANKSIZE  0x00000090
+#define VAL_MRSRB6    0x00000030
+#define VAL_MRSRB7    0x00000030
+#define VAL_GPACON    0x00FFFFFF
+
+/****************************************************************************/
+#elif defined (MINI2440)
+
+/* For Mini2440 board or compatible */
+/* Clock and Power Management setup values */
+#define VAL_CLKDIV    0x5         /* HCLK = FCLK/4, PCLK = HCLK/2 */
+#define VAL_UPLLCON   0x00038022  /* UCLK = 48 MHz */
+#define VAL_MPLLCON   0x0007F021  /* FCLK = 405 MHz */
+
+#define FCLK 405000000
+#define HCLK (FCLK/4)   /* = 101,250,000 */
+#define PCLK (HCLK/2)   /* =  50,625,000 */
+
+/* Memory Controller setup */
+#define VAL_BWSCON    0x22111112    
+#define VAL_BANKCON0  0x00002F50  
+#define VAL_BANKCON1  0x00000700
+#define VAL_BANKCON2  0x00000700
+#define VAL_BANKCON3  0x00000700
+#define VAL_BANKCON4  0x00000700
+#define VAL_BANKCON5  0x0007FFFC
+#define VAL_BANKCON6  0x00018009
+#define VAL_BANKCON7  0x00018009
+
+#define VAL_REFRESH   0x008E04EB
+#define VAL_BANKSIZE  0x000000B2
+#define VAL_MRSRB6    0x00000030
+#define VAL_MRSRB7    0x00000030
+
+#define VAL_GPACON    0x00FFFFFF
+#define VAL_GPFCON    0x000055AA
+#define VAL_GPGCON    0xAA2A0128
+#define VAL_GPGDAT    0x0000
+
+#else
+#error Unknown target
+#endif
+/****************************************************************************/
+
 /* Exception Handlers */
 .section .vectors,"ax",%progbits
 .code 32
@@ -73,6 +216,7 @@ word_copy:
 .ltorg  
 .size       word_copy, .-word_copy
 
+
 /*
  * Entry: start
  *  Variables:
@@ -95,6 +239,7 @@ start:
 
     /************************** DO NOT WRITE TO R0 ***************************/
 
+#ifdef TOSHIBA_GIGABEAT_F
     /* Check if the code is running from flash. If not skip all these checks */
     cmp     r0, #0xA0000
     bne     poweron
@@ -105,7 +250,6 @@ start:
     str     r1, [r2, #0x14]
     
     /* Did an RTC event wake the player up? */ 
-
     mov     r2, #0x4A000000
     ldr     r1, [r2]
     ands    r1, r1, #0x40000000
@@ -147,6 +291,7 @@ start:
 bootOF:
     /* power is not down || menu is held || the charger is not connected */
     mov     pc, #0x70
+#endif
 
 poweron:
     /* enter supervisor mode, disable IRQ */
@@ -166,6 +311,7 @@ poweron:
     ldr     r2, =0x00003FFF
     str     r2, [r1, #0x1C]
 
+#ifdef TOSHIBA_GIGABEAT_F
     /* Check if loaded by the old bootloader or by the OF.  This copy routine
      * cannot run/copy properly until the memory has been initialized, so the
      * copy routine later is still necessary.  The old bootloader/OF will
@@ -198,6 +344,7 @@ poweron:
     bl      word_copy
 
     mov     pc, #0x31000000
+#endif
 
 skipreset:  
 
@@ -209,7 +356,7 @@ skipreset:
     orr     r0, r0, r1 
     mcr     p15, 0, r0, c1, c0, 0
 
-    mov     r2, #0x7
+    mov     r2, #VAL_CLKDIV
     mov     r1, #0x4C000000
     str     r2, [r1, #0x14]
 
@@ -219,7 +366,7 @@ skipreset:
     ldr     r2, =0xFFFFFFFF
     str     r2, [r1]
 
-    ldr     r2, =0x0003C042
+    ldr     r2, =VAL_UPLLCON
     str     r2, [r1, #0x08]
 
     nop
@@ -231,7 +378,7 @@ skipreset:
     nop
     nop
 
-    ldr     r2, =0x000C9042
+    ldr     r2, =VAL_MPLLCON
     str     r2, [r1, #0x04]
 
     nop
@@ -248,128 +395,55 @@ skipreset:
     mov     r1, #0x56000000
     str     r2, [r1, #0x80]
 
-    /* Memory setup (taken from 0x5070) */
+    /* Memory setup */
 
-    /* BWSCON
-     *      Reserved 0
-     * Bank 0:
-     *      Bus width 01 (16 bit)
-     * Bank 1:
-     *      Buswidth 00 (8 bit)
-     *      Disable wait 0
-     *      Not using UB/LB 0
-     * Bank 2:
-     *      Buswidth 10 (32 bit)
-     *      Disable wait 0
-     *      Not using UB/LB 0
-     * Bank 3:
-     *      Buswidth 10 (32 bit)
-     *      Disable wait 0
-     *      Use UB/LB 1
-     * Bank 4:
-     *      Buswidth 10 (32 bit)
-     *      Disable wait 0
-     *      Use UB/LB 1
-     * Bank 5: 
-     *      Buswidth 00 (8 bit)
-     *      Disable wait 0
-     *      Not using UB/LB 0
-     * Bank 6:
-     *      Buswidth 10 (32 bit)
-     *      Disable wait 0
-     *      Not using UB/LB 0
-     * Bank 7:
-     *      Buswidth 00 (8 bit)
-     *      Disable wait 0
-     *      Not using UB/LB 0
-     */
-    ldr     r2, =0x01055102
+    ldr     r2, =VAL_BWSCON
     mov     r1, #0x48000000
     str     r2, [r1]
 
-    /* BANKCON0 
-     *      Pagemode: normal (1 data) 00
-     *      Pagemode access cycle: 2 clocks 00
-     *      Address hold: 2 clocks 10
-     *      Chip selection hold time: 1 clock 10
-     *      Access cycle: 8 clocks 101
-     *      Chip select setup time: 1 clock 01
-     *      Address setup time: 0 clock 00
-     */
-    ldr     r2, =0x00000D60
+    /* BANKCON0 */
+    ldr     r2, =VAL_BANKCON0
     str     r2, [r1, #0x04]
 
-
-    /* BANKCON1 
-     *      Pagemode: normal (1 data) 00
-     *      Pagemode access cycle: 2 clocks 00
-     *      Address hold: 0 clocks 00
-     *      Chip selection hold time: 0 clock 00
-     *      Access cycle: 1 clocks 000
-     *      Chip select setup time: 0 clocks 00
-     *      Address setup time: 0 clocks 00
-     */
-    ldr     r2, =0x00000000
+    /* BANKCON1 */
+    ldr     r2, =VAL_BANKCON1
     str     r2, [r1, #0x08]
 
-    /* BANKCON2 
-     *      Pagemode: normal (1 data) 00
-     *      Pagemode access cycle: 2 clocks 00
-     *      Address hold: 2 clocks 10
-     *      Chip selection hold time: 2 clocks 10
-     *      Access cycle: 14 clocks 111
-     *      Chip select setup time: 4 clocks 11
-     *      Address setup time: 0 clocks 00
-     */
-    ldr     r2, =0x00001FA0
+    /* BANKCON2 */
+    ldr     r2, =VAL_BANKCON2
     str     r2, [r1, #0xC]
 
     /* BANKCON3 */
-    ldr     r2, =0x00001D80
+    ldr     r2, =VAL_BANKCON3
     str     r2, [r1, #0x10]
     /* BANKCON4 */
     str     r2, [r1, #0x14]
 
     /* BANKCON5 */
-    ldr     r2, =0x00000000
+    ldr     r2, =VAL_BANKCON5
     str     r2, [r1, #0x18]
 
-    /* BANKCON6/7
-     *      SCAN:   9 bit       01
-     *      Trcd:   3 clocks    01
-     *      Tcah:   0 clock     00
-     *      Tcoh:   0 clock     00
-     *      Tacc:   1 clock     000
-     *      Tcos:   0 clock     00
-     *      Tacs:   0 clock     00
-     *      MT:     Sync DRAM   11
-     */
-    ldr     r2, =0x00018005
+    /* BANKCON6/7 */
+    ldr     r2, =VAL_BANKCON6
     str     r2, [r1, #0x1C]
     /* BANKCON7 */
     str     r2, [r1, #0x20]
 
     /* REFRESH */
-    ldr     r2, =0x00980501
+    ldr     r2, =VAL_REFRESH
     str     r2, [r1, #0x24]
 
-    /* BANKSIZE
-     *      BK76MAP: 32M/32M    000
-     *      Reserved: 0         0 (was 1)
-     *      SCLK_EN: always     1 (was 0)
-     *      SCKE_EN: disable    0
-     *      Reserved: 0         0
-     *      BURST_EN: enabled   1
-     */
-    ldr     r2, =0x00000090
+    /* BANKSIZE */
+    ldr     r2, =VAL_BANKSIZE
     str     r2, [r1, #0x28]
 
     /* MRSRB6 */
-    ldr     r2, =0x00000030
+    ldr     r2, =VAL_MRSRB6
     str     r2, [r1, #0x2C]
     /* MRSRB7 */
     str     r2, [r1, #0x30]
     
+    /* RMC: I guess this is some notes about Gigabeat */ 
     /*
         0x56000000 0x1FFFCFF
                  4 0x1FFFEFF
@@ -379,25 +453,33 @@ skipreset:
 
     /* GPACON */
     mov     r1, #0x56000000 
-    ldr     r2, =0x00FFFFFF
+    ldr     r2, =VAL_GPACON
     str     r2, [r1]
 
-    /* The builds have two potential load addresses, one being from flash, 
+#if 0
+    /* GPGCON */
+    ldr     r2, =VAL_GPGCON
+    str     r2, [r1, #0x60]
+    ldr     r2, =VAL_GPGDAT
+    str     r2, [r1, #0x64]
+#endif
+
+    /* Copy from current location (from NOR Flash if bootloader, load buffer if
+        firmware) to RAM */
+    
+    /* Gigabeat: The builds have two potential load addresses, one being from flash, 
      * and the other from some "unknown" location right now the assumption
      * is that the code is not at 0x3000000.
      */   
     /* get the high part of our execute address (where am I) */
     ldr     r0, =0xfffff000
-    and     r0, pc, r0
+    and     r0, pc, r0           /* copy from address */
 
-    /* Copy code to 0x30000000 */
+    /* SDRAM starts at 0x30000000 (physical address) */
+    ldr     r1, =0x30000000      /* copy To address */   
     ldr     r2, = _vectorstart
     ldr     r3, = _initdata_end
-
     sub     r2, r3, r2           /* length of loader */
-    
-    ldr     r1, =0x30000000     /* copy location */   
-    
     bl      word_copy
 
     ldr     r1, =donecopy
@@ -410,8 +492,8 @@ donecopy:
     /* Setup the MMU, start by disabling */
 
     mrc     p15, 0, r0, c1, c0, 0  
-    bic     r0, r0, #0x41      /* disable mmu and dcache */
-    bic     r0, r0, #0x1000   /* disable icache */
+    bic     r0, r0, #0x41          /* disable mmu and dcache */
+    bic     r0, r0, #0x1000        /* disable icache */
     mcr     p15, 0, r0, c1, c0, 0
 
     bl      ttb_init
@@ -515,6 +597,7 @@ fiq_handler:
 UIE:
     b UIE
 
+/* TODO: Review this function - is it target dependent? */
 /*
  * Function: rom_shutdown
  *  Variables:

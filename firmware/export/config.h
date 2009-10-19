@@ -112,6 +112,7 @@
 #define SAMSUNG_YH_PAD     38
 #define ONDAVX777_PAD      39
 #define SAMSUNG_YPS3_PAD   40
+#define MINI2440_PAD       41
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -192,10 +193,11 @@
 #define LCD_ONDAVX767 30 /* as used by the Onda VX767 */
 #define LCD_SSD1303   31 /* as used by the Sansa Clip */
 #define LCD_FUZE      32 /* as used by the Sansa Fuze */
-#define LCD_LYRE_PROTO1      33 /* as used by the Lyre */
+#define LCD_LYRE_PROTO1      33 /* as used by the Lyre prototype 1 */
 #define LCD_YH925     34 /* as used by Samsung YH-925 (similar to the H10 20GB) */
-#define LCD_VIEW      35 /* as used by the Sansa View */ 
+#define LCD_VIEW      35 /* as used by the Sansa View */
 #define LCD_NANO2G    36 /* as used by the iPod Nano 2nd Generation */
+#define LCD_MINI2440  37 /* as used by the Mini2440 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -216,7 +218,7 @@
 
 /* CONFIG_I2C */
 #define I2C_NONE     0 /* For targets that do not use I2C - as the
-Lyre prototype 1*/
+Lyre prototype 1 */
 #define I2C_PLAYREC  1 /* Archos Player/Recorder style */
 #define I2C_ONDIO    2 /* Ondio style */
 #define I2C_COLDFIRE 3 /* Coldfire style */
@@ -386,6 +388,8 @@ Lyre prototype 1*/
 #include "config-view.h"
 #elif defined(LYRE_PROTO1)
 #include "config-lyre_proto1.h"
+#elif defined(MINI2440)
+#include "config-mini2440.h"
 #elif defined(SAMSUNG_YH820)
 #include "config-yh820.h"
 #elif defined(SAMSUNG_YH920)

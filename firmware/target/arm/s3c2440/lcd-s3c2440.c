@@ -8,6 +8,7 @@
 * $Id$
 *
 * Copyright (C) 2007 by Greg White
+* Copyright (C) 2009 by Bob Cousins
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -76,18 +77,14 @@ static inline void delay_cycles(volatile int delay)
 
 static void LCD_CTRL_setup(void)
 {
-    /* ENVID = 0, BPPMODE = 16 bpp, PNRMODE = TFT, MMODE = Each Frame, CLKVAL = 8 */
-    LCDCON1 = 0x878;
+    LCDCON1 = (LCD_CLKVAL << 8) | (LCD_MMODE << 7) | (LCD_PNRMODE << 5) | 
+                (LCD_BPPMODE << 1);  
+    LCDCON2 = (LCD_UPPER_MARGIN << 24) | ((LCD_HEIGHT - 1) << 14) | 
+                (LCD_LOWER_MARGIN << 6) | (LCD_VSYNC_LEN << 0);
+    LCDCON3 = (LCD_LEFT_MARGIN << 19) | ((LCD_WIDTH  - 1) <<  8) | 
+                (LCD_RIGHT_MARGIN << 0);
+    LCDCON4 = (LCD_HSYNC_LEN << 0);
 
-    /* VCPW = 1, VFPD = 5, LINEVAL = 319, VBPD = 7 */
-    LCDCON2 = 0x74FC141;
-    
-    /* HFPD = 9, HOZVAL = 239, HBPD = 7 */
-    LCDCON3 = 0x38EF09;
-
-    /* HSPW = 7 */
-    LCDCON4 = 7;
-    
     /* HWSWP = 1, INVVFRAM = 1, INVVLINE = 1, FRM565 = 1, All others = 0 */
     LCDCON5 = 0xB01;
 
@@ -100,17 +97,16 @@ static void LCD_CTRL_clock(bool onoff)
 {
     if(onoff)
     {
-        GPCCON  &= ~0xFFF000FC;
-        GPDCON  &= ~0xFFF0FFF0;
-
+        GPCCON  &=~0xFFF000FC;
         GPCCON  |= 0xAAA000A8;
         GPCUP   |= 0xFC0E;
 
+        GPDCON  &=~0xFFF0FFF0;
         GPDCON  |= 0xAAA0AAA0;
         GPDUP   |= 0xFCFC;
 
         s3c_regset32(&CLKCON, 0x20);  /* enable LCD clock */
-        LCDCON1 |=0x01;
+        LCDCON1 |= LCD_ENVID;
     }
     else
     {
@@ -120,11 +116,12 @@ static void LCD_CTRL_clock(bool onoff)
         GPDCON  &= ~0xFFF0FFF0;
         GPDUP   &= ~0xFCFC;
 
-        LCDCON1 &= ~1;              /* Must diable first or bus may freeze */
+        LCDCON1 &= ~LCD_ENVID;        /* Must disable first or bus may freeze */
         s3c_regclr32(&CLKCON, 0x20);  /* disable LCD clock */
     }
 }
 
+#ifdef GIGABEAT_F
 static void reset_LCD(bool reset)
 {
     GPBCON&=~0xC000;
@@ -134,10 +131,14 @@ static void reset_LCD(bool reset)
     else
         GPBDAT&=~0x80;
 }
+#endif
 
+
+/****************************************************************************/
+#ifdef GIGABEAT_F
 static void LCD_SPI_send(const unsigned char *array, int count)
 {
-    while (count--)       
+    while (count--)
     {
         while ((SPSTA0&0x01)==0){};
         SPTDAT0=*array++;
@@ -146,7 +147,7 @@ static void LCD_SPI_send(const unsigned char *array, int count)
 
 static void LCD_SPI_setreg(unsigned char reg, unsigned char value)
 {
-    unsigned char regval[] = 
+    unsigned char regval[] =
     {
         0x00,reg,0x01,value
     };
@@ -162,7 +163,7 @@ static void LCD_SPI_SS(bool select)
 
     if(select)
         GPBDAT|=0x100;
-    else 
+    else
         GPBDAT&=~0x100;
 }
 
@@ -182,7 +183,7 @@ static void LCD_SPI_stop(void)
     LCD_SPI_SS(false);
 
     SPCON0 &= ~0x10;
-    s3c_regclr32(&CLKCON, 0x40000);    /* disable SPI clock */  
+    s3c_regclr32(&CLKCON, 0x40000);    /* disable SPI clock */
 }
 
 static void LCD_SPI_init(void)
@@ -221,8 +222,10 @@ static void LCD_SPI_init(void)
     LCD_SPI_setreg(0x2A, 0x03);
     LCD_SPI_setreg(0x2B, 0x0A);
     LCD_SPI_setreg(0x04, 0x01); /* Turn the display on */
-    LCD_SPI_stop(); 
+    LCD_SPI_stop();
 }
+#endif
+/****************************************************************************/
 
 /* LCD init */
 void lcd_init_device(void)
@@ -247,18 +250,21 @@ void lcd_init_device(void)
 #endif
 
     /* Set pins up */
-
     GPHUP   &= 0x600;
-
     GPECON  |= 0x0A800000;
     GPEUP   |= 0x3800;
-
+#ifdef GIGABEAT_F
     GPBUP   |= 0x181;
+#endif
 
     s3c_regset32(&CLKCON, 0x20);  /* enable LCD clock */
 
     LCD_CTRL_setup();
+#ifdef GIGABEAT_F
     LCD_SPI_init();
+#else
+    LCD_CTRL_clock(true);
+#endif
 }
 
 #if defined(HAVE_LCD_SLEEP)
@@ -319,13 +325,14 @@ void lcd_enable(bool state)
         lcd_update();
         lcd_activation_call_hook();
     }
-    else 
+    else
     {
         lcd_on = false;
     }
 }
 #endif
 
+#ifdef GIGABEAT_F
 void lcd_set_flip(bool yesno) {
     if (!lcd_on)
         return;
@@ -335,7 +342,7 @@ void lcd_set_flip(bool yesno) {
     {
         LCD_SPI_setreg(0x06, 0x02);
     }
-    else 
+    else
     {
         LCD_SPI_setreg(0x06, 0x04);
     }
@@ -365,12 +372,37 @@ void lcd_set_invert_display(bool yesno) {
     {
         LCD_SPI_setreg(0x27, 0x10);
     }
-    else 
+    else
     {
         LCD_SPI_setreg(0x27, 0x00);
     }
     LCD_SPI_stop();
 }
+#else
+void lcd_set_flip(bool yesno) 
+{
+    (void)yesno;
+    /* Not implemented */
+}
+
+int lcd_default_contrast(void)
+{
+    return DEFAULT_CONTRAST_SETTING;
+}
+
+void lcd_set_contrast(int val) 
+{
+    (void)val;
+    /* Not implemented */
+}
+
+void lcd_set_invert_display(bool yesno) 
+{
+    (void)yesno;
+    /* Not implemented */
+}
+
+#endif
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
@@ -423,6 +455,7 @@ void lcd_update(void)
                          LCD_WIDTH*LCD_HEIGHT, 1);
 }
 
+#if defined(TOSHIBA_GIGABEAT_F) || defined(TOSHIBA_GIGABEAT_S)
 void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
                                  int stride, int x, int y, int width,
                                  int height)
@@ -485,6 +518,7 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
           [fgpat]"r"(current_vp->fg_pattern)
     );
 }
+#endif
 
 void lcd_yuv_set_options(unsigned options)
 {

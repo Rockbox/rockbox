@@ -21,3 +21,25 @@
 
 extern void lcd_enable(bool state);
 
+/* Config values for LCDCON1 */
+/* ENVID = 0, BPPMODE = 16 bpp, PNRMODE = TFT, MMODE = Each Frame, CLKVAL = 8 */
+#define LCD_CLKVAL  8
+#define LCD_MMODE   0
+#define LCD_PNRMODE 3
+#define LCD_BPPMODE 12
+#define LCD_ENVID   1
+
+/* Config values for LCDCON2 */
+/* VCPW = 1, VFPD = 5, VBPD = 7 */
+#define LCD_UPPER_MARGIN 7
+#define LCD_LOWER_MARGIN 5
+#define LCD_VSYNC_LEN    1
+
+/* Config values for LCDCON3 */
+/* HFPD = 9, HBPD = 7 */
+#define LCD_LEFT_MARGIN  7
+#define LCD_RIGHT_MARGIN 9
+
+/* Config values for LCDCON4 */
+/* HSPW = 7 */
+#define LCD_HSYNC_LEN 7

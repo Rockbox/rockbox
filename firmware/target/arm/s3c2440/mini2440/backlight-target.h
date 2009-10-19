@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ * Copyright (C) 2006 by Linus Nielsen Feltzing
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,13 +18,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef BACKLIGHT_TARGET_H
+#define BACKLIGHT_TARGET_H
 
-#ifdef GIGABEAT_F
-#define DEBUG_CANCEL  BUTTON_POWER
-#elif defined(MINI2440)
-#define DEBUG_CANCEL  BUTTON_MENU
+#define GPIO_LCD_PWR (1 << 4)   /* GPIO.G4 */
+
+bool _backlight_init(void);
+void _backlight_on(void);
+void _backlight_off(void);
+void _backlight_set_brightness(int brightness);
+
 #endif
-
-bool __dbg_hw_info(void);
-bool __dbg_ports(void);
-

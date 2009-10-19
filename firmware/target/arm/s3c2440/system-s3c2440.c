@@ -165,6 +165,7 @@ void system_prepare_fw_start(void)
 
 void system_init(void)
 {
+#ifdef GIGABEAT_F
     INTMSK = 0xFFFFFFFF;
     INTMOD =  0;
     SRCPND = 0xFFFFFFFF;
@@ -192,7 +193,7 @@ void system_init(void)
     GPGUP  |= 0x70;
 
     GPHCON |= 0x4005;
-    GPHDAT |= 0x03;   
+    GPHDAT |= 0x03;
 
     /* TODO: do something with PRIORITY */
  
@@ -208,6 +209,11 @@ void system_init(void)
     CLKCON &= ~0xFF1ED0;
  
     CLKSLOW |= 0x80;
+#elif defined(MINI2440)        
+    /* TODO: anything? */
+#else
+#error Unknown target    
+#endif
 }
 
 int system_memory_guard(int newmode)

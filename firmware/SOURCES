@@ -274,6 +274,8 @@ drivers/audio/tlv320.c
 drivers/audio/mas35xx.c
 #elif defined(HAVE_AK4537)
 drivers/audio/ak4537.c
+#elif defined(HAVE_UDA1341)
+drivers/audio/uda1341.c
 #endif /* defined(HAVE_*) */
 #endif /* !defined(SIMULATOR) && !defined(BOOTLOADER) */
 
@@ -808,15 +810,15 @@ target/arm/usb-fw-pp502x.c
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
 target/arm/s3c2440/debug-s3c2440.c
+target/arm/s3c2440/kernel-s3c2440.c
+target/arm/s3c2440/lcd-s3c2440.c
+target/arm/s3c2440/system-s3c2440.c
 target/arm/s3c2440/gigabeat-fx/adc-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/ata-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/backlight-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/button-meg-fx.c
-target/arm/s3c2440/gigabeat-fx/kernel-meg-fx.c
-target/arm/s3c2440/gigabeat-fx/lcd-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/power-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/sc606-meg-fx.c
-target/arm/s3c2440/gigabeat-fx/system-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/usb-meg-fx.c
 #ifndef BOOTLOADER
 target/arm/s3c2440/gigabeat-fx/i2c-meg-fx.c
@@ -1391,6 +1393,33 @@ target/arm/at91sam/lyre_proto1/system-lyre_proto1.c
 target/arm/at91sam/lyre_proto1/timer-lyre_proto1.c
 #endif
 #endif /* SIMULATOR */
+
+#if defined(MINI2440)
+#ifndef SIMULATOR
+target/arm/lcd-as-memframe.S
+target/arm/mmu-arm.S
+target/arm/s3c2440/debug-s3c2440.c
+target/arm/s3c2440/kernel-s3c2440.c
+target/arm/s3c2440/lcd-s3c2440.c
+target/arm/s3c2440/system-s3c2440.c
+target/arm/s3c2440/mini2440/backlight-mini2440.c
+target/arm/s3c2440/mini2440/button-mini2440.c
+target/arm/s3c2440/mini2440/led-mini2440.c
+target/arm/s3c2440/mini2440/power-mini2440.c
+#ifdef BOOTLOADER
+/*target/arm/s3c2440/mini2440/mini2440_test.c*/
+#endif
+#ifndef BOOTLOADER
+target/arm/s3c2440/mini2440/adc-mini2440.c
+target/arm/s3c2440/mini2440/i2c-mini2440.c
+target/arm/s3c2440/mini2440/pcm-mini2440.c
+target/arm/s3c2440/mini2440/powermgmt-mini2440.c
+target/arm/s3c2440/mini2440/power-mini2440.c
+target/arm/s3c2440/mini2440/timer-mini2440.c
+target/arm/s3c2440/mini2440/usb-mini2440.c
+#endif
+#endif /* SIMULATOR */
+#endif /* MINI2440 */
 
 #ifdef SAMSUNG_YH820
 #ifndef SIMULATOR

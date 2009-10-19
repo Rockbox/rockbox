@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ * Copyright (C) 2009 by Bob Cousins, Lyre Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,12 +19,25 @@
  *
  ****************************************************************************/
 
-#ifdef GIGABEAT_F
-#define DEBUG_CANCEL  BUTTON_POWER
-#elif defined(MINI2440)
-#define DEBUG_CANCEL  BUTTON_MENU
-#endif
+extern void lcd_enable(bool state);
 
-bool __dbg_hw_info(void);
-bool __dbg_ports(void);
+/* Setup for Mini2440, 3.5" TFT LCD Touchscreen */
 
+/* Config values for LCDCON1 */
+#define LCD_CLKVAL  4
+#define LCD_MMODE   0
+#define LCD_PNRMODE 3
+#define LCD_BPPMODE 12
+#define LCD_ENVID   1
+
+/* Config values for LCDCON2 */
+#define LCD_UPPER_MARGIN 1
+#define LCD_LOWER_MARGIN 4
+#define LCD_VSYNC_LEN    1
+
+/* Config values for LCDCON3 */
+#define LCD_RIGHT_MARGIN 0
+#define LCD_LEFT_MARGIN  25
+
+/* Config values for LCDCON4 */
+#define LCD_HSYNC_LEN 4

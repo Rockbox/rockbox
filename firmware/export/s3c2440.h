@@ -178,6 +178,41 @@
 #define DCDST3 (*(volatile unsigned long *)0x4B0000DC) /* DMA 3 current destination */
 #define DMASKTRIG3 (*(volatile unsigned long *)0x4B0000E0) /* DMA 3 mask trigger */
 
+#define DISRCC_LOC_AHB              (0 << 1)
+#define DISRCC_LOC_APB              (1 << 1)
+#define DISRCC_INC_AUTO             (0 << 0)
+#define DISRCC_INC_FIXED            (1 << 0)
+
+#define DIDSTC_CHK_INT_TC_ZERO      (0 << 2)
+#define DIDSTC_CHK_INT_AFTER_RELOAD (1 << 2)
+#define DIDSTC_LOC_AHB              (0 << 1)
+#define DIDSTC_LOC_APB              (1 << 1)
+#define DIDSTC_INC_AUTO             (0 << 0)
+#define DIDSTC_INC_FIXED            (1 << 0)
+
+#define DCON_DMD_HS                 (1 << 31)
+#define DCON_SYNC_APB               (0 << 30)
+#define DCON_SYNC_AHB               (1 << 30)
+#define DCON_INT                    (1 << 29)
+#define DCON_TSZ                    (1 << 28)
+#define DCON_SERVMODE_WHOLE         (1 << 27)
+#define DCON_HWSRCSEL               (1 << 24)
+#define DCON_HW_SEL                 (1 << 23)
+#define DCON_NO_RELOAD              (1 << 22)
+#define DCON_DSZ_MASK               (3 << 20)
+#define DCON_DSZ_BYTE               (0 << 20)
+#define DCON_DSZ_HALF_WORD          (1 << 20)
+#define DCON_DSZ_WORD               (2 << 20)
+#define DCON_TC                     (1 << 0)
+
+#define DSTAT_STAT_BUSY             (1 << 20)
+#define DSTAT_CURR_TC               (1 << 0)
+
+#define DMASKTRIG_STOP               (1 << 2)
+#define DMASKTRIG_ON                 (1 << 1)
+#define DMASKTRIG_SW_TRIG            (1 << 0)
+
+
 /* Clock & Power Management */
 
 #define LOCKTIME (*(volatile unsigned long *)0x4C000000) /* PLL lock time counter */
@@ -499,7 +534,14 @@
 #define SDIDSTA (*(volatile unsigned long *)0x5A000034) /* SDI data status */
 #define SDIFSTA (*(volatile unsigned long *)0x5A000038) /* SDI FIFO status */
 #define SDIIMSK (*(volatile unsigned long *)0x5A00003C) /* SDI interrupt mask */
-#define SDIDAT (*(volatile unsigned char *)0x5A000040) /* SDI data */
+
+/* SDI data - LE = Little Endian, BE = Big Endian */
+#define SDIDAT_LLE (*(volatile unsigned long *)0x5A000040)  /* 32 bit */  
+#define SDIDAT_HLE (*(volatile unsigned short *)0x5A000044) /* 16 */
+#define SDIDAT_BLE (*(volatile unsigned char *)0x5A000048)  /* 8 */
+#define SDIDAT_LBE (*(volatile unsigned long *)0x5A00004C)  /* 32 */
+#define SDIDAT_HBE (*(volatile unsigned short *)0x5A000041) /* 16 */
+#define SDIDAT_BBE (*(volatile unsigned char *)0x5A000043)  /* 8 */
 
 /* AC97 Audio-CODEC Interface */
 
@@ -529,6 +571,19 @@
 /* timer is based on PCLK and minimum division is 2 */
 #define TIMER_FREQ (49156800/2)
 #define TIMER234_PRESCALE 21
+
+/* I/O Port macros */
+
+#define GPIO_INPUT          0
+#define GPIO_OUTPUT         1
+#define GPIO_FUNCTION       2
+#define GPIO_ALT_FUNCTION   3
+
+#define GPIO_PULLUP_DISABLE 1
+#define GPIO_PULLUP_ENABLE  0
+
+#define S3C2440_GPIO_CONFIG(port,pin,function)  port = ( (port & ~(3<<(pin*2)) ) | (function<<(pin*2)) )
+#define S3C2440_GPIO_PULLUP(port,pin,state)     port = ( (port & ~(1<<pin    ) ) | (state<<pin       ) ) 
 
 
 #endif /* __S3C2440_H__ */
