@@ -31,7 +31,6 @@
 #include "action.h"
 #include "kernel.h"
 #include "filetypes.h"
-#include "debug.h"
 #include "sprintf.h"
 #include "settings.h"
 #include "skin_engine/skin_engine.h"
@@ -67,6 +66,7 @@
 #include "dsp.h"
 #include "playlist_viewer.h"
 #include "wps.h"
+#include "statusbar-skinned.h"
 
 #define RESTORE_WPS_INSTANTLY       0l
 #define RESTORE_WPS_NEXT_SECOND     ((long)(HZ+current_tick))
@@ -82,7 +82,7 @@
 static int wpsbars = 0;
 
 /* currently only one wps_state is needed, initialize to 0 */
-static struct wps_state     wps_state               = { .id3 = NULL };
+        struct wps_state     wps_state               = { .id3 = NULL };
 static struct gui_wps       gui_wps[NB_SCREENS]     = {{ .data = NULL }};
 static struct wps_data      wps_datas[NB_SCREENS]   = {{ .wps_loaded = 0 }};
 
@@ -129,8 +129,8 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
 
 #endif /* __PCTOOL__ */
 
-    loaded_ok = buf && skin_data_load(gui_wps[screen].data,
-                                        &screens[screen], buf, isfile);
+    loaded_ok = buf && skin_data_load(gui_wps[screen].data, buf, isfile);
+
     if (!loaded_ok) /* load the hardcoded default */
     {
         char *skin_buf[NB_SCREENS] = {
@@ -153,11 +153,11 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
             "%pb\n",
 #endif
         };
-        skin_data_load(gui_wps[screen].data, &screens[screen],
-                        skin_buf[screen], false);
+        skin_data_load(gui_wps[screen].data, skin_buf[screen], false);
     }
 #ifdef HAVE_REMOVE_LCD
     gui_wps[screen].data->remote_wps = !(screen == SCREEN_MAIN);
+
 #endif
 }
 
@@ -587,6 +587,8 @@ static void gwps_leave_wps(void)
     /* Play safe and unregister the hook */
     lcd_activation_set_hook(NULL);
 #endif
+    /* unhandle statusbar update delay */
+    sb_skin_set_update_delay(DEFAULT_UPDATE_DELAY);
     send_event(GUI_EVENT_REFRESH, NULL);
 }
 
@@ -739,7 +741,6 @@ long gui_wps_show(void)
 #endif
             }
         }
-
 #ifdef HAVE_LCD_BITMAP
         /* when the peak meter is enabled we want to have a
             few extra updates to make it look smooth. On the
@@ -1175,7 +1176,13 @@ long gui_wps_show(void)
                     skin_update(&gui_wps[i], WPS_REFRESH_NON_STATIC);
                 }
             }
-            wps_state.do_full_update = false;
+            /* currently skinned statusbar and wps share the same wps_state,
+             * don't steal do_full_update away */
+            if (wps_state.do_full_update)
+            {
+                send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
+                wps_state.do_full_update = false;
+            }
             update = false;
         }
 
@@ -1188,6 +1195,9 @@ long gui_wps_show(void)
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
             lcd_activation_set_hook(wps_lcd_activation_hook);
 #endif
+        /* we remove the update delay since it's not very usable in the wps,
+         * e.g. during volume changing or ffwd/rewind */
+            sb_skin_set_update_delay(0);
             FOR_NB_SCREENS(i)
             {
                 screens[i].stop_scroll();

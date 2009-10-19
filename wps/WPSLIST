@@ -44,6 +44,8 @@ selector type: bar (inverse)
 <wps>
 Name: rockbox_default.wps
 RWPS: rockbox_default.rwps
+SBS:
+RSBS:
 Author: Rockbox team
 Font: 08-Schumacher-Clean.fnt
 Font.11x2x1:
@@ -59,6 +61,8 @@ selector type: bar (inverse)
 <wps>
 Name: boxes.wps
 rwps: boxes.rwps
+SBS:
+RSBS:
 Author: Christi Scarborough (after Magnus Westerlund)
 Font: 08-Schumacher-Clean.fnt
 Statusbar: top
@@ -76,6 +80,8 @@ remote ui viewport: -
 <wps>
 Name: engineeer2.wps
 RWPS: engineeer2.rwps
+SBS:
+RSBS:
 Author: Magnus Westerlund
 Font: 08-Nedore.fnt
 Statusbar: top
@@ -90,6 +96,8 @@ remote ui viewport: -
 <wps>
 Name: iAmp.wps
 RWPS: iAmp.rwps
+SBS:
+RSBS:
 Author: Raymond Hoh
 Font: 12-Nimbus.fnt
 backdrop:
@@ -104,6 +112,8 @@ remote ui viewport: -
 <wps>
 Name: zezayer.wps
 RWPS: zezayer.rwps
+SBS:
+RSBS:
 Author: Jake Owen
 Font: 08-Nedore.fnt
 Statusbar: top
@@ -153,6 +163,8 @@ Statusbar: top
 <wps>
 Name: DancePuffDuo.wps
 RWPS: DancePuffDuo.rwps
+SBS:
+RSBS:
 Author: Chris Oxtoby
 Font: 13-Nimbus.fnt
 Statusbar: top
@@ -176,6 +188,8 @@ Statusbar: top
 <wps>
 Name: iCatcher.wps
 RWPS: iCatcher.rwps
+SBS:
+RSBS:
 Author: Ioannis Koutoulakis
 Font.112x64x1: 08-Rockfont.fnt
 Font.128x64x1: 08-Rockfont.fnt
@@ -212,6 +226,8 @@ Statusbar: top
 <wps>
 Name: UniCatcher.wps
 RWPS: UniCatcher.rwps
+SBS:
+RSBS:
 Author: Ioannis Koutoulakis
 Font: 16-GNU-Unifont.fnt
 Foreground Color: 000000
@@ -235,6 +251,8 @@ Statusbar: top
 <wps>
 Name: Rockboxed.wps
 RWPS: rockbox_default.rwps
+SBS:
+RSBS:
 Author: Roan Horning
 Font.112x64x1: 08-Schumacher-Clean.fnt
 Font.128x64x1: 08-Schumacher-Clean.fnt
@@ -268,6 +286,8 @@ Author: Jens Arnold
 <wps>
 Name: cabbiev2.wps
 RWPS: cabbiev2.rwps
+SBS:
+RSBS:
 # Real name of the creator of the WPS
 Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
 
@@ -349,6 +369,7 @@ viewers iconset.240x400x16: /.rockbox/icons/tango_small_viewers.bmp
 
 # Whether the WPS is designed to have the statusbar on or off
 Statusbar: top
+remote statusbar: top
 
 # list & remote ui viewports
 ui viewport: -

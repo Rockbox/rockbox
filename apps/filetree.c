@@ -477,7 +477,26 @@ int ft_enter(struct tree_context* c)
                 break;
 #endif
 
-
+#ifdef HAVE_LCD_BITMAP
+            case FILE_ATTR_SBS:
+                splash(0, ID2P(LANG_WAIT));
+                set_file(buf, (char *)global_settings.sbs_file,
+                         MAX_FILENAME);
+                global_settings.statusbar = STATUSBAR_CUSTOM;
+                settings_apply_skins();
+                viewportmanager_theme_changed(THEME_STATUSBAR);
+                break;
+#endif
+#ifdef HAVE_REMOTE_LCD
+            case FILE_ATTR_RSBS:
+                splash(0, ID2P(LANG_WAIT));
+                set_file(buf, (char *)global_settings.rsbs_file,
+                         MAX_FILENAME);
+                global_settings.remote_statusbar = STATUSBAR_CUSTOM;
+                settings_apply_skins();
+                viewportmanager_theme_changed(THEME_STATUSBAR);
+                break;
+#endif
                 /* wps config file */
             case FILE_ATTR_WPS:
                 splash(0, ID2P(LANG_WAIT));

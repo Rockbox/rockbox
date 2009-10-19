@@ -32,9 +32,18 @@ my $cppdef = $target;
 my @depthlist = ( 16, 8, 4, 2, 1 );
 
 # These parameters are filled in as we parse wpslist
+my $req_size;
+my $req_g_wps;
+my $req_t;
+my $req_t_wps;
 my $wps;
 my $wps_prefix;
+my $sbs_prefix;
 my $rwps;
+my $sbs;
+my $sbs_w_size;
+my $rsbs;
+my $rsbs_w_size;
 my $width;
 my $height;
 my $font;
@@ -42,9 +51,6 @@ my $fgcolor;
 my $bgcolor;
 my $statusbar;
 my $author;
-my $req_g;
-my $req_g_wps;
-my $req_t_wps;
 my $backdrop;
 my $lineselectstart;
 my $lineselectend;
@@ -191,12 +197,26 @@ sub copywps
     my $dir;
     my @filelist;
     my $file;
+    my $__sb;
 
     if($wpslist =~ /(.*)WPSLIST/) {
         $dir = $1;
-#        system("cp $dir/$wps .rockbox/wps/");
-        #print "$req_t_wps $req_g_wps\n";
+        $__sb = $sbs_prefix . "." . $req_size . ".sbs";
+        #print "$req_t_wps $req_g_wps $sbs_prefix\n";
+        #print "$dir/$__sb\n";
 
+#        system("cp $dir/$wps .rockbox/wps/");
+        # check for <name>.WIDTHxHEIGHTxDEPTH.sbs
+        if (-e "$dir/$__sb") {
+            system("cp $dir/$__sb $rbdir/wps/$sbs");
+        }
+        # check for <name>.WIDTHxHEIGHTxDEPTH.<model>.sbs and overwrite the
+        # previous sb if needed
+        $__sb = $sbs_prefix . "." . $req_size . "." . $modelname . ".sbs";
+        if (-e "$dir/$__sb") {
+            system("cp $dir/$__sb $rbdir/wps/$sbs");
+        }
+        
         if (-e "$dir/$req_t_wps" ) {
           system("cp $dir/$req_t_wps $rbdir/wps/$wps");
 
@@ -210,9 +230,9 @@ sub copywps
            close(WPSFILE);
 
            if ($#filelist >= 0) {
-              if (-e "$dir/$wps_prefix/$req_g") {
+              if (-e "$dir/$wps_prefix/$req_size") {
                  foreach $file (@filelist) {
-                     system("cp $dir/$wps_prefix/$req_g/$file $rbdir/wps/$wps_prefix/");
+                     system("cp $dir/$wps_prefix/$req_size/$file $rbdir/wps/$wps_prefix/");
                  }
               }
               elsif (-e "$dir/$wps_prefix") {
@@ -235,7 +255,7 @@ sub copywps
 
 sub buildcfg {
     my $cfg = $wps;
-    my @out;
+    my @out;    
 
     $cfg =~ s/\.(r|)wps/.cfg/;
 
@@ -247,6 +267,20 @@ sub buildcfg {
 wps: /$rbdir/wps/$wps
 MOO
 ;
+    if(defined($sbs)) {
+        if ($sbs eq '') {
+            push @out, "sbs: -\n";
+        } else {
+            push @out, "sbs: /$rbdir/wps/$sbs\n";
+        }
+    }
+    if(defined($sbs)  && $has_remote) {
+        if ($rsbs eq '') {
+            push @out, "rsbs: -\n";
+        } else {
+            push @out, "rsbs: /$rbdir/wps/$rsbs\n";
+        }
+    }
     if($font) {
         push @out, "font: /$rbdir/fonts/$font\n";
     }
@@ -264,7 +298,7 @@ MOO
     }
     if(defined($backdrop)) {
         if ($backdrop eq '') {
-            push @out, "backdrop:\n";
+            push @out, "backdrop: -\n";
         } else {
             # clip resolution from filename
             $backdrop =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
@@ -338,6 +372,8 @@ while(<WPS>) {
         undef $wps;
         undef $wps_prefix;
         undef $rwps;
+        undef $sbs;
+        undef $rsbs;
         undef $width;
         undef $height;
         undef $font;
@@ -386,23 +422,24 @@ while(<WPS>) {
             foreach my $d (@depthlist) {
                 next if ($d > $rdepth);
 
-                $req_g = $rwidth . "x" . $rheight . "x" . $d;
+                $req_size = $rwidth . "x" . $rheight . "x" . $d;
 
                 # check for model specific wps
-                $req_g_wps = $wps_prefix . "." . $req_g . "." . $modelname . ".wps";
+                $req_g_wps = $wps_prefix . "." . $req_size . "." . $modelname . ".wps";
                 last if (-e "$wpsdir/$req_g_wps");
 
-                $req_g_wps = $wps_prefix . "." . $req_g . ".wps";
+                # check for normal wps (with WIDTHxHEIGHTxDEPTH)
+                $req_g_wps = $wps_prefix . "." . $req_size . ".wps";
                 last if (-e "$wpsdir/$req_g_wps");
 
                 if ($isrwps) {
-                    $req_g = $req_g . "." . $main_width . "x" . $main_height . "x" . "$main_depth";
+                    $req_size = $req_size . "." . $main_width . "x" . $main_height . "x" . "$main_depth";
 
-                    $req_g_wps = $wps_prefix . "." . $req_g . ".wps";
+                    $req_g_wps = $wps_prefix . "." . $req_size . ".wps";
                     last if (-e "$wpsdir/$req_g_wps");
                 }
             }
-            $req_t_wps = $wps_prefix . ".txt" . ".wps";
+            $req_t_wps = $wps_prefix . $req_t . ".wps";
 
             #print "LCD: $wps wants $width x $height\n";
             #print "LCD: is $rwidth x $rheight\n";
@@ -453,6 +490,20 @@ while(<WPS>) {
         }
         elsif($l =~ /^RWPS\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $rwps = $1;
+        }
+        elsif($l =~ /^SBS: *(.*)/i) {
+            $sbs = $sbs_prefix = $1;
+            $sbs_prefix =~ s/\.(r|)sbs//;
+        }
+        elsif($l =~ /^SBS\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
+            $sbs = $sbs_prefix = $1;
+            $sbs_prefix =~ s/\.(r|)sbs//;
+        }
+        elsif($l =~ /^RSBS: *(.*)/i) {
+            $rsbs = $1;
+        }
+        elsif($l =~ /^RSBS\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
+            $rsbs = $1;
         }
         elsif($l =~ /^Author: *(.*)/i) {
             $author = $1;
@@ -526,7 +577,13 @@ while(<WPS>) {
         elsif($l =~ /^ui viewport: *(.*)/i) {
             $listviewport = $1;
         }
+        elsif($l =~ /^ui viewport\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
+            $listviewport = $1;
+        }
         elsif($l =~ /^remote ui viewport: *(.*)/i) {
+            $remotelistviewport = $1;
+        }
+        elsif($l =~ /^remote ui viewport\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $remotelistviewport = $1;
         }
         else{

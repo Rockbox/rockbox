@@ -161,7 +161,7 @@ enum filling_state {
 };
 
 #define MAX_TRACK       128
-#define MAX_MULTIPLE_AA 1
+#define MAX_MULTIPLE_AA 2
 
 #define MAX_TRACK_MASK  (MAX_TRACK-1)
 

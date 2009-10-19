@@ -162,12 +162,16 @@ static int statusbar_callback_ex(int action,const struct menu_item_ex *this_item
             old_bar[screen] = statusbar_position(screen);
             break;
         case ACTION_EXIT_MENUITEM:
-            gui_statusbar_changed(screen, old_bar[screen]);
             send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
             send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
+            if ((old_bar[screen] == STATUSBAR_CUSTOM)
+                || (statusbar_position(screen) == STATUSBAR_CUSTOM))
+                send_event(GUI_EVENT_REFRESH, NULL);
+            else
+                gui_statusbar_changed(screen, old_bar[screen]);
             break;
     }
-    return action;
+    return ACTION_REDRAW;
 }
 
 #ifdef HAVE_REMOTE_LCD

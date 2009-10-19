@@ -58,6 +58,9 @@
 #ifdef HAVE_LCD_BITMAP
 #include "language.h"
 #endif
+#include "statusbar-skinned.h"
+#include "debug.h"
+
 
 static int statusbar_enabled = 0;
 
@@ -93,8 +96,9 @@ static bool showing_bars(enum screen_type screen)
     if (statusbar_enabled & VP_SB_ONSCREEN(screen))
     {
 #ifdef HAVE_LCD_BITMAP
-        bool ignore = statusbar_enabled & VP_SB_IGNORE_SETTING(screen);
-        return ignore || (statusbar_position(screen));
+        int ignore;
+        ignore = statusbar_enabled & VP_SB_IGNORE_SETTING(screen);
+        return ignore || (statusbar_position(screen) != STATUSBAR_OFF);
 #else
         return true;
 #endif
@@ -109,22 +113,30 @@ void viewport_set_fullscreen(struct viewport *vp,
     vp->width = screens[screen].lcdwidth;
 
 #ifdef HAVE_LCD_BITMAP
-    set_default_align_flags(vp);
-    vp->drawmode = DRMODE_SOLID;
-    vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */
-        
-    vp->height = screens[screen].lcdheight;
-    if (statusbar_position(screen) != STATUSBAR_BOTTOM
-            && showing_bars(screen))
-        vp->y = STATUSBAR_HEIGHT;
-    else 
-        vp->y = 0;
+    struct viewport *sb_skin_vp = sb_skin_get_info_vp(screen);
+    if (sb_skin_vp && sb_skin_get_state(screen)
+            && statusbar_enabled & VP_SB_ONSCREEN(screen))
+    {
+        *vp = *sb_skin_vp;
+    }
+    else
+    {
+        if (statusbar_position(screen) != STATUSBAR_BOTTOM && showing_bars(screen))
+            vp->y = STATUSBAR_HEIGHT;
+        else 
+            vp->y = 0;
 #else
-    vp->y = 0;
+    {
+        vp->y = 0;
 #endif
-    vp->height = screens[screen].lcdheight
-                        - (showing_bars(screen)?STATUSBAR_HEIGHT:0);
+        vp->height = screens[screen].lcdheight
+                - (showing_bars(screen)?STATUSBAR_HEIGHT:0);
+    }
 
+#ifdef HAVE_LCD_BITMAP
+    set_default_align_flags(vp);
+    vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */
+    vp->drawmode = DRMODE_SOLID;
 #if LCD_DEPTH > 1
 #ifdef HAVE_REMOTE_LCD
     /* We only need this test if there is a remote LCD */
@@ -144,7 +156,7 @@ void viewport_set_fullscreen(struct viewport *vp,
         vp->bg_pattern = LCD_REMOTE_DEFAULT_BG;
     }
 #endif
-
+#endif
 }
 
 void viewport_set_defaults(struct viewport *vp,
@@ -180,21 +192,29 @@ int viewportmanager_get_statusbar(void)
 int viewportmanager_set_statusbar(const int enabled)
 {
     int old = statusbar_enabled;
+    int i;
+    
     statusbar_enabled = enabled;
-    if (enabled)
+
+    FOR_NB_SCREENS(i)
     {
-        int i;
-        FOR_NB_SCREENS(i)
+        if (showing_bars(i)
+                && statusbar_position(i) != STATUSBAR_CUSTOM)
         {
-            if (showing_bars(i))
-                gui_statusbar_draw(&statusbars.statusbars[i], true);
+            add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
+            gui_statusbar_draw(&statusbars.statusbars[i], true);
         }
-        add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
+        else
+            remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
     }
-    else
+
+#ifdef HAVE_LCD_BITMAP
+    FOR_NB_SCREENS(i)
     {
-        remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
+        sb_skin_set_state(showing_bars(i)
+                        && statusbar_position(i) == STATUSBAR_CUSTOM, i);
     }
+#endif
     return old;
 }
 
@@ -204,7 +224,8 @@ static void viewportmanager_redraw(void* data)
 
     FOR_NB_SCREENS(i)
     {
-        if (showing_bars(i))
+        if (showing_bars(i)
+                && statusbar_position(i) != STATUSBAR_CUSTOM)
             gui_statusbar_draw(&statusbars.statusbars[i], NULL != data);
     }
 }
@@ -234,11 +255,6 @@ void viewportmanager_theme_changed(const int which)
         /* reset the ui viewport */
         FOR_NB_SCREENS(i)
             ui_vp_info.active[i] = retval & BIT_N(i);
-
-        if (retval != 0)
-            add_event(GUI_EVENT_REFRESH, false, viewportmanager_ui_vp_changed);
-        else
-            remove_event(GUI_EVENT_REFRESH, viewportmanager_ui_vp_changed);
         /* and point to it */
         ui_vp_info.vp = custom_vp;
     }
@@ -249,18 +265,14 @@ void viewportmanager_theme_changed(const int which)
     }
     if (which & THEME_STATUSBAR)
     {
-        statusbar_enabled = VP_SB_HIDE_ALL;
-
+        statusbar_enabled = 0;
         FOR_NB_SCREENS(i)
         {
             if (statusbar_position(i) != STATUSBAR_OFF)
                 statusbar_enabled  |= VP_SB_ONSCREEN(i);
         }
 
-        if (statusbar_enabled != VP_SB_HIDE_ALL)
-            add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
-        else
-            remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
+        viewportmanager_set_statusbar(statusbar_enabled);
 
         /* reposition viewport to fit statusbar, only if not using the ui vp */
         
@@ -270,6 +282,19 @@ void viewportmanager_theme_changed(const int which)
                 viewport_set_fullscreen(&custom_vp[i], i);
         }
     }
+
+    int event_add = 0;
+    FOR_NB_SCREENS(i)
+    {
+        event_add |= ui_vp_info.active[i];
+        event_add |= (statusbar_position(i) == STATUSBAR_CUSTOM);
+    }
+
+    if (event_add)
+        add_event(GUI_EVENT_REFRESH, false, viewportmanager_ui_vp_changed);
+    else
+        remove_event(GUI_EVENT_REFRESH, viewportmanager_ui_vp_changed);
+
     send_event(GUI_EVENT_THEME_CHANGED, NULL);
 }
 
@@ -283,10 +308,10 @@ static void viewportmanager_ui_vp_changed(void *param)
     FOR_NB_SCREENS(i)
         screens[i].clear_display();
     /* redraw the statusbar if it was enabled */
-    viewportmanager_set_statusbar(statusbar_enabled);
+    send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
     /* call the passed function which will redraw the content of
      * the current screen */
-    if (param != NULL)
+    if (draw_func != NULL)
         draw_func();
     FOR_NB_SCREENS(i)
         screens[i].update();

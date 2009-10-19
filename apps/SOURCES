@@ -81,6 +81,9 @@ gui/wps.c
 gui/scrollbar.c
 gui/splash.c
 gui/statusbar.c
+#ifdef HAVE_LCD_BITMAP
+gui/statusbar-skinned.c
+#endif
 gui/yesno.c
 gui/viewport.c
 

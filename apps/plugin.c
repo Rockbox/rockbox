@@ -802,8 +802,6 @@ int plugin_load(const char* plugin, const void* parameter)
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(global_settings.touch_mode);
 #endif
-    
-    viewportmanager_set_statusbar(oldbars);
 
     button_clear_queue();
 
@@ -832,13 +830,14 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 #endif
 
+    viewportmanager_set_statusbar(oldbars);
+    viewport_set_current_vp(NULL);
+
     if (rc != PLUGIN_GOTO_WPS)
     {
         send_event(GUI_EVENT_REFRESH, NULL);
     }
 
-    viewportmanager_set_statusbar(oldbars);
-    viewport_set_current_vp(NULL);
     if (pfn_tsr_exit == NULL)
         plugin_loaded = false;
 

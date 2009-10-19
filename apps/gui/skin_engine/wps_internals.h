@@ -191,11 +191,14 @@ struct skin_line {
     struct skin_line *next;
 };
 
-#define VP_DRAW_HIDEABLE 0x1
-#define VP_DRAW_HIDDEN   0x2
-#define VP_DRAW_WASHIDDEN  0x4
-#define VP_DEFAULT_LABEL '|'
-#define VP_NO_LABEL      '-'
+#define VP_DRAW_HIDEABLE    0x1
+#define VP_DRAW_HIDDEN      0x2
+#define VP_DRAW_WASHIDDEN   0x4
+/* these are never drawn, nor cleared, i.e. just ignored */
+#define VP_NEVER_VISIBLE    0x8
+#define VP_DEFAULT_LABEL    '|'
+#define VP_NO_LABEL         '-'
+#define VP_INFO_LABEL       '_'
 struct skin_viewport {
     struct viewport vp;   /* The LCD viewport struct */
     struct progressbar *pb;

@@ -199,6 +199,7 @@ static const char graphic_numeric[] = "graphic,numeric";
 
 /* Default theme settings */
 #define DEFAULT_WPSNAME  "cabbiev2"
+#define DEFAULT_SBS_NAME DEFAULT_WPSNAME
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -633,14 +634,14 @@ const struct settings_list settings[] = {
                     ID2P(LANG_INVERT_CURSOR_BAR)),
  #endif
     CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, statusbar,
-                  LANG_STATUS_BAR, STATUSBAR_TOP, "statusbar","off,top,bottom",
-                  NULL, 3, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
-                  ID2P(LANG_STATUSBAR_BOTTOM)),
+                  LANG_STATUS_BAR, STATUSBAR_TOP, "statusbar","off,top,bottom,custom",
+                  NULL, 4, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
+                  ID2P(LANG_STATUSBAR_BOTTOM), ID2P(LANG_STATUSBAR_CUSTOM)),
 #ifdef HAVE_REMOTE_LCD
     CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, remote_statusbar,
-                  LANG_REMOTE_STATUSBAR, STATUSBAR_TOP, "remote statusbar","off,top,bottom",
-                  NULL, 3, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
-                  ID2P(LANG_STATUSBAR_BOTTOM)),
+                  LANG_REMOTE_STATUSBAR, STATUSBAR_TOP, "remote statusbar","off,top,bottom,custom",
+                  NULL, 4, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
+                  ID2P(LANG_STATUSBAR_BOTTOM), ID2P(LANG_STATUSBAR_CUSTOM)),
 #endif
     CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, scrollbar,
                   LANG_SCROLL_BAR, SCROLLBAR_LEFT, "scrollbar","off,left,right",
@@ -1442,11 +1443,17 @@ const struct settings_list settings[] = {
 #endif
     TEXT_SETTING(F_THEMESETTING,wps_file, "wps",
                      DEFAULT_WPSNAME, WPS_DIR "/", ".wps"),
-    TEXT_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng"),
+#ifdef HAVE_LCD_BITMAP
+    TEXT_SETTING(F_THEMESETTING,sbs_file, "sbs",
+                     DEFAULT_SBS_NAME, SBS_DIR "/", ".sbs"),
+#endif
 #ifdef HAVE_REMOTE_LCD
     TEXT_SETTING(F_THEMESETTING,rwps_file,"rwps",
-                     DEFAULT_WPSNAME, WPS_DIR "/", ".rwps"),
+                     DEFAULT_SBS_NAME, WPS_DIR "/", ".rwps"),
+    TEXT_SETTING(F_THEMESETTING,rsbs_file, "rsbs",
+                     DEFAULT_WPSNAME, SBS_DIR "/", ".rsbs"),
 #endif
+    TEXT_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng"),
 #if LCD_DEPTH > 1
     TEXT_SETTING(F_THEMESETTING,backdrop_file,"backdrop",
                      DEFAULT_BACKDROP, BACKDROP_DIR "/", ".bmp"),

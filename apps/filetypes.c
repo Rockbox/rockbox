@@ -108,6 +108,12 @@ static const struct filetype inbuilt_filetypes[] = {
 #endif
     { "bmark",FILE_ATTR_BMARK, Icon_Bookmark,  VOICE_EXT_BMARK },
     { "cue",  FILE_ATTR_CUE,   Icon_Bookmark,  VOICE_EXT_CUESHEET },
+#ifdef HAVE_LCD_BITMAP
+    { "sbs",  FILE_ATTR_SBS,  Icon_Wps,   VOICE_EXT_SBS },
+#endif
+#ifdef HAVE_REMOTE_LCD
+    { "rsbs", FILE_ATTR_RSBS, Icon_Wps,   VOICE_EXT_RSBS },
+#endif
 #ifdef BOOTFILE_EXT
     { BOOTFILE_EXT, FILE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },
 #endif

@@ -27,7 +27,6 @@
 
 #include "wps_internals.h" /* TODO: remove this line.. shoudlnt be needed */
 
-
 #ifdef HAVE_TOUCHSCREEN
 int wps_get_touchaction(struct wps_data *data);
 #endif
@@ -44,7 +43,6 @@ bool skin_update(struct gui_wps *gwps, unsigned int update_type);
  * or from a skinfile (isfile = true)
  */
 bool skin_data_load(struct wps_data *wps_data,
-                    struct screen *display,
                     const char *buf,
                     bool isfile);
 

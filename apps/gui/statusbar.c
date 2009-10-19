@@ -188,6 +188,9 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 {
     struct screen * display = bar->display;
 
+    if (!display)
+        return;
+
 #ifdef HAVE_LCD_CHARCELLS
     int val;
     (void)force_redraw; /* The Player always has "redraw" */

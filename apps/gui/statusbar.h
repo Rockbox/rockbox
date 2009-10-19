@@ -55,7 +55,8 @@ struct status_info {
 };
 
 /* statusbar visibility/position, used for settings also */
-enum statusbar_values { STATUSBAR_OFF = 0, STATUSBAR_TOP, STATUSBAR_BOTTOM };
+enum statusbar_values { STATUSBAR_OFF = 0, STATUSBAR_TOP, STATUSBAR_BOTTOM,
+                        STATUSBAR_CUSTOM };
 
 struct gui_statusbar
 {

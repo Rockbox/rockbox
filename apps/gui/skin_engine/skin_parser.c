@@ -683,8 +683,15 @@ static int parse_viewport(const char *wps_bufptr,
     curr_line = NULL;
     if (!skin_start_new_line(skin_vp, wps_data->num_tokens))
         return WPS_ERROR_INVALID_PARAM;
-
-    if (*ptr == 'l')
+        
+    
+    if (*ptr == 'i')
+    {
+        skin_vp->label = VP_INFO_LABEL;
+        skin_vp->hidden_flags = VP_NEVER_VISIBLE;
+        ++ptr;
+    }
+    else if (*ptr == 'l')
     {
         if (*(ptr+1) == '|')
         {
@@ -1674,7 +1681,6 @@ static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char
     else
 	{
         /* Abort if we can't load an image */
-        DEBUGF("ERR: Failed to load image - %s\n",img_path);
 		loaded = false;
     }
 	return loaded;
@@ -1733,7 +1739,6 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
 /* to setup up the wps-data from a format-buffer (isfile = false)
    from a (wps-)file (isfile = true)*/
 bool skin_data_load(struct wps_data *wps_data,
-                   struct screen *display,
                    const char *buf,
                    bool isfile)
 {
@@ -1755,6 +1760,7 @@ bool skin_data_load(struct wps_data *wps_data,
 
     skin_data_reset(wps_data);
 
+    /* alloc default viewport, will be fixed up later */
     curr_vp = skin_buffer_alloc(sizeof(struct skin_viewport));
     if (!curr_vp)
         return false;
@@ -1766,9 +1772,6 @@ bool skin_data_load(struct wps_data *wps_data,
 
     /* Initialise the first (default) viewport */
     curr_vp->label         = VP_DEFAULT_LABEL;
-    curr_vp->vp.x          = 0;
-    curr_vp->vp.width      = display->getwidth();
-    curr_vp->vp.height     = display->getheight();
     curr_vp->pb            = NULL;
     curr_vp->hidden_flags  = 0;
     curr_vp->lines         = NULL;
@@ -1777,31 +1780,6 @@ bool skin_data_load(struct wps_data *wps_data,
     if (!skin_start_new_line(curr_vp, 0))
         return false;
 
-    switch (statusbar_position(display->screen_type))
-    {
-        case STATUSBAR_OFF:
-            curr_vp->vp.y      = 0;
-            break;
-        case STATUSBAR_TOP:
-            curr_vp->vp.y       = STATUSBAR_HEIGHT;
-            curr_vp->vp.height -= STATUSBAR_HEIGHT;
-            break;
-        case STATUSBAR_BOTTOM:
-            curr_vp->vp.y       = 0;
-            curr_vp->vp.height -= STATUSBAR_HEIGHT;
-            break;
-    }
-#ifdef HAVE_LCD_BITMAP
-    curr_vp->vp.font       = FONT_UI;
-    curr_vp->vp.drawmode   = DRMODE_SOLID;
-#endif
-#if LCD_DEPTH > 1
-    if (display->depth > 1)
-    {
-        curr_vp->vp.fg_pattern = display->get_foreground();
-        curr_vp->vp.bg_pattern = display->get_background();
-    }
-#endif
     if (!isfile)
     {
         return wps_parse(wps_data, buf, false);

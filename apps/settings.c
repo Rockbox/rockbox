@@ -71,6 +71,7 @@
 #include "wps.h"
 #include "skin_engine/skin_engine.h"
 #include "viewport.h"
+#include "statusbar-skinned.h"
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
@@ -740,6 +741,19 @@ void settings_apply_skins(void)
     char buf[MAX_PATH];
     /* re-initialize the skin buffer before we start reloading skins */
     skin_buffer_init();
+#ifdef HAVE_LCD_BITMAP
+    if ( global_settings.sbs_file[0] &&
+        global_settings.sbs_file[0] != 0xff )
+    {
+        snprintf(buf, sizeof buf, WPS_DIR "/%s.sbs",
+                global_settings.sbs_file);
+        sb_skin_data_load(SCREEN_MAIN, buf, true);
+    }
+    else
+    {
+        sb_skin_data_load(SCREEN_MAIN, NULL, true);
+    }
+#endif
     if ( global_settings.wps_file[0] &&
         global_settings.wps_file[0] != 0xff )
     {
@@ -752,6 +766,16 @@ void settings_apply_skins(void)
         wps_data_load(SCREEN_MAIN, NULL, true);
     }
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
+    if ( global_settings.rsbs_file[0] &&
+        global_settings.rsbs_file[0] != 0xff ) {
+        snprintf(buf, sizeof buf, WPS_DIR "/%s.rsbs",
+                global_settings.rsbs_file);
+        sb_skin_data_load(SCREEN_REMOTE, buf, true);
+    }
+    else
+    {
+        sb_skin_data_load(SCREEN_REMOTE, NULL, true);
+    }
     if ( global_settings.rwps_file[0])
     {
         snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
@@ -763,6 +787,7 @@ void settings_apply_skins(void)
         wps_data_load(SCREEN_REMOTE, NULL, true);
     }
 #endif
+    viewportmanager_theme_changed(THEME_STATUSBAR);
 }
 
 void settings_apply(bool read_disk)
@@ -997,7 +1022,10 @@ void settings_apply(bool read_disk)
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
     enc_global_settings_apply();
 #endif
-    viewportmanager_theme_changed(THEME_ALL);
+#ifdef HAVE_LCD_BITMAP
+    /* already called with THEME_STATUSBAR in settings_apply_skins() */
+    viewportmanager_theme_changed(THEME_UI_VIEWPORT|THEME_LANGUAGE);
+#endif
 }
 
 

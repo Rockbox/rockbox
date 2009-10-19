@@ -56,16 +56,16 @@ void viewport_set_defaults(struct viewport *vp,
  */
 
 
-#define THEME_STATUSBAR     (BIT_N(0))
-#define THEME_UI_VIEWPORT   (BIT_N(1))
-#define THEME_BUTTONBAR     (BIT_N(2))
-#define THEME_LANGUAGE      (BIT_N(3))
-#define THEME_ALL           (~(0u))
+#define THEME_STATUSBAR             (BIT_N(0))
+#define THEME_UI_VIEWPORT           (BIT_N(1))
+#define THEME_BUTTONBAR             (BIT_N(2))
+#define THEME_LANGUAGE              (BIT_N(3))
+#define THEME_ALL                   (~(0u))
 
-#define VP_SB_HIDE_ALL 0
-#define VP_SB_ONSCREEN(screen) BIT_N(screen)
-#define VP_SB_IGNORE_SETTING(screen) BIT_N(4+screen)
-#define VP_SB_ALLSCREENS (VP_SB_ONSCREEN(0)|VP_SB_ONSCREEN(1))
+#define VP_SB_HIDE_ALL                          0
+#define VP_SB_ONSCREEN(screen)                  BIT_N(screen)
+#define VP_SB_IGNORE_SETTING(screen)            BIT_N(4+screen)
+#define VP_SB_ALLSCREENS            (VP_SB_ONSCREEN(0)|VP_SB_ONSCREEN(1))
 
 #ifndef __PCTOOL__
 /*

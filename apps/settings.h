@@ -60,6 +60,7 @@ struct opt_items {
 #define FONT_DIR    ROCKBOX_DIR "/fonts"
 #define LANG_DIR    ROCKBOX_DIR "/langs"
 #define WPS_DIR     ROCKBOX_DIR "/wps"
+#define SBS_DIR     WPS_DIR
 #define THEME_DIR   ROCKBOX_DIR "/themes"
 #define ICON_DIR    ROCKBOX_DIR "/icons"
 
@@ -548,6 +549,13 @@ struct user_settings
     int peak_meter_max; /* range maximum */
 
     unsigned char wps_file[MAX_FILENAME+1];  /* last wps */
+#ifdef HAVE_LCD_BITMAP
+    unsigned char sbs_file[MAX_FILENAME+1];  /* last statusbar skin */
+#endif
+#ifdef HAVE_REMOTE_LCD
+    unsigned char rwps_file[MAX_FILENAME+1];  /* last remote-wps */
+    unsigned char rsbs_file[MAX_FILENAME+1];  /* last remote statusbar skin */
+#endif
     unsigned char lang_file[MAX_FILENAME+1]; /* last language */
     unsigned char playlist_catalog_dir[MAX_FILENAME+1];
     int skip_length; /* skip length */
@@ -722,7 +730,6 @@ struct user_settings
     bool remote_bl_filter_first_keypress; /* filter first remote keypress when remote dark? */
     unsigned char remote_icon_file[MAX_FILENAME+1];
     unsigned char remote_viewers_icon_file[MAX_FILENAME+1];
-    unsigned char rwps_file[MAX_FILENAME+1];  /* last remote-wps */
 #ifdef HAS_REMOTE_BUTTON_HOLD
     int remote_backlight_on_button_hold; /* what to do with remote backlight when hold
                                             switch is on */
