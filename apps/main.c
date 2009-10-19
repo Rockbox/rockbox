@@ -56,6 +56,7 @@
 #include "playlist.h"
 #include "buffer.h"
 #include "rolo.h"
+#include "screens.h"
 #include "usb_screen.h"
 #include "power.h"
 #include "talk.h"
