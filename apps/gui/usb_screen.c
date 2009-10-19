@@ -32,6 +32,7 @@
 #endif
 #endif
 #include "settings.h"
+#include "statusbar.h"
 #include "appevents.h"
 
 #ifdef HAVE_LCD_BITMAP
