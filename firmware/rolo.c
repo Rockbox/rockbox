@@ -173,11 +173,11 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         "mov   pc, r0            \n"
     );
 
-#elif defined(CPU_TCC780X) || (CONFIG_CPU == S3C2440) || \
-      (CONFIG_CPU==DM320) || defined(CPU_S5L870X)
+#elif defined(CPU_ARM)
+#ifdef HAVE_CPUCACHE_INVALIDATE
     /* Flush and invalidate caches */
     cpucache_invalidate();
-
+#endif
     asm volatile(
         "mov   pc, %0            \n"
         : : "r"(dest)
@@ -237,9 +237,7 @@ int rolo_load(const char* filename)
 
     length = filesize(fd) - FIRMWARE_OFFSET_FILE_DATA;
 
-#if defined(CPU_COLDFIRE) || defined(CPU_PP) || (CONFIG_CPU==DM320) \
-    || defined(CPU_TCC780X) || (CONFIG_CPU==IMX31L) || (CONFIG_CPU == S3C2440) \
-    || (CONFIG_CPU==AS3525) || (CONFIG_CPU==JZ4732) || defined(CPU_S5L870X)
+#if CONFIG_CPU != SH7034
     /* Read and save checksum */
     lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
     if (read(fd, &file_checksum, 4) != 4) {
@@ -304,7 +302,7 @@ int rolo_load(const char* filename)
     set_irq_level(DISABLE_INTERRUPTS);
 #endif
 
-#elif CONFIG_CPU == SH7034
+#else /* CONFIG_CPU == SH7034 */
     /* Read file length from header and compare to real file length */
     lseek(fd, FIRMWARE_OFFSET_FILE_LENGTH, SEEK_SET);
     if(read(fd, &file_length, 4) != 4) {
