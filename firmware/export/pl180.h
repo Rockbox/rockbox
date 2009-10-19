@@ -56,6 +56,23 @@
 #define MCI_POWER_ON            0x3
 
 /* bits 5:2 are the voltage */
+#define MCI_VDD_2_0              (0<<2)      /* 2.0 - 2.6 comm only  */
+#define MCI_VDD_2_1              (1<<2)
+#define MCI_VDD_2_2              (2<<2)
+#define MCI_VDD_2_3              (3<<2)
+#define MCI_VDD_2_4              (4<<2)
+#define MCI_VDD_2_5              (5<<2)
+#define MCI_VDD_2_6              (6<<2)
+
+#define MCI_VDD_2_7              (7<<2)     /*  2.7 - 3.6  Data Transfer  */
+#define MCI_VDD_2_8              (8<<2)
+#define MCI_VDD_2_9              (9<<2)
+#define MCI_VDD_3_0              (10<<2)
+#define MCI_VDD_3_1              (11<<2)
+#define MCI_VDD_3_2              (12<<2)
+#define MCI_VDD_3_3              (13<<2)
+#define MCI_VDD_3_4              (14<<2)
+#define MCI_VDD_3_5              (15<<2)
 
 #define MCI_POWER_OPEN_DRAIN    (1<<6)
 #define MCI_POWER_ROD           (1<<7)
