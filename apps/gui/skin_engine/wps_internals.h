@@ -77,14 +77,14 @@
 
 #ifdef HAVE_LCD_BITMAP
 struct gui_img {
-    char label;
-    struct bitmap bm;
     struct viewport* vp;    /* The viewport to display this image in */
     short int x;                  /* x-pos */
     short int y;                  /* y-pos */
     short int num_subimages;      /* number of sub-images */
     short int subimage_height;    /* height of each sub-image */
     short int display;            /* -1 for no display, 0..n to display a subimage */
+    struct bitmap bm;
+    char label;
     bool loaded;            /* load state */
     bool always_display;    /* not using the preload/display mechanism */
 };
