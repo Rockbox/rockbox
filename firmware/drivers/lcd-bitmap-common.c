@@ -262,8 +262,7 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
     s->start_tick = current_tick + LCDFN(scroll_info).delay;
     s->style = style;
 
-    memset(s->line, 0, sizeof s->line);
-    strcpy(s->line, string);
+    strlcpy(s->line, string, sizeof s->line);
 
     /* get width */
     s->width = LCDFN(getstringsize)(s->line, &w, &h);
