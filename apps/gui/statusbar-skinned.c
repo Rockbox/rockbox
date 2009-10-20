@@ -43,7 +43,6 @@ static struct wps_sync_data sb_skin_sync_data        = { .do_full_update = false
 /* initial setup of wps_data  */
 static void sb_skin_update(void*);
 static bool loaded_ok[NB_SCREENS] = { false };
-static int skinbars = 0;
 static int update_delay = DEFAULT_UPDATE_DELAY;
 
 
@@ -85,6 +84,7 @@ struct viewport *sb_skin_get_info_vp(enum screen_type screen)
 
 inline bool sb_skin_get_state(enum screen_type screen)
 {
+    int skinbars = sb_skin[screen].sync_data->statusbars;
     return loaded_ok[screen] && (skinbars & VP_SB_ONSCREEN(screen));
 }
 
@@ -103,7 +103,7 @@ static void do_update_callback(void *param)
 void sb_skin_set_state(int state, enum screen_type screen)
 {
     sb_skin[screen].sync_data->do_full_update = true;
-    skinbars = sb_skin[screen].sync_data->statusbars;
+    int skinbars = sb_skin[screen].sync_data->statusbars;
     if (state)
     {
         skinbars |= VP_SB_ONSCREEN(screen);
