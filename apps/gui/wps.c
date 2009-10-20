@@ -78,13 +78,11 @@
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
 
-/* this is for the viewportmanager */
-static int wpsbars = 0;
-
 /* currently only one wps_state is needed, initialize to 0 */
-        struct wps_state     wps_state               = { .id3 = NULL };
+       struct wps_state     wps_state               = { .id3 = NULL };
 static struct gui_wps       gui_wps[NB_SCREENS]     = {{ .data = NULL }};
 static struct wps_data      wps_datas[NB_SCREENS]   = {{ .wps_loaded = 0 }};
+static struct wps_sync_data wps_sync_data           = { .do_full_update = false };
 
 /* initial setup of wps_data  */
 static void wps_state_init(void);
@@ -565,7 +563,7 @@ static void play_hop(int direction)
 static void wps_lcd_activation_hook(void *param)
 {
     (void)param;
-    wps_state.do_full_update = true;
+    wps_sync_data.do_full_update = true;
     /* force timeout in wps main loop, so that the update is instantly */
     queue_post(&button_queue, BUTTON_NONE, 0);
 }
@@ -1127,7 +1125,7 @@ long gui_wps_show(void)
              /* this case is used by the softlock feature
               * it requests a full update here */
             case ACTION_REDRAW:
-                wps_state.do_full_update = true;
+                wps_sync_data.do_full_update = true;
                 break;
             case ACTION_NONE: /* Timeout, do a partial update */
                 update = true;
@@ -1157,7 +1155,7 @@ long gui_wps_show(void)
                 break;
         }
 
-        if (wps_state.do_full_update || update)
+        if (wps_sync_data.do_full_update || update)
         {
 #if defined(HAVE_BACKLIGHT) || defined(HAVE_REMOTE_LCD)
             gwps_caption_backlight(&wps_state);
@@ -1173,13 +1171,7 @@ long gui_wps_show(void)
                     skin_update(&gui_wps[i], WPS_REFRESH_NON_STATIC);
                 }
             }
-            /* currently skinned statusbar and wps share the same wps_state,
-             * don't steal do_full_update away */
-            if (wps_state.do_full_update)
-            {
-                send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
-                wps_state.do_full_update = false;
-            }
+            wps_sync_data.do_full_update = false;
             update = false;
         }
 
@@ -1242,13 +1234,13 @@ static void track_changed_callback(void *param)
         cue_find_current_track(wps_state.id3->cuesheet, wps_state.id3->elapsed);
         cue_spoof_id3(wps_state.id3->cuesheet, wps_state.id3);
     }
-    wps_state.do_full_update = true;
+    wps_sync_data.do_full_update = true;
 }
 static void nextid3available_callback(void* param)
 {
     (void)param;
     wps_state.nid3 = audio_next_track();
-    wps_state.do_full_update = true;
+    wps_sync_data.do_full_update = true;
 }
 
 
@@ -1267,7 +1259,7 @@ static void wps_state_init(void)
         wps_state.nid3 = NULL;
     }
     /* We'll be updating due to restore initialized with true */
-    wps_state.do_full_update = false;
+    wps_sync_data.do_full_update = false;
     /* add the WPS track event callbacks */
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, track_changed_callback);
     add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false, nextid3available_callback);
@@ -1280,7 +1272,8 @@ static void statusbar_toggle_handler(void *data)
     (void)data;
     int i;
 
-    wpsbars = VP_SB_HIDE_ALL;
+    int *wpsbars = &wps_sync_data.statusbars;
+    *wpsbars = VP_SB_HIDE_ALL;
     FOR_NB_SCREENS(i)
     {   /* fix viewports if needed */
         skin_statusbar_changed(&gui_wps[i]);
@@ -1293,7 +1286,7 @@ static void statusbar_toggle_handler(void *data)
         else if (statusbar_position(i) != STATUSBAR_OFF)
             draw = true;
         if (draw)
-            wpsbars |=
+            *wpsbars |=
                     (VP_SB_ONSCREEN(i) | VP_SB_IGNORE_SETTING(i));
     }
 }
@@ -1318,10 +1311,10 @@ void gui_sync_wps_init(void)
            so use the only available ( "global" ) one */
         gui_wps[i].state = &wps_state;
         gui_wps[i].display->backdrop_unload(BACKDROP_SKIN_WPS);
-        /* only one wpsbars needed/wanted */
-        gui_wps[i].statusbars = &wpsbars;
+        /* must point to the same struct for both screens */
+        gui_wps[i].sync_data = &wps_sync_data;
+        gui_wps[i].sync_data->statusbars = VP_SB_ALLSCREENS;
     }
-    *(gui_wps[SCREEN_MAIN].statusbars) =VP_SB_ALLSCREENS;
 #ifdef HAVE_LCD_BITMAP
     add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, statusbar_toggle_handler);
 #endif

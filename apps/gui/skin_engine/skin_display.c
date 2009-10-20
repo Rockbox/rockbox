@@ -100,9 +100,9 @@ bool skin_update(struct gui_wps *gwps, unsigned int update_type)
      * called from. This is also safe for skined screen which dont use the id3 */
     struct mp3entry *id3 = gwps->state->id3;
     bool cuesheet_update = (id3 != NULL ? cuesheet_subtrack_changed(id3) : false);
-    gwps->state->do_full_update = cuesheet_update || gwps->state->do_full_update;
+    gwps->sync_data->do_full_update |= cuesheet_update;
 
-    retval = skin_redraw(gwps, gwps->state->do_full_update ?
+    retval = skin_redraw(gwps, gwps->sync_data->do_full_update ?
                                         WPS_REFRESH_ALL : update_type);
     return retval;
 }
@@ -1145,7 +1145,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 
     if (refresh_mode & WPS_REFRESH_STATUSBAR)
     {
-        viewportmanager_set_statusbar(*gwps->statusbars);
+        viewportmanager_set_statusbar(gwps->sync_data->statusbars);
     }
     /* Restore the default viewport */
     display->set_viewport(NULL);

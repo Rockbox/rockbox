@@ -296,9 +296,19 @@ struct wps_state
     bool wps_time_countup;
     struct mp3entry* id3;
     struct mp3entry* nid3;
-    bool do_full_update;
 };
 
+/* Holds data for all screens in a skin. */
+struct wps_sync_data
+{
+    /* suitable for the viewportmanager, possibly only temporary here
+     * needs to be same for all screens! can't be split up for screens
+     * due to what viewportmanager_set_statusbar() accepts
+     * (FIXME?) */
+    int statusbars;
+    /* indicates whether the skin needs a full update for all screens */
+    bool do_full_update;
+};
 
 /* change the ff/rew-status
    if ff_rew = true then we are in skipping mode
@@ -318,12 +328,8 @@ struct gui_wps
     struct screen *display;
     struct wps_data *data;
     struct wps_state *state;
-
-    /* suitable for the viewportmanager, possibly only temporary here
-     * needs to be same for all screens! can't be split up for screens
-     * due to what viewportmanager_set_statusbar() accepts
-     * (FIXME?) */
-    int *statusbars;
+    /* must point to the same struct for all screens */
+    struct wps_sync_data *sync_data;
 };
 
 /* gui_wps end */
