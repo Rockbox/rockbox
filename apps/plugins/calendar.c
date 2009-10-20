@@ -279,7 +279,7 @@ static bool been_in_usb_mode = false;
 static int is_leap_year(int yr)
 {
     return ((yr) <= 1752 ? !((yr) % 4) : \
-    (!((yr) % 4) && ((yr) % 100)) || !((yr) % 400))  ? 1:0 ;
+        (!((yr) % 4) && ((yr) % 100)) || !((yr) % 400))  ? 1:0 ;
 }
 
 /* searches the weekday of the first day in month,
@@ -287,28 +287,25 @@ static int is_leap_year(int yr)
 static int calc_weekday( struct shown *shown )
 {
     return ( shown->wday + 36 - shown->mday ) % 7 ;
-
 }
 
 static void calendar_init(struct shown *shown)
 {
-    int w,h;
+    int w, h;
 #if CONFIG_RTC
     struct tm *tm;
 #endif
-    rb->lcd_getstringsize("A",&w,&h);
+    rb->lcd_getstringsize("A", &w, &h);
     if ( ((w * 14) > LCD_WIDTH) || ((h * 7) > LCD_HEIGHT) )
     {
-        rb->lcd_setfont(FONT_SYSFIXED);
         use_system_font = true;
     }
-    rb->lcd_clear_display();
 #if CONFIG_RTC
     tm = rb->get_time();
     shown->mday = tm->tm_mday;
-    shown->mon = tm->tm_mon +1;
-    shown->year = 2000+tm->tm_year%100;
-    shown->wday = tm->tm_wday-1;
+    shown->mon = tm->tm_mon + 1;
+    shown->year = 2000 + (tm->tm_year%100);
+    shown->wday = tm->tm_wday - 1;
 #endif
     shown->firstday = calc_weekday(shown);
     leap_year = is_leap_year(shown->year);
@@ -316,47 +313,47 @@ static void calendar_init(struct shown *shown)
 
 static void draw_headers(void)
 {
-    int i,w,h;
+    int i, w, h;
     int x = X_OFFSET;
-    const char **dayname = (const char**)&dayname_long;
+    const char **dayname = dayname_long;
 
     for (i = 0; i < 7; i++)
     {
-        rb->lcd_getstringsize(dayname[i],&w,&h);
+        rb->lcd_getstringsize(dayname[i], &w, &h);
         if (w > CELL_WIDTH)
         {
-            dayname = (const char**)&dayname_short;
+            dayname = dayname_short;
             break;
         }
     }
 
-    rb->lcd_getstringsize("A",&w,&h);
+    rb->lcd_getstringsize("A", &w, &h);
     for (i = 0; i < 7; i++)
     {
-        rb->lcd_putsxy(x, 0 , dayname[i]);
+        rb->lcd_putsxy(x, 0, dayname[i]);
         x += CELL_WIDTH;
     }
-    rb->lcd_hline(0, LCD_WIDTH-1 ,h);
+    rb->lcd_hline(0, LCD_WIDTH-1, h);
 }
 
 static bool day_has_memo[32];
 static bool wday_has_memo[7];
 static void draw_calendar(struct shown *shown)
 {
-    int w,h;
-    int x,y,pos,days_per_month,j;
-    char buffer[9];
+    int w, h;
+    int x, y, pos, days_per_month, j;
+    char buffer[12];
     const char *monthname[] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
     if(use_system_font)
+    {
         rb->lcd_setfont(FONT_SYSFIXED);
-    rb->lcd_getstringsize("A",&w,&h);
+    }
+    rb->lcd_getstringsize("A", &w, &h);
     rb->lcd_clear_display();
     draw_headers();
-    if (shown->firstday > 6)
-        shown->firstday -= 7;
     pos = shown->firstday;
     days_per_month = days_in_month[leap_year][shown->mon];
     x = X_OFFSET + (pos * CELL_WIDTH);
@@ -364,9 +361,9 @@ static void draw_calendar(struct shown *shown)
     for (j = 1; j <= days_per_month; j++)
     {
         if ( (day_has_memo[j]) || (wday_has_memo[pos]) )
-            rb->snprintf(buffer,4,"%02d.", j);
+            rb->snprintf(buffer, 4, "%02d.", j);
         else
-            rb->snprintf(buffer,4,"%02d", j);
+            rb->snprintf(buffer, 4, "%02d", j);
         if (shown->mday == j)
         {
             rb->lcd_set_drawmode(DRMODE_SOLID);
@@ -388,12 +385,13 @@ static void draw_calendar(struct shown *shown)
             y += CELL_HEIGHT;
         }
     }
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_vline(LCD_WIDTH-w*8-10,LCD_HEIGHT-h-3,LCD_HEIGHT-1);
-    rb->lcd_hline(LCD_WIDTH-w*8-10,LCD_WIDTH-1,LCD_HEIGHT-h-3);
-    rb->snprintf(buffer,9,"%s %04d",monthname[shown->mon-1],shown->year);
-    rb->lcd_putsxy(LCD_WIDTH-w*8-8,LCD_HEIGHT-h-1,buffer);
     shown->lastday = pos;
+    rb->lcd_set_drawmode(DRMODE_SOLID);
+    rb->lcd_vline(LCD_WIDTH-w*8-10, LCD_HEIGHT-h-3, LCD_HEIGHT-1);
+    rb->lcd_hline(LCD_WIDTH-w*8-10, LCD_WIDTH-1, LCD_HEIGHT-h-3);
+    rb->snprintf(buffer, sizeof(buffer), "%s %04d",
+                 monthname[shown->mon-1], shown->year);
+    rb->lcd_putsxy(LCD_WIDTH-w*8-8, LCD_HEIGHT-h-1, buffer);
     rb->lcd_update();
 }
 
@@ -435,54 +433,38 @@ static void load_memo(struct shown *shown)
         while (!exit)
         {
             bool load_to_memory;
-            rb->memset(&memos[memos_in_memory].message, 0, MAX_CHAR_MEMO_LEN);
-            memos[memos_in_memory].file_pointer_start =
-                                                    rb->lseek(fp, 0, SEEK_CUR);
+            struct memo *memo = &memos[memos_in_memory];
+            rb->memset(memo, 0, sizeof(*memo));
+            memo->file_pointer_start = rb->lseek(fp, 0, SEEK_CUR);
             if (rb->read(fp, temp_memo2, 2) == 2)
-                memos[memos_in_memory].day = rb->atoi(&temp_memo2[0]);
-            else
-                memos[memos_in_memory].day = 0;
+                memo->day = rb->atoi(temp_memo2);
             if (rb->read(fp, temp_memo2, 2) == 2)
-                memos[memos_in_memory].month = rb->atoi(&temp_memo2[0]);
-            else
-                memos[memos_in_memory].month = 0;
+                memo->month = rb->atoi(temp_memo2);
             if (rb->read(fp, temp_memo4, 4) == 4)
-                memos[memos_in_memory].year = rb->atoi(&temp_memo4[0]);
-            else
-                memos[memos_in_memory].year = 0;
-            /* as the year returned is sometimes yearmonth, ie if yr should =
-               2003, and month = 06, then it returns 200306 */
-            if (memos[memos_in_memory].year > (shown->year * 10))
-                memos[memos_in_memory].year = (memos[memos_in_memory].year -
-                                               memos[memos_in_memory].month) /
-                                               100;
+                memo->year = rb->atoi(temp_memo4);
             if (rb->read(fp, temp_memo1, 1) == 1)
-                memos[memos_in_memory].wday = rb->atoi(&temp_memo1[0]);
-            else
-                memos[memos_in_memory].wday = 0;
+                memo->wday = rb->atoi(temp_memo1);
             if (rb->read(fp, temp_memo1, 1) == 1)
-                memos[memos_in_memory].type = rb->atoi(&temp_memo1[0]);
-            else
-                memos[memos_in_memory].type = 0;
-            load_to_memory = ((memos[memos_in_memory].type < 2) ||
-                              ((memos[memos_in_memory].type == 2) &&
-                                  (memos[memos_in_memory].month == shown->mon)) ||
-                              ((memos[memos_in_memory].type > 2) &&
-                                  (memos[memos_in_memory].month == shown->mon) &&
-                                  (memos[memos_in_memory].year == shown->year)));
+                memo->type = rb->atoi(temp_memo1);
+            load_to_memory = ((memo->type < 2) ||
+                              ((memo->type == 2) &&
+                                  (memo->month == shown->mon)) ||
+                              ((memo->type > 2) &&
+                                  (memo->month == shown->mon) &&
+                                  (memo->year == shown->year)));
             k = 0;
             while (1)
             {
                 if (rb->read(fp, temp_memo1, 1) != 1)
                 {
-                    memos[memos_in_memory].day = 0;
-                    memos[memos_in_memory].month = 0;
-                    memos[memos_in_memory].file_pointer_start = 0;
-                    memos[memos_in_memory].file_pointer_end = 0;
-                    memos[memos_in_memory].year = 0;
-                    memos[memos_in_memory].type = 0;
-                    memos[memos_in_memory].wday = 0;
-                    memos[memos_in_memory].message[0] = 0;
+                    memo->day = 0;
+                    memo->month = 0;
+                    memo->file_pointer_start = 0;
+                    memo->file_pointer_end = 0;
+                    memo->year = 0;
+                    memo->type = 0;
+                    memo->wday = 0;
+                    memo->message[0] = 0;
                     exit = true;
                     break;
                 }
@@ -490,19 +472,17 @@ static void load_memo(struct shown *shown)
                 {
                     if (temp_memo1[0] == '\n')
                     {
-                        if (memos[memos_in_memory].type > 0)
-                            day_has_memo[memos[memos_in_memory].day] =
-                                true;
+                        if (memo->type > 0)
+                            day_has_memo[memo->day] = true;
                         else
-                            wday_has_memo[memos[memos_in_memory].wday] =
-                                true;
-                        memos[memos_in_memory++].file_pointer_end =
-                            rb->lseek(fp, 0, SEEK_CUR);
+                            wday_has_memo[memo->wday] = true;
+                        memo->file_pointer_end = rb->lseek(fp, 0, SEEK_CUR);
+                        memos_in_memory++;
                     }
                     else if ( (temp_memo1[0] != '\r') &&
                               (temp_memo1[0] != '\t') &&
                               k < MAX_CHAR_MEMO_LEN-1 )
-                        memos[memos_in_memory].message[k++] = temp_memo1[0];
+                        memo->message[k++] = temp_memo1[0];
                 }
                 if (temp_memo1[0] == '\n')
                     break;
@@ -514,7 +494,7 @@ static void load_memo(struct shown *shown)
 
 static bool save_memo(int changed, bool new_mod, struct shown *shown)
 {
-    int fp,fq;
+    int fp, fq;
     /* use O_RDWR|O_CREAT so that file is created if it doesn't exist. */
     fp = rb->open(MEMO_FILE, O_RDWR|O_CREAT);
     fq = rb->creat(TEMP_FILE);
@@ -522,26 +502,23 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
     {
         int i;
         char temp[MAX_CHAR_MEMO_LEN];
+        struct memo *memo = &memos[changed];
         rb->lseek(fp, 0, SEEK_SET);
-        for (i = 0; i < memos[changed].file_pointer_start; i++)
+        for (i = 0; i < memo->file_pointer_start; i++)
         {
             rb->read(fp, temp, 1);
-            rb->write(fq,temp,1);
+            rb->write(fq, temp, 1);
         }
         if (new_mod)
         {
             rb->fdprintf(fq, "%02d%02d%04d%01d%01d%s\n",
-                         memos[changed].day,
-                         memos[changed].month,
-                         memos[changed].year,
-                         memos[changed].wday,
-                         memos[changed].type,
-                         memos[changed].message);
+                         memo->day, memo->month, memo->year, memo->wday,
+                         memo->type, memo->message);
         }
-        rb->lseek(fp, memos[changed].file_pointer_end, SEEK_SET);
+        rb->lseek(fp, memo->file_pointer_end, SEEK_SET);
         while(rb->read(fp, temp, 1) == 1)
         {
-            rb->write(fq,temp,1);
+            rb->write(fq, temp, 1);
         }
         rb->close(fp);
         rb->close(fq);
@@ -560,41 +537,39 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
 static void add_memo(struct shown *shown, int type)
 {
     bool saved = false;
-    if (rb->kbd_input(memos[memos_in_memory].message,
-                      sizeof memos[memos_in_memory].message) == 0)
+    struct memo *memo = &memos[memos_in_memory];
+    if (rb->kbd_input(memo->message, MAX_CHAR_MEMO_LEN) == 0)
     {
-        if (rb->strlen(memos[memos_in_memory].message))
+        if (memo->message[0])
         {
-            memos[memos_in_memory].file_pointer_start = 0;
-            memos[memos_in_memory].file_pointer_end = 0;
-            memos[memos_in_memory].day = shown->mday;
-            memos[memos_in_memory].month = shown->mon;
-            memos[memos_in_memory].wday = shown->wday;
-            memos[memos_in_memory].year = shown->year;
-            memos[memos_in_memory].type = type;
-            if (save_memo(memos_in_memory,true,shown))
+            memo->file_pointer_start = 0;
+            memo->file_pointer_end = 0;
+            memo->day = shown->mday;
+            memo->month = shown->mon;
+            memo->wday = shown->wday;
+            memo->year = shown->year;
+            memo->type = type;
+            if (save_memo(memos_in_memory, true, shown))
             {
                 saved = true;
             }
             else
             {
-                memos[memos_in_memory].file_pointer_start = 0;
-                memos[memos_in_memory].file_pointer_end = 0;
-                memos[memos_in_memory].day = 0;
-                memos[memos_in_memory].month = 0;
-                memos[memos_in_memory].year = 0;
-                memos[memos_in_memory].type = 0;
-                memos[memos_in_memory].wday = 0;
+                memo->file_pointer_start = 0;
+                memo->file_pointer_end = 0;
+                memo->day = 0;
+                memo->month = 0;
+                memo->year = 0;
+                memo->type = 0;
+                memo->wday = 0;
             }
         }
     }
     rb->lcd_clear_display();
-    if(use_system_font)
-        rb->lcd_setfont(FONT_SYSFIXED);
     if (saved)
-        rb->splash(HZ/2,"Event added");
+        rb->splash(HZ/2, "Event added");
     else
-        rb->splash(HZ/2,"Event not added");
+        rb->splash(HZ/2, "Event not added");
 }
 
 static int edit_menu_cb(int action, const struct menu_item_ex *this_item)
@@ -622,29 +597,29 @@ static bool edit_memo(int change, struct shown *shown)
         switch (rb->do_menu(&edit_menu, &selected, NULL, false))
         {
             case 0: /* remove */
-                save_memo(pointer_array[change],false,shown);
+                save_memo(change, false, shown);
                 return false;
 
             case 1: /* edit */
-                if(rb->kbd_input(memos[pointer_array[change]].message,
-                           sizeof memos[pointer_array[change]].message)  == 0)
-                    save_memo(pointer_array[change],true,shown);
+                if(rb->kbd_input(memos[change].message,
+                                 MAX_CHAR_MEMO_LEN)  == 0)
+                    save_memo(change, true, shown);
                 return false;
 
             case 2: /* weekly */
-                add_memo(shown,0);
+                add_memo(shown, 0);
                 return false;
 
             case 3: /* monthly */
-                add_memo(shown,1);
+                add_memo(shown, 1);
                 return false;
 
             case 4: /* yearly */
-                add_memo(shown,2);
+                add_memo(shown, 2);
                 return false;
 
             case 5: /* one off */
-                add_memo(shown,3);
+                add_memo(shown, 3);
                 return false;
 
             case 6: /* playback control */
@@ -666,17 +641,17 @@ static const char* get_event_text(int selected, void *data,
                                   char *buffer, size_t buffer_len)
 {
     struct shown *shown = (struct shown *) data;
+    struct memo *memo;
     if (selected < 0 || memos_in_shown_memory <= selected)
     {
         return NULL;
     }
-    if (memos[pointer_array[selected]].type == 2)
+    memo = &memos[pointer_array[selected]];
+    if (memo->type == 2)
         rb->snprintf(buffer, buffer_len, "%s (%d yrs)",
-                     memos[pointer_array[selected]].message,
-                     shown->year - memos[pointer_array[selected]].year);
+                     memo->message, shown->year - memo->year);
     else
-        rb->snprintf(buffer, buffer_len, "%s",
-                     memos[pointer_array[selected]].message);
+        rb->snprintf(buffer, buffer_len, "%s", memo->message);
     return buffer;
 }
 
@@ -694,14 +669,14 @@ static bool view_events(int selected, struct shown *shown)
 
     while (!exit)
     {
-        button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        rb->gui_synclist_do_button(&gui_memos,&button,LIST_WRAP_UNLESS_HELD);
+        button = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
+        rb->gui_synclist_do_button(&gui_memos, &button, LIST_WRAP_UNLESS_HELD);
 
         switch (button)
         {
             case ACTION_STD_OK:
                 selected = rb->gui_synclist_get_sel_pos(&gui_memos);
-                return edit_memo(selected, shown);
+                return edit_memo(pointer_array[selected], shown);
                 break;
 
             case ACTION_STD_CANCEL:
@@ -721,13 +696,15 @@ static bool view_events(int selected, struct shown *shown)
 static void update_memos_shown(struct shown *shown)
 {
     int i;
+    struct memo *memo;
     memos_in_shown_memory = 0;
     for (i = 0; i < memos_in_memory; i++)
-        if (((memos[i].type >= 1) &&
-                (memos[i].day == shown->mday)) ||
-            ((memos[i].type < 1) &&
-                (memos[i].wday == shown->wday)))
+    {
+        memo = &memos[i];
+        if (((memo->type >= 1) && (memo->day == shown->mday)) ||
+            ((memo->type < 1) && (memo->wday == shown->wday)))
             pointer_array[memos_in_shown_memory++] = i;
+    }
 }
 
 static bool any_events(struct shown *shown, bool force)
@@ -749,7 +726,7 @@ static void next_month(struct shown *shown, int step)
     shown->mon++;
     if (shown->mon > 12)
     {
-        shown->mon=1;
+        shown->mon = 1;
         shown->year++;
         leap_year = is_leap_year(shown->year);
     }
@@ -776,6 +753,8 @@ static void prev_month(struct shown *shown, int step)
     else if (shown->mday > days_in_month[leap_year][shown->mon])
         shown->mday = days_in_month[leap_year][shown->mon];
     shown->firstday += 7 - (days_in_month[leap_year][shown->mon] % 7);
+    if (shown->firstday >= 7)
+        shown->firstday -= 7;
     load_memo(shown);
     draw_calendar(shown);
 }
