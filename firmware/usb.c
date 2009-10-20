@@ -109,6 +109,10 @@ static void try_reboot(void)
 #endif /* CONFIG_CPU */
 #endif /* IPOD_ARCH */
 
+#ifdef IPOD_NANO2G
+    memcpy((void *)0x0002bf00, "diskmodehotstuff\1\0\0\0", 20);
+#endif
+
     system_reboot(); /* Reboot */
 }
 #endif /* USB_FIRWIRE_HANDLING || (HAVE_USBSTACK && !USE_ROCKBOX_USB) */

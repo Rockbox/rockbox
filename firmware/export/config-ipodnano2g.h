@@ -161,9 +161,6 @@
 /* USB On-the-go */
 //#define CONFIG_USBOTG USBOTG_M5636
 
-/* We reboot into the OF to handle USB */
-#define USB_HANDLED_BY_OF
-
 /* Define this if you can read an absolute wheel position */
 #define HAVE_WHEEL_POSITION
 
@@ -201,3 +198,12 @@
 #define MIN_BRIGHTNESS_SETTING      1
 #define MAX_BRIGHTNESS_SETTING      0x2e
 #define DEFAULT_BRIGHTNESS_SETTING  0x20
+
+/* USB defines */
+#define HAVE_USBSTACK
+#define USB_ENABLE_STORAGE
+#define USB_VENDOR_ID 0x05AC
+#define USB_PRODUCT_ID 0x1260
+#define USB_NUM_ENDPOINTS 5
+/* #define USE_ROCKBOX_USB - needs testing */
+#define USB_DEVBSS_ATTR __attribute__((aligned(16)))

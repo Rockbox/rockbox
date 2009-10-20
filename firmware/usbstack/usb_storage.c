@@ -44,7 +44,9 @@
 #define RAMDISK_SIZE 2048
 #endif
 
+#ifndef SECTOR_SIZE
 #define SECTOR_SIZE 512
+#endif
 
 /* the ARC driver currently supports up to 64k USB transfers. This is
  * enough for efficient mass storage support, as commonly host OSes
@@ -454,7 +456,11 @@ void usb_storage_init_connection(void)
     unsigned char * audio_buffer;
 
     audio_buffer = audio_get_buffer(false,&bufsize);
+#ifdef UNCACHED_ADDR
     cbw_buffer = (void *)UNCACHED_ADDR((unsigned int)(audio_buffer+31) & 0xffffffe0);
+#else
+    cbw_buffer = (void *)((unsigned int)(audio_buffer+31) & 0xffffffe0);
+#endif
     tb.transfer_buffer = cbw_buffer + 1024;
     cpucache_invalidate();
 #ifdef USB_USE_RAMDISK
