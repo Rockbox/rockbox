@@ -110,8 +110,26 @@ void EXT3(void)
 #if CONFIG_CHARGING
 unsigned int power_input_status(void)
 {
-    return ((GPIOC & (1<<26)) == 0) ?
-        POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
+    /* Players with a PCF50606 can use GPIOs to determine whether AC is inserted
+       and whether charging is taking place. Newer players re-use C26 for the
+       touchscreen, so we need to monitor PCF50635 USB/adapter IRQs for this. */
+    
+    if (get_pmu_type() == PCF50606)
+    {
+        /* Check AC adapter */
+        if (GPIOD & (1<<23))
+            return POWER_INPUT_MAIN_CHARGER;
+        
+        /* C26 indicates charging, without AC connected it implies USB power */
+        if ((GPIOC & (1<<26)) == 0)
+            return POWER_INPUT_USB_CHARGER;
+    }
+    else
+    {
+        /* TODO: use adapter/usb connection state from PCF50635 driver */
+    }
+    
+    return POWER_INPUT_NONE;
 }
 #endif
 
