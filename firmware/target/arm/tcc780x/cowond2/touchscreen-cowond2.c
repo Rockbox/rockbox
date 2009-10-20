@@ -39,30 +39,13 @@ static int short_cmp(const void *a, const void *b)
     return *(short*)a - *(short*)b;
 }
 
-struct touch_calibration_point {
-    short px_x; /* known pixel value */
-    short px_y;
-    short val_x; /* touchscreen value at the known pixel */
-    short val_y;
-};
-
-static struct touch_calibration_point topleft, bottomright;
-
 static int touch_to_pixels(short val_x, short val_y)
 {
-    short x, y;
-
-    x = val_x;
-    y = val_y;
-
-    x = (x - topleft.val_x) * (bottomright.px_x - topleft.px_x)
-    / (bottomright.val_x - topleft.val_x) + topleft.px_x;
-
-    y = (y - topleft.val_y) * (bottomright.px_y - topleft.px_y)
-    / (bottomright.val_y - topleft.val_y) + topleft.px_y;
+    int x = (val_x * LCD_WIDTH) >> 10;
+    int y = (val_y * LCD_HEIGHT) >> 10;
 
     if (x < 0)
-    x = 0;
+        x = 0;
     else if (x >= LCD_WIDTH)
         x = LCD_WIDTH - 1;
 
@@ -161,19 +144,6 @@ static int touchscreen_read_tsc200x(int *data, int *old_data)
 void touchscreen_init_device(void)
 {
     touch_available = false;
-
-    /* Arbitrary touchscreen calibration */
-    topleft.px_x = 0;
-    topleft.px_y = 0;
-
-    bottomright.px_x = LCD_WIDTH;
-    bottomright.px_y = LCD_HEIGHT;
-
-    topleft.val_x = 50;
-    topleft.val_y = 50;
-
-    bottomright.val_x = 980;
-    bottomright.val_y = 980;
     
     if (get_pmu_type() != PCF50606)
     {
