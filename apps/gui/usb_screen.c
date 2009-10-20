@@ -47,11 +47,11 @@
 #include "ata_mmc.h"
 #endif
 
-#ifndef SIMULATOR
-
 #ifdef USB_ENABLE_HID
 int usb_keypad_mode;
 #endif
+
+#ifndef SIMULATOR
 
 static int handle_usb_events(void)
 {
