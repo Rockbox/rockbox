@@ -267,13 +267,14 @@ Lyre prototype 1 */
 #define RTC_D2       18 /* Either PCF50606 or PCF50635 */ 
 
 /* USB On-the-go */
-#define USBOTG_M66591  6591 /* M:Robe 500 */
-#define USBOTG_ISP1362 1362 /* iriver H300 */
-#define USBOTG_ISP1583 1583 /* Creative Zen Vision:M */
-#define USBOTG_M5636   5636 /* iAudio X5 */
-#define USBOTG_ARC     5020 /* PortalPlayer 502x */
-#define USBOTG_JZ4740  4740 /* Ingenic Jz4740/Jz4732 */
-#define USBOTG_AS3525  3525 /* AMS AS3525 */
+#define USBOTG_M66591   6591 /* M:Robe 500 */
+#define USBOTG_ISP1362  1362 /* iriver H300 */
+#define USBOTG_ISP1583  1583 /* Creative Zen Vision:M */
+#define USBOTG_M5636    5636 /* iAudio X5 */
+#define USBOTG_ARC      5020 /* PortalPlayer 502x */
+#define USBOTG_JZ4740   4740 /* Ingenic Jz4740/Jz4732 */
+#define USBOTG_AS3525   3525 /* AMS AS3525 */
+#define USBOTG_S3C6400X 6400 /* Samsung S3C6400X, also used in the S5L8701 */
 
 /* Multiple cores */
 #define CPU 0
@@ -838,6 +839,9 @@ Lyre prototype 1 */
 #define USB_HAS_INTERRUPT
 #elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
 #define USB_HAS_BULK
+#elif CONFIG_USBOTG == USBOTG_S3C6400X
+#define USB_HAS_BULK
+#define USB_HAS_INTERRUPT
 #endif /* CONFIG_USBOTG */
 
 /* define the class drivers to enable */
@@ -847,7 +851,7 @@ Lyre prototype 1 */
 #if  (defined(TOSHIBA_GIGABEAT_S) || \
      (defined(CREATIVE_ZVx) || \
      defined(CPU_TCC77X) || defined(CPU_TCC780X))) || \
-     (CONFIG_USBOTG == USBOTG_JZ4740)
+     (CONFIG_USBOTG == USBOTG_JZ4740) || defined(IPOD_NANO2G)
 #define USB_ENABLE_STORAGE
 #endif
 
