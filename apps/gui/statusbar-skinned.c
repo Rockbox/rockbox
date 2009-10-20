@@ -118,13 +118,19 @@ void sb_skin_set_state(int state, enum screen_type screen)
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
         add_event(LCD_EVENT_ACTIVATION, false, do_update_callback);
 #endif
+        add_event(PLAYBACK_EVENT_TRACK_CHANGE, false,
+                                                do_update_callback);
+        add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false,
+                                                do_update_callback);
         add_event(GUI_EVENT_ACTIONUPDATE, false, sb_skin_update);
     }
     else
     {
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-        add_event(LCD_EVENT_ACTIVATION, false, do_update_callback);
+        remove_event(LCD_EVENT_ACTIVATION, do_update_callback);
 #endif
+        remove_event(PLAYBACK_EVENT_TRACK_CHANGE, do_update_callback);
+        remove_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, do_update_callback);
         remove_event(GUI_EVENT_ACTIONUPDATE, sb_skin_update);
     }
         
@@ -182,6 +188,4 @@ void sb_skin_init(void)
         sb_skin_sync_data.statusbars = VP_SB_HIDE_ALL;
         sb_skin[i].sync_data = &sb_skin_sync_data;
     }
-    add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, do_update_callback);
-    add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false, do_update_callback);
 }
