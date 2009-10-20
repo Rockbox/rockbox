@@ -358,7 +358,7 @@ int main(int argc, char **argv)
         }
 #endif
 
-        res = skin_data_load(&wps, wps_screen, argv[filearg], true);
+        res = skin_data_load(&wps, argv[filearg], true);
 
         if (!res) {
             printf("WPS parsing failure\n");
