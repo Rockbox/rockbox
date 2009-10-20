@@ -334,7 +334,7 @@ union ftl_spare_data_type
 };
 
 
-// Keeps track of troublesome blocks, only in memory, lost on unmount. */
+/* Keeps track of troublesome blocks, only in memory, lost on unmount. */
 struct ftl_trouble_type
 {
 
@@ -1161,24 +1161,27 @@ uint32_t ftl_erase_block(uint32_t block)
 uint32_t ftl_allocate_pool_block(void)
 {
     uint32_t i;
-    uint32_t erasectr = 0xFFFFFFFF, bestidx = 0, block;
+    uint32_t erasectr = 0xFFFFFFFF, bestidx = 0xFFFFFFFF, block;
     for (i = 0; i < ftl_cxt.freecount; i++)
     {
         uint32_t idx = ftl_cxt.nextfreeidx + i;
         if (idx >= 0x14) idx -= 0x14;
+        if (!ftl_cxt.blockpool[idx]) continue;
         if (ftl_erasectr[ftl_cxt.blockpool[idx]] < erasectr)
         {
             erasectr = ftl_erasectr[ftl_cxt.blockpool[idx]];
             bestidx = idx;
         }
     }
+    if (bestidx == 0xFFFFFFFF) panicf("Out of pool blocks!");
     block = ftl_cxt.blockpool[bestidx];
     if (bestidx != ftl_cxt.nextfreeidx)
     {
         ftl_cxt.blockpool[bestidx] = ftl_cxt.blockpool[ftl_cxt.nextfreeidx];
         ftl_cxt.blockpool[ftl_cxt.nextfreeidx] = block;
     }
-    if (block > (*ftl_nand_type).userblocks) return 0;
+    if (block > (uint32_t)(*ftl_nand_type).userblocks + 0x17)
+        panicf("FTL: Bad block number in pool: %u", (unsigned)block);
     if (ftl_erase_block(block) != 0) return 0;
     if (++ftl_cxt.nextfreeidx == 0x14) ftl_cxt.nextfreeidx = 0;
     ftl_cxt.freecount--;
@@ -1191,7 +1194,9 @@ uint32_t ftl_allocate_pool_block(void)
 /* Releases a vBlock back into the pool */
 void ftl_release_pool_block(uint32_t block)
 {
-    if (block >= (uint32_t)(*ftl_nand_type).userblocks + 0x17) return;
+    if (!block) panicf("FTL: Tried to put block 0 into the pool!");
+    if (block >= (uint32_t)(*ftl_nand_type).userblocks + 0x17)
+        panicf("FTL: Tried to release block %u", (unsigned)block);
     uint32_t idx = ftl_cxt.nextfreeidx + ftl_cxt.freecount++;
     if (idx >= 0x14) idx -= 0x14;
     ftl_cxt.blockpool[idx] = block;
@@ -1370,10 +1375,11 @@ uint32_t ftl_compact_scattered(struct ftl_log_type* entry)
     for (i = 0; i < 4; i++)
     {
         uint32_t block = ftl_allocate_pool_block();
+        if (block == 0) return 1;
         (*entry).pagesused = 0;
         (*entry).pagescurrent = 0;
         (*entry).issequential = 1;
-        if (block == 0) return 1;
+        (*entry).scatteredvblock = block;
         error = 0;
         for (j = 0; j < ppb; j++)
             if ((*entry).pageoffsets[j] != 0xFFFF)
@@ -1430,7 +1436,7 @@ uint32_t ftl_commit_scattered(struct ftl_log_type* entry)
 /* Fills the rest of a scattered page block that was actually written
    sequentially until now, in order to be able to save a block erase by
    committing it without needing to copy it again.
-   If this fails for whatever reason, it will be committed the usual way. */
+   If this fails for whichever reason, it will be committed the usual way. */
 uint32_t ftl_commit_sequential(struct ftl_log_type* entry)
 {
     uint32_t ppb = (*ftl_nand_type).pagesperblock * ftl_banks;
@@ -1534,7 +1540,7 @@ struct ftl_log_type* ftl_allocate_log_entry(uint32_t block)
 
     if (entry == (struct ftl_log_type*)0)
     {
-        if (ftl_cxt.freecount == 3)
+        while (ftl_cxt.freecount <= 3)
             if (ftl_remove_scattered_block((struct ftl_log_type*)0) != 0)
                 return (struct ftl_log_type*)0;
         entry = ftl_log;
@@ -1547,8 +1553,8 @@ struct ftl_log_type* ftl_allocate_log_entry(uint32_t block)
         }
     }
 
-    (*entry).logicalvblock = block;
     ftl_init_log_entry(entry);
+    (*entry).logicalvblock = block;
     (*entry).usn = ftl_cxt.nextblockusn - 1;
 
     return entry;
@@ -1815,8 +1821,8 @@ uint32_t ftl_sync(void)
 #endif
 
 
-/* Initializes and mounts the FTL. As long as nothing was written,
-   you won't need to unmount it.
+/* Initializes and mounts the FTL.
+   As long as nothing was written, you won't need to unmount it.
    Before shutting down after writing something, call ftl_sync(),
    which will just do nothing if everything was already clean. */
 uint32_t ftl_init(void)
