@@ -26,9 +26,11 @@
 #include "checkwps.h"
 #include "resize.h"
 #include "wps.h"
+#include "skin_engine.h"
 #include "wps_internals.h"
 #include "settings.h"
 #include "viewport.h"
+#include "file.h"
 
 bool debug_wps = true;
 int wps_verbose_level = 0;
@@ -313,7 +315,6 @@ int main(int argc, char **argv)
     int filearg = 1;
 
     struct wps_data wps;
-    struct screen* wps_screen = &screens[SCREEN_MAIN];
 
     /* No arguments -> print the help text
      * Also print the help text upon -h or --help */

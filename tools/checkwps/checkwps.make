@@ -7,7 +7,7 @@
 # $Id$
 #
 
-FLAGS=-g -D__PCTOOL__ -DDEBUG -DROCKBOX_DIR_LEN=9 -DWPS_DIR=\".\" $(TARGET)
+FLAGS=-g -D__PCTOOL__ -DDEBUG -DROCKBOX_DIR_LEN=9 -DWPS_DIR=\".\" $(TARGET) -Wall
 
 SRC= $(call preprocess, $(TOOLSDIR)/checkwps/SOURCES)
 
