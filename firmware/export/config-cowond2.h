@@ -142,6 +142,9 @@
 /* Hardware controlled charging */
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
+/* Define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
+
 /* Define current usage levels. */
 #define CURRENT_NORMAL     88 /* 18 hours from a 1600 mAh battery */  
 #define CURRENT_BACKLIGHT  30 /* TBD */ 
