@@ -315,6 +315,9 @@ int main(int argc, char **argv)
     int filearg = 1;
 
     struct wps_data wps;
+#ifdef HAVE_REMOTE_LCD
+    struct screen* wps_screen = &screens[SCREEN_MAIN];
+#endif
 
     /* No arguments -> print the help text
      * Also print the help text upon -h or --help */
