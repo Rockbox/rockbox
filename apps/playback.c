@@ -1562,11 +1562,12 @@ static void buffering_handle_rebuffer_callback(void *data)
     queue_post(&audio_queue, Q_AUDIO_FLUSH, 0);
 }
 
-static void buffering_handle_finished_callback(int *data)
+static void buffering_handle_finished_callback(void *data)
 {
     logf("handle %d finished buffering", *data);
+    int hid = (*(int*)data);
 
-    if (*data == tracks[track_widx].id3_hid)
+    if (hid == tracks[track_widx].id3_hid)
     {
         int offset = ci.new_track + wps_offset;
         int next_idx = (track_ridx + offset + 1) & MAX_TRACK_MASK;
@@ -1574,16 +1575,16 @@ static void buffering_handle_finished_callback(int *data)
            We can ask the audio thread to load the rest of the track's data. */
         LOGFQUEUE("audio >| audio Q_AUDIO_FINISH_LOAD");
         queue_post(&audio_queue, Q_AUDIO_FINISH_LOAD, 0);
-        if (tracks[next_idx].id3_hid == *data)
+        if (tracks[next_idx].id3_hid == hid)
             send_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, NULL);
     }
     else
     {
         /* This is most likely an audio handle, so we strip the useless
            trailing tags that are left. */
-        strip_tags(*data);
+        strip_tags(hid);
 
-        if (*data == tracks[track_widx-1].audio_hid
+        if (hid == tracks[track_widx-1].audio_hid
             && filling == STATE_END_OF_PLAYLIST)
         {
             /* This was the last track in the playlist.

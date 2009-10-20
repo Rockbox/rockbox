@@ -568,17 +568,17 @@ static bool settings_write_config(const char* filename, int options)
     return true;
 }
 #ifndef HAVE_RTC_RAM
-static bool flush_global_status_callback(void)
+static void flush_global_status_callback(void *data)
 {
-    return write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
+    (void)data;
+    write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
 }
 #endif
-static bool flush_config_block_callback(void)
+static void flush_config_block_callback(void *data)
 {
-    bool r1, r2;
-    r1 = write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
-    r2 = settings_write_config(CONFIGFILE, SETTINGS_SAVE_CHANGED);
-    return r1 || r2;
+    (void)data;
+    write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
+    settings_write_config(CONFIGFILE, SETTINGS_SAVE_CHANGED);
 }
 
 /*

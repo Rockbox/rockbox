@@ -48,11 +48,9 @@ enum {
                                && (CONFIG_NAND == NAND_IFP7XX)) \
                             && !defined(BOOTLOADER)
 
-typedef bool (*storage_idle_notify)(void);
-
-extern void register_storage_idle_func(storage_idle_notify function);
+extern void register_storage_idle_func(void (*function)(void *data));
 #if USING_STORAGE_CALLBACK
-extern void unregister_storage_idle_func(storage_idle_notify function, bool run);
+extern void unregister_storage_idle_func(void (*function)(void *data), bool run);
 extern bool call_storage_idle_notifys(bool force);
 #else
 #define unregister_storage_idle_func(f,r)

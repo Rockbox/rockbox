@@ -33,7 +33,7 @@ struct sysevent {
 
 static struct sysevent events[MAX_SYS_EVENTS];
 
-bool add_event(unsigned short id, bool oneshot, void (*handler))
+bool add_event(unsigned short id, bool oneshot, void (*handler)(void *data))
 {
     int i;
     
@@ -60,7 +60,7 @@ bool add_event(unsigned short id, bool oneshot, void (*handler))
     return false;
 }
 
-void remove_event(unsigned short id, void (*handler))
+void remove_event(unsigned short id, void (*handler)(void *data))
 {
     int i;
     

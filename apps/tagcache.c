@@ -3068,16 +3068,16 @@ static bool command_queue_is_full(void)
     return (next == command_queue_ridx);
 }
 
-static bool command_queue_sync_callback(void)
+static void command_queue_sync_callback(void *data)
 {
-    
+    (void)data;
     struct master_header myhdr;
     int masterfd;
         
     mutex_lock(&command_queue_mutex);
 	
     if ( (masterfd = open_master_fd(&myhdr, true)) < 0)
-        return false;
+        return;
     
     while (command_queue_ridx != command_queue_widx)
     {
@@ -3092,7 +3092,7 @@ static bool command_queue_sync_callback(void)
                 
                 /* Re-open the masterfd. */
                 if ( (masterfd = open_master_fd(&myhdr, true)) < 0)
-                    return true;
+                    return;
                 
                 break;
             }
@@ -3111,7 +3111,6 @@ static bool command_queue_sync_callback(void)
     
     tc_stat.queue_length = 0;
     mutex_unlock(&command_queue_mutex);
-    return true;
 }
 
 static void run_command_queue(bool force)
@@ -3120,7 +3119,7 @@ static void run_command_queue(bool force)
         return;
     
     if (force || command_queue_is_full())
-        command_queue_sync_callback();
+        command_queue_sync_callback(NULL);
     else
         register_storage_idle_func(command_queue_sync_callback);
 }

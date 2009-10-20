@@ -18,10 +18,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
-void scrobbler_change_event(struct mp3entry *id);
+
+#ifndef __SCROBBLER_H__
+#define __SCROBBLER_H__
+
 int scrobbler_init(void);
 void scrobbler_flush_cache(void);
 void scrobbler_shutdown(void);
 void scrobbler_poweroff(void);
 bool scrobbler_is_enabled(void);
+
+#endif /* __SCROBBLER_H__ */

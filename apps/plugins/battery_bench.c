@@ -306,22 +306,19 @@ static unsigned int charge_state(void)
 #endif
 
 
-static bool flush_buffer(void)
+static void flush_buffer(void* data)
 {
+    (void)data;
     int fd, secs;
     unsigned int i;
 
     /* don't access the disk when in usb mode, or when no data is available */
     if (in_usb_mode || (buf_idx == 0))
-    {
-        return false;
-    }
+        return;
 
     fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT | O_APPEND);
     if (fd < 0)
-    {
-        return false;
-    }
+        return;
 
     for (i = 0; i < buf_idx; i++)
     {
@@ -357,7 +354,6 @@ static bool flush_buffer(void)
     rb->close(fd);
 
     buf_idx = 0;
-    return true;
 }
 
 
@@ -395,7 +391,7 @@ void thread(void)
            for this to occur because it requires > 16 hours of no disk activity.
          */
         if (buf_idx == BUF_ELEMENTS) {
-            flush_buffer();
+            flush_buffer(NULL);
         }
         
         /* sleep some time until next measurement */

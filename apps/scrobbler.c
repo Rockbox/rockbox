@@ -128,11 +128,11 @@ static void write_cache(void)
     cache_pos = 0;
 }
 
-static bool scrobbler_flush_callback(void)
+static void scrobbler_flush_callback(void *data)
 {
+    (void)data;
     if (scrobbler_initialised && cache_pos)
         write_cache();
-    return true;
 }
 
 static void add_to_cache(unsigned long play_length)
@@ -185,8 +185,9 @@ static void add_to_cache(unsigned long play_length)
 
 }
 
-void scrobbler_change_event(struct mp3entry *id)
+static void scrobbler_change_event(void *data)
 {
+    struct mp3entry *id = (struct mp3entry*)data;
     /* add entry using the previous scrobbler_entry and timestamp */
     if (pending)
         add_to_cache(audio_prev_elapsed());

@@ -403,8 +403,8 @@ struct plugin_api {
     void (*storage_spin)(void);
     void (*storage_spindown)(int seconds);
 #if USING_STORAGE_CALLBACK
-    void (*register_storage_idle_func)(storage_idle_notify function);
-    void (*unregister_storage_idle_func)(storage_idle_notify function, bool run);
+    void (*register_storage_idle_func)(void (*function)(void *data));
+    void (*unregister_storage_idle_func)(void (*function)(void *data), bool run);
 #endif /* USING_STORAGE_CALLBACK */
     void (*reload_directory)(void);
     char *(*create_numbered_filename)(char *buffer, const char *path,

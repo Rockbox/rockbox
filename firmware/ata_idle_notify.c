@@ -25,12 +25,12 @@
 #include "kernel.h"
 #include "string.h"
 
-void register_storage_idle_func(storage_idle_notify function)
+void register_storage_idle_func(void (*function)(void *data))
 {
 #if USING_STORAGE_CALLBACK
     add_event(DISK_EVENT_SPINUP, true, function);
 #else
-    function(); /* just call the function now */
+    function(NULL); /* just call the function now */
 /* this _may_ cause problems later if the calling function
    sets a variable expecting the callback to unset it, because
    the callback will be run before this function exits, so before the var is set */
@@ -38,12 +38,12 @@ void register_storage_idle_func(storage_idle_notify function)
 }
 
 #if USING_STORAGE_CALLBACK
-void unregister_storage_idle_func(storage_idle_notify func, bool run)
+void unregister_storage_idle_func(void (*func)(void *data), bool run)
 {
     remove_event(DISK_EVENT_SPINUP, func);
     
     if (run)
-        func();
+        func(NULL);
 }
 
 bool call_storage_idle_notifys(bool force)
