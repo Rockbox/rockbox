@@ -598,7 +598,7 @@ static uint32_t increment_time(uint32_t val, int32_t amount, uint32_t range)
     return val;
 }
 
-#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 static void get_start_time_lcd_enable_hook(void *param)
 {
     (void)param;
@@ -619,7 +619,7 @@ static int get_start_time(uint32_t duration)
     lcd_(clear_display)();
     lcd_(update)();
 
-#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
     rb->add_event(LCD_EVENT_ACTIVATION, false, get_start_time_lcd_enable_hook);
 #endif
 
