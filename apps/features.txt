@@ -196,11 +196,12 @@ usb_charging
 
 #if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
 usbstack
+#endif
+
 #if defined(USB_ENABLE_HID)
 usb_hid
 #if defined(HAVE_USB_HID_MOUSE)
 usb_hid_mouse
-#endif
 #endif
 #endif
 
