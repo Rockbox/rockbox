@@ -155,7 +155,6 @@ static const struct plugin_api rockbox_api = {
     lcd_set_mode,
 #endif
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-    lcd_activation_set_hook,
     &button_queue,
 #endif
     bidi_l2v,
@@ -255,6 +254,7 @@ static const struct plugin_api rockbox_api = {
     button_status,
 #ifdef HAVE_BUTTON_DATA
     button_get_data,
+    button_status_wdata,
 #endif
     button_clear_queue,
     button_queue_count,
@@ -376,6 +376,9 @@ static const struct plugin_api rockbox_api = {
     __cyg_profile_func_enter,
     __cyg_profile_func_exit,
 #endif
+    add_event,
+    remove_event,
+    send_event,
 
 #ifdef SIMULATOR
     /* special simulator hooks */
@@ -668,9 +671,6 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#ifdef HAVE_BUTTON_DATA
-    button_status_wdata,
-#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

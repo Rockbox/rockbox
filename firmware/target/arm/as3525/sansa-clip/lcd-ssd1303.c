@@ -172,7 +172,7 @@ void lcd_enable(bool enable)
         ascodec_write(AS3514_DCDC15, 1);
 
         lcd_write_command(LCD_SET_DISPLAY_ON);
-        lcd_activation_call_hook();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
     }
     else {
         lcd_write_command(LCD_SET_DISPLAY_OFF);

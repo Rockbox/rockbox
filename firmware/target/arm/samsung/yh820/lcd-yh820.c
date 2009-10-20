@@ -226,7 +226,7 @@ void lcd_enable(bool yesno)
     {
         lcd_send_command(R_STANDBY_OFF);
         lcd_send_command(R_DISPLAY_ON);
-        lcd_activation_call_hook();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
     }
     else
     {

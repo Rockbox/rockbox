@@ -74,27 +74,6 @@ static struct viewport* current_vp IDATA_ATTR = &default_vp;
 struct viewport* current_vp IDATA_ATTR = &default_vp;
 #endif
 
-
-/*** Helpers - consolidate optional code ***/
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-static void (*lcd_activation_hook)(void) = NULL;
-
-void lcd_activation_set_hook(void (*func)(void))
-{
-    lcd_activation_hook = func;
-}
-
-/* To be called by target driver after enabling display and refreshing it */
-void lcd_activation_call_hook(void)
-{
-    void (*func)(void) = lcd_activation_hook;
-
-    if (func != NULL)
-        func();
-}
-
-#endif
-
 /* LCD init */
 void lcd_init(void)
 {

@@ -448,7 +448,7 @@ void lcd_enable(bool on)
         DEV_EN |= DEV_LCD; /* Enable LCD controller */
         lcd_display_on();  /* Turn on display */
         lcd_update();      /* Resync display */
-        lcd_activation_call_hook();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
         LCD_REG_6 |= 1;    /* Restart DMA */
         sleep(HZ/50);      /* Wait for a frame to be written */
     }

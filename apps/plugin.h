@@ -133,12 +133,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 172
+#define PLUGIN_API_VERSION 173
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 172
+#define PLUGIN_MIN_API_VERSION 173
 
 /* plugin return codes */
 enum plugin_status {
@@ -244,7 +244,6 @@ struct plugin_api {
 #endif
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-    void (*lcd_activation_set_hook)(void (*enable_hook)(void));
     struct event_queue *button_queue;
 #endif
     unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
@@ -367,6 +366,7 @@ struct plugin_api {
     int (*button_status)(void);
 #ifdef HAVE_BUTTON_DATA
     intptr_t (*button_get_data)(void);
+    int (*button_status_wdata)(int *pdata);
 #endif
     void (*button_clear_queue)(void);
     int (*button_queue_count)(void);
@@ -500,6 +500,10 @@ struct plugin_api {
     void (*profile_func_enter)(void *this_fn, void *call_site);
     void (*profile_func_exit)(void *this_fn, void *call_site);
 #endif
+    /* event api */
+    bool (*add_event)(unsigned short id, bool oneshot, void (*handler)(void *data));
+    void (*remove_event)(unsigned short id, void (*handler)(void *data));
+    void (*send_event)(unsigned short id, void *data);
 
 #ifdef SIMULATOR
     /* special simulator hooks */
@@ -837,10 +841,6 @@ struct plugin_api {
     const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-       
-#ifdef HAVE_BUTTON_DATA
-    int (*button_status_wdata)(int *pdata);
-#endif
 };
 
 /* plugin header */

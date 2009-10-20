@@ -37,6 +37,7 @@
 #define EVENT_CLASS_PLAYBACK   0x0200
 #define EVENT_CLASS_BUFFERING  0x0400
 #define EVENT_CLASS_GUI        0x0800
+#define EVENT_CLASS_LCD        0xf000
 
 bool add_event(unsigned short id, bool oneshot, void (*handler)(void *data));
 void remove_event(unsigned short id, void (*handler)(void *data));

@@ -618,7 +618,7 @@ void lcd_awake(void)
         tick_add_task(&lcd_tick);
         wakeup_wait(&(lcd_state.initwakeup), TIMEOUT_BLOCK);
 
-        lcd_activation_call_hook();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
     }
 }
 

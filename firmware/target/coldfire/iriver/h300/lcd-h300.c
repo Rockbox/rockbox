@@ -280,7 +280,7 @@ void lcd_enable(bool on)
         if (on)
         {
             _display_on();
-            lcd_activation_call_hook();
+            send_event(LCD_EVENT_ACTIVATION, NULL);
         }
         else
         {

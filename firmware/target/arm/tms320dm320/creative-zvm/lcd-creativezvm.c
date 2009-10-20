@@ -237,7 +237,7 @@ return;
     {
         lcd_display_on(false);  /* Turn on display */
         lcd_update();      /* Resync display */
-        lcd_activation_call_hook();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
     }
     else
     {

@@ -562,8 +562,9 @@ static void play_hop(int direction)
  * we suppress updates until the wps is activated again (the lcd driver will
  * call this hook to issue an instant update)
  * */
-static void wps_lcd_activation_hook(void)
+static void wps_lcd_activation_hook(void *param)
 {
+    (void)param;
     wps_state.do_full_update = true;
     /* force timeout in wps main loop, so that the update is instantly */
     queue_post(&button_queue, BUTTON_NONE, 0);
@@ -585,7 +586,7 @@ static void gwps_leave_wps(void)
     viewportmanager_set_statusbar(oldbars);
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
     /* Play safe and unregister the hook */
-    lcd_activation_set_hook(NULL);
+    remove_event(LCD_EVENT_ACTIVATION, wps_lcd_activation_hook);
 #endif
     /* unhandle statusbar update delay */
     sb_skin_set_update_delay(DEFAULT_UPDATE_DELAY);
@@ -1164,13 +1165,9 @@ long gui_wps_show(void)
             FOR_NB_SCREENS(i)
             {
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-                if (lcd_active()
-#ifdef HAVE_REMOTE_LCD
                 /* currently, all remotes are readable without backlight
                  * so still update those */
-                            || (i == SCREEN_REMOTE)
-#endif
-                                                )
+                if (lcd_active() || (i != SCREEN_MAIN))
 #endif
                 {
                     skin_update(&gui_wps[i], WPS_REFRESH_NON_STATIC);
@@ -1193,7 +1190,7 @@ long gui_wps_show(void)
             restore = false;
             restoretimer = RESTORE_WPS_INSTANTLY;
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-            lcd_activation_set_hook(wps_lcd_activation_hook);
+            add_event(LCD_EVENT_ACTIVATION, false, wps_lcd_activation_hook);
 #endif
         /* we remove the update delay since it's not very usable in the wps,
          * e.g. during volume changing or ffwd/rewind */

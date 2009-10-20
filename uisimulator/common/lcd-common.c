@@ -22,7 +22,9 @@
  *
  ****************************************************************************/
 
+#include <stdbool.h>
 #include "config.h"
+#include "system.h"
 #include "lcd.h"
 
 #ifdef HAVE_LCD_ENABLE
@@ -82,7 +84,7 @@ void lcd_awake(void)
 {
     if (lcd_sleeping)
     {
-        lcd_activation_call_hook();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
         lcd_sleeping = false;
     }
 }
@@ -96,7 +98,7 @@ void lcd_enable(bool on)
         /* lcd_awake will handle the activation call */
         lcd_awake();
 #else
-        lcd_activation_call_hook();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
 #endif
     }
     lcd_enabled = on;

@@ -599,8 +599,9 @@ static uint32_t increment_time(uint32_t val, int32_t amount, uint32_t range)
 }
 
 #if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
-static void get_start_time_lcd_enable_hook(void)
+static void get_start_time_lcd_enable_hook(void *param)
 {
+    (void)param;
     rb->queue_post(rb->button_queue, LCD_ENABLE_EVENT_0, 0);
 }
 #endif /* HAVE_LCD_ENABLE */
@@ -619,7 +620,7 @@ static int get_start_time(uint32_t duration)
     lcd_(update)();
 
 #if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
-    rb->lcd_activation_set_hook(get_start_time_lcd_enable_hook);
+    rb->add_event(LCD_EVENT_ACTIVATION, false, get_start_time_lcd_enable_hook);
 #endif
 
     draw_slider(0, 100, &rc_bound);
@@ -810,7 +811,7 @@ static int get_start_time(uint32_t duration)
     }
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-    rb->lcd_activation_set_hook(NULL);
+    rb->remove_event(LCD_EVENT_ACTIVATION, get_start_time_lcd_enable_hook);
 #endif
 #ifndef HAVE_LCD_COLOR
     stream_gray_show(false);

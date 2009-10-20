@@ -217,7 +217,7 @@ void lcd_enable(bool on)
         lcd_write_reg(0x07, 0x17);
         display_on = true;
         lcd_update();      /* Resync display */
-        lcd_activation_call_hook();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
         sleep(0);
 
     }

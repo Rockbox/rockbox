@@ -209,7 +209,7 @@ void lcd_enable(bool on)
         lcd_display_on();
         LCDC_CTRL |= 1;     /* controller enable */
         lcd_update();       /* Resync display */
-        lcd_activation_call_hook();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
     }
     else
     {

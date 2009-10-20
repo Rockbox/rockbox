@@ -122,7 +122,7 @@ void lcd_enable(bool state)
         lcd_powered = true;
         lcd_on = true;
         lcd_update();
-        lcd_activation_call_hook();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
     }
     else
     {

@@ -98,7 +98,7 @@ void lcd_awake(void)
         sleep(HZ/10);
         
         
-        lcd_activation_call_hook();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
     }
 }
 #endif

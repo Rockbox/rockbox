@@ -91,25 +91,6 @@ void LCDFN(init)(void)
 #endif
 }
 
-#ifdef MAIN_LCD
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-static void (*lcd_activation_hook)(void) = NULL;
-
-void lcd_activation_set_hook(void (*func)(void))
-{
-    lcd_activation_hook = func;
-}
-
-void lcd_activation_call_hook(void)
-{
-    void (*func)(void) = lcd_activation_hook;
-
-    if (func != NULL)
-        func();
-}
-#endif
-#endif
-
 /*** parameter handling ***/
 
 void LCDFN(set_drawmode)(int mode)

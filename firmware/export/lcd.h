@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include "cpu.h"
 #include "config.h"
+#include "events.h"
 
 #define VP_FLAG_ALIGN_RIGHT  0x01
 #define VP_FLAG_ALIGN_CENTER 0x02
@@ -426,13 +427,16 @@ extern void lcd_sleep(void);
  * framebuffer data is synchronized */
 /* Sansa Clip has these function in it's lcd driver, since it's the only
  * 1-bit display featuring lcd_active, so far */
+
+enum {
+    LCD_EVENT_ACTIVATION = (EVENT_CLASS_LCD|1),
+};
+
 extern bool lcd_active(void);
-extern void lcd_activation_set_hook(void (*enable_hook)(void));
-extern void lcd_activation_call_hook(void);
 #endif
 
 #ifdef HAVE_LCD_SHUTDOWN
-void lcd_shutdown(void);
+extern void lcd_shutdown(void);
 #endif
 
 /* Bitmap formats */
