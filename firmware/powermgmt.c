@@ -806,7 +806,12 @@ void sys_poweroff(void)
         if (audio_status() & AUDIO_STATUS_RECORD)
             shutdown_timeout += HZ*8;
 #endif
+#ifdef IPOD_NANO2G
+        /* The FTL alone may take half a minute to shut down cleanly. */
+        shutdown_timeout += HZ*60;
+#else
         shutdown_timeout += HZ*20;
+#endif
     }
 
     queue_broadcast(SYS_POWEROFF, 0);
