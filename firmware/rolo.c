@@ -293,6 +293,9 @@ int rolo_load(const char* filename)
     lcd_remote_update();
 #endif
     adc_close();
+#ifdef HAVE_STORAGE_FLUSH
+    storage_flush();
+#endif
 
 #ifdef CPU_ARM
     /* Should do these together since some ARM version should never have
@@ -348,6 +351,10 @@ int rolo_load(const char* filename)
     lcd_puts(0, 1, "Executing     ");
     lcd_update();
 
+#ifdef HAVE_STORAGE_FLUSH
+    storage_flush();
+#endif
+
     set_irq_level(HIGHEST_IRQ_LEVEL);
 
     /* Calling these 2 initialization routines was necessary to get the
@@ -362,9 +369,6 @@ int rolo_load(const char* filename)
     defined(ARCHOS_FMRECORDER)
     PAIOR = 0x0FA0;
 #endif
-#endif
-#ifdef HAVE_STORAGE_FLUSH
-    storage_flush();
 #endif
     rolo_restart(audiobuf, ramstart, length);
 
