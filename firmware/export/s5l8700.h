@@ -304,6 +304,8 @@
 #define TDDATA1                 (*(REG32_PTR_T)(0x3C70006C))     /* Data1 Register */
 #define TDPRE                   (*(REG32_PTR_T)(0x3C700070))     /* Pre-scale register */
 #define TDCNT                   (*(REG32_PTR_T)(0x3C700074))     /* Counter register */
+#define USEC_TIMER              (((*(REG32_PTR_T)(0x3C700080) << 32) \
+                                | *(REG32_PTR_T)(0x3C700084)) * 5) /* 64bit 5usec timer */     
 
 /* 12. NAND FLASH CONTROLER */
 #if CONFIG_CPU==S5L8701

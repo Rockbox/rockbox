@@ -40,18 +40,9 @@
 #include "power.h"
 #include "powermgmt.h"
 
-#ifdef CPU_PP
-/* PortalPlayer uses the USEC timer */
 #define WHEEL_FAST_OFF_TIMEOUT   250000 /* timeout for acceleration = 250ms */
 #define WHEEL_REPEAT_TIMEOUT     250000 /* timeout for button repeat = 250ms */
 #define WHEEL_UNTOUCH_TIMEOUT    150000 /* timeout for untouching wheel = 150ms */
-#else
-/* Other targets use current_tick */
-#define WHEEL_FAST_OFF_TIMEOUT   (HZ/4) /* timeout for acceleration = 250ms */
-#define WHEEL_REPEAT_TIMEOUT     (HZ/4) /* timeout for button repeat = 250ms */
-#define WHEEL_UNTOUCH_TIMEOUT    ((HZ*15)/100) /* timeout for untouching wheel = 150ms */
-
-#endif
 
 #ifdef CPU_PP
 #define CLICKWHEEL_DATA   (*(volatile unsigned long*)(0x7000c140))
@@ -131,11 +122,7 @@ static inline int ipod_4g_button_read(void)
                 btn |= BUTTON_MENU;
             if (status & 0x40000000) 
             {
-#ifdef CPU_PP
                 unsigned long usec = USEC_TIMER;
-#else
-                unsigned long usec = current_tick;
-#endif
                 
                 /* Highest wheel = 0x5F, clockwise increases */
                 new_wheel_value = (status >> 16) & 0x7f;
