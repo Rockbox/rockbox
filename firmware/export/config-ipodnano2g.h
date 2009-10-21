@@ -105,6 +105,8 @@
 /* Define the type of audio codec */
 #define HAVE_WM8975
 
+#define HAVE_PCM_DMA_ADDRESS
+
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
@@ -205,5 +207,5 @@
 #define USB_VENDOR_ID 0x05AC
 #define USB_PRODUCT_ID 0x1260
 #define USB_NUM_ENDPOINTS 5
-/* #define USE_ROCKBOX_USB - needs testing */
+#define USE_ROCKBOX_USB
 #define USB_DEVBSS_ATTR __attribute__((aligned(16)))

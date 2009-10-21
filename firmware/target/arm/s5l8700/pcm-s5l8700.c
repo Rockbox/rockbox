@@ -105,7 +105,7 @@ static void play_next(void *addr, size_t size)
                       dma_callback);
     
     /* DMA channel on */
-    clean_dcache();
+//    clean_dcache();
     dma_enable_channel(DMA_IISOUT_CHANNEL);
 }
 
@@ -139,7 +139,8 @@ void pcm_play_dma_start(const void *addr, size_t size)
     PCON5 = (PCON5 & ~(0xFFFF0000)) | 0x77720000;
     PCON6 = (PCON6 & ~(0x0F000000)) | 0x02000000;
 
-    I2STXCON = (0x10 << 16) |  /* burst length */
+    I2STXCON = (1 << 20) |  /* undocumented */
+               (DMA_IISOUT_BLEN << 16) |  /* burst length */
                (0 << 15) |  /* 0 = falling edge */
                (0 << 13) |  /* 0 = basic I2S format */
                (0 << 12) |  /* 0 = MSB first */
@@ -162,7 +163,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 #endif
     
     /* S3: DMA channel 0 on */
-    clean_dcache();
+//    clean_dcache();
     dma_enable_channel(DMA_IISOUT_CHANNEL);
 
     /* S4: IIS Tx clock on */
@@ -190,14 +191,14 @@ void pcm_play_dma_stop(void)
                (0 << 0);    /* 0 = LRCK on */
 }
 
-/* pause playback by disabling further DMA requests */
+/* pause playback by disabling the I2S interface */
 void pcm_play_dma_pause(bool pause)
 {
     if (pause) {
-        I2STXCOM &= ~(1 << 1);  /* DMA request enable */
+        I2STXCOM |= (1 << 0);   /* LRCK off */
     }
     else {
-        I2STXCOM |= (1 << 1);   /* DMA request enable */
+        I2STXCOM &= ~(1 << 0);  /* LRCK on */
     }
 }
 
@@ -267,7 +268,7 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 void * pcm_dma_addr(void *addr)
 {
     if (addr != NULL)
-        addr = UNCACHED_ADDR(addr);
+        addr = (void*)((uintptr_t)addr | 0x40000000);
     return addr;
 }
 #endif
