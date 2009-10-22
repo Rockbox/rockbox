@@ -21,6 +21,9 @@
 #include <stdlib.h>
 #include "system.h"
 #include "kernel.h"
+
+/* Define LOGF_ENABLE to enable logf output in this file */
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 #include "audio.h"
 #include "sound.h"

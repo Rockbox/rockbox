@@ -682,22 +682,6 @@ int show_logo( void )
     return 0;
 }
 
-#if CONFIG_CODEC == SWCODEC
-int get_replaygain_mode(bool have_track_gain, bool have_album_gain)
-{
-    int type;
-
-    bool track = ((global_settings.replaygain_type == REPLAYGAIN_TRACK)
-        || ((global_settings.replaygain_type == REPLAYGAIN_SHUFFLE)
-            && global_settings.playlist_shuffle));
-
-    type = (!track && have_album_gain) ? REPLAYGAIN_ALBUM 
-        : have_track_gain ? REPLAYGAIN_TRACK : -1;
-    
-    return type;
-}
-#endif
-
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF)
 /*

@@ -65,6 +65,7 @@ int dsp_input_count(struct dsp_config *dsp, int count);
 int dsp_output_count(struct dsp_config *dsp, int count);
 intptr_t dsp_configure(struct dsp_config *dsp, int setting,
                        intptr_t value);
+int get_replaygain_mode(bool have_track_gain, bool have_album_gain);
 void dsp_set_replaygain(void);
 void dsp_set_crossfeed(bool enable);
 void dsp_set_crossfeed_direct_gain(int gain);

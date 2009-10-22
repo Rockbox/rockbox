@@ -25,6 +25,9 @@
 #include <kernel.h>
 #include "pcmbuf.h"
 #include "pcm.h"
+
+/* Define LOGF_ENABLE to enable logf output in this file */
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 #ifndef SIMULATOR
 #include "cpu.h"

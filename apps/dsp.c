@@ -26,16 +26,13 @@
 #include "dsp.h"
 #include "eq.h"
 #include "kernel.h"
-#include "playback.h"
 #include "system.h"
 #include "settings.h"
 #include "replaygain.h"
-#include "misc.h"
 #include "tdspeed.h"
 #include "buffer.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
-#include "pcmbuf.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
@@ -1477,6 +1474,20 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
     }
 
     return 1;
+}
+
+int get_replaygain_mode(bool have_track_gain, bool have_album_gain)
+{
+    int type;
+
+    bool track = ((global_settings.replaygain_type == REPLAYGAIN_TRACK)
+        || ((global_settings.replaygain_type == REPLAYGAIN_SHUFFLE)
+            && global_settings.playlist_shuffle));
+
+    type = (!track && have_album_gain) ? REPLAYGAIN_ALBUM 
+        : have_track_gain ? REPLAYGAIN_TRACK : -1;
+    
+    return type;
 }
 
 void dsp_set_replaygain(void)
