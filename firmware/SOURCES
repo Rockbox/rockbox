@@ -1399,24 +1399,26 @@ target/arm/at91sam/lyre_proto1/timer-lyre_proto1.c
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
 target/arm/s3c2440/debug-s3c2440.c
+target/arm/s3c2440/dma-s3c2440.c
 target/arm/s3c2440/kernel-s3c2440.c
 target/arm/s3c2440/lcd-s3c2440.c
+target/arm/s3c2440/sd-s3c2440.c
 target/arm/s3c2440/system-s3c2440.c
+target/arm/s3c2440/uart-s3c2440.c
 target/arm/s3c2440/mini2440/backlight-mini2440.c
 target/arm/s3c2440/mini2440/button-mini2440.c
 target/arm/s3c2440/mini2440/led-mini2440.c
 target/arm/s3c2440/mini2440/power-mini2440.c
 #ifdef BOOTLOADER
-/*target/arm/s3c2440/mini2440/mini2440_test.c*/
 #endif
 #ifndef BOOTLOADER
 target/arm/s3c2440/mini2440/adc-mini2440.c
-target/arm/s3c2440/mini2440/i2c-mini2440.c
+//target/arm/s3c2440/mini2440/i2c-mini2440.c
 target/arm/s3c2440/mini2440/pcm-mini2440.c
 target/arm/s3c2440/mini2440/powermgmt-mini2440.c
 target/arm/s3c2440/mini2440/power-mini2440.c
 target/arm/s3c2440/mini2440/timer-mini2440.c
-target/arm/s3c2440/mini2440/usb-mini2440.c
+//target/arm/s3c2440/mini2440/usb-mini2440.c
 #endif
 #endif /* SIMULATOR */
 #endif /* MINI2440 */

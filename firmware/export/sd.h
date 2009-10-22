@@ -100,4 +100,47 @@ int sd_num_drives(int first_drive);
 #define SD_SEND_SCR             51  /* acmd51 */
 #define SD_APP_CMD              55
 
+/*
+  SD/MMC status in R1, for native mode (SPI bits are different)
+  Type
+    e : error bit
+    s : status bit
+    r : detected and set for the actual command response
+    x : detected and set during command execution. the host must poll
+            the card by sending status command in order to read these bits.
+  Clear condition
+    a : according to the card state
+    b : always related to the previous command. Reception of
+            a valid command will clear it (with a delay of one command)
+    c : clear by read
+ */
+
+#define SD_R1_OUT_OF_RANGE         (1 << 31)   /* erx, c */
+#define SD_R1_ADDRESS_ERROR        (1 << 30)   /* erx, c */
+#define SD_R1_BLOCK_LEN_ERROR      (1 << 29)   /* erx, c */
+#define SD_R1_ERASE_SEQ_ERROR      (1 << 28)   /* er,  c */
+#define SD_R1_ERASE_PARAM          (1 << 27)   /* exx, c */
+#define SD_R1_WP_VIOLATION         (1 << 26)   /* erx, c */
+#define SD_R1_CARD_IS_LOCKED       (1 << 25)   /* sx,  a */
+#define SD_R1_LOCK_UNLOCK_FAILED   (1 << 24)   /* erx, c */
+#define SD_R1_COM_CRC_ERROR        (1 << 23)   /* er,  b */
+#define SD_R1_ILLEGAL_COMMAND      (1 << 22)   /* er,  b */
+#define SD_R1_CARD_ECC_FAILED      (1 << 21)   /* erx, c */
+#define SD_R1_CC_ERROR             (1 << 20)   /* erx, c */
+#define SD_R1_ERROR                (1 << 19)   /* erx, c */
+#define SD_R1_UNDERRUN             (1 << 18)   /* ex,  c */
+#define SD_R1_OVERRUN              (1 << 17)   /* ex,  c */
+#define SD_R1_CSD_OVERWRITE        (1 << 16)   /* erx, c */
+#define SD_R1_WP_ERASE_SKIP        (1 << 15)   /* erx, c */
+#define SD_R1_CARD_ECC_DISABLED    (1 << 14)   /* sx,  a */
+#define SD_R1_ERASE_RESET          (1 << 13)   /* sr,  c */
+#define SD_R1_STATUS(x)            (x & 0xFFFFE000)
+#define SD_R1_CURRENT_STATE(x)     ((x & 0x00001E00) >> 9) /* sx, b (4 bits) */
+#define SD_R1_READY_FOR_DATA       (1 << 8)    /* sx,  a */
+#define SD_R1_APP_CMD              (1 << 5)    /* sr,  c */
+#define SD_R1_AKE_SEQ_ERROR        (1 << 3)    /* er,  c */
+
+/* SD OCR bits */
+#define SD_OCR_CARD_CAPACITY_STATUS    (1 << 30)   /* Card Capacity Status */
+
 #endif

@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- *
+ * $Id$
  *
  * Copyright (C) 2009 by Bob Cousins, Lyre Project
  *
@@ -43,10 +43,8 @@
 #include "backlight-target.h"
 #include "lcd-target.h"
 #include "debug-target.h"
-#if 0
 #include "dma-target.h"
 #include "uart-s3c2440.h"
-#endif
 #include "led-mini2440.h"
 
 /* Show the Rockbox logo - in show_logo.c */
@@ -55,14 +53,11 @@ extern int show_logo(void);
 
 int main(void)
 {
-#if 0
     /* required later */
     unsigned char* loadbuffer;
     int buffer_size;
     int rc;
     int(*kernel_entry)(void);
-#endif
-    int start, elapsed;
 
     led_init();
     clear_leds(LED_ALL);
@@ -74,20 +69,11 @@ int main(void)
     lcd_init();
     lcd_setfont(FONT_SYSFIXED);
     button_init();
-#if 0    
     dma_init();
     uart_init_device(UART_DEBUG);
-#endif
-/*    mini2440_test(); */ 
-        
-#if 1
-    show_logo();
-    /* pause here for now */
-    led_flash(LED1|LED4, LED2|LED3);
-#endif
 
-    
-#if 0 
+/*    mini2440_test(); */  
+        
     /* TODO */
     
     /* Show debug messages if button is pressed */
@@ -130,15 +116,11 @@ int main(void)
 
     if (rc == EOK)
     {
-        uart_printf ("entering kernel\n");
         cpucache_invalidate();
         kernel_entry = (void*) loadbuffer;
         rc = kernel_entry();
     }
         
-    uart_printf ("stopping %d\n", rc);
-#endif
-
     /* end stop - should not get here */
     led_flash(LED_ALL, LED_NONE);
     while (1); /* avoid warning */

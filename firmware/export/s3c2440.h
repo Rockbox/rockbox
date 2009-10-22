@@ -212,6 +212,41 @@
 #define DMASKTRIG_ON                 (1 << 1)
 #define DMASKTRIG_SW_TRIG            (1 << 0)
 
+/* Get DMA request source (HWSRCSEL) from the map for the specified channel */
+#define DMA_GET_SRC(map,channel)  ( ((map) << (channel*8)) & 0xff)
+
+#define DMA_CH0(x) (x<<0)
+#define DMA_CH1(x) (x<<8)
+#define DMA_CH2(x) (x<<16)
+#define DMA_CH3(x) (x<<24)
+
+#define DMA_INVALID 0xff
+#define DMA_INV0    DMA_CH0(DMA_INVALID)
+#define DMA_INV1    DMA_CH1(DMA_INVALID)
+#define DMA_INV2    DMA_CH2(DMA_INVALID)
+#define DMA_INV3    DMA_CH3(DMA_INVALID)
+
+/* This map encodes the DMA request source field (HWSRCSEL) since it's value
+ * depends on channel number and peripheral type. 
+ */
+#define DMA_SRC_MAP_XDREQ0    (DMA_CH0(0) | DMA_INV1   | DMA_INV2   | DMA_INV3)
+#define DMA_SRC_MAP_XDREQ1    (DMA_INV0   | DMA_CH1(0) | DMA_INV2   | DMA_INV3)
+#define DMA_SRC_MAP_USB_EP1   (DMA_CH0(4) | DMA_INV1   | DMA_INV2   | DMA_INV3)
+#define DMA_SRC_MAP_USB_EP2   (DMA_INV0   | DMA_CH1(4) | DMA_INV2   | DMA_INV3)
+#define DMA_SRC_MAP_USB_EP3   (DMA_INV0   | DMA_INV1   | DMA_CH2(4) | DMA_INV3)
+#define DMA_SRC_MAP_USB_EP4   (DMA_INV0   | DMA_INV1   | DMA_INV2   | DMA_CH3(4))
+#define DMA_SRC_MAP_SDI       (DMA_CH0(2) | DMA_CH1(6) | DMA_CH2(2) | DMA_CH3(1))
+#define DMA_SRC_MAP_UART0     (DMA_CH0(1) | DMA_INV1   | DMA_INV2   | DMA_INV3)
+#define DMA_SRC_MAP_UART1     (DMA_INV0   | DMA_CH1(1) | DMA_INV2   | DMA_INV3)
+#define DMA_SRC_MAP_UART2     (DMA_INV0   | DMA_INV1   | DMA_INV2   | DMA_CH3(0))
+#define DMA_SRC_MAP_I2SSDO    (DMA_CH0(5) | DMA_INV1   | DMA_CH2(0) | DMA_INV3)
+#define DMA_SRC_MAP_I2SSDI    (DMA_INV0   | DMA_CH1(2) | DMA_CH2(1) | DMA_INV3)
+#define DMA_SRC_MAP_PCMOUT    (DMA_INV0   | DMA_CH1(5) | DMA_INV2   | DMA_CH3(6))
+#define DMA_SRC_MAP_PCMIN     (DMA_CH0(6) | DMA_INV1   | DMA_CH2(5) | DMA_INV3)
+#define DMA_SRC_MAP_MICIN     (DMA_INV0   | DMA_INV1   | DMA_CH2(6) | DMA_CH3(5))      
+#define DMA_SRC_MAP_SPI0      (DMA_INV0   | DMA_CH1(3) | DMA_INV2   | DMA_INV3)      
+#define DMA_SRC_MAP_SPI1      (DMA_INV0   | DMA_INV1   | DMA_INV2   | DMA_CH3(2))      
+#define DMA_SRC_MAP_TIMER     (DMA_CH0(3) | DMA_INV1   | DMA_CH2(3) | DMA_CH3(3))      
 
 /* Clock & Power Management */
 
@@ -542,6 +577,102 @@
 #define SDIDAT_LBE (*(volatile unsigned long *)0x5A00004C)  /* 32 */
 #define SDIDAT_HBE (*(volatile unsigned short *)0x5A000041) /* 16 */
 #define SDIDAT_BBE (*(volatile unsigned char *)0x5A000043)  /* 8 */
+
+/* SDI register bit definitions. S3C2440 is a superset of S3C2410 */
+
+#define S3C2440_SDICON_SDRESET        (1<<8)
+#define S3C2440_SDICON_MMCCLOCK       (1<<5)
+#define S3C2410_SDICON_BYTEORDER      (1<<4)
+#define S3C2410_SDICON_SDIOIRQ        (1<<3)
+#define S3C2410_SDICON_RWAITEN        (1<<2)
+#define S3C2410_SDICON_FIFORESET      (1<<1)
+#define S3C2410_SDICON_CLOCKTYPE      (1<<0)
+
+#define S3C2410_SDICMDCON_ABORT       (1<<12)
+#define S3C2410_SDICMDCON_WITHDATA    (1<<11)
+#define S3C2410_SDICMDCON_LONGRSP     (1<<10)
+#define S3C2410_SDICMDCON_WAITRSP     (1<<9)
+#define S3C2410_SDICMDCON_CMDSTART    (1<<8)
+#define S3C2410_SDICMDCON_SENDERHOST  (1<<6)
+#define S3C2410_SDICMDCON_INDEX       (0x3f)
+
+#define S3C2410_SDICMDSTAT_CRCFAIL    (1<<12)
+#define S3C2410_SDICMDSTAT_CMDSENT    (1<<11)
+#define S3C2410_SDICMDSTAT_CMDTIMEOUT (1<<10)
+#define S3C2410_SDICMDSTAT_RSPFIN     (1<<9)
+#define S3C2410_SDICMDSTAT_XFERING    (1<<8)
+#define S3C2410_SDICMDSTAT_INDEX      (0xff)
+
+#define S3C2440_SDIDCON_DS_BYTE       (0<<22)
+#define S3C2440_SDIDCON_DS_HALFWORD   (1<<22)
+#define S3C2440_SDIDCON_DS_WORD       (2<<22)
+#define S3C2410_SDIDCON_IRQPERIOD     (1<<21)
+#define S3C2410_SDIDCON_TXAFTERRESP   (1<<20)
+#define S3C2410_SDIDCON_RXAFTERCMD    (1<<19)
+#define S3C2410_SDIDCON_BUSYAFTERCMD  (1<<18)
+#define S3C2410_SDIDCON_BLOCKMODE     (1<<17)
+#define S3C2410_SDIDCON_WIDEBUS       (1<<16)
+#define S3C2410_SDIDCON_DMAEN         (1<<15)
+#define S3C2410_SDIDCON_STOP          (0<<14)
+#define S3C2440_SDIDCON_DATSTART      (1<<14)
+#define S3C2410_SDIDCON_DATMODE       (3<<12)
+#define S3C2410_SDIDCON_BLKNUM        (0xfff)
+
+/* constants for S3C2410_SDIDCON_DATMODE */
+#define S3C2410_SDIDCON_XFER_READY    (0<<12)
+#define S3C2410_SDIDCON_XFER_CHKSTART (1<<12)
+#define S3C2410_SDIDCON_XFER_RXSTART  (2<<12)
+#define S3C2410_SDIDCON_XFER_TXSTART  (3<<12)
+
+#define S3C2410_SDIDCNT_BLKNUM_MASK   (0xFFF)
+#define S3C2410_SDIDCNT_BLKNUM_SHIFT  (12)
+
+#define S3C2410_SDIDSTA_RDYWAITREQ    (1<<10)
+#define S3C2410_SDIDSTA_SDIOIRQDETECT (1<<9)
+#define S3C2410_SDIDSTA_FIFOFAIL      (1<<8)    /* reserved on 2440 */
+#define S3C2410_SDIDSTA_CRCFAIL       (1<<7)
+#define S3C2410_SDIDSTA_RXCRCFAIL     (1<<6)
+#define S3C2410_SDIDSTA_DATATIMEOUT   (1<<5)
+#define S3C2410_SDIDSTA_XFERFINISH    (1<<4)
+#define S3C2410_SDIDSTA_BUSYFINISH    (1<<3)
+#define S3C2410_SDIDSTA_SBITERR       (1<<2)    /* reserved on 2410a/2440 */
+#define S3C2410_SDIDSTA_TXDATAON      (1<<1)
+#define S3C2410_SDIDSTA_RXDATAON      (1<<0)
+
+#define S3C2410_SDIDSTA_CLEAR_BITS    ( S3C2410_SDIDSTA_BUSYFINISH  | \
+        S3C2410_SDIDSTA_XFERFINISH    | S3C2410_SDIDSTA_DATATIMEOUT | \
+        S3C2410_SDIDSTA_RXCRCFAIL     | S3C2410_SDIDSTA_CRCFAIL     | \
+        S3C2410_SDIDSTA_SDIOIRQDETECT | S3C2410_SDIDSTA_RDYWAITREQ )
+
+#define S3C2440_SDIFSTA_FIFORESET      (1<<16)
+#define S3C2440_SDIFSTA_FIFOFAIL       (3<<14)  /* 3 is correct (2 bits) */
+#define S3C2410_SDIFSTA_TFDET          (1<<13)
+#define S3C2410_SDIFSTA_RFDET          (1<<12)
+#define S3C2410_SDIFSTA_TFHALF         (1<<11)
+#define S3C2410_SDIFSTA_TFEMPTY        (1<<10)
+#define S3C2410_SDIFSTA_RFLAST         (1<<9)
+#define S3C2410_SDIFSTA_RFFULL         (1<<8)
+#define S3C2410_SDIFSTA_RFHALF         (1<<7)
+#define S3C2410_SDIFSTA_COUNTMASK      (0x7f)
+
+#define S3C2410_SDIIMSK_RESPONSECRC    (1<<17)
+#define S3C2410_SDIIMSK_CMDSENT        (1<<16)
+#define S3C2410_SDIIMSK_CMDTIMEOUT     (1<<15)
+#define S3C2410_SDIIMSK_RESPONSEND     (1<<14)
+#define S3C2410_SDIIMSK_READWAIT       (1<<13)
+#define S3C2410_SDIIMSK_SDIOIRQ        (1<<12)
+#define S3C2410_SDIIMSK_FIFOFAIL       (1<<11)
+#define S3C2410_SDIIMSK_CRCSTATUS      (1<<10)
+#define S3C2410_SDIIMSK_DATACRC        (1<<9)
+#define S3C2410_SDIIMSK_DATATIMEOUT    (1<<8)
+#define S3C2410_SDIIMSK_DATAFINISH     (1<<7)
+#define S3C2410_SDIIMSK_BUSYFINISH     (1<<6)
+#define S3C2410_SDIIMSK_SBITERR        (1<<5)   /* reserved 2440/2410a */
+#define S3C2410_SDIIMSK_TXFIFOHALF     (1<<4)
+#define S3C2410_SDIIMSK_TXFIFOEMPTY    (1<<3)
+#define S3C2410_SDIIMSK_RXFIFOLAST     (1<<2)
+#define S3C2410_SDIIMSK_RXFIFOFULL     (1<<1)
+#define S3C2410_SDIIMSK_RXFIFOHALF     (1<<0)
 
 /* AC97 Audio-CODEC Interface */
 
