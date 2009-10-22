@@ -192,10 +192,17 @@ def build(wd="."):
     # make
     print "Building ..."
     output = subprocess.Popen(["make"], stdout=subprocess.PIPE, cwd=wd)
-    output.communicate()
-    if not output.returncode == 0:
-        print "Build failed!"
-        return -1
+    while True:
+        c = output.stdout.readline()
+        sys.stdout.write(".")
+        sys.stdout.flush()
+        if not output.poll() == None:
+            sys.stdout.write("\n")
+            sys.stdout.flush()
+            if not output.returncode == 0:
+                print "Build failed!"
+                return -1
+            break
     # strip
     print "Stripping binary."
     output = subprocess.Popen(["strip", progexe], stdout=subprocess.PIPE, cwd=wd)
