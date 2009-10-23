@@ -30,7 +30,6 @@
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
 
 void irq_handler(void) __attribute__((interrupt ("IRQ"), naked));
-void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked));
 
 default_interrupt(EXT0);
 default_interrupt(EXT1);
@@ -141,14 +140,6 @@ void irq_handler(void)
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
                     "subs  pc, lr, #4           \n"); /* Return from IRQ */
 }
-
-void fiq_handler(void)
-{
-    asm volatile (
-        "subs   pc, lr, #4   \r\n"
-    );
-}
-
 
 void system_init(void)
 {

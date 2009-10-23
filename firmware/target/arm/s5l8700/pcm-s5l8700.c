@@ -28,7 +28,6 @@
 #include "audiohw.h"
 #include "pcm.h"
 #include "pcm_sampr.h"
-#include "dma-target.h"
 #include "mmu-target.h"
 
 /*  Driver for the IIS/PCM part of the s5l8700 using DMA
@@ -41,8 +40,10 @@
     - recording is not implemented
 */
 
-static void             dma_callback(void);
-static volatile int     locked = 0;
+static volatile int locked = 0;
+size_t nextsize;
+int dmamode;
+unsigned char* dblbuf;
 
 /* table of recommended PLL/MCLK dividers for mode 256Fs from the datasheet */
 static const struct div_entry {
@@ -54,10 +55,9 @@ static const struct div_entry {
     [HW_FREQ_44] = {   2,   41,    3,    4},
     [HW_FREQ_88] = {   2,   41,    2,    4},
 #if 0   /* disabled because the codec driver does not support it (yet) */
-    [HW_FREQ_8 ] = {   2,   12,    3,    9}
+    [HW_FREQ_8 ] = {   2,   12,    3,    9},
     [HW_FREQ_16] = {   2,   12,    2,    9},
     [HW_FREQ_32] = {   2,   12,    1,    9},
-    
     [HW_FREQ_12] = {   2,   12,    4,    3},
     [HW_FREQ_24] = {   2,   12,    3,    3},
     [HW_FREQ_48] = {   2,   12,    2,    3},
@@ -69,10 +69,9 @@ static const struct div_entry {
     [HW_FREQ_44] = {  37,  151,    1,    9},
     [HW_FREQ_88] = {  50,   98,    1,    4},
 #if 0   /* disabled because the codec driver does not support it (yet) */
-    [HW_FREQ_8 ] = {  28,  192,    3,   12}
+    [HW_FREQ_8 ] = {  28,  192,    3,   12},
     [HW_FREQ_16] = {  28,  192,    3,    6},
     [HW_FREQ_32] = {  28,  192,    2,    6},
-    
     [HW_FREQ_12] = {  28,  192,    3,    8},
     [HW_FREQ_24] = {  28,  192,    2,    8},
     [HW_FREQ_48] = {  28,  192,    2,    4},
@@ -97,50 +96,109 @@ void pcm_play_unlock(void)
     }
 }
 
-static void play_next(void *addr, size_t size)
+static void* dma_callback(void) ICODE_ATTR;
+static void* dma_callback(void)
 {
-    /* setup DMA */
-    dma_setup_channel(DMA_IISOUT_CHANNEL, DMA_IISOUT_SELECT, DMA_MEM_TO_IO,
-                      DMA_IISOUT_DSIZE, DMA_IISOUT_BLEN, addr, size / 2,
-                      dma_callback);
-    
-    /* DMA channel on */
-//    clean_dcache();
-    dma_enable_channel(DMA_IISOUT_CHANNEL);
-}
-
-static void dma_callback(void)
-{
-    unsigned char *dma_start_addr;
-    size_t dma_size;
-    
-    register pcm_more_callback_type get_more = pcm_callback_for_more;
-    if (get_more) {
-        get_more(&dma_start_addr, &dma_size);
-        
-        if (dma_size == 0) {
-            pcm_play_dma_stop();
-            pcm_play_dma_stopped_callback();
+    if (dmamode)
+    {
+        unsigned char *dma_start_addr;
+        register pcm_more_callback_type get_more = pcm_callback_for_more;
+        if (get_more)
+        {
+            get_more(&dma_start_addr, &nextsize);
+            if (nextsize > 4096)
+            {
+                nextsize = nextsize - 2048;
+                dblbuf = dma_start_addr + nextsize;
+                dmamode = 0;
+            }
+            nextsize = (nextsize >> 1) - 1;
+            clean_dcache();
+            return dma_start_addr;
         }
-        else {
-            play_next(dma_start_addr, dma_size);
+        else
+        {
+            nextsize = -1;
+            return 0;
         }
     }
+    else
+    {
+        dmamode = 1;
+        nextsize = 1023;
+        return dblbuf;
+    }
+}
+
+void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked)) ICODE_ATTR;
+void fiq_handler(void)
+{
+    asm volatile (
+        "cmn    r11, #1                            \n"
+        "strne  r10, [r8]                          \n"  /* DMABASE0 */
+        "strne  r11, [r8,#0x08]                    \n"  /* DMATCNT0 */
+        "strne  r9, [r8,#0x14]                     \n"  /* DMACOM0 */
+        "moveq  r10, #5                            \n"  /* STOP DMA */
+        "streq  r10, [r8,#0x14]                    \n"  /* DMACOM0 */
+        "mov    r10, #7                            \n"  /* CLEAR IRQ */
+        "str    r10, [r8,#0x14]                    \n"  /* DMACOM0 */
+        "mov    r11, #0x39C00000                   \n"  /* SRCPND */
+        "mov    r10, #0x00000400                   \n"  /* INT_DMA */
+        "str    r10, [r11]                         \n"  /* ACK FIQ */
+        "stmfd  sp!, {r0-r3,lr}                    \n"
+        "ldreq  r0, =pcm_play_dma_stopped_callback \n"
+        "ldrne  r0, =dma_callback                  \n"
+        "mov    lr, pc                             \n"
+        "bx     r0                                 \n"
+        "mov    r10, r0                            \n"
+        "ldmfd  sp!, {r0-r3,lr}                    \n"
+        "ldr    r11, =nextsize                     \n"
+        "ldr    r11, [r11]                         \n"
+        "subs   pc, lr, #4                         \n"
+    );
+}
+
+void bootstrap_fiq(const void* addr, size_t tcnt) __attribute__((naked,noinline));
+void bootstrap_fiq(const void* addr, size_t tcnt)
+{
+    (void)addr;
+    (void)tcnt;
+    asm volatile (
+        "add    r2, lr, #4        \n"
+        "mrs    r3, cpsr          \n"
+        "msr    cpsr_c, #0xD1     \n"  /* FIQ mode, IRQ/FIQ disabled */
+        "mov    r8, #0x38400000   \n"  /* DMA BASE */
+        "mov    r9, #4            \n"  /* START DMA */
+        "mov    r10, r0           \n"
+        "mov    r11, r1           \n"
+        "mov    r0, #0            \n"
+        "ldr    r12, =fiq_handler \n"
+        "ldr    sp, =_fiqstackend \n"
+        "mov    lr, r2            \n"
+        "msr    spsr_all, r3      \n"
+        "bx     r12               \n"
+    );
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
     /* S1: DMA channel 0 set */
-    dma_setup_channel(DMA_IISOUT_CHANNEL, DMA_IISOUT_SELECT, DMA_MEM_TO_IO,
-                      DMA_IISOUT_DSIZE, DMA_IISOUT_BLEN, (void *)addr, size / 2,
-                      dma_callback);
+    DMACON0 = (0 << 30) |       /* DEVSEL */
+              (1 << 29) |       /* DIR */
+              (0 << 24) |       /* SCHCNT */
+              (1 << 22) |       /* DSIZE */
+              (0 << 19) |       /* BLEN */
+              (0 << 18) |       /* RELOAD */
+              (0 << 17) |       /* HCOMINT */
+              (1 << 16) |       /* WCOMINT */
+              (0 << 0);         /* OFFSET */
 
 #ifdef IPOD_NANO2G
     PCON5 = (PCON5 & ~(0xFFFF0000)) | 0x77720000;
     PCON6 = (PCON6 & ~(0x0F000000)) | 0x02000000;
 
     I2STXCON = (1 << 20) |  /* undocumented */
-               (DMA_IISOUT_BLEN << 16) |  /* burst length */
+               (0 << 16) |  /* burst length */
                (0 << 15) |  /* 0 = falling edge */
                (0 << 13) |  /* 0 = basic I2S format */
                (0 << 12) |  /* 0 = MSB first */
@@ -163,8 +221,10 @@ void pcm_play_dma_start(const void *addr, size_t size)
 #endif
     
     /* S3: DMA channel 0 on */
-//    clean_dcache();
-    dma_enable_channel(DMA_IISOUT_CHANNEL);
+    clean_dcache();
+    dmamode = 0;
+    dblbuf = (unsigned char*)addr + size - 2048;
+    bootstrap_fiq(addr, (size >> 1) - 1025);
 
     /* S4: IIS Tx clock on */
     I2SCLKCON = (1 << 0);   /* 1 = power on */
@@ -179,7 +239,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 void pcm_play_dma_stop(void)
 {
     /* DMA channel off */
-    dma_disable_channel(DMA_IISOUT_CHANNEL);
+    DMACOM0 = 5;
     
     /* TODO Some time wait */
     /* LRCK half cycle wait */
@@ -214,6 +274,10 @@ void pcm_play_dma_init(void)
 
     /* enable clock to the IIS module */
     PWRCON &= ~(1 << 6);
+
+    /* Enable the DMA FIQ */
+    INTMOD |= (1 << 10);
+    INTMSK |= (1 << 10);
     
     audiohw_preinit();
 }
@@ -248,20 +312,20 @@ void pcm_dma_apply_settings(void)
     /* configure MCLK */
     CLKCON = (CLKCON & ~(0xFF)) | 
              (0 << 7) |         /* MCLK_MASK */
-             (2 << 5) |         /* MCLK_SEL = PLL2 */
+             (2 << 5) |         /* MCLK_SEL = PLL1 */
              (1 << 4) |         /* MCLK_DIV_ON */
              (div.cdiv - 1);    /* MCLK_DIV_VAL */
 }
 
 size_t pcm_get_bytes_waiting(void)
 {
-    return DMACTCNT0 * 2;
+    return (DMACTCNT0 + 1) << 1;
 }
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     *count = DMACTCNT0 >> 1;
-    return (void *)((DMACADDR0 + 2) & ~3);
+    return (void *)(((DMACADDR0 + 2) & ~3) | 0x40000000);
 }
 
 #ifdef HAVE_PCM_DMA_ADDRESS
