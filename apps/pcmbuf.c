@@ -687,7 +687,7 @@ static void crossfade_start(void)
 }
 
 /* Returns the number of bytes _NOT_ mixed */
-static size_t crossfade_fade_mix(int factor, const char *buf, size_t fade_rem)
+static size_t crossfade_mix(int factor, const char *buf, size_t length)
 {
     const int16_t *input_buf = (const int16_t *)buf;
     int16_t *output_buf = (int16_t *)(crossfade_chunk->addr);
@@ -695,49 +695,16 @@ static size_t crossfade_fade_mix(int factor, const char *buf, size_t fade_rem)
     output_buf = &output_buf[crossfade_sample];
     int32_t sample;
 
-    while (fade_rem)
-    {
-        /* fade left and right channel at once to keep buffer alignment */
-        sample = *input_buf++;
-        sample = ((sample * factor) >> 8) + *output_buf;
-        *output_buf++ = clip_sample_16(sample);
-
-        sample = *input_buf++;
-        sample = ((sample * factor) >> 8) + *output_buf;
-        *output_buf++ = clip_sample_16(sample);
-
-        fade_rem -= 4; /* 2 samples, each 16 bit -> 4 bytes */
-
-        if (output_buf >= chunk_end)
-        {
-            crossfade_chunk = crossfade_chunk->link;
-            if (!crossfade_chunk)
-                return fade_rem;
-            output_buf = (int16_t *)crossfade_chunk->addr;
-            chunk_end = SKIPBYTES(output_buf, crossfade_chunk->size);
-        }
-    }
-    crossfade_sample = output_buf - (int16_t *)crossfade_chunk->addr;
-    return 0;
-}
-
-/* Returns the number of bytes _NOT_ mixed */
-static size_t crossfade_mix(const char *buf, size_t length)
-{
-    const int16_t *input_buf = (const int16_t *)buf;
-    int16_t *output_buf = (int16_t *)crossfade_chunk->addr;
-    int16_t *chunk_end = SKIPBYTES(output_buf, crossfade_chunk->size);
-    output_buf = &output_buf[crossfade_sample];
-    int32_t sample;
-
     while (length)
     {
         /* fade left and right channel at once to keep buffer alignment */
-        sample = *input_buf++ + *output_buf;
-        *output_buf++ = clip_sample_16(sample);
-
-        sample = *input_buf++ + *output_buf;
-        *output_buf++ = clip_sample_16(sample);
+        int i;
+        for (i = 0; i < 2; i++)
+        {
+            sample = *input_buf++;
+            sample = ((sample * factor) >> 8) + *output_buf;
+            *output_buf++ = clip_sample_16(sample);
+        }
 
         length -= 4; /* 2 samples, each 16 bit -> 4 bytes */
 
@@ -746,7 +713,6 @@ static size_t crossfade_mix(const char *buf, size_t length)
             crossfade_chunk = crossfade_chunk->link;
             if (!crossfade_chunk)
                 return length;
-
             output_buf = (int16_t *)crossfade_chunk->addr;
             chunk_end = SKIPBYTES(output_buf, crossfade_chunk->size);
         }
@@ -796,32 +762,28 @@ static void flush_crossfade(char *buf, size_t length)
             {
                 /* Mix the data */
                 size_t fade_total = fade_rem;
-                fade_rem = crossfade_fade_mix(factor, buf, fade_rem);
+                fade_rem = crossfade_mix(factor, buf, fade_rem);
                 length -= fade_total - fade_rem;
                 buf += fade_total - fade_rem;
                 if (!length)
                     return;
-                if (!fade_rem)
-                    goto fade_done;
             }
 
             samples = fade_rem / 2;
             input_buf = (int16_t *)buf;
             /* Fade remaining samples in place */
-            while (samples)
+            while (samples--)
             {
                 int32_t sample = *input_buf;
                 *input_buf++ = (sample * factor) >> 8;
-                samples--;
             }
         }
 
-fade_done:
         if (crossfade_chunk)
         {
             /* Mix the data */
             size_t mix_total = length;
-            length = crossfade_mix(buf, length);
+            length = crossfade_mix(256, buf, length);
             buf += mix_total - length;
             if (!length)
                 return;
@@ -958,27 +920,6 @@ void pcmbuf_write_complete(int count)
             pcmbuf_flush_fillpos();
     }
 }
-
-#if 0
-bool pcmbuf_insert_buffer(char *buf, int count)
-{
-    size_t length = (size_t)(unsigned int)count << 2;
-
-    if (crossfade_active)
-    {
-        flush_crossfade(buf, length);
-        if (!(crossfade_fade_in_rem || crossfade_chunk))
-            crossfade_active = false;
-    }
-    else
-    {
-        if (!prepare_insert(length))
-            return false;
-        pcmbuf_flush_buffer(buf, length);
-    }
-    return true;
-}
-#endif
 
 #ifndef HAVE_HARDWARE_BEEP
 #define MINIBUF_SAMPLES (NATIVE_FREQUENCY / 1000 * KEYCLICK_DURATION)
