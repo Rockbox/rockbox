@@ -288,7 +288,7 @@ static void usb_thread(void)
 #ifdef USB_ENABLE_CHARGING_ONLY
                     usb_core_enable_driver(USB_DRIVER_HID, false);
 #else
-                    usb_core_enable_driver(USB_DRIVER_HID, usb_hid);
+                    usb_core_enable_driver(USB_DRIVER_HID, true);
 #endif /* USB_ENABLE_CHARGING_ONLY */
 #endif /* USB_ENABLE_HID */
 
