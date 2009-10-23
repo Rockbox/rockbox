@@ -781,6 +781,7 @@ struct user_settings
     /* new stuff to be added at the end */
 
 #ifdef USB_ENABLE_HID
+    bool usb_hid;
     int usb_keypad_mode;
 #endif
 

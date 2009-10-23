@@ -31,6 +31,7 @@
 #include "backlight.h"
 #include "settings.h"
 #include "settings_list.h"
+#include "usb.h"
 #include "sound.h"
 #include "dsp.h"
 #include "mpeg.h"
@@ -1623,6 +1624,7 @@ const struct settings_list settings[] = {
 #endif
 
 #ifdef USB_ENABLE_HID
+    OFFON_SETTING(0, usb_hid, LANG_USB_HID, true, "usb hid", usb_set_hid),
     CHOICE_SETTING(0, usb_keypad_mode, LANG_USB_KEYPAD_MODE, 0,
             "usb keypad mode", "multimedia,presentation,browser"
 #ifdef HAVE_USB_HID_MOUSE

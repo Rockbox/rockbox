@@ -92,6 +92,7 @@ bool dir_exists(const char *path);
  */
 char *strip_extension(char* buffer, int buffer_size, const char *filename);
 
+#ifdef HAVE_LCD_BITMAP
 /* A simplified scanf */
 /*
  * Checks whether the value at position 'position' was really read
@@ -102,5 +103,11 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename);
 #define LIST_VALUE_PARSED(setvals, position) ((setvals) & BIT_N(position))
 const char* parse_list(const char *fmt, uint32_t *set_vals,
                        const char sep, const char* str, ...);
+
+/* only used in USB HID and set_time screen */
+#if defined(USB_ENABLE_HID) || (CONFIG_RTC != 0)
+int clamp_value_wrap(int value, int max, int min);
+#endif
+#endif
 
 #endif /* MISC_H */

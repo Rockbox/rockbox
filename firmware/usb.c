@@ -218,6 +218,10 @@ static inline bool usb_reboot_button(void)
 #endif
 #endif /* HAVE_USB_POWER */
 
+#ifdef USB_ENABLE_HID
+static bool usb_hid = true;
+#endif
+
 static void usb_thread(void)
 {
     int num_acks_to_expect = 0;
@@ -284,7 +288,7 @@ static void usb_thread(void)
 #ifdef USB_ENABLE_CHARGING_ONLY
                     usb_core_enable_driver(USB_DRIVER_HID, false);
 #else
-                    usb_core_enable_driver(USB_DRIVER_HID, true);
+                    usb_core_enable_driver(USB_DRIVER_HID, usb_hid);
 #endif /* USB_ENABLE_CHARGING_ONLY */
 #endif /* USB_ENABLE_HID */
 
@@ -307,7 +311,7 @@ static void usb_thread(void)
                 usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
 #endif
 #ifdef USB_ENABLE_HID
-                usb_core_enable_driver(USB_DRIVER_HID, true);
+                usb_core_enable_driver(USB_DRIVER_HID, usb_hid);
 #endif
 #ifdef USB_ENABLE_CHARGING_ONLY
                 usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, false);
@@ -688,6 +692,14 @@ int usb_release_exclusive_storage(void)
 bool usb_powered(void)
 {
     return usb_state == USB_POWERED;
+}
+#endif
+
+#ifdef USB_ENABLE_HID
+void usb_set_hid(bool enable)
+{
+    usb_hid = enable;
+    usb_core_enable_driver(USB_DRIVER_HID, usb_hid);
 }
 #endif
 

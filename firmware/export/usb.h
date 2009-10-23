@@ -148,4 +148,8 @@ bool firewire_detect(void);
 void usb_firewire_connect_event(void);
 #endif
 
+#ifdef USB_ENABLE_HID
+void usb_set_hid(bool enable);
+#endif
+
 #endif

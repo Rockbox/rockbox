@@ -60,18 +60,6 @@
 #include "dsp.h"
 #endif
 
-/* only used in set_time screen */
-#if defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0)
-static int clamp_value_wrap(int value, int max, int min)
-{
-    if (value > max)
-        return min;
-    if (value < min)
-        return max;
-    return value;
-}
-#endif
-
 #if (CONFIG_STORAGE & STORAGE_MMC)
 int mmc_remove_request(void)
 {

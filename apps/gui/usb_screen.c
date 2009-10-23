@@ -49,6 +49,7 @@
 
 #ifdef USB_ENABLE_HID
 int usb_keypad_mode;
+static bool usb_hid;
 #endif
 
 #ifndef SIMULATOR
@@ -64,7 +65,7 @@ static int handle_usb_events(void)
     {
         int button;
 #ifdef USB_ENABLE_HID
-        if (usb_core_driver_enabled(USB_DRIVER_HID))
+        if (usb_hid)
         {
             button = get_hid_usb_action();
 
@@ -157,20 +158,24 @@ static void usb_screen_fix_viewports(struct screen *screen,
     logo->height = logo_height;
 
 #ifdef USB_ENABLE_HID
-    struct viewport *title = &usb_screen_vps->title;
-    int char_height, nb_lines;
+    if (usb_hid)
+    {
+        struct viewport *title = &usb_screen_vps->title;
+        int char_height, nb_lines;
 
-    /* nb_lines only returns the number of fully visible lines, small screens
-       or really large fonts could cause problems with the calculation below.
-       */
-    nb_lines = viewport_get_nb_lines(parent);
-    if (nb_lines == 0)
-        nb_lines++;
+        /* nb_lines only returns the number of fully visible lines, small
+         * screens or really large fonts could cause problems with the
+         * calculation below.
+         */
+        nb_lines = viewport_get_nb_lines(parent);
+        if (nb_lines == 0)
+            nb_lines++;
 
-    char_height = parent->height/nb_lines;
+        char_height = parent->height/nb_lines;
 
-    *title = *parent;
-    title->y = logo->y + logo->height + char_height;
+        *title = *parent;
+        title->y = logo->y + logo->height + char_height;
+    }
 #endif
 }
 #endif
@@ -209,9 +214,12 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
             screen->transparent_bitmap(usblogo, 0, 0, logo->width,
                 logo->height);
 #ifdef USB_ENABLE_HID
-            screen->set_viewport(&usb_screen_vps->title);
-            usb_screen_vps->title.flags |= VP_FLAG_ALIGN_CENTER;
-            screen->puts_scroll(0, 0, str(keypad_mode_name_get()));
+            if (usb_hid)
+            {
+                screen->set_viewport(&usb_screen_vps->title);
+                usb_screen_vps->title.flags |= VP_FLAG_ALIGN_CENTER;
+                screen->puts_scroll(0, 0, str(keypad_mode_name_get()));
+            }
 #endif /* USB_ENABLE_HID */
         }
         screen->set_viewport(parent);
@@ -252,6 +260,7 @@ void gui_usb_screen_run(void)
 #endif
 
 #ifdef USB_ENABLE_HID
+    usb_hid = global_settings.usb_hid;
     usb_keypad_mode = global_settings.usb_keypad_mode;
 #endif
 
@@ -283,7 +292,7 @@ void gui_usb_screen_run(void)
         const struct viewport* vp = NULL;
 
 #if defined(HAVE_LCD_BITMAP) && defined(USB_ENABLE_HID)
-        vp = &usb_screen_vps_ar[i].title;
+        vp = usb_hid ? &usb_screen_vps_ar[i].title : NULL;
 #elif !defined(HAVE_LCD_BITMAP)
         vp = &usb_screen_vps_ar[i].parent;
 #endif

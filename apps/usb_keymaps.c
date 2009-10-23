@@ -23,6 +23,7 @@
 #ifdef USB_ENABLE_HID
 #include "action.h"
 #include "lang.h"
+#include "misc.h"
 #include "usbstack/usb_hid.h"
 //#define LOGF_ENABLE
 #include "logf.h"
@@ -174,40 +175,47 @@ extern int usb_keypad_mode;
 
 int get_hid_usb_action(void)
 {
-    int action;
+    int action, step;
     const hid_key_mapping_t *key_mapping = hid_key_mappings[usb_keypad_mode];
 
+    step = -1;
     action = get_action(key_mapping->context, HZ/4);
-    /* Skip key mappings in a cyclic way */
-    if (action == ACTION_USB_HID_MODE_SWITCH_NEXT)
+    switch (action)
     {
-        /* TODO: Use clamp_value_wrap() */
-        usb_keypad_mode = (usb_keypad_mode + 1) % NUM_KEY_MAPPINGS;
-    }
-    else if (action == ACTION_USB_HID_MODE_SWITCH_PREV)
-    {
-        /* TODO: Use clamp_value_wrap() */
-        usb_keypad_mode = (usb_keypad_mode - 1) % NUM_KEY_MAPPINGS;
-    }
-    else if (action > ACTION_USB_HID_FIRST && action < ACTION_USB_HID_LAST)
-    {
-        const mapping_t *mapping;
-        const hid_key_mapping_t *key_mapping =
-            hid_key_mappings[usb_keypad_mode];
-
-        for (mapping = key_mapping->mapping; mapping->action; mapping++)
-        {
-            if (action == mapping->action)
+        case ACTION_USB_HID_MODE_SWITCH_NEXT:
+            step = 1;
+        case ACTION_USB_HID_MODE_SWITCH_PREV:
+            /* Switch key mappings in a cyclic way */
+            usb_keypad_mode = clamp_value_wrap(usb_keypad_mode + step,
+                    NUM_KEY_MAPPINGS - 1, 0);
+            break;
+        default:
             {
-                logf("Action %d", action);
-                usb_hid_send(key_mapping->usage_page, mapping->id);
+                const mapping_t *mapping;
+                const hid_key_mapping_t *key_mapping =
+                    hid_key_mappings[usb_keypad_mode];
+
+                if (action <= ACTION_USB_HID_FIRST ||
+                        action >= ACTION_USB_HID_LAST)
+                {
+                    break;
+                }
+
+                for (mapping = key_mapping->mapping; mapping->action; mapping++)
+                {
+                    if (action == mapping->action)
+                    {
+                        logf("Action %d", action);
+                        usb_hid_send(key_mapping->usage_page, mapping->id);
+                        break;
+                    }
+                }
+#ifdef DEBUG
+                if (!mapping->action)
+                    logf("Action %d not found", action);
+#endif
                 break;
             }
-        }
-#ifdef DEBUG
-        if (!mapping->action)
-            logf("Action %d not found", action);
-#endif
     }
 
     return action;

@@ -1047,4 +1047,16 @@ err:
     va_end(ap);
     return 0;
 }
+
+/* only used in USB HID and set_time screen */
+#if defined(USB_ENABLE_HID) || (CONFIG_RTC != 0)
+int clamp_value_wrap(int value, int max, int min)
+{
+    if (value > max)
+        return min;
+    if (value < min)
+        return max;
+    return value;
+}
+#endif
 #endif

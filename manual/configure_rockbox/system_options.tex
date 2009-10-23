@@ -183,6 +183,14 @@ this option \setting{On}. If it is not required, then turning this setting
   }
 }
 \opt{usb_hid}{
+  \subsection{USB HID}
+  \label{ref:USB_HID}
+    This option turns the USB HID feature \setting{On} and \setting{Off}.
+    When this feature is enabled, the \dap{} enumerates as a Human Interface
+    Device (HID), composed of several HID sub devices.
+    Since the \dap{} also enumerates as a Mass Storage Device, it becomes a USB
+    Composite Device, which contains both these devices.
+
   \subsection{USB Keypad Mode}
     This setting control the keypad mode when the \dap{} is attached to a
     computer through USB. Pressing a key on the \dap{} sends a keystroke the
