@@ -10,6 +10,7 @@ lfunc.c
 lgc.c
 liolib.c
 llex.c
+lmathlib.c
 lmem.c
 loadlib.c
 lobject.c
