@@ -503,6 +503,8 @@ static void fill_text_message(lua_State *L, struct text_message * message,
     luaL_checktype(L, pos, LUA_TTABLE);
     int n = luaL_getn(L, pos);
     const char **lines = (const char**) dlmalloc(n * sizeof(const char*));
+    if(lines == NULL)
+        luaL_error(L, "Can't allocate %d bytes!", n * sizeof(const char*));
     for(i=1; i<=n; i++)
     {
         lua_rawgeti(L, pos, i);
@@ -531,6 +533,41 @@ RB_WRAP(gui_syncyesno_run)
         dlfree(yes_message.message_lines);
     if(no)
         dlfree(no_message.message_lines);
+
+    lua_pushinteger(L, result);
+    return 1;
+}
+
+RB_WRAP(do_menu)
+{
+    struct menu_callback_with_desc menu_desc = {NULL, NULL, Icon_NOICON};
+    struct menu_item_ex menu = {MT_RETURN_ID | MENU_HAS_DESC, {.strings = NULL},
+                                {.callback_and_desc = &menu_desc}};
+    int i, n, start_selected;
+    const char **items, *title;
+
+    title = luaL_checkstring(L, 1);
+    luaL_checktype(L, 2, LUA_TTABLE);
+    start_selected = luaL_optint(L, 3, 0);
+
+    n = luaL_getn(L, 2);
+    items = (const char**) dlmalloc(n * sizeof(const char*));
+    if(items == NULL)
+        luaL_error(L, "Can't allocate %d bytes!", n * sizeof(const char*));
+    for(i=1; i<=n; i++)
+    {
+        lua_rawgeti(L, 2, i); /* Push item on the stack */
+        items[i-1] = luaL_checkstring(L, -1);
+        lua_pop(L, 1); /* Pop it */
+    }
+
+    menu.strings = items;
+    menu.flags |= MENU_ITEM_COUNT(n);
+    menu_desc.desc = (unsigned char*) title;
+
+    int result = rb->do_menu(&menu, &start_selected, NULL, false);
+
+    dlfree(items);
 
     lua_pushinteger(L, result);
     return 1;
@@ -575,6 +612,7 @@ static const luaL_Reg rocklib[] =
     R(clear_viewport),
     R(current_path),
     R(gui_syncyesno_run),
+    R(do_menu),
 
     {"new_image", rli_new},
 
