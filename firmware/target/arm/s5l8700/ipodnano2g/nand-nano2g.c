@@ -29,6 +29,7 @@
 #include <pmu-target.h>
 #include <mmu-target.h>
 #include <string.h>
+#include "led.h"
 
 
 #define NAND_CMD_READ       0x00
@@ -101,6 +102,7 @@ static uint8_t nand_ecc[0x30] __attribute__((aligned(16)));
 
 uint32_t nand_unlock(uint32_t rc)
 {
+    led(false);
     mutex_unlock(&nand_mtx);
     return rc;
 }
@@ -349,6 +351,7 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
 	if (sparebuffer && !((uint32_t)sparebuffer & 0xf))
         spare = (uint8_t*)sparebuffer;
     mutex_lock(&nand_mtx);
+    led(true);
     if (!nand_powered) nand_power_up();
     uint32_t rc, eccresult;
     nand_set_fmctrl0(bank, FMCTRL0_ENABLEDMA);
@@ -405,6 +408,7 @@ uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
 	if (sparebuffer && !((uint32_t)sparebuffer & 0xf))
         spare = (uint8_t*)sparebuffer;
     mutex_lock(&nand_mtx);
+    led(true);
     if (!nand_powered) nand_power_up();
     if (sparebuffer)
 	{
@@ -438,6 +442,7 @@ uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
 uint32_t nand_block_erase(uint32_t bank, uint32_t page)
 {
     mutex_lock(&nand_mtx);
+    led(true);
     if (!nand_powered) nand_power_up();
     nand_set_fmctrl0(bank, 0);
     if (nand_send_cmd(NAND_CMD_BLOCKERASE)) return nand_unlock(1);

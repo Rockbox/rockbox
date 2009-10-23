@@ -23,7 +23,6 @@
 #include "system.h"
 #include <string.h>
 #include "thread.h"
-#include "led.h"
 #include "disk.h"
 #include "storage.h"
 #include "panic.h"
@@ -40,11 +39,6 @@ static bool initialized = false;
 static long nand_stack[20];
 
 /* API Functions */
-
-void nand_led(bool onoff)
-{
-    led(onoff);
-}
 
 int nand_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
                      void* inbuf)
