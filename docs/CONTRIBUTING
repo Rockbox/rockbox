@@ -25,8 +25,9 @@ readable and maintainable.
 
 Language features
 -----------------
-Write normal C code. Don't redefine the language. No new types (structs are
-structs, not typedefs), no C++isms or Javaisms.
+Write normal C code. Keep it simple. Don't redefine the language. No new types
+(structs are structs, not typedefs). No C++isms or Javaisms. No code in .h
+files or #defines.
 
 Identifiers
 -----------
