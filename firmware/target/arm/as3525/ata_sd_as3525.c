@@ -310,25 +310,27 @@ static int sd_init_card(const int drive)
     MCI_CLOCK(drive) |= MCI_CLOCK_BYPASS;   /*  FIXME: 50 MHz is spec limit  */
     mci_delay();
 
-    /*  CMD7 w/rca: Select card to put it in TRAN state */
-    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
-        return -7;
-
+#ifdef HAVE_MULTIDRIVE
     /* Try to switch V2 cards to HS timings, non HS seem to ignore this */
     if(sd_v2)
     {
+        /*  CMD7 w/rca: Select card to put it in TRAN state */
+        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
+            return -7;
+
         if(sd_wait_for_state(drive, SD_TRAN))
             return -8;
         /* CMD6 */
         if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_ARG, NULL))
             return -9;
         mci_delay();
-    }
 
-    /*  go back to STBY state so we can read csd */
-    /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
-    if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_ARG, NULL))
-        return -10;
+        /*  go back to STBY state so we can read csd */
+        /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
+        if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_ARG, NULL))
+            return -10;
+    }
+#endif /*  HAVE_MULTIDRIVE  */
 
     /* CMD9 send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
