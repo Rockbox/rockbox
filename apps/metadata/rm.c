@@ -38,6 +38,9 @@
 #define DEBUGF(...)
 #endif
 
+#define ID3V1_OFFSET            -128
+#define METADATA_FOOTER_OFFSET  -140
+
 static inline void print_cook_extradata(RMContext *rmctx) {
 
     DEBUGF("            cook_version = 0x%08lx\n", rm_get_uint32be(rmctx->codec_extradata));
@@ -84,6 +87,52 @@ static char* fourcc2str(uint32_t f)
     return res;
 }
 #endif
+
+static inline int real_read_id3v1_tags(int fd, struct mp3entry *id3)
+{
+    /* ID3v1 Standard : http://id3.org/id3v1.html */
+    char    temp[31];    
+    char    *buf = &id3->id3v1buf[0][0];
+    long    buf_remaining = sizeof(id3->id3v1buf);
+
+    lseek(fd, ID3V1_OFFSET, SEEK_END);
+    read(fd, temp, 3);
+    temp[3] = '\0';
+    if(!strcmp(temp, "TAG"))
+    {        
+        read_string(fd, temp, sizeof(temp), -1, 30);
+        parse_tag("title", temp, id3, buf, buf_remaining, 0);
+        buf += 30;
+        buf_remaining -= 30;
+
+        read_string(fd, temp, sizeof(temp), -1, 30);
+        parse_tag("artist", temp, id3, buf, buf_remaining, 0);
+        buf += 30;
+        buf_remaining -= 30;
+
+        read_string(fd, temp, sizeof(temp), -1, 30);
+        parse_tag("album", temp, id3, buf, buf_remaining, 0);
+        buf += 30;
+        buf_remaining -= 30;
+
+        read_string(fd, temp, sizeof(temp), -1, 4);
+        parse_tag("year", temp, id3, buf, buf_remaining, 0);
+        buf += 4;
+        buf_remaining -= 4;
+
+        read_string(fd, temp, sizeof(temp), -1, 30);
+        parse_tag("comment", temp, id3, buf, buf_remaining, 0);
+        buf += 30;
+        buf_remaining -= 30;
+        
+        read_string(fd, temp, sizeof(temp), -1, 1);
+        parse_tag("genre", temp, id3, buf, buf_remaining, 0);
+
+        return 0;
+    }
+    
+    return -1;
+}
 
 static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
 {
@@ -348,7 +397,6 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
                 lseek(fd, len + 4, SEEK_CUR);
 #endif
                 skipped += len + 4;
-                //From ffmpeg: codec_pos = url_ftell(pb);
                 read_uint32be(fd,&v);
                 skipped += 4;
 
@@ -409,11 +457,13 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
     memset(rmctx,0,sizeof(RMContext));
     if(rm_parse_header(fd, rmctx, id3) < 0)
         return false;
-
-    /* Copy tags */
-    id3->title = id3->id3v1buf[0];
-    id3->artist = id3->id3v1buf[1];
-    id3->comment = id3->id3v1buf[3];
+        
+    if(real_read_id3v1_tags(fd, id3)) {  
+    /* file has no id3v1 tags, use the tags from CONT chunk */
+        id3->title  = id3->id3v1buf[0];
+        id3->artist = id3->id3v1buf[1];
+        id3->comment= id3->id3v1buf[3];
+    }
 
     switch(rmctx->codec_type)
     {
@@ -432,7 +482,7 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
             id3->codectype = AFMT_RM_ATRAC3;
             break;
     }
-    
+
     id3->bitrate = rmctx->bit_rate / 1000;
     id3->frequency = rmctx->sample_rate;
     id3->length = rmctx->duration;
