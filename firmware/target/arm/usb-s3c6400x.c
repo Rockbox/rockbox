@@ -370,9 +370,10 @@ void usb_drv_exit(void)
 {
 	DCTL = 0x802;  /* Soft Disconnect */
 
+    ORSTCON = 1;  /* Put the PHY into reset (needed to get current down) */
+    PCGCCTL = 1;  /* Shut down PHY clock */
     OPHYPWR = 0xF;  /* PHY: Power down */
     
-    PCGCCTL = 1;  /* Mask clocks */
     PWRCON |= 0x4000;
     PWRCONEXT |= 0x800;
 }
@@ -406,12 +407,12 @@ int usb_detect(void)
 #else
 void usb_init_device(void)
 {
-    /* simply switch USB off for now */
 	DCTL = 0x802;  /* Soft Disconnect */
 
+    ORSTCON = 1;  /* Put the PHY into reset (needed to get current down) */
+    PCGCCTL = 1;  /* Shut down PHY clock */
     OPHYPWR = 0xF;  /* PHY: Power down */
     
-    PCGCCTL = 1; /* Mask clocks */
     PWRCON |= 0x4000;
     PWRCONEXT |= 0x800;
 }
