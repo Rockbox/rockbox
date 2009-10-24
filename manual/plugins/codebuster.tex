@@ -1,0 +1,34 @@
+% $Id:
+\subsection{Codebuster}
+\screenshot{plugins/images/ss-codebuster}{Codebuster}{img:codebuster}
+
+Codebuster is a clone of the classic mastermind game. Your aim is to guess the
+computer's combination in a minimal number of attempts. At every turn, you input
+a combination, which is then validated by the computer, which displays the number
+of well-placed and misplaced pegs (a red square for right ones, and a white square
+for misplaced ones).
+
+\begin{table}
+  \begin{btnmap}{}{}
+    \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD}{\ButtonPower}
+    \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
+    \opt{IPOD_4G_PAD}{\ButtonMenu}
+    \opt{IRIVER_H300_PAD}{\ButtonOff}
+    \opt{GIGABEAT_S_PAD}{\ButtonBack}
+       \opt{HAVEREMOTEKEYMAP}{& }
+        & Show menu \\
+    \opt{IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,IPOD_4G_PAD}
+        {\ButtonSelect}
+    \opt{IAUDIO_X5_PAD}{\ButtonRec}
+       \opt{HAVEREMOTEKEYMAP}{& }
+        & Validate suggestion and move to next line \\
+    \ButtonLeft\ / \ButtonRight
+       \opt{HAVEREMOTEKEYMAP}{& }
+        & Select a peg \\
+    \opt{IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD}
+        {\ButtonUp\ / \ButtonDown}
+    \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_4G_PAD}{\ButtonScrollFwd\ / \ButtonScrollBack}
+      \opt{HAVEREMOTEKEYMAP}{& }
+        & Change current peg \\
+  \end{btnmap}
+\end{table}

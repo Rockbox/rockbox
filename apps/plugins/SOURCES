@@ -67,6 +67,7 @@ robotfindskitten.c
 #ifdef HAVE_LCD_COLOR
 clix.c
 ppmviewer.c
+codebuster.c
 #endif
 
 /* Plugins needing the grayscale lib on low-depth LCDs */
