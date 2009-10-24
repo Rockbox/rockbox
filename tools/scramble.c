@@ -31,9 +31,9 @@
 #include "creative.h"
 #include "iaudio_bl_flash.h"
 
-int iaudio_encode(char *iname, char *oname, char *idstring);
-int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc);
-int ccpmp_encode(char *iname, char *oname);
+static int iaudio_encode(char *iname, char *oname, char *idstring);
+static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc);
+static int ccpmp_encode(char *iname, char *oname);
 
 enum
 {
@@ -640,7 +640,7 @@ int main (int argc, char** argv)
     return 0;
 }
 
-int iaudio_encode(char *iname, char *oname, char *idstring)
+static int iaudio_encode(char *iname, char *oname, char *idstring)
 {
     size_t len;
     int length;
@@ -714,7 +714,7 @@ int iaudio_encode(char *iname, char *oname, char *idstring)
    This has also only been tested on an ipod Photo 
 */
 
-int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
+static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
 {
     static const char *apple_stop_sign = "{{~~  /-----\\   "\
                                          "{{~~ /       \\  "\
@@ -834,7 +834,7 @@ int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
 }
 
 #define CCPMP_SIZE 0x500000
-int ccpmp_encode(char *iname, char *oname)
+static int ccpmp_encode(char *iname, char *oname)
 {
     size_t len;
     int length;
