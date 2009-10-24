@@ -96,7 +96,7 @@ void pcm_play_unlock(void)
     }
 }
 
-static void* dma_callback(void) ICODE_ATTR;
+static void* dma_callback(void) ICODE_ATTR __attribute__((unused));
 static void* dma_callback(void)
 {
     if (dmamode)
