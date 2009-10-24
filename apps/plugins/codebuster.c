@@ -327,8 +327,8 @@ static void randomize_solution(void) {
 
 static void settings_menu(void) {
     MENUITEM_STRINGLIST(settings_menu, "Settings", NULL,
-                        "Number of colors", "Number of pieces",
-                        "Number of guesses", "Labels ?", "Frames ?");
+                        "Number of colours", "Number of pegs",
+                        "Number of guesses", "Labels", "Frames");
 
     int cur_item =0;
 
@@ -337,11 +337,11 @@ static void settings_menu(void) {
 
         switch(rb->do_menu(&settings_menu, &cur_item, NULL, false)) {
             case 0:
-                rb->set_int("Number of colors", "", UNIT_INT, &colors_tmp,
+                rb->set_int("Number of colours", "", UNIT_INT, &colors_tmp,
                             NULL, -1, MAX_COLORS_COUNT, 1, NULL);
                 break;
             case 1:
-                rb->set_int("Number of pieces", "", UNIT_INT, &pieces_tmp,
+                rb->set_int("Number of pegs", "", UNIT_INT, &pieces_tmp,
                             NULL, -1, MAX_PIECES_COUNT, 1, NULL);
                 break;
             case 2:
@@ -349,10 +349,10 @@ static void settings_menu(void) {
                             NULL, -1, MAX_GUESSES_COUNT, 1, NULL);
                 break;
             case 3:
-                rb->set_bool("Display labels ?", &labeling);
+                rb->set_bool("Display labels", &labeling);
                 break;
             case 4:
-                rb->set_bool("Display frames ?", &framing);
+                rb->set_bool("Display frames", &framing);
                 break;
             case GO_TO_PREVIOUS:
                 menu_quit = true;
