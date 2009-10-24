@@ -556,12 +556,15 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     ptr = (fb_data*)&lcd_framebuffer[y][x];
 
+    
+    height = ymax - y - 1; /* fix height */
+
     do
     {
         lcd_write_data(ptr, width);
         ptr += LCD_WIDTH;
     }
-    while (++y <= ymax);
+    while (--height > 0);
 
     lcd_busy = false;
 } /* lcd_update_rect */
