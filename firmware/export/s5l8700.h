@@ -25,7 +25,7 @@
 #define REG16_PTR_T volatile uint16_t *
 #define REG32_PTR_T volatile uint32_t *
 
-#define TIMER_FREQ  48000000L
+#define TIMER_FREQ  47923200L
 
 /* 04. CALMADM2E */
 
@@ -226,6 +226,12 @@
 #define DMACADDR7               (*(REG32_PTR_T)(0x384000EC))     /* Current memory address register for channel 7 */
 #define DMACTCNT7               (*(REG32_PTR_T)(0x384000F0))     /* Current transfer count register for channel 7 */
 #define DMACOM7                 (*(REG32_PTR_T)(0x384000F4))     /* Channel 7 command register */
+#define DMABASE8                (*(REG32_PTR_T)(0x38400100))     /* Base address register for channel 8 */
+#define DMACON8                 (*(REG32_PTR_T)(0x38400104))     /* Configuration register for channel 8 */
+#define DMATCNT8                (*(REG32_PTR_T)(0x38400108))     /* Transfer count register for channel 8 */
+#define DMACADDR8               (*(REG32_PTR_T)(0x3840010C))     /* Current memory address register for channel 8 */
+#define DMACTCNT8               (*(REG32_PTR_T)(0x38400110))     /* Current transfer count register for channel 8 */
+#define DMACOM8                 (*(REG32_PTR_T)(0x38400114))     /* Channel 8 command register */
 #define DMAALLST                (*(REG32_PTR_T)(0x38400180))     /* All channel status register */
 #else
 #define DMAALLST                (*(REG32_PTR_T)(0x38400100))     /* All channel status register */
@@ -304,9 +310,9 @@
 #define TDDATA1                 (*(REG32_PTR_T)(0x3C70006C))     /* Data1 Register */
 #define TDPRE                   (*(REG32_PTR_T)(0x3C700070))     /* Pre-scale register */
 #define TDCNT                   (*(REG32_PTR_T)(0x3C700074))     /* Counter register */
-#define FIVE_USEC_TIMER         ((*(REG32_PTR_T)(0x3C700080) << 32) \
-                                | *(REG32_PTR_T)(0x3C700084))    /* 64bit 5usec timer */     
-#define USEC_TIMER              (*(REG32_PTR_T)(0x3C700084) * 5) /* lower 32 bits of the above as a usec timer */     
+#define FIVE_USEC_TIMER         (((*(REG32_PTR_T)(0x3C700080)) << 32) \
+                                | (*(REG32_PTR_T)(0x3C700084)))  /* 64bit 5usec timer */     
+#define USEC_TIMER              ((*(REG32_PTR_T)(0x3C700084)) * 5) /* lower 32 bits of the above as a usec timer */     
 
 /* 12. NAND FLASH CONTROLER */
 #if CONFIG_CPU==S5L8701

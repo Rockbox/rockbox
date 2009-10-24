@@ -24,9 +24,10 @@
 #include "system-arm.h"
 #include "mmu-target.h"
 
-#define CPUFREQ_DEFAULT 32000000
-#define CPUFREQ_NORMAL  48000000
-#define CPUFREQ_MAX    192000000
+#define CPUFREQ_SLEEP      32768
+#define CPUFREQ_DEFAULT 47923200
+#define CPUFREQ_NORMAL  47923200
+#define CPUFREQ_MAX    191692800
 
 #define inl(a) (*(volatile unsigned long *) (a))
 #define outl(a,b) (*(volatile unsigned long *) (b) = (a))
