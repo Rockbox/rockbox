@@ -2,11 +2,12 @@
 \subsection{Codebuster}
 \screenshot{plugins/images/ss-codebuster}{Codebuster}{img:codebuster}
 
-Codebuster is a clone of the classic mastermind game. Your aim is to guess the
-computer's combination in a minimal number of attempts. At every turn, you input
-a combination, which is then validated by the computer, which displays the number
-of well-placed and misplaced pegs (a red square for right ones, and a white square
-for misplaced ones).
+Codebuster is a clone of the classic mastermind game. The computer selects a
+random combination of coloured pegs and the aim is to guess the correct combination
+in the smallest number of moves. After each attempt to guess the combination the
+results are displayed in the form of red and white pegs.  A red peg signifies
+a correct peg in the correct position, and a white peg signifies a correct
+peg in the wrong position.
 
 \begin{table}
   \begin{btnmap}{}{}
@@ -21,7 +22,7 @@ for misplaced ones).
         {\ButtonSelect}
     \opt{IAUDIO_X5_PAD}{\ButtonRec}
        \opt{HAVEREMOTEKEYMAP}{& }
-        & Validate suggestion and move to next line \\
+        & Check suggestion and move to next line \\
     \ButtonLeft\ / \ButtonRight
        \opt{HAVEREMOTEKEYMAP}{& }
         & Select a peg \\
