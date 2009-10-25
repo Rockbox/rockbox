@@ -88,52 +88,6 @@ static char* fourcc2str(uint32_t f)
 }
 #endif
 
-static inline int real_read_id3v1_tags(int fd, struct mp3entry *id3)
-{
-    /* ID3v1 Standard : http://id3.org/id3v1.html */
-    char    temp[31];    
-    char    *buf = &id3->id3v1buf[0][0];
-    long    buf_remaining = sizeof(id3->id3v1buf);
-
-    lseek(fd, ID3V1_OFFSET, SEEK_END);
-    read(fd, temp, 3);
-    temp[3] = '\0';
-    if(!strcmp(temp, "TAG"))
-    {        
-        read_string(fd, temp, sizeof(temp), -1, 30);
-        parse_tag("title", temp, id3, buf, buf_remaining, 0);
-        buf += 30;
-        buf_remaining -= 30;
-
-        read_string(fd, temp, sizeof(temp), -1, 30);
-        parse_tag("artist", temp, id3, buf, buf_remaining, 0);
-        buf += 30;
-        buf_remaining -= 30;
-
-        read_string(fd, temp, sizeof(temp), -1, 30);
-        parse_tag("album", temp, id3, buf, buf_remaining, 0);
-        buf += 30;
-        buf_remaining -= 30;
-
-        read_string(fd, temp, sizeof(temp), -1, 4);
-        parse_tag("year", temp, id3, buf, buf_remaining, 0);
-        buf += 4;
-        buf_remaining -= 4;
-
-        read_string(fd, temp, sizeof(temp), -1, 30);
-        parse_tag("comment", temp, id3, buf, buf_remaining, 0);
-        buf += 30;
-        buf_remaining -= 30;
-        
-        read_string(fd, temp, sizeof(temp), -1, 1);
-        parse_tag("genre", temp, id3, buf, buf_remaining, 0);
-
-        return 0;
-    }
-    
-    return -1;
-}
-
 static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
 {
     int skipped = 0;
@@ -457,8 +411,8 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
     memset(rmctx,0,sizeof(RMContext));
     if(rm_parse_header(fd, rmctx, id3) < 0)
         return false;
-        
-    if(real_read_id3v1_tags(fd, id3)) {  
+
+    if (!setid3v1title(fd, id3)) {
     /* file has no id3v1 tags, use the tags from CONT chunk */
         id3->title  = id3->id3v1buf[0];
         id3->artist = id3->id3v1buf[1];

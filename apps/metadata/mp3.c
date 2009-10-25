@@ -555,7 +555,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
  *
  * Returns: true if a title was found and created, else false
  */
-static bool setid3v1title(int fd, struct mp3entry *entry)
+bool setid3v1title(int fd, struct mp3entry *entry)
 {
     unsigned char buffer[128];
     static const char offsets[] = {3, 33, 63, 97, 93, 125, 127};
