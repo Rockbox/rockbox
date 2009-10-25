@@ -94,9 +94,9 @@ SECTIONS
 #ifdef IPOD_NANO2G
   /* The bss section is too large for IRAM - we just move it 12MB into the
      DRAM */
-  . += (12*1024*1024) {
+  . += (12*1024*1024);
 #endif
-  .bss :{
+  .bss : {
      _edata = .;
      *(.bss*);
      *(.ibss);
