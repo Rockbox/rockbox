@@ -97,6 +97,7 @@ int sd_num_drives(int first_drive);
 #define SD_ERASE                38
 #define SD_APP_OP_COND          41
 #define SD_LOCK_UNLOCK          42
+#define SD_SET_CLR_CARD_DETECT  42  /* acmd42 */
 #define SD_SEND_SCR             51  /* acmd51 */
 #define SD_APP_CMD              55
 
