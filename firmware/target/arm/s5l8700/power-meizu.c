@@ -56,7 +56,7 @@ void power_init(void)
 unsigned int power_input_status(void)
 {
     /* check VBUS in the USB2.0 function controller */
-    if (TR & (1 << 15)) {
+    if (USB_TR & (1 << 15)) {
         return POWER_INPUT_USB;
     }
     
