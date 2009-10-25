@@ -45,7 +45,7 @@ static int loaded_cp_table = 0;
 #define MAX_CP_TABLE_SIZE  32768
 #define NUM_TABLES             5
 
-static const char *filename[NUM_TABLES] =
+static const char * const filename[NUM_TABLES] =
 {
     CODEPAGE_DIR"/iso.cp",
     CODEPAGE_DIR"/932.cp",  /* SJIS    */
@@ -59,7 +59,7 @@ static const char cp_2_table[NUM_CODEPAGES] =
     0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 0
 };
 
-static const char *name_codepages[NUM_CODEPAGES+1] =
+static const char * const name_codepages[NUM_CODEPAGES+1] =
 {
     "ISO-8859-1",
     "ISO-8859-7",
@@ -83,7 +83,7 @@ static const char *name_codepages[NUM_CODEPAGES+1] =
 #define MAX_CP_TABLE_SIZE  640
 #define NUM_TABLES           1
 
-static const char *filename[NUM_TABLES] = {
+static const char * const filename[NUM_TABLES] = {
     CODEPAGE_DIR"/isomini.cp"
 };
 
@@ -92,7 +92,7 @@ static const char cp_2_table[NUM_CODEPAGES] =
     0, 1, 1, 1, 1, 1, 0
 };
 
-static const char *name_codepages[NUM_CODEPAGES+1] =
+static const char * const name_codepages[NUM_CODEPAGES+1] =
 {
     "ISO-8859-1",
     "ISO-8859-7",
@@ -116,7 +116,7 @@ static const unsigned char utf8comp[6] =
 /* Load codepage file into memory */
 static int load_cp_table(int cp)
 {
-    int i=0;
+    int i = 0;
     int table = cp_2_table[cp];
     int file, tablesize;
     unsigned char tmp[2];
