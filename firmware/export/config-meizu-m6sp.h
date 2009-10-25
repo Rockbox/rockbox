@@ -58,6 +58,9 @@
 
 #define CONFIG_NAND NAND_SAMSUNG
 
+/* The NAND flash has 2048-byte sectors, and is our only storage */
+#define SECTOR_SIZE 2048
+
 /* LCD dimensions */
 #define LCD_WIDTH  240
 #define LCD_HEIGHT 320

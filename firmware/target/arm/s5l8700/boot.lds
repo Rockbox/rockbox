@@ -90,11 +90,13 @@ SECTIONS
      _fiqstackend = .;
   } > IRAM
 
+  . = DRAMORIG;
+#ifdef IPOD_NANO2G
   /* The bss section is too large for IRAM - we just move it 12MB into the
      DRAM */
-
-  . = DRAMORIG;
-  .bss . + (12*1024*1024): {
+  . += (12*1024*1024) {
+#endif
+  .bss :{
      _edata = .;
      *(.bss*);
      *(.ibss);
@@ -102,5 +104,9 @@ SECTIONS
      *(COMMON);
     . = ALIGN(0x4);
      _end = .;
+#ifdef IPOD_NANO2G
   } > DRAM
+#else /* other targets don't have DRAM set up yet */
+  } > IRAM
+#endif  
 }
