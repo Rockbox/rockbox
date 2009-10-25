@@ -486,6 +486,31 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
         cur_handle = dest;
 
     if (overlap > 0) {
+        /* FIXME : this code is broken and can leave the data corrupted when
+         * the amount of data to move is close to the whole buffer size.
+         *
+         * Example : ('S' is the source data, '-' is empty buffer)
+         * Size of the buffer is 8 bytes, starts at 0.
+         * Size of the data to move is 7 bytes.
+         *
+         * -SSSSSSS
+         *  ^-------- start of source data == 1
+         *
+         * DD-DDDDD ('D' is desired destination data)
+         *    ^------ start of destination data == 3
+         *
+         *  memmove(3, 1, 5);
+         *  memmove(0, 7, 2);
+         *
+         * First memmove() call will leave the buffer in this state:
+         *
+         * -SSDDDDD
+         *       ^^
+         *       \--- data to be moved by the second memmove() call, but
+         *            overwritten by the first call.
+         *
+         * See FS#10605 for more details
+         */
         size_t first_part = size_to_move - overlap;
         memmove(dest, src, first_part);
         memmove(buffer, (const char *)src + first_part, overlap);
