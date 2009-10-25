@@ -103,9 +103,17 @@ static void init_pl180_controller(const int drive);
 
 static tCardInfo card_info[NUM_DRIVES];
 
-/* maximum timeouts recommanded in the SD Specification v2.00 */
-#define SD_MAX_READ_TIMEOUT     ((AS3525_PCLK_FREQ) / 1000 * 100) /* 100 ms */
-#define SD_MAX_WRITE_TIMEOUT    ((AS3525_PCLK_FREQ) / 1000 * 250) /* 250 ms */
+#ifdef HAVE_MULTIDRIVE
+/* maximum timeouts recommended in the SD Specification v2.00 */
+#define SD_MAX_READ_TIMEOUT   (((drive == SD_SLOT_AS3525)? (AS3525_PCLK_FREQ): \
+                                   (AS3525_IDE_FREQ)) / 1000 * 100) /* 100 ms */
+#define SD_MAX_WRITE_TIMEOUT  (((drive == SD_SLOT_AS3525)? (AS3525_PCLK_FREQ): \
+                                   (AS3525_IDE_FREQ)) / 1000 * 250) /* 250 ms */
+#else
+/* maximum timeouts recommended in the SD Specification v2.00 */
+#define SD_MAX_READ_TIMEOUT   ((AS3525_IDE_FREQ) / 1000 * 100) /* 100 ms */
+#define SD_MAX_WRITE_TIMEOUT  ((AS3525_IDE_FREQ) / 1000 * 250) /* 250 ms */
+#endif
 
 /* for compatibility */
 static long last_disk_activity = -1;
@@ -306,7 +314,7 @@ static int sd_init_card(const int drive)
     /*  End of Card Identification Mode   ************************************/
 
 
-    /* full speed for controller clock  MCICLK = MCLK = PCLK = 62 MHz */
+    /* full speed for controller clock MCICLK = MCLK = PCLK = IDECLK = 62 MHz */
     MCI_CLOCK(drive) |= MCI_CLOCK_BYPASS;   /*  FIXME: 50 MHz is spec limit  */
     mci_delay();
 
@@ -612,7 +620,7 @@ static int sd_select_bank(signed char bank)
             DMA_PERI_SD, DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8,
             NULL);
 
-        MCI_DATA_TIMER(INTERNAL_AS3525) = SD_MAX_WRITE_TIMEOUT;
+        MCI_DATA_TIMER(INTERNAL_AS3525) = ((AS3525_IDE_FREQ) / 1000 * 250) /* 250 ms */;
         MCI_DATA_LENGTH(INTERNAL_AS3525) = 512;
         MCI_DATA_CTRL(INTERNAL_AS3525) =  (1<<0) /* enable */   |
                                 (0<<1) /* transfer direction */ |

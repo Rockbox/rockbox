@@ -113,14 +113,15 @@
   #define AS3525_DBOP_DIV        (CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ) - 1) /*div=1/(n+1)*/
   #define AS3525_I2C_PRESCALER   CLK_DIV(AS3525_PCLK_FREQ, AS3525_I2C_FREQ)
   #define AS3525_I2C_FREQ        400000
+
+  /*  For now use same divider for ident frequencies on both internal and uSD cards */
   #define AS3525_SD_IDENT_DIV    ((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SD_IDENT_FREQ) / 2) - 1)
   #define AS3525_SD_IDENT_FREQ   400000      /* must be between 100 & 400 kHz */
 
 #define AS3525_IDE_SEL           AS3525_CLK_PLLA           /* Input Source   */
 #define AS3525_IDE_DIV           (CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1)/*div=1/(n+1)*/
-#define AS3525_IDE_FREQ          90000000    /* The OF uses 66MHz maximal freq
-                                               but sd transfers fail on some
-                                               players with this limit */
+                                 /* for now use IDECLK == PCLK for consistency */
+#define AS3525_IDE_FREQ          AS3525_PCLK_FREQ    /* The OF uses 66MHz maximal freq */
 
 //#define AS3525_USB_SEL           AS3525_CLK_PLLA            /* Input Source   */
 //#define AS3525_USB_DIV           /* div = 1/(n=0?1:2n)*/
