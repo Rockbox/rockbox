@@ -41,6 +41,7 @@
 #include "rbunicode.h"
 #include "usb.h"
 #include "qt1106.h"
+#include "bitmaps/rockboxlogo.h"
 
 #include <stdarg.h>
 
@@ -107,7 +108,10 @@ void main(void)
     oldval = PCON1;
     PCON1 = ((oldval & ~(0xf << 16)) | (0 << 16));
 
-    // Wait for play to be pressed
+    lcd_bitmap(rockboxlogo, 0, 0, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
+    lcd_init_device();
+
+   // Wait for play to be pressed
     while(!(PDAT1 & (1 << 4)));
     // Wait for play to be released
     while((PDAT1 & (1 << 4)));
