@@ -34,9 +34,6 @@
 #define CTRL(key) MODIFIER(HID_KEYBOARD_LEFT_CONTROL, key)
 #define SHIFT(key) MODIFIER(HID_KEYBOARD_LEFT_SHIFT, key)
 
-#define NUM_KEY_MAPPINGS (sizeof(hid_key_mappings) / \
-        sizeof(hid_key_mappings[0]))
-
 typedef struct
 {
     int action;
@@ -187,7 +184,7 @@ int get_hid_usb_action(void)
         case ACTION_USB_HID_MODE_SWITCH_PREV:
             /* Switch key mappings in a cyclic way */
             usb_keypad_mode = clamp_value_wrap(usb_keypad_mode + step,
-                    NUM_KEY_MAPPINGS - 1, 0);
+                    ARRAYLEN(hid_key_mappings) - 1, 0);
             break;
         default:
             {
