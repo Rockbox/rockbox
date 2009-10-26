@@ -411,7 +411,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_data(ptr, width);
         ptr += LCD_WIDTH;
     }
-    while (--height > 0);
+    while (--height >= 0);
     lcd_busy = false;
 }
 
