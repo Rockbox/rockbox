@@ -36,10 +36,6 @@ static bool lcd_on = true;
 static bool lcd_powered = true;
 #endif
 static unsigned lcd_yuv_options = 0;
-/*
-** This is imported from lcd-16bit.c
-*/
-extern struct viewport* current_vp;
 
 /* Copies a rectangle from one framebuffer to another. Can be used in
    single transfer mode with width = num pixels, and height = 1 which
