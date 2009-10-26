@@ -239,7 +239,7 @@ static void draw_guess(int line, struct mm_line* guess, int cur_guess,
 }
 
 static void draw_score(int line, struct mm_line* guess) {
-    int cur_y = Y_MARGIN + 2 * line_h * line;
+    int cur_y = (Y_MARGIN + MARGIN) + 2 * line_h * line;
     int l_margin = X_MARGIN + true_guess_w + MARGIN;
 
     int tick = 0;
