@@ -74,7 +74,6 @@ void nand_sleepnow(void)
 void nand_spin(void)
 {
     last_disk_activity = current_tick;
-    nand_power_up();
 }
 
 void nand_enable(bool on)
