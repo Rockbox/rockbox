@@ -13,7 +13,8 @@ LDFLAGS := -g
 
 CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
  generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat \
- lngdump telechips gigabeats creative hmac-sha1 mktccboot mknkboot rbspeexenc mkzenboot
+ lngdump telechips gigabeats creative hmac-sha1 mktccboot mknkboot rbspeexenc \
+ mkzenboot mk500boot
 
 all: scramble descramble sh2d rdf2binary mkboot mktccboot mknkboot mkzenboot \
 	convbdf codepages uclpack rbspeexenc voicefont mk500boot
