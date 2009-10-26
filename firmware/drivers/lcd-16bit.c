@@ -907,9 +907,8 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
             if (data != TRANSPARENT_COLOR)
             {
                 if (data == REPLACEWITHFG_COLOR)
-                    *dst_row = fg;
-                else
-                    *dst_row = data;
+                    data = fg;
+                *dst_row = data;
             }
         }
         while (++dst_row < row_end);
