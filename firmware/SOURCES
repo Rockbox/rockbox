@@ -809,11 +809,11 @@ target/arm/usb-fw-pp502x.c
 #ifndef SIMULATOR
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
+target/arm/s3c2440/adc-s3c2440.c
 target/arm/s3c2440/debug-s3c2440.c
 target/arm/s3c2440/kernel-s3c2440.c
 target/arm/s3c2440/lcd-s3c2440.c
 target/arm/s3c2440/system-s3c2440.c
-target/arm/s3c2440/gigabeat-fx/adc-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/ata-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/backlight-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/button-meg-fx.c
@@ -821,7 +821,7 @@ target/arm/s3c2440/gigabeat-fx/power-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/sc606-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/usb-meg-fx.c
 #ifndef BOOTLOADER
-target/arm/s3c2440/gigabeat-fx/i2c-meg-fx.c
+target/arm/s3c2440/i2c-s3c2440.c
 target/arm/s3c2440/gigabeat-fx/pcm-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/powermgmt-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/timer-meg-fx.c
@@ -1405,20 +1405,16 @@ target/arm/s3c2440/lcd-s3c2440.c
 target/arm/s3c2440/sd-s3c2440.c
 target/arm/s3c2440/system-s3c2440.c
 target/arm/s3c2440/uart-s3c2440.c
+target/arm/s3c2440/adc-s3c2440.c
+target/arm/s3c2440/i2c-s3c2440.c
 target/arm/s3c2440/mini2440/backlight-mini2440.c
 target/arm/s3c2440/mini2440/button-mini2440.c
 target/arm/s3c2440/mini2440/led-mini2440.c
 target/arm/s3c2440/mini2440/power-mini2440.c
-#ifdef BOOTLOADER
-#endif
 #ifndef BOOTLOADER
-target/arm/s3c2440/mini2440/adc-mini2440.c
-//target/arm/s3c2440/mini2440/i2c-mini2440.c
-target/arm/s3c2440/mini2440/pcm-mini2440.c
 target/arm/s3c2440/mini2440/powermgmt-mini2440.c
-target/arm/s3c2440/mini2440/power-mini2440.c
-target/arm/s3c2440/mini2440/timer-mini2440.c
-//target/arm/s3c2440/mini2440/usb-mini2440.c
+target/arm/s3c2440/mini2440/pcm-mini2440.c
+target/arm/s3c2440/gigabeat-fx/timer-meg-fx.c
 #endif
 #endif /* SIMULATOR */
 #endif /* MINI2440 */

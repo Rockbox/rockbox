@@ -39,9 +39,11 @@
 /* define the storage type */
 #define CONFIG_STORAGE STORAGE_SD
 
+/*
 #define HAVE_MULTIDRIVE
 #define NUM_DRIVES 2
 #define HAVE_HOTSWAP
+*/
 
 /* Disk storage */
 /* define this if you have a disk storage, i.e. something
@@ -62,7 +64,7 @@
 #define LCD_DEPTH  16          /* 65536 colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 /* Define this for LCD backlight available */
-/* The Mini2440 supports backight brightness depending on LCD type */
+/* The Mini2440 supports backlight brightness depending on LCD type */
 /* But the 3.5" LCD touch screen does not support brightness*/
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
@@ -71,14 +73,16 @@
 #define CONFIG_KEYPAD MINI2440_PAD
 
 /* I2C */
-/* Do not use I2C */
-#define CONFIG_I2C I2C_NONE
+/* We do not use currently use hardware I2C, but does not build without */
+#define CONFIG_I2C I2C_S3C2440
 
 /* Define DAC/Codec */
-/*#define HAVE_UDA1341*/
-#define HAVE_TLV320
+#define HAVE_UDA1341
 /* ... tone controls, use the software ones */
 #define HAVE_SW_TONE_CONTROLS
+
+#define HW_SAMPR_CAPS (SAMPR_CAP_64 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
+                       SAMPR_CAP_11)
 
 /* Battery */
 #define BATTERY_CAPACITY_DEFAULT 1100   /* default battery capacity */
@@ -89,6 +93,9 @@
 
 /* USB */
 /* TODO:#define HAVE_USBSTACK */
+#define USB_NONE
+
+#define HAVE_SERIAL
 
 /***************************************************************************/
 /* Application Config */

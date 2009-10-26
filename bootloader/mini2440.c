@@ -47,13 +47,9 @@
 #include "uart-s3c2440.h"
 #include "led-mini2440.h"
 
-/* Show the Rockbox logo - in show_logo.c */
-extern int show_logo(void);
-
 
 int main(void)
 {
-    /* required later */
     unsigned char* loadbuffer;
     int buffer_size;
     int rc;
@@ -70,12 +66,12 @@ int main(void)
     lcd_setfont(FONT_SYSFIXED);
     button_init();
     dma_init();
-    uart_init_device(UART_DEBUG);
+    
+    uart_init();
+    uart_init_device(DEBUG_UART_PORT);
 
 /*    mini2440_test(); */  
         
-    /* TODO */
-    
     /* Show debug messages if button is pressed */
     if(button_read_device() & BUTTON_MENU) 
         verbose = true;

@@ -126,9 +126,6 @@ static unsigned char *  uncached_buffer;
 /*****************************************************************************
     Definitions specific to Mini2440
  *****************************************************************************/
-#define FCLK 405000000
-#define HCLK (FCLK/4)   /* = 101,250,000 */
-#define PCLK (HCLK/2)   /* =  50,625,000 */
 
 #define SD_CD (1<<8)    /* Port G */
 #define SD_WP (1<<8)    /* Port H */
@@ -206,8 +203,11 @@ static void debug_r1(int cmd)
 void SDI (void)
 {
     int status = SDIDSTA;
+#ifndef HAVE_MULTIDRIVE
+    const int curr_card = 0;
+#endif     
     
-    transfer_error[curr_card] = status 
+    transfer_error[curr_card] = status
 #if 0
         & ( S3C2410_SDIDSTA_CRCFAIL | S3C2410_SDIDSTA_RXCRCFAIL |
             S3C2410_SDIDSTA_DATATIMEOUT )
@@ -619,7 +619,9 @@ static int sd_transfer_sectors(IF_MD2(int card_no,) unsigned long start,
     sd_enable(true);
     set_leds(SD_ACTIVE_LED);
 
+#ifdef HAVE_MULTIDRIVE
     curr_card = card_no;
+#endif
     if (card_info[card_no].initialized <= 0)
     {
         ret = sd_init_card(card_no);
@@ -814,6 +816,9 @@ int sd_read_sectors(IF_MD2(int card_no,) unsigned long start, int incount,
 int sd_write_sectors(IF_MD2(int card_no,) unsigned long start, int count,
                       const void* outbuf)
 {
+#ifndef HAVE_MULTIDRIVE
+    const int card_no = 0;
+#endif
     dbgprintf ("sd_write %d %x %d\n", card_no, start, count);
     
     return sd_transfer_sectors(IF_MD2(card_no,) start, count, outbuf, true);

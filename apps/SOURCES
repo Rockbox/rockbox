@@ -254,4 +254,6 @@ keymaps/keymap-ondavx777.c
 keymaps/keymap-ondavx767.c
 #elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
 keymaps/keymap-yh8xx_yh9xx.c
+#elif CONFIG_KEYPAD == MINI2440_PAD
+keymaps/keymap-mini2440.c
 #endif

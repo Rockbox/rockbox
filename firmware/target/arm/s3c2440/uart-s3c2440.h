@@ -22,16 +22,17 @@
 #ifndef __UART_S3C2440_H__
 #define __UART_S3C2440_H__
 
-#define UART_DEBUG        0
+/* target specific */
+#define DEBUG_UART_PORT     0
 
-#define UART_NO_PARITY    0
-#define UART_ODD_PARITY   4
-#define UART_EVEN_PARITY  5
-#define UART_MARK_PARITY  6
-#define UART_SPACE_PARITY 7
+#define UART_NO_PARITY      0
+#define UART_ODD_PARITY     4
+#define UART_EVEN_PARITY    5
+#define UART_MARK_PARITY    6
+#define UART_SPACE_PARITY   7
 
-#define UART_1_STOP_BIT   0
-#define UART_2_STOP_BIT   1
+#define UART_1_STOP_BIT     0
+#define UART_2_STOP_BIT     1
 
 bool uart_init (void);
 void uart_printf (const char *format, ...);
@@ -39,10 +40,13 @@ void uart_printf (const char *format, ...);
 /* low level routines */
 bool uart_init_device (unsigned dev);
 bool uart_config (unsigned dev, unsigned speed, unsigned num_bits, unsigned parity, unsigned stop_bits);
-bool uart_send (unsigned dev, char *buf, unsigned len);
 
+bool uart_tx_ready  (unsigned dev);
+bool uart_send_byte (unsigned dev, char ch);
+bool uart_send_buf  (unsigned dev, char *buf, unsigned len);
+
+bool uart_rx_ready  (unsigned dev);
 char uart_read_byte (unsigned dev);
-char uart_rx_ready (unsigned dev);
 
 
 #endif

@@ -462,6 +462,39 @@
 #define IISFCON (*(volatile unsigned long *)0x5500000C) /* IIS FIFO control */
 #define IISFIFO (*(volatile unsigned short *)0x55000010) /* IIS FIFO entry */
 
+#define IISCON_RIGHT_CHANNEL            (1 << 8)
+#define IISCON_TX_FIFO_NOT_EMPTY        (1 << 7)
+#define IISCON_RX_FIFO_NOT_FULL         (1 << 6)
+#define IISCON_TX_DMA_REQUEST           (1 << 5)
+#define IISCON_RX_DMA_REQUEST           (1 << 4)
+#define IISCON_TX_IDLE                  (1 << 3)
+#define IISCON_RX_IDLE                  (1 << 2)
+#define IISCON_IIS_PRESCALER_ENABLE     (1 << 1)
+#define IISCON_IIS_INTERFACE_ENABLE     (1 << 0)
+         
+#define IISMOD_MASTER_CLOCK_PCLK        (0 << 9)
+#define IISMOD_MASTER_CLOCK_MPLLIN      (1 << 9)
+#define IISMOD_MASTER_MODE              (0 << 8)
+#define IISMOD_SLAVE_MODE               (1 << 8)
+#define IISMOD_NO_TRANSFER              (0 << 6)
+#define IISMOD_RECEIVE_MODE             (1 << 6)
+#define IISMOD_TRANSMIT_MODE            (2 << 6)
+#define IISMOD_TRANSMIT_RECEIVE_MODE    (3 << 6)
+#define IISMOD_LOW_LEFT                 (0 << 5)
+#define IISMOD_HIGH_LEFT                (1 << 5)
+#define IISMOD_IIS                      (0 << 4)
+#define IISMOD_MSB                      (1 << 4)
+#define IISMOD_8_BIT                    (0 << 3)
+#define IISMOD_16_BIT                   (1 << 3)
+#define IISMOD_MASTER_CLOCK_256FS       (0 << 2)
+#define IISMOD_MASTER_CLOCK_384FS       (1 << 2)
+#define IISMOD_BIT_CLOCK_16FS           (0 << 0)
+#define IISMOD_BIT_CLOCK_32FS           (1 << 0)
+#define IISMOD_BIT_CLOCK_48FS           (2 << 0)
+
+#define IISPSR_PRESCALER_A              (1 << 5)
+#define IISPSR_PRESCALER_B              (1 << 0)
+
 /* I/O port */
 
 #define GPACON (*(volatile unsigned long *)0x56000000) /* Port A control */

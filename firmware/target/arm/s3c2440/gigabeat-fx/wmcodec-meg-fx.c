@@ -28,7 +28,7 @@
 #include "cpu.h"
 #include "kernel.h"
 #include "sound.h"
-#include "i2c-meg-fx.h"
+#include "i2c-s3c2440.h"
 #include "system-target.h"
 #include "timer.h"
 #include "wmcodec.h"

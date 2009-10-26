@@ -30,13 +30,32 @@
 #include "kernel.h"
 #include "thread.h"
 
+#include "system-target.h"
 #include "uart-s3c2440.h"
 
-#define FCLK 405000000
-#define HCLK (FCLK/4)   /* = 101,250,000 */
-#define PCLK (HCLK/2)   /* =  50,625,000 */
+#define MAX_PRINTF_BUF        1024
 
-#define MAX_TX_BUF        1024
+/****************************************************************************
+ * serial driver API 
+ ****************************************************************************/
+void serial_setup (void)
+{
+    uart_init();
+    uart_init_device(DEBUG_UART_PORT);
+}
+
+int tx_rdy(void)
+{
+    if (uart_tx_ready (DEBUG_UART_PORT))
+        return 1;
+    else
+        return 0;
+}
+
+void tx_writec(unsigned char c)
+{
+    uart_send_byte (DEBUG_UART_PORT, c);
+}
 
 
 /****************************************************************************
@@ -46,10 +65,12 @@
 void uart_printf (const char *format, ...)
 {
     static bool debug_uart_init = false;
-    static char tx_buf [MAX_TX_BUF];
+    static char tx_buf [MAX_PRINTF_BUF];
 
     int len;
     unsigned char *ptr;
+    int j;
+    
     va_list ap;
     va_start(ap, format);
 
@@ -59,11 +80,16 @@ void uart_printf (const char *format, ...)
 
     if (!debug_uart_init)
     {
-      uart_init_device(UART_DEBUG);
+      uart_init_device(DEBUG_UART_PORT);
       debug_uart_init = true;
     }
     
-    uart_send (UART_DEBUG, tx_buf, len);
+    for (j=0; j<len; j++)
+    {
+        uart_send_byte (DEBUG_UART_PORT, tx_buf[j]);
+        if ( tx_buf[j] == '\n')
+            uart_send_byte (DEBUG_UART_PORT, '\r');
+    }
 }
 
 /****************************************************************************
@@ -142,28 +168,49 @@ bool uart_config (unsigned dev, unsigned speed, unsigned num_bits,
     return true;
 }
 
-bool uart_send_byte (unsigned dev, char ch)
+/* transmit */
+bool uart_tx_ready (unsigned dev)
 {
+    /* test if transmit buffer empty */
     switch (dev)
     {
     case 0:
-        /* wait for transmit buffer empty */
-        while ((UTRSTAT0 & 0x02) == 0)
-          ;
+        if (UTRSTAT0 & 0x02)
+            return true;
+        else
+            return false;
+        break;
+    case 1:
+        if (UTRSTAT1 & 0x02)
+            return true;
+        else
+            return false;
+        break;
+    case 2:
+        if (UTRSTAT2 & 0x02)
+            return true;
+        else
+            return false;
+        break;
+    }
+    return false;
+}
+
+bool uart_send_byte (unsigned dev, char ch)
+{
+    /* wait for transmit buffer empty */
+    while (!uart_tx_ready(dev))
+        ;
+        
+    switch (dev)
+    {
+    case 0:
         UTXH0 = ch;
         break;
-
     case 1:
-        /* wait for transmit buffer empty */
-        while ((UTRSTAT1 & 0x02) == 0)
-          ;
         UTXH1 = ch;
         break;
-
     case 2:
-        /* wait for transmit buffer empty */
-        while ((UTRSTAT2 & 0x02) == 0)
-          ;
         UTXH2 = ch;
         break;
     }
@@ -171,26 +218,26 @@ bool uart_send_byte (unsigned dev, char ch)
     return true;
 }
 
-char uart_rx_ready (unsigned dev)
+/* Receive */
+
+bool uart_rx_ready (unsigned dev)
 {
+    /* test receive buffer data ready */
     switch (dev)
     {
     case 0:
-        /* wait for receive buffer data ready */
         if (UTRSTAT0 & 0x01)
             return true;
         else
             return false;
         break;
     case 1:
-        /* wait for receive buffer data ready */
         if (UTRSTAT1 & 0x01)
             return true;
         else
             return false;
         break;
     case 2:
-        /* wait for receive buffer data ready */
         if (UTRSTAT2 & 0x01)
             return true;
         else
@@ -202,43 +249,34 @@ char uart_rx_ready (unsigned dev)
 
 char uart_read_byte (unsigned dev)
 {
+    while (!uart_rx_ready(dev))
+        ;
     switch (dev)
     {
     case 0:
-        while (!uart_rx_ready(dev))
-            ;
         return URXH0;
         break;
     case 1:
-        while (!uart_rx_ready(dev))
-            ;
         return URXH1;
         break;
     case 2:
-        while (!uart_rx_ready(dev))
-            ;
         return URXH2;
         break;
     }
     
-    return true;
+    return '\0';
 }
 
 /****************************************************************************
  * General
  *****************************************************************************/
 
-bool uart_send (unsigned dev, char *buf, unsigned len)
+bool uart_send_buf (unsigned dev, char *buf, unsigned len)
 {
     unsigned index=0;
     while (index<len)
     {
         uart_send_byte (dev, buf[index]);
-        
-        /* hack for ASCII terminals */
-        if (buf[index] == '\n')
-          uart_send_byte (dev, '\r');
-          
         index++;
     }
     return true;

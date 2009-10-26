@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include "system.h"
-#include "i2c-meg-fx.h"
+#include "i2c-s3c2440.h"
 
 static struct wakeup i2c_wake; /* Transfer completion signal */
 static struct mutex i2c_mtx;   /* Mutual exclusion */

@@ -27,30 +27,34 @@
 /* TODO: Needs checking/porting */
 
 #ifdef GIGABEAT_F
-#define CPUFREQ_DEFAULT 98784000
-#define CPUFREQ_NORMAL  98784000
-#define CPUFREQ_MAX    296352000
+    #define CPUFREQ_DEFAULT 98784000
+    #define CPUFREQ_NORMAL  98784000
+    #define CPUFREQ_MAX    296352000
 
-#ifdef BOOTLOADER
-/* All addresses within rockbox are in IRAM in the bootloader so
-   are therefore uncached */
-#define UNCACHED_ADDR(a) (a)
-#else /* !BOOTLOADER */
-#define UNCACHED_BASE_ADDR 0x30000000
-#define UNCACHED_ADDR(a)  ((typeof(a))((unsigned int)(a) | UNCACHED_BASE_ADDR ))
-#endif /* BOOTLOADER */
+    #ifdef BOOTLOADER
+        /* All addresses within rockbox are in IRAM in the bootloader so
+           are therefore uncached */
+        #define UNCACHED_ADDR(a) (a)
+    #else /* !BOOTLOADER */
+        #define UNCACHED_BASE_ADDR 0x30000000
+        #define UNCACHED_ADDR(a)  ((typeof(a))((unsigned int)(a) | UNCACHED_BASE_ADDR ))
+    #endif /* BOOTLOADER */
 
 #elif defined(MINI2440)
 
-#define CPUFREQ_DEFAULT 101250000
-#define CPUFREQ_NORMAL  101250000
-#define CPUFREQ_MAX     405000000
+    #define CPUFREQ_DEFAULT 101250000
+    #define CPUFREQ_NORMAL  101250000
+    #define CPUFREQ_MAX     405000000
+    
+    #define UNCACHED_BASE_ADDR 0x30000000
+    #define UNCACHED_ADDR(a)  ((typeof(a))((unsigned int)(a) | UNCACHED_BASE_ADDR ))
 
-#define UNCACHED_BASE_ADDR 0x30000000
-#define UNCACHED_ADDR(a)  ((typeof(a))((unsigned int)(a) | UNCACHED_BASE_ADDR ))
-
+    #define FCLK 405000000
+    #define HCLK (FCLK/4)   /* = 101,250,000 */
+    #define PCLK (HCLK/2)   /* =  50,625,000 */
+    
 #else
-#error Unknown target
+    #error Unknown target
 #endif
 
 
