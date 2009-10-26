@@ -31,11 +31,14 @@ BootloaderInstallAms::BootloaderInstallAms(QObject *parent)
 QString BootloaderInstallAms::ofHint()
 {
     return tr("Bootloader installation requires you to provide "
-               "a firmware file of the original firmware (bin file). "
-               "You need to download this file yourself due to legal "
-               "reasons." 
-               "Press Ok to continue and browse your computer for the firmware "
-               "file.");
+              "a firmware file of the original firmware (bin file). "
+              "You need to download this file yourself due to legal "
+              "reasons. Please refer to the "
+              "<a href='http://www.rockbox.org/manual.shtml'>manual</a> and the "
+              "<a href='http://www.rockbox.org/wiki/SansaAMS'>SansaAMS</a> "
+              "wiki page on how to obtain this file.<br/>"
+              "Press Ok to continue and browse your computer for the firmware "
+              "file.");
 }
 
 bool BootloaderInstallAms::install(void)
