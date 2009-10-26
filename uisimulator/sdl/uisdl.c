@@ -48,6 +48,9 @@ void button_event(int key, bool pressed);
 
 SDL_Surface *gui_surface;
 bool background = true;                   /* use backgrounds by default */
+#ifdef HAVE_REMOTE_LCD
+static bool showremote = true;            /* include remote by default */
+#endif
 
 bool lcd_display_redraw = true;         /* Used for player simulator */
 char having_new_lcd = true;               /* Used for player simulator */
@@ -124,18 +127,25 @@ bool gui_startup(void)
     }
 
     /* Set things up */
-
-    if (background) {
+    if (background)
+    {
         width = UI_WIDTH;
         height = UI_HEIGHT;
-    } else {
+    } 
+    else 
+    {
 #ifdef HAVE_REMOTE_LCD
-        width = SIM_LCD_WIDTH > SIM_REMOTE_WIDTH ? SIM_LCD_WIDTH : SIM_REMOTE_WIDTH;
-        height = SIM_LCD_HEIGHT + SIM_REMOTE_HEIGHT;
-#else
-        width = SIM_LCD_WIDTH;
-        height = SIM_LCD_HEIGHT;
+        if (showremote)
+        {
+            width = SIM_LCD_WIDTH > SIM_REMOTE_WIDTH ? SIM_LCD_WIDTH : SIM_REMOTE_WIDTH;
+            height = SIM_LCD_HEIGHT + SIM_REMOTE_HEIGHT;
+        }
+        else
 #endif
+        {
+            width = SIM_LCD_WIDTH;
+            height = SIM_LCD_HEIGHT;
+        }
     }
    
     
@@ -148,7 +158,8 @@ bool gui_startup(void)
 
     sim_lcd_init();
 #ifdef HAVE_REMOTE_LCD
-    sim_lcd_remote_init();
+    if (showremote)
+        sim_lcd_remote_init();
 #endif
 
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -197,6 +208,14 @@ int main(int argc, char *argv[])
                 background = false;
                 printf("Disabling background image.\n");
             } 
+#ifdef HAVE_REMOTE_LCD
+            else if (!strcmp("--noremote", argv[x]))
+            {
+                showremote = false;
+                background = false;
+                printf("Disabling remote image.\n");
+            }
+#endif
             else if (!strcmp("--old_lcd", argv[x]))
             {
                 having_new_lcd = false;
@@ -232,6 +251,9 @@ int main(int argc, char *argv[])
                 printf("  --debugaudio \t Write raw PCM data to audiodebug.raw\n");
                 printf("  --debugwps \t Print advanced WPS debug info\n");
                 printf("  --nobackground \t Disable the background image\n");
+#ifdef HAVE_REMOTE_LCD
+                printf("  --noremote \t Disable the remote image (will disable backgrounds)\n");
+#endif
                 printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
                 printf("  --zoom [VAL]\t Window zoom (will disable backgrounds)\n");
                 printf("  --alarm \t Simulate a wake-up on alarm\n");
