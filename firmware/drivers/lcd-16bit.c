@@ -788,34 +788,36 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                                 int stride, int x, int y, int width,
                                 int height)
 {
-    fb_data *dst, *dst_end;
+    fb_data *dst;
 
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= current_vp->width) || 
-        (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
-        return;
+    if (x + width > current_vp->width)
+        width = current_vp->width - x; /* Clip right */
 
-    /* clipping */
-    if (x < 0)
+    if (x < 0)  /* Clip left */
     {
         width += x;
         src_x -= x;
         x = 0;
     }
-    if (y < 0)
+
+    if (width <= 0)
+        return; /* nothing left to do */
+
+    if (y + height > current_vp->height)
+        height = current_vp->height - y; /* Clip bottom */
+
+    if (y < 0)  /* Clip top */
     {
         height += y;
         src_y -= y;
         y = 0;
     }
-    if (x + width > current_vp->width)
-        width = current_vp->width - x;
-    if (y + height > current_vp->height)
-        height = current_vp->height - y;
+
+    if (height <= 0)
+        return; /* nothing left to do */
 
     src += stride * src_y + src_x; /* move starting point */
     dst = LCDADDR(current_vp->x + x, current_vp->y + y);
-    dst_end = dst + height * LCD_WIDTH;
 
     do
     {
@@ -823,7 +825,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
         src += stride;
         dst += LCD_WIDTH;
     }
-    while (dst < dst_end);
+    while (--height > 0);
 }
 
 /* Draw a full native bitmap */
@@ -832,60 +834,99 @@ void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
     lcd_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
-#if !defined(TOSHIBA_GIGABEAT_F) && !defined(TOSHIBA_GIGABEAT_S) \
-    || defined(SIMULATOR)
-/* Draw a partial native bitmap */
+/* Draw a partial native bitmap with transparency and foreground colors */
 void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
                                             int src_y, int stride, int x,
                                             int y, int width, int height)
 {
-    fb_data *dst, *dst_end;
+    fb_data *dst;
+    unsigned fg = current_vp->fg_pattern;
 
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= current_vp->width) || 
-        (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
-        return;
+    if (x + width > current_vp->width)
+        width = current_vp->width - x; /* Clip right */
 
-    /* clipping */
-    if (x < 0)
+    if (x < 0)  /* Clip left */
     {
         width += x;
         src_x -= x;
         x = 0;
     }
-    if (y < 0)
+
+    if (width <= 0)
+        return; /* nothing left to do */
+
+    if (y + height > current_vp->height)
+        height = current_vp->height - y; /* Clip bottom */
+
+    if (y < 0)  /* Clip top */
     {
         height += y;
         src_y -= y;
         y = 0;
     }
-    if (x + width > current_vp->width)
-        width = current_vp->width - x;
-    if (y + height > current_vp->height)
-        height = current_vp->height - y;
+
+    if (height <= 0)
+        return; /* nothing left to do */
 
     src += stride * src_y + src_x; /* move starting point */
     dst = LCDADDR(current_vp->x + x, current_vp->y + y);
-    dst_end = dst + height * LCD_WIDTH;
 
+#ifdef CPU_ARM
+    {
+        int w, px;
+        asm volatile (
+        ".rowstart:                              \n"
+            "mov     %[w], %[width]              \n" /* Load width for inner loop */
+        ".nextpixel:                             \n"
+            "ldrh    %[px], [%[s]], #2           \n" /* Load src pixel */
+            "add     %[d], %[d], #2              \n" /* Uncoditionally increment dst */
+                                                 /* done here for better pipelining */
+            "cmp     %[px], %[fgcolor]           \n" /* Compare to foreground color */
+            "streqh  %[fgpat], [%[d], #-2]       \n" /* Store foregroud if match */
+            "cmpne   %[px], %[transcolor]        \n" /* Compare to transparent color */
+            "strneh  %[px], [%[d], #-2]          \n" /* Store dst if not transparent */
+            "subs    %[w], %[w], #1              \n" /* Width counter has run down? */
+            "bgt     .nextpixel                  \n" /* More in this row? */
+            "add     %[s], %[s], %[sstp], lsl #1 \n" /* Skip over to start of next line */
+            "add     %[d], %[d], %[dstp], lsl #1 \n"
+            "subs    %[h], %[h], #1              \n" /* Height counter has run down? */
+            "bgt     .rowstart                   \n" /* More rows? */
+            : [w]"=&r"(w), [h]"+&r"(height), [px]"=&r"(px),
+              [s]"+&r"(src), [d]"+&r"(dst)
+            : [width]"r"(width),
+              [sstp]"r"(stride - width),
+              [dstp]"r"(LCD_WIDTH - width),
+              [transcolor]"r"(TRANSPARENT_COLOR),
+              [fgcolor]"r"(REPLACEWITHFG_COLOR),
+              [fgpat]"r"(fg)
+        );
+    }
+#else  /* optimized C version */
     do
     {
-        int i;
-        for(i = 0;i < width;i++)
+        const fb_data *src_row = src;
+        fb_data *dst_row = dst;
+        fb_data *row_end = dst_row + width;
+        do
         {
-            if (src[i] == REPLACEWITHFG_COLOR)
-                dst[i] = current_vp->fg_pattern;
-            else if(src[i] != TRANSPARENT_COLOR)
-                dst[i] = src[i];
+            unsigned data = *src_row++;
+            if (data != TRANSPARENT_COLOR)
+            {
+                if (data == REPLACEWITHFG_COLOR)
+                    *dst_row = fg;
+                else
+                    *dst_row = data;
+            }
         }
+        while (++dst_row < row_end);
         src += stride;
         dst += LCD_WIDTH;
     }
-    while (dst < dst_end);
+    while (--height > 0);
+#endif
 }
-#endif /* !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR) */
 
-/* Draw a full native bitmap with a transparent color */
+/* Draw a full native bitmap with transparent and foreground colors */
 void lcd_bitmap_transparent(const fb_data *src, int x, int y,
                             int width, int height)
 {
