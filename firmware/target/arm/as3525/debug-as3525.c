@@ -183,9 +183,9 @@ int calc_freq(int clk)
             if(!(MCI_NAND & (1<<8)))
                 return 0;
             else if(MCI_NAND & (1<<10))
-                return calc_freq(CLK_IDE);
+                return calc_freq(CLK_PCLK);
             else
-                return calc_freq(CLK_IDE)/(((MCI_NAND & 0xff)+1)*2);
+                return calc_freq(CLK_PCLK)/(((MCI_NAND & 0xff)+1)*2);
         case CLK_SD_MCLK_MSD:
             if(!(MCI_SD & (1<<8)))
                 return 0;
@@ -222,7 +222,7 @@ bool __dbg_hw_info(void)
 {
     int line;
     int last_nand = 0;
-#ifdef HAVE_MULTIDRIVE
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
     int last_sd = 0;
 #endif
 
@@ -293,10 +293,10 @@ bool __dbg_hw_info(void)
             last_nand = MCI_NAND;
                                                 /*  MCLK == PCLK  */
         lcd_putsf(0, line++, "SD  :%3dMHz    %3dMHz",
-            ((last_nand ? (AS3525_IDE_FREQ/ 1000000): 0) /
+            ((last_nand ? (AS3525_PCLK_FREQ/ 1000000): 0) /
             ((last_nand & MCI_CLOCK_BYPASS)? 1:(((last_nand & 0xff)+1) * 2))),
             calc_freq(CLK_SD_MCLK_NAND)/1000000);
-#ifdef HAVE_MULTIDRIVE
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
         if(MCI_SD)
             last_sd = MCI_SD;
         lcd_putsf(0, line++, "uSD :%3dMHz    %3dMHz",
