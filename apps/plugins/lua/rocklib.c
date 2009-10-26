@@ -27,6 +27,7 @@
 
 #include "lauxlib.h"
 #include "rocklib.h"
+#include "lib/helper.h"
 
 /*
  * http://www.lua.org/manual/5.1/manual.html#lua_CFunction
@@ -180,6 +181,7 @@ static inline void rli_init(lua_State *L)
  */
 
 #define RB_WRAP(M) static int rock_##M(lua_State *L)
+#define SIMPLE_VOID_WRAPPER(func) RB_WRAP(func) { (void)L; func(); return 0; }
 
 /* Helper function for opt_viewport */
 static void check_tablevalue(lua_State *L, const char* key, int tablepos, void* res, bool unsigned_val)
@@ -573,6 +575,27 @@ RB_WRAP(do_menu)
     return 1;
 }
 
+SIMPLE_VOID_WRAPPER(backlight_force_on);
+SIMPLE_VOID_WRAPPER(backlight_use_settings);
+#ifdef HAVE_REMOTE_LCD
+SIMPLE_VOID_WRAPPER(remote_backlight_force_on);
+SIMPLE_VOID_WRAPPER(remote_backlight_use_settings);
+#endif
+#ifdef HAVE_BUTTON_LIGHT
+SIMPLE_VOID_WRAPPER(buttonlight_force_on);
+SIMPLE_VOID_WRAPPER(buttonlight_use_settings);
+#endif
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+RB_WRAP(backlight_brightness_set)
+{
+    int brightness = luaL_checkint(L, 1);
+    backlight_brightness_set(brightness);
+
+    return 0;
+}
+SIMPLE_VOID_WRAPPER(backlight_brightness_use_setting);
+#endif
+
 #define R(NAME) {#NAME, rock_##NAME}
 static const luaL_Reg rocklib[] =
 {
@@ -613,6 +636,22 @@ static const luaL_Reg rocklib[] =
     R(current_path),
     R(gui_syncyesno_run),
     R(do_menu),
+
+    /* Backlight helper */
+    R(backlight_force_on),
+    R(backlight_use_settings),
+#ifdef HAVE_REMOTE_LCD
+    R(remote_backlight_force_on),
+    R(remote_backlight_use_settings),
+#endif
+#ifdef HAVE_BUTTON_LIGHT
+    R(buttonlight_force_on),
+    R(buttonlight_use_settings),
+#endif
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    R(backlight_brightness_set),
+    R(backlight_brightness_use_setting),
+#endif
 
     {"new_image", rli_new},
 
