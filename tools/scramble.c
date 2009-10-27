@@ -125,7 +125,7 @@ void usage(void)
            "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2,\n");
     printf("\t                   9200, 1630, ldax, m200, c100, clip, e2v2, m2v4,\n"
            "\t                   fuze, c2v2, clv2, y820, y920, y925, x747, 747p, \n"
-           "\t                   x777, nn2g)\n");
+           "\t                   x777, nn2g, m244)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -318,6 +318,8 @@ int main (int argc, char** argv)
             modelnum = 62;
         else if (!strcmp(&argv[1][5], "x767"))
             modelnum = 64;
+        else if (!strcmp(&argv[1][5], "m244"))
+            modelnum = 131;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;
