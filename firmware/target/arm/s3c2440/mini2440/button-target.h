@@ -27,7 +27,7 @@
 
 bool button_hold(void);
 void button_init_device(void);
-int button_read_device(void);
+int button_read_device(int*);
 void touchpad_set_sensitivity(int level);
 
 /* Mini2440 specific button codes */
@@ -42,6 +42,20 @@ void touchpad_set_sensitivity(int level);
 /* Add on buttons */
 #define BUTTON_SEVEN        0x0200
 #define BUTTON_EIGHT        0x0400
+
+/* Touch Screen Area Buttons */
+#define BUTTON_TOPLEFT      0x010000
+#define BUTTON_TOPMIDDLE    0x020000
+#define BUTTON_TOPRIGHT     0x040000
+#define BUTTON_MIDLEFT      0x080000
+#define BUTTON_CENTER       0x100000
+#define BUTTON_MIDRIGHT     0x200000
+#define BUTTON_BOTTOMLEFT   0x400000
+#define BUTTON_BOTTOMMIDDLE 0x800000
+#define BUTTON_BOTTOMRIGHT  0x100000
+
+#define BUTTON_TOUCH        0x200000
+
 
 #define BUTTON_MENU         BUTTON_ONE         
 #define BUTTON_UP           BUTTON_TWO

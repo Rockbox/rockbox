@@ -24,6 +24,7 @@
 #include "system.h"
 #include "button.h"
 #include "kernel.h"
+#include "touchscreen-target.h"
 
 void button_init_device(void)
 {
@@ -50,6 +51,8 @@ void button_init_device(void)
     S3C2440_GPIO_PULLUP (GPGUP, 9, GPIO_PULLUP_ENABLE);
     S3C2440_GPIO_PULLUP (GPGUP, 10, GPIO_PULLUP_ENABLE);
     
+    /* init touchscreen */
+    touchscreen_init_device();
 }
 
 inline bool button_hold(void)
@@ -57,12 +60,18 @@ inline bool button_hold(void)
     return 0;
 }
 
-int button_read_device(void)
+int button_read_device(int* data)
 {
     int btn = BUTTON_NONE;
+    static int old_data = 0;
+
+   *data = old_data;
 
     /* Read the buttons - active low */
     btn = (GPGDAT & BUTTON_MAIN) ^ BUTTON_MAIN;
+
+    /* read touchscreen */ 
+    btn |= touchscreen_read_device(data, &old_data);
     
     return btn;
 }

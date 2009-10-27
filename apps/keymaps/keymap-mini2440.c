@@ -337,7 +337,7 @@ static const struct button_mapping* get_context_mapping_remote( int context )
 }
 #endif
 
-const struct button_mapping* get_context_mapping(int context)
+const struct button_mapping* target_get_context_mapping(int context)
 {
 #ifdef HAVE_MINI2440_REMOTE
     if (context&CONTEXT_REMOTE)

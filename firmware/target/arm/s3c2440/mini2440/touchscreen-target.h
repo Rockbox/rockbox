@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 by Bob Cousins
+ * Copyright (C) 2009 by Dominik Wenger
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,21 +18,16 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _ADC_TARGET_H_
-#define _ADC_TARGET_H_
 
-/*  Channel 0 is connected to an on board pot for testing
-    Channels 0-3 are available via expansion connector CON4
-    Channels 4-7 are routed to LCD connector for touchscreen operation if
-        supported by display panel. 
-*/
-#define NUM_ADC_CHANNELS 4
+#ifndef _TOUCHSCREEN_TARGET_H
+#define _TOUCHSCREEN_TARGET_H
 
-#define ADC_ONBOARD     0
-#define ADC_SPARE_1     1
-#define ADC_SPARE_2     2
-#define ADC_SPARE_3     3
+/* try to get a touchscreen reading from adc */
+void touchscreen_scan_device(void);
+/* init touchscreen driver */
+void touchscreen_init_device(void);
 
-#define ADC_READ_ERROR 0xFFFF
+int touchscreen_read_device(int *data, int *old_data);
 
 #endif
+

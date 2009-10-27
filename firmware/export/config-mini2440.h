@@ -71,6 +71,8 @@
 
 /* Keypad */
 #define CONFIG_KEYPAD MINI2440_PAD
+#define HAVE_TOUCHSCREEN
+#define HAVE_BUTTON_DATA
 
 /* I2C */
 /* We do not use currently use hardware I2C, but does not build without */
@@ -108,6 +110,9 @@
 /* RMC TODO: what is this for?? */
 /* define this if you have access to the pitchscreen */
 #define HAVE_PITCHSCREEN
+#define HAVE_QUICKSCREEN
+
+
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC

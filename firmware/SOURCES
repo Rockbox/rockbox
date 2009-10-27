@@ -1411,6 +1411,7 @@ target/arm/s3c2440/mini2440/backlight-mini2440.c
 target/arm/s3c2440/mini2440/button-mini2440.c
 target/arm/s3c2440/mini2440/led-mini2440.c
 target/arm/s3c2440/mini2440/power-mini2440.c
+target/arm/s3c2440/mini2440/touchscreen-mini2440.c
 #ifndef BOOTLOADER
 target/arm/s3c2440/mini2440/powermgmt-mini2440.c
 target/arm/s3c2440/mini2440/pcm-mini2440.c
