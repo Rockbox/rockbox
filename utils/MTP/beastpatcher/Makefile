@@ -1,4 +1,4 @@
-CFLAGS=-Wall -W -DWITH_BOOTOBJS -DBEASTPATCHER -I../../../tools
+CFLAGS=-Wall -W -DWITH_BOOTOBJS -I../../../tools
 
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 OUTPUT=beastpatcher.exe
@@ -30,17 +30,17 @@ CC = $(CROSS)gcc
 
 all: $(OUTPUT)
 
-SOURCES = beastpatcher.c bootimg.c ../../../tools/mknkboot.c main.c
-HEADERS = beastpatcher.h mtp_common.h bootimg.h ../../../tools/mknkboot.h
+SOURCES = beastpatcher.c bootimg.c mknkboot.c main.c
+HEADERS = beastpatcher.h mtp_common.h bootimg.h mknkboot.h
 MTPSRCS_W32 = mtp_win32.c
 MTPSRCS_MTP = mtp_libmtp.c
 
 beastpatcher: $(SOURCES) $(HEADERS) $(MTPSRCS_MTP)
-	gcc $(CFLAGS) -o beastpatcher $(SOURCES) $(MTPSRCS_MTP) $(LIBS)
+	gcc $(CFLAGS) -DBEASTPATCHER -o beastpatcher $(SOURCES) $(MTPSRCS_MTP) $(LIBS)
 	strip beastpatcher
 
 beastpatcher.exe: $(SOURCES) $(HEADERS) $(MTPSRCS_W32) $(WINLIBS)
-	$(CC) $(CFLAGS) -o beastpatcher.exe $(SOURCES) $(MTPSRCS_W32) $(WINLIBS)
+	$(CC) $(CFLAGS) -DBEASTPATCHER -o beastpatcher.exe $(SOURCES) $(MTPSRCS_W32) $(WINLIBS)
 	$(CROSS)strip beastpatcher.exe
 
 beastpatcher-mac: beastpatcher-i386 beastpatcher-ppc
@@ -60,5 +60,7 @@ bin2c: ../../../rbutil/tools/bin2c.c
 bootimg.c: bootloader.bin bin2c
 	./bin2c bootloader.bin bootimg
 
+mknkboot: mknkboot.c
+	$(SILENT)$(NATIVECC) $(CFLAGS) $+ -o $@
 clean:
-	rm -f beastpatcher.exe beastpatcher-mac beastpatcher-i386 beastpatcher-ppc beastpatcher bin2c bootimg.c bootimg.h *~
+	rm -f beastpatcher.exe beastpatcher-mac beastpatcher-i386 beastpatcher-ppc beastpatcher bin2c bootimg.c bootimg.h mknkboot *~

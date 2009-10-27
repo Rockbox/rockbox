@@ -1608,7 +1608,7 @@ fi
     appextra="recorder:gui"
     plugins="yes"
     swcodec="yes"
-    toolset="$gigabeatbitmaptools mknkboot"
+    toolset="$gigabeatbitmaptools"
     boottool="$rootdir/tools/scramble -gigabeats"
     bootoutput="nk.bin"
     # architecture, manufacturer and model for the target-tree build
