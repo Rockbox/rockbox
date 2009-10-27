@@ -18,12 +18,13 @@ while (scalar @ARGV > 0) {
     if ($ARGV[0] eq "-h") {
         print $ARGV[0]."\n";
         print <<MOO
-Usage: w32sims [-v] [-u] [-r VERSION] [-f filename] [buildonly]
+Usage: w32sims [-v] [-u] [-s] [-w] [-r VERSION] [-f filename] [buildonly]
        -v Verbose output
        -u Run svn up before building
        -r Use the specified version string for filenames (defaults to SVN
           revision)
        -s Strip binaries before zipping them up.
+       -w Crosscompile for Windows (requires mingw32)
        -f Filename format string (without extension). This can include a
           filepath (relative or absolute) May include the following special
           strings:
@@ -48,6 +49,9 @@ MOO
     }
     elsif ($ARGV[0] eq "-s") {
         $strip =1;
+    }
+    elsif ($ARGV[0] eq "-w") {
+        $cross =1;
     }
     elsif ($ARGV[0] eq "-r") {
         $version =$ARGV[1];
@@ -153,8 +157,15 @@ sub buildit {
 
     `rm -rf * >/dev/null 2>&1`;
 
-    my $c = sprintf('printf "%s\n%ss\n" | ../tools/configure',
-                    $confnum, $extra);
+    if ($cross) {
+        $simstring = 'a\nw\ns\n\n';
+    }
+    else {
+        $simstring = 's\n';
+    }
+
+    my $c = sprintf('printf "%s\n%s%s" | ../tools/configure',
+                    $confnum, $extra, $simstring);
 
     print "C: $c\n" if($verbose);
     `$c`;
