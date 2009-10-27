@@ -117,6 +117,7 @@ sub runone {
         $cmd = "find \\( -name 'rockboxui*' -o -iname '*dll' -o -name '*.rock' -o -name '*.codec' \\) -exec $striptool '{}' ';'";
         print("$cmd\n") if ($verbose);
         `$cmd`;
+        close(MAKE);
     }
 
     chdir "..";
@@ -135,9 +136,15 @@ sub runone {
     print "Zip up the sim and associated files\n" if ($verbose);
     mkpath(dirname($newo));
     system("mv build-$dir $newo");
-    if (-f "$newo/rockboxui.exe") {
+    if ($cross) {
         print "Find and copy SDL.dll\n" if ($verbose);
-        `cp \`dirname \\\`which sdl-config\\\`\`/SDL.dll ./$newo/`;
+        open(MAKE, "$newo/Makefile");
+        my $GCCOPTS=(grep(/^export GCCOPTS=/, <MAKE>))[0];
+        chomp($GCCOPTS);
+        (my $sdldll = $GCCOPTS) =~ s/^export GCCOPTS=.*-I([^ ]+)\/include\/SDL.*$/$1\/bin\/SDL.dll/;
+        print "Found $sdldll\n" if ($verbose);
+        `cp $sdldll ./$newo/`;
+        close(MAKE);
     }
     my $toplevel = getcwd();
     chdir(dirname($newo));
