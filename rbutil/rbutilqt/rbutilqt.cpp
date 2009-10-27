@@ -174,6 +174,7 @@ void RbUtilQt::downloadInfo()
         daily->setCache(true);
     else
         daily->setCache(false);
+    ui.statusbar->showMessage(tr("Downloading build information, please wait ..."));
     qDebug() << "[RbUtil] downloading build info";
     daily->setFile(&buildInfo);
     daily->getFile(QUrl(RbSettings::value(RbSettings::ServerConfUrl).toString()));
@@ -184,6 +185,7 @@ void RbUtilQt::downloadDone(bool error)
 {
     if(error) {
         qDebug() << "[RbUtil] network error:" << daily->error();
+        ui.statusbar->showMessage(tr("Can't get version information!"));
         QMessageBox::critical(this, tr("Network error"),
             tr("Can't get version information."));
         return;
@@ -217,6 +219,7 @@ void RbUtilQt::downloadDone(bool error)
         bleeding->setCache(true);
     bleeding->setFile(&bleedingInfo);
     bleeding->getFile(QUrl(RbSettings::value(RbSettings::BleedingInfo).toString()));
+    ui.statusbar->showMessage(tr("Downloading build information, please wait ..."));
 
     if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION) {
         QApplication::processEvents();
@@ -249,6 +252,7 @@ void RbUtilQt::downloadBleedingDone(bool error)
         versmap.insert("bleed_rev", info.value("bleeding/rev").toString());
         versmap.insert("bleed_date", info.value("bleeding/timestamp").toString());
         qDebug() << "[RbUtil] version map:" << versmap;
+        ui.statusbar->showMessage(tr("Download build information finished."), 5000);
 
         m_gotInfo = true;
         
