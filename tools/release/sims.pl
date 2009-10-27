@@ -148,7 +148,11 @@ sub runone {
     }
     my $toplevel = getcwd();
     chdir(dirname($newo));
-    $cmd = "zip -9 -r -q \"".basename($newo)."\" \"".basename($newo)."\"/{rockboxui*,UI256.bmp,SDL.dll,simdisk}";
+    $cmd = "zip -9 -r -q \"".basename($newo)."\" "
+       . "\"".basename($newo)."\"/rockboxui* "
+       . "\"".basename($newo)."\"/UI256.bmp "
+       . "\"".basename($newo)."\"/SDL.dll "
+       . "\"".basename($newo)."\"/simdisk ";
     print("$cmd\n") if($verbose);
     `$cmd`;
     chdir($toplevel);
