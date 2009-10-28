@@ -68,6 +68,10 @@
 /* But the 3.5" LCD touch screen does not support brightness*/
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
+/* Main LCD backlight brightness range and defaults */
+#define MIN_BRIGHTNESS_SETTING          1   /* 0.5 mA */
+#define MAX_BRIGHTNESS_SETTING          12  /* 32 mA */
+#define DEFAULT_BRIGHTNESS_SETTING      10  /* 16 mA */
 
 /* Keypad */
 #define CONFIG_KEYPAD MINI2440_PAD
@@ -93,11 +97,7 @@
 #define BATTERY_CAPACITY_INC      100   /* capacity increment */
 #define BATTERY_TYPES_COUNT         1   /* only one type */
 
-/* USB */
-/* TODO:#define HAVE_USBSTACK */
-#define USB_NONE
 
-#define HAVE_SERIAL
 
 /***************************************************************************/
 /* Application Config */
@@ -134,15 +134,18 @@
 #define MCK_FREQ   (CPU_FREQ/4)
 #define SLOW_CLOCK        32768
 
-/* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING          1   /* 0.5 mA */
-#define MAX_BRIGHTNESS_SETTING          12  /* 32 mA */
-#define DEFAULT_BRIGHTNESS_SETTING      10  /* 16 mA */
+
 /* Define this if your LCD can set contrast */
 #define HAVE_LCD_CONTRAST
 #define MIN_CONTRAST_SETTING        0
 #define MAX_CONTRAST_SETTING        63
 #define DEFAULT_CONTRAST_SETTING    47 /* Match boot contrast */
+
+/* USB */
+/* TODO:#define HAVE_USBSTACK */
+#define USB_NONE
+
+#define HAVE_SERIAL
 
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR

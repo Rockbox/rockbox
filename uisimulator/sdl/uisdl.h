@@ -353,6 +353,12 @@
 #define UI_LCD_POSX                 124 /* x position of lcd */
 #define UI_LCD_POSY                 42  /* y position of lcd */
 
+#elif defined(MINI2440)
+#define UI_TITLE                    "Mini2440"
+#define UI_WIDTH                    441 /* width of GUI window */
+#define UI_HEIGHT                   436 /* height of GUI window */
+#define UI_LCD_POSX                 148 /* x position of lcd */
+#define UI_LCD_POSY                 50 /* y position of lcd */
 #else
 #error no UI defines
 #endif
