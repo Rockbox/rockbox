@@ -945,7 +945,7 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
     const char* p = str, *f = fmt;
     const char** s;
     int* d;
-    bool set;
+    bool set, is_negative;
     int i=0;
 
     va_start(ap, str);
@@ -973,7 +973,13 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                 break;
 
             case 'd': /* int */
+                is_negative = false;
                 d = va_arg(ap, int*);
+                if (*p == '-' && isdigit(*(p+1)))
+                {
+                    is_negative = true;
+                    p++;
+                }
                 if (!isdigit(*p))
                 {
                     if (!set_vals || *p != '-')
@@ -987,6 +993,8 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                     while (isdigit(*p))
                        *d = (*d * 10) + (*p++ - '0');
                     set = true;
+                    if (is_negative)
+                        *d *= -1;
                 }
 
                 break;

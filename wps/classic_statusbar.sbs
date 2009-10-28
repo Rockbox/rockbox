@@ -35,5 +35,5 @@
 
 
 # Clock on RTC able targets, and disk access
-%V|140|0|-|8|0|-|-| # The 140 is (LCD_WIDTH-(6 letters * 6 pixels))
+%V|-36|0|-|8|0|-|-| # align on the right with room for 6 SYSFONT digits
 %?ca<%?St|time format|<%cH|%cI>:%cM|--:-->%?lh<*|>

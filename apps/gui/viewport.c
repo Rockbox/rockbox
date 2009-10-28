@@ -445,7 +445,11 @@ const char* viewport_parse_viewport(struct viewport *vp,
     /* X and Y *must* be set */
     if (!LIST_VALUE_PARSED(set, PL_X) || !LIST_VALUE_PARSED(set, PL_Y))
         return NULL;
-    
+    /* check for negative values */        
+    if (vp->x < 0)
+        vp->x += screens[screen].lcdwidth;
+    if (vp->y < 0)
+        vp->y += screens[screen].lcdheight;
     /* fix defaults */
     if (!LIST_VALUE_PARSED(set, PL_WIDTH))
         vp->width = screens[screen].lcdwidth - vp->x;
