@@ -10,7 +10,10 @@
 
 # Battery area
 %V|0|0|-|8|0|-|-| 
-%?bl<%xdBa|%xdBa|%xdBb|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>%?bc<%xdSa|>
+%?bl<%xdBa|%xdBa|%xdBb|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>
+# charging icon
+%V|16|0|-|8|0|-|-| 
+%?bc<%xdSa|>
 
 # Volume area
 %V|27|0|-|8|0|-|-| 
