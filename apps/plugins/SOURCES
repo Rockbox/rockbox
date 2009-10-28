@@ -173,6 +173,9 @@ md5sum.c
 
 #if (PLUGIN_BUFFER_SIZE >= 0x80000)
 lua.c
+#ifdef HAVE_TOUCHSCREEN
+boomshine.lua
+#endif
 #endif
 
 #ifdef USB_ENABLE_HID
