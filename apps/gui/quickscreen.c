@@ -367,16 +367,16 @@ bool quick_screen_quick(int button_enter)
     int oldrepeat = global_settings.repeat_mode;
 
     qs.items[QUICKSCREEN_TOP] = 
-            get_setting(global_settings.qs_item_top,
+            get_setting(global_settings.qs_items[QUICKSCREEN_TOP],
                         find_setting(&global_settings.party_mode, NULL));
     qs.items[QUICKSCREEN_LEFT] = 
-            get_setting(global_settings.qs_item_left,
+            get_setting(global_settings.qs_items[QUICKSCREEN_LEFT],
                         find_setting(&global_settings.playlist_shuffle, NULL));
     qs.items[QUICKSCREEN_RIGHT] = 
-            get_setting(global_settings.qs_item_right,
+            get_setting(global_settings.qs_items[QUICKSCREEN_RIGHT],
                         find_setting(&global_settings.repeat_mode, NULL));
     qs.items[QUICKSCREEN_BOTTOM] = 
-            get_setting(global_settings.qs_item_bottom,
+            get_setting(global_settings.qs_items[QUICKSCREEN_BOTTOM],
                         find_setting(&global_settings.dirfilter, NULL));
 
     qs.callback = NULL;
@@ -452,22 +452,7 @@ void set_as_qs_item(const struct settings_list *setting,
         if (&settings[i] == setting)
             break;
     }
-    switch (item)
-    {
-        case QUICKSCREEN_TOP:
-            global_settings.qs_item_top = i;
-            break;
-        case QUICKSCREEN_LEFT:
-            global_settings.qs_item_left = i;
-            break;
-        case QUICKSCREEN_RIGHT:
-            global_settings.qs_item_right = i;
-            break;
-        case QUICKSCREEN_BOTTOM:
-            global_settings.qs_item_bottom = i;
-            break;
-        default: /* shut the compiler up */
-            break;
-    }
+
+    global_settings.qs_items[item] = i;
 }
 

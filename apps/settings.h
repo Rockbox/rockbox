@@ -27,6 +27,7 @@
 #include "inttypes.h"
 #include "config.h"
 #include "statusbar.h" /* for the statusbar values */
+#include "quickscreen.h"
 #include "button.h"
 #if CONFIG_CODEC == SWCODEC
 #include "audio.h"
@@ -507,11 +508,7 @@ struct user_settings
 #endif
 
 #ifdef HAVE_QUICKSCREEN
-    /* these are split because settings_list cant handle arrays */
-    int qs_item_top;
-    int qs_item_left;
-    int qs_item_right;
-    int qs_item_bottom;
+    int qs_items[QUICKSCREEN_ITEM_COUNT];
 #endif
 
 #if CONFIG_RTC
