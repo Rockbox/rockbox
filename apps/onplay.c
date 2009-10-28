@@ -173,8 +173,12 @@ static bool add_to_playlist(int position, bool queue)
         playlist_create(NULL, NULL);
 
     /* always set seed before inserting shuffled */
-    if (position == PLAYLIST_INSERT_SHUFFLED)
+    if (position == PLAYLIST_INSERT_SHUFFLED || position == PLAYLIST_INSERT_LAST_SHUFFLED)
+    {
         srand(current_tick);
+	if (position == PLAYLIST_INSERT_LAST_SHUFFLED)
+	    playlist_set_last_shuffled_start();
+    }
 
 #ifdef HAVE_TAGCACHE
     if (context == CONTEXT_ID3DB)
@@ -355,6 +359,10 @@ MENUITEM_FUNCTION(i_shuf_pl_item, MENU_FUNC_USEPARAM,
                   ID2P(LANG_INSERT_SHUFFLED), playlist_insert_func,
                   (intptr_t*)PLAYLIST_INSERT_SHUFFLED, treeplaylist_callback,
                   Icon_Playlist);
+MENUITEM_FUNCTION(i_last_shuf_pl_item, MENU_FUNC_USEPARAM,
+                  ID2P(LANG_INSERT_LAST_SHUFFLED), playlist_insert_func,
+                  (intptr_t*)PLAYLIST_INSERT_LAST_SHUFFLED, treeplaylist_callback,
+                  Icon_Playlist);
 /* queue items */
 MENUITEM_FUNCTION(q_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE),
                   playlist_queue_func, (intptr_t*)PLAYLIST_INSERT,
@@ -369,6 +377,10 @@ MENUITEM_FUNCTION(q_shuf_pl_item, MENU_FUNC_USEPARAM,
                   ID2P(LANG_QUEUE_SHUFFLED), playlist_queue_func,
                   (intptr_t*)PLAYLIST_INSERT_SHUFFLED,
                   treeplaylist_wplayback_callback, Icon_Playlist);
+MENUITEM_FUNCTION(q_last_shuf_pl_item, MENU_FUNC_USEPARAM,
+                  ID2P(LANG_QUEUE_LAST_SHUFFLED), playlist_queue_func,
+                  (intptr_t*)PLAYLIST_INSERT_LAST_SHUFFLED,
+                  treeplaylist_callback, Icon_Playlist);
 /* replace playlist */
 MENUITEM_FUNCTION(replace_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_REPLACE),
                   playlist_insert_func, (intptr_t*)PLAYLIST_REPLACE,
@@ -388,10 +400,12 @@ MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_PLAYLIST),
                  /* insert */
                  &i_pl_item, &i_first_pl_item,
                  &i_last_pl_item, &i_shuf_pl_item,
+                 &i_last_shuf_pl_item,
                  
                  /* queue */
                  &q_pl_item, &q_first_pl_item, &q_last_pl_item,
                  &q_shuf_pl_item,
+                 &q_last_shuf_pl_item,
                  
                  /* replace */
                  &replace_pl_item
@@ -438,6 +452,15 @@ static int treeplaylist_callback(int action,
                     return action;
                 }
                 return ACTION_EXIT_MENUITEM;
+            }
+            else if (this_item == &i_last_shuf_pl_item || this_item == &q_last_shuf_pl_item)
+            {
+        	if ((playlist_amount() > 0) && (audio_status() & AUDIO_STATUS_PLAY) && (selected_file_attr & ATTR_DIRECTORY))
+        	{
+        	    return action;
+        	}
+        	else
+        	    return ACTION_EXIT_MENUITEM;
             }
             break;
     }

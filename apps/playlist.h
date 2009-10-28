@@ -53,7 +53,8 @@ enum {
     PLAYLIST_INSERT_LAST = -3,
     PLAYLIST_INSERT_FIRST = -4,
     PLAYLIST_INSERT_SHUFFLED = -5,
-    PLAYLIST_REPLACE = -6
+    PLAYLIST_REPLACE = -6,
+    PLAYLIST_INSERT_LAST_SHUFFLED = -7
 };
 
 enum {
@@ -105,6 +106,8 @@ struct playlist_info
     bool pending_control_sync; /* control file needs to be synced   */
 
     struct mutex control_mutex; /* mutex for control file access    */
+    int last_shuffled_start; /* number of tracks when insert last
+                                    shuffled command start */
 };
 
 struct playlist_track_info
@@ -131,6 +134,7 @@ int playlist_get_resume_info(int *resume_index);
 int playlist_update_resume_info(const struct mp3entry* id3);
 int playlist_get_display_index(void);
 int playlist_amount(void);
+void playlist_set_last_shuffled_start(void);
 
 /* Exported functions for all playlists.  Pass NULL for playlist_info
    structure to work with current playlist. */

@@ -664,19 +664,21 @@ int playlist_remove_all_tracks(struct playlist_info *playlist)
 
 
 /*
- * Add track to playlist at specified position.  There are five special
+ * Add track to playlist at specified position. There are seven special
  * positions that can be specified:
- *     PLAYLIST_PREPEND         - Add track at beginning of playlist
- *     PLAYLIST_INSERT          - Add track after current song.  NOTE: If
- *                                there are already inserted tracks then track
- *                                is added to the end of the insertion list
- *     PLAYLIST_INSERT_FIRST    - Add track immediately after current song, no
- *                                matter what other tracks have been inserted
- *     PLAYLIST_INSERT_LAST     - Add track to end of playlist
- *     PLAYLIST_INSERT_SHUFFLED - Add track at some random point between the
- *                                current playing track and end of playlist
- *     PLAYLIST_REPLACE         - Erase current playlist, Cue the current track
- *                                and inster this track at the end.
+ *  PLAYLIST_PREPEND              - Add track at beginning of playlist
+ *  PLAYLIST_INSERT               - Add track after current song.  NOTE: If
+ *                                  there are already inserted tracks then track
+ *                                  is added to the end of the insertion list
+ *  PLAYLIST_INSERT_FIRST         - Add track immediately after current song, no
+ *                                  matter what other tracks have been inserted
+ *  PLAYLIST_INSERT_LAST          - Add track to end of playlist
+ *  PLAYLIST_INSERT_SHUFFLED      - Add track at some random point between the
+ *                                  current playing track and end of playlist
+ *  PLAYLIST_INSERT_LAST_SHUFFLED - Add tracks in random order to the end of
+ *                                  the playlist.
+ *  PLAYLIST_REPLACE              - Erase current playlist, Cue the current track
+ *                                  and inster this track at the end.
  */
 static int add_track_to_playlist(struct playlist_info* playlist,
                                  const char *filename, int position,
@@ -751,6 +753,12 @@ static int add_track_to_playlist(struct playlist_info* playlist,
             }
             else
                 position = insert_position = (rand() % (playlist->amount+1));
+            break;
+        }
+        case PLAYLIST_INSERT_LAST_SHUFFLED:
+        {
+            position = insert_position = playlist->last_shuffled_start +
+                          rand() % (playlist->amount - playlist->last_shuffled_start + 1);
             break;
         }
         case PLAYLIST_REPLACE:
@@ -2639,7 +2647,13 @@ int playlist_amount(void)
 {
     return playlist_amount_ex(NULL);
 }
-
+/* set playlist->last_shuffle_start to playlist->amount for
+   PLAYLIST_INSERT_LAST_SHUFFLED command purposes*/
+void playlist_set_last_shuffled_start(void)
+{
+    struct playlist_info* playlist = &current_playlist;
+    playlist->last_shuffled_start = playlist->amount;
+}
 /*
  * Create a new playlist  If playlist is not NULL then we're loading a
  * playlist off disk for viewing/editing.  The index_buffer is used to store
