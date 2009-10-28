@@ -15,6 +15,8 @@ ROCKS1 := $(subst $(ROOTDIR),$(BUILDDIR),$(ROCKS1))
 
 ROCKS := $(ROCKS1)
 
+ROCKS1 := $(ROCKS1:%.lua=)
+
 # libplugin.a
 PLUGINLIB := $(BUILDDIR)/apps/plugins/libplugin.a
 PLUGINLIB_SRC = $(call preprocess, $(APPSDIR)/plugins/lib/SOURCES)
@@ -95,6 +97,9 @@ ifdef SIMVER
 else
 	$(SILENT)$(OC) -O binary $(BUILDDIR)/$*.elf $@
 endif
+
+$(BUILDDIR)/apps/plugins/%.lua: $(ROOTDIR)/apps/plugins/%.lua
+	$(call PRINTS,CP $(subst $(ROOTDIR)/,,$<))cp $< $(BUILDDIR)/apps/plugins/
 
 $(BUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(OVERLAYREF_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB)
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o /dev/null \
