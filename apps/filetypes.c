@@ -130,12 +130,11 @@ void tree_get_filetypes(const struct filetype** types, int* count)
 }
 
 /* mask for dynamic filetype info in attribute */
-#define FILETYPES_MASK 0xFF00
 #define ROCK_EXTENSION "rock"
 
 struct file_type {
     int  icon; /* the icon which shall be used for it, NOICON if unknown */
-    unsigned char  attr; /* FILETYPES_MASK >> 8 */ 
+    unsigned char  attr; /* FILE_ATTR_MASK >> 8 */
     char* plugin; /* Which plugin to use, NULL if unknown, or builtin */
     char* extension; /* NULL for none */
 };
