@@ -274,7 +274,7 @@ STOP
         rmdir("$rbdir/codecs");
     }
 
-    find(find_copyfile(qr/\.(rock|ovl)/, abs_path("$rbdir/rocks/")), 'apps/plugins');
+    find(find_copyfile(qr/\.(rock|ovl|lua)/, abs_path("$rbdir/rocks/")), 'apps/plugins');
 
     open VIEWERS, "$ROOT/apps/plugins/viewers.config" or
         die "can't open viewers.config";
@@ -340,8 +340,14 @@ STOP
                 # well
                 move("$rbdir/rocks/${plugin}.ovl", "$rbdir/rocks/$dir");
             }
+            if(-e "$rbdir/rocks/${plugin}.lua") {
+                # if this is a lua script, move it to the appropriate dir
+                move("$rbdir/rocks/${plugin}.lua", "$rbdir/rocks/$dir/");
+            }
         }
     }
+
+    glob_unlink("$rbdir/rocks/*.lua"); # Clean up unwanted *.lua files (e.g. actions.lua, buttons.lua)
 
     if ($bitmap) {
         mkdir "$rbdir/icons", 0777;
