@@ -20,7 +20,7 @@ this can be downloaded and built with the tools/rockboxdev.sh script.
 
 The latest officially released bootloader can always be downloaded from:
 
-http://download.rockbox.org/bootloader/gigabeat-s/
+http://download.rockbox.org/toshiba/bootloader/gigabeat-s/
 
 
 
@@ -59,3 +59,9 @@ Linux using the mingw32 package, or compile in Cygwin.  Just type
 
 To run beastpatcher.exe, you need MTP_DLL.dll in the same directory
 (or the Windows DLL path).
+
+Alternatively, beastpatcher can be built as binary that includes the
+MTP functionality and thus doesn't require the MTP_DLL. Building has
+the additional requirements as building the MTP_DLL. A VS2005 project
+file is available.
+
