@@ -1,0 +1,36 @@
+# Classic statusbar adapted to skin engine
+#
+# Bar at the top.. very easy to change to the bottom
+#
+# Load some bitmaps
+%wd # not sure if this is needed for sbs files?
+%xl|B|battery.bmp|0|0|10|
+%xl|V|volume.bmp|0|0|10|
+%xl|S|status.bmp|0|0|12|
+
+# Battery area
+%V|0|0|-|8|0|-|-| 
+%?bl<%xdBa|%xdBa|%xdBb|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>%?bc<%xdSa|>
+
+# Volume area
+%V|27|0|-|8|0|-|-| 
+%?mv<%pv|%?pv<%xdVa|%xdVb|%xdVc|%xdVd|%xdVe|%xdVf|%xdVg|%xdVh|%xdVi|%xdVj>>
+
+# Icons, all in the same bmp strip, so need to use multiple viewports
+# Playback mode
+%V|44|0|-|8|0|-|-| 
+%?mp<%xdSc|%xdSb|%xdSd|%xdSe|%xdSf>
+
+# Repeat mode
+%V|54|0|-|8|0|-|-| 
+%?mm<|%xdSi|%xdSj|%xdSk|%xdSl>
+
+# Shuffle mode
+%V|64|0|-|8|0|-|-| 
+%?ps<%xdSk|>
+
+
+
+# Clock on RTC able targets, and disk access
+%V|140|0|-|8|0|-|-| # The 140 is (LCD_WIDTH-(6 letters * 6 pixels))
+%?ca<%?St|time format|<%cH|%cI>:%cM|--:-->%?lh<*|>
