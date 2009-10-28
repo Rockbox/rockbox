@@ -202,25 +202,6 @@ static int get_action_worker(int context, int timeout,
         return ACTION_NONE; /* "safest" return value */
     }
     last_context = context;
-#ifdef HAVE_TOUCHSCREEN
-    if (button & BUTTON_TOUCHSCREEN)
-    {
-        repeated = false;
-        short_press = false;
-        if (last_button & BUTTON_TOUCHSCREEN)
-        {
-            if ((button & BUTTON_REL) &&
-                ((last_button & BUTTON_REPEAT)==0))
-            {
-                short_press = true;
-            }
-            else if (button & BUTTON_REPEAT)
-                repeated = true;
-        }
-        last_button = button;
-        return ACTION_TOUCHSCREEN;
-    }
-#endif
 #ifndef HAS_BUTTON_HOLD
     screen_has_lock = ((context & ALLOW_SOFTLOCK) == ALLOW_SOFTLOCK);
     if (screen_has_lock && keys_locked)
@@ -244,6 +225,26 @@ static int get_action_worker(int context, int timeout,
     }
     context &= ~ALLOW_SOFTLOCK;
 #endif /* HAS_BUTTON_HOLD */
+
+#ifdef HAVE_TOUCHSCREEN
+    if (button & BUTTON_TOUCHSCREEN)
+    {
+        repeated = false;
+        short_press = false;
+        if (last_button & BUTTON_TOUCHSCREEN)
+        {
+            if ((button & BUTTON_REL) &&
+                ((last_button & BUTTON_REPEAT)==0))
+            {
+                short_press = true;
+            }
+            else if (button & BUTTON_REPEAT)
+                repeated = true;
+        }
+        last_button = button;
+        return ACTION_TOUCHSCREEN;
+    }
+#endif
 
 #if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
     button = button_flip_horizontally(context, button);
