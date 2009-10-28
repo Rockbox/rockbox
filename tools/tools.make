@@ -18,7 +18,6 @@ $(TOOLSDIR)/rdf2binary:	$(TOOLSDIR)/rdf2binary.c
 $(TOOLSDIR)/convbdf: $(TOOLSDIR)/convbdf.c
 $(TOOLSDIR)/codepages: $(TOOLSDIR)/codepages.c $(TOOLSDIR)/codepage_tables.c
 $(TOOLSDIR)/mkboot: $(TOOLSDIR)/mkboot.c
-$(TOOLSDIR)/mktccboot: $(TOOLSDIR)/mktccboot.c $(TOOLSDIR)/telechips.c
 $(TOOLSDIR)/wavtrim: $(TOOLSDIR)/wavtrim.c
 $(TOOLSDIR)/voicefont: $(TOOLSDIR)/voicefont.c
 

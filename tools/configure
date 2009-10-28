@@ -909,7 +909,7 @@ fi
   iaudiobitmaptools="$toolset scramble descramble mkboot bmp2rb"
   ipodbitmaptools="$toolset scramble bmp2rb"
   gigabeatbitmaptools="$toolset scramble descramble bmp2rb"
-  tccbitmaptools="$toolset scramble mktccboot bmp2rb"
+  tccbitmaptools="$toolset scramble bmp2rb"
   # generic is used by IFP, Meizu and Onda
   genericbitmaptools="$toolset bmp2rb"
   # scramble is used by all other targets
