@@ -23,7 +23,7 @@
 
 #include "config.h"
 
-#ifndef VX777
+#ifndef ONDA_VX777
 #define HAS_BUTTON_HOLD
 #endif
 

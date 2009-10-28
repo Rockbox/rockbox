@@ -39,11 +39,13 @@
  */
 
 static const struct button_mapping button_context_standard[]  = {
+    { ACTION_STD_CANCEL,      BUTTON_POWER,                  BUTTON_NONE },
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
 
 static const struct button_mapping button_context_wps[]  = {
+    { ACTION_STD_KEYLOCK,  BUTTON_POWER,    BUTTON_NONE  },
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
@@ -64,7 +66,7 @@ static const struct button_mapping button_context_listtree_scroll_without_combo[
 };
 
 static const struct button_mapping button_context_settings[]  = {
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+    { ACTION_STD_CANCEL,            BUTTON_POWER,               BUTTON_NONE },    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 
 static const struct button_mapping button_context_settings_right_is_inc[]  = {
@@ -90,7 +92,7 @@ static const struct button_mapping button_context_bmark[]  = {
 }; /* button_context_bmark */
 
 static const struct button_mapping button_context_time[]  = {
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
+    { ACTION_STD_CANCEL,         BUTTON_POWER|BUTTON_REL,     BUTTON_POWER },    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
 }; /* button_context_time */
 
 static const struct button_mapping button_context_quickscreen[]  = {
@@ -99,10 +101,14 @@ static const struct button_mapping button_context_quickscreen[]  = {
 }; /* button_context_quickscreen */
 
 static const struct button_mapping button_context_pitchscreen[]  = {
+    { ACTION_PS_EXIT,      BUTTON_POWER,                  BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
 
 /** FM Radio Screen **/
 static const struct button_mapping button_context_radio[]  = {
+    { ACTION_FM_MODE,        BUTTON_POWER|BUTTON_REL,           BUTTON_POWER  },
+    { ACTION_FM_EXIT,        BUTTON_POWER|BUTTON_REPEAT,        BUTTON_NONE   },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_radio */
 
@@ -112,6 +118,8 @@ static const struct button_mapping button_context_keyboard[]  = {
 
 #ifdef USB_ENABLE_HID
 static const struct button_mapping button_context_usb_hid[] = {
+    { ACTION_USB_HID_MODE_SWITCH_NEXT, BUTTON_POWER|BUTTON_REL,    BUTTON_POWER },
+    { ACTION_USB_HID_MODE_SWITCH_PREV, BUTTON_POWER|BUTTON_REPEAT, BUTTON_POWER },
     LAST_ITEM_IN_LIST
 }; /* button_context_usb_hid */
 #endif
