@@ -102,6 +102,7 @@ static const struct filetype inbuilt_filetypes[] = {
 #endif
     { "lng", FILE_ATTR_LNG, Icon_Language, LANG_LANGUAGE },
     { "rock",FILE_ATTR_ROCK,Icon_Plugin,   VOICE_EXT_ROCK },
+    { "lua", FILE_ATTR_LUA, Icon_Plugin,   VOICE_EXT_ROCK },
 #ifdef HAVE_LCD_BITMAP
     { "fnt", FILE_ATTR_FONT,Icon_Font,     VOICE_EXT_FONT },
     { "kbd", FILE_ATTR_KBD, Icon_Keyboard, VOICE_EXT_KBD },

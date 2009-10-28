@@ -344,7 +344,8 @@ int ft_load(struct tree_context* c, const char* tempdir)
             (*c->dirfilter == SHOW_CFG && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_CFG) ||
             (*c->dirfilter == SHOW_LNG && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LNG) ||
             (*c->dirfilter == SHOW_MOD && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_MOD) ||
-            (*c->dirfilter == SHOW_PLUGINS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_ROCK))
+            (*c->dirfilter == SHOW_PLUGINS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_ROCK &&
+                                              (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LUA))
         {
             i--;
             continue;
@@ -582,13 +583,21 @@ int ft_enter(struct tree_context* c)
 
                 /* plugin file */
             case FILE_ATTR_ROCK:
+            case FILE_ATTR_LUA:
             {
+                char *plugin = buf, *argument = NULL;
                 int ret;
+
+                if ((file->attr & FILE_ATTR_MASK) == FILE_ATTR_LUA) {
+                    plugin = VIEWERS_DIR "/lua.rock"; /* Use a #define here ? */
+                    argument = buf;
+                }
+
                 if (global_settings.party_mode && audio_status()) {
                     splash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
                 }
-                ret = plugin_load(buf,NULL);
+                ret = plugin_load(plugin, argument);
                 switch (ret)
                 {
                     case PLUGIN_GOTO_WPS:

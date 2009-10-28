@@ -43,6 +43,7 @@
 #define FILE_ATTR_CUE   0x0E00 /* cuesheet file */
 #define FILE_ATTR_SBS   0x0F00 /* statusbar file */
 #define FILE_ATTR_RSBS  0x1000 /* remote statusbar file */
+#define FILE_ATTR_LUA   0x1100 /* Lua rockbox plugin */
 #define FILE_ATTR_MASK  0xFF00 /* which bits tree.c uses for file types */
 
 struct filetype {
