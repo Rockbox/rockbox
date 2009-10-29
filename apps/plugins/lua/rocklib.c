@@ -330,12 +330,11 @@ RB_WRAP(lcd_get_backdrop)
 {
     fb_data* backdrop = rb->lcd_get_backdrop();
     if(backdrop == NULL)
-        return 0;
+        lua_pushnil(L);
     else
-    {
         rli_wrap(L, backdrop, LCD_WIDTH, LCD_HEIGHT);
-        return 1;
-    }
+
+    return 1;
 }
 #endif /* LCD_DEPTH > 1 */
 
@@ -478,24 +477,28 @@ RB_WRAP(read_bmp_file)
     if(result > 0)
     {
         bm.data = (unsigned char*) rli_alloc(L, bm.width, bm.height);
-        rb->read_bmp_file(filename, &bm, result, format, NULL);
-
-        return 1;
+        if(rb->read_bmp_file(filename, &bm, result, format, NULL) < 0)
+        {
+            /* Error occured, drop newly allocated image from stack */
+            lua_pop(L, 1);
+            lua_pushnil(L);
+        }
     }
+    else
+        lua_pushnil(L);
 
-    return 0;
+    return 1;
 }
 
 RB_WRAP(current_path)
 {
     const char *current_path = get_current_path(L, 1);
     if(current_path != NULL)
-    {
         lua_pushstring(L, current_path);
-        return 1;
-    }
     else
-        return 0;
+        lua_pushnil(L);
+
+    return 1;
 }
 
 static void fill_text_message(lua_State *L, struct text_message * message,
