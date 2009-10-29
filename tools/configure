@@ -1537,10 +1537,11 @@ fi
     memory=32
     arm926ejscc
     tool="$rootdir/tools/scramble -add=d2"
-    boottool="$rootdir/tools/scramble -tcc=crc"
+    boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.d2"
+    bootoutput="bootloader-cowond2.bin"
     appextra="recorder:gui"
     plugins="yes"
     swcodec="yes"
