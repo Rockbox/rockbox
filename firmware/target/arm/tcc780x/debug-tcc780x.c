@@ -42,8 +42,7 @@ bool __dbg_ports(void)
 
 bool __dbg_hw_info(void)
 {
-    int line = 0, i, button, oldline;
-    bool done=false;
+    int line = 0, i, oldline;
     char buf[100];
 
     lcd_setfont(FONT_SYSFIXED);
@@ -54,15 +53,13 @@ bool __dbg_hw_info(void)
 
     line++;
     oldline=line;
-    while(!done)
+    
+    while (1)
     {
         line = oldline;
-        button = button_get(false);
-        
-        button &= ~BUTTON_REPEAT;
-        
-        if (button == BUTTON_POWER)
-            done=true;
+
+        if (button_get_w_tmo(HZ/20) == (BUTTON_POWER|BUTTON_REL))
+            break;
 
         snprintf(buf, sizeof(buf), "current tick: %08x Seconds running: %08d",
             (unsigned int)current_tick, (unsigned int)current_tick/100);  lcd_puts(0, line++, buf);
