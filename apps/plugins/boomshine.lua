@@ -249,11 +249,14 @@ rb.backlight_force_on()
 local idx, highscore = 1, 0
 while true do
     local level = levels[idx]
-    local goal, nrBalls = level[1], level[2]
+    local goal, nrBalls
 
     if level == nil then
         break -- No more levels to play
     end
+
+    goal = level[1]
+    nrBalls = level[2]
 
     display_message(string.format("Level %d: get %d out of %d balls", idx, goal, nrBalls))
 
