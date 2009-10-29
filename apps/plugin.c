@@ -39,6 +39,7 @@
 #include "talk.h"
 #include "version.h"
 #include "storage.h"
+#include "pcmbuf.h"
 
 #if CONFIG_CHARGING
 #include "power.h"
@@ -671,6 +672,7 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    pcmbuf_beep,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
