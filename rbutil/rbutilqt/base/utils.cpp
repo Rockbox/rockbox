@@ -101,7 +101,7 @@ QString resolvePathCase(QString path)
         else
             return QString("");
     }
-    qDebug() << __func__ << path << "->" << realpath;
+    qDebug() << "[Utils] resolving path" << path << "->" << realpath;
     return realpath;
 }
 
@@ -143,7 +143,7 @@ QString findExecutable(QString name)
 #elif defined(Q_OS_WIN)
     QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
 #endif
-    qDebug() << path;
+    qDebug() << "[Utils] system path:" << path;
     for(int i = 0; i < path.size(); i++) 
     {
         QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + name;
@@ -152,7 +152,7 @@ QString findExecutable(QString name)
         QStringList ex = executable.split("\"", QString::SkipEmptyParts);
         executable = ex.join("");
 #endif
-        qDebug() << executable;
+        qDebug() << "[Utils] executable:" << executable;
         if(QFileInfo(executable).isExecutable())
         {
             return QDir::toNativeSeparators(executable);
