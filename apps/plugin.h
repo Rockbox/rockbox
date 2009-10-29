@@ -842,9 +842,11 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
+#if (CONFIG_CODEC == SWCODEC)
     void (*pcmbuf_beep)(unsigned int frequency,
                         size_t duration,
                         int amplitude);
+#endif
 };
 
 /* plugin header */
