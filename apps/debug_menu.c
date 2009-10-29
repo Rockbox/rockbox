@@ -118,8 +118,8 @@
 #include "pmu-target.h"
 #endif
 
-#ifdef HAVE_USBSTACK 	 
-#include "usb_core.h" 	 
+#ifdef HAVE_USBSTACK     
+#include "usb_core.h"    
 #endif
 
 /*---------------------------------------------------*/
@@ -1130,8 +1130,8 @@ bool dbg_ports(void)
 #if defined(IPOD_ACCESSORY_PROTOCOL)
 extern unsigned char serbuf[];
         lcd_putsf(0, line++, "IAP PACKET: %02x %02x %02x %02x %02x %02x %02x %02x", 
-		 serbuf[0], serbuf[1], serbuf[2], serbuf[3], serbuf[4], serbuf[5],
-		 serbuf[6], serbuf[7]);
+         serbuf[0], serbuf[1], serbuf[2], serbuf[3], serbuf[4], serbuf[5],
+         serbuf[6], serbuf[7]);
 #endif
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
@@ -2207,6 +2207,20 @@ static bool dbg_save_roms(void)
 
     return false;
 }
+#elif defined(CPU_TCC780X)
+static bool dbg_save_roms(void)
+{
+    int fd;
+
+    fd = creat("/eeprom_E0000000-E0001FFF.bin");
+    if (fd >= 0)
+    {
+        write(fd, (void*)0xe0000000, 0x2000);
+        close(fd);
+    }
+
+    return false;
+}
 #endif /* CPU */
 
 #ifndef SIMULATOR
@@ -2536,7 +2550,7 @@ struct the_menu_item {
 static const struct the_menu_item menuitems[] = {
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
     (defined(CPU_PP) && !(CONFIG_STORAGE & STORAGE_SD)) || \
-    CONFIG_CPU == IMX31L
+    CONFIG_CPU == IMX31L || defined(CPU_TCC780X)
         { "Dump ROM contents", dbg_save_roms },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) \
