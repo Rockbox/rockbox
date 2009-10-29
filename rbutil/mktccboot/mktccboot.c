@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <inttypes.h>
+#include "mktccboot.h"
 #include "telechips.h"
 
 /*
