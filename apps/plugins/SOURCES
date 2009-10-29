@@ -173,7 +173,7 @@ md5sum.c
 
 #if (PLUGIN_BUFFER_SIZE >= 0x80000)
 lua.c
-#ifdef HAVE_TOUCHSCREEN
+#ifdef HAVE_LCD_BITMAP
 boomshine.lua
 #endif
 #endif
