@@ -1510,14 +1510,10 @@ bool recording_screen(bool no_source)
                 update_countdown = 0; /* Update immediately */
                 break;
 #endif
+            case ACTION_REC_PAUSE:
             case ACTION_REC_NEWFILE:
-                /* start recording or start a new file */
-                if(audio_stat & AUDIO_STATUS_RECORD)
-                {
-                    rec_command(RECORDING_CMD_START_NEWFILE);
-                    last_seconds = 0;
-                }
-                else
+                /* Only act if the mpeg is stopped */
+                if(!(audio_stat & AUDIO_STATUS_RECORD))
                 {
                     /* is this manual or triggered recording? */
                     if ((global_settings.rec_trigger_mode == TRIG_MODE_OFF) ||
@@ -1543,25 +1539,30 @@ bool recording_screen(bool no_source)
                         peak_meter_set_trigger_listener(&trigger_listener);
                     }
                 }
-                update_countdown = 0; /* Update immediately */
-                break;
-            case ACTION_REC_PAUSE:
-                /* Only act if a recording is ongoing (paused or not) */
-                if(audio_stat & AUDIO_STATUS_RECORD)
+                else
                 {
-                    /* if pause button pressed, pause or resume */
-                    if(audio_stat & AUDIO_STATUS_PAUSE)
+                    /*if new file button pressed, start new file */
+                    if (button == ACTION_REC_NEWFILE)
                     {
-                        rec_command(RECORDING_CMD_RESUME);
-                        if (global_settings.talk_menu)
-                        {
-                            /* no voice possible here, but a beep */
-                            audio_beep(HZ/4); /* short beep on resume */
-                        }
+                        rec_command(RECORDING_CMD_START_NEWFILE);
+                        last_seconds = 0;
                     }
                     else
+                        /* if pause button pressed, pause or resume */
                     {
-                        rec_command(RECORDING_CMD_PAUSE);
+                        if(audio_stat & AUDIO_STATUS_PAUSE)
+                        {
+                            rec_command(RECORDING_CMD_RESUME);
+                            if (global_settings.talk_menu)
+                            {
+                                /* no voice possible here, but a beep */
+                                audio_beep(HZ/4); /* short beep on resume */
+                            }
+                        }
+                        else
+                        {
+                            rec_command(RECORDING_CMD_PAUSE);
+                        }
                     }
                 }
                 update_countdown = 0; /* Update immediately */
