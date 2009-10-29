@@ -47,6 +47,7 @@
 #include "bootloaderinstallfile.h"
 #include "bootloaderinstallchinachip.h"
 #include "bootloaderinstallams.h"
+#include "bootloaderinstalltcc.h"
 
 
 #if defined(Q_OS_LINUX)
@@ -672,6 +673,9 @@ void RbUtilQt::installBootloader()
     }
     else if(type == "ams") {
         bl = new BootloaderInstallAms(this);
+    }
+    else if(type == "tcc") {
+        bl = new BootloaderInstallTcc(this);
     }
     else {
         logger->addItem(tr("No install method known."), LOGERROR);

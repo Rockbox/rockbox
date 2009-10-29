@@ -42,14 +42,16 @@ LIBSPEEX = $$system(pkg-config --silence-errors --libs speex)
 rbspeex.commands = @$(MAKE) TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/rbspeex librbspeex.a
 libucl.commands = @$(MAKE) TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/ucl/src libucl.a
 libmkamsboot.commands = @$(MAKE) TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkamsboot libmkamsboot.a
+libmktccboot.commands = @$(MAKE) TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mktccboot libmktccboot.a
 }
 mac {
 rbspeex.commands = @$(MAKE) TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/rbspeex librbspeex-universal
 libucl.commands = @$(MAKE) TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/ucl/src libucl-universal
 libmkamsboot.commands = @$(MAKE) TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkamsboot libmkamsboot-universal
+libmktccboot.commands = @$(MAKE) TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mktccboot libmktccboot-universal
 }
-QMAKE_EXTRA_TARGETS += rbspeex libucl libmkamsboot
-PRE_TARGETDEPS += rbspeex libucl libmkamsboot
+QMAKE_EXTRA_TARGETS += rbspeex libucl libmkamsboot libmktccboot
+PRE_TARGETDEPS += rbspeex libucl libmkamsboot libmktccboot
 
 # rule for creating ctags file
 tags.commands = ctags -R --c++-kinds=+p --fields=+iaS --extra=+q $(SOURCES)
@@ -110,8 +112,10 @@ SOURCES += rbutilqt.cpp \
  base/bootloaderinstallfile.cpp \
  base/bootloaderinstallchinachip.cpp \
  base/bootloaderinstallams.cpp \
+ base/bootloaderinstalltcc.cpp \
  ../../tools/mkboot.c \
- ../../tools/iriver.c
+ ../../tools/iriver.c \
+ ../../tools/telechips.c \
 
 HEADERS += rbutilqt.h \
  install.h \
@@ -170,8 +174,10 @@ HEADERS += rbutilqt.h \
  base/bootloaderinstallfile.h \
  base/bootloaderinstallchinachip.h \
  base/bootloaderinstallams.h \
+ base/bootloaderinstalltcc.h \
  ../../tools/mkboot.h \
- ../../tools/iriver.h 
+ ../../tools/iriver.h \
+ ../../tools/telechips.h \
  
 # Needed by QT on Win
 INCLUDEPATH = $$_PRO_FILE_PWD_ $$_PRO_FILE_PWD_/irivertools $$_PRO_FILE_PWD_/zip $$_PRO_FILE_PWD_/zlib $$_PRO_FILE_PWD_/base
@@ -179,7 +185,7 @@ INCLUDEPATH += $$RBBASE_DIR/rbutil/ipodpatcher $$RBBASE_DIR/rbutil/sansapatcher 
 
 DEPENDPATH = $$INCLUDEPATH
 
-LIBS += -L$$OUT_PWD -L$$MYBUILDDIR -lrbspeex -lmkamsboot -lucl
+LIBS += -L$$OUT_PWD -L$$MYBUILDDIR -lrbspeex -lmkamsboot -lmktccboot -lucl
 
 TEMPLATE = app
 dbg {

@@ -81,7 +81,7 @@ void usage(void)
     exit(1);
 }
 
-off_t filesize(int fd) {
+static off_t filesize(int fd) {
     struct stat buf;
 
     if (fstat(fd,&buf) < 0) {
@@ -92,16 +92,97 @@ off_t filesize(int fd) {
     }
 }
 
+#define DRAMORIG 0x20000000
+/* Injects a bootloader into a Telechips 77X/78X firmware file */
+unsigned char *patch_firmware_tcc(unsigned char *of_buf, int of_size,
+        unsigned char *boot_buf, int boot_size, int *patched_size)
+{
+    unsigned char *patched_buf;
+    uint32_t ldr, old_ep_offset, new_ep_offset;
+    int of_offset;
 
+    patched_buf = malloc(of_size + boot_size);
+    if (!patched_buf)
+        return NULL;
+
+    memcpy(patched_buf, of_buf, of_size);
+    memcpy(patched_buf + of_size, boot_buf, boot_size);
+
+    ldr = get_uint32le(patched_buf);
+
+    /* TODO: Verify it's a LDR instruction */
+    of_offset = (ldr & 0xfff) + 8;
+    old_ep_offset = get_uint32le(patched_buf + of_offset);
+    new_ep_offset = DRAMORIG + of_size;
+
+    printf("OF entry point: 0x%08x\n", old_ep_offset);
+    printf("New entry point: 0x%08x\n", new_ep_offset + 8);
+
+    /* Save the OF entry point at the start of the bootloader image */
+    put_uint32le(old_ep_offset, patched_buf + of_size);
+    put_uint32le(new_ep_offset, patched_buf + of_size + 4);
+
+    /* Change the OF entry point to the third word in our bootloader */
+    put_uint32le(new_ep_offset + 8, patched_buf + of_offset);
+
+    telechips_encode_crc(patched_buf, of_size + boot_size);
+    *patched_size = of_size + boot_size;
+
+    return patched_buf;
+}
+
+unsigned char *file_read(char *filename, int *size)
+{
+    unsigned char *buf = NULL;
+    int n, fd = -1;
+
+    /* Open file for reading */
+    fd = open(filename, O_RDONLY|O_BINARY);
+    if (fd < 0)
+    {
+        printf("[ERR] Could open file for reading, aborting\n");
+        perror(filename);
+        goto error;
+    }
+
+    /* Get file size, and allocate a buffer of that size */
+    *size = filesize(fd);
+    buf = malloc(*size);
+    if (buf == NULL)
+    {
+        printf("[ERR] Could not allocate memory, aborting\n");
+        goto error;
+    }
+
+    /* Read the file's content to the buffer */
+    n = read(fd, buf, *size);
+    if (n != *size)
+    {
+        printf("[ERR] Could not read from %s\n", filename);
+        goto error;
+    }
+
+    return buf;
+
+error:
+    if (fd >= 0)
+        close(fd);
+
+    if (buf)
+        free(buf);
+
+    return NULL;
+}
+
+#ifndef LIB
 int main(int argc, char *argv[])
 {
     char *infile, *bootfile, *outfile;
-    int fdin = -1, fdboot = -1, fdout = -1;
-    int n;
-    int inlength,bootlength;
-    uint32_t ldr;
-    unsigned char* image;
-    int origoffset;
+    int fdout = -1;
+    int n, of_size, boot_size, patched_size;
+    unsigned char *of_buf;
+    unsigned char *boot_buf = NULL;
+    unsigned char* image = NULL;
     int ret = 0;
     
     if(argc < 3) {
@@ -112,79 +193,50 @@ int main(int argc, char *argv[])
     bootfile = argv[2];
     outfile = argv[3];
 
-    fdin = open(infile, O_RDONLY|O_BINARY);
-    if (fdin < 0)
+    /* Read OF and boot files */
+    of_buf = file_read(infile, &of_size);
+    if (!of_buf)
     {
-        perror(infile);
         ret = 1;
         goto error_exit;
     }
 
-    fdboot = open(bootfile, O_RDONLY|O_BINARY);
-    if (fdboot < 0)
+    boot_buf = file_read(bootfile, &boot_size);
+    if (!boot_buf)
     {
-        perror(bootfile);
-        ret = 2;
-        goto error_exit;
-    }
-
-    inlength = filesize(fdin);
-    bootlength = filesize(fdboot);
-    
-    image = malloc(inlength + bootlength);
-
-    if (image==NULL)
-    {
-        printf("[ERR]  Could not allocate memory, aborting\n");
         ret = 3;
         goto error_exit;
     }
 
-    n = read(fdin, image, inlength);
-    if (n != inlength)
+    /* Allocate buffer for patched firmware */
+    image = malloc(of_size + boot_size);
+    if (image == NULL)
     {
-        printf("[ERR] Could not read from %s\n",infile);
+        printf("[ERR] Could not allocate memory, aborting\n");
         ret = 4;
         goto error_exit;
     }
 
-    n = read(fdboot, image + inlength, bootlength);
-    if (n != bootlength)
+    /* Create the patched firmware */
+    image = patch_firmware_tcc(of_buf, of_size, boot_buf, boot_size,
+            &patched_size);
+    if (!image)
     {
-        printf("[ERR] Could not read from %s\n",bootfile);
+        printf("[ERR] Error creating patched firmware, aborting\n");
         ret = 5;
         goto error_exit;
     }
 
-    ldr = get_uint32le(image);
-
-    /* TODO: Verify it's a LDR instruction */
-    origoffset = (ldr&0xfff) + 8;
-
-    printf("original firmware entry point: 0x%08x\n", 
-           (unsigned int) get_uint32le(image + origoffset));
-    printf("New entry point: 0x%08x\n",0x20000000 + inlength + 8);
-
-    /* Save the original firmware entry point at the start of the bootloader image */
-    put_uint32le(get_uint32le(image + origoffset),image+inlength);
-    put_uint32le(0x20000000 + inlength,image + inlength + 4);
-
-    /* Change the original firmware entry point to the third word in our bootloader */
-    put_uint32le(0x20000000 + inlength + 8,image+origoffset);
-
-
-    telechips_encode_crc(image, inlength + bootlength);
-
     fdout = open(outfile, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
     if (fdout < 0)
     {
-        perror(bootfile);
+        perror(outfile);
         ret = 6;
         goto error_exit;
     }
 
-    n = write(fdout, image, inlength + bootlength);
-    if (n != inlength + bootlength)
+    n = write(fdout, image, patched_size);
+    if (n != patched_size)
     {
         printf("[ERR] Could not write output file %s\n",outfile);
         ret = 7;
@@ -193,14 +245,18 @@ int main(int argc, char *argv[])
 
 error_exit:
 
-    if (fdin >= 0)
-        close(fdin);
-
-    if (fdboot >= 0)
-        close(fdboot);
-
     if (fdout >= 0)
         close(fdout);
 
+    if (of_buf)
+        free(of_buf);
+
+    if (boot_buf)
+        free(boot_buf);
+
+    if (image)
+        free(image);
+
     return ret;
 }
+#endif

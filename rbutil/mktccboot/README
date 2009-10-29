@@ -1,0 +1,35 @@
+mktccboot
+---------
+
+A tool to inject a bootloader into a Telechips 77X/78X firmware file.
+
+Usage
+-----
+
+mktccboot <firmware file> <boot file> <output file>
+
+<firmware file> is an original Telechips firmware file.
+
+<boot file> is the code you want to execute (a rockbox bootloader), previously
+    scrambled with tools/scramble utility.
+
+<output file> is the resulting firmware file which you'll have to copy on your
+    player. See "Firmware filenames".
+
+Dual-Boot
+---------
+
+The purpose of this program is to provide dual-boot between the original
+firmware and the new (rockbox) firmware.
+
+By default the player will boot into the new firmware.
+
+To boot into the Original Firmware, you need to press the <???> key.
+
+The player will boot into the Original Firmware as well if it is powered up by
+inserting an usb cable.
+
+Hacking
+-------
+
+See comments in mktccboot.c for more information.
