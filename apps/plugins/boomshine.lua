@@ -314,7 +314,7 @@ function start_round(level, goal, nrBalls, total)
         end
     end
 
-    return exit, score
+    return exit, score, nrExpandedBalls
 end
 
 -- Helper function to display a message
@@ -355,11 +355,11 @@ while true do
 
     display_message(string.format("Level %d: get %d out of %d balls", idx, goal, nrBalls))
 
-    local exit, score = start_round(idx, goal, nrBalls, highscore)
+    local exit, score, nrExpandedBalls = start_round(idx, goal, nrBalls, highscore)
     if exit then
         break -- Exiting..
     else
-        if score >= goal then
+        if nrExpandedBalls >= goal then
             display_message("You won!")
             idx = idx + 1
             highscore = highscore + score
