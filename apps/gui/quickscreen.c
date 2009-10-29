@@ -182,7 +182,7 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
         title = P2STR(ID2P(qs->items[i]->lang_id));
         setting = qs->items[i]->setting;
         temp = option_value_as_int(qs->items[i]);
-        value = option_get_valuestring((struct settings_list*)qs->items[i],
+        value = option_get_valuestring(qs->items[i],
                                        buf, MAX_PATH, temp);
 
         if (viewport_get_nb_lines(vp) < 2)
@@ -218,7 +218,7 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
     display->set_viewport(NULL);
 }
 
-static void talk_qs_option(struct settings_list *opt, bool enqueue)
+static void talk_qs_option(const struct settings_list *opt, bool enqueue)
 {
     if (global_settings.talk_menu) {
         if (!enqueue)
@@ -260,8 +260,8 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
         default:
             return false;
     }
-    option_select_next_val((struct settings_list *)qs->items[item], invert, true);
-    talk_qs_option((struct settings_list *)qs->items[item], false);
+    option_select_next_val(qs->items[item], invert, true);
+    talk_qs_option(qs->items[item], false);
     return true;
 }
 
@@ -309,10 +309,10 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
        queued up, but can be interrupted as soon as a setting is
        changed. */
     cond_talk_ids(VOICE_QUICKSCREEN);
-    talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_TOP], true);
-    talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_LEFT], true);
-    talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_BOTTOM], true);
-    talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_RIGHT], true);
+    talk_qs_option(qs->items[QUICKSCREEN_TOP], true);
+    talk_qs_option(qs->items[QUICKSCREEN_LEFT], true);
+    talk_qs_option(qs->items[QUICKSCREEN_BOTTOM], true);
+    talk_qs_option(qs->items[QUICKSCREEN_RIGHT], true);
     while (true) {
         button = get_action(CONTEXT_QUICKSCREEN, HZ/5);
 #ifdef HAVE_TOUCHSCREEN
