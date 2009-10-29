@@ -31,17 +31,9 @@
 
 /*some short cuts for fg/bg/line selector handling */
 #ifdef HAVE_LCD_COLOR
-#define LINE_SEL_FROM_SETTINGS(vp) \
-    do { \
-        vp->lss_pattern = global_settings.lss_color; \
-        vp->lse_pattern = global_settings.lse_color; \
-        vp->lst_pattern = global_settings.lst_color; \
-    } while (0)
 #define FG_FALLBACK global_settings.fg_color
 #define BG_FALLBACK global_settings.bg_color
 #else
-/* mono/greyscale doesn't have most of the above */
-#define LINE_SEL_FROM_SETTINGS(vp)
 #define FG_FALLBACK LCD_DEFAULT_FG
 #define BG_FALLBACK LCD_DEFAULT_BG
 #endif
@@ -145,7 +137,11 @@ void viewport_set_fullscreen(struct viewport *vp,
     {
         vp->fg_pattern = FG_FALLBACK;
         vp->bg_pattern = BG_FALLBACK;
-        LINE_SEL_FROM_SETTINGS(vp);
+#ifdef HAVE_LCD_COLOR
+        vp->lss_pattern = global_settings.lss_color;
+        vp->lse_pattern = global_settings.lse_color;
+        vp->lst_pattern = global_settings.lst_color;
+#endif
     }
 #endif
 
@@ -450,11 +446,17 @@ const char* viewport_parse_viewport(struct viewport *vp,
         vp->x += screens[screen].lcdwidth;
     if (vp->y < 0)
         vp->y += screens[screen].lcdheight;
-    /* fix defaults */
+        
+    /* fix defaults, 
+     * and negative width/height which means "extend to edge minus value */
     if (!LIST_VALUE_PARSED(set, PL_WIDTH))
         vp->width = screens[screen].lcdwidth - vp->x;
+    else if (vp->width < 0)
+        vp->width = (vp->width + screens[screen].lcdwidth) - vp->x;
     if (!LIST_VALUE_PARSED(set, PL_HEIGHT))
         vp->height = screens[screen].lcdheight - vp->y;
+    else if (vp->height < 0)
+        vp->height = (vp->height + screens[screen].lcdheight) - vp->y;
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
     if (!LIST_VALUE_PARSED(set, PL_FG))
@@ -463,7 +465,11 @@ const char* viewport_parse_viewport(struct viewport *vp,
         vp->bg_pattern = BG_FALLBACK;
 #endif /* LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1 */
 
-    LINE_SEL_FROM_SETTINGS(vp);
+#ifdef HAVE_LCD_COLOR
+    vp->lss_pattern = global_settings.lss_color;
+    vp->lse_pattern = global_settings.lse_color;
+    vp->lst_pattern = global_settings.lst_color;
+#endif
 
     /* Validate the viewport dimensions - we know that the numbers are
        non-negative integers, ignore bars and assume the viewport takes them

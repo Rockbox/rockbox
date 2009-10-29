@@ -159,7 +159,10 @@ static char *get_token_desc(struct wps_token *token, char *buf,
         case WPS_TOKEN_PLAYBACK_STATUS:
             snprintf(buf, bufsize, "mode playback");
             break;
-
+            
+        case WPS_TOKEN_RTC_PRESENT:
+            snprintf(buf, bufsize, "rtc: present?");
+            break;
         case WPS_TOKEN_RTC_DAY_OF_MONTH:
             snprintf(buf, bufsize, "rtc: day of month (01..31)");
             break;
