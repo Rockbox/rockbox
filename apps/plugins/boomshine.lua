@@ -274,7 +274,11 @@ while true do
     end
 end
 
-display_message(string.format("You made it till level %d with %d points!", idx, highscore))
+if idx > #levels then
+    display_message(string.format("You finished the game with %d points!", highscore))
+else
+    display_message(string.format("You made it till level %d with %d points!", idx, highscore))
+end
 
 -- Restore user backlight settings
 rb.backlight_use_settings()
