@@ -11,17 +11,18 @@ LDFLAGS := -g
 
 .PHONY: rbspeexenc uclpack
 
-CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
- generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat \
- lngdump telechips gigabeats creative hmac-sha1 rbspeexenc \
- mkzenboot mk500boot
+CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf \
+    generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat lngdump \
+    telechips gigabeats creative hmac-sha1 rbspeexenc mkzenboot mk500boot
 
-all: scramble descramble sh2d rdf2binary mkboot mkzenboot \
-	convbdf codepages uclpack rbspeexenc voicefont mk500boot
+all: scramble descramble sh2d rdf2binary mkboot mkzenboot convbdf codepages \
+	uclpack rbspeexenc voicefont mk500boot
 
-scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o iaudio_bl_flash.o creative.o hmac-sha1.o
+scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o \
+	iaudio_bl_flash.o creative.o hmac-sha1.o
 descramble: descramble.o iriver.o gigabeat.o
-scramble.o: scramble.c iriver.h mi4.h gigabeat.h telechips.h iaudio_bl_flash.h creative.h
+scramble.o: scramble.c iriver.h mi4.h gigabeat.h telechips.h iaudio_bl_flash.h \
+	creative.h
 
 descramble.o: descramble.c iriver.h gigabeat.h
 creative.o: creative.c creative.h
@@ -64,10 +65,12 @@ lngdump: lngdump.c
 ipod_fw:	ipod_fw.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
 
-checkwps: checkwps.c ../apps/gui/wps_parser.c ../apps/gui/wps_debug.c ../firmware/common/ctype.c ../apps/misc.c ../apps/recorder/bmp.c
+checkwps: checkwps.c ../apps/gui/wps_parser.c ../apps/gui/wps_debug.c \
+	../firmware/common/ctype.c ../apps/misc.c ../apps/recorder/bmp.c
 	$(SILENT)$(CC) $(CFLAGS) -I ../apps/gui -I../firmware/export \
--D__PCTOOL__ -DDEBUG -DROCKBOX_HAS_LOGF -DIPOD_COLOR -D ROCKBOX_DIR_LEN -D WPS_DIR=\".\" \
--I../apps -I../firmware/target/arm/ipod -I../firmware/include $+ -o $@
+	    -D__PCTOOL__ -DDEBUG -DROCKBOX_HAS_LOGF -DIPOD_COLOR \
+	    -D ROCKBOX_DIR_LEN -D WPS_DIR=\".\" -I../apps \
+	    -I../firmware/target/arm/ipod -I../firmware/include $+ -o $@
 
 convbdf: convbdf.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
@@ -76,7 +79,8 @@ codepages: codepages.c codepage_tables.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
 
 player_unifont: player_unifont.c ../firmware/drivers/lcd-charset-player.c
-	$(SILENT)$(CC) -DARCHOS_PLAYER -D__PCTOOL__ -I../firmware/export $+ -o $@
+	$(SILENT)$(CC) -DARCHOS_PLAYER -D__PCTOOL__ -I../firmware/export $+ \
+	    -o $@
 
 uclpack:
 	$(SILENT)$(MAKE) -C ucl
@@ -95,7 +99,8 @@ usb_benchmark: usb_benchmark.c
 
 clean:
 	@echo "Cleaning tools"
-	$(SILENT)rm -f $(CLEANALL) $(shell for f in $(CLEANALL) ; do echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~
+	$(SILENT)rm -f $(CLEANALL) $(shell for f in $(CLEANALL) ; do \
+	    echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~
 	$(SILENT)$(MAKE) -C ucl clean
 	$(SILENT)$(MAKE) -C rbspeex clean
 
