@@ -32,6 +32,7 @@ all: $(OUTPUT)
 
 SOURCES = beastpatcher.c bootimg.c mknkboot.c main.c
 HEADERS = beastpatcher.h mtp_common.h bootimg.h mknkboot.h
+OBJS    = beastpatcher.o bootimg.o mknkboot.o main.o mtp_libmtp.o
 MTPSRCS_W32 = mtp_win32.c
 MTPSRCS_MTP = mtp_libmtp.c
 
@@ -46,12 +47,14 @@ beastpatcher.exe: $(SOURCES) $(HEADERS) $(MTPSRCS_W32) $(WINLIBS)
 beastpatcher-mac: beastpatcher-i386 beastpatcher-ppc
 	lipo -create beastpatcher-ppc beastpatcher-i386 -output beastpatcher-mac
 
-beastpatcher-i386:  beastpatcher.c  bootimg.c usb.h main.c libusb-i386.a
-	$(CC) -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -framework iokit -framework coreservices -arch i386 $(CFLAGS) -o beastpatcher-i386 beastpatcher.c bootimg.c -I. libusb-i386.a
+beastpatcher-i386:  $(SOURCES) $(HEADERS) $(MTPSRCS_MTP) usb.h libmtp.h libusb-i386.a libmtp-i386.a 
+	gcc -c -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 $(CFLAGS) -I. -DBEASTPATCHER $(SOURCES) $(MTPSRCS_MTP)
+	gcc -framework iokit -framework coreservices -arch i386 -o beastpatcher-i386 $(OBJS) libusb-i386.a libmtp-i386.a -liconv
 	strip beastpatcher-i386
-
-beastpatcher-ppc: beastpatcher.c bootimg.c usb.h main.c libusb-ppc.a
-	$(CC) -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -framework iokit -framework coreservices -arch ppc $(CFLAGS) -o beastpatcher-ppc beastpatcher.c bootimg.c -I. libusb-ppc.a
+	
+beastpatcher-ppc: $(SOURCES) $(HEADERS) $(MTPSRCS_MTP) usb.h libmtp.h libusb-ppc.a libmtp-ppc.a 
+	gcc -c -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch ppc $(CFLAGS) -I. -DBEASTPATCHER $(SOURCES) $(MTPSRCS_MTP)
+	gcc -framework iokit -framework coreservices -arch ppc -o beastpatcher-ppc $(OBJS) libusb-ppc.a libmtp-ppc.a -liconv
 	strip beastpatcher-ppc
 
 bin2c: ../../../rbutil/tools/bin2c.c
@@ -63,4 +66,4 @@ bootimg.c: bootloader.bin bin2c
 mknkboot: mknkboot.c
 	$(SILENT)$(NATIVECC) $(CFLAGS) $+ -o $@
 clean:
-	rm -f beastpatcher.exe beastpatcher-mac beastpatcher-i386 beastpatcher-ppc beastpatcher bin2c bootimg.c bootimg.h mknkboot *~
+	rm -f beastpatcher.exe beastpatcher-mac beastpatcher-i386 beastpatcher-ppc beastpatcher bin2c bootimg.c bootimg.h mknkboot *~ *.o

@@ -41,10 +41,28 @@ After this, just type "make" to get a
 OS X
 ----
 
-[Not yet implemented]
+The OS X build is a universal binary statically linked with libusb and libmtp. 
+It has been tested with libusb version 0.1.12 and libmtp version 1.0.1.
 
-The OS X build is a universal binary statically linked with libusb and libmtp.
+The following files are expected the beaspatcher source directory:
 
+Intel:
+    libusb: usb.h libusb-i386.a
+    libmtp: libmtp.h libmtp-i386.a
+    
+PowerPC:
+    libusb: usb.h libusb-ppc.a
+    libmtp: libmtp.h libmtp-ppc.a
+
+These are easily compiled from source using the standard 
+'./configure && make'. Look in .libs for libusb.a and src/.libs for libmtp.a, 
+and make sure to rename them to their -i386/-ppc filenames when copying into 
+the beastpatcher directory.
+
+After this, just type "make beastpatcher-mac" to get a universal binary. If you
+only want a binary for a particular architecture, you can use
+"make beastpatcher-i386" or "make beastpatcher-ppc" instead. In this case, you
+only need the libusb and libmtp library for your desired architecture.
 
 
 Windows
