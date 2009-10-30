@@ -86,10 +86,10 @@
     *: "Ask"
   </source>
   <dest>
-    *: "逐次確認"
+    *: "毎回確認"
   </dest>
   <voice>
-    *: "逐次確認"
+    *: "毎回確認"
   </voice>
 </phrase>
 <phrase>
@@ -266,12 +266,14 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU = Yes"
     h100,h120,h300: "NAVI = Yes"
     yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = はい"
+    cowond2*: "MENU = はい"
     h100,h120,h300: "NAVI = はい"
     yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = はい"
     mrobe500: "PLAY or POWER = はい"
@@ -1680,11 +1682,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "スキップしたときだけ"
+    swcodec: "スキップしたときのみ"
   </dest>
   <voice>
     *: none
-    swcodec: "スキップしたときだけ"
+    swcodec: "スキップしたときのみ"
   </voice>
 </phrase>
 <phrase>
@@ -7096,10 +7098,10 @@
     *: "Insert Next"
   </source>
   <dest>
-    *: "次のダイナミックリストに追加"
+    *: "リストに次の曲として追加"
   </dest>
   <voice>
-    *: "次のダイナミックリストに追加"
+    *: "リストに次の曲として追加"
   </voice>
 </phrase>
 <phrase>
@@ -7110,10 +7112,10 @@
     *: "Insert Last"
   </source>
   <dest>
-    *: "ダイナミックリストの最後尾に追加"
+    *: "リストの最後に追加"
   </dest>
   <voice>
-    *: "ダイナミックリストの最後尾に追加"
+    *: "リストの最後に追加"
   </voice>
 </phrase>
 <phrase>
@@ -7124,10 +7126,10 @@
     *: "Insert Shuffled"
   </source>
   <dest>
-    *: "シャッフルで追加"
+    *: "リストにシャッフルで追加"
   </dest>
   <voice>
-    *: "シャッフルで追加"
+    *: "リストにシャッフルで追加"
   </voice>
 </phrase>
 <phrase>
@@ -7138,10 +7140,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "リストに予約"
+    *: "ダイナミックリストに予約"
   </dest>
   <voice>
-    *: "リストに予約"
+    *: "ダイナミックリストに予約"
   </voice>
 </phrase>
 <phrase>
@@ -7152,10 +7154,10 @@
     *: "Queue Next"
   </source>
   <dest>
-    *: "次のダイナミックリストに予約"
+    *: "リストに次の曲として予約"
   </dest>
   <voice>
-    *: "次のダイナミックリストに予約"
+    *: "リストに次の曲として予約"
   </voice>
 </phrase>
 <phrase>
@@ -7166,10 +7168,10 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "プレイリストの最後尾に予約"
+    *: "リストの最後に予約"
   </dest>
   <voice>
-    *: "プレイリストの最後尾に予約"
+    *: "リストの最後に予約"
   </voice>
 </phrase>
 <phrase>
@@ -7180,10 +7182,10 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "ダイナミックリストに予約 (シャッフル)"
+    *: "リストにシャッフルで予約"
   </dest>
   <voice>
-    *: "ダイナミックリストに予約 (シャッフル)"
+    *: "リストにシャッフルで予約"
   </voice>
 </phrase>
 <phrase>
@@ -12532,6 +12534,57 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_SEMITONE
+  desc: 
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "半音階"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "半音階"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "リミット"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "リミット"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "比率"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "比率"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SKIN_RAM_USAGE
   desc: how much RAM the skins are using
   user: core
@@ -12577,5 +12630,174 @@
   <voice>
     *: none
     lcd_bitmap: "スクロールバーの位置"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "上クイック画面の項目に設定"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "上クイック画面の項目に設定"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ITALY
+  desc: fm region Italy
+  user: core
+  <source>
+    *: none
+    radio: "Italy"
+  </source>
+  <dest>
+    *: none
+    radio: "イタリア"
+  </dest>
+  <voice>
+    *: none
+    radio: "イタリア"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_OTHER
+  desc: Catch-all FM region. Select if none of the others work
+  user: core
+  <source>
+    *: none
+    radio: "Other"
+  </source>
+  <dest>
+    *: none
+    radio: "その他"
+  </dest>
+  <voice>
+    *: none
+    radio: "その他"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "曲の終わりにスキップ"
+  </dest>
+  <voice>
+    *: "曲の終わりにスキップ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "カスタム"
+  </dest>
+  <voice>
+    *: "カスタム"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "ステータスバー スキン"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "リモコンのステータスバー スキン"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_STATUSBAR
+  desc: browse for custom statusbar in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Custom Statusbar"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "カスタム ステータスバー"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "カスタム ステータスバー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CUSTOM_STATUSBAR
+  desc: browse for remote custom statusbar in theme settings
+  user: core
+  <source>
+    *:none
+    remote: "Remote Custom Statusbar"
+  </source>
+  <dest>
+    *:none
+    remote: "リモコンのカスタム ステータスバー"
+  </dest>
+  <voice>
+    *:none
+    remote: "リモコンのカスタム ステータスバー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "リストの最後にシャッフルで追加"
+  </dest>
+  <voice>
+    *: "リストの最後にシャッフルで追加"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at and of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "リストの最後にシャッフルで予約"
+  </dest>
+  <voice>
+    *: "リストの最後にシャッフルで予約"
   </voice>
 </phrase>
