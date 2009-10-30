@@ -42,11 +42,23 @@ import zipfile
 import shutil
 import subprocess
 import getopt
-import which
 import time
 import hashlib
-import pysvn
 import tempfile
+
+# modules that are not part of python itself.
+try:
+    import pysvn
+except ImportError:
+    print "Fatal: This script requires the pysvn package to run."
+    print "       See http://pysvn.tigris.org/."
+    sys.exit(-5)
+try:
+    import which
+except ImportError:
+    print "Fatal: This script requires the which package to run."
+    print "       See http://code.google.com/p/which/."
+    sys.exit(-5)
 
 # == Global stuff ==
 # Windows nees some special treatment. Differentiate between program name
