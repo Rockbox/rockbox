@@ -31,7 +31,7 @@
 
 # Battery area, Icons
 %Vl|a|0|0|-|8|0|-|-| 
-%?bl<%xdBa|%xdBa|%xdBb|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>
+%?bl<%xdBa|%xdBb|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>
 # charging icon
 %Vl|a|16|0|-|8|0|-|-| 
 %?bc<%xdSa|>
@@ -66,4 +66,4 @@
 %?cc<%?ca<%?St|time format|<%cH|%cI>:%cM|--:-->|>
 # disk access "icon"
 %V|-6|0|-|8|0|-|-| # align on the right with room for 1 SYSFONT digit
-%?mm<*|>
+%?lh<*|>
