@@ -45,16 +45,17 @@ OUT = $(TARGET_DIR)build$(RBARCH)
 
 all: $(OUTPUT)
 
-$(TOOLSDIR)/telechips.o: $(TOOLSDIR)/telechips.[ch]
-	make -C $(TOOLSDIR) $(TARGET_DIR)telechips.o
+$(OUT)/telechips.o: $(TOOLSDIR)/telechips.[ch]
+	@echo CC $<
+	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/telechips.o $(TOOLSDIR)/telechips.c
 
-$(OUT)/mktccboot.o: mktccboot.[ch] $(TOOLSDIR)/telechips.o
+$(OUT)/mktccboot.o: mktccboot.[ch] $(OUT)/telechips.o
 	@echo CC $<
 	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/mktccboot.o -W -Wall mktccboot.c -DVERSION=\"$(APPVERSION)\"
 
 $(OUTPUT):  $(OUT) $(OUT)/mktccboot.o
-	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -o $(OUTPUT) $(OUT)/mktccboot.o $(TOOLSDIR)/telechips.o
+	@echo LD $@
+	$(SILENT)$(CC) $(CFLAGS) -o $(OUTPUT) $(OUT)/mktccboot.o $(OUT)/telechips.o
 
 $(OUT)/libmktccboot.o: $(OUT)/mktccboot.o
 	@echo CC $<
