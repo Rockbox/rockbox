@@ -47,6 +47,11 @@ beastpatcher.exe: $(SOURCES) $(HEADERS) $(MTPSRCS_W32) $(WINLIBS)
 beastpatcher-mac: beastpatcher-i386 beastpatcher-ppc
 	lipo -create beastpatcher-ppc beastpatcher-i386 -output beastpatcher-mac
 
+beastpatcher.dmg: beastpatcher-mac
+	mkdir -p beastpatcher-dmg
+	cp -p beastpatcher-mac beastpatcher-dmg
+	hdiutil create -srcfolder beastpatcher-dmg beastpatcher.dmg
+
 beastpatcher-i386:  $(SOURCES) $(HEADERS) $(MTPSRCS_MTP) usb.h libmtp.h libusb-i386.a libmtp-i386.a 
 	gcc -c -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 $(CFLAGS) -I. -DBEASTPATCHER $(SOURCES) $(MTPSRCS_MTP)
 	gcc -framework iokit -framework coreservices -arch i386 -o beastpatcher-i386 $(OBJS) libusb-i386.a libmtp-i386.a -liconv
@@ -66,4 +71,5 @@ bootimg.c: bootloader.bin bin2c
 mknkboot: mknkboot.c
 	$(SILENT)$(NATIVECC) $(CFLAGS) $+ -o $@
 clean:
-	rm -f beastpatcher.exe beastpatcher-mac beastpatcher-i386 beastpatcher-ppc beastpatcher bin2c bootimg.c bootimg.h mknkboot *~ *.o
+	rm -f beastpatcher.exe beastpatcher-mac beastpatcher-i386 beastpatcher-ppc beastpatcher bin2c bootimg.c bootimg.h mknkboot *~ *.o beastpatcher.dmg
+	rm -rf beastpatcher-dmg
