@@ -31,7 +31,7 @@
 
 # Battery area, Icons
 %Vl|a|0|0|-|8|0|-|-| 
-%?bl<%xdBa|%xdBb|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>
+%?bl<%xdBa|%xdBa|%xdBb|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>
 # charging icon
 %Vl|a|16|0|-|8|0|-|-| 
 %?bc<%xdSa|>
