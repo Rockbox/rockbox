@@ -235,5 +235,6 @@ runone("yh920", "yh_920");
 runone("yh925", "yh_925");
 runone("ondavx747", "ondavx747");
 runone("ondavx747p", "ondavx747p");
-runone("ondavx777", "ondavx777");
-runone("ifp7xx", "ifp7xx");
+#runone("ondavx777", "ondavx777");
+#runone("ifp7xx", "ifp7xx");
+runone("lyremini2440", "mini2440");
