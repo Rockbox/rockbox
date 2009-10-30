@@ -75,6 +75,8 @@ svnpaths = [ "rbutil/",
              "tools/wavtrim.h",
              "tools/iriver.h",
              "tools/mkboot.c",
+             "tools/telechips.c",
+             "tools/telechips.h",
              "tools/voicefont.h",
              "tools/wavtrim.c",
              "tools/sapi_voice.vbs" ]
