@@ -197,10 +197,6 @@
 
 #define CONFIG_LCD LCD_GIGABEAT
 
-/* define this if the backlight can be set to a brightness */
-//#define HAVE_BACKLIGHT_SET_FADING
-#define __BACKLIGHT_INIT
-
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
 

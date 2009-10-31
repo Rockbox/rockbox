@@ -148,9 +148,6 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-/* define this if the backlight can be set to a brightness */
-#define __BACKLIGHT_INIT
-
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
 

@@ -236,9 +236,6 @@
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
 
-/* define this if the backlight can be set to a brightness */
-#define __BACKLIGHT_INIT
-
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
 
