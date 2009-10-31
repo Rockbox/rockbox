@@ -1,6 +1,5 @@
 # We use the UCL code available in the Rockbox tools/ directory
 CFLAGS=-I../../tools/ucl/include -Wall
-LIBUCL=../../tools/ucl/src/libucl$(RBARCH).a
 CC = gcc
 
 #change for releases
@@ -27,7 +26,6 @@ endif
 endif
 endif
 
-
 ifdef RBARCH
 CFLAGS += -arch $(RBARCH)
 endif
@@ -36,33 +34,38 @@ OUT = $(TARGET_DIR)build$(RBARCH)
 
 all: $(OUTPUT)
 
+# Dependant modules
+LIBUCL=../../tools/ucl/src/libucl$(RBARCH).a
+
 $(LIBUCL):
 	make -C ../../tools/ucl/src $(TARGET_DIR)libucl$(RBARCH).a
 
 # This file can be generated in the dualboot/ directory
-$(OUT)/dualboot.o: dualboot.c
+$(OUT)/dualboot.o: dualboot.[ch]
 	@echo CC $<
 	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/dualboot.o dualboot.c
 
-$(OUT)/md5.o: md5.c md5.h
+$(OUT)/md5.o: md5.[ch]
 	@echo CC $<
 	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/md5.o -W -Wall md5.c
 
-$(OUT)/mkamsboot.o: mkamsboot.c dualboot.h md5.h
+DEPENDANT_OBJS=$(LIBUCL) $(OUT)/dualboot.o $(OUT)/md5.o
+
+$(OUT)/mkamsboot.o: mkamsboot.[ch] $(DEPENDANT_OBJS)
 	@echo CC $<
 	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/mkamsboot.o -W -Wall mkamsboot.c -DVERSION=\"$(APPVERSION)\"
 
-$(OUTPUT):  $(OUT) $(OUT)/mkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o $(LIBUCL)
+$(OUTPUT):  $(OUT) $(OUT)/mkamsboot.o
 	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -o $(OUTPUT) $(OUT)/mkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o $(LIBUCL)
+	$(SILENT)$(CC) $(CFLAGS) -o $(OUTPUT) $(OUT)/mkamsboot.o $(DEPENDANT_OBJS)
 
-$(OUT)/libmkamsboot.o: mkamsboot.c dualboot.h md5.h
+$(OUT)/libmkamsboot.o: $(OUT)/mkamsboot.o
 	@echo CC $<
 	$(SILENT)$(CC) $(CFLAGS) -DLIB -c -o $(OUT)/libmkamsboot.o -W -Wall mkamsboot.c
 
-libmkamsboot$(RBARCH).a: $(OUT) $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
+libmkamsboot$(RBARCH).a: $(OUT) $(OUT)/libmkamsboot.o
 	@echo AR $@
-	$(SILENT)$(AR) ruc $(TARGET_DIR)libmkamsboot$(RBARCH).a $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
+	$(SILENT)$(AR) ruc $(TARGET_DIR)libmkamsboot$(RBARCH).a $(OUT)/libmkamsboot.o
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
@@ -79,7 +82,7 @@ libmkamsboot-universal: libmkamsbooti386.a libmkamsbootppc.a
 	lipo -create $(TARGET_DIR)libmkamsbootppc.a $(TARGET_DIR)libmkamsbooti386.a -output $(TARGET_DIR)libmkamsboot.a
     
 clean:
-	rm -f $(OUTPUT) libmkamsboot.o $(TARGET_DIR)libmkamsboot*.a mkamsboot.dmg
+	rm -f $(OUTPUT) libmkamsboot.o $(TARGET_DIR)libmkamsboot*.a mkamsboot.dmg $(DEPENDANT_OBJS)
 	rm -rf build* mkamsboot-*
 
 mkamsboot-i386:
