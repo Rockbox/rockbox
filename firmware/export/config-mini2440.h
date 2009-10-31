@@ -107,12 +107,12 @@
 #define HAVE_BMP_SCALING
 /* define this to enable JPEG decoding */
 #define HAVE_JPEG
-/* RMC TODO: what is this for?? */
 /* define this if you have access to the pitchscreen */
 #define HAVE_PITCHSCREEN
 #define HAVE_QUICKSCREEN
 
-
+/* define this if you have a real-time clock */
+#define CONFIG_RTC RTC_S3C2440
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
