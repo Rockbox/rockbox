@@ -104,38 +104,42 @@
 <context>
     <name>BootloaderInstallAms</name>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="33"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons.Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ bin). עליך להוריד קובץ זה בעצמך עקב סיבות משפטיות. לחץ אישור כדי להמשיך ולעיין במחשב שלך למציאת קובץ הקושחה שהורדת.</translation>
+        <translation type="obsolete">התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ bin). עליך להוריד קובץ זה בעצמך עקב סיבות משפטיות. לחץ אישור כדי להמשיך ולעיין במחשב שלך למציאת קובץ הקושחה שהורדת.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="47"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="33"/>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallams.cpp" line="50"/>
         <source>Downloading bootloader file</source>
         <translation>מוריד קובץ מנהל איתחול</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="83"/>
-        <location filename="../base/bootloaderinstallams.cpp" line="94"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="86"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="97"/>
         <source>Could not load %1</source>
         <translation>לא מצליח לטעון את %1</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="114"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="117"/>
         <source>Patching Firmware...</source>
         <translation>תופר קושחה...</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="125"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="128"/>
         <source>Could not open %1 for writing</source>
         <translation>לא מצליח לפתוח את %1 לכתיבה</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="137"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="140"/>
         <source>Could not write firmware file</source>
         <translation>לא מצליח לכתוב קובץ קושחה</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="152"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="155"/>
         <source>Success: modified firmware file created</source>
         <translation>הצלחה: קובץ קושחה מוסגל נוצר</translation>
     </message>
@@ -693,6 +697,50 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <location filename="../base/bootloaderinstallsansa.cpp" line="159"/>
         <source>Uninstalling bootloader</source>
         <translation>מסיר התקנת מנהל איתחול</translation>
+    </message>
+</context>
+<context>
+    <name>BootloaderInstallTcc</name>
+    <message>
+        <location filename="../base/bootloaderinstalltcc.cpp" line="34"/>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons.Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished">התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ bin). עליך להוריד קובץ זה בעצמך עקב סיבות משפטיות. לחץ אישור כדי להמשיך ולעיין במחשב שלך למציאת קובץ הקושחה שהורדת.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalltcc.cpp" line="48"/>
+        <source>Downloading bootloader file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalltcc.cpp" line="80"/>
+        <location filename="../base/bootloaderinstalltcc.cpp" line="89"/>
+        <source>Could not load %1</source>
+        <translation type="unfinished">לא מצליח לטעון את %1</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalltcc.cpp" line="94"/>
+        <source>Patching Firmware...</source>
+        <translation type="unfinished">תופר קושחה...</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalltcc.cpp" line="101"/>
+        <source>Could patch firmware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalltcc.cpp" line="107"/>
+        <source>Could not open %1 for writing</source>
+        <translation type="unfinished">לא מצליח לפתוח את %1 לכתיבה</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalltcc.cpp" line="116"/>
+        <source>Could not write firmware file</source>
+        <translation type="unfinished">לא מצליח לכתוב קובץ קושחה</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalltcc.cpp" line="121"/>
+        <source>Success: modified firmware file created</source>
+        <translation type="unfinished">הצלחה: קובץ קושחה מוסגל נוצר</translation>
     </message>
 </context>
 <context>
@@ -1660,306 +1708,322 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
 <context>
     <name>RbUtilQt</name>
     <message>
-        <location filename="../rbutilqt.cpp" line="88"/>
+        <location filename="../rbutilqt.cpp" line="89"/>
         <source>File</source>
         <translation>קובץ</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="88"/>
+        <location filename="../rbutilqt.cpp" line="89"/>
         <source>Version</source>
         <translation>גירסה</translation>
     </message>
     <message>
+        <location filename="../rbutilqt.cpp" line="178"/>
         <location filename="../rbutilqt.cpp" line="223"/>
+        <source>Downloading build information, please wait ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="189"/>
+        <source>Can&apos;t get version information!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="227"/>
         <source>New installation</source>
         <translation>התקנה חדשה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="224"/>
+        <location filename="../rbutilqt.cpp" line="228"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
         <translation>זוהי התקנה חדשה של תוכנת השירות של רוקבוקס, או גרסה חדשה. תיבת השיח של ההגדרות תיפתח כעת על מנת לאפשר לך להגדיר את התוכנית, או לעבור על ההגדרות הקיימות.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="231"/>
-        <location filename="../rbutilqt.cpp" line="1217"/>
+        <location filename="../rbutilqt.cpp" line="235"/>
+        <location filename="../rbutilqt.cpp" line="1226"/>
         <source>Configuration error</source>
         <translation>שגיאת הגדרות</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="232"/>
+        <location filename="../rbutilqt.cpp" line="236"/>
         <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
         <translation>ההגדרות שלך שגויות. לרוב הדבר נובע מכך שהנתיב לנגן השתנה. תיבת השיח של ההגדרות תיפתח כעת, על מנת לאפשר לך לתקן את הבעיה.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="264"/>
+        <location filename="../rbutilqt.cpp" line="256"/>
+        <source>Download build information finished.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="269"/>
         <source>Network error: %1. Please check your network and proxy settings.</source>
         <translation>שגיאת רשת: %1. אנא בדוק את הגדרות הרשת והפרוקסי שלך.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="364"/>
+        <location filename="../rbutilqt.cpp" line="370"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%1 %2&lt;/b&gt; ב- &lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="383"/>
+        <location filename="../rbutilqt.cpp" line="389"/>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;מדריך PDF&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="385"/>
+        <location filename="../rbutilqt.cpp" line="391"/>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;מדריך HTML (נפתח בדפדפן)&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="389"/>
+        <location filename="../rbutilqt.cpp" line="395"/>
         <source>Select a device for a link to the correct manual</source>
         <translation>בחר בנגן בשביל קישור למדריך המשתמש המתאים</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="390"/>
+        <location filename="../rbutilqt.cpp" line="396"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;רשימת כל מדריכי המשתמש&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="399"/>
-        <location filename="../rbutilqt.cpp" line="455"/>
-        <location filename="../rbutilqt.cpp" line="632"/>
-        <location filename="../rbutilqt.cpp" line="810"/>
-        <location filename="../rbutilqt.cpp" line="859"/>
-        <location filename="../rbutilqt.cpp" line="898"/>
+        <location filename="../rbutilqt.cpp" line="405"/>
+        <location filename="../rbutilqt.cpp" line="461"/>
+        <location filename="../rbutilqt.cpp" line="638"/>
+        <location filename="../rbutilqt.cpp" line="819"/>
+        <location filename="../rbutilqt.cpp" line="868"/>
+        <location filename="../rbutilqt.cpp" line="907"/>
         <source>Confirm Installation</source>
         <translation>אשר התקנה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="478"/>
-        <location filename="../rbutilqt.cpp" line="1101"/>
+        <location filename="../rbutilqt.cpp" line="484"/>
+        <location filename="../rbutilqt.cpp" line="1110"/>
         <source>Mount point is wrong!</source>
         <translation>נקודת העיגון הינה שגויה!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="549"/>
+        <location filename="../rbutilqt.cpp" line="555"/>
         <source>Aborted!</source>
         <translation>בוטל!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="559"/>
+        <location filename="../rbutilqt.cpp" line="565"/>
         <source>Installed Rockbox detected</source>
         <translation>זוהתה התקנה של רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="560"/>
+        <location filename="../rbutilqt.cpp" line="566"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>זוהתה התקנה של רוקבוקס. האם ברצונך לגבות לפני כן?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="563"/>
+        <location filename="../rbutilqt.cpp" line="569"/>
         <source>Starting backup...</source>
         <translation>מתחיל גיבוי...</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="581"/>
+        <location filename="../rbutilqt.cpp" line="587"/>
         <source>Backup successful</source>
         <translation>הגיבוי הסתיים בהצלחה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="585"/>
+        <location filename="../rbutilqt.cpp" line="591"/>
         <source>Backup failed!</source>
         <translation>הגיבוי נכשל!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="633"/>
+        <location filename="../rbutilqt.cpp" line="639"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>האם באמת ברצונך להתקין את מנהל האיתחול?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="811"/>
+        <location filename="../rbutilqt.cpp" line="820"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>האם באמת ברצונך להתקין את חבילת הגופנים?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="853"/>
+        <location filename="../rbutilqt.cpp" line="862"/>
         <source>Warning</source>
         <translation>אזהרה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="854"/>
+        <location filename="../rbutilqt.cpp" line="863"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>תוכנית השרות עדיין מורידה מידע לגבי גרסאות חדשות. אנא נסה שוב בקרוב.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="860"/>
+        <location filename="../rbutilqt.cpp" line="869"/>
         <source>Do you really want to install the voice file?</source>
         <translation>האם באמת ברצונך להתקין את קובץ הקראת התפריטים?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="893"/>
+        <location filename="../rbutilqt.cpp" line="902"/>
         <source>Error</source>
         <translation>שגיאה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="894"/>
+        <location filename="../rbutilqt.cpp" line="903"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>לנגן שברשותך אין הרחבת doom. מבטל.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="899"/>
+        <location filename="../rbutilqt.cpp" line="908"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>האם באמת ברצונך להתקין את קבצי הרחבות המשחקים?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="980"/>
+        <location filename="../rbutilqt.cpp" line="989"/>
         <source>Confirm Uninstallation</source>
         <translation>אשר הסרת התקנה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="981"/>
+        <location filename="../rbutilqt.cpp" line="990"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>האם באמת ברצונת להסיר את מנהל האיתחול?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1036"/>
+        <location filename="../rbutilqt.cpp" line="1045"/>
         <source>Confirm download</source>
         <translation>אשר הורדה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1037"/>
+        <location filename="../rbutilqt.cpp" line="1046"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>האם באמת ברצונך להוריד את מדריך המשתמש? המדריך יישמר בספרייה הראשית של הנגן שלך.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1087"/>
+        <location filename="../rbutilqt.cpp" line="1096"/>
         <source>Confirm installation</source>
         <translation>אשר התקנה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1088"/>
+        <location filename="../rbutilqt.cpp" line="1097"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>האם באמת ברצונך להתקין את תוכנית השרות של רוקבוקס לנגן שלך? לאחר ההתקנה תוכל להריץ אותה מהתקן האיחסון של הנגן.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1097"/>
+        <location filename="../rbutilqt.cpp" line="1106"/>
         <source>Installing Rockbox Utility</source>
         <translation>מתקין את תוכנת השרות של רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1115"/>
+        <location filename="../rbutilqt.cpp" line="1124"/>
         <source>Error installing Rockbox Utility</source>
         <translation>שגיאה בהתקנת תוכנת השרות של רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1119"/>
+        <location filename="../rbutilqt.cpp" line="1128"/>
         <source>Installing user configuration</source>
         <translation>מתקין הגדרות משתמש</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1123"/>
+        <location filename="../rbutilqt.cpp" line="1132"/>
         <source>Error installing user configuration</source>
         <translation>שגיאה בהתקנת הגדרות משתמש</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1127"/>
+        <location filename="../rbutilqt.cpp" line="1136"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>התקנת תוכנית השרות של רוקבוקס הסתיימה בהצלחה.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1218"/>
+        <location filename="../rbutilqt.cpp" line="1227"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>ההגדרות שלך שגויות. אנא עבור לתיבת השיח של ההגדרות וודא שהערכים הנכונים נבחרו.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1301"/>
+        <location filename="../rbutilqt.cpp" line="1310"/>
         <source>RockboxUtility Update available</source>
         <translation>קיים עידכון של תוכנת השירות של רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1302"/>
+        <location filename="../rbutilqt.cpp" line="1311"/>
         <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="187"/>
+        <location filename="../rbutilqt.cpp" line="190"/>
         <source>Network error</source>
         <translation>שגיאת רשת</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="188"/>
+        <location filename="../rbutilqt.cpp" line="191"/>
         <source>Can&apos;t get version information.</source>
         <translation>לא מצליח לקבל מידע גירסה.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="545"/>
+        <location filename="../rbutilqt.cpp" line="551"/>
         <source>Really continue?</source>
         <translation>באמת להמשיך?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="673"/>
+        <location filename="../rbutilqt.cpp" line="682"/>
         <source>No install method known.</source>
         <translation>אין שיטת התקנה ידועה.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="693"/>
+        <location filename="../rbutilqt.cpp" line="702"/>
         <source>Bootloader detected</source>
         <translation>מנהל איתחול זוהה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="694"/>
+        <location filename="../rbutilqt.cpp" line="703"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
         <translation>מנהל איתחול כבר מותקן. האם אתה באמת רוצה להתקין מחדש את מנהל האיתחול?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="717"/>
+        <location filename="../rbutilqt.cpp" line="726"/>
         <source>Create Bootloader backup</source>
         <translation>יוצר גיבוי מנהל האיתחול</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="718"/>
+        <location filename="../rbutilqt.cpp" line="727"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
         <translation>ביכולתך ליצור גיבוי של קובץ מנהל האיתחול המקורי. לחץ &quot;כן&quot; על מנת לבחור ספריית פלט על המחשב שלך אליה יישמר הקובץ, אשר יימצא תחת ספרייה חדשה בשם &quot;%1&quot; מתחת לספרייה שנבחרה.
 לחץ &quot;לא&quot; כדי לדלג על שלב זה.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="724"/>
+        <location filename="../rbutilqt.cpp" line="733"/>
         <source>Browse backup folder</source>
         <translation>עיין בספריית הגיבוי</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="737"/>
+        <location filename="../rbutilqt.cpp" line="746"/>
         <source>Prerequisites</source>
         <translation>דרישות מוקדמות</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="750"/>
+        <location filename="../rbutilqt.cpp" line="759"/>
         <source>Select firmware file</source>
         <translation>בחר קובץ קושחה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="752"/>
+        <location filename="../rbutilqt.cpp" line="761"/>
         <source>Error opening firmware file</source>
         <translation>שגיאה בפתיחת קובץ קושחה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="770"/>
+        <location filename="../rbutilqt.cpp" line="779"/>
         <source>Backup error</source>
         <translation>שגיאת גיבוי</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="771"/>
+        <location filename="../rbutilqt.cpp" line="780"/>
         <source>Could not create backup file. Continue?</source>
         <translation>לא מצליח ליצור קובץ גיבוי. להמשיך?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="801"/>
+        <location filename="../rbutilqt.cpp" line="810"/>
         <source>Manual steps required</source>
         <translation>צעדים ידניים נדרשים</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1009"/>
+        <location filename="../rbutilqt.cpp" line="1018"/>
         <source>No uninstall method known.</source>
         <translation>אין שיטת הסרת התקנה ידועה.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="400"/>
+        <location filename="../rbutilqt.cpp" line="406"/>
         <source>Do you really want to perform a complete installation?
 
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
@@ -1968,7 +2032,7 @@ This will install Rockbox %1. To install the most recent development build avail
 דבר זה יתקין את רוקבוקס %1. על מנת להתקין את גירסת הפיתוח המעודכנת ביותר לחץ &quot;ביטול&quot; והשתמש בלשונית ה&quot;התקנה&quot;.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="456"/>
+        <location filename="../rbutilqt.cpp" line="462"/>
         <source>Do you really want to perform a minimal installation? A minimal installation will contain only the absolutely necessary parts to run Rockbox.
 
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
@@ -1977,12 +2041,12 @@ This will install Rockbox %1. To install the most recent development build avail
 דבר זה יתקין את רוקבוקס %1. על מנת להתקין את גירסת הפיתוח המעודכנת ביותר לחץ &quot;ביטול&quot; והשתמש בלשונית ה&quot;התקנה&quot;.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="699"/>
+        <location filename="../rbutilqt.cpp" line="708"/>
         <source>Bootloader installation skipped</source>
         <translation>התקנת מנהל האיתחול לא בוצעה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="743"/>
+        <location filename="../rbutilqt.cpp" line="752"/>
         <source>Bootloader installation aborted</source>
         <translation>התקנת מנהל האיתחול בוטלה</translation>
     </message>
@@ -1990,420 +2054,419 @@ This will install Rockbox %1. To install the most recent development build avail
 <context>
     <name>RbUtilQtFrm</name>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="13"/>
+        <location filename="../rbutilqtfrm.ui" line="14"/>
         <source>Rockbox Utility</source>
         <translation>תוכנת השרות של רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="70"/>
+        <location filename="../rbutilqtfrm.ui" line="71"/>
         <source>Device</source>
         <translation>נגן</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="82"/>
+        <location filename="../rbutilqtfrm.ui" line="83"/>
         <source>Selected device:</source>
         <translation>הנגן שנבחר:</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="89"/>
+        <location filename="../rbutilqtfrm.ui" line="90"/>
         <source>device / mountpoint unknown or invalid</source>
         <translation>נגן / נקודת עגינה לא ידועים או שגויים</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="109"/>
+        <location filename="../rbutilqtfrm.ui" line="110"/>
         <source>&amp;Change</source>
         <translation>&amp;שינוי</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="127"/>
-        <location filename="../rbutilqtfrm.ui" line="834"/>
+        <location filename="../rbutilqtfrm.ui" line="128"/>
+        <location filename="../rbutilqtfrm.ui" line="832"/>
         <source>&amp;Quick Start</source>
         <translation>התחלה &amp;מהירה</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="130"/>
+        <location filename="../rbutilqtfrm.ui" line="131"/>
         <source>Welcome</source>
         <translation>ברוכים הבאים</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="136"/>
+        <location filename="../rbutilqtfrm.ui" line="137"/>
         <source>Complete Installation</source>
         <translation>התקנה מלאה</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="153"/>
+        <location filename="../rbutilqtfrm.ui" line="154"/>
         <source>&lt;b&gt;Complete Installation&lt;/b&gt;&lt;br/&gt;This installs the bootloader, a current build and the extras package. This is the recommended method for new installations.</source>
         <translation>&lt;b&gt;התקנה מלאה&lt;/b&gt;&lt;br/&gt;התקנת מנהל האיתחול, הגירסה הנוכחית של רוקבוקס וחבילת התוספות. זוהי הבחירה המומלצת עבור התקנות חדשות.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="223"/>
-        <location filename="../rbutilqtfrm.ui" line="827"/>
+        <location filename="../rbutilqtfrm.ui" line="224"/>
+        <location filename="../rbutilqtfrm.ui" line="825"/>
         <source>&amp;Installation</source>
         <translation>&amp;התקנה</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="226"/>
+        <location filename="../rbutilqtfrm.ui" line="227"/>
         <source>Basic Rockbox installation</source>
         <translation>התקנה בסיסית של רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="232"/>
+        <location filename="../rbutilqtfrm.ui" line="233"/>
         <source>Install Bootloader</source>
         <translation>התקנת מנהל האיתחול</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="249"/>
+        <location filename="../rbutilqtfrm.ui" line="250"/>
         <source>&lt;b&gt;Install the bootloader&lt;/b&gt;&lt;br/&gt;Before Rockbox can be run on your audio player, you may have to install a bootloader. This is only necessary the first time Rockbox is installed.</source>
         <translation>&lt;b&gt;התקנת מנהל האיתחול&lt;/b&gt;&lt;br/&gt;בטרם ניתן להריץ את רוקבוקס על הנגן שלך, ייתכן ותצטרך להתקין מנהל איתחול. הדבר נדרש רק בפעם הראשונה שרוקבוקס מותקנת.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="259"/>
-        <location filename="../rbutilqtfrm.ui" line="262"/>
+        <location filename="../rbutilqtfrm.ui" line="260"/>
         <source>Install Rockbox</source>
         <translation>התקן את רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="279"/>
+        <location filename="../rbutilqtfrm.ui" line="277"/>
         <source>&lt;b&gt;Install Rockbox&lt;/b&gt; on your audio player</source>
         <translation>&lt;b&gt;התקן את רוקבוקס&lt;/b&gt; על הנגן שלך</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="322"/>
-        <location filename="../rbutilqtfrm.ui" line="841"/>
+        <location filename="../rbutilqtfrm.ui" line="320"/>
+        <location filename="../rbutilqtfrm.ui" line="839"/>
         <source>&amp;Extras</source>
         <translation>&amp;תוספות</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="325"/>
+        <location filename="../rbutilqtfrm.ui" line="323"/>
         <source>Install extras for Rockbox</source>
         <translation>התקן תוספות עבור רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="331"/>
+        <location filename="../rbutilqtfrm.ui" line="329"/>
         <source>Install Fonts package</source>
         <translation>התקן חבילת גופנים</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="348"/>
+        <location filename="../rbutilqtfrm.ui" line="346"/>
         <source>&lt;b&gt;Fonts Package&lt;/b&gt;&lt;br/&gt;The Fonts Package contains a couple of commonly used fonts. Installation is highly recommended.</source>
         <translation>&lt;b&gt;חבילת גופנים&lt;/b&gt;&lt;br/&gt;חבילת הגופנים מכילה מספר גופנים בהם נעשה שימוש לעתים קרובות. התקנה זו מומלצת ביותר.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="358"/>
+        <location filename="../rbutilqtfrm.ui" line="356"/>
         <source>Install themes</source>
         <translation>התקנת ערכות נושא</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="375"/>
+        <location filename="../rbutilqtfrm.ui" line="373"/>
         <source>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos; look can be customized by themes. You can choose and install several officially distributed themes.</source>
         <translation>&lt;b&gt;התקנת ערכות נושא&lt;/b&gt;&lt;br/&gt;המראה של רוקבוקס יכול להיות מותאם אישית באמצעות ערכות נושא. ביכולתך לבחור ולהתקין מספר ערכות נושא המופצות רשמית.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="385"/>
+        <location filename="../rbutilqtfrm.ui" line="383"/>
         <source>Install game files</source>
         <translation>התקנת קבצי משחק</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="402"/>
+        <location filename="../rbutilqtfrm.ui" line="400"/>
         <source>&lt;b&gt;Install Game Files&lt;/b&gt;&lt;br/&gt;Doom needs a base wad file to run.</source>
         <translation>&lt;b&gt;התקנת קבצי משחק&lt;/b&gt;&lt;br/&gt; בסיסי על מנת לרוץ wad דום זקוקה לקובץ.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="439"/>
-        <location filename="../rbutilqtfrm.ui" line="849"/>
+        <location filename="../rbutilqtfrm.ui" line="437"/>
+        <location filename="../rbutilqtfrm.ui" line="847"/>
         <source>&amp;Accessibility</source>
         <translation>&amp;נגישות</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="442"/>
+        <location filename="../rbutilqtfrm.ui" line="440"/>
         <source>Install accessibility add-ons</source>
         <translation>התקנת תוסף נגישות</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="448"/>
+        <location filename="../rbutilqtfrm.ui" line="446"/>
         <source>Install Voice files</source>
         <translation>התקנת קבצי הקראת תפריטים</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="465"/>
+        <location filename="../rbutilqtfrm.ui" line="463"/>
         <source>&lt;b&gt;Install Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.</source>
         <translation>&lt;b&gt;התקנת קבצי הקראת תפריטים&lt;/b&gt;&lt;br/&gt;קבצי הקראת תפריטים נחוצים על מנת להקריא את ממשק המשתמש. הקראה מופעלת כברירת מחדל, כך שאם התקנת את קבצי הקראת התפריטים, רוקבוקס תקריא אותם.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="475"/>
+        <location filename="../rbutilqtfrm.ui" line="473"/>
         <source>Install Talk files</source>
         <translation>התקנת קבצי דיבור</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="492"/>
+        <location filename="../rbutilqtfrm.ui" line="490"/>
         <source>&lt;b&gt;Create Talk Files&lt;/b&gt;&lt;br/&gt;Talkfiles are needed to let Rockbox speak File and Foldernames</source>
         <translation>&lt;b&gt;יצירת קבצי דיבור&lt;/b&gt;&lt;br/&gt;קבצי דיבור נחוצים על מנת לתת לרוקבוקס להקריא שמות קבצים וספריות</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="525"/>
+        <location filename="../rbutilqtfrm.ui" line="523"/>
         <source>Create Voice files</source>
         <translation>יצירת קבצי קול</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="542"/>
+        <location filename="../rbutilqtfrm.ui" line="540"/>
         <source>&lt;b&gt;Create Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the  user interface. Speaking is enabled by default, so
  if you installed the voice file Rockbox will speak.</source>
         <translation>&lt;b&gt;יצירת קבצי הקראת התפריטים&lt;/b&gt;&lt;br/&gt;קבצי קול נחוצים על מנת לגרום לרוקבוקס להקריא את ממשק המשתמש. הקראה מאופשרת כברירת מחדל, כך שאם התקנת את קבצי הקראת התפריטים, רוקבוקס תקריא אותם.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="554"/>
-        <location filename="../rbutilqtfrm.ui" line="857"/>
+        <location filename="../rbutilqtfrm.ui" line="552"/>
+        <location filename="../rbutilqtfrm.ui" line="855"/>
         <source>&amp;Uninstallation</source>
         <translation>ה&amp;סרת התקנה</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="557"/>
-        <location filename="../rbutilqtfrm.ui" line="590"/>
+        <location filename="../rbutilqtfrm.ui" line="555"/>
+        <location filename="../rbutilqtfrm.ui" line="588"/>
         <source>Uninstall Rockbox</source>
         <translation>הסרת התקנת רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="563"/>
+        <location filename="../rbutilqtfrm.ui" line="561"/>
         <source>Uninstall Bootloader</source>
         <translation>הסרת התקנת מנהל האיתחול</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="580"/>
+        <location filename="../rbutilqtfrm.ui" line="578"/>
         <source>&lt;b&gt;Remove the bootloader&lt;/b&gt;&lt;br/&gt;After removing the bootloader you won&apos;t be able to start Rockbox.</source>
         <translation>&lt;b&gt;הסרת מנהל האיתחול&lt;/b&gt;&lt;br/&gt;לאחר הסרת מנהל האיתחול לא תוכל להפעיל את רוקבוקס.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="607"/>
+        <location filename="../rbutilqtfrm.ui" line="605"/>
         <source>&lt;b&gt;Uninstall Rockbox from your audio player.&lt;/b&gt;&lt;br/&gt;This will leave the bootloader in place (you need to remove it manually).</source>
         <translation>&lt;b&gt;הסרת רוקבוקס מהנגן שלך&lt;/b&gt;&lt;br/&gt;מנהל האתחול ישאר במקומו (יהיה עליך להסירו ידנית).</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="650"/>
+        <location filename="../rbutilqtfrm.ui" line="648"/>
         <source>&amp;Manual</source>
         <translation>מ&amp;דריך למשתמש</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="653"/>
+        <location filename="../rbutilqtfrm.ui" line="651"/>
         <source>View and download the manual</source>
         <translation>צפה והורד את המדריך למשתמש</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="659"/>
+        <location filename="../rbutilqtfrm.ui" line="657"/>
         <source>Read the manual</source>
         <translation>קרא את המדריך למשתמש</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="665"/>
+        <location filename="../rbutilqtfrm.ui" line="663"/>
         <source>PDF manual</source>
         <translation>PDF מדריך למשתמש מסוג</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="678"/>
+        <location filename="../rbutilqtfrm.ui" line="676"/>
         <source>HTML manual</source>
         <translation>HTML מדריך למשתמש מסוג</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="694"/>
+        <location filename="../rbutilqtfrm.ui" line="692"/>
         <source>Download the manual</source>
         <translation>הורד את המדריך למשתמש</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="702"/>
+        <location filename="../rbutilqtfrm.ui" line="700"/>
         <source>&amp;PDF version</source>
         <translation>&amp;גירסת PDF</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="709"/>
+        <location filename="../rbutilqtfrm.ui" line="707"/>
         <source>&amp;HTML version (zip file)</source>
         <translation>&amp;גירסת HTML (קובץ מכווץ)</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="731"/>
+        <location filename="../rbutilqtfrm.ui" line="729"/>
         <source>Down&amp;load</source>
         <translation>&amp;הורדה</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="755"/>
+        <location filename="../rbutilqtfrm.ui" line="753"/>
         <source>Inf&amp;o</source>
         <translation>&amp;מידע</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="761"/>
+        <location filename="../rbutilqtfrm.ui" line="759"/>
         <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
         <translation>חבילות מותקנות. &lt;br/&gt;&lt;b&gt;שים לב:&lt;/b&gt; אם התקנת חבילות ידנית, מידע זה עשוי שלא להיות מדויק!</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="775"/>
+        <location filename="../rbutilqtfrm.ui" line="773"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="797"/>
+        <location filename="../rbutilqtfrm.ui" line="795"/>
         <source>&amp;File</source>
         <translation>&amp;קובץ</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="806"/>
+        <location filename="../rbutilqtfrm.ui" line="804"/>
         <source>Abou&amp;t</source>
         <translation>&amp;אודות</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="810"/>
+        <location filename="../rbutilqtfrm.ui" line="808"/>
         <source>&amp;Troubleshoot</source>
         <translation>תפעול ת&amp;קלות</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="823"/>
+        <location filename="../rbutilqtfrm.ui" line="821"/>
         <source>Action&amp;s</source>
         <translation>&amp;פעולות</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="875"/>
+        <location filename="../rbutilqtfrm.ui" line="873"/>
         <source>Empty local download cache</source>
         <translation>ריקון מטמון הורדות מקומי</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="880"/>
+        <location filename="../rbutilqtfrm.ui" line="878"/>
         <source>Install Rockbox Utility on player</source>
         <translation>התקנת תוכנית השירות של רוקבוקס על הנגן</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="885"/>
+        <location filename="../rbutilqtfrm.ui" line="883"/>
         <source>&amp;Configure</source>
         <translation>&amp;הגדרות</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="890"/>
+        <location filename="../rbutilqtfrm.ui" line="888"/>
         <source>E&amp;xit</source>
         <translation>&amp;יציאה</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="893"/>
+        <location filename="../rbutilqtfrm.ui" line="891"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="898"/>
+        <location filename="../rbutilqtfrm.ui" line="896"/>
         <source>&amp;About</source>
         <translation>&amp;אודות</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="903"/>
+        <location filename="../rbutilqtfrm.ui" line="901"/>
         <source>About &amp;Qt</source>
         <translation>Qt או&amp;דות</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="908"/>
+        <location filename="../rbutilqtfrm.ui" line="906"/>
         <source>&amp;Help</source>
         <translation>&amp;עזרה</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="913"/>
+        <location filename="../rbutilqtfrm.ui" line="911"/>
         <source>Info</source>
         <translation>מידע</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="922"/>
+        <location filename="../rbutilqtfrm.ui" line="920"/>
         <source>&amp;Complete Installation</source>
         <translation>התקנה &amp;מלאה</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="940"/>
+        <location filename="../rbutilqtfrm.ui" line="938"/>
         <source>Install &amp;Bootloader</source>
         <translation>התקנת מנהל ה&amp;איתחול</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="949"/>
+        <location filename="../rbutilqtfrm.ui" line="947"/>
         <source>Install &amp;Rockbox</source>
         <translation>התקנת &amp;רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="958"/>
+        <location filename="../rbutilqtfrm.ui" line="956"/>
         <source>Install &amp;Fonts Package</source>
         <translation>התקנת חבילת &amp;גופנים</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="967"/>
+        <location filename="../rbutilqtfrm.ui" line="965"/>
         <source>Install &amp;Themes</source>
         <translation>התקנת &amp;ערכות נושא</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="976"/>
+        <location filename="../rbutilqtfrm.ui" line="974"/>
         <source>Install &amp;Game Files</source>
         <translation>התקנת קבצי &amp;משחק</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="985"/>
+        <location filename="../rbutilqtfrm.ui" line="983"/>
         <source>&amp;Install Voice File</source>
         <translation>התקנת קבצי הקראת &amp;תפריטים</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="994"/>
+        <location filename="../rbutilqtfrm.ui" line="992"/>
         <source>Create &amp;Talk Files</source>
         <translation>יצירת קבצי &amp;דיבור</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1003"/>
+        <location filename="../rbutilqtfrm.ui" line="1001"/>
         <source>Remove &amp;bootloader</source>
         <translation>הסרת &amp;מנהל האיתחול</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1012"/>
+        <location filename="../rbutilqtfrm.ui" line="1010"/>
         <source>Uninstall &amp;Rockbox</source>
         <translation>הסרת &amp;רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1017"/>
+        <location filename="../rbutilqtfrm.ui" line="1015"/>
         <source>Read PDF manual</source>
         <translation>קריאת מדריך למשתמש מסוג PDF</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1022"/>
+        <location filename="../rbutilqtfrm.ui" line="1020"/>
         <source>Read HTML manual</source>
         <translation>קריאת מדריך למשתמש מסוג HTML</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1027"/>
+        <location filename="../rbutilqtfrm.ui" line="1025"/>
         <source>Download PDF manual</source>
         <translation>הורדת מדריך למשתמש מסוג PDF</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1032"/>
+        <location filename="../rbutilqtfrm.ui" line="1030"/>
         <source>Download HTML manual (zip)</source>
         <translation>הורדת מדריך למשתמש מסוג HTML (קובץ zip)</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1041"/>
+        <location filename="../rbutilqtfrm.ui" line="1039"/>
         <source>Create &amp;Voice File</source>
         <translation>יצירת קובץ &amp;הקראת תפריטים</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1044"/>
+        <location filename="../rbutilqtfrm.ui" line="1042"/>
         <source>Create Voice File</source>
         <translation>יצירת קובץ הקראת תפריטים</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1049"/>
+        <location filename="../rbutilqtfrm.ui" line="1047"/>
         <source>&amp;System Info</source>
         <translation>&amp;מידע מערכת</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="1054"/>
+        <location filename="../rbutilqtfrm.ui" line="1052"/>
         <source>System &amp;Trace</source>
         <translation>יומן רי&amp;צת מערכת</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="166"/>
+        <location filename="../rbutilqtfrm.ui" line="167"/>
         <source>Minimal Installation</source>
         <translation>התקנה מינימאלית</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="183"/>
+        <location filename="../rbutilqtfrm.ui" line="184"/>
         <source>&lt;b&gt;Minimal installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.</source>
         <translation>&lt;b&gt;התקנה מינימאלית&lt;/b&gt;&lt;br/&gt;התקנת מנהל האיתחול והגירסה הנוכחית של רוקבוקס. אם אינך מעוניין בחבילת התוספות, בחר באפשרות זו.</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="931"/>
+        <location filename="../rbutilqtfrm.ui" line="929"/>
         <source>&amp;Minimal Installation</source>
         <translation>התקנה מינימא&amp;לית</translation>
     </message>
@@ -2411,7 +2474,7 @@ This will install Rockbox %1. To install the most recent development build avail
 <context>
     <name>SysTrace</name>
     <message>
-        <location filename="../systrace.cpp" line="47"/>
+        <location filename="../systrace.cpp" line="48"/>
         <source>Save system trace log</source>
         <translation>שמור יומן ריצת מערכת</translation>
     </message>
@@ -2752,72 +2815,75 @@ This will install Rockbox %1. To install the most recent development build avail
         <translation>לא נבחרה ערכת נושא</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="101"/>
+        <location filename="../themesinstallwindow.cpp" line="102"/>
         <source>Network error: %1.
 Please check your network and proxy settings.</source>
         <translation>תקלת רשת: %1.
 אנא בדוק את הגדרות הרשת והפרוקסי שלך.</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="114"/>
+        <location filename="../themesinstallwindow.cpp" line="115"/>
         <source>the following error occured:
 %1</source>
         <translation>השגיאה הבאה התרחשה:
 %1</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="120"/>
+        <location filename="../themesinstallwindow.cpp" line="121"/>
         <source>done.</source>
         <translation>הסתיים.</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="187"/>
+        <location filename="../themesinstallwindow.cpp" line="188"/>
         <source>fetching details for %1</source>
         <translation>טוען פרטים עבור %1</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="190"/>
+        <location filename="../themesinstallwindow.cpp" line="191"/>
         <source>fetching preview ...</source>
         <translation>טוען תצוגה מקדימה...</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="203"/>
+        <location filename="../themesinstallwindow.cpp" line="204"/>
         <source>&lt;b&gt;Author:&lt;/b&gt; %1&lt;hr/&gt;</source>
-        <translation>&lt;b&gt;יוצר:&lt;/b&gt; %1&lt;hr/&gt;</translation>
+        <translatorcomment>Keep in English</translatorcomment>
+        <translation>&lt;b&gt;Author:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="204"/>
-        <location filename="../themesinstallwindow.cpp" line="206"/>
+        <location filename="../themesinstallwindow.cpp" line="205"/>
+        <location filename="../themesinstallwindow.cpp" line="207"/>
         <source>unknown</source>
         <translation>לא ידוע</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="205"/>
+        <location filename="../themesinstallwindow.cpp" line="206"/>
         <source>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</source>
-        <translation>&lt;b&gt;גירסה:&lt;/b&gt; %1&lt;hr/&gt;</translation>
-    </message>
-    <message>
-        <location filename="../themesinstallwindow.cpp" line="207"/>
-        <source>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</source>
-        <translation>&lt;b&gt;תיאור:&lt;/b&gt; %1&lt;hr/&gt;</translation>
+        <translatorcomment>Keep in English</translatorcomment>
+        <translation type="unfinished">&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
         <location filename="../themesinstallwindow.cpp" line="208"/>
+        <source>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</source>
+        <translatorcomment>Keep in English</translatorcomment>
+        <translation type="unfinished">&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</translation>
+    </message>
+    <message>
+        <location filename="../themesinstallwindow.cpp" line="209"/>
         <source>no description</source>
         <translation>אין תיאור</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="251"/>
+        <location filename="../themesinstallwindow.cpp" line="252"/>
         <source>no theme preview</source>
         <translation>אין תצוגה מקדימה של ערכת נושא</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="282"/>
+        <location filename="../themesinstallwindow.cpp" line="283"/>
         <source>getting themes information ...</source>
         <translation>מוריד מידע על ערכות הנושא...</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="330"/>
+        <location filename="../themesinstallwindow.cpp" line="331"/>
         <source>Mount point is wrong!</source>
         <translation>נקודת העיגון שגויה!</translation>
     </message>
@@ -2827,12 +2893,12 @@ Please check your network and proxy settings.</source>
         <translation>אין בחירה</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="157"/>
+        <location filename="../themesinstallwindow.cpp" line="158"/>
         <source>Information</source>
         <translation>מידע</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themesinstallwindow.cpp" line="174"/>
+        <location filename="../themesinstallwindow.cpp" line="175"/>
         <source>Download size %L1 kiB (%n item(s))</source>
         <translation type="unfinished">
             <numerusform>גודל הורדה kiB %L1 (פריט אחד)</numerusform>
@@ -2840,7 +2906,7 @@ Please check your network and proxy settings.</source>
         </translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="239"/>
+        <location filename="../themesinstallwindow.cpp" line="240"/>
         <source>Retrieving theme preview failed.
 HTTP response code: %1</source>
         <translation>נכשלה תצורגה מקדימה של ערכת נושא.
@@ -3236,12 +3302,12 @@ HTTP response code: %1</translation>
 <context>
     <name>aboutBox</name>
     <message>
-        <location filename="../aboutbox.ui" line="13"/>
+        <location filename="../aboutbox.ui" line="14"/>
         <source>About Rockbox Utility</source>
         <translation>אודות תוכנת השרות של רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../aboutbox.ui" line="35"/>
+        <location filename="../aboutbox.ui" line="36"/>
         <source>The Rockbox Utility</source>
         <translation>תוכנת השרות של רוקבוקס</translation>
     </message>
@@ -3249,23 +3315,23 @@ HTTP response code: %1</translation>
         <source>http://www.rockbox.org</source>
         <translation type="obsolete">http://www.rockbox.org</translation>
     </message>
-    <message>
-        <location filename="../aboutbox.ui" line="57"/>
+    <message utf8="true">
+        <location filename="../aboutbox.ui" line="58"/>
         <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2009 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../aboutbox.ui" line="77"/>
+        <location filename="../aboutbox.ui" line="78"/>
         <source>&amp;Credits</source>
         <translation>&amp;תודות</translation>
     </message>
     <message>
-        <location filename="../aboutbox.ui" line="109"/>
+        <location filename="../aboutbox.ui" line="110"/>
         <source>&amp;License</source>
         <translation>&amp;רישיון</translation>
     </message>
     <message>
-        <location filename="../aboutbox.ui" line="151"/>
+        <location filename="../aboutbox.ui" line="152"/>
         <source>&amp;Ok</source>
         <translation>&amp;אישור</translation>
     </message>
