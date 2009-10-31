@@ -182,6 +182,7 @@ enum {
 /* 8x8 bubbles (Sansa C200) */
 #elif ((LCD_HEIGHT == 80) && (LCD_WIDTH == 132))
 #define XOFS          45
+#define ROW_HEIGHT     6
 #define MAX_FPS       30
 
 /* 7x7 bubbles (Sansa Clip/m200) */
