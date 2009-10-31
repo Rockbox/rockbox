@@ -123,7 +123,7 @@ static void set_page_tables(void)
     map_section(0, 0, 0x1000, CACHE_NONE); 
     
     /* map RAM to 0 and enable caching for it */
-    map_section(0x30000000, 0, 32, CACHE_ALL); 
+    map_section(0x30000000, 0, MEMORYSIZE, CACHE_ALL); 
     
     /* enable buffered writing for the framebuffer */
     map_section((int)FRAME, (int)FRAME, 1, BUFFERED); 
