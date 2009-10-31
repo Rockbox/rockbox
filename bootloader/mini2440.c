@@ -73,7 +73,8 @@ int main(void)
 /*    mini2440_test(); */  
         
     /* Show debug messages if button is pressed */
-    if(button_read_device() & BUTTON_MENU) 
+    int touch_data;
+    if(button_read_device(&touch_data) & BUTTON_MENU) 
         verbose = true;
         
     printf("Rockbox boot loader");

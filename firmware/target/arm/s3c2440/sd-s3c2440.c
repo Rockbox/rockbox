@@ -811,19 +811,23 @@ int sd_read_sectors(IF_MD2(int card_no,) unsigned long start, int incount,
 }
 
 /*****************************************************************************/
-#ifndef X_BOOTLOADER
-/* writing not required for Bootloader - or is it? */
 int sd_write_sectors(IF_MD2(int card_no,) unsigned long start, int count,
                       const void* outbuf)
 {
-#ifndef HAVE_MULTIDRIVE
-    const int card_no = 0;
+#ifdef BOOTLOADER /* we don't need write support in bootloader */
+#ifdef HAVE_MULTIDRIVE
+    (void) drive;
 #endif
+    (void) start;
+    (void) count;
+    (void) outbuf;
+    return -1;
+#else
     dbgprintf ("sd_write %d %x %d\n", card_no, start, count);
     
-    return sd_transfer_sectors(IF_MD2(card_no,) start, count, outbuf, true);
+    return sd_transfer_sectors(IF_MD2(card_no,) start, count, (void*)outbuf, true);
+#endif    
 }
-#endif /* BOOTLOADER */
 /*****************************************************************************/
 
 void sd_enable(bool on)
