@@ -1243,10 +1243,16 @@ void button_event(int key, bool pressed)
      * implementation (look at button-e200.c for example if you are trying to 
      * figure out why using button_get_data needed a hack before).
      */
-#if defined(BUTTON_SCROLL_FWD) && defined(BUTTON_SCROLL_BACK)
+#if defined(HAVE_WHEEL_ACCELERATION)
     if((new_btn == BUTTON_SCROLL_FWD || new_btn == BUTTON_SCROLL_BACK) && 
         pressed)
     {
+        /* Clear these buttons from the data - adding them to the queue is
+         *  handled in the scrollwheel drivers for the targets.  They do not
+         *  store the scroll forward/back buttons in their button data for
+         *  the button_read call.
+         */
+        btn &= ~(BUTTON_SCROLL_FWD | BUTTON_SCROLL_BACK);
         queue_post(&button_queue, new_btn, 1<<24);
     }
 #endif
