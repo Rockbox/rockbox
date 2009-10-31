@@ -4210,10 +4210,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Heiti]"
+    *: "Heiti"
   </dest>
   <voice>
     *: ""
@@ -4224,10 +4224,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Listamaður]"
+    *: "Listamaður"
   </dest>
   <voice>
     *: ""
@@ -4238,10 +4238,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Hljómplata]"
+    *: "Hljómplata"
   </dest>
   <voice>
     *: ""
@@ -4252,10 +4252,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Lagnúmer]"
+    *: "Lagnúmer"
   </dest>
   <voice>
     *: ""
@@ -4266,10 +4266,10 @@
   desc: ID3 frame 'genre'
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Tegund]"
+    *: "Tegund"
   </dest>
   <voice>
     *: ""
@@ -4280,10 +4280,10 @@
   desc: ID3 info 'year'
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[Ár]"
+    *: "Ár"
   </dest>
   <voice>
     *: ""
@@ -4294,10 +4294,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Lagalisti]"
+    *: "Lagalisti"
   </dest>
   <voice>
     *: ""
@@ -4308,10 +4308,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Gæði]"
+    *: "Gæði"
   </dest>
   <voice>
     *: ""
@@ -4350,10 +4350,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Tíðni]"
+    *: "Tíðni"
   </dest>
   <voice>
     *: ""
@@ -4364,10 +4364,10 @@
   desc: in browse_id3
   user: core
   <source>
-    *: "[Track gain]"
+    *: "Track gain"
   </source>
   <dest>
-    *: "[Lag hækkun]"
+    *: "Lag hækkun"
   </dest>
   <voice>
     *: ""
@@ -4378,10 +4378,10 @@
   desc: in browse_id3
   user: core
   <source>
-    *: "[Album gain]"
+    *: "Album gain"
   </source>
   <dest>
-    *: "[Albúm hækkun]"
+    *: "Albúm hækkun"
   </dest>
   <voice>
     *: ""
@@ -4392,10 +4392,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Slóð]"
+    *: "Slóð"
   </dest>
   <voice>
     *: ""

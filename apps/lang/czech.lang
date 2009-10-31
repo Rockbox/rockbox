@@ -7399,10 +7399,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Název]"
+    *: "Název"
   </dest>
   <voice>
     *: ""
@@ -7413,10 +7413,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Autor]"
+    *: "Autor"
   </dest>
   <voice>
     *: ""
@@ -7427,10 +7427,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Album]"
+    *: "Album"
   </dest>
   <voice>
     *: ""
@@ -7441,10 +7441,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Č.skladby]"
+    *: "Č.skladby"
   </dest>
   <voice>
     *: ""
@@ -7455,10 +7455,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Žánr]"
+    *: "Žánr"
   </dest>
   <voice>
     *: ""
@@ -7469,10 +7469,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[Rok]"
+    *: "Rok"
   </dest>
   <voice>
     *: ""
@@ -7483,10 +7483,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[Délka]"
+    *: "Délka"
   </dest>
   <voice>
     *: ""
@@ -7497,10 +7497,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Playlist]"
+    *: "Playlist"
   </dest>
   <voice>
     *: ""
@@ -7511,10 +7511,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Datový tok]"
+    *: "Datový tok"
   </dest>
   <voice>
     *: ""
@@ -7525,10 +7525,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[Autor alba]"
+    *: "Autor alba"
   </dest>
   <voice>
     *: ""
@@ -7539,10 +7539,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[Č.disku]"
+    *: "Č.disku"
   </dest>
   <voice>
     *: ""
@@ -7553,10 +7553,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[Komentář]"
+    *: "Komentář"
   </dest>
   <voice>
     *: ""
@@ -7581,10 +7581,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Frekvence]"
+    *: "Frekvence"
   </dest>
   <voice>
     *: ""
@@ -7595,10 +7595,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[Zesílení skladby]"
+    *: "Zesílení skladby"
   </dest>
   <voice>
     *: ""
@@ -7609,10 +7609,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[Zesílení alba]"
+    *: "Zesílení alba"
   </dest>
   <voice>
     *: ""
@@ -7623,10 +7623,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Cesta]"
+    *: "Cesta"
   </dest>
   <voice>
     *: ""
@@ -10944,10 +10944,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[Dílo]"
+    *: "Dílo"
   </dest>
   <voice>
     *: ""

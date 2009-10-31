@@ -7461,10 +7461,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[כותרת]"
+    *: "כותרת"
   </dest>
   <voice>
     *: ""
@@ -7475,10 +7475,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[אמן]"
+    *: "אמן"
   </dest>
   <voice>
     *: ""
@@ -7489,10 +7489,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[אלבום]"
+    *: "אלבום"
   </dest>
   <voice>
     *: ""
@@ -7503,10 +7503,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[מספר שיר]"
+    *: "מספר שיר"
   </dest>
   <voice>
     *: ""
@@ -7517,10 +7517,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[סגנון]"
+    *: "סגנון"
   </dest>
   <voice>
     *: ""
@@ -7531,10 +7531,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[שנה]"
+    *: "שנה"
   </dest>
   <voice>
     *: ""
@@ -7545,10 +7545,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[אורך]"
+    *: "אורך"
   </dest>
   <voice>
     *: ""
@@ -7559,10 +7559,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[רשימת שירים]"
+    *: "רשימת שירים"
   </dest>
   <voice>
     *: ""
@@ -7573,10 +7573,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </dest>
   <voice>
     *: ""
@@ -7587,10 +7587,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[אמן האלבום]"
+    *: "אמן האלבום"
   </dest>
   <voice>
     *: ""
@@ -7601,10 +7601,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[מס' דיסק]"
+    *: "מס' דיסק"
   </dest>
   <voice>
     *: ""
@@ -7615,10 +7615,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[הערה]"
+    *: "הערה"
   </dest>
   <voice>
     *: ""
@@ -7643,10 +7643,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[תדירות]"
+    *: "תדירות"
   </dest>
   <voice>
     *: ""
@@ -7657,10 +7657,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[הגברת שיר]"
+    *: "הגברת שיר"
   </dest>
   <voice>
     *: ""
@@ -7671,10 +7671,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[הגברת אלבום]"
+    *: "הגברת אלבום"
   </dest>
   <voice>
     *: ""
@@ -7685,10 +7685,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[נתיב]"
+    *: "נתיב"
   </dest>
   <voice>
     *: ""
@@ -11011,10 +11011,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[עבודה]"
+    *: "עבודה"
   </dest>
   <voice>
     *: ""

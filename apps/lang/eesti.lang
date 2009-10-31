@@ -5397,10 +5397,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Title]"
+    *: "Title"
   </dest>
   <voice>
     *: ""
@@ -5411,10 +5411,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Artist]"
+    *: "Artist"
   </dest>
   <voice>
     *: ""
@@ -5425,10 +5425,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Album]"
+    *: "Album"
   </dest>
   <voice>
     *: ""
@@ -5439,10 +5439,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </dest>
   <voice>
     *: ""
@@ -5453,10 +5453,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Genre]"
+    *: "Genre"
   </dest>
   <voice>
     *: ""
@@ -5467,10 +5467,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[Year]"
+    *: "Year"
   </dest>
   <voice>
     *: ""
@@ -5481,10 +5481,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[Length]"
+    *: "Length"
   </dest>
   <voice>
     *: ""
@@ -5495,10 +5495,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Playlist]"
+    *: "Playlist"
   </dest>
   <voice>
     *: ""
@@ -5509,10 +5509,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </dest>
   <voice>
     *: ""
@@ -5551,10 +5551,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Frequency]"
+    *: "Frequency"
   </dest>
   <voice>
     *: ""
@@ -5565,10 +5565,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </dest>
   <voice>
     *: ""
@@ -5579,10 +5579,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </dest>
   <voice>
     *: ""
@@ -5593,10 +5593,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Path]"
+    *: "Path"
   </dest>
   <voice>
     *: ""

@@ -4210,10 +4210,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Titel]"
+    *: "Titel"
   </dest>
   <voice>
     *: ""
@@ -4224,10 +4224,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Kunstner]"
+    *: "Kunstner"
   </dest>
   <voice>
     *: ""
@@ -4238,10 +4238,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Album]"
+    *: "Album"
   </dest>
   <voice>
     *: ""
@@ -4252,10 +4252,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Sangnummer]"
+    *: "Sangnummer"
   </dest>
   <voice>
     *: ""
@@ -4266,10 +4266,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Genre]"
+    *: "Genre"
   </dest>
   <voice>
     *: ""
@@ -4280,10 +4280,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[År]"
+    *: "År"
   </dest>
   <voice>
     *: ""
@@ -4294,10 +4294,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Sætliste]"
+    *: "Sætliste"
   </dest>
   <voice>
     *: ""
@@ -4308,10 +4308,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </dest>
   <voice>
     *: ""
@@ -4336,10 +4336,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Frekvens]"
+    *: "Frekvens"
   </dest>
   <voice>
     *: ""
@@ -4350,10 +4350,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[Sang lydstyrke]"
+    *: "Sang lydstyrke"
   </dest>
   <voice>
     *: ""
@@ -4364,10 +4364,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[Album lydstyrke]"
+    *: "Album lydstyrke"
   </dest>
   <voice>
     *: ""
@@ -4378,10 +4378,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Sti]"
+    *: "Sti"
   </dest>
   <voice>
     *: ""
@@ -7285,10 +7285,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[Længde]"
+    *: "Længde"
   </dest>
   <voice>
     *: ""
@@ -9357,10 +9357,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[Kommentar]"
+    *: "Kommentar"
   </dest>
   <voice>
     *: ""
@@ -9949,10 +9949,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[Album kunstner]"
+    *: "Album kunstner"
   </dest>
   <voice>
     *: ""
@@ -10208,10 +10208,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[Disc nummer]"
+    *: "Disc nummer"
   </dest>
   <voice>
     *: ""
@@ -10846,10 +10846,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[Værk]"
+    *: "Værk"
   </dest>
   <voice>
     *: ""

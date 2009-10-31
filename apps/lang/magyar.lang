@@ -7419,10 +7419,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Cím]"
+    *: "Cím"
   </dest>
   <voice>
     *: ""
@@ -7433,10 +7433,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Előadó]"
+    *: "Előadó"
   </dest>
   <voice>
     *: ""
@@ -7447,10 +7447,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Album]"
+    *: "Album"
   </dest>
   <voice>
     *: ""
@@ -7461,10 +7461,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Sorszám]"
+    *: "Sorszám"
   </dest>
   <voice>
     *: ""
@@ -7475,10 +7475,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Műfaj]"
+    *: "Műfaj"
   </dest>
   <voice>
     *: ""
@@ -7489,10 +7489,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[Év]"
+    *: "Év"
   </dest>
   <voice>
     *: ""
@@ -7503,10 +7503,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[Hossz]"
+    *: "Hossz"
   </dest>
   <voice>
     *: ""
@@ -7517,10 +7517,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Lejátszólista]"
+    *: "Lejátszólista"
   </dest>
   <voice>
     *: ""
@@ -7531,10 +7531,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Bitráta]"
+    *: "Bitráta"
   </dest>
   <voice>
     *: ""
@@ -7545,10 +7545,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[Lemez előadója]"
+    *: "Lemez előadója"
   </dest>
   <voice>
     *: ""
@@ -7559,10 +7559,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[Lemez száma]"
+    *: "Lemez száma"
   </dest>
   <voice>
     *: ""
@@ -7573,10 +7573,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[Megjegyzés]"
+    *: "Megjegyzés"
   </dest>
   <voice>
     *: ""
@@ -7601,10 +7601,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Mintavétel]"
+    *: "Mintavétel"
   </dest>
   <voice>
     *: ""
@@ -7615,10 +7615,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[Számonkénti módosítás]"
+    *: "Számonkénti módosítás"
   </dest>
   <voice>
     *: ""
@@ -7629,10 +7629,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[Albumonkénti módosítás]"
+    *: "Albumonkénti módosítás"
   </dest>
   <voice>
     *: ""
@@ -7643,10 +7643,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Elérési út]"
+    *: "Elérési út"
   </dest>
   <voice>
     *: ""
@@ -10967,10 +10967,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[Mű]"
+    *: "Mű"
   </dest>
   <voice>
     *: ""

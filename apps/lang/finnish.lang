@@ -4953,10 +4953,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Kappale]"
+    *: "Kappale"
   </dest>
   <voice>
     *: ""
@@ -4967,10 +4967,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Esittäjä]"
+    *: "Esittäjä"
   </dest>
   <voice>
     *: ""
@@ -4981,10 +4981,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Albumi]"
+    *: "Albumi"
   </dest>
   <voice>
     *: ""
@@ -4995,10 +4995,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Kappalenro]"
+    *: "Kappalenro"
   </dest>
   <voice>
     *: ""
@@ -5009,10 +5009,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Tyylilaji]"
+    *: "Tyylilaji"
   </dest>
   <voice>
     *: ""
@@ -5023,10 +5023,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[Vuosi]"
+    *: "Vuosi"
   </dest>
   <voice>
     *: ""
@@ -5037,10 +5037,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[Pituus]"
+    *: "Pituus"
   </dest>
   <voice>
     *: ""
@@ -5051,10 +5051,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Soittolista]"
+    *: "Soittolista"
   </dest>
   <voice>
     *: ""
@@ -5065,10 +5065,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Bittinopeus]"
+    *: "Bittinopeus"
   </dest>
   <voice>
     *: ""
@@ -5093,10 +5093,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Taajuus]"
+    *: "Taajuus"
   </dest>
   <voice>
     *: ""
@@ -5107,10 +5107,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[Kappalevahvistus]"
+    *: "Kappalevahvistus"
   </dest>
   <voice>
     *: ""
@@ -5121,10 +5121,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[Albumivahvistus]"
+    *: "Albumivahvistus"
   </dest>
   <voice>
     *: ""
@@ -5135,10 +5135,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Polku]"
+    *: "Polku"
   </dest>
   <voice>
     *: ""
@@ -9790,10 +9790,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[Albumin esittäjä]"
+    *: "Albumin esittäjä"
   </dest>
   <voice>
     *: ""
@@ -9804,10 +9804,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[Kommentti]"
+    *: "Kommentti"
   </dest>
   <voice>
     *: ""
@@ -10812,10 +10812,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[Levynro]"
+    *: "Levynro"
   </dest>
   <voice>
     *: ""
@@ -10983,10 +10983,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[Työ]"
+    *: "Työ"
   </dest>
   <voice>
     *: ""

@@ -7404,10 +7404,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[ชื่อ]"
+    *: "ชื่อ"
   </dest>
   <voice>
     *: ""
@@ -7418,10 +7418,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[นักร้อง]"
+    *: "นักร้อง"
   </dest>
   <voice>
     *: ""
@@ -7432,10 +7432,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[อัลบัม]"
+    *: "อัลบัม"
   </dest>
   <voice>
     *: ""
@@ -7446,10 +7446,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[เพลงที่]"
+    *: "เพลงที่"
   </dest>
   <voice>
     *: ""
@@ -7460,10 +7460,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[ประเภท]"
+    *: "ประเภท"
   </dest>
   <voice>
     *: ""
@@ -7474,10 +7474,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[ปี]"
+    *: "ปี"
   </dest>
   <voice>
     *: ""
@@ -7488,10 +7488,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[ความยาว]"
+    *: "ความยาว"
   </dest>
   <voice>
     *: ""
@@ -7502,10 +7502,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[รายการเพลง]"
+    *: "รายการเพลง"
   </dest>
   <voice>
     *: ""
@@ -7516,10 +7516,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </dest>
   <voice>
     *: ""
@@ -7530,10 +7530,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[ศิลปิน]"
+    *: "ศิลปิน"
   </dest>
   <voice>
     *: ""
@@ -7544,10 +7544,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[แผ่นที่]"
+    *: "แผ่นที่"
   </dest>
   <voice>
     *: ""
@@ -7558,10 +7558,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[หมายเหตุ]"
+    *: "หมายเหตุ"
   </dest>
   <voice>
     *: ""
@@ -7586,10 +7586,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[ความถี่]"
+    *: "ความถี่"
   </dest>
   <voice>
     *: ""
@@ -7600,10 +7600,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[อัตราขยายของเพลง]"
+    *: "อัตราขยายของเพลง"
   </dest>
   <voice>
     *: ""
@@ -7614,10 +7614,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[อัตราขยายของอัลบัม]"
+    *: "อัตราขยายของอัลบัม"
   </dest>
   <voice>
     *: ""
@@ -7628,10 +7628,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[ที่เก็บ]"
+    *: "ที่เก็บ"
   </dest>
   <voice>
     *: ""
@@ -10953,10 +10953,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[งาน]"
+    *: "งาน"
   </dest>
   <voice>
     *: ""

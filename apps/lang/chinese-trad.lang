@@ -4965,10 +4965,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[標題]"
+    *: "標題"
   </dest>
   <voice>
     *: ""
@@ -4979,10 +4979,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[作者]"
+    *: "作者"
   </dest>
   <voice>
     *: ""
@@ -4993,10 +4993,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[專輯]"
+    *: "專輯"
   </dest>
   <voice>
     *: ""
@@ -5007,10 +5007,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[曲目編號]"
+    *: "曲目編號"
   </dest>
   <voice>
     *: ""
@@ -5021,10 +5021,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[類別]"
+    *: "類別"
   </dest>
   <voice>
     *: ""
@@ -5035,10 +5035,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[年份]"
+    *: "年份"
   </dest>
   <voice>
     *: ""
@@ -5049,10 +5049,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[長度]"
+    *: "長度"
   </dest>
   <voice>
     *: ""
@@ -5063,10 +5063,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[播放清單]"
+    *: "播放清單"
   </dest>
   <voice>
     *: ""
@@ -5077,10 +5077,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[位元率]"
+    *: "位元率"
   </dest>
   <voice>
     *: ""
@@ -5105,10 +5105,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[頻率]"
+    *: "頻率"
   </dest>
   <voice>
     *: ""
@@ -5119,10 +5119,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </dest>
   <voice>
     *: ""
@@ -5133,10 +5133,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </dest>
   <voice>
     *: ""
@@ -5147,10 +5147,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[路徑]"
+    *: "路徑"
   </dest>
   <voice>
     *: ""
@@ -8808,10 +8808,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[註解]"
+    *: "註解"
   </dest>
   <voice>
     *: ""
@@ -9988,10 +9988,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[作品]"
+    *: "作品"
   </dest>
   <voice>
     *: ""
@@ -10295,10 +10295,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[唱片編號]"
+    *: "唱片編號"
   </dest>
   <voice>
     *: ""
@@ -10692,10 +10692,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[專輯作者]"
+    *: "專輯作者"
   </dest>
   <voice>
     *: ""

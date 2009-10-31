@@ -2388,10 +2388,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Naslov]"
+    *: "Naslov"
   </dest>
   <voice>
     *: ""
@@ -2402,10 +2402,10 @@
   desc: in wps 
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Avtor]"
+    *: "Avtor"
   </dest>
   <voice>
     *: ""
@@ -2416,10 +2416,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Album]"
+    *: "Album"
   </dest>
   <voice>
     *: ""
@@ -2430,10 +2430,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Stevika skladbe]"
+    *: "Stevika skladbe"
   </dest>
   <voice>
     *: ""
@@ -2444,10 +2444,10 @@
   desc: ID3 frame 'genre'
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Stil]"
+    *: "Stil"
   </dest>
   <voice>
     *: ""
@@ -2458,10 +2458,10 @@
   desc: ID3 info 'year'
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[Leto]"
+    *: "Leto"
   </dest>
   <voice>
     *: ""
@@ -2472,10 +2472,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Seznam]"
+    *: "Seznam"
   </dest>
   <voice>
     *: ""
@@ -2486,10 +2486,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </dest>
   <voice>
     *: ""
@@ -2500,10 +2500,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Frekvenca]"
+    *: "Frekvenca"
   </dest>
   <voice>
     *: ""
@@ -2514,10 +2514,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Pot]"
+    *: "Pot"
   </dest>
   <voice>
     *: ""

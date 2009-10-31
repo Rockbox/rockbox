@@ -4015,10 +4015,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Título]"
+    *: "Título"
   </dest>
   <voice>
     *: ""
@@ -4029,10 +4029,10 @@
   desc: in wps 
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Artista]"
+    *: "Artista"
   </dest>
   <voice>
     *: ""
@@ -4043,10 +4043,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Disco]"
+    *: "Disco"
   </dest>
   <voice>
     *: ""
@@ -4057,10 +4057,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Nº Pista]"
+    *: "Nº Pista"
   </dest>
   <voice>
     *: ""
@@ -4071,10 +4071,10 @@
   desc: ID3 frame 'genre'
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Xénero]"
+    *: "Xénero"
   </dest>
   <voice>
     *: ""
@@ -4085,10 +4085,10 @@
   desc: ID3 info 'year'
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[Ano]"
+    *: "Ano"
   </dest>
   <voice>
     *: ""
@@ -4099,7 +4099,7 @@
   desc: in wps
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
     *: "Lista de Reprod."
@@ -4113,10 +4113,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </dest>
   <voice>
     *: ""
@@ -4127,10 +4127,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Frecuencia]"
+    *: "Frecuencia"
   </dest>
   <voice>
     *: ""
@@ -4141,10 +4141,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Ruta]"
+    *: "Ruta"
   </dest>
   <voice>
     *: ""

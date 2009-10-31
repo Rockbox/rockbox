@@ -3510,10 +3510,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Titel]"
+    *: "Titel"
   </dest>
   <voice>
     *: ""
@@ -3524,10 +3524,10 @@
   desc: in wps 
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Künschtler]"
+    *: "Künschtler"
   </dest>
   <voice>
     *: ""
@@ -3538,10 +3538,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Album]"
+    *: "Album"
   </dest>
   <voice>
     *: ""
@@ -3552,10 +3552,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Lied Nr.]"
+    *: "Lied Nr."
   </dest>
   <voice>
     *: ""
@@ -3566,10 +3566,10 @@
   desc: ID3 frame 'genre'
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Stil]"
+    *: "Stil"
   </dest>
   <voice>
     *: ""
@@ -3580,10 +3580,10 @@
   desc: ID3 info 'year'
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[Jahr]"
+    *: "Jahr"
   </dest>
   <voice>
     *: ""
@@ -3594,10 +3594,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Liederlischta]"
+    *: "Liederlischta"
   </dest>
   <voice>
     *: ""
@@ -3608,10 +3608,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Bitrata]"
+    *: "Bitrata"
   </dest>
   <voice>
     *: ""
@@ -3622,10 +3622,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Frequänz]"
+    *: "Frequänz"
   </dest>
   <voice>
     *: ""
@@ -3636,10 +3636,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Pfad]"
+    *: "Pfad"
   </dest>
   <voice>
     *: ""

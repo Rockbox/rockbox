@@ -700,10 +700,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[النوع]"
+    *: "النوع"
   </dest>
   <voice>
     *: ""
@@ -818,10 +818,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[الفنان]"
+    *: "الفنان"
   </dest>
   <voice>
     *: ""
@@ -3105,10 +3105,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[فنان الألبوم]"
+    *: "فنان الألبوم"
   </dest>
   <voice>
     *: ""
@@ -4470,10 +4470,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[تعليق]"
+    *: "تعليق"
   </dest>
   <voice>
     *: ""
@@ -4622,10 +4622,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[قائمة التشغيل]"
+    *: "قائمة التشغيل"
   </dest>
   <voice>
     *: ""
@@ -5431,10 +5431,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[التردد]"
+    *: "التردد"
   </dest>
   <voice>
     *: ""
@@ -5715,10 +5715,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[العنوان]"
+    *: "العنوان"
   </dest>
   <voice>
     *: ""
@@ -5836,10 +5836,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[السنة]"
+    *: "السنة"
   </dest>
   <voice>
     *: ""
@@ -6022,10 +6022,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[معدل البت]"
+    *: "معدل البت"
   </dest>
   <voice>
     *: ""
@@ -6236,10 +6236,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[البوم]"
+    *: "البوم"
   </dest>
   <voice>
     *: ""
@@ -6270,10 +6270,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[طول]"
+    *: "طول"
   </dest>
   <voice>
     *: ""

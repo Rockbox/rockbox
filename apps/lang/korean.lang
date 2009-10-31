@@ -3255,7 +3255,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "[문자 흐름 속도 설정을 미리보기 위한 예시입니다]"
+    *: "문자 흐름 속도 설정을 미리보기 위한 예시입니다"
   </dest>
   <voice>
     *: ""
@@ -3297,7 +3297,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "[문자 흐름 크기 설정을 미리보기 위한 예시입니다]"
+    *: "문자 흐름 크기 설정을 미리보기 위한 예시입니다"
   </dest>
   <voice>
     *: ""
@@ -4976,10 +4976,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[제목]"
+    *: "제목"
   </dest>
   <voice>
     *: ""
@@ -4990,10 +4990,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[음악가]"
+    *: "음악가"
   </dest>
   <voice>
     *: ""
@@ -5004,10 +5004,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[앨범]"
+    *: "앨범"
   </dest>
   <voice>
     *: ""
@@ -5018,10 +5018,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[트랙 번호]"
+    *: "트랙 번호"
   </dest>
   <voice>
     *: ""
@@ -5032,10 +5032,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[장르]"
+    *: "장르"
   </dest>
   <voice>
     *: ""
@@ -5046,10 +5046,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[연도]"
+    *: "연도"
   </dest>
   <voice>
     *: ""
@@ -5060,10 +5060,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[길이]"
+    *: "길이"
   </dest>
   <voice>
     *: ""
@@ -5074,10 +5074,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[재생순서]"
+    *: "재생순서"
   </dest>
   <voice>
     *: ""
@@ -5088,10 +5088,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[비트 전송률]"
+    *: "비트 전송률"
   </dest>
   <voice>
     *: ""
@@ -5116,10 +5116,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[오디오 샘플 속도]"
+    *: "오디오 샘플 속도"
   </dest>
   <voice>
     *: ""
@@ -5130,10 +5130,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[트랙 게인]"
+    *: "트랙 게인"
   </dest>
   <voice>
     *: ""
@@ -5144,10 +5144,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[앨범 게인]"
+    *: "앨범 게인"
   </dest>
   <voice>
     *: ""
@@ -5158,10 +5158,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[파일 위치]"
+    *: "파일 위치"
   </dest>
   <voice>
     *: ""
@@ -9810,10 +9810,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[앨범 음악가]"
+    *: "앨범 음악가"
   </dest>
   <voice>
     *: ""
@@ -9824,10 +9824,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[설명]"
+    *: "설명"
   </dest>
   <voice>
     *: ""
@@ -11310,10 +11310,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[작업]"
+    *: "작업"
   </dest>
   <voice>
     *: ""
@@ -11533,10 +11533,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[디스크 번호]"
+    *: "디스크 번호"
   </dest>
   <voice>
     *: ""

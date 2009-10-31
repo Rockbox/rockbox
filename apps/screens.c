@@ -649,7 +649,9 @@ static const char* id3_get_info(int selected_item, void* data,
     int info_no=selected_item/2;
     if(!(selected_item%2))
     {/* header */
-        return(str(id3_headers[info->info_id[info_no]]));
+        snprintf(buffer, buffer_len,
+                 "[%s]", str(id3_headers[info->info_id[info_no]]));
+        return buffer;
     }
     else
     {/* data */

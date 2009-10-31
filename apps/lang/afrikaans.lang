@@ -1197,10 +1197,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Titel]"
+    *: "Titel"
   </dest>
   <voice>
     *: ""
@@ -1211,10 +1211,10 @@
   desc: in wps 
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Kunstenaar]"
+    *: "Kunstenaar"
   </dest>
   <voice>
     *: ""
@@ -1225,10 +1225,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Album]"
+    *: "Album"
   </dest>
   <voice>
     *: ""
@@ -1239,10 +1239,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Liednommer]"
+    *: "Liednommer"
   </dest>
   <voice>
     *: ""
@@ -1253,10 +1253,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Speellys]"
+    *: "Speellys"
   </dest>
   <voice>
     *: ""
@@ -1267,10 +1267,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </dest>
   <voice>
     *: ""
@@ -1281,10 +1281,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Frekwensie]"
+    *: "Frekwensie"
   </dest>
   <voice>
     *: ""
@@ -1295,10 +1295,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Pad]"
+    *: "Pad"
   </dest>
   <voice>
     *: ""

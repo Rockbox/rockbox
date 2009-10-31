@@ -3532,10 +3532,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[साल]"
+    *: "साल"
   </dest>
   <voice>
     *: ""
@@ -3546,10 +3546,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[पलेलिसट]"
+    *: "पलेलिसट"
   </dest>
   <voice>
     *: ""

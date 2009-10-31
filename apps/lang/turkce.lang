@@ -2701,10 +2701,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Adi]"
+    *: "Adi"
   </dest>
   <voice>
     *: ""
@@ -2715,10 +2715,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Sanatci]"
+    *: "Sanatci"
   </dest>
   <voice>
     *: ""
@@ -2729,10 +2729,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Sarki no]"
+    *: "Sarki no"
   </dest>
   <voice>
     *: ""
@@ -2743,10 +2743,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Sarki Listesi]"
+    *: "Sarki Listesi"
   </dest>
   <voice>
     *: ""
@@ -2757,10 +2757,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Frekans]"
+    *: "Frekans"
   </dest>
   <voice>
     *: ""
@@ -2771,10 +2771,10 @@
   desc: in wps
   user: core
   <source>
-    *: "[PATH]"
+    *: "PATH"
   </source>
   <dest>
-    *: "[YOL]"
+    *: "YOL"
   </dest>
   <voice>
     *: ""
@@ -3857,10 +3857,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[Çalış]"
+    *: "Çalış"
   </dest>
   <voice>
     *: ""

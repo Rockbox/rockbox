@@ -7424,10 +7424,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Τίτλος]"
+    *: "Τίτλος"
   </dest>
   <voice>
     *: ""
@@ -7438,10 +7438,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Καλλιτέχνης]"
+    *: "Καλλιτέχνης"
   </dest>
   <voice>
     *: ""
@@ -7452,10 +7452,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Άλμπουμ]"
+    *: "Άλμπουμ"
   </dest>
   <voice>
     *: ""
@@ -7466,10 +7466,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Αριθμός κομματιού]"
+    *: "Αριθμός κομματιού"
   </dest>
   <voice>
     *: ""
@@ -7480,10 +7480,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Είδος]"
+    *: "Είδος"
   </dest>
   <voice>
     *: ""
@@ -7494,10 +7494,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[Χρονιά]"
+    *: "Χρονιά"
   </dest>
   <voice>
     *: ""
@@ -7508,10 +7508,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[Μήκος]"
+    *: "Μήκος"
   </dest>
   <voice>
     *: ""
@@ -7522,10 +7522,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Λίστα αναπαραγωγής]"
+    *: "Λίστα αναπαραγωγής"
   </dest>
   <voice>
     *: ""
@@ -7536,10 +7536,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Ρυθμός μετάδοσης]"
+    *: "Ρυθμός μετάδοσης"
   </dest>
   <voice>
     *: ""
@@ -7550,10 +7550,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[Καλλιτέχνης Άλμπουμ]"
+    *: "Καλλιτέχνης Άλμπουμ"
   </dest>
   <voice>
     *: ""
@@ -7564,10 +7564,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[Αριθμός δίσκου]"
+    *: "Αριθμός δίσκου"
   </dest>
   <voice>
     *: ""
@@ -7578,10 +7578,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[Σχόλειο]"
+    *: "Σχόλειο"
   </dest>
   <voice>
     *: ""
@@ -7606,10 +7606,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Συχνότητα]"
+    *: "Συχνότητα"
   </dest>
   <voice>
     *: ""
@@ -7620,10 +7620,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[Ενίσχυση κομματιού]"
+    *: "Ενίσχυση κομματιού"
   </dest>
   <voice>
     *: ""
@@ -7634,10 +7634,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[Ενίσχυση άλμπουμ]"
+    *: "Ενίσχυση άλμπουμ"
   </dest>
   <voice>
     *: ""
@@ -7648,10 +7648,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Θέση]"
+    *: "Θέση"
   </dest>
   <voice>
     *: ""
@@ -10972,10 +10972,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[Εργασία]"
+    *: "Εργασία"
   </dest>
   <voice>
     *: ""

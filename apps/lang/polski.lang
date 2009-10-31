@@ -7464,10 +7464,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Tytuł]"
+    *: "Tytuł"
   </dest>
   <voice>
     *: ""
@@ -7478,10 +7478,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Wykonawca]"
+    *: "Wykonawca"
   </dest>
   <voice>
     *: ""
@@ -7492,10 +7492,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Album]"
+    *: "Album"
   </dest>
   <voice>
     *: ""
@@ -7506,10 +7506,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Nr utworu]"
+    *: "Nr utworu"
   </dest>
   <voice>
     *: ""
@@ -7520,10 +7520,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Gatunek]"
+    *: "Gatunek"
   </dest>
   <voice>
     *: ""
@@ -7534,10 +7534,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[Rok]"
+    *: "Rok"
   </dest>
   <voice>
     *: ""
@@ -7548,10 +7548,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[Długość]"
+    *: "Długość"
   </dest>
   <voice>
     *: ""
@@ -7562,10 +7562,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Lista odtwarzania]"
+    *: "Lista odtwarzania"
   </dest>
   <voice>
     *: ""
@@ -7576,10 +7576,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Prędkość transmisji]"
+    *: "Prędkość transmisji"
   </dest>
   <voice>
     *: ""
@@ -7590,10 +7590,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[Wykonawca Albumu]"
+    *: "Wykonawca Albumu"
   </dest>
   <voice>
     *: ""
@@ -7604,10 +7604,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[Numer płyty]"
+    *: "Numer płyty"
   </dest>
   <voice>
     *: ""
@@ -7618,10 +7618,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[Komentarz]"
+    *: "Komentarz"
   </dest>
   <voice>
     *: ""
@@ -7646,10 +7646,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Częstotliwość]"
+    *: "Częstotliwość"
   </dest>
   <voice>
     *: ""
@@ -7660,10 +7660,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[Wzm. utworu]"
+    *: "Wzm. utworu"
   </dest>
   <voice>
     *: ""
@@ -7674,10 +7674,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[Wzm. albumu]"
+    *: "Wzm. albumu"
   </dest>
   <voice>
     *: ""
@@ -7688,10 +7688,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Ścieżka]"
+    *: "Ścieżka"
   </dest>
   <voice>
     *: ""
@@ -11012,10 +11012,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[Praca]"
+    *: "Praca"
   </dest>
   <voice>
     *: ""

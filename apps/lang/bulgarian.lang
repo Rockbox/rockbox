@@ -1411,10 +1411,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Заглавие]"
+    *: "Заглавие"
   </dest>
   <voice>
     *: ""
@@ -1425,10 +1425,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Изпълнител]"
+    *: "Изпълнител"
   </dest>
   <voice>
     *: ""
@@ -1439,10 +1439,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Албум]"
+    *: "Албум"
   </dest>
   <voice>
     *: ""
@@ -1453,10 +1453,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Трак№]"
+    *: "Трак№"
   </dest>
   <voice>
     *: ""
@@ -1467,10 +1467,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Плейлист]"
+    *: "Плейлист"
   </dest>
   <voice>
     *: ""
@@ -1481,10 +1481,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Битрейт]"
+    *: "Битрейт"
   </dest>
   <voice>
     *: ""
@@ -1495,10 +1495,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Честота]"
+    *: "Честота"
   </dest>
   <voice>
     *: ""
@@ -1509,10 +1509,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Път]"
+    *: "Път"
   </dest>
   <voice>
     *: ""
@@ -3171,10 +3171,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[Коментар]"
+    *: "Коментар"
   </dest>
   <voice>
     *: ""
@@ -4005,10 +4005,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Стил]"
+    *: "Стил"
   </dest>
   <voice>
     *: ""
@@ -4301,10 +4301,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[Усилване на албума]"
+    *: "Усилване на албума"
   </dest>
   <voice>
     *: ""
@@ -5429,10 +5429,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[година]"
+    *: "година"
   </dest>
   <voice>
     *: ""
@@ -6195,10 +6195,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[усилване на трак]"
+    *: "усилване на трак"
   </dest>
   <voice>
     *: ""
@@ -7284,10 +7284,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[произведение]"
+    *: "произведение"
   </dest>
   <voice>
     *: ""
@@ -7486,10 +7486,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[дължина]"
+    *: "дължина"
   </dest>
   <voice>
     *: ""
@@ -8953,10 +8953,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[ДискNo]"
+    *: "ДискNo"
   </dest>
   <voice>
     *: ""
@@ -10255,10 +10255,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[Албумен изпълнител]"
+    *: "Албумен изпълнител"
   </dest>
   <voice>
     *: ""

@@ -7512,10 +7512,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Pavadinimas]"
+    *: "Pavadinimas"
   </dest>
   <voice>
     *: ""
@@ -7526,10 +7526,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Autorius]"
+    *: "Autorius"
   </dest>
   <voice>
     *: ""
@@ -7540,10 +7540,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Albumas]"
+    *: "Albumas"
   </dest>
   <voice>
     *: ""
@@ -7554,10 +7554,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Įrašo nr.]"
+    *: "Įrašo nr."
   </dest>
   <voice>
     *: ""
@@ -7568,10 +7568,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Žanras]"
+    *: "Žanras"
   </dest>
   <voice>
     *: ""
@@ -7582,10 +7582,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[Metai]"
+    *: "Metai"
   </dest>
   <voice>
     *: ""
@@ -7596,10 +7596,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[Trukmė]"
+    *: "Trukmė"
   </dest>
   <voice>
     *: ""
@@ -7610,10 +7610,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Grojaraštis]"
+    *: "Grojaraštis"
   </dest>
   <voice>
     *: ""
@@ -7624,10 +7624,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Bitreitas]"
+    *: "Bitreitas"
   </dest>
   <voice>
     *: ""
@@ -7638,10 +7638,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[Albumo autorius]"
+    *: "Albumo autorius"
   </dest>
   <voice>
     *: ""
@@ -7652,10 +7652,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[Disko nr.]"
+    *: "Disko nr."
   </dest>
   <voice>
     *: ""
@@ -7666,10 +7666,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[Komentarai]"
+    *: "Komentarai"
   </dest>
   <voice>
     *: ""
@@ -7694,10 +7694,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Dažnis]"
+    *: "Dažnis"
   </dest>
   <voice>
     *: ""
@@ -7708,10 +7708,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[Įrašo stiprinimas]"
+    *: "Įrašo stiprinimas"
   </dest>
   <voice>
     *: ""
@@ -7722,10 +7722,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[Albumo stiprinimas]"
+    *: "Albumo stiprinimas"
   </dest>
   <voice>
     *: ""
@@ -7736,10 +7736,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Kelias]"
+    *: "Kelias"
   </dest>
   <voice>
     *: ""
@@ -11060,10 +11060,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
-    *: "[Darbas]"
+    *: "Darbas"
   </dest>
   <voice>
     *: ""
