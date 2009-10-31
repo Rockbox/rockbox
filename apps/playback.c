@@ -24,7 +24,7 @@
  * play whilst audio is paused */
 
 //#include <stdio.h>
-//#include <string.h>
+#include <string.h>
 //#include <ctype.h>
 
 #include "playback.h"
@@ -50,6 +50,7 @@
 //#include "mp3_playback.h"
 #include "usb.h"
 //#include "storage.h"
+#include "ata.h"
 //#include "screens.h"
 #include "playlist.h"
 #include "pcmbuf.h"

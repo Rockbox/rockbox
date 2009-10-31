@@ -111,7 +111,7 @@ static struct trackdata trackdata[MAX_TRACK_ENTRIES];
 static unsigned int current_track_counter = 0;
 
 /* Play time of the previous track */
-static unsigned long prev_track_elapsed;
+unsigned long prev_track_elapsed;
 
 #ifndef SIMULATOR
 static int track_read_idx = 0;
