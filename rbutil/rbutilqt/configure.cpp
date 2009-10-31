@@ -73,7 +73,6 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
 
     /* Explicitly set some widgets to have left-to-right layout */
     ui.treeDevices->setLayoutDirection(Qt::LeftToRight);
-    ui.treeDevices->setLayoutDirection(Qt::LeftToRight);
     ui.mountPoint->setLayoutDirection(Qt::LeftToRight);
     ui.proxyHost->setLayoutDirection(Qt::LeftToRight);
     ui.proxyPort->setLayoutDirection(Qt::LeftToRight);
