@@ -707,6 +707,7 @@ long gui_wps_show(void)
     bool exit = false;
     bool bookmark = false;
     bool update = false;
+    bool vol_changed = false;
     int i;
     long last_left = 0, last_right = 0;
 
@@ -867,40 +868,12 @@ long gui_wps_show(void)
                 break;
 
             case ACTION_WPS_VOLUP:
-            {
-                FOR_NB_SCREENS(i)
-                    gui_wps[i].data->button_time_volume = current_tick;
                 global_settings.volume++;
-                bool res = false;
-                setvol();
-                FOR_NB_SCREENS(i)
-                {
-                    if(update_onvol_change(&gui_wps[i]))
-                        res = true;
-                }
-                if (res) {
-                    restore = true;
-                    restoretimer = RESTORE_WPS_NEXT_SECOND;
-                }
-            }
-            break;
+                vol_changed = true;
+                break;
             case ACTION_WPS_VOLDOWN:
-            {
-                FOR_NB_SCREENS(i)
-                    gui_wps[i].data->button_time_volume = current_tick;
                 global_settings.volume--;
-                setvol();
-                bool res = false;
-                FOR_NB_SCREENS(i)
-                {
-                    if(update_onvol_change(&gui_wps[i]))
-                        res = true;
-                }
-                if (res) {
-                    restore = true;
-                    restoretimer = RESTORE_WPS_NEXT_SECOND;
-                }
-            }
+                vol_changed = true;
                 break;
             /* fast forward 
                 OR next dir if this is straight after ACTION_WPS_SKIPNEXT */
@@ -1153,6 +1126,23 @@ long gui_wps_show(void)
                 }
                 update = true;
                 break;
+        }
+
+        if (vol_changed)
+        {
+            FOR_NB_SCREENS(i)
+                gui_wps[i].data->button_time_volume = current_tick;
+            bool res = false;
+            setvol();
+            FOR_NB_SCREENS(i)
+            {
+                if(update_onvol_change(&gui_wps[i]))
+                    res = true;
+            }
+            if (res) {
+                restore = true;
+                restoretimer = RESTORE_WPS_NEXT_SECOND;
+            }
         }
 
         if (wps_sync_data.do_full_update || update)
