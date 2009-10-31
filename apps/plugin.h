@@ -67,6 +67,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "dsp.h"
 #include "codecs.h"
 #include "playback.h"
+#include "codec_thread.h"
 #ifdef HAVE_RECORDING
 #include "recording.h"
 #endif

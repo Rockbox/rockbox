@@ -34,7 +34,6 @@
 #include "audio.h"
 #if CONFIG_CODEC == SWCODEC
 #include "thread.h"
-#include "playback.h"
 #include "enc_config.h"
 #if defined(HAVE_SPDIF_IN) || defined(HAVE_SPDIF_OUT)
 #include "spdif.h"

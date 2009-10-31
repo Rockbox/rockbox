@@ -134,6 +134,7 @@ audio_path.c
 #endif /* INPUT_SRC_CAPS != 0 */
 fixedpoint.c
 pcmbuf.c
+codec_thread.c
 playback.c
 codecs.c
 dsp.c

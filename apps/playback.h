@@ -23,6 +23,7 @@
 #define _PLAYBACK_H
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include "config.h"
 
 #ifdef HAVE_ALBUMART
@@ -52,7 +53,6 @@ void playback_release_aa_slot(int slot);
 #endif
 
 /* Functions */
-const char *get_codec_filename(int cod_spec);
 void voice_wait(void);
 bool audio_is_thread_ready(void);
 int audio_track_count(void);
@@ -68,18 +68,53 @@ enum
     AUDIO_WANT_VOICE,
 };
 bool audio_restore_playback(int type); /* Restores the audio buffer to handle the requested playback */
-void codec_thread_do_callback(void (*fn)(void),
-                              unsigned int *codec_thread_id);
+size_t audio_get_filebuflen(void);
+int get_audio_hid(void);
+int *get_codec_hid(void);
+void audio_set_prev_elapsed(unsigned long setting);
+bool audio_is_playing(void);
+bool audio_is_paused(void);
 
+/* Define one constant that includes recording related functionality */
+#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+#define AUDIO_HAVE_RECORDING
+#endif
 
-#if CONFIG_CODEC == SWCODEC /* This #ifdef is better here than gui/wps.c */
-extern void audio_next_dir(void);
-extern void audio_prev_dir(void);
+enum {
+    Q_NULL = 0,
+    Q_AUDIO_PLAY = 1,
+    Q_AUDIO_STOP,
+    Q_AUDIO_PAUSE,
+    Q_AUDIO_SKIP,
+    Q_AUDIO_PRE_FF_REWIND,
+    Q_AUDIO_FF_REWIND,
+    Q_AUDIO_CHECK_NEW_TRACK,
+    Q_AUDIO_FLUSH,
+    Q_AUDIO_TRACK_CHANGED,
+    Q_AUDIO_DIR_SKIP,
+    Q_AUDIO_POSTINIT,
+    Q_AUDIO_FILL_BUFFER,
+    Q_AUDIO_FINISH_LOAD,
+    Q_CODEC_REQUEST_COMPLETE,
+    Q_CODEC_REQUEST_FAILED,
+
+    Q_CODEC_LOAD,
+    Q_CODEC_LOAD_DISK,
+
+#ifdef AUDIO_HAVE_RECORDING
+    Q_ENCODER_LOAD_DISK,
+    Q_ENCODER_RECORD,
+#endif
+
+    Q_CODEC_DO_CALLBACK,
+};
+
+#if CONFIG_CODEC == SWCODEC
+void audio_next_dir(void);
+void audio_prev_dir(void);
 #else
 #define audio_next_dir() ({ })
 #define audio_prev_dir() ({ })
 #endif
 
 #endif
-
-

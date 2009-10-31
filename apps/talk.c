@@ -40,9 +40,6 @@
 #include "logf.h"
 #include "bitswap.h"
 #include "structec.h"
-#if CONFIG_CODEC == SWCODEC
-#include "playback.h"
-#endif
 #include "debug.h"
 
 

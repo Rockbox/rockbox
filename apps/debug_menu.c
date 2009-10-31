@@ -272,9 +272,6 @@ static bool dbg_audio_thread(void)
 }
 #endif /* !SIMULATOR */
 #else /* CONFIG_CODEC == SWCODEC */
-extern size_t filebuflen;
-/* This is a size_t, but call it a long so it puts a - when it's bad. */
-
 static unsigned int ticks, boost_ticks, freq_sum;
 
 static void dbg_audio_task(void)
@@ -296,6 +293,8 @@ static bool dbg_buffering_thread(void)
     size_t bufsize = pcmbuf_get_bufsize();
     int pcmbufdescs = pcmbuf_descs();
     struct buffering_debug d;
+    size_t filebuflen = audio_get_filebuflen();
+    /* This is a size_t, but call it a long so it puts a - when it's bad. */
 
     ticks = boost_ticks = freq_sum = 0;
 

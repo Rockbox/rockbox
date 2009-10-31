@@ -25,7 +25,6 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 
 #include "file.h"
 #include "sprintf.h"
-#include "playback.h"
 #include "logf.h"
 #include "metadata.h"
 #include "kernel.h"
@@ -72,7 +71,7 @@ static unsigned long timestamp;
 
 /* Crude work-around for Archos Sims - return a set amount */
 #if (CONFIG_CODEC != SWCODEC) && defined(SIMULATOR)
-unsigned long audio_prev_elapsed(void)
+static unsigned long audio_prev_elapsed(void)
 {
     return 120000;
 }

@@ -24,7 +24,6 @@
 #include <ctype.h>
 #include <inttypes.h>
 
-#include "playback.h"
 #include "debug.h"
 #include "logf.h"
 #include "cuesheet.h"
