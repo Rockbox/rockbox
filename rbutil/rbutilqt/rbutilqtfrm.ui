@@ -255,9 +255,6 @@
         </item>
         <item row="1" column="0" >
          <widget class="QToolButton" name="buttonRockbox" >
-          <property name="toolTip" >
-           <string>Install Rockbox</string>
-          </property>
           <property name="text" >
            <string>Install Rockbox</string>
           </property>
