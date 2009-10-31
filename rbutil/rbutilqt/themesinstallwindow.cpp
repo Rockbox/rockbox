@@ -35,6 +35,7 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
     ui.themePreview->clear();
     ui.themePreview->setText(tr("no theme selected"));
     ui.labelSize->setText(tr("no selection"));
+    ui.themeDescription->setLayoutDirection(Qt::LeftToRight);
 
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));

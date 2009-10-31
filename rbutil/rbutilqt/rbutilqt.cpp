@@ -89,6 +89,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     ui.treeInfo->setHeaderLabels(QStringList() << tr("File") << tr("Version"));
     ui.treeInfo->expandAll();
     ui.treeInfo->setColumnCount(2);
+    ui.treeInfo->setLayoutDirection(Qt::LeftToRight);
     // disable quick install until version info is available
     ui.buttonSmall->setEnabled(false);
     ui.buttonComplete->setEnabled(false);
@@ -281,6 +282,7 @@ void RbUtilQt::about()
     QDialog *window = new QDialog(this);
     Ui::aboutBox about;
     about.setupUi(window);
+    window->setLayoutDirection(Qt::LeftToRight);
     window->setModal(true);
 
     QFile licence(":/docs/gpl-2.0.html");

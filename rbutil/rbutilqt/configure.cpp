@@ -71,6 +71,17 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     ui.treeDevices->setAlternatingRowColors(true);
     ui.listLanguages->setAlternatingRowColors(true);
 
+    /* Explicitly set some widgets to have left-to-right layout */
+    ui.treeDevices->setLayoutDirection(Qt::LeftToRight);
+    ui.treeDevices->setLayoutDirection(Qt::LeftToRight);
+    ui.mountPoint->setLayoutDirection(Qt::LeftToRight);
+    ui.proxyHost->setLayoutDirection(Qt::LeftToRight);
+    ui.proxyPort->setLayoutDirection(Qt::LeftToRight);
+    ui.proxyUser->setLayoutDirection(Qt::LeftToRight);
+    ui.proxyPass->setLayoutDirection(Qt::LeftToRight);
+    ui.listLanguages->setLayoutDirection(Qt::LeftToRight);
+    ui.cachePath->setLayoutDirection(Qt::LeftToRight);
+
     this->setModal(true);
 
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));

@@ -28,6 +28,7 @@ SysTrace::SysTrace(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
     ui.textTrace->setReadOnly(true);
+    ui.textTrace->setLayoutDirection(Qt::LeftToRight);
     refresh();
 
     connect(ui.buttonClose, SIGNAL(clicked()), this, SLOT(close()));
