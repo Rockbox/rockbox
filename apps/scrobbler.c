@@ -71,7 +71,7 @@ static unsigned long timestamp;
 
 /* Crude work-around for Archos Sims - return a set amount */
 #if (CONFIG_CODEC != SWCODEC) && defined(SIMULATOR)
-static unsigned long audio_prev_elapsed(void)
+unsigned long audio_prev_elapsed(void)
 {
     return 120000;
 }
