@@ -405,7 +405,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     ptr = &lcd_framebuffer[y][x];
 
-    height = ymax - y - 1; /* fix height */
+    height = ymax - y; /* fix height */
     do
     {
         lcd_write_data(ptr, width);
