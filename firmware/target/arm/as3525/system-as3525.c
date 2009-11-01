@@ -111,9 +111,12 @@ struct vec_int_src vec_int_srcs[] =
     { INT_SRC_TIMER2, INT_TIMER2 },
     { INT_SRC_DMAC, INT_DMAC },
     { INT_SRC_NAND, INT_NAND },
+#ifdef HAVE_MULTIDRIVE
     { INT_SRC_MCI0, INT_MCI0 },
+#endif
+#ifdef HAVE_HOTSWAP
     { INT_SRC_GPIOA, INT_GPIOA, },
-    { INT_SRC_GPIOB, INT_GPIOB, },
+#endif
 #ifdef HAVE_RECORDING
     { INT_SRC_I2SIN, INT_I2SIN, },
 #endif
