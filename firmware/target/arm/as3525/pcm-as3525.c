@@ -61,9 +61,6 @@ static void play_start_pcm(void)
     if(size > MAX_TRANSFER)
         size = MAX_TRANSFER;
 
-    if((unsigned int)dma_start_addr & 3)
-        panicf("unaligned pointer!");
-
     dma_size -= size;
     dma_start_addr += size;
 
@@ -148,9 +145,8 @@ void pcm_dma_apply_settings(void)
 {
     unsigned long frequency = pcm_sampr;
 
+    /* TODO : use a table ? */
     const int divider = (((AS3525_PLLA_FREQ/128) + (frequency/2)) / frequency) - 1;
-    if(divider < 0 || divider > 511)
-        panicf("unsupported frequency %ld", frequency);
 
     int cgu_audio = CGU_AUDIO;  /* read register */
     cgu_audio &= ~(511 << 2);   /* clear i2sout divider */
@@ -265,9 +261,6 @@ void pcm_rec_dma_start(void *addr, size_t size)
 {
     rec_start_addr = addr;
     rec_size = size;
-
-    if((unsigned int)addr & 3)
-        panicf("unaligned pointer!");
 
     CGU_PERI |= CGU_I2SIN_APB_CLOCK_ENABLE|CGU_I2SOUT_APB_CLOCK_ENABLE;
     CGU_AUDIO |= ((1<<23)|(1<<11));

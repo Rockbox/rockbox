@@ -132,21 +132,35 @@
 #if (CLK_DIV(AS3525_PLLA_FREQ, AS3525_PCLK_FREQ) - 1) >= (1<<4) /* 4 bits */
 #error PCLK frequency is too low : clock divider will not fit !
 #endif
+
 /*  AS3525_DBOP_FREQ */
 #if (CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ) - 1) >= (1<<3) /* 3 bits */
 #error DBOP frequency is too low : clock divider will not fit !
 #endif
+
 /* AS3525_IDE_FREQ */
 #if (CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1) >= (1<<4) /* 4 bits */
 #error IDE frequency is too low : clock divider will not fit !
 #endif
+
 /* AS3525_I2C_FREQ */
 #if (CLK_DIV(AS3525_PCLK_FREQ, AS3525_I2C_FREQ)) >= (1<<10) /* 2+8 bits */
 #error I2C frequency is too low : clock divider will not fit !
 #endif
+
 /* AS3525_SD_IDENT_FREQ */
 #if ((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SD_IDENT_FREQ) / 2) - 1) >= (1<<8) /* 8 bits */
 #error SD IDENTIFICATION frequency is too low : clock divider will not fit !
+#endif
+
+/* I2SIN / I2SOUT frequencies */
+/* low samplerate */
+#if ((AS3525_PLLA_FREQ/(128*8000))) > 512   /* 8kHz = lowest frequency */
+#error PLLA frequency is too low for 8kHz samplerate !
+#endif
+/* high samplerate */
+#if ((AS3525_PLLA_FREQ/(128*96000))) < 1   /* 96kHz = highest frequency */
+#error PLLA frequency is too high for 96kHz samplerate !
 #endif
 
 #endif /* CLOCK_TARGET_H */
