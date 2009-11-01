@@ -93,6 +93,8 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     // disable quick install until version info is available
     ui.buttonSmall->setEnabled(false);
     ui.buttonComplete->setEnabled(false);
+    ui.actionSmall_Installation->setEnabled(false);
+    ui.actionComplete_Installation->setEnabled(false);
 
     connect(ui.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updateTabs(int)));
     connect(ui.actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
@@ -204,14 +206,12 @@ void RbUtilQt::downloadDone(bool error)
     versmap.insert("rel_rev", info.value(RbSettings::value(RbSettings::CurBuildserverModel).toString()).toString());
     info.endGroup();
 
-    if(versmap.value("rel_rev").isEmpty()) {
-        ui.buttonSmall->setEnabled(false);
-        ui.buttonComplete->setEnabled(false);
-    }
-    else {
-        ui.buttonSmall->setEnabled(true);
-        ui.buttonComplete->setEnabled(true);
-    }
+    bool installable = !versmap.value("rel_rev").isEmpty();
+
+    ui.buttonSmall->setEnabled(installable);
+    ui.buttonComplete->setEnabled(installable);
+    ui.actionSmall_Installation->setEnabled(installable);
+    ui.actionComplete_Installation->setEnabled(installable);
 
     bleeding = new HttpGet(this);
     connect(bleeding, SIGNAL(done(bool)), this, SLOT(downloadBleedingDone(bool)));
@@ -343,24 +343,27 @@ void RbUtilQt::updateSettings()
 
 void RbUtilQt::updateDevice()
 {
-    if(RbSettings::value(RbSettings::CurBootloaderMethod) == "none" ) {
-        ui.buttonBootloader->setEnabled(false);
-        ui.buttonRemoveBootloader->setEnabled(false);
-        ui.labelBootloader->setEnabled(false);
-        ui.labelRemoveBootloader->setEnabled(false);
-    }
-    else {
-        ui.buttonBootloader->setEnabled(true);
-        ui.labelBootloader->setEnabled(true);
-        if(RbSettings::value(RbSettings::CurBootloaderMethod) == "fwpatcher") {
-            ui.labelRemoveBootloader->setEnabled(false);
-            ui.buttonRemoveBootloader->setEnabled(false);
-        }
-        else {
-            ui.labelRemoveBootloader->setEnabled(true);
-            ui.buttonRemoveBootloader->setEnabled(true);
-        }
-    }
+    /* TODO: We should check the flags of the bootloaderinstall classes, and not
+     * just check if its != none or != "fwpatcher" */
+
+    /* Enable bootloader installation, if possible */
+    bool bootloaderInstallable =
+        RbSettings::value(RbSettings::CurBootloaderMethod) != "none";
+    ui.buttonBootloader->setEnabled(bootloaderInstallable);
+    ui.labelBootloader->setEnabled(bootloaderInstallable);
+    ui.actionInstall_Bootloader->setEnabled(bootloaderInstallable);
+
+    /* Enable bootloader uninstallation, if possible */
+    bool bootloaderUninstallable = bootloaderInstallable &&
+        RbSettings::value(RbSettings::CurBootloaderMethod) != "fwpatcher";
+    ui.labelRemoveBootloader->setEnabled(bootloaderUninstallable);
+    ui.buttonRemoveBootloader->setEnabled(bootloaderUninstallable);
+    ui.actionRemove_bootloader->setEnabled(bootloaderUninstallable);
+
+    /* Disable the whole tab widget if configuration is invalid */
+    bool configurationValid = !chkConfig(false);
+    ui.tabWidget->setEnabled(configurationValid);
+    ui.menuA_ctions->setEnabled(configurationValid);
 
     // displayed device info
     QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
