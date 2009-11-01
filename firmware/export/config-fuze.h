@@ -7,15 +7,12 @@
 #define MODEL_NUMBER 43
 #define MODEL_NAME   "Sandisk Sansa Fuze"
 
-#define HW_SAMPR_CAPS       (SAMPR_CAP_44)
+#define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
-#if 0
 /* define this if you have recording possibility */
-#define HAVE_RECORDING
+//#define HAVE_RECORDING
 
-#define REC_SAMPR_CAPS      (SAMPR_CAP_22)
-#define REC_FREQ_DEFAULT    REC_FREQ_22 /* Default is not 44.1kHz */
-#define REC_SAMPR_DEFAULT   SAMPR_22
+#define REC_SAMPR_CAPS      SAMPR_CAP_ALL
 
 /* Default recording levels */
 #define DEFAULT_REC_MIC_GAIN    23
@@ -24,7 +21,6 @@
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
-#endif
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FMRADIO)
 
 /* define this if you have a bitmap LCD display */

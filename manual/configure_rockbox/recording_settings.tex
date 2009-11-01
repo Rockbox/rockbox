@@ -42,11 +42,13 @@
 }
 
   \section{Frequency}
-   \nopt{sansa,sansaAMS}{
+   \nopt{sansa}{
     Choose the recording frequency (sample rate).
     \opt{masf}{48kHz, 44.1kHz, 32kHz, 24kHz, 22.05kHz, 16kHz}
     \opt{h100,h300}{44.1kHz, 22.05kHz and 11.025kHz}
     \opt{x5}{88.2kHz, 44.1kHz, 22.05kHz and 11.025kHz}
+    \opt{sansaAMS}{96kHz, 88.2kHz, 64kHz, 48kHz, 44.1kHz, 32kHz, 24kHz, %
+        22.05kHz, 16kHz, 12kHz, 11.025kHz and 8kHz}
     are available. Higher sample rates use up more disk space, but give better
     sound quality.
     \opt{swcodec}{\note{The 11.025kHz setting is not available when using%
@@ -61,11 +63,11 @@
     \opt{recorder,recorderv2fm,h100}
       {\note{You cannot change the sample rate for digital recordings.}
     }
-   } % nopt e200  
-   \opt{e200,e200v2}{ 
+   } % nopt sansa
+   \opt{sansa}{
        Recordings can only be made at a 22.05kHz frequency (sample rate)
          on this \dap. 
-    } % opt e200
+    } % opt sansa
 
 \section{Source}
   Choose the source of the recording. The options are: 

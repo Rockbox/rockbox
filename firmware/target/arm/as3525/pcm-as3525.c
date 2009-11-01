@@ -69,6 +69,10 @@ static void play_start_pcm(void)
 
     CGU_PERI |= CGU_I2SOUT_APB_CLOCK_ENABLE;
     CGU_AUDIO |= (1<<11);
+#ifdef HAVE_RECORDING
+    CGU_PERI &= ~CGU_I2SIN_APB_CLOCK_ENABLE;
+    CGU_AUDIO &= ~(1<<23);
+#endif
 
     clean_dcache_range((void*)addr, size);  /* force write back */
     dma_enable_channel(1, (void*)addr, (void*)I2SOUT_DATA, DMA_PERI_I2SOUT,
@@ -130,9 +134,7 @@ void pcm_play_dma_init(void)
     /* clock source PLLA, minimal frequency */
     CGU_AUDIO |= (511<<2) | (1<<0);
 
-    I2SOUT_CONTROL |= (1<<6) ;  /* enable dma */
-    I2SOUT_CONTROL |= (1<<3) ;  /* stereo */
-    I2SOUT_CONTROL &= ~(1<<2);  /* 16 bit samples */
+    I2SOUT_CONTROL = (1<<6)|(1<<3)  /* enable dma, stereo */;
 
     audiohw_preinit();
 }
@@ -153,7 +155,7 @@ void pcm_dma_apply_settings(void)
     int cgu_audio = CGU_AUDIO;  /* read register */
     cgu_audio &= ~(511 << 2);   /* clear i2sout divider */
     cgu_audio |= divider << 2;  /* set new i2sout divider */
-#if 0
+#ifdef HAVE_RECORDING
     cgu_audio &= ~(511 << 14);  /* clear i2sin divider */
     cgu_audio |= divider << 14; /* set new i2sin divider */
 #endif
@@ -185,43 +187,130 @@ void * pcm_dma_addr(void *addr)
  ** Recording DMA transfer
  **/
 #ifdef HAVE_RECORDING
+
+static int rec_locked = 0;
+static unsigned int *rec_start_addr;
+static size_t      rec_size;
+
+
 void pcm_rec_lock(void)
 {
+    if(++rec_locked == 1)
+        VIC_INT_EN_CLEAR = INTERRUPT_I2SIN;
 }
+
 
 void pcm_rec_unlock(void)
 {
+    if(--rec_locked == 0)
+        VIC_INT_ENABLE |= INTERRUPT_I2SIN;
 }
+
 
 void pcm_record_more(void *start, size_t size)
 {
-    (void)start;
-    (void)size;
+    rec_start_addr = start;
+    rec_size = size;
 }
+
 
 void pcm_rec_dma_stop(void)
 {
+    VIC_INT_EN_CLEAR = INTERRUPT_I2SIN;
+
+    I2SOUT_CONTROL &= ~(1<<5); /* source = i2soutif fifo */
+    CGU_AUDIO &= ~((1<<23)|(1<<11));
+    CGU_PERI &= ~(CGU_I2SIN_APB_CLOCK_ENABLE|CGU_I2SOUT_APB_CLOCK_ENABLE);
 }
+
+
+void INT_I2SIN(void)
+{
+    register int status;
+    register pcm_more_callback_type2 more_ready;
+
+    status = I2SIN_STATUS;
+
+#if 0   /* FIXME */
+    if ( status & ((1<<6)|(1<<0)) ) /* errors */
+        panicf("i2sin error: 0x%x = %s %s", status,
+            (status & (1<<6)) ? "push" : "",
+            (status & (1<<0)) ? "pop" : ""
+        );
+#endif
+
+    while (((I2SIN_RAW_STATUS & (1<<5)) == 0) && rec_size)
+    {
+        /* 14 bits per sample = 1 32 bits word */
+        *rec_start_addr++ = *I2SIN_DATA;
+        rec_size -= 4;
+    }
+
+    I2SIN_CLEAR = status;
+
+    if(!rec_size)
+    {
+        more_ready = pcm_callback_more_ready;
+        if(!more_ready || more_ready(0) < 0)
+        {
+            /* Finished recording */
+            pcm_rec_dma_stop();
+            pcm_rec_dma_stopped_callback();
+        }
+    }
+}
+
 
 void pcm_rec_dma_start(void *addr, size_t size)
 {
-    (void)addr;
-    (void)size;
+    rec_start_addr = addr;
+    rec_size = size;
+
+    if((unsigned int)addr & 3)
+        panicf("unaligned pointer!");
+
+    CGU_PERI |= CGU_I2SIN_APB_CLOCK_ENABLE|CGU_I2SOUT_APB_CLOCK_ENABLE;
+    CGU_AUDIO |= ((1<<23)|(1<<11));
+
+    I2SOUT_CONTROL |= 1<<5; /* source = loopback from i2sin fifo */
+
+    /* 14 bits samples, i2c clk src = I2SOUTIF, sdata src = AFE,
+     * data valid at positive edge of SCLK */
+    I2SIN_CONTROL = (1<<5) | (1<<2);
+
+    unsigned long tmp;
+    while ( ( I2SIN_RAW_STATUS & ( 1<<5 ) ) == 0 )
+        tmp = *I2SIN_DATA; /* FLUSH FIFO */
+    I2SIN_CLEAR = (1<<6)|(1<<0);    /* push error, pop error */
+    I2SIN_MASK =    (1<<6) | (1<<0) |
+                    (1<<3) | (1<<2) | (1<<1); /* half full, almost full, full */
+
+    VIC_INT_ENABLE |= INTERRUPT_I2SIN;
 }
+
 
 void pcm_rec_dma_close(void)
 {
+    pcm_rec_dma_stop();
 }
 
 
 void pcm_rec_dma_init(void)
 {
+    pcm_dma_apply_settings();
 }
 
 
 const void * pcm_rec_dma_get_peak_buffer(int *count)
 {
-    (void)count;
+    const void *peak_buffer;
+
+    pcm_rec_lock();
+    *count = rec_size >> 2;
+    peak_buffer = (const void*)rec_start_addr;
+    pcm_rec_unlock();
+
+    return peak_buffer;
 }
 
 #endif /* HAVE_RECORDING */

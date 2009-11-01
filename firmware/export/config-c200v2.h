@@ -9,18 +9,12 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 #define FIRMWARE_OFFSET_FILE_CRC 0
 
-#if 0
-
-#define HW_SAMPR_CAPS       (SAMPR_CAP_44)
+#define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
 /* define this if you have recording possibility */
-#define HAVE_RECORDING
+//#define HAVE_RECORDING
 
-#define REC_SAMPR_CAPS      (SAMPR_CAP_22)
-#define REC_FREQ_DEFAULT    REC_FREQ_22 /* Default is not 44.1kHz */
-#define REC_SAMPR_DEFAULT   SAMPR_22
-
-#endif
+#define REC_SAMPR_CAPS      SAMPR_CAP_ALL
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */

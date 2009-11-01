@@ -25,44 +25,71 @@
 #include "audiohw.h"
 #include "sound.h"
 
-int audio_channels = 2;
-int audio_output_source = AUDIO_SRC_PLAYBACK;
-
 void audio_set_output_source(int source)
 {
-    if ((unsigned)source >= AUDIO_NUM_SOURCES)
-        source = AUDIO_SRC_PLAYBACK;
-
-    audio_output_source = source;
-} /* audio_set_output_source */
+    (void)source;
+}
 
 void audio_input_mux(int source, unsigned flags)
 {
     static int last_source = AUDIO_SRC_PLAYBACK;
-
-    (void)flags;
+#ifdef HAVE_RECORDING
+    static bool last_recording = false;
+    const bool recording = flags & SRCF_RECORDING;
+#else
+    (void) flags;
+#endif
 
     switch (source)
     {
         default:                        /* playback - no recording */
             source = AUDIO_SRC_PLAYBACK;
         case AUDIO_SRC_PLAYBACK:
-            audio_channels = 2;
             if (source != last_source)
             {
                 audiohw_set_monitor(false);
+#ifdef HAVE_RECORDING
+                audiohw_disable_recording();
+#endif
             }
             break;
 
+#ifdef HAVE_RECORDING
+        case AUDIO_SRC_MIC:             /* recording only */
+            if (source != last_source)
+            {
+                audiohw_set_monitor(false);
+                audiohw_enable_recording(true);  /* source mic */
+            }
+            break;
+#endif
+
         case AUDIO_SRC_FMRADIO:         /* recording and playback */
-            audio_channels = 2;
-            if (source == last_source)
+            if (source == last_source
+#ifdef HAVE_RECORDING
+                    && recording == last_recording
+#endif
+                )
                 break;
 
-            audiohw_set_monitor(true);
+#ifdef HAVE_RECORDING
+            last_recording = recording;
+
+            if (recording)
+            {
+                audiohw_set_monitor(false);
+                audiohw_enable_recording(false);
+            }
+            else
+#endif
+            {
+#ifdef HAVE_RECORDING
+                audiohw_disable_recording();
+#endif
+                audiohw_set_monitor(true); /* line 2 analog audio path */
+            }
             break;
-    } /* end switch */
+    }
 
     last_source = source;
-} /* audio_input_mux */
-
+}

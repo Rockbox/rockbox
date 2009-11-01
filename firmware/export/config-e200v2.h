@@ -7,17 +7,13 @@
 #define MODEL_NUMBER 41
 #define MODEL_NAME   "Sandisk Sansa e200v2 series"
 
-#define HW_SAMPR_CAPS       (SAMPR_CAP_44)
+#define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
-#if 0
 /* define this if you have recording possibility */
-#define HAVE_RECORDING
+//#define HAVE_RECORDING
 
-#define REC_SAMPR_CAPS      (SAMPR_CAP_22)
-#define REC_FREQ_DEFAULT    REC_FREQ_22 /* Default is not 44.1kHz */
-#define REC_SAMPR_DEFAULT   SAMPR_22
+#define REC_SAMPR_CAPS      SAMPR_CAP_ALL
 
-#endif
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FMRADIO)

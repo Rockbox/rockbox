@@ -507,4 +507,15 @@ interface */
 #define USB_NUM_ENDPOINTS 4
 #define USB_DEVBSS_ATTR IBSS_ATTR
 
+/* I2SIN registers */
+
+#define I2SIN_CONTROL      (*(volatile unsigned long*)(I2SIN_BASE+0x00))
+#define I2SIN_MASK         (*(volatile unsigned char*)(I2SIN_BASE+0x04))
+#define I2SIN_RAW_STATUS   (*(volatile unsigned char*)(I2SIN_BASE+0x08))
+#define I2SIN_STATUS       (*(volatile unsigned char*)(I2SIN_BASE+0x0C))
+#define I2SIN_CLEAR        (*(volatile unsigned char*)(I2SIN_BASE+0x10))
+#define I2SIN_DATA         (volatile unsigned long*)(I2SIN_BASE+0x14)
+#define I2SIN_SPDIF_STATUS (*(volatile unsigned long*)(I2SIN_BASE+0x18))
+
+
 #endif /*__AS3525_H__*/
