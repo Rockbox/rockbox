@@ -26,6 +26,9 @@
 #include "config.h"
 #include "cpu.h"
 
+#define CACHE_NONE  0
+#define CACHE_ALL   0x0C
+#define BUFFERED    0x04
 /****************************************************************************/
 #ifdef TOSHIBA_GIGABEAT_F
 
@@ -501,19 +504,19 @@ donecopy:
     ldr     r0, =0x0
     ldr     r1, =0x0
     ldr     r2, =0x1000
-    mov     r3, #0
+    mov     r3, #CACHE_NONE
     bl      map_section
 
     ldr     r0, =0x30000000
     ldr     r1, =0x0
-    mov     r2, #32
-    mov     r3, #12
+    mov     r2, #MEMORYSIZE
+    mov     r3, #CACHE_ALL
     bl      map_section
 
-    ldr     r0, =0x31FD6800     /* FRAME */
+    ldr     r0, =LCD_FRAME_ADDR    /* LCD Frame buffer */
     mov     r1, r0
     mov     r2, #1
-    mov     r3, #4
+    mov     r3, #BUFFERED
     bl      map_section        
     
     bl      enable_mmu   
