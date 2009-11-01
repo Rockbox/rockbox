@@ -1387,6 +1387,83 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
     return skip;
 }
 
+
+/*
+ * Returns the number of bytes to skip the buf pointer to access the false
+ * branch in a _binary_ conditional
+ *
+ * That is:
+ *  - before the '|' if we have a false branch, (%?<true|false> -> %?<|false>)
+ *  - or before the closing '>' if there's no false branch (%?<true> -> %?<>)
+ *
+ * depending on the features of a target it's not called from check_feature_tag,
+ * hence the __attribute__ or it issues compiler warnings
+ *
+ **/
+
+static int find_false_branch(const char *wps_bufptr) __attribute__((unused));
+static int find_false_branch(const char *wps_bufptr)
+{
+    const char *buf = wps_bufptr;
+    /* wps_bufptr is after the opening '<', hence level = 1*/
+    int level = 1;
+    char ch;
+    do
+    {
+        ch = *buf;
+        if (ch == '%')
+        {   /* filter out the characters we check later if they're printed
+             * as literals */
+            ch = *(++buf);
+            if (ch == '<' || ch == '>' || ch == '|')
+                continue;
+            /* else: some tags/printed literals we skip over */
+        }
+        else if (ch == '<') /* nested conditional */
+            level++;
+        else if (ch == '>')
+        {   /* closed our or a nested conditional,
+             * do NOT skip over the '>' so that wps_parse() sees it for closing
+             * if it is the closing one for our conditional */
+            level--;
+        }
+        else if (ch == '|' && level == 1)
+        {   /* we found our separator, point before and get out */
+            break;
+        }
+    /* if level is 0, we don't have a false branch */
+    } while (level > 0 && *(++buf));
+
+    return buf - wps_bufptr;
+}
+
+/*
+ * returns the number of bytes to get the appropriate branch of a binary
+ * conditional
+ *
+ * That means:
+ *  - if a feature is available, it returns 0 to not skip anything
+ *  - if the feature is not available, skip to the false branch and don't
+ *    parse the true branch at all
+ *
+ * */
+static int check_feature_tag(const char *wps_bufptr, const int type)
+{
+    (void)wps_bufptr;
+    switch (type)
+    {
+        case WPS_TOKEN_RTC_PRESENT:
+#if CONFIG_RTC
+            return 0;
+#else
+            return find_false_branch(wps_bufptr);
+#endif
+        default: /* not a tag we care about, just don't skip */
+            return 0;
+    }
+}
+
+
 /* Parses the WPS.
    data is the pointer to the structure where the parsed WPS should be stored.
         It is initialised.
@@ -1466,7 +1543,8 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                     fail = PARSE_FAIL_COND_SYNTAX_ERROR;
                     break;
                 }
-
+                wps_bufptr += check_feature_tag(wps_bufptr,
+                                    data->tokens[data->num_tokens-1].type);
                 data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_START;
                 lastcond[level] = data->num_tokens++;
                 break;
