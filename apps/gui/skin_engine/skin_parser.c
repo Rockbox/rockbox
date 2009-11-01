@@ -200,7 +200,6 @@ static const struct wps_tag all_tags[] = {
 #endif
 
     { WPS_TOKEN_RTC_PRESENT     ,             "cc", WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_RTC_24HR_SETTING_MODE,        "cx", WPS_REFRESH_STATIC, NULL },
     { WPS_TOKEN_RTC_DAY_OF_MONTH,             "cd", WPS_RTC_REFRESH, NULL },
     { WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED,"ce", WPS_RTC_REFRESH, NULL },
     { WPS_TOKEN_RTC_12HOUR_CFG,               "cf", WPS_RTC_REFRESH, NULL },

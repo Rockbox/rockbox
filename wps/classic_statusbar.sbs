@@ -63,7 +63,7 @@
 
 # Clock on RTC able targets, and disk access
 %V|-36|0|-6|8|0|-|-| # align on the right with room for 6 SYSFONT digits
-%?cc<%?ca<%?cx<%cH|%cI>:%cM|--:-->|>
+%?cc<%?ca<%?St|time format|<%cH|%cI>:%cM|--:-->|>
 # disk access "icon"
 %V|-6|0|-|8|0|-|-| # align on the right with room for 1 SYSFONT digit
 %?lh<*|>

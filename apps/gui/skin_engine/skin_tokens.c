@@ -569,12 +569,6 @@ const char *get_token_value(struct gui_wps *gwps,
 #else
                 return NULL;
 #endif
-        case WPS_TOKEN_RTC_24HR_SETTING_MODE:
-#if CONFIG_RTC
-                return global_settings.timeformat?NULL:"z";
-#else
-                return NULL;
-#endif
 
 #if CONFIG_RTC
         case WPS_TOKEN_RTC_12HOUR_CFG:
