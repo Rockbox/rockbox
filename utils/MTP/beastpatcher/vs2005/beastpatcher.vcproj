@@ -191,7 +191,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\tools\mknkboot.c"
+				RelativePath="..\mknkboot.c"
 				>
 			</File>
 			<File
@@ -229,7 +229,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\tools\mknkboot.h"
+				RelativePath="..\mknkboot.h"
 				>
 			</File>
 			<File
