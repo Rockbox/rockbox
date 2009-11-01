@@ -29,7 +29,6 @@
 #include "settings_list.h"
 #include "rbunicode.h"
 #include "timefuncs.h"
-#include "audio.h"
 #include "status.h"
 #include "power.h"
 #include "powermgmt.h"
@@ -39,7 +38,6 @@
 #include "hwcompat.h"
 #endif
 #include "abrepeat.h"
-#include "mp3_playback.h"
 #include "lang.h"
 #include "misc.h"
 #include "led.h"

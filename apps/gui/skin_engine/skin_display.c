@@ -19,42 +19,31 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "font.h"
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+#include "misc.h"
+#include "font.h"
 #include "system.h"
-#include "settings.h"
-#include "settings_list.h"
 #include "rbunicode.h"
-#include "rtc.h"
-#include "audio.h"
-#include "status.h"
-#include "power.h"
-#include "powermgmt.h"
-#include "sound.h"
+#ifdef DEBUG
 #include "debug.h"
-#ifdef HAVE_LCD_CHARCELLS
-#include "hwcompat.h"
 #endif
 #include "abrepeat.h"
-#include "mp3_playback.h"
 #include "lang.h"
-#include "misc.h"
-#include "splash.h"
 #include "scrollbar.h"
-#include "led.h"
-#include "lcd.h"
+#include "screen_access.h"
+
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 /* Image stuff */
 #include "bmp.h"
+#ifdef HAVE_ALBUMART
 #include "albumart.h"
 #endif
-#include "dsp.h"
-#include "action.h"
+#endif
+
 #include "cuesheet.h"
-#include "playlist.h"
 #if CONFIG_CODEC == SWCODEC
 #include "playback.h"
 #endif
