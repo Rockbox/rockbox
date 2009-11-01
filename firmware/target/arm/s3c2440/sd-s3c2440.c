@@ -823,8 +823,11 @@ int sd_write_sectors(IF_MD2(int card_no,) unsigned long start, int count,
     (void) outbuf;
     return -1;
 #else
+#ifdef HAVE_MULTIDRIVE
     dbgprintf ("sd_write %d %x %d\n", card_no, start, count);
-    
+#else
+    dbgprintf ("sd_write %x %d\n", start, count);
+#endif    
     return sd_transfer_sectors(IF_MD2(card_no,) start, count, (void*)outbuf, true);
 #endif    
 }
