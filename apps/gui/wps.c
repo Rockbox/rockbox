@@ -672,10 +672,6 @@ int wps_get_touchaction(struct wps_data *data)
 
                         global_settings.volume += min_vol;
                         setvol();
-                        FOR_NB_SCREENS(i)
-                        {
-                            gui_wps[i].data->button_time_volume = current_tick;
-                        }
                         return ACTION_REDRAW;
                     }
                 }

@@ -277,7 +277,6 @@ void skin_data_init(struct wps_data *wps_data)
     }
     wps_data->full_line_progressbar = false;
 #endif
-    wps_data->button_time_volume = 0;
     wps_data->wps_loaded = false;
 }
 
