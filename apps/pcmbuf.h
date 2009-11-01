@@ -75,6 +75,5 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude);
 
 int pcmbuf_used_descs(void);
 int pcmbuf_descs(void);
-void pcmbuf_play_remainder(void);
 
 #endif

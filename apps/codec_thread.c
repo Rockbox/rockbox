@@ -20,69 +20,17 @@
  *
  ****************************************************************************/
 
-//#include <stdio.h>
-//#include <string.h>
-//#include <stdlib.h>
-//#include <ctype.h>
-
 #include "playback.h"
 #include "codec_thread.h"
 #include "system.h"
-//#include "thread.h"
-//#include "file.h"
-//#include "panic.h"
-//#include "memory.h"
-//#include "lcd.h"
-//#include "font.h"
-//#include "button.h"
 #include "kernel.h"
-//#include "tree.h"
-//#include "debug.h"
-//#include "sprintf.h"
-//#include "settings.h"
 #include "codecs.h"
-//#include "audio.h"
 #include "buffering.h"
-//#include "appevents.h"
-//#include "voice_thread.h"
-//#include "mp3_playback.h"
-//#include "usb.h"
-//#include "storage.h"
-//#include "screens.h"
-//#include "playlist.h"
 #include "pcmbuf.h"
-//#include "buffer.h"
 #include "dsp.h"
 #include "abrepeat.h"
-//#include "cuesheet.h"
-#ifdef HAVE_TAGCACHE
-//#include "tagcache.h"
-#endif
-#ifdef HAVE_LCD_BITMAP
-//#include "icons.h"
-//#include "peakmeter.h"
-//#include "action.h"
-#ifdef HAVE_ALBUMART
-//#include "albumart.h"
-//#include "bmp.h"
-#endif
-#endif
-//#include "lang.h"
-//#include "misc.h"
-//#include "sound.h"
 #include "metadata.h"
 #include "splash.h"
-//#include "talk.h"
-//#include "ata_idle_notify.h"
-
-#ifdef HAVE_RECORDING
-//#include "recording.h"
-//#include "pcm_record.h"
-#endif
-
-#ifdef IPOD_ACCESSORY_PROTOCOL
-//#include "iap.h"
-#endif
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
@@ -110,12 +58,16 @@
 #endif
 
 
-/* Variables are commented with the threads that use them: *
- * A=audio, C=codec, V=voice. A suffix of - indicates that *
- * the variable is read but not updated on that thread.    */
+/* Variables are commented with the threads that use them:
+ * A=audio, C=codec, V=voice. A suffix of - indicates that
+ * the variable is read but not updated on that thread.
+
+ * Unless otherwise noted, the extern variables are located
+ * in playback.c.
+ */
 
 /* Main state control */
-static volatile bool audio_codec_loaded SHAREDBSS_ATTR = false; /* Codec loaded? (C/A-) */
+volatile bool audio_codec_loaded SHAREDBSS_ATTR = false; /* Codec loaded? (C/A-) */
 
 extern struct mp3entry *thistrack_id3,  /* the currently playing track */
                        *othertrack_id3; /* prev track during track-change-transition, or end of playlist,
@@ -131,25 +83,35 @@ static bool codec_requested_stop = false;
 
 extern struct event_queue audio_queue;
 extern struct event_queue codec_queue;
-extern struct event_queue pcmbuf_queue;
+
+extern struct codec_api ci; /* from codecs.c */
 
 /* Codec thread */
-extern struct codec_api ci;
-unsigned int codec_thread_id;   /* For modifying thread priority later. */
+unsigned int codec_thread_id;   /* For modifying thread priority later.
+                                   Used by playback.c and pcmbuf.c */
 static struct queue_sender_list codec_queue_sender_list;
 static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
 
+/* function prototypes */
+static bool codec_load_next_track(void);
+
+
 /**************************************/
 
-/* Function to be called by pcm buffer callbacks.
- * Permissible Context(s): Audio interrupt
- */
-static void pcmbuf_callback_queue_post(long id, intptr_t data)
+/** misc external functions */
+
+int get_codec_base_type(int type)
 {
-    /* No lock since we're already in audio interrupt context */
-    queue_post(&pcmbuf_queue, id, data);
+    switch (type) {
+        case AFMT_MPA_L1:
+        case AFMT_MPA_L2:
+        case AFMT_MPA_L3:
+            return AFMT_MPA_L3;
+    }
+
+    return type;
 }
 
 const char *get_codec_filename(int cod_spec)
@@ -182,7 +144,30 @@ const char *get_codec_filename(int cod_spec)
     return fname;
 } /* get_codec_filename */
 
-/* --- Codec thread --- */
+/* Borrow the codec thread and return the ID */
+void codec_thread_do_callback(void (*fn)(void), unsigned int *id)
+{
+    /* Set id before telling thread to call something; it may be
+     * needed before this function returns. */
+    if (id != NULL)
+        *id = codec_thread_id;
+
+    /* Codec thread will signal just before entering callback */
+    LOGFQUEUE("codec >| Q_CODEC_DO_CALLBACK");
+    queue_send(&codec_queue, Q_CODEC_DO_CALLBACK, (intptr_t)fn);
+}
+
+
+/** codec API callbacks */
+
+static void* codec_get_buffer(size_t *size)
+{
+    if (codec_size >= CODEC_SIZE)
+        return NULL;
+    *size = CODEC_SIZE - codec_size;
+    return &codecbuf[codec_size];
+}
+
 static bool codec_pcmbuf_insert_callback(
         const void *ch1, const void *ch2, int count)
 {
@@ -230,37 +215,8 @@ static bool codec_pcmbuf_insert_callback(
     return true;
 } /* codec_pcmbuf_insert_callback */
 
-static void* codec_get_buffer(size_t *size)
-{
-    if (codec_size >= CODEC_SIZE)
-        return NULL;
-    *size = CODEC_SIZE - codec_size;
-    return &codecbuf[codec_size];
-}
-
-/* Between the codec and PCM track change, we need to keep updating the
-   "elapsed" value of the previous (to the codec, but current to the
-   user/PCM/WPS) track, so that the progressbar reaches the end.
-   During that transition, the WPS will display prevtrack_id3. */
-static void codec_pcmbuf_position_callback(size_t size) ICODE_ATTR;
-static void codec_pcmbuf_position_callback(size_t size)
-{
-    /* This is called from an ISR, so be quick */
-    unsigned int time = size * 1000 / 4 / NATIVE_FREQUENCY +
-        othertrack_id3->elapsed;
-
-    if (time >= othertrack_id3->length)
-    {
-        pcmbuf_set_position_callback(NULL);
-        othertrack_id3->elapsed = othertrack_id3->length;
-    }
-    else
-        othertrack_id3->elapsed = time;
-}
-
 static void codec_set_elapsed_callback(unsigned int value)
 {
-    unsigned int latency;
     if (ci.seek_time)
         return;
 
@@ -268,30 +224,33 @@ static void codec_set_elapsed_callback(unsigned int value)
     ab_position_report(value);
 #endif
 
-    latency = pcmbuf_get_latency();
+    unsigned int latency = pcmbuf_get_latency();
     if (value < latency)
         thistrack_id3->elapsed = 0;
-    else if (value - latency > thistrack_id3->elapsed ||
-            value - latency < thistrack_id3->elapsed - 2)
+    else
     {
-        thistrack_id3->elapsed = value - latency;
+        unsigned int elapsed = value - latency;
+        if (elapsed > thistrack_id3->elapsed ||
+            elapsed < thistrack_id3->elapsed - 2)
+            {
+                thistrack_id3->elapsed = elapsed;
+            }
     }
 }
 
 static void codec_set_offset_callback(size_t value)
 {
-    unsigned int latency;
-
     if (ci.seek_time)
         return;
 
-    latency = pcmbuf_get_latency() * thistrack_id3->bitrate / 8;
+    unsigned int latency = pcmbuf_get_latency() * thistrack_id3->bitrate / 8;
     if (value < latency)
         thistrack_id3->offset = 0;
     else
         thistrack_id3->offset = value - latency;
 }
 
+/* helper function, not a callback */
 static void codec_advance_buffer_counters(size_t amount)
 {
     bufadvance(get_audio_hid(), amount);
@@ -346,18 +305,6 @@ static void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     return ptr;
 } /* codec_request_buffer_callback */
 
-int get_codec_base_type(int type)
-{
-    switch (type) {
-        case AFMT_MPA_L1:
-        case AFMT_MPA_L2:
-        case AFMT_MPA_L3:
-            return AFMT_MPA_L3;
-    }
-
-    return type;
-}
-
 static void codec_advance_buffer_callback(size_t amount)
 {
     codec_advance_buffer_counters(amount);
@@ -368,28 +315,6 @@ static void codec_advance_buffer_loc_callback(void *ptr)
 {
     size_t amount = buf_get_offset(get_audio_hid(), ptr);
     codec_advance_buffer_callback(amount);
-}
-
-static void codec_seek_complete_callback(void)
-{
-    logf("seek_complete");
-    /* If seeking-while-playing, pcm playback is actually paused (pcm_is_paused())
-     * but audio_is_paused() is false.  If seeking-while-paused, audio_is_paused() is
-     * true, but pcm playback may have actually stopped due to a previous buffer clear.
-     * The buffer clear below occurs with either condition.  A seemless seek skips
-     * this section and no buffer clear occurs.
-     */
-    if (pcm_is_paused() || audio_is_paused())
-    {
-        /* Clear the buffer */
-        pcmbuf_play_stop();
-        dsp_configure(ci.dsp, DSP_FLUSH, 0);
-
-        /* If seeking-while-playing, resume pcm playback */
-        if (!audio_is_paused())
-            pcmbuf_pause(false);
-    }
-    ci.seek_time = 0;
 }
 
 static bool codec_seek_buffer_callback(size_t newpos)
@@ -406,25 +331,23 @@ static bool codec_seek_buffer_callback(size_t newpos)
     }
 }
 
-static void codec_configure_callback(int setting, intptr_t value)
+static void codec_seek_complete_callback(void)
 {
-    switch (setting) {
-    default:
-        if (!dsp_configure(ci.dsp, setting, value))
-            { logf("Illegal key:%d", setting); }
+    logf("seek_complete");
+    /* If seeking-while-playing, pcm_is_paused() is true.
+     * If seeking-while-paused, audio_is_paused() is true.
+     * A seamless seek skips this section. */
+    if (pcm_is_paused() || audio_is_paused())
+    {
+        /* Clear the buffer */
+        pcmbuf_play_stop();
+        dsp_configure(ci.dsp, DSP_FLUSH, 0);
+
+        /* If seeking-while-playing, resume pcm playback */
+        if (!audio_is_paused())
+            pcmbuf_pause(false);
     }
-}
-
-static void codec_track_changed(void)
-{
-    LOGFQUEUE("codec > audio Q_AUDIO_TRACK_CHANGED");
-    queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
-}
-
-static void codec_pcmbuf_track_changed_callback(void)
-{
-    pcmbuf_set_position_callback(NULL);
-    pcmbuf_callback_queue_post(Q_AUDIO_TRACK_CHANGED, 0);
+    ci.seek_time = 0;
 }
 
 static void codec_discard_codec_callback(void)
@@ -436,6 +359,94 @@ static void codec_discard_codec_callback(void)
         *codec_hid = -1;
     }
 }
+
+static bool codec_request_next_track_callback(void)
+{
+    int prev_codectype;
+
+    if (ci.stop_codec || !audio_is_playing())
+        return false;
+
+    prev_codectype = get_codec_base_type(thistrack_id3->codectype);
+    if (!codec_load_next_track())
+        return false;
+
+    /* Seek to the beginning of the new track because if the struct
+       mp3entry was buffered, "elapsed" might not be zero (if the track has
+       been played already but not unbuffered) */
+    codec_seek_buffer_callback(thistrack_id3->first_frame_offset);
+    /* Check if the next codec is the same file. */
+    if (prev_codectype == get_codec_base_type(thistrack_id3->codectype))
+    {
+        logf("New track loaded");
+        codec_discard_codec_callback();
+        return true;
+    }
+    else
+    {
+        logf("New codec:%d/%d", thistrack_id3->codectype, prev_codectype);
+        return false;
+    }
+}
+
+static void codec_configure_callback(int setting, intptr_t value)
+{
+    if (!dsp_configure(ci.dsp, setting, value))
+        { logf("Illegal key:%d", setting); }
+}
+
+/* Initialize codec API */
+void codec_init_codec_api(void)
+{
+    ci.dsp                 = (struct dsp_config *)dsp_configure(NULL, DSP_MYDSP,
+                                                                CODEC_IDX_AUDIO);
+    ci.codec_get_buffer    = codec_get_buffer;
+    ci.pcmbuf_insert       = codec_pcmbuf_insert_callback;
+    ci.set_elapsed         = codec_set_elapsed_callback;
+    ci.read_filebuf        = codec_filebuf_callback;
+    ci.request_buffer      = codec_request_buffer_callback;
+    ci.advance_buffer      = codec_advance_buffer_callback;
+    ci.advance_buffer_loc  = codec_advance_buffer_loc_callback;
+    ci.seek_buffer         = codec_seek_buffer_callback;
+    ci.seek_complete       = codec_seek_complete_callback;
+    ci.request_next_track  = codec_request_next_track_callback;
+    ci.discard_codec       = codec_discard_codec_callback;
+    ci.set_offset          = codec_set_offset_callback;
+    ci.configure           = codec_configure_callback;
+}
+
+
+/** pcmbuf track change callbacks */
+
+/* Between the codec and PCM track change, we need to keep updating the
+   "elapsed" value of the previous (to the codec, but current to the
+   user/PCM/WPS) track, so that the progressbar reaches the end.
+   During that transition, the WPS will display prevtrack_id3. */
+static void codec_pcmbuf_position_callback(size_t size) ICODE_ATTR;
+static void codec_pcmbuf_position_callback(size_t size)
+{
+    /* This is called from an ISR, so be quick */
+    unsigned int time = size * 1000 / 4 / NATIVE_FREQUENCY +
+        othertrack_id3->elapsed;
+
+    if (time >= othertrack_id3->length)
+    {
+        pcmbuf_set_position_callback(NULL);
+        othertrack_id3->elapsed = othertrack_id3->length;
+    }
+    else
+        othertrack_id3->elapsed = time;
+}
+
+static void codec_pcmbuf_track_changed_callback(void)
+{
+    LOGFQUEUE("codec > pcmbuf/audio Q_AUDIO_TRACK_CHANGED");
+    pcmbuf_set_position_callback(NULL);
+    audio_post_track_change();
+}
+
+
+/** track change functions */
 
 static inline void codec_gapless_track_change(void)
 {
@@ -450,7 +461,8 @@ static inline void codec_crossfade_track_change(void)
     /* Initiate automatic crossfade mode */
     pcmbuf_crossfade_init(false);
     /* Notify the wps that the track change starts now */
-    codec_track_changed();
+    LOGFQUEUE("codec > audio Q_AUDIO_TRACK_CHANGED");
+    queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
 }
 
 static void codec_track_skip_done(bool was_manual)
@@ -531,35 +543,7 @@ static bool codec_load_next_track(void)
     }
 }
 
-static bool codec_request_next_track_callback(void)
-{
-    int prev_codectype;
-
-    if (ci.stop_codec || !audio_is_playing())
-        return false;
-
-    prev_codectype = get_codec_base_type(thistrack_id3->codectype);
-    if (!codec_load_next_track())
-        return false;
-
-    /* Seek to the beginning of the new track because if the struct
-       mp3entry was buffered, "elapsed" might not be zero (if the track has
-       been played already but not unbuffered) */
-    codec_seek_buffer_callback(thistrack_id3->first_frame_offset);
-    /* Check if the next codec is the same file. */
-    if (prev_codectype == get_codec_base_type(thistrack_id3->codectype))
-    {
-        logf("New track loaded");
-        codec_discard_codec_callback();
-        return true;
-    }
-    else
-    {
-        logf("New codec:%d/%d", thistrack_id3->codectype, prev_codectype);
-        return false;
-    }
-}
-
+/** CODEC THREAD */
 static void codec_thread(void)
 {
     struct queue_event ev;
@@ -732,44 +716,6 @@ static void codec_thread(void)
 
         } /* end switch */
     }
-}
-
-/* Borrow the codec thread and return the ID */
-void codec_thread_do_callback(void (*fn)(void), unsigned int *id)
-{
-    /* Set id before telling thread to call something; it may be
-     * needed before this function returns. */
-    if (id != NULL)
-        *id = codec_thread_id;
-
-    /* Codec thread will signal just before entering callback */
-    LOGFQUEUE("codec >| Q_CODEC_DO_CALLBACK");
-    queue_send(&codec_queue, Q_CODEC_DO_CALLBACK, (intptr_t)fn);
-}
-
-void codec_init_codec_api(void)
-{
-     /* Initialize codec api. */
-    ci.read_filebuf        = codec_filebuf_callback;
-    ci.pcmbuf_insert       = codec_pcmbuf_insert_callback;
-    ci.codec_get_buffer    = codec_get_buffer;
-    ci.request_buffer      = codec_request_buffer_callback;
-    ci.advance_buffer      = codec_advance_buffer_callback;
-    ci.advance_buffer_loc  = codec_advance_buffer_loc_callback;
-    ci.request_next_track  = codec_request_next_track_callback;
-    ci.seek_buffer         = codec_seek_buffer_callback;
-    ci.seek_complete       = codec_seek_complete_callback;
-    ci.set_elapsed         = codec_set_elapsed_callback;
-    ci.set_offset          = codec_set_offset_callback;
-    ci.configure           = codec_configure_callback;
-    ci.discard_codec       = codec_discard_codec_callback;
-    ci.dsp                 = (struct dsp_config *)dsp_configure(NULL, DSP_MYDSP,
-                                                                CODEC_IDX_AUDIO);
-}
-
-bool codec_is_loaded(void)
-{
-    return audio_codec_loaded;
 }
 
 void make_codec_thread(void)

@@ -23,68 +23,34 @@
 /* TODO: Pause should be handled in here, rather than PCMBUF so that voice can
  * play whilst audio is paused */
 
-//#include <stdio.h>
 #include <string.h>
-//#include <ctype.h>
-
 #include "playback.h"
 #include "codec_thread.h"
-//#include "system.h"
-//#include "thread.h"
-//#include "file.h"
-//#include "panic.h"
-//#include "memory.h"
-//#include "lcd.h"
-//#include "font.h"
-//#include "button.h"
 #include "kernel.h"
-//#include "tree.h"
-//#include "debug.h"
-//#include "sprintf.h"
-//#include "settings.h"
 #include "codecs.h"
-//#include "audio.h"
 #include "buffering.h"
-//#include "appevents.h"
 #include "voice_thread.h"
-//#include "mp3_playback.h"
 #include "usb.h"
-//#include "storage.h"
 #include "ata.h"
-//#include "screens.h"
 #include "playlist.h"
 #include "pcmbuf.h"
 #include "buffer.h"
-//#include "dsp.h"
-//#include "abrepeat.h"
 #include "cuesheet.h"
 #ifdef HAVE_TAGCACHE
 #include "tagcache.h"
 #endif
 #ifdef HAVE_LCD_BITMAP
-//#include "icons.h"
-//#include "peakmeter.h"
-//#include "action.h"
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
-//#include "bmp.h"
 #endif
 #endif
-//#include "lang.h"
-//#include "misc.h"
 #include "sound.h"
 #include "metadata.h"
 #include "splash.h"
 #include "talk.h"
-//#include "ata_idle_notify.h"
 
 #ifdef HAVE_RECORDING
-//#include "recording.h"
 #include "pcm_record.h"
-#endif
-
-#ifdef IPOD_ACCESSORY_PROTOCOL
-//#include "iap.h"
 #endif
 
 #define PLAYBACK_VOICE
@@ -139,8 +105,9 @@ static bool audio_thread_ready SHAREDBSS_ATTR = false;
 /* TBD: Split out "audio" and "playback" (ie. calling) threads */
 
 /* Main state control */
-static volatile bool playing SHAREDBSS_ATTR = false; /* Is audio playing? (A) */
+static volatile bool playing SHAREDBSS_ATTR = false;/* Is audio playing? (A) */
 static volatile bool paused SHAREDBSS_ATTR = false; /* Is audio paused? (A/C-) */
+extern volatile bool audio_codec_loaded;            /* Codec loaded? (C/A-) */
 
 /* Ring buffer where compressed audio and codecs are loaded */
 static unsigned char *filebuf = NULL;       /* Start of buffer (A/C-) */
@@ -233,7 +200,7 @@ static size_t buffer_margin  = 5; /* Buffer margin aka anti-skip buffer (A/C-) *
 /* Event queues */
 struct event_queue audio_queue SHAREDBSS_ATTR;
 struct event_queue codec_queue SHAREDBSS_ATTR;
-struct event_queue pcmbuf_queue SHAREDBSS_ATTR;
+static struct event_queue pcmbuf_queue SHAREDBSS_ATTR;
 
 extern struct codec_api ci;
 extern unsigned int codec_thread_id;
@@ -255,6 +222,13 @@ static void audio_stop_playback(void);
 
 
 /**************************************/
+
+/* Post message from pcmbuf callback in the codec thread that
+ * the end of the previous track has just been played. */
+void audio_post_track_change(void)
+{
+    queue_post(&pcmbuf_queue, Q_AUDIO_TRACK_CHANGED, 0);
+}
 
 /* Scan the pcmbuf queue and return true if a message pulled.
  * Permissible Context(s): Thread
@@ -1077,7 +1051,7 @@ static bool audio_loadcodec(bool start_play)
             if (id3 && prev_id3 &&
                 get_codec_base_type(id3->codectype) ==
                 get_codec_base_type(prev_id3->codectype)
-                && codec_is_loaded())
+                && audio_codec_loaded)
             {
                 logf("Reusing prev. codec");
                 return true;
@@ -1634,7 +1608,7 @@ static void audio_stop_codec_flush(void)
     ci.stop_codec = true;
     pcmbuf_pause(true);
 
-    while (codec_is_loaded())
+    while (audio_codec_loaded)
         yield();
 
     /* If the audio codec is not loaded any more, and the audio is still
@@ -1652,13 +1626,6 @@ static void audio_stop_playback(void)
 {
     if (playing)
     {
-        /* If still actively playing here, play out the last samples in the
-         * pcm buffer before stopping.  If a manual stop has occurred, the
-         * paused flag is set, so don't continue playback.
-         */
-        if (!paused)
-            pcmbuf_play_remainder();
-        
         /* If we were playing, save resume information */
         struct mp3entry *id3 = NULL;
 

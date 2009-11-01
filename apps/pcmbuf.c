@@ -135,12 +135,13 @@ static void pcmbuf_under_watermark(bool under);
 static bool pcmbuf_flush_fillpos(void);
 
 #define CALL_IF_EXISTS(function, args...) if (function) function(args)
-/* This function has 2 major logical parts (separated by brackets both for
+/* This function has 3 major logical parts (separated by brackets both for
  * readability and variable scoping).  The first part performs the
- * operastions related to finishing off the last buffer we fed to the DMA.
- * The second part performs the operations involved in sending a new buffer
- * to the DMA.  Finally the function checks the status of the buffer and
- * boosts if necessary */
+ * operations related to finishing off the last buffer we fed to the DMA.
+ * The second part detects the end of playlist condition when the pcm
+ * buffer is empty except for uncommitted samples.  Then they are committed.
+ * The third part performs the operations involved in sending a new buffer
+ * to the DMA. */
 static void pcmbuf_callback(unsigned char** start, size_t* size) ICODE_ATTR;
 static void pcmbuf_callback(unsigned char** start, size_t* size)
 {
@@ -163,6 +164,15 @@ static void pcmbuf_callback(unsigned char** start, size_t* size)
         /* If we've read over the crossfade chunk while it's still fading */
         if (pcmbuf_current == crossfade_chunk)
             crossfade_chunk = pcmbuf_read;
+    }
+    
+    {
+        /* Commit last samples at end of playlist */
+        if (audiobuffer_fillpos && !pcmbuf_read)
+        {
+            logf("pcmbuf callback: commit last samples");
+            pcmbuf_flush_fillpos();
+        }
     }
 
     {
@@ -1108,12 +1118,4 @@ bool pcmbuf_is_crossfade_enabled(void)
         return global_settings.playlist_shuffle;
 
     return crossfade_enabled;
-}
-
-/** PLAY LAST REMAINING SAMPLES AT END OF PLAYBACK
- *  Commit any remaining samples in the PCM buffer for playback. */
-void pcmbuf_play_remainder(void)
-{
-    if (audiobuffer_fillpos)
-        pcmbuf_flush_fillpos();
 }

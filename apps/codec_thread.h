@@ -24,12 +24,11 @@
 
 #include <stdbool.h>
 
+int get_codec_base_type(int type);
 const char *get_codec_filename(int cod_spec);
 void codec_thread_do_callback(void (*fn)(void),
                               unsigned int *codec_thread_id);
-void make_codec_thread(void);
-int get_codec_base_type(int type);
 void codec_init_codec_api(void);
-bool codec_is_loaded(void);
+void make_codec_thread(void);
 
 #endif
