@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include <stdlib.h>
+#include "config.h"
 #include "system.h"
 #include "kernel.h"
 #include "logf.h"
@@ -48,7 +49,7 @@ static struct
 static const unsigned char pcm_freq_parms[HW_NUM_FREQ][2] =
 {
     [HW_FREQ_64] = { 2, IISMOD_MASTER_CLOCK_256FS },
-    [HW_FREQ_44] = { 3, IISMOD_MASTER_CLOCK_384FS },
+    [HW_FREQ_44] = { 2, IISMOD_MASTER_CLOCK_384FS },
     [HW_FREQ_22] = { 8, IISMOD_MASTER_CLOCK_256FS },
     [HW_FREQ_11] = { 17, IISMOD_MASTER_CLOCK_256FS },
 };
@@ -127,9 +128,12 @@ void pcm_postinit(void)
 void pcm_dma_apply_settings(void)
 {
 #ifdef HAVE_UDA1341
+	unsigned int reg_val;
     /* set prescaler and master clock rate according to freq */
-    IISPSR = (pcm_freq_parms [pcm_fsel][0] * IISPSR_PRESCALER_A) | pcm_freq_parms [pcm_fsel][0];
-    IISMOD |= ~IISMOD_MASTER_CLOCK_384FS | pcm_freq_parms [pcm_fsel][1] ;
+    reg_val = (pcm_freq_parms [pcm_fsel][0] << 5) | pcm_freq_parms [pcm_fsel][0];
+
+    IISMOD = (IISMOD & ~IISMOD_MASTER_CLOCK_384FS) | pcm_freq_parms [pcm_fsel][1] ;
+	IISPSR = reg_val;
 #endif
 
     audiohw_set_frequency(pcm_fsel);
@@ -155,6 +159,11 @@ static void play_start_pcm(void)
 
     /* turn off the idle */
     IISCON &= ~(1<<3);
+
+#ifdef HAVE_UDA1341
+    IISMOD = (IISMOD & ~IISMOD_MASTER_CLOCK_384FS) | pcm_freq_parms [pcm_fsel][1] ;
+    IISPSR = (pcm_freq_parms [pcm_fsel][0] << 5) | pcm_freq_parms [pcm_fsel][0];
+#endif
 
     /* start the IIS */
     IISCON |= (1<<0);

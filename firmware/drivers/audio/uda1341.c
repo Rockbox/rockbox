@@ -33,15 +33,26 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -84,   0, -25},
     [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0},
     [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0},
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
+    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},   /* not used */
+    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},   /* not used */
+    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},   /* not used */
 #ifdef HAVE_RECORDING
     [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0},
     [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
     [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
 #endif
 };
+
+/* convert tenth of dB volume (-600..0) to master volume register value */
+int tenthdb2master(int db)
+{
+    if (db < -600) 
+        return 63;
+    else                            /* 1 dB steps */
+        return -(db / 10) + 1;
+}
+
+static unsigned short uda_regs[NUM_REG_ID];
 
 /****************************************************************************/
 
@@ -59,7 +70,7 @@ const struct sound_settings_info audiohw_settings[] = {
 static void l3_init (void)
 {
     L3PORT |= L3MODE | L3CLOCK;
-    L3PORT &= L3DATA; 
+    L3PORT &= ~L3DATA; 
 
     S3C2440_GPIO_CONFIG (GPBCON, 2, GPIO_OUTPUT);   /* L3 MODE */
     S3C2440_GPIO_CONFIG (GPBCON, 3, GPIO_OUTPUT);   /* L3 DATA */
@@ -72,8 +83,8 @@ static void l3_init (void)
 
 static void bit_delay (void)
 {
-    int j;
-    for (j=0; j<4; j++)
+    volatile int j;
+    for (j=0; j<5; j++)
         ;
 }
 
@@ -86,6 +97,7 @@ static void l3_write_byte (unsigned char data, bool address_mode)
         L3PORT &= ~L3MODE;
     else
         L3PORT |= L3MODE;
+    bit_delay();
     
     for (bit=0; bit < 8; bit++)
     {
@@ -144,41 +156,91 @@ static void udacodec_reset(void)
                                     I2S_IFMT_IIS);
     udacodec_write (UDA_REG_STATUS, UDA_STATUS_0 | UDA_SYSCLK_256FS | I2S_IFMT_IIS);
     udacodec_write (UDA_REG_STATUS, UDA_STATUS_1 | UDA_POWER_DAC_ON);
+    
+    uda_regs[UDA_REG_ID_CTRL2] = UDA_PEAK_DETECT_POS_AFTER | 
+            UDA_DE_EMPHASIS_NONE | UDA_MUTE_OFF | UDA_MODE_SWITCH_FLAT;
+    
 }
 
 /****************************************************************************/
 
 /* Audio API functions */
 
+/* This table must match the table in pcm-xxxx.c if using Master mode */
+/* [reserved, master clock rate] */
+static const unsigned char uda_freq_parms[HW_NUM_FREQ][2] =
+{
+    [HW_FREQ_64] = { 0, UDA_SYSCLK_256FS },
+    [HW_FREQ_44] = { 0, UDA_SYSCLK_384FS },
+    [HW_FREQ_22] = { 0, UDA_SYSCLK_256FS },
+    [HW_FREQ_11] = { 0, UDA_SYSCLK_256FS },
+};
+
 void audiohw_init(void)
 {
     udacodec_reset();
-}
-
-void audiohw_close(void)
-{
-}
-
-void audiohw_set_bass(int value)
-{
-}
-
-void audiohw_set_treble(int value)
-{
-}
-
-void audiohw_mute(bool mute)
-{
-}
-
-void audiohw_set_prescaler(int val)
-{
+     
+    audiohw_set_bass (0);  
+    audiohw_set_treble (0);  
+    audiohw_set_master_vol (26, 26);    /* -25 dB */
 }
 
 void audiohw_postinit(void)
 {
 }
 
+void audiohw_close(void)
+{
+    /* DAC, ADC off */
+    udacodec_write (UDA_REG_STATUS, UDA_STATUS_1 | 0);
+}
+
+void audiohw_set_bass(int value)
+{
+    uda_regs [UDA_REG_ID_CTRL1] &= UDA_BASS_BOOST (UDA_BASS_BOOST_MASK);
+    uda_regs [UDA_REG_ID_CTRL1] |= UDA_BASS_BOOST (value & UDA_BASS_BOOST_MASK);
+     
+    udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL1 | uda_regs [UDA_REG_ID_CTRL1] );
+}
+
+void audiohw_set_treble(int value)
+{
+    uda_regs [UDA_REG_ID_CTRL1] &= UDA_TREBLE (UDA_TREBLE_MASK);
+    uda_regs [UDA_REG_ID_CTRL1] |= UDA_TREBLE (value & UDA_TREBLE_MASK);
+     
+    udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL1 | uda_regs [UDA_REG_ID_CTRL1] );
+}
+
+void audiohw_mute(bool mute)
+{
+    if (mute)
+        uda_regs [UDA_REG_ID_CTRL2] |= UDA_MUTE_ON;
+    else    
+        uda_regs [UDA_REG_ID_CTRL2] &= ~UDA_MUTE_ON;
+    
+    udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL2 | uda_regs [UDA_REG_ID_CTRL2] );
+}
+
+void audiohw_set_prescaler(int val)
+{
+    (void)val;
+}
+
+/**
+ * Sets left and right master volume  (1(max) to 62(muted))
+ */
+void audiohw_set_master_vol(int vol_l, int vol_r)
+{
+    uda_regs[UDA_REG_ID_CTRL0] = (vol_l + vol_r) / 2;
+    udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL0 | uda_regs[UDA_REG_ID_CTRL0]);
+}
+
 void audiohw_set_frequency(int fsel)
 {
+    if ((unsigned)fsel >= HW_NUM_FREQ)
+        fsel = HW_FREQ_DEFAULT;
+
+    uda_regs[UDA_REG_ID_STATUS_0] = I2S_IFMT_IIS | uda_freq_parms[fsel][1];
+
+    udacodec_write (UDA_REG_STATUS, UDA_STATUS_0 | uda_regs[UDA_REG_ID_STATUS_0]);
 }

@@ -26,13 +26,30 @@
 #define VOLUME_MIN -840
 #define VOLUME_MAX  0
 
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP)
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
 
 extern int tenthdb2master(int db);
 extern int tenthdb2mixer(int db);
 
 extern void audiohw_set_master_vol(int vol_l, int vol_r);
 extern void audiohw_set_mixer_vol(int channel1, int channel2);
+
+/* These are logical register numbers for driver */ 
+enum uda_register {
+    UDA_REG_ID_STATUS_0,
+    UDA_REG_ID_STATUS_1,
+    UDA_REG_ID_CTRL0,
+    UDA_REG_ID_CTRL1,
+    UDA_REG_ID_CTRL2,
+    UDA_REG_ID_EXT_0,
+    UDA_REG_ID_EXT_1,
+    UDA_REG_ID_EXT_2,
+    UDA_REG_ID_EXT_4,
+    UDA_REG_ID_EXT_5,
+    UDA_REG_ID_EXT_6,
+    NUM_REG_ID
+};
+
 
 /* Address byte */
 #define UDA1341_ADDR            0x14
@@ -67,23 +84,27 @@ extern void audiohw_set_mixer_vol(int channel1, int channel2);
 #define UDA_POWER_DAC_ON        (1 << 0)
 
 /* DATA0 */
-#define UDA_DATA_CTRL0          (0 << 6)
-#define UDA_DATA_CTRL1          (1 << 6)
-#define UDA_DATA_CTRL2          (2 << 6)
+#define UDA_DATA_CTRL0          (0 << 6)    /* volume */
+#define UDA_DATA_CTRL1          (1 << 6)    /* bass, treble */
+#define UDA_DATA_CTRL2          (2 << 6)    /* peak det pos, de-emp, mute */
 #define UDA_DATA_EXT_ADDR       (6 << 5)
 #define UDA_DATA_EXT_DATA       (7 << 5)
 
-#define UDA_VOLUME(x)           ((x) << 8)  /* 1=0dB, 61=-60dB */
+#define UDA_VOLUME(x)           ((x) << 0)  /* 1=0dB, 61=-60dB */
 
 #define UDA_BASS_BOOST(x)       ((x) << 2)  /* see datasheet */
+#define UDA_BASS_BOOST_MASK     0x0F  
 #define UDA_TREBLE(x)           ((x) << 0)  /* see datasheet */
+#define UDA_TREBLE_MASK         0x03  
 
-#define UDA_PEAK_DETECT_POS     (1 << 5)
+#define UDA_PEAK_DETECT_POS_BEFORE  (0 << 5)
+#define UDA_PEAK_DETECT_POS_AFTER   (1 << 5)
 #define UDA_DE_EMPHASIS_NONE    (0 << 3)
 #define UDA_DE_EMPHASIS_32      (1 << 3)
 #define UDA_DE_EMPHASIS_44_1    (2 << 3)
 #define UDA_DE_EMPHASIS_48      (3 << 3)
-#define UDA_MUTE                (1 << 2)
+#define UDA_MUTE_ON                 (1 << 2)
+#define UDA_MUTE_OFF                (0 << 2)
 #define UDA_MODE_SWITCH_FLAT    (0 << 0)
 #define UDA_MODE_SWITCH_MIN     (1 << 0)
 #define UDA_MODE_SWITCH_MAX     (3 << 0)
