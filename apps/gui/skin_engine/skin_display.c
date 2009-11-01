@@ -31,6 +31,7 @@
 #endif
 #include "abrepeat.h"
 #include "lang.h"
+#include "statusbar.h"
 #include "scrollbar.h"
 #include "screen_access.h"
 
