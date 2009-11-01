@@ -658,7 +658,6 @@ int wps_get_touchaction(struct wps_data *data)
                         break;
                     case WPS_TOUCHREGION_VOLUME:
                     {
-                        int i;
                         const int min_vol = sound_min(SOUND_VOLUME);
                         const int max_vol = sound_max(SOUND_VOLUME);
                         if(r->width > r->height)
