@@ -1130,8 +1130,6 @@ long gui_wps_show(void)
 
         if (vol_changed)
         {
-            FOR_NB_SCREENS(i)
-                gui_wps[i].data->button_time_volume = current_tick;
             bool res = false;
             setvol();
             FOR_NB_SCREENS(i)

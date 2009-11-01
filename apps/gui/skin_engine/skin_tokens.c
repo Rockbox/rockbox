@@ -818,8 +818,8 @@ const char *get_token_value(struct gui_wps *gwps,
                 return NULL;
 #endif
         case WPS_TOKEN_BUTTON_VOLUME:
-            if (data->button_time_volume &&
-                TIME_BEFORE(current_tick, data->button_time_volume +
+            if (global_status.last_volume_change &&
+                TIME_BEFORE(current_tick, global_status.last_volume_change +
                                           token->value.i * TIMEOUT_UNIT))
                 return "v";
             return NULL;

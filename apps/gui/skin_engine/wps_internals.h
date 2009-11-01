@@ -264,8 +264,6 @@ struct wps_data
     /* Total number of tokens in the WPS. During WPS parsing, this is
        the index of the token being parsed. */
     int num_tokens;
-    /* tick the volume button was last pressed */
-    unsigned int button_time_volume;
 
 #ifdef HAVE_LCD_BITMAP
     bool peak_meter_enabled;

@@ -158,6 +158,7 @@ static void app_main(void)
     }
 #endif /* #ifdef AUTOROCK */
 
+    global_status.last_volume_change = 0;
     root_menu();
 }
 

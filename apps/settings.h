@@ -308,6 +308,7 @@ struct system_status
 #endif
     signed char last_screen;
     int  viewer_icon_count;
+    int last_volume_change; /* tick the last volume change happened. skins use this */
 };
 
 struct user_settings

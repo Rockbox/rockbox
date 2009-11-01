@@ -1632,7 +1632,6 @@ void skin_data_reset(struct wps_data *wps_data)
 #endif
     wps_data->tokens = NULL;
     wps_data->num_tokens = 0;
-    wps_data->button_time_volume = 0;
 
 #ifdef HAVE_LCD_BITMAP
     wps_data->peak_meter_enabled = false;
