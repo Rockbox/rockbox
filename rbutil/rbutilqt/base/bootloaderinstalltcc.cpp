@@ -81,6 +81,14 @@ void BootloaderInstallTcc::installStage2(void)
         goto exit;
     }
 
+    /* A CRC test in order to reject non OF file */
+    if (test_firmware_tcc(of_buf, of_size))
+    {
+        emit logItem(errstr, LOGERROR);
+        emit logItem(tr("Unknown OF file used: %1").arg(m_offile), LOGERROR);
+        goto exit;
+    }
+
     /* Load bootloader file */
     boot_buf = file_read(bootfile.toLocal8Bit().data(), &boot_size);
     if (boot_buf == NULL)

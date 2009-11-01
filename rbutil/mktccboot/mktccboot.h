@@ -35,6 +35,9 @@ unsigned char *patch_firmware_tcc(unsigned char *of_buf, int of_size,
 
 unsigned char *file_read(char *filename, int *size);
 
+/* Test TCC firmware file for consistency using CRC test */
+int test_firmware_tcc(unsigned char* buf, int length);
+
 #ifdef __cplusplus
 };
 #endif

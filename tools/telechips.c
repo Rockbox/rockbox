@@ -31,6 +31,7 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 static uint32_t crctable[256];
 
@@ -57,11 +58,11 @@ static void gentable(uint32_t poly)
 {
     int i;
     uint32_t r;
-    uint32_t index;
+    uint32_t idx;
 
-    for (index = 0; index < 256; index++)
+    for (idx = 0; idx < 256; idx++)
     {
-        r = bitreverse(index,8) << 24;
+        r = bitreverse(idx,8) << 24;
         for (i=0; i<8; i++)
         {
             if (r & (1 << 31))
@@ -69,7 +70,7 @@ static void gentable(uint32_t poly)
             else
                 r<<=1;
         }
-        crctable[index] = bitreverse(r,32);
+        crctable[idx] = bitreverse(r,32);
     }
 }
 
@@ -155,4 +156,27 @@ void telechips_encode_crc(unsigned char* buf, int length)
     } else {
         put_uint32le(buf+0x10, crc1);
     }
+}
+
+int telechips_test_crc(unsigned char* buf, int length)
+{
+    uint32_t crc1, crc2, test_crc1, test_crc2;
+    unsigned char *test_buf;
+
+    crc1 = get_uint32le(buf + 0x10);
+    crc2 = get_uint32le(buf + 0x18);
+
+    test_buf = malloc(length);
+    if (!test_buf)
+        return 1;
+
+    memcpy(test_buf, buf, length);
+    telechips_encode_crc(test_buf, length);
+
+    test_crc1 = get_uint32le(test_buf + 0x10);
+    test_crc2 = get_uint32le(test_buf + 0x18);
+
+    free(test_buf);
+
+    return (crc1 == test_crc1 && crc2 == test_crc2) ? 0 : 2;
 }

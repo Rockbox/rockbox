@@ -175,6 +175,12 @@ error:
     return NULL;
 }
 
+/* A CRC test in order to reject non OF file */
+int test_firmware_tcc(unsigned char* buf, int length)
+{
+    return telechips_test_crc(buf, length);
+}
+
 #ifndef LIB
 int main(int argc, char *argv[])
 {
@@ -185,7 +191,7 @@ int main(int argc, char *argv[])
     unsigned char *boot_buf = NULL;
     unsigned char* image = NULL;
     int ret = 0;
-    
+
     if(argc < 3) {
         usage();
     }
@@ -199,6 +205,14 @@ int main(int argc, char *argv[])
     if (!of_buf)
     {
         ret = 1;
+        goto error_exit;
+    }
+
+    /* Validate input file */
+    if (test_firmware_tcc(of_buf, of_size))
+    {
+        printf("[ERR] Unknown OF file used, aborting\n");
+        ret = 2;
         goto error_exit;
     }
 

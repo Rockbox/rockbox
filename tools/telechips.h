@@ -24,5 +24,5 @@
 
 void telechips_encode_sum(unsigned char* buf, int length);
 void telechips_encode_crc(unsigned char* buf, int length);
-
+int telechips_test_crc(unsigned char* buf, int length);
 #endif
