@@ -489,34 +489,6 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
     return true;
 }
 
-#ifdef HAVE_LCD_BITMAP
-struct gui_img* find_image(char label, struct wps_data *data)
-{
-    struct skin_token_list *list = data->images;
-    while (list)
-    {
-        struct gui_img *img = (struct gui_img *)list->token->value.data;
-        if (img->label == label)
-            return img;
-        list = list->next;
-    }
-    return NULL;
-}
-#endif
-
-struct skin_viewport* find_viewport(char label, struct wps_data *data)
-{
-    struct skin_token_list *list = data->viewports;
-    while (list)
-    {
-        struct skin_viewport *vp = (struct skin_viewport *)list->token->value.data;
-        if (vp->label == label)
-            return vp;
-        list = list->next;
-    }
-    return NULL;
-}
-
 
 /* Read a (sub)line to the given alignment format buffer.
    linebuf is the buffer where the data is actually stored.

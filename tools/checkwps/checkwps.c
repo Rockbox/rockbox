@@ -127,16 +127,6 @@ int read_line(int fd, char* buffer, int buffer_size)
     return errno ? -1 : num_read;
 }
 
-bool load_wps_backdrop(const char* filename)
-{
-    return true;
-}
-
-bool load_remote_wps_backdrop(const char* filename)
-{
-    return true;
-}
-
 int recalc_dimension(struct dim *dst, struct dim *src)
 {
     return 0;
@@ -163,24 +153,6 @@ int resize_on_load(struct bitmap *bm, bool dither,
                    void *args)
 {
     return 0;
-}
-
-int audio_status(void)
-{
-    return 0;
-}
-
-struct mp3entry* audio_current_track(void)
-{
-    return NULL;
-}
-
-void audio_stop(void)
-{
-}
-
-void audio_play(long offset)
-{
 }
 
 static char pluginbuf[PLUGIN_BUFFER_SIZE];
@@ -259,54 +231,6 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
 }
 #endif
 
-/* From skin_display.c */
-void skin_data_init(struct wps_data *wps_data)
-{
-#ifdef HAVE_LCD_BITMAP
-    wps_data->wps_sb_tag = false;
-    wps_data->show_sb_on_wps = false;
-    wps_data->peak_meter_enabled = false;
-    wps_data->images = NULL;
-    wps_data->progressbars = NULL;
-    /* progress bars */
-#else /* HAVE_LCD_CHARCELLS */
-    int i;
-    for (i = 0; i < 8; i++)
-    {
-        wps_data->wps_progress_pat[i] = 0;
-    }
-    wps_data->full_line_progressbar = false;
-#endif
-    wps_data->wps_loaded = false;
-}
-
-#ifdef HAVE_LCD_BITMAP
-struct gui_img* find_image(char label, struct wps_data *data)
-{
-    struct skin_token_list *list = data->images;
-    while (list)
-    {
-        struct gui_img *img = (struct gui_img *)list->token->value.data;
-        if (img->label == label)
-            return img;
-        list = list->next;
-    }
-    return NULL;
-}   
-#endif 
-
-struct skin_viewport* find_viewport(char label, struct wps_data *data)
-{
-    struct skin_token_list *list = data->viewports;
-    while (list)
-    {
-        struct skin_viewport *vp = (struct skin_viewport *)list->token->value.data;
-        if (vp->label == label)
-            return vp;
-        list = list->next;
-    }
-    return NULL;
-}
 
 int main(int argc, char **argv)
 {

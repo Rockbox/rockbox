@@ -381,6 +381,38 @@ static void add_to_ll_chain(struct skin_token_list **list, struct skin_token_lis
         t->next = item;
     }
 }
+
+/* traverse the image linked-list for an image */
+#ifdef HAVE_LCD_BITMAP
+struct gui_img* find_image(char label, struct wps_data *data)
+{
+    struct skin_token_list *list = data->images;
+    while (list)
+    {
+        struct gui_img *img = (struct gui_img *)list->token->value.data;
+        if (img->label == label)
+            return img;
+        list = list->next;
+    }
+    return NULL;
+}
+#endif
+
+/* traverse the viewport linked list for a viewport */
+struct skin_viewport* find_viewport(char label, struct wps_data *data)
+{
+    struct skin_token_list *list = data->viewports;
+    while (list)
+    {
+        struct skin_viewport *vp = (struct skin_viewport *)list->token->value.data;
+        if (vp->label == label)
+            return vp;
+        list = list->next;
+    }
+    return NULL;
+}
+
+
 /* create and init a new wpsll item.
  * passing NULL to token will alloc a new one.
  * You should only pass NULL for the token when the token type (table above)
@@ -1841,7 +1873,7 @@ bool skin_data_load(struct wps_data *wps_data,
             return false;
         }
 #endif
-#ifdef HAVE_ALBUMART
+#if defined(HAVE_ALBUMART) && !defined(__PCTOOL__)
         status = audio_status();
         if (status & AUDIO_STATUS_PLAY)
         {

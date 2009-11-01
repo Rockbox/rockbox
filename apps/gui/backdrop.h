@@ -36,10 +36,9 @@ bool backdrop_load(enum backdrop_type bdrop, const char*);
 void backdrop_unload(enum backdrop_type bdrop);
 void backdrop_show(enum backdrop_type bdrop);
 
-#else /* LCD_DEPTH > 1 */
+#else /* LCD_DEPTH <= 1 || __PCTOOL__ */
 
-static inline
-bool backdrop_load(enum backdrop_type bdrop, const char* filename)
+static inline bool backdrop_load(enum backdrop_type bdrop, const char* filename)
 {
     (void)filename; (void)bdrop; return true;
 }
