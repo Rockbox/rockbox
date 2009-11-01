@@ -173,11 +173,12 @@ static bool add_to_playlist(int position, bool queue)
         playlist_create(NULL, NULL);
 
     /* always set seed before inserting shuffled */
-    if (position == PLAYLIST_INSERT_SHUFFLED || position == PLAYLIST_INSERT_LAST_SHUFFLED)
+    if (position == PLAYLIST_INSERT_SHUFFLED ||
+        position == PLAYLIST_INSERT_LAST_SHUFFLED)
     {
         srand(current_tick);
-	if (position == PLAYLIST_INSERT_LAST_SHUFFLED)
-	    playlist_set_last_shuffled_start();
+        if (position == PLAYLIST_INSERT_LAST_SHUFFLED)
+            playlist_set_last_shuffled_start();
     }
 
 #ifdef HAVE_TAGCACHE
@@ -439,7 +440,6 @@ static int treeplaylist_callback(int action,
             }
             else if (this_item == &i_shuf_pl_item)
             {
-                
                 if (audio_status() & AUDIO_STATUS_PLAY)
                 {
                     return action;
@@ -453,14 +453,18 @@ static int treeplaylist_callback(int action,
                 }
                 return ACTION_EXIT_MENUITEM;
             }
-            else if (this_item == &i_last_shuf_pl_item || this_item == &q_last_shuf_pl_item)
+            else if (this_item == &i_last_shuf_pl_item ||
+                this_item == &q_last_shuf_pl_item)
             {
-        	if ((playlist_amount() > 0) && (audio_status() & AUDIO_STATUS_PLAY) && (selected_file_attr & ATTR_DIRECTORY))
-        	{
-        	    return action;
-        	}
-        	else
-        	    return ACTION_EXIT_MENUITEM;
+                if ((playlist_amount() > 0) &&
+                    (audio_status() & AUDIO_STATUS_PLAY) &&
+                    ((selected_file_attr & ATTR_DIRECTORY) ||
+                    ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)))
+                {
+                    return action;
+                }
+                else
+                    return ACTION_EXIT_MENUITEM;
             }
             break;
     }
