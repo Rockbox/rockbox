@@ -53,7 +53,6 @@
 #include "viewport.h"
 
 #include "wps_internals.h"
-#include "wps.h"
 #include "root_menu.h"
 #ifdef HAVE_RECORDING
 #include "recording.h"
@@ -525,7 +524,7 @@ const char *get_token_value(struct gui_wps *gwps,
             int mode = 1; /* stop */
             if (status == STATUS_PLAY)
                 mode = 2; /* play */
-            if (is_wps_fading() || 
+            if (state->is_fading || 
                (status == STATUS_PAUSE  && !status_get_ffmode()))
                 mode = 3; /* pause */
             else

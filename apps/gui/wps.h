@@ -36,9 +36,9 @@ void fade(bool fade_in, bool updatewps);
 bool ffwd_rew(int button);
 void display_keylock_text(bool locked);
 
-bool is_wps_fading(void);
-
 #ifdef IPOD_ACCESSORY_PROTOCOL
+/* whether the wps is fading the volume due to pausing/stopping */
+bool is_wps_fading(void);
 /* return length of the current ff or rewin action, IAP needs this */
 int wps_get_ff_rewind_count(void);
 #endif /* IPOD_ACCESSORY_PROTOCOL */

@@ -288,12 +288,13 @@ struct wps_data
    and some status infos */
 struct wps_state
 {
-    bool ff_rewind;
-    bool paused;
-    int ff_rewind_count;
-    bool wps_time_countup;
     struct mp3entry* id3;
     struct mp3entry* nid3;
+    int  ff_rewind_count;
+    bool ff_rewind;
+    bool paused;
+    bool wps_time_countup;
+    bool is_fading;
 };
 
 /* Holds data for all screens in a skin. */

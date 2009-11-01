@@ -159,14 +159,13 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
 #endif
 }
 
-static bool wps_fading_out = false;
 void fade(bool fade_in, bool updatewps)
 {
     int fp_global_vol = global_settings.volume << 8;
     int fp_min_vol = sound_min(SOUND_VOLUME) << 8;
     int fp_step = (fp_global_vol - fp_min_vol) / 30;
     int i;
-    wps_fading_out = !fade_in;
+    wps_state.is_fading = !fade_in;
     if (fade_in) {
         /* fade in */
         int fp_volume = fp_min_vol;
@@ -204,7 +203,7 @@ void fade(bool fade_in, bool updatewps)
             sleep(1);
         }
         audio_pause();
-        wps_fading_out = false;
+        wps_state.is_fading = false;
 #if CONFIG_CODEC != SWCODEC
 #ifndef SIMULATOR
         /* let audio thread run and wait for the mas to run out of data */
@@ -216,10 +215,6 @@ void fade(bool fade_in, bool updatewps)
         /* reset volume to what it was before the fade */
         sound_set_volume(global_settings.volume);
     }
-}
-bool is_wps_fading(void)
-{
-    return wps_fading_out;
 }
 
 static bool update_onvol_change(struct gui_wps * gwps)
@@ -1305,6 +1300,11 @@ void gui_sync_wps_init(void)
 
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
+bool is_wps_fading(void)
+{
+    return wps_state.is_fading;
+}
+
 int wps_get_ff_rewind_count(void)
 {
     return wps_state.ff_rewind_count;
