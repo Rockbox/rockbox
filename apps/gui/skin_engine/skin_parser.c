@@ -1219,6 +1219,7 @@ static struct touchaction touchactions[] = {
     {"shuffle", ACTION_TOUCH_SHUFFLE }, {"repmode", ACTION_TOUCH_REPMODE },
     {"quickscreen", ACTION_WPS_QUICKSCREEN },{"contextmenu", ACTION_WPS_CONTEXT },
     {"playlist", ACTION_WPS_VIEW_PLAYLIST }, {"pitch", ACTION_WPS_PITCHSCREEN},
+    {"voldown", ACTION_WPS_VOLDOWN}, {"volup", ACTION_WPS_VOLUP},
 };
 static int parse_touchregion(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
@@ -1249,6 +1250,8 @@ static int parse_touchregion(const char *wps_bufptr,
      * contextmenu - open the context menu
      * playlist - go into the playlist
      * pitch - go into the pitchscreen
+     * volup - increase volume by one step
+     * voldown - decrease volume by one step
     */
 
 
