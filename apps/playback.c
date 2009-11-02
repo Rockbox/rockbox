@@ -1861,7 +1861,7 @@ static void audio_thread(void)
 
     while (1)
     {
-        if (filling != STATE_FILLING) {
+        if (filling != STATE_FILLING && filling != STATE_IDLE) {
             /* End of buffering, let's calculate the watermark and unboost */
             set_filebuf_watermark();
             cancel_cpu_boost();
@@ -1982,7 +1982,7 @@ static void audio_thread(void)
                 break;
 
             default:
-                // LOGFQUEUE("audio < default : %08lX", ev.id);
+                /* LOGFQUEUE("audio < default : %08lX", ev.id); */
                 break;
         } /* end switch */
     } /* end while */
