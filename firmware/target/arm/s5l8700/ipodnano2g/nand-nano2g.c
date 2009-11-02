@@ -186,6 +186,7 @@ uint32_t nand_reset(uint32_t bank)
     if (nand_send_cmd(NAND_CMD_RESET)) return 1;
     if (nand_wait_chip_ready(bank)) return 1;
     FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
+    sleep(HZ / 100);  /* Some chips seem to need this */
     return 0;
 }
 
@@ -344,11 +345,11 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
                         void* sparebuffer, uint32_t doecc,
                         uint32_t checkempty)
 {
-	uint8_t* data = nand_data;
-	uint8_t* spare = nand_spare;
-	if (databuffer && !((uint32_t)databuffer & 0xf))
+    uint8_t* data = nand_data;
+    uint8_t* spare = nand_spare;
+    if (databuffer && !((uint32_t)databuffer & 0xf))
         data = (uint8_t*)databuffer;
-	if (sparebuffer && !((uint32_t)sparebuffer & 0xf))
+    if (sparebuffer && !((uint32_t)sparebuffer & 0xf))
         spare = (uint8_t*)sparebuffer;
     mutex_lock(&nand_mtx);
     led(true);
@@ -371,7 +372,7 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
         {
             if (nand_transfer_data(bank, 0, spare, 0x40))
                 return nand_unlock(1);
-			if (sparebuffer && spare != sparebuffer) 
+            if (sparebuffer && spare != sparebuffer) 
                 memcpy(sparebuffer, spare, 0x800);
             if (checkempty)
                 rc = nand_check_empty((uint8_t*)sparebuffer) << 1;
@@ -401,19 +402,19 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
 uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
                          void* sparebuffer, uint32_t doecc)
 {
-	uint8_t* data = nand_data;
-	uint8_t* spare = nand_spare;
-	if (databuffer && !((uint32_t)databuffer & 0xf))
+    uint8_t* data = nand_data;
+    uint8_t* spare = nand_spare;
+    if (databuffer && !((uint32_t)databuffer & 0xf))
         data = (uint8_t*)databuffer;
-	if (sparebuffer && !((uint32_t)sparebuffer & 0xf))
+    if (sparebuffer && !((uint32_t)sparebuffer & 0xf))
         spare = (uint8_t*)sparebuffer;
     mutex_lock(&nand_mtx);
     led(true);
     if (!nand_powered) nand_power_up();
     if (sparebuffer)
-	{
-	    if (spare != sparebuffer) memcpy(spare, sparebuffer, 0x40);
-	}
+    {
+        if (spare != sparebuffer) memcpy(spare, sparebuffer, 0x40);
+    }
     else memset(spare, 0xFF, 0x40);
     if (doecc)
     {
