@@ -207,6 +207,13 @@ void _logf(const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
+    
+#ifdef SIMULATOR
+    char buf[1024];
+    vsnprintf(buf, sizeof buf, fmt, ap);
+    DEBUGF("%s\n", buf);
+#endif
+
     vfnprintf(logf_push, NULL, fmt, ap);
     va_end(ap);
     
