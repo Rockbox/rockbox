@@ -27,7 +27,7 @@
 # Load some bitmaps
 %xl|B|battery.bmp|0|0|10|
 %xl|V|volume.bmp|0|0|10|
-%xl|S|status.bmp|0|0|12|
+%xl|S|status.bmp|0|0|14|
 
 # Battery area, Icons
 %Vl|a|0|0|-|8|0|-|-| 
@@ -48,8 +48,8 @@
 
 # Icons, all in the same bmp strip, so need to use multiple viewports
 # Playback mode
-%V|44|0|-|8|0|-|-| 
-%?mp<%xdSc|%xdSb|%xdSd|%xdSe|%xdSf>
+%V|46|0|-|8|0|-|-| 
+%?mp<%xdSc|%xdSb|%xdSd|%xdSe|%xdSf|%xdSg|%xdSh|%xdSi|%xdSj>
 
 # Repeat mode
 %V|54|0|-|8|0|-|-| 
