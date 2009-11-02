@@ -893,7 +893,7 @@ static void buffering_handle_rebuffer_callback(void *data)
 
 static void buffering_handle_finished_callback(void *data)
 {
-    logf("handle %d finished buffering", *data);
+    logf("handle %d finished buffering", *(int*)data);
     int hid = (*(int*)data);
 
     if (hid == tracks[track_widx].id3_hid)
@@ -973,7 +973,7 @@ static void audio_clear_track_entries(void)
 {
     int cur_idx = track_widx;
 
-    logf("Clearing tracks:%d/%d", track_ridx, track_widx);
+    logf("Clearing tracks: r%d/w%d", track_ridx, track_widx);
 
     /* Loop over all tracks from write-to-read */
     while (1)
@@ -1100,7 +1100,7 @@ static bool audio_load_track(size_t offset, bool start_play)
     last_peek_offset++;
     tracks[track_widx].taginfo_ready = false;
 
-    logf("Buffering track:%d/%d", track_widx, track_ridx);
+    logf("Buffering track: r%d/w%d", track_ridx, track_widx);
     /* Get track name from current playlist read position. */
     while ((trackname = playlist_peek(last_peek_offset)) != NULL)
     {
@@ -1155,7 +1155,7 @@ static bool audio_load_track(size_t offset, bool start_play)
             get_metadata(&unbuffered_id3, fd, trackname);
             last_peek_offset--;
             close(fd);
-            logf("buffer is full for now");
+            logf("buffer is full for now (get metadata)");
             filling = STATE_FULL;
             return false;
         }
@@ -1198,7 +1198,7 @@ static void audio_finish_load_track(void)
     track_load_started = false;
 
     if (tracks[track_widx].id3_hid < 0) {
-        logf("no metatdata");
+        logf("No metadata");
         return;
     }
 
@@ -1268,7 +1268,7 @@ static void audio_finish_load_track(void)
                 if(aa_hid == ERR_BUFFER_FULL)
                 {
                     filling = STATE_FULL;
-                    logf("buffer is full for now");
+                    logf("buffer is full for now (get album art)");
                     return;  /* No space for track's album art, not an error */
                 }
                 else if (aa_hid < 0)
@@ -1346,7 +1346,7 @@ static void audio_finish_load_track(void)
         break;
     }
 
-    logf("alt:%s", track_id3->path);
+    logf("load track: %s", track_id3->path);
 
     if (file_offset > AUDIO_REBUFFER_GUESS_SIZE)
         file_offset -= AUDIO_REBUFFER_GUESS_SIZE;
@@ -1362,7 +1362,7 @@ static void audio_finish_load_track(void)
     if (tracks[track_widx].audio_hid == ERR_BUFFER_FULL)
     {
         filling = STATE_FULL;
-        logf("buffer is full for now");
+        logf("buffer is full for now (load audio)");
         return;
     }
     else if (tracks[track_widx].audio_hid < 0)
@@ -1982,7 +1982,7 @@ static void audio_thread(void)
                 break;
 
             default:
-                LOGFQUEUE("audio < default");
+                // LOGFQUEUE("audio < default : %08lX", ev.id);
                 break;
         } /* end switch */
     } /* end while */

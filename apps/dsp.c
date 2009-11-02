@@ -1707,7 +1707,7 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
            clipped signal */
         comp_curve[65] = fp_factor(db_curve[4].offset, 16) << 8;
         
-#if defined(SIMULATOR) && defined(LOGF_ENABLE)
+#if defined(ROCKBOX_HAS_LOGF) && defined(LOGF_ENABLE)
         logf("\n   *** Compression Offsets ***");
         /* some settings for display only, not used in calculations */
         db_curve[0].offset = 0;
