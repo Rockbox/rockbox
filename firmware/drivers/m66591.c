@@ -19,7 +19,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#define LOGF_ENABLE
+//#define LOGF_ENABLE
 
 #include "system.h"
 #include "config.h"
@@ -47,9 +47,10 @@
  */
 #define HISPEED
 
-/* Right now sending blocks till the full transfer has completed, this needs to
- *  be fixed so that it does not require a block. (USB_TRAN_LOCK ideally would
- *  not be set).
+/* Right now sending blocks till the full transfer has completed. The driver
+ *  will work without USB_TRAN_BLOCK set, but it is more than 50% slower.  
+ *  The driver is more "Proper" without USB_TRAN_BLOCK defined so if you start
+ *  having freezeups or trouble using USB undefine this option.
  */
 #define USB_TRAN_BLOCK
 
@@ -69,7 +70,8 @@ static int pipe_maxpack_size (int pipe);
 static void control_received(void);
 static void transfer_complete(int endpoint);
 static int mxx_transmit_receive(int endpoint);
-static int mxx_queue(int endpoint, void * ptr, int length, bool send);
+static int mxx_queue(int endpoint, void * ptr, int length, bool send, 
+    bool wait);
 
 struct M66591_epstat {
     unsigned char dir;      /* endpoint direction */
@@ -89,6 +91,15 @@ static volatile unsigned short * pipe_ctrl_addr(int pipe) {
     } else {
         return &M66591_PIPECTRL1 + (pipe-1);
     }
+}
+
+static void pipe_init(int pipe) {
+    volatile unsigned short *pipe_cfg;
+    pipe_cfg = pipe_ctrl_addr(pipe);
+    
+    *pipe_cfg |= 1<<9;      /* ACLR */
+    *pipe_cfg &= ~(1<<9);   /* Force de-assertion */
+    *pipe_cfg |= 1<<8;      /* SQCLR */
 }
 
 /* This function sets the pipe/endpoint handshake */
@@ -125,7 +136,10 @@ static int pipe_buffer_size (int pipe) {
         return 256;
     case 1:
     case 2:
-        return 1024;
+        if(M66591_PIPE_CFGWND & (1<<9) )
+            return 1024;
+        else
+            return 512;
     case 3:
     case 4:
         return 512;
@@ -206,7 +220,7 @@ static void transfer_complete(int endpoint) {
     logf("mxx: ep %d transfer complete", endpoint);
     int temp=M66591_eps[endpoint].dir ? USB_DIR_IN : USB_DIR_OUT;
     usb_core_transfer_complete(endpoint, temp, 0, 
-        M66591_eps[endpoint].length);
+        M66591_eps[endpoint].count);
 }
 
 /* This is the main transmit routine that is typically called from the interrupt
@@ -250,7 +264,8 @@ static int mxx_transmit_receive(int endpoint) {
         length = M66591_eps[endpoint].length;
 #else
         int bufsize=pipe_buffer_size(endpoint);
-        length=MIN(M66591_eps[endpoint].length, bufsize);
+        length=MIN(M66591_eps[endpoint].length - M66591_eps[endpoint].count, 
+            bufsize);
 #endif
 
         /* Calculate the position in the buffer, all transfers should be 2-byte
@@ -259,32 +274,70 @@ static int mxx_transmit_receive(int endpoint) {
         ptrs = (unsigned short *)(M66591_eps[endpoint].buf
             + M66591_eps[endpoint].count);
         
-        /* Start sending data in 16-bit words */
-        for (i = 0; i < (length>>1); i++) { 
-            /* This wait is dangerous in the event that something happens to 
-             *  the PHY pipe where it never becomes ready again, should probably
-             *  add a timeout, and ideally completely remove.
-             */
-            while(!(M66591_CPORT_CTRL1&(1<<13))){};
+        /* Check if the buffer is alligned */
+        if( LIKELY(((int)ptrs) & 0x01) == 0 )
+        {
+            /* Start sending data in 16-bit words (fast) */
+            for (i = 0; i < (length>>1); i++) { 
+#if defined(USB_TRAN_BLOCK)
+                /* This wait is dangerous in the event that something happens 
+                 *  to the PHY pipe where it never becomes ready again, should 
+                 *  probably add a timeout, and ideally completely remove.
+                 */
+                while(!(M66591_CPORT_CTRL1&(1<<13))){};
+#endif
 
-            M66591_CPORT = *ptrs++;
-            M66591_eps[endpoint].count+=2;
+                M66591_CPORT = *ptrs++;
+                M66591_eps[endpoint].count+=2;
+            }
+            
+            /* If the length is odd, send the last byte after setting the byte 
+             *  width of the FIFO.
+             */
+            if(length & 0x01) {
+                /* Unset MBW (8-bit transfer) */
+                M66591_CPORT_CTRL0 &= ~(1<<10);
+                M66591_CPORT = *((unsigned char *)ptrs);
+                M66591_eps[endpoint].count++;
+            }
         }
-        
-        /* If the length is odd, send the last byte after setting the byte width
-         *  of the FIFO.
-         */
-        if(length & 0x01) {
-            /* Unset MBW (8-bit transfer) */
-            M66591_CPORT_CTRL0 &= ~(1<<10);
-            M66591_CPORT = *((unsigned char *)ptrs - 1);
-            M66591_eps[endpoint].count++;
-        }
-        
-        /* Set BVAL if length is not a multiple of the maximum packet size */
-        if( (length == 0) || (length % maxpack != 0) ) {
-            logf("mxx: do set BVAL");
-            M66591_CPORT_CTRL1 |= (1<<15);
+        else
+        {
+            /* The buffer is mis-aligned - data needs to be organized first. 
+             *  This is slower than the above method.
+             */
+            unsigned short sbuf;
+            unsigned char *ptrc = (unsigned char*)ptrs;
+            
+            /* Start sending data in 16-bit words */
+            for (i = 0; i < (length>>1); i++) { 
+#if defined(USB_TRAN_BLOCK)
+                /* This wait is dangerous in the event that something happens 
+                 *  to the PHY pipe where it never becomes ready again, should 
+                 *  probably add a timeout, and ideally completely remove.
+                 */
+                while(!(M66591_CPORT_CTRL1&(1<<13))){};
+#endif
+
+                /* These are mis-aligned accesses so the data nees to be
+                 *  arranged.
+                 */
+                sbuf = (*(ptrc+1) << 8) | *ptrc;
+                ptrc += 2;
+
+                M66591_CPORT = sbuf;
+                M66591_eps[endpoint].count+=2;
+            }
+            
+            /* If the length is odd, send the last byte after setting the byte 
+             *  width of the FIFO.
+             */
+            if(length & 0x01) {
+                /* Unset MBW (8-bit transfer) */
+                M66591_CPORT_CTRL0 &= ~(1<<10);
+                M66591_CPORT = *ptrc;
+                M66591_eps[endpoint].count++;
+            }
         }
         
         /* If the transfer is complete set up interrupts to notify when FIFO is
@@ -301,6 +354,12 @@ static int mxx_transmit_receive(int endpoint) {
         } else {
             /* There is still data to transfer, make sure READY is enabled */
             M66591_INTCFG_RDY |= 1 << endpoint;
+        }
+        
+        /* Set BVAL if length is not a multiple of the maximum packet size */
+        if( (length == 0) || (length % maxpack != 0) ) {
+            logf("mxx: do set BVAL");
+            M66591_CPORT_CTRL1 |= (1<<15) | ((length == 0) << 14);
         }
     } else {
         /* Read data from FIFO */
@@ -366,8 +425,17 @@ static int mxx_transmit_receive(int endpoint) {
 
 /* This function is used to start transfers.  It is a helper function for the 
  *  usb_drv_send_nonblocking, usb_drv_send, and usb_drv_receive functions.
+ *
+ * The functionality for wait needs to be added.  Currently the driver is 
+ *  always used in a blocking mode(USB_TRAN_BLOCK) so it is not required.
  */
-static int mxx_queue(int endpoint, void * ptr, int length, bool send) {
+static int mxx_queue(int endpoint, void * ptr, int length, bool send, 
+    bool wait) 
+{
+#if defined(USB_TRAN_BLOCK) && !defined(LOGF_ENABLE)
+    (void) wait;
+#endif
+
     /* Disable IRQs */
     int flags = disable_irq_save();
 
@@ -384,7 +452,8 @@ static int mxx_queue(int endpoint, void * ptr, int length, bool send) {
     M66591_eps[endpoint].dir=send;
     M66591_eps[endpoint].waiting=true;
 
-    logf("mxx: queue ep %d %s, len: %d", endpoint, send ? "out" : "in", length);
+    logf("mxx: queue ep %d %s, len: %d, wait: %d", 
+        endpoint, send ? "out" : "in", length, wait);
     
     /* Pick the pipe that communications are happening on */
     pipe_c_select(endpoint, send);
@@ -436,9 +505,10 @@ static int mxx_queue(int endpoint, void * ptr, int length, bool send) {
  * This is the interrupt handler for this driver.  It should be called from the
  *  target interrupt handler routine (eg. GPIO3 on M:Robe 500).
  ******************************************************************************/
+void USB_DEVICE(void)  __attribute__ ((section(".icode")));
 void USB_DEVICE(void) {
     int pipe_restore=M66591_CPORT_CTRL0;
-    logf("mxx: INT BEGIN tick: %d\n", (int) current_tick);
+    logf("\nmxx: INT BEGIN tick: %d", (int) current_tick);
     
     logf("mxx: sMAIN0: 0x%04x, sRDY: 0x%04x", 
         M66591_INTSTAT_MAIN, M66591_INTSTAT_RDY);
@@ -548,7 +618,7 @@ void USB_DEVICE(void) {
     
     /* Restore the pipe state before the interrupt occured */
     M66591_CPORT_CTRL0=pipe_restore;
-    logf("\nmxx: INT END");
+    logf("mxx: INT END\n");
 }
 
 /*******************************************************************************
@@ -576,7 +646,7 @@ int usb_drv_request_endpoint(int type, int dir) {
 
     if (type == USB_ENDPOINT_XFER_BULK) {
         /* Enable double buffer mode (only used for ep 1 and 2) */
-        pipecfg |= 1<<9; 
+        pipecfg |= 1<<9 | 1<<8; 
         
         /* Bulk endpoints must be between 1 and 4 inclusive */
         ep=1;
@@ -590,6 +660,8 @@ int usb_drv_request_endpoint(int type, int dir) {
         }
     } else if (type == USB_ENDPOINT_XFER_INT) {
         ep=5;
+        
+        pipecfg |= 1<<13; 
         
         while(M66591_eps[ep].busy && ep++<7);
         
@@ -612,13 +684,15 @@ int usb_drv_request_endpoint(int type, int dir) {
     
     M66591_PIPE_CFGSEL=ep;
     
-    /* Enable pipe (15) and continuous transfer mode (8) */
-    pipecfg |= 1<<15 | 1<<8; 
+    /* Enable pipe (15) */
+    pipecfg |= 1<<15; 
     
     pipe_handshake(ep, PIPE_SHAKE_NAK);
 
     /* Setup the flags */
     M66591_PIPE_CFGWND=pipecfg;
+    
+    pipe_init(ep);
     
     logf("mxx: ep req ep#: %d config: 0x%04x", ep, M66591_PIPE_CFGWND);
 
@@ -664,24 +738,13 @@ void usb_enable(bool on) {
 void usb_drv_init(void) {
     logf("mxx: Device Init");
     
-    /* State left behind by m:robe 500i original firmware */
-    M66591_TRN_CTRL         = 0x8001; /* External 48 MHz clock */
-    M66591_TRN_LNSTAT       = 0x0040; /* "Reserved. Set it to '1'." */
-    
-    M66591_PIN_CFG0         = 0x0000;
     M66591_PIN_CFG1         = 0x8000; /* Drive Current: 3.3V setting */
     M66591_PIN_CFG2         = 0x0000;
     
-    M66591_INTCFG_MAIN      = 0x0000; /* All Interrupts Disable for now */
-    M66591_INTCFG_OUT       = 0x0000; /* Sense is edge, polarity is low */
-    M66591_INTCFG_RDY       = 0x0000;
-    M66591_INTCFG_NRDY      = 0x0000;
-    M66591_INTCFG_EMP       = 0x0000;
-    
-    M66591_INTSTAT_MAIN     = 0;
-    M66591_INTSTAT_RDY      = 0;
-    M66591_INTSTAT_NRDY     = 0;
-    M66591_INTSTAT_EMP      = 0;
+    M66591_TRN_CTRL         = 0x8000; /* External 48 MHz clock */
+    M66591_TRN_CTRL         |=0x0001;
+
+    M66591_INTCFG_MAIN      |=0x8000; /* Enable VBUS interrupt */
 }
 
 /* fully enable driver */
@@ -713,17 +776,17 @@ void usb_attach(void) {
     M66591_TRN_CTRL &= ~(1<<7);
 #endif
 
-    /* Enable oscillation buffer */
+    /* Enable oscillation buffer XCKE */
 	M66591_TRN_CTRL |= (1<<13);
 
     udelay(1500);
 
-    /* Enable reference clock, PLL */
+    /* Enable reference clock, PLL RCKE */
     M66591_TRN_CTRL |= (3<<11);
 
     udelay(9);
 
-    /* Enable internal clock supply */
+    /* Enable internal clock supply SCKE */
     M66591_TRN_CTRL |= (1<<10);
 
     /* Disable PIPE ready interrupts */
@@ -744,7 +807,7 @@ void usb_attach(void) {
     M66591_DCP_CNTMD |= (1<<8);
     
     /* Set the threshold that the PHY will automatically transmit from EP0 */
-    M66591_DCP_CTRLEN = 128;
+    M66591_DCP_CTRLEN = 256;
     
     pipe_handshake(0, PIPE_SHAKE_NAK);
     
@@ -793,8 +856,7 @@ void usb_drv_exit(void) {
  */
 int usb_drv_send_nonblocking(int endpoint, void* ptr, int length)
 {
-    /* The last arguement for queue specifies the dir of data (true==send) */
-    return mxx_queue(endpoint, ptr, length, true);
+    return mxx_queue(endpoint, ptr, length, true, false);
 }
 
 /* This function begins a transmit (on an IN endpoint), it does not block
@@ -802,8 +864,7 @@ int usb_drv_send_nonblocking(int endpoint, void* ptr, int length)
  */
 int usb_drv_send(int endpoint, void* ptr, int length)
 {
-    /* The last arguement for queue specifies the dir of data (true==send) */
-    return mxx_queue(endpoint, ptr, length, true);
+    return mxx_queue(endpoint, ptr, length, true, true);
 }
 
 /* This function begins a receive (on an OUT endpoint), it should not block
@@ -811,8 +872,7 @@ int usb_drv_send(int endpoint, void* ptr, int length)
  */
 int usb_drv_recv(int endpoint, void* ptr, int length)
 {
-    /* Last arguement for queue specifies the dir of data (false==receive) */
-    return mxx_queue(endpoint, ptr, length, false);
+    return mxx_queue(endpoint, ptr, length, false, false);
 }
 
 /* This function checks the reset handshake speed status 

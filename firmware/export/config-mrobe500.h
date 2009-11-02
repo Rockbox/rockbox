@@ -207,7 +207,7 @@
 /* enable these for the usb stack */
 #define CONFIG_USBOTG       USBOTG_M66591
 #define USE_ROCKBOX_USB
-//#define USB_ENABLE_SERIAL
+
 #define HAVE_USBSTACK
 //#define HAVE_USB_POWER
 //#define USBPOWER_BUTTON     BUTTON_POWER
@@ -216,6 +216,7 @@
 #define USB_NUM_ENDPOINTS   7
 #define USB_VENDOR_ID       0x07b4
 #define USB_PRODUCT_ID      0x0281
+#define HAVE_USB_HID_MOUSE
 
 /* Define this if hardware supports alternate blitting */
 #define HAVE_LCD_MODES LCD_MODE_RGB565 | LCD_MODE_YUV | LCD_MODE_PAL256

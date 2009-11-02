@@ -98,10 +98,18 @@ enum {
 #ifdef HAVE_USBSTACK
 /* USB class drivers */
 enum {
+#ifdef USB_ENABLE_STORAGE
     USB_DRIVER_MASS_STORAGE,
+#endif
+#ifdef USB_ENABLE_SERIAL
     USB_DRIVER_SERIAL,
+#endif
+#ifdef USB_ENABLE_CHARGING_ONLY
     USB_DRIVER_CHARGING_ONLY,
+#endif
+#ifdef USB_ENABLE_HID
     USB_DRIVER_HID,
+#endif
     USB_NUM_DRIVERS
 };
 

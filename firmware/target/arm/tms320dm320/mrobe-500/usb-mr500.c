@@ -30,32 +30,44 @@
 void usb_init_device(void) {
     logf("mxx: SOC Init");
 
-    /* The EMIF timing that is currently used may not be apropriate when the 
-     *  device is boosted.  The following values were used with sucess too:
+    /* The following EMIF timing values are from the OF:
      *      IO_EMIF_CS4CTRL1 = 0x66AB;
      *      IO_EMIF_CS4CTRL2 = 0x4220; 
+     *
+     * These EMIF timing values are more agressive, but appear to work as long
+     *  as USB_TRANS_BLOCK is defined in the USB driver:
+     *      IO_EMIF_CS4CTRL1 = 0x2245;
+     *      IO_EMIF_CS4CTRL2 = 0x4110; 
+     *
+     * When USB_TRANS_BLOCK is not defined the USB driver does not work unless
+     *  the values from the OF are used.
      */
+    
     IO_EMIF_CS4CTRL1 = 0x2245;
     IO_EMIF_CS4CTRL2 = 0x4110; 
 
-    IO_GIO_DIR0 &= ~(1<<2);
-    IO_GIO_INV0 &= ~(1<<2);
-    IO_GIO_FSEL0 &= ~(0x03);
+    /* Setup the m66591 reset signal */
+    IO_GIO_DIR0     &= ~(1<<2); /* output */
+    IO_GIO_INV0     &= ~(1<<2); /* non-inverted */
+    IO_GIO_FSEL0    &= ~(0x03); /* normal pins */
+    
+    /* Setup the m66591 interrupt signal */
+    IO_GIO_DIR0     |= 1<<3;    /* input */
+    IO_GIO_INV0     &= ~(1<<3); /* non-inverted */
+    IO_GIO_IRQPORT  |= 1<<3;    /* enable EIRQ */
+    
+    udelay(100);
     
     /* Drive the reset pin low */
-    IO_GIO_BITCLR0 = 1<<2;
+    IO_GIO_BITCLR0  = 1<<2;
 
     /* Wait a bit */
-    udelay(3);
+    udelay(100);
 
     /* Release the reset (drive it high) */
-    IO_GIO_BITSET0 = 1<<2;
+    IO_GIO_BITSET0  = 1<<2;
     
-    udelay(300);
-    
-    IO_GIO_DIR0 |= 1<<3;
-    IO_GIO_INV0 &= ~(1<<3);
-    IO_GIO_IRQPORT |= 1<<3;
+    udelay(500);
 
     /* Enable the MXX interrupt */
     IO_INTC_EINT1 |= (1<<8); /* IRQ_GIO3 */

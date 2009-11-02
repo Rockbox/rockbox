@@ -102,7 +102,7 @@ static const unsigned short const irqpriority[] =
     IRQ_ICE,IRQ_ARMCOM_RX,IRQ_ARMCOM_TX,IRQ_RESERVED
 }; /* IRQ priorities, ranging from highest to lowest */
 
-static void (* const irqvector[])(void) =
+static void (* const irqvector[])(void) __attribute__ ((section(".idata"))) =
 {
     TIMER0,TIMER1,TIMER2,TIMER3,CCD_VD0,CCD_VD1,
     CCD_WEN,VENC,SERIAL0,SERIAL1,EXT_HOST,DSPHINT,
@@ -222,11 +222,16 @@ void system_init(void)
     
     /* setup the clocks */
     IO_CLK_DIV0=0x0003;
+    
+    /* SDRAM Divide by 3 */
     IO_CLK_DIV1=0x0102;
     IO_CLK_DIV2=0x021F;
     IO_CLK_DIV3=0x1FFF;
     IO_CLK_DIV4=0x1F00;
     
+    /* 27 MHz input clock:
+     *  PLLA = 27*11/1
+     */
     IO_CLK_PLLA=0x80A0;
     IO_CLK_PLLB=0x80C0;
     
@@ -286,6 +291,7 @@ void system_init(void)
     ttb_init();
     /* Make sure everything is mapped on itself */
     map_section(0, 0, 0x1000, CACHE_NONE);
+    
     /* Enable caching for RAM */
     map_section(CONFIG_SDRAM_START, CONFIG_SDRAM_START, MEM, CACHE_ALL);
     /* enable buffered writing for the framebuffer */

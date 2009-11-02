@@ -310,6 +310,27 @@ static const struct button_mapping button_context_usb_hid_mode_browser[] = {
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
 }; /* button_context_usb_hid_mode_browser */
+
+#ifdef HAVE_USB_HID_MOUSE
+static const struct button_mapping button_context_usb_hid_mode_mouse[] = {
+    { ACTION_USB_HID_MOUSE_UP,                BUTTON_TOPMIDDLE,                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_UP_REP,            BUTTON_TOPMIDDLE|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN,              BUTTON_BOTTOMMIDDLE,              BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN_REP,          BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT,BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LEFT,              BUTTON_MIDLEFT,                   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_LEFT_REP,          BUTTON_MIDLEFT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RIGHT,             BUTTON_MIDRIGHT,                  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_RIGHT_REP,         BUTTON_MIDRIGHT|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_LEFT,       BUTTON_CENTER,                    BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_BUTTON_LEFT_REL,   BUTTON_CENTER|BUTTON_REL,         BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_UP,   BUTTON_TOPRIGHT,                  BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_UP,   BUTTON_TOPRIGHT|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_DOWN, BUTTON_BOTTOMRIGHT,               BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_DOWN, BUTTON_BOTTOMRIGHT|BUTTON_REPEAT, BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
+}; /* button_context_usb_hid_mode_mouse */
+#endif
 #endif
 
 const struct button_mapping* get_context_mapping(int context)
@@ -373,8 +394,13 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_usb_hid_mode_presentation;
         case CONTEXT_USB_HID_MODE_BROWSER:
             return button_context_usb_hid_mode_browser;
+#ifdef HAVE_USB_HID_MOUSE
+        case CONTEXT_USB_HID_MODE_MOUSE:
+            return button_context_usb_hid_mode_mouse;
 #endif
-
+#endif
+        default:
+            return button_context_standard;
     }
     return button_context_standard;
 }
