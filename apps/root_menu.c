@@ -595,5 +595,4 @@ void root_menu(void)
                 break;
         } /* switch() */
     }
-    return;
 }

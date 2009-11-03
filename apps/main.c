@@ -127,7 +127,8 @@ static void init(void);
 #ifdef SIMULATOR
 void app_main(void)
 #else
-static void app_main(void)
+int main(void) __attribute__((noreturn));
+int main(void)
 #endif
 {
     int i;
@@ -640,17 +641,5 @@ void cop_main(void)
 }
 #endif /* CPU_PP */
 
-int main(void)
-{
-    app_main();
-
-    while(1) {
-#if (CONFIG_LED == LED_REAL)
-        led(true); sleep(HZ/10);
-        led(false); sleep(HZ/10);
-#endif
-    }
-    return 0;
-}
 #endif
 

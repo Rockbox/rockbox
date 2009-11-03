@@ -22,7 +22,7 @@
 #ifndef __ROOT_MENU_H__
 #define __ROOT_MENU_H__
 
-void root_menu(void);
+void root_menu(void) __attribute__((noreturn));
 
 enum {
     /* from old menu api, but still required*/
