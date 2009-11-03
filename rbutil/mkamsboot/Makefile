@@ -65,7 +65,7 @@ $(OUT)/libmkamsboot.o: $(OUT)/mkamsboot.o
 
 libmkamsboot$(RBARCH).a: $(OUT) $(OUT)/libmkamsboot.o
 	@echo AR $@
-	$(SILENT)$(AR) ruc $(TARGET_DIR)libmkamsboot$(RBARCH).a $(OUT)/libmkamsboot.o
+	$(SILENT)$(AR) ruc $(TARGET_DIR)libmkamsboot$(RBARCH).a $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
