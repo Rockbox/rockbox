@@ -327,6 +327,9 @@ void system_reboot(void)
 
 void system_exception_wait(void)
 {
+    /* wait until button release (if a button is pressed) */
+    while(button_read_device());
+    /* then wait until next button press */
     while(!button_read_device());
 }
 
