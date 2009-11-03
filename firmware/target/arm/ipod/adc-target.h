@@ -21,12 +21,16 @@
 #ifndef _ADC_TARGET_H_
 #define _ADC_TARGET_H_
 
-#define NUM_ADC_CHANNELS 2
-
 #define ADC_BATTERY 0
 #define ADC_ACCESSORY 1
 #define ADC_UNREG_POWER ADC_BATTERY
-
+#ifdef IPOD_VIDEO
+#define ADC_4066_ISTAT 2
+#define NUM_ADC_CHANNELS 3
+#else
+#define NUM_ADC_CHANNELS 2
+#endif
+ 
 /* Force a scan now */
 unsigned short adc_scan(int channel);
 #endif

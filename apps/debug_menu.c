@@ -1125,6 +1125,9 @@ bool dbg_ports(void)
 #ifdef ADC_ACCESSORY
         lcd_putsf(0, line++, "ACCESSORY: %d", adc_read(ADC_ACCESSORY));
 #endif
+#ifdef IPOD_VIDEO
+        lcd_putsf(0, line++, "4066_ISTAT: %d", adc_read(ADC_4066_ISTAT));
+#endif
 
 #if defined(IPOD_ACCESSORY_PROTOCOL)
 extern unsigned char serbuf[];
@@ -1529,6 +1532,16 @@ static bool view_battery(void)
                          dock    ? "enabled" : "disabled");
                 lcd_putsf(0, 7, "Headphone: %s",
                          headphone ? "connected" : "disconnected");
+#ifdef IPOD_VIDEO
+                x = (adc_read(ADC_4066_ISTAT) * 2400) /
+#if MEM == 64
+                (1024 * 2);
+#else
+                (1024 * 3);
+#endif
+                lcd_putsf(0, 8, "Ibat: %d mA", x);
+                lcd_putsf(0, 9, "Vbat * Ibat: %d mW", x * y / 1000);
+#endif
 #elif defined TOSHIBA_GIGABEAT_S
                 int line = 3;
                 unsigned int st;
