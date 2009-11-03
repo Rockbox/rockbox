@@ -131,4 +131,3 @@
 #define MAX_CONTRAST_SETTING        63
 
 #define HAVE_SERIAL
-
