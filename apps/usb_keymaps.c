@@ -25,7 +25,7 @@
 #include "lang.h"
 #include "misc.h"
 #include "usbstack/usb_hid.h"
-//#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 #define MODIFIER(modifier, key) ((key) | (modifier << 8))

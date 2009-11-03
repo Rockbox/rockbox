@@ -52,7 +52,7 @@
 #include "splash.h"
 #include "general.h"
 
-#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 #ifdef SIMULATOR

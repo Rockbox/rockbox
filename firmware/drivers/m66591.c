@@ -19,7 +19,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-//#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 
 #include "system.h"
 #include "config.h"

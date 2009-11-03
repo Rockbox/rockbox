@@ -26,7 +26,7 @@
 #include "usb_charging_only.h"
 #include "usb_class_driver.h"
 
-//#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 /* charging_only interface */

@@ -52,7 +52,7 @@ static int fd_log = -1;
 #define TUNER_LOG(s...)     fdprintf(fd_log, s)
 
 #elif defined(SANYO_TUNER_LOGF)
-#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 #define TUNER_LOG_OPEN()

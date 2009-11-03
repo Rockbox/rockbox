@@ -25,7 +25,7 @@
 #include "audiohw.h"
 #include "wmcodec.h"
 #include "audio.h"
-//#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 /* TODO: Define/refine an API for special hardware steps outside the

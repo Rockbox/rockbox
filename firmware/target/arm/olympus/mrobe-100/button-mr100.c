@@ -31,7 +31,7 @@ static bool remote_hold = false;
 static bool headphones_status = true;
 #endif
 
-#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 static int int_btn = BUTTON_NONE;

@@ -30,7 +30,7 @@
 #include "storage.h"
 #include "buffer.h"
 #include "string.h"
-//#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 //#define USE_DMA

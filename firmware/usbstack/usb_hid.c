@@ -25,7 +25,7 @@
 #include "kernel.h"
 #include "usb_hid.h"
 #include "usb_class_driver.h"
-//#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 /* Documents avaiable here: http://www.usb.org/developers/devclass_docs/ */

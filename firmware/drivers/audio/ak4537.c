@@ -22,7 +22,7 @@
 #include "system.h"
 #include "string.h"
 
-// #define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 #include "pcm_sampr.h"

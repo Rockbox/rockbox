@@ -24,7 +24,7 @@
 #include "backlight.h"
 #include "synaptics-mep.h"
 
-#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 static int int_btn = BUTTON_NONE;

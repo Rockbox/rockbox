@@ -24,7 +24,7 @@
  * support the tag cache interface.
  */
 
-/* #define LOGF_ENABLE */
+/*#define LOGF_ENABLE*/
 
 #include <stdio.h>
 #include <string.h>

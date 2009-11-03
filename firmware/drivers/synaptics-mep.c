@@ -26,7 +26,7 @@
 #include "kernel.h"
 #include "button-target.h"
 
-#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 /* Driver for the Synaptics Touchpad based on the "Synaptics Modular Embedded

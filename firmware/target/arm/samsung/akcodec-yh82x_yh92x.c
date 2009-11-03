@@ -25,7 +25,7 @@
 #include "i2s.h"
 #include "akcodec.h"
 
-// #define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 #define I2C_AUDIO_ADDRESS 0x10

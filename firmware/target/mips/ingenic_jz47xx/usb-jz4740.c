@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "config.h"
-//#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 #include "system.h"
 #include "usb_ch9.h"
