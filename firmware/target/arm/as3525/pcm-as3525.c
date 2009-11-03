@@ -64,13 +64,6 @@ static void play_start_pcm(void)
     dma_size -= size;
     dma_start_addr += size;
 
-    CGU_PERI |= CGU_I2SOUT_APB_CLOCK_ENABLE;
-    CGU_AUDIO |= (1<<11);
-#ifdef HAVE_RECORDING
-    CGU_PERI &= ~CGU_I2SIN_APB_CLOCK_ENABLE;
-    CGU_AUDIO &= ~(1<<23);
-#endif
-
     clean_dcache_range((void*)addr, size);  /* force write back */
     dma_enable_channel(1, (void*)addr, (void*)I2SOUT_DATA, DMA_PERI_I2SOUT,
                 DMAC_FLOWCTRL_DMAC_MEM_TO_PERI, true, false, size >> 2, DMA_S1,
@@ -102,6 +95,11 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
     dma_retain();
 
+    I2SOUT_CONTROL |= 1<<6; /* dma */
+
+    CGU_PERI |= CGU_I2SOUT_APB_CLOCK_ENABLE;
+    CGU_AUDIO |= (1<<11);
+
     play_start_pcm();
 }
 
@@ -128,10 +126,9 @@ void pcm_play_dma_init(void)
 {
     CGU_PERI |= CGU_I2SOUT_APB_CLOCK_ENABLE;
 
-    /* clock source PLLA, minimal frequency */
-    CGU_AUDIO |= (511<<2) | (1<<0);
+    CGU_AUDIO = (CGU_AUDIO & ~(3<<0)) | (1<<0); /* clock source PLLA */
 
-    I2SOUT_CONTROL = (1<<6)|(1<<3)  /* enable dma, stereo */;
+    I2SOUT_CONTROL = (1<<3)  /* stereo */;
 
     audiohw_preinit();
 }
@@ -290,6 +287,7 @@ void pcm_rec_dma_close(void)
 
 void pcm_rec_dma_init(void)
 {
+    CGU_AUDIO = (CGU_AUDIO & ~(3<<12)) | (1<<12); /* clock source = PLLA */
     pcm_dma_apply_settings();
 }
 
