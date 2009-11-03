@@ -1982,8 +1982,8 @@ static int brickmania_game_loop(void)
                 button_right =  move_button & (RIGHT | ALTRIGHT);
                 button_left  =  move_button & (LEFT | ALTLEFT);
 #else
-                button_right =((move_button & RIGHT)|| SCROLL_FWD(move_button));
-                button_left  =((move_button & LEFT) ||SCROLL_BACK(move_button));
+                button_right =((move_button & RIGHT)|| SCROLL_FWD(button));
+                button_left  =((move_button & LEFT) ||SCROLL_BACK(button));
 #endif
                 if ((game_state==ST_PAUSE) && (button_right || button_left))
                     continue;
