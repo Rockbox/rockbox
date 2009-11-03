@@ -84,11 +84,8 @@
 
 /* Define DAC/Codec */
 #define HAVE_UDA1341
-/* ... tone controls, use the software ones */
-#define HAVE_SW_TONE_CONTROLS
 
-#define HW_SAMPR_CAPS (SAMPR_CAP_64 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
-                       SAMPR_CAP_11)
+#define HW_SAMPR_CAPS (SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
 
 /* Battery */
 #define BATTERY_CAPACITY_DEFAULT 1100   /* default battery capacity */
@@ -130,7 +127,7 @@
 #define CONFIG_CPU S3C2440
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ      405000000
+#define CPU_FREQ      406000000
 #define MCK_FREQ   (CPU_FREQ/4)
 #define SLOW_CLOCK        32768
 

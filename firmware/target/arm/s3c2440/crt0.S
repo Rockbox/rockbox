@@ -138,13 +138,11 @@
 
 /* For Mini2440 board or compatible */
 /* Clock and Power Management setup values */
+/* NB: clock settings must match values in s3c2440/system-target.h */
 #define VAL_CLKDIV    0x5         /* HCLK = FCLK/4, PCLK = HCLK/2 */
 #define VAL_UPLLCON   0x00038022  /* UCLK = 48 MHz */
-#define VAL_MPLLCON   0x0007F021  /* FCLK = 405 MHz */
+#define VAL_MPLLCON   0x000C3041  /* FCLK = 406 MHz */
 
-#define FCLK 405000000
-#define HCLK (FCLK/4)   /* = 101,250,000 */
-#define PCLK (HCLK/2)   /* =  50,625,000 */
 
 /* Memory Controller setup */
 #define VAL_BWSCON    0x22111112    

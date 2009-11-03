@@ -48,7 +48,6 @@ static struct
 /* [prescaler, master clock rate] */
 static const unsigned char pcm_freq_parms[HW_NUM_FREQ][2] =
 {
-    [HW_FREQ_64] = { 2, IISMOD_MASTER_CLOCK_256FS },
     [HW_FREQ_44] = { 2, IISMOD_MASTER_CLOCK_384FS },
     [HW_FREQ_22] = { 8, IISMOD_MASTER_CLOCK_256FS },
     [HW_FREQ_11] = { 17, IISMOD_MASTER_CLOCK_256FS },

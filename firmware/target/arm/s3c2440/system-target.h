@@ -24,12 +24,17 @@
 #include "system-arm.h"
 #include "mmu-arm.h"
 
-/* TODO: Needs checking/porting */
+/* NB: These values must match the register settings in s3c2440/crt0.S */
 
 #ifdef GIGABEAT_F
     #define CPUFREQ_DEFAULT 98784000
     #define CPUFREQ_NORMAL  98784000
     #define CPUFREQ_MAX    296352000
+
+    /* Uses 1:3:6 */
+    #define FCLK    CPUFREQ_MAX
+    #define HCLK    (FCLK/3)   /* = 98,784,000 */
+    #define PCLK    (HCLK/2)   /* = 49,392,000 */
 
     #ifdef BOOTLOADER
         /* All addresses within rockbox are in IRAM in the bootloader so
@@ -42,17 +47,18 @@
 
 #elif defined(MINI2440)
 
-    #define CPUFREQ_DEFAULT 101250000
-    #define CPUFREQ_NORMAL  101250000
-    #define CPUFREQ_MAX     405000000
+    /* Uses 1:4:8 */
+    #define FCLK 406000000
+    #define HCLK (FCLK/4)   /* = 101,250,000 */
+    #define PCLK (HCLK/2)   /* =  50,625,000 */
+
+    #define CPUFREQ_DEFAULT FCLK    /* 406 MHz */
+    #define CPUFREQ_NORMAL  (FCLK/4)/* 101.25 MHz */   
+    #define CPUFREQ_MAX     FCLK    /* 406 MHz */
     
     #define UNCACHED_BASE_ADDR 0x30000000
     #define UNCACHED_ADDR(a)  ((typeof(a))((unsigned int)(a) | UNCACHED_BASE_ADDR ))
 
-    #define FCLK 405000000
-    #define HCLK (FCLK/4)   /* = 101,250,000 */
-    #define PCLK (HCLK/2)   /* =  50,625,000 */
-    
 #else
     #error Unknown target
 #endif

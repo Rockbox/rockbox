@@ -170,7 +170,6 @@ static void udacodec_reset(void)
 /* [reserved, master clock rate] */
 static const unsigned char uda_freq_parms[HW_NUM_FREQ][2] =
 {
-    [HW_FREQ_64] = { 0, UDA_SYSCLK_256FS },
     [HW_FREQ_44] = { 0, UDA_SYSCLK_384FS },
     [HW_FREQ_22] = { 0, UDA_SYSCLK_256FS },
     [HW_FREQ_11] = { 0, UDA_SYSCLK_256FS },
