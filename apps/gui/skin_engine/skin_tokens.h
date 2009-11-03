@@ -193,6 +193,13 @@ enum wps_token_type {
     /* Setting option */
     WPS_TOKEN_SETTING,
     WPS_TOKEN_CURRENT_SCREEN,
+    
+    /* Recording Tokens */
+    WPS_TOKEN_HAVE_RECORDING,
+    WPS_TOKEN_REC_FREQ,
+    WPS_TOKEN_REC_ENCODER,
+    WPS_TOKEN_REC_BITRATE, /* SWCODEC: MP3 bitrate, HWCODEC: MP3 "quality" */
+    WPS_TOKEN_REC_MONO,
 };
 
 struct wps_token {

@@ -360,7 +360,16 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_LASTTOUCH,                "Tl",  WPS_REFRESH_DYNAMIC, parse_timeout },
     { WPS_TOKEN_CURRENT_SCREEN,           "cs",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_NO_TOKEN,                       "T",   0,    parse_touchregion      },
-
+    
+    
+    /* Recording Tokens */
+    { WPS_TOKEN_HAVE_RECORDING,         "Rp", WPS_REFRESH_STATIC, NULL },
+#ifdef HAVE_RECORDING
+    { WPS_TOKEN_REC_FREQ,               "Rf", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_REC_ENCODER,            "Re", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_REC_BITRATE,            "Rb", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_REC_MONO,               "Rm", WPS_REFRESH_DYNAMIC, NULL },
+#endif
     { WPS_TOKEN_UNKNOWN,                  "",    0, NULL }
     /* the array MUST end with an empty string (first char is \0) */
 };
@@ -1461,6 +1470,12 @@ static int check_feature_tag(const char *wps_bufptr, const int type)
 #else
             return find_false_branch(wps_bufptr);
 #endif
+        case WPS_TOKEN_HAVE_RECORDING:
+#ifdef HAVE_RECORDING
+            return 0;
+#else
+            return find_false_branch(wps_bufptr);
+#endif          
         default: /* not a tag we care about, just don't skip */
             return 0;
     }

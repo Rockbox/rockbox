@@ -56,6 +56,7 @@
 #include "root_menu.h"
 #ifdef HAVE_RECORDING
 #include "recording.h"
+#include "pcm_record.h"
 #endif
 
 static char* get_codectype(const struct mp3entry* id3)
@@ -873,6 +874,201 @@ const char *get_token_value(struct gui_wps *gwps,
             cfg_to_string(token->value.i,buf,buf_size);
             return buf;
         }
+        /* Recording tokens */
+        case WPS_TOKEN_HAVE_RECORDING:
+#ifdef HAVE_RECORDING
+            return "r";
+#else
+            return NULL;
+#endif
+
+#ifdef HAVE_RECORDING
+        case WPS_TOKEN_REC_FREQ: /* order from REC_FREQ_CFG_VAL_LIST */
+        {
+#if CONFIG_CODEC == SWCODEC
+            unsigned long samprk;
+            int rec_freq = global_settings.rec_frequency;
+
+#ifdef SIMULATOR
+            samprk = 44100;
+#else
+#if defined(HAVE_SPDIF_REC)
+            if (global_settings.rec_source == AUDIO_SRC_SPDIF)
+            {
+                /* Use rate in use, not current measured rate if it changed */
+                samprk = pcm_rec_sample_rate();
+                rec_freq = 0;
+                while (rec_freq < SAMPR_NUM_FREQ &&
+                       audio_master_sampr_list[rec_freq] != samprk)
+                {       
+                    rec_freq++;
+                }
+            }
+            else
+#endif
+                samprk = rec_freq_sampr[rec_freq];
+#endif /* SIMULATOR */
+            if (intval)
+            {
+                switch (rec_freq)
+                {
+                    REC_HAVE_96_(case REC_FREQ_96:
+                        *intval = 1;
+                        break;)
+                    REC_HAVE_88_(case REC_FREQ_88:
+                        *intval = 2;
+                        break;)
+                    REC_HAVE_64_(case REC_FREQ_64:
+                        *intval = 3;
+                        break;)
+                    REC_HAVE_48_(case REC_FREQ_48:
+                        *intval = 4;
+                        break;)
+                    REC_HAVE_44_(case REC_FREQ_44:
+                        *intval = 5;
+                        break;)
+                    REC_HAVE_32_(case REC_FREQ_32:
+                        *intval = 6;
+                        break;)
+                    REC_HAVE_24_(case REC_FREQ_24:
+                        *intval = 7;
+                        break;)
+                    REC_HAVE_22_(case REC_FREQ_22:
+                        *intval = 8;
+                        break;)
+                    REC_HAVE_16_(case REC_FREQ_16:
+                        *intval = 9;
+                        break;)
+                    REC_HAVE_12_(case REC_FREQ_12:
+                        *intval = 10;
+                        break;)
+                    REC_HAVE_11_(case REC_FREQ_11:
+                        *intval = 11;
+                        break;)
+                    REC_HAVE_8_(case REC_FREQ_8:
+                        *intval = 12;
+                        break;)
+                }
+                *intval = rec_freq+1;
+            }
+            snprintf(buf, buf_size, "%d.%1d", samprk/1000,samprk%1000);
+#else /* HWCODEC */
+            
+            static const char * const freq_strings[] =
+               {"--", "44", "48", "32", "22", "24", "16"};
+            int freq = 1 + global_settings.rec_frequency;
+#ifdef HAVE_SPDIF_REC
+            if (global_settings.rec_source == AUDIO_SRC_SPDIF)
+            {
+                /* Can't measure S/PDIF sample rate on Archos/Sim yet */
+                freq = 0;
+            }
+#endif /* HAVE_SPDIF_IN */
+            if (intval)
+                *intval = freq+1; /* so the token gets a value 1<=x<=7 */
+            snprintf(buf, buf_size, "%d\n",
+                        freq_strings[global_settings.rec_frequency]);
+#endif
+            return buf;
+        }
+#if CONFIG_CODEC == SWCODEC        
+        case WPS_TOKEN_REC_ENCODER:
+        {
+            int rec_format = global_settings.rec_format+1; /* WAV, AIFF, WV, MPEG */
+            if (intval)
+                *intval = rec_format;
+            switch (rec_format)
+            {
+                case REC_FORMAT_PCM_WAV:
+                    return "wav";
+                case REC_FORMAT_AIFF:
+                    return "aiff";
+                case REC_FORMAT_WAVPACK:
+                    return "wv";
+                case REC_FORMAT_MPA_L3:
+                    return "MP3";
+                default:
+                    return NULL;
+            }
+            break;
+        }
+#endif
+        case WPS_TOKEN_REC_BITRATE:
+#if CONFIG_CODEC == SWCODEC  
+            if (global_settings.rec_format == REC_FORMAT_MPA_L3)
+            {
+                if (intval)
+                {
+                    #if 0 /* FIXME: I dont know if this is needed? */
+                    switch (1<<global_settings.mp3_enc_config.bitrate)
+                    {
+                        case MP3_BITR_CAP_8:
+                            *intval = 1;
+                            break;
+                        case MP3_BITR_CAP_16:
+                            *intval = 2;
+                            break;
+                        case MP3_BITR_CAP_24:
+                            *intval = 3;
+                            break;
+                        case MP3_BITR_CAP_32:
+                            *intval = 4;
+                            break;
+                        case MP3_BITR_CAP_40:
+                            *intval = 5;
+                            break;
+                        case MP3_BITR_CAP_48:
+                            *intval = 6;
+                            break;
+                        case MP3_BITR_CAP_56:
+                            *intval = 7;
+                            break;
+                        case MP3_BITR_CAP_64:
+                            *intval = 8;
+                            break;
+                        case MP3_BITR_CAP_80:
+                            *intval = 9;
+                            break;
+                        case MP3_BITR_CAP_96:
+                            *intval = 10;
+                            break;
+                        case MP3_BITR_CAP_112:
+                            *intval = 11;
+                            break;
+                        case MP3_BITR_CAP_128:
+                            *intval = 12;
+                            break;
+                        case MP3_BITR_CAP_144:
+                            *intval = 13;
+                            break;
+                        case MP3_BITR_CAP_160:
+                            *intval = 14;
+                            break;
+                        case MP3_BITR_CAP_192:
+                            *intval = 15;
+                            break;
+                    }
+                    #endif
+                }
+                *intval = global_settings.mp3_enc_config.bitrate+1;
+                snprintf(buf, buf_size, "%d", global_settings.mp3_enc_config.bitrate+1);
+                return buf;
+            }
+            else
+                return NULL; /* Fixme later */
+#else /* CONFIG_CODEC == HWCODEC */
+            if (intval)
+                *intval = global_settings.rec_quality+1;
+            snprintf(buf, buf_size, "%d", global_settings.rec_quality);
+            return buf;
+#endif
+        case WPS_TOKEN_REC_MONO:
+            if (intval)
+                *intval = global_settings.rec_channels?2:1;
+            snprintf(buf, buf_size, "%s", !global_settings.rec_channels?"m":'\0');
+            return buf;
+
+#endif /* HAVE_RECORDING */
         case WPS_TOKEN_CURRENT_SCREEN:
         {
             int curr_screen = current_screen();
