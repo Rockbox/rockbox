@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <sprintf.h>
 #include "inttypes.h"
 #include "string.h"
 #include "cpu.h"
@@ -58,38 +59,33 @@ void tx_writec(unsigned char c)
 }
 
 
+static int uart_push(void *user_data, unsigned char ch)
+{
+    (void)user_data;
+
+    uart_send_byte(DEBUG_UART_PORT, ch);
+    if (ch == '\n')
+        uart_send_byte(DEBUG_UART_PORT, '\r');
+    return 1;
+}
+
 /****************************************************************************
  * General purpose debug function
  ****************************************************************************/
-
 void uart_printf (const char *format, ...)
 {
     static bool debug_uart_init = false;
-    static char tx_buf [MAX_PRINTF_BUF];
-
-    int len;
-    unsigned char *ptr;
-    int j;
-    
     va_list ap;
-    va_start(ap, format);
-
-    ptr = tx_buf;
-    len = vsnprintf(ptr, sizeof(tx_buf), format, ap);
-    va_end(ap);
 
     if (!debug_uart_init)
     {
       uart_init_device(DEBUG_UART_PORT);
       debug_uart_init = true;
     }
-    
-    for (j=0; j<len; j++)
-    {
-        uart_send_byte (DEBUG_UART_PORT, tx_buf[j]);
-        if ( tx_buf[j] == '\n')
-            uart_send_byte (DEBUG_UART_PORT, '\r');
-    }
+
+    va_start(ap, format);
+    vuprintf(uart_push, NULL, format, ap);
+    va_end(ap);
 }
 
 /****************************************************************************
