@@ -214,7 +214,7 @@ void _logf(const char *fmt, ...)
     DEBUGF("%s\n", buf);
 #endif
 
-    vfnprintf(logf_push, NULL, fmt, ap);
+    vuprintf(logf_push, NULL, fmt, ap);
     va_end(ap);
     
     /* add trailing zero */

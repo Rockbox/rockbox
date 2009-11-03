@@ -292,7 +292,7 @@ int fdprintf(int fd, const char *fmt, ...)
     return fpr.bytes; /* return 0 on error */
 }
 
-int vfnprintf(int (*push)(void *userp, unsigned char data), void *userp, const char *fmt, va_list ap)
+int vuprintf(int (*push)(void *userp, unsigned char data), void *userp, const char *fmt, va_list ap)
 {
     return format(push, userp, fmt, ap);
 }
