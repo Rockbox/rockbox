@@ -49,7 +49,7 @@
 #define I2C_SCL_PIN 6
 #define I2C_SDA_PIN 7
 
-#elif
+#else
 #error no FM I2C GPIOPIN defines
 #endif
 
