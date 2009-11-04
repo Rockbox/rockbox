@@ -13,11 +13,6 @@ CFLAGS := -O -g -W -Wall -Wshadow -pedantic -I$(TOOLSDIR)
 
 CC = gcc
 
-# Change for releases
-ifndef APPVERSION
-APPVERSION=`$(TOOLSDIR)/version.sh`
-endif
-
 ifndef V
 SILENT = @
 endif
