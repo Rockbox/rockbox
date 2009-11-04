@@ -1117,6 +1117,7 @@ long gui_wps_show(void)
         if (vol_changed)
         {
             bool res = false;
+            vol_changed = false;
             setvol();
             FOR_NB_SCREENS(i)
             {
