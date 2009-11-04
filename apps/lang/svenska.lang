@@ -1384,7 +1384,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB-Styrka"
+    masf: "MDB-styrka"
   </voice>
 </phrase>
 <phrase>
@@ -3565,7 +3565,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Scale"
+    *: "Skala"
     masd: none
   </voice>
 </phrase>
@@ -6151,7 +6151,7 @@
   </source>
   <dest>
     *: none
-    recording: deprecated
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -9957,7 +9957,7 @@
     *: ""
   </source>
   <dest>
-    *: deprecated
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -10016,7 +10016,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "fast program"
   </voice>
 </phrase>
 <phrase>
@@ -10092,7 +10092,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Kockan är:"
+    rtc: "Klockan är:"
   </voice>
 </phrase>
 <phrase>
@@ -11866,7 +11866,7 @@
     *: "Långsam"
   </dest>
   <voice>
-    *: "Längsam"
+    *: "Långsam"
   </voice>
 </phrase>
 <phrase>
@@ -12641,11 +12641,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Compressor"
+    swcodec: "Kompressor"
   </dest>
   <voice>
     *: none
-    swcodec: "Compressor"
+    swcodec: "Kompressor"
   </voice>
 </phrase>
 <phrase>
@@ -12663,5 +12663,395 @@
   <voice>
     *: none
     quickscreen: "Sätt som övre snabbmenyval"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ITALY
+  desc: fm region Italy
+  user: core
+  <source>
+    *: none
+    radio: "Italy"
+  </source>
+  <dest>
+    *: none
+    radio: "Italien"
+  </dest>
+  <voice>
+    *: none
+    radio: "Italien"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_OTHER
+  desc: Catch-all FM region. Select if none of the others work
+  user: core
+  <source>
+    *: none
+    radio: "Other"
+  </source>
+  <dest>
+    *: none
+    radio: "Annan"
+  </dest>
+  <voice>
+    *: none
+    radio: "Annan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Threshold"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Tröskel"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Tröskel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Ratio"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Förhållande"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Förhållande"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "2:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "2:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "2 till 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_4
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "4:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "4:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "4 till 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_6
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "6:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "6:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "6 till 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_10
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "10:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "10:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "10 till 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_LIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limiter"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limiter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Makeup Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Förstärkning"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Förstärkning"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Automatisk"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Automatisk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Övergång"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Övergång"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Hard Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Hård"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Hård"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Soft Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Mjuk"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Mjuk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Release Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Återgångstid"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Återgångstid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Hoppa till outro"
+  </dest>
+  <voice>
+    *: "Hoppa till outro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Egen"
+  </dest>
+  <voice>
+    *: "Egen"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "statuslist"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "fjärrstatuslist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_STATUSBAR
+  desc: browse for custom statusbar in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Custom Statusbar"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Egen statuslist"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Egen statuslist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CUSTOM_STATUSBAR
+  desc: browse for remote custom statusbar in theme settings
+  user: core
+  <source>
+    *:none
+    remote: "Remote Custom Statusbar"
+  </source>
+  <dest>
+    *:none
+    remote: "Egen fjärrstatuslist"
+  </dest>
+  <voice>
+    *:none
+    remote: "Egen fjärrstatuslist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB-knappar"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB-knappar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "Infoga blandat sist"
+  </dest>
+  <voice>
+    *: "Infoga blandat sist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at and of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "Köa blandat sist"
+  </dest>
+  <voice>
+    *: "Köa blandat sist"
   </voice>
 </phrase>
