@@ -384,7 +384,10 @@ void viewport_set_defaults(struct viewport *vp,
             a->x + a->width  > b->x              &&
             a->y             < b->y + b->height  &&
             a->y + a->height > b->y)
-        {   /* interesect so that the ui viewport is cropped so that it
+        {
+            /* copy from ui vp first (for other field),fix coordinates after */
+            *vp = *user_setting;
+            /* interesect so that the ui viewport is cropped so that it
              * is completely within the info vp */
             vp->x = MAX(a->x, b->x);
             vp->y = MAX(a->y, b->y);
