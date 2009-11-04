@@ -272,15 +272,7 @@ int main(int argc, char **argv)
         printf("Checking %s...\n", argv[filearg]);
 #ifdef HAVE_REMOTE_LCD
         if(strcmp(&argv[filearg][strlen(argv[filearg])-4], "rwps") == 0)
-        {
             screen = SCREEN_REMOTE;
-            wps.remote_wps = true;
-        }
-        else
-        {
-            screen = SCREEN_MAIN;
-            wps.remote_wps = false;
-        }
 #endif    
         wps_screen = &screens[screen];
 
