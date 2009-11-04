@@ -416,45 +416,7 @@ void codec_init_codec_api(void)
 }
 
 
-/** pcmbuf track change callbacks */
-
-/* Between the codec and PCM track change, we need to keep updating the
-   "elapsed" value of the previous (to the codec, but current to the
-   user/PCM/WPS) track, so that the progressbar reaches the end.
-   During that transition, the WPS will display prevtrack_id3. */
-static void codec_pcmbuf_position_callback(size_t size) ICODE_ATTR;
-static void codec_pcmbuf_position_callback(size_t size)
-{
-    /* This is called from an ISR, so be quick */
-    unsigned int time = size * 1000 / 4 / NATIVE_FREQUENCY +
-        othertrack_id3->elapsed;
-
-    if (time >= othertrack_id3->length)
-    {
-        pcmbuf_set_position_callback(NULL);
-        othertrack_id3->elapsed = othertrack_id3->length;
-    }
-    else
-        othertrack_id3->elapsed = time;
-}
-
-static void codec_pcmbuf_track_changed_callback(void)
-{
-    LOGFQUEUE("codec > pcmbuf/audio Q_AUDIO_TRACK_CHANGED");
-    pcmbuf_set_position_callback(NULL);
-    audio_post_track_change();
-}
-
-
 /** track change functions */
-
-static inline void codec_gapless_track_change(void)
-{
-    /* callback keeps the progress bar moving while the pcmbuf empties */
-    pcmbuf_set_position_callback(codec_pcmbuf_position_callback);
-    /* set the pcmbuf callback for when the track really changes */
-    pcmbuf_set_event_handler(codec_pcmbuf_track_changed_callback);
-}
 
 static inline void codec_crossfade_track_change(void)
 {
@@ -484,8 +446,8 @@ static void codec_track_skip_done(bool was_manual)
                 /* shuffle mode is on, so crossfade: */
                 codec_crossfade_track_change();
             else
-                /* shuffle mode is off, so do a gapless track change */
-                codec_gapless_track_change();
+                /* shuffle mode is off, so normal gapless playback */
+                pcmbuf_start_track_change();
         }
         else
             /* normal crossfade:  */
@@ -493,7 +455,7 @@ static void codec_track_skip_done(bool was_manual)
     }
     else
         /* normal gapless playback. */
-        codec_gapless_track_change();
+        pcmbuf_start_track_change();
 }
 
 static bool codec_load_next_track(void)

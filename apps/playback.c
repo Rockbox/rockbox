@@ -179,6 +179,7 @@ static unsigned long prev_track_elapsed = 0; /* Previous track elapsed time (C/A
 
 /* Track change controls */
 bool automatic_skip = false;        /* Who initiated in-progress skip? (C/A-) */
+extern bool track_transition;       /* Are we in a track transition? */
 static bool dir_skip = false;       /* Is a directory skip pending? (A) */
 static bool new_playlist = false;   /* Are we starting a new playlist? (A) */
 static int wps_offset = 0;          /* Pending track change offset, to keep WPS responsive (A) */
@@ -223,10 +224,31 @@ static void audio_stop_playback(void);
 
 /**************************************/
 
-/* Post message from pcmbuf callback in the codec thread that
- * the end of the previous track has just been played. */
+/* Between the codec and PCM track change, we need to keep updating the
+   "elapsed" value of the previous (to the codec, but current to the
+   user/PCM/WPS) track, so that the progressbar reaches the end.
+   During that transition, the WPS will display othertrack_id3. */
+void audio_pcmbuf_position_callback(size_t size)
+{
+    /* This is called from an ISR, so be quick */
+    unsigned int time = size * 1000 / 4 / NATIVE_FREQUENCY +
+        othertrack_id3->elapsed;
+
+    if (time >= othertrack_id3->length)
+    {
+        if(track_transition){logf("playback: (callback) track transition false");}
+        track_transition = false;
+        othertrack_id3->elapsed = othertrack_id3->length;
+    }
+    else
+        othertrack_id3->elapsed = time;
+}
+
+/* Post message from pcmbuf that the end of the previous track
+ * has just been played. */
 void audio_post_track_change(void)
 {
+    LOGFQUEUE("pcmbuf > pcmbuf Q_AUDIO_TRACK_CHANGED");
     queue_post(&pcmbuf_queue, Q_AUDIO_TRACK_CHANGED, 0);
 }
 
@@ -246,16 +268,6 @@ static bool pcmbuf_queue_scan(struct queue_event *ev)
     }
 
     return false;
-}
-
-/* Clear the pcmbuf queue of messages
- * Permissible Context(s): Thread
- */
-static void pcmbuf_queue_clear(void)
-{
-    pcm_play_lock();
-    queue_clear(&pcmbuf_queue);
-    pcm_play_unlock();
 }
 
 /* --- Helper functions --- */
@@ -1617,7 +1629,9 @@ static void audio_stop_codec_flush(void)
     if (pcm_is_playing())
     {
         pcmbuf_play_stop();
-        pcmbuf_queue_clear();
+        pcm_play_lock();
+        queue_clear(&pcmbuf_queue);
+        pcm_play_unlock();
     }
     pcmbuf_pause(paused);
 }
