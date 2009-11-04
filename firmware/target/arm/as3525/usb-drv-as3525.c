@@ -155,10 +155,19 @@ void usb_drv_init(void)
     sleep(1); //msleep(10)
     USB_DEV_CTRL &= ~0x400; /* clear soft disconnect */
 
-    /* note : this pin might be Clip specific */
+#if defined(SANSA_CLIP)
     GPIOA_DIR |= (1<<6);
     GPIOA_PIN(6) = (1<<6);
     GPIOA_DIR &= ~(1<<6);   /* restore direction for usb_detect() */
+#elif defined(SANSA_FUZE) || defined(SANSA_E200V2)
+    GPIOA_DIR |= (1<<3);
+    GPIOA_PIN(3) = (1<<3);
+    GPIOA_DIR &= ~(1<<3);   /* restore direction for usb_detect() */
+#elif defined(SANSA_C200V2)
+    GPIOA_DIR |= (1<<1);
+    GPIOA_PIN(1) = (1<<1);
+    GPIOA_DIR &= ~(1<<1);   /* restore direction for usb_detect() */
+#endif
 
 #if 0 /* linux */
     USB_DEV_CFG |= (1<<17)  /* csr programming */
