@@ -307,7 +307,9 @@ static const char* formatter_unit_0_is_skip_track(char *buffer, size_t buffer_si
 static int32_t getlang_unit_0_is_skip_track(int value, int unit)
 {
     (void)unit;
-    if (value == 0)
+    if (value == -1)
+        return LANG_SKIP_OUTRO;
+    else if (value == 0)
         return LANG_SKIP_TRACK;
     else if (value % 60 == 0)
         return TALK_ID(value/60, UNIT_MIN);
