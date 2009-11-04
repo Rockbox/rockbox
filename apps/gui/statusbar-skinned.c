@@ -51,7 +51,7 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
     struct wps_data *data = sb_skin[screen].data;
 
     int success;
-    success = buf && skin_data_load(data, buf, isfile);
+    success = buf && skin_data_load(screen, data, buf, isfile);
 
     if (success)
     {  /* hide the sb's default viewport because it has nasty effect with stuff

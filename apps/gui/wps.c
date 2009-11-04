@@ -127,7 +127,7 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
 
 #endif /* __PCTOOL__ */
 
-    loaded_ok = buf && skin_data_load(gui_wps[screen].data, buf, isfile);
+    loaded_ok = buf && skin_data_load(screen, gui_wps[screen].data, buf, isfile);
 
     if (!loaded_ok) /* load the hardcoded default */
     {
@@ -151,7 +151,7 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
             "%pb\n",
 #endif
         };
-        skin_data_load(gui_wps[screen].data, skin_buf[screen], false);
+        skin_data_load(screen, gui_wps[screen].data, skin_buf[screen], false);
     }
 #ifdef HAVE_REMOVE_LCD
     gui_wps[screen].data->remote_wps = !(screen == SCREEN_MAIN);

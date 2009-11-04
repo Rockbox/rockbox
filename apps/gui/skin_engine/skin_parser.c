@@ -64,6 +64,9 @@
 
 #define WPS_ERROR_INVALID_PARAM         -1
 
+/* which screen are we parsing for? */
+static enum screen_type curr_screen;
+
 /* level of current conditional.
    -1 means we're not in a conditional. */
 static int level = -1;
@@ -519,11 +522,7 @@ static int parse_statusbar_enable(const char *wps_bufptr,
     wps_data->wps_sb_tag = true;
     wps_data->show_sb_on_wps = true;
     struct skin_viewport *default_vp = find_viewport(VP_DEFAULT_LABEL, wps_data);
-    if (default_vp->vp.y == 0)
-    {
-        default_vp->vp.y = STATUSBAR_HEIGHT;
-        default_vp->vp.height -= STATUSBAR_HEIGHT;
-    }
+    viewport_set_defaults(&default_vp->vp, curr_screen);
     return skip_end_of_line(wps_bufptr);
 }
 
@@ -535,11 +534,7 @@ static int parse_statusbar_disable(const char *wps_bufptr,
     wps_data->wps_sb_tag = true;
     wps_data->show_sb_on_wps = false;
     struct skin_viewport *default_vp = find_viewport(VP_DEFAULT_LABEL, wps_data);
-    if (default_vp->vp.y == STATUSBAR_HEIGHT)
-    {
-        default_vp->vp.y = 0;
-        default_vp->vp.height += STATUSBAR_HEIGHT;
-    }
+    viewport_set_fullscreen(&default_vp->vp, curr_screen);
     return skip_end_of_line(wps_bufptr);
 }
 
@@ -1865,9 +1860,8 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
 
 /* to setup up the wps-data from a format-buffer (isfile = false)
    from a (wps-)file (isfile = true)*/
-bool skin_data_load(struct wps_data *wps_data,
-                   const char *buf,
-                   bool isfile)
+bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
+                    const char *buf, bool isfile)
 {
 
     if (!wps_data || !buf)
@@ -1886,7 +1880,8 @@ bool skin_data_load(struct wps_data *wps_data,
 #endif
 
     skin_data_reset(wps_data);
-
+    curr_screen = screen;
+    
     /* alloc default viewport, will be fixed up later */
     curr_vp = skin_buffer_alloc(sizeof(struct skin_viewport));
     if (!curr_vp)
@@ -1902,6 +1897,8 @@ bool skin_data_load(struct wps_data *wps_data,
     curr_vp->pb            = NULL;
     curr_vp->hidden_flags  = 0;
     curr_vp->lines         = NULL;
+    
+    viewport_set_defaults(&curr_vp->vp, screen);
 
     curr_line = NULL;
     if (!skin_start_new_line(curr_vp, 0))

@@ -42,9 +42,8 @@ bool skin_update(struct gui_wps *gwps, unsigned int update_type);
  * setup up the skin-data from a format-buffer (isfile = false)
  * or from a skinfile (isfile = true)
  */
-bool skin_data_load(struct wps_data *wps_data,
-                    const char *buf,
-                    bool isfile);
+bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
+                    const char *buf, bool isfile);
 
 
 /* initial setup of wps_data */
