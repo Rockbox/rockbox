@@ -179,9 +179,9 @@ void viewport_set_defaults(struct viewport *vp,
     else if (user_setting)
         *vp = *user_setting;
     /* have neither so its fullscreen which was fixed at the beginning */   
-    else
-        viewport_set_fullscreen(vp, screen);    
+    else  
 #endif /* HAVE_LCD_BITMAP */
+        viewport_set_fullscreen(vp, screen);  
 }
 
 void viewportmanager_init(void)
