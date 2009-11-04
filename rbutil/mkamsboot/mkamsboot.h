@@ -51,6 +51,11 @@ struct md5sums {
     char *md5;
 };
 
+extern const unsigned short hw_revisions[];
+extern const unsigned short fw_revisions[];
+extern const char* model_names[];
+extern const int bootloader_sizes[];
+
 /* load_rockbox_file()
  *
  * Loads a rockbox bootloader file into memory

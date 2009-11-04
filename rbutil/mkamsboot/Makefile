@@ -1,11 +1,12 @@
-# We use the UCL code available in the Rockbox tools/ directory
-CFLAGS=-I../../tools/ucl/include -Wall
-CC = gcc
 
 #change for releases
 ifndef APPVERSION
 APPVERSION=`../../tools/version.sh`
 endif
+
+# We use the UCL code available in the Rockbox tools/ directory
+CFLAGS=-I../../tools/ucl/include -Wall -DVERSION=\"$(APPVERSION)\"
+CC = gcc
 
 ifndef V
 SILENT = @
@@ -34,38 +35,36 @@ OUT = $(TARGET_DIR)build$(RBARCH)
 
 all: $(OUTPUT)
 
-# Dependant modules
+# additional link dependencies for the standalone executable
 LIBUCL=../../tools/ucl/src/libucl$(RBARCH).a
 
 $(LIBUCL):
 	make -C ../../tools/ucl/src $(TARGET_DIR)libucl$(RBARCH).a
 
-# This file can be generated in the dualboot/ directory
-$(OUT)/dualboot.o: dualboot.[ch]
-	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/dualboot.o dualboot.c
+# inputs
+LIBSOURCES := dualboot.c md5.c mkamsboot.c
+SOURCES := $(LIBSOURCES) main.c
+OBJS := $(patsubst %.c,%.o,$(addprefix $(OUT)/,$(SOURCES)))
+LIBOBJS := $(patsubst %.c,%.o,$(addprefix $(OUT)/,$(LIBSOURCES)))
+EXTRADEPS := $(LIBUCL)
 
-$(OUT)/md5.o: md5.[ch]
-	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/md5.o -W -Wall md5.c
+$(OUT)/%.o: %.c $(OUT)
+	@echo CC $< $
+	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
-DEPENDANT_OBJS=$(LIBUCL) $(OUT)/dualboot.o $(OUT)/md5.o
-
-$(OUT)/mkamsboot.o: mkamsboot.[ch] $(DEPENDANT_OBJS)
-	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/mkamsboot.o -W -Wall mkamsboot.c -DVERSION=\"$(APPVERSION)\"
-
-$(OUTPUT):  $(OUT) $(OUT)/mkamsboot.o
-	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -o $(OUTPUT) $(OUT)/mkamsboot.o $(DEPENDANT_OBJS)
-
+# building the library archive
 $(OUT)/libmkamsboot.o: $(OUT)/mkamsboot.o
 	@echo CC $<
 	$(SILENT)$(CC) $(CFLAGS) -DLIB -c -o $(OUT)/libmkamsboot.o -W -Wall mkamsboot.c
 
-libmkamsboot$(RBARCH).a: $(OUT) $(OUT)/libmkamsboot.o
+libmkamsboot$(RBARCH).a: $(LIBOBJS)
 	@echo AR $@
-	$(SILENT)$(AR) ruc $(TARGET_DIR)libmkamsboot$(RBARCH).a $(OUT)/libmkamsboot.o $(OUT)/md5.o $(OUT)/dualboot.o
+	$(SILENT)$(AR) ruc $(TARGET_DIR)$@ $^
+
+# building the standalone executable
+$(OUTPUT): $(OBJS) $(EXTRADEPS)
+	@echo LD $@
+	$(SILENT)$(CC) $(CFLAGS) -o$(OUTPUT) $(OBJS) $(EXTRADEPS)
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
