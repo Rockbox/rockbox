@@ -81,7 +81,7 @@ libmkamsboot-universal: libmkamsbooti386.a libmkamsbootppc.a
 	lipo -create $(TARGET_DIR)libmkamsbootppc.a $(TARGET_DIR)libmkamsbooti386.a -output $(TARGET_DIR)libmkamsboot.a
     
 clean:
-	rm -f $(OUTPUT) libmkamsboot.o $(TARGET_DIR)libmkamsboot*.a mkamsboot.dmg $(DEPENDANT_OBJS)
+	rm -f $(OUTPUT) libmkamsboot.o $(TARGET_DIR)libmkamsboot*.a mkamsboot.dmg
 	rm -rf build* mkamsboot-*
 
 mkamsboot-i386:
