@@ -379,22 +379,25 @@ void viewport_set_defaults(struct viewport *vp,
     if (sbs_area && user_setting)
     {
         struct viewport *a = sbs_area, *b = user_setting;
-        /* make sure they do actually overlap,
-         * if they dont its user error, so use the full display 
-         * and live with redraw problems */
+        /* if ui vp and info vp overlap, intersect */
         if (a->x             < b->x + b->width   &&
             a->x + a->width  > b->x              &&
             a->y             < b->y + b->height  &&
             a->y + a->height > b->y)
-        {
+        {   /* interesect so that the ui viewport is cropped so that it
+             * is completely within the info vp */
             vp->x = MAX(a->x, b->x);
             vp->y = MAX(a->y, b->y);
             vp->width = MIN(a->x + a->width, b->x + b->width) - vp->x;
             vp->height = MIN(a->y + a->height, b->y + b->height) - vp->y;
+            return;
         }
+        /* else take info vp below */
     }
-    /* only one so use it */
-    else if (sbs_area)
+    /* if only one is active use it
+     * or if the above check for overlapping failed, use info vp then, because
+     * that doesn't give redraw problems */
+    if (sbs_area)
         *vp = *sbs_area;
     else if (user_setting)
         *vp = *user_setting;
