@@ -25,6 +25,7 @@
 
 #include <timefuncs.h>
 #include "lib/playback_control.h"
+#include "lib/configfile.h"
 
 PLUGIN_HEADER
 
@@ -252,6 +253,12 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define CELL_WIDTH  (LCD_WIDTH / 7)
 #define CELL_HEIGHT (LCD_HEIGHT / 7)
 
+#define CFG_FILE "calendar.cfg"
+static int first_wday = 0, old_first_wday;
+static struct configdata config[] = {
+    { TYPE_INT, 0, 6, { .int_p = &first_wday }, "first wday", NULL },
+};
+
 static bool leap_year;
 /* days_in_month[][0] is for December */
 static const int days_in_month[2][13] = {
@@ -315,6 +322,7 @@ static void draw_headers(void)
 {
     int i, w, h;
     int x = X_OFFSET;
+    int wday;
     const char **dayname = dayname_long;
 
     for (i = 0; i < 7; i++)
@@ -327,10 +335,12 @@ static void draw_headers(void)
         }
     }
 
+    wday = first_wday;
     rb->lcd_getstringsize("A", &w, &h);
     for (i = 0; i < 7; i++)
     {
-        rb->lcd_putsxy(x, 0, dayname[i]);
+        if (wday >= 7) wday = 0;
+        rb->lcd_putsxy(x, 0, dayname[wday++]);
         x += CELL_WIDTH;
     }
     rb->lcd_hline(0, LCD_WIDTH-1, h);
@@ -342,6 +352,7 @@ static void draw_calendar(struct shown *shown)
 {
     int w, h;
     int x, y, pos, days_per_month, j;
+    int wday;
     char buffer[12];
     const char *monthname[] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -354,13 +365,16 @@ static void draw_calendar(struct shown *shown)
     rb->lcd_getstringsize("A", &w, &h);
     rb->lcd_clear_display();
     draw_headers();
-    pos = shown->firstday;
+    wday = shown->firstday;
+    pos = wday + 7 - first_wday;
+    if (pos >= 7) pos -= 7;
+
     days_per_month = days_in_month[leap_year][shown->mon];
     x = X_OFFSET + (pos * CELL_WIDTH);
     y = Y_OFFSET + h;
     for (j = 1; j <= days_per_month; j++)
     {
-        if ( (day_has_memo[j]) || (wday_has_memo[pos]) )
+        if ( (day_has_memo[j]) || (wday_has_memo[wday]) )
             rb->snprintf(buffer, 4, "%02d.", j);
         else
             rb->snprintf(buffer, 4, "%02d", j);
@@ -369,7 +383,7 @@ static void draw_calendar(struct shown *shown)
             rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_fillrect(x, y - 1, CELL_WIDTH - 1, CELL_HEIGHT);
             rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-            shown->wday = pos;
+            shown->wday = wday;
         }
         else
         {
@@ -377,6 +391,9 @@ static void draw_calendar(struct shown *shown)
         }
         rb->lcd_putsxy(x, y, buffer);
         x += CELL_WIDTH;
+        wday++;
+        if (wday >= 7)
+            wday = 0;
         pos++;
         if (pos >= 7)
         {
@@ -385,7 +402,7 @@ static void draw_calendar(struct shown *shown)
             y += CELL_HEIGHT;
         }
     }
-    shown->lastday = pos;
+    shown->lastday = wday;
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_vline(LCD_WIDTH-w*8-10, LCD_HEIGHT-h-3, LCD_HEIGHT-1);
     rb->lcd_hline(LCD_WIDTH-w*8-10, LCD_WIDTH-1, LCD_HEIGHT-h-3);
@@ -586,10 +603,21 @@ static bool edit_memo(int change, struct shown *shown)
     bool exit = false;
     int selected = 0;
 
+    static const struct opt_items modes[7] = {
+        { "Mon", -1 },
+        { "Tue", -1 },
+        { "Wed", -1 },
+        { "Thu", -1 },
+        { "Fri", -1 },
+        { "Sat", -1 },
+        { "Sun", -1 },
+    };
+
     MENUITEM_STRINGLIST(edit_menu, "Edit menu", edit_menu_cb,
                         "Remove", "Edit",
                         "New Weekly", "New Monthly",
                         "New Yearly", "New One off",
+                        "First Day of Week",
                         "Playback Control");
 
     while (!exit)
@@ -622,7 +650,12 @@ static bool edit_memo(int change, struct shown *shown)
                 add_memo(shown, 3);
                 return false;
 
-            case 6: /* playback control */
+            case 6: /* weekday */
+                rb->set_option("First Day of Week", &first_wday,
+                                INT, modes, 7, NULL);
+                break;
+
+            case 7: /* playback control */
                 playback_control(NULL);
                 break;
 
@@ -785,10 +818,14 @@ enum plugin_status plugin_start(const void* parameter)
 
     (void)(parameter);
 
+    configfile_load(CFG_FILE, config, 1, 0);
+    old_first_wday = first_wday;
+
     calendar_init(&shown);
     load_memo(&shown);
     any_events(&shown, false);
     draw_calendar(&shown);
+
     while (!exit)
     {
         button = rb->button_get(true);
@@ -840,6 +877,9 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
         }
     }
+
+    if (old_first_wday != first_wday)
+        configfile_save(CFG_FILE, config, 1, 0);
     return been_in_usb_mode?PLUGIN_USB_CONNECTED:PLUGIN_OK;
 }
 
