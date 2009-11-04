@@ -45,25 +45,35 @@ OUT = $(TARGET_DIR)build$(RBARCH)
 
 all: $(OUTPUT)
 
-$(OUT)/telechips.o: $(TOOLSDIR)/telechips.[ch]
+# inputs
+LIBSOURCES := mktccboot.c $(TOOLSDIR)/telechips.o
+SOURCES := $(LIBSOURCES) main.c
+OBJS := $(patsubst %.c,%.o,$(addprefix $(OUT)/,$(notdir $(SOURCES))))
+LIBOBJS := $(patsubst %.c,%.o,$(addprefix $(OUT)/,$(notdir $(LIBSOURCES))))
+EXTRADEPS :=
+
+# rule for sources from tools dir
+$(OUT)/%.o: $(TOOLSDIR)/%.c $(OUT)
 	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/telechips.o $(TOOLSDIR)/telechips.c
+	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
-$(OUT)/mktccboot.o: mktccboot.[ch] $(OUT)/telechips.o
+$(OUT)/%.o: %.c $(OUT)
 	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -c -o $(OUT)/mktccboot.o -W -Wall mktccboot.c -DVERSION=\"$(APPVERSION)\"
+	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
-$(OUTPUT):  $(OUT) $(OUT)/mktccboot.o
-	@echo LD $@
-	$(SILENT)$(CC) $(CFLAGS) -o $(OUTPUT) $(OUT)/mktccboot.o $(OUT)/telechips.o
-
+# building the library archive
 $(OUT)/libmktccboot.o: $(OUT)/mktccboot.o
 	@echo CC $<
 	$(SILENT)$(CC) $(CFLAGS) -DLIB -c -o $(OUT)/libmktccboot.o -W -Wall mktccboot.c
 
-libmktccboot$(RBARCH).a: $(OUT) $(OUT)/libmktccboot.o
+libmktccboot$(RBARCH).a: $(LIBOBJS)
 	@echo AR $@
-	$(SILENT)$(AR) ruc $(TARGET_DIR)libmktccboot$(RBARCH).a $(OUT)/libmktccboot.o
+	$(SILENT)$(AR) ruc $(TARGET_DIR)$@ $^
+
+# building the standalone executable
+$(OUTPUT): $(OBJS) $(EXTRADEPS)
+	@echo LD $@
+	$(SILENT)$(CC) $(CFLAGS) -o$(OUTPUT) $(OBJS) $(EXTRADEPS)
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
@@ -80,9 +90,8 @@ libmktccboot-universal: libmktccbooti386.a libmktccbootppc.a
 	lipo -create $(TARGET_DIR)libmktccbootppc.a $(TARGET_DIR)libmktccbooti386.a -output $(TARGET_DIR)libmktccboot.a
     
 clean:
-	rm -f $(OUTPUT) libmktccboot.o $(TARGET_DIR)libmktccboot*.a mktccboot.dmg
-	rm -f $(TOOLSDIR)/telechips.o
-	rm -rf build* mktccboot-*
+	rm -f $(OUTPUT) $(TARGET_DIR)libmktccboot*.a mktccboot.dmg
+	rm -rf $(OUT)
 
 mktccboot-i386:
 	$(MAKE) RBARCH=i386

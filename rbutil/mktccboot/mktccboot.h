@@ -25,6 +25,11 @@
 #ifndef _MKTCCBOOT_H_
 #define _MKTCCBOOT_H_
 
+/* win32 compatibility */
+#ifndef O_BINARY
+#define O_BINARY 0
+
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -115,7 +115,6 @@ SOURCES += rbutilqt.cpp \
  base/bootloaderinstalltcc.cpp \
  ../../tools/mkboot.c \
  ../../tools/iriver.c \
- ../../tools/telechips.c \
 
 HEADERS += rbutilqt.h \
  install.h \
@@ -177,7 +176,6 @@ HEADERS += rbutilqt.h \
  base/bootloaderinstalltcc.h \
  ../../tools/mkboot.h \
  ../../tools/iriver.h \
- ../../tools/telechips.h \
  
 # Needed by QT on Win
 INCLUDEPATH = $$_PRO_FILE_PWD_ $$_PRO_FILE_PWD_/irivertools $$_PRO_FILE_PWD_/zip $$_PRO_FILE_PWD_/zlib $$_PRO_FILE_PWD_/base
