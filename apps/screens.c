@@ -908,6 +908,7 @@ int calibrate(void)
 
     touchscreen_disable_mapping(); /* set raw mode */
     touchscreen_set_mode(TOUCHSCREEN_POINT);
+    
     for(i=0; i<3; i++)
     {
         screen->clear_display();
@@ -923,17 +924,25 @@ int calibrate(void)
         touchscreen_calibrate(&cal);
     else
         touchscreen_reset_mapping();
-    memcpy(&global_settings.ts_calibration_data, &calibration_parameters, sizeof(struct touchscreen_parameter));
+
+    memcpy(&global_settings.ts_calibration_data, &calibration_parameters,
+        sizeof(struct touchscreen_parameter));
+
     touchscreen_set_mode(old_mode);
     global_settings.statusbar = statusbar;
 
+    settings_save();
     return ret;
 }
 
 int reset_mapping(void)
 {
     touchscreen_reset_mapping();
-    memcpy(&global_settings.ts_calibration_data, &calibration_parameters, sizeof(struct touchscreen_parameter));
+
+    memcpy(&global_settings.ts_calibration_data, &calibration_parameters,
+        sizeof(struct touchscreen_parameter));
+
+    settings_save();
     return 0;
 }
 #endif
