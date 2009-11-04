@@ -102,28 +102,9 @@ void viewport_set_fullscreen(struct viewport *vp,
                               const enum screen_type screen)
 {
     vp->x = 0;
+    vp->y = 0;
     vp->width = screens[screen].lcdwidth;
-
-#ifdef HAVE_LCD_BITMAP
-    struct viewport *sb_skin_vp = sb_skin_get_info_vp(screen);
-    if (sb_skin_vp && sb_skin_get_state(screen)
-            && statusbar_enabled & VP_SB_ONSCREEN(screen))
-    {
-        *vp = *sb_skin_vp;
-    }
-    else
-    {
-        if (statusbar_position(screen) != STATUSBAR_BOTTOM && showing_bars(screen))
-            vp->y = STATUSBAR_HEIGHT;
-        else 
-            vp->y = 0;
-#else
-    {
-        vp->y = 0;
-#endif
-        vp->height = screens[screen].lcdheight
-                - (showing_bars(screen)?STATUSBAR_HEIGHT:0);
-    }
+    vp->height = screens[screen].lcdheight;
 
 #ifdef HAVE_LCD_BITMAP
     set_default_align_flags(vp);
@@ -158,13 +139,49 @@ void viewport_set_fullscreen(struct viewport *vp,
 void viewport_set_defaults(struct viewport *vp,
                             const enum screen_type screen)
 {
+    /* Reposition:
+       1) If the "ui viewport" setting is set, and a sbs is loaded which specifies a %Vi
+            return the intersection of those two viewports
+       2) If only one of the "ui viewport" setting, or sbs %Vi is set
+            return it
+       3) No user viewports set
+            return the full display
+     */
 #ifdef HAVE_LCD_BITMAP
+    
+    struct viewport *sbs_area = NULL, *user_setting = NULL;
+    /* get the two viewports */
     if (ui_vp_info.active[screen])
-        *vp = ui_vp_info.vp[screen];
+        user_setting = &ui_vp_info.vp[screen];
+    if (sb_skin_get_state(screen))    
+        sbs_area = sb_skin_get_info_vp(screen);
+    /* have both? get their intersection */
+    if (sbs_area && user_setting)
+    {
+        struct viewport *a = sbs_area, *b = user_setting;
+        /* make sure they do actually overlap,
+         * if they dont its user error, so use the full display 
+         * and live with redraw problems */
+        if (a->x             < b->x + b->width   &&
+            a->x + a->width  > b->x              &&
+            a->y             < b->y + b->height  &&
+            a->y + a->height > b->y)
+        {
+            vp->x = MAX(a->x, b->x);
+            vp->y = MAX(a->y, b->y);
+            vp->width = MIN(a->x + a->width, b->x + b->width) - vp->x;
+            vp->height = MIN(a->y + a->height, b->y + b->height) - vp->y;
+        }
+    }
+    /* only one so use it */
+    else if (sbs_area)
+        *vp = *sbs_area;
+    else if (user_setting)
+        *vp = *user_setting;
+    /* have neither so its fullscreen which was fixed at the beginning */   
     else
-#endif
-        viewport_set_fullscreen(vp, screen);
-
+        viewport_set_fullscreen(vp, screen);    
+#endif /* HAVE_LCD_BITMAP */
 }
 
 void viewportmanager_init(void)

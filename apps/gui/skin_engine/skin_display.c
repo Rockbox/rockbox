@@ -108,7 +108,7 @@ void skin_statusbar_changed(struct gui_wps *skin)
     const int   screen = display->screen_type;
 
     struct viewport *vp = &find_viewport(VP_DEFAULT_LABEL, data)->vp;
-    viewport_set_fullscreen(vp, screen);
+    viewport_set_defaults(vp, screen);
 
     if (data->wps_sb_tag)
     {   /* fix up the default viewport */

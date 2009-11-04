@@ -77,15 +77,49 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
     loaded_ok[screen] = success;
 }
 
+/* temporary viewport structs while the non-skinned bar is in the build */
+static struct viewport inbuilt[NB_SCREENS];
 struct viewport *sb_skin_get_info_vp(enum screen_type screen)
 {
-    return &find_viewport(VP_INFO_LABEL, sb_skin[screen].data)->vp;
+    int bar_setting = global_settings.statusbar;
+#if NB_SCREENS > 1
+    if (screen == SCREEN_REMOTE)
+        bar_setting = global_settings.remote_statusbar;
+#endif
+    if (bar_setting == STATUSBAR_CUSTOM)
+        return &find_viewport(VP_INFO_LABEL, sb_skin[screen].data)->vp;
+    else if (bar_setting == STATUSBAR_OFF)
+        return NULL;
+    else
+    {
+        viewport_set_fullscreen(&inbuilt[screen], screen);
+        /* WE need to return the UI area.. NOT the statusbar area! */
+        if (bar_setting == STATUSBAR_TOP)
+            inbuilt[screen].y = STATUSBAR_HEIGHT;
+        inbuilt[screen].height -= STATUSBAR_HEIGHT;
+        return &inbuilt[screen];
+    }
 }
 
 inline bool sb_skin_get_state(enum screen_type screen)
 {
     int skinbars = sb_skin[screen].sync_data->statusbars;
-    return loaded_ok[screen] && (skinbars & VP_SB_ONSCREEN(screen));
+    /* Temp fix untill the hardcoded bar is removed */
+    int bar_setting = global_settings.statusbar;
+#if NB_SCREENS > 1
+    if (screen == SCREEN_REMOTE)
+        bar_setting = global_settings.remote_statusbar;
+#endif
+    switch (bar_setting)
+    {
+        case STATUSBAR_CUSTOM:
+            return loaded_ok[screen] && (skinbars & VP_SB_ONSCREEN(screen));
+        case STATUSBAR_TOP:
+        case STATUSBAR_BOTTOM:
+        case STATUSBAR_OFF:
+            return (VP_SB_ONSCREEN(screen));
+    }
+    return false; /* Should never actually get here */
 }
 
 
