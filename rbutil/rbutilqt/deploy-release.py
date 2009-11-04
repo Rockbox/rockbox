@@ -67,8 +67,10 @@ program = "rbutilqt"
 project = "rbutil/rbutilqt/rbutilqt.pro"
 if sys.platform == "win32":
     progexe = "Release/rbutilqt.exe"
+    make = "mingw32-make"
 else:
     progexe = program
+    make = "make"
 
 programfiles = [ progexe ]
 
@@ -205,7 +207,7 @@ def qmake(qmake="qmake", projfile=project, wd=".", static=True):
 def build(wd="."):
     # make
     print "Building ..."
-    output = subprocess.Popen(["make"], stdout=subprocess.PIPE, cwd=wd)
+    output = subprocess.Popen([make], stdout=subprocess.PIPE, cwd=wd)
     while True:
         c = output.stdout.readline()
         sys.stdout.write(".")
