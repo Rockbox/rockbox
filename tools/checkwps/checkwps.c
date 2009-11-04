@@ -231,24 +231,6 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
 }
 #endif
 
-/* reimplement some simple stuff from viewport.c which doesnt change the skins
-  validity even if the values are not correct */
-void viewport_set_fullscreen(struct viewport *vp,
-                              const enum screen_type screen)
-{
-    vp->x = 0;
-    vp->y = 0;
-    vp->width = screens[screen].lcdwidth;
-    vp->height = screens[screen].lcdheight;
-}
-
-void viewport_set_defaults(struct viewport *vp,
-                              const enum screen_type screen)
-{
-    viewport_set_fullscreen(vp, screen);
-}
-
-
 int main(int argc, char **argv)
 {
     int res;
