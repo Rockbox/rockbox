@@ -71,9 +71,6 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
     if (!success)
         remove_event(GUI_EVENT_ACTIONUPDATE, sb_skin_update);
 
-#ifdef HAVE_REMOVE_LCD
-    data->remote_wps = !(screen == SCREEN_MAIN);
-#endif
     loaded_ok[screen] = success;
 }
 
@@ -210,9 +207,6 @@ void sb_skin_init(void)
 #ifdef HAVE_ALBUMART
         sb_skin_data[i].albumart = NULL;
         sb_skin_data[i].playback_aa_slot = -1;
-#endif
-#ifdef HAVE_REMOTE_LCD
-        sb_skin_data[i].remote_wps = (i == SCREEN_REMOTE);
 #endif
         sb_skin[i].data = &sb_skin_data[i];
         sb_skin[i].display = &screens[i];

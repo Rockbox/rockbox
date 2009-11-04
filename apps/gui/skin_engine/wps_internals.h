@@ -274,10 +274,6 @@ struct wps_data
     bool full_line_progressbar;
 #endif
     bool wps_loaded;
-#ifdef HAVE_REMOTE_LCD
-    /* this must not be reset on skin loading */
-    bool remote_wps;
-#endif
 };
 
 /* wps_data end */

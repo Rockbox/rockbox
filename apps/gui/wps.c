@@ -153,10 +153,6 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
         };
         skin_data_load(screen, gui_wps[screen].data, skin_buf[screen], false);
     }
-#ifdef HAVE_REMOVE_LCD
-    gui_wps[screen].data->remote_wps = !(screen == SCREEN_MAIN);
-
-#endif
 }
 
 void fade(bool fade_in, bool updatewps)
@@ -1279,9 +1275,6 @@ void gui_sync_wps_init(void)
 #ifdef HAVE_ALBUMART
         wps_datas[i].albumart = NULL;
         wps_datas[i].playback_aa_slot = -1;
-#endif
-#ifdef HAVE_REMOTE_LCD
-        wps_datas[i].remote_wps = (i == SCREEN_REMOTE);
 #endif
         gui_wps[i].data = &wps_datas[i];
         gui_wps[i].display = &screens[i];

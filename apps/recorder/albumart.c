@@ -306,12 +306,6 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
     struct wps_data *data = gwps->data;
     struct skin_albumart *aa = data->albumart;
 
-#ifdef HAVE_REMOTE_LCD
-    /* No album art on RWPS */
-    if (data->remote_wps)
-        return;
-#endif
-
     if (!aa)
         return;
         

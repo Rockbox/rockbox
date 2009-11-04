@@ -696,12 +696,6 @@ static int parse_viewport(const char *wps_bufptr,
     (void)token; /* Kill warnings */
     const char *ptr = wps_bufptr;
 
-    const int screen =
-#ifdef HAVE_REMOTE_LCD
-            wps_data->remote_wps ? SCREEN_REMOTE :
-#endif
-                                                    SCREEN_MAIN;
-
     struct skin_viewport *skin_vp = skin_buffer_alloc(sizeof(struct skin_viewport));
 
     /* check for the optional letter to signify its a hideable viewport */
@@ -749,7 +743,7 @@ static int parse_viewport(const char *wps_bufptr,
     struct viewport *vp = &skin_vp->vp;
     /* format: %V|x|y|width|height|font|fg_pattern|bg_pattern| */
 
-    if (!(ptr = viewport_parse_viewport(vp, screen, ptr, '|')))
+    if (!(ptr = viewport_parse_viewport(vp, curr_screen, ptr, '|')))
         return WPS_ERROR_INVALID_PARAM;
 
     vp->flags &= ~VP_FLAG_ALIGN_RIGHT; /* ignore right-to-left languages */
@@ -1732,7 +1726,6 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
  * initial setup of wps_data; does reset everything
  * except fields which need to survive, i.e.
  * 
- *  wps_data->remote_wps
  **/
 void skin_data_reset(struct wps_data *wps_data)
 {
@@ -1784,7 +1777,7 @@ static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char
 	/* load the image */
     int format;
 #ifdef HAVE_REMOTE_LCD
-    if (wps_data->remote_wps)
+    if (curr_screen == SCREEN_REMOTE)
         format = FORMAT_ANY|FORMAT_REMOTE;
     else
 #endif
@@ -1839,16 +1832,10 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
     if (bmp_names[BACKDROP_BMP])
     {
-        int screen = SCREEN_MAIN;
         char img_path[MAX_PATH];
         get_image_filename(bmp_names[BACKDROP_BMP], bmpdir,
                             img_path, sizeof(img_path));
-#if defined(HAVE_REMOTE_LCD)
-        /* We only need to check LCD type if there is a remote LCD */
-        if (wps_data->remote_wps)
-            screen = SCREEN_REMOTE;
-#endif
-        screens[screen].backdrop_load(BACKDROP_SKIN_WPS, img_path);
+        screens[curr_screen].backdrop_load(BACKDROP_SKIN_WPS, img_path);
     }
 #endif /* has backdrop support */
 
