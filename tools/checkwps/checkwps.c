@@ -231,6 +231,23 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
 }
 #endif
 
+/* reimplement some simple stuff from viewport.c which doesnt change the skins
+  validity even if the values are not correct */
+void viewport_set_fullscreen(struct viewport *vp,
+                              const enum screen_type screen)
+{
+    vp->x = 0;
+    vp->y = 0;
+    vp->width = screens[screen].lcdwidth;
+    vp->height = screens[screen].lcdheight;
+}
+
+void viewport_set_defaults(struct viewport *vp,
+                              const enum screen_type screen)
+{
+    viewport_set_fullscreen(vp, screen);
+}
+
 
 int main(int argc, char **argv)
 {
@@ -238,9 +255,8 @@ int main(int argc, char **argv)
     int filearg = 1;
 
     struct wps_data wps;
-#ifdef HAVE_REMOTE_LCD
-    struct screen* wps_screen = &screens[SCREEN_MAIN];
-#endif
+    enum screen_type screen = SCREEN_MAIN;
+    struct screen* wps_screen;
 
     /* No arguments -> print the help text
      * Also print the help text upon -h or --help */
@@ -275,17 +291,18 @@ int main(int argc, char **argv)
 #ifdef HAVE_REMOTE_LCD
         if(strcmp(&argv[filearg][strlen(argv[filearg])-4], "rwps") == 0)
         {
-            wps_screen = &screens[SCREEN_REMOTE];
+            screen = SCREEN_REMOTE;
             wps.remote_wps = true;
         }
         else
         {
-            wps_screen = &screens[SCREEN_MAIN];
+            screen = SCREEN_MAIN;
             wps.remote_wps = false;
         }
-#endif
+#endif    
+        wps_screen = &screens[screen];
 
-        res = skin_data_load(&wps, argv[filearg], true);
+        res = skin_data_load(screen, &wps, argv[filearg], true);
 
         if (!res) {
             printf("WPS parsing failure\n");
