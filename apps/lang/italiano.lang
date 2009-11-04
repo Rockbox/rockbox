@@ -7108,10 +7108,10 @@
     *: "Insert Last"
   </source>
   <dest>
-    *: "Inserisci in fondo"
+    *: "Inserisci Come Ultima"
   </dest>
   <voice>
-    *: "Inserisci in fondo"
+    *: "Inserisci Come Ultima"
   </voice>
 </phrase>
 <phrase>
@@ -7122,10 +7122,10 @@
     *: "Insert Shuffled"
   </source>
   <dest>
-    *: "Inserisci a caso"
+    *: "Mescola E Inserisci"
   </dest>
   <voice>
-    *: "Inserisci a caso"
+    *: "Mescola E Inserisci"
   </voice>
 </phrase>
 <phrase>
@@ -7164,10 +7164,10 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "Accoda in fondo"
+    *: "Accoda Come Ultima"
   </dest>
   <voice>
-    *: "Accoda in fondo"
+    *: "Accoda Come Ultima"
   </voice>
 </phrase>
 <phrase>
@@ -7178,10 +7178,10 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "Inserisci casualmente"
+    *: "Mescola e Accoda"
   </dest>
   <voice>
-    *: "Inserisci casualmente"
+    *: "Mescola E Accoda"
   </voice>
 </phrase>
 <phrase>
@@ -7192,10 +7192,10 @@
     *: "Play Next"
   </source>
   <dest>
-    *: "Suona Successiva"
+    *: "Riproduce Come Prossima"
   </dest>
   <voice>
-    *: "Suona Successiva"
+    *: "Riproduce Come Prossima"
   </voice>
 </phrase>
 <phrase>
@@ -7276,10 +7276,10 @@
     *: "Reshuffle"
   </source>
   <dest>
-    *: "Rimescola"
+    *: "Mescola"
   </dest>
   <voice>
-    *: "Rimescola"
+    *: "Mescola"
   </voice>
 </phrase>
 <phrase>
@@ -13002,5 +13002,140 @@
   <voice>
     *: none
     swcodec: "Tempo Rilascio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Salta a Fine Traccia"
+  </dest>
+  <voice>
+    *: "Salta a Fine Traccia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Personalizzata"
+  </dest>
+  <voice>
+    *: "Personalizzata"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Skin Barra Di Stato"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Skin Barra Di Stato Per Telecomando"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_STATUSBAR
+  desc: browse for custom statusbar in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Custom Statusbar"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Personalizza Barra Di Stato"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Personalizza Barra Di Stato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CUSTOM_STATUSBAR
+  desc: browse for remote custom statusbar in theme settings
+  user: core
+  <source>
+    *:none
+    remote: "Remote Custom Statusbar"
+  </source>
+  <dest>
+    *:none
+    remote: "Personalizza Barra Di Stato Del Telecomando"
+  </dest>
+  <voice>
+    *:none
+    remote: "Personalizza Barra Di Stato Del Telecomando"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB HID"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Periferica USB Human Interface"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "Mescola E Inserisci Come Ultima"
+  </dest>
+  <voice>
+    *: "Mescola E Inserisci Come Ultima"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "Mescola E Accoda Come Ultima"
+  </dest>
+  <voice>
+    *: "Mescola E Accoda Come Ultima"
   </voice>
 </phrase>

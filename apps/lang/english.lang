@@ -13198,7 +13198,7 @@
 </phrase>
 <phrase>
   id: LANG_QUEUE_LAST_SHUFFLED
-  desc: in onplay menu.  queue a playlist randomly at and of dynamic playlist
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
   user: core
   <source>
     *: "Queue Last Shuffled"
