@@ -364,28 +364,10 @@ static void compressor_set(int val)
 {
     (void)val;
     dsp_set_compressor(global_settings.compressor_threshold,
-                       global_settings.compressor_ratio,
                        global_settings.compressor_makeup_gain,
+                       global_settings.compressor_ratio,
                        global_settings.compressor_knee,
                        global_settings.compressor_release_time);
-}
-
-static const char* auto_formatter(char *buffer, size_t buffer_size,
-                                int val, const char *unit)
-{
-    if (val == -1)
-        return str(LANG_AUTO);
-    else
-        snprintf(buffer, buffer_size, "%d %s", val, unit);
-    return buffer;
-}
-
-static int32_t auto_getlang(int value, int unit)
-{
-    if (value == -1)
-        return LANG_AUTO;
-    else
-        return TALK_ID(value, unit);
 }
 
 static const char* db_format(char* buffer, size_t buffer_size, int value,
@@ -1293,24 +1275,24 @@ const struct settings_list settings[] = {
                        LANG_COMPRESSOR_THRESHOLD, 0,
                        "compressor threshold", UNIT_DB, 0, -24,
                        -3, formatter_unit_0_is_off, getlang_unit_0_is_off, compressor_set),
+    CHOICE_SETTING(F_SOUNDSETTING|F_NO_WRAP, compressor_makeup_gain,
+                   LANG_COMPRESSOR_GAIN, 1, "compressor makeup gain",
+                   "off,auto", compressor_set, 2,
+                   ID2P(LANG_OFF), ID2P(LANG_AUTO)),
     CHOICE_SETTING(F_SOUNDSETTING|F_NO_WRAP, compressor_ratio,
                    LANG_COMPRESSOR_RATIO, 1, "compressor ratio",
                    "2:1,4:1,6:1,10:1,limit", compressor_set, 5,
                    ID2P(LANG_COMPRESSOR_RATIO_2), ID2P(LANG_COMPRESSOR_RATIO_4),
                    ID2P(LANG_COMPRESSOR_RATIO_6), ID2P(LANG_COMPRESSOR_RATIO_10),
                    ID2P(LANG_COMPRESSOR_RATIO_LIMIT)),
-    INT_SETTING_NOWRAP(F_SOUNDSETTING, compressor_makeup_gain,
-                       LANG_COMPRESSOR_GAIN, -1,
-                       "compressor makeup gain", UNIT_DB, -1, 20,
-                       1, auto_formatter, auto_getlang, compressor_set),
     CHOICE_SETTING(F_SOUNDSETTING|F_NO_WRAP, compressor_knee,
                    LANG_COMPRESSOR_KNEE, 1, "compressor knee",
                    "hard knee,soft knee", compressor_set, 2,
                    ID2P(LANG_COMPRESSOR_HARD_KNEE), ID2P(LANG_COMPRESSOR_SOFT_KNEE)),
     INT_SETTING_NOWRAP(F_SOUNDSETTING, compressor_release_time,
-                       LANG_COMPRESSOR_RELEASE, 100,
-                       "compressor release time", UNIT_MS, 20, 200,
-                       10, NULL, NULL, compressor_set),
+                       LANG_COMPRESSOR_RELEASE, 500,
+                       "compressor release time", UNIT_MS, 100, 1000,
+                       100, NULL, NULL, compressor_set),
 #endif
 #ifdef HAVE_WM8758
     SOUND_SETTING(F_NO_WRAP, bass_cutoff, LANG_BASS_CUTOFF,

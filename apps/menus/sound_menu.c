@@ -109,16 +109,16 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
     /* compressor submenu */
     MENUITEM_SETTING(compressor_threshold,
                      &global_settings.compressor_threshold, lowlatency_callback);
-    MENUITEM_SETTING(compressor_ratio,
-                     &global_settings.compressor_ratio, lowlatency_callback);
     MENUITEM_SETTING(compressor_gain,
                      &global_settings.compressor_makeup_gain, lowlatency_callback);
+    MENUITEM_SETTING(compressor_ratio,
+                     &global_settings.compressor_ratio, lowlatency_callback);
     MENUITEM_SETTING(compressor_knee,
                      &global_settings.compressor_knee, lowlatency_callback);
     MENUITEM_SETTING(compressor_release,
                      &global_settings.compressor_release_time, lowlatency_callback);
     MAKE_MENU(compressor_menu,ID2P(LANG_COMPRESSOR), NULL, Icon_NOICON,
-              &compressor_threshold, &compressor_ratio, &compressor_gain,
+              &compressor_threshold, &compressor_gain, &compressor_ratio,
               &compressor_knee, &compressor_release);
 #endif
 

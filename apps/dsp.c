@@ -137,8 +137,8 @@ struct eq_state
 struct compressor_menu
 {
     int  threshold;     /* dB - from menu */
+    bool auto_gain;     /* 0 = off, 1 = auto */
     int  ratio;         /* from menu */
-    int  gain;          /* dB - from menu */
     bool soft_knee;     /* 0 = hard knee, 1 = soft knee */     
     int  release;       /* samples - from menu */
 };
@@ -1542,11 +1542,12 @@ void dsp_set_replaygain(void)
 
 /** SET COMPRESSOR
  *  Called by the menu system to configure the compressor process */
-void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
+void dsp_set_compressor(int c_threshold, int c_gain, int c_ratio,
                         int c_knee, int c_release)
 {
     bool changed = false;
     bool active = (c_threshold < 0);
+    bool new_auto_gain = (c_gain == 1);
     const int comp_ratio[] = {2, 4, 6, 10, 0};
     int  new_ratio = comp_ratio[c_ratio];
     bool new_knee = (c_knee == 1);
@@ -1560,32 +1561,22 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
             c_menu.threshold, active ? "Yes" : "No");
     }
 
+    if (c_menu.auto_gain != new_auto_gain)
+    {
+        changed = true;
+        c_menu.auto_gain = new_auto_gain;
+        logf("   Compressor Makeup Gain: %s",
+            c_menu.auto_gain ? "Auto" : "Off");
+    }
+    
     if (c_menu.ratio != new_ratio)
     {
         changed = true;
         c_menu.ratio = new_ratio;
         if (c_menu.ratio)
-        {
-            logf("   Compressor Ratio: %d:1", c_menu.ratio);
-        }
+            { logf("   Compressor Ratio: %d:1", c_menu.ratio); }
         else
-        {
-            logf("   Compressor Ratio: Limit");
-        }
-    }
-    
-    if (c_menu.gain != c_gain)
-    {
-        changed = true;
-        c_menu.gain = c_gain;
-        if (c_menu.gain >= 0)
-        {
-            logf("   Compressor Makeup Gain: %d dB", c_menu.gain);
-        }
-        else
-        {
-            logf("   Compressor Makeup Gain: Auto");
-        }
+            { logf("   Compressor Ratio: Limit"); }
     }
     
     if (c_menu.soft_knee != new_knee)
@@ -1731,9 +1722,8 @@ void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
 #endif
         
         /* if using auto peak, then makeup gain is max offset - .1dB headroom */
-        int32_t db_makeup = (c_menu.gain == -1) ?
-            -(db_curve[3].offset) - 0x199A : c_menu.gain << 16;
-        comp_makeup_gain = fp_factor(db_makeup, 16) << 8;
+        comp_makeup_gain = c_menu.auto_gain ?
+            fp_factor(-(db_curve[3].offset) - 0x199A, 16) << 8 : UNITY;
         logf("Makeup gain:\t%.6f", (float)comp_makeup_gain / UNITY);
 
         /* calculate per-sample gain change a rate of 10db over release time */

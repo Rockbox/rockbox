@@ -792,8 +792,8 @@ struct user_settings
 
 #if CONFIG_CODEC == SWCODEC
     int compressor_threshold;
-    int compressor_ratio;
     int compressor_makeup_gain;
+    int compressor_ratio;
     int compressor_knee;
     int compressor_release_time;
 #endif

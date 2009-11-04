@@ -982,8 +982,8 @@ void settings_apply(bool read_disk)
     dsp_dither_enable(global_settings.dithering_enabled);
     dsp_timestretch_enable(global_settings.timestretch_enabled);
     dsp_set_compressor(global_settings.compressor_threshold,
-                       global_settings.compressor_ratio,
                        global_settings.compressor_makeup_gain,
+                       global_settings.compressor_ratio,
                        global_settings.compressor_knee,
                        global_settings.compressor_release_time);
 #endif

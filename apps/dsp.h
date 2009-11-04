@@ -82,7 +82,7 @@ int32_t sound_get_pitch(void);
 void dsp_set_timestretch(int32_t percent);
 int32_t dsp_get_timestretch(void);
 int dsp_callback(int msg, intptr_t param);
-void dsp_set_compressor(int c_threshold, int c_ratio, int c_gain,
+void dsp_set_compressor(int c_threshold, int c_gain, int c_ratio,
                         int c_knee, int c_release);
 
 #endif

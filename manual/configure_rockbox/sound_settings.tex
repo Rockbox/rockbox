@@ -445,18 +445,48 @@ experience with more complex audio.
 }
 
 \opt{swcodec}{
-\section{Limiter Preamp}
-The limiter preamp raises the gain of the audio by the selected amount.  The associated
-limiter function works on the resulting louder signal to reduce any peaks to below the
-maximum level.  The default selection of 0dB turns all limiter processing off.
+\section{Compressor}
+The \setting{Compressor} reduces, or compresses, the dynamic range of the audio
+signal.  This makes the quieter and louder sections closer to the same volume
+level by progressively reducing the gain of louder signals.  When subsequently
+amplified, this has the effect of making the quieter sections louder while
+keeping the louder sections from clipping.  This allows listening to the quiet
+sections of dynamic material in noisy environments while preventing sudden loud
+sections from being overbearing.
 
-The limiter has the effect of reducing dynamic range by amplifying quiet sections while
-loud sections are kept just under maximum gain.  This allows listening to the quiet sections
-of dynamic material in noisy environments while preventing sudden loud sections from being
-overbearing.
+There are several settings associated with the compressor.  The first, and most
+important, is the \setting{Threshold}.  The threshold is the audio input level
+at which the compressor begins to act.  Any level louder than the threshold
+will be compressed to some extent.  The maximum amount of compression, or the
+quietest level at which the compressor will operate, is -24db.  The default of
+Off disables the compressor.
 
-Think of this as a smart volume control.  The preamp in effect turns up the volume by the
-amount you select so that you can hear quiet passages.  But it senses when a loud section is
-about to play and quickly and smoothly lowers the volume as necessary to keep the audio
-under the maximum limit.  As the loud section fades, the volume is turned back up.
+The \setting{Makeup Gain} setting has two options: Off and Auto.  Off means
+that the compressed audio will not be amplified after compression.  The default
+of Auto will amplify the signal so that the loudest possible signal after
+compression will be just under the clipping limit.  This is desirable because
+the compressed signal without makeup gain is quieter than the input signal.
+Makeup Gain in Auto restores the signal to the maximum possible level and
+brings the quieter audio up with it.  This is what makes it possible to hear
+the quieter audio in noisy environments.
+
+The \setting{Ratio} setting determines how aggressively the compressor reduces
+gain above the threshold.  For example, the 2:1 setting means that for each
+two decibels of input signal above the threshold, the compressor will only
+allow the output to appear as one decibel.  The higher the ratio, the harder
+the signal is compressed.  The ratio setting of Limit means essentially a ratio
+of infinity to one.  In this case, the output signal is not allowed to exceed
+the threshold at all.
+
+The \setting{Knee} setting determines how abrupt the transition is from a
+non-compressed signal to a compressed signal.  Hard Knee means that the
+transition occurs precisely at the threshold.  The Soft Knee setting smoothes
+the transition from plus or minus three decibels around the threshold.
+
+The \setting{Release Time} setting sets the recovery time after the signal is
+compressed.  Once the compressor determines that compression is necessary,
+the input signal is reduced appropriately, but the gain isn't allowed to
+immediately return to normal levels.  This is necessary to reduce artifacts
+such as "pumping."  Instead, the gain is allowed to return to normal at the
+chosen rate.  Release Time is the time for the gain to recover by 10dB.
 }
