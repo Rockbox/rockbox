@@ -38,7 +38,9 @@
 #define BG_FALLBACK LCD_DEFAULT_BG
 #endif
 
+#ifdef HAVE_LCD_BITMAP
 static void set_default_align_flags(struct viewport *vp);
+#endif
 
 /* all below isn't needed for pc tools (i.e. checkwps/wps editor)
  * only viewport_parse_viewport() is */
