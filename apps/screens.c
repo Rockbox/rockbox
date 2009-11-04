@@ -903,8 +903,10 @@ int calibrate(void)
     enum touchscreen_mode old_mode = touchscreen_get_mode();
     struct touchscreen_calibration cal;
     int i, ret = 0;
-    int statusbar = global_settings.statusbar; /* hide the statusbar */
-    global_settings.statusbar = STATUSBAR_OFF;
+    
+    /* hide the statusbar */
+    int old_statusbar = viewportmanager_get_statusbar();
+    viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
 
     touchscreen_disable_mapping(); /* set raw mode */
     touchscreen_set_mode(TOUCHSCREEN_POINT);
@@ -929,7 +931,7 @@ int calibrate(void)
         sizeof(struct touchscreen_parameter));
 
     touchscreen_set_mode(old_mode);
-    global_settings.statusbar = statusbar;
+    viewportmanager_set_statusbar(old_statusbar);
 
     settings_save();
     return ret;
