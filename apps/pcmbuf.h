@@ -59,7 +59,7 @@ void pcmbuf_play_start(void);
 bool pcmbuf_crossfade_init(bool manual_skip);
 void pcmbuf_start_track_change(void);
 size_t pcmbuf_free(void);
-unsigned int pcmbuf_get_latency(void);
+unsigned long pcmbuf_get_latency(void);
 void pcmbuf_set_low_latency(bool state);
 void * pcmbuf_request_buffer(int *count);
 void pcmbuf_write_complete(int count);

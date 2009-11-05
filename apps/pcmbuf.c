@@ -136,6 +136,45 @@ static void pcmbuf_under_watermark(bool under);
 static bool pcmbuf_flush_fillpos(void);
 
 
+/**************************************/
+
+/* define this to show detailed pcmbufdesc usage information on the sim console */
+/*#define DESC_DEBUG*/
+
+#ifndef SIMULATOR
+#undef DESC_DEBUG
+#endif
+#ifdef DESC_DEBUG
+static struct pcmbufdesc *first_desc;
+static bool show_desc_in_use = false;
+#define DISPLAY_DESC(caller) while(!show_desc(caller))
+#define DESC_IDX(desc)  (desc ? desc - first_desc : -1)
+#define DESCL_IDX(desc) (desc && desc->link ? desc->link - first_desc : -1)
+#define SHOW_1ST(desc) if(DESC_IDX (desc)==-1) DEBUGF(" -- "); \
+                       else DEBUGF(" %02d ",   DESC_IDX(desc))
+#define SHOW_2ND(desc) if(DESCL_IDX(desc)==-1) DEBUGF("l --  "); \
+                       else DEBUGF("l %02d  ", DESCL_IDX(desc))
+#define DESC_SHOW(tag, desc) DEBUGF(tag);SHOW_1ST(desc); \
+                             DEBUGF(tag);SHOW_2ND(desc)
+
+static bool show_desc(char *caller)
+{
+    if (show_desc_in_use) return false;
+    show_desc_in_use = true;
+    DEBUGF("%-14s\t", caller);
+    DESC_SHOW("r",  pcmbuf_read);
+    DESC_SHOW("re", pcmbuf_read_end);
+    DEBUGF(" ");
+    DESC_SHOW("w",  pcmbuf_write);
+    DESC_SHOW("we", pcmbuf_write_end);
+    DEBUGF("\n");
+    show_desc_in_use = false;
+    return true;
+}
+#else
+#define DISPLAY_DESC(caller) do{}while(0)
+#endif
+
 /* Track change functions */
 
 /* The codec is moving on to the next track, but the current track is
@@ -232,6 +271,7 @@ static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
                 pcmbuf_finish_track_change();
         }
     }
+    DISPLAY_DESC("callback");
 }
 
 static void pcmbuf_set_watermark_bytes(void)
@@ -287,6 +327,7 @@ static inline void pcmbuf_add_chunk(void)
         audiobuffer_pos -= pcmbuf_size;
 
     audiobuffer_fillpos = 0;
+    DISPLAY_DESC("add_chunk");
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING
@@ -348,11 +389,11 @@ static void pcmbuf_under_watermark(bool under)
     }
 }
 
-unsigned int pcmbuf_get_latency(void)
+unsigned long pcmbuf_get_latency(void)
 {
     /* Be careful how this calculation is rearranged, it's easy to overflow */
     size_t bytes = pcmbuf_unplayed_bytes + pcm_get_bytes_waiting();
-    return bytes / 4 / (NATIVE_FREQUENCY/1000);
+    return bytes / 4 * 1000 / NATIVE_FREQUENCY;
 }
 
 void pcmbuf_set_low_latency(bool state)
@@ -437,6 +478,7 @@ void pcmbuf_play_stop(void)
     crossfade_init = false;
     crossfade_active = false;
     pcmbuf_flush = false;
+    DISPLAY_DESC("play_stop");
 
 #ifdef HAVE_PRIORITY_SCHEDULING
     /* Can unboost the codec thread here no matter who's calling */
@@ -462,6 +504,9 @@ int pcmbuf_descs(void)
 
 static void pcmbuf_init_pcmbuffers(void)
 {
+#ifdef DESC_DEBUG
+    first_desc = pcmbuf_write;
+#endif
     struct pcmbufdesc *next = pcmbuf_write;
     next++;
     pcmbuf_write_end = pcmbuf_write;
@@ -470,6 +515,7 @@ static void pcmbuf_init_pcmbuffers(void)
         pcmbuf_write_end=next;
         next++;
     }
+    DISPLAY_DESC("init");
 }
 
 static size_t pcmbuf_get_next_required_pcmbuf_size(void)
@@ -755,24 +801,6 @@ static size_t crossfade_mix(int factor, const char *buf, size_t length)
     return 0;
 }
 
-static void pcmbuf_flush_buffer(const char *buf, size_t length)
-{
-    size_t copy_n;
-    while (length > 0) {
-        size_t audiobuffer_index = audiobuffer_pos + audiobuffer_fillpos;
-        if (NEED_FLUSH(audiobuffer_index))
-        {
-            pcmbuf_flush_fillpos();
-            audiobuffer_index = audiobuffer_pos + audiobuffer_fillpos;
-        }
-        copy_n = MIN(length, pcmbuf_size - audiobuffer_index);
-        memcpy(&audiobuffer[audiobuffer_index], buf, copy_n);
-        buf += copy_n;
-        audiobuffer_fillpos += copy_n;
-        length -= copy_n;
-    }
-}
-
 static void flush_crossfade(char *buf, size_t length)
 {
     if (length)
@@ -826,11 +854,23 @@ static void flush_crossfade(char *buf, size_t length)
         /* Flush samples to the buffer */
         while (!prepare_insert(length))
             sleep(1);
-        pcmbuf_flush_buffer(buf, length);
+        while (length > 0)
+        {
+            size_t audiobuffer_index = audiobuffer_pos + audiobuffer_fillpos;
+            if (NEED_FLUSH(audiobuffer_index))
+            {
+                pcmbuf_flush_fillpos();
+                audiobuffer_index = audiobuffer_pos + audiobuffer_fillpos;
+            }
+            size_t copy_n = MIN(length, pcmbuf_size - audiobuffer_index);
+            memcpy(&audiobuffer[audiobuffer_index], buf, copy_n);
+            buf += copy_n;
+            audiobuffer_fillpos += copy_n;
+            length -= copy_n;
+        }
     }
-
 }
-#endif
+#endif /* HAVE_CROSSFADE */
 
 static bool prepare_insert(size_t length)
 {

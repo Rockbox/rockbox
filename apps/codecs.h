@@ -123,7 +123,7 @@ struct codec_api {
        automatically. */
     bool (*pcmbuf_insert)(const void *ch1, const void *ch2, int count);
     /* Set song position in WPS (value in ms). */
-    void (*set_elapsed)(unsigned int value);
+    void (*set_elapsed)(unsigned long value);
     
     /* Read next <size> amount bytes from file buffer to <ptr>.
        Will return number of bytes read or 0 if end of file. */

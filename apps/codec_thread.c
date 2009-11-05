@@ -215,7 +215,7 @@ static bool codec_pcmbuf_insert_callback(
     return true;
 } /* codec_pcmbuf_insert_callback */
 
-static void codec_set_elapsed_callback(unsigned int value)
+static void codec_set_elapsed_callback(unsigned long value)
 {
     if (ci.seek_time)
         return;
@@ -224,12 +224,12 @@ static void codec_set_elapsed_callback(unsigned int value)
     ab_position_report(value);
 #endif
 
-    unsigned int latency = pcmbuf_get_latency();
+    unsigned long latency = pcmbuf_get_latency();
     if (value < latency)
         thistrack_id3->elapsed = 0;
     else
     {
-        unsigned int elapsed = value - latency;
+        unsigned long elapsed = value - latency;
         if (elapsed > thistrack_id3->elapsed ||
             elapsed < thistrack_id3->elapsed - 2)
             {
@@ -243,7 +243,7 @@ static void codec_set_offset_callback(size_t value)
     if (ci.seek_time)
         return;
 
-    unsigned int latency = pcmbuf_get_latency() * thistrack_id3->bitrate / 8;
+    unsigned long latency = pcmbuf_get_latency() * thistrack_id3->bitrate / 8;
     if (value < latency)
         thistrack_id3->offset = 0;
     else

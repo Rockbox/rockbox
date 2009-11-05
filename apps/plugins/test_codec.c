@@ -363,7 +363,7 @@ static bool pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
 }
 
 /* Set song position in WPS (value in ms). */
-static void set_elapsed(unsigned int value)
+static void set_elapsed(unsigned long value)
 {
     elapsed = value;
 }
