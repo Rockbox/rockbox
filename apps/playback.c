@@ -246,10 +246,18 @@ void audio_pcmbuf_position_callback(size_t size)
 
 /* Post message from pcmbuf that the end of the previous track
  * has just been played. */
-void audio_post_track_change(void)
+void audio_post_track_change(bool pcmbuf)
 {
-    LOGFQUEUE("pcmbuf > pcmbuf Q_AUDIO_TRACK_CHANGED");
-    queue_post(&pcmbuf_queue, Q_AUDIO_TRACK_CHANGED, 0);
+    if (pcmbuf)
+    {
+        LOGFQUEUE("pcmbuf > pcmbuf Q_AUDIO_TRACK_CHANGED");
+        queue_post(&pcmbuf_queue, Q_AUDIO_TRACK_CHANGED, 0);
+    }
+    else
+    {
+        LOGFQUEUE("pcmbuf > audio Q_AUDIO_TRACK_CHANGED");
+        queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
+    }
 }
 
 /* Scan the pcmbuf queue and return true if a message pulled.
@@ -814,18 +822,12 @@ void audio_set_crossfade(int enable)
     size_t size;
 
     /* Tell it the next setting to use */
-    pcmbuf_crossfade_enable(enable);
+    pcmbuf_request_crossfade_enable(enable);
 
     /* Return if size hasn't changed or this is too early to determine
        which in the second case there's no way we could be playing
        anything at all */
-    if (pcmbuf_is_same_size())
-    {
-        /* This function is a copout and just syncs some variables -
-           to be removed at a later date */
-        pcmbuf_crossfade_enable_finished();
-        return;
-    }
+    if (pcmbuf_is_same_size()) return;
 
     offset = 0;
     was_playing = playing;
@@ -2058,7 +2060,7 @@ void audio_init(void)
 #endif
 
     /* Set crossfade setting for next buffer init which should be about... */
-    pcmbuf_crossfade_enable(global_settings.crossfade);
+    pcmbuf_request_crossfade_enable(global_settings.crossfade);
 
     /* initialize the buffering system */
 

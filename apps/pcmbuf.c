@@ -49,6 +49,17 @@ static inline int32_t clip_sample_16(int32_t sample)
     return sample;
 }
 
+#define PCMBUF_TARGET_CHUNK 32768 /* This is the target fill size of chunks
+                                     on the pcm buffer */
+#define PCMBUF_MINAVG_CHUNK 24576 /* This is the minimum average size of
+                                     chunks on the pcm buffer (or we run out
+                                     of buffer descriptors, which is
+                                     non-fatal) */
+#define PCMBUF_MIN_CHUNK     4096 /* We try to never feed a chunk smaller than
+                                     this to the DMA */
+#define PCMBUF_MIX_CHUNK     8192 /* This is the maximum size of one packet
+                                     for mixing (crossfade or voice) */
+
 #if MEMORYSIZE > 2
 /* Keep watermark high for iPods at least (2s) */
 #define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 4 * 2)
@@ -135,6 +146,10 @@ static bool prepare_insert(size_t length);
 static void pcmbuf_under_watermark(bool under);
 static bool pcmbuf_flush_fillpos(void);
 
+static bool pcmbuf_crossfade_init(bool manual_skip);
+static bool pcmbuf_is_crossfade_enabled(void);
+static void pcmbuf_finish_crossfade_enable(void);
+
 
 /**************************************/
 
@@ -181,13 +196,51 @@ static bool show_desc(char *caller)
  * still playing.  Set flags to make sure the elapsed time of the current
  * track is updated properly, and mark the currently written chunk as the
  * last one in the track. */
-void pcmbuf_start_track_change(void)
+static void pcmbuf_gapless_track_change(void)
 {
     /* we're starting a track transition */
     track_transition = true;
     
     /* mark the last chunk in the track */
     end_of_track = true;
+}
+
+static void pcmbuf_crossfade_track_change(void)
+{
+    /* Initiate automatic crossfade mode */
+    pcmbuf_crossfade_init(false);
+    /* Notify the wps that the track change starts now */
+    audio_post_track_change(false);
+}
+
+void pcmbuf_start_track_change(bool manual_skip)
+{
+    /* Manual track change (always crossfade or flush audio). */
+    if (manual_skip)
+    {
+        pcmbuf_crossfade_init(true);
+        audio_post_track_change(false);
+    }
+    /* Automatic track change w/crossfade, if not in "Track Skip Only" mode. */
+    else if (pcmbuf_is_crossfade_enabled() && !pcmbuf_is_crossfade_active()
+             && global_settings.crossfade != CROSSFADE_ENABLE_TRACKSKIP)
+    {
+        if (global_settings.crossfade == CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP)
+        {
+            if (global_settings.playlist_shuffle)
+                /* shuffle mode is on, so crossfade: */
+                pcmbuf_crossfade_track_change();
+            else
+                /* shuffle mode is off, so normal gapless playback */
+                pcmbuf_gapless_track_change();
+        }
+        else
+            /* normal crossfade:  */
+            pcmbuf_crossfade_track_change();
+    }
+    else
+        /* normal gapless playback. */
+        pcmbuf_gapless_track_change();
 }
 
 /* Called when the last chunk in the track has been played */
@@ -198,7 +251,7 @@ static void pcmbuf_finish_track_change(void)
     track_transition = false;
     
     /* notify playback that the track has just finished */
-    audio_post_track_change();
+    audio_post_track_change(true);
 }
 
 
@@ -274,15 +327,6 @@ static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
     DISPLAY_DESC("callback");
 }
 
-static void pcmbuf_set_watermark_bytes(void)
-{
-    pcmbuf_watermark = (crossfade_enabled && pcmbuf_size) ?
-        /* If crossfading, try to keep the buffer full other than 1 second */
-        (pcmbuf_size - (NATIVE_FREQUENCY * 4 * 1)) :
-        /* Otherwise, just use the default */
-        PCMBUF_WATERMARK;
-}
-
 /* This is really just part of pcmbuf_flush_fillpos, but is easier to keep
  * in a separate function for the moment */
 static inline void pcmbuf_add_chunk(void)
@@ -328,6 +372,28 @@ static inline void pcmbuf_add_chunk(void)
 
     audiobuffer_fillpos = 0;
     DISPLAY_DESC("add_chunk");
+}
+
+/**
+ * Commit samples waiting to the pcm buffer.
+ */
+static bool pcmbuf_flush_fillpos(void)
+{
+    if (audiobuffer_fillpos) {
+        /* Never use the last buffer descriptor */
+        while (pcmbuf_write == pcmbuf_write_end) {
+            /* If this happens, something is being stupid */
+            if (!pcm_is_playing()) {
+                logf("pcmbuf_flush_fillpos error");
+                pcmbuf_play_start();
+            }
+            /* Let approximately one chunk of data playback */
+            sleep(HZ*PCMBUF_TARGET_CHUNK/(NATIVE_FREQUENCY*4));
+        }
+        pcmbuf_add_chunk();
+        return true;
+    }
+    return false;
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING
@@ -431,7 +497,7 @@ inline size_t pcmbuf_free(void)
     return pcmbuf_size;
 }
 
-bool pcmbuf_crossfade_init(bool manual_skip)
+static bool pcmbuf_crossfade_init(bool manual_skip)
 {
     /* Can't do two crossfades at once and, no fade if pcm is off now */
     if (crossfade_init || crossfade_active || !pcm_is_playing())
@@ -542,11 +608,20 @@ static char *pcmbuf_calc_audiobuffer_ptr(size_t bufsize)
 
 bool pcmbuf_is_same_size(void)
 {
+    bool same_size;
+    
     if (audiobuffer == NULL)
-        return true; /* Not set up yet even once so always */
-
-    size_t bufsize = pcmbuf_get_next_required_pcmbuf_size();
-    return pcmbuf_calc_audiobuffer_ptr(bufsize) == audiobuffer;
+        same_size = true;   /* Not set up yet even once so always */
+    else
+    {
+        size_t bufsize = pcmbuf_get_next_required_pcmbuf_size();
+        same_size = pcmbuf_calc_audiobuffer_ptr(bufsize) == audiobuffer;
+    }
+    
+    if (same_size)
+        pcmbuf_finish_crossfade_enable();
+    
+    return same_size;
 }
 
 /* Initialize the pcmbuffer the structure looks like this:
@@ -566,7 +641,7 @@ size_t pcmbuf_init(unsigned char *bufend)
     end_of_track = false;
     track_transition = false;
 
-    pcmbuf_crossfade_enable_finished();
+    pcmbuf_finish_crossfade_enable();
 
     pcmbuf_play_stop();
 
@@ -604,28 +679,6 @@ void pcmbuf_play_start(void)
         pcm_play_data(pcmbuf_pcm_callback,
             (unsigned char *)pcmbuf_read->addr, last_chunksize);
     }
-}
-
-/**
- * Commit samples waiting to the pcm buffer.
- */
-static bool pcmbuf_flush_fillpos(void)
-{
-    if (audiobuffer_fillpos) {
-        /* Never use the last buffer descriptor */
-        while (pcmbuf_write == pcmbuf_write_end) {
-            /* If this happens, something is being stupid */
-            if (!pcm_is_playing()) {
-                logf("pcmbuf_flush_fillpos error");
-                pcmbuf_play_start();
-            }
-            /* Let approximately one chunk of data playback */
-            sleep(HZ*PCMBUF_TARGET_CHUNK/(NATIVE_FREQUENCY*4));
-        }
-        pcmbuf_add_chunk();
-        return true;
-    }
-    return false;
 }
 
 /** 
@@ -907,7 +960,7 @@ static bool prepare_insert(size_t length)
     return true;
 }
 
-void* pcmbuf_request_buffer(int *count)
+void *pcmbuf_request_buffer(int *count)
 {
 #ifdef HAVE_CROSSFADE
     if (crossfade_init)
@@ -941,38 +994,6 @@ void* pcmbuf_request_buffer(int *count)
             return NULL;
         }
     }
-}
-
-void * pcmbuf_request_voice_buffer(int *count)
-{
-    /* A get-it-to-work-for-now hack (audio status could change by
-       completion) */
-    if (audio_status() & AUDIO_STATUS_PLAY)
-    {
-        if (pcmbuf_read == NULL)
-        {
-            return NULL;
-        }
-        else if (pcmbuf_usage() >= 10 && pcmbuf_mix_free() >= 30 &&
-                 (pcmbuf_mix_chunk || pcmbuf_read->link))
-        {
-            *count = MIN(*count, PCMBUF_MIX_CHUNK/4);
-            return voicebuf;
-        }
-        else
-        {
-            return NULL;
-        }
-    }
-    else
-    {
-        return pcmbuf_request_buffer(count);
-    }
-}
-
-bool pcmbuf_is_crossfade_active(void)
-{
-    return crossfade_active || crossfade_init;
 }
 
 void pcmbuf_write_complete(int count)
@@ -1098,12 +1119,12 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
 #endif /* HAVE_HARDWARE_BEEP */
 
 /* Returns pcm buffer usage in percents (0 to 100). */
-int pcmbuf_usage(void)
+static int pcmbuf_usage(void)
 {
     return pcmbuf_unplayed_bytes * 100 / pcmbuf_size;
 }
 
-int pcmbuf_mix_free(void)
+static int pcmbuf_mix_free(void)
 {
     if (pcmbuf_mix_chunk)
     {
@@ -1115,6 +1136,33 @@ int pcmbuf_mix_free(void)
         return (my_write_pos - my_mix_end) * 100 / pcmbuf_unplayed_bytes;
     }
     return 100;
+}
+
+void *pcmbuf_request_voice_buffer(int *count)
+{
+    /* A get-it-to-work-for-now hack (audio status could change by
+       completion) */
+    if (audio_status() & AUDIO_STATUS_PLAY)
+    {
+        if (pcmbuf_read == NULL)
+        {
+            return NULL;
+        }
+        else if (pcmbuf_usage() >= 10 && pcmbuf_mix_free() >= 30 &&
+                 (pcmbuf_mix_chunk || pcmbuf_read->link))
+        {
+            *count = MIN(*count, PCMBUF_MIX_CHUNK/4);
+            return voicebuf;
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+    else
+    {
+        return pcmbuf_request_buffer(count);
+    }
 }
 
 void pcmbuf_write_voice_complete(int count)
@@ -1163,23 +1211,33 @@ void pcmbuf_write_voice_complete(int count)
     }
 }
 
-void pcmbuf_crossfade_enable(bool on_off)
+void pcmbuf_request_crossfade_enable(bool on_off)
 {
     /* Next setting to be used, not applied now */
     crossfade_enabled_pending = on_off;
 }
 
-void pcmbuf_crossfade_enable_finished(void)
+static void pcmbuf_finish_crossfade_enable(void)
 {
     /* Copy the pending setting over now */
     crossfade_enabled = crossfade_enabled_pending;
-    pcmbuf_set_watermark_bytes();
+    
+    pcmbuf_watermark = (crossfade_enabled && pcmbuf_size) ?
+        /* If crossfading, try to keep the buffer full other than 1 second */
+        (pcmbuf_size - (NATIVE_FREQUENCY * 4 * 1)) :
+        /* Otherwise, just use the default */
+        PCMBUF_WATERMARK;
 }
 
-bool pcmbuf_is_crossfade_enabled(void)
+static bool pcmbuf_is_crossfade_enabled(void)
 {
     if (global_settings.crossfade == CROSSFADE_ENABLE_SHUFFLE)
         return global_settings.playlist_shuffle;
 
     return crossfade_enabled;
+}
+
+bool pcmbuf_is_crossfade_active(void)
+{
+    return crossfade_active || crossfade_init;
 }

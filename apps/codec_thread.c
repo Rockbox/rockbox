@@ -416,47 +416,7 @@ void codec_init_codec_api(void)
 }
 
 
-/** track change functions */
-
-static inline void codec_crossfade_track_change(void)
-{
-    /* Initiate automatic crossfade mode */
-    pcmbuf_crossfade_init(false);
-    /* Notify the wps that the track change starts now */
-    LOGFQUEUE("codec > audio Q_AUDIO_TRACK_CHANGED");
-    queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
-}
-
-static void codec_track_skip_done(bool was_manual)
-{
-    /* Manual track change (always crossfade or flush audio). */
-    if (was_manual)
-    {
-        pcmbuf_crossfade_init(true);
-        LOGFQUEUE("codec > audio Q_AUDIO_TRACK_CHANGED");
-        queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
-    }
-    /* Automatic track change w/crossfade, if not in "Track Skip Only" mode. */
-    else if (pcmbuf_is_crossfade_enabled() && !pcmbuf_is_crossfade_active()
-             && global_settings.crossfade != CROSSFADE_ENABLE_TRACKSKIP)
-    {
-        if (global_settings.crossfade == CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP)
-        {
-            if (global_settings.playlist_shuffle)
-                /* shuffle mode is on, so crossfade: */
-                codec_crossfade_track_change();
-            else
-                /* shuffle mode is off, so normal gapless playback */
-                pcmbuf_start_track_change();
-        }
-        else
-            /* normal crossfade:  */
-            codec_crossfade_track_change();
-    }
-    else
-        /* normal gapless playback. */
-        pcmbuf_start_track_change();
-}
+/* track change */
 
 static bool codec_load_next_track(void)
 {
@@ -487,7 +447,7 @@ static bool codec_load_next_track(void)
     {
         case Q_CODEC_REQUEST_COMPLETE:
             LOGFQUEUE("codec |< Q_CODEC_REQUEST_COMPLETE");
-            codec_track_skip_done(!automatic_skip);
+            pcmbuf_start_track_change(!automatic_skip);
             return true;
 
         case Q_CODEC_REQUEST_FAILED:
