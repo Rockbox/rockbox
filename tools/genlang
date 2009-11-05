@@ -543,6 +543,7 @@ while(<LANG>) {
                         print "### $idstr: The phrase is not used. Skipped\n";
                     }
                 }
+                undef @phrase;
             } # end of </phrase>
             elsif($part eq "/options") {
                 # closing the options
@@ -550,8 +551,6 @@ while(<LANG>) {
                     $langoptions |= $LANGUAGE_FLAG_RTL;
                 }
             } # end of </options>
-
-           undef @phrase;
 
             # starts with a slash, this _ends_ this section
             $m = pop @m; # get back old value, the previous level's tag
