@@ -13121,3 +13121,48 @@
     remote: "Barre d'état personnalisée pour télécommande"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB HID"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Périphérique d'interface avec un humain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "Insérer mélangé en fin"
+  </dest>
+  <voice>
+    *: "Insérer mélangé en fin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "Insérer mélangé en fin (lecture unique)"
+  </dest>
+  <voice>
+    *: "Insérer mélangé en fin en lecture unique"
+  </voice>
+</phrase>
