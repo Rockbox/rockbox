@@ -144,12 +144,13 @@ extern unsigned int codec_thread_id;
 
 static bool pcmbuf_flush_fillpos(void);
 static void pcmbuf_finish_track_change(void);
+#ifdef HAVE_CROSSFADE
 static void crossfade_start(void);
 static void flush_crossfade(char *buf, size_t length);
+#endif
 static bool pcmbuf_crossfade_init(bool manual_skip);
 static void pcmbuf_finish_crossfade_enable(void);
 static bool pcmbuf_is_crossfade_enabled(void);
-
 
 /**************************************/
 
