@@ -771,16 +771,23 @@ int kbd_input(char* text, int buflen)
         pm = &param[button_screen];
         sc = &screens[button_screen];
 
-#if defined KBD_MORSE_INPUT && !defined KBD_MODES
+#if defined(KBD_MODES) || defined(KBD_MORSE_INPUT)
+        /* Remap some buttons to allow to move
+         * cursor in line edit mode and morse mode. */
+#if defined(KBD_MODES) && defined(KBD_MORSE_INPUT)
+        if (pm->line_edit || morse_mode)
+#elif defined(KBD_MODES)
+        if (pm->line_edit)
+#else /* defined(KBD_MORSE_INPUT) */
         if (morse_mode)
+#endif
         {
-            /* Remap some buttons for morse mode. */
             if (button == ACTION_KBD_LEFT)
                 button = ACTION_KBD_CURSOR_LEFT;
             if (button == ACTION_KBD_RIGHT)
                 button = ACTION_KBD_CURSOR_RIGHT;
         }
-#endif
+#endif /* defined(KBD_MODES) || defined(KBD_MORSE_INPUT) */
 
         switch ( button )
         {
@@ -827,91 +834,33 @@ int kbd_input(char* text, int buflen)
 #endif /* KBD_MORSE_INPUT */
 
             case ACTION_KBD_RIGHT:
-#ifdef KBD_MODES
-#ifdef KBD_MORSE_INPUT
-                /* allow cursor change in non line edit morse mode */
-                if (pm->line_edit || morse_mode)
-#else
-                /* right doubles as cursor_right in line_edit */
-                if (pm->line_edit)
-#endif
+                if (++pm->x >= pm->max_chars)
                 {
-                    pm->hangul = false;
-
-                    if (editpos < len_utf8)
-                    {
-                        int c = utf8seek(text, ++editpos);
-                        kbd_spellchar(text[c]);
-                    }
-#if CONFIG_CODEC == SWCODEC
-                    else if (global_settings.talk_menu)
-                        pcmbuf_beep(1000, 150, 1500);
-#endif
-                }
-                else
-#endif /* KBD_MODES */
-                {
-#ifdef KBD_MORSE_INPUT
-                    if (morse_mode)
-                        break;
-#endif
-                    if (++pm->x >= pm->max_chars)
-                    {
 #ifndef KBD_PAGE_FLIP
-                        /* no dedicated flip key - flip page on wrap */
-                        if (++pm->page >= pm->pages)
-                            pm->page = 0;
+                    /* no dedicated flip key - flip page on wrap */
+                    if (++pm->page >= pm->pages)
+                        pm->page = 0;
 #endif
-                        pm->x = 0;
-                    }
-
-                    ch = get_kbd_ch(pm);
-                    kbd_spellchar(ch);
+                    pm->x = 0;
                 }
+
+                ch = get_kbd_ch(pm);
+                kbd_spellchar(ch);
                 break;
 
             case ACTION_KBD_LEFT:
-#ifdef KBD_MODES
-#ifdef KBD_MORSE_INPUT
-                /* allow cursor change in non line edit morse mode */
-                if (pm->line_edit || morse_mode)
-#else
-                /* left doubles as cursor_left in line_edit */
-                if (pm->line_edit)
-#endif
+                if (--pm->x < 0)
                 {
-                    pm->hangul = false;
-
-                    if (editpos > 0)
-                    {
-                        int c = utf8seek(text, --editpos);
-                        kbd_spellchar(text[c]);
-                    }
-#if CONFIG_CODEC == SWCODEC
-                    else if (global_settings.talk_menu)
-                        pcmbuf_beep(1000, 150, 1500);
-#endif
-                }
-                else
-#endif /* KBD_MODES */
-                {
-#ifdef KBD_MORSE_INPUT
-                    if (morse_mode)
-                        break;
-#endif
-                    if (--pm->x < 0)
-                    {
 #ifndef KBD_PAGE_FLIP
-                        /* no dedicated flip key - flip page on wrap */
-                        if (--pm->page < 0)
-                            pm->page = pm->pages - 1;
+                    /* no dedicated flip key - flip page on wrap */
+                    if (--pm->page < 0)
+                        pm->page = pm->pages - 1;
 #endif
-                        pm->x = pm->max_chars - 1;
-                    }
-
-                    ch = get_kbd_ch(pm);
-                    kbd_spellchar(ch);
+                    pm->x = pm->max_chars - 1;
                 }
+
+                ch = get_kbd_ch(pm);
+                kbd_spellchar(ch);
                 break;
 
             case ACTION_KBD_DOWN:
@@ -1019,7 +968,6 @@ int kbd_input(char* text, int buflen)
 #endif /* KBD_MORSE_INPUT */
 
             case ACTION_KBD_SELECT:
-            case ACTION_KBD_SELECT_REM:
 #ifdef KBD_MORSE_INPUT
 #ifdef KBD_MODES
                 if (morse_mode && !pm->line_edit)
@@ -1166,6 +1114,7 @@ int kbd_input(char* text, int buflen)
                 if (global_settings.talk_menu) /* voice UI? */
                     talk_spell(text, false);   /* speak revised text */
                 break;
+#endif /* !defined (KBD_MODES) || defined (KBD_CURSOR_KEYS) */
 
             case ACTION_KBD_CURSOR_RIGHT:
                 pm->hangul = false;
@@ -1194,7 +1143,6 @@ int kbd_input(char* text, int buflen)
                     pcmbuf_beep(1000, 150, 1500);
 #endif
                 break;
-#endif /* !defined (KBD_MODES) || defined (KBD_CURSOR_KEYS) */
 
             case BUTTON_NONE:
 #ifdef KBD_MORSE_INPUT
