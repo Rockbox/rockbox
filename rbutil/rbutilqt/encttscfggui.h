@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: encoders.h 17902 2008-06-30 22:09:45Z bluebrother $
+ *   $Id$
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
