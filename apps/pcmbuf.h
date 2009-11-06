@@ -21,25 +21,29 @@
 #ifndef PCMBUF_H
 #define PCMBUF_H
 
-/* playback */
+/* Commit PCM data */
+void *pcmbuf_request_buffer(int *count);
+void pcmbuf_write_complete(int count);
+
+/* Init */
 size_t pcmbuf_init(unsigned char *bufend);
+
+/* Playback */
 void pcmbuf_play_start(void);
 void pcmbuf_play_stop(void);
 void pcmbuf_pause(bool pause);
 void pcmbuf_start_track_change(bool manual_skip);
-void *pcmbuf_request_buffer(int *count);
-void pcmbuf_write_complete(int count);
 
-/* crossfade */
+/* Crossfade */
 bool pcmbuf_is_crossfade_active(void);
 void pcmbuf_request_crossfade_enable(bool on_off);
 bool pcmbuf_is_same_size(void);
 
-/* voice */
+/* Voice */
 void *pcmbuf_request_voice_buffer(int *count);
 void pcmbuf_write_voice_complete(int count);
 
-/* debug menu, other metrics */
+/* Debug menu, other metrics */
 size_t pcmbuf_free(void);
 size_t pcmbuf_get_bufsize(void);
 int pcmbuf_descs(void);
@@ -49,9 +53,9 @@ unsigned char *pcmbuf_get_meminfo(size_t *length);
 #endif
 
 /* misc */
-void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude);
 bool pcmbuf_is_lowdata(void);
 void pcmbuf_set_low_latency(bool state);
 unsigned long pcmbuf_get_latency(void);
+void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude);
 
 #endif
