@@ -55,7 +55,7 @@ newstart2:
     orr r0, r0, r1
     mcr 15, 0, r0, c1, c0, 0 // set bigendian
 #endif
-			 
+             
     ldr r1, =0x3c800000 // disable watchdog
     mov r0, #0xa5
     str r0, [r1]
@@ -107,7 +107,7 @@ start_loc:
 #if !(CONFIG_CPU==S5L8701 && defined(BOOTLOADER))
     ldr r1, =0x3c500000 
     ldr r0, =0x00800080
-    str r0, [r1]		// CLKCON
+    str r0, [r1]        // CLKCON
     mov r0, #0
     str r0, [r1,#0x24]  // PLLCON
 #ifdef IPOD_NANO2G
@@ -136,7 +136,7 @@ start_loc:
     orr r0, r0, r2
     mcr 15, 0, r0, c1, c0, 0 // asynchronous clocking mode
     nop
-    nop					        
+    nop                         
     nop
     nop
 #endif
@@ -235,6 +235,67 @@ start_loc:
     str r0, [r1, #40] // enable clock for all peripherals
     mov r0, #0  // 0x0
     str r0, [r1, #44] // do not enter any power saving mode
+
+#ifdef MEIZU_M6SP
+    /* setup SDRAM for Meizu M6SP */
+    ldr r1, =0x38200000
+    // configure SDR drive strength and pad settings
+    mov r0, #5
+    str r0, [r1, #0x4C] // MIU_DSS_SEL_B
+    mov r0, #2
+    str r0, [r1, #0x50] // MIU_DSS_SEL_O
+    str r0, [r1, #0x54] // MIU_DSS_SEL_C
+    mov r0, #2
+    str r0, [r1, #0x60] // SSTL2_PAD_ON
+    // select SDR mode
+    ldr r0, [r1, #0x40]
+    mov r2, #0xFFFDFFFF
+    and r0, r0, r2
+    orr r0, r0, #1
+    str r0, [r1, #0x40] // MIUORG
+    // set controller configuration
+    mov r0, #0x700
+    str r0, [r1]        // MIUCON
+    // set SDRAM timing
+    ldr r0, =0x6A4965
+    str r0, [r1, #0x10] // MIUSDPARA
+    // set refresh rate
+    mov r0, #0x1080
+    str r0, [r1, #0x08] // MIUAREF
+    // initialise SDRAM 
+    mov r0, #0x003
+    str r0, [r1, #0x04] // MIUCOM = nop
+    ldr r0, =0x203
+    str r0, [r1, #0x04] // MIUCOM = precharge all banks
+    nop
+    nop
+    nop
+    ldr r0, =0x303
+    str r0, [r1, #0x04] // MIUCOM = auto-refresh
+    nop
+    nop
+    nop
+    nop
+    str r0, [r1, #0x04] // MIUCOM = auto-refresh
+    nop
+    nop
+    nop
+    nop
+    str r0, [r1, #0x04] // MIUCOM = auto-refresh
+    nop
+    nop
+    nop
+    nop
+    // set mode register
+    mov r0, #0x33
+    str r0, [r1, #0x0C] // MIUMRS
+    ldr r0, =0x103
+    str r0, [r1, #0x04] // MIUCOM = mode register set
+    ldr r0, =0x4033
+    str r0, [r1, #0x0C] // MIUMRS
+    ldr r0, =0x103
+    str r0, [r1, #0x04] // MIUCOM = mode register set
+#endif /* MEIZU_M6SP */
 
     mov r1, #0x1
     mrc 15, 0, r0, c1, c0, 0
@@ -364,7 +425,7 @@ start_loc:
     ldrhi   r1, [r4], #4
     strhi   r1, [r2], #4
     bhi     1b
-	
+    
     /* Initialise ibss section to zero */
     ldr     r2, =_iedata
     ldr     r3, =_iend
