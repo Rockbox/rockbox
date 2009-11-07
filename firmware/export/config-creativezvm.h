@@ -128,8 +128,6 @@
 /* Hardware controlled charging with monitoring */
 //#define CONFIG_CHARGING CHARGING_MONITOR
 
-#ifndef SIMULATOR
-
 /* Define this if you have a TI TMS320DM320 */
 #define CONFIG_CPU DM320
 
@@ -173,4 +171,3 @@
 #define BUTTON_DEBUG
 */
 
-#endif

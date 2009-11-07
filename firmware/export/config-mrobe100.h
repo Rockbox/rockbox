@@ -123,8 +123,6 @@
 
 #define BATTERY_CAPACITY_DEFAULT 720 /* default battery capacity */
 
-#ifndef SIMULATOR
-
 /* Define this if you have a PortalPlayer PP5020 */
 #define CONFIG_CPU PP5020
 
@@ -199,4 +197,3 @@
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
-#endif

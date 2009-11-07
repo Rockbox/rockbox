@@ -58,8 +58,6 @@
 /* Hardware controlled charging */
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
-#ifndef SIMULATOR
-
 /* Define this if you have a SH7034 */
 #define CONFIG_CPU SH7034
 
@@ -96,8 +94,6 @@
 #define BOOTFILE_EXT "mod"
 #define BOOTFILE "archos." BOOTFILE_EXT
 #define BOOTDIR "/"
-
-#endif /* SIMULATOR */
 
 #define HAVE_LCD_CONTRAST
 

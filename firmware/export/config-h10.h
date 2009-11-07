@@ -127,8 +127,6 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
-#ifndef SIMULATOR
-
 /* Define this if you have a PortalPlayer PP5020 */
 #define CONFIG_CPU PP5020
 
@@ -185,4 +183,3 @@
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
-#endif

@@ -1,0 +1,80 @@
+/* This config file is for all simulators, and is used in addition to the
+   target specific configs */
+
+#undef CONFIG_CPU
+
+#undef HAVE_FMADC
+
+#undef NEED_ATA_POWER_BATT_MEASURE
+
+#undef CONFIG_I2C
+
+#undef HAVE_PCM_DMA_ADDRESS
+
+#undef FLASH_SIZE
+
+#undef CPU_FREQ
+
+#undef HAVE_ATA_POWER_OFF
+
+#undef CONFIG_LCD
+
+#undef CONFIG_LED
+
+#undef ROM_START
+
+#undef FIRMWARE_OFFSET_FILE_LENGTH
+#undef FIRMWARE_OFFSET_FILE_CRC
+#undef FIRMWARE_OFFSET_FILE_DATA
+
+#undef AMS_OF_SIZE
+
+#undef HAVE_MULTIDRIVE
+#undef NUM_DRIVES
+#undef HAVE_HOTSWAP
+
+#undef CONFIG_STORAGE
+
+#undef CONFIG_USBOTG
+
+#undef USB_HANDLED_BY_OF
+
+#undef HAVE_USBSTACK
+#undef USE_ROCKBOX_USB
+#undef USB_VENDOR_ID
+#undef USB_PRODUCT_ID
+#undef USB_NUM_ENDPOINTS
+#undef HAVE_USB_HID_MOUSE
+
+#undef HAVE_ADJUSTABLE_CPU_FREQ
+
+#undef MI4_FORMAT
+#undef BOOTFILE_EXT
+#undef BOOTFILE
+#undef BOOTDIR
+
+#undef BOOTLOADER_ENTRYPOINT
+
+#undef FLASH_ENTRYPOINT
+
+#undef FLASH_MAGIC
+
+#undef HAVE_EEPROM
+#undef HAVE_EEPROM_SETTINGS
+
+#undef HAVE_HARDWARE_BEEP
+
+#undef HAVE_POWEROFF_WHILE_CHARGING
+
+#undef INCLUDE_TIMEOUT_API
+
+#undef HAVE_FLASHED_ROCKBOX
+
+#undef IPOD_ACCESSORY_PROTOCOL
+
+#undef HAVE_WHEEL_POSITION
+
+#undef HAVE_LCD_MODES
+
+#undef HAVE_SPEAKER
+

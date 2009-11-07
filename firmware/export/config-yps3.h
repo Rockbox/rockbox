@@ -121,8 +121,6 @@
 /* Hardware controlled charging, software can monitor plug and charge state */
 #define CONFIG_CHARGING CHARGING_MONITOR
 
-#ifndef SIMULATOR
-
 /* Define this if your LCD can set contrast */
 //#define HAVE_LCD_CONTRAST
 
@@ -166,8 +164,6 @@
 //#define BOOTLOADER_ENTRYPOINT  0x001F0000
 //#define FLASH_ENTRYPOINT       0x00001000
 //#define FLASH_MAGIC            0xfbfbfbf1
-
-#endif /* SIMULATOR */
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN

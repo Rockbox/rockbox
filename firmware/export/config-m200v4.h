@@ -111,8 +111,6 @@
 /* define this if the unit should not shut down on low battery. */
 #define NO_LOW_BATTERY_SHUTDOWN
 
-#ifndef SIMULATOR
-
 /* Define this if you have an AMS AS3525 */
 #define CONFIG_CPU AS3525
 
@@ -162,4 +160,3 @@
 
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
 
-#endif /* SIMULATOR */

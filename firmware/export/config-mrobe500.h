@@ -199,8 +199,6 @@
 /* Define this if you have a Texas Instruments TSC2100 touch screen */
 #define HAVE_TSC2100
 
-#if !defined(SIMULATOR)
-
 /* M66591 register base */
 #define M66591_BASE 0x60000000
 
@@ -252,4 +250,3 @@
 
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
 
-#endif

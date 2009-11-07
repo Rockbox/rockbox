@@ -403,6 +403,11 @@ Lyre prototype 1 */
 /* no known platform */
 #endif
 
+/* keep this include after the target configs */
+#ifdef SIMULATOR
+#include "config-sim.h"
+#endif
+
 /* setup basic macros from capability masks */
 #include "config_caps.h"
 

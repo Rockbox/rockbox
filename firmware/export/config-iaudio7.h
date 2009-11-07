@@ -133,8 +133,6 @@
 
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
-#ifndef SIMULATOR
-
 /* Define this if you have a TCC770 */
 #define CONFIG_CPU TCC770
 
@@ -162,4 +160,3 @@
 
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
 
-#endif /* SIMULATOR */

@@ -103,8 +103,6 @@
 /* define this if the unit should not shut down on low battery. */
 #define NO_LOW_BATTERY_SHUTDOWN
 
-#ifndef SIMULATOR
-
 /* Define this if you have a TCC773L */
 #define CONFIG_CPU TCC773L
 
@@ -147,4 +145,3 @@
 
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
 
-#endif /* SIMULATOR */

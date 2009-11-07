@@ -120,8 +120,6 @@
 /* FIXME: Don't shutdown on low battery until we have proper suspend. */
 #define NO_LOW_BATTERY_SHUTDOWN
 
-#ifndef SIMULATOR
-
 /* Define this if you have a PortalPlayer PP5002 */
 #define CONFIG_CPU PP5002
 
@@ -168,4 +166,3 @@
 
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
 
-#endif /* SIMULATOR */

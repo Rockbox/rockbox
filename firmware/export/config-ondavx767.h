@@ -133,8 +133,6 @@
 /* Hardware controlled charging with monitoring */
 //#define CONFIG_CHARGING CHARGING_MONITOR
 
-#ifndef SIMULATOR
-
 /* Define this if you have a Ingenic JZ4740 */
 #define CONFIG_CPU JZ4732
 
@@ -167,4 +165,3 @@
 #define USB_VENDOR_ID   0x07C4
 #define USB_PRODUCT_ID  0xA4A5
 
-#endif

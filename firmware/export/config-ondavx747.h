@@ -140,9 +140,7 @@
 #define HAVE_SW_TONE_CONTROLS
 
 /* has no volume control, so we use the software ones */
-#ifndef SIMULATOR
 #define HAVE_SW_VOLUME_CONTROL
-#endif
 
 /* software controlled volume ranges from -73 -> 0 dB, other than that
    is controlled by hardware */
@@ -168,8 +166,6 @@
 #define CONFIG_CHARGING CHARGING_MONITOR
 
 #define CFG_EXTAL 12000000    /* EXT clock: 12 Mhz */
-
-#ifndef SIMULATOR
 
 #define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
 #define NUM_DRIVES 2
@@ -217,4 +213,3 @@
 #define USB_VENDOR_ID     0x07C4
 #define USB_PRODUCT_ID    0xA4A5
 
-#endif

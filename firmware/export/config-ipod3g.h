@@ -124,8 +124,6 @@
 /* Hardware controlled charging? FIXME */
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
-#ifndef SIMULATOR
-
 /* Define this if you have a PortalPlayer PP5002 */
 #define CONFIG_CPU PP5002
 
@@ -172,4 +170,3 @@
 
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
 
-#endif /* SIMULATOR */

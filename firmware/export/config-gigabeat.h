@@ -59,9 +59,7 @@
 
 #define HAVE_TOUCHPAD_SENSITIVITY_SETTING
 
-#ifndef SIMULATOR
 #define HAVE_HARDWARE_BEEP
-#endif
 
 #endif /* BOOTLOADER */
 
@@ -140,11 +138,6 @@
  * when running */
 #define HAVE_BATTERY_SWITCH
 
-#ifndef SIMULATOR
-
-/* The LCD on a Gigabeat is 240x320 - it is portrait */
-#define HAVE_PORTRAIT_LCD
-
 #define HAVE_LCD_FLIP
 
 /* Define this if your LCD can set contrast */
@@ -190,4 +183,3 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-#endif

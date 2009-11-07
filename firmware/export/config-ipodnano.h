@@ -131,8 +131,6 @@
 #define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
 #endif
 
-#ifndef SIMULATOR
-
 /* Define this if you have a PortalPlayer PP5022 */
 #define CONFIG_CPU PP5022
 
@@ -187,4 +185,3 @@
 #define IPOD_ACCESSORY_PROTOCOL
 #define HAVE_SERIAL
 
-#endif

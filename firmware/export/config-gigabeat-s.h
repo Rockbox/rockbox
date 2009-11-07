@@ -128,11 +128,6 @@
 #define HAVE_HEADPHONE_DETECTION
 #endif /* BOOTLOADER */
 
-#ifndef SIMULATOR
-
-/* The LCD on a Gigabeat is 240x320 - it is portrait */
-#define HAVE_PORTRAIT_LCD
-
 #define CONFIG_CPU IMX31L
 
 /* Define this if you want to use imx31l's i2c interface */
@@ -221,4 +216,3 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-#endif

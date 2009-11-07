@@ -62,14 +62,10 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-#ifndef SIMULATOR
 #define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
 #define HAVE_MULTIDRIVE
 #define HAVE_HOTSWAP
 #define NUM_DRIVES 2
-#else
-#define CONFIG_STORAGE STORAGE_NAND
-#endif
 
 #define CONFIG_NAND NAND_TCC
 
@@ -150,7 +146,6 @@
 #define CURRENT_BACKLIGHT  30 /* TBD */ 
 #define CURRENT_RECORD     0  /* no recording yet */ 
 
-#ifndef SIMULATOR
 /* Define this if you have a TCC7801 */
 #define CONFIG_CPU TCC7801
 
@@ -174,5 +169,3 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-
-#endif /* SIMULATOR */

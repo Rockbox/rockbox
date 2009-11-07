@@ -139,8 +139,6 @@
  * if USB/MAIN power is discernable and hardware doesn't compel charging */
 #define HAVE_USB_CHARGING_ENABLE
 
-#ifndef SIMULATOR
-
 /* Define this if you have a Motorola SCF5249 */
 #define CONFIG_CPU MCF5249
 
@@ -180,8 +178,6 @@
 
 /* Define this if there is an EEPROM chip */
 #define HAVE_EEPROM
-
-#endif /* SIMULATOR */
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN

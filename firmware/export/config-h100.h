@@ -133,8 +133,6 @@
 #define CURRENT_RECORD    105  /* additional current while recording */
 #define CURRENT_REMOTE      8  /* additional current when remote connected */
 
-#ifndef SIMULATOR
-
 /* Define this if you have a Motorola SCF5249 */
 #define CONFIG_CPU MCF5249
 
@@ -182,8 +180,6 @@
 
 /* Define this if the EEPROM chip is used */
 #define HAVE_EEPROM_SETTINGS
-
-#endif /* !SIMULATOR */
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */

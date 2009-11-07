@@ -137,9 +137,6 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
-/** Non-simulator section **/
-#ifndef SIMULATOR
-
 /* Define this if you have a PortalPlayer PP5024 */
 #define CONFIG_CPU AS3525
 
@@ -188,8 +185,6 @@
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
 #define INCLUDE_TIMEOUT_API
-
-#endif /* SIMULATOR */
 
 /** Port-specific settings **/
 

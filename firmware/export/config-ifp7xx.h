@@ -76,8 +76,6 @@
 /* define this if the unit should not shut down on low battery. */
 #define NO_LOW_BATTERY_SHUTDOWN
 
-#ifndef SIMULATOR
-
 /* Define this if you have a Philips PNX0101 */
 #define CONFIG_CPU PNX0101
 
@@ -127,4 +125,3 @@
 
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
 
-#endif

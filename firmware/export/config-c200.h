@@ -149,9 +149,6 @@
 #define CURRENT_BACKLIGHT  40  /* Screen is about 20, blue LEDs are another 20, so 40 if both */
 #define CURRENT_RECORD     30  /* flash player, so this is just unboosted current*/
 
-/** Non-simulator section **/
-#ifndef SIMULATOR
-
 /* Define this if you have a PortalPlayer PP5024 */
 #define CONFIG_CPU PP5022
 
@@ -203,8 +200,6 @@
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
 #define INCLUDE_TIMEOUT_API
-
-#endif /* SIMULATOR */
 
 /* Default recording levels */
 #define DEFAULT_REC_MIC_GAIN    23

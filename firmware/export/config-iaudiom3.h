@@ -117,8 +117,6 @@
 /* define current usage levels */
 #define CURRENT_REMOTE      8  /* additional current when remote connected */
 
-#ifndef SIMULATOR
-
 /* Define this if your LCD can set contrast */
 #define HAVE_LCD_CONTRAST
 
@@ -140,8 +138,8 @@
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
 
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL /* FIXME: implement hardware LED handling */
+/* FIXME: implement hardware LED handling */
+/* #define CONFIG_LED LED_REAL */
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
@@ -159,8 +157,6 @@
 #define BOOTLOADER_ENTRYPOINT  0x001F0000
 #define FLASH_ENTRYPOINT       0x00001000
 #define FLASH_MAGIC            0xfbfbfbf1
-
-#endif /* SIMULATOR */
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN

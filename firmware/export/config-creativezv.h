@@ -127,8 +127,6 @@
 /* Hardware controlled charging with monitoring */
 //#define CONFIG_CHARGING CHARGING_MONITOR
 
-#ifndef SIMULATOR
-
 /* Define this if you have a TI TMS320DM320 */
 #define CONFIG_CPU DM320
 
@@ -143,9 +141,6 @@
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
-
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
@@ -167,4 +162,3 @@
 #define USB_PRODUCT_ID 0x4133
 #define USB_NUM_ENDPOINTS 7
 
-#endif /* SIMULATOR */

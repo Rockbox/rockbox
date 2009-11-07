@@ -144,8 +144,6 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
-#ifndef SIMULATOR
-
 /* Define this if you have a PortalPlayer PP5022 */
 #define CONFIG_CPU PP5022
 
@@ -202,4 +200,3 @@
 
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
 
-#endif

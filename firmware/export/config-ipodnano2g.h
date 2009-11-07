@@ -105,9 +105,7 @@
 /* Define the type of audio codec */
 #define HAVE_WM8975
 
-#ifndef SIMULATOR
 #define HAVE_PCM_DMA_ADDRESS
-#endif
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
@@ -133,8 +131,6 @@
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
-
-#ifndef SIMULATOR
 
 /* Define this if your LCD can set contrast */
 //#define HAVE_LCD_CONTRAST
@@ -183,8 +179,6 @@
 #define FLASH_ENTRYPOINT       0x00001000
 #define FLASH_MAGIC            0xfbfbfbf1
 #endif
-
-#endif /* SIMULATOR */
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN

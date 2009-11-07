@@ -79,8 +79,6 @@
 #define CURRENT_USB         1  /* host powered in USB mode; avoid zero-div */
 #define CURRENT_BACKLIGHT   0  /* no backlight */
 
-#ifndef SIMULATOR
-
 /* Define this if you have a SH7034 */
 #define CONFIG_CPU SH7034
 
@@ -133,8 +131,6 @@
 #define BOOTFILE_EXT "ajz"
 #define BOOTFILE "ajbrec." BOOTFILE_EXT
 #define BOOTDIR "/"
-
-#endif /* SIMULATOR */
 
 #define HAVE_LCD_CONTRAST
 

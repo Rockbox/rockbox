@@ -120,10 +120,6 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
-
-/***************************************************************************/
-#ifndef SIMULATOR
-
 #define CONFIG_CPU S3C2440
 
 /* Define this to the CPU frequency */
@@ -158,5 +154,3 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-#endif
-/***************************************************************************/
