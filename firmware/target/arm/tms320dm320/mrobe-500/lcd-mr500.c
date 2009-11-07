@@ -115,6 +115,14 @@ void lcd_init_device(void)
 {
     unsigned int addr;
     
+    /* Pin 32 controls the LED above the LCD */
+    IO_GIO_DIR2     &= ~(0x01);     /* output */
+    IO_GIO_INV2     &= ~(0x01);     /* non-inverted */
+    IO_GIO_FSEL2    &= ~(0x03<<14); /* normal pins */
+    
+    /* Turn the LED off */
+    IO_GIO_BITCLR2 = 1;
+    
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
 
@@ -556,21 +564,22 @@ void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
         + (LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)
         - (LCD_NATIVE_WIDTH+LCD_FUDGE)*x + y;
 	
-    src=src+src_x+src_y*LCD_WIDTH;
+    src=src+src_x+src_y*width;
 
     while(height--)
     {
+        register char *c_src=src;
         register char *c_dst=dst;
         register int c_width=width;
 
         while (c_width--)
         {
-            *c_dst = *src++;
+            *c_dst = *c_src++;
             c_dst -= (LCD_NATIVE_WIDTH+LCD_FUDGE);
         } 
 
         dst++;
-        src+=LCD_WIDTH-width;
+        src+=width;
     }
 #endif
 }
