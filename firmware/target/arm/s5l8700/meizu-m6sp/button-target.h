@@ -30,21 +30,18 @@ bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
 
-/* Toshiba Gigabeat specific button codes */
+/* Meizu M6 specific button codes */
 
 #define BUTTON_LEFT         0x00000001
 #define BUTTON_RIGHT        0x00000002
-#define BUTTON_UP           0x00000004
-#define BUTTON_DOWN         0x00000008
-
-#define BUTTON_SELECT       0x00000010
-
-#define BUTTON_MENU         0x00000020
-#define BUTTON_PLAY         0x00000040
+#define BUTTON_PLAY         0x00000004
+#define BUTTON_MENU         0x00000008
+#define BUTTON_SELECT       0x00000010  /* TODO: tap on the touch strip */
+#define BUTTON_ENTER        0x00000020
 
 
-#define BUTTON_MAIN (BUTTON_MENU|BUTTON_LEFT|BUTTON_RIGHT\
-                |BUTTON_UP|BUTTON_DOWN|BUTTON_SELECT|BUTTON_PLAY)
+#define BUTTON_MAIN (BUTTON_LEFT|BUTTON_RIGHT|BUTTON_PLAY|BUTTON_MENU\
+                    |BUTTON_SELECT|BUTTON_ENTER)
 
 #define BUTTON_REMOTE 0
 
