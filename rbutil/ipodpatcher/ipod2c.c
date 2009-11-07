@@ -76,6 +76,7 @@ static int write_hfile(unsigned char* buf, off_t len, char* cname)
 {
     char filename[256];
     FILE* fp;
+    (void)buf;
 
     snprintf(filename,256,"%s.h",cname);
     fp = fopen(filename,"w+");
