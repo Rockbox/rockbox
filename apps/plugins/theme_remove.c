@@ -57,8 +57,12 @@ enum remove_settings {
     REMOVE_FONT,
 #endif
     REMOVE_WPS,
+#ifdef HAVE_LCD_BITMAP
+    REMOVE_SBS,
+#endif
 #ifdef HAVE_REMOTE_LCD
     REMOVE_RWPS,
+    REMOVE_RSBS,
 #endif
 #if LCD_DEPTH > 1
     REMOVE_BACKDROP,
@@ -85,8 +89,14 @@ static struct remove_setting remove_list[NUM_REMOVE_ITEMS] = {
 #endif
     [REMOVE_WPS] = { "wps", WPS_DIR "/", ".wps", "",
         REMOVE_IF_NOT_USED, remove_wps, false },
+#ifdef HAVE_LCD_BITMAP
+    [REMOVE_SBS] = { "sbs", SBS_DIR "/", ".sbs", "",
+        REMOVE_IF_NOT_USED, remove_wps, false },
+#endif
 #ifdef HAVE_REMOTE_LCD
     [REMOVE_RWPS] = { "rwps", WPS_DIR "/", ".rwps", "",
+        REMOVE_IF_NOT_USED, remove_wps, false },
+    [REMOVE_RSBS] = { "rsbs", SBS_DIR "/", ".rsbs", "",
         REMOVE_IF_NOT_USED, remove_wps, false },
 #endif
 #if LCD_DEPTH > 1
@@ -122,10 +132,18 @@ static struct configdata config[] = {
     { TYPE_INT, 0, NUM_REMOVE_OPTION,
         { .int_p = &remove_list[REMOVE_WPS].option },
         "remove wps", option_names },
+#ifdef HAVE_LCD_BITMAP
+    { TYPE_INT, 0, NUM_REMOVE_OPTION,
+        { .int_p = &remove_list[REMOVE_SBS].option },
+        "remove sbs", option_names },
+#endif
 #ifdef HAVE_REMOTE_LCD
     { TYPE_INT, 0, NUM_REMOVE_OPTION,
         { .int_p = &remove_list[REMOVE_RWPS].option },
         "remove rwps", option_names },
+    { TYPE_INT, 0, NUM_REMOVE_OPTION,
+        { .int_p = &remove_list[REMOVE_RSBS].option },
+        "remove rsbs", option_names },
 #endif
 #if LCD_DEPTH > 1
     { TYPE_INT, 0, NUM_REMOVE_OPTION,
@@ -319,8 +337,12 @@ static void check_whether_used_in_setting(void)
         rb->global_settings->font_file,
 #endif
         rb->global_settings->wps_file,
+#ifdef HAVE_LCD_BITMAP
+        rb->global_settings->sbs_file,
+#endif
 #ifdef HAVE_REMOTE_LCD
         rb->global_settings->rwps_file,
+        rb->global_settings->rsbs_file,
 #endif
 #if LCD_DEPTH > 1
         rb->global_settings->backdrop_file,
@@ -572,8 +594,12 @@ static bool option_menu(void)
                         "Font",
 #endif
                         "WPS",
+#ifdef HAVE_LCD_BITMAP
+                        "Statusbar Skin",
+#endif
 #ifdef HAVE_REMOTE_LCD
                         "Remote WPS",
+                        "Remote Statusbar Skin",
 #endif
 #if LCD_DEPTH > 1
                         "Backdrop",
