@@ -404,11 +404,10 @@ void LCDFN(hline)(int x1, int x2, int y)
         
     /* adjust to viewport */
     x1 += current_vp->x;
+    x2 += current_vp->x;
     y += current_vp->y;
     
 #if defined(HAVE_VIEWPORT_CLIP)
-    x2 += current_vp->x;
-
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
     if (((unsigned)y >= (unsigned) LCDM(HEIGHT)) || (x1 >= LCDM(WIDTH))
