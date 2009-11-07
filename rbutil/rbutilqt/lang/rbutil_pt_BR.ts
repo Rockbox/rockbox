@@ -1,5 +1,111 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>@default</name>
+    <message>
+        <source>Can&apos;t open file %s!</source>
+        <translation>Não é possível abrir o arquivo %s!</translation>
+    </message>
+    <message>
+        <source>Bootloader size is %d bytes</source>
+        <translation>O tamanho do inicializador é %d bytes</translation>
+    </message>
+    <message>
+        <source>Firmware size is %d bytes</source>
+        <translation>O tamanho do firmware é %d bytes</translation>
+    </message>
+    <message>
+        <source>Can&apos;t allocate %d bytes!</source>
+        <translation>Não é possível alocar %d bytes!</translation>
+    </message>
+    <message>
+        <source>Reading %s into memory...</source>
+        <translation>Lendo %s para a memória...</translation>
+    </message>
+    <message>
+        <source>Can&apos;t read file %s to memory!</source>
+        <translation>Não é possível ler o arquivo %s para a memória!</translation>
+    </message>
+    <message>
+        <source>File %s isn&apos;t a valid ChinaChip firmware!</source>
+        <translation>O arquivo %s não é um arquivo de firmware ChinaChip válido!</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t find ccpmp.bin in %s!</source>
+        <translation>Não foi possível encontrar ccpmp.bin em %s!</translation>
+    </message>
+    <message>
+        <source>Found ccpmp.bin at %d bytes</source>
+        <translation>Encontrado ccpmp.bin a %d bytes</translation>
+    </message>
+    <message>
+        <source>Writing %d bytes to %s...</source>
+        <translation>Escrevendo %d bytes para %s...</translation>
+    </message>
+    <message>
+        <source>Can&apos;t write to file %s!</source>
+        <translation>Não é possível escrever para o arquivo %s!</translation>
+    </message>
+    <message>
+        <source>Renaming it to ccpmp.old...</source>
+        <translation>Renomeando-o para ccpmp.old...</translation>
+    </message>
+    <message>
+        <source>Making place for ccpmp.bin...</source>
+        <translation>Criando espaço para ccpmp.bin...</translation>
+    </message>
+    <message>
+        <source>Adding header to %s...</source>
+        <translation>Acrescentando cabeçalho para %s...</translation>
+    </message>
+    <message>
+        <source>Can&apos;t obtain current time!</source>
+        <translation>Não é possível obter a hora atual!</translation>
+    </message>
+    <message>
+        <source>Computing checksum...</source>
+        <translation>Calculando checksum...</translation>
+    </message>
+    <message>
+        <source>Updating main header...</source>
+        <translation>Atualizando cabeçalho principal...</translation>
+    </message>
+    <message>
+        <source>Writing output to %s...</source>
+        <translation>Escrevendo saída para %s...</translation>
+    </message>
+</context>
+<context>
+    <name>BootloaderInstallAms</name>
+    <message>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; e a &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; página wiki para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
+    </message>
+    <message>
+        <source>Downloading bootloader file</source>
+        <translation>Transferindo arquivo do inicializador</translation>
+    </message>
+    <message>
+        <source>Could not load %1</source>
+        <translation>Não foi possível carregar %1</translation>
+    </message>
+    <message>
+        <source>Patching Firmware...</source>
+        <translation>Aplicando correção no Firmware...</translation>
+    </message>
+    <message>
+        <source>Could not open %1 for writing</source>
+        <translation>Não foi possível abrir %1 para escrita</translation>
+    </message>
+    <message>
+        <source>Could not write firmware file</source>
+        <translation>Não foi possível escrever o arquivo de firmware</translation>
+    </message>
+    <message>
+        <source>Success: modified firmware file created</source>
+        <translation>Sucesso: criado arquivo de firmware modificado</translation>
+    </message>
+</context>
+<context>
     <name>BootloaderInstallBase</name>
     <message>
         <source>Download error: received HTTP error %1.</source>
@@ -67,6 +173,17 @@
     </message>
 </context>
 <context>
+    <name>BootloaderInstallChinaChip</name>
+    <message>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (HXF file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo HXF). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; e a &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; página wiki para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
+    </message>
+    <message>
+        <source>Downloading bootloader file</source>
+        <translation>Transferindo arquivo do inicializador</translation>
+    </message>
+</context>
+<context>
     <name>BootloaderInstallFile</name>
     <message>
         <source>Downloading bootloader</source>
@@ -94,11 +211,11 @@
     </message>
     <message>
         <source>Can&apos;t remove Rockbox bootloader file.</source>
-        <translation>Não foi possível remover o arquivo do inicializador do Rockbox.</translation>
+        <translation>Não é possível remover o arquivo do inicializador do Rockbox.</translation>
     </message>
     <message>
         <source>Can&apos;t restore bootloader file.</source>
-        <translation>Não foi possível restaurar o arquivo do inicializador.</translation>
+        <translation>Não é possível restaurar o arquivo do inicializador.</translation>
     </message>
     <message>
         <source>Original bootloader restored successfully.</source>
@@ -161,7 +278,7 @@
     </message>
     <message>
         <source>can&apos;t open bootloader file</source>
-        <translation>Não foi possível abrir o arquivo do inicializador</translation>
+        <translation>Não é possível abrir o arquivo do inicializador</translation>
     </message>
     <message>
         <source>reading bootloader file failed</source>
@@ -169,7 +286,7 @@
     </message>
     <message>
         <source>can&apos;t open output file</source>
-        <translation>Não foi possível abrir o arquivo de saída</translation>
+        <translation>Não é possível abrir o arquivo de saída</translation>
     </message>
     <message>
         <source>writing output file failed</source>
@@ -197,11 +314,11 @@
     </message>
     <message>
         <source>Can&apos;t open input file</source>
-        <translation>Não foi possível abrir o arquivo de entrada</translation>
+        <translation>Não é possível abrir o arquivo de entrada</translation>
     </message>
     <message>
         <source>Can&apos;t open output file</source>
-        <translation>Não foi possível abrir o arquivo de saída</translation>
+        <translation>Não é possível abrir o arquivo de saída</translation>
     </message>
     <message>
         <source>invalid file: header length wrong</source>
@@ -236,7 +353,7 @@
     <name>BootloaderInstallIpod</name>
     <message>
         <source>Error: can&apos;t allocate buffer memory!</source>
-        <translation>Erro: não foi possível alocar memoria buffer!</translation>
+        <translation>Erro: não é possível alocar memoria buffer!</translation>
     </message>
     <message>
         <source>No Ipod detected
@@ -350,7 +467,7 @@ Veja http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <name>BootloaderInstallSansa</name>
     <message>
         <source>Error: can&apos;t allocate buffer memory!</source>
-        <translation>Erro: não foi possível alocar memoria buffer!</translation>
+        <translation>Erro: não é possível alocar memoria buffer!</translation>
     </message>
     <message>
         <source>Searching for Sansa</source>
@@ -432,6 +549,45 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
     <message>
         <source>Disk is not a Sansa (Error %1), aborting.</source>
         <translation>Disco não é um Sansa (Erro %1), abortando.</translation>
+    </message>
+</context>
+<context>
+    <name>BootloaderInstallTcc</name>
+    <message>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons.Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
+    </message>
+    <message>
+        <source>Downloading bootloader file</source>
+        <translation>Transferindo arquivo do inicializador</translation>
+    </message>
+    <message>
+        <source>Could not load %1</source>
+        <translation>Não foi possível carregar %1</translation>
+    </message>
+    <message>
+        <source>Unknown OF file used: %1</source>
+        <translation>Arquivo OF usado desconhecido: %1</translation>
+    </message>
+    <message>
+        <source>Patching Firmware...</source>
+        <translation>Aplicando correção no Firmware...</translation>
+    </message>
+    <message>
+        <source>Could patch firmware</source>
+        <translation>Não foi possível aplicar a correção ao firmware</translation>
+    </message>
+    <message>
+        <source>Could not open %1 for writing</source>
+        <translation>Não foi possível abrir %1 para escrita</translation>
+    </message>
+    <message>
+        <source>Could not write firmware file</source>
+        <translation>Não foi possível escrever o arquivo de firmware</translation>
+    </message>
+    <message>
+        <source>Success: modified firmware file created</source>
+        <translation>Sucesso: criado arquivo de firmware modificado</translation>
     </message>
 </context>
 <context>
@@ -537,11 +693,11 @@ Você precisa modificar seu reprodutor para o modo UMS para a instalação.</tra
     </message>
     <message>
         <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
-        <translation>Detectado um reprodutor não suportado %1. Desculpe, o Rockbox não funciona no seu reprodutor.</translation>
+        <translation type="obsolete">Detectado um reprodutor não suportado %1. Desculpe, o Rockbox não funciona no seu reprodutor.</translation>
     </message>
     <message>
         <source>Fatal error: incompatible player found</source>
-        <translation>Erro fatal: encontrado reprodutor incompatível</translation>
+        <translation type="obsolete">Erro fatal: encontrado reprodutor incompatível</translation>
     </message>
     <message>
         <source>Autodetection</source>
@@ -575,6 +731,56 @@ Selecione seu dispositivo e Ponto de Montagem manualmente.</translation>
         <source>The cache path is invalid. Aborting.</source>
         <translation>O caminho para o cache é inválido. Abortando.</translation>
     </message>
+    <message>
+        <source>Detected an unsupported player:
+%1
+Sorry, Rockbox doesn&apos;t run on your player.</source>
+        <translation>Detectado um reprodutor não suportado:
+%1
+Desculpe, o Rockbox não funciona no seu reprodutor.</translation>
+    </message>
+    <message>
+        <source>Fatal: player incompatible</source>
+        <translation>Fatal: reprodutor incompatível</translation>
+    </message>
+    <message>
+        <source>TTS configuration invalid</source>
+        <translation>Configuração TTS inválida</translation>
+    </message>
+    <message>
+        <source>TTS configuration invalid. 
+ Please configure TTS engine.</source>
+        <translation>Configuração TTS inválida.
+Por favor, configure o motor TTS.</translation>
+    </message>
+    <message>
+        <source>Could not start TTS engine.</source>
+        <translation>Não foi possível iniciar o motor TTS.</translation>
+    </message>
+    <message>
+        <source>Could not start TTS engine.
+</source>
+        <translation>Não foi possível iniciar o motor TTS.</translation>
+    </message>
+    <message>
+        <source>
+Please configure TTS engine.</source>
+        <translation>
+Por favor, configure o motor TTS.</translation>
+    </message>
+    <message>
+        <source>Rockbox Utility Voice Test</source>
+        <translation>Teste de Voz do Utilitário Rockbox</translation>
+    </message>
+    <message>
+        <source>Could not voice test string.</source>
+        <translation>Não foi possível criar voz para a string de teste.</translation>
+    </message>
+    <message>
+        <source>Could not voice test string.
+</source>
+        <translation>Não foi possível criar voz para a string de teste.</translation>
+    </message>
 </context>
 <context>
     <name>ConfigForm</name>
@@ -588,7 +794,7 @@ Selecione seu dispositivo e Ponto de Montagem manualmente.</translation>
     </message>
     <message>
         <source>&amp;Device</source>
-        <translation>&amp;Despositivo</translation>
+        <translation>&amp;Dispositivo</translation>
     </message>
     <message>
         <source>Select your device in the &amp;filesystem</source>
@@ -733,6 +939,10 @@ Selecione seu dispositivo e Ponto de Montagem manualmente.</translation>
     <message>
         <source>&amp;Cancel</source>
         <translation>&amp;Cancelar</translation>
+    </message>
+    <message>
+        <source>Test TTS</source>
+        <translation>Testar TTS</translation>
     </message>
 </context>
 <context>
@@ -1036,7 +1246,7 @@ Selecione seu dispositivo e Ponto de Montagem manualmente.</translation>
     </message>
     <message>
         <source>Overwrite Talkfiles</source>
-        <translation>Sobrescrever arquivos Talk</translation>
+        <translation type="obsolete">Sobrescrever arquivos Talk</translation>
     </message>
     <message>
         <source>Generate .talk files for Folders</source>
@@ -1053,6 +1263,14 @@ Selecione seu dispositivo e Ponto de Montagem manualmente.</translation>
     <message>
         <source>&amp;Cancel</source>
         <translation>&amp;Cancelar</translation>
+    </message>
+    <message>
+        <source>Ignore files (comma seperated Wildcards):</source>
+        <translation>Ignorar arquivos (Coringas separados por vírgula):</translation>
+    </message>
+    <message>
+        <source>Create only new Talkfiles</source>
+        <translation>Criar apenas arquivos Talk novos</translation>
     </message>
 </context>
 <context>
@@ -1091,6 +1309,10 @@ Selecione seu dispositivo e Ponto de Montagem manualmente.</translation>
         <source>&amp;Abort</source>
         <translation>&amp;Abortar</translation>
     </message>
+    <message>
+        <source>Save Log</source>
+        <translation>Salvar Log</translation>
+    </message>
 </context>
 <context>
     <name>ProgressLoggerGui</name>
@@ -1101,6 +1323,10 @@ Selecione seu dispositivo e Ponto de Montagem manualmente.</translation>
     <message>
         <source>&amp;Ok</source>
         <translation>&amp;Ok</translation>
+    </message>
+    <message>
+        <source>Save system trace log</source>
+        <translation>Salvar trace log do sistema</translation>
     </message>
 </context>
 <context>
@@ -1158,7 +1384,7 @@ Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
     </message>
     <message>
         <source>Can&apos;t get version information.</source>
-        <translation>Não pode obter informação da versão.</translation>
+        <translation>Não é possível obter informação da versão.</translation>
     </message>
     <message>
         <source>New installation</source>
@@ -1394,6 +1620,26 @@ Pressione &quot;Não&quot; para pular esse passo.</translation>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Sua configuração é inválida. Por favor, vá a janela de configuração e certifique-se de selecionar os valores corretos.</translation>
     </message>
+    <message>
+        <source>Downloading build information, please wait ...</source>
+        <translation>Baixando informação de compilação, por favor espere...</translation>
+    </message>
+    <message>
+        <source>Can&apos;t get version information!</source>
+        <translation>Não é possível obter informação da versão!</translation>
+    </message>
+    <message>
+        <source>Download build information finished.</source>
+        <translation>Baixar informação de compilação finalizada.</translation>
+    </message>
+    <message>
+        <source>RockboxUtility Update available</source>
+        <translation>Disponível atualização do RockboxUtility</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
+        <translation>&lt;b&gt;Nova versão do RockboxUtility disponível.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Baixá-la daqui: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
+    </message>
 </context>
 <context>
     <name>RbUtilQtFrm</name>
@@ -1415,11 +1661,11 @@ Pressione &quot;Não&quot; para pular esse passo.</translation>
     </message>
     <message>
         <source>&amp;Change</source>
-        <translation>&amp;Modificar</translation>
+        <translation>M&amp;odificar</translation>
     </message>
     <message>
         <source>&amp;Quick Start</source>
-        <translation>&amp;Inicio Rápido</translation>
+        <translation>I&amp;nício Rápido</translation>
     </message>
     <message>
         <source>Welcome</source>
@@ -1685,7 +1931,7 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     </message>
     <message>
         <source>Remove &amp;bootloader</source>
-        <translation>Remover &amp;inicializador</translation>
+        <translation>Remover &amp;Inicializador</translation>
     </message>
     <message>
         <source>Uninstall &amp;Rockbox</source>
@@ -1718,6 +1964,44 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     <message>
         <source>&amp;System Info</source>
         <translation>Informação do &amp;Sistema</translation>
+    </message>
+    <message>
+        <source>&amp;Troubleshoot</source>
+        <translation>&amp;Relatar Falhas</translation>
+    </message>
+    <message>
+        <source>System &amp;Trace</source>
+        <translation>&amp;Trace do Sistema</translation>
+    </message>
+</context>
+<context>
+    <name>SysTrace</name>
+    <message>
+        <source>Save system trace log</source>
+        <translation>Salvar trace log do sistema</translation>
+    </message>
+</context>
+<context>
+    <name>SysTraceFrm</name>
+    <message>
+        <source>System Trace</source>
+        <translation>Trace do Sistema</translation>
+    </message>
+    <message>
+        <source>System State trace</source>
+        <translation>Trace do Estado do Sistema</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>Fecha&amp;r</translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation>&amp;Salvar</translation>
+    </message>
+    <message>
+        <source>&amp;Refresh</source>
+        <translation>&amp;Atualizar</translation>
     </message>
 </context>
 <context>
@@ -1797,7 +2081,7 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     </message>
     <message>
         <source>engine could not voice string</source>
-        <translation>o motor não pode encadear a voz</translation>
+        <translation>o motor não pode criar a voz para a string</translation>
     </message>
     <message>
         <source>No description available</source>
@@ -1839,11 +2123,11 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     </message>
     <message>
         <source>Init of TTS engine failed</source>
-        <translation>Falhou ao iniciar o motor TTS</translation>
+        <translation type="obsolete">Falhou ao iniciar o motor TTS</translation>
     </message>
     <message>
         <source>Init of Encoder engine failed</source>
-        <translation>Falhou ao iniciar o motor do codificador</translation>
+        <translation type="obsolete">Falhou ao iniciar o motor do codificador</translation>
     </message>
     <message>
         <source>Reading Filelist...</source>
@@ -1855,19 +2139,19 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     </message>
     <message>
         <source>Voicing entries...</source>
-        <translation>Entradas de vocalização...</translation>
+        <translation type="obsolete">Entradas de vocalização...</translation>
     </message>
     <message>
         <source>Encoding files...</source>
-        <translation>Codificando arquivos...</translation>
+        <translation type="obsolete">Codificando arquivos...</translation>
     </message>
     <message>
         <source>Copying Talkfile for Dirs...</source>
-        <translation>Copiando arquivo Talk para Diretórios...</translation>
+        <translation type="obsolete">Copiando arquivo Talk para Diretórios...</translation>
     </message>
     <message>
         <source>Copying Talkfile for Files...</source>
-        <translation>Copiando arquivo Talk para Arquivos...</translation>
+        <translation type="obsolete">Copiando arquivo Talk para Arquivos...</translation>
     </message>
     <message>
         <source>Finished creating Talk files</source>
@@ -1875,11 +2159,11 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     </message>
     <message>
         <source>Voicing of %1 failed: %2</source>
-        <translation>Vocalização de %1 falhou: %2</translation>
+        <translation type="obsolete">Vocalização de %1 falhou: %2</translation>
     </message>
     <message>
         <source>Encoding of %1 failed</source>
-        <translation>Codificação de %1 falhou</translation>
+        <translation type="obsolete">Codificação de %1 falhou</translation>
     </message>
     <message>
         <source>Copying of %1 to %2 failed</source>
@@ -1888,6 +2172,61 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     <message>
         <source>Cleaning up..</source>
         <translation>Limpando..</translation>
+    </message>
+    <message>
+        <source>Copying Talkfiles...</source>
+        <translation>Copiando arquivos Talk...</translation>
+    </message>
+    <message>
+        <source>File copy aborted</source>
+        <translation>Cópia de arquivo abortada</translation>
+    </message>
+    <message>
+        <source>Finished</source>
+        <translation>Finalizado</translation>
+    </message>
+</context>
+<context>
+    <name>TalkGenerator</name>
+    <message>
+        <source>Starting TTS Engine</source>
+        <translation>Iniciando motor TTS</translation>
+    </message>
+    <message>
+        <source>Init of TTS engine failed</source>
+        <translation>Falhou ao iniciar o motor TTS</translation>
+    </message>
+    <message>
+        <source>Starting Encoder Engine</source>
+        <translation>Iniciando Motor Codificador</translation>
+    </message>
+    <message>
+        <source>Init of Encoder engine failed</source>
+        <translation>Falhou ao iniciar o motor Codificador</translation>
+    </message>
+    <message>
+        <source>Voicing entries...</source>
+        <translation>Vocalizando entradas...</translation>
+    </message>
+    <message>
+        <source>Encoding files...</source>
+        <translation>Codificando arquivos...</translation>
+    </message>
+    <message>
+        <source>Voicing aborted</source>
+        <translation>Vocalização abortada</translation>
+    </message>
+    <message>
+        <source>Voicing of %1 failed: %2</source>
+        <translation>Vocalização de %1 falhou: %2</translation>
+    </message>
+    <message>
+        <source>Encoding aborted</source>
+        <translation>Codificação abortada</translation>
+    </message>
+    <message>
+        <source>Encoding of %1 failed</source>
+        <translation>Codificação de %1 falhou</translation>
     </message>
 </context>
 <context>
@@ -2163,11 +2502,11 @@ código de resposta HTTP: %1</translation>
     </message>
     <message>
         <source>Init of TTS engine failed</source>
-        <translation>Falhou ao iniciar o motor TTS</translation>
+        <translation type="obsolete">Falhou ao iniciar o motor TTS</translation>
     </message>
     <message>
         <source>Init of Encoder engine failed</source>
-        <translation>Falhou ao iniciar o motor do Codificador</translation>
+        <translation type="obsolete">Falhou ao iniciar o motor do Codificador</translation>
     </message>
     <message>
         <source>The downloaded file was empty!</source>
@@ -2175,7 +2514,7 @@ código de resposta HTTP: %1</translation>
     </message>
     <message>
         <source>creating </source>
-        <translation>criando</translation>
+        <translation type="obsolete">criando</translation>
     </message>
     <message>
         <source>Error opening downloaded file</source>
@@ -2188,6 +2527,26 @@ código de resposta HTTP: %1</translation>
     <message>
         <source>successfully created.</source>
         <translation>criado com sucesso.</translation>
+    </message>
+    <message>
+        <source>Downloading voice info...</source>
+        <translation>Baixando informação de voz...</translation>
+    </message>
+    <message>
+        <source>Reading strings...</source>
+        <translation>Lendo strings...</translation>
+    </message>
+    <message>
+        <source>Creating voicefiles...</source>
+        <translation>Criando arquivos de voz...</translation>
+    </message>
+    <message>
+        <source>Cleaning up...</source>
+        <translation>Limpando...</translation>
+    </message>
+    <message>
+        <source>Finished</source>
+        <translation>Finalizado</translation>
     </message>
 </context>
 <context>
@@ -2307,14 +2666,14 @@ código de resposta HTTP: %1</translation>
 
 © 2005 - 2009 The Rockbox Team.
 Released under the GNU General Public License v2.</source>
-        <translation>Utilitário instalador e de manutenção para o firmware de código aberto de reprodutores digitais de música Rockbox.
+        <translation type="obsolete">Utilitário instalador e de manutenção para o firmware de código aberto de reprodutores digitais de música Rockbox.
 
 © 2005 - 2009 The Rockbox Team.
 Released under the GNU General Public License v2.</translation>
     </message>
     <message>
         <source>http://www.rockbox.org</source>
-        <translation>http://www.rockbox.org</translation>
+        <translation type="obsolete">http://www.rockbox.org</translation>
     </message>
     <message>
         <source>&amp;Credits</source>
@@ -2327,6 +2686,10 @@ Released under the GNU General Public License v2.</translation>
     <message>
         <source>&amp;Ok</source>
         <translation>&amp;Ok</translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2009 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
+        <translation>Utilitário instalador e de manutenção para o firmware de código aberto de reprodutores digitais de música Rockbox.&lt;br/&gt;© 2005 - 2009 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
 </context>
 </TS>
