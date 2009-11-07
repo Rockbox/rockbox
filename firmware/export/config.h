@@ -24,6 +24,8 @@
 
 #include "autoconf.h"
 
+#define HAVE_VIEWPORT_CLIP
+
 /* symbolic names for multiple choice configurations: */
 
 /* CONFIG_STORAGE (note these are combineable bit-flags) */
