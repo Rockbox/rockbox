@@ -65,6 +65,9 @@
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST
 
+/* define this if you want viewport clipping enabled for safe LCD functions */
+#define HAVE_VIEWPORT_CLIP
+
 /* LCD dimensions */
 #define CONFIG_LCD LCD_MROBE500
 

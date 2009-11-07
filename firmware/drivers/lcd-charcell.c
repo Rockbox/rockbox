@@ -84,6 +84,28 @@ void lcd_set_viewport(struct viewport* vp)
         current_vp = &default_vp;
     else
         current_vp = vp;
+        
+#if defined(SIMULATOR)
+    /* Force the viewport to be within bounds.  If this happens it should
+     *  be considered an error - the viewport will not draw as it might be
+     *  expected.
+     */
+    if((unsigned) current_vp->x > (unsigned) LCD_WIDTH 
+        || (unsigned) current_vp->y > (unsigned) LCD_HEIGHT 
+        || current_vp->x + current_vp->width > LCD_WIDTH
+        || current_vp->y + current_vp->height > LCD_HEIGHT)
+    {
+#if !defined(HAVE_VIEWPORT_CLIP)
+        DEBUGF("ERROR: "
+#else
+        DEBUGF("NOTE: "
+#endif
+            "set_viewport out of bounds: x: %d y: %d width: %d height:%d\n", 
+            current_vp->x, current_vp->y, 
+            current_vp->width, current_vp->height);
+    }
+    
+#endif
 }
 
 void lcd_update_viewport(void)
@@ -249,6 +271,11 @@ static void lcd_putxchar(int x, int y, int xchar)
     /* Adjust for viewport */
     x += current_vp->x;
     y += current_vp->y;
+
+#if defined(HAVE_VIEWPORT_CLIP)
+    if((unsigned)x > (unsigned)LCD_WIDTH || (unsigned)y > (unsigned)LCD_HEIGHT)
+        return;
+#endif
 
     lcd_char  = lcd_charbuffer[y][x];
 

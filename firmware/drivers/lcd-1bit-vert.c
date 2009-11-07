@@ -66,6 +66,28 @@ void LCDFN(set_viewport)(struct viewport* vp)
         current_vp = &default_vp;
     else
         current_vp = vp;
+
+#if defined(SIMULATOR)
+    /* Force the viewport to be within bounds.  If this happens it should
+     *  be considered an error - the viewport will not draw as it might be
+     *  expected.
+     */
+    if((unsigned) current_vp->x > (unsigned) LCDM(WIDTH) 
+        || (unsigned) current_vp->y > (unsigned) LCDM(HEIGHT) 
+        || current_vp->x + current_vp->width > LCDM(WIDTH)
+        || current_vp->y + current_vp->height > LCDM(HEIGHT))
+    {
+#if !defined(HAVE_VIEWPORT_CLIP)
+        DEBUGF("ERROR: "
+#else
+        DEBUGF("NOTE: "
+#endif
+            "set_viewport out of bounds: x: %d y: %d width: %d height:%d\n", 
+            current_vp->x, current_vp->y, 
+            current_vp->width, current_vp->height);
+    }
+    
+#endif
 }
 
 void LCDFN(update_viewport)(void)
@@ -254,8 +276,13 @@ void LCDFN(clear_viewport)(void)
 /* Set a single pixel */
 void LCDFN(drawpixel)(int x, int y)
 {
-    if (((unsigned)x < (unsigned)current_vp->width) &&
-        ((unsigned)y < (unsigned)current_vp->height))
+    if (   ((unsigned)x < (unsigned)current_vp->width) 
+        && ((unsigned)y < (unsigned)current_vp->height)
+#if defined(HAVE_VIEWPORT_CLIP)
+        && ((unsigned)x < (unsigned)LCDM(WIDTH))
+        && ((unsigned)y < (unsigned)LCDM(HEIGHT))
+#endif
+        )
         LCDFN(pixelfuncs)[current_vp->drawmode](current_vp->x + x, current_vp->y + y);
 }
 
@@ -324,8 +351,13 @@ void LCDFN(drawline)(int x1, int y1, int x2, int y2)
 
     for (i = 0; i < numpixels; i++)
     {
-        if (((unsigned)x < (unsigned)current_vp->width)
-            && ((unsigned)y < (unsigned)current_vp->height))
+        if (   ((unsigned)x < (unsigned)current_vp->width)
+            && ((unsigned)y < (unsigned)current_vp->height)
+#if defined(HAVE_VIEWPORT_CLIP)
+            && ((unsigned)x < (unsigned)LCDM(WIDTH))
+            && ((unsigned)y < (unsigned)LCDM(HEIGHT))
+#endif
+            )
             pfunc(current_vp->x + x, current_vp->y + y);
 
         if (d < 0)
@@ -359,22 +391,38 @@ void LCDFN(hline)(int x1, int x2, int y)
         x2 = x;
     }
     
+    /******************** In viewport clipping **********************/
     /* nothing to draw? */
     if (((unsigned)y >= (unsigned)current_vp->height) || (x1 >= current_vp->width)
+        || (x2 < 0))
+        return;  
+    
+    if (x1 < 0)
+        x1 = 0;
+    if (x2 >= current_vp->width)
+        x2 = current_vp->width-1;
+        
+    /* adjust to viewport */
+    x1 += current_vp->x;
+    y += current_vp->y;
+    
+#if defined(HAVE_VIEWPORT_CLIP)
+    x2 += current_vp->x;
+
+    /********************* Viewport on screen clipping ********************/
+    /* nothing to draw? */
+    if (((unsigned)y >= (unsigned) LCDM(HEIGHT)) || (x1 >= LCDM(WIDTH))
         || (x2 < 0))
         return;  
     
     /* clipping */
     if (x1 < 0)
         x1 = 0;
-    if (x2 >= current_vp->width)
-        x2 = current_vp->width-1;
-        
-    width = x2 - x1 + 1;
+    if (x2 >= LCDM(WIDTH))
+        x2 = LCDM(WIDTH)-1;
+#endif
 
-    /* adjust to viewport */
-    x1 += current_vp->x;
-    y += current_vp->y;
+    width = x2 - x1 + 1;
 
     bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
     dst   = &LCDFN(framebuffer)[y>>3][x1];
@@ -402,12 +450,12 @@ void LCDFN(vline)(int x, int y1, int y2)
         y2 = ny;
     }
 
+    /******************** In viewport clipping **********************/
     /* nothing to draw? */
     if (((unsigned)x >= (unsigned)current_vp->width) || (y1 >= current_vp->height)
         || (y2 < 0))
         return;  
     
-    /* clipping */
     if (y1 < 0)
         y1 = 0;
     if (y2 >= current_vp->height)
@@ -417,6 +465,20 @@ void LCDFN(vline)(int x, int y1, int y2)
     y1 += current_vp->y;
     y2 += current_vp->y;
     x += current_vp->x;
+    
+#if defined(HAVE_VIEWPORT_CLIP)
+    /********************* Viewport on screen clipping ********************/
+    /* nothing to draw? */
+    if (( (unsigned) x >= (unsigned)LCDM(WIDTH)) || (y1 >= LCDM(HEIGHT)) 
+        || (y2 < 0))
+        return;
+    
+    /* clipping */
+    if (y1 < 0)
+        y1 = 0;
+    if (y2 >= LCDM(HEIGHT))
+        y2 = LCDM(HEIGHT)-1;
+#endif
 
     bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
     dst   = &LCDFN(framebuffer)[y1>>3][x];
@@ -459,12 +521,12 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
     LCDFN(blockfunc_type) *bfunc;
     bool fillopt = false;
 
+    /******************** In viewport clipping **********************/
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= current_vp->width)
         || (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
         return;
 
-    /* clipping */
     if (x < 0)
     {
         width += x;
@@ -483,6 +545,30 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
     /* adjust for viewport */
     x += current_vp->x;
     y += current_vp->y;
+    
+#if defined(HAVE_VIEWPORT_CLIP)
+    /********************* Viewport on screen clipping ********************/
+    /* nothing to draw? */
+    if ((x >= LCDM(WIDTH)) || (y >= LCDM(HEIGHT)) 
+        || (x + width <= 0) || (y + height <= 0))
+        return;
+    
+    /* clip image in viewport in screen */
+    if (x < 0)
+    {
+        width += x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        y = 0;
+    }
+    if (x + width > LCDM(WIDTH))
+        width = LCDM(WIDTH) - x;
+    if (y + height > LCDM(HEIGHT))
+        height = LCDM(HEIGHT) - y;
+#endif
 
     if (current_vp->drawmode & DRMODE_INVERSEVID)
     {
@@ -556,12 +642,13 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
     unsigned mask, mask_bottom;
     LCDFN(blockfunc_type) *bfunc;
 
+    /******************** Image in viewport clipping **********************/
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= current_vp->width)
         || (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
         return;
         
-    /* clipping */
+    /* clip image in viewport */
     if (x < 0)
     {
         width += x;
@@ -582,6 +669,32 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
     /* adjust for viewport */
     x += current_vp->x;
     y += current_vp->y;
+    
+#if defined(HAVE_VIEWPORT_CLIP)
+    /********************* Viewport on screen clipping ********************/
+    /* nothing to draw? */
+    if ((x >= LCDM(WIDTH)) || (y >= LCDM(HEIGHT)) 
+        || (x + width <= 0) || (y + height <= 0))
+        return;
+    
+    /* clip image in viewport in screen */
+    if (x < 0)
+    {
+        width += x;
+        src_x -= x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        src_y -= y;
+        y = 0;
+    }
+    if (x + width > LCDM(WIDTH))
+        width = LCDM(WIDTH) - x;
+    if (y + height > LCDM(HEIGHT))
+        height = LCDM(HEIGHT) - y;
+#endif
 
     src    += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
