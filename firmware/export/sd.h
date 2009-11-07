@@ -72,34 +72,37 @@ int sd_num_drives(int first_drive);
 #define SD_DIS              8
 
 /* SD Commands */
-#define SD_GO_IDLE_STATE         0
-#define SD_ALL_SEND_CID          2
-#define SD_SEND_RELATIVE_ADDR    3
-#define SD_SET_DSR               4
-#define SD_SWITCH_FUNC           6
-#define SD_SET_BUS_WIDTH         6  /* acmd6 */
-#define SD_SELECT_CARD           7
-#define SD_DESELECT_CARD         7
-#define SD_SEND_IF_COND          8
-#define SD_SEND_CSD              9
-#define SD_SEND_CID             10
-#define SD_STOP_TRANSMISSION    12
-#define SD_SEND_STATUS          13
-#define SD_GO_INACTIVE_STATE    15
-#define SD_SET_BLOCKLEN         16
-#define SD_READ_SINGLE_BLOCK    17
-#define SD_READ_MULTIPLE_BLOCK  18
-#define SD_SEND_NUM_WR_BLOCKS   22
-#define SD_WRITE_BLOCK          24
-#define SD_WRITE_MULTIPLE_BLOCK 25
-#define SD_ERASE_WR_BLK_START   32
-#define SD_ERASE_WR_BLK_END     33
-#define SD_ERASE                38
-#define SD_APP_OP_COND          41
-#define SD_LOCK_UNLOCK          42
-#define SD_SET_CLR_CARD_DETECT  42  /* acmd42 */
-#define SD_SEND_SCR             51  /* acmd51 */
-#define SD_APP_CMD              55
+#define SD_GO_IDLE_STATE           0
+#define SD_ALL_SEND_CID            2
+#define SD_SEND_RELATIVE_ADDR      3
+#define SD_SET_DSR                 4
+#define SD_SWITCH_FUNC             6
+#define SD_SET_BUS_WIDTH           6  /* acmd6 */
+#define SD_SELECT_CARD             7  /* with card's rca  */
+#define SD_DESELECT_CARD           7  /* with rca = 0  */
+#define SD_SEND_IF_COND            8
+#define SD_SEND_CSD                9
+#define SD_SEND_CID               10
+#define SD_STOP_TRANSMISSION      12
+#define SD_SEND_STATUS            13
+#define SD_SD_STATUS              13  /* acmd13 */
+#define SD_GO_INACTIVE_STATE      15
+#define SD_SET_BLOCKLEN           16
+#define SD_READ_SINGLE_BLOCK      17
+#define SD_READ_MULTIPLE_BLOCK    18
+#define SD_SEND_NUM_WR_BLOCKS     22  /* acmd22 */
+#define SD_SET_WR_BLK_ERASE_COUNT 23  /* acmd23 */
+#define SD_WRITE_BLOCK            24
+#define SD_WRITE_MULTIPLE_BLOCK   25
+#define SD_PROGRAM_CSD            27
+#define SD_ERASE_WR_BLK_START     32
+#define SD_ERASE_WR_BLK_END       33
+#define SD_ERASE                  38
+#define SD_APP_OP_COND            41  /* acmd41 */
+#define SD_LOCK_UNLOCK            42
+#define SD_SET_CLR_CARD_DETECT    42  /* acmd42 */
+#define SD_SEND_SCR               51  /* acmd51 */
+#define SD_APP_CMD                55
 
 /*
   SD/MMC status in R1, for native mode (SPI bits are different)
@@ -143,5 +146,24 @@ int sd_num_drives(int first_drive);
 
 /* SD OCR bits */
 #define SD_OCR_CARD_CAPACITY_STATUS    (1 << 30)   /* Card Capacity Status */
+
+/*  All R1 Response flags that indicate Card error(vs MCI Controller error) */
+#define SD_R1_CARD_ERROR           ( SD_R1_OUT_OF_RANGE           \
+                                   | SD_R1_ADDRESS_ERROR          \
+                                   | SD_R1_BLOCK_LEN_ERROR        \
+                                   | SD_R1_ERASE_SEQ_ERROR        \
+                                   | SD_R1_ERASE_PARAM            \
+                                   | SD_R1_WP_VIOLATION           \
+                                   | SD_R1_LOCK_UNLOCK_FAILED     \
+                                   | SD_R1_COM_CRC_ERROR          \
+                                   | SD_R1_ILLEGAL_COMMAND        \
+                                   | SD_R1_CARD_ECC_FAILED        \
+                                   | SD_R1_CC_ERROR               \
+                                   | SD_R1_ERROR                  \
+                                   | SD_R1_UNDERRUN               \
+                                   | SD_R1_CSD_OVERWRITE          \
+                                   | SD_R1_WP_ERASE_SKIP          \
+                                   | SD_R1_AKE_SEQ_ERROR)
+
 
 #endif
