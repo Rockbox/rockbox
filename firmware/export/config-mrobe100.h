@@ -64,6 +64,9 @@
 #define CONFIG_KEYPAD        MROBE100_PAD
 #define CONFIG_REMOTE_KEYPAD MROBE_REMOTE
 
+/* Define this to enable morse code input */
+#define HAVE_MORSE_INPUT
+
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 

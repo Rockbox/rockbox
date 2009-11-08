@@ -94,6 +94,9 @@
 //#define AB_REPEAT_ENABLE 1
 //#define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
 
+/* Define this to enable morse code input */
+#define HAVE_MORSE_INPUT
+
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 

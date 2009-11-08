@@ -48,6 +48,9 @@
 /* define this if you have a Recorder style 10-key keyboard */
 #define CONFIG_KEYPAD RECORDER_PAD
 
+/* Define this to enable morse code input */
+#define HAVE_MORSE_INPUT
+
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_M41ST84W
 

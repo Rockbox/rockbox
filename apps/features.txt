@@ -102,6 +102,10 @@ masf
 masd
 #endif
 
+#if defined(HAVE_MORSE_INPUT)
+morse_input
+#endif
+
 #if defined(HAVE_PITCHSCREEN)
 pitchscreen
 #endif

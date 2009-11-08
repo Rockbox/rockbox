@@ -76,6 +76,9 @@
 
 #define CONFIG_KEYPAD IRIVER_H10_PAD
 
+/* Define this to enable morse code input */
+#define HAVE_MORSE_INPUT
+
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 

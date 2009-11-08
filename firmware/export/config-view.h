@@ -74,6 +74,9 @@
 /* The only difference is that the power/hold is on the left instead of right on Fuze */
 #define CONFIG_KEYPAD SANSA_FUZE_PAD
 
+/* Define this to enable morse code input */
+#define HAVE_MORSE_INPUT
+
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 /* There is no hardware tone control */

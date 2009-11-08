@@ -274,6 +274,7 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_DONE,         BUTTON_VOL_UP,                   BUTTON_NONE },
     { ACTION_KBD_DONE,         BUTTON_VOL_DOWN,                 BUTTON_NONE },
     { ACTION_KBD_ABORT,        BUTTON_POWER,                    BUTTON_NONE },
+    { ACTION_KBD_MORSE_SELECT, BUTTON_SELECT|BUTTON_REL,        BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */

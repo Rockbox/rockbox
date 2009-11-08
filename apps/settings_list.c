@@ -1635,6 +1635,10 @@ const struct settings_list settings[] = {
     VIEWPORT_SETTING(remote_ui_vp_config, "remote ui viewport"),
 #endif
 #endif
+
+#ifdef HAVE_MORSE_INPUT
+    OFFON_SETTING(0, morse_input, LANG_MORSE_INPUT, false, "morse input", NULL),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

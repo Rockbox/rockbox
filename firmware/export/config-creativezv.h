@@ -76,6 +76,9 @@
 #define HAVE_HEADPHONE_DETECTION
 //#define HAVE_TOUCHPAD
 
+/* Define this to enable morse code input */
+#define HAVE_MORSE_INPUT
+
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 

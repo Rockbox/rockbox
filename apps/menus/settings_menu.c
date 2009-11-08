@@ -257,6 +257,10 @@ MENUITEM_SETTING(usb_hid, &global_settings.usb_hid, NULL);
 MENUITEM_SETTING(usb_keypad_mode, &global_settings.usb_keypad_mode, NULL);
 #endif
 
+#ifdef HAVE_MORSE_INPUT
+MENUITEM_SETTING(morse_input, &global_settings.morse_input, NULL);
+#endif
+
 #ifdef HAVE_BUTTON_LIGHT
 MENUITEM_SETTING(buttonlight_timeout, &global_settings.buttonlight_timeout, NULL);
 #endif
@@ -280,6 +284,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
             &poweroff,
             &limits_menu,
+#ifdef HAVE_MORSE_INPUT
+            &morse_input,
+#endif
 #if CONFIG_CODEC == MAS3507D
             &line_in,
 #endif
@@ -287,7 +294,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &car_adapter_mode,
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
-        &serial_bitrate,
+            &serial_bitrate,
 #endif
 #ifdef HAVE_ACCESSORY_SUPPLY
             &accessory_supply,

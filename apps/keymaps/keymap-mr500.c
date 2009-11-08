@@ -191,6 +191,7 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_UP,           BUTTON_RC_PLAY|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_KBD_DOWN,         BUTTON_RC_DOWN,                   BUTTON_NONE },
     { ACTION_KBD_DOWN,         BUTTON_RC_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_KBD_MORSE_SELECT, BUTTON_RC_HEART|BUTTON_REL,       BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */

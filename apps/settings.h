@@ -798,6 +798,10 @@ struct user_settings
     int compressor_release_time;
 #endif
 
+#ifdef HAVE_MORSE_INPUT
+    bool morse_input; /* text input method setting */
+#endif
+
 };
 
 /** global variables **/

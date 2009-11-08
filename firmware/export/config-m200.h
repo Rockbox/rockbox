@@ -58,6 +58,9 @@
 /* define this to indicate your device's keypad */
 #define CONFIG_KEYPAD SANSA_M200_PAD
 
+/* Define this to enable morse code input */
+#define HAVE_MORSE_INPUT
+
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_TCC77X
 

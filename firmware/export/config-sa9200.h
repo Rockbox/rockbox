@@ -62,6 +62,9 @@
 
 #define CONFIG_KEYPAD PHILIPS_SA9200_PAD
 
+/* Define this to enable morse code input */
+#define HAVE_MORSE_INPUT
+
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST
 

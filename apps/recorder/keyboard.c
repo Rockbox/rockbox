@@ -49,45 +49,47 @@
 #define DEFAULT_MARGIN 6
 #define KBD_BUF_SIZE 500
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-    (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define KBD_CURSOR_KEYS /* certain key combos move the cursor even if not
-                           in line edit mode */
-#define KBD_MODES /* I-Rivers can use picker, line edit and cursor keys */
-#define KBD_MORSE_INPUT /* I-Rivers have a Morse input mode */
+#if (CONFIG_KEYPAD == ONDIO_PAD) \
+    || (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD) \
+    || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
+    || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD) \
+    || (CONFIG_KEYPAD == IAUDIO_M3_PAD) \
+    || (CONFIG_KEYPAD == IRIVER_H10_PAD)
+/* no key combos to move the cursor if not in line edit mode */
+#define KBD_MODES /* uses 2 modes, picker and line edit */
 
-#elif CONFIG_KEYPAD == ONDIO_PAD /* restricted Ondio keypad */
-#define KBD_MODES /* Ondio uses 2 modes, picker and line edit */
-
-#elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) \
-   || (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define KBD_MODES /* iPod uses 2 modes, picker and line edit */
-#define KBD_MORSE_INPUT
-
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-#define KBD_MODES /* iFP7xx uses 2 modes, picker and line edit */
-
-#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD) || (CONFIG_KEYPAD == IAUDIO_M3_PAD)
-#define KBD_MODES /* iAudios use 2 modes, picker and line edit */
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define KBD_MODES /* iriver H10 uses 2 modes, picker and line edit */
-#define KBD_MORSE_INPUT
-
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) \
+    || (CONFIG_KEYPAD == IRIVER_H300_PAD) \
+    || (CONFIG_KEYPAD == GIGABEAT_PAD) \
+    || (CONFIG_KEYPAD == GIGABEAT_S_PAD) \
+    || (CONFIG_KEYPAD == SANSA_E200_PAD) \
+    || (CONFIG_KEYPAD == SANSA_FUZE_PAD) \
+    || (CONFIG_KEYPAD == SANSA_C200_PAD) \
+    || (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+/* certain key combos move the cursor even if not in line edit mode */
 #define KBD_CURSOR_KEYS
-#define KBD_MODES
-#define KBD_MORSE_INPUT
+#define KBD_MODES /* uses 2 modes, picker and line edit */
 
-#elif CONFIG_KEYPAD == SANSA_E200_PAD \
-    || CONFIG_KEYPAD == SANSA_FUZE_PAD \
-    || CONFIG_KEYPAD == SANSA_C200_PAD \
-    || CONFIG_KEYPAD == SAMSUNG_YH_PAD
-#define KBD_CURSOR_KEYS
-#define KBD_MODES
+#else
+#define KBD_CURSOR_KEYS /* certain keys move the cursor, no line edit mode */
+#endif
 
-#elif CONFIG_KEYPAD == MROBE100_PAD
-#define KBD_MORSE_INPUT
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) \
+    || (CONFIG_KEYPAD == IRIVER_H300_PAD) \
+    || (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD) \
+    || (CONFIG_KEYPAD == IRIVER_H10_PAD) \
+    || (CONFIG_KEYPAD == GIGABEAT_PAD) \
+    || (CONFIG_KEYPAD == GIGABEAT_S_PAD) \
+    || (CONFIG_KEYPAD == MROBE100_PAD) \
+    || (CONFIG_KEYPAD == SANSA_E200_PAD) \
+    || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) \
+    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
+/* certain key combos toggle input mode between keyboard input and Morse input */
+#define KBD_TOGGLE_INPUT
 #endif
 
 struct keyboard_parameters
@@ -124,7 +126,7 @@ struct keyboard_parameters
 static struct keyboard_parameters kbd_param[NB_SCREENS];
 static bool kbd_loaded = false;
 
-#ifdef KBD_MORSE_INPUT
+#ifdef HAVE_MORSE_INPUT
 /* FIXME: We should put this to a configuration file. */
 static const char *morse_alphabets =
     "abcdefghijklmnopqrstuvwxyz1234567890,.?-@ ";
@@ -134,7 +136,6 @@ static const unsigned char morse_codes[] = {
     0x2f,0x27,0x23,0x21,0x20,0x30,0x38,0x3c,0x3e,0x3f,
     0x73,0x55,0x4c,0x61,0x5a,0x80 };
 
-static bool morse_mode = false;
 #endif
 
 /* Loads a custom keyboard into memory
@@ -306,7 +307,8 @@ int kbd_input(char* text, int buflen)
     unsigned char *utf8;
     bool cur_blink = true;      /* Cursor on/off flag */
     int ret = 0; /* assume success */
-#ifdef KBD_MORSE_INPUT
+#ifdef HAVE_MORSE_INPUT
+    bool morse_mode = global_settings.morse_input;
     bool morse_reading = false;
     unsigned char morse_code = 0;
     int morse_tick = 0;
@@ -534,10 +536,10 @@ int kbd_input(char* text, int buflen)
         pm->main_x = 0;
         pm->keyboard_margin -= pm->keyboard_margin/2;
 
-#ifdef KBD_MORSE_INPUT
+#ifdef HAVE_MORSE_INPUT
         pm->old_main_y = pm->main_y;
         if (morse_mode)
-            pm->main_y = sc_h - pm->font_h;
+            pm->main_y = sc_h - pm->font_h - BUTTONBAR_HEIGHT;
 #endif
     }
 
@@ -567,7 +569,7 @@ int kbd_input(char* text, int buflen)
         FOR_NB_SCREENS(l)
             screens[l].clear_display();
 
-#ifdef KBD_MORSE_INPUT
+#ifdef HAVE_MORSE_INPUT
         if (morse_mode)
         {
             FOR_NB_SCREENS(l)
@@ -615,7 +617,7 @@ int kbd_input(char* text, int buflen)
             }
         }
         else
-#endif /* KBD_MORSE_INPUT */
+#endif /* HAVE_MORSE_INPUT */
         {
             /* draw page */
             FOR_NB_SCREENS(l)
@@ -752,7 +754,7 @@ int kbd_input(char* text, int buflen)
                              sc->getwidth(), pm->font_h + 2);
             else /* highlight the key that has focus */
 #endif
-#ifdef KBD_MORSE_INPUT
+#ifdef HAVE_MORSE_INPUT
             if(!morse_mode)
 #endif
                 sc->fillrect(pm->font_w*pm->x,
@@ -771,14 +773,14 @@ int kbd_input(char* text, int buflen)
         pm = &param[button_screen];
         sc = &screens[button_screen];
 
-#if defined(KBD_MODES) || defined(KBD_MORSE_INPUT)
+#if defined(KBD_MODES) || defined(HAVE_MORSE_INPUT)
         /* Remap some buttons to allow to move
          * cursor in line edit mode and morse mode. */
-#if defined(KBD_MODES) && defined(KBD_MORSE_INPUT)
+#if defined(KBD_MODES) && defined(HAVE_MORSE_INPUT)
         if (pm->line_edit || morse_mode)
 #elif defined(KBD_MODES)
         if (pm->line_edit)
-#else /* defined(KBD_MORSE_INPUT) */
+#else /* defined(HAVE_MORSE_INPUT) */
         if (morse_mode)
 #endif
         {
@@ -787,7 +789,7 @@ int kbd_input(char* text, int buflen)
             if (button == ACTION_KBD_RIGHT)
                 button = ACTION_KBD_CURSOR_RIGHT;
         }
-#endif /* defined(KBD_MODES) || defined(KBD_MORSE_INPUT) */
+#endif /* defined(KBD_MODES) || defined(HAVE_MORSE_INPUT) */
 
         switch ( button )
         {
@@ -798,7 +800,7 @@ int kbd_input(char* text, int buflen)
 
             case ACTION_KBD_PAGE_FLIP:
             {
-#ifdef KBD_MORSE_INPUT
+#ifdef HAVE_MORSE_INPUT
                 if (morse_mode)
                     break;
 #endif
@@ -810,7 +812,7 @@ int kbd_input(char* text, int buflen)
                 break;
                 }
 
-#ifdef KBD_MORSE_INPUT
+#if defined(HAVE_MORSE_INPUT) && defined(KBD_TOGGLE_INPUT)
             case ACTION_KBD_MORSE_INPUT:
                 morse_mode = !morse_mode;
 
@@ -822,7 +824,7 @@ int kbd_input(char* text, int buflen)
                     if (morse_mode)
                     {
                         pm->old_main_y = pm->main_y;
-                        pm->main_y = sc->getheight() - pm->font_h;
+                        pm->main_y = sc->getheight() - pm->font_h - BUTTONBAR_HEIGHT;
                     }
                     else
                     {
@@ -831,7 +833,7 @@ int kbd_input(char* text, int buflen)
                 }
                 /* FIXME: We should talk something like Morse mode.. */
                 break;
-#endif /* KBD_MORSE_INPUT */
+#endif /* KBD_TOGGLE_INPUT */
 
             case ACTION_KBD_RIGHT:
                 if (++pm->x >= pm->max_chars)
@@ -864,7 +866,7 @@ int kbd_input(char* text, int buflen)
                 break;
 
             case ACTION_KBD_DOWN:
-#ifdef KBD_MORSE_INPUT
+#ifdef HAVE_MORSE_INPUT
 #ifdef KBD_MODES
                 if (morse_mode)
                 {
@@ -877,7 +879,7 @@ int kbd_input(char* text, int buflen)
                 if (morse_mode)
                     break;
 #endif
-#endif /* KBD_MORSE_INPUT */
+#endif /* HAVE_MORSE_INPUT */
                 {
 #ifdef KBD_MODES
                     if (pm->line_edit)
@@ -907,7 +909,7 @@ int kbd_input(char* text, int buflen)
                 break;
 
             case ACTION_KBD_UP:
-#ifdef KBD_MORSE_INPUT
+#ifdef HAVE_MORSE_INPUT
 #ifdef KBD_MODES
                 if (morse_mode)
                 {
@@ -920,7 +922,7 @@ int kbd_input(char* text, int buflen)
                 if (morse_mode)
                     break;
 #endif
-#endif /* KBD_MORSE_INPUT */
+#endif /* HAVE_MORSE_INPUT */
                 {
 #ifdef KBD_MODES
                     if (pm->line_edit)
@@ -955,7 +957,7 @@ int kbd_input(char* text, int buflen)
                 done = true;
                 break;
 
-#ifdef KBD_MORSE_INPUT
+#ifdef HAVE_MORSE_INPUT
             case ACTION_KBD_MORSE_SELECT:
                 if (morse_mode && morse_reading)
                 {
@@ -965,10 +967,10 @@ int kbd_input(char* text, int buflen)
                 }
 
                 break;
-#endif /* KBD_MORSE_INPUT */
+#endif /* HAVE_MORSE_INPUT */
 
             case ACTION_KBD_SELECT:
-#ifdef KBD_MORSE_INPUT
+#ifdef HAVE_MORSE_INPUT
 #ifdef KBD_MODES
                 if (morse_mode && !pm->line_edit)
 #else
@@ -984,7 +986,7 @@ int kbd_input(char* text, int buflen)
                     }
                     break;
                 }
-#endif /* KBD_MORSE_INPUT */
+#endif /* HAVE_MORSE_INPUT */
 
                 /* inserts the selected char */
 #ifdef KBD_MODES
@@ -1088,7 +1090,7 @@ int kbd_input(char* text, int buflen)
                 /* speak revised text */
                 break;
 
-#if !defined (KBD_MODES) || defined (KBD_CURSOR_KEYS)
+#ifdef KBD_CURSOR_KEYS
             case ACTION_KBD_BACKSPACE:
                 if (pm->hangul)
                 {
@@ -1114,7 +1116,7 @@ int kbd_input(char* text, int buflen)
                 if (global_settings.talk_menu) /* voice UI? */
                     talk_spell(text, false);   /* speak revised text */
                 break;
-#endif /* !defined (KBD_MODES) || defined (KBD_CURSOR_KEYS) */
+#endif /* KBD_CURSOR_KEYS */
 
             case ACTION_KBD_CURSOR_RIGHT:
                 pm->hangul = false;
@@ -1145,7 +1147,7 @@ int kbd_input(char* text, int buflen)
                 break;
 
             case BUTTON_NONE:
-#ifdef KBD_MORSE_INPUT
+#ifdef HAVE_MORSE_INPUT
                 if (morse_reading)
                 {
                     int j;
@@ -1172,7 +1174,7 @@ int kbd_input(char* text, int buflen)
                     if (global_settings.talk_menu) /* voice UI? */
                         talk_spell(text, false);   /* speak revised text */
                 }
-#endif /* KBD_MORSE_INPUT */
+#endif /* HAVE_MORSE_INPUT */
                 break;
 
             default:
@@ -1197,6 +1199,14 @@ int kbd_input(char* text, int buflen)
 
     if (ret < 0)
         splash(HZ/2, ID2P(LANG_CANCEL));
+
+#ifdef HAVE_MORSE_INPUT
+    if(global_settings.morse_input != morse_mode)
+    {
+        global_settings.morse_input = morse_mode;
+        settings_save();
+    }
+#endif /* HAVE_MORSE_INPUT */
 
     FOR_NB_SCREENS(l)
         screens[l].setfont(FONT_UI);

@@ -13210,3 +13210,20 @@
     *: "Queue Last Shuffled"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </voice>
+</phrase>
