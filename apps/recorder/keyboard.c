@@ -788,6 +788,11 @@ int kbd_input(char* text, int buflen)
                 button = ACTION_KBD_CURSOR_LEFT;
             if (button == ACTION_KBD_RIGHT)
                 button = ACTION_KBD_CURSOR_RIGHT;
+#ifdef KBD_MODES
+            /* select doubles as backspace in line_edit */
+            if (pm->line_edit && button == ACTION_KBD_SELECT)
+                button = ACTION_KBD_BACKSPACE;
+#endif
         }
 #endif /* defined(KBD_MODES) || defined(HAVE_MORSE_INPUT) */
 
@@ -971,11 +976,7 @@ int kbd_input(char* text, int buflen)
 
             case ACTION_KBD_SELECT:
 #ifdef HAVE_MORSE_INPUT
-#ifdef KBD_MODES
-                if (morse_mode && !pm->line_edit)
-#else
                 if (morse_mode)
-#endif
                 {
                     morse_tick = current_tick;
 
@@ -984,38 +985,11 @@ int kbd_input(char* text, int buflen)
                         morse_reading = true;
                         morse_code = 1;
                     }
-                    break;
-                }
-#endif /* HAVE_MORSE_INPUT */
-
-                /* inserts the selected char */
-#ifdef KBD_MODES
-                if (pm->line_edit)
-                { /* select doubles as backspace in line_edit */
-                    if (pm->hangul)
-                    {
-                        if (pm->htail)
-                            pm->htail = 0;
-                        else if (pm->hvowel)
-                            pm->hvowel = 0;
-                        else
-                            pm->hangul = false;
-                    }
-
-                    kbd_delchar(text, &editpos);
-
-                    if (pm->hangul)
-                    {
-                        if (pm->hvowel)
-                            ch = hangul_join(pm->hlead, pm->hvowel, pm->htail);
-                        else
-                            ch = pm->hlead;
-                        kbd_inschar(text, buflen, &editpos, ch);
-                    }
                 }
                 else
-#endif /* KBD_MODES */
+#endif /* HAVE_MORSE_INPUT */
                 {
+                    /* inserts the selected char */
                     /* find input char */
                     ch = get_kbd_ch(pm);
 
@@ -1082,15 +1056,14 @@ int kbd_input(char* text, int buflen)
 
                     /* insert char */
                     kbd_inschar(text, buflen, &editpos, ch);
+
+                    if (global_settings.talk_menu) /* voice UI? */
+                        talk_spell(text, false);
+
+                    /* speak revised text */
                 }
-
-                if (global_settings.talk_menu) /* voice UI? */
-                    talk_spell(text, false);
-
-                /* speak revised text */
                 break;
 
-#ifdef KBD_CURSOR_KEYS
             case ACTION_KBD_BACKSPACE:
                 if (pm->hangul)
                 {
@@ -1116,7 +1089,6 @@ int kbd_input(char* text, int buflen)
                 if (global_settings.talk_menu) /* voice UI? */
                     talk_spell(text, false);   /* speak revised text */
                 break;
-#endif /* KBD_CURSOR_KEYS */
 
             case ACTION_KBD_CURSOR_RIGHT:
                 pm->hangul = false;
