@@ -65,7 +65,7 @@ struct sansa_t {
     loff_t start;  /* Offset in bytes of firmware partition from start of disk */
 };
 
-void print_error(char* msg);
+void sansa_print_error(char* msg);
 int sansa_open(struct sansa_t* sansa, int silent);
 int sansa_reopen_rw(struct sansa_t* sansa);
 int sansa_close(struct sansa_t* sansa);

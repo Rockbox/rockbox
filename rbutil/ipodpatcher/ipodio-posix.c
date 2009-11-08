@@ -160,7 +160,7 @@ static int ipod_unmount(struct ipod_t* ipod)
 }
 #endif
 
-void print_error(char* msg)
+void ipod_print_error(char* msg)
 {
     perror(msg);
 }

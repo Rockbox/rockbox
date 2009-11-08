@@ -175,7 +175,7 @@ int read_partinfo(struct ipod_t* ipod, int silent)
     count = ipod_read(ipod,ipod_sectorbuf, ipod->sector_size);
 
     if (count <= 0) {
-        print_error(" Error reading from disk: ");
+        ipod_print_error(" Error reading from disk: ");
         return -1;
     }
 
@@ -225,7 +225,7 @@ int read_partinfo(struct ipod_t* ipod, int silent)
             count = ipod_read(ipod, ipod_sectorbuf, ipod->sector_size);
 
             if (count <= 0) {
-                print_error(" Error reading from disk: ");
+                ipod_print_error(" Error reading from disk: ");
                 return -1;
             }
 
@@ -372,7 +372,7 @@ int write_partition(struct ipod_t* ipod, int infile)
         res = ipod_write(ipod, ipod_sectorbuf, n);
 
         if (res < 0) {
-            print_error(" Error writing to disk: ");
+            ipod_print_error(" Error writing to disk: ");
             fprintf(stderr,"Bytes written: %d\n",byteswritten);
             return -1;
         }

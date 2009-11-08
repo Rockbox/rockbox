@@ -99,7 +99,7 @@ int sansa_read_partinfo(struct sansa_t* sansa, int silent)
     count = sansa_read(sansa,sansa_sectorbuf, sansa->sector_size);
 
     if (count <= 0) {
-        print_error(" Error reading from disk: ");
+        sansa_print_error(" Error reading from disk: ");
         return -1;
     }
 

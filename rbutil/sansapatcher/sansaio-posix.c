@@ -65,12 +65,10 @@ static int sansa_unmount(struct sansa_t* sansa)
 #endif
 
 
-#ifndef RBUTIL
-void print_error(char* msg)
+void sansa_print_error(char* msg)
 {
     perror(msg);
 }
-#endif
 
 int sansa_open(struct sansa_t* sansa, int silent)
 {

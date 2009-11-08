@@ -91,7 +91,7 @@ struct ipod_t {
 #endif
 };
 
-void print_error(char* msg);
+void ipod_print_error(char* msg);
 int ipod_open(struct ipod_t* ipod, int silent);
 int ipod_reopen_rw(struct ipod_t* ipod);
 int ipod_close(struct ipod_t* ipod);

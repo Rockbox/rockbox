@@ -55,8 +55,7 @@ static int unlock_volume(HANDLE hDisk)
                          &dummy, NULL);
 }
 
-#ifndef RBUTIL
-void print_error(char* msg)
+void sansa_print_error(char* msg)
 {
     char* pMsgBuf;
 
@@ -68,7 +67,7 @@ void print_error(char* msg)
     printf(pMsgBuf);
     LocalFree(pMsgBuf);
 }
-#endif
+
 int sansa_open(struct sansa_t* sansa, int silent)
 {
     DISK_GEOMETRY_EX diskgeometry_ex;
@@ -80,7 +79,7 @@ int sansa_open(struct sansa_t* sansa, int silent)
                     FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
 
     if (sansa->dh == INVALID_HANDLE_VALUE) {
-        if (!silent) print_error(" Error opening disk: ");
+        if (!silent) sansa_print_error(" Error opening disk: ");
         if(GetLastError() == ERROR_ACCESS_DENIED)
             return -2;
         else
@@ -88,7 +87,7 @@ int sansa_open(struct sansa_t* sansa, int silent)
     }
 
     if (!lock_volume(sansa->dh)) {
-        if (!silent) print_error(" Error locking disk: ");
+        if (!silent) sansa_print_error(" Error locking disk: ");
         return -1;
     }
 
@@ -108,7 +107,7 @@ int sansa_open(struct sansa_t* sansa, int silent)
                              sizeof(diskgeometry),
                              &n,
                              NULL)) {
-            if (!silent) print_error(" Error reading disk geometry: ");
+            if (!silent) sansa_print_error(" Error reading disk geometry: ");
             return -1;
         } else {
             sansa->sector_size=diskgeometry.BytesPerSector;
@@ -131,12 +130,12 @@ int sansa_reopen_rw(struct sansa_t* sansa)
                      FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
 
     if (sansa->dh == INVALID_HANDLE_VALUE) {
-        print_error(" Error opening disk: ");
+        sansa_print_error(" Error opening disk: ");
         return -1;
     }
 
     if (!lock_volume(sansa->dh)) {
-        print_error(" Error locking disk: ");
+        sansa_print_error(" Error locking disk: ");
         return -1;
     }
 
@@ -156,7 +155,7 @@ int sansa_alloc_buffer(unsigned char** sectorbuf, int bufsize)
        the disk sector size. */
     *sectorbuf = (unsigned char*)VirtualAlloc(NULL, bufsize, MEM_COMMIT, PAGE_READWRITE);
     if (*sectorbuf == NULL) {
-        print_error(" Error allocating a buffer: ");
+        sansa_print_error(" Error allocating a buffer: ");
         return -1;
     }
     return 0;
@@ -171,7 +170,7 @@ int sansa_seek(struct sansa_t* sansa, loff_t pos)
     li.LowPart = SetFilePointer (sansa->dh, li.LowPart, &li.HighPart, FILE_BEGIN);
 
     if (li.LowPart == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR) {
-        print_error(" Seek error ");
+        sansa_print_error(" Seek error ");
         return -1;
     }
     return 0;
@@ -182,7 +181,7 @@ int sansa_read(struct sansa_t* sansa, unsigned char* buf, int nbytes)
     unsigned long count;
 
     if (!ReadFile(sansa->dh, buf, nbytes, &count, NULL)) {
-        print_error(" Error reading from disk: ");
+        sansa_print_error(" Error reading from disk: ");
         return -1;
     }
 
@@ -194,7 +193,7 @@ int sansa_write(struct sansa_t* sansa, unsigned char* buf, int nbytes)
     unsigned long count;
 
     if (!WriteFile(sansa->dh, buf, nbytes, &count, NULL)) {
-        print_error(" Error writing to disk: ");
+        sansa_print_error(" Error writing to disk: ");
         return -1;
     }
 

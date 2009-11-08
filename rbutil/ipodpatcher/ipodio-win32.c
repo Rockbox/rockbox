@@ -54,7 +54,7 @@ static int unlock_volume(HANDLE hDisk)
 			 &dummy, NULL); 
 } 
 
-void print_error(char* msg)
+void ipod_print_error(char* msg)
 {
     LPSTR pMsgBuf = NULL;
 
@@ -78,7 +78,7 @@ int ipod_open(struct ipod_t* ipod, int silent)
                     FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
 
     if (ipod->dh == INVALID_HANDLE_VALUE) {
-        if (!silent) print_error(" Error opening disk: ");
+        if (!silent) ipod_print_error(" Error opening disk: ");
         if(GetLastError() == ERROR_ACCESS_DENIED)
             return -2;
         else
@@ -86,7 +86,7 @@ int ipod_open(struct ipod_t* ipod, int silent)
     }
 
     if (!lock_volume(ipod->dh)) {
-        if (!silent) print_error(" Error locking disk: ");
+        if (!silent) ipod_print_error(" Error locking disk: ");
         return -1;
     }
 
@@ -110,7 +110,7 @@ int ipod_open(struct ipod_t* ipod, int silent)
                              sizeof(diskgeometry),
                              &n,
                              NULL)) {
-            if (!silent) print_error(" Error reading disk geometry: ");
+            if (!silent) ipod_print_error(" Error reading disk geometry: ");
             return -1;
         } else {
             ipod->sector_size = diskgeometry.BytesPerSector;
@@ -137,12 +137,12 @@ int ipod_reopen_rw(struct ipod_t* ipod)
                      FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
 
     if (ipod->dh == INVALID_HANDLE_VALUE) {
-        print_error(" Error opening disk: ");
+        ipod_print_error(" Error opening disk: ");
         return -1;
     }
 
     if (!lock_volume(ipod->dh)) {
-        print_error(" Error locking disk: ");
+        ipod_print_error(" Error locking disk: ");
         return -1;
     }
 
@@ -162,7 +162,7 @@ int ipod_alloc_buffer(unsigned char** sectorbuf, int bufsize)
        the disk sector size. */
     *sectorbuf = (unsigned char*)VirtualAlloc(NULL, bufsize, MEM_COMMIT, PAGE_READWRITE);
     if (*sectorbuf == NULL) {
-        print_error(" Error allocating a buffer: ");
+        ipod_print_error(" Error allocating a buffer: ");
         return -1;
     }
     return 0;
@@ -171,7 +171,7 @@ int ipod_alloc_buffer(unsigned char** sectorbuf, int bufsize)
 int ipod_seek(struct ipod_t* ipod, unsigned long pos)
 {
     if (SetFilePointer(ipod->dh, pos, NULL, FILE_BEGIN)==0xffffffff) {
-        print_error(" Seek error ");
+        ipod_print_error(" Seek error ");
         return -1;
     }
     return 0;
@@ -182,7 +182,7 @@ ssize_t ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes)
     unsigned long count;
 
     if (!ReadFile(ipod->dh, buf, nbytes, &count, NULL)) {
-        print_error(" Error reading from disk: ");
+        ipod_print_error(" Error reading from disk: ");
         return -1;
     }
 
@@ -194,7 +194,7 @@ ssize_t ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes)
     unsigned long count;
 
     if (!WriteFile(ipod->dh, buf, nbytes, &count, NULL)) {
-        print_error(" Error writing to disk: ");
+        ipod_print_error(" Error writing to disk: ");
         return -1;
     }
 
