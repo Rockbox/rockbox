@@ -41,14 +41,6 @@
 #include "dsp.h"
 #include "thread.h"
 
-/* Clip sample to signed 16 bit range */
-static inline int32_t clip_sample_16(int32_t sample)
-{
-    if ((int16_t)sample != sample)
-        sample = 0x7fff ^ (sample >> 31);
-    return sample;
-}
-
 #define PCMBUF_TARGET_CHUNK 32768 /* This is the target fill size of chunks
                                      on the pcm buffer */
 #define PCMBUF_MINAVG_CHUNK 24576 /* This is the minimum average size of
@@ -142,7 +134,6 @@ extern unsigned int codec_thread_id;
 #define LOW_DATA(quarter_secs) \
     (pcmbuf_unplayed_bytes < NATIVE_FREQUENCY * quarter_secs)
 
-static bool pcmbuf_flush_fillpos(void);
 static void pcmbuf_finish_track_change(void);
 #ifdef HAVE_CROSSFADE
 static void crossfade_start(void);
@@ -151,6 +142,7 @@ static void flush_crossfade(char *buf, size_t length);
 static bool pcmbuf_crossfade_init(bool manual_skip);
 static void pcmbuf_finish_crossfade_enable(void);
 static bool pcmbuf_is_crossfade_enabled(void);
+
 
 /**************************************/
 
@@ -253,6 +245,75 @@ static void pcmbuf_under_watermark(bool under)
     }
 }
 
+/* This is really just part of pcmbuf_flush_fillpos, but is easier to keep
+ * in a separate function for the moment */
+static inline void pcmbuf_add_chunk(void)
+{
+    register size_t size = audiobuffer_fillpos;
+    /* Grab the next description to write, and change the write pointer */
+    register struct pcmbufdesc *pcmbuf_current = pcmbuf_write;
+    pcmbuf_write = pcmbuf_current->link;
+    /* Fill in the values in the new buffer chunk */
+    pcmbuf_current->addr = &audiobuffer[audiobuffer_pos];
+    pcmbuf_current->size = size;
+    pcmbuf_current->end_of_track = end_of_track;
+    pcmbuf_current->link = NULL;
+    end_of_track = false;   /* This is single use only */
+    if (pcmbuf_read != NULL) {
+        if (pcmbuf_flush)
+        {
+            pcmbuf_write_end->link = pcmbuf_read->link;
+            pcmbuf_read->link = pcmbuf_current;
+            while (pcmbuf_write_end->link)
+            {
+                pcmbuf_write_end = pcmbuf_write_end->link;
+                pcmbuf_unplayed_bytes -= pcmbuf_write_end->size;
+            }
+            pcmbuf_flush = false;
+        }
+        /* If there is already a read buffer setup, add to it */
+        else
+            pcmbuf_read_end->link = pcmbuf_current;
+    } else {
+        /* Otherwise create the buffer */
+        pcmbuf_read = pcmbuf_current;
+    }
+    /* This is now the last buffer to read */
+    pcmbuf_read_end = pcmbuf_current;
+
+    /* Update bytes counters */
+    pcmbuf_unplayed_bytes += size;
+
+    audiobuffer_pos += size;
+    if (audiobuffer_pos >= pcmbuf_size)
+        audiobuffer_pos -= pcmbuf_size;
+
+    audiobuffer_fillpos = 0;
+    DISPLAY_DESC("add_chunk");
+}
+
+/**
+ * Commit samples waiting to the pcm buffer.
+ */
+static bool pcmbuf_flush_fillpos(void)
+{
+    if (audiobuffer_fillpos) {
+        /* Never use the last buffer descriptor */
+        while (pcmbuf_write == pcmbuf_write_end) {
+            /* If this happens, something is being stupid */
+            if (!pcm_is_playing()) {
+                logf("pcmbuf_flush_fillpos error");
+                pcmbuf_play_start();
+            }
+            /* Let approximately one chunk of data playback */
+            sleep(HZ*PCMBUF_TARGET_CHUNK/(NATIVE_FREQUENCY*4));
+        }
+        pcmbuf_add_chunk();
+        return true;
+    }
+    return false;
+}
+
 static bool prepare_insert(size_t length)
 {
     if (low_latency_mode)
@@ -342,75 +403,6 @@ void pcmbuf_write_complete(int count)
         if (NEED_FLUSH(audiobuffer_pos + audiobuffer_fillpos))
             pcmbuf_flush_fillpos();
     }
-}
-
-/* This is really just part of pcmbuf_flush_fillpos, but is easier to keep
- * in a separate function for the moment */
-static inline void pcmbuf_add_chunk(void)
-{
-    register size_t size = audiobuffer_fillpos;
-    /* Grab the next description to write, and change the write pointer */
-    register struct pcmbufdesc *pcmbuf_current = pcmbuf_write;
-    pcmbuf_write = pcmbuf_current->link;
-    /* Fill in the values in the new buffer chunk */
-    pcmbuf_current->addr = &audiobuffer[audiobuffer_pos];
-    pcmbuf_current->size = size;
-    pcmbuf_current->end_of_track = end_of_track;
-    pcmbuf_current->link = NULL;
-    end_of_track = false;   /* This is single use only */
-    if (pcmbuf_read != NULL) {
-        if (pcmbuf_flush)
-        {
-            pcmbuf_write_end->link = pcmbuf_read->link;
-            pcmbuf_read->link = pcmbuf_current;
-            while (pcmbuf_write_end->link)
-            {
-                pcmbuf_write_end = pcmbuf_write_end->link;
-                pcmbuf_unplayed_bytes -= pcmbuf_write_end->size;
-            }
-            pcmbuf_flush = false;
-        }
-        /* If there is already a read buffer setup, add to it */
-        else
-            pcmbuf_read_end->link = pcmbuf_current;
-    } else {
-        /* Otherwise create the buffer */
-        pcmbuf_read = pcmbuf_current;
-    }
-    /* This is now the last buffer to read */
-    pcmbuf_read_end = pcmbuf_current;
-
-    /* Update bytes counters */
-    pcmbuf_unplayed_bytes += size;
-
-    audiobuffer_pos += size;
-    if (audiobuffer_pos >= pcmbuf_size)
-        audiobuffer_pos -= pcmbuf_size;
-
-    audiobuffer_fillpos = 0;
-    DISPLAY_DESC("add_chunk");
-}
-
-/**
- * Commit samples waiting to the pcm buffer.
- */
-static bool pcmbuf_flush_fillpos(void)
-{
-    if (audiobuffer_fillpos) {
-        /* Never use the last buffer descriptor */
-        while (pcmbuf_write == pcmbuf_write_end) {
-            /* If this happens, something is being stupid */
-            if (!pcm_is_playing()) {
-                logf("pcmbuf_flush_fillpos error");
-                pcmbuf_play_start();
-            }
-            /* Let approximately one chunk of data playback */
-            sleep(HZ*PCMBUF_TARGET_CHUNK/(NATIVE_FREQUENCY*4));
-        }
-        pcmbuf_add_chunk();
-        return true;
-    }
-    return false;
 }
 
 
@@ -664,6 +656,14 @@ static void pcmbuf_finish_track_change(void)
 
 
 /* Crossfade */
+
+/* Clip sample to signed 16 bit range */
+static inline int32_t clip_sample_16(int32_t sample)
+{
+    if ((int16_t)sample != sample)
+        sample = 0x7fff ^ (sample >> 31);
+    return sample;
+}
 
 /** 
  * Low memory targets don't have crossfade, so don't compile crossfade

@@ -52,7 +52,7 @@ int pcmbuf_used_descs(void);
 unsigned char *pcmbuf_get_meminfo(size_t *length);
 #endif
 
-/* misc */
+/* Misc */
 bool pcmbuf_is_lowdata(void);
 void pcmbuf_set_low_latency(bool state);
 unsigned long pcmbuf_get_latency(void);
