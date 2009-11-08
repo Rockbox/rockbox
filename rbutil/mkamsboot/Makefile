@@ -64,7 +64,7 @@ libmkamsboot$(RBARCH).a: $(LIBOBJS)
 # building the standalone executable
 $(OUTPUT): $(OBJS) $(EXTRADEPS)
 	@echo LD $@
-	$(SILENT)$(CC) $(CFLAGS) -o$(OUTPUT) $(OBJS) $(EXTRADEPS)
+	$(SILENT)$(CC) $(CFLAGS) -o $(OUTPUT) $(OBJS) $(EXTRADEPS)
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
