@@ -30,30 +30,20 @@
 #include "ftl-target.h"
 #include "nand-target.h"
 
-/* for compatibility */
-long last_disk_activity = -1;
-
 /** static, private data **/ 
 static bool initialized = false;
 
-static long nand_stack[20];
-
 /* API Functions */
-
 int nand_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
-    int rc = ftl_read(start, incount, inbuf);
-    last_disk_activity = current_tick;
-    return rc;
+    return ftl_read(start, incount, inbuf);
 }
 
 int nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
-    int rc = ftl_write(start, count, outbuf);
-    last_disk_activity = current_tick;
-    return rc;
+    return ftl_write(start, count, outbuf);
 }
 
 void nand_spindown(int seconds)
@@ -73,7 +63,7 @@ void nand_sleepnow(void)
 
 void nand_spin(void)
 {
-    last_disk_activity = current_tick;
+    nand_set_active();
 }
 
 void nand_enable(bool on)
@@ -93,39 +83,21 @@ void nand_get_info(IF_MD2(int drive,) struct storage_info *info)
 
 long nand_last_disk_activity(void)
 {
-    return last_disk_activity;
+    return nand_last_activity();
 }
 
 #ifdef HAVE_STORAGE_FLUSH
 int nand_flush(void)
 {
-    last_disk_activity = current_tick;
     int rc = ftl_sync();
     if (rc != 0) panicf("Failed to unmount flash: %X", rc);
     return rc;
 }
 #endif
 
-static void nand_thread(void)
-{
-    while (1)
-    {
-        if (TIME_AFTER(current_tick, last_disk_activity + HZ / 5))
-            nand_power_down();
-        sleep(HZ / 10);
-    }
-}
-
 int nand_init(void)
 {
     if (ftl_init()) return 1;
-
-    last_disk_activity = current_tick;
-
-    create_thread(nand_thread, nand_stack,
-                  sizeof(nand_stack), 0, "nand"
-                  IF_PRIO(, PRIORITY_USER_INTERFACE)
-                  IF_COP(, CPU));
 
     initialized = true;
     return 0;

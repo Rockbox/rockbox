@@ -88,6 +88,8 @@ uint8_t nand_tunk2[4];
 uint8_t nand_tunk3[4];
 uint32_t nand_type[4];
 int nand_powered = 0;
+long nand_last_activity_value = -1;
+static long nand_stack[20];
 
 static struct mutex nand_mtx;
 static struct wakeup nand_wakeup;
@@ -186,7 +188,6 @@ uint32_t nand_reset(uint32_t bank)
     if (nand_send_cmd(NAND_CMD_RESET)) return 1;
     if (nand_wait_chip_ready(bank)) return 1;
     FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
-    sleep(HZ / 100);  /* Some chips seem to need this */
     return 0;
 }
 
@@ -301,10 +302,21 @@ uint32_t nand_get_chip_type(uint32_t bank)
     return nand_unlock(result);
 }
 
+void nand_set_active(void)
+{
+    nand_last_activity_value = current_tick;
+}
+
+long nand_last_activity(void)
+{
+    return nand_last_activity_value;
+}
+
 void nand_power_up(void)
 {
     uint32_t i;
     mutex_lock(&nand_mtx);
+    nand_last_activity_value = current_tick;
     PWRCONEXT &= ~0x40;
     PWRCON &= ~0x100000;
     PCON2 = 0x33333333;
@@ -318,13 +330,16 @@ void nand_power_up(void)
     pmu_ldo_set_voltage(4, 0x15);
     pmu_ldo_power_on(4);
     sleep(HZ / 20);
+    nand_last_activity_value = current_tick;
     for (i = 0; i < 4; i++) nand_reset(i);
     nand_powered = 1;
+    nand_last_activity_value = current_tick;
     mutex_unlock(&nand_mtx);
 }
 
 void nand_power_down(void)
 {
+    if (!nand_powered) return;
     mutex_lock(&nand_mtx);
     pmu_ldo_power_off(4);
     PCON2 = 0x11111111;
@@ -352,6 +367,7 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
     if (sparebuffer && !((uint32_t)sparebuffer & 0xf))
         spare = (uint8_t*)sparebuffer;
     mutex_lock(&nand_mtx);
+    nand_last_activity_value = current_tick;
     led(true);
     if (!nand_powered) nand_power_up();
     uint32_t rc, eccresult;
@@ -409,6 +425,7 @@ uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
     if (sparebuffer && !((uint32_t)sparebuffer & 0xf))
         spare = (uint8_t*)sparebuffer;
     mutex_lock(&nand_mtx);
+    nand_last_activity_value = current_tick;
     led(true);
     if (!nand_powered) nand_power_up();
     if (sparebuffer)
@@ -443,6 +460,7 @@ uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
 uint32_t nand_block_erase(uint32_t bank, uint32_t page)
 {
     mutex_lock(&nand_mtx);
+    nand_last_activity_value = current_tick;
     led(true);
     if (!nand_powered) nand_power_up();
     nand_set_fmctrl0(bank, 0);
@@ -463,6 +481,17 @@ const struct nand_device_info_type* nand_get_device_type(uint32_t bank)
     return &nand_deviceinfotable[nand_type[bank]];
 }
 
+static void nand_thread(void)
+{
+    while (1)
+    {
+        if (TIME_AFTER(current_tick, nand_last_activity_value + HZ / 5)
+         && nand_powered)
+            nand_power_down();
+        sleep(HZ / 10);
+    }
+}
+
 uint32_t nand_device_init(void)
 {
     mutex_init(&nand_mtx);
@@ -472,7 +501,7 @@ uint32_t nand_device_init(void)
 
     uint32_t type;
     uint32_t i, j;
-    if (!nand_powered) nand_power_up();
+    nand_power_up();
     for (i = 0; i < 4; i++)
     {
         nand_tunk1[i] = 7;
@@ -497,5 +526,12 @@ uint32_t nand_device_init(void)
         nand_tunk3[i] = nand_deviceinfotable[nand_type[i]].tunk3;
     }
     if (nand_type[0] == 0xFFFFFFFF) return 1;
+
+    nand_last_activity_value = current_tick;
+    create_thread(nand_thread, nand_stack,
+                  sizeof(nand_stack), 0, "nand"
+                  IF_PRIO(, PRIORITY_USER_INTERFACE)
+                  IF_COP(, CPU));
+
     return 0;
 }
