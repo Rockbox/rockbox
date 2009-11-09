@@ -279,6 +279,9 @@ static const struct wps_tag all_tags[] = {
 #if (CONFIG_CODEC != MAS3507D)
     { WPS_TOKEN_SOUND_PITCH,              "Sp",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
+#if (CONFIG_CODEC == SWCODEC)
+    { WPS_TOKEN_SOUND_SPEED,              "Ss",  WPS_REFRESH_DYNAMIC, NULL },
+#endif
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     { WPS_TOKEN_VLED_HDD,                 "lh",  WPS_REFRESH_DYNAMIC, NULL },
 #endif

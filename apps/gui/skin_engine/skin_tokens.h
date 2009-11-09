@@ -68,6 +68,7 @@ enum wps_token_type {
     WPS_TOKEN_SOUND_PITCH,
 #endif
 #if (CONFIG_CODEC == SWCODEC)
+    WPS_TOKEN_SOUND_SPEED,
     WPS_TOKEN_REPLAYGAIN,
     WPS_TOKEN_CROSSFADE,
 #endif

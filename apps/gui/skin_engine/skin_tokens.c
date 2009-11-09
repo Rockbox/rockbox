@@ -49,6 +49,7 @@
 #include "playlist.h"
 #if CONFIG_CODEC == SWCODEC
 #include "playback.h"
+#include "tdspeed.h"
 #endif
 #include "viewport.h"
 
@@ -830,6 +831,25 @@ const char *get_token_value(struct gui_wps *gwps,
 					       PITCH_SPEED_PRECISION * 100);
             return buf;
         }
+#endif
+
+#if CONFIG_CODEC == SWCODEC
+	case WPS_TOKEN_SOUND_SPEED:
+	{
+	    int32_t pitch = sound_get_pitch();
+	    int32_t speed;
+	    if (dsp_timestretch_available())
+		    speed = GET_SPEED(pitch, dsp_get_timestretch());
+	    else
+		    speed = pitch;
+	    snprintf(buf, buf_size, "%ld.%ld",
+                     speed / PITCH_SPEED_PRECISION,
+		     (speed  % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
+	    if (intval)
+		    *intval = pitch_speed_enum(limit, speed,
+					       PITCH_SPEED_PRECISION * 100);
+            return buf;
+	}
 #endif
 
         case WPS_TOKEN_MAIN_HOLD:
