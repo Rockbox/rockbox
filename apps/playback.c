@@ -2126,13 +2126,3 @@ int *get_codec_hid()
 {
     return &tracks[track_ridx].codec_hid;
 }
-
-bool audio_is_playing(void)
-{
-    return playing;
-}
-
-bool audio_is_paused(void)
-{
-    return paused;
-}

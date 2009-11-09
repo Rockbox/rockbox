@@ -262,7 +262,7 @@ static size_t codec_filebuf_callback(void *ptr, size_t size)
 {
     ssize_t copy_n;
 
-    if (ci.stop_codec || !audio_is_playing())
+    if (ci.stop_codec || !(audio_status() & AUDIO_STATUS_PLAY))
         return 0;
 
     copy_n = bufread(get_audio_hid(), size, ptr);
@@ -284,7 +284,7 @@ static void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     ssize_t ret;
     void *ptr;
 
-    if (!audio_is_playing())
+    if (!(audio_status() & AUDIO_STATUS_PLAY))
     {
         *realsize = 0;
         return NULL;
@@ -335,16 +335,17 @@ static void codec_seek_complete_callback(void)
 {
     logf("seek_complete");
     /* If seeking-while-playing, pcm_is_paused() is true.
-     * If seeking-while-paused, audio_is_paused() is true.
+     * If seeking-while-paused, audio_status PAUSE is true.
      * A seamless seek skips this section. */
-    if (pcm_is_paused() || audio_is_paused())
+    bool audio_paused = audio_status() & AUDIO_STATUS_PAUSE;
+    if (pcm_is_paused() || audio_paused)
     {
         /* Clear the buffer */
         pcmbuf_play_stop();
         dsp_configure(ci.dsp, DSP_FLUSH, 0);
 
         /* If seeking-while-playing, resume pcm playback */
-        if (!audio_is_paused())
+        if (!audio_paused)
             pcmbuf_pause(false);
     }
     ci.seek_time = 0;
@@ -364,7 +365,7 @@ static bool codec_request_next_track_callback(void)
 {
     int prev_codectype;
 
-    if (ci.stop_codec || !audio_is_playing())
+    if (ci.stop_codec || !(audio_status() & AUDIO_STATUS_PLAY))
         return false;
 
     prev_codectype = get_codec_base_type(thistrack_id3->codectype);
@@ -542,7 +543,7 @@ static void codec_thread(void)
             if (ci.stop_codec)
             {
                 status = CODEC_OK;
-                if (!audio_is_playing())
+                if (!(audio_status() & AUDIO_STATUS_PLAY))
                     pcmbuf_play_stop();
 
             }
@@ -553,7 +554,7 @@ static void codec_thread(void)
             case Q_CODEC_LOAD_DISK:
             case Q_CODEC_LOAD:
                 LOGFQUEUE("codec < Q_CODEC_LOAD");
-                if (audio_is_playing())
+                if (audio_status() & AUDIO_STATUS_PLAY)
                 {
                     if (ci.new_track || status != CODEC_OK)
                     {

@@ -74,8 +74,6 @@ void audio_post_track_change(bool pcmbuf);
 int get_audio_hid(void);
 int *get_codec_hid(void);
 void audio_set_prev_elapsed(unsigned long setting);
-bool audio_is_playing(void);
-bool audio_is_paused(void);
 
 /* Define one constant that includes recording related functionality */
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
