@@ -247,9 +247,9 @@ void fat_size(IF_MV2(int volume,) unsigned long* size, unsigned long* free)
 #endif
     struct bpb* fat_bpb = &fat_bpbs[volume];
     if (size)
-      *size = fat_bpb->dataclusters * fat_bpb->bpb_secperclus / 2;
+      *size = fat_bpb->dataclusters * (fat_bpb->bpb_secperclus * SECTOR_SIZE / 1024);
     if (free)
-      *free = fat_bpb->fsinfo.freecount * fat_bpb->bpb_secperclus / 2;
+      *free = fat_bpb->fsinfo.freecount * (fat_bpb->bpb_secperclus * SECTOR_SIZE / 1024);
 }
 
 void fat_init(void)
