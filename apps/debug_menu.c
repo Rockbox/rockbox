@@ -754,7 +754,7 @@ static const char* dbg_partitions_getname(int selected_item, void *data,
     struct partinfo* p = disk_partinfo(partition);
     if (selected_item%2)
     {
-        snprintf(buffer, buffer_len, "   T:%x %ld MB", p->type, p->size / 2048);
+        snprintf(buffer, buffer_len, "   T:%x %ld MB", p->type, p->size / ( 2048 / ( SECTOR_SIZE / 512 )));
     }
     else
     {
