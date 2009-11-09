@@ -68,10 +68,8 @@ struct chunkdesc
     bool end_of_track;
 };
 
-#define CHUNK_DESCS(bufsize) \
+#define NUM_CHUNK_DESCS(bufsize) \
     ((bufsize) / PCMBUF_MINAVG_CHUNK)
-#define CHUNK_DESCS_SIZE(bufsize) \
-    (CHUNK_DESCS(bufsize)*sizeof(struct chunkdesc))
 
 /* Size of the PCM buffer. */
 static size_t pcmbuf_size IDATA_ATTR = 0;
@@ -132,7 +130,6 @@ extern unsigned int codec_thread_id;
 #define LOW_DATA(quarter_secs) \
     (pcmbuf_unplayed_bytes < NATIVE_FREQUENCY * quarter_secs)
 
-static void finish_gapless_track_change(void);
 #ifdef HAVE_CROSSFADE
 static void crossfade_start(void);
 static void flush_crossfade(char *buf, size_t length);
@@ -432,22 +429,17 @@ static size_t get_next_required_pcmbuf_size(void)
     return seconds * (NATIVE_FREQUENCY*4); /* 2 channels + 2 bytes/sample */
 }
 
-static char *pcmbuf_calc_pcmbuffer_ptr(size_t bufsize)
-{
-    return pcmbuf_bufend - (bufsize + PCMBUF_MIX_CHUNK * 2 +
-               CHUNK_DESCS_SIZE(bufsize));
-}
-
 /* Initialize the pcmbuffer the structure looks like this:
  * ...|---------PCMBUF---------|FADEBUF|VOICEBUF|DESCS|... */
 size_t pcmbuf_init(unsigned char *bufend)
 {
     pcmbuf_bufend = bufend;
     pcmbuf_size = get_next_required_pcmbuf_size();
-    pcmbuffer = pcmbuf_calc_pcmbuffer_ptr(pcmbuf_size);
-    fadebuf = &pcmbuffer[pcmbuf_size];
-    voicebuf = &fadebuf[PCMBUF_MIX_CHUNK];
-    write_chunk = (struct chunkdesc *)&voicebuf[PCMBUF_MIX_CHUNK];
+    write_chunk = (struct chunkdesc *)pcmbuf_bufend -
+        NUM_CHUNK_DESCS(pcmbuf_size);
+    voicebuf = (char *)write_chunk - PCMBUF_MIX_CHUNK;
+    fadebuf = voicebuf - PCMBUF_MIX_CHUNK;
+    pcmbuffer = fadebuf - pcmbuf_size;
 
     init_pcmbuffers();
 
@@ -460,123 +452,6 @@ size_t pcmbuf_init(unsigned char *bufend)
     pcmbuf_play_stop();
 
     return pcmbuf_bufend - pcmbuffer;
-}
-
-
-/* Playback */
-
-/** PCM driver callback
- * This function has 3 major logical parts (separated by brackets both for
- * readability and variable scoping).  The first part performs the
- * operations related to finishing off the last buffer we fed to the DMA.
- * The second part detects the end of playlist condition when the pcm
- * buffer is empty except for uncommitted samples.  Then they are committed.
- * The third part performs the operations involved in sending a new buffer
- * to the DMA. */
-static void pcmbuf_pcm_callback(unsigned char** start, size_t* size) ICODE_ATTR;
-static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
-{
-    {
-        struct chunkdesc *pcmbuf_current = read_chunk;
-        /* Take the finished buffer out of circulation */
-        read_chunk = pcmbuf_current->link;
-
-        /* if during a track transition, update the elapsed time */
-        if (track_transition)
-            audio_pcmbuf_position_callback(last_chunksize);
-        
-        /* if last buffer in the track, let the audio thread know */
-        if (pcmbuf_current->end_of_track)
-            finish_gapless_track_change();
-
-        /* Put the finished buffer back into circulation */
-        write_end_chunk->link = pcmbuf_current;
-        write_end_chunk = pcmbuf_current;
-
-        /* If we've read over the mix chunk while it's still mixing there */
-        if (pcmbuf_current == mix_chunk)
-            mix_chunk = NULL;
-        /* If we've read over the crossfade chunk while it's still fading */
-        if (pcmbuf_current == crossfade_chunk)
-            crossfade_chunk = read_chunk;
-    }
-    
-    {
-        /* Commit last samples at end of playlist */
-        if (pcmbuffer_fillpos && !read_chunk)
-        {
-            logf("pcmbuf_pcm_callback: commit last samples");
-            commit_chunk();
-        }
-    }
-
-    {
-        /* Send the new buffer to the pcm */
-        struct chunkdesc *pcmbuf_new = read_chunk;
-        size_t *realsize = size;
-        unsigned char** realstart = start;
-        if(pcmbuf_new)
-        {
-            size_t current_size = pcmbuf_new->size;
-
-            pcmbuf_unplayed_bytes -= current_size;
-            last_chunksize = current_size;
-            *realsize = current_size;
-            *realstart = pcmbuf_new->addr;
-        }
-        else
-        {
-            /* No more buffers */
-            last_chunksize = 0;
-            *realsize = 0;
-            *realstart = NULL;
-            if (end_of_track)
-                finish_gapless_track_change();
-        }
-    }
-    DISPLAY_DESC("callback");
-}
-
-/* Force playback. */
-void pcmbuf_play_start(void)
-{
-    if (!pcm_is_playing() && pcmbuf_unplayed_bytes && read_chunk != NULL)
-    {
-        last_chunksize = read_chunk->size;
-        pcmbuf_unplayed_bytes -= last_chunksize;
-        pcm_play_data(pcmbuf_pcm_callback,
-            (unsigned char *)read_chunk->addr, last_chunksize);
-    }
-}
-
-void pcmbuf_play_stop(void)
-{
-    pcm_play_stop();
-
-    pcmbuf_unplayed_bytes = 0;
-    mix_chunk = NULL;
-    if (read_chunk) {
-        write_end_chunk->link = read_chunk;
-        write_end_chunk = read_end_chunk;
-        read_chunk = read_end_chunk = NULL;
-    }
-    pcmbuffer_pos = 0;
-    pcmbuffer_fillpos = 0;
-    crossfade_track_change_started = false;
-    crossfade_active = false;
-    flush_pcmbuf = false;
-    DISPLAY_DESC("play_stop");
-
-    /* Can unboost the codec thread here no matter who's calling */
-    boost_codec_thread(false);
-}
-
-void pcmbuf_pause(bool pause)
-{
-    if (pcm_is_playing())
-        pcm_play_pause(!pause);
-    else if (!pause)
-        pcmbuf_play_start();
 }
 
 
@@ -662,6 +537,120 @@ static void finish_gapless_track_change(void)
     
     /* notify playback that the track has just finished */
     audio_post_track_change(true);
+}
+
+
+/* Playback */
+
+/** PCM driver callback
+ * This function has 3 major logical parts (separated by brackets both for
+ * readability and variable scoping).  The first part performs the
+ * operations related to finishing off the last buffer we fed to the DMA.
+ * The second part detects the end of playlist condition when the pcm
+ * buffer is empty except for uncommitted samples.  Then they are committed.
+ * The third part performs the operations involved in sending a new buffer
+ * to the DMA. */
+static void pcmbuf_pcm_callback(unsigned char** start, size_t* size) ICODE_ATTR;
+static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
+{
+    {
+        struct chunkdesc *pcmbuf_current = read_chunk;
+        /* Take the finished buffer out of circulation */
+        read_chunk = pcmbuf_current->link;
+
+        /* if during a track transition, update the elapsed time */
+        if (track_transition)
+            audio_pcmbuf_position_callback(last_chunksize);
+        
+        /* if last buffer in the track, let the audio thread know */
+        if (pcmbuf_current->end_of_track)
+            finish_gapless_track_change();
+
+        /* Put the finished buffer back into circulation */
+        write_end_chunk->link = pcmbuf_current;
+        write_end_chunk = pcmbuf_current;
+
+        /* If we've read over the mix chunk while it's still mixing there */
+        if (pcmbuf_current == mix_chunk)
+            mix_chunk = NULL;
+        /* If we've read over the crossfade chunk while it's still fading */
+        if (pcmbuf_current == crossfade_chunk)
+            crossfade_chunk = read_chunk;
+    }
+    
+    {
+        /* Commit last samples at end of playlist */
+        if (pcmbuffer_fillpos && !read_chunk)
+        {
+            logf("pcmbuf_pcm_callback: commit last samples");
+            commit_chunk();
+        }
+    }
+
+    {
+        /* Send the new buffer to the pcm */
+        if(read_chunk)
+        {
+            size_t current_size = read_chunk->size;
+
+            pcmbuf_unplayed_bytes -= current_size;
+            last_chunksize = current_size;
+            *size = current_size;
+            *start = read_chunk->addr;
+        }
+        else
+        {
+            /* No more buffers */
+            last_chunksize = 0;
+            *size = 0;
+            *start = NULL;
+            if (end_of_track)
+                finish_gapless_track_change();
+        }
+    }
+    DISPLAY_DESC("callback");
+}
+
+/* Force playback. */
+void pcmbuf_play_start(void)
+{
+    if (!pcm_is_playing() && pcmbuf_unplayed_bytes && read_chunk != NULL)
+    {
+        last_chunksize = read_chunk->size;
+        pcmbuf_unplayed_bytes -= last_chunksize;
+        pcm_play_data(pcmbuf_pcm_callback,
+            (unsigned char *)read_chunk->addr, last_chunksize);
+    }
+}
+
+void pcmbuf_play_stop(void)
+{
+    pcm_play_stop();
+
+    pcmbuf_unplayed_bytes = 0;
+    mix_chunk = NULL;
+    if (read_chunk) {
+        write_end_chunk->link = read_chunk;
+        write_end_chunk = read_end_chunk;
+        read_chunk = read_end_chunk = NULL;
+    }
+    pcmbuffer_pos = 0;
+    pcmbuffer_fillpos = 0;
+    crossfade_track_change_started = false;
+    crossfade_active = false;
+    flush_pcmbuf = false;
+    DISPLAY_DESC("play_stop");
+
+    /* Can unboost the codec thread here no matter who's calling */
+    boost_codec_thread(false);
+}
+
+void pcmbuf_pause(bool pause)
+{
+    if (pcm_is_playing())
+        pcm_play_pause(!pause);
+    else if (!pause)
+        pcmbuf_play_start();
 }
 
 
@@ -1095,7 +1084,7 @@ int pcmbuf_used_descs(void)
 
 int pcmbuf_descs(void)
 {
-    return CHUNK_DESCS(pcmbuf_size);
+    return NUM_CHUNK_DESCS(pcmbuf_size);
 }
 
 #ifdef ROCKBOX_HAS_LOGF
