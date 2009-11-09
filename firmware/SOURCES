@@ -881,6 +881,7 @@ target/arm/tms320dm320/uart-dm320.c
 
 #ifdef MROBE_500
 #ifndef SIMULATOR
+target/arm/ata-as-arm.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
 target/arm/tms320dm320/mrobe-500/adc-mr500.c

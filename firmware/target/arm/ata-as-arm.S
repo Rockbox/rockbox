@@ -38,6 +38,12 @@
 #elif defined(CREATIVE_ZVx) /* Zen Vision could have an other address */
     .text
     .equ    .ata_port, 0x50FEE000
+#elif defined(MROBE_500)
+    .text
+    .equ    .ata_port, 0x50400000
+#else
+    /* This isn't vaild, but it does it's job, not sure what this should be */
+    #error ata_port undefined!
 #endif
 
     .align  2

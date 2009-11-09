@@ -22,9 +22,18 @@
 #ifndef ATA_TARGET_H
 #define ATA_TARGET_H
 
+#if 0
 /* Plain C read & write loops */
 #define PREFER_C_READING
 #define PREFER_C_WRITING
+#else
+/* ASM optimized reading and writing */
+#define ATA_OPTIMIZED_READING
+#define ATA_OPTIMIZED_WRITING
+
+void copy_read_sectors(const unsigned char* buf, int wordcount);
+void copy_write_sectors(const unsigned char* buf, int wordcount);
+#endif
 
 #define ATA_IOBASE      0x50000000
 #define REGISTER_OFFSET (ATA_IOBASE+0x00400000) /* A21 = High */
