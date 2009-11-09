@@ -448,7 +448,7 @@ static bool codec_load_next_track(void)
     {
         case Q_CODEC_REQUEST_COMPLETE:
             LOGFQUEUE("codec |< Q_CODEC_REQUEST_COMPLETE");
-            pcmbuf_start_track_change(!automatic_skip);
+            pcmbuf_start_track_change(automatic_skip);
             return true;
 
         case Q_CODEC_REQUEST_FAILED:
