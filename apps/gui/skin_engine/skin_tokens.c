@@ -107,6 +107,7 @@ static char* get_dir(char* buf, int buf_size, const char* path, int level)
     return buf;
 }
 
+#if (CONFIG_CODEC != MAS3507D)
 /* A helper to determine the enum value for pitch/speed.
 
    When there are two choices (i.e. boolean), return 1 if the value is
@@ -142,6 +143,7 @@ static int pitch_speed_enum(int range, int32_t val, int32_t normval)
 	n = (center * val) / normval + 1;
 	return (range <= n) ? (range - 1) : n;
 }
+#endif
 
 /* Return the tag found at index i and write its value in buf.
    The return value is buf if the tag had a value, or NULL if not.
