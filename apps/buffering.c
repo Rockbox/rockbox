@@ -47,7 +47,6 @@
 #include "screens.h"
 #include "playlist.h"
 #include "pcmbuf.h"
-#include "buffer.h"
 #include "bmp.h"
 #include "appevents.h"
 #include "metadata.h"

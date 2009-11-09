@@ -40,7 +40,6 @@
 #include "metadata.h"
 #include "screens.h"
 #include "tree.h"
-#include "buffer.h"
 #include "settings.h"
 #include "playlist_viewer.h"
 #include "talk.h"

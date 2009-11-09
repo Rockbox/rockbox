@@ -36,7 +36,6 @@
 #include "lang.h"
 #include "debug.h"
 #include "settings.h"
-#include "buffer.h"
 #include "plugin.h"
 #include "playback.h"
 #include "cuesheet.h"

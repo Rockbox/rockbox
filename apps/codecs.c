@@ -39,7 +39,6 @@
 #include "lang.h"
 #include "keyboard.h"
 #include "mpeg.h"
-#include "buffer.h"
 #include "buffering.h"
 #include "mp3_playback.h"
 #include "backlight.h"

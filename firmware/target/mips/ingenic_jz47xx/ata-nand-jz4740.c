@@ -28,7 +28,6 @@
 #include "panic.h"
 #include "kernel.h"
 #include "storage.h"
-#include "buffer.h"
 #include "string.h"
 /*#define LOGF_ENABLE*/
 #include "logf.h"
