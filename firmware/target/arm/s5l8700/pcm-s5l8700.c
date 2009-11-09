@@ -42,8 +42,9 @@
 
 static volatile int locked = 0;
 size_t nextsize;
+size_t dblbufsize;
 int dmamode;
-unsigned char* dblbuf;
+const unsigned char* dblbuf;
 
 /* table of recommended PLL/MCLK dividers for mode 256Fs from the datasheet */
 static const struct div_entry {
@@ -96,8 +97,8 @@ void pcm_play_unlock(void)
     }
 }
 
-static void* dma_callback(void) ICODE_ATTR __attribute__((unused));
-static void* dma_callback(void)
+static const void* dma_callback(void) ICODE_ATTR __attribute__((unused));
+static const void* dma_callback(void)
 {
     if (dmamode)
     {
@@ -106,9 +107,10 @@ static void* dma_callback(void)
         if (get_more)
         {
             get_more(&dma_start_addr, &nextsize);
-            if (nextsize > 4096)
+            if (nextsize >= 4096)
             {
-                nextsize = nextsize - 2048;
+                dblbufsize = nextsize >> 4;
+                nextsize = nextsize - dblbufsize;
                 dblbuf = dma_start_addr + nextsize;
                 dmamode = 0;
             }
@@ -125,7 +127,7 @@ static void* dma_callback(void)
     else
     {
         dmamode = 1;
-        nextsize = 1023;
+        nextsize = (dblbufsize >> 1) - 1;
         return dblbuf;
     }
 }
@@ -180,8 +182,10 @@ void bootstrap_fiq(const void* addr, size_t tcnt)
     );
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr_in, size_t size)
 {
+    unsigned char* addr = (unsigned char*)addr_in;
+
     /* S1: DMA channel 0 set */
     DMACON0 = (0 << 30) |       /* DEVSEL */
               (1 << 29) |       /* DIR */
@@ -221,10 +225,23 @@ void pcm_play_dma_start(const void *addr, size_t size)
 #endif
     
     /* S3: DMA channel 0 on */
+    if (!size)
+    {
+        register pcm_more_callback_type get_more = pcm_callback_for_more;
+        if (get_more) get_more(&addr, &size);
+        else return;  /* Nothing to play!? */
+    }
+    if (!size) return;  /* Nothing to play!? */
     clean_dcache();
-    dmamode = 0;
-    dblbuf = (unsigned char*)addr + size - 2048;
-    bootstrap_fiq(addr, (size >> 1) - 1025);
+    if (size >= 4096)
+    {
+        dblbufsize = size >> 4;
+        size = size - dblbufsize;
+        dblbuf = addr + size;
+        dmamode = 0;
+    }
+    else dmamode = 1;
+    bootstrap_fiq(addr, (size >> 1) - 1);
 
     /* S4: IIS Tx clock on */
     I2SCLKCON = (1 << 0);   /* 1 = power on */
@@ -319,7 +336,7 @@ void pcm_dma_apply_settings(void)
 
 size_t pcm_get_bytes_waiting(void)
 {
-    return (DMACTCNT0 + 1) << 1;
+    return (nextsize + DMACTCNT0 + 2) << 1;
 }
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
