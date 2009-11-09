@@ -41,7 +41,7 @@
 #define IRAM_IBSS_SIZE 37376
 
 /* Define CPU of large IRAM (PP5022/5024)              */
-#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || defined(CPU_S5L870X)
 /* PCM_BUFFER    : 32768 byte (4096*2*4 or 2048*4*4)   *
  * WINDOW_LOOKUP : 9216 Byte (256*4 + 2048*4)          *
  * TOTAL         : 41984                               */

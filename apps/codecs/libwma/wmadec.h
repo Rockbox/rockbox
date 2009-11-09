@@ -55,7 +55,7 @@
 
 /*define IRAM for targets with 48k/80k IRAM split*/
 #ifndef IBSS_ATTR_WMA_LARGE_IRAM
-#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || defined(CPU_S5L870X)
 /* PP5022/24 and MCF5250 have 128KB of IRAM, but only PP5022+ have 80KB allocated for codecs */
 #define IBSS_ATTR_WMA_LARGE_IRAM IBSS_ATTR
 #else
