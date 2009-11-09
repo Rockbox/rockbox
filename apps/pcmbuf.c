@@ -184,10 +184,27 @@ static bool show_desc(char *caller)
 
 /* Commit PCM data */
 
-/* This is really just part of commit_chunk, but is easier to keep
- * in a separate function for the moment */
-static inline void pcmbuf_add_chunk(void)
+/**
+ * Commit samples waiting to the pcm buffer.
+ */
+static void commit_chunk(void)
 {
+    if (!pcmbuffer_fillpos)
+        return;
+    
+    /* Never use the last buffer descriptor */
+    while (write_chunk == write_end_chunk) {
+        /* If this happens, something is being stupid */
+        if (!pcm_is_playing()) {
+            logf("commit_chunk error");
+            pcmbuf_play_start();
+        }
+        /* Let approximately one chunk of data playback */
+        sleep(HZ*PCMBUF_TARGET_CHUNK/(NATIVE_FREQUENCY*4));
+    }
+    
+    /* commit the chunk */
+    
     register size_t size = pcmbuffer_fillpos;
     /* Grab the next description to write, and change the write pointer */
     register struct chunkdesc *pcmbuf_current = write_chunk;
@@ -198,9 +215,13 @@ static inline void pcmbuf_add_chunk(void)
     pcmbuf_current->end_of_track = end_of_track;
     pcmbuf_current->link = NULL;
     end_of_track = false;   /* This is single use only */
-    if (read_chunk != NULL) {
+    
+    if (read_chunk != NULL)
+    {
         if (flush_pcmbuf)
         {
+            /* flush! discard all data after the currently playing chunk,
+               and make the current chunk play next */
             write_end_chunk->link = read_chunk->link;
             read_chunk->link = pcmbuf_current;
             while (write_end_chunk->link)
@@ -213,10 +234,13 @@ static inline void pcmbuf_add_chunk(void)
         /* If there is already a read buffer setup, add to it */
         else
             read_end_chunk->link = pcmbuf_current;
-    } else {
+    }
+    else
+    {
         /* Otherwise create the buffer */
         read_chunk = pcmbuf_current;
     }
+    
     /* This is now the last buffer to read */
     read_end_chunk = pcmbuf_current;
 
@@ -228,29 +252,7 @@ static inline void pcmbuf_add_chunk(void)
         pcmbuffer_pos -= pcmbuf_size;
 
     pcmbuffer_fillpos = 0;
-    DISPLAY_DESC("add_chunk");
-}
-
-/**
- * Commit samples waiting to the pcm buffer.
- */
-static bool commit_chunk(void)
-{
-    if (pcmbuffer_fillpos) {
-        /* Never use the last buffer descriptor */
-        while (write_chunk == write_end_chunk) {
-            /* If this happens, something is being stupid */
-            if (!pcm_is_playing()) {
-                logf("commit_chunk error");
-                pcmbuf_play_start();
-            }
-            /* Let approximately one chunk of data playback */
-            sleep(HZ*PCMBUF_TARGET_CHUNK/(NATIVE_FREQUENCY*4));
-        }
-        pcmbuf_add_chunk();
-        return true;
-    }
-    return false;
+    DISPLAY_DESC("commit_chunk");
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING
