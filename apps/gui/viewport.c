@@ -387,15 +387,15 @@ void viewport_set_defaults(struct viewport *vp,
         {
             /* copy from ui vp first (for other field),fix coordinates after */
             *vp = *user_setting;
-            /* interesect so that the ui viewport is cropped so that it
-             * is completely within the info vp */
             vp->x = MAX(a->x, b->x);
             vp->y = MAX(a->y, b->y);
             vp->width = MIN(a->x + a->width, b->x + b->width) - vp->x;
             vp->height = MIN(a->y + a->height, b->y + b->height) - vp->y;
             return;
         }
-        /* else take info vp below */
+        else /* They don't overlap, so the best wrong answer is show fullscreen */
+            viewport_set_fullscreen(vp, screen); 
+        
     }
     /* if only one is active use it
      * or if the above check for overlapping failed, use info vp then, because
