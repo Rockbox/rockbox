@@ -114,7 +114,7 @@ inline bool sb_skin_get_state(enum screen_type screen)
         case STATUSBAR_TOP:
         case STATUSBAR_BOTTOM:
         case STATUSBAR_OFF:
-            return (VP_SB_ONSCREEN(screen));
+            return (skinbars&VP_SB_ONSCREEN(screen));
     }
     return false; /* Should never actually get here */
 }
