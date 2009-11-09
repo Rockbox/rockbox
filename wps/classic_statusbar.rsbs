@@ -60,11 +60,11 @@
 
 # Repeat mode
 %Vl|r|54|0|-|8|0|
-%?mm<|%xdSi|%xdSj|%xdSk|%xdSl>
+%?mm<|%xdSk|%xdSl|%xdSm|%xdSn>
 
 # Shuffle mode
 %Vl|s|64|0|-|8|0|
-%?ps<%xdSk|>
+%?ps<%xdSm|>
 
 
 # Recording section
