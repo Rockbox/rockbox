@@ -103,14 +103,13 @@ struct keyboard_parameters
     int text_w;
     struct font* font;
     int curfont;
-    int main_x;
     int main_y;
+    int old_main_y;
     int max_chars;
     int max_chars_text;
     int lines;
     int pages;
     int keyboard_margin;
-    int old_main_y;
     int curpos;
     int leftpos;
     int page;
@@ -190,9 +189,7 @@ int load_kbd(unsigned char* filename)
             kbd_param[l].kbd_buf[i] = ch;
 
         if (ch != 0xFEFF && ch != '\r') /*skip BOM & carriage returns */
-        {
             i++;
-        }
     }
 
     close(fd);
@@ -232,55 +229,37 @@ static void say_edit(void)
 static void kbd_inschar(unsigned char* text, int buflen,
                         int* editpos, unsigned short ch)
 {
-    int i, j, k, len;
+    int i, j, len;
     unsigned char tmp[4];
     unsigned char* utf8;
 
     len = strlen(text);
-    k = utf8length(text);
     utf8 = utf8encode(ch, tmp);
     j = (long)utf8 - (long)tmp;
 
     if (len + j < buflen)
     {
-        for (i = len+j; k >= *editpos; i--)
-        {
-            text[i] = text[i-j];
-            if ((text[i] & MASK) != COMP)
-                k--;
-        }
-
-        while (j--)
-            text[i--] = tmp[j];
-
+        i = utf8seek(text, *editpos);
+        utf8 = text + i;
+        memmove(utf8 + j, utf8, len - i + 1);
+        memcpy(utf8, tmp, j);
         (*editpos)++;
     }
 }
 
 static void kbd_delchar(unsigned char* text, int* editpos)
 {
-    int i = 0;
+    int i, j, len;
     unsigned char* utf8;
 
     if (*editpos > 0)
     {
-        utf8 = text + utf8seek(text, *editpos);
-
-        do
-        {
-            i++;
-            utf8--;
-        }
-        while ((*utf8 & MASK) == COMP);
-
-        while (utf8[i])
-        {
-            *utf8 = utf8[i];
-            utf8++;
-        }
-
-        *utf8 = 0;
         (*editpos)--;
+        len = strlen(text);
+        i = utf8seek(text, *editpos);
+        utf8 = text + i;
+        j = utf8seek(utf8, 1);
+        memmove(utf8, utf8 + j, len - i - j + 1);
     }
 }
 
@@ -302,7 +281,6 @@ int kbd_input(char* text, int buflen)
 #endif
     int l; /* screen loop variable */
     int editpos;                /* Edit position on all screens */
-    const int statusbar_size = 0;
     unsigned short ch;
     unsigned char *utf8;
     bool cur_blink = true;      /* Cursor on/off flag */
@@ -402,8 +380,7 @@ int kbd_input(char* text, int buflen)
         pm->font_h = pm->font->height;
 
         /* check if FONT_UI fits the screen */
-        if (2*pm->font_h + 3 + statusbar_size + 
-            BUTTONBAR_HEIGHT > sc->getheight())
+        if (2*pm->font_h + 3 + BUTTONBAR_HEIGHT > sc->getheight())
         {
             pm->font = font_get(FONT_SYSFIXED);
             pm->font_h = pm->font->height;
@@ -504,36 +481,30 @@ int kbd_input(char* text, int buflen)
         if(pm->max_chars_text < 3 && icon_w > pm->text_w)
             pm->max_chars_text = sc_w / pm->text_w - 2;
 
-        if (!kbd_loaded)
-        {
+        pm->lines = (sc_h - BUTTONBAR_HEIGHT) / pm->font_h - 1;
+
+        if (!kbd_loaded && pm->lines > pm->DEFAULT_LINES)
             pm->lines = pm->DEFAULT_LINES;
-            pm->keyboard_margin = DEFAULT_MARGIN;
-        }
-        else
+
+        pm->keyboard_margin = sc_h - BUTTONBAR_HEIGHT
+                                - (pm->lines+1)*pm->font_h;
+
+        if (pm->keyboard_margin < 3 && pm->lines > 1)
         {
-            pm->lines = (sc_h - BUTTONBAR_HEIGHT - statusbar_size)
-                            / pm->font_h - 1;
-            pm->keyboard_margin = sc_h - BUTTONBAR_HEIGHT - statusbar_size
-                                    - (pm->lines+1)*pm->font_h;
-
-            if (pm->keyboard_margin < 3)
-            {
-                pm->lines--;
-                pm->keyboard_margin += pm->font_h;
-            }
-
-            if (pm->keyboard_margin > 6)
-                pm->keyboard_margin = 6;
+            pm->lines--;
+            pm->keyboard_margin += pm->font_h;
         }
+
+        if (pm->keyboard_margin > DEFAULT_MARGIN)
+            pm->keyboard_margin = DEFAULT_MARGIN;
 
         pm->pages = (pm->nchars + (pm->lines*pm->max_chars-1))
                         / (pm->lines*pm->max_chars);
 
-        if (pm->pages == 1 && kbd_loaded)
+        if (pm->pages == 1)
             pm->lines = (pm->nchars + pm->max_chars - 1) / pm->max_chars;
 
-        pm->main_y = pm->font_h*pm->lines + pm->keyboard_margin + statusbar_size;
-        pm->main_x = 0;
+        pm->main_y = pm->font_h*pm->lines + pm->keyboard_margin;
         pm->keyboard_margin -= pm->keyboard_margin/2;
 
 #ifdef HAVE_MORSE_INPUT
@@ -548,7 +519,6 @@ int kbd_input(char* text, int buflen)
 
     if (global_settings.talk_menu) /* voice UI? */
         talk_spell(text, true); /* spell initial text */
-
 
     while (!done)
     {
@@ -583,7 +553,7 @@ int kbd_input(char* text, int buflen)
                 /* Draw morse code screen with sysfont */
                 sc->setfont(FONT_SYSFIXED);
                 x = 0;
-                y = statusbar_size;
+                y = 0;
                 outline[1] = '\0';
 
                 /* Draw morse code table with code descriptions. */
@@ -638,7 +608,7 @@ int kbd_input(char* text, int buflen)
 
                     sc->getstringsize(outline, &w, NULL);
                     sc->putsxy(i*pm->font_w + (pm->font_w-w) / 2,
-                               j*pm->font_h + statusbar_size, outline);
+                               j*pm->font_h, outline);
 
                     if (++i >= pm->max_chars)
                     {
@@ -683,7 +653,7 @@ int kbd_input(char* text, int buflen)
                 {
                     int w;
                     outline[j] = 0;
-                    j=0;
+                    j = 0;
                     sc->getstringsize(outline, &w, NULL);
                     sc->putsxy(text_margin + i*text_w + (text_w-w)/2,
                                 pm->main_y, outline);
@@ -757,8 +727,7 @@ int kbd_input(char* text, int buflen)
 #ifdef HAVE_MORSE_INPUT
             if(!morse_mode)
 #endif
-                sc->fillrect(pm->font_w*pm->x,
-                             statusbar_size + pm->font_h*pm->y,
+                sc->fillrect(pm->font_w*pm->x, pm->font_h*pm->y,
                              pm->font_w, pm->font_h);
             sc->set_drawmode(DRMODE_SOLID);
         }
@@ -798,13 +767,18 @@ int kbd_input(char* text, int buflen)
 
         switch ( button )
         {
+            case ACTION_KBD_DONE:
+                /* accepts what was entered and continues */
+                ret = 0;
+                done = true;
+                break;
+
             case ACTION_KBD_ABORT:
                 ret = -1;
                 done = true;
                 break;
 
             case ACTION_KBD_PAGE_FLIP:
-            {
 #ifdef HAVE_MORSE_INPUT
                 if (morse_mode)
                     break;
@@ -815,7 +789,6 @@ int kbd_input(char* text, int buflen)
                 ch = get_kbd_ch(pm);
                 kbd_spellchar(ch);
                 break;
-                }
 
 #if defined(HAVE_MORSE_INPUT) && defined(KBD_TOGGLE_INPUT)
             case ACTION_KBD_MORSE_INPUT:
@@ -827,18 +800,13 @@ int kbd_input(char* text, int buflen)
                     struct screen *sc = &screens[l];
 
                     if (morse_mode)
-                    {
-                        pm->old_main_y = pm->main_y;
                         pm->main_y = sc->getheight() - pm->font_h - BUTTONBAR_HEIGHT;
-                    }
                     else
-                    {
                         pm->main_y = pm->old_main_y;
-                    }
                 }
                 /* FIXME: We should talk something like Morse mode.. */
                 break;
-#endif /* KBD_TOGGLE_INPUT */
+#endif /* HAVE_MORSE_INPUT && KBD_TOGGLE_INPUT */
 
             case ACTION_KBD_RIGHT:
                 if (++pm->x >= pm->max_chars)
@@ -872,38 +840,31 @@ int kbd_input(char* text, int buflen)
 
             case ACTION_KBD_DOWN:
 #ifdef HAVE_MORSE_INPUT
-#ifdef KBD_MODES
                 if (morse_mode)
                 {
+#ifdef KBD_MODES
                     pm->line_edit = !pm->line_edit;
                     if(pm->line_edit)
                         say_edit();
-                }
-                else
-#else
-                if (morse_mode)
+#endif
                     break;
-#endif
-#endif /* HAVE_MORSE_INPUT */
-                {
-#ifdef KBD_MODES
-                    if (pm->line_edit)
-                    {
-                        pm->y = 0;
-                        pm->line_edit = false;
-                    }
-                    else
-#endif
-                    if (++pm->y >= pm->lines)
-#ifdef KBD_MODES
-                    {
-                        pm->line_edit = true;
-                        say_edit();
-                    }
-#else
-                        pm->y = 0;
-#endif
                 }
+#endif /* HAVE_MORSE_INPUT */
+#ifdef KBD_MODES
+                if (pm->line_edit)
+                {
+                    pm->y = 0;
+                    pm->line_edit = false;
+                }
+                else if (++pm->y >= pm->lines)
+                {
+                    pm->line_edit = true;
+                    say_edit();
+                }
+#else
+                if (++pm->y >= pm->lines)
+                    pm->y = 0;
+#endif
 #ifdef KBD_MODES
                 if (!pm->line_edit)
 #endif
@@ -915,38 +876,31 @@ int kbd_input(char* text, int buflen)
 
             case ACTION_KBD_UP:
 #ifdef HAVE_MORSE_INPUT
-#ifdef KBD_MODES
                 if (morse_mode)
                 {
+#ifdef KBD_MODES
                     pm->line_edit = !pm->line_edit;
                     if(pm->line_edit)
                         say_edit();
-                }
-                else
-#else
-                if (morse_mode)
+#endif
                     break;
-#endif
-#endif /* HAVE_MORSE_INPUT */
-                {
-#ifdef KBD_MODES
-                    if (pm->line_edit)
-                    {
-                        pm->y = pm->lines - 1;
-                        pm->line_edit = false;
-                    }
-                    else
-#endif
-                    if (--pm->y < 0)
-#ifdef KBD_MODES
-                    {
-                        pm->line_edit = true;
-                        say_edit();
-                    }
-#else
-                        pm->y = pm->lines - 1;
-#endif
                 }
+#endif /* HAVE_MORSE_INPUT */
+#ifdef KBD_MODES
+                if (pm->line_edit)
+                {
+                    pm->y = pm->lines - 1;
+                    pm->line_edit = false;
+                }
+                else if (--pm->y < 0)
+                {
+                    pm->line_edit = true;
+                    say_edit();
+                }
+#else
+                if (--pm->y < 0)
+                    pm->y = pm->lines - 1;
+#endif
 #ifdef KBD_MODES
                 if (!pm->line_edit)
 #endif
@@ -954,12 +908,6 @@ int kbd_input(char* text, int buflen)
                     ch = get_kbd_ch(pm);
                     kbd_spellchar(ch);
                 }
-                break;
-
-            case ACTION_KBD_DONE:
-                /* accepts what was entered and continues */
-                ret = 0;
-                done = true;
                 break;
 
 #ifdef HAVE_MORSE_INPUT
@@ -970,7 +918,6 @@ int kbd_input(char* text, int buflen)
                     if ((current_tick - morse_tick) > HZ/5)
                         morse_code |= 0x01;
                 }
-
                 break;
 #endif /* HAVE_MORSE_INPUT */
 
@@ -1058,9 +1005,7 @@ int kbd_input(char* text, int buflen)
                     kbd_inschar(text, buflen, &editpos, ch);
 
                     if (global_settings.talk_menu) /* voice UI? */
-                        talk_spell(text, false);
-
-                    /* speak revised text */
+                        talk_spell(text, false);   /* speak revised text */
                 }
                 break;
 
@@ -1172,13 +1117,13 @@ int kbd_input(char* text, int buflen)
     if (ret < 0)
         splash(HZ/2, ID2P(LANG_CANCEL));
 
-#ifdef HAVE_MORSE_INPUT
+#if defined(HAVE_MORSE_INPUT) && defined(KBD_TOGGLE_INPUT)
     if(global_settings.morse_input != morse_mode)
     {
         global_settings.morse_input = morse_mode;
         settings_save();
     }
-#endif /* HAVE_MORSE_INPUT */
+#endif /* HAVE_MORSE_INPUT && KBD_TOGGLE_INPUT */
 
     FOR_NB_SCREENS(l)
         screens[l].setfont(FONT_UI);
