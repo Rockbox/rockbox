@@ -502,9 +502,10 @@ static void start_crossfade_track_change(bool auto_skip)
 
 void pcmbuf_start_track_change(bool auto_skip)
 {
+    bool crossfade = false;
     /* Manual track change (always crossfade or flush audio). */
     if (!auto_skip)
-        start_crossfade_track_change(false);
+        crossfade = true;
     
     /* Automatic track change w/crossfade, if not in "Track Skip Only" mode. */
     else if (pcmbuf_is_crossfade_enabled() && !pcmbuf_is_crossfade_active()
@@ -513,16 +514,15 @@ void pcmbuf_start_track_change(bool auto_skip)
         if (global_settings.crossfade == CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP)
         {
             if (global_settings.playlist_shuffle)
-                /* shuffle mode is on, so crossfade: */
-                start_crossfade_track_change(true);
-            else
-                /* shuffle mode is off, so normal gapless playback */
-                start_gapless_track_change();
+                crossfade = true;
         }
         else
-            /* normal crossfade:  */
-            start_crossfade_track_change(true);
+            crossfade = true;
     }
+    
+    if (crossfade)
+        /* crossfade to next track */
+        start_crossfade_track_change(auto_skip);
     else
         /* normal gapless playback. */
         start_gapless_track_change();
