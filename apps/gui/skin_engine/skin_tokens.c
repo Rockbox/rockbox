@@ -107,6 +107,42 @@ static char* get_dir(char* buf, int buf_size, const char* path, int level)
     return buf;
 }
 
+/* A helper to determine the enum value for pitch/speed.
+
+   When there are two choices (i.e. boolean), return 1 if the value is
+   different from normal value and 2 if the value is the same as the
+   normal value.  E.g. "%?Sp<%Sp>" would show the pitch only when
+   playing at a modified pitch.
+
+   When there are more than two choices (i.e. enum), the left half of
+   the choices are to show 0..normal range, and the right half of the
+   choices are to show values over that.  The last entry is used when
+   it is set to the normal setting, following the rockbox convention
+   to use the last entry for special values.
+
+   E.g.
+
+   2 items: %?Sp<0..99 or 101..infinity|100>
+   3 items: %?Sp<0..99|101..infinity|100>
+   4 items: %?Sp<0..49|50..99|101..infinity|100>
+   5 items: %?Sp<0..49|50..99|101..149|150..infinity|100>
+   6 items: %?Sp<0..33|34..66|67..99|101..133|134..infinity|100>
+   7 items: %?Sp<0..33|34..66|67..99|101..133|134..167|167..infinity|100>
+*/
+static int pitch_speed_enum(int range, int32_t val, int32_t normval)
+{
+	int center;
+	int n;
+
+	if (range < 3)
+		return (val == normval) + 1;
+	if (val == normval)
+		return range;
+	center = range / 2;
+	n = (center * val) / normval + 1;
+	return (range <= n) ? (range - 1) : n;
+}
+
 /* Return the tag found at index i and write its value in buf.
    The return value is buf if the tag had a value, or NULL if not.
 
@@ -786,6 +822,10 @@ const char *get_token_value(struct gui_wps *gwps,
             snprintf(buf, buf_size, "%ld.%ld",
                      pitch / PITCH_SPEED_PRECISION,
 		     (pitch  % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
+
+	    if (intval)
+		    *intval = pitch_speed_enum(limit, pitch,
+					       PITCH_SPEED_PRECISION * 100);
             return buf;
         }
 #endif
