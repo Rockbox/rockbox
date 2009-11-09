@@ -42,6 +42,29 @@ extern bool debug_wps;
 extern int wps_verbose_level;
 #endif
 
+struct debug_token_table
+{
+    enum wps_token_type start_marker;
+    char *desc;
+};
+#define X(name) name, #name
+struct debug_token_table tokens[] = {
+    { X(TOKEN_MARKER_CONTROL_TOKENS) },
+	{ X(TOKEN_MARKER_BATTERY) },
+	{ X(TOKEN_MARKER_SOUND) },
+	{ X(TOKEN_MARKER_RTC) },
+	{ X(TOKEN_MARKER_DATABASE) },
+	{ X(TOKEN_MARKER_FILE) },
+	{ X(TOKEN_MARKER_IMAGES) },
+	{ X(TOKEN_MARKER_METADATA) },	
+	{ X(TOKEN_MARKER_PLAYBACK_INFO) },
+	{ X(TOKEN_MARKER_PLAYLIST) },
+	{ X(TOKEN_MARKER_MISC) },
+	{ X(TOKEN_MARKER_RECORDING) },
+	{ X(TOKEN_MARKER_END) },
+};
+#undef X
+
 static char *next_str(bool next) {
     return next ? "next " : "";
 }
@@ -49,11 +72,11 @@ static char *next_str(bool next) {
 static char *get_token_desc(struct wps_token *token, char *buf,
                             int bufsize, struct wps_data *data)
 {
+    unsigned i;
 #ifndef HAVE_LCD_BITMAP
     (void)data; /* kill charcell warning */
 #endif
     bool next = token->next;
-
     switch(token->type)
     {
         case WPS_NO_TOKEN:
@@ -468,8 +491,15 @@ static char *get_token_desc(struct wps_token *token, char *buf,
                  settings[token->value.i].cfg_name);
             break;
         default:
-            snprintf(buf, bufsize, "FIXME (code: %d)",
-                    token->type);
+            for(i=1; i<sizeof(tokens)/sizeof(*token); i++)
+            {
+                if (token->type < tokens[i].start_marker)
+                {
+                    snprintf(buf, bufsize, "FIXME: %s + %d\n", tokens[i-1].desc,
+					         token->type - tokens[i-1].start_marker);
+                    break;
+                }
+            } 
             break;
     }
 

@@ -24,9 +24,11 @@
 
 #include <stdbool.h>
  
- 
+
 enum wps_token_type {
-    WPS_NO_TOKEN,   /* for WPS tags we don't want to save as tokens */
+    
+  TOKEN_MARKER_CONTROL_TOKENS = -1,
+    WPS_NO_TOKEN = 0,   /* for WPS tags we don't want to save as tokens */
     WPS_TOKEN_UNKNOWN,
 
     /* Markers */
@@ -41,8 +43,18 @@ enum wps_token_type {
 
     /* Sublines */
     WPS_TOKEN_SUBLINE_TIMEOUT,
+    
+    /* Conditional */
+    WPS_TOKEN_CONDITIONAL,
+    WPS_TOKEN_CONDITIONAL_START,
+    WPS_TOKEN_CONDITIONAL_OPTION,
+    WPS_TOKEN_CONDITIONAL_END,
 
+    /* Viewport display */
+    WPS_VIEWPORT_ENABLE,
+    
     /* Battery */
+  TOKEN_MARKER_BATTERY,
     WPS_TOKEN_BATTERY_PERCENT,
     WPS_TOKEN_BATTERY_VOLTS,
     WPS_TOKEN_BATTERY_TIME,
@@ -51,6 +63,7 @@ enum wps_token_type {
     WPS_TOKEN_BATTERY_SLEEPTIME,
 
     /* Sound */
+  TOKEN_MARKER_SOUND,
 #if (CONFIG_CODEC != MAS3507D)
     WPS_TOKEN_SOUND_PITCH,
 #endif
@@ -60,7 +73,7 @@ enum wps_token_type {
 #endif
 
     /* Time */
-
+  TOKEN_MARKER_RTC,
     WPS_TOKEN_RTC_PRESENT,
 
     /* The begin/end values allow us to know if a token is an RTC one.
@@ -89,13 +102,8 @@ enum wps_token_type {
 
     WPS_TOKENS_RTC_END,     /* just the end marker, not an actual token */
 
-    /* Conditional */
-    WPS_TOKEN_CONDITIONAL,
-    WPS_TOKEN_CONDITIONAL_START,
-    WPS_TOKEN_CONDITIONAL_OPTION,
-    WPS_TOKEN_CONDITIONAL_END,
-
     /* Database */
+  TOKEN_MARKER_DATABASE,
 #ifdef HAVE_TAGCACHE
     WPS_TOKEN_DATABASE_PLAYCOUNT,
     WPS_TOKEN_DATABASE_RATING,
@@ -103,6 +111,7 @@ enum wps_token_type {
 #endif
 
     /* File */
+  TOKEN_MARKER_FILE,
     WPS_TOKEN_FILE_BITRATE,
     WPS_TOKEN_FILE_CODEC,
     WPS_TOKEN_FILE_FREQUENCY,
@@ -116,6 +125,7 @@ enum wps_token_type {
 
 #ifdef HAVE_LCD_BITMAP
     /* Image */
+  TOKEN_MARKER_IMAGES,
     WPS_TOKEN_IMAGE_BACKDROP,
     WPS_TOKEN_IMAGE_PROGRESS_BAR,
     WPS_TOKEN_IMAGE_PRELOAD,
@@ -130,6 +140,7 @@ enum wps_token_type {
 #endif
 
     /* Metadata */
+  TOKEN_MARKER_METADATA,
     WPS_TOKEN_METADATA_ARTIST,
     WPS_TOKEN_METADATA_COMPOSER,
     WPS_TOKEN_METADATA_ALBUM_ARTIST,
@@ -143,29 +154,19 @@ enum wps_token_type {
     WPS_TOKEN_METADATA_YEAR,
     WPS_TOKEN_METADATA_COMMENT,
 
+  TOKEN_MARKER_PLAYBACK_INFO,
     /* Mode */
     WPS_TOKEN_REPEAT_MODE,
     WPS_TOKEN_PLAYBACK_STATUS,
-
-    WPS_TOKEN_MAIN_HOLD,
-
-#ifdef HAS_REMOTE_BUTTON_HOLD
-    WPS_TOKEN_REMOTE_HOLD,
-#endif
-
     /* Progressbar */
     WPS_TOKEN_PROGRESSBAR,
 #ifdef HAVE_LCD_CHARCELLS
     WPS_TOKEN_PLAYER_PROGRESSBAR,
 #endif
-
 #ifdef HAVE_LCD_BITMAP
     /* Peakmeter */
     WPS_TOKEN_PEAKMETER,
 #endif
-
-    /* Volume level */
-    WPS_TOKEN_VOLUME,
 
     /* Current track */
     WPS_TOKEN_TRACK_ELAPSED_PERCENT,
@@ -174,32 +175,42 @@ enum wps_token_type {
     WPS_TOKEN_TRACK_LENGTH,
 
     /* Playlist */
+  TOKEN_MARKER_PLAYLIST,
     WPS_TOKEN_PLAYLIST_ENTRIES,
     WPS_TOKEN_PLAYLIST_NAME,
     WPS_TOKEN_PLAYLIST_POSITION,
     WPS_TOKEN_PLAYLIST_SHUFFLE,
+
+
+    /* buttons */
+  TOKEN_MARKER_MISC,
+    WPS_TOKEN_BUTTON_VOLUME,
+    WPS_TOKEN_LASTTOUCH,
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     /* Virtual LED */
     WPS_TOKEN_VLED_HDD,
 #endif
-
-    /* Viewport display */
-    WPS_VIEWPORT_ENABLE,
-
-    /* buttons */
-    WPS_TOKEN_BUTTON_VOLUME,
-    WPS_TOKEN_LASTTOUCH,
+    /* Volume level */
+    WPS_TOKEN_VOLUME,
+    /* hold */
+    WPS_TOKEN_MAIN_HOLD,
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    WPS_TOKEN_REMOTE_HOLD,
+#endif
 
     /* Setting option */
     WPS_TOKEN_SETTING,
     WPS_TOKEN_CURRENT_SCREEN,
     
     /* Recording Tokens */
+  TOKEN_MARKER_RECORDING,
     WPS_TOKEN_HAVE_RECORDING,
     WPS_TOKEN_REC_FREQ,
     WPS_TOKEN_REC_ENCODER,
     WPS_TOKEN_REC_BITRATE, /* SWCODEC: MP3 bitrate, HWCODEC: MP3 "quality" */
     WPS_TOKEN_REC_MONO,
+    
+  TOKEN_MARKER_END, /* this needs to be the last value in this enum */
 };
 
 struct wps_token {
