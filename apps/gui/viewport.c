@@ -388,10 +388,10 @@ void viewport_set_defaults(struct viewport *vp,
             vp->height = MIN(a->y + a->height, b->y + b->height) - vp->y;
             return;
         }
-        else /* They don't overlap, so the best wrong answer is show fullscreen */
-            viewport_set_fullscreen(vp, screen); 
-        
+        /* else (no overlap at all) fall back to info vp from sbs, that
+         * has no redraw problems */
     }
+
     /* if only one is active use it
      * or if the above check for overlapping failed, use info vp then, because
      * that doesn't give redraw problems */
