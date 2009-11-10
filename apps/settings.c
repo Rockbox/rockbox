@@ -964,7 +964,9 @@ void settings_apply(bool read_disk)
     set_codepage(global_settings.default_codepage);
 
 #if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_CROSSFADE
     audio_set_crossfade(global_settings.crossfade);
+#endif
     dsp_set_replaygain();
     dsp_set_crossfeed(global_settings.crossfeed);
     dsp_set_crossfeed_direct_gain(global_settings.crossfeed_direct_gain);

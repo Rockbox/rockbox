@@ -35,9 +35,11 @@ void pcmbuf_pause(bool pause);
 void pcmbuf_start_track_change(bool manual_skip);
 
 /* Crossfade */
+#ifdef HAVE_CROSSFADE
 bool pcmbuf_is_crossfade_active(void);
 void pcmbuf_request_crossfade_enable(bool on_off);
 bool pcmbuf_is_same_size(void);
+#endif
 
 /* Voice */
 void *pcmbuf_request_voice_buffer(int *count);

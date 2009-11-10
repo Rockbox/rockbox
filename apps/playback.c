@@ -814,6 +814,7 @@ void audio_set_buffer_margin(int setting)
 }
 #endif
 
+#ifdef HAVE_CROSSFADE
 /* Take necessary steps to enable or disable the crossfade setting */
 void audio_set_crossfade(int enable)
 {
@@ -847,6 +848,7 @@ void audio_set_crossfade(int enable)
     if (was_playing)
         audio_play(offset);
 }
+#endif
 
 /* --- Routines called from multiple threads --- */
 
@@ -1919,7 +1921,11 @@ static void audio_thread(void)
 
             case Q_AUDIO_PAUSE:
                 LOGFQUEUE("audio < Q_AUDIO_PAUSE");
-                if (!(bool) ev.data && skipped_during_pause && !pcmbuf_is_crossfade_active())
+                if (!(bool) ev.data && skipped_during_pause
+#ifdef HAVE_CROSSFADE
+                    && !pcmbuf_is_crossfade_active()
+#endif
+                    )
                     pcmbuf_play_stop(); /* Flush old track on resume after skip */
                 skipped_during_pause = false;
                 if (!playing)
@@ -2059,8 +2065,10 @@ void audio_init(void)
     voice_thread_init();
 #endif
 
+#ifdef HAVE_CROSSFADE
     /* Set crossfade setting for next buffer init which should be about... */
     pcmbuf_request_crossfade_enable(global_settings.crossfade);
+#endif
 
     /* initialize the buffering system */
 

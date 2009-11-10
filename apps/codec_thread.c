@@ -475,7 +475,10 @@ static void codec_thread(void)
     while (1) {
         status = 0;
         
-        if (!pcmbuf_is_crossfade_active()) {
+#ifdef HAVE_CROSSFADE
+        if (!pcmbuf_is_crossfade_active())
+#endif
+        {
             cancel_cpu_boost();
         }
             

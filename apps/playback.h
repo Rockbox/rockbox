@@ -58,9 +58,11 @@ bool audio_is_thread_ready(void);
 int audio_track_count(void);
 long audio_filebufused(void);
 void audio_pre_ff_rewind(void);
-void audio_set_crossfade(int type);
 void audio_skip(int direction);
 void audio_hard_stop(void); /* Stops audio from serving playback */
+#ifdef HAVE_CROSSFADE
+void audio_set_crossfade(int enable);
+#endif
 
 enum
 {

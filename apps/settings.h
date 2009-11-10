@@ -339,6 +339,7 @@ struct user_settings
 #endif
 
 #if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_CROSSFADE
     /* Crossfade */
     int crossfade;     /* Enable crossfade (0=off, 1=shuffle, 2=trackskip,
                                             3=shuff&trackskip, 4=always) */
@@ -347,6 +348,7 @@ struct user_settings
     int crossfade_fade_in_duration;   /* Fade in duration (0-15s)          */
     int crossfade_fade_out_duration;  /* Fade out duration (0-15s)         */
     int crossfade_fade_out_mixmode;   /* Fade out mode (0=crossfade,1=mix) */
+#endif
 
     /* Replaygain */
     bool replaygain_noclip; /* scale to prevent clips */

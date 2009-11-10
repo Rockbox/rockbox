@@ -40,7 +40,7 @@
 #endif
 
 
-#if CONFIG_CODEC == SWCODEC
+#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_CROSSFADE)
 static int setcrossfadeonexit_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
@@ -90,19 +90,19 @@ MENUITEM_SETTING(fade_on_stop, &global_settings.fade_on_stop, NULL);
 MENUITEM_SETTING(party_mode, &global_settings.party_mode, NULL);
 
 #if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_CROSSFADE
 /* crossfade submenu */
 MENUITEM_SETTING(crossfade, &global_settings.crossfade, setcrossfadeonexit_callback);
 MENUITEM_SETTING(crossfade_fade_in_delay,
-    &global_settings.crossfade_fade_in_delay, setcrossfadeonexit_callback);
+    &global_settings.crossfade_fade_in_delay, NULL);
 MENUITEM_SETTING(crossfade_fade_in_duration,
-    &global_settings.crossfade_fade_in_duration, setcrossfadeonexit_callback);
+    &global_settings.crossfade_fade_in_duration, NULL);
 MENUITEM_SETTING(crossfade_fade_out_delay,
     &global_settings.crossfade_fade_out_delay, setcrossfadeonexit_callback);
 MENUITEM_SETTING(crossfade_fade_out_duration,
     &global_settings.crossfade_fade_out_duration, setcrossfadeonexit_callback);
 MENUITEM_SETTING(crossfade_fade_out_mixmode,
     &global_settings.crossfade_fade_out_mixmode,NULL);
-#ifdef HAVE_CROSSFADE
 MAKE_MENU(crossfade_settings_menu,ID2P(LANG_CROSSFADE),0, Icon_NOICON,
           &crossfade, &crossfade_fade_in_delay, &crossfade_fade_in_duration,
           &crossfade_fade_out_delay, &crossfade_fade_out_duration,
@@ -187,7 +187,7 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #endif
           &fade_on_stop, &party_mode,
           
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_CROSSFADE)
+#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_CROSSFADE)
           &crossfade_settings_menu, 
 #endif
 
