@@ -21,7 +21,7 @@
 #ifndef _USB_SCREEN_H_
 #define _USB_SCREEN_H_
 
-extern void gui_usb_screen_run(void);
+extern void gui_usb_screen_run(bool early_usb);
 
 #endif
 

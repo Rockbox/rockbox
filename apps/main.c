@@ -496,7 +496,7 @@ static void init(void)
                 (mmc_remove_request() == SYS_HOTSWAP_EXTRACTED))
 #endif
             {
-                gui_usb_screen_run();
+                gui_usb_screen_run(true);
                 mounted = true; /* mounting done @ end of USB mode */
             }
 #ifdef HAVE_USB_POWER
@@ -521,7 +521,7 @@ static void init(void)
             lcd_update();
 
             while(button_get(true) != SYS_USB_CONNECTED) {};
-            gui_usb_screen_run();
+            gui_usb_screen_run(true);
             system_reboot();
         }
     }

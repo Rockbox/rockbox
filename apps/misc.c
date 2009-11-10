@@ -581,7 +581,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
                 check_bootfile(false); /* gets initial size */
 #endif
 #endif
-                gui_usb_screen_run();
+                gui_usb_screen_run(false);
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF)
                 check_bootfile(true);

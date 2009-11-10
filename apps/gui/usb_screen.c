@@ -128,7 +128,7 @@ struct usb_screen_vps_t
 
 #ifdef HAVE_LCD_BITMAP
 static void usb_screen_fix_viewports(struct screen *screen,
-        struct usb_screen_vps_t *usb_screen_vps)
+        struct usb_screen_vps_t *usb_screen_vps, bool early_usb)
 {
     int logo_width, logo_height;
     struct viewport *parent = &usb_screen_vps->parent;
@@ -147,10 +147,15 @@ static void usb_screen_fix_viewports(struct screen *screen,
         logo_height = BMPHEIGHT_usblogo;
     }
 
-    viewport_set_defaults(parent, screen->screen_type);
-    if (parent->width < logo_width || parent->height < logo_height)
+    if (!early_usb)
+    {
+        viewport_set_defaults(parent, screen->screen_type);
+        if (parent->width < logo_width || parent->height < logo_height)
+            viewport_set_fullscreen(parent, screen->screen_type);
+    }
+    else
         viewport_set_fullscreen(parent, screen->screen_type);
-
+        
     *logo = *parent;
     logo->x = parent->width - logo_width;
     logo->y = (parent->height - logo_height) / 2;
@@ -242,10 +247,10 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
     viewportmanager_set_statusbar(usb_bars);
 }
 
-void gui_usb_screen_run(void)
+void gui_usb_screen_run(bool early_usb)
 {
     int i;
-    int old_bars  = viewportmanager_get_statusbar();
+    int old_bars  = early_usb ? 0 : viewportmanager_get_statusbar();
     struct usb_screen_vps_t usb_screen_vps_ar[NB_SCREENS];
 #if defined HAVE_TOUCHSCREEN
     enum touchscreen_mode old_mode = touchscreen_get_mode();
@@ -270,7 +275,7 @@ void gui_usb_screen_run(void)
 
         screen->set_viewport(NULL);
 #ifdef HAVE_LCD_BITMAP
-        usb_screen_fix_viewports(screen, &usb_screen_vps_ar[i]);
+        usb_screen_fix_viewports(screen, &usb_screen_vps_ar[i], early_usb);
 #endif
     }
 
@@ -318,9 +323,11 @@ void gui_usb_screen_run(void)
     {
         screens[i].backlight_on();
     }
-    viewportmanager_set_statusbar(old_bars);
-    send_event(GUI_EVENT_REFRESH, NULL);
-
+    if (!early_usb)
+    {
+        viewportmanager_set_statusbar(old_bars);
+        send_event(GUI_EVENT_REFRESH, NULL);
+    }
 }
 #endif /* !defined(USB_NONE) */
 
