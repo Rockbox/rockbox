@@ -185,7 +185,7 @@ static void usb_screen_fix_viewports(struct screen *screen,
 }
 #endif
 
-static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
+static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar, bool early_usb)
 {
     int i;
     int usb_bars = VP_SB_ALLSCREENS; /* force statusbars */
@@ -244,7 +244,8 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
         usb_bars |= VP_SB_IGNORE_SETTING(i);
     }
 
-    viewportmanager_set_statusbar(usb_bars);
+    if (!early_usb)
+        viewportmanager_set_statusbar(usb_bars);
 }
 
 void gui_usb_screen_run(bool early_usb)
@@ -281,7 +282,7 @@ void gui_usb_screen_run(bool early_usb)
 
     while (1)
     {
-        usb_screens_draw(usb_screen_vps_ar);
+        usb_screens_draw(usb_screen_vps_ar, early_usb);
 #ifdef SIMULATOR
         if (button_get_w_tmo(HZ/2))
             break;
