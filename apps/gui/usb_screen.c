@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "action.h"
+#include "font.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
@@ -157,8 +158,8 @@ static void usb_screen_fix_viewports(struct screen *screen,
         viewport_set_fullscreen(parent, screen->screen_type);
         
     *logo = *parent;
-    logo->x = parent->width - logo_width;
-    logo->y = (parent->height - logo_height) / 2;
+    logo->x = parent->x + parent->width - logo_width;
+    logo->y = parent->y + (parent->height - logo_height) / 2;
     logo->width = logo_width;
     logo->height = logo_height;
 
@@ -166,20 +167,16 @@ static void usb_screen_fix_viewports(struct screen *screen,
     if (usb_hid)
     {
         struct viewport *title = &usb_screen_vps->title;
-        int char_height, nb_lines;
-
-        /* nb_lines only returns the number of fully visible lines, small
-         * screens or really large fonts could cause problems with the
-         * calculation below.
-         */
-        nb_lines = viewport_get_nb_lines(parent);
-        if (nb_lines == 0)
-            nb_lines++;
-
-        char_height = parent->height/nb_lines;
-
+        int char_height = font_get(parent->font)->height;
         *title = *parent;
         title->y = logo->y + logo->height + char_height;
+        title->height = char_height;
+        /* try to fit logo and title to parent */
+        if (parent->y + parent->height < title->y + title->height)
+        {
+            logo->y = parent->y;
+            title->y = parent->y + logo->height;
+        }
     }
 #endif
 }
