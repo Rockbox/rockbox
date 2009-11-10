@@ -766,10 +766,14 @@ const char *get_token_value(struct gui_wps *gwps,
 
 #if (CONFIG_CODEC == SWCODEC)
         case WPS_TOKEN_CROSSFADE:
+#ifdef HAVE_CROSSFADE
             if (intval)
                 *intval = global_settings.crossfade + 1;
             snprintf(buf, buf_size, "%d", global_settings.crossfade);
             return buf;
+#else
+            return NULL;
+#endif
 
         case WPS_TOKEN_REPLAYGAIN:
         {

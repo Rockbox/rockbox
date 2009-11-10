@@ -534,6 +534,8 @@ static void start_processed_track_change(bool auto_skip)
     crossfade_mixmode = auto_skip && global_settings.crossfade_fade_out_mixmode;
 
     crossfade_track_change_started = true;
+#else
+    (void)auto_skip;
 #endif
 }
 
