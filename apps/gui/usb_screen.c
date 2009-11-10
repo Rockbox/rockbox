@@ -129,7 +129,7 @@ struct usb_screen_vps_t
 
 #ifdef HAVE_LCD_BITMAP
 static void usb_screen_fix_viewports(struct screen *screen,
-        struct usb_screen_vps_t *usb_screen_vps, bool early_usb)
+        struct usb_screen_vps_t *usb_screen_vps)
 {
     int logo_width, logo_height;
     struct viewport *parent = &usb_screen_vps->parent;
@@ -148,15 +148,10 @@ static void usb_screen_fix_viewports(struct screen *screen,
         logo_height = BMPHEIGHT_usblogo;
     }
 
-    if (!early_usb)
-    {
-        viewport_set_defaults(parent, screen->screen_type);
-        if (parent->width < logo_width || parent->height < logo_height)
-            viewport_set_fullscreen(parent, screen->screen_type);
-    }
-    else
+    viewport_set_defaults(parent, screen->screen_type);
+    if (parent->width < logo_width || parent->height < logo_height)
         viewport_set_fullscreen(parent, screen->screen_type);
-        
+
     *logo = *parent;
     logo->x = parent->x + parent->width - logo_width;
     logo->y = parent->y + (parent->height - logo_height) / 2;
@@ -182,7 +177,7 @@ static void usb_screen_fix_viewports(struct screen *screen,
 }
 #endif
 
-static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar, bool early_usb)
+static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 {
     int i;
     int usb_bars = VP_SB_ALLSCREENS; /* force statusbars */
@@ -241,14 +236,13 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar, bool ea
         usb_bars |= VP_SB_IGNORE_SETTING(i);
     }
 
-    if (!early_usb)
-        viewportmanager_set_statusbar(usb_bars);
+    viewportmanager_set_statusbar(usb_bars);
 }
 
-void gui_usb_screen_run(bool early_usb)
+void gui_usb_screen_run(void)
 {
     int i;
-    int old_bars  = early_usb ? 0 : viewportmanager_get_statusbar();
+    int old_bars  = viewportmanager_get_statusbar();
     struct usb_screen_vps_t usb_screen_vps_ar[NB_SCREENS];
 #if defined HAVE_TOUCHSCREEN
     enum touchscreen_mode old_mode = touchscreen_get_mode();
@@ -273,13 +267,13 @@ void gui_usb_screen_run(bool early_usb)
 
         screen->set_viewport(NULL);
 #ifdef HAVE_LCD_BITMAP
-        usb_screen_fix_viewports(screen, &usb_screen_vps_ar[i], early_usb);
+        usb_screen_fix_viewports(screen, &usb_screen_vps_ar[i]);
 #endif
     }
 
     while (1)
     {
-        usb_screens_draw(usb_screen_vps_ar, early_usb);
+        usb_screens_draw(usb_screen_vps_ar);
 #ifdef SIMULATOR
         if (button_get_w_tmo(HZ/2))
             break;
@@ -321,11 +315,9 @@ void gui_usb_screen_run(bool early_usb)
     {
         screens[i].backlight_on();
     }
-    if (!early_usb)
-    {
-        viewportmanager_set_statusbar(old_bars);
-        send_event(GUI_EVENT_REFRESH, NULL);
-    }
+    viewportmanager_set_statusbar(old_bars);
+    send_event(GUI_EVENT_REFRESH, NULL);
+
 }
 #endif /* !defined(USB_NONE) */
 

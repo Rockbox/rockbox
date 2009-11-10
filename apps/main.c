@@ -142,7 +142,8 @@ int main(void)
     list_init();
 #endif
     tree_gui_init();
-    viewportmanager_init();
+    /* Keep the order of this 3
+     * Must be done before any code uses the multi-screen API */
 #ifdef HAVE_USBSTACK
     /* All threads should be created and public queues registered by now */
     usb_start_monitoring();
@@ -318,13 +319,16 @@ static void init(void)
 #ifdef DEBUG
     debug_init();
 #endif
-    /* Must be done before any code uses the multi-screen API */
+    /* Keep the order of this 3 (viewportmanager handles statusbars)
+     * Must be done before any code uses the multi-screen API */
     gui_syncstatusbar_init(&statusbars);
+    sb_skin_init();
+    viewportmanager_init();
+
+    gui_sync_wps_init();
     storage_init();
     settings_reset();
     settings_load(SETTINGS_ALL);
-    gui_sync_wps_init();
-    sb_skin_init();
     settings_apply(true);
     init_dircache(true);
     init_dircache(false);
@@ -443,8 +447,13 @@ static void init(void)
     radio_init();
 #endif
 
-    /* Must be done before any code uses the multi-screen API */
+    /* Keep the order of this 3 (viewportmanager handles statusbars)
+     * Must be done before any code uses the multi-screen API */
     gui_syncstatusbar_init(&statusbars);
+    sb_skin_init();
+    viewportmanager_init();
+
+    gui_sync_wps_init();
 
 #if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
     /* charger_inserted() can't be used here because power_thread()
@@ -496,7 +505,7 @@ static void init(void)
                 (mmc_remove_request() == SYS_HOTSWAP_EXTRACTED))
 #endif
             {
-                gui_usb_screen_run(true);
+                gui_usb_screen_run();
                 mounted = true; /* mounting done @ end of USB mode */
             }
 #ifdef HAVE_USB_POWER
@@ -521,7 +530,7 @@ static void init(void)
             lcd_update();
 
             while(button_get(true) != SYS_USB_CONNECTED) {};
-            gui_usb_screen_run(true);
+            gui_usb_screen_run();
             system_reboot();
         }
     }
@@ -551,8 +560,6 @@ static void init(void)
 #endif
     }
 
-    gui_sync_wps_init();
-    sb_skin_init();
     settings_apply(true);
     init_dircache(false);
 #ifdef HAVE_TAGCACHE

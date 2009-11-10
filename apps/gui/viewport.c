@@ -104,12 +104,7 @@ static bool showing_bars(enum screen_type screen)
 void viewportmanager_init(void)
 {
 #ifdef HAVE_LCD_BITMAP
-    int retval, i;
     add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, statusbar_toggled);
-    retval = viewport_init_ui_vp();
-    FOR_NB_SCREENS(i)
-        ui_vp_info.active[i] = retval & BIT_N(i);
-    ui_vp_info.vp = custom_vp;
 #endif
     viewportmanager_set_statusbar(VP_SB_ALLSCREENS);
 }
