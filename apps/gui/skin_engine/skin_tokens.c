@@ -770,10 +770,10 @@ const char *get_token_value(struct gui_wps *gwps,
             if (intval)
                 *intval = global_settings.crossfade + 1;
             snprintf(buf, buf_size, "%d", global_settings.crossfade);
-            return buf;
 #else
-            return NULL;
+            snprintf(buf, buf_size, "%d", 0);
 #endif
+            return buf;
 
         case WPS_TOKEN_REPLAYGAIN:
         {

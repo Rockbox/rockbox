@@ -160,7 +160,9 @@
       replaygain preamp
                     & -120 to 120       & 0.1dB\\
 %
-      crossfade     & off, shuffle, track skip, always
+      \opt{crossfade}{
+      crossfade     & off, auto track skip, man track skip, shuffle,
+                    shuffle and man track skip, always
                                         & N/A\\
       crossfade fade in delay
                     & 0 to 7            & seconds\\
@@ -172,6 +174,7 @@
                     & 0 to 15           & seconds\\
       crossfade fade out mode
                     & crossfade, mix    & N/A\\
+      }
 %
       crossfeed     & on, off           & N/A\\
       crossfeed direct gain
@@ -202,6 +205,17 @@
       eq band 4 gain & -240 to 240      & 0.1dB\\
 %
       dithering enabled & on, off       & N/A\\
+%
+      timestretch enabled & on, off     & N/A\\
+%
+      compressor threshold      & 0 to -24      & -3dB\\
+      compressor makeup gain    & off, auto     & N/A\\
+      compressor ratio          & 2:1, 4:1, 6:1, 10:1, limit
+                                                & N/A\\
+      compressor knee           & hard knee, soft knee
+                                                & N/A\\
+      compressor release time   & 100 to 1000   & 100 ms\\
+%
       beep          & off, weak, moderate, strong & N/A\\
       keyclick      & off, weak, moderate, strong & N/A\\
       keyclick repeats & on, off        & N/A\\

@@ -97,17 +97,21 @@ you to configure settings related to audio playback.
   disabled as well as skipping songs and launching plugins.
 
 \opt{swcodec}{
+  \opt{crossfade}{
   \section{Crossfade}
-    This setting enables a cross-fader. At the end of a song, the song will 
-    fade out as the next song fades in, creating a smooth transition between 
-    songs. The crossfade setting is particularly effective when the player is 
-      set on shuffle.\\
+    This section controls the behavior of the crossfader.  The crossfader, when
+    enabled, smoothly fades one track into the next.  This can occur in two
+    situations: an automatic track skip and a manual track skip.  An automatic
+    track skip occurs at the end of the track, moving to the next track in the
+    playlist without user intervention.  A manual track skip occurs immediately
+    when the appropriate button is pressed.\\
 
     Options for crossfade settings are:
     \begin{description}
-      \item[Enable Crossfade.] If set to \setting{Off}, crossfade is disabled.
-	    If set to \setting{Auto Track Skip Only}, crossfade occurs for
-        automatic skips, but not for manual skips.  The next setting,
+      \item[Enable Crossfade.] If set to \setting{Off}, crossfade is disabled
+        and all track skips are gapless.  If set to
+        \setting{Auto Track Skip Only}, crossfade occurs for automatic skips,
+        but not for manual skips.  The next setting,
         \setting{Manual Track Skip Only}, is the opposite: tracks will only
         crossfade when manually skipped.  If set to \setting{Shuffle}, crossfade
         is enabled for all track changes when the shuffle feature is set to
@@ -147,6 +151,7 @@ you to configure settings related to audio playback.
           The graphic below illustrates how the different settings work in practice.
 
          \includegraphics[width=14cm]{configure_rockbox/images/crossfade_graphic.png}
+    }%\opt{crossfade}
     
   \section{Replaygain}
     This allows you to control the replaygain function.

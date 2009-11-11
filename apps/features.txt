@@ -42,6 +42,10 @@ button_light
 buttonlight_brightness
 #endif
 
+#if defined(HAVE_CROSSFADE)
+crossfade
+#endif
+
 #if defined(HAVE_DIRCACHE)
 dircache
 #endif
