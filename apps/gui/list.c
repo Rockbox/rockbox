@@ -92,7 +92,7 @@ static void list_init_viewports(struct gui_synclist *list)
             list->parent[i] = &parent[i];
             viewport_set_defaults(&parent[i], i);
 #ifdef HAVE_BUTTONBAR
-            if (screens[i].has_buttonbar && !viewport_ui_vp_get_state(i))
+            if (screens[i].has_buttonbar)
                 list->parent[i]->height -= BUTTONBAR_HEIGHT;
 #endif
         }
