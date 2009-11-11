@@ -28,6 +28,7 @@
 #include "audiohw.h"
 #include "pcm.h"
 #include "pcm_sampr.h"
+#include "dma-target.h"
 #include "mmu-target.h"
 
 /*  Driver for the IIS/PCM part of the s5l8700 using DMA
@@ -36,7 +37,6 @@
     - not all possible PCM sample rates are enabled (no support in codec driver)
     - pcm_play_dma_pause is untested, not sure if implemented the right way
     - pcm_play_dma_stop is untested, not sure if implemented the right way
-    - pcm_play_dma_get_peak_buffer is not implemented
     - recording is not implemented
 */
 
