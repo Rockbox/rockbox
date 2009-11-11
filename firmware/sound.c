@@ -124,7 +124,7 @@ int sound_default(int setting)
     return audiohw_settings[setting].defaultval;
 }
 
-static sound_set_type *sound_set_fns[] =
+static sound_set_type * const sound_set_fns[] =
 {
     [0 ... SOUND_LAST_SETTING-1] = NULL,
     [SOUND_VOLUME]        = sound_set_volume,
@@ -336,7 +336,7 @@ void sound_set_treble(int value)
 #if defined(HAVE_WM8751)
     current_treble = value;
 #else
-    current_treble =  value * 10;
+    current_treble = value * 10;
 #endif
 #endif
 
