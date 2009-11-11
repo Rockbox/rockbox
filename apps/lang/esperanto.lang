@@ -2880,11 +2880,11 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TRACKSKIP
+  id: LANG_MANTRACKSKIP
   desc: in crossfade settings
   user: core
   <source>
-    *: "Track Skip Only"
+    *: "Manual Track Skip Only"
   </source>
   <dest>
     *: "Nur por transsalti kanton"

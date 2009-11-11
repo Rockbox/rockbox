@@ -236,7 +236,7 @@ void audio_pcmbuf_position_callback(size_t size)
 
     if (time >= othertrack_id3->length)
     {
-        if(track_transition){logf("playback: (callback) track transition false");}
+        /* we just played the end of the track, so stop this callback */
         track_transition = false;
         othertrack_id3->elapsed = othertrack_id3->length;
     }

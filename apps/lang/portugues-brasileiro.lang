@@ -1666,12 +1666,12 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TRACKSKIP
+  id: LANG_MANTRACKSKIP
   desc: in crossfade settings
   user: core
   <source>
     *: none
-    swcodec: "Track Skip Only"
+    swcodec: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
@@ -1688,7 +1688,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Track Skip"
+    swcodec: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none

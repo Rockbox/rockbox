@@ -106,13 +106,16 @@ you to configure settings related to audio playback.
     Options for crossfade settings are:
     \begin{description}
       \item[Enable Crossfade.] If set to \setting{Off}, crossfade is disabled.
-        If set to \setting{Shuffle}, crossfade is enabled when the
-        shuffle feature is set to \setting{Yes}, but disabled otherwise. If set
-        to \setting{Track Skip Only}, tracks will only crossfade when manually
-        skipped. If set to \setting{Shuffle and Track Skip}
-        then crossfade will only be active when shuffle is set to
-        \setting{Yes} and the track is manually skipped. If set to
-        \setting{Always}, tracks will always crossfade into one another.
+	    If set to \setting{Auto Track Skip Only}, crossfade occurs for
+        automatic skips, but not for manual skips.  The next setting,
+        \setting{Manual Track Skip Only}, is the opposite: tracks will only
+        crossfade when manually skipped.  If set to \setting{Shuffle}, crossfade
+        is enabled for all track changes when the shuffle feature is set to
+        \setting{Yes}, but disabled otherwise.  If set to
+        \setting{Shuffle and Manual Track Skip} then crossfade will only be
+        active when shuffle is set to \setting{Yes} and the track is then
+        manually skipped.  If set to \setting{Always}, tracks will always
+        crossfade into one another.
         %
       \item[Fade In Delay.] The ``fade in delay'' is the length of time between
         when the crossfade process begins and when the new track begins to fade

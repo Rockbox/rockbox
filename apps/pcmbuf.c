@@ -454,10 +454,6 @@ size_t pcmbuf_init(unsigned char *bufend)
 
     init_pcmbuffers();
 
-    if(track_transition){logf("pcmbuf: (init) track transition false");}
-    end_of_track = false;
-    track_transition = false;
-
 #ifdef HAVE_CROSSFADE
     pcmbuf_finish_crossfade_enable();
 #else
@@ -472,112 +468,84 @@ size_t pcmbuf_init(unsigned char *bufend)
 
 /* Track change */
 
-/* The codec is moving on to the next track, but the current track is
- * still playing.  Set flags to make sure the elapsed time of the current
- * track is updated properly, and mark the currently written chunk as the
- * last one in the track. */
-static void start_gapless_track_change(void)
-{
-    logf("  gapless track change");
-    /* we're starting a track transition */
-    track_transition = true;
-    
-    /* mark the last chunk in the track */
-    end_of_track = true;
-}
-
-#ifdef HAVE_CROSSFADE
-static bool pcmbuf_is_crossfade_enabled(void)
-{
-    if (global_settings.crossfade == CROSSFADE_ENABLE_SHUFFLE)
-        return global_settings.playlist_shuffle;
-
-    return crossfade_enabled;
-}
-#endif
-
-static void start_processed_track_change(bool auto_skip)
-{
-    logf("  processed track change");
-    /* Notify the wps that the track change starts now */
-    audio_post_track_change(false);
-
-    /* Can't do two crossfades at once and, no fade if pcm is off now */
-    if (
-#ifdef HAVE_CROSSFADE
-        pcmbuf_is_crossfade_active() ||
-#endif
-        !pcm_is_playing())
-    {
-        pcmbuf_play_stop();
-        return;
-    }
-
-    trigger_cpu_boost();
-
-    /* Not enough data, or crossfade disabled, flush the old data instead */
-    if (LOW_DATA(2) ||
-#ifdef HAVE_CROSSFADE
-        !pcmbuf_is_crossfade_enabled() ||
-#endif
-        low_latency_mode)
-    {
-        /* commit everything to this point and keep going, but... */
-        commit_chunk();
-        /* ... when the next chunk commits, throw away everything but itself */
-        flush_pcmbuf = true;
-        return;
-    }
-
-#ifdef HAVE_CROSSFADE
-    /* Don't enable mix mode when skipping tracks manually. */
-    crossfade_mixmode = auto_skip && global_settings.crossfade_fade_out_mixmode;
-
-    crossfade_track_change_started = true;
-#else
-    (void)auto_skip;
-#endif
-}
-
 void pcmbuf_start_track_change(bool auto_skip)
 {
-    bool process = false;
-    /* Manual track change (always crossfade or flush audio). */
-    if (!auto_skip)
-        process = true;
-    
+    bool crossfade = false;
 #ifdef HAVE_CROSSFADE
-    /* Automatic track change w/crossfade, if not in "Track Skip Only" mode. */
-    else if (pcmbuf_is_crossfade_enabled() && !pcmbuf_is_crossfade_active()
-             && global_settings.crossfade != CROSSFADE_ENABLE_TRACKSKIP)
+    /* Determine whether this track change needs to crossfade */
+    
+    if(crossfade_enabled && !pcmbuf_is_crossfade_active())
     {
-        if (global_settings.crossfade == CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP)
+        switch(global_settings.crossfade)
         {
-            if (global_settings.playlist_shuffle)
-                process = true;
+            case CROSSFADE_ENABLE_AUTOSKIP:
+                crossfade = auto_skip;
+                break;
+            case CROSSFADE_ENABLE_MANSKIP:
+                crossfade = !auto_skip;
+                break;
+            case CROSSFADE_ENABLE_SHUFFLE:
+                crossfade = global_settings.playlist_shuffle;
+                break;
+            case CROSSFADE_ENABLE_SHUFFLE_AND_MANSKIP:
+                crossfade = global_settings.playlist_shuffle && !auto_skip;
+                break;
+            case CROSSFADE_ENABLE_ALWAYS:
+                crossfade = true;
+                break;
         }
-        else
-            process = true;
     }
 #endif
     
-    if (process)
-        /* process track change (manual skip or crossfade) */
-        start_processed_track_change(auto_skip);
-    else
-        /* normal gapless playback */
-        start_gapless_track_change();
-}
+    if (!auto_skip || crossfade)
+    /* manual skip or crossfade */
+    {
+        if (crossfade)
+            { logf("  crossfade track change"); }
+        else
+            { logf("  manual track change"); }
+        
+        /* Notify the wps that the track change starts now */
+        audio_post_track_change(false);
 
-/* Called when the last chunk in the track has been played */
-static void finish_gapless_track_change(void)
-{
-    /* not in a track transition anymore */
-    if(track_transition){logf("pcmbuf: (finish change) track transition false");}
-    track_transition = false;
-    
-    /* notify playback that the track has just finished */
-    audio_post_track_change(true);
+        /* Can't do two crossfades at once and, no fade if pcm is off now */
+        if (
+#ifdef HAVE_CROSSFADE
+            pcmbuf_is_crossfade_active() ||
+#endif
+            !pcm_is_playing())
+        {
+            pcmbuf_play_stop();
+            return;
+        }
+
+        trigger_cpu_boost();
+
+        /* Not enough data, or not crossfading, flush the old data instead */
+        if (LOW_DATA(2) || !crossfade || low_latency_mode)
+        {
+            flush_pcmbuf = true;
+            commit_chunk();
+            return;
+        }
+
+#ifdef HAVE_CROSSFADE
+        /* Don't enable mix mode when skipping tracks manually. */
+        crossfade_mixmode = auto_skip && global_settings.crossfade_fade_out_mixmode;
+
+        crossfade_track_change_started = crossfade;
+#endif
+    }
+    else    /* automatic and not crossfading, so gapless track change */
+    {
+        /* The codec is moving on to the next track, but the current track will
+         * continue to play.  Set a flag to make sure the elapsed time of the
+         * current track will be updated properly, and mark the current chunk
+         * as the last one in the track. */
+        logf("  gapless track change");
+        track_transition = true;
+        end_of_track = true;
+    }
 }
 
 
@@ -586,28 +554,31 @@ static void finish_gapless_track_change(void)
 /** PCM driver callback
  * This function has 3 major logical parts (separated by brackets both for
  * readability and variable scoping).  The first part performs the
- * operations related to finishing off the last buffer we fed to the DMA.
- * The second part detects the end of playlist condition when the pcm
- * buffer is empty except for uncommitted samples.  Then they are committed.
- * The third part performs the operations involved in sending a new buffer
- * to the DMA. */
+ * operations related to finishing off the last chunk we fed to the DMA.
+ * The second part detects the end of playlist condition when the PCM
+ * buffer is empty except for uncommitted samples.  Then they are committed
+ * and sent to the PCM driver for playback.  The third part performs the
+ * operations involved in sending a new chunk to the DMA. */
 static void pcmbuf_pcm_callback(unsigned char** start, size_t* size) ICODE_ATTR;
 static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
 {
     {
         struct chunkdesc *pcmbuf_current = read_chunk;
-        /* Take the finished buffer out of circulation */
+        /* Take the finished chunk out of circulation */
         read_chunk = pcmbuf_current->link;
 
         /* if during a track transition, update the elapsed time */
         if (track_transition)
             audio_pcmbuf_position_callback(last_chunksize);
         
-        /* if last buffer in the track, let the audio thread know */
+        /* if last chunk in the track, stop updates and notify audio thread */
         if (pcmbuf_current->end_of_track)
-            finish_gapless_track_change();
+        {
+            track_transition = false;
+            audio_post_track_change(true);
+        }
 
-        /* Put the finished buffer back into circulation */
+        /* Put the finished chunk back into circulation */
         write_end_chunk->link = pcmbuf_current;
         write_end_chunk = pcmbuf_current;
 
@@ -632,7 +603,7 @@ static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
     }
 
     {
-        /* Send the new buffer to the pcm */
+        /* Send the new chunk to the PCM */
         if(read_chunk)
         {
             size_t current_size = read_chunk->size;
@@ -644,12 +615,11 @@ static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
         }
         else
         {
-            /* No more buffers */
+            /* No more chunks */
+            logf("pcmbuf_pcm_callback: no more chunks");
             last_chunksize = 0;
             *size = 0;
             *start = NULL;
-            if (end_of_track)
-                finish_gapless_track_change();
         }
     }
     DISPLAY_DESC("callback");
@@ -660,6 +630,7 @@ void pcmbuf_play_start(void)
 {
     if (!pcm_is_playing() && pcmbuf_unplayed_bytes && read_chunk != NULL)
     {
+        logf("pcmbuf_play_start");
         last_chunksize = read_chunk->size;
         pcmbuf_unplayed_bytes -= last_chunksize;
         pcm_play_data(pcmbuf_pcm_callback,
@@ -669,6 +640,7 @@ void pcmbuf_play_start(void)
 
 void pcmbuf_play_stop(void)
 {
+    logf("pcmbuf_play_stop");
     pcm_play_stop();
 
     pcmbuf_unplayed_bytes = 0;
@@ -684,6 +656,8 @@ void pcmbuf_play_stop(void)
     crossfade_track_change_started = false;
     crossfade_active = false;
 #endif
+    end_of_track = false;
+    track_transition = false;
     flush_pcmbuf = false;
     DISPLAY_DESC("play_stop");
 
@@ -693,6 +667,7 @@ void pcmbuf_play_stop(void)
 
 void pcmbuf_pause(bool pause)
 {
+    logf("pcmbuf_pause: %s", pause?"pause":"play");
     if (pcm_is_playing())
         pcm_play_pause(!pause);
     else if (!pause)

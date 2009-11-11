@@ -1740,20 +1740,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TRACKSKIP
+  id: LANG_MANTRACKSKIP
   desc: in crossfade settings
   user: core
   <source>
     *: none
-    swcodec: "Track Skip Only"
+    swcodec: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Track Skip Only"
+    swcodec: "Manual Track Skip Only"
   </dest>
   <voice>
     *: none
-    swcodec: "Track Skip Only"
+    swcodec: "Manual Track Skip Only"
   </voice>
 </phrase>
 <phrase>
@@ -1762,15 +1762,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Track Skip"
+    swcodec: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Shuffle and Track Skip"
+    swcodec: "Shuffle and Manual Track Skip"
   </dest>
   <voice>
     *: none
-    swcodec: "Shuffle and Track Skip"
+    swcodec: "Shuffle and Manual Track Skip"
   </voice>
 </phrase>
 <phrase>
@@ -13225,5 +13225,22 @@
   <voice>
     *: none
     morse_input: "Use Morse Code Input"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto Track Skip Only"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Auto Track Skip Only"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Auto Track Skip Only"
   </voice>
 </phrase>

@@ -1166,8 +1166,9 @@ const struct settings_list settings[] = {
     /* crossfade */
     CHOICE_SETTING(F_SOUNDSETTING, crossfade, LANG_CROSSFADE_ENABLE, 0,
                    "crossfade",
-                   "off,shuffle,track skip,shuffle and track skip,always", NULL,
-                   5, ID2P(LANG_OFF), ID2P(LANG_SHUFFLE), ID2P(LANG_TRACKSKIP),
+                   "off,auto track skip,man track skip,shuffle,shuffle and man track skip,always",
+                   NULL, 6, ID2P(LANG_OFF), ID2P(LANG_AUTOTRACKSKIP),
+                   ID2P(LANG_MANTRACKSKIP), ID2P(LANG_SHUFFLE),
                    ID2P(LANG_SHUFFLE_TRACKSKIP), ID2P(LANG_ALWAYS)),
     INT_SETTING(F_SOUNDSETTING, crossfade_fade_in_delay,
                 LANG_CROSSFADE_FADE_IN_DELAY, 0,
