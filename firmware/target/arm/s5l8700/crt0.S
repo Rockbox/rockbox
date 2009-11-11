@@ -22,6 +22,28 @@
 #include "config.h"
 #include "cpu.h"
 
+/* Meizu M3 SDRAM settings */
+#ifdef MEIZU_M3
+#define SDR_DSS_SEL_B   1
+#define SDR_DSS_SEL_O   1
+#define SDR_DSS_SEL_C   1
+#define SDR_TIMING      0x6A491D
+#define SDR_CONFIG      0x900
+#define SDR_MRS         0x37
+#define SDR_EMRS        0x4000
+#endif
+
+/* Meizu M6SP SDRAM settings */
+#ifdef MEIZU_M6SP
+#define SDR_DSS_SEL_B   5
+#define SDR_DSS_SEL_O   2
+#define SDR_DSS_SEL_C   2
+#define SDR_TIMING      0x6A4965
+#define SDR_CONFIG      0x700
+#define SDR_MRS         0x33
+#define SDR_EMRS        0x4033
+#endif
+
     .section .intvect,"ax",%progbits
     .global    start
     .global    _newstart
@@ -236,14 +258,15 @@ start_loc:
     mov r0, #0  // 0x0
     str r0, [r1, #44] // do not enter any power saving mode
 
-#ifdef MEIZU_M6SP
+#if defined(MEIZU_M6SP) || defined(MEIZU_M3)
     /* setup SDRAM for Meizu M6SP */
     ldr r1, =0x38200000
     // configure SDR drive strength and pad settings
-    mov r0, #5
+    mov r0, #SDR_DSS_SEL_B
     str r0, [r1, #0x4C] // MIU_DSS_SEL_B
-    mov r0, #2
+    mov r0, #SDR_DSS_SEL_O
     str r0, [r1, #0x50] // MIU_DSS_SEL_O
+    mov r0, #SDR_DSS_SEL_C
     str r0, [r1, #0x54] // MIU_DSS_SEL_C
     mov r0, #2
     str r0, [r1, #0x60] // SSTL2_PAD_ON
@@ -254,10 +277,10 @@ start_loc:
     orr r0, r0, #1
     str r0, [r1, #0x40] // MIUORG
     // set controller configuration
-    mov r0, #0x700
+    mov r0, #SDR_CONFIG
     str r0, [r1]        // MIUCON
     // set SDRAM timing
-    ldr r0, =0x6A4965
+    ldr r0, =SDR_TIMING
     str r0, [r1, #0x10] // MIUSDPARA
     // set refresh rate
     mov r0, #0x1080
@@ -287,11 +310,11 @@ start_loc:
     nop
     nop
     // set mode register
-    mov r0, #0x33
+    mov r0, #SDR_MRS
     str r0, [r1, #0x0C] // MIUMRS
     ldr r0, =0x103
     str r0, [r1, #0x04] // MIUCOM = mode register set
-    ldr r0, =0x4033
+    ldr r0, =SDR_EMRS
     str r0, [r1, #0x0C] // MIUMRS
     ldr r0, =0x103
     str r0, [r1, #0x04] // MIUCOM = mode register set

@@ -104,9 +104,5 @@ SECTIONS
      *(COMMON);
     . = ALIGN(0x4);
      _end = .;
-#if defined(IPOD_NANO2G) || defined(MEIZU_M6SP)
   } > DRAM
-#else /* other targets don't have DRAM set up yet */
-  } > IRAM
-#endif  
 }
