@@ -679,10 +679,9 @@ static const struct plugin_api rockbox_api = {
 
 int plugin_load(const char* plugin, const void* parameter)
 {
-    int rc, i;
+    int rc;
     int oldbars;
     struct plugin_header *hdr;
-    struct viewport plugin_vp[NB_SCREENS];
 #ifdef SIMULATOR
     void *pd;
 #else /* !SIMULATOR */
@@ -789,11 +788,6 @@ int plugin_load(const char* plugin, const void* parameter)
 
     oldbars = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
 
-    FOR_NB_SCREENS(i)
-        viewport_set_fullscreen(&plugin_vp[i], i);
-
-    viewport_set_current_vp(plugin_vp);
-
     cpucache_invalidate();
     
 #ifdef HAVE_TOUCHSCREEN
@@ -835,7 +829,6 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 
     viewportmanager_set_statusbar(oldbars);
-    viewport_set_current_vp(NULL);
 
     if (rc != PLUGIN_GOTO_WPS)
     {

@@ -242,27 +242,6 @@ static void viewportmanager_ui_vp_changed(void *param)
         screens[i].update();
 }
 
-void viewport_set_current_vp(struct viewport* vp)
-{
-    if (vp != NULL)
-        ui_vp_info.vp = vp;
-    else
-        ui_vp_info.vp = custom_vp;
-
-    /* must be done after the assignment above or event handler get old vps */
-    send_event(GUI_EVENT_THEME_CHANGED, NULL);
-}
-
-struct viewport* viewport_get_current_vp(void)
-{
-    return ui_vp_info.vp;
-}
-
-bool viewport_ui_vp_get_state(enum screen_type screen)
-{
-    return ui_vp_info.active[screen];
-}
-
 /*
  * (re)parse the UI vp from the settings
  *  - Returns

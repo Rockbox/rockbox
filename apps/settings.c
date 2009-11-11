@@ -1149,8 +1149,7 @@ bool set_int_ex(const unsigned char* string,
     item.lang_id = -1;
     item.cfg_vals = (char*)string;
     item.setting = (void *)variable;
-    return option_screen(&item,
-            viewport_get_current_vp(), false, NULL);
+    return option_screen(&item, NULL, false, NULL);
 }
 
 

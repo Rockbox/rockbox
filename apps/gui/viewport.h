@@ -89,23 +89,6 @@ void viewport_set_fullscreen(struct viewport *vp,
 /* call this when a theme changed */
 void viewportmanager_theme_changed(const int);
 
-/*
- * Returns a pointer to the current viewport
- *  - That could be the UI vp, or a viewport passed to do_menu() or the like
- */
-struct viewport* viewport_get_current_vp(void);
-
-/*
- * Set the UI vp pointer to a different one - NULL to reset to the UI vp
- *
- * This is needed since the UI viewport needs is kept in RAM.
- */
-void viewport_set_current_vp(struct viewport* vp);
-
-/*
- * returns true if the ui viewport is active on the screen
- */
-bool viewport_ui_vp_get_state(const enum screen_type screen);
 #ifdef HAVE_TOUCHSCREEN
 bool viewport_point_within_vp(const struct viewport *vp,
                                const int x, const int y);
