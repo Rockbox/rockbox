@@ -71,6 +71,8 @@ static const struct button_mapping button_context_list[]  = {
 }; /* button_context_list */
 
 static const struct button_mapping button_context_tree[]  = {
+    { ACTION_TREE_WPS,   BUTTON_PLUS|BUTTON_MENU,   BUTTON_PLUS },
+    { ACTION_TREE_WPS,   BUTTON_PLUS|BUTTON_MENU,   BUTTON_PLUS|BUTTON_REPEAT },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)
 }; /* button_context_tree */
 
