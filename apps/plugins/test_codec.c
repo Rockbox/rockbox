@@ -239,14 +239,12 @@ static int process_dsp(const void *ch1, const void *ch2, int count)
 }
 
 /* Null output */
-static bool pcmbuf_insert_null(const void *ch1, const void *ch2, int count)
+static void pcmbuf_insert_null(const void *ch1, const void *ch2, int count)
 {
     if (use_dsp) process_dsp(ch1, ch2, count);
 
     /* Prevent idle poweroff */
     rb->reset_poweroff_timer();
-
-    return true;
 }
 
 static inline int32_t clip_sample(int32_t sample)
@@ -259,7 +257,7 @@ static inline int32_t clip_sample(int32_t sample)
 
 
 /* WAV output */
-static bool pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
+static void pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
 {
     const int16_t* data1_16;
     const int16_t* data2_16;
@@ -360,8 +358,6 @@ static bool pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
     wavinfo.totalsamples += count;
     rb->write(wavinfo.fd, wavbuffer, p - wavbuffer);
     } /* else */
-
-    return true;
 }
 
 /* Set song position in WPS (value in ms). */

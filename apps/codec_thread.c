@@ -168,7 +168,7 @@ static void* codec_get_buffer(size_t *size)
     return &codecbuf[codec_size];
 }
 
-static bool codec_pcmbuf_insert_callback(
+static void codec_pcmbuf_insert_callback(
         const void *ch1, const void *ch2, int count)
 {
     const char *src[2] = { ch1, ch2 };
@@ -181,14 +181,14 @@ static bool codec_pcmbuf_insert_callback(
 
         /* Prevent audio from a previous track from playing */
         if (ci.new_track || ci.stop_codec)
-            return true;
+            return;
 
         while ((dest = pcmbuf_request_buffer(&out_count)) == NULL)
         {
             cancel_cpu_boost();
             sleep(1);
             if (ci.seek_time || ci.new_track || ci.stop_codec)
-                return true;
+                return;
         }
 
         /* Get the real input_size for output_size bytes, guarding
@@ -196,7 +196,7 @@ static bool codec_pcmbuf_insert_callback(
         inp_count = dsp_input_count(ci.dsp, out_count);
 
         if (inp_count <= 0)
-            return true;
+            return;
 
         /* Input size has grown, no error, just don't write more than length */
         if (inp_count > count)
@@ -205,14 +205,12 @@ static bool codec_pcmbuf_insert_callback(
         out_count = dsp_process(ci.dsp, dest, src, inp_count);
 
         if (out_count <= 0)
-            return true;
+            return;
 
         pcmbuf_write_complete(out_count);
 
         count -= inp_count;
     }
-
-    return true;
 } /* codec_pcmbuf_insert_callback */
 
 static void codec_set_elapsed_callback(unsigned long value)
