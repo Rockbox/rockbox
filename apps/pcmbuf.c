@@ -690,63 +690,16 @@ static inline int32_t clip_sample_16(int32_t sample)
 }
 
 #ifdef HAVE_CROSSFADE
-/* Completely process the crossfade fade-out effect with current PCM buffer */
-static void crossfade_process_buffer(size_t fade_in_delay,
-        size_t fade_out_delay, size_t fade_out_rem)
+/* Find the chunk that's (length) deep in the list. Return the position within
+ * the chunk, and leave the chunkdesc pointer pointing to the chunk. */
+static size_t find_chunk(size_t length, struct chunkdesc **chunk)
 {
-    if (!crossfade_mixmode)
+    while (*chunk && length >= (*chunk)->size)
     {
-        /* Fade out the specified amount of the already processed audio */
-        size_t total_fade_out = fade_out_rem;
-        size_t fade_out_sample;
-        struct chunkdesc *fade_out_chunk = crossfade_chunk;
-
-        /* Find the right chunk to start fading out */
-        fade_out_delay += crossfade_sample * 2;
-        while (fade_out_delay != 0 && fade_out_delay >= fade_out_chunk->size)
-        {
-            fade_out_delay -= fade_out_chunk->size;
-            fade_out_chunk = fade_out_chunk->link;
-        }
-        /* The start sample within the chunk */
-        fade_out_sample = fade_out_delay / 2;
-
-        while (fade_out_rem > 0)
-        {
-            /* Each 1/10 second of audio will have the same fade applied */
-            size_t block_rem = MIN(NATIVE_FREQUENCY * 4 / 10, fade_out_rem);
-            int factor = (fade_out_rem << 8) / total_fade_out;
-
-            fade_out_rem -= block_rem;
-
-            /* Fade this block */
-            while (block_rem > 0 && fade_out_chunk != NULL)
-            {
-                /* Fade one sample */
-                int16_t *buf = (int16_t *)fade_out_chunk->addr;
-                int32_t sample = buf[fade_out_sample];
-                buf[fade_out_sample++] = (sample * factor) >> 8;
-
-                block_rem -= 2;
-                /* Move to the next chunk as needed */
-                if (fade_out_sample * 2 >= fade_out_chunk->size)
-                {
-                    fade_out_chunk = fade_out_chunk->link;
-                    fade_out_sample = 0;
-                }
-            }
-        }
+        length -= (*chunk)->size;
+        *chunk = (*chunk)->link;
     }
-
-    /* Find the right chunk and sample to start fading in */
-    fade_in_delay += crossfade_sample * 2;
-    while (fade_in_delay != 0 && fade_in_delay >= crossfade_chunk->size)
-    {
-        fade_in_delay -= crossfade_chunk->size;
-        crossfade_chunk = crossfade_chunk->link;
-    }
-    crossfade_sample = fade_in_delay / 2;
-    logf("process done!");
+    return length / 2;
 }
 
 /* Initializes crossfader, calculates all necessary parameters and performs
@@ -777,25 +730,19 @@ static void crossfade_start(void)
     crossfade_chunk = read_chunk->link;
     crossfade_sample = 0;
 
-    /* Get fade out delay from settings. */
+    /* Get fade out info from settings. */
     fade_out_delay =
         NATIVE_FREQUENCY * global_settings.crossfade_fade_out_delay * 4;
-
-    /* Get fade out duration from settings. */
     fade_out_rem =
         NATIVE_FREQUENCY * global_settings.crossfade_fade_out_duration * 4;
 
     crossfade_need = fade_out_delay + fade_out_rem;
-    /* We want only to modify the last part of the buffer. */
+    /* We want only to modify the last part of the buffer, so find
+     * the right chunk and sample to start the crossfade */
     if (crossfade_rem > crossfade_need)
     {
-        size_t crossfade_extra = crossfade_rem - crossfade_need;
-        while (crossfade_extra > crossfade_chunk->size)
-        {
-            crossfade_extra -= crossfade_chunk->size;
-            crossfade_chunk = crossfade_chunk->link;
-        }
-        crossfade_sample = crossfade_extra / 2;
+        crossfade_sample = find_chunk(crossfade_rem - crossfade_need,
+            &crossfade_chunk);
     }
     /* Truncate fade out duration if necessary. */
     else if (crossfade_rem < crossfade_need)
@@ -810,7 +757,46 @@ static void crossfade_start(void)
         }
     }
 
-    /* Get also fade in duration and delays from settings. */
+    /* Completely process the crossfade fade-out effect with current PCM buffer */
+    if (!crossfade_mixmode)
+    {
+        /* Fade out the specified amount of the already processed audio */
+        size_t total_fade_out = fade_out_rem;
+        size_t fade_out_sample;
+        struct chunkdesc *fade_out_chunk = crossfade_chunk;
+
+        /* Find the right chunk and sample to start fading out */
+        fade_out_delay += crossfade_sample * 2;
+        fade_out_sample = find_chunk(fade_out_delay, &fade_out_chunk);
+
+        while (fade_out_rem > 0)
+        {
+            /* Each 1/10 second of audio will have the same fade applied */
+            size_t block_rem = MIN(NATIVE_FREQUENCY * 4 / 10, fade_out_rem);
+            int factor = (fade_out_rem << 8) / total_fade_out;
+
+            fade_out_rem -= block_rem;
+
+            /* Fade this block */
+            while (block_rem > 0 && fade_out_chunk != NULL)
+            {
+                /* Fade one sample */
+                int16_t *buf = (int16_t *)fade_out_chunk->addr;
+                int32_t sample = buf[fade_out_sample];
+                buf[fade_out_sample++] = (sample * factor) >> 8;
+
+                block_rem -= 2;
+                /* Move to the next chunk as needed */
+                if (fade_out_sample * 2 >= fade_out_chunk->size)
+                {
+                    fade_out_chunk = fade_out_chunk->link;
+                    fade_out_sample = 0;
+                }
+            }
+        }
+    }
+
+    /* Initialize fade-in counters */
     crossfade_fade_in_total =
         NATIVE_FREQUENCY * global_settings.crossfade_fade_in_duration * 4;
     crossfade_fade_in_rem = crossfade_fade_in_total;
@@ -818,7 +804,10 @@ static void crossfade_start(void)
     fade_in_delay =
         NATIVE_FREQUENCY * global_settings.crossfade_fade_in_delay * 4;
 
-    crossfade_process_buffer(fade_in_delay, fade_out_delay, fade_out_rem);
+    /* Find the right chunk and sample to start fading in */
+    fade_in_delay += crossfade_sample * 2;
+    crossfade_sample = find_chunk(fade_in_delay, &crossfade_chunk);
+    logf("crossfade_start done!");
 }
 
 /* Returns the number of bytes _NOT_ mixed */
