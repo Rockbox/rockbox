@@ -1616,15 +1616,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "تأخير انعدام الصوت التدريجى"
+    crossfade: "تأخير انعدام الصوت التدريجى"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </voice>
 </phrase>
 <phrase>
@@ -2221,15 +2221,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "مدة الزيادة التدريجية فى الصوت"
+    crossfade: "مدة الزيادة التدريجية فى الصوت"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </voice>
 </phrase>
 <phrase>
@@ -2238,15 +2238,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "مدة الانعدام التدريجي للصوت"
+    crossfade: "مدة الانعدام التدريجي للصوت"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </voice>
 </phrase>
 <phrase>
@@ -2379,15 +2379,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "تخطي المسار فقط"
+    crossfade: "تخطي المسار فقط"
   </dest>
   <voice>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </voice>
 </phrase>
 <phrase>
@@ -3463,15 +3463,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "وضع الانعدام التدريجى"
+    crossfade: "وضع الانعدام التدريجى"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </voice>
 </phrase>
 <phrase>
@@ -3916,15 +3916,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "خلط"
+    crossfade: "خلط"
   </dest>
   <voice>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </voice>
 </phrase>
 <phrase>

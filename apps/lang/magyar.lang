@@ -1618,15 +1618,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Átúsztatás"
+    crossfade: "Átúsztatás"
   </dest>
   <voice>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -1635,15 +1635,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Átúsztatás be"
+    crossfade: "Átúsztatás be"
   </dest>
   <voice>
     *: none
-    swcodec: "Enable crossfade"
+    crossfade: "Enable crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -1652,15 +1652,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Csak szám átugrása"
+    crossfade: "Csak szám átugrása"
   </dest>
   <voice>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </voice>
 </phrase>
 <phrase>
@@ -1669,15 +1669,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Keverés és szám átugrása"
+    crossfade: "Keverés és szám átugrása"
   </dest>
   <voice>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </voice>
 </phrase>
 <phrase>
@@ -1686,15 +1686,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Beúsztatás késleltetés"
+    crossfade: "Beúsztatás késleltetés"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade in delay"
+    crossfade: "Fade in delay"
   </voice>
 </phrase>
 <phrase>
@@ -1703,15 +1703,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Beúsztatás hossza"
+    crossfade: "Beúsztatás hossza"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade in duration"
+    crossfade: "Fade in duration"
   </voice>
 </phrase>
 <phrase>
@@ -1720,15 +1720,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Lekeverés késleltetés"
+    crossfade: "Lekeverés késleltetés"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade out delay"
+    crossfade: "Fade out delay"
   </voice>
 </phrase>
 <phrase>
@@ -1737,11 +1737,11 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Lekeverés hossza"
+    crossfade: "Lekeverés hossza"
   </dest>
   <voice>
     *: "Fade-Out Duration"
@@ -1753,15 +1753,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Lekeveréses mód"
+    crossfade: "Lekeveréses mód"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </voice>
 </phrase>
 <phrase>
@@ -1770,15 +1770,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Keverés"
+    crossfade: "Keverés"
   </dest>
   <voice>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </voice>
 </phrase>
 <phrase>

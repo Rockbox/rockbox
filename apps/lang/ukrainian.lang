@@ -1636,15 +1636,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Накладання"
+    crossfade: "Накладання"
   </dest>
   <voice>
     *: none
-    swcodec: "Накладання"
+    crossfade: "Накладання"
   </voice>
 </phrase>
 <phrase>
@@ -1653,15 +1653,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Задiяти Накладання"
+    crossfade: "Задiяти Накладання"
   </dest>
   <voice>
     *: none
-    swcodec: "Задiяти Накладання"
+    crossfade: "Задiяти Накладання"
   </voice>
 </phrase>
 <phrase>
@@ -1670,15 +1670,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Тiльки пропуск треку"
+    crossfade: "Тiльки пропуск треку"
   </dest>
   <voice>
     *: none
-    swcodec: "Тiльки пропуск треку"
+    crossfade: "Тiльки пропуск треку"
   </voice>
 </phrase>
 <phrase>
@@ -1687,15 +1687,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Змiшування i пропуск треку"
+    crossfade: "Змiшування i пропуск треку"
   </dest>
   <voice>
     *: none
-    swcodec: "Змiшування i пропуск треку"
+    crossfade: "Змiшування i пропуск треку"
   </voice>
 </phrase>
 <phrase>
@@ -1704,15 +1704,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Затримка Зростання"
+    crossfade: "Затримка Зростання"
   </dest>
   <voice>
     *: none
-    swcodec: "Затримка Зростання"
+    crossfade: "Затримка Зростання"
   </voice>
 </phrase>
 <phrase>
@@ -1721,15 +1721,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Тривалiсть Зростання"
+    crossfade: "Тривалiсть Зростання"
   </dest>
   <voice>
     *: none
-    swcodec: "Тривалiсть Зростання"
+    crossfade: "Тривалiсть Зростання"
   </voice>
 </phrase>
 <phrase>
@@ -1738,15 +1738,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Затримка Затухання"
+    crossfade: "Затримка Затухання"
   </dest>
   <voice>
     *: none
-    swcodec: "Затримка Затухання"
+    crossfade: "Затримка Затухання"
   </voice>
 </phrase>
 <phrase>
@@ -1755,15 +1755,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Тривалiсть Затухання"
+    crossfade: "Тривалiсть Затухання"
   </dest>
   <voice>
     *: none
-    swcodec: "Тривалiсть Затухання"
+    crossfade: "Тривалiсть Затухання"
   </voice>
 </phrase>
 <phrase>
@@ -1772,15 +1772,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Режим Затухання"
+    crossfade: "Режим Затухання"
   </dest>
   <voice>
     *: none
-    swcodec: "Режим Затухання"
+    crossfade: "Режим Затухання"
   </voice>
 </phrase>
 <phrase>
@@ -1789,15 +1789,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Змiшування"
+    crossfade: "Змiшування"
   </dest>
   <voice>
     *: none
-    swcodec: "Змiшування"
+    crossfade: "Змiшування"
   </voice>
 </phrase>
 <phrase>

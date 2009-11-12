@@ -1328,15 +1328,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "크로스페이드"
+    crossfade: "크로스페이드"
   </dest>
   <voice>
     *: none
-    swcodec: "크로스페이드"
+    crossfade: "크로스페이드"
   </voice>
 </phrase>
 <phrase>
@@ -2691,15 +2691,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "크로스페이드 켜기"
+    crossfade: "크로스페이드 켜기"
   </dest>
   <voice>
     *: none
-    swcodec: "크로스페이드 켜기"
+    crossfade: "크로스페이드 켜기"
   </voice>
 </phrase>
 <phrase>
@@ -2708,15 +2708,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "트랙 스킵만"
+    crossfade: "트랙 스킵만"
   </dest>
   <voice>
     *: none
-    swcodec: "트랙 스킵만"
+    crossfade: "트랙 스킵만"
   </voice>
 </phrase>
 <phrase>
@@ -2725,15 +2725,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "페이드인 지연시간"
+    crossfade: "페이드인 지연시간"
   </dest>
   <voice>
     *: none
-    swcodec: "페이드인 지연시간"
+    crossfade: "페이드인 지연시간"
   </voice>
 </phrase>
 <phrase>
@@ -2742,15 +2742,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "페이드인 시간"
+    crossfade: "페이드인 시간"
   </dest>
   <voice>
     *: none
-    swcodec: "페이드인 시간"
+    crossfade: "페이드인 시간"
   </voice>
 </phrase>
 <phrase>
@@ -2759,15 +2759,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "페이드아웃 지연시간"
+    crossfade: "페이드아웃 지연시간"
   </dest>
   <voice>
     *: none
-    swcodec: "페이드아웃 지연시간"
+    crossfade: "페이드아웃 지연시간"
   </voice>
 </phrase>
 <phrase>
@@ -2776,15 +2776,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "페이드아웃 시간"
+    crossfade: "페이드아웃 시간"
   </dest>
   <voice>
     *: none
-    swcodec: "페이드아웃 시간"
+    crossfade: "페이드아웃 시간"
   </voice>
 </phrase>
 <phrase>
@@ -2793,15 +2793,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "페이드아웃 모드"
+    crossfade: "페이드아웃 모드"
   </dest>
   <voice>
     *: none
-    swcodec: "페이드아웃 모드"
+    crossfade: "페이드아웃 모드"
   </voice>
 </phrase>
 <phrase>
@@ -2810,15 +2810,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "혼합"
+    crossfade: "혼합"
   </dest>
   <voice>
     *: none
-    swcodec: "혼합"
+    crossfade: "혼합"
   </voice>
 </phrase>
 <phrase>
@@ -9693,15 +9693,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "무작위 & 트랙 스킵"
+    crossfade: "무작위 & 트랙 스킵"
   </dest>
   <voice>
     *: none
-    swcodec: "무작위 & 트랙 스킵"
+    crossfade: "무작위 & 트랙 스킵"
   </voice>
 </phrase>
 <phrase>

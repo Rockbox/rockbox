@@ -6515,15 +6515,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Activar fundido"
+    crossfade: "Activar fundido"
   </dest>
   <voice>
     *: none
-    swcodec: "Activar fundido"
+    crossfade: "Activar fundido"
   </voice>
 </phrase>
 <phrase>
@@ -7472,15 +7472,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Retraso de fundido de salida"
+    crossfade: "Retraso de fundido de salida"
   </dest>
   <voice>
     *: none
-    swcodec: "Retraso de fundido de salida"
+    crossfade: "Retraso de fundido de salida"
   </voice>
 </phrase>
 <phrase>
@@ -7776,15 +7776,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Duración del fundido de entrada"
+    crossfade: "Duración del fundido de entrada"
   </dest>
   <voice>
     *: none
-    swcodec: "Duración del fundido de entrada"
+    crossfade: "Duración del fundido de entrada"
   </voice>
 </phrase>
 <phrase>
@@ -7793,15 +7793,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Duración del fundido de salida"
+    crossfade: "Duración del fundido de salida"
   </dest>
   <voice>
     *: none
-    swcodec: "Duración del fundido de salida"
+    crossfade: "Duración del fundido de salida"
   </voice>
 </phrase>
 <phrase>
@@ -7908,15 +7908,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Sólo saltar pista"
+    crossfade: "Sólo saltar pista"
   </dest>
   <voice>
     *: none
-    swcodec: "Sólo saltar pista"
+    crossfade: "Sólo saltar pista"
   </voice>
 </phrase>
 <phrase>
@@ -8394,15 +8394,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Fundido de cruce"
+    crossfade: "Fundido de cruce"
   </dest>
   <voice>
     *: none
-    swcodec: "Fundido de cruce"
+    crossfade: "Fundido de cruce"
   </voice>
 </phrase>
 <phrase>
@@ -8569,15 +8569,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Modo de fundido de salida"
+    crossfade: "Modo de fundido de salida"
   </dest>
   <voice>
     *: none
-    swcodec: "Modo de fundido de salida"
+    crossfade: "Modo de fundido de salida"
   </voice>
 </phrase>
 <phrase>
@@ -8719,15 +8719,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Retraso del fundido de entrada"
+    crossfade: "Retraso del fundido de entrada"
   </dest>
   <voice>
     *: none
-    swcodec: "Retraso del fundido de entrada"
+    crossfade: "Retraso del fundido de entrada"
   </voice>
 </phrase>
 <phrase>
@@ -8778,15 +8778,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Mezcla"
+    crossfade: "Mezcla"
   </dest>
   <voice>
     *: none
-    swcodec: "Mezcla"
+    crossfade: "Mezcla"
   </voice>
 </phrase>
 <phrase>
@@ -8911,15 +8911,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Aleatorio y saltar pista"
+    crossfade: "Aleatorio y saltar pista"
   </dest>
   <voice>
     *: none
-    swcodec: "Aleatorio y saltar pista"
+    crossfade: "Aleatorio y saltar pista"
   </voice>
 </phrase>
 <phrase>

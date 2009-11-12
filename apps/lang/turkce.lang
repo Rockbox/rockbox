@@ -1411,15 +1411,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Crossfade Başla"
+    crossfade: "Crossfade Başla"
   </dest>
   <voice>
     *: none
-    swcodec: "Crossfade başla"
+    crossfade: "Crossfade başla"
   </voice>
 </phrase>
 <phrase>

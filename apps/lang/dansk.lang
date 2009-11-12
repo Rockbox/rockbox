@@ -1030,15 +1030,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Glidende overgang"
+    crossfade: "Glidende overgang"
   </dest>
   <voice>
     *: none
-    swcodec: "Glidende overgang"
+    crossfade: "Glidende overgang"
   </voice>
 </phrase>
 <phrase>
@@ -2252,15 +2252,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Aktiver glidende overgang"
+    crossfade: "Aktiver glidende overgang"
   </dest>
   <voice>
     *: none
-    swcodec: "Aktiver glidende overgang"
+    crossfade: "Aktiver glidende overgang"
   </voice>
 </phrase>
 <phrase>
@@ -2269,15 +2269,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Pause før indtoning"
+    crossfade: "Pause før indtoning"
   </dest>
   <voice>
     *: none
-    swcodec: "Pause før indtoning"
+    crossfade: "Pause før indtoning"
   </voice>
 </phrase>
 <phrase>
@@ -2286,15 +2286,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Længde af indtoning"
+    crossfade: "Længde af indtoning"
   </dest>
   <voice>
     *: none
-    swcodec: "Længde af indtoning"
+    crossfade: "Længde af indtoning"
   </voice>
 </phrase>
 <phrase>
@@ -2303,15 +2303,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Pause før udtoning"
+    crossfade: "Pause før udtoning"
   </dest>
   <voice>
     *: none
-    swcodec: "Pause før udtoning"
+    crossfade: "Pause før udtoning"
   </voice>
 </phrase>
 <phrase>
@@ -2320,15 +2320,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Længde af udtoning"
+    crossfade: "Længde af udtoning"
   </dest>
   <voice>
     *: none
-    swcodec: "Længde af udtoning"
+    crossfade: "Længde af udtoning"
   </voice>
 </phrase>
 <phrase>
@@ -2337,15 +2337,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Overgangs type"
+    crossfade: "Overgangs type"
   </dest>
   <voice>
     *: none
-    swcodec: "Overgangs type"
+    crossfade: "Overgangs type"
   </voice>
 </phrase>
 <phrase>
@@ -2354,15 +2354,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Kort glidende overgang"
+    crossfade: "Kort glidende overgang"
   </dest>
   <voice>
     *: none
-    swcodec: "Kort glidende overgang"
+    crossfade: "Kort glidende overgang"
   </voice>
 </phrase>
 <phrase>
@@ -7492,15 +7492,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Kun ved manuel sangskift"
+    crossfade: "Kun ved manuel sangskift"
   </dest>
   <voice>
     *: none
-    swcodec: "Kun ved manuel sangskift"
+    crossfade: "Kun ved manuel sangskift"
   </voice>
 </phrase>
 <phrase>
@@ -9516,15 +9516,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Sangskift ved blandet afspilning"
+    crossfade: "Sangskift ved blandet afspilning"
   </dest>
   <voice>
     *: none
-    swcodec: "Sangskift ved blandet afspilning"
+    crossfade: "Sangskift ved blandet afspilning"
   </voice>
 </phrase>
 <phrase>

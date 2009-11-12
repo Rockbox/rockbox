@@ -1669,15 +1669,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Fondu-enchaîné"
+    crossfade: "Fondu-enchaîné"
   </dest>
   <voice>
     *: none
-    swcodec: "Fondu-enchaîné"
+    crossfade: "Fondu-enchaîné"
   </voice>
 </phrase>
 <phrase>
@@ -1686,15 +1686,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Activer le fondu-enchaîné"
+    crossfade: "Activer le fondu-enchaîné"
   </dest>
   <voice>
     *: none
-    swcodec: "Activer le fondu-enchaîné"
+    crossfade: "Activer le fondu-enchaîné"
   </voice>
 </phrase>
 <phrase>
@@ -1703,15 +1703,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Seulement pour changement piste"
+    crossfade: "Seulement pour changement piste"
   </dest>
   <voice>
     *: none
-    swcodec: "Seulement pour changement de piste"
+    crossfade: "Seulement pour changement de piste"
   </voice>
 </phrase>
 <phrase>
@@ -1720,15 +1720,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Aléatoire et quand changement piste"
+    crossfade: "Aléatoire et quand changement piste"
   </dest>
   <voice>
     *: none
-    swcodec: "Aléatoire et quand changement de piste"
+    crossfade: "Aléatoire et quand changement de piste"
   </voice>
 </phrase>
 <phrase>
@@ -1737,15 +1737,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Délai du fondu en ouverture"
+    crossfade: "Délai du fondu en ouverture"
   </dest>
   <voice>
     *: none
-    swcodec: "Délai du fondu en ouverture"
+    crossfade: "Délai du fondu en ouverture"
   </voice>
 </phrase>
 <phrase>
@@ -1754,15 +1754,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Durée du fondu en ouverture"
+    crossfade: "Durée du fondu en ouverture"
   </dest>
   <voice>
     *: none
-    swcodec: "Durée du fondu en ouverture"
+    crossfade: "Durée du fondu en ouverture"
   </voice>
 </phrase>
 <phrase>
@@ -1771,15 +1771,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Délai du fondu en fermeture"
+    crossfade: "Délai du fondu en fermeture"
   </dest>
   <voice>
     *: none
-    swcodec: "Délai du fondu en fermeture"
+    crossfade: "Délai du fondu en fermeture"
   </voice>
 </phrase>
 <phrase>
@@ -1788,15 +1788,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Durée du fondu en fermeture"
+    crossfade: "Durée du fondu en fermeture"
   </dest>
   <voice>
     *: none
-    swcodec: "Durée du fondu en fermeture"
+    crossfade: "Durée du fondu en fermeture"
   </voice>
 </phrase>
 <phrase>
@@ -1805,15 +1805,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Mode de fondu en fermeture"
+    crossfade: "Mode de fondu en fermeture"
   </dest>
   <voice>
     *: none
-    swcodec: "Mode de fondu en fermeture"
+    crossfade: "Mode de fondu en fermeture"
   </voice>
 </phrase>
 <phrase>
@@ -1822,15 +1822,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Mixé"
+    crossfade: "Mixé"
   </dest>
   <voice>
     *: none
-    swcodec: "Mixé"
+    crossfade: "Mixé"
   </voice>
 </phrase>
 <phrase>

@@ -904,15 +904,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Crossfade चालू करो"
+    crossfade: "Crossfade चालू करो"
   </dest>
   <voice>
     *: none
-    swcodec: "Crossfade चालू करो"
+    crossfade: "Crossfade चालू करो"
   </voice>
 </phrase>
 <phrase>
@@ -921,15 +921,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "मिला"
+    crossfade: "मिला"
   </dest>
   <voice>
     *: none
-    swcodec: "मिला"
+    crossfade: "मिला"
   </voice>
 </phrase>
 <phrase>

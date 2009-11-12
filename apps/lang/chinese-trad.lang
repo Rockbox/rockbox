@@ -1316,15 +1316,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "交叉淡變"
+    crossfade: "交叉淡變"
   </dest>
   <voice>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -2679,15 +2679,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "開啟Crossfade"
+    crossfade: "開啟Crossfade"
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    crossfade: ""
   </voice>
 </phrase>
 <phrase>
@@ -2696,15 +2696,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "只在跳到另一首時"
+    crossfade: "只在跳到另一首時"
   </dest>
   <voice>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </voice>
 </phrase>
 <phrase>
@@ -2713,15 +2713,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "淡入延遲"
+    crossfade: "淡入延遲"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </voice>
 </phrase>
 <phrase>
@@ -2730,15 +2730,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "淡入期間"
+    crossfade: "淡入期間"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </voice>
 </phrase>
 <phrase>
@@ -2747,15 +2747,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "淡出延遲"
+    crossfade: "淡出延遲"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </voice>
 </phrase>
 <phrase>
@@ -2764,15 +2764,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "淡出期間"
+    crossfade: "淡出期間"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </voice>
 </phrase>
 <phrase>
@@ -2781,15 +2781,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "淡出模式"
+    crossfade: "淡出模式"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </voice>
 </phrase>
 <phrase>
@@ -2798,15 +2798,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "混合"
+    crossfade: "混合"
   </dest>
   <voice>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </voice>
 </phrase>
 <phrase>
@@ -9235,15 +9235,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "亂序播放與跳過曲目"
+    crossfade: "亂序播放與跳過曲目"
   </dest>
   <voice>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </voice>
 </phrase>
 <phrase>

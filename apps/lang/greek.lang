@@ -1622,15 +1622,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Ομαλή εναλλαγή"
+    crossfade: "Ομαλή εναλλαγή"
   </dest>
   <voice>
     *: none
-    swcodec: "Ομαλή εναλλαγή"
+    crossfade: "Ομαλή εναλλαγή"
   </voice>
 </phrase>
 <phrase>
@@ -1639,15 +1639,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Ενεργοποίηση ομαλής εναλλαγής"
+    crossfade: "Ενεργοποίηση ομαλής εναλλαγής"
   </dest>
   <voice>
     *: none
-    swcodec: "Ενεργοποίηση ομαλής εναλλαγής"
+    crossfade: "Ενεργοποίηση ομαλής εναλλαγής"
   </voice>
 </phrase>
 <phrase>
@@ -1656,15 +1656,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Στην αλλαγή κομματιών μόνο"
+    crossfade: "Στην αλλαγή κομματιών μόνο"
   </dest>
   <voice>
     *: none
-    swcodec: "Στην αλλαγή κομματιών μόνο"
+    crossfade: "Στην αλλαγή κομματιών μόνο"
   </voice>
 </phrase>
 <phrase>
@@ -1673,15 +1673,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Ανακάτεμα και αναπήδηση κομματιού"
+    crossfade: "Ανακάτεμα και αναπήδηση κομματιού"
   </dest>
   <voice>
     *: none
-    swcodec: "Ανακάτεμα και αναπήδηση κομματιού"
+    crossfade: "Ανακάτεμα και αναπήδηση κομματιού"
   </voice>
 </phrase>
 <phrase>
@@ -1690,15 +1690,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Καθυστέρηση εισόδου ομαλής εναλλαγής"
+    crossfade: "Καθυστέρηση εισόδου ομαλής εναλλαγής"
   </dest>
   <voice>
     *: none
-    swcodec: "Καθύστέρηση εισόδου ομαλής εναλλαγής"
+    crossfade: "Καθύστέρηση εισόδου ομαλής εναλλαγής"
   </voice>
 </phrase>
 <phrase>
@@ -1707,15 +1707,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Διάρκεια εισόδου ομαλής εναλλαγής"
+    crossfade: "Διάρκεια εισόδου ομαλής εναλλαγής"
   </dest>
   <voice>
     *: none
-    swcodec: "Διάρκεια εισόδου ομαλής εναλλαγής"
+    crossfade: "Διάρκεια εισόδου ομαλής εναλλαγής"
   </voice>
 </phrase>
 <phrase>
@@ -1724,15 +1724,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Καθυστέρηση ομαλής εναλλαγής"
+    crossfade: "Καθυστέρηση ομαλής εναλλαγής"
   </dest>
   <voice>
     *: none
-    swcodec: "Καθύστέρηση ομαλής εναλλαγής"
+    crossfade: "Καθύστέρηση ομαλής εναλλαγής"
   </voice>
 </phrase>
 <phrase>
@@ -1741,15 +1741,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Διάρκεια εξόδου ομαλής εναλλαγής"
+    crossfade: "Διάρκεια εξόδου ομαλής εναλλαγής"
   </dest>
   <voice>
     *: none
-    swcodec: "Διάρκεια εξόδου ομαλής εναλλαγής"
+    crossfade: "Διάρκεια εξόδου ομαλής εναλλαγής"
   </voice>
 </phrase>
 <phrase>
@@ -1758,15 +1758,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Τρόπος εξόδου ομαλής εναλλαγής"
+    crossfade: "Τρόπος εξόδου ομαλής εναλλαγής"
   </dest>
   <voice>
     *: none
-    swcodec: "Τρόπος εξόδου ομαλής εναλλαγής"
+    crossfade: "Τρόπος εξόδου ομαλής εναλλαγής"
   </voice>
 </phrase>
 <phrase>
@@ -1775,15 +1775,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Μίξη"
+    crossfade: "Μίξη"
   </dest>
   <voice>
     *: none
-    swcodec: "Μίξη"
+    crossfade: "Μίξη"
   </voice>
 </phrase>
 <phrase>

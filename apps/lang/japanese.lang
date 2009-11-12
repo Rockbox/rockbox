@@ -1644,15 +1644,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "クロスフェード"
+    crossfade: "クロスフェード"
   </dest>
   <voice>
     *: none
-    swcodec: "クロスフェード"
+    crossfade: "クロスフェード"
   </voice>
 </phrase>
 <phrase>
@@ -1661,15 +1661,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "クロスフェードの有効化"
+    crossfade: "クロスフェードの有効化"
   </dest>
   <voice>
     *: none
-    swcodec: "クロスフェードの有効化"
+    crossfade: "クロスフェードの有効化"
   </voice>
 </phrase>
 <phrase>
@@ -1678,15 +1678,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "スキップしたときのみ"
+    crossfade: "スキップしたときのみ"
   </dest>
   <voice>
     *: none
-    swcodec: "スキップしたときのみ"
+    crossfade: "スキップしたときのみ"
   </voice>
 </phrase>
 <phrase>
@@ -1695,15 +1695,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "シャッフルとスキップしたとき"
+    crossfade: "シャッフルとスキップしたとき"
   </dest>
   <voice>
     *: none
-    swcodec: "シャッフルとスキップしたとき"
+    crossfade: "シャッフルとスキップしたとき"
   </voice>
 </phrase>
 <phrase>
@@ -1712,15 +1712,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "フェードイン時間"
+    crossfade: "フェードイン時間"
   </dest>
   <voice>
     *: none
-    swcodec: "フェードイン時間"
+    crossfade: "フェードイン時間"
   </voice>
 </phrase>
 <phrase>
@@ -1729,15 +1729,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "フェードイン継続時間"
+    crossfade: "フェードイン継続時間"
   </dest>
   <voice>
     *: none
-    swcodec: "フェードイン継続時間"
+    crossfade: "フェードイン継続時間"
   </voice>
 </phrase>
 <phrase>
@@ -1746,15 +1746,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "フェードアウト時間"
+    crossfade: "フェードアウト時間"
   </dest>
   <voice>
     *: none
-    swcodec: "フェードアウト時間"
+    crossfade: "フェードアウト時間"
   </voice>
 </phrase>
 <phrase>
@@ -1763,15 +1763,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "フェードアウト継続時間"
+    crossfade: "フェードアウト継続時間"
   </dest>
   <voice>
     *: none
-    swcodec: "フェードアウト継続時間"
+    crossfade: "フェードアウト継続時間"
   </voice>
 </phrase>
 <phrase>
@@ -1780,15 +1780,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "フェードアウト・モード"
+    crossfade: "フェードアウト・モード"
   </dest>
   <voice>
     *: none
-    swcodec: "フェードアウト・モード"
+    crossfade: "フェードアウト・モード"
   </voice>
 </phrase>
 <phrase>
@@ -1797,15 +1797,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "ミックス"
+    crossfade: "ミックス"
   </dest>
   <voice>
     *: none
-    swcodec: "ミックス"
+    crossfade: "ミックス"
   </voice>
 </phrase>
 <phrase>

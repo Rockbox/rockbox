@@ -1291,15 +1291,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Наложение"
+    crossfade: "Наложение"
   </dest>
   <voice>
     *: none
-    swcodec: "Наложение"
+    crossfade: "Наложение"
   </voice>
 </phrase>
 <phrase>
@@ -2522,15 +2522,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Включить пересечение"
+    crossfade: "Включить пересечение"
   </dest>
   <voice>
     *: none
-    swcodec: "Включить пересечение"
+    crossfade: "Включить пересечение"
   </voice>
 </phrase>
 <phrase>
@@ -2539,15 +2539,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Задержка нарастания"
+    crossfade: "Задержка нарастания"
   </dest>
   <voice>
     *: none
-    swcodec: "Задержка нарастания"
+    crossfade: "Задержка нарастания"
   </voice>
 </phrase>
 <phrase>
@@ -2556,15 +2556,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Длительность нарастания"
+    crossfade: "Длительность нарастания"
   </dest>
   <voice>
     *: none
-    swcodec: "Длительность нарастания"
+    crossfade: "Длительность нарастания"
   </voice>
 </phrase>
 <phrase>
@@ -2573,15 +2573,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Задержка затухания"
+    crossfade: "Задержка затухания"
   </dest>
   <voice>
     *: none
-    swcodec: "Задержка затухания"
+    crossfade: "Задержка затухания"
   </voice>
 </phrase>
 <phrase>
@@ -2590,15 +2590,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Длительность затухания"
+    crossfade: "Длительность затухания"
   </dest>
   <voice>
     *: none
-    swcodec: "Длительность затухания"
+    crossfade: "Длительность затухания"
   </voice>
 </phrase>
 <phrase>
@@ -2607,15 +2607,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Режим затухания"
+    crossfade: "Режим затухания"
   </dest>
   <voice>
     *: none
-    swcodec: "Режим затухания"
+    crossfade: "Режим затухания"
   </voice>
 </phrase>
 <phrase>
@@ -2624,15 +2624,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Смешивание"
+    crossfade: "Смешивание"
   </dest>
   <voice>
     *: none
-    swcodec: "Смешивание"
+    crossfade: "Смешивание"
   </voice>
 </phrase>
 <phrase>
@@ -8761,15 +8761,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Тасование и пропуск треков"
+    crossfade: "Тасование и пропуск треков"
   </dest>
   <voice>
     *: none
-    swcodec: "Тасование и пропуск треков"
+    crossfade: "Тасование и пропуск треков"
   </voice>
 </phrase>
 <phrase>
@@ -10299,15 +10299,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Только при переключении"
+    crossfade: "Только при переключении"
   </dest>
   <voice>
     *: none
-    swcodec: "Только при переключении"
+    crossfade: "Только при переключении"
   </voice>
 </phrase>
 <phrase>

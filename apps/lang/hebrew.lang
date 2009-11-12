@@ -1646,15 +1646,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "מעבר ביניים"
+    crossfade: "מעבר ביניים"
   </dest>
   <voice>
     *: none
-    swcodec: "מעבר ביניים"
+    crossfade: "מעבר ביניים"
   </voice>
 </phrase>
 <phrase>
@@ -1663,15 +1663,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "הפעל מעבר ביניים"
+    crossfade: "הפעל מעבר ביניים"
   </dest>
   <voice>
     *: none
-    swcodec: "הפעל מעבר ביניים"
+    crossfade: "הפעל מעבר ביניים"
   </voice>
 </phrase>
 <phrase>
@@ -1680,15 +1680,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "רק בדילוג על שיר"
+    crossfade: "רק בדילוג על שיר"
   </dest>
   <voice>
     *: none
-    swcodec: "רק בדילוג על שיר"
+    crossfade: "רק בדילוג על שיר"
   </voice>
 </phrase>
 <phrase>
@@ -1697,15 +1697,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "בערבוב ובדילוג על שיר"
+    crossfade: "בערבוב ובדילוג על שיר"
   </dest>
   <voice>
     *: none
-    swcodec: "בערבוב ובדילוג על שיר"
+    crossfade: "בערבוב ובדילוג על שיר"
   </voice>
 </phrase>
 <phrase>
@@ -1714,15 +1714,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "השהיית גאייה"
+    crossfade: "השהיית גאייה"
   </dest>
   <voice>
     *: none
-    swcodec: "השהיית גאייה"
+    crossfade: "השהיית גאייה"
   </voice>
 </phrase>
 <phrase>
@@ -1731,15 +1731,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "משך זמן גאייה"
+    crossfade: "משך זמן גאייה"
   </dest>
   <voice>
     *: none
-    swcodec: "משך זמן גאייה"
+    crossfade: "משך זמן גאייה"
   </voice>
 </phrase>
 <phrase>
@@ -1748,15 +1748,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "השהיית דעיכה"
+    crossfade: "השהיית דעיכה"
   </dest>
   <voice>
     *: none
-    swcodec: "השהיית דעיכה"
+    crossfade: "השהיית דעיכה"
   </voice>
 </phrase>
 <phrase>
@@ -1765,15 +1765,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "משך זמן דעיכה"
+    crossfade: "משך זמן דעיכה"
   </dest>
   <voice>
     *: none
-    swcodec: "משך זמן דעיכה"
+    crossfade: "משך זמן דעיכה"
   </voice>
 </phrase>
 <phrase>
@@ -1782,15 +1782,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "מצב דעיכה"
+    crossfade: "מצב דעיכה"
   </dest>
   <voice>
     *: none
-    swcodec: "מצב דעיכה"
+    crossfade: "מצב דעיכה"
   </voice>
 </phrase>
 <phrase>
@@ -1799,15 +1799,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "מיקס"
+    crossfade: "מיקס"
   </dest>
   <voice>
     *: none
-    swcodec: "מיקס"
+    crossfade: "מיקס"
   </voice>
 </phrase>
 <phrase>

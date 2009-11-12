@@ -1317,15 +1317,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Ristivaihto"
+    crossfade: "Ristivaihto"
   </dest>
   <voice>
     *: none
-    swcodec: "Ristivaihto"
+    crossfade: "Ristivaihto"
   </voice>
 </phrase>
 <phrase>
@@ -2680,15 +2680,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Käytä ristivaihtoa"
+    crossfade: "Käytä ristivaihtoa"
   </dest>
   <voice>
     *: none
-    swcodec: "Käytä ristivaihtoa"
+    crossfade: "Käytä ristivaihtoa"
   </voice>
 </phrase>
 <phrase>
@@ -2697,15 +2697,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Vain kappaleohituksessa"
+    crossfade: "Vain kappaleohituksessa"
   </dest>
   <voice>
     *: none
-    swcodec: "Vain kappaleohituksessa"
+    crossfade: "Vain kappaleohituksessa"
   </voice>
 </phrase>
 <phrase>
@@ -2714,15 +2714,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Sisäänhäivytyksen viive"
+    crossfade: "Sisäänhäivytyksen viive"
   </dest>
   <voice>
     *: none
-    swcodec: "Sisäänhäivytyksen viive"
+    crossfade: "Sisäänhäivytyksen viive"
   </voice>
 </phrase>
 <phrase>
@@ -2731,15 +2731,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Sisäänhäivytyksen kesto"
+    crossfade: "Sisäänhäivytyksen kesto"
   </dest>
   <voice>
     *: none
-    swcodec: "Sisäänhäivytyksen kesto"
+    crossfade: "Sisäänhäivytyksen kesto"
   </voice>
 </phrase>
 <phrase>
@@ -2748,15 +2748,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Poishäivytyksen viive"
+    crossfade: "Poishäivytyksen viive"
   </dest>
   <voice>
     *: none
-    swcodec: "Poishäivytyksen viive"
+    crossfade: "Poishäivytyksen viive"
   </voice>
 </phrase>
 <phrase>
@@ -2765,15 +2765,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Poishäivytyksen kesto"
+    crossfade: "Poishäivytyksen kesto"
   </dest>
   <voice>
     *: none
-    swcodec: "Poishäivytyksen kesto"
+    crossfade: "Poishäivytyksen kesto"
   </voice>
 </phrase>
 <phrase>
@@ -2782,15 +2782,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Poishäivytyksen tyyppi"
+    crossfade: "Poishäivytyksen tyyppi"
   </dest>
   <voice>
     *: none
-    swcodec: "Poishäivytyksen tyyppi"
+    crossfade: "Poishäivytyksen tyyppi"
   </voice>
 </phrase>
 <phrase>
@@ -2799,15 +2799,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Miksaus"
+    crossfade: "Miksaus"
   </dest>
   <voice>
     *: none
-    swcodec: "Miksaus"
+    crossfade: "Miksaus"
   </voice>
 </phrase>
 <phrase>
@@ -9673,15 +9673,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Sekoitus ja kappaleohitus"
+    crossfade: "Sekoitus ja kappaleohitus"
   </dest>
   <voice>
     *: none
-    swcodec: "Sekoitus ja kappaleohitus"
+    crossfade: "Sekoitus ja kappaleohitus"
   </voice>
 </phrase>
 <phrase>

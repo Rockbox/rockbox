@@ -1643,15 +1643,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Korstona"
+    crossfade: "Korstona"
   </dest>
   <voice>
     *: none
-    swcodec: "Korstona"
+    crossfade: "Korstona"
   </voice>
 </phrase>
 <phrase>
@@ -1660,15 +1660,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Aktivera korstoning"
+    crossfade: "Aktivera korstoning"
   </dest>
   <voice>
     *: none
-    swcodec: "Aktivera korstoning"
+    crossfade: "Aktivera korstoning"
   </voice>
 </phrase>
 <phrase>
@@ -1677,15 +1677,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Manuellt byte"
+    crossfade: "Manuellt byte"
   </dest>
   <voice>
     *: none
-    swcodec: "Manuellt byte"
+    crossfade: "Manuellt byte"
   </voice>
 </phrase>
 <phrase>
@@ -1694,15 +1694,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Blanda och manuellt byte"
+    crossfade: "Blanda och manuellt byte"
   </dest>
   <voice>
     *: none
-    swcodec: "Blandning och manuellt byte"
+    crossfade: "Blandning och manuellt byte"
   </voice>
 </phrase>
 <phrase>
@@ -1711,15 +1711,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Intoningsfördröjning"
+    crossfade: "Intoningsfördröjning"
   </dest>
   <voice>
     *: none
-    swcodec: "Intoningsfördröjning"
+    crossfade: "Intoningsfördröjning"
   </voice>
 </phrase>
 <phrase>
@@ -1728,15 +1728,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Intoningslängd"
+    crossfade: "Intoningslängd"
   </dest>
   <voice>
     *: none
-    swcodec: "Intoningslängd"
+    crossfade: "Intoningslängd"
   </voice>
 </phrase>
 <phrase>
@@ -1745,15 +1745,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Uttoningsfördröjning"
+    crossfade: "Uttoningsfördröjning"
   </dest>
   <voice>
     *: none
-    swcodec: "Uttoningsfördröjning"
+    crossfade: "Uttoningsfördröjning"
   </voice>
 </phrase>
 <phrase>
@@ -1762,15 +1762,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Uttoningslängd"
+    crossfade: "Uttoningslängd"
   </dest>
   <voice>
     *: none
-    swcodec: "Uttoningslängd"
+    crossfade: "Uttoningslängd"
   </voice>
 </phrase>
 <phrase>
@@ -1779,15 +1779,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Uttoningsläge"
+    crossfade: "Uttoningsläge"
   </dest>
   <voice>
     *: none
-    swcodec: "Uttoningsläge"
+    crossfade: "Uttoningsläge"
   </voice>
 </phrase>
 <phrase>
@@ -1796,15 +1796,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Mixa"
+    crossfade: "Mixa"
   </dest>
   <voice>
     *: none
-    swcodec: "Mixa"
+    crossfade: "Mixa"
   </voice>
 </phrase>
 <phrase>

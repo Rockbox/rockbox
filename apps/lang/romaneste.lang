@@ -3884,15 +3884,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Activeaza Crossfade"
+    crossfade: "Activeaza Crossfade"
   </dest>
   <voice>
     *: none
-    swcodec: "Activeaza Crossfade"
+    crossfade: "Activeaza Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -4930,15 +4930,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Aleator si salt melodie"
+    crossfade: "Aleator si salt melodie"
   </dest>
   <voice>
     *: none
-    swcodec: "Aleator si salt melodie"
+    crossfade: "Aleator si salt melodie"
   </voice>
 </phrase>
 <phrase>
@@ -7411,15 +7411,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Intarziere filare stingere"
+    crossfade: "Intarziere filare stingere"
   </dest>
   <voice>
     *: none
-    swcodec: "Intarziere filare stingere"
+    crossfade: "Intarziere filare stingere"
   </voice>
 </phrase>
 <phrase>
@@ -8519,15 +8519,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Durata filare aprindere"
+    crossfade: "Durata filare aprindere"
   </dest>
   <voice>
     *: none
-    swcodec: "Durata filare aprindere"
+    crossfade: "Durata filare aprindere"
   </voice>
 </phrase>
 <phrase>
@@ -8570,15 +8570,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Durata filare stingere"
+    crossfade: "Durata filare stingere"
   </dest>
   <voice>
     *: none
-    swcodec: "Durata filare stingere"
+    crossfade: "Durata filare stingere"
   </voice>
 </phrase>
 <phrase>
@@ -8787,15 +8787,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Numai salt melodie"
+    crossfade: "Numai salt melodie"
   </dest>
   <voice>
     *: none
-    swcodec: "Numai salt melodie"
+    crossfade: "Numai salt melodie"
   </voice>
 </phrase>
 <phrase>
@@ -10007,15 +10007,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </dest>
   <voice>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -10860,15 +10860,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Mod filare"
+    crossfade: "Mod filare"
   </dest>
   <voice>
     *: none
-    swcodec: "Mod filare"
+    crossfade: "Mod filare"
   </voice>
 </phrase>
 <phrase>
@@ -11198,15 +11198,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Intarziere Fade-In"
+    crossfade: "Intarziere Fade-In"
   </dest>
   <voice>
     *: none
-    swcodec: "Intarziere Fade-In"
+    crossfade: "Intarziere Fade-In"
   </voice>
 </phrase>
 <phrase>
@@ -11414,15 +11414,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </dest>
   <voice>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </voice>
 </phrase>
 <phrase>

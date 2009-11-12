@@ -3603,15 +3603,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Включване на Crossfade"
+    crossfade: "Включване на Crossfade"
   </dest>
   <voice>
     *: none
-    swcodec: none
+    crossfade: none
   </voice>
 </phrase>
 <phrase>
@@ -4674,15 +4674,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Разбъркване и пропускане на трак"
+    crossfade: "Разбъркване и пропускане на трак"
   </dest>
   <voice>
     *: ""
-    swcodec: ""
+    crossfade: ""
   </voice>
 </phrase>
 <phrase>
@@ -7240,15 +7240,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Задържане на затихването"
+    crossfade: "Задържане на затихването"
   </dest>
   <voice>
     *: ""
-    swcodec: ""
+    crossfade: ""
   </voice>
 </phrase>
 <phrase>
@@ -8365,15 +8365,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Продължителност на постепенното започване"
+    crossfade: "Продължителност на постепенното започване"
   </dest>
   <voice>
     *: ""
-    swcodec: ""
+    crossfade: ""
   </voice>
 </phrase>
 <phrase>
@@ -8416,15 +8416,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Продължителност на затихването"
+    crossfade: "Продължителност на затихването"
   </dest>
   <voice>
     *: ""
-    swcodec: ""
+    crossfade: ""
   </voice>
 </phrase>
 <phrase>
@@ -8633,15 +8633,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Само при пропускане на трак"
+    crossfade: "Само при пропускане на трак"
   </dest>
   <voice>
     *: ""
-    swcodec: ""
+    crossfade: ""
   </voice>
 </phrase>
 <phrase>
@@ -9912,15 +9912,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </dest>
   <voice>
     *: ""
-    swcodec: ""
+    crossfade: ""
   </voice>
 </phrase>
 <phrase>
@@ -10810,15 +10810,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Режим на затихване"
+    crossfade: "Режим на затихване"
   </dest>
   <voice>
     *: ""
-    swcodec: ""
+    crossfade: ""
   </voice>
 </phrase>
 <phrase>
@@ -11196,15 +11196,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Задържане на засилването"
+    crossfade: "Задържане на засилването"
   </dest>
   <voice>
     *: ""
-    swcodec: ""
+    crossfade: ""
   </voice>
 </phrase>
 <phrase>
@@ -11434,15 +11434,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Смесване"
+    crossfade: "Смесване"
   </dest>
   <voice>
     *: ""
-    swcodec: ""
+    crossfade: ""
   </voice>
 </phrase>
 <phrase>

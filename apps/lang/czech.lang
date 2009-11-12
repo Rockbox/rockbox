@@ -1622,15 +1622,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Prolínání skladeb"
+    crossfade: "Prolínání skladeb"
   </dest>
   <voice>
     *: none
-    swcodec: "Prolínání skladeb"
+    crossfade: "Prolínání skladeb"
   </voice>
 </phrase>
 <phrase>
@@ -1639,15 +1639,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Prolínání skladeb"
+    crossfade: "Prolínání skladeb"
   </dest>
   <voice>
     *: none
-    swcodec: "Prolínání skladeb"
+    crossfade: "Prolínání skladeb"
   </voice>
 </phrase>
 <phrase>
@@ -1656,15 +1656,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Pouze při přeskočení skladby"
+    crossfade: "Pouze při přeskočení skladby"
   </dest>
   <voice>
     *: none
-    swcodec: "Pouze při přeskočení skladby"
+    crossfade: "Pouze při přeskočení skladby"
   </voice>
 </phrase>
 <phrase>
@@ -1673,15 +1673,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Zamíchat a přeskočit"
+    crossfade: "Zamíchat a přeskočit"
   </dest>
   <voice>
     *: none
-    swcodec: "Zamíchat a přeskočit"
+    crossfade: "Zamíchat a přeskočit"
   </voice>
 </phrase>
 <phrase>
@@ -1690,15 +1690,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Prodleva při zesílení"
+    crossfade: "Prodleva při zesílení"
   </dest>
   <voice>
     *: none
-    swcodec: "Prodleva při zesílení"
+    crossfade: "Prodleva při zesílení"
   </voice>
 </phrase>
 <phrase>
@@ -1707,15 +1707,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Délka zesílení"
+    crossfade: "Délka zesílení"
   </dest>
   <voice>
     *: none
-    swcodec: "Délka zesílení"
+    crossfade: "Délka zesílení"
   </voice>
 </phrase>
 <phrase>
@@ -1724,15 +1724,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Prodleva při zeslabení"
+    crossfade: "Prodleva při zeslabení"
   </dest>
   <voice>
     *: none
-    swcodec: "Prodleva při zeslabení"
+    crossfade: "Prodleva při zeslabení"
   </voice>
 </phrase>
 <phrase>
@@ -1741,15 +1741,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Délka zeslabení"
+    crossfade: "Délka zeslabení"
   </dest>
   <voice>
     *: none
-    swcodec: "Délka zeslabení"
+    crossfade: "Délka zeslabení"
   </voice>
 </phrase>
 <phrase>
@@ -1758,15 +1758,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Mód zeslabení"
+    crossfade: "Mód zeslabení"
   </dest>
   <voice>
     *: none
-    swcodec: "Mód zeslabení"
+    crossfade: "Mód zeslabení"
   </voice>
 </phrase>
 <phrase>
@@ -1775,15 +1775,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </dest>
   <voice>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </voice>
 </phrase>
 <phrase>

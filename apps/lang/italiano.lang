@@ -1640,15 +1640,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </dest>
   <voice>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -1657,15 +1657,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Attiva Crossfade"
+    crossfade: "Attiva Crossfade"
   </dest>
   <voice>
     *: none
-    swcodec: "Attiva crossfade"
+    crossfade: "Attiva crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -1674,15 +1674,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Solo al cambio traccia"
+    crossfade: "Solo al cambio traccia"
   </dest>
   <voice>
     *: none
-    swcodec: "Solo al cambio traccia"
+    crossfade: "Solo al cambio traccia"
   </voice>
 </phrase>
 <phrase>
@@ -1691,15 +1691,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Casuale ed al Cambio Traccia"
+    crossfade: "Casuale ed al Cambio Traccia"
   </dest>
   <voice>
     *: none
-    swcodec: "Casuale ed al Cambio Traccia"
+    crossfade: "Casuale ed al Cambio Traccia"
   </voice>
 </phrase>
 <phrase>
@@ -1708,15 +1708,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Ritardo Fade in"
+    crossfade: "Ritardo Fade in"
   </dest>
   <voice>
     *: none
-    swcodec: "Ritardo fade in"
+    crossfade: "Ritardo fade in"
   </voice>
 </phrase>
 <phrase>
@@ -1725,15 +1725,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Durata Fade In"
+    crossfade: "Durata Fade In"
   </dest>
   <voice>
     *: none
-    swcodec: "Durata fade in"
+    crossfade: "Durata fade in"
   </voice>
 </phrase>
 <phrase>
@@ -1742,15 +1742,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Ritardo fade out"
+    crossfade: "Ritardo fade out"
   </dest>
   <voice>
     *: none
-    swcodec: "Ritardo fade out"
+    crossfade: "Ritardo fade out"
   </voice>
 </phrase>
 <phrase>
@@ -1759,15 +1759,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Durata fade out"
+    crossfade: "Durata fade out"
   </dest>
   <voice>
     *: none
-    swcodec: "Durata fade out"
+    crossfade: "Durata fade out"
   </voice>
 </phrase>
 <phrase>
@@ -1776,15 +1776,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Modo fade out"
+    crossfade: "Modo fade out"
   </dest>
   <voice>
     *: none
-    swcodec: "Modo fade out"
+    crossfade: "Modo fade out"
   </voice>
 </phrase>
 <phrase>
@@ -1793,15 +1793,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </dest>
   <voice>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </voice>
 </phrase>
 <phrase>

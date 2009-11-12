@@ -1297,15 +1297,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Overtoning"
+    crossfade: "Overtoning"
   </dest>
   <voice>
     *: none
-    swcodec: "Overtoning"
+    crossfade: "Overtoning"
   </voice>
 </phrase>
 <phrase>
@@ -2629,15 +2629,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Bruk overtoning"
+    crossfade: "Bruk overtoning"
   </dest>
   <voice>
     *: none
-    swcodec: "Bruk overtoning"
+    crossfade: "Bruk overtoning"
   </voice>
 </phrase>
 <phrase>
@@ -2646,15 +2646,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Berre ved hopp mellom spor"
+    crossfade: "Berre ved hopp mellom spor"
   </dest>
   <voice>
     *: none
-    swcodec: "Berre ved hopp mellom spor"
+    crossfade: "Berre ved hopp mellom spor"
   </voice>
 </phrase>
 <phrase>
@@ -2663,15 +2663,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Pause før inntoning"
+    crossfade: "Pause før inntoning"
   </dest>
   <voice>
     *: none
-    swcodec: "Pause før inntoning"
+    crossfade: "Pause før inntoning"
   </voice>
 </phrase>
 <phrase>
@@ -2680,15 +2680,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Inntoningslengd"
+    crossfade: "Inntoningslengd"
   </dest>
   <voice>
     *: none
-    swcodec: "Inntoningslengd"
+    crossfade: "Inntoningslengd"
   </voice>
 </phrase>
 <phrase>
@@ -2697,15 +2697,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Pause før uttoning"
+    crossfade: "Pause før uttoning"
   </dest>
   <voice>
     *: none
-    swcodec: "Pause før uttoning"
+    crossfade: "Pause før uttoning"
   </voice>
 </phrase>
 <phrase>
@@ -2714,15 +2714,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Uttoningslengd"
+    crossfade: "Uttoningslengd"
   </dest>
   <voice>
     *: none
-    swcodec: "Uttoningslengd"
+    crossfade: "Uttoningslengd"
   </voice>
 </phrase>
 <phrase>
@@ -2731,15 +2731,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Uttoningsmodus"
+    crossfade: "Uttoningsmodus"
   </dest>
   <voice>
     *: none
-    swcodec: "Uttoningsmodus"
+    crossfade: "Uttoningsmodus"
   </voice>
 </phrase>
 <phrase>
@@ -2748,15 +2748,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Miks"
+    crossfade: "Miks"
   </dest>
   <voice>
     *: none
-    swcodec: "Miks"
+    crossfade: "Miks"
   </voice>
 </phrase>
 <phrase>
@@ -9355,15 +9355,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Ved omstokking og sporendring"
+    crossfade: "Ved omstokking og sporendring"
   </dest>
   <voice>
     *: none
-    swcodec: "Ved omstokking og sporendring"
+    crossfade: "Ved omstokking og sporendring"
   </voice>
 </phrase>
 <phrase>

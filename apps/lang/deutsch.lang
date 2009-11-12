@@ -1639,15 +1639,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Überblenden"
+    crossfade: "Überblenden"
   </dest>
   <voice>
     *: none
-    swcodec: "Überblenden"
+    crossfade: "Überblenden"
   </voice>
 </phrase>
 <phrase>
@@ -1656,15 +1656,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Überblenden aktivieren"
+    crossfade: "Überblenden aktivieren"
   </dest>
   <voice>
     *: none
-    swcodec: "Überblenden aktivieren"
+    crossfade: "Überblenden aktivieren"
   </voice>
 </phrase>
 <phrase>
@@ -1673,15 +1673,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Nur bei manuellem Titelwechsel"
+    crossfade: "Nur bei manuellem Titelwechsel"
   </dest>
   <voice>
     *: none
-    swcodec: "Nur bei manuellem Titelwechsel"
+    crossfade: "Nur bei manuellem Titelwechsel"
   </voice>
 </phrase>
 <phrase>
@@ -1690,15 +1690,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Zufallswiedergabe und manuellem Titelwechsel"
+    crossfade: "Zufallswiedergabe und manuellem Titelwechsel"
   </dest>
   <voice>
     *: none
-    swcodec: "Zufallswiedergabe und manuellem Titelwechsel"
+    crossfade: "Zufallswiedergabe und manuellem Titelwechsel"
   </voice>
 </phrase>
 <phrase>
@@ -1707,15 +1707,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Einblendverzögerung"
+    crossfade: "Einblendverzögerung"
   </dest>
   <voice>
     *: none
-    swcodec: "Einblendverzögerung"
+    crossfade: "Einblendverzögerung"
   </voice>
 </phrase>
 <phrase>
@@ -1724,15 +1724,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Einblenddauer"
+    crossfade: "Einblenddauer"
   </dest>
   <voice>
     *: none
-    swcodec: "Einblenddauer"
+    crossfade: "Einblenddauer"
   </voice>
 </phrase>
 <phrase>
@@ -1741,15 +1741,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Ausblendverzögerung"
+    crossfade: "Ausblendverzögerung"
   </dest>
   <voice>
     *: none
-    swcodec: "Ausblendverzögerung"
+    crossfade: "Ausblendverzögerung"
   </voice>
 </phrase>
 <phrase>
@@ -1758,15 +1758,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Ausblenddauer"
+    crossfade: "Ausblenddauer"
   </dest>
   <voice>
     *: none
-    swcodec: "Ausblenddauer"
+    crossfade: "Ausblenddauer"
   </voice>
 </phrase>
 <phrase>
@@ -1775,15 +1775,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Ausblendmodus"
+    crossfade: "Ausblendmodus"
   </dest>
   <voice>
     *: none
-    swcodec: "Ausblendmodus"
+    crossfade: "Ausblendmodus"
   </voice>
 </phrase>
 <phrase>
@@ -1792,15 +1792,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Mischen"
+    crossfade: "Mischen"
   </dest>
   <voice>
     *: none
-    swcodec: "Mischen"
+    crossfade: "Mischen"
   </voice>
 </phrase>
 <phrase>

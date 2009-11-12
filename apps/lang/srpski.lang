@@ -1621,15 +1621,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </dest>
   <voice>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -1638,15 +1638,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Укључи Crossfade"
+    crossfade: "Укључи Crossfade"
   </dest>
   <voice>
     *: none
-    swcodec: "Укључи Crossfade"
+    crossfade: "Укључи Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -1655,15 +1655,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Само кад се прескаче нумера"
+    crossfade: "Само кад се прескаче нумера"
   </dest>
   <voice>
     *: none
-    swcodec: "Само кад се прескаче нумера"
+    crossfade: "Само кад се прескаче нумера"
   </voice>
 </phrase>
 <phrase>
@@ -1672,15 +1672,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Кад се прескаче нумера и меша"
+    crossfade: "Кад се прескаче нумера и меша"
   </dest>
   <voice>
     *: none
-    swcodec: "Кад се прескаче нумера и меша"
+    crossfade: "Кад се прескаче нумера и меша"
   </voice>
 </phrase>
 <phrase>
@@ -1689,15 +1689,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Fade-In кашњење"
+    crossfade: "Fade-In кашњење"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-In кашњење"
+    crossfade: "Fade-In кашњење"
   </voice>
 </phrase>
 <phrase>
@@ -1706,15 +1706,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Fade-In трајање"
+    crossfade: "Fade-In трајање"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-In трајање"
+    crossfade: "Fade-In трајање"
   </voice>
 </phrase>
 <phrase>
@@ -1723,15 +1723,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Fade-Out кашњење"
+    crossfade: "Fade-Out кашњење"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out кашњење"
+    crossfade: "Fade-Out кашњење"
   </voice>
 </phrase>
 <phrase>
@@ -1740,15 +1740,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Fade-Out трајање"
+    crossfade: "Fade-Out трајање"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out трајање"
+    crossfade: "Fade-Out трајање"
   </voice>
 </phrase>
 <phrase>
@@ -1757,15 +1757,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Fade-Out мод"
+    crossfade: "Fade-Out мод"
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out мод"
+    crossfade: "Fade-Out мод"
   </voice>
 </phrase>
 <phrase>
@@ -1774,15 +1774,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </dest>
   <voice>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </voice>
 </phrase>
 <phrase>

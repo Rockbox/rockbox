@@ -1320,7 +1320,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: "Overvloeien"
@@ -2681,15 +2681,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Overvloeien aanzetten"
+    crossfade: "Overvloeien aanzetten"
   </dest>
   <voice>
     *: none
-    swcodec: "Overvloeien aanzetten"
+    crossfade: "Overvloeien aanzetten"
   </voice>
 </phrase>
 <phrase>
@@ -2698,15 +2698,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Alleen bij handmatig overslaan"
+    crossfade: "Alleen bij handmatig overslaan"
   </dest>
   <voice>
     *: none
-    swcodec: "Alleen bij handmatig overslaan"
+    crossfade: "Alleen bij handmatig overslaan"
   </voice>
 </phrase>
 <phrase>
@@ -2715,15 +2715,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Invloei vertraging"
+    crossfade: "Invloei vertraging"
   </dest>
   <voice>
     *: none
-    swcodec: "Invloei vertraging"
+    crossfade: "Invloei vertraging"
   </voice>
 </phrase>
 <phrase>
@@ -2732,15 +2732,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Invloei duur"
+    crossfade: "Invloei duur"
   </dest>
   <voice>
     *: none
-    swcodec: "Invloei duur"
+    crossfade: "Invloei duur"
   </voice>
 </phrase>
 <phrase>
@@ -2749,15 +2749,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Uitvloei vertraging"
+    crossfade: "Uitvloei vertraging"
   </dest>
   <voice>
     *: none
-    swcodec: "Uitvloei vertraging"
+    crossfade: "Uitvloei vertraging"
   </voice>
 </phrase>
 <phrase>
@@ -2766,15 +2766,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Uitvloei duur"
+    crossfade: "Uitvloei duur"
   </dest>
   <voice>
     *: none
-    swcodec: "Uitvloei duur"
+    crossfade: "Uitvloei duur"
   </voice>
 </phrase>
 <phrase>
@@ -2783,15 +2783,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Overvloei modus"
+    crossfade: "Overvloei modus"
   </dest>
   <voice>
     *: none
-    swcodec: "Overvloei modus"
+    crossfade: "Overvloei modus"
   </voice>
 </phrase>
 <phrase>
@@ -2800,15 +2800,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </dest>
   <voice>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </voice>
 </phrase>
 <phrase>
@@ -9671,15 +9671,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </dest>
   <voice>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </voice>
 </phrase>
 <phrase>

@@ -1643,15 +1643,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Croejhlé fondou"
+    crossfade: "Croejhlé fondou"
   </dest>
   <voice>
     *: none
-    swcodec: "Croejhlé fondou"
+    crossfade: "Croejhlé fondou"
   </voice>
 </phrase>
 <phrase>
@@ -1660,15 +1660,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
     *: none
-    swcodec: "Mete croejhlé fondou en alaedje"
+    crossfade: "Mete croejhlé fondou en alaedje"
   </dest>
   <voice>
     *: none
-    swcodec: "Mete croejhlé fondou en alaedje"
+    crossfade: "Mete croejhlé fondou en alaedje"
   </voice>
 </phrase>
 <phrase>
@@ -1677,15 +1677,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
     *: none
-    swcodec: "Seulmint po candjî d' boket"
+    crossfade: "Seulmint po candjî d' boket"
   </dest>
   <voice>
     *: none
-    swcodec: "Seulmint po candjî d' boket"
+    crossfade: "Seulmint po candjî d' boket"
   </voice>
 </phrase>
 <phrase>
@@ -1694,15 +1694,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
   </source>
   <dest>
     *: none
-    swcodec: "A l'astcheyance et candjmint d' boket"
+    crossfade: "A l'astcheyance et candjmint d' boket"
   </dest>
   <voice>
     *: none
-    swcodec: "A l'astcheyance et candjmint d' boket"
+    crossfade: "A l'astcheyance et candjmint d' boket"
   </voice>
 </phrase>
 <phrase>
@@ -1711,15 +1711,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Tårdjaedje fondou d'atake"
+    crossfade: "Tårdjaedje fondou d'atake"
   </dest>
   <voice>
     *: none
-    swcodec: "Tårdjaedje fondou d'atake"
+    crossfade: "Tårdjaedje fondou d'atake"
   </voice>
 </phrase>
 <phrase>
@@ -1728,15 +1728,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Tins do fondou d'atake"
+    crossfade: "Tins do fondou d'atake"
   </dest>
   <voice>
     *: none
-    swcodec: "Tins do fondou d'atake"
+    crossfade: "Tins do fondou d'atake"
   </voice>
 </phrase>
 <phrase>
@@ -1745,15 +1745,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
     *: none
-    swcodec: "Tins do fondou di djoke"
+    crossfade: "Tins do fondou di djoke"
   </dest>
   <voice>
     *: none
-    swcodec: "Tins do fondou di djoke"
+    crossfade: "Tins do fondou di djoke"
   </voice>
 </phrase>
 <phrase>
@@ -1762,15 +1762,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
     *: none
-    swcodec: "Tårdjaedje fondou di djoke"
+    crossfade: "Tårdjaedje fondou di djoke"
   </dest>
   <voice>
     *: none
-    swcodec: "Tårdjaedje fondou di djoke"
+    crossfade: "Tårdjaedje fondou di djoke"
   </voice>
 </phrase>
 <phrase>
@@ -1779,15 +1779,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Môde djocaedje fondou"
+    crossfade: "Môde djocaedje fondou"
   </dest>
   <voice>
     *: none
-    swcodec: "Môde djocaedje fondou"
+    crossfade: "Môde djocaedje fondou"
   </voice>
 </phrase>
 <phrase>
@@ -1796,15 +1796,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
   </source>
   <dest>
     *: none
-    swcodec: "Maxhî"
+    crossfade: "Maxhî"
   </dest>
   <voice>
     *: none
-    swcodec: "Maxhî"
+    crossfade: "Maxhî"
   </voice>
 </phrase>
 <phrase>

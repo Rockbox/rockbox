@@ -1620,15 +1620,15 @@
  user: core
  <source>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
  </source>
  <dest>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
  </dest>
  <voice>
     *: none
-    swcodec: "Crossfade"
+    crossfade: "Crossfade"
  </voice>
 </phrase>
 <phrase>
@@ -1637,15 +1637,15 @@
  user: core
  <source>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
  </source>
  <dest>
     *: none
-    swcodec: "Magbigay-kaya ng Crossfade"
+    crossfade: "Magbigay-kaya ng Crossfade"
  </dest>
  <voice>
     *: none
-    swcodec: "Enable Crossfade"
+    crossfade: "Enable Crossfade"
  </voice>
 </phrase>
 <phrase>
@@ -1654,15 +1654,15 @@
  user: core
  <source>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
  </source>
  <dest>
     *: none
-    swcodec: "Landas Laktawan Tangi"
+    crossfade: "Landas Laktawan Tangi"
  </dest>
  <voice>
     *: none
-    swcodec: "Manual Track Skip Only"
+    crossfade: "Manual Track Skip Only"
  </voice>
 </phrase>
 <phrase>
@@ -1671,15 +1671,15 @@
  user: core
  <source>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
  </source>
  <dest>
     *: none
-    swcodec: "Magbalasa at Landas Laktawan"
+    crossfade: "Magbalasa at Landas Laktawan"
  </dest>
  <voice>
     *: none
-    swcodec: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle and Manual Track Skip"
  </voice>
 </phrase>
 <phrase>
@@ -1688,15 +1688,15 @@
  user: core
  <source>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
  </source>
  <dest>
     *: none
-    swcodec: "Pagpapalit ng abala"
+    crossfade: "Pagpapalit ng abala"
  </dest>
  <voice>
     *: none
-    swcodec: "Fade-In Delay"
+    crossfade: "Fade-In Delay"
  </voice>
 </phrase>
 <phrase>
@@ -1705,15 +1705,15 @@
  user: core
  <source>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
  </source>
  <dest>
     *: none
-    swcodec: "Pagpapalit ng Tagal"
+    crossfade: "Pagpapalit ng Tagal"
  </dest>
  <voice>
     *: none
-    swcodec: "Fade-In Duration"
+    crossfade: "Fade-In Duration"
  </voice>
 </phrase>
 <phrase>
@@ -1722,15 +1722,15 @@
  user: core
  <source>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
  </source>
  <dest>
     *: none
-    swcodec: "Pagpapalit ng abala"
+    crossfade: "Pagpapalit ng abala"
  </dest>
  <voice>
     *: none
-    swcodec: "Fade-Out Delay"
+    crossfade: "Fade-Out Delay"
  </voice>
 </phrase>
 <phrase>
@@ -1739,15 +1739,15 @@
  user: core
  <source>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
  </source>
  <dest>
     *: none
-    swcodec: "Pagpapalit ng Tagal"
+    crossfade: "Pagpapalit ng Tagal"
  </dest>
  <voice>
     *: none
-    swcodec: "Fade-Out Duration"
+    crossfade: "Fade-Out Duration"
  </voice>
 </phrase>
 <phrase>
@@ -1756,15 +1756,15 @@
  user: core
  <source>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
  </source>
  <dest>
     *: none
-    swcodec: "Pagpapalit ng Paraan"
+    crossfade: "Pagpapalit ng Paraan"
  </dest>
  <voice>
     *: none
-    swcodec: "Fade-Out Mode"
+    crossfade: "Fade-Out Mode"
  </voice>
 </phrase>
 <phrase>
@@ -1773,15 +1773,15 @@
  user: core
  <source>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
  </source>
  <dest>
     *: none
-    swcodec: "Haluin"
+    crossfade: "Haluin"
  </dest>
  <voice>
     *: none
-    swcodec: "Mix"
+    crossfade: "Mix"
  </voice>
 </phrase>
 <phrase>
