@@ -138,11 +138,6 @@
  * for example in hardware, but not controllable*/
 #define BACKLIGHT_FADING_TARGET     0x8
 
-/*include support for crossfading - requires significant PCM buffer space*/
-#if MEMORYSIZE > 2
-#define HAVE_CROSSFADE
-#endif
-
 /* CONFIG_CHARGING */
 
 /* Generic types */
@@ -676,6 +671,11 @@ Lyre prototype 1 */
     || (CONFIG_CPU == AS3525) || (CONFIG_CPU == S3C2440) \
     || defined(CPU_S5L870X)
 #define HAVE_WAKEUP_OBJECTS
+#endif
+
+/*include support for crossfading - requires significant PCM buffer space*/
+#if MEMORYSIZE > 2
+#define HAVE_CROSSFADE
 #endif
 
 #endif /*  (CONFIG_CODEC == SWCODEC) */

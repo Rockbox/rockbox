@@ -367,7 +367,7 @@ static int talk_callback(int action,const struct menu_item_ex *this_item)
             oldval = global_settings.talk_file_clip;
             break;
         case ACTION_EXIT_MENUITEM:
-#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_CROSSFADE)
+#ifdef HAVE_CROSSFADE
             audio_set_crossfade(global_settings.crossfade);
 #endif
             if (this_item == &talk_dir_clip_item)
