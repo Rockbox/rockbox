@@ -1759,7 +1759,7 @@
   user: core
   <source>
     *: none
-    crossfade: "Shuffle and Manual Track Skip"
+    crossfade: "Shuffle or Manual Track Skip"
   </source>
   <dest>
     *: none

@@ -101,25 +101,25 @@ you to configure settings related to audio playback.
   \section{Crossfade}
     This section controls the behavior of the crossfader.  The crossfader, when
     enabled, smoothly fades one track into the next.  This can occur in two
-    situations: an automatic track skip and a manual track skip.  An automatic
-    track skip occurs at the end of the track, moving to the next track in the
-    playlist without user intervention.  A manual track skip occurs immediately
-    when the appropriate button is pressed.\\
+    situations: an automatic track change or a manual track skip.  An automatic
+    track change occurs at the end of the track, moving to the next track in the
+    playlist without user intervention.  A manual track skip goes to the next
+    track immediately when the appropriate button is pressed.\\
 
     Options for crossfade settings are:
     \begin{description}
       \item[Enable Crossfade.] If set to \setting{Off}, crossfade is disabled
-        and all track skips are gapless.  If set to
-        \setting{Auto Track Skip Only}, crossfade occurs for automatic skips,
-        but not for manual skips.  The next setting,
+        and all track changes are gapless.  If set to
+        \setting{Automatic Track Change Only}, crossfade occurs for automatic
+        track changes, but not for manual track skips.  The next setting,
         \setting{Manual Track Skip Only}, is the opposite: tracks will only
         crossfade when manually skipped.  If set to \setting{Shuffle}, crossfade
-        is enabled for all track changes when the shuffle feature is set to
-        \setting{Yes}, but disabled otherwise.  If set to
-        \setting{Shuffle and Manual Track Skip} then crossfade will only be
-        active when shuffle is set to \setting{Yes} and the track is then
-        manually skipped.  If set to \setting{Always}, tracks will always
-        crossfade into one another.
+        is enabled for all track changes, automatic or manual, when the shuffle
+        feature is set to \setting{Yes}, but disabled otherwise.  If set to
+        \setting{Shuffle or Manual Track Skip} then crossfade will be active
+        either when shuffle is set to \setting{Yes} or the track is manually
+        skipped.  If set to \setting{Always}, tracks will always crossfade into
+        one another.
         %
       \item[Fade In Delay.] The ``fade in delay'' is the length of time between
         when the crossfade process begins and when the new track begins to fade
@@ -137,10 +137,10 @@ you to configure settings related to audio playback.
         %
       \item[Fade Out Mode.] If set to \setting{Crossfade}, one song will fade
         out and the next song will simultaneously fade in. If set to 
-        \setting{Mix}, the ending song will continue to play as normal until 
-        its end, while the starting song will fade in from under it. 
-        \setting{Mix} mode is not
-        used for manual track skips, even if it is selected here.
+        \setting{Mix}, the ending song will not fade out at all, and will
+        continue to play as normal until its end with the starting song fading
+        in from under it. \setting{Mix} mode is not used for manual track skips,
+        even if it is selected here.
       \end{description}
       
       \note{The rules above apply except in the instance where
