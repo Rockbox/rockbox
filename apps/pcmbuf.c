@@ -92,6 +92,7 @@ static char *fadebuf IDATA_ATTR;
 static bool crossfade_enabled;
 static bool crossfade_enable_request;
 static bool crossfade_mixmode;
+static bool crossfade_auto_skip;
 static bool crossfade_active IDATA_ATTR;
 static bool crossfade_track_change_started IDATA_ATTR;
 
@@ -537,6 +538,8 @@ void pcmbuf_start_track_change(bool auto_skip)
 #ifdef HAVE_CROSSFADE
         /* Don't enable mix mode when skipping tracks manually. */
         crossfade_mixmode = auto_skip && global_settings.crossfade_fade_out_mixmode;
+        
+        crossfade_auto_skip = auto_skip;
 
         crossfade_track_change_started = crossfade;
 #endif
@@ -702,6 +705,27 @@ static size_t find_chunk(size_t length, struct chunkdesc **chunk)
     return length / 2;
 }
 
+/* Fade samples in the PCM buffer */
+static void fade_block(int factor, size_t length, size_t *fade_sample,
+                       struct chunkdesc **fade_chunk)
+{
+    while (length > 0 && *fade_chunk != NULL)
+    {
+        /* Fade one sample */
+        int16_t *buf = (int16_t *)((*fade_chunk)->addr);
+        int32_t sample = buf[*fade_sample];
+        buf[(*fade_sample)++] = (sample * factor) >> 8;
+        length -= 2;
+
+        /* Move to the next chunk as needed */
+        if (*fade_sample * 2 >= (*fade_chunk)->size)
+        {
+            *fade_chunk = (*fade_chunk)->link;
+            *fade_sample = 0;
+        }
+    }
+}
+
 /* Initializes crossfader, calculates all necessary parameters and performs
  * fade-out with the PCM buffer.  */
 static void crossfade_start(void)
@@ -737,15 +761,25 @@ static void crossfade_start(void)
         NATIVE_FREQUENCY * global_settings.crossfade_fade_out_duration * 4;
 
     crossfade_need = fade_out_delay + fade_out_rem;
-    /* We want only to modify the last part of the buffer, so find
-     * the right chunk and sample to start the crossfade */
     if (crossfade_rem > crossfade_need)
     {
-        crossfade_sample = find_chunk(crossfade_rem - crossfade_need,
-            &crossfade_chunk);
+        if (crossfade_auto_skip)
+        /* Automatic track changes only modify the last part of the buffer,
+         * so find the right chunk and sample to start the crossfade */
+        {
+            crossfade_sample = find_chunk(crossfade_rem - crossfade_need,
+                &crossfade_chunk);
+            crossfade_rem = crossfade_need;
+        }
+        else
+        /* Manual skips occur immediately, but give time to process */
+        {
+            crossfade_rem -= crossfade_chunk->size;
+            crossfade_chunk = crossfade_chunk->link;
+        }
     }
     /* Truncate fade out duration if necessary. */
-    else if (crossfade_rem < crossfade_need)
+    if (crossfade_rem < crossfade_need)
     {
         size_t crossfade_short = crossfade_need - crossfade_rem;
         if (fade_out_rem >= crossfade_short)
@@ -756,6 +790,7 @@ static void crossfade_start(void)
             fade_out_rem = 0;
         }
     }
+    crossfade_rem -= fade_out_delay + fade_out_rem;
 
     /* Completely process the crossfade fade-out effect with current PCM buffer */
     if (!crossfade_mixmode)
@@ -777,23 +812,11 @@ static void crossfade_start(void)
 
             fade_out_rem -= block_rem;
 
-            /* Fade this block */
-            while (block_rem > 0 && fade_out_chunk != NULL)
-            {
-                /* Fade one sample */
-                int16_t *buf = (int16_t *)fade_out_chunk->addr;
-                int32_t sample = buf[fade_out_sample];
-                buf[fade_out_sample++] = (sample * factor) >> 8;
-
-                block_rem -= 2;
-                /* Move to the next chunk as needed */
-                if (fade_out_sample * 2 >= fade_out_chunk->size)
-                {
-                    fade_out_chunk = fade_out_chunk->link;
-                    fade_out_sample = 0;
-                }
-            }
+            fade_block(factor, block_rem, &fade_out_sample, &fade_out_chunk);
         }
+        
+        /* zero out the rest of the buffer */
+        fade_block(0, crossfade_rem, &fade_out_sample, &fade_out_chunk);
     }
 
     /* Initialize fade-in counters */
@@ -890,6 +913,7 @@ static void write_to_crossfade(char *buf, size_t length)
         {
             /* Mix the data */
             size_t mix_total = length;
+            /* A factor of 256 means no fading */
             length = crossfade_mix(256, buf, length);
             buf += mix_total - length;
             if (!length)
