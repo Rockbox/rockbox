@@ -299,10 +299,18 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
     asm volatile ("sts\tpr,%0" : "=r"(n));
 
     /* clear screen */
-    lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
-    lcd_setfont(FONT_SYSFIXED);
+#if LCD_DEPTH > 1
+    lcd_set_backdrop(NULL);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
 #endif
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_set_viewport(NULL);
+#endif
+
+    lcd_clear_display();
     /* output exception */
     n = (n - (unsigned)UIE4 + 12)>>2; /* get exception or interrupt number */
     lcd_putsf(0, 0, "I%02x:%s", n, irqname[n]);

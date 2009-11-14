@@ -262,9 +262,17 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
                           "$1", "LO", "HI", "STATUS", "EPC" };
     int i;
 
+#ifdef HAVE_LCD_BITMAP
+#if LCD_DEPTH > 1
     lcd_set_backdrop(NULL);
-    lcd_clear_display();
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
+#endif
     lcd_setfont(FONT_SYSFIXED);
+    lcd_set_viewport(NULL);
+#endif
+    lcd_clear_display();
     _backlight_on();
 
     snprintf(buffer, sizeof(buffer), "0x%08x at 0x%08x", read_c0_badvaddr(), epc);

@@ -36,10 +36,16 @@ static const char* const uiename[] = {
  */
 void __attribute__((noreturn)) UIE(unsigned int pc, unsigned int num)
 {
-    lcd_clear_display();
-#ifdef HAVE_LCD_BITMAP
-    lcd_setfont(FONT_SYSFIXED);
+#if LCD_DEPTH > 1
+    lcd_set_backdrop(NULL);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
 #endif
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_set_viewport(NULL);
+#endif
+    lcd_clear_display();
     lcd_puts(0, 0, uiename[num]);
     lcd_putsf(0, 1, "at %08x" IF_COP(" (%d)"), pc
              IF_COP(, CURRENT_CORE));

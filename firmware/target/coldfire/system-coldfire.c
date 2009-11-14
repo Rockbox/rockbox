@@ -167,8 +167,15 @@ static void system_display_exception_info(unsigned long format,
     int vector = (format >> 18) & 0xff;
 
     /* clear screen */
-    lcd_clear_display ();
+#if LCD_DEPTH > 1
+    lcd_set_backdrop(NULL);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
+#endif
     lcd_setfont(FONT_SYSFIXED);
+    lcd_set_viewport(NULL);
+    lcd_clear_display();
 
     lcd_putsf(0, 0, "I%02x:%s", vector, irqname[vector]);
     lcd_putsf(0, 1, "at %08x", pc);
