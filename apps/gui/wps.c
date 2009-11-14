@@ -745,7 +745,10 @@ long gui_wps_show(void)
             button = BUTTON_NONE;
             while (TIME_BEFORE(current_tick, next_big_refresh)) {
                 button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,TIMEOUT_NOBLOCK);
-                if (button != ACTION_NONE) {
+                /* check for restore to not let the peakmeter delay the
+                 * initial draw of the wps, don't delay handling of button
+                 * presses either */
+                if (button != ACTION_NONE || restore) {
                     break;
                 }
                 peak_meter_peek();
@@ -769,7 +772,7 @@ long gui_wps_show(void)
 #endif
         {
             button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,
-                restore ? HZ/100 : HZ/5);
+                restore ? TIMEOUT_NOBLOCK : HZ/5);
         }
 
         /* Exit if audio has stopped playing. This happens e.g. at end of
