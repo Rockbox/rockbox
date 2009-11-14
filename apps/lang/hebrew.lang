@@ -13010,3 +13010,172 @@
     swcodec: "זמן שחרור"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Skip to Outro"
+  </dest>
+  <voice>
+    *: "Skip to Outro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "מותאם אישית"
+  </dest>
+  <voice>
+    *: "מותאם אישית"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "statusbar skin"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "remote statusbar skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_STATUSBAR
+  desc: browse for custom statusbar in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Custom Statusbar"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "שורת מצב מותאמת אישית"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "שורת מצב מותאמת אישית"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CUSTOM_STATUSBAR
+  desc: browse for remote custom statusbar in theme settings
+  user: core
+  <source>
+    *:none
+    remote: "Remote Custom Statusbar"
+  </source>
+  <dest>
+    *:none
+    remote: "שורת מצב בשלט מותאמת אישית"
+  </dest>
+  <voice>
+    *:none
+    remote: "שורת מצב בשלט מותאמת אישית"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB התקן ממשק אנושי"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB התקן ממשק אנושי"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "הכנס אחרון ובמעורבב"
+  </dest>
+  <voice>
+    *: "הכנס אחרון ובמעורבב"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "הכנס לתור אחרון ובמעורבב"
+  </dest>
+  <voice>
+    *: "הכנס לתור אחרון ובמעורבב"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "השתמש בקלט של קוד מורס"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "השתמש בקלט של קוד מורס"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "רק בהחלפה אוטומטית של שיר"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "רק בהחלפה אוטומטית של שיר"
+  </voice>
+</phrase>
