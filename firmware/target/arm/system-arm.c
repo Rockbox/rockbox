@@ -44,7 +44,6 @@ void __attribute__((noreturn)) UIE(unsigned int pc, unsigned int num)
 #endif
     lcd_setfont(FONT_SYSFIXED);
     lcd_set_viewport(NULL);
-#endif
     lcd_clear_display();
     lcd_puts(0, 0, uiename[num]);
     lcd_putsf(0, 1, "at %08x" IF_COP(" (%d)"), pc
