@@ -1326,12 +1326,6 @@ void LodePNG_Decoder_cleanup(LodePNG_Decoder* decoder)
     LodePNG_InfoPng_cleanup(&decoder->infoPng);
 }
 
-/* support function for qsort() */
-static int compare(const void* p1, const void* p2)
-{
-    return rb->strcasecmp(*((char **)p1), *((char **)p2));
-}
-
 bool png_ext(const char ext[])
 {
     if (!ext)
@@ -1346,34 +1340,32 @@ bool png_ext(const char ext[])
 void get_pic_list(void)
 {
     int i;
-    long int str_len = 0;
+    struct entry *dircache;
     char *pname;
     tree = rb->tree_get_context();
+    dircache = tree->dircache;
 
-#if PLUGIN_BUFFER_SIZE >= MIN_MEM
-    file_pt = rb->plugin_get_buffer((size_t *)&image_size);
-#else
-    file_pt = rb->plugin_get_audio_buffer((size_t *)&image_size);
-#endif
-
-    for (i = 0; i < tree->filesindir; i++)
-    {
-        if (png_ext(rb->strrchr(&tree->name_buffer[str_len],'.')))
-            file_pt[entries++] = &tree->name_buffer[str_len];
-
-        str_len += rb->strlen(&tree->name_buffer[str_len]) + 1;
-    }
-
-    rb->qsort(file_pt, entries, sizeof(char**), compare);
+    file_pt = (char **) memory;
 
     /* Remove path and leave only the name.*/
     pname = rb->strrchr(np_file,'/');
     pname++;
 
-    /* Find Selected File. */
-    for (i = 0; i < entries; i++)
-        if (!rb->strcmp(file_pt[i], pname))
-            curfile = i;
+    for (i = 0; i < tree->filesindir; i++)
+    {
+        if (!(dircache[i].attr & ATTR_DIRECTORY)
+            && png_ext(rb->strrchr(dircache[i].name, '.')))
+        {
+            file_pt[entries] = dircache[i].name;
+            /* Set Selected File. */
+            if (!rb->strcmp(file_pt[entries], pname))
+                curfile = entries;
+            entries++;
+        }
+    }
+
+    memory += (entries * sizeof(char**));
+    memory_size -= (entries * sizeof(char**));
 }
 
 int change_filename(int direct)
@@ -1390,7 +1382,7 @@ int change_filename(int direct)
                 curfile = entries - 1;
             else
                 curfile--;
-        }while (file_pt[curfile] == '\0' && count < entries);
+        }while (file_pt[curfile] == NULL && count < entries);
         /* we "erase" the file name if  we encounter
          * a non-supported file, so skip it now */
     }
@@ -1403,14 +1395,15 @@ int change_filename(int direct)
                 curfile = 0;
             else
                 curfile++;
-        }while (file_pt[curfile] == '\0' && count < entries);
+        }while (file_pt[curfile] == NULL && count < entries);
     }
 
-    if (count == entries && file_pt[curfile] == '\0')
+    if (count == entries)
     {
         rb->splash(HZ, "No supported files");
         return PLUGIN_ERROR;
     }
+
     if (rb->strlen(tree->currdir) > 1)
     {
         rb->strcpy(np_file, tree->currdir);
@@ -1549,7 +1542,7 @@ static void pan_view_right(struct LodePNG_Decoder* decoder)
 {
     int move;
 
-    move = MIN(HSCROLL, decoder->infoPng.width/ds - decoder->x - LCD_WIDTH);
+    move = MIN(HSCROLL, (int)(decoder->infoPng.width/ds) - decoder->x - LCD_WIDTH);
     if (move > 0)
     {
         decoder->x += move;
@@ -1595,7 +1588,7 @@ static void pan_view_down(struct LodePNG_Decoder* decoder)
 {
     int move;
 
-    move = MIN(VSCROLL, decoder->infoPng.height/ds - decoder->y - LCD_HEIGHT);
+    move = MIN(VSCROLL, (int)(decoder->infoPng.height/ds) - decoder->y - LCD_HEIGHT);
     if (move > 0)
     {
         decoder->y += move;
@@ -2028,8 +2021,6 @@ int load_and_show(char* filename)
                     plug_buf = false;
                     memory = rb->plugin_get_audio_buffer(
                                  (size_t *)&memory_size);
-                    memory += (entries * sizeof(char**));
-                    memory_size -= (entries * sizeof(char**));
                     memory_max = memory + memory_size - 1;
                     /*try again this file, now using the audio buffer */
                     return PLUGIN_OTHER;
@@ -2141,7 +2132,7 @@ int load_and_show(char* filename)
             } else if (decoder.error == OUT_OF_MEMORY && entries == 1) {
                 return PLUGIN_ERROR;
             } else {
-                file_pt[curfile] = '\0';
+                file_pt[curfile] = NULL;
                 return change_filename(direction);
             }
         }
@@ -2226,6 +2217,12 @@ enum plugin_status plugin_start(const void* parameter)
 
     if (!parameter) return PLUGIN_ERROR;
 
+#if PLUGIN_BUFFER_SIZE >= MIN_MEM
+    memory = rb->plugin_get_buffer((size_t *)&memory_size);
+#else
+    memory = rb->plugin_get_audio_buffer((size_t *)&memory_size);
+#endif
+
     rb->strcpy(np_file, parameter);
     get_pic_list();
 
@@ -2233,17 +2230,12 @@ enum plugin_status plugin_start(const void* parameter)
 
 #if (PLUGIN_BUFFER_SIZE >= MIN_MEM) && !defined(SIMULATOR)
     if (rb->audio_status()) {
-        memory = (unsigned char *)rb->plugin_get_buffer((size_t *)&memory_size);
         plug_buf = true;
     } else {
         memory = (unsigned char *)rb->plugin_get_audio_buffer((size_t *)&memory_size);
     }
-#else
-    memory = (unsigned char *)rb->plugin_get_audio_buffer((size_t *)&memory_size);
 #endif
 
-    memory += (entries * sizeof(char**));
-    memory_size -= (entries * sizeof(char**));
     memory_max = memory + memory_size - 1;
 
     /* should be ok to just load settings since the plugin itself has

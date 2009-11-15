@@ -185,12 +185,6 @@ bool plug_buf = false;
 
 /************************* Implementation ***************************/
 
-/* support function for qsort() */
-static int compare(const void* p1, const void* p2)
-{
-    return rb->strcasecmp(*((char **)p1), *((char **)p2));
-}
-
 bool jpg_ext(const char ext[])
 {
     if(!ext)
@@ -207,34 +201,32 @@ bool jpg_ext(const char ext[])
 void get_pic_list(void)
 {
     int i;
-    long int str_len = 0;
+    struct entry *dircache;
     char *pname;
     tree = rb->tree_get_context();
+    dircache = tree->dircache;
 
-#if PLUGIN_BUFFER_SIZE >= MIN_MEM
-    file_pt = rb->plugin_get_buffer((size_t *)&buf_size);
-#else
-    file_pt = rb->plugin_get_audio_buffer((size_t *)&buf_size);
-#endif
-
-    for(i = 0; i < tree->filesindir; i++)
-    {
-        if(jpg_ext(rb->strrchr(&tree->name_buffer[str_len],'.')))
-            file_pt[entries++] = &tree->name_buffer[str_len];
-
-        str_len += rb->strlen(&tree->name_buffer[str_len]) + 1;
-    }
-
-    rb->qsort(file_pt, entries, sizeof(char**), compare);
+    file_pt = (char **) buf;
 
     /* Remove path and leave only the name.*/
     pname = rb->strrchr(np_file,'/');
     pname++;
 
-    /* Find Selected File. */
-    for(i = 0; i < entries; i++)
-        if(!rb->strcmp(file_pt[i], pname))
-            curfile = i;
+    for (i = 0; i < tree->filesindir; i++)
+    {
+        if (!(dircache[i].attr & ATTR_DIRECTORY)
+            && jpg_ext(rb->strrchr(dircache[i].name,'.')))
+        {
+            file_pt[entries] = dircache[i].name;
+            /* Set Selected File. */
+            if (!rb->strcmp(file_pt[entries], pname))
+                curfile = entries;
+            entries++;
+        }
+    }
+
+    buf += (entries * sizeof(char**));
+    buf_size -= (entries * sizeof(char**));
 }
 
 int change_filename(int direct)
@@ -251,7 +243,7 @@ int change_filename(int direct)
                 curfile = entries - 1;
             else
                 curfile--;
-        }while(file_pt[curfile] == '\0' && count < entries);
+        }while(file_pt[curfile] == NULL && count < entries);
         /* we "erase" the file name if  we encounter
          * a non-supported file, so skip it now */
     }
@@ -264,10 +256,10 @@ int change_filename(int direct)
                 curfile = 0;
             else
                 curfile++;
-        }while(file_pt[curfile] == '\0' && count < entries);
+        }while(file_pt[curfile] == NULL && count < entries);
     }
 
-    if(count == entries && file_pt[curfile] == '\0')
+    if(count == entries)
     {
         rb->splash(HZ, "No supported files");
         return PLUGIN_ERROR;
@@ -830,7 +822,7 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
     if (status)
     {
         rb->splashf(HZ, "decode error %d", status);
-        file_pt[curfile] = '\0';
+        file_pt[curfile] = NULL;
         return NULL;
     }
     time = *rb->current_tick - time;
@@ -907,10 +899,10 @@ int load_and_show(char* filename)
 
     if (buf_size <= 0)
     {
+        rb->close(fd);
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
         if(plug_buf)
         {
-            rb->close(fd);
             rb->lcd_setfont(FONT_SYSFIXED);
             rb->lcd_clear_display();
             rb->snprintf(print,sizeof(print),"%s:",rb->strrchr(filename,'/')+1);
@@ -969,7 +961,6 @@ int load_and_show(char* filename)
 #endif
         {
             rb->splash(HZ, "Out of Memory");
-            rb->close(fd);
             return PLUGIN_ERROR;
         }
     }
@@ -1016,7 +1007,7 @@ int load_and_show(char* filename)
     if (status < 0 || (status & (DQT | SOF0)) != (DQT | SOF0))
     {   /* bad format or minimum components not contained */
         rb->splashf(HZ, "unsupported %d", status);
-        file_pt[curfile] = '\0';
+        file_pt[curfile] = NULL;
         return change_filename(direction);
     }
 
@@ -1035,7 +1026,7 @@ int load_and_show(char* filename)
     if (ds_min == 0)
     {
         rb->splash(HZ, "too large");
-        file_pt[curfile] = '\0';
+        file_pt[curfile] = NULL;
         return change_filename(direction);
     }
 
@@ -1129,6 +1120,12 @@ enum plugin_status plugin_start(const void* parameter)
 
     if(!parameter) return PLUGIN_ERROR;
 
+#if PLUGIN_BUFFER_SIZE >= MIN_MEM
+    buf = rb->plugin_get_buffer((size_t *)&buf_size);
+#else
+    buf = rb->plugin_get_audio_buffer((size_t *)&buf_size);
+#endif
+
     rb->strcpy(np_file, parameter);
     get_pic_list();
 
@@ -1136,18 +1133,9 @@ enum plugin_status plugin_start(const void* parameter)
 
 #if (PLUGIN_BUFFER_SIZE >= MIN_MEM) && !defined(SIMULATOR)
     if(rb->audio_status())
-    {
-        buf = rb->plugin_get_buffer((size_t *)&buf_size) +
-             (entries * sizeof(char**));
-        buf_size -= (entries * sizeof(char**));
         plug_buf = true;
-    }
     else
         buf = rb->plugin_get_audio_buffer((size_t *)&buf_size);
-#else
-    buf = rb->plugin_get_audio_buffer(&buf_size) +
-               (entries * sizeof(char**));
-    buf_size -= (entries * sizeof(char**));
 #endif
 
 #ifdef USEGSLIB
