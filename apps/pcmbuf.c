@@ -705,25 +705,51 @@ static size_t find_chunk(size_t length, struct chunkdesc **chunk)
     return length / 2;
 }
 
-/* Fade samples in the PCM buffer */
-static void fade_block(int factor, size_t length, size_t *fade_sample,
-                       struct chunkdesc **fade_chunk)
+/* Returns the number of bytes _NOT_ mixed/faded */
+static size_t crossfade_mix_fade(int factor, size_t length, const char *buf,
+                                 size_t *out_sample, struct chunkdesc **out_chunk)
 {
-    while (length > 0 && *fade_chunk != NULL)
-    {
-        /* Fade one sample */
-        int16_t *buf = (int16_t *)((*fade_chunk)->addr);
-        int32_t sample = buf[*fade_sample];
-        buf[(*fade_sample)++] = (sample * factor) >> 8;
-        length -= 2;
+    const int16_t *input_buf = (const int16_t *)buf;
+    int16_t *output_buf = (int16_t *)((*out_chunk)->addr);
+    int16_t *chunk_end = SKIPBYTES(output_buf, (*out_chunk)->size);
+    output_buf = &output_buf[*out_sample];
+    int32_t sample;
 
-        /* Move to the next chunk as needed */
-        if (*fade_sample * 2 >= (*fade_chunk)->size)
+    while (length)
+    {
+        /* fade left and right channel at once to keep buffer alignment */
+        int i;
+        for (i = 0; i < 2; i++)
         {
-            *fade_chunk = (*fade_chunk)->link;
-            *fade_sample = 0;
+            if (input_buf)
+            /* fade the input buffer and mix into the chunk */
+            {
+                sample = *input_buf++;
+                sample = ((sample * factor) >> 8) + *output_buf;
+                *output_buf++ = clip_sample_16(sample);
+            }
+            else
+            /* fade the chunk only */
+            {
+                sample = *output_buf;
+                *output_buf++ = (sample * factor) >> 8;
+            }
+        }
+
+        length -= 4; /* 2 samples, each 16 bit -> 4 bytes */
+
+        /* move to next chunk as needed */
+        if (output_buf >= chunk_end)
+        {
+            *out_chunk = (*out_chunk)->link;
+            if (!(*out_chunk))
+                return length;
+            output_buf = (int16_t *)((*out_chunk)->addr);
+            chunk_end = SKIPBYTES(output_buf, (*out_chunk)->size);
         }
     }
+    *out_sample = output_buf - (int16_t *)((*out_chunk)->addr);
+    return 0;
 }
 
 /* Initializes crossfader, calculates all necessary parameters and performs
@@ -812,11 +838,13 @@ static void crossfade_start(void)
 
             fade_out_rem -= block_rem;
 
-            fade_block(factor, block_rem, &fade_out_sample, &fade_out_chunk);
+            crossfade_mix_fade(factor, block_rem, NULL,
+                &fade_out_sample, &fade_out_chunk);
         }
         
         /* zero out the rest of the buffer */
-        fade_block(0, crossfade_rem, &fade_out_sample, &fade_out_chunk);
+        crossfade_mix_fade(0, crossfade_rem, NULL,
+            &fade_out_sample, &fade_out_chunk);
     }
 
     /* Initialize fade-in counters */
@@ -831,41 +859,6 @@ static void crossfade_start(void)
     fade_in_delay += crossfade_sample * 2;
     crossfade_sample = find_chunk(fade_in_delay, &crossfade_chunk);
     logf("crossfade_start done!");
-}
-
-/* Returns the number of bytes _NOT_ mixed */
-static size_t crossfade_mix(int factor, const char *buf, size_t length)
-{
-    const int16_t *input_buf = (const int16_t *)buf;
-    int16_t *output_buf = (int16_t *)(crossfade_chunk->addr);
-    int16_t *chunk_end = SKIPBYTES(output_buf, crossfade_chunk->size);
-    output_buf = &output_buf[crossfade_sample];
-    int32_t sample;
-
-    while (length)
-    {
-        /* fade left and right channel at once to keep buffer alignment */
-        int i;
-        for (i = 0; i < 2; i++)
-        {
-            sample = *input_buf++;
-            sample = ((sample * factor) >> 8) + *output_buf;
-            *output_buf++ = clip_sample_16(sample);
-        }
-
-        length -= 4; /* 2 samples, each 16 bit -> 4 bytes */
-
-        if (output_buf >= chunk_end)
-        {
-            crossfade_chunk = crossfade_chunk->link;
-            if (!crossfade_chunk)
-                return length;
-            output_buf = (int16_t *)crossfade_chunk->addr;
-            chunk_end = SKIPBYTES(output_buf, crossfade_chunk->size);
-        }
-    }
-    crossfade_sample = output_buf - (int16_t *)crossfade_chunk->addr;
-    return 0;
 }
 
 /* Perform fade-in of new track */
@@ -892,7 +885,8 @@ static void write_to_crossfade(char *buf, size_t length)
             {
                 /* Mix the data */
                 size_t fade_total = fade_rem;
-                fade_rem = crossfade_mix(factor, buf, fade_rem);
+                fade_rem = crossfade_mix_fade(factor, fade_rem, buf,
+                    &crossfade_sample, &crossfade_chunk);
                 length -= fade_total - fade_rem;
                 buf += fade_total - fade_rem;
                 if (!length)
@@ -913,8 +907,9 @@ static void write_to_crossfade(char *buf, size_t length)
         {
             /* Mix the data */
             size_t mix_total = length;
-            /* A factor of 256 means no fading */
-            length = crossfade_mix(256, buf, length);
+            /* A factor of 256 means mix only, no fading */
+            length = crossfade_mix_fade(256, length, buf,
+                    &crossfade_sample, &crossfade_chunk);
             buf += mix_total - length;
             if (!length)
                 return;
