@@ -243,7 +243,7 @@ static inline void enable_interrupt(int mask)
         "mrs     %0, cpsr   \n"
         "bic     %0, %0, %1 \n"
         "msr     cpsr_c, %0 \n"
-        : "=&r"(tmp) : "i"(mask));
+        : "=&r"(tmp) : "r"(mask));
 }
 
 static inline void disable_interrupt(int mask)
@@ -254,7 +254,7 @@ static inline void disable_interrupt(int mask)
         "mrs     %0, cpsr   \n"
         "orr     %0, %0, %1 \n"
         "msr     cpsr_c, %0 \n"
-        : "=&r"(tmp) : "i"(mask));
+        : "=&r"(tmp) : "r"(mask));
 }
 
 static inline int disable_interrupt_save(int mask)
@@ -266,7 +266,7 @@ static inline int disable_interrupt_save(int mask)
         "orr     %0, %1, %2 \n"
         "msr     cpsr_c, %0 \n"
         : "=&r"(tmp), "=&r"(cpsr)
-        : "i"(mask));
+        : "r"(mask));
     return cpsr;
 }
 

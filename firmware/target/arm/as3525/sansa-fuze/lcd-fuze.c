@@ -46,7 +46,7 @@ static int xoffset = 20; /* needed for flip */
 /* we need to write a red pixel for correct button reads
  * (see lcd_button_support()),but that must not happen while the lcd is updating
  * so block lcd_button_support the during updates */
-static bool lcd_busy = false;
+static volatile int lcd_busy = false;
 
 static inline void lcd_delay(int x)
 {

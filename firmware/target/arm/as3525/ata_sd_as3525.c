@@ -129,7 +129,13 @@ static volatile unsigned int transfer_error[NUM_VOLUMES];
 static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SECTOR_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
 static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
 
-static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
+static inline void mci_delay(void)
+{
+    int i = 0xffff;
+    do {
+        asm volatile("nop\n");
+    } while (--i);
+}
 
 #ifdef HAVE_HOTSWAP
 static int sd1_oneshot_callback(struct timeout *tmo)
