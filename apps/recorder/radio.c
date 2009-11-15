@@ -752,6 +752,8 @@ int radio_screen(void)
 
             case ACTION_FM_MENU:
                 viewportmanager_set_statusbar(oldbars);
+                FOR_NB_SCREENS(i)
+                    screens[i].scroll_stop(&vp[i]);
                 radio_menu();
                 curr_preset = find_preset(curr_freq);
                 viewportmanager_set_statusbar(fmbars);

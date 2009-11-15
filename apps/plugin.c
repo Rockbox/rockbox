@@ -803,6 +803,11 @@ int plugin_load(const char* plugin, const void* parameter)
 
     button_clear_queue();
 
+    lcd_clear_display();
+#ifdef HAVE_LCD_REMOTE
+    lcd_remote_clear_display();
+#endif
+
 #ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_UI);
 #if LCD_DEPTH > 1
