@@ -759,9 +759,9 @@ bool load_sudoku(struct sudoku_state_t* state, char* filename)
     }
 
     /* Check that the board is valid - we need to check every row/column
-       individually, so we check the diagonal from top-left to bottom-right */
-    for (state->x = 0; state->x < 9; state->x++) {
-        state->y = state->x;
+       and block individually */
+    for (state->y = 0; state->y < 9; state->y++) {
+        state->x = (state->y%3)*3 + (state->y/3);
         if (check_status(state)) return false;
     }
     state->x = 0;
