@@ -78,11 +78,7 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
 static struct viewport inbuilt[NB_SCREENS];
 struct viewport *sb_skin_get_info_vp(enum screen_type screen)
 {
-    int bar_setting = global_settings.statusbar;
-#if NB_SCREENS > 1
-    if (screen == SCREEN_REMOTE)
-        bar_setting = global_settings.remote_statusbar;
-#endif
+    int bar_setting = statusbar_position(screen);
     if (bar_setting == STATUSBAR_CUSTOM)
         return &find_viewport(VP_INFO_LABEL, sb_skin[screen].data)->vp;
     else if (bar_setting == STATUSBAR_OFF)
