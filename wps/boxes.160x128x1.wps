@@ -17,7 +17,7 @@
 %ac%s%?it<%it|%fn>
 %ac%t5%s%?ia<%ia|%?d2<%d2|(Unknown Artist)>>;%ac%t5%s%?id<%id|%?d1<%d1|(Unknown Album)>>
 
-%ac%t5%pc / %pt;%ac%t5Track %pp of %pe
+%ac%t5%pc / %pt;%ac%t5Track %?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>
 
  %fbk
 

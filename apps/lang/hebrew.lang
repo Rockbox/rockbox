@@ -13179,3 +13179,45 @@
     crossfade: "רק בהחלפה אוטומטית של שיר"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in Cabbie theme
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: ":השיר הבא"
+  </dest>
+  <voice>
+    *: ":השיר הבא"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in Cabbie theme
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: ":הבא"
+  </dest>
+  <voice>
+    *: ":הבא"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in Cabbie theme
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "מתוך"
+  </dest>
+  <voice>
+    *: "מתוך"
+  </voice>
+</phrase>

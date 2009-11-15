@@ -18,7 +18,7 @@
 %ac%s%?ia<%ia|%?d2<%d2|(Unknown Artist)>>
 %ac%s%?id<%id|%?d1<%d1|(Unknown Album)>>
 
-%acTrack %pp of %pe
+%acTrack %?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>
 %ac%pc / %pt (-%pr)
 
  %fbk

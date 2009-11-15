@@ -18,7 +18,7 @@
 %?C<|%s%ac%?id<%id|%?d1<%d1|(root)>>>
 %?C<|%s%ac%?iy<%iy|>>
 
-%?C<|%s%acNext Track:>
+%?C<|%s%ac%Sx|Next Track:|>
 %?C<|%s%ac%?It<%It|%Fn>>
 %?C<|%s%ac%?Ia<%Ia|>>
 
@@ -26,7 +26,7 @@
 %?C<%s%ac%?ia<%ia|%?d2<%d2|(root)>>|>
 %?C<%s%ac%?id<%id|%?d1<%d1|(root)>>|>
 
-%al    %pc%ac%pp of %pe%ar%pr   
+%al    %pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr   
 %?mh<%xdAa|%xdAb>
 %?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
 %?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>

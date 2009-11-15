@@ -59,6 +59,7 @@
 #include "recording.h"
 #include "pcm_record.h"
 #endif
+#include "language.h"
 
 static char* get_codectype(const struct mp3entry* id3)
 {
@@ -1173,6 +1174,9 @@ const char *get_token_value(struct gui_wps *gwps,
             snprintf(buf, buf_size, "%d", curr_screen);
             return buf;
         }
+
+        case WPS_TOKEN_LANG_IS_RTL:
+            return lang_is_rtl() ? "r" : NULL;
 
         default:
             return NULL;

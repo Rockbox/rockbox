@@ -27,7 +27,7 @@
 %s%al%?id<%id|%?d1<%d1|(root)>>
 %s%al%iy
 
-%s%alNext Track:
+%s%al%Sx|Next Track:|
 %s%al%?It<%It|%Fn>
 %s%al%Ia
 
@@ -37,10 +37,10 @@
 %s%ac%?id<%id|%?d1<%d1|(root)>>
 %s%ac%iy
 
-%acNext Track:
+%ac%Sx|Next Track:|
 %s%ac%?It<%It|%Fn>
 %s%ac%Ia
 
 %V|0|180|-|20|1|-|-|
-%al   %pc%ac%pp of %pe%ar%pr   
+%al   %pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr   
 

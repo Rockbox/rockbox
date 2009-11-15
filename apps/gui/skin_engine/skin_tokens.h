@@ -202,6 +202,7 @@ enum wps_token_type {
     /* Setting option */
     WPS_TOKEN_SETTING,
     WPS_TOKEN_CURRENT_SCREEN,
+    WPS_TOKEN_LANG_IS_RTL,
     
     /* Recording Tokens */
   TOKEN_MARKER_RECORDING,

@@ -25,15 +25,15 @@
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?d2<%d2|(root)>>
 %s%al%?id<%id|%?d1<%d1|(root)>>
-%s%alNext Track:
+%s%al%Sx|Next Track:|
 %s%al%?It<%It|%Fn>
 
 %Vl|b|0|10|-|60|1|-|-|
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>
 %s%ac%?id<%id|%?d1<%d1|(root)>>
-%s%acNext Track:
+%s%ac%Sx|Next Track:|
 %s%ac%?It<%It|%Fn>
 
 %V|0|82|-|13|1|-|-|
-%al %pc%ac%pp of %pe%ar%pr 
+%al %pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr 

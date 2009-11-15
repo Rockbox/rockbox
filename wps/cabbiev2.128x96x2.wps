@@ -20,6 +20,6 @@
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>
 %s%ac%?id<%id|%?d1<%d1|(root)>>
-%sNext: %ac%It
+%s%Sx|Next:| %ac%It
 
-%al %pc%ac%pp of %pe%ar%pr 
+%al %pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr 

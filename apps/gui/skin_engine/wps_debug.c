@@ -490,6 +490,9 @@ static char *get_token_desc(struct wps_token *token, char *buf,
             snprintf(buf, bufsize, "Setting value: '%s'",
                  settings[token->value.i].cfg_name);
             break;
+        case WPS_TOKEN_LANG_IS_RTL:
+            snprintf(buf, bufsize, "lang: is_rtl?");
+            break;
         default:
             for(i=1; i<sizeof(tokens)/sizeof(*token); i++)
             {

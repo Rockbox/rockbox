@@ -25,7 +25,7 @@
 %s%al%?ia<%ia|%?d2<%d2|(root)>>
 %s%al%?id<%id|%?d1<%d1|(root)>>
 
-Next Track:
+%Sx|Next Track:|
 %s%?It<%It|%Fn>
 
 # NowPlaying - no AA
@@ -34,9 +34,9 @@ Next Track:
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>
 %s%ac%?id<%id|%?d1<%d1|(root)>>
 
-Next Track:
+%Sx|Next Track:|
 %s%?It<%It|%Fn>
 
 %V|0|96|-|10|1|-|-|
-%al  %pc%ac%pc%ac%pp of %pe%ar%pr%ar%pr  
+%al  %pc%ac%pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr%ar%pr  
 

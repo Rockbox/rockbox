@@ -13,7 +13,7 @@
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>
 %s%ac%?id<%id|%?d1<%d1|(root)>>
-%t5%ac%s%?Fn<Next: %?It<%It|%Fn>|%ac%pp of %pe>;%t5%ac%s%?Fn<Next: %?Ia<%Ia|%Fn>|%ac%pp of %pe>
+%t5%ac%s%?Fn<%Sx|Next:| %?It<%It|%Fn>|%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>>;%t5%ac%s%?Fn<%Sx|Next:| %?Ia<%Ia|%Fn>|%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>>
 %pb|pb-112x64x1.bmp|1|42|110|4|
 %pc%ar%pr
 #Bottom status bar

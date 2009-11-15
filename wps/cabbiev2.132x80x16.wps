@@ -25,11 +25,11 @@
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?d2<%d2|(root)>>
 %s%al%?id<%id|%?d1<%d1|(root)>>
-%s%alNext: %?It<%It|%Fn>
+%s%al%Sx|Next:| %?It<%It|%Fn>
 
 #NowPlaying - no aa
 %Vl|b|0|10|-|48|1|-|-|
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>
 %s%ac%?id<%id|%?d1<%d1|(root)>>
-%s%acNext: %?It<%It|%Fn>
+%s%ac%Sx|Next:| %?It<%It|%Fn>

@@ -8,7 +8,7 @@
 %V|0|0|128|16|1|
 %pb|pb-128x64x1.bmp|2|1|124|4|
 %x|a|pbbackground-128x64x1.bmp|1|0|
-%pp of %pe%ar%pc
+%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pc
 
 # tag info viewport
 %V|0|18|128|25|1|

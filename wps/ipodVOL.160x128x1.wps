@@ -6,7 +6,7 @@
 %wd
 %ac%?mp<Now Stopped|Now Playing|Now Paused|Now Playing|Now Playing>%?mp<|%?ps< (S)|>>
 
-%al%pp of %pe 
+%al%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe> 
 
 %s%ac%?it<%it|%fn>
 %s%t3%ac%?ia<%ia|%d2>

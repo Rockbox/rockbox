@@ -23,7 +23,7 @@
 %xl|D|shuffle-128x64x1.bmp|67|13|
 %xl|E|repeat-128x64x1.bmp|93|12|4|
 %xl|F|playmode-128x64x1.bmp|113|12|5|
-%pp of %pe%ar%pc
+%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pc
 
 # status bar
 %?mh<%xdAa|%xdAb>
