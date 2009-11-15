@@ -770,9 +770,12 @@ long gui_wps_show(void)
            -> no additional screen updates needed */
         else
 #endif
-        {
+        {   /* 1 is the minimum timeout which lets other threads run.
+             * audio thread (apprently) needs to run before displaying the wps
+             * or bad things happen with regards to cuesheet
+             * (probably a race condition, on sh at least) */
             button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,
-                restore ? TIMEOUT_NOBLOCK : HZ/5);
+                restore ? 1 : HZ/5);
         }
 
         /* Exit if audio has stopped playing. This happens e.g. at end of
