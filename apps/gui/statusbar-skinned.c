@@ -135,7 +135,7 @@ void sb_skin_set_state(int state, enum screen_type screen)
 {
     sb_skin[screen].sync_data->do_full_update = true;
     int skinbars = sb_skin[screen].sync_data->statusbars;
-    if (state)
+    if (state && loaded_ok[screen])
     {
         skinbars |= VP_SB_ONSCREEN(screen);
     }
