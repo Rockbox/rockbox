@@ -174,7 +174,7 @@ static struct
 {
     completion_handler_t completion_handler[2];
     control_handler_t control_handler[2];
-    struct usb_transfer_completion_event_data completion_event;
+    struct usb_transfer_completion_event_data completion_event[2];
 } ep_data[USB_NUM_ENDPOINTS];
 
 static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
@@ -821,7 +821,7 @@ void usb_core_transfer_complete(int endpoint,int dir,int status,int length)
             break;
 
         default:
-            completion_event=&ep_data[endpoint].completion_event;
+            completion_event=&ep_data[endpoint].completion_event[dir!=0];
 
             completion_event->endpoint=endpoint;
             completion_event->dir=dir;
@@ -838,7 +838,7 @@ void usb_core_transfer_complete(int endpoint,int dir,int status,int length)
 void usb_core_control_request(struct usb_ctrlrequest* req)
 {
     struct usb_transfer_completion_event_data* completion_event =
-        &ep_data[EP_CONTROL].completion_event;
+        &ep_data[EP_CONTROL].completion_event[1];
 
     completion_event->endpoint=EP_CONTROL;
     completion_event->dir=0;
