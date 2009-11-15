@@ -445,6 +445,25 @@ int show_menu(void) /* return 1 to quit */
     return 0;
 }
 
+void draw_image_rect(struct t_disp* pdisp, int x, int y, int width, int height)
+{
+#ifdef HAVE_LCD_COLOR
+    yuv_bitmap_part(
+        pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
+        pdisp->x + x, pdisp->y + y, pdisp->stride,
+        x + MAX(0, (LCD_WIDTH - pdisp->width) / 2),
+        y + MAX(0, (LCD_HEIGHT - pdisp->height) / 2),
+        width, height,
+        jpeg_settings.colour_mode, jpeg_settings.dither_mode);
+#else
+    MYXLCD(gray_bitmap_part)(
+        pdisp->bitmap[0], pdisp->x + x, pdisp->y + y, pdisp->stride,
+        x + MAX(0, (LCD_WIDTH-pdisp->width)/2),
+        y + MAX(0, (LCD_HEIGHT-pdisp->height)/2),
+        width, height);
+#endif
+}
+
 /* Pan the viewing window right - move image to the left and fill in
    the right-hand side */
 static void pan_view_right(struct t_disp* pdisp)
@@ -456,20 +475,7 @@ static void pan_view_right(struct t_disp* pdisp)
     {
         MYXLCD(scroll_left)(move); /* scroll left */
         pdisp->x += move;
-#ifdef HAVE_LCD_COLOR
-        yuv_bitmap_part(
-            pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
-            pdisp->x + LCD_WIDTH - move, pdisp->y, pdisp->stride,
-            LCD_WIDTH - move, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
-            move, MIN(LCD_HEIGHT, pdisp->height),    /* w, h */
-            jpeg_settings.colour_mode, jpeg_settings.dither_mode);
-#else
-        MYXLCD(gray_bitmap_part)(
-            pdisp->bitmap[0], pdisp->x + LCD_WIDTH - move,
-            pdisp->y, pdisp->stride,
-            LCD_WIDTH - move, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
-            move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
-#endif
+        draw_image_rect(pdisp, LCD_WIDTH - move, 0, move, pdisp->height-pdisp->y);
         MYLCD_UPDATE();
     }
 }
@@ -485,23 +491,10 @@ static void pan_view_left(struct t_disp* pdisp)
     {
         MYXLCD(scroll_right)(move); /* scroll right */
         pdisp->x -= move;
-#ifdef HAVE_LCD_COLOR
-        yuv_bitmap_part(
-            pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
-            pdisp->x, pdisp->y, pdisp->stride,
-            0, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
-            move, MIN(LCD_HEIGHT, pdisp->height),    /* w, h */
-            jpeg_settings.colour_mode, jpeg_settings.dither_mode);
-#else
-        MYXLCD(gray_bitmap_part)(
-            pdisp->bitmap[0], pdisp->x, pdisp->y, pdisp->stride,
-            0, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
-            move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
-#endif
+        draw_image_rect(pdisp, 0, 0, move, pdisp->height-pdisp->y);
         MYLCD_UPDATE();
     }
 }
-
 
 /* Pan the viewing window up - move image down and fill in
    the top */
@@ -521,19 +514,8 @@ static void pan_view_up(struct t_disp* pdisp)
                caused by lack of error history on line zero. */
             move = MIN(move + 1, pdisp->y + pdisp->height);
         }
-
-        yuv_bitmap_part(
-            pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
-            pdisp->x, pdisp->y, pdisp->stride,
-            MAX(0, (LCD_WIDTH-pdisp->width)/2), 0,   /* x, y */
-            MIN(LCD_WIDTH, pdisp->width), move,      /* w, h */
-            jpeg_settings.colour_mode, jpeg_settings.dither_mode);
-#else
-        MYXLCD(gray_bitmap_part)(
-            pdisp->bitmap[0], pdisp->x, pdisp->y, pdisp->stride,
-            MAX(0, (LCD_WIDTH-pdisp->width)/2), 0,   /* x, y */
-            MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
 #endif
+        draw_image_rect(pdisp, 0, 0, pdisp->width-pdisp->x, move);
         MYLCD_UPDATE();
     }
 }
@@ -561,14 +543,11 @@ static void pan_view_down(struct t_disp* pdisp)
                    rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
                    LCD_WIDTH*sizeof (fb_data));
         }
+#endif
 
-        yuv_bitmap_part(
-            pdisp->bitmap, pdisp->csub_x, pdisp->csub_y, pdisp->x,
-            pdisp->y + LCD_HEIGHT - move, pdisp->stride,
-            MAX(0, (LCD_WIDTH-pdisp->width)/2), LCD_HEIGHT - move, /* x, y */
-            MIN(LCD_WIDTH, pdisp->width), move,     /* w, h */
-            jpeg_settings.colour_mode, jpeg_settings.dither_mode);
+        draw_image_rect(pdisp, 0, LCD_HEIGHT - move, pdisp->width-pdisp->x, move);
 
+#ifdef HAVE_LCD_COLOR
         if (jpeg_settings.dither_mode == DITHER_DIFFUSION)
         {
             /* Cover the first row drawn with previous image data. */
@@ -577,12 +556,6 @@ static void pan_view_down(struct t_disp* pdisp)
                    LCD_WIDTH*sizeof (fb_data));
             pdisp->y++;
         }
-#else
-        MYXLCD(gray_bitmap_part)(
-            pdisp->bitmap[0], pdisp->x,
-            pdisp->y + LCD_HEIGHT - move, pdisp->stride,
-            MAX(0, (LCD_WIDTH-pdisp->width)/2), LCD_HEIGHT - move, /* x, y */
-            MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
 #endif
         MYLCD_UPDATE();
     }
@@ -687,14 +660,8 @@ int scroll_bmp(struct t_disp* pdisp)
 #ifdef USEGSLIB
             grey_show(true); /* switch on greyscale overlay */
 #else
-            yuv_bitmap_part(
-                pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
-                pdisp->x, pdisp->y, pdisp->stride,
-                MAX(0, (LCD_WIDTH - pdisp->width) / 2),
-                MAX(0, (LCD_HEIGHT - pdisp->height) / 2),
-                MIN(LCD_WIDTH, pdisp->width),
-                MIN(LCD_HEIGHT, pdisp->height),
-                jpeg_settings.colour_mode, jpeg_settings.dither_mode);
+            draw_image_rect(pdisp, 0, 0,
+                            pdisp->width-pdisp->x, pdisp->height-pdisp->y);
             MYLCD_UPDATE();
 #endif
             break;
@@ -1072,7 +1039,7 @@ int load_and_show(char* filename)
         return change_filename(direction);
     }
 
-    ds = ds_max; /* initials setting */
+    ds = ds_max; /* initialize setting */
     cx = jpg.x_size/ds/2; /* center the view */
     cy = jpg.y_size/ds/2;
 
@@ -1091,24 +1058,10 @@ int load_and_show(char* filename)
             rb->lcd_puts(0, 3, print);
             rb->lcd_update();
         }
+
         MYLCD(clear_display)();
-#ifdef HAVE_LCD_COLOR
-        yuv_bitmap_part(
-            p_disp->bitmap, p_disp->csub_x, p_disp->csub_y,
-            p_disp->x, p_disp->y, p_disp->stride,
-            MAX(0, (LCD_WIDTH - p_disp->width) / 2),
-            MAX(0, (LCD_HEIGHT - p_disp->height) / 2),
-            MIN(LCD_WIDTH, p_disp->width),
-            MIN(LCD_HEIGHT, p_disp->height),
-            jpeg_settings.colour_mode, jpeg_settings.dither_mode);
-#else
-        MYXLCD(gray_bitmap_part)(
-            p_disp->bitmap[0], p_disp->x, p_disp->y, p_disp->stride,
-            MAX(0, (LCD_WIDTH - p_disp->width) / 2),
-            MAX(0, (LCD_HEIGHT - p_disp->height) / 2),
-            MIN(LCD_WIDTH, p_disp->width),
-            MIN(LCD_HEIGHT, p_disp->height));
-#endif
+        draw_image_rect(p_disp, 0, 0,
+                        p_disp->width-p_disp->x, p_disp->height-p_disp->y);
         MYLCD_UPDATE();
 
 #ifdef USEGSLIB

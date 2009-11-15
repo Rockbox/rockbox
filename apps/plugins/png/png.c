@@ -1302,7 +1302,7 @@ void LodePNG_decode(LodePNG_Decoder* decoder, unsigned char* in, size_t insize, 
     /*TODO: check if this works according to the statement in the documentation: "The converter can convert from greyscale input color type, to 8-bit greyscale or greyscale with alpha"*/
 if (!(decoder->infoRaw.color.colorType == 2 || decoder->infoRaw.color.colorType == 6) && !(decoder->infoRaw.color.bitDepth == 8)) { decoder->error = 56; return; }
     converted_image = (fb_data *)((intptr_t)(memory + 3) & ~3);
-    converted_image_size = FB_DATA_SZ*decoder->infoPng.width*decoder->infoPng.height;
+    converted_image_size = decoder->infoPng.width*decoder->infoPng.height;
     if ((unsigned char *)(converted_image + converted_image_size) >= decoded_image) { decoder->error = OUT_OF_MEMORY; }
     if (!decoder->error) decoder->error = LodePNG_convert(converted_image, decoded_image, &decoder->infoRaw.color, &decoder->infoPng.color, decoder->infoPng.width, decoder->infoPng.height);
 }
@@ -1534,6 +1534,15 @@ int show_menu(void) /* return 1 to quit */
     return 0;
 }
 
+void draw_image(struct LodePNG_Decoder* decoder)
+{
+    rb->lcd_bitmap_part(resized_image, decoder->x, decoder->y, decoder->infoPng.width/ds /*stride*/,
+                        MAX(0, (LCD_WIDTH - (int)decoder->infoPng.width/(int)ds) / 2),
+                        MAX(0, (LCD_HEIGHT - (int)decoder->infoPng.height/(int)ds) / 2),
+                        decoder->infoPng.width/ds - decoder->x,
+                        decoder->infoPng.height/ds - decoder->y);
+}
+
 /* Pan the viewing window right - move image to the left and fill in
    the right-hand side */
 static void pan_view_right(struct LodePNG_Decoder* decoder)
@@ -1541,14 +1550,10 @@ static void pan_view_right(struct LodePNG_Decoder* decoder)
     int move;
 
     move = MIN(HSCROLL, decoder->infoPng.width/ds - decoder->x - LCD_WIDTH);
-    if (move > 0 && decoder->infoPng.width/ds > LCD_WIDTH)
+    if (move > 0)
     {
         decoder->x += move;
-        rb->lcd_bitmap_part(resized_image, decoder->x, decoder->y, decoder->infoPng.width/ds /*stride*/,
-                            MAX(0, (LCD_WIDTH - (int)decoder->infoPng.width/(int)ds) / 2),
-                            MAX(0, (LCD_HEIGHT - (int)decoder->infoPng.height/(int)ds) / 2),
-                            MIN(LCD_WIDTH, decoder->infoPng.width/ds),
-                            MIN(LCD_HEIGHT, decoder->infoPng.height/ds));
+        draw_image(decoder);
         rb->lcd_update();
     }
 }
@@ -1563,11 +1568,7 @@ static void pan_view_left(struct LodePNG_Decoder* decoder)
     if (move > 0)
     {
         decoder->x -= move;
-        rb->lcd_bitmap_part(resized_image, decoder->x, decoder->y, decoder->infoPng.width/ds /*stride*/,
-                            MAX(0, (LCD_WIDTH - (int)decoder->infoPng.width/(int)ds) / 2),
-                            MAX(0, (LCD_HEIGHT - (int)decoder->infoPng.height/(int)ds) / 2),
-                            MIN(LCD_WIDTH, decoder->infoPng.width/ds),
-                            MIN(LCD_HEIGHT, decoder->infoPng.height/ds));
+        draw_image(decoder);
         rb->lcd_update();
     }
 }
@@ -1583,11 +1584,7 @@ static void pan_view_up(struct LodePNG_Decoder* decoder)
     if (move > 0)
     {
         decoder->y -= move;
-        rb->lcd_bitmap_part(resized_image, decoder->x, decoder->y, decoder->infoPng.width/ds /*stride*/,
-                            MAX(0, (LCD_WIDTH - (int)decoder->infoPng.width/(int)ds) / 2),
-                            MAX(0, (LCD_HEIGHT - (int)decoder->infoPng.height/(int)ds) / 2),
-                            MIN(LCD_WIDTH, decoder->infoPng.width/ds),
-                            MIN(LCD_HEIGHT, decoder->infoPng.height/ds));
+        draw_image(decoder);
         rb->lcd_update();
     }
 }
@@ -1599,14 +1596,10 @@ static void pan_view_down(struct LodePNG_Decoder* decoder)
     int move;
 
     move = MIN(VSCROLL, decoder->infoPng.height/ds - decoder->y - LCD_HEIGHT);
-    if (move > 0 && decoder->infoPng.height/ds > LCD_HEIGHT)
+    if (move > 0)
     {
         decoder->y += move;
-        rb->lcd_bitmap_part(resized_image, decoder->x, decoder->y, decoder->infoPng.width/ds /*stride*/,
-                            MAX(0, (LCD_WIDTH - (int)decoder->infoPng.width/(int)ds) / 2),
-                            MAX(0, (LCD_HEIGHT - (int)decoder->infoPng.height/(int)ds) / 2),
-                            MIN(LCD_WIDTH, decoder->infoPng.width/ds),
-                            MIN(LCD_HEIGHT, decoder->infoPng.height/ds));
+        draw_image(decoder);
         rb->lcd_update();
     }
 }
@@ -1765,7 +1758,7 @@ void cb_progress(int current, int total)
 
 int pngmem(struct LodePNG_Decoder* decoder, int ds)
 {
-    return decoder->infoPng.width * decoder->infoPng.height * FB_DATA_SZ / ds;
+    return (decoder->infoPng.width/ds) * (decoder->infoPng.height/ds) * FB_DATA_SZ;
 }
 
 /* how far can we zoom in without running out of memory */
@@ -1819,7 +1812,7 @@ fb_data *get_image(struct LodePNG_Decoder* decoder)
         previous_size = converted_image_size;
     }
 
-    size[ds] = decoder->infoPng.width * decoder->infoPng.height * FB_DATA_SZ / ds;
+    size[ds] = (decoder->infoPng.width/ds) * (decoder->infoPng.height/ds);
 
     /* assign image buffer */
     if (ds > 1) {
@@ -1837,7 +1830,7 @@ fb_data *get_image(struct LodePNG_Decoder* decoder)
         if ((unsigned char *)(disp[ds] + size[ds]) >= memory_max) {
             //rb->splash(HZ, "Out of Memory");
             // Still display the original image which is already decoded in RAM
-            disp[ds] = NULL;
+            disp[ds] = converted_image;
             ds = 1;
             return converted_image;
         } else {
@@ -1858,9 +1851,8 @@ fb_data *get_image(struct LodePNG_Decoder* decoder)
         }
     } else {
         disp[ds] = converted_image;
+        return converted_image;
     }
-
-
 
     previous_disp = disp[ds];
     previous_size = size[ds];
@@ -1958,6 +1950,7 @@ int load_and_show(char* filename)
                 rb->lcd_puts(0, 2, print);
                 rb->lcd_update();
             }
+
             ds_max = max_downscale(&decoder);            /* check display constraint */
 
             ds = ds_max; /* initials setting */
@@ -2009,7 +2002,6 @@ int load_and_show(char* filename)
         rb->lcd_update();
     }
 
-    do {
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
         if (plug_buf && (decoder.error == FILE_TOO_LARGE || decoder.error == OUT_OF_MEMORY || decoder.error == Z_MEM_ERROR))
         {
@@ -2073,9 +2065,6 @@ int load_and_show(char* filename)
         //else
 #endif
 
-        if (!decoder.error) {
-            resized_image = get_image(&decoder); /* decode or fetch from cache */
-        }
         if (decoder.error) {
 
             switch (decoder.error) {
@@ -2152,10 +2141,13 @@ int load_and_show(char* filename)
             } else if (decoder.error == OUT_OF_MEMORY && entries == 1) {
                 return PLUGIN_ERROR;
             } else {
+                file_pt[curfile] = '\0';
                 return change_filename(direction);
             }
-
         }
+
+    do {
+        resized_image = get_image(&decoder); /* decode or fetch from cache */
 
         cx = decoder.infoPng.width/ds/2; /* center the view */
         cy = decoder.infoPng.height/ds/2;
@@ -2171,17 +2163,8 @@ int load_and_show(char* filename)
         }
 
         rb->lcd_clear_display();
-
-        rb->lcd_bitmap_part(resized_image, decoder.x, decoder.y, decoder.infoPng.width/ds /*stride*/,
-                            MAX(0, (LCD_WIDTH - (int)decoder.infoPng.width/(int)ds) / 2),
-                            MAX(0, (LCD_HEIGHT - (int)decoder.infoPng.height/(int)ds) / 2),
-                            MIN(LCD_WIDTH, decoder.infoPng.width/ds),
-                            MIN(LCD_HEIGHT, decoder.infoPng.height/ds));
-
+        draw_image(&decoder);
         rb->lcd_update();
-
-        //}
-        //}
 
         /* drawing is now finished, play around with scrolling
          * until you press OFF or connect USB
