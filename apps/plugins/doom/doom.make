@@ -19,18 +19,12 @@ DOOM_OBJ := $(call c2obj, $(DOOM_SRC))
 # add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(DOOM_SRC)
 
-DOOMCFLAGS = $(PLUGINFLAGS) -Wno-strict-prototypes
+DOOMCFLAGS = $(PLUGINFLAGS) -Wno-strict-prototypes -O2
 
-# The arm code compiles too large for the plugin buffer when set to optimize for speed
-ifeq ($(CPU), arm)
-    DOOMCFLAGS += -Os
 ifndef SIMVER
 ifeq ($(TARGET), IRIVER_H100)
     DOOMCCFLAGS += -mstructure-size-boundary=8
 endif
-endif
-else
-    DOOMCFLAGS += -O2
 endif
 
 $(DOOMBUILDDIR)/doom.rock: $(DOOM_OBJ)
