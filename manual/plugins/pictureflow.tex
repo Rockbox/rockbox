@@ -2,7 +2,8 @@
 \screenshot{plugins/images/ss-pictureflow}{PictureFlow}{img:pictureflow}
 PictureFlow provides a visualisation of your albums with their associated cover
 art. \opt{swcodec}{It is possible to start playback of the selected
-album from PictureFlow. Playback will start from the selected track.}
+album from PictureFlow. Playback will start from the selected track. The 
+PictureFlow plugin will continue to run while your tracks are played.}
 
 \opt{hwcodec}{
 \note{PictureFlow is a visualisation only. It cannot be used to select and
@@ -25,68 +26,98 @@ aware:
 \begin{table}
     \begin{btnmap}{}{}
         \opt{scrollwheel,IRIVER_H10_PAD}{
-          \opt{scrollwheel}{\ButtonScrollFwd{} / \ButtonScrollBack}
-          \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
-             \opt{HAVEREMOTEKEYMAP}{& }
-          & Scroll through albums / track list\\}
-           
-        \nopt{scrollwheel,IRIVER_H10_PAD}{\ButtonLeft{} / \ButtonRight
-           \opt{HAVEREMOTEKEYMAP}{& 
-              \opt{GIGABEAT_RC_PAD}{\ButtonRCVolDown{} / \ButtonRCVolUp}
-           }
-        & Scroll through albums\\}
+            \ActionStdPrev{} / \ActionStdNext
+                &
+            \opt{HAVEREMOTEKEYMAP}{
+                &}
+            Scroll through albums / track list
+                \\
+        }
+        
+        % only scroll wheel and 'strip' targets use the same action in album and track list
+        \nopt{scrollwheel,IRIVER_H10_PAD}{%
+            % currently the M3 does not use buttons of the main unit which has no display
+            \nopt{IAUDIO_M3_PAD}{\ButtonLeft{} / \ButtonRight}
+                &
+            \opt{HAVEREMOTEKEYMAP}{
+                \opt{IAUDIO_M3_PAD,GIGABEAT_RC_PAD}{\ActionRCStdPrev{} / \ActionRCStdNext}
+                &}
+            Scroll through albums
+                \\
 
-        \nopt{scrollwheel,IRIVER_H10_PAD}{\ButtonUp{} / \ButtonDown
-           \opt{HAVEREMOTEKEYMAP}{&
-             \opt{GIGABEAT_RC_PAD}{\ButtonRCVolDown{} / \ButtonRCVolUp}
-           }
-        & Scroll through track list\\}
+            \nopt{IAUDIO_M3_PAD}{\ActionStdPrev{} / \ActionStdNext}
+                &
+            \opt{HAVEREMOTEKEYMAP}{
+                % even though the M3 uses an Iaudio remote, mapping differs when used with M/X5
+                \opt{IAUDIO_M3_PAD}{\ButtonRCLeft{} / \ButtonRCRight}
+                \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp{} / \ButtonRCVolDown{}}
+                &}
+            Scroll through track list
+                \\
+        }
 
-        \opt{IRIVER_H10_PAD}{\ButtonRight}
-        \opt{ONDIO_PAD}{\ButtonUp}
-        \opt{RECORDER_PAD}{\ButtonOn}
-        \nopt{ONDIO_PAD,IRIVER_H10_PAD,RECORDER_PAD}{\ButtonSelect}
-           \opt{HAVEREMOTEKEYMAP}{&
-             \opt{GIGABEAT_RC_PAD}{\ButtonRCFF}
-           }
-        & Enter track list 
-             \opt{swcodec}{/ Play album from selected track}
-        \\
+        \nopt{IAUDIO_M3_PAD}{%
+            \nopt{ONDIO_PAD,IRIVER_H10_PAD,RECORDER_PAD}{\ButtonSelect}
+            \opt{ONDIO_PAD}{\ButtonUp} 
+            \opt{IRIVER_H10_PAD}{\ButtonRight} 
+            \opt{RECORDER_PAD}{\ButtonOn} 
+        }
+            &
+        \opt{HAVEREMOTEKEYMAP}{
+            \opt{IAUDIO_M3_PAD}{\ButtonRCPlay}
+            \opt{GIGABEAT_RC_PAD}{\ButtonRCFF}
+            &}
+        Enter track list
+            \nopt{ONDIO_PAD}{/ Play album from selected track}
+            \\
+            
+        % Ondio uses a different button in album list and track list
+        \opt{ONDIO_PAD}{
+            \ButtonMenu
+                &
+            Play album from selected track in track list
+                \\
+        }
+        
+        \nopt{IAUDIO_M3_PAD}{\ButtonLeft}
+            &
+        \opt{HAVEREMOTEKEYMAP}{
+            \opt{IAUDIO_M3_PAD,GIGABEAT_RC_PAD}{\ActionRCStdCancel}
+            &}
+        Exit track list
+            \\
 
-        \ButtonLeft
-           \opt{HAVEREMOTEKEYMAP}{&
-             \opt{GIGABEAT_RC_PAD}{\ButtonRCRew}
-            }
-        & Exit track list\\
+        \nopt{IAUDIO_M3_PAD}{\ActionStdMenu}
+            &
+        \opt{HAVEREMOTEKEYMAP}{
+            \opt{IAUDIO_M3_PAD,GIGABEAT_RC_PAD}{\ActionRCStdMenu}
+            &}
+        Enter menu
+            \\
 
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-        \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,GIGABEAT_PAD,%
-             GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonMenu}
-        \opt{IAUDIO_X5_PAD}{\ButtonRec}
-        \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonDown}
-        \opt{IRIVER_H10_PAD,SANSA_C200_PAD}{\ButtonPower}
-        \opt{RECORDER_PAD}{\ButtonFOne}
-        \opt{ONDIO_PAD}{Long \ButtonMenu}
-            \opt{HAVEREMOTEKEYMAP}{&
-              \opt{GIGABEAT_RC_PAD}{\ButtonRCDsp}
-            }
-        & Enter menu\\
-
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
-        \opt{IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,%
-             MROBE100_PAD}{\ButtonPower}
-        \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
-        \opt{SANSA_C200_PAD,IRIVER_H10_PAD}{Long \ButtonPower}
-        \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{Long \ButtonMenu}
-           \opt{HAVEREMOTEKEYMAP}{&
-             \opt{GIGABEAT_RC_PAD}{\ButtonRCRew}
-           }
-        & Exit PictureFlow\\
+        \nopt{IAUDIO_M3_PAD}{%
+            \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
+            \opt{IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD%
+                ,MROBE100_PAD}{\ButtonPower}
+            \opt{SANSA_C200_PAD,IRIVER_H10_PAD}{Long \ButtonPower}
+            \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Long \ButtonMenu}
+            \opt{SANSA_FUZE_PAD}{Long \ButtonHome} 
+        }
+            &
+        \opt{HAVEREMOTEKEYMAP}{
+            \opt{IAUDIO_M3_PAD}{\ButtonRCRec}
+            \opt{GIGABEAT_RC_PAD}{\ButtonRCRew}
+            &}
+        Exit PictureFlow
+            \\
+            
     \end{btnmap}
 \end{table}
 
 \subsubsection{Main Menu}
 \begin{description}
+  \item[Go to WPS.] Leave PictureFlow and enter the while playing screen.
+  \opt{swcodec}{\item[Playback Control.] Control music playback from within the plugin.}
   \item[Settings.] Enter the settings menu.
   \item[Return.] Exit menu.
   \item[Quit.] Exit PictureFlow plugin.
