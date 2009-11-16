@@ -228,11 +228,9 @@ static void audio_stop_playback(void);
    "elapsed" value of the previous (to the codec, but current to the
    user/PCM/WPS) track, so that the progressbar reaches the end.
    During that transition, the WPS will display othertrack_id3. */
-void audio_pcmbuf_position_callback(size_t size)
+void audio_pcmbuf_position_callback(unsigned int time)
 {
-    /* This is called from an ISR, so be quick */
-    unsigned int time = size * 1000 / 4 / NATIVE_FREQUENCY +
-        othertrack_id3->elapsed;
+    time += othertrack_id3->elapsed;
 
     if (time >= othertrack_id3->length)
     {

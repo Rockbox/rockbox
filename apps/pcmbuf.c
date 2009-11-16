@@ -50,11 +50,14 @@
 #define PCMBUF_MIX_CHUNK     8192 /* This is the maximum size of one packet
                                      for mixing (crossfade or voice) */
 
+/* number of bytes played per second (sample rate * 2 channels * 2 bytes/sample) */
+#define BYTERATE            (NATIVE_FREQUENCY * 4)
+
 #if MEMORYSIZE > 2
 /* Keep watermark high for iPods at least (2s) */
-#define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 4 * 2)
+#define PCMBUF_WATERMARK    (BYTERATE * 2)
 #else
-#define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 1) /* 0.25 seconds */
+#define PCMBUF_WATERMARK    (BYTERATE / 4)  /* 0.25 seconds */
 #endif
 
 /* Structure we can use to queue pcm chunks in memory to be played
@@ -137,7 +140,7 @@ extern unsigned int codec_thread_id;
 
 #ifdef HAVE_CROSSFADE
 static void crossfade_start(void);
-static void write_to_crossfade(char *buf, size_t length);
+static void write_to_crossfade(size_t length);
 static void pcmbuf_finish_crossfade_enable(void);
 #endif
 
@@ -198,7 +201,7 @@ static void commit_chunk(bool flush_next_time)
             pcmbuf_play_start();
         }
         /* Let approximately one chunk of data playback */
-        sleep(HZ*PCMBUF_TARGET_CHUNK/(NATIVE_FREQUENCY*4));
+        sleep(HZ * PCMBUF_TARGET_CHUNK / BYTERATE);
     }
     
     /* commit the chunk */
@@ -398,7 +401,7 @@ void pcmbuf_write_complete(int count)
     size_t length = (size_t)(unsigned int)count << 2;
 #ifdef HAVE_CROSSFADE
     if (crossfade_active)
-        write_to_crossfade(fadebuf, length);
+        write_to_crossfade(length);
     else
 #endif    
     {
@@ -441,7 +444,7 @@ static size_t get_next_required_pcmbuf_size(void)
     seconds += 2;
 #endif
     logf("pcmbuf len: %ld", (long)seconds);
-    return seconds * (NATIVE_FREQUENCY*4); /* 2 channels + 2 bytes/sample */
+    return seconds * BYTERATE;
 }
 
 /* Initialize the pcmbuffer the structure looks like this:
@@ -575,9 +578,9 @@ static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
         /* Take the finished chunk out of circulation */
         read_chunk = pcmbuf_current->link;
 
-        /* if during a track transition, update the elapsed time */
+        /* if during a track transition, update the elapsed time in ms */
         if (track_transition)
-            audio_pcmbuf_position_callback(last_chunksize);
+            audio_pcmbuf_position_callback(last_chunksize * 1000 / BYTERATE);
         
         /* if last chunk in the track, stop updates and notify audio thread */
         if (pcmbuf_current->end_of_track)
@@ -781,10 +784,8 @@ static void crossfade_start(void)
     crossfade_sample = 0;
 
     /* Get fade out info from settings. */
-    fade_out_delay =
-        NATIVE_FREQUENCY * global_settings.crossfade_fade_out_delay * 4;
-    fade_out_rem =
-        NATIVE_FREQUENCY * global_settings.crossfade_fade_out_duration * 4;
+    fade_out_delay = global_settings.crossfade_fade_out_delay * BYTERATE;
+    fade_out_rem = global_settings.crossfade_fade_out_duration * BYTERATE;
 
     crossfade_need = fade_out_delay + fade_out_rem;
     if (crossfade_rem > crossfade_need)
@@ -833,7 +834,7 @@ static void crossfade_start(void)
         while (fade_out_rem > 0)
         {
             /* Each 1/10 second of audio will have the same fade applied */
-            size_t block_rem = MIN(NATIVE_FREQUENCY * 4 / 10, fade_out_rem);
+            size_t block_rem = MIN(BYTERATE / 10, fade_out_rem);
             int factor = (fade_out_rem << 8) / total_fade_out;
 
             fade_out_rem -= block_rem;
@@ -848,12 +849,10 @@ static void crossfade_start(void)
     }
 
     /* Initialize fade-in counters */
-    crossfade_fade_in_total =
-        NATIVE_FREQUENCY * global_settings.crossfade_fade_in_duration * 4;
+    crossfade_fade_in_total = global_settings.crossfade_fade_in_duration * BYTERATE;
     crossfade_fade_in_rem = crossfade_fade_in_total;
 
-    fade_in_delay =
-        NATIVE_FREQUENCY * global_settings.crossfade_fade_in_delay * 4;
+    fade_in_delay = global_settings.crossfade_fade_in_delay * BYTERATE;
 
     /* Find the right chunk and sample to start fading in */
     fade_in_delay += crossfade_sample * 2;
@@ -862,10 +861,11 @@ static void crossfade_start(void)
 }
 
 /* Perform fade-in of new track */
-static void write_to_crossfade(char *buf, size_t length)
+static void write_to_crossfade(size_t length)
 {
     if (length)
     {
+        char *buf = fadebuf;
         if (crossfade_fade_in_rem)
         {
             size_t samples;
@@ -941,7 +941,7 @@ static void pcmbuf_finish_crossfade_enable(void)
     
     pcmbuf_watermark = (crossfade_enabled && pcmbuf_size) ?
         /* If crossfading, try to keep the buffer full other than 1 second */
-        (pcmbuf_size - (NATIVE_FREQUENCY * 4 * 1)) :
+        (pcmbuf_size - BYTERATE) :
         /* Otherwise, just use the default */
         PCMBUF_WATERMARK;
 }
@@ -1038,7 +1038,7 @@ void pcmbuf_write_voice_complete(int count)
     {
         mix_chunk = read_chunk->link;
         /* Start 1/8s into the next chunk */
-        pcmbuf_mix_sample = NATIVE_FREQUENCY * 4 / 16;
+        pcmbuf_mix_sample = BYTERATE / 16;
     }
 
     if (!mix_chunk)
@@ -1142,9 +1142,7 @@ void pcmbuf_set_low_latency(bool state)
 
 unsigned long pcmbuf_get_latency(void)
 {
-    /* Be careful how this calculation is rearranged, it's easy to overflow */
-    size_t bytes = pcmbuf_unplayed_bytes + pcm_get_bytes_waiting();
-    return bytes / 4 * 1000 / NATIVE_FREQUENCY;
+    return (pcmbuf_unplayed_bytes + pcm_get_bytes_waiting()) * 1000 / BYTERATE;
 }
 
 #ifndef HAVE_HARDWARE_BEEP
@@ -1176,7 +1174,7 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
             return;
 
         /* Give 5ms clearance. */    
-        bufstart += NATIVE_FREQUENCY * 4 / 200;
+        bufstart += BYTERATE / 200;
 
 #ifdef HAVE_PCM_DMA_ADDRESS
         /* Returned peak addresses are DMA addresses */

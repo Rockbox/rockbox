@@ -71,7 +71,7 @@ enum
 };
 bool audio_restore_playback(int type); /* Restores the audio buffer to handle the requested playback */
 size_t audio_get_filebuflen(void);
-void audio_pcmbuf_position_callback(size_t size) ICODE_ATTR;
+void audio_pcmbuf_position_callback(unsigned int time) ICODE_ATTR;
 void audio_post_track_change(bool pcmbuf);
 int get_audio_hid(void);
 int *get_codec_hid(void);
