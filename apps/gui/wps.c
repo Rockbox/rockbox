@@ -1161,7 +1161,25 @@ long gui_wps_show(void)
             }
         }
 
-        if (wps_sync_data.do_full_update || update)
+
+        if (restore && wps_state.id3 &&
+            ((restoretimer == RESTORE_WPS_INSTANTLY) ||
+             TIME_AFTER(current_tick, restoretimer)))
+        {
+            restore = false;
+            restoretimer = RESTORE_WPS_INSTANTLY;
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+            add_event(LCD_EVENT_ACTIVATION, false, wps_lcd_activation_hook);
+#endif
+        /* we remove the update delay since it's not very usable in the wps,
+         * e.g. during volume changing or ffwd/rewind */
+            sb_skin_set_update_delay(0);
+            FOR_NB_SCREENS(i)
+                gui_wps[i].display->backdrop_show(BACKDROP_SKIN_WPS);
+            send_event(GUI_EVENT_REFRESH, gwps_enter_wps);
+            wps_sync_data.do_full_update = update = false;
+        }
+        else if (wps_sync_data.do_full_update || update)
         {
 #if defined(HAVE_BACKLIGHT) || defined(HAVE_REMOTE_LCD)
             gwps_caption_backlight(&wps_state);
@@ -1179,23 +1197,6 @@ long gui_wps_show(void)
             }
             wps_sync_data.do_full_update = false;
             update = false;
-        }
-
-        if (restore && wps_state.id3 &&
-            ((restoretimer == RESTORE_WPS_INSTANTLY) ||
-             TIME_AFTER(current_tick, restoretimer)))
-        {
-            restore = false;
-            restoretimer = RESTORE_WPS_INSTANTLY;
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-            add_event(LCD_EVENT_ACTIVATION, false, wps_lcd_activation_hook);
-#endif
-        /* we remove the update delay since it's not very usable in the wps,
-         * e.g. during volume changing or ffwd/rewind */
-            sb_skin_set_update_delay(0);
-            FOR_NB_SCREENS(i)
-                gui_wps[i].display->backdrop_show(BACKDROP_SKIN_WPS);
-            send_event(GUI_EVENT_REFRESH, gwps_enter_wps);
         }
 
         if (exit) {
