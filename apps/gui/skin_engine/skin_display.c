@@ -58,26 +58,6 @@
 
 static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode);
 
-
-/* TODO: maybe move this whole function into wps.c instead ? */
-bool gui_wps_display(struct gui_wps *gwps)
-{
-    struct screen *display = gwps->display;
-
-    /* Update the values in the first (default) viewport - in case the user
-       has modified the statusbar or colour settings */
-#if LCD_DEPTH > 1
-    if (display->depth > 1)
-    {
-        struct viewport *vp = &find_viewport(VP_DEFAULT_LABEL, gwps->data)->vp;
-        vp->fg_pattern = display->get_foreground();
-        vp->bg_pattern = display->get_background();
-    }
-#endif
-    display->backdrop_show(BACKDROP_SKIN_WPS);
-    return skin_redraw(gwps, WPS_REFRESH_ALL);
-}
-
 /* update a skinned screen, update_type is WPS_REFRESH_* values.
  * Usually it should only be WPS_REFRESH_NON_STATIC
  * A full update will be done if required (state.do_full_update == true)

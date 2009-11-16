@@ -70,6 +70,7 @@ static struct viewport custom_vp[NB_SCREENS];
 
 /* callbacks for GUI_EVENT_* events */
 static void viewportmanager_ui_vp_changed(void *param);
+static void viewportmanager_call_draw_func(void *param);
 static void statusbar_toggled(void* param);
 static unsigned viewport_init_ui_vp(void);
 #endif
@@ -215,29 +216,47 @@ void viewportmanager_theme_changed(const int which)
         event_add |= (statusbar_position(i) == STATUSBAR_CUSTOM);
     }
 
+    /* add one of those to ensure the draw function is called always */
     if (event_add)
+    {
         add_event(GUI_EVENT_REFRESH, false, viewportmanager_ui_vp_changed);
+        remove_event(GUI_EVENT_REFRESH, viewportmanager_call_draw_func);
+    }
     else
+    {
+        add_event(GUI_EVENT_REFRESH, false, viewportmanager_call_draw_func);
         remove_event(GUI_EVENT_REFRESH, viewportmanager_ui_vp_changed);
+    }
 
     send_event(GUI_EVENT_THEME_CHANGED, NULL);
+}
+
+/*
+ * simply calls a function that draws stuff, this exists to ensure the
+ * drawing function call in the GUI_EVENT_REFRESH event
+ *
+ * param should be 'void func(void)' */
+static void viewportmanager_call_draw_func(void *param)
+{
+    /* cast param to a function */
+    void (*draw_func)(void) = ((void(*)(void))param);
+    /* call the passed function which will redraw the content of
+     * the current screen */
+    if (draw_func != NULL)
+        draw_func();
 }
 
 static void viewportmanager_ui_vp_changed(void *param)
 {
     /* if the user changed the theme, we need to initiate a full redraw */
     int i;
-    /* cast param to a function */
-    void (*draw_func)(void) = ((void(*)(void))param);
     /* start with clearing the screen */
     FOR_NB_SCREENS(i)
         screens[i].clear_display();
     /* redraw the statusbar if it was enabled */
     send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
-    /* call the passed function which will redraw the content of
-     * the current screen */
-    if (draw_func != NULL)
-        draw_func();
+    /* call redraw function */
+    viewportmanager_call_draw_func(param);
     FOR_NB_SCREENS(i)
         screens[i].update();
 }

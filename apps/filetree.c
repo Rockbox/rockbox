@@ -528,13 +528,9 @@ int ft_enter(struct tree_context* c)
                 splash(0, ID2P(LANG_WAIT));
                 if (!settings_load_config(buf,true))
                     break;
-                /* do both steps seperately so that the redrawing after theme
-                 * changing is independant of whether the theme has a custom ui
-                 * vp or not */
-                send_event(GUI_EVENT_REFRESH, NULL);
-                /* for the statusbar */
-                send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
-                tree_drawlists();
+
+                /* redraw the UI in case the user setting changed apparence */
+                send_event(GUI_EVENT_REFRESH, tree_drawlists);
                 splash(HZ, ID2P(LANG_SETTINGS_LOADED));
                 break;
 

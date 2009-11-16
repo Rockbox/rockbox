@@ -582,6 +582,31 @@ static void gwps_leave_wps(void)
     send_event(GUI_EVENT_REFRESH, NULL);
 }
 
+/*
+ * display the wps on entering or restoring */
+static void gwps_enter_wps(void)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+    {
+        struct gui_wps *gwps = &gui_wps[i];
+        struct screen *display = gwps->display;
+
+        display->stop_scroll();
+        /* Update the values in the first (default) viewport - in case the user
+           has modified the statusbar or colour settings */
+#if LCD_DEPTH > 1
+        if (display->depth > 1)
+        {
+            struct viewport *vp = &find_viewport(VP_DEFAULT_LABEL, gwps->data)->vp;
+            vp->fg_pattern = display->get_foreground();
+            vp->bg_pattern = display->get_background();
+        }
+#endif
+        skin_update(gwps, WPS_REFRESH_ALL);
+    }
+}
+
 #ifdef HAVE_TOUCHSCREEN
 int wps_get_touchaction(struct wps_data *data)
 {
@@ -1169,10 +1194,8 @@ long gui_wps_show(void)
          * e.g. during volume changing or ffwd/rewind */
             sb_skin_set_update_delay(0);
             FOR_NB_SCREENS(i)
-            {
-                screens[i].stop_scroll();
-                gui_wps_display(&gui_wps[i]);
-            }
+                gui_wps[i].display->backdrop_show(BACKDROP_SKIN_WPS);
+            send_event(GUI_EVENT_REFRESH, gwps_enter_wps);
         }
 
         if (exit) {
