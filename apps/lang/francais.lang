@@ -45,7 +45,7 @@
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
 #    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mar 2007, Sep 2007,
 #    Oct 2007, Nov 2007, Dec 2007, Jan 2008, Avril 2008, Août 2008, Oct 2008
-#    Dec 2008, Fév 2009, Août 2009
+#    Dec 2008, Fév 2009, Août 2009, Nov 2009
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -1707,11 +1707,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Seulement pour changement piste"
+    crossfade: "Seulement quand changement de piste manuel"
   </dest>
   <voice>
     *: none
-    crossfade: "Seulement pour changement de piste"
+    crossfade: "Seulement quand changement de piste manuel"
   </voice>
 </phrase>
 <phrase>
@@ -1724,11 +1724,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Aléatoire et quand changement piste"
+    crossfade: "Aléatoire ou changement manuel"
   </dest>
   <voice>
     *: none
-    crossfade: "Aléatoire et quand changement de piste"
+    crossfade: "Aléatoire ou changement manuel"
   </voice>
 </phrase>
 <phrase>
@@ -13164,5 +13164,81 @@
   </dest>
   <voice>
     *: "Insérer mélangé en fin en lecture unique"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Utiliser les impulsions du Morse"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Utiliser les impulsions du Morse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Seulement quand changement de piste automatique"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Seulement quand changement de piste automatique
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Titre suivant:"
+  </dest>
+  <voice>
+    *: "Titre suivant:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "Suivant:"
+  </dest>
+  <voice>
+    *: "Suivant:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "sur"
+  </dest>
+  <voice>
+    *: "sur"
   </voice>
 </phrase>
