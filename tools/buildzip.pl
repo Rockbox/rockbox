@@ -428,6 +428,16 @@ STOP
     else {
         print STDERR "No wps module present, can't do the WPS magic!\n";
     }
+    
+    # until buildwps.pl is fixed, manually copy the classic_statusbar theme across
+    mkdir "$rbdir/wps/classic_statusbar", 0777;
+    glob_copy("$ROOT/wps/classic_statusbar/*.bmp", "$rbdir/wps/classic_statusbar");
+    if ($swcodec) {
+        copy("$ROOT/wps/classic_statusbar.sbs", "$rbdir/wps");
+    } else {
+        copy("$ROOT/wps/classic_statusbar-hwcodec.sbs", "$rbdir/wps/classic_statusbar.sbs");
+    }
+    system("touch $rbdir/wps/rockbox_none.sbs");
 
     # and the info file
     copy("rockbox-info.txt", "$rbdir/rockbox-info.txt");
