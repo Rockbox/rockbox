@@ -53,6 +53,31 @@
 #define AUDIO_GAIN_MIC          1
 
 
+void audio_init(void);
+void audio_play(long offset);
+void audio_stop(void);
+void audio_pause(void);
+void audio_resume(void);
+void audio_next(void);
+void audio_prev(void);
+int audio_status(void);
+void audio_ff_rewind(long newpos);
+void audio_flush_and_reload_tracks(void);
+struct mp3entry* audio_current_track(void);
+struct mp3entry* audio_next_track(void);
+#ifdef HAVE_DISK_STORAGE
+void audio_set_buffer_margin(int setting);
+#endif
+void audio_error_clear(void);
+int audio_get_file_pos(void);
+void audio_beep(int duration);
+
+#if CONFIG_CODEC == SWCODEC
+/* Required call when audio buffer is required for some other purpose */
+unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size); 
+/* only implemented in playback.c, but called from firmware */
+
+#else /* hwcodec only */
 struct audio_debug
 {
         int audiobuflen;
@@ -77,40 +102,9 @@ struct audio_debug
         int lowest_watermark_level;
 };
 
-void audio_init(void);
-void audio_play(long offset);
-void audio_stop(void);
-void audio_pause(void);
-void audio_resume(void);
-void audio_next(void);
-void audio_prev(void);
-int audio_status(void);
-void audio_ff_rewind(long newtime);
-void audio_flush_and_reload_tracks(void);
-struct mp3entry* audio_current_track(void);
-struct mp3entry* audio_next_track(void);
 void audio_get_debugdata(struct audio_debug *dbgdata);
-#ifdef HAVE_DISK_STORAGE
-void audio_set_buffer_margin(int seconds);
-#endif
-unsigned int audio_error(void);
-void audio_error_clear(void);
-int audio_get_file_pos(void);
-void audio_beep(int duration);
+/* unsigned int audio_error(void); - unused function */
 void audio_init_playback(void);
-
-/* Required call when audio buffer is required for some other purpose */
-unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size); 
-/* only implemented in playback.c, but called from firmware */
-
-#if CONFIG_CODEC == SWCODEC
-enum audio_buffer_state
-{
-    AUDIOBUF_STATE_TRASHED = -1,    /* trashed; must be reset */
-    AUDIOBUF_STATE_INITIALIZED = 0, /* voice+audio OR audio-only */
-    AUDIOBUF_STATE_VOICED_ONLY = 1, /* voice-only */
-};
-int audio_buffer_state(void);
 #endif
 
 /* channel modes */
@@ -237,7 +231,7 @@ void audio_spdif_set_monitor(int monitor_spdif);
 
 unsigned long audio_prev_elapsed(void);
 
-
+#if CONFIG_CODEC != SWCODEC
 /***********************************************************************/
 /* audio event handling */
 
@@ -278,4 +272,5 @@ void audio_register_event_handler(AUDIO_EVENT_HANDLER handler, unsigned short ma
     event for any remaining handlers as well as the normal end-of-track 
     processing */
 
+#endif
 #endif

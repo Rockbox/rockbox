@@ -116,6 +116,12 @@ static size_t filebuflen = 0;               /* Size of buffer (A/C-) */
 /* FIXME: make buf_ridx (C/A-) */
 
 /* Possible arrangements of the buffer */
+enum audio_buffer_state
+{
+    AUDIOBUF_STATE_TRASHED = -1,    /* trashed; must be reset */
+    AUDIOBUF_STATE_INITIALIZED = 0, /* voice+audio OR audio-only */
+    AUDIOBUF_STATE_VOICED_ONLY = 1, /* voice-only */
+};
 static int buffer_state = AUDIOBUF_STATE_TRASHED; /* Buffer state */
 
 /* These are used to store the current and next (or prev if the current is the last)
@@ -224,10 +230,13 @@ static void audio_stop_playback(void);
 
 /**************************************/
 
+
+/** Pcmbuf callbacks */
+
 /* Between the codec and PCM track change, we need to keep updating the
-   "elapsed" value of the previous (to the codec, but current to the
-   user/PCM/WPS) track, so that the progressbar reaches the end.
-   During that transition, the WPS will display othertrack_id3. */
+ * "elapsed" value of the previous (to the codec, but current to the
+ * user/PCM/WPS) track, so that the progressbar reaches the end.
+ * During that transition, the WPS will display othertrack_id3. */
 void audio_pcmbuf_position_callback(unsigned int time)
 {
     time += othertrack_id3->elapsed;
@@ -258,9 +267,7 @@ void audio_post_track_change(bool pcmbuf)
     }
 }
 
-/* Scan the pcmbuf queue and return true if a message pulled.
- * Permissible Context(s): Thread
- */
+/* Scan the pcmbuf queue and return true if a message pulled */
 static bool pcmbuf_queue_scan(struct queue_event *ev)
 {
     if (!queue_empty(&pcmbuf_queue))
@@ -276,7 +283,8 @@ static bool pcmbuf_queue_scan(struct queue_event *ev)
     return false;
 }
 
-/* --- Helper functions --- */
+
+/** Helper functions */
 
 static struct mp3entry *bufgetid3(int handle_id)
 {
@@ -439,9 +447,9 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
     return buf;
 }
 
-int audio_buffer_state(void)
+bool audio_buffer_state_trashed(void)
 {
-    return buffer_state;
+    return buffer_state == AUDIOBUF_STATE_TRASHED;
 }
 
 #ifdef HAVE_RECORDING

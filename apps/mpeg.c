@@ -533,9 +533,9 @@ static void recalculate_watermark(int bitrate)
 }
 
 #ifdef HAVE_DISK_STORAGE
-void audio_set_buffer_margin(int seconds)
+void audio_set_buffer_margin(int setting)
 {
-    low_watermark_margin = seconds;
+    low_watermark_margin = setting;     /* in seconds */
 }
 #endif
 
@@ -2040,7 +2040,7 @@ static void mpeg_thread(void)
 }
 #endif /* !SIMULATOR */
 
-struct mp3entry* audio_current_track()
+struct mp3entry* audio_current_track(void)
 {
 #ifdef SIMULATOR
     struct mp3entry *id3 = &taginfo;
@@ -2069,7 +2069,7 @@ struct mp3entry* audio_current_track()
 #endif /* !SIMULATOR */
 }
 
-struct mp3entry* audio_next_track()
+struct mp3entry* audio_next_track(void)
 {
 #ifdef SIMULATOR
     return &taginfo;
@@ -2771,12 +2771,12 @@ void audio_prev(void)
 #endif /* SIMULATOR */
 }
 
-void audio_ff_rewind(long newtime)
+void audio_ff_rewind(long newpos)
 {
 #ifndef SIMULATOR
-    queue_post(&mpeg_queue, MPEG_FF_REWIND, newtime);
+    queue_post(&mpeg_queue, MPEG_FF_REWIND, newpos);
 #else /* SIMULATOR */
-    (void)newtime;
+    (void)newpos;
 #endif /* SIMULATOR */
 }
 
@@ -2811,10 +2811,12 @@ int audio_status(void)
     return ret;
 }
 
+/* Unused function
 unsigned int audio_error(void)
 {
     return mpeg_errno;
 }
+*/
 
 void audio_error_clear(void)
 {

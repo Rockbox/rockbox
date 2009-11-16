@@ -1196,7 +1196,7 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
         bufstart = minibuf;
         bufend = SKIPBYTES(bufstart, MINIBUF_SIZE);
     }
-    else if (audio_buffer_state() != AUDIOBUF_STATE_TRASHED)
+    else if (!audio_buffer_state_trashed())
     {
         /* Use pcmbuffer */
         bufstart = (int16_t *)pcmbuffer;
