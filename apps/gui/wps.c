@@ -1162,7 +1162,7 @@ long gui_wps_show(void)
         }
 
 
-        if (restore && wps_state.id3 &&
+        if (restore &&
             ((restoretimer == RESTORE_WPS_INSTANTLY) ||
              TIME_AFTER(current_tick, restoretimer)))
         {
