@@ -54,6 +54,27 @@
 #include "lcd.h"
 #endif
 
+#define MPEG_SWAP_CHUNKSIZE  0x2000
+#define MPEG_HIGH_WATER  2 /* We leave 2 bytes empty because otherwise we
+                              wouldn't be able to see the difference between
+                              an empty buffer and a full one. */
+#define MPEG_LOW_WATER                  0x60000
+#define MPEG_RECORDING_LOW_WATER        0x80000
+#define MPEG_LOW_WATER_CHUNKSIZE        0x40000
+#define MPEG_LOW_WATER_SWAP_CHUNKSIZE   0x10000
+#if (CONFIG_STORAGE & STORAGE_MMC)
+#define MPEG_PLAY_PENDING_THRESHOLD     0x20000
+#define MPEG_PLAY_PENDING_SWAPSIZE      0x20000
+#else
+#define MPEG_PLAY_PENDING_THRESHOLD     0x10000
+#define MPEG_PLAY_PENDING_SWAPSIZE      0x10000
+#endif
+
+#define MPEG_MAX_PRERECORD_SECONDS 30
+
+/* For ID3 info and VBR header */
+#define MPEG_RESERVED_HEADER_SPACE (4096 + 576)
+
 #ifndef SIMULATOR
 extern unsigned long mas_version_code;
 #endif

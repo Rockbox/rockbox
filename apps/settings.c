@@ -32,7 +32,6 @@
 #include "usb.h"
 #include "backlight.h"
 #include "audio.h"
-#include "mpeg.h"
 #include "talk.h"
 #include "string.h"
 #include "rtc.h"

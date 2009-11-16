@@ -34,7 +34,6 @@
 #include "usb.h"
 #include "sound.h"
 #include "dsp.h"
-#include "mpeg.h"
 #include "audio.h"
 #include "power.h"
 #include "powermgmt.h"

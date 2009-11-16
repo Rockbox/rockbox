@@ -30,7 +30,6 @@
 #include "powermgmt.h"
 #include "lcd.h"
 #include "led.h"
-#include "mpeg.h"
 #include "audio.h"
 #if CONFIG_CODEC == SWCODEC
 #include "thread.h"

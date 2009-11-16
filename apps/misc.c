@@ -39,7 +39,6 @@
 #include "screens.h"
 #include "usb_screen.h"
 #include "talk.h"
-#include "mpeg.h"
 #include "audio.h"
 #include "mp3_playback.h"
 #include "settings.h"

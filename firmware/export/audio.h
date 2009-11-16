@@ -77,6 +77,9 @@ void audio_beep(int duration);
 unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size); 
 /* only implemented in playback.c, but called from firmware */
 
+void audio_next_dir(void);
+void audio_prev_dir(void);
+
 #else /* hwcodec only */
 struct audio_debug
 {
@@ -105,6 +108,10 @@ struct audio_debug
 void audio_get_debugdata(struct audio_debug *dbgdata);
 /* unsigned int audio_error(void); - unused function */
 void audio_init_playback(void);
+
+#define audio_next_dir() ({ })
+#define audio_prev_dir() ({ })
+
 #endif
 
 /* channel modes */

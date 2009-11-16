@@ -29,7 +29,6 @@
 #include "button.h"
 #include "status.h"
 #include "thread.h"
-#include "mpeg.h"
 #include "audio.h"
 #include "mp3_playback.h"
 #include "ctype.h"

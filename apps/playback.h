@@ -112,12 +112,4 @@ enum {
     Q_CODEC_DO_CALLBACK,
 };
 
-#if CONFIG_CODEC == SWCODEC
-void audio_next_dir(void);
-void audio_prev_dir(void);
-#else
-#define audio_next_dir() ({ })
-#define audio_prev_dir() ({ })
-#endif
-
 #endif
