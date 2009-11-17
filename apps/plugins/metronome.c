@@ -636,7 +636,7 @@ static const struct button_mapping ondio_action[] =
 {
     {METRONOME_PLAY_TAP, BUTTON_MENU|BUTTON_REL, BUTTON_MENU },
     {METRONOME_PAUSE, BUTTON_MENU|BUTTON_REPEAT, BUTTON_NONE },
-    {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_PLUGIN)
 };
 #else /* !ONDIO_PAD  */
 #define METRONOME_TAP       PLA_FIRE
@@ -649,7 +649,7 @@ static const struct button_mapping ondio_action[] =
 static const struct button_mapping iriver_syncaction[] =
 {
     {METRONOME_SYNC, BUTTON_REC, BUTTON_NONE },
-    {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_PLUGIN)
 };
 #endif /* IRIVER_H100_PAD||IRIVER_H300_PAD */
 #endif /* #if CONFIG_KEYPAD == ONDIO_PAD */
