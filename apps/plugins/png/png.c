@@ -152,9 +152,8 @@ typedef struct LodePNG_Decoder
 
 /* decompressed image in the possible sizes (1,2,4,8), wasting the other */
 static fb_data *disp[9];
-static fb_data *previous_disp;
-static size_t size[9];
-static size_t previous_size;
+/* up to here currently used by image(s) */
+static fb_data *disp_buf;
 
 /* my memory pool (from the mp3 buffer) */
 static char print[128]; /* use a common snprintf() buffer */
@@ -1800,13 +1799,6 @@ fb_data *get_image(struct LodePNG_Decoder* decoder)
         return p_disp; /* we still have it */
     }
 
-    if (previous_disp == NULL) {
-        previous_disp = converted_image;
-        previous_size = converted_image_size;
-    }
-
-    size[ds] = (decoder->infoPng.width/ds) * (decoder->infoPng.height/ds);
-
     /* assign image buffer */
     if (ds > 1) {
         if (!running_slideshow)
@@ -1818,9 +1810,10 @@ fb_data *get_image(struct LodePNG_Decoder* decoder)
         }
         static struct bitmap bmp_src, bmp_dst;
 
-        disp[ds] = (fb_data *)((intptr_t)(previous_disp + previous_size + 3) & ~3);
+        int size = (decoder->infoPng.width/ds) * (decoder->infoPng.height/ds);
+        disp[ds] = disp_buf;
 
-        if ((unsigned char *)(disp[ds] + size[ds]) >= memory_max) {
+        if ((unsigned char *)(disp[ds] + size) >= memory_max) {
             //rb->splash(HZ, "Out of Memory");
             // Still display the original image which is already decoded in RAM
             disp[ds] = converted_image;
@@ -1841,18 +1834,15 @@ fb_data *get_image(struct LodePNG_Decoder* decoder)
 #else
             smooth_resize_bitmap(&bmp_src, &bmp_dst);
 #endif /*HAVE_ADJUSTABLE_CPU_FREQ*/
+
+            disp_buf = (fb_data *)((intptr_t)(disp[ds] + size + 3) & ~3);
         }
     } else {
         disp[ds] = converted_image;
         return converted_image;
     }
 
-    previous_disp = disp[ds];
-    previous_size = size[ds];
-
     return disp[ds];
-
-
 }
 
 /* load, decode, display the image */
@@ -1877,8 +1867,6 @@ int load_and_show(char* filename)
     }
     image_size = rb->filesize(fd);
     memset(&disp, 0, sizeof(disp));
-    previous_disp = NULL;
-    previous_size = 0;
 
     DEBUGF("reading file '%s'\n", filename);
 
@@ -1966,7 +1954,8 @@ int load_and_show(char* filename)
             LodePNG_decode(&decoder, image, image_size, cb_progress);
 #endif /*HAVE_ADJUSTABLE_CPU_FREQ*/
 
-            ds_min = min_downscale(&decoder, memory_max - (unsigned char*)(converted_image + converted_image_size));  /* check memory constraint */
+            disp_buf = (fb_data *)((intptr_t)(converted_image + converted_image_size + 3) & ~3);
+            ds_min = min_downscale(&decoder, memory_max - (unsigned char*)disp_buf); /* check memory constraint */
 
             if (ds_min == 0) {
                 // Could not resize the image
@@ -1976,7 +1965,6 @@ int load_and_show(char* filename)
     }
 
     if (decoder.error == PLUGIN_ABORT || decoder.error == FILE_TOO_LARGE) {
-        rb->close(fd);
 #ifndef SIMULATOR
         if (immediate_ata_off) {
             /* running slideshow and time is long enough: power down disk */

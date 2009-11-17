@@ -158,15 +158,17 @@ static struct t_disp disp[9];
 
 /* my memory pool (from the mp3 buffer) */
 static char print[32]; /* use a common snprintf() buffer */
-static unsigned char* buf; /* up to here currently used by image(s) */
-
 /* the remaining free part of the buffer for compressed+uncompressed images */
-static unsigned char* buf_images;
+static unsigned char* buf;
+static ssize_t buf_size;
 
-static ssize_t buf_size, buf_images_size;
 /* the root of the images, hereafter are decompresed ones */
 static unsigned char* buf_root;
 static int root_size;
+
+/* up to here currently used by image(s) */
+static unsigned char* buf_images;
+static ssize_t buf_images_size;
 
 static int ds, ds_min, ds_max; /* downscaling and limits */
 static struct jpeg jpg; /* too large for stack */
@@ -760,13 +762,13 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
 
      /* physical size needed for decoding */
     size = jpegmem(p_jpg, ds);
-    if (buf_size <= size)
+    if (buf_images_size <= size)
     {   /* have to discard the current */
         int i;
         for (i=1; i<=8; i++)
             disp[i].bitmap[0] = NULL; /* invalidate all bitmaps */
-        buf = buf_root; /* start again from the beginning of the buffer */
-        buf_size = root_size;
+        buf_images = buf_root; /* start again from the beginning of the buffer */
+        buf_images_size = root_size;
     }
 
 #ifdef HAVE_LCD_COLOR
@@ -778,9 +780,9 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
         {
             size = (p_jpg->x_phys / ds / p_jpg->subsample_x[i])
                  * (p_jpg->y_phys / ds / p_jpg->subsample_y[i]);
-            p_disp->bitmap[i] = buf;
-            buf += size;
-            buf_size -= size;
+            p_disp->bitmap[i] = buf_images;
+            buf_images += size;
+            buf_images_size -= size;
         }
         p_disp->csub_x = p_jpg->subsample_x[1];
         p_disp->csub_y = p_jpg->subsample_y[1];
@@ -788,14 +790,14 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
     else
     {
         p_disp->csub_x = p_disp->csub_y = 0;
-        p_disp->bitmap[1] = p_disp->bitmap[2] = buf;
+        p_disp->bitmap[1] = p_disp->bitmap[2] = buf_images;
     }
 #endif
     /* size may be less when decoded (if height is not block aligned) */
     size = (p_jpg->x_phys/ds) * (p_jpg->y_size / ds);
-    p_disp->bitmap[0] = buf;
-    buf += size;
-    buf_size -= size;
+    p_disp->bitmap[0] = buf_images;
+    buf_images += size;
+    buf_images_size -= size;
 
     if(!running_slideshow)
     {
@@ -889,15 +891,14 @@ int load_and_show(char* filename)
     filesize = rb->filesize(fd);
     rb->memset(&disp, 0, sizeof(disp));
 
-    buf = buf_images + filesize;
-    buf_size = buf_images_size - filesize;
     /* allocate JPEG buffer */
-    buf_jpeg = buf_images;
+    buf_jpeg = buf;
 
-    buf_root = buf; /* we can start the decompressed images behind it */
-    root_size = buf_size;
+    /* we can start the decompressed images behind it */
+    buf_images = buf_root = buf + filesize;
+    buf_images_size = root_size = buf_size - filesize;
 
-    if (buf_size <= 0)
+    if (buf_images_size <= 0)
     {
         rb->close(fd);
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
@@ -924,8 +925,7 @@ int load_and_show(char* filename)
                 {
                     case JPEG_ZOOM_IN:
                         plug_buf = false;
-                        buf_images = rb->plugin_get_audio_buffer(
-                                        (size_t *)&buf_images_size);
+                        buf = rb->plugin_get_audio_buffer((size_t *)&buf_size);
                         /*try again this file, now using the audio buffer */
                         return PLUGIN_OTHER;
 #ifdef JPEG_RC_MENU
@@ -1022,7 +1022,7 @@ int load_and_show(char* filename)
         rb->lcd_update();
     }
     ds_max = max_downscale(&jpg);            /* check display constraint */
-    ds_min = min_downscale(&jpg, buf_size);  /* check memory constraint */
+    ds_min = min_downscale(&jpg, buf_images_size); /* check memory constraint */
     if (ds_min == 0)
     {
         rb->splash(HZ, "too large");
@@ -1154,8 +1154,6 @@ enum plugin_status plugin_start(const void* parameter)
     configfile_load(JPEG_CONFIGFILE, jpeg_config,
                     ARRAYLEN(jpeg_config), JPEG_SETTINGS_MINVERSION);
     old_settings = jpeg_settings;
-
-    buf_images = buf; buf_images_size = buf_size;
 
     /* Turn off backlight timeout */
     backlight_force_on(); /* backlight control in lib/helper.c */
