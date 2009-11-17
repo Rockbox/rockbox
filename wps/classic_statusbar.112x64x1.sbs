@@ -1,0 +1,84 @@
+#
+# Classic statusbar adapted to skin engine
+#
+# Bar at the top.. very easy to change to the bottom (change the y positions from 0 to -8
+#
+
+# specify the UI area viewport... everything but a bar 8 pixels high at the top
+%Vi|0|8|-|-|1|-|-|
+
+##############################################################
+# Options: 
+# you can use icons or text for the volume and battery display
+# Just comment out the line for the one you dont want!
+
+# comment out the next line if you dont want battery icons
+ %Vda
+# comment out the next line if you dont want battery number as text
+# %Vdb
+
+# comment out the next line if you dont want volume icons
+# %Vdc
+# comment out the next line if you dont want volume number as text
+# %Vdd
+ 
+################################################################
+
+# Load some bitmaps
+%xl|B|battery.bmp|0|0|10|
+%xl|V|volume.bmp|0|0|10|
+%xl|S|status.bmp|0|0|14|
+
+# Enable the correct viewports
+%?cs<%Vdc%Vdp%Vdr%Vds|%Vdc%Vdp%Vdr%Vds|%Vdz|%Vdc%Vdp%Vdr%Vds>
+
+# Battery area, Icons
+%Vl|a|0|0|16|8|0|-|-| 
+%?bl<%xdBa|%xdBa|%xdBb|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>
+# charging icon
+%Vl|a|16|0|8|8|0|-|-| 
+%?bc<%xdSa|>
+
+# battery area, no icons
+%Vl|b|0|0|-|8|0|-|-| 
+%bl%bc
+
+# Volume area
+%Vl|c|27|0|-|8|0|-|-| 
+%?mv<%pv|%?pv<%xdVa|%xdVb|%xdVc|%xdVd|%xdVe|%xdVf|%xdVg|%xdVh|%xdVi|%xdVj>>
+%Vl|d|27|0|-|8|0|-|-| 
+%pv
+
+# Icons, all in the same bmp strip, so need to use multiple viewports
+# Playback mode
+%Vl|p|46|0|-|8|0|-|-| 
+%?mp<%xdSc|%xdSb|%xdSd|%xdSe|%xdSf|%xdSg|%xdSh|%xdSi|%xdSj>
+
+# Repeat mode
+%Vl|r|54|0|-|8|0|-|-| 
+%?mm<|%xdSi|%xdSj|%xdSk|%xdSl>
+
+# Shuffle mode
+%Vl|s|64|0|-|8|0|-|-| 
+%?ps<%xdSk|>
+
+
+# Recording section
+%Vl|z|27|0|6|8|0|-|-|
+
+%Vl|z|33|0|18|8|0|-|-|
+%?Rp<Q%Rb>
+# status icon
+%Vl|z|46|0|8|8|0|-|-|
+%?mp<%xdSc|%xdSb|%xdSd|%xdSe|%xdSf|%xdSg|%xdSh|%xdSi|%xdSj>
+# frequency
+%Vl|z|54|0|-|8|0|-|-|
+%?Rp<%?Rf<??|44|48|32|22|24|16>>
+
+# Clock on RTC able targets, and disk access
+%V|-36|0|-6|8|0|-|-| # align on the right with room for 6 SYSFONT digits
+%?cc<%?ca<%?St|time format|<%cH|%cI>:%cM|--:-->|>
+# disk access "icon"
+%V|-6|0|-|8|0|-|-| # align on the right with room for 1 SYSFONT digit
+%?lh<*|>
+
