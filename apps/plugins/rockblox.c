@@ -21,9 +21,11 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "lib/highscore.h"
-#include "lib/playergfx.h"
+#include "lib/display_text.h"
 #include "lib/helper.h"
+#include "lib/highscore.h"
+#include "lib/playback_control.h"
+#include "lib/playergfx.h"
 
 PLUGIN_HEADER
 
@@ -163,7 +165,7 @@ PLUGIN_HEADER
 #define ROCKBLOX_DROP          BUTTON_SELECT
 #define ROCKBLOX_RESTART       BUTTON_HOME
 
-#elif CONFIG_KEYPAD == SANSA_M200_PAD 
+#elif CONFIG_KEYPAD == SANSA_M200_PAD
 
 #define ROCKBLOX_OFF           BUTTON_POWER
 #define ROCKBLOX_ROTATE_RIGHT  BUTTON_UP
@@ -723,6 +725,8 @@ figures[BLOCKS_NUM] = {
         {0, 0, 0, 1}
     }
 };
+bool resume = false;
+bool resume_file = false;
 
 /* Rockbox File System only supports full filenames inc dir */
 #define HIGH_SCORE PLUGIN_GAMES_DIR "/rockblox.score"
@@ -792,31 +796,30 @@ static void show_highscores (void)
 }
 #endif
 
-/* Returns >0 on successful read AND if the game wasn't over, else 0 */
-static int load_resume(void)
+static void load_game(void)
 {
     int fd;
+
+    resume = false;
+
     fd = rb->open(RESUME_FILE, O_RDONLY);
-    if (fd < 0)
-        return 0;
+    if (fd < 0) return;
 
     if (rb->read(fd, &rockblox_status, sizeof(struct _rockblox_status))
             < (ssize_t)sizeof(struct _rockblox_status))
     {
         rb->splash(HZ/2, "Loading Rockblox resume info failed");
-        return 0;
+        return;
+    } else {
+        resume = true;
     }
 
     rb->close(fd);
 
-    if (rockblox_status.gameover)
-        show_game_over();
-    
-    return !rockblox_status.gameover;
+    return;
 }
 
-/* Returns >0 on success, else 0 */
-static int dump_resume(void)
+static void dump_resume(void)
 {
     int fd;
 
@@ -831,24 +834,22 @@ static int dump_resume(void)
         goto fail;
     }
     rb->close(fd);
-    return 1;
+    return;
 
 fail:
     rb->splash(HZ/2, "Writing Rockblox resume info failed");
-    return 0;
+    return;
 }
+
 static void init_rockblox (bool resume)
 {
     char score_name[50];
     struct tm* tm;
-    
+
     tm = rb->get_time();
     rb->snprintf(score_name, sizeof(score_name), "%04d%02d%02d %02d%02d%02d",
             tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
             tm->tm_hour, tm->tm_min, tm->tm_sec);
-
-    highscore_update(rockblox_status.score, rockblox_status.level,
-                     score_name, highest, MAX_HIGH_SCORES);
 
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -861,7 +862,7 @@ static void init_rockblox (bool resume)
     pgfx_fillrect (15, 7, 2, 7);
     pgfx_update();
 #endif
-    if (!resume || !load_resume())
+    if (!resume)
     {
         rockblox_status.level = 1;
         rockblox_status.lines = 0;
@@ -1177,11 +1178,112 @@ static void move_down (void)
         move_block (0, 1, rockblox_status.co);
 }
 
+static bool rockblox_help(void)
+{
+    int button;
+
+#define WORDS (sizeof help_text / sizeof (char*))
+    char *help_text[] = {
+        "Rockblox", "", "Aim", "", "Make", "the", "falling", "blocks", "of", "different",
+        "shapes", "form", "full", "rows.", "Whenever", "a", "row", "is", "completed,", "it",
+        "will", "be", "cleared", "away", "and", "you", "gain", "points."
+    };
+
+    static struct style_text formation[]={
+        { 0, TEXT_CENTER|TEXT_UNDERLINE },
+        { 2, C_RED },
+        { -1, 0 }
+    };
+#ifdef HAVE_LCD_BITMAP
+    rb->lcd_setfont(FONT_UI);
+#endif
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_set_foreground(LCD_WHITE);
+#endif
+    if (display_text(WORDS, help_text, formation, NULL))
+        return true;
+    do {
+        button = rb->button_get(true);
+        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+            return true;
+    } while( ( button == BUTTON_NONE )
+            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+#ifdef HAVE_LCD_BITMAP
+    rb->lcd_setfont(FONT_SYSFIXED);
+#endif
+    return false;
+}
+
+static int rockblox_menu_cb(int action, const struct menu_item_ex *this_item)
+{
+    int i = ((intptr_t)this_item);
+    if(action == ACTION_REQUEST_MENUITEM
+       && !resume && (i==0 || i==5))
+        return ACTION_EXIT_MENUITEM;
+    return action;
+}
+
+static int rockblox_menu(void)
+{
+    int selected = 0;
+
+    MENUITEM_STRINGLIST(main_menu, "Rockblox Menu", rockblox_menu_cb,
+                        "Resume Game", "Start New Game",
+                        "Help", "High Scores", "Playback Control",
+                        "Quit without Saving", "Quit");
+
+    rb->button_clear_queue();
+    while (true) {
+        switch (rb->do_menu(&main_menu, &selected, NULL, false)) {
+            case 0:
+                if(resume_file)
+                    rb->remove(RESUME_FILE);
+                init_rockblox(true);
+                return 0;
+            case 1:
+                init_rockblox(false);
+                return 0;
+            case 2:
+                if (rockblox_help())
+                    return 1;
+                break;
+            case 3:
+                highscore_show(MAX_HIGH_SCORES, highest, MAX_HIGH_SCORES, true);
+                break;
+            case 4:
+                if (playback_control(NULL))
+                    return 1;
+                break;
+            case 5:
+                return 1;
+            case 6:
+                if (resume) {
+                    rb->splash(HZ*1, "Saving game ...");
+                    dump_resume();
+                }
+                return 1;
+            case MENU_ATTACHED_USB:
+                return 1;
+            default:
+                return 1;
+                break;
+        }
+    }
+}
+
+
 static int rockblox_loop (void)
 {
     int button;
     int lastbutton = BUTTON_NONE;
     long next_down_tick = *rb->current_tick + level_speed(rockblox_status.level);
+
+    if (rockblox_menu()) {
+        return 1;
+    }
+    resume = false;
+    resume_file = false;
 
     while (1) {
 #ifdef HAS_BUTTON_HOLD
@@ -1216,7 +1318,9 @@ static int rockblox_loop (void)
                 if (lastbutton != ROCKBLOX_OFF_PRE)
                     break;
 #endif
-                return PLUGIN_OK;
+                resume = true;
+                return 0;
+                break;
 
 #if defined(ROCKBLOX_ROTATE)
             case ROCKBLOX_ROTATE:
@@ -1331,18 +1435,18 @@ static int rockblox_loop (void)
             rb->lcd_set_foreground (LCD_BLACK);
 #endif
             show_game_over();
-            init_rockblox (false);
+            resume = false;
+            return 0;
         }
 
         refresh_board ();
     }
 
-    return PLUGIN_OK;
+    return 0;
 }
 
 enum plugin_status plugin_start (const void *parameter)
 {
-    int ret;
 
     (void) parameter;
 
@@ -1366,9 +1470,20 @@ enum plugin_status plugin_start (const void *parameter)
 #endif
     /* Turn off backlight timeout */
     backlight_force_on(); /* backlight control in lib/helper.c */
-
-    init_rockblox (true);
-    ret = rockblox_loop ();
+    load_game();
+    resume_file = resume;
+    while(!rockblox_loop()) {
+        if(!resume) {
+            int position = highscore_update(rockblox_status.score, rockblox_status.level, "", highest,
+                MAX_HIGH_SCORES);
+            if (position == 0) {
+                rb->splash(HZ*2, "New High Score");
+            }
+            if (position != -1) {
+                highscore_show(position, highest, MAX_HIGH_SCORES, true);
+            }
+        }
+    }
 
 #ifndef HAVE_LCD_BITMAP
     pgfx_release();
@@ -1377,7 +1492,5 @@ enum plugin_status plugin_start (const void *parameter)
     highscore_save(HIGH_SCORE, highest, MAX_HIGH_SCORES);
     backlight_use_settings(); /* backlight control in lib/helper.c */
 
-    dump_resume();
-
-    return ret;
+    return PLUGIN_OK;
 }
