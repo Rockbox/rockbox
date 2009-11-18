@@ -50,7 +50,7 @@ static int set_replaygain(struct mp3entry* id3, bool album, long value,
 
 bool get_musepack_metadata(int fd, struct mp3entry *id3)
 {
-    const int32_t sfreqs_sv7[4] = { 44100, 48000, 37800, 32000 };
+    static const int32_t sfreqs_sv7[4] = { 44100, 48000, 37800, 32000 };
     uint32_t header[8];
     uint64_t samples = 0;
     int i;

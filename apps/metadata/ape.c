@@ -59,7 +59,8 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
     struct apetag_header header;
 
     if ((lseek(fd, -APETAG_HEADER_LENGTH, SEEK_END) < 0)
-        || (ecread(fd, &header, 1, APETAG_HEADER_FORMAT, IS_BIG_ENDIAN) != APETAG_HEADER_LENGTH)
+        || (ecread(fd, &header, 1, APETAG_HEADER_FORMAT, IS_BIG_ENDIAN)
+            != APETAG_HEADER_LENGTH)
         || (memcmp(header.id, "APETAGEX", sizeof(header.id))))
     {
         return false;
@@ -91,7 +92,8 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
                 break;
             }
             
-            if (ecread(fd, &item, 1, APETAG_ITEM_HEADER_FORMAT, IS_BIG_ENDIAN) < (long) sizeof(item))
+            if (ecread(fd, &item, 1, APETAG_ITEM_HEADER_FORMAT, IS_BIG_ENDIAN)
+                < (long) sizeof(item))
             {
                 return false;
             }

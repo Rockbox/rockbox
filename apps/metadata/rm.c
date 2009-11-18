@@ -60,15 +60,16 @@ struct real_object_t
     uint16_t version;
 };
 
-#define FOURCC(a,b,c,d) (((a)<<24) | ((b) << 16) | ((c) << 8) | (d))
-
 static int real_read_object_header(int fd, struct real_object_t* obj)
 {
     int n;
 
-    if ((n = read_uint32be(fd, &obj->fourcc)) <= 0) return n;
-    if ((n = read_uint32be(fd, &obj->size)) <= 0) return n;
-    if ((n = read_uint16be(fd, &obj->version)) <= 0) return n;
+    if ((n = read_uint32be(fd, &obj->fourcc)) <= 0)
+        return n;
+    if ((n = read_uint32be(fd, &obj->size)) <= 0)
+        return n;
+    if ((n = read_uint16be(fd, &obj->version)) <= 0)
+        return n;
 
     return 1;
 }

@@ -140,11 +140,11 @@ static int asf_intdecode(int fd, int type, int length)
     uint32_t tmp32;
     uint64_t tmp64;
 
-    if (type==3) {
+    if (type == 3) {
         read_uint32le(fd, &tmp32);
         lseek(fd,length - 4,SEEK_CUR);
         return (int)tmp32;
-    } else if (type==4) {
+    } else if (type == 4) {
         read_uint64le(fd, &tmp64);
         lseek(fd,length - 8,SEEK_CUR);
         return (int)tmp64;
@@ -430,19 +430,19 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                             } else {
                                 lseek(fd, length, SEEK_CUR);
                             }
-                        } else if ((!strcmp("WM/Genre",utf8buf)) && (type == 0)) {
+                        } else if ((!strcmp("WM/Genre", utf8buf)) && (type == 0)) {
                             id3->genre_string = id3buf;
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
-                        } else if ((!strcmp("WM/AlbumTitle",utf8buf)) && (type == 0)) {
+                        } else if ((!strcmp("WM/AlbumTitle", utf8buf)) && (type == 0)) {
                             id3->album = id3buf;
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
-                        } else if ((!strcmp("WM/AlbumArtist",utf8buf)) && (type == 0)) {
+                        } else if ((!strcmp("WM/AlbumArtist", utf8buf)) && (type == 0)) {
                             id3->albumartist = id3buf;
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
-                        } else if ((!strcmp("WM/Composer",utf8buf)) && (type == 0)) {
+                        } else if ((!strcmp("WM/Composer", utf8buf)) && (type == 0)) {
                             id3->composer = id3buf;
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
-                        } else if (!strcmp("WM/Year",utf8buf)) {
+                        } else if (!strcmp("WM/Year", utf8buf)) {
                             if (type == 0) {
                                 id3->year_string = id3buf;
                                 asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);

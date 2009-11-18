@@ -46,7 +46,7 @@ bool get_sid_metadata(int fd, struct mp3entry* id3)
         return false;
     }
     
-    if ((memcmp(buf, "PSID",4) != 0))
+    if ((memcmp(buf, "PSID", 4) != 0))
     {
         return false;
     }

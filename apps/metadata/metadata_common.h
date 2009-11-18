@@ -29,6 +29,8 @@
 #define TAG_NAME_LENGTH             32
 #define TAG_VALUE_LENGTH            128
 
+#define FOURCC(a,b,c,d) (((a)<<24) | ((b) << 16) | ((c) << 8) | (d))
+
 enum tagtype { TAGTYPE_APE = 1, TAGTYPE_VORBIS };
 
 bool read_ape_tags(int fd, struct mp3entry* id3);

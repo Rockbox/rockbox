@@ -104,9 +104,10 @@ static int ASAP_ParseDuration(const char *s)
     return r;
 }
 
-static bool read_asap_string(char* source,char** buf,char** buffer_end,char** dest)
+static bool read_asap_string(char* source, char** buf, char** buffer_end, char** dest)
 {
-    if(parse_text(*buf,source) == false) return false;
+    if(parse_text(*buf,source) == false)
+        return false;
   
     /* set dest pointer */
     *dest = *buf;
@@ -123,7 +124,7 @@ static bool read_asap_string(char* source,char** buf,char** buffer_end,char** de
     return true;
 }
 
-static bool parse_sap_header(int fd,struct mp3entry* id3,int file_len)
+static bool parse_sap_header(int fd, struct mp3entry* id3, int file_len)
 {
     int module_index = 0;
     int sap_signature = -1;
@@ -132,9 +133,9 @@ static bool parse_sap_header(int fd,struct mp3entry* id3,int file_len)
     int i;
     
     /* set defaults */
-    int numSongs=1;
-    int defSong=0;
-    int numChannels=1;
+    int numSongs = 1;
+    int defSong = 0;
+    int numChannels = 1;
     int durations[MAX_SONGS];
     int loops[MAX_SONGS];
     for (i = 0; i < MAX_SONGS; i++) {
@@ -190,36 +191,36 @@ static bool parse_sap_header(int fd,struct mp3entry* id3,int file_len)
             sap_signature = 1;
         if (sap_signature == -1)
             return false;
-        if (strcmp(line,"AUTHOR") == 0)
+        if (strcmp(line, "AUTHOR") == 0)
         {
-            if(read_asap_string(p,&buffer,&buffer_end,&id3->artist) == false)
+            if(read_asap_string(p, &buffer, &buffer_end, &id3->artist) == false)
                 return false;
         }
-        else if(strcmp(line,"NAME")==0)
+        else if(strcmp(line, "NAME") == 0)
         {
-            if(read_asap_string(p,&buffer,&buffer_end,&id3->title) == false)
+            if(read_asap_string(p, &buffer, &buffer_end, &id3->title) == false)
                 return false;
         }
-        else if(strcmp(line,"DATE")==0)
+        else if(strcmp(line, "DATE") == 0)
         {
-            if(read_asap_string(p,&buffer,&buffer_end,&id3->year_string) == false)
+            if(read_asap_string(p, &buffer, &buffer_end, &id3->year_string) == false)
                 return false;          
         }
-        else if (strcmp(line,"SONGS")==0)
+        else if (strcmp(line, "SONGS") == 0)
         {
-            if (parse_dec(&numSongs, p,1,MAX_SONGS) == false )
+            if (parse_dec(&numSongs, p, 1, MAX_SONGS) == false )
                 return false; 
         }
-        else if (strcmp(line,"DEFSONG")==0)
+        else if (strcmp(line, "DEFSONG") == 0)
         {
-            if (parse_dec(&defSong, p,0,MAX_SONGS) == false)
+            if (parse_dec(&defSong, p, 0, MAX_SONGS) == false)
                 return false; 
         }
-        else if (strcmp(line,"STEREO")==0)
+        else if (strcmp(line, "STEREO") == 0)
         {
             numChannels = 2;
         }       
-        else if (strcmp(line,"TIME") == 0) 
+        else if (strcmp(line, "TIME") == 0) 
         {
             int durationTemp = ASAP_ParseDuration(p);
             if (durationTemp < 0 || duration_index >= MAX_SONGS)
@@ -237,7 +238,7 @@ static bool parse_sap_header(int fd,struct mp3entry* id3,int file_len)
         length = 180 * 1000;
     id3->length = length;
     
-    lseek(fd,0,SEEK_SET);
+    lseek(fd, 0, SEEK_SET);
     return true;
 }
 
@@ -247,7 +248,7 @@ bool get_asap_metadata(int fd, struct mp3entry* id3)
 
     int filelength = filesize(fd);
  
-    if(parse_sap_header(fd,id3,filelength) == false)
+    if(parse_sap_header(fd, id3, filelength) == false)
     {
         DEBUGF("parse sap header failed.\n");
         return false;
