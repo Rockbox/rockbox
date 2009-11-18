@@ -48,6 +48,7 @@ enum codec_status codec_main(void)
     uint32_t s = 0; /* sample rate */
     unsigned char c = 0; /* channels */
     int playback_on = -1;
+    size_t resume_offset = ci->id3->offset;
 
     /* Generic codec initialisation */
     ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
@@ -91,6 +92,15 @@ next_track:
         err = CODEC_ERROR;
         goto done;
     }   
+    
+    /* check for a mid-track resume and force a seek time accordingly */
+    if(resume_offset > rmctx.data_offset + DATA_HEADER_SIZE) {
+        resume_offset -= rmctx.data_offset + DATA_HEADER_SIZE;
+        /* put number of subpackets to skip in resume_offset */
+        resume_offset /= (rmctx.block_align + PACKET_HEADER_SIZE);
+        ci->seek_time =  (int)resume_offset * ((rmctx.block_align * 8 * 1000)/rmctx.bit_rate);                
+    }
+    
     ci->id3->frequency = s;    
     ci->set_elapsed(0);
     ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE);

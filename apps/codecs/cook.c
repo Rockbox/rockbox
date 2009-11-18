@@ -45,6 +45,7 @@ enum codec_status codec_main(void)
     uint16_t fs,sps,h;
     uint32_t packet_count;
     int scrambling_unit_size, num_units;
+    size_t resume_offset = ci->id3->offset;
 
 next_track:
     if (codec_init()) {
@@ -78,6 +79,15 @@ next_track:
     if(res < 0) {
         DEBUGF("failed to initialize cook decoder\n");
         return CODEC_ERROR;
+    }
+    
+    /* check for a mid-track resume and force a seek time accordingly */
+    if(resume_offset > rmctx.data_offset + DATA_HEADER_SIZE) {
+        resume_offset -= rmctx.data_offset + DATA_HEADER_SIZE;
+        num_units = (int)resume_offset / scrambling_unit_size;    
+        /* put number of subpackets to skip in resume_offset */
+        resume_offset /= (sps + PACKET_HEADER_SIZE);
+        ci->seek_time =  (int)resume_offset * ((sps * 8 * 1000)/rmctx.bit_rate);                
     }
 
     ci->set_elapsed(0);

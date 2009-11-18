@@ -45,6 +45,7 @@ enum codec_status codec_main(void)
     uint32_t packet_count;
     int scrambling_unit_size, num_units, elapsed = 0;
     int playback_on = -1;
+    size_t resume_offset = ci->id3->offset;
 
 next_track:
     if (codec_init()) {
@@ -80,6 +81,15 @@ next_track:
         return CODEC_ERROR;
     }
 
+    /* check for a mid-track resume and force a seek time accordingly */
+    if(resume_offset > rmctx.data_offset + DATA_HEADER_SIZE) {
+        resume_offset -= rmctx.data_offset + DATA_HEADER_SIZE;
+        num_units = (int)resume_offset / scrambling_unit_size;        
+        /* put number of subpackets to skip in resume_offset */
+        resume_offset /= (sps + PACKET_HEADER_SIZE);
+        ci->seek_time =  (int)resume_offset * ((sps * 8 * 1000)/rmctx.bit_rate);                
+    }
+    
     ci->set_elapsed(0);
     ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE);
 
@@ -98,7 +108,7 @@ seek_start :
             else
                 goto done;
         }
-       
+
         for(i = 0; i < rmctx.audio_pkt_cnt*(fs/sps) ; i++)
         { 
             ci->yield();
