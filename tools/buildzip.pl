@@ -438,6 +438,8 @@ STOP
         copy("$ROOT/wps/classic_statusbar-hwcodec.sbs", "$rbdir/wps/classic_statusbar.sbs");
     }
     system("touch $rbdir/wps/rockbox_none.sbs");
+    copy("$rbdir/wps/classic_statusbar.sbs", "$rbdir/wps/classic_statusbar.rsbs");
+    copy("$rbdir/wps/rockbox_none.sbs", "$rbdir/wps/rockbox_none.rsbs");
 
     # and the info file
     copy("rockbox-info.txt", "$rbdir/rockbox-info.txt");
