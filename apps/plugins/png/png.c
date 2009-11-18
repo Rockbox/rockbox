@@ -225,8 +225,6 @@ static struct configdata png_config[] =
 static fb_data* old_backdrop;
 #endif
 
-#define MAX_X_SIZE LCD_WIDTH*8
-
 /* Min memory allowing us to use the plugin buffer
  * and thus not stopping the music
  * *Very* rough estimation:
@@ -1369,35 +1367,28 @@ void get_pic_list(void)
 
 int change_filename(int direct)
 {
-    int count = 0;
+    bool file_erased = (file_pt[curfile] == NULL);
     direction = direct;
 
-    if (direct == DIR_PREV)
+    curfile += (direct == DIR_PREV? entries - 1: 1);
+    if (curfile >= entries)
+        curfile -= entries;
+
+    if (file_erased)
     {
-        do
+        /* remove 'erased' file names from list. */
+        int count, i;
+        for (count = i = 0; i < entries; i++)
         {
-            count++;
-            if (curfile == 0)
-                curfile = entries - 1;
-            else
-                curfile--;
-        }while (file_pt[curfile] == NULL && count < entries);
-        /* we "erase" the file name if  we encounter
-         * a non-supported file, so skip it now */
-    }
-    else /* DIR_NEXT/DIR_NONE */
-    {
-        do
-        {
-            count++;
-            if (curfile == entries - 1)
-                curfile = 0;
-            else
-                curfile++;
-        }while (file_pt[curfile] == NULL && count < entries);
+            if (curfile == i)
+                curfile = count;
+            if (file_pt[i] != NULL)
+                file_pt[count++] = file_pt[i];
+        }
+        entries = count;
     }
 
-    if (count == entries)
+    if (entries == 0)
     {
         rb->splash(HZ, "No supported files");
         return PLUGIN_ERROR;
@@ -1613,14 +1604,16 @@ int scroll_bmp(struct LodePNG_Decoder* decoder)
         switch (button)
         {
         case PNG_LEFT:
-            if (!(ds < ds_max) && entries > 0 && decoder->infoPng.width <= MAX_X_SIZE)
+            if (entries > 1 && decoder->infoPng.width/ds <= LCD_WIDTH
+                            && decoder->infoPng.height/ds <= LCD_HEIGHT)
                 return change_filename(DIR_PREV);
         case PNG_LEFT | BUTTON_REPEAT:
             pan_view_left(decoder);
             break;
 
         case PNG_RIGHT:
-            if (!(ds < ds_max) && entries > 0 && decoder->infoPng.width <= MAX_X_SIZE)
+            if (entries > 1 && decoder->infoPng.width/ds <= LCD_WIDTH
+                            && decoder->infoPng.height/ds <= LCD_HEIGHT)
                 return change_filename(DIR_NEXT);
         case PNG_RIGHT | BUTTON_REPEAT:
             pan_view_right(decoder);
@@ -1640,7 +1633,7 @@ int scroll_bmp(struct LodePNG_Decoder* decoder)
             if (!slideshow_enabled)
                 break;
             running_slideshow = true;
-            if (entries > 0)
+            if (entries > 1)
                 return change_filename(DIR_NEXT);
             break;
 
@@ -1655,7 +1648,7 @@ int scroll_bmp(struct LodePNG_Decoder* decoder)
         case PNG_NEXT_REPEAT:
 #endif
         case PNG_NEXT:
-            if (entries > 0)
+            if (entries > 1)
                 return change_filename(DIR_NEXT);
             break;
 
@@ -1663,7 +1656,7 @@ int scroll_bmp(struct LodePNG_Decoder* decoder)
         case PNG_PREVIOUS_REPEAT:
 #endif
         case PNG_PREVIOUS:
-            if (entries > 0)
+            if (entries > 1)
                 return change_filename(DIR_PREV);
             break;
 
@@ -1735,15 +1728,17 @@ void cb_progress(int current, int total)
     if (current & 1) rb->yield(); /* be nice to the other threads */
     if (!running_slideshow)
     {
-        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, LCD_HEIGHT-8, LCD_WIDTH, 8, total, 0,
-                               current, HORIZONTAL);
+        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],
+                            0, LCD_HEIGHT-8, LCD_WIDTH, 8,
+                            total, 0, current, HORIZONTAL);
         rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
     }
     else
     {
         /* in slideshow mode, keep gui interference to a minimum */
-        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, LCD_HEIGHT-4, LCD_WIDTH, 4, total, 0,
-                               current, HORIZONTAL);
+        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],
+                            0, LCD_HEIGHT-4, LCD_WIDTH, 4,
+                            total, 0, current, HORIZONTAL);
         rb->lcd_update_rect(0, LCD_HEIGHT-4, LCD_WIDTH, 4);
     }
 }
@@ -1772,8 +1767,8 @@ unsigned max_downscale(struct LodePNG_Decoder* decoder)
 {
     unsigned downscale = 1;
 
-    while (downscale < 8 && (decoder->infoPng.width > LCD_WIDTH*downscale
-                             || decoder->infoPng.height > LCD_HEIGHT*downscale))
+    while (downscale < 8 && (decoder->infoPng.width/downscale > LCD_WIDTH
+                             || decoder->infoPng.height/downscale > LCD_HEIGHT))
     {
         downscale *= 2;
     }
@@ -2007,8 +2002,7 @@ int load_and_show(char* filename)
                 {
                 case PNG_ZOOM_IN:
                     plug_buf = false;
-                    memory = rb->plugin_get_audio_buffer(
-                                 (size_t *)&memory_size);
+                    memory = rb->plugin_get_audio_buffer((size_t *)&memory_size);
                     memory_max = memory + memory_size - 1;
                     /*try again this file, now using the audio buffer */
                     return PLUGIN_OTHER;
@@ -2117,8 +2111,6 @@ int load_and_show(char* filename)
 
             if (decoder.error == PLUGIN_ABORT) {
                 return PLUGIN_OK;
-            } else if (decoder.error == OUT_OF_MEMORY && entries == 1) {
-                return PLUGIN_ERROR;
             } else {
                 file_pt[curfile] = NULL;
                 return change_filename(direction);
@@ -2220,7 +2212,7 @@ enum plugin_status plugin_start(const void* parameter)
     if (rb->audio_status()) {
         plug_buf = true;
     } else {
-        memory = (unsigned char *)rb->plugin_get_audio_buffer((size_t *)&memory_size);
+        memory = rb->plugin_get_audio_buffer((size_t *)&memory_size);
     }
 #endif
 

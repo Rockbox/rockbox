@@ -55,8 +55,6 @@ GREY_INFO_STRUCT
 #define MYXLCD(fn) xlcd_ ## fn
 #endif
 
-#define MAX_X_SIZE LCD_WIDTH*8
-
 /* Min memory allowing us to use the plugin buffer
  * and thus not stopping the music
  * *Very* rough estimation:
@@ -233,40 +231,34 @@ void get_pic_list(void)
 
 int change_filename(int direct)
 {
-    int count = 0;
+    bool file_erased = (file_pt[curfile] == NULL);
     direction = direct;
 
-    if(direct == DIR_PREV)
+    curfile += (direct == DIR_PREV? entries - 1: 1);
+    if (curfile >= entries)
+        curfile -= entries;
+
+    if (file_erased)
     {
-        do
+        /* remove 'erased' file names from list. */
+        int count, i;
+        for (count = i = 0; i < entries; i++)
         {
-            count++;
-            if(curfile == 0)
-                curfile = entries - 1;
-            else
-                curfile--;
-        }while(file_pt[curfile] == NULL && count < entries);
-        /* we "erase" the file name if  we encounter
-         * a non-supported file, so skip it now */
-    }
-    else /* DIR_NEXT/DIR_NONE */
-    {
-        do
-        {
-            count++;
-            if(curfile == entries - 1)
-                curfile = 0;
-            else
-                curfile++;
-        }while(file_pt[curfile] == NULL && count < entries);
+            if (curfile == i)
+                curfile = count;
+            if (file_pt[i] != NULL)
+                file_pt[count++] = file_pt[i];
+        }
+        entries = count;
     }
 
-    if(count == entries)
+    if (entries == 0)
     {
         rb->splash(HZ, "No supported files");
         return PLUGIN_ERROR;
     }
-    if(rb->strlen(tree->currdir) > 1)
+
+    if (rb->strlen(tree->currdir) > 1)
     {
         rb->strcpy(np_file, tree->currdir);
         rb->strcat(np_file, "/");
@@ -572,14 +564,16 @@ int scroll_bmp(struct t_disp* pdisp)
         switch(button)
         {
         case JPEG_LEFT:
-            if (!(ds < ds_max) && entries > 0 && jpg.x_size <= MAX_X_SIZE)
+            if (entries > 1 && pdisp->width <= LCD_WIDTH
+                            && pdisp->height <= LCD_HEIGHT)
                 return change_filename(DIR_PREV);
         case JPEG_LEFT | BUTTON_REPEAT:
             pan_view_left(pdisp);
             break;
 
         case JPEG_RIGHT:
-            if (!(ds < ds_max) && entries > 0 && jpg.x_size <= MAX_X_SIZE)
+            if (entries > 1 && pdisp->width <= LCD_WIDTH
+                            && pdisp->height <= LCD_HEIGHT)
                 return change_filename(DIR_NEXT);
         case JPEG_RIGHT | BUTTON_REPEAT:
             pan_view_right(pdisp);
@@ -599,7 +593,7 @@ int scroll_bmp(struct t_disp* pdisp)
             if (!slideshow_enabled)
                 break;
             running_slideshow = true;
-            if (entries > 0)
+            if (entries > 1)
                 return change_filename(DIR_NEXT);
             break;
 
@@ -614,7 +608,7 @@ int scroll_bmp(struct t_disp* pdisp)
         case JPEG_NEXT_REPEAT:
 #endif
         case JPEG_NEXT:
-            if (entries > 0)
+            if (entries > 1)
                 return change_filename(DIR_NEXT);
             break;
 
@@ -622,7 +616,7 @@ int scroll_bmp(struct t_disp* pdisp)
         case JPEG_PREVIOUS_REPEAT:
 #endif
         case JPEG_PREVIOUS:
-            if (entries > 0)
+            if (entries > 1)
                 return change_filename(DIR_PREV);
             break;
 
@@ -675,21 +669,23 @@ int scroll_bmp(struct t_disp* pdisp)
 /********************* main function *************************/
 
 /* callback updating a progress meter while JPEG decoding */
-void cb_progess(int current, int total)
+void cb_progress(int current, int total)
 {
     rb->yield(); /* be nice to the other threads */
     if(!running_slideshow)
     {
-        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, LCD_HEIGHT-8, LCD_WIDTH, 8, total, 0,
-                      current, HORIZONTAL);
+        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],
+                            0, LCD_HEIGHT-8, LCD_WIDTH, 8,
+                            total, 0, current, HORIZONTAL);
         rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
     }
 #ifndef USEGSLIB
     else
     {
         /* in slideshow mode, keep gui interference to a minimum */
-        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, LCD_HEIGHT-4, LCD_WIDTH, 4, total, 0,
-                      current, HORIZONTAL);
+        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],
+                            0, LCD_HEIGHT-4, LCD_WIDTH, 4,
+                            total, 0, current, HORIZONTAL);
         rb->lcd_update_rect(0, LCD_HEIGHT-4, LCD_WIDTH, 4);
     }
 #endif
@@ -727,14 +723,13 @@ int min_downscale(struct jpeg *p_jpg, int bufsize)
     return downscale;
 }
 
-
 /* how far can we zoom out, to fit image into the LCD */
 int max_downscale(struct jpeg *p_jpg)
 {
     int downscale = 1;
 
-    while (downscale < 8 && (p_jpg->x_size > LCD_WIDTH*downscale
-                          || p_jpg->y_size > LCD_HEIGHT*downscale))
+    while (downscale < 8 && (p_jpg->x_size/downscale > LCD_WIDTH
+                          || p_jpg->y_size/downscale > LCD_HEIGHT))
     {
         downscale *= 2;
     }
@@ -816,15 +811,14 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
     time = *rb->current_tick;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
-    status = jpeg_decode(p_jpg, p_disp->bitmap, ds, cb_progess);
+    status = jpeg_decode(p_jpg, p_disp->bitmap, ds, cb_progress);
     rb->cpu_boost(false);
 #else
-    status = jpeg_decode(p_jpg, p_disp->bitmap, ds, cb_progess);
+    status = jpeg_decode(p_jpg, p_disp->bitmap, ds, cb_progress);
 #endif
     if (status)
     {
         rb->splashf(HZ, "decode error %d", status);
-        file_pt[curfile] = NULL;
         return NULL;
     }
     time = *rb->current_tick - time;
@@ -1038,7 +1032,10 @@ int load_and_show(char* filename)
     {
         p_disp = get_image(&jpg, ds); /* decode or fetch from cache */
         if (p_disp == NULL)
+        {
+            file_pt[curfile] = NULL;
             return change_filename(direction);
+        }
 
         set_view(p_disp, cx, cy);
 
