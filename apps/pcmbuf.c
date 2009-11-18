@@ -157,26 +157,34 @@ static void pcmbuf_finish_crossfade_enable(void);
 static struct chunkdesc *first_desc;
 static bool show_desc_in_use = false;
 #define DISPLAY_DESC(caller) while(!show_desc(caller))
-#define DESC_IDX(desc)  (desc ? desc - first_desc : -1)
-#define DESCL_IDX(desc) (desc && desc->link ? desc->link - first_desc : -1)
-#define SHOW_1ST(desc) if(DESC_IDX (desc)==-1) DEBUGF(" -- "); \
-                       else DEBUGF(" %02d ",   DESC_IDX(desc))
-#define SHOW_2ND(desc) if(DESCL_IDX(desc)==-1) DEBUGF("l --  "); \
-                       else DEBUGF("l %02d  ", DESCL_IDX(desc))
-#define DESC_SHOW(tag, desc) DEBUGF(tag);SHOW_1ST(desc); \
-                             DEBUGF(tag);SHOW_2ND(desc)
+#define DESC_IDX(desc)       (desc ? desc - first_desc : -1)
+#define SHOW_DESC(desc)      if(DESC_IDX(desc)==-1) DEBUGF("--"); \
+                             else DEBUGF("%02d", DESC_IDX(desc))
+#define SHOW_DESC_LINK(desc) if(desc){SHOW_DESC(desc->link);DEBUGF(" ");} \
+                             else DEBUGF("-- ")
+#define SHOW_DETAIL(desc)    DEBUGF(":");SHOW_DESC(desc); DEBUGF(">"); \
+                             SHOW_DESC_LINK(desc)
+#define SHOW_POINT(tag,desc) DEBUGF("%s",tag);SHOW_DETAIL(desc)
+#define SHOW_NUM(num,desc)   DEBUGF("%02d>",num);SHOW_DESC_LINK(desc)
 
 static bool show_desc(char *caller)
 {
     if (show_desc_in_use) return false;
     show_desc_in_use = true;
     DEBUGF("%-14s\t", caller);
-    DESC_SHOW("r",  read_chunk);
-    DESC_SHOW("re", read_end_chunk);
+    SHOW_POINT("r",  read_chunk);
+    SHOW_POINT("re", read_end_chunk);
     DEBUGF(" ");
-    DESC_SHOW("w",  write_chunk);
-    DESC_SHOW("we", write_end_chunk);
+    SHOW_POINT("w",  write_chunk);
+    SHOW_POINT("we", write_end_chunk);
     DEBUGF("\n");
+    int i;
+    for (i = 0; i < pcmbuf_descs(); i++)
+    {
+        SHOW_NUM(i, (first_desc + i));
+        if (i%10 == 9) DEBUGF("\n");
+    }
+    DEBUGF("\n\n");
     show_desc_in_use = false;
     return true;
 }
@@ -223,6 +231,7 @@ static void commit_chunk(bool flush_next_time)
         {
             /* Flush! Discard all data after the currently playing chunk,
                and make the current chunk play next */
+            logf("commit_chunk: flush");
             write_end_chunk->link = read_chunk->link;
             read_chunk->link = pcmbuf_current;
             while (write_end_chunk->link)
@@ -669,6 +678,7 @@ void pcmbuf_play_stop(void)
 #endif
     end_of_track = false;
     track_transition = false;
+    flush_pcmbuf = false;
     DISPLAY_DESC("play_stop");
 
     /* Can unboost the codec thread here no matter who's calling */
