@@ -274,6 +274,8 @@ int main(int argc, char **argv)
         if((strcmp(&argv[filearg][strlen(argv[filearg])-4], "rwps") == 0) || 
             (strcmp(&argv[filearg][strlen(argv[filearg])-4], "rsbs") == 0))
             screen = SCREEN_REMOTE;
+        else
+            screen = SCREEN_MAIN;
 #endif    
         wps_screen = &screens[screen];
 
