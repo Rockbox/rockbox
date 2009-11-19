@@ -231,8 +231,9 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
           qtmovie->res->codecdata_len = entry_remaining + 12 + 8;
           if (qtmovie->res->codecdata_len > MAX_CODECDATA_SIZE)
           {
-             DEBUGF("codecdata too large (%d) in stsd\n", 
-                    (int)qtmovie->res->codecdata_len);
+              DEBUGF("codecdata too large (%d) in stsd\n", 
+                      (int)qtmovie->res->codecdata_len);
+              return false;
           }
 
           memset(qtmovie->res->codecdata, 0, qtmovie->res->codecdata_len);
