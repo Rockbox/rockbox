@@ -38,6 +38,16 @@ prefixtools () {
  OC=${prefix}objcopy
 }
 
+findarmgcc() {
+  if [ "$ARG_ARM_EABI" = "1" ]; then
+    prefixtools arm-elf-eabi-
+    gccchoice="4.4.2"
+  else
+    prefixtools arm-elf-
+    gccchoice="4.0.3"
+  fi
+}
+
 # scan the $PATH for the given command
 findtool(){
   file="$1"
@@ -241,76 +251,68 @@ coldfirecc () {
 }
 
 arm7tdmicc () {
- prefixtools arm-elf-
+ findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm7tdmi"
  if test "X$1" != "Xshort"; then
    GCCOPTS="$GCCOPTS -mlong-calls"
  fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
- gccchoice="4.0.3"
 }
 
 arm9tdmicc () {
- prefixtools arm-elf-
+ findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm9tdmi"
  if test "$modelname" != "gigabeatf" -a "$t_manufacturer" != "as3525"; then
   GCCOPTS="$GCCOPTS -mlong-calls"
  fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
- gccchoice="4.0.3"
 }
 
 arm940tbecc () {
- prefixtools arm-elf-
+ findarmgcc
  GCCOPTS="$CCOPTS -mbig-endian -mcpu=arm940t -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="big"
- gccchoice="4.0.3"
 }
 
 arm940tcc () {
- prefixtools arm-elf-
+ findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm940t -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
- gccchoice="4.0.3"
 }
 
 arm946cc () {
- prefixtools arm-elf-
+ findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm9e -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
- gccchoice="4.0.3"
 }
 
 arm926ejscc () {
- prefixtools arm-elf-
+ findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm926ej-s -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
- gccchoice="4.0.3"
 }
 
 arm1136jfscc () {
- prefixtools arm-elf-
+ findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm1136jf-s"
  if test "$modelname" != "gigabeats"; then
   GCCOPTS="$GCCOPTS -mlong-calls"
  fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
- gccchoice="4.0.3"
 }
 
 arm1176jzscc () {
- prefixtools arm-elf-
+ findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm1176jz-s -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
- gccchoice="4.0.3"
 }
 
 mipselcc () {
@@ -756,6 +758,10 @@ help() {
 
     --ccache          Enable ccache use (done by default these days)
     --no-ccache       Disable ccache use
+
+    --eabi            Make configure prefer toolchains that are able to compile
+                      for the new ARM standard abi EABI
+    --no-eabi         The opposite of --eabi (prefer old non-eabi toolchains)
     --help            Shows this message (must not be used with other options)
 
 EOF
@@ -773,13 +779,14 @@ ARG_TTS=
 ARG_TTSOPTS=
 ARG_TYPE=
 ARG_VOICE=
+ARG_ARM_EABI=
 err=
 for arg in "$@"; do
 	case "$arg" in
 		--ccache)     ARG_CCACHE=1;;
+		--no-ccache)  ARG_CCACHE=0;;
 		--encopts=*)  ARG_ENCOPTS=`echo "$arg" | cut -d = -f 2`;;
 		--language=*) ARG_LANG=`echo "$arg" | cut -d = -f 2`;;
-		--no-ccache)  ARG_CCACHE=0;;
 		--ram=*)      ARG_RAM=`echo "$arg" | cut -d = -f 2`;;
 		--rbdir=*)    ARG_RBDIR=`echo "$arg" | cut -d = -f 2`;;
 		--target=*)   ARG_TARGET=`echo "$arg" | cut -d = -f 2`;;
@@ -787,6 +794,8 @@ for arg in "$@"; do
 		--ttsopts=*)  ARG_TTSOPTS=`echo "$arg" | cut -d = -f 2`;;
 		--type=*)     ARG_TYPE=`echo "$arg" | cut -d = -f 2`;;
 		--voice=*)    ARG_VOICE=`echo "$arg" | cut -d = -f 2`;;
+		--eabi)       ARG_ARM_EABI=1;;
+		--no-eabi)    ARG_ARM_EABI=0;;
 		--help)       help;;
 		*)            err=1; echo "[ERROR] Option '$arg' unsupported";;
 	esac
