@@ -2012,7 +2012,7 @@ void G_ReloadDefaults(void)
       int i = M_CheckParm("-complevel");
       if (i && (1+i) < myargc) compatibility_level = atoi(myargv[i+1]);
    }
-   if ((signed)compatibility_level == -1)
+   if (compatibility_level == (complevel_t)-1)
       compatibility_level = MAX_COMPATIBILITY_LEVEL-1;
 
    if (mbf_features)

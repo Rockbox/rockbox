@@ -547,7 +547,7 @@ static void P_DoNewChaseDir(mobj_t *actor, fixed_t deltax, fixed_t deltay)
             return;
    }
    else
-      for (tdir = DI_SOUTHEAST; tdir != (unsigned)(DI_EAST-1); tdir--)
+      for (tdir = DI_SOUTHEAST; tdir != (dirtype_t)(DI_EAST-1); tdir--)
          if (tdir != turnaround && (actor->movedir = tdir, P_TryWalk(actor)))
             return;
 
