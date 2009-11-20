@@ -23,6 +23,8 @@
 #ifndef MPEGPLAYER_H
 #define MPEGPLAYER_H
 
+#include "mpeg2.h"
+
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
 #define trigger_cpu_boost rb->trigger_cpu_boost
 #define cancel_cpu_boost  rb->cancel_cpu_boost
@@ -31,17 +33,6 @@
 
 /* Memory allotments for various subsystems */
 #define MIN_MEMMARGIN (4*1024)
-
-enum mpeg_malloc_reason_t
-{
-    __MPEG_ALLOC_FIRST = -256,
-    MPEG_ALLOC_CODEC_MALLOC,
-    MPEG_ALLOC_CODEC_CALLOC,
-    MPEG_ALLOC_MPEG2_BUFFER,
-    MPEG_ALLOC_AUDIOBUF,
-    MPEG_ALLOC_PCMOUT,
-    MPEG_ALLOC_DISKBUF,
-};
 
 /** Video thread **/
 #define LIBMPEG2_ALLOC_SIZE (2*1024*1024)

@@ -191,7 +191,7 @@ mpeg2_state_t mpeg2_parse (mpeg2dec_t * mpeg2dec)
 
     	state = mpeg2dec->action (mpeg2dec);
 
-	    if ((int)state > (int)STATE_INTERNAL_NORETURN)
+	    if (state > STATE_INTERNAL_NORETURN)
 	        return state;
     }
 

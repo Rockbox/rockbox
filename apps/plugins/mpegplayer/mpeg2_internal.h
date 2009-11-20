@@ -29,8 +29,6 @@
 
 #include "config.h" /* for Rockbox CPU_ #defines */
 
-#define STATE_INTERNAL_NORETURN ((mpeg2_state_t)-1)
-
 /* macroblock modes */
 #define MACROBLOCK_INTRA            1
 #define MACROBLOCK_PATTERN          2

@@ -130,6 +130,7 @@ typedef struct mpeg2_decoder_s mpeg2_decoder_t;
 
 typedef enum
 {
+    STATE_INTERNAL_NORETURN = -1,
     STATE_BUFFER            = 0,
     STATE_SEQUENCE          = 1,
     STATE_SEQUENCE_REPEATED = 2,
@@ -199,7 +200,14 @@ typedef enum
     MPEG2_ALLOC_CHUNK      = 1,
     MPEG2_ALLOC_YUV        = 2,
     MPEG2_ALLOC_CONVERT_ID = 3,
-    MPEG2_ALLOC_CONVERTED  = 4
+    MPEG2_ALLOC_CONVERTED  = 4,
+    MPEG_ALLOC_CODEC_MALLOC,
+    MPEG_ALLOC_CODEC_CALLOC,
+    MPEG_ALLOC_MPEG2_BUFFER,
+    MPEG_ALLOC_AUDIOBUF,
+    MPEG_ALLOC_PCMOUT,
+    MPEG_ALLOC_DISKBUF,
+    __MPEG_ALLOC_FIRST = -256,
 } mpeg2_alloc_t;
 
 void * mpeg2_malloc (unsigned size, mpeg2_alloc_t reason);
