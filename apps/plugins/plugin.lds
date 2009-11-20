@@ -231,11 +231,16 @@ SECTIONS
         . = ALIGN(CACHEALIGN_SIZE);
         *(.ncdata*)
         . = ALIGN(CACHEALIGN_SIZE);
-    } AT> PLUGIN_RAM
-#endif
-
+/* EABI currently needs iramcopy defined here, otherwise .iram can sometimes
+   have an incorrect load address, breaking codecs. */
 #if defined(IRAMSIZE)
-    iramcopy = . - NOCACHE_BASE;
+        iramcopy = . - NOCACHE_BASE;
+#endif
+    } AT> PLUGIN_RAM
+/* This definition is used when NOCACHE_BASE is 0. The address offset bug only
+   seems to occur when the empty .ncdata is present. */
+#elif defined(IRAMSIZE)
+    iramcopy = .;
 #endif
 
     /DISCARD/ :
