@@ -5,7 +5,7 @@
 #
 
 # specify the UI area viewport... everything but a bar 8 pixels high at the top
-%Vi|0|8|-|-|1|
+%Vi|0|8|-|-|1|-|-|
 
 ##############################################################
 # Options: 
@@ -27,7 +27,11 @@
 # Load some bitmaps
 %xl|B|battery.bmp|0|0|10|
 %xl|V|volume.bmp|0|0|10|
-%xl|S|status.bmp|0|0|16|
+%xl|S|status.bmp|0|0|14|
+
+%xl|m|rec_mpegbitrates.bmp|0|0|18|
+%xl|f|rec_frequencies.bmp|0|0|12|
+%xl|e|rec_encoders.bmp|0|0|4|
 
 # Enable the correct viewports
 %?cs<%Vdc%Vdp%Vdr%Vds|%Vdc%Vdp%Vdr%Vds|%Vdz|%Vdc%Vdp%Vdr%Vds>
@@ -56,24 +60,23 @@
 
 # Repeat mode
 %Vl|r|54|0|-|8|0|
-%?mm<|%xdSi|%xdSj|%xdSk|%xdSl>
+%?mm<|%xdSk|%xdSl|%xdSm|%xdSn>
 
 # Shuffle mode
 %Vl|s|64|0|-|8|0|
-%?ps<%xdSk|>
+%?ps<%xdSm|>
 
 
 # Recording section
-%Vl|z|27|0|6|8|0|
-
-%Vl|z|33|0|18|8|0|
-%?Rp<Q%Rb>
+# encoder/mpeg bitrate
+%Vl|z|27|0|18|8|0|
+%?Rp<%?Rh<Q%Rb|%?Re<%xdea|%xdeb|%xdec|%?Rb<%xdma|%xdmb|%xdmc|%xdmd|%xdme|%xdmf|%xdmg|%xdmh|%xdmi|%xdmj|%xdmk|%xdml|%xdmm|%xdmn|%xdmo|%xdmp|%xdmq|%xdmr>>>>
 # status icon
 %Vl|z|46|0|8|8|0|
 %?mp<%xdSc|%xdSb|%xdSd|%xdSe|%xdSf|%xdSg|%xdSh|%xdSi|%xdSj>
-# frequency and stereo/mono
+# frequency
 %Vl|z|54|0|-|8|0|
-%?Rp<%?Rf<??|44|48|32|22|24|16>%?Rm<%xdSm|%xdSn>>
+%?Rp<%?Rf<%xdfa|%xdfb|%xdfc|%xdfd|%xdfe|%xdff|%xdfg|%xdfh|%xdfi|%xdfj|%xdfk|%xdfl>>
 
 # Clock on RTC able targets, and disk access
 %V|-36|0|-6|8|0| # align on the right with room for 6 SYSFONT digits

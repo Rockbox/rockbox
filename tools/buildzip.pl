@@ -433,12 +433,20 @@ STOP
     mkdir "$rbdir/wps/classic_statusbar", 0777;
     glob_copy("$ROOT/wps/classic_statusbar/*.bmp", "$rbdir/wps/classic_statusbar");
     if ($swcodec) {
-        copy("$ROOT/wps/classic_statusbar.sbs", "$rbdir/wps");
+		if ($depth > 1) {
+			copy("$ROOT/wps/classic_statusbar.sbs", "$rbdir/wps");
+		} else {
+			copy("$ROOT/wps/classic_statusbar.mono.sbs", "$rbdir/wps");
+		}
     } else {
-        copy("$ROOT/wps/classic_statusbar-hwcodec.sbs", "$rbdir/wps/classic_statusbar.sbs");
+        copy("$ROOT/wps/classic_statusbar.112x64x1.sbs", "$rbdir/wps/classic_statusbar.sbs");
     }
     system("touch $rbdir/wps/rockbox_none.sbs");
-    copy("$rbdir/wps/classic_statusbar.sbs", "$rbdir/wps/classic_statusbar.rsbs");
+    if ($remote_depth != $depth) {
+		copy("$ROOT/wps/classic_statusbar.mono.sbs", "$rbdir/wps/classic_statusbar.rsbs");
+	} else {
+		copy("$rbdir/wps/classic_statusbar.sbs", "$rbdir/wps/classic_statusbar.rsbs");
+	}
     copy("$rbdir/wps/rockbox_none.sbs", "$rbdir/wps/rockbox_none.rsbs");
 
     # and the info file
