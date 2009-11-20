@@ -81,6 +81,7 @@ svnpaths = [ "rbutil/",
              "tools/ucl",
              "tools/rbspeex",
              "apps/codecs/libspeex",
+             "docs/COPYING",
              "tools/iriver.c",
              "tools/Makefile",
              "tools/mkboot.h",
@@ -117,10 +118,17 @@ def getsources(svnsrv, filelist, dest):
     for elem in filelist:
         url = re.subn('/$', '', svnsrv + elem)[0]
         destpath = re.subn('/$', '', dest + elem)[0]
+        # make sure the destination path does exist
+        d = os.path.dirname(destpath)
+        print d
+        if not os.path.exists(d):
+            os.makedirs(d)
+        # get from svn
         try:
             client.export(url, destpath)
         except:
             print "SVN client error: %s" % sys.exc_value
+            print "URL: %s, destination: %s" % (url, destpath)
             return -1
     print "Checkout finished."
     return 0
