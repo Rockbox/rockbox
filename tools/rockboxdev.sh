@@ -153,6 +153,8 @@ gccver="4.0.3" # default gcc version
 binutils="2.16.1" # The binutils version to use
 gccconfigure="" #default is nothing added to configure
 binutilsconf="" #default is nothing added to configure
+gcctarget="" #default make target
+gccinstalltarget="install" #default install target
 
 system=`uname -s`
 gccurl="http://www.rockbox.org/gcc"
@@ -184,6 +186,16 @@ case $arch in
   [Aa])
     target="arm-elf"
     gccpatch="rockbox-multilibs-arm-elf-gcc-4.0.3_3.diff"
+    ;;
+  [Ee])
+    target="arm-elf-eabi"
+    gccpatch="rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff"
+    binutilsconf="--disable-werror"
+    gccver="4.4.2"
+    # needed to build a bare-metal gcc-4.4.2
+    gcctarget="all-gcc all-target-libgcc"
+    gccinstalltarget="install-gcc install-target-libgcc"
+    binutils="2.20"
     ;;
   [Ii])
     target="mipsel-elf"
@@ -313,9 +325,9 @@ echo "ROCKBOXDEV: gcc/configure"
 # recent Ubuntu installations
 CFLAGS=-U_FORTIFY_SOURCE ../gcc-$gccver/configure --target=$target --prefix=$prefix/$target --enable-languages=c $gccconfigure
 echo "ROCKBOXDEV: gcc/make"
-$make
+$make $gcctarget
 echo "ROCKBOXDEV: gcc/make install to $prefix/$target"
-$make install
+$make $gccinstalltarget
 cd .. # get out of build-gcc
 cd .. # get out of $builddir
 
@@ -326,6 +338,7 @@ echo "Select target arch:"
 echo "s   - sh       (Archos models)"
 echo "m   - m68k     (iriver h1x0/h3x0, ifp7x0 and iaudio)"
 echo "a   - arm      (ipods, iriver H10, Sansa, etc)"
+echo "e   - arm-eabi (same as above, new testing toolchain)"
 echo "i   - mips     (Jz4740 and ATJ-based players)"
 echo "separate multiple targets with spaces"
 echo "(Example: \"s m a\" will build sh, m86k and arm)"
@@ -350,6 +363,10 @@ case $arch in
     cleardir $builddir $arch
     ;;
   [Aa])
+    buildone $arch
+    cleardir $builddir $arch
+    ;;
+  [Ee])
     buildone $arch
     cleardir $builddir $arch
     ;;
