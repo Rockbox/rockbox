@@ -25,7 +25,7 @@
 
 #  ifdef __GNUC__
 #    define STIN static inline
-#  elif _WIN32
+#  elif defined(_WIN32)
 #    define STIN static __inline__
 #  endif
 #else

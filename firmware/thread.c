@@ -927,7 +927,7 @@ static inline void core_sleep(void)
         : : "z"(&SBYCR-GBR) : "r1");
 }
 
-#elif CPU_MIPS == 32
+#elif defined(CPU_MIPS) && CPU_MIPS == 32
 
 /*---------------------------------------------------------------------------
  * Start the thread running and terminate it if it returns
