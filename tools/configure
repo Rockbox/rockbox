@@ -253,7 +253,7 @@ coldfirecc () {
 arm7tdmicc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm7tdmi"
- if test "X$1" != "Xshort"; then
+ if test "X$1" != "Xshort" -a "$ARG_ARM_EABI" != "1"; then
    GCCOPTS="$GCCOPTS -mlong-calls"
  fi
  GCCOPTIMIZE="-fomit-frame-pointer"
@@ -263,7 +263,7 @@ arm7tdmicc () {
 arm9tdmicc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm9tdmi"
- if test "$modelname" != "gigabeatf" -a "$t_manufacturer" != "as3525"; then
+ if test "$modelname" != "gigabeatf" -a "$t_manufacturer" != "as3525" -a "$ARG_ARM_EABI" != "1"; then
   GCCOPTS="$GCCOPTS -mlong-calls"
  fi
  GCCOPTIMIZE="-fomit-frame-pointer"
@@ -272,28 +272,40 @@ arm9tdmicc () {
 
 arm940tbecc () {
  findarmgcc
- GCCOPTS="$CCOPTS -mbig-endian -mcpu=arm940t -mlong-calls"
+ GCCOPTS="$CCOPTS -mbig-endian -mcpu=arm940t"
+ if test "ARG_ARM_EABI" != "1"; then
+  GCCOPTS="$GCCOPTS -mlong-calls"
+ fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="big"
 }
 
 arm940tcc () {
  findarmgcc
- GCCOPTS="$CCOPTS -mcpu=arm940t -mlong-calls"
+ GCCOPTS="$CCOPTS -mcpu=arm940t"
+ if test "ARG_ARM_EABI" != "1"; then
+  GCCOPTS="$GCCOPTS -mlong-calls"
+ fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
 
 arm946cc () {
  findarmgcc
- GCCOPTS="$CCOPTS -mcpu=arm9e -mlong-calls"
+ GCCOPTS="$CCOPTS -mcpu=arm9e"
+ if test "ARG_ARM_EABI" != "1"; then
+  GCCOPTS="$GCCOPTS -mlong-calls"
+ fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
 
 arm926ejscc () {
  findarmgcc
- GCCOPTS="$CCOPTS -mcpu=arm926ej-s -mlong-calls"
+ GCCOPTS="$CCOPTS -mcpu=arm926ej-s"
+ if test "ARG_ARM_EABI" != "1"; then
+  GCCOPTS="$GCCOPTS -mlong-calls"
+ fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
@@ -301,7 +313,7 @@ arm926ejscc () {
 arm1136jfscc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm1136jf-s"
- if test "$modelname" != "gigabeats"; then
+ if test "$modelname" != "gigabeats" -a "ARG_ARM_EABI" != "1"; then
   GCCOPTS="$GCCOPTS -mlong-calls"
  fi
  GCCOPTIMIZE="-fomit-frame-pointer"
@@ -310,7 +322,10 @@ arm1136jfscc () {
 
 arm1176jzscc () {
  findarmgcc
- GCCOPTS="$CCOPTS -mcpu=arm1176jz-s -mlong-calls"
+ GCCOPTS="$CCOPTS -mcpu=arm1176jz-s"
+ if test "ARG_ARM_EABI" != "1"; then
+  GCCOPTS="$GCCOPTS -mlong-calls"
+ fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
