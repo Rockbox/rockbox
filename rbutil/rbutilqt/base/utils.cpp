@@ -120,7 +120,7 @@ qulonglong filesystemFree(QString path)
     ret = statvfs(qPrintable(path), &fs);
 
     if(ret == 0)
-        size = (qulonglong)fs.f_bsize * (qulonglong)fs.f_bavail;
+        size = (qulonglong)fs.f_frsize * (qulonglong)fs.f_bavail;
 #endif
 #if defined(Q_OS_WIN32)
     BOOL ret;
