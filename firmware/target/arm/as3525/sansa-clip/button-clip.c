@@ -20,6 +20,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "system.h"
 #include "button-target.h"
 #include "as3525.h"
 #ifndef BOOTLOADER
@@ -56,12 +57,22 @@ int button_read_device(void)
 {
     static int row = 0;
     static int buttons = 0;
+    static unsigned power_counter = 0;
 
     if(button_hold())
+    {
+        power_counter = HZ;
         return 0;
+    }
 
     /* direct GPIO connections */
-    if (GPIOA_PIN(7))
+    /* read power, but not if hold button was just released, since
+     * you basically always hit power due to the slider mechanism after
+     * releasing hold (wait 1 sec) */
+    if (power_counter)
+        power_counter--;
+
+    if (GPIOA_PIN(7) && !power_counter)
         buttons |= BUTTON_POWER;
     else
         buttons &= ~BUTTON_POWER;
