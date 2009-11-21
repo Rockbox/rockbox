@@ -182,6 +182,11 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
     int i;
     int usb_bars = VP_SB_ALLSCREENS; /* force statusbars */
 
+    lcd_clear_display();
+#ifdef HAVE_LCD_REMOTE
+    lcd_remote_clear_display();
+#endif
+
     FOR_NB_SCREENS(i)
     {
         struct screen *screen = &screens[i];
