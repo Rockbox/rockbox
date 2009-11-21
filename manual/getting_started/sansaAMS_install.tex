@@ -9,10 +9,13 @@ files:
       \url{http://forums.sandisk.com/sansa/board/message?board.id=e200&thread.id=13548}}
     \opt{fuze}{
       \url{http://forums.sandisk.com/sansa/board/message?board.id=sansafuse&thread.id=23276}}
+    \opt{clip}{
+      \url{http://forums.sandisk.com/sansa/board/message?board.id=clip&thread.id=15109}}
 
   \item The bootloader: 
     \opt{e200v2}{\download{bootloader/sandisk-sansa/e200v2/bootloader-e200v2.sansa}}
     \opt{fuze}{\download{bootloader/sandisk-sansa/fuze/bootloader-fuze.sansa}}
+    \opt{clip}{\download{bootloader/sandisk-sansa/clip/bootloader-clip.sansa}}
 
   \item The version of mkamsboot for your operating system from
     \download{bootloader/sandisk-sansa/mkamsboot/}
@@ -33,13 +36,15 @@ files:
   \begin{code} 
     \opt{fuze}{mkamsboot.exe fuzea.bin bootloader-fuze.sansa patched.bin}
     \opt{e200v2}{mkamsboot.exe e200pe.bin bootloader-e200v2.sansa patched.bin}
+    \opt{clip}{mkamsboot.exe m300a.bin bootloader-clip.sansa patched.bin}
   \end{code}
  
   If mkamsboot.exe does not report success, then retry or abort.
 
 \item Copy the output file (``patched.bin'' in the example given above) to the
   root of the device and rename it to the same name as the OF file you downloaded earlier 
-  \opt{fuze}{(``fuzea.bin''} \opt{e200v2}{(``e200pe.bin''} above).
+  \opt{fuze}{(``fuzea.bin''} \opt{e200v2}{(``e200pe.bin''}
+  \opt{clip}{(``m300a.bin''} above).
 
 \item Safely eject the device, unplug USB and wait for the firmware update to finish.
 \end{enumerate}
@@ -59,13 +64,15 @@ files:
   \begin{code} 
     \opt{fuze}{./mkamsboot fuzea.bin bootloader-fuze.sansa patched.bin}
     \opt{e200v2}{./mkamsboot e200pe.bin bootloader-e200v2.sansa patched.bin}
+    \opt{clip}{./mkamsboot m300a.bin bootloader-clip.sansa patched.bin}
   \end{code}
  
   If mkamsboot does not report success, then retry or abort.
 
 \item Copy the output file (``patched.bin'' in the example given above) to the
   root of the device and rename it to the same name as the OF file you downloaded earlier 
-  \opt{fuze}{(``fuzea.bin''} \opt{e200v2}{(``e200pe.bin''} above).
+  \opt{fuze}{(``fuzea.bin''} \opt{e200v2}{(``e200pe.bin''}
+  \opt{clip}{(``m300a.bin''} above).
 
 \item Safely eject the device, unplug USB and wait for the firmware update to finish.
 \end{enumerate}
