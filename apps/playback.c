@@ -1549,7 +1549,6 @@ static int audio_check_new_track(void)
     /* Move to the new track */
     track_ridx = (track_ridx + ci.new_track) & MAX_TRACK_MASK;
 
-    buf_set_base_handle(CUR_TI->audio_hid);
 
     if (automatic_skip)
     {
@@ -1904,6 +1903,7 @@ static void audio_thread(void)
             case Q_AUDIO_FINISH_LOAD:
                 LOGFQUEUE("audio < Q_AUDIO_FINISH_LOAD");
                 audio_finish_load_track();
+                buf_set_base_handle(CUR_TI->audio_hid);
                 break;
 
             case Q_AUDIO_PLAY:

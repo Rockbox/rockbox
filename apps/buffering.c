@@ -403,10 +403,17 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
 {
     struct memory_handle *dest;
     const struct memory_handle *src;
+    int32_t *here;
+    int32_t *there;
+    int32_t *end;
+    int32_t *begin;
+    size_t oldpos;
     size_t newpos;
     size_t size_to_move;
     size_t final_delta = *delta;
+    size_t n;
     int overlap;
+    int overlap_old;
 
     if (h == NULL || (src = *h) == NULL)
         return false;
@@ -423,33 +430,34 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
     mutex_lock(&llist_mutex);
     mutex_lock(&llist_mod_mutex);
 
-    newpos = RINGBUF_ADD((void *)src - (void *)buffer, final_delta);
+    oldpos = (void *)src - (void *)buffer;
+    newpos = RINGBUF_ADD(oldpos, final_delta);
     overlap = RINGBUF_ADD_CROSS(newpos, size_to_move, buffer_len - 1);
+    overlap_old = RINGBUF_ADD_CROSS(oldpos, size_to_move, buffer_len -1);
 
     if (overlap > 0) {
         /* Some part of the struct + data would wrap, maybe ok */
         size_t correction = 0;
         /* If the overlap lands inside the memory_handle */
-        if ((unsigned)overlap > data_size) {
-            /* Correct the position and real delta to prevent the struct from
-             * wrapping, this guarantees an aligned delta, I think */
-            correction = overlap - data_size;
-        } else if (!can_wrap) {
+        if (!can_wrap) {
             /* Otherwise the overlap falls in the data area and must all be
              * backed out.  This may become conditional if ever we move
              * data that is allowed to wrap (ie audio) */
             correction = overlap;
-            /* Align correction to four bytes, up */
-            correction = (correction+3) & ~3;
+        } else if ((unsigned)overlap > data_size) {
+            /* Correct the position and real delta to prevent the struct from
+             * wrapping, this guarantees an aligned delta, I think */
+            correction = overlap - data_size;
         }
         if (correction) {
+            /* Align correction to four bytes up */
+            correction = (correction + 3) & ~3; 
             if (final_delta < correction + sizeof(struct memory_handle)) {
                 /* Delta cannot end up less than the size of the struct */
                 mutex_unlock(&llist_mod_mutex);
                 mutex_unlock(&llist_mutex);
                 return false;
             }
-
             newpos -= correction;
             overlap -= correction;/* Used below to know how to split the data */
             final_delta -= correction;
@@ -484,38 +492,33 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
     if (src == cur_handle)
         cur_handle = dest;
 
-    if (overlap > 0) {
-        /* FIXME : this code is broken and can leave the data corrupted when
-         * the amount of data to move is close to the whole buffer size.
-         *
-         * Example : ('S' is the source data, '-' is empty buffer)
-         * Size of the buffer is 8 bytes, starts at 0.
-         * Size of the data to move is 7 bytes.
-         *
-         * -SSSSSSS
-         *  ^-------- start of source data == 1
-         *
-         * DD-DDDDD ('D' is desired destination data)
-         *    ^------ start of destination data == 3
-         *
-         *  memmove(3, 1, 5);
-         *  memmove(0, 7, 2);
-         *
-         * First memmove() call will leave the buffer in this state:
-         *
-         * -SSDDDDD
-         *       ^^
-         *       \--- data to be moved by the second memmove() call, but
-         *            overwritten by the first call.
-         *
-         * See FS#10605 for more details
-         */
-        size_t first_part = size_to_move - overlap;
-        memmove(dest, src, first_part);
-        memmove(buffer, (const char *)src + first_part, overlap);
+
+    /* Copying routine takes into account that the handles have a 
+     * distance between each other which is a multiple of four.  Faster 2 word
+     * copy may be ok but do this for safety and because wrapped copies should
+     * be fairly uncommon */ 
+
+    here = (int32_t *)((RINGBUF_ADD(oldpos, size_to_move - 1) & ~3)+ (intptr_t)buffer);
+    there =(int32_t *)((RINGBUF_ADD(newpos, size_to_move - 1) & ~3)+ (intptr_t)buffer);
+    end = (int32_t *)(( intptr_t)buffer + buffer_len - 4);
+    begin =(int32_t *)buffer;
+    
+    n = (size_to_move & ~3)/4;
+
+    if ( overlap_old > 0 || overlap > 0 ) {   
+    /* Old or moved handle wraps */ 	
+    	while (n--) {
+       	if (here < begin)
+          here =  end;
+       	if (there < begin)
+          there = end;
+       	*there-- = *here--;
+    	}
     } else {
-        memmove(dest, src, size_to_move);
-    }
+    /* both handles do not wrap */
+        memmove(dest,src,size_to_move);
+    } 
+
 
     /* Update the caller with the new location of h and the distance moved */
     *h = dest;
@@ -641,10 +644,10 @@ static bool buffer_handle(int handle_id)
         if (RINGBUF_ADD_CROSS(h->widx, copy_n, buf_ridx) >= 0)
             return false;
 
-        /* This would read into the next handle, this is broken */
+        /* This would read into the next handle, this is broken 
         if (h->next && RINGBUF_ADD_CROSS(h->widx, copy_n,
                     (unsigned)((void *)h->next - (void *)buffer)) > 0) {
-            /* Try to recover by truncating this file */
+             Try to recover by truncating this file 
             copy_n = RINGBUF_ADD_CROSS(h->widx, copy_n,
                     (unsigned)((void *)h->next - (void *)buffer));
             h->filerem -= copy_n;
@@ -654,7 +657,7 @@ static bool buffer_handle(int handle_id)
                 continue;
             else
                 break;
-        }
+        }  */
 
         /* rc is the actual amount read */
         int rc = read(h->fd, &buffer[h->widx], copy_n);
