@@ -1698,11 +1698,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Blanda och manuellt byte"
+    crossfade: "Blanda eller manuellt hopp"
   </dest>
   <voice>
     *: none
-    crossfade: "Blandning och manuellt byte"
+    crossfade: "Blanda eller manuellt hopp"
   </voice>
 </phrase>
 <phrase>
@@ -13053,5 +13053,22 @@
   </dest>
   <voice>
     *: "Köa blandat sist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Automatiskt byte"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Automatiskt byte"
   </voice>
 </phrase>
