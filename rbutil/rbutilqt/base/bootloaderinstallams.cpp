@@ -118,10 +118,8 @@ void BootloaderInstallAms::installStage2(void)
     
     patch_firmware(sum.model,firmware_revision(sum.model),firmware_size,buf,len,of_packed,of_packedsize,rb_packed,rb_packedsize);
 
-    /* construct path for write out. combine path of m_blfile with filename from of */
-    QString outfilename = QFileInfo(m_blfile).absolutePath() + "/" +QFileInfo(m_offile).fileName();
-    /* write out file*/ 
-    QFile out(outfilename); 
+    /* write out file */
+    QFile out(m_blfile);
     
     if(!out.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
