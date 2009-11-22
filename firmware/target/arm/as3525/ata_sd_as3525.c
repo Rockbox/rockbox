@@ -662,13 +662,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
     last_disk_activity = current_tick;
 
-    ret = sd_wait_for_state(drive, SD_TRAN);
-    if (ret < 0)
-    {
-        ret -= 20;
-        goto sd_transfer_error;
-    }
-
     dma_retain();
 
     while(count)
@@ -692,7 +685,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                 ret = sd_select_bank(bank);
                 if (ret < 0)
                 {
-                    ret -= 2*20;
+                    ret -= 20;
                     goto sd_transfer_error;
                 }
             }
@@ -718,13 +711,13 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         ret = sd_wait_for_state(drive, SD_TRAN);
         if (ret < 0)
         {
-            ret -= 3*20;
+            ret -= 2*20;
             goto sd_transfer_error;
         }
 
         if(!send_cmd(drive, cmd, bank_start, MCI_ARG, NULL))
         {
-            ret -= 4*20;
+            ret -= 3*20;
             goto sd_transfer_error;
         }
 
@@ -770,7 +763,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_FLAGS, NULL))
         {
-            ret = -5*20;
+            ret = -4*20;
             goto sd_transfer_error;
         }
     }
