@@ -73,7 +73,7 @@ bool BootloaderInstallIpod::install(void)
     }
 
     if(ipod.macpod) {
-        emit logItem(tr("Warning: This is a MacPod, Rockbox only runs on WinPods.\n"
+        emit logItem(tr("Warning: This is a MacPod, Rockbox only runs on WinPods. \n"
                     "See http://www.rockbox.org/wiki/IpodConversionToFAT32"), LOGERROR);
         emit done(true);
         return false;
@@ -112,7 +112,7 @@ void BootloaderInstallIpod::installStage2(void)
     }
 
     if(ipod.macpod) {
-        emit logItem(tr("Warning: This is a MacPod, Rockbox only runs on WinPods.\n"
+        emit logItem(tr("Warning: This is a MacPod, Rockbox only runs on WinPods. \n"
                     "See http://www.rockbox.org/wiki/IpodConversionToFAT32"), LOGERROR);
         emit done(true);
         return;
@@ -235,11 +235,11 @@ bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
         sprintf(ipod->diskname, "\\\\.\\PhysicalDrive%i",
                 Autodetection::resolveDevicename(m_blfile).toInt());
 #elif defined(Q_OS_MACX)
-        sprintf(ipod->diskname,
+        sprintf(ipod->diskname, "%s",
             qPrintable(Autodetection::resolveDevicename(m_blfile)
             .remove(QRegExp("s[0-9]+$"))));
 #else
-        sprintf(ipod->diskname,
+        sprintf(ipod->diskname, "%s",
             qPrintable(Autodetection::resolveDevicename(m_blfile)
             .remove(QRegExp("[0-9]+$"))));
 #endif
