@@ -265,7 +265,7 @@ QString Autodetection::resolveMountPoint(QString device)
         if(QString(ent->mnt_fsname).startsWith(device)
            && QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)) {
             endmntent(mn);
-            qDebug() << "[Autodetect] resolved mountpoint is:" << mntinf->nmt_dir;
+            qDebug() << "[Autodetect] resolved mountpoint is:" << ent->mnt_dir;
             return QString(ent->mnt_dir);
         }
     }
