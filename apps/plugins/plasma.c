@@ -53,6 +53,9 @@ static size_t        gbuf_size = 0;
 #endif
 static unsigned char sp1, sp2, sp3, sp4; /* Speed of plasma */
 static int plasma_frequency;
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+static bool boosted = false;
+#endif
 
 /* Key assignement, all bitmapped models */
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
@@ -260,6 +263,10 @@ void cleanup(void *parameter)
 {
     (void)parameter;
     
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    if (boosted)
+        rb->cpu_boost(false);
+#endif
 #ifndef HAVE_LCD_COLOR
     grey_release();
 #endif
@@ -275,8 +282,12 @@ void cleanup(void *parameter)
 int main(void)
 {
     plasma_frequency = 1;
-    int button, x, y;
-    unsigned char p1,p2,p3,p4,t1,t2,t3,t4, z;
+    int button, delay, x, y;
+    unsigned char p1,p2,p3,p4,t1,t2,t3,t4, z,z0;
+    long last_tick = *rb->current_tick;
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    int cumulated_lag = 0;
+#endif
 #ifdef HAVE_LCD_COLOR
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     unsigned char *ptr;
@@ -325,10 +336,10 @@ int main(void)
         {
             t3=p3;
             t4=p4;
+            z0 = wave_array[t1] + wave_array[t2];
             for(x = 0; x < LCD_WIDTH; ++x)
             {
-                z = wave_array[t1] + wave_array[t2] + wave_array[t3]
-                  + wave_array[t4];  
+                z = z0 + wave_array[t3] + wave_array[t4];  
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
                 *ptr++ = z;
 #else
@@ -356,7 +367,22 @@ int main(void)
         grey_ub_gray_bitmap(greybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 
-        button = rb->button_get(false);
+        delay = last_tick - *rb->current_tick + HZ/33;
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        if (!boosted && delay < 0)
+        {
+            cumulated_lag -= delay;     /* proportional increase */
+            if (cumulated_lag >= HZ)
+                rb->cpu_boost(boosted = true);
+        }
+        else if (boosted && delay > 1)  /* account for jitter */
+        {
+            if (--cumulated_lag <= 0)   /* slow decrease */
+                rb->cpu_boost(boosted = false);
+        }
+#endif
+        button = rb->button_get_w_tmo(MAX(0, delay));
+        last_tick = *rb->current_tick;
 
         switch(button)
         {
