@@ -1737,7 +1737,7 @@ int ipod_scan(struct ipod_t* ipod)
     int i;
     int n = 0;
     int ipod_version;
-    char last_ipod[4096];
+    struct ipod_t ipod_found;
     int denied = 0;
     int result;
 
@@ -1780,9 +1780,13 @@ int ipod_scan(struct ipod_t* ipod)
          }
 
          ipod_version=(ipod->ipod_directory[ipod->ososimage].vers>>8);
-         /* Windows requires the ipod in R/W mode for SCSI Inquiry */
          ipod->ramsize = 0;
+#ifdef __WIN32__
+         /* Windows requires the ipod in R/W mode for SCSI Inquiry.
+          * ipod_reopen_rw does unmount the player on OS X so do this on
+          * W32 only during scanning. */
          ipod_reopen_rw(ipod);
+#endif
          ipod_get_xmlinfo(ipod);
          ipod_get_ramsize(ipod);
          if (getmodel(ipod,ipod_version) < 0) {
@@ -1798,13 +1802,15 @@ int ipod_scan(struct ipod_t* ipod)
              ipod->modelstr,ipod->macpod ? "macpod" : "winpod",ipod->diskname);
 #endif
          n++;
-         strcpy(last_ipod,ipod->diskname);
+         /* save the complete ipod_t structure for match. The for loop might
+          * overwrite it, so we need to restore it later if only one found. */
+         memcpy(&ipod_found, ipod, sizeof(struct ipod_t));
          ipod_close(ipod);
     }
 
     if (n==1) {
-        /* Remember the disk name */
-        strcpy(ipod->diskname,last_ipod);
+        /* restore the ipod_t structure, it might have been overwritten */
+        memcpy(ipod, &ipod_found, sizeof(struct ipod_t));
     }
     else if(n == 0 && denied) {
         printf("[ERR]  FATAL: Permission denied on %d device(s) and no ipod detected.\n", denied);
