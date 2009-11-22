@@ -177,47 +177,6 @@ bool cfi_get_flash_info(struct flash_info* pInfo)
     return false;
 }
 
-
-/*********** Utility Functions ************/
-
-
-/* Tool function to calculate a CRC32 across some buffer */
-/* third argument is either 0xFFFFFFFF to start or value from last piece */
-unsigned crc_32(const unsigned char* buf, unsigned len, unsigned crc32)
-{
-    /* CCITT standard polynomial 0x04C11DB7 */
-    static const unsigned crc32_lookup[16] = 
-    {   /* lookup table for 4 bits at a time is affordable */
-        0x00000000, 0x04C11DB7, 0x09823B6E, 0x0D4326D9, 
-        0x130476DC, 0x17C56B6B, 0x1A864DB2, 0x1E475005, 
-        0x2608EDB8, 0x22C9F00F, 0x2F8AD6D6, 0x2B4BCB61, 
-        0x350C9B64, 0x31CD86D3, 0x3C8EA00A, 0x384FBDBD
-    };
-    
-    unsigned char byte;
-    unsigned t;
-
-    while (len--)
-    {   
-        byte = *buf++; /* get one byte of data */
-
-        /* upper nibble of our data */
-        t = crc32 >> 28; /* extract the 4 most significant bits */
-        t ^= byte >> 4; /* XOR in 4 bits of data into the extracted bits */
-        crc32 <<= 4; /* shift the CRC register left 4 bits */     
-        crc32 ^= crc32_lookup[t]; /* do the table lookup and XOR the result */
-
-        /* lower nibble of our data */
-        t = crc32 >> 28; /* extract the 4 most significant bits */
-        t ^= byte & 0x0F; /* XOR in 4 bits of data into the extracted bits */
-        crc32 <<= 4; /* shift the CRC register left 4 bits */     
-        crc32 ^= crc32_lookup[t]; /* do the table lookup and XOR the result */
-    }
-    
-    return crc32;
-}
-
-
 /***************** User Interface Functions *****************/
 int wait_for_button(void)
 {
@@ -357,18 +316,18 @@ bool detect_valid_bootloader(const unsigned char *addr, int len)
 {
     int i;
     unsigned long crc32;
-    
+
     /* Try to scan through all valid bootloaders. */
     for (i = 0; valid_bootloaders[i][0]; i++)
     {
         if (len > 0 && len != (long)valid_bootloaders[i][0])
             continue;
-        
-        crc32 = crc_32(addr, valid_bootloaders[i][0], 0xffffffff);
+
+        crc32 = rb->crc_32(addr, valid_bootloaders[i][0], 0xffffffff);
         if (crc32 == valid_bootloaders[i][1])
             return true;
     }
-    
+
     return false;
 }
 
