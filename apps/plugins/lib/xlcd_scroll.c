@@ -171,7 +171,7 @@ void xlcd_scroll_left(int count)
         int bx, y;
         unsigned char *addr = rb->lcd_framebuffer + blocklen;
 #if LCD_DEPTH == 2
-        unsigned fill = 0x55 * (~rb->lcd_get_background() & 3);
+        unsigned fill = (0x55 * (~rb->lcd_get_background() & 3)) << bitcount;
 #endif
 
         for (y = 0; y < LCD_HEIGHT; y++)
@@ -479,12 +479,9 @@ void xlcd_scroll_up(int count)
         ".su_iloop:              \n"  /* repeat for all rows */
             "sub.l   %[wide],%%a1\n"  /* address -= width */
 
-            "clr.l   %%d0        \n"
-            "move.b  (%%a1),%%d0 \n"  /* get data byte */
             "lsl.l   #8,%%d1     \n"  /* old data to 2nd byte */
-            "or.l    %%d1,%%d0   \n"  /* combine old data */
-            "clr.l   %%d1        \n"
-            "move.b  %%d0,%%d1   \n"  /* keep data for next round */
+            "move.b  (%%a1),%%d1 \n"  /* combine with new data byte */
+            "move.l  %%d1,%%d0   \n"  /* keep data for next round */
             "lsr.l   %[cnt],%%d0 \n"  /* shift right */
             "move.b  %%d0,(%%a1) \n"  /* store data */
 
