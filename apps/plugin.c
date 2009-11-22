@@ -675,6 +675,7 @@ static const struct plugin_api rockbox_api = {
 #if (CONFIG_CODEC == SWCODEC)
     pcmbuf_beep,
 #endif
+    crc_32,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

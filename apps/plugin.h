@@ -95,6 +95,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "ata_idle_notify.h"
 #include "settings_list.h"
 #include "timefuncs.h"
+#include "crc32.h"
 
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
@@ -134,7 +135,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 174
+#define PLUGIN_API_VERSION 175
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -848,6 +849,7 @@ struct plugin_api {
                         size_t duration,
                         int amplitude);
 #endif
+    unsigned (*crc_32)(const void *src, unsigned len, unsigned crc32);
 };
 
 /* plugin header */

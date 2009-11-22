@@ -111,6 +111,9 @@ static bool taginfo_ready = true;
 
 static bool use_dsp;
 
+static bool checksum;
+static uint32_t crc32;
+
 static volatile unsigned int elapsed;
 static volatile bool codec_playing;
 static volatile long endtick;
@@ -172,30 +175,31 @@ void init_wav(char* filename)
 }
 
 
-void close_wav(void) {
-  int filesize = rb->filesize(wavinfo.fd);
-  int channels = (wavinfo.stereomode == STEREO_MONO) ? 1 : 2;
-  int bps = 16; /* TODO */
+void close_wav(void)
+{
+    int filesize = rb->filesize(wavinfo.fd);
+    int channels = (wavinfo.stereomode == STEREO_MONO) ? 1 : 2;
+    int bps = 16; /* TODO */
 
-  /* We assume 16-bit, Stereo */
+    /* We assume 16-bit, Stereo */
 
-  rb->lseek(wavinfo.fd,0,SEEK_SET);
+    rb->lseek(wavinfo.fd,0,SEEK_SET);
 
-  int2le32(wav_header+4, filesize-8); /* ChunkSize */
+    int2le32(wav_header+4, filesize-8); /* ChunkSize */
 
-  int2le16(wav_header+22, channels);
+    int2le16(wav_header+22, channels);
 
-  int2le32(wav_header+24, wavinfo.samplerate);
+    int2le32(wav_header+24, wavinfo.samplerate);
 
-  int2le32(wav_header+28, wavinfo.samplerate * channels * (bps / 8)); /* ByteRate */
+    int2le32(wav_header+28, wavinfo.samplerate * channels * (bps / 8)); /* ByteRate */
 
-  int2le16(wav_header+32, channels * (bps / 8));
+    int2le16(wav_header+32, channels * (bps / 8));
 
-  int2le32(wav_header+40, filesize - 44);  /* Subchunk2Size */
+    int2le32(wav_header+40, filesize - 44);  /* Subchunk2Size */
 
-  rb->write(wavinfo.fd, wav_header, sizeof(wav_header));
+    rb->write(wavinfo.fd, wav_header, sizeof(wav_header));
 
-  rb->close(wavinfo.fd);
+    rb->close(wavinfo.fd);
 }
 
 /* Returns buffer to malloc array. Only codeclib should need this. */
@@ -238,15 +242,6 @@ static int process_dsp(const void *ch1, const void *ch2, int count)
     return written_count;
 }
 
-/* Null output */
-static void pcmbuf_insert_null(const void *ch1, const void *ch2, int count)
-{
-    if (use_dsp) process_dsp(ch1, ch2, count);
-
-    /* Prevent idle poweroff */
-    rb->reset_poweroff_timer();
-}
-
 static inline int32_t clip_sample(int32_t sample)
 {
     if ((int16_t)sample != sample)
@@ -255,6 +250,111 @@ static inline int32_t clip_sample(int32_t sample)
     return sample;
 }
 
+/* Null output */
+static void pcmbuf_insert_null(const void *ch1, const void *ch2, int count)
+{
+    if (use_dsp)
+        process_dsp(ch1, ch2, count);
+
+    /* Prevent idle poweroff */
+    rb->reset_poweroff_timer();
+}
+
+static void pcmbuf_insert_checksum(const void *ch1, const void *ch2, int count)
+{
+    const int16_t* data1_16;
+    const int16_t* data2_16;
+    const int32_t* data1_32;
+    const int32_t* data2_32;
+    const int scale = wavinfo.sampledepth - 15;
+    const int dc_bias = 1 << (scale - 1);
+    int channels = (wavinfo.stereomode == STEREO_MONO) ? 1 : 2;
+
+    /* Prevent idle poweroff */
+    rb->reset_poweroff_timer();
+
+    if (use_dsp) {
+        count = process_dsp(ch1, ch2, count);
+        wavinfo.totalsamples += count;
+        if (channels == 1)
+        {
+            unsigned char *s = dspbuffer, *d = dspbuffer;
+            int c = count;
+            while (c-- > 0)
+            {
+                *d++ = *s++;
+                *d++ = *s++;
+                s++;
+                s++;
+            }
+        }
+        crc32 = rb->crc_32(dspbuffer, count * 2 * channels, crc32);
+    }
+    else
+    {
+        if (wavinfo.sampledepth <= 16) {
+            data1_16 = ch1;
+            data2_16 = ch2;
+
+            switch(wavinfo.stereomode)
+            {
+                case STEREO_INTERLEAVED:
+                    while (count--) {
+                        crc32 = rb->crc_32(data1_16, 4, crc32);
+                        data1_16 += 2;
+                    }
+                    break;
+ 
+                case STEREO_NONINTERLEAVED:
+                    while (count--) {
+                        crc32 = rb->crc_32(data1_16++, 2, crc32);
+                        crc32 = rb->crc_32(data2_16++, 2, crc32);
+                    }
+                    break;
+     
+                case STEREO_MONO:
+                    while (count--) {
+                        crc32 = rb->crc_32(data1_16++, 2, crc32);
+                    }
+                    break;
+            }
+        }
+        else
+        {
+            data1_32 = ch1;
+            data2_32 = ch2;
+
+            switch(wavinfo.stereomode)
+            {
+                case STEREO_INTERLEAVED:
+                    while (count--) {
+                        int16_t s = clip_sample((*data1_32++ + dc_bias) >> scale);
+                        crc32 = rb->crc_32(&s, 2, crc32);
+                        s = clip_sample((*data1_32++ + dc_bias) >> scale);
+                        crc32 = rb->crc_32(&s, 2, crc32);
+                    }
+                    break;
+ 
+                case STEREO_NONINTERLEAVED:
+                    while (count--) {
+                        int16_t s = clip_sample((*data1_32++ + dc_bias) >> scale);
+                        crc32 = rb->crc_32(&s, 2, crc32);
+                        s = clip_sample((*data2_32++ + dc_bias) >> scale);
+                        crc32 = rb->crc_32(&s, 2, crc32);
+                    }
+
+                    break;
+
+                case STEREO_MONO:
+                    while (count--) {
+                        int16_t s = clip_sample((*data1_32++ + dc_bias) >> scale);
+                        crc32 = rb->crc_32(&s, 2, crc32);
+                    }
+                    break;
+            }
+        }
+    }
+}
 
 /* WAV output */
 static void pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
@@ -287,76 +387,77 @@ static void pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
             }
         }
         rb->write(wavinfo.fd, dspbuffer, count * 2 * channels);
-    } else {
-    
-    if (wavinfo.sampledepth <= 16) {
-        data1_16 = ch1;
-        data2_16 = ch2;
-
-        switch(wavinfo.stereomode)
-        {
-            case STEREO_INTERLEAVED:
-                while (count--) {
-                    int2le16(p,*data1_16++);
-                    p += 2;
-                    int2le16(p,*data1_16++);
-                    p += 2;
-                }
-                break;
- 
-            case STEREO_NONINTERLEAVED:
-                while (count--) {
-                    int2le16(p,*data1_16++);
-                    p += 2;
-                    int2le16(p,*data2_16++);
-                    p += 2;
-                }
-
-                break;
-     
-            case STEREO_MONO:
-                while (count--) {
-                    int2le16(p,*data1_16++);
-                    p += 2;
-                }
-                break;
-        }
-    } else {
-        data1_32 = ch1;
-        data2_32 = ch2;
-
-        switch(wavinfo.stereomode)
-        {
-            case STEREO_INTERLEAVED:
-                while (count--) {
-                    int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
-                    p += 2;
-                    int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
-                    p += 2;
-                }
-                break;
- 
-            case STEREO_NONINTERLEAVED:
-                while (count--) {
-                    int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
-                    p += 2;
-                    int2le16(p, clip_sample((*data2_32++ + dc_bias) >> scale));
-                    p += 2;
-                }
-
-                break;
-     
-            case STEREO_MONO:
-                while (count--) {
-                    int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
-                    p += 2;
-                }
-                break;
-        }
     }
+    else
+    { 
+        if (wavinfo.sampledepth <= 16) {
+            data1_16 = ch1;
+            data2_16 = ch2;
 
-    wavinfo.totalsamples += count;
-    rb->write(wavinfo.fd, wavbuffer, p - wavbuffer);
+            switch(wavinfo.stereomode)
+            {
+                case STEREO_INTERLEAVED:
+                    while (count--) {
+                        int2le16(p,*data1_16++);
+                        p += 2;
+                        int2le16(p,*data1_16++);
+                        p += 2;
+                    }
+                    break;
+ 
+                case STEREO_NONINTERLEAVED:
+                    while (count--) {
+                        int2le16(p,*data1_16++);
+                        p += 2;
+                        int2le16(p,*data2_16++);
+                        p += 2;
+                    }
+
+                    break;
+
+                case STEREO_MONO:
+                    while (count--) {
+                        int2le16(p,*data1_16++);
+                        p += 2;
+                    }
+                    break;
+            }
+        } else {
+            data1_32 = ch1;
+            data2_32 = ch2;
+
+            switch(wavinfo.stereomode)
+            {
+                case STEREO_INTERLEAVED:
+                    while (count--) {
+                        int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
+                        p += 2;
+                        int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
+                        p += 2;
+                    }
+                    break;
+ 
+                case STEREO_NONINTERLEAVED:
+                    while (count--) {
+                        int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
+                        p += 2;
+                        int2le16(p, clip_sample((*data2_32++ + dc_bias) >> scale));
+                        p += 2;
+                    }
+
+                    break;
+
+                case STEREO_MONO:
+                    while (count--) {
+                        int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
+                        p += 2;
+                    }
+                    break;
+            }
+        }
+
+        wavinfo.totalsamples += count;
+        rb->write(wavinfo.fd, wavbuffer, p - wavbuffer);
     } /* else */
 }
 
@@ -481,9 +582,12 @@ static void init_ci(void)
 
     if (wavinfo.fd >= 0) {
         ci.pcmbuf_insert = pcmbuf_insert_wav;
+    } else if (checksum){
+        ci.pcmbuf_insert = pcmbuf_insert_checksum;
     } else {
         ci.pcmbuf_insert = pcmbuf_insert_null;
     }
+
     ci.set_elapsed = set_elapsed;
     ci.read_filebuf = read_filebuf;
     ci.request_buffer = request_buffer;
@@ -636,6 +740,9 @@ static enum plugin_status test_track(const char* filename)
     if (use_dsp)
         rb->dsp_configure(ci.dsp, DSP_RESET, 0);
 
+    if (checksum)
+        crc32 = 0xffffffff;
+
     starttick = *rb->current_tick;
 
     codec_playing = true;
@@ -656,7 +763,12 @@ static enum plugin_status test_track(const char* filename)
 
     log_text(str,true);
     
-    if (wavinfo.fd < 0) 
+    if (checksum)
+    {
+        rb->snprintf(str, sizeof(str), "CRC32 - %x", (unsigned)crc32);
+        log_text(str,true);
+    }
+    else if (wavinfo.fd < 0) 
     {
         /* Display benchmark information */
         rb->snprintf(str,sizeof(str),"Decode time - %d.%02ds",(int)ticks/100,(int)ticks%100);
@@ -727,6 +839,19 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_clear_display();
     rb->lcd_update();
 
+    enum
+    {
+        SPEED_TEST = 0,
+        SPEED_TEST_DIR,
+        WRITE_WAV,
+        SPEED_TEST_WITH_DSP,
+        SPEED_TEST_DIR_WITH_DSP,
+        WRITE_WAV_WITH_DSP,
+        CHECKSUM,
+        CHECKSUM_DIR,
+        QUIT,
+    };
+
     MENUITEM_STRINGLIST(
         menu, "test_codec", NULL,
         "Speed test",
@@ -735,15 +860,17 @@ enum plugin_status plugin_start(const void* parameter)
         "Speed test with DSP",
         "Speed test folder with DSP",
         "Write WAV with DSP",
+        "Checksum",
+        "Checksum folder",
         "Quit",
     );
 
 show_menu:
     rb->lcd_clear_display();
 
-    result=rb->do_menu(&menu,&selection, NULL, false);
+    result = rb->do_menu(&menu, &selection, NULL, false);
 
-    if (result == 6)
+    if (result == QUIT)
     {
         res = PLUGIN_OK;
         goto exit;
@@ -751,13 +878,17 @@ show_menu:
 
     scandir = 0;
 
-    if ((use_dsp = ((result >= 3) && (result <=5)))) {
+    if ((checksum = (result == CHECKSUM || result == CHECKSUM_DIR)))
+        result -= 6;
+
+    if ((use_dsp = ((result >= SPEED_TEST_WITH_DSP)
+                   && (result <= WRITE_WAV_WITH_DSP)))) {
         result -= 3;
     }
-    if (result==0) {
+    if (result == SPEED_TEST) {
         wavinfo.fd = -1;
         log_init(false);
-    } else if (result==1) {
+    } else if (result == SPEED_TEST_DIR) {
         wavinfo.fd = -1;
         scandir = 1;
 
@@ -767,7 +898,7 @@ show_menu:
             res = PLUGIN_ERROR;
             goto exit;
         }
-    } else if (result==2) {
+    } else if (result == WRITE_WAV) {
         log_init(false);
         init_wav("/test.wav");
         if (wavinfo.fd < 0) {
@@ -817,7 +948,6 @@ show_menu:
             close_wav();
             log_text("Wrote /test.wav",true);
         }
-
         while (rb->button_get(true) != TESTCODEC_EXITBUTTON);
     }
     goto show_menu;
