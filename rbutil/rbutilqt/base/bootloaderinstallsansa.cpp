@@ -75,6 +75,15 @@ bool BootloaderInstallSansa::install(void)
         emit done(true);
         return false;
     }
+    if(sansa.hasoldbootloader) {
+        emit logItem(tr("OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
+               "You must reinstall the original Sansa firmware before running\n"
+               "sansapatcher for the first time.\n"
+               "See http://www.rockbox.org/wiki/SansaE200Install\n"),
+               LOGERROR);
+        emit done(true);
+        return false;
+    }
     emit logItem(tr("Downloading bootloader file"), LOGINFO);
 
     downloadBlStart(m_blurl);
@@ -94,16 +103,6 @@ void BootloaderInstallSansa::installStage2(void)
     if(!sansaInitialize(&sansa)) {
             emit done(true);
             return;
-    }
-
-    if(sansa.hasoldbootloader) {
-        emit logItem(tr("OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
-               "You must reinstall the original Sansa firmware before running\n"
-               "sansapatcher for the first time.\n"
-               "See http://www.rockbox.org/wiki/SansaE200Install\n"),
-               LOGERROR);
-        emit done(true);
-        return;
     }
 
     if(sansa_reopen_rw(&sansa) < 0) {
@@ -226,6 +225,9 @@ bool BootloaderInstallSansa::sansaInitialize(struct sansa_t *sansa)
 #if defined(Q_OS_WIN32)
         sprintf(sansa->diskname, "\\\\.\\PhysicalDrive%i",
                 Autodetection::resolveDevicename(m_blfile).toInt());
+#elif defined(Q_OS_MACX)
+        sprintf(sansa->diskname,
+            qPrintable(Autodetection::resolveDevicename(m_blfile).remove(QRegExp("s[0-9]+$"))));
 #else
         sprintf(sansa->diskname,
             qPrintable(Autodetection::resolveDevicename(m_blfile).remove(QRegExp("[0-9]+$"))));
