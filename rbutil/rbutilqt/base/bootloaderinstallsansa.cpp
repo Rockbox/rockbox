@@ -134,10 +134,14 @@ void BootloaderInstallSansa::installStage2(void)
     if(sansa_add_bootloader(&sansa, blfile.toLatin1().data(),
             FILETYPE_MI4) == 0) {
         emit logItem(tr("Successfully installed bootloader"), LOGOK);
-        logInstall(LogAdd);
-        emit done(false);
         sansa_close(&sansa);
-        return;
+#if defined(Q_OS_MACX)
+        m_remountDevice = sansa.diskname;
+        connect(this, SIGNAL(remounted(bool)), this, SLOT(installStage3(bool)));
+        waitRemount();
+#else
+        installStage3(true);
+#endif
     }
     else {
         emit logItem(tr("Failed to install bootloader"), LOGERROR);
@@ -146,6 +150,22 @@ void BootloaderInstallSansa::installStage2(void)
         return;
     }
 
+}
+
+
+void BootloaderInstallSansa::installStage3(bool mounted)
+{
+    if(mounted) {
+        logInstall(LogAdd);
+        emit logItem(tr("Bootloader Installation complete."), LOGINFO);
+        emit done(false);
+        return;
+    }
+    else {
+        emit logItem(tr("Writing log aborted"), LOGERROR);
+        emit done(true);
+    }
+    qDebug() << "version installed:" << m_blversion.toString(Qt::ISODate);
 }
 
 

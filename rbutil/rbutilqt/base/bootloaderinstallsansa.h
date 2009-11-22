@@ -42,6 +42,7 @@ class BootloaderInstallSansa : public BootloaderInstallBase
 
     private slots:
         void installStage2(void);
+        void installStage3(bool);
 };
 
 

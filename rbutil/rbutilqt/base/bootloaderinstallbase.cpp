@@ -23,6 +23,12 @@
 #include "bootloaderinstallbase.h"
 #include "utils.h"
 
+#if defined(Q_OS_MACX)
+#include <sys/param.h>
+#include <sys/ucred.h>
+#include <sys/mount.h>
+#endif
+
 BootloaderInstallBase::BootloaderType BootloaderInstallBase::installed(void)
 {
     return BootloaderUnknown;
@@ -186,6 +192,52 @@ QString BootloaderInstallBase::postinstallHints(QString model)
         return msg;
     else
         return QString("");
+}
+
+
+#if defined(Q_OS_MACX)
+void BootloaderInstallBase::waitRemount()
+{
+    m_remountTries = 600;
+    emit logItem(tr("Waiting for system to remount player"), LOGINFO);
+
+    QTimer::singleShot(100, this, SLOT(checkRemount()));
+}
+#endif
+
+
+void BootloaderInstallBase::checkRemount()
+{
+#if defined(Q_OS_MACX)
+    if(m_remountTries--) {
+        int status = 0;
+        // check if device has been remounted
+        QCoreApplication::processEvents();
+        int num;
+        struct statfs *mntinf;
+
+        num = getmntinfo(&mntinf, MNT_WAIT);
+        while(num--) {
+            if(QString(mntinf->f_mntfromname).startsWith(m_remountDevice)
+                    && QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive))
+                status = 1;
+            mntinf++;
+        }
+        if(!status) {
+            // still not remounted, restart timer.
+            QTimer::singleShot(500, this, SLOT(checkRemount()));
+            qDebug() << "player not remounted yet" << m_remountDevice;
+        }
+        else {
+            emit logItem(tr("Player remounted"), LOGINFO);
+            emit remounted(true);
+        }
+    }
+    else {
+        emit logItem(tr("Timeout on remount"), LOGERROR);
+        emit remounted(false);
+    }
+#endif
 }
 
 

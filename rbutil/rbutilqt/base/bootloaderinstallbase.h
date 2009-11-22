@@ -74,6 +74,10 @@ class BootloaderInstallBase : public QObject
         void downloadReqFinished(int id, bool error);
         void downloadBlFinish(bool error);
         void installBlfile(void);
+
+        // NOTE: we need to keep this slot even on targets that don't need it
+        // -- using the preprocessor here confused moc.
+        void checkRemount(void);
     protected:
         enum LogMode
             { LogAdd, LogRemove };
@@ -88,11 +92,22 @@ class BootloaderInstallBase : public QObject
         QTemporaryFile m_tempfile; //! temporary file for download
         QDateTime m_blversion; //! download timestamp used for version information
         QString m_offile;      //! path to the offile
+#if defined(Q_OS_MACX)
+        void waitRemount(void);
+
+        int m_remountTries;
+        QString m_remountDevice;
+#endif
+
     signals:
         void downloadDone(void); //! internal signal sent when download finished.
         void done(bool);
         void logItem(QString, int); //! set logger item
         void logProgress(int, int); //! set progress bar.
+
+        // NOTE: we need to keep this signal even on targets that don't need it
+        // -- using the preprocessor here confused moc.
+        void remounted(bool);
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(BootloaderInstallBase::Capabilities)

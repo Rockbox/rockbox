@@ -129,16 +129,35 @@ void BootloaderInstallIpod::installStage2(void)
     m_tempfile.close();
     if(add_bootloader(&ipod, blfile.toLatin1().data(), FILETYPE_DOT_IPOD) == 0) {
         emit logItem(tr("Successfull added bootloader"), LOGOK);
-        logInstall(LogAdd);
-        emit done(false);
         ipod_close(&ipod);
-        return;
+#if defined(Q_OS_MACX)
+        m_remountDevice = ipod.diskname;
+        connect(this, SIGNAL(remounted(bool)), this, SLOT(installStage3(bool)));
+        waitRemount();
+#else
+        installStage3(true);
+#endif
     }
     else {
         emit logItem(tr("Failed to add bootloader"), LOGERROR);
         ipod_close(&ipod);
         emit done(true);
         return;
+    }
+}
+
+
+void BootloaderInstallIpod::installStage3(bool mounted)
+{
+    if(mounted) {
+        logInstall(LogAdd);
+        emit logItem(tr("Bootloader Installation complete."), LOGINFO);
+        emit done(false);
+        return;
+    }
+    else {
+        emit logItem(tr("Writing log aborted"), LOGERROR);
+        emit done(true);
     }
     qDebug() << "[BootloaderInstallIpod] version installed:" << m_blversion.toString(Qt::ISODate);
 }
@@ -248,6 +267,8 @@ bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
     }
     else {
         ipod_scan(ipod);
+        qDebug() << "[BootloaderInstallIpod] ipodpatcher: scanning, found device"
+                 << ipod->diskname;
     }
     if(ipod_open(ipod, 0) < 0) {
         emit logItem(tr("Could not open Ipod"), LOGERROR);

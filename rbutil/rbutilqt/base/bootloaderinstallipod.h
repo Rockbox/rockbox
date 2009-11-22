@@ -40,6 +40,7 @@ class BootloaderInstallIpod : public BootloaderInstallBase
 
     private slots:
         void installStage2(void);
+        void installStage3(bool mounted);
 
     private:
         bool ipodInitialize(struct ipod_t *);
