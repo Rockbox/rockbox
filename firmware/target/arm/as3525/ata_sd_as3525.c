@@ -188,36 +188,28 @@ void INT_MCI0(void)
 static bool send_cmd(const int drive, const int cmd, const int arg,
                      const int flags, long *response)
 {
-    int val, status;
+    int status;
 
-    while(MCI_STATUS(drive) & MCI_CMD_ACTIVE);
-
-    if(MCI_COMMAND(drive) & MCI_COMMAND_ENABLE) /* clears existing command */
-    {
-        MCI_COMMAND(drive) = 0;
-        mci_delay();
-    }
-
-    val = cmd | MCI_COMMAND_ENABLE;
-    if(flags & MCI_RESP)
-    {
-        val |= MCI_COMMAND_RESPONSE;
-        if(flags & MCI_LONG_RESP)
-            val |= MCI_COMMAND_LONG_RESPONSE;
-    }
-
+    /* Clear old status flags */
     MCI_CLEAR(drive) = 0x7ff;
 
+    /* Load command argument or clear if none */
     MCI_ARGUMENT(drive) = (flags & MCI_ARG) ? arg : 0;
-    MCI_COMMAND(drive) = val;
 
-    while(MCI_STATUS(drive) & MCI_CMD_ACTIVE);  /* wait for cmd completion */
+    /* Construct MCI_COMMAND & enable CPSM */
+    MCI_COMMAND(drive) =
+       /*b0:5*/  cmd
+       /* b6 */| ((flags & (MCI_RESP|MCI_LONG_RESP)) ? MCI_COMMAND_RESPONSE : 0)
+       /* b7 */| ((flags & MCI_LONG_RESP) ? MCI_COMMAND_LONG_RESPONSE : 0)
+       /* b8   | MCI_COMMAND_INTERRUPT */
+       /* b9   | MCI_COMMAND_PENDING */  /*Only used with stream data transfer*/
+       /* b10*/| MCI_COMMAND_ENABLE;     /* Enables CPSM */
 
+    /* Wait while cmd completes then disable CPSM */
+    while(MCI_STATUS(drive) & MCI_CMD_ACTIVE);
     MCI_COMMAND(drive) = 0;
-    MCI_ARGUMENT(drive) = ~0;
 
     status = MCI_STATUS(drive);
-    MCI_CLEAR(drive) = 0x7ff;
 
     if(flags & MCI_RESP)
     {
@@ -723,9 +715,16 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         if(!(card_info[drive].ocr & (1<<30)))   /* not SDHC */
             bank_start *= SD_BLOCK_SIZE;
 
-        if(!send_cmd(drive, cmd, bank_start, MCI_ARG, NULL))
+        ret = sd_wait_for_state(drive, SD_TRAN);
+        if (ret < 0)
         {
             ret -= 3*20;
+            goto sd_transfer_error;
+        }
+
+        if(!send_cmd(drive, cmd, bank_start, MCI_ARG, NULL))
+        {
+            ret -= 4*20;
             goto sd_transfer_error;
         }
 
@@ -771,14 +770,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_FLAGS, NULL))
         {
-            ret = -4*20;
-            goto sd_transfer_error;
-        }
-
-        ret = sd_wait_for_state(drive, SD_TRAN);
-        if (ret < 0)
-        {
-            ret -= 5*20;
+            ret = -5*20;
             goto sd_transfer_error;
         }
     }
