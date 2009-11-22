@@ -194,14 +194,12 @@ void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
                               int style, int offset)
 {
     int xpos, ypos, w, h;
-    unsigned long chars_in_str;
     LCDFN(scroll_stop_line)(current_vp, y);
     if(!str || !str[0])
         return;
 
-    chars_in_str = utf8length((char *)str);
     LCDFN(getstringsize)(str, &w, &h);
-    xpos = x * w / chars_in_str;
+    xpos = x * LCDFN(getstringsize)(" ", NULL, NULL);
     ypos = y * h;
     LCDFN(putsxyofs_style)(xpos, ypos, str, style, w, h, offset);
 }
@@ -289,7 +287,7 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
     s->y = y;
     s->len = utf8length(string);
     s->offset = offset;
-    s->startx = x * s->width / s->len;
+    s->startx = x * LCDFN(getstringsize)(" ", NULL, NULL);
     s->backward = false;
 
     LCDFN(scroll_info).lines++;
