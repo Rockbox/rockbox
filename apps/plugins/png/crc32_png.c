@@ -158,9 +158,9 @@ local void make_crc_table()
     {
         FILE *out;
 
-        out = fopen("crc32.h", "w");
+        out = fopen("crc32_png.h", "w");
         if (out == NULL) return;
-        fprintf(out, "/* crc32.h -- tables for rapid CRC calculation\n");
+        fprintf(out, "/* crc32_png.h -- tables for rapid CRC calculation\n");
         fprintf(out, " * Generated automatically by crc32.c\n */\n\n");
         fprintf(out, "local const unsigned long FAR ");
         fprintf(out, "crc_table[TBLS][256] =\n{\n  {\n");
@@ -196,7 +196,7 @@ local void write_table(out, table)
 /* ========================================================================
  * Tables of CRC-32s of all single-byte values, made by make_crc_table().
  */
-#include "crc32.h"
+#include "crc32_png.h"
 #endif /* DYNAMIC_CRC_TABLE */
 
 /* =========================================================================

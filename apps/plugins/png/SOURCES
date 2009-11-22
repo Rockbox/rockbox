@@ -1,5 +1,5 @@
 adler32.c
-crc32.c
+crc32_png.c
 inffast.c
 inflate.c
 inftrees.c
