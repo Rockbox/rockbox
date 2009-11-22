@@ -201,6 +201,9 @@ static const struct wps_tag all_tags[] = {
 #if CONFIG_CHARGING
     { WPS_TOKEN_BATTERY_CHARGER_CONNECTED,"bp",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
+#ifdef HAVE_USB_POWER
+	{ WPS_TOKEN_USB_POWERED,			  "bu",  WPS_REFRESH_DYNAMIC, NULL },
+#endif
 
     { WPS_TOKEN_RTC_PRESENT     ,             "cc", WPS_REFRESH_STATIC, NULL },
     { WPS_TOKEN_RTC_DAY_OF_MONTH,             "cd", WPS_RTC_REFRESH, NULL },

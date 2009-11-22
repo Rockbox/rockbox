@@ -60,6 +60,7 @@
 #include "pcm_record.h"
 #endif
 #include "language.h"
+#include "usb.h"
 
 static char* get_codectype(const struct mp3entry* id3)
 {
@@ -546,6 +547,12 @@ const char *get_token_value(struct gui_wps *gwps,
                 return NULL;
             }
         }
+#endif
+#ifdef HAVE_USB_POWER
+		case WPS_TOKEN_USB_POWERED:
+			if (usb_powered())
+				return "u";
+			return NULL;
 #endif
         case WPS_TOKEN_BATTERY_SLEEPTIME:
         {
@@ -1129,10 +1136,9 @@ const char *get_token_value(struct gui_wps *gwps,
             return buf;
 #endif
         case WPS_TOKEN_REC_MONO:
-            if (intval)
-                *intval = global_settings.rec_channels?2:1;
-            snprintf(buf, buf_size, "%s", !global_settings.rec_channels?"m":'\0');
-            return buf;
+			if (!global_settings.rec_channels)
+				return "m";
+			return NULL;
 
 #endif /* HAVE_RECORDING */
         case WPS_TOKEN_CURRENT_SCREEN:
