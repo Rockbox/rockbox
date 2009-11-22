@@ -1016,7 +1016,6 @@ const char *get_token_value(struct gui_wps *gwps,
                         *intval = 12;
                         break;)
                 }
-                *intval = rec_freq+1;
             }
             snprintf(buf, buf_size, "%d.%1d", samprk/1000,samprk%1000);
 #else /* HWCODEC */
