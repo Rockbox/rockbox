@@ -265,6 +265,7 @@ QString Autodetection::resolveMountPoint(QString device)
         if(QString(ent->mnt_fsname).startsWith(device)
            && QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)) {
             endmntent(mn);
+            qDebug() << "[Autodetect] resolved mountpoint is:" << mntinf->nmt_dir;
             return QString(ent->mnt_dir);
         }
     }
@@ -272,28 +273,17 @@ QString Autodetection::resolveMountPoint(QString device)
 
 #endif
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
     int num;
     struct statfs *mntinf;
 
     num = getmntinfo(&mntinf, MNT_WAIT);
     while(num--) {
         if(QString(mntinf->f_mntfromname).startsWith(device)
-           && QString(mntinf->f_fstypename).contains("vfat", Qt::CaseInsensitive))
+           && QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive)) {
+            qDebug() << "[Autodetect] resolved mountpoint is:" << mntinf->f_mntonname;
             return QString(mntinf->f_mntonname);
-        mntinf++;
-    }
-#endif
-
-#if defined(Q_OS_OPENBSD)
-    int num;
-    struct statfs *mntinf;
-
-    num = getmntinfo(&mntinf, MNT_WAIT);
-    while(num--) {
-        if(QString(mntinf->f_mntfromname).startsWith(device)
-           && QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive))
-            return QString(mntinf->f_mntonname);
+        }
         mntinf++;
     }
 #endif
@@ -334,6 +324,7 @@ QString Autodetection::resolveDevicename(QString path)
         if(QString(ent->mnt_dir).startsWith(path)
            && QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)) {
             endmntent(mn);
+            qDebug() << "[Autodetect] device name is" << ent->mnt_fsname;
             return QString(ent->mnt_fsname);
         }
     }
@@ -341,31 +332,21 @@ QString Autodetection::resolveDevicename(QString path)
 
 #endif
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
     int num;
     struct statfs *mntinf;
 
     num = getmntinfo(&mntinf, MNT_WAIT);
     while(num--) {
         if(QString(mntinf->f_mntonname).startsWith(path)
-           && QString(mntinf->f_fstypename).contains("vfat", Qt::CaseInsensitive))
+           && QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive)) {
+            qDebug() << "[Autodetect] device name is" << mntinf->f_mntfromname;
             return QString(mntinf->f_mntfromname);
+        }
         mntinf++;
     }
 #endif
 
-#if defined(Q_OS_OPENBSD)
-    int num;
-    struct statfs *mntinf;
-
-    num = getmntinfo(&mntinf, MNT_WAIT);
-    while(num--) {
-        if(QString(mntinf->f_mntonname).startsWith(device)
-           && QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive))
-            return QString(mntinf->f_mntfromname);
-        mntinf++;
-    }
-#endif
 #if defined(Q_OS_WIN32)
     DWORD written;
     HANDLE h;
@@ -387,7 +368,7 @@ QString Autodetection::resolveDevicename(QString path)
             qDebug() << "[Autodetect] resolving device name: volume spans multiple disks!";
             return "";
         }
-        //qDebug() << "Disk:" << extents->Extents[0].DiskNumber;
+        qDebug() << "[Autodetect] device name is" << extents->Extents[0].DiskNumber;
         return QString("%1").arg(extents->Extents[0].DiskNumber);
     }
 #endif
