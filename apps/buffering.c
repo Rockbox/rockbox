@@ -451,7 +451,7 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
         }
         if (correction) {
             /* Align correction to four bytes up */
-            correction = (correction + 3) & ~3; 
+            correction = (correction + 3) & ~3;
             if (final_delta < correction + sizeof(struct memory_handle)) {
                 /* Delta cannot end up less than the size of the struct */
                 mutex_unlock(&llist_mod_mutex);
@@ -493,31 +493,31 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
         cur_handle = dest;
 
 
-    /* Copying routine takes into account that the handles have a 
+    /* Copying routine takes into account that the handles have a
      * distance between each other which is a multiple of four.  Faster 2 word
      * copy may be ok but do this for safety and because wrapped copies should
-     * be fairly uncommon */ 
+     * be fairly uncommon */
 
     here = (int32_t *)((RINGBUF_ADD(oldpos, size_to_move - 1) & ~3)+ (intptr_t)buffer);
     there =(int32_t *)((RINGBUF_ADD(newpos, size_to_move - 1) & ~3)+ (intptr_t)buffer);
     end = (int32_t *)(( intptr_t)buffer + buffer_len - 4);
     begin =(int32_t *)buffer;
-    
+
     n = (size_to_move & ~3)/4;
 
-    if ( overlap_old > 0 || overlap > 0 ) {   
-    /* Old or moved handle wraps */ 	
-    	while (n--) {
-       	if (here < begin)
-          here =  end;
-       	if (there < begin)
-          there = end;
-       	*there-- = *here--;
-    	}
+    if ( overlap_old > 0 || overlap > 0 ) {
+    /* Old or moved handle wraps */
+        while (n--) {
+            if (here < begin)
+                here =  end;
+            if (there < begin)
+                there = end;
+           *there-- = *here--;
+        }
     } else {
     /* both handles do not wrap */
         memmove(dest,src,size_to_move);
-    } 
+    }
 
 
     /* Update the caller with the new location of h and the distance moved */
@@ -644,10 +644,10 @@ static bool buffer_handle(int handle_id)
         if (RINGBUF_ADD_CROSS(h->widx, copy_n, buf_ridx) >= 0)
             return false;
 
-        /* This would read into the next handle, this is broken 
+        /* This would read into the next handle, this is broken
         if (h->next && RINGBUF_ADD_CROSS(h->widx, copy_n,
                     (unsigned)((void *)h->next - (void *)buffer)) > 0) {
-             Try to recover by truncating this file 
+             Try to recover by truncating this file
             copy_n = RINGBUF_ADD_CROSS(h->widx, copy_n,
                     (unsigned)((void *)h->next - (void *)buffer));
             h->filerem -= copy_n;
