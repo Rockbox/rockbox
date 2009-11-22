@@ -66,7 +66,8 @@ static void read_chunk_ftyp(qtmovie_t *qtmovie, size_t chunk_len)
         (type != MAKEFOURCC('M','4','B',' ')) &&
         (type != MAKEFOURCC('m','p','4','2')) &&
         (type != MAKEFOURCC('3','g','p','6')) &&
-        (type != MAKEFOURCC('q','t',' ',' ')))
+        (type != MAKEFOURCC('q','t',' ',' ')) &&
+        (type != MAKEFOURCC('i','s','o','m')))
     {
         DEBUGF("not M4A file\n");
         return;
