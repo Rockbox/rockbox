@@ -211,26 +211,28 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
 
     status = MCI_STATUS(drive);
 
-    if(flags & MCI_RESP)
+    /*  Handle command responses */
+    if(flags & MCI_RESP)                   /*  CMD expects response  */
     {
-        if(status & MCI_CMD_TIMEOUT)
+        response[0] = MCI_RESP0(drive);    /*  Always prepare short response  */
+
+        if(status & (MCI_CMD_TIMEOUT | MCI_CMD_CRC_FAIL))  /* failed response */
             return false;
-        else if(status & (MCI_CMD_CRC_FAIL /* FIXME? */ | MCI_CMD_RESP_END))
-        {   /* resp received */
+
+        if(status &  MCI_CMD_RESP_END)            /*Response passed CRC check */
+        {
             if(flags & MCI_LONG_RESP)
-            {
+            {   /* replace short response with long response */
                 /* store the response in reverse words order */
                 response[0] = MCI_RESP3(drive);
                 response[1] = MCI_RESP2(drive);
                 response[2] = MCI_RESP1(drive);
                 response[3] = MCI_RESP0(drive);
             }
-            else
-                response[0] = MCI_RESP0(drive);
             return true;
         }
     }
-    else if(status & MCI_CMD_SENT)
+    else if(status & MCI_CMD_SENT)          /* CMD sent, no response required */
         return true;
 
     return false;
@@ -268,29 +270,23 @@ static int sd_init_card(const int drive)
     init_timeout = current_tick + HZ;
 
     do {
-        /* timeout */
+        /* this timeout is the only valid error for this loop*/
         if(TIME_AFTER(current_tick, init_timeout))
             return -2;
 
         /* app_cmd */
-        if( !send_cmd(drive, SD_APP_CMD, 0, MCI_RESP|MCI_ARG, &response) )
-        {
-            return -3;
-        }
+        send_cmd(drive, SD_APP_CMD, 0, MCI_RESP|MCI_ARG, &response);
 
         /* ACMD41 For v2 cards set HCS bit[30] & send host voltage range to all */
-        if(!send_cmd(drive, SD_APP_OP_COND, (0x00FF8000 | (sd_v2 ? 1<<30 : 0)),
-                        MCI_RESP|MCI_ARG, &card_info[drive].ocr))
-        {
-            return -4;
-        }
+        send_cmd(drive, SD_APP_OP_COND, (0x00FF8000 | (sd_v2 ? 1<<30 : 0)),
+                        MCI_RESP|MCI_ARG, &card_info[drive].ocr);
 
     } while(!(card_info[drive].ocr & (1<<31)));
 
     /* CMD2 send CID */
     if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP|MCI_ARG,
                             temp_reg))
-        return -5;
+        return -3;
 
     for(i=0; i<4; i++)
         card_info[drive].cid[3-i] = temp_reg[i];
@@ -298,7 +294,7 @@ static int sd_init_card(const int drive)
     /* CMD3 send RCA */
     if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP|MCI_ARG,
                 &card_info[drive].rca))
-        return -6;
+        return -4;
 
 
     /*  End of Card Identification Mode   ************************************/
@@ -314,26 +310,26 @@ static int sd_init_card(const int drive)
     {
         /*  CMD7 w/rca: Select card to put it in TRAN state */
         if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
-            return -7;
+            return -5;
 
         if(sd_wait_for_state(drive, SD_TRAN))
-            return -8;
+            return -6;
         /* CMD6 */
         if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_ARG, NULL))
-            return -9;
+            return -7;
         mci_delay();
 
         /*  go back to STBY state so we can read csd */
         /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
         if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_ARG, NULL))
-            return -10;
+            return -8;
     }
 #endif /*  HAVE_MULTIDRIVE  */
 
     /* CMD9 send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
                  MCI_RESP|MCI_LONG_RESP|MCI_ARG, temp_reg))
-        return -11;
+        return -9;
 
     for(i=0; i<4; i++)
         card_info[drive].csd[3-i] = temp_reg[i];
@@ -342,10 +338,10 @@ static int sd_init_card(const int drive)
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
-        return -12;
+        return -10;
 
     /*
-     * enable bank switching 
+     * enable bank switching
      * without issuing this command, we only have access to 1/4 of the blocks
      * of the first bank (0x1E9E00 blocks, which is the size reported in the
      * CSD register)
@@ -354,7 +350,7 @@ static int sd_init_card(const int drive)
     {
         const int ret = sd_select_bank(-1);
         if(ret < 0)
-            return ret - 13;
+            return ret - 11;
     }
 
     card_info[drive].initialized = 1;
