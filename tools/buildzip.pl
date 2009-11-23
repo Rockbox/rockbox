@@ -435,7 +435,7 @@ STOP
     if ($swcodec) {
 		if ($depth == 16) {
 			copy("$ROOT/wps/classic_statusbar.sbs", "$rbdir/wps");
-		} else if ($depth > 1) {
+		} elsif ($depth > 1) {
 			copy("$ROOT/wps/classic_statusbar.grey.sbs", "$rbdir/wps");
 		} else {
 			copy("$ROOT/wps/classic_statusbar.mono.sbs", "$rbdir/wps");
