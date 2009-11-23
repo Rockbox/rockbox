@@ -305,6 +305,9 @@ void tree_gui_init(void)
 /* drawer function for the GUI_EVENT_REDRAW callback */
 void tree_drawlists(void)
 {
+	/* band-aid to fix the bar/list redrawing properly after leaving a plugin */
+ 	send_event(GUI_EVENT_THEME_CHANGED, NULL);
+	/* end bandaid */
     gui_synclist_draw(&tree_lists);
 }
 
