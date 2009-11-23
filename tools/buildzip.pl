@@ -433,8 +433,10 @@ STOP
     mkdir "$rbdir/wps/classic_statusbar", 0777;
     glob_copy("$ROOT/wps/classic_statusbar/*.bmp", "$rbdir/wps/classic_statusbar");
     if ($swcodec) {
-		if ($depth > 1) {
+		if ($depth == 16) {
 			copy("$ROOT/wps/classic_statusbar.sbs", "$rbdir/wps");
+		} else if ($depth > 1) {
+			copy("$ROOT/wps/classic_statusbar.grey.sbs", "$rbdir/wps");
 		} else {
 			copy("$ROOT/wps/classic_statusbar.mono.sbs", "$rbdir/wps");
 		}
