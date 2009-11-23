@@ -63,41 +63,47 @@ void dma_enable_channel(int channel, void *src, void *dst, int peri,
 {
     dma_callback[channel] = callback;
 
-    int control = 0;
+    /* Clear any pending interrupts leftover from previous operation */
+    DMAC_INT_TC_CLEAR  = (1<<channel);
+    DMAC_INT_ERR_CLEAR = (1<<channel);
 
     DMAC_CH_SRC_ADDR(channel) = (int)src;
     DMAC_CH_DST_ADDR(channel) = (int)dst;
 
-    DMAC_CH_LLI(channel) = 0;    /* we use contigous memory, so don't use the LLI */
+    /* When LLI is 0 channel is disabled upon transfer completion */
+    DMAC_CH_LLI(channel) = 0;
 
-    /* specify address increment */
-    if(src_inc)
-        control |= (1<<26);
+    /*  Channel Control Register */
+    DMAC_CH_CONTROL(channel) =
+         ((1<<31)                 /* LLI triggers terminal count interrupt */
+     /* | (1<<30) */              /* cacheable  = 1,  non = 0 */
+     /* | (1<<29) */              /* bufferable = 1,  non = 0 */
+     /* | (1<<28) */              /* privileged = 1, user = 0 */
+        | (dst_inc? (1<<27): 0)   /* specify address increment */
+        | (src_inc? (1<<26): 0)   /* specify address increment */
+       /* [25:24] */              /* undefined  */
+        | (2<<21)                 /* dst width = word, 32bit */
+        | (2<<18)                 /* src width = word, 32bit */
+       /* OF uses transfers of 4 * 32 bits words on memory, i2sin, i2sout */
+       /* OF uses transfers of 8 * 32 bits words on SD */
+        | (nwords<<15)            /* dst size  */
+        | (nwords<<12)            /* src size  */
+        | ((size & 0x7ff)<<0));   /* transfer size */
 
-    if(dst_inc)
-        control |= (1<<27);
-
-    /* OF use transfers of 4 * 32 bits words on memory, i2sin, i2sout */
-    /* OF use transfers of 8 * 32 bits words on SD */
-
-    control |= (2<<21) | (2<<18);  /* dst/src width = word, 32bit */
-    control |= (nwords<<15) | (nwords<<12);  /* dst/src size  */
-    control |= (size & 0x7ff);     /* transfer size */
-
-    control |= (1<<31); /* current LLI is expected to trigger terminal count interrupt */
-
-    DMAC_CH_CONTROL(channel) = control;
-
-    /* we set the same peripheral as source and destination because we always
-     * use memory-to-peripheral or peripheral-to-memory transfers */
+    /*  Channel Config Register  */
     DMAC_CH_CONFIGURATION(channel) =
-        (flow_controller<<11)   /* flow controller is peripheral */
-        | (1<<15)               /* terminal count interrupt mask */
-        | (1<<14)               /* interrupt error mask */
-        | (peri<<6)             /* dst peripheral */
-        | (peri<<1)             /* src peripheral */
-        | (1<<0)                /* enable channel */
-        ;
+       /* [31:19] */              /* Read undefined. Write as zero  */
+       /* (0<<18) */              /* Halt Bit    */
+       /* (0<<17) */              /* Active Bit  */
+       /* (0<<16) */              /* Lock Bit    */
+          (1<<15)                 /* terminal count interrupt mask */
+        | (1<<14)                 /* interrupt error mask */
+        | (flow_controller<<11)   /* flow controller is peripheral or SDMAC */
+       /* we set the same peripheral as source and destination because we
+        * always use memory-to-peripheral or peripheral-to-memory transfers */
+        | (peri<<6)               /* dst peripheral */
+        | (peri<<1)               /* src peripheral */
+        | (1<<0);                 /* enable channel */
 }
 
 /* isr */
