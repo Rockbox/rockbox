@@ -481,10 +481,11 @@ static void backlight_update_state(void)
     if (UNLIKELY(timeout < 0))
     {
         do_backlight_off();
-#if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
     || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
-    /* necessary step to issue fading down when the setting is selected */
-        queue_post(&backlight_queue, SYS_TIMEOUT, 0);
+        /* necessary step to issue fading down when the setting is selected */
+        if (queue_empty(&backlight_queue))
+            queue_post(&backlight_queue, SYS_TIMEOUT, 0);
 #endif
     }
     else
