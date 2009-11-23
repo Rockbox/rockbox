@@ -35,6 +35,7 @@
 #include "settings.h"
 #include "logfdisp.h"
 #include "action.h"
+#include "splash.h"
 
 #ifdef HAVE_LCD_BITMAP
 int compute_nb_lines(int w, struct font* font)
@@ -225,6 +226,8 @@ bool logfdump(void)
 {
     int fd;
 
+    splashf(HZ, "Log File Dumped");
+    
     /* nothing to print ? */
     if(logfindex == 0 && !logfwrap)
         /* nothing is logged just yet */

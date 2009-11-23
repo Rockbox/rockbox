@@ -2635,8 +2635,8 @@ static const struct the_menu_item menuitems[] = {
         { "View PIC info", dbg_pic },
 #endif
 #ifdef ROCKBOX_HAS_LOGF
-        {"logf", logfdisplay },
-        {"logfdump", logfdump },
+        {"Show Log File", logfdisplay },
+        {"Dump Log File", logfdump },
 #endif
 #if defined(HAVE_USBSTACK)
 #if defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL)
