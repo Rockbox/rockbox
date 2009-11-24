@@ -620,9 +620,6 @@ static int sd_select_bank(signed char bank)
 
         dma_release();
 
-        ret = sd_wait_for_state(INTERNAL_AS3525, SD_TRAN);
-        if (ret < 0)
-            return ret - 4;
     } while(transfer_error[INTERNAL_AS3525]);
 
     card_info[INTERNAL_AS3525].current_bank = (bank == -1) ? 0 : bank;
