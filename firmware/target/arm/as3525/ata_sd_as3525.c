@@ -615,8 +615,8 @@ static int sd_select_bank(signed char bank)
 
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
-        /*  Wait for FIFO to empty  */
-        while(MCI_STATUS(INTERNAL_AS3525) & (MCI_TX_ACTIVE | MCI_RX_ACTIVE));
+        /*  Wait for FIFO to empty, card may still be in PRG state  */
+        while(MCI_STATUS(INTERNAL_AS3525) & MCI_TX_ACTIVE );
 
         dma_release();
 
@@ -737,8 +737,8 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
-        /*  Wait for FIFO to empty  */
-        while(MCI_STATUS(drive) & (MCI_TX_ACTIVE | MCI_RX_ACTIVE));
+        /*  Wait for FIFO to empty, card may still be in PRG state for writes */
+        while(MCI_STATUS(drive) & MCI_TX_ACTIVE);
 
         if(!transfer_error[drive])
         {
