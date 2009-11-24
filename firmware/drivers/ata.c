@@ -250,7 +250,9 @@ STATICIRAM ICODE_ATTR int wait_for_end_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
-    return (ATA_ALT_STATUS & (STATUS_RDY|STATUS_DRQ)) == STATUS_RDY;
+    return (ATA_ALT_STATUS & 
+            (STATUS_BSY|STATUS_RDY|STATUS_DF|STATUS_DRQ|STATUS_ERR))
+           == STATUS_RDY;
 }    
 
 #if (CONFIG_LED == LED_REAL)
