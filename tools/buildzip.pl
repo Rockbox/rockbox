@@ -436,9 +436,9 @@ STOP
 		if ($depth == 16) {
 			copy("$ROOT/wps/classic_statusbar.sbs", "$rbdir/wps");
 		} elsif ($depth > 1) {
-			copy("$ROOT/wps/classic_statusbar.grey.sbs", "$rbdir/wps");
+			copy("$ROOT/wps/classic_statusbar.grey.sbs", "$rbdir/wps/classic_statusbar.sbs");
 		} else {
-			copy("$ROOT/wps/classic_statusbar.mono.sbs", "$rbdir/wps");
+			copy("$ROOT/wps/classic_statusbar.mono.sbs", "$rbdir/wps/classic_statusbar.sbs");
 		}
     } else {
         copy("$ROOT/wps/classic_statusbar.112x64x1.sbs", "$rbdir/wps/classic_statusbar.sbs");
