@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Copyright (C) 2006 by Robert Kukla
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,34 +22,33 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
 #define HAS_BUTTON_HOLD
 
+#define button_init_device()
+
 bool button_hold(void);
-void button_init_device(void);
 int button_read_device(void);
 
-/* Tatung Elio TPJ-1022 button codes */
-
 /* Main unit's buttons */
-#define BUTTON_POWER        0x00000001
 
-#define BUTTON_LEFT         0x00000002
-#define BUTTON_RIGHT        0x00000004
-#define BUTTON_UP           0x00000008
-#define BUTTON_DOWN         0x00000010
+#define BUTTON_VOL_DOWN     0x00000001
 
-#define BUTTON_MENU         0x00000020
-#define BUTTON_FF           0x00000040
-#define BUTTON_REW          0x00000080
-#define BUTTON_REC          0x00000100
-#define BUTTON_AB           0x00000200
-#define BUTTON_PLUS         0x00000400
-#define BUTTON_MINUS        0x00000800
+/* bit position in GPIOA */
+#define BUTTON_REW          0x00000002
+#define BUTTON_FF           0x00000004
+#define BUTTON_POWER        0x00000008
+#define BUTTON_UP           0x00000010
+#define BUTTON_DOWN         0x00000020
+#define BUTTON_AB           0x00000040
+#define BUTTON_RIGHT        0x00000080
 
-#define BUTTON_MAIN         0x00000fff
+/* still unknown */
+#define BUTTON_MENU         0x00000100
+#define BUTTON_REC          0x00000200
+#define BUTTON_VOL_UP       0x00000400
+#define BUTTON_LEFT         0x00000800
+
+#define BUTTON_MAIN         0x00000FFF
 
 /* No Remote control */
 #define BUTTON_REMOTE 0

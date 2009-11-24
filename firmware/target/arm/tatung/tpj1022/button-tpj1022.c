@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Copyright (C) 2006 by Robert Kukla
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,64 +19,30 @@
  *
  ****************************************************************************/
 
-/* Custom written for the TPJ-1022 based on analysis of the GPIO data */
-
-#include <stdlib.h>
-#include "config.h"
-#include "cpu.h"
 #include "system.h"
 #include "button.h"
-#include "kernel.h"
-#include "backlight.h"
-
-void button_init_device(void)
-{
-    /* No hardware initialisation required as it is done by the bootloader */
-}
 
 bool button_hold(void)
 {
-  return false;
+    return (GPIOK_INPUT_VAL & 0x40) ?  true : false; 
 }
 
-/*
- * Get button pressed from hardware
- */
 int button_read_device(void)
 {
     int btn = BUTTON_NONE;
-    unsigned char state;
-    static bool hold_button = false;
 
-#if 0
-    /* light handling */
-    if (hold_button && !button_hold())
+    if (!button_hold())
     {
-        backlight_on();
-    }
-#endif
+        btn = (GPIOA_INPUT_VAL & 0xfe) ^ 0xfe;
 
-    hold_button = button_hold();
-    if (!hold_button)
-    {
-        /* Read normal buttons */
-        state = GPIOA_INPUT_VAL;
-        if ((state & 0x2) == 0) btn |= BUTTON_REW;
-        if ((state & 0x4) == 0) btn |= BUTTON_FF;
-        if ((state & 0x80) == 0) btn |= BUTTON_RIGHT;
+        if ((GPIOK_INPUT_VAL & 0x20) == 0) btn |= BUTTON_VOL_DOWN;
 
-        /* Buttons left to figure out:
-           button_hold()
-           BUTTON_POWER
-           BUTTON_LEFT
-           BUTTON_UP
-           BUTTON_DOWN
-           BUTTON_MENU
-           BUTTON_REC  
-           BUTTON_AB
-           BUTTON_PLUS
-           BUTTON_MINUS
-        */
+        /* to be found
+        if ((GPIO?_INPUT_VAL & 0x??) == 0) btn |= BUTTON_MENU;
+        if ((GPIO?_INPUT_VAL & 0x??) == 0) btn |= BUTTON_REC;
+        if ((GPIO?_INPUT_VAL & 0x??) == 0) btn |= BUTTON_VOL_UP;
+        if ((GPIO?_INPUT_VAL & 0x??) == 0) btn |= BUTTON_LEFT;
+         */  
     }
     
     return btn;
