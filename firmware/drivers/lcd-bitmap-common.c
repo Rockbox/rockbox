@@ -84,8 +84,8 @@ struct lcd_bitmap_char
 {
     char is_rtl;
     char is_diacritic;
-    unsigned short int width;
-    unsigned short base_width;
+    unsigned char width;
+    unsigned char base_width;
 };
 
 /* put a string at a given pixel position, skipping first ofs pixel columns */
@@ -120,7 +120,11 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
     ucs = bidi_l2v(str, 1);
     /* Mark diacritic and rtl flags for each character */
     for (i = 0; i < SCROLL_LINE_SIZE && ucs[i]; i++)
-        chars[i].is_diacritic = is_diacritic(ucs[i], &chars[i].is_rtl);
+    {
+        bool is_rtl;
+        chars[i].is_diacritic = is_diacritic(ucs[i], &is_rtl);
+        chars[i].is_rtl=is_rtl;
+    }
     len = i;
 
     /* Get proportional width and glyph bits */

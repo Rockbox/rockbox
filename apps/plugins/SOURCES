@@ -1,3 +1,5 @@
+test_disk.c
+test_gfx.c
 /* plugins common to all models */
 chessclock.c
 credits.c
