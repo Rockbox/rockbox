@@ -517,5 +517,14 @@ interface */
 #define I2SIN_DATA         (volatile unsigned long*)(I2SIN_BASE+0x14)
 #define I2SIN_SPDIF_STATUS (*(volatile unsigned long*)(I2SIN_BASE+0x18))
 
+/* I2SIN_MASK */
+
+#define I2SIN_MASK_PUER   ( 1<<6 ) /* push error */
+#define I2SIN_MASK_POE    ( 1<<5 ) /* empty */
+#define I2SIN_MASK_POAE   ( 1<<4 ) /* almost empty */
+#define I2SIN_MASK_POHF   ( 1<<3 ) /* half full */
+#define I2SIN_MASK_POAF   ( 1<<2 ) /* almost full */
+#define I2SIN_MASK_POF    ( 1<<1 ) /* full */
+#define I2SIN_MASK_POER   ( 1<<0 ) /* pop error */
 
 #endif /*__AS3525_H__*/

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright © 2008 Rafaël Carré
+ * Copyright © 2008-2009 Rafaël Carré
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -93,12 +93,10 @@ void pcm_play_dma_start(const void *addr, size_t size)
     dma_size = size;
     dma_start_addr = (unsigned char*)addr;
 
-    dma_retain();
-
-    I2SOUT_CONTROL |= 1<<6; /* dma */
-
     CGU_PERI |= CGU_I2SOUT_APB_CLOCK_ENABLE;
     CGU_AUDIO |= (1<<11);
+
+    dma_retain();
 
     play_start_pcm();
 }
@@ -126,9 +124,7 @@ void pcm_play_dma_init(void)
 {
     CGU_PERI |= CGU_I2SOUT_APB_CLOCK_ENABLE;
 
-    CGU_AUDIO = (CGU_AUDIO & ~(3<<0)) | (1<<0); /* clock source PLLA */
-
-    I2SOUT_CONTROL = (1<<3)  /* stereo */;
+    I2SOUT_CONTROL = (1<<6)|(1<<3)  /* enable dma, stereo */;
 
     audiohw_preinit();
 }
@@ -148,10 +144,6 @@ void pcm_dma_apply_settings(void)
     int cgu_audio = CGU_AUDIO;  /* read register */
     cgu_audio &= ~(511 << 2);   /* clear i2sout divider */
     cgu_audio |= divider << 2;  /* set new i2sout divider */
-#ifdef HAVE_RECORDING
-    cgu_audio &= ~(511 << 14);  /* clear i2sin divider */
-    cgu_audio |= divider << 14; /* set new i2sin divider */
-#endif
     CGU_AUDIO = cgu_audio;      /* write back register */
 }
 
@@ -180,23 +172,31 @@ void * pcm_dma_addr(void *addr)
  ** Recording DMA transfer
  **/
 #ifdef HAVE_RECORDING
+#define I2SIN_RECORDING_MASK ( I2SIN_MASK_POER | I2SIN_MASK_PUER | \
+            I2SIN_MASK_POHF | I2SIN_MASK_POAF | I2SIN_MASK_POF )
 
 static int rec_locked = 0;
 static unsigned int *rec_start_addr;
 static size_t      rec_size;
 
-
 void pcm_rec_lock(void)
 {
-    if(++rec_locked == 1)
+    if(++rec_locked == 1) {
+        int vic_state = disable_irq_save();
         VIC_INT_EN_CLEAR = INTERRUPT_I2SIN;
+        I2SIN_MASK = 0;
+        restore_irq( vic_state );
+    }
 }
-
 
 void pcm_rec_unlock(void)
 {
-    if(--rec_locked == 0)
+    if(--rec_locked == 0) {
+        int vic_state = disable_irq_save();
         VIC_INT_ENABLE = INTERRUPT_I2SIN;
+        I2SIN_MASK = I2SIN_RECORDING_MASK;
+        restore_irq( vic_state );
+    }
 }
 
 
@@ -209,7 +209,10 @@ void pcm_record_more(void *start, size_t size)
 
 void pcm_rec_dma_stop(void)
 {
+    int vic_state = disable_irq_save();
     VIC_INT_EN_CLEAR = INTERRUPT_I2SIN;
+    I2SIN_MASK = 0;
+    restore_irq( vic_state );
 
     I2SOUT_CONTROL &= ~(1<<5); /* source = i2soutif fifo */
     CGU_AUDIO &= ~((1<<23)|(1<<11));
@@ -224,14 +227,40 @@ void INT_I2SIN(void)
 
     status = I2SIN_STATUS;
 
-#if 0   /* FIXME */
     if ( status & ((1<<6)|(1<<0)) ) /* errors */
         panicf("i2sin error: 0x%x = %s %s", status,
             (status & (1<<6)) ? "push" : "",
             (status & (1<<0)) ? "pop" : ""
         );
-#endif
 
+    /* called at half full so it's safe to pull 16 FIFO reads in one chunk */
+    if( rec_size >= 16*4 )
+    {
+        /* unrolled loop */
+        *rec_start_addr++ = *I2SIN_DATA;
+        *rec_start_addr++ = *I2SIN_DATA;
+        *rec_start_addr++ = *I2SIN_DATA;
+        *rec_start_addr++ = *I2SIN_DATA;
+
+        *rec_start_addr++ = *I2SIN_DATA;
+        *rec_start_addr++ = *I2SIN_DATA;
+        *rec_start_addr++ = *I2SIN_DATA;
+        *rec_start_addr++ = *I2SIN_DATA;
+
+        *rec_start_addr++ = *I2SIN_DATA;
+        *rec_start_addr++ = *I2SIN_DATA;
+        *rec_start_addr++ = *I2SIN_DATA;
+        *rec_start_addr++ = *I2SIN_DATA;
+
+        *rec_start_addr++ = *I2SIN_DATA;
+        *rec_start_addr++ = *I2SIN_DATA;
+        *rec_start_addr++ = *I2SIN_DATA;
+        *rec_start_addr++ = *I2SIN_DATA;
+
+        rec_size -= 16*4; /* 16x4byte reads */
+    }
+
+    /* read out any odd samples left */
     while (((I2SIN_RAW_STATUS & (1<<5)) == 0) && rec_size)
     {
         /* 14 bits per sample = 1 32 bits word */
@@ -272,8 +301,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
     while ( ( I2SIN_RAW_STATUS & ( 1<<5 ) ) == 0 )
         tmp = *I2SIN_DATA; /* FLUSH FIFO */
     I2SIN_CLEAR = (1<<6)|(1<<0);    /* push error, pop error */
-    I2SIN_MASK =    (1<<6) | (1<<0) |
-                    (1<<3) | (1<<2) | (1<<1); /* half full, almost full, full */
+    I2SIN_MASK = I2SIN_RECORDING_MASK;
 
     VIC_INT_ENABLE = INTERRUPT_I2SIN;
 }
@@ -287,8 +315,17 @@ void pcm_rec_dma_close(void)
 
 void pcm_rec_dma_init(void)
 {
-    CGU_AUDIO = (CGU_AUDIO & ~(3<<12)) | (1<<12); /* clock source = PLLA */
-    pcm_dma_apply_settings();
+    unsigned long frequency = pcm_sampr;
+
+    /* TODO : use a table ? */
+    const int divider = (((AS3525_PLLA_FREQ/128) + (frequency/2)) / frequency) - 1;
+
+    int cgu_audio = CGU_AUDIO;  /* read register */
+    cgu_audio &= ~(3 << 12);    /* clear i2sin clocksource */
+    cgu_audio |=  (1 << 12);    /* set to PLLA */
+    cgu_audio &= ~(511 << 14);  /* clear i2sin divider */
+    cgu_audio |= divider << 14; /* set new i2sin divider */
+    CGU_AUDIO = cgu_audio;      /* write back register */
 }
 
 

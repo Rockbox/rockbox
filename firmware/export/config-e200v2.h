@@ -10,7 +10,7 @@
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
 /* define this if you have recording possibility */
-//#define HAVE_RECORDING
+#define HAVE_RECORDING
 
 #define REC_SAMPR_CAPS      SAMPR_CAP_ALL
 
