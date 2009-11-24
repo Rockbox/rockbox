@@ -51,7 +51,7 @@ void pcm_play_lock(void)
 void pcm_play_unlock(void)
 {
     if(--locked == 0)
-        VIC_INT_ENABLE |= INTERRUPT_DMAC;
+        VIC_INT_ENABLE = INTERRUPT_DMAC;
 }
 
 static void play_start_pcm(void)
@@ -196,7 +196,7 @@ void pcm_rec_lock(void)
 void pcm_rec_unlock(void)
 {
     if(--rec_locked == 0)
-        VIC_INT_ENABLE |= INTERRUPT_I2SIN;
+        VIC_INT_ENABLE = INTERRUPT_I2SIN;
 }
 
 
@@ -275,7 +275,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
     I2SIN_MASK =    (1<<6) | (1<<0) |
                     (1<<3) | (1<<2) | (1<<1); /* half full, almost full, full */
 
-    VIC_INT_ENABLE |= INTERRUPT_I2SIN;
+    VIC_INT_ENABLE = INTERRUPT_I2SIN;
 }
 
 

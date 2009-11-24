@@ -456,11 +456,11 @@ static void init_pl180_controller(const int drive)
     MCI_MASK0(drive) = MCI_ERROR | MCI_DATA_END;
     MCI_MASK1(drive) = 0;
 #ifdef HAVE_MULTIDRIVE
-    VIC_INT_ENABLE |=
+    VIC_INT_ENABLE =
         (drive == INTERNAL_AS3525) ? INTERRUPT_NAND : INTERRUPT_MCI0;
 
     /* setup isr for microsd monitoring */
-    VIC_INT_ENABLE |= (INTERRUPT_GPIOA);
+    VIC_INT_ENABLE = (INTERRUPT_GPIOA);
     /* clear previous irq */
     GPIOA_IC = (1<<2);
     /* enable edge detecting */
@@ -469,7 +469,7 @@ static void init_pl180_controller(const int drive)
     GPIOA_IBE |= (1<<2);
 
 #else
-    VIC_INT_ENABLE |= INTERRUPT_NAND;
+    VIC_INT_ENABLE = INTERRUPT_NAND;
 #endif
 
     MCI_POWER(drive) = MCI_POWER_UP | (MCI_VDD_3_0);  /*  OF Setting  */

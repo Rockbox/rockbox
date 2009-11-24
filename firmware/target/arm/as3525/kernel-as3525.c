@@ -64,7 +64,7 @@ void tick_start(unsigned int interval_in_ms)
     int cycles = KERNEL_TIMER_FREQ / 1000 * interval_in_ms;
 
     CGU_PERI |= CGU_TIMER2_CLOCK_ENABLE;    /* enable peripheral */
-    VIC_INT_ENABLE |= INTERRUPT_TIMER2;     /* enable interrupt */
+    VIC_INT_ENABLE = INTERRUPT_TIMER2;     /* enable interrupt */
 
     TIMER2_LOAD = TIMER2_BGLOAD = cycles;   /* timer period */
 

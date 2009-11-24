@@ -56,7 +56,7 @@ bool timer_set(long cycles, bool start)
 bool timer_start(void)
 {
     CGU_PERI |= CGU_TIMER1_CLOCK_ENABLE;    /* enable peripheral */
-    VIC_INT_ENABLE |= INTERRUPT_TIMER1;
+    VIC_INT_ENABLE = INTERRUPT_TIMER1;
     return true;
 }
 

@@ -187,7 +187,7 @@ void usb_drv_init(void)
 
     USB_DEV_EP_INTR_MASK &= ~((1<<0) | (1<<16));    /* ep 0 */
 
-    VIC_INT_ENABLE |= INTERRUPT_USB;
+    VIC_INT_ENABLE = INTERRUPT_USB;
 
     USB_IEP_CTRL(0) |= (1<<7); /* set NAK */
     USB_OEP_CTRL(0) |= (1<<7); /* set NAK */

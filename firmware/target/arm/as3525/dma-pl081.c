@@ -49,7 +49,7 @@ void dma_release(void)
 void dma_init(void)
 {
     DMAC_SYNC = 0xffff; /* disable synchronisation logic */
-    VIC_INT_ENABLE |= INTERRUPT_DMAC;
+    VIC_INT_ENABLE = INTERRUPT_DMAC;
 }
 
 inline void dma_disable_channel(int channel)
