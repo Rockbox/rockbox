@@ -35,6 +35,7 @@
 #include "debug.h"
 #include "panic.h"
 #include "rbunicode.h"
+#include "diacritic.h"
 
 #ifndef BOOTLOADER
 /* Font cache includes */
@@ -604,6 +605,8 @@ int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
 
     for (str = utf8decode(str, &ch); ch != 0 ; str = utf8decode(str, &ch))
     {
+        if (is_diacritic(ch, NULL))
+            continue;
 
         /* get proportional width and glyph bits*/
         width += font_get_width(pf,ch);

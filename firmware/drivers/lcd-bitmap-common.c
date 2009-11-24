@@ -29,6 +29,7 @@
  ****************************************************************************/
 #include "stdarg.h"
 #include "sprintf.h"
+#include "diacritic.h"
 
 #ifndef LCDFN /* Not compiling for remote - define macros for main LCD. */
 #define LCDFN(fn) lcd_ ## fn
@@ -79,15 +80,22 @@ static void lcd_gradient_rect(int x1, int x2, int y, unsigned h,
 }
 #endif
 
+struct lcd_bitmap_char
+{
+    bool is_rtl;
+    bool is_diacritic;
+    int width;
+    int base_width;
+};
+
 /* put a string at a given pixel position, skipping first ofs pixel columns */
 static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 {
-    unsigned short ch;
     unsigned short *ucs;
     struct font* pf = font_get(current_vp->font);
     int vp_flags = current_vp->flags;
-
-    ucs = bidi_l2v(str, 1);
+    int i, len;
+    static struct lcd_bitmap_char chars[SCROLL_LINE_SIZE];
 
     if ((vp_flags & VP_FLAG_ALIGNMENT_MASK) != 0)
     {
@@ -109,13 +117,59 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         }
     }
 
-    while ((ch = *ucs++) != 0 && x < current_vp->width)
-    {
-        int width;
-        const unsigned char *bits;
+    ucs = bidi_l2v(str, 1);
+    /* Mark diacritic and rtl flags for each character */
+    for (i = 0; i < SCROLL_LINE_SIZE && ucs[i]; i++)
+        chars[i].is_diacritic = is_diacritic(ucs[i], &chars[i].is_rtl);
+    len = i;
 
-        /* get proportional width and glyph bits */
-        width = font_get_width(pf, ch);
+    /* Get proportional width and glyph bits */
+    for (i = 0; i < len; i++)
+        chars[i].width = font_get_width(pf, ucs[i]);
+
+    /* Calculate base width for each character */
+    for (i = 0; i < len; i++)
+    {
+        if (chars[i].is_rtl)
+        {
+            /* Forward-seek the next non-diacritic character for base width */
+            if (chars[i].is_diacritic)
+            {
+                int j;
+
+                /* Jump to next non-diacritic character, and calc its width */
+                for (j = i; j < len && chars[j].is_diacritic; j++);
+
+                /* Set all related diacritic char's base-width accordingly */
+                for (; i <= j; i++)
+                    chars[i].base_width = chars[j].width;
+            }
+            else
+            {
+                chars[i].base_width = chars[i].width;
+            }
+        }
+        else
+        {
+            static int last_non_diacritic_width = 0;
+
+            if (!chars[i].is_diacritic)
+                last_non_diacritic_width = chars[i].width;
+
+            chars[i].base_width = last_non_diacritic_width;
+        }
+    }
+
+    for (i = 0; i < len; i++)
+    {
+        const unsigned char *bits;
+        unsigned short ch = ucs[i];
+        int width = chars[i].width;
+        int drawmode = 0, base_ofs = 0;
+        bool next_is_diacritic;
+
+        if (x >= current_vp->width)
+            break;
 
         if (ofs > width)
         {
@@ -123,13 +177,34 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
             continue;
         }
 
+        if (chars[i].is_diacritic)
+        {
+            drawmode = current_vp->drawmode;
+            current_vp->drawmode = DRMODE_FG;
+
+            base_ofs = (chars[i].base_width - width) / 2;
+        }
+
         bits = font_get_bits(pf, ch);
+        LCDFN(mono_bitmap_part)(bits, ofs, 0, width,
+            x + base_ofs, y, width - ofs, pf->height);
 
-        LCDFN(mono_bitmap_part)(bits, ofs, 0, width, x, y, width - ofs,
-                                pf->height);
+        if (chars[i].is_diacritic)
+        {
+            current_vp->drawmode = drawmode;
+        }
 
-        x += width - ofs;
-        ofs = 0;
+        /* Increment if next char is not diacritic (non-rtl),
+         * or current char is non-diacritic and next char is diacritic (rtl)*/
+        next_is_diacritic = (ucs[i + 1] && chars[i + 1].is_diacritic);
+
+        if (ucs[i + 1] &&
+            ((chars[i].is_rtl && !chars[i].is_diacritic) ||
+            (!chars[i].is_rtl && (chars[i + 1].is_rtl || !chars[i + 1].is_diacritic))))
+        {
+            x += chars[i].base_width - ofs;
+            ofs = 0;
+        }
     }
 }
 /* put a string at a given pixel position */
