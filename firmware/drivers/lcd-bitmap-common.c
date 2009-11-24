@@ -82,10 +82,10 @@ static void lcd_gradient_rect(int x1, int x2, int y, unsigned h,
 
 struct lcd_bitmap_char
 {
-    bool is_rtl;
-    bool is_diacritic;
-    int width;
-    int base_width;
+    char is_rtl;
+    char is_diacritic;
+    unsigned short int width;
+    unsigned short base_width;
 };
 
 /* put a string at a given pixel position, skipping first ofs pixel columns */
