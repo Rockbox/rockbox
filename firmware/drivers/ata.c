@@ -71,7 +71,7 @@
 #define Q_SLEEP    0
 #define Q_CLOSE    1
 
-#define READ_TIMEOUT 5*HZ
+#define READWRITE_TIMEOUT 5*HZ
 
 #ifdef HAVE_ATA_POWER_OFF
 #define ATA_POWER_OFF_TIMEOUT 2*HZ
@@ -302,16 +302,47 @@ STATICIRAM ICODE_ATTR void copy_read_sectors(unsigned char* buf, int wordcount)
 }
 #endif /* !ATA_OPTIMIZED_READING */
 
-#ifdef MAX_PHYS_SECTOR_SIZE
-static int _read_sectors(unsigned long start,
-                         int incount,
-                         void* inbuf)
+#ifndef ATA_OPTIMIZED_WRITING
+STATICIRAM ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
+                                              int wordcount)
+{
+    if ( (unsigned long)buf & 1)
+    {   /* not 16-bit aligned, copy byte by byte */
+        unsigned short tmp = 0;
+        const unsigned char* bufend = buf + wordcount*2;
+        do
+        {
+#if defined(SWAP_WORDS) || defined(ROCKBOX_LITTLE_ENDIAN)
+            tmp = (unsigned short) *buf++;
+            tmp |= (unsigned short) *buf++ << 8;
+            SET_16BITREG(ATA_DATA, tmp);
 #else
-int ata_read_sectors(IF_MD2(int drive,)
-                     unsigned long start,
-                     int incount,
-                     void* inbuf)
+            tmp = (unsigned short) *buf++ << 8;
+            tmp |= (unsigned short) *buf++;
+            SET_16BITREG(ATA_DATA, tmp);
 #endif
+        } while (buf < bufend); /* tail loop is faster */
+    }
+    else
+    {   /* 16-bit aligned, can do faster copy */
+        unsigned short* wbuf = (unsigned short*)buf;
+        unsigned short* wbufend = wbuf + wordcount;
+        do
+        {
+#ifdef SWAP_WORDS
+            SET_16BITREG(ATA_DATA, swap16(*wbuf));
+#else
+            SET_16BITREG(ATA_DATA, *wbuf);
+#endif
+        } while (++wbuf < wbufend); /* tail loop is faster */
+    }
+}
+#endif /* !ATA_OPTIMIZED_WRITING */
+
+static int ata_transfer_sectors(unsigned long start,
+                                int incount,
+                                void* inbuf,
+                                int write)
 {
     int ret = 0;
     long timeout;
@@ -323,9 +354,6 @@ int ata_read_sectors(IF_MD2(int drive,)
 #endif
 
 #ifndef MAX_PHYS_SECTOR_SIZE
-#ifdef HAVE_MULTIDRIVE
-    (void)drive; /* unused for now */
-#endif
     mutex_lock(&ata_mtx);
 #endif
 
@@ -355,7 +383,7 @@ int ata_read_sectors(IF_MD2(int drive,)
         }
     }
 
-    timeout = current_tick + READ_TIMEOUT;
+    timeout = current_tick + READWRITE_TIMEOUT;
 
     SET_REG(ATA_SELECT, ata_device);
     if (!wait_for_rdy())
@@ -373,7 +401,7 @@ int ata_read_sectors(IF_MD2(int drive,)
 
 #ifdef HAVE_ATA_DMA
         /* If DMA is supported and parameters are ok for DMA, use it */
-        if (dma_mode && ata_dma_setup(inbuf, incount * SECTOR_SIZE, false))
+        if (dma_mode && ata_dma_setup(inbuf, incount * SECTOR_SIZE, write))
             usedma = true;
 #endif
 
@@ -390,9 +418,12 @@ int ata_read_sectors(IF_MD2(int drive,)
             SET_REG(ATA_HCYL, (start >> 16) & 0xff); /* 23:16 */
             SET_REG(ATA_SELECT, SELECT_LBA | ata_device);
 #ifdef HAVE_ATA_DMA
-            SET_REG(ATA_COMMAND, usedma ? CMD_READ_DMA_EXT : CMD_READ_MULTIPLE_EXT);
+            if (write)
+                SET_REG(ATA_COMMAND, usedma ? CMD_WRITE_DMA_EXT : CMD_WRITE_MULTIPLE_EXT);
+            else
+                SET_REG(ATA_COMMAND, usedma ? CMD_READ_DMA_EXT : CMD_READ_MULTIPLE_EXT);
 #else
-            SET_REG(ATA_COMMAND, CMD_READ_MULTIPLE_EXT);
+            SET_REG(ATA_COMMAND, write ? CMD_WRITE_MULTIPLE_EXT : CMD_READ_MULTIPLE_EXT);
 #endif
         }
         else
@@ -404,9 +435,12 @@ int ata_read_sectors(IF_MD2(int drive,)
             SET_REG(ATA_HCYL, (start >> 16) & 0xff);
             SET_REG(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
 #ifdef HAVE_ATA_DMA
-            SET_REG(ATA_COMMAND, usedma ? CMD_READ_DMA : CMD_READ_MULTIPLE);
+            if (write)
+                SET_REG(ATA_COMMAND, usedma ? CMD_WRITE_DMA : CMD_WRITE_MULTIPLE);
+            else
+                SET_REG(ATA_COMMAND, usedma ? CMD_READ_DMA : CMD_READ_MULTIPLE);
 #else
-            SET_REG(ATA_COMMAND, CMD_READ_MULTIPLE);
+            SET_REG(ATA_COMMAND, write ? CMD_WRITE_MULTIPLE : CMD_READ_MULTIPLE);
 #endif
         }
 
@@ -473,7 +507,10 @@ int ata_read_sectors(IF_MD2(int drive,)
 
                 wordcount = sectors * SECTOR_SIZE / 2;
 
-                copy_read_sectors(buf, wordcount);
+                if (write)
+                    copy_write_sectors(buf, wordcount);
+                else
+                    copy_read_sectors(buf, wordcount);
 
                 /*
                   "Device errors encountered during READ MULTIPLE commands
@@ -513,191 +550,33 @@ int ata_read_sectors(IF_MD2(int drive,)
     return ret;
 }
 
-#ifndef ATA_OPTIMIZED_WRITING
-STATICIRAM ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
-                                              int wordcount)
+#ifndef MAX_PHYS_SECTOR_SIZE
+int ata_read_sectors(IF_MD2(int drive,)
+                     unsigned long start,
+                     int incount,
+                     void* inbuf)
 {
-    if ( (unsigned long)buf & 1)
-    {   /* not 16-bit aligned, copy byte by byte */
-        unsigned short tmp = 0;
-        const unsigned char* bufend = buf + wordcount*2;
-        do
-        {
-#if defined(SWAP_WORDS) || defined(ROCKBOX_LITTLE_ENDIAN)
-            tmp = (unsigned short) *buf++;
-            tmp |= (unsigned short) *buf++ << 8;
-            SET_16BITREG(ATA_DATA, tmp);
-#else
-            tmp = (unsigned short) *buf++ << 8;
-            tmp |= (unsigned short) *buf++;
-            SET_16BITREG(ATA_DATA, tmp);
+#ifdef HAVE_MULTIDRIVE
+    (void)drive; /* unused for now */
 #endif
-        } while (buf < bufend); /* tail loop is faster */
-    }
-    else
-    {   /* 16-bit aligned, can do faster copy */
-        unsigned short* wbuf = (unsigned short*)buf;
-        unsigned short* wbufend = wbuf + wordcount;
-        do
-        {
-#ifdef SWAP_WORDS
-            SET_16BITREG(ATA_DATA, swap16(*wbuf));
-#else
-            SET_16BITREG(ATA_DATA, *wbuf);
-#endif
-        } while (++wbuf < wbufend); /* tail loop is faster */
-    }
-}
-#endif /* !ATA_OPTIMIZED_WRITING */
 
-#ifdef MAX_PHYS_SECTOR_SIZE
-static int _write_sectors(unsigned long start,
-                          int count,
-                          const void* buf)
-#else
+    return ata_transfer_sectors(start, incount, inbuf, false);
+}
+#endif
+
+#ifndef MAX_PHYS_SECTOR_SIZE
 int ata_write_sectors(IF_MD2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
-#endif
 {
-    int i;
-    int ret = 0;
-    long spinup_start;
-#ifdef HAVE_ATA_DMA
-    bool usedma = false;
-#endif
-
-#ifndef MAX_PHYS_SECTOR_SIZE
 #ifdef HAVE_MULTIDRIVE
     (void)drive; /* unused for now */
 #endif
-    mutex_lock(&ata_mtx);
-#endif
-    
-    if (start + count > total_sectors)
-        panicf("Writing past end of disk");
 
-    last_disk_activity = current_tick;
-    spinup_start = current_tick;
-
-    ata_led(true);
-
-    if ( sleeping ) {
-        spinup = true;
-        if (poweroff) {
-            if (ata_power_on()) {
-                ret = -1;
-                goto error;
-            }
-        }
-        else {
-            if (perform_soft_reset()) {
-                ret = -1;
-                goto error;
-            }
-        }
-    }
-    
-    SET_REG(ATA_SELECT, ata_device);
-    if (!wait_for_rdy())
-    {
-        ret = -2;
-        goto error;
-    }
-
-#ifdef HAVE_ATA_DMA
-        /* If DMA is supported and parameters are ok for DMA, use it */
-        if (dma_mode && ata_dma_setup((void *)buf, count * SECTOR_SIZE, true))
-            usedma = true;
-#endif
-        
-#ifdef HAVE_LBA48
-    if (lba48)
-    {
-        SET_REG(ATA_NSECTOR, count >> 8);
-        SET_REG(ATA_NSECTOR, count & 0xff);
-        SET_REG(ATA_SECTOR, (start >> 24) & 0xff); /* 31:24 */
-        SET_REG(ATA_SECTOR, start & 0xff); /* 7:0 */
-        SET_REG(ATA_LCYL, 0); /* 39:32 */
-        SET_REG(ATA_LCYL, (start >> 8) & 0xff); /* 15:8 */
-        SET_REG(ATA_HCYL, 0); /* 47:40 */
-        SET_REG(ATA_HCYL, (start >> 16) & 0xff); /* 23:16 */
-        SET_REG(ATA_SELECT, SELECT_LBA | ata_device);
-#ifdef HAVE_ATA_DMA
-        SET_REG(ATA_COMMAND, usedma ? CMD_WRITE_DMA_EXT : CMD_WRITE_SECTORS_EXT);
-#else
-        SET_REG(ATA_COMMAND, CMD_WRITE_SECTORS_EXT);
-#endif
-    }
-    else
-#endif
-    {
-        SET_REG(ATA_NSECTOR, count & 0xff); /* 0 means 256 sectors */
-        SET_REG(ATA_SECTOR, start & 0xff);
-        SET_REG(ATA_LCYL, (start >> 8) & 0xff);
-        SET_REG(ATA_HCYL, (start >> 16) & 0xff);
-        SET_REG(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
-#ifdef HAVE_ATA_DMA
-        SET_REG(ATA_COMMAND, usedma ? CMD_WRITE_DMA : CMD_WRITE_SECTORS);
-#else
-        SET_REG(ATA_COMMAND, CMD_WRITE_SECTORS);
-#endif
-    }
-
-#ifdef HAVE_ATA_DMA
-    if (usedma) {
-        if (!ata_dma_finish())
-            ret = -7;
-        else if (spinup) {
-            spinup_time = current_tick - spinup_start;
-            spinup = false;
-            sleeping = false;
-            poweroff = false;
-        }
-    }
-    else
-#endif /* HAVE_ATA_DMA */
-    {
-        for (i=0; i<count; i++) {
-
-            if (!wait_for_start_of_transfer()) {
-                ret = -3;
-                break;
-            }
-
-            if (spinup) {
-                spinup_time = current_tick - spinup_start;
-                spinup = false;
-                sleeping = false;
-                poweroff = false;
-            }
-
-            copy_write_sectors(buf, SECTOR_SIZE/2);
-
-#ifdef USE_INTERRUPT
-            /* reading the status register clears the interrupt */
-            j = ATA_STATUS;
-#endif
-            buf += SECTOR_SIZE;
-
-            last_disk_activity = current_tick;
-        }
-    }
-
-    if(!ret && !wait_for_end_of_transfer()) {
-        DEBUGF("End on transfer failed. -- jyp");
-        ret = -4;
-    }
-
-  error:
-    ata_led(false);
-#ifndef MAX_PHYS_SECTOR_SIZE
-    mutex_unlock(&ata_mtx);
-#endif
-
-    return ret;
+    return ata_transfer_sectors(start, count, (void*)buf, true);
 }
+#endif
 
 #ifdef MAX_PHYS_SECTOR_SIZE
 static int cache_sector(unsigned long sector)
@@ -713,7 +592,7 @@ static int cache_sector(unsigned long sector)
 
     /* not found: read the sector */
     sector_cache.inuse = false;
-    rc = _read_sectors(sector, phys_sector_mult, sector_cache.data);
+    rc = ata_transfer_sectors(sector, phys_sector_mult, sector_cache.data, false);
     if (!rc)
     {    
         sector_cache.sectornum = sector;
@@ -724,8 +603,8 @@ static int cache_sector(unsigned long sector)
 
 static inline int flush_current_sector(void)
 {
-    return _write_sectors(sector_cache.sectornum, phys_sector_mult,
-                          sector_cache.data);
+    return ata_transfer_sectors(sector_cache.sectornum, phys_sector_mult,
+                                sector_cache.data, true);
 }
 
 int ata_read_sectors(IF_MD2(int drive,)
@@ -767,7 +646,7 @@ int ata_read_sectors(IF_MD2(int drive,)
         
         if (incount)
         {
-            rc = _read_sectors(start, incount, inbuf);
+            rc = ata_transfer_sectors(start, incount, inbuf, false);
             if (rc)
             {
                 rc = rc * 10 - 2;
@@ -838,7 +717,7 @@ int ata_write_sectors(IF_MD2(int drive,)
         
         if (count)
         {
-            rc = _write_sectors(start, count, buf);
+            rc = ata_transfer_sectors(start, count, (void*)buf, true);
             if (rc)
             {
                 rc = rc * 10 - 3;
