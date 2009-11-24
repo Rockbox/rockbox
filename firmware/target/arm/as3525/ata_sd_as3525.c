@@ -539,13 +539,10 @@ bool sd_present(IF_MD_NONVOID(int drive))
 static int sd_wait_for_state(const int drive, unsigned int state)
 {
     unsigned long response = 0;
-    unsigned int timeout = 100; /* ticks */
-    long t = current_tick;
+    unsigned int timeout = current_tick + 100; /* 100 ticks timeout */
 
     while (1)
     {
-        long tick;
-
         if(!send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca,
                     MCI_RESP|MCI_ARG, &response))
             return -1;
@@ -553,14 +550,13 @@ static int sd_wait_for_state(const int drive, unsigned int state)
         if (((response >> 9) & 0xf) == state)
             return 0;
 
-        if(TIME_AFTER(current_tick, t + timeout))
+        if(TIME_AFTER(current_tick, timeout))
             return -2;
 
-        if (TIME_AFTER((tick = current_tick), next_yield))
+        if (TIME_AFTER(current_tick, next_yield))
         {
             yield();
-            timeout += current_tick - tick;
-            next_yield = tick + MIN_YIELD_PERIOD;
+            next_yield = current_tick + MIN_YIELD_PERIOD;
         }
     }
 }
