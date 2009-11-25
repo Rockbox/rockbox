@@ -79,7 +79,8 @@
 #include "playback.h"
 
 #ifdef BOOTFILE
-#if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF)
+#if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF) \
+        || defined(HAVE_HOTSWAP_STORAGE_AS_MAIN)
 #include "rolo.h"
 #endif
 #endif
@@ -606,6 +607,13 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             audio_resume();
             return SYS_CAR_ADAPTER_RESUME;
 #endif
+#ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
+        case SYS_FS_CHANGED:
+            system_flush();
+            check_bootfile(true); /* state gotten in main.c:init() */
+            system_restore();
+            return SYS_FS_CHANGED;
+#endif
 #ifdef HAVE_HEADPHONE_DETECTION
         case SYS_PHONE_PLUGGED:
             unplug_change(true);
@@ -682,7 +690,7 @@ int show_logo( void )
 }
 
 #ifdef BOOTFILE
-#if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF)
+#if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF) || defined(HAVE_HOTSWAP_STORAGE_AS_MAIN)
 /*
     memorize/compare details about the BOOTFILE
     we don't use dircache because it may not be up to date after

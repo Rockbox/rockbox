@@ -69,7 +69,8 @@ extern int show_logo(void);
 int open_utf8(const char* pathname, int flags);
 
 #ifdef BOOTFILE
-#if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF)
+#if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF) \
+        || defined(HAVE_HOTSWAP_STORAGE_AS_MAIN)
 void check_bootfile(bool do_rolo);
 #endif
 #endif

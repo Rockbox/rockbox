@@ -622,6 +622,9 @@ static void init(void)
 #ifdef HAVE_ACCESSORY_SUPPLY
     accessory_supply_set(global_settings.accessory_supply);
 #endif
+#ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
+    check_bootfile(false); /* remember write time and filesize */
+#endif
 }
 
 #ifdef CPU_PP
