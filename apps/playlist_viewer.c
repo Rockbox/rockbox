@@ -643,9 +643,7 @@ bool playlist_viewer_ex(const char* filename)
                                                             playing is stopped*/
             viewer.current_playing_track = track;
             gui_synclist_set_nb_items(&playlist_lists, viewer.num_tracks);
-            /* Abort move on playlist change */
-            viewer.moving_track = -1;
-            viewer.moving_playlist_index = -1;
+
             gui_synclist_draw(&playlist_lists);
         }
 
