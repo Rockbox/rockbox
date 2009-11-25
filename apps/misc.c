@@ -609,9 +609,19 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 #endif
 #ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
         case SYS_FS_CHANGED:
+        {
+            /* simple sanity: assume rockbox is on the first hotswappable
+             * driver, abort out if that one isn't inserted */
+            int i;
+            for (i = 0; i < NUM_DRIVES; i++)
+            {
+                if (storage_removable(i) && !storage_present(i))
+                    return SYS_FS_CHANGED;
+            }
             system_flush();
             check_bootfile(true); /* state gotten in main.c:init() */
             system_restore();
+        }
             return SYS_FS_CHANGED;
 #endif
 #ifdef HAVE_HEADPHONE_DETECTION
