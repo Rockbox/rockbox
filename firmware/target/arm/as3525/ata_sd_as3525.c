@@ -98,7 +98,7 @@ static int sd_wait_for_state(const int drive, unsigned int state);
 static int sd_select_bank(signed char bank);
 static int sd_init_card(const int drive);
 static void init_pl180_controller(const int drive);
-#define SECTOR_SIZE     512 /* XXX: different sector sizes ? */
+
 #define BLOCKS_PER_BANK 0x7a7800
 
 static tCardInfo card_info[NUM_DRIVES];
@@ -126,7 +126,7 @@ static volatile unsigned int transfer_error[NUM_VOLUMES];
 #define PL180_MAX_TRANSFER_ERRORS 10
 
 #define UNALIGNED_NUM_SECTORS 10
-static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SECTOR_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
+static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SD_BLOCK_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
 static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
 
 static inline void mci_delay(void)
@@ -691,7 +691,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         if(transfer > UNALIGNED_NUM_SECTORS)
             transfer = UNALIGNED_NUM_SECTORS;
         if(write)
-            memcpy(uncached_buffer, buf, transfer * SECTOR_SIZE);
+            memcpy(uncached_buffer, buf, transfer * SD_BLOCK_SIZE);
 
         /* Set bank_start to the correct unit (blocks or bytes) */
         if(!(card_info[drive].ocr & (1<<30)))   /* not SDHC */
@@ -724,7 +724,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
          * Note : the OF doesn't seem to use them anyway */
         MCI_DATA_TIMER(drive) = write ?
                 SD_MAX_WRITE_TIMEOUT : SD_MAX_READ_TIMEOUT;
-        MCI_DATA_LENGTH(drive) = transfer * card_info[drive].blocksize;
+        MCI_DATA_LENGTH(drive) = transfer * SD_BLOCK_SIZE;
         MCI_DATA_CTRL(drive) =  (1<<0) /* enable */                     |
                                 (!write<<1) /* transfer direction */    |
                                 (1<<3) /* DMA */                        |
@@ -739,8 +739,8 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         if(!transfer_error[drive])
         {
             if(!write)
-                memcpy(buf, uncached_buffer, transfer * SECTOR_SIZE);
-            buf += transfer * SECTOR_SIZE;
+                memcpy(buf, uncached_buffer, transfer * SD_BLOCK_SIZE);
+            buf += transfer * SD_BLOCK_SIZE;
             start += transfer;
             count -= transfer;
             loops = 0;  /* reset errors counter */
