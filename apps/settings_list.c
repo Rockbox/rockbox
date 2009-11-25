@@ -1101,11 +1101,11 @@ const struct settings_list settings[] = {
 #endif /* CONFIG_CODEC == SWCODEC */
     /* values for the trigger */
     INT_SETTING(F_RECSETTING, rec_start_thres_db, LANG_RECORD_START_THRESHOLD, -35,
-        "trigger start threshold dB", UNIT_DB, VOLUME_MIN/10, 0, -1, NULL, NULL, NULL),
+        "trigger start threshold dB", UNIT_DB, VOLUME_MIN/10, 0, 1, NULL, NULL, NULL),
     INT_SETTING(F_RECSETTING, rec_start_thres_linear, LANG_RECORD_START_THRESHOLD, 5,
         "trigger start threshold linear", UNIT_PERCENT, 0, 100, 1, NULL, NULL, NULL),
     INT_SETTING(F_RECSETTING, rec_stop_thres_db, LANG_RECORD_STOP_THRESHOLD, -45,
-        "trigger stop threshold dB", UNIT_DB, VOLUME_MIN/10, 0, -1, NULL, NULL, NULL),
+        "trigger stop threshold dB", UNIT_DB, VOLUME_MIN/10, 0, 1, NULL, NULL, NULL),
     INT_SETTING(F_RECSETTING, rec_stop_thres_linear, LANG_RECORD_STOP_THRESHOLD, 10,
         "trigger stop threshold linear", UNIT_PERCENT, 0, 100, 1, NULL, NULL, NULL),
     TABLE_SETTING(F_RECSETTING, rec_start_duration, LANG_MIN_DURATION, 0,
