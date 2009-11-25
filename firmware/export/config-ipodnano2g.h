@@ -58,6 +58,9 @@
 
 /* define this if the unit uses a scrollwheel for navigation */
 #define HAVE_SCROLLWHEEL
+#define HAVE_WHEEL_ACCELERATION
+#define WHEEL_ACCEL_START 270
+#define WHEEL_ACCELERATION 3
 
 /* Define this if you can detect headphones */
 #define HAVE_HEADPHONE_DETECTION
