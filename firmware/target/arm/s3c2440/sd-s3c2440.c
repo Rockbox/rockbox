@@ -19,17 +19,21 @@
  *
  ****************************************************************************/
  
-#define SD_DEBUG
+//#define SD_DEBUG
 
 #include "sd.h"
 #include "system.h"
 #include <string.h>
-#include "hotswap.h"
 #include "thread.h"
 #include "panic.h"
 
 #ifdef SD_DEBUG
 #include "uart-s3c2440.h"
+#endif
+#ifdef HAVE_HOTSWAP
+#include "hotswap.h"
+#include "disk.h"
+#include "fat.h"
 #endif
 #include "dma-target.h"     
 #include "system-target.h"
@@ -121,6 +125,12 @@ static unsigned char    aligned_buffer[UNALIGNED_NUM_SECTORS * SD_BLOCK_SIZE]
                         __attribute__((aligned(32)));
 static unsigned char *  uncached_buffer;
 
+static inline void mci_delay(void) 
+{ 
+    int i = 0xffff; 
+    while (i--)
+        asm volatile ("nop\n");
+}
 
 /* TODO: should be in target include file */
 /*****************************************************************************
@@ -133,12 +143,6 @@ static unsigned char *  uncached_buffer;
 /*****************************************************************************
     Functions specific to S3C2440 SoC
  *****************************************************************************/
-static inline void mci_delay(void) 
-{ 
-    /* Does this get optimised out ? */
-    int i = 0xffff; 
-    while(i--) ; 
-}
 
 #ifdef SD_DEBUG
 static unsigned reg_copy[16], reg_copy2[16];
@@ -163,7 +167,7 @@ static void dump_regs (unsigned *regs1, unsigned *regs2)
     {
         diff = *regs1 ^ *regs2;
         if (diff)
-            uart_printf ("%8x %8x %8x %8x\n", sdi_reg, *regs1, *regs2, diff );
+            dbgprintf ("%8x %8x %8x %8x\n", sdi_reg, *regs1, *regs2, diff );
         regs1++;
         regs2++;
         sdi_reg++;
@@ -174,7 +178,7 @@ static void dump_regs (unsigned *regs1, unsigned *regs2)
 static void debug_r1(int cmd)
 {
 #if defined(SD_DEBUG)
-    uart_printf("CMD%2.2d:SDICSTA=%04x [%c%c%c%c%c-%c%c%c%c%c%c%c]  SDIRSP0=%08x [%d %s] \n", 
+    dbgprintf("CMD%2.2d:SDICSTA=%04x [%c%c%c%c%c-%c%c%c%c%c%c%c]  SDIRSP0=%08x [%d %s] \n", 
         cmd, 
         SDICSTA, 
         (SDICSTA & S3C2410_SDICMDSTAT_CRCFAIL)    ? 'C' : ' ', 
@@ -493,10 +497,25 @@ static int sd_init_card(const int card_no)
 /*****************************************************************************/
 #ifdef HAVE_HOTSWAP
 
+static int sd1_oneshot_callback(struct timeout *tmo)
+{
+    (void)tmo;
+
+    /* This is called only if the state was stable for 300ms - check state
+     * and post appropriate event. */
+    if (card_detect_target())
+    {
+        queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
+    }
+    else
+        queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+    return 0;
+}
+
 bool card_detect_target(void)
 {
     /* TODO - use interrupt on change? */
-#ifdef MINI2440    
+#ifdef MINI2440
     return (GPGDAT & SD_CD) == 0;
 #else
 #error Unsupported target
@@ -505,18 +524,30 @@ bool card_detect_target(void)
 
 void card_enable_monitoring_target(bool on)
 {
-    (void)on;
-    /* TODO */
+    if (on)
+    {   /* enable external irq 8-23 on the internal interrupt controller */
+        INTMSK &= ~1<<5;
+        /* enable GPG8 IRQ on the external interrupt controller */
+        EINTMASK &= ~(1<<16);
+    }
+    else
+    {
+        /* mask internal and external IRQs */
+        INTMSK |=  1<<5;
+        EINTMASK |= (1<<16);
+    }
 }
 
-#if 0
-void EXT0(void)
+void EINT8_23(void)
 {
     static struct timeout sd1_oneshot;
-    
-    /* TODO */
+    EINTPEND = (1<<16); /* ack irq on external, then internal irq controller */
+    SRCPND = (1<<5);
+    INTPND = (1<<5);
+    /* add task to inform the system about the SD insertion
+     * sanity check if it's still inserted after 300ms  */
+    timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
 }
-#endif
 
 bool sd_removable(IF_MD_NONVOID(int card_no))
 {
@@ -569,9 +600,52 @@ static void sd_thread(void)
     while (1)
     {
         queue_wait_w_tmo(&sd_queue, &ev, HZ);
-
         switch ( ev.id )
         {
+#ifdef HAVE_HOTSWAP
+        case SYS_HOTSWAP_INSERTED:
+        case SYS_HOTSWAP_EXTRACTED:
+        {
+            int success = 1;
+            fat_lock();          /* lock-out FAT activity first -
+                                    prevent deadlocking via disk_mount that
+                                    would cause a reverse-order attempt with
+                                    another thread */
+            mutex_lock(&sd_mtx); /* lock-out card activity - direct calls
+                                    into driver that bypass the fat cache */
+
+            /* We now have exclusive control of fat cache and ata */
+
+            disk_unmount(0);     /* release "by force", ensure file
+                                    descriptors aren't leaked and any busy
+                                    ones are invalid if mounting */
+
+            /* Force card init for new card, re-init for re-inserted one or
+             * clear if the last attempt to init failed with an error. */
+            card_info[0].initialized = 0;
+
+            if (ev.id == SYS_HOTSWAP_INSERTED)
+            {
+                /* FIXME: once sd_enabled is implement properly,
+                 * reinitializing the controllers might be needed */
+                sd_enable(true);
+                if (success < 0) /* initialisation failed */
+                    panicf("SD init failed : %d", success);
+                success = disk_mount(0); /* 0 if fail */
+            }
+
+            /* notify the system about the changed filesystems
+             */
+            if (success)
+                queue_broadcast(SYS_FS_CHANGED, 0);
+
+            /* Access is now safe */
+            mutex_unlock(&sd_mtx);
+            fat_unlock();
+            sd_enable(false);
+        }
+            break;
+#endif
         }        
     }
 }
@@ -605,12 +679,9 @@ static int sd_wait_for_state(const int card_no, unsigned int state)
     }
 }
 
-static int sd_transfer_sectors(IF_MD2(int card_no,) unsigned long start,
+static int sd_transfer_sectors(int card_no, unsigned long start,
                                int count, void* buf, const bool write)
 {
-#ifndef HAVE_MULTIDRIVE
-    const int card_no = 0;
-#endif
     int ret = EC_OK;
     unsigned loops = 0;
     struct dma_request request;
@@ -672,9 +743,9 @@ static int sd_transfer_sectors(IF_MD2(int card_no,) unsigned long start,
         else
             SDIDCON |= S3C2410_SDIDCON_RXAFTERCMD | S3C2410_SDIDCON_XFER_RXSTART;
 
-    SDIDSTA |= S3C2410_SDIDSTA_CLEAR_BITS;  /* needed to clear int  */
-    SRCPND = SDI_MASK;
-    INTPND = SDI_MASK;
+        SDIDSTA |= S3C2410_SDIDSTA_CLEAR_BITS;  /* needed to clear int  */
+        SRCPND = SDI_MASK;
+        INTPND = SDI_MASK;
 
         /* Initiate read/write command */
         if(!send_cmd(card_no, cmd, start_addr, MCI_ARG | MCI_RESP, NULL))
@@ -739,7 +810,7 @@ static int sd_transfer_sectors(IF_MD2(int card_no,) unsigned long start,
         {
             status = SDIDSTA;
         }
-        uart_printf("%x \n", status);
+        dbgprintf("%x \n", status);
 #endif
         if( transfer_error[card_no] & S3C2410_SDIDSTA_XFERFINISH )
         {
@@ -805,7 +876,12 @@ int sd_read_sectors(IF_MD2(int card_no,) unsigned long start, int incount,
 #else
     dbgprintf ("sd_read %x %d\n", start, incount);
 #endif
-    ret = sd_transfer_sectors(IF_MD2(card_no,) start, incount, inbuf, false);
+#ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
+    if (!card_detect_target())
+        ret = 0; /* assume success */
+    else
+#endif
+        ret = sd_transfer_sectors(card_no, start, incount, inbuf, false);
     dbgprintf ("sd_read, ret=%d\n", ret);
     return ret;
 }
@@ -827,9 +903,14 @@ int sd_write_sectors(IF_MD2(int card_no,) unsigned long start, int count,
     dbgprintf ("sd_write %d %x %d\n", card_no, start, count);
 #else
     dbgprintf ("sd_write %x %d\n", start, count);
-#endif    
-    return sd_transfer_sectors(IF_MD2(card_no,) start, count, (void*)outbuf, true);
-#endif    
+#endif
+#ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
+    if (!card_detect_target())
+        return 0; /* assume success */
+    else
+#endif
+        return sd_transfer_sectors(card_no, start, count, (void*)outbuf, true);
+#endif
 }
 /*****************************************************************************/
 
@@ -870,7 +951,24 @@ int sd_init(void)
             sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
 
     uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
-    
+
+#ifdef HAVE_HOTSWAP
+    /*
+     * prepare detecting of SD insertion (not extraction) */
+    unsigned long for_extint = EXTINT2;
+    unsigned long for_gpgcon = GPGCON;
+    for_extint &= ~0x7;
+#ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
+    for_extint |=  0x2; /* detect falling edge only (0 means SD inserted) */
+#else
+    for_extint |=  0x3; /* detect both, raising and falling, edges */
+#endif
+    for_gpgcon &= ~(0x3<<16);
+    for_gpgcon |=  (0x2<<16); /* enable interrupt on pin 8 */
+    EXTINT2 = for_extint;
+    GPGCON = for_gpgcon;
+#endif
+
     initialized = true;
     return ret;
 }
