@@ -555,7 +555,7 @@ stackmunge:
     ldr     sp, =stackend
 
     /* Start the main function */
-    ldr     lr, =vectors
+    adr     lr, vectors
     ldr     pc, =main
 
     /* Should never get here, but let's restart in case (also needed for
