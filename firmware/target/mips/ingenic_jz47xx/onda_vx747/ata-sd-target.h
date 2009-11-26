@@ -22,20 +22,19 @@
 #ifndef ATA_SD_TARGET_H
 #define ATA_SD_TARGET_H
 
-#include "inttypes.h"
-#include "hotswap.h"
 #include "jz4740.h"
-
-int _sd_read_sectors(unsigned long start, int count, void* buf);
-int _sd_write_sectors(unsigned long start, int count, const void* buf);
-int _sd_init(void);
+#include "system.h"
 
 #define MMC_CD_PIN    (32*1 + 29)  /* Pin to check card insertion */
+#define MMC_CD_IRQ    GPIO61
 
-static inline void mmc_init_gpio(void)
+static inline void sd_init_gpio(void)
 {
     __gpio_as_msc();
+    __gpio_enable_pull(MMC_CD_PIN);
     __gpio_as_input(MMC_CD_PIN);
+    __gpio_mask_irq(MMC_CD_PIN);
+    system_enable_irq(GPIO_IRQ(MMC_CD_PIN));
 }
 
 #endif

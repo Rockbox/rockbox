@@ -782,7 +782,11 @@ int release_files(int volume)
     int closed = 0;
     for ( fd=0; fd<MAX_OPEN_FILES; fd++, pfile++)
     {
+#ifdef HAVE_MULTIVOLUME
         if (pfile->fatfile.volume == volume)
+#else
+        (void)volume;
+#endif
         {
             pfile->busy = false; /* mark as available, no further action */
             closed++;

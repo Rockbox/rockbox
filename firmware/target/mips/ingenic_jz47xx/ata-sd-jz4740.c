@@ -22,25 +22,40 @@
 #include "config.h"
 #include "jz4740.h"
 #include "ata.h"
+#include "ata_idle_notify.h"
 #include "ata-sd-target.h"
+#include "disk.h"
+#include "fat.h"
+#include "led.h"
+#include "hotswap.h"
 #include "logf.h"
 #include "sd.h"
 #include "system.h"
 #include "kernel.h"
-#include "panic.h"
-#include "debug.h"
 #include "storage.h"
 #include "string.h"
-#include "led.h"
+#include "usb.h"
 
-static struct wakeup sd_wakeup;
-static long last_disk_activity = -1;
-static tCardInfo card;
+static long               last_disk_activity = -1;
+static int                sd_drive_nr = 0;
+static tCardInfo          card;
+
+static long               sd_stack[(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
+static const char         sd_thread_name[] = "ata/sd";
+static struct event_queue sd_queue;
+static struct mutex       sd_mtx;
+static struct wakeup      sd_wakeup;
+static void               sd_thread(void) __attribute__((noreturn));
+
+static int                use_4bit;
+static int                num_6;
+static int                sd2_0;
 
 //#define SD_DMA_ENABLE
 #define SD_DMA_INTERRUPT 0
 
-#define DEBUG(x...)         logf(x)
+//#define DEBUG(x...)         logf(x)
+#define DEBUG(x, ...)
 
 #define SD_INSERT_STATUS() __gpio_get_pin(MMC_CD_PIN)
 #define SD_RESET()         __msc_reset()
@@ -116,7 +131,6 @@ enum sd_rsp_t
     RESPONSE_R6      = 8,
     RESPONSE_R7      = 9,
 };
-
 
 /*
   MMC status in R1
@@ -199,10 +213,6 @@ struct sd_request
 #define SD_EVENT_TX_DATA_DONE    0x02    /* Tx data done */
 #define SD_EVENT_PROG_DONE       0x04    /* Programming is done */
 
-static int use_4bit = 1;        /* Use 4-bit data bus */
-static int num_6 = 0;
-static int sd2_0 = 0;
-
 /**************************************************************************
  * Utility functions
  **************************************************************************/
@@ -214,7 +224,7 @@ static int sd2_0 = 0;
 #define PARSE_U16(_buf,_index) \
     (((unsigned short)_buf[_index]) << 8) | ((unsigned short)_buf[_index+1]);
 
-int sd_unpack_r1(struct sd_request *request, struct sd_response_r1 *r1)
+static int sd_unpack_r1(struct sd_request *request, struct sd_response_r1 *r1)
 {
     unsigned char *buf = request->response;
 
@@ -253,32 +263,22 @@ int sd_unpack_r1(struct sd_request *request, struct sd_response_r1 *r1)
     return 0;
 }
 
-int sd_unpack_scr(struct sd_request *request, struct sd_response_r1 *r1, unsigned int *scr)
-{
-    unsigned char *buf = request->response;
-    if (request->result)
-        return request->result;
-
-    *scr = PARSE_U32(buf, 5); /* Save SCR returned by the SD Card */
-    return sd_unpack_r1(request, r1); 
-}
-
-static inline int sd_unpack_r6(struct sd_request *request, struct sd_response_r1 *r1, unsigned long *rca)
+static int sd_unpack_r6(struct sd_request *request, struct sd_response_r1 *r1, unsigned long *rca)
 {
     unsigned char *buf = request->response;
 
     if (request->result)
         return request->result;
-        
+
     *rca = PARSE_U16(buf,1);  /* Save RCA returned by the SD Card */
-    
+
     *(buf+1) = 0;
     *(buf+2) = 0;
-    
-    return sd_unpack_r1(request, r1);
-}   
 
-int sd_unpack_r3(struct sd_request *request, struct sd_response_r3 *r3)
+    return sd_unpack_r1(request, r1);
+}
+
+static int sd_unpack_r3(struct sd_request *request, struct sd_response_r3 *r3)
 {
     unsigned char *buf = request->response;
 
@@ -287,7 +287,9 @@ int sd_unpack_r3(struct sd_request *request, struct sd_response_r3 *r3)
     r3->ocr = PARSE_U32(buf,1);
     DEBUG("sd_unpack_r3: ocr=%08x", r3->ocr);
 
-    if (buf[0] != 0x3f)  return SD_ERROR_HEADER_MISMATCH;
+    if (buf[0] != 0x3f)
+        return SD_ERROR_HEADER_MISMATCH;
+
     return 0;
 }
 
@@ -917,7 +919,6 @@ static void jz_sd_tx_handler(unsigned int arg)
     }
     if (__dmac_channel_transmit_end_detected(arg))
     {
-
         __dmac_channel_clear_transmit_end(arg);
         OSSemPost(sd_dma_tx_sem);
     }
@@ -945,6 +946,14 @@ void MSC(void)
     logf("MSC interrupt");
 }
 
+static void sd_gpio_setup_irq(bool inserted)
+{
+    if(inserted)
+        __gpio_as_irq_rise_edge(MMC_CD_PIN);
+    else
+        __gpio_as_irq_fall_edge(MMC_CD_PIN);
+}
+
 /*******************************************************************************************************************
 ** Name:      void sd_hardware_init()
 ** Function:  initialize the hardware condiction that access sd card
@@ -954,7 +963,8 @@ void MSC(void)
 static void jz_sd_hardware_init(void)
 {
     __cpm_start_msc();   /* enable mmc clock */
-    mmc_init_gpio();     /* init GPIO */
+    sd_init_gpio();     /* init GPIO */
+    sd_gpio_setup_irq(jz_sd_chkcard());
 #ifdef SD_POWER_ON
     SD_POWER_ON();      /* turn on power of card */
 #endif
@@ -1000,7 +1010,6 @@ static void sd_simple_cmd(struct sd_request *request, int cmd, unsigned int arg,
 #define SD_INIT_DOING   0
 #define SD_INIT_PASSED  1
 #define SD_INIT_FAILED  2
-
 static int sd_init_card_state(struct sd_request *request)
 {
     struct sd_response_r1 r1;
@@ -1026,41 +1035,42 @@ static int sd_init_card_state(struct sd_request *request)
                       retval);
                 limit_41++;
                 sd_simple_cmd(request, SD_APP_OP_COND, ocr, RESPONSE_R3);
-            } else if (limit_41 < 100) {
+            }
+            else if (limit_41 < 100)
+            {
                 limit_41++;
                 sd_simple_cmd(request, SD_APP_OP_COND, ocr, RESPONSE_R3);
-            } else{
+            }
+            else
                 /* reset the card to idle*/
                 sd_simple_cmd(request, SD_GO_IDLE_STATE, 0, RESPONSE_NONE);
-            }
             break;
 
         case SD_APP_OP_COND:
             retval = sd_unpack_r3(request, &r3);
             if (retval)
-            {
                 break;
-            }
 
             DEBUG("sd_init_card_state: read ocr value = 0x%08x", r3.ocr);
             card.ocr = r3.ocr;
 
-            if(!(r3.ocr & SD_CARD_BUSY || ocr == 0)){
-                udelay(10000);
+            if(!(r3.ocr & SD_CARD_BUSY || ocr == 0))
+            {
+                sleep(HZ / 100);
                 sd_simple_cmd(request, SD_APP_CMD, 0, RESPONSE_R1);
             }
             else
             {
-              /* Set the data bus width to 4 bits */
-              use_4bit = 1;
-              sd_simple_cmd(request, SD_ALL_SEND_CID, 0, RESPONSE_R2_CID);
+                /* Set the data bus width to 4 bits */
+                use_4bit = 1;
+                sd_simple_cmd(request, SD_ALL_SEND_CID, 0, RESPONSE_R2_CID);
             }
             break;
 
         case SD_ALL_SEND_CID:
             for(i=0; i<4; i++)
                 card.cid[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) | 
-                              (request->response[3+i*4]<< 8) | request->response[4+i*4]);
+                               (request->response[3+i*4]<< 8) | request->response[4+i*4]);
 
             logf("CID: %08lx%08lx%08lx%08lx", card.cid[0], card.cid[1], card.cid[2], card.cid[3]);
             sd_simple_cmd(request, SD_SEND_RELATIVE_ADDR, 0, RESPONSE_R6);
@@ -1068,7 +1078,7 @@ static int sd_init_card_state(struct sd_request *request)
         case SD_SEND_RELATIVE_ADDR:
             retval = sd_unpack_r6(request, &r1, &card.rca);
             card.rca = card.rca << 16; 
-            DEBUG("sd_init_card_state: Get RCA from SD: 0x%04x Status: %x", card.rca, r1.status);
+            DEBUG("sd_init_card_state: Get RCA from SD: 0x%04lx Status: %x", card.rca, r1.status);
             if (retval)
             {
                 DEBUG("sd_init_card_state: unable to SET_RELATIVE_ADDR error=%d", 
@@ -1082,7 +1092,7 @@ static int sd_init_card_state(struct sd_request *request)
         case SD_SEND_CSD:
             for(i=0; i<4; i++)
                 card.csd[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) | 
-                              (request->response[3+i*4]<< 8) | request->response[4+i*4]);
+                               (request->response[3+i*4]<< 8) | request->response[4+i*4]);
 
             sd_parse_csd(&card);
             sd2_0 = (card_extract_bits(card.csd, 127, 2) == 1);
@@ -1091,6 +1101,7 @@ static int sd_init_card_state(struct sd_request *request)
             DEBUG("SD card is ready");
             jz_sd_set_clock(SD_CLOCK_FAST);
             return SD_INIT_PASSED;
+
         default:
             DEBUG("sd_init_card_state: error!  Illegal last cmd %d", request->cmd);
             return SD_INIT_FAILED;
@@ -1110,7 +1121,7 @@ static int sd_switch(struct sd_request *request, int mode, int group,
     arg &= ~(0xF << (group * 4));
     arg |= value << (group * 4);
     sd_send_cmd(request, 6, arg, 1, 64, RESPONSE_R1, resp);
-    
+
     return 0;
 }
 
@@ -1123,7 +1134,7 @@ static int sd_read_switch(struct sd_request *request)
 
     memset((unsigned char *)status, 0, 64);
     sd_switch(request, 0, 0, 1, (unsigned char*) status);
-    
+
     if (((unsigned char *)status)[13] & 0x02)
         return 0;
     else 
@@ -1141,7 +1152,7 @@ static int sd_switch_hs(struct sd_request *request)
     return 0;
 }
 
-int sd_select_card(void)
+static int sd_select_card(void)
 {
     struct sd_request request;
     struct sd_response_r1 r1;
@@ -1173,51 +1184,63 @@ int sd_select_card(void)
     if (retval)
         return retval;
 
+    card.initialized = 1;
+
     return 0;
+}
+
+static int sd_init_device(void)
+{
+    int retval;
+    struct sd_request init_req;
+
+    mutex_lock(&sd_mtx);
+
+    /* Initialise card data as blank */
+    memset(&card, 0, sizeof(tCardInfo));
+
+    sd2_0 = 0;
+    num_6 = 0;
+    use_4bit = 0;
+
+    /* reset mmc/sd controller */
+    jz_sd_hardware_init();
+
+    sd_simple_cmd(&init_req, SD_CIM_RESET,     0,     RESPONSE_NONE);
+    sd_simple_cmd(&init_req, SD_GO_IDLE_STATE, 0,     RESPONSE_NONE);
+
+    sleep(HZ/2); /* Give the card/controller some rest */
+
+    while((retval = sd_init_card_state(&init_req)) == SD_INIT_DOING);
+    retval = (retval == SD_INIT_PASSED ? sd_select_card() : -1);
+
+    mutex_unlock(&sd_mtx);
+
+    return retval;
 }
 
 int sd_init(void)
 {
-    int retval;
     static bool inited = false;
-    struct sd_request init_req;
     if(!inited)
     {
-        jz_sd_hardware_init();
         wakeup_init(&sd_wakeup);
-        num_6 = 0;
+        mutex_init(&sd_mtx);
+        queue_init(&sd_queue, true);
+        create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
+                      sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE)
+                      IF_COP(, CPU));
+
         inited = true;
     }
-    
-    sd_simple_cmd(&init_req, SD_CIM_RESET,    0,     RESPONSE_NONE);
-    sd_simple_cmd(&init_req, SD_GO_IDLE_STATE, 0,     RESPONSE_NONE);
-    
-    while ((retval = sd_init_card_state(&init_req)) == SD_INIT_DOING);
 
-    if (retval == SD_INIT_PASSED)
-        return sd_select_card();
-    else
-        return -1;
+    return sd_init_device();
 }
 
 static inline bool card_detect_target(void)
 {
     return (jz_sd_chkcard() == 1);
 }
-
-#ifdef HAVE_HOTSWAP
-void card_enable_monitoring_target(bool on)
-{
-    if(on)
-    {
-        
-    }
-    else
-    {
-        
-    }
-}
-#endif
 
 tCardInfo* card_get_info_target(int card_no)
 {
@@ -1230,30 +1253,34 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
 #endif
+    mutex_lock(&sd_mtx);
     led(true);
 
     struct sd_request request;
     struct sd_response_r1 r1;
-    int retval; 
+    int retval = -1;
 
     if (!card_detect_target() || count == 0 || start > card.numblocks)
-        return -1;
-    
+        goto err;
+
+    if(card.initialized == 0 && !sd_init_device())
+        goto err;
+
     sd_simple_cmd(&request, SD_SEND_STATUS, card.rca, RESPONSE_R1);
     retval = sd_unpack_r1(&request, &r1);
     if (retval && (retval != SD_ERROR_STATE_MISMATCH))
-        return retval;
-    
+        goto err;
+
     sd_simple_cmd(&request, SD_SET_BLOCKLEN, SD_BLOCK_SIZE, RESPONSE_R1);
     if ((retval = sd_unpack_r1(&request, &r1)))
-        return retval;
-    
+        goto err;
+
     if (sd2_0)
     {
         sd_send_cmd(&request, SD_READ_MULTIPLE_BLOCK, start,
                      count, SD_BLOCK_SIZE, RESPONSE_R1, buf);
         if ((retval = sd_unpack_r1(&request, &r1)))
-            return retval;
+            goto err;
     }
     else
     {
@@ -1261,16 +1288,18 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf
                      start * SD_BLOCK_SIZE, count,
                      SD_BLOCK_SIZE, RESPONSE_R1, buf);
         if ((retval = sd_unpack_r1(&request, &r1)))
-            return retval;
+            goto err;
     }
-    
+
     last_disk_activity = current_tick;
 
     sd_simple_cmd(&request, SD_STOP_TRANSMISSION, 0, RESPONSE_R1B);
     if ((retval = sd_unpack_r1(&request, &r1)))
-        return retval;
-    
+        goto err;
+
+err:
     led(false);
+    mutex_unlock(&sd_mtx);
 
     return retval;
 }
@@ -1280,23 +1309,27 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const vo
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
 #endif
+    mutex_lock(&sd_mtx);
     led(true);
 
     struct sd_request request;
     struct sd_response_r1 r1;
-    int retval;
+    int retval = -1;
 
     if (!card_detect_target() || count == 0 || start > card.numblocks)
-        return -1;
+        goto err;
+
+    if(card.initialized == 0 && !sd_init_device())
+        goto err;
 
     sd_simple_cmd(&request, SD_SEND_STATUS, card.rca, RESPONSE_R1);
     retval = sd_unpack_r1(&request, &r1);
     if (retval && (retval != SD_ERROR_STATE_MISMATCH))
-        return retval;
+        goto err;
 
     sd_simple_cmd(&request, SD_SET_BLOCKLEN, SD_BLOCK_SIZE, RESPONSE_R1);
     if ((retval = sd_unpack_r1(&request, &r1)))
-        return retval;
+        goto err;
 
     if (sd2_0)
     {
@@ -1304,7 +1337,7 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const vo
                  count, SD_BLOCK_SIZE, RESPONSE_R1,
                  (void*)buf);
         if ((retval = sd_unpack_r1(&request, &r1)))
-            return retval;
+            goto err;
     }
     else
     {
@@ -1312,13 +1345,18 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const vo
                  start * SD_BLOCK_SIZE, count,
                  SD_BLOCK_SIZE, RESPONSE_R1, (void*)buf);
         if ((retval = sd_unpack_r1(&request, &r1)))
-            return retval;
+            goto err;
     }
+
+    last_disk_activity = current_tick;
+
     sd_simple_cmd(&request, SD_STOP_TRANSMISSION, 0, RESPONSE_R1B);
     if ((retval = sd_unpack_r1(&request, &r1)))
-        return retval;
+        goto err;
 
+err:
     led(false);
+    mutex_unlock(&sd_mtx);
 
     return retval;
 }
@@ -1342,10 +1380,9 @@ void sd_sleepnow(void)
 {
 }
 
-/* TODO */
 bool sd_disk_is_active(void)
 {
-    return false;
+    return sd_mtx.locked;
 }
 
 int sd_soft_reset(void)
@@ -1359,8 +1396,39 @@ bool sd_removable(IF_MV_NONVOID(int drive))
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
 #endif
-    //return true;
-    return false;
+    return true;
+}
+
+void card_enable_monitoring_target(bool on)
+{
+    if(on)
+        sd_gpio_setup_irq(card_detect_target());
+    else
+        __gpio_mask_irq(MMC_CD_PIN);
+}
+
+static int sd_oneshot_callback(struct timeout *tmo)
+{
+    (void)tmo;
+    int state = card_detect_target();
+
+    /* This is called only if the state was stable for 300ms - check state
+     * and post appropriate event. */
+    if (state)
+        queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
+    else
+        queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+
+    sd_gpio_setup_irq(state);
+
+    return 0;
+}
+
+/* called on insertion/removal interrupt */
+void MMC_CD_IRQ(void)
+{
+    static struct timeout sd_oneshot;
+    timeout_register(&sd_oneshot, sd_oneshot_callback, (3*HZ/10), 0);
 }
 #endif
 
@@ -1375,9 +1443,72 @@ bool sd_present(IF_MV_NONVOID(int drive))
 #ifdef CONFIG_STORAGE_MULTI
 int sd_num_drives(int first_drive)
 {
-    /* We don't care which logical drive number(s) we have been assigned */
-    (void)first_drive;
-    
+    sd_drive_nr = first_drive;
     return 1;
 }
 #endif
+
+static void sd_thread(void)
+{
+    struct queue_event ev;
+    bool idle_notified = false;
+
+    while (1)
+    {
+        queue_wait_w_tmo(&sd_queue, &ev, HZ);
+
+        switch (ev.id)
+        {
+#ifdef HAVE_HOTSWAP
+        case SYS_HOTSWAP_INSERTED:
+        case SYS_HOTSWAP_EXTRACTED:
+            fat_lock();          /* lock-out FAT activity first -
+                                    prevent deadlocking via disk_mount that
+                                    would cause a reverse-order attempt with
+                                    another thread */
+            mutex_lock(&sd_mtx); /* lock-out card activity - direct calls
+                                    into driver that bypass the fat cache */
+
+            /* We now have exclusive control of fat cache and ata */
+
+            disk_unmount(sd_drive_nr);     /* release "by force", ensure file
+                                    descriptors aren't leaked and any busy
+                                    ones are invalid if mounting */
+
+            /* Force card init for new card, re-init for re-inserted one or
+             * clear if the last attempt to init failed with an error. */
+            card.initialized = 0;
+
+            if(ev.id == SYS_HOTSWAP_INSERTED)
+                disk_mount(sd_drive_nr);
+
+            queue_broadcast(SYS_FS_CHANGED, 0);
+
+            /* Access is now safe */
+            mutex_unlock(&sd_mtx);
+            fat_unlock();
+            break;
+#endif
+        case SYS_TIMEOUT:
+            if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
+                idle_notified = false;
+            else
+            {
+                if (!idle_notified)
+                {
+                    call_storage_idle_notifys(false);
+                    idle_notified = true;
+                }
+            }
+            break;
+        case SYS_USB_CONNECTED:
+            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            /* Wait until the USB cable is extracted again */
+            usb_wait_for_disconnect(&sd_queue);
+            break;
+        case SYS_USB_DISCONNECTED:
+            usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
+            break;
+        }
+    }
+}

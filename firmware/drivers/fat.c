@@ -458,11 +458,15 @@ int fat_mount(IF_MV2(int volume,) IF_MD2(int drive,) long startsector)
 int fat_unmount(int volume, bool flush)
 {
     int rc;
+#ifdef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[volume];
+#else
+    (void)volume;
+#endif
 
     if(flush)
     {
-        rc = flush_fat(fat_bpb); /* the clean way, while still alive */
+        rc = flush_fat(IF_MV(fat_bpb)); /* the clean way, while still alive */
     }
     else
     {   /* volume is not accessible any more, e.g. MMC removed */
@@ -471,7 +475,11 @@ int fat_unmount(int volume, bool flush)
         for(i = 0;i < FAT_CACHE_SIZE;i++)
         {
             struct fat_cache_entry *fce = &fat_cache[i];
-            if(fce->inuse && fce->fat_vol == fat_bpb)
+            if(fce->inuse
+#ifdef HAVE_MULTIVOLUME
+               && fce->fat_vol == fat_bpb
+#endif
+              )
             {
                 fce->inuse = false; /* discard all from that volume */
                 fce->dirty = false;
@@ -480,7 +488,9 @@ int fat_unmount(int volume, bool flush)
         mutex_unlock(&cache_mutex);
         rc = 0;
     }
+#ifdef HAVE_MULTIVOLUME
     fat_bpb->mounted = false;
+#endif
     return rc;
 }
 #endif /* #ifdef HAVE_HOTSWAP */

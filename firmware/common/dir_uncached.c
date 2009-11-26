@@ -74,7 +74,11 @@ int release_dirs(int volume)
     int closed = 0;
     for ( dd=0; dd<MAX_OPEN_DIRS; dd++, pdir++)
     {
+#ifdef HAVE_MULTIVOLUME
         if (pdir->fatdir.file.volume == volume)
+#else
+        (void)volume;
+#endif
         {
             pdir->busy = false; /* mark as available, no further action */
             closed++;

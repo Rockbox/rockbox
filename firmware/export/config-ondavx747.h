@@ -167,11 +167,19 @@
 
 #define CFG_EXTAL 12000000    /* EXT clock: 12 Mhz */
 
+/*
+No access to the NAND yet..
+
 #define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
 #define NUM_DRIVES 2
+*/
+#define CONFIG_STORAGE (STORAGE_SD)
+#define NUM_DRIVES 1
+#define HAVE_HOTSWAP_STORAGE_AS_MAIN
+#define INCLUDE_TIMEOUT_API
 
 /* Define this if media can be exchanged on the fly */
-//#define HAVE_HOTSWAP
+#define HAVE_HOTSWAP
 
 /* Define this if you have a Ingenic JZ4732 */
 #define CONFIG_CPU JZ4732

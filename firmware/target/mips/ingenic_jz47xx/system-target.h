@@ -33,14 +33,14 @@
 /* This one returns the old status */
 static inline int set_interrupt_status(int status, int mask)
 {
-	unsigned int res, oldstatus;
-    
-	res = oldstatus = read_c0_status();
-	res &= ~mask;
-	res |= (status & mask);
-	write_c0_status(res);
-    
-	return oldstatus;
+    unsigned int res, oldstatus;
+
+    res = oldstatus = read_c0_status();
+    res &= ~mask;
+    res |= (status & mask);
+    write_c0_status(res);
+
+    return oldstatus;
 }
 
 static inline void enable_interrupt(void)
@@ -71,9 +71,9 @@ static inline void restore_interrupt(int status)
 #define set_irq_level(status)  set_interrupt_status((status), ST0_IE)
 #define disable_irq_save()     disable_interrupt_save(ST0_IE)
 #define restore_irq(c0_status) restore_interrupt(c0_status)
-    
-#define	swap16(x) (((x) & 0xff) << 8 | ((x) >> 8) & 0xff)
-#define	swap32(x) (((x) & 0xff) << 24 | ((x) & 0xff00) << 8 | \
+
+#define swap16(x) (((x) & 0xff) << 8 | ((x) >> 8) & 0xff)
+#define swap32(x) (((x) & 0xff) << 24 | ((x) & 0xff00) << 8 | \
                    ((x) & 0xff0000) >> 8 | ((x) >> 24) & 0xff)
 
 #define UNCACHED_ADDRESS(addr)    ((unsigned int)(addr) | 0xA0000000)
@@ -94,6 +94,7 @@ void dma_disable(void);
 #define XDMA_CALLBACK(n) DMA ## n
 #define DMA_CALLBACK(n)  XDMA_CALLBACK(n)
 
-#define DMA_IRQ(n)      (IRQ_DMA_0 + n)
+#define DMA_IRQ(n)      (IRQ_DMA_0 + (n))
+#define GPIO_IRQ(n)     (IRQ_GPIO_0 + (n))
 
 #endif /* __SYSTEM_TARGET_H_ */
