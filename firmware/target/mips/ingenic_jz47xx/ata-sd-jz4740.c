@@ -37,7 +37,7 @@
 #include "usb.h"
 
 static long               last_disk_activity = -1;
-#ifdef CONFIG_STORAGE_MULTI
+#if defined(CONFIG_STORAGE_MULTI) || defined(HAVE_HOTSWAP)
 static int                sd_drive_nr = 0;
 #endif
 static tCardInfo          card;
