@@ -80,9 +80,9 @@ void sd_spindown(int seconds)
 }
 
 #ifdef STORAGE_GET_INFO
-void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
+void sd_get_info(IF_MD2(int drive,) struct storage_info *info)
 {
-#ifndef HAVE_MULTIVOLUME
+#ifndef HAVE_MULTIDRIVE
     const int drive=0;
 #endif
 
