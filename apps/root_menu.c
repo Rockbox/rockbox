@@ -37,8 +37,12 @@
 #include "power.h"
 #include "talk.h"
 #include "audio.h"
-#include "hotswap.h"
 
+#ifdef HAVE_HOTSWAP
+#include "storage.h"
+#include "hotswap.h"
+#include "dir.h"
+#endif
 /* gui api */
 #include "list.h"
 #include "splash.h"
@@ -110,14 +114,37 @@ static int browser(void* param)
             {
                 strcpy(folder, current_track_path);
             }
-#ifdef HAVE_HOTSWAP /* quick hack to stop crashing if you try entering 
-                     the browser from the menu when you were in the card
-                     and it was removed */
-            else if (strchr(last_folder, '<') && (card_detect() == false))
-                strcpy(folder, "/");
-#endif
             else
+            {
+#ifdef HAVE_HOTSWAP
+                bool in_hotswap = false;
+                /* handle entering an ejected drive */
+                int i;
+                for (i = 0; i < NUM_VOLUMES; i++)
+                {
+                    char vol_string[VOL_ENUM_POS + 8];
+                    if (!storage_removable(i))
+                        continue;
+                    /* VOL_NAMES contains a %d */
+                    snprintf(vol_string, sizeof(vol_string), "/"VOL_NAMES, i);
+                    /* test whether we would browse the external card */
+                    if (!storage_present(i) &&
+                            (strstr(last_folder, vol_string)
+#ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
+                                                                || (i == 0)
+#endif
+                                                                ))
+                    {   /* leave folder as "/" to avoid crash when trying
+                         * to access an ejected drive */
+                        strcpy(folder, "/");
+                        in_hotswap = true;
+                        break;
+                    }
+                }
+            if (!in_hotswap)
+#endif
                 strcpy(folder, last_folder);
+            }
         break;
 #ifdef HAVE_TAGCACHE
         case GO_TO_DBBROWSER:
