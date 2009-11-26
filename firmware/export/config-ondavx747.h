@@ -174,7 +174,6 @@ No access to the NAND yet..
 #define NUM_DRIVES 2
 */
 #define CONFIG_STORAGE (STORAGE_SD)
-#define HAVE_MULTIVOLUME
 #define HAVE_MULTIDRIVE
 #define NUM_DRIVES 1
 #define HAVE_HOTSWAP_STORAGE_AS_MAIN
