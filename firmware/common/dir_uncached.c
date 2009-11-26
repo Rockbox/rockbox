@@ -26,6 +26,7 @@
 #include "fat.h"
 #include "dir.h"
 #include "debug.h"
+#include "filefuncs.h"
 
 #if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8)
 #define MAX_OPEN_DIRS 12

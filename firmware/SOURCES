@@ -39,9 +39,9 @@ common/disk.c
 #if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
 common/errno.c
 #endif /* !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__) */
+common/filefuncs.c
 common/memcmp.c
 common/memchr.c
-common/misc.c
 common/qsort.c
 common/random.c
 common/sprintf.c

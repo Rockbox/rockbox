@@ -26,6 +26,7 @@
 #include "dir_uncached.h"
 #include "debug.h"
 #include "dircache.h"
+#include "filefuncs.h"
 #include "system.h"
 
 /*
