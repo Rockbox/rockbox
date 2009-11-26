@@ -205,9 +205,13 @@ static void sd_card_mux(int card_no)
 
 #ifdef HAVE_HOTSWAP
 
-bool card_detect_target(void)
+static inline bool card_detect_target(void)
 {
+#ifdef HAVE_HOTSWAP
     return (GPIOB & (1<<26)) == 0; /* low active */
+#else
+    return false;
+#endif
 }
 
 void card_enable_monitoring_target(bool on)
@@ -260,11 +264,6 @@ bool sd_present(IF_MD_NONVOID(int card_no))
 }
 
 #else
-
-bool card_detect_target(void)
-{
-    return false;
-}
 
 bool sd_removable(IF_MD_NONVOID(int card_no))
 {

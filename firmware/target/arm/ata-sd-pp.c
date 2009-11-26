@@ -340,6 +340,21 @@ static int sd_wait_for_state(unsigned int state, int id)
     }
 }
 
+
+static inline bool card_detect_target(void)
+{
+#ifdef HAVE_HOTSWAP
+#ifdef SANSA_E200
+    return (GPIOA_INPUT_VAL & 0x80) == 0; /* low active */
+#elif defined SANSA_C200
+    return (GPIOL_INPUT_VAL & 0x08) != 0; /* high active */
+#endif
+#else
+    return false;
+#endif
+}
+
+
 static inline void copy_read_sectors_fast(unsigned char **buf)
 {
     /* Copy one chunk of 16 words using best method for start alignment */
@@ -1278,20 +1293,6 @@ tCardInfo *card_get_info_target(int card_no)
 {
     return &card_info[card_no];
 }
-
-bool card_detect_target(void)
-{
-#ifdef HAVE_HOTSWAP
-#ifdef SANSA_E200
-    return (GPIOA_INPUT_VAL & 0x80) == 0; /* low active */
-#elif defined SANSA_C200
-    return (GPIOL_INPUT_VAL & 0x08) != 0; /* high active */
-#endif
-#else
-    return false;
-#endif
-}
-
 #ifdef HAVE_HOTSWAP
 static int sd1_oneshot_callback(struct timeout *tmo)
 {

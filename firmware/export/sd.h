@@ -51,8 +51,6 @@ bool sd_present(IF_MV_NONVOID(int drive));
 void card_enable_monitoring_target(bool on);
 #endif
 
-bool card_detect_target(void);
-
 long sd_last_disk_activity(void);
 
 #ifdef CONFIG_STORAGE_MULTI

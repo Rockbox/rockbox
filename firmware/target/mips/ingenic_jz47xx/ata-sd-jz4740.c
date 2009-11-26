@@ -1200,7 +1200,7 @@ int sd_init(void)
         return -1;
 }
 
-bool card_detect_target(void)
+static inline bool card_detect_target(void)
 {
     return (jz_sd_chkcard() == 1);
 }

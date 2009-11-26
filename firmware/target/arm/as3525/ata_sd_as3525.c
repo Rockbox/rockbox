@@ -137,6 +137,16 @@ static inline void mci_delay(void)
     } while (--i);
 }
 
+
+static inline bool card_detect_target(void)
+{
+#if defined(HAVE_MULTIDRIVE)
+    return !(GPIOA_PIN(2));
+#else
+    return false;
+#endif
+}
+
 #ifdef HAVE_HOTSWAP
 static int sd1_oneshot_callback(struct timeout *tmo)
 {
@@ -870,15 +880,6 @@ void sd_enable(bool on)
 tCardInfo *card_get_info_target(int card_no)
 {
     return &card_info[card_no];
-}
-
-bool card_detect_target(void)
-{
-#if defined(HAVE_MULTIDRIVE)
-    return !(GPIOA_PIN(2));
-#else
-    return false;
-#endif
 }
 
 #ifdef HAVE_HOTSWAP

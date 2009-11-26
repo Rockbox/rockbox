@@ -53,7 +53,6 @@ typedef struct
 #if (CONFIG_STORAGE & STORAGE_SD)
 
 #include "sd.h"
-#define card_detect            card_detect_target
 #define card_get_info          card_get_info_target
 tCardInfo *card_get_info_target(int card_no);
 void sd_parse_csd(tCardInfo *card);
@@ -65,7 +64,6 @@ void sd_parse_csd(tCardInfo *card);
 #else /* STORAGE_MMC */
 
 #include "ata_mmc.h"
-#define card_detect            mmc_detect
 #define card_get_info          mmc_card_info
 tCardInfo *mmc_card_info(int card_no);
 #define card_touched           mmc_touched

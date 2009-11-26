@@ -494,6 +494,17 @@ static int sd_init_card(const int card_no)
     Generic functions
  *****************************************************************************/
 
+static inline bool card_detect_target(void)
+{
+    /* TODO - use interrupt on change? */
+#ifdef MINI2440
+    return (GPGDAT & SD_CD) == 0;
+#else
+#error Unsupported target
+#endif
+}
+
+
 /*****************************************************************************/
 #ifdef HAVE_HOTSWAP
 
@@ -510,16 +521,6 @@ static int sd1_oneshot_callback(struct timeout *tmo)
     else
         queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
     return 0;
-}
-
-bool card_detect_target(void)
-{
-    /* TODO - use interrupt on change? */
-#ifdef MINI2440
-    return (GPGDAT & SD_CD) == 0;
-#else
-#error Unsupported target
-#endif
 }
 
 void card_enable_monitoring_target(bool on)
@@ -569,12 +570,6 @@ bool sd_present(IF_MD_NONVOID(int card_no))
 
 /*****************************************************************************/
 #else
-
-bool card_detect_target(void)
-{
-    /* not applicable */
-    return false;
-}
 
 bool sd_removable(IF_MD_NONVOID(int card_no))
 {
