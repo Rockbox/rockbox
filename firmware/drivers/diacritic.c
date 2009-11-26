@@ -354,7 +354,7 @@ int is_diacritic(unsigned short char_code, bool *is_rtl)
     for (i = 1; i < DIAC_NUM_RANGES; i++)
     {
         /* Found */
-        if (char_code < DIAC_VAL(i))
+        if (char_code <= DIAC_VAL(i))
             break;
     }
 
