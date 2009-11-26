@@ -722,6 +722,9 @@ static size_t find_chunk(size_t length, struct chunkdesc **chunk)
 static size_t crossfade_mix_fade(int factor, size_t length, const char *buf,
                                  size_t *out_sample, struct chunkdesc **out_chunk)
 {
+    if (length == 0)
+        return 0;
+
     const int16_t *input_buf = (const int16_t *)buf;
     int16_t *output_buf = (int16_t *)((*out_chunk)->addr);
     int16_t *chunk_end = SKIPBYTES(output_buf, (*out_chunk)->size);
