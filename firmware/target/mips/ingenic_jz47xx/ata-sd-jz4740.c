@@ -37,7 +37,9 @@
 #include "usb.h"
 
 static long               last_disk_activity = -1;
+#ifdef CONFIG_STORAGE_MULTI
 static int                sd_drive_nr = 0;
+#endif
 static tCardInfo          card;
 
 static long               sd_stack[(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];

@@ -182,6 +182,9 @@ static bool check_event_queue(void)
 static int dircache_scan(IF_MV2(int volume,) struct travel_data *td)
 {
 #ifdef SIMULATOR
+#ifdef HAVE_MULTIVOLUME
+    (void)volume;
+#endif
     while ( ( td->entry = readdir_uncached(td->dir) ) )
 #else
     while ( (fat_getnext(td->dir, &td->entry) >= 0) && (td->entry.name[0]))

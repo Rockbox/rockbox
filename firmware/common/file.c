@@ -795,4 +795,3 @@ int release_files(int volume)
     return closed; /* return how many we did */
 }
 #endif /* #ifdef HAVE_HOTSWAP */
-
