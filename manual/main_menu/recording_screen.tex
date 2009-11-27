@@ -41,7 +41,8 @@ The controls for this screen are:
     \ActionRecPause 
     \opt{HAVEREMOTEKEYMAP}{& \ActionRCRecPause}
                      & Start Recording.\\
-                     & While recording: pause recording (press again to
+                     & \opt{HAVEREMOTEKEYMAP}{&}
+                      While recording: pause recording (press again to
                       continue).\\
     %
     \ActionRecExit  
@@ -55,7 +56,7 @@ The controls for this screen are:
       \ActionRecNewfile
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCRecNewfile} 
                      & Start Recording.\\
-                    & \opt{HAVEREMOTEKEYMAP}{&}
+                     & \opt{HAVEREMOTEKEYMAP}{&}
                         While recording: close the current file and open
                         a new one.\\
     }
