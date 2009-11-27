@@ -244,4 +244,5 @@ W_timeout:
 
 void i2c_init(void)
 {
+    __gpio_as_i2c();
 }
