@@ -1678,11 +1678,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Solo al cambio traccia"
+    crossfade: "Solo Al Cambio Traccia Manuale"
   </dest>
   <voice>
     *: none
-    crossfade: "Solo al cambio traccia"
+    crossfade: "Solo Al Cambio Traccia Manuale"
   </voice>
 </phrase>
 <phrase>
@@ -1695,11 +1695,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Casuale ed al Cambio Traccia"
+    crossfade: "Casuale O Al Cambio Traccia"
   </dest>
   <voice>
     *: none
-    crossfade: "Casuale ed al Cambio Traccia"
+    crossfade: "Casuale O Al Cambio Traccia"
   </voice>
 </phrase>
 <phrase>
@@ -13137,5 +13137,81 @@
   </dest>
   <voice>
     *: "Mescola E Accoda Come Ultima"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Usa Codice Morse Per Inserire"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Usa Codice Morse Per Inserire"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Solo Al Cambio Traccia Automatico"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Solo Al Cambio Traccia Automatico"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Prossima Traccia:"
+  </dest>
+  <voice>
+    *: "Prossima Traccia:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "Prossima:"
+  </dest>
+  <voice>
+    *: "Prossima:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "di"
+  </dest>
+  <voice>
+    *: "di"
   </voice>
 </phrase>
