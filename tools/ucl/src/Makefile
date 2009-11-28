@@ -40,14 +40,14 @@ $(OUT)/%.o: %.c
     
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
-libucli386.a:
+$(TARGET_DIR)libucli386.a:
 	make RBARCH=i386 TARGET_DIR=$(TARGET_DIR) libucli386.a
 
-libuclppc.a:
+$(TARGET_DIR)libuclppc.a:
 	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) libuclppc.a
 endif    
     
-libucl-universal: libucli386.a libuclppc.a
+libucl-universal: $(TARGET_DIR)libucli386.a $(TARGET_DIR)libuclppc.a
 	@echo lipo $(TARGET_DIR)libucl.a
 	$(SILENT) rm -f $(TARGET_DIR)libucl.a
 	lipo -create $(TARGET_DIR)libuclppc.a $(TARGET_DIR)libucli386.a -output $(TARGET_DIR)libucl.a    

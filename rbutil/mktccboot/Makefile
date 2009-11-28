@@ -72,14 +72,14 @@ $(OUTPUT): $(OBJS) $(EXTRADEPS)
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
-libmktccbooti386.a:
+$(TARGET_DIR)libmktccbooti386.a:
 	make RBARCH=i386 TARGET_DIR=$(TARGET_DIR) libmktccbooti386.a
 
-libmktccbootppc.a:
+$(TARGET_DIR)libmktccbootppc.a:
 	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) libmktccbootppc.a
 endif    
     
-libmktccboot-universal: libmktccbooti386.a libmktccbootppc.a
+libmktccboot-universal: $(TARGET_DIR)libmktccbooti386.a $(TARGET_DIR)libmktccbootppc.a
 	@echo lipo $(TARGET_DIR)libmktccboot.a
 	$(SILENT) rm -f $(TARGET_DIR)libmktccboot.a
 	lipo -create $(TARGET_DIR)libmktccbootppc.a $(TARGET_DIR)libmktccbooti386.a -output $(TARGET_DIR)libmktccboot.a

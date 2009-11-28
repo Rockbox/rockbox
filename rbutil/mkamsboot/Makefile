@@ -68,14 +68,14 @@ $(OUTPUT): $(OBJS) $(EXTRADEPS)
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
-libmkamsbooti386.a:
+$(TARGET_DIR)libmkamsbooti386.a:
 	make RBARCH=i386 TARGET_DIR=$(TARGET_DIR) libmkamsbooti386.a
 
-libmkamsbootppc.a:
+$(TARGET_DIR)libmkamsbootppc.a:
 	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) libmkamsbootppc.a
 endif    
     
-libmkamsboot-universal: libmkamsbooti386.a libmkamsbootppc.a
+libmkamsboot-universal: $(TARGET_DIR)libmkamsbooti386.a $(TARGET_DIR)libmkamsbootppc.a
 	@echo lipo $(TARGET_DIR)libmkamsboot.a
 	$(SILENT) rm -f $(TARGET_DIR)libmkamsboot.a
 	lipo -create $(TARGET_DIR)libmkamsbootppc.a $(TARGET_DIR)libmkamsbooti386.a -output $(TARGET_DIR)libmkamsboot.a
