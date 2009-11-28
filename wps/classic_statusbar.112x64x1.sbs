@@ -13,71 +13,95 @@
 # Just comment out the line for the one you dont want!
 
 # comment out the next line if you dont want battery icons
- %Vda
+%Vda%Vde
+
 # comment out the next line if you dont want battery number as text
 # %Vdb
 
 # comment out the next line if you dont want volume icons
-# %Vdc
+%Vdc
 # comment out the next line if you dont want volume number as text
 # %Vdd
  
 ################################################################
 
 # Load some bitmaps
-%xl|B|battery.bmp|0|0|10|
-%xl|V|volume.bmp|0|0|10|
-%xl|S|status.bmp|0|0|16|
+%xl|B|battery.bmp|0|0|16|
+%xl|V|volume.bmp|1|0|17|
+%xl|S|status.bmp|0|0|15|
+%xl|D|access_flash.bmp|0|0|
+%xl|y|batter-y.bmp|0|0|
+
+# %xl|m|rec_mpegbitrates.bmp|1|0|18|
+%xl|f|rec_frequencies.bmp|0|0|12|
+# %xl|e|rec_encoders.bmp|0|0|3|
+%xl|c|rec_channels.bmp|13|0|2|
 
 # Enable the correct viewports
 %?cs<%Vdc%Vdp%Vdr%Vds|%Vdc%Vdp%Vdr%Vds|%Vdz|%Vdc%Vdp%Vdr%Vds>
 
+# Charging animation viewports
+%t2%?bc<%Vdx|%Vda>;%t2%Vda
+
+# Either RTC (Recorders) or virtual LED (Ondios) viewport
+%?cc<%Vdt|%Vdl>
+
 # Battery area, Icons
-%Vl|a|0|0|16|8|0|
-%?bl<%xdBa|%xdBa|%xdBb|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>
-# charging icon
-%Vl|a|16|0|8|8|0|
-%?bc<%xdSa|>
+%Vl|a|0|0|17|7|0|
+%?bl<%xdBa|%xdBb|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj|%xdBk|%xdBl|%xdBm|%xdBn|%xdBo>
+
+# Battery area, viewport with full battery icon for charging animation
+%Vl|x|0|0|17|7|0| 
+%xdBo
+
+# end of battery symbol (to exclude it from animation)
+%Vl|e|17|0|3|7|0|
+%xdy
+
+# usb power or charger icon
+%V|20|0|8|8|0| 
+%?bu<%xdSa|%?bc<%xdSa|%?bp<%xdSo>>>
 
 # battery area, no icons
-%Vl|b|0|0|-|8|0|
-%bl%bc
+%Vl|b|0|0|18|8|0|
+%ar%bl
 
 # Volume area
-%Vl|c|27|0|-|8|0|
-%?mv<%pv|%?pv<%xdVa|%xdVb|%xdVc|%xdVd|%xdVe|%xdVf|%xdVg|%xdVh|%xdVi|%xdVj>>
-%Vl|d|27|0|-|8|0|
-%pv
+%Vl|c|28|0|19|8|0|
+%?mv<%ac%?pv<%xdVa|%pv| %pv| %pv>|%?pv<%xdVa|%xdVb|%xdVc|%xdVd|%xdVe|%xdVf|%xdVg|%xdVh|%xdVi|%xdVj|%xdVk|%xdVl|%xdVm|%xdVn|%xdVo|%xdVp|%xdVq>>
+%Vl|d|28|0|19|8|0|
+%ac%?pv<%xdVa|%pv| %pv| %pv>
 
 # Icons, all in the same bmp strip, so need to use multiple viewports
 # Playback mode
-%Vl|p|46|0|-|8|0|
+%Vl|p|47|0|9|8|0|
 %?mp<%xdSc|%xdSb|%xdSd|%xdSe|%xdSf|%xdSg|%xdSh|%xdSi|%xdSj>
 
 # Repeat mode
-%Vl|r|54|0|-|8|0|
-%?mm<|%xdSi|%xdSj|%xdSk|%xdSl>
+%Vl|r|56|0|9|8|0|
+%?mm<|%xdSk|%xdSl|%xdSm|%xdSn>
 
 # Shuffle mode
-%Vl|s|64|0|-|8|0|
-%?ps<%xdSk|>
+%Vl|s|65|0|-|8|0|
+%?ps<%xdSm|>
 
 
 # Recording section
-%Vl|z|27|0|6|8|0|
-
-%Vl|z|33|0|18|8|0|
-%?Rp<Q%Rb>
+# encoder/mpeg bitrate
+%Vl|z|28|0|19|8|0|
+%?Rp<%acQ%Rb>
 # status icon
-%Vl|z|46|0|8|8|0|
+%Vl|z|47|0|8|8|0|
 %?mp<%xdSc|%xdSb|%xdSd|%xdSe|%xdSf|%xdSg|%xdSh|%xdSi|%xdSj>
-# frequency and stereo/mono
-%Vl|z|54|0|-|8|0|
-%?Rp<%?Rf<??|44|48|32|22|24|16>%?Rm<%xdSm|%xdSn>>
+# frequency and channels
+%Vl|z|55|0|-|8|0|
+%?Rp<%?Rf<%xdfa|%xdfb|%xdfc|%xdfd|%xdfe|%xdff|%xdfg|%xdfh|%xdfi|%xdfj|%xdfk|%xdfl>>
+%?Rm<%xdca|%xdcb>
 
-# Clock on RTC able targets, and disk access
-%V|-36|0|-6|8|0| # align on the right with room for 6 SYSFONT digits
+# Clock on Recorders
+%Vl|t|-30|0|30|8|0| # align on the right with room for 5 SYSFONT digits
 %?cc<%?ca<%?St|time format|<%cH|%cI>:%cM|--:-->|>
-# disk access "icon"
-%V|-6|0|-|8|0| # align on the right with room for 1 SYSFONT digit
-%?lh<*|>
+
+# Disk access on Ondios
+%Vl|l|-12|0|-|8|0|
+%?lh<%xdD|>
