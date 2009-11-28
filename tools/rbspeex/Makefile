@@ -22,10 +22,6 @@ CFLAGS = $(SPEEXOPTS) $(INCLUDES) -O3 -fomit-frame-pointer -Wno-unused-parameter
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 CFLAGS+=-mno-cygwin
 endif
-# on mingw32, make sure CC is set to gcc
-ifeq ($(findstring MINGW,$(shell uname)),MINGW)
-CC = gcc
-endif
 
 ifdef RBARCH
 CFLAGS += -arch $(RBARCH)

@@ -7,7 +7,6 @@
 # $Id$
 #
 CFLAGS = -I../include
-CC = gcc
 
 ifndef V
 SILENT = @

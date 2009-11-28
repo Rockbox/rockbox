@@ -6,7 +6,6 @@ endif
 
 # We use the UCL code available in the Rockbox tools/ directory
 CFLAGS=-I../../tools/ucl/include -Wall -DVERSION=\"$(APPVERSION)\"
-CC = gcc
 
 ifndef V
 SILENT = @

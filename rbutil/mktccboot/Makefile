@@ -11,8 +11,6 @@
 TOOLSDIR=../../tools
 CFLAGS := -O -g -W -Wall -Wshadow -pedantic -I$(TOOLSDIR)
 
-CC = gcc
-
 ifndef V
 SILENT = @
 endif
