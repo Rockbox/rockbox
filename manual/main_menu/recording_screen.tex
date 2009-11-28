@@ -38,28 +38,35 @@ The controls for this screen are:
     \opt{HAVEREMOTEKEYMAP}{& \ActionRCRecSettingsDec{} / \ActionRecSettingsInc}
     & Adjust selected setting.\\
     %
-    \ActionRecPause 
-    \opt{HAVEREMOTEKEYMAP}{& \ActionRCRecPause}
-                     & Start Recording.\\
-                     & \opt{HAVEREMOTEKEYMAP}{&}
-                      While recording: pause recording (press again to
-                      continue).\\
+    \ActionRecPause
+        &
+    \opt{HAVEREMOTEKEYMAP}{
+        \ActionRCRecPause
+        &}
+    Start Recording.\newline
+    While recording: pause recording (press again to continue).
+        \\
     %
-    \ActionRecExit  
-    \opt{HAVEREMOTEKEYMAP}{& \ActionRCRecExit}
-                    & Exit \setting{Recording Screen}.\\
-                    & \opt{HAVEREMOTEKEYMAP}{&}
-                      While recording: Stop recording.\\
+    \ActionRecExit
+        &
+    \opt{HAVEREMOTEKEYMAP}{
+        \ActionRCRecExit
+        &}
+    Exit \setting{Recording Screen}.\newline
+    While recording: Stop recording.
+        \\
     %
-    \opt{IRIVER_H10_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,%
-         SANSA_E200_PAD,IPOD_4G_PAD,SANSA_C200_PAD}{
-      \ActionRecNewfile
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCRecNewfile} 
-                     & Start Recording.\\
-                     & \opt{HAVEREMOTEKEYMAP}{&}
-                        While recording: close the current file and open
-                        a new one.\\
-    }
+    \opt{IRIVER_H10_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+        ,SANSA_E200_PAD,IPOD_4G_PAD,SANSA_C200_PAD}{
+        \ActionRecNewfile
+            &
+        \opt{HAVEREMOTEKEYMAP}{
+            \ActionRCRecNewfile
+            &}
+        Start Recording.\newline
+        While recording: close the current file and open a new one.
+            \\
+        }
     %
     \ActionRecMenu
     \opt{HAVEREMOTEKEYMAP}{& \ActionRCRecMenu}
