@@ -22,5 +22,5 @@
 #define _DIACRITIC_H_
 #include "system.h"
 
-int is_diacritic(unsigned short char_code, bool *is_rtl);
+int is_diacritic(const unsigned short char_code, bool *is_rtl);
 #endif

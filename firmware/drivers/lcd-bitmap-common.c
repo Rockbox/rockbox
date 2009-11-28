@@ -83,11 +83,10 @@ static void lcd_gradient_rect(int x1, int x2, int y, unsigned h,
 /* put a string at a given pixel position, skipping first ofs pixel columns */
 static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 {
-    unsigned short ch, *ucs;
+    unsigned short *ucs;
     struct font* pf = font_get(current_vp->font);
     int vp_flags = current_vp->flags;
-    unsigned i;
-    static int rtl_next_non_diacritic_width, last_non_diacritic_width;
+    int rtl_next_non_diac_width, last_non_diacritic_width;
 
     if ((vp_flags & VP_FLAG_ALIGNMENT_MASK) != 0)
     {
@@ -109,25 +108,23 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         }
     }
 
-    ucs = bidi_l2v(str, 1);
-
-    rtl_next_non_diacritic_width = 0;
+    rtl_next_non_diac_width = 0;
     last_non_diacritic_width = 0;
     /* Mark diacritic and rtl flags for each character */
-    for (i = 0; i < SCROLL_LINE_SIZE && (ch = ucs[i]); i++)
+    for (ucs = bidi_l2v(str, 1); *ucs; ucs++)
     {
         bool is_rtl, is_diac;
         const unsigned char *bits;
         int width, base_width, drawmode = 0, base_ofs = 0;
-        unsigned short next_ch = ucs[i + 1];
+        const unsigned short next_ch = ucs[1];
 
         if (x >= current_vp->width)
             break;
 
-        is_diac = is_diacritic(ch, &is_rtl);
+        is_diac = is_diacritic(*ucs, &is_rtl);
 
         /* Get proportional width and glyph bits */
-        width = font_get_width(pf, ch);
+        width = font_get_width(pf, *ucs);
 
         /* Calculate base width */
         if (is_rtl)
@@ -135,20 +132,20 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
             /* Forward-seek the next non-diacritic character for base width */
             if (is_diac)
             {
-                if (!rtl_next_non_diacritic_width)
+                if (!rtl_next_non_diac_width)
                 {
-                    unsigned j;
+                    const unsigned short *u;
 
                     /* Jump to next non-diacritic char, and calc its width */
-                    for (j = i + 1; ucs[j] && is_diacritic(ucs[j], NULL); j++);
-                    rtl_next_non_diacritic_width = ucs[j] ?
-                        font_get_width(pf, ucs[j]) : 0;
+                    for (u = &ucs[1]; *u && is_diacritic(*u, NULL); u++);
+
+                    rtl_next_non_diac_width = *u ?  font_get_width(pf, *u) : 0;
                 }
-                base_width = rtl_next_non_diacritic_width;
+                base_width = rtl_next_non_diac_width;
             }
             else
             {
-                rtl_next_non_diacritic_width = 0; /* Mark */
+                rtl_next_non_diac_width = 0; /* Mark */
                 base_width = width;
             }
         }
@@ -188,7 +185,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
             base_ofs = (base_width - width) / 2;
         }
 
-        bits = font_get_bits(pf, ch);
+        bits = font_get_bits(pf, *ucs);
         LCDFN(mono_bitmap_part)(bits, ofs, 0, width, MAX(x + base_ofs, 0), y,
                 width - ofs, pf->height);
 
