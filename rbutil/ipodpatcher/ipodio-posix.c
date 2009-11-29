@@ -115,6 +115,10 @@ int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
                       unsigned char* buf, int bufsize)
 {
     /* TODO: Implement for BSD */
+    (void)ipod;
+    (void)page_code;
+    (void)buf;
+    (void)bufsize;
     return -1;
 }
 
@@ -134,6 +138,10 @@ int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
                       unsigned char* buf, int bufsize)
 {
     /* TODO: Implement for OS X */
+    (void)ipod;
+    (void)page_code;
+    (void)buf;
+    (void)bufsize;
     return -1;
 }
 
