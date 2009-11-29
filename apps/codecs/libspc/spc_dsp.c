@@ -288,7 +288,7 @@ static void key_on(struct Spc_Dsp* const this, struct voice_t* const voice,
 void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
 {
     #undef RAM
-#ifdef CPU_ARM
+#if defined(CPU_ARM) && !SPC_BRRCACHE
     uint8_t* const ram_ = ram.ram;
     #define RAM ram_
 #else
