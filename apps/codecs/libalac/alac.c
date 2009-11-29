@@ -166,6 +166,15 @@ static inline void unreadbits(alac_file *alac, int bits)
         alac->input_buffer_bitaccumulator *= -1;
 }
 
+/* ARMv5+ has a clz instruction equivalent to our function.
+ */
+#if (defined(CPU_ARM) && (ARM_ARCH > 4))
+static inline int count_leading_zeros(uint32_t v)
+{
+    return __builtin_clz(v);
+}
+#else
+
 static const unsigned char bittab[16] ICONST_ATTR = {
     0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4
 };
@@ -196,9 +205,7 @@ static inline int count_leading_zeros(int input)
     output -= bittab[input];
     return output;
 }
-
-
-
+#endif
 
 void basterdised_rice_decompress(alac_file *alac,
                                  int32_t *output_buffer,
