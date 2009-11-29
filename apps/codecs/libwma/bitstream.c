@@ -30,6 +30,8 @@
 #include "bitstream.h"
 #include <codecs/lib/codeclib.h>
 
+/* this stuff is unused */
+#if 0
 /**
  * Same as av_mallocz_static(), but does a realloc.
  *
@@ -79,6 +81,7 @@ void ff_put_string(PutBitContext * pbc, char *s, int put_zero)
     if(put_zero)
         put_bits(pbc, 8, 0);
 }
+#endif
 
 /* VLC decoding */
 
@@ -247,9 +250,8 @@ int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
              const void *codes, int codes_wrap, int codes_size,
              int flags)
 {
-
     vlc->bits = nb_bits;
-     vlc->table_size = 0;
+    vlc->table_size = 0;
 
 #ifdef DEBUG_VLC
     printf("build table nb_codes=%d\n", nb_codes);
