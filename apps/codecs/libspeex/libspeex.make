@@ -11,8 +11,10 @@
 # (one for codec, one for core voice)
 # so a little trickery is necessary
 
-SPEEXFLAGS = $(filter-out -O%,$(CODECFLAGS)) \
-		 -DHAVE_CONFIG_H -DSPEEX_DISABLE_ENCODER \
+# disable strict aliasing optimizations for now, it gives warnings due to
+# some horrid typecasting
+SPEEXFLAGS = $(filter-out -O%, $(filter-out -fstrict-aliasing, $(CODECFLAGS))) \
+		-fstrict-aliasing -DHAVE_CONFIG_H -DSPEEX_DISABLE_ENCODER \
 		-I$(APPSDIR)/codecs/libspeex
 
 # libspeex is faster on ARM-targets with -O1 instead of -O2
