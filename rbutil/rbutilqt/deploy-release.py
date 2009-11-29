@@ -65,12 +65,19 @@ except ImportError:
 # and executable filename.
 program = "rbutilqt"
 project = "rbutil/rbutilqt/rbutilqt.pro"
+environment = os.environ
+make = "make"
 if sys.platform == "win32":
     progexe = "Release/rbutilqt.exe"
     make = "mingw32-make"
+elif sys.platform == "darwin":
+    progexe = "rbutilqt.app"
+    # OS X 10.6 defaults to gcc 4.2. Building universal binaries that are
+    # compatible with 10.4 requires using gcc-4.0.
+    if not "QMAKESPEC" in environment:
+        environment["QMAKESPEC"] = "macx-g++40"
 else:
     progexe = program
-    make = "make"
 
 programfiles = [ progexe ]
 
@@ -105,7 +112,8 @@ def usage(myself):
     print "       -a, --add=<file>      add file to build folder before building"
     print "       -s, --source-only     only create source archive"
     print "       -b, --binary-only     only create binary archive"
-    print "       -d, --dynamic         link dynamically instead of static"
+    if sys.platform != "darwin":
+        print "       -d, --dynamic         link dynamically instead of static"
     print "       -h, --help            this help"
     print "  If neither a project file nor tag is specified trunk will get downloaded"
     print "  from svn."
@@ -120,7 +128,6 @@ def getsources(svnsrv, filelist, dest):
         destpath = re.subn('/$', '', dest + elem)[0]
         # make sure the destination path does exist
         d = os.path.dirname(destpath)
-        print d
         if not os.path.exists(d):
             os.makedirs(d)
         # get from svn
@@ -204,7 +211,7 @@ def qmake(qmake="qmake", projfile=project, wd=".", static=True):
         command.append("-config")
         command.append("static")
     command.append(projfile)
-    output = subprocess.Popen(command, stdout=subprocess.PIPE, cwd=wd)
+    output = subprocess.Popen(command, stdout=subprocess.PIPE, cwd=wd, env=environment)
     output.communicate()
     if not output.returncode == 0:
         print "qmake returned an error!"
@@ -227,13 +234,14 @@ def build(wd="."):
                 print "Build failed!"
                 return -1
             break
-    # strip
-    print "Stripping binary."
-    output = subprocess.Popen(["strip", progexe], stdout=subprocess.PIPE, cwd=wd)
-    output.communicate()
-    if not output.returncode == 0:
-        print "Stripping failed!"
-        return -1
+    if sys.platform != "darwin":
+        # strip. OS X handles this via macdeployqt.
+        print "Stripping binary."
+        output = subprocess.Popen(["strip", progexe], stdout=subprocess.PIPE, cwd=wd)
+        output.communicate()
+        if not output.returncode == 0:
+            print "Stripping failed!"
+            return -1
     return 0
 
 
@@ -296,6 +304,26 @@ def tarball(versionstring, buildfolder):
     return archivename
 
 
+def macdeploy(versionstring, buildfolder):
+    '''package created binary to dmg'''
+    dmgfile = program + "-" + versionstring + ".dmg"
+    appbundle = buildfolder + "/" + progexe
+
+    # workaround to Qt issues when building out-of-tree. Hardcoded for simplicity.
+    sourcebase = buildfolder + re.sub('rbutilqt.pro$', '', project)
+    shutil.copy(sourcebase + "icons/rbutilqt.icns", appbundle + "/Contents/Resources/")
+    shutil.copy(sourcebase + "Info.plist", appbundle + "/Contents/")
+    # end of Qt workaround
+
+    output = subprocess.Popen(["macdeployqt", progexe, "-dmg"], stdout=subprocess.PIPE, cwd=buildfolder)
+    output.communicate()
+    if not output.returncode == 0:
+        print "macdeployqt failed!"
+        return -1
+    # copy dmg to output folder
+    shutil.copy(buildfolder + "/" + program + ".dmg", dmgfile)
+    return dmgfile
+
 def filehashes(filename):
     '''Calculate md5 and sha1 hashes for a given file.'''
     if not os.path.exists(filename):
@@ -341,7 +369,10 @@ def main():
     cleanup = True
     binary = True
     source = True
-    static = True
+    if sys.platform != "darwin":
+        static = True
+    else:
+        static = False
     for o, a in opts:
         if o in ("-q", "--qmake"):
             qt = a
@@ -357,7 +388,7 @@ def main():
             binary = False
         if o in ("-b", "--binary-only"):
             source = False
-        if o in ("-d", "--dynamic"):
+        if o in ("-d", "--dynamic") and sys.platform != "darwin":
             static = False
         if o in ("-h", "--help"):
             usage(sys.argv[0])
@@ -438,6 +469,8 @@ def main():
         if not upxfile(sourcefolder) == 0:
             sys.exit(1)
         archive = zipball(ver, sourcefolder)
+    elif sys.platform == "darwin":
+        archive = macdeploy(ver, sourcefolder)
     else:
         archive = tarball(ver, sourcefolder)
 
