@@ -21,6 +21,13 @@
 
 #include <limits.h>
 
+#if (defined(CPU_ARM) && (ARM_ARCH > 4))
+static inline int av_log2(uint32_t v)
+{
+    return 31 - __builtin_clz(v);
+}
+#else
+
 /* From libavutil/common.h */
 extern const uint8_t ff_log2_tab[256];
 
@@ -41,6 +48,7 @@ static inline int av_log2(unsigned int v)
 
     return n;
 }
+#endif
 
 /**
  * @file golomb.h
