@@ -22,7 +22,7 @@ manual-prep: rockbox.tex
 	@if [ "$(OBJDIR)" = "" ]; then echo Run make in you build directory!; false; fi
 	@mkdir -p $(OBJDIR)
 	@find * -type d \! -regex '.*\.svn.*' -exec mkdir -p $(OBJDIR)/{} \;
-	@find * -type f \! -regex '.*\.svn.*' -exec cp -u {} $(OBJDIR)/{} \;
+	@find * -type f \! -regex '.*\.svn.*' -exec cp {} $(OBJDIR)/{} \;
 	@printf "%s%%" $(VERSION) > $(OBJDIR)/version.tex
 	@perl credits.pl < $(DOCSDIR)/CREDITS  > $(OBJDIR)/CREDITS.tex
 	@printf "\\\\newcommand{\\\\platform}{${MANUALDEV}}\n" > $(OBJDIR)/$(MANFILE).tex
