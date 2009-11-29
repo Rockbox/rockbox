@@ -41,8 +41,8 @@ include $(APPSDIR)/codecs/librm/librm.make
 include $(APPSDIR)/codecs/libatrac/libatrac.make
 
 # compile flags for codecs
-CODECFLAGS = $(CFLAGS) -I$(APPSDIR)/codecs -I$(APPSDIR)/codecs/lib \
-	-DCODEC
+CODECFLAGS = $(filter-out -fno-strict-aliasing,$(CFLAGS)) -fstrict-aliasing \
+	-I$(APPSDIR)/codecs -I$(APPSDIR)/codecs/lib -DCODEC
 
 ifndef SIMVER
   CODEC_LDS := $(APPSDIR)/plugins/plugin.lds # codecs and plugins use same file

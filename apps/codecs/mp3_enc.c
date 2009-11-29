@@ -2090,33 +2090,35 @@ STATICIRAM void to_mono_mm(void)
     /* |llllllllllllllll|rrrrrrrrrrrrrrrr| =>
      * |mmmmmmmmmmmmmmmm|mmmmmmmmmmmmmmmm|
      */
-    uint32_t *samp = (uint32_t *)&mfbuf[2*512];
-    uint32_t *samp_end = samp + samp_per_frame;
+    uint16_t *samp = &mfbuf[2*512];
+    uint16_t *samp_end = samp + 2*samp_per_frame;
 
-    inline void to_mono(uint32_t **samp)
+    inline void to_mono(uint16_t **samp)
     {
-        int32_t lr = **samp;
+        int16_t l = **samp;
+        int16_t r = **(samp+1);
         int32_t m;
 
         switch(cfg.rec_mono_mode)
         {
             case 1:
                 /* mono = L */
-                m  = lr >> 16;
+                m  = l;
                 break;
             case 2:
                 /* mono = R */
-                m  = (int16_t)lr;
+                m  = r;
                 break;
             case 0:
             default:
                 /* mono = (L+R)/2 */
-                m  = (int16_t)lr + (lr >> 16) + err;
+                m  = r + r + err;
                 err = m & 1;
                 m >>= 1;
                 break;
         }
-        *(*samp)++ = (m << 16) | (uint16_t)m;
+        *(*samp)++ = (uint16_t)m;
+        *(*samp)++ = (uint16_t)m;
     } /* to_mono */
 
     do

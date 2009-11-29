@@ -137,16 +137,15 @@ static inline void set_le16( void* p, unsigned n )
 }
 
 #define GET_LE16( addr )        get_le16( addr )
+#define GET_LE16A( addr )       get_le16( addr )
 #define SET_LE16( addr, data )  set_le16( addr, data )
 #define INT16A( addr ) (*(uint16_t*) (addr))
 #define INT16SA( addr ) (*(int16_t*) (addr))
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
-    #define GET_LE16A( addr )       (*(uint16_t*) (addr))
     #define GET_LE16SA( addr )      (*( int16_t*) (addr))
     #define SET_LE16A( addr, data ) (void) (*(uint16_t*) (addr) = (data))
 #else
-    #define GET_LE16A( addr )       get_le16 ( addr )
     #define GET_LE16SA( addr )      get_le16s( addr )
     #define SET_LE16A( addr, data ) set_le16 ( addr, data )
 #endif
@@ -166,13 +165,22 @@ struct cpu_regs_t
     uint8_t sp;
 };
 
+struct src_dir
+{
+    uint16_t start;
+    uint16_t loop;
+};
+
 struct cpu_ram_t
 {
     union {
         uint8_t padding1 [0x100];
         uint16_t align;
     } padding1 [1];
-    uint8_t ram      [0x10000];
+    union {
+        uint8_t ram       [0x10000];
+        struct src_dir sd [0x10000/sizeof(struct src_dir)];
+    };
     uint8_t padding2 [0x100];
 };
 
@@ -337,12 +345,6 @@ struct Spc_Dsp
     struct cache_entry_t wave_entry     [256];
     struct cache_entry_t wave_entry_old [256];
 #endif
-};
-
-struct src_dir
-{
-    char start [2];
-    char loop  [2];
 };
 
 void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf ) ICODE_ATTR;

@@ -77,12 +77,13 @@ static void decode_brr( struct Spc_Dsp* this, unsigned start_addr,
     /* setup same variables as where decode_brr() is called from */
     #undef RAM
     #define RAM ram.ram
+
     struct src_dir const* const sd =
-        (struct src_dir*) &RAM [this->r.g.wave_page * 0x100];
+        &ram.sd[this->r.g.wave_page * 0x100/sizeof(struct src_dir)];
     struct cache_entry_t* const wave_entry =
         &this->wave_entry [raw_voice->waveform];
-    
-    /* the following block can be put in place of the call to
+
+   /* the following block can be put in place of the call to
        decode_brr() below
     */
     {
@@ -106,7 +107,7 @@ static void decode_brr( struct Spc_Dsp* this, unsigned start_addr,
         wave_entry->start_addr = start_addr;
         
         uint8_t const* const loop_ptr =
-            RAM + GET_LE16A( sd [raw_voice->waveform].loop );
+            RAM + letoh16(sd[raw_voice->waveform].loop);
         short* loop_start = 0;
         
         short* out = BRRcache + start_addr * 2;
@@ -251,7 +252,7 @@ static void key_on(struct Spc_Dsp* const this, struct voice_t* const voice,
         voice->envx         = 0;
         voice->env_mode     = state_attack;
         voice->env_timer    = env_rate_init; /* TODO: inaccurate? */
-        unsigned start_addr = GET_LE16A(sd [raw_voice->waveform].start);
+        unsigned start_addr = letoh16(sd[raw_voice->waveform].start);
         #if !SPC_BRRCACHE
         {
             voice->addr = RAM + start_addr;
@@ -331,9 +332,9 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         }
         while ( (vbit >>= 1) != 0 );
     }
-    
-    struct src_dir const* const sd =
-        (struct src_dir*) &RAM [this->r.g.wave_page * 0x100];
+
+    struct src_dir const* const sd = 
+        &ram.sd[this->r.g.wave_page * 0x100/sizeof(struct src_dir)];
 
     #ifdef ROCKBOX_BIG_ENDIAN
         /* Convert endiannesses before entering loops - these
@@ -358,7 +359,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         const int echo_start = this->r.g.echo_page * 0x100;
     #endif /* CPU_COLDFIRE */
     #else
-        #define VOICE_RATE(x) (INT16A(raw_voice->rate) & 0x3FFF)
+        #define VOICE_RATE(x) (GET_LE16(raw_voice->rate) & 0x3FFF)
         #define IF_RBE(...)
     #endif /* ROCKBOX_BIG_ENDIAN */
    
@@ -590,7 +591,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 /* action based on previous block's header */
                 if ( voice->block_header & 1 )
                 {
-                    addr = RAM + GET_LE16A( sd [raw_voice->waveform].loop );
+                    addr = RAM + letoh16(sd[raw_voice->waveform].loop);
                     this->r.g.wave_ended |= vbit;
                     if ( !(voice->block_header & 2) ) /* 1% of the time */
                     {

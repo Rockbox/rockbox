@@ -1097,16 +1097,16 @@ static inline int clip(int i)
     else return(i);
 }
 
-STATICIRAM void synthrender(void *renderbuffer, int samplecount) ICODE_ATTR;
-void synthrender(void *renderbuffer, int samplecount)
+STATICIRAM void synthrender(int32_t *renderbuffer, int samplecount) ICODE_ATTR;
+void synthrender(int32_t *renderbuffer, int samplecount)
 {
     /* 125bpm equals to 50Hz (= 0.02s)
      * => one tick = mixingrate/50,
      * samples passing in one tick:
      * mixingrate/(bpm/2.5) = 2.5*mixingrate/bpm */
 
-    int *p_left = (int *) renderbuffer; /* int in rockbox */
-    int *p_right = p_left+1;
+    int32_t *p_left = renderbuffer; /* int in rockbox */
+    int32_t *p_right = p_left+1;
     signed short s;
     int qf_distance, qf_distance2;
 
