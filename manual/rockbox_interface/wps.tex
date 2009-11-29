@@ -5,7 +5,7 @@ currently playing audio file.
 %
 \opt{lcd_bitmap}{%
   The appearance of the WPS can be configured using WPS configuration files.
-  The items shown depend on your configuration -- all item can be turned on
+  The items shown depend on your configuration -- all items can be turned on
   or off independently. Refer to \reference{ref:wps_tags} for details on how
   to change the display of the WPS.
   \begin{itemize}
@@ -258,10 +258,12 @@ This screen is accessible from the WPS screen, and provides a detailed view of
 all the identity information about the current track. This info is known as
 meta data and is stored in audio file formats to keep information on artist,
 album etc. To access this screen, % 
-\opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD}{
+\opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,%
+      MROBE100_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,%
+      GIGABEAT_PAD,GIGABEAT_S_PAD}{
   press \ActionWpsIdThreeScreen. }%
-\opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}{press \ActionWpsContext{}
-  to access the \setting{WPS Context Menu} and select
+\opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IAUDIO_M3_PAD}{press
+  \ActionWpsContext{} to access the \setting{WPS Context Menu} and select
   \setting{Show Track Info}. }%
 \opt{RECORDER_PAD,PLAYER_PAD,ONDIO_PAD}{Use \ButtonLeft\ and \ButtonRight\
   to move through the information.}%
