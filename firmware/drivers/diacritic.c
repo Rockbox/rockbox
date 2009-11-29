@@ -26,319 +26,166 @@
 #include "diacritic.h"
 #include "system.h"
 
-#define DIAC_FLAG_NONE      0
-#define DIAC_FLAG_DIACRITIC (1 << 0)
-#define DIAC_FLAG_RTL       (1 << 1)
-
-#define DIAC_VAL(i)          (diac_ranges[(i)].last)
-#define DIAC_IS_DIACRITIC(i) (diac_ranges[(i)].flags & DIAC_FLAG_DIACRITIC)
-#define DIAC_IS_RTL(i)       (diac_ranges[(i)].flags & DIAC_FLAG_RTL)
 #define DIAC_NUM_RANGES      (ARRAYLEN(diac_ranges))
 
+/* Each diac_range_ struct defines a Unicode range that begins with
+ * N diacritic characters, and continues with non-diacritic characters up to the
+ * base of the next item in the array */
 struct diac_range
 {
-    unsigned short last;
-    unsigned char flags;
+    unsigned base           : 16;
+    unsigned num_diacritics :  7;
+    unsigned is_rtl         :  1;
 };
+
+#define DIAC_RANGE_ENTRY(first_diac, first_non_diac, is_rtl) \
+    { first_diac, first_non_diac - first_diac, is_rtl }
 
 /* Sorted by Unicode value */
 static const struct diac_range diac_ranges[] =
 {
-    { 0x0000, DIAC_FLAG_NONE },
-    { 0x02ff, DIAC_FLAG_NONE },
-    { 0x036f, DIAC_FLAG_DIACRITIC }, /* Combining Diacritical Marks */
-    { 0x0482, DIAC_FLAG_NONE },
-    { 0x0489, DIAC_FLAG_DIACRITIC }, /* Cyrillic */
-    { 0x0590, DIAC_FLAG_NONE },
-    { 0x05bd, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Hebrew */
-    { 0x05be, DIAC_FLAG_RTL },
-    { 0x05bf, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Hebrew */
-    { 0x05c0, DIAC_FLAG_RTL },
-    { 0x05c2, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Hebrew */
-    { 0x05c3, DIAC_FLAG_RTL },
-    { 0x05c5, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Hebrew */
-    { 0x05c6, DIAC_FLAG_RTL },
-    { 0x05c7, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Hebrew */
-    { 0x060f, DIAC_FLAG_RTL },
-    { 0x061a, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Arabic */
-    { 0x064a, DIAC_FLAG_RTL },
-    { 0x065e, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Arabic */
-    { 0x066f, DIAC_FLAG_RTL },
-    { 0x0670, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Arabic */
-    { 0x06d5, DIAC_FLAG_RTL },
-    { 0x06dc, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Arabic */
-    { 0x06de, DIAC_FLAG_RTL },
-    { 0x06e4, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Arabic */
-    { 0x06e6, DIAC_FLAG_RTL },
-    { 0x06e8, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Arabic */
-    { 0x06e9, DIAC_FLAG_RTL },
-    { 0x06ed, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Arabic */
-    { 0x0710, DIAC_FLAG_RTL },
-    { 0x0711, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Syriac */
-    { 0x072f, DIAC_FLAG_RTL },
-    { 0x074a, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Syriac */
-    { 0x07a5, DIAC_FLAG_RTL },
-    { 0x07b0, DIAC_FLAG_DIACRITIC | DIAC_FLAG_RTL }, /* Thaana */
-    { 0x07c0, DIAC_FLAG_RTL },
-    { 0x07ea, DIAC_FLAG_NONE },
-    { 0x07f3, DIAC_FLAG_DIACRITIC }, /* NKo */
-    { 0x0815, DIAC_FLAG_NONE },
-    { 0x0819, DIAC_FLAG_DIACRITIC }, /* Samaritan */
-    { 0x081a, DIAC_FLAG_NONE },
-    { 0x0823, DIAC_FLAG_DIACRITIC }, /* Samaritan */
-    { 0x0824, DIAC_FLAG_NONE },
-    { 0x0827, DIAC_FLAG_DIACRITIC }, /* Samaritan */
-    { 0x0828, DIAC_FLAG_NONE },
-    { 0x082d, DIAC_FLAG_DIACRITIC }, /* Samaritan */
-    { 0x08ff, DIAC_FLAG_NONE },
-    { 0x0903, DIAC_FLAG_DIACRITIC }, /* Devanagari */
-    { 0x093b, DIAC_FLAG_NONE },
-    { 0x093c, DIAC_FLAG_DIACRITIC }, /* Devanagari */
-    { 0x093d, DIAC_FLAG_NONE },
-    { 0x094e, DIAC_FLAG_DIACRITIC }, /* Devanagari */
-    { 0x0950, DIAC_FLAG_NONE },
-    { 0x0955, DIAC_FLAG_DIACRITIC }, /* Devanagari */
-    { 0x0961, DIAC_FLAG_NONE },
-    { 0x0963, DIAC_FLAG_DIACRITIC }, /* Devanagari */
-    { 0x0980, DIAC_FLAG_NONE },
-    { 0x0983, DIAC_FLAG_DIACRITIC }, /* Bengali */
-    { 0x09bb, DIAC_FLAG_NONE },
-    { 0x09bc, DIAC_FLAG_DIACRITIC }, /* Bengali */
-    { 0x09bd, DIAC_FLAG_NONE },
-    { 0x09cd, DIAC_FLAG_DIACRITIC }, /* Bengali */
-    { 0x09d6, DIAC_FLAG_NONE },
-    { 0x09d7, DIAC_FLAG_DIACRITIC }, /* Bengali */
-    { 0x09e1, DIAC_FLAG_NONE },
-    { 0x09e3, DIAC_FLAG_DIACRITIC }, /* Bengali */
-    { 0x0a00, DIAC_FLAG_NONE },
-    { 0x0a03, DIAC_FLAG_DIACRITIC }, /* Gurmukhi */
-    { 0x0a3b, DIAC_FLAG_NONE },
-    { 0x0a51, DIAC_FLAG_DIACRITIC }, /* Gurmukhi */
-    { 0x0a6f, DIAC_FLAG_NONE },
-    { 0x0a71, DIAC_FLAG_DIACRITIC }, /* Gurmukhi */
-    { 0x0a74, DIAC_FLAG_NONE },
-    { 0x0a75, DIAC_FLAG_DIACRITIC }, /* Gurmukhi */
-    { 0x0a80, DIAC_FLAG_NONE },
-    { 0x0a83, DIAC_FLAG_DIACRITIC }, /* Gujarati */
-    { 0x0abb, DIAC_FLAG_NONE },
-    { 0x0abc, DIAC_FLAG_DIACRITIC }, /* Gujarati */
-    { 0x0abd, DIAC_FLAG_NONE },
-    { 0x0acd, DIAC_FLAG_DIACRITIC }, /* Gujarati */
-    { 0x0ae1, DIAC_FLAG_NONE },
-    { 0x0ae3, DIAC_FLAG_DIACRITIC }, /* Gujarati */
-    { 0x0b00, DIAC_FLAG_NONE },
-    { 0x0b03, DIAC_FLAG_DIACRITIC }, /* Oriya */
-    { 0x0b3b, DIAC_FLAG_NONE },
-    { 0x0b3c, DIAC_FLAG_DIACRITIC }, /* Oriya */
-    { 0x0b3d, DIAC_FLAG_NONE },
-    { 0x0b57, DIAC_FLAG_DIACRITIC }, /* Oriya */
-    { 0x0b81, DIAC_FLAG_NONE },
-    { 0x0b82, DIAC_FLAG_DIACRITIC }, /* Tamil */
-    { 0x0bbd, DIAC_FLAG_NONE },
-    { 0x0bcd, DIAC_FLAG_DIACRITIC }, /* Tamil */
-    { 0x0bd6, DIAC_FLAG_NONE },
-    { 0x0bd7, DIAC_FLAG_DIACRITIC }, /* Tamil */
-    { 0x0c00, DIAC_FLAG_NONE },
-    { 0x0c03, DIAC_FLAG_DIACRITIC }, /* Telugu */
-    { 0x0c3d, DIAC_FLAG_NONE },
-    { 0x0c56, DIAC_FLAG_DIACRITIC }, /* Telugu */
-    { 0x0c61, DIAC_FLAG_NONE },
-    { 0x0c63, DIAC_FLAG_DIACRITIC }, /* Telugu */
-    { 0x0c81, DIAC_FLAG_NONE },
-    { 0x0c83, DIAC_FLAG_DIACRITIC }, /* Kannada */
-    { 0x0cbb, DIAC_FLAG_NONE },
-    { 0x0cbc, DIAC_FLAG_DIACRITIC }, /* Kannada */
-    { 0x0cbd, DIAC_FLAG_NONE },
-    { 0x0cd6, DIAC_FLAG_DIACRITIC }, /* Kannada */
-    { 0x0ce1, DIAC_FLAG_NONE },
-    { 0x0ce3, DIAC_FLAG_DIACRITIC }, /* Kannada */
-    { 0x0d01, DIAC_FLAG_NONE },
-    { 0x0d03, DIAC_FLAG_DIACRITIC }, /* Malayalam */
-    { 0x0d3d, DIAC_FLAG_NONE },
-    { 0x0d57, DIAC_FLAG_DIACRITIC }, /* Malayalam */
-    { 0x0d61, DIAC_FLAG_NONE },
-    { 0x0d63, DIAC_FLAG_DIACRITIC }, /* Malayalam */
-    { 0x0d81, DIAC_FLAG_NONE },
-    { 0x0d83, DIAC_FLAG_DIACRITIC }, /* Sinhala */
-    { 0x0dc9, DIAC_FLAG_NONE },
-    { 0x0df3, DIAC_FLAG_DIACRITIC }, /* Sinhala */
-    { 0x0e30, DIAC_FLAG_NONE },
-    { 0x0e31, DIAC_FLAG_DIACRITIC }, /* Thai */
-    { 0x0e33, DIAC_FLAG_NONE },
-    { 0x0e3a, DIAC_FLAG_DIACRITIC }, /* Thai */
-    { 0x0e46, DIAC_FLAG_NONE },
-    { 0x0e4e, DIAC_FLAG_DIACRITIC }, /* Thai */
-    { 0x0eb0, DIAC_FLAG_NONE },
-    { 0x0eb1, DIAC_FLAG_DIACRITIC }, /* Lao */
-    { 0x0eb3, DIAC_FLAG_NONE },
-    { 0x0ebc, DIAC_FLAG_DIACRITIC }, /* Lao */
-    { 0x0ec7, DIAC_FLAG_NONE },
-    { 0x0ecd, DIAC_FLAG_DIACRITIC }, /* Lao */
-    { 0x0f17, DIAC_FLAG_NONE },
-    { 0x0f19, DIAC_FLAG_DIACRITIC }, /* Tibetan */
-    { 0x0f34, DIAC_FLAG_NONE },
-    { 0x0f35, DIAC_FLAG_DIACRITIC }, /* Tibetan */
-    { 0x0f36, DIAC_FLAG_NONE },
-    { 0x0f37, DIAC_FLAG_DIACRITIC }, /* Tibetan */
-    { 0x0f38, DIAC_FLAG_NONE },
-    { 0x0f39, DIAC_FLAG_DIACRITIC }, /* Tibetan */
-    { 0x0f3d, DIAC_FLAG_NONE },
-    { 0x0f3f, DIAC_FLAG_DIACRITIC }, /* Tibetan */
-    { 0x0f70, DIAC_FLAG_NONE },
-    { 0x0f84, DIAC_FLAG_DIACRITIC }, /* Tibetan */
-    { 0x0f85, DIAC_FLAG_NONE },
-    { 0x0f87, DIAC_FLAG_DIACRITIC }, /* Tibetan */
-    { 0x0f8f, DIAC_FLAG_NONE },
-    { 0x0fbc, DIAC_FLAG_DIACRITIC }, /* Tibetan */
-    { 0x102a, DIAC_FLAG_NONE },
-    { 0x103e, DIAC_FLAG_DIACRITIC }, /* Myanmar */
-    { 0x1055, DIAC_FLAG_NONE },
-    { 0x1059, DIAC_FLAG_DIACRITIC }, /* Myanmar */
-    { 0x105d, DIAC_FLAG_NONE },
-    { 0x1060, DIAC_FLAG_DIACRITIC }, /* Myanmar */
-    { 0x1061, DIAC_FLAG_NONE },
-    { 0x1064, DIAC_FLAG_DIACRITIC }, /* Myanmar */
-    { 0x1066, DIAC_FLAG_NONE },
-    { 0x106d, DIAC_FLAG_DIACRITIC }, /* Myanmar */
-    { 0x1070, DIAC_FLAG_NONE },
-    { 0x1074, DIAC_FLAG_DIACRITIC }, /* Myanmar */
-    { 0x1081, DIAC_FLAG_NONE },
-    { 0x108d, DIAC_FLAG_DIACRITIC }, /* Myanmar */
-    { 0x108e, DIAC_FLAG_NONE },
-    { 0x108f, DIAC_FLAG_DIACRITIC }, /* Myanmar */
-    { 0x1099, DIAC_FLAG_NONE },
-    { 0x109d, DIAC_FLAG_DIACRITIC }, /* Myanmar */
-    { 0x135e, DIAC_FLAG_NONE },
-    { 0x135f, DIAC_FLAG_DIACRITIC }, /* Ethiopic */
-    { 0x1711, DIAC_FLAG_NONE },
-    { 0x1714, DIAC_FLAG_DIACRITIC }, /* Tagalog */
-    { 0x1731, DIAC_FLAG_NONE },
-    { 0x1734, DIAC_FLAG_DIACRITIC }, /* Hanunoo */
-    { 0x1751, DIAC_FLAG_NONE },
-    { 0x1753, DIAC_FLAG_DIACRITIC }, /* Buhid */
-    { 0x1771, DIAC_FLAG_NONE },
-    { 0x1773, DIAC_FLAG_DIACRITIC }, /* Tagbanwa */
-    { 0x17b5, DIAC_FLAG_NONE },
-    { 0x17d3, DIAC_FLAG_DIACRITIC }, /* Khmer */
-    { 0x17dc, DIAC_FLAG_NONE },
-    { 0x17dd, DIAC_FLAG_DIACRITIC }, /* Khmer */
-    { 0x18a8, DIAC_FLAG_NONE },
-    { 0x18a9, DIAC_FLAG_DIACRITIC }, /* Mongolian */
-    { 0x191f, DIAC_FLAG_NONE },
-    { 0x193b, DIAC_FLAG_DIACRITIC }, /* Limbu */
-    { 0x19af, DIAC_FLAG_NONE },
-    { 0x19c0, DIAC_FLAG_DIACRITIC }, /* New Tai Lue */
-    { 0x19c7, DIAC_FLAG_NONE },
-    { 0x19c9, DIAC_FLAG_DIACRITIC }, /* New Tai Lue */
-    { 0x1a16, DIAC_FLAG_NONE },
-    { 0x1a1b, DIAC_FLAG_DIACRITIC }, /* Buginese */
-    { 0x1a54, DIAC_FLAG_NONE },
-    { 0x1a7f, DIAC_FLAG_DIACRITIC }, /* Tai Tham */
-    { 0x1aff, DIAC_FLAG_NONE },
-    { 0x1b04, DIAC_FLAG_DIACRITIC }, /* Balinese */
-    { 0x1b33, DIAC_FLAG_NONE },
-    { 0x1b44, DIAC_FLAG_DIACRITIC }, /* Balinese */
-    { 0x1b6a, DIAC_FLAG_NONE },
-    { 0x1b73, DIAC_FLAG_DIACRITIC }, /* Balinese */
-    { 0x1b7f, DIAC_FLAG_NONE },
-    { 0x1b82, DIAC_FLAG_DIACRITIC }, /* Sundanese */
-    { 0x1ba0, DIAC_FLAG_NONE },
-    { 0x1baa, DIAC_FLAG_DIACRITIC }, /* Sundanese */
-    { 0x1c23, DIAC_FLAG_NONE },
-    { 0x1c37, DIAC_FLAG_DIACRITIC }, /* Lepcha */
-    { 0x1ccf, DIAC_FLAG_NONE },
-    { 0x1cd2, DIAC_FLAG_DIACRITIC }, /* Vedic Extensions */
-    { 0x1cd3, DIAC_FLAG_NONE },
-    { 0x1ce8, DIAC_FLAG_DIACRITIC }, /* Vedic Extensions */
-    { 0x1cec, DIAC_FLAG_NONE },
-    { 0x1ced, DIAC_FLAG_DIACRITIC }, /* Vedic Extensions */
-    { 0x1cf1, DIAC_FLAG_NONE },
-    { 0x1cf2, DIAC_FLAG_DIACRITIC }, /* Vedic Extensions */
-    { 0x1dbf, DIAC_FLAG_NONE },
-    { 0x1dff, DIAC_FLAG_DIACRITIC }, /* Combining Diacritical Marks Supplement */
-    { 0x20cf, DIAC_FLAG_NONE },
-    { 0x20f0, DIAC_FLAG_DIACRITIC }, /* Combining Diacritical Marks for Symbols */
-    { 0x2cee, DIAC_FLAG_NONE },
-    { 0x2cf1, DIAC_FLAG_DIACRITIC }, /* Coptic */
-    { 0x2ddf, DIAC_FLAG_NONE },
-    { 0x2dff, DIAC_FLAG_DIACRITIC }, /* Coptic */
-    { 0x3029, DIAC_FLAG_NONE },
-    { 0x302f, DIAC_FLAG_DIACRITIC }, /* CJK Symbols and Punctuation */
-    { 0x3098, DIAC_FLAG_NONE },
-    { 0x309a, DIAC_FLAG_DIACRITIC }, /* Hiragana */
-    { 0xa66e, DIAC_FLAG_NONE },
-    { 0xa672, DIAC_FLAG_DIACRITIC }, /* Hiragana */
-    { 0xa67b, DIAC_FLAG_NONE },
-    { 0xa67d, DIAC_FLAG_DIACRITIC }, /* Hiragana */
-    { 0xa6ef, DIAC_FLAG_NONE },
-    { 0xa6f1, DIAC_FLAG_DIACRITIC }, /* Bamum */
-    { 0xa801, DIAC_FLAG_NONE },
-    { 0xa802, DIAC_FLAG_DIACRITIC }, /* Syloti Nagri */
-    { 0xa805, DIAC_FLAG_NONE },
-    { 0xa806, DIAC_FLAG_DIACRITIC }, /* Syloti Nagri */
-    { 0xa80a, DIAC_FLAG_NONE },
-    { 0xa80b, DIAC_FLAG_DIACRITIC }, /* Syloti Nagri */
-    { 0xa822, DIAC_FLAG_NONE },
-    { 0xa827, DIAC_FLAG_DIACRITIC }, /* Syloti Nagri */
-    { 0xa87f, DIAC_FLAG_NONE },
-    { 0xa881, DIAC_FLAG_DIACRITIC }, /* Saurashtra */
-    { 0xa8b3, DIAC_FLAG_NONE },
-    { 0xa8c4, DIAC_FLAG_DIACRITIC }, /* Saurashtra */
-    { 0xa8df, DIAC_FLAG_NONE },
-    { 0xa8f1, DIAC_FLAG_DIACRITIC }, /* Devanagari Extended */
-    { 0xa925, DIAC_FLAG_NONE },
-    { 0xa92d, DIAC_FLAG_DIACRITIC }, /* Kayah Li */
-    { 0xa946, DIAC_FLAG_NONE },
-    { 0xa953, DIAC_FLAG_DIACRITIC }, /* Rejang */
-    { 0xa97f, DIAC_FLAG_NONE },
-    { 0xa983, DIAC_FLAG_DIACRITIC }, /* Javanese */
-    { 0xa9b2, DIAC_FLAG_NONE },
-    { 0xa9c0, DIAC_FLAG_DIACRITIC }, /* Javanese */
-    { 0xaa28, DIAC_FLAG_NONE },
-    { 0xaa36, DIAC_FLAG_DIACRITIC }, /* Cham */
-    { 0xaa42, DIAC_FLAG_NONE },
-    { 0xaa43, DIAC_FLAG_DIACRITIC }, /* Cham */
-    { 0xaa4b, DIAC_FLAG_NONE },
-    { 0xaa4d, DIAC_FLAG_DIACRITIC }, /* Cham */
-    { 0xaa7a, DIAC_FLAG_NONE },
-    { 0xaa7b, DIAC_FLAG_DIACRITIC }, /* Cham */
-    { 0xaaaf, DIAC_FLAG_NONE },
-    { 0xaab0, DIAC_FLAG_DIACRITIC }, /* Tai Viet */
-    { 0xaab1, DIAC_FLAG_NONE },
-    { 0xaab4, DIAC_FLAG_DIACRITIC }, /* Tai Viet */
-    { 0xaab6, DIAC_FLAG_NONE },
-    { 0xaab8, DIAC_FLAG_DIACRITIC }, /* Tai Viet */
-    { 0xaabd, DIAC_FLAG_NONE },
-    { 0xaabf, DIAC_FLAG_DIACRITIC }, /* Tai Viet */
-    { 0xaac0, DIAC_FLAG_NONE },
-    { 0xaac1, DIAC_FLAG_DIACRITIC }, /* Tai Viet */
-    { 0xabe2, DIAC_FLAG_NONE },
-    { 0xabea, DIAC_FLAG_DIACRITIC }, /* Meetei Mayek */
-    { 0xabeb, DIAC_FLAG_NONE },
-    { 0xabed, DIAC_FLAG_DIACRITIC }, /* Meetei Mayek */
-    { 0xfb1d, DIAC_FLAG_NONE },
-    { 0xfb1e, DIAC_FLAG_DIACRITIC }, /* Alphabetic Presentation Forms */
-    { 0xfe1f, DIAC_FLAG_NONE },
-    { 0xfe26, DIAC_FLAG_DIACRITIC }, /* Combining Half Marks */
-    /* Currently we don't support chars above U-FFFF */
-    { 0xffff, DIAC_FLAG_NONE },
-#if 0
-    { 0x1107f, DIAC_FLAG_NONE },
-    { 0x11082, DIAC_FLAG_DIACRITIC }, /* Kaithi */
-    { 0x110af, DIAC_FLAG_NONE },
-    { 0x110ba, DIAC_FLAG_DIACRITIC }, /* Kaithi */
-    { 0x1d164, DIAC_FLAG_NONE },
-    { 0x1d169, DIAC_FLAG_DIACRITIC }, /* Musical Symbols */
-    { 0x1d16c, DIAC_FLAG_NONE },
-    { 0x1d182, DIAC_FLAG_DIACRITIC }, /* Musical Symbols */
-    { 0x1d184, DIAC_FLAG_NONE },
-    { 0x1d18b, DIAC_FLAG_DIACRITIC }, /* Musical Symbols */
-    { 0x1d1a9, DIAC_FLAG_NONE },
-    { 0x1d1ad, DIAC_FLAG_DIACRITIC }, /* Musical Symbols */
-    { 0x1d241, DIAC_FLAG_NONE },
-    { 0x1d244, DIAC_FLAG_DIACRITIC }, /* Ancient Greek Musical Notation */
-    { 0xe01ef, DIAC_FLAG_NONE },
-#endif
+    DIAC_RANGE_ENTRY(0x0000, 0x0000, 0),
+    DIAC_RANGE_ENTRY(0x0300, 0x0370, 0),
+    DIAC_RANGE_ENTRY(0x0483, 0x048a, 0),
+    DIAC_RANGE_ENTRY(0x0591, 0x05be, 1),
+    DIAC_RANGE_ENTRY(0x05bf, 0x05c0, 1),
+    DIAC_RANGE_ENTRY(0x05c1, 0x05c3, 1),
+    DIAC_RANGE_ENTRY(0x05c4, 0x05c6, 1),
+    DIAC_RANGE_ENTRY(0x05c7, 0x05c8, 1),
+    DIAC_RANGE_ENTRY(0x0610, 0x061b, 1),
+    DIAC_RANGE_ENTRY(0x064b, 0x065f, 1),
+    DIAC_RANGE_ENTRY(0x0670, 0x0671, 1),
+    DIAC_RANGE_ENTRY(0x06d6, 0x06dd, 1),
+    DIAC_RANGE_ENTRY(0x06df, 0x06e5, 1),
+    DIAC_RANGE_ENTRY(0x06e7, 0x06e9, 1),
+    DIAC_RANGE_ENTRY(0x06ea, 0x06ee, 1),
+    DIAC_RANGE_ENTRY(0x0711, 0x0712, 1),
+    DIAC_RANGE_ENTRY(0x0730, 0x074b, 1),
+    DIAC_RANGE_ENTRY(0x07a6, 0x07b1, 1),
+    DIAC_RANGE_ENTRY(0x07bf, 0x07c0, 0),
+    DIAC_RANGE_ENTRY(0x07eb, 0x07f4, 0),
+    DIAC_RANGE_ENTRY(0x0816, 0x081a, 0),
+    DIAC_RANGE_ENTRY(0x081b, 0x0824, 0),
+    DIAC_RANGE_ENTRY(0x0825, 0x0828, 0),
+    DIAC_RANGE_ENTRY(0x0829, 0x082e, 0),
+    DIAC_RANGE_ENTRY(0x0900, 0x0904, 0),
+    DIAC_RANGE_ENTRY(0x093c, 0x093d, 0),
+    DIAC_RANGE_ENTRY(0x093e, 0x094f, 0),
+    DIAC_RANGE_ENTRY(0x0951, 0x0956, 0),
+    DIAC_RANGE_ENTRY(0x0962, 0x0964, 0),
+    DIAC_RANGE_ENTRY(0x0981, 0x0984, 0),
+    DIAC_RANGE_ENTRY(0x09bc, 0x09bd, 0),
+    DIAC_RANGE_ENTRY(0x09be, 0x09ce, 0),
+    DIAC_RANGE_ENTRY(0x09d7, 0x09d8, 0),
+    DIAC_RANGE_ENTRY(0x09e2, 0x09e4, 0),
+    DIAC_RANGE_ENTRY(0x0a01, 0x0a04, 0),
+    DIAC_RANGE_ENTRY(0x0a3c, 0x0a52, 0),
+    DIAC_RANGE_ENTRY(0x0a70, 0x0a72, 0),
+    DIAC_RANGE_ENTRY(0x0a75, 0x0a76, 0),
+    DIAC_RANGE_ENTRY(0x0a81, 0x0a84, 0),
+    DIAC_RANGE_ENTRY(0x0abc, 0x0abd, 0),
+    DIAC_RANGE_ENTRY(0x0abe, 0x0ace, 0),
+    DIAC_RANGE_ENTRY(0x0ae2, 0x0ae4, 0),
+    DIAC_RANGE_ENTRY(0x0b01, 0x0b04, 0),
+    DIAC_RANGE_ENTRY(0x0b3c, 0x0b3d, 0),
+    DIAC_RANGE_ENTRY(0x0b3e, 0x0b58, 0),
+    DIAC_RANGE_ENTRY(0x0b82, 0x0b83, 0),
+    DIAC_RANGE_ENTRY(0x0bbe, 0x0bce, 0),
+    DIAC_RANGE_ENTRY(0x0bd7, 0x0bd8, 0),
+    DIAC_RANGE_ENTRY(0x0c01, 0x0c04, 0),
+    DIAC_RANGE_ENTRY(0x0c3e, 0x0c57, 0),
+    DIAC_RANGE_ENTRY(0x0c62, 0x0c64, 0),
+    DIAC_RANGE_ENTRY(0x0c82, 0x0c84, 0),
+    DIAC_RANGE_ENTRY(0x0cbc, 0x0cbd, 0),
+    DIAC_RANGE_ENTRY(0x0cbe, 0x0cd7, 0),
+    DIAC_RANGE_ENTRY(0x0ce2, 0x0ce4, 0),
+    DIAC_RANGE_ENTRY(0x0d02, 0x0d04, 0),
+    DIAC_RANGE_ENTRY(0x0d3e, 0x0d58, 0),
+    DIAC_RANGE_ENTRY(0x0d62, 0x0d64, 0),
+    DIAC_RANGE_ENTRY(0x0d82, 0x0d84, 0),
+    DIAC_RANGE_ENTRY(0x0dca, 0x0df4, 0),
+    DIAC_RANGE_ENTRY(0x0e31, 0x0e32, 0),
+    DIAC_RANGE_ENTRY(0x0e34, 0x0e3b, 0),
+    DIAC_RANGE_ENTRY(0x0e47, 0x0e4f, 0),
+    DIAC_RANGE_ENTRY(0x0eb1, 0x0eb2, 0),
+    DIAC_RANGE_ENTRY(0x0eb4, 0x0ebd, 0),
+    DIAC_RANGE_ENTRY(0x0ec8, 0x0ece, 0),
+    DIAC_RANGE_ENTRY(0x0f18, 0x0f1a, 0),
+    DIAC_RANGE_ENTRY(0x0f35, 0x0f36, 0),
+    DIAC_RANGE_ENTRY(0x0f37, 0x0f38, 0),
+    DIAC_RANGE_ENTRY(0x0f39, 0x0f3a, 0),
+    DIAC_RANGE_ENTRY(0x0f3e, 0x0f40, 0),
+    DIAC_RANGE_ENTRY(0x0f71, 0x0f85, 0),
+    DIAC_RANGE_ENTRY(0x0f86, 0x0f88, 0),
+    DIAC_RANGE_ENTRY(0x0f90, 0x0fbd, 0),
+    DIAC_RANGE_ENTRY(0x102b, 0x103f, 0),
+    DIAC_RANGE_ENTRY(0x1056, 0x105a, 0),
+    DIAC_RANGE_ENTRY(0x105e, 0x1061, 0),
+    DIAC_RANGE_ENTRY(0x1062, 0x1065, 0),
+    DIAC_RANGE_ENTRY(0x1067, 0x106e, 0),
+    DIAC_RANGE_ENTRY(0x1071, 0x1075, 0),
+    DIAC_RANGE_ENTRY(0x1082, 0x108e, 0),
+    DIAC_RANGE_ENTRY(0x108f, 0x1090, 0),
+    DIAC_RANGE_ENTRY(0x109a, 0x109e, 0),
+    DIAC_RANGE_ENTRY(0x135f, 0x1360, 0),
+    DIAC_RANGE_ENTRY(0x1712, 0x1715, 0),
+    DIAC_RANGE_ENTRY(0x1732, 0x1735, 0),
+    DIAC_RANGE_ENTRY(0x1752, 0x1754, 0),
+    DIAC_RANGE_ENTRY(0x1772, 0x1774, 0),
+    DIAC_RANGE_ENTRY(0x17b6, 0x17d4, 0),
+    DIAC_RANGE_ENTRY(0x17dd, 0x17de, 0),
+    DIAC_RANGE_ENTRY(0x18a9, 0x18aa, 0),
+    DIAC_RANGE_ENTRY(0x1920, 0x193c, 0),
+    DIAC_RANGE_ENTRY(0x19b0, 0x19c1, 0),
+    DIAC_RANGE_ENTRY(0x19c8, 0x19ca, 0),
+    DIAC_RANGE_ENTRY(0x1a17, 0x1a1c, 0),
+    DIAC_RANGE_ENTRY(0x1a55, 0x1a80, 0),
+    DIAC_RANGE_ENTRY(0x1b00, 0x1b05, 0),
+    DIAC_RANGE_ENTRY(0x1b34, 0x1b45, 0),
+    DIAC_RANGE_ENTRY(0x1b6b, 0x1b74, 0),
+    DIAC_RANGE_ENTRY(0x1b80, 0x1b83, 0),
+    DIAC_RANGE_ENTRY(0x1ba1, 0x1bab, 0),
+    DIAC_RANGE_ENTRY(0x1c24, 0x1c38, 0),
+    DIAC_RANGE_ENTRY(0x1cd0, 0x1cd3, 0),
+    DIAC_RANGE_ENTRY(0x1cd4, 0x1ce9, 0),
+    DIAC_RANGE_ENTRY(0x1ced, 0x1cee, 0),
+    DIAC_RANGE_ENTRY(0x1cf2, 0x1cf3, 0),
+    DIAC_RANGE_ENTRY(0x1dc0, 0x1e00, 0),
+    DIAC_RANGE_ENTRY(0x20d0, 0x20f1, 0),
+    DIAC_RANGE_ENTRY(0x2cef, 0x2cf2, 0),
+    DIAC_RANGE_ENTRY(0x2de0, 0x2e00, 0),
+    DIAC_RANGE_ENTRY(0x302a, 0x3030, 0),
+    DIAC_RANGE_ENTRY(0x3099, 0x309b, 0),
+    DIAC_RANGE_ENTRY(0xa66f, 0xa673, 0),
+    DIAC_RANGE_ENTRY(0xa67c, 0xa67e, 0),
+    DIAC_RANGE_ENTRY(0xa6f0, 0xa6f2, 0),
+    DIAC_RANGE_ENTRY(0xa802, 0xa803, 0),
+    DIAC_RANGE_ENTRY(0xa806, 0xa807, 0),
+    DIAC_RANGE_ENTRY(0xa80b, 0xa80c, 0),
+    DIAC_RANGE_ENTRY(0xa823, 0xa828, 0),
+    DIAC_RANGE_ENTRY(0xa880, 0xa882, 0),
+    DIAC_RANGE_ENTRY(0xa8b4, 0xa8c5, 0),
+    DIAC_RANGE_ENTRY(0xa8e0, 0xa8f2, 0),
+    DIAC_RANGE_ENTRY(0xa926, 0xa92e, 0),
+    DIAC_RANGE_ENTRY(0xa947, 0xa954, 0),
+    DIAC_RANGE_ENTRY(0xa980, 0xa984, 0),
+    DIAC_RANGE_ENTRY(0xa9b3, 0xa9c1, 0),
+    DIAC_RANGE_ENTRY(0xaa29, 0xaa37, 0),
+    DIAC_RANGE_ENTRY(0xaa43, 0xaa44, 0),
+    DIAC_RANGE_ENTRY(0xaa4c, 0xaa4e, 0),
+    DIAC_RANGE_ENTRY(0xaa7b, 0xaa7c, 0),
+    DIAC_RANGE_ENTRY(0xaab0, 0xaab1, 0),
+    DIAC_RANGE_ENTRY(0xaab2, 0xaab5, 0),
+    DIAC_RANGE_ENTRY(0xaab7, 0xaab9, 0),
+    DIAC_RANGE_ENTRY(0xaabe, 0xaac0, 0),
+    DIAC_RANGE_ENTRY(0xaac1, 0xaac2, 0),
+    DIAC_RANGE_ENTRY(0xabe3, 0xabeb, 0),
+    DIAC_RANGE_ENTRY(0xabec, 0xabee, 0),
+    DIAC_RANGE_ENTRY(0xfb1e, 0xfb1f, 0),
+    DIAC_RANGE_ENTRY(0xfe20, 0xfe27, 0),
+    DIAC_RANGE_ENTRY(0xfe70, 0xfe70, 1),
+    DIAC_RANGE_ENTRY(0xff00, 0xff00, 0),
+    DIAC_RANGE_ENTRY(0xffff, 0xffff, 0),
 };
 
 #define MRU_MAX_LEN 32
@@ -349,6 +196,7 @@ static unsigned short diacritic_mru[MRU_MAX_LEN];
 int is_diacritic(const unsigned short char_code, bool *is_rtl)
 {
     unsigned short mru, i;
+    const struct diac_range *diac;
 
     /* Search in MRU */
     for (mru = 0; mru < mru_len; mru++)
@@ -356,15 +204,18 @@ int is_diacritic(const unsigned short char_code, bool *is_rtl)
         i = diacritic_mru[mru];
 
         /* Found in MRU */
-        if (DIAC_VAL(i - 1) < char_code && char_code <= DIAC_VAL(i))
+        if (diac_ranges[i].base <= char_code &&
+                char_code < diac_ranges[i + 1].base)
+        {
             goto Found;
+        }
     }
 
     /* Search in DB */
-    for (i = 1; i < DIAC_NUM_RANGES; i++)
+    for (i = 0; i < DIAC_NUM_RANGES - 1; i++)
     {
         /* Found */
-        if (char_code <= DIAC_VAL(i))
+        if (char_code < diac_ranges[i + 1].base)
             break;
     }
 
@@ -380,9 +231,11 @@ Found:
         diacritic_mru[mru] = diacritic_mru[mru - 1];
     diacritic_mru[0] = i;
 
+    diac = &diac_ranges[i];
+
     /* Update RTL */
     if (is_rtl)
-        *is_rtl = DIAC_IS_RTL(i);
+        *is_rtl = diac->is_rtl;
 
-    return DIAC_IS_DIACRITIC(i);
+    return (char_code < diac->base + diac->num_diacritics);
 }
