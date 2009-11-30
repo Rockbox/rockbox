@@ -1122,8 +1122,8 @@ const char *get_token_value(struct gui_wps *gwps,
                             break;
                     }
                     #endif
+					*intval = global_settings.mp3_enc_config.bitrate+1;
                 }
-                *intval = global_settings.mp3_enc_config.bitrate+1;
                 snprintf(buf, buf_size, "%d", global_settings.mp3_enc_config.bitrate+1);
                 return buf;
             }
