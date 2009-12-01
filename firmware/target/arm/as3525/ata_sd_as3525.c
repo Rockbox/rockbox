@@ -816,8 +816,6 @@ long sd_last_disk_activity(void)
 
 void sd_enable(bool on)
 {
-    /* buttonlight AMSes need a bit of special handling for the buttonlight here
-     * due to the dual mapping of GPIOD and XPD */
 #if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
     extern int buttonlight_is_on;
 #endif
@@ -830,19 +828,23 @@ void sd_enable(bool on)
         return; /* nothing to do */
     if(on)
     {
+        /*  Enable both NAF_CLOCK & IDE clk for internal SD */
         CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
+        CGU_IDE  |= ((1<<7)    /* IDE AHB interface enable */
+                  |  (1<<6));  /* IDE interface enable */
 #ifdef HAVE_MULTIDRIVE
+        /* Enable MCI clk for uSD */
         CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
 #ifdef HAVE_BUTTON_LIGHT
-        CCU_IO |= (1<<2);
+        /* buttonlight AMSes need a bit of special handling for the buttonlight
+         * here due to the dual mapping of GPIOD and XPD */
+        CCU_IO |= (1<<2);              /* XPD is SD-MCI interface (b3:2 = 01) */
         if (buttonlight_is_on)
             GPIOD_DIR &= ~(1<<7);
         else
             _buttonlight_off();
 #endif /* HAVE_BUTTON_LIGHT */
 #endif /* HAVE_MULTIDRIVE */
-        CGU_IDE |= (1<<7)  /* AHB interface enable */  |
-                   (1<<6)  /* interface enable */;
         sd_enabled = true;
 
 #ifdef HAVE_HOTSWAP
@@ -855,18 +857,6 @@ void sd_enable(bool on)
     }
     else
     {
-        CGU_PERI &= ~CGU_NAF_CLOCK_ENABLE;
-#ifdef HAVE_MULTIDRIVE
-#ifdef HAVE_BUTTON_LIGHT
-        CCU_IO &= ~(1<<2);
-        if (buttonlight_is_on)
-            _buttonlight_on();
-#endif /* HAVE_BUTTON_LIGHT */
-        CGU_PERI &= ~CGU_MCI_CLOCK_ENABLE;
-#endif /* HAVE_MULTIDRIVE */
-        CGU_IDE &= ~((1<<7)|(1<<6));
-        sd_enabled = false;
-
 #ifdef HAVE_HOTSWAP
         if(cpu_boosted)
         {
@@ -874,6 +864,22 @@ void sd_enable(bool on)
             cpu_boosted = false;
         }
 #endif
+        sd_enabled = false;
+
+#ifdef HAVE_MULTIDRIVE
+#ifdef HAVE_BUTTON_LIGHT
+        CCU_IO &= ~(1<<2);           /* XPD is general purpose IO (b3:2 = 00) */
+        if (buttonlight_is_on)
+            _buttonlight_on();
+#endif /* HAVE_BUTTON_LIGHT */
+        /* Disable MCI clk for uSD */
+        CGU_PERI &= ~CGU_MCI_CLOCK_ENABLE;
+#endif /* HAVE_MULTIDRIVE */
+
+        /*  Disable both NAF_CLOCK & IDE clk for internal SD */
+        CGU_PERI &= ~CGU_NAF_CLOCK_ENABLE;
+        CGU_IDE &= ~((1<<7)      /* IDE AHB interface disable */
+                 |   (1<<6));    /* IDE interface disable */
     }
 }
 
