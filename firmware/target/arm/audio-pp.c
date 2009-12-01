@@ -110,7 +110,7 @@ void audio_input_mux(int source, unsigned flags)
 
             last_recording = recording;
 
-#if defined(IPOD_REMOTE_TUNER)
+#if CONFIG_TUNER & IPOD_REMOTE_TUNER
             /* Ipod FM tuner is in the remote connected to line-in */
                 audiohw_enable_recording(false); /* source line */
                 audiohw_set_monitor(true);  /* enable bypass mode */
