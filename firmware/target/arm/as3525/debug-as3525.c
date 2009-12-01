@@ -61,6 +61,7 @@
 #define MCI_NAND        *((volatile unsigned long *)(NAND_FLASH_BASE + 0x04))
 #define MCI_SD          *((volatile unsigned long *)(SD_MCI_BASE + 0x04))
 
+extern bool sd_enabled;
 
 /* FIXME: target tree is including ./debug-target.h rather than the one in
  * sansa-fuze/, even though deps contains the correct one
@@ -291,13 +292,16 @@ bool __dbg_hw_info(void)
         lcd_putsf(0, line++, "I2SO: %s      %3dMHz", (CGU_AUDIO & (1<<11)) ?
                                     "on " : "off", calc_freq(CLK_I2SO)/1000000);
 
-        /* Enable SD cards to read the registers */
-        sd_enable(true);
-        last_nand = MCI_NAND;
+        /* If disabled, enable SD cards so we can read the registers */
+        if(sd_enabled == false)
+        {
+            sd_enable(true);
+            last_nand = MCI_NAND;
 #ifdef HAVE_MULTIDRIVE
-        last_sd = MCI_SD;
+            last_sd = MCI_SD;
 #endif
-        sd_enable(false);
+            sd_enable(false);
+        }
 
         lcd_putsf(0, line++, "SD  :%3dMHz    %3dMHz",
             ((AS3525_PCLK_FREQ/ 1000000) /
