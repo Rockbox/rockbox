@@ -33,7 +33,7 @@ enum
     RADIO_MUTE,
     RADIO_FORCE_MONO,
     RADIO_SCAN_FREQUENCY,
-
+    
     /* Put new general-purpose settings above this line */
     __RADIO_SET_STANDARD_LAST
 };
@@ -44,10 +44,24 @@ enum
     RADIO_PRESENT = 0,
     RADIO_TUNED,
     RADIO_STEREO,
+    /* RADIO_EVENT is an event that requests a screen update */
+    RADIO_EVENT,
 
     /* Put new general-purpose readback values above this line */
     __RADIO_GET_STANDARD_LAST
 };
+
+#ifdef HAVE_RDS_CAP
+/** Readback from the tuner RDS layer **/
+enum
+{
+    RADIO_RDS_NAME,
+    RADIO_RDS_TEXT,
+
+    /* Put new general-purpose readback values above this line */
+    __RADIO_GET_RDS_INFO_STANDARD_LAST
+};
+#endif
 
 /** Tuner regions **/
 
@@ -112,6 +126,11 @@ extern int (*tuner_get)(int setting);
 /* Silicon Labs 4700 */
 #if (CONFIG_TUNER & SI4700)
 #include "si4700.h"
+#endif
+
+/* Apple remote tuner */
+#if (CONFIG_TUNER & IPOD_REMOTE_TUNER)
+#include "ipod_remote_tuner.h"
 #endif
 
 #endif /* SIMULATOR */

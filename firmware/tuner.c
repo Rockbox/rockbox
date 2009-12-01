@@ -89,17 +89,31 @@ const struct si4700_region_data si4700_region_data[TUNER_NUM_REGIONS] =
 };
 #endif /* (CONFIG_TUNER & SI4700) */
 
+#if (CONFIG_TUNER & IPOD_REMOTE_TUNER)
+const struct rmt_tuner_region_data
+                        rmt_tuner_region_data[TUNER_NUM_REGIONS] =
+{
+    [REGION_EUROPE]    = { 1, 0, 1 }, /* 50uS, US/Europe band, 100kHz spacing */
+    [REGION_US_CANADA] = { 0, 0, 0 }, /* 75uS, US/Europe band, 200kHz spacing */
+    [REGION_JAPAN]     = { 1, 2, 1 }, /* 50uS, Japanese band,  100kHz spacing */
+    [REGION_KOREA]     = { 1, 0, 0 }, /* 50uS, US/Europe band, 200kHz spacing */
+    [REGION_ITALY]     = { 1, 0, 2 }, /* 50uS, US/Europe band,  50kHz spacing */
+    [REGION_OTHER]     = { 1, 0, 2 }, /* 50uS, US/Europe band,  50kHz spacing */
+};
+#endif /* (CONFIG_TUNER & IPOD_REMOTE_TUNER) */
+
 #ifdef CONFIG_TUNER_MULTI
 int (*tuner_set)(int setting, int value);
 int (*tuner_get)(int setting);
-#define TUNER_TYPE_CASE(type, set, get, ...) \
+
+#define TUNER_TYPE_CASE(type, set, get, ...)         \
     case type:                                       \
         tuner_set = set;                             \
         tuner_get = get;                             \
         __VA_ARGS__;                                 \
         break;
 #else
-#define TUNER_TYPE_CASE(type, set, get, ...) \
+#define TUNER_TYPE_CASE(type, set, get, ...)         \
         __VA_ARGS__;
 #endif /* CONFIG_TUNER_MULTI */
 
@@ -139,5 +153,4 @@ void tuner_init(void)
     #endif
     }
 }
-
 #endif /* SIMULATOR */

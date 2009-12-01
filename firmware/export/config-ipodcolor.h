@@ -18,7 +18,7 @@
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
-#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN)
+#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_FMRADIO)
 
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_44)
@@ -120,6 +120,10 @@
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
+
+/* Define Apple remote tuner */
+#define CONFIG_TUNER IPOD_REMOTE_TUNER
+#define HAVE_RDS_CAP
 
 /* Define this if you have a PortalPlayer PP5020 */
 #define CONFIG_CPU PP5020

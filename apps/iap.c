@@ -37,11 +37,12 @@
 #include "settings.h"
 #include "metadata.h"
 #include "wps.h"
-
+#include "sound.h"
 #include "action.h"
+#include "powermgmt.h"
 
-#define RX_BUFLEN 260
-#define TX_BUFLEN 128
+#include "tuner.h"
+#include "ipod_remote_tuner.h"
 
 static volatile int iap_pollspeed = 0;
 static volatile bool iap_remotetick = true;
@@ -115,7 +116,7 @@ void iap_bitrate_set(int ratenum)
    checksum (length+mode+parameters+checksum == 0)
 */
 
-static void iap_send_pkt(const unsigned char * data, int len)
+void iap_send_pkt(const unsigned char * data, int len)
 {
     int i, chksum;
     
@@ -192,15 +193,15 @@ void iap_periodic(void)
     unsigned long time_elapsed = audio_current_track()->elapsed;
 
     time_elapsed += wps_get_ff_rewind_count();
-    
-    data[3] = 0x04; // playing
+
+    data[3] = 0x04; /* playing */
 
     /* If info has changed, don't flag it right away */
     if(iap_changedctr && iap_changedctr++ >= iap_pollspeed * 2)
-    {        
+    {
         /* track info has changed */
         iap_changedctr = 0;
-        data[3] = 0x01; // 0x02 has same effect? 
+        data[3] = 0x01; /* 0x02 has same effect?  */
         iap_updateflag = true;
     }
 
@@ -211,12 +212,19 @@ void iap_periodic(void)
     iap_send_pkt(data, sizeof(data));
 }
 
+void iap_set_remote_volume(void)
+{
+    unsigned char data[] = {0x03, 0x0D, 0x04, 0x00, 0x00};
+    data[4] = (char)((global_settings.volume+58) * 4);
+    iap_send_pkt(data, sizeof(data));
+}
+
 void iap_handlepkt(void)
 {
-    
+
     if(!iap_setupflag) return;
     if(serbuf[0] == 0) return;
-    
+
     /* if we are waiting for a remote button to go out,
        delay the handling of the new packet */
     if(!iap_remotetick)
@@ -224,63 +232,140 @@ void iap_handlepkt(void)
         queue_post(&button_queue, SYS_IAP_HANDLEPKT, 0);
         return;
     }
-    
+
     /* Handle Mode 0 */
     if (serbuf[1] == 0x00)
     {
         switch (serbuf[2])
         {
-            /* get model info */
-            case 0x0D:
+            case 0x24:
             {
-                unsigned char data[] = {0x00, 0x0E, 0x00, 0x0B, 0x00, 0x10,
-                                       'R', 'O', 'C', 'K', 'B', 'O', 'X', 0x00};
+                /* ipod video send this */
+                unsigned char data[] = {0x00, 0x25, 0x00, 0x00, 0x00,
+                                                0x00, 0x00, 0x00, 0x00,0x01};
                 iap_send_pkt(data, sizeof(data));
                 break;
             }
-            /* No idea ??? */
+
+            case 0x18:
+            {
+                /* ciphered authentication command */
+                /* Isn't used since we don't send the 0x00 0x17 command */
+                break;
+            }
+
+            case 0x15:
+            {
+                unsigned char data0[] = {0x00, 0x16, 0x00};
+                iap_send_pkt(data0, sizeof(data0));
+                unsigned char data1[] = {0x00, 0x27, 0x00};
+                iap_send_pkt(data1, sizeof(data1));
+                /* authentication ack, mandatory to enable some hardware */
+                unsigned char data2[] = {0x00, 0x19, 0x00};
+                iap_send_pkt(data2, sizeof(data2));
+                if (radio_present == 1)
+                {
+                    /* get tuner capacities */
+                    unsigned char data3[] = {0x07, 0x01};
+                    iap_send_pkt(data3, sizeof(data3));
+                }
+                iap_set_remote_volume();
+                break;
+            }
+
+            case 0x13:
+            {
+                unsigned char data[] = {0x00, 0x02, 0x00, 0x13};
+                iap_send_pkt(data, sizeof(data));
+
+                if (serbuf[6] == 0x35)
+                /* FM transmitter sends this: */
+                /* FF 55 0E 00 13 00 00 00 35 00 00 00 04 00 00 00 00 A6 (??)*/
+                {
+                    unsigned char data2[] = {0x00, 0x27, 0x00};
+                    iap_send_pkt(data2, sizeof(data2));
+                    unsigned char data3[] = {0x05, 0x02};
+                    iap_send_pkt(data3, sizeof(data3));
+                }
+
+                else
+                {
+                    /* ipod fm remote sends this: */ 
+                    /* FF 55 0E 00 13 00 00 00 8D 00 00 00 0E 00 00 00 03 41 */
+                    if (serbuf[6] |= 0x80)
+                        radio_present = 1;
+                    unsigned char data4[] = {0x00, 0x14};
+                    iap_send_pkt(data4, sizeof(data4));
+                }
+                break;
+            }
+
+            /* Init */
             case 0x0F:
             {
                 unsigned char data[] = {0x00, 0x10, 0x00, 0x01, 0x05};
+                data[2] = serbuf[3];
                 iap_send_pkt(data, sizeof(data));
                 break;
             }
-            /* FM transmitter sends this: FF 55 06 00 01 05 00 02 01 F1 (mode switch) */
+
+            /* get model info */
+            case 0x0D:
+            {
+                /* ipod is supposed to work only with 5G and nano 2G */
+                /*{0x00, 0x0E, 0x00, 0x0B, 0x00, 0x05, 0x50, 0x41, 0x31, 0x34, 
+                        0x37, 0x4C, 0x4C, 0x00};    PA147LL (IPOD 5G 60 GO) */
+                unsigned char data[] = {0x00, 0x0E, 0x00, 0x0B, 0x00, 0x10,
+                                    'R', 'O', 'C', 'K', 'B', 'O', 'X', 0x00};
+                iap_send_pkt(data, sizeof(data));
+                break;
+            }
+
+            /* Ipod FM remote sends this: FF 55 02 00 09 F5  */
+            case 0x09:
+            {
+                /* ipod5G firmware version */
+                unsigned char data[] = {0x00, 0x0A, 0x01, 0x02, 0x01 };
+                iap_send_pkt(data, sizeof(data));
+                break;
+            } 
+
+            /* FM transmitter sends this: */
+            /* FF 55 02 00 05 F9 (mode switch: AiR mode) */
+            case 0x05:
+            {
+                unsigned char data[] = {0x00, 0x02, 0x06,
+                                        0x05, 0x00, 0x00, 0x0B, 0xB8, 0x28};
+                iap_send_pkt(data, sizeof(data));
+                unsigned char data2[] = {0x00, 0x02, 0x00, 0x05};
+                iap_send_pkt(data2, sizeof(data2));
+                break;
+            }
+
             case 0x01:
             {
-                if(serbuf[3] == 0x05) 
+                /* FM transmitter sends this: */
+                /* FF 55 06 00 01 05 00 02 01 F1 (mode switch) */
+                if(serbuf[3] == 0x05)
                 {
                     sleep(HZ/3);
                     unsigned char data[] = {0x05, 0x02};
                     iap_send_pkt(data, sizeof(data));
                 }
+                /* FM remote sends this: */
+                /* FF 55 03 00 01 02 FA (1st thing sent) */
+                else if(serbuf[3] == 0x02)
+                {
+                    /* useful only for apple firmware */
+                }
                 break;
             }
-            /* FM transmitter sends this: FF 55 0E 00 13 00 00 00 35 00 00 00 04 00 00 00 00 A6 (???)*/
-            case 0x13:
-            {
-                unsigned char data[] = {0x00, 0x02, 0x00, 0x13};
-                iap_send_pkt(data, sizeof(data));
-                unsigned char data2[] = {0x00, 0x27, 0x00};
-                iap_send_pkt(data2, sizeof(data2));
-                unsigned char data3[] = {0x05, 0x02};
-                iap_send_pkt(data3, sizeof(data3));
-                break;
-            }
-            /* FM transmitter sends this: FF 55 02 00 05 F9 (mode switch: AiR mode) */
-            case 0x05:
-            {
-                unsigned char data[] = {0x00, 0x02, 0x06, 0x05, 0x00, 0x00, 0x0B, 0xB8, 0x28};
-                iap_send_pkt(data, sizeof(data));
-                unsigned char data2[] = {0x00, 0x02, 0x00, 0x05};
-                iap_send_pkt(data2, sizeof(data2));
-                break;
-            }            
+
             /* default response is with cmd ok packet */
             default:
             {
                 unsigned char data[] = {0x00, 0x02, 0x00, 0x00};
-                data[3] = serbuf[2]; //respond with cmd
+                data[3] = serbuf[2]; /* respond with cmd */
                 iap_send_pkt(data, sizeof(data));
                 break;
             }
@@ -395,6 +480,30 @@ void iap_handlepkt(void)
                 iap_send_pkt(data, sizeof(data));
                 break;
             }
+
+            case 0x08:
+            {
+                /* ACK */
+                unsigned char data[] = {0x03, 0x00, 0x00, 0x08};
+                iap_send_pkt(data, sizeof(data));
+                break;
+            }
+            
+            case 0x0C:
+            {
+                /* request ipod volume */
+                if (serbuf[3] == 0x04)
+                {
+                    iap_set_remote_volume();
+                }
+                break;
+            }
+            /* get volume from accessory */
+            case 0x0E:
+                if (serbuf[3] == 0x04)
+                    global_settings.volume = (-58)+((int)serbuf[5]+1)/4;
+                    sound_set_volume(global_settings.volume);
+                break;
         }
     }
     /* Handle Mode 4 */
@@ -708,6 +817,37 @@ void iap_handlepkt(void)
                 data[4] = serbuf[2];
                 data[5] = serbuf[3];
                 iap_send_pkt(data, sizeof(data));
+                break;
+            }
+        }
+    }
+    /* Handle Mode 7 */
+    else if (serbuf[1] == 0x07)
+    {
+        switch(serbuf[2])
+        {
+            /* tuner capabilities */
+            case 0x02:
+            {
+                /* do nothing */
+                
+                unsigned char data[] = {0x00, 0x27, 0x00};
+                iap_send_pkt(data, sizeof(data));
+                break;
+            }
+            /* actual tuner frequency */
+            case 0x0A:
+            /* fall through */
+            /* tuner frequency from scan */
+            case 0x13:
+            {
+                rmt_tuner_freq();
+                break;
+            }
+            /* RDS station name 0x21 1E 00 + ASCII text*/
+            case 0x21:
+            {
+                rmt_tuner_rds_data();
                 break;
             }
         }

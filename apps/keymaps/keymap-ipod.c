@@ -193,6 +193,26 @@ const struct button_mapping button_context_recscreen[]  = {
 }; /* button_context_recscreen */
 #endif
 
+/** FM Radio Screen **/
+ #if CONFIG_TUNER
+ static const struct button_mapping button_context_radio[]  = {
+     { ACTION_FM_MENU,           BUTTON_SELECT | BUTTON_REPEAT,   BUTTON_NONE },
+     { ACTION_FM_STOP,           BUTTON_PLAY | BUTTON_REPEAT,     BUTTON_PLAY },
+     { ACTION_FM_MODE,           BUTTON_SELECT,                   BUTTON_NONE },
+     { ACTION_FM_EXIT,           BUTTON_MENU | BUTTON_REL,        BUTTON_NONE },
+     { ACTION_FM_PLAY,           BUTTON_PLAY | BUTTON_REL,        BUTTON_PLAY },   
+     { ACTION_SETTINGS_INC,      BUTTON_SCROLL_FWD,               BUTTON_NONE },
+     { ACTION_SETTINGS_INCREPEAT,BUTTON_SCROLL_FWD|BUTTON_REPEAT, BUTTON_NONE },
+     { ACTION_SETTINGS_DEC,      BUTTON_SCROLL_BACK,              BUTTON_NONE },
+     { ACTION_SETTINGS_DECREPEAT,BUTTON_SCROLL_BACK|BUTTON_REPEAT,BUTTON_NONE },
+     { ACTION_STD_NEXT,          BUTTON_RIGHT,                    BUTTON_NONE },
+     { ACTION_STD_NEXTREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT,      BUTTON_NONE },
+     { ACTION_STD_PREV,          BUTTON_LEFT,                     BUTTON_NONE },
+     { ACTION_STD_PREVREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,       BUTTON_NONE },
+     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+ }; /* button_context_radio */
+ #endif
+
 #ifdef USB_ENABLE_HID
 static const struct button_mapping button_context_usb_hid[] = {
     { ACTION_USB_HID_MODE_SWITCH_NEXT, BUTTON_SELECT|BUTTON_RIGHT|BUTTON_REL,    BUTTON_SELECT|BUTTON_RIGHT },
@@ -311,6 +331,26 @@ static const struct button_mapping remote_button_context_wps[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* remote_button_context_wps */
 
+static const struct button_mapping remote_button_context_tree[]  = {
+    { ACTION_TREE_WPS,          BUTTON_RC_PLAY|BUTTON_REL,    BUTTON_RC_PLAY },
+    { ACTION_TREE_STOP,         BUTTON_RC_PLAY|BUTTON_REPEAT, BUTTON_RC_PLAY },
+    
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+}; /* remote_button_context_tree */
+
+#if CONFIG_TUNER
+ static const struct button_mapping remote_button_context_radio[]  = {
+     { ACTION_FM_STOP,           BUTTON_RC_PLAY | BUTTON_REPEAT,     BUTTON_NONE },
+     { ACTION_FM_PLAY,           BUTTON_RC_PLAY | BUTTON_REL,        BUTTON_RC_PLAY },   
+     { ACTION_STD_NEXT,          BUTTON_RC_RIGHT|BUTTON_REL,         BUTTON_RC_RIGHT },
+     { ACTION_STD_NEXTREPEAT,    BUTTON_RC_RIGHT|BUTTON_REPEAT,      BUTTON_NONE },
+     { ACTION_STD_PREV,          BUTTON_RC_LEFT|BUTTON_REL,          BUTTON_RC_LEFT },
+     { ACTION_STD_PREVREPEAT,    BUTTON_RC_LEFT|BUTTON_REPEAT,       BUTTON_NONE },
+     
+     LAST_ITEM_IN_LIST
+ }; /* remote_button_context_radio */
+#endif
+
 static const struct button_mapping* get_context_mapping_remote( int context )
 {
     context ^= CONTEXT_REMOTE;
@@ -319,6 +359,14 @@ static const struct button_mapping* get_context_mapping_remote( int context )
     {
         case CONTEXT_WPS:
             return remote_button_context_wps;
+        case CONTEXT_TREE:
+        case CONTEXT_CUSTOM|CONTEXT_TREE:
+            return remote_button_context_tree;
+
+#ifdef CONFIG_TUNER
+        case CONTEXT_FM:
+            return remote_button_context_radio;
+#endif
         default:
             return remote_button_context_standard;
     }
@@ -370,6 +418,10 @@ const struct button_mapping* get_context_mapping(int context)
 #ifdef HAVE_RECORDING
         case CONTEXT_RECSCREEN:
             return button_context_recscreen;
+#endif
+#if CONFIG_TUNER
+         case CONTEXT_FM:
+             return button_context_radio;
 #endif
 #ifdef USB_ENABLE_HID
         case CONTEXT_USB_HID:

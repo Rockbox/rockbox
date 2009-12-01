@@ -201,6 +201,7 @@ drivers/rtc/rtc_d2.c
 #endif /* (CONFIG_RTC == RTC_) */
 #endif /* SIMULATOR */
 
+#ifndef BOOTLOADER
 /* Tuner */
 #if CONFIG_TUNER
 tuner.c
@@ -221,8 +222,12 @@ drivers/tuner/tea5767.c
 #if (CONFIG_TUNER & SI4700)
 drivers/tuner/si4700.c
 #endif /* (CONFIG_TUNER & SI4700) */
+#if (CONFIG_TUNER & IPOD_REMOTE_TUNER)
+drivers/tuner/ipod_remote_tuner.c
+#endif /* (CONFIG_TUNER & IPOD_REMOTE_TUNER) */
 #endif /*SIMULATOR */
 #endif /* CONFIG_TUNER */
+#endif /* BOOTLOADER */
 
 /* Sound */
 #if CONFIG_CODEC != SWCODEC

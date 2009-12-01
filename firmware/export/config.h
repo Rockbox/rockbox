@@ -40,6 +40,7 @@
 #define SI4700     0x08 /* Silicon Labs */
 #define TEA5760    0x10 /* Philips */
 #define LV240000   0x20 /* Sanyo */
+#define IPOD_REMOTE_TUNER   0x40 /* Apple */
 
 /* CONFIG_CODEC */
 #define MAS3587F 3587

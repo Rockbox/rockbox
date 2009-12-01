@@ -104,11 +104,17 @@ void audio_input_mux(int source, unsigned flags)
             if (!recording)
                 audiohw_set_recvol(0x17, 0x17, AUDIO_GAIN_LINEIN);
 #endif
+
             if (source == last_source && recording == last_recording)
                 break;
 
             last_recording = recording;
 
+#if defined(IPOD_REMOTE_TUNER)
+            /* Ipod FM tuner is in the remote connected to line-in */
+                audiohw_enable_recording(false); /* source line */
+                audiohw_set_monitor(true);  /* enable bypass mode */
+#else
             if (recording)
             {
                 audiohw_set_monitor(false);  /* disable bypass mode */
@@ -119,6 +125,7 @@ void audio_input_mux(int source, unsigned flags)
                 audiohw_disable_recording();
                 audiohw_set_monitor(true);  /* enable bypass mode */
             }
+#endif
         break;
 #endif
     } /* end switch */
