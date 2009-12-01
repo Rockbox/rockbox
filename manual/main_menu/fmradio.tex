@@ -13,17 +13,24 @@
 
 \screenshot{main_menu/images/ss-fm-radio-screen}{The FM radio screen}{}
   This menu option switches to the radio screen.
-  The FM radio has the ability \opt{recording}{to record and} to
-  remember station frequency settings (presets). Since stations and their
-  frequencies vary depending on location, it is possible to load these
-  settings from a file. Such files should have the filename extension
-  \fname{.fmr} and reside in the directory \fname{/.rockbox/fmpresets}
-  (note that this directory does not exist after the initial Rockbox
-  installation; you should create it manually). To load the settings,
-  i.e. a set of FM stations, from a preset file, just ``play'' it from the
-  file browser. Rockbox will ``remember'' and use it in \setting{PRESET} mode
-  until another file has been selected. Some preset files are available here:
-  \wikilink{FmPresets}
+  The FM radio has the ability to remember station frequency settings
+  (presets). Since stations and their frequencies vary depending on location,
+  it is possible to load these settings from a file. Such files should have
+  the filename extension \fname{.fmr} and reside in the directory
+  \fname{/.rockbox/fmpresets} (note that this directory does not exist after
+  the initial Rockbox installation; you should create it manually). To load
+  the settings, i.e. a set of FM stations, from a preset file, just ``play''
+  it from the file browser. Rockbox will ``remember'' and use it in
+  \setting{PRESET} mode until another file has been selected. Some preset
+  files are available here: \wikilink{FmPresets}
+  
+  \opt{recording}{
+      It is also possible to record the FM radio while listening.
+      To start recording, enter the FM radio settings menu with
+      \ActionFMMenu{}. Select \setting{Recording} and you will switched to the
+      \setting{Recording Screen}. Further information on \setting{Recording}
+      can be found in \reference{ref:Recording}.
+  }
 
   \opt{masf}{\note{The radio will shorten battery life, because the
       MAS-chip is set to record mode for instant recordings.}
