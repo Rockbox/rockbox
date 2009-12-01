@@ -74,9 +74,13 @@
 \section{Source}
   Choose the source of the recording. The options are: 
   \opt{recorder,recorderv2fm,h100}{\setting{SPDIF (digital)}, }%
-  \nopt{ipodnano,ipodvideo}{\setting{Mic}}%
-  \nopt{sansa}{\nopt{sansaAMS}{, and {\setting{Line In}}}}. %
-  \opt{radio}{For recording from the radio see \reference{ref:FMradio}.}
+  \nopt{ipodnano,ipodvideo}{\setting{Mic}\nopt{radio}
+    {\nopt{recorder,m5,ipod4g,ipodcolor}{,} and }}%
+  \nopt{sansa,sansaAMS}{\nopt{ipodnano,ipodvideo,recorder,m5,ipod4g,ipodcolor}%
+    {, }\setting{Line In}}%
+  \nopt{radio}{.}
+  \opt{radio}{and {\setting{FM Radio}}. For more information on recording from the radio
+    see \reference{ref:FMradio}.}
 
 \section{Channels}
   This allows you to select mono or stereo recording. Please note that
