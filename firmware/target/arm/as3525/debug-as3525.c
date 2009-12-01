@@ -30,6 +30,7 @@
 #include "pl180.h"
 #include "ascodec-target.h"
 #include "adc.h"
+#include "storage.h"
 
 #define ON "Enabled"
 #define OFF "Disabled"
@@ -51,8 +52,8 @@
 #define CLK_I2SI             8
 #define CLK_I2SO             9
 #define CLK_DBOP             10
-#define CLK_SD_MCLK_NAND    11
-#define CLK_SD_MCLK_MSD     12
+#define CLK_SD_MCLK_NAND     11
+#define CLK_SD_MCLK_MSD      12
 #define CLK_USB              13
 
 #define I2C2_CPSR0      *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x1C))
@@ -289,18 +290,22 @@ bool __dbg_hw_info(void)
 
         lcd_putsf(0, line++, "I2SO: %s      %3dMHz", (CGU_AUDIO & (1<<11)) ?
                                     "on " : "off", calc_freq(CLK_I2SO)/1000000);
-        if(MCI_NAND)
-            last_nand = MCI_NAND;
-                                                /*  MCLK == PCLK  */
+
+        /* Enable SD cards to read the registers */
+        sd_enable(true);
+        last_nand = MCI_NAND;
+#ifdef HAVE_MULTIDRIVE
+        last_sd = MCI_SD;
+#endif
+        sd_enable(false);
+
         lcd_putsf(0, line++, "SD  :%3dMHz    %3dMHz",
-            ((last_nand ? (AS3525_PCLK_FREQ/ 1000000): 0) /
+            ((AS3525_PCLK_FREQ/ 1000000) /
             ((last_nand & MCI_CLOCK_BYPASS)? 1:(((last_nand & 0xff)+1) * 2))),
             calc_freq(CLK_SD_MCLK_NAND)/1000000);
 #ifdef HAVE_MULTIDRIVE
-        if(MCI_SD)
-            last_sd = MCI_SD;
         lcd_putsf(0, line++, "uSD :%3dMHz    %3dMHz",
-            ((last_sd ? (AS3525_PCLK_FREQ/ 1000000): 0) /
+            ((AS3525_PCLK_FREQ/ 1000000) /
             ((last_sd & MCI_CLOCK_BYPASS) ? 1: (((last_sd & 0xff) + 1) * 2))),
             calc_freq(CLK_SD_MCLK_MSD)/1000000);
 #endif
