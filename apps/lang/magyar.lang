@@ -260,14 +260,16 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Igen"
+    cowond2*: "MENU = Igen"
     h100,h120,h300: "NAVI = Igen"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Igen"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Igen"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -1130,7 +1132,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Center Frequency"
+    swcodec: "Centre Frequency"
   </source>
   <dest>
     *: none
@@ -1385,7 +1387,7 @@
   user: core
   <source>
     *: none
-    masf: "MDB Center Frequency"
+    masf: "MDB Centre Frequency"
   </source>
   <dest>
     *: none
@@ -1902,7 +1904,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
@@ -2366,14 +2368,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Készítem az adatbázist... %d-t találtam (OFF - vissza)"
     h100,h120,h300: "Készítem az adatbázist... %d-t találtam (STOP - vissza)"
     ipod*: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
     x5,m5,gigabeat*,mrobe100: "Készítem az adatbázist... %d-t találtam (BAL - vissza)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
+    sa9200: "Készítem az adatbázist... %d-t találtam (REW - vissza)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -2556,7 +2560,7 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
@@ -2572,7 +2576,7 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
     *: "WPS fájl választás"
@@ -2587,11 +2591,11 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "rwps fájlok"
+    remote: "RWPS fájlok"
   </dest>
   <voice>
     *: none
@@ -4123,18 +4127,21 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
+    sa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Beállít"
+    mrobe500: "SZÍV = Beállít"
     h100,h120,h300: "NAVI = Beállít"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Beállít"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Beállít"
+    sa9200: "PLAY = Beállít"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200*,c200*,gigabeatf: ""
   </voice>
 </phrase>
 <phrase>
@@ -4144,28 +4151,31 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
+    ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "KI = mégsem"
+    mrobe500: "POWER = mégsem"
     h100,h120,h300: "STOP = mégsem"
-    ipod*,c200*,sa9200: "MENU = mégsem"
+    ipod*,c200*: "MENU = mégsem"
     x5,m5: "RECORD = mégsem"
     h10,h10_5gb,e200*,fuze*: "PREV = mégsem"
     gigabeatf: "POWER = mégsem"
     mrobe100: "DISPLAY = mégsem"
     gigabeats: "VISSZA = mégsem"
+    sa9200: "BAL = mégsem"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200*,c200*,x5,m5,h10,h10_gb,gigabeatf: ""
   </voice>
 </phrase>
 <phrase>
@@ -5089,7 +5099,7 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
     *: "Témák"
@@ -6490,7 +6500,7 @@
     agc: "Élő (lassú)"
   </dest>
   <voice>
-    *: "none
+    *: none
     agc: "Live (slow)"
   </voice>
 </phrase>
@@ -10206,7 +10216,7 @@
   </dest>
   <voice>
     *: none
-    lcd_repeat: ""
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -10376,7 +10386,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -10767,7 +10777,7 @@
   </dest>
   <voice>
     *: none
-    recording: "ze"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -12275,7 +12285,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_POINT
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12306,7 +12316,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_GRID
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12323,7 +12333,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_MODE
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12350,5 +12360,296 @@
   </dest>
   <voice>
     *: "As digits"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Gördítősáv pozíció"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Gördítősáv pozíció"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Távoli állapotsáv"
+  </dest>
+  <voice>
+    *: none
+    remote: "Távoli állapotsáv"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Beállítás legyfelső gyorsképernyő elemként"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Beállítás legyfelső gyorsképernyő elemként"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Ráta"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Ráta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Jobb"
+  </dest>
+  <voice>
+    *: "Jobb"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc:
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Semitone"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Semitone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Limit"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Limit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Kalibrálás"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Kalibrálás"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Kalibrálás törlése"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Kalibrálás törlése"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Gördítősáv szélesség"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Gördítősáv szélesség"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Téma RAM használat:"
+  </dest>
+  <voice>
+    *: "Téma RAM használat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Vége"
+  </dest>
+  <voice>
+    *: "Vége"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Időnyújtás"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Időnyújtás"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limiter Preamp"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Határoló erősítő"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Határoló erősítő"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Bal"
+  </dest>
+  <voice>
+    *: "Bal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Érintőképernyő beállítások"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Érintőképernyő beállítások"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Eleje"
+  </dest>
+  <voice>
+    *: "Eleje"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Sebesség"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Sebesség"
   </voice>
 </phrase>
