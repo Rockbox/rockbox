@@ -24,7 +24,6 @@
 #include "ipc.h"
 #include "dma.h"
 #include "audio.h"
-#include <math.h>
 
 void main(void) {
     TCR = 1 << 4; /* Stop the timer. */
@@ -36,7 +35,9 @@ void main(void) {
     
     dma_init();
 
+#if defined(HAVE_DEBUG)
     debugf("DSP inited...");
+#endif
 
     for (;;) {
         asm("        IDLE 1");
@@ -45,13 +46,6 @@ void main(void) {
 }
 
 /* Obsoleted/testing snippets: */
-#ifdef REMAP_VECTORS
-    /* Remap vectors to 0x3F80 (set in linker.cmd). */
-    PMST = (PMST & 0x7f) | 0x3F80;
-    
-    /* Make sure working interrupts aren't a fluke. */
-    memset((unsigned short *)0x7f80, 0, 0x80);
-#endif
 
 #ifdef DATA_32_SINE
     for (i = 0; i < 32; i++) {

@@ -34,14 +34,14 @@
 #define PACKED
 #endif
 
-#define PCM_SIZE 0x8000 /* bytes */
+/* Define this if you want to use debugf on the DSP.  This consumes quite a bit
+ *  of space so it is disabled by default. */
+/* #define HAVE_DEBUG */
 
 struct sdram_buffer {
     unsigned long addr;
     unsigned short bytes;
 } PACKED;
-
-#define SDRAM_BUFFERS 4
 
 struct ipc_message {
     unsigned short msg;

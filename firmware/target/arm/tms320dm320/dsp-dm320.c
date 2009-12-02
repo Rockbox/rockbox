@@ -37,10 +37,8 @@ static void dsp_status(void)
     DEBUGF("dsp_status(): clkc_hpib=%u clkc_dsp=%u",
            !!(IO_CLK_MOD0 & (1 << 11)), !!(IO_CLK_MOD0 & (1 << 10)));
     
-    DEBUGF("dsp_status(): irq_dsphint=%u 7fff=%04x scratch_status=%04x"
-           " acked=%04x",
-           (IO_INTC_IRQ0 >> IRQ_DSPHINT) & 1, DSP_(0x7fff), DSP_(_status),
-           DSP_(_acked));
+    DEBUGF("dsp_status(): irq_dsphint=%u 7fff=%04x scratch_status=%04x",
+           (IO_INTC_IRQ0 >> IRQ_DSPHINT) & 1, DSP_(0x7fff), DSP_(_status));
 #define B(f,w,b,m) if ((w & (1 << b)) == 0) \
                        strcat(f, "!"); \
                        strcat(f, #m "|");

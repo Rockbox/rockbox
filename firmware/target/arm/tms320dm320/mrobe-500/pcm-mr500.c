@@ -91,6 +91,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 void pcm_play_dma_stop(void)
 {
     DSP_(_dma0_stopped)=1;
+    dsp_wake();
 }
 
 void pcm_play_lock(void)
@@ -108,6 +109,7 @@ void pcm_play_dma_pause(bool pause)
     if (pause)
     {
         DSP_(_dma0_stopped)=2;
+        dsp_wake();
     }
     else
     {

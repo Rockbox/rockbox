@@ -28,17 +28,27 @@
 
 volatile struct ipc_message status;
 
-extern int waiting;
-volatile int acked;
+#if defined(HAVE_DEBUG)
+static int acked;
+#endif
+
 interrupt void handle_int0(void) {
     IFR = 1;
+    
+#if defined(HAVE_DEBUG)
     acked = 1;
+#endif
+
     waiting = 0;
     
     if(dma0_stopped==0)
    	{
    		if(!(DMPREC&0x01))
    		{
+   		    /* Give the HPIB access to refill first */
+   		    rebuffer();
+   		    
+   		    /* Start the MCBSP DMA */
    			DMPREC |= 1;
    			audiohw_start();
 		}
@@ -47,15 +57,20 @@ interrupt void handle_int0(void) {
 			rebuffer();
 		}
 	}
+	else
+	{
+	    rebuffer();
+    }
 }
 
-void startack(void)
+#if defined(HAVE_DEBUG)
+static void startack(void)
 {
     acked = 0;
     int_arm();
 }
 
-void waitack(void)
+static void waitack(void)
 {
     /* Wait until ARM has picked up data. */
     while (!acked) 
@@ -78,3 +93,4 @@ void debugf(const char *fmt, ...) {
 
     acked = 2;
 }
+#endif

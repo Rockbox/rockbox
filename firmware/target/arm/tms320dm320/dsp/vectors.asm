@@ -27,13 +27,17 @@
             
             ; External Functions
             .global _handle_int0
-            .global _c_int00
+            .global _main
             .global _handle_dma0
             .global _handle_dmac
 
             .sect   ".vectors"
 ; Reset Interrupt
-RS_V:       BD    _c_int00
+; The rtx500.lib should be included if you want proper initialization, 
+;  currently the program is setup so that it is not necessary to save space.
+;  reset vector should jump to _c_int00 instead of main if initialization is
+;  needed.
+RS_V:       BD    _main
             NOP
             NOP
 

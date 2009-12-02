@@ -26,9 +26,6 @@
 
 extern volatile struct ipc_message status;
 
-void startack(void);
-void waitack(void);
-
 void debugf(const char *fmt, ...);
 
 inline void int_arm(void) {

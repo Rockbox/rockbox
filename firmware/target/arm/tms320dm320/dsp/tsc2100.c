@@ -40,8 +40,10 @@ void audiohw_start(void)
     /* Trigger first XEVT0 */
     SPCR20 |= 1;
 }
-audiohw_stop(void)
+
+void audiohw_stop(void)
 {
-	/* Reset the transmitter */
-	SPCR20&=0xFFFE;
+    /* Reset the transmitter */
+    SPCR20&=0xFFFE;
 }
+
