@@ -13138,3 +13138,79 @@
     usb_hid: "Presentatie mode"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "Volgende:"
+  </dest>
+  <voice>
+    *: "Volgende:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Gebruik Morse Code Input"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Gebruiker Morse Code Input"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Enkel bij automatische nummerwissel"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Enkel bij automatische nummerwissel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Volgend nummer:"
+  </dest>
+  <voice>
+    *: "Volgend nummer:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "van"
+  </dest>
+  <voice>
+    *: "van"
+  </voice>
+</phrase>
