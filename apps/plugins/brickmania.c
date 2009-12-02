@@ -1104,7 +1104,6 @@ static int brickmania_help(void)
 #if CONFIG_KEYPAD == ONDIO_PAD
         "MENU:",
 #elif (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IAUDIO_M3_PAD) \
-      (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
         "PLAY:",
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
         "NAVI:",
