@@ -192,6 +192,13 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
+#define QUIT BUTTON_POWER
+#define LEFT BUTTON_PREV
+#define RIGHT BUTTON_NEXT
+#define SELECT BUTTON_PLAY
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define QUIT    BUTTON_POWER
 
@@ -1096,7 +1103,8 @@ static int brickmania_help(void)
         "< & >", "Moves", "the", "paddle", "",
 #if CONFIG_KEYPAD == ONDIO_PAD
         "MENU:",
-#elif (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IAUDIO_M3_PAD)
+#elif (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IAUDIO_M3_PAD) \
+      (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
         "PLAY:",
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
         "NAVI:",
