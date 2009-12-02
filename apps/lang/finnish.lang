@@ -243,13 +243,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Selaa teemoja"
+    *: "Selaa teematiedostoja"
   </dest>
   <voice>
-    *: "Selaa teemoja"
+    *: "Selaa teematiedostoja"
   </voice>
 </phrase>
 <phrase>
@@ -1348,15 +1348,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Äänimerkin voimakkuus"
+    swcodec: "Kappaleenvaihtoäänimerkin voimakkuus"
   </dest>
   <voice>
     *: none
-    swcodec: "Äänimerkin voimakkuus"
+    swcodec: "Kappaleenvaihtoäänimerkin voimakkuus"
   </voice>
 </phrase>
 <phrase>
@@ -1744,15 +1744,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Selaa fontteja"
+    lcd_bitmap: "Fontti"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Selaa fontteja"
+    lcd_bitmap: "Fontti"
   </voice>
 </phrase>
 <phrase>
@@ -1760,13 +1760,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Selaa .wps-tiedostoja"
+    *: "Soittonäyttö"
   </dest>
   <voice>
-    *: "Selaa soittonäyttötiedostoja"
+    *: "Soittonäyttö"
   </voice>
 </phrase>
 <phrase>
@@ -1775,15 +1775,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "Selaa .rwps-tiedostoja"
+    remote: "Kaukosäätimen soittonäyttö"
   </dest>
   <voice>
     *: none
-    remote: "Selaa kaukosäätimen soittonäyttötiedostoja"
+    remote: "Kaukosäätimen soittonäyttö"
   </voice>
 </phrase>
 <phrase>
@@ -4587,24 +4587,28 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
+    ipod*,c200*: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*,fuze*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    sa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = Peruuta"
+    mrobe500: "POWER = Peruuta"
     h100,h120,h300: "STOP = Peruuta"
-    ipod*,c200*,sa9200: "MENU = Peruuta"
+    ipod*,c200*: "MENU = Peruuta"
     x5,m5: "RECORD = Peruuta"
     h10,h10_5gb,e200*,fuze*: "PREV = Peruuta"
     gigabeatf: "POWER = Peruuta"
     mrobe100: "DISPLAY = Peruuta"
     gigabeats: "BACK = Peruuta"
+    sa9200: "VASEN = Revert"
   </dest>
   <voice>
     *: none
@@ -9968,14 +9972,16 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
+    sa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Luodaan tietokantaa... %d löytyi (OFF = palaa)"
     h100,h120,h300: "Luodaan tietokantaa... %d löytyi (STOP = palaa)"
     ipod*: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
-    x5,m5,gigabeat*,mrobe100: "Luodaan tietokantaa... %d löytyi (LEFT = palaa)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
+    x5,m5,gigabeat*,mrobe100: "Luodaan tietokantaa... %d löytyi (VASEN = palaa)"
+    h10,h10_5gb,e200*,c200*,fuze*: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
+    sa9200: "Luodaan tietokantaa... %d löytyi (REW = palaa)"
   </dest>
   <voice>
     *: "tietokantaa varten löytyi merkintöjä"
@@ -10518,14 +10524,16 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU = Yes"
     h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Kyllä"
+    cowond2*: "MENU = Kyllä"
     h100,h120,h300: "NAVI = Kyllä"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Kyllä"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Kyllä"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -10539,18 +10547,21 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
+    sa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Aseta"
+    mrobe500: "HEART = Aseta"
     h100,h120,h300: "NAVI = Aseta"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Aseta"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Aseta"
+    sa9200: "PLAY = Aseta"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -12319,7 +12330,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_POINT
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12336,7 +12347,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_GRID
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12344,16 +12355,16 @@
   </source>
   <dest>
     *: none
-    touchscreen: "3x3 ruutu"
+    touchscreen: "3x3 ruudukko"
   </dest>
   <voice>
     *: none
-    touchscreen: "3 kertaa 3 ruutu"
+    touchscreen: "3 kertaa 3 ruudukko"
   </voice>
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_MODE
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12366,5 +12377,296 @@
   <voice>
     *: none
     touchscreen: "Kosketusnäytön tila"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Vierityspalkin sijainti"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Vierityspalkin sijainti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Kaukosäätimen tilapalkki"
+  </dest>
+  <voice>
+    *: none
+    remote: "Kaukosäätimen tilapalkki"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Aseta pikanäytön ylimmäiseksi kohteeksi"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Aseta pikanäytön ylimmäiseksi kohteeksi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Nopeus"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Nopeus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Oikea"
+  </dest>
+  <voice>
+    *: "Oikea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc:
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Puolisävelaskel"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Puolisävelaskel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Raja"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Raja"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Kalibroi"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Kalibroi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Nollaa kalibrointi"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Nollaa kalibrointi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Vierityspalkin leveys"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Vierityspalkin leveys"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Nahan käyttämä RAM-muisti:"
+  </dest>
+  <voice>
+    *: "Nahan käyttämä RAM-muisti:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Alhaalla"
+  </dest>
+  <voice>
+    *: "Alhaalla"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ajan venytys"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ajan venytys"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limiter Preamp"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Rajoittimen esivahvistus"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Rajoittimen esivahvistus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Vasen"
+  </dest>
+  <voice>
+    *: "Vasen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Kosketusnäyttö"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Kosketusnäyttö"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Ylhäällä"
+  </dest>
+  <voice>
+    *: "Ylhäällä"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Nopeus"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Nopeus"
   </voice>
 </phrase>
