@@ -60,7 +60,7 @@
      <property name="title">
       <string>Generation settings</string>
      </property>
-     <layout class="QGridLayout">
+     <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
        <widget class="QLabel" name="labelEncProfile">
         <property name="text">
