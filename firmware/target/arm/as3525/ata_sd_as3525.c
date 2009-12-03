@@ -257,12 +257,11 @@ static int sd_init_card(const int drive)
     int i;
 
 
+    /* MCLCK on and set to 400kHz ident frequency  */
+    MCI_CLOCK(drive) = MCI_CLOCK_ENABLE | AS3525_SD_IDENT_DIV;
+
     /* 100 - 400kHz clock required for Identification Mode  */
-    MCI_CLOCK(drive) = (MCI_CLOCK(drive) & 0xf00) | AS3525_SD_IDENT_DIV;
-
-
     /*  Start of Card Identification Mode ************************************/
-
 
     /* CMD0 Go Idle  */
     if(!send_cmd(drive, SD_GO_IDLE_STATE, 0, MCI_NO_FLAGS, NULL))
@@ -306,9 +305,7 @@ static int sd_init_card(const int drive)
                 &card_info[drive].rca))
         return -4;
 
-
     /*  End of Card Identification Mode   ************************************/
-
 
     /* full speed for controller clock  MCICLK = MCLK = PCLK = 62 MHz */
     MCI_CLOCK(drive) |= MCI_CLOCK_BYPASS;   /*  FIXME: 50 MHz is spec limit  */
@@ -490,8 +487,7 @@ static void init_pl180_controller(const int drive)
 
     MCI_SELECT(drive) = 0;
 
-    MCI_CLOCK(drive) = MCI_CLOCK_ENABLE;
-    mci_delay();
+    /* Pl180 clocks get turned on at start of card init */
 }
 
 int sd_init(void)
