@@ -202,7 +202,7 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_BATTERY_CHARGER_CONNECTED,"bp",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 #ifdef HAVE_USB_POWER
-	{ WPS_TOKEN_USB_POWERED,			  "bu",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_USB_POWERED,              "bu",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
     { WPS_TOKEN_RTC_PRESENT     ,             "cc", WPS_REFRESH_STATIC, NULL },
@@ -447,8 +447,8 @@ static struct skin_token_list *new_skin_token_list_item(struct wps_token *token,
         return NULL;
     llitem->next = NULL;
     llitem->token = token;
-	if (token_data)
-	    llitem->token->value.data = token_data;
+    if (token_data)
+        llitem->token->value.data = token_data;
     return llitem;
 }
 
@@ -515,7 +515,6 @@ static bool skin_start_new_line(struct skin_viewport *vp, int curr_token)
     curr_line = line;
     if (!vp->lines)
         vp->lines = line;
-    line_number++;
     return true;
 }
 
@@ -582,7 +581,7 @@ static int parse_image_display(const char *wps_bufptr,
 {
     char label = wps_bufptr[0];
     int subimage;
-	struct gui_img *img;;
+    struct gui_img *img;;
 
     /* sanity check */
     img = find_image(label, wps_data);
@@ -616,7 +615,7 @@ static int parse_image_load(const char *wps_bufptr,
     const char* id;
     const char *newline;
     int x,y;
-	struct gui_img *img;
+    struct gui_img *img;
 
     /* format: %x|n|filename.bmp|x|y|
        or %xl|n|filename.bmp|x|y|
@@ -642,14 +641,14 @@ static int parse_image_load(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM;
     }
     img = skin_buffer_alloc(sizeof(struct gui_img));
-	if (!img)
-	    return WPS_ERROR_INVALID_PARAM;
+    if (!img)
+        return WPS_ERROR_INVALID_PARAM;
     /* save a pointer to the filename */
     img->bm.data = (char*)filename;
     img->label = *id;
     img->x = x;
     img->y = y;
-	img->num_subimages = 1;
+    img->num_subimages = 1;
     img->always_display = false;
 
     /* save current viewport */
@@ -671,10 +670,10 @@ static int parse_image_load(const char *wps_bufptr,
         if (img->num_subimages <= 0)
             return WPS_ERROR_INVALID_PARAM;
     }
-	struct skin_token_list *item = new_skin_token_list_item(NULL, img);
-	if (!item)
-	    return WPS_ERROR_INVALID_PARAM;
-	add_to_ll_chain(&wps_data->images, item);
+    struct skin_token_list *item = new_skin_token_list_item(NULL, img);
+    if (!item)
+        return WPS_ERROR_INVALID_PARAM;
+    add_to_ll_chain(&wps_data->images, item);
 
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);
@@ -935,8 +934,8 @@ static int parse_progressbar(const char *wps_bufptr,
     struct progressbar *pb = skin_buffer_alloc(sizeof(struct progressbar));
     struct skin_token_list *item = new_skin_token_list_item(token, pb);
 
-	if (!pb || !item)
-	    return WPS_ERROR_INVALID_PARAM;
+    if (!pb || !item)
+        return WPS_ERROR_INVALID_PARAM;
 
     struct viewport *vp = &curr_vp->vp;
 #ifndef __PCTOOL__
@@ -954,7 +953,7 @@ static int parse_progressbar(const char *wps_bufptr,
         line = line->next;
     }
     pb->have_bitmap_pb = false;
-	pb->bm.data = NULL; /* no bitmap specified */
+    pb->bm.data = NULL; /* no bitmap specified */
 
     if (*wps_bufptr != '|') /* regular old style */
     {
@@ -1491,7 +1490,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
     int ret;
     int max_tokens = TOKEN_BLOCK_SIZE;
     size_t buf_free = 0;
-    line_number = 1;
+    line_number = 0;
     level = -1;
 
     /* allocate enough RAM for a reasonable skin, grow as needed.
@@ -1637,6 +1636,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                     fail = PARSE_FAIL_LIMITS_EXCEEDED;
                     break;
                 }
+                line_number++;
 
                 break;
 
@@ -1659,15 +1659,15 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                     /* look if we already have that string */
                     char *str;
                     bool found = false;
-					struct skin_token_list *list = data->strings;
-					while (list)
-					{
-						str = (char*)list->token->value.data;
-						found = (strlen(str) == len &&
+                    struct skin_token_list *list = data->strings;
+                    while (list)
+                    {
+                        str = (char*)list->token->value.data;
+                        found = (strlen(str) == len &&
                                     strncmp(string_start, str, len) == 0);
-						if (found)
-						    break; /* break here because the list item is
-							          used if its found */
+                        if (found)
+                            break; /* break here because the list item is
+                                      used if its found */
                         list = list->next;
                     }
                     /* If a matching string is found, found is true and i is
@@ -1676,21 +1676,21 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                     if (!found)
                     {
                         /* new string */
-						str = (char*)skin_buffer_alloc(len+1);
-						if (!str)
-						{
-							fail = PARSE_FAIL_LIMITS_EXCEEDED;
-							break;
+                        str = (char*)skin_buffer_alloc(len+1);
+                        if (!str)
+                        {
+                            fail = PARSE_FAIL_LIMITS_EXCEEDED;
+                            break;
                         }
                         strlcpy(str, string_start, len+1);
-						struct skin_token_list *item =
-						    new_skin_token_list_item(&data->tokens[data->num_tokens], str);
-						if(!item)
-						{
-							fail = PARSE_FAIL_LIMITS_EXCEEDED;
-							break;
+                        struct skin_token_list *item =
+                            new_skin_token_list_item(&data->tokens[data->num_tokens], str);
+                        if(!item)
+                        {
+                            fail = PARSE_FAIL_LIMITS_EXCEEDED;
+                            break;
                         }
-						add_to_ll_chain(&data->strings, item);
+                        add_to_ll_chain(&data->strings, item);
                     }
                     else
                     {
@@ -1775,13 +1775,13 @@ void skin_data_reset(struct wps_data *wps_data)
 #ifdef HAVE_LCD_BITMAP
 static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char* bmpdir)
 {
-	(void)wps_data; /* only needed for remote targets */
-	bool loaded = false;
+    (void)wps_data; /* only needed for remote targets */
+    bool loaded = false;
     char img_path[MAX_PATH];
     get_image_filename(bitmap->data, bmpdir,
                        img_path, sizeof(img_path));
 
-	/* load the image */
+    /* load the image */
     int format;
 #ifdef HAVE_REMOTE_LCD
     if (curr_screen == SCREEN_REMOTE)
@@ -1790,22 +1790,22 @@ static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char
 #endif
         format = FORMAT_ANY|FORMAT_TRANSPARENT;
 
-	size_t max_buf;
+    size_t max_buf;
     char* imgbuf = (char*)skin_buffer_grab(&max_buf);
-	bitmap->data = imgbuf;
+    bitmap->data = imgbuf;
     int ret = read_bmp_file(img_path, bitmap, max_buf, format, NULL);
 
     if (ret > 0)
     {
-		skin_buffer_increment(ret, true);
+        skin_buffer_increment(ret, true);
         loaded = true;
     }
     else
-	{
+    {
         /* Abort if we can't load an image */
-		loaded = false;
+        loaded = false;
     }
-	return loaded;
+    return loaded;
 }
 
 static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
@@ -1820,20 +1820,20 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
         {
             pb->have_bitmap_pb = load_skin_bmp(wps_data, &pb->bm, bmpdir);
         }
-		list = list->next;
+        list = list->next;
     }
     /* regular images */
-	list = wps_data->images;
+    list = wps_data->images;
     while (list)
     {
         struct gui_img *img = (struct gui_img*)list->token->value.data;
         if (img->bm.data)
         {
             img->loaded = load_skin_bmp(wps_data, &img->bm, bmpdir);
-			if (img->loaded)
-			    img->subimage_height = img->bm.height / img->num_subimages;
+            if (img->loaded)
+                img->subimage_height = img->bm.height / img->num_subimages;
         }
-		list = list->next;
+        list = list->next;
     }
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
