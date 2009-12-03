@@ -15,7 +15,7 @@ endif
 endif
 
 ifneq ($(findstring MINGW,$(shell uname)),MINGW)
-LIBS = /usr/lib/libmtp.a /usr/lib/libusb.a
+LIBS = /usr/local/lib/libmtp.a /usr/local/lib/libusb.a
 CFLAGS += $(shell printf \
 	'\#include <libmtp.h>\nlibmtp version: LIBMTP_VERSION\n' | \
 	gcc -E -P - -o - | grep -q '^libmtp version: 0\.2' && echo '-DOLDMTP')

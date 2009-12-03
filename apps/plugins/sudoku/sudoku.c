@@ -122,9 +122,11 @@ static const char default_game[9][9] =
 #define MARK_SIZE   1   /* Mark width and height */
 
 #elif (LCD_HEIGHT==110) && (LCD_WIDTH==138) \
-   || (LCD_HEIGHT==128) && (LCD_WIDTH==128)
+   || (LCD_HEIGHT==128) && (LCD_WIDTH==128) \
+   || (LCD_HEIGHT==160) && (LCD_WIDTH==128) 
 /* iPod Mini - 138x110, 9 cells @ 10x10 with 14 border lines */
 /* iriver H10 5-6GB - 128x128, 9 cells @ 10x10 with 14 border lines */
+/* Philips GoGear SA9200 - 128x160, 9 cells @ 10x10 with 14 border tiles */
 #define MARK_OFFS   1   /* Pixels between border and mark */
 #define MARK_SPACE  1   /* Pixels between two marks */
 #define MARK_SIZE   2   /* Mark width and height */
