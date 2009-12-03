@@ -248,6 +248,11 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
     return false;
 }
 
+#define MCI_FULLSPEED     (MCI_CLOCK_ENABLE | MCI_CLOCK_BYPASS)     /* MCLK   */
+#define MCI_HALFSPEED     (MCI_CLOCK_ENABLE)                        /* MCLK/2 */
+#define MCI_QUARTERSPEED  (MCI_CLOCK_ENABLE | 1)                    /* MCLK/4 */
+#define MCI_IDENTSPEED    (MCI_CLOCK_ENABLE | AS3525_SD_IDENT_DIV)  /* IDENT  */
+
 static int sd_init_card(const int drive)
 {
     unsigned long response;
@@ -258,7 +263,7 @@ static int sd_init_card(const int drive)
 
 
     /* MCLCK on and set to 400kHz ident frequency  */
-    MCI_CLOCK(drive) = MCI_CLOCK_ENABLE | AS3525_SD_IDENT_DIV;
+    MCI_CLOCK(drive) = MCI_IDENTSPEED;
 
     /* 100 - 400kHz clock required for Identification Mode  */
     /*  Start of Card Identification Mode ************************************/
@@ -307,11 +312,11 @@ static int sd_init_card(const int drive)
 
     /*  End of Card Identification Mode   ************************************/
 
-    /* full speed for controller clock  MCICLK = MCLK = PCLK = 62 MHz */
-    MCI_CLOCK(drive) |= MCI_CLOCK_BYPASS;   /*  FIXME: 50 MHz is spec limit  */
-    mci_delay();
+    /* Boost MCICLK to operating speed */ /*  FIXME: 50 MHz is spec limit  */
+    MCI_CLOCK(drive) = (sd_v2 ? MCI_FULLSPEED : MCI_FULLSPEED);
 
-#ifdef HAVE_MULTIDRIVE
+#ifdef HAVE_MULTIDRIVE        /*  The internal SDs are v1 */
+
     /* Try to switch V2 cards to HS timings, non HS seem to ignore this */
     if(sd_v2)
     {
