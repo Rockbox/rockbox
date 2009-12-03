@@ -106,6 +106,16 @@ sub runone {
     # build the target
     $a = buildit($dir, $confnum, $extra);
 
+    # Do not continue if the rockboxui executable is not created. This will
+    #    prevent a good build getting overwritten by a bad build when
+    #    uploaded to the web server.
+    unless ( (-e "rockboxui") || (-e "rockboxui.exe") ) {
+        print "No rockboxui, clean up and return\n" if($verbose);
+        chdir "..";
+        system("rm -rf build-$dir");
+        return $a;
+    }
+
     if ($strip) {
         print "Stripping binaries\n" if ($verbose);
         # find \( -name "*.exe" -o -name "*.rock" -o -name "*.codec" \) -exec ls -l "{}" ";"
