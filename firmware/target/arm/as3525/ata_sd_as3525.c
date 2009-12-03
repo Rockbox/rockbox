@@ -312,8 +312,8 @@ static int sd_init_card(const int drive)
 
     /*  End of Card Identification Mode   ************************************/
 
-    /* Boost MCICLK to operating speed */ /*  FIXME: 50 MHz is spec limit  */
-    MCI_CLOCK(drive) = (sd_v2 ? MCI_FULLSPEED : MCI_FULLSPEED);
+    /* Boost MCICLK to operating speed */ /*FIXME: v1 at 31 MHz still too high*/
+    MCI_CLOCK(drive) = (sd_v2 ? MCI_HALFSPEED : MCI_HALFSPEED);
 
 #ifdef HAVE_MULTIDRIVE        /*  The internal SDs are v1 */
 
@@ -741,11 +741,18 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                                 (1<<3) /* DMA */                        |
                                 (9<<4) /* 2^9 = 512 */ ;
 
-
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
         /*  Wait for FIFO to empty, card may still be in PRG state for writes */
         while(MCI_STATUS(drive) & MCI_TX_ACTIVE);
+
+        last_disk_activity = current_tick;
+
+        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_FLAGS, NULL))
+        {
+            ret = -4*20;
+            goto sd_transfer_error;
+        }
 
         if(!transfer_error[drive])
         {
@@ -759,14 +766,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         else if(loops++ > PL180_MAX_TRANSFER_ERRORS)
                 panicf("SD Xfer %s err:0x%x Disk%d", (write? "write": "read"),
                                                   transfer_error[drive], drive);
-
-        last_disk_activity = current_tick;
-
-        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_FLAGS, NULL))
-        {
-            ret = -4*20;
-            goto sd_transfer_error;
-        }
     }
 
     ret = 0;    /* success */
