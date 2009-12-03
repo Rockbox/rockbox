@@ -498,11 +498,9 @@ static void init_pl180_controller(const int drive)
 int sd_init(void)
 {
     int ret;
-    CGU_IDE =   (1<<7)  /* AHB interface enable */  |
-                (1<<6)  /* interface enable */      |
-                (AS3525_IDE_DIV << 2)               |
-                AS3525_CLK_PLLA;  /* clock source = PLLA */
-
+    CGU_IDE =   (1<<6)                  /*  enable non AHB interface*/
+            |   (AS3525_IDE_DIV << 2)
+            |    AS3525_CLK_PLLA;       /* clock source = PLLA */
 
     CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
 #ifdef HAVE_MULTIDRIVE
@@ -831,8 +829,7 @@ void sd_enable(bool on)
     {
         /*  Enable both NAF_CLOCK & IDE clk for internal SD */
         CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
-        CGU_IDE  |= ((1<<7)    /* IDE AHB interface enable */
-                  |  (1<<6));  /* IDE interface enable */
+        CGU_IDE  |= (1<<6);     /* enable non AHB interface*/
 #ifdef HAVE_MULTIDRIVE
         /* Enable MCI clk for uSD */
         CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
@@ -879,8 +876,7 @@ void sd_enable(bool on)
 
         /*  Disable both NAF_CLOCK & IDE clk for internal SD */
         CGU_PERI &= ~CGU_NAF_CLOCK_ENABLE;
-        CGU_IDE &= ~((1<<7)      /* IDE AHB interface disable */
-                 |   (1<<6));    /* IDE interface disable */
+        CGU_IDE &= ~(1<<6);       /* disable non AHB interface*/
     }
 }
 
