@@ -1252,7 +1252,7 @@ static int rockblox_menu(void)
 #ifdef HAVE_LCD_BITMAP
                 highscore_show(MAX_HIGH_SCORES, highest, MAX_HIGH_SCORES, true);
 #else
-                rb->splashf(2*HZ, "High Score: %d", highest[MAX_HIGH_SCORES].score);
+                rb->splashf(2*HZ, "High Score: %d", highest[0].score);
 #endif
                 break;
             case 4:
