@@ -297,7 +297,7 @@ void si4700_init(void)
 #ifdef USE_INTERNAL_OSCILLATOR
         /* Enable the internal oscillator
           (Si4702-16 needs this register to be initialised to 0x100) */
-        si4700_write_reg(TEST1, TEST1_XOSCEN | 0x100);
+        si4700_write_set(TEST1, TEST1_XOSCEN | 0x100);
         sleep(HZ/2);
 #endif    
     }
