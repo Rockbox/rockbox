@@ -756,7 +756,8 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             loops = 0;  /* reset errors counter */
         }
         else if(loops++ > PL180_MAX_TRANSFER_ERRORS)
-                panicf("SD transfer error : 0x%x", transfer_error[drive]);
+                panicf("SD Xfer %s err:0x%x Disk%d", (write? "write": "read"),
+                                                  transfer_error[drive], drive);
 
         last_disk_activity = current_tick;
 
