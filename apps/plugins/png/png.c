@@ -141,6 +141,7 @@ typedef struct LodePNG_Decoder
     long error;
     char error_msg[128];
     int x,y;
+    int width,height;
 } LodePNG_Decoder;
 
 #define VERSION_STRING "20080927"
@@ -1519,11 +1520,11 @@ int show_menu(void) /* return 1 to quit */
 
 void draw_image(struct LodePNG_Decoder* decoder)
 {
-    rb->lcd_bitmap_part(resized_image, decoder->x, decoder->y, decoder->infoPng.width/ds /*stride*/,
-                        MAX(0, (LCD_WIDTH - (int)decoder->infoPng.width/(int)ds) / 2),
-                        MAX(0, (LCD_HEIGHT - (int)decoder->infoPng.height/(int)ds) / 2),
-                        decoder->infoPng.width/ds - decoder->x,
-                        decoder->infoPng.height/ds - decoder->y);
+    rb->lcd_bitmap_part(resized_image, decoder->x, decoder->y, decoder->width,
+                        MAX(0, (LCD_WIDTH - decoder->width) / 2),
+                        MAX(0, (LCD_HEIGHT - decoder->height) / 2),
+                        decoder->width - decoder->x,
+                        decoder->height - decoder->y);
 }
 
 /* Pan the viewing window right - move image to the left and fill in
@@ -1532,7 +1533,7 @@ static void pan_view_right(struct LodePNG_Decoder* decoder)
 {
     int move;
 
-    move = MIN(HSCROLL, (int)(decoder->infoPng.width/ds) - decoder->x - LCD_WIDTH);
+    move = MIN(HSCROLL, decoder->width - decoder->x - LCD_WIDTH);
     if (move > 0)
     {
         decoder->x += move;
@@ -1578,7 +1579,7 @@ static void pan_view_down(struct LodePNG_Decoder* decoder)
 {
     int move;
 
-    move = MIN(VSCROLL, (int)(decoder->infoPng.height/ds) - decoder->y - LCD_HEIGHT);
+    move = MIN(VSCROLL, decoder->height - decoder->y - LCD_HEIGHT);
     if (move > 0)
     {
         decoder->y += move;
@@ -1604,16 +1605,16 @@ int scroll_bmp(struct LodePNG_Decoder* decoder)
         switch (button)
         {
         case PNG_LEFT:
-            if (entries > 1 && decoder->infoPng.width/ds <= LCD_WIDTH
-                            && decoder->infoPng.height/ds <= LCD_HEIGHT)
+            if (entries > 1 && decoder->width <= LCD_WIDTH
+                            && decoder->height <= LCD_HEIGHT)
                 return change_filename(DIR_PREV);
         case PNG_LEFT | BUTTON_REPEAT:
             pan_view_left(decoder);
             break;
 
         case PNG_RIGHT:
-            if (entries > 1 && decoder->infoPng.width/ds <= LCD_WIDTH
-                            && decoder->infoPng.height/ds <= LCD_HEIGHT)
+            if (entries > 1 && decoder->width <= LCD_WIDTH
+                            && decoder->height <= LCD_HEIGHT)
                 return change_filename(DIR_NEXT);
         case PNG_RIGHT | BUTTON_REPEAT:
             pan_view_right(decoder);
@@ -1699,28 +1700,6 @@ int scroll_bmp(struct LodePNG_Decoder* decoder)
     } /* while (true) */
 }
 
-/* set the view to the given center point, limit if necessary */
-void set_view (struct LodePNG_Decoder* decoder, int cx, int cy)
-{
-    int x, y;
-
-    /* plain center to available width/height */
-    x = cx - MIN(LCD_WIDTH, decoder->infoPng.width/ds) / 2;
-    y = cy - MIN(LCD_HEIGHT, decoder->infoPng.height/ds) / 2;
-
-    /* limit against upper image size */
-    x = MIN((int)(decoder->infoPng.width/ds) - LCD_WIDTH, x);
-    y = MIN((int)(decoder->infoPng.height/ds) - LCD_HEIGHT, y);
-
-    /* limit against negative side */
-    x = MAX(0, x);
-    y = MAX(0, y);
-
-    decoder->x = x; /* set the values */
-    decoder->y = y;
-
-}
-
 /* callback updating a progress meter while PNG decoding */
 void cb_progress(int current, int total)
 {
@@ -1776,17 +1755,13 @@ unsigned max_downscale(struct LodePNG_Decoder* decoder)
     return downscale;
 }
 
-/* calculate the view center based on the bitmap position */
-void get_view(struct LodePNG_Decoder* decoder, int* p_cx, int* p_cy)
-{
-    *p_cx = decoder->x + MIN(LCD_WIDTH, decoder->infoPng.width/ds) / 2;
-    *p_cy = decoder->y + MIN(LCD_HEIGHT, decoder->infoPng.height/ds) / 2;
-}
-
 /* return decoded or cached image */
-fb_data *get_image(struct LodePNG_Decoder* decoder)
+fb_data *get_image(struct LodePNG_Decoder* decoder, int ds)
 {
     fb_data * p_disp = disp[ds]; /* short cut */
+
+    decoder->width = decoder->infoPng.width / ds;
+    decoder->height = decoder->infoPng.height / ds;
 
     if (p_disp != NULL)
     {
@@ -1799,45 +1774,75 @@ fb_data *get_image(struct LodePNG_Decoder* decoder)
         if (!running_slideshow)
         {
             rb->snprintf(print, sizeof(print), "resizing %d*%d",
-                         decoder->infoPng.width/ds, decoder->infoPng.height/ds);
+                         decoder->width, decoder->height);
             rb->lcd_puts(0, 3, print);
             rb->lcd_update();
         }
         static struct bitmap bmp_src, bmp_dst;
 
-        int size = (decoder->infoPng.width/ds) * (decoder->infoPng.height/ds);
+        int size = decoder->width * decoder->height;
+
+        if ((unsigned char *)(disp_buf + size) >= memory_max) {
+            /* have to discard the current */
+            int i;
+            for (i=1; i<=8; i++)
+                disp[i] = NULL; /* invalidate all bitmaps */
+            /* start again from the beginning of the buffer */
+            disp_buf = (fb_data *)((intptr_t)(converted_image + converted_image_size + 3) & ~3);
+        }
+
         disp[ds] = disp_buf;
 
-        if ((unsigned char *)(disp[ds] + size) >= memory_max) {
-            //rb->splash(HZ, "Out of Memory");
-            // Still display the original image which is already decoded in RAM
-            disp[ds] = converted_image;
-            ds = 1;
-            return converted_image;
-        } else {
-            bmp_src.width = decoder->infoPng.width;
-            bmp_src.height = decoder->infoPng.height;
-            bmp_src.data = (unsigned char *)converted_image;
+        bmp_src.width = decoder->infoPng.width;
+        bmp_src.height = decoder->infoPng.height;
+        bmp_src.data = (unsigned char *)converted_image;
 
-            bmp_dst.width = decoder->infoPng.width/ds;
-            bmp_dst.height = decoder->infoPng.height/ds;
-            bmp_dst.data = (unsigned char *)disp[ds];
+        bmp_dst.width = decoder->width;
+        bmp_dst.height = decoder->height;
+        bmp_dst.data = (unsigned char *)disp[ds];
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(true);
-            smooth_resize_bitmap(&bmp_src, &bmp_dst);
-            rb->cpu_boost(false);
+        rb->cpu_boost(true);
+        smooth_resize_bitmap(&bmp_src, &bmp_dst);
+        rb->cpu_boost(false);
 #else
-            smooth_resize_bitmap(&bmp_src, &bmp_dst);
+        smooth_resize_bitmap(&bmp_src, &bmp_dst);
 #endif /*HAVE_ADJUSTABLE_CPU_FREQ*/
 
-            disp_buf = (fb_data *)((intptr_t)(disp[ds] + size + 3) & ~3);
-        }
+        disp_buf = (fb_data *)((intptr_t)(disp[ds] + size + 3) & ~3);
     } else {
         disp[ds] = converted_image;
         return converted_image;
     }
 
     return disp[ds];
+}
+
+/* set the view to the given center point, limit if necessary */
+void set_view (struct LodePNG_Decoder* decoder, int cx, int cy)
+{
+    int x, y;
+
+    /* plain center to available width/height */
+    x = cx - MIN(LCD_WIDTH, decoder->width) / 2;
+    y = cy - MIN(LCD_HEIGHT, decoder->height) / 2;
+
+    /* limit against upper image size */
+    x = MIN(decoder->width - LCD_WIDTH, x);
+    y = MIN(decoder->height - LCD_HEIGHT, y);
+
+    /* limit against negative side */
+    x = MAX(0, x);
+    y = MAX(0, y);
+
+    decoder->x = x; /* set the values */
+    decoder->y = y;
+}
+
+/* calculate the view center based on the bitmap position */
+void get_view(struct LodePNG_Decoder* decoder, int* p_cx, int* p_cy)
+{
+    *p_cx = decoder->x + MIN(LCD_WIDTH, decoder->width) / 2;
+    *p_cy = decoder->y + MIN(LCD_HEIGHT, decoder->height) / 2;
 }
 
 /* load, decode, display the image */
@@ -1922,14 +1927,11 @@ int load_and_show(char* filename)
         if (!decoder.error) {
 
             if (!running_slideshow) {
-                rb->snprintf(print, sizeof(print), "image %dx%d", decoder.infoPng.width, decoder.infoPng.height);
+                rb->snprintf(print, sizeof(print), "image %dx%d",
+                             decoder.infoPng.width, decoder.infoPng.height);
                 rb->lcd_puts(0, 2, print);
                 rb->lcd_update();
             }
-
-            ds_max = max_downscale(&decoder);            /* check display constraint */
-
-            ds = ds_max; /* initials setting */
 
             if (!running_slideshow)
             {
@@ -1948,14 +1950,6 @@ int load_and_show(char* filename)
 #else
             LodePNG_decode(&decoder, image, image_size, cb_progress);
 #endif /*HAVE_ADJUSTABLE_CPU_FREQ*/
-
-            disp_buf = (fb_data *)((intptr_t)(converted_image + converted_image_size + 3) & ~3);
-            ds_min = min_downscale(&decoder, memory_max - (unsigned char*)disp_buf); /* check memory constraint */
-
-            if (ds_min == 0) {
-                // Could not resize the image
-                ds_min = ds = ds_max = 1;
-            }
         }
     }
 
@@ -2117,18 +2111,29 @@ int load_and_show(char* filename)
             }
         }
 
-    do {
-        resized_image = get_image(&decoder); /* decode or fetch from cache */
+    disp_buf = (fb_data *)((intptr_t)(converted_image + converted_image_size + 3) & ~3);
+    ds_max = max_downscale(&decoder);            /* check display constraint */
+    ds_min = min_downscale(&decoder, memory_max - (unsigned char*)disp_buf); /* check memory constraint */
+    if (ds_min == 0) {
+        /* Can not resize the image */
+        ds_min = ds_max = 1;
+    } else if (ds_max < ds_min) {
+        ds_max = ds_min;
+    }
 
-        cx = decoder.infoPng.width/ds/2; /* center the view */
-        cy = decoder.infoPng.height/ds/2;
+    ds = ds_max; /* initials setting */
+    cx = decoder.infoPng.width/ds/2; /* center the view */
+    cy = decoder.infoPng.height/ds/2;
+
+    do {
+        resized_image = get_image(&decoder, ds); /* decode or fetch from cache */
 
         set_view(&decoder, cx, cy);
 
         if (!running_slideshow)
         {
             rb->snprintf(print, sizeof(print), "showing %dx%d",
-                         decoder.infoPng.width/ds, decoder.infoPng.height/ds);
+                         decoder.width, decoder.height);
             rb->lcd_puts(0, 3, print);
             rb->lcd_update();
         }
@@ -2145,16 +2150,14 @@ int load_and_show(char* filename)
             status = scroll_bmp(&decoder);
             if (status == ZOOM_IN)
             {
-                if (ds > ds_min)
+                if (ds > 1)
                 {
-                    while (1)
-                    {
-                        ds /= 2; /* reduce downscaling to zoom in */
-                        get_view(&decoder, &cx, &cy);
-                        cx *= 2; /* prepare the position in the new image */
-                        cy *= 2;
-                        if (disp[ds] != converted_image || ds <= ds_min) break;
-                    }
+                    /* as 1/1 is always available, jump ds to 1 if ds is ds_min. */
+                    int zoom = (ds == ds_min)? ds_min: 2;
+                    ds /= zoom; /* reduce downscaling to zoom in */
+                    get_view(&decoder, &cx, &cy);
+                    cx *= zoom; /* prepare the position in the new image */
+                    cy *= zoom;
                 }
                 else
                     continue;
@@ -2164,14 +2167,12 @@ int load_and_show(char* filename)
             {
                 if (ds < ds_max)
                 {
-                    while (1)
-                    {
-                        ds *= 2; /* increase downscaling to zoom out */
-                        get_view(&decoder, &cx, &cy);
-                        cx /= 2; /* prepare the position in the new image */
-                        cy /= 2;
-                        if (disp[ds] != converted_image || ds >= ds_max) break;
-                    }
+                    /* if ds is 1 and ds_min is greater than 1, jump ds to ds_min. */
+                    int zoom = (ds < ds_min)? ds_min: 2;
+                    ds *= zoom; /* increase downscaling to zoom out */
+                    get_view(&decoder, &cx, &cy);
+                    cx /= zoom; /* prepare the position in the new image */
+                    cy /= zoom;
                 }
                 else
                     continue;
