@@ -38,8 +38,8 @@ public:
     virtual void setProgressVisible(bool);
 
 signals:
-    virtual void aborted();
-    virtual void closed();
+    void aborted();
+    void closed();
 
 public slots:
     virtual void addItem(const QString &text);  //! add a string to the progress list

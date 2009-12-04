@@ -42,7 +42,7 @@ public:
     virtual int getProgressMax()=0;
 
 signals:
-    virtual void aborted()=0;
+    void aborted();
 
 
 public slots:
