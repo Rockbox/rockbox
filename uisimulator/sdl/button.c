@@ -58,23 +58,6 @@ struct event_queue button_queue;
 
 static int btn = 0;    /* Hopefully keeps track of currently pressed keys... */
 
-#ifdef HAVE_BACKLIGHT
-static bool filter_first_keypress;
-
-void set_backlight_filter_keypress(bool value)
-{
-    filter_first_keypress = value;
-}
-#ifdef HAVE_REMOTE_LCD
-static bool remote_filter_first_keypress;
-
-void set_remote_backlight_filter_keypress(bool value)
-{
-    remote_filter_first_keypress = value;
-}
-#endif
-#endif
-
 #ifdef HAS_BUTTON_HOLD
 bool hold_button_state = false;
 bool button_hold(void) {

@@ -519,6 +519,7 @@ void button_set_flip(bool flip)
     }
 }
 #endif /* HAVE_LCD_FLIP */
+#endif /* SIMULATOR */
 
 #ifdef HAVE_BACKLIGHT
 void set_backlight_filter_keypress(bool value)
@@ -533,7 +534,6 @@ void set_remote_backlight_filter_keypress(bool value)
 #endif
 #endif
 
-#endif /* SIMULATOR */
 /*
  * Get button pressed from hardware
  */
