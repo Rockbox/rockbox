@@ -41,13 +41,13 @@ static int last_char_index = 0;
 #define ACTION_UPDATE 3
 #define ACTION_CONCAT 4
 
-int _do_action(int action, char* str, int line);
+char* _do_action(int action, char* str, int line);
 #ifndef HAVE_ADJUSTABLE_CPU_FREQ
 #define do_action _do_action
 #else
-int do_action(int action, char* str, int line)
+char* do_action(int action, char* str, int line)
 {
-    int r;
+    char *r;
     rb->cpu_boost(1);
     r = _do_action(action,str,line);
     rb->cpu_boost(0);
@@ -55,7 +55,7 @@ int do_action(int action, char* str, int line)
 }
 #endif
 
-int _do_action(int action, char* str, int line)
+char* _do_action(int action, char* str, int line)
 {
     int len, lennew;
     int i=0,c=0;
@@ -74,7 +74,7 @@ int _do_action(int action, char* str, int line)
         case ACTION_INSERT:
             len = rb->strlen(str)+1;
             if ( char_count+ len > MAX_CHARS )
-                return 0;
+                return NULL;
             rb->memmove(&buffer[c+len],&buffer[c],char_count-c);
             rb->strcpy(&buffer[c],str);
             char_count += len;
@@ -82,10 +82,7 @@ int _do_action(int action, char* str, int line)
             break;
         case ACTION_GET:
             if (line > line_count)
-                return 0;
-            last_action_line = i;
-            last_char_index = c;
-            return c;
+                return &buffer[0];
             break;
         case ACTION_REMOVE:
             if (line > line_count)
@@ -97,34 +94,34 @@ int _do_action(int action, char* str, int line)
             break;
         case ACTION_UPDATE:
             if (line > line_count)
-                return 0;
+                return NULL;
             len = rb->strlen(&buffer[c])+1;
             lennew = rb->strlen(str)+1;
             if ( char_count+ lennew-len > MAX_CHARS )
-                return 0;
+                return NULL;
             rb->memmove(&buffer[c+lennew],&buffer[c+len],char_count-c-len);
             rb->strcpy(&buffer[c],str);
             char_count += lennew-len;
             break;
         case ACTION_CONCAT:
             if (line > line_count)
-                return 0;
+                return NULL;
             rb->memmove(&buffer[c-1],&buffer[c],char_count-c);
             char_count--;
             line_count--;
             break;
         default:
-            return 0;
+            return NULL;
     }
     last_action_line = i;
     last_char_index = c;
-    return 1;
+    return &buffer[c];
 }
 static const char* list_get_name_cb(int selected_item, void* data,
                                     char* buf, size_t buf_len)
 {
     (void)data;
-    char *b = &buffer[do_action(ACTION_GET,0,selected_item)];
+    char *b = do_action(ACTION_GET, 0, selected_item);
     /* strlcpy(dst, src, siz) returns strlen(src) */
     if (rb->strlcpy(buf, b, buf_len) >= buf_len)
     {
@@ -201,7 +198,7 @@ bool save_changes(int overwrite)
 #endif
     for (i=0;i<line_count;i++)
     {
-        rb->fdprintf(fd,"%s%s",&buffer[do_action(ACTION_GET,0,i)],eol);
+        rb->fdprintf(fd,"%s%s", do_action(ACTION_GET, 0, i), eol);
     }
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(0);
@@ -238,12 +235,14 @@ int do_item_menu(int cur_sel, char* copy_buffer)
     switch (rb->do_menu(&menu, NULL, NULL, false))
     {
         case 0: /* cut */
-            rb->strcpy(copy_buffer,&buffer[do_action(ACTION_GET,0,cur_sel)]);
-            do_action(ACTION_REMOVE,0,cur_sel);
+            rb->strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
+                        MAX_LINE_LEN);
+            do_action(ACTION_REMOVE, 0, cur_sel);
             ret = MENU_RET_UPDATE;
         break;
         case 1: /* copy */
-            rb->strcpy(copy_buffer,&buffer[do_action(ACTION_GET,0,cur_sel)]);
+            rb->strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
+                        MAX_LINE_LEN);
             ret = MENU_RET_NO_UPDATE;
         break;
         case 2: /* insert above */
@@ -346,12 +345,12 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef HAVE_LCD_COLOR
         char *c = NULL;
 #endif
-        rb->strcpy(filename,(char*)parameter);
+        rb->strlcpy(filename, (char*)parameter, MAX_PATH);
         get_eol_string(filename);
         fd = rb->open(filename,O_RDONLY);
         if (fd<0)
         {
-            rb->splashf(HZ*2,"Couldnt open file: %s",(char*)parameter);
+            rb->splashf(HZ*2, "Couldnt open file: %s", filename);
             return PLUGIN_ERROR;
         }
 #ifdef HAVE_LCD_COLOR
@@ -397,14 +396,15 @@ enum plugin_status plugin_start(const void* parameter)
             case ACTION_STD_OK:
             {
                 if (line_count)
-                    rb->strcpy(temp_line,&buffer[do_action(ACTION_GET,0,cur_sel)]);
+                    rb->strlcpy(temp_line, do_action(ACTION_GET, 0, cur_sel),
+                                MAX_LINE_LEN);
 #ifdef HAVE_LCD_COLOR
                 if (edit_colors_file && line_count)
                 {
                     char *name = temp_line, *value = NULL;
                     char extension[MAX_LINE_LEN];
                     int color, old_color;
-                    bool temp_changed;
+                    bool temp_changed = false;
                     rb->settings_parseline(temp_line, &name, &value);
                     if (line_count)
                     {
@@ -426,9 +426,6 @@ enum plugin_status plugin_start(const void* parameter)
                                 rb->set_color(rb->screens[SCREEN_MAIN], name, &color, -1);
                                 temp_changed = (value == NULL) || (color != old_color);
                                 break;
-                            default:
-                                /* Should never happen but makes compiler happy */
-                                temp_changed = false;
                         }
 
                         if (temp_changed)
@@ -456,8 +453,9 @@ enum plugin_status plugin_start(const void* parameter)
             break;
             case ACTION_STD_CONTEXT:
                 if (!line_count) break;
-                rb->strcpy(copy_buffer,&buffer[do_action(ACTION_GET,0,cur_sel)]);
-                do_action(ACTION_REMOVE,0,cur_sel);
+                rb->strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
+                            MAX_LINE_LEN);
+                do_action(ACTION_REMOVE, 0, cur_sel);
                 changed = true;
             break;
             case ACTION_STD_MENU:
