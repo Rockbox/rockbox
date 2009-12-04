@@ -141,6 +141,9 @@ void dice_print(struct dices* dice, struct screen* display){
     int display_nb_col=display->getwidth()/char_width;
 
     int nb_dices_per_line=display_nb_col/4;/* 4 char per dice displayed*/
+    if(!nb_dices_per_line)
+        nb_dices_per_line++;
+    
     int nb_lines_required=dice->nb_dices/nb_dices_per_line;
     int current_row=0;
     if(dice->nb_dices%nb_dices_per_line!=0)
