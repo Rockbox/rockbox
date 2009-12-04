@@ -955,7 +955,7 @@ static unsigned int blackjack_get_yes_no(char message[20]) {
             case BJACK_SELECT: breakout = true;
                 break;
             case BJACK_QUIT: breakout = true;
-                choice = BJ_QUIT;
+                choice = 1;
                 break;
         }
     }
@@ -975,7 +975,7 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
                                        signed int start) {
     int button;
     char str[9];
-    bool changed = false;
+    bool breakout = false, changed = false;
     unsigned int w, h;
     signed int amount;
 
@@ -1035,7 +1035,7 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
                         37*w / 2, 8*h -3);
 #endif
 
-    while(true) {
+    while(!breakout) {
         button = rb->button_get(true);
 
         switch(button) {
@@ -1076,14 +1076,12 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
                 changed = true;
                 break;
             case BJACK_QUIT:
-                return 0;
+                breakout = true;
+                amount = 0;
+                break;
             case BJACK_SELECT:
-#if LCD_DEPTH > 1
-                rb->lcd_set_foreground(FG_COLOR);
-                rb->lcd_set_background(BG_COLOR);
-#endif
-                rb->lcd_clear_display();
-                return amount;
+                breakout = true;
+                break;
         }
 
         if(changed) {
@@ -1101,6 +1099,13 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
             changed = false;
         }
     }
+
+#if LCD_DEPTH > 1
+    rb->lcd_set_foreground(FG_COLOR);
+    rb->lcd_set_background(BG_COLOR);
+#endif
+    rb->lcd_clear_display();
+    return amount;
 }
 
 /*****************************************************************************
@@ -1127,7 +1132,7 @@ static void double_down(struct game_context* bj) {
 * means a split has already occurred and the first hand is done.
 ******************************************************************************/
 static void split(struct game_context* bj) {
-    if (blackjack_get_yes_no("Split?") == 1)
+    if (blackjack_get_yes_no("Split?") != 0)
         bj->split_status = 1;
     else {
         bj->split_status = 2;
@@ -1149,7 +1154,7 @@ static unsigned int insurance(struct game_context* bj) {
     bj->asked_insurance = true;
     max_amount = bj->current_bet < (unsigned int)bj->player_money ?
                             bj->current_bet/2 : (unsigned int)bj->player_money;
-    if (insurance == 1) return 0;
+    if (insurance != 0) return 0;
 
     insurance = blackjack_get_amount("How much?", 0, max_amount, 0);
     redraw_board(bj);
@@ -1275,8 +1280,8 @@ static int blackjack(struct game_context* bj) {
     bool dbl_down = false;
 
 #if LCD_DEPTH > 1
-        rb->lcd_set_background(BG_COLOR);
-        rb->lcd_set_foreground(FG_COLOR);
+    rb->lcd_set_background(BG_COLOR);
+    rb->lcd_set_foreground(FG_COLOR);
 #endif
 
     /********************
