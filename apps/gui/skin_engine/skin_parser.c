@@ -1099,15 +1099,9 @@ static int parse_albumart_load(const char *wps_bufptr,
     /* extract max width data */
     if (*_pos != '|')
     {
-        if (!isdigit(*_pos))   /* malformed token: e.g. %Cl|7|59|# */
+        _pos = parse_list("d", NULL, '|', _pos, &aa->width);
+        if (!_pos || _pos > newline || *_pos != '|')
             return WPS_ERROR_INVALID_PARAM;
-
-        aa->width = atoi(_pos);
-
-        _pos = strchr(_pos, '|');
-        if (!_pos || _pos > newline)
-            return WPS_ERROR_INVALID_PARAM; /* malformed token: no | after width field
-                                               e.g. %Cl|7|59|200\n */
     }
 
     /* parsing height field */
@@ -1148,15 +1142,9 @@ static int parse_albumart_load(const char *wps_bufptr,
     /* extract max height data */
     if (*_pos != '|')
     {
-        if (!isdigit(*_pos))
-            return WPS_ERROR_INVALID_PARAM; /* malformed token  e.g. %Cl|7|59|200|@  */
-
-        aa->height = atoi(_pos);
-
-        _pos = strchr(_pos, '|');
-        if (!_pos || _pos > newline)
-            return WPS_ERROR_INVALID_PARAM; /* malformed token: no closing |
-                                               e.g. %Cl|7|59|200|200\n */
+        _pos = parse_list("d", NULL, '|', _pos, &aa->height);
+        if (!_pos || _pos > newline || *_pos != '|')
+            return WPS_ERROR_INVALID_PARAM;
     }
 
     /* if we got here, we parsed everything ok .. ! */
@@ -1179,9 +1167,7 @@ static int parse_albumart_load(const char *wps_bufptr,
 
     albumart_slot = playback_claim_aa_slot(&dimensions);
 
-    if (albumart_slot < 0) /* didn't get a slot ? */
-        return skip_end_of_line(wps_bufptr);
-    else
+    if (0 <= albumart_slot)
         wps_data->playback_aa_slot = albumart_slot;
 
     /* Skip the rest of the line */
