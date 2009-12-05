@@ -122,7 +122,7 @@ static const struct button_mapping button_context_list[]  = {
 static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,    BUTTON_TOPRIGHT|BUTTON_REL,         BUTTON_TOPRIGHT },
 
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_CUSTOM2|CONTEXT_TREE)
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_CUSTOM|CONTEXT_TREE)
 }; /* button_context_tree */
 
 static const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
@@ -138,19 +138,26 @@ static const struct button_mapping button_context_settings[]  = {
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_TOPMIDDLE|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_BOTTOMMIDDLE,                BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_SETTINGS_RESET,        BUTTON_CENTER,                      BUTTON_NONE },
+
+    { ACTION_STD_PREV,          BUTTON_MIDLEFT,                         BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,    BUTTON_MIDLEFT|BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_STD_NEXT,          BUTTON_MIDRIGHT,                        BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,    BUTTON_MIDRIGHT|BUTTON_REPEAT,          BUTTON_NONE },
+    { ACTION_STD_CANCEL,        BUTTON_TOPLEFT,                         BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_SETTINGS)
 }; /* button_context_settings */
 
 static const struct button_mapping button_context_settings_right_is_inc[]  = {
-    { ACTION_STD_PREV,          BUTTON_TOPMIDDLE,                   BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,    BUTTON_TOPMIDDLE|BUTTON_REPEAT,     BUTTON_NONE },
-    { ACTION_STD_NEXT,          BUTTON_BOTTOMMIDDLE,                BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,    BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_NONE,                  BUTTON_MIDRIGHT|BUTTON_REL,     BUTTON_MIDRIGHT },
+    { ACTION_NONE,                  BUTTON_MIDRIGHT|BUTTON_REPEAT,  BUTTON_MIDRIGHT },
     { ACTION_SETTINGS_INC,          BUTTON_MIDRIGHT,                BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_MIDRIGHT|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_MIDLEFT,                 BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_MIDLEFT|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_SETTINGS_RESET,        BUTTON_CENTER,                  BUTTON_NONE },
+
     { ACTION_STD_CANCEL,            BUTTON_TOPLEFT,                 BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_CUSTOM|CONTEXT_SETTINGS)
@@ -351,7 +358,9 @@ const struct button_mapping* get_context_mapping(int context)
         || context & CONTEXT_REMOTE
 #endif
        )
+    {
         return target_get_context_mapping(context & ~CONTEXT_CUSTOM2);
+    }
 
     switch (context)
     {
