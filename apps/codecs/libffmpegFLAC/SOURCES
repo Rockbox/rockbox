@@ -1,9 +1,6 @@
 bitstream.c
 decoder.c
 shndec.c
-#if !(defined(CPU_ARM) && (ARM_ARCH > 4))
-tables.c
-#endif
 #if defined(CPU_COLDFIRE)
 coldfire.S
 #elif defined(CPU_ARM)

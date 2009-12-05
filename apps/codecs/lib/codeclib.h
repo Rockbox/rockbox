@@ -19,6 +19,9 @@
  *
  ****************************************************************************/
 
+#ifndef __CODECLIB_H__
+#define __CODECLIB_H__
+
 #include "config.h"
 #include "codecs.h"
 #include <sys/types.h>
@@ -71,6 +74,37 @@ unsigned udiv32_arm(unsigned a, unsigned b);
 #define UDIV32(a, b) (a / b)
 #endif
 
+/* TODO figure out if we really need to care about calculating
+   av_log2(0) */
+#if (defined(CPU_ARM) && (ARM_ARCH > 4))
+static inline unsigned int av_log2(uint32_t v)
+{
+    unsigned int lz = __builtin_clz(v);
+    return 31 - lz + (lz >> 5); /* make sure av_log2(0) returns 0 */
+}
+#else
+/* From libavutil/common.h */
+extern const uint8_t ff_log2_tab[256] ICONST_ATTR;
+
+static inline unsigned int av_log2(unsigned int v)
+{
+    int n;
+
+    n = 0;
+    if (v & 0xffff0000) {
+        v >>= 16;
+        n += 16;
+    }
+    if (v & 0xff00) {
+        v >>= 8;
+        n += 8;
+    }
+    n += ff_log2_tab[v];
+
+    return n;
+}
+#endif
+
 /* Various codec helper functions */
 
 int codec_init(void);
@@ -82,3 +116,5 @@ void __cyg_profile_func_enter(void *this_fn, void *call_site)
 void __cyg_profile_func_exit(void *this_fn, void *call_site)
     NO_PROF_ATTR ICODE_ATTR;
 #endif
+
+#endif /* __CODECLIB_H__ */

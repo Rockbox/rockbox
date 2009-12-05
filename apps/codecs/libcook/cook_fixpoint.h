@@ -40,19 +40,8 @@
 #include "asm_arm.h"
 #include "asm_mcf5249.h"
 #include "codeclib_misc.h"
+#include "codeclib.h"
 #endif
-
-/* The following table is taken from libavutil/mathematics.c */
-const uint8_t ff_log2_tab[256] ={
-        0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-        5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
-        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
-        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
-};
 
 /* cplscales was moved from cookdata_fixpoint.h since only   *
  * cook_fixpoint.h should see/use it.                        */
@@ -113,24 +102,6 @@ static inline int32_t fixmul31(int32_t x, int32_t y)
     return (int32_t)temp; 	 
 } 	 
 #endif
-
-/* math functions taken from libavutil/common.h */
-
-static inline int av_log2(unsigned int v)
-{
-    int n = 0;
-    if (v & 0xffff0000) {
-        v >>= 16;
-        n += 16;
-    }
-    if (v & 0xff00) {
-        v >>= 8;
-        n += 8;
-    }
-    n += ff_log2_tab[v];
-
-    return n;
-}
 
 /**
  * Clips a signed integer value into the amin-amax range.
