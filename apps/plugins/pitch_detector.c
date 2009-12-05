@@ -118,7 +118,7 @@ typedef struct _fixed fixed;
 #define fp_data(x)   ((x).a)
 #define fp_frac(x)   (fp_sub((x), int2fixed(fixed2int(x))))
 #define FP_ZERO      ((fixed){0})
-#define FP_LOW       ((fixed){1})
+#define FP_LOW       ((fixed){2})
 
 /* Some defines for converting between period and frequency  */
 
@@ -719,8 +719,8 @@ void draw_bar(fixed wrong_by_cents)
 }
 
 /* Calculate how wrong the note is and draw the GUI */
-void display_frequency (fixed freq)                    
-{                                                     
+void display_frequency (fixed freq)
+{
     fixed ldf, mldf;
     fixed lfreq, nfreq;
     fixed orig_freq;
@@ -729,7 +729,7 @@ void display_frequency (fixed freq)
 
     if (fp_lt(freq, FP_LOW))
         freq = FP_LOW;
-    
+
     /* We calculate the frequency and its log as if */
     /* the reference frequency of A were 440 Hz.    */
     orig_freq = freq;
@@ -741,15 +741,15 @@ void display_frequency (fixed freq)
     /* i.e. into the right octave.                                   */
     while (fp_lt(lfreq, fp_sub(notes[0].logfreq, fp_shr(LOG_D_NOTE, 1))))
         lfreq = fp_add(lfreq, LOG_2);
-    while (fp_gte(lfreq, fp_sub(fp_add(notes[0].logfreq, LOG_2), 
+    while (fp_gte(lfreq, fp_sub(fp_add(notes[0].logfreq, LOG_2),
            fp_shr(LOG_D_NOTE, 1))))
         lfreq = fp_sub(lfreq, LOG_2);
     mldf = LOG_D_NOTE;
-    for (i=0; i<12; i++) 
+    for (i=0; i<12; i++)
     {
-        ldf = fp_gt(fp_sub(lfreq,notes[i].logfreq), FP_ZERO) ? 
+        ldf = fp_gt(fp_sub(lfreq,notes[i].logfreq), FP_ZERO) ?
                  fp_sub(lfreq,notes[i].logfreq) : fp_neg(fp_sub(lfreq,notes[i].logfreq));
-        if (fp_lt(ldf, mldf)) 
+        if (fp_lt(ldf, mldf))
         {
             mldf = ldf;
             note = i;
@@ -758,11 +758,10 @@ void display_frequency (fixed freq)
     nfreq = notes[note].freq;
     while (fp_gt(fp_div(nfreq, freq), D_NOTE_SQRT))
         nfreq = fp_shr(nfreq, 1);
+
     while (fp_gt(fp_div(freq, nfreq), D_NOTE_SQRT))
-    {
         nfreq = fp_shl(nfreq, 1);
-    }
-    
+
     ldf = fp_mul(int2fixed(1200), log(fp_div(freq,nfreq)));
 
     rb->lcd_clear_display();
@@ -772,7 +771,7 @@ void display_frequency (fixed freq)
         draw_note(notes[note].name);
         if(tuner_settings.display_hz)
         {
-            rb->snprintf(str_buf,30, "%s : %d cents (%d.%02dHz)", 
+            rb->snprintf(str_buf,30, "%s : %d cents (%d.%02dHz)",
                          notes[note].name, fp_round(ldf) ,fixed2int(orig_freq),
                          fp_round(fp_mul(fp_frac(orig_freq),
                                          int2fixed(DISPLAY_HZ_PRECISION))));
