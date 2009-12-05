@@ -592,7 +592,7 @@ void set_cpu_frequency(long frequency)
     unsigned long cfcr = REG_CPM_CPCCR;
     cfcr &= ~CPM_CPCCR_CDIV_MASK;
 
-    if(frequency == CPUFREQ_NORMAL)
+    if(frequency != CPUFREQ_NORMAL)
         cfcr |= (0 << CPM_CPCCR_CDIV_BIT);
     else
         cfcr |= (2 << CPM_CPCCR_CDIV_BIT);
