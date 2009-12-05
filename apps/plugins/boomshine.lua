@@ -33,8 +33,8 @@ else
 end
 
 -- color used to write the text
-if rb.lcd_rgbpack ~= nil then
-    DEFAULT_FOREGROUND_COLOR = rb.lcd_rgbpack(255, 255, 255)
+if rb.lcd_get_foreground ~= nil then
+    DEFAULT_FOREGROUND_COLOR = rb.lcd_get_foreground()
 else
     DEFAULT_FOREGROUND_COLOR = 0
 end
