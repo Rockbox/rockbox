@@ -79,8 +79,7 @@ unsigned udiv32_arm(unsigned a, unsigned b);
 #if (defined(CPU_ARM) && (ARM_ARCH > 4))
 static inline unsigned int av_log2(uint32_t v)
 {
-    unsigned int lz = __builtin_clz(v);
-    return 31 - lz + (lz >> 5); /* make sure av_log2(0) returns 0 */
+    return v ? 31 - __builtin_clz(v) : v;
 }
 #else
 /* From libavutil/common.h */
