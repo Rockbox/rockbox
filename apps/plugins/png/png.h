@@ -298,6 +298,17 @@ You are free to name this file lodepng.cpp or lodepng.c depending on your usage.
 #define PNG_NEXT       BUTTON_VIEW
 #define PNG_PREVIOUS   BUTTON_PLAYLIST
 
+#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
+#define PNG_ZOOM_IN    BUTTON_VOL_UP
+#define PNG_ZOOM_OUT   BUTTON_VOL_DOWN
+#define PNG_UP         BUTTON_UP
+#define PNG_DOWN       BUTTON_DOWN
+#define PNG_LEFT       BUTTON_PREV
+#define PNG_RIGHT      BUTTON_NEXT
+#define PNG_MENU       BUTTON_MENU
+#define PNG_NEXT       BUTTON_RIGHT
+#define PNG_PREVIOUS   BUTTON_LEFT
+
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
 #define PNG_MENU       BUTTON_POWER
 #elif CONFIG_KEYPAD == ONDAVX777_PAD

@@ -157,6 +157,14 @@
 #define ZX_SELECT       BUTTON_SELECT
 #define ZX_MENU         BUTTON_MENU
 
+#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
+#define ZX_UP           BUTTON_UP
+#define ZX_DOWN         BUTTON_DOWN
+#define ZX_LEFT         BUTTON_PREV
+#define ZX_RIGHT        BUTTON_NEXT
+#define ZX_SELECT       BUTTON_RIGHT
+#define ZX_MENU         BUTTON_MENU
+
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
 #define ZX_MENU         (BUTTON_MENU|BUTTON_REL)
 
