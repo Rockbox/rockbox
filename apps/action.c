@@ -109,6 +109,10 @@ static int button_flip_horizontally(int context, int button)
     !defined(SIMULATOR)
         | BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD
 #endif
+#if defined(BUTTON_MINUS) && defined(BUTTON_PLUS) && \
+    !defined(SIMULATOR)
+        | BUTTON_MINUS | BUTTON_PLUS
+#endif
         );
 
     if (button & BUTTON_LEFT)
@@ -121,6 +125,13 @@ static int button_flip_horizontally(int context, int button)
         newbutton |= BUTTON_SCROLL_FWD;
     if (button & BUTTON_SCROLL_FWD)
         newbutton |= BUTTON_SCROLL_BACK;
+#endif
+#if defined(BUTTON_MINUS) && defined(BUTTON_PLUS) && \
+    !defined(SIMULATOR)
+    if (button & BUTTON_MINUS)
+        newbutton |= BUTTON_PLUS;
+    if (button & BUTTON_PLUS)
+        newbutton |= BUTTON_MINUS;
 #endif
 
     return newbutton;
