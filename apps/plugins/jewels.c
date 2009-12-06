@@ -480,6 +480,8 @@ static void jewels_savegame(struct game_context* bj)
     int fd;
     /* write out the game state to the save file */
     fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
+    if(fd < 0) return;
+
     rb->write(fd, &bj->tmp_type, sizeof(bj->tmp_type));
     rb->write(fd, &bj->type, sizeof(bj->type));
     rb->write(fd, &bj->score, sizeof(bj->score));

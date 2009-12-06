@@ -160,7 +160,7 @@ struct GPatch * gusload(char * filename)
 
     int file = rb->open(filename, O_RDONLY);
 
-    if(file == -1)
+    if(file < 0)
     {
         char message[50];
         rb->snprintf(message, 50, "Error opening %s", filename);

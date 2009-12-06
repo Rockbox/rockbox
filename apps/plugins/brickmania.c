@@ -1046,6 +1046,8 @@ static void brickmania_savegame(void)
 
     /* write out the game state to the save file */
     fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
+    if(fd < 0) return;
+
     rb->write(fd, &pad_pos_x, sizeof(pad_pos_x));
     rb->write(fd, &life, sizeof(life));
     rb->write(fd, &game_state, sizeof(game_state));

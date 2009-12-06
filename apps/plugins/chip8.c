@@ -1329,7 +1329,7 @@ static bool chip8_init(const char* file)
     int i;
 
     fd = rb->open(file, O_RDONLY);
-    if (fd==-1) {
+    if (fd < 0) {
 	rb->lcd_puts(0, 6, "File Error.");
 	return false;
     }
@@ -1351,7 +1351,7 @@ static bool chip8_init(const char* file)
     c8kname[len-2] = '8';
     c8kname[len-1] = 'k';
     fd = rb->open(c8kname, O_RDONLY);
-    if (fd!=-1) {
+    if (fd >= 0) {
 	rb->lcd_puts(0, 6, "File&Keymap OK.");
 	numread = rb->read(fd, chip8_keymap, 16);
 	rb->close(fd);

@@ -133,7 +133,7 @@ bool custom_dir(void)
     int i, errors = 0;
 
     /* populate removed dirs array */
-    if((fd2 = rb->open(RFADIR_FILE,O_RDONLY)) > 0)
+    if((fd2 = rb->open(RFADIR_FILE,O_RDONLY)) >= 0)
     {
         while ((rb->read_line(fd2, line, MAX_PATH - 1)) > 0)
         {
@@ -148,7 +148,7 @@ bool custom_dir(void)
         rb->close(fd2);
     }
 
-    if((fd2 = rb->open(RFADIR_FILE,O_RDONLY)) > 0)
+    if((fd2 = rb->open(RFADIR_FILE,O_RDONLY)) >= 0)
     {
         while ((rb->read_line(fd2, line, MAX_PATH - 1)) > 0)
         {

@@ -564,7 +564,7 @@ struct pgn_game_node* pgn_list_games(const char* filename){
     int line_count = 0;
     bool header_start = true, game_start = false;
 
-    if ( (fhandler = rb->open(filename, O_RDONLY)) == 0 ) return NULL;
+    if ( (fhandler = rb->open(filename, O_RDONLY)) < 0 ) return NULL;
 
     if (bufptr == NULL){
         pl_malloc_init();
@@ -572,7 +572,7 @@ struct pgn_game_node* pgn_list_games(const char* filename){
     while (rb->read_line(fhandler, line_buffer, sizeof line_buffer) > 0){
         line_count++;
         /* looking for a game header */
-	if (header_start) {
+        if (header_start) {
             /* a new game header is found */
             if (line_buffer[0] == '['){
                 temp_node = (struct pgn_game_node *)pl_malloc(sizeof size_node);

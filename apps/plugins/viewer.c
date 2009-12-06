@@ -1193,7 +1193,7 @@ static bool viewer_init(void)
 #endif
 
     fd = rb->open(file_name, O_RDONLY);
-    if (fd==-1)
+    if (fd < 0)
         return false;
 
     file_size = rb->filesize(fd);

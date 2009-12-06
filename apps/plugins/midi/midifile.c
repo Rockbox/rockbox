@@ -31,7 +31,7 @@ struct MIDIfile * loadFile(const char * filename)
     struct MIDIfile * mfload;
     int file = rb->open (filename, O_RDONLY);
 
-    if(file==-1)
+    if(file < 0)
     {
         printf("Could not open file");
         return NULL;

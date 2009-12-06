@@ -121,7 +121,7 @@ static bool search_init(const char* file){
         clear_display();
         rb->splash(0, "Searching...");
         fd = rb->open(file, O_RDONLY);
-        if (fd==-1)
+        if (fd < 0)
             return false;
 
         fdw = rb->creat(resultfile);
@@ -132,6 +132,7 @@ static bool search_init(const char* file){
 #else
             rb->splash(HZ, "File creation failed");
 #endif
+            rb->close(fd);
             return false;
         }
 
@@ -153,8 +154,9 @@ enum plugin_status plugin_start(const void* parameter)
 
     DEBUGF("%s - %s\n", (char *)parameter, &filename[rb->strlen(filename)-4]);
     /* Check the extension. We only allow .m3u files. */
-    if(rb->strcasecmp(&filename[rb->strlen(filename)-4], ".m3u") &&
-       rb->strcasecmp(&filename[rb->strlen(filename)-5], ".m3u8")) {
+    if (!(p = rb->strrchr(filename, '.')) ||
+        (rb->strcasecmp(p, ".m3u") && rb->strcasecmp(p, ".m3u8")))
+    {
         rb->splash(HZ, "Not a .m3u or .m3u8 file");
         return PLUGIN_ERROR;
     }

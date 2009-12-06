@@ -178,7 +178,7 @@ static bool do_file(char *path, char *desc, bool is_load) {
     file_mode = is_load ? O_RDONLY : (O_WRONLY | O_CREAT);
   
     /* attempt to open file descriptor here */
-    if ((fd = open(path, file_mode)) <= 0)
+    if ((fd = open(path, file_mode)) < 0)
         return false;
 
     /* load/save state */

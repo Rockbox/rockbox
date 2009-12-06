@@ -1935,7 +1935,7 @@ static int load_game(const char* file) {
     int fd;
 
     fd = rb->open(file, O_RDONLY);
-    if(fd == 0) {
+    if(fd < 0) {
         DEBUGF("Couldn't open savegame\n");
         return -1;
     }
