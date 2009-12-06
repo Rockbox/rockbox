@@ -25,27 +25,13 @@
 require "actions"
 
 local CYCLETIME = rb.HZ / 50
-
-if rb.action_get_touchscreen_press == nil then
-    HAS_TOUCHSCREEN = false
-else
-    HAS_TOUCHSCREEN = true
-end
-
--- color used to write the text
-if rb.lcd_get_foreground ~= nil then
-    DEFAULT_FOREGROUND_COLOR = rb.lcd_get_foreground()
-else
-    DEFAULT_FOREGROUND_COLOR = 0
-end
-
-if rb.LCD_HEIGHT > rb.LCD_WIDTH then
-    DEFAULT_BALL_SIZE = rb.LCD_WIDTH/40
-else
-    DEFAULT_BALL_SIZE = rb.LCD_HEIGHT/40
-end
-
-MAX_BALL_SPEED = DEFAULT_BALL_SIZE/2
+local HAS_TOUCHSCREEN = rb.action_get_touchscreen_press ~= nil
+local DEFAULT_BALL_SIZE = rb.LCD_HEIGHT > rb.LCD_WIDTH and rb.LCD_WIDTH  / 30
+                                                       or  rb.LCD_HEIGHT / 30
+local MAX_BALL_SPEED = DEFAULT_BALL_SIZE / 2
+local DEFAULT_FOREGROUND_COLOR = rb.lcd_get_foreground ~= nil
+                                                     and rb.lcd_get_foreground()
+                                                     or  0
 
 local levels = {
             --  {GOAL, TOTAL_BALLS},
@@ -77,7 +63,7 @@ function Ball:new(o)
                 color = random_color(),
                 up_speed = Ball:generateSpeed(),
                 right_speed = Ball:generateSpeed(),
-                explosion_size = math.random((3*self.size)/2, (5*self.size)/2),
+                explosion_size = math.random(2*self.size, 4*self.size),
                 life_duration = math.random(rb.HZ, rb.HZ*5)
             }
     end
@@ -89,8 +75,10 @@ end
 
 function Ball:generateSpeed()
     local speed = math.random(-MAX_BALL_SPEED, MAX_BALL_SPEED)
-    -- Make sure all balls move
-    if speed == 0 then speed = 1 end
+    if speed == 0 then
+        speed = 1       -- Make sure all balls move
+    end
+
     return speed
 end
 
@@ -159,9 +147,7 @@ end
 
 function Cursor:do_action(action)
     if action == rb.actions.ACTION_TOUCHSCREEN and HAS_TOUCHSCREEN then
-        if HAS_TOUCHSCREEN then
-            _, self.x, self.y = rb.action_get_touchscreen_press()
-        end
+        _, self.x, self.y = rb.action_get_touchscreen_press()
         return true
     elseif action == rb.actions.ACTION_KBD_SELECT then
         return true
@@ -174,21 +160,25 @@ function Cursor:do_action(action)
     elseif (action == rb.actions.ACTION_KBD_DOWN) then
         self.y = self.y + self.size
     end
+
     if self.x > rb.LCD_WIDTH then
         self.x = 0
     elseif self.x < 0 then
         self.x = rb.LCD_WIDTH
     end
+
     if self.y > rb.LCD_HEIGHT then
         self.y = 0
     elseif self.y < 0 then
         self.y = rb.LCD_HEIGHT
     end
+
     return false
 end
 
 function Cursor:draw()
     set_foreground(DEFAULT_FOREGROUND_COLOR)
+
     rb.lcd_hline(self.x - self.size/2, self.x - self.size/4, self.y - self.size/2)
     rb.lcd_hline(self.x + self.size/4, self.x + self.size/2, self.y - self.size/2)
     rb.lcd_hline(self.x - self.size/2, self.x - self.size/4, self.y + self.size/2)
@@ -204,6 +194,7 @@ end
 
 function draw_positioned_string(bottom, right, str)
     local _, w, h = rb.font_getstringsize(str, rb.FONT_UI)
+
     rb.lcd_putsxy((rb.LCD_WIDTH-w)*right, (rb.LCD_HEIGHT-h)*bottom, str)
 end
 
@@ -217,6 +208,7 @@ function random_color()
     if rb.lcd_rgbpack ~= nil then --color target
         return rb.lcd_rgbpack(math.random(1,255), math.random(1,255), math.random(1,255))
     end
+
     return math.random(1, rb.LCD_DEPTH)
 end
 
@@ -287,6 +279,7 @@ function start_round(level, goal, nrBalls, total)
 
         -- Drawing phase
         rb.lcd_clear_display()
+
         set_foreground(DEFAULT_FOREGROUND_COLOR)
         draw_positioned_string(0, 0, string.format("%d balls expanded", nrExpandedBalls))
         draw_positioned_string(0, 1, string.format("Level %d", level))
@@ -302,9 +295,12 @@ function start_round(level, goal, nrBalls, total)
             explodedBall:step()
             explodedBall:draw()
         end
+
         if not HAS_TOUCHSCREEN and not player_added then
             cursor:draw()
         end
+
+        -- Push framebuffer to the LCD
         rb.lcd_update()
 
         if rb.current_tick() < endtick then
@@ -318,7 +314,8 @@ function start_round(level, goal, nrBalls, total)
 end
 
 -- Helper function to display a message
-function display_message(message)
+function display_message(...)
+    local message = string.format(...)
     local _, w, h = rb.font_getstringsize(message, rb.FONT_UI)
     local x, y = (rb.LCD_WIDTH - w) / 2, (rb.LCD_HEIGHT - h) / 2
 
@@ -342,18 +339,10 @@ end
 rb.backlight_force_on()
 
 local idx, highscore = 1, 0
-while true do
-    local level = levels[idx]
-    local goal, nrBalls
+while levels[idx] ~= nil do
+    local goal, nrBalls = levels[idx][1], levels[idx][2]
 
-    if level == nil then
-        break -- No more levels to play
-    end
-
-    goal = level[1]
-    nrBalls = level[2]
-
-    display_message(string.format("Level %d: get %d out of %d balls", idx, goal, nrBalls))
+    display_message("Level %d: get %d out of %d balls", idx, goal, nrBalls)
 
     local exit, score, nrExpandedBalls = start_round(idx, goal, nrBalls, highscore)
     if exit then
@@ -370,11 +359,10 @@ while true do
 end
 
 if idx > #levels then
-    display_message(string.format("You finished the game with %d points!", highscore))
+    display_message("You finished the game with %d points!", highscore)
 else
-    display_message(string.format("You made it till level %d with %d points!", idx, highscore))
+    display_message("You made it till level %d with %d points!", idx, highscore)
 end
 
 -- Restore user backlight settings
 rb.backlight_use_settings()
-
