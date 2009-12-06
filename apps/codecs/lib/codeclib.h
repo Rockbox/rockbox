@@ -76,12 +76,24 @@ unsigned udiv32_arm(unsigned a, unsigned b);
 
 /* TODO figure out if we really need to care about calculating
    av_log2(0) */
-#if (defined(CPU_ARM) && (ARM_ARCH > 4))
+#ifdef CPU_ARM
+#if ARM_ARCH > 5
+static inline unsigned int av_log2(uint32_t v)
+{
+    unsigned int r;
+    asm volatile("clz %[r], %[v]\n\t" /* count leading zeroes */
+                 "rsb %[r], %[r], #31\n\t" /* r = 31 - leading zeroes */
+                 "usat %[r], #5, %[r]\n\t" /* unsigned saturate r so -1 -> 0 */
+                 :[r] "=r" (r) : [v] "r" (v));
+    return(r);
+}
+#elif ARM_ARCH > 4
 static inline unsigned int av_log2(uint32_t v)
 {
     return v ? 31 - __builtin_clz(v) : 0;
 }
-#else
+#endif
+#else /* CPU_ARM */
 /* From libavutil/common.h */
 extern const uint8_t ff_log2_tab[256] ICONST_ATTR;
 
