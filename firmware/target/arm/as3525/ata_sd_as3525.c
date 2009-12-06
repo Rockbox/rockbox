@@ -312,9 +312,6 @@ static int sd_init_card(const int drive)
 
     /*  End of Card Identification Mode   ************************************/
 
-    /* Boost MCICLK to operating speed */ /*FIXME: v1 at 31 MHz still too high*/
-    MCI_CLOCK(drive) = (sd_v2 ? MCI_HALFSPEED : MCI_HALFSPEED);
-
 #ifdef HAVE_MULTIDRIVE        /*  The internal SDs are v1 */
 
     /* Try to switch V2 cards to HS timings, non HS seem to ignore this */
@@ -323,6 +320,7 @@ static int sd_init_card(const int drive)
         /*  CMD7 w/rca: Select card to put it in TRAN state */
         if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
             return -5;
+        mci_delay();
 
         if(sd_wait_for_state(drive, SD_TRAN))
             return -6;
@@ -337,6 +335,9 @@ static int sd_init_card(const int drive)
             return -8;
     }
 #endif /*  HAVE_MULTIDRIVE  */
+
+    /* Boost MCICLK to operating speed */ /*FIXME: v1 at 31 MHz still too high*/
+    MCI_CLOCK(drive) = (sd_v2 ? MCI_HALFSPEED : MCI_HALFSPEED);
 
     /* CMD9 send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
