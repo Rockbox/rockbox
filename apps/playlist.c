@@ -1348,7 +1348,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
         if (playlist->filenames[index] != NULL)
         {
             dircache_copy_path(playlist->filenames[index], tmp_buf, sizeof(tmp_buf)-1);
-            max = strlen(tmp_buf) + 1;
+            max = strlen(tmp_buf);
         }
     }
 #else
@@ -1357,8 +1357,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
     
     if (playlist->in_ram && !control_file && max < 0)
     {
-        strlcpy(tmp_buf, &playlist->buffer[seek], sizeof(tmp_buf));
-        max = strlen(tmp_buf) + 1;
+        max = strlcpy(tmp_buf, &playlist->buffer[seek], sizeof(tmp_buf));
     }
     else if (max < 0)
     {
