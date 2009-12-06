@@ -54,11 +54,6 @@ $(OUT)/%.o: %.c $(OUT)
 	@echo CC $<
 	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
-# building the library archive
-$(OUT)/libmktccboot.o: $(OUT)/mktccboot.o
-	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -DLIB -c -o $(OUT)/libmktccboot.o -W -Wall mktccboot.c
-
 libmktccboot$(RBARCH).a: $(LIBOBJS)
 	@echo AR $@
 	$(SILENT)$(AR) ruc $(TARGET_DIR)$@ $^

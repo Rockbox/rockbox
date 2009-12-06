@@ -51,11 +51,6 @@ $(OUT)/%.o: %.c $(OUT)
 	@echo CC $< $
 	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
-# building the library archive
-$(OUT)/libmkamsboot.o: $(OUT)/mkamsboot.o
-	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -DLIB -c -o $(OUT)/libmkamsboot.o -W -Wall mkamsboot.c
-
 libmkamsboot$(RBARCH).a: $(LIBOBJS)
 	@echo AR $@
 	$(SILENT)$(AR) ruc $(TARGET_DIR)$@ $^
