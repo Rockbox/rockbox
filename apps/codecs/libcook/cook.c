@@ -47,6 +47,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <string.h>
+#include "codeclib.h"
 
 #include "cook.h"
 #include "cookdata.h"
