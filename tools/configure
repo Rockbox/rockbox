@@ -263,7 +263,7 @@ arm7tdmicc () {
 arm9tdmicc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm9tdmi"
- if test "$modelname" != "gigabeatf" -a "$t_manufacturer" != "as3525" -a "$ARG_ARM_EABI" != "1"; then
+ if test "$modelname" != "gigabeatfx" -a "$t_manufacturer" != "as3525" -a "$ARG_ARM_EABI" != "1"; then
   GCCOPTS="$GCCOPTS -mlong-calls"
  fi
  GCCOPTIMIZE="-fomit-frame-pointer"
@@ -896,7 +896,7 @@ cat <<EOF
   5) Ondio FM             15) H10 5/6Gb          25) Mini 1G
   6) AV300                                       26) Mini 2G
                           ==Toshiba==            27) 1G, 2G
- ==Cowon/iAudio==         40) Gigabeat F         28) Nano 2G
+ ==Cowon/iAudio==         40) Gigabeat F/X       28) Nano 2G
  30) X5/X5V/X5L           41) Gigabeat S
  31) M5/M5L                                      ==SanDisk==
  32) 7                    ==Olympus=             50) Sansa e200
