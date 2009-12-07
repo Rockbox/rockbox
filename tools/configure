@@ -1716,9 +1716,9 @@ fi
     t_model="logikdax"
     ;;
 	
-    90|creativezvm30gb)
+    90|zenvisionm30gb)
     target_id=35
-    modelname="creativezvm30gb"
+    modelname="zenvisionm30gb"
     target="-DCREATIVE_ZVM"
     memory=64
     arm926ejscc
@@ -1739,9 +1739,9 @@ fi
     t_model="creative-zvm"
     ;;
     
-    91|creativezvm60gb)
+    91|zenvisionm60gb)
     target_id=40
-    modelname="creativezvm60gb"
+    modelname="zenvisionm60gb"
     target="-DCREATIVE_ZVM60GB"
     memory=64
     arm926ejscc
@@ -1762,9 +1762,9 @@ fi
     t_model="creative-zvm"
     ;;
     
-    92|creativezenvision)
+    92|zenvision)
     target_id=39
-    modelname="creativezenvision"
+    modelname="zenvision"
     target="-DCREATIVE_ZV"
     memory=64
     arm926ejscc
