@@ -87,7 +87,7 @@
 #define IRIVER_H10_PAD     12
 #define SANSA_E200_PAD     13
 #define SANSA_C200_PAD     14
-#define ELIO_TPJ1022_PAD   15
+#define TATUNG_TPJ1022_PAD 15
 #define ARCHOS_AV300_PAD   16
 #define MROBE100_PAD       17
 #define MROBE500_PAD       18
@@ -337,7 +337,7 @@ Lyre prototype 1 */
 #include "config/sansac200.h"
 #elif defined(SANSA_M200)
 #include "config/sansam200.h"
-#elif defined(ELIO_TPJ1022)
+#elif defined(TATUNG_TPJ1022)
 #include "config/tatungtpj1022.h"
 #elif defined(MROBE_100)
 #include "config/mrobe100.h"

@@ -139,7 +139,7 @@ PLUGIN_HEADER
 #define RIGHT BUTTON_RIGHT
 #define FIRE BUTTON_SELECT
 
-#elif CONFIG_KEYPAD == ELIO_TPJ1022_PAD
+#elif CONFIG_KEYPAD == TATUNG_TPJ1022_PAD
 
 /* TODO: Figure out which buttons to use for Tatung Elio TPJ-1022 */
 #define QUIT BUTTON_AB

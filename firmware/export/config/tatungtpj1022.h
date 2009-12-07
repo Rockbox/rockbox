@@ -43,7 +43,7 @@
 
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
-#define CONFIG_KEYPAD ELIO_TPJ1022_PAD
+#define CONFIG_KEYPAD TATUNG_TPJ1022_PAD
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC

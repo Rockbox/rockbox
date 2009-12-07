@@ -25,7 +25,7 @@ main-c250wipe.c
 show_logo.c
 main-pp.c
 #endif
-#elif defined(ELIO_TPJ1022)
+#elif defined(TATUNG_TPJ1022)
 tpj1022.c
 #elif defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(IAUDIO_M3)
 iaudio_coldfire.c

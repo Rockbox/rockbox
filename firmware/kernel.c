@@ -272,7 +272,7 @@ void sleep(int ticks)
 
 void yield(void)
 {
-#if ((defined(ELIO_TPJ1022)) && defined(BOOTLOADER))
+#if ((defined(TATUNG_TPJ1022)) && defined(BOOTLOADER))
     /* Some targets don't like yielding in the bootloader */
 #else
     switch_thread();

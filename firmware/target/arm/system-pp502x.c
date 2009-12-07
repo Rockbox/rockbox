@@ -459,7 +459,7 @@ void system_init(void)
         /* to be done */
 #elif defined (MROBE_100)
         /* to be done */
-#elif defined (ELIO_TPJ1022)
+#elif defined (TATUNG_TPJ1022)
         /* to be done */
 #endif
 
