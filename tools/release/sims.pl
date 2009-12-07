@@ -4,8 +4,6 @@ use File::Basename;
 use File::Path;
 use Cwd;
 
-require "../builds.pm";
-
 my $verbose, $strip, $update, $doonly, $version;
 my @doonly;
 
@@ -90,7 +88,7 @@ if (!defined($version)) {
 
 # made once for all targets
 sub runone {
-    my ($dir)=@_;
+    my ($dir, $confnum, $extra)=@_;
     my $a;
 
     if(@doonly > 0 && !grep(/^$dir$/, @doonly)) {
@@ -102,7 +100,7 @@ sub runone {
     print "Build in build-$dir\n" if($verbose);
 
     # build the target
-    $a = buildit($dir);
+    $a = buildit($dir, $confnum, $extra);
 
     if ($strip) {
         print "Stripping binaries\n" if ($verbose);
@@ -151,11 +149,12 @@ sub runone {
 };
 
 sub buildit {
-    my ($target)=@_;
+    my ($target, $confnum, $extra)=@_;
 
     `rm -rf * >/dev/null 2>&1`;
 
-    my $c = "../tools/configure --type=s --target=$target";
+    my $c = sprintf('printf "%s\n%ss\n" | ../tools/configure',
+                    $confnum, $extra);
 
     print "C: $c\n" if($verbose);
     `$c`;
@@ -167,9 +166,52 @@ sub buildit {
     `make install 2>/dev/null`;
 }
 
-for my $b (keys %builds) {
-    next if ($builds{$b}{status} < 3); # only stable builds
-    next if ($builds{$b}{configname} < 3); # no memsize variants
-
-    runone($b);
-}
+runone("player", "player", '\n');
+runone("recorder", "recorder", '\n');
+#runone("recorder8mb", "recorder", '8\n');
+runone("fmrecorder", "fmrecorder", '\n');
+#runone("fmrecorder8mb", "fmrecorder", '8\n');
+runone("recorderv2", "recorderv2", '\n');
+runone("ondiosp", "ondiosp", '\n');
+runone("ondiofm", "ondiofm", '\n');
+runone("h100", "h100");
+runone("h120", "h120");
+runone("h300", "h300");
+runone("ipodcolor", "ipodcolor");
+runone("ipodnano", "ipodnano");
+runone("ipod4gray", "ipod4g");
+runone("ipodvideo", "ipodvideo", '32\n');
+#runone("ipodvideo64mb", "ipodvideo", '64\n');
+runone("ipod3g", "ipod3g");
+runone("ipod1g2g", "ipod1g2g");
+runone("iaudiox5", "x5");
+runone("iaudiom5", "m5");
+runone("iaudiom3", "m3");
+runone("ipodmini1g", "ipodmini");
+runone("ipodmini2g", "ipodmini2g");
+runone("h10", "h10");
+runone("h10_5gb", "h10_5gb");
+runone("gigabeatf", "gigabeatf");
+runone("gigabeats", "gigabeats");
+runone("sansae200", "e200");
+runone("sansae200v2", "e200v2");
+runone("sansac200", "c200");
+runone("mrobe500", "mrobe500");
+runone("mrobe100", "mrobe100");
+runone("cowond2", "cowond2");
+runone("clip", "clip");
+runone("zvm30gb", "creativezvm30gb");
+runone("zvm60gb", "creativezvm60gb");
+runone("zenvision", "creativezenvision");
+runone("hdd1630", "hdd1630");
+runone("fuze", "fuze");
+runone("m200v4", "m200v4");
+runone("sa9200", "sa9200");
+runone("sansac200v2", "c200v2");
+runone("yh820", "yh_820");
+runone("yh920", "yh_920");
+runone("yh925", "yh_925");
+runone("ondavx747", "ondavx747");
+runone("ondavx747p", "ondavx747p");
+runone("ondavx777", "ondavx777");
+runone("ifp7xx", "ifp7xx");

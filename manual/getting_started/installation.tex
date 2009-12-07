@@ -6,16 +6,16 @@ before beginning there are a few things it is important to know.
 
 \section{Before Starting}
 
-\opt{sansae200}{\fixme{NOTE: These instructions will not work on the 
+\opt{e200}{\fixme{NOTE: These instructions will not work on the 
 ``Rhapsody'' version of the E200 series (also known as E200R). Please 
 follow the instructions at 
 \url{http://www.rockbox.org/twiki/bin/view/Main/SansaE200RInstallation}.}}
 
-\opt{ipodnano1g,ipodvideo,sansae200,sansac200}{
+\opt{ipodnano,ipodvideo,e200,c200}{
 \begin{description}  
 \item[Supported hardware versions.] 
-    \opt{ipodnano1g}{
-    The \archosplayertype{} is available in multiple versions, not
+    \opt{ipodnano}{
+    The \playertype{} is available in multiple versions, not
     all of which run Rockbox.  Rockbox presently runs only on 
     the original Ipod Nano. Rockbox does
     \emph{not} run on the second, third, or fourth generation Ipod Nano.
@@ -23,13 +23,13 @@ follow the instructions at
     Apple's website: \url{http://www.info.apple.com/kbnum/n61688}.
   }
   \opt{ipodvideo}{
-    The \archosplayertype{} is the 5th/5.5th generation \archosplayerman{} only.
+    The \playertype{} is the 5th/5.5th generation \playerman{} only.
     Rockbox does \emph{not} run on the newer, 6th/Classic generation Ipod. 
     For information on identifying which Ipod you own, see this page on Apple's 
     website: \url{http://www.info.apple.com/kbnum/n61688}.
   }
-  \opt{sansae200,sansac200}{
-    The \archosplayertype{} is available in multiple versions, not
+  \opt{e200,c200}{
+    The \playertype{} is available in multiple versions, not
     all of which run Rockbox.  Rockbox doesn't run on the
     newer v2 models. They can be identified
     by checking the Sandisk firmware version number under 
@@ -39,7 +39,7 @@ follow the instructions at
 \end{description}
 }
 
-\opt{iriverh300}{
+\opt{h300}{
 \begin{description}  
   \item[DRM capability.] If your \dap{} has a US firmware, then by installing Rockbox you will
   \emph{permanently} lose the ability to playback files with DRM.
@@ -77,7 +77,7 @@ follow the instructions at
     and hold the \ButtonSelect{} and \ButtonPlay{} buttons simultaneously. Your
     \dap{} should enter disk mode and you can try reconnecting to the computer.
   }
-  \opt{iaudiox5}{
+  \opt{x5}{
     When instructed to connect/disconnect the USB cable, always use
     the USB port through the subpack, not the side 'USB Host' port. The side port
     is intended to be used for USB OTG connections only (digital cameras, memory
@@ -89,15 +89,15 @@ follow the instructions at
 
     \warn{Never extract files to your \dap{} while it is in recovery mode.}
   }
-  \opt{iriverh10,iriverh10_5gb}{
+  \opt{h10,h10_5gb}{
     The installation requires you to use UMS mode and so
     may require use of the UMS trick, whereby it is possible to force a MTP
-    \archosplayertype{} to start up in UMS mode as follows:
+    \playertype{} to start up in UMS mode as follows:
       \begin{enumerate}
-        \item Ensure the \dap{} is fully powered off by \opt{iriverh10}{using a pin to
+        \item Ensure the \dap{} is fully powered off by \opt{h10}{using a pin to
         push the small reset button inside the hole between the Hold switch and
-        remote control connector.}\opt{iriverh10_5gb}{removing the battery and putting it back in again.}
-        \item Connect your \archosplayertype{} to the computer using the data cable.
+        remote control connector.}\opt{h10_5gb}{removing the battery and putting it back in again.}
+        \item Connect your \playertype{} to the computer using the data cable.
         \item Hold \ButtonRight{} and push \ButtonPower{} to turn the \dap{} on.
         \item Continue holding \ButtonRight{} until the USB Connected screen appears.
         \item The \dap{} will now appear as a regular disk on your computer.
@@ -105,7 +105,7 @@ follow the instructions at
       \note{Once Rockbox has been installed, when you shut down your \dap{} from Rockbox it will totally
        power the player off so step 1 is no longer necessary.}
   }
-  \opt{gigabeatfx}{During installation, do not connect your \dap{}
+  \opt{gigabeatf}{During installation, do not connect your \dap{}
   using the cradle but plug the USB cable directly to the \dap{}.
   } 
 \end{description}
@@ -141,7 +141,7 @@ for you. However, should you encounter a problem, then the manual way is
 still available to you.\\
 
 \opt{gigabeats}{\note{The automated install is not yet available for the
-  \archosplayertype{}. For now you can use the manual method to install Rockbox.
+  \playertype{}. For now you can use the manual method to install Rockbox.
   Please still read the section on the automatic install as it explains
   various important aspects of Rockbox, such as the different versions
   available.\\}}
@@ -156,31 +156,31 @@ still available to you.\\
 
 \begin{description}
 \opt{HAVE_RB_BL_ON_DISK}{
-\item[The \archosplayerman{} bootloader.]
-  The \archosplayerman{} bootloader is the program that tells your \dap{} how to load
+\item[The \playerman{} bootloader.]
+  The \playerman{} bootloader is the program that tells your \dap{} how to load
   and start the original firmware. It is also responsible for any emergency,
   recovery, or disk modes on your \dap{}. This bootloader is stored in special flash
-  memory in your \archosplayerman{} and comes factory-installed. It is not necessary
+  memory in your \playerman{} and comes factory-installed. It is not necessary
   to modify this in order to install Rockbox.}
 
 \item[The Rockbox bootloader.] \index{Bootloader}
   \opt{HAVE_RB_BL_ON_DISK}{The Rockbox bootloader is loaded from disk by
-  the \archosplayerman{} bootloader. It is responsible for loading the Rockbox
+  the \playerman{} bootloader. It is responsible for loading the Rockbox
   firmware and for providing the dual boot function. It directly replaces the
-  \archosplayerman{} firmware in the \daps{} boot sequence.
-  \opt{gigabeatfx}{\note{Dual boot does not currently work on the Gigabeat.}}}
+  \playerman{} firmware in the \daps{} boot sequence.
+  \opt{gigabeatf}{\note{Dual boot does not currently work on the Gigabeat.}}}
 
   \opt{HAVE_RB_BL_IN_FLASH}{
   The bootloader is the program that tells your
   \dap{} how to load and start other components of Rockbox and for providing
   the dual boot function. This is the component of Rockbox that is installed
-  to the flash memory of your \archosplayerman.
-  \opt{iaudio}{\note{Dual boot does not currently work on the \archosplayertype{}.}}}
+  to the flash memory of your \playerman.
+  \opt{iaudio}{\note{Dual boot does not currently work on the \playertype{}.}}}
 
 \item[The Rockbox firmware.]
-  \opt{HAVE_RB_BL_IN_FLASH}{Unlike the \archosplayerman{} firmware, which runs
+  \opt{HAVE_RB_BL_IN_FLASH}{Unlike the \playerman{} firmware, which runs
   entirely from flash memory,}
-  \opt{HAVE_RB_BL_ON_DISK}{Similar to the \archosplayerman{} firmware,}
+  \opt{HAVE_RB_BL_ON_DISK}{Similar to the \playerman{} firmware,}
   most of the Rockbox code is contained in a
   ``build'' that resides on your \daps{} drive. This makes it easy to
   update Rockbox. The build consists of a directory called
@@ -190,7 +190,7 @@ still available to you.\\
 \end{description}
 }
 
-\nopt{archosplayer} {
+\nopt{player} {
     Apart from the required parts there are some addons you might be interested
     in installing.
     \begin{description}
@@ -214,7 +214,7 @@ housekeeping tool \caps{Rockbox Utility}. It allows you to:
         (``Minimal Installation'').
 \item Automatically install all suggested components (``Complete Installation'').
 \item Selectively install optional components.
-\nopt{archosplayer}{\item Install additional fonts and themes.}
+\nopt{player}{\item Install additional fonts and themes.}
 \item Install voice files and generate talk clips.
 \item Uninstall all components you installed using Rockbox Utility.
 \end{itemize}
@@ -232,35 +232,35 @@ filesystem.\\*
 
 \opt{ipodvideo}
     {\note{Autodetection is unable to distinguish between the
-    \archosplayerman{} 30~GB and 60~GB / 80~GB models and defaults to the
+    \playerman{} 30~GB and 60~GB / 80~GB models and defaults to the
     30~GB model. This will usually work but you might want to check the
     detected value, especially if you experience problems with Rockbox.}
 }
 
-\opt{iriverh100,iriverh300}{
+\opt{h100,h300}{
   Rockbox Utility will ask you for a compatible copy of the original
   firmware. This is because for legal reasons we cannot distribute
   the bootloader directly. Instead, we have to patch the Iriver firmware
   with the Rockbox bootloader.
 
   Download a supported version of the Iriver firmware for your 
-  \archosplayername{} from the Iriver website, links can be found on 
+  \playername{} from the Iriver website, links can be found on 
   \wikilink{IriverBoot}.
  
   Supported Iriver firmware versions currently include 
-  \opt{iriverh100}{1.63US, 1.63EU, 1.63K, 1.65US, 1.65EU, 1.65K, 1.66US, 
+  \opt{h100}{1.63US, 1.63EU, 1.63K, 1.65US, 1.65EU, 1.65K, 1.66US, 
     1.66EU and 1.66K. Note that the H140 uses the same firmware as the H120;
     H120 and H140 owners should use the firmware called \fname{ihp\_120.hex}.
     Likewise, the iHP110 and iHP115 use the same firmware, called 
     \fname{ihp\_100.hex}. Be sure to use the correct firmware file for 
     your player.}
-    \opt{iriverh300}{1.28K, 1.28EU, 1.28J, 1.29K, 1.29J and 1.30EU.
-    \note{The US \archosplayername{} firmware is not supported and cannot be
+    \opt{h300}{1.28K, 1.28EU, 1.28J, 1.29K, 1.29J and 1.30EU.
+    \note{The US \playername{} firmware is not supported and cannot be
     patched to be used with the bootloader. If you wish to install Rockbox
-    on a US \archosplayername{}, you must first install a non-US version of the
+    on a US \playername{}, you must first install a non-US version of the
     original firmware and then install one of the supported versions patched
     with the Rockbox bootloader.}
-    \warn{Installing a non-US firmware on a US \archosplayername{} will
+    \warn{Installing a non-US firmware on a US \playername{} will
     \emph{permanently} remove DRM support from the player.}}
 
   If the file that you downloaded is a \fname{.zip} file, use an unzip 
@@ -339,7 +339,7 @@ data partiton.}}
 \dap{}.}}
 
 \item Connect your \dap{} to the computer via USB
-  \opt{ipod3g,ipod4g,ipodmini1g,ipodcolor}{ or Firewire} as described in
+  \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire} as described in
   the manual that came with your \dap{}.
 
 \item Take the \fname{.zip} file that you downloaded and use
@@ -370,18 +370,18 @@ structure that Rockbox needs.\\}
 
 \opt{swcodec}{\nopt{gigabeats}{
   \subsubsection{Installing the bootloader}
-  \opt{iriverh100,iriverh300}{\input{getting_started/iriver_install.tex}}
+  \opt{h100,h300}{\input{getting_started/iriver_install.tex}}
   \opt{ipod}{\input{getting_started/ipod_install.tex}}
-  \opt{iaudiom3,iaudiom5,iaudiox5}{\input{getting_started/iaudio_install.tex}}
-  \opt{iriverh10,iriverh10_5gb}{\input{getting_started/h10_install.tex}}
-  \opt{gigabeatfx}{\input{getting_started/gigabeat_install.tex}}
+  \opt{m3,m5,x5}{\input{getting_started/iaudio_install.tex}}
+  \opt{h10,h10_5gb}{\input{getting_started/h10_install.tex}}
+  \opt{gigabeatf}{\input{getting_started/gigabeat_install.tex}}
   \opt{sansa}{\input{getting_started/sansa_install.tex}}
   \opt{mrobe100}{\input{getting_started/mrobe100_install.tex}}
 }}
 
 \subsection{Finishing the install}\label{ref:finish_install}
 
-\opt{gigabeatfx}{
+\opt{gigabeatf}{
   After installing you \emph{need} to power-cycle the 
   \dap{} by doing the following steps. Failure to do so may result in problems.
   \begin{itemize}
@@ -394,7 +394,7 @@ structure that Rockbox needs.\\}
   \end{itemize}
 }
 
-\opt{iaudiom3,iaudiom5,iaudiox5}{
+\opt{m3,m5,x5}{
   After installing you \emph{need} to power-cycle the 
   \dap{} by doing the following steps.
   \begin{itemize}
@@ -407,7 +407,7 @@ structure that Rockbox needs.\\}
   \end{itemize}
 }
 
-\opt{iriverh10,iriverh10_5gb,ipod,mrobe100,sansa,archos}{
+\opt{h10,h10_5gb,ipod,mrobe100,sansa,archos}{
   Safely eject / unmount the USB drive, unplug the cable and restart.
 }
 
@@ -415,7 +415,7 @@ structure that Rockbox needs.\\}
   Safely eject / unmount your \dap{}.
 }
 
-\opt{iriverh100,iriverh300}{
+\opt{h100,h300}{
   \begin{itemize}
   \item Safely eject / unmount your \dap{}.
   
@@ -426,14 +426,14 @@ structure that Rockbox needs.\\}
   the jukebox on. Press and hold the \ButtonSelect{} button to enter the main menu,
   and navigate to \setting{General $\rightarrow$ Firmware Upgrade}. Select
   \setting{Yes} when asked to confirm if you want to upgrade the 
-  firmware. The \archosplayerman{} will display a message indicating that the
+  firmware. The \playerman{} will display a message indicating that the
   firmware update is in progress. Do \emph{not} interrupt this process. When the
   firmware update is complete the player will turn itself off. (The update
   firmware process usually takes a minute or so.). You are now ready to go.
 \end{itemize}
 }
 
-\opt{sansae200}{Your e200 will automatically reboot and Rockbox should load.}
+\opt{e200}{Your e200 will automatically reboot and Rockbox should load.}
 
 
 
@@ -463,10 +463,10 @@ you turn the unit on, Rockbox should load.}
 \opt{gigabeats}{Rockbox should automatically load when you turn on your player.\\
 
   \note{
-    If you have loaded music onto your \dap{} using the \archosplayerman{}
+    If you have loaded music onto your \dap{} using the \playerman{}
     firmware, you will not be able to see your music properly in the
     \setting{File Browser} as MTP mode changes the location and file names. 
-    Files placed on your \dap{} using the \archosplayerman{} firmware can be
+    Files placed on your \dap{} using the \playerman{} firmware can be
     viewed by initialising and using Rockbox's database.
     See \reference{ref:database} for more information.}
 }
@@ -482,7 +482,7 @@ you turn the unit on, Rockbox should load.}
   }
 }
 
-\opt{iaudiom3}{
+\opt{m3}{
   \fixme{Add a note about the charging trick and place it here?}
 }
 
@@ -512,7 +512,7 @@ The new build will be installed over your current build.\\
 
 \section{Uninstalling Rockbox}\index{Installation!uninstall}
 
-\nopt{gigabeatfx,iaudiom5,iaudiox5,archos,mrobe100,gigabeats}{
+\nopt{gigabeatf,m5,x5,archos,mrobe100,gigabeats}{
   \note{The Rockbox bootloader allows you to choose between Rockbox and 
   the original firmware. (See \reference{ref:Dualboot} for more information.)}
 }
@@ -524,37 +524,37 @@ You can uninstall Rockbox automatically by using Rockbox Utility. If you
 installed Rockbox manually you can still use Rockbox Utility for uninstallation
 but will not be able to do this selectively.
 
-\opt{iriverh100,iriverh300}{\note{Rockbox Utility cannot uninstall the bootloader due to
+\opt{h100,h300}{\note{Rockbox Utility cannot uninstall the bootloader due to
 the fact that it requires a flashing procedure. To uninstall the bootloader
 completely follow the manual uninstallation instructions below.}}
 
 \subsection{Manual Uninstallation}
 
 \opt{archos}{
-  If you would like to go back to using the original \archosplayerman{} software,
+  If you would like to go back to using the original \playerman{} software,
   connect the \dap{} to your computer, and delete the
   \fname{\firmwarefilename} file.
 }
 
-\opt{iriverh10,iriverh10_5gb}{
-  If you would like to go back to using the original \archosplayerman{} software,
+\opt{h10,h10_5gb}{
+  If you would like to go back to using the original \playerman{} software,
   connect the \dap{} to your computer, and delete the
-  \opt{iriverh10}{\fname{H10\_20GC.mi4}}\opt{iriverh10_5gb}{\fname{H10.mi4}} file and rename
-  \fname{OF.mi4} to \opt{iriverh10}{\fname{H10\_20GC.mi4}}\opt{iriverh10_5gb}{\fname{H10.mi4}}
-  in the \fname{System} directory on your \archosplayertype{}. As in the installation,
+  \opt{h10}{\fname{H10\_20GC.mi4}}\opt{h10_5gb}{\fname{H10.mi4}} file and rename
+  \fname{OF.mi4} to \opt{h10}{\fname{H10\_20GC.mi4}}\opt{h10_5gb}{\fname{H10.mi4}}
+  in the \fname{System} directory on your \playertype{}. As in the installation,
   it may be necessary to first put your device into UMS mode.
 }
 
 \opt{mrobe100}{
-  If you would like to go back to using the original \archosplayerman{} software,
+  If you would like to go back to using the original \playerman{} software,
   connect the \dap{} to your computer, and delete the
   \fname{pp5020.mi4} file and rename
   \fname{OF.mi4} to \fname{pp5020.mi4}
-  in the \fname{System} directory on your \archosplayertype{}.
+  in the \fname{System} directory on your \playertype{}.
 }
 
-\opt{sansae200}{
-  If you would like to go back to using the original \archosplayerman{} software,
+\opt{e200}{
+  If you would like to go back to using the original \playerman{} software,
   connect the \dap{} to your computer, and follow the instructions to install
   the bootloader, but when prompted by sansapatcher, enter \texttt{u} for uninstall,
   instead of \texttt{i} for install. As in the installation, it may be necessary to
@@ -568,26 +568,26 @@ completely follow the manual uninstallation instructions below.}}
   instead of \texttt{i} for install.
 }
 
-\opt{iaudiom5,iaudiox5}{
-  If you would like to go back to using the original \archosplayerman{} software,
-  connect the \dap{} to your computer, download the original \archosplayername{}
-  firmware from the \archosplayerman{} website, and copy it to the \fname{FIRMWARE}
-  directory on your \archosplayername{}. Turn off the \dap{}, remove the USB cable
+\opt{m5,x5}{
+  If you would like to go back to using the original \playerman{} software,
+  connect the \dap{} to your computer, download the original \playername{}
+  firmware from the \playerman{} website, and copy it to the \fname{FIRMWARE}
+  directory on your \playername{}. Turn off the \dap{}, remove the USB cable
   and insert the charger. The original firmware will automatically be flashed.
 }
 
-\opt{iriverh100,iriverh300}{
+\opt{h100,h300}{
     If you want to remove the Rockbox bootloader, simply flash an unpatched
-    \archosplayerman{} firmware. Be aware that doing so will also remove the bootloader
+    \playerman{} firmware. Be aware that doing so will also remove the bootloader
     USB mode. As that mode can come in quite handy (especially if you experience
    disk errors) it is recommended to keep the bootloader. It also
     gives you the possibility of trying Rockbox anytime later by simply
     installing the distribution files.
-    \opt{iriverh100}{
+    \opt{h100}{
       The Rockbox bootloader will automatically start the original firmware if
       the \fname{.rockbox} directory has been deleted.
     }
-    \opt{iriverh300}{
+    \opt{h300}{
       Although if you retain the Rockbox bootloader, you will need to hold the
       \ButtonRec{} button each time you want to start the original firmware.
     }
@@ -596,8 +596,8 @@ completely follow the manual uninstallation instructions below.}}
 \nopt{gigabeats}{
   If you wish to clean up your disk, you may also wish to delete the
   \fname{.rockbox} directory and its contents.
-  \nopt{iaudiom5,iaudiox5}{Turn the \archosplayerman{} off.
-    Turn the \dap{} back on and the original \archosplayerman{} software will load.}
+  \nopt{m5,x5}{Turn the \playerman{} off.
+    Turn the \dap{} back on and the original \playerman{} software will load.}
 }
 
 \opt{gigabeats}{
@@ -605,7 +605,7 @@ completely follow the manual uninstallation instructions below.}}
   \fname{.rockbox} directory and its contents, this must be done
   before uninstalling the bootloader in the next step.
 
-  Before installation you should have downloaded a copy of the \archosplayerman{}
+  Before installation you should have downloaded a copy of the \playerman{}
   firmware from
   \url{http://www.tacp.toshiba.com/tacpassets-images/firmware/MESV12US.zip}.
   \begin{itemize}
@@ -633,7 +633,7 @@ completely follow the manual uninstallation instructions below.}}
   please ensure that you are either logged in as an administrator (Windows), or
   you have root rights (Linux)}
 
-\opt{iriverh100,iriverh300}{
+\opt{h100,h300}{
   \item[Immediately loading original firmware.]
   If the original firmware is immediately
   loaded without the Rockbox bootloader appearing first, then the Rockbox bootloader
@@ -641,10 +641,10 @@ completely follow the manual uninstallation instructions below.}}
   the update if the filename is correct, including case. Make sure that the patched
   Iriver firmware is called \fname{.hex}.}
 
-\nopt{iriverh100,iriverh300}{\item[``File Not Found'']}
-\opt{iriverh100,iriverh300}{\item[``-1 error'']}
+\nopt{h100,h300}{\item[``File Not Found'']}
+\opt{h100,h300}{\item[``-1 error'']}
   If you receive a
-  \nopt{iriverh100,iriverh300}{``File Not Found''}\opt{iriverh100,iriverh300}{``-1 error''} from the
+  \nopt{h100,h300}{``File Not Found''}\opt{h100,h300}{``-1 error''} from the
   bootloader, then the bootloader cannot find the Rockbox firmware. This is
   usually a result of not extracting the contents of the \fname{.zip} file
   to the proper location, and should not happen when Rockbox has been

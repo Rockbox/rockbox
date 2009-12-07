@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
-require "../builds.pm";
-my $version = $publicrelease;
+$version="3.4";
 
 my $verbose;
 if($ARGV[0] eq "-v") {
@@ -17,7 +16,7 @@ if($ARGV[0]) {
 
 # made once for all targets
 sub runone {
-    my ($dir)=@_;
+    my ($dir, $select, $newl)=@_;
     my $a;
 
     if($doonly && ($doonly ne $dir)) {
@@ -29,7 +28,7 @@ sub runone {
     print "Build in buildv-$dir\n" if($verbose);
 
     # build the manual(s)
-    $a = buildit($dir);
+    $a = buildit($dir, $select, $newl);
 
     chdir "..";
 
@@ -51,11 +50,13 @@ sub runone {
 };
 
 sub buildit {
-    my ($model)=@_;
+    my ($dir, $select, $newl)=@_;
 
     `rm -rf * >/dev/null 2>&1`;
 
-    my $c = "../tools/configure --type=av --target=$model --language=0 --tts=f";
+    # V (voice), F (festival), L (lame), [blank] (English)
+    my $c = sprintf('printf "%s\n%sa\nv\n\n\nf\n\n" | ../tools/configure',
+                    $select, $newl?'\n':"");
 
     print "C: $c\n" if($verbose);
     `$c`;
@@ -74,8 +75,31 @@ my $pool="$home/tmp/rockbox-voices-$version/voice-pool";
 `rm -f $pool/*`;
 $ENV{'POOL'}="$pool";
 
-for my $b (&stablebuilds) {
-    next if ($builds{$b}{configname} < 3); # no variants
+runone("player", "player", 1);
+runone("recorder", "recorder", 1);
+runone("fmrecorder", "fmrecorder", 1);
+runone("recorderv2", "recorderv2", 1);
+runone("ondiosp", "ondiosp", 1);
+runone("ondiofm", "ondiofm", 1);
+runone("h100", "h100");
+runone("h120", "h120");
+runone("h300", "h300");
+runone("ipodcolor", "ipodcolor");
+runone("ipodnano", "ipodnano");
+runone("ipod4gray", "ipod4g");
+runone("ipodvideo", "ipodvideo", 1);
+runone("ipod3g", "ipod3g");
+runone("ipod1g2g", "ipod1g2g");
+runone("iaudiox5", "x5");
+runone("iaudiom5", "m5");
+runone("iaudiom3", "m3");
+runone("ipodmini2g", "ipodmini2g");
+runone("ipodmini1g", "ipodmini");
+runone("h10", "h10");
+runone("h10_5gb", "h10_5gb");
+runone("gigabeatf", "gigabeatf");
+runone("sansae200", "e200");
+runone("sansac200", "c200");
+runone("mrobe100", "mrobe100");
+#runone("cowond2", "cowond2");
 
-    runone($b);
-}

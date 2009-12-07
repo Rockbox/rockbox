@@ -1,13 +1,13 @@
 CFLAGS=-Wall -W
 
-BOOT_H = ipod1g2g.h ipod3g.h ipod4g.h ipodcolor.h ipodmini1g.h ipodmini2g.h ipodnano1g.h ipodvideo.h
+BOOT_H = ipod1g2g.h ipod3g.h ipod4g.h ipodcolor.h ipodmini.h ipodmini2g.h ipodnano.h ipodvideo.h
 
 # Uncomment the next two lines to build with embedded bootloaders and the 
 # --install option and interactive mode.  You need the full set of Rockbox 
 # bootloaders in this directory - download them from
 # http://download.rockbox.org/bootloader/ipod/bootloaders.zip
 
-#BOOTSRC = ipod1g2g.c ipod3g.c ipod4g.c ipodcolor.c ipodmini1g.c ipodmini2g.c ipodnano1g.c ipodvideo.c
+#BOOTSRC = ipod1g2g.c ipod3g.c ipod4g.c ipodcolor.c ipodmini.c ipodmini2g.c ipodnano.c ipodvideo.c
 #CFLAGS += -DWITH_BOOTOBJS
 
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
@@ -69,14 +69,14 @@ ipod4g.c: bootloader-ipod4g.ipod ipod2c
 ipodcolor.c: bootloader-ipodcolor.ipod ipod2c
 	./ipod2c bootloader-ipodcolor.ipod ipodcolor
 
-ipodmini1g.c: bootloader-ipodmini1g.ipod ipod2c
-	./ipod2c bootloader-ipodmini1g.ipod ipodmini1g
+ipodmini.c: bootloader-ipodmini.ipod ipod2c
+	./ipod2c bootloader-ipodmini.ipod ipodmini
 
 ipodmini2g.c: bootloader-ipodmini2g.ipod ipod2c
 	./ipod2c bootloader-ipodmini2g.ipod ipodmini2g
 
-ipodnano1g.c: bootloader-ipodnano1g.ipod ipod2c
-	./ipod2c bootloader-ipodnano1g.ipod ipodnano1g
+ipodnano.c: bootloader-ipodnano.ipod ipod2c
+	./ipod2c bootloader-ipodnano.ipod ipodnano
 
 ipodvideo.c: bootloader-ipodvideo.ipod ipod2c
 	./ipod2c bootloader-ipodvideo.ipod ipodvideo

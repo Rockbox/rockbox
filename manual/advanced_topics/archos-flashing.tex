@@ -2,18 +2,18 @@
 
 \subsection{Introduction}
 
-When you bought your \archosplayertype, it came with the \archosplayerman\ firmware in
-flash ROM. When you power on your \dap, this \archosplayerman\ firmware starts,
+When you bought your \playertype, it came with the \playerman\ firmware in
+flash ROM. When you power on your \dap, this \playerman\ firmware starts,
 and then loads an updated firmware from disk if present (\firmwarefilename).
 An ordinary Rockbox installation only replaces the on-disk firmware, leaving
-the flash ROM contents intact. That means the \archosplayerman\ firmware still
+the flash ROM contents intact. That means the \playerman\ firmware still
 controls the boot process.
 
 The main reason to change this is to improve the startup time of your player.
-The \archosplayerman\ bootloader is rather slow. With Rockbox in flash, your \dap\
+The \playerman\ bootloader is rather slow. With Rockbox in flash, your \dap\
 will boot much faster, typically in three to five seconds. Furthermore you
 might prefer a clean Rockbox environment, with as little remnants of the
-\archosplayerman\ software as possible.
+\playerman\ software as possible.
 \opt{rombox}{On your \dap\ it is also possible to execute Rockbox directly
   from flash ROM, increasing the amount of free RAM for buffering music. This
   is called \emph{Rombox}.
@@ -28,11 +28,11 @@ might prefer a clean Rockbox environment, with as little remnants of the
   of them fails, it will not program.
 }
 
-\opt{ondio}{\warn{After flashing Rockbox, never try to ROLO the \archosplayerman\
+\opt{ondio}{\warn{After flashing Rockbox, never try to ROLO the \playerman\
     firmware
-    \opt{archosondiofm}{versions 1.31f or 1.32b! These versions are flash updates
+    \opt{ondiofm}{versions 1.31f or 1.32b! These versions are flash updates
       themselves. If they are}
-    \opt{archosondiosp}{version 1.32b! This version is a flash update itself.
+    \opt{ondiosp}{version 1.32b! This version is a flash update itself.
       If it is}
     applied when Rockbox is flashed, you'll end up with a garbled flash ROM
     and hence a dead box.
@@ -76,14 +76,14 @@ screen. To get out of it, perform a hardware shutdown of your \dap.
 \subsection{Initial Flashing Procedure}
 
 You only need to perform this procedure the first time you flash your
-\archosplayertype. You may also want to perform it in case the update procedure for
+\playertype. You may also want to perform it in case the update procedure for
 the second image recommends it. In the latter case do not perform the steps
 listed under "Preparation".
 
 \subsubsection{Preparation}
 
 \nopt{ondio}{
-  First, check whether your \archosplayertype\ is flashable at all. Select
+  First, check whether your \playertype\ is flashable at all. Select
   \setting{System $\rightarrow$ Debug (Keep Out!) $\rightarrow$ View HW
   Info}. 
   \opt{lcd_charcell}{Cycle through the displayed values with \ButtonRight /
@@ -115,7 +115,7 @@ a safe place.
   \nopt{ondio}{This will extract two files to the root,
     \fname{firmware\_{\textless}model{\textgreater}.bin} and
     \fname{firmware\_{\textless}model{\textgreater}\_norom.bin}.
-    \opt{archosrecorder,archosrecorderv2fm}{(The {\textless}model{\textgreater} part is
+    \opt{recorder,recorderv2fm}{(The {\textless}model{\textgreater} part is
       slighty different from that in the .zip file name.)
     }
     The flash plugin will select the correct one for your \dap.
@@ -152,14 +152,14 @@ a safe place.
 
 \note{There are no separate flash packages for {\dap}s modified to have 8MB
   of RAM. You need to use the corresponding package for non-modified
-  \archosplayertype. You should then install a Rockbox image that makes use of all
+  \playertype. You should then install a Rockbox image that makes use of all
   available RAM as described in the following section.
 }
 
 \subsection{Updating the Rockbox Image in Flash}
 
 When Rockbox is booted from flash, it does not check for an updated firmware
-on disk. This is one of the reasons why it boots faster than the \archosplayerman\
+on disk. This is one of the reasons why it boots faster than the \playerman\
 firmware. It means that whenever you update Rockbox, you also need to update
 the image in the flash. This is a simple and safe procedure:
 

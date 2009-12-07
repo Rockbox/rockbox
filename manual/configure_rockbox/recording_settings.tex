@@ -45,8 +45,8 @@
    \nopt{sansa}{
     Choose the recording frequency (sample rate).
     \opt{masf}{48kHz, 44.1kHz, 32kHz, 24kHz, 22.05kHz, 16kHz}
-    \opt{iriverh100,iriverh300}{44.1kHz, 22.05kHz and 11.025kHz}
-    \opt{iaudiox5}{88.2kHz, 44.1kHz, 22.05kHz and 11.025kHz}
+    \opt{h100,h300}{44.1kHz, 22.05kHz and 11.025kHz}
+    \opt{x5}{88.2kHz, 44.1kHz, 22.05kHz and 11.025kHz}
     are available. Higher sample rates use up more disk space, but give better
     sound quality.
     \opt{swcodec}{\note{The 11.025kHz setting is not available when using%
@@ -58,19 +58,19 @@
       MPEG v1 for 48, 44.1 and 32\\
       MPEG v2 for 24, 22.05 and 16\\
     }
-    \opt{archosrecorder,archosrecorderv2fm,iriverh100}
+    \opt{recorder,recorderv2fm,h100}
       {\note{You cannot change the sample rate for digital recordings.}
     }
    } % nopt e200  
-   \opt{sansae200}{ 
+   \opt{e200}{ 
        Recordings can only be made at a 22.05kHz frequency (sample rate)
          on this \dap. 
     } % opt e200
 
 \section{Source}
   Choose the source of the recording. The options are: 
-  \opt{archosrecorder,archosrecorderv2fm,iriverh100}{\setting{SPDIF (digital)}, }%
-  \nopt{ipodnano1g,ipodvideo}{\setting{Mic}}%
+  \opt{recorder,recorderv2fm,h100}{\setting{SPDIF (digital)}, }%
+  \nopt{ipodnano,ipodvideo}{\setting{Mic}}%
   \nopt{sansa}{, and {\setting{Line In}}}. %
   \opt{radio}{For recording from the radio see \reference{ref:FMradio}.}
 
@@ -228,7 +228,7 @@
   
 More information can be found at \wikilink{VolumeTriggeredRecording}.
   
-\opt{iriverh100,iriverh300}{%
+\opt{h100,h300}{%
   \section{Automatic Gain Control}
     The \setting{Automatic Gain Control} has five different presets for
     automatically controlling the gain while recording.

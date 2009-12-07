@@ -1,5 +1,5 @@
 % $Id$ %
-\def\UseOption{iaudiom3}
+\def\UseOption{m3}
 \edef\UseOption{\UseOption,HAVE_RB_BL_IN_FLASH}
 \edef\UseOption{\UseOption,IAUDIO_M3_PAD}
 \edef\UseOption{\UseOption,IAUDIO_RC_PAD}
@@ -8,19 +8,19 @@
 \edef\UseOption{\UseOption,iaudio}
 \edef\UseOption{\UseOption,HAVEREMOTEKEYMAP}
 
-\newcommand{\archosplayerman}{Iaudio}
-\newcommand{\archosplayertype}{M3}
-\newcommand{\archosplayerlongtype}{\archosplayertype}
+\newcommand{\playerman}{Iaudio}
+\newcommand{\playertype}{M3}
+\newcommand{\playerlongtype}{\playertype}
 \newcommand{\genericimg}{128x96x2}
-\newcommand{\specimg}{iaudiom3}
+\newcommand{\specimg}{m3}
 %Used to name the player, e.g. ...to the \dap
-\newcommand{\dap}{archosplayer}
+\newcommand{\dap}{player}
 %For use when referring to the player. E.g. the \daps\ capacity ...
-\newcommand{\daps}{archosplayer's}
+\newcommand{\daps}{player's}
 \newcommand{\firmwarefilename}{\fname{rockbox.iaudio}}
 \newcommand{\screenshotsize}{4cm}
 \newcommand{\disk}{hard disk}
 
 % link external keymap files
-\input{platform/keymap-iaudiom3.tex}
+\input{platform/keymap-m3.tex}
 \input{platform/remote-keymap-iaudio.tex}
