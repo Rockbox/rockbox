@@ -137,7 +137,7 @@ enum {
 #define XOFS          64
 #define MAX_FPS       30
 
-/* 16x16 bubbles (H300, iPod Color) */
+/* 16x16 bubbles (H300, iPod Color, HDD6330) */
 #elif (LCD_HEIGHT == 176) && (LCD_WIDTH == 220)
 #define XOFS          46
 #define MAX_FPS       30
@@ -164,9 +164,16 @@ enum {
 #define XOFS          40
 #define MAX_FPS       40
 
-/* 12x12 bubbles (H100, H10, iAudio X5, iPod 3G, iPod 4G grayscale) */
+/* 12x12 bubbles (H100, H10, iAudio X5, HDD1630, iPod 3G, iPod 4G grayscale) */
 #elif (LCD_HEIGHT == 128) && ((LCD_WIDTH == 160) || (LCD_WIDTH == 128))
 #define XOFS          33
+#define MAX_FPS       30
+
+/* 12x12 bubbles (GoGear SA9200) */
+#elif (LCD_HEIGHT == 160) && (LCD_WIDTH == 128)
+#define XOFS          33
+#define ROW_HEIGHT    10
+#define ROW_INDENT     6
 #define MAX_FPS       30
 
 /* 10x10 bubbles (iPod Mini) */

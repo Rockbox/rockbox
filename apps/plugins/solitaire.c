@@ -395,6 +395,24 @@ PLUGIN_HEADER
 #   define HK_CUR2STACK    "SELECT.."
 #   define HK_REM2STACK    "VIEW+RIGHT"
 
+#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
+#   define SOL_QUIT          BUTTON_POWER
+#   define SOL_UP            BUTTON_UP
+#   define SOL_DOWN          BUTTON_DOWN
+#   define SOL_LEFT          BUTTON_PREV
+#   define SOL_RIGHT         BUTTON_NEXT
+#   define SOL_MOVE_PRE      BUTTON_PLAY
+#   define SOL_MOVE          (BUTTON_PLAY | BUTTON_REL)
+#   define SOL_DRAW          BUTTON_MENU
+#   define SOL_REM2CUR       BUTTON_LEFT
+#   define SOL_CUR2STACK     (BUTTON_PLAY | BUTTON_REPEAT)
+#   define SOL_REM2STACK     BUTTON_RIGHT
+#   define HK_MOVE           "PLAY"
+#   define HK_DRAW           "MENU"
+#   define HK_REM2CUR        "LEFT"
+#   define HK_CUR2STACK      "PLAY..."
+#   define REM2STACK         "RIGHT"
+
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) || \
 (CONFIG_KEYPAD == ONDAVX777_PAD) || \
 CONFIG_KEYPAD == MROBE500_PAD
