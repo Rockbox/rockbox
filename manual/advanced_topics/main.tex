@@ -213,7 +213,7 @@ all the tags that are available.
   the last number giving the colour depth in bits) when
   designing your own WPS, or if you use a WPS designed for another target.
   \opt{HAVE_REMOTE_LCD}{The resolution of the remote is
-  \opt{h100,h300}{128x64x1}\opt{x5,m5}{128x96x2} pixels.}}
+  \opt{iriverh100,iriverh300}{128x64x1}\opt{iaudiox5,iaudiom5}{128x96x2} pixels.}}
 
 \nopt{lcd_charcell}{
 \subsubsection{\label{ref:Viewports}Viewports}
@@ -554,7 +554,7 @@ Example of a configuration file:
 \end{description}
 
 \section{\label{ref:FirmwareLoading}Firmware Loading}
-\opt{player,recorder,recorderv2fm,ondio}{
+\opt{archosplayer,archosrecorder,archosrecorderv2fm,ondio}{
   When your \dap{} powers on, it loads the Archos firmware in ROM, which
   automatically checks your \daps{} root directory for a file named 
   \firmwarefilename. Note that Archos firmware can only read the first 
@@ -567,14 +567,14 @@ Example of a configuration file:
 \subsection{\label{ref:using_rolo}Using ROLO (Rockbox Loader)}
 Rockbox is able to load and start another firmware file without rebooting. 
 You just ``play'' a file with the extension %
-\opt{recorder,recorderv2fm,ondio}{\fname{.ajz}.} %
-\opt{player}{\fname{.mod}.} %
-\opt{h100,h300}{\fname{.iriver}.} %
+\opt{archosrecorder,archosrecorderv2fm,ondio}{\fname{.ajz}.} %
+\opt{archosplayer}{\fname{.mod}.} %
+\opt{iriverh100,iriverh300}{\fname{.iriver}.} %
 \opt{ipod}{\fname{.ipod}.} %
 \opt{iaudio}{\fname{.iaudio}.} %
-\opt{sansa,h10,h10_5gb}{\fname{.mi4}.} %
+\opt{sansa,iriverh10,iriverh10_5gb}{\fname{.mi4}.} %
 \opt{sansaAMS}{\fname{.sansa}.} %
-\opt{gigabeatf,gigabeats}{\fname{.gigabeat}.} %
+\opt{gigabeatfx,gigabeats}{\fname{.gigabeat}.} %
 This can be used to test new firmware versions without deleting your
 current version.
 

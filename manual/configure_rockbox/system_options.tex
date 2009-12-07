@@ -15,19 +15,19 @@
   \begin{description}
     \item [Battery Capacity: ]This setting can be used to tell Rockbox what
       capacity (in mAh) the battery being used has. The default is
-      \opt{player,recorder}{1500mAh}%
-      \opt{recorderv2fm}{2200mAh}%
-      \opt{ondiosp,ondiofm}{1000mAh}%
-      \opt{h100,h300}{1300mAh}%
-      \opt{ipodmini}{400mAh (1G) or 630mAh (2G)}%
+      \opt{archosplayer,archosrecorder}{1500mAh}%
+      \opt{archosrecorderv2fm}{2200mAh}%
+      \opt{archosondiosp,archosondiofm}{1000mAh}%
+      \opt{iriverh100,iriverh300}{1300mAh}%
+      \opt{ipodmini1g}{400mAh (1G) or 630mAh (2G)}%
       \opt{ipodcolor}{700mAh}%
-      \opt{ipodnano}{300mAh}%
+      \opt{ipodnano1g}{300mAh}%
       \opt{ipodvideo}{400mAh (30GB) or 600mAh (60/80GB)}%
       \opt{ipod4g}{630mAh}%
       \opt{ipod3g}{630mAh}%
       \opt{ipod1g2g}{1200mAh}%
-      \opt{m5,x5}{950mAh}%
-      \opt{gigabeatf}{2000mAh}%
+      \opt{iaudiom5,iaudiox5}{950mAh}%
+      \opt{gigabeatfx}{2000mAh}%
       \opt{gigabeats}{700mAh}%
       , which is the capacity value for the standard
       \opt{archos}{batteries}\nopt{archos}{battery} shipped with the \dap.
@@ -37,9 +37,9 @@
         runtime estimation as shown on screen.
       \opt{iaudio}{Rockbox does not automatically distinguish between the
         ``L'' models and the ``simple'' models which determine the default
-        value. If your dap{} is an \opt{m5}{M5L}\opt{x5}{X5L} set the value
+        value. If your dap{} is an \opt{iaudiom5}{M5L}\opt{iaudiox5}{X5L} set the value
         to 2250mAh for more accuracy in the runtime estimation.}
-      \opt{ipod,sansa}{This value is fairly meaningless in the \playerman{}
+      \opt{ipod,sansa}{This value is fairly meaningless in the \archosplayerman{}
         family at present, and work is on-going into finding a better way to
         determine battery life.}
 
@@ -117,7 +117,7 @@ This sub menu relates to limits in the Rockbox operating system.
   \end{description}
 
 % TODO: this needs to be rewritten in another style, it lets you mix sound from another source into the music
-\opt{player}{
+\opt{archosplayer}{
   \subsection{Line In} This option activates the line in port on \dap, which is
     off by default. This is useful for such applications as:
     \begin{itemize}
@@ -161,7 +161,7 @@ this option \setting{On}. If it is not required, then turning this setting
 } 
 
 \opt{HAVE_BUTTON_LIGHTS}{
-  \opt{e200}{
+  \opt{sansae200}{
   \subsection{Wheel Light Timeout}
     This setting controls the amount of time the wheel lights shine after a
     button press or wheel turn. If set to \setting{Off}, the LEDs will not
@@ -169,7 +169,7 @@ this option \setting{On}. If it is not required, then turning this setting
     never shut off. If set to a time (1 to 120 seconds), the wheel will stay
     lit for that amount of time after a button press or wheel turn.
   }
-  \nopt{e200}{
+  \nopt{sansae200}{
   \subsection{Button Light Timeout}
     This setting controls the amount of time the button lights shine after a
     button press. If set to \setting{Off}, the LEDs will not light when a
@@ -177,7 +177,7 @@ this option \setting{On}. If it is not required, then turning this setting
     If set to a time (1 to 120 seconds), the buttons will stay lit for
     that amount of time after a button press.
   }
-  \opt{gigabeatf}{
+  \opt{gigabeatfx}{
     \subsection{Button Light Brightness}
       Changes the brightness of the button lights.
   }

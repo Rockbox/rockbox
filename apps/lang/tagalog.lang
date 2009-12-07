@@ -261,16 +261,16 @@
  <source>
     *: "PLAY = Yes"
     cowond2*: "MENU = Yes"
-    h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    archosplayer: "(PLAY/STOP)"
  </source>
  <dest>
     *: "PLAY = Oo"
     cowond2*: "MENU = Oo"
-    h100,h120,h300: "NAVI = Oo"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Oo"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Oo"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Oo"
+    archosplayer: "(PLAY/STOP)"
  </dest>
  <voice>
     *: ""
@@ -282,15 +282,15 @@
  user: core
  <source>
     *: "Any Other = No"
-    player: none
+    archosplayer: none
  </source>
  <dest>
     *: "Ibang wala = Hindi"
-    player: none
+    archosplayer: none
  </dest>
  <voice>
     *: ""
-    player: none
+    archosplayer: none
  </voice>
 </phrase>
 <phrase>
@@ -2366,19 +2366,19 @@
  user: core
  <source>
     *: "Building database... %d found (OFF to return)"
-    h100,h120,h300: "Building database... %d found (STOP to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
-    sa9200: "Building database... %d found (REW to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
  </source>
  <dest>
     *: "Gumawa database... %d found (OFF sa pagbalik)"
-    h100,h120,h300: "Gumawa database... %d found (STOP sa pagbalik)"
+    iriverh100,iriverh120,iriverh300: "Gumawa database... %d found (STOP sa pagbalik)"
     ipod*: "Gumawa database... %d found (PLAY/PAUSE sa pagbalik)"
-    x5,m5,gigabeat*,mrobe100: "Gumawa database... %d found (LEFT sa pagbalik)"
-    h10,h10_5gb,e200*,c200*,fuze*: "Gumawa database... %d found (PREV sa pagbalik)"
-    sa9200: "Gumawa database... %d found (REW sa pagbalik)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Gumawa database... %d found (LEFT sa pagbalik)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Gumawa database... %d found (PREV sa pagbalik)"
+    gogearsa9200: "Gumawa database... %d found (REW sa pagbalik)"
  </dest>
  <voice>
     *: "entries found for database"
@@ -3178,7 +3178,7 @@
 </phrase>
 <phrase>
  id: LANG_JUMP_SCROLL
- desc: (player) menu alternative for jump scroll
+ desc: (archosplayer) menu alternative for jump scroll
  user: core
  <source>
     *: "Jump Scroll"
@@ -3192,7 +3192,7 @@
 </phrase>
 <phrase>
  id: LANG_ONE_TIME
- desc: (player) the jump scroll shall be done "one time"
+ desc: (archosplayer) the jump scroll shall be done "one time"
  user: core
  <source>
     *: "One time"
@@ -3206,7 +3206,7 @@
 </phrase>
 <phrase>
  id: LANG_JUMP_SCROLL_DELAY
- desc: (player) Delay before making a jump scroll
+ desc: (archosplayer) Delay before making a jump scroll
  user: core
  <source>
     *: "Jump Scroll Delay"
@@ -3838,17 +3838,17 @@
  <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
  </source>
  <dest>
     *: none
     button_light: "Pahintuin buttones sa ilaw"
-    fuze*,e200*: "Pahintuin gulong sa ilaw"
+    sansafuze*,sansae200*: "Pahintuin gulong sa ilaw"
  </dest>
  <voice>
     *: none
     button_light: ""
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
  </voice>
 </phrase>
 <phrase>
@@ -4130,17 +4130,17 @@
     *: none
     rtc: "ON = Set"
     mrobe500: "HEART = Set"
-    h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
-    sa9200: "PLAY = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
+    gogearsa9200: "PLAY = Set"
  </source>
  <dest>
     *: none
     rtc: "ON = Ilagay"
     mrobe500: "HEART =Ilagay"
-    h100,h120,h300: "NAVI = Ilagay"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Ilagay"
-    sa9200: "PLAY = Ilagay"
+    iriverh100,iriverh120,iriverh300: "NAVI = Ilagay"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Ilagay"
+    gogearsa9200: "PLAY = Ilagay"
  </dest>
  <voice>
     *: none
@@ -4154,27 +4154,27 @@
     *: none
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
-    h100,h120,h300: "STOP = Revert"
-    ipod*,c200*: "MENU = Revert"
-    x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
-    gigabeatf: "POWER = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*: "MENU = Revert"
+    iaudiox5,iaudiom5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
-    sa9200: "LEFT = Revert"
+    gogearsa9200: "LEFT = Revert"
  </source>
  <dest>
     *: none
     rtc: "OFF = Mabalik"
     mrobe500: "POWER = Mabalik"
-    h100,h120,h300: "STOP = Mabalik"
-    ipod*,c200*: "MENU = Mabalik"
-    x5,m5: "RECORD = Mabalik"
-    h10,h10_5gb,e200*,fuze*: "PREV = Mabalik"
-    gigabeatf: "POWER = Mabalik"
+    iriverh100,iriverh120,iriverh300: "STOP = Mabalik"
+    ipod*,sansac200*: "MENU = Mabalik"
+    iaudiox5,iaudiom5: "RECORD = Mabalik"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Mabalik"
+    gigabeatfx: "POWER = Mabalik"
     mrobe100: "DISPLAY = Mabalik"
     gigabeats: "BACK = Mabalik"
-    sa9200: "LEFT = Mabalik"
+    gogearsa9200: "LEFT = Mabalik"
  </dest>
  <voice>
     *: none
@@ -4700,21 +4700,21 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
-    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
  </source>
  <dest>
     *: none
     alarm: "PLAY=Ilagay OFF=Kanselahin"
     ipod*: "SELECT=Ilagay MENU=Kanselahin"
-    h10,h10_5gb: "SELECT = Ilagay MENU = Kanselahin"
+    iriverh10,iriverh10_5gb: "SELECT = Ilagay MENU = Kanselahin"
     gigabeats: "SELECT = Ilagay POWER = Kanselahin"
  </dest>
  <voice>
     *: none
     alarm: ""
     ipod*: ""
-    h10,h10_5gb: ""
+    iriverh10,iriverh10_5gb: ""
     gigabeats: ""
  </voice>
 </phrase>
@@ -5885,17 +5885,17 @@
  <source>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
  </source>
  <dest>
     *: none
     recording: "Mikropono"
-    h100,h120,h300: "Panloob mikropono"
+    iriverh100,iriverh120,iriverh300: "Panloob mikropono"
  </dest>
  <voice>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
  </voice>
 </phrase>
 <phrase>
@@ -5921,15 +5921,15 @@
  user: core
  <source>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
  </source>
  <dest>
     *: none
-    recording,player: "Sa Guhit"
+    recording,archosplayer: "Sa Guhit"
  </dest>
  <voice>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
  </voice>
 </phrase>
 <phrase>
@@ -7021,7 +7021,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -7609,20 +7609,20 @@
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200*: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Puno disk. Magpatuloy Pindutin OFF."
-    h100,h120,h300: "Puno disk. Magpatuloy Pindutin STOP."
-    m5,x5: "Puno disk. Magpatuloy Pindutin POWER."
-    e200*,c200*: "Puno disk. Magpatuloy Pindutin PREV."
+    iriverh100,iriverh120,iriverh300: "Puno disk. Magpatuloy Pindutin STOP."
+    iaudiom5,iaudiox5: "Puno disk. Magpatuloy Pindutin POWER."
+    sansae200*,sansac200*: "Puno disk. Magpatuloy Pindutin PREV."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -7682,15 +7682,15 @@
   user: core
   <source>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </source>
   <dest>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </dest>
   <voice>
     *: "Buffer size"
-    player: ""
+    archosplayer: ""
   </voice>
 </phrase>
 <phrase>
@@ -8066,25 +8066,25 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on recorder models
+  desc: Used on archosrecorder models
   user: core
   <source>
     *: "OFF to abort"
-    player,h100,h120,h300: "STOP to abort"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
-    x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200*: "PREV to abort"
+    iaudiox5,iaudiom5: "Long PLAY to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
     gigabeats: "BACK to abort"
-    gigabeatf: "POWER to abort"
+    gigabeatfx: "POWER to abort"
   </source>
   <dest>
     *: "OFF sa agas"
-    player,h100,h120,h300: "STOP sa agas"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP sa agas"
     ipod*: "PLAY/PAUSE sa agas"
-    x5,m5: "Long PLAY sa agas"
-    h10,h10_5gb,e200*,c200*: "PREV sa agas"
+    iaudiox5,iaudiom5: "Long PLAY sa agas"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV sa agas"
     gigabeats: "BACK sa agas"
-    gigabeatf: "POWER sa agas"
+    gigabeatfx: "POWER sa agas"
   </dest>
   <voice>
     *: ""
@@ -8138,13 +8138,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -8333,15 +8333,15 @@
   user: core
   <source>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </source>
   <dest>
     *: "Magtapos kanta listahan"
-    player: "Magtapos listahan"
+    archosplayer: "Magtapos listahan"
   </dest>
   <voice>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </voice>
 </phrase>
 <phrase>
@@ -9664,19 +9664,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 recorder
+  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
   user: core
   <source>
     *: none
-    recorder: "Battery: Top-Off Chg"
+    archosrecorder: "Battery: Top-Off Chg"
   </source>
   <dest>
     *: none
-    recorder: "Batirya: Top-Off Chg"
+    archosrecorder: "Batirya: Top-Off Chg"
   </dest>
   <voice>
     *: none
-    recorder: "Top off charge"
+    archosrecorder: "Top off charge"
   </voice>
 </phrase>
 <phrase>
@@ -10111,19 +10111,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1:"
-    e200*,c200*,fuze*: "MSD:"
+    sansae200*,sansac200*,sansafuze*: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D Isa"
-    e200*,c200*,fuze*: "micro S D"
+    sansae200*,sansac200*,sansafuze*: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -11508,15 +11508,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatf: "Sensitibo Touchpad"
+    gigabeatfx: "Sensitibo Touchpad"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Sensitibo Touchpad"
+    gigabeatfx: "Sensitibo Touchpad"
   </voice>
 </phrase>
 <phrase>
@@ -11806,15 +11806,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </source>
   <dest>
     *: none
-    gigabeatf: "Mataas"
+    gigabeatfx: "Mataas"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Mataas"
+    gigabeatfx: "Mataas"
   </voice>
 </phrase>
 <phrase>

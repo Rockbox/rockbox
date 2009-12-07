@@ -2203,15 +2203,15 @@
   user: core
   <source>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </source>
   <dest>
     *: none
-    recording,player: "라인 인"
+    recording,archosplayer: "라인 인"
   </dest>
   <voice>
     *: none
-    recording,player: "라인 인"
+    recording,archosplayer: "라인 인"
   </voice>
 </phrase>
 <phrase>
@@ -2457,17 +2457,17 @@
   <source>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </source>
   <dest>
     *: none
     recording: "외부 마이크"
-    h100,h120,h300: "내장 마이크"
+    iriverh100,iriverh120,iriverh300: "내장 마이크"
   </dest>
   <voice>
     *: none
     recording: "외부 마이크"
-    h100,h120,h300: "내장 마이크"
+    iriverh100,iriverh120,iriverh300: "내장 마이크"
   </voice>
 </phrase>
 <phrase>
@@ -3319,7 +3319,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu alternative for jump scroll
+  desc: (archosplayer) menu alternative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
@@ -3333,7 +3333,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -3347,7 +3347,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (player) Delay before making a jump scroll
+  desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
@@ -4352,19 +4352,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 recorder
+  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
   user: core
   <source>
     *: none
-    recorder: "Battery: Top-Off Chg"
+    archosrecorder: "Battery: Top-Off Chg"
   </source>
   <dest>
     *: none
-    recorder: "배터리: Top-Off Chg"
+    archosrecorder: "배터리: Top-Off Chg"
   </dest>
   <voice>
     *: none
-    recorder: "배터리: Top-Off Chg"
+    archosrecorder: "배터리: Top-Off Chg"
   </voice>
 </phrase>
 <phrase>
@@ -4390,13 +4390,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "배터리: %d%% (%d시간 %d분)"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %d시간 %d분"
-    h10,ipodmini,ipodmini2g: "배터리: %d%% %d시간 %d분"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %d시간 %d분"
+    iriverh10,ipodmini1g,ipodmini2g: "배터리: %d%% %d시간 %d분"
   </dest>
   <voice>
     *: "배터리 레벨"
@@ -4454,19 +4454,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1 "
-    e200*,c200*,fuze*: "micro S D"
+    sansae200*,sansac200*,sansafuze*: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -4598,22 +4598,22 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
-    x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
-    gigabeatf: "A = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    iaudiox5,iaudiom5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "A = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
   </source>
   <dest>
     *: none
     rtc: "[끔]: 원상태 복구"
-    h100,h120,h300: "[정지]: 원상태 복구"
-    ipod*,c200*,sa9200: "[메뉴]: 원상태 복구"
-    x5,m5: "[녹음]: 원상태 복구"
-    h10,h10_5gb,e200*,fuze*: "[이전]: 원상태 복구"
-    gigabeatf: "[전원]: 원상태 복구"
+    iriverh100,iriverh120,iriverh300: "[정지]: 원상태 복구"
+    ipod*,sansac200*,gogearsa9200: "[메뉴]: 원상태 복구"
+    iaudiox5,iaudiom5: "[녹음]: 원상태 복구"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "[이전]: 원상태 복구"
+    gigabeatfx: "[전원]: 원상태 복구"
     mrobe100: "[화면]: 원상태 복구"
     gigabeats: "[뒤]: 원상태 복구"
   </dest>
@@ -4713,16 +4713,16 @@
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200*: "The disk is full. Press UP to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "디스크 공간이 부족합니다. [끔] 버튼을 누르세요."
-    h100,h120,h300: "디스크 공간이 부족합니다. [정지] 버튼을 누르세요."
-    m5,x5: "디스크 공간이 부족합니다. [전원] 버튼을 누르세요."
-    e200*,c200*: "디스크 공간이 부족합니다. [위] 버튼을 누르세요."
+    iriverh100,iriverh120,iriverh300: "디스크 공간이 부족합니다. [정지] 버튼을 누르세요."
+    iaudiom5,iaudiox5: "디스크 공간이 부족합니다. [전원] 버튼을 누르세요."
+    sansae200*,sansac200*: "디스크 공간이 부족합니다. [위] 버튼을 누르세요."
   </dest>
   <voice>
     *: none
@@ -4889,14 +4889,14 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
-    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "[재생]: 설정   [꺼짐]: 취소"
     ipod*: "[선택]: 설정   [메뉴]: 취소"
-    h10,h10_5gb: "[선택]: 설정   [이전]: 취소"
+    iriverh10,iriverh10_5gb: "[선택]: 설정   [이전]: 취소"
     gigabeats: "[선택]: 설정   [꺼짐]: 취소"
   </dest>
   <voice>
@@ -7400,25 +7400,25 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on recorder models
+  desc: Used on archosrecorder models
   user: core
   <source>
     *: "OFF to abort"
-    player,h100,h120,h300: "STOP to abort"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
-    x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200*: "PREV to abort"
+    iaudiox5,iaudiom5: "Long PLAY to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
     gigabeats: "BACK to abort"
-    gigabeatf: "POWER to abort"
+    gigabeatfx: "POWER to abort"
   </source>
   <dest>
     *: "[꺼짐]: 중지"
-    player,h100,h120,h300: "[정지]: 중지"
+    archosplayer,iriverh100,iriverh120,iriverh300: "[정지]: 중지"
     ipod*: "[재생/일시정지]: 중지"
-    x5,m5: "[재생 길게누름]: 중지"
-    h10,h10_5gb,e200*,c200*: "[이전]: 중지"
+    iaudiox5,iaudiom5: "[재생 길게누름]: 중지"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "[이전]: 중지"
     gigabeats: "[뒤]: 중지"
-    gigabeatf: "[전원]: 중지"
+    gigabeatfx: "[전원]: 중지"
   </dest>
   <voice>
     *: ""
@@ -8813,7 +8813,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -9985,17 +9985,17 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    h100,h120,h300: "Building database... %d found (STOP to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "음악 DB 생성 중... %d개 완료 ([꺼짐]: 돌아가기)"
-    h100,h120,h300: "음악 DB 생성 중... %d개 완료 ([정지]: 돌아가기)"
+    iriverh100,iriverh120,iriverh300: "음악 DB 생성 중... %d개 완료 ([정지]: 돌아가기)"
     ipod*: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
-    x5,m5,gigabeat*,mrobe100: "음악 DB 생성 중... %d개 완료 ([왼쪽]: 돌아가기)"
-    h10,h10_5gb,e200*,c200*,sa9200: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "음악 DB 생성 중... %d개 완료 ([왼쪽]: 돌아가기)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
   </dest>
   <voice>
     *: "음악 DB의 요소를 찾음"
@@ -10022,17 +10022,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "버튼 조명 시간"
-    fuze*,e200*: "휠 조명 시간"
+    sansafuze*,sansae200*: "휠 조명 시간"
   </dest>
   <voice>
     *: none
     button_light: "버튼 조명 시간"
-    fuze*,e200*: "휠 조명 시간"
+    sansafuze*,sansae200*: "휠 조명 시간"
   </voice>
 </phrase>
 <phrase>
@@ -10373,15 +10373,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatf: "터치패드 감도"
+    gigabeatfx: "터치패드 감도"
   </dest>
   <voice>
     *: none
-    gigabeatf: "터치패드 감도"
+    gigabeatfx: "터치패드 감도"
   </voice>
 </phrase>
 <phrase>
@@ -10587,11 +10587,11 @@
   user: core
   <source>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </source>
   <dest>
     *: "버퍼:"
-    player: "버퍼:"
+    archosplayer: "버퍼:"
   </dest>
   <voice>
     *: "버퍼 크기"
@@ -10727,15 +10727,15 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "[재생] = 예"
-    h100,h120,h300: "[네비] = 예"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "[선택] = 예"
-    player: "(재생/정지)"
+    iriverh100,iriverh120,iriverh300: "[네비] = 예"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "[선택] = 예"
+    archosplayer: "(재생/정지)"
   </dest>
   <voice>
     *: ""
@@ -10748,14 +10748,14 @@
   <source>
     *: none
     rtc: "ON = Set"
-    h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "[켬] = 설정"
-    h100,h120,h300: "[네비] = 설정"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "[선택] = 설정"
+    iriverh100,iriverh120,iriverh300: "[네비] = 설정"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "[선택] = 설정"
   </dest>
   <voice>
     *: none
@@ -10767,15 +10767,15 @@
   user: core
   <source>
     *: "Any Other = No"
-    player: none
+    archosplayer: none
   </source>
   <dest>
     *: "다른 버튼 = 아니오"
-    player: none
+    archosplayer: none
   </dest>
   <voice>
     *: ""
-    player: none
+    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -10981,15 +10981,15 @@
   user: core
   <source>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </source>
   <dest>
     *: "노래 목록의 마지막"
-    player: "목록의 마지막"
+    archosplayer: "목록의 마지막"
   </dest>
   <voice>
     *: "노래 목록의 마지막"
-    player: "목록의 마지막"
+    archosplayer: "목록의 마지막"
   </voice>
 </phrase>
 <phrase>
@@ -12071,15 +12071,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </source>
   <dest>
     *: none
-    gigabeatf: "높음"
+    gigabeatfx: "높음"
   </dest>
   <voice>
     *: none
-    gigabeatf: "높음"
+    gigabeatfx: "높음"
   </voice>
 </phrase>
 <phrase>

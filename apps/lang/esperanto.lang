@@ -850,14 +850,14 @@
 </phrase>
 <phrase>
   id: LANG_CONFIRM_WITH_PLAY_RECORDER
-  desc: Generic recorder string to use to confirm
+  desc: Generic archosrecorder string to use to confirm
   user: core
   <source>
     *: "PLAY = Yes"
   </source>
   <dest>
     *: "LEGI = Jes"
-    h100,h120,h300: "NAVI = Jes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Jes"
   </dest>
   <voice>
     *: ""
@@ -865,7 +865,7 @@
 </phrase>
 <phrase>
   id: LANG_CANCEL_WITH_ANY_RECORDER
-  desc: Generic recorder string to use to cancel
+  desc: Generic archosrecorder string to use to cancel
   user: core
   <source>
     *: "Any Other = No"
@@ -3441,7 +3441,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu altarnative for jump scroll
+  desc: (archosplayer) menu altarnative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
@@ -3455,7 +3455,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -3469,7 +3469,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (player) Delay before making a jump scroll
+  desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
@@ -4435,7 +4435,7 @@
 </phrase>
 <phrase>
   id: LANG_BUFFER_STAT_PLAYER
-  desc: the buffer size player-screen width, %d MB %d fraction of MB
+  desc: the buffer size archosplayer-screen width, %d MB %d fraction of MB
   user: core
   <source>
     *: "Buf: %d.%03dMB"
@@ -4449,7 +4449,7 @@
 </phrase>
 <phrase>
   id: LANG_BUFFER_STAT_RECORDER
-  desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+  desc: the buffer size archosrecorder-screen width, %d MB %d fraction of MB
   user: core
   <source>
     *: "Buffer: %d.%03dMB"
@@ -4764,7 +4764,7 @@
   </source>
   <dest>
     *: "LEGI = Elekti"
-    h100,h120,h300: "NAVI = Elekti"
+    iriverh100,iriverh120,iriverh300: "NAVI = Elekti"
   </dest>
   <voice>
     *: ""
@@ -4779,7 +4779,7 @@
   </source>
   <dest>
     *: "ON+LEGI = Elpreni"
-    h100,h120,h300: "ON+NAVI = Elpreni"
+    iriverh100,iriverh120,iriverh300: "ON+NAVI = Elpreni"
   </dest>
   <voice>
     *: ""
@@ -7839,7 +7839,7 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on recorder models
+  desc: Used on archosrecorder models
   user: core
   <source>
     *: "OFF to abort"
@@ -7853,7 +7853,7 @@
 </phrase>
 <phrase>
   id: LANG_STOP_ABORT
-  desc: Used on player models
+  desc: Used on archosplayer models
   user: core
   <source>
     *: "STOP to abort"

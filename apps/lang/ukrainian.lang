@@ -261,15 +261,15 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "ВIДТВОР. = Так"
-    h100,h120,h300: "НАВIГ. = Так"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "ВИБIР = Так"
-    player: "(ВIДТВОР./СТОП)"
+    iriverh100,iriverh120,iriverh300: "НАВIГ. = Так"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "ВИБIР = Так"
+    archosplayer: "(ВIДТВОР./СТОП)"
   </dest>
   <voice>
     *: ""
@@ -281,15 +281,15 @@
   user: core
   <source>
     *: "Any Other = No"
-    player: none
+    archosplayer: none
   </source>
   <dest>
     *: "Будь-яка Iнша Кнопка = Нi"
-    player: none
+    archosplayer: none
   </dest>
   <voice>
     *: ""
-    player: none
+    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -2382,19 +2382,19 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    h100,h120,h300: "Building database... %d found (STOP to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
-    sa9200: "Building database... %d found (REW to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Створення Бази Даних ... %d знайдено (ВИМК. для вiдмiни)"
-    h100,h120,h300: "Створення Бази Даних... %d знайдено (СТОП для вiдмiни)"
+    iriverh100,iriverh120,iriverh300: "Створення Бази Даних... %d знайдено (СТОП для вiдмiни)"
     ipod*: "Створення Бази Даних... %d знайдено (ПОПЕРЕД. для вiдмiни)"
-    x5,m5,gigabeat*,mrobe100: "Створення Бази Даних... %d знайдено (ЛIВО для вiдмiни)"
-    h10,h10_5gb,e200*,c200*,fuze*: "Створення Бази Даних... %d знайдено (ПОПЕРЕД. для вiдмiни)"
-    sa9200: "Створення Бази Даних... %d знайденр (ПЕРЕМ. для вiдмiни)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Створення Бази Даних... %d знайдено (ЛIВО для вiдмiни)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Створення Бази Даних... %d знайдено (ПОПЕРЕД. для вiдмiни)"
+    gogearsa9200: "Створення Бази Даних... %d знайденр (ПЕРЕМ. для вiдмiни)"
   </dest>
   <voice>
     *: "Знайдено записiв в базi даних"
@@ -3194,7 +3194,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu alternative for jump scroll
+  desc: (archosplayer) menu alternative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
@@ -3208,7 +3208,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -3222,7 +3222,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (player) Delay before making a jump scroll
+  desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
@@ -3854,17 +3854,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Таймаут Пiдсвiтки Кнопок"
-    fuze*,e200*: "Таймаут Пiдсвiтки Колеса"
+    sansafuze*,sansae200*: "Таймаут Пiдсвiтки Колеса"
   </dest>
   <voice>
     *: none
     button_light: "Таймаут Пiдсвiтки Кнопок"
-    fuze*,e200*: "Таймаут Пiдсвiтки Колеса"
+    sansafuze*,sansae200*: "Таймаут Пiдсвiтки Колеса"
   </voice>
 </phrase>
 <phrase>
@@ -4145,20 +4145,20 @@
   <source>
     *: none
     rtc: "ON = Set"
-    h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
-    sa9200: "PLAY = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
+    gogearsa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ВВIМК. = Встановити"
-    h100,h120,h300: "НАВIГ. = Встановити"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "ВИБIР = Встановити"
-    sa9200: "ПРОГРАВ. = Встановити"
+    iriverh100,iriverh120,iriverh300: "НАВIГ. = Встановити"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "ВИБIР = Встановити"
+    gogearsa9200: "ПРОГРАВ. = Встановити"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200*,c200*,gigabeat*,mrobe100,sa9200: ""
+    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4168,30 +4168,30 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    h100,h120,h300: "STOP = Revert"
-    ipod*,c200*: "MENU = Revert"
-    x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
-    gigabeatf: "POWER = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*: "MENU = Revert"
+    iaudiox5,iaudiom5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
-    sa9200: "LEFT = Revert"
+    gogearsa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "ВИМК. = Вiдмiнити"
-    h100,h120,h300: "СТОП = Вiдмiнити"
-    ipod*,c200*: "МЕНЮ = Вiдмiнити"
-    x5,m5: "ЗАПИС = Вiдмiнити"
-    h10,h10_5gb,e200*,fuze*: "ПОПЕРЕД. = Вiдмiнити"
-    gigabeatf: "ЖИВЛЕННЯ = Вiдмiнити"
+    iriverh100,iriverh120,iriverh300: "СТОП = Вiдмiнити"
+    ipod*,sansac200*: "МЕНЮ = Вiдмiнити"
+    iaudiox5,iaudiom5: "ЗАПИС = Вiдмiнити"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "ПОПЕРЕД. = Вiдмiнити"
+    gigabeatfx: "ЖИВЛЕННЯ = Вiдмiнити"
     mrobe100: "ДИСПЛЕЙ = Вiдмiнити"
     gigabeats: "НАЗАД = Вiдмiнити"
-    sa9200: "ВЛIВО = Вiдмiнити"
+    gogearsa9200: "ВЛIВО = Вiдмiнити"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200*,c200*,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
+    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4714,14 +4714,14 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
-    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "ВIДТВОР.=Встановити ВИМК.=Вiдмiнити"
     ipod*: "ВИБIР=Встановити МЕНЮ=Вiдмiнити"
-    h10,h10_5gb: "ВИБIР=Встановити ПОПЕРЕД.=Вiдмiнити"
+    iriverh10,iriverh10_5gb: "ВИБIР=Встановити ПОПЕРЕД.=Вiдмiнити"
     gigabeats: "ВИБIР=Встановити ЖИВЛ.=Вiдмiнити"
   </dest>
   <voice>
@@ -5896,17 +5896,17 @@
   <source>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </source>
   <dest>
     *: none
     recording: "Мiкрофон"
-    h100,h120,h300: "Вбудований Мiкрофон"
+    iriverh100,iriverh120,iriverh300: "Вбудований Мiкрофон"
   </dest>
   <voice>
     *: none
     recording: "Мiкрофон"
-    h100,h120,h300: "Вбудований Мiкрофон"
+    iriverh100,iriverh120,iriverh300: "Вбудований Мiкрофон"
   </voice>
 </phrase>
 <phrase>
@@ -5932,15 +5932,15 @@
   user: core
   <source>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </source>
   <dest>
     *: none
-    recording,player: "Лiнiйний Вхiд"
+    recording,archosplayer: "Лiнiйний Вхiд"
   </dest>
   <voice>
     *: none
-    recording,player: "Лiнiйний Вхiд"
+    recording,archosplayer: "Лiнiйний Вхiд"
   </voice>
 </phrase>
 <phrase>
@@ -6870,11 +6870,11 @@
   user: core
   <source>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </source>
   <dest>
     *: "Буфер:"
-    player: "Буф:"
+    archosplayer: "Буф:"
   </dest>
   <voice>
     *: "Розмiр буферу"
@@ -6886,13 +6886,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Акумулятор: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Рiвень Заряду Акумулятору"
@@ -6950,19 +6950,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "microSD:"
+    sansae200*,sansac200*,sansafuze*: "microSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    e200*,c200*,fuze*: "micro S D"
+    sansae200*,sansac200*,sansafuze*: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -8074,11 +8074,11 @@
   user: core
   <source>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </source>
   <dest>
     *: "Кiнець Списку Пiсень"
-    player: "Кiнець Списку"
+    archosplayer: "Кiнець Списку"
   </dest>
   <voice>
     *: "Кiнець Списку Пiсень"
@@ -8323,20 +8323,20 @@
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200*: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Диск повний. Натичнiть OFF для продовження."
-    h100,h120,h300: "Диск повний. Натичнiть STOP для продовження."
-    m5,x5: "Диск повний. Натичнiть POWER для продовження."
-    e200*,c200*: "Диск повний. Натичнiть PREV для продовження."
+    iriverh100,iriverh120,iriverh300: "Диск повний. Натичнiть STOP для продовження."
+    iaudiom5,iaudiox5: "Диск повний. Натичнiть POWER для продовження."
+    sansae200*,sansac200*: "Диск повний. Натичнiть PREV для продовження."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8420,25 +8420,25 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on recorder models
+  desc: Used on archosrecorder models
   user: core
   <source>
     *: "OFF to abort"
-    player,h100,h120,h300: "STOP to abort"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
-    x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200*: "PREV to abort"
+    iaudiox5,iaudiom5: "Long PLAY to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
     gigabeats: "BACK to abort"
-    gigabeatf: "POWER to abort"
+    gigabeatfx: "POWER to abort"
   </source>
   <dest>
     *: "OFF для вiдмiни"
-    player,h100,h120,h300: "STOP для вiдмiни"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP для вiдмiни"
     ipod*: "PLAY/PAUSE для вiдмiни"
-    x5,m5: "Довге натискання PLAY для вiдмiни"
-    h10,h10_5gb,e200*,c200*: "PREV для вiдмiни"
+    iaudiox5,iaudiom5: "Довге натискання PLAY для вiдмiни"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV для вiдмiни"
     gigabeats: "BACK для вiдмiни"
-    gigabeatf: "POWER для вiдмiни"
+    gigabeatfx: "POWER для вiдмiни"
   </dest>
   <voice>
     *: ""
@@ -8662,19 +8662,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 recorder
+  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
   user: core
   <source>
     *: none
-    recorder: "Battery: Top-Off Chg"
+    archosrecorder: "Battery: Top-Off Chg"
   </source>
   <dest>
     *: none
-    recorder: "Акумулятор: Більше Можливого"
+    archosrecorder: "Акумулятор: Більше Можливого"
   </dest>
   <voice>
     *: none
-    recorder: "Акумулятор: Більше Можливого"
+    archosrecorder: "Акумулятор: Більше Можливого"
   </voice>
 </phrase>
 <phrase>
@@ -10491,7 +10491,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -11702,15 +11702,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatf: "Чутливiсть Тачпаду"
+    gigabeatfx: "Чутливiсть Тачпаду"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Чутливiсть Тачпаду"
+    gigabeatfx: "Чутливiсть Тачпаду"
   </voice>
 </phrase>
 <phrase>
@@ -11719,15 +11719,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </source>
   <dest>
     *: none
-    gigabeatf: "Висока"
+    gigabeatfx: "Висока"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Висока"
+    gigabeatfx: "Висока"
   </voice>
 </phrase>
 <phrase>

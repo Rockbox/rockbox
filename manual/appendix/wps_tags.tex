@@ -112,7 +112,7 @@ produce the information for the next file to be played.
 \begin{table}
   \begin{tagmap}{}{}
     \config{\%pb} & Progress Bar\\
-    \opt{player}{
+    \opt{archosplayer}{
           & This will display a one character ``cup''
             that empties as the time progresses.}
     \opt{lcd_bitmap}{
@@ -120,13 +120,13 @@ produce the information for the next file to be played.
          & You can set the position, width and height of the progressbar %
            (in pixels) and load a custom image for it: %
            \config{\%pb{\textbar}image.bmp{\textbar}x{\textbar}y{\textbar}width{\textbar}height{\textbar}}} \\
-    \opt{player}{%
+    \opt{archosplayer}{%
     \config{\%pf} & Full-line progress bar \& time display\\
     }%
     \config{\%px} & Percentage Played In Song\\
     \config{\%pc} & Current Time In Song\\
     \config{\%pe} & Total Number of Playlist Entries\\
-    \nopt{player}{%
+    \nopt{archosplayer}{%
     \config{\%pm} & Peak Meter. The entire line is used as %
                     volume peak meter.\\%
     }%
@@ -202,7 +202,7 @@ produce the information for the next file to be played.
 \begin{table}
   \begin{tagmap}{}{}
     \config{\%mm} & Repeat mode, 0-4, in the order: Off, All, One, Shuffle
-           \opt{player,recorder,recorderv2fm}{, A-B}\\
+           \opt{archosplayer,archosrecorder,archosrecorderv2fm}{, A-B}\\
   \end{tagmap}
 \end{table}
 Example: \config{\%?mm{\textless}Off{\textbar}All{\textbar}One{\textbar}Shuffle%
@@ -422,9 +422,9 @@ used as a conditional. This can be very useful for designing a WPS that works on
 multiple targets, some with and some without a clock. By using this tag as a
 conditional it is possible to display current date and time on those targets that
 support this
-\opt{rtc}{ (like the \playertype)},
+\opt{rtc}{ (like the \archosplayertype)},
 or alternate information on those that do not
-\nopt{rtc}{ (like the \playertype)}%
+\nopt{rtc}{ (like the \archosplayertype)}%
 .
 
 Example:

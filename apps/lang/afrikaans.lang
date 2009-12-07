@@ -970,7 +970,7 @@
 </phrase>
 <phrase>
   id: LANG_BUFFER_STAT_PLAYER
-  desc: the buffer size player-screen width, %d MB %d fraction of MB
+  desc: the buffer size archosplayer-screen width, %d MB %d fraction of MB
   user: core
   <source>
     *: "Buf: %d.%02dMB"
@@ -984,7 +984,7 @@
 </phrase>
 <phrase>
   id: LANG_BUFFER_STAT_RECORDER
-  desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+  desc: the buffer size archosrecorder-screen width, %d MB %d fraction of MB
   user: core
   <source>
     *: "Buffer: %d.%02dMB"
