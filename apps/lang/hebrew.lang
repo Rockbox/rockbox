@@ -6901,12 +6901,12 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "סוללה: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "סולל: %d%% %dh %dm"
   </dest>
   <voice>
@@ -6966,19 +6966,19 @@
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*: "mSD:"
-    ondio*: "MMC:"
+    archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*: "MSD:"
-    ondio*: "MMC:"
+    archosondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
     sansae200*,sansac200*,sansafuze*: "micro S D"
-    ondio*: "M M C"
+    archosondio*: "M M C"
   </voice>
 </phrase>
 <phrase>
@@ -8394,15 +8394,15 @@
   user: core
   <source>
     *: none
-    ondio*: "Please remove inserted MMC"
+    archosondio*: "Please remove inserted MMC"
   </source>
   <dest>
     *: none
-    ondio*: "MMC אנא הסר כרטיס"
+    archosondio*: "MMC אנא הסר כרטיס"
   </dest>
   <voice>
     *: none
-    ondio*: "אנא הסר כרטיס מולטימדיה"
+    archosondio*: "אנא הסר כרטיס מולטימדיה"
   </voice>
 </phrase>
 <phrase>

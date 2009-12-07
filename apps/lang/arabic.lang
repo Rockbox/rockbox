@@ -5626,15 +5626,15 @@
   user: core
   <source>
     *: none
-    ondio*: "Please remove inserted MMC"
+    archosondio*: "Please remove inserted MMC"
   </source>
   <dest>
     *: none
-    ondio*: "من فضلك أخرج كارت الـMMC المدخل"
+    archosondio*: "من فضلك أخرج كارت الـMMC المدخل"
   </dest>
   <voice>
     *: none
-    ondio*: "Please remove multimedia card"
+    archosondio*: "Please remove multimedia card"
   </voice>
 </phrase>
 <phrase>

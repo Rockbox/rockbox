@@ -4083,15 +4083,15 @@
   user: core
   <source>
     *: none
-    ondio*: "Please remove inserted MMC"
+    archosondio*: "Please remove inserted MMC"
   </source>
   <dest>
     *: none
-    ondio*: "ैूनिकालो MMC"
+    archosondio*: "ैूनिकालो MMC"
   </dest>
   <voice>
     *: none
-    ondio*: "multimedia card ैूनिकालो"
+    archosondio*: "multimedia card ैूनिकालो"
   </voice>
 </phrase>
 <phrase>

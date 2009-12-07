@@ -2641,17 +2641,17 @@
   <source>
     *: none
     sansae200,sansac200*: "mSD:"
-    ondio*: "MMC:"
+    archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     sansae200,sansac200*: "MSD:"
-    ondio*: "MMC:"
+    archosondio*: "MMC:"
   </dest>
   <voice>
     *: none
     sansae200,sansac200*: "micro S D"
-    ondio*: "M M C"
+    archosondio*: "M M C"
   </voice>
 </phrase>
 <phrase>

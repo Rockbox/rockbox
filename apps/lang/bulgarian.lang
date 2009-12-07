@@ -1280,17 +1280,17 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Батерия: %d%% %dч %dмин"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dч %dмин"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dч %dмин"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dч %dмин"
   </dest>
   <voice>
     *: ""
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: ""
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: ""
     iriverh10,ipodmini1g,ipodmini2g: ""
   </voice>
 </phrase>
@@ -4863,15 +4863,15 @@
   user: core
   <source>
     *: none
-    ondio*: "Please remove inserted MMC"
+    archosondio*: "Please remove inserted MMC"
   </source>
   <dest>
     *: none
-    ondio*: "Моля извадете MMC картата"
+    archosondio*: "Моля извадете MMC картата"
   </dest>
   <voice>
     *: ""
-    ondio*: "Please remove multimedia card"
+    archosondio*: "Please remove multimedia card"
   </voice>
 </phrase>
 <phrase>
@@ -8845,17 +8845,17 @@
   <source>
     *: none
     sansae200*,sansac200*,sansafuze*: "mSD:"
-    ondio*: "MMC:"
+    archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     sansae200*,sansac200*,sansafuze*: "MSD:"
-    ondio*: "MMC:"
+    archosondio*: "MMC:"
   </dest>
   <voice>
     *: ""
     sansae200*,sansac200*,sansafuze*: "micro S D"
-    ondio*: "M M C"
+    archosondio*: "M M C"
   </voice>
 </phrase>
 <phrase>

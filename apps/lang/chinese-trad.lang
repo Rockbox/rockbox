@@ -156,15 +156,15 @@
   user: core
   <source>
     *: none
-    ondio*: "Please remove inserted MMC"
+    archosondio*: "Please remove inserted MMC"
   </source>
   <dest>
     *: none
-    ondio*: "請移除插入的MMC卡"
+    archosondio*: "請移除插入的MMC卡"
   </dest>
   <voice>
     *: "Please remove multimedia card"
-    ondio*: "Please remove multimedia card"
+    archosondio*: "Please remove multimedia card"
   </voice>
 </phrase>
 <phrase>
@@ -4378,7 +4378,7 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
@@ -4388,7 +4388,7 @@
   </dest>
   <voice>
     *: "Battery level"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: ""
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: ""
     iriverh10,ipodmini1g,ipodmini2g: ""
   </voice>
 </phrase>
@@ -4445,19 +4445,19 @@
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*: "mSD:"
-    ondio*: "MMC:"
+    archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "磁盤1"
     sansae200*,sansac200*,sansafuze*: "Multimedia 卡:"
-    ondio*: "MMC卡:"
+    archosondio*: "MMC卡:"
   </dest>
   <voice>
     *: none
     multivolume: "磁盤1"
     sansae200*,sansac200*,sansafuze*: "Multimedia 卡"
-    ondio*: "mmc卡"
+    archosondio*: "mmc卡"
   </voice>
 </phrase>
 <phrase>
