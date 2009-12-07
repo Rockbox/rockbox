@@ -3854,15 +3854,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </source>
   <dest>
     *: none
-    gigabeatf: "عالى"
+    gigabeatfx: "عالى"
   </dest>
   <voice>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </voice>
 </phrase>
 <phrase>
@@ -4289,19 +4289,19 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    h100,h120,h300: "Building database... %d found (STOP to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
-    sa9200: "Building database... %d found (REW to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "جاري بناء قاعدة البيانات...  عثر على d% (إيقاف للعودة)"
-    h100,h120,h300: "جاري بناء قاعدة البيانات...  عثر على d% (إيقاف للعودة)"
+    iriverh100,iriverh120,iriverh300: "جاري بناء قاعدة البيانات...  عثر على d% (إيقاف للعودة)"
     ipod*: "جاري بناء قاعدة البيانات...  عثر على d% (السابق للعودة)"
-    x5,m5,gigabeat*,mrobe100: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
-    h10,h10_5gb,e200*,c200*,fuze*: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
-    sa9200: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
+    gogearsa9200: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
   </dest>
   <voice>
     *: "المدخلات التي عثر عليها لفاعدة البيانات"
@@ -4676,7 +4676,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4837,15 +4837,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatf: "حساسية اللمس"
+    gigabeatfx: "حساسية اللمس"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </voice>
 </phrase>
 <phrase>
@@ -5447,16 +5447,16 @@
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200*: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "القرص مملوء. اضغط إيقاف للاستمرار."
-    h100,h120,h300: "القرص مملوء. اضغط إيقاف للاستمرار."
-    m5,x5: "القرص مملوء. اضغط زر التشغيل للاستمرار."
-    e200*,c200*: "القرص مملوء. اضغط السابق للاستمرار."
+    iriverh100,iriverh120,iriverh300: "القرص مملوء. اضغط إيقاف للاستمرار."
+    iaudiom5,iaudiox5: "القرص مملوء. اضغط زر التشغيل للاستمرار."
+    sansae200*,sansac200*: "القرص مملوء. اضغط السابق للاستمرار."
   </dest>
   <voice>
     *: none
@@ -6067,7 +6067,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -6252,17 +6252,17 @@
   <source>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </source>
   <dest>
     *: none
     recording: "ميكروفون"
-    h100,h120,h300: "ميكروفون داخلي"
+    iriverh100,iriverh120,iriverh300: "ميكروفون داخلي"
   </dest>
   <voice>
     *: none
     recording: "ميكروفون"
-    h100,h120,h300: "ميكروفون داخلي"
+    iriverh100,iriverh120,iriverh300: "ميكروفون داخلي"
   </voice>
 </phrase>
 <phrase>
@@ -6902,15 +6902,15 @@
   user: core
   <source>
     *: "Any Other = No"
-    player: none
+    archosplayer: none
   </source>
   <dest>
     *: "أي آخر = لا"
-    player: none
+    archosplayer: none
   </dest>
   <voice>
     *: ""
-    player: none
+    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -7006,11 +7006,11 @@
   user: core
   <source>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </source>
   <dest>
     *: "نهاية القائمة"
-    player: "نهاية القائمة الاغنية"
+    archosplayer: "نهاية القائمة الاغنية"
   </dest>
   <voice>
     *: "نهاية القائمة الاغنية"
@@ -7552,26 +7552,26 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    h100,h120,h300: "STOP = Revert"
-    ipod*,c200*: "MENU = Revert"
-    x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
-    gigabeatf: "POWER = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*: "MENU = Revert"
+    iaudiox5,iaudiom5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
-    sa9200: "LEFT = Revert"
+    gogearsa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = Revert"
-    h100,h120,h300: "عرض = إاغاء الأمر"
-    ipod*,c200*: "قائمة = إاغاء الأمر"
-    x5,m5: "سجل = إاغاء الأمر"
-    h10,h10_5gb,e200*,fuze*: "السابق = إاغاء الأمر"
-    gigabeatf: "طاقة = إاغاء الأمر"
+    iriverh100,iriverh120,iriverh300: "عرض = إاغاء الأمر"
+    ipod*,sansac200*: "قائمة = إاغاء الأمر"
+    iaudiox5,iaudiom5: "سجل = إاغاء الأمر"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "السابق = إاغاء الأمر"
+    gigabeatfx: "طاقة = إاغاء الأمر"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "خلف = إاغاء الأمر"
-    sa9200: "يسار = إاغاء الأمر"
+    gogearsa9200: "يسار = إاغاء الأمر"
   </dest>
   <voice>
     *: none

@@ -1,6 +1,6 @@
-% Id: %
-\def\UseOption{clip}
-\edef\UseOption{\UseOption,SANSA_CLIP_PAD}
+% $Id$ %
+\def\UseOption{fuze}
+\edef\UseOption{\UseOption,SANSA_FUZE_PAD}
 \edef\UseOption{\UseOption,HAVE_BACKLIGHT}
 \edef\UseOption{\UseOption,HAVE_CAR_ADAPTER_MODE}
 \edef\UseOption{\UseOption,HAVE_BUTTON_LIGHTS}
@@ -8,18 +8,18 @@
 \edef\UseOption{\UseOption,HAVE_RB_BL_IN_FLASH}
 
 \newcommand{\playerman}{Sansa}
-\newcommand{\playertype}{Clip}
+\newcommand{\playertype}{Fuze}
 \newcommand{\playerlongtype}{\playertype}
-\newcommand{\genericimg}{128x64x1-clip}
-\newcommand{\specimg}{clip}
+\newcommand{\genericimg}{220x176x16}
+\newcommand{\specimg}{fuze}
 %Used to name the player, e.g. ...to the \dap
 \newcommand{\dap}{player}
-%For use when referring to the player. E.g. the \daps\ capacity...
+%For use when referring to the player. E.g. the \daps\ capacity ...
 \newcommand{\daps}{player's}
 \newcommand{\firmwarefilename}{\fname{rockbox.sansa}}
 \newcommand{\firmwareextension}{\fname{sansa}}
-\newcommand{\screenshotsize}{3cm}
+\newcommand{\screenshotsize}{4cm}
 \newcommand{\disk}{flash storage}
 
 % link external keymap file
-\input{platform/keymap-clip.tex}
+\input{platform/keymap-sansafuze.tex}

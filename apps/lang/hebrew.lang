@@ -269,18 +269,18 @@
   <source>
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
-    h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
-    player: "(PLAY/STOP)"
+    archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "כן = PLAY"
     cowond2*: "או פינה ימנית-עליונה = כן MENU"
-    h100,h120,h300: "כן = NAVI"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "כן = SELECT"
+    iriverh100,iriverh120,iriverh300: "כן = NAVI"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "כן = SELECT"
     mrobe500: "או פינה ימנית-עליונה = כן Power, Play"
-    player: "(PLAY/STOP)"
+    archosplayer: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
@@ -292,15 +292,15 @@
   user: core
   <source>
     *: "Any Other = No"
-    player: none
+    archosplayer: none
   </source>
   <dest>
     *: "כל כפתור אחר = לא"
-    player: none
+    archosplayer: none
   </dest>
   <voice>
     *: ""
-    player: none
+    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -2393,19 +2393,19 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    h100,h120,h300: "Building database... %d found (STOP to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
-    sa9200: "Building database... %d found (REW to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "בונה מסד נתונים... %d נמצאו (OFF כדי לחזור)"
-    h100,h120,h300: "בונה מסד נתונים... %d נמצאו (STOP כדי לחזור)"
+    iriverh100,iriverh120,iriverh300: "בונה מסד נתונים... %d נמצאו (STOP כדי לחזור)"
     ipod*: "בונה מסד נתונים... %d נמצאו (PREV כדי לחזור)"
-    x5,m5,gigabeat*,mrobe100: "בונה מסד נתונים... %d נמצאו (LEFT כדי לחזור)"
-    h10,h10_5gb,e200*,c200*,fuze*: "בונה מסד נתונים... %d נמצאו (PREV כדי לחזור)"
-    sa9200: "בונה מסד נתונים... %d נמצאו (REW כדי לחזור)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "בונה מסד נתונים... %d נמצאו (LEFT כדי לחזור)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "בונה מסד נתונים... %d נמצאו (PREV כדי לחזור)"
+    gogearsa9200: "בונה מסד נתונים... %d נמצאו (REW כדי לחזור)"
   </dest>
   <voice>
     *: "רשומות נמצאו עבור מסד הנתונים"
@@ -3205,7 +3205,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu alternative for jump scroll
+  desc: (archosplayer) menu alternative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
@@ -3219,7 +3219,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -3233,7 +3233,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (player) Delay before making a jump scroll
+  desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
@@ -3865,17 +3865,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "זמן תאורת כפתורים"
-    fuze*,e200*: "זמן תאורת גלגל"
+    sansafuze*,sansae200*: "זמן תאורת גלגל"
   </dest>
   <voice>
     *: none
     button_light: "זמן תאורת כפתורים"
-    fuze*,e200*: "זמן תאורת גלגל"
+    sansafuze*,sansae200*: "זמן תאורת גלגל"
   </voice>
 </phrase>
 <phrase>
@@ -4157,21 +4157,21 @@
     *: none
     rtc: "ON = Set"
     mrobe500: "HEART = Set"
-    h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
-    sa9200: "PLAY = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
+    gogearsa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "קבע = ON"
     mrobe500: "קבע = HEART"
-    h100,h120,h300: "קבע = NAVI"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "קבע = SELECT"
-    sa9200: "קבע = PLAY"
+    iriverh100,iriverh120,iriverh300: "קבע = NAVI"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "קבע = SELECT"
+    gogearsa9200: "קבע = PLAY"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200*,c200*,gigabeat*,mrobe100,sa9200: ""
+    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4182,31 +4182,31 @@
     *: none
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
-    h100,h120,h300: "STOP = Revert"
-    ipod*,c200*: "MENU = Revert"
-    x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
-    gigabeatf: "POWER = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*: "MENU = Revert"
+    iaudiox5,iaudiom5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
-    sa9200: "LEFT = Revert"
+    gogearsa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "החזר = OFF"
     mrobe500: "החזר = POWER"
-    h100,h120,h300: "החזר = STOP"
-    ipod*,c200*: "החזר = MENU"
-    x5,m5: "החזר = RECORD"
-    h10,h10_5gb,e200*,fuze*: "החזר = PREV"
-    gigabeatf: "החזר = POWER"
+    iriverh100,iriverh120,iriverh300: "החזר = STOP"
+    ipod*,sansac200*: "החזר = MENU"
+    iaudiox5,iaudiom5: "החזר = RECORD"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "החזר = PREV"
+    gigabeatfx: "החזר = POWER"
     mrobe100: "החזר = DISPLAY"
     gigabeats: "החזר = BACK"
-    sa9200: "החזר = LEFT"
+    gogearsa9200: "החזר = LEFT"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200*,c200*,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
+    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4729,14 +4729,14 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
-    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "ביטול=OFF קבע=PLAY"
     ipod*: "ביטול=MENU קבע=SELECT"
-    h10,h10_5gb: "ביטול=PREV קבע=SELECT"
+    iriverh10,iriverh10_5gb: "ביטול=PREV קבע=SELECT"
     gigabeats: "ביטול=POWER קבע=SELECT"
   </dest>
   <voice>
@@ -5911,17 +5911,17 @@
   <source>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </source>
   <dest>
     *: none
     recording: "מיקרופון"
-    h100,h120,h300: "מיקרופון פנימי"
+    iriverh100,iriverh120,iriverh300: "מיקרופון פנימי"
   </dest>
   <voice>
     *: none
     recording: "מיקרופון"
-    h100,h120,h300: "מיקרופון פנימי"
+    iriverh100,iriverh120,iriverh300: "מיקרופון פנימי"
   </voice>
 </phrase>
 <phrase>
@@ -5947,15 +5947,15 @@
   user: core
   <source>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </source>
   <dest>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </dest>
   <voice>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </voice>
 </phrase>
 <phrase>
@@ -6885,11 +6885,11 @@
   user: core
   <source>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </source>
   <dest>
     *: "חוצץ:"
-    player: "חצץ:"
+    archosplayer: "חצץ:"
   </dest>
   <voice>
     *: "גודל חוצץ"
@@ -6901,13 +6901,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "סוללה: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "סולל: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "סולל: %d%% %dh %dm"
   </dest>
   <voice>
     *: "רמת סוללה"
@@ -6965,19 +6965,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "MSD:"
+    sansae200*,sansac200*,sansafuze*: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    e200*,c200*,fuze*: "micro S D"
+    sansae200*,sansac200*,sansafuze*: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -8089,11 +8089,11 @@
   user: core
   <source>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </source>
   <dest>
     *: "סוף רשימת השירים"
-    player: "סוף הרשימה"
+    archosplayer: "סוף הרשימה"
   </dest>
   <voice>
     *: "סוף רשימת השירים"
@@ -8338,20 +8338,20 @@
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200*: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "הכונן מלא. לחץ על OFF כדי להמשיך"
-    h100,h120,h300: "הכונן מלא. לחץ על STOP כדי להמשיך"
-    m5,x5: "הכונן מלא. לחץ על POWER כדי להמשיך"
-    e200*,c200*: "הכונן מלא. לחץ על PREV כדי להמשיך"
+    iriverh100,iriverh120,iriverh300: "הכונן מלא. לחץ על STOP כדי להמשיך"
+    iaudiom5,iaudiox5: "הכונן מלא. לחץ על POWER כדי להמשיך"
+    sansae200*,sansac200*: "הכונן מלא. לחץ על PREV כדי להמשיך"
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8435,25 +8435,25 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on recorder models
+  desc: Used on archosrecorder models
   user: core
   <source>
     *: "OFF to abort"
-    player,h100,h120,h300: "STOP to abort"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
-    x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200*: "PREV to abort"
+    iaudiox5,iaudiom5: "Long PLAY to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
     gigabeats: "BACK to abort"
-    gigabeatf: "POWER to abort"
+    gigabeatfx: "POWER to abort"
   </source>
   <dest>
     *: "כדי לבטל OFF"
-    player,h100,h120,h300: "כדי לבטל STOP"
+    archosplayer,iriverh100,iriverh120,iriverh300: "כדי לבטל STOP"
     ipod*: "כדי לבטל PLAY/PAUSE"
-    x5,m5: "PLAY ארוך כדי לבטל"
-    h10,h10_5gb,e200*,c200*: "כדי לבטל PREV"
+    iaudiox5,iaudiom5: "PLAY ארוך כדי לבטל"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "כדי לבטל PREV"
     gigabeats: "כדי לבטל BACK"
-    gigabeatf: "כדי לבטל POWER"
+    gigabeatfx: "כדי לבטל POWER"
   </dest>
   <voice>
     *: ""
@@ -8677,19 +8677,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 recorder
+  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
   user: core
   <source>
     *: none
-    recorder: "Battery: Top-Off Chg"
+    archosrecorder: "Battery: Top-Off Chg"
   </source>
   <dest>
     *: none
-    recorder: "סוללה: Top-Off Chg"
+    archosrecorder: "סוללה: Top-Off Chg"
   </dest>
   <voice>
     *: none
-    recorder: "Top off charge"
+    archosrecorder: "Top off charge"
   </voice>
 </phrase>
 <phrase>
@@ -10506,7 +10506,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -11717,15 +11717,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatf: "רגישות משטח מגע"
+    gigabeatfx: "רגישות משטח מגע"
   </dest>
   <voice>
     *: none
-    gigabeatf: "רגישות משטח מגע"
+    gigabeatfx: "רגישות משטח מגע"
   </voice>
 </phrase>
 <phrase>
@@ -11734,15 +11734,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </source>
   <dest>
     *: none
-    gigabeatf: "גבוה"
+    gigabeatfx: "גבוה"
   </dest>
   <voice>
     *: none
-    gigabeatf: "גבוה"
+    gigabeatfx: "גבוה"
   </voice>
 </phrase>
 <phrase>

@@ -82,14 +82,14 @@ ipod4g.c: bootloader-ipod4g.ipod ipod2c
 ipodcolor.c: bootloader-ipodcolor.ipod ipod2c
 	./ipod2c bootloader-ipodcolor.ipod ipodcolor
 
-ipodmini.c: bootloader-ipodmini.ipod ipod2c
-	./ipod2c bootloader-ipodmini.ipod ipodmini
+ipodmini1g.c: bootloader-ipodmini1g.ipod ipod2c
+	./ipod2c bootloader-ipodmini1g.ipod ipodmini1g
 
 ipodmini2g.c: bootloader-ipodmini2g.ipod ipod2c
 	./ipod2c bootloader-ipodmini2g.ipod ipodmini2g
 
-ipodnano.c: bootloader-ipodnano.ipod ipod2c
-	./ipod2c bootloader-ipodnano.ipod ipodnano
+ipodnano1g.c: bootloader-ipodnano1g.ipod ipod2c
+	./ipod2c bootloader-ipodnano1g.ipod ipodnano1g
 
 ipodvideo.c: bootloader-ipodvideo.ipod ipod2c
 	./ipod2c bootloader-ipodvideo.ipod ipodvideo

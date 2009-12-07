@@ -759,17 +759,17 @@
   <source>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </source>
   <dest>
     *: none
     recording: "Microfon"
-    h100,h120,h300: "Microfon intern"
+    iriverh100,iriverh120,iriverh300: "Microfon intern"
   </dest>
   <voice>
     *: none
     recording: "Microfon"
-    h100,h120,h300: "Microfon intern"
+    iriverh100,iriverh120,iriverh300: "Microfon intern"
   </voice>
 </phrase>
 <phrase>
@@ -1411,19 +1411,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 recorder
+  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
   user: core
   <source>
     *: none
-    recorder: "Battery: Top-Off Chg"
+    archosrecorder: "Battery: Top-Off Chg"
   </source>
   <dest>
     *: none
-    recorder: "Nivel maxim de incarcare"
+    archosrecorder: "Nivel maxim de incarcare"
   </dest>
   <voice>
     *: none
-    recorder: ""
+    archosrecorder: ""
   </voice>
 </phrase>
 <phrase>
@@ -1449,13 +1449,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Baterie: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Bat: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Bat: %d%% %dh %dm"
   </dest>
   <voice>
     *: ""
@@ -1516,22 +1516,22 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
-    x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
-    gigabeatf: "POWER = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    iaudiox5,iaudiom5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF pentru anulare"
-    h100,h120,h300: "STOP pentru anulare"
-    ipod*,c200*,sa9200: "MENU pentru anulare"
-    x5,m5: "RECORD pentru anulare"
-    h10,h10_5gb,e200*,fuze*: "PREV pentru anulare"
-    gigabeatf: "POWER pentru anulare"
+    iriverh100,iriverh120,iriverh300: "STOP pentru anulare"
+    ipod*,sansac200*,gogearsa9200: "MENU pentru anulare"
+    iaudiox5,iaudiom5: "RECORD pentru anulare"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV pentru anulare"
+    gigabeatfx: "POWER pentru anulare"
     mrobe100: "DISPLAY pentru anulare"
     gigabeats: "BACK  pentru anulare"
   </dest>
@@ -1666,14 +1666,14 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
-    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Setat OFF=Anulare"
     ipod*: "SELECT=Setat MENU=Anulare"
-    h10,h10_5gb: "SELECT=Setat PREV=Anulare"
+    iriverh10,iriverh10_5gb: "SELECT=Setat PREV=Anulare"
     gigabeats: "SELECT=Setat POWER=Anulare"
   </dest>
   <voice>
@@ -3226,17 +3226,17 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    h100,h120,h300: "Building database... %d found (STOP to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Creare bază de date... %d găsite (OFF pentru revenire)"
-    h100,h120,h300: "Creare bază de date... %d găsite (STOP pentru revenire)"
+    iriverh100,iriverh120,iriverh300: "Creare bază de date... %d găsite (STOP pentru revenire)"
     ipod*: "Creare bază de date... %d găsite (PREV pentru revenire)"
-    x5,m5,gigabeat*,mrobe100: "Creare bază de date... %d găsite (LEFT pentru revenire)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Creare bază de date... %d găsite (PREV pentru revenire)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Creare bază de date... %d găsite (LEFT pentru revenire)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Creare bază de date... %d găsite (PREV pentru revenire)"
   </dest>
   <voice>
     *: "intrări găsite pentru baza de date"
@@ -3757,7 +3757,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4905,23 +4905,23 @@
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200*: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Discul este plin. Apasati OFF pentru a continua."
-    h100,h120,h300: "Discul este plin. Apasati STOP pentru a continua."
-    m5,x5: "Discul este plin. Apasati POWER pentru a continua."
-    e200*,c200*: "Discul este plin. Apasati PREV pentru a continua."
+    iriverh100,iriverh120,iriverh300: "Discul este plin. Apasati STOP pentru a continua."
+    iaudiom5,iaudiox5: "Discul este plin. Apasati POWER pentru a continua."
+    sansae200*,sansac200*: "Discul este plin. Apasati PREV pentru a continua."
   </dest>
   <voice>
     *: none
     recording: ""
-    h100,h120,h300: ""
-    m5,x5: ""
-    e200*,c200*: ""
+    iriverh100,iriverh120,iriverh300: ""
+    iaudiom5,iaudiox5: ""
+    sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -5012,15 +5012,15 @@
   user: core
   <source>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </source>
   <dest>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </dest>
   <voice>
     *: "Buffer size"
-    player: ""
+    archosplayer: ""
   </voice>
 </phrase>
 <phrase>
@@ -5243,15 +5243,15 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Da"
-    h100,h120,h300: "NAVI = Da"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Da"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Da"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Da"
+    archosplayer: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
@@ -5278,14 +5278,14 @@
   <source>
     *: none
     rtc: "ON = Set"
-    h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Setat"
-    h100,h120,h300: "NAVI = Setat"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Setat"
+    iriverh100,iriverh120,iriverh300: "NAVI = Setat"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Setat"
   </dest>
   <voice>
     *: none
@@ -5297,15 +5297,15 @@
   user: core
   <source>
     *: "Any Other = No"
-    player: none
+    archosplayer: none
   </source>
   <dest>
     *: "Oricare altul = Nu"
-    player: none
+    archosplayer: none
   </dest>
   <voice>
     *: ""
-    player: none
+    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -5668,25 +5668,25 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on recorder models
+  desc: Used on archosrecorder models
   user: core
   <source>
     *: "OFF to abort"
-    player,h100,h120,h300: "STOP to abort"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
-    x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200*: "PREV to abort"
+    iaudiox5,iaudiom5: "Long PLAY to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
     gigabeats: "BACK to abort"
-    gigabeatf: "POWER to abort"
+    gigabeatfx: "POWER to abort"
   </source>
   <dest>
     *: "OFF pentru anulare"
-    player,h100,h120,h300: "STOP pentru anulare"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP pentru anulare"
     ipod*: "PLAY/PAUSE pentru anulare"
-    x5,m5: "PLAY (apasare lunga) pentru anulare"
-    h10,h10_5gb,e200*,c200*: "PREV pentru anulare"
+    iaudiox5,iaudiom5: "PLAY (apasare lunga) pentru anulare"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV pentru anulare"
     gigabeats: "BACK pentru anulare"
-    gigabeatf: "POWER pentru anulare"
+    gigabeatfx: "POWER pentru anulare"
   </dest>
   <voice>
     *: ""
@@ -5965,11 +5965,11 @@
   user: core
   <source>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </source>
   <dest>
     *: "Sfarsit lista melodii"
-    player: "Sfarsit lista"
+    archosplayer: "Sfarsit lista"
   </dest>
   <voice>
     *: "End of Song List"
@@ -6827,7 +6827,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (player) Delay before making a jump scroll
+  desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
@@ -6872,7 +6872,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -7885,15 +7885,15 @@
   user: core
   <source>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </source>
   <dest>
     *: none
-    recording,player: "Intrare"
+    recording,archosplayer: "Intrare"
   </dest>
   <voice>
     *: none
-    recording,player: "Intrare"
+    recording,archosplayer: "Intrare"
   </voice>
 </phrase>
 <phrase>
@@ -8982,19 +8982,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    e200*,c200*,fuze*: "micro S D"
+    sansae200*,sansac200*,sansafuze*: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -10287,17 +10287,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Timp iluminare butoane"
-    fuze*,e200*: "Timp iluminare rotita"
+    sansafuze*,sansae200*: "Timp iluminare rotita"
   </dest>
   <voice>
     *: none
     button_light: "Timp iluminare butoane"
-    fuze*,e200*: "Timp iluminare rotita"
+    sansafuze*,sansae200*: "Timp iluminare rotita"
   </voice>
 </phrase>
 <phrase>
@@ -10547,7 +10547,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu alternative for jump scroll
+  desc: (archosplayer) menu alternative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
@@ -11544,15 +11544,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatf: "Sensibilitate Touchpad"
+    gigabeatfx: "Sensibilitate Touchpad"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Sensibilitate Touchpad"
+    gigabeatfx: "Sensibilitate Touchpad"
   </voice>
 </phrase>
 <phrase>
@@ -11947,15 +11947,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </source>
   <dest>
     *: none
-    gigabeatf: "Mare"
+    gigabeatfx: "Mare"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Mare"
+    gigabeatfx: "Mare"
   </voice>
 </phrase>
 <phrase>

@@ -2191,15 +2191,15 @@
   user: core
   <source>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </source>
   <dest>
     *: none
-    recording,player: "聲音輸入"
+    recording,archosplayer: "聲音輸入"
   </dest>
   <voice>
     *: none
-    recording,player: ""
+    recording,archosplayer: ""
   </voice>
 </phrase>
 <phrase>
@@ -2445,17 +2445,17 @@
   <source>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </source>
   <dest>
     *: none
     recording: "麥克風"
-    h100,h120,h300: "內置麥克風"
+    iriverh100,iriverh120,iriverh300: "內置麥克風"
   </dest>
   <voice>
     *: none
     recording: ""
-    h100,h120,h300: ""
+    iriverh100,iriverh120,iriverh300: ""
   </voice>
 </phrase>
 <phrase>
@@ -3307,7 +3307,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu alternative for jump scroll
+  desc: (archosplayer) menu alternative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
@@ -3321,7 +3321,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -3335,7 +3335,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (player) Delay before making a jump scroll
+  desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
@@ -4340,19 +4340,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 recorder
+  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
   user: core
   <source>
     *: none
-    recorder: "Battery: Top-Off Chg"
+    archosrecorder: "Battery: Top-Off Chg"
   </source>
   <dest>
     *: none
-    recorder: "電池: 完成充電"
+    archosrecorder: "電池: 完成充電"
   </dest>
   <voice>
     *: none
-    recorder: ""
+    archosrecorder: ""
   </voice>
 </phrase>
 <phrase>
@@ -4378,18 +4378,18 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "電池: %d%% %d小時%d分"
-    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "電池: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondiosp,archosondiofm,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "電池: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: ""
-    h10,ipodmini,ipodmini2g: ""
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: ""
+    iriverh10,ipodmini1g,ipodmini2g: ""
   </voice>
 </phrase>
 <phrase>
@@ -4444,19 +4444,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "磁盤1"
-    e200*,c200*,fuze*: "Multimedia 卡:"
+    sansae200*,sansac200*,sansafuze*: "Multimedia 卡:"
     ondio*: "MMC卡:"
   </dest>
   <voice>
     *: none
     multivolume: "磁盤1"
-    e200*,c200*,fuze*: "Multimedia 卡"
+    sansae200*,sansac200*,sansafuze*: "Multimedia 卡"
     ondio*: "mmc卡"
   </voice>
 </phrase>
@@ -4588,33 +4588,33 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
-    x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
-    gigabeatf: "POWER = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    iaudiox5,iaudiom5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = 回去"
-    h100,h120,h300: "STOP = 回去"
-    ipod*,c200*,sa9200: "MENU = 回去"
-    x5,m5: "RECORD = 回去"
-    h10,h10_5gb,e200*,fuze*: "PREV = 回去"
-    gigabeatf: "POWER = 回去"
+    iriverh100,iriverh120,iriverh300: "STOP = 回去"
+    ipod*,sansac200*,gogearsa9200: "MENU = 回去"
+    iaudiox5,iaudiom5: "RECORD = 回去"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = 回去"
+    gigabeatfx: "POWER = 回去"
     mrobe100: "DISPLAY = 回去"
     gigabeats: "BACK = 回去"
   </dest>
   <voice>
     *: none
     rtc: ""
-    h100,h120,h300: ""
-    ipod*,e200*,c200*,sa9200: ""
-    x5,m5: ""
-    h10,h10_5gb: ""
-    gigabeatf: ""
+    iriverh100,iriverh120,iriverh300: ""
+    ipod*,sansae200*,sansac200*,gogearsa9200: ""
+    iaudiox5,iaudiom5: ""
+    iriverh10,iriverh10_5gb: ""
+    gigabeatfx: ""
     mrobe100: ""
     gigabeats: ""
   </voice>
@@ -4694,23 +4694,23 @@
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200*: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "硬碟已滿，按下OFF繼續。"
-    h100,h120,h300: "硬碟已滿，按下STOP繼續。"
-    m5,x5: "硬碟已滿，按下POWER繼續。"
-    e200*,c200*: "硬碟已滿，按下PREV繼續。"
+    iriverh100,iriverh120,iriverh300: "硬碟已滿，按下STOP繼續。"
+    iaudiom5,iaudiox5: "硬碟已滿，按下POWER繼續。"
+    sansae200*,sansac200*: "硬碟已滿，按下PREV繼續。"
   </dest>
   <voice>
     *: none
     recording: ""
-    h100,h120,h300: ""
-    m5,x5: ""
-    e200*,c200*: ""
+    iriverh100,iriverh120,iriverh300: ""
+    iaudiom5,iaudiox5: ""
+    sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4874,21 +4874,21 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
-    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=設定 OFF=取消"
     ipod*: "SELECT=設定 MENU=取消"
-    h10,h10_5gb: "SELECT=設定 PREV=取消"
+    iriverh10,iriverh10_5gb: "SELECT=設定 PREV=取消"
     gigabeats: "SELECT=設定 POWER=取消"
   </dest>
   <voice>
     *: none
     alarm: ""
     ipod*: ""
-    h10,h10_5gb: ""
+    iriverh10,iriverh10_5gb: ""
     gigabeats: ""
   </voice>
 </phrase>
@@ -7403,25 +7403,25 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on recorder models
+  desc: Used on archosrecorder models
   user: core
   <source>
     *: "OFF to abort"
-    player,h100,h120,h300: "STOP to abort"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
-    x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200*: "PREV to abort"
+    iaudiox5,iaudiom5: "Long PLAY to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
     gigabeats: "BACK to abort"
-    gigabeatf: "POWER to abort"
+    gigabeatfx: "POWER to abort"
   </source>
   <dest>
     *: "OFF: 離開"
-    player,h100,h120,h300: "STOP: 離開"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP: 離開"
     ipod*: "PLAY/PAUSE: 離開"
-    x5,m5: "長按PLAY: 離開"
-    h10,h10_5gb,e200*,c200*: "PREV: 離開"
+    iaudiox5,iaudiom5: "長按PLAY: 離開"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV: 離開"
     gigabeats: "BACK: 離開"
-    gigabeatf: "POWER: 離開"
+    gigabeatfx: "POWER: 離開"
   </dest>
   <voice>
     *: ""
@@ -8480,7 +8480,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8755,24 +8755,24 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    h100,h120,h300: "Building database... %d found (STOP to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "建立資料庫... 找到%d項 (OFF: 回上一畫面)"
-    h100,h120,h300: "建立資料庫... 找到%d項 (STOP: 回上一畫面)"
+    iriverh100,iriverh120,iriverh300: "建立資料庫... 找到%d項 (STOP: 回上一畫面)"
     ipod*: "建立資料庫... 找到%d項 (PREV: 回上一畫面)"
-    x5,m5,gigabeat*,mrobe100: "建立資料庫... 找到%d項 (LEFT: 回上一畫面)"
-    h10,h10_5gb,e200*,c200*,sa9200: "建立資料庫... 找到%d項 (PREV: 回上一畫面)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "建立資料庫... 找到%d項 (LEFT: 回上一畫面)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "建立資料庫... 找到%d項 (PREV: 回上一畫面)"
   </dest>
   <voice>
     *: "entries found for database"
-    h100,h120,h300: ""
+    iriverh100,iriverh120,iriverh300: ""
     ipod*: ""
-    x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200*,c200*,sa9200: ""
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: ""
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9266,15 +9266,15 @@
   user: core
   <source>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </source>
   <dest>
     *: "緩沖:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </dest>
   <voice>
     *: ""
-    player: ""
+    archosplayer: ""
   </voice>
 </phrase>
 <phrase>
@@ -9331,21 +9331,21 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = 是"
-    h100,h120,h300: "NAVI = 是"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = 是"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = 是"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = 是"
+    archosplayer: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
-    h100,h120,h300: ""
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: ""
-    player: ""
+    iriverh100,iriverh120,iriverh300: ""
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: ""
+    archosplayer: ""
   </voice>
 </phrase>
 <phrase>
@@ -9355,20 +9355,20 @@
   <source>
     *: none
     rtc: "ON = Set"
-    h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = 設定"
-    h100,h120,h300: "NAVI = 設定"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = 設定"
+    iriverh100,iriverh120,iriverh300: "NAVI = 設定"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = 設定"
   </dest>
   <voice>
     *: none
     rtc: ""
-    h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: ""
+    iriverh100,iriverh120,iriverh300: ""
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9377,15 +9377,15 @@
   user: core
   <source>
     *: "Any Other = No"
-    player: none
+    archosplayer: none
   </source>
   <dest>
     *: "Any Other = 否"
-    player: none
+    archosplayer: none
   </dest>
   <voice>
     *: ""
-    player: none
+    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -9571,15 +9571,15 @@
   user: core
   <source>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </source>
   <dest>
     *: "列表結束"
-    player: "列表結束"
+    archosplayer: "列表結束"
   </dest>
   <voice>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </voice>
 </phrase>
 <phrase>
@@ -10674,17 +10674,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "轉盤燈自動關時間"
+    sansafuze*,sansae200*: "轉盤燈自動關時間"
   </dest>
   <voice>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
   </voice>
 </phrase>
 <phrase>
@@ -11648,15 +11648,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatf: "觸摸板靈敏度"
+    gigabeatfx: "觸摸板靈敏度"
   </dest>
   <voice>
     *: none
-    gigabeatf: "觸摸板靈敏度"
+    gigabeatfx: "觸摸板靈敏度"
   </voice>
 </phrase>
 <phrase>
@@ -12291,15 +12291,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </source>
   <dest>
     *: none
-    gigabeatf: "高"
+    gigabeatfx: "高"
   </dest>
   <voice>
     *: none
-    gigabeatf: "高"
+    gigabeatfx: "高"
   </voice>
 </phrase>
 <phrase>

@@ -232,15 +232,15 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200*,c200*,h10,h10_5gb: "SELECT = Yes"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeatfx,sansae200*,sansac200*,iriverh10,iriverh10_5gb: "SELECT = Yes"
+    archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "बजाना = हां"
-    h100,h120,h300: "NAVI = हां"
-    ipod*,x5,m5,gigabeatf,e200*,c200*,h10,h10_5gb: "चुन = हां"
-    player: "(बजाना/रोक)"
+    iriverh100,iriverh120,iriverh300: "NAVI = हां"
+    ipod*,iaudiox5,iaudiom5,gigabeatfx,sansae200*,sansac200*,iriverh10,iriverh10_5gb: "चुन = हां"
+    archosplayer: "(बजाना/रोक)"
   </dest>
   <voice>
     *: ""
@@ -252,15 +252,15 @@
   user: core
   <source>
     *: "Any Other = No"
-    player: none
+    archosplayer: none
   </source>
   <dest>
     *: "दूसरों = नहीं"
-    player: none
+    archosplayer: none
   </dest>
   <voice>
     *: ""
-    player: none
+    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -1267,17 +1267,17 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    h100,h120,h300: "Building database... %d found (STOP to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
+    iaudiox5,iaudiom5: "Building database... %d found (LEFT to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "डाटाबेस बन रहा है... %d मिले (OFF to बढ़)"
-    h100,h120,h300: "डाटाबेस बन रहा है... %d मिले (STOP to बढ़)"
+    iriverh100,iriverh120,iriverh300: "डाटाबेस बन रहा है... %d मिले (STOP to बढ़)"
     ipod*: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
-    x5,m5: "डाटाबेस बन रहा है... %d मिले (LEFT to बढ़)"
-    h10,h10_5gb,e200*,c200*,fuze*: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
+    iaudiox5,iaudiom5: "डाटाबेस बन रहा है... %d मिले (LEFT to बढ़)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -1620,7 +1620,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -2132,13 +2132,13 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
-    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=लगा OFF=बंद"
     ipod*: "SELECT=लगा MENU=बंद"
-    h10,h10_5gb: "SELECT=लगा PREV=बंद"
+    iriverh10,iriverh10_5gb: "SELECT=लगा PREV=बंद"
   </dest>
   <voice>
     *: none
@@ -3867,15 +3867,15 @@
   user: core
   <source>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </source>
   <dest>
     *: "गाने खतम हो गये"
-    player: "खतम हो गये"
+    archosplayer: "खतम हो गये"
   </dest>
   <voice>
     *: "गाने खतम हो गये"
-    player: "खतम हो गये"
+    archosplayer: "खतम हो गये"
   </voice>
 </phrase>
 <phrase>
@@ -3982,11 +3982,11 @@
   user: core
   <source>
     *: "No partition?"
-    player: "Partition?"
+    archosplayer: "Partition?"
   </source>
   <dest>
     *: "पारटिशन नहीं है?"
-    player: "पारटिशन?"
+    archosplayer: "पारटिशन?"
   </dest>
   <voice>
     *: ""
@@ -4044,20 +4044,20 @@
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200*: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "दिसक भरी ह. Press OFF to continue."
-    h100,h120,h300: "दिसक भरी ह. Press STOP to continue."
-    m5,x5: "दिसक भरी ह. Press POWER to continue."
-    e200*,c200*: "दिसक भरी ह. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "दिसक भरी ह. Press STOP to continue."
+    iaudiom5,iaudiox5: "दिसक भरी ह. Press POWER to continue."
+    sansae200*,sansac200*: "दिसक भरी ह. Press PREV to continue."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -5058,18 +5058,18 @@
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: "The disk is full. Press LEFT to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
     *: none
     recording: "दिसक भरी ह. Press OFF to continue."
-    h100,h120,h300: "दिसक भरी ह. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: "दिसक भरी ह. Press LEFT to continue."
+    iriverh100,iriverh120,iriverh300: "दिसक भरी ह. Press STOP to continue."
+    iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: "दिसक भरी ह. Press LEFT to continue."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>

@@ -264,15 +264,15 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Επικύρωση"
-    h100,h120,h300: "NAVI = Επικύρωση"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Επικύρωση"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Επικύρωση"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Επικύρωση"
+    archosplayer: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
@@ -284,15 +284,15 @@
   user: core
   <source>
     *: "Any Other = No"
-    player: none
+    archosplayer: none
   </source>
   <dest>
     *: "Any Other = Άκυρο"
-    player: none
+    archosplayer: none
   </dest>
   <voice>
     *: ""
-    player: none
+    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -2368,17 +2368,17 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    h100,h120,h300: "Building database... %d found (STOP to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (OFF για επιστροφή)"
-    h100,h120,h300: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (STOP για επιστροφή)"
+    iriverh100,iriverh120,iriverh300: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (STOP για επιστροφή)"
     ipod*: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (PREV για επιστροφή)"
-    x5,m5,gigabeat*,mrobe100: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (LEFT για επιστροφή)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (PREV για επιστροφή)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (LEFT για επιστροφή)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (PREV για επιστροφή)"
   </dest>
   <voice>
     *: "Kαταχωρήσεις βρέθηκαν για τη βάση δεδομένων"
@@ -3178,7 +3178,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu alternative for jump scroll
+  desc: (archosplayer) menu alternative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
@@ -3192,7 +3192,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -3206,7 +3206,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (player) Delay before making a jump scroll
+  desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
@@ -3838,17 +3838,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Χρόνος σβησίματος πλήκτρων"
-    fuze*,e200*: "Χρόνος σβησίματος τροχού"
+    sansafuze*,sansae200*: "Χρόνος σβησίματος τροχού"
   </dest>
   <voice>
     *: none
     button_light: "Χρόνος σβησίματος πλήκτρων"
-    fuze*,e200*: "Χρόνος σβησίματος τροχού"
+    sansafuze*,sansae200*: "Χρόνος σβησίματος τροχού"
   </voice>
 </phrase>
 <phrase>
@@ -4129,14 +4129,14 @@
   <source>
     *: none
     rtc: "ON = Set"
-    h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Ρύθμιση"
-    h100,h120,h300: "NAVI = Ρύθμιση"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Ρύθμιση"
+    iriverh100,iriverh120,iriverh300: "NAVI = Ρύθμιση"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Ρύθμιση"
   </dest>
   <voice>
     *: none
@@ -4149,22 +4149,22 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
-    x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
-    gigabeatf: "POWER = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    iaudiox5,iaudiom5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = Ακύρωση"
-    h100,h120,h300: "STOP = Ακύρωση"
-    ipod*,c200*,sa9200: "MENU = Ακύρωση"
-    x5,m5: "RECORD = Ακύρωση"
-    h10,h10_5gb,e200*,fuze*: "PREV = Ακύρωση"
-    gigabeatf: "POWER = Ακύρωση"
+    iriverh100,iriverh120,iriverh300: "STOP = Ακύρωση"
+    ipod*,sansac200*,gogearsa9200: "MENU = Ακύρωση"
+    iaudiox5,iaudiom5: "RECORD = Ακύρωση"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Ακύρωση"
+    gigabeatfx: "POWER = Ακύρωση"
     mrobe100: "DISPLAY = Ακύρωση"
     gigabeats: "BACK = Ακύρωση"
   </dest>
@@ -4692,14 +4692,14 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
-    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Όρισε ΟFF=Ακύρωση"
     ipod*: "SELECT=Όρισε MENU=Ακύρωση"
-    h10,h10_5gb: "SELECT=Όρισε PREV=Ακύρωση"
+    iriverh10,iriverh10_5gb: "SELECT=Όρισε PREV=Ακύρωση"
     gigabeats: "SELECT=Όρισε POWER=Ακύρωση"
   </dest>
   <voice>
@@ -5873,17 +5873,17 @@
   <source>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </source>
   <dest>
     *: none
     recording: "Μικρόφωνο"
-    h100,h120,h300: "Εσωτερικό Μικρόφωνο"
+    iriverh100,iriverh120,iriverh300: "Εσωτερικό Μικρόφωνο"
   </dest>
   <voice>
     *: none
     recording: "Μικρόφωνο"
-    h100,h120,h300: "Εσωτερικό Μικρόφωνο"
+    iriverh100,iriverh120,iriverh300: "Εσωτερικό Μικρόφωνο"
   </voice>
 </phrase>
 <phrase>
@@ -5909,15 +5909,15 @@
   user: core
   <source>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </source>
   <dest>
     *: none
-    recording,player: "Eίσοδος"
+    recording,archosplayer: "Eίσοδος"
   </dest>
   <voice>
     *: none
-    recording,player: "Eίσοδος"
+    recording,archosplayer: "Eίσοδος"
   </voice>
 </phrase>
 <phrase>
@@ -6847,11 +6847,11 @@
   user: core
   <source>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </source>
   <dest>
     *: "Μνήμη:"
-    player: "Μνη:"
+    archosplayer: "Μνη:"
   </dest>
   <voice>
     *: "Μέγεθος μνήμης"
@@ -6863,13 +6863,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "%d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Μπάτ: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Μπάτ: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Επίπεδο μπαταρίας"
@@ -6927,19 +6927,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "Έιτς Ντι 1"
-    e200*,c200*,fuze*: "μάικρο Ες Ντι"
+    sansae200*,sansac200*,sansafuze*: "μάικρο Ες Ντι"
     ondio*: "Εμ Εμ Σι"
   </voice>
 </phrase>
@@ -8051,11 +8051,11 @@
   user: core
   <source>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </source>
   <dest>
     *: "Τέλος λίστας κομματιών"
-    player: "Τέλος λίστας"
+    archosplayer: "Τέλος λίστας"
   </dest>
   <voice>
     *: "Τέλος λίστας κομματιών"
@@ -8298,20 +8298,20 @@
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200*: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Ο δίσκος είναι γεμάτος. Πατήστε OFF για συνέχεια."
-    h100,h120,h300: "Ο δίσκος είναι γεμάτος. Πατήστε STOP για συνέχεια."
-    m5,x5: "Ο δίσκος είναι γεμάτος. Πατήστε POWER για συνέχεια.."
-    e200*,c200*: "Ο δίσκος είναι γεμάτος. Πατήστε PREV για συνέχεια."
+    iriverh100,iriverh120,iriverh300: "Ο δίσκος είναι γεμάτος. Πατήστε STOP για συνέχεια."
+    iaudiom5,iaudiox5: "Ο δίσκος είναι γεμάτος. Πατήστε POWER για συνέχεια.."
+    sansae200*,sansac200*: "Ο δίσκος είναι γεμάτος. Πατήστε PREV για συνέχεια."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8395,25 +8395,25 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on recorder models
+  desc: Used on archosrecorder models
   user: core
   <source>
     *: "OFF to abort"
-    player,h100,h120,h300: "STOP to abort"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
-    x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200*: "PREV to abort"
+    iaudiox5,iaudiom5: "Long PLAY to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
     gigabeats: "BACK to abort"
-    gigabeatf: "POWER to abort"
+    gigabeatfx: "POWER to abort"
   </source>
   <dest>
     *: "OFF για ακύρωση"
-    player,h100,h120,h300: "STOP για ακύρωση"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP για ακύρωση"
     ipod*: "PLAY/PAUSE για ακύρωση"
-    x5,m5: "Long PLAY για ακύρωση"
-    h10,h10_5gb,e200*,c200*: "PREV για ακύρωση"
+    iaudiox5,iaudiom5: "Long PLAY για ακύρωση"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV για ακύρωση"
     gigabeats: "BACK για ακύρωση"
-    gigabeatf: "POWER για ακύρωση"
+    gigabeatfx: "POWER για ακύρωση"
   </dest>
   <voice>
     *: ""
@@ -8637,19 +8637,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 recorder
+  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
   user: core
   <source>
     *: none
-    recorder: "Battery: Top-Off Chg"
+    archosrecorder: "Battery: Top-Off Chg"
   </source>
   <dest>
     *: none
-    recorder: "Μπαταρία: Μέγιστη φόρτιση"
+    archosrecorder: "Μπαταρία: Μέγιστη φόρτιση"
   </dest>
   <voice>
     *: none
-    recorder: "Μπαταρία: Μέγιστη φόρτιση"
+    archosrecorder: "Μπαταρία: Μέγιστη φόρτιση"
   </voice>
 </phrase>
 <phrase>
@@ -10466,7 +10466,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -11531,15 +11531,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatf: "Ευαισθησία πινακίδας αφής"
+    gigabeatfx: "Ευαισθησία πινακίδας αφής"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Ευαισθησία πινακίδας αφής"
+    gigabeatfx: "Ευαισθησία πινακίδας αφής"
   </voice>
 </phrase>
 <phrase>
@@ -11945,15 +11945,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </source>
   <dest>
     *: none
-    gigabeatf: "Ψηλά"
+    gigabeatfx: "Ψηλά"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Ψηλά"
+    gigabeatfx: "Ψηλά"
   </voice>
 </phrase>
 <phrase>

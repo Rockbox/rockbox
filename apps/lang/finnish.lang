@@ -2192,15 +2192,15 @@
   user: core
   <source>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </source>
   <dest>
     *: none
-    recording,player: "Linjatulo"
+    recording,archosplayer: "Linjatulo"
 </dest>
   <voice>
     *: none
-    recording,player: "Linjatulo"
+    recording,archosplayer: "Linjatulo"
   </voice>
 </phrase>
 <phrase>
@@ -2446,17 +2446,17 @@
   <source>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </source>
   <dest>
     *: none
     recording: "Mikrofoni"
-    h100,h120,h300: "Sis. mikrofoni"
+    iriverh100,iriverh120,iriverh300: "Sis. mikrofoni"
   </dest>
   <voice>
     *: none
     recording: "Mikrofoni"
-    h100,h120,h300: "Sisäinen mikrofoni"
+    iriverh100,iriverh120,iriverh300: "Sisäinen mikrofoni"
   </voice>
 </phrase>
 <phrase>
@@ -3308,7 +3308,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu alternative for jump scroll
+  desc: (archosplayer) menu alternative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
@@ -3322,7 +3322,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -3336,7 +3336,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (player) Delay before making a jump scroll
+  desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
@@ -4341,19 +4341,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 recorder
+  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
   user: core
   <source>
     *: none
-    recorder: "Battery: Top-Off Chg"
+    archosrecorder: "Battery: Top-Off Chg"
   </source>
   <dest>
     *: none
-    recorder: "Akku: huippulataus"
+    archosrecorder: "Akku: huippulataus"
   </dest>
   <voice>
     *: none
-    recorder: "Akku täynnä"
+    archosrecorder: "Akku täynnä"
   </voice>
 </phrase>
 <phrase>
@@ -4379,13 +4379,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Akku: %d%% %dt %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dt %dm"
-    h10,ipodmini,ipodmini2g: "Akku: %d%% %dt %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dt %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Akku: %d%% %dt %dm"
   </dest>
   <voice>
     *: "Akun varauksen taso"
@@ -4443,19 +4443,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "MSD:"
+    sansae200*,sansac200*,sansafuze*: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "Kiintolevy1"
-    e200*,c200*,fuze*: "micro s d muistikortti"
+    sansae200*,sansac200*,sansafuze*: "micro s d muistikortti"
     ondio*: "m m c muistikortti"
   </voice>
 </phrase>
@@ -4588,27 +4588,27 @@
     *: none
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
-    h100,h120,h300: "STOP = Revert"
-    ipod*,c200*: "MENU = Revert"
-    x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
-    gigabeatf: "POWER = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*: "MENU = Revert"
+    iaudiox5,iaudiom5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
-    sa9200: "LEFT = Revert"
+    gogearsa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = Peruuta"
     mrobe500: "POWER = Peruuta"
-    h100,h120,h300: "STOP = Peruuta"
-    ipod*,c200*: "MENU = Peruuta"
-    x5,m5: "RECORD = Peruuta"
-    h10,h10_5gb,e200*,fuze*: "PREV = Peruuta"
-    gigabeatf: "POWER = Peruuta"
+    iriverh100,iriverh120,iriverh300: "STOP = Peruuta"
+    ipod*,sansac200*: "MENU = Peruuta"
+    iaudiox5,iaudiom5: "RECORD = Peruuta"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Peruuta"
+    gigabeatfx: "POWER = Peruuta"
     mrobe100: "DISPLAY = Peruuta"
     gigabeats: "BACK = Peruuta"
-    sa9200: "VASEN = Revert"
+    gogearsa9200: "VASEN = Revert"
   </dest>
   <voice>
     *: none
@@ -4689,23 +4689,23 @@
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200*: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Levy täynnä. Jatka painamalla OFF."
-    h100,h120,h300: "Levy täynnä. Jatka painamalla STOP."
-    m5,x5: "Levy täynnä. Jatka painamalla POWER."
-    e200*,c200*: "Levy täynnä. Jatka painamalla PREV."
+    iriverh100,iriverh120,iriverh300: "Levy täynnä. Jatka painamalla STOP."
+    iaudiom5,iaudiox5: "Levy täynnä. Jatka painamalla POWER."
+    sansae200*,sansac200*: "Levy täynnä. Jatka painamalla PREV."
   </dest>
   <voice>
     *: none
     recording: ""
-    h100,h120,h300: ""
-    m5,x5: ""
-    e200*,c200*: ""
+    iriverh100,iriverh120,iriverh300: ""
+    iaudiom5,iaudiox5: ""
+    sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4869,14 +4869,14 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
-    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Aseta OFF=Peruuta"
     ipod*: "SELECT=Aseta MENU=Peruuta"
-    h10,h10_5gb: "SELECT=Aseta PREV=Peruuta"
+    iriverh10,iriverh10_5gb: "SELECT=Aseta PREV=Peruuta"
     gigabeats: "SELECT=Aseta POWER=Peruuta"
   </dest>
   <voice>
@@ -7395,34 +7395,34 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on recorder models
+  desc: Used on archosrecorder models
   user: core
   <source>
     *: "OFF to abort"
-    player,h100,h120,h300: "STOP to abort"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
-    x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200*: "PREV to abort"
+    iaudiox5,iaudiom5: "Long PLAY to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
     gigabeats: "BACK to abort"
-    gigabeatf: "POWER to abort"
+    gigabeatfx: "POWER to abort"
   </source>
   <dest>
     *: "OFF keskeyttää"
-    player,h100,h120,h300: "STOP keskeyttää"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP keskeyttää"
     ipod*: "PLAY/PAUSE keskeyttää"
-    x5,m5: "Pitkä PLAY keskeyttää"
-    h10,h10_5gb,e200*,c200*: "PREV keskeyttää"
+    iaudiox5,iaudiom5: "Pitkä PLAY keskeyttää"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV keskeyttää"
     gigabeats: "BACK keskeyttää"
-    gigabeatf: "POWER keskeyttää"
+    gigabeatfx: "POWER keskeyttää"
   </dest>
   <voice>
     *: ""
-    player,h100,h120,h300: ""
+    archosplayer,iriverh100,iriverh120,iriverh300: ""
     ipod*: ""
-    x5,m5: ""
-    h10,h10_5gb,e200*,c200*: ""
+    iaudiox5,iaudiom5: ""
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: ""
     gigabeats: ""
-    gigabeatf: ""
+    gigabeatfx: ""
   </voice>
 </phrase>
 <phrase>
@@ -8814,7 +8814,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -9782,11 +9782,11 @@
   </source>
   <dest>
     *: none
-    usb_charging: "Lataa USB-yhteyden aikana"
+    usb_charging: "Lataa USB-samsungyhteyden aikana"
   </dest>
   <voice>
     *: none
-    usb_charging: "Lataa u s b yhteyden aikana"
+    usb_charging: "Lataa u s b samsungyhteyden aikana"
   </voice>
 </phrase>
 <phrase>
@@ -9969,19 +9969,19 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    h100,h120,h300: "Building database... %d found (STOP to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,fuze*: "Building database... %d found (PREV to return)"
-    sa9200: "Building database... %d found (REW to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Luodaan tietokantaa... %d löytyi (OFF = palaa)"
-    h100,h120,h300: "Luodaan tietokantaa... %d löytyi (STOP = palaa)"
+    iriverh100,iriverh120,iriverh300: "Luodaan tietokantaa... %d löytyi (STOP = palaa)"
     ipod*: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
-    x5,m5,gigabeat*,mrobe100: "Luodaan tietokantaa... %d löytyi (VASEN = palaa)"
-    h10,h10_5gb,e200*,c200*,fuze*: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
-    sa9200: "Luodaan tietokantaa... %d löytyi (REW = palaa)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Luodaan tietokantaa... %d löytyi (VASEN = palaa)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
+    gogearsa9200: "Luodaan tietokantaa... %d löytyi (REW = palaa)"
   </dest>
   <voice>
     *: "tietokantaa varten löytyi merkintöjä"
@@ -10008,17 +10008,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Painikevalon aikakatkaisu"
-    fuze*,e200*: "Rullavalon aikakatkaisu"
+    sansafuze*,sansae200*: "Rullavalon aikakatkaisu"
   </dest>
   <voice>
     *: none
     button_light: "Painikevalon aikakatkaisu"
-    fuze*,e200*: "Rullavalon aikakatkaisu"
+    sansafuze*,sansae200*: "Rullavalon aikakatkaisu"
   </voice>
 </phrase>
 <phrase>
@@ -10477,11 +10477,11 @@
   user: core
   <source>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </source>
   <dest>
     *: "Puskuri:"
-    player: "Puskuri:"
+    archosplayer: "Puskuri:"
   </dest>
   <voice>
     *: "Puskurin koko"
@@ -10525,16 +10525,16 @@
   <source>
     *: "PLAY = Yes"
     cowond2*: "MENU = Yes"
-    h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Yes"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Kyllä"
     cowond2*: "MENU = Kyllä"
-    h100,h120,h300: "NAVI = Kyllä"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,clip*,fuze*: "SELECT = Kyllä"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Kyllä"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Kyllä"
+    archosplayer: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
@@ -10548,17 +10548,17 @@
     *: none
     rtc: "ON = Set"
     mrobe500: "HEART = Set"
-    h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Set"
-    sa9200: "PLAY = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
+    gogearsa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Aseta"
     mrobe500: "HEART = Aseta"
-    h100,h120,h300: "NAVI = Aseta"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,clip*,fuze*: "SELECT = Aseta"
-    sa9200: "PLAY = Aseta"
+    iriverh100,iriverh120,iriverh300: "NAVI = Aseta"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Aseta"
+    gogearsa9200: "PLAY = Aseta"
   </dest>
   <voice>
     *: none
@@ -10570,15 +10570,15 @@
   user: core
   <source>
     *: "Any Other = No"
-    player: none
+    archosplayer: none
   </source>
   <dest>
     *: "Muu = Ei"
-    player: none
+    archosplayer: none
   </dest>
   <voice>
     *: ""
-    player: none
+    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -10632,15 +10632,15 @@
   user: core
   <source>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </source>
   <dest>
     *: "Kappalelistan loppu"
-    player: "Listan loppu"
+    archosplayer: "Listan loppu"
   </dest>
   <voice>
     *: "Kappalelistan loppu"
-    player: "Listan loppu"
+    archosplayer: "Listan loppu"
   </voice>
 </phrase>
 <phrase>
@@ -11699,15 +11699,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatf: "Kosketuslevyn herkkyys"
+    gigabeatfx: "Kosketuslevyn herkkyys"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Kosketuslevyn herkkyys"
+    gigabeatfx: "Kosketuslevyn herkkyys"
   </voice>
 </phrase>
 <phrase>
@@ -11716,15 +11716,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </source>
   <dest>
     *: none
-    gigabeatf: "Suuri"
+    gigabeatfx: "Suuri"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Suuri"
+    gigabeatfx: "Suuri"
   </voice>
 </phrase>
 <phrase>

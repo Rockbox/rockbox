@@ -4,6 +4,8 @@ use File::Basename;
 use File::Path;
 use Cwd;
 
+require "../builds.pm";
+
 my $verbose, $strip, $update, $doonly, $version;
 my @doonly;
 
@@ -92,7 +94,7 @@ if (!defined($version)) {
 
 # made once for all targets
 sub runone {
-    my ($dir, $confnum, $extra)=@_;
+    my ($dir)=@_;
     my $a;
 
     if(@doonly > 0 && !grep(/^$dir$/, @doonly)) {
@@ -104,7 +106,7 @@ sub runone {
     print "Build in build-$dir\n" if($verbose);
 
     # build the target
-    $a = buildit($dir, $confnum, $extra);
+    $a = buildit($dir);
 
     # Do not continue if the rockboxui executable is not created. This will
     #    prevent a good build getting overwritten by a bad build when

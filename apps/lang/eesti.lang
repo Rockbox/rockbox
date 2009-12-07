@@ -844,25 +844,25 @@
 </phrase>
 <phrase>
   id: LANG_CONFIRM_WITH_PLAY_RECORDER
-  desc: Generic recorder string to use to confirm
+  desc: Generic archosrecorder string to use to confirm
   user: core
   <source>
     *: "PLAY = Yes"
-    h100,h120,h300: "NAVI = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     ipod*: "SELECT = Yes"
-    x5: "SELECT = Yes"
-    h10,h10_5gb: "SELECT = Yes"
-    gigabeatf: "SELECT = Yes"
-    e200*,c200*: "SELECT = Yes"
+    iaudiox5: "SELECT = Yes"
+    iriverh10,iriverh10_5gb: "SELECT = Yes"
+    gigabeatfx: "SELECT = Yes"
+    sansae200*,sansac200*: "SELECT = Yes"
   </source>
   <dest>
     *: "PLAY = Jah"
-    h100,h120,h300: "NAVI = Jah"
+    iriverh100,iriverh120,iriverh300: "NAVI = Jah"
     ipod*: "SELECT = Jah"
-    x5: "SELECT = Jah"
-    h10,h10_5gb: "SELECT = Jah"
-    gigabeatf: "SELECT = Jah"
-    e200*,c200*: "SELECT = Jah"
+    iaudiox5: "SELECT = Jah"
+    iriverh10,iriverh10_5gb: "SELECT = Jah"
+    gigabeatfx: "SELECT = Jah"
+    sansae200*,sansac200*: "SELECT = Jah"
   </dest>
   <voice>
     *: ""
@@ -870,7 +870,7 @@
 </phrase>
 <phrase>
   id: LANG_CANCEL_WITH_ANY_RECORDER
-  desc: Generic recorder string to use to cancel
+  desc: Generic archosrecorder string to use to cancel
   user: core
   <source>
     *: "Any Other = No"
@@ -3446,7 +3446,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu altarnative for jump scroll
+  desc: (archosplayer) menu altarnative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
@@ -3460,7 +3460,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -3474,7 +3474,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (player) Delay before making a jump scroll
+  desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
@@ -4440,7 +4440,7 @@
 </phrase>
 <phrase>
   id: LANG_BUFFER_STAT_PLAYER
-  desc: the buffer size player-screen width, %d MB %d fraction of MB
+  desc: the buffer size archosplayer-screen width, %d MB %d fraction of MB
   user: core
   <source>
     *: "Buf: %d.%03dMB"
@@ -4454,7 +4454,7 @@
 </phrase>
 <phrase>
   id: LANG_BUFFER_STAT_RECORDER
-  desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+  desc: the buffer size archosrecorder-screen width, %d MB %d fraction of MB
   user: core
   <source>
     *: "Buffer: %d.%03dMB"
@@ -4514,13 +4514,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondiosp,archosondiofm,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondiosp,archosondiofm,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Aku"
@@ -4868,21 +4868,21 @@
   user: core
   <source>
     *: "ON = Set"
-    h100,h120,h300: "NAVI = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*: "SELECT = Set"
-    x5: "SELECT = Set"
-    h10,h10_5gb: "SELECT = Set"
-    gigabeatf: "SELECT = Set"
-    e200*,c200*: "SELECT = Set"
+    iaudiox5: "SELECT = Set"
+    iriverh10,iriverh10_5gb: "SELECT = Set"
+    gigabeatfx: "SELECT = Set"
+    sansae200*,sansac200*: "SELECT = Set"
   </source>
   <dest>
     *: "ON muutmiseks"
-    h100,h120,h300: "NAVI muutmiseks"
+    iriverh100,iriverh120,iriverh300: "NAVI muutmiseks"
     ipod*: "SELECT muutmiseks"
-    x5: "SELECT muutmiseks"
-    h10,h10_5gb: "SELECT muutmiseks"
-    gigabeatf: "SELECT muutmiseks"
-    e200*,c200*: "SELECT muutmiseks"
+    iaudiox5: "SELECT muutmiseks"
+    iriverh10,iriverh10_5gb: "SELECT muutmiseks"
+    gigabeatfx: "SELECT muutmiseks"
+    sansae200*,sansac200*: "SELECT muutmiseks"
   </dest>
   <voice>
     *: ""
@@ -4894,19 +4894,19 @@
   user: core
   <source>
     *: "OFF = Revert"
-    h100,h120,h300: "STOP = Revert"
-    ipod*,c200*: "MENU = Revert"
-    x5: "RECORD = Revert"
-    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
-    gigabeatf: "POWER = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*: "MENU = Revert"
+    iaudiox5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "POWER = Revert"
   </source>
   <dest>
     *: "OFF tagasi pöördumiseks"
-    h100,h120,h300: "STOP tagasi pöördumiseks"
-    ipod*,c200*: "MENU tagasi pöördumiseks"
-    x5: "RECORD tagasi pöördumiseks"
-    h10,h10_5gb,e200*,fuze*: "PREV tagasi pöördumiseks"
-    gigabeatf: "POWER tagasi pöördumiseks"
+    iriverh100,iriverh120,iriverh300: "STOP tagasi pöördumiseks"
+    ipod*,sansac200*: "MENU tagasi pöördumiseks"
+    iaudiox5: "RECORD tagasi pöördumiseks"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV tagasi pöördumiseks"
+    gigabeatfx: "POWER tagasi pöördumiseks"
   </dest>
   <voice>
     *: ""
@@ -5100,11 +5100,11 @@
   user: core
   <source>
     *: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
   </dest>
   <voice>
     *: ""
@@ -7872,23 +7872,23 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on recorder models
+  desc: Used on archosrecorder models
   user: core
   <source>
     *: "OFF to abort"
-    h100,h120,h300: "STOP to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
-    x5: "Long PLAY to abort"
-    h10,h10_5gb: "PREV to abort"
-    e200*,c200*: "PREV to abort"
+    iaudiox5: "Long PLAY to abort"
+    iriverh10,iriverh10_5gb: "PREV to abort"
+    sansae200*,sansac200*: "PREV to abort"
   </source>
   <dest>
     *: "OFF katkestamiseks"
-    h100,h120,h300: "STOP katkestamiseks"
+    iriverh100,iriverh120,iriverh300: "STOP katkestamiseks"
     ipod*: "PLAY/PAUSE katkestamiseks"
-    x5: "Long PLAY katkestamiseks"
-    h10,h10_5gb: "PREV katkestamiseks"
-    e200*,c200*: "PREV katkestamiseks"
+    iaudiox5: "Long PLAY katkestamiseks"
+    iriverh10,iriverh10_5gb: "PREV katkestamiseks"
+    sansae200*,sansac200*: "PREV katkestamiseks"
   </dest>
   <voice>
     *: ""
@@ -7896,7 +7896,7 @@
 </phrase>
 <phrase>
   id: LANG_STOP_ABORT
-  desc: Used on player models
+  desc: Used on archosplayer models
   user: core
   <source>
     *: "STOP to abort"

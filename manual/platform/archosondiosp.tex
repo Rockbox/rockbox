@@ -1,16 +1,16 @@
 % $Id$ %
-%platform file for the Ondio FM
-\def\UseOption{ondiofm}
-% To not break the current manual
+%platform file for the Ondio SP
+\def\UseOption{ondiosp}
 \edef\UseOption{\UseOption,ondio}
 \edef\UseOption{\UseOption,ONDIO_PAD}
 \edef\UseOption{\UseOption,archos}
+\edef\UseOption{\UseOption,rombox}
 
 \newcommand{\playerman}{Archos}
 \newcommand{\playertype}{Ondio}
-\newcommand{\playerlongtype}{Ondio 128 FM}
+\newcommand{\playerlongtype}{Ondio 128 SP}
 \newcommand{\genericimg}{112x64x1}
-\newcommand{\specimg}{ondiofm}
+\newcommand{\specimg}{ondiosp}
 %Used to name the player, e.g. ...to the \dap
 \newcommand{\dap}{player}
 %For use when referring to the player. E.g. the \daps\ capacity ...
@@ -21,4 +21,4 @@
 \newcommand{\disk}{flash storage}
 
 % link external keymap file
-\input{platform/keymap-ondio.tex}
+\input{platform/keymap-archosondio.tex}

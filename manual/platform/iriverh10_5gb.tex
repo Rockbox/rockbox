@@ -1,17 +1,17 @@
 % $Id$ %
-\def\UseOption{c200}
+\def\UseOption{h10_5gb}
 \edef\UseOption{\UseOption,HAVE_RB_BL_ON_DISK}
-\edef\UseOption{\UseOption,SANSA_C200_PAD}
+\edef\UseOption{\UseOption,IRIVER_H10_PAD}
 \edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_DISK_STORAGE}
 \edef\UseOption{\UseOption,HAVE_CAR_ADAPTER_MODE}
-\edef\UseOption{\UseOption,HAVE_BUTTON_LIGHTS}
-\edef\UseOption{\UseOption,sansa}
+\edef\UseOption{\UseOption,iriver}
 
-\newcommand{\playerman}{Sansa}
-\newcommand{\playertype}{c200 Series}
-\newcommand{\playerlongtype}{\playertype}
-\newcommand{\genericimg}{132x80x16}
-\newcommand{\specimg}{c200}
+\newcommand{\playerman}{Iriver}
+\newcommand{\playertype}{H10}
+\newcommand{\playerlongtype}{\playertype{} 5GB and 6GB}
+\newcommand{\genericimg}{128x128x16}
+\newcommand{\specimg}{h10_5gb}
 %Used to name the player, e.g. ...to the \dap
 \newcommand{\dap}{player}
 %For use when referring to the player. E.g. the \daps\ capacity ...
@@ -19,7 +19,7 @@
 \newcommand{\firmwarefilename}{\fname{rockbox.mi4}}
 \newcommand{\firmwareextension}{\fname{mi4}}
 \newcommand{\screenshotsize}{4cm}
-\newcommand{\disk}{flash storage}
+\newcommand{\disk}{hard disk}
 
 % link external keymap file
-\input{platform/keymap-c200.tex}
+\input{platform/keymap-iriverh10.tex}

@@ -354,16 +354,16 @@ whichadvanced () {
     if [ "$memory" = "2" ]; then
       printf ", (8)MB MOD"
     fi
-    if [ "$modelname" = "player" ]; then
+    if [ "$modelname" = "archosplayer" ]; then
       printf ", Use (A)TA poweroff"
     fi
     if [ "$t_model" = "ondio" ]; then
       printf ", (B)acklight MOD"
     fi
-    if [ "$modelname" = "m5" ]; then
+    if [ "$modelname" = "iaudiom5" ]; then
       printf ", (F)M radio MOD"
     fi
-    if [ "$modelname" = "h120" ]; then
+    if [ "$modelname" = "iriverh120" ]; then
       printf ", (R)TC MOD"
     fi
     echo ""
@@ -414,7 +414,7 @@ whichadvanced () {
         fi
         ;;
       [Aa])
-        if [ "$modelname" = "player" ]; then
+        if [ "$modelname" = "archosplayer" ]; then
           have_ata_poweroff="#define HAVE_ATA_POWEROFF"
           echo "ATA poweroff enabled"
         fi
@@ -426,13 +426,13 @@ whichadvanced () {
         fi
         ;;
       [Ff])
-        if [ "$modelname" = "m5" ]; then
+        if [ "$modelname" = "iaudiom5" ]; then
           have_fmradio_in="#define HAVE_FMRADIO_IN"
           echo "FM radio functions enabled"
         fi
         ;;
       [Rr])
-        if [ "$modelname" = "h120" ]; then
+        if [ "$modelname" = "iriverh120" ]; then
           config_rtc="#define CONFIG_RTC RTC_DS1339_DS3231"
           have_rtc_alarm="#define HAVE_RTC_ALARM"
           echo "RTC functions enabled (DS1339/DS3231)"
@@ -889,7 +889,7 @@ else
 cat <<EOF
  ==Archos==               ==iriver==             ==Apple iPod==
   0) Player/Studio        10) H120/H140          20) Color/Photo
-  1) Recorder             11) H320/H340          21) Nano
+  1) Recorder             11) H320/H340          21) Nano 1G
   2) FM Recorder          12) iHP-100/110/115    22) Video
   3) Recorder v2          13) iFP-790            23) 3G
   4) Ondio SP             14) H10 20Gb           24) 4G Grayscale
@@ -978,9 +978,9 @@ fi
 
   case $buildfor in
 
-   0|player)
+   0|archosplayer)
     target_id=1
-    modelname="player"
+    modelname="archosplayer"
     target="-DARCHOS_PLAYER"
     shcc
     tool="$rootdir/tools/scramble"
@@ -1004,9 +1004,9 @@ fi
     t_model="player"
     ;;
 
-   1|recorder)
+   1|archosrecorder)
     target_id=2
-    modelname="recorder"
+    modelname="archosrecorder"
     target="-DARCHOS_RECORDER"
     shcc
     tool="$rootdir/tools/scramble"
@@ -1026,9 +1026,9 @@ fi
     t_model="recorder"
     ;;
 
-   2|fmrecorder)
+   2|archosfmrecorder)
     target_id=3
-    modelname="fmrecorder"
+    modelname="archosfmrecorder"
     target="-DARCHOS_FMRECORDER"
     shcc
     tool="$rootdir/tools/scramble -fm"
@@ -1048,9 +1048,9 @@ fi
     t_model="fm_v2"
     ;;
 
-   3|recorderv2)
+   3|archosrecorderv2)
     target_id=4
-    modelname="recorderv2"
+    modelname="archosrecorderv2"
     target="-DARCHOS_RECORDERV2"
     shcc
     tool="$rootdir/tools/scramble -v2"
@@ -1070,9 +1070,9 @@ fi
     t_model="fm_v2"
     ;;
 
-   4|ondiosp)
+   4|archosondiosp)
     target_id=7
-    modelname="ondiosp"
+    modelname="archosondiosp"
     target="-DARCHOS_ONDIOSP"
     shcc
     tool="$rootdir/tools/scramble -osp"
@@ -1092,9 +1092,9 @@ fi
     t_model="ondio"
     ;;
 
-   5|ondiofm)
+   5|archosondiofm)
     target_id=8
-    modelname="ondiofm"
+    modelname="archosondiofm"
     target="-DARCHOS_ONDIOFM"
     shcc
     tool="$rootdir/tools/scramble -ofm"
@@ -1112,9 +1112,9 @@ fi
     t_model="ondio"
     ;;
 
-   6|av300)
+   6|archosav300)
     target_id=38
-    modelname="av300"
+    modelname="archosav300"
     target="-DARCHOS_AV300"
     memory=16 # always
     arm7tdmicc
@@ -1134,9 +1134,9 @@ fi
     t_model="av300"
     ;;
 
-  10|h120)
+  10|iriverh120)
     target_id=9
-    modelname="h120"
+    modelname="iriverh120"
     target="-DIRIVER_H120"
     memory=32 # always
     coldfirecc
@@ -1159,9 +1159,9 @@ fi
     t_model="h100"
     ;;
 
-   11|h300)
+   11|iriverh300)
     target_id=10
-    modelname="h300"
+    modelname="iriverh300"
     target="-DIRIVER_H300"
     memory=32 # always
     coldfirecc
@@ -1182,9 +1182,9 @@ fi
     t_model="h300"
     ;;
 
-   12|h100)
+   12|iriverh100)
     target_id=11
-    modelname="h100"
+    modelname="iriverh100"
     target="-DIRIVER_H100"
     memory=16 # always
     coldfirecc
@@ -1207,9 +1207,9 @@ fi
     t_model="h100"
     ;;
 
-   13|ifp7xx)
+   13|iriverifp7xx)
     target_id=19
-    modelname="ifp7xx"
+    modelname="iriverifp7xx"
     target="-DIRIVER_IFP7XX"
     memory=1
     arm7tdmicc short
@@ -1228,9 +1228,9 @@ fi
     t_model="iriver-ifp7xx"
     ;;
 
-   14|h10)
+   14|iriverh10)
     target_id=22
-    modelname="h10"
+    modelname="iriverh10"
     target="-DIRIVER_H10"
     memory=32 # always
     arm7tdmicc
@@ -1252,9 +1252,9 @@ fi
     t_model="h10"
     ;;
 
-   15|h10_5gb)
+   15|iriverh10_5gb)
     target_id=24
-    modelname="h10_5gb"
+    modelname="iriverh10_5gb"
     target="-DIRIVER_H10_5GB"
     memory=32 # always
     arm7tdmicc
@@ -1299,9 +1299,9 @@ fi
     t_model="color"
     ;;
 
-   21|ipodnano)
+   21|ipodnano1g)
     target_id=14
-    modelname="ipodnano"
+    modelname="ipodnano1g"
     target="-DIPOD_NANO"
     memory=32 # always
     arm7tdmicc
@@ -1390,9 +1390,9 @@ fi
     t_model="4g"
     ;;
 
-   25|ipodmini)
+   25|ipodmini1g)
     target_id=18
-    modelname="ipodmini"
+    modelname="ipodmini1g"
     target="-DIPOD_MINI"
     memory=32 # always
     arm7tdmicc
@@ -1482,9 +1482,9 @@ fi
     t_model="ipodnano2g"
     ;;
 
-   30|x5)
+   30|iaudiox5)
     target_id=12
-    modelname="x5"
+    modelname="iaudiox5"
     target="-DIAUDIO_X5"
     memory=16 # always
     coldfirecc
@@ -1506,9 +1506,9 @@ fi
     t_model="x5"
     ;;
 
-   31|m5)
+   31|iaudiom5)
     target_id=28
-    modelname="m5"
+    modelname="iaudiom5"
     target="-DIAUDIO_M5"
     memory=16 # always
     coldfirecc
@@ -1576,9 +1576,9 @@ fi
     t_model="cowond2"
     ;;
     
-   34|m3)
+   34|iaudiom3)
     target_id=37
-    modelname="m3"
+    modelname="iaudiom3"
     target="-DIAUDIO_M3"
     memory=16 # always
     coldfirecc
@@ -1598,9 +1598,9 @@ fi
     t_model="m3"
     ;;
 
-   40|gigabeatf)
+   40|gigabeatfx)
     target_id=20
-    modelname="gigabeatf"
+    modelname="gigabeatfx"
     target="-DGIGABEAT_F"
     memory=32 # always
     arm9tdmicc
@@ -1785,9 +1785,9 @@ fi
     t_model="creative-zvm"
     ;;
 
-   50|e200)
+   50|sansae200)
     target_id=23
-    modelname="e200"
+    modelname="sansae200"
     target="-DSANSA_E200"
     memory=32 # supposedly
     arm7tdmicc
@@ -1809,12 +1809,12 @@ fi
     t_model="sansa-e200"
     ;;
 
-   51|e200r)
+   51|sansae200r)
     # the e200R model is pretty much identical to the e200, it only has a
     # different option to the scramble tool when building a bootloader and
     # makes the bootloader output file name in all lower case.
     target_id=27
-    modelname="e200r"
+    modelname="sansae200r"
     target="-DSANSA_E200"
     memory=32 # supposedly
     arm7tdmicc
@@ -1836,9 +1836,9 @@ fi
     t_model="sansa-e200"
     ;;
 
-   52|c200)
+   52|sansac200)
     target_id=30
-    modelname="c200"
+    modelname="sansac200"
     target="-DSANSA_C200"
     memory=32 # supposedly
     arm7tdmicc
@@ -1860,9 +1860,9 @@ fi
     t_model="sansa-c200"
     ;;
 
-   53|m200)
+   53|sansam200)
     target_id=48
-    modelname="m200"
+    modelname="sansam200"
     target="-DSANSA_M200"
     memory=1 # always
     arm946cc
@@ -1884,9 +1884,9 @@ fi
     t_model="m200"
     ;;
 
-   54|c100)
+   54|sansac100)
     target_id=42 
-    modelname="c100" 
+    modelname="sansac100" 
     target="-DSANSA_C100"     
     memory=2
     arm946cc
@@ -1908,9 +1908,9 @@ fi
     t_model="c100"
     ;;
 
-   55|Clip|clip)
+   55|sansaclip)
     target_id=50
-    modelname="clip"
+    modelname="sansaclip"
     target="-DSANSA_CLIP"
     memory=2
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1929,9 +1929,9 @@ fi
     ;;
 
 
-   56|e200v2)
+   56|sansae200v2)
     target_id=51
-    modelname="e200v2"
+    modelname="sansae200v2"
     target="-DSANSA_E200V2"
     memory=8
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1950,9 +1950,9 @@ fi
     ;;
 
 
-   57|m200v4)
+   57|sansam200v4)
     target_id=52
-    modelname="m200v4"
+    modelname="sansam200v4"
     target="-DSANSA_M200V4"
     memory=2
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1971,9 +1971,9 @@ fi
     ;;
 
 
-   58|fuze)
+   58|sansafuze)
     target_id=53
-    modelname="fuze"
+    modelname="sansafuze"
     target="-DSANSA_FUZE"
     memory=8
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1992,9 +1992,9 @@ fi
     ;;
 
 
-   59|c200v2)
+   59|sansac200v2)
     target_id=55
-    modelname="c200v2"
+    modelname="sansac200v2"
     target="-DSANSA_C200V2"
     memory=2 # as per OF diagnosis mode
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -2015,11 +2015,11 @@ fi
     arm9tdmicc
     ;;
 
-   60|Clipv2|clipv2)
+   60|sansaclipv2)
     echo "Sansa Clipv2 is not yet supported !"
     exit 1
     target_id=60
-    modelname="clipv2"
+    modelname="sansaclipv2"
     target="-DSANSA_CLIPV2"
     memory=8
     arm926ejscc
@@ -2037,11 +2037,11 @@ fi
     t_model="sansa-clipv2"
     ;;
 
-   61|view)
+   61|sansaview)
     echo "Sansa View is not yet supported!"
     exit 1
     target_id=63
-    modelname="view"
+    modelname="sansaview"
     target="-DSANSA_VIEW"
     memory=32
     arm1176jzscc
@@ -2061,10 +2061,10 @@ fi
     t_model="sansa-view"
     ;;
 
-   150|tpj1022)
+   150|tatungtpj1022)
     target_id=25
-    modelname="tpj1022"
-    target="-DELIO_TPJ1022"
+    modelname="tatungtpj1022"
+    target="-DTATUNG_TPJ1022"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -add tpj2"
@@ -2085,9 +2085,9 @@ fi
     t_model="tpj1022"
     ;;
 
-   100|sa9200)
+   100|gogearsa9200)
     target_id=41
-    modelname="sa9200"
+    modelname="gogearsa9200"
     target="-DPHILIPS_SA9200"
     memory=32 # supposedly
     arm7tdmicc
@@ -2109,9 +2109,9 @@ fi
     t_model="sa9200"
     ;;
 
-   101|hdd1630)
+   101|gogearhdd1630)
     target_id=43
-    modelname="hdd1630"
+    modelname="gogearhdd1630"
     target="-DPHILIPS_HDD1630"
     memory=32 # supposedly
     arm7tdmicc
@@ -2287,9 +2287,9 @@ fi
     t_model="onda_vx747"
     ;;
     
-    130|lyre_proto1)
+    130|lyreproto1)
     target_id=56
-    modelname="lyre_proto1"
+    modelname="lyreproto1"
     target="-DLYRE_PROTO1"
     memory=64
     arm926ejscc
@@ -2331,9 +2331,9 @@ fi
     t_model="mini2440"
     ;;
 
-   140|yh820)
+   140|samsungyh820)
     target_id=57
-    modelname="yh820"
+    modelname="samsungyh820"
     target="-DSAMSUNG_YH820"
     memory=32 # always
     arm7tdmicc
@@ -2355,9 +2355,9 @@ fi
     t_model="yh820"
     ;;
 
-   141|yh920)
+   141|samsungyh920)
     target_id=58
-    modelname="yh920"
+    modelname="samsungyh920"
     target="-DSAMSUNG_YH920"
     memory=32 # always
     arm7tdmicc
@@ -2379,9 +2379,9 @@ fi
     t_model="yh920"
     ;;
 
-   142|yh925)
+   142|samsungyh925)
     target_id=59
-    modelname="yh925"
+    modelname="samsungyh925"
     target="-DSAMSUNG_YH925"
     memory=32 # always
     arm7tdmicc
@@ -2403,9 +2403,9 @@ fi
     t_model="yh925"
     ;;
 
-   143|yps3)
+   143|samsungyps3)
     target_id=60
-    modelname="yps3"
+    modelname="samsungyps3"
     target="-DSAMSUNG_YPS3"
     memory=16 # always
     arm940tbecc
@@ -2489,13 +2489,13 @@ fi
   # the ifp7x0 is the only platform that supports building a gdb stub like
   # this
 case $modelname in
-  ifp7xx)
+  iriverifp7xx)
      gdbstub="(G)DB stub, "
      ;;
-  e200r|e200)
+  sansae200r|sansae200)
      gdbstub="(I)nstaller, "
      ;;
-  c200)
+  sansac200)
      gdbstub="(E)raser, "
      ;;
   *)
@@ -2572,7 +2572,7 @@ fi
       appsdir='\$(ROOTDIR)/gdb'
       apps="stub"
       case $modelname in
-          ifp7xx)
+          iriverifp7xx)
               output="stub.wma"
               ;;
           *)
@@ -2608,7 +2608,7 @@ fi
       echo "Database tool build selected"
       ;;
     *)
-      if [ "$modelname" = "e200r" ]; then
+      if [ "$modelname" = "sansae200r" ]; then
           echo "Do not use the e200R target for regular builds.  Use e200 instead."
           exit 8
       fi
@@ -2620,17 +2620,17 @@ fi
   esac
   # to be able running "make manual" from non-manual configuration
   case $modelname in
-      fmrecorder)
-          manualdev="recorderv2fm"
+      archosfmrecorder)
+          manualdev="archosrecorderv2fm"
           ;;
-      recorderv2)
-          manualdev="recorderv2fm"
+      archosrecorderv2)
+          manualdev="archosrecorderv2fm"
           ;;
-      h1??)
-          manualdev="h100"
+      iriverh1??)
+          manualdev="iriverh100"
           ;;
       ipodmini2g)
-          manualdev="ipodmini"
+          manualdev="ipodmini1g"
           ;;
       *)
           manualdev=$modelname

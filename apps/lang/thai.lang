@@ -261,15 +261,15 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    h100,h120,h300: "NAVI = Yes"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = ใช่"
-    h100,h120,h300: "NAVI = ใช่"
-    yh*,ipod*,x5,m5,gigabeat*,e200*,c200*,h10,h10_5gb,mrobe100,sa9200: "SELECT = ใช่"
-    player: "(PLAY/STOP)"
+    iriverh100,iriverh120,iriverh300: "NAVI = ใช่"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = ใช่"
+    archosplayer: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
@@ -281,15 +281,15 @@
   user: core
   <source>
     *: "Any Other = No"
-    player: none
+    archosplayer: none
   </source>
   <dest>
     *: "ปุ่มอื่นๆ = ไม่ใช่"
-    player: none
+    archosplayer: none
   </dest>
   <voice>
     *: ""
-    player: none
+    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -2365,17 +2365,17 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    h100,h120,h300: "Building database... %d found (STOP to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200*,sa9200: "Building database... %d found (PREV to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (OFF เพื่อย้อนกลับ)"
-    h100,h120,h300: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (STOP เพื่อย้อนกลับ)"
+    iriverh100,iriverh120,iriverh300: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (STOP เพื่อย้อนกลับ)"
     ipod*: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
-    x5,m5,gigabeat*,mrobe100: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (LEFT เพื่อย้อนกลับ)"
-    h10,h10_5gb,e200*,c200*,sa9200: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (LEFT เพื่อย้อนกลับ)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -3175,7 +3175,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu alternative for jump scroll
+  desc: (archosplayer) menu alternative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
@@ -3189,7 +3189,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -3203,7 +3203,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (player) Delay before making a jump scroll
+  desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
@@ -3835,17 +3835,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "เวลาเปิดไฟปุ่ม"
-    fuze*,e200*: "เวลาเปิดไฟล้อหมุน"
+    sansafuze*,sansae200*: "เวลาเปิดไฟล้อหมุน"
   </dest>
   <voice>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
   </voice>
 </phrase>
 <phrase>
@@ -4109,14 +4109,14 @@
   <source>
     *: none
     rtc: "ON = Set"
-    h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = ตั้งค่า"
-    h100,h120,h300: "NAVI = ตั้งค่า"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200*,gigabeat*,mrobe100,sa9200: "SELECT = ตั้งค่า"
+    iriverh100,iriverh120,iriverh300: "NAVI = ตั้งค่า"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = ตั้งค่า"
   </dest>
   <voice>
     *: none
@@ -4129,22 +4129,22 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    h100,h120,h300: "STOP = Revert"
-    ipod*,c200*,sa9200: "MENU = Revert"
-    x5,m5: "RECORD = Revert"
-    h10,h10_5gb,e200*,fuze*: "PREV = Revert"
-    gigabeatf: "POWER = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    iaudiox5,iaudiom5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = ยกเลิก"
-    h100,h120,h300: "STOP = ยกเลิก"
-    ipod*,c200*,sa9200: "MENU = ยกเลิก"
-    x5,m5: "RECORD = ยกเลิก"
-    h10,h10_5gb,e200*,fuze*: "PREV = ยกเลิก"
-    gigabeatf: "POWER = ยกเลิก"
+    iriverh100,iriverh120,iriverh300: "STOP = ยกเลิก"
+    ipod*,sansac200*,gogearsa9200: "MENU = ยกเลิก"
+    iaudiox5,iaudiom5: "RECORD = ยกเลิก"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = ยกเลิก"
+    gigabeatfx: "POWER = ยกเลิก"
     mrobe100: "DISPLAY = ยกเลิก"
     gigabeats: "BACK = ยกเลิก"
   </dest>
@@ -4672,14 +4672,14 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
-    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=ตั้งเวลา OFF=ยกเลิก"
     ipod*: "SELECT=ตั้งเวลา MENU=ยกเลิก"
-    h10,h10_5gb: "SELECT=ตั้งเวลา PREV=ยกเลิก"
+    iriverh10,iriverh10_5gb: "SELECT=ตั้งเวลา PREV=ยกเลิก"
     gigabeats: "SELECT=ตั้งเวลา POWER=ยกเลิก"
   </dest>
   <voice>
@@ -5853,17 +5853,17 @@
   <source>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </source>
   <dest>
     *: none
     recording: "ไมโครโฟน"
-    h100,h120,h300: "ไมโครโฟนภายใน"
+    iriverh100,iriverh120,iriverh300: "ไมโครโฟนภายใน"
   </dest>
   <voice>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -5889,15 +5889,15 @@
   user: core
   <source>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </source>
   <dest>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </dest>
   <voice>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </voice>
 </phrase>
 <phrase>
@@ -6827,11 +6827,11 @@
   user: core
   <source>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </source>
   <dest>
     *: "บัฟเฟอร์:"
-    player: "บัฟเฟอร์:"
+    archosplayer: "บัฟเฟอร์:"
   </dest>
   <voice>
     *: ""
@@ -6843,13 +6843,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "แบตเตอรี่: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "แบต: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,ondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "แบต: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -6907,19 +6907,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    e200*,c200*,fuze*: "micro Secure Digital card:"
+    sansae200*,sansac200*,sansafuze*: "micro Secure Digital card:"
     ondio*: "Multimedia card"
   </voice>
 </phrase>
@@ -8031,15 +8031,15 @@
   user: core
   <source>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </source>
   <dest>
     *: "สิ้นสุดรายการเพลง"
-    player: "สิ้นสุดรายการ"
+    archosplayer: "สิ้นสุดรายการ"
   </dest>
   <voice>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </voice>
 </phrase>
 <phrase>
@@ -8279,20 +8279,20 @@
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200*: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "ดีสก์เต็ม กดปุ่ม OFF เพื่อทำงานต่อ"
-    h100,h120,h300: "ดีสก์เต็ม กดปุ่ม STOP เพื่อทำงานต่อ"
-    m5,x5: "ดีสก์เต็ม กดปุ่ม POWER เพื่อทำงานต่อ"
-    e200*,c200*: "ดีสก์เต็ม กดปุ่ม PREV เพื่อทำงานต่อ"
+    iriverh100,iriverh120,iriverh300: "ดีสก์เต็ม กดปุ่ม STOP เพื่อทำงานต่อ"
+    iaudiom5,iaudiox5: "ดีสก์เต็ม กดปุ่ม POWER เพื่อทำงานต่อ"
+    sansae200*,sansac200*: "ดีสก์เต็ม กดปุ่ม PREV เพื่อทำงานต่อ"
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8376,25 +8376,25 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on recorder models
+  desc: Used on archosrecorder models
   user: core
   <source>
     *: "OFF to abort"
-    player,h100,h120,h300: "STOP to abort"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
-    x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200*,c200*: "PREV to abort"
+    iaudiox5,iaudiom5: "Long PLAY to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
     gigabeats: "BACK to abort"
-    gigabeatf: "POWER to abort"
+    gigabeatfx: "POWER to abort"
   </source>
   <dest>
     *: "OFF เพื่อยกเลิก"
-    player,h100,h120,h300: "STOP เพื่อยกเลิก"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP เพื่อยกเลิก"
     ipod*: "PLAY/PAUSE เพื่อยกเลิก"
-    x5,m5: "Long PLAY เพื่อยกเลิก"
-    h10,h10_5gb,e200*,c200*: "PREV เพื่อยกเลิก"
+    iaudiox5,iaudiom5: "Long PLAY เพื่อยกเลิก"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV เพื่อยกเลิก"
     gigabeats: "BACK เพื่อยกเลิก"
-    gigabeatf: "POWER เพื่อยกเลิก"
+    gigabeatfx: "POWER เพื่อยกเลิก"
   </dest>
   <voice>
     *: ""
@@ -8618,19 +8618,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 recorder
+  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
   user: core
   <source>
     *: none
-    recorder: "Battery: Top-Off Chg"
+    archosrecorder: "Battery: Top-Off Chg"
   </source>
   <dest>
     *: none
-    recorder: "แบตเตอรี่: ชาร์จสูงสุด"
+    archosrecorder: "แบตเตอรี่: ชาร์จสูงสุด"
   </dest>
   <voice>
     *: none
-    recorder: "Top off charge"
+    archosrecorder: "Top off charge"
   </voice>
 </phrase>
 <phrase>
@@ -10447,7 +10447,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200*: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -11571,15 +11571,15 @@
   user: core
   <source>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatf: "ความไวแผ่นสัมผัส"
+    gigabeatfx: "ความไวแผ่นสัมผัส"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </voice>
 </phrase>
 <phrase>
@@ -12104,14 +12104,14 @@
   user: core
   <source>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </source>
   <dest>
     *: none
-    gigabeatf: "สูง"
+    gigabeatfx: "สูง"
   </dest>
   <voice>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </voice>
 </phrase>

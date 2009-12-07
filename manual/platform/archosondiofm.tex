@@ -1,16 +1,16 @@
 % $Id$ %
-\def\UseOption{recorderv2fm}
-\edef\UseOption{\UseOption,RECORDER_PAD}
-\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
-\edef\UseOption{\UseOption,HAVE_DISK_STORAGE}
-\edef\UseOption{\UseOption,HAVE_CAR_ADAPTER_MODE}
+%platform file for the Ondio FM
+\def\UseOption{ondiofm}
+% To not break the current manual
+\edef\UseOption{\UseOption,ondio}
+\edef\UseOption{\UseOption,ONDIO_PAD}
 \edef\UseOption{\UseOption,archos}
 
 \newcommand{\playerman}{Archos}
-\newcommand{\playertype}{Recorder V2/FM}
-\newcommand{\playerlongtype}{Recorder V2 and FM}
+\newcommand{\playertype}{Ondio}
+\newcommand{\playerlongtype}{Ondio 128 FM}
 \newcommand{\genericimg}{112x64x1}
-\newcommand{\specimg}{recorderv2fm}
+\newcommand{\specimg}{ondiofm}
 %Used to name the player, e.g. ...to the \dap
 \newcommand{\dap}{player}
 %For use when referring to the player. E.g. the \daps\ capacity ...
@@ -18,7 +18,7 @@
 \newcommand{\firmwarefilename}{\fname{ajbrec.ajz}}
 \newcommand{\firmwareextension}{\fname{ajz}}
 \newcommand{\screenshotsize}{4cm}
-\newcommand{\disk}{hard disk}
+\newcommand{\disk}{flash storage}
 
 % link external keymap file
-\input{platform/keymap-recorder.tex}
+\input{platform/keymap-archosondio.tex}
