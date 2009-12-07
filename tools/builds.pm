@@ -99,7 +99,7 @@ $releasenotes="/wiki/ReleaseNotes34";
     },
     'ipodnano2g' => {
         name => 'iPod Nano 2nd gen',
-        status => 3,
+        status => 2,
     },
     'ipodvideo' => {
         name => 'iPod Video 30GB',
@@ -237,7 +237,7 @@ $releasenotes="/wiki/ReleaseNotes34";
     },
     'sansae200v2' => {
         name => 'SanDisk Sansa e200 v2',
-        status => 3,
+        status => 2,
         icon => 'sansae200',
     },
     'sansafuze' => {
