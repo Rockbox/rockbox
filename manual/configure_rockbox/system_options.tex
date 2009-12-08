@@ -240,7 +240,7 @@ this option \setting{On}. If it is not required, then turning this setting
                     &}
                 Volume up / down, respectively
                 \\
-     
+
                 % Volume mute
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
                     ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}{\ButtonSelect}
@@ -253,7 +253,7 @@ this option \setting{On}. If it is not required, then turning this setting
                     &}
                 Volume mute
                 \\
-     
+
                 % Playback play / pause
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonUp}
                 \opt{IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD%
@@ -266,7 +266,7 @@ this option \setting{On}. If it is not required, then turning this setting
                     &}
                 Play / Pause
                 \\
-     
+
                 % Playback stop
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
                 \opt{GIGABEAT_S_PAD}{\ButtonMenu; \ButtonDown}
@@ -282,7 +282,7 @@ this option \setting{On}. If it is not required, then turning this setting
                     &}
                 Stop
                 \\
-     
+
                 % Scan previous track
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,%
                     IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD%
@@ -295,7 +295,7 @@ this option \setting{On}. If it is not required, then turning this setting
                     &}
                 Scan previous track
                 \\
-     
+
                 % Scan next track
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
                     ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD%
@@ -310,7 +310,7 @@ this option \setting{On}. If it is not required, then turning this setting
                 \\
             \end{btnmap}
         \end{table}
- 
+
         \item [Presentation.] This mode lets you control a presentation program
         (e.g. OpenOffice Impress, and some other popular application), making
         the \dap{} a wired remote control device. This mode is can be useful
@@ -391,6 +391,7 @@ this option \setting{On}. If it is not required, then turning this setting
                     \opt{MROBE100_RC_PAD}{Long \ButtonRCFF}%
                     &}
                 Slide last
+                %\nopt{SANSA_C200_PAD}{
                 \\
 
                 % Screen black
@@ -404,6 +405,7 @@ this option \setting{On}. If it is not required, then turning this setting
                     \opt{MROBE100_RC_PAD}{\ButtonRCDisplay}%
                     &}
                 Blank screen
+                %}
                 \\
 
                 % Screen white
@@ -462,7 +464,7 @@ this option \setting{On}. If it is not required, then turning this setting
                 \\
             \end{btnmap}
         \end{table}
- 
+
         \item [Browser.] This mode lets you control a web browser (e.g. 
         Firefox). It uses the \dap{}'s keys to navigate through the web page
         and different tabs, navigate through history, and to control zoom.
@@ -592,7 +594,7 @@ this option \setting{On}. If it is not required, then turning this setting
                 \\
             \end{btnmap}
         \end{table}
- 
+
         {\opt{usb_hid_mouse}{
         \item [Mouse.] This mode emulates a mouse. Features supported: Mouse
         movement; left and right button clicking; and dragging and dropping.
@@ -614,7 +616,7 @@ this option \setting{On}. If it is not required, then turning this setting
                     &}
                 Cursor move up / down / left / right, respectively
                 \\
-     
+
                 % Mouse button left-click
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
                     ,IPOD_3G_PAD,IPOD_1G2G_PAD}
@@ -627,8 +629,9 @@ this option \setting{On}. If it is not required, then turning this setting
                     \opt{MROBE100_RC_PAD}{\ButtonRCHeart}%
                     &}
                 Left mouse button click
+                \nopt{IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{
                 \\
-     
+ 
                 % Mouse button right-click
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
                 \opt{GIGABEAT_S_PAD}{\ButtonMenu}
@@ -638,8 +641,9 @@ this option \setting{On}. If it is not required, then turning this setting
                 \opt{HAVEREMOTEKEYMAP}{
                     &}
                 Right mouse button click
+                }
                 \\
-     
+
                 % Mouse wheel scroll up / down
                 \opt{SANSA_E200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
                     {\ButtonScrollBack / \ButtonScrollFwd}
