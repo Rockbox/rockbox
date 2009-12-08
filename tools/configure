@@ -628,19 +628,12 @@ voiceconfig () {
         echo "(voice_$TTS_FESTIVAL_VOICE)" > festival-prolog.scm
     fi
 
-    # Allow the user to input manual commandline options
+    # Read custom tts options from command line
     if [ "$ARG_TTSOPTS" ]; then
-        USER_TTS_OPTS=$ARG_TTSOPTS
-    else
-        printf "Enter $TTS_ENGINE options (enter for defaults \"$TTS_OPTS\"): "
-        USER_TTS_OPTS=`input`
-        echo ""
+        TTS_OPTS="$ARG_TTS_OPTS"
+        advopts="$advopts --ttsopts='$TTS_OPTS'"
+        echo "$TTS_ENGINE options set to $TTS_OPTS"
     fi
-    advopts="$advopts --ttsopts='$USER_TTS_OPTS'"
-    if [ -n "$USER_TTS_OPTS" ]; then
-        TTS_OPTS="$USER_TTS_OPTS"
-    fi
-    echo "$TTS_ENGINE options set to $TTS_OPTS"
 
     if [ "$swcodec" = "yes" ]; then
         ENCODER="rbspeexenc"
@@ -660,18 +653,12 @@ voiceconfig () {
  
     echo "Using $ENCODER for encoding voice clips"
 
-    # Allow the user to input manual commandline options
+    # Read custom encoder options from command line
     if [ "$ARG_ENCOPTS" ]; then
-        USER_ENC_OPTS=$ARG_ENCOPTS
-    else
-        printf "Enter $ENCODER options (enter for defaults \"$ENC_OPTS\"): "
-        USER_ENC_OPTS=`input`
+        ENC_OPTS="$ARG_ENCOPTS"
+        advopts="$advopts --encopts='$ENC_OPTS'"
+        echo "$ENCODER options set to $ENC_OPTS"
     fi
-    advopts="$advopts --encopts='$USER_ENC_OPTS'"
-    if [ -n "$USER_ENC_OPTS" ]; then
-        ENC_OPTS=$USER_ENC_OPTS
-    fi
-    echo "$ENCODER options set to $ENC_OPTS"
 
     TEMPDIR="${pwd}"
     if [ -n "`findtool cygpath`" ]; then
