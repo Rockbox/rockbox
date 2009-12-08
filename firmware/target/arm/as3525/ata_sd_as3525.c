@@ -336,9 +336,6 @@ static int sd_init_card(const int drive)
     }
 #endif /*  HAVE_MULTIDRIVE  */
 
-    /* Boost MCICLK to operating speed */ /*FIXME: v1 at 31 MHz still too high*/
-    MCI_CLOCK(drive) = (sd_v2 ? MCI_HALFSPEED : MCI_HALFSPEED);
-
     /* CMD9 send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
                  MCI_RESP|MCI_LONG_RESP|MCI_ARG, temp_reg))
@@ -348,6 +345,14 @@ static int sd_init_card(const int drive)
         card_info[drive].csd[3-i] = temp_reg[i];
 
     sd_parse_csd(&card_info[drive]);
+
+    /* Boost MCICLK to operating speed */
+    if(drive == INTERNAL_AS3525)
+        MCI_CLOCK(drive) = MCI_QUARTERSPEED;  /* MCICLK = PCLK/4 = 15.5MHz  */
+    else
+        /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
+        MCI_CLOCK(drive) = ((card_info[drive].speed == 50000000) ?
+                                              MCI_HALFSPEED : MCI_QUARTERSPEED);
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
@@ -619,6 +624,7 @@ static int sd_select_bank(signed char bank)
                                 (1<<3) /* DMA */                |
                                 (9<<4) /* 2^9 = 512 */ ;
 
+        /* Wakeup signal comes from NAND/MCIO isr on MCI_ERROR | MCI_DATA_END */
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
         /*  Wait for FIFO to empty, card may still be in PRG state  */
@@ -697,15 +703,16 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                 transfer = BLOCKS_PER_BANK - bank_start;
         }
 
-        dma_buf = aligned_buffer;
-        if(transfer > UNALIGNED_NUM_SECTORS)
-            transfer = UNALIGNED_NUM_SECTORS;
-        if(write)
-            memcpy(uncached_buffer, buf, transfer * SD_BLOCK_SIZE);
-
         /* Set bank_start to the correct unit (blocks or bytes) */
         if(!(card_info[drive].ocr & (1<<30)))   /* not SDHC */
             bank_start *= SD_BLOCK_SIZE;
+
+        dma_buf = aligned_buffer;
+        if(transfer > UNALIGNED_NUM_SECTORS)
+            transfer = UNALIGNED_NUM_SECTORS;
+
+        if(write)
+            memcpy(uncached_buffer, buf, transfer * SD_BLOCK_SIZE);
 
         ret = sd_wait_for_state(drive, SD_TRAN);
         if (ret < 0)
@@ -721,17 +728,20 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         }
 
         if(write)
+        {
             dma_enable_channel(0, dma_buf, MCI_FIFO(drive),
                 (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
                 DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
+
+            /*Small delay for writes prevents data crc failures at lower freqs*/
+            int write_delay = 125;
+            while(write_delay--);
+        }
         else
             dma_enable_channel(0, MCI_FIFO(drive), dma_buf,
                 (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
-        /* FIXME : we should check if the timeouts calculated from the card's
-         * CSD are lower, and use them if it is the case
-         * Note : the OF doesn't seem to use them anyway */
         MCI_DATA_TIMER(drive) = write ?
                 SD_MAX_WRITE_TIMEOUT : SD_MAX_READ_TIMEOUT;
         MCI_DATA_LENGTH(drive) = transfer * SD_BLOCK_SIZE;
@@ -740,6 +750,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                                 (1<<3) /* DMA */                        |
                                 (9<<4) /* 2^9 = 512 */ ;
 
+        /* Wakeup signal comes from NAND/MCIO isr on MCI_ERROR | MCI_DATA_END */
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
         /*  Wait for FIFO to empty, card may still be in PRG state for writes */
