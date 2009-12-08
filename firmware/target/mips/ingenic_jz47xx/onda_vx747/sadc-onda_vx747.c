@@ -78,21 +78,18 @@ static struct wakeup battery_wkup;
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    /* TODO */
     1600
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    /* TODO */
-    1500
+    1550
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    /* TODO */
-    { 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400 },
+    { 1550, 1790, 1810, 1825, 1855, 1865, 1875, 1900, 1930, 1985, 2200 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
