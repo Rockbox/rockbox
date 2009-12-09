@@ -1,6 +1,6 @@
 CFLAGS=-Wall -W
 
-BOOT_H = ipod1g2g.h ipod3g.h ipod4g.h ipodcolor.h ipodmini.h ipodmini2g.h ipodnano.h ipodvideo.h
+BOOT_H = ipod1g2g.h ipod3g.h ipod4g.h ipodcolor.h ipodmini1g.h ipodmini2g.h ipodnano1g.h ipodvideo.h
 
 # Enable the next two lines to build with embedded bootloaders and the 
 # --install option and interactive mode.  You need the full set of Rockbox 
@@ -13,7 +13,7 @@ BOOTOBJS=1
 endif
 
 ifdef BOOTOBJS
-BOOTSRC = ipod1g2g.c ipod3g.c ipod4g.c ipodcolor.c ipodmini.c ipodmini2g.c ipodnano.c ipodvideo.c ipodnano2g.c
+BOOTSRC = ipod1g2g.c ipod3g.c ipod4g.c ipodcolor.c ipodmini1g.c ipodmini2g.c ipodnano1g.c ipodvideo.c ipodnano2g.c
 CFLAGS += -DWITH_BOOTOBJS
 endif
 

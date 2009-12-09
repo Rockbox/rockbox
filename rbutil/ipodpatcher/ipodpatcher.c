@@ -1648,8 +1648,8 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelname = "mini";
             ipod->targetname = "ipodmini1g";
 #ifdef WITH_BOOTOBJS
-            ipod->bootloader = ipodmini;
-            ipod->bootloader_len = LEN_ipodmini;
+            ipod->bootloader = ipodmini1g;
+            ipod->bootloader_len = LEN_ipodmini1g;
 #endif
             break;
         case 0x50:
@@ -1688,8 +1688,8 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelname = "nano";
             ipod->targetname = "ipodnano1g";
 #ifdef WITH_BOOTOBJS
-            ipod->bootloader = ipodnano;
-            ipod->bootloader_len = LEN_ipodnano;
+            ipod->bootloader = ipodnano1g;
+            ipod->bootloader_len = LEN_ipodnano1g;
 #endif
             break;
         case 0xb0:
