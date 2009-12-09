@@ -28,8 +28,6 @@
 #include "screen_access.h"
 #include "settings.h"
 #include "misc.h"
-#include "panic.h"
-#include "viewport.h"
 
 /*some short cuts for fg/bg/line selector handling */
 #ifdef HAVE_LCD_COLOR
@@ -49,6 +47,7 @@
 #include "system.h"
 #include "statusbar.h"
 #include "appevents.h"
+#include "panic.h"
 #ifdef HAVE_LCD_BITMAP
 #include "language.h"
 #endif
@@ -307,10 +306,8 @@ bool viewport_point_within_vp(const struct viewport *vp,
 static void set_default_align_flags(struct viewport *vp)
 {
     vp->flags &= ~VP_FLAG_ALIGNMENT_MASK;
-#ifndef __PCTOOL__
     if (UNLIKELY(lang_is_rtl()))
         vp->flags |= VP_FLAG_ALIGN_RIGHT;
-#endif
 }
 
 #endif /* HAVE_LCD_BITMAP */
@@ -332,7 +329,9 @@ void viewport_set_fullscreen(struct viewport *vp,
     vp->height = screens[screen].lcdheight;
 
 #ifdef HAVE_LCD_BITMAP
+#ifndef __PCTOOL__
     set_default_align_flags(vp);
+#endif
     vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */
     vp->drawmode = DRMODE_SOLID;
 #if LCD_DEPTH > 1
@@ -520,7 +519,9 @@ const char* viewport_parse_viewport(struct viewport *vp,
 
     /* Set the defaults for fields not user-specified */
     vp->drawmode = DRMODE_SOLID;
+#ifndef __PCTOOL__
     set_default_align_flags(vp);
+#endif
 
     return ptr;
 }
