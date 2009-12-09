@@ -1724,7 +1724,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 {
     tCardInfo *card;
     int *cardnum = (int*)lists->data;
-    unsigned char card_name[7];
+    unsigned char card_name[6];
     unsigned char pbuf[32];
     char *title = lists->title;
     static const unsigned char i_vmin[] = { 0, 1, 5, 10, 25, 35, 60, 100 };
@@ -1751,15 +1751,21 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 
         if (card->initialized > 0)
         {
-            strlcpy(card_name, ((unsigned char*)card->cid) + 3, sizeof(card_name));
+            char temp[6] = "\0";
+            unsigned i;
+            for (i=0; i<sizeof(card_name); i++)
+            {
+                temp[i] = card_extract_bits(card->cid, (103-8*i), 8);
+            }
+            strlcpy(card_name, temp, sizeof(temp));
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "%s Rev %d.%d", card_name,
-                    (int) card_extract_bits(card->cid, 55, 4),
-                    (int) card_extract_bits(card->cid, 51, 4));
+                    (int) card_extract_bits(card->cid, 63, 4),
+                    (int) card_extract_bits(card->cid, 59, 4));
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Prod: %d/%d",
 #if (CONFIG_STORAGE & STORAGE_SD)
-                    (int) card_extract_bits(card->cid, 11, 3),
+                    (int) card_extract_bits(card->cid, 11, 4),
                     (int) card_extract_bits(card->cid, 19, 8) + 2000
 #elif (CONFIG_STORAGE & STORAGE_MMC)
                     (int) card_extract_bits(card->cid, 15, 4),
