@@ -57,12 +57,12 @@ static int unlock_volume(HANDLE hDisk)
 
 void sansa_print_error(char* msg)
 {
-    char* pMsgBuf;
+    LPSTR pMsgBuf = NULL;
 
     printf(msg);
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+    FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
                   FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(),
-                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&pMsgBuf,
+                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pMsgBuf,
                   0, NULL);
     printf(pMsgBuf);
     LocalFree(pMsgBuf);
