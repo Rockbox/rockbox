@@ -1751,13 +1751,13 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 
         if (card->initialized > 0)
         {
-            char temp[6] = "\0";
+            char card_name_temp[6] = "\0";
             unsigned i;
             for (i=0; i<sizeof(card_name); i++)
             {
-                temp[i] = card_extract_bits(card->cid, (103-8*i), 8);
+                card_name_temp[i] = card_extract_bits(card->cid, (103-8*i), 8);
             }
-            strlcpy(card_name, temp, sizeof(temp));
+            strlcpy(card_name, card_name_temp, sizeof(card_name_temp));
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "%s Rev %d.%d", card_name,
                     (int) card_extract_bits(card->cid, 63, 4),
