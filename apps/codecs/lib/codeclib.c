@@ -33,6 +33,15 @@ unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
 unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
 unsigned char* filebuf;    // The rest of the MP3 buffer
 
+unsigned bs_log2(unsigned x)
+{ return bs_generic(x, BS_LOG2); }
+unsigned bs_log2_0(unsigned x)
+{ return bs_generic(x, BS_LOG2|BS_0_0); }
+unsigned bs_clz(unsigned x)
+{ return bs_generic(x, BS_CLZ); }
+unsigned bs_clz_0(unsigned x)
+{ return bs_generic(x, BS_CLZ|BS_0_0); }
+
 int codec_init(void)
 {
     mem_ptr = 0;
@@ -139,7 +148,7 @@ void qsort(void *base, size_t nmemb, size_t size,
 }
 
 /* From ffmpeg - libavutil/common.h */
-const uint8_t ff_log2_tab[256] ICONST_ATTR = {
+const uint8_t bs_log2_tab[256] ICONST_ATTR = {
     0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
     5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
     6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
@@ -148,6 +157,17 @@ const uint8_t ff_log2_tab[256] ICONST_ATTR = {
     7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
     7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
     7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
+};
+
+const uint8_t bs_clz_tab[256] ICONST_ATTR = {
+    8,7,6,6,5,5,5,5,4,4,4,4,4,4,4,4,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
 #ifdef RB_PROFILE

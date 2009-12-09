@@ -241,58 +241,7 @@ uint32_t random_int(void)
     return (__r1 = (t3 >> 1) | t1 ) ^ (__r2 = (t4 + t4) | t2 );
 }
 
-uint32_t ones32(uint32_t x)
-{
-    x -= ((x >> 1) & 0x55555555);
-    x = (((x >> 2) & 0x33333333) + (x & 0x33333333));
-    x = (((x >> 4) + x) & 0x0f0f0f0f);
-    x += (x >> 8);
-    x += (x >> 16);
-
-    return (x & 0x0000003f);
-}
-
-uint32_t floor_log2(uint32_t x)
-{
-#if 1
-    x |= (x >> 1);
-    x |= (x >> 2);
-    x |= (x >> 4);
-    x |= (x >> 8);
-    x |= (x >> 16);
-
-    return (ones32(x) - 1);
-#else
-    uint32_t count = 0;
-
-    while (x >>= 1)
-        count++;
-
-    return count;
-#endif
-}
-
-/* returns position of first bit that is not 0 from msb,
- * starting count at lsb */
-uint32_t wl_min_lzc(uint32_t x)
-{
-#if 1
-    x |= (x >> 1);
-    x |= (x >> 2);
-    x |= (x >> 4);
-    x |= (x >> 8);
-    x |= (x >> 16);
-
-    return (ones32(x));
-#else
-    uint32_t count = 0;
-
-    while (x >>= 1)
-        count++;
-
-    return (count + 1);
-#endif
-}
+#define floor_log2(x) bs_generic(x, BS_LOG2)
 
 #ifdef FIXED_POINT
 

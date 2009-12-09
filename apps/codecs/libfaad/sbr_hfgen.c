@@ -222,10 +222,6 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac,
 
     exp = wl_min_lzc(mask);
 
-    /* improves accuracy */
-    if (exp > 0)
-        exp -= 1;
-
     for (j = offset; j < len + offset; j++)
     {
         real_t buf_j = ((QMF_RE(buffer[j][bd])+(1<<(exp-1)))>>exp);
@@ -292,10 +288,6 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
     }
 
     exp = wl_min_lzc(mask);
-
-    /* improves accuracy */
-    if (exp > 0)
-        exp -= 1;
    
     pow2_to_exp = 1<<(exp-1);
 
