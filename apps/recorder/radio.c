@@ -494,7 +494,6 @@ int radio_screen(void)
     int button_timeout = current_tick + (2*HZ);
 #endif
     struct viewport vp[NB_SCREENS];
-    int oldbars = 0, fmbars = VP_SB_ALLSCREENS;
 #ifdef HAVE_BUTTONBAR
     struct gui_buttonbar buttonbar;
     gui_buttonbar_init(&buttonbar);
@@ -505,9 +504,6 @@ int radio_screen(void)
     in_screen = true;
 
     /* always display status bar in radio screen for now */
-    FOR_NB_SCREENS(i)
-        fmbars |= VP_SB_IGNORE_SETTING(i);
-    oldbars = viewportmanager_set_statusbar(fmbars);
     FOR_NB_SCREENS(i)
     {
         viewport_set_defaults(&vp[i], i);
@@ -761,14 +757,14 @@ int radio_screen(void)
                 break;
 
             case ACTION_FM_MENU:
-                viewportmanager_set_statusbar(oldbars);
-                FOR_NB_SCREENS(i)
-                    screens[i].scroll_stop(&vp[i]);
-                radio_menu();
-                curr_preset = find_preset(curr_freq);
-                viewportmanager_set_statusbar(fmbars);
                 FOR_NB_SCREENS(i)
                 {
+                    screens[i].scroll_stop(&vp[i]);
+                }
+                radio_menu();
+                curr_preset = find_preset(curr_freq);
+                FOR_NB_SCREENS(i)
+                {                
                     screens[i].set_viewport(&vp[i]);
                     screens[i].clear_viewport();
                     screens[i].update_viewport();
@@ -798,9 +794,7 @@ int radio_screen(void)
 
                     break;
                 }
-                viewportmanager_set_statusbar(oldbars);
                 handle_radio_presets();
-                viewportmanager_set_statusbar(fmbars);
                 FOR_NB_SCREENS(i)
                 {
                     screens[i].set_viewport(&vp[i]);
@@ -932,12 +926,9 @@ int radio_screen(void)
                 FOR_NB_SCREENS(i)
                 {
                     screens[i].set_viewport(&vp[i]);
-                    peak_meter_screen(&screens[i],0,
-                                    STATUSBAR_HEIGHT + fh*(top_of_screen + 4),
-                                        fh);
-                    screens[i].update_rect(0,
-                                    STATUSBAR_HEIGHT + fh*(top_of_screen + 4),
-                                        screens[i].getwidth(), fh);
+                    peak_meter_screen(&screens[i],0, fh*(top_of_screen + 4),fh);
+                    screens[i].update_rect(0, fh*(top_of_screen + 4),
+                                           screens[i].getwidth(), fh);
                     screens[i].set_viewport(NULL);
                 }
             }
@@ -1134,8 +1125,9 @@ int radio_screen(void)
     cpu_idle_mode(false);
 #endif
     FOR_NB_SCREENS(i)
+    {
         screens[i].scroll_stop(&vp[i]);
-    viewportmanager_set_statusbar(oldbars);
+    }
     in_screen = false;
 #if CONFIG_CODEC != SWCODEC
     return have_recorded;

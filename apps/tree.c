@@ -788,7 +788,6 @@ static int dirbrowse()
                     }
                     onplay_result = onplay(buf, attr, curr_context);
                 }
-                send_event(GUI_EVENT_REFRESH, tree_drawlists);
                 switch (onplay_result)
                 {
                     case ONPLAY_MAINMENU:

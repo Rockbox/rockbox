@@ -28,6 +28,8 @@
 #include "screen_access.h"
 #include "settings.h"
 #include "misc.h"
+#include "panic.h"
+#include "viewport.h"
 
 /*some short cuts for fg/bg/line selector handling */
 #ifdef HAVE_LCD_COLOR
@@ -36,10 +38,6 @@
 #else
 #define FG_FALLBACK LCD_DEFAULT_FG
 #define BG_FALLBACK LCD_DEFAULT_BG
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-static void set_default_align_flags(struct viewport *vp);
 #endif
 
 /* all below isn't needed for pc tools (i.e. checkwps/wps editor)
@@ -56,25 +54,146 @@ static void set_default_align_flags(struct viewport *vp);
 #endif
 #include "statusbar-skinned.h"
 #include "debug.h"
+#include "viewport.h"
 
-
-static int statusbar_enabled = 0;
+#define VPSTACK_DEPTH 16
+struct viewport_stack_item
+{
+    struct  viewport* vp;
+    bool   enabled;
+};
 
 #ifdef HAVE_LCD_BITMAP
-static struct {
-    struct  viewport* vp;
-    int     active[NB_SCREENS];
-} ui_vp_info;
+static void viewportmanager_redraw(void* data);
+   
+static int theme_stack_top[NB_SCREENS]; /* the last item added */
+static struct viewport_stack_item theme_stack[NB_SCREENS][VPSTACK_DEPTH];
+static bool is_theme_enabled(enum screen_type screen);
 
+static void toggle_theme(void)
+{
+    bool enable_event = false;
+    static bool was_enabled[NB_SCREENS] = {false};
+    int i;
+    FOR_NB_SCREENS(i)
+    {
+        enable_event = enable_event || is_theme_enabled(i);
+    }
+    if (enable_event)
+    {
+        add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+        add_event(LCD_EVENT_ACTIVATION, false, do_sbs_update_callback);
+#endif
+        add_event(PLAYBACK_EVENT_TRACK_CHANGE, false,
+                                                do_sbs_update_callback);
+        add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false,
+                                                do_sbs_update_callback);
+        
+        /* remove the left overs from the previous screen.
+         * could cause a tiny flicker. Redo your screen code if that happens */
+        FOR_NB_SCREENS(i)
+        {
+            if (!was_enabled[i])
+            {
+                struct viewport deadspace, user;
+                viewport_set_defaults(&user, i);
+                deadspace = user; /* get colours and everything */
+                /* above */
+                deadspace.x = 0;
+                deadspace.y = 0;
+                deadspace.width = screens[i].lcdwidth;
+                deadspace.height = user.y;
+                if (deadspace.width && deadspace.height)
+                {
+                    screens[i].set_viewport(&deadspace);
+                    screens[i].clear_viewport();
+                    screens[i].update_viewport();
+                }
+                /* below */
+                deadspace.y = user.y + user.height;
+                deadspace.height = screens[i].lcdheight - deadspace.y;
+                if (deadspace.width && deadspace.height)
+                {
+                    screens[i].set_viewport(&deadspace);
+                    screens[i].clear_viewport();
+                    screens[i].update_viewport();
+                }
+                /* left */
+                deadspace.x = 0;
+                deadspace.y = 0;
+                deadspace.width = user.x;
+                deadspace.height = screens[i].lcdheight;
+                if (deadspace.width && deadspace.height)
+                {
+                    screens[i].set_viewport(&deadspace);
+                    screens[i].clear_viewport();
+                    screens[i].update_viewport();
+                }
+                /* below */
+                deadspace.x = user.x + user.width;
+                deadspace.width = screens[i].lcdwidth - deadspace.x;
+                if (deadspace.width && deadspace.height)
+                {
+                    screens[i].set_viewport(&deadspace);
+                    screens[i].clear_viewport();
+                    screens[i].update_viewport();
+                }
+            }
+        }
+        send_event(GUI_EVENT_ACTIONUPDATE, (void*)1); /* force a redraw */
+    }
+    else
+    {
+        FOR_NB_SCREENS(i)
+            screens[i].stop_scroll();
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+        remove_event(LCD_EVENT_ACTIVATION, do_sbs_update_callback);
+#endif
+        remove_event(PLAYBACK_EVENT_TRACK_CHANGE, do_sbs_update_callback);
+        remove_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, do_sbs_update_callback);
+        remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
+    }
+        
+    FOR_NB_SCREENS(i)
+        was_enabled[i] = is_theme_enabled(i);
+}
+
+void viewportmanager_theme_enable(enum screen_type screen, bool enable,
+                                 struct viewport *viewport)
+{
+    int top = ++theme_stack_top[screen];
+    if (top >= VPSTACK_DEPTH-1)
+        panicf("Stack overflow... viewportmanager");
+    theme_stack[screen][top].enabled = enable;
+    theme_stack[screen][top].vp = viewport;
+    toggle_theme();
+    /* then be nice and set the viewport up */
+    if (viewport)
+        viewport_set_defaults(viewport, screen);
+}
+
+void viewportmanager_theme_undo(enum screen_type screen)
+{
+    int top = --theme_stack_top[screen];
+    if (top < 0)
+        panicf("Stack underflow... viewportmanager");
+    
+    toggle_theme();
+}
+
+
+static bool is_theme_enabled(enum screen_type screen)
+{
+    int top = theme_stack_top[screen];
+    return theme_stack[screen][top].enabled;
+}
+
+static bool custom_vp_loaded_ok[NB_SCREENS];
 static struct viewport custom_vp[NB_SCREENS];
 
-/* callbacks for GUI_EVENT_* events */
-static void viewportmanager_ui_vp_changed(void *param);
-static void viewportmanager_call_draw_func(void *param);
-static void statusbar_toggled(void* param);
 static unsigned viewport_init_ui_vp(void);
-#endif
-static void viewportmanager_redraw(void* data);
+#endif /* HAVE_LCD_BITMAP */
 
 int viewport_get_nb_lines(const struct viewport *vp)
 {
@@ -86,85 +205,36 @@ int viewport_get_nb_lines(const struct viewport *vp)
 #endif
 }
 
-static bool showing_bars(enum screen_type screen)
-{
-    if (statusbar_enabled & VP_SB_ONSCREEN(screen))
-    {
-#ifdef HAVE_LCD_BITMAP
-        int ignore;
-        ignore = statusbar_enabled & VP_SB_IGNORE_SETTING(screen);
-        return ignore || (statusbar_position(screen) != STATUSBAR_OFF);
-#else
-        return true;
-#endif
-    }
-    return false;
-}
-
-
-void viewportmanager_init(void)
-{
-#ifdef HAVE_LCD_BITMAP
-    add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, statusbar_toggled);
-#endif
-    viewportmanager_set_statusbar(VP_SB_ALLSCREENS);
-}
-
-int viewportmanager_get_statusbar(void)
-{
-    return statusbar_enabled;
-}
-
-int viewportmanager_set_statusbar(const int enabled)
-{
-    int old = statusbar_enabled;
-    int i;
-    
-    statusbar_enabled = enabled;
-
-    FOR_NB_SCREENS(i)
-    {
-        if (showing_bars(i)
-                && statusbar_position(i) != STATUSBAR_CUSTOM)
-        {
-            add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
-            gui_statusbar_draw(&statusbars.statusbars[i], true);
-        }
-        else
-            remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
-    }
-
-#ifdef HAVE_LCD_BITMAP
-    FOR_NB_SCREENS(i)
-    {
-        sb_skin_set_state(showing_bars(i)
-                        && statusbar_position(i) == STATUSBAR_CUSTOM, i);
-    }
-#endif
-    return old;
-}
-
 static void viewportmanager_redraw(void* data)
 {
     int i;
-
     FOR_NB_SCREENS(i)
     {
-        if (showing_bars(i)
-                && statusbar_position(i) != STATUSBAR_CUSTOM)
+#ifdef HAVE_LCD_BITMAP
+       if (statusbar_position(i) == STATUSBAR_CUSTOM)
+           sb_skin_update(i, NULL != data);
+        else if (statusbar_position(i) != STATUSBAR_OFF)
+#endif
             gui_statusbar_draw(&statusbars.statusbars[i], NULL != data);
     }
 }
-#ifdef HAVE_LCD_BITMAP
 
-static void statusbar_toggled(void* param)
+void viewportmanager_init()
 {
-    (void)param;
-    /* update vp manager for the new setting and reposition vps
-     * if necessary */
-    viewportmanager_theme_changed(THEME_STATUSBAR);
+#ifdef HAVE_LCD_BITMAP
+    int i;
+    FOR_NB_SCREENS(i)
+    {
+        theme_stack_top[i] = -1; /* the next call fixes this to 0 */
+        /* We always want the theme enabled by default... */
+        viewportmanager_theme_enable(i, true, NULL); 
+    }
+#else
+    add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
+#endif
 }
 
+#ifdef HAVE_LCD_BITMAP
 void viewportmanager_theme_changed(const int which)
 {
     int i;
@@ -177,88 +247,22 @@ void viewportmanager_theme_changed(const int which)
 #endif
     if (which & THEME_UI_VIEWPORT)
     {
-        int retval = viewport_init_ui_vp();
-        /* reset the ui viewport */
-        FOR_NB_SCREENS(i)
-            ui_vp_info.active[i] = retval & BIT_N(i);
-        /* and point to it */
-        ui_vp_info.vp = custom_vp;
+        viewport_init_ui_vp();
     }
-    else if (which & THEME_LANGUAGE)
-    {   /* THEME_UI_VIEWPORT handles rtl already */
-        FOR_NB_SCREENS(i)
-            set_default_align_flags(&custom_vp[i]);
+    if (which & THEME_LANGUAGE)
+    {   
     }
     if (which & THEME_STATUSBAR)
     {
-        statusbar_enabled = 0;
         FOR_NB_SCREENS(i)
         {
-            if (statusbar_position(i) != STATUSBAR_OFF)
-                statusbar_enabled  |= VP_SB_ONSCREEN(i);
-        }
-
-        viewportmanager_set_statusbar(statusbar_enabled);
-
-        /* reposition viewport to fit statusbar, only if not using the ui vp */
-        
-        FOR_NB_SCREENS(i)
-        {
-            if (!ui_vp_info.active[i])
-                viewport_set_fullscreen(&custom_vp[i], i);
+            /* This can probably be done better...
+             * disable the theme so it's forced to do a full redraw  */
+            viewportmanager_theme_enable(i, false, NULL);
+            viewportmanager_theme_undo(i);
         }
     }
-
-    int event_add = 0;
-    FOR_NB_SCREENS(i)
-    {
-        event_add |= ui_vp_info.active[i];
-        event_add |= (statusbar_position(i) == STATUSBAR_CUSTOM);
-    }
-
-    /* add one of those to ensure the draw function is called always */
-    if (event_add)
-    {
-        add_event(GUI_EVENT_REFRESH, false, viewportmanager_ui_vp_changed);
-        remove_event(GUI_EVENT_REFRESH, viewportmanager_call_draw_func);
-    }
-    else
-    {
-        add_event(GUI_EVENT_REFRESH, false, viewportmanager_call_draw_func);
-        remove_event(GUI_EVENT_REFRESH, viewportmanager_ui_vp_changed);
-    }
-
     send_event(GUI_EVENT_THEME_CHANGED, NULL);
-}
-
-/*
- * simply calls a function that draws stuff, this exists to ensure the
- * drawing function call in the GUI_EVENT_REFRESH event
- *
- * param should be 'void func(void)' */
-static void viewportmanager_call_draw_func(void *param)
-{
-    /* cast param to a function */
-    void (*draw_func)(void) = ((void(*)(void))param);
-    /* call the passed function which will redraw the content of
-     * the current screen */
-    if (draw_func != NULL)
-        draw_func();
-}
-
-static void viewportmanager_ui_vp_changed(void *param)
-{
-    /* if the user changed the theme, we need to initiate a full redraw */
-    int i;
-    /* start with clearing the screen */
-    FOR_NB_SCREENS(i)
-        screens[i].clear_display();
-    /* redraw the statusbar if it was enabled */
-    send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
-    /* call redraw function */
-    viewportmanager_call_draw_func(param);
-    FOR_NB_SCREENS(i)
-        screens[i].update();
 }
 
 /*
@@ -270,7 +274,7 @@ static void viewportmanager_ui_vp_changed(void *param)
 static unsigned viewport_init_ui_vp(void)
 {
     int screen;
-    unsigned ret = 0;
+    const char *ret = NULL;
     char *setting;
     FOR_NB_SCREENS(screen)
     {
@@ -280,15 +284,13 @@ static unsigned viewport_init_ui_vp(void)
         else
 #endif
             setting = global_settings.ui_vp_config;
-
             
-        if (!(viewport_parse_viewport(&custom_vp[screen], screen,
-                 setting, ',')))
-            viewport_set_fullscreen(&custom_vp[screen], screen);
-        else
-            ret |= BIT_N(screen);
+        ret = viewport_parse_viewport(&custom_vp[screen], screen,
+                                     setting, ',');
+
+        custom_vp_loaded_ok[screen] = ret?true:false;
     }
-    return ret;
+    return true; /* meh fixme */
 }
 
 #ifdef HAVE_TOUCHSCREEN
@@ -301,6 +303,16 @@ bool viewport_point_within_vp(const struct viewport *vp,
     return (is_x && is_y);
 }
 #endif /* HAVE_TOUCHSCREEN */
+
+static void set_default_align_flags(struct viewport *vp)
+{
+    vp->flags &= ~VP_FLAG_ALIGNMENT_MASK;
+#ifndef __PCTOOL__
+    if (UNLIKELY(lang_is_rtl()))
+        vp->flags |= VP_FLAG_ALIGN_RIGHT;
+#endif
+}
+
 #endif /* HAVE_LCD_BITMAP */
 #endif /* __PCTOOL__ */
 
@@ -363,11 +375,17 @@ void viewport_set_defaults(struct viewport *vp,
 #if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
     
     struct viewport *sbs_area = NULL, *user_setting = NULL;
+    if (!is_theme_enabled(screen))
+   {
+       viewport_set_fullscreen(vp, screen);
+       return;
+   }
     /* get the two viewports */
-    if (ui_vp_info.active[screen])
-        user_setting = &ui_vp_info.vp[screen];
+    if (custom_vp_loaded_ok[screen])
+        user_setting = &custom_vp[screen];
     if (sb_skin_get_state(screen))    
         sbs_area = sb_skin_get_info_vp(screen);
+        
     /* have both? get their intersection */
     if (sbs_area && user_setting)
     {
@@ -380,6 +398,7 @@ void viewport_set_defaults(struct viewport *vp,
         {
             /* copy from ui vp first (for other field),fix coordinates after */
             *vp = *user_setting;
+            set_default_align_flags(vp);
             vp->x = MAX(a->x, b->x);
             vp->y = MAX(a->y, b->y);
             vp->width = MIN(a->x + a->width, b->x + b->width) - vp->x;
@@ -405,16 +424,6 @@ void viewport_set_defaults(struct viewport *vp,
 
 
 #ifdef HAVE_LCD_BITMAP
-
-static void set_default_align_flags(struct viewport *vp)
-{
-    vp->flags &= ~VP_FLAG_ALIGNMENT_MASK;
-#ifndef __PCTOOL__
-    if (UNLIKELY(lang_is_rtl()))
-        vp->flags |= VP_FLAG_ALIGN_RIGHT;
-#endif
-}
-
 const char* viewport_parse_viewport(struct viewport *vp,
                                     enum screen_type screen,
                                     const char *bufptr,

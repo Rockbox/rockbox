@@ -35,9 +35,9 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile);
 
 /* probably temporary, to shut the classic statusbar up */
 bool sb_skin_get_state(enum screen_type screen);
-void sb_skin_set_state(int state, enum screen_type screen);
 void sb_skin_init(void);
 struct viewport *sb_skin_get_info_vp(enum screen_type screen);
+void sb_skin_update(enum screen_type screen, bool force);
 
 void sb_skin_set_update_delay(int delay);
 
@@ -48,4 +48,5 @@ void sb_skin_set_update_delay(int delay);
 #define sb_skin_set_state(a,b)
 #define sb_skin_get_state(a)
 #endif
+void do_sbs_update_callback(void *param);
 #endif /* __STATUSBAR_SKINNED_H__ */

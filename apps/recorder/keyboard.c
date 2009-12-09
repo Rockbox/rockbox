@@ -291,10 +291,10 @@ int kbd_input(char* text, int buflen)
     unsigned char morse_code = 0;
     int morse_tick = 0;
 #endif
-    int oldbars = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
     FOR_NB_SCREENS(l)
     {
         struct keyboard_parameters *pm = &param[l];
+        viewportmanager_theme_enable(l, false, NULL);
 #if LCD_WIDTH >= 160 && LCD_HEIGHT >= 96
         struct screen *sc = &screens[l];
 
@@ -1126,9 +1126,9 @@ int kbd_input(char* text, int buflen)
 #endif /* HAVE_MORSE_INPUT && KBD_TOGGLE_INPUT */
 
     FOR_NB_SCREENS(l)
+    {
         screens[l].setfont(FONT_UI);
-    viewportmanager_set_statusbar(oldbars);
-    send_event(GUI_EVENT_REFRESH, NULL);
-
+        viewportmanager_theme_undo(l);
+   }
     return ret;
 }

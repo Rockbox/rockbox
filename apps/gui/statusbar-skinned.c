@@ -41,7 +41,7 @@ static struct wps_data      sb_skin_data[NB_SCREENS] = {{ .wps_loaded = 0 }};
 static struct wps_sync_data sb_skin_sync_data        = { .do_full_update = false };
 
 /* initial setup of wps_data  */
-static void sb_skin_update(void*);
+
 static bool loaded_ok[NB_SCREENS] = { false };
 static int update_delay = DEFAULT_UPDATE_DELAY;
 
@@ -68,9 +68,6 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
         vp->hidden_flags = VP_NEVER_VISIBLE;
     }
 
-    if (!success)
-        remove_event(GUI_EVENT_ACTIONUPDATE, sb_skin_update);
-
     loaded_ok[screen] = success;
 }
 
@@ -96,7 +93,6 @@ struct viewport *sb_skin_get_info_vp(enum screen_type screen)
 
 inline bool sb_skin_get_state(enum screen_type screen)
 {
-    int skinbars = sb_skin[screen].sync_data->statusbars;
     /* Temp fix untill the hardcoded bar is removed */
     int bar_setting = global_settings.statusbar;
 #if NB_SCREENS > 1
@@ -106,17 +102,38 @@ inline bool sb_skin_get_state(enum screen_type screen)
     switch (bar_setting)
     {
         case STATUSBAR_CUSTOM:
-            return loaded_ok[screen] && (skinbars & VP_SB_ONSCREEN(screen));
+            return loaded_ok[screen];
         case STATUSBAR_TOP:
         case STATUSBAR_BOTTOM:
+           return true;
         case STATUSBAR_OFF:
-            return (viewportmanager_get_statusbar()&VP_SB_ONSCREEN(screen));
+            return false;
     }
     return false; /* Should never actually get here */
 }
 
+void sb_skin_update(enum screen_type screen, bool force)
+{
+    static long next_update = 0;
+    int i = screen;
+    if (TIME_AFTER(current_tick, next_update) || force)
+    {
+        if (sb_skin_get_state(i))
+        {
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+            /* currently, all remotes are readable without backlight
+             * so still update those */
+            if (lcd_active() || (i != SCREEN_MAIN))
+#endif
+                skin_update(&sb_skin[i], force?
+                        WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
+        }
+    }
+    next_update = current_tick + update_delay; /* don't update too often */
+    sb_skin[SCREEN_MAIN].sync_data->do_full_update = false;
+}
 
-static void do_update_callback(void *param)
+void do_sbs_update_callback(void *param)
 {
     (void)param;
     /* the WPS handles changing the actual id3 data in the id3 pointers
@@ -124,69 +141,6 @@ static void do_update_callback(void *param)
     sb_skin_sync_data.do_full_update = true;
     /* force timeout in wps main loop, so that the update is instantly */
     queue_post(&button_queue, BUTTON_NONE, 0);
-}
-
-
-void sb_skin_set_state(int state, enum screen_type screen)
-{
-    sb_skin[screen].sync_data->do_full_update = true;
-    int skinbars = sb_skin[screen].sync_data->statusbars;
-    if (state && loaded_ok[screen])
-    {
-        skinbars |= VP_SB_ONSCREEN(screen);
-    }
-    else
-    {
-        skinbars &= ~VP_SB_ONSCREEN(screen);
-    }
-
-    if (skinbars)
-    {
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-        add_event(LCD_EVENT_ACTIVATION, false, do_update_callback);
-#endif
-        add_event(PLAYBACK_EVENT_TRACK_CHANGE, false,
-                                                do_update_callback);
-        add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false,
-                                                do_update_callback);
-        add_event(GUI_EVENT_ACTIONUPDATE, false, sb_skin_update);
-    }
-    else
-    {
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-        remove_event(LCD_EVENT_ACTIVATION, do_update_callback);
-#endif
-        remove_event(PLAYBACK_EVENT_TRACK_CHANGE, do_update_callback);
-        remove_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, do_update_callback);
-        remove_event(GUI_EVENT_ACTIONUPDATE, sb_skin_update);
-    }
-        
-    sb_skin[screen].sync_data->statusbars = skinbars;
-}
-
-static void sb_skin_update(void* param)
-{
-    static long next_update = 0;
-    int i;
-    int forced_draw = param ||  sb_skin[SCREEN_MAIN].sync_data->do_full_update;
-    if (TIME_AFTER(current_tick, next_update) || forced_draw)
-    {
-        FOR_NB_SCREENS(i)
-        {
-            if (sb_skin_get_state(i))
-            {
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-                /* currently, all remotes are readable without backlight
-                 * so still update those */
-                if (lcd_active() || (i != SCREEN_MAIN))
-#endif
-                    skin_update(&sb_skin[i], forced_draw?
-                            WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
-            }
-        }
-        next_update = current_tick + update_delay; /* don't update too often */
-        sb_skin[SCREEN_MAIN].sync_data->do_full_update = false;
-    }
 }
 
 void sb_skin_set_update_delay(int delay)
@@ -209,7 +163,6 @@ void sb_skin_init(void)
         /* Currently no seperate wps_state needed/possible
            so use the only available ( "global" ) one */
         sb_skin[i].state = &wps_state;
-        sb_skin_sync_data.statusbars = VP_SB_HIDE_ALL;
         sb_skin[i].sync_data = &sb_skin_sync_data;
     }
 }

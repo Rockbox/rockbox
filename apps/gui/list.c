@@ -822,14 +822,17 @@ static const char* simplelist_static_getname(int item,
 bool simplelist_show_list(struct simplelist_info *info)
 {
     struct gui_synclist lists;
-    int action, old_line_count = simplelist_line_count;
-    int oldbars = viewportmanager_set_statusbar(VP_SB_ALLSCREENS);
+    int action, old_line_count = simplelist_line_count, i;
     const char* (*getname)(int item, void * data, char *buffer, size_t buffer_len);
     int wrap = LIST_WRAP_UNLESS_HELD;
     if (info->get_name)
         getname = info->get_name;
     else
         getname = simplelist_static_getname;
+        
+    FOR_NB_SCREENS(i)
+       viewportmanager_theme_enable(i, true, NULL);
+       
     gui_synclist_init(&lists, getname,  info->callback_data, 
                       info->scroll_all, info->selection_size, NULL);
 
@@ -904,7 +907,8 @@ bool simplelist_show_list(struct simplelist_info *info)
             return true;
     }
     talk_shutup();
-    viewportmanager_set_statusbar(oldbars);
+    FOR_NB_SCREENS(i)
+       viewportmanager_theme_undo(i);
     return false;
 }
 

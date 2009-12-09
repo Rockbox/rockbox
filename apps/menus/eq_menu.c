@@ -391,7 +391,8 @@ bool eq_menu_graphical(void)
     enum eq_type current_type;
     char buf[24];
     int i, w, h, height, start_item, nb_eq_sliders[NB_SCREENS];
-    int barsenabled = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
+    FOR_NB_SCREENS(i)
+        viewportmanager_theme_enable(i, false, NULL);
 
 
     FOR_NB_SCREENS(i) {
@@ -570,12 +571,13 @@ bool eq_menu_graphical(void)
     }
 
     /* Reset screen settings */
-    FOR_NB_SCREENS(i) {
+    FOR_NB_SCREENS(i) 
+    {
         screens[i].setfont(FONT_UI);
         screens[i].clear_display();
         screens[i].set_viewport(NULL);
+        viewportmanager_theme_undo(i);
     }
-    viewportmanager_set_statusbar(barsenabled);
     return result;
 }
 

@@ -230,7 +230,6 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_bitmap,
 #endif
     viewport_set_defaults,
-    viewportmanager_set_statusbar,
     
     /* list */
     gui_synclist_init,
@@ -680,8 +679,7 @@ static const struct plugin_api rockbox_api = {
 
 int plugin_load(const char* plugin, const void* parameter)
 {
-    int rc;
-    int oldbars;
+    int rc, i;
     struct plugin_header *hdr;
 #ifdef SIMULATOR
     void *pd;
@@ -787,7 +785,8 @@ int plugin_load(const char* plugin, const void* parameter)
     lcd_remote_update();
 #endif
 
-    oldbars = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
+    FOR_NB_SCREENS(i)
+       viewportmanager_theme_enable(i, false, NULL);
 
     cpucache_invalidate();
     
@@ -834,12 +833,8 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 #endif
 
-    viewportmanager_set_statusbar(oldbars);
-
-    if (rc != PLUGIN_GOTO_WPS)
-    {
-        send_event(GUI_EVENT_REFRESH, NULL);
-    }
+    FOR_NB_SCREENS(i)
+        viewportmanager_theme_undo(i);
 
     if (pfn_tsr_exit == NULL)
         plugin_loaded = false;

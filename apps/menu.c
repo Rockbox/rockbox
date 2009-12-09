@@ -343,8 +343,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     const struct menu_item_ex *temp, *menu;
     int ret = 0, i;
     bool redraw_lists;
-    int oldbars = viewportmanager_get_statusbar();
-    viewportmanager_set_statusbar(hide_bars ? VP_SB_HIDE_ALL : oldbars);
+   FOR_NB_SCREENS(i)
+       viewportmanager_theme_enable(i, true/*!hide_bars*/, NULL);
     
     const struct menu_item_ex *menu_stack[MAX_MENUS];
     int menu_stack_selected_item[MAX_MENUS];
@@ -686,7 +686,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         *start_selected = get_menu_selection(
                             gui_synclist_get_sel_pos(&lists), menu);
     }
-    viewportmanager_set_statusbar(oldbars);
+   FOR_NB_SCREENS(i)
+       viewportmanager_theme_undo(i);
     return ret;
 }
 

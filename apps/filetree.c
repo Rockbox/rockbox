@@ -528,9 +528,6 @@ int ft_enter(struct tree_context* c)
                 splash(0, ID2P(LANG_WAIT));
                 if (!settings_load_config(buf,true))
                     break;
-
-                /* redraw the UI in case the user setting changed apparence */
-                send_event(GUI_EVENT_REFRESH, tree_drawlists);
                 splash(HZ, ID2P(LANG_SETTINGS_LOADED));
                 break;
 
@@ -651,8 +648,6 @@ int ft_enter(struct tree_context* c)
                 break;
             }
         }
-
-        send_event(GUI_EVENT_REFRESH, tree_drawlists);
 
         if ( play ) {
             /* the resume_index must always be the index in the

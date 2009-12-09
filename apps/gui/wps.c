@@ -88,9 +88,6 @@ static struct wps_sync_data wps_sync_data           = { .do_full_update = false 
 static void wps_state_init(void);
 static void track_changed_callback(void *param);
 static void nextid3available_callback(void* param);
-#ifdef HAVE_LCD_BITMAP
-static void statusbar_toggle_handler(void *data);
-#endif
 
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
 #ifdef HAVE_REMOTE_LCD
@@ -562,24 +559,21 @@ static void wps_lcd_activation_hook(void *param)
 
 static void gwps_leave_wps(void)
 {
-    int i, oldbars = VP_SB_HIDE_ALL;
+    int i;
 
     FOR_NB_SCREENS(i)
     {
         gui_wps[i].display->stop_scroll();
         gui_wps[i].display->backdrop_show(BACKDROP_MAIN);
-        if (statusbar_position(i) != STATUSBAR_OFF)
-            oldbars |= VP_SB_ONSCREEN(i);
+        viewportmanager_theme_undo(i);
     }
 
-    viewportmanager_set_statusbar(oldbars);
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
     /* Play safe and unregister the hook */
     remove_event(LCD_EVENT_ACTIVATION, wps_lcd_activation_hook);
 #endif
     /* unhandle statusbar update delay */
     sb_skin_set_update_delay(DEFAULT_UPDATE_DELAY);
-    send_event(GUI_EVENT_REFRESH, NULL);
 }
 
 /*
@@ -591,6 +585,14 @@ static void gwps_enter_wps(void)
     {
         struct gui_wps *gwps = &gui_wps[i];
         struct screen *display = gwps->display;
+#ifdef HAVE_LCD_BITMAP
+        bool draw = false;
+        if (gui_wps[i].data->wps_sb_tag)
+            draw = gui_wps[i].data->show_sb_on_wps;
+        else if (statusbar_position(i) != STATUSBAR_OFF)
+            draw = true;
+#endif
+        viewportmanager_theme_enable(i, draw, NULL);
 
         display->stop_scroll();
         /* Update the values in the first (default) viewport - in case the user
@@ -725,8 +727,6 @@ long gui_wps_show(void)
 #ifdef HAVE_LCD_CHARCELLS
     status_set_audio(true);
     status_set_param(false);
-#else
-    statusbar_toggle_handler(NULL);
 #endif
 
 #ifdef AB_REPEAT_ENABLE
@@ -734,7 +734,7 @@ long gui_wps_show(void)
     ab_reset_markers();
 #endif
     wps_state_init();
-
+    
     while ( 1 )
     {
         bool audio_paused = (audio_status() & AUDIO_STATUS_PAUSE)?true:false;
@@ -1176,8 +1176,8 @@ long gui_wps_show(void)
             sb_skin_set_update_delay(0);
             FOR_NB_SCREENS(i)
                 gui_wps[i].display->backdrop_show(BACKDROP_SKIN_WPS);
-            send_event(GUI_EVENT_REFRESH, gwps_enter_wps);
             wps_sync_data.do_full_update = update = false;
+            gwps_enter_wps();
         }
         else if (wps_sync_data.do_full_update || update)
         {
@@ -1271,33 +1271,6 @@ static void wps_state_init(void)
 }
 
 
-#ifdef HAVE_LCD_BITMAP
-static void statusbar_toggle_handler(void *data)
-{
-    (void)data;
-    int i;
-
-    int *wpsbars = &wps_sync_data.statusbars;
-    *wpsbars = VP_SB_HIDE_ALL;
-    FOR_NB_SCREENS(i)
-    {   /* fix viewports if needed */
-        skin_statusbar_changed(&gui_wps[i]);
-
-        bool draw = false;
-
-        /* fix up gui_wps::statusbars, so that the viewportmanager accepts it*/
-        if (gui_wps[i].data->wps_sb_tag)
-            draw = gui_wps[i].data->show_sb_on_wps;
-        else if (statusbar_position(i) != STATUSBAR_OFF)
-            draw = true;
-        if (draw)
-            *wpsbars |=
-                    (VP_SB_ONSCREEN(i) | VP_SB_IGNORE_SETTING(i));
-    }
-}
-#endif
-
-
 void gui_sync_wps_init(void)
 {
     int i;
@@ -1315,11 +1288,7 @@ void gui_sync_wps_init(void)
         gui_wps[i].display->backdrop_unload(BACKDROP_SKIN_WPS);
         /* must point to the same struct for both screens */
         gui_wps[i].sync_data = &wps_sync_data;
-        gui_wps[i].sync_data->statusbars = VP_SB_ALLSCREENS;
     }
-#ifdef HAVE_LCD_BITMAP
-    add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, statusbar_toggle_handler);
-#endif
 }
 
 

@@ -1084,11 +1084,6 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 #ifdef HAVE_LCD_BITMAP
     data->peak_meter_enabled = enable_pm;
 #endif
-
-    if (refresh_mode & WPS_REFRESH_STATUSBAR)
-    {
-        viewportmanager_set_statusbar(gwps->sync_data->statusbars);
-    }
     /* Restore the default viewport */
     display->set_viewport(NULL);
 

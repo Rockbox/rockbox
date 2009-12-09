@@ -1019,7 +1019,6 @@ bool recording_screen(bool no_source)
     int peak_l, peak_r;
     int balance = 0;
 #endif
-    int oldbars, recbars = VP_SB_ALLSCREENS;
     int i;
     int pm_x[NB_SCREENS];           /* peakmeter (and trigger bar) x pos */
     int pm_y[NB_SCREENS];           /* peakmeter y pos */
@@ -1082,9 +1081,6 @@ bool recording_screen(bool no_source)
 
     /* viewport init and calculations that only needs to be done once */
     FOR_NB_SCREENS(i)
-        recbars |= VP_SB_IGNORE_SETTING(i);
-    oldbars = viewportmanager_set_statusbar(recbars);
-    FOR_NB_SCREENS(i)
     {
         struct viewport *v;
         /* top vp, 4 lines, force sys font if total screen < 6 lines
@@ -1122,6 +1118,9 @@ bool recording_screen(bool no_source)
     /* init the bottom list */
     gui_synclist_init(&lists, reclist_get_name, NULL, false, 1, vp_list);
     gui_synclist_set_title(&lists, NULL, Icon_NOICON);
+    
+    
+    send_event(GUI_EVENT_ACTIONUPDATE, (void*)1); /* force a redraw */
 
     /* start of the loop: we stay in this loop until user quits recscreen */
     while(done <= 0)
@@ -1576,7 +1575,6 @@ bool recording_screen(bool no_source)
                     /* led is restored at begin of loop / end of function */
                     led(false);
 #endif
-                    viewportmanager_set_statusbar(oldbars);
                     if (recording_menu(no_source))
                     {
                         done = 1;
@@ -1590,7 +1588,6 @@ bool recording_screen(bool no_source)
                         done = -1;
                         /* the init is now done at the beginning of the loop */
                     }
-                    viewportmanager_set_statusbar(recbars);
                 }
                 break;
 
@@ -1602,7 +1599,6 @@ bool recording_screen(bool no_source)
                     /* led is restored at begin of loop / end of function */
                     led(false);
 #endif
-                    viewportmanager_set_statusbar(oldbars);
                     if (f2_rec_screen())
                     {
                         rec_status |= RCSTAT_HAVE_RECORDED;
@@ -1610,7 +1606,6 @@ bool recording_screen(bool no_source)
                     }
                     else
                         update_countdown = 0; /* Update immediately */
-                    viewportmanager_set_statusbar(recbars);
                 }
                 break;
 
@@ -1626,7 +1621,6 @@ bool recording_screen(bool no_source)
                     /* led is restored at begin of loop / end of function */
                     led(false);
 #endif
-                    viewportmanager_set_statusbar(oldbars);
                     if (f3_rec_screen())
                     {
                         rec_status |= RCSTAT_HAVE_RECORDED;
@@ -1634,7 +1628,6 @@ bool recording_screen(bool no_source)
                     }
                     else
                         update_countdown = 0; /* Update immediately */
-                    viewportmanager_set_statusbar(recbars);
                 }
                 break;
 #endif /*  CONFIG_KEYPAD == RECORDER_PAD */
@@ -1920,8 +1913,6 @@ rec_abort:
     FOR_NB_SCREENS(i)
         screens[i].setfont(FONT_UI);
         
-    viewportmanager_set_statusbar(oldbars);
-    send_event(GUI_EVENT_REFRESH, NULL);
 
     /* if the directory was created or recording happened, make sure the
        browser is updated */

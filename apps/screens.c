@@ -905,8 +905,7 @@ int calibrate(void)
     int i, ret = 0;
     
     /* hide the statusbar */
-    int old_statusbar = viewportmanager_get_statusbar();
-    viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
+    viewportmanager_theme_enable(SCREEN_MAIN, false, NULL);
 
     touchscreen_disable_mapping(); /* set raw mode */
     touchscreen_set_mode(TOUCHSCREEN_POINT);
@@ -931,7 +930,7 @@ int calibrate(void)
         sizeof(struct touchscreen_parameter));
 
     touchscreen_set_mode(old_mode);
-    viewportmanager_set_statusbar(old_statusbar);
+    viewportmanager_theme_undo(SCREEN_MAIN);
 
     settings_save();
     return ret;

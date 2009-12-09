@@ -204,12 +204,15 @@ void splashf(int ticks, const char *fmt, ...)
     fmt = P2STR((unsigned char *)fmt);
     FOR_NB_SCREENS(i)
     {
+        viewportmanager_theme_enable(i, false, NULL);
         va_start(ap, fmt);
         splash_internal(&(screens[i]), fmt, ap);
         va_end(ap);
     }
     if (ticks)
         sleep(ticks);
+    FOR_NB_SCREENS(i)
+        viewportmanager_theme_undo(i);
 }
 
 void splash(int ticks, const char *str)

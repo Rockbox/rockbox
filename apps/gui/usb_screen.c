@@ -150,7 +150,7 @@ static void usb_screen_fix_viewports(struct screen *screen,
 
     viewport_set_defaults(parent, screen->screen_type);
     if (parent->width < logo_width || parent->height < logo_height)
-        viewport_set_fullscreen(parent, screen->screen_type);
+        viewportmanager_theme_enable(screen->screen_type, false, parent);
 
     *logo = *parent;
     logo->x = parent->x + parent->width - logo_width;
@@ -180,8 +180,6 @@ static void usb_screen_fix_viewports(struct screen *screen,
 static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 {
     int i;
-    int usb_bars = VP_SB_ALLSCREENS; /* force statusbars */
-
     lcd_clear_display();
 #ifdef HAVE_LCD_REMOTE
     lcd_remote_clear_display();
@@ -236,18 +234,12 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 
         screen->update_viewport();
         screen->set_viewport(NULL);
-
-        /* force statusbar by ignoring the setting */
-        usb_bars |= VP_SB_IGNORE_SETTING(i);
     }
-
-    viewportmanager_set_statusbar(usb_bars);
 }
 
 void gui_usb_screen_run(void)
 {
     int i;
-    int old_bars  = viewportmanager_get_statusbar();
     struct usb_screen_vps_t usb_screen_vps_ar[NB_SCREENS];
 #if defined HAVE_TOUCHSCREEN
     enum touchscreen_mode old_mode = touchscreen_get_mode();
@@ -319,9 +311,8 @@ void gui_usb_screen_run(void)
     FOR_NB_SCREENS(i)
     {
         screens[i].backlight_on();
+        viewportmanager_theme_undo(i);
     }
-    viewportmanager_set_statusbar(old_bars);
-    send_event(GUI_EVENT_REFRESH, NULL);
 
 }
 #endif /* !defined(USB_NONE) */

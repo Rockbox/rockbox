@@ -31,41 +31,11 @@
 /* return the number of text lines in the vp viewport */
 int viewport_get_nb_lines(const struct viewport *vp);
 
-void viewport_set_defaults(struct viewport *vp,
-                            const enum screen_type screen);
-
-/* Used to specify which screens the statusbar (SB) should be displayed on.
- *
- * The parameter is a bit OR'ed combination of the following (screen is
- * SCREEN_MAIN or SCREEN_REMOTE from screen_access.h):
- *
- * VP_SB_HIDE_ALL means "hide the SB on all screens"
- * VP_SB_ONSCREEN(screen) means "display the SB on the given screen
- *                              as specified by the SB setting for that screen"
- * VP_SB_IGNORE_SETTING(screen) means "ignore the SB setting for that screen"
- * VP_SB_ALLSCREENS means "VP_SB_ONSCREEN for all screens"
- * 
- * In most cases, VP_SB_ALLSCREENS should be used which means display the SB
- * as specified by the settings.
- * For the WPS (and other possible exceptions) use VP_SB_IGNORE_SETTING() to
- * FORCE the statusbar on for the given screen (i.e it will show regardless
- * of the setting)
- *
- * Returns the status before the call. This value can be used to restore the
- * SB "displaying rules".
- */
-
-
 #define THEME_STATUSBAR             (BIT_N(0))
 #define THEME_UI_VIEWPORT           (BIT_N(1))
 #define THEME_BUTTONBAR             (BIT_N(2))
 #define THEME_LANGUAGE              (BIT_N(3))
 #define THEME_ALL                   (~(0u))
-
-#define VP_SB_HIDE_ALL                          0
-#define VP_SB_ONSCREEN(screen)                  BIT_N(screen)
-#define VP_SB_IGNORE_SETTING(screen)            BIT_N(4+screen)
-#define VP_SB_ALLSCREENS            (VP_SB_ONSCREEN(0)|VP_SB_ONSCREEN(1))
 
 #ifndef __PCTOOL__
 /*
@@ -73,18 +43,18 @@ void viewport_set_defaults(struct viewport *vp,
  * statusbar stuff
  */
 void viewportmanager_init(void);
-int viewportmanager_get_statusbar(void);
-int viewportmanager_set_statusbar(const int enabled);
 
 
-/*
- * Initializes the given viewport with maximum dimensions minus status- and
- * buttonbar
- */
+void viewport_set_defaults(struct viewport *vp,
+                            const enum screen_type screen);
 void viewport_set_fullscreen(struct viewport *vp,
-                              const  enum screen_type screen);
+                              const enum screen_type screen);
 
 #ifdef HAVE_LCD_BITMAP
+void viewportmanager_theme_enable(enum screen_type screen, bool enable,
+                                 struct viewport *viewport);
+
+void viewportmanager_theme_undo(enum screen_type screen);
 
 /* call this when a theme changed */
 void viewportmanager_theme_changed(const int);
@@ -95,9 +65,9 @@ bool viewport_point_within_vp(const struct viewport *vp,
 #endif
 
 #else /* HAVE_LCD_CHARCELL */
-#define viewport_set_current_vp(a)
-#define viewport_get_current_vp() NULL
 #define viewportmanager_theme_changed(a)
+#define viewportmanager_theme_enable(...)
+#define viewportmanager_theme_undo(...)
 #endif
 
 #endif /* __PCTOOL__ */

@@ -49,7 +49,6 @@ static int clear_main_backdrop(void)
     global_settings.backdrop_file[0]=0;
     backdrop_unload(BACKDROP_MAIN);
     backdrop_show(BACKDROP_MAIN);
-    send_event(GUI_EVENT_REFRESH, NULL);
     settings_save();
     return 0;
 }
@@ -164,11 +163,6 @@ static int statusbar_callback_ex(int action,const struct menu_item_ex *this_item
         case ACTION_EXIT_MENUITEM:
             send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
             send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
-            if ((old_bar[screen] == STATUSBAR_CUSTOM)
-                || (statusbar_position(screen) == STATUSBAR_CUSTOM))
-                send_event(GUI_EVENT_REFRESH, NULL);
-            else
-                gui_statusbar_changed(screen, old_bar[screen]);
             break;
     }
     return ACTION_REDRAW;

@@ -2652,13 +2652,15 @@ static const struct the_menu_item menuitems[] = {
     };
 static int menu_action_callback(int btn, struct gui_synclist *lists)
 {
+   int i;
     if (btn == ACTION_STD_OK)
     {
-        int oldbars = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
+        FOR_NB_SCREENS(i)
+           viewportmanager_theme_enable(i, false, NULL);
         menuitems[gui_synclist_get_sel_pos(lists)].function();
         btn = ACTION_REDRAW;
-        send_event(GUI_EVENT_REFRESH, NULL);
-        viewportmanager_set_statusbar(oldbars);
+        FOR_NB_SCREENS(i)
+            viewportmanager_theme_undo(i);
     }
     return btn;
 }
