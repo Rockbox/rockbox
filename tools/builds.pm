@@ -10,26 +10,32 @@ $releasenotes="/wiki/ReleaseNotes34";
     'archosfmrecorder' => {
         name => 'Archos FM Recorder',
         status => 3,
+        ram => 2,
     },
     'archosondiofm' => {
         name => 'Archos Ondio FM',
         status => 3,
+        ram => 2,
     },
     'archosondiosp' => {
         name => 'Archos Ondio SP',
         status => 3,
+        ram => 2,
     },
     'archosplayer' => {
         name => 'Archos Player/Studio',
         status => 3,
+        ram => 2,
     },
     'archosrecorder' => {
         name => 'Archos Recorder v1',
         status => 3,
+        ram => 2,
     },
     'archosrecorderv2' => {
         name => 'Archos Recorder v2', 
         status => 3,
+        ram => 2,
     },
     'cowond2' => {
         name => 'Cowon D2',
@@ -104,6 +110,7 @@ $releasenotes="/wiki/ReleaseNotes34";
     'ipodvideo' => {
         name => 'iPod Video 30GB',
         status => 3,
+        ram => 32,
     },
     'ipodvideo64mb' => {
         name => 'iPod Video 60/80GB',
@@ -112,7 +119,7 @@ $releasenotes="/wiki/ReleaseNotes34";
         manual => 'ipodvideo',
         voice => 'ipodvideo',
         configname => 'ipodvideo',
-        ram => 64
+        ram => 64,
     },
     'iriverh10' => {
         name => 'iriver H10 20GB',

@@ -4,7 +4,7 @@ use File::Basename;
 use File::Path;
 use Cwd;
 
-require "../builds.pm";
+require "tools/builds.pm";
 
 my $verbose, $strip, $update, $doonly, $version;
 my @doonly;
@@ -94,7 +94,7 @@ if (!defined($version)) {
 
 # made once for all targets
 sub runone {
-    my ($dir)=@_;
+    my ($dir, $extra)=@_;
     my $a;
 
     if(@doonly > 0 && !grep(/^$dir$/, @doonly)) {
@@ -106,7 +106,7 @@ sub runone {
     print "Build in build-$dir\n" if($verbose);
 
     # build the target
-    $a = buildit($dir);
+    $a = buildit($dir, $extra);
 
     # Do not continue if the rockboxui executable is not created. This will
     #    prevent a good build getting overwritten by a bad build when
@@ -176,7 +176,7 @@ sub runone {
 };
 
 sub buildit {
-    my ($target, $confnum, $extra)=@_;
+    my ($dir, $extra)=@_;
 
     `rm -rf * >/dev/null 2>&1`;
 
@@ -188,7 +188,7 @@ sub buildit {
     }
 
     my $c = sprintf('printf "%s\n%s%s" | ../tools/configure',
-                    $confnum, $extra, $simstring);
+                    $dir, $extra, $simstring);
 
     print "C: $c\n" if($verbose);
     `$c`;
@@ -200,53 +200,35 @@ sub buildit {
     `make install 2>/dev/null`;
 }
 
-runone("player", "player", '\n');
-runone("recorder", "recorder", '\n');
-#runone("recorder8mb", "recorder", '8\n');
-runone("fmrecorder", "fmrecorder", '\n');
-#runone("fmrecorder8mb", "fmrecorder", '8\n');
-runone("recorderv2", "recorderv2", '\n');
-runone("ondiosp", "ondiosp", '\n');
-runone("ondiofm", "ondiofm", '\n');
-runone("h100", "h100");
-runone("h120", "h120");
-runone("h300", "h300");
-runone("ipodcolor", "ipodcolor");
-runone("ipodnano", "ipodnano");
-runone("ipod4gray", "ipod4g");
-runone("ipodvideo", "ipodvideo", '32\n');
-#runone("ipodvideo64mb", "ipodvideo", '64\n');
-runone("ipod3g", "ipod3g");
-runone("ipod1g2g", "ipod1g2g");
-runone("iaudiox5", "x5");
-runone("iaudiom5", "m5");
-runone("iaudiom3", "m3");
-runone("ipodmini1g", "ipodmini");
-runone("ipodmini2g", "ipodmini2g");
-runone("h10", "h10");
-runone("h10_5gb", "h10_5gb");
-runone("gigabeatf", "gigabeatf");
-runone("gigabeats", "gigabeats");
-runone("sansae200", "e200");
-runone("sansae200v2", "e200v2");
-runone("sansac200", "c200");
-runone("mrobe500", "mrobe500");
-runone("mrobe100", "mrobe100");
-runone("cowond2", "cowond2");
-runone("clip", "clip");
-runone("zvm30gb", "creativezvm30gb");
-runone("zvm60gb", "creativezvm60gb");
-runone("zenvision", "creativezenvision");
-runone("hdd1630", "hdd1630");
-runone("fuze", "fuze");
-runone("m200v4", "m200v4");
-runone("sa9200", "sa9200");
-runone("sansac200v2", "c200v2");
-runone("yh820", "yh820");
-runone("yh920", "yh920");
-runone("yh925", "yh925");
-runone("ondavx747", "ondavx747");
-runone("ondavx747p", "ondavx747p");
-runone("ondavx777", "ondavx777");
-#runone("ifp7xx", "ifp7xx");
-runone("lyremini2440", "mini2440");
+for my $b (sort byname keys %builds) {
+    if ($builds{$b}{status} >= 2)
+    {
+        # ipodvideo64mb uses the ipodvideo simulator
+        # sansae200r uses the sansae200 simulator
+        if ($b ne 'ipodvideo64mb' && $b ne 'sansae200r')
+        {
+            if ($builds{$b}{ram} ne '')
+            {
+                # These builds need the ram size sent to configure
+                runone($b, $builds{$b}{ram} . '\n');
+            }
+            else
+            {
+                runone($b);
+            }
+        }
+    }
+}
+
+#The following ports are in the unusable category, but the simulator does build
+runone("gogearhdd1630");
+runone("gogearsa9200");
+runone("mini2440");
+runone("ondavx747");
+runone("ondavx747p");
+runone("ondavx777");
+runone("sansac200v2");
+runone("sansam200v4");
+runone("zenvision");
+runone("zenvisionm30gb");
+runone("zenvisionm60gb");
