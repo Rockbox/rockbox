@@ -2543,6 +2543,10 @@ fi
       echo "Bootloader build selected"
       ;;
     [Ss])
+      if [ "$modelname" = "sansae200r" ]; then
+          echo "Do not use the e200R target for simulator builds.  Use e200 instead."
+          exit 8
+      fi
       debug="-DDEBUG"
       simulator="yes"
       extradefines="-DSIMULATOR"
