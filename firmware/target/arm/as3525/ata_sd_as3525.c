@@ -333,6 +333,7 @@ static int sd_init_card(const int drive)
         /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
         if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_ARG, NULL))
             return -8;
+        mci_delay();
     }
 #endif /*  HAVE_MULTIDRIVE  */
 
