@@ -1,0 +1,24 @@
+% $Id:%
+\def\UseOption{sa9200}
+\edef\UseOption{\UseOption,HAVE_RB_BL_ON_DISK}
+\edef\UseOption{\UseOption,PHILIPS_SA9200_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_BUTTON_LIGHTS}
+\edef\UseOption{\UseOption,gogear}
+
+\newcommand{\playerman}{Philips}
+\newcommand{\playertype}{GoGear SA9200}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\genericimg}{128x160x16}
+\newcommand{\specimg}{sa9200}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{FWImage.ebn}}
+\newcommand{\firmwareextension}{\fname{ebn}}
+\newcommand{\screenshotsize}{4cm}
+\newcommand{\disk}{flash storage}
+
+% link external keymap file
+\input{platform/keymap-sa9200.tex}
