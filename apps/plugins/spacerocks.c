@@ -277,7 +277,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 
 #define SHOW_COL                0
 #define SCALE                   5000
-#define WRAP_GAP                12*SCALE
+#define WRAP_GAP                (LARGE*SCALE*3)
 #define POINT_SIZE              2
 #define START_LEVEL             1
 #define SHOW_LEVEL_TIME         50
@@ -293,14 +293,20 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define NUM_SHIP_VERTICES       4
 #define NUM_ENEMY_VERTICES      8
 
-#define SPAWN_TIME              30
+#define INVULNERABLE_TIME       30
 #define BLINK_TIME              10
 #define EXTRA_LIFE              250
 #define START_LIVES             3
-#define MISSILE_SURVIVAL_LENGTH 40
+#define MISSILE_LIFE_LENGTH     40
 
 #define ASTEROID_SPEED          (RES/20)
 #define SPACE_CHECK_SIZE        30*SCALE
+
+#if (LARGE_LCD)
+#define SIZE_SHIP_COLLISION     8*SCALE
+#else
+#define SIZE_SHIP_COLLISION     6*SCALE
+#endif
 
 #define LITTLE_SHIP             1
 #define BIG_SHIP                2
@@ -308,7 +314,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define ENEMY_APPEAR_PROBABILITY_START  35
 #define ENEMY_APPEAR_TIMING_START       600
 #define ENEMY_SPEED             4
-#define ENEMY_MISSILE_SURVIVAL_LENGTH   (RES/2)
+#define ENEMY_MISSILE_LIFE_LENGTH   (RES/2)
 #if (LARGE_LCD)
 #define SIZE_ENEMY_COLLISION    7*SCALE
 #else
@@ -507,8 +513,8 @@ struct Point
 
 struct TrailPoint
 {
-    int alive;
     struct Point position;
+    int alive;
 #ifdef HAVE_LCD_COLOR
     short r;
     short g;
@@ -532,18 +538,17 @@ struct Asteroid
 
 struct Ship
 {
-    struct Point vertices[NUM_SHIP_VERTICES];
     struct Point position;
-    bool waiting_for_space;
+    struct Point vertices[NUM_SHIP_VERTICES];
+    bool exists;
     int explode_countdown;
-    bool invulnerable;
-    int spawn_time;
+    int invulnerable_time;
 };
 
 struct Enemy
 {
-    struct Point vertices[NUM_ENEMY_VERTICES];
     struct Point position;
+    struct Point vertices[NUM_ENEMY_VERTICES];
     bool exists;
     int explode_countdown;
     int appear_countdown;
@@ -556,7 +561,7 @@ struct Missile
 {
     struct Point position;
     struct Point oldpoint;
-    int survived;
+    int alive;
 };
 
 static enum game_state game_state;
@@ -621,7 +626,7 @@ static bool is_point_within_rectangle(struct Point* rect, struct Point* p,
     int dy = p->y - rect->y;
 #if SHOW_COL
     rb->lcd_drawrect((rect->x - size)/SCALE, (rect->y - size)/SCALE,
-                     size*2/SCALE, size*2/SCALE);
+                     (size*2+1)/SCALE, (size*2+1)/SCALE);
 #endif
     if (dx < -SCALED_WIDTH/2) dx += SCALED_WIDTH;
     else if (dx > SCALED_WIDTH/2) dx -= SCALED_WIDTH;
@@ -656,36 +661,32 @@ static void draw_polygon(struct Point* vertices, int num_vertices,
 {
     int n, new_x, new_y, old_x, old_y;
     struct Point *p;
-    bool bDrawAll = (px < WRAP_GAP || SCALED_WIDTH - px < WRAP_GAP ||
-                     py < WRAP_GAP || SCALED_HEIGHT - py < WRAP_GAP);
+    bool draw_wrap;
+
+    if (px > SCALED_WIDTH - WRAP_GAP)
+        px -= SCALED_WIDTH;
+    if (py > SCALED_HEIGHT - WRAP_GAP)
+        py -= SCALED_HEIGHT;
+
+    draw_wrap = (px < WRAP_GAP || py < WRAP_GAP);
 
     p = vertices + num_vertices - 1;
     old_x = (p->x + px)/SCALE;
     old_y = (p->y + py)/SCALE;
     p = vertices;
     n = num_vertices;
-    while(n--)
+    while (n--)
     {
         new_x = (p->x + px)/SCALE;
         new_y = (p->y + py)/SCALE;
 
         rb->lcd_drawline(old_x, old_y, new_x, new_y);
-
-        if(bDrawAll)
+        if (draw_wrap)
         {
-            rb->lcd_drawline(old_x - LCD_WIDTH, old_y, new_x - LCD_WIDTH, new_y);
             rb->lcd_drawline(old_x + LCD_WIDTH, old_y, new_x + LCD_WIDTH, new_y);
-            rb->lcd_drawline(old_x - LCD_WIDTH, old_y + LCD_HEIGHT,
-                             new_x - LCD_WIDTH, new_y + LCD_HEIGHT);
+            rb->lcd_drawline(old_x, old_y + LCD_HEIGHT, new_x, new_y + LCD_HEIGHT);
             rb->lcd_drawline(old_x + LCD_WIDTH, old_y + LCD_HEIGHT,
                              new_x + LCD_WIDTH, new_y + LCD_HEIGHT);
-
-            rb->lcd_drawline(old_x, old_y - LCD_HEIGHT, new_x, new_y - LCD_HEIGHT);
-            rb->lcd_drawline(old_x, old_y + LCD_HEIGHT, new_x, new_y + LCD_HEIGHT);
-            rb->lcd_drawline(old_x - LCD_WIDTH, old_y - LCD_HEIGHT,
-                             new_x - LCD_WIDTH, new_y - LCD_HEIGHT);
-            rb->lcd_drawline(old_x + LCD_WIDTH, old_y - LCD_HEIGHT,
-                             new_x + LCD_WIDTH, new_y - LCD_HEIGHT);
         }
         old_x = new_x;
         old_y = new_y;
@@ -748,7 +749,7 @@ static void create_trail_blaze(int colour, struct Point* position)
     {
         /* find a space in the array of trail_points that is NULL or DEAD or
            whatever and place this one here. */
-        if (!tpoint->alive)
+        if (tpoint->alive <= 0)
         {
             numtoadd--;
             /* take a random point near the position. */
@@ -821,7 +822,7 @@ static void draw_and_move_trail_blaze(void)
     n = NUM_TRAIL_POINTS;
     while (n--)
     {
-        if (tpoint->alive)
+        if (tpoint->alive > 0)
         {
             if (game_state != PAUSE_MODE)
             {
@@ -863,8 +864,8 @@ static void initialise_asteroid(struct Asteroid* asteroid,
     int n;
 
     asteroid->exists = true;
-    asteroid->type = type;
     asteroid->explode_countdown = 0;
+    asteroid->type = type;
 
     /* Set the radius of the asteroid: */
     asteroid->radius = (int)type*SCALE*3;
@@ -956,7 +957,7 @@ static void create_asteroid(enum asteroid_type type, struct Point *position)
     n = MAX_NUM_ASTEROIDS;
     while (n--)
     {
-        if (!asteroid->exists && !asteroid->explode_countdown)
+        if (!asteroid->exists && asteroid->explode_countdown <= 0)
         {
             initialise_asteroid(asteroid, type, position);
             break;
@@ -977,6 +978,11 @@ static void draw_and_move_asteroids(void)
     n = MAX_NUM_ASTEROIDS;
     while (n--)
     {
+        if (asteroid->exists)
+        {
+            draw_polygon(asteroid->vertices, NUM_ASTEROID_VERTICES,
+                         asteroid->position.x, asteroid->position.y);
+        }
         if (game_state != PAUSE_MODE)
         {
             if (asteroid->exists)
@@ -984,17 +990,42 @@ static void draw_and_move_asteroids(void)
                 move_point(&asteroid->position);
                 rotate_asteroid(asteroid);
             }
-            else if (asteroid->explode_countdown)
+            else if (asteroid->explode_countdown > 0)
             {
                 asteroid->explode_countdown--;
             }
         }
-        if (asteroid->exists)
-        {
-            draw_polygon(asteroid->vertices, NUM_ASTEROID_VERTICES,
-                         asteroid->position.x, asteroid->position.y);
-        }
         asteroid++;
+    }
+}
+
+static void explode_asteroid(struct Asteroid* asteroid)
+{
+    struct Point p;
+    p.dx = asteroid->position.dx;
+    p.dy = asteroid->position.dy;
+    p.x  = asteroid->position.x;
+    p.y  = asteroid->position.y;
+
+    asteroid_count--;
+    asteroid->exists = false;
+
+    switch(asteroid->type)
+    {
+        case SMALL:
+            asteroid->explode_countdown = EXPLOSION_LENGTH;
+            create_trail_blaze(EXPLOSION_ASTEROID, &p);
+            break;
+
+        case MEDIUM:
+            create_asteroid(SMALL, &p);
+            create_asteroid(SMALL, &p);
+            break;
+
+        case LARGE:
+            create_asteroid(MEDIUM, &p);
+            create_asteroid(MEDIUM, &p);
+            break;
     }
 }
 
@@ -1013,9 +1044,9 @@ static void initialise_ship(void)
     ship.position.y = CENTER_LCD_Y * SCALE;
     ship.position.dx = 0;
     ship.position.dy = 0;
-    ship.explode_countdown  = 0;
-    ship.spawn_time = SPAWN_TIME;
-    ship.invulnerable = 1;
+    ship.exists = true;
+    ship.explode_countdown = 0;
+    ship.invulnerable_time = INVULNERABLE_TIME;
 
     point = ship.vertices;
     lives_point = lives_points;
@@ -1040,8 +1071,7 @@ static void initialise_ship(void)
  */
 static void draw_and_move_ship(void)
 {
-    if (ship.invulnerable &&
-        (ship.spawn_time > BLINK_TIME || ship.spawn_time % 2 == 0))
+    if (ship.invulnerable_time > BLINK_TIME || ship.invulnerable_time % 2 != 0)
     {
         SET_FG(COL_INVULN);
     }
@@ -1050,36 +1080,24 @@ static void draw_and_move_ship(void)
         SET_FG(COL_PLAYER);
     }
 
-    if (!ship.explode_countdown)
+    if (ship.exists)
     {
-        /* make sure ship is invulnerable until spawn time over */
-        if (game_state != PAUSE_MODE)
-        {
-            if (ship.spawn_time)
-            {
-                ship.spawn_time--;
-                if (ship.spawn_time <= 0)
-                {
-                    ship.invulnerable = 0;
-                }
-            }
-        }
-        if (!ship.waiting_for_space)
-        {
-            draw_polygon(ship.vertices, NUM_SHIP_VERTICES,
-                         ship.position.x, ship.position.y);
-            if (game_state != PAUSE_MODE && game_state != GAME_OVER)
-            {
-                move_point(&ship.position);
-            }
-        }
+        draw_polygon(ship.vertices, NUM_SHIP_VERTICES,
+                     ship.position.x, ship.position.y);
     }
-    else
+
+    if (game_state != PAUSE_MODE)
     {
-        if (game_state != PAUSE_MODE)
+        if (ship.exists)
+        {
+            if (ship.invulnerable_time > 0)
+                ship.invulnerable_time--;
+            move_point(&ship.position);
+        }
+        else if (ship.explode_countdown > 0)
         {
             ship.explode_countdown--;
-            if (!ship.explode_countdown)
+            if (ship.explode_countdown <= 0)
             {
                 num_lives--;
                 if (!num_lives)
@@ -1089,17 +1107,27 @@ static void draw_and_move_ship(void)
                 else
                 {
                     initialise_ship();
-                    ship.waiting_for_space = true;
                 }
             }
         }
     }
 }
 
+static void explode_ship(void)
+{
+    if (!ship.invulnerable_time)
+    {
+        /* if not invulnerable, blow up ship */
+        ship.explode_countdown = EXPLOSION_LENGTH;
+        ship.exists = false;
+        create_trail_blaze(EXPLOSION_SHIP, &ship.position);
+    }
+}
+
 /* Rotate the ship using the passed sin & cos values */
 static void rotate_ship(int cos, int sin)
 {
-    if (!ship.waiting_for_space && !ship.explode_countdown)
+    if (ship.exists)
     {
         rotate_polygon(ship.vertices, NUM_SHIP_VERTICES, cos, sin);
     }
@@ -1107,7 +1135,7 @@ static void rotate_ship(int cos, int sin)
 
 static void thrust_ship(void)
 {
-    if (!ship.waiting_for_space && !ship.explode_countdown)
+    if (ship.exists)
     {
         ship.position.dx += ( ship.vertices[0].x - ship.vertices[2].x )/20;
         ship.position.dy += ( ship.vertices[0].y - ship.vertices[2].y )/20;
@@ -1123,7 +1151,7 @@ static void thrust_ship(void)
 /* stop movement of ship, 'cos that's what happens when you go into hyperspace. */
 static void hyperspace(void)
 {
-    if (!ship.waiting_for_space && !ship.explode_countdown)
+    if (ship.exists)
     {
         ship.position.dx = ship.position.dy = 0;
         ship.position.x = (rb->rand()%SCALED_WIDTH);
@@ -1167,7 +1195,7 @@ static void initialise_missile(struct Missile* missile)
     missile->position.y = ship.position.y + ship.vertices[0].y;
     missile->position.dx = (ship.vertices[0].x - ship.vertices[2].x)/2;
     missile->position.dy = (ship.vertices[0].y - ship.vertices[2].y)/2;
-    missile->survived = MISSILE_SURVIVAL_LENGTH;
+    missile->alive = MISSILE_LIFE_LENGTH;
     missile->oldpoint.x = missile->position.x;
     missile->oldpoint.y = missile->position.y;
 }
@@ -1178,13 +1206,13 @@ static void fire_missile(void)
     struct Missile* missile;
     int n;
 
-    if (!ship.explode_countdown && !ship.waiting_for_space)
+    if (ship.exists)
     {
         missile = missiles_array;
         n = MAX_NUM_MISSILES;
         while (n--)
         {
-            if (!missile->survived)
+            if (missile->alive <= 0)
             {
                 initialise_missile(missile);
                 break;
@@ -1207,7 +1235,7 @@ static void draw_and_move_missiles(void)
     n = MAX_NUM_MISSILES;
     while (n--)
     {
-        if (missile->survived)
+        if (missile->alive > 0)
         {
             vertices[0].x = 0;
             vertices[0].y = 0;
@@ -1220,7 +1248,7 @@ static void draw_and_move_missiles(void)
                 missile->oldpoint.x = missile->position.x;
                 missile->oldpoint.y = missile->position.y;
                 move_point(&missile->position);
-                missile->survived--;
+                missile->alive--;
             }
         }
         missile++;
@@ -1298,57 +1326,46 @@ static void draw_and_move_enemy(void)
 
     if (enemy.exists)
     {
-        if (!enemy.explode_countdown)
+        draw_polygon(enemy.vertices, NUM_ENEMY_VERTICES,
+                     enemy.position.x, enemy.position.y);
+    }
+
+    if (game_state != PAUSE_MODE)
+    {
+        if (enemy.exists)
         {
-            draw_polygon(enemy.vertices, NUM_ENEMY_VERTICES,
-                         enemy.position.x, enemy.position.y);
+            enemy.position.x += enemy.position.dx;
+            enemy.position.y += enemy.position.dy;
 
-            if (game_state != PAUSE_MODE)
-            {
-                enemy.position.x += enemy.position.dx;
-                enemy.position.y += enemy.position.dy;
+            if (enemy.position.x > SCALED_WIDTH || enemy.position.x < 0)
+                enemy.exists = false;
 
-                if (enemy.position.x > SCALED_WIDTH || enemy.position.x < 0)
-                    enemy.exists = false;
+            enemy.position.y %= SCALED_HEIGHT;
+            if (enemy.position.y < 0)
+                enemy.position.y += SCALED_HEIGHT;
 
-                enemy.position.y %= SCALED_HEIGHT;
-                if (enemy.position.y < 0)
-                    enemy.position.y += SCALED_HEIGHT;
-
-                if ((rb->rand()%1000) < 10)
-                    enemy.position.dy = -enemy.position.dy;
-            }
+            if ((rb->rand()%1000) < 10)
+                enemy.position.dy = -enemy.position.dy;
+        }
+        else if (enemy.explode_countdown > 0)
+        {
+            enemy.explode_countdown--;
         }
         else
         {
-            if (game_state != PAUSE_MODE)
-            {
-                enemy.explode_countdown--;
-                if (!enemy.explode_countdown)
-                {
-                    enemy.exists = false;
-                }
-            }
-        }
-    }
-    else
-    {
-        if (game_state != PAUSE_MODE)
-        {
-            if (enemy.appear_countdown)
+            if (enemy.appear_countdown > 0)
                 enemy.appear_countdown--;
             else if (rb->rand()%100 >= enemy.appear_probability)
                 initialise_enemy();
         }
     }
 
-    if (!enemy_missile.survived)
+    if (enemy_missile.alive <= 0)
     {
         /* if no missile and the enemy is here and not exploding..
            then shoot baby! */
-        if (!enemy.explode_countdown && enemy.exists &&
-            !ship.waiting_for_space && game_state == PLAY_MODE &&
-            (rb->rand()%10) >= 5 )
+        if (enemy.exists && ship.exists &&
+            game_state == PLAY_MODE && (rb->rand()%10) >= 5 )
         {
             int dx = ship.position.x - enemy.position.x;
             int dy = ship.position.y - enemy.position.y;
@@ -1385,7 +1402,7 @@ static void draw_and_move_enemy(void)
 
             enemy_missile.position.dx *= SCALE;
             enemy_missile.position.dy *= SCALE;
-            enemy_missile.survived = ENEMY_MISSILE_SURVIVAL_LENGTH;
+            enemy_missile.alive = ENEMY_MISSILE_LIFE_LENGTH;
         }
     }
     else
@@ -1396,7 +1413,7 @@ static void draw_and_move_enemy(void)
         if (game_state != PAUSE_MODE)
         {
             move_point(&enemy_missile.position);
-            enemy_missile.survived--;
+            enemy_missile.alive--;
         }
     }
 }
@@ -1424,32 +1441,20 @@ static bool is_point_within_asteroid(struct Asteroid* asteroid,
                             point->x - asteroid->position.x,
                             point->y - asteroid->position.y))
     {
-        struct Point p;
-        p.dx = asteroid->position.dx;
-        p.dy = asteroid->position.dy;
-        p.x  = asteroid->position.x;
-        p.y  = asteroid->position.y;
+        explode_asteroid(asteroid);
+        return true;
+    }
+    else
+        return false;
+}
 
-        asteroid_count--;
-        asteroid->exists = false;
-
-        switch(asteroid->type)
-        {
-            case SMALL:
-                asteroid->explode_countdown = EXPLOSION_LENGTH;
-                create_trail_blaze(EXPLOSION_ASTEROID, &p);
-                break;
-
-            case MEDIUM:
-                create_asteroid(SMALL, &p);
-                create_asteroid(SMALL, &p);
-                break;
-
-            case LARGE:
-                create_asteroid(MEDIUM, &p);
-                create_asteroid(MEDIUM, &p);
-                break;
-        }
+static bool is_point_within_ship(struct Point* point)
+{
+    if (is_point_within_rectangle(&ship.position, point, SIZE_SHIP_COLLISION)
+     && is_point_in_polygon(ship.vertices, NUM_SHIP_VERTICES,
+                            point->x - ship.position.x,
+                            point->y - ship.position.y))
+    {
         return true;
     }
     else
@@ -1462,6 +1467,7 @@ static bool is_point_within_enemy(struct Point* point)
     {
         add_score(5);
         enemy.explode_countdown = EXPLOSION_LENGTH;
+        enemy.exists = false;
         create_trail_blaze(EXPLOSION_ENEMY, &enemy.position);
         return true;
     }
@@ -1472,6 +1478,10 @@ static bool is_point_within_enemy(struct Point* point)
 static bool is_ship_within_asteroid(struct Asteroid* asteroid)
 {
     struct Point p;
+
+    if (!is_point_within_rectangle(&asteroid->position, &ship.position,
+                                   asteroid->radius+SIZE_SHIP_COLLISION))
+        return false;
 
     p.x = ship.position.x + ship.vertices[0].x;
     p.y = ship.position.y + ship.vertices[0].y;
@@ -1498,7 +1508,6 @@ static void check_collisions(void)
     struct Asteroid* asteroid;
     int m, n;
     bool asteroids_onscreen = false;
-    bool ship_cant_be_placed = false;
 
     asteroid = asteroids_array;
     m = MAX_NUM_ASTEROIDS;
@@ -1512,14 +1521,14 @@ static void check_collisions(void)
             while (n--)
             {
                 /* if the missiles exists: */
-                if (missile->survived > 0)
+                if (missile->alive > 0)
                 {
                     /* has the missile hit the asteroid? */
                     if (is_point_within_asteroid(asteroid, &missile->position) ||
                         is_point_within_asteroid(asteroid, &missile->oldpoint))
                     {
                         add_score(1);
-                        missile->survived = 0;
+                        missile->alive = 0;
                         break;
                     }
                 }
@@ -1527,72 +1536,53 @@ static void check_collisions(void)
             }
 
             /* now check collision with ship: */
-            if (asteroid->exists && !ship.waiting_for_space && !ship.explode_countdown)
+            if (asteroid->exists && ship.exists)
             {
                 if (is_ship_within_asteroid(asteroid))
                 {
                     add_score(1);
-                    if (!ship.invulnerable)
-                    {
-                        /* if not invulnerable, blow up ship */
-                        ship.explode_countdown = EXPLOSION_LENGTH;
-                        create_trail_blaze(EXPLOSION_SHIP, &ship.position);
-                    }
+                    explode_ship();
                 }
+            }
 
-                /* has the enemy missile blown something up? */
-                if (asteroid->exists && enemy_missile.survived)
+            /* has the enemy missile blown something up? */
+            if (asteroid->exists && enemy_missile.alive > 0)
+            {
+                if (is_point_within_asteroid(asteroid, &enemy_missile.position))
                 {
-                    if (is_point_within_asteroid(asteroid, &enemy_missile.position))
-                    {
-                        enemy_missile.survived = 0;
-                    }
-
-                    /* if it still exists, check if ship is waiting for space: */
-                    if (asteroid->exists && ship.waiting_for_space)
-                    {
-                        ship_cant_be_placed |=
-                            is_point_within_rectangle(&ship.position,
-                                                      &asteroid->position,
-                                                      SPACE_CHECK_SIZE);
-                    }
+                    enemy_missile.alive = 0;
                 }
             }
         }
 
         /* is an asteroid still exploding? */
-        if (asteroid->explode_countdown)
+        if (asteroid->explode_countdown > 0)
             asteroids_onscreen = true;
 
         asteroid++;
     }
 
     /* now check collision between ship and enemy */
-    if (enemy.exists && !enemy.explode_countdown &&
-        !ship.waiting_for_space && !ship.explode_countdown)
+    if (enemy.exists && ship.exists)
     {
         /* has the enemy collided with the ship? */
         if (is_point_within_enemy(&ship.position))
         {
-            if (!ship.invulnerable)
-            {
-                ship.explode_countdown = EXPLOSION_LENGTH;
-                create_trail_blaze(EXPLOSION_SHIP, &ship.position);
-            }
+            explode_ship();
             create_trail_blaze(EXPLOSION_ENEMY, &enemy.position);
         }
 
-        if (enemy.exists && !enemy.explode_countdown)
+        if (enemy.exists)
         {
             /* Now see if the enemy has been shot at by the ships missiles: */
             missile = missiles_array;
             n = MAX_NUM_MISSILES;
             while (n--)
             {
-                if (missile->survived > 0 &&
+                if (missile->alive > 0 &&
                     is_point_within_enemy(&missile->position))
                 {
-                    missile->survived = 0;
+                    missile->alive = 0;
                     break;
                 }
                 missile++;
@@ -1601,25 +1591,16 @@ static void check_collisions(void)
     }
 
     /* test collision with enemy missile and ship: */
-    if (!ship_cant_be_placed && enemy_missile.survived > 0 &&
-        is_point_in_polygon(ship.vertices, NUM_SHIP_VERTICES,
-                            enemy_missile.position.x - ship.position.x,
-                            enemy_missile.position.y - ship.position.y))
+    if (enemy_missile.alive > 0 && is_point_within_ship(&enemy_missile.position))
     {
-        if (!ship.invulnerable)
-        {
-            ship.explode_countdown = EXPLOSION_LENGTH;
-            create_trail_blaze(EXPLOSION_SHIP, &ship.position);
-        }
-        enemy_missile.survived = 0;
+        explode_ship();
+        enemy_missile.alive = 0;
         enemy_missile.position.x = enemy_missile.position.y = 0;
     }
 
-    if (!ship_cant_be_placed)
-        ship.waiting_for_space = false;
-
     /* if all asteroids cleared then start again: */
-    if (asteroid_count == 0 && !enemy.exists && !asteroids_onscreen)
+    if (asteroid_count == 0 && !asteroids_onscreen
+        && !enemy.exists && enemy.explode_countdown <= 0)
     {
         current_level++;
         enemy.appear_probability += 5;
@@ -1682,7 +1663,8 @@ static void initialise_level(int start_num)
 
     /* no enemy */
     enemy.exists = 0;
-    enemy_missile.survived = 0;
+    enemy.explode_countdown = 0;
+    enemy_missile.alive = 0;
 
     /* clear asteroids */
     asteroid = asteroids_array;
@@ -1702,7 +1684,7 @@ static void initialise_level(int start_num)
     n = MAX_NUM_MISSILES;
     while (n--)
     {
-        missile->survived = 0;
+        missile->alive = 0;
         missile++;
     }
 
