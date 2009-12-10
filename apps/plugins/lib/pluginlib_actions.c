@@ -107,7 +107,6 @@ const struct button_mapping generic_directions[] =
     || (CONFIG_KEYPAD == SANSA_C200_PAD) \
     || (CONFIG_KEYPAD == GIGABEAT_S_PAD) \
     || (CONFIG_KEYPAD == MROBE100_PAD) \
-    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) \
     || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) \
     || (CONFIG_KEYPAD == SANSA_CLIP_PAD) \
     || (CONFIG_KEYPAD == CREATIVEZVM_PAD) \
@@ -171,6 +170,15 @@ const struct button_mapping generic_directions[] =
     { PLA_DOWN_REPEAT,       BUTTON_PLAY|BUTTON_REPEAT,         BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE},
+#elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
+    { PLA_UP,                BUTTON_UP,                  BUTTON_NONE},
+    { PLA_DOWN,              BUTTON_DOWN,                BUTTON_NONE},
+    { PLA_LEFT,              BUTTON_PREV,                BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_NEXT,                BUTTON_NONE},
+    { PLA_UP_REPEAT,         BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE},
+    { PLA_DOWN_REPEAT,       BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_PREV|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_NEXT|BUTTON_REPEAT,  BUTTON_NONE},
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) /* Touchscreen target */
 #elif (CONFIG_KEYPAD == ONDAVX777_PAD) /* Touchscreen target */
 #elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
@@ -205,7 +213,6 @@ const struct button_mapping generic_left_right_fire[] =
     || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
     || (CONFIG_KEYPAD == GIGABEAT_S_PAD)    \
     || (CONFIG_KEYPAD == MROBE100_PAD)      \
-    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) \
     || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) \
     || (CONFIG_KEYPAD == SANSA_CLIP_PAD) \
     || (CONFIG_KEYPAD == SANSA_M200_PAD)
@@ -303,6 +310,13 @@ const struct button_mapping generic_left_right_fire[] =
     { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
     { PLA_FIRE,              BUTTON_SELECT,                BUTTON_NONE},
     { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,  BUTTON_NONE},
+#elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
+    { PLA_LEFT,              BUTTON_PREV,                BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_NEXT,                BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_PREV|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_NEXT|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_PLAY,                  BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_PLAY|BUTTON_REPEAT,    BUTTON_NONE},
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) /* Touchscreen target */
 #elif (CONFIG_KEYPAD == ONDAVX777_PAD) /* Touchscreen target */
 #elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
@@ -445,10 +459,10 @@ const struct button_mapping generic_actions[] =
     {PLA_FIRE_REPEAT,   BUTTON_RC_MODE|BUTTON_REPEAT,   BUTTON_NONE},
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
     {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
-    {PLA_START,         BUTTON_RIGHT,                    BUTTON_NONE},
+    {PLA_START,         BUTTON_RIGHT,                   BUTTON_NONE},
     {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,                  BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_PLAY,                    BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IAUDIO67_PAD)
     {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
     {PLA_START,         BUTTON_PLAY,                    BUTTON_NONE},
