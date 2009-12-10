@@ -197,19 +197,7 @@ static vorbis_look_floor *floor1_look(vorbis_dsp_state *vd,vorbis_info_mode *mi,
 static int render_point(int x0,int x1,int y0,int y1,int x){
   y0&=0x7fff; /* mask off flag */
   y1&=0x7fff;
-#if defined(CPU_COLDFIRE)
-  asm volatile ("sub.l %[x0],%[x];"
-                "sub.l %[y0],%[y1];"
-                "sub.l %[x0],%[x1];"
-                "muls.l %[y1],%[x];"
-                "divs.l %[x1],%[x];"
-                "add.l %[y0],%[x];"
-       : [x] "+d" (x), [x1] "+d" (x1), [y1] "+d" (y1)
-       : [x0] "r" (x0), [y0] "r" (y0) );
-  return x;
-#else
   return y0+((y1-y0)*(x-x0))/(x1-x0);
-#endif
 }
 
 #ifdef _LOW_ACCURACY_
