@@ -241,6 +241,7 @@ $releasenotes="/wiki/ReleaseNotes34";
         name => 'SanDisk Sansa e200R',
         status => 3,
         icon => 'sansae200',
+        manual => 'sansae200',
     },
     'sansae200v2' => {
         name => 'SanDisk Sansa e200 v2',
