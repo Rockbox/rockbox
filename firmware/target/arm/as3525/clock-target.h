@@ -118,9 +118,8 @@
 
 #define AS3525_IDE_SEL           AS3525_CLK_PLLA           /* Input Source   */
 #define AS3525_IDE_DIV           (CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1)/*div=1/(n+1)*/
-#define AS3525_IDE_FREQ          90000000    /* The OF uses 66MHz maximal freq
-                                               but sd transfers fail on some
-                                               players with this limit */
+#define AS3525_IDE_FREQ          50000000    /* The OF uses 66MHz maximal freq */
+
 
 //#define AS3525_USB_SEL           AS3525_CLK_PLLA            /* Input Source   */
 //#define AS3525_USB_DIV           /* div = 1/(n=0?1:2n)*/

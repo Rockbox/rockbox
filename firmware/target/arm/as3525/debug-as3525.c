@@ -185,9 +185,9 @@ int calc_freq(int clk)
             if(!(MCI_NAND & (1<<8)))
                 return 0;
             else if(MCI_NAND & (1<<10))
-                return calc_freq(CLK_PCLK);
+                return calc_freq(CLK_IDE);
             else
-                return calc_freq(CLK_PCLK)/(((MCI_NAND & 0xff)+1)*2);
+                return calc_freq(CLK_IDE)/(((MCI_NAND & 0xff)+1)*2);
         case CLK_SD_MCLK_MSD:
             if(!(MCI_SD & (1<<8)))
                 return 0;
@@ -304,7 +304,7 @@ bool __dbg_hw_info(void)
         }
 
         lcd_putsf(0, line++, "SD  :%3dMHz    %3dMHz",
-            ((AS3525_PCLK_FREQ/ 1000000) /
+            ((AS3525_IDE_FREQ/ 1000000) /
             ((last_nand & MCI_CLOCK_BYPASS)? 1:(((last_nand & 0xff)+1) * 2))),
             calc_freq(CLK_SD_MCLK_NAND)/1000000);
 #ifdef HAVE_MULTIDRIVE

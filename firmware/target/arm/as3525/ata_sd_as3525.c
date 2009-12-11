@@ -121,6 +121,10 @@ static struct event_queue sd_queue;
 bool sd_enabled = false;
 #endif
 
+#if defined(HAVE_MULTIDRIVE)
+static bool hs_card = false;
+#endif
+
 static struct wakeup transfer_completion_signal;
 static volatile unsigned int transfer_error[NUM_VOLUMES];
 #define PL180_MAX_TRANSFER_ERRORS 10
@@ -347,13 +351,18 @@ static int sd_init_card(const int drive)
 
     sd_parse_csd(&card_info[drive]);
 
+#if defined(HAVE_MULTIDRIVE)
+    hs_card = (card_info[drive].speed == 50000000) ? true : false;
+#endif
+
     /* Boost MCICLK to operating speed */
     if(drive == INTERNAL_AS3525)
-        MCI_CLOCK(drive) = MCI_QUARTERSPEED;  /* MCICLK = PCLK/4 = 15.5MHz  */
+        MCI_CLOCK(drive) = MCI_HALFSPEED;  /* MCICLK = IDE_CLK/2 = 25 MHz  */
+#if defined(HAVE_MULTIDRIVE)
     else
         /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
-        MCI_CLOCK(drive) = ((card_info[drive].speed == 50000000) ?
-                                              MCI_HALFSPEED : MCI_QUARTERSPEED);
+        MCI_CLOCK(drive) = (hs_card ? MCI_HALFSPEED : MCI_QUARTERSPEED);
+#endif
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
@@ -733,10 +742,14 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             dma_enable_channel(0, dma_buf, MCI_FIFO(drive),
                 (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
                 DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
-
+#if defined(HAVE_MULTIDRIVE)
             /*Small delay for writes prevents data crc failures at lower freqs*/
-            int write_delay = 125;
-            while(write_delay--);
+            if((drive == SD_SLOT_AS3525) && !hs_card)
+            {
+                int write_delay = 125;
+                while(write_delay--);
+            }
+#endif
         }
         else
             dma_enable_channel(0, MCI_FIFO(drive), dma_buf,
