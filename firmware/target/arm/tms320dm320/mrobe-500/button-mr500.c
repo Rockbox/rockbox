@@ -128,7 +128,7 @@ int button_read_device(int *data)
         button_read |= touchscreen_to_pixels(touch_x, touch_y, data);
     }
 
-    tsc2100_set_mode(true, 0x01);
+    tsc2100_set_mode(true, 0x02);
         
     /* Handle power button */
     if ((IO_GIO_BITSET0&0x01) == 0) {

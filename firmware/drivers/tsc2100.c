@@ -28,9 +28,6 @@
 /* adc_data contains the last readings from the tsc2100 */
 static short adc_data[10];
 static short adc_status;
-static long adc_last_read=0;
-static long adc_last_touch_read=0;
-static long adc_last_volt_read=0;
 
 void tsc2100_read_data(void)
 {
@@ -42,8 +39,6 @@ void tsc2100_read_data(void)
     
     adc_status|=tsc2100_readreg(TSSTAT_PAGE, TSSTAT_ADDRESS);
     
-    adc_last_read=current_tick;
-    
     spi_block_transfer(SPI_target_TSC2100,
                        out, sizeof(out), (char *)adc_data, sizeof(adc_data));
                        
@@ -54,19 +49,13 @@ void tsc2100_read_data(void)
 /* Read X, Y, Z1, Z2 touchscreen coordinates. */
 bool tsc2100_read_touch(short *x, short* y, short *z1, short *z2)
 {
-    /* Note: This could cause problems if the current tick is not reset in ~1.3
-     * years.  Noting this in the event that a suspend/resume function
-     * is added.
-     */
-    if( (adc_status&(3<<9)) && (adc_last_read - adc_last_touch_read>=0) ) {
+    if( adc_status&(3<<9) ) {
         *x      = adc_data[0];
         *y      = adc_data[1];
         *z1     = adc_data[2];
         *z2     = adc_data[3];
         
         adc_status&=~(3<<9);
-        
-        adc_last_touch_read=current_tick;
         
         return true;
     } else {
@@ -76,13 +65,12 @@ bool tsc2100_read_touch(short *x, short* y, short *z1, short *z2)
 
 bool tsc2100_read_volt(short *bat1, short *bat2, short *aux)
 {
-    if( (adc_status&(7<<4)) && TIME_BEFORE(adc_last_volt_read, adc_last_read)) {
+    if( adc_status&(7<<4) ) {
         *bat1   = adc_data[5];
         *bat2   = adc_data[6];
         *aux    = adc_data[7];
         
         adc_status&=~(7<<4);
-        adc_last_volt_read=current_tick;
         return true;
     } else {
         return false;
@@ -110,7 +98,7 @@ void tsc2100_set_mode(bool poweron, unsigned char scan_mode)
 void tsc2100_adc_init(void)
 {
     /* Set the TSC2100 to read touchscreen */
-    tsc2100_set_mode(true, 0x01);
+    tsc2100_set_mode(true, 0x02);
 
     tsc2100_writereg(TSSTAT_PAGE, TSSTAT_ADDRESS, 
                      (0x1<<TSSTAT_PINTDAV_SHIFT) /* Data available only */
@@ -131,7 +119,6 @@ short tsc2100_readreg(int page, int address)
     spi_block_transfer(SPI_target_TSC2100, out, sizeof(out), in, sizeof(in));
     return (in[0]<<8)|in[1];
 }
-
 
 void tsc2100_writereg(int page, int address, short value)
 {

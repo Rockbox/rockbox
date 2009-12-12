@@ -126,7 +126,7 @@ SECTIONS
     .fiqstack (NOLOAD) :
     {
        *(.stack)
-       . += 0x100;
+       . += 0x400;
        fiq_stack = .;
     } > IRAM
     

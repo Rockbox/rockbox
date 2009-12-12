@@ -155,17 +155,17 @@ void fiq_handler(void)
      * Based on: linux/arch/arm/kernel/entry-armv.S and system-meg-fx.c
      */
 
-    asm volatile (
-        "sub    lr, lr, #4            \r\n"
-        "stmfd  sp!, {r0-r3, ip, lr}  \r\n"
-        "mov    r0, #0x00030000       \r\n"
-        "ldr    r0, [r0, #0x510]      \r\n" /* Fetch value from IO_INTC_FIQENTRY0 */
-        "sub    r0, r0, #1            \r\n"
-        "ldr    r1, =irqvector        \r\n"
-        "ldr    r1, [r1, r0, lsl #2]  \r\n" /* Divide value by 4 (TBA0/TBA1 is set to 0) and load appropriate pointer from the vector list */
-        "blx    r1                    \r\n" /* Jump to handler */
-        "ldmfd  sp!, {r0-r3, ip, pc}^ \r\n" /* Return from FIQ */
-    );
+    asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
+                    "sub   sp, sp, #8           \n"); /* Reserve stack */
+    unsigned short addr = IO_INTC_FIQENTRY0>>2;
+    if(addr != 0)
+    {
+        addr--;
+        irqvector[addr]();
+    }
+    asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
+                    "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
+                    "subs  pc, lr, #4           \n"); /* Return from FIQ */
 }
 
 void system_reboot(void)

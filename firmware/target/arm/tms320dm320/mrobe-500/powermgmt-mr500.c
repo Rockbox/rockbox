@@ -68,17 +68,14 @@ unsigned int battery_adc_voltage(void)
         current_bat2=((short)((int)(bat2<<10)/4096*6*2.5));
         current_aux=((short)((int)(aux<<10)/4096*6*2.5));
     }
-
-    if (TIME_BEFORE(last_tick+2*HZ, current_tick) || last_tick==0)
+    
+    tsadc=tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS);
+    
+    /* Set the TSC2100 to read voltages if not busy with pen */
+    if(!(tsadc & TSADC_PSTCM))
     {
-        tsadc=tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS);
-        
-        /* Set the TSC2100 to read voltages if not busy with pen */
-        if(!(tsadc & TSADC_PSTCM))
-        {
-            tsc2100_set_mode(true, 0x0B);
-            last_tick = current_tick;
-        }
+        tsc2100_set_mode(true, 0x0B);
+        last_tick = current_tick;
     }
         
     return current_voltage;
