@@ -245,7 +245,7 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_CURSOR_RIGHT, BUTTON_TOPRIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_KBD_SELECT,       BUTTON_CENTER|BUTTON_REL,          BUTTON_NONE },
     { ACTION_KBD_DONE,         BUTTON_CENTER|BUTTON_REPEAT,       BUTTON_CENTER },
-    { ACTION_KBD_ABORT,        BUTTON_POWER,                      BUTTON_NONE },
+    { ACTION_KBD_ABORT,        BUTTON_BOTTOMRIGHT,                BUTTON_NONE },
     { ACTION_KBD_BACKSPACE,    BUTTON_BOTTOMLEFT,                 BUTTON_NONE },
     { ACTION_KBD_BACKSPACE,    BUTTON_BOTTOMLEFT|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_KBD_UP,           BUTTON_TOPMIDDLE,                  BUTTON_NONE },
