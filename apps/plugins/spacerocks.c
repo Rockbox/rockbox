@@ -207,22 +207,18 @@ PLUGIN_HEADER
 #define AST_FIRE BUTTON_LEFT
 
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) || \
-(CONFIG_KEYPAD == ONDAVX777_PAD) || \
-CONFIG_KEYPAD == MROBE500_PAD
+      (CONFIG_KEYPAD == ONDAVX777_PAD) || \
+      (CONFIG_KEYPAD == MROBE500_PAD)
 #define AST_QUIT BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
 #define AST_PAUSE      BUTTON_FFWD
 #define AST_QUIT       BUTTON_REC
-#define AST_THRUST_REP (BUTTON_UP | BUTTON_REW)
 #define AST_THRUST     BUTTON_UP
 #define AST_HYPERSPACE BUTTON_DOWN
 #define AST_LEFT       BUTTON_LEFT
-#define AST_LEFT_REP   (BUTTON_LEFT | BUTTON_REW)
 #define AST_RIGHT      BUTTON_RIGHT
-#define AST_RIGHT_REP  (BUTTON_RIGHT | BUTTON_REW)
 #define AST_FIRE       BUTTON_PLAY
-#define AST_FIRE_REP   (BUTTON_PLAY | BUTTON_REW)
 
 #else
 #error No keymap defined!
@@ -235,9 +231,6 @@ CONFIG_KEYPAD == MROBE500_PAD
 #ifndef AST_QUIT
 #define AST_QUIT        BUTTON_TOPLEFT
 #endif
-#ifndef AST_THRUST_REP
-#define AST_THRUST_REP (BUTTON_TOPMIDDLE | BUTTON_REPEAT)
-#endif
 #ifndef AST_THRUST
 #define AST_THRUST      BUTTON_TOPMIDDLE
 #endif
@@ -247,26 +240,11 @@ CONFIG_KEYPAD == MROBE500_PAD
 #ifndef AST_LEFT
 #define AST_LEFT        BUTTON_MIDLEFT
 #endif
-#ifndef AST_LEFT_REP
-#define AST_LEFT_REP   (BUTTON_MIDLEFT | BUTTON_REPEAT)
-#endif
 #ifndef AST_RIGHT
 #define AST_RIGHT       BUTTON_MIDRIGHT
 #endif
-#ifndef AST_RIGHT_REP
-#define AST_RIGHT_REP  (BUTTON_MIDRIGHT | BUTTON_REPEAT)
-#endif
 #ifndef AST_FIRE
 #define AST_FIRE        BUTTON_BOTTOMMIDDLE
-#endif
-#ifndef AST_FIRE_REP
-
-#ifdef BUTTON_MENU
-#define AST_FIRE_REP   (BUTTON_BOTTOMMIDDLE | BUTTON_MENU)
-#else
-#define AST_FIRE_REP   BUTTON_BOTTOMMIDDLE | BUTTON_REPEAT
-#endif
-
 #endif
 #endif
 
@@ -527,6 +505,7 @@ struct TrailPoint
 struct Asteroid
 {
     struct Point position;
+    struct Point rotation;
     struct Point vertices[NUM_ASTEROID_VERTICES];
     bool exists;
     int explode_countdown;
@@ -539,6 +518,7 @@ struct Asteroid
 struct Ship
 {
     struct Point position;
+    struct Point rotation;
     struct Point vertices[NUM_SHIP_VERTICES];
     bool exists;
     int explode_countdown;
@@ -637,20 +617,39 @@ static bool is_point_within_rectangle(struct Point* rect, struct Point* p,
 
 /* Rotate polygon */
 static void rotate_polygon(struct Point* vertices, int num_vertices,
-                           int cos, int sin)
+                           struct Point* rotation, int cos, int sin)
 {
     struct Point* point;
     int n;
     long temp_x, temp_y;
 
+    temp_x = rotation->x;
+    temp_y = rotation->y;
+    rotation->x = (temp_x*cos - temp_y*sin)/SIN_COS_SCALE;
+    rotation->y = (temp_y*cos + temp_x*sin)/SIN_COS_SCALE;
+#define MIN_SCALE   (SIN_COS_SCALE-10)
+#define MAX_SCALE   (SIN_COS_SCALE+10)
+    /* normalize vector. this is not accurate but would be enough. */
+    temp_x = rotation->x*rotation->x + rotation->y*rotation->y;
+    if (temp_x <= MIN_SCALE*MIN_SCALE)
+    {
+        rotation->x = rotation->x*SIN_COS_SCALE/MIN_SCALE;
+        rotation->y = rotation->y*SIN_COS_SCALE/MIN_SCALE;
+    }
+    else if (temp_x >= MAX_SCALE*MAX_SCALE)
+    {
+        rotation->x = rotation->x*SIN_COS_SCALE/MAX_SCALE;
+        rotation->y = rotation->y*SIN_COS_SCALE/MAX_SCALE;
+    }
+#undef  MIN_SCALE
+#undef  MAX_SCALE
+
     point = vertices;
     n = num_vertices;
     while (n--)
     {
-        temp_x = point->x;
-        temp_y = point->y;
-        point->x = temp_x*cos/SIN_COS_SCALE - temp_y*sin/SIN_COS_SCALE;
-        point->y = temp_y*cos/SIN_COS_SCALE + temp_x*sin/SIN_COS_SCALE;
+        point->x = (point->dx*rotation->x - point->dy*rotation->y)/SIN_COS_SCALE;
+        point->y = (point->dy*rotation->x + point->dx*rotation->y)/SIN_COS_SCALE;
         point++;
     }
 }
@@ -716,6 +715,8 @@ static void move_point(struct Point* point)
 
 static void create_ship_trail(struct TrailPoint* tpoint)
 {
+    tpoint->position.x += ship.vertices[2].x;
+    tpoint->position.y += ship.vertices[2].y;
     tpoint->position.dx = -( ship.vertices[0].x - ship.vertices[2].x )/10;
     tpoint->position.dy = -( ship.vertices[0].y - ship.vertices[2].y )/10;
 }
@@ -745,13 +746,12 @@ static void create_trail_blaze(int colour, struct Point* position)
        times */
     tpoint = trail_points;
     n = NUM_TRAIL_POINTS;
-    while (n-- && numtoadd)
+    while (n--)
     {
         /* find a space in the array of trail_points that is NULL or DEAD or
            whatever and place this one here. */
         if (tpoint->alive <= 0)
         {
-            numtoadd--;
             /* take a random point near the position. */
             tpoint->position.x = (rb->rand()%18000)-9000 + position->x;
             tpoint->position.y = (rb->rand()%18000)-9000 + position->y;
@@ -804,6 +804,10 @@ static void create_trail_blaze(int colour, struct Point* position)
                - i.e. opposite */
             tpoint->position.dx += position->dx;
             tpoint->position.dy += position->dy;
+
+            numtoadd--;
+            if (numtoadd <= 0)
+                break;
         }
         tpoint++;
     }
@@ -849,6 +853,7 @@ static void draw_and_move_trail_blaze(void)
 static void rotate_asteroid(struct Asteroid* asteroid)
 {
     rotate_polygon(asteroid->vertices, NUM_ASTEROID_VERTICES,
+                   &asteroid->rotation,
                    asteroid->speed_cos, asteroid->speed_sin);
 }
 
@@ -908,6 +913,9 @@ static void initialise_asteroid(struct Asteroid* asteroid,
         point->y = asteroid_vertices[n+1];
         point->x *= asteroid->radius/20;
         point->y *= asteroid->radius/20;
+        /* dx and dy are used when rotate polygon */
+        point->dx = point->x;
+        point->dy = point->y;
         point++;
     }
 
@@ -936,6 +944,9 @@ static void initialise_asteroid(struct Asteroid* asteroid,
 
     asteroid->position.dx *= SCALE/10;
     asteroid->position.dy *= SCALE/10;
+
+    asteroid->rotation.x = SIN_COS_SCALE;
+    asteroid->rotation.y = 0;
 
     /* Now rotate the asteroid a bit, so they all look a bit different */
     for(n = (rb->rand()%30)+2; n--; )
@@ -1044,6 +1055,8 @@ static void initialise_ship(void)
     ship.position.y = CENTER_LCD_Y * SCALE;
     ship.position.dx = 0;
     ship.position.dy = 0;
+    ship.rotation.x = SIN_COS_SCALE;
+    ship.rotation.y = 0;
     ship.exists = true;
     ship.explode_countdown = 0;
     ship.invulnerable_time = INVULNERABLE_TIME;
@@ -1056,6 +1069,9 @@ static void initialise_ship(void)
         point->y = ship_vertices[n+1];
         point->x *= SCALE;
         point->y *= SCALE;
+        /* dx and dy are used when rotate polygon */
+        point->dx = point->x;
+        point->dy = point->y;
         /* grab a copy of the ships points for the lives display: */
         lives_point->x = point->x;
         lives_point->y = point->y;
@@ -1100,7 +1116,7 @@ static void draw_and_move_ship(void)
             if (ship.explode_countdown <= 0)
             {
                 num_lives--;
-                if (!num_lives)
+                if (num_lives <= 0)
                 {
                     game_state = GAME_OVER;
                 }
@@ -1129,7 +1145,8 @@ static void rotate_ship(int cos, int sin)
 {
     if (ship.exists)
     {
-        rotate_polygon(ship.vertices, NUM_SHIP_VERTICES, cos, sin);
+        rotate_polygon(ship.vertices, NUM_SHIP_VERTICES,
+                       &ship.rotation, cos, sin);
     }
 }
 
@@ -1603,6 +1620,8 @@ static void check_collisions(void)
         && !enemy.exists && enemy.explode_countdown <= 0)
     {
         current_level++;
+        if (current_level > MAX_LEVEL)
+            current_level = START_LEVEL;
         enemy.appear_probability += 5;
         if (enemy.appear_probability >= 100)
             enemy.appear_probability = ENEMY_APPEAR_PROBABILITY_START;
@@ -1859,7 +1878,7 @@ static int spacerocks_game_loop(void)
                 draw_lives();
                 draw_and_move_ship();
                 show_level_timeout--;
-                if (!show_level_timeout)
+                if (show_level_timeout <= 0)
                 {
                     initialise_level(current_level);
                     game_state = PLAY_MODE;
@@ -1907,7 +1926,7 @@ static int spacerocks_game_loop(void)
             case (AST_THRUST | BUTTON_REPEAT):
                 if (game_state == PLAY_MODE || game_state == SHOW_LEVEL)
                 {
-                    if (!next_thrust_count)
+                    if (next_thrust_count <= 0)
                     {
                         next_thrust_count = 5;
                         thrust_ship();
@@ -1923,9 +1942,9 @@ static int spacerocks_game_loop(void)
 
             case (AST_FIRE):
             case (AST_FIRE | BUTTON_REPEAT):
-                if(game_state == PLAY_MODE)
+                if (game_state == PLAY_MODE)
                 {
-                    if(!next_missile_count)
+                    if (next_missile_count <= 0)
                     {
                         fire_missile();
                         next_missile_count = 10;
@@ -1941,10 +1960,10 @@ static int spacerocks_game_loop(void)
                 break;
         }
 
-        if (next_missile_count)
+        if (next_missile_count > 0)
             next_missile_count--;
 
-        if (next_thrust_count)
+        if (next_thrust_count > 0)
             next_thrust_count--;
 
         if (TIME_BEFORE(*rb->current_tick, end))
@@ -1967,6 +1986,7 @@ enum plugin_status plugin_start(const void* parameter)
     /* Turn off backlight timeout */
     backlight_force_on(); /* backlight control in lib/helper.c */
     highscore_load(HIGH_SCORE, highscores, NUM_SCORES);
+    rb->srand(*rb->current_tick);
 
     /* create stars once, and once only: */
     create_stars();
