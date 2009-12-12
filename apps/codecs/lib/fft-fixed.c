@@ -244,6 +244,19 @@ void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
     BUTTERFLIES(a0,a1,a2,a3)\
 }
 
+/*optimized for wre==wim*/
+#define TRANSFORM_EQUAL(a0,a1,a2,a3,w) {\
+    t3 = fixmul32(a2.re, w);\
+    t4 = fixmul32(a2.im, w);\
+    t7 = fixmul32(a3.re, w);\
+    t8 = fixmul32(a3.im, w);\
+    t1 = t3 + t4;\
+    t2 = t4 - t3;\
+    t5 = t7 - t8;\
+    t6 = t8 + t7;\
+    BUTTERFLIES(a0,a1,a2,a3)\
+}
+
 #define TRANSFORM_ZERO(a0,a1,a2,a3) {\
     t1 = a2.re;\
     t2 = a2.im;\
@@ -322,7 +335,8 @@ static void fft8(FFTComplex *z)
     BF(z[6].re, z[2].re, z[2].re, t7);
     BF(z[6].im, z[2].im, z[2].im, t8);
 
-    TRANSFORM(z[1],z[3],z[5],z[7],sqrthalf,sqrthalf);
+    //TRANSFORM(z[1],z[3],z[5],z[7],sqrthalf,sqrthalf);
+    TRANSFORM_EQUAL(z[1],z[3],z[5],z[7],sqrthalf)
 }
 
 #ifndef CONFIG_SMALL
@@ -335,7 +349,8 @@ static void fft16(FFTComplex *z)
     fft4(z+12);
 
     TRANSFORM_ZERO(z[0],z[4],z[8],z[12]);
-    TRANSFORM(z[2],z[6],z[10],z[14],sqrthalf,sqrthalf);
+    //TRANSFORM(z[2],z[6],z[10],z[14],sqrthalf,sqrthalf);
+    TRANSFORM_EQUAL(z[2],z[6],z[10],z[14],sqrthalf);
     TRANSFORM(z[1],z[5],z[9],z[13],ff_cos_16[1],ff_cos_16[3]);
     TRANSFORM(z[3],z[7],z[11],z[15],ff_cos_16[3],ff_cos_16[1]);
 }
