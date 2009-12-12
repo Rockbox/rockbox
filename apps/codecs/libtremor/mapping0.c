@@ -179,8 +179,7 @@ static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb)
   return(NULL);
 }
 
-
-static int seq = 0;
+// static int seq = 0;
 
 static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
   vorbis_dsp_state     *vd=vb->vd;
@@ -275,19 +274,9 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
     }
   }
 
-
   //for(j=0;j<vi->channels;j++)
   //_analysis_output("residue",seq+j,vb->pcm[j],-8,n/2,0,0);
 
-  /* compute and apply spectral envelope */
-#if 0
-  for(i=0;i<vi->channels;i++){
-    ogg_int32_t *pcm=vb->pcm[i];
-    int submap=info->chmuxlist[i];
-    look->floor_func[submap]->
-      inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
-  } 
-#endif
   //for(j=0;j<vi->channels;j++)
   //_analysis_output("mdct",seq+j,vb->pcm[j],-24,n/2,0,1);
 
@@ -299,15 +288,16 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
     int submap=info->chmuxlist[i];
     
     if(nonzero[i]) {
-	look->floor_func[submap]->
-	  inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
-        mdct_backward(n, (int32_t*) pcm, (int32_t*) pcm);
-        /* window the data */
-        _vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
-      }
-      else 
-        memset(pcm, 0, sizeof(ogg_int32_t)*n);
-   }
+      /* compute and apply spectral envelope */
+      look->floor_func[submap]->
+        inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
+      mdct_backward(n, (int32_t*) pcm, (int32_t*) pcm);
+      /* window the data */
+      _vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
+    }
+    else 
+      memset(pcm, 0, sizeof(ogg_int32_t)*n);
+  }
 
   //for(j=0;j<vi->channels;j++)
   //_analysis_output("imdct",seq+j,vb->pcm[j],-24,n,0,0);
@@ -315,7 +305,7 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
   //for(j=0;j<vi->channels;j++)
   //_analysis_output("window",seq+j,vb->pcm[j],-24,n,0,0);
 
-  seq+=vi->channels;
+  //seq+=vi->channels;
   /* all done! */
   return(0);
 }
