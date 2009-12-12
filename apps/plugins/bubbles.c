@@ -2308,11 +2308,11 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     int buttonres;
     long start;
     const struct button_mapping *plugin_contexts[]
-#if (CONFIG_KEYPAD != SANSA_E200_PAD) && \
-      (CONFIG_KEYPAD != SANSA_FUZE_PAD)
-                     = {generic_left_right_fire,generic_actions};
-#else
+#if (CONFIG_KEYPAD == SANSA_E200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_FUZE_PAD)
                      = {generic_directions,generic_actions};
+#else
+                     = {generic_left_right_fire,generic_actions};
 #endif
 
     if (timeout < 0)
