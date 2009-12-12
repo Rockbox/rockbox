@@ -5,7 +5,7 @@ fixedpoint.c
 mdct2.c
 mdct_lookup.c
 
-fft-fixed.c
+fft-ffmpeg.c
 mdct.c
 
 #ifdef CPU_ARM
