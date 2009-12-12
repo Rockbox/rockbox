@@ -4,6 +4,10 @@ fixedpoint.c
 
 mdct2.c
 mdct_lookup.c
+
+fft-fixed.c
+mdct.c
+
 #ifdef CPU_ARM
 mdct_arm.S
 setjmp_arm.S
