@@ -34,18 +34,6 @@ PLUGIN_HEADER
 const struct button_mapping *plugin_contexts[] =
             {generic_directions, generic_actions};
 
-/* Mapping */
-#define EXIT                PLA_QUIT
-#define VALIDATE            PLA_FIRE
-#define PREV_PIECE          PLA_LEFT
-#define PREV_PIECE_REPEAT   PLA_LEFT_REPEAT
-#define NEXT_PIECE          PLA_RIGHT
-#define NEXT_PIECE_REPEAT   PLA_RIGHT_REPEAT
-#define PREV_COLOR          PLA_UP
-#define PREV_COLOR_REPEAT   PLA_UP_REPEAT
-#define NEXT_COLOR          PLA_DOWN
-#define NEXT_COLOR_REPEAT   PLA_DOWN_REPEAT
-
 /*
  * Screen structure:
  * * (guesses_count) lines of guesses,
@@ -433,35 +421,42 @@ enum plugin_status plugin_start(const void* parameter) {
             while(!stop_game()) {
                 draw_board(guess, piece);
 
-                if ((button = get_button()) == VALIDATE) break;
+                button = get_button();
+                if (button == PLA_FIRE || button == PLA_START)
+                    break;
 
                 switch (button) {
 
-                    case EXIT:
+                    /* Exit */
+                    case PLA_QUIT:
+                    case PLA_MENU:
                         resume = true;
                         main_menu();
                         break;
 
-                    case NEXT_PIECE:
-                    case NEXT_PIECE_REPEAT:
+                    /* Next piece */
+                    case PLA_RIGHT:
+                    case PLA_RIGHT_REPEAT:
                         piece = (piece + 1) % pieces_count;
                         break;
 
-                    case PREV_PIECE:
-                    case PREV_PIECE_REPEAT:
+                    /* Previous piece */
+                    case PLA_LEFT:
+                    case PLA_LEFT_REPEAT:
                         piece = (piece + pieces_count - 1) % pieces_count;
                         break;
 
-
-                    case NEXT_COLOR:
-                    case NEXT_COLOR_REPEAT:
+                    /* Next color */
+                    case PLA_DOWN:
+                    case PLA_DOWN_REPEAT:
                          guesses[guess].pieces[piece] =
                             (guesses[guess].pieces[piece] + 1)
                             % colors_count;
                         break;
 
-                    case PREV_COLOR:
-                    case PREV_COLOR_REPEAT:
+                    /* Previous color */
+                    case PLA_UP:
+                    case PLA_UP_REPEAT:
                         guesses[guess].pieces[piece] =
                             (guesses[guess].pieces[piece] + colors_count - 1)
                             % colors_count;
