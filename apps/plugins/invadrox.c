@@ -199,29 +199,38 @@ CONFIG_KEYPAD == MROBE500_PAD
     #error INVADROX: Unsupported keypad
 #endif
 
+#ifndef RC_QUIT
+#define RC_QUIT 0
+#endif
+
 #ifdef HAVE_TOUCHSCREEN
+
+#ifndef QUIT
+#define QUIT 0
+#endif
+#ifndef LEFT
+#define LEFT 0
+#endif
+#ifndef RIGHT
+#define RIGHT 0
+#endif
+#ifndef FIRE
+#define FIRE 0
+#endif
 
 #define TOUCHSCREEN_QUIT    BUTTON_TOPLEFT
 #define TOUCHSCREEN_LEFT    (BUTTON_MIDLEFT | BUTTON_BOTTOMLEFT)
 #define TOUCHSCREEN_RIGHT   (BUTTON_MIDRIGHT | BUTTON_BOTTOMRIGHT)
 #define TOUCHSCREEN_FIRE    (BUTTON_CENTER | BUTTON_BOTTOMMIDDLE)
 
-#ifdef RC_QUIT
 #define ACTION_QUIT     (QUIT | TOUCHSCREEN_QUIT | RC_QUIT)
-#else
-#define ACTION_QUIT     (QUIT | TOUCHSCREEN_QUIT)
-#endif
 #define ACTION_LEFT     (LEFT | TOUCHSCREEN_LEFT)
 #define ACTION_RIGHT    (RIGHT | TOUCHSCREEN_RIGHT)
 #define ACTION_FIRE     (FIRE | TOUCHSCREEN_FIRE)
 
-#else
+#else /* HAVE_TOUCHSCREEN */
 
-#ifdef RC_QUIT
 #define ACTION_QUIT  (QUIT | RC_QUIT)
-#else
-#define ACTION_QUIT  QUIT
-#endif
 #define ACTION_LEFT  LEFT
 #define ACTION_RIGHT RIGHT
 #define ACTION_FIRE  FIRE
