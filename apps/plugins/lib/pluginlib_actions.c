@@ -449,8 +449,8 @@ const struct button_mapping generic_actions[] =
     {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
     {PLA_START,         BUTTON_MINUS,                   BUTTON_NONE},
     {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_CENTER,                  BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_CENTER|BUTTON_REPEAT,    BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_PLUS,                    BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_PLUS|BUTTON_REPEAT,      BUTTON_NONE},
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
     {PLA_QUIT,          BUTTON_RC_REC,                  BUTTON_NONE},
     {PLA_START,         BUTTON_RC_PLAY,                 BUTTON_NONE},
