@@ -157,6 +157,9 @@ PLUGIN_HEADER
 #elif CONFIG_KEYPAD == COWOND2_PAD
 
 #define QUIT BUTTON_POWER
+#define LEFT BUTTON_MINUS
+#define RIGHT BUTTON_PLUS
+#define FIRE BUTTON_MENU
 
 #elif CONFIG_KEYPAD == IAUDIO67_PAD
 
@@ -197,18 +200,32 @@ CONFIG_KEYPAD == MROBE500_PAD
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-#ifndef QUIT
-#define QUIT     BUTTON_TOPLEFT
+
+#define TOUCHSCREEN_QUIT    BUTTON_TOPLEFT
+#define TOUCHSCREEN_LEFT    (BUTTON_MIDLEFT | BUTTON_BOTTOMLEFT)
+#define TOUCHSCREEN_RIGHT   (BUTTON_MIDRIGHT | BUTTON_BOTTOMRIGHT)
+#define TOUCHSCREEN_FIRE    (BUTTON_CENTER | BUTTON_BOTTOMMIDDLE)
+
+#ifdef RC_QUIT
+#define ACTION_QUIT     (QUIT | TOUCHSCREEN_QUIT | RC_QUIT)
+#else
+#define ACTION_QUIT     (QUIT | TOUCHSCREEN_QUIT)
 #endif
-#ifndef LEFT
-#define LEFT     BUTTON_MIDLEFT
+#define ACTION_LEFT     (LEFT | TOUCHSCREEN_LEFT)
+#define ACTION_RIGHT    (RIGHT | TOUCHSCREEN_RIGHT)
+#define ACTION_FIRE     (FIRE | TOUCHSCREEN_FIRE)
+
+#else
+
+#ifdef RC_QUIT
+#define ACTION_QUIT  (QUIT | RC_QUIT)
+#else
+#define ACTION_QUIT  QUIT
 #endif
-#ifndef RIGHT
-#define RIGHT    BUTTON_MIDRIGHT
-#endif
-#ifndef FIRE
-#define FIRE     BUTTON_CENTER
-#endif
+#define ACTION_LEFT  LEFT
+#define ACTION_RIGHT RIGHT
+#define ACTION_FIRE  FIRE
+
 #endif
 
 #ifndef UNUSED
@@ -1650,17 +1667,17 @@ inline bool handle_buttons(void)
     pressed = newbuttonstate & ~oldbuttonstate;
     oldbuttonstate = newbuttonstate;
     if (pressed) {
-        if (pressed & LEFT) {
+        if (pressed & ACTION_LEFT) {
             if (ship_acc > -1) {
                 ship_acc--;
             }
         }
-        if (pressed & RIGHT) {
+        if (pressed & ACTION_RIGHT) {
             if (ship_acc < 1) {
                 ship_acc++;
             }
         }
-        if (pressed & FIRE) {
+        if (pressed & ACTION_FIRE) {
             if (fire == S_IDLE) {
                 /* Fire shot */
                 fire_x = ship_x + SHIP_WIDTH / 2;
@@ -1669,24 +1686,18 @@ inline bool handle_buttons(void)
                 /* TODO: play fire sound */
             }
         }
-#ifdef RC_QUIT
-        if (pressed & RC_QUIT) {
-            rb->splash(HZ * 1, "Quit");
-            return true;
-        }
-#endif
-        if (pressed & QUIT) {
+        if (pressed & ACTION_QUIT) {
             rb->splash(HZ * 1, "Quit");
             return true;
         }
     }
     if (released) {
-        if ((released & LEFT)) {
+        if ((released & ACTION_LEFT)) {
             if (ship_acc < 1) {
                 ship_acc++;
             }
         }
-        if ((released & RIGHT)) {
+        if ((released & ACTION_RIGHT)) {
             if (ship_acc > -1) {
                 ship_acc--;
             }
