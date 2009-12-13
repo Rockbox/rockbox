@@ -605,7 +605,7 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 
     /* assume small font with uint16_t offsets*/
     bits = pf->bits + (pf->offset?
-            ((uint16_t*)(pf->offset)[char_code]:
+            ((uint16_t*)(pf->offset))[char_code]:
             (((pf->height + 7) / 8) * pf->maxwidth * char_code));
         
     return bits;
