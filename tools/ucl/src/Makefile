@@ -49,7 +49,7 @@ endif
 libucl-universal: $(TARGET_DIR)libucli386.a $(TARGET_DIR)libuclppc.a
 	@echo lipo $(TARGET_DIR)libucl.a
 	$(SILENT) rm -f $(TARGET_DIR)libucl.a
-	lipo -create $(TARGET_DIR)libuclppc.a $(TARGET_DIR)libucli386.a -output $(TARGET_DIR)libucl.a    
+	$(SILENT)lipo -create $(TARGET_DIR)libuclppc.a $(TARGET_DIR)libucli386.a -output $(TARGET_DIR)libucl.a
     
 clean:
 	rm -f $(TARGET_DIR)libucl*.a

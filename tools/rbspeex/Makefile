@@ -101,7 +101,7 @@ endif
 librbspeex-universal: librbspeexi386.a librbspeexppc.a
 	@echo lipo librbspeex.a
 	$(SILENT) rm -f $(TARGET_DIR)librbspeex.a
-	lipo -create $(TARGET_DIR)librbspeexppc.a $(TARGET_DIR)librbspeexi386.a -output $(TARGET_DIR)librbspeex.a
+	$(SILENT)lipo -create $(TARGET_DIR)librbspeexppc.a $(TARGET_DIR)librbspeexi386.a -output $(TARGET_DIR)librbspeex.a
 
 clean:
 	rm -f $(OBJS) $(TARGET_DIR)librbspeex* ../rbspeexenc ../rbspeexdec $(TARGET_DIR)dep-speex

@@ -75,7 +75,7 @@ endif
 libmktccboot-universal: $(TARGET_DIR)libmktccbooti386.a $(TARGET_DIR)libmktccbootppc.a
 	@echo lipo $(TARGET_DIR)libmktccboot.a
 	$(SILENT) rm -f $(TARGET_DIR)libmktccboot.a
-	lipo -create $(TARGET_DIR)libmktccbootppc.a $(TARGET_DIR)libmktccbooti386.a -output $(TARGET_DIR)libmktccboot.a
+	$(SILENT)lipo -create $(TARGET_DIR)libmktccbootppc.a $(TARGET_DIR)libmktccbooti386.a -output $(TARGET_DIR)libmktccboot.a
     
 clean:
 	rm -f $(OUTPUT) $(TARGET_DIR)libmktccboot*.a mktccboot.dmg
@@ -90,7 +90,7 @@ mktccboot-ppc:
 	mv mktccboot mktccboot-ppc
 
 mktccboot-mac: mktccboot-i386 mktccboot-ppc
-	lipo -create mktccboot-ppc mktccboot-i386 -output mktccboot-mac
+	$(SILENT)lipo -create mktccboot-ppc mktccboot-i386 -output mktccboot-mac
 
 mktccboot.dmg: mktccboot-mac
 	mkdir -p mktccboot-dmg

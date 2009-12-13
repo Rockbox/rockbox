@@ -72,7 +72,7 @@ endif
 libmkamsboot-universal: $(TARGET_DIR)libmkamsbooti386.a $(TARGET_DIR)libmkamsbootppc.a
 	@echo lipo $(TARGET_DIR)libmkamsboot.a
 	$(SILENT) rm -f $(TARGET_DIR)libmkamsboot.a
-	lipo -create $(TARGET_DIR)libmkamsbootppc.a $(TARGET_DIR)libmkamsbooti386.a -output $(TARGET_DIR)libmkamsboot.a
+	$(SILENT)lipo -create $(TARGET_DIR)libmkamsbootppc.a $(TARGET_DIR)libmkamsbooti386.a -output $(TARGET_DIR)libmkamsboot.a
     
 clean:
 	rm -f $(OUTPUT) libmkamsboot.o $(TARGET_DIR)libmkamsboot*.a mkamsboot.dmg
@@ -87,7 +87,7 @@ mkamsboot-ppc:
 	mv mkamsboot mkamsboot-ppc
 
 mkamsboot-mac: mkamsboot-i386 mkamsboot-ppc
-	lipo -create mkamsboot-ppc mkamsboot-i386 -output mkamsboot-mac
+	$(SILENT)lipo -create mkamsboot-ppc mkamsboot-i386 -output mkamsboot-mac
 
 mkamsboot.dmg: mkamsboot-mac
 	mkdir -p mkamsboot-dmg
