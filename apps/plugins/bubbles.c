@@ -89,22 +89,6 @@ enum {
 #define BUBBLES_SELECT      PLA_FIRE
 #define BUBBLES_RESUME      PLA_MENU
 
-#if CONFIG_KEYPAD != ONDIO_PAD
-
-#define BUBBLES_LVLINC      PLA_UP
-#define BUBBLES_LVLINC_REP  PLA_UP_REPEAT
-#define BUBBLES_LVLDEC      PLA_DOWN
-#define BUBBLES_LVLDEC_REP  PLA_DOWN_REPEAT
-
-#else /* ondio keys */
-
-#define BUBBLES_LVLINC      PLA_RIGHT
-#define BUBBLES_LVLINC_REP  PLA_RIGHT_REPEAT
-#define BUBBLES_LVLDEC      PLA_LEFT
-#define BUBBLES_LVLDEC_REP  PLA_LEFT_REPEAT
-
-#endif
-
 /* external bitmaps */
 #ifdef HAVE_LCD_COLOR 
 #include "pluginbitmaps/bubbles_background.h"
