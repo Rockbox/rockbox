@@ -404,8 +404,8 @@ uint32_t random_int(void);
 #define LOG2_MIN_INF REAL_CONST(-10000)
 int32_t log2_int(uint32_t val);
 int32_t log2_fix(uint32_t val);
-int32_t pow2_int(real_t val);
-real_t pow2_fix(real_t val);
+uint32_t pow2_int(real_t val);
+uint32_t pow2_fix(real_t val);
 #endif
 uint8_t get_sr_index(const uint32_t samplerate);
 uint8_t max_pred_sfb(const uint8_t sr_index);
