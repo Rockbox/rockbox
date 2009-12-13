@@ -84,10 +84,10 @@ enum {
 #define ANGLE_STEP_REP 4
 #endif
 
-#define BUBBLES_QUIT        PLA_QUIT
-#define BUBBLES_START       PLA_START
-#define BUBBLES_SELECT      PLA_FIRE
-#define BUBBLES_RESUME      PLA_MENU
+#define BUBBLES_QUIT1       PLA_QUIT
+#define BUBBLES_QUIT2       PLA_MENU
+#define BUBBLES_PAUSE       PLA_START
+#define BUBBLES_FIRE        PLA_FIRE
 
 /* external bitmaps */
 #ifdef HAVE_LCD_COLOR 
@@ -2305,7 +2305,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
 #if defined(HAS_BUTTON_HOLD) && !defined(HAVE_REMOTE_LCD_AS_MAIN)
     /* FIXME: Should probably check remote hold here */
     if (rb->button_hold())
-        button = BUBBLES_START;
+        button = BUBBLES_PAUSE;
 #endif
 
     switch(button){
@@ -2321,7 +2321,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
             if(bb->angle < MAX_ANGLE) bb->angle += ANGLE_STEP;
             break;
 
-        case BUBBLES_SELECT: /* fire the shot */
+        case BUBBLES_FIRE: /* fire the shot */
             if(!animblock) {
                 bb->elapsedlvl += bb->elapsedshot;
                 bb->elapsedshot = 0;
@@ -2333,18 +2333,18 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
             }
             break;
 
-        case BUBBLES_START:  /* pause the game */
+        case BUBBLES_PAUSE:  /* pause the game */
             start = *rb->current_tick;
             rb->splash(0, "Paused");
             while(pluginlib_getaction(TIMEOUT_BLOCK,plugin_contexts,2)
-                 != (BUBBLES_START));
+                 != BUBBLES_PAUSE);
             bb->startedshot += *rb->current_tick-start;
             bubbles_drawboard(bb);
             rb->lcd_update();
             break;
 
-        case BUBBLES_RESUME: /* save and end the game */
-        case BUBBLES_QUIT:   /* end the game */
+        case BUBBLES_QUIT1:
+        case BUBBLES_QUIT2:   /* end the game */
             if(!animblock) {
                 resume = true;
                 return BB_END;
