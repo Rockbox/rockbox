@@ -130,7 +130,7 @@ static INLINE void ComplexMult(real_t *y1, real_t *y2,
   #define MUL_SHIFT6(A,B) (real_t)(((int64_t)(A)*(int64_t)(B)+(1 << (6-1))) >> 6)
   #define MUL_SHIFT23(A,B) (real_t)(((int64_t)(A)*(int64_t)(B)+(1 << (23-1))) >> 23)
   #define DESCALE(A,S) ((S)>0?(((A)>>((S)-1))+1)>>1:(A)<<-(S))
-  #define DESCALE_SHIFT(A,SH,SC) DESCALE((A),(SC)-(SH)
+  #define DESCALE_SHIFT(A,SH,SC) DESCALE((A),(SC)-(SH))
 
 #elif defined(__GNUC__) && defined (__arm__)
 
@@ -241,7 +241,7 @@ static inline real_t DESCALE_SHIFT(unsigned val, int shift, int scale)
   #define MUL_SHIFT6(A,B) (real_t)(((int64_t)(A)*(int64_t)(B)+(1 << (6-1))) >> 6)
   #define MUL_SHIFT23(A,B) (real_t)(((int64_t)(A)*(int64_t)(B)+(1 << (23-1))) >> 23)
   #define DESCALE(A,S) ((S)>0?(((A)>>((S)-1))+1)>>1:(A)<<-(S))
-  #define DESCALE_SHIFT(A,SH,SC) DESCALE((A),(SC)-(SH)
+  #define DESCALE_SHIFT(A,SH,SC) DESCALE((A),(SC)-(SH))
 
 /* Complex multiplication */
 static INLINE void ComplexMult(real_t *y1, real_t *y2,
