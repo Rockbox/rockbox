@@ -105,7 +105,6 @@ const struct button_mapping pf_context_buttons[] =
 {
 #ifdef HAVE_TOUCHSCREEN
     {PF_SELECT,       BUTTON_CENTER,              BUTTON_NONE},
-    {PF_MENU,         BUTTON_TOPLEFT,             BUTTON_NONE},
     {PF_BACK,         BUTTON_BOTTOMRIGHT,         BUTTON_NONE},
 #endif
 #if CONFIG_KEYPAD == ARCHOS_AV300_PAD
