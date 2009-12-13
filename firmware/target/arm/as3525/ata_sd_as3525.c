@@ -79,8 +79,12 @@
 #define MCI_SELECT(i)      (*(volatile unsigned long *) (pl180_base[i]+0x44))
 #define MCI_FIFO_CNT(i)    (*(volatile unsigned long *) (pl180_base[i]+0x48))
 
-#define MCI_ERROR \
-    (MCI_DATA_CRC_FAIL | MCI_DATA_TIMEOUT | MCI_RX_OVERRUN | MCI_TX_UNDERRUN)
+#define MCI_DATA_ERROR    \
+    ( MCI_DATA_CRC_FAIL   \
+    | MCI_DATA_TIMEOUT    \
+    | MCI_TX_UNDERRUN     \
+    | MCI_RX_OVERRUN      \
+    | MCI_START_BIT_ERR)
 
 #define MCI_FIFO(i)        ((unsigned long *) (pl180_base[i]+0x80))
 /* volumes */
@@ -181,7 +185,7 @@ void INT_NAND(void)
 {
     const int status = MCI_STATUS(INTERNAL_AS3525);
 
-    transfer_error[INTERNAL_AS3525] = status & MCI_ERROR;
+    transfer_error[INTERNAL_AS3525] = status & MCI_DATA_ERROR;
 
     wakeup_signal(&transfer_completion_signal);
     MCI_CLEAR(INTERNAL_AS3525) = status;
@@ -192,7 +196,7 @@ void INT_MCI0(void)
 {
     const int status = MCI_STATUS(SD_SLOT_AS3525);
 
-    transfer_error[SD_SLOT_AS3525] = status & MCI_ERROR;
+    transfer_error[SD_SLOT_AS3525] = status & MCI_DATA_ERROR;
 
     wakeup_signal(&transfer_completion_signal);
     MCI_CLEAR(SD_SLOT_AS3525) = status;
@@ -275,7 +279,6 @@ static int sd_init_card(const int drive)
     /* CMD0 Go Idle  */
     if(!send_cmd(drive, SD_GO_IDLE_STATE, 0, MCI_NO_FLAGS, NULL))
         return -1;
-
     mci_delay();
 
     /* CMD8 Check for v2 sd card.  Must be sent before using ACMD41
@@ -367,6 +370,32 @@ static int sd_init_card(const int drive)
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
         return -10;
+    mci_delay();
+
+#ifndef BOOTLOADER
+    /*  Switch to to 4 bit widebus mode  */
+    if(sd_wait_for_state(drive, SD_TRAN) < 0)
+        return -11;
+    mci_delay();
+    /* CMD55 */
+    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_ARG, NULL))
+        return -12;
+    mci_delay();
+    /* ACMD6  */
+    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_ARG, NULL))
+        return -13;
+    mci_delay();
+    /* CMD55 */
+    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_ARG, NULL))
+        return -14;
+    mci_delay();
+    /* ACMD42  */
+    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_ARG, NULL))
+        return -15;
+    mci_delay();
+    /* Now that card is widebus make controller widebus also */
+    MCI_CLOCK(drive) |= MCI_CLOCK_WIDEBUS;
+#endif
 
     /*
      * enable bank switching
@@ -378,7 +407,7 @@ static int sd_init_card(const int drive)
     {
         const int ret = sd_select_bank(-1);
         if(ret < 0)
-            return ret - 11;
+            return ret -16;
     }
 
     card_info[drive].initialized = 1;
@@ -481,7 +510,7 @@ static void init_pl180_controller(const int drive)
     MCI_COMMAND(drive) = MCI_DATA_CTRL(drive) = 0;
     MCI_CLEAR(drive) = 0x7ff;
 
-    MCI_MASK0(drive) = MCI_ERROR | MCI_DATA_END;
+    MCI_MASK0(drive) = MCI_DATA_ERROR | MCI_DATA_END;
     MCI_MASK1(drive) = 0;
 #ifdef HAVE_MULTIDRIVE
     VIC_INT_ENABLE =
@@ -634,7 +663,7 @@ static int sd_select_bank(signed char bank)
                                 (1<<3) /* DMA */                |
                                 (9<<4) /* 2^9 = 512 */ ;
 
-        /* Wakeup signal comes from NAND/MCIO isr on MCI_ERROR | MCI_DATA_END */
+        /* Wakeup signal from NAND/MCIO isr on MCI_DATA_ERROR | MCI_DATA_END */
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
         /*  Wait for FIFO to empty, card may still be in PRG state  */
@@ -764,7 +793,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                                 (1<<3) /* DMA */                        |
                                 (9<<4) /* 2^9 = 512 */ ;
 
-        /* Wakeup signal comes from NAND/MCIO isr on MCI_ERROR | MCI_DATA_END */
+        /* Wakeup signal from NAND/MCIO isr on MCI_DATA_ERROR | MCI_DATA_END */
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
         /*  Wait for FIFO to empty, card may still be in PRG state for writes */
