@@ -182,6 +182,8 @@ static const struct button_mapping button_context_eq[]  = {
 
 /* Bookmark Screen */
 static const struct button_mapping button_context_bmark[]  = {
+    { ACTION_BMS_DELETE,    BUTTON_BOTTOMLEFT,                 BUTTON_NONE },
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_BOOKMARKSCREEN),
 }; /* button_context_bmark */
 
@@ -263,6 +265,7 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_STD_NEXTREPEAT, BUTTON_MIDRIGHT|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_FM_MENU,        BUTTON_CENTER|BUTTON_REPEAT,      BUTTON_CENTER },
     { ACTION_FM_PRESET,      BUTTON_CENTER|BUTTON_REL,         BUTTON_NONE },
+    { ACTION_FM_STOP,        BUTTON_BOTTOMRIGHT|BUTTON_REL,    BUTTON_NONE },
     { ACTION_FM_EXIT,        BUTTON_TOPLEFT|BUTTON_REL,        BUTTON_NONE },
     { ACTION_FM_MODE,        BUTTON_BOTTOMLEFT|BUTTON_REL,     BUTTON_NONE },
     { ACTION_FM_PLAY,        BUTTON_TOPRIGHT|BUTTON_REL,       BUTTON_NONE },
