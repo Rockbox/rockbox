@@ -37,6 +37,27 @@
 #include "rbunicode.h"
 #include "diacritic.h"
 
+#define MAX_FONTSIZE_FOR_16_BIT_OFFSETS 0xFFDB
+
+/* max static loadable font buffer size */
+#ifndef MAX_FONT_SIZE
+#if LCD_HEIGHT > 64
+#if MEM > 2
+#define MAX_FONT_SIZE   60000
+#else
+#define MAX_FONT_SIZE   10000
+#endif
+#else
+#define MAX_FONT_SIZE   4000
+#endif
+#endif
+
+#ifndef FONT_HEADER_SIZE
+#define FONT_HEADER_SIZE 36
+#endif
+
+#define GLYPH_CACHE_FILE ROCKBOX_DIR"/.glyphcache"
+
 #ifndef BOOTLOADER
 /* Font cache includes */
 #include "font_cache.h"
@@ -109,32 +130,22 @@ static int32_t readlong(void)
     return l;
 }
 
-/* read count bytes*/
-static void readstr(char *buf, int count)
-{
-    while (count--)
-        *buf++ = *fileptr++;
-}
-
 void font_reset(void)
 {
     memset(&font_ui, 0, sizeof(struct font));
 }
 
-static struct font*  font_load_header(struct font *pf)
+static struct font* font_load_header(struct font *pf)
 {
-    char version[4+1];
-
     /* Check we have enough data */
     if (!HAVEBYTES(28))
         return NULL;
 
     /* read magic and version #*/
-    memset(version, 0, sizeof(version));
-    readstr(version, 4);
-
-    if (strcmp(version, VERSION) != 0)
+    if (memcmp(fileptr, VERSION, 4) != 0)
         return NULL;
+
+    fileptr += 4;
 
     /* font info*/
     pf->maxwidth = readshort();
@@ -169,7 +180,7 @@ static struct font* font_load_in_memory(struct font* pf)
     pf->bits = (unsigned char *)fileptr;
     fileptr += pf->bits_size*sizeof(unsigned char);
 
-    if ( pf->bits_size < 0xFFDB )
+    if (pf->bits_size < MAX_FONTSIZE_FOR_16_BIT_OFFSETS)
     {
         /* pad to 16-bit boundary */
         fileptr = (unsigned char *)(((intptr_t)fileptr + 1) & ~1);
@@ -182,24 +193,24 @@ static struct font* font_load_in_memory(struct font* pf)
 
     if (noffset)
     {
-        if ( pf->bits_size < 0xFFDB )
+        if (pf->bits_size < MAX_FONTSIZE_FOR_16_BIT_OFFSETS)
         {
             long_offset = 0;
-            pf->offset = (unsigned short *)fileptr;
+            pf->offset = (uint16_t*)fileptr;
 
             /* Check we have sufficient buffer */
-            if (!HAVEBYTES(noffset * sizeof(short)))
+            if (!HAVEBYTES(noffset * sizeof(uint16_t)))
                 return NULL;
 
             for (i=0; i<noffset; ++i)
             {
-                ((unsigned short*)(pf->offset))[i] = (unsigned short)readshort();
+                ((uint16_t*)(pf->offset))[i] = (uint16_t)readshort();
             }
         }
         else
         {
             long_offset = 1;
-            pf->offset = (unsigned short *)fileptr;
+            pf->offset = (uint16_t*)fileptr;
 
             /* Check we have sufficient buffer */
             if (!HAVEBYTES(noffset * sizeof(int32_t)))
@@ -248,7 +259,7 @@ static struct font* font_load_cached(struct font* pf)
     /* Calculate offset to offset data */
     fileptr += pf->bits_size * sizeof(unsigned char);
 
-    if ( pf->bits_size < 0xFFDB )
+    if (pf->bits_size < MAX_FONTSIZE_FOR_16_BIT_OFFSETS)
     {
         long_offset = 0;
         /* pad to 16-bit boundary */
@@ -267,8 +278,8 @@ static struct font* font_load_cached(struct font* pf)
         file_offset_offset = 0;
 
     /* Calculate offset to widths data */
-    if ( pf->bits_size < 0xFFDB )
-        fileptr += noffset * sizeof(unsigned short);
+    if (pf->bits_size < MAX_FONTSIZE_FOR_16_BIT_OFFSETS)
+        fileptr += noffset * sizeof(uint16_t);
     else
         fileptr += noffset * sizeof(uint32_t);
 
@@ -408,7 +419,7 @@ load_cache_entry(struct font_cache_entry* p, void* callback_data)
 
     if (file_offset_offset)
     {
-        int32_t offset = file_offset_offset + char_code * (long_offset ? sizeof(int32_t) : sizeof(short));
+        int32_t offset = file_offset_offset + char_code * (long_offset ? sizeof(int32_t) : sizeof(int16_t));
         lseek(fnt_file, offset, SEEK_SET);
         read (fnt_file, tmp, 2);
         bitmap_offset = tmp[0] | (tmp[1] << 8);
@@ -472,11 +483,18 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
     }
     else
     {
-        bits = pf->bits + (pf->offset?
-            pf->offset[char_code]:
-            (((pf->height + 7) / 8) * pf->maxwidth * char_code));
+        bits = pf->bits;
+        if (pf->offset)
+        {
+            if (pf->bits_size < MAX_FONTSIZE_FOR_16_BIT_OFFSETS)
+                bits += ((uint16_t*)(pf->offset))[char_code];
+            else
+                bits += ((uint32_t*)(pf->offset))[char_code];
+        }
+        else
+            bits += ((pf->height + 7) / 8) * pf->maxwidth * char_code;
     }
-        
+
     return bits;
 }
 
@@ -585,8 +603,9 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
         char_code = pf->defaultchar;
     char_code -= pf->firstchar;
 
+    /* assume small font with uint16_t offsets*/
     bits = pf->bits + (pf->offset?
-            pf->offset[char_code]:
+            ((uint16_t*)(pf->offset)[char_code]:
             (((pf->height + 7) / 8) * pf->maxwidth * char_code));
         
     return bits;

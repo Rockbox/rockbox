@@ -33,24 +33,6 @@
 #include "sysfont.h"
 #endif
 
-/* max static loadable font buffer size */
-#ifndef MAX_FONT_SIZE
-#if LCD_HEIGHT > 64
-#if MEM > 2
-#define MAX_FONT_SIZE   60000
-#else
-#define MAX_FONT_SIZE   10000
-#endif
-#else
-#define MAX_FONT_SIZE   4000
-#endif
-#endif
-
-#ifndef FONT_HEADER_SIZE
-#define FONT_HEADER_SIZE 36
-#endif
-
-#define GLYPH_CACHE_FILE ROCKBOX_DIR"/.glyphcache"
 
 /*
  * Fonts are specified by number, and used for display
@@ -102,7 +84,8 @@ struct font {
     int          firstchar;       /* first character in bitmap*/
     int          size;            /* font size in glyphs*/
     const unsigned char *bits;    /* 8-bit column bitmap data*/
-    const unsigned short *offset; /* offsets into bitmap data*/
+    const void *offset;           /* offsets into bitmap data,
+                                     uint16_t if bits_size < 0xFFDB else uint32_t*/
     const unsigned char *width;   /* character widths or NULL if fixed*/
     int          defaultchar;     /* default char (not glyph index)*/
     int32_t      bits_size;       /* # bytes of glyph bits*/
