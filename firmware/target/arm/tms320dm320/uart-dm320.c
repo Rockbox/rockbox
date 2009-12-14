@@ -38,15 +38,20 @@ static volatile int uart1_receive_count, uart1_receive_read, uart1_receive_write
 
 void uart_init(void)
 {
+    /* Setup UART 1 pins:
+     *  27 - input, uart1 rx
+     *  28 - output, uart1 tx */
+    /*  27: input , non-inverted, no-irq, falling edge, no-chat, UART RX */
+    dm320_set_io(27, true, false, false, false, false, 0x01);
+    
+    /*  28: output, non-inverted, no-irq, falling edge, no-chat, UART TX */
+    dm320_set_io(28, false, false, false, false, false, 0x01);
+    
     // 8-N-1
     IO_UART1_MSR = 0xC400;
     IO_UART1_BRSR = 0x0057;
     IO_UART1_RFCR = 0x8020; /* Trigger later */
     IO_UART1_TFCR = 0x0000; /* Trigger level */
-    /* gio 27 is input, uart1 rx
-       gio 28 is output, uart1 tx */
-    IO_GIO_DIR1 |=  (1<<11); /* gio 27 */
-    IO_GIO_DIR1 &= ~(1<<12); /* gio 28 */
 
     /* init the receive buffer */
     uart1_receive_count=0;
@@ -61,7 +66,6 @@ void uart_init(void)
     /* Enable the interrupt */
     IO_INTC_EINT0 |= INTR_EINT0_UART1;
 }
-
 
 /* This function is not interrupt driven */
 void uart1_putc(char ch)
