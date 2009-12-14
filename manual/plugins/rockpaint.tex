@@ -100,7 +100,8 @@ if you select Exit, so any unsaved changes will be lost.}
 \begin{table}
 \begin{btnmap}{}{}
     \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{
-        \nopt{IRIVER_H300_PAD,GIGABEAT_S_PAD,SANSA_FUZE_PAD}{\ButtonPower}
+        \nopt{IRIVER_H300_PAD,GIGABEAT_S_PAD,SANSA_FUZE_PAD,COWON_D2_PAD}
+            {\ButtonPower}
         \opt{IRIVER_H300_PAD}{\ButtonOff}
         \opt{GIGABEAT_S_PAD}{\ButtonBack}
         \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
@@ -108,23 +109,31 @@ if you select Exit, so any unsaved changes will be lost.}
         & Quits Rockpaint immediately.\\
     }
 
-    \ButtonLeft
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H300_PAD,GIGABEAT_S_PAD%
+        ,SANSA_FUZE_PAD}{\ButtonLeft}
+    \opt{COWON_D2_PAD}{\TouchMidLeft}
       \opt{HAVEREMOTEKEYMAP}{& }
     & Moves the cursor to the left.\\
 
-    \ButtonRight
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H300_PAD,GIGABEAT_S_PAD%
+        ,SANSA_FUZE_PAD}{\ButtonRight}
+    \opt{COWON_D2_PAD}{\TouchMidRight}
       \opt{HAVEREMOTEKEYMAP}{& }
     & Moves the cursor to the right.\\
 
-    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H10_PAD}{\ButtonUp}
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H10_PAD,COWON_D2_PAD}
+        {\ButtonUp}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
+    \opt{COWON_D2_PAD}{\TouchTopMiddle}
       \opt{HAVEREMOTEKEYMAP}{& }
     & Moves the cursor up.\\
 
-    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H10_PAD}{\ButtonDown}
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H10_PAD,COWON_D2_PAD}
+        {\ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonPlay}
     \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
+    \opt{COWON_D2_PAD}{\TouchBottomMiddle}
       \opt{HAVEREMOTEKEYMAP}{& }
     & Moves the cursor down.\\
 
@@ -133,7 +142,7 @@ if you select Exit, so any unsaved changes will be lost.}
     \opt{SANSA_C200_PAD,SANSA_E200_PAD}{\ButtonSelect+\ButtonPower}%
     \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonDown}%
     \opt{IAUDIO_X5_PAD}{\ButtonPlay}%
-    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonMenu}%
+    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,COWON_D2_PAD}{\ButtonMenu}%
     \opt{IRIVER_H10_PAD}{\ButtonPlay}%
       \opt{HAVEREMOTEKEYMAP}{& }
     & Displays the Main Menu.\\
@@ -144,11 +153,13 @@ if you select Exit, so any unsaved changes will be lost.}
     \opt{GIGABEAT_PAD}{\ButtonA}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
     \opt{GIGABEAT_S_PAD}{\ButtonPlay}
+    \opt{COWON_D2_PAD}{\TouchBottomLeft}
       \opt{HAVEREMOTEKEYMAP}{& }
     & Displays the toolbar.\\
 
-    \nopt{IRIVER_H10_PAD}{\ButtonSelect}%
+    \nopt{IRIVER_H10_PAD,COWON_D2_PAD}{\ButtonSelect}%
     \opt{IRIVER_H10_PAD}{\ButtonFF}%
+    \opt{COWON_D2_PAD}{\TouchCenter}
       \opt{HAVEREMOTEKEYMAP}{& }
     & Toggles the brush and selects objects.\\
 

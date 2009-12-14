@@ -1,0 +1,23 @@
+% $Id$ %
+\def\UseOption{cowond2}
+\edef\UseOption{\UseOption,COWON_D2_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_RB_BL_IN_FLASH}
+
+\newcommand{\playerman}{Cowon}
+\newcommand{\playertype}{D2}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\genericimg}{320x240x16}
+\newcommand{\specimg}{d2}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.d2}}
+\newcommand{\firmwareextension}{\fname{d2}}
+\newcommand{\screenshotsize}{8cm}
+\newcommand{\disk}{flash storage}
+
+% link external keymap file
+\input{platform/keymap-cowond2.tex}
+\input{platform/keymap-touchscreen.tex}

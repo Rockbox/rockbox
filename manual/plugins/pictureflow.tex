@@ -37,7 +37,7 @@ aware:
         % only scroll wheel and 'strip' targets use the same action in album and track list
         \nopt{scrollwheel,IRIVER_H10_PAD}{%
             % currently the M3 does not use buttons of the main unit which has no display
-            \nopt{IAUDIO_M3_PAD}{\ButtonLeft{} / \ButtonRight}
+            \nopt{IAUDIO_M3_PAD,COWON_D2_PAD}{\ButtonLeft{} / \ButtonRight}
                 &
             \opt{HAVEREMOTEKEYMAP}{
                 \opt{IAUDIO_M3_PAD,GIGABEAT_RC_PAD}{\ActionRCStdPrev{} / \ActionRCStdNext}
@@ -57,10 +57,11 @@ aware:
         }
 
         \nopt{IAUDIO_M3_PAD}{%
-            \nopt{ONDIO_PAD,IRIVER_H10_PAD,RECORDER_PAD}{\ButtonSelect}
+            \nopt{ONDIO_PAD,IRIVER_H10_PAD,RECORDER_PAD,COWON_D2_PAD}{\ButtonSelect}
             \opt{ONDIO_PAD}{\ButtonUp} 
             \opt{IRIVER_H10_PAD}{\ButtonRight} 
             \opt{RECORDER_PAD}{\ButtonOn} 
+            \opt{COWON_D2_PAD}{\TouchCenter}
         }
             &
         \opt{HAVEREMOTEKEYMAP}{
@@ -79,7 +80,8 @@ aware:
                 \\
         }
         
-        \nopt{IAUDIO_M3_PAD}{\ButtonLeft}
+        \nopt{IAUDIO_M3_PAD,COWON_D2_PAD}{\ButtonLeft}
+        \opt{COWON_D2_PAD}{\ButtonPower{} or \TouchBottomRight}
             &
         \opt{HAVEREMOTEKEYMAP}{
             \opt{IAUDIO_M3_PAD,GIGABEAT_RC_PAD}{\ActionRCStdCancel}
@@ -99,7 +101,7 @@ aware:
             \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
             \opt{IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD%
                 ,MROBE100_PAD}{\ButtonPower}
-            \opt{SANSA_C200_PAD,IRIVER_H10_PAD}{Long \ButtonPower}
+            \opt{SANSA_C200_PAD,IRIVER_H10_PAD,COWON_D2_PAD}{Long \ButtonPower}
             \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Long \ButtonMenu}
             \opt{SANSA_FUZE_PAD}{Long \ButtonHome} 
         }

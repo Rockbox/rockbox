@@ -21,14 +21,19 @@ information about the level format, see
     {\ButtonUp, \ButtonDown, }%
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu, \ButtonPlay, }%
 \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown, }%
-    \ButtonLeft, \ButtonRight
+\opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
+    ,IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD%
+    ,SANSA_FUZE_PAD,SANSA_C200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}
+    {\ButtonLeft, \ButtonRight}
+\opt{COWON_D2_PAD}
+    {\TouchTopMiddle, \TouchBottomMiddle, \TouchMidLeft, \TouchMidRight}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Move the ``sokoban'' up, down, left, or right\\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
 \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
-\opt{GIGABEAT_S_PAD}{\ButtonMenu}
+\opt{GIGABEAT_S_PAD,COWON_D2_PAD}{\ButtonMenu}
        \opt{HAVEREMOTEKEYMAP}{&
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
          }
@@ -43,6 +48,7 @@ information about the level format, see
     \opt{MROBE10_PAD}{\ButtonDisplay}
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonSelect+\ButtonDown}
     \opt{GIGABEAT_S_PAD}{\ButtonPrev}
+    \opt{COWON_D2_PAD}{\ButtonMinus}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Back to previous level \\
 }
@@ -55,6 +61,7 @@ information about the level format, see
     \opt{GIGABEAT_PAD,MROBE100_PAD}{\ButtonMenu}
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{\ButtonSelect+\ButtonRight}
     \opt{GIGABEAT_S_PAD}{\ButtonPlay}
+    \opt{COWON_D2_PAD}{\TouchTopRight}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Restart level \\
 }
@@ -68,6 +75,7 @@ information about the level format, see
     \opt{GIGABEAT_S_PAD}{\ButtonNext}
     \opt{MROBE100_PAD}{\ButtonPlay}
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}
+    \opt{COWON_D2_PAD}{\ButtonPlus}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Go to next level \\
 }
@@ -77,6 +85,7 @@ information about the level format, see
 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{\ButtonSelect}
 \opt{IRIVER_H10_PAD}{\ButtonRew}
 \opt{GIGABEAT_S_PAD}{\ButtonVolUp}
+\opt{COWON_D2_PAD}{\TouchTopRight}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Undo last movement \\
 
@@ -90,6 +99,7 @@ information about the level format, see
 \opt{MROBE100_PAD}{\ButtonDisplay}
 \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}
 \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonLeft}
+\opt{COWON_D2_PAD}{\TouchBottomLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Redo previously undone move \\
 \hline
@@ -100,6 +110,7 @@ information about the level format, see
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
       ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{\ButtonSelect}
+\opt{COWON_D2_PAD}{\TouchCenter}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Pause/resume \\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
@@ -108,16 +119,21 @@ information about the level format, see
     {\ButtonUp/\ButtonDown}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu/\ButtonPlay}
 \opt{IRIVER_H10_PAD}{\ButtonScrollUp/\ButtonScrollDown}
+\opt{COWON_D2_PAD}{\TouchTopMiddle/\TouchBottomMiddle}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Increase/decrease playback speed \\
-    \ButtonLeft/\ButtonRight
+\opt{RECORDER_PAD,ARCHOS_AV300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD,ONDIO_PAD%
+    ,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD%
+    ,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}
+    {\ButtonLeft/\ButtonRight}
+\opt{COWON_D2_PAD}{\TouchMidLeft/\TouchMidRight}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Go backward/forward (while paused) \\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
 \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
-\opt{GIGABEAT_S_PAD}{\ButtonMenu}
+\opt{GIGABEAT_S_PAD,COWON_D2_PAD}{\ButtonMenu}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Quit \\
 \end{btnmap}

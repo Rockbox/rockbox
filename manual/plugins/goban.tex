@@ -59,6 +59,7 @@ these markers: \\
          IAUDIO_X5_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonUp}%
         \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}%
         \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
+        \opt{COWON_D2_PAD}{\TouchTopMiddle}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Move cursor up \\
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_CLIP_PAD,SANSA_M200_PAD,SANSA_C200_PAD,%
@@ -66,12 +67,14 @@ these markers: \\
          IAUDIO_X5_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonDown}%
         \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}%
         \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
+        \opt{COWON_D2_PAD}{\TouchBottomMiddle}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Move cursor down \\
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_CLIP_PAD,SANSA_M200_PAD,IPOD_1G2G_PAD,%
          IPOD_3G_PAD,IPOD_4G_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H10_PAD,%
          IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,RECORDER_PAD,%
          ONDIO_PAD}{\ButtonLeft}
+        \opt{COWON_D2_PAD}{\TouchMidLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Move cursor left %
             \opt{ONDIO_PAD}{if in \emph{board} navigation mode, or %
@@ -81,6 +84,7 @@ these markers: \\
          IPOD_3G_PAD,IPOD_4G_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H10_PAD,%
          IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,RECORDER_PAD,%
          ONDIO_PAD}{\ButtonRight}
+        \opt{COWON_D2_PAD}{\TouchMidRight}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Move cursor right
             \opt{ONDIO_PAD}{if in \emph{board} navigation mode, or advance one node in
@@ -92,6 +96,7 @@ these markers: \\
          MROBE100_PAD,IAUDIO_X5_PAD,SANSA_CLIP_PAD,SANSA_M200_PAD}{\ButtonSelect}%
         \opt{IRIVER_H10_PAD,RECORDER_PAD}{\ButtonPlay}%
         \opt{ONDIO_PAD}{\ButtonMenu}
+        \opt{COWON_D2_PAD}{\TouchCenter}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Play a move (or use a tool if play-mode has been changed). \\
     \nopt{ONDIO_PAD}{
@@ -104,6 +109,7 @@ these markers: \\
             \opt{MROBE100_PAD}{\ButtonMenu}%
             \opt{IAUDIO_X5_PAD}{\ButtonPlay}%
             \opt{RECORDER_PAD}{\ButtonFOne}
+            \opt{COWON_D2_PAD}{\TouchBottomLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
         & Retreat one node in the game tree \\
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,%
@@ -115,6 +121,7 @@ these markers: \\
             \opt{MROBE100_PAD}{\ButtonPlay}%
             \opt{IAUDIO_X5_PAD}{\ButtonRec}%
             \opt{RECORDER_PAD}{\ButtonFThree}
+            \opt{COWON_D2_PAD}{\TouchBottomRight}
        \opt{HAVEREMOTEKEYMAP}{& }
         & Advance one node in the game tree \\
     }
@@ -126,6 +133,7 @@ these markers: \\
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}%
         \opt{RECORDER_PAD}{\ButtonFTwo}%
         \opt{ONDIO_PAD}{Long \ButtonMenu}
+        \opt{COWON_D2_PAD}{\TouchTopLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Main Menu \\
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,%
@@ -135,6 +143,7 @@ these markers: \\
              GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,%
              IAUDIO_X5_PAD}{Long \ButtonSelect}%
             \opt{IRIVER_H10_PAD}{Long \ButtonPlay}
+        \opt{COWON_D2_PAD}{Long \TouchCenter}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Context Menu \\ }
     \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,RECORDER_PAD,MROBE100_PAD,%
@@ -147,6 +156,7 @@ these markers: \\
         \opt{GIGABEAT_PAD}{\ButtonA}%
         \opt{GIGABEAT_S_PAD}{\ButtonPlay}%
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
+        \opt{COWON_D2_PAD}{\TouchTopRight}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Go to the next variation when at the first node in a branch \\ }
     \end{btnmap}

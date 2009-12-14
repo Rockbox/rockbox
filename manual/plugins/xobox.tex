@@ -14,7 +14,10 @@ To finish a level you have to section off more than 75\%.
         ,RECORDER_PAD,ONDIO_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}
         {\ButtonUp, \ButtonDown,}%
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown,}
-    \ButtonLeft, \ButtonRight
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+        ,SANSA_E200_PAD,SANSA_C200_PAD,RECORDER_PAD,ONDIO_PAD,GIGABEAT_PAD%
+        ,GIGABEAT_S_PAD,MROBE100_PADvIRIVER_H10_PAD}{\ButtonLeft, \ButtonRight}
+    \opt{COWON_D2_PAD}{\TouchTopMiddle, \TouchBottomMiddle, \TouchMidLeft, \TouchMidRight}
   \opt{HAVEREMOTEKEYMAP}{& }
     & Move around the arena\\
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
@@ -24,11 +27,13 @@ To finish a level you have to section off more than 75\%.
     \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}
     \opt{GIGABEAT_PAD}{\ButtonA}
     \opt{MROBE100_PAD}{\ButtonDisplay}
+    \opt{COWON_D2_PAD}{\TouchCenter}
   \opt{HAVEREMOTEKEYMAP}{& }
     & Pause\\
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect{} + \ButtonMenu}
-    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
+        ,GIGABEAT_PAD,MROBE100_PAD,COWON_D2_PAD}{\ButtonPower}
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
   \opt{HAVEREMOTEKEYMAP}{& }

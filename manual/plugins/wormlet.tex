@@ -17,7 +17,11 @@ Menu controls:}
 
 \begin{table}
     \begin{btnmap}{}{}
-    \ButtonLeft\ / \ButtonRight 
+  \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
+      ,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
+      ,IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD}
+    {\ButtonLeft\ / \ButtonRight}
+  \opt{COWON_D2_PAD}{\TouchMidLeft{} / \TouchMidRight}
   \opt{HAVEREMOTEKEYMAP}{& }
     & Controls number of worms in the game\\
     \opt{RECORDER_PAD}{
@@ -72,10 +76,18 @@ Game controls:}
 \nopt{RECORDER_PAD}{
 \begin{table}
     \begin{btnmap}{}{}
-        \ButtonLeft
+        \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+            ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
+            ,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD}
+        {\ButtonLeft}
+        \opt{COWON_D2_PAD}{\TouchMidLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
         & Turn left\\
-        \ButtonRight
+        \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+            ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
+            ,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD}
+        {\ButtonRight}
+        \opt{COWON_D2_PAD}{\TouchMidRight}
              \opt{HAVEREMOTEKEYMAP}{& }
         & Turn right\\
         \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
@@ -83,6 +95,7 @@ Game controls:}
             ,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonUp}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
         \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
+        \opt{COWON_D2_PAD}{\TouchTopMiddle}
             \opt{HAVEREMOTEKEYMAP}{& }
         & Turn Up\\
         \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
@@ -90,6 +103,7 @@ Game controls:}
             ,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonDown}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}
         \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
+        \opt{COWON_D2_PAD}{\TouchBottomMiddle}
            \opt{HAVEREMOTEKEYMAP}{& }
         & Turn Down\\
     \end{btnmap}

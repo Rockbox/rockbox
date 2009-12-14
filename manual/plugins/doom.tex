@@ -55,7 +55,7 @@ Rockdoom options, you will need to quit your current game and restart the plugin
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{pressing \ButtonOff}%
     \opt{IPOD_3G_PAD,IPOD_4G_PAD}{flipping your \ButtonHold{} switch a couple of times}%
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD, SANSA_C200_PAD%
-         ,GIGABEAT_PAD,GIGABEAT_S_PAD}{pressing \ButtonPower}%
+         ,GIGABEAT_PAD,GIGABEAT_S_PAD,COWON_D2_PAD}{pressing \ButtonPower}%
     \opt{SANSA_FUZE_PAD}{pressing \ButtonHome}
 
   \emph{New Game. } Start a new game\\
@@ -82,23 +82,31 @@ Rockdoom options, you will need to quit your current game and restart the plugin
       ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonUp}
   \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
   \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
+  \opt{COWON_D2_PAD}{\TouchTopMiddle}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Move Forward \\
 %
-  \nopt{IPOD_3G_PAD,IPOD_4G_PAD}{
+  \nopt{IPOD_3G_PAD,IPOD_4G_PAD,COWON_D2_PAD}{
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD%
         ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonDown}
     \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
+    \opt{COWON_D2_PAD}{\TouchBottomMiddle}
        \opt{HAVEREMOTEKEYMAP}{& }
       & Down\\
   }
 %
-  \ButtonLeft
-       \opt{HAVEREMOTEKEYMAP}{& }
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
+      ,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
+      ,IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD}{\ButtonLeft}
+  \opt{COWON_D2_PAD}{\TouchMidLeft}
+      \opt{HAVEREMOTEKEYMAP}{& }
     & Turn Left \\
 %
-  \ButtonRight
-       \opt{HAVEREMOTEKEYMAP}{& }
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
+      ,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
+      ,IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD}{\ButtonRight}
+  \opt{COWON_D2_PAD}{\TouchMidRight}
+      \opt{HAVEREMOTEKEYMAP}{& }
     & Turn Right \\
 %
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
@@ -107,6 +115,7 @@ Rockdoom options, you will need to quit your current game and restart the plugin
   \opt{IRIVER_H10_PAD}{\ButtonRew}
   \opt{GIGABEAT_PAD}{\ButtonA}
   \opt{MROBE100_PAD}{\ButtonDisplay}
+  \opt{COWON_D2_PAD}{\TouchBottomRight}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Shoot \\
 %
@@ -124,6 +133,7 @@ Rockdoom options, you will need to quit your current game and restart the plugin
   \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
       ,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonPower}
   \opt{SANSA_FUZE_PAD}{\ButtonHome}
+  \opt{COWON_D2_PAD}{\TouchTopLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
     & InGame Menu \\
 %
@@ -131,6 +141,7 @@ Rockdoom options, you will need to quit your current game and restart the plugin
       ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD%
       ,MROBE100_PAD}{\ButtonSelect}
   \opt{IRIVER_H10_PAD}{\ButtonRew}
+  \opt{COWON_D2_PAD}{\TouchCenter}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Enter \\
 %
@@ -141,6 +152,7 @@ Rockdoom options, you will need to quit your current game and restart the plugin
   \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollFwd}
   \opt{SANSA_C200_PAD}{\ButtonVolUp}
   \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolDown}
+  \opt{COWON_D2_PAD}{\TouchBottomLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Change Weapon \\
 %

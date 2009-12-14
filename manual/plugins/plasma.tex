@@ -7,7 +7,9 @@ Plasma is a demo displaying a 80's style retro plasma effect.
     \begin{btnmap}{}{}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd\ / \ButtonScrollBack}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp\ / \ButtonScrollDown}
-    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}{\ButtonUp\ / \ButtonDown}
+    \opt{COWON_D2_PAD}{\TouchMidLeft{} / \TouchMidRight}
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,COWON_D2_PAD}
+        {\ButtonUp\ / \ButtonDown}
       \opt{HAVEREMOTEKEYMAP}{& }
     & Adjust frequency\\
     \opt{lcd_color}{
@@ -16,12 +18,14 @@ Plasma is a demo displaying a 80's style retro plasma effect.
             ,MROBE100_PAD}
             {\ButtonSelect}
         \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+        \opt{COWON_D2_PAD}{\TouchCenter}
            \opt{HAVEREMOTEKEYMAP}{& }
         & Change colours\\
     }
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
-    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
+        ,GIGABEAT_PAD,MROBE100_PAD,COWON_D2_PAD}
         {\ButtonPower}
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}

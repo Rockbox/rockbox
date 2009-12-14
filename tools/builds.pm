@@ -40,6 +40,7 @@ $releasenotes="/wiki/ReleaseNotes34";
     'cowond2' => {
         name => 'Cowon D2',
         status => 2,
+        manual => 'cowond2',
     },
     'gigabeatfx' => {
         name => 'Toshiba Gigabeat F/X',

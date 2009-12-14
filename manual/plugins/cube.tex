@@ -11,6 +11,7 @@ This is a rotating cube screen saver in 3D.
     \opt{IRIVER_H10_PAD}{\ButtonFF}
     \opt{GIGABEAT_PAD}{\ButtonA}
     \opt{MROBE100_PAD}{\ButtonDisplay}
+    \opt{COWON_D2_PAD}{\TouchBottomRight}
        \opt{HAVEREMOTEKEYMAP}{& }
         & Display at maximum frame rate\\
     \opt{PLAYER_PAD,RECORDER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD%
@@ -19,6 +20,7 @@ This is a rotating cube screen saver in 3D.
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
     \opt{GIGABEAT_PAD}{\ButtonSelect}
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,MROBE100_PAD}{\ButtonUp}
+    \opt{COWON_D2_PAD}{\TouchCenter}
        \opt{HAVEREMOTEKEYMAP}{& }
         & Pause\\
     \opt{PLAYER_PAD,ONDIO_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonMenu}
@@ -28,10 +30,15 @@ This is a rotating cube screen saver in 3D.
     \opt{IAUDIO_X5_PAD}{\ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{\ButtonDown}
+    \opt{COWON_D2_PAD}{\TouchTopRight}
        \opt{HAVEREMOTEKEYMAP}{& }
         & Cycle draw mode\\
+    \opt{ONDIO_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,RECORDER_PAD%
+        ,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD%
+        ,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}
+        {\ButtonRight{} / \ButtonLeft}
     \opt{PLAYER_PAD}{\ButtonOn+\ButtonRight{} / \ButtonOn+\ButtonLeft}
-    \nopt{PLAYER_PAD}{\ButtonRight{} / \ButtonLeft}
+    \opt{COWON_D2_PAD}{\TouchMidRight{} / \TouchMidLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
         & Select axis to adjust\\
     \opt{PLAYER_PAD}{\ButtonRight{} / \ButtonLeft}
@@ -40,13 +47,14 @@ This is a rotating cube screen saver in 3D.
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
     \opt{SANSA_C200_PAD}{\ButtonVolDown{} / \ButtonVolUp}
+    \opt{COWON_D2_PAD}{\TouchTopMiddle{} / \TouchBottomMiddle}
        \opt{HAVEREMOTEKEYMAP}{& }
         & Change speed/angle (speed can not be changed while paused)\\
     \opt{PLAYER_PAD}{\ButtonStop}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-        ,MROBE100_PAD}{\ButtonPower}
+        ,MROBE100_PAD,COWON_D2_PAD}{\ButtonPower}
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
        \opt{HAVEREMOTEKEYMAP}{& 
