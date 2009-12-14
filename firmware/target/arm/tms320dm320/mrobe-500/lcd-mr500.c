@@ -76,7 +76,7 @@ void lcd_sleep()
 		IO_VID_ENC_VMOD     &= ~(0x01);
     	
     	/* Disabling the LCD saves ~50mA */
-    	IO_GIO_BITCLR2=1<<4;
+    	IO_GIO_BITCLR2=1<<4; /* pin 36 */
     }
 }
 
@@ -103,6 +103,30 @@ void lcd_awake(void)
 }
 #endif
 
+void lcd_enable_composite(bool enable)
+{
+    /* Pin 39 appears to be related to the composite output */
+    /*  39: output, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(39, false, false, false, false, false, 0x00);
+
+    short vidtemp = (IO_VID_ENC_VMOD & 0x7E8);
+    
+    if(enable)
+    {
+        IO_GIO_BITSET2   = 0x80;
+        vidtemp |= 0x0003;
+    }
+    else
+    {
+        IO_GIO_BITCLR2   = 0x80;
+        vidtemp |= 0x2015;
+        IO_VID_ENC_DCLKCTL  = 0x0800;	
+	    IO_VID_ENC_DCLKPTN0 = 0x0001;
+    }
+    
+    IO_VID_ENC_VMOD = vidtemp;
+}
+
 /* Note this is expecting a screen size of 480x640 or 240x320, other screen
  * sizes need to be considered for fudge factors
  */
@@ -115,14 +139,48 @@ void lcd_init_device(void)
 {
     unsigned int addr;
     
-    /* Pin 32 controls the LED above the LCD */
-    IO_GIO_DIR2     &= ~(0x01);     /* output */
-    IO_GIO_INV2     &= ~(0x01);     /* non-inverted */
-    IO_GIO_FSEL2    &= ~(0x03<<14); /* normal pins */
+    /* LCD related pins:
+     *  32 - LED above LCD
+     *  33 - ??
+     *  34 - R2 for 18 bit output
+     *  35 - Resolution (MO?)
+     *  36 - LCD power (INI?)
+     *  37 - Backlight and LCD power
+     *  38 - B2 for 18 bit output
+     */
+     
+    /* Setup main LCD pins */
+    /*  32: output, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(32, false, false, false, false, false, 0x00);
+    IO_GIO_BITCLR2 = 1; /* Turn the LED off */
     
-    /* Turn the LED off */
-    IO_GIO_BITCLR2 = 1;
+    /*  33: output, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(33, false, false, false, false, false, 0x00);
+    /* To-do: figure out value from OF */
     
+    /*  34: output, non-inverted, no-irq, falling edge, no-chat, R2 */
+    dm320_set_io(34, false, false, false, false, false, 0x02);
+    
+    /*  35: output, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(35, false, false, false, false, false, 0x00);
+#if LCD_NATIVE_HEIGHT > 320
+    IO_GIO_BITSET2      = 1<<3; /* Set LCD resolution to VGA */
+#else
+    IO_GIO_BITCLR2      = 1<<3; /* Set LCD resolution to QVGA */
+#endif
+    
+    /*  36: output, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(36, false, false, false, false, false, 0x00);
+    IO_GIO_BITSET2      = 0x10; /* LCD on */
+    
+    /*  37: output, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(37, false, false, false, false, false, 0x00);
+    IO_GIO_BITCLR2 = (1 << 5); /* output low (backlight/lcd on) */
+    
+    /*  38: output, non-inverted, no-irq, falling edge, no-chat, B2 */
+    dm320_set_io(38, false, false, false, false, false, 0x02);
+
+
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
 
@@ -158,8 +216,6 @@ void lcd_init_device(void)
 	IO_VID_ENC_ACCTL    = 0x0000;
 	IO_VID_ENC_PWMP     = 0x0000;
 	IO_VID_ENC_PWMW     = 0x0000;
-	
-	IO_VID_ENC_DCLKPTN0 = 0x0001;
 
 	/* Setup the display */
     IO_OSD_MODE         = 0x00ff;
@@ -230,19 +286,9 @@ void lcd_init_device(void)
     IO_OSD_VIDWIN0XL    = LCD_NATIVE_WIDTH;
     IO_OSD_VIDWIN0YL    = LCD_NATIVE_HEIGHT;
 
-    /* Set pin 36 and 35 (LCD POWER and LCD RESOLUTION) to an output */
-    IO_GIO_DIR2         &= ~(3<<3);
-    
-#if LCD_NATIVE_HEIGHT > 320
-	/* Set LCD resolution to VGA */
-    IO_GIO_BITSET2      = 1<<3;
-#else
-	/* Set LCD resolution to QVGA */
-	IO_GIO_BITCLR2      = 1<<3;
-#endif
-
 	IO_OSD_OSDWINMD0    |= 0x01;
-	IO_VID_ENC_VMOD     |= 0x01;
+	
+	lcd_enable_composite(false);
 }
 
 #if defined(HAVE_LCD_MODES)
