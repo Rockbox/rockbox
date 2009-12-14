@@ -21,8 +21,6 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0)
-
 #include <timefuncs.h>
 #include "lib/playback_control.h"
 #include "lib/configfile.h"
@@ -48,6 +46,16 @@ PLUGIN_HEADER
 #define CALENDAR_PREV_DAY   BUTTON_LEFT
 #define CALENDAR_NEXT_MONTH (BUTTON_ON|BUTTON_DOWN)
 #define CALENDAR_PREV_MONTH (BUTTON_ON|BUTTON_UP)
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define CALENDAR_QUIT       BUTTON_OFF
+#define CALENDAR_SELECT     (BUTTON_MENU|BUTTON_REL)
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH (BUTTON_MENU|BUTTON_DOWN)
+#define CALENDAR_PREV_MONTH (BUTTON_MENU|BUTTON_UP)
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -92,6 +100,16 @@ PLUGIN_HEADER
 #define CALENDAR_NEXT_MONTH BUTTON_VOL_DOWN
 #define CALENDAR_PREV_MONTH BUTTON_VOL_UP
 
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+#define CALENDAR_QUIT       BUTTON_PLAY
+#define CALENDAR_SELECT     BUTTON_SELECT
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH BUTTON_MODE
+#define CALENDAR_PREV_MONTH BUTTON_EQ
+
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
 #define CALENDAR_QUIT       BUTTON_POWER
 #define CALENDAR_SELECT     BUTTON_SELECT
@@ -112,9 +130,9 @@ PLUGIN_HEADER
 #define CALENDAR_NEXT_MONTH BUTTON_DOWN
 #define CALENDAR_PREV_MONTH BUTTON_UP
 
-#elif CONFIG_KEYPAD == SANSA_C200_PAD || \
-CONFIG_KEYPAD == SANSA_CLIP_PAD || \
-CONFIG_KEYPAD == SANSA_M200_PAD
+#elif (CONFIG_KEYPAD == SANSA_C200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
+      (CONFIG_KEYPAD == SANSA_M200_PAD)
 #define CALENDAR_QUIT       BUTTON_POWER
 #define CALENDAR_SELECT     BUTTON_SELECT
 #define CALENDAR_NEXT_WEEK  BUTTON_DOWN
@@ -173,6 +191,16 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define CALENDAR_PREV_DAY   BUTTON_LEFT
 #define CALENDAR_NEXT_MONTH BUTTON_BOTTOMRIGHT
 #define CALENDAR_PREV_MONTH BUTTON_BOTTOMLEFT
+
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+#define CALENDAR_QUIT       BUTTON_BACK
+#define CALENDAR_SELECT     BUTTON_SELECT
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH BUTTON_CUSTOM
+#define CALENDAR_PREV_MONTH BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 #define CALENDAR_QUIT       BUTTON_POWER
@@ -264,9 +292,20 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define CELL_HEIGHT (LCD_HEIGHT / 7)
 
 #define CFG_FILE "calendar.cfg"
-static int first_wday = 0, old_first_wday;
+struct info {
+    int first_wday;
+#if (CONFIG_RTC == 0)
+    int last_mon;
+    int last_year;
+#endif
+};
+static struct info info = { .first_wday = 0 }, old_info;
 static struct configdata config[] = {
-    { TYPE_INT, 0, 6, { .int_p = &first_wday }, "first wday", NULL },
+    { TYPE_INT, 0, 6, { .int_p = &(info.first_wday) }, "first wday", NULL },
+#if (CONFIG_RTC == 0)
+    { TYPE_INT, 1, 12, { .int_p = &(info.last_mon) }, "last mon", NULL },
+    { TYPE_INT, 1, 3000, { .int_p = &(info.last_year) }, "last year", NULL },
+#endif
 };
 
 static bool leap_year;
@@ -306,6 +345,20 @@ static int calc_weekday( struct shown *shown )
     return ( shown->wday + 36 - shown->mday ) % 7 ;
 }
 
+#if (CONFIG_RTC == 0)
+/* from timefunc.c */
+static void my_set_day_of_week(struct shown *shown)
+{
+    int y = shown->year;
+    int d = shown->mday;
+    int m = shown->mon-1;
+    static const char mo[] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
+
+    if(m == 0 || m == 1) y--;
+    shown->wday = (d + mo[m] + y + y/4 - y/100 + y/400) % 7 - 1;
+}
+#endif
+
 static void calendar_init(struct shown *shown)
 {
     int w, h;
@@ -323,6 +376,21 @@ static void calendar_init(struct shown *shown)
     shown->mon = tm->tm_mon + 1;
     shown->year = 2000 + (tm->tm_year%100);
     shown->wday = tm->tm_wday - 1;
+#else
+#define S100(x) 1 ## x
+#define C2DIG2DEC(x) (S100(x)-100)
+    if(info.last_mon == 0 || info.last_year == 0)
+    {
+        shown->mon = C2DIG2DEC(MONTH);
+        shown->year = YEAR;
+    }
+    else
+    {
+        shown->mon = info.last_mon;
+        shown->year = info.last_year;
+    }
+    shown->mday = 1;
+    my_set_day_of_week(shown);
 #endif
     shown->firstday = calc_weekday(shown);
     leap_year = is_leap_year(shown->year);
@@ -345,7 +413,7 @@ static void draw_headers(void)
         }
     }
 
-    wday = first_wday;
+    wday = info.first_wday;
     rb->lcd_getstringsize("A", &w, &h);
     for (i = 0; i < 7; i++)
     {
@@ -376,7 +444,7 @@ static void draw_calendar(struct shown *shown)
     rb->lcd_clear_display();
     draw_headers();
     wday = shown->firstday;
-    pos = wday + 7 - first_wday;
+    pos = wday + 7 - info.first_wday;
     if (pos >= 7) pos -= 7;
 
     days_per_month = days_in_month[leap_year][shown->mon];
@@ -661,7 +729,7 @@ static bool edit_memo(int change, struct shown *shown)
                 return false;
 
             case 6: /* weekday */
-                rb->set_option("First Day of Week", &first_wday,
+                rb->set_option("First Day of Week", &info.first_wday,
                                 INT, modes, 7, NULL);
                 break;
 
@@ -828,8 +896,8 @@ enum plugin_status plugin_start(const void* parameter)
 
     (void)(parameter);
 
-    configfile_load(CFG_FILE, config, 1, 0);
-    old_first_wday = first_wday;
+    configfile_load(CFG_FILE, config, ARRAYLEN(config), 0);
+    rb->memcpy(&old_info, &info, sizeof(struct info));
 
     calendar_init(&shown);
     load_memo(&shown);
@@ -888,9 +956,12 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
 
-    if (old_first_wday != first_wday)
-        configfile_save(CFG_FILE, config, 1, 0);
+
+#if (CONFIG_RTC == 0)
+    info.last_mon = shown.mon;
+    info.last_year = shown.year;
+#endif
+    if (rb->memcmp(&old_info, &info, sizeof(struct info)))
+        configfile_save(CFG_FILE, config, ARRAYLEN(config), 0);
     return been_in_usb_mode?PLUGIN_USB_CONNECTED:PLUGIN_OK;
 }
-
-#endif

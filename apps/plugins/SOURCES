@@ -58,6 +58,7 @@ flipit.c
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
 rockblox1d.c
 brickmania.c
+calendar.c
 maze.c
 mazezam.c      
 text_editor.c
@@ -102,7 +103,6 @@ vu_meter.c
 wormlet.c
 
 #if CONFIG_RTC
-calendar.c
 #endif /* CONFIG_RTC */
 
 #if (MEMORYSIZE <= 8) && !defined(SIMULATOR) /* loaders, only needed for Archos */
