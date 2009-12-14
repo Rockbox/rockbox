@@ -125,9 +125,16 @@ void spi_init(void)
     IO_SERIAL0_TX_ENABLE = 0x0001;
 #ifndef CREATIVE_ZVx
     /* Set GIO 18 to output for touch screen slave enable */
-    IO_GIO_DIR1 &= ~GIO_TS_ENABLE;
+    /* Set GIO 29 to output for backlight enable */
+    IO_GIO_DIR1     &= ~(GIO_TS_ENABLE | GIO_BL_ENABLE);
+    IO_GIO_INV1     &= ~(GIO_TS_ENABLE | GIO_BL_ENABLE);    /* non-inverted */
+    IO_GIO_FSEL1    &= ~(0x03<<2);                          /* normal pin */
+    IO_GIO_FSEL2    &= ~(0x03<<8);                          /* normal pin */
+    
     /* Set GIO 12 to output for rtc slave enable */
-    IO_GIO_DIR0 &= ~GIO_RTC_ENABLE;
+    IO_GIO_DIR0     &= ~GIO_RTC_ENABLE;
+    IO_GIO_INV0     &= ~(GIO_RTC_ENABLE);                   /* non-inverted */
+    IO_GIO_FSEL0    &= ~(0x03<<6);                          /* normal pin */
 #endif
     /* make sure only one is ever enabled at a time */
     spi_disable_all_targets();
