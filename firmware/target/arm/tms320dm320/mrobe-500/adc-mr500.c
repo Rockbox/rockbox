@@ -24,6 +24,7 @@
 #include "adc-target.h"
 #include "kernel.h"
 #include "tsc2100.h"
+#include "system-target.h"
 #include "button-target.h"
 
 void adc_init(void)
@@ -32,10 +33,16 @@ void adc_init(void)
      *  touchscreen does not work, audio has not been tested, but it is
      *  expected that is will also not work when low.
      */
-    IO_GIO_DIR0     &= ~(1<<15);     /* output */
-    IO_GIO_INV0     &= ~(1<<15);     /* non-inverted */
-    IO_GIO_FSEL0    &= ~(0x03<<12);  /* normal pin */
-    IO_GIO_BITSET0  =   (1<<15);
+     
+    /* Setup touchscreen (tsc2100) pins:
+     *  14 - input, touchscreen irq
+     *  15 - output, touchscreen nPWD? */
+    /*  14: input , non-inverted,    irq, falling edge, no-chat, normal */
+    dm320_set_io(14, true, false, true, false, false, 0x00);
+    
+    /*  15: output, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(15, false, false, false, false, false, 0x00);
+    IO_GIO_BITSET0  =   (1<<15); /* Turn on TSC2100 */
 
     /* Initialize the touchscreen and the battery readout */
     tsc2100_adc_init();
