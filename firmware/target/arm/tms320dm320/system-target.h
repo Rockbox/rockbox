@@ -31,4 +31,7 @@
 
 void udelay(int usec);
 
+void dm320_set_io (char pin_num, bool input, bool invert, bool irq, bool irqany,
+                    bool chat, char func_num );
+
 #endif /* SYSTEM_TARGET_H */

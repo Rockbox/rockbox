@@ -336,3 +336,87 @@ void udelay(int usec) {
     }
 }
 
+/* This function sets the spefified pin up */
+void dm320_set_io (char pin_num, bool input, bool invert, bool irq, bool irqany,
+                    bool chat, char func_num )
+{
+    volatile short  *pio;
+    char            reg_offset; /* Holds the offset to the register */
+    char            shift_val;  /* Holds the shift offset to the GPIO bit(s) */
+    short           io_val;     /* Used as an intermediary to prevent glitchy
+                                 *  assignments. */
+    
+    /* Make sure this is a valid pin number */
+    if( (unsigned) pin_num > 40 )
+        return;
+        
+    /* Clamp the function number */
+    func_num    &=  0x03;
+    
+    /* Note that these are integer calculations */
+    reg_offset  =   (pin_num / 16);
+    shift_val   =   (pin_num - (16 * reg_offset));
+    
+    /* Handle the direction */
+    /* Calculate the pointer to the direction register */
+    pio         = &IO_GIO_DIR0 + reg_offset;
+    
+    if(input)
+        *pio        |=  ( 1 << shift_val );
+    else
+        *pio        &= ~( 1 << shift_val );
+    
+    /* Handle the inversion */
+    /* Calculate the pointer to the inversion register */
+    pio         = &IO_GIO_INV0 + reg_offset;
+    
+    if(invert)
+        *pio        |=  ( 1 << shift_val );
+    else
+        *pio        &= ~( 1 << shift_val );
+        
+    /* Handle the chat */
+    /* Calculate the pointer to the chat register */
+    pio         = &IO_GIO_CHAT0 + reg_offset;
+    
+    if(chat)
+        *pio        |=  ( 1 << shift_val );
+    else
+        *pio        &= ~( 1 << shift_val );
+        
+    /* Handle interrupt configuration */
+    if(pin_num < 16)
+    {
+        /* Sets whether the pin is an irq or not */
+        if(irq)
+            IO_GIO_IRQPORT |=  (1 << pin_num );
+        else
+            IO_GIO_IRQPORT &= ~(1 << pin_num );
+        
+        /* Set whether this is a falling or any edge sensitive irq */
+        if(irqany)
+            IO_GIO_IRQEDGE |=  (1 << pin_num );
+        else
+            IO_GIO_IRQEDGE &= ~(1 << pin_num );
+    }
+    
+    /* Handle the function number */
+    /* Calculate the pointer to the function register */
+    reg_offset  =   (  (pin_num - 9) / 8 );
+    shift_val   =   ( ((pin_num - 9) - (8 * reg_offset)) * 2 );
+    
+    if( pin_num < 9 )
+    {
+        reg_offset  =   0;
+        shift_val   =   0;
+    }
+
+    /* Calculate the pointer to the function register */
+    pio         =   &IO_GIO_FSEL0 + reg_offset;
+
+    io_val      =   *pio;
+    io_val      &= ~( 3 << shift_val );         /* zero previous value */
+    io_val      |=  ( func_num << shift_val );  /* Store new value */
+    *pio        =   io_val;
+}
+
