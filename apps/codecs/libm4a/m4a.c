@@ -194,7 +194,8 @@ unsigned int get_sample_offset(demux_res_t *demux_res, uint32_t sample)
         prev_chunk_samples = demux_res->sample_to_chunk[i].num_samples;
     }
 
-    if (sample >= demux_res->sample_to_chunk[0].num_samples)
+    if (prev_chunk_samples > 0 &&
+        sample >= demux_res->sample_to_chunk[0].num_samples)
     {
         chunk = prev_chunk + (sample - total_samples) / prev_chunk_samples;
     }

@@ -53,6 +53,7 @@ enum codec_status codec_main(void)
     int err;
     uint32_t s = 0;
     unsigned char c = 0;
+    void *ret;
 
     /* Generic codec initialisation */
     ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
@@ -179,11 +180,10 @@ next_track:
         buffer=ci->request_buffer(&n,sample_byte_size);
 
         /* Decode one block - returned samples will be host-endian */
-        NeAACDecDecode(decoder, &frame_info, buffer, n);
-        /* Ignore return value, we access samples in the decoder struct 
-         * directly.
-         */
-        if (frame_info.error > 0) {
+        ret = NeAACDecDecode(decoder, &frame_info, buffer, n);
+
+        /* NeAACDecDecode may sometimes return NULL without setting error. */
+        if (ret == NULL || frame_info.error > 0) {
             LOGF("FAAD: decode error '%s'\n", NeAACDecGetErrorMessage(frame_info.error));
             err = CODEC_ERROR;
             goto done;
