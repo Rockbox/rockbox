@@ -18,9 +18,27 @@
 \end{center}
 
 Throughout this manual, the buttons on the \dap{} are labelled according to the
-picture above. Whenever a button name is prefixed by ``Long'', a long press of
-approximately one second should be performed on that button. The buttons are
-described in detail in the following paragraph.
+picture above.
+\opt{touchscreen}{
+The areas of the touchscreen in the 3x3 grid mode are in turn referred as follows:
+\begin{table}
+    \begin{center}
+    %\begin{tabularx}{.82\textwidth}{l|c|r}
+    \begin{tabularx}{.9\textwidth}{X|X|X}
+    \toprule
+        \TouchTopLeft & \TouchTopMiddle & \TouchTopRight \\
+    \midrule
+        \TouchMidLeft & \TouchCenter & \TouchMidRight \\
+    \midrule
+        \TouchBottomLeft & \TouchBottomMiddle & \TouchBottomRight \\
+    \bottomrule
+    \end{tabularx}
+    \end{center}
+\end{table}
+}
+Whenever a button name is prefixed by ``Long'', a long press of approximately
+one second should be performed on that button. The buttons are described in
+detail in the following paragraph.
 
 \blind{
   Additional information for blind users is available on the Rockbox website at 
@@ -443,6 +461,8 @@ described in detail in the following paragraph.
 }
 
 \subsection{Turning the \dap{} on and off}
+\opt{cowond2}{Rockbox has a dual-boot feature with the original firmware being
+  the default.\\}
 To turn on and off your Rockbox enabled \dap{} use the following keys:
   \begin{table}
     \begin{btnmap}{}{}
@@ -452,8 +472,8 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
       \opt{ONDIO_PAD}{\ButtonOff}\opt{RECORDER_PAD,PLAYER_PAD}%
           {Long \ButtonOn}%
       \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
-          ,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,sansaAMS,COWON_D2_PAD}
-          {\ButtonPower}%
+          ,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,sansaAMS}{\ButtonPower}%
+      \opt{COWON_D2_PAD} {\ButtonPower{}, then \ButtonHold}%
     \opt{HAVEREMOTEKEYMAP}{&
       \opt{IRIVER_RC_H100_PAD}{\ButtonRCOn}%
           }
@@ -577,6 +597,11 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
     {
     Rockbox has a dual-boot feature. To boot into the original firmware,
     turn the \ButtonHold{} switch on just after turning on the \dap{}.
+    }
+
+  \opt{cowond2}
+    {
+    Use \ButtonPower{} to boot the original \playerman{} firmware.
     }
 
   }

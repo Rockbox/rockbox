@@ -11,7 +11,7 @@ before beginning there are a few things it is important to know.
 follow the instructions at 
 \url{http://www.rockbox.org/twiki/bin/view/Main/SansaE200RInstallation}.}}
 
-\opt{ipodnano,ipodnano2g,ipodvideo,e200,c200,e200v2,clip}{
+\opt{ipodnano,ipodnano2g,ipodvideo,e200,c200,e200v2,clip,cowond2}{
 \begin{description}  
 \item[Supported hardware versions.] 
     \opt{ipodnano,ipodnano2g}{
@@ -51,9 +51,38 @@ follow the instructions at
     while the v2 firmware begins with 02.  In addition, Rockbox does not
     run on the Clip+.
 }
+  \opt{cowond2}{
+    Rockbox runs on all \playerman{} \playertype{} and \playertype{}+ variants
+    (2 / 4 / 8 / 16GB, with or without DAB/DMB).
+    \note{Newer \playertype{}+ hardware revisions use an updated power
+    management chip, and some functionality is not yet implemented on these
+    players (e.g. touchscreen support).}
+}
 \end{description}
 }
 
+\opt{cowond2}{
+\begin{description}
+  \item[Current limitations.] Most Rockbox functions are usable on the
+    \playertype{}/\playertype{}+, including music playback and most plugins, but
+    there are a number of shortcomings that prevent it from being a fully
+    supported target:
+    \begin{itemize}
+      \item An SD card is required to use many features, since the internal
+        flash memory is read-only in Rockbox.
+        \warn{The SD driver is still in development and may contain bugs.
+          There have been reports of SD cards becoming unusable after being used
+          with Rockbox on \playerman{} \playertype{}. Only use old, low-capacity
+          cards until we are satisfied the driver is safe to use.\\}
+      \item There is only basic touchscreen support. Further work is
+        required to make the UI more usable with a touchscreen in general.
+        \note{The touchscreen can be used in two modes, either a 3x3 grid mode
+          which divides the screen into areas to emulate a set of physical
+          buttons (the default setting), or ``absolute point'' mode where the
+          touchscreen is used to point to items on the screen.\\}
+    \end{itemize}
+\end{description}
+}
 \opt{h300}{
 \begin{description}  
   \item[DRM capability.] If your \dap{} has a US firmware, then by installing Rockbox you will
@@ -373,7 +402,12 @@ data partiton.}}
 
 \item Take the \fname{.zip} file that you downloaded and use
  the ``Extract all'' command of your unzip program to extract 
- the files onto \opt{gigabeats}{the main data partition of }your \dap{}.
+ the files onto%
+ \opt{gigabeats}{the main data partition of }
+ \opt{cowond2}{either an SD card or the internal memory of }
+ your \dap{}.
+ \opt{cowond2}{\note{If you have chosen to extract to the internal memory, it
+     will not be possible to save settings.}}
 \end{enumerate}
 
 \note{The entire contents of the \fname{.zip} file should be extracted 
@@ -407,6 +441,7 @@ structure that Rockbox needs.\\}
   \opt{sansa}{\input{getting_started/sansa_install.tex}}
   \opt{sansaAMS}{\input{getting_started/sansaAMS_install.tex}}
   \opt{mrobe100}{\input{getting_started/mrobe100_install.tex}}
+  \opt{cowond2}{\input{getting_started/cowond2_install.tex}}
 }}
 
 \subsection{Finishing the install}\label{ref:finish_install}
@@ -437,7 +472,7 @@ structure that Rockbox needs.\\}
   \end{itemize}
 }
 
-\opt{h10,h10_5gb,ipod,mrobe100,sansa,archos,sansaAMS}{
+\opt{h10,h10_5gb,ipod,mrobe100,sansa,archos,sansaAMS,cowond2}{
   Safely eject / unmount the USB drive, unplug the cable and restart.
 }
 
@@ -482,7 +517,7 @@ Rockbox Utility can also aid in the production of talk files, which allow Rockbo
 to speak file and folder names.
 
 \section{Running Rockbox}
-\nopt{ipod,gigabeats}{When
+\nopt{ipod,gigabeats,cowond2}{When
 you turn the unit on, Rockbox should load.}
 \opt{ipod}{Hard reset the Ipod by holding
   \opt{IPOD_4G_PAD}{\ButtonMenu{}+\ButtonSelect{}}%
@@ -499,6 +534,15 @@ you turn the unit on, Rockbox should load.}
     Files placed on your \dap{} using the \playerman{} firmware can be
     viewed by initialising and using Rockbox's database.
     See \reference{ref:database} for more information.}
+}
+
+\opt{cowond2}{
+  To boot the Rockbox firmware set the \ButtonHold{} switch immediately after
+  power on.\\
+  \note{If you have chosen to install to an SD card and it is inserted at power
+    on, Rockbox will boot from that card and use it as the primary drive for
+    storing settings, etc. If there is no SD card inserted, Rockbox will boot
+    from the internal memory, and it will not be possible to save settings.}
 }
 
 \opt{ipod}{

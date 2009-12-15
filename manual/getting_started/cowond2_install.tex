@@ -1,0 +1,28 @@
+\begin{enumerate}
+\item Get a copy of the original \playerman{} \playertype{} firmware from
+  \url{http://www.cowonglobal.com/zeroboard/zboard.php?id=C08&bmenu=support}.
+  It has to be of the same version that is currently installed on your \dap{}.
+
+\item Build the mktccboot tool or download a binary for your operating system.
+
+\item Build the bootloader (\fname{bootloader-cowond2.bin}). Pre-built binary
+  is available at \download{bootloader/cowon/d2/bootloader-cowond2.bin}.
+
+\item Patch the bootloader into the \playerman{} firmware using mktccboot:
+  \begin{code}
+    mktccboot D2N.bin bootloader-cowond2.bin D2N-patched.bin
+  \end{code}
+  \note{The filename depends on the firmware version and hardware revision as
+    shown in the table below (for the \playertype{} use the file found in folder
+    ``\fname{1}'', not ``\fname{0}'')
+    \begin{table}
+      \begin{rbtabular}{0.6\textwidth}{XXX}%
+        { \textbf{FW / HW} & \textbf{\playertype{}} & \textbf{\playertype{}+}}{}{}
+        \textbf{1.xx, 3.xx} & \fname{D2.bin} & \fname{D2\_P.bin} \\
+        \textbf{2.xx, 4.xx} & \fname{D2N.bin} & \fname{D2N\_P.bin} \\
+      \end{rbtabular}
+    \end{table}}
+
+\item Copy the output file (``\fname{D2N-patched.bin}'' in our example) to the
+  root of the \daps{} internal memory and rename it according to the above table.
+\end{enumerate}
