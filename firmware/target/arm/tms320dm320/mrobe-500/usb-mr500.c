@@ -47,14 +47,12 @@ void usb_init_device(void) {
     IO_EMIF_CS4CTRL2 = 0x4110; 
 
     /* Setup the m66591 reset signal */
-    IO_GIO_DIR0     &= ~(1<<2); /* output */
-    IO_GIO_INV0     &= ~(1<<2); /* non-inverted */
-    IO_GIO_FSEL0    &= ~(0x03); /* normal pins */
-    
+    /*  2: output, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(2, false, false, false, false, false, 0x00);
+
     /* Setup the m66591 interrupt signal */
-    IO_GIO_DIR0     |= 1<<3;    /* input */
-    IO_GIO_INV0     &= ~(1<<3); /* non-inverted */
-    IO_GIO_IRQPORT  |= 1<<3;    /* enable EIRQ */
+    /*  3: input , non-inverted,    irq, falling edge, no-chat, normal */
+    dm320_set_io(3, true, false, true, false, false, 0x00);
     
     udelay(100);
     
