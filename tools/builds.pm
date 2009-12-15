@@ -93,12 +93,12 @@ $releasenotes="/wiki/ReleaseNotes34";
     'ipodmini1g' => {
         name => 'iPod Mini 1st gen',
         status => 3,
-        manual => 'ipodmini2g',
     },
     'ipodmini2g' => {
         name => 'iPod Mini 2nd gen',
         status => 3,
         icon => 'ipodmini1g',
+        manual => 'ipodmini1g',
     },
     'ipodnano1g' => {
         name => 'iPod Nano 1st gen',
