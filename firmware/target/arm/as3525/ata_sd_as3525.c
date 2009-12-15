@@ -86,6 +86,10 @@
     | MCI_RX_OVERRUN      \
     | MCI_START_BIT_ERR)
 
+#define MCI_RESPONSE_ERROR    \
+    ( MCI_CMD_TIMEOUT         \
+    | MCI_CMD_CRC_FAIL)
+
 #define MCI_FIFO(i)        ((unsigned long *) (pl180_base[i]+0x80))
 /* volumes */
 #define     INTERNAL_AS3525 0   /* embedded SD card */
@@ -234,7 +238,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
     {
         response[0] = MCI_RESP0(drive);    /*  Always prepare short response  */
 
-        if(status & (MCI_CMD_TIMEOUT | MCI_CMD_CRC_FAIL))  /* failed response */
+        if(status & MCI_RESPONSE_ERROR)    /* timeout or crc failure */
             return false;
 
         if(status &  MCI_CMD_RESP_END)            /*Response passed CRC check */
