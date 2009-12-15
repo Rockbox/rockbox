@@ -127,7 +127,7 @@ static bool boosted = false;
 #define PLASMA_DECREASE_FREQUENCY BUTTON_RC_VOL_DOWN
 #define PLASMA_RC_QUIT            BUTTON_REC
 
-#elif (CONFIG_KEYPAD == COWOND2_PAD)
+#elif (CONFIG_KEYPAD == COWON_D2_PAD)
 #define PLASMA_QUIT               BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == IAUDIO67_PAD)

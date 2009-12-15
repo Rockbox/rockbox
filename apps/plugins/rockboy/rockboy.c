@@ -196,7 +196,7 @@ static void setoptions (void)
 #elif CONFIG_KEYPAD == MROBE500_PAD
         options.MENU=BUTTON_POWER;
 
-#elif CONFIG_KEYPAD == COWOND2_PAD
+#elif CONFIG_KEYPAD == COWON_D2_PAD
         options.A=BUTTON_PLUS;
         options.B=BUTTON_MINUS;
         options.MENU=BUTTON_MENU;
@@ -280,7 +280,7 @@ static void setoptions (void)
 #if CONFIG_KEYPAD == MROBE500_PAD
         options.A=BUTTON_BOTTOMLEFT;
         options.B=BUTTON_BOTTOMRIGHT;
-#elif CONFIG_KEYPAD != COWOND2_PAD
+#elif CONFIG_KEYPAD != COWON_D2_PAD
         options.A=BUTTON_BOTTOMLEFT;
         options.B=BUTTON_BOTTOMRIGHT;
         options.MENU=BUTTON_TOPLEFT;

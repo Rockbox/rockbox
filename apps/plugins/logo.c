@@ -143,7 +143,7 @@ const unsigned char rockbox16x7[] = {
 #define LP_DEC_Y BUTTON_RC_VOL_DOWN
 #define LP_INC_Y BUTTON_RC_VOL_UP
 
-#elif CONFIG_KEYPAD == COWOND2_PAD
+#elif CONFIG_KEYPAD == COWON_D2_PAD
 #define LP_QUIT BUTTON_POWER
 
 #elif CONFIG_KEYPAD == IAUDIO67_PAD

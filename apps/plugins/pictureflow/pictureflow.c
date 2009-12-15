@@ -122,9 +122,9 @@ const struct button_mapping pf_context_buttons[] =
 /* These all use short press of BUTTON_POWER for menu, map long POWER to quit
 */
 #elif CONFIG_KEYPAD == SANSA_C200_PAD || CONFIG_KEYPAD == SANSA_M200_PAD || \
-    CONFIG_KEYPAD == IRIVER_H10_PAD || CONFIG_KEYPAD == COWOND2_PAD
+    CONFIG_KEYPAD == IRIVER_H10_PAD || CONFIG_KEYPAD == COWON_D2_PAD
     {PF_QUIT,         BUTTON_POWER|BUTTON_REPEAT, BUTTON_POWER},
-#if CONFIG_KEYPAD == COWOND2_PAD
+#if CONFIG_KEYPAD == COWON_D2_PAD
     {PF_BACK,         BUTTON_POWER|BUTTON_REL,    BUTTON_POWER},
     {ACTION_NONE,     BUTTON_POWER,               BUTTON_NONE},
 #endif

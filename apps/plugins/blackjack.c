@@ -351,7 +351,7 @@ enum {
 #define BJACK_RIGHT         BUTTON_RC_FF
 #define BJACK_LEFT          BUTTON_RC_REW
 
-#elif CONFIG_KEYPAD == COWOND2_PAD
+#elif CONFIG_KEYPAD == COWON_D2_PAD
 #define BJACK_QUIT_NAME     "POWER"
 #define BJACK_DOUBLE_NAME   "-"
 #define BJACK_QUIT          BUTTON_POWER

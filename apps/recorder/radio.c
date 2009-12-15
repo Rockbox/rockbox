@@ -110,7 +110,7 @@
 #define FM_PRESET
 #define FM_MODE
 
-#elif (CONFIG_KEYPAD == COWOND2_PAD)
+#elif (CONFIG_KEYPAD == COWON_D2_PAD)
 #define FM_MENU
 #define FM_PRESET
 #define FM_STOP

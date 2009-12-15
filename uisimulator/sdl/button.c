@@ -782,7 +782,7 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_POWER;
         break;
     
-#elif CONFIG_KEYPAD == COWOND2_PAD
+#elif CONFIG_KEYPAD == COWON_D2_PAD
     case SDLK_ESCAPE:
         new_btn = BUTTON_POWER;
         break;

@@ -94,7 +94,7 @@
 #define GIGABEAT_S_PAD     19
 #define LOGIK_DAX_PAD      20
 #define IAUDIO67_PAD       21
-#define COWOND2_PAD        22
+#define COWON_D2_PAD        22
 #define IAUDIO_M3_PAD      23
 #define CREATIVEZVM_PAD    24
 #define SANSA_M200_PAD     25

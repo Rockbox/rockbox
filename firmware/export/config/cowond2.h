@@ -82,7 +82,7 @@
 #define HAVE_LCD_ENABLE
 
 /* define this to indicate your device's keypad */
-#define CONFIG_KEYPAD COWOND2_PAD
+#define CONFIG_KEYPAD COWON_D2_PAD
 #define HAVE_TOUCHSCREEN
 #define HAVE_BUTTON_DATA
 

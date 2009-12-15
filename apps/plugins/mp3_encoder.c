@@ -2467,7 +2467,7 @@ void get_mp3_filename(const char *wav_name)
 #define MP3ENC_DONE BUTTON_RC_REC
 #define MP3ENC_SELECT BUTTON_RC_FF
 
-#elif CONFIG_KEYPAD == COWOND2_PAD
+#elif CONFIG_KEYPAD == COWON_D2_PAD
 #define MP3ENC_DONE BUTTON_POWER
 
 #elif CONFIG_KEYPAD == IAUDIO67_PAD

@@ -262,7 +262,7 @@ You are free to name this file lodepng.cpp or lodepng.c depending on your usage.
 #define PNG_NEXT        BUTTON_RC_MODE
 #define PNG_PREVIOUS    BUTTON_RC_MENU
 
-#elif CONFIG_KEYPAD == COWOND2_PAD
+#elif CONFIG_KEYPAD == COWON_D2_PAD
 
 #elif CONFIG_KEYPAD == IAUDIO67_PAD
 #define PNG_ZOOM_IN     BUTTON_VOLUP

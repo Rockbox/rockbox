@@ -151,7 +151,7 @@ const struct button_mapping generic_directions[] =
     { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
 #elif (CONFIG_KEYPAD == MROBE500_PAD)
-#elif (CONFIG_KEYPAD == COWOND2_PAD)
+#elif (CONFIG_KEYPAD == COWON_D2_PAD)
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
     { PLA_UP,                BUTTON_RC_VOL_UP,                  BUTTON_NONE},
     { PLA_DOWN,              BUTTON_RC_VOL_DOWN,                BUTTON_NONE},
@@ -282,7 +282,7 @@ const struct button_mapping generic_left_right_fire[] =
     { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,        BUTTON_NONE},
     { PLA_FIRE,              BUTTON_RC_HEART,                   BUTTON_NONE},
     { PLA_FIRE_REPEAT,       BUTTON_RC_HEART|BUTTON_REPEAT,     BUTTON_NONE},
-#elif (CONFIG_KEYPAD == COWOND2_PAD)
+#elif (CONFIG_KEYPAD == COWON_D2_PAD)
     { PLA_LEFT,              BUTTON_MINUS,                  BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_MINUS|BUTTON_REPEAT,    BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_PLUS,                   BUTTON_NONE},
@@ -445,7 +445,7 @@ const struct button_mapping generic_actions[] =
     {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
     {PLA_FIRE,          BUTTON_SELECT,                  BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif (CONFIG_KEYPAD == COWOND2_PAD)
+#elif (CONFIG_KEYPAD == COWON_D2_PAD)
     {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
     {PLA_START,         BUTTON_MINUS,                   BUTTON_NONE},
     {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
@@ -564,7 +564,7 @@ const struct button_mapping generic_increase_decrease[] =
     {PLA_DEC,             BUTTON_RC_VOL_DOWN,                BUTTON_NONE},
     {PLA_INC_REPEAT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE},
     {PLA_DEC_REPEAT,      BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
-#elif CONFIG_KEYPAD == COWOND2_PAD
+#elif CONFIG_KEYPAD == COWON_D2_PAD
     {PLA_INC,             BUTTON_PLUS,                       BUTTON_NONE},
     {PLA_DEC,             BUTTON_MINUS,                      BUTTON_NONE},
     {PLA_INC_REPEAT,      BUTTON_PLUS|BUTTON_REPEAT,         BUTTON_NONE},
