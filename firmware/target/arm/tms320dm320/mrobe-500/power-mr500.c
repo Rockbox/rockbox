@@ -35,9 +35,18 @@ void power_init(void)
 {
     /* Initialize IDE power pin */
     /* set GIO17 (ATA power) on and output */
-    ide_power_enable(true);
-    IO_GIO_DIR1     &=  ~(1<<1);
+    /*  17: output, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(17, false, false, false, false, false, 0x00);
+    ide_power_enable(true); /* Power up the drive */
+    
     /* Charger detect */
+    /*  25: input, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(25, false, false, false, false, false, 0x00);
+    
+    /* Power down pin */
+    /*  26: input, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(26, false, false, false, false, false, 0x00);
+    IO_GIO_BITCLR1  =   1<<10; /* Make sure it is not active */
 }
 
 unsigned int power_input_status(void)
@@ -79,6 +88,5 @@ void power_off(void)
     lcd_sleep();
     sleep(HZ);
     /* Hard shutdown */
-    IO_GIO_DIR1     &= ~(1<<10);
     IO_GIO_BITSET1  =   1<<10;
 }
