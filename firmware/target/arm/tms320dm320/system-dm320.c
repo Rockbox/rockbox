@@ -209,6 +209,11 @@ void system_init(void)
     dm320_set_io(33, false, false, false, false, false, 0x00);
     IO_GIO_BITCLR2      = 1<<1;
 
+    /* Pin 1 is the power button. Right now it is setup without IRQ, but that
+     *  may be needed for wakeup if a different shutdown method is used. */
+    /*  1: input , non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(1, true, false, false, false, false, 0x00);
+
     /* taken from linux/arch/arm/mach-itdm320-20/irq.c */
 
     /* Clearing all FIQs and IRQs. */
