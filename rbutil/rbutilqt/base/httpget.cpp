@@ -381,7 +381,7 @@ void HttpGet::httpFinished(int id, bool error)
             m_serverTimestamp = QDateTime::fromString(date, "MMM d hh:mm:ss yyyy");
         // RFC 822
         else
-            m_serverTimestamp = QDateTime::fromString(date, "dd MMM yyyy hh:mm:ss");
+            m_serverTimestamp = QLocale::c().toDateTime(date, "dd MMM yyyy hh:mm:ss");
         qDebug() << "[HTTP] HEAD finished, server date:" << date << ", parsed:" << m_serverTimestamp;
         emit headerFinished();
         return;
