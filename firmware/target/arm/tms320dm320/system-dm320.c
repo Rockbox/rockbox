@@ -351,7 +351,7 @@ void udelay(int usec) {
     }
 }
 
-/* This function sets the spefified pin up */
+/* This function sets the specified pin up */
 void dm320_set_io (char pin_num, bool input, bool invert, bool irq, bool irqany,
                     bool chat, char func_num )
 {
