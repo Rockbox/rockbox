@@ -52,7 +52,8 @@ void ata_enable(bool on)
 
 bool ata_is_coldstart(void)
 {
-    return true;
+    /* If the reset pin direction is unconfigured it is a coldstart */
+    return (IO_GIO_DIR0&(1<<10));
 }
 
 void ata_device_init(void)
