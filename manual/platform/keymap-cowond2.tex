@@ -14,18 +14,18 @@
 \newcommand{\ActionStdCancel}{\ButtonPower{} or \TouchActionStdCancel}
 \newcommand{\ActionStdContext}{Long \ButtonMenu{} or \TouchActionStdContext}
 \newcommand{\ActionStdQuickScreen}{\TouchActionStdQuickScreen}
-\newcommand{\ActionQuickScreenExit}{\TouchActionQuickScreenExit}
+\newcommand{\ActionQuickScreenExit}{\ButtonPower{} or \ButtonMenu{} or \TouchActionQuickScreenExit}
 \newcommand{\ActionStdMenu}{\TouchActionStdMenu}
-\newcommand{\ActionStdOk}{\TouchActionStdOk}
-\newcommand{\ActionStdRec}{\TouchActionStdRec}
-\newcommand{\ActionStdUsbCharge}{\TouchActionStdUsbCharge}
+\newcommand{\ActionStdOk}{\ButtonMenu{} or \TouchActionStdOk}
+%\newcommand{\ActionStdRec}{\TouchActionStdRec}
+%\newcommand{\ActionStdUsbCharge}{\TouchActionStdUsbCharge}
 
 %Button actions, wps context
 \newcommand{\ActionWpsPlay}{\TouchActionWpsPlay}
 \newcommand{\ActionWpsSkipNext}{\TouchActionWpsSkipNext}
+\newcommand{\ActionWpsSeekFwd}{\TouchActionWpsSeekFwd}
 \newcommand{\ActionWpsSkipPrev}{\TouchActionWpsSkipPrev}
 \newcommand{\ActionWpsSeekBack}{\TouchActionWpsSeekBack}
-\newcommand{\ActionWpsSeekFwd}{\TouchActionWpsSeekFwd}
 
 \newcommand{\ActionWpsStop}{\TouchActionWpsStop}
 \newcommand{\ActionWpsVolDown}{\ButtonMinus{} or \TouchActionWpsVolDown}
@@ -43,17 +43,17 @@
 \newcommand{\ActionWpsAbReset}{\TouchActionWpsAbReset}
 
 %Button actions, tree context
-\newcommand{\ActionTreeWps}{\ButtonPlus}
-\newcommand{\ActionTreeStop}{}
-\newcommand{\ActionTreeEnter}{}
-\newcommand{\ActionTreeParentDirectory}{}
+\newcommand{\ActionTreeWps}{\ButtonPlus{}+\ButtonMenu{} or \TouchActionTreeWps}
+\newcommand{\ActionTreeStop}{\ButtonMinus{}+\ButtonPower{} or \TouchActionTreeStop}
+\newcommand{\ActionTreeEnter}{\ButtonMenu{} or \TouchActionTreeEnter}
+\newcommand{\ActionTreeParentDirectory}{\TouchActionTreeParentDirectory}
 
 %Button actions, YesNo context
-\newcommand{\ActionYesNoAccept}{\ButtonMenu}
+\newcommand{\ActionYesNoAccept}{\ButtonMenu{} or \TouchActionYesNoAccept}
 
 %Button actions, Setting context
-\newcommand{\ActionSettingInc}{\ButtonPlus}
-\newcommand{\ActionSettingDec}{\ButtonMinus}
+\newcommand{\ActionSettingInc}{\TouchActionSettingInc{} or \ButtonPlus}
+\newcommand{\ActionSettingDec}{\TouchActionSettingDec{} or \ButtonMinus}
 
 %Button actions, Virtual Keyboard Context
 \newcommand{\ActionKbdLeft}{\TouchActionKbdLeft}
@@ -78,12 +78,14 @@
 \newcommand{\ActionPsNudgeRight}{\TouchActionPsNudgeRight}
 \newcommand{\ActionPsReset}{\TouchActionPsReset}
 \newcommand{\ActionPsExit}{\ButtonPower{} or \TouchActionPsExit}
+\newcommand{\ActionPsSlower}{\TouchActionPsSlower}
+\newcommand{\ActionPsFaster}{\TouchActionPsFaster}
 
 %Button actions, FM radio context
 \newcommand{\ActionFMPreset}{Long \ButtonMenu{} or \TouchActionFMPreset}
 \newcommand{\ActionFMMenu}{\ButtonMenu{} or \TouchActionFMMenu}
 \newcommand{\ActionFMMode}{\TouchActionFMMode}
-\newcommand{\ActionFMStop}{\ButtonPower}
+\newcommand{\ActionFMStop}{\TouchActionFMStop{} or \ButtonPower}
 \newcommand{\ActionFMExit}{\TouchActionFMExit}
 \newcommand{\ActionFMPlay}{\TouchActionFMPlay}
 \newcommand{\ActionFMSettingsInc}{\ActionSettingInc}

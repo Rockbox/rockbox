@@ -17,8 +17,8 @@
 \newcommand{\TouchActionStdNextRepeat}{Long \TouchBottomMiddle}
 \newcommand{\TouchActionStdCancel}{\TouchMidLeft}
 \newcommand{\TouchActionStdContext}{Long \TouchCenter{} or Long \TouchMidRight}
-\newcommand{\TouchActionStdQuickScreen}{Long \TouchTopLeft}
-\newcommand{\TouchActionQuickScreenExit}{}
+\newcommand{\TouchActionStdQuickScreen}{\TouchBottomLeft}
+\newcommand{\TouchActionQuickScreenExit}{\TouchActionStdQuickScreen{} or \TouchCenter}
 \newcommand{\TouchActionStdMenu}{\TouchTopLeft}
 \newcommand{\TouchActionStdOk}{\TouchCenter{} or \TouchMidRight}
 \newcommand{\TouchActionStdRec}{}
@@ -35,7 +35,7 @@
 \newcommand{\TouchActionWpsVolDown}{\TouchBottomMiddle}
 \newcommand{\TouchActionWpsVolUp}{\TouchTopMiddle}
 
-\newcommand{\TouchActionWpsQuickScreen}{Long \TouchTopLeft}
+\newcommand{\TouchActionWpsQuickScreen}{\TouchBottomLeft}
 \newcommand{\TouchActionWpsMenu}{\TouchTopLeft}
 \newcommand{\TouchActionWpsContext}{Long \TouchCenter}
 \newcommand{\TouchActionWpsBrowse}{\TouchCenter}
@@ -48,9 +48,9 @@
 
 %Button actions, tree context
 \newcommand{\TouchActionTreeWps}{\TouchTopRight}
-\newcommand{\TouchActionTreeStop}{}
-\newcommand{\TouchActionTreeEnter}{}
-\newcommand{\TouchActionTreeParentDirectory}{}
+\newcommand{\TouchActionTreeStop}{\TouchBottomRight}
+\newcommand{\TouchActionTreeEnter}{\TouchCenter{} or \TouchMidRight}
+\newcommand{\TouchActionTreeParentDirectory}{\TouchMidLeft}
 
 %Button actions, YesNo context
 \newcommand{\TouchActionYesNoAccept}{\TouchTopRight}
@@ -82,6 +82,8 @@
 \newcommand{\TouchActionPsNudgeRight}{\TouchMidRight}
 \newcommand{\TouchActionPsReset}{\TouchCenter}
 \newcommand{\TouchActionPsExit}{\TouchTopLeft}
+\newcommand{\TouchActionPsSlower}{Long \TouchMidLeft}
+\newcommand{\TouchActionPsFaster}{Long \TouchMidRight}
 
 %Button actions, Recording screen context
 \newcommand{\TouchActionRecPause}{}
@@ -100,11 +102,11 @@
 \newcommand{\TouchActionFMStop}{\TouchBottomRight}
 \newcommand{\TouchActionFMExit}{\TouchTopLeft}
 \newcommand{\TouchActionFMPlay}{\TouchTopRight}
-\newcommand{\TouchActionFMSettingsInc}{}
-\newcommand{\TouchActionFMSettingsDec}{}
-\newcommand{\TouchActionFMPrev}{\TouchActionRecSettingsInc}
-\newcommand{\TouchActionFMNext}{\TouchActionRecSettingsDec}
+\newcommand{\TouchActionFMSettingsInc}{\TouchActionSettingInc}
+\newcommand{\TouchActionFMSettingsDec}{\TouchActionSettingDec}
+\newcommand{\TouchActionFMPrev}{\TouchMidLeft}
+\newcommand{\TouchActionFMNext}{\TouchMidRight}
 
 %Button actions, Bookmark screen context
-\newcommand{\TouchActionBmDelete}{\TouchBottomLeft}
+\newcommand{\TouchActionBmDelete}{\TouchBottomRight}
 

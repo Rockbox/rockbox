@@ -62,7 +62,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_CANCEL,      BUTTON_MIDLEFT|BUTTON_REPEAT,      BUTTON_NONE },
 
     { ACTION_STD_MENU,        BUTTON_TOPLEFT,                    BUTTON_NONE },
-    { ACTION_STD_QUICKSCREEN, BUTTON_TOPLEFT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_STD_QUICKSCREEN, BUTTON_BOTTOMLEFT,                 BUTTON_NONE },
     { ACTION_STD_CONTEXT,     BUTTON_CENTER|BUTTON_REPEAT,       BUTTON_CENTER },
     { ACTION_STD_CONTEXT,     BUTTON_MIDRIGHT|BUTTON_REPEAT,     BUTTON_MIDRIGHT },
 
@@ -91,8 +91,8 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_CONTEXT,       BUTTON_CENTER|BUTTON_REPEAT,        BUTTON_CENTER },
 
     { ACTION_WPS_MENU,          BUTTON_TOPLEFT|BUTTON_REL,          BUTTON_TOPLEFT },
-    { ACTION_WPS_QUICKSCREEN,   BUTTON_TOPLEFT|BUTTON_REPEAT,       BUTTON_TOPLEFT },
-    { ACTION_WPS_VIEW_PLAYLIST, BUTTON_BOTTOMLEFT|BUTTON_REL,       BUTTON_BOTTOMLEFT },
+    { ACTION_WPS_QUICKSCREEN,   BUTTON_BOTTOMLEFT|BUTTON_REL,       BUTTON_BOTTOMLEFT },
+    { ACTION_WPS_VIEW_PLAYLIST, BUTTON_TOPLEFT|BUTTON_REPEAT,       BUTTON_TOPLEFT },
     { ACTION_WPS_REC,           BUTTON_BOTTOMRIGHT|BUTTON_REPEAT,   BUTTON_BOTTOMRIGHT },
     { ACTION_WPS_PITCHSCREEN,   BUTTON_BOTTOMLEFT|BUTTON_REPEAT,    BUTTON_BOTTOMLEFT },
     { ACTION_WPS_ID3SCREEN,     BUTTON_BOTTOMRIGHT|BUTTON_REL,      BUTTON_BOTTOMRIGHT },
@@ -121,16 +121,17 @@ static const struct button_mapping button_context_list[]  = {
 
 static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,    BUTTON_TOPRIGHT|BUTTON_REL,         BUTTON_TOPRIGHT },
+    { ACTION_TREE_STOP,   BUTTON_BOTTOMRIGHT|BUTTON_REL,      BUTTON_BOTTOMRIGHT },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_CUSTOM|CONTEXT_TREE)
 }; /* button_context_tree */
 
 static const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_CUSTOM|CONTEXT_TREE),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 };
 
 static const struct button_mapping button_context_listtree_scroll_without_combo[]  = {
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_CUSTOM|CONTEXT_TREE),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 };
 
 static const struct button_mapping button_context_settings[]  = {
@@ -182,7 +183,7 @@ static const struct button_mapping button_context_eq[]  = {
 
 /* Bookmark Screen */
 static const struct button_mapping button_context_bmark[]  = {
-    { ACTION_BMS_DELETE,    BUTTON_BOTTOMLEFT,                 BUTTON_NONE },
+    { ACTION_BMS_DELETE,    BUTTON_BOTTOMRIGHT,                 BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_BOOKMARKSCREEN),
 }; /* button_context_bmark */
