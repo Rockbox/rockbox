@@ -141,7 +141,6 @@ void lcd_init_device(void)
     
     /* LCD related pins:
      *  32 - LED above LCD
-     *  33 - ??
      *  34 - R2 for 18 bit output
      *  35 - Resolution (MO?)
      *  36 - LCD power (INI?)
@@ -153,10 +152,6 @@ void lcd_init_device(void)
     /*  32: output, non-inverted, no-irq, falling edge, no-chat, normal */
     dm320_set_io(32, false, false, false, false, false, 0x00);
     IO_GIO_BITCLR2 = 1; /* Turn the LED off */
-    
-    /*  33: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(33, false, false, false, false, false, 0x00);
-    /* To-do: figure out value from OF */
     
     /*  34: output, non-inverted, no-irq, falling edge, no-chat, R2 */
     dm320_set_io(34, false, false, false, false, false, 0x02);

@@ -199,6 +199,16 @@ void system_exception_wait(void)
 
 void system_init(void)
 {
+    /* Pin 33 is connected to a buzzer, for an annoying sound set 
+     *  PWM0C == 0x3264
+     *  PWM0H == 0x1932
+     *  Function to 1
+     *  Since this is not used in the FW, set it to a normal output at a zero
+     *  level. */
+    /*  33: output, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(33, false, false, false, false, false, 0x00);
+    IO_GIO_BITCLR2      = 1<<1;
+
     /* taken from linux/arch/arm/mach-itdm320-20/irq.c */
 
     /* Clearing all FIQs and IRQs. */
