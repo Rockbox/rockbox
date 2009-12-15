@@ -98,7 +98,7 @@ bool Autodetection::detect()
                     m_device = info.target();
                     // special case for video64mb. This is a workaround, and
                     // should get replaced when autodetection is reworked.
-                    if(m_device == "ipodvideo" || info.ram() == 64)
+                    if(m_device == "ipodvideo" && info.ram() == 64)
                     {
                         m_device = "ipodvideo64mb";
                     }
