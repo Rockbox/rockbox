@@ -35,10 +35,6 @@
 #define ATA_RESET_ENABLE  (IO_GIO_BITCLR0 = 1 << 10)
 #define ATA_RESET_DISABLE (IO_GIO_BITSET0 = 1 << 10)
 
-/* ATA_EN on C7C68300 */
-#define USB_ATA_ENABLE    (IO_GIO_BITSET0 = 1 << 2)
-#define USB_ATA_DISABLE   (IO_GIO_BITCLR0 = 1 << 2)
-
 void ata_reset(void)
 {
     ATA_RESET_ENABLE;
@@ -50,10 +46,8 @@ void ata_reset(void)
 /* This function is called before enabling the USB bus */
 void ata_enable(bool on)
 {
-    if(on)
-        USB_ATA_DISABLE;
-    else
-        USB_ATA_ENABLE;
+    (void) on;
+    return;
 }
 
 bool ata_is_coldstart(void)
@@ -64,7 +58,12 @@ bool ata_is_coldstart(void)
 void ata_device_init(void)
 {
     /* ATA reset */
+    /*  10: output, non-inverted, no-irq, falling edge, no-chat, normal */
+    dm320_set_io(10, false, false, false, false, false, 0x00);
     ATA_RESET_DISABLE; /* Set the pin to disable an active low reset */
-    IO_GIO_DIR0&=~(1<<10);
+    
+    /* ATA INT (currently unused) */
+    /*  11: input ,     inverted,    irq,     any edge, no-chat, normal */
+    dm320_set_io(11, true, true, true, true, false, 0x00);
 }
 
