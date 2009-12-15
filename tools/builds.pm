@@ -11,6 +11,7 @@ $releasenotes="/wiki/ReleaseNotes34";
         name => 'Archos FM Recorder',
         status => 3,
         ram => 2,
+        manual => "archosrecorderv2fm",
     },
     'archosondiofm' => {
         name => 'Archos Ondio FM',
@@ -36,6 +37,7 @@ $releasenotes="/wiki/ReleaseNotes34";
         name => 'Archos Recorder v2', 
         status => 3,
         ram => 2,
+        manual => "archosrecorderv2fm",
     },
     'cowond2' => {
         name => 'Cowon D2',
