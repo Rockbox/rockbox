@@ -47,7 +47,7 @@ the \setting{Show Files} setting to all.
     \begin{btnmap}{}{}
       \ActionStdPrev{}/\ActionStdNext{}
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdPrev{}/\ActionRCStdNext{}}
-         & Go to previous/next item in list. If you are on the first/last 
+         & Goes to previous/next item in list. If you are on the first/last 
            entry, the cursor will wrap to the last/first entry.\\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
@@ -56,17 +56,17 @@ the \setting{Show Files} setting to all.
            \opt{HAVEREMOTEKEYMAP}{&           
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCSource{}/ \ButtonRCBitrate}
          }
-          & Move one page up/down in the list.\\
+          & Moves one page up/down in the list.\\
         }
       \opt{IRIVER_H10_PAD}
         {
           \ButtonRew{}/ \ButtonFF
-          & Move one page up/down in the list.\\
+          & Moves one page up/down in the list.\\
         }
       %
       \ActionTreeParentDirectory
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeParentDirectory}
-      & Go to the parent directory.\\
+      & Goes to the parent directory.\\
       %
       \ActionTreeEnter
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeEnter}
@@ -87,11 +87,11 @@ the \setting{Show Files} setting to all.
       %
       \ActionStdContext{}
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdContext}
-      & Enter the \setting{Context Menu}\\
+      & Enters the \setting{Context Menu}\\
       %
       \ActionStdMenu{}
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdMenu}
-      & Enter the \setting{Main Menu}\\
+      & Enters the \setting{Main Menu}\\
       %
       \opt{quickscreen}{
         \ActionStdQuickScreen
@@ -203,15 +203,15 @@ can be easily changed by making a text file with the required layout.  More
       \ActionKbdLeft~/ \ActionKbdRight~/ \ActionKbdUp~/ \ActionKbdDown
       \opt{HAVEREMOTEKEYMAP}{
       &  \ActionRCKbdLeft~/ \ActionRCKbdRight~/ \ActionRCKbdUp~/ \ActionRCKbdDown}
-      & Move about the virtual keyboard (moves the solid cursor) \\
+      & Moves about the virtual keyboard (moves the solid cursor) \\
       %
       \ActionKbdPageFlip
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdPageFlip}
-      & Flip to the next page of characters (if there is more than one) \\
+      & Flips to the next page of characters (if there is more than one) \\
       %
       \ActionKbdCursorLeft{} / \ActionKbdCursorRight
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdCursorLeft{} / \ActionRCKbdCursorRight}
-      & Move the line cursor within the text line \\
+      & Moves the line cursor within the text line \\
       %
       \ActionKbdSelect
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdSelect}
@@ -252,7 +252,7 @@ can be easily changed by making a text file with the required layout.  More
     \begin{btnmap}{}{}
       \ActionKbdUp/\ActionKbdDown 
         \opt{HAVEREMOTEKEYMAP}{& }
-        & Move about the virtual keyboard.
+        & Moves about the virtual keyboard.
       If you move out of the picker area, you get to the \emph{Line edit mode}. \\
       \ActionKbdLeft/\ActionKbdRight 
         \opt{HAVEREMOTEKEYMAP}{& }
@@ -296,7 +296,7 @@ can be easily changed by making a text file with the required layout.  More
     \begin{table}
     \begin{btnmap}{Picker area}{}
       \ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight
-        & Move about the virtual keyboard (moves the solid cursor).
+        & Moves about the virtual keyboard (moves the solid cursor).
           If you move out of the picker area with \ButtonUp/\ButtonDown,
           you get to the line edit mode. \\
       \ButtonMenu 
@@ -304,12 +304,12 @@ can be easily changed by making a text file with the required layout.  More
       Long \ButtonMenu 
        & Accepts the change and returns to the File Browser.\\
       \ButtonOff 
-       & Quit the virtual keyboard without saving the changes.\\
+       & Quits the virtual keyboard without saving the changes.\\
     \end{btnmap}
   \end{table}
   \begin{table}
     \begin{btnmap}{Line edit mode}{}
-      \ButtonLeft/\ButtonRight & Move left and right\\
+      \ButtonLeft/\ButtonRight & Moves left and right\\
       \ButtonMenu & Deletes the letter to the left of the cursor\\
       Long \ButtonMenu & Accepts the deletion\\
       \ButtonUp/\ButtonDown & Returns to the picker area\\
@@ -323,7 +323,7 @@ can be easily changed by making a text file with the required layout.  More
   selection bar, as in the screenshot above.
   \begin{table}
      \begin{btnmap}{}{}
-       \ButtonOn & Toggle picker- and line edit mode\\
+       \ButtonOn & Toggles picker- and line edit mode\\
        \ButtonLeft/\ButtonRight &  moves back and forth in the selected \\
                                 & line (picker of input line) \\
        \ButtonPlay & Picks character in character bar, or acts as backspace \\

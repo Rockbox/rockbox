@@ -63,41 +63,41 @@ your WPS (While Playing Screen).
       %
       \ActionWpsSkipPrev
        \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsSkipPrev}
-      & Go to beginning of track, or if pressed while in the
-        first seconds of a track, go to previous track.\\
+      & Goes to beginning of track, or if pressed while in the
+        first seconds of a track, goes to previous track.\\
       %
       \ActionWpsSeekBack
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsSeekBack}
-      & Rewind in track.\\
+      & Rewinds in track.\\
       %
       \ActionWpsSkipNext
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsSkipNext}
-      & Go to next track.\\
+      & Goes to next track.\\
       %
       \ActionWpsSeekFwd
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsSeekFwd}
-      & Fast forward in track.\\
+      & Fast forwards in track.\\
       %
       \ActionWpsPlay
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsPlay}
-      & Toggle play/pause.\\
+      & Toggles play/pause.\\
       %
       \ActionWpsStop 
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsStop}
-      & Stop playback.\\
+      & Stops playback.\\
       %
       \ActionWpsBrowse
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsBrowse}
-      & Return to the \setting{File Browser}.\\
+      & Returns to the \setting{File Browser}.\\
       %
       \ActionWpsContext
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsContext}
-      & Enter \setting{WPS Context Menu}.\\
+      & Enters \setting{WPS Context Menu}.\\
       %
       \opt{ONDIO_PAD}{\ActionWpsContext{} twice}%
       \nopt{ONDIO_PAD}{\ActionWpsMenu}%
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsMenu}
-      & Enter \setting{Main Menu}%
+      & Enters \setting{Main Menu}%
       \opt{ONDIO_PAD}{ via the \setting{WPS Context Menu}}.\\%
       %
       \opt{quickscreen}{%
@@ -128,13 +128,13 @@ your WPS (While Playing Screen).
 	           ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
         \ActionWpsPitchScreen
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsPitchScreen}
-         & Show \setting{Pitch Screen} (see \reference{sec:pitchscreen}).\\%
+         & Shows \setting{Pitch Screen} (see \reference{sec:pitchscreen}).\\%
       }%
       \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD%
           ,MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
         \ActionWpsIdThreeScreen 
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsIdThreeScreen}
-          & Enter \setting{ID3 Viewer}.\\%
+          & Enters \setting{ID3 Viewer}.\\%
       }%
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
           ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
@@ -145,7 +145,7 @@ your WPS (While Playing Screen).
         &
           \opt{IRIVER_RC_H100_PAD}{\ActionRCWpsAbSetBNextDir{} or}
         Short \ActionRCWpsSkipNext{} + Long \ActionRCWpsSkipNext}
-      & Skip to the next directory.\\
+      & Skips to the next directory.\\
       %
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD%
          ,MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
@@ -155,7 +155,7 @@ your WPS (While Playing Screen).
         &
           \opt{IRIVER_RC_H100_PAD}{\ActionRCWpsAbSetAPrevDir{} or}
         Short \ActionRCWpsSkipPrev{} + Long \ActionRCWpsSkipPrev}
-      & Skip to the previous directory.\\
+      & Skips to the previous directory.\\
       %
       \opt{SANSA_E200_PAD,SANSA_C200_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
         \ActionStdRec
@@ -309,24 +309,24 @@ Delete the currently playing file.
     \begin{table}
       \begin{btnmap}{}{}
         \ActionPsToggleMode
-        & Toggle pitch changing mode \\
+        & Toggles pitch changing mode \\
         %
         \ActionPsIncSmall{} / \ActionPsDecSmall
-        & Increase / Decrease pitch by 0.1\% (in procentual mode) or by 0.1
+        & Increases / Decreases pitch by 0.1\% (in procentual mode) or by 0.1
           semitone (in semitone mode)\\
         %
         \ActionPsIncBig{} / \ActionPsDecBig
-        & Increase / Decrease pitch by 1\% (in procentual mode) or a semitone
+        & Increases / Decreases pitch by 1\% (in procentual mode) or a semitone
           (in semitone mode)\\
         %
         \ActionPsNudgeLeft{} / \ActionPsNudgeRight
-        & Temporarily change pitch by 2\% (beatmatch) \\
+        & Temporarily changes pitch by 2\% (beatmatch) \\
         %
         \ActionPsReset
-        & Reset rate to 100\% \\
+        & Resets rate to 100\% \\
         %
         \ActionPsExit
-        & Leave the Pitch Screen \\
+        & Leaves the Pitch Screen \\
         %
       \end{btnmap}
     \end{table}
@@ -339,29 +339,29 @@ Delete the currently playing file.
       \begin{btnmap}{}{}
         \ActionPsToggleMode
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsToggleMode}
-        & Toggle pitch changing mode (cycles through all available modes)\\
+        & Toggles pitch changing mode (cycles through all available modes)\\
         %
         \ActionPsIncSmall{} / \ActionPsDecSmall
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsIncSmall{} / \ActionRCPsDecSmall}
-        & Increase / Decrease pitch by 0.1\% (in procentual mode) or 0.1
+        & Increases / Decreases pitch by 0.1\% (in procentual mode) or 0.1
           semitone (in semitone mode)\\
         %
         \ActionPsIncBig{} / \ActionPsDecBig
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsIncBig{} / \ActionRCPsDecBig}
-        & Increase / Decrease pitch by 1\% (in procentual mode) or a semitone
+        & Increases / Decreases pitch by 1\% (in procentual mode) or a semitone
           (in semitone mode)\\
         %
         \ActionPsNudgeLeft{} / \ActionPsNudgeRight
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsNudgeLeft{} / \ActionPsNudgeRight}
-        & Temporarily change pitch by 2\% (beatmatch), or modify speed (in timestretch mode) \\
+        & Temporarily changes pitch by 2\% (beatmatch), or modify speed (in timestretch mode) \\
         %
         \ActionPsReset
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsReset}
-        & Reset pitch and speed to 100\% \\
+        & Resets pitch and speed to 100\% \\
         %
         \ActionPsExit
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsExit}
-        & Leave the Pitch Screen \\
+        & Leaves the Pitch Screen \\
         %
       \end{btnmap}
     \end{table}
