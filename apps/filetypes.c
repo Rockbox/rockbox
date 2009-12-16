@@ -505,7 +505,7 @@ int filetype_list_viewers(const char* current_file)
     simplelist_info_init(&info, str(LANG_ONPLAY_OPEN_WITH), count, &data);
     info.action_callback = openwith_action_callback;
     info.get_name = openwith_get_name;
-    info.get_icon = openwith_get_icon;
+    info.get_icon = global_settings.show_icons?openwith_get_icon:NULL;
     return simplelist_show_list(&info);
 }
 

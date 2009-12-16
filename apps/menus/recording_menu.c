@@ -527,7 +527,7 @@ int rectrigger(void)
     }
     gui_synclist_init(&lists, trigger_get_name, settings, false, 2, vp);
     gui_synclist_set_nb_items(&lists, TRIG_OPTION_COUNT*2);
-    gui_synclist_set_icon_callback(&lists, trigger_get_icon);
+    gui_synclist_set_icon_callback(&lists, global_settings.show_icons?trigger_get_icon:NULL);
     /* restart trigger with new values */
     settings_apply_trigger();
     peak_meter_trigger (global_settings.rec_trigger_mode != TRIG_MODE_OFF);

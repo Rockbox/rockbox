@@ -173,8 +173,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 
     /* setup icon placement */
     list_icons = *list_text_vp;
-    int icon_count = global_settings.show_icons &&
-            (list->callback_get_item_icon != NULL) ? 1 : 0;
+    int icon_count = (list->callback_get_item_icon != NULL) ? 1 : 0;
     if (show_cursor)
         icon_count++;
     if (icon_count)

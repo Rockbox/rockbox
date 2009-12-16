@@ -295,7 +295,8 @@ void tree_gui_init(void)
 #endif
     gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1, NULL);
     gui_synclist_set_voice_callback(&tree_lists, tree_voice_cb);
-    gui_synclist_set_icon_callback(&tree_lists, &tree_get_fileicon);
+    gui_synclist_set_icon_callback(&tree_lists,
+                                    global_settings.show_icons?&tree_get_fileicon:NULL);
 #ifdef HAVE_LCD_COLOR
     gui_synclist_set_color_callback(&tree_lists, &tree_get_filecolor);
 #endif
@@ -456,7 +457,8 @@ static int update_dir(void)
     }
     
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
-    gui_synclist_set_icon_callback(&tree_lists, tree_get_fileicon);
+    gui_synclist_set_icon_callback(&tree_lists,
+                                   global_settings.show_icons?tree_get_fileicon:NULL);
     if( tc.selected_item >= tc.filesindir)
         tc.selected_item=tc.filesindir-1;
 

@@ -458,8 +458,6 @@ enum tidy_return tidy_lcd_menu(void)
             {
                 bool show_icons = rb->global_settings->show_icons;
                 struct simplelist_info list;
-                /* force the icons so its readable */
-                rb->global_settings->show_icons = true;
                 rb->simplelist_info_init(&list, "Files to Clean",
                                          tidy_type_count, NULL);
                 list.get_icon = get_icon;

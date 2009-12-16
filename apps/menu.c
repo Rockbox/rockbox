@@ -209,7 +209,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     else
         icon = menu->callback_and_desc->icon_id;
     gui_synclist_set_title(lists, P2STR(menu->callback_and_desc->desc), icon);
-    gui_synclist_set_icon_callback(lists, menu_get_icon);
+    gui_synclist_set_icon_callback(lists, global_settings.show_icons?menu_get_icon:NULL);
 #else
     (void)icon;
     gui_synclist_set_icon_callback(lists, NULL);
