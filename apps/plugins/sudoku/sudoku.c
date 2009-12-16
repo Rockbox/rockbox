@@ -283,6 +283,10 @@ static unsigned int cellypos[9]={
 #define YOFS ((LCD_HEIGHT-BOARD_HEIGHT)/2)
 #endif
 
+#define BLOCK        3
+#define SIZE         (BLOCK*BLOCK)
+
+#if 0
 /****** Solver routine by Tom Shackell <shackell@cs.york.ac.uk>
 
 Downloaded from:
@@ -294,9 +298,6 @@ Released under GPLv2
 */
 
 typedef unsigned int  Bitset;
-
-#define BLOCK        3
-#define SIZE         (BLOCK*BLOCK)
 
 #define true  1
 #define false 0
@@ -564,6 +565,18 @@ void sudoku_solve(struct sudoku_state_t* state)
             }
         }
     } else {
+        rb->splash(HZ*2, "Solve failed");
+    }
+
+    return;
+}
+#endif /* 0 */
+
+void sudoku_solve(struct sudoku_state_t* state)
+{
+    bool ret = sudoku_solve_board(state);
+
+    if (!ret) {
         rb->splash(HZ*2, "Solve failed");
     }
 

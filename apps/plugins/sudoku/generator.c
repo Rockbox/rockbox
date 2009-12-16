@@ -1153,3 +1153,34 @@ bool sudoku_generate_board(struct sudoku_state_t* state, char** difficulty)
     *difficulty = classify( );
     return true;
 }
+
+bool sudoku_solve_board(struct sudoku_state_t* state)
+{
+    bool ret;
+    int r,c,i;
+
+    reset( );
+    i=0;
+    for (r=0;r<9;r++) {
+        for (c=0;c<9;c++) {
+            if( state->startboard[r][c]!='0' )
+            {
+                fill( i, state->startboard[r][c] - '0' );
+            }
+            i++;
+        }
+    }
+
+    ret = ( 0 == solve( ) && 81 == idx_history );
+
+    if (ret) {
+        i=0;
+        for (r=0;r<9;r++) {
+            for (c=0;c<9;c++) {
+                state->currentboard[r][c]='0'+GET_DIGIT( board[ i ] );
+                i++;
+            }
+        }
+    }
+    return ret;
+}
