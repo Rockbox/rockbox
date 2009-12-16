@@ -15,7 +15,11 @@ settings_dumper.c
 snow.c
 sort.c
 stats.c
+#ifdef HAVE_TOUCHSCREEN
+stopwatch.lua
+#else
 stopwatch.c
+#endif
 theme_remove.c
 vbrfix.c
 viewer.c
