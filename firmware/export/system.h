@@ -205,7 +205,7 @@ int get_cpu_boost_counter(void);
 #define UNLIKELY(x) (x)
 #endif
 
-/* returns index of first set bit + 1 or 0 if no bits are set */
+/* returns index of first set bit or 32 if no bits are set */
 int find_first_set_bit(uint32_t val);
 
 static inline __attribute__((always_inline))

@@ -57,7 +57,8 @@ find_first_set_bit:
     | now lookup in table indexed on top 6 bits of %d0
     moveq.l #26, %d0             | %d0 = final shift count
     lsr.l   %d0, %d1             |
-    clr.l   %d0                  |
+
+    | the top 24 bits of d0 are 0 so just load the value over it
     move.b  (%a0, %d1.l), %d0    |
     rts                          |
 
