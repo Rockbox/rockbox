@@ -782,6 +782,9 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                 int write_delay = 125;
                 while(write_delay--);
             }
+#else
+            int write_delay = 125;
+            while(write_delay--);
 #endif
         }
         else
