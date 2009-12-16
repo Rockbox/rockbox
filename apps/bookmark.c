@@ -765,16 +765,14 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
             if (item >= 0)
             {                
                 const char *lines[]={
-                    ID2P(LANG_REALLY_DELETE),
-                    bookmark_file_name
+                    ID2P(LANG_REALLY_DELETE)
                 };
                 const char *yes_lines[]={
-                    ID2P(LANG_DELETING),
-                    bookmark_file_name
+                    ID2P(LANG_DELETING)
                 };
 
-                const struct text_message message={lines, 2};
-                const struct text_message yes_message={yes_lines, 2};
+                const struct text_message message={lines, 1};
+                const struct text_message yes_message={yes_lines, 1};
 
                 if(gui_syncyesno_run(&message, &yes_message, NULL)==YESNO_YES)
                 {                    
