@@ -79,6 +79,12 @@ The main menu consists of the following:
     \item[Save]
         Saves the current file. If it has not been saved before,
         you will be given a chance to name it and choose the saving location.
+    \item[Set Width]
+        Allows you to change the width of the image.
+        Border to indicate the width will be shown but it doesn't affect drawing.
+    \item[Set Height]
+        Allows you to change the height of the image.
+        Border to indicate the height will be shown but it doesn't affect drawing.
     \item[Brush speed]
         Changes the speed at which the selection cursor
         moves when you hold down a movement button.
@@ -98,9 +104,9 @@ The main menu consists of the following:
 if you select Exit, so any unsaved changes will be lost.}
 
 \begin{table}
-\begin{btnmap}{}{}
+  \begin{btnmap}{}{}
     \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{
-        \nopt{IRIVER_H300_PAD,GIGABEAT_S_PAD,SANSA_FUZE_PAD,COWON_D2_PAD}
+        \nopt{IRIVER_H300_PAD,GIGABEAT_S_PAD,SANSA_FUZE_PAD}
             {\ButtonPower}
         \opt{IRIVER_H300_PAD}{\ButtonOff}
         \opt{GIGABEAT_S_PAD}{\ButtonBack}
@@ -109,33 +115,15 @@ if you select Exit, so any unsaved changes will be lost.}
         & Quits Rockpaint immediately.\\
     }
 
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H300_PAD,GIGABEAT_S_PAD%
-        ,SANSA_FUZE_PAD}{\ButtonLeft}
-    \opt{COWON_D2_PAD}{\TouchMidLeft}
-      \opt{HAVEREMOTEKEYMAP}{& }
-    & Moves the cursor to the left.\\
-
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H300_PAD,GIGABEAT_S_PAD%
-        ,SANSA_FUZE_PAD}{\ButtonRight}
-    \opt{COWON_D2_PAD}{\TouchMidRight}
-      \opt{HAVEREMOTEKEYMAP}{& }
-    & Moves the cursor to the right.\\
-
+    \nopt{COWON_D2_PAD}{\ButtonLeft{} / \ButtonRight{} /}
+    \opt{COWON_D2_PAD}{\TouchMidLeft{} / \TouchMidRight{} /}
     \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H10_PAD,COWON_D2_PAD}
-        {\ButtonUp}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu}
-    \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
-    \opt{COWON_D2_PAD}{\TouchTopMiddle}
+        {\ButtonUp{} / \ButtonDown}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu{} / \ButtonPlay}
+    \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
+    \opt{COWON_D2_PAD}{\TouchTopMiddle{} / \TouchBottomMiddle}
       \opt{HAVEREMOTEKEYMAP}{& }
-    & Moves the cursor up.\\
-
-    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H10_PAD,COWON_D2_PAD}
-        {\ButtonDown}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonPlay}
-    \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
-    \opt{COWON_D2_PAD}{\TouchBottomMiddle}
-      \opt{HAVEREMOTEKEYMAP}{& }
-    & Moves the cursor down.\\
+    & Moves the cursor around.\\
 
     \opt{IRIVER_H300_PAD}{\ButtonOn}%
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonSelect+\ButtonMenu}%
@@ -163,5 +151,5 @@ if you select Exit, so any unsaved changes will be lost.}
       \opt{HAVEREMOTEKEYMAP}{& }
     & Toggles the brush and selects objects.\\
 
-    \end{btnmap}
+  \end{btnmap}
 \end{table}
