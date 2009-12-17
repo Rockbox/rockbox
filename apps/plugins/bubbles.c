@@ -90,7 +90,7 @@ enum {
 #define BUBBLES_FIRE        PLA_FIRE
 
 /* external bitmaps */
-#ifdef HAVE_LCD_COLOR 
+#ifdef HAVE_LCD_COLOR
 #include "pluginbitmaps/bubbles_background.h"
 #endif
 #include "pluginbitmaps/bubbles_bubble.h"
@@ -1433,8 +1433,8 @@ static void bubbles_drawboard(struct game_context* bb) {
         for(j=0; j<colmax; j++) {
             if(bb->playboard[i][j].type >= 0 && !bb->playboard[i][j].delete) {
                 rb->lcd_bitmap_part(bubbles_emblem,
-                  0, EMBLEM_HEIGHT*bb->playboard[i][j].type, 
-                  STRIDE(   SCREEN_MAIN, 
+                  0, EMBLEM_HEIGHT*bb->playboard[i][j].type,
+                  STRIDE(   SCREEN_MAIN,
                             BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
                   XOFS+indent+BUBBLE_WIDTH*j+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                   YOFS+ROW_HEIGHT*i+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2+bb->compress*ROW_HEIGHT,
@@ -1451,8 +1451,8 @@ static void bubbles_drawboard(struct game_context* bb) {
 
     /* display bubble to be shot */
     rb->lcd_bitmap_part(bubbles_emblem,
-               0, EMBLEM_HEIGHT*bb->queue[bb->nextinq], 
-               STRIDE(  SCREEN_MAIN, 
+               0, EMBLEM_HEIGHT*bb->queue[bb->nextinq],
+               STRIDE(  SCREEN_MAIN,
                         BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
                SHOTX+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                SHOTY+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2,
@@ -1466,8 +1466,8 @@ static void bubbles_drawboard(struct game_context* bb) {
     /* display next bubble to be shot */
 #ifndef NEXT_BB_X
     rb->lcd_bitmap_part(bubbles_emblem,
-               0, EMBLEM_HEIGHT*bb->queue[(bb->nextinq+1)%NUM_QUEUE], 
-               STRIDE(  SCREEN_MAIN, 
+               0, EMBLEM_HEIGHT*bb->queue[(bb->nextinq+1)%NUM_QUEUE],
+               STRIDE(  SCREEN_MAIN,
                         BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
                XOFS/2-BUBBLE_WIDTH/2+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                SHOTY+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2,
@@ -1479,8 +1479,8 @@ static void bubbles_drawboard(struct game_context* bb) {
     rb->lcd_set_drawmode(DRMODE_SOLID);
 #else
     rb->lcd_bitmap_part(bubbles_emblem,
-               0, EMBLEM_HEIGHT*bb->queue[(bb->nextinq+1)%NUM_QUEUE], 
-               STRIDE(  SCREEN_MAIN, 
+               0, EMBLEM_HEIGHT*bb->queue[(bb->nextinq+1)%NUM_QUEUE],
+               STRIDE(  SCREEN_MAIN,
                         BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
                NEXT_BB_X + NEXT_BB_WIDTH/2-BUBBLE_WIDTH/2+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                NEXT_BB_Y + (BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2 + h,
@@ -1543,7 +1543,7 @@ static void bubbles_drawboard(struct game_context* bb) {
 #else
     rb->lcd_putsxy(NEXT_BB_X+(NEXT_BB_WIDTH/2-w1/2), NEXT_BB_Y, next);
 #endif
-    
+
 
     if(bb->elapsedshot >= (MAX_SHOTTIME*7)/10) {
         rb->lcd_getstringsize(hurry, &w1, &h);
@@ -1603,9 +1603,9 @@ static int bubbles_fire(struct game_context* bb) {
 
         /* display shot */
         bubbles_drawboard(bb);
-        rb->lcd_bitmap_part(bubbles_emblem, 0, EMBLEM_HEIGHT*bubblecur, 
-                       STRIDE(  SCREEN_MAIN, 
-                                BMPWIDTH_bubbles_emblem, 
+        rb->lcd_bitmap_part(bubbles_emblem, 0, EMBLEM_HEIGHT*bubblecur,
+                       STRIDE(  SCREEN_MAIN,
+                                BMPWIDTH_bubbles_emblem,
                                 BMPHEIGHT_bubbles_emblem),
                        SHOTX+tempxofs+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                        SHOTY+tempyofs+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2,
@@ -2068,9 +2068,9 @@ static int bubbles_fall(struct game_context* bb) {
                         onscreen = true;
 
                         rb->lcd_bitmap_part(bubbles_emblem, 0,
-                                EMBLEM_HEIGHT*bb->playboard[i][j].type, 
-                                STRIDE( SCREEN_MAIN, 
-                                        BMPWIDTH_bubbles_emblem, 
+                                EMBLEM_HEIGHT*bb->playboard[i][j].type,
+                                STRIDE( SCREEN_MAIN,
+                                        BMPWIDTH_bubbles_emblem,
                                         BMPHEIGHT_bubbles_emblem),
                                 XOFS+indent+BUBBLE_WIDTH*j+
                                     (BUBBLE_WIDTH-EMBLEM_WIDTH)/2+xofs,
@@ -2365,15 +2365,24 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     return BB_NONE;
 }
 
+static int bubbles_menu_cb(int action, const struct menu_item_ex *this_item)
+{
+    int i = ((intptr_t)this_item);
+    if(action == ACTION_REQUEST_MENUITEM
+       && !resume && (i==0 || i==5))
+        return ACTION_EXIT_MENUITEM;
+    return action;
+}
+
 /*****************************************************************************
 * bubbles_menu() is the initial menu at the start of the game.
 ******************************************************************************/
 static int bubbles_menu(struct game_context* bb) {
     static unsigned int startlevel = 0;
-    int selected = resume?0:1;
+    int selected = 0;
     bool startgame = false;
 
-    MENUITEM_STRINGLIST(menu,"Bubbles Menu",NULL,
+    MENUITEM_STRINGLIST(menu,"Bubbles Menu",bubbles_menu_cb,
                         "Resume Game", "Start New Game",
                         "Level", "High Scores", "Playback Control",
                         "Quit without Saving", "Quit");
@@ -2382,10 +2391,7 @@ static int bubbles_menu(struct game_context* bb) {
         switch (rb->do_menu(&menu, &selected, NULL, false))
         {
             case 0: /* resume game */
-                if (!resume)
-                    rb->splash(HZ/2, "Nothing to resume");
-                else
-                    startgame = true;
+                startgame = true;
                 if(resume_file)
                     rb->remove(SAVE_FILE);
                 resume_file = false;
@@ -2411,7 +2417,10 @@ static int bubbles_menu(struct game_context* bb) {
             case 5: /* quit but don't save */
                 return BB_QUIT_WITHOUT_SAVING;
             case 6: /* save and quit  */
-                return BB_QUIT;
+                if (resume)
+                    return BB_QUIT;
+                else
+                    return BB_QUIT_WITHOUT_SAVING;
             case MENU_ATTACHED_USB:
                 bubbles_callback(bb);
                 return BB_USB;
@@ -2528,14 +2537,8 @@ enum plugin_status plugin_start(const void* parameter) {
                 break;
 
             case BB_QUIT:
-#define SAVE_MESSAGE "Saving Game and Scores..."
-                /* the first splash is to make sure it's read, but don't make it
-                 * too long to not delay the saving further */
-                rb->splash(HZ/5, SAVE_MESSAGE);
-                rb->splash(0, SAVE_MESSAGE);
+                rb->splash(HZ*1, "Saving game ...");
                 bubbles_savegame(&bb);
-                bubbles_savedata();
-                highscore_save(SCORE_FILE, highscores, NUM_SCORES);
                 /* fall through */
 
             case BB_QUIT_WITHOUT_SAVING:
@@ -2546,7 +2549,8 @@ enum plugin_status plugin_start(const void* parameter) {
                 break;
         }
     }
-
+    bubbles_savedata();
+    highscore_save(SCORE_FILE, highscores, NUM_SCORES);
     rb->lcd_setfont(FONT_UI);
     return ret;
 }
