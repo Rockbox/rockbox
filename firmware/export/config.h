@@ -559,9 +559,14 @@ Lyre prototype 1 */
 #endif
 
 /* deactivate fading in bootloader */
-#if defined(BOOTLOADER)
+#ifdef BOOTLOADER
 #undef CONFIG_BACKLIGHT_FADING
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_NO_FADING
+#endif
+
+#ifdef SIMULATOR
+#undef CONFIG_BACKLIGHT_FADING
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
 #endif
 
 /* determine which setting/manual text to use */
