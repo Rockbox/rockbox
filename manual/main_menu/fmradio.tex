@@ -43,12 +43,12 @@
       \begin{btnmap}{}{}
           \ActionFMPrev, \ActionFMNext
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMPrev, \ActionRCFMNext}
-          & Changes frequency in \setting{SCAN} mode or jumps to next/previous
-          station in \setting{PRESET} mode\\
+          & Change frequency in \setting{SCAN} mode or jump to next/previous
+          station in \setting{PRESET} mode.\\
           %
           Long \ActionFMPrev, Long \ActionFMNext
           \opt{HAVEREMOTEKEYMAP}{& Long \ActionRCFMPrev, Long \ActionRCFMNext}
-          & Seeks to next station in \setting{SCAN} mode.\\
+          & Seek to next station in \setting{SCAN} mode.\\
           %
           \ActionFMSettingsInc, \ActionFMSettingsDec
           \opt{HAVEREMOTEKEYMAP}{
@@ -56,40 +56,40 @@
               \opt{IRIVER_RC_H100_PAD}{\ActionRCFMVolUp, \ActionRCFMVolDown}%
               \nopt{IRIVER_RC_H100_PAD}{\ActionRCFMSettingsInc, \ActionRCFMSettingsDec}%
           }
-          & Changes volume.\\
+          & Change volume.\\
           \opt{RECORDER_PAD}{
             \ButtonPlay
-            & Freezes all screen updates. May enhance radio reception in some
+            & Freeze all screen updates. May enhance radio reception in some
               cases.\\
           }
 
           %
           \ActionFMExit
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMExit}
-          & Leaves the radio screen with the radio playing.\\
+          & Leave the radio screen with the radio playing.\\
           %
           \ActionFMStop
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMStop}
-          & Stops the radio and returns to \setting{Main Menu}.\\%
+          & Stop the radio and returns to \setting{Main Menu}.\\%
           %
           \nopt{ONDIO_PAD}{%
             \nopt{RECORDER_PAD}{\ActionFMPlay
               \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMPlay}
-              & Mutes radio playback.\\}%
+              & Mute radio playback.\\}%
             %
             \ActionFMMode
             \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMMode}
-            & Switches between \setting{SCAN} and \setting{PRESET} mode.\\
+            & Switche between \setting{SCAN} and \setting{PRESET} mode.\\
             %
             \ActionFMPreset
             \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMPreset}
-            & Opens a list of radio presets. You can view all the presets that 
+            & Open a list of radio presets. You can view all the presets that 
               you have, and switch to the station.\\
           }%
           %
           \ActionFMMenu
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMMenu}
-          & Displays the FM radio settings menu.\\
+          & Display the FM radio settings menu.\\
        \end{btnmap}
     \end{table}
 

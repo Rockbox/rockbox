@@ -47,7 +47,7 @@ the \setting{Show Files} setting to all.
     \begin{btnmap}{}{}
       \ActionStdPrev{}/\ActionStdNext{}
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdPrev{}/\ActionRCStdNext{}}
-         & Goes to previous/next item in list. If you are on the first/last 
+         & Go to previous/next item in list. If you are on the first/last 
            entry, the cursor will wrap to the last/first entry.\\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
@@ -56,38 +56,38 @@ the \setting{Show Files} setting to all.
           \opt{HAVEREMOTEKEYMAP}{&
             \opt{IRIVER_RC_H100_PAD}{\ButtonRCSource{}/ \ButtonRCBitrate}
           }
-          & Moves one page up/down in the list.\\
+          & Move one page up/down in the list.\\
         }
       \opt{IRIVER_H10_PAD}
         {
           \ButtonRew{}/ \ButtonFF
-          & Moves one page up/down in the list.\\
+          & Move one page up/down in the list.\\
         }
       %
       \ActionTreeParentDirectory
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeParentDirectory}
-      & Goes to the parent directory.\\
+      & Go to the parent directory.\\
       %
       \ActionTreeEnter
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeEnter}
-      & Executes the default action on the selected file or enters a
+      & Execute the default action on the selected file or enter a
         directory.\\
       %
       \ActionTreeWps 
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeWps}
-         & If there is an audio file playing, returns to the
+         & If there is an audio file playing, return to the
          \setting{While Playing Screen} (WPS) without stopping playback.\\
       %
       \nopt{player,c200}%
         {%
           \ActionTreeStop 
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeStop}
-          & Stops audio playback.\\%
+          & Stop audio playback.\\%
         }%
       %
       \ActionStdContext{}
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdContext}
-      & Enters the \setting{Context Menu}\\
+      & Enter the \setting{Context Menu}\\
       %
       \ActionStdMenu{}
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdMenu}
@@ -96,16 +96,16 @@ the \setting{Show Files} setting to all.
       \opt{quickscreen}{
         \ActionStdQuickScreen
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdQuickScreen}
-        & Switches to the \setting{Quick Screen}
+        & Switch to the \setting{Quick Screen}
         (see \reference{ref:QuickScreen}) \\
       }
       \opt{RECORDER_PAD}{
-        \ButtonFThree & Switches to the Display Quick Screen \\ 
+        \ButtonFThree & Switch to the \setting{Quick Screen}.\\ 
         %
       }
       %
       \opt{SANSA_E200_PAD}{
-        \ActionStdRec & Switches to the Recording screen \\
+        \ActionStdRec & Switch to the \setting{Recording Screen}.\\
       %
       }
     \end{btnmap}
@@ -212,38 +212,38 @@ example when renaming a file or creating a new directory.
       \ActionKbdLeft{} / \ActionKbdRight{} / \ActionKbdUp{} / \ActionKbdDown
       \opt{HAVEREMOTEKEYMAP}{
       & \ActionRCKbdLeft{} / \ActionRCKbdRight{} / \ActionRCKbdUp{} / \ActionRCKbdDown}
-      & Moves the cursor on the virtual keyboard. \\
+      & Move the cursor on the virtual keyboard. \\
       %
       \ActionKbdPageFlip
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdPageFlip}
-      & Flips to the next page of characters (if there is more than one) \\
+      & Flip to the next page of characters (if there is more than one). \\
       %
       \ActionKbdCursorLeft{} / \ActionKbdCursorRight
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdCursorLeft{} / \ActionRCKbdCursorRight}
-      & Moves the line cursor within the text line \\
+      & Move the line cursor within the text line. \\
       %
       \ActionKbdSelect
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdSelect}
-      & Inserts the selected keyboard letter at the current line cursor position \\
+      & Insert the selected keyboard letter at the current line cursor position. \\
       %
       \ActionKbdBackSpace
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdBackSpace}
-      & Deletes the character before the line cursor \\
+      & Delete the character before the line cursor. \\
       %
       \ActionKbdDone
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdDone}
-      & Exits the virtual keyboard and saves any changes \\
+      & Exit the virtual keyboard and saves any changes. \\
       %
       \ActionKbdAbort
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdAbort}
-      & Exits the virtual keyboard without saving any changes \\
+      & Exit the virtual keyboard without saving any changes. \\
       %
       \opt{morse_input}{
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
             ,MROBE100_PAD,SANSA_E200_PAD}{
           \ActionKbdMorseInput
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdMorseInput}
-          & Toggles keyboard input mode and Morse code input mode. \\
+          & Toggle keyboard input mode and Morse code input mode. \\
         }
         %
         \ActionKbdMorseSelect
@@ -260,32 +260,32 @@ example when renaming a file or creating a new directory.
     \begin{btnmap}{}{}
       \ActionKbdLeft{} / \ActionKbdRight
       \opt{HAVEREMOTEKEYMAP}{& }
-      & Moves the cursor on the virtual keyboard.
+      & Move the cursor on the virtual keyboard.
         If you move out of the picker area, you get the previous/next page of
         characters (if there is more than one). \\
       %
       \ActionKbdUp{} / \ActionKbdDown
       \opt{HAVEREMOTEKEYMAP}{& }
-      & Moves the cursor on the virtual keyboard.
+      & Move the cursor on the virtual keyboard.
         If you move out of the picker area you get to the line edit mode. \\
       %
       \ActionKbdSelect
       \opt{HAVEREMOTEKEYMAP}{& }
-      & Inserts the selected keyboard letter at the current line cursor position \\
+      & Insert the selected keyboard letter at the current line cursor position. \\
       %
       \ActionKbdDone
       \opt{HAVEREMOTEKEYMAP}{& }
-      & Exits the virtual keyboard and saves any changes \\
+      & Exit the virtual keyboard and save any changes. \\
       %
       \ActionKbdAbort
       \opt{HAVEREMOTEKEYMAP}{& }
-      & Exits the virtual keyboard without saving any changes \\
+      & Exit the virtual keyboard without saving any changes. \\
       %
       \opt{morse_input}{
         \opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}{
           \ActionKbdMorseInput
           \opt{HAVEREMOTEKEYMAP}{& }
-          & Toggles keyboard input mode and Morse code input mode. \\
+          & Toggle keyboard input mode and Morse code input mode. \\
         }
         %
         \ActionKbdMorseSelect
@@ -301,15 +301,15 @@ example when renaming a file or creating a new directory.
     \begin{btnmap}{}{}
       \ActionKbdLeft{} / \ActionKbdRight
       \opt{HAVEREMOTEKEYMAP}{& }
-      & Moves the line cursor within the text line \\
+      & Move the line cursor within the text line. \\
       %
       \ActionKbdSelect
       \opt{HAVEREMOTEKEYMAP}{& }
-      & Deletes the character before the line cursor \\
+      & Delete the character before the line cursor. \\
       %
       \ActionKbdUp{} / \ActionKbdDown
       \opt{HAVEREMOTEKEYMAP}{& }
-      & Returns to the picker area \\
+      & Return to the picker area. \\
       %
     \end{btnmap}
   \end{table}
@@ -320,14 +320,14 @@ example when renaming a file or creating a new directory.
   selection bar, as in the screenshot above.
   \begin{table}
     \begin{btnmap}{}{}
-      \ButtonOn & Toggles picker- and line edit mode \\
+      \ButtonOn & Toggle picker- and line edit mode. \\
       \ButtonLeft{} / \ButtonRight
-        & Moves back and forth in the selected line (picker of input line) \\
+        & Move back and forth in the selected line (picker of input line). \\
       \ButtonPlay
-        & Picks character in character bar, or acts as backspace in the text line. \\
+        & Pick character in character bar, or act as backspace in the text line. \\
       Long \ButtonPlay & Accept \\
       \ButtonStop & Cancel \\
-      \ButtonMenu & Flips picker lines \\
+      \ButtonMenu & Flip picker lines. \\
     \end{btnmap}
   \end{table}
 }
