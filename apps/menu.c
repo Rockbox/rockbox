@@ -515,7 +515,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             /* might be leaving list, so stop scrolling */
             FOR_NB_SCREENS(i)
             {
-                screens[i].stop_scroll();
+                screens[i].scroll_stop(&vps[i]);
             }
             if (menu_callback)
                 menu_callback(ACTION_EXIT_MENUITEM, menu);
@@ -548,7 +548,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             /* entering an item that may not be a list, so stop scrolling */
             FOR_NB_SCREENS(i)
             {
-                screens[i].stop_scroll();
+                screens[i].scroll_stop(&vps[i]);
             }
 #ifdef HAVE_BUTTONBAR
             if (!hide_bars)
