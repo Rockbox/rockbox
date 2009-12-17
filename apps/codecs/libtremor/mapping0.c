@@ -27,8 +27,7 @@
 #include "window.h"
 #include "registry.h"
 #include "misc.h"
-
-
+#include <codecs/lib/codeclib.h>
 
 /* simplistic, wasteful way of doing this (unique lookup for each
    mode/submapping); there should be a central repository for
@@ -291,7 +290,28 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
       /* compute and apply spectral envelope */
       look->floor_func[submap]->
         inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
-      mdct_backward(n, (int32_t*) pcm, (int32_t*) pcm);
+        
+      /* copy pcm to scratch input buffer */
+      /* (ffmpeg-based mdct doesn't yet operate inplace */
+      /* FIXME: really the workload should take place in PCM not SCRATCHPAD
+                i.e. really we should do the minimum work in scratchpad
+                since this is most likely non-iram, and do the bulk in pcm.
+                My point is: should we output into scratchpad and then copy
+                back to pcm;  or copy pcm to scratchpad and output directly
+                into pcm  (i.e. memcpy after imdct; or memcpy before imdct?)
+                The right answer depends on whether scratchpad is in iram,
+                pcm is in iram, or imdct does most of its work in the INPUT
+                buffer or the OUTPUT buffer.
+                Honestly I don't yet know.
+                
+                Addendum: the real fix would be to make imdct operate
+                in-place and not REQUIRE input != output, as it currently does */
+                
+      ff_imdct_calc(vb->mdct_ctx[vb->W],      
+                    (int32_t*)vb->ffmpeg_scratchpad,
+                    (int32_t*)pcm);
+      memcpy(pcm,vb->ffmpeg_scratchpad,n*sizeof(int32_t));
+
       /* window the data */
       _vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
     }

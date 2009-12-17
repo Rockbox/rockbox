@@ -17,6 +17,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef CODECLIB_MDCT_H_INCLUDED
+#define CODECLIB_MDCT_H_INCLUDED
+
 //#include "types.h"
 #include "fft.h"
 
@@ -37,6 +40,69 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse);
 void ff_imdct_calc(MDCTContext *s, fixed32 *output, fixed32 *input);
 int mdct_init_global(void);
 
+#ifdef CPU_ARM
+
+/*Sign-15.16 format */
+
+#define fixmul32(x, y)  \
+    ({ int32_t __hi;  \
+       uint32_t __lo;  \
+       int32_t __result;  \
+       asm ("smull   %0, %1, %3, %4\n\t"  \
+            "movs    %0, %0, lsr %5\n\t"  \
+            "adc    %2, %0, %1, lsl %6"  \
+            : "=&r" (__lo), "=&r" (__hi), "=r" (__result)  \
+            : "%r" (x), "r" (y),  \
+              "M" (PRECISION), "M" (32 - PRECISION)  \
+            : "cc");  \
+       __result;  \
+    })
+
+#define fixmul32b(x, y)  \
+    ({ int32_t __hi;  \
+       uint32_t __lo;  \
+       int32_t __result;  \
+       asm ("smull   %0, %1, %3, %4\n\t"  \
+            "movs    %2, %1, lsl #1"  \
+            : "=&r" (__lo), "=&r" (__hi), "=r" (__result)  \
+            : "%r" (x), "r" (y)  \
+            : "cc");  \
+       __result;  \
+    })
+
+#elif defined(CPU_COLDFIRE)
+
+static inline int32_t fixmul32(int32_t x, int32_t y)
+{
+#if PRECISION != 16
+#warning Coldfire fixmul32() only works for PRECISION == 16
+#endif
+    int32_t t1;
+    asm (
+        "mac.l   %[x], %[y], %%acc0  \n" /* multiply */
+        "mulu.l  %[y], %[x]      \n"     /* get lower half, avoid emac stall */
+        "movclr.l %%acc0, %[t1]  \n"     /* get higher half */
+        "lsr.l   #1, %[t1]       \n"
+        "move.w  %[t1], %[x]     \n"
+        "swap    %[x]            \n"
+        : [t1] "=&d" (t1), [x] "+d" (x)
+        : [y] "d"  (y)
+    );
+    return x;
+}
+
+static inline int32_t fixmul32b(int32_t x, int32_t y)
+{
+    asm (
+        "mac.l   %[x], %[y], %%acc0  \n" /* multiply */
+        "movclr.l %%acc0, %[x]  \n"     /* get higher half */
+        : [x] "+d" (x)
+        : [y] "d"  (y)
+    );
+    return x;
+}
+
+#else
 static inline fixed32 fixmul32(fixed32 x, fixed32 y)
 {
     fixed64 temp;
@@ -59,6 +125,8 @@ static inline fixed32 fixmul32b(fixed32 x, fixed32 y)
 
     return (fixed32)temp;
 }
+#endif
+
 
 #ifdef CPU_ARM
 static inline
@@ -124,103 +192,10 @@ void CMUL(fixed32 *pre,
 
 }
 #endif
+
 /* Inverse gain of circular cordic rotation in s0.31 format. */
-static const long cordic_circular_gain = 0xb2458939; /* 0.607252929 */
-static long fsincos(unsigned long phase, fixed32 *cos);
+const long cordic_circular_gain;
+extern const unsigned long atan_table[];
+long fsincos(unsigned long phase, fixed32 *cos);
 
-/* Table of values of atan(2^-i) in 0.32 format fractions of pi where pi = 0xffffffff / 2 */
-static const unsigned long atan_table[] = {
-    0x1fffffff, /* +0.785398163 (or pi/4) */
-    0x12e4051d, /* +0.463647609 */
-    0x09fb385b, /* +0.244978663 */
-    0x051111d4, /* +0.124354995 */
-    0x028b0d43, /* +0.062418810 */
-    0x0145d7e1, /* +0.031239833 */
-    0x00a2f61e, /* +0.015623729 */
-    0x00517c55, /* +0.007812341 */
-    0x0028be53, /* +0.003906230 */
-    0x00145f2e, /* +0.001953123 */
-    0x000a2f98, /* +0.000976562 */
-    0x000517cc, /* +0.000488281 */
-    0x00028be6, /* +0.000244141 */
-    0x000145f3, /* +0.000122070 */
-    0x0000a2f9, /* +0.000061035 */
-    0x0000517c, /* +0.000030518 */
-    0x000028be, /* +0.000015259 */
-    0x0000145f, /* +0.000007629 */
-    0x00000a2f, /* +0.000003815 */
-    0x00000517, /* +0.000001907 */
-    0x0000028b, /* +0.000000954 */
-    0x00000145, /* +0.000000477 */
-    0x000000a2, /* +0.000000238 */
-    0x00000051, /* +0.000000119 */
-    0x00000028, /* +0.000000060 */
-    0x00000014, /* +0.000000030 */
-    0x0000000a, /* +0.000000015 */
-    0x00000005, /* +0.000000007 */
-    0x00000002, /* +0.000000004 */
-    0x00000001, /* +0.000000002 */
-    0x00000000, /* +0.000000001 */
-    0x00000000, /* +0.000000000 */
-};
-
-/**
- * Implements sin and cos using CORDIC rotation.
- *
- * @param phase has range from 0 to 0xffffffff, representing 0 and
- *        2*pi respectively.
- * @param cos return address for cos
- * @return sin of phase, value is a signed value from LONG_MIN to LONG_MAX,
- *         representing -1 and 1 respectively.
- *
- *        Gives at least 24 bits precision (last 2-8 bits or so are probably off)
- */
-
-static long fsincos(unsigned long phase, fixed32 *cos)
-{
-    int32_t x, x1, y, y1;
-    unsigned long z, z1;
-    int i;
-
-    /* Setup initial vector */
-    x = cordic_circular_gain;
-    y = 0;
-    z = phase;
-
-    /* The phase has to be somewhere between 0..pi for this to work right */
-    if (z < 0xffffffff / 4) {
-        /* z in first quadrant, z += pi/2 to correct */
-        x = -x;
-        z += 0xffffffff / 4;
-    } else if (z < 3 * (0xffffffff / 4)) {
-        /* z in third quadrant, z -= pi/2 to correct */
-        z -= 0xffffffff / 4;
-    } else {
-        /* z in fourth quadrant, z -= 3pi/2 to correct */
-        x = -x;
-        z -= 3 * (0xffffffff / 4);
-    }
-
-    /* Each iteration adds roughly 1-bit of extra precision */
-    for (i = 0; i < 31; i++) {
-        x1 = x >> i;
-        y1 = y >> i;
-        z1 = atan_table[i];
-
-        /* Decided which direction to rotate vector. Pivot point is pi/2 */
-        if (z >= 0xffffffff / 4) {
-            x -= y1;
-            y += x1;
-            z -= z1;
-        } else {
-            x += y1;
-            y -= x1;
-            z += z1;
-        }
-    }
-
-    if (cos)
-        *cos = x;
-
-    return y;
-}
+#endif // CODECLIB_MDCT_H_INCLUDED

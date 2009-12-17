@@ -16,6 +16,9 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#ifndef CODECLIB_FFT_H_INCLUDED
+#define CODECLIB_FFT_H_INCLUDED
+ 
 #include <inttypes.h>
 typedef int32_t fixed32; 
 typedef int64_t fixed64;
@@ -57,7 +60,14 @@ typedef struct FFTContext {
 #define FF_MDCT_PERM_INTERLEAVE 1
 } FFTContext;
 
+//public api
+//int ff_fft_init(FFTContext *s, int nbits, int inverse);
+int ff_fft_init(void *s, int nbits, int inverse);
+
+// internal api  (fft<->mdct)
 int fft_calc_unscaled(FFTContext *s, FFTComplex *z);
-int ff_fft_init(FFTContext *s, int nbits, int inverse);
-void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
+//void ff_fft_permute_c(FFTContext *s, FFTComplex *z); // internal only?
 void ff_fft_calc_c(FFTContext *s, FFTComplex *z);
+
+#endif // CODECLIB_FFT_H_INCLUDED
+

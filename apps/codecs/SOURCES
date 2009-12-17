@@ -9,17 +9,17 @@ wavpack.c
 #ifndef RB_PROFILE
 alac.c
 #endif
-cook.c
-raac.c
+/* cook.c */
+/* raac.c */
 a52_rm.c
-atrac3_rm.c
+/* atrac3_rm.c */
 mpc.c
 wma.c
 sid.c
 ape.c
 nsf.c
 asap.c
-aac.c
+/* aac.c */
 spc.c
 mod.c
 shorten.c

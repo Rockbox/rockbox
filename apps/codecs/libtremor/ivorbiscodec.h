@@ -24,6 +24,7 @@ extern "C"
 #endif /* __cplusplus */
 
 #include "ogg.h"
+//#include <codecs/lib/codeclib.h>
 
 typedef struct vorbis_info{
   int version;
@@ -61,6 +62,8 @@ typedef struct vorbis_dsp_state{
   ogg_int32_t **pcm;
   ogg_int32_t **pcmb;
   ogg_int32_t **pcmret;
+  MDCTContext mdct_ctx[2]; /* ffmpeg mdct - for the two block sizes */
+  int32_t * ffmpeg_scratchpad; /* ffmpeg mdct - temporary workspace */
   int      pcm_storage;
   int      pcm_current;
   int      pcm_returned;
@@ -105,6 +108,9 @@ typedef struct vorbis_block{
   long                localalloc;
   long                totaluse;
   struct alloc_chain *reap;
+  
+  MDCTContext * mdct_ctx[2]; /* for the two block sizes */
+  int32_t * ffmpeg_scratchpad; /* because ffmpeg doesn't operate inplace */
 
 } vorbis_block;
 

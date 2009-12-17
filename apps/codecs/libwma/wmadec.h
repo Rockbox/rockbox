@@ -157,6 +157,8 @@ typedef struct WMADecodeContext
     int bit_offset;
     int nb_frames;
     int current_frame;
+    
+    MDCTContext mdct_ctx[10];
 
 #ifdef TRACE
 

@@ -32,6 +32,8 @@
 #include <math.h>
 #include <inttypes.h>
 #include <time.h>
+#include <codecs/lib/codeclib.h>
+
 
 #define PRECISION       16
 
@@ -39,8 +41,7 @@
 #define ftofix32(x)       ((fixed32)((x) * (float)(1 << PRECISION) + ((x) < 0 ? -0.5 : 0.5)))
 #define itofix32(x)       ((x) << PRECISION)
 #define fixtoi32(x)       ((x) >> PRECISION)
-static inline fixed32 fixmul32(fixed32 x, fixed32 y);
-static inline fixed32 fixdiv32(fixed32 x, fixed32 y);
+static void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
 #define MUL(a,b) \
 ({ int32_t _ta=(a), _tb=(b), _tc; \
    _tc=(_ta & 0xffff)*(_tb >> 16)+(_ta >> 16)*(_tb & 0xffff); (int32_t)(((_tc >> 14))+ (((_ta >> 16)*(_tb >> 16)) << 2 )); })
@@ -48,57 +49,21 @@ static inline fixed32 fixdiv32(fixed32 x, fixed32 y);
 #define DECLARE_ALIGNED_16(type, arg) type arg __attribute__ ((aligned(16)))
 #define M_PI_F          0x0003243f  /* pi 16.16 */
 #define M_SQRT1_2_F     0x0000b505  /* 1/sqrt(2) 16.16 */
-#define av_malloc malloc
 #define av_unused
-#define av_cold
-#define av_freep free
 #define FFT_SIZE 1024
+
+int32_t flattabs[8+16+32+64+128+256+512+1024+2048];
+int32_t * tabstabstabs[] = { flattabs, flattabs+8, flattabs+8+16,flattabs+8+16+32, flattabs+8+16+32+64,
+                             flattabs+8+16+32+64+128, flattabs+8+16+32+64+128+256,
+                             flattabs+8+16+32+64+128+256+512, flattabs+8+16+32+64+128+256+512+1024 };
+
+
 
 /* Global variables for holding number of muls and adds */
 int muls, adds;
 
-/* Inverse gain of circular cordic rotation in s0.31 format. */
-static const long cordic_circular_gain = 0xb2458939; /* 0.607252929 */
-static long fsincos(unsigned long phase, fixed32 *cos);
-
-/* Table of values of atan(2^-i) in 0.32 format fractions of pi where pi = 0xffffffff / 2 */
-static const unsigned long atan_table[] = {
-    0x1fffffff, /* +0.785398163 (or pi/4) */
-    0x12e4051d, /* +0.463647609 */
-    0x09fb385b, /* +0.244978663 */
-    0x051111d4, /* +0.124354995 */
-    0x028b0d43, /* +0.062418810 */
-    0x0145d7e1, /* +0.031239833 */
-    0x00a2f61e, /* +0.015623729 */
-    0x00517c55, /* +0.007812341 */
-    0x0028be53, /* +0.003906230 */
-    0x00145f2e, /* +0.001953123 */
-    0x000a2f98, /* +0.000976562 */
-    0x000517cc, /* +0.000488281 */
-    0x00028be6, /* +0.000244141 */
-    0x000145f3, /* +0.000122070 */
-    0x0000a2f9, /* +0.000061035 */
-    0x0000517c, /* +0.000030518 */
-    0x000028be, /* +0.000015259 */
-    0x0000145f, /* +0.000007629 */
-    0x00000a2f, /* +0.000003815 */
-    0x00000517, /* +0.000001907 */
-    0x0000028b, /* +0.000000954 */
-    0x00000145, /* +0.000000477 */
-    0x000000a2, /* +0.000000238 */
-    0x00000051, /* +0.000000119 */
-    0x00000028, /* +0.000000060 */
-    0x00000014, /* +0.000000030 */
-    0x0000000a, /* +0.000000015 */
-    0x00000005, /* +0.000000007 */
-    0x00000002, /* +0.000000004 */
-    0x00000001, /* +0.000000002 */
-    0x00000000, /* +0.000000001 */
-    0x00000000, /* +0.000000000 */
-};
-
-
 /* cos(2*pi*x/n) for 0<=x<=n/4, followed by its reverse */
+/*
 DECLARE_ALIGNED_16(FFTSample, ff_cos_16[8]);
 DECLARE_ALIGNED_16(FFTSample, ff_cos_32[16]);
 DECLARE_ALIGNED_16(FFTSample, ff_cos_64[32]);
@@ -108,16 +73,38 @@ DECLARE_ALIGNED_16(FFTSample, ff_cos_512[256]);
 DECLARE_ALIGNED_16(FFTSample, ff_cos_1024[512]);
 DECLARE_ALIGNED_16(FFTSample, ff_cos_2048[1024]);
 DECLARE_ALIGNED_16(FFTSample, ff_cos_4096[2048]);
+*/
+/*
 DECLARE_ALIGNED_16(FFTSample, ff_cos_8192[4096]);
 DECLARE_ALIGNED_16(FFTSample, ff_cos_16384[8192]);
 DECLARE_ALIGNED_16(FFTSample, ff_cos_32768[16384]);
 DECLARE_ALIGNED_16(FFTSample, ff_cos_65536[32768]);
+*/
+/* some of these should probably be in iram */
+static FFTSample * ff_cos_16 = NULL;
+static FFTSample * ff_cos_32 = NULL;
+static FFTSample * ff_cos_64 = NULL;
+static FFTSample * ff_cos_128 = NULL;
+static FFTSample * ff_cos_256 = NULL;
+static FFTSample * ff_cos_512 = NULL;
+static FFTSample * ff_cos_1024 = NULL;
+static FFTSample * ff_cos_2048 = NULL;
+static FFTSample * ff_cos_4096 = NULL;
+
+/*
 FFTSample * const ff_cos_tabs[] = {
     ff_cos_16, ff_cos_32, ff_cos_64, ff_cos_128, ff_cos_256, ff_cos_512, ff_cos_1024,
     ff_cos_2048, ff_cos_4096, ff_cos_8192, ff_cos_16384, ff_cos_32768, ff_cos_65536,
 };
-uint16_t revtab[1<<16];
-FFTComplex exptab[1<<15], tmp_buf[1<<16];
+*/
+
+static FFTSample ** const ff_cos_tabs[] = {
+    &ff_cos_16, &ff_cos_32, &ff_cos_64, &ff_cos_128, &ff_cos_256, &ff_cos_512, &ff_cos_1024,
+    &ff_cos_2048, &ff_cos_4096
+};
+
+uint16_t revtab[1<<12];
+FFTComplex exptab[1<<11], tmp_buf[1<<12];
 
 static int split_radix_permutation(int i, int n, int inverse)
 {
@@ -130,13 +117,15 @@ static int split_radix_permutation(int i, int n, int inverse)
     else                  return split_radix_permutation(i, m, inverse)*4 - 1;
 }
 
-av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
+//int ff_fft_init(FFTContext *s, int nbits, int inverse)
+int ff_fft_init(void *arg_s, int nbits, int inverse)
 {
     int i, j, n;
+    FFTContext *s = (FFTContext *)(arg_s);
   
     fixed32 temp, phase;
 
-    if (nbits < 2 || nbits > 16)
+    if (nbits < 2 || nbits > 12)
         return -1;
     s->nbits = nbits;
     n = 1 << nbits;
@@ -159,28 +148,38 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
     if (HAVE_ALTIVEC) ff_fft_init_altivec(s);
     if (HAVE_MMX)     ff_fft_init_mmx(s);*/
     
+    /* FIXME these should really just be precalculated */
     for(j=4; j<=nbits; j++) {
         int m = 1<<j;
         //fixed32 freq = (M_PI_F / m ) << 1;
-        FFTSample *tab = ff_cos_tabs[j-4];
-        for(i=0; i<=m/4; i++) {            
-            phase = ((i<<16) / m)<<16;
-            fsincos(phase, &temp);//tab[i] = cos(i*freq);
-            tab[i] = temp>>15;
-        }
+        FFTSample *tab = *(ff_cos_tabs[j-4]);
+        
+        /* if tab is NULL, table hasn't been built yet, fill it in now */
+        /* effectively do this operation once and once only */
+        if(NULL==tab)
+        {
+          tab = tabstabstabs[j-4];
+
+          *(ff_cos_tabs[j-4]) = tab;
+        
+          for(i=0; i<=m/4; i++) {            
+              phase = ((i<<16) / m)<<16;
+              fsincos(phase, &temp);//tab[i] = cos(i*freq);
+              tab[i] = temp>>15;
+          }
             
-        for(i=1; i<m/4; i++)
-            tab[m/2-i] = tab[i];
+          for(i=1; i<m/4; i++)
+              tab[m/2-i] = tab[i];
+        }
     }
     for(i=0; i<n; i++)
         s->revtab[-split_radix_permutation(i, n, s->inverse) & (n-1)] = i;
     s->tmp_buf = tmp_buf;
     
-
     return 0;
 }
 
-void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
+static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 {
     int j, k, np;
     FFTComplex tmp;
@@ -368,103 +367,23 @@ DECL_FFT(512,256,128)
 DECL_FFT(1024,512,256)
 DECL_FFT(2048,1024,512)
 DECL_FFT(4096,2048,1024)
+/*
 DECL_FFT(8192,4096,2048)
 DECL_FFT(16384,8192,4096)
 DECL_FFT(32768,16384,8192)
 DECL_FFT(65536,32768,16384)
+*/
 
 static void (*fft_dispatch[])(FFTComplex*) = {
     fft4, fft8, fft16, fft32, fft64, fft128, fft256, fft512, fft1024,
-    fft2048, fft4096, fft8192, fft16384, fft32768, fft65536,
+    fft2048, fft4096
+    /*, fft8192, fft16384, fft32768, fft65536,*/
 };
 
 void ff_fft_calc_c(FFTContext *s, FFTComplex *z)
 {
     fft_dispatch[s->nbits-2](z);
 }
-
-/* Fixed-point arithmetic functions */
-static inline fixed32 fixmul32(fixed32 x, fixed32 y)
-{
-    fixed64 temp;
-    temp = x;
-    temp *= y;
-
-    temp >>= PRECISION;
-
-    return (fixed32)temp;
-}
-
-static inline fixed32 fixdiv32(fixed32 x, fixed32 y)
-{
-    fixed64 temp;
-    temp = x << PRECISION;
-    temp /= y;
-
-    return (fixed32)temp;
-}
-
-/**
- * Implements sin and cos using CORDIC rotation.
- *
- * @param phase has range from 0 to 0xffffffff, representing 0 and
- *        2*pi respectively.
- * @param cos return address for cos
- * @return sin of phase, value is a signed value from LONG_MIN to LONG_MAX,
- *         representing -1 and 1 respectively.
- *
- *        Gives at least 24 bits precision (last 2-8 bits or so are probably off)
- */
-
-static long fsincos(unsigned long phase, fixed32 *cos)
-{
-    int32_t x, x1, y, y1;
-    unsigned long z, z1;
-    int i;
-
-    /* Setup initial vector */
-    x = cordic_circular_gain;
-    y = 0;
-    z = phase;
-
-    /* The phase has to be somewhere between 0..pi for this to work right */
-    if (z < 0xffffffff / 4) {
-        /* z in first quadrant, z += pi/2 to correct */
-        x = -x;
-        z += 0xffffffff / 4;
-    } else if (z < 3 * (0xffffffff / 4)) {
-        /* z in third quadrant, z -= pi/2 to correct */
-        z -= 0xffffffff / 4;
-    } else {
-        /* z in fourth quadrant, z -= 3pi/2 to correct */
-        x = -x;
-        z -= 3 * (0xffffffff / 4);
-    }
-
-    /* Each iteration adds roughly 1-bit of extra precision */
-    for (i = 0; i < 31; i++) {
-        x1 = x >> i;
-        y1 = y >> i;
-        z1 = atan_table[i];
-
-        /* Decided which direction to rotate vector. Pivot point is pi/2 */
-        if (z >= 0xffffffff / 4) {
-            x -= y1;
-            y += x1;
-            z -= z1;
-        } else {
-            x += y1;
-            y -= x1;
-            z += z1;
-        }
-    }
-
-    if (cos)
-        *cos = x;
-
-    return y;
-}
-
 
 #if 0
 int main (void)

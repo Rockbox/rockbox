@@ -17,24 +17,46 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "codeclib.h"
 #include "mdct.h"
 
-fixed32 tcos0[1024], tsin0[1024]; //these are the sin and cos rotations used by the MDCT
-uint16_t revtab0[1024];
+/* these are the sin and cos rotations used by the MDCT
+   Accessed too infrequently to give much speedup in IRAM */
+/* Fixme - unify all this with the twiddle arrays used by the fft.
+   It should be straightforward to flatten everything into a single
+   table of sin/cos factors of maximum size = maximum block size
+   (Reason: sin and cos factors are symmetric so don't need to store both
+            cos itself has 8-way symmetry so only need to store 1/8th of them
+            and the mdct rotations require 1/8th fractional steps so 8
+            times as many points (so you're at N*8/8 = N) */
+            
+fixed32 *tcosarray[5], *tsinarray[5];
+fixed32 tcos0[1024], tcos1[512], tcos2[256], tcos3[128], tcos4[64];
+fixed32 tsin0[1024], tsin1[512], tsin2[256], tsin3[128], tsin4[64];
 
 /**
  * init MDCT or IMDCT computation.
  */
 int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
 {
-    int n;
-   // fixed32 alpha;
+    int n, n4, i;
 
     memset(s, 0, sizeof(*s));
     n = 1 << nbits;            //nbits ranges from 12 to 8 inclusive
 
     s->nbits = nbits;
     s->n = n;
+    n4 = n>>2;
+    s->tcos = tcosarray[12-nbits];
+    s->tsin = tsinarray[12-nbits];
+    for(i=0;i<n4;i++)
+    {
+      fixed32 ip = itofix32(i) + 0x2000; // = i+(1/8)
+      ip = ip>>nbits; // = [i+(1/8)]/N
+      /* tsin and tcos are just reflections of each other with a phase shift */
+      s->tsin[i] = -fsincos(ip<<16, &(s->tcos[i]));
+      s->tcos[i] *= (-1);
+    }
 
     (&s->fft)->nbits = nbits-2;
     (&s->fft)->inverse = inverse;
@@ -54,10 +76,13 @@ void ff_imdct_calc(MDCTContext *s,
                    fixed32 *input)
 {
     int k, n8, n4, n2, n, j;
+    const fixed32 *tcos = s->tcos;
+    const fixed32 *tsin = s->tsin;
+    
     const fixed32 *in1, *in2;
     FFTComplex *z1 = (FFTComplex *)output;
     FFTComplex *z2 = (FFTComplex *)input;
-    int revtabshift = 12 - s->nbits;
+//    int revtabshift = 12 - s->nbits;
 
     n = 1 << s->nbits;
 
@@ -65,8 +90,8 @@ void ff_imdct_calc(MDCTContext *s,
     n4 = n >> 2;
     n8 = n >> 3;
 
-    ff_fft_init(&s->fft, s->nbits - 2, 1);
-	
+    ff_fft_init((void *)(&s->fft), s->nbits - 2, 1);
+        	
     /* pre rotation */
     in1 = input;
     in2 = input + n2 - 1;
@@ -74,7 +99,7 @@ void ff_imdct_calc(MDCTContext *s,
     for(k = 0; k < n4; k++)
     {
         j= s->fft.revtab[k];
-        CMUL(&z1[j].re, &z1[j].im, *in2, *in1, tcos0[k], tsin0[k]);
+        CMUL(&z1[j].re, &z1[j].im, *in2, *in1, tcos[k], tsin[k]);
         in1 += 2;
         in2 -= 2;
     }
@@ -84,8 +109,7 @@ void ff_imdct_calc(MDCTContext *s,
     /* post rotation + reordering */
     for(k = 0; k < n4; k++)
     {
-        int kshift = k<<revtabshift;
-        CMUL(&z2[k].re, &z2[k].im, (z1[k].re), (z1[k].im), tcos0[kshift], tsin0[kshift]);
+        CMUL(&z2[k].re, &z2[k].im, (z1[k].re), (z1[k].im), tcos[k], tsin[k]);
     }
 
     for(k = 0; k < n8; k++)
@@ -114,39 +138,123 @@ void ff_imdct_calc(MDCTContext *s,
     }
 }
 
+/* init MDCT */
 int mdct_init_global(void)
 {
-    int i,j,m;
-    /* init the MDCT bit reverse table here rather then in fft_init */
-
-    for(i=0;i<1024;i++)           /*hard coded to a 2048 bit rotation*/
-    {                             /*smaller sizes can reuse the largest*/
-        m=0;
-        for(j=0;j<10;j++)
-        {
-            m |= ((i >> j) & 1) << (10-j-1);
-        }
-
-       revtab0[i]=m;
-    }
-
-    for(i=0;i<1024;i++)
-    {
-        //fixed32 pi2 = fixmul32(0x20000, M_PI_F);
-        fixed32 ip = itofix32(i) + 0x2000;
-        ip = ip >> 12;
-        //ip = fixdiv32(ip,itofix32(n)); // PJJ optimize
-        //alpha = fixmul32(TWO_M_PI_F, ip);
-        //s->tcos[i] = -fixcos32(alpha);        //alpha between 0 and pi/2
-        //s->tsin[i] = -fixsin32(alpha);
-
-        //I can't remember why this works, but it seems to agree for ~24 bits, maybe more!
-        tsin0[i] = - fsincos(ip<<16, &(tcos0[i]));
-        tcos0[i] *=-1;
-  }
-
-   //fft_init_global();
+    /* although seemingly degenerate, these cannot actually be merged
+       together without a substantial increase in error which is unjustified
+       by the tiny memory savings */
+    /* FIXME: Except, that's not true, and these can be merged/flattened */
+    tcosarray[0] = tcos0;
+    tcosarray[1] = tcos1;
+    tcosarray[2] = tcos2;
+    tcosarray[3] = tcos3;
+    tcosarray[4] = tcos4;
+    tsinarray[0] = tsin0;
+    tsinarray[1] = tsin1;
+    tsinarray[2] = tsin2;
+    tsinarray[3] = tsin3;
+    tsinarray[4] = tsin4;
 
     return 0;
 }
 
+const long cordic_circular_gain = 0xb2458939; /* 0.607252929 */
+
+/* Table of values of atan(2^-i) in 0.32 format fractions of pi where pi = 0xffffffff / 2 */
+const unsigned long atan_table[] = {
+    0x1fffffff, /* +0.785398163 (or pi/4) */
+    0x12e4051d, /* +0.463647609 */
+    0x09fb385b, /* +0.244978663 */
+    0x051111d4, /* +0.124354995 */
+    0x028b0d43, /* +0.062418810 */
+    0x0145d7e1, /* +0.031239833 */
+    0x00a2f61e, /* +0.015623729 */
+    0x00517c55, /* +0.007812341 */
+    0x0028be53, /* +0.003906230 */
+    0x00145f2e, /* +0.001953123 */
+    0x000a2f98, /* +0.000976562 */
+    0x000517cc, /* +0.000488281 */
+    0x00028be6, /* +0.000244141 */
+    0x000145f3, /* +0.000122070 */
+    0x0000a2f9, /* +0.000061035 */
+    0x0000517c, /* +0.000030518 */
+    0x000028be, /* +0.000015259 */
+    0x0000145f, /* +0.000007629 */
+    0x00000a2f, /* +0.000003815 */
+    0x00000517, /* +0.000001907 */
+    0x0000028b, /* +0.000000954 */
+    0x00000145, /* +0.000000477 */
+    0x000000a2, /* +0.000000238 */
+    0x00000051, /* +0.000000119 */
+    0x00000028, /* +0.000000060 */
+    0x00000014, /* +0.000000030 */
+    0x0000000a, /* +0.000000015 */
+    0x00000005, /* +0.000000007 */
+    0x00000002, /* +0.000000004 */
+    0x00000001, /* +0.000000002 */
+    0x00000000, /* +0.000000001 */
+    0x00000000, /* +0.000000000 */
+};
+
+/* FIXME: yeah, all of this, should just be a fixed table... */
+/**
+ * Implements sin and cos using CORDIC rotation.
+ *
+ * @param phase has range from 0 to 0xffffffff, representing 0 and
+ *        2*pi respectively.
+ * @param cos return address for cos
+ * @return sin of phase, value is a signed value from LONG_MIN to LONG_MAX,
+ *         representing -1 and 1 respectively.
+ *
+ *        Gives at least 24 bits precision (last 2-8 bits or so are probably off)
+ */
+
+long fsincos(unsigned long phase, fixed32 *cos)
+{
+    int32_t x, x1, y, y1;
+    unsigned long z, z1;
+    int i;
+
+    /* Setup initial vector */
+    x = cordic_circular_gain;
+    y = 0;
+    z = phase;
+
+    /* The phase has to be somewhere between 0..pi for this to work right */
+    if (z < 0xffffffff / 4) {
+        /* z in first quadrant, z += pi/2 to correct */
+        x = -x;
+        z += 0xffffffff / 4;
+    } else if (z < 3 * (0xffffffff / 4)) {
+        /* z in third quadrant, z -= pi/2 to correct */
+        z -= 0xffffffff / 4;
+    } else {
+        /* z in fourth quadrant, z -= 3pi/2 to correct */
+        x = -x;
+        z -= 3 * (0xffffffff / 4);
+    }
+
+    /* Each iteration adds roughly 1-bit of extra precision */
+    for (i = 0; i < 31; i++) {
+        x1 = x >> i;
+        y1 = y >> i;
+        z1 = atan_table[i];
+
+        /* Decided which direction to rotate vector. Pivot point is pi/2 */
+        if (z >= 0xffffffff / 4) {
+            x -= y1;
+            y += x1;
+            z -= z1;
+        } else {
+            x += y1;
+            y -= x1;
+            z += z1;
+        }
+    }
+
+    if (cos)
+        *cos = x;
+
+    return y;
+}

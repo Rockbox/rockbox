@@ -2,6 +2,8 @@
 codeclib.c
 fixedpoint.c
 
+/* OLD MDCT */
+/* (when all other codecs are remediated this can be remoed) */
 mdct2.c
 mdct_lookup.c
 

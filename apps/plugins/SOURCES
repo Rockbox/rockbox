@@ -1,3 +1,5 @@
+test_codec.c
+
 /* plugins common to all models */
 chessclock.c
 credits.c

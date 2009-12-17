@@ -25,6 +25,7 @@
 #include "window.h"
 #include "registry.h"
 #include "misc.h"
+//#include <codecs/lib/codeclib.h>
 
 static int ilog(unsigned int v){
   int ret=0;
@@ -239,6 +240,13 @@ static int _vds_init(vorbis_dsp_state *v,vorbis_info *vi){
     b->mode[i]=_mapping_P[maptype]->look(v,ci->mode_param[i],
                                          ci->map_param[mapnum]);
   }
+
+  /* setup for ffmpeg-based mdct */
+  mdct_init_global();
+  v->ffmpeg_scratchpad = (int32_t *)_ogg_malloc(ci->blocksizes[1] * sizeof(int32_t));
+  ff_mdct_init(&v->mdct_ctx[0], bs_generic(ci->blocksizes[0],BS_LOG2|BS_SHORT), 1);
+  ff_mdct_init(&v->mdct_ctx[1], bs_generic(ci->blocksizes[1],BS_LOG2|BS_SHORT), 1);
+    
   return(0);
 }
 
