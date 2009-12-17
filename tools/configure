@@ -2611,11 +2611,8 @@ fi
   esac
   # to be able running "make manual" from non-manual configuration
   case $modelname in
-      archosfmrecorder)
-          manualdev="archosrecorderv2fm"
-          ;;
       archosrecorderv2)
-          manualdev="archosrecorderv2fm"
+          manualdev="archosfmrecorder"
           ;;
       iriverh1??)
           manualdev="iriverh100"
