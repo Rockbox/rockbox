@@ -53,9 +53,9 @@ the \setting{Show Files} setting to all.
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
         {
           \ButtonOn+\ButtonUp{}/ \ButtonDown
-           \opt{HAVEREMOTEKEYMAP}{&           
-          \opt{IRIVER_RC_H100_PAD}{\ButtonRCSource{}/ \ButtonRCBitrate}
-         }
+          \opt{HAVEREMOTEKEYMAP}{&
+            \opt{IRIVER_RC_H100_PAD}{\ButtonRCSource{}/ \ButtonRCBitrate}
+          }
           & Moves one page up/down in the list.\\
         }
       \opt{IRIVER_H10_PAD}
@@ -191,19 +191,28 @@ each option pertains both to files and directories):
 \subsection{\label{sec:virtual_keyboard}Virtual Keyboard}
 \screenshot{rockbox_interface/images/ss-virtual-keyboard}{The virtual keyboard}{}
 This is the virtual keyboard that is used when entering text in Rockbox, for 
-example when renaming a file or creating a new directory.  The virtual keyboard 
-can be easily changed by making a text file with the required layout.  More
- information on how to achieve this can be found on the Rockbox website
- at \wikilink{LoadableKeyboardLayouts}.
+example when renaming a file or creating a new directory.
+\nopt{player}{The virtual keyboard can be easily changed by making a text file
+ with the required layout. More information on how to achieve this can be found
+ on the Rockbox website at \wikilink{LoadableKeyboardLayouts}.}
 
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,GIGABEAT_PAD,SANSA_E200_PAD,%
-     SANSA_FUZE_PAD,SANSA_C200_PAD,MROBE100_PAD}{
+\opt{morse_input}{
+  Also you can switch to Morse code input mode by changing the
+  \setting{Use Morse Code Input} setting%
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD%
+      ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD}%
+    { or by pressing \ActionKbdMorseInput{} in the virtual keyboard}%
+  .
+}
+
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
+    ,MROBE100_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{
   \begin{table}
     \begin{btnmap}{}{}
-      \ActionKbdLeft~/ \ActionKbdRight~/ \ActionKbdUp~/ \ActionKbdDown
+      \ActionKbdLeft{} / \ActionKbdRight{} / \ActionKbdUp{} / \ActionKbdDown
       \opt{HAVEREMOTEKEYMAP}{
-      &  \ActionRCKbdLeft~/ \ActionRCKbdRight~/ \ActionRCKbdUp~/ \ActionRCKbdDown}
-      & Moves about the virtual keyboard (moves the solid cursor) \\
+      & \ActionRCKbdLeft{} / \ActionRCKbdRight{} / \ActionRCKbdUp{} / \ActionRCKbdDown}
+      & Moves the cursor on the virtual keyboard. \\
       %
       \ActionKbdPageFlip
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdPageFlip}
@@ -215,125 +224,112 @@ can be easily changed by making a text file with the required layout.  More
       %
       \ActionKbdSelect
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdSelect}
-      & Inserts the selected keyboard letter at the current cursor position \\
-      %
-      \ActionKbdAbort
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdAbort}
-      & Exits the virtual keyboard without saving any changes \\
-      %
-      \opt{RECORDER_PAD}{
-        \ButtonFOne
-        & Shifts between the upper case, lower case and accented keyboards \\
-      }
-      %
-      \ActionKbdDone
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdDone}
-      & Exits the virtual keyboard and saves any changes \\
+      & Inserts the selected keyboard letter at the current line cursor position \\
       %
       \ActionKbdBackSpace
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdBackSpace}
       & Deletes the character before the line cursor \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,MROBE100_PAD}{
-        \ActionKbdMorseInput
-         \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdMorseInput}
-        & Enters Morse input mode \\
+      \ActionKbdDone
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdDone}
+      & Exits the virtual keyboard and saves any changes \\
+      %
+      \ActionKbdAbort
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdAbort}
+      & Exits the virtual keyboard without saving any changes \\
+      %
+      \opt{morse_input}{
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
+            ,MROBE100_PAD,SANSA_E200_PAD}{
+          \ActionKbdMorseInput
+          \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdMorseInput}
+          & Toggles keyboard input mode and Morse code input mode. \\
+        }
+        %
         \ActionKbdMorseSelect
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdMorseSelect}
-        & Tap to select a character in Morse input mode \\
+        & Tap to select a character in Morse code input mode. \\
+        %
       }
     \end{btnmap}
   \end{table}
 }
-
-\opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD}{
+\opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD,IAUDIO_M3_PAD}{
   \textbf{Picker area}
   \begin{table}
     \begin{btnmap}{}{}
-      \ActionKbdUp/\ActionKbdDown 
-        \opt{HAVEREMOTEKEYMAP}{& }
-        & Moves about the virtual keyboard.
-      If you move out of the picker area, you get to the \emph{Line edit mode}. \\
-      \ActionKbdLeft/\ActionKbdRight 
-        \opt{HAVEREMOTEKEYMAP}{& }
-         & (moves the solid cursor). \\
+      \ActionKbdLeft{} / \ActionKbdRight
+      \opt{HAVEREMOTEKEYMAP}{& }
+      & Moves the cursor on the virtual keyboard.
+        If you move out of the picker area, you get the previous/next page of
+        characters (if there is more than one). \\
+      %
+      \ActionKbdUp{} / \ActionKbdDown
+      \opt{HAVEREMOTEKEYMAP}{& }
+      & Moves the cursor on the virtual keyboard.
+        If you move out of the picker area you get to the line edit mode. \\
+      %
       \ActionKbdSelect
-        \opt{HAVEREMOTEKEYMAP}{& }
-      & Inserts the currently selected keyboard letter at the current
-      filename cursor position \\
+      \opt{HAVEREMOTEKEYMAP}{& }
+      & Inserts the selected keyboard letter at the current line cursor position \\
+      %
       \ActionKbdDone
-        \opt{HAVEREMOTEKEYMAP}{& }
+      \opt{HAVEREMOTEKEYMAP}{& }
       & Exits the virtual keyboard and saves any changes \\
+      %
       \ActionKbdAbort
-        \opt{HAVEREMOTEKEYMAP}{& }
-      & Exits the virtual keyboard without saving any changes\\
-      \opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}{
+      \opt{HAVEREMOTEKEYMAP}{& }
+      & Exits the virtual keyboard without saving any changes \\
+      %
+      \opt{morse_input}{
+        \opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}{
           \ActionKbdMorseInput
-             \opt{HAVEREMOTEKEYMAP}{& }
-          & Enters Morse input mode \\
-          \ActionKbdMorseSelect
-              \opt{HAVEREMOTEKEYMAP}{& }
-          & Tap to select a character in Morse input mode \\
+          \opt{HAVEREMOTEKEYMAP}{& }
+          & Toggles keyboard input mode and Morse code input mode. \\
+        }
+        %
+        \ActionKbdMorseSelect
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdMorseSelect}
+        & Tap to select a character in Morse code input mode. \\
+        %
       }
     \end{btnmap}
   \end{table}
+
   \textbf{Line edit mode}
   \begin{table}
     \begin{btnmap}{}{}
-      \ActionKbdLeft/\ActionKbdRight
-        \opt{HAVEREMOTEKEYMAP}{& }
-        & Move left and right\\
+      \ActionKbdLeft{} / \ActionKbdRight
+      \opt{HAVEREMOTEKEYMAP}{& }
+      & Moves the line cursor within the text line \\
+      %
       \ActionKbdSelect
-        \opt{HAVEREMOTEKEYMAP}{& }
-         & Deletes the letter to the left of the cursor\\
-      \ActionKbdUp/\ActionKbdDown 
-        \opt{HAVEREMOTEKEYMAP}{& }
-        & Returns to the picker area\\
+      \opt{HAVEREMOTEKEYMAP}{& }
+      & Deletes the character before the line cursor \\
+      %
+      \ActionKbdUp{} / \ActionKbdDown
+      \opt{HAVEREMOTEKEYMAP}{& }
+      & Returns to the picker area \\
+      %
     \end{btnmap}
   \end{table}
 }
-\opt{ondio}{
-    \begin{table}
-    \begin{btnmap}{Picker area}{}
-      \ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight
-        & Moves about the virtual keyboard (moves the solid cursor).
-          If you move out of the picker area with \ButtonUp/\ButtonDown,
-          you get to the line edit mode. \\
-      \ButtonMenu 
-        & Selects the letter underneath the cursor. \\
-      Long \ButtonMenu 
-       & Accepts the change and returns to the File Browser.\\
-      \ButtonOff 
-       & Quits the virtual keyboard without saving the changes.\\
-    \end{btnmap}
-  \end{table}
-  \begin{table}
-    \begin{btnmap}{Line edit mode}{}
-      \ButtonLeft/\ButtonRight & Moves left and right\\
-      \ButtonMenu & Deletes the letter to the left of the cursor\\
-      Long \ButtonMenu & Accepts the deletion\\
-      \ButtonUp/\ButtonDown & Returns to the picker area\\
-    \end{btnmap}
-  \end{table}
-}
-
 \opt{player}{
   The current text line to be entered or edited is always listed on the first
   line of the display. The second line of the display can contain the character
   selection bar, as in the screenshot above.
   \begin{table}
-     \begin{btnmap}{}{}
-       \ButtonOn & Toggles picker- and line edit mode\\
-       \ButtonLeft/\ButtonRight &  moves back and forth in the selected \\
-                                & line (picker of input line) \\
-       \ButtonPlay & Picks character in character bar, or acts as backspace \\
-                   & in the text line.\\
-       Long \ButtonPlay & Accept\\
-       \ButtonStop & Cancel\\
-       \ButtonMenu & Flips picker lines\\
+    \begin{btnmap}{}{}
+      \ButtonOn & Toggles picker- and line edit mode \\
+      \ButtonLeft{} / \ButtonRight
+        & Moves back and forth in the selected line (picker of input line) \\
+      \ButtonPlay
+        & Picks character in character bar, or acts as backspace in the text line. \\
+      Long \ButtonPlay & Accept \\
+      \ButtonStop & Cancel \\
+      \ButtonMenu & Flips picker lines \\
     \end{btnmap}
   \end{table}
-
 }
 
 \input{rockbox_interface/tagcache.tex}
