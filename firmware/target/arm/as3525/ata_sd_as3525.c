@@ -752,11 +752,13 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                 DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
 
             /*Small delay for writes prevents data crc failures at lower freqs*/
+#ifdef HAVE_MULTIDRIVE
             if((drive == SD_SLOT_AS3525) && !hs_card)
             {
                 int write_delay = 125;
                 while(write_delay--);
             }
+#endif
         }
         else
             dma_enable_channel(0, MCI_FIFO(drive), dma_buf,
