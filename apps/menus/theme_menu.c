@@ -49,6 +49,9 @@ static int clear_main_backdrop(void)
     global_settings.backdrop_file[0]=0;
     backdrop_unload(BACKDROP_MAIN);
     backdrop_show(BACKDROP_MAIN);
+    /* force a full redraw so the whole backdrop is cleared */
+    viewportmanager_theme_enable(SCREEN_MAIN, false, NULL);
+    viewportmanager_theme_undo(SCREEN_MAIN);
     settings_save();
     return 0;
 }
@@ -94,7 +97,6 @@ static int set_color_func(void* color)
                          colors[c].setting, banned_color);
     settings_save();
     settings_apply(false);
-    send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
     return res;
 }
 
@@ -108,7 +110,6 @@ static int reset_color(void)
     
     settings_save();
     settings_apply(false);
-    send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
     return 0;
 }
 MENUITEM_FUNCTION(set_bg_col, MENU_FUNC_USEPARAM, ID2P(LANG_BACKGROUND_COLOR),
@@ -162,7 +163,9 @@ static int statusbar_callback_ex(int action,const struct menu_item_ex *this_item
             break;
         case ACTION_EXIT_MENUITEM:
             send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
-            send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
+            /* force a full redraw */
+            viewportmanager_theme_enable(screen, false, NULL);
+            viewportmanager_theme_undo(screen);
             break;
     }
     return ACTION_REDRAW;
