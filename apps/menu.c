@@ -343,8 +343,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     const struct menu_item_ex *temp, *menu;
     int ret = 0, i;
     bool redraw_lists;
-   FOR_NB_SCREENS(i)
-       viewportmanager_theme_enable(i, true/*!hide_bars*/, NULL);
+    FOR_NB_SCREENS(i)
+        viewportmanager_theme_enable(i, !hide_bars, NULL);
     
     const struct menu_item_ex *menu_stack[MAX_MENUS];
     int menu_stack_selected_item[MAX_MENUS];
