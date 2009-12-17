@@ -55,23 +55,24 @@ bool BootloaderInstallIpod::install(void)
         emit done(true);
         return false;
     }
+    memset(&ipod, 0, sizeof(struct ipod_t));
 
-    struct ipod_t ipod;
-
-    int n = ipod_scan(&ipod);
-    if(n == -1) {
-        emit logItem(tr("No Ipod detected\n"
-                "Permission for disc access denied!"),
-                LOGERROR);
-        emit done(true);
-        return false;
-    }
-    if(n == 0) {
-        emit logItem(tr("No Ipod detected!"), LOGERROR);
+    if(!ipodInitialize(&ipod)) {
         emit done(true);
         return false;
     }
 
+    if(ipod.nimages <= 0) {
+        emit logItem(tr("Failed to read firmware directory"), LOGERROR);
+        emit done(true);
+        return false;
+    }
+    if(getmodel(&ipod,(ipod.ipod_directory[ipod.ososimage].vers>>8)) < 0) {
+        emit logItem(tr("Unknown version number in firmware (%1)").arg(
+                    ipod.ipod_directory[0].vers), LOGERROR);
+        emit done(true);
+        return false;
+    }
     if(ipod.macpod) {
         emit logItem(tr("Warning: This is a MacPod, Rockbox only runs on WinPods. \n"
                     "See http://www.rockbox.org/wiki/IpodConversionToFAT32"), LOGERROR);
@@ -88,41 +89,15 @@ bool BootloaderInstallIpod::install(void)
 
 void BootloaderInstallIpod::installStage2(void)
 {
-    struct ipod_t ipod;
-
     emit logItem(tr("Installing Rockbox bootloader"), LOGINFO);
     QCoreApplication::processEvents();
-    if(!ipodInitialize(&ipod)) {
-        emit done(true);
-        return;
-    }
-
-    read_directory(&ipod);
-
-    if(ipod.nimages <= 0) {
-        emit logItem(tr("Failed to read firmware directory"), LOGERROR);
-        emit done(true);
-        return;
-    }
-    if(getmodel(&ipod,(ipod.ipod_directory[ipod.ososimage].vers>>8)) < 0) {
-        emit logItem(tr("Unknown version number in firmware (%1)").arg(
-                    ipod.ipod_directory[0].vers), LOGERROR);
-        emit done(true);
-        return;
-    }
-
-    if(ipod.macpod) {
-        emit logItem(tr("Warning: This is a MacPod, Rockbox only runs on WinPods. \n"
-                    "See http://www.rockbox.org/wiki/IpodConversionToFAT32"), LOGERROR);
-        emit done(true);
-        return;
-    }
 
     if(ipod_reopen_rw(&ipod) < 0) {
         emit logItem(tr("Could not open Ipod in R/W mode"), LOGERROR);
         emit done(true);
         return;
     }
+    QCoreApplication::processEvents();
 
     m_tempfile.open();
     QString blfile = m_tempfile.fileName();
@@ -173,8 +148,6 @@ bool BootloaderInstallIpod::uninstall(void)
         emit done(true);
         return false;
     }
-
-    read_directory(&ipod);
 
     if (ipod.nimages <= 0) {
         emit logItem(tr("Failed to read firmware directory"),LOGERROR);
@@ -266,16 +239,20 @@ bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
                  << ipod->diskname;
     }
     else {
-        ipod_scan(ipod);
-        qDebug() << "[BootloaderInstallIpod] ipodpatcher: scanning, found device"
-                 << ipod->diskname;
+        emit logItem(tr("Error: no mountpoint specified!"), LOGERROR);
+        qDebug() << "[BootloaderInstallIpod] no mountpoint specified!";
     }
-    if(ipod_open(ipod, 0) < 0) {
+    int result = ipod_open(ipod, 1);
+    if(result == -2) {
+        emit logItem(tr("Could not open Ipod: permission denied"), LOGERROR);
+        return false;
+    }
+    else if(result < 0) {
         emit logItem(tr("Could not open Ipod"), LOGERROR);
         return false;
     }
 
-    if(read_partinfo(ipod, 0) < 0) {
+    if(read_partinfo(ipod, 1) < 0) {
         emit logItem(tr("Error reading partition table - possibly not an Ipod"), LOGERROR);
         ipod_close(ipod);
         return false;
@@ -286,6 +263,8 @@ bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
         ipod_close(ipod);
         return false;
     }
+    read_directory(ipod);
+    ipod_close(ipod);
     return true;
 }
 

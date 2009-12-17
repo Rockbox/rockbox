@@ -44,6 +44,7 @@ class BootloaderInstallIpod : public BootloaderInstallBase
 
     private:
         bool ipodInitialize(struct ipod_t *);
+        struct ipod_t ipod;
 };
 
 
