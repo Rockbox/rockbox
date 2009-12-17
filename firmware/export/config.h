@@ -558,15 +558,12 @@ Lyre prototype 1 */
 #define CONFIG_TUNER_MULTI
 #endif
 
-/* deactivate fading in bootloader */
-#ifdef BOOTLOADER
+/* deactivate fading in bootloader/sim */
+#if defined(BOOTLOADER) || (defined(SIMULATOR) && \
+                     (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM || \
+                     CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_TARGET))
 #undef CONFIG_BACKLIGHT_FADING
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_NO_FADING
-#endif
-
-#ifdef SIMULATOR
-#undef CONFIG_BACKLIGHT_FADING
-#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
 #endif
 
 /* determine which setting/manual text to use */
