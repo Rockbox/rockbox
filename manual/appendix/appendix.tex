@@ -61,42 +61,42 @@ cannot do. View it as the opposite of a TODO!
 
 \begin{itemize}
 \opt{archos}{
-\item Record to WAV (uncompressed) or MP3pro format!\\
+\item Record to WAV (uncompressed) or MP3pro format.\\
 The recording hardware (the MAS) does not allow us to do this
-\item Crossfade between tracks!\\
+\item Crossfade between tracks.\\
   Crossfading would require two mp3 decoders, and we only have one. 
   This is not possible.
-\item Support MP3pro, WMA or other sound format playback!\\
+\item Support MP3pro, WMA or other sound format playback.\\
   The mp3{}-decoding hardware can only play MP3. We cannot make it play other 
   sound formats.
-\item  Converting OGG $\rightarrow$ MP3 \\
+\item  Converting OGG $\rightarrow$ MP3.\\
   The mp3{}-decoding hardware cannot decode OGG. It can be reprogrammed, but 
   there is too little memory for OGG and we have no documentation on how to 
   program the MAS' DSP. Doing the conversion with the CPU is impossible, since 
   a 12MHz SH1 is far too slow for this daunting task.
-\item Archos Multimedia support!\\
+\item Archos Multimedia support.\\
   The Archos Multimedia is a completely different beast. It is an entirely 
   different architecture, different CPU and upgrading the software is done 
   a completely different way. We do not wish to venture into this.  Others 
   may do so. We will not.
-\item Multi{}-band (or graphic) equaliser\\
+\item Multi{}-band (or graphic) equaliser.\\
   We cannot access information for that kind of visualisation from the MP3 
   decoding hardware.
-\item CBR recording!\\
+\item CBR recording.\\
   The MP3 encoding hardware does not allow this.
-\item Change tempo of a song without changing pitch!\\
+\item Change tempo of a song without changing pitch.\\
   The MP3 decoding hardware does not allow this.
-\item Graphic frequency (spectrum analyser!)\\
+\item Graphic frequency (spectrum analyser).\\
   We cannot access the audio waveform from the MP3 decoder so we cannot analyse 
   it. Even if we had access to it, the CPU would probably be too slow to 
   perform the analysis anyway.
-\item Cool sound effects!\\
+\item Cool sound effects.\\
   Adding new sound effects requires reprogramming the MAS chip, and we cannot 
   do that. The MAS chip is programmable, but we have no access to the chip 
   documentation.
 }
 \nopt{h300,x5}{
-\item Interfacing with other USB devices (like cameras) or 2 player games over USB\\
+\item Interfacing with other USB devices (like cameras) or 2 player games over USB.\\
   The USB system demands that there is a master that talks to a slave. The
   \dap{} can only serve as a slave, as most other USB devices such as
   cameras can. Thus, without a master no communication between the slaves
@@ -105,7 +105,7 @@ The recording hardware (the MAS) does not allow us to do this
   in the \dap{} is strictly made for disk{}-access and does not allow us
   to play with it the way we'd need for any good communication to work.
 }
-\item Support other file systems than FAT32 (like NTFS or ext2 or whatever)!\\
+\item Support other file systems than FAT32 (like NTFS or ext2 etc.).\\
   No.
   \opt{archos}{Rockbox needs to support FAT32 since it can only start off a FAT32
   partition (since that is the only way the ROM can load it), and adding}%
@@ -113,13 +113,27 @@ The recording hardware (the MAS) does not allow us to do this
   unnecessary features. You can partition your \dap{} fine, just make sure
   the first one is FAT32 and then make the other ones whatever file system
   you want. Just do not expect Rockbox to understand them.
-\item Add scandisk{}-like features!\\
+\item Add scandisk{}-like features.\\
   It would be a very slow operation that would drain the batteries and
   take a lot of useful ram for something that is much better and faster
   done when connected to a host computer.
+\item Alphabetical list skipping.\\
+  Skipping around the lists by jumping letters (i.e skip all C's and go
+  straight to the first D). This isn't feasible with the current list
+  implementation, if you really want this you can get similar effects using
+  the database (see \reference{ref:database}).
+\item Add support for non standard tag formats.\\
+APE tags in MP3 files has been rejected a few times already. Its not something we want.
+\item Implementing the ability to playback DRM files.\\
+  Firstly, this would be extremely difficult to implement legally - Rockbox
+  is not legal entity as such, and therefore is unable to enter into license
+  agreements with providers of DRM technology.
+  Secondly, Rockbox is open source, which would mean that any DRM technology we
+  incorporated into our codebase would suddenly become visible to the whole world,
+  completely defeating its purpose. Remember, DRM achieves part of it's security
+  through obscurity, and publishing the keys necessary to decrypt DRM'd 
+  media would essentially render it useless.
 \end{itemize}
-
-\input{appendix/changelog.tex}
 
 \chapter{Credits}
 People that have contributed to the project, one way or another. Friends!
