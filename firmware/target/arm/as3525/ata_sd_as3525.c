@@ -376,31 +376,6 @@ static int sd_init_card(const int drive)
         return -10;
     mci_delay();
 
-#ifndef BOOTLOADER
-    /*  Switch to to 4 bit widebus mode  */
-    if(sd_wait_for_state(drive, SD_TRAN) < 0)
-        return -11;
-    mci_delay();
-    /* CMD55 */
-    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_ARG, NULL))
-        return -12;
-    mci_delay();
-    /* ACMD6  */
-    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_ARG, NULL))
-        return -13;
-    mci_delay();
-    /* CMD55 */
-    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_ARG, NULL))
-        return -14;
-    mci_delay();
-    /* ACMD42  */
-    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_ARG, NULL))
-        return -15;
-    mci_delay();
-    /* Now that card is widebus make controller widebus also */
-    MCI_CLOCK(drive) |= MCI_CLOCK_WIDEBUS;
-#endif
-
     /*
      * enable bank switching
      * without issuing this command, we only have access to 1/4 of the blocks
@@ -775,17 +750,13 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             dma_enable_channel(0, dma_buf, MCI_FIFO(drive),
                 (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
                 DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
-#if defined(HAVE_MULTIDRIVE)
+
             /*Small delay for writes prevents data crc failures at lower freqs*/
-            if(!hs_card)
+            if((drive == SD_SLOT_AS3525) && !hs_card)
             {
                 int write_delay = 125;
                 while(write_delay--);
             }
-#else
-            int write_delay = 125;
-            while(write_delay--);
-#endif
         }
         else
             dma_enable_channel(0, MCI_FIFO(drive), dma_buf,
