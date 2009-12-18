@@ -61,8 +61,9 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
     (&s->fft)->nbits = nbits-2;
     (&s->fft)->inverse = inverse;
 
-    return 0;
+    ff_fft_init((void *)(&s->fft), s->nbits - 2, 1);
 
+    return 0;
 }
 
 /**
@@ -82,7 +83,6 @@ void ff_imdct_calc(MDCTContext *s,
     const fixed32 *in1, *in2;
     FFTComplex *z1 = (FFTComplex *)output;
     FFTComplex *z2 = (FFTComplex *)input;
-//    int revtabshift = 12 - s->nbits;
 
     n = 1 << s->nbits;
 
@@ -90,15 +90,16 @@ void ff_imdct_calc(MDCTContext *s,
     n4 = n >> 2;
     n8 = n >> 3;
 
-    ff_fft_init((void *)(&s->fft), s->nbits - 2, 1);
-        	
     /* pre rotation */
     in1 = input;
     in2 = input + n2 - 1;
+    /* careful: fft is initialised for a different number of bits here
+       so have to use s->fft->nbits not s->nbits .. */
+    const int revtab_shift = (12- s->fft.nbits);
 
     for(k = 0; k < n4; k++)
     {
-        j= s->fft.revtab[k];
+        j= (s->fft.revtab[k])>>revtab_shift;
         CMUL(&z1[j].re, &z1[j].im, *in2, *in1, tcos[k], tsin[k]);
         in1 += 2;
         in2 -= 2;

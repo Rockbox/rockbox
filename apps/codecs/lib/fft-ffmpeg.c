@@ -104,6 +104,8 @@ static FFTSample ** const ff_cos_tabs[] = {
 };
 
 uint16_t revtab[1<<12];
+static bool revtab_initialised = false;
+
 FFTComplex exptab[1<<11], tmp_buf[1<<12];
 
 static int split_radix_permutation(int i, int n, int inverse)
@@ -172,8 +174,22 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
               tab[m/2-i] = tab[i];
         }
     }
-    for(i=0; i<n; i++)
-        s->revtab[-split_radix_permutation(i, n, s->inverse) & (n-1)] = i;
+
+    /* FIXME: there ought to be some shortcuts here, I just haven't
+       thought of any yet.  Ideally we would be able to massage data
+       so that it comes out in standard or standard-bitrev order
+       rather than this funky thing */
+    if( !revtab_initialised )
+    {
+      /* fully initialise the revtab for entire 1<<12 range */
+      const int MAX_REVTAB=1<<12;
+      
+      for(i=0; i<MAX_REVTAB ; i++)
+          s->revtab[-split_radix_permutation(i, MAX_REVTAB, s->inverse) & (MAX_REVTAB-1)] = i;
+          
+      revtab_initialised = true;
+    }
+
     s->tmp_buf = tmp_buf;
     
     return 0;
@@ -185,17 +201,19 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
     FFTComplex tmp;
     const uint16_t *revtab = s->revtab;
     np = 1 << s->nbits;
+    
+    const int revtab_shift = (12 - s->nbits);
 
     if (s->tmp_buf) {
         /* TODO: handle split-radix permute in a more optimal way, probably in-place */
-        for(j=0;j<np;j++) s->tmp_buf[revtab[j]] = z[j];
+        for(j=0;j<np;j++) s->tmp_buf[revtab[j]>>revtab_shift] = z[j];
         memcpy(z, s->tmp_buf, np * sizeof(FFTComplex));
         return;
     }
 
     /* reverse */
     for(j=0;j<np;j++) {
-        k = revtab[j];
+        k = revtab[j]>>revtab_shift;
         if (k < j) {
             tmp = z[k];
             z[k] = z[j];
