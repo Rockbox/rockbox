@@ -165,6 +165,11 @@
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
 
+#ifndef ONDA_VX777 /* Doesn't have any physical buttons */
+/* There is only USB charging */
+#define HAVE_USB_POWER
+#endif
+
 #define CFG_EXTAL 12000000    /* EXT clock: 12 Mhz */
 
 /*
