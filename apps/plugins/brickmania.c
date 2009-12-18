@@ -266,13 +266,7 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #include "pluginbitmaps/brickmania_gameover.h"
 
 #define GAMESCREEN_WIDTH    FIXED3(LCD_WIDTH)
-
-#if LCD_WIDTH<=LCD_HEIGHT
-/* Maintain a 4/3 ratio (width/height) */
-#define GAMESCREEN_HEIGHT   (GAMESCREEN_WIDTH * 3 / 4)
-#else
 #define GAMESCREEN_HEIGHT   FIXED3(LCD_HEIGHT)
-#endif
 
 #define PAD_WIDTH        FIXED3(BMPWIDTH_brickmania_pads)
 #define PAD_HEIGHT       FIXED3(BMPHEIGHT_brickmania_pads/3)
