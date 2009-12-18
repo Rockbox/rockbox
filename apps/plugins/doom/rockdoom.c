@@ -653,6 +653,9 @@ extern int systemvol;
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
+   /* Disable all talking before initializing IRAM */
+   rb->talk_disable(true);
+
    PLUGIN_IRAM_INIT(rb)
 
    (void)parameter;
@@ -686,6 +689,7 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
        rb->cpu_boost(false);
 #endif
+       rb->talk_disable(false);
        if( result == -1 )
            return PLUGIN_OK; // Quit was selected
        else
@@ -752,5 +756,6 @@ enum plugin_status plugin_start(const void* parameter)
    rb->cpu_boost(false);
 #endif
 
+   rb->talk_disable(false);
    return PLUGIN_OK;
 }
