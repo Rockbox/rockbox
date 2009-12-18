@@ -1589,9 +1589,9 @@ static int brickmania_game_loop(void)
                         rght_brick.p2.y = brick[bnum].powertop + BRICK_HEIGHT;
                     
                         /* Check if any of the active fires hit a brick */
-                        if (pad_type == SHOOTER) 
+                        for (k=0;k<30;k++) 
                         {
-                            for (k=0;k<30;k++) 
+                            if(fire[k].top > 0)
                             {
                                 /* Use misc_line to check if fire hit brick */
                                 misc_line.p1.x = fire[k].x_pos;
@@ -1601,8 +1601,7 @@ static int brickmania_game_loop(void)
                                 misc_line.p2.y = fire[k].top + SPEED_FIRE;
                             
                                 /* If the fire hit the brick take care of it */
-                                if (fire[k].top > 0 && 
-                                    check_lines(&misc_line, &bot_brick, 
+                                if (check_lines(&misc_line, &bot_brick, 
                                                 &pt_hit)) 
                                 {
                                     score+=13;
@@ -1612,7 +1611,7 @@ static int brickmania_game_loop(void)
                                 }
                             }
                         }
-
+                            
                         /* Draw the brick */
                         rb->lcd_bitmap_part(brickmania_bricks,0,
                             INT3(BRICK_HEIGHT)*brick[bnum].color,
