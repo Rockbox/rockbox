@@ -510,7 +510,7 @@ bool option_screen(const struct settings_list *setting,
     gui_synclist_speak_item(&lists);
     while (!done)
     {
-        if (list_do_action(CONTEXT_LIST, TIMEOUT_BLOCK,
+        if (list_do_action(CONTEXT_LIST, HZ, /* HZ so the status bar redraws */
                            &lists, &action,
             allow_wrap? LIST_WRAP_UNLESS_HELD: LIST_WRAP_OFF))
         {

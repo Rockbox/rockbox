@@ -128,9 +128,9 @@ void sb_skin_update(enum screen_type screen, bool force)
                 skin_update(&sb_skin[i], force?
                         WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
         }
+        next_update = current_tick + update_delay; /* don't update too often */
+        sb_skin[SCREEN_MAIN].sync_data->do_full_update = false;
     }
-    next_update = current_tick + update_delay; /* don't update too often */
-    sb_skin[SCREEN_MAIN].sync_data->do_full_update = false;
 }
 
 void do_sbs_update_callback(void *param)

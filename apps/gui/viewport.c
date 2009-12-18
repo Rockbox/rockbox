@@ -153,7 +153,8 @@ static void toggle_theme(void)
         remove_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, do_sbs_update_callback);
         remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
     }
-        
+    /* let list initialize viewport in case viewport dimensions is changed. */
+    send_event(GUI_EVENT_THEME_CHANGED, NULL);
     FOR_NB_SCREENS(i)
         was_enabled[i] = is_theme_enabled(i);
 }
