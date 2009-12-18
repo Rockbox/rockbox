@@ -28,7 +28,7 @@
 #include "fmradio.h"
 #include "fmradio_i2c.h" /* physical interface driver */
 
-#if defined(PHILIPS_HDD1630)
+#if defined(PHILIPS_HDD1630) || defined(ONDA_VX747)
 #define I2C_ADR 0x60
 #else
 #define I2C_ADR 0xC0

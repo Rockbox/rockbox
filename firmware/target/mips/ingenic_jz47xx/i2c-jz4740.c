@@ -121,6 +121,7 @@ void i2c_setclk(unsigned int i2cclk)
  */
 static void i2c_open(void)
 {
+    __cpm_start_i2c();
     i2c_setclk(10000); /* default 10 KHz */
     __i2c_enable();
 }
@@ -129,6 +130,7 @@ static void i2c_close(void)
 {
     udelay(300); /* wait for STOP goes over. */
     __i2c_disable();
+    __cpm_stop_i2c();
 }
 
 int i2c_read(int device, unsigned char *buf, int count)
