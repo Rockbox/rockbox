@@ -23,8 +23,6 @@
 typedef int32_t fixed32; 
 typedef int64_t fixed64;
 
-#define PRECISION       16
-
 #define FFT_FIXED
 
 #ifdef FFT_FIXED
@@ -41,9 +39,6 @@ typedef struct FFTContext {
     int nbits;
     int inverse;
     uint16_t *revtab;
-    FFTComplex *exptab;
-    FFTComplex *exptab1; /* only used by SSE code */
-    FFTComplex *tmp_buf;
     int mdct_size; /* size of MDCT (i.e. number of input data * 2) */
     int mdct_bits; /* n = 2^nbits */
     /* pre/post rotation tables */

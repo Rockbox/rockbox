@@ -34,22 +34,10 @@
 #include <time.h>
 #include <codecs/lib/codeclib.h>
 
-
-#define PRECISION       16
-
-#define fixtof32(x)       (float)((float)(x) / (float)(1 << PRECISION))        //does not work on int64_t!
-#define ftofix32(x)       ((fixed32)((x) * (float)(1 << PRECISION) + ((x) < 0 ? -0.5 : 0.5)))
-#define itofix32(x)       ((x) << PRECISION)
-#define fixtoi32(x)       ((x) >> PRECISION)
 static void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
-#define MUL(a,b) \
-({ int32_t _ta=(a), _tb=(b), _tc; \
-   _tc=(_ta & 0xffff)*(_tb >> 16)+(_ta >> 16)*(_tb & 0xffff); (int32_t)(((_tc >> 14))+ (((_ta >> 16)*(_tb >> 16)) << 2 )); })
 
-#define DECLARE_ALIGNED_16(type, arg) type arg __attribute__ ((aligned(16)))
-#define M_PI_F          0x0003243f  /* pi 16.16 */
-#define M_SQRT1_2_F     0x0000b505  /* 1/sqrt(2) 16.16 */
-#define av_unused
+#define M_SQRT1_2_F	0x5a827999  /* 1/sqrt(2) s.31 */
+
 #define FFT_SIZE 1024
 
 int32_t flattabs[8+16+32+64+128+256+512+1024+2048];
@@ -61,6 +49,8 @@ int32_t * tabstabstabs[] = { flattabs, flattabs+8, flattabs+8+16,flattabs+8+16+3
 
 /* Global variables for holding number of muls and adds */
 int muls, adds;
+
+bool b_done_once = false;
 
 /* cos(2*pi*x/n) for 0<=x<=n/4, followed by its reverse */
 /*
@@ -106,8 +96,6 @@ static FFTSample ** const ff_cos_tabs[] = {
 uint16_t revtab[1<<12];
 static bool revtab_initialised = false;
 
-FFTComplex exptab[1<<11], tmp_buf[1<<12];
-
 static int split_radix_permutation(int i, int n, int inverse)
 {
     int m;
@@ -125,15 +113,13 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
     int i, j, n;
     FFTContext *s = (FFTContext *)(arg_s);
   
-    fixed32 temp, phase;
+    unsigned long phase;
 
     if (nbits < 2 || nbits > 12)
         return -1;
     s->nbits = nbits;
     n = 1 << nbits;
 
-    s->tmp_buf = NULL;
-    s->exptab  = exptab;
     s->revtab = revtab;
     s->inverse = inverse;
 
@@ -143,7 +129,6 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
   /*s->imdct_calc  = ff_imdct_calc_c;
     s->imdct_half  = ff_imdct_half_c;
     s->mdct_calc   = ff_mdct_calc_c;
-    s->exptab1     = NULL;
     s->split_radix = 1;*/
 
   /*if (ARCH_ARM)     ff_fft_init_arm(s);
@@ -153,7 +138,6 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
     /* FIXME these should really just be precalculated */
     for(j=4; j<=nbits; j++) {
         int m = 1<<j;
-        //fixed32 freq = (M_PI_F / m ) << 1;
         FFTSample *tab = *(ff_cos_tabs[j-4]);
         
         /* if tab is NULL, table hasn't been built yet, fill it in now */
@@ -166,10 +150,14 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
         
           for(i=0; i<=m/4; i++) {            
               phase = ((i<<16) / m)<<16;
-              fsincos(phase, &temp);//tab[i] = cos(i*freq);
-              tab[i] = temp>>15;
+
+              fsincos(phase, &tab[i]);   /* get into range 0x00000000 to 0x7fffffff */
           }
-            
+
+          /* second half of tab is the reverse */
+          /* FIXME: wasteful - could just store half as much and use
+             clever indexing to get the re/im parts. (Tremor interleaves
+             cos,sin here, rather than effectively having two separate tables) */            
           for(i=1; i<m/4; i++)
               tab[m/2-i] = tab[i];
         }
@@ -190,8 +178,6 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
       revtab_initialised = true;
     }
 
-    s->tmp_buf = tmp_buf;
-    
     return 0;
 }
 
@@ -203,13 +189,6 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
     np = 1 << s->nbits;
     
     const int revtab_shift = (12 - s->nbits);
-
-    if (s->tmp_buf) {
-        /* TODO: handle split-radix permute in a more optimal way, probably in-place */
-        for(j=0;j<np;j++) s->tmp_buf[revtab[j]>>revtab_shift] = z[j];
-        memcpy(z, s->tmp_buf, np * sizeof(FFTComplex));
-        return;
-    }
 
     /* reverse */
     for(j=0;j<np;j++) {
@@ -253,24 +232,22 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 }
 
 #define TRANSFORM(a0,a1,a2,a3,wre,wim) {\
-    t1 = fixmul32(a2.re, wre) + fixmul32(a2.im, wim);\
-    t2 = fixmul32(a2.im, wre) - fixmul32(a2.re, wim);\
-    t5 = fixmul32(a3.re, wre) - fixmul32(a3.im, wim);\
-    t6 = fixmul32(a3.im, wre) + fixmul32(a3.re, wim);\
+    t1 = fixmul32b(a2.re, wre) + fixmul32b(a2.im, wim);\
+    t2 = fixmul32b(a2.im, wre) - fixmul32b(a2.re, wim);\
+    t5 = fixmul32b(a3.re, wre) - fixmul32b(a3.im, wim);\
+    t6 = fixmul32b(a3.im, wre) + fixmul32b(a3.re, wim);\
     muls += 8;\
     BUTTERFLIES(a0,a1,a2,a3)\
 }
-
-/*optimized for wre==wim*/
 #define TRANSFORM_EQUAL(a0,a1,a2,a3,w) {\
-    t3 = fixmul32(a2.re, w);\
-    t4 = fixmul32(a2.im, w);\
-    t7 = fixmul32(a3.re, w);\
-    t8 = fixmul32(a3.im, w);\
-    t1 = t3 + t4;\
-    t2 = t4 - t3;\
-    t5 = t7 - t8;\
-    t6 = t8 + t7;\
+    t3 = fixmul32b(a2.re, w);\
+    t4 = fixmul32b(a2.im, w);\
+    t7 = fixmul32b(a3.re, w);\
+    t8 = fixmul32b(a3.im, w);\
+    t1 = ( t3 + t4 );\
+    t2 = ( t4 - t3 );\
+    t5 = ( t7 - t8 );\
+    t6 = ( t8 + t7 );\
     BUTTERFLIES(a0,a1,a2,a3)\
 }
 
@@ -406,6 +383,12 @@ void ff_fft_calc_c(FFTContext *s, FFTComplex *z)
 #if 0
 int main (void)
 {
+#define PRECISION       16
+
+#define ftofix32(x)       ((fixed32)((x) * (float)(1 << PRECISION) + ((x) < 0 ? -0.5 : 0.5)))
+#define itofix32(x)       ((x) << PRECISION)
+#define fixtoi32(x)       ((x) >> PRECISION)
+
     int             j;
     const long      N = FFT_SIZE;
     double          r[FFT_SIZE] = {0.0}, i[FFT_SIZE] = {0.0};

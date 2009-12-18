@@ -30,6 +30,8 @@
             and the mdct rotations require 1/8th fractional steps so 8
             times as many points (so you're at N*8/8 = N) */
             
+/* NOTE: data format of mdct trig tables is s.31 */
+            
 fixed32 *tcosarray[5], *tsinarray[5];
 fixed32 tcos0[1024], tcos1[512], tcos2[256], tcos3[128], tcos4[64];
 fixed32 tsin0[1024], tsin1[512], tsin2[256], tsin3[128], tsin4[64];
@@ -49,12 +51,19 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
     n4 = n>>2;
     s->tcos = tcosarray[12-nbits];
     s->tsin = tsinarray[12-nbits];
+    
+    unsigned long phase;
+    
     for(i=0;i<n4;i++)
     {
-      fixed32 ip = itofix32(i) + 0x2000; // = i+(1/8)
-      ip = ip>>nbits; // = [i+(1/8)]/N
+      /* phase = (i+(1/8))/N in 32bit range (e.g. 0x0=0deg, 0x80000000=180deg)
+         Shifting by <<16 in two stages works so long as largest nbits < 16
+         (which it is).
+         Note - this has NOTHING to do with fixmul32/PRECISION/etc
+         (see definition of fsincos function below)               */
+      phase = ( ((i<<16) + 0x2000) >> nbits ) << 16;
       /* tsin and tcos are just reflections of each other with a phase shift */
-      s->tsin[i] = -fsincos(ip<<16, &(s->tcos[i]));
+      s->tsin[i] = -fsincos(phase, &(s->tcos[i]));
       s->tcos[i] *= (-1);
     }
 
