@@ -69,7 +69,9 @@ GREY_INFO_STRUCT
 #define DIR_NEXT -1
 #define DIR_NONE  0
 
-#define PLUGIN_OTHER 10 /* State code for output with return. */
+#define PLUGIN_OTHER    10 /* State code for output with return. */
+#define PLUGIN_ABORT    11
+#define PLUGIN_OUTOFMEM 12
 
 /******************************* Globals ***********************************/
 
@@ -105,25 +107,25 @@ struct jpeg_settings
 };
 
 static struct jpeg_settings jpeg_settings =
-    { 
+{
 #ifdef HAVE_LCD_COLOR
-      COLOURMODE_COLOUR, 
-      DITHER_NONE,
+    COLOURMODE_COLOUR,
+    DITHER_NONE,
 #endif
-      SS_DEFAULT_TIMEOUT
-    };
+    SS_DEFAULT_TIMEOUT
+};
 static struct jpeg_settings old_settings;
 
 static struct configdata jpeg_config[] =
 {
 #ifdef HAVE_LCD_COLOR
-   { TYPE_ENUM, 0, COLOUR_NUM_MODES, { .int_p = &jpeg_settings.colour_mode },
-     "Colour Mode", (char *[]){ "Colour", "Grayscale" } },
-   { TYPE_ENUM, 0, DITHER_NUM_MODES, { .int_p = &jpeg_settings.dither_mode },
-     "Dither Mode", (char *[]){ "None", "Ordered", "Diffusion" } },
+    { TYPE_ENUM, 0, COLOUR_NUM_MODES, { .int_p = &jpeg_settings.colour_mode },
+        "Colour Mode", (char *[]){ "Colour", "Grayscale" } },
+    { TYPE_ENUM, 0, DITHER_NUM_MODES, { .int_p = &jpeg_settings.dither_mode },
+        "Dither Mode", (char *[]){ "None", "Ordered", "Diffusion" } },
 #endif
-   { TYPE_INT, SS_MIN_TIMEOUT, SS_MAX_TIMEOUT,
-     { .int_p = &jpeg_settings.ss_timeout }, "Slideshow Time", NULL },
+    { TYPE_INT, SS_MIN_TIMEOUT, SS_MAX_TIMEOUT,
+        { .int_p = &jpeg_settings.ss_timeout }, "Slideshow Time", NULL },
 };
 
 #if LCD_DEPTH > 1
@@ -526,8 +528,8 @@ static void pan_view_down(struct t_disp* pdisp)
              */
             move++, pdisp->y--;
             rb->memcpy(rgb_linebuf,
-                   rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
-                   LCD_WIDTH*sizeof (fb_data));
+                    rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
+                    LCD_WIDTH*sizeof (fb_data));
         }
 #endif
 
@@ -538,8 +540,7 @@ static void pan_view_down(struct t_disp* pdisp)
         {
             /* Cover the first row drawn with previous image data. */
             rb->memcpy(rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
-                   rgb_linebuf,
-                   LCD_WIDTH*sizeof (fb_data));
+                        rgb_linebuf, LCD_WIDTH*sizeof (fb_data));
             pdisp->y++;
         }
 #endif
@@ -557,7 +558,8 @@ int scroll_bmp(struct t_disp* pdisp)
     {
         if (slideshow_enabled)
             button = rb->button_get_w_tmo(jpeg_settings.ss_timeout * HZ);
-        else button = rb->button_get(true);
+        else
+            button = rb->button_get(true);
 
         running_slideshow = false;
 
@@ -737,6 +739,86 @@ int max_downscale(struct jpeg *p_jpg)
     return downscale;
 }
 
+/* load image from filename. */
+int load_image(char* filename, struct jpeg *p_jpg)
+{
+    int fd;
+    int filesize;
+    unsigned char* buf_jpeg; /* compressed JPEG image */
+    int status;
+
+    fd = rb->open(filename, O_RDONLY);
+    if (fd < 0)
+    {
+        rb->splashf(HZ, "err opening %s:%d", filename, fd);
+        return PLUGIN_ERROR;
+    }
+    filesize = rb->filesize(fd);
+
+    /* allocate JPEG buffer */
+    buf_jpeg = buf;
+
+    /* we can start the decompressed images behind it */
+    buf_images = buf_root = buf + filesize;
+    buf_images_size = root_size = buf_size - filesize;
+
+    if (buf_images_size <= 0)
+    {
+        rb->close(fd);
+        return PLUGIN_OUTOFMEM;
+    }
+
+    if(!running_slideshow)
+    {
+        rb->snprintf(print, sizeof(print), "%s:", rb->strrchr(filename,'/')+1);
+        rb->lcd_puts(0, 0, print);
+        rb->lcd_update();
+
+        rb->snprintf(print, sizeof(print), "loading %d bytes", filesize);
+        rb->lcd_puts(0, 1, print);
+        rb->lcd_update();
+    }
+
+    rb->read(fd, buf_jpeg, filesize);
+    rb->close(fd);
+
+    if(!running_slideshow)
+    {
+        rb->snprintf(print, sizeof(print), "decoding markers");
+        rb->lcd_puts(0, 2, print);
+        rb->lcd_update();
+    }
+#ifndef SIMULATOR
+    else if(immediate_ata_off)
+    {
+        /* running slideshow and time is long enough: power down disk */
+        rb->storage_sleep();
+    }
+#endif
+
+    /* process markers, unstuffing */
+    status = process_markers(buf_jpeg, filesize, p_jpg);
+
+    if (status < 0 || (status & (DQT | SOF0)) != (DQT | SOF0))
+    {   /* bad format or minimum components not contained */
+        rb->splashf(HZ, "unsupported %d", status);
+        return PLUGIN_ERROR;
+    }
+
+    if (!(status & DHT)) /* if no Huffman table present: */
+        default_huff_tbl(p_jpg); /* use default */
+    build_lut(p_jpg); /* derive Huffman and other lookup-tables */
+
+    if(!running_slideshow)
+    {
+        rb->snprintf(print, sizeof(print), "image %dx%d",
+                            p_jpg->x_size, p_jpg->y_size);
+        rb->lcd_puts(0, 2, print);
+        rb->lcd_update();
+    }
+
+    return PLUGIN_OK;
+}
 
 /* return decoded or cached image */
 struct t_disp* get_image(struct jpeg* p_jpg, int ds)
@@ -755,7 +837,7 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
 
     /* assign image buffer */
 
-     /* physical size needed for decoding */
+    /* physical size needed for decoding */
     size = jpegmem(p_jpg, ds);
     if (buf_images_size <= size)
     {   /* have to discard the current */
@@ -856,7 +938,6 @@ void set_view (struct t_disp* p_disp, int cx, int cy)
     p_disp->y = y;
 }
 
-
 /* calculate the view center based on the bitmap position */
 void get_view(struct t_disp* p_disp, int* p_cx, int* p_cy)
 {
@@ -864,37 +945,30 @@ void get_view(struct t_disp* p_disp, int* p_cx, int* p_cy)
     *p_cy = p_disp->y + MIN(LCD_HEIGHT, p_disp->height) / 2;
 }
 
-
 /* load, decode, display the image */
 int load_and_show(char* filename)
 {
-    int fd;
-    int filesize;
-    unsigned char* buf_jpeg; /* compressed JPEG image */
     int status;
     struct t_disp* p_disp; /* currenly displayed image */
     int cx, cy; /* view center */
 
-    fd = rb->open(filename, O_RDONLY);
-    if (fd < 0)
-    {
-        rb->snprintf(print,sizeof(print),"err opening %s:%d",filename,fd);
-        rb->splash(HZ, print);
-        return PLUGIN_ERROR;
-    }
-    filesize = rb->filesize(fd);
+#if LCD_DEPTH > 1
+    rb->lcd_set_foreground(LCD_WHITE);
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_set_backdrop(NULL);
+#endif
+    rb->lcd_clear_display();
+
     rb->memset(&disp, 0, sizeof(disp));
+    rb->memset(&jpg, 0, sizeof(jpg)); /* clear info struct */
 
-    /* allocate JPEG buffer */
-    buf_jpeg = buf;
+    if (rb->button_get(false) == JPEG_MENU)
+        status = PLUGIN_ABORT;
+    else
+        status = load_image(filename, &jpg);
 
-    /* we can start the decompressed images behind it */
-    buf_images = buf_root = buf + filesize;
-    buf_images_size = root_size = buf_size - filesize;
-
-    if (buf_images_size <= 0)
+    if (status == PLUGIN_OUTOFMEM)
     {
-        rb->close(fd);
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
         if(plug_buf)
         {
@@ -944,9 +1018,9 @@ int load_and_show(char* filename)
                         }
                         break;
                     default:
-                         if(rb->default_event_handler_ex(button, cleanup, NULL)
+                        if(rb->default_event_handler_ex(button, cleanup, NULL)
                                 == SYS_USB_CONNECTED)
-                              return PLUGIN_USB_CONNECTED;
+                            return PLUGIN_USB_CONNECTED;
 
                 }
             }
@@ -955,66 +1029,20 @@ int load_and_show(char* filename)
 #endif
         {
             rb->splash(HZ, "Out of Memory");
-            return PLUGIN_ERROR;
+            file_pt[curfile] = NULL;
+            return change_filename(direction);
         }
     }
-
-    if(!running_slideshow)
+    else if (status == PLUGIN_ERROR)
     {
-#if LCD_DEPTH > 1
-        rb->lcd_set_foreground(LCD_WHITE);
-        rb->lcd_set_background(LCD_BLACK);
-        rb->lcd_set_backdrop(NULL);
-#endif
-
-        rb->lcd_clear_display();
-        rb->snprintf(print, sizeof(print), "%s:", rb->strrchr(filename,'/')+1);
-        rb->lcd_puts(0, 0, print);
-        rb->lcd_update();
-
-        rb->snprintf(print, sizeof(print), "loading %d bytes", filesize);
-        rb->lcd_puts(0, 1, print);
-        rb->lcd_update();
-    }
-
-    rb->read(fd, buf_jpeg, filesize);
-    rb->close(fd);
-
-    if(!running_slideshow)
-    {
-        rb->snprintf(print, sizeof(print), "decoding markers");
-        rb->lcd_puts(0, 2, print);
-        rb->lcd_update();
-    }
-#ifndef SIMULATOR
-    else if(immediate_ata_off)
-    {
-        /* running slideshow and time is long enough: power down disk */
-        rb->storage_sleep();
-    }
-#endif
-
-    rb->memset(&jpg, 0, sizeof(jpg)); /* clear info struct */
-    /* process markers, unstuffing */
-    status = process_markers(buf_jpeg, filesize, &jpg);
-
-    if (status < 0 || (status & (DQT | SOF0)) != (DQT | SOF0))
-    {   /* bad format or minimum components not contained */
-        rb->splashf(HZ, "unsupported %d", status);
         file_pt[curfile] = NULL;
         return change_filename(direction);
     }
-
-    if (!(status & DHT)) /* if no Huffman table present: */
-        default_huff_tbl(&jpg); /* use default */
-    build_lut(&jpg); /* derive Huffman and other lookup-tables */
-
-    if(!running_slideshow)
-    {
-        rb->snprintf(print, sizeof(print), "image %dx%d", jpg.x_size, jpg.y_size);
-        rb->lcd_puts(0, 2, print);
-        rb->lcd_update();
+    else if (status == PLUGIN_ABORT) {
+        rb->splash(HZ, "aborted");
+        return PLUGIN_OK;
     }
+
     ds_max = max_downscale(&jpg);            /* check display constraint */
     ds_min = min_downscale(&jpg, buf_images_size); /* check memory constraint */
     if (ds_min == 0)
@@ -1023,6 +1051,8 @@ int load_and_show(char* filename)
         file_pt[curfile] = NULL;
         return change_filename(direction);
     }
+    else if (ds_max < ds_min)
+        ds_max = ds_min;
 
     ds = ds_max; /* initialize setting */
     cx = jpg.x_size/ds/2; /* center the view */
@@ -1096,7 +1126,7 @@ int load_and_show(char* filename)
         rb->lcd_clear_display();
     }
     while (status != PLUGIN_OK && status != PLUGIN_USB_CONNECTED
-                                       && status != PLUGIN_OTHER);
+            && status != PLUGIN_OTHER);
 #ifdef USEGSLIB
     rb->lcd_update();
 #endif
@@ -1158,8 +1188,8 @@ enum plugin_status plugin_start(const void* parameter)
     do
     {
         condition = load_and_show(np_file);
-    }while (condition != PLUGIN_OK && condition != PLUGIN_USB_CONNECTED
-                                          && condition != PLUGIN_ERROR);
+    } while (condition != PLUGIN_OK && condition != PLUGIN_USB_CONNECTED
+            && condition != PLUGIN_ERROR);
 
     if (rb->memcmp(&jpeg_settings, &old_settings, sizeof (jpeg_settings)))
     {

@@ -359,8 +359,8 @@ You are free to name this file lodepng.cpp or lodepng.c depending on your usage.
 #endif
 #endif
 
-#define PLUGIN_OTHER 10 /* State code for output with return. */
-#define PLUGIN_REFRESH 11 /* State code for output with return. */
-#define PLUGIN_ABORT 12
-#define OUT_OF_MEMORY 9900
-#define FILE_TOO_LARGE 9910
+#define PLUGIN_OTHER    10 /* State code for output with return. */
+#define PLUGIN_ABORT    11
+#define PLUGIN_OUTOFMEM 12
+#define OUT_OF_MEMORY   9900
+#define FILE_TOO_LARGE  9910
