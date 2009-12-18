@@ -124,7 +124,7 @@ char *output_dyn_value(char *buf, int buf_size, int value,
         snprintf(tbuf, sizeof(tbuf), "%01d", fraction / 100);
     else
         snprintf(tbuf, sizeof(tbuf), "%02d", fraction / 10);
-    
+
     if (buf)
     {
         if (strlen(tbuf))
@@ -168,7 +168,7 @@ int read_line(int fd, char* buffer, int buffer_size)
 {
     int count = 0;
     int num_read = 0;
-    
+
     errno = 0;
 
     while (count < buffer_size)
@@ -177,9 +177,9 @@ int read_line(int fd, char* buffer, int buffer_size)
 
         if (1 != read(fd, &c, 1))
             break;
-        
+
         num_read++;
-            
+
         if ( c == '\n' )
             break;
 
@@ -201,15 +201,15 @@ int fast_readline(int fd, char *buf, int buf_size, void *parameters,
     char *p, *next;
     int rc, pos = 0;
     int count = 0;
-    
+
     while ( 1 )
     {
         next = NULL;
-        
+
         rc = read(fd, &buf[pos], buf_size - pos - 1);
         if (rc >= 0)
             buf[pos+rc] = '\0';
-        
+
         if ( (p = strchr(buf, '\r')) != NULL)
         {
             *p = '\0';
@@ -217,17 +217,17 @@ int fast_readline(int fd, char *buf, int buf_size, void *parameters,
         }
         else
             p = buf;
-        
+
         if ( (p = strchr(p, '\n')) != NULL)
         {
             *p = '\0';
             next = ++p;
         }
-        
+
         rc = callback(count, buf, parameters);
         if (rc < 0)
             return rc;
-        
+
         count++;
         if (next)
         {
@@ -237,7 +237,7 @@ int fast_readline(int fd, char *buf, int buf_size, void *parameters,
         else
             break ;
     }
-    
+
     return 0;
 }
 
@@ -338,7 +338,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             splashf(0, "%s %s", str(LANG_WARNING_BATTERY_EMPTY),
                                 str(LANG_SHUTTINGDOWN));
         }
-        
+
         if (global_settings.fade_on_stop
             && (audio_stat & AUDIO_STATUS_PLAY))
         {
@@ -371,7 +371,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #endif
 
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
-            audio_close_recording();       
+            audio_close_recording();
 #endif
 
             if(global_settings.talk_menu)
@@ -461,11 +461,11 @@ static bool waiting_to_resume_play = false;
 static long play_resume_tick;
 
 static void car_adapter_mode_processing(bool inserted)
-{    
+{
     if (global_settings.car_adapter_mode)
     {
         if(inserted)
-        { 
+        {
             /*
              * Just got plugged in, delay & resume if we were playing
              */
@@ -598,7 +598,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
         case SYS_CHARGER_CONNECTED:
             car_adapter_mode_processing(true);
             return SYS_CHARGER_CONNECTED;
-            
+
         case SYS_CHARGER_DISCONNECTED:
             car_adapter_mode_processing(false);
             return SYS_CHARGER_DISCONNECTED;
@@ -634,12 +634,12 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             return SYS_PHONE_UNPLUGGED;
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
-	case SYS_IAP_PERIODIC:
-	    iap_periodic();
-	    return SYS_IAP_PERIODIC;
-	case SYS_IAP_HANDLEPKT:
-	    iap_handlepkt();
-	    return SYS_IAP_HANDLEPKT;
+        case SYS_IAP_PERIODIC:
+            iap_periodic();
+            return SYS_IAP_PERIODIC;
+        case SYS_IAP_HANDLEPKT:
+            iap_handlepkt();
+            return SYS_IAP_HANDLEPKT;
 #endif
     }
     return 0;
@@ -772,7 +772,7 @@ char* strrsplt(char* str, int c)
     {
         s = str;
     }
-    
+
     return s;
 }
 
@@ -857,14 +857,14 @@ void format_time(char* buf, int buf_size, long t)
 {
     if ( t < 3600000 ) 
     {
-      snprintf(buf, buf_size, "%d:%02d",
-               (int) (t / 60000), (int) (t % 60000 / 1000));
-    } 
+        snprintf(buf, buf_size, "%d:%02d",
+                 (int) (t / 60000), (int) (t % 60000 / 1000));
+    }
     else
     {
-      snprintf(buf, buf_size, "%d:%02d:%02d",
-               (int) (t / 3600000), (int) (t % 3600000 / 60000),
-               (int) (t % 60000 / 1000));
+        snprintf(buf, buf_size, "%d:%02d:%02d",
+                 (int) (t / 3600000), (int) (t % 3600000 / 60000),
+                 (int) (t % 60000 / 1000));
     }
 }
 
@@ -895,7 +895,7 @@ int open_utf8(const char* pathname, int flags)
         read(fd, bom, BOM_SIZE);
         /* check for BOM */
         if(memcmp(bom, BOM, BOM_SIZE))
-	    lseek(fd, 0, SEEK_SET);
+            lseek(fd, 0, SEEK_SET);
     }
     return fd;
 }
@@ -908,8 +908,8 @@ int open_utf8(const char* pathname, int flags)
 
 static int hex2dec(int c)
 {
-   return  (((c) >= '0' && ((c) <= '9')) ? (c) - '0' :
-                                           (toupper(c)) - 'A' + 10);
+    return  (((c) >= '0' && ((c) <= '9')) ? (c) - '0' :
+                                            (toupper(c)) - 'A' + 10);
 }
 
 int hex_to_rgb(const char* hex, int* color)
@@ -986,7 +986,7 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
 
                 *s = p;
                 while (*p && *p != sep)
-                   p++;
+                    p++;
                 set = (s[0][0]!='-') && (s[0][1]!=sep) ;
                 break;
 
@@ -1007,9 +1007,9 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                 }
                 else
                 {
-                   *d = *p++ - '0';
+                    *d = *p++ - '0';
                     while (isdigit(*p))
-                       *d = (*d * 10) + (*p++ - '0');
+                        *d = (*d * 10) + (*p++ - '0');
                     set = true;
                     if (is_negative)
                         *d *= -1;

@@ -208,20 +208,20 @@ enum plugin_status plugin_start(const void* parameter)
             x = 2*GFX_WIDTH-x;
             sx=-sx;
         }
-	
+
         if (x<0) 
         {
             x = -x;
             sx = -sx;
         }
-	
+
         y+=sy;
         if (y>GFX_HEIGHT) 
         {
             y = 2*GFX_HEIGHT-y;
             sy=-sy;
         }
-	
+
         if (y<0) 
         {
             y = -y;
@@ -235,7 +235,7 @@ enum plugin_status plugin_start(const void* parameter)
         MYLCD(update)();
 
         rb->sleep(HZ/timer);
-        
+
         button = rb->button_get(false);
         switch (button)
         {
@@ -254,7 +254,7 @@ enum plugin_status plugin_start(const void* parameter)
                 if (timer>20)
                     timer=5;
                 break;
-                
+
             case MOSAIQUE_RESTART:
 
                 sx = rb->rand() % (GFX_HEIGHT/2) + 1;
@@ -278,5 +278,3 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
 }
-
-

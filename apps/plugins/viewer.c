@@ -1,12 +1,11 @@
 /***************************************************************************
- *
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- *
+ * $Id$
  *
  * Copyright (C) 2002 Gilles Roux, 2003 Garrett Derner
  *
@@ -432,7 +431,6 @@ struct preferences {
     } scroll_mode;
 
     int autoscroll_speed;
-    
 };
 
 struct preferences prefs;
@@ -1226,7 +1224,7 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
     int settings_fd, i;
     struct bookmark_file_data *data;
     struct bookmarked_file_info this_bookmark;
-    
+
     /* read settings file */
     settings_fd=rb->open(SETTINGS_FILE, O_RDONLY);
     if ((settings_fd >= 0) && (rb->filesize(settings_fd) == sizeof(struct preferences)))
@@ -1271,7 +1269,7 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
             file_pos = screen_pos - screen_top;
             screen_top_ptr = buffer + screen_top;
             break;
-        }    
+        }
     }
 
     this_bookmark.file_position = file_pos;
@@ -1284,16 +1282,16 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
     if (i >= data->bookmarked_files_count) 
     {
         if (i < MAX_BOOKMARKED_FILES) 
-            data->bookmarked_files_count++;    
-        else        
+            data->bookmarked_files_count++;
+        else
             i = MAX_BOOKMARKED_FILES-1;
-    }    
+    }
 
     /* write bookmark file with spare slot in first position 
        to be filled in by viewer_save_settings */
     settings_fd = rb->open(BOOKMARKS_FILE, O_WRONLY|O_CREAT);
     if (settings_fd >=0 )
-    {     
+    {
         /* write count */
         rb->write (settings_fd, &data->bookmarked_files_count, sizeof(signed int));
 
@@ -1336,7 +1334,7 @@ static void viewer_save_settings(void)/* same name as global, but not the same f
             rb->close(settings_fd);
         }
     }
-    
+
     /* save the bookmark if the position has changed */
     if (file_pos + screen_top_ptr - buffer != start_position)
     {
@@ -1559,11 +1557,11 @@ enum plugin_status plugin_start(const void* file)
     }
 
     viewer_load_settings(); /* load the preferences and bookmark */
-    
+
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
-    
+
     viewer_draw(col);
 
     while (!done) {
@@ -1577,7 +1575,7 @@ enum plugin_status plugin_start(const void* file)
                 old_tick = *rb->current_tick;
             }
         }
-        
+
         button = rb->button_get_w_tmo(HZ/10);
         switch (button) {
             case VIEWER_MENU:

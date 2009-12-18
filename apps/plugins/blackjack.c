@@ -136,7 +136,7 @@ enum {
 #define BJACK_LEFT          BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-#define BJACK_SELECT_NAME    "PLAY"
+#define BJACK_SELECT_NAME    "SELECT"
 #define BJACK_STAY_NAME     "REC"
 #define BJACK_RESUME_NAME   "DOWN"
 #define BJACK_QUIT_NAME     "POWER"

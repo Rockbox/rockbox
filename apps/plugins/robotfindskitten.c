@@ -676,7 +676,7 @@ static void play_game()
 {
     int old_x = robot.x;
     int old_y = robot.y;
-    int input = 0; /* Not sure what a reasonable initial value is */
+    int input = BUTTON_NONE;
 #ifdef __PLUGINLIB_ACTIONS_H__
     const struct button_mapping *plugin_contexts[] = {generic_directions, generic_actions};
 #endif

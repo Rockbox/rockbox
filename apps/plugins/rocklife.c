@@ -131,7 +131,7 @@ static bool load_cellfile(const char *file, char *pgrid){
     fd = rb->open(file, O_RDONLY);
     if (fd<0)
         return false;
-        
+
     init_grid(pgrid);
 
     char c;
@@ -143,7 +143,7 @@ static bool load_cellfile(const char *file, char *pgrid){
     ymid = (GRID_H>>1) - 2;
     comment = false;
 
-    while (true) { 
+    while (true) {
         nc = rb->read(fd, &c, 1);
         if (nc <= 0)
             break;
@@ -343,7 +343,7 @@ static inline bool check_cell(unsigned char *n)
 
     /* now we build the number of non-zero neighbours :-P */
     alive_cells = 8 - empty_cells;
-    
+
     if (n[4]) {
         /* If the cell is alive, it stays alive iff it has 2 or 3 alive neighbours */
         result = (alive_cells==2 || alive_cells==3);
@@ -468,6 +468,7 @@ enum plugin_status plugin_start(const void* parameter)
     int button = 0;
     int quit = 0;
     int stop = 0;
+    int usb = 0;
     int pattern = 0;
     char *pgrid;
     char *pnext_grid;
@@ -488,8 +489,7 @@ enum plugin_status plugin_start(const void* parameter)
     pgrid      = (char *)grid_a;
     pnext_grid = (char *)grid_b;
 
-    init_grid(pgrid);    
-
+    init_grid(pgrid);
 
     if( parameter == NULL )
     {
@@ -544,6 +544,11 @@ enum plugin_status plugin_start(const void* parameter)
                     stop = 1;
                     break;
                 default:
+                    if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                        stop = 1;
+                        quit = 1;
+                        usb = 1;
+                    }
                     break;
                 }
                 rb->yield();
@@ -562,12 +567,12 @@ enum plugin_status plugin_start(const void* parameter)
             break;
         case ROCKLIFE_QUIT:
             /* quit plugin */
-            quit=true;
-            return PLUGIN_OK;
+            quit = 1;
             break;
         default:
             if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-                return PLUGIN_USB_CONNECTED;
+                quit = 1;
+                usb = 1;
             }
             break;
         }
@@ -575,5 +580,5 @@ enum plugin_status plugin_start(const void* parameter)
     }
 
     backlight_use_settings(); /* backlight control in lib/helper.c */
-    return PLUGIN_OK;
+    return usb? PLUGIN_USB_CONNECTED: PLUGIN_OK;
 }

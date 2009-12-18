@@ -86,7 +86,7 @@ char* _do_action(int action, char* str, int line)
             break;
         case ACTION_REMOVE:
             if (line > line_count)
-                return 0;
+                return NULL;
             len = rb->strlen(&buffer[c])+1;
             rb->memmove(&buffer[c],&buffer[c+len],char_count-c-len);
             char_count -= len;
@@ -225,7 +225,7 @@ enum {
 };
 int do_item_menu(int cur_sel, char* copy_buffer)
 {
-    int ret = 0;
+    int ret = MENU_RET_NO_UPDATE;
     MENUITEM_STRINGLIST(menu, "Line Options", NULL,
                         "Cut/Delete", "Copy",
                         "Insert Above", "Insert Below",
