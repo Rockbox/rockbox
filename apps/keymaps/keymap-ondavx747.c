@@ -163,6 +163,7 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_CURSOR_RIGHT, BUTTON_VOL_UP,                   BUTTON_NONE },
     { ACTION_KBD_CURSOR_RIGHT, BUTTON_VOL_UP|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_KBD_DONE,         BUTTON_MENU|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_KBD_ABORT,        BUTTON_POWER,                    BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_keyboard */

@@ -112,7 +112,8 @@ static const struct button_mapping button_context_radio[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_radio */
 
-static const struct button_mapping button_context_keyboard[]  = {    
+static const struct button_mapping button_context_keyboard[]  = {
+    { ACTION_KBD_ABORT,        BUTTON_POWER,                    BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_keyboard */
 
