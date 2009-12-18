@@ -317,6 +317,8 @@ MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST),
 /* CONTEXT_[TREE|ID3DB] playlist options */
 static int playlist_insert_func(void *param)
 {
+    if (((intptr_t)param == PLAYLIST_REPLACE) && !warn_on_pl_erase())
+        return 0;
     add_to_playlist((intptr_t)param, false);
     return 0;
 }
