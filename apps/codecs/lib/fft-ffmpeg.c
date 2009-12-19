@@ -34,12 +34,24 @@
 #include <time.h>
 #include <codecs/lib/codeclib.h>
 
+#define USE_MDCT_LOOKUP_TRIG
+
+#ifdef USE_MDCT_LOOKUP_TRIG
+#include "mdct_lookup.h"
+#endif
+
 static void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
 
-#define M_SQRT1_2_F	0x5a827999  /* 1/sqrt(2) s.31 */
+/* constants for fft_16 (same constants as in mdct_arm.S ... ) */
+#define cPI1_8 (0x7641af3d) /* cos(pi/8) s.31 */
+#define cPI2_8 (0x5a82799a) /* cos(2pi/8) = 1/sqrt(2) s.31 */
+#define cPI3_8 (0x30fbc54d) /* cos(3pi/8) s.31 */
 
 #define FFT_SIZE 1024
+/* Global variables for holding number of muls and adds */
+int muls, adds;
 
+#ifndef USE_MDCT_LOOKUP_TRIG
 int32_t flattabs[8+16+32+64+128+256+512+1024+2048];
 int32_t * tabstabstabs[] = { flattabs, flattabs+8, flattabs+8+16,flattabs+8+16+32, flattabs+8+16+32+64,
                              flattabs+8+16+32+64+128, flattabs+8+16+32+64+128+256,
@@ -47,29 +59,6 @@ int32_t * tabstabstabs[] = { flattabs, flattabs+8, flattabs+8+16,flattabs+8+16+3
 
 
 
-/* Global variables for holding number of muls and adds */
-int muls, adds;
-
-bool b_done_once = false;
-
-/* cos(2*pi*x/n) for 0<=x<=n/4, followed by its reverse */
-/*
-DECLARE_ALIGNED_16(FFTSample, ff_cos_16[8]);
-DECLARE_ALIGNED_16(FFTSample, ff_cos_32[16]);
-DECLARE_ALIGNED_16(FFTSample, ff_cos_64[32]);
-DECLARE_ALIGNED_16(FFTSample, ff_cos_128[64]);
-DECLARE_ALIGNED_16(FFTSample, ff_cos_256[128]);
-DECLARE_ALIGNED_16(FFTSample, ff_cos_512[256]);
-DECLARE_ALIGNED_16(FFTSample, ff_cos_1024[512]);
-DECLARE_ALIGNED_16(FFTSample, ff_cos_2048[1024]);
-DECLARE_ALIGNED_16(FFTSample, ff_cos_4096[2048]);
-*/
-/*
-DECLARE_ALIGNED_16(FFTSample, ff_cos_8192[4096]);
-DECLARE_ALIGNED_16(FFTSample, ff_cos_16384[8192]);
-DECLARE_ALIGNED_16(FFTSample, ff_cos_32768[16384]);
-DECLARE_ALIGNED_16(FFTSample, ff_cos_65536[32768]);
-*/
 /* some of these should probably be in iram */
 static FFTSample * ff_cos_16 = NULL;
 static FFTSample * ff_cos_32 = NULL;
@@ -81,17 +70,11 @@ static FFTSample * ff_cos_1024 = NULL;
 static FFTSample * ff_cos_2048 = NULL;
 static FFTSample * ff_cos_4096 = NULL;
 
-/*
-FFTSample * const ff_cos_tabs[] = {
-    ff_cos_16, ff_cos_32, ff_cos_64, ff_cos_128, ff_cos_256, ff_cos_512, ff_cos_1024,
-    ff_cos_2048, ff_cos_4096, ff_cos_8192, ff_cos_16384, ff_cos_32768, ff_cos_65536,
-};
-*/
-
 static FFTSample ** const ff_cos_tabs[] = {
     &ff_cos_16, &ff_cos_32, &ff_cos_64, &ff_cos_128, &ff_cos_256, &ff_cos_512, &ff_cos_1024,
     &ff_cos_2048, &ff_cos_4096
 };
+#endif
 
 uint16_t revtab[1<<12];
 static bool revtab_initialised = false;
@@ -110,11 +93,9 @@ static int split_radix_permutation(int i, int n, int inverse)
 //int ff_fft_init(FFTContext *s, int nbits, int inverse)
 int ff_fft_init(void *arg_s, int nbits, int inverse)
 {
-    int i, j, n;
+    int i, n;
     FFTContext *s = (FFTContext *)(arg_s);
   
-    unsigned long phase;
-
     if (nbits < 2 || nbits > 12)
         return -1;
     s->nbits = nbits;
@@ -135,6 +116,10 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
     if (HAVE_ALTIVEC) ff_fft_init_altivec(s);
     if (HAVE_MMX)     ff_fft_init_mmx(s);*/
     
+#ifndef USE_MDCT_LOOKUP_TRIG
+    int j;
+    unsigned long phase;
+
     /* FIXME these should really just be precalculated */
     for(j=4; j<=nbits; j++) {
         int m = 1<<j;
@@ -162,6 +147,7 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
               tab[m/2-i] = tab[i];
         }
     }
+#endif
 
     /* FIXME: there ought to be some shortcuts here, I just haven't
        thought of any yet.  Ideally we would be able to massage data
@@ -200,8 +186,6 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
         }
     }
 }
-
-#define sqrthalf M_SQRT1_2_F
 
 #define BF(x,y,a,b) {\
     x = a - b;\
@@ -260,6 +244,7 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 }
 
 /* z[0...8n-1], w[1...2n-1] */
+#ifndef USE_MDCT_LOOKUP_TRIG
 #define PASS(name)\
 static void name(FFTComplex *z, const FFTSample *wre, unsigned int n)\
 {\
@@ -283,13 +268,58 @@ static void name(FFTComplex *z, const FFTSample *wre, unsigned int n)\
 	adds += 4;\
     } while(--n);\
 }
+#else
+#define PASS(name)\
+static void name(FFTComplex *z, unsigned int STEP, unsigned int n)\
+{\
+    FFTSample t1, t2, t3, t4, t5, t6;\
+    int o1 = 2*n;\
+    int o2 = 4*n;\
+    int o3 = 6*n;\
+    muls += 3;\
+\
+    const FFTSample *wim = sincos_lookup0+STEP;\
+    /* wre = *(wim+1) .  ordering is sin,cos */\
+    const FFTSample *w_end = sincos_lookup0+1024;\
+\
+    adds += 2;\
+\
+    /* first two are special (well, first one is special, but we need to do pairs) */\
+    TRANSFORM_ZERO(z[0],z[o1],z[o2],z[o3]);\
+    TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wim[1],wim[0]);\
+    wim += STEP;\
+    adds += 1;\
+    /* first pass forwards through sincos_lookup0*/\
+    do {\
+        z += 2;\
+        TRANSFORM(z[0],z[o1],z[o2],z[o3],wim[1],wim[0]);\
+        wim += STEP;\
+        TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wim[1],wim[0]);\
+        wim += STEP;\
+	adds += 3;\
+    } while(wim < w_end);\
+    /* second half: pass backwards through sincos_lookup0*/\
+    /* wim and wre are now in opposite places so ordering now [0],[1] */\
+    w_end=sincos_lookup0;\
+    while(wim>w_end)\
+    {\
+        z += 2;\
+        TRANSFORM(z[0],z[o1],z[o2],z[o3],wim[0],wim[1]);\
+        wim -= STEP;\
+        TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wim[0],wim[1]);\
+        wim -= STEP;\
+ 	adds += 3;\
+    }\
+}
+#endif
 
 PASS(pass)
 #undef BUTTERFLIES
 #define BUTTERFLIES BUTTERFLIES_BIG
 PASS(pass_big)
 
-#define DECL_FFT(n,n2,n4)\
+#ifndef USE_MDCT_LOOKUP_TRIG
+#define DECL_FFT(n,n2,n4,STEP)\
 static void fft##n(FFTComplex *z)\
 {\
     fft##n2(z);\
@@ -297,6 +327,23 @@ static void fft##n(FFTComplex *z)\
     fft##n4(z+n4*3);\
     pass(z,ff_cos_##n,n4/2);\
 }
+#else
+/* what is STEP?
+   sincos_lookup0 has sin,cos pairs for 1/4 cycle, in 1024 points
+   so half cycle would be 2048 points
+   ff_cos_16 has 8 elements corresponding to 4 cos points and 4 sin points
+   so each of the 4 points pairs corresponds to a 256*2-byte jump in sincos_lookup0
+   8192/16 (from "ff_cos_16") is 512 bytes.
+   i.e.  for fft16, STEP = 8192/16 */
+#define DECL_FFT(n,n2,n4)\
+static void fft##n(FFTComplex *z)\
+{\
+    fft##n2(z);\
+    fft##n4(z+n4*2);\
+    fft##n4(z+n4*3);\
+    pass(z,8192/n,n4/2);\
+}
+#endif
 
 static void fft4(FFTComplex *z)
 {
@@ -330,7 +377,7 @@ static void fft8(FFTComplex *z)
     BF(z[6].im, z[2].im, z[2].im, t8);
 
     //TRANSFORM(z[1],z[3],z[5],z[7],sqrthalf,sqrthalf);
-    TRANSFORM_EQUAL(z[1],z[3],z[5],z[7],sqrthalf)
+    TRANSFORM_EQUAL(z[1],z[3],z[5],z[7],cPI2_8)
 }
 
 #ifndef CONFIG_SMALL
@@ -344,9 +391,9 @@ static void fft16(FFTComplex *z)
 
     TRANSFORM_ZERO(z[0],z[4],z[8],z[12]);
     //TRANSFORM(z[2],z[6],z[10],z[14],sqrthalf,sqrthalf);
-    TRANSFORM_EQUAL(z[2],z[6],z[10],z[14],sqrthalf);
-    TRANSFORM(z[1],z[5],z[9],z[13],ff_cos_16[1],ff_cos_16[3]);
-    TRANSFORM(z[3],z[7],z[11],z[15],ff_cos_16[3],ff_cos_16[1]);
+    TRANSFORM_EQUAL(z[2],z[6],z[10],z[14],cPI2_8);
+    TRANSFORM(z[1],z[5],z[9],z[13],cPI1_8,cPI3_8);
+    TRANSFORM(z[3],z[7],z[11],z[15],cPI3_8,cPI1_8);
 }
 #else
 DECL_FFT(16,8,4)
@@ -362,17 +409,10 @@ DECL_FFT(512,256,128)
 DECL_FFT(1024,512,256)
 DECL_FFT(2048,1024,512)
 DECL_FFT(4096,2048,1024)
-/*
-DECL_FFT(8192,4096,2048)
-DECL_FFT(16384,8192,4096)
-DECL_FFT(32768,16384,8192)
-DECL_FFT(65536,32768,16384)
-*/
 
 static void (*fft_dispatch[])(FFTComplex*) = {
     fft4, fft8, fft16, fft32, fft64, fft128, fft256, fft512, fft1024,
     fft2048, fft4096
-    /*, fft8192, fft16384, fft32768, fft65536,*/
 };
 
 void ff_fft_calc_c(FFTContext *s, FFTComplex *z)
