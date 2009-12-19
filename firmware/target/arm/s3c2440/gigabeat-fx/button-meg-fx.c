@@ -155,6 +155,18 @@ int button_read_device(void)
         buttonlight_on();
     }
     
+    /* the cradle buttons */
+    buttons = ~GPFDAT & 0xc0;
+    if (buttons)
+    {
+        if (buttons & (1 << 6))
+            btn |= BUTTON_A;
+
+        if (buttons & (1 << 7))
+            btn |= BUTTON_POWER;
+        buttonlight_on();
+    }
+    
     return btn;
 }
 
