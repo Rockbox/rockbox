@@ -1200,8 +1200,8 @@ static int parse_albumart_display(const char *wps_bufptr,
 
 #ifdef HAVE_TOUCHSCREEN
 
-struct touchaction {char* s; int action;};
-static struct touchaction touchactions[] = {
+struct touchaction {const char* s; int action;};
+static const struct touchaction touchactions[] = {
     {"play", ACTION_WPS_PLAY }, {"stop", ACTION_WPS_STOP },
     {"prev", ACTION_WPS_SKIPPREV }, {"next", ACTION_WPS_SKIPNEXT },
     {"ffwd", ACTION_WPS_SEEKFWD }, {"rwd", ACTION_WPS_SEEKBACK },
