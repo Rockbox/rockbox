@@ -64,31 +64,38 @@ struct mm_line {
 };
 
 const int colors[MAX_COLORS_COUNT] = {
-                                        LCD_RGBPACK(252, 233,  79),
-                                        LCD_RGBPACK(206,  92,   0),
-                                        LCD_RGBPACK(143,  89,   2),
-                                        LCD_RGBPACK( 78, 154,   6),
-                                        /* LCD_RGBPACK( 32,  74, 135), */
-                                        LCD_RGBPACK( 52, 101, 164),
-                                        /* LCD_RGBPACK(114, 159, 207), */
-                                        LCD_RGBPACK(117,  80, 123),
-                                        /* LCD_RGBPACK(173, 127, 168), */
-                                        LCD_RGBPACK(164,   0,   0),
-                                        LCD_RGBPACK(238, 238, 236),
-                                     };
+    LCD_RGBPACK(252, 233,  79),
+    LCD_RGBPACK(206,  92,   0),
+    LCD_RGBPACK(143,  89,   2),
+    LCD_RGBPACK( 78, 154,   6),
+    /* LCD_RGBPACK( 32,  74, 135), */
+    LCD_RGBPACK( 52, 101, 164),
+    /* LCD_RGBPACK(114, 159, 207), */
+    LCD_RGBPACK(117,  80, 123),
+    /* LCD_RGBPACK(173, 127, 168), */
+    LCD_RGBPACK(164,   0,   0),
+    LCD_RGBPACK(238, 238, 236),
+};
 
 /* Flags */
 static bool quit, leave, usb;
 static bool found, game_ended;
 
 /* Settings */
+struct settings {
+    int pieces;
+    int colors;
+    int guesses;
+    bool labeling;
+    bool framing;
+};
+static struct settings settings = {
+    5, 7, 10, false, false,
+};
+static struct settings old_settings;
 static int pieces_count;
 static int colors_count;
 static int guesses_count;
-static int pieces_tmp = 5;
-static int colors_tmp = 7;
-static int guesses_tmp = 10;
-static bool labeling = false, framing = false;
 
 /* Display */
 #define ALUMINIUM   LCD_RGBPACK(136, 138, 133)
@@ -102,13 +109,12 @@ static bool labeling = false, framing = false;
 #define CONFIG_FILE_NAME "codebuster.cfg"
 
 static struct configdata config[] = {
-    {TYPE_INT, 0, MAX_PIECES_COUNT, { .int_p = &pieces_tmp }, "pieces", NULL},
-    {TYPE_INT, 0, MAX_COLORS_COUNT, { .int_p = &colors_tmp }, "colors", NULL},
-    {TYPE_INT, 0, MAX_GUESSES_COUNT, { .int_p = &guesses_tmp }, "guesses", NULL},
-    {TYPE_BOOL, 0, 1, { .bool_p = &labeling }, "labeling", NULL},
-    {TYPE_BOOL, 0, 1, { .bool_p = &framing }, "framing", NULL},
+    {TYPE_INT, 0, MAX_PIECES_COUNT, { .int_p = &settings.pieces }, "pieces", NULL},
+    {TYPE_INT, 0, MAX_COLORS_COUNT, { .int_p = &settings.colors }, "colors", NULL},
+    {TYPE_INT, 0, MAX_GUESSES_COUNT, { .int_p = &settings.guesses }, "guesses", NULL},
+    {TYPE_BOOL, 0, 1, { .bool_p = &settings.labeling }, "labeling", NULL},
+    {TYPE_BOOL, 0, 1, { .bool_p = &settings.framing }, "framing", NULL},
 };
-static bool settings_changed = false;
 
 static int line_h;
 static int piece_w, tick_w;
@@ -158,22 +164,22 @@ static void draw_piece(int x, int y, int w, int h, int color_id, bool emph) {
     else
         fill_color_rect(x, y, w, h, color);
 
-    if (!emph && framing)
+    if (!emph && settings.framing)
         rb->lcd_drawrect(x, y, w, h);
 
-    if (labeling && color_id >= 0) {
+    if (settings.labeling && color_id >= 0) {
         char text[2];
         rb->snprintf(text, 2, "%d", color_id);
 
         int fw, fh; rb->font_getstringsize(text, &fw, &fh, FONT_SYSFIXED);
         rb->lcd_putsxy(x + get_margin(fw, w), y + get_margin(fh, h), text);
-    }   
+    }
 }
 
 /* Compute the score for a given guess (expressed in ticks) */
 static void validate_guess(struct mm_line* guess) {
-    bool solution_match[pieces_count];
-    bool guess_match[pieces_count];
+    bool solution_match[MAX_PIECES_COUNT];
+    bool guess_match[MAX_PIECES_COUNT];
 
     guess->score.misplaced = 0;
     guess->score.correct = 0;
@@ -289,10 +295,10 @@ static void init_vars(void) {
 }
 
 static void init_board(void) {
-    
-    pieces_count = pieces_tmp;
-    colors_count = colors_tmp;
-    guesses_count = guesses_tmp;
+
+    pieces_count = settings.pieces;
+    colors_count = settings.colors;
+    guesses_count = settings.guesses;
 
     line_h = GAME_H / (2 * (guesses_count + 2) - 1);
 
@@ -316,31 +322,31 @@ static void randomize_solution(void) {
 static void settings_menu(void) {
     MENUITEM_STRINGLIST(settings_menu, "Settings", NULL,
                         "Number of colours", "Number of pegs",
-                        "Number of guesses", "Labels", "Frames");
-
-    int cur_item =0;
-
+                        "Number of guesses",
+                        "Display labels", "Display frames");
+    int cur_item = 0;
     bool menu_quit = false;
+
     while(!menu_quit) {
 
         switch(rb->do_menu(&settings_menu, &cur_item, NULL, false)) {
             case 0:
-                rb->set_int("Number of colours", "", UNIT_INT, &colors_tmp,
+                rb->set_int("Number of colours", "", UNIT_INT, &settings.colors,
                             NULL, -1, MAX_COLORS_COUNT, 1, NULL);
                 break;
             case 1:
-                rb->set_int("Number of pegs", "", UNIT_INT, &pieces_tmp,
+                rb->set_int("Number of pegs", "", UNIT_INT, &settings.pieces,
                             NULL, -1, MAX_PIECES_COUNT, 1, NULL);
                 break;
             case 2:
-                rb->set_int("Number of guesses", "", UNIT_INT, &guesses_tmp,
+                rb->set_int("Number of guesses", "", UNIT_INT, &settings.guesses,
                             NULL, -1, MAX_GUESSES_COUNT, 1, NULL);
                 break;
             case 3:
-                rb->set_bool("Display labels", &labeling);
+                rb->set_bool("Display labels", &settings.labeling);
                 break;
             case 4:
-                rb->set_bool("Display frames", &framing);
+                rb->set_bool("Display frames", &settings.framing);
                 break;
             case GO_TO_PREVIOUS:
                 menu_quit = true;
@@ -364,10 +370,9 @@ static void main_menu(void) {
     MENUITEM_STRINGLIST(main_menu, "Codebuster Menu", menu_cb,
                         "Resume Game", "Start New Game", "Settings",
                         "Playback Control", "Quit");
-
-    int cur_item =0;
-
+    int cur_item = 0;
     bool menu_quit = false;
+
     while(!menu_quit) {
 
         switch(rb->do_menu(&main_menu, &cur_item, NULL, false)) {
@@ -381,7 +386,6 @@ static void main_menu(void) {
                 break;
             case 2:
                 settings_menu();
-                settings_changed = true;
                 break;
             case 3:
                 playback_control(NULL);
@@ -406,15 +410,16 @@ enum plugin_status plugin_start(const void* parameter) {
     rb->lcd_set_backdrop(NULL);
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);
-    
-    configfile_load(CONFIG_FILE_NAME,config,5,0);
+
+    configfile_load(CONFIG_FILE_NAME, config, ARRAYLEN(config), 0);
+    rb->memcpy(&old_settings, &settings, sizeof(settings));
 
     main_menu();
     while (!quit) {
         init_board();
         randomize_solution();
         init_vars();
-        
+
         draw_board(0, 0);
         int button = 0, guess = 0, piece = 0;
         for (guess = 0; guess < guesses_count && !stop_game(); guess++) {
@@ -491,19 +496,19 @@ enum plugin_status plugin_start(const void* parameter) {
                 rb->splash(HZ, "Well done :)");
             else
                 rb->splash(HZ, "Wooops :(");
-        do {
-            button = rb->button_get(true);
-            if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-                quit = usb = true;
-            }
-        } while( ( button == BUTTON_NONE )
-              || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+            do {
+                button = rb->button_get(true);
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                    quit = usb = true;
+                }
+            } while( ( button == BUTTON_NONE )
+                  || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
             main_menu();
         }
     }
-    if (settings_changed)
-        configfile_save(CONFIG_FILE_NAME,config,5,0);
-    
+    if (rb->memcmp(&old_settings, &settings, sizeof(settings)))
+        configfile_save(CONFIG_FILE_NAME, config, ARRAYLEN(config), 0);
+
     rb->lcd_setfont(FONT_UI);
     return (usb) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }
