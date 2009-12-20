@@ -1720,7 +1720,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
  * except fields which need to survive, i.e.
  * 
  **/
-void skin_data_reset(struct wps_data *wps_data)
+static void skin_data_reset(struct wps_data *wps_data)
 {
 #ifdef HAVE_LCD_BITMAP
     wps_data->images = NULL;

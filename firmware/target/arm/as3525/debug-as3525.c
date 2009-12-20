@@ -79,7 +79,7 @@ static inline unsigned read_cp15 (void)
     return (cp15_value);
 }
 
-int calc_freq(int clk)
+static int calc_freq(int clk)
 {
     int out_div;
     unsigned int prediv = ((unsigned int)CGU_PROC>>2) & 0x3;

@@ -35,6 +35,7 @@
 #include "settings.h"
 #include "led.h"
 #include "appevents.h"
+#include "usb_screen.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bitmaps/usblogo.h"
