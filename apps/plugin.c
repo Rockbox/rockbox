@@ -675,6 +675,7 @@ static const struct plugin_api rockbox_api = {
     pcmbuf_beep,
 #endif
     crc_32,
+    open_utf8,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

@@ -65,6 +65,7 @@ static int num_entries;
 static char **pointers;
 static char *stringbuffer;
 static char crlf[2] = "\r\n";
+static int bomsize;
 
 /* Compare function for sorting backwards */
 static int compare(const void* p1, const void* p2)
@@ -86,10 +87,13 @@ int read_buffer(int offset)
     char *buf_ptr;
     char *tmp_ptr;
     int readsize;
-    
-    fd = rb->open(filename, O_RDONLY);
+
+    fd = rb->open_utf8(filename, O_RDONLY);
     if(fd < 0)
         return 10 * fd - 1;
+
+    bomsize = rb->lseek(fd, 0, SEEK_CUR);
+    offset += bomsize;
 
     /* Fill the buffer from the file */
     rb->lseek(fd, offset, SEEK_SET);
@@ -127,7 +131,7 @@ int read_buffer(int offset)
         num_entries++;
         buf_ptr++;
     } while(buf_ptr < stringbuffer + readsize);
-    
+
     return 0;
 }
 
@@ -140,7 +144,11 @@ static int write_file(void)
 
     /* Create a temporary file */
     rb->snprintf(tmpfilename, MAX_PATH+1, "%s.tmp", filename);
-    fd = rb->creat(tmpfilename);
+    if (bomsize)
+        fd = rb->open_utf8(tmpfilename, O_WRONLY|O_CREAT|O_TRUNC);
+    else
+        fd = rb->open(tmpfilename, O_WRONLY|O_CREAT|O_TRUNC);
+
     if(fd < 0)
         return 10 * fd - 1;
 
@@ -191,16 +199,16 @@ enum plugin_status plugin_start(const void* parameter)
 
     rb->lcd_clear_display();
     rb->splash(0, "Loading...");
-    
+
     rc = read_buffer(0);
     if(rc == 0) {
         rb->lcd_clear_display();
         rb->splash(0, "Sorting...");
         sort_buffer();
-        
+
         rb->lcd_clear_display();
         rb->splash(0, "Writing...");
-        
+
         rc = write_file();
         if(rc < 0) {
             rb->lcd_clear_display();
@@ -218,6 +226,6 @@ enum plugin_status plugin_start(const void* parameter)
             rb->splash(HZ, "The file is too big");
         }
     }
-    
+
     return PLUGIN_OK;
 }

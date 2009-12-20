@@ -135,7 +135,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 176
+#define PLUGIN_API_VERSION 177
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -329,24 +329,27 @@ struct plugin_api {
     unsigned (*lcd_remote_get_foreground)(void);
     void     (*lcd_remote_set_background)(unsigned background);
     unsigned (*lcd_remote_get_background)(void);
-    void (*lcd_remote_bitmap_part)(const fb_remote_data *src, int src_x, int src_y,
-                                   int stride, int x, int y, int width, int height);
-    void (*lcd_remote_bitmap)(const fb_remote_data *src, int x, int y, int width,
-                              int height);
+    void (*lcd_remote_bitmap_part)(const fb_remote_data *src,
+                                   int src_x, int src_y, int stride,
+                                   int x, int y, int width, int height);
+    void (*lcd_remote_bitmap)(const fb_remote_data *src, int x, int y,
+                              int width, int height);
 #endif
-    void (*viewport_set_defaults)(struct viewport *vp, enum screen_type screen);
+    void (*viewport_set_defaults)(struct viewport *vp,
+                                  const enum screen_type screen);
     /* list */
     void (*gui_synclist_init)(struct gui_synclist * lists,
             list_get_name callback_get_item_name, void * data,
             bool scroll_all,int selected_size,
             struct viewport parent[NB_SCREENS]);
     void (*gui_synclist_set_nb_items)(struct gui_synclist * lists, int nb_items);
-    void (*gui_synclist_set_icon_callback)(struct gui_synclist * lists, list_get_icon icon_callback);
+    void (*gui_synclist_set_icon_callback)(struct gui_synclist * lists,
+                                           list_get_icon icon_callback);
     int (*gui_synclist_get_nb_items)(struct gui_synclist * lists);
     int  (*gui_synclist_get_sel_pos)(struct gui_synclist * lists);
     void (*gui_synclist_draw)(struct gui_synclist * lists);
     void (*gui_synclist_select_item)(struct gui_synclist * lists,
-    int item_number);
+                                     int item_number);
     void (*gui_synclist_add_item)(struct gui_synclist * lists);
     void (*gui_synclist_del_item)(struct gui_synclist * lists);
     void (*gui_synclist_limit_scroll)(struct gui_synclist * lists, bool scroll);
@@ -358,7 +361,7 @@ struct plugin_api {
                                         const struct text_message * yes_message,
                                         const struct text_message * no_message);
     void (*simplelist_info_init)(struct simplelist_info *info, char* title,
-           int count, void* data);
+                                 int count, void* data);
     bool (*simplelist_show_list)(struct simplelist_info *info);
 
     /* button */
@@ -431,7 +434,8 @@ struct plugin_api {
     void (*yield)(void);
     volatile long* current_tick;
     long (*default_event_handler)(long event);
-    long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
+    long (*default_event_handler_ex)(long event,
+            void (*callback)(void *), void *parameter);
     unsigned int (*create_thread)(void (*function)(void), void* stack,
                                   size_t stack_size, unsigned flags,
                                   const char *name
@@ -554,7 +558,8 @@ struct plugin_api {
     const char * (*sound_unit)(int setting);
     int (*sound_val2phys)(int setting, int value);
 #ifndef SIMULATOR
-    void (*mp3_play_data)(const unsigned char* start, int size, void (*get_more)(unsigned char** start, size_t* size));
+    void (*mp3_play_data)(const unsigned char* start, int size,
+                          void (*get_more)(unsigned char** start, size_t* size));
     void (*mp3_play_pause)(bool play);
     void (*mp3_play_stop)(void);
     bool (*mp3_is_playing)(void);
@@ -849,6 +854,7 @@ struct plugin_api {
                         int amplitude);
 #endif
     unsigned (*crc_32)(const void *src, unsigned len, unsigned crc32);
+    int (*open_utf8)(const char* pathname, int flags);
 };
 
 /* plugin header */
