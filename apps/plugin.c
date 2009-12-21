@@ -676,6 +676,10 @@ static const struct plugin_api rockbox_api = {
 #endif
     crc_32,
     open_utf8,
+#ifdef HAVE_LCD_BITMAP
+    viewportmanager_theme_enable,
+    viewportmanager_theme_undo,
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

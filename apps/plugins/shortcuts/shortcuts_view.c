@@ -58,7 +58,8 @@ enum sc_list_action_type draw_sc_list(struct gui_synclist *gui_sc)
 
     while (true) {
         /* user input */
-        button = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
+        button = rb->get_action(CONTEXT_LIST, HZ);
+        /* HZ so the status bar redraws corectly */
         if (rb->gui_synclist_do_button(gui_sc, &button,
                                             LIST_WRAP_UNLESS_HELD)) {
             /* automatic handling of user input.
@@ -93,7 +94,7 @@ static const char* build_sc_list(int selected_item, void *data,
                                  char *buffer, size_t buffer_len)
 {
     sc_file_t *file = (sc_file_t*)data;
-    
+
     if (!is_valid_index(file, selected_item)) {
         return NULL;
     }
@@ -154,7 +155,7 @@ bool list_sc(void)
 bool goto_entry(char *file_or_dir)
 {
     DEBUGF("Trying to go to '%s'...\n", file_or_dir);
-    
+
     bool is_dir = ends_with(file_or_dir, PATH_SEPARATOR);
     bool exists;
     char *what;
@@ -194,8 +195,11 @@ bool ends_with(char *string, char *suffix)
 
 enum plugin_status plugin_start(const void* void_parameter)
 {
+#ifdef HAVE_LCD_BITMAP
+    int i;
+#endif
     bool leave_loop;
-    
+
     /* This is a viewer, so a parameter must have been specified */
     if (void_parameter == NULL) {
         rb->splash(HZ*2, "No parameter specified!");
@@ -221,11 +225,21 @@ enum plugin_status plugin_start(const void* void_parameter)
         goto_entry(sc_file.entries[0].path);
         return PLUGIN_OK;
     }
-    
+
+#ifdef HAVE_LCD_BITMAP
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_enable(i, true, NULL);
+#endif
+
     do {
         /* Display a menu to choose between the entries */
         leave_loop = list_sc();
     } while (!leave_loop);
+
+#ifdef HAVE_LCD_BITMAP
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_undo(i, false);
+#endif
 
     return usb_connected ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }

@@ -172,7 +172,7 @@ static bool _dir_properties(DPS* dps)
                      entry->d_name);
 
         if (entry->attribute & ATTR_DIRECTORY)
-        {   
+        {
             if (!rb->strcmp((char *)entry->d_name, ".") ||
                 !rb->strcmp((char *)entry->d_name, ".."))
                 continue; /* skip these */
@@ -195,7 +195,7 @@ static bool _dir_properties(DPS* dps)
             result = _dir_properties(dps);
         }
         else
-        {   
+        {
             dps->fc++; /* new file */
             dps->bc += entry->size;
         }
@@ -272,8 +272,11 @@ static const char * get_props(int selected_item, void* data,
 enum plugin_status plugin_start(const void* parameter)
 {
     struct gui_synclist properties_lists;
+#ifdef HAVE_LCD_BITMAP
+    int i;
+#endif
     int button;
-    bool quit = false;
+    bool quit = false, usb = false;
     char file[MAX_PATH];
     if(!parameter) return PLUGIN_ERROR;
     rb->strcpy(file, (const char *) parameter);
@@ -301,7 +304,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->closedir(dir);
     }
     /* now we know if it's a file or a dir or maybe something failed */
-    
+
     if(!found)
     {
         /* weird: we couldn't find the entry. This Should Never Happen (TM) */
@@ -319,6 +322,11 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_OK;
     }
 
+#ifdef HAVE_LCD_BITMAP
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_enable(i, true, NULL);
+#endif
+
     rb->gui_synclist_init(&properties_lists, &get_props, file, false, 1, NULL);
     rb->gui_synclist_set_title(&properties_lists, its_a_dir ?
                                                   "Directory properties" :
@@ -331,7 +339,8 @@ enum plugin_status plugin_start(const void* parameter)
 
     while(!quit)
     {
-        button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
+        button = rb->get_action(CONTEXT_LIST, HZ);
+        /* HZ so the status bar redraws corectly */
         if (rb->gui_synclist_do_button(&properties_lists,&button,LIST_WRAP_ON))
             continue;
         switch(button)
@@ -341,9 +350,18 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
+                {
+                    quit = true;
+                    usb = true;
+                }
+                break;
         }
     }
 
-    return PLUGIN_OK;
+#ifdef HAVE_LCD_BITMAP
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_undo(i, false);
+#endif
+
+    return usb? PLUGIN_USB_CONNECTED: PLUGIN_OK;
 }

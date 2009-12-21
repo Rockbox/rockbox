@@ -135,7 +135,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 177
+#define PLUGIN_API_VERSION 178
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -855,6 +855,11 @@ struct plugin_api {
 #endif
     unsigned (*crc_32)(const void *src, unsigned len, unsigned crc32);
     int (*open_utf8)(const char* pathname, int flags);
+#ifdef HAVE_LCD_BITMAP
+    void (*viewportmanager_theme_enable)(enum screen_type screen, bool enable,
+                                         struct viewport *viewport);
+    void (*viewportmanager_theme_undo)(enum screen_type screen, bool force_redraw);
+#endif
 };
 
 /* plugin header */
