@@ -565,7 +565,16 @@ static void gwps_leave_wps(void)
     {
         gui_wps[i].display->stop_scroll();
         gui_wps[i].display->backdrop_show(BACKDROP_MAIN);
-        viewportmanager_theme_undo(i);
+        
+        bool draw = false;
+#ifdef HAVE_LCD_BITMAP
+        if (gui_wps[i].data->wps_sb_tag)
+            draw = gui_wps[i].data->show_sb_on_wps;
+        else if (statusbar_position(i) != STATUSBAR_OFF)
+            draw = true;
+#endif
+        viewportmanager_theme_undo(i, draw);
+        
     }
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)

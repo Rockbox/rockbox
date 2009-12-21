@@ -212,7 +212,7 @@ void splashf(int ticks, const char *fmt, ...)
     if (ticks)
         sleep(ticks);
     FOR_NB_SCREENS(i)
-        viewportmanager_theme_undo(i);
+        viewportmanager_theme_undo(i, false);
 }
 
 void splash(int ticks, const char *str)

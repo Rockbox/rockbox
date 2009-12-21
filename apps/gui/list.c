@@ -908,7 +908,7 @@ bool simplelist_show_list(struct simplelist_info *info)
     }
     talk_shutup();
     FOR_NB_SCREENS(i)
-       viewportmanager_theme_undo(i);
+       viewportmanager_theme_undo(i, false);
     return false;
 }
 

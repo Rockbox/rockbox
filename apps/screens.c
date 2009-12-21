@@ -930,7 +930,7 @@ int calibrate(void)
         sizeof(struct touchscreen_parameter));
 
     touchscreen_set_mode(old_mode);
-    viewportmanager_theme_undo(SCREEN_MAIN);
+    viewportmanager_theme_undo(SCREEN_MAIN, false);
 
     settings_save();
     return ret;

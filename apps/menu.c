@@ -687,7 +687,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                             gui_synclist_get_sel_pos(&lists), menu);
     }
    FOR_NB_SCREENS(i)
-       viewportmanager_theme_undo(i);
+       viewportmanager_theme_undo(i, false);
     return ret;
 }
 

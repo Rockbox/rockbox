@@ -835,7 +835,7 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 
     FOR_NB_SCREENS(i)
-        viewportmanager_theme_undo(i);
+        viewportmanager_theme_undo(i, false);
 
     if (pfn_tsr_exit == NULL)
         plugin_loaded = false;

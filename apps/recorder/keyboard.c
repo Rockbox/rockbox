@@ -1128,7 +1128,7 @@ int kbd_input(char* text, int buflen)
     FOR_NB_SCREENS(l)
     {
         screens[l].setfont(FONT_UI);
-        viewportmanager_theme_undo(l);
+        viewportmanager_theme_undo(l, false);
    }
     return ret;
 }

@@ -69,7 +69,7 @@ static int theme_stack_top[NB_SCREENS]; /* the last item added */
 static struct viewport_stack_item theme_stack[NB_SCREENS][VPSTACK_DEPTH];
 static bool is_theme_enabled(enum screen_type screen);
 
-static void toggle_theme(void)
+static void toggle_theme(enum screen_type screen, bool force)
 {
     bool enable_event = false;
     static bool was_enabled[NB_SCREENS] = {false};
@@ -91,53 +91,50 @@ static void toggle_theme(void)
         
         /* remove the left overs from the previous screen.
          * could cause a tiny flicker. Redo your screen code if that happens */
-        FOR_NB_SCREENS(i)
+        if (!was_enabled[screen] || force)
         {
-            if (!was_enabled[i])
+            struct viewport deadspace, user;
+            viewport_set_defaults(&user, screen);
+            deadspace = user; /* get colours and everything */
+            /* above */
+            deadspace.x = 0;
+            deadspace.y = 0;
+            deadspace.width = screens[screen].lcdwidth;
+            deadspace.height = user.y;
+            if (deadspace.width && deadspace.height)
             {
-                struct viewport deadspace, user;
-                viewport_set_defaults(&user, i);
-                deadspace = user; /* get colours and everything */
-                /* above */
-                deadspace.x = 0;
-                deadspace.y = 0;
-                deadspace.width = screens[i].lcdwidth;
-                deadspace.height = user.y;
-                if (deadspace.width && deadspace.height)
-                {
-                    screens[i].set_viewport(&deadspace);
-                    screens[i].clear_viewport();
-                    screens[i].update_viewport();
-                }
-                /* below */
-                deadspace.y = user.y + user.height;
-                deadspace.height = screens[i].lcdheight - deadspace.y;
-                if (deadspace.width && deadspace.height)
-                {
-                    screens[i].set_viewport(&deadspace);
-                    screens[i].clear_viewport();
-                    screens[i].update_viewport();
-                }
-                /* left */
-                deadspace.x = 0;
-                deadspace.y = 0;
-                deadspace.width = user.x;
-                deadspace.height = screens[i].lcdheight;
-                if (deadspace.width && deadspace.height)
-                {
-                    screens[i].set_viewport(&deadspace);
-                    screens[i].clear_viewport();
-                    screens[i].update_viewport();
-                }
-                /* below */
-                deadspace.x = user.x + user.width;
-                deadspace.width = screens[i].lcdwidth - deadspace.x;
-                if (deadspace.width && deadspace.height)
-                {
-                    screens[i].set_viewport(&deadspace);
-                    screens[i].clear_viewport();
-                    screens[i].update_viewport();
-                }
+                screens[screen].set_viewport(&deadspace);
+                screens[screen].clear_viewport();
+                screens[screen].update_viewport();
+            }
+            /* below */
+            deadspace.y = user.y + user.height;
+            deadspace.height = screens[screen].lcdheight - deadspace.y;
+            if (deadspace.width && deadspace.height)
+            {
+                screens[screen].set_viewport(&deadspace);
+                screens[screen].clear_viewport();
+                screens[screen].update_viewport();
+            }
+            /* left */
+            deadspace.x = 0;
+            deadspace.y = 0;
+            deadspace.width = user.x;
+            deadspace.height = screens[screen].lcdheight;
+            if (deadspace.width && deadspace.height)
+            {
+                screens[screen].set_viewport(&deadspace);
+                screens[screen].clear_viewport();
+                screens[screen].update_viewport();
+            }
+            /* below */
+            deadspace.x = user.x + user.width;
+            deadspace.width = screens[screen].lcdwidth - deadspace.x;
+            if (deadspace.width && deadspace.height)
+            {
+                screens[screen].set_viewport(&deadspace);
+                screens[screen].clear_viewport();
+                screens[screen].update_viewport();
             }
         }
         send_event(GUI_EVENT_ACTIONUPDATE, (void*)1); /* force a redraw */
@@ -167,19 +164,19 @@ void viewportmanager_theme_enable(enum screen_type screen, bool enable,
         panicf("Stack overflow... viewportmanager");
     theme_stack[screen][top].enabled = enable;
     theme_stack[screen][top].vp = viewport;
-    toggle_theme();
+    toggle_theme(screen, false);
     /* then be nice and set the viewport up */
     if (viewport)
         viewport_set_defaults(viewport, screen);
 }
 
-void viewportmanager_theme_undo(enum screen_type screen)
+void viewportmanager_theme_undo(enum screen_type screen, bool force_redraw)
 {
     int top = --theme_stack_top[screen];
     if (top < 0)
         panicf("Stack underflow... viewportmanager");
     
-    toggle_theme();
+    toggle_theme(screen, force_redraw);
 }
 
 
@@ -259,7 +256,7 @@ void viewportmanager_theme_changed(const int which)
             /* This can probably be done better...
              * disable the theme so it's forced to do a full redraw  */
             viewportmanager_theme_enable(i, false, NULL);
-            viewportmanager_theme_undo(i);
+            viewportmanager_theme_undo(i, true);
         }
     }
     send_event(GUI_EVENT_THEME_CHANGED, NULL);

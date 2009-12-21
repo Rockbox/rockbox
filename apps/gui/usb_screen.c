@@ -320,7 +320,7 @@ void gui_usb_screen_run(void)
         screens[i].backlight_on();
         if(screen_theme_needs_undo[i])
         {
-            viewportmanager_theme_undo(i);
+            viewportmanager_theme_undo(i, false);
         }
     }
 

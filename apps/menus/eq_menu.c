@@ -576,7 +576,7 @@ bool eq_menu_graphical(void)
         screens[i].setfont(FONT_UI);
         screens[i].clear_display();
         screens[i].set_viewport(NULL);
-        viewportmanager_theme_undo(i);
+        viewportmanager_theme_undo(i, false);
     }
     return result;
 }

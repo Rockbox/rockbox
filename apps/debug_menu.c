@@ -2665,7 +2665,7 @@ static int menu_action_callback(int btn, struct gui_synclist *lists)
         menuitems[gui_synclist_get_sel_pos(lists)].function();
         btn = ACTION_REDRAW;
         FOR_NB_SCREENS(i)
-            viewportmanager_theme_undo(i);
+            viewportmanager_theme_undo(i, false);
     }
     return btn;
 }

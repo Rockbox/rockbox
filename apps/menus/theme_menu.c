@@ -51,7 +51,7 @@ static int clear_main_backdrop(void)
     backdrop_show(BACKDROP_MAIN);
     /* force a full redraw so the whole backdrop is cleared */
     viewportmanager_theme_enable(SCREEN_MAIN, false, NULL);
-    viewportmanager_theme_undo(SCREEN_MAIN);
+    viewportmanager_theme_undo(SCREEN_MAIN, false);
     settings_save();
     return 0;
 }
@@ -165,7 +165,7 @@ static int statusbar_callback_ex(int action,const struct menu_item_ex *this_item
             send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
             /* force a full redraw */
             viewportmanager_theme_enable(screen, false, NULL);
-            viewportmanager_theme_undo(screen);
+            viewportmanager_theme_undo(screen, false);
             break;
     }
     return ACTION_REDRAW;
