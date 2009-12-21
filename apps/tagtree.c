@@ -1507,7 +1507,6 @@ int tagtree_enter(struct tree_context* c)
                  allow user to cancel the operation */
                 if (!warn_on_pl_erase())
                     break;
-
                 if (tagtree_play_folder(c) >= 0)
                     rc = 2;
                 break;
@@ -1729,7 +1728,7 @@ static int tagtree_play_folder(struct tree_context* c)
     gui_synclist_select_item(&tree_lists, c->selected_item);
 
     playlist_start(c->selected_item,0);
-
+    playlist_get_current()->num_inserted_tracks = 0; /* make warn on playlist erase work */
     return 0;
 }
 

@@ -2776,7 +2776,10 @@ int playlist_set_current(struct playlist_info* playlist)
 
     return 0;
 }
-
+struct playlist_info *playlist_get_current(void)
+{
+    return &current_playlist;
+}
 /*
  * Close files and delete control file for non-current playlist.
  */
