@@ -566,8 +566,8 @@ static void gwps_leave_wps(void)
         gui_wps[i].display->stop_scroll();
         gui_wps[i].display->backdrop_show(BACKDROP_MAIN);
         
-        bool draw = false;
 #ifdef HAVE_LCD_BITMAP
+        bool draw = false;
         if (gui_wps[i].data->wps_sb_tag)
             draw = gui_wps[i].data->show_sb_on_wps;
         else if (statusbar_position(i) != STATUSBAR_OFF)
