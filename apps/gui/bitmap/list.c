@@ -340,7 +340,12 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
 
     if (button == BUTTON_NONE)
         return ACTION_NONE;
-    if (x < list_text_vp->x)
+    if (x > list_text_vp->x + list_text_vp->width)
+    {
+        /* wider than the list's viewport, ignore it */
+        return ACTION_NONE;
+    }
+    else if (x < list_text_vp->x)
     {
         /* Top left corner is GO_TO_ROOT */
         if (y<list_text[SCREEN_MAIN].y)
