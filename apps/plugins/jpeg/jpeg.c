@@ -181,8 +181,10 @@ static int curfile = 0, direction = DIR_NONE, entries = 0;
 
 /* list of the jpeg files */
 static char **file_pt;
+#if PLUGIN_BUFFER_SIZE >= MIN_MEM
 /* are we using the plugin buffer or the audio buffer? */
-bool plug_buf = false;
+static bool plug_buf = true;
+#endif
 
 
 /************************* Implementation ***************************/
@@ -980,7 +982,7 @@ int load_and_show(char* filename)
             rb->lcd_puts(0,2,"Zoom In: Stop playback.");
             if(entries>1)
                 rb->lcd_puts(0,3,"Left/Right: Skip File.");
-            rb->lcd_puts(0,4,"Off: Quit.");
+            rb->lcd_puts(0,4,"Show Menu: Quit.");
             rb->lcd_update();
             rb->lcd_setfont(FONT_UI);
 
@@ -1159,10 +1161,11 @@ enum plugin_status plugin_start(const void* parameter)
     if(!entries) return PLUGIN_ERROR;
 
 #if (PLUGIN_BUFFER_SIZE >= MIN_MEM) && !defined(SIMULATOR)
-    if(rb->audio_status())
-        plug_buf = true;
-    else
+    if(!rb->audio_status())
+    {
+        plug_buf = false;
         buf = rb->plugin_get_audio_buffer((size_t *)&buf_size);
+    }
 #endif
 
 #ifdef USEGSLIB

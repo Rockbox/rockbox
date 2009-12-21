@@ -146,6 +146,15 @@ typedef struct LodePNG_Decoder
 
 #define VERSION_STRING "20080927"
 
+/* Min memory allowing us to use the plugin buffer
+ * and thus not stopping the music
+ * *Very* rough estimation:
+ * Max 10 000 dir entries * 4bytes/entry (char **) = 40000 bytes
+ * + 30k code size = 70 000
+ * + 50k min for png = 130 000
+ */
+#define MIN_MEM 130000
+
 /* Headings */
 #define DIR_PREV  1
 #define DIR_NEXT -1
@@ -165,21 +174,13 @@ static size_t memory_size;
 static unsigned char *image; /* where we put the content of the file */
 static size_t image_size;
 
-#if LCD_DEPTH >= 8
-static fb_data *converted_image __attribute__ ((aligned (16))); /* the (color) converted image */
-#else
 static fb_data *converted_image; /* the (color) converted image */
-#endif
 static size_t converted_image_size;
 
 static unsigned char *decoded_image; /* the decoded image */
 static size_t decoded_image_size;
 
-#if LCD_DEPTH >= 8
-static fb_data *resized_image __attribute__ ((aligned (16))); /* the decoded image */
-#else
 static fb_data *resized_image; /* the decoded image */
-#endif
 
 static struct tree_context *tree;
 
@@ -189,10 +190,12 @@ static int curfile = 0, direction = DIR_NONE, entries = 0;
 
 static LodePNG_Decoder decoder;
 
-/* list of the jpeg files */
+/* list of the png files */
 static char **file_pt;
+#if PLUGIN_BUFFER_SIZE >= MIN_MEM
 /* are we using the plugin buffer or the audio buffer? */
-bool plug_buf = false;
+static bool plug_buf = true;
+#endif
 
 /* Persistent configuration */
 #define PNG_CONFIGFILE             "png.cfg"
@@ -225,15 +228,6 @@ static struct configdata png_config[] =
 #if LCD_DEPTH > 1
 static fb_data* old_backdrop;
 #endif
-
-/* Min memory allowing us to use the plugin buffer
- * and thus not stopping the music
- * *Very* rough estimation:
- * Max 10 000 dir entries * 4bytes/entry (char **) = 40000 bytes
- * + 30k code size = 70 000
- * + 50k min for png = 130 000
- */
-#define MIN_MEM 130000
 
 static int slideshow_enabled = false;   /* run slideshow */
 static int running_slideshow = false;   /* loading image because of slideshw */
@@ -1823,8 +1817,7 @@ int load_image(char* filename, struct LodePNG_Decoder* decoder)
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
     {
-        rb->snprintf(print,sizeof(print),"err opening %s:%d",filename,fd);
-        rb->splash(HZ, print);
+        rb->splashf(HZ, "err opening %s:%d", filename, fd);
         return PLUGIN_ERROR;
     }
     image_size = rb->filesize(fd);
@@ -1913,9 +1906,11 @@ int load_image(char* filename, struct LodePNG_Decoder* decoder)
     }
 
     if (decoder->error) {
-        if (decoder->error == FILE_TOO_LARGE || decoder->error == OUT_OF_MEMORY
-            || decoder->error == Z_MEM_ERROR)
+#if PLUGIN_BUFFER_SIZE >= MIN_MEM
+        if (plug_buf && (decoder->error == FILE_TOO_LARGE
+            || decoder->error == OUT_OF_MEMORY || decoder->error == Z_MEM_ERROR))
             return PLUGIN_OUTOFMEM;
+#endif
 
         if (decoder->error >= PNG_ERROR_MIN && decoder->error <= PNG_ERROR_MAX
             && png_error_messages[decoder->error-PNG_ERROR_MIN] != NULL)
@@ -2070,7 +2065,7 @@ int load_and_show(char* filename)
             rb->lcd_puts(0,2,"Zoom In: Stop playback.");
             if (entries>1)
                 rb->lcd_puts(0,3,"Left/Right: Skip File.");
-            rb->lcd_puts(0,4,"Off: Quit.");
+            rb->lcd_puts(0,4,"Show Menu: Quit.");
             rb->lcd_update();
             rb->lcd_setfont(FONT_UI);
 
@@ -2144,7 +2139,7 @@ int load_and_show(char* filename)
         ds_max = ds_min;
     }
 
-    ds = ds_max; /* initials setting */
+    ds = ds_max; /* initialize setting */
     cx = decoder.infoPng.width/ds/2; /* center the view */
     cy = decoder.infoPng.height/ds/2;
 
@@ -2233,9 +2228,8 @@ enum plugin_status plugin_start(const void* parameter)
     if (!entries) return PLUGIN_ERROR;
 
 #if (PLUGIN_BUFFER_SIZE >= MIN_MEM) && !defined(SIMULATOR)
-    if (rb->audio_status()) {
-        plug_buf = true;
-    } else {
+    if (!rb->audio_status()) {
+        plug_buf = false;
         memory = rb->plugin_get_audio_buffer((size_t *)&memory_size);
     }
 #endif
