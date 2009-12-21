@@ -920,22 +920,28 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
     }
 #endif
 
-    /* disable any viewports which are conditionally displayed */
-    for (viewport_list = data->viewports;
-         viewport_list; viewport_list = viewport_list->next)
+    /* disable any viewports which are conditionally displayed.
+     * If we are only refreshing the peak meter then don't change the viewport 
+     * enabled flags as this will stop scrolling. viewports cant be 
+     * toggled in this refresh mode anyway (FS#10215)*/
+    if (refresh_mode != WPS_REFRESH_PEAK_METER)
     {
-        struct skin_viewport *skin_viewport =
-                        (struct skin_viewport *)viewport_list->token->value.data;
-        if (skin_viewport->hidden_flags&VP_NEVER_VISIBLE)
+        for (viewport_list = data->viewports;
+             viewport_list; viewport_list = viewport_list->next)
         {
-            continue;
-        }
-        if (skin_viewport->hidden_flags&VP_DRAW_HIDEABLE)
-        {
-            if (skin_viewport->hidden_flags&VP_DRAW_HIDDEN)
-                skin_viewport->hidden_flags |= VP_DRAW_WASHIDDEN;
-            else
-                skin_viewport->hidden_flags |= VP_DRAW_HIDDEN;
+            struct skin_viewport *skin_viewport =
+                            (struct skin_viewport *)viewport_list->token->value.data;
+            if (skin_viewport->hidden_flags&VP_NEVER_VISIBLE)
+            {
+                continue;
+            }
+            if (skin_viewport->hidden_flags&VP_DRAW_HIDEABLE)
+            {
+                if (skin_viewport->hidden_flags&VP_DRAW_HIDDEN)
+                    skin_viewport->hidden_flags |= VP_DRAW_WASHIDDEN;
+                else
+                    skin_viewport->hidden_flags |= VP_DRAW_HIDDEN;
+            }
         }
     }
     int viewport_count = 0;
