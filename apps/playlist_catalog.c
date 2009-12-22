@@ -431,16 +431,19 @@ exit:
     close(fd);
     return result;
 }
-
+static bool in_cat_viewer = false;
 bool catalog_view_playlists(void)
 {
+    bool retval = true;
+    if (in_cat_viewer)
+        return false;
+        
     if (initialize_catalog() == -1)
         return false;
-
-    if (display_playlists(NULL, true) == -1)
-        return false;
-
-    return true;
+    in_cat_viewer = true;
+    retval = (display_playlists(NULL, true) != -1);
+    in_cat_viewer = false;
+    return retval;
 }
 
 bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
