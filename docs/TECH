@@ -194,7 +194,7 @@ Profiling
   5) Use the tools/profile_reader/profile_reader.pl script to convert the 
      profile.out into a human readable format.  This script requires the
      relevent map files and object (or library) files created in the build.
-     (ex: ./profile_reader.pl profile.out vorbis.map libTremor.a 0)
+     (ex: ./profile_reader.pl profile.out m68k-elf-objdump vorbis.map libtremor.a 0)
 
   There is also a profile_comparator.pl script which can compare two profile
   runs as output by the above script to show percent change from optimization
