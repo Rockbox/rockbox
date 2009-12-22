@@ -34,7 +34,12 @@
 #include <time.h>
 #include <codecs/lib/codeclib.h>
 
+#include "asm_arm.h"
+#include "asm_mcf5249.h"
+#include "codeclib_misc.h"
+
 #define USE_MDCT_LOOKUP_TRIG
+//#define TRACK_MULS_ADDS
 
 #ifdef USE_MDCT_LOOKUP_TRIG
 #include "mdct_lookup.h"
@@ -48,9 +53,19 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
 #define cPI3_8 (0x30fbc54d) /* cos(3pi/8) s.31 */
 
 #define FFT_SIZE 1024
-/* Global variables for holding number of muls and adds */
-int muls, adds;
 
+
+/* Global variables for holding number of muls and adds */
+#ifdef TRACK_MULS_ADDS
+int muls, adds;
+static inline void muls_inc(int x){ muls += x; }
+static inline void adds_inc(int x){ adds += x; }
+#else
+static inline void muls_inc(int x){ (void)x; }
+static inline void adds_inc(int x){ (void)x; }
+#endif
+
+/* big chunk of below only happens if we're NOT using the tremor mdct trig tables */
 #ifndef USE_MDCT_LOOKUP_TRIG
 int32_t flattabs[8+16+32+64+128+256+512+1024+2048];
 int32_t * tabstabstabs[] = { flattabs, flattabs+8, flattabs+8+16,flattabs+8+16+32, flattabs+8+16+32+64,
@@ -190,16 +205,22 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 #define BF(x,y,a,b) {\
     x = a - b;\
     y = a + b;\
-    adds += 2;\
+    adds_inc(2);\
 }
 
 #define BUTTERFLIES(a0,a1,a2,a3) {\
-    BF(t3, t5, t5, t1);\
-    BF(a2.re, a0.re, a0.re, t5);\
-    BF(a3.im, a1.im, a1.im, t3);\
-    BF(t4, t6, t2, t6);\
-    BF(a3.re, a1.re, a1.re, t4);\
-    BF(a2.im, a0.im, a0.im, t6);\
+    {\
+        FFTSample temp1,temp2;\
+        BF(temp1, temp2, t5, t1);\
+        BF(a2.re, a0.re, a0.re, temp2);\
+        BF(a3.im, a1.im, a1.im, temp1);\
+    }\
+    {\
+        FFTSample temp1,temp2;\
+        BF(temp1, temp2, t2, t6);\
+        BF(a3.re, a1.re, a1.re, temp1);\
+        BF(a2.im, a0.im, a0.im, temp2);\
+    }\
 }
 
 // force loading all the inputs before storing any.
@@ -207,31 +228,102 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 // for addresses separated by large powers of 2.
 #define BUTTERFLIES_BIG(a0,a1,a2,a3) {\
     FFTSample r0=a0.re, i0=a0.im, r1=a1.re, i1=a1.im;\
-    BF(t3, t5, t5, t1);\
-    BF(a2.re, a0.re, r0, t5);\
-    BF(a3.im, a1.im, i1, t3);\
-    BF(t4, t6, t2, t6);\
-    BF(a3.re, a1.re, r1, t4);\
-    BF(a2.im, a0.im, i0, t6);\
+    {\
+        FFTSample temp1, temp2;\
+        BF(temp1, temp2, t5, t1);\
+        BF(a2.re, a0.re, r0, temp2);\
+        BF(a3.im, a1.im, i1, temp1);\
+    }\
+    {\
+        FFTSample temp1, temp2;\
+        BF(temp1, temp2, t2, t6);\
+        BF(a3.re, a1.re, r1, temp1);\
+        BF(a2.im, a0.im, i0, temp2);\
+    }\
 }
 
+/*
+  see conjugate pair description in
+  http://www.fftw.org/newsplit.pdf
+
+  a0 = z[k]
+  a1 = z[k+N/4]
+  a2 = z[k+2N/4]
+  a3 = z[k+3N/4]
+  
+  result:
+  y[k]      = z[k]+w(z[k+2N/4])+w'(z[k+3N/4])
+  y[k+N/4]  = z[k+N/4]-iw(z[k+2N/4])+iw'(z[k+3N/4])
+  y[k+2N/4] = z[k]-w(z[k+2N/4])-w'(z[k+3N/4])
+  y[k+3N/4] = z[k+N/4]+iw(z[k+2N/4])-iw'(z[k+3N/4])
+  
+  i.e.
+  
+  a0        = a0 +  (w.a2 + w'.a3)
+  a1        = a1 - i(w.a2 - w'.a3)
+  a2        = a0 -  (w.a2 + w'.a3)
+  a3        = a1 + i(w.a2 - w'.a3)
+  
+  note re(w') = re(w) and im(w') = -im(w)
+  
+  so therefore
+  
+  re(a0)   = re(a0) + re(w.a2) + re(w.a3)
+  im(a0)   = im(a0) + im(w.a2) - im(w.a3) etc
+
+  and remember also that  
+  Re([s+it][u+iv]) = su-tv
+  Im([s+it][u+iv]) = sv+tu
+  
+  so
+  Re(w'.(s+it)) = Re(w').s - Im(w').t = Re(w).s + Im(w).t
+  Im(w'.(s+it)) = Re(w').t + Im(w').s = Re(w).t - Im(w).s
+
+  For inverse dft we take the complex conjugate of all twiddle factors.
+  Hence 
+  
+  a0        = a0 +  (w'.a2 + w.a3)
+  a1        = a1 - i(w'.a2 - w.a3)
+  a2        = a0 -  (w'.a2 + w.a3)
+  a3        = a1 + i(w'.a2 - w.a3)
+  
+  Define t1 = Re(w'.a2)  =  Re(w)*Re(a2) + Im(w)*Im(a2)
+         t2 = Im(w'.a2)  =  Re(w)*Im(a2) - Im(w)*Re(a2)
+         t5 = Re(w.a3)   =  Re(w)*Re(a3) - Im(w)*Im(a3)
+         t6 = Im(w.a3)   =  Re(w)*Im(a3) + Im(w)*Re(a3)
+         
+  Then we just output:
+  a0.re = a0.re + ( t1 + t5 )
+  a0.im = a0.im + ( t2 + t6 )
+  a1.re = a1.re + ( t2 - t6 )   // since we multiply by -i and i(-i) = 1
+  a1.im = a1.im - ( t1 - t5 )   // since we multiply by -i and 1(-i) = -i
+  a2.re = a0.re - ( t1 + t5 )
+  a2.im = a0.im - ( t1 + t5 )
+  a3.re = a1.re - ( t2 - t6 )   // since we multiply by +i and i(+i) = -1
+  a3.im = a1.im + ( t1 - t5 )   // since we multiply by +i and 1(+i) = i
+    
+    
+*/
 #define TRANSFORM(a0,a1,a2,a3,wre,wim) {\
-    t1 = fixmul32b(a2.re, wre) + fixmul32b(a2.im, wim);\
-    t2 = fixmul32b(a2.im, wre) - fixmul32b(a2.re, wim);\
-    t5 = fixmul32b(a3.re, wre) - fixmul32b(a3.im, wim);\
-    t6 = fixmul32b(a3.im, wre) + fixmul32b(a3.re, wim);\
-    muls += 8;\
-    BUTTERFLIES(a0,a1,a2,a3)\
+    {\
+        FFTSample t1,t2,t5,t6;\
+        XPROD31(a2.re, a2.im, wre, wim, &t1, &t2);\
+        XNPROD31(a3.re, a3.im, wre, wim, &t5,&t6);\
+        BUTTERFLIES(a0,a1,a2,a3)\
+    }\
+    muls_inc(8);\
 }
+
 #define TRANSFORM_EQUAL(a0,a1,a2,a3,w) {\
-    t3 = fixmul32b(a2.re, w);\
-    t4 = fixmul32b(a2.im, w);\
-    t7 = fixmul32b(a3.re, w);\
-    t8 = fixmul32b(a3.im, w);\
+    t3 = MULT31(a2.re, w);\
+    t4 = MULT31(a2.im, w);\
+    t7 = MULT31(a3.re, w);\
+    t8 = MULT31(a3.im, w);\
     t1 = ( t3 + t4 );\
     t2 = ( t4 - t3 );\
     t5 = ( t7 - t8 );\
     t6 = ( t8 + t7 );\
+    muls_inc(4);\
     BUTTERFLIES(a0,a1,a2,a3)\
 }
 
@@ -252,10 +344,10 @@ static void name(FFTComplex *z, const FFTSample *wre, unsigned int n)\
     int o1 = 2*n;\
     int o2 = 4*n;\
     int o3 = 6*n;\
-    muls += 3;\
+    muls_inc(3);\
     const FFTSample *wim = wre+o1;\
     n--;\
-    adds += 2;\
+    adds_inc(2);\
 \
     TRANSFORM_ZERO(z[0],z[o1],z[o2],z[o3]);\
     TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wre[1],wim[-1]);\
@@ -265,30 +357,30 @@ static void name(FFTComplex *z, const FFTSample *wre, unsigned int n)\
         wim -= 2;\
         TRANSFORM(z[0],z[o1],z[o2],z[o3],wre[0],wim[0]);\
         TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wre[1],wim[-1]);\
-	adds += 4;\
+	adds_inc(4);\
     } while(--n);\
 }
 #else
 #define PASS(name)\
 static void name(FFTComplex *z, unsigned int STEP, unsigned int n)\
 {\
-    FFTSample t1, t2, t3, t4, t5, t6;\
-    int o1 = 2*n;\
-    int o2 = 4*n;\
-    int o3 = 6*n;\
-    muls += 3;\
+    FFTSample t1, t2, t5, t6;\
+    int o1 = n;\
+    int o2 = 2*n;\
+    int o3 = 3*n;\
+    muls_inc(2);\
 \
     const FFTSample *wim = sincos_lookup0+STEP;\
     /* wre = *(wim+1) .  ordering is sin,cos */\
     const FFTSample *w_end = sincos_lookup0+1024;\
 \
-    adds += 2;\
+    adds_inc(2);\
 \
     /* first two are special (well, first one is special, but we need to do pairs) */\
     TRANSFORM_ZERO(z[0],z[o1],z[o2],z[o3]);\
     TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wim[1],wim[0]);\
     wim += STEP;\
-    adds += 1;\
+    adds_inc(1);\
     /* first pass forwards through sincos_lookup0*/\
     do {\
         z += 2;\
@@ -296,7 +388,7 @@ static void name(FFTComplex *z, unsigned int STEP, unsigned int n)\
         wim += STEP;\
         TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wim[1],wim[0]);\
         wim += STEP;\
-	adds += 3;\
+	adds_inc(3);\
     } while(wim < w_end);\
     /* second half: pass backwards through sincos_lookup0*/\
     /* wim and wre are now in opposite places so ordering now [0],[1] */\
@@ -308,7 +400,7 @@ static void name(FFTComplex *z, unsigned int STEP, unsigned int n)\
         wim -= STEP;\
         TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wim[0],wim[1]);\
         wim -= STEP;\
- 	adds += 3;\
+ 	adds_inc(3);\
     }\
 }
 #endif
@@ -341,11 +433,11 @@ static void fft##n(FFTComplex *z)\
     fft##n2(z);\
     fft##n4(z+n4*2);\
     fft##n4(z+n4*3);\
-    pass(z,8192/n,n4/2);\
+    pass(z,8192/n,n4);\
 }
 #endif
 
-static void fft4(FFTComplex *z)
+static inline void fft4(FFTComplex *z)
 {
     FFTSample t1, t2, t3, t4, t5, t6, t7, t8;
 
@@ -357,6 +449,11 @@ static void fft4(FFTComplex *z)
     BF(z[3].im, z[1].im, t4, t8);
     BF(z[3].re, z[1].re, t3, t7);
     BF(z[2].im, z[0].im, t2, t5);
+}
+
+static void fft4_dispatch(FFTComplex *z)
+{
+    fft4(z);
 }
 
 static void fft8(FFTComplex *z)
@@ -411,7 +508,7 @@ DECL_FFT(2048,1024,512)
 DECL_FFT(4096,2048,1024)
 
 static void (*fft_dispatch[])(FFTComplex*) = {
-    fft4, fft8, fft16, fft32, fft64, fft128, fft256, fft512, fft1024,
+    fft4_dispatch, fft8, fft16, fft32, fft64, fft128, fft256, fft512, fft1024,
     fft2048, fft4096
 };
 
