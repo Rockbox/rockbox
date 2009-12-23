@@ -140,11 +140,31 @@ int vorbis_staticbook_unpack(oggpack_buffer *opb,static_codebook *s){
    be.  The first-stage decode table catches most words so that
    bitreverse is not in the main execution path. */
 
-static inline ogg_uint32_t bitreverse(register ogg_uint32_t x){
-  x=    swap32(x);
-  x=    ((x>> 4)&0x0f0f0f0f) | ((x<< 4)&0xf0f0f0f0);
-  x=    ((x>> 2)&0x33333333) | ((x<< 2)&0xcccccccc);
-  return((x>> 1)&0x55555555) | ((x<< 1)&0xaaaaaaaa);
+static inline ogg_uint32_t bitreverse(register ogg_uint32_t x)
+{
+  unsigned int mask;
+#if defined(CPU_ARM) && ARM_ARCH >= 6
+  asm ("rev %[x], %[x]" : [x] "+r" (x)); /* swap bytes */
+#else
+#if defined(CPU_COLDFIRE)
+  asm ("swap    %[x]" : [x] "+r" (x));   /* swap halfwords */
+#else
+  x = (x>>16) | (x<<16);
+#endif
+  mask = x&0x00ff00ff;
+  x ^= mask;
+  x = (x >> 8) | (mask << 8);            /* bytes swapped */
+#endif
+  mask = x&0x0f0f0f0f;
+  x ^= mask;
+  x = (x >> 4) | (mask << 4);            /* 4-bit units swapped */
+  mask = x&0x33333333;
+  x ^= mask;
+  x = (x >> 2) | (mask << 2);            /* 2-bit units swapped */
+  mask = x&0x55555555;
+  x ^= mask;
+  x = (x >> 1) | (mask << 1);            /* done */
+  return x;
 }
 
 STIN long decode_packed_entry_number(codebook *book, 
