@@ -273,7 +273,10 @@ This \setting{Open With} function is the same as the \setting{Open With}
 function in the file browser's \setting{Context Menu}.
 
 \subsubsection{Delete}
-Delete the currently playing file.
+Delete the currently playing file. The file will be deleted but the playback
+of the file will not stop immediately. Instead, the part of the file that
+has already been buffered (i.e. read into the \daps\ memory) will be played.
+This may even be the whole track.
 
 \opt{pitchscreen}{
   \subsubsection{\label{sec:pitchscreen}Pitch}
