@@ -1374,8 +1374,8 @@ static int brickmania_game_loop(void)
 
             /* draw the ball */
             for(i=0;i<used_balls;i++)
-                rb->lcd_bitmap(brickmania_ball, INT3(ball[i].pos_x), 
-                    INT3(ball[i].pos_y), INT3(BALL), INT3(BALL));
+                rb->lcd_bitmap(brickmania_ball, 
+                    INT3(ball[i].pos_x), INT3(ball[i].pos_y), INT3(BALL), INT3(BALL));
 
             if (brick_on_board==0)
                 brick_on_board--;
@@ -1733,14 +1733,31 @@ static int brickmania_game_loop(void)
                 /* Loop through all of the balls in play */
                 for(k=0;k<used_balls;k++) 
                 {
+                    line screen_edge;
+
+                    /* Describe the ball movement for the edge collision detection */
+                    misc_line.p1.x = ball[k].pos_x + HALFBALL;
+                    misc_line.p1.y = ball[k].pos_y + HALFBALL;
+                    
+                    misc_line.p2.x = ball[k].pos_x + ball[k].speedx + HALFBALL;
+                    misc_line.p2.y = ball[k].pos_y + ball[k].speedy + HALFBALL;
+
                     /* Did the Ball hit the top of the screen? */
-                    if (ball[k].pos_y<= 0)
+                    screen_edge.p1.x = 0;
+                    screen_edge.p1.y = 0;
+                            
+                    screen_edge.p2.x = FIXED3(LCD_WIDTH);
+                    screen_edge.p2.y = 0;
+                    if (check_lines(&misc_line, &screen_edge, &pt_hit))
                     {
+                        ball[k].tempy = pt_hit.y - HALFBALL + 1;
+                        ball[k].tempx = pt_hit.x - HALFBALL;
                         /* Reverse the direction */
                         ball[k].speedy = -ball[k].speedy;
                     }
+
                     /* Player missed the ball and hit bottom of screen */
-                    else if (ball[k].pos_y+HALFBALL >= GAMESCREEN_HEIGHT) 
+                    if (ball[k].pos_y+HALFBALL >= GAMESCREEN_HEIGHT) 
                     {
                         /* Player had balls to spare, so handle the removal */
                         if (used_balls>1) 
@@ -1781,31 +1798,37 @@ static int brickmania_game_loop(void)
                         }
                     }
 
-                    /* Check if the ball hit the left or right side */
-                    if (    (ball[k].pos_x < 0) || 
-                            (ball[k].pos_x+BALL > GAMESCREEN_WIDTH) )
+                    /* Check if the ball hit the left side */
+                    screen_edge.p1.x = 0;
+                    screen_edge.p1.y = 0;
+                            
+                    screen_edge.p2.x = 0;
+                    screen_edge.p2.y = FIXED3(LCD_HEIGHT);
+                    if ( check_lines(&misc_line, &screen_edge, &pt_hit))
                     {
                         /* Reverse direction */
                         ball[k].speedx = -ball[k].speedx;
+
                         /* Re-position ball in gameboard */
-                        if(ball[k].pos_x <= 0)
-                        {
-                            ball[k].pos_x = 0;
-                        }
-                        else
-                        {
-                            ball[k].pos_x = GAMESCREEN_WIDTH-BALL;
-                        }
+                        ball[k].tempy = pt_hit.y - HALFBALL;
+                        ball[k].tempx = pt_hit.x - HALFBALL + 1;
                     }
 
-                    /* Setup the ball path to describe the current ball
-                     * position and the line it makes to its next
-                     * position. */
-                    misc_line.p1.x = ball[k].pos_x + HALFBALL;
-                    misc_line.p1.y = ball[k].pos_y + HALFBALL;
-                    
-                    misc_line.p2.x = ball[k].pos_x + ball[k].speedx + HALFBALL;
-                    misc_line.p2.y = ball[k].pos_y + ball[k].speedy + HALFBALL;
+                    /* Check if the ball hit the right side */
+                    screen_edge.p1.x = FIXED3(LCD_WIDTH);
+                    screen_edge.p1.y = 0;
+                            
+                    screen_edge.p2.x = FIXED3(LCD_WIDTH);
+                    screen_edge.p2.y = FIXED3(LCD_HEIGHT);
+                    if ( check_lines(&misc_line, &screen_edge, &pt_hit))
+                    {
+                        /* Reverse direction */
+                        ball[k].speedx = -ball[k].speedx;
+
+                        /* Re-position ball in gameboard */
+                        ball[k].tempy = pt_hit.y - HALFBALL;
+                        ball[k].tempx = pt_hit.x - HALFBALL - 1;
+                    }
 
                     /* Did the ball hit the paddle? Depending on where the ball
                      *  Hit set the x/y speed appropriately.
@@ -1813,7 +1836,11 @@ static int brickmania_game_loop(void)
                     if( game_state!=ST_READY && !ball[k].glue &&
                         check_lines(&misc_line, &pad_line, &pt_hit) ) 
                     {
-                        /* Position the ball relative to the paddle width */
+                        /* Re-position ball based on collision */
+                        ball[k].tempy = pt_hit.y - HALFBALL - 1;
+                        ball[k].tempx = pt_hit.x - HALFBALL;
+
+                        /* Calculate the ball position relative to the paddle width */
                         int ball_repos = pt_hit.x - pad_pos_x;
                         /* If the ball hits the right half of paddle, x speed
                          *  should be positive, if it hits the left half it
@@ -1884,6 +1911,11 @@ static int brickmania_game_loop(void)
                         {
                             ball[k].speedy = -ball[k].speedy;
                             ball[k].glue=true;
+
+                            /* X location should not be forced since that is moved with the paddle.  The Y
+                             *  position should be forced to keep the ball at the paddle.
+                             */
+                            ball[k].tempx = 0;
                             ball[k].tempy = pt_hit.y - BALL;
                         }
                     }
