@@ -500,6 +500,11 @@ static int readwrite(int fd, void* buf, long count, bool write)
         return -1;
     }
 
+    if(file->attr & FAT_ATTR_DIRECTORY) {
+        errno = EISDIR;
+        return -1;
+    }
+
     LDEBUGF( "readwrite(%d,%lx,%ld,%s)\n",
              fd,(long)buf,count,write?"write":"read");
 
