@@ -485,13 +485,16 @@ static int readwrite(int fd, void* buf, long count, bool write)
 {
     long sectors;
     long nread=0;
-    struct filedesc* file = &openfiles[fd];
+    struct filedesc* file;
     int rc;
 
     if (fd < 0 || fd > MAX_OPEN_FILES-1) {
         errno = EINVAL;
         return -1;
     }
+
+    file = &openfiles[fd];
+
     if ( !file->busy ) {
         errno = EBADF;
         return -1;
