@@ -142,29 +142,77 @@ int vorbis_staticbook_unpack(oggpack_buffer *opb,static_codebook *s){
 
 static inline ogg_uint32_t bitreverse(register ogg_uint32_t x)
 {
-  unsigned int mask;
-#if defined(CPU_ARM) && ARM_ARCH >= 6
-  asm ("rev %[x], %[x]" : [x] "+r" (x)); /* swap bytes */
+  unsigned tmp, ret;
+#ifdef CPU_ARM
+#if ARM_ARCH >= 6
+  unsigned mask = 0x0f0f0f0f;
 #else
-#if defined(CPU_COLDFIRE)
-  asm ("swap    %[x]" : [x] "+r" (x));   /* swap halfwords */
+  unsigned mask = 0x00ff00ff;
+#endif
+  asm (
+#if ARM_ARCH >= 6
+    "rev     %[r], %[x]              \n"  /* swap halfwords and bytes */
+    "and     %[t], %[m], %[r]        \n"  /* Sequence is one instruction */
+    "eor     %[r], %[t], %[r]        \n"  /*   longer than on <= ARMv5, but */
+    "mov     %[t], %[t], lsl #4      \n"  /*   interlock free */
+    "orr     %[r], %[t], %[r], lsr #4\n"  /* nibbles swapped */
+    "eor     %[m], %[m], %[m], lsl #2\n"  /* mask = 0x33333333 */
+    "and     %[t], %[m], %[r]        \n"
+    "eor     %[r], %[t], %[r]        \n"
+    "mov     %[t], %[t], lsl #2      \n"
+    "orr     %[r], %[t], %[r], lsr #2\n"  /* dibits swapped */
+    "eor     %[m], %[m], %[m], lsl #1\n"  /* mask = 0x55555555 */
+    "and     %[t], %[m], %[r]        \n"
+    "eor     %[r], %[t], %[r]        \n"
+    "mov     %[t], %[t], lsl #1      \n"
+    "orr     %[r], %[t], %[r], lsr #1\n"  /* bits swapped */
+#else /* ARM_ARCH <= 5 */
+    "mov     %[r], %[x], ror #16     \n"  /* swap halfwords */
+    "and     %[t], %[m], %[r], lsr #8\n"
+    "eor     %[r], %[r], %[t], lsl #8\n"
+    "orr     %[r], %[t], %[r], lsl #8\n"  /* bytes swapped */
+    "eor     %[m], %[m], %[m], lsl #4\n"  /* mask = 0x0f0f0f0f */
+    "and     %[t], %[m], %[r], lsr #4\n"
+    "eor     %[r], %[r], %[t], lsl #4\n"
+    "orr     %[r], %[t], %[r], lsl #4\n"  /* nibbles swapped */
+    "eor     %[m], %[m], %[m], lsl #2\n"  /* mask = 0x33333333 */
+    "and     %[t], %[m], %[r], lsr #2\n"
+    "eor     %[r], %[r], %[t], lsl #2\n"
+    "orr     %[r], %[t], %[r], lsl #2\n"  /* dibits swapped */
+    "eor     %[m], %[m], %[m], lsl #1\n"  /* mask = 0x55555555 */
+    "and     %[t], %[m], %[r], lsr #1\n"
+    "eor     %[r], %[r], %[t], lsl #1\n"
+    "orr     %[r], %[t], %[r], lsl #1\n"  /* bits swapped */
+#endif /* ARM_ARCH */
+    : /* outputs */
+    [m]"+r"(mask),
+    [r]"=r"(ret),
+    [t]"=r"(tmp)
+    : /* inputs */
+    [x]"r"(x)
+  );
+#else /* !CPU_ARM */
+
+#ifdef CPU_COLDFIRE
+  ret = x;
+  asm ("swap  %[r]" : [r] "+r" (ret));   /* swap halfwords */
 #else
-  x = (x>>16) | (x<<16);
+  ret = (x>>16) | (x<<16);
 #endif
-  mask = x&0x00ff00ff;
-  x ^= mask;
-  x = (x >> 8) | (mask << 8);            /* bytes swapped */
-#endif
-  mask = x&0x0f0f0f0f;
-  x ^= mask;
-  x = (x >> 4) | (mask << 4);            /* 4-bit units swapped */
-  mask = x&0x33333333;
-  x ^= mask;
-  x = (x >> 2) | (mask << 2);            /* 2-bit units swapped */
-  mask = x&0x55555555;
-  x ^= mask;
-  x = (x >> 1) | (mask << 1);            /* done */
-  return x;
+  tmp = ret & 0x00ff00ff;
+  ret ^= tmp;
+  ret = (ret >> 8) | (tmp << 8);         /* bytes swapped */
+  tmp = ret & 0x0f0f0f0f;
+  ret ^= tmp;
+  ret = (ret >> 4) | (tmp << 4);         /* 4-bit units swapped */
+  tmp = ret & 0x33333333;
+  ret ^= tmp;
+  ret = (ret >> 2) | (tmp << 2);         /* 2-bit units swapped */
+  tmp = ret & 0x55555555;
+  ret ^= tmp;
+  ret = (ret >> 1) | (tmp << 1);         /* done */
+#endif /* !CPU_ARM */
+  return ret;
 }
 
 STIN long decode_packed_entry_number(codebook *book, 
