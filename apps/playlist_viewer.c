@@ -621,8 +621,8 @@ bool playlist_viewer_ex(const char* filename)
                   global_settings.playlist_viewer_icons?
                   &playlist_callback_icons:NULL);
     gui_synclist_set_nb_items(&playlist_lists, viewer.num_tracks);
-    gui_synclist_select_item(&playlist_lists, viewer.selected_track);
     gui_synclist_set_title(&playlist_lists, str(LANG_PLAYLIST), Icon_Playlist);
+    gui_synclist_select_item(&playlist_lists, viewer.selected_track);
     gui_synclist_draw(&playlist_lists);
     while (!exit)
     {
