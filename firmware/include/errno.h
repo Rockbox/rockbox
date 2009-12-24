@@ -10,7 +10,11 @@
 
 #ifndef _SYS_ERRNO_H_
 
+#ifdef PLUGIN
+#define errno   (*rb->__errno)
+#else
 extern int errno;
+#endif
 
 #define	EPERM 1		/* Not super-user */
 #define	ENOENT 2	/* No such file or directory */

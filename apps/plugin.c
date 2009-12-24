@@ -40,6 +40,7 @@
 #include "version.h"
 #include "storage.h"
 #include "pcmbuf.h"
+#include "errno.h"
 
 #if CONFIG_CHARGING
 #include "power.h"
@@ -680,6 +681,7 @@ static const struct plugin_api rockbox_api = {
     viewportmanager_theme_enable,
     viewportmanager_theme_undo,
 #endif
+    &errno
 };
 
 int plugin_load(const char* plugin, const void* parameter)

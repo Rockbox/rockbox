@@ -860,6 +860,7 @@ struct plugin_api {
                                          struct viewport *viewport);
     void (*viewportmanager_theme_undo)(enum screen_type screen, bool force_redraw);
 #endif
+    int* __errno;
 };
 
 /* plugin header */
