@@ -681,7 +681,7 @@ static const struct plugin_api rockbox_api = {
     viewportmanager_theme_enable,
     viewportmanager_theme_undo,
 #endif
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
     &errno
 #endif
 };

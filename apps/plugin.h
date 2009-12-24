@@ -860,7 +860,7 @@ struct plugin_api {
                                          struct viewport *viewport);
     void (*viewportmanager_theme_undo)(enum screen_type screen, bool force_redraw);
 #endif
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
     int* __errno;
 #endif
 };
