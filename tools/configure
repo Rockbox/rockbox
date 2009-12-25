@@ -632,7 +632,7 @@ voiceconfig () {
 
     # Read custom tts options from command line
     if [ "$ARG_TTSOPTS" ]; then
-        TTS_OPTS="$ARG_TTS_OPTS"
+        TTS_OPTS="$ARG_TTSOPTS"
         advopts="$advopts --ttsopts='$TTS_OPTS'"
         echo "$TTS_ENGINE options set to $TTS_OPTS"
     fi
