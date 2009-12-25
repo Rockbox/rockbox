@@ -977,7 +977,8 @@ static bool dbg_spdif(void)
 
 /* This is temporary until the SA9200 touchpad works */
 #elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) || \
-      (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD)
+      (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) || \
+      (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD)
 #   define DEBUG_CANCEL  BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
@@ -1142,7 +1143,7 @@ extern unsigned char serbuf[];
                                 adc_read(ADC_BATTERY), adc_read(ADC_UNKNOWN_1));
         lcd_putsf(0, line++, "REM:  %03x PAD: %03x",
                                  adc_read(ADC_REMOTE), adc_read(ADC_SCROLLPAD));
-#elif defined(PHILIPS_HDD1630)
+#elif defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
         line++;
         lcd_putsf(0, line++, "BATT: %03x UNK1: %03x",
                                 adc_read(ADC_BATTERY), adc_read(ADC_UNKNOWN_1));

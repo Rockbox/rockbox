@@ -75,6 +75,9 @@ extern int show_logo(void);
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 #define BOOTLOADER_BOOT_OF      BUTTON_MENU
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
+#define BOOTLOADER_BOOT_OF      BUTTON_VOL_UP
+
 #elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
 #define BOOTLOADER_BOOT_OF      BUTTON_LEFT
 
@@ -603,7 +606,7 @@ void* main(void)
         }
 #endif
 
-#if defined(PHILIPS_HDD1630)
+#if defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
         printf("Trying /System/OF.ebn");
         rc=load_mi4(loadbuffer, "/System/OF.ebn", MAX_LOADSIZE);
         if (rc < EOK) {

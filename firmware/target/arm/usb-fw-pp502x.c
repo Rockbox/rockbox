@@ -70,7 +70,7 @@
 #define USB_GPIO_MASK   0x80
 #define USB_GPIO_VAL    0x00
 
-#elif defined(PHILIPS_HDD1630)
+#elif defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
     /* GPIO E bit 2 is usb detect */
 #define USB_GPIO        GPIOE
 #define USB_GPIO_MASK   0x04

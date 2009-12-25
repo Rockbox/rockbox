@@ -114,6 +114,7 @@
 #define ONDAVX777_PAD      39
 #define SAMSUNG_YPS3_PAD   40
 #define MINI2440_PAD       41
+#define PHILIPS_HDD6330_PAD 42
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -194,6 +195,7 @@
 #define LCD_VIEW      35 /* as used by the Sansa View */
 #define LCD_NANO2G    36 /* as used by the iPod Nano 2nd Generation */
 #define LCD_MINI2440  37 /* as used by the Mini2440 */
+#define LCD_HDD6330   38 /* as used by the Philips HDD6330 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -359,6 +361,8 @@ Lyre prototype 1 */
 #include "config/gogearsa9200.h"
 #elif defined(PHILIPS_HDD1630)
 #include "config/gogearhdd1630.h"
+#elif defined(PHILIPS_HDD6330)
+#include "config/gogearhdd6330.h"
 #elif defined(SANSA_C100)
 #include "config/sansac100.h"
 #elif defined(MEIZU_M6SL)

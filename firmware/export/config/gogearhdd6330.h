@@ -1,12 +1,12 @@
 /*
- * This config file is for the Philips GoGear HDD16x0/HDD18x0
+ * This config file is for the Philips GoGear HDD63x0
  */
 
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 31
-#define MODEL_NAME   "Philips GoGear HDD16x0"
+#define MODEL_NUMBER 65
+#define MODEL_NAME   "Philips GoGear HDD63x0"
 
 /* define this if you use an ATA controller */
 #define CONFIG_STORAGE STORAGE_ATA
@@ -51,8 +51,8 @@
 #define HAVE_TAGCACHE
 
 /* LCD dimensions */
-#define LCD_WIDTH  128
-#define LCD_HEIGHT 128
+#define LCD_WIDTH  220
+#define LCD_HEIGHT 176
 #define LCD_DEPTH  16   /* 65536 colours */
 #define LCD_PIXELFORMAT RGB565  /* rgb565 byte-swapped */
 
@@ -68,14 +68,14 @@
 #endif
 
 /* define this if you can flip your LCD */
-#define HAVE_LCD_FLIP
+/* #define HAVE_LCD_FLIP */
 
 /* define this if you can invert the colours on your LCD */
-#define HAVE_LCD_INVERT
+/* #define HAVE_LCD_INVERT */
 
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
-#define CONFIG_KEYPAD PHILIPS_HDD1630_PAD
+#define CONFIG_KEYPAD PHILIPS_HDD6330_PAD
 
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
@@ -163,10 +163,10 @@
 #define CPU_FREQ      75000000
 
 /* Type of LCD */
-#define CONFIG_LCD LCD_HDD1630
+#define CONFIG_LCD LCD_HDD6330
 
 /* Define this if your LCD can set contrast */
-#define HAVE_LCD_CONTRAST
+/* #define HAVE_LCD_CONTRAST */
 
 #define MIN_CONTRAST_SETTING        0
 #define MAX_CONTRAST_SETTING        127

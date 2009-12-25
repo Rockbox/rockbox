@@ -143,7 +143,7 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
                 usb_insert_int();
         }
 /* end PHILIPS_SA9200 */
-#elif defined(PHILIPS_HDD1630)
+#elif defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
         else if (CPU_HI_INT_STAT & GPIO0_MASK) {
             if (GPIOA_INT_STAT & 0x20)
                 button_int();
@@ -152,7 +152,7 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
             if (GPIOE_INT_STAT & 0x04)
                 usb_insert_int();
         }
-/* end PHILIPS_HDD1630 */
+/* end PHILIPS_HDD1630 || PHILIPS_HDD6330 */
 #elif defined(SAMSUNG_YH820) || defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
         else if (CPU_HI_INT_STAT & GPIO0_MASK) {
             if (GPIOD_INT_STAT & 0x10)

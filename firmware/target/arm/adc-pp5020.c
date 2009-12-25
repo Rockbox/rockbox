@@ -59,7 +59,7 @@ unsigned short adc_scan(int channel)
 
     adcdata[channel] = (adc_data_1<<2 | adc_data_2);
 
-#if !defined(PHILIPS_HDD1630)
+#if !(defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330))
     /* ADC values read low if PLL is enabled */
     if(PLL_CONTROL & 0x80000000){
         adcdata[channel] += 0x14;
@@ -94,7 +94,7 @@ static void adc_tick(void)
 /* Figured out from how the OF does things */
 void adc_init(void)
 {
-#if defined(PHILIPS_HDD1630)
+#if defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
     ADC_INIT = 0;
 #else
     ADC_INIT |= 1;
@@ -119,7 +119,7 @@ void adc_init(void)
     ADC_ADDR = 0;
     ADC_ADDR |= 0x40;
 
-#if !defined(PHILIPS_HDD1630)
+#if !(defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330))
     ADC_ADDR |= 0x20000000;
     udelay(100);
 
@@ -155,7 +155,7 @@ void adc_init(void)
     ADC_STATUS |= 0x20000000;
 #endif
 
-#if defined(PHILIPS_HDD1630)
+#if defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
     ADC_INIT |= 0x80000000;
     udelay(100);
     ADC_INIT = 0;

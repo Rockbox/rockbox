@@ -12,9 +12,9 @@ gigabeat-s.c
 #elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || \
       defined(SANSA_E200) || defined(SANSA_C200) || \
       defined(MROBE_100)  || defined(PHILIPS_SA9200) || \
-      defined(PHILIPS_HDD1630) || defined(SAMSUNG_YH820) || \
-      defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925) || \
-      defined(SANSA_VIEW)
+      defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330) || \
+      defined(SAMSUNG_YH820) || defined(SAMSUNG_YH920) || \
+      defined(SAMSUNG_YH925) || defined(SANSA_VIEW)
 #ifdef E200R_INSTALLER
 main-e200r-installer.c
 #elif defined(C240_ERASE)

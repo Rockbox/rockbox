@@ -239,6 +239,8 @@ keymaps/keymap-creativezv.c
 keymaps/keymap-sa9200.c
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 keymaps/keymap-hdd1630.c
+#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
+keymaps/keymap-hdd6330.c
 #elif CONFIG_KEYPAD == IAUDIO67_PAD
 keymaps/keymap-iaudio67.c
 #elif CONFIG_KEYPAD == SANSA_C100_PAD

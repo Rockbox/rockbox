@@ -123,9 +123,9 @@ void usage(void)
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
            "\t                   ip3g, ip4g, mini, iax5, iam5, iam3, h10, h10_5gb,\n"
            "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2,\n");
-    printf("\t                   9200, 1630, ldax, m200, c100, clip, e2v2, m2v4,\n"
-           "\t                   fuze, c2v2, clv2, y820, y920, y925, x747, 747p, \n"
-           "\t                   x777, nn2g, m244)\n");
+    printf("\t                   9200, 1630, 6330, ldax, m200, c100, clip, e2v2,\n"
+           "\t                   m2v4, fuze, c2v2, clv2, y820, y920, y925, x747,\n"
+           "\t                   747p, x777, nn2g, m244)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -318,6 +318,8 @@ int main (int argc, char** argv)
             modelnum = 62;
         else if (!strcmp(&argv[1][5], "x767"))
             modelnum = 64;
+        else if (!strcmp(&argv[1][5], "6330")) /* Philips HDD6330 */
+            modelnum = 65;
         else if (!strcmp(&argv[1][5], "m244"))
             modelnum = 131;
         else {
