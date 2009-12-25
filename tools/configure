@@ -450,7 +450,9 @@ whichadvanced () {
         fi
         ;;
     esac
-    if [ ! "$interact" ]; then
+    if [ "$interact" ]; then
+      btype="$btype$option"
+    else
       atype=`echo "$atype" | cut -c 2-`
       [ "$atype" ] || cont=0
     fi
