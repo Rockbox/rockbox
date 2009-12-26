@@ -52,13 +52,12 @@ find_first_set_bit:
     @
     @ Output modified to suit Rockbox purposes.
 
-    adr     r2, L_ffs_table
     orrne   r1, r1, r1, lsl #4       @ r1 = X * 0x11
     orrne   r1, r1, r1, lsl #6       @ r1 = X * 0x451
     rsbne   r1, r1, r1, lsl #16      @ r1 = X * 0x0450fbaf
 
     @ now lookup in table indexed on top 6 bits of r1
-    ldrb    r0, [ r2, r1, lsr #26 ]  @
+    ldrb    r0, [ pc, r1, lsr #26 ]  @ exploit location of table
     bx      lr                       @
 
 L_ffs_table:
