@@ -1071,7 +1071,7 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
 
 err:
     va_end(ap);
-    return 0;
+    return NULL;
 }
 
 /* only used in USB HID and set_time screen */
