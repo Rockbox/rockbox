@@ -40,7 +40,7 @@ then
     exit
 fi
 
-cat $rootdir/targets.txt | (
+awk -f $rootdir/parse_configure.awk $rootdir/../configure | (
     while read target model
     do
         make -j $jobs clean
