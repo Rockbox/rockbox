@@ -1026,6 +1026,13 @@ static int parse_progressbar(const char *wps_bufptr,
 }
 
 #ifdef HAVE_ALBUMART
+static int parse_int(const char *newline, const char **_pos, int *num)
+{
+    *_pos = parse_list("d", NULL, '|', *_pos, num);
+
+    return (!*_pos || *_pos > newline || **_pos != '|');
+}
+
 static int parse_albumart_load(const char *wps_bufptr,
                                struct wps_token *token,
                                struct wps_data *wps_data)
@@ -1050,16 +1057,22 @@ static int parse_albumart_load(const char *wps_bufptr,
 
     newline = strchr(wps_bufptr, '\n');
 
-    /* initial validation and parsing of x and y components */
-    if (*wps_bufptr != '|')
+    _pos = wps_bufptr;
+
+    if (*_pos != '|')
         return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
 
-    _pos = wps_bufptr + 1;
-    _pos = parse_list("dd", NULL, '|', _pos, &aa->x, &aa->y);
+    ++_pos;
 
-    if (!_pos || _pos > newline || *_pos != '|')
-        return WPS_ERROR_INVALID_PARAM;  /* malformed token: no | after y coordinate
-                                            e.g. %Cl|7|59\n */
+    /* initial validation and parsing of x component */
+    if (parse_int(newline, &_pos, &aa->x))
+        return WPS_ERROR_INVALID_PARAM;
+
+    ++_pos;
+
+    /* initial validation and parsing of y component */
+    if (parse_int(newline, &_pos, &aa->y))
+        return WPS_ERROR_INVALID_PARAM;
 
     /* parsing width field */
     parsing = true;
@@ -1099,8 +1112,7 @@ static int parse_albumart_load(const char *wps_bufptr,
     /* extract max width data */
     if (*_pos != '|')
     {
-        _pos = parse_list("d", NULL, '|', _pos, &aa->width);
-        if (!_pos || _pos > newline || *_pos != '|')
+        if (parse_int(newline, &_pos, &aa->width))
             return WPS_ERROR_INVALID_PARAM;
     }
 
@@ -1142,8 +1154,7 @@ static int parse_albumart_load(const char *wps_bufptr,
     /* extract max height data */
     if (*_pos != '|')
     {
-        _pos = parse_list("d", NULL, '|', _pos, &aa->height);
-        if (!_pos || _pos > newline || *_pos != '|')
+        if (parse_int(newline, &_pos, &aa->height))
             return WPS_ERROR_INVALID_PARAM;
     }
 
