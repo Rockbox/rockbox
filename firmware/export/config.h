@@ -131,7 +131,7 @@
  * BACKLIGHT_FADING_SW_SETTING means that backlight is turned on by only setting
  * the brightness (i.e. no real difference between backlight_on and
  * backlight_set_brightness)
- * BACKLIGHT_FADING_SW_SETTING means that backlight brightness is restored
+ * BACKLIGHT_FADING_SW_HW_REG means that backlight brightness is restored
  * "in hardware", from a hardware register upon backlight_on
  * Both types need to have minor adjustments in the software fading code */
 #define BACKLIGHT_FADING_SW_SETTING 0x2
