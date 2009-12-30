@@ -102,7 +102,7 @@ $(DEPFILE) dep:
 	$(call PRINTS,Generating dependencies)
 	@echo foo > /dev/null # there must be a "real" command in the rule
 	$(call mkdepfile,$(DEPFILE),$(SRC))
-	$(call mkdepfile,$(DEPFILE),$(OTHER_SRC))
+	$(call mkdepfile,$(DEPFILE),$(OTHER_SRC:%.lua=))
 	$(call mkdepfile,$(DEPFILE),$(ASMDEFS_SRC))
 	@mv $(DEPFILE)_ $(DEPFILE)
 	$(call bmpdepfile,$(DEPFILE),$(BMP) $(PBMP))
