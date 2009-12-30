@@ -389,18 +389,58 @@ void unveil( int *stack, int y, int x )
         push( stack, y, x );
 }
 
-void discover( int y, int x )
+int is_flagged( int y, int x )
 {
-    int stack[height*width];
+    if( x >= 0 && y >= 0 && x < width && y < height && minefield[y][x].flag )
+        return 1;
+    return 0;
+}
 
+int neighbors_flagged( int y, int x )
+{
+    return is_flagged( y-1, x-1 ) +
+           is_flagged( y-1, x ) +
+           is_flagged( y-1, x+1 ) +
+           is_flagged( y, x-1 ) +
+           is_flagged( y, x ) +
+           is_flagged( y, x+1 ) +
+           is_flagged( y+1, x-1 ) +
+           is_flagged( y+1, x ) +
+           is_flagged( y+1, x+1 );
+}
+
+bool discover( int y, int x, bool explore_neighbors )
+{
     /* Selected tile. */
     if( x < 0 || y < 0 || x > width - 1 || y > height - 1
        || minefield[y][x].known
-       || minefield[y][x].mine || minefield[y][x].flag ) return;
+       || minefield[y][x].mine || minefield[y][x].flag )
+    {
+        if( !minefield[y][x].flag && minefield[y][x].mine )
+            return true;
+
+        if( explore_neighbors && minefield[y][x].known &&
+            minefield[y][x].neighbors == neighbors_flagged( y, x ) )
+        {
+            return discover( y-1, x-1, false ) ||
+                   discover( y-1, x, false ) ||
+                   discover( y-1, x+1, false ) ||
+                   discover( y, x-1, false ) ||
+                   discover( y, x, false ) ||
+                   discover( y, x+1, false ) ||
+                   discover( y+1, x-1, false ) ||
+                   discover( y+1, x, false ) ||
+                   discover( y+1, x+1, false );
+        }
+
+        return false;
+    }
 
     minefield[y][x].known = 1;
     /* Exit if the tile is not empty. (no mines nearby) */
-    if( minefield[y][x].neighbors ) return;
+    if( minefield[y][x].neighbors ) return false;
+
+    int stack[height*width];
 
     push( stack, y, x );
 
@@ -423,6 +463,8 @@ void discover( int y, int x )
         unveil( stack, y+1, x-1 );
         unveil( stack, y,   x-1 );
     }
+
+    return false;
 }
 
 /* Reset the whole board for a new game. */
@@ -640,7 +682,7 @@ enum minesweeper_status minesweeper( void )
      */
     top = (LCD_HEIGHT-height*TileSize)/2;
     left = (LCD_WIDTH-width*TileSize)/2;
-    
+
 #ifdef HAVE_TOUCHSCREEN
     mine_raster.tl_x = left;
     mine_raster.tl_y = top;
@@ -700,14 +742,14 @@ enum minesweeper_status minesweeper( void )
             {
                 button &= ~BUTTON_TOUCHSCREEN;
                 lastbutton &= ~BUTTON_TOUCHSCREEN;
-                
+
                 if(button & BUTTON_REPEAT && lastbutton != MINESWP_TOGGLE && lastbutton ^ BUTTON_REPEAT)
                     button = MINESWP_TOGGLE;
                 else if(button == BUTTON_REL && lastbutton ^ BUTTON_REPEAT)
                     button = MINESWP_DISCOVER;
                 else
                     button |= BUTTON_TOUCHSCREEN;
-                
+
                 x = res.x;
                 y = res.y;
             }
@@ -775,13 +817,12 @@ enum minesweeper_status minesweeper( void )
                 if( tiles_left == width*height && no_mines )
                     minesweeper_putmines(p,x,y);
 
-                discover(y, x);
-
-                if( minefield[y][x].mine )
+                if( discover( y, x, true ) )
                 {
                     minefield[y][x].known = 1;
                     return MINESWEEPER_LOSE;
                 }
+
                 tiles_left = count_tiles_left();
                 if( tiles_left == mine_num )
                 {
