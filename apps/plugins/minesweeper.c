@@ -302,6 +302,8 @@ extern const fb_data minesweeper_tiles[];
 #define Flag         10
 #define Unknown      11
 #define ExplodedMine 12
+#define WrongFlag    13
+#define CorrectFlag  14
 
 #define draw_tile( num, x, y ) \
     rb->lcd_bitmap_part( minesweeper_tiles, 0, num * TileSize, \
@@ -562,17 +564,18 @@ void mine_show( void )
             if( minefield[i][j].mine )
             {
                 if( minefield[i][j].known )
-                {
                     draw_tile( ExplodedMine, j, i );
-                }
+                else if( minefield[i][j].flag )
+                    draw_tile( CorrectFlag, j, i );
                 else
-                {
                     draw_tile( Mine, j, i );
-                }
             }
             else
             {
-                draw_tile( minefield[i][j].neighbors, j, i );
+                if( minefield[i][j].flag )
+                    draw_tile( WrongFlag, j, i );
+                else
+                    draw_tile( minefield[i][j].neighbors, j, i );
             }
         }
     }
