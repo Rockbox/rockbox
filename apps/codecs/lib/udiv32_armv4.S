@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2008 by Jens Arnold
+ * Copyright (C) 2009 by Andrew Mahone
  *
  * Optimised unsigned integer division for ARMv4
  *
@@ -30,7 +31,48 @@
 /* Codecs should not normally do this, but we need to check a macro, and
  * codecs.h would confuse the assembler. */
 
-.macro ARM_DIV_BODY dividend, divisor, result, curbit
+/* Adapted from an algorithm given in ARM System Developer's Guide (7.3.1.2)
+   for dividing a 30-bit value by a 15-bit value, with two operations per
+   iteration by storing quotient and remainder together and adding the previous
+   quotient bit during trial subtraction. Modified to work with any dividend
+   and divisor both less than 1 << 30, and skipping trials by calculating bits
+   in output.
+*/
+.macro ARM_DIV_31_BODY dividend, divisor, result, bits, curbit, quotient
+
+    mov     \bits, #1
+    cmp     \divisor, \dividend, lsr #16
+    movls   \divisor, \divisor, lsl #16
+    addls   \bits, \bits, #16
+    cmp     \divisor, \dividend, lsr #8
+    movls   \divisor, \divisor, lsl #8
+    addls   \bits, \bits, #8
+    cmp     \divisor, \dividend, lsr #4
+    movls   \divisor, \divisor, lsl #4
+    addls   \bits, \bits, #4
+    cmp     \divisor, \dividend, lsr #2
+    movls   \divisor, \divisor, lsl #2
+    addls   \bits, \bits, #2
+    cmp     \divisor, \dividend, lsr #1
+    movls   \divisor, \divisor, lsl #1
+    addls   \bits, \bits, #1
+    rsb     \divisor, \divisor, #0
+    adds    \result, \dividend, \divisor
+    subcc   \result, \result, \divisor
+    rsb     \curbit, \bits, #31
+    add     pc, pc, \curbit, lsl #3
+    nop
+    .rept   30
+    adcs    \result, \divisor, \result, lsl #1
+    subcc   \result, \result, \divisor
+    .endr
+    /* shift remainder/quotient left one, add final quotient bit */
+    adc     \result, \result, \result
+    mov     \dividend, \result, lsr \bits
+    eor     \quotient, \result, \dividend, lsl \bits
+.endm
+
+.macro ARM_DIV_32_BODY dividend, divisor, result, curbit
 
     mov     \result, \dividend
     mov     \curbit, #90          @ 3 * 30, (calculating branch dest)
@@ -93,8 +135,16 @@ udiv32_arm:
     bls     10f
     tst     r1, r2
     beq     30f
+    tst     r0, r0
+    /* High bit must be unset, otherwise use ARM_DIV_32_BODY. High bit of
+       divisor is also unset dividend has been tested to be >= divisor.
+    */
+    bmi     5f
+    ARM_DIV_31_BODY r0, r1, r2, r3, ip, r0
+    bx      lr
 
-    ARM_DIV_BODY r0, r1, r2, r3
+5:
+    ARM_DIV_32_BODY r0, r1, r2, r3
     mov     r0, r2
     bx      lr
 
