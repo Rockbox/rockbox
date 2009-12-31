@@ -402,11 +402,13 @@ target/arm/pnx0101/system-pnx0101.c
 target/arm/pnx0101/timer-pnx0101.c
 #endif
 
-#if CONFIG_CPU == AS3525
+#if CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2
 target/arm/as3525/system-as3525.c
 target/arm/as3525/kernel-as3525.c
 target/arm/as3525/timer-as3525.c
+#ifndef SANSA_CLIPV2
 target/arm/as3525/ata_sd_as3525.c
+#endif
 target/arm/as3525/power-as3525.c
 target/arm/as3525/usb-as3525.c
 target/arm/as3525/dma-pl081.c
@@ -1197,6 +1199,21 @@ target/arm/tcc77x/c100/audio-c100.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* SANSA_C100 */
+
+#ifdef SANSA_CLIPV2
+#ifndef SIMULATOR
+target/arm/as3525/sansa-clip/lcd-ssd1303.c
+target/arm/as3525/sansa-clip/lcd-as-clip.S
+
+target/arm/as3525/sansa-clipv2/sd-clipv2.c
+target/arm/as3525/sansa-clipv2/button-clip.c
+target/arm/as3525/sansa-clipv2/backlight-clip.c
+#ifndef BOOTLOADER
+target/arm/powermgmt-ascodec.c
+target/arm/as3525/sansa-clip/powermgmt-clip.c
+#endif /* !BOOTLOADER */
+#endif /* !SIMULATOR */
+#endif /* SANSA_CLIPV2 */
 
 #ifdef SANSA_CLIP
 #ifndef SIMULATOR

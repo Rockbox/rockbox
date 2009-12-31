@@ -294,7 +294,7 @@
 #define UI_LCD_POSX                 30 /* x position of lcd */
 #define UI_LCD_POSY                 31 /* y position of lcd */
 
-#elif defined(SANSA_CLIP)
+#elif defined(SANSA_CLIP) || defined(SANSA_CLIPV2)
 #define UI_TITLE                    "Sansa Clip"
 #define UI_WIDTH                    205 /* width of GUI window */
 #define UI_HEIGHT                   325 /* height of GUI window */

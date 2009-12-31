@@ -6,24 +6,29 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/crt0.o)
 
-#define IRAMORIG 0x81000000
-#define IRAMSIZE 0x50000
+#ifdef SANSA_CLIPV2
+#define RAMORIG 0x0             /* DRAM */
+#define RAMSIZE (MEM*0x100000)
+#else
+#define RAMORIG 0x81000000      /* IRAM */
+#define RAMSIZE 0x50000
+#endif
 
 MEMORY
 {
-    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+    RAM : ORIGIN = RAMORIG, LENGTH = RAMSIZE
 }
 
 SECTIONS
 {
-  . = IRAMORIG;
+  . = RAMORIG;
 
   .text : {
     *(.init.text)
     *(.glue_7)
     *(.glue_7t)
     *(.text*)
-  } > IRAM
+  } > RAM
 
   .data : {
     *(.icode)
@@ -33,7 +38,7 @@ SECTIONS
     *(.ncdata*)
     *(.rodata*)
     _dataend = . ;
-   } > IRAM
+   } > RAM
 
   .stack :
   {
@@ -43,7 +48,7 @@ SECTIONS
      . += 0x2000;
      _stackend = .;
      stackend = .;
-  } > IRAM
+  } > RAM
 
   .bss : {
      _edata = .;
@@ -52,5 +57,5 @@ SECTIONS
      *(COMMON)
      *(.ncbss*);
      _end = .;
-   } > IRAM
+   } > RAM
 }

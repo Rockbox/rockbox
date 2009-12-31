@@ -41,7 +41,7 @@ int show_logo( void )
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
-#ifdef SANSA_CLIP
+#if defined(SANSA_CLIP) || defined(SANSA_CLIPV2)
     /* The top 16 lines of the Sansa Clip screen are yellow, and the bottom 48 
        are blue, so we reverse the usual positioning */
     lcd_putsxy(TEXT_XPOS, 0, BOOT_VERSION);

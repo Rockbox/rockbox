@@ -37,7 +37,7 @@
 
 int show_logo(void);
 
-void main(void) __attribute__((naked, noreturn));
+void main(void) __attribute__((noreturn));
 void main(void)
 {
     unsigned char* loadbuffer;
@@ -58,7 +58,7 @@ void main(void)
     button_init_device();
     int btn = button_read_device();
 
-#if !defined(SANSA_FUZE) && !defined(SANSA_CLIP)
+#if !defined(SANSA_FUZE) && !defined(SANSA_CLIP) && !defined(SANSA_CLIPV2)
     if (button_hold())
     {
         verbose = true;

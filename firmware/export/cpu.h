@@ -68,4 +68,6 @@
 #if CONFIG_CPU == AS3525
 #include "as3525.h"
 #endif
-
+#if CONFIG_CPU == AS3525v2
+#include "as3525v2.h"
+#endif

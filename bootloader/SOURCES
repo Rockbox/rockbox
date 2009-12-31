@@ -51,7 +51,7 @@ ondavx747.c
 show_logo.c
 #elif defined(CREATIVE_ZVx)
 creativezvm.c
-#elif CONFIG_CPU==AS3525
+#elif CONFIG_CPU==AS3525 || CONFIG_CPU==AS3525v2
 sansa_as3525.c
 show_logo.c
 #elif defined(LYRE_PROTO1)

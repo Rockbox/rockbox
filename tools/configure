@@ -2005,8 +2005,6 @@ fi
     ;;
 
    60|sansaclipv2)
-    echo "Sansa Clipv2 is not yet supported !"
-    exit 1
     target_id=60
     modelname="sansaclipv2"
     target="-DSANSA_CLIPV2"

@@ -37,6 +37,12 @@
 #define I2C_SCL_PIN 4
 #define I2C_SDA_PIN 5
 
+#elif     defined(SANSA_CLIPV2)
+#define I2C_GPIO(x) GPIOB_PIN(x)
+#define I2C_GPIO_DIR GPIOB_DIR
+#define I2C_SCL_PIN 6
+#define I2C_SDA_PIN 7
+
 #elif   defined(SANSA_M200V4)
 #define I2C_GPIO(x) GPIOD_PIN(x)
 #define I2C_GPIO_DIR GPIOD_DIR

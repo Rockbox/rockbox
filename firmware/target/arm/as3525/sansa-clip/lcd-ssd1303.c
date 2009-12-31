@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2002 by Alan Korr
  * Copyright (C) 2008 François Dinel
- * Copyright (C) 2008 Rafaël Carré
+ * Copyright (C) 2008-2009 Rafaël Carré
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,7 +30,12 @@
 #include "string.h"
 
 /*** AS3525 specifics ***/
+#ifdef SANSA_CLIPV2
+#include "as3525v2.h"
+#else
 #include "as3525.h"
+#endif
+
 #include "ascodec.h"
 
 /*** definitions ***/
@@ -71,6 +76,7 @@
 /* DBOP initialisation, do what OF does */
 static void ams3525_dbop_init(void)
 {
+#ifdef SANSA_CLIP
     CGU_DBOP = (1<<3) | AS3525_DBOP_DIV;
 
     GPIOB_AFSEL = 0x08; /* DBOP on pin 3 */
@@ -79,14 +85,34 @@ static void ams3525_dbop_init(void)
     DBOP_CTRL      = 0x51008;
     DBOP_TIMPOL_01 = 0x6E167;
     DBOP_TIMPOL_23 = 0xA167E06F;
+#else /* SANSA_CLIPV2 */
+    CCU_IO |= (1<<12); /* ?? */
+    CGU_DBOP |= /*(1<<3)*/ 0x18 | AS3525_DBOP_DIV;
+
+    DBOP_CTRL      = 0x51004;
+    DBOP_TIMPOL_01 = 0x36A12F;
+    DBOP_TIMPOL_23 = 0xE037E037;
+#endif
 }
+
+#ifdef SANSA_CLIP
+#define LCD_DELAY 1
+#else /* SANSA_CLIPV2 */
+#define LCD_DELAY 10
+#endif
 
 void lcd_write_command(int byte)
 {
     volatile int i = 0;
-    while(i<1) i++;
+    while(i<LCD_DELAY) i++;
+
     /* unset D/C# (data or command) */
+#ifdef SANSA_CLIP
     GPIOA_PIN(5) = 0;
+#else /* SANSA_CLIPV2 */
+    GPIOB_PIN(2) = 0;
+    DBOP_TIMPOL_23 = 0xE0370036;
+#endif
 
     /* Write command */
     /* Only bits 15:12 and 3:0 of DBOP_DOUT are meaningful */
@@ -95,14 +121,22 @@ void lcd_write_command(int byte)
     /* While push fifo is not empty */
     while ((DBOP_STAT & (1<<10)) == 0)
         ;
+
+#ifdef SANSA_CLIPV2
+    DBOP_TIMPOL_23 = 0xE0370036;
+#endif
 }
 
 void lcd_write_data(const fb_data* p_bytes, int count)
 {
     volatile int i = 0;
-    while(i<1) i++;
+    while(i<LCD_DELAY) i++;
     /* set D/C# (data or command) */
+#ifdef SANSA_CLIP
     GPIOA_PIN(5) = (1<<5);
+#else /* SANSA_CLIPV2 */
+    GPIOB_PIN(2) = (1<<2);
+#endif
 
     while (count--)
     {
@@ -139,9 +173,9 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
-    if (yesno) 
+    if (yesno)
         lcd_write_command(LCD_SET_REVERSE_DISPLAY);
-    else 
+    else
         lcd_write_command(LCD_SET_NORMAL_DISPLAY);
 }
 
@@ -168,8 +202,10 @@ void lcd_enable(bool enable)
 
     if( (display_on = enable) ) /* simple '=' is not a typo ! */
     {
+#ifdef SANSA_CLIP
         /* Enable DC-DC AS3525 for some Clip v1 that need it */
         ascodec_write(AS3514_DCDC15, 1);
+#endif
 
         lcd_write_command(LCD_SET_DISPLAY_ON);
         send_event(LCD_EVENT_ACTIVATION, NULL);
@@ -177,8 +213,10 @@ void lcd_enable(bool enable)
     else {
         lcd_write_command(LCD_SET_DISPLAY_OFF);
 
+#ifdef SANSA_CLIP
         /* Disable DC-DC AS3525 */
         ascodec_write(AS3514_DCDC15, 0);
+#endif
     }
 }
 
@@ -198,6 +236,7 @@ void lcd_init_device(void)
 
     ams3525_dbop_init();
 
+#ifdef SANSA_CLIP
     GPIOA_DIR |= 0x33; /* pins 5:4 and 1:0 out */
     GPIOB_DIR |= 0x40; /* pin 6 out */
 
@@ -205,6 +244,10 @@ void lcd_init_device(void)
     GPIOA_PIN(0) = (1<<0);
     GPIOA_PIN(4) = 0;
     GPIOB_PIN(6) = (1<<6);
+#else /* SANSA_CLIPV2 */
+    GPIOB_DIR |= (1<<2)|(1<<5);
+    GPIOB_PIN(5) = (1<<5);
+#endif
 
     /* Set display clock (divide ratio = 1) and oscillator frequency (1) */
     lcd_write_command(LCD_SET_DISPLAY_CLOCK_AND_OSC_FREQ);
@@ -247,7 +290,7 @@ void lcd_init_device(void)
     lcd_write_command (LCD_SET_HIGHER_COLUMN_ADDRESS /*| 0*/);
     lcd_write_command (LCD_SET_LOWER_COLUMN_ADDRESS /*| 0*/);
 
-    memset(p_bytes, 0, sizeof(p_bytes)); /* fills with 0 : pixel off */ 
+    memset(p_bytes, 0, sizeof(p_bytes)); /* fills with 0 : pixel off */
 
     for(i = 0; i < 8; i++)
     {

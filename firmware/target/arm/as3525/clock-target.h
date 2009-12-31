@@ -56,12 +56,21 @@
 #define AS3525_CLK_FCLK           3         /* Available as PCLK input only  */
 
 /** ************ Change these to reconfigure clocking scheme *******************/
+#ifdef SANSA_CLIPV2
+
+/* PLL* registers differ from AS3525 */
+#define AS3525_PLLA_FREQ        240000000
+
+#else
+
 /* PLL  frequencies and settings*/
 #define AS3525_PLLA_FREQ        248000000   /*124,82.7,62,49.6,41.3,35.4 */
        /* FCLK_PREDIV->  *7/8 = 217MHz      108.5 ,72.3, 54.25, 43.4, 36.17 */
                       /* *6/8 = 186MHz      93, 62, 46.5, 37.2 */
                       /* *5/8 = 155MHz      77.5, 51.67, 38.75 */
 #define AS3525_PLLA_SETTING     0x261F
+
+#endif  /* SANSA_CLIPV2 */
 
 //#define AS3525_PLLA_FREQ        384000000 /*192,128,96,76.8,64,54.9,48,42.7,38.4*/
        /* FCLK_PREDIV->  *7/8 = 336MHz      168, 112, 84, 67.2, 56, 48, 42, 37.3*/
@@ -118,7 +127,13 @@
 
 #define AS3525_IDE_SEL           AS3525_CLK_PLLA           /* Input Source   */
 #define AS3525_IDE_DIV           (CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1)/*div=1/(n+1)*/
+
+#ifdef SANSA_CLIPV2
+#define AS3525_MS_FREQ          120000000
+#define AS3525_IDE_FREQ          80000000
+#else
 #define AS3525_IDE_FREQ          50000000    /* The OF uses 66MHz maximal freq */
+#endif /* SANSA_CLIPV2 */
 
 
 //#define AS3525_USB_SEL           AS3525_CLK_PLLA            /* Input Source   */

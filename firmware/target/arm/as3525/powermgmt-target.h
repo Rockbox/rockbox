@@ -22,7 +22,7 @@
 #ifndef POWERMGMT_TARGET_H
 #define POWERMGMT_TARGET_H
 
-#if defined(SANSA_CLIP)
+#if defined(SANSA_CLIP) || defined(SANSA_CLIPV2)
 
 /* Check if topped-off and monitor voltage while plugged. */
 #define BATT_FULL_VOLTAGE   4160
