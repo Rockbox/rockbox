@@ -693,7 +693,7 @@ static int clix_handle_game(struct clix_game_state_t* state)
     while(true)
     {
         if (TIME_AFTER(*rb->current_tick, blink_tick)) {
-            state->blink = state->blink ? false : true;
+            state->blink = !state->blink;
             blink_tick = *rb->current_tick + BLINK_TICKCOUNT;
         }
 

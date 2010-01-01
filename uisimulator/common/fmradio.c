@@ -53,7 +53,7 @@ int tuner_set(int setting, int value)
             break;
 
         case RADIO_FORCE_MONO:
-            mono = value?true:false;
+            mono = (value != 0);
             break;
 
         default:

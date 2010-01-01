@@ -608,7 +608,7 @@ static struct card new_card(void) {
     new_card.suit = rb->rand()%4; /* Random number 0-3 */
     new_card.num = rb->rand()%13; /* Random number 0-12 */
     new_card.value = find_value(new_card.num);
-    new_card.is_soft_ace = new_card.num == 0 ? true : false;
+    new_card.is_soft_ace = (new_card.num == 0);
     return new_card;
 }
 

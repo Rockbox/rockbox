@@ -250,7 +250,7 @@ void mixer_playsample(int channel, int instrument)
     p_channel->channelactive = true;
     p_channel->samplepos = p_instrument->sampledataoffset;
     p_channel->samplefractpos = 0;
-    p_channel->loopsample = (p_instrument->repeatlength > 2) ? true : false;
+    p_channel->loopsample = (p_instrument->repeatlength > 2);
     if (p_channel->loopsample) {
         p_channel->loopstart = p_instrument->repeatoffset +
             p_instrument->sampledataoffset;
@@ -807,8 +807,7 @@ void playline(int pattern, int line)
                 {
                     /* Set Filter */
                     case 0x0:
-                        modplayer.amigafilterenabled =
-                            (effecty>0) ? false : true;
+                        modplayer.amigafilterenabled = (effecty == 0);
                         break;
                     /* Fineslide up */
                     case 0x1:
@@ -834,8 +833,7 @@ void playline(int pattern, int line)
                         break;
                     /* Set glissando on/off */
                     case 0x3:
-                        modplayer.glissandoenabled =
-                            (effecty > 0) ? true:false;
+                        modplayer.glissandoenabled = (effecty > 0);
                         break;
                     /* Set Vibrato waveform */
                     case 0x4:

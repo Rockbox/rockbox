@@ -816,7 +816,7 @@ void mmc_enable_monitoring(bool on)
 
 bool mmc_detect(void)
 {
-    return adc_read(ADC_MMC_SWITCH) < 0x200 ? true : false;
+    return (adc_read(ADC_MMC_SWITCH) < 0x200);
 }
 
 bool mmc_touched(void)

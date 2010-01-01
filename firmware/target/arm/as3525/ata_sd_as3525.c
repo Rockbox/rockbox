@@ -359,7 +359,7 @@ static int sd_init_card(const int drive)
     sd_parse_csd(&card_info[drive]);
 
 #if defined(HAVE_MULTIDRIVE)
-    hs_card = (card_info[drive].speed == 50000000) ? true : false;
+    hs_card = (card_info[drive].speed == 50000000);
 #endif
 
     /* Boost MCICLK to operating speed */

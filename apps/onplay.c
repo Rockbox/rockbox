@@ -571,7 +571,7 @@ static bool delete_handler(bool is_dir)
     if (!res)
         onplay_result = ONPLAY_RELOAD_DIR;
 
-    return ((res == 0) ? true:false);
+    return (res == 0);
 }
 
 

@@ -285,7 +285,7 @@ static unsigned viewport_init_ui_vp(void)
         ret = viewport_parse_viewport(&custom_vp[screen], screen,
                                      setting, ',');
 
-        custom_vp_loaded_ok[screen] = ret?true:false;
+        custom_vp_loaded_ok[screen] = (ret != NULL);
     }
     return true; /* meh fixme */
 }
