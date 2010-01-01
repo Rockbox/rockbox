@@ -367,8 +367,10 @@ int rename(const char* path, const char* newpath)
     nameptr = strrchr(newpath,'/');
     if (nameptr)
         nameptr++;
-    else
+    else {
+        close(fd);
         return - 3;
+    }
 
     /* Extract new path */
     strcpy(newpath2, newpath);
@@ -376,8 +378,10 @@ int rename(const char* path, const char* newpath)
     dirptr = strrchr(newpath2,'/');
     if(dirptr)
         *dirptr = 0;
-    else
+    else {
+        close(fd);
         return - 4;
+    }
 
     dirptr = newpath2;
 
@@ -386,8 +390,10 @@ int rename(const char* path, const char* newpath)
     }
 
     dir = opendir_uncached(dirptr);
-    if(!dir)
+    if(!dir) {
+        close(fd);
         return - 5;
+    }
 
     file = &openfiles[fd];
 
@@ -395,12 +401,16 @@ int rename(const char* path, const char* newpath)
                     file->size, file->attr);
 #ifdef HAVE_MULTIVOLUME
     if ( rc == -1) {
+        close(fd);
+        closedir_uncached(dir);
         DEBUGF("Failed renaming file across volumnes: %d\n", rc);
         errno = EXDEV;
         return -6;
     }
 #endif
     if ( rc < 0 ) {
+        close(fd);
+        closedir_uncached(dir);
         DEBUGF("Failed renaming file: %d\n", rc);
         errno = EIO;
         return rc * 10 - 7;
@@ -412,6 +422,7 @@ int rename(const char* path, const char* newpath)
 
     rc = close(fd);
     if (rc<0) {
+        closedir_uncached(dir);
         errno = EIO;
         return rc * 10 - 8;
     }
