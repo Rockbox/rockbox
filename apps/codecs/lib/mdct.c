@@ -62,11 +62,14 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
          Note - this has NOTHING to do with fixmul32/PRECISION/etc
          (see definition of fsincos function below)               */
       phase = ( ((i<<16) + 0x2000) >> nbits ) << 16;
-      /* tsin and tcos are just reflections of each other with a phase shift */
+      /* tsin and tcos are just reflections of each other with a phase shift
+         so should be able to optimise to reduce storage */
+      /* NOTE the required tables are actually -cos and -sin , so we need to 
+         flip sign of the result of the fsincos calculation.
+         Alternatively could flip at the calculation step instead */
       s->tsin[i] = -fsincos(phase, &(s->tcos[i]));
       s->tcos[i] *= (-1);
     }
-
     (&s->fft)->nbits = nbits-2;
     (&s->fft)->inverse = inverse;
 
@@ -76,28 +79,32 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
 }
 
 /**
- * Compute inverse MDCT of size N = 2^nbits
- * @param output N samples
+ * Compute the middle half of the inverse MDCT of size N = 2^nbits
+ * thus excluding the parts that can be derived by symmetry
+ * @param output N/2 samples
  * @param input N/2 samples
- * @param tmp N/2 samples
  */
-void ff_imdct_calc(MDCTContext *s,
-                   fixed32 *output,
-                   fixed32 *input)
+void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
 {
     int k, n8, n4, n2, n, j;
     const fixed32 *tcos = s->tcos;
     const fixed32 *tsin = s->tsin;
     
     const fixed32 *in1, *in2;
-    FFTComplex *z1 = (FFTComplex *)output;
-    FFTComplex *z2 = (FFTComplex *)input;
-
+    
     n = 1 << s->nbits;
 
     n2 = n >> 1;
     n4 = n >> 2;
     n8 = n >> 3;
+
+    /* function can work in one of two ways, either return the whole N-point
+       imdct, or just the unique N/2-point imdct part (without reflections)
+       If the former, the output buffer needs to be size N/2.
+       If the latter, the output buffer needs to be size N, but all the imdct
+       processing except the final reflection happens in the N/2 samples beginning
+       at N/4  (so range N/4 to 3N/4 in the output buffer) */
+    FFTComplex *z = (FFTComplex *)output;
 
     /* pre rotation */
     in1 = input;
@@ -105,46 +112,57 @@ void ff_imdct_calc(MDCTContext *s,
     /* careful: fft is initialised for a different number of bits here
        so have to use s->fft->nbits not s->nbits .. */
     const int revtab_shift = (12- s->fft.nbits);
-
+    
+    /* bitreverse reorder the input and rotate;   result here is in OUTPUT ... */
+    /* (note that when using the current split radix, the bitreverse ordering is
+        complex, meaning that this reordering cannot easily be done in-place) */
     for(k = 0; k < n4; k++)
     {
         j= (s->fft.revtab[k])>>revtab_shift;
-        CMUL(&z1[j].re, &z1[j].im, *in2, *in1, tcos[k], tsin[k]);
+        /* remember, tcos and tsin are really -cos and -sin 
+           so what we're actually calculating is {re,im) x {-cos,-sin} */
+        CMUL(&z[j].re, &z[j].im, *in2, *in1, tcos[k], tsin[k]);
         in1 += 2;
         in2 -= 2;
     }
 
-    ff_fft_calc_c(&s->fft, z1);
+    /* ... and so fft runs in OUTPUT buffer */
+    ff_fft_calc_c(&s->fft, z);
 
-    /* post rotation + reordering */
-    for(k = 0; k < n4; k++)
-    {
-        CMUL(&z2[k].re, &z2[k].im, (z1[k].re), (z1[k].im), tcos[k], tsin[k]);
-    }
-
+    /* post rotation + reordering.  now keeps the result within the OUTPUT buffer */
     for(k = 0; k < n8; k++)
     {
-        fixed32 r1,r2,r3,r4,r1n,r2n,r3n;
+        /* remember, tcos and tsin are really -cos and -sin 
+           so what we're actually calculating is {re,im) x {-cos,-sin} */
+        fixed32 r0,i0,r1,i1;
+        CMUL(&r0, &i1, z[n8-k-1].im, z[n8-k-1].re, tsin[n8-k-1], tcos[n8-k-1] );
+        CMUL(&r1, &i0, z[n8+k].im,   z[n8+k].re,   tsin[n8+k],   tcos[n8+k]   );
+        z[n8-k-1].re = r0;
+        z[n8-k-1].im = i0;
+        z[n8+k].re   = r1;
+        z[n8+k].im   = i1;
+    }
+} 
 
-        r1 = z2[n8 + k].im;
-        r1n = r1 * -1;
-        r2 = z2[n8-1-k].re;
-        r2n = r2 * -1;
-        r3 = z2[k+n8].re;
-        r3n = r3 * -1;
-        r4 = z2[n8-k-1].im;
+/**
+ * Compute inverse MDCT of size N = 2^nbits
+ * @param output N samples
+ * @param input N/2 samples
+ */
+void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
+{
+    int k;
+    const int n = (1<<s->nbits);
+    const int n2 = (n>>1);
+    const int n4 = (n>>2);
+    
+    ff_imdct_half(s,output+n4,input);
 
-        output[2*k] = r1n;
-        output[n2-1-2*k] = r1;
-
-        output[2*k+1] = r2;
-        output[n2-1-2*k-1] = r2n;
-
-        output[n2 + 2*k]= r3n;
-        output[n-1- 2*k]= r3n;
-
-        output[n2 + 2*k+1]= r4;
-        output[n-2 - 2 * k] = r4;
+    /* TODO: this could easily be optimised! */
+    for(k = 0; k < n4; k++)
+    {
+        output[k]     = -output[n2-k-1];
+        output[n-k-1] =  output[n2+k];
     }
 }
 

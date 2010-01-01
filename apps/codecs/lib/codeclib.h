@@ -68,7 +68,8 @@ void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, con
 extern void mdct_backward(int n, int32_t *in, int32_t *out);
 /* -2- ffmpeg fft-based mdct */
 extern int ff_mdct_init(MDCTContext *s, int nbits, int inverse);
-extern void ff_imdct_calc(MDCTContext *s, int32_t *output, int32_t *input);
+extern void ff_imdct_half(MDCTContext *s, int32_t *output, const int32_t *input);
+extern void ff_imdct_calc(MDCTContext *s, int32_t *output, const int32_t *input);
 extern int mdct_init_global(void);
 
 #if defined(CPU_ARM) && (ARM_ARCH == 4)

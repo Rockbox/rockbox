@@ -1261,7 +1261,6 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
                           (int32_t*)scratch_buffer,
                           (*(s->coefs))[ch]);
 
-
             /* add in the frame */
             index = (s->frame_len / 2) + s->block_pos - n4;
             wma_window(s, scratch_buffer, &((*s->frame_out)[ch][index]));

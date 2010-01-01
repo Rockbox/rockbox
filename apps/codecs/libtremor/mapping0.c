@@ -296,21 +296,18 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
       /* FIXME: really the workload should take place in PCM not SCRATCHPAD
                 i.e. really we should do the minimum work in scratchpad
                 since this is most likely non-iram, and do the bulk in pcm.
-                My point is: should we output into scratchpad and then copy
-                back to pcm;  or copy pcm to scratchpad and output directly
-                into pcm  (i.e. memcpy after imdct; or memcpy before imdct?)
-                The right answer depends on whether scratchpad is in iram,
-                pcm is in iram, or imdct does most of its work in the INPUT
-                buffer or the OUTPUT buffer.
-                Honestly I don't yet know.
+                ff_imdct_calc does the bulk of the work in its 'output' buffer
+                (the first step transforms the input buffer into the output buffer
+                space) - so we make sure pcm is our 'output' buffer, and copy
+                our input to scratchpad.
                 
-                Addendum: the real fix would be to make imdct operate
-                in-place and not REQUIRE input != output, as it currently does */
-                
+                Ideally we would want imdct to operate inplace and not need an
+                auxiliary buffer, but the particular bitreverse required makes
+                this difficult in practice */
+      memcpy(vb->ffmpeg_scratchpad,pcm,(n/2)*sizeof(int32_t));
       ff_imdct_calc(vb->mdct_ctx[vb->W],      
-                    (int32_t*)vb->ffmpeg_scratchpad,
-                    (int32_t*)pcm);
-      memcpy(pcm,vb->ffmpeg_scratchpad,n*sizeof(int32_t));
+                    (int32_t*)pcm,
+                    (int32_t*)vb->ffmpeg_scratchpad);
 
       /* window the data */
       _vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);

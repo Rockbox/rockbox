@@ -35,7 +35,8 @@ typedef struct MDCTContext
 MDCTContext;
 
 int ff_mdct_init(MDCTContext *s, int nbits, int inverse);
-void ff_imdct_calc(MDCTContext *s, fixed32 *output, fixed32 *input);
+void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input);
+void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input);
 int mdct_init_global(void);
 
 #ifdef CPU_ARM
