@@ -70,7 +70,7 @@ void traversedir(char* location, char* name)
     if (dir) {
         entry = rb->readdir(dir);
         while (entry) {
-            if (abort == true)
+            if (abort)
                 break;
             /* Skip .. and . */
             if (entry->d_name[0] == '.')

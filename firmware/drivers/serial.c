@@ -416,7 +416,7 @@ void SERIAL0(void)
             }
         }
         bool pkt = iap_getc(temp);
-        if(newpkt == true && pkt == false)
+        if(newpkt && !pkt)
             autobaud = 0; /* Found good baud */
         newpkt = pkt;
     }

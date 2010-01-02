@@ -164,7 +164,7 @@ void traversedir(char* location, char* name)
     if (dir) {
         entry = rb->readdir(dir);
         while (entry) {
-            if (abort == true)
+            if (abort)
                 break;
             /* Skip .. and . */
             if (rb->strcmp(entry->d_name, ".") && rb->strcmp(entry->d_name, ".."))
@@ -227,7 +227,7 @@ enum plugin_status plugin_start(const void* parameter)
     lasttick = *rb->current_tick;
 
     traversedir("", "");
-    if (abort == true) {
+    if (abort) {
         rb->splash(HZ, "Aborted");
         return PLUGIN_OK;
     }

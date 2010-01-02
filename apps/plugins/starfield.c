@@ -389,7 +389,7 @@ int plugin_main(void)
     ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)))
 
         /* This will make the stars pulse to the music */
-        if(pulse==true){
+        if(pulse){
 
             /* Get the peaks. ( Borrowed from vu_meter ) */
 #if (CONFIG_CODEC == SWCODEC)

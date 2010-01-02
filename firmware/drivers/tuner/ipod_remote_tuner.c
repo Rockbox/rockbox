@@ -300,7 +300,7 @@ int ipod_rmt_tuner_set(int setting, int value)
         case RADIO_FREQUENCY:
         {
             rmt_tuner_set_freq(value);
-            if (reply_timeout() == true)
+            if (reply_timeout())
                 return 0;
             break;
         }
@@ -326,7 +326,7 @@ int ipod_rmt_tuner_set(int setting, int value)
                 else
                     rmt_tuner_scan(1);
                     
-                if (reply_timeout() == true)
+                if (reply_timeout())
                     return 0;
                 radio_tuned = 0;
             }    

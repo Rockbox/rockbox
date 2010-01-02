@@ -356,7 +356,7 @@ void usb_storage_try_release_storage(void)
     bool canrelease=true;
     int i;
     for(i=0;i<storage_num_drives();i++) {
-        if(ejected[i]==false && locked[i]==true) {
+        if(!ejected[i] && locked[i]) {
             canrelease=false;
             break;
         }
