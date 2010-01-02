@@ -104,20 +104,6 @@
     @subls  \dividend, \dividend, \divisor  @ correct remainder not needed
 .endm
 
-.macro ARM_DIV2_ORDER divisor, order
-
-    @ There's exactly one bit set in the divisor, so ffs() can be used
-    @ This is the ffs algorithm devised by D.Seal and posted to
-    @ comp.sys.arm on 16 Feb 1994.
-    adr     \order, L_ffs_table
-    orr     \divisor, \divisor, \divisor, lsl #4   @  = X * 0x11
-    orr     \divisor, \divisor, \divisor, lsl #6   @  = X * 0x451
-    rsb     \divisor, \divisor, \divisor, lsl #16  @  = X * 0x0450fbaf
-
-    ldrb    \order, [\order, \divisor, lsr #26]
-.endm
-
-
 #ifdef USE_IRAM
     .section    .icode,"ax",%progbits
 #else
@@ -128,45 +114,21 @@
     .type   udiv32_arm,%function
 
 udiv32_arm:
-    subs    r2, r1, #1
-    bxeq    lr
-    bcc     20f
-    cmp     r0, r1
-    bls     10f
-    tst     r1, r2
-    beq     30f
+    cmp     r1, #0
+    beq     20f
     tst     r0, r0
     /* High bit must be unset, otherwise use ARM_DIV_32_BODY. High bit of
        divisor is also unset dividend has been tested to be >= divisor.
     */
-    bmi     5f
+    bmi     10f
     ARM_DIV_31_BODY r0, r1, r2, r3, ip, r0
     bx      lr
 
-5:
+10:
     ARM_DIV_32_BODY r0, r1, r2, r3
     mov     r0, r2
     bx      lr
 
-10:
-    moveq   r0, #1
 20:
     movne   r0, #0
     bx      lr
-
-30:
-    ARM_DIV2_ORDER r1, r2
-    mov     r0, r0, lsr r2
-    bx      lr
-
-L_ffs_table:
-    @        0   1   2   3   4   5   6   7
-    @----------------------------------------------
-    .byte   32,  0,  1, 12,  2,  6,  0, 13  @  0- 7
-    .byte    3,  0,  7,  0,  0,  0,  0, 14  @  8-15
-    .byte   10,  4,  0,  0,  8,  0,  0, 25  @ 16-23
-    .byte    0,  0,  0,  0,  0, 21, 27, 15  @ 24-31
-    .byte   31, 11,  5,  0,  0,  0,  0,  0  @ 32-39
-    .byte    9,  0,  0, 24,  0,  0, 20, 26  @ 40-47
-    .byte   30,  0,  0,  0,  0, 23,  0, 19  @ 48-55
-    .byte   29,  0, 22, 18, 28, 17, 16,  0  @ 56-63
