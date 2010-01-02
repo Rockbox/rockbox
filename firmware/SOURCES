@@ -53,6 +53,7 @@ common/strcmp.c
 common/strnatcmp.c
 common/strcpy.c
 common/strncmp.c
+common/strlcat.c
 common/strlcpy.c
 common/strrchr.c
 common/strtok.c

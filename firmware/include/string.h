@@ -42,6 +42,7 @@ char 	*_EXFUN(strstr,(const char *, const char *));
 char 	*_EXFUN(strcasestr,(const char *, const char *));
 
 size_t  strlcpy(char *dst, const char *src, size_t siz);
+size_t  strlcat(char *dst, const char *src, size_t siz);
 
 #ifndef _REENT_ONLY
 char 	*_EXFUN(strtok,(char *, const char *));

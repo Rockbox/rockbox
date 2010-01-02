@@ -682,8 +682,9 @@ static const struct plugin_api rockbox_api = {
     viewportmanager_theme_undo,
 #endif
 #if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
-    &errno
+    &errno,
 #endif
+    strlcat,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

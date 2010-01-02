@@ -863,6 +863,7 @@ struct plugin_api {
 #if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
     int* __errno;
 #endif
+    size_t (*strlcat)(char *dst, const char *src, size_t length);
 };
 
 /* plugin header */
