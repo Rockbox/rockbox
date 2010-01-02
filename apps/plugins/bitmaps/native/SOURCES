@@ -31,6 +31,15 @@ brickmania_long_pads.320x240x16.bmp
 brickmania_break.320x240x16.bmp
 brickmania_powerups.320x240x16.bmp
 
+#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320) /* Gigabeat F/X/S */
+brickmania_ball.7x7x16.bmp
+brickmania_bricks.240x320x16.bmp
+brickmania_break.240x320x16.bmp
+brickmania_pads.240x320x16.bmp
+brickmania_short_pads.240x320x16.bmp
+brickmania_long_pads.240x320x16.bmp
+brickmania_powerups.240x320x16.bmp
+
 #elif LCD_WIDTH >= 220
 brickmania_ball.5x5x16.bmp
 brickmania_bricks.220x176x16.bmp
