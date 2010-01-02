@@ -635,7 +635,9 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
 
 void debug_skin_usage(void)
 {
+#if defined(SIMULATOR) || defined(__PCTOOL__)
     if (wps_verbose_level > 1)
+#endif
         DEBUGF("Skin buffer usage: %lu/%lu\n", (unsigned long)skin_buffer_usage(),
                                 (unsigned long)(skin_buffer_usage() + skin_buffer_freespace()));
 }
