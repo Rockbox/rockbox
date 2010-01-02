@@ -771,12 +771,11 @@ int qtmovie_read(stream_t *file, demux_res_t *demux_res)
             }
             break;
         case MAKEFOURCC('m','d','a','t'):
-            read_chunk_mdat(&qtmovie, chunk_len);
-            /* Keep track of start of stream in file - used for seeking */
-            qtmovie.res->mdat_offset=stream_tell(qtmovie.stream);
             /* There can be empty mdats before the real one. If so, skip them */
-            if (qtmovie.res->mdat_len == 0)
+            if (chunk_len == 8)
                 break;
+            read_chunk_mdat(&qtmovie, chunk_len);
+            qtmovie.res->mdat_offset=stream_tell(qtmovie.stream);
             /* If we've already seen the format, assume there's nothing
                interesting after the mdat chunk (the file is "streamable").
                This avoids having to seek, which might cause rebuffering. */

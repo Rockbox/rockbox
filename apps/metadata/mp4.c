@@ -681,6 +681,10 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
             break;
 
         case MP4_mdat:
+            /* Some AAC files appear to contain additional empty mdat chunks.
+               Ignore them. */
+            if(size == 0)
+                break;
             id3->filesize = size;
             if(id3->samples > 0) {
                 /* We've already seen the moov chunk. */
