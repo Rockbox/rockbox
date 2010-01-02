@@ -113,6 +113,7 @@ int8_t stream_read_int8(stream_t *stream);
 uint8_t stream_read_uint8(stream_t *stream);
 
 void stream_skip(stream_t *stream, size_t skip);
+void stream_seek(stream_t *stream, size_t offset);
 
 int stream_eof(stream_t *stream);
 

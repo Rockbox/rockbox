@@ -548,6 +548,7 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
     uint32_t type;
     uint32_t handler = 0;
     bool rc = true;
+    bool done = false;
     
     do
     {
@@ -681,6 +682,10 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
 
         case MP4_mdat:
             id3->filesize = size;
+            if(id3->samples > 0) {
+                /* We've already seen the moov chunk. */
+                done = true;
+            }
             break;
 
         case MP4_chpl:
@@ -708,15 +713,11 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
         }
         
         /* Skip final seek. */
-        if (id3->filesize == 0)
+        if (!done)
         {
             lseek(fd, size, SEEK_CUR);
         }
-    }
-    while (rc && (size_left > 0) && (errno == 0) && (id3->filesize == 0));
-    /* Break on non-zero filesize, since Rockbox currently doesn't support
-     * metadata after the mdat atom (which sets the filesize field). 
-     */
+    } while (rc && (size_left > 0) && (errno == 0) && !done);
     
     return rc;
 }

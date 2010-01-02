@@ -103,7 +103,12 @@ uint8_t stream_read_uint8(stream_t *stream)
 
 void stream_skip(stream_t *stream, size_t skip)
 {
-  stream->ci->advance_buffer(skip);
+    stream->ci->advance_buffer(skip);
+}
+
+void stream_seek(stream_t *stream, size_t offset)
+{
+    stream->ci->seek_buffer(offset);
 }
 
 int stream_eof(stream_t *stream)

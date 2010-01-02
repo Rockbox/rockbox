@@ -746,7 +746,10 @@ int qtmovie_read(stream_t *file, demux_res_t *demux_res)
         chunk_len = stream_read_uint32(qtmovie.stream);
         if (stream_eof(qtmovie.stream))
         {
-            return 0;
+            if(qtmovie.res->mdat_offset == 0 || qtmovie.res->format == 0)
+                return 0;
+            stream_seek(qtmovie.stream, qtmovie.res->mdat_offset);
+            return 1;
         }
 
         if (chunk_len == 1)
@@ -767,20 +770,19 @@ int qtmovie_read(stream_t *file, demux_res_t *demux_res)
                return 0;
             }
             break;
-            /* once we hit mdat we stop reading and return.
-             * this is on the assumption that there is no furhter interesting
-             * stuff in the stream. if there is stuff will fail (:()).
-             * But we need the read pointer to be at the mdat stuff
-             * for the decoder. And we don't want to rely on fseek/ftell,
-             * as they may not always be avilable */
         case MAKEFOURCC('m','d','a','t'):
             read_chunk_mdat(&qtmovie, chunk_len);
             /* Keep track of start of stream in file - used for seeking */
             qtmovie.res->mdat_offset=stream_tell(qtmovie.stream);
             /* There can be empty mdats before the real one. If so, skip them */
-            if (qtmovie.res->mdat_len > 0) {
+            if (qtmovie.res->mdat_len == 0)
+                break;
+            /* If we've already seen the format, assume there's nothing
+               interesting after the mdat chunk (the file is "streamable").
+               This avoids having to seek, which might cause rebuffering. */
+            if(qtmovie.res->format > 0)
                 return 1;
-            }
+            stream_skip(qtmovie.stream, chunk_len - 8);
             break;
 
             /*  these following atoms can be skipped !!!! */
