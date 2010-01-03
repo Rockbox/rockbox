@@ -1216,6 +1216,7 @@ static int sd_init_device(void)
     while((retval = sd_init_card_state(&init_req)) == SD_INIT_DOING);
     retval = (retval == SD_INIT_PASSED ? sd_select_card() : -1);
 
+    __cpm_stop_msc(); /* disable SD clock */
     mutex_unlock(&sd_mtx);
 
     return retval;
@@ -1250,13 +1251,26 @@ tCardInfo* card_get_info_target(int card_no)
     return &card;
 }
 
+static inline void sd_start_transfer(void)
+{
+    mutex_lock(&sd_mtx);
+    __cpm_start_msc();
+    led(true);
+}
+
+static inline void sd_stop_transfer(void)
+{
+    led(false);
+    __cpm_stop_msc();
+    mutex_unlock(&sd_mtx);
+}
+
 int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
 {
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
 #endif
-    mutex_lock(&sd_mtx);
-    led(true);
+    sd_start_transfer();
 
     struct sd_request request;
     struct sd_response_r1 r1;
@@ -1300,8 +1314,7 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf
         goto err;
 
 err:
-    led(false);
-    mutex_unlock(&sd_mtx);
+    sd_stop_transfer();
 
     return retval;
 }
@@ -1311,8 +1324,7 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const vo
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
 #endif
-    mutex_lock(&sd_mtx);
-    led(true);
+    sd_start_transfer();
 
     struct sd_request request;
     struct sd_response_r1 r1;
@@ -1357,8 +1369,7 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const vo
         goto err;
 
 err:
-    led(false);
-    mutex_unlock(&sd_mtx);
+    sd_stop_transfer();
 
     return retval;
 }
