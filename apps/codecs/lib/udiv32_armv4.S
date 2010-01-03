@@ -128,8 +128,19 @@ udiv32_arm:
     adr     r2, .L_udiv32_div0_trap
     cmp     r2, lr
     subeq     sp, sp, #4
+#if defined(__ARM_EABI__) || !defined(USE_IRAM)
     bleq    __div0
+#else
+    ldr   r3, =__div0
+    moveq   lr, pc
+    bxeq    r3
+#endif
     /* Otherwise, push lr to the stack before calling __div0 */
     stmdb sp!, { lr }
+#if defined(__ARM_EABI__) || !defined(USE_IRAM)
     bl      __div0
+#else
+    mov     lr, pc
+    bx      r3
+#endif
     .size udiv32_arm, . - udiv32_arm
