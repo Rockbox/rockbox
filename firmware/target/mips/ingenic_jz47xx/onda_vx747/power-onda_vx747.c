@@ -24,17 +24,20 @@
 #include "jz4740.h"
 
 /* TQ7051 chip */
-#define UNK_GPIO (32*1+30) /* STAT port */
+#define CHARGE_STAT_GPIO (32*1+30) /* STAT port */
 #define USB_CHARGER_GPIO (32*3+28)
 
 #if CONFIG_CHARGING
 /* Detect which power sources are present. */
 unsigned int power_input_status(void)
 {
-    unsigned int status = 0;
+    unsigned int status = POWER_INPUT_NONE;
 
     if (__gpio_get_pin(USB_CHARGER_GPIO))
         status |= POWER_INPUT_USB_CHARGER;
+
+    if(!__gpio_get_pin(CHARGE_STAT_GPIO))
+        status |= POWER_INPUT_USB;
 
     return status;
 }
@@ -43,11 +46,12 @@ unsigned int power_input_status(void)
 void power_init(void)
 {
     __gpio_as_input(USB_CHARGER_GPIO);
+    __gpio_as_input(CHARGE_STAT_GPIO);
 }
 
 bool charging_state(void)
 {
-    return false;
+    return power_input_status() & POWER_INPUT_USB;
 }
 
 #if CONFIG_TUNER
