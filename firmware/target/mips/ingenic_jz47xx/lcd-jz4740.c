@@ -49,20 +49,27 @@ void lcd_init_device(void)
     system_enable_irq(DMA_IRQ(DMA_LCD_CHANNEL));
 }
 
+#ifdef HAVE_LCD_ENABLE
 void lcd_enable(bool state)
 {
+    if(lcd_is_on == state)
+        return;
+
+    __cpm_start_lcd();
+
     if(state)
     {
         lcd_on();
-#ifdef HAVE_LCD_ENABLE
         send_event(LCD_EVENT_ACTIVATION, NULL);
-#endif
     }
     else
         lcd_off();
-    
+
+    __cpm_stop_lcd();
+
     lcd_is_on = state;
 }
+#endif
 
 bool lcd_active(void)
 {

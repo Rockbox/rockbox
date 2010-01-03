@@ -22,6 +22,7 @@
 #include "config.h"
 #include "jz4740.h"
 #include "backlight-target.h"
+#include "lcd.h"
 
 /* PWM_CHN7 == GPIO(32*3 + 31) */
 #define BACKLIGHT_GPIO  (32*3+31)
@@ -89,12 +90,18 @@ bool _backlight_init(void)
 
 void _backlight_on(void)
 {
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(true); /* power on lcd */
+#endif
     set_backlight_on();
 }
 
 void _backlight_off(void)
 {
     set_backlight_off();
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(false); /* power off lcd */
+#endif
 }
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
@@ -108,6 +115,6 @@ void _backlight_set_brightness(int brightness)
 /* Turn off LED supply */
 void _backlight_lcd_sleep(void)
 {
-    set_backlight_off();
+    _backlight_off();
 }
 #endif
