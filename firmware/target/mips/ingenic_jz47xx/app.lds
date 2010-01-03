@@ -12,17 +12,17 @@ STARTUP(target/mips/ingenic_jz47xx/crt0.o)
 #define STUBOFFSET 0
 #endif
 
-#define DRAMSIZE      (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - STUBOFFSET - CODEC_SIZE
 
-#define DRAMORIG      0x80004000
+#define DRAMORIG      0x80004000 + STUBOFFSET
+#define DRAMSIZE      (MEMORYSIZE * 0x100000 - STUBOFFSET)
 #define IRAMORIG      0x80000000
 #define IRAMSIZE      16K
 
 /* End of the audio buffer, where the codec buffer starts */
-#define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
+#define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE)
 
 /* Where the codec buffer ends, and the plugin buffer starts */
-#define ENDADDR       (ENDAUDIOADDR + CODEC_SIZE)
+#define ENDCODECADDR  (ENDAUDIOADDR + CODEC_SIZE)
 
 MEMORY
 {
@@ -55,11 +55,8 @@ SECTIONS
     {
         *(.data*);
         *(.sdata*);
-        *(.rel.dyn);
     } > DRAM
 
-    . = ALIGN(4);
- 
     /* Set the load address of .iram at the same address as .bss
      * so RAM won't be wasted as .iram in the end will get copied
      * to IRAM. */
@@ -105,30 +102,19 @@ SECTIONS
          _end = .;
     } > DRAM
 
-    . = ALIGN(4);
-
-    .audiobuf ALIGN(4) :
+    .audiobuf :
     {
+        . = ALIGN(4);
         audiobuffer = .;
     } > DRAM
 
-    .audiobufend ENDAUDIOADDR:
-    {
-        audiobufend = .;
-    }
-
-    .codec ENDAUDIOADDR:
-    {
-        codecbuf = .;
-    }
-
-    .plugin ENDADDR:
-    {
-        pluginbuf = .;
-    }
+    audiobufend = ENDAUDIOADDR;
+    codecbuf = ENDAUDIOADDR;
+    pluginbuf = ENDCODECADDR;
 
     /DISCARD/ :
     {
         *(.eh_frame);
+        *(.rel.dyn);
     }
 }
