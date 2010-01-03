@@ -90,14 +90,14 @@ EXTERN byte chip8_mem[4096];                    /* machine memory. program  */
                                                 /* is loaded at 0x200       */
 EXTERN byte chip8_running;                      /* if 0, emulation stops    */
 
-EXTERN void chip8_execute (void);                      /* execute chip8_iperiod    */
+EXTERN void chip8_execute (void);               /* execute chip8_iperiod    */
                                                 /* opcodes                  */
-EXTERN void chip8_reset (void);                        /* reset virtual machine    */
-EXTERN void chip8 (void);                              /* start chip8 emulation    */
+EXTERN void chip8_reset (void);                 /* reset virtual machine    */
+EXTERN void chip8 (void);                       /* start chip8 emulation    */
 
-EXTERN void chip8_sound_on (void);                     /* turn sound on            */
-EXTERN void chip8_sound_off (void);                    /* turn sound off           */
-EXTERN void chip8_interrupt (void);                    /* update keyboard,         */
+EXTERN void chip8_sound_on (void);              /* turn sound on            */
+EXTERN void chip8_sound_off (void);             /* turn sound off           */
+EXTERN void chip8_interrupt (void);             /* update keyboard,         */
                                                 /* display, etc.            */
 
 #ifdef CHIP8_DEBUG
@@ -585,7 +585,7 @@ static void op_sprite (word opcode)
     chip8_regs.alg[15]=collision^1;
 }
 
-static math_fn math_opcodes[16]=
+static const math_fn math_opcodes[16]=
 {
     math_mov,
     math_or,
@@ -611,7 +611,7 @@ static void op_math (word opcode)
         (get_reg_offset(opcode),get_reg_value_2(opcode));
 }
 
-static opcode_fn main_opcodes[16]=
+static const opcode_fn main_opcodes[16]=
 {
     op_system,
     op_jmp,
@@ -642,7 +642,7 @@ STATIC word chip8_trap;
 STATIC void chip8_debug (word opcode,struct chip8_regs_struct *regs)
 {
     int i;
-    byte hextable[16] = "0123456789ABCDEF";
+    static const byte hextable[16] = "0123456789ABCDEF";
     byte v1[3] = "Vx\0";
     byte v2[3] = "Vx\0";
     v1[1] = hextable[(opcode>>8)&0x0f];
@@ -857,7 +857,7 @@ STATIC void chip8_execute(void)
 /****************************************************************************/
 STATIC void chip8_reset(void)
 {
-    static byte chip8_sprites[0x50]=
+    static const byte chip8_sprites[0x50]=
      {
          0xf9,0x99,0xf2,0x62,0x27,
          0xf1,0xf8,0xff,0x1f,0x1f,
@@ -869,7 +869,7 @@ STATIC void chip8_reset(void)
          0xf8,0xf8,0xff,0x8f,0x88,
      }; /* 4x5 pixel hexadecimal character font patterns */
 #ifdef CHIP8_SUPER
-    static byte schip_sprites[10*10]=
+    static const byte schip_sprites[10*10]=
      {
          0x3C, 0x7E, 0xC3, 0xC3, 0xC3, 0xC3, 0xC3, 0xC3, 0x7E, 0x3C, /* 0 */
          0x18, 0x38, 0x58, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x3C, /* 1 */
@@ -1186,7 +1186,7 @@ static unsigned char beep[]={255,
 111,181,184,144, 17,148, 21,101,166,227,100, 86, 85, 85, 85}; 
 
 /* callback to request more mp3 data */
-void callback(unsigned char** start, size_t* size)
+static void callback(unsigned char** start, size_t* size)
 {
     *start = beep; /* give it the same frame again */
     *size = sizeof(beep);
@@ -1314,7 +1314,7 @@ static void chip8_keyboard(void)
 /****************************************************************************/
 static void chip8_interrupt (void)
 {
-    unsigned long newtimer;
+    unsigned long current_tick;
     unsigned long timer, runtime;
 
     chip8_update_display();
@@ -1322,16 +1322,15 @@ static void chip8_interrupt (void)
     cycles ++;
     runtime = cycles * HZ / 50;
     timer = starttimer + runtime;
-    newtimer = *rb->current_tick;
-    if (TIME_AFTER(timer, newtimer))
+    current_tick = *rb->current_tick;
+    if (TIME_AFTER(timer, current_tick))
     {
-        rb->sleep(timer - newtimer);
+        rb->sleep(timer - current_tick);
     }
     else
     {
         rb->yield();
     }
-    starttimer = newtimer - runtime;
 }
 
 static bool chip8_init(const char* file)
@@ -1347,12 +1346,12 @@ static bool chip8_init(const char* file)
         return false;
     }
     numread = rb->read(fd, chip8_mem+0x200, 4096-0x200);
+    rb->close(fd);
     if (numread==-1) {
         rb->lcd_puts(0, 6, "I/O Error.");
         return false;
     }
 
-    rb->close(fd);
     /* is there a c8k file (chip8 keys) ? */
     char c8kname[MAX_PATH];
     rb->strcpy(c8kname, file);
@@ -1389,7 +1388,7 @@ static bool chip8_init(const char* file)
     return true;
 }
 
-bool chip8_run(const char* file)
+static bool chip8_run(const char* file)
 {
     int ok;
 
@@ -1424,11 +1423,6 @@ bool chip8_run(const char* file)
     chip8_iperiod=15;
     cycles = 0;
     chip8();
-
-    if (!ok) {
-        rb->splash(HZ, "Error");
-        return false;
-    }
 
 #ifndef SIMULATOR
     if (!is_playing)
