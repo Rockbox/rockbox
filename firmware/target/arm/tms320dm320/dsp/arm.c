@@ -42,24 +42,24 @@ interrupt void handle_int0(void) {
     waiting = 0;
     
     if(dma0_stopped==0)
-   	{
-   		if(!(DMPREC&0x01))
-   		{
-   		    /* Give the HPIB access to refill first */
-   		    rebuffer();
-   		    
-   		    /* Start the MCBSP DMA */
-   			DMPREC |= 1;
-   			audiohw_start();
-		}
-		else
-		{
-			rebuffer();
-		}
-	}
-	else
-	{
-	    rebuffer();
+    {
+        if(!(DMPREC&0x01))
+        {
+            /* Give the HPIB access to refill first */
+            rebuffer();
+            
+            /* Start the MCBSP DMA */
+            DMPREC |= 1;
+            audiohw_start();
+        }
+        else
+        {
+            rebuffer();
+        }
+    }
+    else
+    {
+        rebuffer();
     }
 }
 
@@ -88,8 +88,8 @@ void debugf(const char *fmt, ...) {
     vsnprintf((char *)status.payload.debugf.buffer, sizeof(status), fmt, args);
     va_end(args);
 
-	startack();
-	waitack();
+    startack();
+    waitack();
 
     acked = 2;
 }

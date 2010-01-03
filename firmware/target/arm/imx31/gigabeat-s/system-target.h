@@ -58,23 +58,23 @@ void imx31_regclr32(volatile uint32_t *reg_p, uint32_t mask);
 #define KDEV_INIT
 
 struct ARM_REGS {
-	int r0;
-	int r1;
-	int r2;
-	int r3;
-	int r4;
-	int r5;
-	int r6;
-	int r7;
-	int r8;
-	int r9;
-	int r10;
-	int r11;
-	int r12;
-	int sp;
-	int lr;
-	int pc;
-	int cpsr;
+    int r0;
+    int r1;
+    int r2;
+    int r3;
+    int r4;
+    int r5;
+    int r6;
+    int r7;
+    int r8;
+    int r9;
+    int r10;
+    int r11;
+    int r12;
+    int sp;
+    int lr;
+    int pc;
+    int cpsr;
 } regs;
 
 inline void dumpregs(void);

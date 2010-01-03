@@ -403,8 +403,8 @@ struct context_data
  */
 struct script_data
 {
-    unsigned long load_address; /* start address of the script */	
-    unsigned long wml;		    /* parameters for the channel descriptor */
+    unsigned long load_address; /* start address of the script */   
+    unsigned long wml;          /* parameters for the channel descriptor */
     unsigned long shp_addr;     /* shared peripheral base address */
     unsigned long event_mask1;  /* first event mask */
     unsigned long event_mask2;  /* second event mask */

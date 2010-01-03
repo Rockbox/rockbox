@@ -41,7 +41,7 @@ bool __dbg_ports(void)
 #if defined(MROBE_500)
     int line = 0;
     int i;
-	int button;
+    int button;
     bool done=false;
     
     lcd_setfont(FONT_SYSFIXED);
@@ -124,7 +124,7 @@ bool __dbg_ports(void)
 bool __dbg_hw_info(void)
 {
     int line = 0, oldline;
-	int button;
+    int button;
 #if defined(MROBE_500)
     int *address=0x0;
 #endif
@@ -175,18 +175,18 @@ bool __dbg_hw_info(void)
         IO_INTC_EINT2, IO_INTC_IRQ0);
     lcd_putsf(0, line++, " IO_INTC_IRQ1: 0x%04x IO_INTC_IRQ2: 0x%04x ", 
         IO_INTC_IRQ1, IO_INTC_IRQ2);
-		
+        
     lcd_puts(0, line++, "Board revision:");
-	switch (IO_BUSC_REVR) {
-			case 0x0010:
-					lcd_puts(0, line++, " DM320 Rev. A");
-					break;
-			case 0x0011:
-					lcd_puts(0, line++, " DM320 Rev. B/C");
-					break;
-			default:
-					lcd_puts(0, line++, " Unknown DM320 Chip ID");
-	}
+    switch (IO_BUSC_REVR) {
+            case 0x0010:
+                    lcd_puts(0, line++, " DM320 Rev. A");
+                    break;
+            case 0x0011:
+                    lcd_puts(0, line++, " DM320 Rev. B/C");
+                    break;
+            default:
+                    lcd_puts(0, line++, " Unknown DM320 Chip ID");
+    }
 
 #if defined(MROBE_500)
     line++;

@@ -69,14 +69,14 @@ void lcd_sleep()
     if (lcd_on)
     {
         lcd_on = false;
-		memset16(FRAME, 0xFFFF, LCD_WIDTH*LCD_HEIGHT);
-		sleep(HZ/5);
+        memset16(FRAME, 0xFFFF, LCD_WIDTH*LCD_HEIGHT);
+        sleep(HZ/5);
         /* Disabling these saves another ~15mA */
         IO_OSD_OSDWINMD0    &= ~(0x01);
-		IO_VID_ENC_VMOD     &= ~(0x01);
-    	
-    	/* Disabling the LCD saves ~50mA */
-    	IO_GIO_BITCLR2=1<<4; /* pin 36 */
+        IO_VID_ENC_VMOD     &= ~(0x01);
+        
+        /* Disabling the LCD saves ~50mA */
+        IO_GIO_BITCLR2=1<<4; /* pin 36 */
     }
 }
 
@@ -85,11 +85,11 @@ void lcd_awake(void)
     /* "enabled" implies "powered" */
     if (!lcd_on)
     {
-    	lcd_on=true;
-    	IO_OSD_OSDWINMD0    |= 0x01;
-		IO_VID_ENC_VMOD     |= 0x01;
-	
-		sleep(2);
+        lcd_on=true;
+        IO_OSD_OSDWINMD0    |= 0x01;
+        IO_VID_ENC_VMOD     |= 0x01;
+    
+        sleep(2);
         IO_GIO_BITSET2      = 1<<4;
         
         lcd_update();
@@ -120,8 +120,8 @@ void lcd_enable_composite(bool enable)
     {
         IO_GIO_BITCLR2   = 0x80;
         vidtemp |= 0x2015;
-        IO_VID_ENC_DCLKCTL  = 0x0800;	
-	    IO_VID_ENC_DCLKPTN0 = 0x0001;
+        IO_VID_ENC_DCLKCTL  = 0x0800;   
+        IO_VID_ENC_DCLKPTN0 = 0x0001;
     }
     
     IO_VID_ENC_VMOD = vidtemp;
@@ -179,40 +179,40 @@ void lcd_init_device(void)
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
 
-	IO_OSD_OSDWINMD0    &= ~(0x0001);
-	IO_OSD_VIDWINMD     &= ~(0x0001);
+    IO_OSD_OSDWINMD0    &= ~(0x0001);
+    IO_OSD_VIDWINMD     &= ~(0x0001);
 
-	/* Setup the LCD controller */
-	IO_VID_ENC_VMOD     = 0x2014;
-	IO_VID_ENC_VDCTL    = 0x2000;
-	IO_VID_ENC_VDPRO    = 0x0000;
-	IO_VID_ENC_SYNCTL   = 0x100E;
-	IO_VID_ENC_HSPLS    = 1; /* HSYNC pulse width */
-	IO_VID_ENC_VSPLS    = 1; /* VSYNC pulse width */
-	
-	/* These calculations support 640x480 and 320x240 (based on OF) */
-	IO_VID_ENC_HINT     = LCD_NATIVE_WIDTH+LCD_NATIVE_WIDTH/3;
-	IO_VID_ENC_HSTART   = LCD_NATIVE_WIDTH/6;   /* Back porch */
-	IO_VID_ENC_HVALID   = LCD_NATIVE_WIDTH;     /* Data valid */
-	IO_VID_ENC_VINT     = LCD_NATIVE_HEIGHT+8;
-	IO_VID_ENC_VSTART   = 2;
-	IO_VID_ENC_VVALID   = LCD_NATIVE_HEIGHT;
-	
-	IO_VID_ENC_HSDLY    = 0x0000;
-	IO_VID_ENC_VSDLY    = 0x0000;
-	IO_VID_ENC_YCCTL    = 0x0000;
-	IO_VID_ENC_RGBCTL   = 0x0000;
-	IO_VID_ENC_RGBCLP   = 0xFF00;
-	IO_VID_ENC_LNECTL   = 0x0000;
-	IO_VID_ENC_CULLLNE  = 0x0000;
-	IO_VID_ENC_LCDOUT   = 0x0000;
-	IO_VID_ENC_BRTS     = 0x0000;
-	IO_VID_ENC_BRTW     = 0x0000;
-	IO_VID_ENC_ACCTL    = 0x0000;
-	IO_VID_ENC_PWMP     = 0x0000;
-	IO_VID_ENC_PWMW     = 0x0000;
+    /* Setup the LCD controller */
+    IO_VID_ENC_VMOD     = 0x2014;
+    IO_VID_ENC_VDCTL    = 0x2000;
+    IO_VID_ENC_VDPRO    = 0x0000;
+    IO_VID_ENC_SYNCTL   = 0x100E;
+    IO_VID_ENC_HSPLS    = 1; /* HSYNC pulse width */
+    IO_VID_ENC_VSPLS    = 1; /* VSYNC pulse width */
+    
+    /* These calculations support 640x480 and 320x240 (based on OF) */
+    IO_VID_ENC_HINT     = LCD_NATIVE_WIDTH+LCD_NATIVE_WIDTH/3;
+    IO_VID_ENC_HSTART   = LCD_NATIVE_WIDTH/6;   /* Back porch */
+    IO_VID_ENC_HVALID   = LCD_NATIVE_WIDTH;     /* Data valid */
+    IO_VID_ENC_VINT     = LCD_NATIVE_HEIGHT+8;
+    IO_VID_ENC_VSTART   = 2;
+    IO_VID_ENC_VVALID   = LCD_NATIVE_HEIGHT;
+    
+    IO_VID_ENC_HSDLY    = 0x0000;
+    IO_VID_ENC_VSDLY    = 0x0000;
+    IO_VID_ENC_YCCTL    = 0x0000;
+    IO_VID_ENC_RGBCTL   = 0x0000;
+    IO_VID_ENC_RGBCLP   = 0xFF00;
+    IO_VID_ENC_LNECTL   = 0x0000;
+    IO_VID_ENC_CULLLNE  = 0x0000;
+    IO_VID_ENC_LCDOUT   = 0x0000;
+    IO_VID_ENC_BRTS     = 0x0000;
+    IO_VID_ENC_BRTW     = 0x0000;
+    IO_VID_ENC_ACCTL    = 0x0000;
+    IO_VID_ENC_PWMP     = 0x0000;
+    IO_VID_ENC_PWMW     = 0x0000;
 
-	/* Setup the display */
+    /* Setup the display */
     IO_OSD_MODE         = 0x00ff;
     
     IO_OSD_ATRMD        = 0x0000;
@@ -281,9 +281,9 @@ void lcd_init_device(void)
     IO_OSD_VIDWIN0XL    = LCD_NATIVE_WIDTH;
     IO_OSD_VIDWIN0YL    = LCD_NATIVE_HEIGHT;
 
-	IO_OSD_OSDWINMD0    |= 0x01;
-	
-	lcd_enable_composite(false);
+    IO_OSD_OSDWINMD0    |= 0x01;
+    
+    lcd_enable_composite(false);
 }
 
 #if defined(HAVE_LCD_MODES)
@@ -578,9 +578,9 @@ void lcd_update(void)
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
 void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
-	int width, int height) __attribute__ ((section(".icode")));
+    int width, int height) __attribute__ ((section(".icode")));
 void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
-	int width, int height)
+    int width, int height)
 {
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
 #if defined(LCD_USE_DMA)
@@ -604,7 +604,7 @@ void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
     char *dst=(char *)FRAME
         + (LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)
         - (LCD_NATIVE_WIDTH+LCD_FUDGE)*x + y;
-	
+    
     src=src+src_x+src_y*width;
 
     while(height--)
@@ -627,29 +627,29 @@ void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
 
 void lcd_pal256_update_pal(fb_data *palette)
 {
-	unsigned char i;
-	for(i=0; i< 255; i++) 
-	{
-	    int y, cb, cr;
-		unsigned char r=RGB_UNPACK_RED_LCD(palette[i])<<3;
-		unsigned char g=RGB_UNPACK_GREEN_LCD(palette[i])<<2;
-		unsigned char b=RGB_UNPACK_BLUE_LCD(palette[i])<<3;
+    unsigned char i;
+    for(i=0; i< 255; i++) 
+    {
+        int y, cb, cr;
+        unsigned char r=RGB_UNPACK_RED_LCD(palette[i])<<3;
+        unsigned char g=RGB_UNPACK_GREEN_LCD(palette[i])<<2;
+        unsigned char b=RGB_UNPACK_BLUE_LCD(palette[i])<<3;
         
         y = ((77 * r + 150 * g + 29 * b) >> 8);        cb = ((-43 * r - 85 * g + 128 * b) >> 8) + 128;
         cr = ((128 * r - 107 * g - 21 * b) >> 8) + 128;
-		
+        
         while(IO_OSD_MISCCTL&0x08)
         {};
-		
-		/* Write in y and cb */
-       	IO_OSD_CLUTRAMYCB= ((unsigned char)y << 8) | (unsigned char)cb;
-		
-		/* Write in the index and cr */
-       	IO_OSD_CLUTRAMCR=((unsigned char)cr << 8) | i;
-	}
+        
+        /* Write in y and cb */
+        IO_OSD_CLUTRAMYCB= ((unsigned char)y << 8) | (unsigned char)cb;
+        
+        /* Write in the index and cr */
+        IO_OSD_CLUTRAMCR=((unsigned char)cr << 8) | i;
+    }
 }
 #endif
-	
+    
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, 
@@ -665,7 +665,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
     if (!lcd_on)
         return;
-	
+    
     /* y has to be on a 16 pixel boundary */
     y &= ~0xF;
 
@@ -703,33 +703,33 @@ void lcd_blit_yuv(unsigned char * const src[3],
     register int y_remain=(stride<<1)-width;
     do
     {
-    	register fb_data *c_dst=dst;
-    	register int c_width=width;
+        register fb_data *c_dst=dst;
+        register int c_width=width;
 
-    	do
-    	{
-    	    /* This needs to be done in a block of 4 pixels */
-    	    
-    		*c_dst=*yuv_src[0]<<8 | *yuv_src[1];
-    		*(c_dst+1)=*(yuv_src[0]+stride)<<8 | *yuv_src[2];
-    		c_dst-=(LCD_NATIVE_WIDTH+LCD_FUDGE);
-    		
-    		yuv_src[0]++;
-    		
-    		*c_dst=*yuv_src[0]<<8 | *yuv_src[1];
-    		*(c_dst+1)=*(yuv_src[0]+stride)<<8 | *yuv_src[2];
-    		c_dst-=(LCD_NATIVE_WIDTH+LCD_FUDGE);
-    		
+        do
+        {
+            /* This needs to be done in a block of 4 pixels */
+            
+            *c_dst=*yuv_src[0]<<8 | *yuv_src[1];
+            *(c_dst+1)=*(yuv_src[0]+stride)<<8 | *yuv_src[2];
+            c_dst-=(LCD_NATIVE_WIDTH+LCD_FUDGE);
+            
             yuv_src[0]++;
             
-        	yuv_src[1]++;
-        	yuv_src[2]++;
-        	
-    		c_width -= 2;
-		}
-		while (c_width > 0);
-		
-		yuv_src[0] += y_remain; /* Skip down two luma lines-width */
+            *c_dst=*yuv_src[0]<<8 | *yuv_src[1];
+            *(c_dst+1)=*(yuv_src[0]+stride)<<8 | *yuv_src[2];
+            c_dst-=(LCD_NATIVE_WIDTH+LCD_FUDGE);
+            
+            yuv_src[0]++;
+            
+            yuv_src[1]++;
+            yuv_src[2]++;
+            
+            c_width -= 2;
+        }
+        while (c_width > 0);
+        
+        yuv_src[0] += y_remain; /* Skip down two luma lines-width */
         yuv_src[1] += cbcr_remain; /* Skip down one chroma line-width/2 */
         yuv_src[2] += cbcr_remain;
         dst+=2;

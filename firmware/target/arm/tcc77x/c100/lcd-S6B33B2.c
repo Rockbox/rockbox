@@ -102,13 +102,13 @@ void lcd_init_device(void)
              (2 << 11) |                 /* Setup time = 2 cycles */
              (2 << 3) |                  /* Pulse width = 2+1 cycles */
              (2 << 0);                   /* Hold time = 2 cycle */
-			 
+             
     GPIOE &= ~0x8;
     sleep(HZ/100);   /* 10ms */
 
     GPIOE |= 0x08;
     sleep(HZ/100);   /* 10ms */
-	
+    
     lcd_send_command(R_STANDBY_OFF);
     sleep(HZ/20);    /* 50ms */
 
@@ -192,7 +192,7 @@ int lcd_default_contrast(void)
 
 void lcd_set_contrast(int val)
 {
-	//val &= 0xFF;
+    //val &= 0xFF;
     lcd_send_command(R_CONTRAST_CONTROL1);
     lcd_send_command(val);
 }

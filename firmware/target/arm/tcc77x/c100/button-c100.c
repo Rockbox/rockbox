@@ -54,7 +54,7 @@ int button_read_device(void)
 
         if (GPIOA & 0x80) btn |= BUTTON_SELECT;  
         if (GPIOA & 0x100) btn |= BUTTON_POWER;
-	}
+    }
     return btn;
 }
 

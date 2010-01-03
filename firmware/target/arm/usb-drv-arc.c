@@ -277,7 +277,7 @@
 #define QH_NEXT_TERMINATE                      (0x00000001)
 #define QH_IOC                                 (0x00008000)
 #define QH_MULTO                               (0x00000C00)
-#define QH_STATUS_HALT	                       (0x00000040)
+#define QH_STATUS_HALT                         (0x00000040)
 #define QH_STATUS_ACTIVE                       (0x00000080)
 #define EP_QUEUE_CURRENT_OFFSET_MASK         (0x00000FFF)
 #define EP_QUEUE_HEAD_NEXT_POINTER_MASK      (0xFFFFFFE0)

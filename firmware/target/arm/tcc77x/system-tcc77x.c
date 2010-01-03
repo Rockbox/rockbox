@@ -77,19 +77,19 @@ static void gpio_init(void)
     GPIOD_FUNC = 0;
     GPIOD_DIR = 0x3f0;
     GPIOD = 0xe0;
-	
+    
     GPIOE_FUNC = 0;
     GPIOE_DIR = 0xe0;
     GPIOE = 0;
-	
+    
     GPIOA_FUNC = 0;
     GPIOA_DIR = 0xffff1000;   /* 0 - 0xf000 */
     GPIOA = 0x1080;
-	
+    
     GPIOB_FUNC = 0x16a3;
     GPIOB_DIR = 0x6ffff;
     GPIOB = 0;
-	
+    
     GPIOC_FUNC = 1;
     GPIOC_DIR = 0x03ffffff;  /* mvn r2, 0xfc000000 */
     GPIOC = 0;
@@ -128,7 +128,7 @@ static void gpio_init(void)
     GPIOC_FUNC = 1;
     GPIOD_FUNC |= 2; 
     GPIOE_FUNC = 0;
-	
+    
     GPIOA_DIR = 0xFFFF0E00;  
     GPIOB_DIR = 0x6FFFF; 
     GPIOC_DIR = 0x03FFFFFF; 
@@ -258,7 +258,7 @@ http://infocenter.arm.com/help/topic/com.arm.doc.ddi0201d/DDI0201D_arm946es_r1p1
         "mcr     p15, 0, r0, c6, c7, 0  \n\t"
         "mcr     p15, 0, r0, c6, c7, 1  \n\t"
 
-		
+        
         /* Register 5 - Access Permission Registers */
 
         "ldr     r0, =0xffff            \n\t"

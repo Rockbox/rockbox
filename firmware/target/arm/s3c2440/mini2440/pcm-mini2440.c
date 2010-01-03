@@ -127,12 +127,12 @@ void pcm_postinit(void)
 void pcm_dma_apply_settings(void)
 {
 #ifdef HAVE_UDA1341
-	unsigned int reg_val;
+    unsigned int reg_val;
     /* set prescaler and master clock rate according to freq */
     reg_val = (pcm_freq_parms [pcm_fsel][0] << 5) | pcm_freq_parms [pcm_fsel][0];
 
     IISMOD = (IISMOD & ~IISMOD_MASTER_CLOCK_384FS) | pcm_freq_parms [pcm_fsel][1] ;
-	IISPSR = reg_val;
+    IISPSR = reg_val;
 #endif
 
     audiohw_set_frequency(pcm_fsel);

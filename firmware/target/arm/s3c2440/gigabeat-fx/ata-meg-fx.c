@@ -114,8 +114,8 @@ void copy_read_sectors(unsigned char* buf, int wordcount)
     DISRCC0 = 0x1;
     /* Dest mapped to physical address, on AHB bus, increment */
     DIDST0 = (int) buf;
-	if(DIDST0 < 0x30000000)
-		DIDST0 += 0x30000000;
+    if(DIDST0 < 0x30000000)
+        DIDST0 += 0x30000000;
     DIDSTC0 = 0;
 
     /* DACK/DREQ Sync to AHB, Whole service, No reload, 16-bit transfers */

@@ -151,7 +151,7 @@ static void usb_reset(void)
     GUSBCFG = 0x1408;  /* OTG: 16bit PHY and some reserved bits */
 
     DCFG = 4;  /* Address 0 */
-	DCTL = 0x800;  /* Soft Reconnect */
+    DCTL = 0x800;  /* Soft Reconnect */
     DIEPMSK = 0x0D;  /* IN EP interrupt mask */
     DOEPMSK = 0x0D;  /* IN EP interrupt mask */
     GINTMSK = 0xC3000;  /* Interrupt mask: IN event, OUT event, bus reset */
@@ -368,7 +368,7 @@ void usb_drv_init(void)
 
 void usb_drv_exit(void)
 {
-	DCTL = 0x802;  /* Soft Disconnect */
+    DCTL = 0x802;  /* Soft Disconnect */
 
     ORSTCON = 1;  /* Put the PHY into reset (needed to get current down) */
     PCGCCTL = 1;  /* Shut down PHY clock */
@@ -407,7 +407,7 @@ int usb_detect(void)
 #else
 void usb_init_device(void)
 {
-	DCTL = 0x802;  /* Soft Disconnect */
+    DCTL = 0x802;  /* Soft Disconnect */
 
     ORSTCON = 1;  /* Put the PHY into reset (needed to get current down) */
     PCGCCTL = 1;  /* Shut down PHY clock */

@@ -134,7 +134,7 @@ void lcd_set_contrast(int val)
     lcd_contrast = val << 8;
 
     if (!power_on)
-  	         return;
+             return;
 
     /* VCOMG=1, VDV4-0=xxxxx, VCM4-0=11000 */
     lcd_write_reg(R_POWER_CONTROL5, 0x2018 | lcd_contrast);

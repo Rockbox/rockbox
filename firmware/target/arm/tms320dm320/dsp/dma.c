@@ -91,7 +91,7 @@ void rebuffer(void)
         
         return;
     }
-	
+    
     /* If the sdem_level is equal to the buffer size the ARM code gave
      *  (sdem_dsp_size) then reset the size and ask the arm for another buffer
      */

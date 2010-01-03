@@ -61,7 +61,7 @@ extern bool lcd_button_support(void);
 
 void button_init_device(void)
 {
-    GPIOA_DIR |= (1<<1); 	 
+    GPIOA_DIR |= (1<<1);     
     GPIOA_PIN(1) = (1<<1);
 }
 

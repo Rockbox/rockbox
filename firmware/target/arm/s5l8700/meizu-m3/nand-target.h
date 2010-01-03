@@ -32,7 +32,7 @@ struct nand_device_info_type
     uint16_t blocks;
     uint16_t userblocks;
     uint16_t pagesperblock;
-	uint8_t blocksizeexponent;
+    uint8_t blocksizeexponent;
     uint8_t tunk1;
     uint8_t twp;
     uint8_t tunk2;

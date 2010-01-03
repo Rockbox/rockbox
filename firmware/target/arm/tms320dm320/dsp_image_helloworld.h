@@ -21,7 +21,7 @@
  */
 
 static const struct dsp_section dsp_image_helloworld[] = {
-	{NULL, 0, 0}
+    {NULL, 0, 0}
 };
 
 /* Symbol table, usable with the DSP_() macro (see dsp-target.h). */
