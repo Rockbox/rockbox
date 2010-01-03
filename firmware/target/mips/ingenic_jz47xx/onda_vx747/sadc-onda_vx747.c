@@ -95,8 +95,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    /* TODO */
-    1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400
+    1580, 1870, 1900, 1900, 1940, 1965, 1990, 2020, 2050, 2090, 2620
 };
 
 /* VBAT = (BDATA/4096) * 7.5V */
