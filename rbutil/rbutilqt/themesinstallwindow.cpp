@@ -119,7 +119,7 @@ void ThemesInstallWindow::downloadDone(bool error)
         connect(logger, SIGNAL(closed()), this, SLOT(close()));
         return;
     }
-    logger->addItem(tr("done."), LOGOK);
+    logger->addItem(tr("Done"), LOGOK);
     logger->setFinished();
     logger->close();
 
@@ -189,7 +189,7 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
     ui.themeDescription->setText(tr("fetching details for %1")
         .arg(cur->data(Qt::DisplayRole).toString()));
     ui.themePreview->clear();
-    ui.themePreview->setText(tr("fetching preview ..."));
+    ui.themePreview->setText(tr("Fetching preview..."));
     imgData.clear();
 
     iniDetails.beginGroup(cur->data(Qt::UserRole).toString());
@@ -281,7 +281,7 @@ void ThemesInstallWindow::show()
     QDialog::show();
     logger = new ProgressLoggerGui(this);
     logger->show();
-    logger->addItem(tr("getting themes information ..."), LOGINFO);
+    logger->addItem(tr("Getting themes information..."), LOGINFO);
 
     connect(logger, SIGNAL(aborted()), this, SLOT(close()));
 

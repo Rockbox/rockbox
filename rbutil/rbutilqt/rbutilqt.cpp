@@ -1019,7 +1019,7 @@ void RbUtilQt::uninstallBootloader(void)
         bl = new BootloaderInstallFile(this);
     }
     else {
-        logger->addItem(tr("No uninstall method known."), LOGERROR);
+        logger->addItem(tr("No uninstall method known"), LOGERROR);
         logger->setFinished();
         return;
     }

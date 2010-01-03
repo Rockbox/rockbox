@@ -49,7 +49,7 @@ void Uninstaller::uninstall(ProgressloggerInterface* dp)
 
     for(int i=0; i< uninstallSections.size() ; i++)
     {
-        m_dp->addItem(tr("Uninstalling ") + uninstallSections.at(i) + " ...",LOGINFO);
+        m_dp->addItem(tr("Uninstalling ") + uninstallSections.at(i) + "...",LOGINFO);
         QCoreApplication::processEvents();
         // create list of all other install sections
         QStringList sections = installlog.childGroups();
