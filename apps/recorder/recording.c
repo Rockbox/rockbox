@@ -1068,6 +1068,11 @@ bool recording_screen(bool no_source)
     agc_preset_str[5] = str(LANG_AGC_VOICE);
 #endif /* HAVE_AGC */
 
+#ifdef HAVE_SPEAKER
+    /* Disable speaker to prevent feedback */
+    audiohw_enable_speaker(false);
+#endif
+
 #if CONFIG_CODEC == SWCODEC
     audio_close_recording();
 #endif
@@ -1902,6 +1907,11 @@ rec_abort:
 #else /* !SWCODEC */
     audio_init_playback();
 #endif /* CONFIG_CODEC == SWCODEC */
+
+#ifdef HAVE_SPEAKER
+    /* Re-enable speaker */
+    audiohw_enable_speaker(global_settings.speaker_enabled);
+#endif
 
     /* make sure the trigger is really turned off */
     peak_meter_trigger(false);
