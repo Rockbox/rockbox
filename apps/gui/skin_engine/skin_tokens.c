@@ -135,16 +135,16 @@ static char* get_dir(char* buf, int buf_size, const char* path, int level)
 */
 static int pitch_speed_enum(int range, int32_t val, int32_t normval)
 {
-	int center;
-	int n;
+    int center;
+    int n;
 
-	if (range < 3)
-		return (val == normval) + 1;
-	if (val == normval)
-		return range;
-	center = range / 2;
-	n = (center * val) / normval + 1;
-	return (range <= n) ? (range - 1) : n;
+    if (range < 3)
+        return (val == normval) + 1;
+    if (val == normval)
+        return range;
+    center = range / 2;
+    n = (center * val) / normval + 1;
+    return (range <= n) ? (range - 1) : n;
 }
 #endif
 
@@ -415,8 +415,8 @@ const char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_ALBUMART_DISPLAY:
             if (!data->albumart)
                 return NULL;        
-			if (!data->albumart->draw)
-				data->albumart->draw = true;
+            if (!data->albumart->draw)
+                data->albumart->draw = true;
             return NULL;
 #endif
 
@@ -549,10 +549,10 @@ const char *get_token_value(struct gui_wps *gwps,
         }
 #endif
 #ifdef HAVE_USB_POWER
-		case WPS_TOKEN_USB_POWERED:
-			if (usb_powered())
-				return "u";
-			return NULL;
+        case WPS_TOKEN_USB_POWERED:
+            if (usb_powered())
+                return "u";
+            return NULL;
 #endif
         case WPS_TOKEN_BATTERY_SLEEPTIME:
         {
@@ -836,32 +836,32 @@ const char *get_token_value(struct gui_wps *gwps,
             int32_t pitch = sound_get_pitch();
             snprintf(buf, buf_size, "%ld.%ld",
                      pitch / PITCH_SPEED_PRECISION,
-		     (pitch  % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
+             (pitch  % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
 
-	    if (intval)
-		    *intval = pitch_speed_enum(limit, pitch,
-					       PITCH_SPEED_PRECISION * 100);
+        if (intval)
+            *intval = pitch_speed_enum(limit, pitch,
+                           PITCH_SPEED_PRECISION * 100);
             return buf;
         }
 #endif
 
 #if CONFIG_CODEC == SWCODEC
-	case WPS_TOKEN_SOUND_SPEED:
-	{
-	    int32_t pitch = sound_get_pitch();
-	    int32_t speed;
-	    if (dsp_timestretch_available())
-		    speed = GET_SPEED(pitch, dsp_get_timestretch());
-	    else
-		    speed = pitch;
-	    snprintf(buf, buf_size, "%ld.%ld",
+    case WPS_TOKEN_SOUND_SPEED:
+    {
+        int32_t pitch = sound_get_pitch();
+        int32_t speed;
+        if (dsp_timestretch_available())
+            speed = GET_SPEED(pitch, dsp_get_timestretch());
+        else
+            speed = pitch;
+        snprintf(buf, buf_size, "%ld.%ld",
                      speed / PITCH_SPEED_PRECISION,
-		     (speed  % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
-	    if (intval)
-		    *intval = pitch_speed_enum(limit, speed,
-					       PITCH_SPEED_PRECISION * 100);
+             (speed  % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
+        if (intval)
+            *intval = pitch_speed_enum(limit, speed,
+                           PITCH_SPEED_PRECISION * 100);
             return buf;
-	}
+    }
 #endif
 
         case WPS_TOKEN_MAIN_HOLD:
@@ -1122,7 +1122,7 @@ const char *get_token_value(struct gui_wps *gwps,
                             break;
                     }
                     #endif
-					*intval = global_settings.mp3_enc_config.bitrate+1;
+                    *intval = global_settings.mp3_enc_config.bitrate+1;
                 }
                 snprintf(buf, buf_size, "%d", global_settings.mp3_enc_config.bitrate+1);
                 return buf;
@@ -1136,9 +1136,9 @@ const char *get_token_value(struct gui_wps *gwps,
             return buf;
 #endif
         case WPS_TOKEN_REC_MONO:
-			if (!global_settings.rec_channels)
-				return "m";
-			return NULL;
+            if (!global_settings.rec_channels)
+                return "m";
+            return NULL;
 
 #endif /* HAVE_RECORDING */
         case WPS_TOKEN_CURRENT_SCREEN:

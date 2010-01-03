@@ -159,7 +159,7 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
 #ifdef BOOTLOADER
     (void)orientation;
     return utf16_buf;
-	
+    
 #else /* !BOOTLOADER */
     if (target == utf16_buf) /* empty string */
         return target;

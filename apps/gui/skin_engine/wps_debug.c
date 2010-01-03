@@ -50,18 +50,18 @@ struct debug_token_table
 #define X(name) name, #name
 struct debug_token_table tokens[] = {
     { X(TOKEN_MARKER_CONTROL_TOKENS) },
-	{ X(TOKEN_MARKER_BATTERY) },
-	{ X(TOKEN_MARKER_SOUND) },
-	{ X(TOKEN_MARKER_RTC) },
-	{ X(TOKEN_MARKER_DATABASE) },
-	{ X(TOKEN_MARKER_FILE) },
-	{ X(TOKEN_MARKER_IMAGES) },
-	{ X(TOKEN_MARKER_METADATA) },	
-	{ X(TOKEN_MARKER_PLAYBACK_INFO) },
-	{ X(TOKEN_MARKER_PLAYLIST) },
-	{ X(TOKEN_MARKER_MISC) },
-	{ X(TOKEN_MARKER_RECORDING) },
-	{ X(TOKEN_MARKER_END) },
+    { X(TOKEN_MARKER_BATTERY) },
+    { X(TOKEN_MARKER_SOUND) },
+    { X(TOKEN_MARKER_RTC) },
+    { X(TOKEN_MARKER_DATABASE) },
+    { X(TOKEN_MARKER_FILE) },
+    { X(TOKEN_MARKER_IMAGES) },
+    { X(TOKEN_MARKER_METADATA) },   
+    { X(TOKEN_MARKER_PLAYBACK_INFO) },
+    { X(TOKEN_MARKER_PLAYLIST) },
+    { X(TOKEN_MARKER_MISC) },
+    { X(TOKEN_MARKER_RECORDING) },
+    { X(TOKEN_MARKER_END) },
 };
 #undef X
 
@@ -499,7 +499,7 @@ static char *get_token_desc(struct wps_token *token, char *buf,
                 if (token->type < tokens[i].start_marker)
                 {
                     snprintf(buf, bufsize, "FIXME: %s + %d\n", tokens[i-1].desc,
-					         token->type - tokens[i-1].start_marker);
+                             token->type - tokens[i-1].start_marker);
                     break;
                 }
             } 

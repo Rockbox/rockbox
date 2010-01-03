@@ -66,7 +66,7 @@
 
 
 #define SKIN_BUFFER_SIZE (MAIN_BUFFER + REMOTE_BUFFER) + \
-						 (WPS_MAX_TOKENS * sizeof(struct wps_token))
+                         (WPS_MAX_TOKENS * sizeof(struct wps_token))
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS

@@ -260,7 +260,7 @@ void sleep(int ticks)
         switch_thread();
 #elif defined(CREATIVE_ZVx) && defined(BOOTLOADER)
     /* hacky.. */
-	long sleep_ticks = current_tick + ticks + 1;
+    long sleep_ticks = current_tick + ticks + 1;
     while (TIME_BEFORE(current_tick, sleep_ticks))
         switch_thread();
 #else

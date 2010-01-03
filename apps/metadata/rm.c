@@ -379,7 +379,7 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
                 read_uint32be(fd,&rmctx->nb_packets);
                 skipped += 4;
                 read_uint32be(fd,&next_data_off);
-                skipped += 4;		
+                skipped += 4;
 
               /***
                * nb_packets correction :
@@ -393,7 +393,7 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
 
                 DEBUGF("    data_nb_packets = %ld\n",rmctx->nb_packets);
                 DEBUGF("    next DATA offset = %ld\n",next_data_off);
-                header_end = 1;			
+                header_end = 1;         
                 break; 
         }
         if(header_end) break;

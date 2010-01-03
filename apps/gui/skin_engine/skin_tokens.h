@@ -226,7 +226,7 @@ struct wps_token {
     union {
         char c;
         unsigned short i;
-		void* data;
+        void* data;
     } value;
 };
  

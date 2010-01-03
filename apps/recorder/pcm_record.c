@@ -368,7 +368,7 @@ void pcm_rec_init(void)
     pcmrec_thread_id =
         create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack),
                       0, pcmrec_thread_name IF_PRIO(, PRIORITY_RECORDING)
-		              IF_COP(, CPU));
+                      IF_COP(, CPU));
     queue_enable_queue_send(&pcmrec_queue, &pcmrec_queue_send,
                             pcmrec_thread_id);
 } /* pcm_rec_init */

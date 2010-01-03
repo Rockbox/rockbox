@@ -229,11 +229,11 @@ static void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
 #ifdef HAVE_ALBUMART
     /* now draw the AA */
     if (data->albumart && data->albumart->vp == vp
-	    && data->albumart->draw)
+        && data->albumart->draw)
     {
         draw_album_art(gwps, playback_current_aa_hid(data->playback_aa_slot),
                         false);
-		data->albumart->draw = false;
+        data->albumart->draw = false;
     }
 #endif
 

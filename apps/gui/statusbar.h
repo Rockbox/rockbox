@@ -70,7 +70,7 @@ struct gui_statusbar
     struct status_info lastinfo;
 #if CONFIG_RTC
     struct tm *time;
-    int	last_tm_min;
+    int last_tm_min;
 #endif
     struct screen * display;
 };

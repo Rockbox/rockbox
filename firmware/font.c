@@ -578,7 +578,7 @@ void font_init(void)
 struct font* font_get(int font)
 {
     (void)font;
-	return &sysfont;
+    return &sysfont;
 }
 
 /*
