@@ -921,6 +921,7 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     }
 #endif
 #ifdef CPU_COLDFIRE
+    unsigned old_macsr = coldfire_get_macsr();
     coldfire_set_macsr(EMAC_UNSIGNED);
 #endif
 #ifdef HAVE_UPSCALER
@@ -950,6 +951,11 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
 #endif
         ret = scale_v_linear(rset, &ctx);
     }
+#endif
+#ifdef CPU_COLDFIRE
+    /* Restore emac status; other modules like tone control filter
+     * calculation may rely on it. */
+    coldfire_set_macsr(old_macsr);
 #endif
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     cpu_boost(false);
