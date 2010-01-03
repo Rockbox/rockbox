@@ -1169,7 +1169,6 @@ static unsigned long cycles; /* Number of update cycles (50Hz) */
 
 #ifndef SIMULATOR
 static bool is_playing;
-#endif
 
 /* one frame of bitswapped mp3 data */
 static unsigned char beep[]={255,
@@ -1191,6 +1190,7 @@ static void callback(unsigned char** start, size_t* size)
     *start = beep; /* give it the same frame again */
     *size = sizeof(beep);
 }
+#endif /* !SIMULATOR */
 
 /****************************************************************************/
 /* Turn sound on                                                            */
