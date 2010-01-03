@@ -44,23 +44,21 @@
        has the high bit set, this is fine, everything inside .rept will be
        skipped, and the add before and adcs after will set the one-bit result
        to zero. */
-    cmp     \divisor, \dividend, lsr #16
-    movls   \divisor, \divisor, lsl #16
-    addls   \bits, \bits, #16
-    cmp     \divisor, \dividend, lsr #8
-    movls   \divisor, \divisor, lsl #8
-    addls   \bits, \bits, #8
-    cmp     \divisor, \dividend, lsr #4
-    movls   \divisor, \divisor, lsl #4
-    addls   \bits, \bits, #4
-    cmp     \divisor, \dividend, lsr #2
-    movls   \divisor, \divisor, lsl #2
-    addls   \bits, \bits, #2
-    cmp     \divisor, \dividend, lsr #1
-    movls   \divisor, \divisor, lsl #1
-    addls   \bits, \bits, #1
-    rsbs    \divisor, \divisor, #0
-    bcs     .L_div0
+    cmn     \divisor, \dividend, lsr #16
+    movcs   \divisor, \divisor, lsl #16
+    addcs   \bits, \bits, #16
+    cmn     \divisor, \dividend, lsr #8
+    movcs   \divisor, \divisor, lsl #8
+    addcs   \bits, \bits, #8
+    cmn     \divisor, \dividend, lsr #4
+    movcs   \divisor, \divisor, lsl #4
+    addcs   \bits, \bits, #4
+    cmn     \divisor, \dividend, lsr #2
+    movcs   \divisor, \divisor, lsl #2
+    addcs   \bits, \bits, #2
+    cmn     \divisor, \dividend, lsr #1
+    movcs   \divisor, \divisor, lsl #1
+    addcs   \bits, \bits, #1
     adds    \result, \dividend, \divisor
     subcc   \result, \result, \divisor
     rsb     \curbit, \bits, #31
@@ -88,6 +86,13 @@
     .type   udiv32_arm,%function
 
 udiv32_arm:
+    /* Invert divisor. ARM_DIV_31_BODY uses adc to both subtract the divisor
+       and add the next bit of the result. The correction code at .L_udiv32
+       does not need the divisor inverted, but can be modified to work with it,
+       and this allows the zero divisor test to be done early and without an
+       explicit comparison. */
+    rsbs    r1, r1, #0
+    beq     .L_div0
     tst     r0, r0
     /* High bit must be unset, otherwise shift numerator right, calculate,
        and correct results. As this case is very uncommon we want to avoid
@@ -106,9 +111,6 @@ udiv32_arm:
        address. */
     mov     r0, r0, lsr #1
     bl      .L_udiv31
-    /* This address is never a branch target, but is used to test lr before
-       calling __div0. */
-.L_udiv32_div0_trap:
     ldmdb   sp, { r2, r3, lr }
     /* Move the low bit of the original numerator to the carry bit */
     movs    r2, r2, lsr #1
@@ -116,26 +118,12 @@ udiv32_arm:
     adc     r1, r1, r1
     /* Subtract the original divisor from the remainder, setting carry if the
        result is non-negative */
-    subs    r1, r1, r3
+    adds    r1, r1, r3
     /* Shift quotient left one and add carry bit */
     adc     r0, r0, r0
     bx      lr
 .L_div0:
-    /* Check the return address, since .L_udiv32 uses bl to wrap the 31-bit
-       divider. If the return address is at .L_udiv32_div0_trap, then the 
-       the return address of the original caller is at sp - 4
-    */
-    adr     r2, .L_udiv32_div0_trap
-    cmp     r2, lr
-    subeq     sp, sp, #4
-#if defined(__ARM_EABI__) || !defined(USE_IRAM)
-    bleq    __div0
-#else
-    ldr   r3, =__div0
-    moveq   lr, pc
-    bxeq    r3
-#endif
-    /* Otherwise, push lr to the stack before calling __div0 */
+    /* __div0 expects the calling address on the top of the stack */
     stmdb sp!, { lr }
 #if defined(__ARM_EABI__) || !defined(USE_IRAM)
     bl      __div0
