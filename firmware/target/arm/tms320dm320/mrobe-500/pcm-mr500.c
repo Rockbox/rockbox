@@ -37,7 +37,7 @@ static size_t         size;
 
 void pcm_postinit(void)
 {
-	audiohw_postinit();
+    audiohw_postinit();
 }
 
 /* Return the current location in the SDRAM to SARAM transfer along with the
@@ -48,7 +48,7 @@ void pcm_postinit(void)
  */
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
-	int cnt = DSP_(_sdem_level);
+    int cnt = DSP_(_sdem_level);
 
     unsigned long addr = (unsigned long) start +cnt;
     
@@ -73,7 +73,7 @@ void pcm_play_dma_init(void)
 
 void pcm_dma_apply_settings(void)
 {
-	audiohw_set_frequency(pcm_fsel);
+    audiohw_set_frequency(pcm_fsel);
 }
 
 /* Note that size is actually limited to the size of a short right now due to
@@ -81,7 +81,7 @@ void pcm_dma_apply_settings(void)
  */
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-	unsigned long sdem_addr=(unsigned long)addr - CONFIG_SDRAM_START;
+    unsigned long sdem_addr=(unsigned long)addr - CONFIG_SDRAM_START;
     /* Initialize codec. */
     DSP_(_sdem_addrl) = sdem_addr & 0xffff;
     DSP_(_sdem_addrh) = sdem_addr >> 16;
@@ -116,7 +116,7 @@ void pcm_play_dma_pause(bool pause)
     }
     else
     {
-    	DSP_(_dma0_stopped)=0;
+        DSP_(_dma0_stopped)=0;
         dsp_wake();
     }
 }
@@ -132,8 +132,8 @@ char buffer[80];
 void DSPHINT(void) __attribute__ ((section(".icode")));
 void DSPHINT(void)
 {
-	register pcm_more_callback_type get_more;   /* No stack for this */
-	
+    register pcm_more_callback_type get_more;   /* No stack for this */
+    
     unsigned int i;
 
     IO_INTC_FIQ0 = 1 << 11;
@@ -151,35 +151,35 @@ void DSPHINT(void)
         break;
         
     case MSG_REFILL:
-		/* Buffer empty.  Try to get more. */
-		get_more = pcm_callback_for_more;
-		size = 0;
-		
-		if (get_more == NULL || (get_more(&start, &size), size == 0))
-		{
-			/* Callback missing or no more DMA to do */
-			pcm_play_dma_stop();
-			pcm_play_dma_stopped_callback();
-		}
+        /* Buffer empty.  Try to get more. */
+        get_more = pcm_callback_for_more;
+        size = 0;
+        
+        if (get_more == NULL || (get_more(&start, &size), size == 0))
+        {
+            /* Callback missing or no more DMA to do */
+            pcm_play_dma_stop();
+            pcm_play_dma_stopped_callback();
+        }
     
-		{
-			unsigned long sdem_addr=(unsigned long)start - CONFIG_SDRAM_START;
-		  	/* Flush any pending cache writes */
-			clean_dcache_range(start, size);
+        {
+            unsigned long sdem_addr=(unsigned long)start - CONFIG_SDRAM_START;
+            /* Flush any pending cache writes */
+            clean_dcache_range(start, size);
 
-			/* set the new DMA values */
-			DSP_(_sdem_addrl) = sdem_addr & 0xffff;
-			DSP_(_sdem_addrh) = sdem_addr >> 16;
-	   		DSP_(_sdem_dsp_size) = size;
-	   		
-			DEBUGF("pcm_sdram at 0x%08lx, sdem_addr 0x%08lx",
-				(unsigned long)start, (unsigned long)sdem_addr);
-		}
-		
-		break;
+            /* set the new DMA values */
+            DSP_(_sdem_addrl) = sdem_addr & 0xffff;
+            DSP_(_sdem_addrh) = sdem_addr >> 16;
+            DSP_(_sdem_dsp_size) = size;
+            
+            DEBUGF("pcm_sdram at 0x%08lx, sdem_addr 0x%08lx",
+                (unsigned long)start, (unsigned long)sdem_addr);
+        }
+        
+        break;
     default:
-	    DEBUGF("DSP: unknown msg 0x%04x", dsp_message.msg);
-	    break;
+        DEBUGF("DSP: unknown msg 0x%04x", dsp_message.msg);
+        break;
     }
     
     /* Re-Activate the channel */

@@ -71,7 +71,7 @@
 #define USB_BULK_RESET_REQUEST   0xff
 #define USB_BULK_GET_MAX_LUN     0xfe
 
-#define DIRECT_ACCESS_DEVICE	   0x00    /* disks */
+#define DIRECT_ACCESS_DEVICE     0x00    /* disks */
 #define DEVICE_REMOVABLE         0x80
 
 #define CBW_SIGNATURE            0x43425355
