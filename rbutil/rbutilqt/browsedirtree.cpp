@@ -55,6 +55,7 @@ void BrowseDirtree::setDir(const QDir &dir)
         ui.tree->expand(p);
         ui.tree->scrollTo(p);
         ui.tree->resizeColumnToContents(0);
+        ui.tree->setLayoutDirection(Qt::LeftToRight);
     }
 }
 

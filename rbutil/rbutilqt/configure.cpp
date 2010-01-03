@@ -80,6 +80,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     ui.proxyPass->setLayoutDirection(Qt::LeftToRight);
     ui.listLanguages->setLayoutDirection(Qt::LeftToRight);
     ui.cachePath->setLayoutDirection(Qt::LeftToRight);
+    ui.comboTts->setLayoutDirection(Qt::LeftToRight);
 
     this->setModal(true);
 

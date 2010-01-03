@@ -59,6 +59,7 @@ void EncTtsCfgGui::setUpWindow()
         gridLayout->addWidget(label, i, 0);
         QWidget *widget = createWidgets(m_settingsList.at(i));
         gridLayout->addWidget(widget, i, 1);
+        widget->setLayoutDirection(Qt::LeftToRight);
         QWidget *btn = createButton(m_settingsList.at(i));
         if(btn != NULL)
         {
