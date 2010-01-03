@@ -171,6 +171,7 @@ L_try_again:
     }
 
     __i2c_send_stop();
+    i2c_close();
     return count - cnt;
 
 device_err:
@@ -230,6 +231,7 @@ W_try_again:
     }
 
     __i2c_send_stop();
+    i2c_close();
     return count - cnt;
 
 device_err:
