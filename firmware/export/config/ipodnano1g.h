@@ -119,7 +119,7 @@
 #define BATTERY_CAPACITY_DEFAULT 300   /* default battery capacity */
 #define BATTERY_CAPACITY_MIN     200   /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX     600   /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC      20  	/* capacity increment */
+#define BATTERY_CAPACITY_INC      20   /* capacity increment */
 #define BATTERY_TYPES_COUNT        1   /* only one type */
 
 /* Hardware controlled charging? FIXME */

@@ -26,8 +26,8 @@
 #include <stdbool.h>
 
 #define RTC_ADR 0xd0
-#define	RTC_DEV_WRITE   (RTC_ADR | 0x00)
-#define	RTC_DEV_READ    (RTC_ADR | 0x01)
+#define RTC_DEV_WRITE   (RTC_ADR | 0x00)
+#define RTC_DEV_READ    (RTC_ADR | 0x01)
 
 void rtc_init(void)
 {
@@ -159,8 +159,8 @@ bool rtc_enable_alarm(bool enable)
     {
         data &= 0x5f; /* turn bit d7=AFE and d5=ABE off */
         rtc_write(0x0a, data);
-	sleep(HZ / 10);
-	rtc_check_alarm_flag();
+    sleep(HZ / 10);
+    rtc_check_alarm_flag();
         data |= 0xa0; /* turn bit d7=AFE and d5=ABE on */
         rtc_write(0x0a, data);
     }

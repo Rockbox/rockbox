@@ -555,9 +555,9 @@ void USB_DEVICE(void) {
         case CTRL_WTDS:
         case CTRL_WTND:
             /* If data is not valid stop */
-	        if(!(M66591_INTSTAT_MAIN & (1<<3)) ) {
-	            logf("mxx: CTRT interrupt but VALID is false");
-	            break;
+            if(!(M66591_INTSTAT_MAIN & (1<<3)) ) {
+                logf("mxx: CTRT interrupt but VALID is false");
+                break;
             }
             control_received();
             break;
@@ -777,7 +777,7 @@ void usb_attach(void) {
 #endif
 
     /* Enable oscillation buffer XCKE */
-	M66591_TRN_CTRL |= (1<<13);
+    M66591_TRN_CTRL |= (1<<13);
 
     udelay(1500);
 

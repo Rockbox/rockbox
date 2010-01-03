@@ -733,7 +733,7 @@ const struct xchar_info xchar_info_oldlcd[] = {
 
     {   0xa7, 0, 0, 0x63 }, /* § (paragraph sign) */
 
-	{   0xab, XF_LEFTDBLANGLEQUOT, 1, 0x40 }, /* « (left double-angle quotation mark) */
+    {   0xab, XF_LEFTDBLANGLEQUOT, 1, 0x40 }, /* « (left double-angle quotation mark) */
 
     {   0xad, 0, 0, 0x31 }, /* ­ (soft hyphen) */
 

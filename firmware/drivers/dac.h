@@ -26,12 +26,12 @@
 #ifdef HAVE_DAC3550A
 
 /*
-	DAC I2C	defs
+    DAC I2C defs
 */
 #define DAC_ADR         0x9a
-#define	DAC_DEV_WRITE   (DAC_ADR | 0x00)
+#define DAC_DEV_WRITE   (DAC_ADR | 0x00)
 
-#define	DAC_REG_WRITE   0xc0
+#define DAC_REG_WRITE   0xc0
 
 /* registers..*/
 #define DAC_SR_REG      1

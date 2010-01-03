@@ -175,7 +175,7 @@ struct dirent_uncached* readdir_uncached(DIR_UNCACHED* dir)
         return NULL;
 
     if ( !entry.name[0] )
-        return NULL;	
+        return NULL;
 
     strlcpy(theent->d_name, entry.name, sizeof(theent->d_name));
     theent->attribute = entry.attr;

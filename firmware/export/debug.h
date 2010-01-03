@@ -33,7 +33,7 @@ extern void ldebugf(const char* file, int line, const char *fmt, ...)
 
 /*  */
 #if defined(SIMULATOR) && !defined(__PCTOOL__)
-#define DEBUGF	debugf
+#define DEBUGF  debugf
 #define LDEBUGF(...) ldebugf(__FILE__, __LINE__, __VA_ARGS__)
 #else
 #if defined(DEBUG)
@@ -42,7 +42,7 @@ extern void ldebugf(const char* file, int line, const char *fmt, ...)
 void breakpoint(void);
 #endif
 
-#define DEBUGF	debugf
+#define DEBUGF  debugf
 #define LDEBUGF debugf
 #else
 #define DEBUGF(...)
