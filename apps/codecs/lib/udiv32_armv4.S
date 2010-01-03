@@ -36,11 +36,14 @@
    iteration by storing quotient and remainder together and adding the previous
    quotient bit during trial subtraction. Modified to work with any dividend
    and divisor both less than 1 << 30, and skipping trials by calculating bits
-   in output.
-*/
-.macro ARM_DIV_31_BODY dividend, divisor, result, bits, curbit, quotient
+   in output. */
+.macro ARM_DIV_31_BODY dividend, divisor, result, bits, curbit, quotient, remainder
 
     mov     \bits, #1
+    /* Shift the divisor left until it aligns with the numerator. If it already
+       has the high bit set, this is fine, everything inside .rept will be
+       skipped, and the add before and adcs after will set the one-bit result
+       to zero. */
     cmp     \divisor, \dividend, lsr #16
     movls   \divisor, \divisor, lsl #16
     addls   \bits, \bits, #16
@@ -56,7 +59,8 @@
     cmp     \divisor, \dividend, lsr #1
     movls   \divisor, \divisor, lsl #1
     addls   \bits, \bits, #1
-    rsb     \divisor, \divisor, #0
+    rsbs    \divisor, \divisor, #0
+    bcs     .L_div0
     adds    \result, \dividend, \divisor
     subcc   \result, \result, \divisor
     rsb     \curbit, \bits, #31
@@ -64,44 +68,14 @@
     nop
     .rept   30
     adcs    \result, \divisor, \result, lsl #1
+    /* Fix the remainder portion of the result. This must be done because the
+       handler for 32-bit numerators needs the remainder. */
     subcc   \result, \result, \divisor
     .endr
-    /* shift remainder/quotient left one, add final quotient bit */
+    /* Shift remainder/quotient left one, add final quotient bit */
     adc     \result, \result, \result
-    mov     \dividend, \result, lsr \bits
-    eor     \quotient, \result, \dividend, lsl \bits
-.endm
-
-.macro ARM_DIV_32_BODY dividend, divisor, result, curbit
-
-    mov     \result, \dividend
-    mov     \curbit, #90          @ 3 * 30, (calculating branch dest)
-    cmp     \divisor, \result, lsr #16
-    movls   \result,\result, lsr #16
-    subls   \curbit, \curbit, #48
-    cmp     \divisor, \result, lsr #8
-    movls   \result,\result, lsr #8
-    subls   \curbit, \curbit, #24
-    cmp     \divisor, \result, lsr #4
-    movls   \result,\result, lsr #4
-    subls   \curbit, \curbit, #12
-    cmp     \divisor, \result, lsr #2
-    subls   \curbit, \curbit, #6
-    @ Calculation is only done down to shift=2, because the shift=1 step
-    @ would need 3 more cycles, but would only gain 1.5 cycles on average.
-    mov     \result, #0
-    add     pc, pc, \curbit, lsl #2
-    nop
-    .set    shift, 32
-    .rept   31
-    .set    shift, shift - 1
-    cmp     \divisor, \dividend, lsr #shift
-    orrls   \result, \result, #(1 << shift)
-    subls   \dividend, \dividend, \divisor, lsl #shift
-    .endr   @ shift==0 in the .rept would cause a warning  for lsr #0
-    cmp     \divisor, \dividend
-    orrls   \result, \result, #1
-    @subls  \dividend, \dividend, \divisor  @ correct remainder not needed
+    mov     \remainder, \result, lsr \bits
+    eor     \quotient, \result, \remainder, lsl \bits
 .endm
 
 #ifdef USE_IRAM
@@ -114,21 +88,48 @@
     .type   udiv32_arm,%function
 
 udiv32_arm:
-    cmp     r1, #0
-    beq     20f
     tst     r0, r0
-    /* High bit must be unset, otherwise use ARM_DIV_32_BODY. High bit of
-       divisor is also unset dividend has been tested to be >= divisor.
+    /* High bit must be unset, otherwise shift numerator right, calculate,
+       and correct results. As this case is very uncommon we want to avoid
+       any other delays on the main path in handling it, so the long divide
+       calls the short divide as a function. */
+    bmi     .L_udiv32
+.L_udiv31:
+    ARM_DIV_31_BODY r0, r1, r2, r3, ip, r0, r1
+    bx      lr
+
+.L_udiv32:
+    /* store original numerator and divisor, we'll need them to correct the
+       result, */
+    stmdb   sp, { r0, r1, lr }
+    /* Call __div0 here if divisor is zero, otherwise it would report the wrong
+       address. */
+    mov     r0, r0, lsr #1
+    bl      .L_udiv31
+    /* This address is never a branch target, but is used to test lr before
+       calling __div0. */
+.L_udiv32_div0_trap:
+    ldmdb   sp, { r2, r3, lr }
+    /* Move the low bit of the original numerator to the carry bit */
+    movs    r2, r2, lsr #1
+    /* Shift the remainder left one and add in the carry bit */
+    adc     r1, r1, r1
+    /* Subtract the original divisor from the remainder, setting carry if the
+       result is non-negative */
+    subs    r1, r1, r3
+    /* Shift quotient left one and add carry bit */
+    adc     r0, r0, r0
+    bx      lr
+.L_div0:
+    /* Check the return address, since .L_udiv32 uses bl to wrap the 31-bit
+       divider. If the return address is at .L_udiv32_div0_trap, then the 
+       the return address of the original caller is at sp - 4
     */
-    bmi     10f
-    ARM_DIV_31_BODY r0, r1, r2, r3, ip, r0
-    bx      lr
-
-10:
-    ARM_DIV_32_BODY r0, r1, r2, r3
-    mov     r0, r2
-    bx      lr
-
-20:
-    movne   r0, #0
-    bx      lr
+    adr     r2, .L_udiv32_div0_trap
+    cmp     r2, lr
+    subeq     sp, sp, #4
+    bleq    __div0
+    /* Otherwise, push lr to the stack before calling __div0 */
+    stmdb sp!, { lr }
+    bl      __div0
+    .size udiv32_arm, . - udiv32_arm
