@@ -308,7 +308,7 @@ void
 lcd_icon(int icon, bool enable)
 {
   lcd_print_icon(icons[icon].xpos, icons[icon].row, enable,
-		 icons[icon].bitmap);
+         icons[icon].bitmap);
 }
 
 #endif /* HAVE_LCD_CHARCELLS */

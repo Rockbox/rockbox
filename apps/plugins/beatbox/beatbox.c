@@ -106,7 +106,7 @@ PLUGIN_IRAM_DECLARE
 #define MAX_VOICES 20   // Note: 24 midi channels is the minimum general midi
                         // spec implementation
 
-#else	// Simulator requires 44100, and we can afford to use more voices
+#else   // Simulator requires 44100, and we can afford to use more voices
 
 #define SAMPLE_RATE SAMPR_44
 #define MAX_VOICES 48
@@ -120,7 +120,7 @@ PLUGIN_IRAM_DECLARE
 #undef SYNC
 
 #ifdef SIMULATOR
-	#define SYNC
+    #define SYNC
 #endif
 
 struct MIDIfile * mf IBSS_ATTR;

@@ -243,12 +243,12 @@ redraw:
                 goto redraw;
         }
         else if(button & BUTTON_POWER)
-	{
-	    if(poweroff_repeat++ > 8)
-		power_off();
-	}
-	else
-	    poweroff_repeat = 0;
+    {
+        if(poweroff_repeat++ > 8)
+        power_off();
+    }
+    else
+        poweroff_repeat = 0;
     }
 }
 

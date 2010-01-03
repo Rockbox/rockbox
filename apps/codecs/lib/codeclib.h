@@ -97,7 +97,7 @@ static inline unsigned int bs_generic(unsigned int v, int mode)
             r &= 31;
     } else {
         r = 31 - r;
-	/* If mode is constant, this is a single conditional instruction */
+    /* If mode is constant, this is a single conditional instruction */
         if (mode & BS_0_0 && (signed)r < 0) 
             r += 1;
     }
