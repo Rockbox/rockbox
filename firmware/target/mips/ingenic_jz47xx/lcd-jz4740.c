@@ -35,13 +35,24 @@
 static volatile bool lcd_is_on = false;
 static struct mutex lcd_mtx;
 static struct wakeup lcd_wkup;
+static int lcd_count = 0;
+
+void lcd_clock_enable(void)
+{
+    if(++lcd_count == 1)
+        __cpm_start_lcd();
+}
+
+void lcd_clock_disable(void)
+{
+    if(--lcd_count == 0)
+        __cpm_stop_lcd();
+}
 
 /* LCD init */
 void lcd_init_device(void)
 {
-    __cpm_start_lcd();
     lcd_init_controller();
-    __cpm_stop_lcd();
     
     lcd_is_on = true;
     mutex_init(&lcd_mtx);
@@ -55,8 +66,6 @@ void lcd_enable(bool state)
     if(lcd_is_on == state)
         return;
 
-    __cpm_start_lcd();
-
     if(state)
     {
         lcd_on();
@@ -64,8 +73,6 @@ void lcd_enable(bool state)
     }
     else
         lcd_off();
-
-    __cpm_stop_lcd();
 
     lcd_is_on = state;
 }
@@ -87,7 +94,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     mutex_lock(&lcd_mtx);
     
-    __cpm_start_lcd();
+    lcd_clock_enable();
     
     lcd_set_target(x, y, width, height);
     
@@ -119,7 +126,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     while(REG_SLCD_STATE & SLCD_STATE_BUSY);
     REG_SLCD_CTRL &= ~SLCD_CTRL_DMA_EN; /* Disable SLCD DMA support */
     
-    __cpm_stop_lcd();
+    lcd_clock_disable();
     
     mutex_unlock(&lcd_mtx);
 }

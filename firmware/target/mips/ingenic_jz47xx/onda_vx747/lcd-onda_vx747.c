@@ -197,6 +197,8 @@ static void _set_lcd_clock(void)
 
 void lcd_init_controller(void)
 {
+    lcd_clock_enable();
+
 #ifdef USB_BOOT
     _display_pin_init();
 #endif
@@ -204,6 +206,8 @@ void lcd_init_controller(void)
     _set_lcd_clock();
     SLEEP(1000);
     _display_init();
+
+    lcd_clock_disable();
 }
 
 void lcd_set_target(int x, int y, int width, int height)
@@ -254,12 +258,20 @@ void lcd_set_flip(bool yesno)
 
 void lcd_on(void)
 {
+    lcd_clock_enable();
+
     _display_on();
+
+    lcd_clock_disable();
 }
 
 void lcd_off(void)
 {
+    lcd_clock_enable();
+
     _display_off();
+
+    lcd_clock_disable();
 }
 
 void lcd_set_contrast(int val)

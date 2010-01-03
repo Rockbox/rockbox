@@ -26,6 +26,8 @@
 void lcd_enable(bool state);
 bool lcd_active(void);
 void lcd_init_device(void);
+void lcd_clock_enable(void);
+void lcd_clock_disable(void);
 
 
 void lcd_init_controller(void);
