@@ -158,7 +158,7 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-/* #define CONFIG_USBOTG	USBOTG_ISP1761 */
+/* #define CONFIG_USBOTG    USBOTG_ISP1761 */
 #define CONFIG_USBOTG USBOTG_ISP1583
 #define HAVE_USBSTACK
 #define USE_ROCKBOX_USB

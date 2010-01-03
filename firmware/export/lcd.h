@@ -159,13 +159,13 @@ typedef unsigned char fb_data;
 #if defined(HAVE_LCD_MODES)
 void lcd_set_mode(int mode);
 #define LCD_MODE_RGB565 0x00000001
-#define LCD_MODE_YUV 	0x00000002
-#define LCD_MODE_PAL256	0x00000004
+#define LCD_MODE_YUV    0x00000002
+#define LCD_MODE_PAL256 0x00000004
 
 #if HAVE_LCD_MODES & LCD_MODE_PAL256
-	void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
-							int width, int height);
-	void lcd_pal256_update_pal(fb_data *palette);
+    void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
+                            int width, int height);
+    void lcd_pal256_update_pal(fb_data *palette);
 #endif
 #endif
 

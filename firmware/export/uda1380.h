@@ -59,7 +59,7 @@ extern void audiohw_set_mixer_vol(int channel1, int channel2);
 
 
 /* REG_I2S: I2S settings */
-#define REG_I2S     		0x01
+#define REG_I2S             0x01
 #define I2S_IFMT_IIS        (0 << 8)
 #define I2S_IFMT_LSB16      (1 << 8)
 #define I2S_IFMT_LSB18      (2 << 8)

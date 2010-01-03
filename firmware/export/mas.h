@@ -27,43 +27,43 @@
 #define MAX_PEAK 0x8000
 
 /*
-	MAS I2C	defs
+    MAS I2C defs
 */
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #define MAS_ADR         0x3c
-#define	MAS_DEV_WRITE   (MAS_ADR | 0x00)
-#define	MAS_DEV_READ    (MAS_ADR | 0x01)
+#define MAS_DEV_WRITE   (MAS_ADR | 0x00)
+#define MAS_DEV_READ    (MAS_ADR | 0x01)
 
 #elif CONFIG_CODEC == MAS3507D
 #define MAS_ADR         0x3a
-#define	MAS_DEV_WRITE   (MAS_ADR | 0x00)
-#define	MAS_DEV_READ    (MAS_ADR | 0x01)
+#define MAS_DEV_WRITE   (MAS_ADR | 0x00)
+#define MAS_DEV_READ    (MAS_ADR | 0x01)
 #endif
 
 /* registers..*/
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-#define	MAS_DATA_WRITE   0x68
+#define MAS_DATA_WRITE   0x68
 #define MAS_DATA_READ    0x69
-#define	MAS_CODEC_WRITE  0x6c
+#define MAS_CODEC_WRITE  0x6c
 #define MAS_CODEC_READ   0x6d
-#define	MAS_CONTROL      0x6a
-#define	MAS_DCCF         0x76
-#define	MAS_DCFR         0x77
+#define MAS_CONTROL      0x6a
+#define MAS_DCCF         0x76
+#define MAS_DCFR         0x77
 
 #elif CONFIG_CODEC == MAS3507D
-#define	MAS_DATA_WRITE   0x68
+#define MAS_DATA_WRITE   0x68
 #define MAS_DATA_READ    0x69
-#define	MAS_CONTROL      0x6a
+#define MAS_CONTROL      0x6a
 #endif
 
 /*
- *	MAS register
+ *  MAS register
  */
-#define	MAS_REG_DCCF            0x8e
-#define	MAS_REG_MUTE            0xaa
-#define	MAS_REG_PIODATA         0xc8
-#define	MAS_REG_StartUpConfig   0xe6
-#define	MAS_REG_KPRESCALE       0xe7
+#define MAS_REG_DCCF            0x8e
+#define MAS_REG_MUTE            0xaa
+#define MAS_REG_PIODATA         0xc8
+#define MAS_REG_StartUpConfig   0xe6
+#define MAS_REG_KPRESCALE       0xe7
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #define MAS_REG_KMDB_SWITCH     0x21
 #define MAS_REG_KMDB_STR        0x22
@@ -77,12 +77,12 @@
 #define MAS_REG_VOLUME_CONTROL  0x10
 #define MAS_REG_BALANCE         0x11
 #define MAS_REG_KAVC            0x12
-#define	MAS_REG_KBASS           0x14
-#define	MAS_REG_KTREBLE         0x15
+#define MAS_REG_KBASS           0x14
+#define MAS_REG_KTREBLE         0x15
 
 #elif CONFIG_CODEC == MAS3507D
-#define	MAS_REG_KBASS           0x6b
-#define	MAS_REG_KTREBLE         0x6f
+#define MAS_REG_KBASS           0x6b
+#define MAS_REG_KTREBLE         0x6f
 #endif
 
 /*

@@ -159,7 +159,7 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-#define CONFIG_USBOTG	USBOTG_JZ4740
+#define CONFIG_USBOTG   USBOTG_JZ4740
 #define HAVE_USBSTACK
 #define USE_ROCKBOX_USB
 #define USB_VENDOR_ID   0x07C4

@@ -112,5 +112,5 @@
 #define TCC7xx_USB_EP_DMA_ADDR1 MMR_REG16(USB_BASE, 0xa0) /* EP DMA MCU addr1 register */
 #define TCC7xx_USB_EP_DMA_ADDR2 MMR_REG16(USB_BASE, 0xa4) /* EP DMA MCU addr2 register */
 #define TCC7xx_USB_EP_DMA_STAT  MMR_REG16(USB_BASE, 0xc0) /* EP DMA Transfer Status register */
-#define TCC7xx_USB_DELAY_CTRL   MMR_REG16(USB_BASE, 0x80)	/* Delay control register */
+#define TCC7xx_USB_DELAY_CTRL   MMR_REG16(USB_BASE, 0x80)   /* Delay control register */
 #endif /* USB_TCC7XX_H */
