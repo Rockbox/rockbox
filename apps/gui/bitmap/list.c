@@ -113,7 +113,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     const int screen = display->screen_type;
     const int list_start_item = list->start_item[screen];
     const int icon_width = get_icon_width(screen) + ICON_PADDING;
-    const int scrollbar_in_left = global_settings.scrollbar == SCROLLBAR_LEFT;
+    const bool scrollbar_in_left = (global_settings.scrollbar == SCROLLBAR_LEFT);
     const bool show_cursor = !global_settings.cursor_style &&
                         list->show_selection_marker;
     struct viewport *parent = (list->parent[screen]);
