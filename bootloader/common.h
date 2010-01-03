@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: main.c 11997 2007-01-13 09:08:18Z miipekk $
+ * $Id$
  *
  * Copyright (C) 2005 by Linus Nielsen Feltzing
  *

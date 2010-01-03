@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: wps_internals.h 22062 2009-07-27 07:21:05Z jdgordon $
+ * $Id$
  *
  * Copyright (C) 2007 Nicolas Pennequin
  * Copyright (C) 2009 Jonathan Gordon

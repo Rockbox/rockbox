@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: screens.h 21312 2009-06-16 17:04:47Z mcuelenaere $
+ * $Id$
  *
  * Copyright (C) 2002 Björn Stenberg
  *

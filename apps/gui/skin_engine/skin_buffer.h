@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: wps_parser.c 19880 2009-01-29 20:49:43Z mcuelenaere $
+ * $Id$
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
  * Copyright (C) 2009 Jonathan Gordon

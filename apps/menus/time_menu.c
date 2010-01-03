@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: main_menu.c 17985 2008-07-08 02:30:58Z jdgordon $
+ * $Id$
  *
  * Copyright (C) 2007 Jonathan Gordon
  *
