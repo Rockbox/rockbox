@@ -109,7 +109,6 @@ int button_read_device(void)
         /* if the buttons dont agree twice in a row, then its none */
         lastbutton = btn;
         btn = BUTTON_NONE;
-        buttonlight_on();
     }
 
     /* Check for hold first - exit if asserted with no button pressed */
@@ -121,7 +120,6 @@ int button_read_device(void)
     if (buttons)
     {
         btn |= buttons;
-        buttonlight_on();
     }
     
     /* the touchpad - only watch the lines we actually read */
@@ -152,7 +150,6 @@ int button_read_device(void)
         if (touchpad & ((1 << 9) | (1 << 8) | (1 << 7)))
             btn |= BUTTON_LEFT;
 
-        buttonlight_on();
     }
     
     /* the cradle buttons */
