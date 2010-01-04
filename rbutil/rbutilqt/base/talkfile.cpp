@@ -264,7 +264,7 @@ bool TalkFileCreator::copyTalkFiles(QString* errString)
 //!
 bool TalkFileCreator::cleanup()
 {
-    emit logItem(tr("Cleaning up.."),LOGINFO);
+    emit logItem(tr("Cleaning up..."),LOGINFO);
 
     for(int i=0; i < m_talkList.size(); i++)
     {
