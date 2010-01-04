@@ -62,7 +62,7 @@
 //#define HAVE_LCD_FLIP
 
 /* define this if you can invert the colours on your LCD */
-//#define HAVE_LCD_INVERT
+#define HAVE_LCD_INVERT
 
 
 /* define this if you have a real-time clock */
