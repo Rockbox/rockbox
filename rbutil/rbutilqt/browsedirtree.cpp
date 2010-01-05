@@ -39,6 +39,7 @@ BrowseDirtree::BrowseDirtree(QWidget *parent, const QString &caption) : QDialog(
     ui.tree->setColumnHidden(2, true);
     ui.tree->setColumnHidden(3, true);
     ui.tree->setAlternatingRowColors(true);
+    ui.tree->setLayoutDirection(Qt::LeftToRight);
 }
 
 
@@ -55,7 +56,6 @@ void BrowseDirtree::setDir(const QDir &dir)
         ui.tree->expand(p);
         ui.tree->scrollTo(p);
         ui.tree->resizeColumnToContents(0);
-        ui.tree->setLayoutDirection(Qt::LeftToRight);
     }
 }
 
