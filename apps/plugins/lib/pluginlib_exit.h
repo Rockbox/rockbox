@@ -29,17 +29,26 @@
 #include <setjmp.h>
 #endif
 
-/* PLUGINLIB_EXIT_INIT needs to be placed as the first line in plugin_start */
-#define PLUGINLIB_EXIT_INIT switch(setjmp(__exit_env))   \
-                            {                            \
-                                case 1:                  \
-                                    return PLUGIN_OK;    \
-                                case 2:                  \
-                                    return PLUGIN_ERROR; \
-                                case 0:                  \
-                                default:                 \
-                                    break;               \
-                            }
+#define _PLUGINLIB_EXIT_INIT(atexit) switch(setjmp(__exit_env))   \
+                                     {                            \
+                                         case 1:                  \
+                                             atexit               \
+                                             return PLUGIN_OK;    \
+                                         case 2:                  \
+                                             atexit               \
+                                             return PLUGIN_ERROR; \
+                                         case 0:                  \
+                                         default:                 \
+                                             break;               \
+                                     }
+
+/* Either PLUGINLIB_EXIT_INIT or PLUGINLIB_EXIT_INIT_ATEXIT needs to be placed
+ * as the first line in plugin_start. The _ATEXIT version will call the named
+ * no-argument function when exit() is called before exiting the plugin, to
+ * allow for cleanup.
+ */
+#define PLUGINLIB_EXIT_INIT _PLUGINLIB_EXIT_INIT()
+#define PLUGINLIB_EXIT_INIT_ATEXIT(atexit) _PLUGINLIB_EXIT_INIT(atexit();)
 
 extern jmp_buf __exit_env;
 #define exit(status) longjmp(__exit_env, status != 0 ? 2 : 1)
