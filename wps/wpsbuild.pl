@@ -439,7 +439,7 @@ while(<WPS>) {
                     last if (-e "$wpsdir/$req_g_wps");
                 }
             }
-            $req_t_wps = $wps_prefix . $req_t . ".wps";
+            $req_t_wps = $wps_prefix . ".txt" . ".wps";
 
             #print "LCD: $wps wants $width x $height\n";
             #print "LCD: is $rwidth x $rheight\n";
