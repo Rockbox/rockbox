@@ -206,7 +206,7 @@ extern bool list_do_action(int context, int timeout,
 struct simplelist_info {
     char *title; /* title to show on the list */
     int  count; /* number of items in the list, each item is selection_size high */
-    char selection_size; /* list selection size, usually 1 */
+    int selection_size; /* list selection size, usually 1 */
     bool hide_selection;
     bool scroll_all;
     int  timeout;
