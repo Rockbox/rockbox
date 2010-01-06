@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: button-e200v2.c 19035 2008-11-07 05:31:05Z jdgordon $
+ * $Id: button-c200v2.c 19035 2008-11-07 05:31:05Z jdgordon $
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Copyright (C) 2006 by Barry Wardell, (C) 2009 by Bertrik Sikken
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,28 +19,19 @@
  *
  ****************************************************************************/
 
+#include "config.h"
 #include "system.h"
 #include "button-target.h"
 #include "button.h"
 #include "backlight.h"
-#include "powermgmt.h"
+#include "dbop-as3525.h"
 
-
-static unsigned short _dbop_din    = 0xFFFF;
-
-/* in the lcd driver */
-extern unsigned short int lcd_dbop_input(void);
+static unsigned short _dbop_din;
 
 static bool hold_button     = false;
 #ifndef BOOTLOADER
 static bool hold_button_old = false;
 #endif
-
-/* for the debug menu */
-unsigned short button_dbop_data(void)
-{
-    return _dbop_din;
-}
 
 void button_init_device(void)
 {
@@ -59,7 +50,7 @@ int button_read_device(void)
 {
     int btn = BUTTON_NONE;
 
-    _dbop_din = lcd_dbop_input();
+    _dbop_din = dbop_read_input();
 
     /* hold button handling */
     hold_button = ((_dbop_din & (1<<12)) == 0);

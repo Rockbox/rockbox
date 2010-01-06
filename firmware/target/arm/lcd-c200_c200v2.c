@@ -25,11 +25,8 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "system.h"
-
 #ifdef SANSA_C200V2
-/* button driver needs to know if a lcd operation is in progress */
-static bool lcd_busy = false;
-static unsigned short dbop_input = 0xFFFF;
+#include "dbop-as3525.h"
 #endif
 
 /* Display status */
@@ -183,45 +180,6 @@ static inline void as3525_dbop_init(void)
     lcd_delay(20);
 }
 
-static unsigned short lcd_dbop_read(void)
-{
-    unsigned int dbop_ctrl_old = DBOP_CTRL;
-    unsigned int dbop_timpol23_old = DBOP_TIMPOL_23;
-    unsigned int value;
-    
-    /* make sure that the DBOP FIFO is empty */
-    while ((DBOP_STAT & (1<<10)) == 0);
-
-    /* write DBOP_DOUT to pre-charge DBOP data lines with a high level */
-    DBOP_TIMPOL_23 = 0xe167e167;    /* no strobe towards lcd */
-    DBOP_CTRL = (1 << 16) |         /* enw=1 (enable write) */
-                (1 << 12);          /* ow=1 (16-bit data width) */
-    DBOP_DOUT = 0xFFFF;             /* all pins high */
-    while ((DBOP_STAT & (1<<10)) == 0);
-
-    /* perform a DBOP read */
-    DBOP_CTRL = (1 << 15) |         /* strd=1 (start read) */
-                (1 << 12) |         /* ow=1 (16-bit data width) */
-                (31 << 0);          /* rs_t=31 (read DBOP at end of cycle) */
-    while ((DBOP_STAT & (1<<16)) == 0);
-    value = DBOP_DIN;
-    
-    /* restore previous values */
-    DBOP_TIMPOL_23 = dbop_timpol23_old;
-    DBOP_CTRL = dbop_ctrl_old;
-    
-    return value;
-}
-
-/* get the DBOP input value, either directly or cached if DBOP is busy */
-unsigned short int lcd_dbop_input(void)
-{
-    if (!lcd_busy) {
-        dbop_input = lcd_dbop_read();
-    }
-    return dbop_input;
-}
-
 #endif
 
 /* LCD init */
@@ -292,13 +250,7 @@ int lcd_default_contrast(void)
 
 void lcd_set_contrast(int val)
 {
-#ifdef SANSA_C200V2
-    lcd_busy = true;
-#endif
     lcd_send_command(R_CONTRAST_CONTROL1, val);
-#ifdef SANSA_C200V2
-    lcd_busy = false;
-#endif
 }
 
 void lcd_set_invert_display(bool yesno)
@@ -313,9 +265,6 @@ void lcd_enable(bool yesno)
     if (yesno == is_lcd_enabled)
         return;
 
-#ifdef SANSA_C200V2
-    lcd_busy = true;
-#endif
     if ((is_lcd_enabled = yesno))
     {
         lcd_send_command(R_STANDBY_OFF, 0);
@@ -326,9 +275,6 @@ void lcd_enable(bool yesno)
     {
         lcd_send_command(R_STANDBY_ON, 0);
     }
-#ifdef SANSA_C200V2
-    lcd_busy = false;
-#endif
 }
 #endif
 
@@ -343,18 +289,12 @@ bool lcd_active(void)
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-#ifdef SANSA_C200V2
-    lcd_busy = true;
-#endif
     lcd_send_command(R_DRIVER_OUTPUT_MODE, yesno ? 0x02 : 0x07);
-#ifdef SANSA_C200V2
-    lcd_busy = false;
-#endif
 }
 
 /*** update functions ***/
 
-#if MEMORYSIZE > 2
+#if MEMORYSIZE > 2  /* not for C200V2 */
 void lcd_yuv_set_options(unsigned options)
 {
     lcd_yuv_options = options;
@@ -450,12 +390,6 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     addr = &lcd_framebuffer[y][x];
 
-#ifdef SANSA_C200V2
-    lcd_busy = true;
-    /* perform a dbop read before doing a potentially lengthy lcd update */
-    dbop_input = lcd_dbop_read();
-#endif
-
     if (width <= 1) {
         /* The X end address must be larger than the X start address, so we
          * switch to vertical mode for single column updates and set the
@@ -476,8 +410,4 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_data(addr, width);
         addr += LCD_WIDTH;
     } while (--height > 0);
-
-#ifdef SANSA_C200V2
-    lcd_busy = false;
-#endif
 }

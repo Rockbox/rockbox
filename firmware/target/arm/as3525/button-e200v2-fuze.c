@@ -20,10 +20,12 @@
  *
  ****************************************************************************/
 
+#include "config.h"
 #include "system.h"
 #include "button.h"
 #include "button-target.h"
 #include "backlight.h"
+#include "dbop-as3525.h"
 
 
 #ifdef SANSA_FUZE
@@ -32,7 +34,6 @@
 #define WHEEL_COUNTER_DIV       4
 #define ACCEL_INCREMENT         2
 #define ACCEL_SHIFT             2
-#define BUTTON_DELAY            60
 #endif
 
 #ifdef SANSA_E200V2
@@ -41,12 +42,6 @@
 #define WHEEL_COUNTER_DIV       2
 #define ACCEL_INCREMENT         3
 #define ACCEL_SHIFT             1
-#define BUTTON_DELAY            20
-
-/* read_missed is true if buttons could not
- * be read (see lcd_button_support) */
-static bool read_missed              = false;
-
 #endif
 
 /* Buttons */
@@ -54,10 +49,6 @@ static bool hold_button     = false;
 #ifndef BOOTLOADER
 static bool hold_button_old = false;
 #endif
-static unsigned short _dbop_din    = BUTTON_NONE;
-
-/* in the lcd driver */
-extern bool lcd_button_support(void);
 
 void button_init_device(void)
 {
@@ -66,10 +57,9 @@ void button_init_device(void)
 }
 
 #if !defined(BOOTLOADER) && defined(HAVE_SCROLLWHEEL)
-static void scrollwheel(unsigned short dbop_din)
+static void scrollwheel(unsigned int wheel_value)
 {
     /* current wheel values, parsed from dbop and the resulting button */
-    unsigned         wheel_value     = 0;
     unsigned         btn             = BUTTON_NONE;
     /* old wheel values */
     static unsigned old_wheel_value = 0;
@@ -111,8 +101,6 @@ static void scrollwheel(unsigned short dbop_din)
         accel  =  counter  = 0;
         return;
     }
-
-    wheel_value = (dbop_din >> 13) & (1<<1|1<<0);
 
     if (old_wheel_value == wheel_tbl[0][wheel_value])
         btn = BUTTON_SCROLL_FWD;
@@ -158,11 +146,7 @@ static void scrollwheel(unsigned short dbop_din)
             last_wheel_post = current_tick;
         }
     }
-    if (accel > 0
-#ifdef SANSA_E200V2
-         && !read_missed /* decrement only if reading buttons was successful */
-#endif         
-        )
+    if (accel > 0)
         accel--;
 
     old_wheel_value = wheel_value;
@@ -174,123 +158,14 @@ bool button_hold(void)
     return hold_button;
 }
 
-static void button_delay(void)
-{
-    int i = BUTTON_DELAY;
-    while(i--) asm volatile ("nop\n");
-}
-
 unsigned short button_read_dbop(void)
 {
-#ifdef SANSA_FUZE
-    /* skip home and power reading if lcd_button_support was blocked,
-     * since the dbop bit 15 is invalid then, and use the old value instead
-     * -20 (arbitary value) indicates valid home&power button read 
-     * (fuze only) */
-    int old_home_power = -20;
-#endif
-    if(!lcd_button_support())
-    {
-#if defined(SANSA_FUZE)
-        old_home_power = (_dbop_din & (1<<15|1<<8));
-#elif defined(SANSA_E200V2)
-        read_missed = true;
-#endif
-    }
-
-#ifdef SANSA_E200V2
-    if (!read_missed)   /* read buttons only if lcd_button_support was not blocked */
-#endif
-    {
-        /* Set up dbop for input */
-        DBOP_CTRL |= (1<<19);                /* Tri-state DBOP on read cycle */
-        DBOP_CTRL &= ~(1<<16);               /* disable output (1:write enabled) */
-        DBOP_TIMPOL_01 = 0xe167e167;         /* Set Timing & Polarity regs 0 & 1 */
-        DBOP_TIMPOL_23 = 0xe167006e;         /* Set Timing & Polarity regs 2 & 3 */
-
-        button_delay();
-        DBOP_CTRL |= (1<<15);                /* start read */
-        while (!(DBOP_STAT & (1<<16)));      /* wait for valid data */
-
-        _dbop_din = DBOP_DIN;                /* Read dbop data*/
-
-        /* Reset dbop for output */
-        DBOP_TIMPOL_01 = 0x6e167;            /* Set Timing & Polarity regs 0 & 1 */
-        DBOP_TIMPOL_23 = 0xa167e06f;         /* Set Timing & Polarity regs 2 & 3 */
-        DBOP_CTRL |= (1<<16);                /* Enable output (0:write disable)  */
-        DBOP_CTRL &= ~(1<<19);               /* Tri-state when no active write */
-    }
-
-#ifdef SANSA_FUZE
-    /* write back old values if blocked */
-    if (old_home_power != -20)
-    {
-        _dbop_din |= old_home_power & 1<<15;
-        _dbop_din &= 0xfeff|(old_home_power & 1<<8);
-    }
-#endif
-
+    unsigned dbop_din = dbop_read_input();
 #if defined(HAVE_SCROLLWHEEL) && !defined(BOOTLOADER)
-    /* read wheel on bit 13 & 14, but sent to the button queue seperately */
-        scrollwheel(_dbop_din);
+    /* scroll wheel handling */
+    scrollwheel((dbop_din >> 13) & (1<<1|1<<0));
 #endif
-
-#ifdef SANSA_E200V2
-    read_missed = false;
-#endif
-
-    return _dbop_din;
-}
-
-/* for the debug menu */
-unsigned short button_dbop_data(void)
-{
-    return _dbop_din;
-}
-
-static int button_gpio(void)
-{
-    int btn = BUTTON_NONE;
-    if(hold_button)
-        return btn;
-
-    /* disable DBOP output while changing GPIO pins that share lines with it */
-    DBOP_CTRL &= ~(1<<16);
-    button_delay();
-    
-    /* set afsel, so that we can read our buttons */
-    GPIOC_AFSEL &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);
-    /* set dir so we can read our buttons (but reset the C pins first) */
-    GPIOB_DIR &= ~(1<<4);
-    GPIOC_DIR |= (1<<2|1<<3|1<<4|1<<5|1<<6);
-    GPIOC_PIN(2) = (1<<2);
-    GPIOC_PIN(3) = (1<<3);
-    GPIOC_PIN(4) = (1<<4);
-    GPIOC_PIN(5) = (1<<5);
-    GPIOC_PIN(6) = (1<<6);
-
-    GPIOC_DIR &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);
-
-    /* small delay needed to read buttons correctly */
-    button_delay();
-
-    /* direct GPIO connections */
-    if (!GPIOC_PIN(3))
-        btn |= BUTTON_LEFT;
-    if (!GPIOC_PIN(2))
-        btn |= BUTTON_UP;
-    if (!GPIOC_PIN(6))
-        btn |= BUTTON_DOWN;
-    if (!GPIOC_PIN(5))
-        btn |= BUTTON_RIGHT;
-    if (!GPIOC_PIN(4))
-        btn |= BUTTON_SELECT;
-    /* return to settings needed for lcd */
-    GPIOC_DIR |= (1<<2|1<<3|1<<4|1<<5|1<<6);
-    GPIOC_AFSEL |= (1<<2|1<<3|1<<4|1<<5|1<<6);
-    
-    DBOP_CTRL |= (1<<16);               /* enable output again */
-    return btn;
+    return dbop_din;
 }
 
 /*
@@ -298,43 +173,16 @@ static int button_gpio(void)
  */
 int button_read_device(void)
 {
-    int btn = BUTTON_NONE;
-    unsigned short dbop = button_read_dbop();
 #ifdef SANSA_FUZE
     static unsigned power_counter = 0;
 #endif
-    /* hold button */
-    if(dbop & (1<<12))
-    {
-#ifdef SANSA_FUZE
-        power_counter = HZ;
-#endif
-        hold_button = true;
-    }
-    else
-    {
-        hold_button = false;
-#ifdef SANSA_FUZE
-    /* read power on bit 8, but not if hold button was just released, since
-     * you basically always hit power due to the slider mechanism after releasing
-     * (fuze only)
-     * hold (wait 1 sec) */
-        if (power_counter)
-            power_counter--;
-#endif
-        if (dbop & (1<<8)
-#ifdef SANSA_FUZE
-            && !power_counter
-#endif
-            )
-            btn |= BUTTON_POWER;
-    /* read home on bit 15 */
-        if (!(dbop & (1<<15)))
-            btn |= DBOP_BIT15_BUTTON;
+    unsigned short dbop_din;
+    int btn = BUTTON_NONE;
 
-        btn |= button_gpio();
-    }
+    dbop_din = button_read_dbop();
 
+    /* hold button handling */
+    hold_button = ((dbop_din & (1<<12)) != 0);
 #ifndef BOOTLOADER
     /* light handling */
     if (hold_button != hold_button_old)
@@ -343,6 +191,40 @@ int button_read_device(void)
         backlight_hold_changed(hold_button);
     }
 #endif /* BOOTLOADER */
+    if (hold_button) {
+#ifdef SANSA_FUZE
+        power_counter = HZ;
+#endif
+        return 0;
+    }
+
+    /* push button handling */
+    if ((dbop_din & (1 << 2)) == 0)
+        btn |= BUTTON_UP;
+    if ((dbop_din & (1 << 3)) == 0)
+        btn |= BUTTON_LEFT;
+    if ((dbop_din & (1 << 4)) == 0)
+        btn |= BUTTON_SELECT;
+    if ((dbop_din & (1 << 5)) == 0)
+        btn |= BUTTON_RIGHT;
+    if ((dbop_din & (1 << 6)) == 0)
+        btn |= BUTTON_DOWN;
+    if ((dbop_din & (1 << 8)) != 0)
+        btn |= BUTTON_POWER;
+    if ((dbop_din & (1 << 15)) == 0)
+        btn |= DBOP_BIT15_BUTTON;
+
+#ifdef SANSA_FUZE
+    /* read power on bit 8, but not if hold button was just released, since
+     * you basically always hit power due to the slider mechanism after releasing
+     * (fuze only)
+     */
+    if (power_counter > 0) {
+            power_counter--;
+        btn &= ~BUTTON_POWER;
+    }
+#endif
 
     return btn;
 }
+

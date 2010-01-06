@@ -28,6 +28,7 @@
 #include "debug.h"
 #include "system.h"
 #include "clock-target.h"
+#include "dbop-as3525.h"
 
 /* The controller is unknown, but some registers appear to be the same as the
    HD66789R */
@@ -92,7 +93,6 @@ static unsigned short r_entry_mode = R_ENTRY_MODE_HORZ_NORMAL;
 static unsigned short r_disp_control_rev = R_DISP_CONTROL_NORMAL;
 
 static const int xoffset = 20;
-static volatile bool lcd_busy = false;
 
 static inline void lcd_delay(int x)
 {
@@ -379,8 +379,6 @@ void lcd_blit_yuv(unsigned char * const src[3],
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
     yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
 
-    lcd_busy = true;
-
 #ifdef HAVE_LCD_FLIP
     lcd_write_reg(R_ENTRY_MODE,
         display_flipped ? R_ENTRY_MODE_VIDEO_FLIPPED : R_ENTRY_MODE_VIDEO_NORMAL
@@ -423,8 +421,6 @@ void lcd_blit_yuv(unsigned char * const src[3],
         }
         while (--height > 0);
     }
-
-    lcd_busy = false;
 }
 
 /* Update the display.
@@ -434,8 +430,6 @@ void lcd_update(void)
     if (!display_on)
         return;
 
-    lcd_busy = true;
-
     lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
 
     lcd_window_x(0, LCD_WIDTH - 1);
@@ -444,8 +438,6 @@ void lcd_update(void)
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
     lcd_write_data((fb_data*)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
-
-    lcd_busy = false;
 }
 
 /* Update a fraction of the display. */
@@ -475,8 +467,6 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (y >= ymax)
         return; /* nothing left to do */
 
-    lcd_busy = true;
-
     lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
 
     lcd_window_x(x, xmax);
@@ -493,26 +483,4 @@ void lcd_update_rect(int x, int y, int width, int height)
         ptr += LCD_WIDTH;
     }
     while (--height >= 0);
-
-    lcd_busy = false;
-}
-
-/* writes one red pixel outside the visible area, needed for correct
- * dbop reads */
-bool lcd_button_support(void)
-{
-    if (lcd_busy)
-        return false;
-
-    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
-
-    /* Set start position and window */
-    lcd_window_x(-1, 0);
-    lcd_window_y(-1, 0);
-
-    lcd_write_cmd(R_WRITE_DATA_2_GRAM);
-
-    lcd_write_value16(0xf<<12);
-
-    return true;
 }
