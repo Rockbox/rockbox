@@ -39,6 +39,7 @@
 #include "plugin.h"
 #include "playback.h"
 #include "cuesheet.h"
+#include "gui/wps.h"
 
 #define CUE_DIR ROCKBOX_DIR "/cue"
 
@@ -328,7 +329,18 @@ bool curr_cuesheet_skip(struct cuesheet *cue, int direction, unsigned long curr_
     else
     {
         if (!(direction <= 0 && track == 0))
-            track += direction;
+        {
+            /* If skipping forward, skip to next cuesheet segment. If skipping
+            backward before DEFAULT_SKIP_TRESH milliseconds have elapsed, skip
+            to previous cuesheet segment. If skipping backward after
+            DEFAULT_SKIP_TRESH seconds have elapsed, skip to the start of the
+            current cuesheet segment */
+            if (direction == 1 || 
+                  ((curr_pos - cue->tracks[track].offset) < DEFAULT_SKIP_TRESH))
+            {
+                track += direction;
+            }
+        }
 
         seek(cue->tracks[track].offset);
         return true;
