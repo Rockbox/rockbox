@@ -19,5 +19,17 @@
  *
  ****************************************************************************/
 
+
+#ifndef __DBOP_AS3525_H__
+#define __DBOP_AS3525_H__
+#include <inttypes.h>
 unsigned short int  dbop_read_input(void);
 unsigned short      dbop_debug(void);
+
+/*
+ * Write any data to dbop
+ * switches to 32bit transfers if possible,
+ * for best performance pre-align count and data
+ **/
+void dbop_write_data(const int16_t *data, int count);
+#endif

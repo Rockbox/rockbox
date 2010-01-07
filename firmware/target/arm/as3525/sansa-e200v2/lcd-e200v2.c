@@ -120,19 +120,11 @@ static void as3525_dbop_init(void)
     /* TODO: The OF calls some other functions here, but maybe not important */
 }
 
-static void lcd_write_value16(unsigned short value)
-{
-    DBOP_CTRL &= ~(1<<14|1<<13);
-    lcd_delay(10);
-    DBOP_DOUT16 = value;
-    while ((DBOP_STAT & (1<<10)) == 0);
-}
-
-static void lcd_write_cmd(int cmd)
+static void lcd_write_cmd(short cmd)
 {
     /* Write register */
     DBOP_TIMPOL_23 = 0xa167006e;
-    lcd_write_value16(cmd);
+    dbop_write_data(&cmd, 1);
 
     /* Wait for fifo to empty */
     while ((DBOP_STAT & (1<<10)) == 0);
@@ -144,43 +136,13 @@ static void lcd_write_cmd(int cmd)
     DBOP_TIMPOL_23 = 0xa167e06f;
 }
 
-void lcd_write_data(const fb_data* p_bytes, int count)
-{
-    const long *data;
-    if ((int)p_bytes & 0x3)
-    {   /* need to do a single 16bit write beforehand if the address is
-         * not word aligned */
-        lcd_write_value16(*p_bytes);
-        count--;p_bytes++;
-    }
-    /* from here, 32bit transfers are save
-     * set it to transfer 4*(outputwidth) units at a time,
-     * if bit 12 is set it only does 2 halfwords though */
-    DBOP_CTRL |= (1<<13|1<<14);
-    data = (long*)p_bytes;
-    while (count > 1)
-    {
-        DBOP_DOUT32 = *data++;
-        count -= 2;
-
-        /* Wait if push fifo is full */
-        while ((DBOP_STAT & (1<<6)) != 0);
-    }
-    /* While push fifo is not empty */
-    while ((DBOP_STAT & (1<<10)) == 0);
-
-    /* due to the 32bit alignment requirement or uneven count,
-     * we possibly need to do a 16bit transfer at the end also */
-    if (count > 0)
-        lcd_write_value16(*(fb_data*)data);
-}
 
 static void lcd_write_reg(int reg, int value)
 {
-    fb_data data = value;
+    unsigned short data = value;
 
     lcd_write_cmd(reg);
-    lcd_write_value16(data);
+    dbop_write_data(&data, 1);
 }
 
 /*** hardware configuration ***/
@@ -486,7 +448,7 @@ void lcd_update(void)
 
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
-    lcd_write_data((fb_data*)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
+    dbop_write_data((fb_data*)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
 }
 
 /* Update a fraction of the display. */
@@ -526,7 +488,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     do
     {
-        lcd_write_data(ptr, width);
+        dbop_write_data(ptr, width);
         ptr += LCD_WIDTH;
     }
     while (--height > 0);
