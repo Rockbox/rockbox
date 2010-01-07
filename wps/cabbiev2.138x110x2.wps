@@ -11,7 +11,7 @@
 %xl|E|repeat-160x128x2.bmp|102|97|4|
 %xl|F|playmode-160x128x2.bmp|123|98|5|
 %ax%Cl|5|15|s55|s55|
-%ax%pb|pb-138x110x2.bmp|2|75|134|6|
+%pb|pb-138x110x2.bmp|2|75|134|6|
 #images
 %?mh<%xdAa|%xdAb>
 %?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
@@ -36,4 +36,4 @@
 %s%ac%?It<%It|%Fn>
 
 %V|2|82|134|13|1|-|-|
-%aL%pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%aR%pr
+%al%pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr
