@@ -153,7 +153,8 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         else
             vp.x += list_text_vp->width;
         display->set_viewport(&vp);
-        gui_scrollbar_draw(display, VP_IS_RTL(&vp) ? 1 : 0, 0, SCROLLBAR_WIDTH-1, vp.height,
+        gui_scrollbar_draw(display,
+                (scrollbar_in_left? 0: 1), 0, SCROLLBAR_WIDTH-1, vp.height,
                 list->nb_items, list_start_item, list_start_item + end-start,
                 VERTICAL);
     }
