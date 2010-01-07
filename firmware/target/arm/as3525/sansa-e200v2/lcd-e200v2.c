@@ -493,41 +493,41 @@ void lcd_update(void)
 void lcd_update_rect(int x, int y, int width, int height)
 {
     const fb_data *ptr;
-    int xmax, ymax;
 
     if (!display_on)
         return;
 
-    xmax = x + width;
-    if (xmax >= LCD_WIDTH)
-        xmax = LCD_WIDTH - 1; /* Clip right */
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || 
+        (y >= LCD_HEIGHT) || (x + width <= 0) || (y + height <= 0))
+        return;
+
     if (x < 0)
-        x = 0;                /* Clip left */
-    if (x >= xmax)
-        return; /* nothing left to do */
-
-    width = xmax - x + 1;     /* Fix width */
-
-    ymax = y + height;
-    if (ymax >= LCD_HEIGHT)
-        ymax = LCD_HEIGHT - 1; /* Clip bottom */
+    {   /* clip left */
+        width += x;
+        x = 0;
+    }
     if (y < 0)
-        y = 0; /* Clip top */
-    if (y >= ymax)
-        return; /* nothing left to do */
+    {   /* clip top */
+        height += y;
+        y = 0;
+    }
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x; /* clip right */
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y; /* clip bottom */
 
     lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
 
-    lcd_window(x, y, xmax, ymax);
+    lcd_window(x, y, x+width-1, y+height-1);
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
     ptr = &lcd_framebuffer[y][x];
 
-    height = ymax - y; /* fix height */
     do
     {
         lcd_write_data(ptr, width);
         ptr += LCD_WIDTH;
     }
-    while (--height >= 0);
+    while (--height > 0);
 }
