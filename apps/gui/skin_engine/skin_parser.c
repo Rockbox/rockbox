@@ -36,6 +36,7 @@
 #include "action.h"
 #include "checkwps.h"
 #include "audio.h"
+#define lang_is_rtl() (false)
 #define DEBUGF printf
 #endif /*WPSEDITOR*/
 #else
