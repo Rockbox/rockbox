@@ -9,8 +9,8 @@
 %xl|D|shuffle-128x128x16.bmp|74|110|
 %xl|E|repeat-128x128x16.bmp|97|110|4|
 %xl|F|playmode-128x128x16.bmp|111|110|5|
-%Cl|4|12|s60|s60|
-%pb|pb-128x128x16.bmp|3|87|122|6|
+%ax%Cl|4|12|s60|s60|
+%ax%pb|pb-128x128x16.bmp|3|87|122|6|
 # images all in the default viewport
 %?mh<%xdAa|%xdAb>
 %?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
@@ -23,7 +23,7 @@
 
 
 #NowPlaying - with AA
-%Vl|a|70|12|-|50|1|-|-|
+%ax%Vl|a|70|12|-|50|1|-|-|
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?d2<%d2|(root)>>
 %s%al%?id<%id|%?d1<%d1|(root)>>
@@ -40,4 +40,4 @@
 %V|3|70|122|18|1|-|-|
 %s%ac%Sx|Next:|%?It<%It|%Fn>
 
-%al%pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr
+%aL%pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%aR%pr

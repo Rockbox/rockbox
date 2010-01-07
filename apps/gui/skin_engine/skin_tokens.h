@@ -38,8 +38,10 @@ enum wps_token_type {
 
     /* Alignment */
     WPS_TOKEN_ALIGN_LEFT,
+    WPS_TOKEN_ALIGN_LEFT_RTL,
     WPS_TOKEN_ALIGN_CENTER,
     WPS_TOKEN_ALIGN_RIGHT,
+    WPS_TOKEN_ALIGN_RIGHT_RTL,
 
     /* Sublines */
     WPS_TOKEN_SUBLINE_TIMEOUT,

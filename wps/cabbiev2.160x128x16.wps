@@ -9,8 +9,8 @@
 %xl|D|shuffle-160x128x16.bmp|104|116|
 %xl|E|repeat-160x128x16.bmp|125|112|4|
 %xl|F|playmode-160x128x16.bmp|142|114|5|
-%Cl|7|16|c65|c65|
-%pb|pb-160x128x16.bmp|6|86|149|8|
+%ax%Cl|7|16|c65|c65|
+%ax%pb|pb-160x128x16.bmp|6|86|149|8|
 %?mh<%xdAa|%xdAb>
 %?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
 %?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
@@ -20,7 +20,7 @@
 %?C<%C%Vda|%Vdb>
 
 # NowPlaying - AA
-%Vl|a|77|10|-|75|1|-|-|
+%ax%Vl|a|77|10|-|75|1|-|-|
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?d2<%d2|(root)>>
 %s%al%?id<%id|%?d1<%d1|(root)>>
@@ -38,5 +38,5 @@
 %s%?It<%It|%Fn>
 
 %V|6|96|149|10|1|-|-|
-%al%pc%ac%pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr%ar%pr
+%aL%pc%ac%pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr%aR%pr
 

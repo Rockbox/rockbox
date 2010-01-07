@@ -99,6 +99,7 @@ struct progressbar {
     short y;
     short width;
     short height;
+    bool  follow_lang_direction;
     /*progressbar image*/
     struct bitmap bm;
     bool have_bitmap_pb;

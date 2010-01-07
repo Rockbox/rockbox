@@ -31,6 +31,7 @@
 #endif
 #include "abrepeat.h"
 #include "lang.h"
+#include "language.h"
 #include "statusbar.h"
 #include "scrollbar.h"
 #include "screen_access.h"
@@ -528,8 +529,10 @@ static bool get_line(struct gui_wps *gwps,
 #endif
 
             case WPS_TOKEN_ALIGN_LEFT:
+            case WPS_TOKEN_ALIGN_LEFT_RTL:
             case WPS_TOKEN_ALIGN_CENTER:
             case WPS_TOKEN_ALIGN_RIGHT:
+            case WPS_TOKEN_ALIGN_RIGHT_RTL:
                 /* remember where the current aligned text started */
                 switch (cur_align)
                 {
@@ -551,11 +554,19 @@ static bool get_line(struct gui_wps *gwps,
                     case WPS_TOKEN_ALIGN_LEFT:
                         cur_align = WPS_ALIGN_LEFT;
                         break;
+                    case WPS_TOKEN_ALIGN_LEFT_RTL:
+                        cur_align = lang_is_rtl() ? WPS_ALIGN_RIGHT :
+                            WPS_ALIGN_LEFT;
+                        break;
                     case WPS_TOKEN_ALIGN_CENTER:
                         cur_align = WPS_ALIGN_CENTER;
                         break;
                     case WPS_TOKEN_ALIGN_RIGHT:
                         cur_align = WPS_ALIGN_RIGHT;
+                        break;
+                    case WPS_TOKEN_ALIGN_RIGHT_RTL:
+                        cur_align = lang_is_rtl() ? WPS_ALIGN_LEFT :
+                            WPS_ALIGN_RIGHT;
                         break;
                     default:
                         break;

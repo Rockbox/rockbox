@@ -548,6 +548,7 @@ int ft_enter(struct tree_context* c)
                         MAX_FILENAME);
                 talk_init(); /* use voice of same language */
                 viewportmanager_theme_changed(THEME_LANGUAGE);
+                settings_apply_skins();
                 splash(HZ, ID2P(LANG_LANGUAGE_LOADED));
                 break;
 

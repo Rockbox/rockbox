@@ -89,6 +89,8 @@ static struct skin_viewport *curr_vp;
 /* the current line, linked to the above viewport */
 static struct skin_line *curr_line;
 
+static int follow_lang_direction = 0;
+
 #ifdef HAVE_LCD_BITMAP
 
 #if LCD_DEPTH > 1
@@ -140,6 +142,19 @@ static int parse_dir_level(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_setting_and_lang(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
+        
+        
+int parse_languagedirection(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data)
+{
+    (void)wps_bufptr;
+    (void)token;
+    (void)wps_data;
+    follow_lang_direction = 2; /* 2 because it is decremented immediatly after 
+                                  this token is parsed, after the next token it 
+                                  will be 0 again. */
+    return 0;
+}
 
 #ifdef HAVE_LCD_BITMAP
 static int parse_viewport_display(const char *wps_bufptr,
@@ -189,7 +204,10 @@ static const struct wps_tag all_tags[] = {
 
     { WPS_TOKEN_ALIGN_CENTER,             "ac",  0,                   NULL },
     { WPS_TOKEN_ALIGN_LEFT,               "al",  0,                   NULL },
+    { WPS_TOKEN_ALIGN_LEFT_RTL,           "aL",  0,                   NULL },
     { WPS_TOKEN_ALIGN_RIGHT,              "ar",  0,                   NULL },
+    { WPS_TOKEN_ALIGN_RIGHT_RTL,          "aR",  0,                   NULL },
+    { WPS_NO_TOKEN,                       "ax",  0,   parse_languagedirection },
 
     { WPS_TOKEN_BATTERY_PERCENT,          "bl",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_BATTERY_VOLTS,            "bv",  WPS_REFRESH_DYNAMIC, NULL },
@@ -748,14 +766,21 @@ static int parse_viewport(const char *wps_bufptr,
     ptr++;
     struct viewport *vp = &skin_vp->vp;
     /* format: %V|x|y|width|height|font|fg_pattern|bg_pattern| */
-
     if (!(ptr = viewport_parse_viewport(vp, curr_screen, ptr, '|')))
         return WPS_ERROR_INVALID_PARAM;
-
-    vp->flags &= ~VP_FLAG_ALIGN_RIGHT; /* ignore right-to-left languages */
+        
     /* Check for trailing | */
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
+
+    if (follow_lang_direction && lang_is_rtl())
+    {
+        vp->flags |= VP_FLAG_ALIGN_RIGHT;
+        vp->x = screens[curr_screen].lcdwidth - vp->width - vp->x;
+    }
+    else
+        vp->flags &= ~VP_FLAG_ALIGN_RIGHT; /* ignore right-to-left languages */
+
 
 
     struct skin_token_list *list = new_skin_token_list_item(NULL, skin_vp);
@@ -954,6 +979,7 @@ static int parse_progressbar(const char *wps_bufptr,
     }
     pb->have_bitmap_pb = false;
     pb->bm.data = NULL; /* no bitmap specified */
+    pb->follow_lang_direction = follow_lang_direction > 0;
 
     if (*wps_bufptr != '|') /* regular old style */
     {
@@ -1041,6 +1067,7 @@ static int parse_albumart_load(const char *wps_bufptr,
     bool parsing;
     struct dim dimensions;
     int albumart_slot;
+    bool swap_for_rtl = lang_is_rtl() && follow_lang_direction;
     struct skin_albumart *aa = skin_buffer_alloc(sizeof(struct skin_albumart));
     (void)token; /* silence warning */
     if (!aa)
@@ -1085,7 +1112,10 @@ static int parse_albumart_load(const char *wps_bufptr,
             case 'l':
             case 'L':
             case '+':
-                aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
+                if (swap_for_rtl)
+                    aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
+                else
+                    aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
                 break;
             case 'c':
             case 'C':
@@ -1094,7 +1124,10 @@ static int parse_albumart_load(const char *wps_bufptr,
             case 'r':
             case 'R':
             case '-':
-                aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
+                if (swap_for_rtl)
+                    aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
+                else
+                    aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
                 break;
             case 'd':
             case 'D':
@@ -1168,6 +1201,9 @@ static int parse_albumart_load(const char *wps_bufptr,
         aa->height = 0;
     else if (aa->height > LCD_HEIGHT)
         aa->height = LCD_HEIGHT;
+        
+    if (swap_for_rtl)
+        aa->x = LCD_WIDTH - (aa->x + aa->width);
 
     aa->state = WPS_ALBUMART_LOAD;
     aa->draw = false;
@@ -1500,6 +1536,8 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
 
     while (*wps_bufptr && !fail)
     {
+        if (follow_lang_direction)
+            follow_lang_direction--;
         /* first make sure there is enough room for tokens */
         if (max_tokens <= data->num_tokens + 5)
         {

@@ -8,8 +8,8 @@
 %xl|D|shuffle-132x80x16.bmp|86|69|
 %xl|E|repeat-132x80x16.bmp|105|67|4|
 %xl|F|playmode-132x80x16.bmp|118|67|5|
-%Cl|3|14|c40|c40|
-%pb|pb-132x80x16.bmp|2|58|127|6|
+%ax%Cl|3|14|c40|c40|
+%ax%pb|pb-132x80x16.bmp|2|58|127|6|
 %?C<%C%Vda|%Vdb>
 
 #Images
@@ -21,7 +21,7 @@
 %?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
 
 #NowPlaying - aa
-%Vl|a|48|10|-|48|1|-|-|
+%ax%Vl|a|48|10|-|48|1|-|-|
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?d2<%d2|(root)>>
 %s%al%?id<%id|%?d1<%d1|(root)>>

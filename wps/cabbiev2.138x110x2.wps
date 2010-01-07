@@ -10,8 +10,8 @@
 %xl|D|shuffle-160x128x2.bmp|78|97|
 %xl|E|repeat-160x128x2.bmp|102|97|4|
 %xl|F|playmode-160x128x2.bmp|123|98|5|
-%Cl|5|15|s55|s55|
-%pb|pb-138x110x2.bmp|2|75|134|6|
+%ax%Cl|5|15|s55|s55|
+%ax%pb|pb-138x110x2.bmp|2|75|134|6|
 #images
 %?mh<%xdAa|%xdAb>
 %?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
@@ -21,7 +21,7 @@
 %?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
 %?C<%C%Vda|%Vdb>
 
-%Vl|a|65|10|-|60|1|-|-|
+%ax%Vl|a|65|10|-|60|1|-|-|
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?d2<%d2|(root)>>
 %s%al%?id<%id|%?d1<%d1|(root)>>
@@ -36,4 +36,4 @@
 %s%ac%?It<%It|%Fn>
 
 %V|2|82|134|13|1|-|-|
-%al%pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr
+%aL%pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%aR%pr
