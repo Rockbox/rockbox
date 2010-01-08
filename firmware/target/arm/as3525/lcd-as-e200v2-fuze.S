@@ -51,14 +51,19 @@ lcd_write_yuv420_lines:
                                         @ r0 = yuv_src
                                         @ r1 = width
                                         @ r2 = stride
-    stmfd       sp!, { r4-r10, lr }     @ save non-scratch
+    stmfd       sp!, { r4-r11, lr }     @ save non-scratch
+
+    mov         r3, #0xC8000000         @
+    orr         r3, r3, #0x120000       @ r3 = DBOP_BASE
+
     ldmia       r0, { r4, r5, r6 }      @ r4 = yuv_src[0] = Y'_p
                                         @ r5 = yuv_src[1] = Cb_p
                                         @ r6 = yuv_src[2] = Cr_p
                                         @ r0 = scratch
-    sub         r2, r2, #1              @
-    mov         r3, #0xC8000000         @
-    orr         r3, r3, #0x120000       @ r3 = DBOP_BASE
+    ldr         r12, [r3, #8]           @
+    sub         r2, r2, #1              @ stride -= 1
+    orr         r12, r12, #3<<13        @
+    str         r12, [r3, #8]           @ DBOP_CTRL |= (1<<13|1<<14) (32bit mode)
 10: @ loop line                         @
     ldrb        r7, [r4], #1            @ r7 = *Y'_p++;
     ldrb        r8, [r5], #1            @ r8 = *Cb_p++;
@@ -109,12 +114,7 @@ lcd_write_yuv420_lines:
     ldrb        r12, [r4, r2]           @ r12 = Y' = *(Y'_p + stride)
                                         @
     orr         r0, r0, lr, lsl #11     @ r0 = (r << 11) | b
-    orr         r0, r0, r7, lsl #5      @ r0 = (r << 11) | (g << 5) | b
-    strh        r0, [r3, #0x10]         @ write pixel
-1: @ busy                               @
-    ldr         r7, [r3,#0xc]           @ r7 = DBOP_STATUS
-    tst         r7, #DBOP_BUSY          @ fifo not empty?
-    beq         1b                      @
+    orr         r11, r0, r7, lsl #5      @ r0 = (r << 11) | (g << 5) | b
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*74
     add         r12, r7, r7, asl #2     @
@@ -143,11 +143,8 @@ lcd_write_yuv420_lines:
                                         @
     orr         r0, r0, lr, lsl #11     @ r0 = (r << 11) | b
     orr         r0, r0, r7, lsl #5      @ r0 = (r << 11) | (g << 5) | b
-    strh        r0, [r3, #0x10]         @ write pixel
-1: @ busy                               @
-    ldr         r7, [r3,#0xc]           @ r7 = DBOP_STATUS
-    tst         r7, #DBOP_BUSY          @ fifo not empty?
-    beq         1b                      @
+    orr         r0, r11, r0, lsl#16     @ pack with 2nd pixel
+    str         r0, [r3, #0x10]         @ write pixel
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*74
     add         r12, r7, r7, asl #2     @
@@ -176,12 +173,7 @@ lcd_write_yuv420_lines:
                                         @
                                         @
     orr         r0, r0, lr, lsl #11     @ r0 = (r << 11) | b
-    orr         r0, r0, r7, lsl #5      @ r0 = (r << 11) | (g << 5) | b
-    strh        r0, [r3, #0x10]         @ write pixel
-1: @ busy                               @
-    ldr         r7, [r3,#0xc]           @ r7 = DBOP_STATUS
-    tst         r7, #DBOP_BUSY          @ fifo not empty?
-    beq         1b                      @
+    orr         r11, r0, r7, lsl #5      @ r0 = (r << 11) | (g << 5) | b
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*74
     add         r12, r7, r7, asl #2     @
@@ -208,16 +200,20 @@ lcd_write_yuv420_lines:
                                         @
     orr         r0, r0, lr, lsl #11     @ r0 = (r << 11) | b
     orr         r0, r0, r7, lsl #5      @ r0 = (r << 11) | (g << 5) | b
-    strh        r0, [r3, #0x10]         @ write pixel
-1: @ busy                               @
-    ldr         r7, [r3,#0xc]           @ r7 = DBOP_STATUS
-    tst         r7, #DBOP_BUSY          @ fifo not empty?
-    beq         1b                      @
+    orr         r0, r11, r0, lsl#16     @ pack with 2nd pixel
+    str         r0, [r3, #0x10]         @ write pixel
                                         @
     subs        r1, r1, #2              @ subtract block from width
     bgt         10b @ loop line         @
                                         @
-    ldmfd       sp!, { r4-r10, pc }     @ restore registers and return
+1: @ busy
+    @ writing at max 110*32 its (LCD_WIDTH/2), the fifo is bigger
+    @ so polling fifo empty after the loops is save
+    ldr         r7, [r3,#0xc]           @ r7 = DBOP_STATUS
+    tst         r7, #DBOP_BUSY          @ fifo not empty?
+    beq         1b                      @
+
+    ldmfd       sp!, { r4-r11, pc }     @ restore registers and return
     bx          lr                      @
     .ltorg                              @ dump constant pool
     .size   lcd_write_yuv420_lines, .-lcd_write_yuv420_lines
@@ -263,13 +259,18 @@ lcd_write_yuv420_lines_odither:
                                         @ r5 = yuv_src[1] = Cb_p
                                         @ r6 = yuv_src[2] = Cr_p
                                         @
-    sub         r2, r2, #1              @
     ldr         r14, [sp, #40]          @ Line up pattern and kernel quadrant
+    sub         r2, r2, #1              @ stride =- 1
     eor         r14, r14, r3            @
     and         r14, r14, #0x2          @
     mov         r14, r14, lsl #6        @ 0x00 or 0x80
+
     mov         r3, #0xC8000000         @
-    orr         r3, r3, #0x120000       @ r3 = DBOP_BASE
+    orr         r3, r3, #0x120000       @ r3 = DBOP_BASE, need to be redone
+                                        @ due to lack of registers
+    ldr         r12, [r3, #8]           @
+    orr         r12, r12, #3<<13        @ DBOP_CTRL |= (1<<13|1<<14) 
+    str         r12, [r3, #8]           @ (32bit mode)
 10: @ loop line                         @
                                         @
     ldrb        r7, [r4], #1            @ r7 = *Y'_p++;
@@ -339,13 +340,8 @@ lcd_write_yuv420_lines_odither:
     and         r11, r11, #0xf800       @ pack pixel
     and         r7, r7, #0x7e00         @ r0 = pixel = (r & 0xf800) |
     orr         r11, r11, r7, lsr #4    @              ((g & 0x7e00) >> 4) |
-    orr         r0, r11, r0, lsr #10    @              (b >> 10)
-    strh        r0, [r3, #0x10]         @ write pixel
-1: @ busy                               @
-    ldr         r7, [r3,#0xc]           @ r7 = DBOP_STATUS
-    tst         r7, #DBOP_BUSY          @ fifo not empty?
-    beq         1b                      @
-                                        @
+    orr         r3, r11, r0, lsr #10    @              (b >> 10)
+                                        @ save pixel
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*149
     add         r12, r7, r7, asl #2     @
     add         r12, r12, r12, asl #4   @
@@ -389,11 +385,11 @@ lcd_write_yuv420_lines_odither:
     and         r7, r7, #0x7e00         @ r0 = pixel = (r & 0xf800) |
     orr         r11, r11, r7, lsr #4    @              ((g & 0x7e00) >> 4) |
     orr         r0, r11, r0, lsr #10    @              (b >> 10)
-    strh        r0, [r3, #0x10]         @ write pixel
-1: @ busy                               @
-    ldr         r7, [r3,#0xc]           @ r7 = DBOP_STATUS
-    tst         r7, #DBOP_BUSY          @ fifo not empty?
-    beq         1b                      @
+    orr         r3, r3, r0, lsl#16      @ pack with 2nd pixel
+    mov         r0, #0xC8000000         @
+    orr         r0, r0, #0x120000       @ r3 = DBOP_BASE
+
+    str         r3, [r0, #0x10]         @ write pixel
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*149
     add         r12, r7, r7, asl #2     @
@@ -439,12 +435,8 @@ lcd_write_yuv420_lines_odither:
     and         r11, r11, #0xf800       @ pack pixel
     and         r7, r7, #0x7e00         @ r0 = pixel = (r & 0xf800) |
     orr         r11, r11, r7, lsr #4    @              ((g & 0x7e00) >> 4) |
-    orr         r0, r11, r0, lsr #10    @              (b >> 10)
-    strh        r0, [r3, #0x10]         @ write pixel
-1: @ busy                               @
-    ldr         r7, [r3,#0xc]           @ r7 = DBOP_STATUS
-    tst         r7, #DBOP_BUSY          @ fifo not empty?
-    beq         1b                      @
+    orr         r3, r11, r0, lsr #10    @              (b >> 10)
+                                        @ save pixel
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*149
     add         r12, r7, r7, asl #2     @
@@ -487,15 +479,22 @@ lcd_write_yuv420_lines_odither:
     and         r7, r7, #0x7e00         @ r0 = pixel = (r & 0xf800) |
     orr         r11, r11, r7, lsr #4    @              ((g & 0x7e00) >> 4) |
     orr         r0, r11, r0, lsr #10    @              (b >> 10)
-    strh        r0, [r3, #0x10]         @ write pixel
-1: @ busy                               @
-    ldr         r7, [r3,#0xc]           @ r7 = DBOP_STATUS
-    tst         r7, #DBOP_BUSY          @ fifo not empty?
-    beq         1b                      @
+    orr         r3, r3, r0, lsl#16      @ pack with 2nd pixel
+    mov         r0, #0xC8000000         @
+    orr         r0, r0, #0x120000       @ r3 = DBOP_BASE
+
+    str         r3, [r0, #0x10]         @ write pixel
                                         @
     subs        r1, r1, #2              @ subtract block from width
     bgt         10b @ loop line         @
                                         @
+1: @ busy                               @
+    @ writing at max 110*32 its (LCD_WIDTH/2), the fifo is bigger
+    @ so polling fifo empty after the loops is save
+    ldr         r7, [r0,#0xc]           @ r7 = DBOP_STATUS
+    tst         r7, #DBOP_BUSY          @ fifo not empty?
+    beq         1b                      @
+
     ldmfd       sp!, { r4-r11, pc }     @ restore registers and return
     .ltorg                              @ dump constant pool
     .size   lcd_write_yuv420_lines_odither, .-lcd_write_yuv420_lines_odither
