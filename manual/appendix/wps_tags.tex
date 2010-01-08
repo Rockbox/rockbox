@@ -15,12 +15,16 @@ They must be noted on their own line (which will not be shown in the WPS).
   \begin{tagmap}{}{}
     \config{\%ia} & Artist\\
     \config{\%ic} & Composer\\
+    \config{\%iA} & Album Artist\\
     \config{\%id} & Album Name\\
+    \config{\%iG} & Grouping\\
     \config{\%ig} & Genre Name\\
     \config{\%in} & Track Number\\
     \config{\%it} & Track Title\\
+    \config{\%iC} & Comment\\
     \config{\%iv} & ID3 version (1.0, 1.1, 2.2, 2.3, 2.4, or empty if not an ID3 tag)\\
     \config{\%iy} & Year\\
+    \config{\%ik} & Disc Number\\
   \end{tagmap}
 \end{table}
 Remember that this information is not always available, so use the 
@@ -91,6 +95,7 @@ show the information for the next song to be played.
            Ogg Vorbis (OGG), FLAC, MPC, AC3, WavPack (WV), ALAC, AAC,
            Shorten (SHN), SID, ADX, NSF, Speex, SPC, APE, WMA, MOD, SAP.\\
     \config{\%ff} & File Frequency (in Hz)\\
+    \config{\%fk} & File Frequency (in KHz)\\
     \config{\%fm} & File Name\\
     \config{\%fn} & File Name (without extension)\\
     \config{\%fp} & File Path\\
@@ -139,6 +144,7 @@ produce the information for the next file to be played.
          & \config{\%?pv{\textless}0{\textbar}1{\textbar}2{\textbar}\ldots%
            {\textbar}N{\textgreater}}\\
          & 0 is used for mute, the last option is used for values greater than zero.\\
+    \config{\%Sp} & Current Playback Pitch\\
   \end{tagmap}
 \end{table}
 
@@ -150,6 +156,7 @@ produce the information for the next file to be played.
            \config{\%?rr{\textless}0{\textbar}1{\textbar}2{\textbar}3{\textbar}%
            4{\textbar}5{\textbar}6{\textbar}7{\textbar}8{\textbar}9{\textbar}%
            10{\textgreater}}\\
+    \config{\%ra} & Autoscore for the song\\
   \end{tagmap}
 \end{table}
 
@@ -359,8 +366,10 @@ Examples:
 \begin{table}
   \begin{tagmap}{}{}
     \config{\%al} & Align the text left\\
+    \config{\%aL} & Align the text left, or to the right if RTL language is in use\\
     \config{\%ac} & Centre the text\\
     \config{\%ar} & Align the text right\\
+    \config{\%aR} & Align the text right, or to the left if RTL language is in use\\
   \end{tagmap}
 \end{table}
 All alignment tags may be present in one line, but they need to be in the 
@@ -397,13 +406,14 @@ display cycling round the defined sublines. See
   \begin{table}
     \begin{tagmap}{}{}
     \opt{rtc}{
-      \config{\%cd}          & Day of month\\
-      \config{\%ce}          & Zero padded day of month\\
+      \config{\%cd}          & Day of month from 01 to 31\\
+      \config{\%ce}          & Zero padded day of month from 1 to 31\\
+      \config{\%cf}          & A conditional for 12/24 hour format. \%?cf{\textless}24 hour stuff{\textbar}12 hour stuff{\textgreater}\\
       \config{\%cH}          & Zero padded hour from 00 to 23 (24 hour format)\\
       \config{\%ck}          & Hour from 0 to 23 (24 hour format)\\
-      \config{\%cI}          & Zero padded hour from 12 to 12 (am/pm format)\\
-      \config{\%cl}          & Hour from 12 to 12 (am/pm format)\\
-      \config{\%cm}          & Month\\
+      \config{\%cI}          & Zero padded hour from 01 to 12 (am/pm format)\\
+      \config{\%cl}          & Hour from 1 to 12 (am/pm format)\\
+      \config{\%cm}          & Month from 01 to 12\\
       \config{\%cM}          & Minutes\\
       \config{\%cS}          & Seconds\\
       \config{\%cy}          & 2-digit year\\
