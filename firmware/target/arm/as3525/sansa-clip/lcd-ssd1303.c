@@ -123,7 +123,7 @@ void lcd_write_command(int byte)
         ;
 
 #ifdef SANSA_CLIPV2
-    DBOP_TIMPOL_23 = 0xE0370036;
+    DBOP_TIMPOL_23 = 0xE037E037;
 #endif
 }
 
