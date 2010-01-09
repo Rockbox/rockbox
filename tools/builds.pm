@@ -130,7 +130,6 @@ $releasenotes="/wiki/ReleaseNotes34";
     'iriverh10_5gb' => {
         name => 'iriver H10 5GB',
         status => 3,
-        manual => 'iriverh10',
     },
     'iriverh100' => {
         name => 'iriver H100/115',
