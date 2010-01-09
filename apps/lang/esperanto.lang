@@ -16,6 +16,7 @@
 #
 # Esperanto language file, translated by:
 # - Marc-André Moreau (aghaster@hotmail.com)
+# updated by Wilfred Hughes (yowilfred+rockbox@gmail.com)
 #
 # Original Release: 04/06/06
 # Last Update: 04/06/06
@@ -79,20 +80,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESUME_SETTING_ASK
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Ask"
-  </source>
-  <dest>
-    *: "Demandi"
-  </dest>
-  <voice>
-    *: "Demandi"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALWAYS
   desc: used in various places
   user: core
@@ -125,13 +112,16 @@
   desc: in shutdown screen
   user: core
   <source>
-    *: "Press OFF to shut down"
+    *: none
+    soft_shutdown: "Press OFF to shut down"
   </source>
   <dest>
-    *: "Pesu OFF por malŝalti"
+    *: none
+    soft_shutdown: "Pesu OFF por malŝalti"
   </dest>
   <voice>
-    *: ""
+    *: none
+    soft_shutdown: "Pesu OFF por malŝalti"
   </voice>
 </phrase>
 <phrase>
@@ -150,16 +140,19 @@
 </phrase>
 <phrase>
   id: LANG_RESTARTING_PLAYBACK
-  desc: splash screen displayed when pcm buffer size is changed
+  desc: deprecated
   user: core
   <source>
-    *: "Restarting playback..."
+    *: none
+    swcodec: ""
   </source>
   <dest>
-    *: "Restartanta la legon..."
+    *: none
+    swcodec: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -167,27 +160,16 @@
   desc: before acknowledging usb in case an MMC is inserted (Ondio)
   user: core
   <source>
-    *: "Please remove inserted MMC"
+    *: none
+    ondio*: "Please remove inserted MMC"
   </source>
   <dest>
-    *: "Retiru enmetata MMCan karton"
+    *: none
+    ondio*: "Retiru enmetata MMCan karton"
   </dest>
   <voice>
-    *: "Retiru enmetata MMCan karton"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MENU_SETTING_CANCEL
-  desc: Visual confirmation of canceling a changed setting
-  user: core
-  <source>
-    *: "Canceled"
-  </source>
-  <dest>
-    *: "Malvalidigita"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    ondio*: "Retiru enmetata MMCan karton"
   </voice>
 </phrase>
 <phrase>
@@ -265,13 +247,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Foliumi Temojn"
+    *: "Foliumi Temajn Dosierojn"
   </dest>
   <voice>
-    *: "Foliumi Temojn"
+    *: "Foliumi Temojn Dosierojn"
   </voice>
 </phrase>
 <phrase>
@@ -279,13 +261,16 @@
   desc: in the main menu
   user: core
   <source>
-    *: "FM Radio"
+    *: none
+    radio: "FM Radio"
   </source>
   <dest>
-    *: "FMa Radio"
+    *: none
+    radio: "FMa Radio"
   </dest>
   <voice>
-    *: "FMa Radio"
+    *: none
+    radio: "FMa Radio"
   </voice>
 </phrase>
 <phrase>
@@ -293,27 +278,16 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Recording"
+    *: none
+    recording: "Recording"
   </source>
   <dest>
-    *: "Rikordanta"
+    *: none
+    recording: "Rikordanta"
   </dest>
   <voice>
-    *: "Rikordanta"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_MENU
-  desc: in the main menu
-  user: core
-  <source>
-    *: "Playlist Options"
-  </source>
-  <dest>
-    *: "Leglista Opcioj"
-  </dest>
-  <voice>
-    *: "Leglista Opcioj"
+    *: none
+    recording: "Rikordanta"
   </voice>
 </phrase>
 <phrase>
@@ -321,27 +295,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Plugins"
+    *: "Plugins"
   </source>
   <dest>
-    *: "Foliumi Kromprogramojn"
+    *: "Kromprogramojn"
   </dest>
   <voice>
-    *: "Foliumi Kromprogramojn"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INFO
-  desc: in the main menu
-  user: core
-  <source>
-    *: "Info"
-  </source>
-  <dest>
-    *: "Informoj"
-  </dest>
-  <voice>
-    *: "Informoj"
+    *: "Kromprogramojn"
   </voice>
 </phrase>
 <phrase>
@@ -349,13 +309,16 @@
   desc: in main menu
   user: core
   <source>
-    *: "Shut down"
+    *: none
+    soft_shutdown: "Shut down"
   </source>
   <dest>
-    *: "Malŝalti"
+    *: none
+    soft_shutdown: "Malŝalti"
   </dest>
   <voice>
-    *: "Malŝalti"
+    *: none
+    soft_shutdown: "Malŝalti"
   </voice>
 </phrase>
 <phrase>
@@ -412,34 +375,6 @@
   </dest>
   <voice>
     *: "Saldo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL_MENU
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Kanaloj"
-  </dest>
-  <voice>
-    *: "Kanaloj"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Channel Configuration"
-  </source>
-  <dest>
-    *: "Kanala Formo"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -545,13 +480,16 @@
   desc: in sound_settings
   user: core
   <source>
-    *: "Loudness"
+    *: none
+    masf: "Loudness"
   </source>
   <dest>
-    *: "Laŭto"
+    *: none
+    masf: "Laŭto"
   </dest>
   <voice>
-    *: "Laŭto"
+    *: none
+    masf: "Laŭto"
   </voice>
 </phrase>
 <phrase>
@@ -559,13 +497,16 @@
   desc: in sound_settings
   user: core
   <source>
-    *: "Auto Volume"
+    *: none
+    masf: "Auto Volume"
   </source>
   <dest>
-    *: "Aŭtomata Volumeno"
+    *: none
+    masf: "Aŭtomata Volumeno"
   </dest>
   <voice>
-    *: "Aŭtomata Volumeno"
+    *: none
+    masf: "Aŭtomata Volumeno"
   </voice>
 </phrase>
 <phrase>
@@ -573,13 +514,16 @@
   desc: in sound_settings
   user: core
   <source>
-    *: "AV Decay Time"
+    *: none
+    masf: "AV Decay Time"
   </source>
   <dest>
-    *: "Averaĝa Kadukiĝa Tempo"
+    *: none
+    masf: "Aŭtomata Sonforteco Kadukiĝa Tempo"
   </dest>
   <voice>
-    *: ""
+    *: none
+    masf: "Aŭtomata Sonforteco Kadukiĝa Tempo"
   </voice>
 </phrase>
 <phrase>
@@ -587,13 +531,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Super Bass"
+    *: none
+    masf: "Super Bass"
   </source>
   <dest>
-    *: "Supra Baso"
+    *: none
+    masf: "Supra Baso"
   </dest>
   <voice>
-    *: "Supra Baso"
+    *: none
+    masf: "Supra Baso"
   </voice>
 </phrase>
 <phrase>
@@ -601,13 +548,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "MDB Enable"
+    *: none
+    masf: "MDB Enable"
   </source>
   <dest>
-    *: "MDB Ebligi"
+    *: none
+    masf: "MDB Ebligi"
   </dest>
   <voice>
-    *: "MDB Ebligi"
+    *: none
+    masf: "MDB Ebligi"
   </voice>
 </phrase>
 <phrase>
@@ -615,13 +565,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "MDB Strength"
+    *: none
+    masf: "MDB Strength"
   </source>
   <dest>
-    *: "MDB Forto"
+    *: none
+    masf: "MDB Forto"
   </dest>
   <voice>
-    *: "MDB Forto"
+    *: none
+    masf: "MDB Forto"
   </voice>
 </phrase>
 <phrase>
@@ -629,13 +582,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "MDB Harmonics"
+    *: none
+    masf: "MDB Harmonics"
   </source>
   <dest>
-    *: "MDB Harmonoj"
+    *: none
+    masf: "MDB Harmonoj"
   </dest>
   <voice>
-    *: "MDB Harmonoj"
+    *: none
+    masf: "MDB Harmonoj"
   </voice>
 </phrase>
 <phrase>
@@ -643,13 +599,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "MDB Center Frequency"
+    *: none
+    masf: "MDB Centre Frequency"
   </source>
   <dest>
-    *: "MDB Centra Frekvenco"
+    *: none
+    masf: "MDB Centra Frekvenco"
   </dest>
   <voice>
-    *: "MDB Center Frekvenco"
+    *: none
+    masf: "MDB Center Frekvenco"
   </voice>
 </phrase>
 <phrase>
@@ -657,13 +616,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "MDB Shape"
+    *: none
+    masf: "MDB Shape"
   </source>
   <dest>
-    *: "MDB Formo"
+    *: none
+    masf: "MDB Formo"
   </dest>
   <voice>
-    *: "MDB Formo"
+    *: none
+    masf: "MDB Formo"
   </voice>
 </phrase>
 <phrase>
@@ -671,13 +633,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Crossfeed"
+    *: none
+    swcodec: "Crossfeed"
   </source>
   <dest>
-    *: "Transmikso"
+    *: none
+    swcodec: "Transmikso"
   </dest>
   <voice>
-    *: "Transmikso"
+    *: none
+    swcodec: "Transmikso"
   </voice>
 </phrase>
 <phrase>
@@ -685,13 +650,16 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: "Equalizer"
+    *: none
+    swcodec: "Equalizer"
   </source>
   <dest>
-    *: "Egalilo"
+    *: none
+    swcodec: "Egalilo"
   </dest>
   <voice>
-    *: "Egalilo"
+    *: none
+    swcodec: "Egalilo"
   </voice>
 </phrase>
 <phrase>
@@ -699,13 +667,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Playback"
+    *: "Playback Settings"
   </source>
   <dest>
-    *: "Lego"
+    *: "Agordoj de Lego"
   </dest>
   <voice>
-    *: "Lego"
+    *: "Agordoj de Lego"
   </voice>
 </phrase>
 <phrase>
@@ -738,7 +706,7 @@
 </phrase>
 <phrase>
   id: LANG_SYSTEM
-  desc: in settings_menu()
+  desc: in the main menu and settings menu
   user: core
   <source>
     *: "System"
@@ -807,20 +775,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FIRMWARE
-  desc: in the main menu
-  user: core
-  <source>
-    *: "Browse Firmwares"
-  </source>
-  <dest>
-    *: "Foliumi Firmvarojn"
-  </dest>
-  <voice>
-    *: "Foliumi Firmvarojn"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESET
   desc: in system_settings_menu()
   user: core
@@ -835,63 +789,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESET_ASK_RECORDER
-  desc: confirm to reset settings
-  user: core
-  <source>
-    *: "Are You Sure?"
-  </source>
-  <dest>
-    *: "Ĉu vi estas certa?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONFIRM_WITH_PLAY_RECORDER
-  desc: Generic archosrecorder string to use to confirm
-  user: core
-  <source>
-    *: "PLAY = Yes"
-  </source>
-  <dest>
-    *: "LEGI = Jes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Jes"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CANCEL_WITH_ANY_RECORDER
-  desc: Generic archosrecorder string to use to cancel
-  user: core
-  <source>
-    *: "Any Other = No"
-  </source>
-  <dest>
-    *: "Alia Ajn = Ne"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_DONE_SETTING
-  desc: visual confirmation after settings reset
-  user: core
-  <source>
-    *: "Settings"
-  </source>
-  <dest>
-    *: "Agordaĵoj"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESET_DONE_CLEAR
   desc: visual confirmation after settings reset
   user: core
@@ -900,20 +797,6 @@
   </source>
   <dest>
     *: "Agordaĵoj Rekomencvalorizita"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_DONE_CANCEL
-  desc: Visual confirmation of cancelation
-  user: core
-  <source>
-    *: "Canceled"
-  </source>
-  <dest>
-    *: "Malvalidigita"
   </dest>
   <voice>
     *: ""
@@ -934,87 +817,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SETTINGS_SAVE_PLAYER
-  desc: displayed if save settings has failed
-  user: core
-  <source>
-    *: "Save Failed"
-  </source>
-  <dest>
-    *: "Surdiskigo Malsukcesis"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_PLAYER
-  desc: if save settings has failed
-  user: core
-  <source>
-    *: "Partition?"
-  </source>
-  <dest>
-    *: "Apartigi?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVE_RECORDER
-  desc: displayed if save settings has failed
-  user: core
-  <source>
-    *: "Save Failed"
-  </source>
-  <dest>
-    *: "Surdiskigo Malsukcesis"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_RECORDER
-  desc: if save settings has failed
-  user: core
-  <source>
-    *: "No partition?"
-  </source>
-  <dest>
-    *: "Neniu apartigo?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_MENU
-  desc: in the recording sub menu
-  user: core
-  <source>
-    *: "Recording Screen"
-  </source>
-  <dest>
-    *: "Rikordanta Ekrano"
-  </dest>
-  <voice>
-    *: "Rikordanta Ekrano"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_SETTINGS
   desc: in the main menu
   user: core
   <source>
-    *: "Recording Settings"
+    *: none
+    recording: "Recording Settings"
   </source>
   <dest>
-    *: "Registranta Agordaĵojn"
+    *: none
+    recording: "Registranta Agordaĵojn"
   </dest>
   <voice>
-    *: "Registranta Agordaĵojn"
+    *: none
+    recording: "Registranta Agordaĵojn"
   </voice>
 </phrase>
 <phrase>
@@ -1022,13 +838,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Enable EQ"
+    *: none
+    swcodec: "Enable EQ"
   </source>
   <dest>
-    *: "Ebligi EQ"
+    *: none
+    swcodec: "Ebligi EQ"
   </dest>
   <voice>
-    *: "Ebligi egalilon"
+    *: none
+    swcodec: "Ebligi egalilon"
   </voice>
 </phrase>
 <phrase>
@@ -1036,13 +855,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Graphical EQ"
+    *: none
+    swcodec: "Graphical EQ"
   </source>
   <dest>
-    *: "Grafika EQ"
+    *: none
+    swcodec: "Grafika EQ"
   </dest>
   <voice>
-    *: "Grafika egalilo"
+    *: none
+    swcodec: "Grafika egalilo"
   </voice>
 </phrase>
 <phrase>
@@ -1050,13 +872,16 @@
   desc: in eq settings
   user: core
   <source>
-    *: "Precut"
+    *: none
+    swcodec: "Precut"
   </source>
   <dest>
-    *: "Antaŭtranĉo"
+    *: none
+    swcodec: "Antaŭtranĉo"
   </dest>
   <voice>
-    *: "Antaŭtranĉo"
+    *: none
+    swcodec: "Antaŭtranĉo"
   </voice>
 </phrase>
 <phrase>
@@ -1064,13 +889,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Simple EQ Settings"
+    *: none
+    swcodec: "Simple EQ Settings"
   </source>
   <dest>
-    *: "Simpla EQ Agordaĵoj"
+    *: none
+    swcodec: "Simpla EQ Agordaĵoj"
   </dest>
   <voice>
-    *: "Simpla egalilo Agordaĵoj"
+    *: none
+    swcodec: "Simpla egalilo Agordaĵoj"
   </voice>
 </phrase>
 <phrase>
@@ -1078,13 +906,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Advanced EQ Settings"
+    *: none
+    swcodec: "Advanced EQ Settings"
   </source>
   <dest>
-    *: "Progresinta EQ Agordaĵoj"
+    *: none
+    swcodec: "Progresinta EQ Agordaĵoj"
   </dest>
   <voice>
-    *: "Progresinta EQ Agordaĵoj"
+    *: none
+    swcodec: "Progresinta EQ Agordaĵoj"
   </voice>
 </phrase>
 <phrase>
@@ -1092,13 +923,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Save EQ Preset"
+    *: none
+    swcodec: "Save EQ Preset"
   </source>
   <dest>
-    *: "Surdiskigi EQ Agordaĵojn"
+    *: none
+    swcodec: "Surdiskigi EQ Agordaĵojn"
   </dest>
   <voice>
-    *: "Surdiskigi egalilon Agordaĵojn"
+    *: none
+    swcodec: "Surdiskigi egalilon Agordaĵojn"
   </voice>
 </phrase>
 <phrase>
@@ -1106,13 +940,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Browse EQ Presets"
+    *: none
+    swcodec: "Browse EQ Presets"
   </source>
   <dest>
-    *: "Foliumi EQ Agordaĵojn"
+    *: none
+    swcodec: "Foliumi EQ Agordaĵojn"
   </dest>
   <voice>
-    *: "Foliumi EQ Agordaĵojn"
+    *: none
+    swcodec: "Foliumi EQ Agordaĵojn"
   </voice>
 </phrase>
 <phrase>
@@ -1120,13 +957,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Edit mode: %s"
+    *: none
+    swcodec: "Edit mode: %s"
   </source>
   <dest>
-    *: "Eldona Reĝimo: %s"
+    *: none
+    swcodec: "Eldona Reĝimo: %s"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: "Eldona Reĝimo: %s"
   </voice>
 </phrase>
 <phrase>
@@ -1134,13 +974,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "%d Hz Band Gain"
+    *: none
+    swcodec: "%d Hz Band Gain"
   </source>
   <dest>
-    *: "%d Hz Strio Gajno"
+    *: none
+    swcodec: "%d Hz Strio Gajno"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: "herco strio gajno"
   </voice>
 </phrase>
 <phrase>
@@ -1148,13 +991,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Low Shelf Filter"
+    *: none
+    swcodec: "Low Shelf Filter"
   </source>
   <dest>
-    *: "Malakuta Filtrilo"
+    *: none
+    swcodec: "Malakuta Filtrilo"
   </dest>
   <voice>
-    *: "Malakuta Filtrilo"
+    *: none
+    swcodec: "Malakuta Filtrilo"
   </voice>
 </phrase>
 <phrase>
@@ -1162,13 +1008,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Peak Filter %d"
+    *: none
+    swcodec: "Peak Filter %d"
   </source>
   <dest>
-    *: "Pinta Filtrilo %d"
+    *: none
+    swcodec: "Pinta Filtrilo %d"
   </dest>
   <voice>
-    *: "Pinta filtrilo"
+    *: none
+    swcodec: "Pinta filtrilo"
   </voice>
 </phrase>
 <phrase>
@@ -1176,13 +1025,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "High Shelf Filter"
+    *: none
+    swcodec: "High Shelf Filter"
   </source>
   <dest>
-    *: "Akuta Filtrilo"
+    *: none
+    swcodec: "Akuta Filtrilo"
   </dest>
   <voice>
-    *: "Akuta Filtrilo"
+    *: none
+    swcodec: "Akuta Filtrilo"
   </voice>
 </phrase>
 <phrase>
@@ -1190,13 +1042,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Cutoff Frequency"
+    *: none
+    swcodec: "Cutoff Frequency"
   </source>
   <dest>
-    *: "Tranĉa Frekvenco"
+    *: none
+    swcodec: "Tranĉa Frekvenco"
   </dest>
   <voice>
-    *: "Tranĉa Frekvenco"
+    *: none
+    swcodec: "Tranĉa Frekvenco"
   </voice>
 </phrase>
 <phrase>
@@ -1204,13 +1059,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Center Frequency"
+    *: none
+    swcodec: "Centre Frequency"
   </source>
   <dest>
-    *: "Centro Frekvenco"
+    *: none
+    swcodec: "Centro Frekvenco"
   </dest>
   <voice>
-    *: "Centro Frekvenco"
+    *: none
+    swcodec: "Centro Frekvenco"
   </voice>
 </phrase>
 <phrase>
@@ -1218,27 +1076,16 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Q"
+    *: none
+    swcodec: "Q"
   </source>
   <dest>
-    *: "Q"
+    *: none
+    swcodec: "Q"
   </dest>
   <voice>
-    *: "Q"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_BAND_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Gajno"
-  </dest>
-  <voice>
-    *: "Gajno"
+    *: none
+    swcodec: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -1312,22 +1159,8 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INFO_MENU
-  desc: in the info menu
-  user: core
-  <source>
-    *: "Rockbox Info"
-  </source>
-  <dest>
-    *: "Rockbox Informoj"
-  </dest>
-  <voice>
-    *: "Rockbox Informoj"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -1351,20 +1184,6 @@
   </dest>
   <voice>
     *: "Erarserĉilo, atentu!"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USB
-  desc: deprecated
-  user:
-  <source>
-    *: none
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
   </voice>
 </phrase>
 <phrase>
@@ -1396,20 +1215,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Ĉiuj"
-  </dest>
-  <voice>
-    *: "Ĉiuj"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REPEAT_ONE
   desc: repeat one song
   user: core
@@ -1425,7 +1230,7 @@
 </phrase>
 <phrase>
   id: LANG_REPEAT_AB
-  desc: repeat one song
+  desc: repeat range from point A to B
   user: core
   <source>
     *: "A-B"
@@ -1452,20 +1257,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESUME
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Resume on Startup"
-  </source>
-  <dest>
-    *: "Aŭtomata Lega Rekomenco Dum Starto"
-  </dest>
-  <voice>
-    *: "Aŭtomata Lega Rekomenco Dum Starto"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_WIND_MENU
   desc: in the playback sub menu
   user: core
@@ -1485,12 +1276,15 @@
   user: core
   <source>
     *: "Anti-Skip Buffer"
+    flash_storage: none
   </source>
   <dest>
     *: "Anti-Salta Bufro"
+    flash_storage: none
   </dest>
   <voice>
     *: "Anti-Salta Bufro"
+    flash_storage: none
   </voice>
 </phrase>
 <phrase>
@@ -1526,13 +1320,16 @@
   desc: in playback settings
   user: core
   <source>
-    *: "Crossfade"
+    *: none
+    crossfade: "Crossfade"
   </source>
   <dest>
-    *: "Transfado"
+    *: none
+    crossfade: "Transfado"
   </dest>
   <voice>
-    *: "Transfado"
+    *: none
+    crossfade: "Transfado"
   </voice>
 </phrase>
 <phrase>
@@ -1568,13 +1365,16 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: "Weak"
+    *: none
+    swcodec: "Weak"
   </source>
   <dest>
-    *: "Malforta"
+    *: none
+    swcodec: "Malforta"
   </dest>
   <voice>
-    *: "Malforta"
+    *: none
+    swcodec: "Malforta"
   </voice>
 </phrase>
 <phrase>
@@ -1582,13 +1382,16 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: "Moderate"
+    *: none
+    swcodec: "Moderate"
   </source>
   <dest>
-    *: "Meza"
+    *: none
+    swcodec: "Meza"
   </dest>
   <voice>
-    *: "Meza"
+    *: none
+    swcodec: "Meza"
   </voice>
 </phrase>
 <phrase>
@@ -1596,13 +1399,16 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: "Strong"
+    *: none
+    swcodec: "Strong"
   </source>
   <dest>
-    *: "Forta"
+    *: none
+    swcodec: "Forta"
   </dest>
   <voice>
-    *: "Forta"
+    *: none
+    swcodec: "Forta"
   </voice>
 </phrase>
 <phrase>
@@ -1610,55 +1416,58 @@
   desc: in playback settings menu. enable/disable the optical out
   user: core
   <source>
-    *: "Optical Output"
+    *: none
+    spdif_power: "Optical Output"
   </source>
   <dest>
-    *: "Cifereca Eligo"
+    *: none
+    spdif_power: "Cifereca Eligo"
   </dest>
   <voice>
-    *: "Cifereca Eligo"
+    *: none
+    spdif_power: "Cifereca Eligo"
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: in playback settings screen
+  desc: DEPRECATED
   user: core
   <source>
-    *: "ID3 Tag Priority"
+    *: ""
   </source>
   <dest>
-    *: "ID3a Etikedo Prioritato"
+    *: deprecated
   </dest>
   <voice>
-    *: "ID3a Etikedo Prioritato"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED
   user: core
   <source>
-    *: "V1 then V2"
+    *: ""
   </source>
   <dest>
-    *: "V1 poste V2"
+    *: deprecated
   </dest>
   <voice>
-    *: "Versio unu poste versio du"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED
   user: core
   <source>
-    *: "V2 then V1"
+    *: ""
   </source>
   <dest>
-    *: "V2 poste V1"
+    *: deprecated
   </dest>
   <voice>
-    *: "Versio du poste versio unu"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1677,30 +1486,16 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in tag cache settings
+  desc: in the main menu and the settings menu
   user: core
   <source>
-    *: "Tag Cache"
+    *: "Database"
   </source>
   <dest>
-    *: "Etikedo de Kaŝmemoro"
+    *: "Datumbazo"
   </dest>
   <voice>
-    *: "Etikedo de Kaŝmemoro"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TAGCACHE_DISK
-  desc: in tag cache settings
-  user: core
-  <source>
-    *: "Keep on Disk"
-  </source>
-  <dest>
-    *: "Ŝargi el Durdisko"
-  </dest>
-  <voice>
-    *: "Ŝargi el Durdisko"
+    *: "Datumbazo"
   </voice>
 </phrase>
 <phrase>
@@ -1708,13 +1503,16 @@
   desc: in tag cache settings
   user: core
   <source>
-    *: "Load to RAM"
+    *: none
+    tc_ramcache: "Load to RAM"
   </source>
   <dest>
-    *: "Ŝargi al Ĉefmemoron"
+    *: none
+    tc_ramcache: "Ŝargi al Ĉefmemoron"
   </dest>
   <voice>
-    *: "Ŝargi al Ĉefmemoron"
+    *: none
+    tc_ramcache: "Ŝargi al Ĉefmemoron"
   </voice>
 </phrase>
 <phrase>
@@ -1750,10 +1548,10 @@
   desc: while initializing tagcache on boot
   user: core
   <source>
-    *: "Committing tagcache"
+    *: "Committing database"
   </source>
   <dest>
-    *: "Surdiskiganta Kaŝmemoron de Etikedo"
+    *: "Surdiskiganta datumbazon"
   </dest>
   <voice>
     *: ""
@@ -1886,20 +1684,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILTER_ALL
-  desc: show all files
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Ĉiuj"
-  </dest>
-  <voice>
-    *: "Ĉiuj"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FILTER_SUPPORTED
   desc: show all file types supported by Rockbox
   user: core
@@ -1925,34 +1709,6 @@
   </dest>
   <voice>
     *: "Muziko"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_PLAYLIST
-  desc: show only playlist
-  user: core
-  <source>
-    *: "Playlists"
-  </source>
-  <dest>
-    *: "Leglistoj"
-  </dest>
-  <voice>
-    *: "Leglistoj"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_ID3DB
-  desc: show ID3 Database
-  user: core
-  <source>
-    *: "ID3 Database"
-  </source>
-  <dest>
-    *: "ID3a Datumbazo"
-  </dest>
-  <voice>
-    *: "ID3a Datumbazo"
   </voice>
 </phrase>
 <phrase>
@@ -1988,13 +1744,16 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: "Browse Fonts"
+    *: none
+    lcd_bitmap: "Font"
   </source>
   <dest>
-    *: "Foliumi Tiparojn"
+    *: none
+    lcd_bitmap: "Tiparo"
   </dest>
   <voice>
-    *: "Foliumi Tiparojn"
+    *: none
+    lcd_bitmap: "Tiparo"
   </voice>
 </phrase>
 <phrase>
@@ -2044,13 +1803,16 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: "Remote-LCD Settings"
+    *: none
+    remote: "Remote-LCD Settings"
   </source>
   <dest>
-    *: "Fora-LCD Agordaĵoj"
+    *: none
+    remote: "Fora-LCD Agordaĵoj"
   </dest>
   <voice>
-    *: "Fora-LCD Agordaĵoj"
+    *: none
+    remote: "Fora-LCD Agordaĵoj"
   </voice>
 </phrase>
 <phrase>
@@ -2072,13 +1834,16 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: "Status-/Scrollbar"
+    *: none
+    lcd_bitmap: "Status-/Scrollbar"
   </source>
   <dest>
-    *: "Stato-/Rulumskalo"
+    *: none
+    lcd_bitmap: "Stato-/Rulumskalo"
   </dest>
   <voice>
-    *: "Stato kaj Rulumskalo"
+    *: none
+    lcd_bitmap: "Stato kaj Rulumskalo"
   </voice>
 </phrase>
 <phrase>
@@ -2087,12 +1852,15 @@
   user: core
   <source>
     *: "Peak Meter"
+    masd: none
   </source>
   <dest>
     *: "Pintoskalo"
+    masd: none
   </dest>
   <voice>
     *: "Pintoskalo"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2142,13 +1910,16 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: "Hebrew (ISO-8859-8)"
+    *: none
+    lcd_bitmap: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: "Hebreo (ISO-8859-8)"
+    *: none
+    lcd_bitmap: "Hebreo (ISO-8859-8)"
   </dest>
   <voice>
-    *: "Hebreo"
+    *: none
+    lcd_bitmap: "Hebreo"
   </voice>
 </phrase>
 <phrase>
@@ -2170,13 +1941,16 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: "Thai (ISO-8859-11)"
+    *: none
+    lcd_bitmap: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: "Tajo (ISO-8859-11)"
+    *: none
+    lcd_bitmap: "Tajo (ISO-8859-11)"
   </dest>
   <voice>
-    *: "Tajo"
+    *: none
+    lcd_bitmap: "Tajo"
   </voice>
 </phrase>
 <phrase>
@@ -2184,13 +1958,16 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: "Arabic (CP1256)"
+    *: none
+    lcd_bitmap: "Arabic (CP1256)"
   </source>
   <dest>
-    *: "Arabo (CP1256)"
+    *: none
+    lcd_bitmap: "Arabo (CP1256)"
   </dest>
   <voice>
-    *: "Arabo"
+    *: none
+    lcd_bitmap: "Arabo"
   </voice>
 </phrase>
 <phrase>
@@ -2226,13 +2003,16 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: "Japanese (SJIS)"
+    *: none
+    lcd_bitmap: "Japanese (SJIS)"
   </source>
   <dest>
-    *: "Japano (SJIS)"
+    *: none
+    lcd_bitmap: "Japano (SJIS)"
   </dest>
   <voice>
-    *: "Japano"
+    *: none
+    lcd_bitmap: "Japano"
   </voice>
 </phrase>
 <phrase>
@@ -2240,13 +2020,16 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: "Simp. Chinese (GB2312)"
+    *: none
+    lcd_bitmap: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: "Simpligata Ĉino (GB2312)"
+    *: none
+    lcd_bitmap: "Simpligata Ĉino (GB2312)"
   </dest>
   <voice>
-    *: "Simpligata Ĉino"
+    *: none
+    lcd_bitmap: "Simpligata Ĉino"
   </voice>
 </phrase>
 <phrase>
@@ -2254,13 +2037,16 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: "Korean (KSX1001)"
+    *: none
+    lcd_bitmap: "Korean (KSX1001)"
   </source>
   <dest>
-    *: "Koreujo (KSX1001)"
+    *: none
+    lcd_bitmap: "Koreujo (KSX1001)"
   </dest>
   <voice>
-    *: "Koreujo"
+    *: none
+    lcd_bitmap: "Koreujo"
   </voice>
 </phrase>
 <phrase>
@@ -2268,13 +2054,16 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: "Trad. Chinese (BIG5)"
+    *: none
+    lcd_bitmap: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: "Tradicia Ĉino (BIG5)"
+    *: none
+    lcd_bitmap: "Tradicia Ĉino (BIG5)"
   </dest>
   <voice>
-    *: "Tradicia Ĉino"
+    *: none
+    lcd_bitmap: "Tradicia Ĉino"
   </voice>
 </phrase>
 <phrase>
@@ -2324,13 +2113,16 @@
   desc: in the system sub menu
   user: core
   <source>
-    *: "Time & Date"
+    *: none
+    rtc: "Time & Date"
   </source>
   <dest>
-    *: "Tempo kaj Dato"
+    *: none
+    rtc: "Tempo kaj Dato"
   </dest>
   <voice>
-    *: "Tempo kaj Dato"
+    *: none
+    rtc: "Tempo kaj Dato"
   </voice>
 </phrase>
 <phrase>
@@ -2366,13 +2158,16 @@
   desc: The name of the additional entry in the main menu for the RTC alarm mod.
   user: core
   <source>
-    *: "Wake-Up Alarm"
+    *: none
+    alarm: "Wake-Up Alarm"
   </source>
   <dest>
-    *: "Vekalarmo"
+    *: none
+    alarm: "Vekalarmo"
   </dest>
   <voice>
-    *: "Vekalarmo"
+    *: none
+    alarm: "Vekalarmo"
   </voice>
 </phrase>
 <phrase>
@@ -2391,16 +2186,19 @@
 </phrase>
 <phrase>
   id: LANG_LINE_IN
-  desc: in settings_menu
+  desc: in the recording settings
   user: core
   <source>
-    *: "Line In"
+    *: none
+    recording,archosplayer: "Line In"
   </source>
   <dest>
-    *: "Analoga Enigaĵo"
+    *: none
+    recording,archosplayer: "Analoga Enigaĵo"
   </dest>
   <voice>
-    *: "Analoga Enigaĵo"
+    *: none
+    recording,archosplayer: "Analoga Enigaĵo"
   </voice>
 </phrase>
 <phrase>
@@ -2408,13 +2206,16 @@
   desc: Displayed for setting car adapter mode to on/off
   user: core
   <source>
-    *: "Car Adapter Mode"
+    *: none
+    charging: "Car Adapter Mode"
   </source>
   <dest>
-    *: "Aŭtomobilo Adaptinto Reĝimo"
+    *: none
+    charging: "Aŭtomobilo Adaptinto Reĝimo"
   </dest>
   <voice>
-    *: "Aŭtomobilo Adaptinto Reĝimo"
+    *: none
+    charging: "Aŭtomobilo Adaptinto Reĝimo"
   </voice>
 </phrase>
 <phrase>
@@ -2517,7 +2318,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR
-  desc: item of voice menu, set the "talkbox" mode for directories
+  desc: item of voice menu, set the voice mode for directories
   user: core
   <source>
     *: "Voice Directories"
@@ -2531,7 +2332,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_FILE
-  desc: item of voice menu, set the voive mode for files
+  desc: item of voice menu, set the voice mode for files
   user: core
   <source>
     *: "Voice Filenames"
@@ -2590,13 +2391,16 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Quality"
+    *: none
+    recording_hwcodec: "Quality"
   </source>
   <dest>
-    *: "Eco"
+    *: none
+    recording_hwcodec: "Eco"
   </dest>
   <voice>
-    *: "Eco"
+    *: none
+    recording_hwcodec: "Eco"
   </voice>
 </phrase>
 <phrase>
@@ -2604,13 +2408,16 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Frequency"
+    *: none
+    recording: "Frequency"
   </source>
   <dest>
-    *: "Frekvenco"
+    *: none
+    recording: "Frekvenco"
   </dest>
   <voice>
-    *: "Frekvenco"
+    *: none
+    recording: "Frekvenco"
   </voice>
 </phrase>
 <phrase>
@@ -2618,13 +2425,16 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Source"
+    *: none
+    recording: "Source"
   </source>
   <dest>
-    *: "Fonto"
+    *: none
+    recording: "Fonto"
   </dest>
   <voice>
-    *: "Fonto"
+    *: none
+    recording: "Fonto"
   </voice>
 </phrase>
 <phrase>
@@ -2642,45 +2452,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "Analoga Enigaĵo"
-  </dest>
-  <voice>
-    *: "Analoga Enigaĵo"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_SRC_DIGITAL
   desc: in the recording settings
   user: core
   <source>
-    *: "Digital"
+    *: none
+    recording: "Digital"
   </source>
   <dest>
-    *: "Cifereca"
+    *: none
+    recording: "Cifereca"
   </dest>
   <voice>
-    *: "Cifereca"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Kanaloj"
-  </dest>
-  <voice>
-    *: "Kanaloj"
+    *: none
+    recording: "Cifereca"
   </voice>
 </phrase>
 <phrase>
@@ -2688,13 +2473,16 @@
   desc: Editable recordings setting
   user: core
   <source>
-    *: "Independent Frames"
+    *: none
+    recording_hwcodec: "Independent Frames"
   </source>
   <dest>
-    *: "Sendependaj Kadroj"
+    *: none
+    recording_hwcodec: "Sendependaj Kadroj"
   </dest>
   <voice>
-    *: "Sendependaj Kadroj"
+    *: none
+    recording_hwcodec: "Sendependaj Kadroj"
   </voice>
 </phrase>
 <phrase>
@@ -2716,13 +2504,16 @@
   desc: in recording settings_menu
   user: core
   <source>
-    *: "Prerecord Time"
+    *: none
+    recording: "Prerecord Time"
   </source>
   <dest>
-    *: "Antaŭ-Registra Tempo"
+    *: none
+    recording: "Antaŭ-Registra Tempo"
   </dest>
   <voice>
-    *: "Antaŭ-Registra Tempo"
+    *: none
+    recording: "Antaŭ-Registra Tempo"
   </voice>
 </phrase>
 <phrase>
@@ -2730,41 +2521,32 @@
   desc: in recording settings_menu
   user: core
   <source>
-    *: "Directory"
+    *: none
+    recording: "Directory"
   </source>
   <dest>
-    *: "Dosierujoj"
+    *: none
+    recording: "Dosierujoj"
   </dest>
   <voice>
-    *: "Dosierujoj"
+    *: none
+    recording: "Dosierujoj"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_CURRENT_DIR
-  desc: in recording directory options
+  desc: DEPRECATED
   user: core
   <source>
-    *: "Current Directory"
+    *: none
+    recording: ""
   </source>
   <dest>
-    *: "Nuna Dosierujo"
+    *: none
+    recording: ""
   </dest>
   <voice>
-    *: "Nuna Dosierujo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording Screen
-  user: core
-  <source>
-    *: "Show Recording Screen on Startup"
-  </source>
-  <dest>
-    *: "Montri Registranta Ekranon dum Komenco"
-  </dest>
-  <voice>
-    *: "Montri Registranta Ekranon dum Komenco"
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -2772,13 +2554,16 @@
   desc: in recording settings_menu
   user: core
   <source>
-    *: "Trigger"
+    *: none
+    recording: "Trigger"
   </source>
   <dest>
-    *: "Ekkaŭzo"
+    *: none
+    recording: "Ekkaŭzo"
   </dest>
   <voice>
-    *: "Ekkaŭzo"
+    *: none
+    recording: "Ekkaŭzo"
   </voice>
 </phrase>
 <phrase>
@@ -2786,13 +2571,16 @@
   desc: in record settings menu.
   user: core
   <source>
-    *: "Clipping Light"
+    *: none
+    recording: "Clipping Light"
   </source>
   <dest>
-    *: "Sinkroniga Lumo"
+    *: none
+    recording: "Sinkroniga Lumo"
   </dest>
   <voice>
-    *: "Sinkroniga Lumo"
+    *: none
+    recording: "Sinkroniga Lumo"
   </voice>
 </phrase>
 <phrase>
@@ -2800,13 +2588,16 @@
   desc: in record settings menu.
   user: core
   <source>
-    *: "Main Unit Only"
+    *: none
+    remote: "Main Unit Only"
   </source>
   <dest>
-    *: "Nur ĉefa unito"
+    *: none
+    remote: "Nur ĉefa unito"
   </dest>
   <voice>
-    *: "Nur ĉefa unito"
+    *: none
+    remote: "Nur ĉefa unito"
   </voice>
 </phrase>
 <phrase>
@@ -2814,13 +2605,16 @@
   desc: in record settings menu.
   user: core
   <source>
-    *: "Remote Unit Only"
+    *: none
+    remote: "Remote Unit Only"
   </source>
   <dest>
-    *: "Nur fona unito"
+    *: none
+    remote: "Nur fona unito"
   </dest>
   <voice>
-    *: "Nur fona unito"
+    *: none
+    remote: "Nur fona unito"
   </voice>
 </phrase>
 <phrase>
@@ -2828,13 +2622,16 @@
   desc: in record settings menu.
   user: core
   <source>
-    *: "Main and Remote Unit"
+    *: none
+    remote: "Main and Remote Unit"
   </source>
   <dest>
-    *: "Ĉefa kaj Fona Unitoj"
+    *: none
+    remote: "Ĉefa kaj Fona Unitoj"
   </dest>
   <voice>
-    *: "Ĉefa kaj Fona Unitoj"
+    *: none
+    remote: "Ĉefa kaj Fona Unitoj"
   </voice>
 </phrase>
 <phrase>
@@ -2870,13 +2667,16 @@
   desc: in crossfade settings menu
   user: core
   <source>
-    *: "Enable Crossfade"
+    *: none
+    crossfade: "Enable Crossfade"
   </source>
   <dest>
-    *: "Ebligi Transfadon"
+    *: none
+    crossfade: "Ebligi Transfadon"
   </dest>
   <voice>
-    *: "Ebligi Transfadon"
+    *: none
+    crossfade: "Ebligi Transfadon"
   </voice>
 </phrase>
 <phrase>
@@ -2884,13 +2684,16 @@
   desc: in crossfade settings
   user: core
   <source>
-    *: "Manual Track Skip Only"
+    *: none
+    crossfade: "Manual Track Skip Only"
   </source>
   <dest>
-    *: "Nur por transsalti kanton"
+    *: none
+    crossfade: "Nur por transsalti kanton"
   </dest>
   <voice>
-    *: "Nur por transsalti kanton"
+    *: none
+    crossfade: "Nur por transsalti kanton"
   </voice>
 </phrase>
 <phrase>
@@ -2898,13 +2701,16 @@
   desc: in crossfade settings menu
   user: core
   <source>
-    *: "Fade-In Delay"
+    *: none
+    crossfade: "Fade-In Delay"
   </source>
   <dest>
-    *: "Alfada Malfruiĝo"
+    *: none
+    crossfade: "Alfada Malfruiĝo"
   </dest>
   <voice>
-    *: "Alfada Malfruiĝo"
+    *: none
+    crossfade: "Alfada Malfruiĝo"
   </voice>
 </phrase>
 <phrase>
@@ -2912,13 +2718,16 @@
   desc: in crossfade settings menu
   user: core
   <source>
-    *: "Fade-In Duration"
+    *: none
+    crossfade: "Fade-In Duration"
   </source>
   <dest>
-    *: "Alfada Daŭro"
+    *: none
+    crossfade: "Alfada Daŭro"
   </dest>
   <voice>
-    *: "Alfada Daŭro"
+    *: none
+    crossfade: "Alfada Daŭro"
   </voice>
 </phrase>
 <phrase>
@@ -2926,13 +2735,16 @@
   desc: in crossfade settings menu
   user: core
   <source>
-    *: "Fade-Out Delay"
+    *: none
+    crossfade: "Fade-Out Delay"
   </source>
   <dest>
-    *: "Elfada Malfruiĝo"
+    *: none
+    crossfade: "Elfada Malfruiĝo"
   </dest>
   <voice>
-    *: "Elfada Malfruiĝo"
+    *: none
+    crossfade: "Elfada Malfruiĝo"
   </voice>
 </phrase>
 <phrase>
@@ -2940,13 +2752,16 @@
   desc: in crossfade settings menu
   user: core
   <source>
-    *: "Fade-Out Duration"
+    *: none
+    crossfade: "Fade-Out Duration"
   </source>
   <dest>
-    *: "Elfada Daŭro"
+    *: none
+    crossfade: "Elfada Daŭro"
   </dest>
   <voice>
-    *: "Elfada Daŭro"
+    *: none
+    crossfade: "Elfada Daŭro"
   </voice>
 </phrase>
 <phrase>
@@ -2954,13 +2769,16 @@
   desc: in crossfade settings menu
   user: core
   <source>
-    *: "Fade-Out Mode"
+    *: none
+    crossfade: "Fade-Out Mode"
   </source>
   <dest>
-    *: "Elfada Reĝimo"
+    *: none
+    crossfade: "Elfada Reĝimo"
   </dest>
   <voice>
-    *: "Elfada Reĝimo"
+    *: none
+    crossfade: "Elfada Reĝimo"
   </voice>
 </phrase>
 <phrase>
@@ -2968,13 +2786,16 @@
   desc: in playback settings, crossfade option
   user: core
   <source>
-    *: "Mix"
+    *: none
+    crossfade: "Mix"
   </source>
   <dest>
-    *: "Mikso"
+    *: none
+    crossfade: "Mikso"
   </dest>
   <voice>
-    *: "Mikso"
+    *: none
+    crossfade: "Mikso"
   </voice>
 </phrase>
 <phrase>
@@ -2996,13 +2817,16 @@
   desc: in replaygain
   user: core
   <source>
-    *: "Prevent Clipping"
+    *: none
+    swcodec: "Prevent Clipping"
   </source>
   <dest>
-    *: "Preventi Tromoduladon"
+    *: none
+    swcodec: "Preventi Tromoduladon"
   </dest>
   <voice>
-    *: "Preventi Tromoduladon"
+    *: none
+    swcodec: "Preventi Tromoduladon"
   </voice>
 </phrase>
 <phrase>
@@ -3094,13 +2918,16 @@
   desc: in display_settings_menu, backlight timeout with charger connected
   user: core
   <source>
-    *: "Backlight (While Plugged In)"
+    *: none
+    charging: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "Malantaŭa Lumo (Kiam Elektre Ŝarĝanta)"
+    *: none
+    charging: "Malantaŭa Lumo (Kiam Elektre Ŝarĝanta)"
   </dest>
   <voice>
-    *: "Malantaŭa Lumo (Kiam Elektre Ŝarĝanta)"
+    *: none
+    charging: "Malantaŭa Lumo (Kiam Elektre Ŝarĝanta)"
   </voice>
 </phrase>
 <phrase>
@@ -3122,13 +2949,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Backlight Fade In"
+    *: none
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
-    *: "Malantaŭa Lumo Alfado"
+    *: none
+    backlight_fade*: "Malantaŭa Lumo Alfado"
   </dest>
   <voice>
-    *: "Malantaŭa Lumo Alfado"
+    *: none
+    backlight_fade*: "Malantaŭa Lumo Alfado"
   </voice>
 </phrase>
 <phrase>
@@ -3136,13 +2966,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Backlight Fade Out"
+    *: none
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
-    *: "Malantaŭa Lumo Elfado"
+    *: none
+    backlight_fade*: "Malantaŭa Lumo Elfado"
   </dest>
   <voice>
-    *: "Malantaŭa Lumo Elfado"
+    *: none
+    backlight_fade*: "Malantaŭa Lumo Elfado"
   </voice>
 </phrase>
 <phrase>
@@ -3150,13 +2983,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Brightness"
+    *: none
+    backlight_brightness: "Brightness"
   </source>
   <dest>
-    *: "Heleco"
+    *: none
+    backlight_brightness: "Heleco"
   </dest>
   <voice>
-    *: "Heleco"
+    *: none
+    backlight_brightness: "Heleco"
   </voice>
 </phrase>
 <phrase>
@@ -3192,27 +3028,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "LCD Mode"
+    *: none
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
-    *: "LCDa Reĝimo"
+    *: none
+    lcd_invert,remote_lcd_invert: "LCDa Reĝimo"
   </dest>
   <voice>
-    *: "LCDa Reĝimo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INVERT_LCD_NORMAL
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Normal"
-  </source>
-  <dest>
-    *: "Normale"
-  </dest>
-  <voice>
-    *: "Normale"
+    *: none
+    lcd_invert,remote_lcd_invert: "LCDa Reĝimo"
   </voice>
 </phrase>
 <phrase>
@@ -3231,16 +3056,19 @@
 </phrase>
 <phrase>
   id: LANG_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: "Upside Down"
+    *: none
+    lcd_bitmap: "Upside Down"
   </source>
   <dest>
-    *: "180-Gradoja Rotacio"
+    *: none
+    lcd_bitmap: "180-Gradoja Rotacio"
   </dest>
   <voice>
-    *: "180-Gradoja Rotacio"
+    *: none
+    lcd_bitmap: "180-Gradoja Rotacio"
   </voice>
 </phrase>
 <phrase>
@@ -3262,13 +3090,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Pointer"
+    *: none
+    lcd_bitmap: "Pointer"
   </source>
   <dest>
-    *: "Pintigo"
+    *: none
+    lcd_bitmap: "Pintigo"
   </dest>
   <voice>
-    *: "Pintigo"
+    *: none
+    lcd_bitmap: "Pintigo"
   </voice>
 </phrase>
 <phrase>
@@ -3276,13 +3107,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Bar (Inverse)"
+    *: none
+    lcd_bitmap: "Bar (Inverse)"
   </source>
   <dest>
-    *: "Substreka Linio"
+    *: none
+    lcd_bitmap: "Substreka Linio"
   </dest>
   <voice>
-    *: "Substreka Linio"
+    *: none
+    lcd_bitmap: "Substreka Linio"
   </voice>
 </phrase>
 <phrase>
@@ -3290,13 +3124,16 @@
   desc: text for LCD settings menu
   user: core
   <source>
-    *: "Clear Backdrop"
+    *: none
+    lcd_non-mono: "Clear Backdrop"
   </source>
   <dest>
-    *: "Viŝi Fonon"
+    *: none
+    lcd_non-mono: "Viŝi Fonon"
   </dest>
   <voice>
-    *: "Viŝi Fonon"
+    *: none
+    lcd_non-mono: "Viŝi Fonon"
   </voice>
 </phrase>
 <phrase>
@@ -3304,13 +3141,16 @@
   desc: menu entry to set the background color
   user: core
   <source>
-    *: "Background Colour"
+    *: none
+    lcd_non-mono: "Background Colour"
   </source>
   <dest>
-    *: "Fona Koloro"
+    *: none
+    lcd_non-mono: "Fona Koloro"
   </dest>
   <voice>
-    *: "Fona Koloro"
+    *: none
+    lcd_non-mono: "Fona Koloro"
   </voice>
 </phrase>
 <phrase>
@@ -3318,13 +3158,16 @@
   desc: menu entry to set the foreground color
   user: core
   <source>
-    *: "Foreground Colour"
+    *: none
+    lcd_non-mono: "Foreground Colour"
   </source>
   <dest>
-    *: "Malfona Koloro"
+    *: none
+    lcd_non-mono: "Malfona Koloro"
   </dest>
   <voice>
-    *: "Malfona Koloro"
+    *: none
+    lcd_non-mono: "Malfona Koloro"
   </voice>
 </phrase>
 <phrase>
@@ -3332,13 +3175,16 @@
   desc: menu
   user: core
   <source>
-    *: "Reset Colours"
+    *: none
+    lcd_non-mono: "Reset Colours"
   </source>
   <dest>
-    *: "Reŝargi Kolorojn"
+    *: none
+    lcd_non-mono: "Reŝargi Kolorojn"
   </dest>
   <voice>
-    *: "Reŝargi Kolorojn"
+    *: none
+    lcd_non-mono: "Reŝargi Kolorojn"
   </voice>
 </phrase>
 <phrase>
@@ -3346,13 +3192,16 @@
   desc: in remote lcd settings menu
   user: core
   <source>
-    *: "Reduce Ticking"
+    *: none
+    remote_ticking: "Reduce Ticking"
   </source>
   <dest>
-    *: "Redukti Tiktakon"
+    *: none
+    remote_ticking: "Redukti Tiktakon"
   </dest>
   <voice>
-    *: "Redukti Tiktakon"
+    *: none
+    remote_ticking: "Redukti Tiktakon"
   </voice>
 </phrase>
 <phrase>
@@ -3832,20 +3681,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_POWEROFF
-  desc: disk poweroff flag
-  user: core
-  <source>
-    *: "Disk Poweroff"
-  </source>
-  <dest>
-    *: "Durdisko Malŝalto"
-  </dest>
-  <voice>
-    *: "Durdisko Malŝalto"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DIRCACHE_ENABLE
   desc: in directory cache settings
   user: core
@@ -3857,34 +3692,6 @@
   </dest>
   <voice>
     *: "Doseriuja kaŝmemoro"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRCACHE_REBOOT
-  desc: when activating directory cache
-  user: core
-  <source>
-    *: "Please reboot to enable the cache"
-  </source>
-  <dest>
-    *: "Restartu por ebligi la kaŝmemoron"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRCACHE_BUILDING
-  desc: when booting up and rebuilding the cache
-  user: core
-  <source>
-    *: "Scanning disk..."
-  </source>
-  <dest>
-    *: "Skananta durdisko..."
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4025,20 +3832,6 @@
   </dest>
   <voice>
     *: "Agordi Kanton Klasaĵon"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RATING
-  desc: in set_rating
-  user: core
-  <source>
-    *: "Klasaĵo:"
-  </source>
-  <dest>
-    *: "Klasaĵo:"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4434,34 +4227,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUFFER_STAT_PLAYER
-  desc: the buffer size archosplayer-screen width, %d MB %d fraction of MB
-  user: core
-  <source>
-    *: "Buf: %d.%03dMB"
-  </source>
-  <dest>
-    *: "Buf: %d.%03dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUFFER_STAT_RECORDER
-  desc: the buffer size archosrecorder-screen width, %d MB %d fraction of MB
-  user: core
-  <source>
-    *: "Buffer: %d.%03dMB"
-  </source>
-  <dest>
-    *: "Bufro: %d.%03dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BATTERY_CHARGE
   desc: tells that the battery is charging, instead of battery level
   user: core
@@ -4630,176 +4395,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_F2_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Reĝimo:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_STATUS
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Status"
-  </source>
-  <dest>
-    *: "Statuto"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_SCROLL
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Scroll"
-  </source>
-  <dest>
-    *: "Rulumi"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_BAR
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Bar"
-  </source>
-  <dest>
-    *: "Streko"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-  desc: From the auto-load screen, allows user to list all bookmarks
-  user: core
-  <source>
-    *: "Down = List"
-  </source>
-  <dest>
-    *: "Malalto = Listo"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_EXIT
-  desc: From the bookmark list screen, allows user to exit
-  user: core
-  <source>
-    *: "OFF = Exit"
-  </source>
-  <dest>
-    *: "OFF = Eliri"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-  desc: Used on the bookmark select window to label bookmark number
-  user: core
-  <source>
-    *: "Bookmark"
-  </source>
-  <dest>
-    *: "Legosigno"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-  desc: Used on the bookmark select window to label index number
-  user: core
-  <source>
-    *: "Index"
-  </source>
-  <dest>
-    *: "Indekso"
-  </dest>
-  <voice>
-    *: "Indekso"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_TIME_TEXT
-  desc: Used on the bookmark select window to label elapsed time
-  user: core
-  <source>
-    *: "Time"
-  </source>
-  <dest>
-    *: "Tempo"
-  </dest>
-  <voice>
-    *: "Tempo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_PLAY
-  desc: Used on the bookmark select window to indicated the play option
-  user: core
-  <source>
-    *: "PLAY = Select"
-  </source>
-  <dest>
-    *: "LEGI = Elekti"
-    iriverh100,iriverh120,iriverh300: "NAVI = Elekti"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_DELETE
-  desc: Used on the bookmark select window to indicated the bookmark delete option
-  user: core
-  <source>
-    *: "ON+Play = Delete"
-  </source>
-  <dest>
-    *: "ON+LEGI = Elpreni"
-    iriverh100,iriverh120,iriverh300: "ON+NAVI = Elpreni"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_AUTOLOAD_QUERY
-  desc: prompt for user to decide to create a bookmark
-  user: core
-  <source>
-    *: "Load Last Bookmark?"
-  </source>
-  <dest>
-    *: "Ŝarĝi Lastan Legosignon?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTO_BOOKMARK_QUERY
   desc: prompt for user to decide to create an bookmark
   user: core
@@ -4850,20 +4445,6 @@
   </source>
   <dest>
     *: "Legosigno Malplena"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TIME_SET
-  desc: used in set_time()
-  user: core
-  <source>
-    *: "ON To Set"
-  </source>
-  <dest>
-    *: "ON Por Validigi"
   </dest>
   <voice>
     *: ""
