@@ -254,7 +254,8 @@ static void LCDFN(putsxyofs_style)(int xpos, int ypos,
         current_vp->drawmode = (style & STYLE_INVERT) ?
         (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     }
-    lcd_putsxyofs(xpos, ypos, offset, str);
+    if (str[0])
+        lcd_putsxyofs(xpos, ypos, offset, str);
     current_vp->fg_pattern = oldfgcolor;
     current_vp->bg_pattern = oldbgcolor;
 #else
@@ -262,7 +263,8 @@ static void LCDFN(putsxyofs_style)(int xpos, int ypos,
                                            0 : DRMODE_INVERSEVID);
     LCDFN(fillrect)(x, ypos, current_vp->width - xrect, h);
     current_vp->drawmode ^= DRMODE_INVERSEVID;
-    LCDFN(putsxyofs)(xpos, ypos, offset, str);
+    if (str[0])
+        LCDFN(putsxyofs)(xpos, ypos, offset, str);
 #endif
     current_vp->drawmode = lastmode;
 }
@@ -275,7 +277,7 @@ void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
 {
     int xpos, ypos, w, h;
     LCDFN(scroll_stop_line)(current_vp, y);
-    if(!str || !str[0])
+    if(!str)
         return;
 
     LCDFN(getstringsize)(str, &w, &h);
@@ -323,7 +325,7 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
         return;
 
     /* remove any previously scrolling line at the same location */
-    lcd_scroll_stop_line(current_vp, y);
+    LCDFN(scroll_stop_line)(current_vp, y);
 
     if (LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES)) return;
     if (!string)
