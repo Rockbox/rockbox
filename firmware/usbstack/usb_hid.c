@@ -168,14 +168,14 @@ typedef struct
     bool is_key_released;
 } usb_hid_report_t;
 
-usb_hid_report_t usb_hid_reports[REPORT_ID_COUNT];
+static usb_hid_report_t usb_hid_reports[REPORT_ID_COUNT];
 
 static unsigned char report_descriptor[HID_BUF_SIZE_REPORT]
     USB_DEVBSS_ATTR __attribute__((aligned(32)));
 
 static unsigned char send_buffer[HID_NUM_BUFFERS][HID_BUF_SIZE_MSG]
     USB_DEVBSS_ATTR __attribute__((aligned(32)));
-size_t send_buffer_len[HID_NUM_BUFFERS];
+static size_t send_buffer_len[HID_NUM_BUFFERS];
 static int cur_buf_prepare;
 static int cur_buf_send;
 

@@ -131,10 +131,10 @@ static struct trackdata trackdata[MAX_TRACK_ENTRIES];
 
 static unsigned int current_track_counter = 0;
 
-/* Play time of the previous track */
-unsigned long prev_track_elapsed;
-
 #ifndef SIMULATOR
+/* Play time of the previous track */
+static unsigned long prev_track_elapsed;
+
 static int track_read_idx = 0;
 static int track_write_idx = 0;
 #endif /* !SIMULATOR */
@@ -213,10 +213,10 @@ static int prerecord_count;   /* Number of seconds in the prerecord buffer */
 static int prerecord_timeout; /* The tick count of the next prerecord data
                                  store */
 
-unsigned long record_start_time; /* Value of current_tick when recording
-                                    was started */
-unsigned long pause_start_time;  /* Value of current_tick when pause was
-                                    started */
+static unsigned long record_start_time; /* Value of current_tick when recording
+                                           was started */
+static unsigned long pause_start_time;  /* Value of current_tick when pause was
+                                           started */
 static unsigned long last_rec_time;
 static unsigned long num_rec_bytes;
 static unsigned long last_rec_bytes;

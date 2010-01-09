@@ -84,7 +84,7 @@ struct gui_synclist tree_lists;
 /* I put it here because other files doesn't use it yet,
  * but should be elsewhere since it will be used mostly everywhere */
 #ifdef HAVE_BUTTONBAR
-struct gui_buttonbar tree_buttonbar;
+static struct gui_buttonbar tree_buttonbar;
 #endif
 static struct tree_context tc;
 
