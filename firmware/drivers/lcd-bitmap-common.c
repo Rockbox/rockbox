@@ -186,7 +186,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         }
 
         bits = font_get_bits(pf, *ucs);
-        LCDFN(mono_bitmap_part)(bits, ofs, 0, width, MAX(x + base_ofs, 0), y,
+        LCDFN(mono_bitmap_part)(bits, ofs, 0, width, x + base_ofs, y,
                 width - ofs, pf->height);
 
         if (is_diac)
