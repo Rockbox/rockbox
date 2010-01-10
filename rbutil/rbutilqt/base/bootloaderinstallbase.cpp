@@ -84,9 +84,9 @@ void BootloaderInstallBase::downloadBlFinish(bool error)
         return;
     }
     else if(m_http.isCached())
-        emit logItem(tr("Download finished (cache used)"), LOGOK);
+        emit logItem(tr("Download finished (cache used)."), LOGOK);
     else
-        emit logItem(tr("Download finished"), LOGOK);
+        emit logItem(tr("Download finished."), LOGOK);
 
     QCoreApplication::processEvents();
     m_blversion = m_http.timestamp();

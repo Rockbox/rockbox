@@ -157,7 +157,7 @@ void BootloaderInstallSansa::installStage3(bool mounted)
 {
     if(mounted) {
         logInstall(LogAdd);
-        emit logItem(tr("Bootloader Installation complete"), LOGINFO);
+        emit logItem(tr("Bootloader Installation complete."), LOGINFO);
         emit done(false);
         return;
     }

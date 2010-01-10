@@ -56,7 +56,7 @@ void ZipInstaller::installContinue()
     runner++; // this gets called when a install finished, so increase first.
     qDebug() << "[ZipInstall] runner done:" << runner << "/" << m_urllist.size();
     if(runner < m_urllist.size()) {
-        emit logItem(tr("Done"), LOGOK);
+        emit logItem(tr("done."), LOGOK);
         m_url = m_urllist.at(runner);
         m_logsection = m_loglist.at(runner);
         if(runner < m_verlist.size()) m_logver = m_verlist.at(runner);
@@ -64,7 +64,7 @@ void ZipInstaller::installContinue()
         installStart();
     }
     else {
-        emit logItem(tr("Installation finished successfully"), LOGOK);
+        emit logItem(tr("Installation finished successfully."), LOGOK);
 
         emit done(false);
         return;
@@ -117,19 +117,19 @@ void ZipInstaller::downloadDone(bool error)
         return;
     }
     if(getter->isCached())
-        emit logItem(tr("Cached file used"), LOGINFO);
+        emit logItem(tr("Cached file used."), LOGINFO);
     if(error) {
         emit logItem(tr("Download error: %1").arg(getter->errorString()), LOGERROR);
         emit done(true);
         return;
     }
-    else emit logItem(tr("Download finished"),LOGOK);
+    else emit logItem(tr("Download finished."),LOGOK);
     QCoreApplication::processEvents();
     if(m_unzip) {
         // unzip downloaded file
         qDebug() << "[ZipInstall] about to unzip " << m_file << "to" << m_mountpoint;
 
-        emit logItem(tr("Extracting file"), LOGINFO);
+        emit logItem(tr("Extracting file."), LOGINFO);
         QCoreApplication::processEvents();
 
         UnZip::ErrorCode ec;

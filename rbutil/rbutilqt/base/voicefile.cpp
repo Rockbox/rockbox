@@ -97,7 +97,7 @@ void VoiceFileCreator::downloadDone(bool error)
     }
     
     if(getter->isCached()) 
-        emit logItem(tr("Cached file used"), LOGINFO);
+        emit logItem(tr("Cached file used."), LOGINFO);
     if(error)
     {
         emit logItem(tr("Download error: %1").arg(getter->errorString()),LOGERROR);
@@ -105,7 +105,7 @@ void VoiceFileCreator::downloadDone(bool error)
         return;
     }
     else 
-        emit logItem(tr("Download finished"),LOGINFO);
+        emit logItem(tr("Download finished."),LOGINFO);
     
     QCoreApplication::processEvents();
 
