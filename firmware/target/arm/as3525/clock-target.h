@@ -52,7 +52,7 @@
 /* Clock Sources  */
 #define AS3525_CLK_MAIN           0
 #define AS3525_CLK_PLLA           1
-//#define AS3525_CLK_PLLB           2
+#define AS3525_CLK_PLLB           2
 #define AS3525_CLK_FCLK           3         /* Available as PCLK input only  */
 
 /** ************ Change these to reconfigure clocking scheme *******************/
@@ -69,6 +69,10 @@
                       /* *6/8 = 186MHz      93, 62, 46.5, 37.2 */
                       /* *5/8 = 155MHz      77.5, 51.67, 38.75 */
 #define AS3525_PLLA_SETTING     0x261F
+
+/* PLLB frequencies and settings (audio and USB) */
+#define AS3525_PLLB_FREQ        384000000   /* allows 44.1kHz with 0.04% error*/
+#define AS3525_PLLB_SETTING     0x2630
 
 #endif  /* SANSA_CLIPV2 */
 
@@ -106,6 +110,16 @@
 /* FCLK */
 #define AS3525_FCLK_SEL          AS3525_CLK_PLLA
 #define AS3525_FCLK_POSTDIV      (CLK_DIV((AS3525_PLLA_FREQ*(8-AS3525_FCLK_PREDIV)/8), AS3525_FCLK_FREQ) - 1) /*div=1/(n+1)*/
+
+/* MCLK */
+#define AS3525_MCLK_SEL          AS3525_CLK_PLLA
+#if (AS3525_MCLK_SEL==AS3525_CLK_PLLA)
+#define AS3525_MCLK_FREQ         AS3525_PLLA_FREQ
+#elif (AS3525_MCLK_SEL==AS3525_CLK_PLLB)
+#define AS3525_MCLK_FREQ         AS3525_PLLB_FREQ
+#else
+#error Choose either PLLA or PLLB for MCLK!
+#endif
 
 /* PCLK */
 #ifdef ASYNCHRONOUS_BUS
@@ -169,12 +183,12 @@
 
 /* I2SIN / I2SOUT frequencies */
 /* low samplerate */
-#if ((AS3525_PLLA_FREQ/(128*8000))) > 512   /* 8kHz = lowest frequency */
-#error PLLA frequency is too low for 8kHz samplerate !
+#if ((AS3525_MCLK_FREQ/(128*8000))) > 512   /* 8kHz = lowest frequency */
+#error AS3525_MCLK_FREQ is too high for 8kHz samplerate !
 #endif
 /* high samplerate */
-#if ((AS3525_PLLA_FREQ/(128*96000))) < 1   /* 96kHz = highest frequency */
-#error PLLA frequency is too high for 96kHz samplerate !
+#if ((AS3525_MCLK_FREQ/(128*96000))) < 1   /* 96kHz = highest frequency */
+#error AS3525_MCLK_FREQ is too low for 96kHz samplerate !
 #endif
 
 #endif /* CLOCK_TARGET_H */

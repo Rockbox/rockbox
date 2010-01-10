@@ -285,8 +285,15 @@ void system_init(void)
     CGU_PROC = 0;           /* fclk 24 MHz */
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
 
+    CGU_PLLASUP = 0;        /* enable PLLA */
     CGU_PLLA = AS3525_PLLA_SETTING;
     while(!(CGU_INTCTRL & (1<<0)));           /* wait until PLLA is locked */
+    
+#if (AS3525_MCLK_SEL == AS3525_CLK_PLLB)
+    CGU_PLLBSUP = 0;        /* enable PLLB */
+    CGU_PLLB = AS3525_PLLB_SETTING;
+    while(!(CGU_INTCTRL & (1<<1)));           /* wait until PLLB is locked */
+#endif
 
     /*  Set FCLK frequency */
     CGU_PROC = ((AS3525_FCLK_POSTDIV << 4) |

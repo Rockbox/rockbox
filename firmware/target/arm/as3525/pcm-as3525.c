@@ -139,11 +139,13 @@ void pcm_dma_apply_settings(void)
     unsigned long frequency = pcm_sampr;
 
     /* TODO : use a table ? */
-    const int divider = (((AS3525_PLLA_FREQ/128) + (frequency/2)) / frequency) - 1;
+    const int divider = ((AS3525_MCLK_FREQ/128) + (frequency/2)) / frequency;
 
     int cgu_audio = CGU_AUDIO;  /* read register */
+    cgu_audio &= ~(3 << 0);     /* clear i2sout MCLK_SEL */
+    cgu_audio |=  (AS3525_MCLK_SEL << 0);  /* set i2sout MCLK_SEL */
     cgu_audio &= ~(511 << 2);   /* clear i2sout divider */
-    cgu_audio |= divider << 2;  /* set new i2sout divider */
+    cgu_audio |= (divider - 1) << 2;  /* set new i2sout divider */
     CGU_AUDIO = cgu_audio;      /* write back register */
 }
 
@@ -318,13 +320,13 @@ void pcm_rec_dma_init(void)
     unsigned long frequency = pcm_sampr;
 
     /* TODO : use a table ? */
-    const int divider = (((AS3525_PLLA_FREQ/128) + (frequency/2)) / frequency) - 1;
+    const int divider = ((AS3525_MCLK_FREQ/128) + (frequency/2)) / frequency;
 
     int cgu_audio = CGU_AUDIO;  /* read register */
-    cgu_audio &= ~(3 << 12);    /* clear i2sin clocksource */
-    cgu_audio |=  (1 << 12);    /* set to PLLA */
+    cgu_audio &= ~(3 << 12);    /* clear i2sin MCLK_SEL */
+    cgu_audio |=  (AS3525_MCLK_SEL << 12);  /* set i2sin MCLK_SEL */
     cgu_audio &= ~(511 << 14);  /* clear i2sin divider */
-    cgu_audio |= divider << 14; /* set new i2sin divider */
+    cgu_audio |= (divider - 1) << 14; /* set new i2sin divider */
     CGU_AUDIO = cgu_audio;      /* write back register */
 }
 
