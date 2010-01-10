@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: button-c200v2.c 19035 2008-11-07 05:31:05Z jdgordon $
+ * $Id$
  *
  * Copyright (C) 2006 by Barry Wardell, (C) 2009 by Bertrik Sikken
  *

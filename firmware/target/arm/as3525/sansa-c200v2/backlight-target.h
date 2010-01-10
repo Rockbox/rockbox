@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: backlight-target.h 19136 2008-11-18 13:44:27Z dave $
+ * $Id$
  *
  * Copyright (C) 2006 Barry Wardell
  *

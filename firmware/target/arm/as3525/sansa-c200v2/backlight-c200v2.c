@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: backlight-e200v2-fuze.c 19224 2008-11-26 10:21:03Z pondlife $
+ * $Id$
  *
  * Copyright (C) 2006 by Barry Wardell
  *
