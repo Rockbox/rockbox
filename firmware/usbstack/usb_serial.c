@@ -147,7 +147,6 @@ void usb_serial_init(void)
     buffer_start = 0;
     buffer_length = 0;
     buffer_transitlength = 0;
-    active = true;
 }
 
 void usb_serial_disconnect(void)
