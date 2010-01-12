@@ -369,12 +369,14 @@ void set_cpu_frequency(long frequency)
 {
     if(frequency == CPUFREQ_MAX)
     {
+#ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
         /* Increasing frequency so boost voltage before change */
         ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_20));
 
         /* Some players run a bit low so use 1.175 volts instead of 1.20  */
         /* Wait for voltage to be at least 1.175v before making fclk > 200 MHz */
         while(adc_read(ADC_CVDD) < 470); /* 470 * .0025 = 1.175V */
+#endif  /*  HAVE_ADJUSTABLE_CPU_VOLTAGE */
 
         asm volatile(
             "mrc p15, 0, r0, c1, c0  \n"
@@ -399,8 +401,10 @@ void set_cpu_frequency(long frequency)
             "mcr p15, 0, r0, c1, c0  \n"
             : : : "r0" );
 
+#ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
         /* Decreasing frequency so reduce voltage after change */
         ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_10));
+#endif  /*  HAVE_ADJUSTABLE_CPU_VOLTAGE */
 
         cpu_frequency = CPUFREQ_NORMAL;
     }

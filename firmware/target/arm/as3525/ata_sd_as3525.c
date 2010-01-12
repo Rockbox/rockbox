@@ -854,7 +854,7 @@ void sd_enable(bool on)
     extern int buttonlight_is_on;
 #endif
 
-#ifdef HAVE_HOTSWAP
+#if defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE)
     static bool cpu_boosted = false;
 #endif
 
@@ -880,23 +880,24 @@ void sd_enable(bool on)
 #endif /* HAVE_MULTIDRIVE */
         sd_enabled = true;
 
-#ifdef HAVE_HOTSWAP
+#if defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE)
         if(card_detect_target())  /* If SD card present Boost cpu for voltage */
         {
             cpu_boosted = true;
             cpu_boost(true);
         }
-#endif
+#endif  /* defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE) */
     }
     else
     {
-#ifdef HAVE_HOTSWAP
+#if defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE)
         if(cpu_boosted)
         {
             cpu_boost(false);
             cpu_boosted = false;
         }
-#endif
+#endif  /* defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE) */
+
         sd_enabled = false;
 
 #ifdef HAVE_MULTIDRIVE
