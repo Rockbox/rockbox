@@ -225,6 +225,26 @@ struct touchregion {
 };
 #endif
 
+#define MAX_PLAYLISTLINE_TOKENS 16
+#define MAX_PLAYLISTLINE_STRINGS    8
+#define MAX_PLAYLISTLINE_STRLEN     8
+enum info_line_type {
+    TRACK_HAS_INFO = 0,
+    TRACK_HAS_NO_INFO
+};
+struct playlistviewer {
+    struct viewport *vp;
+    bool show_icons;
+    int start_offset;
+    struct {
+        enum wps_token_type tokens[MAX_PLAYLISTLINE_TOKENS];
+        char strings[MAX_PLAYLISTLINE_STRINGS][MAX_PLAYLISTLINE_STRLEN];
+        int count;
+        bool scroll;
+    } lines[2];
+};
+    
+
 
 #ifdef HAVE_ALBUMART
 struct skin_albumart {

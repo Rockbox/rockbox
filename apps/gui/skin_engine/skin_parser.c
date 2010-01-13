@@ -160,6 +160,8 @@ int parse_languagedirection(const char *wps_bufptr,
 #ifdef HAVE_LCD_BITMAP
 static int parse_viewport_display(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
+static int parse_playlistview(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data);
 static int parse_viewport(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_statusbar_enable(const char *wps_bufptr,
@@ -373,6 +375,9 @@ static const struct wps_tag all_tags[] = {
 
     { WPS_VIEWPORT_ENABLE,                "Vd",  WPS_REFRESH_DYNAMIC,
                                                     parse_viewport_display },
+#ifdef HAVE_LCD_BITMAP
+    { WPS_VIEWPORT_CUSTOMLIST,            "Vp",  WPS_REFRESH_STATIC, parse_playlistview },
+#endif
     { WPS_NO_TOKEN,                       "V",   0,    parse_viewport      },
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
@@ -713,6 +718,119 @@ static int parse_viewport_display(const char *wps_bufptr,
     token->value.i = letter;
     return 1;
 }
+
+#ifdef HAVE_LCD_BITMAP
+int parse_playlistview_text(struct playlistviewer *viewer,
+                             enum info_line_type line,  char* text)
+{
+    int cur_string = 0;
+    const struct wps_tag *tag;
+    int taglen = 0;
+    const char *start = text;
+    if (*text != '|')
+        return -1;
+    text++;
+    viewer->lines[line].count = 0;
+    viewer->lines[line].scroll = false;
+    while (*text != '|')
+    {
+        if (*text == '%') /* it is a token of some type */
+        {
+            text++;
+            taglen = 0;
+            switch(*text)
+            {
+                case '%':
+                case '<':
+                case '|':
+                case '>':
+                case ';':
+                case '#':
+                    /* escaped characters */
+                    viewer->lines[line].tokens[viewer->lines[line].count++] = WPS_TOKEN_CHARACTER;
+                    viewer->lines[line].strings[cur_string][0] = *text;
+                    viewer->lines[line].strings[cur_string++][0] = '\0';
+                    break;
+                default:
+                for (tag = all_tags;
+                     strncmp(text, tag->name, strlen(tag->name)) != 0;
+                     tag++) ;
+                /* %s isnt stored as a tag so manually check for it */
+                if (tag->type == WPS_NO_TOKEN)
+                {
+                    if (!strncmp(tag->name, "s", 1))
+                    {
+                        viewer->lines[line].scroll = true;
+                        taglen = 1;
+                    }
+                }
+                else if (tag->type == WPS_TOKEN_UNKNOWN)
+                {
+                    int i = 0;
+                    /* just copy the string */
+                    viewer->lines[line].tokens[viewer->lines[line].count++] = WPS_TOKEN_STRING;
+                    while (i<(MAX_PLAYLISTLINE_STRLEN-1) && text[i] != '|' && text[i] != '%')
+                    {
+                        viewer->lines[line].strings[cur_string][i] = text[i];
+                        i++;
+                    }
+                    viewer->lines[line].strings[cur_string][i] = '\0';
+                    cur_string++;
+                    taglen = i;
+                }
+                else
+                {                    
+                    taglen = strlen(tag->name);
+                    viewer->lines[line].tokens[viewer->lines[line].count++] = tag->type;
+                }
+                text += taglen;
+            }
+        }
+        else
+        {
+            /* regular string */
+            int i = 0;
+            /* just copy the string */
+            viewer->lines[line].tokens[viewer->lines[line].count++] = WPS_TOKEN_STRING;
+            while (i<(MAX_PLAYLISTLINE_STRLEN-1) && text[i] != '|' && text[i] != '%')
+            {
+                viewer->lines[line].strings[cur_string][i] = text[i];
+                i++;
+            }
+            viewer->lines[line].strings[cur_string][i] = '\0';
+            cur_string++;
+            text += i;
+        }
+    }
+    return text - start;
+}
+    
+
+static int parse_playlistview(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data)
+{
+    (void)wps_data;
+    /* %Vp|<use icons>|<start offset>|info line text|no info text| */
+    struct playlistviewer *viewer = skin_buffer_alloc(sizeof(struct playlistviewer));
+    char *ptr = strchr(wps_bufptr, '|');
+    int length;
+    if (!viewer || !ptr)
+        return WPS_ERROR_INVALID_PARAM;
+    viewer->vp = &curr_vp->vp;
+    viewer->show_icons = true;
+    viewer->start_offset = atoi(ptr+1);
+    token->value.data = (void*)viewer;
+    ptr = strchr(ptr+1, '|');
+    length = parse_playlistview_text(viewer, TRACK_HAS_INFO, ptr);          
+    if (length < 0)
+        return WPS_ERROR_INVALID_PARAM;
+    length = parse_playlistview_text(viewer, TRACK_HAS_NO_INFO, ptr+length);          
+    if (length < 0)
+        return WPS_ERROR_INVALID_PARAM;
+    
+    return skip_end_of_line(wps_bufptr);
+}
+#endif
 
 static int parse_viewport(const char *wps_bufptr,
                           struct wps_token *token,

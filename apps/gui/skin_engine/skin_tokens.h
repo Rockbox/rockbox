@@ -54,6 +54,7 @@ enum wps_token_type {
 
     /* Viewport display */
     WPS_VIEWPORT_ENABLE,
+    WPS_VIEWPORT_CUSTOMLIST,
     
     /* Battery */
   TOKEN_MARKER_BATTERY,
@@ -237,6 +238,7 @@ struct skin_token_list {
     struct skin_token_list *next;
 };
 
+char* get_dir(char* buf, int buf_size, const char* path, int level);
  
 #endif
  

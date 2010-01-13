@@ -81,7 +81,7 @@ static char* get_codectype(const struct mp3entry* id3)
  *
  * Returns buf if the desired level was found, NULL otherwise.
  */
-static char* get_dir(char* buf, int buf_size, const char* path, int level)
+char* get_dir(char* buf, int buf_size, const char* path, int level)
 {
     const char* sep;
     const char* last_sep;

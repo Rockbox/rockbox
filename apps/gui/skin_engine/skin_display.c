@@ -35,6 +35,8 @@
 #include "statusbar.h"
 #include "scrollbar.h"
 #include "screen_access.h"
+#include "playlist.h"
+#include "playback.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -163,6 +165,94 @@ static void draw_progressbar(struct gui_wps *gwps,
         cue_draw_markers(display, state->id3->cuesheet, length,
                          pb->x, pb->x + pb->width, y+1, pb->height-2);
 }
+bool audio_peek_track(struct mp3entry* id3, int offset);
+static void draw_playlist_viewer_list(struct gui_wps *gwps,
+                                      struct playlistviewer *viewer)
+{
+    int lines = viewport_get_nb_lines(viewer->vp);
+    int line_height = font_get(viewer->vp->font)->height;
+    int cur_playlist_pos = playlist_get_display_index();
+    int start_item = MAX(0, cur_playlist_pos + viewer->start_offset);
+    int i;
+    
+    struct mp3entry *pid3, id3;
+    char buf[MAX_PATH*2], tempbuf[MAX_PATH];
+    
+    
+    gwps->display->set_viewport(viewer->vp);
+    for(i=start_item; (i-start_item)<lines && i<playlist_amount(); i++)
+    {
+        if (i == cur_playlist_pos)
+        {
+            pid3 = audio_current_track();
+        }
+        else if (i == cur_playlist_pos+1)
+        {
+            pid3 = audio_next_track();
+        }            
+        else if ((i>cur_playlist_pos) && audio_peek_track(&id3, i-cur_playlist_pos))
+        {
+            pid3 = &id3;
+        }
+        else
+            pid3 = NULL;
+            
+        int line = pid3 ? TRACK_HAS_INFO : TRACK_HAS_NO_INFO;        
+        int token = 0, cur_string = 0;
+        char *filename = playlist_peek(i-cur_playlist_pos);
+        buf[0] = '\0';
+        while (token < viewer->lines[line].count)
+        {
+            switch (viewer->lines[line].tokens[token])
+            {
+                case WPS_TOKEN_STRING:
+                case WPS_TOKEN_CHARACTER:
+                    strcat(buf, viewer->lines[line].strings[cur_string++]);
+                    break;
+                case WPS_TOKEN_PLAYLIST_POSITION:
+                    snprintf(tempbuf, sizeof(tempbuf), "%d", i);
+                    strcat(buf, tempbuf);
+                    break;
+                case WPS_TOKEN_FILE_NAME:
+                    get_dir(tempbuf, sizeof(tempbuf), filename, 0);
+                    strcat(buf, tempbuf);                    
+                    break;
+                case WPS_TOKEN_FILE_PATH:
+                    strcat(buf, filename);
+                    break;                
+                case WPS_TOKEN_METADATA_ARTIST:
+                    if (pid3)
+                        strcat(buf, pid3->artist ? pid3->artist : "");
+                    break;
+                case WPS_TOKEN_METADATA_TRACK_TITLE:
+                    if (pid3)
+                        strcat(buf, pid3->title ? pid3->title : "");
+                    break;
+                case WPS_TOKEN_TRACK_LENGTH:
+                    if (pid3)
+                    {
+                        format_time(tempbuf, sizeof(tempbuf), pid3->length);
+                        strcat(buf, tempbuf);
+                    }
+                    break;                      
+                    
+                default:
+                    break;
+            }
+            token++;
+        }
+            
+        if (viewer->lines[line].scroll)
+        {
+            gwps->display->puts_scroll(0, (i-start_item), buf );
+        }
+        else
+        {            
+            gwps->display->putsxy(0, (i-start_item)*line_height, buf );
+        }
+    }
+}
+
 
 /* clears the area where the image was shown */
 static void clear_image_pos(struct gui_wps *gwps, struct gui_img *img)
@@ -595,6 +685,11 @@ static bool get_line(struct gui_wps *gwps,
                 }
             }
                 break;
+#ifdef HAVE_LCD_BITMAP
+            case WPS_VIEWPORT_CUSTOMLIST:
+                draw_playlist_viewer_list(gwps, data->tokens[i].value.data);
+                break;
+#endif
             default:
             {
                 /* get the value of the tag and copy it to the buffer */

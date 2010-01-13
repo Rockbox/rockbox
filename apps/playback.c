@@ -629,6 +629,23 @@ struct mp3entry* audio_next_track(void)
     return NULL;
 }
 
+bool audio_peek_track(struct mp3entry* id3, int offset)
+{
+    int next_idx;
+    int new_offset = ci.new_track + wps_offset + offset;
+
+    if (!audio_have_tracks())
+        return false;
+    next_idx = (track_ridx + new_offset) & MAX_TRACK_MASK;
+
+    if (tracks[next_idx].id3_hid >= 0)
+    {
+        bufread(tracks[next_idx].id3_hid, sizeof(struct mp3entry), id3);
+        return true;
+    }
+    return false;
+}
+
 #ifdef HAVE_ALBUMART
 int playback_current_aa_hid(int slot)
 {
