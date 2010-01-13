@@ -720,7 +720,7 @@ static int parse_viewport_display(const char *wps_bufptr,
 }
 
 #ifdef HAVE_LCD_BITMAP
-int parse_playlistview_text(struct playlistviewer *viewer,
+static int parse_playlistview_text(struct playlistviewer *viewer,
                              enum info_line_type line,  char* text)
 {
     int cur_string = 0;
@@ -749,7 +749,7 @@ int parse_playlistview_text(struct playlistviewer *viewer,
                     /* escaped characters */
                     viewer->lines[line].tokens[viewer->lines[line].count++] = WPS_TOKEN_CHARACTER;
                     viewer->lines[line].strings[cur_string][0] = *text;
-                    viewer->lines[line].strings[cur_string++][0] = '\0';
+                    viewer->lines[line].strings[cur_string++][1] = '\0';
                     break;
                 default:
                 for (tag = all_tags;
