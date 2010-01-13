@@ -105,12 +105,13 @@ static const char * model(uint8_t id)
 		case 0x24: return "E200"; break;
 		case 0x25: return "M200"; break;
 		case 0x27: return "CLV2"; break;
+		case 0x28: return "CLI+"; break;
         case 0x70:
 		case 0x6d: return "FUZ2"; break;
 		default:
 		printf("Unknown ID 0x%x\n", id);
 
-		assert(id == 0x1E || (id > 0x21 && id < 0x26));
+		assert(id == 0x1E || (id >= 0x22 && id <= 0x28));
 		return "UNKNOWN!";
 	}
 }
