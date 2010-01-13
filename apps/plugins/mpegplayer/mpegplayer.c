@@ -151,6 +151,7 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_VOLUP2     BUTTON_VOL_UP
 #define MPEG_RW         BUTTON_UP
 #define MPEG_FF         BUTTON_DOWN
+
 #define MPEG_RC_MENU    BUTTON_RC_DSP
 #define MPEG_RC_STOP    (BUTTON_RC_PLAY | BUTTON_REPEAT)
 #define MPEG_RC_PAUSE   (BUTTON_RC_PLAY | BUTTON_REL)
@@ -170,6 +171,7 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_VOLUP2     BUTTON_VOL_UP
 #define MPEG_RW         BUTTON_UP
 #define MPEG_FF         BUTTON_DOWN
+
 #define MPEG_RC_MENU    BUTTON_RC_DSP
 #define MPEG_RC_STOP    (BUTTON_RC_PLAY | BUTTON_REPEAT)
 #define MPEG_RC_PAUSE   (BUTTON_RC_PLAY | BUTTON_REL)
@@ -337,7 +339,7 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 /* One thing we can do here for targets with remotes is having a display
  * always on the remote instead of always forcing a popup on the main display */
 
-#define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
+#define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP (TS_SECOND/2)
 #define WVS_MIN_UPDATE_INTERVAL (HZ/2)
@@ -467,18 +469,7 @@ static void draw_clear_area(int x, int y, int width, int height)
 
 static void draw_clear_area_rect(const struct vo_rect *rc)
 {
-    int x = rc->l;
-    int y = rc->t;
-    int width = rc->r - rc->l;
-    int height = rc->b - rc->t;
-#ifdef HAVE_LCD_COLOR
-    rb->screen_clear_area(rb->screens[SCREEN_MAIN], _X, _Y, _W, _H);
-#else
-    int oldmode = grey_get_drawmode();
-    grey_set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
-    grey_fillrect(_X, _Y, _W, _H);
-    grey_set_drawmode(oldmode);
-#endif
+    draw_clear_area(rc->l, rc->t, rc->r - rc->l, rc->b - rc->t);
 }
 
 static void draw_fillrect(int x, int y, int width, int height)
@@ -572,7 +563,7 @@ static void draw_oriented_mono_bitmap_part(const unsigned char *src,
     src_end = src + width;
 
     dst = rb->lcd_framebuffer + (LCD_WIDTH - y) + x*LCD_WIDTH;
-    do 
+    do
     {
         const unsigned char *src_col = src++;
         unsigned data = *src_col >> src_y;
@@ -582,7 +573,7 @@ static void draw_oriented_mono_bitmap_part(const unsigned char *src,
         dst_end = dst_col - height;
         dst += LCD_WIDTH;
 
-        do 
+        do
         {
             dst_col--;
 
@@ -882,7 +873,7 @@ static void wvs_refresh_time(void)
     hms_format(buf, sizeof (buf), &hms);
 
     draw_clear_area_rect(&wvs.time_rect);
-    draw_putsxy_oriented(wvs.time_rect.l, wvs.time_rect.t, buf);    
+    draw_putsxy_oriented(wvs.time_rect.l, wvs.time_rect.t, buf);
 
     vo_rect_union(&wvs.update_rect, &wvs.update_rect,
                   &wvs.prog_rect);
@@ -1588,6 +1579,10 @@ static void button_loop(void)
 
             /* The menu can change the font, so restore */
             rb->lcd_setfont(FONT_SYSFIXED);
+#ifdef HAVE_LCD_COLOR
+            rb->lcd_set_foreground(LCD_WHITE);
+            rb->lcd_set_background(LCD_BLACK);
+#endif
 
             switch (result)
             {
@@ -1739,7 +1734,7 @@ enum plugin_status plugin_start(const void* parameter)
             rb->lcd_clear_display();
             rb->lcd_update();
 
-            save_settings();  /* Save settings (if they have changed) */
+            save_settings();
             status = PLUGIN_OK;
 
             mpeg_menu_sysevent_handle();
@@ -1757,7 +1752,7 @@ enum plugin_status plugin_start(const void* parameter)
             rb->splashf(HZ*2, errstring, err);
         }
     }
-    
+
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_YUV)
     rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif

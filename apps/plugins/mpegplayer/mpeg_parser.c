@@ -354,7 +354,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
     uint32_t time_right = str_parser.end_pts;
     uint32_t pts = 0;
     uint32_t prevpts = 0;
-    enum state_enum state = state0;
+    enum state_enum state = STATE0;
     struct stream_scan sk;
 
     /* Initial estimate taken from average bitrate - later interpolations are
@@ -372,7 +372,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
 
     sk.dir = SSCAN_REVERSE;
 
-    while (state < state9)
+    while (state < STATE9)
     {
         uint32_t currpts;
         sk.pos = pos_new;
@@ -422,7 +422,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
                     pos_new = pos_right;
                 }
 
-                state = state2; /* Last scan was early */
+                state = STATE2; /* Last scan was early */
                 sk.dir = SSCAN_REVERSE;
    
                 DEBUGF(">> tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
@@ -450,7 +450,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
 
                 pos_new += pos_left - pos_adj;
 
-                state = state3; /* Last scan was late */
+                state = STATE3; /* Last scan was late */
                 sk.dir = SSCAN_REVERSE;
 
                 DEBUGF("<< tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
@@ -465,7 +465,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
                        (unsigned)time_right, pos_left, pos_new, pos_right);
                 pts = currpts;
                 pos = sk.pos;
-                state = state9;
+                state = STATE9;
             }
         }
         else
@@ -474,17 +474,17 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
 
             switch (state)
             {
-            case state1:
+            case STATE1:
                 /* We already tried the bruteforce scan and failed again - no
                  * more stamps could possibly exist in the interval */
                 DEBUGF("!! no timestamp 2x\n");
                 break;
-            case state0:
+            case STATE0:
                 /* Hardly likely except at very beginning - just do L->R scan
                  * to find something */
                 DEBUGF("!! no timestamp on first probe: %ld\n", sk.pos);
-            case state2:
-            case state3:
+            case STATE2:
+            case STATE3:
                 /* Could just be missing timestamps because the interval is
                  * narrowing down. A large block of data from another stream
                  * may also be in the midst of our chosen points which could
@@ -495,7 +495,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
                 DEBUGF("?? tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
                        (unsigned)time_left, (unsigned)time, (unsigned)currpts,
                        (unsigned)time_right, pos_left, pos_new, pos_right);
-                state = state1;
+                state = STATE1;
                 break;
             default:
                 DEBUGF("?? Invalid state: %d\n", state);
@@ -506,7 +506,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
         if (currpts == prevpts)
         {
             DEBUGF("!! currpts == prevpts (stop)\n");
-            state = state9;
+            state = STATE9;
         }
 
         prevpts = currpts;

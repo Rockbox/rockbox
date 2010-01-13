@@ -13,16 +13,16 @@ struct mpeg_settings settings;
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define MPEG_START_TIME_SELECT      BUTTON_ON
-#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_UP
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #define MPEG_START_TIME_SELECT      BUTTON_PLAY
-#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_UP
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
@@ -31,8 +31,8 @@ struct mpeg_settings settings;
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define MPEG_START_TIME_SELECT      BUTTON_SELECT
-#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_SCROLL_FWD
 #define MPEG_START_TIME_DOWN        BUTTON_SCROLL_BACK
 #define MPEG_START_TIME_EXIT        BUTTON_MENU
@@ -43,16 +43,16 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_UP
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
-#define MPEG_START_TIME_SCROLL_DOWN BUTTON_VOL_DOWN
-#define MPEG_START_TIME_SCROLL_UP   BUTTON_VOL_UP
+#define MPEG_START_TIME_LEFT2       BUTTON_VOL_UP
+#define MPEG_START_TIME_RIGHT2      BUTTON_VOL_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
-#define MPEG_START_TIME_RC_SELECT      (BUTTON_RC_PLAY | BUTTON_REL)
-#define MPEG_START_TIME_RC_LEFT        BUTTON_RC_REW
-#define MPEG_START_TIME_RC_RIGHT       BUTTON_RC_FF
-#define MPEG_START_TIME_RC_UP          BUTTON_RC_VOL_UP
-#define MPEG_START_TIME_RC_DOWN        BUTTON_RC_VOL_DOWN
-#define MPEG_START_TIME_RC_EXIT        (BUTTON_RC_PLAY | BUTTON_REPEAT)
+#define MPEG_START_TIME_RC_SELECT   (BUTTON_RC_PLAY | BUTTON_REL)
+#define MPEG_START_TIME_RC_LEFT     BUTTON_RC_REW
+#define MPEG_START_TIME_RC_RIGHT    BUTTON_RC_FF
+#define MPEG_START_TIME_RC_UP       BUTTON_RC_VOL_UP
+#define MPEG_START_TIME_RC_DOWN     BUTTON_RC_VOL_DOWN
+#define MPEG_START_TIME_RC_EXIT     (BUTTON_RC_PLAY | BUTTON_REPEAT)
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 #define MPEG_START_TIME_SELECT      BUTTON_SELECT
@@ -60,16 +60,16 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_UP
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
-#define MPEG_START_TIME_SCROLL_DOWN BUTTON_VOL_DOWN
-#define MPEG_START_TIME_SCROLL_UP   BUTTON_VOL_UP
+#define MPEG_START_TIME_LEFT2       BUTTON_VOL_UP
+#define MPEG_START_TIME_RIGHT2      BUTTON_VOL_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
-#define MPEG_START_TIME_RC_SELECT      (BUTTON_RC_PLAY | BUTTON_REL)
-#define MPEG_START_TIME_RC_LEFT        BUTTON_RC_REW
-#define MPEG_START_TIME_RC_RIGHT       BUTTON_RC_FF
-#define MPEG_START_TIME_RC_UP          BUTTON_RC_VOL_UP
-#define MPEG_START_TIME_RC_DOWN        BUTTON_RC_VOL_DOWN
-#define MPEG_START_TIME_RC_EXIT        (BUTTON_RC_PLAY | BUTTON_REPEAT)
+#define MPEG_START_TIME_RC_SELECT   (BUTTON_RC_PLAY | BUTTON_REL)
+#define MPEG_START_TIME_RC_LEFT     BUTTON_RC_REW
+#define MPEG_START_TIME_RC_RIGHT    BUTTON_RC_FF
+#define MPEG_START_TIME_RC_UP       BUTTON_RC_VOL_UP
+#define MPEG_START_TIME_RC_DOWN     BUTTON_RC_VOL_DOWN
+#define MPEG_START_TIME_RC_EXIT     (BUTTON_RC_PLAY | BUTTON_REPEAT)
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define MPEG_START_TIME_SELECT      BUTTON_PLAY
@@ -81,44 +81,44 @@ struct mpeg_settings settings;
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
 #define MPEG_START_TIME_SELECT      BUTTON_SELECT
-#define MPEG_START_TIME_SCROLL_UP   BUTTON_SCROLL_BACK
-#define MPEG_START_TIME_SCROLL_DOWN BUTTON_SCROLL_FWD
 #define MPEG_START_TIME_LEFT        BUTTON_LEFT
 #define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_UP
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_LEFT2       BUTTON_SCROLL_BACK
+#define MPEG_START_TIME_RIGHT2      BUTTON_SCROLL_FWD
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
 #define MPEG_START_TIME_SELECT      BUTTON_SELECT
-#define MPEG_START_TIME_SCROLL_UP   BUTTON_SCROLL_BACK
-#define MPEG_START_TIME_SCROLL_DOWN BUTTON_SCROLL_FWD
 #define MPEG_START_TIME_LEFT        BUTTON_LEFT
 #define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_UP
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_LEFT2       BUTTON_SCROLL_BACK
+#define MPEG_START_TIME_RIGHT2      BUTTON_SCROLL_FWD
 #define MPEG_START_TIME_EXIT        (BUTTON_HOME|BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == SANSA_C200_PAD) || \
 (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
 (CONFIG_KEYPAD == SANSA_M200_PAD)
 #define MPEG_START_TIME_SELECT      BUTTON_SELECT
-#define MPEG_START_TIME_SCROLL_UP   BUTTON_VOL_UP
-#define MPEG_START_TIME_SCROLL_DOWN BUTTON_VOL_DOWN
 #define MPEG_START_TIME_LEFT        BUTTON_LEFT
 #define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_UP
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_LEFT2       BUTTON_VOL_UP
+#define MPEG_START_TIME_RIGHT2      BUTTON_VOL_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
 #elif CONFIG_KEYPAD == MROBE500_PAD
 #define MPEG_START_TIME_SELECT      BUTTON_RC_HEART
-#define MPEG_START_TIME_SCROLL_UP   BUTTON_RC_VOL_UP
-#define MPEG_START_TIME_SCROLL_DOWN BUTTON_RC_VOL_DOWN
 #define MPEG_START_TIME_LEFT        BUTTON_LEFT
 #define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_RC_PLAY
 #define MPEG_START_TIME_DOWN        BUTTON_RC_DOWN
+#define MPEG_START_TIME_LEFT2       BUTTON_RC_VOL_UP
+#define MPEG_START_TIME_RIGHT2      BUTTON_RC_VOL_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
 #elif CONFIG_KEYPAD == MROBE100_PAD
@@ -127,8 +127,8 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_UP
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
-#define MPEG_START_TIME_SCROLL_DOWN BUTTON_MENU
-#define MPEG_START_TIME_SCROLL_UP   BUTTON_PLAY
+#define MPEG_START_TIME_LEFT2       BUTTON_PLAY
+#define MPEG_START_TIME_RIGHT2      BUTTON_MENU
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
@@ -152,12 +152,12 @@ struct mpeg_settings settings;
 
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 #define MPEG_START_TIME_SELECT      BUTTON_SELECT
-#define MPEG_START_TIME_SCROLL_UP   BUTTON_PLAY
-#define MPEG_START_TIME_SCROLL_DOWN BUTTON_MENU
 #define MPEG_START_TIME_LEFT        BUTTON_LEFT
 #define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_UP
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_LEFT2       BUTTON_PLAY
+#define MPEG_START_TIME_RIGHT2      BUTTON_MENU
 #define MPEG_START_TIME_EXIT        BUTTON_BACK
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
@@ -166,8 +166,8 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_UP
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
-#define MPEG_START_TIME_SCROLL_DOWN BUTTON_VOL_DOWN
-#define MPEG_START_TIME_SCROLL_UP   BUTTON_VOL_UP
+#define MPEG_START_TIME_LEFT2       BUTTON_VOL_UP
+#define MPEG_START_TIME_RIGHT2      BUTTON_VOL_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
@@ -176,8 +176,8 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_RIGHT       BUTTON_NEXT
 #define MPEG_START_TIME_UP          BUTTON_UP
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
-#define MPEG_START_TIME_SCROLL_DOWN BUTTON_VOL_DOWN
-#define MPEG_START_TIME_SCROLL_UP   BUTTON_VOL_UP
+#define MPEG_START_TIME_LEFT2       BUTTON_VOL_UP
+#define MPEG_START_TIME_RIGHT2      BUTTON_VOL_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
@@ -192,8 +192,8 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
 #define MPEG_START_TIME_UP          BUTTON_UP
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
-#define MPEG_START_TIME_SCROLL_DOWN BUTTON_FFWD
-#define MPEG_START_TIME_SCROLL_UP   BUTTON_REW
+#define MPEG_START_TIME_LEFT2       BUTTON_REW
+#define MPEG_START_TIME_RIGHT2      BUTTON_FFWD
 #define MPEG_START_TIME_EXIT        BUTTON_REC
 
 #else
@@ -203,12 +203,6 @@ struct mpeg_settings settings;
 #ifdef HAVE_TOUCHSCREEN
 #ifndef MPEG_START_TIME_SELECT
 #define MPEG_START_TIME_SELECT      BUTTON_CENTER
-#endif
-#ifndef MPEG_START_TIME_SCROLL_UP
-#define MPEG_START_TIME_SCROLL_UP   BUTTON_TOPRIGHT
-#endif
-#ifndef MPEG_START_TIME_SCROLL_DOWN
-#define MPEG_START_TIME_SCROLL_DOWN BUTTON_TOPLEFT
 #endif
 #ifndef MPEG_START_TIME_LEFT
 #define MPEG_START_TIME_LEFT        BUTTON_MIDLEFT
@@ -221,6 +215,12 @@ struct mpeg_settings settings;
 #endif
 #ifndef MPEG_START_TIME_DOWN
 #define MPEG_START_TIME_DOWN        BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef MPEG_START_TIME_LEFT2
+#define MPEG_START_TIME_LEFT2       BUTTON_TOPRIGHT
+#endif
+#ifndef MPEG_START_TIME_RIGHT2
+#define MPEG_START_TIME_RIGHT2      BUTTON_TOPLEFT
 #endif
 #ifndef MPEG_START_TIME_EXIT
 #define MPEG_START_TIME_EXIT        BUTTON_TOPLEFT
@@ -236,7 +236,7 @@ static struct configdata config[] =
      NULL},
     {TYPE_INT, 0, MPEG_RESUME_NUM_OPTIONS,
      { .int_p = &settings.resume_options }, "Resume options", NULL},
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) || defined(SANSA_FUZE) || defined(SANSA_E200V2)
+#if MPEG_OPTION_DITHERING_ENABLED
     {TYPE_INT, 0, INT_MAX, { .int_p = &settings.displayoptions },
      "Display options", NULL},
 #endif
@@ -624,7 +624,7 @@ static int get_start_time(uint32_t duration)
     struct vo_rect rc_vid, rc_bound;
     uint32_t aspect_vid, aspect_bound;
 
-    enum state_enum slider_state = state0;
+    enum state_enum slider_state = STATE0;
 
     lcd_(clear_display)();
     lcd_(update)();
@@ -699,7 +699,7 @@ static int get_start_time(uint32_t duration)
     stream_gray_show(true);
 #endif
 
-    while (slider_state < state9)
+    while (slider_state < STATE9)
     {
         mpeg_menu_sysevent_clear();
         button = tmo == TIMEOUT_BLOCK ?
@@ -720,7 +720,7 @@ static int get_start_time(uint32_t duration)
         case MPEG_START_TIME_RC_DOWN | BUTTON_REPEAT:
 #endif
             resume_time = increment_time(resume_time, -60*TS_SECOND, duration);
-            slider_state = state0;
+            slider_state = STATE0;
             break;
 
         case MPEG_START_TIME_UP:
@@ -730,7 +730,7 @@ static int get_start_time(uint32_t duration)
         case MPEG_START_TIME_RC_UP | BUTTON_REPEAT:
 #endif
             resume_time = increment_time(resume_time, 60*TS_SECOND, duration);
-            slider_state = state0;
+            slider_state = STATE0;
             break;
 
         /* Fine (1 second) control */
@@ -740,12 +740,12 @@ static int get_start_time(uint32_t duration)
         case MPEG_START_TIME_RC_LEFT:
         case MPEG_START_TIME_RC_LEFT | BUTTON_REPEAT:
 #endif
-#ifdef MPEG_START_TIME_SCROLL_UP
-        case MPEG_START_TIME_SCROLL_UP:
-        case MPEG_START_TIME_SCROLL_UP | BUTTON_REPEAT:
+#ifdef MPEG_START_TIME_LEFT2
+        case MPEG_START_TIME_LEFT2:
+        case MPEG_START_TIME_LEFT2 | BUTTON_REPEAT:
 #endif
             resume_time = increment_time(resume_time, -TS_SECOND, duration);
-            slider_state = state0;
+            slider_state = STATE0;
             break;
 
         case MPEG_START_TIME_RIGHT:
@@ -754,12 +754,12 @@ static int get_start_time(uint32_t duration)
         case MPEG_START_TIME_RC_RIGHT:
         case MPEG_START_TIME_RC_RIGHT | BUTTON_REPEAT:
 #endif
-#ifdef MPEG_START_TIME_SCROLL_DOWN
-        case MPEG_START_TIME_SCROLL_DOWN:
-        case MPEG_START_TIME_SCROLL_DOWN | BUTTON_REPEAT:
+#ifdef MPEG_START_TIME_RIGHT2
+        case MPEG_START_TIME_RIGHT2:
+        case MPEG_START_TIME_RIGHT2 | BUTTON_REPEAT:
 #endif
             resume_time = increment_time(resume_time, TS_SECOND, duration);
-            slider_state = state0;
+            slider_state = STATE0;
             break;
 
         case MPEG_START_TIME_SELECT:
@@ -768,7 +768,7 @@ static int get_start_time(uint32_t duration)
 #endif
             settings.resume_time = resume_time;
             button = MPEG_START_SEEK;
-            slider_state = state9;
+            slider_state = STATE9;
             break;
 
         case MPEG_START_TIME_EXIT:
@@ -776,17 +776,17 @@ static int get_start_time(uint32_t duration)
         case MPEG_START_TIME_RC_EXIT:
 #endif
             button = MPEG_START_EXIT;
-            slider_state = state9;
+            slider_state = STATE9;
             break;
 
         case ACTION_STD_CANCEL:
             button = MPEG_START_QUIT;
-            slider_state = state9;
+            slider_state = STATE9;
             break;
 
 #ifdef HAVE_LCD_ENABLE
         case LCD_ENABLE_EVENT_0:
-            if (slider_state == state2)
+            if (slider_state == STATE2)
                 display_thumb_image(&rc_vid);
             continue;
 #endif
@@ -799,18 +799,18 @@ static int get_start_time(uint32_t duration)
 
         switch (slider_state)
         {
-        case state0:
+        case STATE0:
             trigger_cpu_boost();
             stream_seek(resume_time, SEEK_SET);
             show_loading(&rc_bound);
             draw_slider(duration, resume_time, NULL);
-            slider_state = state1;
+            slider_state = STATE1;
             tmo = THUMB_DELAY;
             break;
-        case state1:
+        case STATE1:
             display_thumb_image(&rc_vid);
-            slider_state = state2;
-        case state2:
+            slider_state = STATE2;
+        case STATE2:
             cancel_cpu_boost();
             tmo = TIMEOUT_BLOCK;
         default:
@@ -968,7 +968,6 @@ int mpeg_menu(void)
     return result;
 }
 
-/** MPEG Menu **/
 static void display_options(void)
 {
     int selected = 0;
@@ -1121,13 +1120,9 @@ static void resume_options(void)
 
 static void clear_resume_count(void)
 {
+    settings.resume_count = 0;
     configfile_save(SETTINGS_FILENAME, config, ARRAYLEN(config),
                     SETTINGS_VERSION);
-
-    settings.resume_count = 0;
-
-    /* add this place holder so the count is above resume entries */
-    configfile_update_entry(SETTINGS_FILENAME, "Resume count", 0);
 }
 
 static void mpeg_settings(void)
@@ -1188,7 +1183,7 @@ void init_settings(const char* filename)
     settings.limitfps = 1;    /* Limit FPS */
     settings.skipframes = 1;  /* Skip frames */
     settings.resume_options = MPEG_RESUME_MENU_ALWAYS; /* Enable start menu */
-    settings.resume_count = -1;
+    settings.resume_count = 0;
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     settings.backlight_brightness = -1; /* Use default setting */
 #endif
@@ -1201,40 +1196,26 @@ void init_settings(const char* filename)
     settings.equalizer = false;
     settings.dithering = false;
 
-    if (configfile_load(SETTINGS_FILENAME, config,
-                        sizeof(config)/sizeof(*config),
+    if (configfile_load(SETTINGS_FILENAME, config, ARRAYLEN(config),
                         SETTINGS_MIN_VERSION) < 0)
     {
         /* Generate a new config file with default values */
-        configfile_save(SETTINGS_FILENAME, config,
-                        sizeof(config)/sizeof(*config),
+        configfile_save(SETTINGS_FILENAME, config, ARRAYLEN(config),
                         SETTINGS_VERSION);
     }
 
-#if MPEG_OPTION_DITHERING_ENABLED
-    if ((settings.displayoptions =
-         configfile_get_value(SETTINGS_FILENAME, "Display options")) < 0)
-    {
-        configfile_update_entry(SETTINGS_FILENAME, "Display options",
-                                (settings.displayoptions=0));
-    }
-    rb->lcd_yuv_set_options(settings.displayoptions);
-#endif
+    rb->strlcpy(settings.resume_filename, filename, MAX_PATH);
 
-    if (settings.resume_count < 0)
-    {
-        settings.resume_count = 0;
-        configfile_update_entry(SETTINGS_FILENAME, "Resume count", 0);
-    }
-
-    rb->snprintf(settings.resume_filename, MAX_PATH, "%s", filename);
-
-    /* get the resume time for the current mpeg if it exist */
+    /* get the resume time for the current mpeg if it exists */
     if ((settings.resume_time = configfile_get_value
          (SETTINGS_FILENAME, filename)) < 0)
     {
         settings.resume_time = 0;
     }
+
+#if MPEG_OPTION_DITHERING_ENABLED
+    rb->lcd_yuv_set_options(settings.displayoptions);
+#endif
 
     /* Set our audio options */
     sync_audio_settings(false);
@@ -1242,14 +1223,12 @@ void init_settings(const char* filename)
 
 void save_settings(void)
 {
-    configfile_update_entry(SETTINGS_FILENAME, "Show FPS",
-                            settings.showfps);
-    configfile_update_entry(SETTINGS_FILENAME, "Limit FPS",
-                            settings.limitfps);
-    configfile_update_entry(SETTINGS_FILENAME, "Skip frames",
-                            settings.skipframes);
-    configfile_update_entry(SETTINGS_FILENAME, "Resume options",
-                            settings.resume_options);
+    unsigned i;
+    for (i = 0; i < ARRAYLEN(config); i++)
+    {
+        configfile_update_entry(SETTINGS_FILENAME, config[i].name,
+                                *(config[i].int_p));
+    }
 
     /* If this was a new resume entry then update the total resume count */
     if (configfile_update_entry(SETTINGS_FILENAME, settings.resume_filename,
@@ -1258,26 +1237,6 @@ void save_settings(void)
         configfile_update_entry(SETTINGS_FILENAME, "Resume count",
                                 ++settings.resume_count);
     }
-
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    configfile_update_entry(SETTINGS_FILENAME, "Backlight brightness",
-                            settings.backlight_brightness);
-#endif
-
-#if MPEG_OPTION_DITHERING_ENABLED
-    configfile_update_entry(SETTINGS_FILENAME, "Display options",
-                            settings.displayoptions);
-#endif
-    configfile_update_entry(SETTINGS_FILENAME, "Tone controls",
-                            settings.tone_controls);
-    configfile_update_entry(SETTINGS_FILENAME, "Channel modes",
-                            settings.channel_modes);
-    configfile_update_entry(SETTINGS_FILENAME, "Crossfeed",
-                            settings.crossfeed);
-    configfile_update_entry(SETTINGS_FILENAME, "Equalizer",
-                            settings.equalizer);
-    configfile_update_entry(SETTINGS_FILENAME, "Dithering",
-                            settings.dithering);
 
     /* Restore audio options */
     sync_audio_settings(true);

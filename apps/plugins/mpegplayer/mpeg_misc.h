@@ -31,16 +31,16 @@
 /* Generic states for when things are too simple to care about naming them */
 enum state_enum
 {
-    state0 = 0,
-    state1,
-    state2,
-    state3,
-    state4,
-    state5,
-    state6,
-    state7,
-    state8,
-    state9,
+    STATE0 = 0,
+    STATE1,
+    STATE2,
+    STATE3,
+    STATE4,
+    STATE5,
+    STATE6,
+    STATE7,
+    STATE8,
+    STATE9,
 };
 
 /* Macros for comparing memory bytes to a series of constant bytes in an
