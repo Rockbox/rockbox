@@ -116,7 +116,8 @@ void rmt_tuner_sleep(int state)
         unsigned char data1[] = {0x07, 0x24, 0x06 };
         iap_send_pkt(data1, sizeof(data1));
         /* set volume */
-        unsigned char data2[] = {0x03, 0x09, 0x04, 0x00, 0x77 };
+        unsigned char data2[] = {0x03, 0x09, 0x04, 0x00, 0x00 };
+        data2[4] = (char)((global_settings.volume+58) * 4);
         iap_send_pkt(data2, sizeof(data2));
         /* set rds on */
         unsigned char data3[] = {0x07, 0x20, 0x40, 0x00, 0x00, 0x10 };
@@ -254,7 +255,9 @@ void set_mono(int value)
 
     if (value != mono_mode)
     {
-        tuner_param |= 0x10;
+        tuner_param &= 0xEF;
+        if (value == 1)
+            tuner_param |= 0x10;
         rmt_tuner_set_param(tuner_param);
         sleep(HZ/100);
         mono_mode = value;
