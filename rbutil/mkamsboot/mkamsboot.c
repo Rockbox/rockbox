@@ -109,7 +109,7 @@ execution to the uncompressed firmware.
 #define O_BINARY 0
 #endif
 
-/* 4 for m200, 2 for e200/c200, 1 or 2 for fuze/clop */
+/* 4 for m200, 2 for e200/c200, 1 or 2 for fuze/clip, 1 for clip+ */
 const unsigned short hw_revisions[] = {
     [MODEL_FUZE]    = 1,
     [MODEL_CLIP]    = 1,
@@ -117,9 +117,10 @@ const unsigned short hw_revisions[] = {
     [MODEL_E200V2]  = 2,
     [MODEL_M200V4]  = 4,
     [MODEL_C200V2]  = 2,
+    [MODEL_CLIPPLUS]= 1,
 };
 
-/* version 2 is used in Clipv2 and Fuzev2 firmwares */
+/* version 2 is used in Clipv2, Clip+ and Fuzev2 firmwares */
 const unsigned short fw_revisions[] = {
     [MODEL_FUZE]    = 1,
     [MODEL_CLIP]    = 1,
@@ -127,6 +128,7 @@ const unsigned short fw_revisions[] = {
     [MODEL_E200V2]  = 1,
     [MODEL_M200V4]  = 1,
     [MODEL_C200V2]  = 1,
+    [MODEL_CLIPPLUS]= 2,
 };
 
 /* Descriptive name of these models */
@@ -134,6 +136,7 @@ const char* model_names[] = {
     [MODEL_FUZE]    = "Fuze",
     [MODEL_CLIP]    = "Clip",
     [MODEL_CLIPV2]  = "Clip",
+    [MODEL_CLIPPLUS]= "Clip+",
     [MODEL_E200V2]  = "e200",
     [MODEL_M200V4]  = "m200",
     [MODEL_C200V2]  = "c200",
@@ -147,6 +150,7 @@ static const unsigned char* bootloaders[] = {
     [MODEL_E200V2]  = dualboot_e200v2,
     [MODEL_M200V4]  = dualboot_m200v4,
     [MODEL_C200V2]  = dualboot_c200v2,
+    [MODEL_CLIPPLUS]= dualboot_clipplus,
 };
 
 /* Size of dualboot functions for these models */
@@ -157,6 +161,7 @@ const int bootloader_sizes[] = {
     [MODEL_E200V2]  = sizeof(dualboot_e200v2),
     [MODEL_M200V4]  = sizeof(dualboot_m200v4),
     [MODEL_C200V2]  = sizeof(dualboot_c200v2),
+    [MODEL_CLIPPLUS]= sizeof(dualboot_clipplus),
 };
 
 /* Model names used in the Rockbox header in ".sansa" files - these match the
@@ -168,6 +173,7 @@ static const char* rb_model_names[] = {
     [MODEL_E200V2]  = "e2v2",
     [MODEL_M200V4]  = "m2v4",
     [MODEL_C200V2]  = "c2v2",
+    [MODEL_CLIPPLUS]= "cli+",
 };
 
 /* Model numbers used to initialise the checksum in the Rockbox header in
@@ -178,7 +184,8 @@ static const int rb_model_num[] = {
     [MODEL_CLIPV2]  = 60,
     [MODEL_E200V2]  = 41,
     [MODEL_M200V4]  = 42,
-    [MODEL_C200V2]  = 44
+    [MODEL_C200V2]  = 44,
+    [MODEL_CLIPPLUS]= 66,
 };
 
 /* Checksums of unmodified original firmwares - for safety, and device
@@ -212,7 +219,11 @@ static struct md5sums sansasums[] = {
     { MODEL_CLIP,   "1.01.32", "d835d12342500732ffb9c4ee54abec15" },
 
     { MODEL_CLIPV2, "2.01.16", "c57fb3fcbe07c2c9b360f060938f80cb" },
-    { MODEL_CLIPV2, "2.01.32", "0ad3723e52022509089d938d0fbbf8c5" }
+    { MODEL_CLIPV2, "2.01.32", "0ad3723e52022509089d938d0fbbf8c5" },
+
+#if 0 /* uncomment when Clip+ support is tested */
+    { MODEL_CLIPPLUS, "01.02.09", "656d38114774c2001dc18e6726df3c5d" },
+#endif
 };
 
 #define NUM_MD5S (sizeof(sansasums)/sizeof(sansasums[0]))
@@ -293,6 +304,8 @@ static int get_model(int model_id)
             return MODEL_M200V4;
         case 0x27:
             return MODEL_CLIPV2;
+        case 0x28:
+            return MODEL_CLIPPLUS;
     }
 
     return MODEL_UNKNOWN;

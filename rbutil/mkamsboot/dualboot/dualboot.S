@@ -21,7 +21,7 @@
 
 .text
 
- #if defined(SANSA_CLIPV2)
+#if defined(SANSA_CLIPV2) || defined(SANSA_CLIPPLUS)
 .set RAM_SIZE, 0x100000 /* Use 1MB of SDRAM on v2 firmwares (bigger firmware) */
 #else
 .set RAM_SIZE, 0x50000  /* Use full IRAM on v1 firmwares */
@@ -156,6 +156,12 @@ uclcopy:
 
         cmp     r1, #0             /* C3 = #0 means button pressed */
         beq     boot_of
+#elif defined(SANSA_CLIPPLUS)
+        /* TODO */
+        mov     r0, #0x500000       /* Approximately 5 seconds */
+1:      subs    r0, r0, #1          /* just to prove we are running */
+        bne     1b
+        b       boot_of             /* branch to OF */
 #elif defined(SANSA_C200V2)
         /* check for RIGHT on C6, should changed to LEFT as soon as it
          * known in which pin that is in order for consistency  */

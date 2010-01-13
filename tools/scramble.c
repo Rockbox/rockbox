@@ -125,7 +125,7 @@ void usage(void)
            "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2,\n");
     printf("\t                   9200, 1630, 6330, ldax, m200, c100, clip, e2v2,\n"
            "\t                   m2v4, fuze, c2v2, clv2, y820, y920, y925, x747,\n"
-           "\t                   747p, x777, nn2g, m244)\n");
+           "\t                   747p, x777, nn2g, m244, cli+)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -320,6 +320,8 @@ int main (int argc, char** argv)
             modelnum = 64;
         else if (!strcmp(&argv[1][5], "6330")) /* Philips HDD6330 */
             modelnum = 65;
+        else if (!strcmp(&argv[1][5], "cli+")) /* Sansa Clip+ */
+            modelnum = 66;
         else if (!strcmp(&argv[1][5], "m244"))
             modelnum = 131;
         else {

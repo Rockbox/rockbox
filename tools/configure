@@ -900,14 +900,14 @@ cat <<EOF
  ==Onda==                                        59) Sansa c200v2
  120) VX747               ==Meizu==              60) Sansa Clipv2
  121) VX767               110) M6SL              61) Sansa View
- 122) VX747+              111) M6SP
- 123) VX777               112) M3                ==Logik==
-                                                 80) DAX 1GB MP3/DAB
- ==Samsung==              ==Tatung==
- 140) YH-820              150) Elio TPJ-1022     ==Lyre project==
- 141) YH-920                                     130) Lyre proto 1
- 142) YH-925                                     131) Mini2440
- 143) YP-S3
+ 122) VX747+              111) M6SP              62) Sansa Clip+
+ 123) VX777               112) M3
+                                                 ==Logik==
+ ==Samsung==              ==Tatung==             80) DAX 1GB MP3/DAB
+ 140) YH-820              150) Elio TPJ-1022
+ 141) YH-920                                     ==Lyre project==1
+ 142) YH-925                                     130) Lyre proto 1
+ 143) YP-S3                                      131) Mini2440
 EOF
 
   buildfor=`input`;
@@ -2046,6 +2046,26 @@ fi
     t_cpu="arm"
     t_manufacturer="sandisk"
     t_model="sansa-view"
+    ;;
+
+   62|sansaclipplus)
+    target_id=66
+    modelname="sansaclipplus"
+    target="-DSANSA_CLIPPLUS"
+    memory=8
+    arm926ejscc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$bmp2rb_mono"
+    tool="$rootdir/tools/scramble -add=cli+"
+    output="rockbox.sansa"
+    bootoutput="bootloader-clipplus.sansa"
+    appextra="recorder:gui"
+    plugins="yes"
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="as3525"
+    t_model="sansa-clipplus"
     ;;
 
    150|tatungtpj1022)

@@ -23,6 +23,7 @@ Supported models
 ----------------
 
 Sansa Clip  :   firmware version starting with "01."
+Sansa Clip+ :   firmware version starting with "01."
 Sansa Clipv2:   firmware version starting with "02."
 Sansa Fuze  :   firmware version starting with "01."
 Sansa E200v2:   firmware version starting with "03."
@@ -37,6 +38,7 @@ For the firmware upgrade to happen, the firmware has to be named specially:
 
 clip v2 :   m30pa.bin
 clip    :   m300a.bin
+clip+   :   clppa.bin
 fuze    :   fuzea.bin
 e200v2  :   e200pa.bin
 c200v2  :   c200pa.bin
