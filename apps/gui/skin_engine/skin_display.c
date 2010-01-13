@@ -36,7 +36,7 @@
 #include "scrollbar.h"
 #include "screen_access.h"
 #include "playlist.h"
-#include "playback.h"
+#include "audio.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -175,7 +175,10 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     int start_item = MAX(0, cur_playlist_pos + viewer->start_offset);
     int i;
     
-    struct mp3entry *pid3, id3;
+    struct mp3entry *pid3;
+#if CONFIG_CODEC == SWCODEC
+    struct mp3entry id3;
+#endif    
     char buf[MAX_PATH*2], tempbuf[MAX_PATH];
     
     
@@ -189,11 +192,13 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
         else if (i == cur_playlist_pos+1)
         {
             pid3 = audio_next_track();
-        }            
+        }
+#if CONFIG_CODEC == SWCODEC
         else if ((i>cur_playlist_pos) && audio_peek_track(&id3, i-cur_playlist_pos))
         {
             pid3 = &id3;
         }
+#endif
         else
             pid3 = NULL;
             
