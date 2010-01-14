@@ -56,6 +56,7 @@
 #define LCD_TYPE1_ID        0x139   /* id for LCD type S6D0139 */
 
 static int lcd_type = 0;
+static bool lcd_is_active = false;
 
 /* simple and crude delay */
 static void lcd_delay(int count)
@@ -357,6 +358,13 @@ void lcd_enable(bool on)
         /* disable controller clock */
         PWRCON |= (1 << 18);
     }
+    
+    lcd_is_active = on;
+}
+
+bool lcd_active(void)
+{
+    return lcd_is_active;
 }
 
 /* initialise the lcd controller inside the s5l8700 */
@@ -466,5 +474,20 @@ void lcd_update_rect(int x, int y, int width, int height)
 void lcd_update(void)
 {
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+}
+
+void lcd_blit_yuv(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    (void)src;
+    (void)src_x;
+    (void)src_y;
+    (void)stride;
+    (void)x;
+    (void)y;
+    (void)width;
+    (void)height;
+    /* TODO: not implemented yet */
 }
 

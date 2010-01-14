@@ -18,6 +18,12 @@
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
 
+/* FIXME: define actual rates applicable for M6SP */
+#define CODEC_SRCTRL_11025HZ     (0x19 << 1)
+#define CODEC_SRCTRL_22050HZ     (0x1b << 1)
+#define CODEC_SRCTRL_44100HZ     (0x11 << 1)
+#define CODEC_SRCTRL_88200HZ     (0x1f << 1)
+
 /* define the bitmask of recording sample rates */
 #define REC_SAMPR_CAPS  (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
 

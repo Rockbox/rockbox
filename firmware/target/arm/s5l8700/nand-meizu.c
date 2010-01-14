@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 by Michael Sparmann
+ * Copyright (C) 2010 by Bertrik Sikken
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,41 +18,64 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+ 
+ #include "config.h"
+ #include "nand-target.h"
 
-#ifndef __NAND_TARGET_H__
-#define __NAND_TARGET_H__
+const struct nand_device_info_type* nand_get_device_type(uint32_t bank);
 
-#include "config.h"
-#include "inttypes.h"
-
-
-struct nand_device_info_type
-{
-    uint32_t id;
-    uint16_t blocks;
-    uint16_t userblocks;
-    uint16_t pagesperblock;
-    uint8_t blocksizeexponent;
-    uint8_t tunk1;
-    uint8_t twp;
-    uint8_t tunk2;
-    uint8_t tunk3;
-} __attribute__((packed));
 
 uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
                         void* sparebuffer, uint32_t doecc,
-                        uint32_t checkempty);
+                        uint32_t checkempty)
+{
+    /* TODO implement */
+    return 0;
+}
+
 uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
-                         void* sparebuffer, uint32_t doecc);
-uint32_t nand_block_erase(uint32_t bank, uint32_t page);
+                         void* sparebuffer, uint32_t doecc)
+{
+    /* TODO implement */
+    return 0;
+}
 
-const struct nand_device_info_type* nand_get_device_type(uint32_t bank);
-uint32_t nand_reset(uint32_t bank);
-uint32_t nand_device_init(void);
-void nand_set_active(void);
-long nand_last_activity(void);
-void nand_power_up(void);
-void nand_power_down(void);
+uint32_t nand_block_erase(uint32_t bank, uint32_t page)
+{
+    /* TODO implement */
+    return 0;
+}
 
+uint32_t nand_reset(uint32_t bank)
+{
+    /* TODO implement */
+    return 0;
+}
 
-#endif
+uint32_t nand_device_init(void)
+{
+    /* TODO implement */
+    return 0;
+}
+
+void nand_power_up(void)
+{
+    /* TODO implement */
+}
+
+void nand_power_down(void)
+{
+    /* TODO implement */
+}
+
+void nand_set_active(void)
+{
+    /* TODO implement */
+}
+
+long nand_last_activity(void)
+{
+    /* TODO implement */
+    return 0;
+}
+

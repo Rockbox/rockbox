@@ -1351,9 +1351,26 @@ drivers/qt1106.c
 #endif /* MEIZU_M6SL */
 
 #ifdef MEIZU_M6SP
+target/arm/s5l8700/backlight-meizu.c
+target/arm/s5l8700/power-meizu.c
+target/arm/s5l8700/kernel-s5l8700.c
+target/arm/s5l8700/meizu-m6sp/button-m6sp.c
 target/arm/s5l8700/meizu-m6sp/lcd-m6sp.c
 #ifndef SIMULATOR
 #ifndef BOOTLOADER
+drivers/generic_i2c.c
+drivers/rtc/rtc_s35390a.c
+target/arm/s5l8700/adc-s5l8700.c
+target/arm/s5l8700/audio-meizu.c
+target/arm/s5l8700/debug-s5l8700.c
+target/arm/s5l8700/dma-s5l8700.c
+target/arm/s5l8700/ftl-meizu.c
+target/arm/s5l8700/nand-meizu.c
+target/arm/s5l8700/fmradio-i2c-meizu.c
+target/arm/s5l8700/pcm-s5l8700.c
+target/arm/s5l8700/powermgmt-meizu.c
+target/arm/s5l8700/usb-s5l8700.c
+target/arm/s5l8700/wmcodec-s5l8700.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* MEIZU_M6SP */
