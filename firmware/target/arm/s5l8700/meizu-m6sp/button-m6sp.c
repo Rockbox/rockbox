@@ -30,7 +30,7 @@
     
     Future improvements:
     * touch strip support
-    * left/right buttons (probably part of touch strip)
+    * left/right buttons (probably read out with ADC0)
     * unify with m3/m6sl button driver if possible
 
  */
@@ -40,8 +40,7 @@ void button_init_device(void)
 {
     PCON0 &= ~(0x3 << 10);  /* P0.5 hold switch */
     PCON0 &= ~(0x3 << 14);  /* P0.7 enter button */
-    PCON1 &= ~(0xF << 12);  /* P1.3 menu button */
-    PCON1 &= ~(0xF << 16);  /* P1.4 play button */
+    PCON1 &= ~(0xF << 16);  /* P1.4 play/power button */
 }
 
 int button_read_device(void)
@@ -52,16 +51,13 @@ int button_read_device(void)
         return 0;
     }
 
-    if ((PDAT0 & (1 << 7)) == 0) {
-        buttons |= BUTTON_ENTER;
-    }
-    if ((PDAT1 & (1 << 3)) == 0) {
-        buttons |= BUTTON_MENU;
-    }
     if ((PDAT1 & (1 << 4)) == 0) {
         buttons |= BUTTON_PLAY;
     }
-    
+    if ((PDAT0 & (1 << 7)) == 0) {
+        buttons |= BUTTON_ENTER;
+    }
+
     return buttons;
 }
 
