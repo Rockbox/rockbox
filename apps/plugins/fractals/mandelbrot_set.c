@@ -30,18 +30,24 @@ static unsigned char imgbuffer[LCD_HEIGHT];
 static fb_data imgbuffer[LCD_HEIGHT];
 #endif
 
-/* 8 entries cyclical, last entry is black (convergence) */
+#define NUM_COLORS 8 /* Must be a power of 2 */
+/* NUM_COLORS entries cyclical, last entry is black (convergence) */
 #ifdef HAVE_LCD_COLOR
-static const fb_data color[9] = {
-    LCD_RGBPACK(255, 0, 159), LCD_RGBPACK(159, 0, 255), LCD_RGBPACK(0, 0, 255),
-    LCD_RGBPACK(0, 159, 255), LCD_RGBPACK(0, 255, 128), LCD_RGBPACK(128, 255, 0),
-    LCD_RGBPACK(255, 191, 0), LCD_RGBPACK(255, 0, 0),   LCD_RGBPACK(0, 0, 0)
+static const fb_data color[NUM_COLORS] = {
+    LCD_RGBPACK(255, 0,   159), LCD_RGBPACK(159, 0,   255),
+    LCD_RGBPACK(0,   0,   255), LCD_RGBPACK(0,   159, 255),
+    LCD_RGBPACK(0,   255, 128), LCD_RGBPACK(128, 255, 0),
+    LCD_RGBPACK(255, 191, 0),   LCD_RGBPACK(255, 0,   0)
 };
+#define CONVERGENCE_COLOR LCD_RGBPACK(0, 0, 0)
 #else /* greyscale */
-static const unsigned char color[9] = {
-    255, 223, 191, 159, 128, 96, 64, 32, 0
+static const unsigned char color[NUM_COLORS] = {
+    255, 223, 191, 159, 128, 96, 64, 32
 };
+#define CONVERGENCE_COLOR 0
 #endif
+
+#define COLOR(iter) color[(iter) % (NUM_COLORS - 1)]
 
 #if CONFIG_LCD == LCD_SSD1815
 /* Recorder, Ondio: pixel_height == 1.25 * pixel_width */
@@ -196,9 +202,9 @@ static int mandelbrot_calc_low_prec(struct fractal_rect *rect,
             }
 
             if  (n_iter > ctx.max_iter)
-                imgbuffer[p_y] = color[8];
+                imgbuffer[p_y] = CONVERGENCE_COLOR;
             else
-                imgbuffer[p_y] = color[n_iter & 7];
+                imgbuffer[p_y] = COLOR(n_iter);
 
             /* be nice to other threads:
              * if at least one tick has passed, yield */
@@ -293,9 +299,9 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
             }
 
             if  (n_iter > ctx.max_iter)
-                imgbuffer[p_y] = color[8];
+                imgbuffer[p_y] = CONVERGENCE_COLOR;
             else
-                imgbuffer[p_y] = color[n_iter & 7];
+                imgbuffer[p_y] = COLOR(n_iter);
 
             /* be nice to other threads:
              * if at least one tick has passed, yield */
