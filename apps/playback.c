@@ -640,8 +640,8 @@ bool audio_peek_track(struct mp3entry* id3, int offset)
 
     if (tracks[next_idx].id3_hid >= 0)
     {
-        bufread(tracks[next_idx].id3_hid, sizeof(struct mp3entry), id3);
-        return true;
+        return bufread(tracks[next_idx].id3_hid, sizeof(struct mp3entry), id3) 
+                    == sizeof(struct mp3entry);
     }
     return false;
 }

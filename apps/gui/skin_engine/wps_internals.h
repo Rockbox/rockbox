@@ -358,6 +358,8 @@ const char *get_token_value(struct gui_wps *gwps,
                            char *buf, int buf_size,
                            int *intval);
 
+const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
+                          char *buf, int buf_size, int limit, int *intval);
 
 
 struct gui_img* find_image(char label, struct wps_data *data);

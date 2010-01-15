@@ -62,6 +62,8 @@
 #include "language.h"
 #include "usb.h"
 
+extern struct wps_state wps_state;
+
 static char* get_codectype(const struct mp3entry* id3)
 {
     if (id3 && id3->codectype < AFMT_NUM_CODECS) {
@@ -148,8 +150,197 @@ static int pitch_speed_enum(int range, int32_t val, int32_t normval)
 }
 #endif
 
-/* Return the tag found at index i and write its value in buf.
-   The return value is buf if the tag had a value, or NULL if not.
+
+/* All tokens which only need the info to return a value go in here */
+const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
+                          char *buf, int buf_size, int limit, int *intval)
+{
+    struct wps_state *state = &wps_state;
+    if (id3)
+    {
+        switch (token->type)
+        {
+            case WPS_TOKEN_METADATA_ARTIST:
+                return id3->artist;
+            case WPS_TOKEN_METADATA_COMPOSER:
+                return id3->composer;
+            case WPS_TOKEN_METADATA_ALBUM:
+                return id3->album;
+            case WPS_TOKEN_METADATA_ALBUM_ARTIST:
+                return id3->albumartist;
+            case WPS_TOKEN_METADATA_GROUPING:
+                return id3->grouping;
+            case WPS_TOKEN_METADATA_GENRE:
+                return id3->genre_string;
+            case WPS_TOKEN_METADATA_DISC_NUMBER:
+                if (id3->disc_string)
+                    return id3->disc_string;
+                if (id3->discnum) {
+                    snprintf(buf, buf_size, "%d", id3->discnum);
+                    return buf;
+                }
+                return NULL;
+            case WPS_TOKEN_METADATA_TRACK_NUMBER:
+                if (id3->track_string)
+                    return id3->track_string;
+                if (id3->tracknum) {
+                    snprintf(buf, buf_size, "%d", id3->tracknum);
+                    return buf;
+                }
+                return NULL;
+            case WPS_TOKEN_METADATA_TRACK_TITLE:
+                return id3->title;
+            case WPS_TOKEN_METADATA_VERSION:
+                switch (id3->id3version)
+                {
+                    case ID3_VER_1_0:
+                        return "1";
+                    case ID3_VER_1_1:
+                        return "1.1";
+                    case ID3_VER_2_2:
+                        return "2.2";
+                    case ID3_VER_2_3:
+                        return "2.3";
+                    case ID3_VER_2_4:
+                        return "2.4";
+                    default:
+                        break;
+                }
+                return NULL;
+            case WPS_TOKEN_METADATA_YEAR:
+                if( id3->year_string )
+                    return id3->year_string;
+                if (id3->year) {
+                    snprintf(buf, buf_size, "%d", id3->year);
+                    return buf;
+                }
+                return NULL;
+            case WPS_TOKEN_METADATA_COMMENT:
+                return id3->comment;   
+            case WPS_TOKEN_FILE_PATH:
+                return id3->path;     
+            case WPS_TOKEN_FILE_BITRATE:
+                if(id3->bitrate)
+                    snprintf(buf, buf_size, "%d", id3->bitrate);
+                else
+                    return "?";
+                return buf;
+            case WPS_TOKEN_TRACK_TIME_ELAPSED:
+                format_time(buf, buf_size,
+                            id3->elapsed + state->ff_rewind_count);
+                return buf;
+
+            case WPS_TOKEN_TRACK_TIME_REMAINING:
+                format_time(buf, buf_size,
+                            id3->length - id3->elapsed -
+                            state->ff_rewind_count);
+                return buf;
+
+            case WPS_TOKEN_TRACK_LENGTH:
+                format_time(buf, buf_size, id3->length);
+                return buf;
+
+            case WPS_TOKEN_TRACK_ELAPSED_PERCENT:
+                if (id3->length <= 0)
+                    return NULL;
+
+                if (intval)
+                {
+                    *intval = limit * (id3->elapsed + state->ff_rewind_count)
+                              / id3->length + 1;
+                }
+                snprintf(buf, buf_size, "%d",
+                         100*(id3->elapsed + state->ff_rewind_count) / id3->length);
+                return buf;
+
+
+            case WPS_TOKEN_FILE_CODEC:
+                if (intval)
+                {
+                    if(id3->codectype == AFMT_UNKNOWN)
+                        *intval = AFMT_NUM_CODECS;
+                    else
+                        *intval = id3->codectype;
+                }
+                return get_codectype(id3);
+
+            case WPS_TOKEN_FILE_FREQUENCY:
+                snprintf(buf, buf_size, "%ld", id3->frequency);
+                return buf;
+            case WPS_TOKEN_FILE_FREQUENCY_KHZ:
+                /* ignore remainders < 100, so 22050 Hz becomes just 22k */
+                if ((id3->frequency % 1000) < 100)
+                    snprintf(buf, buf_size, "%ld", id3->frequency / 1000);
+                else
+                    snprintf(buf, buf_size, "%ld.%d",
+                            id3->frequency / 1000,
+                            (id3->frequency % 1000) / 100);
+                return buf;
+            case WPS_TOKEN_FILE_NAME:
+                if (get_dir(buf, buf_size, id3->path, 0)) {
+                    /* Remove extension */
+                    char* sep = strrchr(buf, '.');
+                    if (NULL != sep) {
+                        *sep = 0;
+                    }
+                    return buf;
+                }
+                return NULL;
+            case WPS_TOKEN_FILE_NAME_WITH_EXTENSION:
+                return get_dir(buf, buf_size, id3->path, 0);
+            case WPS_TOKEN_FILE_SIZE:
+                snprintf(buf, buf_size, "%ld", id3->filesize / 1024);
+                return buf;
+            case WPS_TOKEN_FILE_VBR:
+                return (id3->vbr) ? "(avg)" : NULL;
+            case WPS_TOKEN_FILE_DIRECTORY:
+                return get_dir(buf, buf_size, id3->path, token->value.i);
+                                
+#ifdef HAVE_TAGCACHE
+        case WPS_TOKEN_DATABASE_PLAYCOUNT:
+            if (intval)
+                *intval = id3->playcount + 1;
+            snprintf(buf, buf_size, "%ld", id3->playcount);
+            return buf;
+        case WPS_TOKEN_DATABASE_RATING:
+            if (intval)
+                *intval = id3->rating + 1;
+            snprintf(buf, buf_size, "%ld", id3->rating);
+            return buf;
+        case WPS_TOKEN_DATABASE_AUTOSCORE:
+            if (intval)
+                *intval = id3->score + 1;
+            snprintf(buf, buf_size, "%ld", id3->score);
+            return buf;
+#endif
+    
+            default:
+                return NULL;
+        }
+    }
+    else /* id3 == NULL, handle the error based on the expected return type */
+    {
+        switch (token->type)
+        {
+            /* Most tokens expect NULL on error so leave that for the default case,
+             * The ones that expect "0" need to be handled */
+            case WPS_TOKEN_FILE_FREQUENCY:
+            case WPS_TOKEN_FILE_FREQUENCY_KHZ:
+            case WPS_TOKEN_FILE_SIZE:
+            case WPS_TOKEN_DATABASE_PLAYCOUNT:
+            case WPS_TOKEN_DATABASE_RATING:
+            case WPS_TOKEN_DATABASE_AUTOSCORE:
+                if (intval)
+                    *intval = 0;
+                return "0";
+            default:
+                return NULL;
+        }
+    }
+    return buf;
+}
+
+/* Return the tags value as text. buf should be used as temp storage if needed.
 
    intval is used with conditionals/enums: when this function is called,
    intval should contain the number of options in the conditional/enum.
@@ -158,27 +349,6 @@ static int pitch_speed_enum(int range, int32_t val, int32_t normval)
    and the original value of *intval, inclusive).
    When not treating a conditional/enum, intval should be NULL.
 */
-
-/* a few convinience macros for the id3 == NULL case
- * depends on a few variable names in get_token_value() */
-
-#define HANDLE_NULL_ID3(id3field) (LIKELY(id3) ? (id3field) : NULL)
-
-#define HANDLE_NULL_ID3_NUM_ZERO { if (UNLIKELY(!id3)) return zero_str; }
-
-#define HANDLE_NULL_ID3_NUM_INTVAL(id3field) \
-            do { \
-                if (intval) { \
-                    *intval =  (LIKELY(id3) ? (id3field) + 1 : 0); \
-                } \
-            if (LIKELY(id3)) \
-            { \
-                snprintf(buf, buf_size, "%ld", (id3field)); \
-                return buf; \
-            } \
-            return zero_str; \
-            } while (0)
-
 const char *get_token_value(struct gui_wps *gwps,
                            struct wps_token *token,
                            char *buf, int buf_size,
@@ -189,30 +359,19 @@ const char *get_token_value(struct gui_wps *gwps,
 
     struct wps_data *data = gwps->data;
     struct wps_state *state = gwps->state;
-    int elapsed, length;
-    static const char * const zero_str = "0";
+    struct mp3entry *id3; /* Think very carefully about using this. 
+                             maybe get_id3_token() is the better place? */
+    const char *out_text = NULL;
 
     if (!data || !state)
         return NULL;
 
-    struct mp3entry *id3;
 
     if (token->next)
         id3 = state->nid3;
     else
         id3 = state->id3;
-
-    if (id3)
-    {
-        elapsed = id3->elapsed;
-        length = id3->length;
-    }
-    else
-    {
-        elapsed = 0;
-        length = 0;
-    }
-
+        
 #if CONFIG_RTC
     struct tm* tm = NULL;
 
@@ -234,6 +393,10 @@ const char *get_token_value(struct gui_wps *gwps,
         limit = *intval;
         *intval = -1;
     }
+    
+    out_text = get_id3_token(token, id3, buf, buf_size, limit, intval);
+    if (out_text)
+        return out_text;
 
     switch (token->type)
     {
@@ -247,21 +410,6 @@ const char *get_token_value(struct gui_wps *gwps,
             
         case WPS_TOKEN_TRANSLATEDSTRING:
             return (char*)P2STR(ID2P(token->value.i));
-
-        case WPS_TOKEN_TRACK_TIME_ELAPSED:
-            format_time(buf, buf_size,
-                        elapsed + state->ff_rewind_count);
-            return buf;
-
-        case WPS_TOKEN_TRACK_TIME_REMAINING:
-            format_time(buf, buf_size,
-                        length - elapsed -
-                        state->ff_rewind_count);
-            return buf;
-
-        case WPS_TOKEN_TRACK_LENGTH:
-            format_time(buf, buf_size, length);
-            return buf;
 
         case WPS_TOKEN_PLAYLIST_ENTRIES:
             snprintf(buf, buf_size, "%d", playlist_amount());
@@ -305,105 +453,6 @@ const char *get_token_value(struct gui_wps *gwps,
                 }
             }
             return buf;
-
-        case WPS_TOKEN_TRACK_ELAPSED_PERCENT:
-            if (length <= 0)
-                return NULL;
-
-            if (intval)
-            {
-                *intval = limit * (elapsed + state->ff_rewind_count)
-                          / length + 1;
-            }
-            snprintf(buf, buf_size, "%d",
-                     100*(elapsed + state->ff_rewind_count) / length);
-            return buf;
-
-        case WPS_TOKEN_METADATA_ARTIST:
-            return HANDLE_NULL_ID3(id3->artist);
-
-        case WPS_TOKEN_METADATA_COMPOSER:
-            return HANDLE_NULL_ID3(id3->composer);
-
-        case WPS_TOKEN_METADATA_ALBUM:
-            return HANDLE_NULL_ID3(id3->album);
-
-        case WPS_TOKEN_METADATA_ALBUM_ARTIST:
-            return HANDLE_NULL_ID3(id3->albumartist);
-
-        case WPS_TOKEN_METADATA_GROUPING:
-            return HANDLE_NULL_ID3(id3->grouping);
-
-        case WPS_TOKEN_METADATA_GENRE:
-            return HANDLE_NULL_ID3(id3->genre_string);
-
-        case WPS_TOKEN_METADATA_DISC_NUMBER:
-            if (LIKELY(id3)) {
-                if (id3->disc_string)
-                    return id3->disc_string;
-                if (id3->discnum) {
-                    snprintf(buf, buf_size, "%d", id3->discnum);
-                    return buf;
-                }
-            }
-            return NULL;
-
-        case WPS_TOKEN_METADATA_TRACK_NUMBER:
-            if (LIKELY(id3)) {
-                if (id3->track_string)
-                    return id3->track_string;
-
-                if (id3->tracknum) {
-                    snprintf(buf, buf_size, "%d", id3->tracknum);
-                    return buf;
-                }
-            }
-            return NULL;
-
-        case WPS_TOKEN_METADATA_TRACK_TITLE:
-            return HANDLE_NULL_ID3(id3->title);
-
-        case WPS_TOKEN_METADATA_VERSION:
-            if (LIKELY(id3))
-            {
-                switch (id3->id3version)
-                {
-                    case ID3_VER_1_0:
-                        return "1";
-
-                    case ID3_VER_1_1:
-                        return "1.1";
-
-                    case ID3_VER_2_2:
-                        return "2.2";
-
-                    case ID3_VER_2_3:
-                        return "2.3";
-
-                    case ID3_VER_2_4:
-                        return "2.4";
-
-                    default:
-                        break;
-                }
-            }
-            return NULL;
-
-        case WPS_TOKEN_METADATA_YEAR:
-            if (LIKELY(id3)) {
-                if( id3->year_string )
-                    return id3->year_string;
-
-                if (id3->year) {
-                    snprintf(buf, buf_size, "%d", id3->year);
-                    return buf;
-                }
-            }
-            return NULL;
-
-        case WPS_TOKEN_METADATA_COMMENT:
-            return HANDLE_NULL_ID3(id3->comment);
-
 #ifdef HAVE_ALBUMART
         case WPS_TOKEN_ALBUMART_FOUND:
             if (data->albumart) {
@@ -419,75 +468,6 @@ const char *get_token_value(struct gui_wps *gwps,
                 data->albumart->draw = true;
             return NULL;
 #endif
-
-        case WPS_TOKEN_FILE_BITRATE:
-            if(id3 && id3->bitrate)
-                snprintf(buf, buf_size, "%d", id3->bitrate);
-            else
-                return "?";
-            return buf;
-
-        case WPS_TOKEN_FILE_CODEC:
-            if (intval)
-            {
-                if (UNLIKELY(!id3))
-                    *intval = 0;
-                else if(id3->codectype == AFMT_UNKNOWN)
-                    *intval = AFMT_NUM_CODECS;
-                else
-                    *intval = id3->codectype;
-            }
-            return get_codectype(id3);
-
-        case WPS_TOKEN_FILE_FREQUENCY:
-            HANDLE_NULL_ID3_NUM_ZERO;
-            snprintf(buf, buf_size, "%ld", id3->frequency);
-            return buf;
-
-        case WPS_TOKEN_FILE_FREQUENCY_KHZ:
-            HANDLE_NULL_ID3_NUM_ZERO;
-            /* ignore remainders < 100, so 22050 Hz becomes just 22k */
-            if ((id3->frequency % 1000) < 100)
-                snprintf(buf, buf_size, "%ld", id3->frequency / 1000);
-            else
-                snprintf(buf, buf_size, "%ld.%d",
-                        id3->frequency / 1000,
-                        (id3->frequency % 1000) / 100);
-            return buf;
-
-        case WPS_TOKEN_FILE_NAME:
-            if (LIKELY(id3) && get_dir(buf, buf_size, id3->path, 0)) {
-                /* Remove extension */
-                char* sep = strrchr(buf, '.');
-                if (NULL != sep) {
-                    *sep = 0;
-                }
-                return buf;
-            }
-            else {
-                return NULL;
-            }
-
-        case WPS_TOKEN_FILE_NAME_WITH_EXTENSION:
-            if (LIKELY(id3))
-                return get_dir(buf, buf_size, id3->path, 0);
-            return NULL;
-
-        case WPS_TOKEN_FILE_PATH:
-            return HANDLE_NULL_ID3(id3->path);
-
-        case WPS_TOKEN_FILE_SIZE:
-            HANDLE_NULL_ID3_NUM_ZERO;
-            snprintf(buf, buf_size, "%ld", id3->filesize / 1024);
-            return buf;
-
-        case WPS_TOKEN_FILE_VBR:
-            return (LIKELY(id3) && id3->vbr) ? "(avg)" : NULL;
-
-        case WPS_TOKEN_FILE_DIRECTORY:
-            if (LIKELY(id3))
-                return get_dir(buf, buf_size, id3->path, token->value.i);
-            return NULL;
 
         case WPS_TOKEN_BATTERY_PERCENT:
         {
@@ -760,17 +740,7 @@ const char *get_token_value(struct gui_wps *gwps,
             return buf;
 #endif
 
-                
-#ifdef HAVE_TAGCACHE
-        case WPS_TOKEN_DATABASE_PLAYCOUNT:
-            HANDLE_NULL_ID3_NUM_INTVAL(id3->playcount);
 
-        case WPS_TOKEN_DATABASE_RATING:
-            HANDLE_NULL_ID3_NUM_INTVAL(id3->rating);
-
-        case WPS_TOKEN_DATABASE_AUTOSCORE:
-            HANDLE_NULL_ID3_NUM_INTVAL(id3->score);
-#endif
 
 #if (CONFIG_CODEC == SWCODEC)
         case WPS_TOKEN_CROSSFADE:
