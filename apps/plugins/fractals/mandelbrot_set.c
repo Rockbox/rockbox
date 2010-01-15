@@ -61,7 +61,7 @@ static const unsigned char color[9] = {
 #endif
 
 #if (LCD_DEPTH < 8)
-#define USEGLIB
+#define USEGSLIB
 #else
 #define UPDATE_FREQ (HZ/50)
 #endif
