@@ -779,7 +779,12 @@ static int parse_playlistview_text(struct playlistviewer *viewer,
                     taglen = i;
                 }
                 else
-                {                    
+                { 
+                    if (tag->parse_func)
+                    {
+                        /* unsupported tag, reject */
+                        return -1;
+                    }                   
                     taglen = strlen(tag->name);
                     viewer->lines[line].tokens[viewer->lines[line].count++] = tag->type;
                 }
