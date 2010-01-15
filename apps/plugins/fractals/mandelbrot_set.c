@@ -25,9 +25,9 @@
 #define BUTTON_YIELD_TIMEOUT (HZ / 4)
 
 #ifdef USEGSLIB
-unsigned char imgbuffer[LCD_HEIGHT];
+static unsigned char imgbuffer[LCD_HEIGHT];
 #else
-fb_data imgbuffer[LCD_HEIGHT];
+static fb_data imgbuffer[LCD_HEIGHT];
 #endif
 
 /* 8 entries cyclical, last entry is black (convergence) */
@@ -60,9 +60,7 @@ static const unsigned char color[9] = {
 #define MB_XFAC (MB_YFAC*LCD_WIDTH/MB_HEIGHT)
 #endif
 
-#if (LCD_DEPTH < 8)
-#define USEGSLIB
-#else
+#ifndef USEGSLIB
 #define UPDATE_FREQ (HZ/50)
 #endif
 

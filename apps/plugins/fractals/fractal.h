@@ -21,6 +21,10 @@
 #ifndef _FRACTAL_H
 #define _FRACTAL_H
 
+#if (LCD_DEPTH < 8)
+#define USEGSLIB
+#endif
+
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define FRACTAL_QUIT BUTTON_OFF
