@@ -1,0 +1,10 @@
+fractal.c
+fractal_rect.c
+mandelbrot_set.c
+#if CONFIG_CPU == SH7034
+cpu_sh7043.c
+#elif defined CPU_COLDFIRE
+cpu_coldfire.c
+#elif defined CPU_ARM
+cpu_arm.c
+#endif

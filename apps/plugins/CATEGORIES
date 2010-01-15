@@ -41,7 +41,7 @@ keybox,apps
 lamp,apps
 logo,demos
 lua,viewers
-mandelbrot,demos
+fractals,demos
 matrix,demos
 maze,games
 mazezam,games

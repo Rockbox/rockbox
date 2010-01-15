@@ -77,7 +77,6 @@ codebuster.c
 
 /* Plugins needing the grayscale lib on low-depth LCDs */
 fire.c
-mandelbrot.c
 plasma.c
 
 blackjack.c
