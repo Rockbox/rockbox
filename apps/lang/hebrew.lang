@@ -8268,22 +8268,22 @@
   </voice>
 </phrase>
 /* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
- * the selector should probably be usb_charging_enable as well. */
+ * the selector should probably be usb_charging_enable_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
   desc: in Battery menu
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "USB הטען סוללה בזמן חיבור"
+    usb_charging_enable: "USB הטען סוללה בזמן חיבור"
   </dest>
   <voice>
     *: none
-    usb_charging: "הטען סוללה בזמן חיבור U S B"
+    usb_charging_enable: "הטען סוללה בזמן חיבור U S B"
   </voice>
 </phrase>
 <phrase>

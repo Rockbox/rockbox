@@ -9275,11 +9275,11 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Lad batteri ved USB-samband"
+    usb_charging_enable: "Lad batteri ved USB-samband"
   </dest>
   <voice>
     *: none

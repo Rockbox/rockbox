@@ -10953,15 +10953,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Carregar Durante Conecção USB"
+    usb_charging_enable: "Carregar Durante Conecção USB"
   </dest>
   <voice>
     *: none
-    usb_charging: "Carregar Durante Conecção U S B"
+    usb_charging_enable: "Carregar Durante Conecção U S B"
   </voice>
 </phrase>
 <phrase>

@@ -8269,15 +8269,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Tchedje tins do raloyaedje USB"
+    usb_charging_enable: "Tchedje tins do raloyaedje USB"
   </dest>
   <voice>
     *: none
-    usb_charging: "Tchedje tins do raloyaedje USB"
+    usb_charging_enable: "Tchedje tins do raloyaedje USB"
   </voice>
 </phrase>
 <phrase>

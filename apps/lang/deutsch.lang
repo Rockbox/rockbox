@@ -8267,15 +8267,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Laden bei USB-Verbindung"
+    usb_charging_enable: "Laden bei USB-Verbindung"
   </dest>
   <voice>
     *: none
-    usb_charging: "Laden bei U S B Verbindung"
+    usb_charging_enable: "Laden bei U S B Verbindung"
   </voice>
 </phrase>
 <phrase>

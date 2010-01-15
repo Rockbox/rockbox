@@ -8269,15 +8269,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Ladda via USB"
+    usb_charging_enable: "Ladda via USB"
   </dest>
   <voice>
     *: none
-    usb_charging: "Ladda via USB"
+    usb_charging_enable: "Ladda via USB"
   </voice>
 </phrase>
 <phrase>

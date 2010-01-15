@@ -9772,15 +9772,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Opladen bij USB verbinding"
+    usb_charging_enable: "Opladen bij USB verbinding"
   </dest>
   <voice>
     *: none
-    usb_charging: "Opladen bij U S B verbinding"
+    usb_charging_enable: "Opladen bij U S B verbinding"
   </voice>
 </phrase>
 <phrase>

@@ -9794,15 +9794,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "USB 연결 중 충전"
+    usb_charging_enable: "USB 연결 중 충전"
   </dest>
   <voice>
     *: none
-    usb_charging: "USB 연결 중 충전"
+    usb_charging_enable: "USB 연결 중 충전"
   </voice>
 </phrase>
 <phrase>

@@ -9807,15 +9807,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Lad opp under USB-tilkobling"
+    usb_charging_enable: "Lad opp under USB-tilkobling"
   </dest>
   <voice>
     *: none
-    usb_charging: "Lad opp under USB-tilkobling"
+    usb_charging_enable: "Lad opp under USB-tilkobling"
   </voice>
 </phrase>
 <phrase>

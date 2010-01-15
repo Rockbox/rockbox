@@ -8216,15 +8216,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "ชาร์จระหว่างการต่อ USB"
+    usb_charging_enable: "ชาร์จระหว่างการต่อ USB"
   </dest>
   <voice>
     *: none
-    usb_charging: "Charge During U S B Connection"
+    usb_charging_enable: "Charge During U S B Connection"
   </voice>
 </phrase>
 <phrase>

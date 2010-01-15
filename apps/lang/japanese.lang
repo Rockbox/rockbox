@@ -8270,15 +8270,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "USB接続時に充電する"
+    usb_charging_enable: "USB接続時に充電する"
   </dest>
   <voice>
     *: none
-    usb_charging: "USB接続時に充電する"
+    usb_charging_enable: "USB接続時に充電する"
   </voice>
 </phrase>
 <phrase>

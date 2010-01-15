@@ -8295,15 +8295,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Charger quand USB connecté"
+    usb_charging_enable: "Charger quand USB connecté"
   </dest>
   <voice>
     *: none
-    usb_charging: "Charger quand U S B connecté"
+    usb_charging_enable: "Charger quand U S B connecté"
   </voice>
 </phrase>
 <phrase>

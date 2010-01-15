@@ -9012,15 +9012,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Cargar durante conexión USB"
+    usb_charging_enable: "Cargar durante conexión USB"
   </dest>
   <voice>
     *: none
-    usb_charging: "Cargar durante conexión u s b"
+    usb_charging_enable: "Cargar durante conexión u s b"
   </voice>
 </phrase>
 <phrase>

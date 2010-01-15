@@ -8323,15 +8323,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Krauti kai prijungtas USB"
+    usb_charging_enable: "Krauti kai prijungtas USB"
   </dest>
   <voice>
     *: none
-    usb_charging: "Krauti kai prijungtas USB"
+    usb_charging_enable: "Krauti kai prijungtas USB"
   </voice>
 </phrase>
 <phrase>

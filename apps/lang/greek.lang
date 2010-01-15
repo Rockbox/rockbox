@@ -8235,15 +8235,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Φόρτιση στην σύνδεση USB"
+    usb_charging_enable: "Φόρτιση στην σύνδεση USB"
   </dest>
   <voice>
     *: none
-    usb_charging: "Φόρτιση στην σύνδεση Γιού Ες Μπι"
+    usb_charging_enable: "Φόρτιση στην σύνδεση Γιού Ες Μπι"
   </voice>
 </phrase>
 <phrase>

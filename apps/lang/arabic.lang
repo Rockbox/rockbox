@@ -4899,15 +4899,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "الشحن أثناء التتوصيل بالـUSB"
+    usb_charging_enable: "الشحن أثناء التتوصيل بالـUSB"
   </dest>
   <voice>
     *: none
-    usb_charging: "Charge During U S B Connection"
+    usb_charging_enable: "Charge During U S B Connection"
   </voice>
 </phrase>
 <phrase>

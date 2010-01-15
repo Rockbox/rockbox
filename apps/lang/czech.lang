@@ -8229,15 +8229,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Nabíjet při připojení přes USB"
+    usb_charging_enable: "Nabíjet při připojení přes USB"
   </dest>
   <voice>
     *: none
-    usb_charging: "Nabíjet při připojení přes USB"
+    usb_charging_enable: "Nabíjet při připojení přes USB"
   </voice>
 </phrase>
 <phrase>

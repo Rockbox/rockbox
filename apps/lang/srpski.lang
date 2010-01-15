@@ -8251,15 +8251,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Пуни за време USB везе"
+    usb_charging_enable: "Пуни за време USB везе"
   </dest>
   <voice>
     *: none
-    usb_charging: "Пуни за време U S B везе"
+    usb_charging_enable: "Пуни за време U S B везе"
   </voice>
 </phrase>
 <phrase>

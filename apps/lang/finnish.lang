@@ -9778,15 +9778,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Lataa USB-samsungyhteyden aikana"
+    usb_charging_enable: "Lataa USB-samsungyhteyden aikana"
   </dest>
   <voice>
     *: none
-    usb_charging: "Lataa u s b samsungyhteyden aikana"
+    usb_charging_enable: "Lataa u s b samsungyhteyden aikana"
   </voice>
 </phrase>
 <phrase>

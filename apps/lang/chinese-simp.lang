@@ -8971,15 +8971,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "USB连接时充电"
+    usb_charging_enable: "USB连接时充电"
   </dest>
   <voice>
     *: none
-    usb_charging: "USB连接时充电"
+    usb_charging_enable: "USB连接时充电"
   </voice>
 </phrase>
 <phrase>

@@ -8276,15 +8276,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Ładuj podczas podłączenia USB"
+    usb_charging_enable: "Ładuj podczas podłączenia USB"
   </dest>
   <voice>
     *: none
-    usb_charging: "Ładuj podczas podłączenia u es be"
+    usb_charging_enable: "Ładuj podczas podłączenia u es be"
   </voice>
 </phrase>
 <phrase>

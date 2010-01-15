@@ -3758,15 +3758,15 @@
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Зареждане пo време на USB връзка"
+    usb_charging_enable: "Зареждане пo време на USB връзка"
   </dest>
   <voice>
     *: none
-    usb_charging: none
+    usb_charging_enable: none
   </voice>
 </phrase>
 <phrase>
