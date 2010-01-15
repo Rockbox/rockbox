@@ -584,9 +584,11 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
 
   \opt{sansaAMS}
     {
-    The player will boot into the original firmware if it is powered
-    by a USB connection. This feature may be removed in the future when
-    Rockbox is able to handle USB transfers natively.
+    The player will always boot into the original firmware if it is powered
+    by a USB connection, and additionally will do so if USB is inserted while
+	rockbox is running without holding \ActionStdUsbCharge{}. This feature may
+	be removed in the future when Rockbox is able to handle USB transfers 
+	natively.
     }
 
   \opt{mrobe100}
