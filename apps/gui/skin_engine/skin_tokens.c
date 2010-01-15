@@ -326,10 +326,12 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
              * The ones that expect "0" need to be handled */
             case WPS_TOKEN_FILE_FREQUENCY:
             case WPS_TOKEN_FILE_FREQUENCY_KHZ:
-            case WPS_TOKEN_FILE_SIZE:
+            case WPS_TOKEN_FILE_SIZE:         
+#ifdef HAVE_TAGCACHE
             case WPS_TOKEN_DATABASE_PLAYCOUNT:
             case WPS_TOKEN_DATABASE_RATING:
             case WPS_TOKEN_DATABASE_AUTOSCORE:
+#endif
                 if (intval)
                     *intval = 0;
                 return "0";
