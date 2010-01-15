@@ -45,9 +45,6 @@
 GREY_INFO_STRUCT
 static unsigned char *gbuf;
 static size_t gbuf_size = 0;
-unsigned char imgbuffer[LCD_HEIGHT];
-#else
-fb_data imgbuffer[LCD_HEIGHT];
 #endif
 
 #define REDRAW_NONE    0

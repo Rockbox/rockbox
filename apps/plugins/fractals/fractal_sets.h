@@ -24,12 +24,6 @@
 #include "lib/grey.h"
 #include "lib/xlcd.h"
 
-#ifdef USEGSLIB
-extern unsigned char imgbuffer[LCD_HEIGHT];
-#else
-extern fb_data imgbuffer[LCD_HEIGHT];
-#endif
-
 struct fractal_rect
 {
     int px_min;

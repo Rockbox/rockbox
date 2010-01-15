@@ -24,6 +24,12 @@
 
 #define BUTTON_YIELD_TIMEOUT (HZ / 4)
 
+#ifdef USEGSLIB
+unsigned char imgbuffer[LCD_HEIGHT];
+#else
+fb_data imgbuffer[LCD_HEIGHT];
+#endif
+
 /* 8 entries cyclical, last entry is black (convergence) */
 #ifdef HAVE_LCD_COLOR
 static const fb_data color[9] = {
@@ -55,6 +61,7 @@ static const unsigned char color[9] = {
 #endif
 
 #if (LCD_DEPTH < 8)
+#define USEGLIB
 #else
 #define UPDATE_FREQ (HZ/50)
 #endif
