@@ -408,9 +408,9 @@ target/arm/as3525/system-as3525.c
 target/arm/as3525/kernel-as3525.c
 target/arm/as3525/timer-as3525.c
 #if CONFIG_CPU == AS3525
-target/arm/as3525/ata_sd_as3525.c
+target/arm/as3525/sd-as3525.c
 #else /* AS3535v2 */
-target/arm/as3525/ata_sd-as3525v2.c
+target/arm/as3525/sd-as3525v2.c
 #endif
 target/arm/as3525/power-as3525.c
 target/arm/as3525/usb-as3525.c
