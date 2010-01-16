@@ -45,6 +45,12 @@ static int mouse_coords = 0;
 /* speed repeat finishes at */
 #define REPEAT_INTERVAL_FINISH  2
 
+#ifdef HAVE_TOUCHSCREEN
+#define USB_KEY SDLK_c /* SDLK_u is taken by BUTTON_MIDLEFT */
+#else
+#define USB_KEY SDLK_u
+#endif
+
 #if defined(IRIVER_H100_SERIES) || defined (IRIVER_H300_SERIES)
 int _remote_type=REMOTETYPE_H100_LCD;
 
@@ -76,7 +82,7 @@ void button_event(int key, bool pressed)
 {
     int new_btn = 0;
     static bool usb_connected = false;
-    if (usb_connected && key != SDLK_u)
+    if (usb_connected && key != USB_KEY)
         return;
     switch (key)
     {
@@ -103,30 +109,43 @@ void button_event(int key, bool pressed)
         }
         break;
     case SDLK_KP7:
+    case SDLK_7:
         new_btn = BUTTON_TOPLEFT;
         break;
     case SDLK_KP8:
+    case SDLK_8:
+    case SDLK_UP:
         new_btn = BUTTON_TOPMIDDLE;
         break;
     case SDLK_KP9:
+    case SDLK_9:
         new_btn = BUTTON_TOPRIGHT;
         break;
     case SDLK_KP4:
+    case SDLK_u:
+    case SDLK_LEFT:
         new_btn = BUTTON_MIDLEFT;
         break;
     case SDLK_KP5:
+    case SDLK_i:
         new_btn = BUTTON_CENTER;
         break;
     case SDLK_KP6:
+    case SDLK_o:
+    case SDLK_RIGHT:
         new_btn = BUTTON_MIDRIGHT;
         break;
     case SDLK_KP1:
+    case SDLK_j:
         new_btn = BUTTON_BOTTOMLEFT;
         break;
     case SDLK_KP2:
+    case SDLK_k:
+    case SDLK_DOWN:
         new_btn = BUTTON_BOTTOMMIDDLE;
         break;
     case SDLK_KP3:
+    case SDLK_l:
         new_btn = BUTTON_BOTTOMRIGHT;
         break;
     case SDLK_F4:
@@ -138,7 +157,7 @@ void button_event(int key, bool pressed)
         break;
             
 #endif
-    case SDLK_u:
+    case USB_KEY:
         if (!pressed)
         {
             usb_connected = !usb_connected;
