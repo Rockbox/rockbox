@@ -325,6 +325,7 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_recscreen;
 #endif
         case CONTEXT_KEYBOARD:
+        case CONTEXT_MORSE_INPUT:
             return button_context_keyboard;
 
         default:

@@ -433,6 +433,7 @@ static const struct button_mapping* get_context_mapping_remote( int context )
             return remote_button_context_radio;
 
         case CONTEXT_KEYBOARD:
+        case CONTEXT_MORSE_INPUT:
             return remote_button_context_keyboard;
 
         case CONTEXT_PITCHSCREEN:
@@ -489,8 +490,8 @@ const struct button_mapping* get_context_mapping( int context )
             return button_context_radio;
 
         case CONTEXT_KEYBOARD:
+        case CONTEXT_MORSE_INPUT:
             return button_context_keyboard;
-
 
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;

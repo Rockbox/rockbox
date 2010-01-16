@@ -425,6 +425,7 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_RECSCREEN:
             return button_context_recscreen;
         case CONTEXT_KEYBOARD:
+        case CONTEXT_MORSE_INPUT:
             return button_context_keyboard;
 #ifdef USB_ENABLE_HID
         case CONTEXT_USB_HID:

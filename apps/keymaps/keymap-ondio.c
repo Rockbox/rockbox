@@ -155,7 +155,7 @@ static const struct button_mapping button_context_recscreen[]  = {
 
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                           BUTTON_NONE },
-    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },   
+    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                          BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,            BUTTON_NONE },
     { ACTION_KBD_SELECT,       BUTTON_MENU|BUTTON_REL,                BUTTON_MENU },
@@ -168,6 +168,22 @@ static const struct button_mapping button_context_keyboard[]  = {
 
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
+
+static const struct button_mapping button_context_morse_input[]  = {
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_LEFT,                     BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_LEFT|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_RIGHT,                    BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_RIGHT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_KBD_BACKSPACE,    BUTTON_MENU|BUTTON_REL,          BUTTON_MENU },
+    { ACTION_KBD_DONE,         BUTTON_MENU|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_KBD_ABORT,        BUTTON_OFF,                      BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_DOWN,                     BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_DOWN|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_KBD_SELECT,       BUTTON_UP,                       BUTTON_NONE },
+    { ACTION_KBD_MORSE_SELECT, BUTTON_UP|BUTTON_REL,            BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* button_context_morse_input */
 
 #if CONFIG_TUNER
 static const struct button_mapping button_context_radio[]  = {
@@ -223,6 +239,8 @@ const struct button_mapping* get_context_mapping( int context )
 #endif
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+        case CONTEXT_MORSE_INPUT:
+            return button_context_morse_input;
 #if CONFIG_TUNER
         case CONTEXT_FM:
             return button_context_radio;

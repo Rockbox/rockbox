@@ -414,6 +414,7 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;
         case CONTEXT_KEYBOARD:
+        case CONTEXT_MORSE_INPUT:
             return button_context_keyboard;
 #ifdef HAVE_RECORDING
         case CONTEXT_RECSCREEN:

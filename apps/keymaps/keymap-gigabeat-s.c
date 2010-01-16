@@ -691,6 +691,7 @@ static const struct button_mapping* get_context_mapping_remote( int context )
             return remote_button_context_recscreen;
 
         case CONTEXT_KEYBOARD:
+        case CONTEXT_MORSE_INPUT:
             return ACTION_NONE; /* Any sensible mapping for this remote? */
 
         case CONTEXT_FM:
@@ -769,6 +770,7 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_settings_right_is_inc;
 
         case CONTEXT_KEYBOARD:
+        case CONTEXT_MORSE_INPUT:
             return button_context_keyboard;
 
         case CONTEXT_FM:

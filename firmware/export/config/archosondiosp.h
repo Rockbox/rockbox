@@ -31,6 +31,9 @@
 /* define this if you have an Ondio style 6-key keyboard */
 #define CONFIG_KEYPAD ONDIO_PAD
 
+/* Define this to enable morse code input */
+#define HAVE_MORSE_INPUT
+
 #define AB_REPEAT_ENABLE 1
 #define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
 

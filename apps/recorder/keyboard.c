@@ -735,7 +735,11 @@ int kbd_input(char* text, int buflen)
         FOR_NB_SCREENS(l)
             screens[l].update();
 
-        button = get_action(CONTEXT_KEYBOARD, HZ/2);
+        button = get_action(
+#ifdef HAVE_MORSE_INPUT
+                morse_mode? CONTEXT_MORSE_INPUT:
+#endif
+                            CONTEXT_KEYBOARD, HZ/2);
 #if NB_SCREENS > 1
         button_screen = (get_action_statuscode(NULL) & ACTION_REMOTE) ? 1 : 0;
 #endif

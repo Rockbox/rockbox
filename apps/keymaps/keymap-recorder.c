@@ -302,6 +302,7 @@ const struct button_mapping* get_context_mapping( int context )
         case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_recscreen;
         case CONTEXT_KEYBOARD:
+        case CONTEXT_MORSE_INPUT:
             return button_context_keyboard;
         case CONTEXT_FM:
             return button_context_radio;

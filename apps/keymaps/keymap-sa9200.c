@@ -270,7 +270,7 @@ static const struct button_mapping button_context_keyboard[]  = {
 
     { ACTION_KBD_PAGE_FLIP,    BUTTON_VOL_DOWN,                 BUTTON_NONE },
 
-    { ACTION_KBD_MORSE_INPUT,  BUTTON_MENU|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_KBD_MORSE_INPUT,  BUTTON_MENU|BUTTON_PLAY,         BUTTON_NONE },
     { ACTION_KBD_MORSE_SELECT, BUTTON_MENU|BUTTON_REL,          BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
@@ -427,7 +427,9 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_pitchscreen;
 
         case CONTEXT_KEYBOARD:
+        case CONTEXT_MORSE_INPUT:
             return button_context_keyboard;
+
 #ifdef USB_ENABLE_HID
         case CONTEXT_USB_HID:
             return button_context_usb_hid;
