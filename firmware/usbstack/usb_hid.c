@@ -551,7 +551,7 @@ static size_t descriptor_report_get(unsigned char *dest)
     PACK_VAL(report, END_COLLECTION);
 #endif /* HAVE_USB_HID_MOUSE */
 
-    return (size_t)((uint32_t)report - (uint32_t)dest);
+    return (size_t)(report - dest);
 }
 
 static void descriptor_hid_get(unsigned char **dest)
