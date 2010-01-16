@@ -261,14 +261,16 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = ใช่"
+    cowond2*: "MENU = ใช่"
     iriverh100,iriverh120,iriverh300: "NAVI = ใช่"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = ใช่"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = ใช่"
     archosplayer: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -1904,15 +1906,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "ความดังเสียงบี๊ป"
+    swcodec: "เสียงบี๊ปข้ามเพลง"
   </dest>
   <voice>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </voice>
 </phrase>
 <phrase>
@@ -2368,14 +2370,16 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (OFF เพื่อย้อนกลับ)"
     iriverh100,iriverh120,iriverh300: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (STOP เพื่อย้อนกลับ)"
     ipod*: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (LEFT เพื่อย้อนกลับ)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
+    gogearsa9200: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (REW เพื่อย้อนกลับ)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -2558,15 +2562,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "เลือกฟอนต์"
+    lcd_bitmap: "ฟอนต์"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </voice>
 </phrase>
 <phrase>
@@ -2574,13 +2578,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "เลือกไฟล์ .wps"
+    *: "หน้าจอขณะเล่น"
   </dest>
   <voice>
-    *: "Browse while-playing-screen files"
+    *: "While playing screen"
   </voice>
 </phrase>
 <phrase>
@@ -2589,15 +2593,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "เลือกไฟล์ .rwps"
+    remote: "หน้าจอขณะเล่นบนรีโมท"
   </dest>
   <voice>
     *: none
-    remote: "Browse remote while-playing-screen files"
+    remote: "Remote While Playing Screen"
   </voice>
 </phrase>
 <phrase>
@@ -3175,7 +3179,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (archosplayer) menu alternative for jump scroll
+  desc: (player) menu alternative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
@@ -3189,7 +3193,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (archosplayer) the jump scroll shall be done "one time"
+  desc: (player) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -3203,7 +3207,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (archosplayer) Delay before making a jump scroll
+  desc: (player) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
@@ -4109,14 +4113,18 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
+    gogearsa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = ตั้งค่า"
+    mrobe500: "HEART = ตั้งค่า"
     iriverh100,iriverh120,iriverh300: "NAVI = ตั้งค่า"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = ตั้งค่า"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = ตั้งค่า"
+    gogearsa9200: "PLAY = ตั้งค่า"
   </dest>
   <voice>
     *: none
@@ -4129,24 +4137,28 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    ipod*,sansac200*: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    gogearsa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = ยกเลิก"
+    mrobe500: "POWER = ยกเลิก"
     iriverh100,iriverh120,iriverh300: "STOP = ยกเลิก"
-    ipod*,sansac200*,gogearsa9200: "MENU = ยกเลิก"
+    ipod*,sansac200*: "MENU = ยกเลิก"
     iaudiox5,iaudiom5: "RECORD = ยกเลิก"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = ยกเลิก"
     gigabeatfx: "POWER = ยกเลิก"
     mrobe100: "DISPLAY = ยกเลิก"
     gigabeats: "BACK = ยกเลิก"
+    gogearsa9200: "LEFT = ยกเลิก"
   </dest>
   <voice>
     *: none
@@ -4873,7 +4885,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR_TALK
-  desc: Item of voice menu, whether to use directory .talk clips
+  desc: Item of voice menu, whether to use directory .talk sansaclips
   user: core
   <source>
     *: "Use Directory .talk Clips"
@@ -4901,7 +4913,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_FILE_TALK
-  desc: Item of voice menu, whether to use file .talk clips
+  desc: Item of voice menu, whether to use file .talk sansaclips
   user: core
   <source>
     *: "Use File .talk Clips"
@@ -4946,13 +4958,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk mp3 sansaclip"
   </source>
   <dest>
     *: "คลิป .talk mp3"
   </dest>
   <voice>
-    *: "talk mp3 clip"
+    *: "talk mp3 sansaclip"
   </voice>
 </phrase>
 <phrase>
@@ -5072,13 +5084,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
     *: "เลือกหน้ากาก"
   </dest>
   <voice>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </voice>
 </phrase>
 <phrase>
@@ -6450,7 +6462,7 @@
   user: core
   <source>
     *: none
-    agc: "Safety (clip)"
+    agc: "Safety (sansaclip)"
   </source>
   <dest>
     *: none
@@ -6458,7 +6470,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: "Safety (sansaclip)"
   </voice>
 </phrase>
 <phrase>
@@ -6843,12 +6855,12 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    archosplayer,archosrecorder,fmarchosrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "แบตเตอรี่: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    archosplayer,archosrecorder,fmarchosrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "แบต: %d%% %dh %dm"
   </dest>
   <voice>
@@ -6925,7 +6937,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -8216,15 +8228,15 @@
   user: core
   <source>
     *: none
-    usb_charging_enable: "Charge During USB Connection"
+    usb_charging: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging_enable: "ชาร์จระหว่างการต่อ USB"
+    usb_charging: "ชาร์จระหว่างการต่อ USB"
   </dest>
   <voice>
     *: none
-    usb_charging_enable: "Charge During U S B Connection"
+    usb_charging: "Charge During U S B Connection"
   </voice>
 </phrase>
 <phrase>
@@ -8618,19 +8630,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
+  desc: in info display, shows that top off charge is running Only for V1 arhosrecorder
   user: core
   <source>
     *: none
-    archosrecorder: "Battery: Top-Off Chg"
+    archosrecorder "Battery: Top-Off Chg"
   </source>
   <dest>
     *: none
-    archosrecorder: "แบตเตอรี่: ชาร์จสูงสุด"
+    archosrecorder "แบตเตอรี่: ชาร์จสูงสุด"
   </dest>
   <voice>
     *: none
-    archosrecorder: "Top off charge"
+    archosrecorder "Top off charge"
   </voice>
 </phrase>
 <phrase>
@@ -12042,7 +12054,7 @@
   user: core
   <source>
     *: none
-    agc: "AGC clip time"
+    agc: "AGC sansaclip time"
   </source>
   <dest>
     *: none
@@ -12050,7 +12062,7 @@
   </dest>
   <voice>
     *: none
-    agc: "AGC clip time"
+    agc: "AGC sansaclip time"
   </voice>
 </phrase>
 <phrase>
@@ -12113,5 +12125,536 @@
   <voice>
     *: none
     gigabeatfx: "High"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest>
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "ป้องกันเพลงกระตุก"
+  </dest>
+  <voice>
+    *: "Prevent Track Skipping"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "เปิดลำโพง"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Enable Speaker"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "เลือกแบบตัวเลขการเรียงลำดับ"
+  </dest>
+  <voice>
+    *: "Interpret numbers when sorting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "ตำแหน่งแถบเลื่อน"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scroll bar position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "แถบสถานะบนรีโมท"
+  </dest>
+  <voice>
+    *: none
+    remote: "Remote Statusbar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest>
+    *: none
+    serial_port: "ความเร็วซีเรียลพอร์ต"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Serial Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "ตำแหน่งแน่นอน"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Absolute Point"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "ตั้งเป็นตัวเลือกในควิคสกรีนด้านบน"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "ความเร็ว"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Rate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "ขวา"
+  </dest>
+  <voice>
+    *: "Right"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc:
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "เสียงกลาง"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Semitone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "จำกัดที่"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Limit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "ปรับความแม่นยำ"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Calibrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest>
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "ยกเลิกการปรับความแม่นยำ"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Reset Calibration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "ใช้ตัวเลขทั้งหมด"
+  </dest>
+  <voice>
+    *: "As whole numbers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user: core
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "ผู้พัฒนา"
+  </dest>
+  <voice>
+    *: "Credits"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "ตาราง 3x3"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "3 by 3 grid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "ความกว้างแถบเลื่อน"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scroll bar width"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "ใช้งานหน้าจอสัมผัส"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "หน่วยความจำหน้ากาก:"
+  </dest>
+  <voice>
+    *: "Skin RAM usage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "ล่าง"
+  </dest>
+  <voice>
+    *: "Bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ขยายเวลาเล่น"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Timestretch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "ใช้ตัวเลขทีละตัว"
+  </dest>
+  <voice>
+    *: "As digits"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limiter Preamp"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ขีดจำกัดปรีแอมป์"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limiter Preamp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "ซ้าย"
+  </dest>
+  <voice>
+    *: "Left"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "ตั้งค่าหน้าจอสัมผัส"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "บน"
+  </dest>
+  <voice>
+    *: "Top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ความเร็ว"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest>
+    *: none
+    serial_port: "อัตโนมัติ"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Automatic"
   </voice>
 </phrase>
