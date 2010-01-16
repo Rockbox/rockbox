@@ -729,16 +729,22 @@ void button_event(int key, bool pressed)
     case SDLK_F12:
         new_btn = BUTTON_RC_VOL_UP;
         break;
-    case SDLK_LEFT:
+    case SDLK_MINUS:
+    case SDLK_LESS:
+    case SDLK_LEFTBRACKET:
+    case SDLK_KP_DIVIDE:
         new_btn = BUTTON_LEFT;
         break;
-    case SDLK_RIGHT:
+    case SDLK_PLUS:
+    case SDLK_GREATER:
+    case SDLK_RIGHTBRACKET:
+    case SDLK_KP_MULTIPLY:
         new_btn = BUTTON_RIGHT;
         break;
-    case SDLK_UP:
+    case SDLK_PAGEUP:
         new_btn = BUTTON_RC_PLAY;
         break;
-    case SDLK_DOWN:
+    case SDLK_PAGEDOWN:
         new_btn = BUTTON_RC_DOWN;
         break;
     case SDLK_F8:
@@ -1150,11 +1156,17 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_POWER;
         break;
     case SDLK_KP_PLUS:
-    case SDLK_RIGHT:
+    case SDLK_PLUS:
+    case SDLK_GREATER:
+    case SDLK_RIGHTBRACKET:
+    case SDLK_KP_MULTIPLY:
         new_btn = BUTTON_VOL_UP;
         break;
     case SDLK_KP_MINUS:
-    case SDLK_LEFT:
+    case SDLK_MINUS:
+    case SDLK_LESS:
+    case SDLK_LEFTBRACKET:
+    case SDLK_KP_DIVIDE:
         new_btn = BUTTON_VOL_DOWN;
         break;
     case SDLK_KP_ENTER:
