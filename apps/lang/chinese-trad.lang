@@ -18,6 +18,7 @@
 # - Wenbin Leo
 # - Xinlu Huang
 # - Harry Tu
+# - Tse-Hsien Chiang
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -112,7 +113,7 @@
   </source>
   <dest>
     *: none
-    soft_shutdown: "按下 OFF關機"
+    soft_shutdown: "按下 OFF 關機"
   </dest>
   <voice>
     *: none
@@ -160,7 +161,7 @@
   </source>
   <dest>
     *: none
-    archosondio*: "請移除插入的MMC卡"
+    archosondio*: "請移除插入的 MMC 卡"
   </dest>
   <voice>
     *: "Please remove multimedia card"
@@ -175,7 +176,7 @@
     *: "Failed"
   </source>
   <dest>
-    *: "已失敗"
+    *: "失敗"
   </dest>
   <voice>
     *: ""
@@ -189,7 +190,7 @@
     *: "Recent Bookmarks"
   </source>
   <dest>
-    *: "最近書籤"
+    *: "最近的書籤"
   </dest>
   <voice>
     *: "Recent Bookmarks"
@@ -203,10 +204,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "聲音的設置"
+    *: "音效設定"
   </dest>
   <voice>
-    *: "聲音的設置"
+    *: "音效設定"
   </voice>
 </phrase>
 <phrase>
@@ -261,7 +262,7 @@
   </source>
   <dest>
     *: none
-    radio: "收聽FM廣播"
+    radio: "收聽 FM 廣播"
   </dest>
   <voice>
     *: none
@@ -422,7 +423,7 @@
     *: "Mono Left"
   </source>
   <dest>
-    *: "單聲道（左）"
+    *: "單聲道 (左)"
   </dest>
   <voice>
     *: "Mono Left"
@@ -436,7 +437,7 @@
     *: "Mono Right"
   </source>
   <dest>
-    *: "單聲道（右）"
+    *: "單聲道 (右)"
   </dest>
   <voice>
     *: "Mono Right"
@@ -450,7 +451,7 @@
     *: "Karaoke"
   </source>
   <dest>
-    *: "卡啦OK"
+    *: "卡啦 OK"
   </dest>
   <voice>
     *: "Karaoke"
@@ -548,7 +549,7 @@
   </source>
   <dest>
     *: none
-    masf: "MDB有效"
+    masf: "MDB 有效"
   </dest>
   <voice>
     *: none
@@ -565,7 +566,7 @@
   </source>
   <dest>
     *: none
-    masf: "MDB強度"
+    masf: "MDB 強度"
   </dest>
   <voice>
     *: none
@@ -582,7 +583,7 @@
   </source>
   <dest>
     *: none
-    masf: "MDB泛音"
+    masf: "MDB 泛音"
   </dest>
   <voice>
     *: none
@@ -599,7 +600,7 @@
   </source>
   <dest>
     *: none
-    masf: "MDB中心頻率"
+    masf: "MDB 中心頻率"
   </dest>
   <voice>
     *: none
@@ -616,7 +617,7 @@
   </source>
   <dest>
     *: none
-    masf: "MDB形狀"
+    masf: "MDB 形狀"
   </dest>
   <voice>
     *: none
@@ -763,7 +764,7 @@
     *: "Browse .cfg Files"
   </source>
   <dest>
-    *: "瀏覽.cfg檔案"
+    *: "瀏覽 .cfg 檔案"
   </dest>
   <voice>
     *: "Browse configuration files"
@@ -805,7 +806,7 @@
     *: "Save .cfg File"
   </source>
   <dest>
-    *: "寫出.cfg檔案"
+    *: "寫出 .cfg 檔案"
   </dest>
   <voice>
     *: "Write configuration file"
@@ -974,7 +975,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "%d Hz頻帶增益"
+    swcodec: "%d Hz 頻帶增益"
   </dest>
   <voice>
     *: none
@@ -1175,7 +1176,7 @@
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "除錯(請勿進入!)"
+    *: "除錯 (請勿進入!)"
   </dest>
   <voice>
     *: "Debug, keep out!"
@@ -1351,11 +1352,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "改歌的聲音"
+    swcodec: "換曲提示音"
   </dest>
   <voice>
     *: none
-    swcodec: "改歌的聲音"
+    swcodec: "換曲提示音"
   </voice>
 </phrase>
 <phrase>
@@ -1633,7 +1634,7 @@
     *: "By Date"
   </source>
   <dest>
-    *: "以日期"
+    *: "依日期"
   </dest>
   <voice>
     *: "By Date"
@@ -1647,7 +1648,7 @@
     *: "By Newest Date"
   </source>
   <dest>
-    *: "以最新日期"
+    *: "依最新日期"
   </dest>
   <voice>
     *: "By Newest Date"
@@ -1661,7 +1662,7 @@
     *: "By Type"
   </source>
   <dest>
-    *: "以類型"
+    *: "依類型"
   </dest>
   <voice>
     *: "By Type"
@@ -1762,7 +1763,7 @@
     *: "Browse .wps files"
   </source>
   <dest>
-    *: "瀏覽.wps檔案"
+    *: "瀏覽 .wps 檔案"
   </dest>
   <voice>
     *: "Browse while-playing-screen files"
@@ -1778,7 +1779,7 @@
   </source>
   <dest>
     *: none
-    remote: "瀏覽.rwps檔案"
+    remote: "瀏覽 .rwps 檔案"
   </dest>
   <voice>
     *: none
@@ -1872,7 +1873,7 @@
     *: "Default Codepage"
   </source>
   <dest>
-    *: "預設碼頁"
+    *: "預設編碼"
   </dest>
   <voice>
     *: "Default codepage"
@@ -2026,7 +2027,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "簡體中文(GB2312)"
+    lcd_bitmap: "簡體中文 (GB2312)"
   </dest>
   <voice>
     *: none
@@ -2043,7 +2044,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "韓文(KSX1001)"
+    lcd_bitmap: "韓文 (KSX1001)"
   </dest>
   <voice>
     *: none
@@ -2060,7 +2061,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "正體中文(BIG5)"
+    lcd_bitmap: "正體中文 (BIG5)"
   </dest>
   <voice>
     *: none
@@ -2075,7 +2076,7 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "萬國碼(UTF-8)"
+    *: "萬國碼 (UTF-8)"
   </dest>
   <voice>
     *: "Unicode"
@@ -2848,7 +2849,7 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Replaygain種類"
+    *: "Replaygain 種類"
   </dest>
   <voice>
     *: "Replaygain Type"
@@ -2890,7 +2891,7 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "亂序播放時使用Track Gain"
+    *: "亂序播放時使用 Track Gain"
   </dest>
   <voice>
     *: "Track Gain if Shuffling"
@@ -2934,7 +2935,7 @@
   </source>
   <dest>
     *: none
-    charging: "背光(使用外部電源時)"
+    charging: "背光 (使用外部電源時)"
   </dest>
   <voice>
     *: none
@@ -3815,7 +3816,7 @@
   </source>
   <dest>
     *: none
-    rtc: "12小時制"
+    rtc: "12 小時制"
   </dest>
   <voice>
     *: none
@@ -3832,7 +3833,7 @@
   </source>
   <dest>
     *: none
-    rtc: "24小時制"
+    rtc: "24 小時制"
   </dest>
   <voice>
     *: none
@@ -3903,7 +3904,7 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "顯示音軌信息"
+    *: "顯示音軌資訊"
   </dest>
   <voice>
     *: "Show ID3 Info"
@@ -3987,7 +3988,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "檔案/目錄已存在。覆寫?"
+    *: "檔案/目錄已存在. 覆寫?"
   </dest>
   <voice>
     *: ""
@@ -4074,7 +4075,7 @@
     *: "Open With..."
   </source>
   <dest>
-    *: "檔案開啟..."
+    *: "開啟檔案..."
   </dest>
   <voice>
     *: "open with"
@@ -4231,7 +4232,7 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "隊列最后"
+    *: "隊列最後"
   </dest>
   <voice>
     *: "Queue Last"
@@ -4273,7 +4274,7 @@
     *: "Searching... %d found (%s)"
   </source>
   <dest>
-    *: "搜尋中... 找到%d件 (%s)"
+    *: "搜尋中... 找到 %d 件 (%s)"
   </dest>
   <voice>
     *: ""
@@ -4315,7 +4316,7 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Rockbox資訊:"
+    *: "Rockbox 資訊"
   </dest>
   <voice>
     *: ""
@@ -4382,7 +4383,7 @@
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "電池: %d%% %d小時%d分"
+    *: "電池: %d%% %d小時 %d分"
     archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondiosp,archosondiofm,iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "電池: %d%% %dh %dm"
   </dest>
@@ -4451,13 +4452,13 @@
     *: none
     multivolume: "磁盤1"
     sansae200*,sansac200*,sansafuze*: "Multimedia 卡:"
-    archosondio*: "MMC卡:"
+    archosondio*: "MMC 卡:"
   </dest>
   <voice>
     *: none
     multivolume: "磁盤1"
     sansae200*,sansac200*,sansafuze*: "Multimedia 卡"
-    archosondio*: "mmc卡"
+    archosondio*: "MMC 卡"
   </voice>
 </phrase>
 <phrase>
@@ -4598,14 +4599,14 @@
   </source>
   <dest>
     *: none
-    rtc: "OFF = 回去"
-    iriverh100,iriverh120,iriverh300: "STOP = 回去"
-    ipod*,sansac200*,gogearsa9200: "MENU = 回去"
+    rtc: "OFF = 返回"
+    iriverh100,iriverh120,iriverh300: "STOP = 返回"
+    ipod*,sansac200*,gogearsa9200: "MENU = 返回"
     iaudiox5,iaudiom5: "RECORD = 回去"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = 回去"
-    gigabeatfx: "POWER = 回去"
-    mrobe100: "DISPLAY = 回去"
-    gigabeats: "BACK = 回去"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = 返回"
+    gigabeatfx: "POWER = 返回"
+    mrobe100: "DISPLAY = 返回"
+    gigabeats: "BACK = 返回"
   </dest>
   <voice>
     *: none
@@ -4700,10 +4701,10 @@
   </source>
   <dest>
     *: none
-    recording: "硬碟已滿，按下OFF繼續。"
-    iriverh100,iriverh120,iriverh300: "硬碟已滿，按下STOP繼續。"
-    iaudiom5,iaudiox5: "硬碟已滿，按下POWER繼續。"
-    sansae200*,sansac200*: "硬碟已滿，按下PREV繼續。"
+    recording: "硬碟已滿, 按下 OFF 繼續."
+    iriverh100,iriverh120,iriverh300: "硬碟已滿, 按下 STOP 繼續."
+    iaudiom5,iaudiox5: "硬碟已滿, 按下 POWER 繼續."
+    sansae200*,sansac200*: "硬碟已滿, 按下 PREV 繼續."
   </dest>
   <voice>
     *: none
@@ -7637,7 +7638,7 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "Plugin回傳錯誤"
+    *: "插件回傳錯誤"
   </dest>
   <voice>
     *: ""
@@ -7679,7 +7680,7 @@
     *: "Plugin name too long"
   </source>
   <dest>
-    *: "Plugin名稱太長"
+    *: "插件名稱太長"
   </dest>
   <voice>
     *: ""
@@ -7763,7 +7764,7 @@
   </source>
   <dest>
     *: none
-    radio: "找不到設定，自動掃描?"
+    radio: "找不到設定, 自動掃描?"
   </dest>
   <voice>
     *: none
@@ -8761,11 +8762,11 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
-    *: "建立資料庫... 找到%d項 (OFF: 回上一畫面)"
-    iriverh100,iriverh120,iriverh300: "建立資料庫... 找到%d項 (STOP: 回上一畫面)"
-    ipod*: "建立資料庫... 找到%d項 (PREV: 回上一畫面)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "建立資料庫... 找到%d項 (LEFT: 回上一畫面)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "建立資料庫... 找到%d項 (PREV: 回上一畫面)"
+    *: "建立資料庫... 找到 %d 項 (OFF: 回上一畫面)"
+    iriverh100,iriverh120,iriverh300: "建立資料庫... 找到 %d 項 (STOP: 回上一畫面)"
+    ipod*: "建立資料庫... 找到 %d 項 (PREV: 回上一畫面)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "建立資料庫... 找到 %d 項 (LEFT: 回上一畫面)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "建立資料庫... 找到 %d 項 (PREV: 回上一畫面)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -8827,7 +8828,7 @@
   </source>
   <dest>
     *: none
-    agc: "DJ設定(慢)"
+    agc: "DJ 設定 (慢)"
   </dest>
   <voice>
     *: none
@@ -8892,7 +8893,7 @@
   </source>
   <dest>
     *: none
-    lcd_sleep: "睡眠(在背光關閉後)"
+    lcd_sleep: "睡眠 (在背光關閉後)"
   </dest>
   <voice>
     *: none
@@ -8938,7 +8939,7 @@
     *: "Deleting..."
   </source>
   <dest>
-    *: "正刪除中..."
+    *: "刪除中..."
   </dest>
   <voice>
     *: "Deleting"
@@ -8954,7 +8955,7 @@
   </source>
   <dest>
     *: none
-    usb_charging_enable: "在USB連線時充電"
+    usb_charging_enable: "在 USB 連線時充電"
   </dest>
   <voice>
     *: none
@@ -9269,7 +9270,7 @@
     archosplayer: "Buf:"
   </source>
   <dest>
-    *: "緩沖:"
+    *: "緩衝:"
     archosplayer: "Buf:"
   </dest>
   <voice>
@@ -9559,7 +9560,7 @@
     *: "Games"
   </source>
   <dest>
-    *: "游戲"
+    *: "遊戲"
   </dest>
   <voice>
     *: "Games"
@@ -9657,7 +9658,7 @@
   </source>
   <dest>
     *: none
-    agc: "現場(慢)"
+    agc: "現場 (慢)"
   </dest>
   <voice>
     *: none
@@ -9722,7 +9723,7 @@
   </source>
   <dest>
     *: none
-    agc: "語音(快)"
+    agc: "語音 (快)"
   </dest>
   <voice>
     *: none
@@ -9900,7 +9901,7 @@
   </source>
   <dest>
     *: none
-    agc: "安全(clip)"
+    agc: "安全 (clip)"
   </dest>
   <voice>
     *: none
@@ -9931,7 +9932,7 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "耳機拔出后暫停"
+    headphone_detection: "耳機拔出後暫停"
   </dest>
   <voice>
     *: none
@@ -10052,7 +10053,7 @@
   </source>
   <dest>
     *: none
-    radio: "美國/加拿大"
+    radio: "美國 / 加拿大"
   </dest>
   <voice>
     *: none
@@ -10225,7 +10226,7 @@
     *: "Context Menu"
   </source>
   <dest>
-    *: "有關菜單"
+    *: "有關選單"
   </dest>
   <voice>
     *: "Context Menu"
@@ -10284,7 +10285,7 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Cuesheet支援"
+    *: "Cuesheet 支援"
   </dest>
   <voice>
     *: "Cuesheet Support"
@@ -10312,7 +10313,7 @@
     *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "顯示文件后綴"
+    *: "顯示副檔名"
   </dest>
   <voice>
     *: "Show filename extensions"
@@ -10326,7 +10327,7 @@
     *: "Loading... %d%% done (%s)"
   </source>
   <dest>
-    *: "載入中... 完成%d%%  (%s)"
+    *: "載入中... %d%% 完成 (%s)"
   </dest>
   <voice>
     *: ""
@@ -10527,7 +10528,7 @@
     wheel_acceleration: none
   </source>
   <dest>
-    *: "列表加速緩沖"
+    *: "列表加速緩衝"
     wheel_acceleration: none
   </dest>
   <voice>
@@ -10858,7 +10859,7 @@
     *: "Last.fm Log"
   </source>
   <dest>
-    *: "Last.fm紀錄"
+    *: "Last.fm 紀錄"
   </dest>
   <voice>
     *: "Last.fm Log"
@@ -10874,7 +10875,7 @@
   </source>
   <dest>
     *: none
-    hold_button: "背光(Hold時)"
+    hold_button: "背光 (Hold 時)"
   </dest>
   <voice>
     *: none
@@ -10973,7 +10974,7 @@
     *: "Copying..."
   </source>
   <dest>
-    *: "正在復制中..."
+    *: "複製中..."
   </dest>
   <voice>
     *: "Copying"
@@ -11023,7 +11024,7 @@
   </source>
   <dest>
     *: none
-    radio: "FM收音選單"
+    radio: "FM 收音選單"
   </dest>
   <voice>
     *: none
@@ -11289,7 +11290,7 @@
     *: "Announce Battery Level"
   </source>
   <dest>
-    *: "讀出電池剩余容量"
+    *: "讀出電池剩餘容量"
   </dest>
   <voice>
     *: "Announce Battery Level"
@@ -11351,7 +11352,7 @@
     *: "Theme Settings"
   </source>
   <dest>
-    *: "主题設定"
+    *: "主題設定"
   </dest>
   <voice>
     *: "Theme Settings"
@@ -11478,10 +11479,10 @@
     *: "<Random>"
   </source>
   <dest>
-    *: "<隨机>"
+    *: "<隨機>"
   </dest>
   <voice>
-    *: "隨机"
+    *: "隨機"
   </voice>
 </phrase>
 <phrase>
@@ -11573,7 +11574,7 @@
   </source>
   <dest>
     *: none
-    recording: "已錄制文件大小"
+    recording: "已錄製檔案大小:"
   </dest>
   <voice>
     *: none
@@ -11635,11 +11636,11 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: "單聲道(左)+單聲道(右)"
+    recording_swcodec: "單聲道 (左)+ 單聲道 (右)"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "單聲道(左)+單聲道(右)"
+    recording_swcodec: "單聲道 (左)+ 單聲道 (右)"
   </voice>
 </phrase>
 <phrase>
@@ -11828,10 +11829,10 @@
     *: "Reset Setting"
   </source>
   <dest>
-    *: "恢復默認值"
+    *: "恢復預設值"
   </dest>
   <voice>
-    *: "恢復默認值"
+    *: "恢復預設值"
   </voice>
 </phrase>
 <phrase>
@@ -12070,7 +12071,7 @@
   </source>
   <dest>
     *: none
-    recording: "文件名:"
+    recording: "檔案名稱:"
   </dest>
   <voice>
     *: none
@@ -12085,10 +12086,10 @@
     *: "As whole numbers"
   </source>
   <dest>
-    *: "以整個數字排"
+    *: "依整個數字排"
   </dest>
   <voice>
-    *: "以整個數字排"
+    *: "依整個數字排"
   </voice>
 </phrase>
 <phrase>
@@ -12113,10 +12114,10 @@
     *: "Credits"
   </source>
   <dest>
-    *: "制作人員名單"
+    *: "製作人員名單"
   </dest>
   <voice>
-    *: "制作人員名單"
+    *: "製作人員名單"
   </voice>
 </phrase>
 <phrase>
@@ -12172,10 +12173,10 @@
     *: "Search Results"
   </source>
   <dest>
-    *: "搜索結果"
+    *: "搜尋結果"
   </dest>
   <voice>
-    *: "搜索結果"
+    *: "搜尋結果"
   </voice>
 </phrase>
 <phrase>
@@ -12217,10 +12218,10 @@
     *: "As digits"
   </source>
   <dest>
-    *: "以單個數字排"
+    *: "依單個數字排"
   </dest>
   <voice>
-    *: "以單個數字排"
+    *: "依單個數字排"
   </voice>
 </phrase>
 <phrase>
@@ -12377,10 +12378,10 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Touchscreen選擇"
+    touchscreen: "Touchscreen 選擇"
   </dest>
   <voice>
     *: none
-    touchscreen: "Touchscreen選擇"
+    touchscreen: "Touchscreen 選擇"
   </voice>
 </phrase>
