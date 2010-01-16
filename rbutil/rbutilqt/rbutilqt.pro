@@ -228,8 +228,10 @@ TRANSLATIONS += lang/rbutil_cs.ts \
  lang/rbutil_he.ts \
  lang/rbutil_ja.ts \
  lang/rbutil_nl.ts \
+ lang/rbutil_pl.ts \
  lang/rbutil_pt.ts \
  lang/rbutil_pt_BR.ts \
+ lang/rbutil_ru.ts \
  lang/rbutil_tr.ts \
  lang/rbutil_zh_CN.ts \
  lang/rbutil_zh_TW.ts \
