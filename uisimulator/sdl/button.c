@@ -802,16 +802,25 @@ void button_event(int key, bool pressed)
         break;
     
 #elif CONFIG_KEYPAD == COWON_D2_PAD
+    case SDLK_KP_MULTIPLY:
+    case SDLK_F8:
     case SDLK_ESCAPE:
+    case SDLK_BACKSPACE:
+    case SDLK_DELETE:
         new_btn = BUTTON_POWER;
         break;
     case SDLK_KP_PLUS:
+    case SDLK_EQUALS:
         new_btn = BUTTON_PLUS;
         break;
     case SDLK_KP_MINUS:
+    case SDLK_MINUS:
         new_btn = BUTTON_MINUS;
         break;
     case SDLK_KP_ENTER:
+    case SDLK_RETURN:
+    case SDLK_SPACE:
+    case SDLK_INSERT:
         new_btn = BUTTON_MENU;
         break;
 #elif CONFIG_KEYPAD == IAUDIO67_PAD
