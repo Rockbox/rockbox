@@ -22,6 +22,21 @@
 #ifndef _CPU_ARM_H
 #define _CPU_ARM_H
 
-inline long muls32_asr26(long a, long b);
+inline static long muls32_asr26(long a, long b)
+{
+    long r, t1;
+    asm (
+        "smull   %[r], %[t1], %[a], %[b]     \n"
+        "mov     %[r], %[r], lsr #26         \n"
+        "orr     %[r], %[r], %[t1], lsl #6   \n"
+        : /* outputs */
+        [r] "=&r,&r,&r"(r),
+        [t1]"=&r,&r,&r"(t1)
+        : /* inputs */
+        [a] "%r,%r,%r" (a),
+        [b] "r,0,1" (b)
+    );
+    return r;
+}
 
 #endif
