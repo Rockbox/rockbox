@@ -23,9 +23,6 @@
 
 #include "fractal_sets.h"
 
-#define LCD_SHIFT_X (LCD_WIDTH / 8)
-#define LCD_SHIFT_Y (LCD_HEIGHT / 8)
-
 void rects_queue_init(void);
 void rects_calc_all(int (*calc)(struct fractal_rect *, int (*)(void *), void *),
         int (*button_yield_cb)(void *), void *ctx);

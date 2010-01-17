@@ -139,8 +139,9 @@ static int ilog2_fp(long value) /* calculate integer log2(value_fp_6.26) */
 static void recalc_parameters(void)
 {
     ctx.x_step = (ctx.x_max - ctx.x_min) / LCD_WIDTH;
-    ctx.x_delta = (ctx.x_step * LCD_WIDTH) / 8;
+    ctx.x_delta = X_DELTA(ctx.x_step);
     ctx.y_step = (ctx.y_max - ctx.y_min) / LCD_HEIGHT;
+    ctx.y_delta = Y_DELTA(ctx.y_step);
     ctx.y_delta = (ctx.y_step * LCD_HEIGHT) / 8;
     ctx.step_log2 = ilog2_fp(MIN(ctx.x_step, ctx.y_step));
     ctx.max_iter = MAX(15, -15 * ctx.step_log2 - 45);

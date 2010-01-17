@@ -24,6 +24,14 @@
 #include "lib/grey.h"
 #include "lib/xlcd.h"
 
+#define DELTA 8 /* Panning moves 1/DELTA of screen */
+
+#define LCD_SHIFT_X (LCD_WIDTH / DELTA)
+#define LCD_SHIFT_Y (LCD_HEIGHT / DELTA)
+
+#define X_DELTA(x) (((x) * LCD_WIDTH) / DELTA)
+#define Y_DELTA(y) (((y) * LCD_HEIGHT) / DELTA)
+
 struct fractal_rect
 {
     int px_min;
