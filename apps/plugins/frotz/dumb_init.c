@@ -53,7 +53,7 @@ int os_random_seed (void)
 {
   if (user_random_seed == -1)
     /* Use the rockbox tick as seed value */
-    return ((int)rb->current_tick) & 0x7fff;
+    return ((int)*rb->current_tick) & 0x7fff;
   else return user_random_seed;
 }
 

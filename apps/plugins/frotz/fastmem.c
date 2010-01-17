@@ -342,7 +342,7 @@ void init_memory (void)
     }
 
     /* Assign left over memory as the arena for undo alloc */
-    arena_start = arena_next = (void*)((int)(zmp + story_size + 3) & ~3);
+    arena_start = arena_next = (void*)((intptr_t)(zmp + story_size + 3) & ~3);
     arena_end = zmp + buf_size;
 
     /* Load story file in chunks of 32KB */
@@ -385,7 +385,7 @@ void init_undo (void)
     if ((arena_end - arena_start) >= size) {
 	prev_zmp = arena_start;
 	undo_diff = arena_start + h_dynamic_size;
-	arena_start = (void*)((int)(arena_start + size + 3) & ~3);
+	arena_start = (void*)((intptr_t)(arena_start + size + 3) & ~3);
 	arena_next = arena_start;
 	memcpy (prev_zmp, zmp, h_dynamic_size);
     } else
@@ -691,7 +691,7 @@ static long mem_diff (zbyte *a, zbyte *b, zword mem_size, zbyte *diff)
     unsigned size = mem_size;
     zbyte *p = diff;
     unsigned j;
-    zbyte c;
+    zbyte c = 0;
 
     for (;;) {
 	for (j = 0; size > 0 && (c = *a++ ^ *b++) == 0; j++)
@@ -928,7 +928,7 @@ int save_undo (void)
 	    if ((arena_end - arena_next) >= size) {
 		/* Trivial: enough room at the end */
 		p = arena_next;
-		arena_next = (void*)((int)(arena_next + size + 3) & ~3);
+		arena_next = (void*)((intptr_t)(arena_next + size + 3) & ~3);
 	    } else {
 		/* Need to wrap */
 		arena_next = arena_start;
@@ -939,7 +939,7 @@ int save_undo (void)
 	    if (((void*)first_undo - arena_next) >= size) {
 		/* There is room before the "first" undo */
 		p = arena_next;
-		arena_next = (void*)((int)(arena_next + size + 3) & ~3);
+		arena_next = (void*)((intptr_t)(arena_next + size + 3) & ~3);
 	    } else {
 		/* Not enough room, just need to free some */
 		p = NULL;
