@@ -1250,7 +1250,8 @@ target/arm/as3525/sansa-c200v2/button-c200v2.c
 target/arm/as3525/sansa-c200v2/backlight-c200v2.c
 target/arm/as3525/dbop-as3525.c
 #ifndef BOOTLOADER
-target/arm/as3525/powermgmt-as3525.c
+target/arm/powermgmt-ascodec.c
+target/arm/as3525/sansa-c200v2/powermgmt-c200v2.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
 #endif /* SANSA_E200V2 */

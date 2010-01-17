@@ -109,7 +109,7 @@
 #endif
 
 #if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200) \
-    || defined(SANSA_CLIP) || defined(SANSA_FUZE)
+    || defined(SANSA_CLIP) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
 #include "ascodec.h"
 #include "as3514.h"
 #endif
@@ -1618,7 +1618,8 @@ static bool view_battery(void)
                     lcd_puts(0, line++, "T Battery: ?");
                 }
                     
-#elif defined(SANSA_E200) || defined(SANSA_C200) || defined(SANSA_CLIP) || defined(SANSA_FUZE)
+#elif defined(SANSA_E200) || defined(SANSA_C200) || defined(SANSA_CLIP) || \
+      defined(SANSA_FUZE) || defined (SANSA_C200V2)
                 const int first = CHARGE_STATE_DISABLED;
                 static const char * const chrgstate_strings[] =
                 {
