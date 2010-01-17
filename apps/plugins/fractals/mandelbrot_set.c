@@ -30,24 +30,22 @@ static unsigned char imgbuffer[LCD_HEIGHT];
 static fb_data imgbuffer[LCD_HEIGHT];
 #endif
 
-#define NUM_COLORS 8 /* Must be a power of 2 */
-/* NUM_COLORS entries cyclical, last entry is black (convergence) */
+#define NUM_COLORS ((unsigned)(1 << LCD_DEPTH))
+
+/*
+ * Spread iter's colors over color range.
+ * 345 (=15*26-45) is max_iter maximal value
+ * This implementation ignores pixel format, thus it is not uniformly spread
+ */
+#define LCOLOR(iter) ((iter * NUM_COLORS) / 345)
+
 #ifdef HAVE_LCD_COLOR
-static const fb_data color[NUM_COLORS] = {
-    LCD_RGBPACK(255, 0,   159), LCD_RGBPACK(159, 0,   255),
-    LCD_RGBPACK(0,   0,   255), LCD_RGBPACK(0,   159, 255),
-    LCD_RGBPACK(0,   255, 128), LCD_RGBPACK(128, 255, 0),
-    LCD_RGBPACK(255, 191, 0),   LCD_RGBPACK(255, 0,   0)
-};
+#define COLOR(iter) (fb_data)LCOLOR(iter)
 #define CONVERGENCE_COLOR LCD_RGBPACK(0, 0, 0)
 #else /* greyscale */
-static const unsigned char color[NUM_COLORS] = {
-    255, 223, 191, 159, 128, 96, 64, 32
-};
+#define COLOR(iter) (unsigned char)LCOLOR(iter)
 #define CONVERGENCE_COLOR 0
 #endif
-
-#define COLOR(iter) color[(iter) % (NUM_COLORS - 1)]
 
 #if CONFIG_LCD == LCD_SSD1815
 /* Recorder, Ondio: pixel_height == 1.25 * pixel_width */
@@ -389,7 +387,9 @@ static int mandelbrot_zoom(int factor)
 
     res = recalc_parameters();
     if (res) /* zoom not possible, revert */
+    {
         mandelbrot_zoom(-factor);
+    }
 
     return res;
 }
