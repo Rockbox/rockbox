@@ -1,0 +1,45 @@
+frotz is quite portable and is divided into 'common' and os-specific files.
+The common files are included here with minimal modifications. For the
+os-specific files I have started with dumbfrotz, the port intended for a plain
+C stdio system - it has its own screen buffering which is needed for rockbox.
+
+Things that work
+----------------
+
+Games, mostly! If the game is too large to fit in the plugin buffer it will
+stop playback and steal the audio buffer.
+
+Saving and restoring (/path/to/story.sav, no filename selection).
+
+Transcripts, command records and replays (likewise).
+
+Undo, up to the limit of available memory (the rest of the plugin buffer if
+the game fit there, or the rest of the audio buffer if not).
+
+Timed input, though it resets the timer when you enter the menu and only
+counts until you enter the keyboard.
+
+Input line preloading, though the actual displayed line after editing looks
+wrong.
+
+Things that don't work because I've not implemented it
+------------------------------------------------------
+
+Reading buttons that don't appear on the rockbox keyboard.
+
+Audible beeps (just a splash for now).
+
+Setting the random seed.
+
+Things which don't work in the original frotz anyway
+----------------------------------------------------
+
+Mouse and menus.
+
+Pictures.
+
+Non-beep sound samples.
+
+Unicode.
+
+Colours.

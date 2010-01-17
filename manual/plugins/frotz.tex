@@ -1,0 +1,67 @@
+% $Id$ %
+\subsection{Frotz}
+Frotz is a Z-Machine interpreter for playing Infocom's interactive fiction
+games, and newer games using the same format. To start a game open a
+\fname{.z1 - .z8} file in the \setting{File Browser}. Most modern games are
+in the \fname{.z5} or \fname{.z8} format but the older formats used by
+Infocom are supported.
+
+Z-Machine games are text based and most depend heavily on typed commands.
+The virtual keyboard is used for text entry, both for typing entire lines
+and for typing single characters when the game requires single character
+input.
+
+Sounds, pictures, colour and Unicode are not currently supported, but
+the interpreter informs the game of this and almost all games will
+adapt so that they are still playable. This port of Frotz attempts to be
+compliant with the Z-Machine Specification version 1.0.
+
+Some places where you can find Z-Machine games, and information about
+interactive fiction:
+\begin{itemize}
+\item The Interactive Fiction Archive, where many free modern works
+can be downloaded:
+\url{http://www.ifarchive.org/}
+\item The specific folder on the if-archive containing Z-Machine games:
+\url{http://www.ifarchive.org/indexes/if-archiveXgamesXzcode.html}
+\item The Infocom homepage, with information about how to get the
+classic commercial Infocom games:
+\url{http://www.csd.uwo.ca/Infocom/}
+\item The Frotz homepage (for the original Unix port):
+\url{http://frotz.sourceforge.net/}
+\item A Beginner's Guide to Playing Interactive Fiction:
+\url{http://www.microheaven.com/IFGuide/}
+\end{itemize}
+
+\begin{table}
+    \begin{btnmap}{}{}
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,GIGABEAT_S_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD,MROBE100_PAD}{\ButtonPower}
+    \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonUp}
+    \opt{GIGABEAT_PAD}{\ButtonA}
+       \opt{HAVEREMOTEKEYMAP}{& 
+          \opt{IRIVER_RC_H100_PAD}{\ButtonRCOn}
+           }
+        & Display keyboard to enter text\\
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
+        ,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonSelect}
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonUp}
+    \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \opt{COWON_D2_PAD}{\ButtonMenu{}, \TouchCenter{} or \TouchBottomMiddle}
+       \opt{HAVEREMOTEKEYMAP}{& }
+        & Press enter\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
+        ,MROBE100_PAD}{\ButtonPower}
+    \opt{GIGABEAT_S_PAD}{\ButtonBack}
+    \opt{COWON_D2_PAD}{\ButtonPower{} or \TouchBottomRight}
+       \opt{HAVEREMOTEKEYMAP}{& 
+          \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
+            }
+        & Open Frotz menu (not available at MORE prompts)\\
+    \end{btnmap}
+\end{table}
