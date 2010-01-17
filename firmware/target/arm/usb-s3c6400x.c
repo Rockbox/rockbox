@@ -276,9 +276,16 @@ void ep_send(int ep, void *ptr, int length)
     DIEPCTL(ep) |= 0x8000;  /* EPx OUT ACTIVE */
     int blocksize = usb_drv_port_speed() ? 512 : 64;
     int packets = (length + blocksize - 1) / blocksize;
-    if (!length) DIEPTSIZ(ep) = 1 << 19;  /* one empty packet */
-    else DIEPTSIZ(ep) = length | (packets << 19);
-    DIEPDMA(ep) = (uint32_t)ptr;
+    if (!length)
+    {
+        DIEPTSIZ(ep) = 1 << 19;  /* one empty packet */
+        DIEPDMA(ep) = 0x10000000;  /* dummy address */
+    }
+    else
+    {
+        DIEPTSIZ(ep) = length | (packets << 19);
+        DIEPDMA(ep) = (uint32_t)ptr;
+    }
     clean_dcache();
     DIEPCTL(ep) |= 0x84000000;  /* EPx OUT ENABLE CLEARNAK */
 }
@@ -291,9 +298,16 @@ void ep_recv(int ep, void *ptr, int length)
     DOEPCTL(ep) |= 0x8000;  /* EPx OUT ACTIVE */
     int blocksize = usb_drv_port_speed() ? 512 : 64;
     int packets = (length + blocksize - 1) / blocksize;
-    if (!length) DIEPTSIZ(ep) = 1 << 19;  /* one empty packet */
-    else DOEPTSIZ(ep) = length | (packets << 19);
-    DOEPDMA(ep) = (uint32_t)ptr;
+    if (!length)
+    {
+        DOEPTSIZ(ep) = 1 << 19;  /* one empty packet */
+        DOEPDMA(ep) = 0x10000000;  /* dummy address */
+    }
+    else
+    {
+        DOEPTSIZ(ep) = length | (packets << 19);
+        DOEPDMA(ep) = (uint32_t)ptr;
+    }
     clean_dcache();
     DOEPCTL(ep) |= 0x84000000;  /* EPx OUT ENABLE CLEARNAK */
 }
