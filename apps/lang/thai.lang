@@ -4885,7 +4885,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR_TALK
-  desc: Item of voice menu, whether to use directory .talk sansaclips
+  desc: Item of voice menu, whether to use directory .talk clips
   user: core
   <source>
     *: "Use Directory .talk Clips"
@@ -4913,7 +4913,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_FILE_TALK
-  desc: Item of voice menu, whether to use file .talk sansaclips
+  desc: Item of voice menu, whether to use file .talk clips
   user: core
   <source>
     *: "Use File .talk Clips"
@@ -4958,13 +4958,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 sansaclip"
+    *: ".talk mp3 clip"
   </source>
   <dest>
     *: "คลิป .talk mp3"
   </dest>
   <voice>
-    *: "talk mp3 sansaclip"
+    *: "talk mp3 clip"
   </voice>
 </phrase>
 <phrase>
@@ -6462,7 +6462,7 @@
   user: core
   <source>
     *: none
-    agc: "Safety (sansaclip)"
+    agc: "Safety (clip)"
   </source>
   <dest>
     *: none
@@ -6470,7 +6470,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Safety (sansaclip)"
+    agc: "Safety (clip)"
   </voice>
 </phrase>
 <phrase>
@@ -12054,7 +12054,7 @@
   user: core
   <source>
     *: none
-    agc: "AGC sansaclip time"
+    agc: "AGC clip time"
   </source>
   <dest>
     *: none
@@ -12062,7 +12062,7 @@
   </dest>
   <voice>
     *: none
-    agc: "AGC sansaclip time"
+    agc: "AGC clip time"
   </voice>
 </phrase>
 <phrase>
