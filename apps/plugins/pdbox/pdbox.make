@@ -26,7 +26,6 @@ PDBOXFLAGS = $(PLUGINFLAGS) \
              -I$(PDBOXSRCDIR)/TLSF-2.4.4/src
 
 # Compile PDBox with extra flags (adapted from ZXBox)
-$(PDBOXBUILDDIR)/%.o: $(PDBOXSRCDIR)/%.c $(PLUGINBITMAPLIB) $(PDBOXSRCDIR)/pdbox.make
+$(PDBOXBUILDDIR)/%.o: $(PDBOXSRCDIR)/%.c $(PDBOXSRCDIR)/pdbox.make
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PDBOXFLAGS) -c $< -o $@
-

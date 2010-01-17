@@ -53,6 +53,6 @@ $(PICTUREFLOW_OBJDIR)/pictureflow.ovl: $(PICTUREFLOW_OBJ) $(PICTUREFLOW_OUTLDS)
 	$(call PRINTS,LD $(@F))$(OC) -O binary $(basename $@).elf $@
 
 # special pattern rule for compiling pictureflow with extra flags
-$(PICTUREFLOW_OBJDIR)/%.o: $(PICTUREFLOW_SRCDIR)/%.c $(PLUGINBITMAPLIB) $(PICTUREFLOW_SRCDIR)/pictureflow.make
+$(PICTUREFLOW_OBJDIR)/%.o: $(PICTUREFLOW_SRCDIR)/%.c $(PICTUREFLOW_SRCDIR)/pictureflow.make
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PICTUREFLOWFLAGS) -c $< -o $@

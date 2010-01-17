@@ -48,6 +48,6 @@ $(ZXBOX_OBJDIR)/zxbox.ovl: $(ZXBOX_OBJ) $(ZXBOX_OUTLDS)
 	$(call PRINTS,LD $(@F))$(OC) -O binary $(basename $@).elf $@
 
 # special pattern rule for compiling zxbox with extra flags
-$(ZXBOX_OBJDIR)/%.o: $(ZXBOX_SRCDIR)/%.c $(PLUGINBITMAPLIB) $(ZXBOX_SRCDIR)/zxbox.make
+$(ZXBOX_OBJDIR)/%.o: $(ZXBOX_SRCDIR)/%.c $(ZXBOX_SRCDIR)/zxbox.make
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(ZXBOXFLAGS) -c $< -o $@

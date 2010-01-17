@@ -32,6 +32,8 @@ $(BUILDDIR)/lang/lang_core.o: $(APPSDIR)/lang/$(LANGUAGE).lang $(BUILDDIR)/apps/
 		perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(MODELNAME)$$feat $<
 	$(call PRINTS,CC lang_core.c)$(CC) $(CFLAGS) -c $(BUILDDIR)/lang/lang_core.c -o $@
 
+$(BUILDDIR)/lang/lang.h: $(BUILDDIR)/lang/lang_core.o
+
 $(BUILDDIR)/%.lng : $(ROOTDIR)/%.lang $(BUILDDIR)/apps/genlang-features
 	$(call PRINTS,GENLANG $(subst $(ROOTDIR)/,,$<))
 	$(SILENT)mkdir -p $(dir $@)

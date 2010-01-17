@@ -76,7 +76,7 @@ $(BUILDDIR)/apps/plugins/lib/%.o: $(ROOTDIR)/apps/plugins/lib/%.c
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINFLAGS) -ffunction-sections -fdata-sections -c $< -o $@
 
 # special pattern rule for compiling plugins with extra flags
-$(BUILDDIR)/apps/plugins/%.o: $(ROOTDIR)/apps/plugins/%.c $(PLUGINBITMAPLIB)
+$(BUILDDIR)/apps/plugins/%.o: $(ROOTDIR)/apps/plugins/%.c
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINFLAGS) -c $< -o $@
 

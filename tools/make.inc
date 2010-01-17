@@ -45,7 +45,7 @@ $(DEPFILE): $(SOURCES)
 	        rm $$del; \
 	        del=""; \
 	    fi \
-	done | sed -e "s:[^[:space:]]*lang.h:$(OBJDIR)/lang/lang_core.o:" \
+	done | sed -e "s:[^[:space:]]*lang.h:$(OBJDIR)/lang/lang.h:" \
 	-e "s:[^[:space:]]*sysfont.h:$(BUILDDIR)/sysfont.h:" \
 	-e "s:[^[:space:]]*max_language_size.h:$(BUILDDIR)/max_language_size.h:" \
 	-e "s: bitmaps/: $(BUILDDIR)/bitmaps/:g" \

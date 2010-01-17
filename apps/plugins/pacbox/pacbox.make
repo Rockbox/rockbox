@@ -22,6 +22,6 @@ PACBOXFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) -O2
 
 $(PACBOXBUILDDIR)/pacbox.rock: $(PACBOX_OBJ)
 
-$(PACBOXBUILDDIR)/%.o: $(PACBOXSRCDIR)/%.c $(PLUGINBITMAPLIB) $(PACBOXSRCDIR)/pacbox.make
+$(PACBOXBUILDDIR)/%.o: $(PACBOXSRCDIR)/%.c $(PACBOXSRCDIR)/pacbox.make
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PACBOXFLAGS) -c $< -o $@
