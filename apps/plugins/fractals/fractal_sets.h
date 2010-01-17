@@ -47,7 +47,7 @@ struct fractal_ops
     int (*calc)(struct fractal_rect *rect, int (*button_yield_cb)(void *ctx),
             void *button_yield_ctx);
     void (*move)(int dx, int dy);
-    void (*zoom)(int factor);
+    int (*zoom)(int factor);
     int (*precision)(int d);
 };
 

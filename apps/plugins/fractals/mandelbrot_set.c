@@ -96,7 +96,7 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
 
 static void mandelbrot_move(int dx, int dy);
 
-static void mandelbrot_zoom(int factor);
+static int mandelbrot_zoom(int factor);
 
 static int mandelbrot_precision(int d);
 
@@ -109,13 +109,15 @@ struct fractal_ops mandelbrot_ops =
     .precision = mandelbrot_precision,
 };
 
+#define LOG2_OUT_OF_BOUNDS -32767
+
 static int ilog2_fp(long value) /* calculate integer log2(value_fp_6.26) */
 {
     int i = 0;
 
     if (value <= 0)
     {
-        return -32767;
+        return LOG2_OUT_OF_BOUNDS;
     }
     else if (value > (1L << 26))
     {
@@ -136,18 +138,24 @@ static int ilog2_fp(long value) /* calculate integer log2(value_fp_6.26) */
     return i;
 }
 
-static void recalc_parameters(void)
+static int recalc_parameters(void)
 {
     ctx.x_step = (ctx.x_max - ctx.x_min) / LCD_WIDTH;
-    ctx.x_delta = X_DELTA(ctx.x_step);
     ctx.y_step = (ctx.y_max - ctx.y_min) / LCD_HEIGHT;
+    ctx.step_log2 = ilog2_fp(MIN(ctx.x_step, ctx.y_step));
+
+    if (ctx.step_log2 == LOG2_OUT_OF_BOUNDS)
+        return 1; /* out of bounds */
+
+    ctx.x_delta = X_DELTA(ctx.x_step);
     ctx.y_delta = Y_DELTA(ctx.y_step);
     ctx.y_delta = (ctx.y_step * LCD_HEIGHT) / 8;
-    ctx.step_log2 = ilog2_fp(MIN(ctx.x_step, ctx.y_step));
     ctx.max_iter = MAX(15, -15 * ctx.step_log2 - 45);
 
     ctx.ops->calc = (ctx.step_log2 <= -10) ?
         mandelbrot_calc_high_prec : mandelbrot_calc_low_prec;
+
+    return 0;
 }
 
 static void mandelbrot_init(void)
@@ -368,8 +376,9 @@ static void mandelbrot_move(int dx, int dy)
     ctx.y_max += d_y;
 }
 
-static void mandelbrot_zoom(int factor)
+static int mandelbrot_zoom(int factor)
 {
+    int res;
     long factor_x = (long)factor * ctx.x_delta;
     long factor_y = (long)factor * ctx.y_delta;
 
@@ -378,7 +387,11 @@ static void mandelbrot_zoom(int factor)
     ctx.y_min += factor_y;
     ctx.y_max -= factor_y;
 
-    recalc_parameters();
+    res = recalc_parameters();
+    if (res) /* zoom not possible, revert */
+        mandelbrot_zoom(-factor);
+
+    return res;
 }
 
 static int mandelbrot_precision(int d)

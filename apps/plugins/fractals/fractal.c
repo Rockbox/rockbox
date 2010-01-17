@@ -167,8 +167,8 @@ enum plugin_status plugin_start(const void* parameter)
             if (lastbutton != FRACTAL_ZOOM_OUT_PRE)
                 break;
 #endif
-            ops->zoom(-1);
-            redraw = REDRAW_FULL;
+            if (!ops->zoom(-1))
+                redraw = REDRAW_FULL;
             break;
 
 
@@ -180,8 +180,8 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef FRACTAL_ZOOM_IN2
         case FRACTAL_ZOOM_IN2:
 #endif
-            ops->zoom(1);
-            redraw = REDRAW_FULL;
+            if (!ops->zoom(1))
+                redraw = REDRAW_FULL;
             break;
 
         case FRACTAL_UP:
