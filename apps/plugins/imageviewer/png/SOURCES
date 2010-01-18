@@ -4,3 +4,4 @@ inffast.c
 inflate.c
 inftrees.c
 png.c
+png_ui.c

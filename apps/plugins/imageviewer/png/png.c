@@ -54,15 +54,9 @@ You are free to name this file lodepng.cpp or lodepng.c depending on your usage.
 
 #include "plugin.h"
 #include "lcd.h"
-#include <lib/playback_control.h>
-#include <lib/helper.h>
-#include <lib/configfile.h>
-#include <lib/grey.h>
 #include <lib/pluginlib_bmp.h>
 #include "zlib.h"
 #include "png.h"
-
-PLUGIN_HEADER
 
 /* ////////////////////////////////////////////////////////////////////////// */
 /* LodeFlate & LodeZlib Setting structs                                       */
@@ -140,25 +134,9 @@ typedef struct LodePNG_Decoder
     LodePNG_InfoPng infoPng; /*info of the PNG image obtained after decoding*/
     long error;
     char error_msg[128];
-    int x,y;
-    int width,height;
 } LodePNG_Decoder;
 
 #define VERSION_STRING "20080927"
-
-/* Min memory allowing us to use the plugin buffer
- * and thus not stopping the music
- * *Very* rough estimation:
- * Max 10 000 dir entries * 4bytes/entry (char **) = 40000 bytes
- * + 30k code size = 70 000
- * + 50k min for png = 130 000
- */
-#define MIN_MEM 130000
-
-/* Headings */
-#define DIR_PREV  1
-#define DIR_NEXT -1
-#define DIR_NONE  0
 
 /* decompressed image in the possible sizes (1,2,4,8), wasting the other */
 static fb_data *disp[9];
@@ -180,62 +158,7 @@ static size_t converted_image_size;
 static unsigned char *decoded_image; /* the decoded image */
 static size_t decoded_image_size;
 
-static fb_data *resized_image; /* the decoded image */
-
-static struct tree_context *tree;
-
-/* the current full file name */
-static char np_file[MAX_PATH];
-static int curfile = 0, direction = DIR_NONE, entries = 0;
-
-static LodePNG_Decoder decoder;
-
-/* list of the png files */
-static char **file_pt;
-#if PLUGIN_BUFFER_SIZE >= MIN_MEM
-/* are we using the plugin buffer or the audio buffer? */
-static bool plug_buf = true;
-#endif
-
-/* Persistent configuration */
-#define PNG_CONFIGFILE             "png.cfg"
-#define PNG_SETTINGS_MINVERSION    1
-#define PNG_SETTINGS_VERSION       1
-
-/* Slideshow times */
-#define SS_MIN_TIMEOUT 1
-#define SS_MAX_TIMEOUT 20
-#define SS_DEFAULT_TIMEOUT 5
-
-struct png_settings
-{
-    int ss_timeout;
-};
-
-static struct png_settings png_settings =
-    {
-        SS_DEFAULT_TIMEOUT
-    };
-static struct png_settings old_settings;
-
-static struct configdata png_config[] =
-    {
-        { TYPE_INT, SS_MIN_TIMEOUT, SS_MAX_TIMEOUT,
-            { .int_p = &png_settings.ss_timeout }, "Slideshow Time", NULL
-        },
-    };
-
-#if LCD_DEPTH > 1
-static fb_data* old_backdrop;
-#endif
-
-static int slideshow_enabled = false;   /* run slideshow */
-static int running_slideshow = false;   /* loading image because of slideshw */
-#ifndef SIMULATOR
-static int immediate_ata_off = false;   /* power down disk after loading */
-#endif
-
-static unsigned ds, ds_min, ds_max; /* downscaling and limits */
+static LodePNG_Decoder _decoder;
 
 /*
 The two functions below (LodePNG_decompress and LodePNG_compress) directly call the
@@ -1263,7 +1186,7 @@ if (size == 0 || in == 0) { decoder->error = 48; return; } /*the given data is e
     if (!decoder->error)
     {
         unsigned char *scanlines = idat + idat_size;
-        size_t scanlines_size = (size_t)memory_max - idat_size + 1;
+        size_t scanlines_size = (size_t)memory_max - idat_size;
         long time = *rb->current_tick;
         decoder->error = LodePNG_decompress(scanlines, &scanlines_size, idat, idat_size, decoder->error_msg); /*decompress with the Zlib decompressor*/
         if (pf_progress) pf_progress(100, 100);
@@ -1273,7 +1196,7 @@ if (size == 0 || in == 0) { decoder->error = 48; return; } /*the given data is e
         {
             decoded_image_size = (decoder->infoPng.height * decoder->infoPng.width * LodePNG_InfoColor_getBpp(&decoder->infoPng.color) + 7) / 8;
             if (decoded_image_size > memory_size) { decoder->error = OUT_OF_MEMORY; return; }
-            decoded_image = memory_max - decoded_image_size + 1;
+            decoded_image = memory_max - decoded_image_size;
             if (scanlines + scanlines_size >= decoded_image) { decoder->error = OUT_OF_MEMORY; return; }
             memset(decoded_image, 0, decoded_image_size * sizeof(unsigned char));
             if (!running_slideshow)
@@ -1373,7 +1296,7 @@ static const unsigned char *png_error_messages[PNG_ERROR_MAX-PNG_ERROR_MIN+1] =
     "invalid pHYs chunk size",  /*74*/
 };
 
-bool png_ext(const char ext[])
+bool img_ext(const char *ext)
 {
     if (!ext)
         return false;
@@ -1383,436 +1306,36 @@ bool png_ext(const char ext[])
         return false;
 }
 
-/*Read directory contents for scrolling. */
-void get_pic_list(void)
+void draw_image_rect(struct image_info *info,
+                     int x, int y, int width, int height)
 {
-    int i;
-    struct entry *dircache;
-    char *pname;
-    tree = rb->tree_get_context();
-    dircache = tree->dircache;
-
-    file_pt = (char **) memory;
-
-    /* Remove path and leave only the name.*/
-    pname = rb->strrchr(np_file,'/');
-    pname++;
-
-    for (i = 0; i < tree->filesindir; i++)
-    {
-        if (!(dircache[i].attr & ATTR_DIRECTORY)
-            && png_ext(rb->strrchr(dircache[i].name, '.')))
-        {
-            file_pt[entries] = dircache[i].name;
-            /* Set Selected File. */
-            if (!rb->strcmp(file_pt[entries], pname))
-                curfile = entries;
-            entries++;
-        }
-    }
-
-    memory += (entries * sizeof(char**));
-    memory_size -= (entries * sizeof(char**));
+    fb_data **pdisp = (fb_data**)info->data;
+    rb->lcd_bitmap_part(*pdisp, info->x + x, info->y + y, info->width,
+                        x + MAX(0, (LCD_WIDTH-info->width)/2),
+                        y + MAX(0, (LCD_HEIGHT-info->height)/2),
+                        width, height);
 }
 
-int change_filename(int direct)
+int img_mem(int ds)
 {
-    bool file_erased = (file_pt[curfile] == NULL);
-    direction = direct;
-
-    curfile += (direct == DIR_PREV? entries - 1: 1);
-    if (curfile >= entries)
-        curfile -= entries;
-
-    if (file_erased)
-    {
-        /* remove 'erased' file names from list. */
-        int count, i;
-        for (count = i = 0; i < entries; i++)
-        {
-            if (curfile == i)
-                curfile = count;
-            if (file_pt[i] != NULL)
-                file_pt[count++] = file_pt[i];
-        }
-        entries = count;
-    }
-
-    if (entries == 0)
-    {
-        rb->splash(HZ, "No supported files");
-        return PLUGIN_ERROR;
-    }
-
-    if (rb->strlen(tree->currdir) > 1)
-    {
-        rb->strcpy(np_file, tree->currdir);
-        rb->strcat(np_file, "/");
-    }
-    else
-        rb->strcpy(np_file, tree->currdir);
-
-    rb->strcat(np_file, file_pt[curfile]);
-
-    return PLUGIN_OTHER;
-}
-
-/* switch off overlay, for handling SYS_ events */
-void cleanup(void *parameter)
-{
-    (void)parameter;
-}
-
-#define VSCROLL (LCD_HEIGHT/8)
-#define HSCROLL (LCD_WIDTH/10)
-
-#define ZOOM_IN  100 /* return codes for below function */
-#define ZOOM_OUT 101
-
-int show_menu(void) /* return 1 to quit */
-{
-#if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(old_backdrop);
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(rb->global_settings->fg_color);
-    rb->lcd_set_background(rb->global_settings->bg_color);
-#else
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_background(LCD_WHITE);
-#endif
-#endif
-    int result;
-
-    enum menu_id
-    {
-        MIID_RETURN = 0,
-        MIID_TOGGLE_SS_MODE,
-        MIID_CHANGE_SS_MODE,
-#if PLUGIN_BUFFER_SIZE >= MIN_MEM
-        MIID_SHOW_PLAYBACK_MENU,
-#endif
-        MIID_QUIT,
-    };
-
-    MENUITEM_STRINGLIST(menu, "Png Menu", NULL,
-                        "Return", "Toggle Slideshow Mode",
-                        "Change Slideshow Time",
-#if PLUGIN_BUFFER_SIZE >= MIN_MEM
-                        "Show Playback Menu",
-#endif
-                        "Quit");
-
-    static const struct opt_items slideshow[2] = {
-        { "Disable", -1 },
-        { "Enable", -1 },
-    };
-
-    result=rb->do_menu(&menu, NULL, NULL, false);
-
-    switch (result)
-    {
-    case MIID_RETURN:
-        break;
-    case MIID_TOGGLE_SS_MODE:
-        rb->set_option("Toggle Slideshow", &slideshow_enabled, INT,
-                       slideshow , 2, NULL);
-        break;
-    case MIID_CHANGE_SS_MODE:
-        rb->set_int("Slideshow Time", "s", UNIT_SEC,
-                    &png_settings.ss_timeout, NULL, 1,
-                    SS_MIN_TIMEOUT, SS_MAX_TIMEOUT, NULL);
-        break;
-#if PLUGIN_BUFFER_SIZE >= MIN_MEM
-    case MIID_SHOW_PLAYBACK_MENU:
-        if (plug_buf)
-        {
-            playback_control(NULL);
-        }
-        else
-        {
-            rb->splash(HZ, "Cannot restart playback");
-        }
-        break;
-#endif
-    case MIID_QUIT:
-        return 1;
-        break;
-    }
-
-#if !defined(SIMULATOR) && defined(HAVE_DISK_STORAGE)
-    /* change ata spindown time based on slideshow time setting */
-    immediate_ata_off = false;
-    rb->storage_spindown(rb->global_settings->disk_spindown);
-
-    if (slideshow_enabled)
-    {
-        if (png_settings.ss_timeout < 10)
-        {
-            /* slideshow times < 10s keep disk spinning */
-            rb->storage_spindown(0);
-        }
-        else if (!rb->mp3_is_playing())
-        {
-            /* slideshow times > 10s and not playing: ata_off after load */
-            immediate_ata_off = true;
-        }
-    }
-#endif
-#if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
-#endif
-    rb->lcd_clear_display();
-    return 0;
-}
-
-void draw_image(struct LodePNG_Decoder* decoder)
-{
-    rb->lcd_bitmap_part(resized_image, decoder->x, decoder->y, decoder->width,
-                        MAX(0, (LCD_WIDTH - decoder->width) / 2),
-                        MAX(0, (LCD_HEIGHT - decoder->height) / 2),
-                        decoder->width - decoder->x,
-                        decoder->height - decoder->y);
-}
-
-/* Pan the viewing window right - move image to the left and fill in
-   the right-hand side */
-static void pan_view_right(struct LodePNG_Decoder* decoder)
-{
-    int move;
-
-    move = MIN(HSCROLL, decoder->width - decoder->x - LCD_WIDTH);
-    if (move > 0)
-    {
-        decoder->x += move;
-        draw_image(decoder);
-        rb->lcd_update();
-    }
-}
-
-/* Pan the viewing window left - move image to the right and fill in
-   the left-hand side */
-static void pan_view_left(struct LodePNG_Decoder* decoder)
-{
-    int move;
-
-    move = MIN(HSCROLL, decoder->x);
-    if (move > 0)
-    {
-        decoder->x -= move;
-        draw_image(decoder);
-        rb->lcd_update();
-    }
-}
-
-
-/* Pan the viewing window up - move image down and fill in
-   the top */
-static void pan_view_up(struct LodePNG_Decoder* decoder)
-{
-    int move;
-
-    move = MIN(VSCROLL, decoder->y);
-    if (move > 0)
-    {
-        decoder->y -= move;
-        draw_image(decoder);
-        rb->lcd_update();
-    }
-}
-
-/* Pan the viewing window down - move image up and fill in
-   the bottom */
-static void pan_view_down(struct LodePNG_Decoder* decoder)
-{
-    int move;
-
-    move = MIN(VSCROLL, decoder->height - decoder->y - LCD_HEIGHT);
-    if (move > 0)
-    {
-        decoder->y += move;
-        draw_image(decoder);
-        rb->lcd_update();
-    }
-}
-
-/* interactively scroll around the image */
-int scroll_bmp(struct LodePNG_Decoder* decoder)
-{
-    int button;
-    int lastbutton = 0;
-
-    while (true)
-    {
-        if (slideshow_enabled)
-            button = rb->button_get_w_tmo(png_settings.ss_timeout * HZ);
-        else
-            button = rb->button_get(true);
-
-        running_slideshow = false;
-
-        switch (button)
-        {
-        case PNG_LEFT:
-            if (entries > 1 && decoder->width <= LCD_WIDTH
-                            && decoder->height <= LCD_HEIGHT)
-                return change_filename(DIR_PREV);
-        case PNG_LEFT | BUTTON_REPEAT:
-            pan_view_left(decoder);
-            break;
-
-        case PNG_RIGHT:
-            if (entries > 1 && decoder->width <= LCD_WIDTH
-                            && decoder->height <= LCD_HEIGHT)
-                return change_filename(DIR_NEXT);
-        case PNG_RIGHT | BUTTON_REPEAT:
-            pan_view_right(decoder);
-            break;
-
-        case PNG_UP:
-        case PNG_UP | BUTTON_REPEAT:
-            pan_view_up(decoder);
-            break;
-
-        case PNG_DOWN:
-        case PNG_DOWN | BUTTON_REPEAT:
-            pan_view_down(decoder);
-            break;
-
-        case BUTTON_NONE:
-            if (!slideshow_enabled)
-                break;
-            running_slideshow = true;
-            if (entries > 1)
-                return change_filename(DIR_NEXT);
-            break;
-
-#ifdef PNG_SLIDE_SHOW
-        case PNG_SLIDE_SHOW:
-            slideshow_enabled = !slideshow_enabled;
-            running_slideshow = slideshow_enabled;
-            break;
-#endif
-
-#ifdef PNG_NEXT_REPEAT
-        case PNG_NEXT_REPEAT:
-#endif
-        case PNG_NEXT:
-            if (entries > 1)
-                return change_filename(DIR_NEXT);
-            break;
-
-#ifdef PNG_PREVIOUS_REPEAT
-        case PNG_PREVIOUS_REPEAT:
-#endif
-        case PNG_PREVIOUS:
-            if (entries > 1)
-                return change_filename(DIR_PREV);
-            break;
-
-        case PNG_ZOOM_IN:
-#ifdef PNG_ZOOM_PRE
-            if (lastbutton != PNG_ZOOM_PRE)
-                break;
-#endif
-            return ZOOM_IN;
-            break;
-
-        case PNG_ZOOM_OUT:
-#ifdef PNG_ZOOM_PRE
-            if (lastbutton != PNG_ZOOM_PRE)
-                break;
-#endif
-            return ZOOM_OUT;
-            break;
-
-#ifdef PNG_RC_MENU
-        case PNG_RC_MENU:
-#endif
-        case PNG_MENU:
-
-            if (show_menu() == 1)
-                return PLUGIN_OK;
-
-            draw_image(decoder);
-            rb->lcd_update();
-
-            break;
-        default:
-            if (rb->default_event_handler_ex(button, cleanup, NULL)
-                    == SYS_USB_CONNECTED)
-                return PLUGIN_USB_CONNECTED;
-            break;
-
-        } /* switch */
-
-        if (button != BUTTON_NONE)
-            lastbutton = button;
-    } /* while (true) */
-}
-
-/* callback updating a progress meter while PNG decoding */
-void cb_progress(int current, int total)
-{
-
-    if (current & 1) rb->yield(); /* be nice to the other threads */
-    if (!running_slideshow)
-    {
-        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],
-                            0, LCD_HEIGHT-8, LCD_WIDTH, 8,
-                            total, 0, current, HORIZONTAL);
-        rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
-    }
-    else
-    {
-        /* in slideshow mode, keep gui interference to a minimum */
-        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],
-                            0, LCD_HEIGHT-4, LCD_WIDTH, 4,
-                            total, 0, current, HORIZONTAL);
-        rb->lcd_update_rect(0, LCD_HEIGHT-4, LCD_WIDTH, 4);
-    }
-}
-
-int pngmem(struct LodePNG_Decoder* decoder, int ds)
-{
+    LodePNG_Decoder *decoder = &_decoder;
     return (decoder->infoPng.width/ds) * (decoder->infoPng.height/ds) * FB_DATA_SZ;
 }
 
-/* how far can we zoom in without running out of memory */
-int min_downscale(struct LodePNG_Decoder* decoder, int bufsize)
-{
-    int downscale = 8;
-
-    if (pngmem(decoder, 8) > bufsize)
-        return 0; /* error, too large, even 1:8 doesn't fit */
-
-    while (downscale > 1 && pngmem(decoder, downscale/2) <= bufsize)
-        downscale /= 2;
-
-    return downscale;
-}
-
-/* how far can we zoom out, to fit image into the LCD */
-unsigned max_downscale(struct LodePNG_Decoder* decoder)
-{
-    unsigned downscale = 1;
-
-    while (downscale < 8 && (decoder->infoPng.width/downscale > LCD_WIDTH
-                             || decoder->infoPng.height/downscale > LCD_HEIGHT))
-    {
-        downscale *= 2;
-    }
-
-    return downscale;
-}
-
-/* load image from filename. */
-int load_image(char* filename, struct LodePNG_Decoder* decoder)
+int load_image(char *filename, struct image_info *info,
+               unsigned char *buf, ssize_t *buf_size)
 {
     int fd;
     long time = 0; /* measured ticks */
     int w, h; /* used to center output */
+    LodePNG_Decoder *decoder = &_decoder;
+
+    memset(&disp, 0, sizeof(disp));
+    LodePNG_Decoder_init(decoder);
+
+    memory = buf;
+    memory_size = *buf_size;
+    memory_max = memory + memory_size;
 
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
@@ -1833,12 +1356,6 @@ int load_image(char* filename, struct LodePNG_Decoder* decoder)
     if (image_size > memory_size) {
         decoder->error = FILE_TOO_LARGE;
         rb->close(fd);
-#ifndef SIMULATOR
-        if (running_slideshow && immediate_ata_off) {
-            /* running slideshow and time is long enough: power down disk */
-            rb->storage_sleep();
-        }
-#endif
 
     } else {
         if (!running_slideshow) {
@@ -1847,7 +1364,7 @@ int load_image(char* filename, struct LodePNG_Decoder* decoder)
             rb->lcd_update();
         }
 
-        image = memory_max - image_size + 1;
+        image = memory_max - image_size;
         rb->read(fd, image, image_size);
         rb->close(fd);
 
@@ -1856,7 +1373,7 @@ int load_image(char* filename, struct LodePNG_Decoder* decoder)
             rb->lcd_puts(0, 2, print);
             rb->lcd_update();
         }
-#ifndef SIMULATOR
+#ifdef DISK_SPINDOWN
         else if (immediate_ata_off) {
             /* running slideshow and time is long enough: power down disk */
             rb->storage_sleep();
@@ -1939,21 +1456,27 @@ int load_image(char* filename, struct LodePNG_Decoder* decoder)
         else
             return PLUGIN_ERROR;
     }
+
+    disp_buf = (fb_data *)((intptr_t)(converted_image + converted_image_size + 3) & ~3);
+    info->x_size = decoder->infoPng.width;
+    info->y_size = decoder->infoPng.height;
+    *buf_size = memory_max - (unsigned char*)disp_buf;
     return PLUGIN_OK;
 }
 
-/* return decoded or cached image */
-fb_data *get_image(struct LodePNG_Decoder* decoder, int ds)
+int get_image(struct image_info *info, int ds)
 {
-    fb_data * p_disp = disp[ds]; /* short cut */
+    fb_data **p_disp = &disp[ds]; /* short cut */
+    LodePNG_Decoder *decoder = &_decoder;
 
-    decoder->width = decoder->infoPng.width / ds;
-    decoder->height = decoder->infoPng.height / ds;
+    info->width = decoder->infoPng.width / ds;
+    info->height = decoder->infoPng.height / ds;
+    info->data = p_disp;
 
-    if (p_disp != NULL)
+    if (*p_disp != NULL)
     {
-        DEBUGF("Found an image in cache\n");
-        return p_disp; /* we still have it */
+        /* we still have it */
+        return PLUGIN_OK;
     }
 
     /* assign image buffer */
@@ -1961,13 +1484,13 @@ fb_data *get_image(struct LodePNG_Decoder* decoder, int ds)
         if (!running_slideshow)
         {
             rb->snprintf(print, sizeof(print), "resizing %d*%d",
-                         decoder->width, decoder->height);
+                         info->width, info->height);
             rb->lcd_puts(0, 3, print);
             rb->lcd_update();
         }
         struct bitmap bmp_src, bmp_dst;
 
-        int size = decoder->width * decoder->height;
+        int size = info->width * info->height;
 
         if ((unsigned char *)(disp_buf + size) >= memory_max) {
             /* have to discard the current */
@@ -1978,16 +1501,16 @@ fb_data *get_image(struct LodePNG_Decoder* decoder, int ds)
             disp_buf = (fb_data *)((intptr_t)(converted_image + converted_image_size + 3) & ~3);
         }
 
-        disp[ds] = disp_buf;
-        disp_buf = (fb_data *)((intptr_t)(disp[ds] + size + 3) & ~3);
+        *p_disp = disp_buf;
+        disp_buf = (fb_data *)((intptr_t)(disp_buf + size + 3) & ~3);
 
         bmp_src.width = decoder->infoPng.width;
         bmp_src.height = decoder->infoPng.height;
         bmp_src.data = (unsigned char *)converted_image;
 
-        bmp_dst.width = decoder->width;
-        bmp_dst.height = decoder->height;
-        bmp_dst.data = (unsigned char *)disp[ds];
+        bmp_dst.width = info->width;
+        bmp_dst.height = info->height;
+        bmp_dst.data = (unsigned char *)*p_disp;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         rb->cpu_boost(true);
         smooth_resize_bitmap(&bmp_src, &bmp_dst);
@@ -1996,276 +1519,8 @@ fb_data *get_image(struct LodePNG_Decoder* decoder, int ds)
         smooth_resize_bitmap(&bmp_src, &bmp_dst);
 #endif /*HAVE_ADJUSTABLE_CPU_FREQ*/
     } else {
-        disp[ds] = converted_image;
-        return converted_image;
+        *p_disp = converted_image;
     }
 
-    return disp[ds];
-}
-
-/* set the view to the given center point, limit if necessary */
-void set_view (struct LodePNG_Decoder* decoder, int cx, int cy)
-{
-    int x, y;
-
-    /* plain center to available width/height */
-    x = cx - MIN(LCD_WIDTH, decoder->width) / 2;
-    y = cy - MIN(LCD_HEIGHT, decoder->height) / 2;
-
-    /* limit against upper image size */
-    x = MIN(decoder->width - LCD_WIDTH, x);
-    y = MIN(decoder->height - LCD_HEIGHT, y);
-
-    /* limit against negative side */
-    x = MAX(0, x);
-    y = MAX(0, y);
-
-    decoder->x = x; /* set the values */
-    decoder->y = y;
-}
-
-/* calculate the view center based on the bitmap position */
-void get_view(struct LodePNG_Decoder* decoder, int* p_cx, int* p_cy)
-{
-    *p_cx = decoder->x + MIN(LCD_WIDTH, decoder->width) / 2;
-    *p_cy = decoder->y + MIN(LCD_HEIGHT, decoder->height) / 2;
-}
-
-/* load, decode, display the image */
-int load_and_show(char* filename)
-{
-    int status;
-    int cx=0, cy=0; /* view center */
-
-#if LCD_DEPTH > 1
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_backdrop(NULL);
-#endif
-    rb->lcd_clear_display();
-
-    memset(&disp, 0, sizeof(disp));
-    LodePNG_Decoder_init(&decoder);
-
-    if (rb->button_get(false) == PNG_MENU)
-        status = PLUGIN_ABORT;
-    else
-        status = load_image(filename, &decoder);
-
-    if (status == PLUGIN_OUTOFMEM)
-    {
-#if PLUGIN_BUFFER_SIZE >= MIN_MEM
-        if (plug_buf)
-        {
-            rb->lcd_setfont(FONT_SYSFIXED);
-            rb->lcd_clear_display();
-            rb->snprintf(print,sizeof(print),"%s:",rb->strrchr(filename,'/')+1);
-            rb->lcd_puts(0,0,print);
-            rb->lcd_puts(0,1,"Not enough plugin memory!");
-            rb->lcd_puts(0,2,"Zoom In: Stop playback.");
-            if (entries>1)
-                rb->lcd_puts(0,3,"Left/Right: Skip File.");
-            rb->lcd_puts(0,4,"Show Menu: Quit.");
-            rb->lcd_update();
-            rb->lcd_setfont(FONT_UI);
-
-            rb->button_clear_queue();
-
-            while (1)
-            {
-                int button = rb->button_get(true);
-                switch (button)
-                {
-                case PNG_ZOOM_IN:
-                    plug_buf = false;
-                    memory = rb->plugin_get_audio_buffer((size_t *)&memory_size);
-                    memory_max = memory + memory_size - 1;
-                    /*try again this file, now using the audio buffer */
-                    return PLUGIN_OTHER;
-#ifdef PNG_RC_MENU
-                case PNG_RC_MENU:
-#endif
-                case PNG_MENU:
-                    return PLUGIN_OK;
-
-                case PNG_LEFT:
-                    if (entries>1)
-                    {
-                        rb->lcd_clear_display();
-                        return change_filename(DIR_PREV);
-                    }
-                    break;
-
-                case PNG_RIGHT:
-                    if (entries>1)
-                    {
-                        rb->lcd_clear_display();
-                        return change_filename(DIR_NEXT);
-                    }
-                    break;
-                default:
-                    if (rb->default_event_handler_ex(button, cleanup, NULL)
-                            == SYS_USB_CONNECTED)
-                        return PLUGIN_USB_CONNECTED;
-
-                }
-            }
-        }
-        else
-#endif
-        {
-            rb->splash(HZ, "Out of Memory");
-            file_pt[curfile] = NULL;
-            return change_filename(direction);
-        }
-    }
-    else if (status == PLUGIN_ERROR)
-    {
-        file_pt[curfile] = NULL;
-        return change_filename(direction);
-    }
-    else if (status == PLUGIN_ABORT) {
-        rb->splash(HZ, "aborted");
-        return PLUGIN_OK;
-    }
-
-    disp_buf = (fb_data *)((intptr_t)(converted_image + converted_image_size + 3) & ~3);
-    ds_max = max_downscale(&decoder);            /* check display constraint */
-    ds_min = min_downscale(&decoder, memory_max - (unsigned char*)disp_buf); /* check memory constraint */
-    if (ds_min == 0) {
-        /* Can not resize the image */
-        ds_min = ds_max = 1;
-    } else if (ds_max < ds_min) {
-        ds_max = ds_min;
-    }
-
-    ds = ds_max; /* initialize setting */
-    cx = decoder.infoPng.width/ds/2; /* center the view */
-    cy = decoder.infoPng.height/ds/2;
-
-    do {
-        resized_image = get_image(&decoder, ds); /* decode or fetch from cache */
-
-        set_view(&decoder, cx, cy);
-
-        if (!running_slideshow)
-        {
-            rb->snprintf(print, sizeof(print), "showing %dx%d",
-                         decoder.width, decoder.height);
-            rb->lcd_puts(0, 3, print);
-            rb->lcd_update();
-        }
-
-        rb->lcd_clear_display();
-        draw_image(&decoder);
-        rb->lcd_update();
-
-        /* drawing is now finished, play around with scrolling
-         * until you press OFF or connect USB
-         */
-        while (1)
-        {
-            status = scroll_bmp(&decoder);
-            if (status == ZOOM_IN)
-            {
-                if (ds > 1)
-                {
-                    /* as 1/1 is always available, jump ds to 1 if ds is ds_min. */
-                    int zoom = (ds == ds_min)? ds_min: 2;
-                    ds /= zoom; /* reduce downscaling to zoom in */
-                    get_view(&decoder, &cx, &cy);
-                    cx *= zoom; /* prepare the position in the new image */
-                    cy *= zoom;
-                }
-                else
-                    continue;
-            }
-
-            if (status == ZOOM_OUT)
-            {
-                if (ds < ds_max)
-                {
-                    /* if ds is 1 and ds_min is greater than 1, jump ds to ds_min. */
-                    int zoom = (ds < ds_min)? ds_min: 2;
-                    ds *= zoom; /* increase downscaling to zoom out */
-                    get_view(&decoder, &cx, &cy);
-                    cx /= zoom; /* prepare the position in the new image */
-                    cy /= zoom;
-                }
-                else
-                    continue;
-            }
-            break;
-        }
-        rb->lcd_clear_display();
-    }
-    while (status != PLUGIN_OK && status != PLUGIN_USB_CONNECTED
-            && status != PLUGIN_OTHER);
-
-    return status;
-}
-
-/******************** Plugin entry point *********************/
-
-enum plugin_status plugin_start(const void* parameter)
-{
-    int condition;
-#if LCD_DEPTH > 1
-    old_backdrop = rb->lcd_get_backdrop();
-#endif
-
-    if (!parameter) return PLUGIN_ERROR;
-
-#if PLUGIN_BUFFER_SIZE >= MIN_MEM
-    memory = rb->plugin_get_buffer((size_t *)&memory_size);
-#else
-    memory = rb->plugin_get_audio_buffer((size_t *)&memory_size);
-#endif
-
-    rb->strcpy(np_file, parameter);
-    get_pic_list();
-
-    if (!entries) return PLUGIN_ERROR;
-
-#if (PLUGIN_BUFFER_SIZE >= MIN_MEM) && !defined(SIMULATOR)
-    if (!rb->audio_status()) {
-        plug_buf = false;
-        memory = rb->plugin_get_audio_buffer((size_t *)&memory_size);
-    }
-#endif
-
-    memory_max = memory + memory_size - 1;
-
-    /* should be ok to just load settings since the plugin itself has
-       just been loaded from disk and the drive should be spinning */
-    configfile_load(PNG_CONFIGFILE, png_config,
-                    ARRAYLEN(png_config), PNG_SETTINGS_MINVERSION);
-    old_settings = png_settings;
-
-    /* Turn off backlight timeout */
-    backlight_force_on(); /* backlight control in lib/helper.c */
-
-    do
-    {
-        condition = load_and_show(np_file);
-    } while (condition != PLUGIN_OK && condition != PLUGIN_USB_CONNECTED
-            && condition != PLUGIN_ERROR);
-
-    if (rb->memcmp(&png_settings, &old_settings, sizeof (png_settings)))
-    {
-        /* Just in case drive has to spin, keep it from looking locked */
-        rb->splash(0, "Saving Settings");
-        configfile_save(PNG_CONFIGFILE, png_config,
-                        ARRAYLEN(png_config), PNG_SETTINGS_VERSION);
-    }
-
-#if !defined(SIMULATOR) && defined(HAVE_DISK_STORAGE)
-    /* set back ata spindown time in case we changed it */
-    rb->storage_spindown(rb->global_settings->disk_spindown);
-#endif
-
-    /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(); /* backlight control in lib/helper.c */
-
-    return condition;
+    return PLUGIN_OK;
 }

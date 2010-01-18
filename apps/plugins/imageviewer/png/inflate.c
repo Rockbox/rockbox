@@ -555,8 +555,6 @@ unsigned out;
    will return Z_BUF_ERROR if it has not reached the end of the stream.
  */
 
-extern void cb_progress(int current, int total);
-
 int ZEXPORT inflate(strm, flush)
 z_streamp strm;
 int flush;
@@ -1132,7 +1130,7 @@ int flush;
             return Z_STREAM_ERROR;
         }
         //DEBUGF("%d / %d\n", strm->total_in, strm->avail_in);
-        if (rb->button_get(false) == PNG_MENU)
+        if (rb->button_get(false) == IMGVIEW_MENU)
           return PLUGIN_ABORT;
         else cb_progress(insize - strm->avail_in, insize);
     }

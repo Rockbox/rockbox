@@ -7,15 +7,10 @@
 # $Id$
 #
 
-JPEGSRCDIR := $(APPSDIR)/plugins/jpeg
-JPEGBUILDDIR := $(BUILDDIR)/apps/plugins/jpeg
+IMGVSRCDIR := $(APPSDIR)/plugins/imageviewer
+IMGVBUILDDIR := $(BUILDDIR)/apps/plugins/imageviewer
 
-ROCKS += $(JPEGBUILDDIR)/jpeg.rock
+# include actual viewer's make file
+IMGVSUBDIRS := $(call preprocess, $(IMGVSRCDIR)/SUBDIRS)
+$(foreach dir,$(IMGVSUBDIRS),$(eval include $(dir)/$(notdir $(dir)).make))
 
-JPEG_SRC := $(call preprocess, $(JPEGSRCDIR)/SOURCES)
-JPEG_OBJ := $(call c2obj, $(JPEG_SRC))
-
-# add source files to OTHER_SRC to get automatic dependencies
-OTHER_SRC += $(JPEG_SRC)
-
-$(JPEGBUILDDIR)/jpeg.rock: $(JPEG_OBJ)

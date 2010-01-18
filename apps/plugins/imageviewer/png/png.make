@@ -7,8 +7,8 @@
 # $Id$
 #
 
-PNGSRCDIR := $(APPSDIR)/plugins/png
-PNGBUILDDIR := $(BUILDDIR)/apps/plugins/png
+PNGSRCDIR := $(IMGVSRCDIR)/png
+PNGBUILDDIR := $(IMGVBUILDDIR)/png
 
 ROCKS += $(PNGBUILDDIR)/png.rock
 
