@@ -41,10 +41,10 @@ void power_init(void)
     
     /* Charger detect */
     /*  25: input, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(25, false, false, false, false, false, 0x00);
+    dm320_set_io(25, true, false, false, false, false, 0x00);
     
     /* Power down pin */
-    /*  26: input, non-inverted, no-irq, falling edge, no-chat, normal */
+    /*  26: output, non-inverted, no-irq, falling edge, no-chat, normal */
     dm320_set_io(26, false, false, false, false, false, 0x00);
     IO_GIO_BITCLR1  =   1<<10; /* Make sure it is not active */
 }
