@@ -2091,7 +2091,7 @@ STATICIRAM void to_mono_mm(void)
      * |mmmmmmmmmmmmmmmm|mmmmmmmmmmmmmmmm|
      */
     uint16_t *samp = &mfbuf[2*512];
-    uint16_t *samp_end = samp + 2*samp_per_frame;
+    uint16_t *samp_end = samp + samp_per_frame;
 
     inline void to_mono(uint16_t **samp)
     {
