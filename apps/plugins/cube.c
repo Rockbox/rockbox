@@ -304,7 +304,7 @@ static int x_off = LCD_WIDTH/2;
 static int y_off = LCD_HEIGHT/2;
 
 #if LCD_DEPTH == 1
-#define USE_GSLIB
+#define USEGSLIB
 GREY_INFO_STRUCT
 struct my_lcd {
     void (*update)(void);
@@ -399,13 +399,13 @@ static const struct face faces[6] =
     {{1, 5, 6, 2}, {9, 6, 10, 1}}
 };
 
-#if LCD_DEPTH > 1 || defined(USE_GSLIB)
+#if LCD_DEPTH > 1 || defined(USEGSLIB)
 static const unsigned face_colors[6] =
 {
 #ifdef HAVE_LCD_COLOR
     LCD_RGBPACK(255, 0, 0), LCD_RGBPACK(255, 0, 0), LCD_RGBPACK(0, 255, 0),
     LCD_RGBPACK(0, 255, 0), LCD_RGBPACK(0, 0, 255), LCD_RGBPACK(0, 0, 255)
-#elif defined(USE_GSLIB)
+#elif defined(USEGSLIB)
 #ifdef MROBE_100
     GREY_LIGHTGRAY, GREY_LIGHTGRAY, GREY_DARKGRAY,
     GREY_DARKGRAY,  GREY_WHITE,     GREY_WHITE
@@ -421,7 +421,7 @@ static const unsigned face_colors[6] =
 #endif
 
 enum {
-#if LCD_DEPTH > 1 || defined(USE_GSLIB)
+#if LCD_DEPTH > 1 || defined(USEGSLIB)
     SOLID,
 #endif
     HIDDEN_LINES,
@@ -512,13 +512,13 @@ static void cube_viewport(void)
 static void cube_draw(void)
 {
     int i, j, line;
-#if LCD_DEPTH > 1 || defined(USE_GSLIB)
+#if LCD_DEPTH > 1 || defined(USEGSLIB)
     unsigned old_foreground;
 #endif
 
     switch (mode)
     {
-#if LCD_DEPTH > 1 || defined(USE_GSLIB)
+#if LCD_DEPTH > 1 || defined(USEGSLIB)
       case SOLID:
       
         old_foreground = MY_GET_FOREGROUND();
@@ -596,7 +596,7 @@ void cleanup(void *parameter)
 {
     (void)parameter;
 
-#ifdef USE_GSLIB
+#ifdef USEGSLIB
     grey_release();
 #elif defined HAVE_LCD_CHARCELLS
     pgfx_release();
@@ -607,7 +607,7 @@ enum plugin_status plugin_start(const void* parameter)
 {
     char buffer[30];
     int t_disp = 0;
-#ifdef USE_GSLIB
+#ifdef USEGSLIB
     unsigned char *gbuf;
     size_t gbuf_size = 0;
     bool mode_switch = true;
@@ -624,7 +624,7 @@ enum plugin_status plugin_start(const void* parameter)
     (void)(parameter);
 
 #ifdef HAVE_LCD_BITMAP
-#if defined(USE_GSLIB)
+#if defined(USEGSLIB)
     gbuf = (unsigned char *)rb->plugin_get_buffer(&gbuf_size);
     if (!grey_init(gbuf, gbuf_size, GREY_BUFFERED,
                    LCD_WIDTH, LCD_HEIGHT, NULL))
@@ -696,7 +696,7 @@ enum plugin_status plugin_start(const void* parameter)
             }
         }
 #endif
-#ifdef USE_GSLIB
+#ifdef USEGSLIB
         if (mode_switch)
         {
             grey_show(mode == SOLID);
@@ -783,7 +783,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
                 if (++mode >= NUM_MODES)
                     mode = 0;
-#ifdef USE_GSLIB
+#ifdef USEGSLIB
                 mylcd = (mode == SOLID) ? &greyfuncs : &lcdfuncs;
                 mode_switch = true;
 #endif
@@ -824,7 +824,7 @@ enum plugin_status plugin_start(const void* parameter)
             lastbutton = button;
     }
 
-#ifdef USE_GSLIB
+#ifdef USEGSLIB
     grey_release();
 #elif defined(HAVE_LCD_CHARCELLS)
     pgfx_release();
