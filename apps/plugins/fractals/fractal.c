@@ -46,9 +46,10 @@ static unsigned char *gbuf;
 static size_t gbuf_size = 0;
 #endif
 
-#define REDRAW_NONE    0
-#define REDRAW_PARTIAL 1
-#define REDRAW_FULL    2
+#define REDRAW_NONE         0
+#define REDRAW_PARTIAL      1
+#define REDRAW_FULL         2
+#define REDRAW_FULL_OVERLAY 3
 
 PLUGIN_HEADER
 
@@ -139,11 +140,17 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(true);
 #endif
-            if (redraw == REDRAW_FULL)
+            switch (redraw)
             {
-                MYLCD(clear_display)();
-                MYLCD_UPDATE();
-                rects_queue_init();
+                case REDRAW_FULL:
+                    MYLCD(clear_display)();
+                    MYLCD_UPDATE();
+                    /* fall-through */
+                case REDRAW_FULL_OVERLAY:
+                    rects_queue_init();
+                    break;
+                default:
+                    break;
             }
 
             /* paint all rects */
@@ -229,7 +236,7 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
 #endif
             if (ops->precision(-1))
-                redraw = REDRAW_FULL;
+                redraw = REDRAW_FULL_OVERLAY;
 
             break;
 
@@ -239,7 +246,7 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
 #endif
             if (ops->precision(+1))
-                redraw = REDRAW_FULL;
+                redraw = REDRAW_FULL_OVERLAY;
 
             break;
 
