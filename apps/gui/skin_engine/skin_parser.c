@@ -145,7 +145,7 @@ static int parse_setting_and_lang(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
         
         
-int parse_languagedirection(const char *wps_bufptr,
+static int parse_languagedirection(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
 {
     (void)wps_bufptr;

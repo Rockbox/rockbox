@@ -25,6 +25,7 @@
 #include "lang.h"
 #include "misc.h"
 #include "usbstack/usb_hid.h"
+#include "usb_keymaps.h"
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 

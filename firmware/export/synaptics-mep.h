@@ -23,6 +23,6 @@
 
 int touchpad_init(void);
 int touchpad_read_device(char *data, int len);
-int touchpad_set_buttonlights(char led_mask, char brightness);
+int touchpad_set_buttonlights(unsigned int led_mask, char brightness);
 
 #endif
