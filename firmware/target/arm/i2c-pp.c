@@ -270,7 +270,8 @@ void i2c_init(void)
 #if CONFIG_I2C == I2C_PP5020
     outl(0x0, 0x600060a4);
 #if defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330) || \
-    defined(SAMSUNG_YH820) || defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+    defined(SAMSUNG_YH820) || defined(SAMSUNG_YH920) || \
+    defined(SAMSUNG_YH925) || defined(PBELL_VIBE500)
     outl(inl(0x600060a4) | 0x20, 0x600060a4);
     outl(inl(0x7000c020) | 0x3, 0x7000c020);
     outl(0x55, 0x7000c02c);

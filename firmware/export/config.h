@@ -116,6 +116,7 @@
 #define SAMSUNG_YPS3_PAD   40
 #define MINI2440_PAD       41
 #define PHILIPS_HDD6330_PAD 42
+#define PBELL_VIBE500_PAD 43
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -197,6 +198,7 @@
 #define LCD_NANO2G    36 /* as used by the iPod Nano 2nd Generation */
 #define LCD_MINI2440  37 /* as used by the Mini2440 */
 #define LCD_HDD6330   38 /* as used by the Philips HDD6330 */
+#define LCD_VIBE500   39 /* as used by the Packard Bell Vibe 500 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -402,6 +404,8 @@ Lyre prototype 1 */
 #include "config/samsungyh925.h"
 #elif defined(SAMSUNG_YPS3)
 #include "config/samsungyps3.h"
+#elif defined(PBELL_VIBE500)
+#include "config/vibe500.h"
 #else
 /* no known platform */
 #endif

@@ -31,6 +31,10 @@
 #define ADC_DATA_2          (*(volatile unsigned long*)(0x7000ad24))
 #define ADC_INIT            (*(volatile unsigned long*)(0x7000ad2c))
 
+#if defined(PBELL_VIBE500)
+#define ADC_UNK             (*(volatile unsigned long*)(0x7000002c))
+#endif
+
 static unsigned short adcdata[NUM_ADC_CHANNELS];
 
 /* Scan ADC so that adcdata[channel] gets updated. */
@@ -94,6 +98,10 @@ static void adc_tick(void)
 /* Figured out from how the OF does things */
 void adc_init(void)
 {
+#if defined(PBELL_VIBE500)
+    ADC_UNK |= 0x1000;
+#endif
+
 #if defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
     ADC_INIT = 0;
 #else

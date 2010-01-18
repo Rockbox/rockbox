@@ -261,4 +261,6 @@ keymaps/keymap-ondavx767.c
 keymaps/keymap-yh8xx_yh9xx.c
 #elif CONFIG_KEYPAD == MINI2440_PAD
 keymaps/keymap-mini2440.c
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+keymaps/keymap-vibe500.c
 #endif

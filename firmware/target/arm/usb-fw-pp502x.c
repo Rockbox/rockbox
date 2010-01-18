@@ -88,6 +88,12 @@
 #define USB_GPIO_MASK   0x10
 #define USB_GPIO_VAL    0x10
 
+#elif defined(PBELL_VIBE500)
+    /* GPIO L bit 3 is usb detect */
+#define USB_GPIO        GPIOL
+#define USB_GPIO_MASK   0x04
+#define USB_GPIO_VAL    0x04
+
 #else
 #error No USB GPIO config specified
 #endif

@@ -906,8 +906,8 @@ cat <<EOF
  ==Samsung==              ==Tatung==             80) DAX 1GB MP3/DAB
  140) YH-820              150) Elio TPJ-1022
  141) YH-920                                     ==Lyre project==1
- 142) YH-925                                     130) Lyre proto 1
- 143) YP-S3                                      131) Mini2440
+ 142) YH-925              ==Packard Bell==       130) Lyre proto 1
+ 143) YP-S3               160) Vibe 500          131) Mini2440
 EOF
 
   buildfor=`input`;
@@ -2456,6 +2456,29 @@ fi
     t_model="yps3"
     ;;
     
+   160|pb_vibe500)
+    target_id=67
+    modelname="pb_vibe500"
+    target="-DPBELL_VIBE500"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -mi4v3 -model=vibe500 -type=RBOS"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
+    output="jukebox.mi4"
+    appextra="recorder:gui"
+    plugins="no"
+    swcodec="yes"
+    boottool="$rootdir/tools/scramble -mi4v3 -model=vibe500 -type=RBBL"
+    bootoutput="rockbox.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$scramblebitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="pbell"
+    t_model="vibe500"
+    ;;
 
    *)
     echo "Please select a supported target platform!"

@@ -33,7 +33,8 @@
 #include "wmcodec.h"
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || \
-    defined(MROBE_100) || defined(PHILIPS_HDD1630)
+    defined(MROBE_100) || defined(PHILIPS_HDD1630) || \
+    defined(PBELL_VIBE500)
 /* The H10's audio codec uses an I2C address of 0x1b */
 #define I2C_AUDIO_ADDRESS 0x1b
 #else

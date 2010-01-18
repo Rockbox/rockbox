@@ -159,6 +159,16 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
                 usb_insert_int();
         }
 /* end SAMSUNG_YHxxx */
+#elif defined(PBELL_VIBE500)
+        else if (CPU_HI_INT_STAT & GPIO0_MASK) {
+            if (GPIOA_INT_STAT & 0x20)
+                button_int();
+        }
+        else if (CPU_HI_INT_STAT & GPIO2_MASK) {
+            if (GPIOL_INT_STAT & 0x04)
+                usb_insert_int();
+        }
+/* end PBELL_VIBE500 */
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
         else if (CPU_HI_INT_STAT & SER0_MASK) {
@@ -460,6 +470,8 @@ void system_init(void)
 #elif defined (MROBE_100)
         /* to be done */
 #elif defined (TATUNG_TPJ1022)
+        /* to be done */
+#elif defined(PBELL_VIBE500)
         /* to be done */
 #endif
 

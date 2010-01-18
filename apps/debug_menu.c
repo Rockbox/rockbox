@@ -984,6 +984,9 @@ static bool dbg_spdif(void)
 #elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
 #   define DEBUG_CANCEL  BUTTON_PLAY
 
+#elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
+#   define DEBUG_CANCEL  BUTTON_CANCEL
+
 #endif /* key definitions */
 
 /* Test code!!! */
