@@ -30,7 +30,11 @@ extern void lcd_awake(void);
 /* in uisimulator/sdl/lcd-bitmap.c and lcd-charcell.c */
 extern void sim_backlight(int value);
 
-static int old_val = 100;
+static inline int normalize_backlight(int val)
+{
+    /* normalize to xx% brightness for sdl */
+    return ((val - MIN_BRIGHTNESS_SETTING + 1) * 100)/MAX_BRIGHTNESS_SETTING;
+}
 
 bool _backlight_init(void)
 {
@@ -39,11 +43,15 @@ bool _backlight_init(void)
 
 void _backlight_on(void)
 {
-    sim_backlight(old_val);
 #if defined(HAVE_LCD_ENABLE)
     lcd_enable(true);
 #elif defined(HAVE_LCD_SLEEP)
     lcd_awake();
+#endif
+#if (CONFIG_BACKLIGHT_FADING != BACKLIGHT_FADING_SW_SETTING)
+    /* if we set the brightness to the settings value, then fading up
+     * is glitchy */
+    sim_backlight(normalize_backlight(backlight_brightness));
 #endif
 }
 
@@ -58,10 +66,7 @@ void _backlight_off(void)
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void _backlight_set_brightness(int val)
 {
-    int normalized = ((val - MIN_BRIGHTNESS_SETTING + 1) * 100) / MAX_BRIGHTNESS_SETTING;
-    sim_backlight(normalized);
-
-    old_val = normalized;
+    sim_backlight(normalize_backlight(val));
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 #ifdef HAVE_BUTTON_LIGHT
