@@ -490,6 +490,7 @@ void USB_DEVICE(void)
 
 void usb_drv_set_address(int address)
 {
+    (void) address;
     DEBUG(2, "setting address %d %d", address, TCC7xx_USB_FUNC);
 }
 
@@ -628,7 +629,8 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
     flags = disable_irq_save();
 
     if (tcc_ep->buf) {
-        panicf_my("%s: overrun: %x %x", __func__, tcc_ep->buf, tcc_ep);
+        panicf_my("%s: overrun: %x %x", __func__,
+                  (unsigned int)tcc_ep->buf, (unsigned int)tcc_ep);
     }
 
     tcc_ep->buf = ptr;
@@ -676,10 +678,14 @@ void usb_drv_set_test_mode(int mode)
 bool usb_drv_stalled(int endpoint, bool in)
 {
     panicf_my("%s(%d,%d)", __func__, endpoint, in);
+    return false;
 }
 
 void usb_drv_stall(int endpoint, bool stall,bool in)
 {
+    (void) endpoint;
+    (void) stall;
+    (void) in;
     printf("%s(%d,%d,%d)", __func__, endpoint, stall, in);
 }
 
