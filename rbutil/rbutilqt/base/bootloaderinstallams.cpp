@@ -45,6 +45,8 @@ bool BootloaderInstallAms::install(void)
 {
     if(m_offile.isEmpty())
         return false;
+        
+    qDebug() << "[BootloaderInstallAms] installing bootloader";
     
     // download firmware from server
     emit logItem(tr("Downloading bootloader file"), LOGINFO);
@@ -57,6 +59,8 @@ bool BootloaderInstallAms::install(void)
 
 void BootloaderInstallAms::installStage2(void)
 {    
+    qDebug() << "[BootloaderInstallAms] installStage2";
+    
     unsigned char* buf;
     unsigned char* of_packed;
     int of_packedsize;
@@ -82,6 +86,7 @@ void BootloaderInstallAms::installStage2(void)
                         &of_packed,&of_packedsize,errstr,sizeof(errstr));
     if (buf == NULL) 
     {
+        qDebug() << "[BootloaderInstallAms] could not load OF: " << m_offile;
         emit logItem(errstr, LOGERROR);
         emit logItem(tr("Could not load %1").arg(m_offile), LOGERROR);
         emit done(true);
@@ -92,7 +97,8 @@ void BootloaderInstallAms::installStage2(void)
     rb_packed = load_rockbox_file(bootfile.toLocal8Bit().data(), sum.model, &bootloader_size,&rb_packedsize,
                                     errstr,sizeof(errstr));
     if (rb_packed == NULL) 
-    {
+    {   
+        qDebug() << "[BootloaderInstallAms] could not load bootloader: " << bootfile;
         emit logItem(errstr, LOGERROR);
         emit logItem(tr("Could not load %1").arg(bootfile), LOGERROR);
         free(buf);
@@ -105,6 +111,7 @@ void BootloaderInstallAms::installStage2(void)
     totalsize = total_size(sum.model,rb_packedsize,of_packedsize);
     if (totalsize > firmware_size) 
     {
+        qDebug() << "[BootloaderInstallAms] No room to insert bootloader";
         emit logItem("No room to insert bootloader, try another firmware version",LOGERROR);
         free(buf);
         free(of_packed);
@@ -123,6 +130,7 @@ void BootloaderInstallAms::installStage2(void)
     
     if(!out.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
+        qDebug() << "[BootloaderInstallAms] Could not open" <<  m_blfile "for writing";
         emit logItem(tr("Could not open %1 for writing").arg(m_blfile),LOGERROR);
         free(buf);
         free(of_packed);
@@ -135,6 +143,7 @@ void BootloaderInstallAms::installStage2(void)
 
     if (n != len)
     {
+        qDebug() << "[BootloaderInstallAms] Could not write firmware file";
         emit logItem(tr("Could not write firmware file"),LOGERROR);
         free(buf);
         free(of_packed);
@@ -150,6 +159,7 @@ void BootloaderInstallAms::installStage2(void)
     free(rb_packed);
     
     //end of install
+    qDebug() << "[BootloaderInstallAms] install successfull";
     emit logItem(tr("Success: modified firmware file created"), LOGINFO);
     logInstall(LogAdd);
     emit done(false);
