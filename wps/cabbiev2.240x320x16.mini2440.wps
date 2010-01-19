@@ -1,0 +1,46 @@
+# cabbie 2.0
+# (C) 20077, Johannes Voggenthaler (Zinc Alloy)
+# (C) Keith Perri (kperri) ported to (Gigabeat)
+#derived from "cabbie" (C) Yohann Misquitta
+%wd
+
+%T|206|292|24|24|play|
+%T|46|292|84|24|menu|
+%T|139|292|24|24|shuffle|
+%T|182|292|24|24|repmode|
+%T|22|254|199|13|progressbar|
+%X|wpsbackdrop-240x320x16.bmp|
+%xl|A|lock-240x320x16.bmp|11|292|2|
+%xl|B|battery-240x320x16.bmp|46|292|10|
+%xl|C|volume-240x320x16.bmp|98|292|10|
+%xl|D|shuffle-240x320x16.bmp|139|292|
+%xl|E|repeat-240x320x16.bmp|182|292|4|
+%xl|F|playmode-240x320x16.bmp|206|292|5|
+%Cl|55|30|c130|c130|
+%pb|pb-240x320x16.bmp|22|254|199|13|
+%?C<|>
+%?C<|%s%ac%?it<%it|%fn>>
+%?C<|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
+%?C<|%s%ac%?id<%id|%?d1<%d1|(root)>>>
+%?C<|%ac%?iy<%iy|>>
+%?C<|>
+%?C<|%ac%?ig<%ig|>>
+%?C<|%ac%?fv<(vbr) |>%fb kbit/s %fc>
+%?C<|>
+%?C<%s%ac%?it<%it|%fn>|>
+%?C<%s%ac%?ia<%ia|%?d2<%d2|(root)>>|%ac%Sx|Next Track:|>
+%?C<%s%ac%?id<%id|%?d1<%d1|(root)>>|%ac%s%?It<%It|%Fn>>
+%?C<|%s%ac%?Ia<%Ia|%?D2<%D2|(root)>>>
+%?C<%s%ac%Sx|Next:| %?Ia<%Ia|%?D2<%D2|(root)>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D1<%D1|(root)>>>
+
+
+     %pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr     
+
+%?mh<%xdAa|%xdAb>
+%?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
+%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
+%?ps<%xdD>
+%?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
+%?mp<%xdFa|%xdFc|%xdFb|%xdFd|%xdFe>
+%?C<%C>
+
