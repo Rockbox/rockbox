@@ -94,7 +94,8 @@ void BootloaderInstallAms::installStage2(void)
     }
 
     /* Load bootloader file */
-    rb_packed = load_rockbox_file(bootfile.toLocal8Bit().data(), sum.model, &bootloader_size,&rb_packedsize,
+    rb_packed = load_rockbox_file(bootfile.toLocal8Bit().data(), sum.model,
+                                  &bootloader_size,&rb_packedsize,
                                     errstr,sizeof(errstr));
     if (rb_packed == NULL) 
     {   
@@ -112,7 +113,8 @@ void BootloaderInstallAms::installStage2(void)
     if (totalsize > firmware_size) 
     {
         qDebug() << "[BootloaderInstallAms] No room to insert bootloader";
-        emit logItem("No room to insert bootloader, try another firmware version",LOGERROR);
+        emit logItem(tr("No room to insert bootloader, try another firmware version"),
+                     LOGERROR);
         free(buf);
         free(of_packed);
         free(rb_packed);
@@ -123,14 +125,15 @@ void BootloaderInstallAms::installStage2(void)
     /* patch the firmware */
     emit logItem(tr("Patching Firmware..."), LOGINFO);
     
-    patch_firmware(sum.model,firmware_revision(sum.model),firmware_size,buf,len,of_packed,of_packedsize,rb_packed,rb_packedsize);
+    patch_firmware(sum.model,firmware_revision(sum.model),firmware_size,buf,
+                   len,of_packed,of_packedsize,rb_packed,rb_packedsize);
 
     /* write out file */
     QFile out(m_blfile);
     
     if(!out.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
-        qDebug() << "[BootloaderInstallAms] Could not open" <<  m_blfile "for writing";
+        qDebug() << "[BootloaderInstallAms] Could not open" <<  m_blfile << "for writing";
         emit logItem(tr("Could not open %1 for writing").arg(m_blfile),LOGERROR);
         free(buf);
         free(of_packed);
@@ -168,7 +171,8 @@ void BootloaderInstallAms::installStage2(void)
 
 bool BootloaderInstallAms::uninstall(void)
 {
-    emit logItem("To uninstall, perform a normal upgrade with an unmodified original firmware", LOGINFO);
+    emit logItem(tr("To uninstall, perform a normal upgrade with an unmodified "
+                    "original firmware"), LOGINFO);
     logInstall(LogRemove);
     return false;
 }
@@ -182,3 +186,4 @@ BootloaderInstallBase::Capabilities BootloaderInstallAms::capabilities(void)
 {
     return (Install | NeedsOf);
 }
+
