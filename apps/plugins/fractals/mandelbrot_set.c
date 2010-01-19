@@ -69,20 +69,17 @@ static fb_data imgbuffer[LCD_HEIGHT];
 #endif
 
 /* Fixed point format s5.26: sign, 5 bits integer part, 26 bits fractional part */
-struct mandelbrot_ctx
-{
-    struct fractal_ops *ops;
-    long x_min;
-    long x_max;
-    long x_step;
-    long x_delta;
-    long y_min;
-    long y_max;
-    long y_step;
-    long y_delta;
-    int step_log2;
-    unsigned max_iter;
-} ctx;
+struct fractal_ops *ops;
+long x_min;
+long x_max;
+long x_step;
+long x_delta;
+long y_min;
+long y_max;
+long y_step;
+long y_delta;
+int step_log2;
+unsigned max_iter;
 
 static void mandelbrot_init(void);
 
@@ -138,19 +135,19 @@ static int ilog2_fp(long value) /* calculate integer log2(value_fp_6.26) */
 
 static int recalc_parameters(void)
 {
-    ctx.x_step = (ctx.x_max - ctx.x_min) / LCD_WIDTH;
-    ctx.y_step = (ctx.y_max - ctx.y_min) / LCD_HEIGHT;
-    ctx.step_log2 = ilog2_fp(MIN(ctx.x_step, ctx.y_step));
+    x_step = (x_max - x_min) / LCD_WIDTH;
+    y_step = (y_max - y_min) / LCD_HEIGHT;
+    step_log2 = ilog2_fp(MIN(x_step, y_step));
 
-    if (ctx.step_log2 == LOG2_OUT_OF_BOUNDS)
+    if (step_log2 == LOG2_OUT_OF_BOUNDS)
         return 1; /* out of bounds */
 
-    ctx.x_delta = X_DELTA(ctx.x_step);
-    ctx.y_delta = Y_DELTA(ctx.y_step);
-    ctx.y_delta = (ctx.y_step * LCD_HEIGHT) / 8;
-    ctx.max_iter = MAX(15, -15 * ctx.step_log2 - 45);
+    x_delta = X_DELTA(x_step);
+    y_delta = Y_DELTA(y_step);
+    y_delta = (y_step * LCD_HEIGHT) / 8;
+    max_iter = MAX(15, -15 * step_log2 - 45);
 
-    ctx.ops->calc = (ctx.step_log2 <= -10) ?
+    ops->calc = (step_log2 <= -10) ?
         mandelbrot_calc_high_prec : mandelbrot_calc_low_prec;
 
     return 0;
@@ -158,12 +155,12 @@ static int recalc_parameters(void)
 
 static void mandelbrot_init(void)
 {
-    ctx.ops = &mandelbrot_ops;
+    ops = &mandelbrot_ops;
 
-    ctx.x_min = MB_XOFS - MB_XFAC;
-    ctx.x_max = MB_XOFS + MB_XFAC;
-    ctx.y_min = -MB_YFAC;
-    ctx.y_max = MB_YFAC;
+    x_min = MB_XOFS - MB_XFAC;
+    x_max = MB_XOFS + MB_XFAC;
+    y_min = -MB_YFAC;
+    y_max = MB_YFAC;
 
     recalc_parameters();
 }
@@ -182,13 +179,13 @@ static int mandelbrot_calc_low_prec(struct fractal_rect *rect,
     unsigned long last_yield = *rb->current_tick;
     unsigned long last_button_yield = *rb->current_tick;
 
-    a32 = ctx.x_min + ctx.x_step * rect->px_min;
+    a32 = x_min + x_step * rect->px_min;
 
     for (p_x = rect->px_min; p_x < rect->px_max; p_x++)
     {
         a = a32 >> 16;
 
-        b32 = ctx.y_min + ctx.y_step * (LCD_HEIGHT - rect->py_max);
+        b32 = y_min + y_step * (LCD_HEIGHT - rect->py_max);
 
         for (p_y = rect->py_max - 1; p_y >= rect->py_min; p_y--)
         {
@@ -197,7 +194,7 @@ static int mandelbrot_calc_low_prec(struct fractal_rect *rect,
             y = b;
             n_iter = 0;
 
-            while (++n_iter <= ctx.max_iter)
+            while (++n_iter <= max_iter)
             {
                 x2 = MULS16_ASR10(x, x);
                 y2 = MULS16_ASR10(y, y);
@@ -208,7 +205,7 @@ static int mandelbrot_calc_low_prec(struct fractal_rect *rect,
                 x = x2 - y2 + a;
             }
 
-            if  (n_iter > ctx.max_iter)
+            if  (n_iter > max_iter)
                 imgbuffer[p_y] = CONVERGENCE_COLOR;
             else
                 imgbuffer[p_y] = COLOR(n_iter);
@@ -238,7 +235,7 @@ static int mandelbrot_calc_low_prec(struct fractal_rect *rect,
                 last_button_yield = *rb->current_tick + BUTTON_YIELD_TIMEOUT;
             }
 
-            b32 += ctx.y_step;
+            b32 += y_step;
         }
 #ifdef USEGSLIB
         grey_ub_gray_bitmap_part(imgbuffer, 0, rect->py_min, 1,
@@ -259,7 +256,7 @@ static int mandelbrot_calc_low_prec(struct fractal_rect *rect,
         }
 #endif
 
-        a32 += ctx.x_step;
+        a32 += x_step;
     }
 
     rect->valid = 0;
@@ -282,11 +279,11 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
 
     MULS32_INIT();
 
-    a = ctx.x_min + ctx.x_step * rect->px_min;
+    a = x_min + x_step * rect->px_min;
 
     for (p_x = rect->px_min; p_x < rect->px_max; p_x++)
     {
-        b = ctx.y_min + ctx.y_step * (LCD_HEIGHT - rect->py_max);
+        b = y_min + y_step * (LCD_HEIGHT - rect->py_max);
 
         for (p_y = rect->py_max - 1; p_y >= rect->py_min; p_y--)
         {
@@ -294,7 +291,7 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
             y = b;
             n_iter = 0;
 
-            while (++n_iter <= ctx.max_iter)
+            while (++n_iter <= max_iter)
             {
                 x2 = MULS32_ASR26(x, x);
                 y2 = MULS32_ASR26(y, y);
@@ -305,7 +302,7 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
                 x = x2 - y2 + a;
             }
 
-            if  (n_iter > ctx.max_iter)
+            if  (n_iter > max_iter)
                 imgbuffer[p_y] = CONVERGENCE_COLOR;
             else
                 imgbuffer[p_y] = COLOR(n_iter);
@@ -335,7 +332,7 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
                 last_button_yield = *rb->current_tick + BUTTON_YIELD_TIMEOUT;
             }
 
-            b += ctx.y_step;
+            b += y_step;
         }
 #ifdef USEGSLIB
         grey_ub_gray_bitmap_part(imgbuffer, 0, rect->py_min, 1,
@@ -355,7 +352,7 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
             last_px = p_x;
         }
 #endif
-        a += ctx.x_step;
+        a += x_step;
     }
 
     rect->valid = 0;
@@ -365,25 +362,25 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
 
 static void mandelbrot_move(int dx, int dy)
 {
-    long d_x = (long)dx * ctx.x_delta;
-    long d_y = (long)dy * ctx.y_delta;
+    long d_x = (long)dx * x_delta;
+    long d_y = (long)dy * y_delta;
 
-    ctx.x_min += d_x;
-    ctx.x_max += d_x;
-    ctx.y_min += d_y;
-    ctx.y_max += d_y;
+    x_min += d_x;
+    x_max += d_x;
+    y_min += d_y;
+    y_max += d_y;
 }
 
 static int mandelbrot_zoom(int factor)
 {
     int res;
-    long factor_x = (long)factor * ctx.x_delta;
-    long factor_y = (long)factor * ctx.y_delta;
+    long factor_x = (long)factor * x_delta;
+    long factor_y = (long)factor * y_delta;
 
-    ctx.x_min += factor_x;
-    ctx.x_max -= factor_x;
-    ctx.y_min += factor_y;
-    ctx.y_max -= factor_y;
+    x_min += factor_x;
+    x_max -= factor_x;
+    y_min += factor_y;
+    y_max -= factor_y;
 
     res = recalc_parameters();
     if (res) /* zoom not possible, revert */
@@ -401,14 +398,14 @@ static int mandelbrot_precision(int d)
     /* Precision increase */
     for (; d > 0; d--)
     {
-        ctx.max_iter += ctx.max_iter / 2;
+        max_iter += max_iter / 2;
         changed = 1;
     }
 
     /* Precision decrease */
-    for (; d < 0 && ctx.max_iter >= 15; d++)
+    for (; d < 0 && max_iter >= 15; d++)
     {
-        ctx.max_iter -= ctx.max_iter / 3;
+        max_iter -= max_iter / 3;
         changed = 1;
     }
 
