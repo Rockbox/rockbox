@@ -46,8 +46,7 @@ enum {
 #define USING_STORAGE_CALLBACK  !defined(SIMULATOR)             \
                             && ! ((CONFIG_STORAGE & STORAGE_NAND) \
                                && (CONFIG_NAND == NAND_IFP7XX)) \
-                            && !defined(BOOTLOADER) \
-                            && !defined(HAVE_HOTSWAP_STORAGE_AS_MAIN)
+                            && !defined(BOOTLOADER)
 
 extern void register_storage_idle_func(void (*function)(void *data));
 #if USING_STORAGE_CALLBACK
