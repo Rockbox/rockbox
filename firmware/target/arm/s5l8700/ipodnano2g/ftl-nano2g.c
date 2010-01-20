@@ -1186,7 +1186,7 @@ uint32_t ftl_erase_block(uint32_t block)
 
 #ifndef FTL_READONLY
 /* Allocates a block from the pool,
-   returning its vBlock number, or 0 on error */
+   returning its vBlock number, or 0xFFFFFFFF on error */
 uint32_t ftl_allocate_pool_block(void)
 {
     uint32_t i;
@@ -1211,7 +1211,7 @@ uint32_t ftl_allocate_pool_block(void)
     }
     if (block > (uint32_t)(*ftl_nand_type).userblocks + 0x17)
         panicf("FTL: Bad block number in pool: %u", (unsigned)block);
-    if (ftl_erase_block(block) != 0) return 0;
+    if (ftl_erase_block(block) != 0) return 0xFFFFFFFF;
     if (++ftl_cxt.nextfreeidx == 0x14) ftl_cxt.nextfreeidx = 0;
     ftl_cxt.freecount--;
     return block;
@@ -1223,7 +1223,6 @@ uint32_t ftl_allocate_pool_block(void)
 /* Releases a vBlock back into the pool */
 void ftl_release_pool_block(uint32_t block)
 {
-    if (!block) panicf("FTL: Tried to put block 0 into the pool!");
     if (block >= (uint32_t)(*ftl_nand_type).userblocks + 0x17)
         panicf("FTL: Tried to release block %u", (unsigned)block);
     uint32_t idx = ftl_cxt.nextfreeidx + ftl_cxt.freecount++;
@@ -1286,7 +1285,7 @@ uint32_t ftl_next_ctrl_pool_page(void)
     i = (i + 1) % 3;
     uint32_t oldblock = ftl_cxt.ftlctrlblocks[i];
     uint32_t newblock = ftl_allocate_pool_block();
-    if (newblock == 0) return 1;
+    if (newblock == 0xFFFFFFFF) return 1;
     ftl_cxt.ftlctrlblocks[i] = newblock;
     ftl_cxt.ftlctrlpage = newblock * ppb;
     uint32_t pagestoread = ((*ftl_nand_type).userblocks + 23) >> 10;
@@ -1402,7 +1401,7 @@ uint32_t ftl_compact_scattered(struct ftl_log_type* entry)
     for (i = 0; i < 4; i++)
     {
         uint32_t block = ftl_allocate_pool_block();
-        if (block == 0) return 1;
+        if (block == 0xFFFFFFFF) return 1;
         (*entry).pagesused = 0;
         (*entry).pagescurrent = 0;
         (*entry).issequential = 1;
@@ -1449,7 +1448,7 @@ uint32_t ftl_commit_scattered(struct ftl_log_type* entry)
     for (i = 0; i < 4; i++)
     {
         block = ftl_allocate_pool_block();
-        if (block == 0) return 1;
+        if (block == 0xFFFFFFFF) return 1;
         error = ftl_copy_block((*entry).logicalvblock, block);
         if (error == 0) break;
         ftl_release_pool_block(block);
@@ -1574,7 +1573,7 @@ struct ftl_log_type* ftl_allocate_log_entry(uint32_t block)
         entry = ftl_log;
         while ((*entry).scatteredvblock != 0xFFFF) entry = &entry[1];
         (*entry).scatteredvblock = ftl_allocate_pool_block();
-        if ((*entry).scatteredvblock == 0)
+        if ((*entry).scatteredvblock == 0xFFFFFFFF)
         {
             (*entry).scatteredvblock = 0xFFFF;
             return (struct ftl_log_type*)0;
@@ -1731,7 +1730,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
             {
                 ftl_release_pool_block(vblock);
                 vblock = ftl_allocate_pool_block();
-                if (vblock == 0)
+                if (vblock == 0xFFFFFFFF)
                 {
                     mutex_unlock(&ftl_mtx);
                     return 1;
