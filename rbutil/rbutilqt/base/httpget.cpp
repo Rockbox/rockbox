@@ -375,10 +375,10 @@ void HttpGet::httpFinished(int id, bool error)
         // distinguish input formats (see RFC1945)
         // RFC 850
         if(date.contains("-"))
-            m_serverTimestamp = QDateTime::fromString(date, "dd-MMM-yy hh:mm:ss");
+            m_serverTimestamp = QLocale::c().toDateTime(date, "dd-MMM-yy hh:mm:ss");
         // asctime format
         else if(date.at(0).isLetter())
-            m_serverTimestamp = QDateTime::fromString(date, "MMM d hh:mm:ss yyyy");
+            m_serverTimestamp = QLocale::c().toDateTime(date, "MMM d hh:mm:ss yyyy");
         // RFC 822
         else
             m_serverTimestamp = QLocale::c().toDateTime(date, "dd MMM yyyy hh:mm:ss");
