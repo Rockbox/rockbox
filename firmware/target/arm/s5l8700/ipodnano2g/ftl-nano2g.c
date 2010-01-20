@@ -1573,11 +1573,8 @@ struct ftl_log_type* ftl_allocate_log_entry(uint32_t block)
         entry = ftl_log;
         while ((*entry).scatteredvblock != 0xFFFF) entry = &entry[1];
         (*entry).scatteredvblock = ftl_allocate_pool_block();
-        if ((*entry).scatteredvblock == 0xFFFFFFFF)
-        {
-            (*entry).scatteredvblock = 0xFFFF;
+        if ((*entry).scatteredvblock == 0xFFFF)
             return (struct ftl_log_type*)0;
-        }
     }
 
     ftl_init_log_entry(entry);
