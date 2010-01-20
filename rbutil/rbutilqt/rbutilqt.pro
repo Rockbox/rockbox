@@ -65,7 +65,7 @@ QMAKE_EXTRA_TARGETS += lrelease
 
 SOURCES += rbutilqt.cpp \
  main.cpp \
- install.cpp \
+ installwindow.cpp \
  base/httpget.cpp \
  configure.cpp \
  zip/zip.cpp \
@@ -115,7 +115,7 @@ SOURCES += rbutilqt.cpp \
  ../../tools/iriver.c \
 
 HEADERS += rbutilqt.h \
- install.h \
+ installwindow.h \
  base/httpget.h \
  configure.h \
  zip/zip.h \

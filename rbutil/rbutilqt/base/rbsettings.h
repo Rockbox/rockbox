@@ -97,6 +97,16 @@ class RbSettings : public QObject
             CurConfigureModel,
         };
         
+        //! All Server settings
+        enum ServerSettings {
+            CurReleaseVersion,
+            CurStatus,
+            DailyRevision,
+            DailyDate,
+            BleedingRevision,
+            BleedingDate,
+        };
+        
         //! call this to flush the user Settings
         static void sync();
         //! returns the filename of the usersettings file
@@ -115,12 +125,18 @@ class RbSettings : public QObject
         static QVariant value(enum SystemSettings setting);
         //! get a value from user settings
         static QVariant value(enum UserSettings setting);
+        //! get a value from server settings
+        static QVariant value(enum ServerSettings setting);
         //! set a user setting value
         static void setValue(enum UserSettings setting , QVariant value);
+        //! set a server setting value
+        static void setValue(enum ServerSettings setting , QVariant value);
         //! get a user setting from a subvalue (ie for encoders and tts engines)
         static QVariant subValue(QString sub, enum UserSettings setting);
         //! set a user setting from a subvalue (ie for encoders and tts engines)
         static void setSubValue(QString sub, enum UserSettings setting, QVariant value);
+        //! set a value for a server settings for a named platform.
+        static void setPlatformValue(QString platform, enum ServerSettings setting, QVariant value);
         //! get a value from system settings for a named platform.
         static QVariant platformValue(QString platform, enum SystemSettings setting);
 
@@ -135,6 +151,7 @@ class RbSettings : public QObject
         //! pointers to our setting objects
         static QSettings *systemSettings;
         static QSettings *userSettings;
+        static QSettings *serverSettings;
 };
 
 #endif

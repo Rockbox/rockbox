@@ -24,7 +24,7 @@
 #include "ui_rbutilqtfrm.h"
 #include "ui_aboutbox.h"
 #include "configure.h"
-#include "install.h"
+#include "installwindow.h"
 #include "installtalkwindow.h"
 #include "createvoicewindow.h"
 #include "httpget.h"
@@ -167,8 +167,6 @@ void RbUtilQt::updateTabs(int count)
 
 void RbUtilQt::downloadInfo()
 {
-    // make sure the version map is repopulated correctly later.
-    versmap.clear();
     // try to get the current build information
     daily = new HttpGet(this);
     connect(daily, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
@@ -196,23 +194,32 @@ void RbUtilQt::downloadDone(bool error)
     }
     qDebug() << "[RbUtil] network status:" << daily->error();
 
+    // read info into settings object
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
-    versmap.insert("arch_rev", info.value("dailies/rev").toString());
-    versmap.insert("arch_date", info.value("dailies/date").toString());
-
+    RbSettings::setValue(RbSettings::DailyRevision,info.value("dailies/rev"));
+    QDate date = QDate::fromString(info.value("dailies/date").toString(), "yyyyMMdd");
+    RbSettings::setValue(RbSettings::DailyDate,date.toString());
+   
     info.beginGroup("release");
-    versmap.insert("rel_rev", info.value(RbSettings::value(RbSettings::CurBuildserverModel).toString()).toString());
+    QStringList keys = info.allKeys();
+    for(int i=0; i < keys.size(); i++)
+    {
+        RbSettings::setPlatformValue(keys[i],RbSettings::CurReleaseVersion,info.value(keys[i]));
+    }
     info.endGroup();
 
-    bool installable = !versmap.value("rel_rev").isEmpty();
+    info.beginGroup("status");
+    keys = info.allKeys();
+    for(int i=0; i < keys.size(); i++)
+    {
+        RbSettings::setPlatformValue(keys[i],RbSettings::CurStatus,info.value(keys[i]));
+    }
+    info.endGroup();
 
-    ui.buttonSmall->setEnabled(installable);
-    ui.buttonComplete->setEnabled(installable);
-    ui.actionSmall_Installation->setEnabled(installable);
-    ui.actionComplete_Installation->setEnabled(installable);
-
+    
+    //start bleeding info download
     bleeding = new HttpGet(this);
     connect(bleeding, SIGNAL(done(bool)), this, SLOT(downloadBleedingDone(bool)));
     connect(bleeding, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
@@ -223,22 +230,6 @@ void RbUtilQt::downloadDone(bool error)
     bleeding->getFile(QUrl(RbSettings::value(RbSettings::BleedingInfo).toString()));
     ui.statusbar->showMessage(tr("Downloading build information, please wait ..."));
 
-    if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION) {
-        QApplication::processEvents();
-        QMessageBox::information(this, tr("New installation"),
-            tr("This is a new installation of Rockbox Utility, or a new version. "
-                "The configuration dialog will now open to allow you to setup the program, "
-                " or review your settings."));
-        configDialog();
-    }
-    else if(chkConfig(false)) {
-        QApplication::processEvents();
-        QMessageBox::critical(this, tr("Configuration error"),
-            tr("Your configuration is invalid. This is most likely due "
-                "to a changed device path. The configuration dialog will "
-                "now open to allow you to correct the problem."));
-        configDialog();
-    }
 }
 
 
@@ -251,11 +242,12 @@ void RbUtilQt::downloadBleedingDone(bool error)
         bleedingInfo.open();
         QSettings info(bleedingInfo.fileName(), QSettings::IniFormat, this);
         bleedingInfo.close();
-        versmap.insert("bleed_rev", info.value("bleeding/rev").toString());
-        versmap.insert("bleed_date", info.value("bleeding/timestamp").toString());
-        qDebug() << "[RbUtil] version map:" << versmap;
-        ui.statusbar->showMessage(tr("Download build information finished."), 5000);
+        RbSettings::setValue(RbSettings::BleedingRevision,info.value("bleeding/rev"));
+        QDateTime date = QDateTime::fromString(info.value("bleeding/timestamp").toString(), "yyyyMMddThhmmssZ");
+        RbSettings::setValue(RbSettings::BleedingDate,date.toString());
 
+        ui.statusbar->showMessage(tr("Download build information finished."), 5000);
+        updateSettings();
         m_gotInfo = true;
         
         //start check for updates
@@ -317,7 +309,6 @@ void RbUtilQt::configDialog()
 {
     Config *cw = new Config(this);
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
-    connect(cw, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
     cw->show();
 }
 
@@ -338,6 +329,23 @@ void RbUtilQt::updateSettings()
     }
     HttpGet::setGlobalCache(RbSettings::value(RbSettings::CachePath).toString());
     HttpGet::setGlobalDumbCache(RbSettings::value(RbSettings::CacheOffline).toBool());
+    
+     if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION) {
+        QApplication::processEvents();
+        QMessageBox::information(this, tr("New installation"),
+            tr("This is a new installation of Rockbox Utility, or a new version. "
+                "The configuration dialog will now open to allow you to setup the program, "
+                " or review your settings."));
+        configDialog();
+    }
+    else if(chkConfig(false)) {
+        QApplication::processEvents();
+        QMessageBox::critical(this, tr("Configuration error"),
+            tr("Your configuration is invalid. This is most likely due "
+                "to a changed device path. The configuration dialog will "
+                "now open to allow you to correct the problem."));
+        configDialog();
+    }    
 }
 
 
@@ -373,6 +381,13 @@ void RbUtilQt::updateDevice()
     if(mountpoint.isEmpty()) mountpoint = "&lt;invalid&gt;";
     ui.labelDevice->setText(tr("<b>%1 %2</b> at <b>%3</b>")
             .arg(brand, name, QDir::toNativeSeparators(mountpoint)));
+            
+    // hide quickstart buttons if no release available        
+    bool installable = !RbSettings::value(RbSettings::CurReleaseVersion).toString().isEmpty();
+    ui.buttonSmall->setEnabled(installable);
+    ui.buttonComplete->setEnabled(installable);
+    ui.actionSmall_Installation->setEnabled(installable);
+    ui.actionComplete_Installation->setEnabled(installable);        
 }
 
 
@@ -411,7 +426,7 @@ void RbUtilQt::completeInstall()
               "This will install Rockbox %1. To install the most recent "
               "development build available press \"Cancel\" and "
               "use the \"Installation\" tab.")
-              .arg(versmap.value("rel_rev")),
+              .arg(RbSettings::value(RbSettings::CurReleaseVersion).toString()),
               QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
         return;
     // create logger
@@ -469,7 +484,7 @@ void RbUtilQt::smallInstall()
               "This will install Rockbox %1. To install the most recent "
               "development build available press \"Cancel\" and "
               "use the \"Installation\" tab.")
-              .arg(versmap.value("rel_rev")),
+              .arg(RbSettings::value(RbSettings::CurReleaseVersion).toString()),
               QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
         return;
 
@@ -543,7 +558,7 @@ bool RbUtilQt::installAuto()
 {
     QString file = RbSettings::value(RbSettings::ReleaseUrl).toString();
     file.replace("%MODEL%", RbSettings::value(RbSettings::CurBuildserverModel).toString());
-    file.replace("%RELVERSION%", versmap.value("rel_rev"));
+    file.replace("%RELVERSION%", RbSettings::value(RbSettings::CurReleaseVersion).toString());
 
     // check installed Version and Target
     QString warning = check(false);
@@ -600,7 +615,7 @@ bool RbUtilQt::installAuto()
     ZipInstaller* installer = new ZipInstaller(this);
     installer->setUrl(file);
     installer->setLogSection("Rockbox (Base)");
-    installer->setLogVersion(versmap.value("rel_rev"));
+    installer->setLogVersion(RbSettings::value(RbSettings::CurReleaseVersion).toString());
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
     installer->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
@@ -617,10 +632,7 @@ bool RbUtilQt::installAuto()
 
 void RbUtilQt::install()
 {
-    Install *installWindow = new Install(this);
-
-    installWindow->setVersionStrings(versmap);
-
+    InstallWindow *installWindow = new InstallWindow(this);
     installWindow->show();
 }
 
@@ -837,7 +849,7 @@ void RbUtilQt::installFonts()
 
     installer->setUrl(RbSettings::value(RbSettings::FontUrl).toString());
     installer->setLogSection("Fonts");
-    installer->setLogVersion(versmap.value("arch_date"));
+    installer->setLogVersion(RbSettings::value(RbSettings::DailyDate).toString());
     installer->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
@@ -876,12 +888,12 @@ void RbUtilQt::installVoice()
     QString voiceurl = RbSettings::value(RbSettings::VoiceUrl).toString();
 
     voiceurl += RbSettings::value(RbSettings::CurBuildserverModel).toString() + "-" +
-        versmap.value("arch_date") + "-english.zip";
+        RbSettings::value(RbSettings::DailyDate).toString() + "-english.zip";
     qDebug() << "[RbUtil] voicefile URL:" << voiceurl;
 
     installer->setUrl(voiceurl);
     installer->setLogSection("Voice");
-    installer->setLogVersion(versmap.value("arch_date"));
+    installer->setLogVersion(RbSettings::value(RbSettings::DailyDate).toString());
     installer->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
@@ -931,7 +943,7 @@ void RbUtilQt::installDoom()
 
     installer->setUrl(RbSettings::value(RbSettings::DoomUrl).toString());
     installer->setLogSection("Game Addons");
-    installer->setLogVersion(versmap.value("arch_date"));
+    installer->setLogVersion(RbSettings::value(RbSettings::DailyDate).toString());
     installer->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
@@ -1050,7 +1062,7 @@ void RbUtilQt::downloadManual(void)
     if(manual.isEmpty())
         manual = "rockbox-" + RbSettings::value(RbSettings::Platform).toString();
 
-    QString date = versmap.value("arch_date");
+    QString date = RbSettings::value(RbSettings::DailyDate).toString();
 
     QString manualurl;
     QString target;

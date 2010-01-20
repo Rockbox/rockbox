@@ -28,12 +28,11 @@
 #include "zipinstaller.h"
 #include "progressloggergui.h"
 
-class Install : public QDialog
+class InstallWindow : public QDialog
 {
     Q_OBJECT
     public:
-        Install(QWidget *parent);
-        void setVersionStrings(QMap<QString, QString>&);
+        InstallWindow(QWidget *parent);
 
     public slots:
         void accept(void);
@@ -45,7 +44,6 @@ class Install : public QDialog
         QFile *target;
         QString file;
         ZipInstaller* installer;
-        QMap<QString, QString> version;
         QString m_backupName;
         void resizeEvent(QResizeEvent*);
 

@@ -55,7 +55,6 @@ class RbUtilQt : public QMainWindow
         ProgressLoggerGui *logger;
         ZipInstaller *installer;
         QUrl proxy(void);
-        QMap<QString, QString> versmap;
         bool chkConfig(bool);
 
         volatile bool m_installed;
