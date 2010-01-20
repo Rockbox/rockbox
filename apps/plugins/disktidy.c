@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "errno.h"
 
 PLUGIN_HEADER
 
@@ -172,33 +173,53 @@ void tidy_lcd_status(const char *name, int *removed)
     rb->lcd_update();
 }
 
-void tidy_get_absolute_path(struct dirent *entry, char *fullname, 
-                            const char* name)
+int tidy_path_append_entry(char *path, struct dirent *entry, int *path_length)
 {
-    /* gets absolute path using dirent and name */
-    rb->strcpy(fullname, name);
-    if (rb->strlen(name) > 1)
+    int name_len = rb->strlen(entry->d_name);
+    /* for the special case of path="/" this is one bigger but it's not a problem */
+    int new_length = *path_length + name_len + 1;
+    
+    /* check overflow (keep space for trailing zero) */
+    if(new_length >= MAX_PATH)
+        return 0;
+    
+    /* special case for path <> "/" */
+    if(rb->strcmp(path, "/") != 0)
     {
-        rb->strcat(fullname, "/");
+        rb->strcat(path + *path_length, "/");
+        (*path_length)++;
     }
-    rb->strcat(fullname, entry->d_name);
+    /* strcat is unsafe but the previous check normally avoid any problem */
+    /* use path_length to optimise */
+    
+    rb->strcat(path + *path_length, entry->d_name);
+    *path_length += name_len;
+    
+    return 1;
 }
 
-enum tidy_return tidy_removedir(const char *name, int *removed)
+void tidy_path_remove_entry(char *path, int old_path_length, int *path_length)
+{
+    path[old_path_length] = '\0';
+    *path_length = old_path_length;
+}
+
+/* path is assumed to be array of size MAX_PATH */
+enum tidy_return tidy_removedir(char *path, int *path_length, int *removed)
 {
     /* delete directory */
     struct dirent *entry;
     enum tidy_return status = TIDY_RETURN_OK;
     int button;
     DIR *dir;
-    char fullname[MAX_PATH];
+    int old_path_length = *path_length;
 
     /* display status text */
-    tidy_lcd_status(name, removed);
+    tidy_lcd_status(path, removed);
 
     rb->yield();
 
-    dir = rb->opendir(name);
+    dir = rb->opendir(path);
     if (dir)
     {
         while((status == TIDY_RETURN_OK) && ((entry = rb->readdir(dir)) != 0))
@@ -220,7 +241,10 @@ enum tidy_return tidy_removedir(const char *name, int *removed)
             rb->yield();
 
             /* get absolute path */
-            tidy_get_absolute_path(entry, fullname, name);
+            /* returns an error if path is too long */
+            if(!tidy_path_append_entry(path, entry, path_length))
+                /* silent error */
+                continue;
 
             if (entry->attribute & ATTR_DIRECTORY)
             {
@@ -228,20 +252,23 @@ enum tidy_return tidy_removedir(const char *name, int *removed)
                 if ((rb->strcmp(entry->d_name, ".") != 0) && \
                     (rb->strcmp(entry->d_name, "..") != 0))
                 {
-                    tidy_removedir(fullname, removed);
+                    tidy_removedir(path, path_length, removed);
                 }
             }
             else
             {
                 /* file */
                 *removed += 1;
-                rb->remove(fullname);
+                rb->remove(path);
             }
+            
+            /* restore path */
+            tidy_path_remove_entry(path, old_path_length, path_length);
         }
         rb->closedir(dir);
         /* rmdir */
         *removed += 1;
-        rb->rmdir(name);
+        rb->rmdir(path);
     }
     else
     {
@@ -250,7 +277,8 @@ enum tidy_return tidy_removedir(const char *name, int *removed)
     return status;
 }
 
-enum tidy_return tidy_clean(const char *name, int *removed)
+/* path is assumed to be array of size MAX_PATH */
+enum tidy_return tidy_clean(char *path, int *path_length, int *removed)
 {
     /* deletes junk files and dirs left by system */
     struct dirent *entry;
@@ -258,14 +286,14 @@ enum tidy_return tidy_clean(const char *name, int *removed)
     int button;
     int del; /* has the item been deleted */
     DIR *dir;
-    char fullname[MAX_PATH];
+    int old_path_length = *path_length;
 
     /* display status text */
-    tidy_lcd_status(name, removed);
+    tidy_lcd_status(path, removed);
 
     rb->yield();
 
-    dir = rb->opendir(name);
+    dir = rb->opendir(path);
     if (dir)
     {
         while((status == TIDY_RETURN_OK) && ((entry = rb->readdir(dir)) != 0))
@@ -295,20 +323,26 @@ enum tidy_return tidy_clean(const char *name, int *removed)
                     del = 0;
 
                     /* get absolute path */
-                    tidy_get_absolute_path(entry, fullname, name);
+                    /* returns an error if path is too long */
+                    if(!tidy_path_append_entry(path, entry, path_length))
+                        /* silent error */
+                        continue;
 
                     if (tidy_remove_item(entry->d_name, entry->attribute))
                     {
                         /* delete dir */
-                        tidy_removedir(fullname, removed);
+                        tidy_removedir(path, path_length, removed);
                         del = 1;
                     }
 
                     if (del == 0)
                     {
                         /* dir not deleted so clean it */
-                        status = tidy_clean(fullname, removed);
+                        status = tidy_clean(path, path_length, removed);
                     }
+                    
+                    /* restore path */
+                    tidy_path_remove_entry(path, old_path_length, path_length);
                 }
             }
             else
@@ -317,15 +351,19 @@ enum tidy_return tidy_clean(const char *name, int *removed)
                 del = 0;
                 if (tidy_remove_item(entry->d_name, entry->attribute))
                 {
-                    *removed += 1; /* increment removed files counter */
-
                     /* get absolute path */
-                    char fullname[MAX_PATH];
-                    tidy_get_absolute_path(entry, fullname, name);
+                    /* returns an error if path is too long */
+                    if(!tidy_path_append_entry(path, entry, path_length))
+                        /* silent error */
+                        continue;
 
+                    *removed += 1; /* increment removed files counter */
                     /* delete file */
-                    rb->remove(fullname);
+                    rb->remove(path);
                     del = 1;
+                    
+                    /* restore path */
+                    tidy_path_remove_entry(path, old_path_length, path_length);
                 }
             }
         }
@@ -344,12 +382,16 @@ enum tidy_return tidy_do(void)
     int removed = 0;
     enum tidy_return status;
     char text[24]; /* "Cleaned up nnnnn items" */
+    char path[MAX_PATH];
+    int path_length;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
 
-    status = tidy_clean("/", &removed);
+    rb->strcpy(path, "/");
+    path_length = rb->strlen(path);
+    status = tidy_clean(path, &path_length, &removed);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
