@@ -544,9 +544,6 @@ bool RbUtilQt::installAuto()
     QString file = RbSettings::value(RbSettings::ReleaseUrl).toString();
     file.replace("%MODEL%", RbSettings::value(RbSettings::CurBuildserverModel).toString());
     file.replace("%RELVERSION%", versmap.value("rel_rev"));
-    buildInfo.open();
-    QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
-    buildInfo.close();
 
     // check installed Version and Target
     QString warning = check(false);
@@ -622,9 +619,6 @@ void RbUtilQt::install()
 {
     Install *installWindow = new Install(this);
 
-    buildInfo.open();
-    QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
-    buildInfo.close();
     installWindow->setVersionStrings(versmap);
 
     installWindow->show();
@@ -1052,15 +1046,11 @@ void RbUtilQt::downloadManual(void)
         QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
         return;
 
-    buildInfo.open();
-    QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
-    buildInfo.close();
-
     QString manual = RbSettings::value(RbSettings::CurManual).toString();
     if(manual.isEmpty())
         manual = "rockbox-" + RbSettings::value(RbSettings::Platform).toString();
 
-    QString date = (info.value("dailies/date").toString());
+    QString date = versmap.value("arch_date");
 
     QString manualurl;
     QString target;
