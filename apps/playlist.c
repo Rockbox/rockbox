@@ -783,15 +783,16 @@ static int add_track_to_playlist(struct playlist_info* playlist,
     }
     
     /* update stored indices if needed */
-    if (playlist->amount > 0 && insert_position <= playlist->index &&
-        playlist->started)
-        playlist->index++;
 
-    if (playlist->amount > 0 && insert_position <= playlist->first_index &&
-        orig_position != PLAYLIST_PREPEND && playlist->started)
+    if (orig_position < 0)
     {
-        playlist->first_index++;
+        if (playlist->amount > 0 && insert_position <= playlist->index &&
+            playlist->started)
+            playlist->index++;
 
+        if (playlist->amount > 0 && insert_position <= playlist->first_index &&
+            orig_position != PLAYLIST_PREPEND && playlist->started)
+            playlist->first_index++;
     }
 
     if (insert_position < playlist->last_insert_pos ||
