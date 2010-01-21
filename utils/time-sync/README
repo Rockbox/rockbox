@@ -1,0 +1,20 @@
+time-sync is a utility to sync the time with any Rockbox target that runs the
+software USB stack.
+
+It was originally take from libgpod and stripped of unnecessary code.
+
+http://gtkpod.git.sourceforge.net/git/gitweb.cgi?p=gtkpod/libgpod
+
+To compile and install, just run:
+    make
+    make install
+
+Example run:
+    mcuelenaere@wim2160:~/rockbox/utils/time-sync$ sudo time-sync /dev/sdb1
+	Data Payload: 07 da 00 14 04 0c 30 2b 00 00 00 00
+	Write buffer cmd: 3b 01 00 0c 00 00 00 00 0c 00
+    Time was synced!
+
+Example udev rule (for Onda VX747):
+    # automatically adjust my Rockboxed DAP RTC
+    ACTION=="add", ATTRS{idVendor}=="07c4", ATTRS{idProduct}=="a4a5", KERNEL=="sd?", NAME="%k", RUN+="/usr/local/bin/time-sync /dev/%k"
