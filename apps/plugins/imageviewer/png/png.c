@@ -146,7 +146,7 @@ static fb_data *disp_buf;
 /* my memory pool (from the mp3 buffer) */
 static char print[128]; /* use a common snprintf() buffer */
 
-unsigned char *memory, *memory_max;
+unsigned char *memory, *memory_max; /* inffast.c needs memory_max */
 static size_t memory_size;
 
 static unsigned char *image; /* where we put the content of the file */
@@ -1053,7 +1053,7 @@ static void decodeGeneric(LodePNG_Decoder* decoder, unsigned char* in, size_t si
     /*provide some proper output values if error will happen*/
     decoded_image_size = 0;
 
-if (size == 0 || in == 0) { decoder->error = 48; return; } /*the given data is empty*/
+    if (size == 0 || in == 0) { decoder->error = 48; return; } /*the given data is empty*/
 
     LodePNG_inspect(decoder, in, size); /*reads header and resets other parameters in decoder->infoPng*/
     if (decoder->error) return;
@@ -1216,7 +1216,7 @@ void LodePNG_decode(LodePNG_Decoder* decoder, unsigned char* in, size_t insize, 
     if (decoder->error) return;
 
     /*TODO: check if this works according to the statement in the documentation: "The converter can convert from greyscale input color type, to 8-bit greyscale or greyscale with alpha"*/
-if (!(decoder->infoRaw.color.colorType == 2 || decoder->infoRaw.color.colorType == 6) && !(decoder->infoRaw.color.bitDepth == 8)) { decoder->error = 56; return; }
+    if (!(decoder->infoRaw.color.colorType == 2 || decoder->infoRaw.color.colorType == 6) && !(decoder->infoRaw.color.bitDepth == 8)) { decoder->error = 56; return; }
     converted_image = (fb_data *)((intptr_t)(memory + 3) & ~3);
     converted_image_size = decoder->infoPng.width*decoder->infoPng.height;
     if ((unsigned char *)(converted_image + converted_image_size) >= decoded_image) { decoder->error = OUT_OF_MEMORY; }

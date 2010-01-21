@@ -39,7 +39,7 @@ GREY_INFO_STRUCT
 /******************************* Globals ***********************************/
 
 bool slideshow_enabled = false;   /* run slideshow */
-bool running_slideshow = false;   /* loading image because of slideshw */
+bool running_slideshow = false;   /* loading image because of slideshow */
 #ifdef DISK_SPINDOWN
 bool immediate_ata_off = false;   /* power down disk after loading */
 #endif
@@ -120,7 +120,7 @@ static char **file_pt;
 
 /************************* Implementation ***************************/
 
-/*Read directory contents for scrolling. */
+/* Read directory contents for scrolling. */
 static void get_pic_list(void)
 {
     int i;
@@ -295,7 +295,7 @@ static int show_menu(void) /* return 1 to quit */
         case MIID_RETURN:
             break;
         case MIID_TOGGLE_SS_MODE:
-            rb->set_option("Toggle Slideshow", &slideshow_enabled, INT,
+            rb->set_option("Toggle Slideshow", &slideshow_enabled, BOOL,
                            slideshow , 2, NULL);
             break;
         case MIID_CHANGE_SS_MODE:

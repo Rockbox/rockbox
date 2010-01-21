@@ -394,12 +394,12 @@ extern bool immediate_ata_off;
 extern bool plug_buf;
 #endif
 
-/* functions needed to be implemented in each image decoders. */
+/* functions need to be implemented in each image decoders. */
 /* return true if ext is supported by the decoder. */
 extern bool img_ext(const char *ext);
 /* return needed size of buffer to store downscaled image by ds */
 extern int img_mem(int ds);
-/* load image from filename. set width and height of info properly. alos, set
+/* load image from filename. set width and height of info properly. also, set
  * buf_size to remaining size of buf after load image. it is used to caluclate
  * min downscale. */
 extern int load_image(char *filename, struct image_info *info,
