@@ -151,7 +151,7 @@ class RbSettings : public QObject
         //! pointers to our setting objects
         static QSettings *systemSettings;
         static QSettings *userSettings;
-        static QSettings *serverSettings;
+        static QMap<QString, QVariant> serverSettings;
 };
 
 #endif
