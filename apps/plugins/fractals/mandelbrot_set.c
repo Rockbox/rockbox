@@ -20,6 +20,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "fractal_sets.h"
 #include "mandelbrot_set.h"
 
 #define BUTTON_YIELD_TIMEOUT (HZ / 4)

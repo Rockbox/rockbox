@@ -21,8 +21,14 @@
 #ifndef _FRACTAL_SETS_H
 #define _FRACTAL_SETS_H
 
+#include "plugin.h"
+
+#if (LCD_DEPTH < 8)
+#define USEGSLIB
 #include "lib/grey.h"
+#else
 #include "lib/xlcd.h"
+#endif
 
 #define DELTA 8 /* Panning moves 1/DELTA of screen */
 
