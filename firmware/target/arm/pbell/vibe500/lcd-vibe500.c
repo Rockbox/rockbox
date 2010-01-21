@@ -206,7 +206,7 @@ static void lcd_power_on(void)
     lcd_write_reg(R_POWER_CONTROL1,0x0010);
     sleep(HZ/67); /* 15ms */
     lcd_write_reg(R_POWER_CONTROL5,0x3019);
-    sleep(HZ/6.6);/* 150ms */
+    sleep(HZ*10/66);/* /6.6 = 150ms */
     lcd_write_reg(0x09,0x0002); /* - ?? */
     sleep(HZ/67); /* 15ms */
     lcd_write_reg(R_POWER_CONTROL4,0x0018);
@@ -331,7 +331,7 @@ static void lcd_display_on(void)
     lcd_write_reg(R_POWER_CONTROL1,0x10);
     sleep(HZ/67); /* 15ms */
     lcd_write_reg(R_POWER_CONTROL5,0x3019);
-    sleep(HZ/6.6);/* 150ms */
+    sleep(HZ*10/66);/* /6.6 = 150ms */
     lcd_write_reg(0x09,2); /* -?? */
     sleep(HZ/20); /* 50ms */
     lcd_write_reg(R_DISP_CONTROL,5);
