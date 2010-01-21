@@ -1486,6 +1486,10 @@ static void wvs_handle_phone_plug(bool inserted)
 static void button_loop(void)
 {
     rb->lcd_setfont(FONT_SYSFIXED);
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_WHITE);
+    rb->lcd_set_background(LCD_BLACK);
+#endif
     rb->lcd_clear_display();
     rb->lcd_update();
 
@@ -1583,6 +1587,8 @@ static void button_loop(void)
             rb->lcd_set_foreground(LCD_WHITE);
             rb->lcd_set_background(LCD_BLACK);
 #endif
+            rb->lcd_clear_display();
+            rb->lcd_update();
 
             switch (result)
             {

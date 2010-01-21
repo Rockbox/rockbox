@@ -902,9 +902,6 @@ static int show_start_menu(uint32_t duration)
         }
     }
 
-    rb->lcd_clear_display();
-    rb->lcd_update();
-
     return result;
 }
 
@@ -961,9 +958,6 @@ int mpeg_menu(void)
 
     if (mpeg_menu_sysevent() != 0)
         result = MPEG_MENU_QUIT;
-
-    rb->lcd_clear_display();
-    rb->lcd_update();
 
     return result;
 }
