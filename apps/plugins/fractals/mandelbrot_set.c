@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: mandelbrot.c 24010 2009-12-15 20:51:41Z tomers $
+ * $Id$
  *
  * Copyright (C) 2004 Matthias Wientapper
  * Heavily extended 2005 Jens Arnold
