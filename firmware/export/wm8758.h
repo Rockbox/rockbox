@@ -23,7 +23,7 @@
 #define _WM8758_H
 
 /* volume/balance/treble/bass interdependency */
-#define VOLUME_MIN -570
+#define VOLUME_MIN -890
 #define VOLUME_MAX  60
 
 #define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BASS_CUTOFF_CAP | TREBLE_CUTOFF_CAP)
