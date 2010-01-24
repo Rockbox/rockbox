@@ -111,6 +111,7 @@ const static struct {
 //! pointer to setting object to NULL
 QSettings* RbSettings::systemSettings = NULL;
 QSettings* RbSettings::userSettings = NULL;
+//! global volatile settings
 QMap<QString, QVariant> RbSettings::serverSettings;
 
 void RbSettings::ensureRbSettingsExists()
@@ -225,8 +226,12 @@ QVariant RbSettings::value(enum ServerSettings setting)
         i++;
 
     QString s = constructSettingPath(ServerSettingsList[i].name);
-    qDebug() << "[Settings] GET SERV:" << s << serverSettings.value(s, ServerSettingsList[i].def).toString();
-    return serverSettings.value(s);
+    qDebug() << "[Settings] GET SERV:" << s
+             << serverSettings.value(s, ServerSettingsList[i].def).toString();
+    if(serverSettings.contains(s))
+        return serverSettings.value(s);
+    else
+        return ServerSettingsList[i].def;
 }
 
 void RbSettings::setValue(enum UserSettings setting , QVariant value)
