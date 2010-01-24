@@ -359,7 +359,7 @@ Lyre prototype 1 */
 #elif defined(CREATIVE_ZVM60GB)
 #include "config/zenvisionm60gb.h"
 #elif defined(CREATIVE_ZV)
-#include "config/zenvisionm.h"
+#include "config/zenvision.h"
 #elif defined(PHILIPS_SA9200)
 #include "config/gogearsa9200.h"
 #elif defined(PHILIPS_HDD1630)
