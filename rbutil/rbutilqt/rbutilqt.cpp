@@ -77,7 +77,6 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     HttpGet::setGlobalUserAgent("rbutil/"VERSION);
     // init startup & autodetection
     ui.setupUi(this);
-    updateSettings();
     downloadInfo();
 
     m_gotInfo = false;
