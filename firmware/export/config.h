@@ -374,8 +374,10 @@ Lyre prototype 1 */
 #include "config/meizum6sp.h"
 #elif defined(MEIZU_M3)
 #include "config/meizum3.h"
-#elif defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX777)
+#elif defined(ONDA_VX747) || defined(ONDA_VX747P)
 #include "config/ondavx747.h"
+#elif defined(ONDA_VX777)
+#include "config/ondavx777.h"
 #elif defined(ONDA_VX767)
 #include "config/ondavx767.h"
 #elif defined(SANSA_CLIP)

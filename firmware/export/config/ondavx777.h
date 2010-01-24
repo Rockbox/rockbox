@@ -27,14 +27,8 @@
 
 #define CONFIG_SDRAM_START 0x80004000
 
-#ifdef ONDA_VX747P
-#define MODEL_NAME  "Onda VX747+"
-#define MODEL_NUMBER 54
-/* Define something for camera interface... */
-#else
-#define MODEL_NAME  "Onda VX747"
-#define MODEL_NUMBER 45
-#endif
+#define MODEL_NAME  "Onda VX777"
+#define MODEL_NUMBER 61
 
 /* Support FAT16 for SD cards <= 2GB */
 #define HAVE_FAT16SUPPORT
@@ -86,7 +80,7 @@
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE
 
-#define CONFIG_KEYPAD ONDAVX747_PAD
+#define CONFIG_KEYPAD ONDAVX777_PAD
 
 #define HAVE_TOUCHSCREEN
 #define HAVE_BUTTON_DATA
@@ -159,9 +153,6 @@
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
 
-/* There is only USB charging */
-#define HAVE_USB_POWER
-
 #define CFG_EXTAL 12000000    /* EXT clock: 12 Mhz */
 
 /*
@@ -203,11 +194,7 @@ No access to the NAND yet..
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 
-#ifdef ONDA_VX747P
-#define BOOTFILE_EXT "vx747p"
-#else
-#define BOOTFILE_EXT "vx747"
-#endif
+#define BOOTFILE_EXT "vx777"
 
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
 #define BOOTDIR      "/.rockbox"
