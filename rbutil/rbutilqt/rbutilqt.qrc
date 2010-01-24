@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/" >
-        <file>docs/CREDITS</file>
+        <file>../../docs/CREDITS</file>
         <file>docs/gpl-2.0.html</file>
     </qresource>
      <qresource>

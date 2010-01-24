@@ -287,8 +287,13 @@ void RbUtilQt::about()
     credits.open(QIODevice::ReadOnly);
     QTextStream r(&credits);
     r.setCodec(QTextCodec::codecForName("UTF-8"));
-    QString rline = r.readAll();
-    about.browserCredits->insertPlainText(rline);
+    while(!r.atEnd()) {
+        QString line = r.readLine();
+        // filter out header.
+        line.remove(QRegExp("^[^A-Z]+.*"));
+        line.remove(QRegExp("^People.*"));
+        about.browserCredits->append(line);
+    }
     about.browserCredits->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
     QString title = QString("<b>The Rockbox Utility</b><br/>Version %1").arg(FULLVERSION);
     about.labelTitle->setText(title);
