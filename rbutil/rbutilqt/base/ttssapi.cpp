@@ -20,6 +20,7 @@
 #include "ttssapi.h"
 #include "utils.h"
 #include "rbsettings.h"
+#include "systeminfo.h"
 
 TTSSapi::TTSSapi(QObject* parent) : TTSBase(parent)
 {
@@ -31,7 +32,7 @@ TTSSapi::TTSSapi(QObject* parent) : TTSBase(parent)
 void TTSSapi::generateSettings()
 {
     // language
-    QStringList languages = RbSettings::languages();
+    QStringList languages = SystemInfo::languages();
     languages.sort();
     EncTtsSetting* setting =new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,
         tr("Language:"),RbSettings::subValue("sapi",RbSettings::TtsLanguage),languages);

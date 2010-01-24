@@ -20,6 +20,7 @@
 #include "voicefile.h"
 #include "utils.h"
 #include "rbsettings.h"
+#include "systeminfo.h"
 
 VoiceFileCreator::VoiceFileCreator(QObject* parent) :QObject(parent)
 {
@@ -61,7 +62,7 @@ bool VoiceFileCreator::createVoiceFile()
     version = version.left(version.indexOf("-")).remove("r");
  
     //prepare download url
-    QUrl genlangUrl = RbSettings::value(RbSettings::GenlangUrl).toString()
+    QUrl genlangUrl = SystemInfo::value(SystemInfo::GenlangUrl).toString()
             +"?lang=" + m_lang + "&t=" + target + "&rev=" + version + "&f=" + features;
 
     qDebug() << "downloading " << genlangUrl;

@@ -23,6 +23,7 @@
 #include "browsedirtree.h"
 #include "configure.h"
 #include "rbsettings.h"
+#include "systeminfo.h"
 
 CreateVoiceWindow::CreateVoiceWindow(QWidget *parent) : QDialog(parent)
 {
@@ -72,7 +73,7 @@ void CreateVoiceWindow::accept()
 void CreateVoiceWindow::updateSettings(void)
 {
     // fill in language combobox
-    QStringList languages = RbSettings::languages();
+    QStringList languages = SystemInfo::languages();
     languages.sort();
     ui.comboLanguage->addItems(languages);
     // set saved lang
@@ -99,7 +100,7 @@ void CreateVoiceWindow::updateSettings(void)
         ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
             .arg("Invalid TTS configuration!"));
     
-    QString encoder = RbSettings::value(RbSettings::CurEncoder).toString();
+    QString encoder = SystemInfo::value(SystemInfo::CurEncoder).toString();
     // only proceed if encoder setting is set
     EncBase* enc = EncBase::getEncoder(this,encoder);
     if(enc != NULL) {

@@ -24,18 +24,10 @@
 
 #include <QtCore>
 
-class QSettings;
-
 class RbSettings : public QObject
 {
     Q_OBJECT
     public:
-        //! Type of requested usb-id map
-        enum MapType {
-            MapDevice,
-            MapError,
-            MapIncompatible,
-        };
         
         //! All user settings
         enum UserSettings {
@@ -68,77 +60,19 @@ class RbSettings : public QObject
             EncoderQuality,
             EncoderVolume,
         };
-        
-        //! All system settings
-        enum SystemSettings {
-            ManualUrl,
-            BleedingUrl,
-            BootloaderUrl,
-            BootloaderInfoUrl,
-            FontUrl,
-            VoiceUrl,
-            DoomUrl,
-            ReleaseUrl,
-            DailyUrl,
-            ServerConfUrl,
-            GenlangUrl,
-            ThemesUrl,
-            RbutilUrl,
-            BleedingInfo,
-            CurPlatformName,
-            CurManual,
-            CurBootloaderMethod,
-            CurBootloaderName,
-            CurBootloaderFile,
-            CurEncoder,
-            CurBrand,
-            CurName,
-            CurBuildserverModel,
-            CurConfigureModel,
-        };
-        
-        //! All Server settings
-        enum ServerSettings {
-            CurReleaseVersion,
-            CurStatus,
-            DailyRevision,
-            DailyDate,
-            BleedingRevision,
-            BleedingDate,
-        };
-        
+ 
         //! call this to flush the user Settings
         static void sync();
         //! returns the filename of the usersettings file
         static QString userSettingFilename();
-        //! return a list of all platforms (rbutil internal names)
-        static QStringList platforms(void);
-        //! returns a list of all languages
-        static QStringList languages(void);
-        //! maps a platform to its name
-        static QString name(QString plattform);
-        //! maps a platform to its brand
-        static QString brand(QString plattform);
-        //! returns a map of usb-ids and their targets
-        static QMap<int, QString> usbIdMap(enum MapType);
-        //! get a value from system settings
-        static QVariant value(enum SystemSettings setting);
         //! get a value from user settings
         static QVariant value(enum UserSettings setting);
-        //! get a value from server settings
-        static QVariant value(enum ServerSettings setting);
         //! set a user setting value
         static void setValue(enum UserSettings setting , QVariant value);
-        //! set a server setting value
-        static void setValue(enum ServerSettings setting , QVariant value);
         //! get a user setting from a subvalue (ie for encoders and tts engines)
         static QVariant subValue(QString sub, enum UserSettings setting);
         //! set a user setting from a subvalue (ie for encoders and tts engines)
         static void setSubValue(QString sub, enum UserSettings setting, QVariant value);
-        //! set a value for a server settings for a named platform.
-        static void setPlatformValue(QString platform, enum ServerSettings setting, QVariant value);
-        //! get a value from system settings for a named platform.
-        static QVariant platformValue(QString platform, enum SystemSettings setting);
 
     private:
         //! you shouldnt call this, its a fully static calls
@@ -148,11 +82,8 @@ class RbSettings : public QObject
         //! create a settings path, substitute platform, tts and encoder
         static QString constructSettingPath(QString path, QString substitute = QString());
 
-        //! pointers to our setting objects
-        static QSettings *systemSettings;
+        //! pointers to our setting object
         static QSettings *userSettings;
-        //! global volatile settings
-        static QMap<QString, QVariant> serverSettings;
 };
 
 #endif

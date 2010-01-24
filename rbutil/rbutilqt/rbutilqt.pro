@@ -97,6 +97,8 @@ SOURCES += rbutilqt.cpp \
  base/voicefile.cpp \
  createvoicewindow.cpp \
  base/rbsettings.cpp \
+ base/serverinfo.cpp \
+ base/systeminfo.cpp \
  base/rbunzip.cpp \
  base/rbzip.cpp \
  base/system.cpp \
@@ -158,6 +160,8 @@ HEADERS += rbutilqt.h \
  base/voicefile.h \
  createvoicewindow.h \
  base/rbsettings.h \
+ base/serverinfo.h \
+ base/systeminfo.h \
  base/rbunzip.h \
  base/rbzip.h \
  sysinfo.h \

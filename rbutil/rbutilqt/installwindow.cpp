@@ -22,6 +22,8 @@
 #include "rbzip.h"
 #include "system.h"
 #include "rbsettings.h"
+#include "serverinfo.h"
+#include "systeminfo.h"
 #include "utils.h"
 
 InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
@@ -54,24 +56,24 @@ InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
     backupCheckboxChanged(Qt::Unchecked);
     
     
-    if(RbSettings::value(RbSettings::DailyRevision).toString().isEmpty()) {
+    if(ServerInfo::value(ServerInfo::DailyRevision).toString().isEmpty()) {
         ui.radioArchived->setEnabled(false);
         qDebug() << "[Install] no information about archived version available!";
     }
-    if(RbSettings::value(RbSettings::CurReleaseVersion).toString().isEmpty()) {
+    if(ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty()) {
         ui.radioStable->setEnabled(false);
     }
 
     // try to use the old selection first. If no selection has been made
     // in the past, use a preselection based on released status.
     if(RbSettings::value(RbSettings::Build).toString() == "stable"
-        && !RbSettings::value(RbSettings::CurReleaseVersion).toString().isEmpty())
+        && !ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty())
         ui.radioStable->setChecked(true);
     else if(RbSettings::value(RbSettings::Build).toString() == "archived")
         ui.radioArchived->setChecked(true);
     else if(RbSettings::value(RbSettings::Build).toString() == "current")
         ui.radioCurrent->setChecked(true);
-    else if(!RbSettings::value(RbSettings::CurReleaseVersion).toString().isEmpty()) {
+    else if(!ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty()) {
         ui.radioStable->setChecked(true);
         ui.radioStable->setEnabled(true);
         QFont font;
@@ -138,30 +140,30 @@ void InstallWindow::accept()
     }
 
     QString myversion;
-    QString buildname = RbSettings::value(RbSettings::CurBuildserverModel).toString();
+    QString buildname = SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
     if(ui.radioStable->isChecked()) {
-        file = RbSettings::value(RbSettings::ReleaseUrl).toString();
+        file = SystemInfo::value(SystemInfo::ReleaseUrl).toString();
         RbSettings::setValue(RbSettings::Build, "stable");
-        myversion = RbSettings::value(RbSettings::CurReleaseVersion).toString();
+        myversion = ServerInfo::value(ServerInfo::CurReleaseVersion).toString();
     }
     else if(ui.radioArchived->isChecked()) {
-        file = RbSettings::value(RbSettings::DailyUrl).toString();
+        file = SystemInfo::value(SystemInfo::DailyUrl).toString();
         RbSettings::setValue(RbSettings::Build, "archived");
-        myversion = "r" + RbSettings::value(RbSettings::DailyRevision).toString() + "-" + RbSettings::value(RbSettings::DailyDate).toString();
+        myversion = "r" + ServerInfo::value(ServerInfo::DailyRevision).toString() + "-" + ServerInfo::value(ServerInfo::DailyDate).toString();
     }
     else if(ui.radioCurrent->isChecked()) {
-        file = RbSettings::value(RbSettings::BleedingUrl).toString();
+        file = SystemInfo::value(SystemInfo::BleedingUrl).toString();
         RbSettings::setValue(RbSettings::Build, "current");
-        myversion = "r" + RbSettings::value(RbSettings::BleedingRevision).toString();
+        myversion = "r" + ServerInfo::value(ServerInfo::BleedingRevision).toString();
     }
     else {
         qDebug() << "[Install] no build selected -- this shouldn't happen";
         return;
     }
     file.replace("%MODEL%", buildname);
-    file.replace("%RELVERSION%", RbSettings::value(RbSettings::CurReleaseVersion).toString());
-    file.replace("%REVISION%", RbSettings::value(RbSettings::DailyRevision).toString());
-    file.replace("%DATE%", RbSettings::value(RbSettings::DailyDate).toString());
+    file.replace("%RELVERSION%", ServerInfo::value(ServerInfo::CurReleaseVersion).toString());
+    file.replace("%REVISION%", ServerInfo::value(ServerInfo::DailyRevision).toString());
+    file.replace("%DATE%", ServerInfo::value(ServerInfo::DailyDate).toString());
 
     RbSettings::sync();
 
@@ -268,8 +270,8 @@ void InstallWindow::setDetailsCurrent(bool show)
         ui.labelDetails->setText(tr("This is the absolute up to the minute "
                 "Rockbox built. A current build will get updated every time "
                 "a change is made. Latest version is r%1 (%2).")
-                .arg(RbSettings::value(RbSettings::BleedingRevision).toString(),RbSettings::value(RbSettings::BleedingDate).toString()));
-        if(RbSettings::value(RbSettings::CurReleaseVersion).toString().isEmpty())
+                .arg(ServerInfo::value(ServerInfo::BleedingRevision).toString(),ServerInfo::value(ServerInfo::BleedingDate).toString()));
+        if(ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty())
             ui.labelNote->setText(tr("<b>This is the recommended version.</b>"));
         else
             ui.labelNote->setText("");
@@ -283,11 +285,11 @@ void InstallWindow::setDetailsStable(bool show)
         ui.labelDetails->setText(
             tr("This is the last released version of Rockbox."));
 
-        if(!RbSettings::value(RbSettings::CurReleaseVersion).toString().isEmpty())
+        if(!ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty())
             ui.labelNote->setText(tr("<b>Note:</b> "
             "The lastest released version is %1. "
             "<b>This is the recommended version.</b>")
-                    .arg(RbSettings::value(RbSettings::CurReleaseVersion).toString()));
+                    .arg(ServerInfo::value(ServerInfo::CurReleaseVersion).toString()));
         else ui.labelNote->setText("");
     }
 }
@@ -301,7 +303,7 @@ void InstallWindow::setDetailsArchived(bool show)
         "features than the last stable release but may be much less stable. "
         "Features may change regularly."));
         ui.labelNote->setText(tr("<b>Note:</b> archived version is r%1 (%2).")
-            .arg(RbSettings::value(RbSettings::DailyRevision).toString(),RbSettings::value(RbSettings::DailyDate).toString()));
+            .arg(ServerInfo::value(ServerInfo::DailyRevision).toString(),ServerInfo::value(ServerInfo::DailyDate).toString()));
     }
 }
 

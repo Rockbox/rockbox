@@ -19,6 +19,7 @@
 
 #include "talkgenerator.h"
 #include "rbsettings.h"
+#include "systeminfo.h"
 #include "wavtrim.h"
 
 TalkGenerator::TalkGenerator(QObject* parent): QObject(parent)
@@ -48,7 +49,7 @@ TalkGenerator::Status TalkGenerator::process(QList<TalkEntry>* list,int wavtrimt
 
     // Encoder
     emit logItem(tr("Starting Encoder Engine"),LOGINFO);
-    m_enc = EncBase::getEncoder(this,RbSettings::value(RbSettings::CurEncoder).toString());
+    m_enc = EncBase::getEncoder(this,SystemInfo::value(SystemInfo::CurEncoder).toString());
     if(!m_enc->start())
     {
         emit logItem(tr("Init of Encoder engine failed"),LOGERROR);

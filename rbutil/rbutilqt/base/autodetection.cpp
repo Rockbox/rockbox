@@ -20,6 +20,7 @@
 #include <QtCore>
 #include "autodetection.h"
 #include "rbsettings.h"
+#include "systeminfo.h"
 
 #include "../ipodpatcher/ipodpatcher.h"
 #include "../sansapatcher/sansapatcher.h"
@@ -384,9 +385,9 @@ bool Autodetection::detectUsb()
     // usbids holds the mapping in the form
     // ((VID<<16)|(PID)), targetname
     // the ini file needs to hold the IDs as hex values.
-    QMap<int, QString> usbids = RbSettings::usbIdMap(RbSettings::MapDevice);
-    QMap<int, QString> usberror = RbSettings::usbIdMap(RbSettings::MapError);
-    QMap<int, QString> usbincompat = RbSettings::usbIdMap(RbSettings::MapIncompatible);
+    QMap<int, QString> usbids = SystemInfo::usbIdMap(SystemInfo::MapDevice);
+    QMap<int, QString> usberror = SystemInfo::usbIdMap(SystemInfo::MapError);
+    QMap<int, QString> usbincompat = SystemInfo::usbIdMap(SystemInfo::MapIncompatible);
 
     // usb pid detection
     QList<uint32_t> attached;
@@ -405,7 +406,7 @@ bool Autodetection::detectUsb()
             return true;
         }
         QString idstring = QString("%1").arg(attached.at(i), 8, 16, QChar('0'));
-        if(!RbSettings::platformValue(idstring, RbSettings::CurName).toString().isEmpty()) {
+        if(!SystemInfo::platformValue(idstring, SystemInfo::CurName).toString().isEmpty()) {
             m_incompat = idstring;
             qDebug() << "[USB] detected incompatible player" << m_incompat;
             return true;

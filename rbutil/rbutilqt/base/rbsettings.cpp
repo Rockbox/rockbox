@@ -18,45 +18,12 @@
  ****************************************************************************/
 
 #include "rbsettings.h"
-
+#include "systeminfo.h"
 #include <QSettings>
 
 #if defined(Q_OS_LINUX)
 #include <unistd.h>
 #endif
-
-
-// device settings
-const static struct {
-    RbSettings::SystemSettings setting;
-    const char* name;
-    const char* def;
-} SystemSettingsList[] = {
-    { RbSettings::ManualUrl,            "manual_url",           "" },
-    { RbSettings::BleedingUrl,          "bleeding_url",         "" },
-    { RbSettings::BootloaderUrl,        "bootloader_url",       "" },
-    { RbSettings::BootloaderInfoUrl,    "bootloader_info_url",  "" },
-    { RbSettings::FontUrl,              "font_url",             "" },
-    { RbSettings::VoiceUrl,             "voice_url",            "" },
-    { RbSettings::DoomUrl,              "doom_url",             "" },
-    { RbSettings::ReleaseUrl,           "release_url",          "" },
-    { RbSettings::DailyUrl,             "daily_url",            "" },
-    { RbSettings::ServerConfUrl,        "server_conf_url",      "" },
-    { RbSettings::GenlangUrl,           "genlang_url",          "" },
-    { RbSettings::ThemesUrl,            "themes_url",           "" },
-    { RbSettings::RbutilUrl,            "rbutil_url",           "" },
-    { RbSettings::BleedingInfo,         "bleeding_info",        "" },
-    { RbSettings::CurPlatformName,      ":platform:/name",      "" },
-    { RbSettings::CurManual,            ":platform:/manualname","rockbox-:platform:" },
-    { RbSettings::CurBootloaderMethod,  ":platform:/bootloadermethod", "none" },
-    { RbSettings::CurBootloaderName,    ":platform:/bootloadername", "" },
-    { RbSettings::CurBootloaderFile,    ":platform:/bootloaderfile", "" },
-    { RbSettings::CurEncoder,           ":platform:/encoder",   "" },
-    { RbSettings::CurBrand,             ":platform:/brand",     "" },
-    { RbSettings::CurName,              ":platform:/name",      "" },
-    { RbSettings::CurBuildserverModel,  ":platform:/buildserver_modelname", "" },
-    { RbSettings::CurConfigureModel,    ":platform:/configure_modelname", "" },
-};
 
 // user settings
 const static struct {
@@ -94,35 +61,11 @@ const static struct {
     { RbSettings::EncoderVolume,        ":encoder:/volume",     "1.0" },
 };
 
-// server settings
-const static struct {
-    RbSettings::ServerSettings setting;
-    const char* name;
-    const char* def;
-} ServerSettingsList[] = {
-    { RbSettings::CurReleaseVersion,    ":platform:/releaseversion", "" },
-    { RbSettings::CurStatus,            ":platform:/status", "" },
-    { RbSettings::DailyRevision,        "dailyrev",             "" },
-    { RbSettings::DailyDate,            "dailydate",            "" },
-    { RbSettings::BleedingRevision,     "bleedingrev",          "" },
-    { RbSettings::BleedingDate,         "bleedingdate",         "" },
-};  
-
 //! pointer to setting object to NULL
-QSettings* RbSettings::systemSettings = NULL;
 QSettings* RbSettings::userSettings = NULL;
-//! global volatile settings
-QMap<QString, QVariant> RbSettings::serverSettings;
 
 void RbSettings::ensureRbSettingsExists()
 {
-    //check and create settings object
-    if(systemSettings == NULL)
-    {
-        // only use built-in rbutil.ini
-        systemSettings = new QSettings(":/ini/rbutil.ini", QSettings::IniFormat, 0);
-    }
-    
     if(userSettings == NULL)
     {
         // portable installation:
@@ -180,22 +123,6 @@ QString RbSettings::userSettingFilename()
     return userSettings->fileName();
 }
 
-QVariant RbSettings::value(enum SystemSettings setting)
-{
-    ensureRbSettingsExists();
-
-    // locate setting item
-    int i = 0;
-    while(SystemSettingsList[i].setting != setting)
-        i++;
-
-    QString s = constructSettingPath(SystemSettingsList[i].name);
-    QString d = SystemSettingsList[i].def;
-    d.replace(":platform:", userSettings->value("platform").toString());
-    qDebug() << "[Settings] GET S:" << s << systemSettings->value(s, d).toString();
-    return systemSettings->value(s, d);
-}
-
 QVariant RbSettings::value(enum UserSettings setting)
 {
     QString empty;
@@ -214,24 +141,6 @@ QVariant RbSettings::subValue(QString sub, enum UserSettings setting)
     QString s = constructSettingPath(UserSettingsList[i].name, sub);
     qDebug() << "[Settings] GET U:" << s << userSettings->value(s).toString();
     return userSettings->value(s, UserSettingsList[i].def);
-}
-
-QVariant RbSettings::value(enum ServerSettings setting)
-{
-    ensureRbSettingsExists();
-
-    // locate setting item
-    int i = 0;
-    while(ServerSettingsList[i].setting != setting)
-        i++;
-
-    QString s = constructSettingPath(ServerSettingsList[i].name);
-    qDebug() << "[Settings] GET SERV:" << s
-             << serverSettings.value(s, ServerSettingsList[i].def).toString();
-    if(serverSettings.contains(s))
-        return serverSettings.value(s);
-    else
-        return ServerSettingsList[i].def;
 }
 
 void RbSettings::setValue(enum UserSettings setting , QVariant value)
@@ -254,133 +163,6 @@ void RbSettings::setSubValue(QString sub, enum UserSettings setting, QVariant va
     qDebug() << "[Settings] SET U:" << s << userSettings->value(s).toString();
 }
 
-void RbSettings::setValue(enum ServerSettings setting, QVariant value)
-{
-    QString empty;
-    return setPlatformValue(empty, setting, value);
-}
-
-void RbSettings::setPlatformValue(QString platform, enum ServerSettings setting, QVariant value)
-{
-    ensureRbSettingsExists();
-
-    // locate setting item
-    int i = 0;
-    while(ServerSettingsList[i].setting != setting)
-        i++;
-
-    QString s = ServerSettingsList[i].name;
-    s.replace(":platform:", platform);
-    serverSettings.insert(s, value);
-    qDebug() << "[Settings] SET SERV:" << s << serverSettings.value(s).toString();
-}
-
-
-QVariant RbSettings::platformValue(QString platform, enum SystemSettings setting)
-{
-    ensureRbSettingsExists();
-
-    // locate setting item
-    int i = 0;
-    while(SystemSettingsList[i].setting != setting)
-        i++;
-
-    QString s = SystemSettingsList[i].name;
-    s.replace(":platform:", platform);
-    QString d = SystemSettingsList[i].def;
-    d.replace(":platform:", platform);
-    qDebug() << "[Settings] GET P:" << s << systemSettings->value(s, d).toString();
-    return systemSettings->value(s, d);
-}
-
-
-QStringList RbSettings::platforms()
-{
-    ensureRbSettingsExists();
-
-    QStringList result;
-    systemSettings->beginGroup("platforms");
-    QStringList a = systemSettings->childKeys();
-    systemSettings->endGroup();
-    for(int i = 0; i < a.size(); i++)
-    {
-        //only add not disabled targets
-        QString target = systemSettings->value("platforms/"+a.at(i), "null").toString();
-        if(systemSettings->value(target+"/status").toString() != "disabled")
-            result.append(target);
-    }
-    return result;
-}
-
-QStringList RbSettings::languages()
-{
-    ensureRbSettingsExists();
-
-    QStringList result;
-    systemSettings->beginGroup("languages");
-    QStringList a = systemSettings->childKeys();
-    for(int i = 0; i < a.size(); i++)
-    {
-        result.append(systemSettings->value(a.at(i), "null").toString());
-    }
-    systemSettings->endGroup();
-    return result;
-}
-
-
-QString RbSettings::name(QString platform)
-{
-    ensureRbSettingsExists();
-    return systemSettings->value(platform + "/name").toString();
-}
-
-QString RbSettings::brand(QString platform)
-{
-    ensureRbSettingsExists();
-    return systemSettings->value(platform + "/brand").toString();
-}
-
-QMap<int, QString> RbSettings::usbIdMap(enum MapType type)
-{
-    ensureRbSettingsExists();
-
-    QMap<int, QString> map;
-    // get a list of ID -> target name
-    QStringList platforms;
-    systemSettings->beginGroup("platforms");
-    platforms = systemSettings->childKeys();
-    systemSettings->endGroup();
-
-    QString t;
-    switch(type) {
-        case MapDevice:
-            t = "usbid";
-            break;
-        case MapError:
-            t = "usberror";
-            break;
-        case MapIncompatible:
-            t = "usbincompat";
-            break;
-    }
-
-    for(int i = 0; i < platforms.size(); i++)
-    {
-        systemSettings->beginGroup("platforms");
-        QString target = systemSettings->value(platforms.at(i)).toString();
-        systemSettings->endGroup();
-        systemSettings->beginGroup(target);
-        QStringList ids = systemSettings->value(t).toStringList();
-        int j = ids.size();
-        while(j--)
-            map.insert(ids.at(j).toInt(0, 16), target);
-
-        systemSettings->endGroup();
-    }
-    return map;
-}
-
-
 QString RbSettings::constructSettingPath(QString path, QString substitute)
 {
     QString platform = userSettings->value("platform").toString();
@@ -390,7 +172,7 @@ QString RbSettings::constructSettingPath(QString path, QString substitute)
     }
     else {
         path.replace(":tts:", userSettings->value("tts").toString());
-        path.replace(":encoder:", systemSettings->value(platform + "/encoder").toString());
+        path.replace(":encoder:", SystemInfo::platformValue(platform,SystemInfo::CurEncoder).toString());
     }
     path.replace(":platform:", platform);
 

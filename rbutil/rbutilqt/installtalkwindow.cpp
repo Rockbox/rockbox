@@ -23,6 +23,7 @@
 #include "browsedirtree.h"
 #include "configure.h"
 #include "rbsettings.h"
+#include "systeminfo.h"
 
 InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
 {
@@ -130,7 +131,7 @@ void InstallTalkWindow::updateSettings(void)
         ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
             .arg("Invalid TTS configuration!"));
     
-    QString encoder = RbSettings::value(RbSettings::CurEncoder).toString();
+    QString encoder = SystemInfo::value(SystemInfo::CurEncoder).toString();
     EncBase* enc = EncBase::getEncoder(this,encoder);
     if(enc != NULL) {
         if(enc->configOk())

@@ -25,6 +25,7 @@
 #include "progressloggergui.h"
 #include "utils.h"
 #include "rbsettings.h"
+#include "systeminfo.h"
 
 ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
 {
@@ -63,9 +64,9 @@ void ThemesInstallWindow::downloadInfo()
     themesInfo.close();
 
     QUrl url;
-    url = QUrl(RbSettings::value(RbSettings::ThemesUrl).toString()
+    url = QUrl(SystemInfo::value(SystemInfo::ThemesUrl).toString()
                 + "/rbutilqt.php?target="
-                + RbSettings::value(RbSettings::CurConfigureModel).toString());
+                + SystemInfo::value(SystemInfo::CurConfigureModel).toString());
     qDebug() << "[Themes] Info URL:" << url << "Query:" << url.queryItems();
     if(RbSettings::value(RbSettings::CacheOffline).toBool())
         getter->setCache(true);
@@ -195,9 +196,9 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
     iniDetails.beginGroup(cur->data(Qt::UserRole).toString());
 
     QUrl img, txt;
-    txt = QUrl(QString(RbSettings::value(RbSettings::ThemesUrl).toString() + "/"
+    txt = QUrl(QString(SystemInfo::value(SystemInfo::ThemesUrl).toString() + "/"
         + iniDetails.value("descriptionfile").toString()));
-    img = QUrl(QString(RbSettings::value(RbSettings::ThemesUrl).toString() + "/"
+    img = QUrl(QString(SystemInfo::value(SystemInfo::ThemesUrl).toString() + "/"
         + iniDetails.value("image").toString()));
 
     QString text;
@@ -311,7 +312,7 @@ void ThemesInstallWindow::accept()
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
     for(int i = 0; i < ui.listThemes->selectedItems().size(); i++) {
         iniDetails.beginGroup(ui.listThemes->selectedItems().at(i)->data(Qt::UserRole).toString());
-        zip = RbSettings::value(RbSettings::ThemesUrl).toString()
+        zip = SystemInfo::value(SystemInfo::ThemesUrl).toString()
                 + "/" + iniDetails.value("archive").toString();
         themes.append(zip);
         names.append("Theme: " +

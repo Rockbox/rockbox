@@ -20,6 +20,7 @@
 #include "utils.h"
 #include "system.h"
 #include "rbsettings.h"
+#include "systeminfo.h"
 
 #ifdef UNICODE
 #define _UNICODE
@@ -187,11 +188,11 @@ QString check(bool permission)
     // Check TargetId
     RockboxInfo rbinfo(RbSettings::value(RbSettings::Mountpoint).toString());
     QString installed = rbinfo.target();
-    if(!installed.isEmpty() && installed != RbSettings::value(RbSettings::CurConfigureModel).toString())
+    if(!installed.isEmpty() && installed != SystemInfo::value(SystemInfo::CurConfigureModel).toString())
     {
         text += QObject::tr("<li>Target mismatch detected.\n"
                 "Installed target: %1, selected target: %2.</li>")
-            .arg(installed, RbSettings::value(RbSettings::CurPlatformName).toString());
+            .arg(installed, SystemInfo::value(SystemInfo::CurPlatformName).toString());
             // FIXME: replace installed by human-friendly name
     }
 
