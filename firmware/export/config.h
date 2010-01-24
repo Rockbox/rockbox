@@ -355,7 +355,7 @@ Lyre prototype 1 */
 #elif defined(COWON_D2)
 #include "config/cowond2.h"
 #elif defined(CREATIVE_ZVM)
-#include "config/zenvisionm.h"
+#include "config/zenvisionm30gb.h"
 #elif defined(CREATIVE_ZVM60GB)
 #include "config/zenvisionm60gb.h"
 #elif defined(CREATIVE_ZV)
