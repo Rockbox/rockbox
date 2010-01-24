@@ -45,6 +45,7 @@ CODECFLAGS = $(filter-out -fno-strict-aliasing,$(CFLAGS)) -fstrict-aliasing \
 	-I$(APPSDIR)/codecs -I$(APPSDIR)/codecs/lib -DCODEC
 
 ifndef SIMVER
+  CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
   CODEC_LDS := $(APPSDIR)/plugins/plugin.lds # codecs and plugins use same file
   CODECLINK_LDS := $(CODECDIR)/codec.link
 endif
@@ -59,7 +60,7 @@ CODECLIBS := $(DEMACLIB) $(A52LIB) $(ALACLIB) $(ASAPLIB) \
 
 $(CODECS): $(CODEC_CRT0) $(CODECLINK_LDS) 
 
-$(CODECLINK_LDS): $(CODEC_LDS)
+$(CODECLINK_LDS): $(CODEC_LDS) $(CONFIGFILE)
 	$(call PRINTS,PP $(@F))
 	$(shell mkdir -p $(dir $@))
 	$(call preprocess2file, $<, $@, -DCODEC)
