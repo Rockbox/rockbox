@@ -107,7 +107,7 @@
 #define CODEC_SIZE 0x48000
 
 /* The number of bytes reserved for loadable plugins */
-#define PLUGIN_BUFFER_SIZE 0x80000
+#define PLUGIN_BUFFER_SIZE 0x60000
 
 #define AB_REPEAT_ENABLE 1
 
