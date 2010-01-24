@@ -226,6 +226,7 @@ TRANSLATIONS += lang/rbutil_cs.ts \
  lang/rbutil_fr.ts \
  lang/rbutil_gr.ts \
  lang/rbutil_he.ts \
+ lang/rbutil_it.ts \
  lang/rbutil_ja.ts \
  lang/rbutil_nl.ts \
  lang/rbutil_pl.ts \
