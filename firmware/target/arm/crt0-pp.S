@@ -348,7 +348,7 @@ vectors:
    in UIE.
  */
 undef_instr_handler:
-    mov    r0, lr
+    sub    r0, lr, #4
     mov    r1, #0
     b      UIE
 
