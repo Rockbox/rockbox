@@ -612,8 +612,12 @@ static void gwps_enter_wps(void)
         }
 #endif
         display->backdrop_show(BACKDROP_SKIN_WPS);
+        /* make the backdrop actually take effect */
+        display->clear_display();
         skin_update(gwps, WPS_REFRESH_ALL);
     }
+    /* force statusbar/skin update since we just cleared the whole screen */
+    send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
 }
 
 #ifdef HAVE_TOUCHSCREEN
