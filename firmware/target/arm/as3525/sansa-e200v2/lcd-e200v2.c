@@ -481,6 +481,10 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
 
+    /* we need to make x and width even to enable 32bit transfers */
+    width = (width + (x & 1) + 1) & ~1;
+    x &= ~1;
+
     lcd_window(x, y, x+width-1, y+height-1);
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
