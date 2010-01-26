@@ -89,6 +89,8 @@ static void toggle_theme(enum screen_type screen, bool force)
         add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false,
                                                 do_sbs_update_callback);
         
+        screens[screen].backdrop_show(BACKDROP_MAIN);
+        
         /* remove the left overs from the previous screen.
          * could cause a tiny flicker. Redo your screen code if that happens */
         if (!was_enabled[screen] || force)
@@ -142,7 +144,11 @@ static void toggle_theme(enum screen_type screen, bool force)
     else
     {
         FOR_NB_SCREENS(i)
+        {
+            screens[i].backdrop_hide();
             screens[i].stop_scroll();
+        }
+            
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
         remove_event(LCD_EVENT_ACTIVATION, do_sbs_update_callback);
 #endif

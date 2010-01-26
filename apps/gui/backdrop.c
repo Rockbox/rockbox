@@ -124,6 +124,12 @@ void backdrop_show(enum backdrop_type bdrop)
         show_skin_backdrop();
 }
 
+void backdrop_hide(void)
+{
+    lcd_set_backdrop(NULL);
+}
+
+    
 
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
 
@@ -201,4 +207,11 @@ void remote_backdrop_unload(enum backdrop_type bdrop)
 }
 
 
+void remote_backdrop_hide(void)
+{
+        lcd_remote_set_backdrop(NULL);
+}
+
 #endif
+
+    

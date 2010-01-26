@@ -335,7 +335,7 @@ void do_setting_from_menu(const struct menu_item_ex *temp,
 
 /* display a menu */
 int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
-            struct viewport parent[NB_SCREENS], bool hide_bars)
+            struct viewport parent[NB_SCREENS], bool hide_theme)
 {
     int selected = start_selected? *start_selected : 0;
     int action;
@@ -344,7 +344,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     int ret = 0, i;
     bool redraw_lists;
     FOR_NB_SCREENS(i)
-        viewportmanager_theme_enable(i, !hide_bars, NULL);
+        viewportmanager_theme_enable(i, !hide_theme, NULL);
     
     const struct menu_item_ex *menu_stack[MAX_MENUS];
     int menu_stack_selected_item[MAX_MENUS];
@@ -363,7 +363,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         menu = &main_menu_;
     else menu = start_menu;
 
-    /* if hide_bars is true, assume parent has been fixed before passed into
+    /* if hide_theme is true, assume parent has been fixed before passed into
      * this function, e.g. with viewport_set_defaults(parent, screen) */
     init_menu_lists(menu, &lists, selected, true, parent);
     vps = *(lists.parent);
@@ -373,7 +373,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     
 
 #ifdef HAVE_BUTTONBAR
-    if (!hide_bars)
+    if (!hide_theme)
     {
         gui_buttonbar_set(&buttonbar, "<<<", "", "");
         gui_buttonbar_draw(&buttonbar);
@@ -382,7 +382,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     while (!done)
     {
         redraw_lists = false;
-        if (!hide_bars)
+        if (!hide_theme)
         {
 #ifdef HAVE_BUTTONBAR
             gui_buttonbar_draw(&buttonbar);
@@ -551,7 +551,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 screens[i].scroll_stop(&vps[i]);
             }
 #ifdef HAVE_BUTTONBAR
-            if (!hide_bars)
+            if (!hide_theme)
             {
                 gui_buttonbar_unset(&buttonbar);
                 gui_buttonbar_draw(&buttonbar);
@@ -653,7 +653,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 break;
             }
 #ifdef HAVE_BUTTONBAR
-            if (!hide_bars)
+            if (!hide_theme)
             {
                 gui_buttonbar_set(&buttonbar, "<<<", "", "");
                 gui_buttonbar_draw(&buttonbar);

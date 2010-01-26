@@ -2019,6 +2019,7 @@ void update_scroll_animation(void)
 void cleanup(void *parameter)
 {
     (void) parameter;
+    int i;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
@@ -2029,6 +2030,8 @@ void cleanup(void *parameter)
 #ifdef USEGSLIB
     grey_release();
 #endif
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_undo(i, false);
 }
 
 /**
@@ -2076,7 +2079,7 @@ int settings_menu(void)
     };
 
     do {
-        selection=rb->do_menu(&settings_menu,&selection, NULL, false);
+        selection=rb->do_menu(&settings_menu,&selection, NULL, true);
         switch(selection) {
             case 0:
                 rb->set_bool("Show FPS", &show_fps);
@@ -2168,7 +2171,7 @@ int main_menu(void)
 #endif
                                             "Settings", "Return", "Quit");
     while (1)  {
-        switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
+        switch (rb->do_menu(&main_menu,&selection, NULL, true)) {
             case PF_GOTO_WPS: /* WPS */
                 return -2;
 #if PF_PLAYBACK_CAPABLE
@@ -2732,11 +2735,11 @@ int main(void)
 
 enum plugin_status plugin_start(const void *parameter)
 {
-    int ret;
+    int ret, i;
     (void) parameter;
-#if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-#endif
+
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_enable(i, false, NULL);
     /* Turn off backlight timeout */
     backlight_force_on();     /* backlight control in lib/helper.c */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

@@ -202,6 +202,7 @@ struct screen screens[NB_SCREENS] =
         .backdrop_load=&backdrop_load,
         .backdrop_unload=&backdrop_unload,
         .backdrop_show=&backdrop_show,
+        .backdrop_hide=&backdrop_hide,
 #ifdef HAVE_BUTTONBAR
         .has_buttonbar=false,
 #endif
@@ -288,6 +289,7 @@ struct screen screens[NB_SCREENS] =
         .backdrop_load=&remote_backdrop_load,
         .backdrop_unload=&remote_backdrop_unload,
         .backdrop_show=&remote_backdrop_show,
+        .backdrop_hide=&remote_backdrop_hide,
 #ifdef HAVE_BUTTONBAR
         .has_buttonbar=false,
 #endif

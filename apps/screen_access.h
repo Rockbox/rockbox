@@ -150,6 +150,7 @@ struct screen
     bool (*backdrop_load)(enum backdrop_type bdrop, const char* filename);
     void (*backdrop_unload)(enum backdrop_type bdrop);
     void (*backdrop_show)(enum backdrop_type bdrop);
+    void (*backdrop_hide)(void);
 };
 
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD)

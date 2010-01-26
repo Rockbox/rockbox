@@ -121,7 +121,7 @@ void do_setting_from_menu(const struct menu_item_ex *temp,
                      If NULL it is ignored and the firs item starts selected
 */
 int do_menu(const struct menu_item_ex *menu, int *start_selected,
-            struct viewport parent[NB_SCREENS], bool hide_bars);
+            struct viewport parent[NB_SCREENS], bool hide_theme);
 
 /* In all the following macros the argument names are as follows:
     - name: The name for the variable (so it can be used in a MAKE_MENU()

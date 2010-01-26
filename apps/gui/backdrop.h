@@ -35,6 +35,7 @@ enum backdrop_type {
 bool backdrop_load(enum backdrop_type bdrop, const char*);
 void backdrop_unload(enum backdrop_type bdrop);
 void backdrop_show(enum backdrop_type bdrop);
+void backdrop_hide(void);
 
 #else /* LCD_DEPTH <= 1 || __PCTOOL__ */
 
@@ -52,6 +53,7 @@ static inline void backdrop_show(enum backdrop_type bdrop)
     (void)bdrop;
 }
 
+static inline void backdrop_hide(void) {}
 #endif
 
 #if defined(HAVE_REMOTE_LCD)
@@ -60,6 +62,7 @@ static inline void backdrop_show(enum backdrop_type bdrop)
 bool remote_backdrop_load(enum backdrop_type bdrop,const char* filename);
 void remote_backdrop_unload(enum backdrop_type bdrop);
 void remote_backdrop_show(enum backdrop_type bdrop);
+void remote_backdrop_hide(void);
 #else
 static inline
 bool remote_backdrop_load(enum backdrop_type bdrop,const char* filename)
@@ -76,6 +79,7 @@ static inline void remote_backdrop_show(enum backdrop_type bdrop)
 {
     (void)bdrop;
 }
+static inline void remote_backdrop_hide(void) {}
 #endif
 #endif
 

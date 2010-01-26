@@ -611,6 +611,7 @@ static void gwps_enter_wps(void)
             vp->bg_pattern = display->get_background();
         }
 #endif
+        display->backdrop_show(BACKDROP_SKIN_WPS);
         skin_update(gwps, WPS_REFRESH_ALL);
     }
 }
@@ -1180,8 +1181,6 @@ long gui_wps_show(void)
         /* we remove the update delay since it's not very usable in the wps,
          * e.g. during volume changing or ffwd/rewind */
             sb_skin_set_update_delay(0);
-            FOR_NB_SCREENS(i)
-                gui_wps[i].display->backdrop_show(BACKDROP_SKIN_WPS);
             wps_sync_data.do_full_update = update = false;
             gwps_enter_wps();
         }

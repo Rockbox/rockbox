@@ -659,7 +659,7 @@ struct plugin_api {
 
     /* menu */
     int (*do_menu)(const struct menu_item_ex *menu, int *start_selected,
-                   struct viewport parent[NB_SCREENS], bool hide_bars);
+                   struct viewport parent[NB_SCREENS], bool hide_theme);
 
     /* scroll bar */
     struct gui_syncstatusbar *statusbars;
