@@ -13134,36 +13134,30 @@
 </phrase>
 <phrase>
   id: LANG_CUSTOM_STATUSBAR
-  desc: browse for custom statusbar in theme settings
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *:none
-    lcd_bitmap: "Custom Statusbar"
+    *: none
   </source>
   <dest>
-    *:none
-    lcd_bitmap: "Custom Statusbar"
+    *: none
   </dest>
   <voice>
-    *:none
-    lcd_bitmap: "Custom Statusbar"
+    *: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_REMOTE_CUSTOM_STATUSBAR
-  desc: browse for remote custom statusbar in theme settings
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *:none
-    remote: "Remote Custom Statusbar"
+    *: none
   </source>
   <dest>
-    *:none
-    remote: "Remote Custom Statusbar"
+    *: none
   </dest>
   <voice>
-    *:none
-    remote: "Remote Custom Statusbar"
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -13285,5 +13279,39 @@
   </dest>
   <voice>
     *: "of"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
   </voice>
 </phrase>

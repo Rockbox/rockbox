@@ -247,7 +247,7 @@ MENUITEM_FUNCTION(browse_fonts, MENU_FUNC_USEPARAM,
         browse_folder, (void*)&fonts, NULL, Icon_Font);
 
 MENUITEM_FUNCTION(browse_sbs, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_CUSTOM_STATUSBAR), 
+        ID2P(LANG_BASE_SKIN), 
         browse_folder, (void*)&sbs, NULL, Icon_Wps);
 #endif
 MENUITEM_FUNCTION(browse_wps, MENU_FUNC_USEPARAM, 
@@ -258,7 +258,7 @@ MENUITEM_FUNCTION(browse_rwps, MENU_FUNC_USEPARAM,
         ID2P(LANG_REMOTE_WHILE_PLAYING), 
         browse_folder, (void*)&rwps, NULL, Icon_Wps);
 MENUITEM_FUNCTION(browse_rsbs, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_REMOTE_CUSTOM_STATUSBAR), 
+        ID2P(LANG_REMOTE_BASE_SKIN), 
         browse_folder, (void*)&rsbs, NULL, Icon_Wps);
 #endif
 

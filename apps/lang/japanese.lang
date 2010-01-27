@@ -12741,36 +12741,30 @@
 </phrase>
 <phrase>
   id: LANG_CUSTOM_STATUSBAR
-  desc: browse for custom statusbar in theme settings
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *:none
-    lcd_bitmap: "Custom Statusbar"
+    *: none
   </source>
   <dest>
-    *:none
-    lcd_bitmap: "カスタム ステータスバー"
+    *: none
   </dest>
   <voice>
-    *:none
-    lcd_bitmap: "カスタム ステータスバー"
+    *: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_REMOTE_CUSTOM_STATUSBAR
-  desc: browse for remote custom statusbar in theme settings
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *:none
-    remote: "Remote Custom Statusbar"
+    *: none
   </source>
   <dest>
-    *:none
-    remote: "リモコンのカスタム ステータスバー"
+    *: none
   </dest>
   <voice>
-    *:none
-    remote: "リモコンのカスタム ステータスバー"
+    *: none
   </voice>
 </phrase>
 <phrase>
