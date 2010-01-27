@@ -183,6 +183,11 @@ int remote_getwidth(void) { return LCD_REMOTE_WIDTH; }
 int remote_getheight(void) { return LCD_REMOTE_HEIGHT; }
 #endif
 
+static inline bool backdrop_load(enum backdrop_type bdrop, const char* filename) 	 
+{ 	 
+ (void)filename; (void)bdrop; return true; 	 
+}
+
 struct screen screens[NB_SCREENS] =
 {
     {
@@ -200,8 +205,8 @@ struct screen screens[NB_SCREENS] =
 #if LCD_DEPTH > 1
         .get_foreground=dummy_func2,
         .get_background=dummy_func2,
-#endif
         .backdrop_load=backdrop_load,
+#endif
     },
 #ifdef HAVE_REMOTE_LCD
     {
@@ -215,8 +220,8 @@ struct screen screens[NB_SCREENS] =
 #if LCD_REMOTE_DEPTH > 1
         .get_foreground=dummy_func2,
         .get_background=dummy_func2,
-#endif
         .backdrop_load=backdrop_load,
+#endif
     }
 #endif
 };
