@@ -17,7 +17,7 @@ visit\\
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
         ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_C200_PAD}
       {\ButtonLeft{} / \ButtonRight{} / \ButtonUp{} / \ButtonDown}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD}
       {\ButtonLeft{} / \ButtonRight{} / \ButtonScrollFwd{} / \ButtonScrollBack}
     \opt{IRIVER_H10_PAD}
       {\ButtonLeft{} / \ButtonRight{} / \ButtonScrollUp{} / \ButtonScrollDown}
@@ -27,7 +27,7 @@ visit\\
     \opt{RECORDER_PAD,IRIVER_H10_PAD,GIGABEAT_S_PAD}{\ButtonPlay}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD%
-        ,SANSA_E200_PAD,SANSA_C200_PAD,MROBE100_PAD}{\ButtonSelect}
+        ,SANSA_E200_PAD,SANSA_C200_PAD,MROBE100_PAD,SANSA_FUZE_PAD}{\ButtonSelect}
     \opt{ONDIO_PAD}{\ButtonMenu}
     \opt{COWON_D2_PAD}{\TouchTopRight}
        \opt{HAVEREMOTEKEYMAP}{& }
@@ -35,7 +35,7 @@ visit\\
     \opt{RECORDER_PAD}{\ButtonFOne}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonRec}
     \opt{IRIVER_H10_PAD}{\ButtonFF}
-    \opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRight}
+    \opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD}{\ButtonRight}
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolDown}
     \opt{MROBE100_PAD}{\ButtonDisplay}
     \opt{COWON_D2_PAD}{\TouchBottomLeft}
@@ -48,26 +48,17 @@ visit\\
     \opt{GIGABEAT_PAD}{\ButtonA}
     \opt{ONDIO_PAD}{\ButtonUp}
     \opt{MROBE100_PAD}{\ButtonDown}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonLeft}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD}{\ButtonLeft}
     \opt{COWON_D2_PAD}{\ButtonMinus}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Double down\\
-    \opt{RECORDER_PAD}{\ButtonFThree}
-    \opt{ONDIO_PAD,IAUDIO_X5_PAD,SANSA_C200_PAD,SANSA_E200_PAD}{\ButtonDown}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-    \opt{IRIVER_H10_PAD}{\ButtonRight}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonPlay}
-    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonMenu}
-    \opt{MROBE100_PAD}{\ButtonPlay}
-    \opt{COWON_D2_PAD}{\TouchCenter}
-       \opt{HAVEREMOTEKEYMAP}{& }
-        & Return to menu without end the game\\
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
         ,GIGABEAT_PAD,MROBE100_PAD,COWON_D2_PAD}{\ButtonPower}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
+    \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
        \opt{HAVEREMOTEKEYMAP}{& }
-        & End game and return to menu / Cancel\\
+        & Pause game and go to menu / Cancel\\
     \end{btnmap}
 \end{table}
