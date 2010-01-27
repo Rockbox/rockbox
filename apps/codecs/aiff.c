@@ -218,7 +218,8 @@ next_track:
     codec = get_codec(format.formattag);
     if (codec == 0)
     {
-        DEBUGF("CODEC_ERROR: AIFC does not support compressionType: 0x%x\n", format.formattag);
+        DEBUGF("CODEC_ERROR: AIFC does not support compressionType: 0x%x\n", 
+            (unsigned int)format.formattag);
         i = CODEC_ERROR;
         goto done;
     }

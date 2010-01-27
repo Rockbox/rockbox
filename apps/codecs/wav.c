@@ -174,8 +174,8 @@ next_track:
                     /* this is not a fatal error with some formats,
                      * we'll see later if we can't decode it */
                     DEBUGF("CODEC_WARNING: non-PCM WAVE (formattag=0x%x) "
-                           "doesn't have ext. fmt descr (chunksize=%ld<18).\n",
-                           format.formattag, (long)i);
+                           "doesn't have ext. fmt descr (chunksize=%d<18).\n",
+                           (unsigned int)format.formattag, i);
                 }
                 else
                 {
@@ -202,7 +202,8 @@ next_track:
             codec = get_wave_codec(format.formattag);
             if (!codec)
             {
-                DEBUGF("CODEC_ERROR: unsupport wave format %x\n", format.formattag);
+                DEBUGF("CODEC_ERROR: unsupported wave format %x\n", 
+                    (unsigned int) format.formattag);
                 status = CODEC_ERROR;
                 goto done;
             }
