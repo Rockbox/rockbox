@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (c) 2005 Jvo Studer
+ * Copyright (c) 2009 Yoshihisa Uchida
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,48 +22,62 @@
 
 #include "codeclib.h"
 #include <inttypes.h>
+#include "codecs/libpcm/support_formats.h"
 
 CODEC_HEADER
 
-/* Macro that sign extends an unsigned byte */
-#define SE(x) ((int32_t)((int8_t)(x)))
+#define FOURCC(c1, c2, c3, c4) \
+((((uint32_t)c1)<<24)|(((uint32_t)c2)<<16)|(((uint32_t)c3)<<8)|((uint32_t)c4))
 
-/* This codec supports AIFF files with the following formats:
- * - PCM, 8, 16 and 24 bits, mono or stereo
- */
-
-enum
-{
-    AIFF_FORMAT_PCM = 0x0001,   /* AIFF PCM Format (big endian) */
-    IEEE_FORMAT_FLOAT = 0x0003, /* IEEE Float */
-    AIFF_FORMAT_ALAW = 0x0004,  /* AIFC ALaw compressed */
-    AIFF_FORMAT_ULAW = 0x0005   /* AIFC uLaw compressed */
+/* This codec supports the following AIFC compressionType formats */
+enum {
+    AIFC_FORMAT_PCM          = FOURCC('N', 'O', 'N', 'E'), /* AIFC PCM Format (big endian) */
+    AIFC_FORMAT_ALAW         = FOURCC('a', 'l', 'a', 'w'), /* AIFC ALaw compressed */
+    AIFC_FORMAT_MULAW        = FOURCC('u', 'l', 'a', 'w'), /* AIFC uLaw compressed */
 };
 
-/* Maximum number of bytes to process in one iteration */
-/* for 44.1kHz stereo 16bits, this represents 0.023s ~= 1/50s */
-#define AIF_CHUNK_SIZE (1024*2)
+static const struct pcm_entry pcm_codecs[] = {
+    { AIFC_FORMAT_PCM,          get_linear_pcm_codec      },
+    { AIFC_FORMAT_ALAW,         get_itut_g711_alaw_codec  },
+    { AIFC_FORMAT_MULAW,        get_itut_g711_mulaw_codec },
+};
 
-static int32_t samples[AIF_CHUNK_SIZE] IBSS_ATTR;
+#define NUM_FORMATS 3
+
+static int32_t samples[PCM_CHUNK_SIZE] IBSS_ATTR;
+
+static const struct pcm_codec *get_codec(uint32_t formattag)
+{
+    int i;
+
+    for (i = 0; i < NUM_FORMATS; i++)
+    {
+        if (pcm_codecs[i].format_tag == formattag)
+        {
+            if (pcm_codecs[i].get_codec)
+                return pcm_codecs[i].get_codec();
+            return 0;
+        }
+    }
+    return 0;
+}
 
 enum codec_status codec_main(void)
 {
-    uint32_t numbytes, bytesdone;
-    uint16_t num_channels = 0;
+    int status = CODEC_OK;
+    struct pcm_format format;
+    uint32_t bytesdone, decodedbytes;
     uint32_t num_sample_frames = 0;
-    uint16_t sample_size = 0;
-    uint32_t sample_rate = 0;
-    uint32_t i;
+    uint32_t i = CODEC_OK;
     size_t n;
     int bufcount;
     int endofstream;
     unsigned char *buf;
     uint8_t *aifbuf;
-    long chunksize;
     uint32_t offset2snd = 0;
-    uint16_t block_size = 0;
-    uint32_t avgbytespersec = 0;
     off_t firstblockposn;     /* position of the first block in file */
+    bool is_aifc = false;
+    const struct pcm_codec *codec;
 
     /* Generic codec initialisation */
     ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
@@ -84,45 +99,80 @@ next_track:
         i = CODEC_ERROR;
         goto done;
     }
-    if ((memcmp(buf, "FORM", 4) != 0) || (memcmp(&buf[8], "AIFF", 4) != 0)) {
+
+    if (memcmp(buf, "FORM", 4) != 0)
+    {
+        DEBUGF("CODEC_ERROR: does not aiff format %c%c%c%c\n", buf[0], buf[1], buf[2], buf[3]);
+        i = CODEC_ERROR;
+        goto done;
+    }
+    if (memcmp(&buf[8], "AIFF", 4) == 0)
+        is_aifc = false;
+    else if (memcmp(&buf[8], "AIFC", 4) == 0)
+        is_aifc = true;
+    else
+    {
+        DEBUGF("CODEC_ERROR: does not aiff format %c%c%c%c\n", buf[8], buf[9], buf[10], buf[11]);
         i = CODEC_ERROR;
         goto done;
     }
 
     buf += 12;
     n -= 12;
-    numbytes = 0;
+
+    ci->memset(&format, 0, sizeof(struct pcm_format));
+    format.is_signed = true;
+    format.is_little_endian = false;
+
+    decodedbytes = 0;
+    codec = 0;
 
     /* read until 'SSND' chunk, which typically is last */
-    while (numbytes == 0 && n >= 8) {
+    while (format.numbytes == 0 && n >= 8)
+    {
         /* chunkSize */
         i = ((buf[4]<<24)|(buf[5]<<16)|(buf[6]<<8)|buf[7]);
         if (memcmp(buf, "COMM", 4) == 0) {
-            if (i < 18) {
-                DEBUGF("CODEC_ERROR: 'COMM' chunk size=%lu < 18\n",
-                       (unsigned long)i);
+            if ((!is_aifc && i < 18) || (is_aifc && i < 22))
+            {
+                DEBUGF("CODEC_ERROR: 'COMM' chunk size=%lu < %d\n",
+                       (unsigned long)i, (is_aifc)?22:18);
                 i = CODEC_ERROR;
                 goto done;
             }
             /* num_channels */
-            num_channels = ((buf[8]<<8)|buf[9]);
+            format.channels = ((buf[8]<<8)|buf[9]);
             /* num_sample_frames */
             num_sample_frames = ((buf[10]<<24)|(buf[11]<<16)|(buf[12]<<8)
                                 |buf[13]);
             /* sample_size */
-            sample_size  = ((buf[14]<<8)|buf[15]);
+            format.bitspersample = ((buf[14]<<8)|buf[15]);
             /* sample_rate (don't use last 4 bytes, only integer fs) */
             if (buf[16] != 0x40) {
                 DEBUGF("CODEC_ERROR: weird sampling rate (no @)\n");
                 i = CODEC_ERROR;
                 goto done;
             }
-            sample_rate = ((buf[18]<<24)|(buf[19]<<16)|(buf[20]<<8)|buf[21])+1;
-            sample_rate = sample_rate >> (16 + 14 - buf[17]);
+            format.samplespersec = ((buf[18]<<24)|(buf[19]<<16)|(buf[20]<<8)|buf[21])+1;
+            format.samplespersec >>= (16 + 14 - buf[17]);
+            /* compressionType (AIFC only) */
+            if (is_aifc)
+            {
+                format.formattag = (buf[26]<<24)|(buf[27]<<16)|(buf[28]<<8)|buf[29];
+
+                /*
+                 * aiff's sample_size is uncompressed sound data size.
+                 * But format.bitspersample is compressed sound data size.
+                 */
+                if (format.formattag == AIFC_FORMAT_ALAW || format.formattag == AIFC_FORMAT_MULAW)
+                    format.bitspersample = 8;
+            }
+            else
+                format.formattag = AIFC_FORMAT_PCM;
             /* calc average bytes per second */
-            avgbytespersec = sample_rate*num_channels*sample_size/8;
+            format.avgbytespersec = format.samplespersec*format.channels*format.bitspersample/8;
         } else if (memcmp(buf, "SSND", 4)==0) {
-            if (sample_size == 0) {
+            if (format.bitspersample == 0) {
                 DEBUGF("CODEC_ERROR: unsupported chunk order\n");
                 i = CODEC_ERROR;
                 goto done;
@@ -130,11 +180,14 @@ next_track:
             /* offset2snd */
             offset2snd = (buf[8]<<24)|(buf[9]<<16)|(buf[10]<<8)|buf[11];
             /* block_size */
-            block_size = (buf[12]<<24)|(buf[13]<<16)|(buf[14]<<8)|buf[15];
-            if (block_size == 0)
-                block_size = num_channels*sample_size;
-            numbytes = i - 8 - offset2snd;
+            format.blockalign = (buf[12]<<24)|(buf[13]<<16)|(buf[14]<<8)|buf[15];
+            if (format.blockalign == 0)
+                format.blockalign = format.channels*format.bitspersample;
+            format.numbytes = i - 8 - offset2snd;
             i = 8 + offset2snd; /* advance to the beginning of data */
+        } else if (is_aifc && (memcmp(buf, "FVER", 4)==0)) {
+            /* Format Version Chunk (AIFC only chunk) */
+            /* skip this chunk */
         } else {
             DEBUGF("unsupported AIFF chunk: '%c%c%c%c', size=%lu\n",
                    buf[0], buf[1], buf[2], buf[3], (unsigned long)i);
@@ -151,28 +204,36 @@ next_track:
         n -= i + 8;
     } /* while 'SSND' */
 
-    if (num_channels == 0) {
+    if (format.channels == 0) {
         DEBUGF("CODEC_ERROR: 'COMM' chunk not found or 0-channels file\n");
         i = CODEC_ERROR;
         goto done;
     }
-    if (numbytes == 0) {
+    if (format.numbytes == 0) {
         DEBUGF("CODEC_ERROR: 'SSND' chunk not found or has zero length\n");
         i = CODEC_ERROR;
         goto done;
     }
-    if (sample_size > 24) {
-        DEBUGF("CODEC_ERROR: PCM with more than 24 bits per sample "
-               "is unsupported\n");
+
+    codec = get_codec(format.formattag);
+    if (codec == 0)
+    {
+        DEBUGF("CODEC_ERROR: AIFC does not support compressionType: 0x%x\n", format.formattag);
+        i = CODEC_ERROR;
+        goto done;
+    }
+
+    if (!codec->set_format(&format, 0))
+    {
         i = CODEC_ERROR;
         goto done;
     }
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
 
-    if (num_channels == 2) {
+    if (format.channels == 2) {
         ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
-    } else if (num_channels == 1) {
+    } else if (format.channels == 1) {
         ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     } else {
         DEBUGF("CODEC_ERROR: more than 2 channels unsupported\n");
@@ -187,18 +248,6 @@ next_track:
     bytesdone = 0;
     ci->set_elapsed(0);
     endofstream = 0;
-    /* chunksize is computed so that one chunk is about 1/50s.
-     * this make 4096 for 44.1kHz 16bits stereo.
-     * It also has to be a multiple of blockalign */
-    chunksize = (1 + avgbytespersec/(50*block_size))*block_size;
-    /* check that the output buffer is big enough (convert to samplespersec,
-      then round to the block_size multiple below) */
-    if (((uint64_t)chunksize*ci->id3->frequency*num_channels*2)
-        /(uint64_t)avgbytespersec >= AIF_CHUNK_SIZE) {
-        chunksize = ((uint64_t)AIF_CHUNK_SIZE*avgbytespersec
-                     /((uint64_t)ci->id3->frequency*num_channels*2 
-                     *block_size))*block_size;
-    }
 
     while (!endofstream) {
         ci->yield();
@@ -206,61 +255,39 @@ next_track:
             break;
 
         if (ci->seek_time) {
-            uint32_t newpos;
-
-            /* use avgbytespersec to round to the closest blockalign multiple,
-               add firstblockposn. 64-bit casts to avoid overflows. */
-            newpos = (((uint64_t)avgbytespersec*(ci->seek_time - 1))
-                      /(1000LL*block_size))*block_size;
-            if (newpos > numbytes)
+            uint32_t newpos = codec->get_seek_pos(ci->seek_time);
+            if (newpos > format.numbytes)
                 break;
             if (ci->seek_buffer(firstblockposn + newpos))
                 bytesdone = newpos;
             ci->seek_complete();
         }
-        aifbuf = (uint8_t *)ci->request_buffer(&n, chunksize);
+        aifbuf = (uint8_t *)ci->request_buffer(&n, format.chunksize);
 
         if (n == 0)
             break; /* End of stream */
 
-        if (bytesdone + n > numbytes) {
-            n = numbytes - bytesdone;
+        if (bytesdone + n > format.numbytes) {
+            n = format.numbytes - bytesdone;
             endofstream = 1;
         }
 
-        if (sample_size > 24) {
-            for (i = 0; i < n; i += 4) {
-                samples[i/4] = (SE(aifbuf[i])<<21)|(aifbuf[i + 1]<<13)
-                               |(aifbuf[i + 2]<<5)|(aifbuf[i + 3]>>3);
-            }
-            bufcount = n >> 2;
-        } else if (sample_size > 16) {
-            for (i = 0; i < n; i += 3) {
-                samples[i/3] = (SE(aifbuf[i])<<21)|(aifbuf[i + 1]<<13)
-                               |(aifbuf[i + 2]<<5);
-            }
-            bufcount = n/3;
-        } else if (sample_size > 8) {
-            for (i = 0; i < n; i += 2)
-                samples[i/2] = (SE(aifbuf[i])<<21)|(aifbuf[i + 1]<<13);
-            bufcount = n >> 1;
-        } else {
-            for (i = 0; i < n; i++)
-                samples[i] = SE(aifbuf[i]) << 21;
-            bufcount = n;
+        status = codec->decode(aifbuf, n, samples, &bufcount);
+        if (status == CODEC_ERROR)
+        {
+            DEBUGF("codec error\n");
+            goto done;
         }
-
-        if (num_channels == 2)
-            bufcount >>= 1;
 
         ci->pcmbuf_insert(samples, NULL, bufcount);
 
         ci->advance_buffer(n);
         bytesdone += n;
-        if (bytesdone >= numbytes)
+        decodedbytes += bufcount;
+        if (bytesdone >= format.numbytes)
             endofstream = 1;
 
-        ci->set_elapsed(bytesdone*1000LL/avgbytespersec);
+        ci->set_elapsed(decodedbytes*1000LL/ci->id3->frequency);
     }
     i = CODEC_OK;
 

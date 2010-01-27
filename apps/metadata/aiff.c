@@ -48,7 +48,7 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
     }
     
     if ((memcmp(buf, "FORM",4) != 0)
-        || (memcmp(&buf[8], "AIFF", 4) !=0 ))
+        || ((memcmp(&buf[8], "AIFF", 4) !=0) && (memcmp(&buf[8], "AIFC", 4) !=0)))
     {
         return false;
     }
