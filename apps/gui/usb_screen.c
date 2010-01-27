@@ -202,7 +202,9 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 #endif
 
         screen->set_viewport(parent);
+#if LCD_DEPTH > 1
         screen->backdrop_show(BACKDROP_MAIN);
+#endif
         screen->backlight_on();
         screen->clear_viewport();
 

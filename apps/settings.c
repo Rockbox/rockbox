@@ -796,8 +796,9 @@ void settings_apply(bool read_disk)
 #if CONFIG_CODEC == SWCODEC
     int i;
 #endif
+#if LCD_DEPTH > 1
     int screen;
-
+#endif
     sound_settings_apply();
 
 #ifdef HAVE_DISK_STORAGE
@@ -918,8 +919,10 @@ void settings_apply(bool read_disk)
         }
 #endif
 
+#if LCD_DEPTH > 1
         FOR_NB_SCREENS(screen)
             screens[screen].backdrop_show(BACKDROP_MAIN);
+#endif
 
         if ( global_settings.lang_file[0]) {
             snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",

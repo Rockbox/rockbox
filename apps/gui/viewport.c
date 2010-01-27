@@ -89,8 +89,9 @@ static void toggle_theme(enum screen_type screen, bool force)
         add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false,
                                                 do_sbs_update_callback);
         
+#if LCD_DEPTH > 1
         screens[screen].backdrop_show(BACKDROP_MAIN);
-        
+#endif
         /* remove the left overs from the previous screen.
          * could cause a tiny flicker. Redo your screen code if that happens */
         if (!was_enabled[screen] || force)
@@ -145,7 +146,9 @@ static void toggle_theme(enum screen_type screen, bool force)
     {
         FOR_NB_SCREENS(i)
         {
+#if LCD_DEPTH > 1
             screens[i].backdrop_hide();
+#endif
             screens[i].stop_scroll();
         }
             

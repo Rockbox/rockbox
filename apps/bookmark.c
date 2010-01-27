@@ -194,7 +194,11 @@ bool bookmark_autobookmark(void)
     const struct text_message message={lines, 2};
 #endif
     FOR_NB_SCREENS(i)
+    {
+#if LCD_DEPTH > 1
         screens[i].backdrop_show(BACKDROP_MAIN);
+#endif
+    }
 
     if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
     {

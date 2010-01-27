@@ -99,7 +99,9 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
 {
     bool loaded_ok;
 
+#if LCD_DEPTH > 1
     screens[screen].backdrop_unload(BACKDROP_SKIN_WPS);
+#endif
 
 #ifndef __PCTOOL__
     /*
@@ -561,7 +563,9 @@ static void gwps_leave_wps(void)
     FOR_NB_SCREENS(i)
     {
         gui_wps[i].display->stop_scroll();
+#if LCD_DEPTH > 1
         gui_wps[i].display->backdrop_show(BACKDROP_MAIN);
+#endif
         
 #ifdef HAVE_LCD_BITMAP
         bool draw = false;
@@ -610,8 +614,8 @@ static void gwps_enter_wps(void)
             vp->fg_pattern = display->get_foreground();
             vp->bg_pattern = display->get_background();
         }
-#endif
         display->backdrop_show(BACKDROP_SKIN_WPS);
+#endif
         /* make the backdrop actually take effect */
         display->clear_display();
         skin_update(gwps, WPS_REFRESH_ALL);
@@ -1294,7 +1298,9 @@ void gui_sync_wps_init(void)
         /* Currently no seperate wps_state needed/possible
            so use the only available ( "global" ) one */
         gui_wps[i].state = &wps_state;
+#if LCD_DEPTH > 1
         gui_wps[i].display->backdrop_unload(BACKDROP_SKIN_WPS);
+#endif
         /* must point to the same struct for both screens */
         gui_wps[i].sync_data = &wps_sync_data;
     }
