@@ -109,7 +109,7 @@ static void toggle_theme(enum screen_type screen, bool force)
 
     if (is_theme_enabled(screen))
     {
-#if LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1
+#if LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1)
         screens[screen].backdrop_show(BACKDROP_MAIN);
 #endif
         /* remove the left overs from the previous screen.
@@ -164,7 +164,7 @@ static void toggle_theme(enum screen_type screen, bool force)
     }
     else
     {
-#if LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1
+#if LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1)
         screens[screen].backdrop_hide();
 #endif
         screens[screen].stop_scroll();
