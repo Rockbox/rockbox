@@ -177,7 +177,7 @@ next_track:
                      * we'll see later if we can't decode it */
                     DEBUGF("CODEC_WARNING: non-PCM WAVE (formattag=0x%x) "
                            "doesn't have ext. fmt descr (chunksize=%d<18).\n",
-                           (unsigned int)format.formattag, i);
+                           (unsigned int)format.formattag, (int)i);
                 }
                 else
                 {
