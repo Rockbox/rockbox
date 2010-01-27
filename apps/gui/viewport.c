@@ -69,16 +69,10 @@ static int theme_stack_top[NB_SCREENS]; /* the last item added */
 static struct viewport_stack_item theme_stack[NB_SCREENS][VPSTACK_DEPTH];
 static bool is_theme_enabled(enum screen_type screen);
 
-static void toggle_theme(enum screen_type screen, bool force)
+
+static void toggle_events(bool enable)
 {
-    bool enable_event = false;
-    static bool was_enabled[NB_SCREENS] = {false};
-    int i;
-    FOR_NB_SCREENS(i)
-    {
-        enable_event = enable_event || is_theme_enabled(i);
-    }
-    if (enable_event)
+    if (enable)
     {
         add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
@@ -88,8 +82,34 @@ static void toggle_theme(enum screen_type screen, bool force)
                                                 do_sbs_update_callback);
         add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false,
                                                 do_sbs_update_callback);
-        
-#if LCD_DEPTH > 1
+    }
+    else
+    {
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+        remove_event(LCD_EVENT_ACTIVATION, do_sbs_update_callback);
+#endif
+        remove_event(PLAYBACK_EVENT_TRACK_CHANGE, do_sbs_update_callback);
+        remove_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, do_sbs_update_callback);
+        remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
+    }   
+}
+
+
+static void toggle_theme(enum screen_type screen, bool force)
+{
+    bool enable_event = false;
+    static bool was_enabled[NB_SCREENS] = {false};
+    int i;
+
+    FOR_NB_SCREENS(i)
+    {
+        enable_event = enable_event || is_theme_enabled(i);
+    }
+    toggle_events(enable_event);
+
+    if (is_theme_enabled(screen))
+    {
+#if LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1
         screens[screen].backdrop_show(BACKDROP_MAIN);
 #endif
         /* remove the left overs from the previous screen.
@@ -144,20 +164,10 @@ static void toggle_theme(enum screen_type screen, bool force)
     }
     else
     {
-        FOR_NB_SCREENS(i)
-        {
-#if LCD_DEPTH > 1
-            screens[i].backdrop_hide();
+#if LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1
+        screens[screen].backdrop_hide();
 #endif
-            screens[i].stop_scroll();
-        }
-            
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-        remove_event(LCD_EVENT_ACTIVATION, do_sbs_update_callback);
-#endif
-        remove_event(PLAYBACK_EVENT_TRACK_CHANGE, do_sbs_update_callback);
-        remove_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, do_sbs_update_callback);
-        remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
+        screens[screen].stop_scroll();
     }
     /* let list initialize viewport in case viewport dimensions is changed. */
     send_event(GUI_EVENT_THEME_CHANGED, NULL);
