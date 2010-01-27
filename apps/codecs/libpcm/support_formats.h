@@ -34,4 +34,7 @@ const struct pcm_codec *get_itut_g711_mulaw_codec(void);
 
 /* Intel DVI ADPCM */
 const struct pcm_codec *get_dvi_adpcm_codec(void);
+
+/* IEEE float */
+const struct pcm_codec *get_ieee_float_codec(void);
 #endif

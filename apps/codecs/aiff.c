@@ -34,15 +34,19 @@ enum {
     AIFC_FORMAT_PCM          = FOURCC('N', 'O', 'N', 'E'), /* AIFC PCM Format (big endian) */
     AIFC_FORMAT_ALAW         = FOURCC('a', 'l', 'a', 'w'), /* AIFC ALaw compressed */
     AIFC_FORMAT_MULAW        = FOURCC('u', 'l', 'a', 'w'), /* AIFC uLaw compressed */
+    AIFC_FORMAT_IEEE_FLOAT32 = FOURCC('f', 'l', '3', '2'), /* AIFC IEEE float 32 bit */
+    AIFC_FORMAT_IEEE_FLOAT64 = FOURCC('f', 'l', '6', '4'), /* AIFC IEEE float 64 bit */
 };
 
 static const struct pcm_entry pcm_codecs[] = {
     { AIFC_FORMAT_PCM,          get_linear_pcm_codec      },
     { AIFC_FORMAT_ALAW,         get_itut_g711_alaw_codec  },
     { AIFC_FORMAT_MULAW,        get_itut_g711_mulaw_codec },
+    { AIFC_FORMAT_IEEE_FLOAT32, get_ieee_float_codec      },
+    { AIFC_FORMAT_IEEE_FLOAT64, get_ieee_float_codec      },
 };
 
-#define NUM_FORMATS 3
+#define NUM_FORMATS 5
 
 static int32_t samples[PCM_CHUNK_SIZE] IBSS_ATTR;
 

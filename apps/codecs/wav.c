@@ -45,6 +45,7 @@ enum
 {
     WAVE_FORMAT_UNKNOWN = 0x0000, /* Microsoft Unknown Wave Format */
     WAVE_FORMAT_PCM = 0x0001,   /* Microsoft PCM Format */
+    WAVE_FORMAT_IEEE_FLOAT = 0x0003, /* IEEE Float */
     WAVE_FORMAT_ALAW = 0x0006,  /* Microsoft ALAW */
     WAVE_FORMAT_MULAW = 0x0007, /* Microsoft MULAW */
     WAVE_FORMAT_DVI_ADPCM = 0x0011, /* Intel's DVI ADPCM */
@@ -56,6 +57,7 @@ enum
 const struct pcm_entry wave_codecs[] = {
     { WAVE_FORMAT_UNKNOWN,            0                            },
     { WAVE_FORMAT_PCM,                get_linear_pcm_codec         },
+    { WAVE_FORMAT_IEEE_FLOAT,         get_ieee_float_codec         },
     { WAVE_FORMAT_ALAW,               get_itut_g711_alaw_codec     },
     { WAVE_FORMAT_MULAW,              get_itut_g711_mulaw_codec    },
     { WAVE_FORMAT_DVI_ADPCM,          get_dvi_adpcm_codec          },
@@ -63,7 +65,7 @@ const struct pcm_entry wave_codecs[] = {
     { IBM_FORMAT_ALAW,                get_itut_g711_alaw_codec     },
 };
 
-#define NUM_FORMATS 7
+#define NUM_FORMATS 8
 
 static const struct pcm_codec *get_wave_codec(uint32_t formattag)
 {
