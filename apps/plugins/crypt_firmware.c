@@ -170,16 +170,16 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
     }
 
-    if (length > buf_size) {
-        rb->splash(HZ*2, "File too big");
-        return PLUGIN_ERROR;
-    }
-
     /* Get the audio buffer */
     buf = rb->plugin_get_audio_buffer((size_t *)&buf_size);
 
     /* Use uncached alias for buf - equivalent to buf |= 0x40000000 */
     buf += 0x10000000;
+
+    if (length > buf_size) {
+        rb->splash(HZ*2, "File too big");
+        return PLUGIN_ERROR;
+    }
 
     n = rb->read(fd, buf, length);
     if (n < length) {
