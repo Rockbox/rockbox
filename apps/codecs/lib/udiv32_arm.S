@@ -229,7 +229,7 @@ udiv32_arm:
     smmul   \inv, \numerator, \divisor
 #else
     mov     \bits, #0
-    smlal   \bits, \divisor, \divisor, \inv
+    smlal   \bits, \divisor, \inv, \divisor
     umull   \bits, \inv, \numerator, \divisor
 #endif
     add     \numerator, \numerator, \neg
@@ -250,7 +250,7 @@ udiv32_arm:
     smmul   \inv, \numerator, \divisor
 #else
     mov     \bits, #0
-    smlal   \bits, \divisor, \divisor, \inv
+    smlal   \bits, \divisor, \inv, \divisor
     umull   \bits, \inv, \numerator, \divisor
 #endif
     mla     \divisor, \inv, \neg, \numerator
