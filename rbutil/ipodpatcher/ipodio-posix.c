@@ -185,7 +185,7 @@ int ipod_open(struct ipod_t* ipod, int silent)
     /* Read information about the disk */
 
     if(ioctl(ipod->dh,IPOD_SECTORSIZE_IOCTL,&ipod->sector_size) < 0) {
-        ipod->sector_size=512;
+        ipod->sector_size=2048;
         if (!silent) {
             fprintf(stderr,"[ERR] ioctl() call to get sector size failed, defaulting to %d\n"
                    ,ipod->sector_size);

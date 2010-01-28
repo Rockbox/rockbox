@@ -2,10 +2,13 @@ CFLAGS=-Wall -W
 
 BOOT_H = ipod1g2g.h ipod3g.h ipod4g.h ipodcolor.h ipodmini1g.h ipodmini2g.h ipodnano1g.h ipodvideo.h
 
-# Enable the next two lines to build with embedded bootloaders and the 
+# Build with "make BOOTOBJS=1" to build with embedded bootloaders and the 
 # --install option and interactive mode.  You need the full set of Rockbox 
 # bootloaders in this directory - download them from
 # http://download.rockbox.org/bootloader/ipod/bootloaders.zip
+
+# Releases of ipodpatcher are created with "make RELEASE=1".  This
+# enables BOOTOBJS and uses the VERSION string defined in main.c
 
 ifdef RELEASE
 CFLAGS+=-DRELEASE

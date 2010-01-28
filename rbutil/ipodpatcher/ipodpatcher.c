@@ -2080,7 +2080,7 @@ static int find_key(struct ipod_t* ipod, int aupd, unsigned char* key)
         return -1;
     }
 
-    if ((n = ipod_read(ipod, ipod_sectorbuf, 512)) < 0) {
+    if ((n = ipod_read(ipod, ipod_sectorbuf, ipod->sector_size)) < 0) {
         return -1;
     }
 

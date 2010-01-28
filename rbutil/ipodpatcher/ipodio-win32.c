@@ -181,6 +181,7 @@ ssize_t ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes)
 {
     unsigned long count;
 
+    printf("[DEBUG] ipod_read - nbytes=%d\n",nbytes);
     if (!ReadFile(ipod->dh, buf, nbytes, &count, NULL)) {
         ipod_print_error(" Error reading from disk: ");
         return -1;
