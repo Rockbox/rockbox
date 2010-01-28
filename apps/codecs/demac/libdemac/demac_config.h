@@ -57,11 +57,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #elif defined(CPU_S5L870X)
 #define ICODE_SECTION_DEMAC_ARM   .icode
 #define ICODE_ATTR_DEMAC          ICODE_ATTR
-#define IBSS_ATTR_DEMAC_INSANEBUF IBSS_ATTR
+#define IBSS_ATTR_DEMAC_INSANEBUF
 #else
 #define ICODE_SECTION_DEMAC_ARM   .text
 #define ICODE_ATTR_DEMAC
-#define IBSS_ATTR_DEMAC_INSANEBUF IBSS_ATTR
+#define IBSS_ATTR_DEMAC_INSANEBUF
 #endif
 
 #else /* !ROCKBOX */

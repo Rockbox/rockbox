@@ -7,9 +7,7 @@ mdct_lookup.c
 #ifdef CPU_ARM
 mdct_arm.S
 setjmp_arm.S
-#if ARM_ARCH == 4
-udiv32_armv4.S
-#endif
+udiv32_arm.S
 #endif
 
 #ifdef CPU_COLDFIRE

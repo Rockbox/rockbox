@@ -65,7 +65,7 @@ void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, con
 
 extern void mdct_backward(int n, int32_t *in, int32_t *out);
 
-#if defined(CPU_ARM) && (ARM_ARCH == 4)
+#ifdef CPU_ARM
 /* optimised unsigned integer division for ARMv4, in IRAM */
 unsigned udiv32_arm(unsigned a, unsigned b);
 #define UDIV32(a, b) udiv32_arm(a, b)
