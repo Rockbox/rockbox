@@ -243,16 +243,7 @@ udiv32_arm:
     rsb     \bits, \bits, #0
     sub     \inv, \inv, #4
     mov     \divisor, \inv, lsr \bits
-#if ARM_ARCH >= 6
-    tst     \numerator, \numerator
-    smmla   \divisor, \divisor, \inv, \divisor
-    bmi     50f
-    smmul   \inv, \numerator, \divisor
-#else
-    mov     \bits, #0
-    smlal   \bits, \divisor, \inv, \divisor
     umull   \bits, \inv, \numerator, \divisor
-#endif
     mla     \divisor, \inv, \neg, \numerator
     mov     \quotient, \inv
     cmn     \neg, \divisor, lsr #1
@@ -280,16 +271,6 @@ udiv32_arm:
     cmn     \divisor, \neg
     addcc   \quotient, \quotient, #1
     addpl   \quotient, \quotient, #2
-    bx      lr
-50:
-    umull   \bits, \inv, \numerator, \divisor
-    mla     \divisor, \inv, \neg, \numerator
-    mov     \quotient, \inv
-    cmn     \neg, \divisor, lsr #1
-    addcs   \divisor, \divisor, \neg, lsl #1
-    addcs   \quotient, \quotient, #2
-    cmn     \neg, \divisor
-    addcs   \quotient, \quotient, #1
     bx      lr
 #endif
 .endm
