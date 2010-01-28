@@ -743,19 +743,6 @@ int sd_write_sectors(unsigned long start, int count, const void* buf)
 }
 
 #ifndef BOOTLOADER
-void sd_sleep(void)
-{
-}
-
-void sd_spin(void)
-{
-}
-
-void sd_spindown(int seconds)
-{
-    (void)seconds;
-}
-
 long sd_last_disk_activity(void)
 {
     return last_disk_activity;
