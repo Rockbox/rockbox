@@ -21,6 +21,7 @@
  ****************************************************************************/
 #include "codeclib.h"
 #include "pcm_common.h"
+#include "support_formats.h"
 
 /*
  * ITU-T G.711 A-law mu-law

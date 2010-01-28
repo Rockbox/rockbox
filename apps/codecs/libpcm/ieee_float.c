@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "codeclib.h"
 #include "pcm_common.h"
+#include "support_formats.h"
 
 /*
  * IEEE float
