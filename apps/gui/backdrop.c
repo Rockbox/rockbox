@@ -211,7 +211,29 @@ void remote_backdrop_hide(void)
 {
         lcd_remote_set_backdrop(NULL);
 }
+#else
+/* api functions */
+bool remote_backdrop_load(enum backdrop_type bdrop,
+                                const char *filename)
+{
+    (void)bdrop; (void)filename;
+    return true;
+}
 
+void remote_backdrop_show(enum backdrop_type bdrop)
+{
+    (void)bdrop;
+}
+
+void remote_backdrop_unload(enum backdrop_type bdrop)
+{
+    (void)bdrop;
+}
+
+
+void remote_backdrop_hide(void)
+{
+}
 #endif
 
     
