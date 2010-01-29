@@ -148,10 +148,8 @@ struct screen
     bool (*is_backlight_on)(bool ignore_always_off);
     void (*backlight_set_timeout)(int index);
 #if LCD_DEPTH > 1
-    bool (*backdrop_load)(enum backdrop_type bdrop, const char* filename);
-    void (*backdrop_unload)(enum backdrop_type bdrop);
-    void (*backdrop_show)(enum backdrop_type bdrop);
-    void (*backdrop_hide)(void);
+    bool (*backdrop_load)(const char *filename, char* backdrop_buffer);
+    void (*backdrop_show)(char* backdrop_buffer);
 #endif
 };
 

@@ -27,213 +27,53 @@
 #endif
 #include "backdrop.h"
 
-static fb_data main_backdrop[LCD_FBHEIGHT][LCD_FBWIDTH]
-                __attribute__ ((aligned (16)));
-static fb_data skin_backdrop[LCD_FBHEIGHT][LCD_FBWIDTH]
-                __attribute__ ((aligned (16)));
-
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-static fb_remote_data
-remote_skin_backdrop[LCD_REMOTE_FBHEIGHT][LCD_REMOTE_FBWIDTH];
-static bool remote_skin_backdrop_valid = false;
-#endif
-
-static bool main_backdrop_valid = false;
-static bool skin_backdrop_valid = false;
-
-/* load a backdrop into a buffer */
-static bool load_backdrop(const char* filename, fb_data* backdrop_buffer)
+bool backdrop_load(const char* filename, char *backdrop_buffer)
 {
     struct bitmap bm;
     int ret;
 
     /* load the image */
-    bm.data=(char*)backdrop_buffer;
-    ret = read_bmp_file(filename, &bm, sizeof(main_backdrop),
+    bm.data = backdrop_buffer;
+    ret = read_bmp_file(filename, &bm, LCD_BACKDROP_BYTES,
                         FORMAT_NATIVE | FORMAT_DITHER, NULL);
 
     return ((ret > 0)
             && (bm.width == LCD_WIDTH) && (bm.height == LCD_HEIGHT));
 }
-
-static bool load_main_backdrop(const char* filename)
+  
+  
+void backdrop_show(char *backdrop_buffer)
 {
-    main_backdrop_valid = load_backdrop(filename, &main_backdrop[0][0]);
-    return main_backdrop_valid;
+    lcd_set_backdrop((fb_data*)backdrop_buffer);
 }
+  
 
-static inline bool load_skin_backdrop(const char* filename)
-{
-    skin_backdrop_valid = load_backdrop(filename, &skin_backdrop[0][0]);
-    return skin_backdrop_valid;
-}
+#if defined(HAVE_REMOTE_LCD)
 
-static inline void unload_main_backdrop(void)
-{
-    main_backdrop_valid = false;
-}
-
-static inline void unload_skin_backdrop(void)
-{
-    skin_backdrop_valid = false;
-}
-
-static inline void show_main_backdrop(void)
-{
-    lcd_set_backdrop(main_backdrop_valid ? &main_backdrop[0][0] : NULL);
-}
-
-static void show_skin_backdrop(void)
-{
-    /* if no wps backdrop, fall back to main backdrop */
-    if(skin_backdrop_valid)
-    {
-        lcd_set_backdrop(&skin_backdrop[0][0]);
-    }
-    else
-    {
-        show_main_backdrop();
-    }
-}
-
+#if LCD_REMOTE_DEPTH > 1
 /* api functions */
-
-bool backdrop_load(enum backdrop_type bdrop, const char* filename)
-{
-    if (bdrop == BACKDROP_MAIN)
-        return load_main_backdrop(filename);
-    else if (bdrop == BACKDROP_SKIN_WPS)
-        return load_skin_backdrop(filename);
-    else
-        return false;
-}
-
-void backdrop_unload(enum backdrop_type bdrop)
-{
-    if (bdrop == BACKDROP_MAIN)
-        unload_main_backdrop();
-    else if (bdrop == BACKDROP_SKIN_WPS)
-        unload_skin_backdrop();
-}
-
-void backdrop_show(enum backdrop_type bdrop)
-{
-    if (bdrop == BACKDROP_MAIN)
-        show_main_backdrop();
-    else if (bdrop == BACKDROP_SKIN_WPS)
-        show_skin_backdrop();
-}
-
-void backdrop_hide(void)
-{
-    lcd_set_backdrop(NULL);
-}
-
-    
-
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-
-static bool load_remote_backdrop(const char* filename,
-            fb_remote_data* backdrop_buffer)
+bool remote_backdrop_load(const char *filename, char* backdrop_buffer)
 {
     struct bitmap bm;
     int ret;
 
     /* load the image */
-    bm.data=(char*)backdrop_buffer;
-    ret = read_bmp_file(filename, &bm, sizeof(main_backdrop),
+    bm.data = backdrop_buffer;
+    ret = read_bmp_file(filename, &bm, REMOTE_LCD_BACKDROP_BYTES,
                         FORMAT_NATIVE | FORMAT_DITHER | FORMAT_REMOTE, NULL);
-
     return ((ret > 0)
-            && (bm.width == LCD_REMOTE_WIDTH)
-            && (bm.height == LCD_REMOTE_HEIGHT));
+            && (bm.width == REMOTE_LCD_WIDTH) && (bm.height == REMOTE_LCD_HEIGHT));
 }
+#else /* needs stubs */
 
-static inline bool load_remote_skin_backdrop(const char* filename)
+bool remote_backdrop_load(const char *filename, char* backdrop_buffer)
 {
-    remote_skin_backdrop_valid =
-            load_remote_backdrop(filename, &remote_skin_backdrop[0][0]);
-    return remote_skin_backdrop_valid;
+    (void)filename; (void) backdrop_buffer;
+    return false;
 }
-
-static inline void unload_remote_skin_backdrop(void)
+void remote_backdrop_show(char* backdrop_buffer)
 {
-    remote_skin_backdrop_valid = false;
-}
-
-static inline void show_remote_main_backdrop(void)
-{
-    lcd_remote_set_backdrop(NULL);
-}
-
-static inline void show_remote_skin_backdrop(void)
-{
-    /* if no wps backdrop, fall back to main backdrop */
-    if(remote_skin_backdrop_valid)
-    {
-        lcd_remote_set_backdrop(&remote_skin_backdrop[0][0]);
-    }
-    else
-    {
-        show_remote_main_backdrop();
-    }
-}
-
-
-/* api functions */
-bool remote_backdrop_load(enum backdrop_type bdrop,
-                                const char *filename)
-{
-    if (bdrop == BACKDROP_SKIN_WPS)
-        return load_remote_skin_backdrop(filename);
-    else if (bdrop == BACKDROP_MAIN)
-        return true;
-    else
-        return false;
-}
-
-void remote_backdrop_show(enum backdrop_type bdrop)
-{
-    if (bdrop == BACKDROP_MAIN)
-        show_remote_main_backdrop();
-    else if (bdrop == BACKDROP_SKIN_WPS)
-        show_remote_skin_backdrop();
-}
-
-void remote_backdrop_unload(enum backdrop_type bdrop)
-{
-    if (bdrop != BACKDROP_MAIN)
-        unload_remote_skin_backdrop();
-}
-
-
-void remote_backdrop_hide(void)
-{
-        lcd_remote_set_backdrop(NULL);
-}
-#else
-/* api functions */
-bool remote_backdrop_load(enum backdrop_type bdrop,
-                                const char *filename)
-{
-    (void)bdrop; (void)filename;
-    return true;
-}
-
-void remote_backdrop_show(enum backdrop_type bdrop)
-{
-    (void)bdrop;
-}
-
-void remote_backdrop_unload(enum backdrop_type bdrop)
-{
-    (void)bdrop;
-}
-
-
-void remote_backdrop_hide(void)
-{
+    (void)backdrop_buffer;
 }
 #endif
-
-    
+#endif

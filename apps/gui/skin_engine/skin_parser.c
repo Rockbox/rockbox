@@ -62,6 +62,7 @@
 #endif
 
 #include "backdrop.h"
+#include "statusbar-skinned.h"
 
 #define WPS_ERROR_INVALID_PARAM         -1
 
@@ -91,22 +92,6 @@ static struct skin_viewport *curr_vp;
 static struct skin_line *curr_line;
 
 static int follow_lang_direction = 0;
-
-#ifdef HAVE_LCD_BITMAP
-
-#if LCD_DEPTH > 1
-#define MAX_BITMAPS (MAX_IMAGES+MAX_PROGRESSBARS+1) /* WPS images + pbar bitmap + backdrop */
-#else
-#define MAX_BITMAPS (MAX_IMAGES+MAX_PROGRESSBARS) /* WPS images + pbar bitmap */
-#endif
-
-#define PROGRESSBAR_BMP MAX_IMAGES
-#define BACKDROP_BMP    (MAX_BITMAPS-1)
-
-/* pointers to the bitmap filenames in the WPS source */
-static const char *bmp_names[MAX_BITMAPS];
-
-#endif /* HAVE_LCD_BITMAP */
 
 #if defined(DEBUG) || defined(SIMULATOR)
 /* debugging function */
@@ -925,20 +910,29 @@ static int parse_image_special(const char *wps_bufptr,
     (void)token;
     const char *pos = NULL;
     const char *newline;
+    bool error = false;
 
     pos = strchr(wps_bufptr + 1, '|');
     newline = strchr(wps_bufptr, '\n');
+    
+    error = (pos > newline);
+        
 
-    if (pos > newline)
-        return WPS_ERROR_INVALID_PARAM;
 #if LCD_DEPTH > 1
     if (token->type == WPS_TOKEN_IMAGE_BACKDROP)
     {
-        /* format: %X|filename.bmp| */
-        bmp_names[BACKDROP_BMP] = wps_bufptr + 1;
+        /* format: %X|filename.bmp| or %Xd */
+        if (*(wps_bufptr) == 'd')
+        {
+            wps_data->backdrop = NULL;
+            return skip_end_of_line(wps_bufptr);
+        }
+        else if (!error)
+            wps_data->backdrop = (char*)wps_bufptr + 1;
     }
 #endif
-
+    if (error)
+        return WPS_ERROR_INVALID_PARAM;
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);
 }
@@ -1657,6 +1651,14 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
         return false;
     skin_buffer_increment(max_tokens * sizeof(struct wps_token), false);
     data->num_tokens = 0;
+    
+#if LCD_DEPTH > 1
+    /* Backdrop defaults to the setting unless %X is used, so set it now */
+    if (global_settings.backdrop_file[0])
+    {
+        data->backdrop = "-";
+    }
+#endif
 
     while (*wps_bufptr && !fail)
     {
@@ -1899,6 +1901,9 @@ static void skin_data_reset(struct wps_data *wps_data)
     wps_data->images = NULL;
     wps_data->progressbars = NULL;
 #endif
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    wps_data->backdrop = NULL;
+#endif
 #ifdef HAVE_TOUCHSCREEN
     wps_data->touchregions = NULL;
 #endif
@@ -1996,12 +2001,51 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
     }
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
-    if (bmp_names[BACKDROP_BMP])
+    /* Backdrop load scheme:
+     * 1) %X|filename|
+     * 2) load the backdrop from settings
+     */
+    if (wps_data->backdrop)
     {
         char img_path[MAX_PATH];
-        get_image_filename(bmp_names[BACKDROP_BMP], bmpdir,
-                            img_path, sizeof(img_path));
-        screens[curr_screen].backdrop_load(BACKDROP_SKIN_WPS, img_path);
+        bool loaded = false;
+        size_t buf_size;
+#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+        if (curr_screen == SCREEN_REMOTE)
+            buf_size = REMOTE_LCD_BACKDROP_BYTES;
+        else
+#endif
+            buf_size = LCD_BACKDROP_BYTES;
+        if (wps_data->backdrop[0] == '-')
+        {
+#if NB_SCREENS > 1
+            if (curr_screen == SCREEN_REMOTE)
+            {
+                wps_data->backdrop = NULL;
+                return true;
+            }
+            else
+#endif
+            {
+                if (!global_settings.backdrop_file[0])
+                {
+                    wps_data->backdrop = NULL;
+                    return true;
+                }
+                snprintf(img_path, sizeof(img_path), "%s/%s.bmp",
+                         BACKDROP_DIR, global_settings.backdrop_file);
+            }
+        }
+        else
+        {
+            get_image_filename(wps_data->backdrop, bmpdir,
+                              img_path, sizeof(img_path));
+        }
+        char *buffer = skin_buffer_alloc(buf_size);
+        if (!buffer)
+            return false;
+        loaded = screens[curr_screen].backdrop_load(img_path, buffer);
+        wps_data->backdrop = loaded ? buffer : NULL;
     }
 #endif /* has backdrop support */
 
@@ -2059,7 +2103,18 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
 
     if (!isfile)
     {
-        return wps_parse(wps_data, buf, false);
+        if (wps_parse(wps_data, buf, false))
+        {
+#ifdef HAVE_LCD_BITMAP
+            /* load the backdrop */
+            if (!load_skin_bitmaps(wps_data, BACKDROP_DIR)) {
+                skin_data_reset(wps_data);
+                return false;
+            }
+#endif
+            return true;
+        }
+        return false;
     }
     else
     {
@@ -2093,11 +2148,6 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         if (start <= 0)
             return false;
 
-#ifdef HAVE_LCD_BITMAP
-        /* Set all filename pointers to NULL */
-        memset(bmp_names, 0, sizeof(bmp_names));
-#endif
-
         /* parse the WPS source */
         if (!wps_parse(wps_data, wps_buffer, true)) {
             skin_data_reset(wps_data);
@@ -2116,6 +2166,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         /* load the bitmaps that were found by the parsing */
         if (!load_skin_bitmaps(wps_data, bmpdir)) {
             skin_data_reset(wps_data);
+            wps_data->wps_loaded = false;
             return false;
         }
 #endif

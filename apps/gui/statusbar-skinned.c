@@ -41,8 +41,6 @@ static struct wps_data      sb_skin_data[NB_SCREENS] = {{ .wps_loaded = 0 }};
 static struct wps_sync_data sb_skin_sync_data        = { .do_full_update = false };
 
 /* initial setup of wps_data  */
-
-static bool loaded_ok[NB_SCREENS] = { false };
 static int update_delay = DEFAULT_UPDATE_DELAY;
 
 
@@ -68,66 +66,62 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
         vp->hidden_flags = VP_NEVER_VISIBLE;
     }
 
-    loaded_ok[screen] = success;
+    if (!success && isfile)
+        sb_create_from_settings(screen);
 }
 
-/* temporary viewport structs while the non-skinned bar is in the build */
-static struct viewport inbuilt[NB_SCREENS];
 struct viewport *sb_skin_get_info_vp(enum screen_type screen)
 {
-    int bar_setting = statusbar_position(screen);
-    if (bar_setting == STATUSBAR_CUSTOM)
-        return &find_viewport(VP_INFO_LABEL, sb_skin[screen].data)->vp;
-    else if (bar_setting == STATUSBAR_OFF)
-        return NULL;
-    else
-    {
-        viewport_set_fullscreen(&inbuilt[screen], screen);
-        /* WE need to return the UI area.. NOT the statusbar area! */
-        if (bar_setting == STATUSBAR_TOP)
-            inbuilt[screen].y = STATUSBAR_HEIGHT;
-        inbuilt[screen].height -= STATUSBAR_HEIGHT;
-        return &inbuilt[screen];
-    }
+    return &find_viewport(VP_INFO_LABEL, sb_skin[screen].data)->vp;
 }
 
-inline bool sb_skin_get_state(enum screen_type screen)
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+char* sb_get_backdrop(enum screen_type screen)
 {
-    /* Temp fix untill the hardcoded bar is removed */
-    int bar_setting = global_settings.statusbar;
-#if NB_SCREENS > 1
-    if (screen == SCREEN_REMOTE)
-        bar_setting = global_settings.remote_statusbar;
-#endif
-    switch (bar_setting)
-    {
-        case STATUSBAR_CUSTOM:
-            return loaded_ok[screen];
-        case STATUSBAR_TOP:
-        case STATUSBAR_BOTTOM:
-           return true;
-        case STATUSBAR_OFF:
-            return false;
-    }
-    return false; /* Should never actually get here */
+    return sb_skin[screen].data->backdrop;
 }
 
+bool sb_set_backdrop(enum screen_type screen, char* filename)
+{
+    if (!filename)
+    {
+        sb_skin[screen].data->backdrop = NULL;
+        return true;
+    }
+    else if (!sb_skin[screen].data->backdrop)
+    {
+        /* need to make room on the buffer */
+        size_t buf_size;
+#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+        if (curr_screen == SCREEN_REMOTE)
+            buf_size = REMOTE_LCD_BACKDROP_BYTES;
+        else
+#endif
+            buf_size = LCD_BACKDROP_BYTES;
+        sb_skin[screen].data->backdrop = skin_buffer_alloc(buf_size);
+        if (!sb_skin[screen].data->backdrop)
+            return false;          
+    }
+  
+    if (!screens[screen].backdrop_load(filename, sb_skin[screen].data->backdrop))
+        sb_skin[screen].data->backdrop = NULL;
+    return sb_skin[screen].data->backdrop != NULL;
+}
+        
+#endif
 void sb_skin_update(enum screen_type screen, bool force)
 {
     static long next_update = 0;
     int i = screen;
     if (TIME_AFTER(current_tick, next_update) || force)
     {
-        if (sb_skin_get_state(i))
-        {
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-            /* currently, all remotes are readable without backlight
-             * so still update those */
-            if (lcd_active() || (i != SCREEN_MAIN))
+        /* currently, all remotes are readable without backlight
+         * so still update those */
+        if (lcd_active() || (i != SCREEN_MAIN))
 #endif
-                skin_update(&sb_skin[i], force?
-                        WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
-        }
+            skin_update(&sb_skin[i], force?
+                    WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
         next_update = current_tick + update_delay; /* don't update too often */
         sb_skin[SCREEN_MAIN].sync_data->do_full_update = false;
     }
@@ -148,6 +142,50 @@ void sb_skin_set_update_delay(int delay)
     update_delay = delay;
 }
 
+/* This creates and loads a ".sbs" based on the user settings for:
+ *  - regular statusbar
+ *  - colours
+ *  - ui viewport
+ *  - backdrop
+ */
+void sb_create_from_settings(enum screen_type screen)
+{
+    char buf[128], *ptr, *ptr2;
+    int len, remaining = sizeof(buf);
+    
+    ptr = buf;
+    ptr[0] = '\0';
+    
+    /* %Vi viewport, colours handled by the parser */
+#if NB_SCREENS > 1
+    if (screen == SCREEN_REMOTE)
+        ptr2 = global_settings.remote_ui_vp_config;
+#endif
+    ptr2 = global_settings.ui_vp_config;
+    
+    if (ptr2[0] && ptr2[0] != '-') /* from ui viewport setting */
+    {
+        len = snprintf(ptr, remaining, "%%Vi|%s\n", ptr2);
+        while ((ptr2 = strchr(ptr, ',')))
+            *ptr2 = '|';
+    }
+    else
+    {
+        int y = 0, height;
+        switch (statusbar_position(screen))
+        {
+            case STATUSBAR_TOP:
+                y = STATUSBAR_HEIGHT;
+            case STATUSBAR_BOTTOM:
+                height = screens[screen].lcdheight - STATUSBAR_HEIGHT;
+                break;
+            default:
+                height = screens[screen].lcdheight;
+        }
+        len = snprintf(ptr, remaining, "%%Vi|0|%d|-|%d|1|-|-|\n", y, height);
+    }
+    sb_skin_data_load(screen, buf, false);
+}
 
 void sb_skin_init(void)
 {

@@ -201,9 +201,7 @@ struct screen screens[NB_SCREENS] =
         .backlight_set_timeout=&backlight_set_timeout,
 #if LCD_DEPTH > 1
         .backdrop_load=&backdrop_load,
-        .backdrop_unload=&backdrop_unload,
         .backdrop_show=&backdrop_show,
-        .backdrop_hide=&backdrop_hide,
 #endif
 #ifdef HAVE_BUTTONBAR
         .has_buttonbar=false,
@@ -291,9 +289,7 @@ struct screen screens[NB_SCREENS] =
         
 #if LCD_DEPTH > 1
         .backdrop_load=&remote_backdrop_load,
-        .backdrop_unload=&remote_backdrop_unload,
         .backdrop_show=&remote_backdrop_show,
-        .backdrop_hide=&remote_backdrop_hide,
 #endif
 #ifdef HAVE_BUTTONBAR
         .has_buttonbar=false,

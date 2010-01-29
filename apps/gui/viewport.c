@@ -109,11 +109,11 @@ static void toggle_theme(enum screen_type screen, bool force)
 
     if (is_theme_enabled(screen))
     {
-#if LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1)
-        screens[screen].backdrop_show(BACKDROP_MAIN);
-#endif
         /* remove the left overs from the previous screen.
          * could cause a tiny flicker. Redo your screen code if that happens */
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+        screens[screen].backdrop_show(sb_get_backdrop(screen));
+#endif
         if (!was_enabled[screen] || force)
         {
             struct viewport deadspace, user;
@@ -165,7 +165,7 @@ static void toggle_theme(enum screen_type screen, bool force)
     else
     {
 #if LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1)
-        screens[screen].backdrop_hide();
+        screens[screen].backdrop_show(NULL);
 #endif
         screens[screen].stop_scroll();
     }
@@ -204,11 +204,6 @@ static bool is_theme_enabled(enum screen_type screen)
     int top = theme_stack_top[screen];
     return theme_stack[screen][top].enabled;
 }
-
-static bool custom_vp_loaded_ok[NB_SCREENS];
-static struct viewport custom_vp[NB_SCREENS];
-
-static unsigned viewport_init_ui_vp(void);
 #endif /* HAVE_LCD_BITMAP */
 
 int viewport_get_nb_lines(const struct viewport *vp)
@@ -263,7 +258,6 @@ void viewportmanager_theme_changed(const int which)
 #endif
     if (which & THEME_UI_VIEWPORT)
     {
-        viewport_init_ui_vp();
     }
     if (which & THEME_LANGUAGE)
     {   
@@ -279,34 +273,6 @@ void viewportmanager_theme_changed(const int which)
         }
     }
     send_event(GUI_EVENT_THEME_CHANGED, NULL);
-}
-
-/*
- * (re)parse the UI vp from the settings
- *  - Returns
- *          0 if no UI vp is used at all
- *          else the bit for the screen (1<<screen) is set
- */
-static unsigned viewport_init_ui_vp(void)
-{
-    int screen;
-    const char *ret = NULL;
-    char *setting;
-    FOR_NB_SCREENS(screen)
-    {
-#ifdef HAVE_REMOTE_LCD
-        if ((screen == SCREEN_REMOTE))
-            setting = global_settings.remote_ui_vp_config;
-        else
-#endif
-            setting = global_settings.ui_vp_config;
-            
-        ret = viewport_parse_viewport(&custom_vp[screen], screen,
-                                     setting, ',');
-
-        custom_vp_loaded_ok[screen] = (ret != NULL);
-    }
-    return true; /* meh fixme */
 }
 
 #ifdef HAVE_TOUCHSCREEN
@@ -380,59 +346,18 @@ void viewport_set_fullscreen(struct viewport *vp,
 void viewport_set_defaults(struct viewport *vp,
                             const enum screen_type screen)
 {
-    /* Reposition:
-       1) If the "ui viewport" setting is set, and a sbs is loaded which specifies a %Vi
-            return the intersection of those two viewports
-       2) If only one of the "ui viewport" setting, or sbs %Vi is set
-            return it
-       3) No user viewports set
-            return the full display
-     */
 #if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
     
-    struct viewport *sbs_area = NULL, *user_setting = NULL;
+    struct viewport *sbs_area = NULL;
     if (!is_theme_enabled(screen))
-   {
+    {
        viewport_set_fullscreen(vp, screen);
        return;
-   }
-    /* get the two viewports */
-    if (custom_vp_loaded_ok[screen])
-        user_setting = &custom_vp[screen];
-    if (sb_skin_get_state(screen))    
-        sbs_area = sb_skin_get_info_vp(screen);
-        
-    /* have both? get their intersection */
-    if (sbs_area && user_setting)
-    {
-        struct viewport *a = sbs_area, *b = user_setting;
-        /* if ui vp and info vp overlap, intersect */
-        if (a->x             < b->x + b->width   &&
-            a->x + a->width  > b->x              &&
-            a->y             < b->y + b->height  &&
-            a->y + a->height > b->y)
-        {
-            /* copy from ui vp first (for other field),fix coordinates after */
-            *vp = *user_setting;
-            set_default_align_flags(vp);
-            vp->x = MAX(a->x, b->x);
-            vp->y = MAX(a->y, b->y);
-            vp->width = MIN(a->x + a->width, b->x + b->width) - vp->x;
-            vp->height = MIN(a->y + a->height, b->y + b->height) - vp->y;
-            return;
-        }
-        /* else (no overlap at all) fall back to info vp from sbs, that
-         * has no redraw problems */
     }
-
-    /* if only one is active use it
-     * or if the above check for overlapping failed, use info vp then, because
-     * that doesn't give redraw problems */
+    sbs_area = sb_skin_get_info_vp(screen);
+    
     if (sbs_area)
         *vp = *sbs_area;
-    else if (user_setting)
-        *vp = *user_setting;
-    /* have neither so its fullscreen which was fixed at the beginning */   
     else  
 #endif /* HAVE_LCD_BITMAP */
         viewport_set_fullscreen(vp, screen);  

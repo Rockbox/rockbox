@@ -40,7 +40,6 @@
 #include "yesno.h"
 #include "list.h"
 #include "plugin.h"
-#include "backdrop.h"
 #include "file.h"
 #include "filefuncs.h"
 
@@ -165,7 +164,6 @@ bool bookmark_autobookmark(void)
     char*  bookmark;
     if (!system_check())
         return false;
-    int i;
 
     audio_pause();    /* first pause playback */
     bookmark = create_bookmark();
@@ -193,12 +191,6 @@ bool bookmark_autobookmark(void)
                             str(LANG_CONFIRM_WITH_BUTTON)};
     const struct text_message message={lines, 2};
 #endif
-    FOR_NB_SCREENS(i)
-    {
-#if LCD_DEPTH > 1
-        screens[i].backdrop_show(BACKDROP_MAIN);
-#endif
-    }
 
     if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
     {

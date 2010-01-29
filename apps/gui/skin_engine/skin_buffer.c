@@ -27,6 +27,7 @@
 #include "buffer.h"
 #include "settings.h"
 #include "screen_access.h"
+#include "skin_engine.h"
 #include "wps_internals.h"
 #include "skin_tokens.h"
 #include "skin_buffer.h"
@@ -46,7 +47,7 @@
  * items with unknown sizes get allocated from the start (0->)      (data)
  * items with known sizes get allocated from the end (<-buf_size)   (tokens)
  * After loading 2 skins the buffer will look like this:
- *  |tokens skin1|images skin2|---SPACE---|data skin2|data skin1|
+ *  |tokens skin1|images skin1|tokens s2|images s2|---SPACE---|data skin2|data skin1|
  * Make sure to never start allocating from the beginning before letting us know
  * how much was used. and RESPECT THE buf_free RETURN VALUES!
  *
@@ -54,12 +55,12 @@
 
 
 #ifdef HAVE_LCD_BITMAP
-#define MAIN_BUFFER ((LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8) \
-                            + (2*LCD_HEIGHT*LCD_WIDTH/8))
+#define MAIN_BUFFER ((2*LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8) \
+                    + (SKINNABLE_SCREENS_COUNT * LCD_BACKDROP_BYTES))
 
 #if (NB_SCREENS > 1)
-#define REMOTE_BUFFER ((LCD_REMOTE_HEIGHT*LCD_REMOTE_WIDTH*LCD_REMOTE_DEPTH/8) \
-                            + (2*LCD_REMOTE_HEIGHT*LCD_REMOTE_WIDTH/8))
+#define REMOTE_BUFFER (2*(LCD_REMOTE_HEIGHT*LCD_REMOTE_WIDTH*LCD_REMOTE_DEPTH/8) \
+                      + (SKINNABLE_SCREENS_COUNT * REMOTE_LCD_BACKDROP_BYTES))
 #else
 #define REMOTE_BUFFER 0
 #endif

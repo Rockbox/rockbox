@@ -33,20 +33,24 @@
 
 void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile);
 
-/* probably temporary, to shut the classic statusbar up */
-bool sb_skin_get_state(enum screen_type screen);
+void sb_create_from_settings(enum screen_type screen);
 void sb_skin_init(void);
 struct viewport *sb_skin_get_info_vp(enum screen_type screen);
 void sb_skin_update(enum screen_type screen, bool force);
 
 void sb_skin_set_update_delay(int delay);
 
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+char* sb_get_backdrop(enum screen_type screen);
+bool sb_set_backdrop(enum screen_type screen, char* filename);
+#endif
+
 #else /* CHARCELL */
 #define sb_skin_init()
 #define sb_skin_data_load(a,b,c)
 #define sb_skin_set_update_delay(a)
 #define sb_skin_set_state(a,b)
-#define sb_skin_get_state(a)
+#define sb_create_from_settings(a)
 #endif
 void do_sbs_update_callback(void *param);
 #endif /* __STATUSBAR_SKINNED_H__ */

@@ -63,7 +63,6 @@
 #include "settings_list.h"
 #include "filetypes.h"
 #include "option_select.h"
-#include "backdrop.h"
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
@@ -796,9 +795,6 @@ void settings_apply(bool read_disk)
 #if CONFIG_CODEC == SWCODEC
     int i;
 #endif
-#if LCD_DEPTH > 1
-    int screen;
-#endif
     sound_settings_apply();
 
 #ifdef HAVE_DISK_STORAGE
@@ -905,23 +901,6 @@ void settings_apply(bool read_disk)
         }
         else
             load_kbd(NULL);
-#endif
-
-
-#if LCD_DEPTH > 1
-        if ( global_settings.backdrop_file[0] &&
-            global_settings.backdrop_file[0] != 0xff ) {
-            snprintf(buf, sizeof buf, BACKDROP_DIR "/%s.bmp",
-                    global_settings.backdrop_file);
-            backdrop_load(BACKDROP_MAIN, buf);
-        } else {
-            backdrop_unload(BACKDROP_MAIN);
-        }
-#endif
-
-#if LCD_DEPTH > 1
-        FOR_NB_SCREENS(screen)
-            screens[screen].backdrop_show(BACKDROP_MAIN);
 #endif
 
         if ( global_settings.lang_file[0]) {

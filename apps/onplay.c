@@ -61,7 +61,7 @@
 #include "tagtree.h"
 #endif
 #include "cuesheet.h"
-#include "backdrop.h"
+#include "statusbar-skinned.h"
 #include "pitchscreen.h"
 #include "viewport.h"
 
@@ -589,16 +589,16 @@ static bool delete_dir(void)
 static bool set_backdrop(void)
 {
     /* load the image */
-    if(backdrop_load(BACKDROP_MAIN, selected_file)) {
+    if(sb_set_backdrop(SCREEN_MAIN, selected_file)) {
         splash(HZ, str(LANG_BACKDROP_LOADED));
         set_file(selected_file, (char *)global_settings.backdrop_file,
             MAX_FILENAME);
-        backdrop_show(BACKDROP_MAIN);
         return true;
     } else {
         splash(HZ, str(LANG_BACKDROP_FAILED));
         return false;
     }
+    return true;
 }
 #endif
 

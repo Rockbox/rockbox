@@ -27,6 +27,15 @@
 
 #include "wps_internals.h" /* TODO: remove this line.. shoudlnt be needed */
 
+enum skinnable_screens {
+    CUSTOM_STATUSBAR,
+    WPS,
+    
+    
+    SKINNABLE_SCREENS_COUNT
+};
+
+
 #ifdef HAVE_TOUCHSCREEN
 int wps_get_touchaction(struct wps_data *data);
 #endif

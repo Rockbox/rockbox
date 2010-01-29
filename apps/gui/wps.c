@@ -99,10 +99,6 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
 {
     bool loaded_ok;
 
-#if LCD_DEPTH > 1
-    screens[screen].backdrop_unload(BACKDROP_SKIN_WPS);
-#endif
-
 #ifndef __PCTOOL__
     /*
      * Hardcode loading WPS_DEFAULTCFG to cause a reset ideally this
@@ -129,6 +125,9 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
     {
         char *skin_buf[NB_SCREENS] = {
 #ifdef HAVE_LCD_BITMAP
+#if LCD_DEPTH > 1
+            "%Xd\n"
+#endif
             "%s%?it<%?in<%in. |>%it|%fn>\n"
             "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
             "%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>\n\n"
@@ -140,6 +139,9 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
             "%pc%?ps<*|/>%pt\n",
 #endif
 #ifdef HAVE_REMOTE_LCD
+#if LCD_REMOTE_DEPTH > 1
+            "%Xd\n"
+#endif
             "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
             "%s%?it<%?in<%in. |>%it|%fn>\n"
             "%al%pc/%pt%ar[%pp:%pe]\n"
@@ -563,9 +565,6 @@ static void gwps_leave_wps(void)
     FOR_NB_SCREENS(i)
     {
         gui_wps[i].display->stop_scroll();
-#if LCD_DEPTH > 1
-        gui_wps[i].display->backdrop_show(BACKDROP_MAIN);
-#endif
         
 #ifdef HAVE_LCD_BITMAP
         bool draw = false;
@@ -614,7 +613,6 @@ static void gwps_enter_wps(void)
             vp->fg_pattern = display->get_foreground();
             vp->bg_pattern = display->get_background();
         }
-        display->backdrop_show(BACKDROP_SKIN_WPS);
 #endif
         /* make the backdrop actually take effect */
         display->clear_display();
@@ -1298,9 +1296,6 @@ void gui_sync_wps_init(void)
         /* Currently no seperate wps_state needed/possible
            so use the only available ( "global" ) one */
         gui_wps[i].state = &wps_state;
-#if LCD_DEPTH > 1
-        gui_wps[i].display->backdrop_unload(BACKDROP_SKIN_WPS);
-#endif
         /* must point to the same struct for both screens */
         gui_wps[i].sync_data = &wps_sync_data;
     }

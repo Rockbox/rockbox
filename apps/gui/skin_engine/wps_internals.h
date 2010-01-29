@@ -271,6 +271,9 @@ struct wps_data
     struct skin_token_list *images;
     struct skin_token_list *progressbars;
 #endif
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    char *backdrop;
+#endif
 
 #ifdef HAVE_TOUCHSCREEN
     struct skin_token_list *touchregions;

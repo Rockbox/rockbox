@@ -22,29 +22,29 @@
 #ifndef _BACKDROP_H
 #define _BACKDROP_H
 
-enum backdrop_type {
-    BACKDROP_MAIN,
-    BACKDROP_SKIN_WPS,
-};
-
 #if LCD_DEPTH > 1 && !defined(__PCTOOL__)
 
 #include "lcd.h"
 #include "bmp.h"
 
-bool backdrop_load(enum backdrop_type bdrop, const char*);
-void backdrop_unload(enum backdrop_type bdrop);
-void backdrop_show(enum backdrop_type bdrop);
-void backdrop_hide(void);
+#define LCD_BACKDROP_BYTES (LCD_FBHEIGHT*LCD_FBWIDTH*sizeof(fb_data))
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+#define REMOTE_LCD_BACKDROP_BYTES \
+            (LCD_REMOTE_FBHEIGHT*LCD_REMOTE_FBWIDTH*sizeof(fb_remote_data))
+#else
+#define REMOTE_LCD_BACKDROP_BYTES 0
+#endif
 
+bool backdrop_load(const char *filename, char* backdrop_buffer);
+void backdrop_show(char* backdrop_buffer);
+
+#else
+#define LCD_BACKDROP_BYTES 0
 #endif
 
 #if defined(HAVE_REMOTE_LCD)
-/* no main backdrop, stubs! */
-bool remote_backdrop_load(enum backdrop_type bdrop,const char* filename);
-void remote_backdrop_unload(enum backdrop_type bdrop);
-void remote_backdrop_show(enum backdrop_type bdrop);
-void remote_backdrop_hide(void);
+bool remote_backdrop_load(const char *filename, char* backdrop_buffer);
+void remote_backdrop_show(char* backdrop_buffer);
 #endif
 
 #endif /* _BACKDROP_H */

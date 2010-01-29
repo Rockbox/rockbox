@@ -52,7 +52,6 @@
 #include "radio.h"
 #endif
 #include "wps.h"
-#include "backdrop.h"
 
 static int compare_sort_dir; /* qsort key for sorting directories */
 
@@ -503,9 +502,6 @@ int ft_enter(struct tree_context* c)
                 /* wps config file */
             case FILE_ATTR_WPS:
                 splash(0, ID2P(LANG_WAIT));
-#if LCD_DEPTH > 1
-                backdrop_unload(BACKDROP_SKIN_WPS);
-#endif
                 set_file(buf, (char *)global_settings.wps_file,
                          MAX_FILENAME);
                 settings_apply_skins();
@@ -515,9 +511,6 @@ int ft_enter(struct tree_context* c)
                 /* remote-wps config file */
             case FILE_ATTR_RWPS:
                 splash(0, ID2P(LANG_WAIT));
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                remote_backdrop_unload(BACKDROP_SKIN_WPS);
-#endif
                 set_file(buf, (char *)global_settings.rwps_file,
                          MAX_FILENAME);
                 settings_apply_skins();

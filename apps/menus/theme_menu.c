@@ -39,6 +39,7 @@
 #include "exported_menus.h"
 #include "appevents.h"
 #include "viewport.h"
+#include "statusbar-skinned.h"
 
 #if LCD_DEPTH > 1
 /**
@@ -47,11 +48,9 @@
 static int clear_main_backdrop(void)
 {
     global_settings.backdrop_file[0]=0;
-    backdrop_unload(BACKDROP_MAIN);
-    backdrop_show(BACKDROP_MAIN);
-    /* force a full redraw so the whole backdrop is cleared */
+    sb_set_backdrop(SCREEN_MAIN, NULL);
     viewportmanager_theme_enable(SCREEN_MAIN, false, NULL);
-    viewportmanager_theme_undo(SCREEN_MAIN, false);
+    viewportmanager_theme_undo(SCREEN_MAIN, true);
     settings_save();
     return 0;
 }
@@ -162,10 +161,7 @@ static int statusbar_callback_ex(int action,const struct menu_item_ex *this_item
             old_bar[screen] = statusbar_position(screen);
             break;
         case ACTION_EXIT_MENUITEM:
-            send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
-            /* force a full redraw */
-            viewportmanager_theme_enable(screen, false, NULL);
-            viewportmanager_theme_undo(screen, false);
+            settings_apply_skins();
             break;
     }
     return ACTION_REDRAW;

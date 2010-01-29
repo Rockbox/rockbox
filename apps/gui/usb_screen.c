@@ -129,10 +129,10 @@ struct usb_screen_vps_t
 };
 
 #ifdef HAVE_LCD_BITMAP
-static bool usb_screen_fix_viewports(struct screen *screen,
+static void usb_screen_fix_viewports(struct screen *screen,
         struct usb_screen_vps_t *usb_screen_vps)
 {
-    bool theme_needs_undo = false;
+    bool disable = true;
     int logo_width, logo_height;
     struct viewport *parent = &usb_screen_vps->parent;
     struct viewport *logo = &usb_screen_vps->logo;
@@ -151,11 +151,8 @@ static bool usb_screen_fix_viewports(struct screen *screen,
     }
 
     viewport_set_defaults(parent, screen->screen_type);
-    if (parent->width < logo_width || parent->height < logo_height)
-    {
-        theme_needs_undo = true;
-        viewportmanager_theme_enable(screen->screen_type, false, parent);
-    }
+    disable = (parent->width < logo_width || parent->height < logo_height);
+    viewportmanager_theme_enable(screen->screen_type, !disable, parent);
 
     *logo = *parent;
     logo->x = parent->x + parent->width - logo_width;
@@ -179,18 +176,12 @@ static bool usb_screen_fix_viewports(struct screen *screen,
         }
     }
 #endif
-    return theme_needs_undo;
 }
 #endif
 
 static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 {
     int i;
-    lcd_clear_display();
-#ifdef HAVE_LCD_REMOTE
-    lcd_remote_clear_display();
-#endif
-
     FOR_NB_SCREENS(i)
     {
         struct screen *screen = &screens[i];
@@ -202,11 +193,8 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 #endif
 
         screen->set_viewport(parent);
-#if LCD_DEPTH > 1
-        screen->backdrop_show(BACKDROP_MAIN);
-#endif
-        screen->backlight_on();
         screen->clear_viewport();
+        screen->backlight_on();
 
 #ifdef HAVE_LCD_BITMAP
         screen->set_viewport(logo);
@@ -240,15 +228,14 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
         status_set_usb(true);
 #endif /* HAVE_LCD_BITMAP */
 
-        screen->update_viewport();
         screen->set_viewport(NULL);
+        screen->update_viewport();
     }
 }
 
 void gui_usb_screen_run(void)
 {
     int i;
-    bool screen_theme_needs_undo[NB_SCREENS];
     struct usb_screen_vps_t usb_screen_vps_ar[NB_SCREENS];
 #if defined HAVE_TOUCHSCREEN
     enum touchscreen_mode old_mode = touchscreen_get_mode();
@@ -273,7 +260,7 @@ void gui_usb_screen_run(void)
 
         screen->set_viewport(NULL);
 #ifdef HAVE_LCD_BITMAP
-        screen_theme_needs_undo[i] = usb_screen_fix_viewports(screen, &usb_screen_vps_ar[i]);
+        usb_screen_fix_viewports(screen, &usb_screen_vps_ar[i]);
 #endif
     }
 
@@ -320,10 +307,7 @@ void gui_usb_screen_run(void)
     FOR_NB_SCREENS(i)
     {
         screens[i].backlight_on();
-        if(screen_theme_needs_undo[i])
-        {
-            viewportmanager_theme_undo(i, false);
-        }
+        viewportmanager_theme_undo(i, false);
     }
 
 }
