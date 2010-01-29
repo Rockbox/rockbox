@@ -35,13 +35,17 @@ void backdrop_show(char* backdrop_buffer);
 #define LCD_BACKDROP_BYTES 0
 #endif
 
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1 && !defined(__PCTOOL__)
-#define REMOTE_LCD_BACKDROP_BYTES \
-            (LCD_REMOTE_FBHEIGHT*LCD_REMOTE_FBWIDTH*sizeof(fb_remote_data))
+#if defined(HAVE_REMOTE_LCD) 
 bool remote_backdrop_load(const char *filename, char* backdrop_buffer);
 void remote_backdrop_show(char* backdrop_buffer);
+
+#if LCD_DEPTH > 1 && LCD_REMOTE_DEPTH > 1 && !defined(__PCTOOL__)
+#define REMOTE_LCD_BACKDROP_BYTES \
+            (LCD_REMOTE_FBHEIGHT*LCD_REMOTE_FBWIDTH*sizeof(fb_remote_data))
 #else
 #define REMOTE_LCD_BACKDROP_BYTES 0
+#endif
+
 #endif
 
 #endif /* _BACKDROP_H */
