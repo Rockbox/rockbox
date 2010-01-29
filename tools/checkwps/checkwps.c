@@ -183,9 +183,9 @@ int remote_getwidth(void) { return LCD_REMOTE_WIDTH; }
 int remote_getheight(void) { return LCD_REMOTE_HEIGHT; }
 #endif
 
-static inline bool backdrop_load(enum backdrop_type bdrop, const char* filename) 	 
+static inline bool backdrop_load(const char *filename, char* backdrop_buffer) 	 
 { 	 
- (void)filename; (void)bdrop; return true; 	 
+ (void)filename; (void)backdrop_buffer; return true; 	 
 }
 
 struct screen screens[NB_SCREENS] =
