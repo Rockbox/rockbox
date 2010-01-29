@@ -165,16 +165,19 @@ void RbSettings::setSubValue(QString sub, enum UserSettings setting, QVariant va
 
 QString RbSettings::constructSettingPath(QString path, QString substitute)
 {
-    QString platform = userSettings->value("platform").toString();
-    if(!substitute.isEmpty()) {
-        path.replace(":tts:", substitute);
-        path.replace(":encoder:", substitute);
+    // anything to substitute?
+    if(path.contains(':')) {
+        QString platform = userSettings->value("platform").toString();
+        if(!substitute.isEmpty()) {
+            path.replace(":tts:", substitute);
+            path.replace(":encoder:", substitute);
+        }
+        else {
+            path.replace(":tts:", userSettings->value("tts").toString());
+            path.replace(":encoder:", SystemInfo::platformValue(platform,SystemInfo::CurEncoder).toString());
+        }
+        path.replace(":platform:", platform);
     }
-    else {
-        path.replace(":tts:", userSettings->value("tts").toString());
-        path.replace(":encoder:", SystemInfo::platformValue(platform,SystemInfo::CurEncoder).toString());
-    }
-    path.replace(":platform:", platform);
 
     return path;
 }

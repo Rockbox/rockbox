@@ -81,12 +81,12 @@ QVariant SystemInfo::value(enum SystemInfos info)
     int i = 0;
     while(SystemInfosList[i].info != info)
         i++;
-
+    QString platform = RbSettings::value(RbSettings::CurrentPlatform).toString();
     QString s = SystemInfosList[i].name;
-    s.replace(":platform:", RbSettings::value(RbSettings::CurrentPlatform).toString());
+    s.replace(":platform:", platform);
     QString d = SystemInfosList[i].def;
-    d.replace(":platform:", RbSettings::value(RbSettings::CurrentPlatform).toString());
-    qDebug() << "[SystemInfos] GET:" << s << systemInfos->value(s, d).toString();
+    d.replace(":platform:", platform);
+    qDebug() << "[SystemInfo] GET:" << s << systemInfos->value(s, d).toString();
     return systemInfos->value(s, d);
 }
 
