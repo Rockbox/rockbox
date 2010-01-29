@@ -62,8 +62,14 @@ bool remote_backdrop_load(const char *filename, char* backdrop_buffer)
     ret = read_bmp_file(filename, &bm, REMOTE_LCD_BACKDROP_BYTES,
                         FORMAT_NATIVE | FORMAT_DITHER | FORMAT_REMOTE, NULL);
     return ((ret > 0)
-            && (bm.width == REMOTE_LCD_WIDTH) && (bm.height == REMOTE_LCD_HEIGHT));
+            && (bm.width == LCD_REMOTE_WIDTH) && (bm.height == LCD_REMOTE_HEIGHT));
 }
+
+void remote_backdrop_show(char *backdrop_buffer)
+{
+    lcd_remote_set_backdrop((fb_remote_data*)backdrop_buffer);
+}
+
 #else /* needs stubs */
 
 bool remote_backdrop_load(const char *filename, char* backdrop_buffer)

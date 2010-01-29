@@ -93,7 +93,7 @@ bool sb_set_backdrop(enum screen_type screen, char* filename)
         /* need to make room on the buffer */
         size_t buf_size;
 #if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
-        if (curr_screen == SCREEN_REMOTE)
+        if (screen == SCREEN_REMOTE)
             buf_size = REMOTE_LCD_BACKDROP_BYTES;
         else
 #endif
