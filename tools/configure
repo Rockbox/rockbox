@@ -2458,7 +2458,7 @@ fi
     
    160|pb_vibe500)
     target_id=67
-    modelname="pb_vibe500"
+    modelname="vibe500"
     target="-DPBELL_VIBE500"
     memory=32 # always
     arm7tdmicc
