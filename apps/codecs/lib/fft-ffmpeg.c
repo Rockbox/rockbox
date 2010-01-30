@@ -437,19 +437,61 @@ static void fft##n(FFTComplex *z)\
 }
 #endif
 
+
+#ifdef CPU_ARM
+#define fft4(z_arg)\
+{\
+    /* input[0..7] -> output[0..7] */\
+    fixed32 * m = (fixed32 *) ( ( z_arg ) );\
+    /* load r1=z[0],r2=z[1],...,r8=z[7] */\
+    asm volatile(\
+      "ldmia %[z], {r1-r8}\n\t"\
+      "add r1,r1,r3\n\t"         /* r1 :=t1 */\
+      "sub r3,r1,r3, lsl #1\n\t" /* r3 :=t3 */\
+      "sub r7,r7,r5\n\t"         /* r10:=t8 */\
+      "add r5,r7,r5, lsl #1\n\t" /* r5 :=t6 */\
+      \
+      "add r1,r1,r5\n\t"                 /* r1 = o[0] */\
+      "sub r5,r1,r5, lsl #1\n\t"         /* r5 = o[4] */\
+      \
+      "add r2,r2,r4\n\t"         /* r2 :=t2 */\
+      "sub r4,r2,r4, lsl #1\n\t" /* r9 :=t4 */\
+      \
+      "add r12,r6,r8\n\t"        /* r10:=t5 */\
+      "sub r6,r6,r8\n\t"         /* r6 :=t7 */\
+      \
+      "sub r8,r4,r7\n\t"                 /* r8 = o[7]*/ \
+      "add r4,r4,r7\n\t"                 /* r4 = o[3]*/ \
+      "sub r7,r3,r6\n\t"                 /* r7 = o[6]*/ \
+      "add r3,r3,r6\n\t"                 /* r3 = o[2]*/ \
+      "sub r6,r2,r12\n\t"                /* r6 = o[5]*/ \
+      "add r2,r2,r12\n\t"                /* r2 = o[1]*/ \
+      \
+      "stmia %[z], {r1-r8}\n\t"\
+      : /* outputs */\
+      : /* inputs */ [z] "r" (m)\
+      : /* clobbers */\
+      "r1","r2","r3","r4","r5","r6","r7","r8","r12","memory"\
+   );\
+}
+#else
 static inline void fft4(FFTComplex *z)
 {
     FFTSample t1, t2, t3, t4, t5, t6, t7, t8;
 
-    BF(t3, t1, z[0].re, z[1].re);
-    BF(t8, t6, z[3].re, z[2].re);
-    BF(z[2].re, z[0].re, t1, t6);
-    BF(t4, t2, z[0].im, z[1].im);
-    BF(t7, t5, z[2].im, z[3].im);
-    BF(z[3].im, z[1].im, t4, t8);
-    BF(z[3].re, z[1].re, t3, t7);
-    BF(z[2].im, z[0].im, t2, t5);
+    BF(t3, t1, z[0].re, z[1].re); // t3=r1-r3 ; t1 = r1+r3
+    BF(t8, t6, z[3].re, z[2].re); // t8=r7-r5 ; t6 = r7+r5
+
+    BF(z[2].re, z[0].re, t1, t6); // r5=t1-t6 ; r1 = t1+t6
+
+    BF(t4, t2, z[0].im, z[1].im); // t4=r2-r4 ; t2 = r2+r4
+    BF(t7, t5, z[2].im, z[3].im); // t7=r6-r8 ; t5 = r6+r8
+
+    BF(z[3].im, z[1].im, t4, t8); // r8=t4-t8 ; r4 = t4+t8
+    BF(z[3].re, z[1].re, t3, t7); // r7=t3-t7 ; r3 = t3+t7
+    BF(z[2].im, z[0].im, t2, t5); // r6=t2-t5 ; r2 = t2+t5
 }
+#endif
 
 static void fft4_dispatch(FFTComplex *z)
 {
