@@ -22,6 +22,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 */
 
+#include "demac_config.h"
+#ifndef FILTER256_IRAM
+#undef ICODE_ATTR_DEMAC
+#define ICODE_ATTR_DEMAC
+#endif
 #define ORDER 256
 #define FRACBITS 13
 #include "filter.c"

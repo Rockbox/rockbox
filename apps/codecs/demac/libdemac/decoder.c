@@ -33,10 +33,23 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 /* Statically allocate the filter buffers */
 
+#ifdef FILTER256_IRAM
 static filter_int filterbuf32[(32*3 + FILTER_HISTORY_SIZE) * 2]   
                   IBSS_ATTR __attribute__((aligned(16))); /* 2432/4864 bytes */
 static filter_int filterbuf256[(256*3 + FILTER_HISTORY_SIZE) * 2]
                   IBSS_ATTR __attribute__((aligned(16))); /* 5120/10240 bytes */
+#define FILTERBUF64 filterbuf256
+#define FILTERBUF32 filterbuf32
+#define FILTERBUF16 filterbuf32
+#else
+static filter_int filterbuf64[(64*3 + FILTER_HISTORY_SIZE) * 2]   
+                  IBSS_ATTR __attribute__((aligned(16))); /* 2432/4864 bytes */
+static filter_int filterbuf256[(256*3 + FILTER_HISTORY_SIZE) * 2]
+                  __attribute__((aligned(16))); /* 5120/10240 bytes */
+#define FILTERBUF64 filterbuf64
+#define FILTERBUF32 filterbuf64
+#define FILTERBUF16 filterbuf64
+#endif
 
 /* This is only needed for "insane" files, and no current Rockbox targets
    can hope to decode them in realtime, although the Gigabeat S comes close. */
@@ -57,22 +70,22 @@ void init_frame_decoder(struct ape_ctx_t* ape_ctx,
     switch (ape_ctx->compressiontype)
     {
         case 2000:
-            init_filter_16_11(filterbuf32);
+            init_filter_16_11(FILTERBUF16);
             break;
 
         case 3000:
-            init_filter_64_11(filterbuf256);
+            init_filter_64_11(FILTERBUF64);
             break;
 
         case 4000:
             init_filter_256_13(filterbuf256);
-            init_filter_32_10(filterbuf32);
+            init_filter_32_10(FILTERBUF32);
             break;
 
         case 5000:
             init_filter_1280_15(filterbuf1280);
             init_filter_256_13(filterbuf256);
-            init_filter_16_11(filterbuf32);
+            init_filter_16_11(FILTERBUF32);
     }
 }
 

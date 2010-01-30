@@ -90,18 +90,18 @@
 
 #ifdef CPU_PP
 #if CONFIG_CPU == PP5020
-.set recip_max, 5952
+.set recip_max, 8384
 #elif CONFIG_CPU == PP5002
-.set recip_max, 1472
+.set recip_max, 4992
 #else
-.set recip_max, 14208
+.set recip_max, 16384
 #endif
 #elif CONFIG_CPU == AS3525
 .set recip_max, 42752
 #elif CONFIG_CPU == S5L8701
-.set recip_max, 9600
+.set recip_max, 13184
 #elif CONFIG_CPU == S5L8700
-.set recip_max, 5504
+.set recip_max, 9088
 #endif
 
 udiv32_arm:

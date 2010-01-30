@@ -97,9 +97,26 @@ struct filter_t {
 #define FP_HALF  (1 << (FRACBITS - 1))   /* 0.5 in fixed-point format. */
 #define FP_TO_INT(x) ((x + FP_HALF) >> FRACBITS)  /* round(x) */
 
-#if defined(CPU_ARM) && (ARM_ARCH >= 6)
+#ifdef CPU_ARM
+#if ARM_ARCH >= 6
 #define SATURATE(x) ({int __res; asm("ssat %0, #16, %1" : "=r"(__res) : "r"(x)); __res; })
-#else
+#else /* ARM_ARCH < 6 */
+/* Keeping the asr #31 outside of the asm allows loads to be scheduled between
+   it and the rest of the block on ARM9E, with the load's result latency filled
+   by the other calculations. */
+#define SATURATE(x) ({ \
+    int __res = (x) >> 31; \
+    asm volatile ( \
+        "teq %0, %1, asr #15\n\t" \
+        "moveq %0, %1\n\t" \
+        "eorne %0, %0, #0xff\n\t" \
+        "eorne %0, %0, #0x7f00" \
+        : "+r" (__res) : "r" (x) : "cc" \
+    ); \
+    __res; \
+})
+#endif /* ARM_ARCH */
+#else /* CPU_ARM */
 #define SATURATE(x) (LIKELY((x) == (int16_t)(x)) ? (x) : ((x) >> 31) ^ 0x7FFF)
 #endif
 
