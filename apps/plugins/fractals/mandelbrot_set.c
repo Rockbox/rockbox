@@ -31,14 +31,16 @@ static unsigned char imgbuffer[LCD_HEIGHT];
 static fb_data imgbuffer[LCD_HEIGHT];
 #endif
 
-#define NUM_COLORS ((unsigned)(1 << LCD_DEPTH))
-
+#ifdef USEGSLIB
+#define LCOLOR(iter) (iter << 5)
+#else
 /*
  * Spread iter's colors over color range.
  * 345 (=15*26-45) is max_iter maximal value
  * This implementation ignores pixel format, thus it is not uniformly spread
  */
-#define LCOLOR(iter) ((iter * NUM_COLORS) / 345)
+#define LCOLOR(iter) ((iter << LCD_DEPTH) / 345)
+#endif
 
 #ifdef HAVE_LCD_COLOR
 #define COLOR(iter) (fb_data)LCOLOR(iter)
