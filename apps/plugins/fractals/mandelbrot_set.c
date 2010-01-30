@@ -32,7 +32,7 @@ static fb_data imgbuffer[LCD_HEIGHT];
 #endif
 
 #ifdef USEGSLIB
-#define LCOLOR(iter) (iter << 5)
+#define LCOLOR(iter) ((iter ^ 7) << 5)
 #else
 /*
  * Spread iter's colors over color range.
