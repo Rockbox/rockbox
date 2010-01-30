@@ -61,7 +61,8 @@ void rtc_init(void)
 int rtc_read_datetime(struct tm *tm)
 {
     unsigned char buf[7];
-    int i, ret;
+    unsigned int i;
+    int ret;
 
     ret = i2c_read(RTC_ADDR | (REALTIME_DATA1 << 1), -1, sizeof(buf), buf);
     reverse_bits(buf, sizeof(buf));
@@ -69,7 +70,7 @@ int rtc_read_datetime(struct tm *tm)
     buf[4] &= 0x3f; /* mask out p.m. flag */
 
     for (i = 0; i < sizeof(buf); i++)
-        BCD2DEC(buf[i]);
+        buf[i] = BCD2DEC(buf[i]);
 
     tm->tm_sec = buf[6];
     tm->tm_min = buf[5];
@@ -85,7 +86,8 @@ int rtc_read_datetime(struct tm *tm)
 int rtc_write_datetime(const struct tm *tm)
 {
     unsigned char buf[7];
-    int i, ret;
+    unsigned int i;
+    int ret;
 
     buf[6] = tm->tm_sec;
     buf[5] = tm->tm_min;
@@ -96,7 +98,7 @@ int rtc_write_datetime(const struct tm *tm)
     buf[0] = tm->tm_year - 100;
 
     for (i = 0; i < sizeof(buf); i++)
-        DEC2BCD(buf[i]);
+        buf[i] = DEC2BCD(buf[i]);
 
     reverse_bits(buf, sizeof(buf));
     ret = i2c_write(RTC_ADDR | (REALTIME_DATA1 << 1), -1, sizeof(buf), buf);
