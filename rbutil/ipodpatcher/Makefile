@@ -39,8 +39,14 @@ OUTPUT=ipodpatcher
 CROSS=i586-mingw32msvc-
 endif
 endif
+ifeq ($(findstring Darwin,$(shell uname)),Darwin)
+# building against SDK 10.4 is not compatible with gcc-4.2 (default on newer Xcode)
+# might need adjustment for older Xcode.
+NATIVECC ?= gcc-4.0
+CFLAGS+=-framework CoreFoundation -framework IOKit -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
+endif
 
-NATIVECC = gcc
+NATIVECC ?= gcc
 CC = $(CROSS)gcc
 WINDRES = $(CROSS)windres
 
@@ -49,7 +55,7 @@ SRC = main.c ipodpatcher.c fat32format.c arc4.c
 all: $(OUTPUT)
 
 ipodpatcher: $(SRC) ipodio-posix.c $(BOOTSRC)
-	gcc $(CFLAGS) -o ipodpatcher $(SRC) ipodio-posix.c $(BOOTSRC)
+	$(NATIVECC) $(CFLAGS) -o ipodpatcher $(SRC) ipodio-posix.c $(BOOTSRC)
 	strip ipodpatcher
 
 ipodpatcher.exe: $(SRC) ipodio-win32.c ipodio-win32-scsi.c ipodpatcher-rc.o $(BOOTSRC)
@@ -63,11 +69,11 @@ ipodpatcher-mac: ipodpatcher-i386 ipodpatcher-ppc
 	lipo -create ipodpatcher-ppc ipodpatcher-i386 -output ipodpatcher-mac
 
 ipodpatcher-i386: $(SRC) ipodio-posix.c $(BOOTSRC)
-	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 $(CFLAGS) -o ipodpatcher-i386 $(SRC) ipodio-posix.c $(BOOTSRC)
+	$(NATIVECC) -arch i386 $(CFLAGS) -o ipodpatcher-i386 $(SRC) ipodio-posix.c $(BOOTSRC)
 	strip ipodpatcher-i386
 
 ipodpatcher-ppc: $(SRC) ipodio-posix.c $(BOOTSRC)
-	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch ppc $(CFLAGS) -o ipodpatcher-ppc $(SRC) ipodio-posix.c $(BOOTSRC)
+	$(NATIVECC) -arch ppc $(CFLAGS) -o ipodpatcher-ppc $(SRC) ipodio-posix.c $(BOOTSRC)
 	strip ipodpatcher-ppc
 
 ipod2c: ipod2c.c

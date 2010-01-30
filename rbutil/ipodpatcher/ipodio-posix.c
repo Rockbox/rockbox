@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -53,7 +54,7 @@ static void get_geometry(struct ipod_t* ipod)
     }
 }
 
-/* Linux SCSI Inquiry code based on the documentation and example code from 
+/* Linux SCSI Inquiry code based on the documentation and example code from
    http://www.ibm.com/developerworks/linux/library/l-scsi-api/index.html
 */
 
@@ -84,7 +85,7 @@ int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
     cdb[3] = 0;
     cdb[4] = 0xff;
     cdb[5] = 0; /* For control filed, just use 0 */
-    
+
     hdr.dxfer_direction = SG_DXFER_FROM_DEV;
     hdr.cmdp = cdb;
     hdr.cmd_len = 6;
@@ -123,7 +124,13 @@ int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
 }
 
 #elif defined(__APPLE__) && defined(__MACH__)
+/* OS X IOKit includes don't like VERSION being defined! */
+#undef VERSION
 #include <sys/disk.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <IOKit/IOKitLib.h>
+#include <IOKit/scsi-commands/SCSITaskLib.h>
+#include <IOKit/scsi-commands/SCSICommandOperationCodes.h>
 #define IPOD_SECTORSIZE_IOCTL DKIOCGETBLOCKSIZE
 
 /* TODO: Implement this function for Mac OS X */
@@ -137,12 +144,143 @@ static void get_geometry(struct ipod_t* ipod)
 int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
                       unsigned char* buf, int bufsize)
 {
-    /* TODO: Implement for OS X */
+    /* OS X doesn't allow to simply send out a SCSI inquiry request but
+     * requires registering an interface handler first.
+     * Currently this is done on each inquiry request which is somewhat
+     * inefficient but the current ipodpatcher API doesn't really fit here.
+     * Based on the documentation in Apple's document
+     * "SCSI Architecture Model Device Interface Guide".
+     *
+     * WARNING: this code currently doesn't take the selected device into
+     *          account. It simply looks for an Ipod on the system and uses
+     *          the first match.
+     */
     (void)ipod;
-    (void)page_code;
-    (void)buf;
-    (void)bufsize;
-    return -1;
+    int result = 0;
+    /* first, create a dictionary to match the device. This is needed to get the
+     * service. */
+    CFMutableDictionaryRef match_dict;
+    match_dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
+    if(match_dict == NULL)
+        return -1;
+
+    /* set value to match. In case of the Ipod this is "iPodUserClientDevice". */
+    CFMutableDictionaryRef sub_dict;
+    sub_dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
+    CFDictionarySetValue(sub_dict, CFSTR(kIOPropertySCSITaskDeviceCategory),
+                         CFSTR("iPodUserClientDevice"));
+    CFDictionarySetValue(match_dict, CFSTR(kIOPropertyMatchKey), sub_dict);
+
+    if(sub_dict == NULL)
+        return -1;
+
+    /* get an iterator for searching for the service. */
+    kern_return_t kr;
+    io_iterator_t iterator = IO_OBJECT_NULL;
+    /* get matching services from IO registry. Consumes one reference to
+     * the dictionary, so no need to release that. */
+    kr = IOServiceGetMatchingServices(kIOMasterPortDefault, match_dict, &iterator);
+
+    if(!iterator | (kr != kIOReturnSuccess))
+        return -1;
+
+    /* get interface and obtain exclusive access */
+    SInt32 score;
+    HRESULT herr;
+    kern_return_t err;
+    IOCFPlugInInterface **plugin_interface = NULL;
+    SCSITaskDeviceInterface **interface = NULL;
+    io_service_t device = IO_OBJECT_NULL;
+    device = IOIteratorNext(iterator);
+
+    err = IOCreatePlugInInterfaceForService(device, kIOSCSITaskDeviceUserClientTypeID,
+                                            kIOCFPlugInInterfaceID, &plugin_interface,
+                                            &score);
+
+    if(err != noErr) {
+        return -1;
+    }
+    /* query the plugin interface for task interface */
+    herr = (*plugin_interface)->QueryInterface(plugin_interface,
+                            CFUUIDGetUUIDBytes(kIOSCSITaskDeviceInterfaceID), (LPVOID*)&interface);
+    if(herr != S_OK) {
+        IODestroyPlugInInterface(plugin_interface);
+        return -1;
+    }
+
+    err = (*interface)->ObtainExclusiveAccess(interface);
+    if(err != noErr) {
+        (*interface)->Release(interface);
+        IODestroyPlugInInterface(plugin_interface);
+        return -1;
+    }
+
+    /* do the inquiry */
+    SCSITaskInterface **task = NULL;
+
+    task = (*interface)->CreateSCSITask(interface);
+    if(task != NULL) {
+        kern_return_t err;
+        SCSITaskStatus task_status;
+        IOVirtualRange* range;
+        SCSI_Sense_Data sense_data;
+        SCSICommandDescriptorBlock cdb;
+        UInt64 transfer_count = 0;
+        memset(buf, 0, bufsize);
+        /* allocate virtual range for buffer. */
+        range = (IOVirtualRange*) malloc(sizeof(IOVirtualRange));
+        memset(&sense_data, 0, sizeof(sense_data));
+        memset(cdb, 0, sizeof(cdb));
+        /* set up range. address is buffer address, length is request size. */
+        range->address = (IOVirtualAddress)buf;
+        range->length = bufsize;
+        /* setup CDB */
+        cdb[0] = 0x12; /* inquiry */
+        cdb[1] = 1;
+        cdb[2] = page_code;
+        cdb[4] = bufsize;
+
+        /* set cdb in task */
+        err = (*task)->SetCommandDescriptorBlock(task, cdb, kSCSICDBSize_6Byte);
+        if(err != kIOReturnSuccess) {
+            result = -1;
+            goto cleanup;
+        }
+        err = (*task)->SetScatterGatherEntries(task, range, 1, bufsize,
+                kSCSIDataTransfer_FromTargetToInitiator);
+        if(err != kIOReturnSuccess) {
+            result = -1;
+            goto cleanup;
+        }
+        /* set timeout */
+        err = (*task)->SetTimeoutDuration(task, 10000);
+        if(err != kIOReturnSuccess) {
+            result = -1;
+            goto cleanup;
+        }
+
+        /* request data */
+        err = (*task)->ExecuteTaskSync(task, &sense_data, &task_status, &transfer_count);
+        if(err != kIOReturnSuccess) {
+            result = -1;
+            goto cleanup;
+        }
+        /* cleanup */
+        free(range);
+
+        /* release task interface */
+        (*task)->Release(task);
+    }
+    else {
+        result = -1;
+    }
+cleanup:
+    /* cleanup interface */
+    (*interface)->ReleaseExclusiveAccess(interface);
+    (*interface)->Release(interface);
+    IODestroyPlugInInterface(plugin_interface);
+
+    return result;
 }
 
 #else
@@ -189,7 +327,7 @@ int ipod_open(struct ipod_t* ipod, int silent)
         if (!silent) {
             fprintf(stderr,"[ERR] ioctl() call to get sector size failed, defaulting to %d\n"
                    ,ipod->sector_size);
-	}
+        }
     }
 
     get_geometry(ipod);
