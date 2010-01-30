@@ -186,6 +186,7 @@
 /* and doesn't handle them in the drive firmware */
 /* #define MAX_PHYS_SECTOR_SIZE 1024 */
 
+#define MI4_FORMAT
 #define BOOTFILE_EXT "mi4"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.system"

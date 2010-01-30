@@ -322,6 +322,8 @@ int main (int argc, char** argv)
             modelnum = 65;
         else if (!strcmp(&argv[1][5], "cli+")) /* Sansa Clip+ */
             modelnum = 66;
+        else if (!strcmp(&argv[1][5], "v500")) /* Packard Bell Vibe 500 */
+            modelnum = 67;
         else if (!strcmp(&argv[1][5], "m244"))
             modelnum = 131;
         else {

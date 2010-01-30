@@ -2462,14 +2462,14 @@ fi
     target="-DPBELL_VIBE500"
     memory=32 # always
     arm7tdmicc
-    tool="$rootdir/tools/scramble -mi4v3 -model=vibe500 -type=RBOS"
+    tool="$rootdir/tools/scramble -mi4v3 -model=v500 -type=RBOS"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="jukebox.mi4"
     appextra="recorder:gui"
     plugins="no"
     swcodec="yes"
-    boottool="$rootdir/tools/scramble -mi4v3 -model=vibe500 -type=RBBL"
+    boottool="$rootdir/tools/scramble -mi4v3 -model=v500 -type=RBBL"
     bootoutput="rockbox.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
