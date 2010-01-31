@@ -223,15 +223,17 @@ mpc_streaminfo_read(mpc_streaminfo * si, mpc_reader * r)
 #endif
         si->stream_version = HeaderData[0] >> 24;
 
-        // stream version 8
-        if ((si->stream_version & 15) >= 8) {
-            return ERROR_CODE_INVALIDSV;
-        }
         // stream version 7
-        else if ((si->stream_version & 15) == 7) {
+        if ((si->stream_version & 15) == 7) {
             Error = streaminfo_read_header_sv7(si, HeaderData);
             if (Error != ERROR_CODE_OK) return Error;
+        } else {
+            // only sv7 allowed with "MP+" signature
+            return ERROR_CODE_INVALIDSV;
         }
+    } else if (memcmp(HeaderData, "MPCK", 4) == 0) {
+        // stream version 8 uses "MPCK" signature
+        return ERROR_CODE_INVALIDSV;
     } else {
 #ifdef MPC_SUPPORT_SV456
 #ifndef MPC_LITTLE_ENDIAN

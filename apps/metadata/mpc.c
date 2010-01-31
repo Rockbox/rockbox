@@ -66,9 +66,7 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
         
         header[0] = letoh32(header[0]);
         streamversion = (header[0] >> 24) & 15;
-        if (streamversion >= 8) {
-            return false; /* SV8 or higher don't exist yet, so no support */
-        } else if (streamversion == 7) {
+        if (streamversion == 7) {
             unsigned int gapless = (header[5] >> 31) & 0x0001;
             unsigned int last_frame_samples = (header[5] >> 20) & 0x07ff;
             unsigned int bufused = 0;
@@ -82,7 +80,11 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
            
             bufused = set_replaygain(id3, false, header[3], bufused);
             bufused = set_replaygain(id3, true, header[4], bufused);
+        } else {
+            return false; /* only SV7 is allowed within a "MP+" signature */
         }
+    } else if (!memcmp(header, "MPCK", 4)) { /* Compare to sig "MPCK" */ 
+        return false; /* SV8 is not supported yet */
     } else {
         return false; /* SV4-6 is not supported anymore */
     }
