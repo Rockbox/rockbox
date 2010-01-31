@@ -45,7 +45,7 @@
 #if CONFIG_CODEC == SWCODEC
 #define MAX_FILETYPES 128
 #else
-#define MAX_FILETYPES 48
+#define MAX_FILETYPES 64
 #endif
 
 /* a table for the know file types */
