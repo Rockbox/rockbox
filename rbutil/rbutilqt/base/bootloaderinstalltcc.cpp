@@ -34,7 +34,7 @@ QString BootloaderInstallTcc::ofHint()
     return tr("Bootloader installation requires you to provide "
                "a firmware file of the original firmware (bin file). "
                "You need to download this file yourself due to legal "
-               "reasons."
+               "reasons. "
                "Press Ok to continue and browse your computer for the firmware "
                "file.");
 }
@@ -106,7 +106,7 @@ void BootloaderInstallTcc::installStage2(void)
     if (patched_buf == NULL)
     {
         emit logItem(errstr, LOGERROR);
-        emit logItem(tr("Could patch firmware"), LOGERROR);
+        emit logItem(tr("Could not patch firmware"), LOGERROR);
         goto exit;
     }
 
