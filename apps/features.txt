@@ -197,12 +197,13 @@ tc_ramcache
 
 #if CONFIG_CHARGING
 charging
-#if defined(HAVE_USB_POWER)
-usb_charging
-#endif
 #if defined(HAVE_USB_CHARGING_ENABLE)
 usb_charging_enable
 #endif
+#endif
+
+#if defined(HAVE_USB_POWER)
+usb_power
 #endif
 
 #if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)

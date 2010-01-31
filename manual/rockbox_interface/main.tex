@@ -712,6 +712,7 @@ all other settings that can be modified using \fname{.cfg} files. This topic
 is discussed in more detail in \reference{ref:manage_settings}.
 The Rockbox distribution comes with some themes that should look nice on
 your \dap{}.
+
 \opt{lcd_bitmap}{
 \note{Some of the themes shipped with Rockbox need additional
 fonts from the fonts package, so make sure you installed them.
@@ -720,9 +721,18 @@ have the needed fonts installed as otherwise the theme may not display
 properly.}
 }
 
-\opt{usb_charging}
-{
-    \section{Charging}
+\nopt{ondio}{
+  \opt{usb_power}{
+    \section{USB Charging}
+
+    The \dap{} can be charged over USB without connecting to your
+    computer by holding \ActionStdUsbCharge{} while plugging in. This
+    allows you to continue using the \dap{} normally.
+  }
+}
+
+\opt{ondio}{
+  \section{USB Power}
 
     The \dap{} can be powered over USB without connecting to your
     computer by holding \ActionStdUsbCharge{} while plugging in. This
