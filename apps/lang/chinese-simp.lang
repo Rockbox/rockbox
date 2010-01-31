@@ -243,7 +243,7 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
     *: "浏览主题"
@@ -1744,7 +1744,7 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
@@ -1760,13 +1760,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "浏览.wps文件"
+    *: "浏览WPS(正在播放界面)文件"
   </dest>
   <voice>
-    *: "浏览.wps文件"
+    *: "浏览WPS(正在播放界面)文件"
   </voice>
 </phrase>
 <phrase>
@@ -1775,15 +1775,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "浏览.rwps文件"
+    remote: "浏览RWPS(线控正在播放界面)文件"
   </dest>
   <voice>
     *: none
-    remote: "浏览.rwps文件"
+    remote: "浏览RWPS(线控正在播放界面)文件"
   </voice>
 </phrase>
 <phrase>
@@ -4587,24 +4587,28 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    ipod*,sansac200*: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    gogearsa9200: "LEFT = Revert"
   </source>
   <dest>
     *: none
-    rtc: "OFF=放弃"
-    iriverh100,iriverh120,iriverh300: "STOP=放弃"
-    ipod*,sansac200*,gogearsa9200: "MENU=放弃"
-    iaudiox5,iaudiom5: "RECORD=放弃"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV=放弃"
-    gigabeatfx: "POWER=放弃"
-    mrobe100: "DISPLAY=放弃"
-    gigabeats: "BACK=放弃"
+    rtc: "OFF:取消"
+    mrobe500: "电源:取消"
+    iriverh100,iriverh120,iriverh300: "STOP:取消"
+    ipod*,sansac200*: "MENU:取消"
+    iaudiox5,iaudiom5: "RECORD:取消"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV:取消"
+    gigabeatfx: "POWER:取消"
+    mrobe100: "DISPLAY:取消"
+    gigabeats: "BACK:取消"
+    gogearsa9200: "LEFT:取消"
   </dest>
   <voice>
     *: none
@@ -8779,21 +8783,19 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
-    *: "数据库更新中...已找到%d个(按OFF返回)"
-    iriverh100,iriverh120,iriverh300: "数据库更新中...已找到%d个(按STOP返回)"
-    ipod*: "数据库更新中...已找到%d个(按PREV返回)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "数据库更新中...已找到%d个(按LEFT返回)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "数据库更新中...已找到%d个(按PREV返回)"
+    *: "数据库更新中...已找到%d个(按OFF键返回)"
+    iriverh100,iriverh120,iriverh300: "数据库更新中...已找到%d个(按STOP键返回)"
+    ipod*: "数据库更新中...已找到%d个(按PREV键返回)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "数据库更新中...已找到%d个(按LEFT键返回)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "数据库更新中...已找到%d个(按PREV键返回)"
+    gogearsa9200: "数据库更新中...已找到%d个(按REW键返回)"
   </dest>
   <voice>
     *: "数据库更新中"
-    iriverh100,iriverh120,iriverh300: ""
-    ipod*: ""
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: ""
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9351,14 +9353,18 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
-    *: "PLAY=是"
+    *: "PLAY:是"
+    cowond2*: "MENU或TOP-RIGHT:是"
     iriverh100,iriverh120,iriverh300: "NAVI=是"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT=是"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT:是"
+    mrobe500: "PLAY,POWER或TOP-RIGHT:是"
     archosplayer: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -9372,14 +9378,18 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
+    gogearsa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
-    rtc: "ON=设置"
+    rtc: "ON:设置"
+    mrobe500: "HEART:设置"
     iriverh100,iriverh120,iriverh300: "NAVI=设置"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT=设置"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT:设置"
+    gogearsa9200: "PLAY:设置"
   </dest>
   <voice>
     *: none
@@ -12314,7 +12324,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_POINT
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12322,16 +12332,16 @@
   </source>
   <dest>
     *: none
-    touchscreen: "那个地方"
+    touchscreen: "具体位置(触屏)"
   </dest>
   <voice>
     *: none
-    touchscreen: "那个地方"
+    touchscreen: "具体位置(触屏)"
   </voice>
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_GRID
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12339,16 +12349,16 @@
   </source>
   <dest>
     *: none
-    touchscreen: "3x3网格"
+    touchscreen: "3x3虚拟按键"
   </dest>
   <voice>
     *: none
-    touchscreen: "3x3网格"
+    touchscreen: "3x3虚拟按键"
   </voice>
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_MODE
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12356,10 +12366,880 @@
   </source>
   <dest>
     *: none
-    touchscreen: "touchscreen 选择"
+    touchscreen: "触屏模式选择"
   </dest>
   <voice>
     *: none
-    touchscreen: "touchscreen 选择"
+    touchscreen: "触屏模式选择"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "列表播放完毕后重新随机排序"
+  </dest>
+  <voice>
+    *: "列表播放完毕后重新随机排序"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_STATUSBAR
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "状态栏样式"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Release Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "编译时间"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "编译时间"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CUSTOM_STATUSBAR
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Threshold"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Threshold"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Threshold"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Makeup Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Makeup Gain"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Makeup Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Base Skin"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Base Skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scroll bar position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Remote Statusbar"
+  </dest>
+  <voice>
+    *: none
+    remote: "Remote Statusbar"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "remote statusbar skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Knee"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Knee"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Auto"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Auto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "Insert Last Shuffled"
+  </dest>
+  <voice>
+    *: "Insert Last Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Soft Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Soft Knee"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Soft Knee"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "Next:"
+  </dest>
+  <voice>
+    *: "Next:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Ratio"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ratio"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ratio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_KEYPAD_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Hard Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Hard Knee"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Hard Knee"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Rate"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Rate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSER_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Browser Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Browser Mode"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Browser Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB HID"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB Human Interface Device"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Right"
+  </dest>
+  <voice>
+    *: "Right"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc:
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Semitone"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Semitone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_OTHER
+  desc: Catch-all FM region. Select if none of the others work
+  user: core
+  <source>
+    *: none
+    radio: "Other"
+  </source>
+  <dest>
+    *: none
+    radio: "Other"
+  </dest>
+  <voice>
+    *: none
+    radio: "Other"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Limit"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Limit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ITALY
+  desc: fm region Italy
+  user: core
+  <source>
+    *: none
+    radio: "Italy"
+  </source>
+  <dest>
+    *: none
+    radio: "Italy"
+  </dest>
+  <voice>
+    *: none
+    radio: "Italy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Calibrate"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Calibrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_10
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "10:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "10:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "10 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Reset Calibration"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Reset Calibration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "2:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "2:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "2 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOUSE_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Mouse Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Mouse Mode"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Mouse Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_LIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limit"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIMEDIA_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Multimedia Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Multimedia Mode"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Multimedia Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Custom"
+  </dest>
+  <voice>
+    *: "Custom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scroll bar width"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Skin RAM usage:"
+  </dest>
+  <voice>
+    *: "Skin RAM usage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Skip to Outro"
+  </dest>
+  <voice>
+    *: "Skip to Outro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Bottom"
+  </dest>
+  <voice>
+    *: "Bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Timestretch"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Timestretch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_6
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "6:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "6:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "6 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Compressor"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Compressor"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Compressor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Left"
+  </dest>
+  <voice>
+    *: "Left"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Top"
+  </dest>
+  <voice>
+    *: "Top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Speed"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Next Track:"
+  </dest>
+  <voice>
+    *: "Next Track:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_4
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "4:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "4:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "4 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESENTATION_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Presentation Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Presentation Mode"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Presentation Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "of"
+  </dest>
+  <voice>
+    *: "of"
   </voice>
 </phrase>
