@@ -21,6 +21,7 @@
 
 
 #include "config.h"
+#include "panic.h"
 #include "system.h"
 #include "kernel.h"
 #include "cpu.h"
@@ -188,6 +189,7 @@ uint32_t nand_reset(uint32_t bank)
     if (nand_send_cmd(NAND_CMD_RESET)) return 1;
     if (nand_wait_chip_ready(bank)) return 1;
     FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
+    sleep(0);
     return 0;
 }
 
@@ -197,7 +199,7 @@ uint32_t nand_wait_status_ready(uint32_t bank)
     nand_set_fmctrl0(bank, 0);
     if ((FMCSTAT & (FMCSTAT_BANK0READY << bank)))
         FMCSTAT = (FMCSTAT_BANK0READY << bank);
-    FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
+    FMCTRL1 = FMCTRL1_CLEARRFIFO;
     if (nand_send_cmd(NAND_CMD_GET_STATUS)) return 1;
     while (1)
     {
@@ -234,6 +236,7 @@ uint32_t nand_transfer_data(uint32_t bank, uint32_t direction,
     if (!direction) invalidate_dcache();
     if (nand_wait_addrdone()) return 1;
     if (!direction) FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
+    else FMCTRL1 = FMCTRL1_CLEARRFIFO;
     return 0;
 }
 
@@ -298,7 +301,7 @@ uint32_t nand_get_chip_type(uint32_t bank)
     FMCTRL1 = FMCTRL1_DOREADDATA;
     if (nand_wait_addrdone()) return nand_unlock(0xFFFFFFFF);
     result = FMFIFO;
-    FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
+    FMCTRL1 = FMCTRL1_CLEARRFIFO;
     return nand_unlock(result);
 }
 
@@ -331,7 +334,14 @@ void nand_power_up(void)
     pmu_ldo_power_on(4);
     sleep(HZ / 20);
     nand_last_activity_value = current_tick;
-    for (i = 0; i < 4; i++) nand_reset(i);
+    for (i = 0; i < 4; i++)
+    {
+        if(nand_type[i] != 0xFFFFFFFF)
+        {
+            if(nand_reset(i))
+                if(nand_reset(i)) panicf("nand_power_up: nand_reset(bank=%d) failed.",(unsigned int)i);
+        }
+    }
     nand_powered = 1;
     nand_last_activity_value = current_tick;
     mutex_unlock(&nand_mtx);
