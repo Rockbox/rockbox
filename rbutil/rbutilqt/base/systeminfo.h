@@ -63,14 +63,21 @@ class SystemInfo : public QObject
             CurConfigureModel,
         };
 
+        enum PlatformType {
+            PlatformAll,
+            PlatformBase,
+            PlatformVariant
+        };
+
         //! return a list of all platforms (rbutil internal names)
-        static QStringList platforms(void);
+        static QStringList platforms(enum PlatformType type = PlatformAll,
+                                     QString variant="");
         //! returns a list of all languages
         static QStringList languages(void);
         //! maps a platform to its name
-        static QString name(QString plattform);
+        static QString name(QString platform);
         //! maps a platform to its brand
-        static QString brand(QString plattform);
+        static QString brand(QString platform);
         //! returns a map of usb-ids and their targets
         static QMap<int, QString> usbIdMap(enum MapType);
         //! get a value from system settings

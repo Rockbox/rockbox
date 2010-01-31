@@ -51,33 +51,47 @@ void ServerInfo::readBuildInfo(QString file)
    
     info.beginGroup("release");
     QStringList keys = info.allKeys();
-    for(int i=0; i < keys.size(); i++)
-    {
-        setAllConfigPlatformValue(keys[i],ServerInfo::CurReleaseVersion,info.value(keys[i]));
-    }
     info.endGroup();
 
-    info.beginGroup("status");
-    keys = info.allKeys();
-    for(int i=0; i < keys.size(); i++)
+    // get base platforms, handle variants with platforms in the loop
+    QStringList platforms = SystemInfo::platforms(SystemInfo::PlatformBase);
+    for(int i = 0; i < platforms.size(); i++)
     {
-        switch(info.value(keys[i]).toInt())
+        // check if there are rbutil-variants of the current platform and handle
+        // them the same time.
+        QStringList variants;
+        variants = SystemInfo::platforms(SystemInfo::PlatformVariant, platforms.at(i));
+        QVariant release;
+        info.beginGroup("release");
+        if(keys.contains(platforms.at(i))) {
+            release = info.value(platforms.at(i));
+        }
+
+        info.endGroup();
+        info.beginGroup("status");
+        QString status = tr("Unknown");
+        switch(info.value(platforms.at(i)).toInt())
         {
             case 1:
-                ServerInfo::setAllConfigPlatformValue(keys[i],ServerInfo::CurStatus,tr("Unusable"));
+                status = tr("Unusable");
                 break;
             case 2:
-                ServerInfo::setAllConfigPlatformValue(keys[i],ServerInfo::CurStatus,tr("Unstable"));
+                status = tr("Unstable");
                 break;
             case 3:
-                ServerInfo::setAllConfigPlatformValue(keys[i],ServerInfo::CurStatus,tr("Stable"));
+                status = tr("Stable");
                 break;
-            default:    
-                ServerInfo::setAllConfigPlatformValue(keys[i],ServerInfo::CurStatus,tr("Unknown"));
+            default:
                 break;
         }
+        info.endGroup();
+        // set variants (if any)
+        for(int j = 0; j < variants.size(); ++j) {
+            setPlatformValue(variants.at(j), ServerInfo::CurStatus, status);
+            setPlatformValue(variants.at(j), ServerInfo::CurReleaseVersion, release);
+        }
+
     }
-    info.endGroup();
 }
 
 void ServerInfo::readBleedingInfo(QString file)
@@ -120,17 +134,6 @@ void ServerInfo::setPlatformValue(QString platform, enum ServerInfos info, QVari
     serverInfos.insert(s, value);
     qDebug() << "[ServerInfo] SET:" << s << serverInfos.value(s).toString();
 }
-
-void ServerInfo::setAllConfigPlatformValue(QString configplatform, ServerInfos info, QVariant value)
-{
-    // insert intp all platforms where configurename matches
-    QStringList platforms = SystemInfo::platforms();
-    for(int i =0; i < platforms.size(); i++)
-    {
-        if(SystemInfo::platformValue(platforms.at(i),SystemInfo::CurConfigureModel) == configplatform)
-            setPlatformValue(platforms.at(i),info,value);
-    }
-} 
 
 QVariant ServerInfo::platformValue(QString platform, enum ServerInfos info)
 {

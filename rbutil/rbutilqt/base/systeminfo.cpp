@@ -107,7 +107,7 @@ QVariant SystemInfo::platformValue(QString platform, enum SystemInfos info)
     return systemInfos->value(s, d);
 }
 
-QStringList SystemInfo::platforms()
+QStringList SystemInfo::platforms(enum SystemInfo::PlatformType type, QString variant)
 {
     ensureSystemInfoExists();
 
@@ -117,10 +117,17 @@ QStringList SystemInfo::platforms()
     systemInfos->endGroup();
     for(int i = 0; i < a.size(); i++)
     {
-        //only add not disabled targets
         QString target = systemInfos->value("platforms/"+a.at(i), "null").toString();
-        if(systemInfos->value(target+"/status").toString() != "disabled")
-            result.append(target);
+        // only add target if its not disabled
+        if(systemInfos->value(target+"/status").toString() == "disabled")
+            continue;
+        // report only base targets when PlatformBase is requested
+        if(type == PlatformBase && target.contains('.'))
+            continue;
+        // report only matching target if PlatformVariant is requested
+        if(type == PlatformVariant && !target.startsWith(variant))
+            continue;
+        result.append(target);
     }
     return result;
 }

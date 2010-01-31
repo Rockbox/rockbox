@@ -49,8 +49,6 @@ class ServerInfo : public QObject
         static QVariant platformValue(QString platform, enum ServerInfos setting);
     
     private:
-        //! set a server info to all platforms where configurename matches
-        static void setAllConfigPlatformValue(QString configplatform,ServerInfos info, QVariant value);
         //! set a server info value
         static void setValue(enum ServerInfos setting , QVariant value);
         //! set a value for a server info for a named platform.
