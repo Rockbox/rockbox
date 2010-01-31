@@ -81,3 +81,37 @@ void copy_write_sectors(const unsigned char* buf, int wordcount);
 void ata_reset(void);
 bool ata_is_coldstart(void);
 void ata_device_init(void);
+
+#ifdef HAVE_ATA_DMA
+
+/* IDE DMA controller registers */
+#define IDE_DMA_CONTROL (*(volatile unsigned long *)(0xc3000400))
+#define IDE_DMA_LENGTH  (*(volatile unsigned long *)(0xc3000408))
+#define IDE_DMA_ADDR    (*(volatile unsigned long *)(0xc300040C))
+
+/* Maximum multi-word DMA mode supported by the controller */
+#define ATA_MAX_MWDMA 2
+
+#ifndef BOOTLOADER    
+/* The PP5020 supports UDMA 4, but it needs cpu boosting and only
+ * improves performance by ~10% with a stock disk.
+ * UDMA 2 is stable at 30 Mhz.
+ * UDMA 1 is stable at 24 Mhz.
+ */
+#if CPUFREQ_NORMAL >= 30000000
+#define ATA_MAX_UDMA 2
+#elif CPUFREQ_NORMAL >= 24000000
+#define ATA_MAX_UDMA 1
+#else
+#error "CPU speeds under 24Mhz have not been tested with DMA"
+#endif
+#else
+/* The bootloader runs at 24 Mhz and needs a slower mode */
+#define ATA_MAX_UDMA 1
+#endif
+
+void ata_dma_set_mode(unsigned char mode);
+bool ata_dma_setup(void *addr, unsigned long bytes, bool write);
+bool ata_dma_finish(void);
+
+#endif /* HAVE_ATA_DMA */

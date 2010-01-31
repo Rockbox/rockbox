@@ -137,3 +137,8 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
+
+/* DMA is used only for reading on PP502x because although reads are ~8x faster
+ * writes appear to be ~25% slower.
+ */
+#define HAVE_ATA_DMA
