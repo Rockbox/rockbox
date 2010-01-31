@@ -202,13 +202,13 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 #else
 #define BUTTERFLIES(a0,a1,a2,a3) {\
     {\
-        FFTSample temp1,temp2;
+        FFTSample temp1,temp2;\
         BF(temp1, temp2, t5, t1);\
         BF(a2.re, a0.re, a0.re, temp2);\
         BF(a3.im, a1.im, a1.im, temp1);\
     }\
     {\
-        FFTSample temp1,temp2;
+        FFTSample temp1,temp2;\
         BF(temp1, temp2, t2, t6);\
         BF(a3.re, a1.re, a1.re, temp1);\
         BF(a2.im, a0.im, a0.im, temp2);\
