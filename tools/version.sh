@@ -109,5 +109,5 @@ else
     fi
 fi
 VERSION=$VER-`date -u +%y%m%d`
-echo $VERSION
-
+#echo $VERSION
+echo "3.5"
