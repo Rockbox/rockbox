@@ -165,7 +165,7 @@ void sb_create_from_settings(enum screen_type screen)
     
     if (ptr2[0] && ptr2[0] != '-') /* from ui viewport setting */
     {
-        len = snprintf(ptr, remaining, "%%Vi|%s\n", ptr2);
+        len = snprintf(ptr, remaining, "%%ax%%Vi|%s\n", ptr2);
         while ((ptr2 = strchr(ptr, ',')))
             *ptr2 = '|';
     }
@@ -182,7 +182,7 @@ void sb_create_from_settings(enum screen_type screen)
             default:
                 height = screens[screen].lcdheight;
         }
-        len = snprintf(ptr, remaining, "%%Vi|0|%d|-|%d|1|-|-|\n", y, height);
+        len = snprintf(ptr, remaining, "%%ax%%Vi|0|%d|-|%d|1|-|-|\n", y, height);
     }
     sb_skin_data_load(screen, buf, false);
 }
