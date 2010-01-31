@@ -19,6 +19,10 @@
 
 #include "codeclib.h"
 #include "mdct.h"
+#include "asm_arm.h"
+#include "asm_mcf5249.h"
+#include "codeclib_misc.h"
+#include "mdct_lookup.h"
 
 /* these are the sin and cos rotations used by the MDCT
    Accessed too infrequently to give much speedup in IRAM */
@@ -54,14 +58,15 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
     
     unsigned long phase;
     
+    /* NOTE THAT THESE TWIDDLE FACTORS HAVE NOW CHANGED !! */
     for(i=0;i<n4;i++)
     {
-      /* phase = (i+(1/8))/N in 32bit range (e.g. 0x0=0deg, 0x80000000=180deg)
+      /* phase = (i+(1/4))/N in 32bit range (e.g. 0x0=0deg, 0x80000000=180deg)
          Shifting by <<16 in two stages works so long as largest nbits < 16
          (which it is).
          Note - this has NOTHING to do with fixmul32/PRECISION/etc
          (see definition of fsincos function below)               */
-      phase = ( ((i<<16) + 0x2000) >> nbits ) << 16;
+      phase = ( ((i<<16) + 0x4000) >> nbits ) << 16;
       /* tsin and tcos are just reflections of each other with a phase shift
          so should be able to optimise to reduce storage */
       /* NOTE the required tables are actually -cos and -sin , so we need to 
@@ -116,15 +121,59 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
     /* bitreverse reorder the input and rotate;   result here is in OUTPUT ... */
     /* (note that when using the current split radix, the bitreverse ordering is
         complex, meaning that this reordering cannot easily be done in-place) */
-    for(k = 0; k < n4; k++)
+    /* Using the following pdf, you can see that it is possible to rearrange
+       the 'classic' pre/post rotate with an alternative one that enables
+       us to use fewer distinct twiddle factors.
+       http://www.eurasip.org/Proceedings/Eusipco/Eusipco2006/papers/1568980508.pdf
+       
+       For prerotation, the factors are just sin,cos(2PI*i/N)
+       For postrotation, the factors are sin,cos(2PI*(i+1/4)/N)
+       
+       Therefore, prerotation can immediately reuse the same twiddles as fft
+       (for postrotation it's still a bit complex, so this is still using
+        an mdct-local set of twiddles to do that part)
+       */
+    const int32_t *T = sincos_lookup0;
+    const int step = (12-s->nbits)<<1;
+
+    const uint16_t * p_revtab=s->fft.revtab;
     {
-        j= (s->fft.revtab[k])>>revtab_shift;
-        /* remember, tcos and tsin are really -cos and -sin 
-           so what we're actually calculating is {re,im) x {-cos,-sin} */
-        CMUL(&z[j].re, &z[j].im, *in2, *in1, tcos[k], tsin[k]);
-        in1 += 2;
-        in2 -= 2;
+        const uint16_t * const p_revtab_end = p_revtab + n8;
+        while(p_revtab < p_revtab_end)
+        {
+            j = (*p_revtab)>>revtab_shift;
+            CMUL(&z[j].re, &z[j].im, *in2, *in1, -T[1], -T[0] );
+            T += step;
+            in1 += 2;
+            in2 -= 2;
+            p_revtab++;
+            j = (*p_revtab)>>revtab_shift;
+            CMUL(&z[j].re, &z[j].im, *in2, *in1, -T[1], -T[0] );
+            T += step;
+            in1 += 2;
+            in2 -= 2;
+            p_revtab++;
+        }
     }
+    {
+        const uint16_t * const p_revtab_end = p_revtab + n8;
+        while(p_revtab < p_revtab_end)
+        {
+            j = (*p_revtab)>>revtab_shift;
+            CMUL(&z[j].re, &z[j].im, *in2, *in1, -T[0], -T[1] );
+            T -= step;
+            in1 += 2;
+            in2 -= 2;
+            p_revtab++;
+            j = (*p_revtab)>>revtab_shift;
+            CMUL(&z[j].re, &z[j].im, *in2, *in1, -T[0], -T[1] );
+            T -= step;
+            in1 += 2;
+            in2 -= 2;
+            p_revtab++;
+        }
+    }
+
 
     /* ... and so fft runs in OUTPUT buffer */
     ff_fft_calc_c(&s->fft, z);
@@ -135,8 +184,8 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
         /* remember, tcos and tsin are really -cos and -sin 
            so what we're actually calculating is {re,im) x {-cos,-sin} */
         fixed32 r0,i0,r1,i1;
-        CMUL(&r0, &i1, z[n8-k-1].im, z[n8-k-1].re, tsin[n8-k-1], tcos[n8-k-1] );
-        CMUL(&r1, &i0, z[n8+k].im,   z[n8+k].re,   tsin[n8+k],   tcos[n8+k]   );
+        XNPROD31_R(z[n8-k-1].im, z[n8-k-1].re, tsin[n8-k-1], tcos[n8-k-1], r0, i1 );
+        XNPROD31_R(z[n8+k].im,   z[n8+k].re,   tsin[n8+k],   tcos[n8+k],   r1, i0 );
         z[n8-k-1].re = r0;
         z[n8-k-1].im = i0;
         z[n8+k].re   = r1;
@@ -151,18 +200,36 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
  */
 void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
 {
-    int k;
     const int n = (1<<s->nbits);
     const int n2 = (n>>1);
     const int n4 = (n>>2);
     
     ff_imdct_half(s,output+n4,input);
 
-    /* TODO: this could easily be optimised! */
-    for(k = 0; k < n4; k++)
+    /* reflect the half imdct into the full N samples */
+    /* TODO: this could easily be optimised more! */
+    fixed32 * in_r = output + n2;
+    output += n-4;
+
+    while(output>in_r)
     {
-        output[k]     = -output[n2-k-1];
-        output[n-k-1] =  output[n2+k];
+        output[3] = in_r[0];
+        output[2] = in_r[1];
+        output[1] = in_r[2];
+        output[0] = in_r[3];
+        in_r +=4;
+        output -= 4;
+    }
+    output-=n2-n4+4;
+    in_r=output+n2-4;
+    while(in_r<output)
+    {
+        output[0]     = -in_r[3];
+        output[1]     = -in_r[2];
+        output[2]     = -in_r[1];
+        output[3]     = -in_r[0];
+        in_r -= 4;
+        output += 4;
     }
 }
 
