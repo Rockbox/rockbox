@@ -12612,7 +12612,7 @@
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "Multimedia Mode"
   </source>
   <dest>
     *: none
@@ -12629,7 +12629,7 @@
   user: core
   <source>
     *: none
-    usb_hid: "Presentation"
+    usb_hid: "Presentation Mode"
   </source>
   <dest>
     *: none
@@ -12646,7 +12646,7 @@
   user: core
   <source>
     *: none
-    usb_hid: "Browser"
+    usb_hid: "Browser Mode"
   </source>
   <dest>
     *: none
@@ -12663,7 +12663,7 @@
   user: core
   <source>
     *: none
-    usb_hid: "Mouse"
+    usb_hid: "Mouse Mode"
   </source>
   <dest>
     *: none
@@ -13214,5 +13214,39 @@
   </dest>
   <voice>
     *: "מתוך"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
   </voice>
 </phrase>
