@@ -162,6 +162,11 @@
 /* Define this if you want to use the AS2525 i2c interface */
 #define CONFIG_I2C I2C_AS3525
 
+/* define current usage levels (based on battery bench) */
+#define CURRENT_NORMAL     65
+#define CURRENT_BACKLIGHT  30
+#define CURRENT_RECORD     CURRENT_NORMAL
+
 /* Define this to the CPU frequency */
 #define CPU_FREQ      250000000
 
