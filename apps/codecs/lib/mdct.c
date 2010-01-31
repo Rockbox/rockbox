@@ -209,27 +209,27 @@ void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
     /* reflect the half imdct into the full N samples */
     /* TODO: this could easily be optimised more! */
     fixed32 * in_r = output + n2;
-    output += n-4;
+    fixed32 * out_r = output + n-4;
 
-    while(output>in_r)
+    while(out_r>in_r)
     {
-        output[3] = in_r[0];
-        output[2] = in_r[1];
-        output[1] = in_r[2];
-        output[0] = in_r[3];
+        out_r[3] = in_r[0];
+        out_r[2] = in_r[1];
+        out_r[1] = in_r[2];
+        out_r[0] = in_r[3];
         in_r +=4;
-        output -= 4;
+        out_r -= 4;
     }
-    output-=n2-n4+4;
-    in_r=output+n2-4;
-    while(in_r<output)
+    out_r =output;
+    in_r  =output+n2-4;
+    while(out_r<in_r)
     {
-        output[0]     = -in_r[3];
-        output[1]     = -in_r[2];
-        output[2]     = -in_r[1];
-        output[3]     = -in_r[0];
+        out_r[0]     = -in_r[3];
+        out_r[1]     = -in_r[2];
+        out_r[2]     = -in_r[1];
+        out_r[3]     = -in_r[0];
         in_r -= 4;
-        output += 4;
+        out_r += 4;
     }
 }
 
