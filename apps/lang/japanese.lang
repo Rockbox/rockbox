@@ -266,17 +266,18 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = はい"
-    cowond2*: "MENU = はい"
+    cowond2*: "MENU または top-right = はい"
     iriverh100,iriverh120,iriverh300: "NAVI = はい"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = はい"
-    mrobe500: "PLAY or POWER = はい"
+    mrobe500: "PLAY または POWER, top-right = はい"
     archosplayer: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -496,10 +497,10 @@
     *: "<Don't Resume>"
   </source>
   <dest>
-    *: "<レジュームしません>"
+    *: "<レジュームしない>"
   </dest>
   <voice>
-    *: "レジュームしません"
+    *: "レジュームしない"
   </voice>
 </phrase>
 <phrase>
@@ -1682,11 +1683,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "スキップしたときのみ"
+    crossfade: "スキップ時のみ"
   </dest>
   <voice>
     *: none
-    crossfade: "スキップしたときのみ"
+    crossfade: "スキップ時のみ"
   </voice>
 </phrase>
 <phrase>
@@ -1699,11 +1700,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "シャッフルとスキップしたとき"
+    crossfade: "シャッフル時とスキップ時"
   </dest>
   <voice>
     *: none
-    crossfade: "シャッフルとスキップしたとき"
+    crossfade: "シャッフル時とスキップ時"
   </voice>
 </phrase>
 <phrase>
@@ -2843,11 +2844,11 @@
   </source>
   <dest>
     *: none
-    lcd_invert,remote_lcd_invert:"反転"
+    lcd_invert,remote_lcd_invert: "反転"
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert:"反転"
+    lcd_invert,remote_lcd_invert: "反転"
   </voice>
 </phrase>
 <phrase>
@@ -4677,7 +4678,7 @@
   </source>
   <dest>
     *: none
-    alarm: "%d:%02d に起きます"
+    alarm: "%d:%02d 後に起きます"
   </dest>
   <voice>
     *: none
@@ -4794,10 +4795,10 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "最近のリストのみ保存"
+    *: "最近のブックマークのみ保存"
   </dest>
   <voice>
-    *: "最近のリストのみ保存"
+    *: "最近のブックマークのみ保存"
   </voice>
 </phrase>
 <phrase>
@@ -4808,10 +4809,10 @@
     *: "Ask - Recent only"
   </source>
   <dest>
-    *: "最近のリストのみ毎回尋ねる"
+    *: "最近のブックマークのみ, 毎回確認"
   </dest>
   <voice>
-    *: "最近のリストのみ毎回尋ねる"
+    *: "最近のブックマークのみ 毎回確認"
   </voice>
 </phrase>
 <phrase>
@@ -5588,11 +5589,11 @@
   </source>
   <dest>
     *: none
-    radio: "プリセットが空なので自動スキャンしますか?"
+    radio: "プリセットが空です. 自動スキャンしますか?"
   </dest>
   <voice>
     *: none
-    radio: "プリセットが から なので自動スキャンしますか?"
+    radio: "プリセットが から です 自動スキャンしますか?"
   </voice>
 </phrase>
 <phrase>
@@ -6713,10 +6714,10 @@
     *: "Track Display"
   </source>
   <dest>
-    *: "曲目を表示"
+    *: "曲目の表示"
   </dest>
   <voice>
-    *: "曲目を表示"
+    *: "曲目の表示"
   </voice>
 </phrase>
 <phrase>
@@ -6825,7 +6826,7 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "ダイナミックリストを削除するときに警告を表示"
+    *: "ダイナミックリストの削除するときに警告を表示"
   </dest>
   <voice>
     *: "ダイナミックリストを削除するときに警告を表示"
@@ -7042,10 +7043,10 @@
     *: "Clear Time?"
   </source>
   <dest>
-    *: "稼働時間をクリアしますか?"
+    *: "稼働時間を消去しますか?"
   </dest>
   <voice>
-    *: "稼働時間をクリアしますか?"
+    *: "稼働時間を消去しますか?"
   </voice>
 </phrase>
 <phrase>
@@ -7339,7 +7340,7 @@
     *: "%s が存在しません"
   </dest>
   <voice>
-    *: "プレイリストディレクトリが存在しません。"
+    *: "プレイリストディレクトリが存在しません"
   </voice>
 </phrase>
 <phrase>
@@ -7434,10 +7435,10 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "Cueシートの参照"
+    *: "Cueシートを表示"
   </dest>
   <voice>
-    *: "キューシートの参照"
+    *: "キューシートを表示"
   </voice>
 </phrase>
 <phrase>
@@ -7448,10 +7449,10 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "タグ情報の表示"
+    *: "タグ情報を表示"
   </dest>
   <voice>
-    *: "タグ情報の表示"
+    *: "タグ情報を表示"
   </voice>
 </phrase>
 <phrase>
@@ -7798,10 +7799,10 @@
     *: "Delete Directory"
   </source>
   <dest>
-    *: "ディレクトリの削除"
+    *: "ディレクトリを削除"
   </dest>
   <voice>
-    *: "ディレクトリの削除"
+    *: "ディレクトリを削除"
   </voice>
 </phrase>
 <phrase>
@@ -8339,10 +8340,10 @@
   </source>
   <dest>
     *: none
-    recording: "ディスクが一杯です．停止ボタンを押してください"
-    iriverh100,iriverh120,iriverh300: "ディスクが一杯です．停止ボタンを押してください"
-    iaudiom5,iaudiox5: "ディスクが一杯です．電源ボタンを押してください"
-    sansae200*,sansac200*: "ディスクが一杯です．PREVボタンを押してください"
+    recording: "ディスクが一杯です. OFFボタンを押してください"
+    iriverh100,iriverh120,iriverh300: "ディスクが一杯です. STOPボタンを押してください"
+    iaudiom5,iaudiox5: "ディスクが一杯です. POWERボタンを押してください"
+    sansae200*,sansac200*: "ディスクが一杯です. PREVボタンを押してください"
   </dest>
   <voice>
     *: none
@@ -8602,10 +8603,10 @@
     *: "Invalid Filename!"
   </source>
   <dest>
-    *: "無効なファイル名!"
+    *: "無効なファイル名です"
   </dest>
   <voice>
-    *: "無効なファイル名"
+    *: "無効なファイル名です"
   </voice>
 </phrase>
 <phrase>
@@ -11367,11 +11368,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "色"
+    lcd_color: "色設定"
   </dest>
   <voice>
     *: none
-    lcd_color: "色"
+    lcd_color: "色設定"
   </voice>
 </phrase>
 <phrase>
@@ -12585,6 +12586,91 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_USB_KEYPAD_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB キーパッドの動作モード"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB キーパッドの動作モード"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIMEDIA_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Multimedia Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "マルチメディア モード"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "マルチメディア モード"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESENTATION_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Presentation Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "プレゼンテーション モード"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "プレゼンテーション モード"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSER_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Browser Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "ブラウザ モード"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "ブラウザ モード"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOUSE_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Mouse Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "マウス モード"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "マウス モード"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SKIN_RAM_USAGE
   desc: how much RAM the skins are using
   user: core
@@ -12722,7 +12808,7 @@
     *: ""
   </dest>
   <voice>
-    *: "ステータスバー スキン"
+    *: "スキン"
   </voice>
 </phrase>
 <phrase>
@@ -12736,7 +12822,7 @@
     *: ""
   </dest>
   <voice>
-    *: "リモコンのステータスバー スキン"
+    *: "リモコンのスキン"
   </voice>
 </phrase>
 <phrase>
@@ -12768,6 +12854,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB HID"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB H I D"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_INSERT_LAST_SHUFFLED
   desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
   user: core
@@ -12783,7 +12886,7 @@
 </phrase>
 <phrase>
   id: LANG_QUEUE_LAST_SHUFFLED
-  desc: in onplay menu.  queue a playlist randomly at and of dynamic playlist
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
   user: core
   <source>
     *: "Queue Last Shuffled"
@@ -12793,5 +12896,115 @@
   </dest>
   <voice>
     *: "リストの最後にシャッフルで予約"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "モールス信号で入力する"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "モールス信号で入力する"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "自動的な曲変更時のみ"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "自動的な曲変更時のみ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "次の曲:"
+  </dest>
+  <voice>
+    *: "次の曲:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "次:"
+  </dest>
+  <voice>
+    *: "次:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "/"
+  </dest>
+  <voice>
+    *: "オブ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "基本スキン"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "基本スキン"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "リモコンの基本スキン"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "リモコンの基本スキン"
   </voice>
 </phrase>
