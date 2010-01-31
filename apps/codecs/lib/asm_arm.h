@@ -86,6 +86,34 @@ static inline void XNPROD31(int32_t  a, int32_t  b,
   *y = y1 << 1;
 }
 
+#define XPROD31_R(_a, _b, _t, _v, _x, _y)\
+{\
+  int x1, y1, l;\
+  asm(	"smull	%0, %1, %4, %6\n\t"\
+	"rsb	%3, %4, #0\n\t"\
+	"smlal	%0, %1, %5, %7\n\t"\
+	"smull	%0, %2, %5, %6\n\t"\
+	"smlal	%0, %2, %3, %7"\
+	: "=&r" (l), "=&r" (x1), "=&r" (y1), "=r" (_a)\
+	: "3" (_a), "r" (_b), "r" (_t), "r" (_v) );\
+  _x = x1 << 1;\
+  _y = y1 << 1;\
+}
+
+#define XNPROD31_R(_a, _b, _t, _v, _x, _y)\
+{\
+  int x1, y1, l;\
+  asm(	"smull	%0, %1, %3, %5\n\t"\
+	"rsb	%2, %4, #0\n\t"\
+	"smlal	%0, %1, %2, %6\n\t"\
+	"smull	%0, %2, %4, %5\n\t"\
+	"smlal	%0, %2, %3, %6"\
+	: "=&r" (l), "=&r" (x1), "=&r" (y1)\
+	: "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
+  _x = x1 << 1;\
+  _y = y1 << 1;\
+}
+
 #ifndef _V_VECT_OPS
 #define _V_VECT_OPS
 

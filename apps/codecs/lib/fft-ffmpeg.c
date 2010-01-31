@@ -26,6 +26,20 @@
  * FFT/IFFT transforms.
  */
 
+
+#ifdef CPU_ARM
+// we definitely want CONFIG_SMALL undefined for ipod
+// so we get the inlined version of fft16 (which is measurably faster)
+#undef CONFIG_SMALL
+// we also want to undefine USE_PASS_BIG, as pass_big/BUTTERFLIES_BIG is
+// measurably slower than pass/BUTTERFLIES, for some reason
+#undef USE_PASS_BIG
+#else
+// for other targets?  - dunno really
+#define USE_PASS_BIG
+#undef CONFIG_SMALL 
+#endif
+ 
 #include "fft.h"
 #include <string.h>
 #include <stdlib.h>
@@ -37,13 +51,9 @@
 #include "asm_arm.h"
 #include "asm_mcf5249.h"
 #include "codeclib_misc.h"
-
-#define USE_MDCT_LOOKUP_TRIG
-//#define TRACK_MULS_ADDS
-
-#ifdef USE_MDCT_LOOKUP_TRIG
 #include "mdct_lookup.h"
-#endif
+
+//#define TRACK_MULS_ADDS
 
 static void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
 
@@ -63,32 +73,6 @@ static inline void adds_inc(int x){ adds += x; }
 #else
 static inline void muls_inc(int x){ (void)x; }
 static inline void adds_inc(int x){ (void)x; }
-#endif
-
-/* big chunk of below only happens if we're NOT using the tremor mdct trig tables */
-#ifndef USE_MDCT_LOOKUP_TRIG
-int32_t flattabs[8+16+32+64+128+256+512+1024+2048];
-int32_t * tabstabstabs[] = { flattabs, flattabs+8, flattabs+8+16,flattabs+8+16+32, flattabs+8+16+32+64,
-                             flattabs+8+16+32+64+128, flattabs+8+16+32+64+128+256,
-                             flattabs+8+16+32+64+128+256+512, flattabs+8+16+32+64+128+256+512+1024 };
-
-
-
-/* some of these should probably be in iram */
-static FFTSample * ff_cos_16 = NULL;
-static FFTSample * ff_cos_32 = NULL;
-static FFTSample * ff_cos_64 = NULL;
-static FFTSample * ff_cos_128 = NULL;
-static FFTSample * ff_cos_256 = NULL;
-static FFTSample * ff_cos_512 = NULL;
-static FFTSample * ff_cos_1024 = NULL;
-static FFTSample * ff_cos_2048 = NULL;
-static FFTSample * ff_cos_4096 = NULL;
-
-static FFTSample ** const ff_cos_tabs[] = {
-    &ff_cos_16, &ff_cos_32, &ff_cos_64, &ff_cos_128, &ff_cos_256, &ff_cos_512, &ff_cos_1024,
-    &ff_cos_2048, &ff_cos_4096
-};
 #endif
 
 uint16_t revtab[1<<12];
@@ -131,39 +115,6 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
     if (HAVE_ALTIVEC) ff_fft_init_altivec(s);
     if (HAVE_MMX)     ff_fft_init_mmx(s);*/
     
-#ifndef USE_MDCT_LOOKUP_TRIG
-    int j;
-    unsigned long phase;
-
-    /* FIXME these should really just be precalculated */
-    for(j=4; j<=nbits; j++) {
-        int m = 1<<j;
-        FFTSample *tab = *(ff_cos_tabs[j-4]);
-        
-        /* if tab is NULL, table hasn't been built yet, fill it in now */
-        /* effectively do this operation once and once only */
-        if(NULL==tab)
-        {
-          tab = tabstabstabs[j-4];
-
-          *(ff_cos_tabs[j-4]) = tab;
-        
-          for(i=0; i<=m/4; i++) {            
-              phase = ((i<<16) / m)<<16;
-
-              fsincos(phase, &tab[i]);   /* get into range 0x00000000 to 0x7fffffff */
-          }
-
-          /* second half of tab is the reverse */
-          /* FIXME: wasteful - could just store half as much and use
-             clever indexing to get the re/im parts. (Tremor interleaves
-             cos,sin here, rather than effectively having two separate tables) */            
-          for(i=1; i<m/4; i++)
-              tab[m/2-i] = tab[i];
-        }
-    }
-#endif
-
     /* FIXME: there ought to be some shortcuts here, I just haven't
        thought of any yet.  Ideally we would be able to massage data
        so that it comes out in standard or standard-bitrev order
@@ -208,20 +159,62 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
     adds_inc(2);\
 }
 
+#define BF_REV(x,y,a,b) {\
+    x = a + b;\
+    y = a - b;\
+    adds_inc(2);\
+}
+
+#ifdef CPU_ARM
+// where y==a
+#define BF_OPT(x,y,a,b) {\
+    y = a + b;\
+    x = y - (b<<1);\
+    adds_inc(2);\
+}
+
+// where y==b
+#define BF_OPT2(x,y,a,b) {\
+    x = a - b;\
+    y = x + (b<<1);\
+    adds_inc(2);\
+}
+
+// where y==-b
+#define BF_OPT2_REV(x,y,a,b) {\
+    x = a + b;\
+    y = x - (b<<1);\
+    adds_inc(2);\
+}
+
 #define BUTTERFLIES(a0,a1,a2,a3) {\
     {\
-        FFTSample temp1,temp2;\
+        BF_OPT(t1, t5, t5, t1);\
+        BF_OPT(a2.re, a0.re, a0.re, t5);\
+        BF_OPT(a3.im, a1.im, a1.im, t1);\
+    }\
+    {\
+        BF_OPT(t6, t2, t2, t6);\
+        BF_OPT(a3.re, a1.re, a1.re, t6);\
+        BF_OPT(a2.im, a0.im, a0.im, t2);\
+    }\
+}
+#else
+#define BUTTERFLIES(a0,a1,a2,a3) {\
+    {\
+        FFTSample temp1,temp2;
         BF(temp1, temp2, t5, t1);\
         BF(a2.re, a0.re, a0.re, temp2);\
         BF(a3.im, a1.im, a1.im, temp1);\
     }\
     {\
-        FFTSample temp1,temp2;\
+        FFTSample temp1,temp2;
         BF(temp1, temp2, t2, t6);\
         BF(a3.re, a1.re, a1.re, temp1);\
         BF(a2.im, a0.im, a0.im, temp2);\
     }\
 }
+#endif
 
 // force loading all the inputs before storing any.
 // this is slightly slower for small data, but avoids store->load aliasing
@@ -307,6 +300,17 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 #define TRANSFORM(a0,a1,a2,a3,wre,wim) {\
     {\
         FFTSample t1,t2,t5,t6;\
+        XPROD31_R(a2.re, a2.im, wre, wim, t1,t2);\
+        XNPROD31_R(a3.re, a3.im, wre, wim, t5,t6);\
+        BUTTERFLIES(a0,a1,a2,a3)\
+    }\
+    muls_inc(8);\
+}
+
+#define TRANSFORM_W01(a0,a1,a2,a3,w) {\
+    {\
+        FFTSample t1,t2,t5,t6;\
+        const FFTSample wre=w[0],wim=w[1];\
         XPROD31(a2.re, a2.im, wre, wim, &t1, &t2);\
         XNPROD31(a3.re, a3.im, wre, wim, &t5,&t6);\
         BUTTERFLIES(a0,a1,a2,a3)\
@@ -314,18 +318,50 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
     muls_inc(8);\
 }
 
-#define TRANSFORM_EQUAL(a0,a1,a2,a3,w) {\
-    t3 = MULT31(a2.re, w);\
-    t4 = MULT31(a2.im, w);\
-    t7 = MULT31(a3.re, w);\
-    t8 = MULT31(a3.im, w);\
-    t1 = ( t3 + t4 );\
-    t2 = ( t4 - t3 );\
-    t5 = ( t7 - t8 );\
-    t6 = ( t8 + t7 );\
-    muls_inc(4);\
-    BUTTERFLIES(a0,a1,a2,a3)\
+#define TRANSFORM_W10(a0,a1,a2,a3,w) {\
+    {\
+        FFTSample t1,t2,t5,t6;\
+        const FFTSample wim=w[0],wre=w[1];\
+        XPROD31(a2.re, a2.im, wre, wim, &t1, &t2);\
+        XNPROD31(a3.re, a3.im, wre, wim, &t5,&t6);\
+        BUTTERFLIES(a0,a1,a2,a3)\
+    }\
+    muls_inc(8);\
 }
+
+#ifdef CPU_ARM
+#define TRANSFORM_EQUAL(a0,a1,a2,a3,w) {\
+    {\
+        register FFTSample t1,t2,t5,t6;\
+        t2 = MULT32(a2.re, w);\
+        t1 = MULT31(a2.im, w);\
+        t6 = MULT31(a3.re, w);\
+        t5 = MULT32(a3.im, w);\
+        t1 = ( t1 + (t2<<1) );\
+        t2 = ( t1 - (t2<<2) );\
+        t6 = ( t6 + (t5<<1) );\
+        t5 = ( t6 - (t5<<2) );\
+        muls_inc(4);\
+        BUTTERFLIES(a0,a1,a2,a3)\
+    }\
+}
+#else
+#define TRANSFORM_EQUAL(a0,a1,a2,a3,w) {\
+    {\
+        FFTSample t1,t2,t5,t6,temp1,temp2;\
+        t2    = MULT31(a2.re, w);\
+        temp1 = MULT31(a2.im, w);\
+        temp2 = MULT31(a3.re, w);\
+        t5    = MULT31(a3.im, w);\
+        t1 = ( temp1 + t2 );\
+        t2 = ( temp1 - t2 );\
+        t6 = ( temp2 + t5 );\
+        t5 = ( temp2 - t5 );\
+        muls_inc(4);\
+        BUTTERFLIES(a0,a1,a2,a3)\
+    }\
+}
+#endif
 
 #define TRANSFORM_ZERO(a0,a1,a2,a3) {\
     t1 = a2.re;\
@@ -336,31 +372,6 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 }
 
 /* z[0...8n-1], w[1...2n-1] */
-#ifndef USE_MDCT_LOOKUP_TRIG
-#define PASS(name)\
-static void name(FFTComplex *z, const FFTSample *wre, unsigned int n)\
-{\
-    FFTSample t1, t2, t3, t4, t5, t6;\
-    int o1 = 2*n;\
-    int o2 = 4*n;\
-    int o3 = 6*n;\
-    muls_inc(3);\
-    const FFTSample *wim = wre+o1;\
-    n--;\
-    adds_inc(2);\
-\
-    TRANSFORM_ZERO(z[0],z[o1],z[o2],z[o3]);\
-    TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wre[1],wim[-1]);\
-    do {\
-        z += 2;\
-        wre += 2;\
-        wim -= 2;\
-        TRANSFORM(z[0],z[o1],z[o2],z[o3],wre[0],wim[0]);\
-        TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wre[1],wim[-1]);\
-	adds_inc(4);\
-    } while(--n);\
-}
-#else
 #define PASS(name)\
 static void name(FFTComplex *z, unsigned int STEP, unsigned int n)\
 {\
@@ -370,7 +381,7 @@ static void name(FFTComplex *z, unsigned int STEP, unsigned int n)\
     int o3 = 3*n;\
     muls_inc(2);\
 \
-    const FFTSample *wim = sincos_lookup0+STEP;\
+    const FFTSample *w = sincos_lookup0+STEP;\
     /* wre = *(wim+1) .  ordering is sin,cos */\
     const FFTSample *w_end = sincos_lookup0+1024;\
 \
@@ -378,48 +389,39 @@ static void name(FFTComplex *z, unsigned int STEP, unsigned int n)\
 \
     /* first two are special (well, first one is special, but we need to do pairs) */\
     TRANSFORM_ZERO(z[0],z[o1],z[o2],z[o3]);\
-    TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wim[1],wim[0]);\
-    wim += STEP;\
+    TRANSFORM_W10(z[1],z[o1+1],z[o2+1],z[o3+1],w);\
+    w += STEP;\
     adds_inc(1);\
     /* first pass forwards through sincos_lookup0*/\
     do {\
         z += 2;\
-        TRANSFORM(z[0],z[o1],z[o2],z[o3],wim[1],wim[0]);\
-        wim += STEP;\
-        TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wim[1],wim[0]);\
-        wim += STEP;\
+        TRANSFORM_W10(z[0],z[o1],z[o2],z[o3],w);\
+        w += STEP;\
+        TRANSFORM_W10(z[1],z[o1+1],z[o2+1],z[o3+1],w);\
+        w += STEP;\
 	adds_inc(3);\
-    } while(wim < w_end);\
+    } while(w < w_end);\
     /* second half: pass backwards through sincos_lookup0*/\
     /* wim and wre are now in opposite places so ordering now [0],[1] */\
     w_end=sincos_lookup0;\
-    while(wim>w_end)\
+    while(w>w_end)\
     {\
         z += 2;\
-        TRANSFORM(z[0],z[o1],z[o2],z[o3],wim[0],wim[1]);\
-        wim -= STEP;\
-        TRANSFORM(z[1],z[o1+1],z[o2+1],z[o3+1],wim[0],wim[1]);\
-        wim -= STEP;\
+        TRANSFORM_W01(z[0],z[o1],z[o2],z[o3],w);\
+        w -= STEP;\
+        TRANSFORM_W01(z[1],z[o1+1],z[o2+1],z[o3+1],w);\
+        w -= STEP;\
  	adds_inc(3);\
     }\
 }
-#endif
 
 PASS(pass)
+#ifdef USE_PASS_BIG
 #undef BUTTERFLIES
 #define BUTTERFLIES BUTTERFLIES_BIG
 PASS(pass_big)
+#endif
 
-#ifndef USE_MDCT_LOOKUP_TRIG
-#define DECL_FFT(n,n2,n4,STEP)\
-static void fft##n(FFTComplex *z)\
-{\
-    fft##n2(z);\
-    fft##n4(z+n4*2);\
-    fft##n4(z+n4*3);\
-    pass(z,ff_cos_##n,n4/2);\
-}
-#else
 /* what is STEP?
    sincos_lookup0 has sin,cos pairs for 1/4 cycle, in 1024 points
    so half cycle would be 2048 points
@@ -435,8 +437,6 @@ static void fft##n(FFTComplex *z)\
     fft##n4(z+n4*3);\
     pass(z,8192/n,n4);\
 }
-#endif
-
 
 #ifdef CPU_ARM
 #define fft4(z_arg)\
@@ -498,12 +498,93 @@ static void fft4_dispatch(FFTComplex *z)
     fft4(z);
 }
 
-static void fft8(FFTComplex *z)
+static inline void fft8(FFTComplex *z)
 {
-    FFTSample t1, t2, t3, t4, t5, t6, t7, t8;
-
     fft4(z);
 
+#ifdef CPU_ARM
+    {
+        /* The following asm is equivalent to the following:
+        
+        // first load in z[4].re thru z[7].im into local registers
+        // ...
+        BF_OPT2_REV(z[4].re, z[5].re, z[4].re, z[5].re); // x=a+b; y=x-(b<<1)
+        BF_OPT2_REV(z[4].im, z[5].im, z[4].im, z[5].im);
+        BF_REV     (temp, z[7].re, z[6].re, z[7].re);  // x=a+b; y=a-b;
+        BF_REV     (z[6].re, z[7].im, z[6].im, z[7].im);
+        // save z[7].re and z[7].im as those are complete now
+        // z[5].re and z[5].im are also complete now but save these later on
+        
+        BF(z[6].im, z[4].re, temp, z[4].re);        // x=a-b; y=a+b
+        BF_OPT(z[6].re, z[4].im, z[4].im, z[6].re); // y=a+b; x=y-(b<<1)
+        // now load z[2].re and z[2].im
+        // ...        
+        BF_OPT(z[6].re, z[2].re, z[2].re, z[6].re); // y=a+b; x=y-(b<<1)
+        BF_OPT(z[6].im, z[2].im, z[2].im, z[6].im); // y=a+b; x=y-(b<<1)
+        // Now save z[6].re and z[6].im, along with z[5].re and z[5].im
+        // for efficiency.  Also save z[2].re and z[2].im.
+        // Now load z[0].re and z[0].im
+        // ...
+        
+        BF_OPT(z[4].re, z[0].re, z[0].re, z[4].re); // y=a+b; x=y-(b<<1)
+        BF_OPT(z[4].im, z[0].im, z[0].im, z[4].im); // y=a+b; x=y-(b<<1)
+        // Finally save out z[4].re, z[4].im, z[0].re and z[0].im
+        // ...
+        */
+        
+        FFTSample temp;
+        fixed32 * m4 = (fixed32 *)(&(z[4].re));
+
+        asm volatile(
+            "add %[z_ptr], %[z_ptr], #16\n\t"  /* point to &z[2].re */
+            /* read in z[4].re thru z[7].im */
+            "ldmia %[z4_ptr]!, {r1,r2,r3,r4,r5,r6,r7,r8}\n\t"
+            /* (now points one word past &z[7].im) */
+            "add r1,r1,r3\n\t"
+            "sub r3,r1,r3,lsl #1\n\t"
+            "add r2,r2,r4\n\t"
+            "sub r4,r2,r4,lsl #1\n\t"
+            "add %[temp],r5,r7\n\t"
+            "sub r7,r5,r7\n\t"
+            "add r5,r6,r8\n\t"
+            "sub r8,r6,r8\n\t"
+        
+            "stmdb %[z4_ptr]!, {r7,r8}\n\t" /* write z[7].re,z[7].im  straight away */
+                                            /* Note, registers r7 & r8 now free */
+                                       
+            "sub r6,%[temp],r1\n\t"
+            "add r1,%[temp],r1\n\t"
+            "add r2,r2,r5\n\t"
+            "sub r5,r2,r5,lsl #1\n\t"
+        
+            "ldmia %[z_ptr],{r7,r8}\n\t"  /* load z[2].re and z[2].im */
+            "add r7,r7,r5\n\t"
+            "sub r5,r7,r5,lsl #1\n\t"
+            "add r8,r8,r6\n\t"
+            "sub r6,r8,r6,lsl #1\n\t"
+        
+            /* write out z[5].re, z[5].im, z[6].re, z[6].im in one go*/
+            "stmdb %[z4_ptr]!, {r3,r4,r5,r6}\n\t"
+            "stmia %[z_ptr],{r7,r8}\n\t" /* write out z[2].re, z[2].im */
+            "sub %[z_ptr],%[z_ptr], #16\n\t" /* point z_ptr back to &z[0].re */
+            "ldmia %[z_ptr],{r7,r8}\n\t" /* load r[0].re, r[0].im */
+        
+            "add r7,r7,r1\n\t"
+            "sub r1,r7,r1,lsl #1\n\t"
+            "add r8,r8,r2\n\t"
+            "sub r2,r8,r2,lsl #1\n\t"
+        
+            "stmia %[z_ptr],{r7,r8}\n\t" /* write out z[0].re, z[0].im */
+            "stmdb %[z4_ptr], {r1,r2}\n\t" /* write out z[4].re, z[4].im */
+            : [z4_ptr] "+r" (m4), [z_ptr] "+r" (z), [temp] "=r" (temp)
+            : 
+            : "r1","r2","r3","r4","r5","r6","r7","r8","memory"
+        );
+    }
+        
+#else
+    FFTSample t1,t2,t3,t4,t7,t8;
+    
     BF(t1, z[5].re, z[4].re, -z[5].re);
     BF(t2, z[5].im, z[4].im, -z[5].im);
     BF(t3, z[7].re, z[6].re, -z[7].re);
@@ -515,21 +596,26 @@ static void fft8(FFTComplex *z)
     BF(z[6].re, z[2].re, z[2].re, t7);
     BF(z[6].im, z[2].im, z[2].im, t8);
 
-    //TRANSFORM(z[1],z[3],z[5],z[7],sqrthalf,sqrthalf);
+#endif
+
     TRANSFORM_EQUAL(z[1],z[3],z[5],z[7],cPI2_8)
+}
+
+static void fft8_dispatch(FFTComplex *z)
+{
+    fft8(z);
 }
 
 #ifndef CONFIG_SMALL
 static void fft16(FFTComplex *z)
 {
-    FFTSample t1, t2, t3, t4, t5, t6, t7, t8;
+    FFTSample t1, t2, t5, t6;
 
     fft8(z);
     fft4(z+8);
     fft4(z+12);
 
     TRANSFORM_ZERO(z[0],z[4],z[8],z[12]);
-    //TRANSFORM(z[2],z[6],z[10],z[14],sqrthalf,sqrthalf);
     TRANSFORM_EQUAL(z[2],z[6],z[10],z[14],cPI2_8);
     TRANSFORM(z[1],z[5],z[9],z[13],cPI1_8,cPI3_8);
     TRANSFORM(z[3],z[7],z[11],z[15],cPI3_8,cPI1_8);
@@ -542,7 +628,7 @@ DECL_FFT(64,32,16)
 DECL_FFT(128,64,32)
 DECL_FFT(256,128,64)
 DECL_FFT(512,256,128)
-#ifndef CONFIG_SMALL
+#ifdef USE_PASS_BIG
 #define pass pass_big
 #endif
 DECL_FFT(1024,512,256)
@@ -550,7 +636,7 @@ DECL_FFT(2048,1024,512)
 DECL_FFT(4096,2048,1024)
 
 static void (*fft_dispatch[])(FFTComplex*) = {
-    fft4_dispatch, fft8, fft16, fft32, fft64, fft128, fft256, fft512, fft1024,
+    fft4_dispatch, fft8_dispatch, fft16, fft32, fft64, fft128, fft256, fft512, fft1024,
     fft2048, fft4096
 };
 
