@@ -390,54 +390,85 @@ static int dircache_travel(IF_MV2(int volume,) struct fat_dir *dir, struct dirca
 
 /**
  * Internal function to get a pointer to dircache_entry for a given filename.
- *   path: Absolute path to a file or directory.
- *   get_before: Returns the cache pointer before the last valid entry found.
- *   only_directories: Match only filenames which are a directory type.
+ *   path: Absolute path to a file or directory (see comment)
+ *   go_down: Returns the first entry of the directory given by the path (see comment)
+ *
+ * As a a special case to handle buggy code, accept path="" as an alias for "/"
+ *
+ * * If get_down=true:
+ *   If path="/", the returned entry is the first of root directory (ie dircache_root)
+ *   Otherwise, if 'entry' is the returned value when get_down=false, 
+ *   the functions returns entry->down (which can be NULL)
+ *
+ * * If get_down=false:
+ *   If path="/chunk_1/chunk_2/.../chunk_n" then this functions returns the entry
+ *   root_entry()->chunk_1->chunk_2->...->chunk_(n-1)
+ *   Which means that
+ *   dircache_get_entry(path)->d_name == chunk_n
+ *
+ *   If path="/", the returned entry is NULL.
+ *   If the entry doesn't exist, return NULL
+ *
+ *  NOTE: this functions silently handles double '/'
  */
-static struct dircache_entry* dircache_get_entry(const char *path,
-        bool get_before, bool only_directories)
+static struct dircache_entry* dircache_get_entry(const char *path, bool go_down)
 {
-    struct dircache_entry *cache_entry, *before;
-    char namecopy[MAX_PATH*2];
+    char namecopy[MAX_PATH];
     char* part;
     char* end;
-
-    strlcpy(namecopy, path, sizeof(namecopy));
-    cache_entry = dircache_root;
-    before = NULL;
     
-    for ( part = strtok_r(namecopy, "/", &end); part;
-          part = strtok_r(NULL, "/", &end)) {
-
+    bool at_root = true;
+    struct dircache_entry *cache_entry = dircache_root;
+    
+    /* check that the path is absolute (accept empty path also) */
+    if(path[0] != '/' && path[0] != 0)
+        return NULL;
+ 
+    /* make a copy of the path because strok_r modifies the path */
+    /* also handle the weird "" alias for "/" */
+    if(path[0] != 0)
+        strlcpy(namecopy, path, sizeof(namecopy));
+    else
+        strlcpy(namecopy, "/", sizeof(namecopy));
+    
+    for(part = strtok_r(namecopy, "/", &end); part; part = strtok_r(NULL, "/", &end))
+    {
+        /* If request another chunk, the current entry has to be directory
+         * and so cache_entry->down has to be non-NULL/
+         * Special case of root because it's already the first entry of the root directory
+         *
+         * NOTE: this is safe even if cache_entry->down is NULL */
+        if(!at_root)
+            cache_entry = cache_entry->down;
+        else
+            at_root = false;
+        
         /* scan dir for name */
-        while (1)
+        while(cache_entry != NULL)
         {
-            if (cache_entry == NULL)
-            {
-                return NULL;
-            }
-            else if (cache_entry->name_len == 0)
+            /* skip unused entries */
+            if(cache_entry->name_len == 0)
             {
                 cache_entry = cache_entry->next;
-                continue ;
+                continue;
             }
-
-            if (!strcasecmp(part, cache_entry->d_name))
-            {
-                before = cache_entry;
-                if (cache_entry->down || only_directories)
-                    cache_entry = cache_entry->down;
-                break ;
-            }
-
+            /* compare names */
+            if(!strcasecmp(part, cache_entry->d_name))
+                break;
+            /* go to next entry */
             cache_entry = cache_entry->next;
         }
+        
+        /* handle not found case */
+        if(cache_entry == NULL)
+            return NULL;
     }
 
-    if (get_before)
-        cache_entry = before;
-        
-    return cache_entry;
+    /* NOTE: here cache_entry!=NULL so taking ->down is safe */
+    if(go_down)
+        return at_root ? cache_entry : cache_entry->down;
+    else
+        return at_root ? NULL : cache_entry;
 }
 
 #ifdef HAVE_EEPROM_SETTINGS
@@ -873,7 +904,7 @@ const struct dircache_entry *dircache_get_entry_ptr(const char *filename)
     if (!dircache_initialized || filename == NULL)
         return NULL;
     
-    return dircache_get_entry(filename, false, false);
+    return dircache_get_entry(filename, false);
 }
 
 /**
@@ -941,7 +972,7 @@ static struct dircache_entry* dircache_new_entry(const char *path, int attribute
     *new = '\0';
     new++;
 
-    entry = dircache_get_entry(basedir, false, true);
+    entry = dircache_get_entry(basedir, true);
     if (entry == NULL)
     {
         logf("basedir not found!");
@@ -1011,7 +1042,7 @@ void dircache_bind(int fd, const char *path)
         return ;
 
     logf("bind: %d/%s", fd, path);
-    entry = dircache_get_entry(path, false, false);
+    entry = dircache_get_entry(path, false);
     if (entry == NULL)
     {
         logf("not found!");
@@ -1080,10 +1111,10 @@ void dircache_rmdir(const char *path)
         return ;
         
     logf("rmdir: %s", path);
-    entry = dircache_get_entry(path, true, true);
-    if (entry == NULL)
+    entry = dircache_get_entry(path, false);
+    if (entry == NULL || entry->down == NULL)
     {
-        logf("not found!");
+        logf("not found or not a directory!");
         dircache_initialized = false;
         return ;
     }
@@ -1102,7 +1133,7 @@ void dircache_remove(const char *name)
         
     logf("remove: %s", name);
     
-    entry = dircache_get_entry(name, false, false);
+    entry = dircache_get_entry(name, false);
 
     if (entry == NULL)
     {
@@ -1126,7 +1157,7 @@ void dircache_rename(const char *oldpath, const char *newpath)
         
     logf("rename: %s->%s", oldpath, newpath);
     
-    entry = dircache_get_entry(oldpath, true, false);
+    entry = dircache_get_entry(oldpath, false);
     if (entry == NULL)
     {
         logf("not found!");
@@ -1223,7 +1254,7 @@ DIR_CACHED* opendir_cached(const char* name)
     
     pdir->busy = true;
     pdir->regulardir = NULL;
-    cache_entry = dircache_get_entry(name, false, true);
+    cache_entry = dircache_get_entry(name, true);
     pdir->entry = cache_entry;
 
     if (cache_entry == NULL)
