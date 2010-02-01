@@ -364,6 +364,13 @@
 #define UI_HEIGHT                   436 /* height of GUI window */
 #define UI_LCD_POSX                 148 /* x position of lcd */
 #define UI_LCD_POSY                 50 /* y position of lcd */
+
+#elif defined(PBELL_VIBE500)
+#define UI_TITLE                    "Packard Bell Vibe 500"
+#define UI_WIDTH                    287 /* width of GUI window */
+#define UI_HEIGHT                   488 /* height of GUI window */
+#define UI_LCD_POSX                 64 /* x position of lcd */
+#define UI_LCD_POSY                 61 /* y position of lcd */
 #else
 #error no UI defines
 #endif

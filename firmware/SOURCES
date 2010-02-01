@@ -1555,6 +1555,7 @@ target/arm/s5l8700/yps3/power-yps3.c
 #endif /* SAMSUNG_YPS3 */
 
 #ifdef PBELL_VIBE500
+#ifndef SIMULATOR
 drivers/synaptics-mep.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
@@ -1568,5 +1569,6 @@ target/arm/pbell/vibe500/backlight-vibe500.c
 target/arm/pbell/vibe500/lcd-as-vibe500.S
 target/arm/pbell/vibe500/powermgmt-vibe500.c
 target/arm/usb-fw-pp502x.c
+#endif /* SIMULATOR */
 #endif
 
