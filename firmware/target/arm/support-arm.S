@@ -662,7 +662,7 @@ __aeabi_uidivmod:
     ARMV4_UDIV32_BODY r0, r1, r0, r1, r2, r3, __div0_wrap, 1
     .size __aeabi_uidivmod, . - __aeabi_uidivmo
 
-__aeabi_idivmod
+__aeabi_idivmod:
     ARMV4_SDIV32_BODY r0, r1, r0, r1, r2, r3, __div0_wrap, 1
     .size __aeabi_idivmod, . - __aeabi_idivmod
 #endif
@@ -682,7 +682,7 @@ __aeabi_uidivmod:
     ARMV5_UDIV32_BODY r0, r1, r0, r1, r2, r3, ip, __div0_wrap, 1
     .size __aeabi_uidivmod, . - __aeabi_uidivmo
 
-__aeabi_idivmod
+__aeabi_idivmod:
     ARMV5_SDIV32_BODY r0, r1, r0, r1, r2, lr, ip, r3, __div0_wrap_s, "ldr pc, [sp, #-4]"
     .size __aeabi_idivmod, . - __aeabi_idivmod
 #endif
