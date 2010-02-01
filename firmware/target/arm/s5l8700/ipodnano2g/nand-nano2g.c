@@ -339,7 +339,7 @@ void nand_power_up(void)
         if(nand_type[i] != 0xFFFFFFFF)
         {
             if(nand_reset(i))
-                if(nand_reset(i)) panicf("nand_power_up: nand_reset(bank=%d) failed.",(unsigned int)i);
+                panicf("nand_power_up: nand_reset(bank=%d) failed.",(unsigned int)i);
         }
     }
     nand_powered = 1;
@@ -511,7 +511,14 @@ uint32_t nand_device_init(void)
 
     uint32_t type;
     uint32_t i, j;
+
+    /* Assume there are 0 banks, to prevent
+       nand_power_up from talking with them yet. */
+    for(i = 0; i < 4; i++) nand_type[i] = 0xFFFFFFFF;
     nand_power_up();
+
+    /* Now that the flash is powered on, detect how
+       many banks we really have and initialize them. */
     for (i = 0; i < 4; i++)
     {
         nand_tunk1[i] = 7;
@@ -519,7 +526,6 @@ uint32_t nand_device_init(void)
         nand_tunk2[i] = 7;
         nand_tunk3[i] = 7;
         type = nand_get_chip_type(i);
-        nand_type[i] = 0xFFFFFFFF;
         if (type == 0xFFFFFFFF) continue;
         for (j = 0; ; j++)
         {
