@@ -71,7 +71,7 @@ static unsigned long entry_count = 0;
 static unsigned long reserve_used = 0;
 static unsigned int  cache_build_ticks = 0;
 static unsigned long appflags = 0;
-static char dircache_cur_path[MAX_PATH*2];
+static char dircache_cur_path[MAX_PATH];
 
 static struct event_queue dircache_queue;
 static long dircache_stack[(DEFAULT_STACK_SIZE + 0x900)/sizeof(long)];
@@ -393,7 +393,8 @@ static int dircache_travel(IF_MV2(int volume,) struct fat_dir *dir, struct dirca
  *   path: Absolute path to a file or directory (see comment)
  *   go_down: Returns the first entry of the directory given by the path (see comment)
  *
- * As a a special case to handle buggy code, accept path="" as an alias for "/"
+ * As a a special case, accept path="" as an alias for "/".
+ * Also if the path omits the first '/', it will be accepted.
  *
  * * If get_down=true:
  *   If path="/", the returned entry is the first of root directory (ie dircache_root)
@@ -420,16 +421,7 @@ static struct dircache_entry* dircache_get_entry(const char *path, bool go_down)
     bool at_root = true;
     struct dircache_entry *cache_entry = dircache_root;
     
-    /* check that the path is absolute (accept empty path also) */
-    if(path[0] != '/' && path[0] != 0)
-        return NULL;
- 
-    /* make a copy of the path because strok_r modifies the path */
-    /* also handle the weird "" alias for "/" */
-    if(path[0] != 0)
-        strlcpy(namecopy, path, sizeof(namecopy));
-    else
-        strlcpy(namecopy, "/", sizeof(namecopy));
+    strlcpy(namecopy, path, sizeof(namecopy));
     
     for(part = strtok_r(namecopy, "/", &end); part; part = strtok_r(NULL, "/", &end))
     {
@@ -913,31 +905,39 @@ const struct dircache_entry *dircache_get_entry_ptr(const char *filename)
  */
 void dircache_copy_path(const struct dircache_entry *entry, char *buf, int size)
 {
-    const struct dircache_entry *down[MAX_SCAN_DEPTH];
-    int depth = 0;
+    int path_size = 0;
+    int idx;
+    const struct dircache_entry *temp = entry;
     
     if (size <= 0)
         return ;
-    
-    buf[0] = '\0';
-    
-    if (entry == NULL)
-        return ;
-    
-    do {
-        down[depth] = entry;
-        entry = entry->up;
-        depth++;
-    } while (entry != NULL && depth < MAX_SCAN_DEPTH);
-    
-    while (--depth >= 0)
+        
+    /* first compute the necessary size */
+    while(temp != NULL)
     {
-        snprintf(buf, size, "/%s", down[depth]->d_name);
-        buf += down[depth]->name_len; /* '/' + d_name */
-        size -= down[depth]->name_len;
-        if (size <= 0)
-            break ;
+        path_size += temp->name_len; /* '/' + d_name */
+        temp = temp->up;
     }
+    
+    /* now copy the path */
+    /* doesn't matter with trailing 0 because it's added later */
+    idx = path_size;
+    while(entry != NULL)
+    {
+        idx -= entry->name_len;
+        /* available size */
+        int rem = size - idx;
+        
+        if(rem >= 1)
+        {
+            buf[idx] = '/';
+            memcpy(buf + idx + 1, entry->d_name, MIN((size_t)(rem - 1), (size_t)(entry->name_len - 1)));
+        }
+        entry = entry->up;
+    }
+    
+    /* add trailing 0 */
+    buf[MIN(path_size, size-1)] = 0;
 }
 
 /* --- Directory cache live updating functions --- */
@@ -1060,7 +1060,7 @@ void dircache_update_filesize(int fd, long newsize, long startcluster)
 
     if (fd_bindings[fd] == NULL)
     {
-        logf("dircache fd access error");
+        logf("dircache fd(%d) access error", fd);
         dircache_initialized = false;
         return ;
     }
