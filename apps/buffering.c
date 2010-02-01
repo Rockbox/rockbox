@@ -108,7 +108,9 @@ struct memory_handle {
     enum data_type type;       /* Type of data buffered with this handle */
     char path[MAX_PATH];       /* Path if data originated in a file */
     int fd;                    /* File descriptor to path (-1 if closed) */
-    size_t data;               /* Start index of the handle's data buffer */
+    size_t start;              /* Start index of the handle's data buffer,
+                                  for use by reset_handle. */
+    size_t data;               /* Start index of the handle's data */
     volatile size_t ridx;      /* Read pointer, relative to the main buffer */
     size_t widx;               /* Write pointer */
     size_t filesize;           /* File total length */
@@ -713,13 +715,19 @@ static bool buffer_handle(int handle_id)
    Use this after having set the new offset to use. */
 static void reset_handle(int handle_id)
 {
+    size_t alignment_pad;
+
     logf("reset_handle(%d)", handle_id);
 
     struct memory_handle *h = find_handle(handle_id);
     if (!h)
         return;
 
-    h->ridx = h->widx = h->data;
+    /* Align to desired storage alignment */
+    alignment_pad = (h->offset - (size_t)(&buffer[h->start]))
+                    & STORAGE_ALIGN_MASK;
+    h->ridx = h->widx = h->data = RINGBUF_ADD(h->start, alignment_pad);
+
     if (h == cur_handle)
         buf_widx = h->widx;
     h->available = 0;
@@ -831,6 +839,7 @@ static void shrink_handle(struct memory_handle *h)
             return;
 
         h->data = RINGBUF_ADD(h->data, delta);
+        h->start = RINGBUF_ADD(h->start, delta);
         h->available -= delta;
         h->offset += delta;
     }
@@ -981,7 +990,9 @@ int bufopen(const char *file, size_t offset, enum data_type type,
     if (adjusted_offset > size)
         adjusted_offset = 0;
 
-    struct memory_handle *h = add_handle(size-adjusted_offset, can_wrap, false);
+    /* Reserve extra space because alignment can move data forward */
+    struct memory_handle *h = add_handle(size-adjusted_offset+STORAGE_ALIGN_MASK,
+                                         can_wrap, false);
     if (!h)
     {
         DEBUGF("bufopen: failed to add handle\n");
@@ -991,6 +1002,23 @@ int bufopen(const char *file, size_t offset, enum data_type type,
 
     strlcpy(h->path, file, MAX_PATH);
     h->offset = adjusted_offset;
+
+    /* Don't bother to storage align bitmaps because they are not
+     * loaded directly into the buffer.
+     */
+    if (type != TYPE_BITMAP)
+    {
+        size_t alignment_pad;
+        
+        /* Remember where data area starts, for use by reset_handle */
+        h->start = buf_widx;
+
+        /* Align to desired storage alignment */
+        alignment_pad = (adjusted_offset - (size_t)(&buffer[buf_widx]))
+                        & STORAGE_ALIGN_MASK;
+        buf_widx = RINGBUF_ADD(buf_widx, alignment_pad);
+    }
+
     h->ridx = buf_widx;
     h->widx = buf_widx;
     h->data = buf_widx;
@@ -1522,7 +1550,8 @@ bool buffering_reset(char *buf, size_t buflen)
         return false;
 
     buffer = buf;
-    buffer_len = buflen;
+    /* Preserve alignment when wrapping around */
+    buffer_len = buflen & ~STORAGE_ALIGN_MASK;
     guard_buffer = buf + buflen;
 
     buf_widx = 0;
