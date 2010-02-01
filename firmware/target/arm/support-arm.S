@@ -110,7 +110,7 @@
     eor     \quotient, \numerator, \remainder, lsl \bits
 .endif
 .endif
-.ifne \return        
+.ifne \return
     bx      lr
 .else
     b       99f
@@ -128,7 +128,7 @@
     subcc   \remainder, \tmp, \divisor, asr \bits
     movcs   \remainder, \tmp
 .endif
-.ifne \return        
+.ifne \return
     bx      lr
 .else
     b       99f
@@ -142,7 +142,7 @@
 .ifnc "", "\quotient"
     mov   \quotient, #0
 .endif
-.ifne \return        
+.ifne \return
     bx      lr
 .else
 99:
@@ -195,7 +195,7 @@
     sub     \quotient, \numerator, \remainder, lsl \bits
 .endif
 .endif
-.ifne \return        
+.ifne \return
     ARM_SDIV32_POST \quotient, \remainder, \sign
     bx      lr
 .else
@@ -208,7 +208,7 @@
 .ifnc "", "\quotient"
     mov     \quotient, #0
 .endif
-.ifne \return        
+.ifne \return
     ARM_SDIV32_POST "", \remainder, \sign
     bx      lr
 .else
@@ -588,7 +588,7 @@
 .endif
 99:
 .endm
-#endif    
+#endif
 
     .section .text
 
