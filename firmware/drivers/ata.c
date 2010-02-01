@@ -53,6 +53,7 @@
 #define CMD_READ_MULTIPLE          0xC4
 #define CMD_READ_MULTIPLE_EXT      0x29
 #define CMD_WRITE_MULTIPLE         0xC5
+#define CMD_WRITE_MULTIPLE_EXT     0x39
 #define CMD_SET_MULTIPLE_MODE      0xC6
 #define CMD_STANDBY_IMMEDIATE      0xE0
 #define CMD_STANDBY                0xE2
