@@ -279,16 +279,18 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Ja"
-    cowond2*: "MENU = Ja"
+    cowond2*: "MENU oder rechts oben= Ja"
     iriverh100,iriverh120,iriverh300: "NAVI = Ja"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Ja"
+    mrobe500: "PLAY, POWER oder rechts oben = Ja"
     archosplayer: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -7123,10 +7125,10 @@
     *: "Insert Shuffled"
   </source>
   <dest>
-    *: "Zufällig einfügen"
+    *: "Gemischt einfügen"
   </dest>
   <voice>
-    *: "Zufällig einfügen"
+    *: "Gemischt einfügen"
   </voice>
 </phrase>
 <phrase>
@@ -7179,10 +7181,10 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "Zufällig in Warteschlange"
+    *: "Gemischt in Warteschlange"
   </dest>
   <voice>
-    *: "Zufällig in Warteschlange"
+    *: "Gemischt in Warteschlange"
   </voice>
 </phrase>
 <phrase>
@@ -11564,11 +11566,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Tastentöne Wiederholung"
+    swcodec: "Tastentonwiederholung"
   </dest>
   <voice>
     *: none
-    swcodec: "Tastentöne Wiederholung"
+    swcodec: "Tastentonwiederholung"
   </voice>
 </phrase>
 <phrase>
@@ -11581,11 +11583,11 @@
   </source>
   <dest>
     *: none
-    accessory_supply: "Zubehör Spannungsversorgung"
+    accessory_supply: "Zubehör-Spannungsversorgung"
   </dest>
   <voice>
     *: none
-    accessory_supply: "Zubehör Spannungsversorgung"
+    accessory_supply: "Zubehör-Spannungsversorgung"
   </voice>
 </phrase>
 <phrase>
@@ -12678,5 +12680,584 @@
   </dest>
   <voice>
     *: "Oben"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "Gemischt ans Ende der Warteschlange"
+  </dest>
+  <voice>
+    *: "Gemischt ans Ende der Warteschlange"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_STATUSBAR
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+  </source>
+  <dest>
+    *:none
+  </dest>
+  <voice>
+    *:none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "SBS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Release Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Abklingzeit"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Abklingzeit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CUSTOM_STATUSBAR
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+  </source>
+  <dest>
+    *:none
+  </dest>
+  <voice>
+    *:none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Threshold"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Schwellwert"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Schwellwert"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Makeup Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Endverstärkung"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Endverstärkung"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "RSBS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Übergang"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Übergang"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Automatik"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Automatik"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "Gemischt am Ende einfügen"
+  </dest>
+  <voice>
+    *: "Gemischt am Ende einfügen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Soft Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Weicher Übergang"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Weicher Übergang"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "Danach:"
+  </dest>
+  <voice>
+    *: "Danach:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Ratio"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Verhältnis"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Verhältnis"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_KEYPAD_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB-Tastenmodus"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB-Tastenmodus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Hard Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Harter Übergang"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Harter Übergang"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSER_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Browser Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Browser-Modus"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Browser-Modus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB HID"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB Human Interface Device"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_OTHER
+  desc: Catch-all FM region. Select if none of the others work
+  user: core
+  <source>
+    *: none
+    radio: "Other"
+  </source>
+  <dest>
+    *: none
+    radio: "Andere"
+  </dest>
+  <voice>
+    *: none
+    radio: "Andere"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ITALY
+  desc: fm region Italy
+  user: core
+  <source>
+    *: none
+    radio: "Italy"
+  </source>
+  <dest>
+    *: none
+    radio: "Italien"
+  </dest>
+  <voice>
+    *: none
+    radio: "Italien"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_10
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "10:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "10:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "10 zu 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Morseeingabe verwenden"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Morseeingabe verwenden"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "2:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "2:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "2 zu 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOUSE_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Mouse Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Mausmodus"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Mausmodus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_LIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Grenze"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Grenze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIMEDIA_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Multimedia Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Multimediamodus"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Multimediamodus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Eigene"
+  </dest>
+  <voice>
+    *: "Eigene"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Vor das Ende springen"
+  </dest>
+  <voice>
+    *: "Vor das Ende springen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Bei automatischem Titelwechsel"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Bei automatischem Titelwechsel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_6
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "6:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "6:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "6 zu 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Nächster Titel:"
+  </dest>
+  <voice>
+    *: "Nächster Titel:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_4
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "4:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "4:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "4 zu 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESENTATION_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Presentation Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Präsentationsmodus"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Präsentationsmodus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "von"
+  </dest>
+  <voice>
+    *: "von"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Basisskin (SBS)"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Basisskin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Fernbedienungs-SBS"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Fernbedienungs-SBS"
   </voice>
 </phrase>
