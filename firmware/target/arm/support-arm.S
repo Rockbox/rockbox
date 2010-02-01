@@ -605,10 +605,10 @@ __div0_wrap:
     .size __div0_wrap, . - __div0_wrap
 
 #ifndef __ARM_EABI__
+#if ARM_ARCH < 5 /* Gigabeat S is crashing on boot with this enabled */
     .global __divsi3
     .type   __divsi3,%function
-    .global __udivsi3
-    .type   __udivsi3,%function
+#endif
     .global __udivsi3
     .type   __udivsi3,%function
 #else
@@ -619,11 +619,13 @@ __div0_wrap:
     .global __aeabi_uidiv
     .type   __aeabi_uidiv,%function
     .set    __aeabi_uidiv,__aeabi_uidivmod
+#if ARM_ARCH < 5 /* Gigabeat S is crashing on boot with this enabled */
     .global __aeabi_idivmod
     .type   __aeabi_idivmod,%function
     .global __aeabi_idiv
     .type   __aeabi_idiv,%function
     .set    __aeabi_idiv,__aeabi_idivmod
+#endif
 #endif
 
 
@@ -673,18 +675,22 @@ __udivsi3:
     ARMV5_UDIV32_BODY r0, r1, r0, "", r2, r3, ip, __div0_wrap, 1
     .size __udivsi3, . - __udivsi3
 
+#if ARM_ARCH < 5 /* Gigabeat S is crashing on boot with this enabled */
 __divsi3:
     ARMV5_SDIV32_BODY r0, r1, r0, "", r2, lr, ip, r3, __div0_wrap_s, "ldr pc, [sp, #-4]"
     .size __divsi3, . - __divsi3
+#endif
 
 #else
 __aeabi_uidivmod:
     ARMV5_UDIV32_BODY r0, r1, r0, r1, r2, r3, ip, __div0_wrap, 1
     .size __aeabi_uidivmod, . - __aeabi_uidivmo
 
+#if ARM_ARCH < 5 /* Gigabeat S is crashing on boot with this enabled */
 __aeabi_idivmod:
     ARMV5_SDIV32_BODY r0, r1, r0, r1, r2, lr, ip, r3, __div0_wrap_s, "ldr pc, [sp, #-4]"
     .size __aeabi_idivmod, . - __aeabi_idivmod
+#endif
 #endif
 
 .L_udiv_est_table:
