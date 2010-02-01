@@ -32,11 +32,14 @@ BootloaderInstallTcc::BootloaderInstallTcc(QObject *parent)
 QString BootloaderInstallTcc::ofHint()
 {
     return tr("Bootloader installation requires you to provide "
-               "a firmware file of the original firmware (bin file). "
-               "You need to download this file yourself due to legal "
-               "reasons. "
-               "Press Ok to continue and browse your computer for the firmware "
-               "file.");
+              "a firmware file of the original firmware (bin file). "
+              "You need to download this file yourself due to legal "
+              "reasons. Please refer to the "
+              "<a href='http://www.rockbox.org/manual.shtml'>manual</a> and the "
+              "<a href='http://www.rockbox.org/wiki/CowonD2Info'>CowonD2Info</a> "
+              "wiki page on how to obtain the file.<br/>"
+              "Press Ok to continue and browse your computer for the firmware "
+              "file.");
 }
 
 bool BootloaderInstallTcc::install(void)
