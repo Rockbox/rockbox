@@ -418,10 +418,15 @@ int sim_remove(const char *name)
 
 int sim_rename(const char *oldname, const char *newname)
 {
+    char sim_old[MAX_PATH];
+    char sim_new[MAX_PATH];
 #ifdef HAVE_DIRCACHE
     dircache_rename(oldname, newname);
 #endif
-    return RENAME(get_sim_pathname(oldname), get_sim_pathname(newname));
+    // This is needed as get_sim_pathname() has a static buffer
+    strncpy(sim_old, get_sim_pathname(oldname), MAX_PATH);
+    strncpy(sim_new, get_sim_pathname(newname), MAX_PATH);
+    return RENAME(sim_old, sim_new);
 }
 
 /* rockbox off_t may be different from system off_t */
