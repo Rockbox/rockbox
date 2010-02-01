@@ -1006,16 +1006,17 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 
 #endif
 
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+        display->backdrop_show(data->backdrop);
+#endif
+
+
     /* reset to first subline if refresh all flag is set */
     if (refresh_mode == WPS_REFRESH_ALL)
     {
         struct skin_line *line;
         struct skin_viewport *skin_viewport = find_viewport(VP_DEFAULT_LABEL, data);
         
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
-        display->backdrop_show(data->backdrop);
-#endif
-
         if (!(skin_viewport->hidden_flags & VP_NEVER_VISIBLE))
         {
             display->set_viewport(&skin_viewport->vp);
