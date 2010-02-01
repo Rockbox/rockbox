@@ -30,6 +30,7 @@ profile_plugin.c
 #endif
 #ifdef HAVE_LCD_BITMAP
 #ifdef CPU_ARM
+../../../firmware/target/arm/support-arm.S
 pluginlib_jpeg_idct_arm.S
 #endif
 pluginlib_jpeg_mem.c

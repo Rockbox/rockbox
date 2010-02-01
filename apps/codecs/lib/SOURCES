@@ -8,6 +8,7 @@ mdct_lookup.c
 mdct_arm.S
 setjmp_arm.S
 udiv32_arm.S
+../../../firmware/target/arm/support-arm.S
 #endif
 
 #ifdef CPU_COLDFIRE
