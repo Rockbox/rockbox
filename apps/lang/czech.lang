@@ -349,10 +349,10 @@
     *: "Database"
   </source>
   <dest>
-    *: "Databáze popisù"
+    *: "Databáze popisů"
   </dest>
   <voice>
-    *: "Databáze popisù"
+    *: "Databáze popisů"
   </voice>
 </phrase>
 <phrase>
@@ -363,10 +363,10 @@
     *: "Now Playing"
   </source>
   <dest>
-    *: "Právì hraje"
+    *: "Právě hraje"
   </dest>
   <voice>
-    *: "Právì hraje"
+    *: "Právě hraje"
   </voice>
 </phrase>
 <phrase>
@@ -377,10 +377,10 @@
     *: "Resume Playback"
   </source>
   <dest>
-    *: "Pokraèovat v pøehrávání"
+    *: "Pokračovat v přehrávání"
   </dest>
   <voice>
-    *: "Pokraèovat v pøehrávání"
+    *: "Pokračovat v přehrávání"
   </voice>
 </phrase>
 <phrase>
@@ -551,10 +551,10 @@
     *: "Resume"
   </source>
   <dest>
-    *: "Pokraèovat"
+    *: "Pokračovat"
   </dest>
   <voice>
-    *: "Pokraèovat"
+    *: "Pokračovat"
   </voice>
 </phrase>
 <phrase>
@@ -579,10 +579,10 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "Vytvoøit záložku?"
+    *: "Vytvořit záložku?"
   </dest>
   <voice>
-    *: "Vytvoøit záložku?"
+    *: "Vytvořit záložku?"
   </voice>
 </phrase>
 <phrase>
@@ -593,10 +593,10 @@
     *: "Bookmark Created"
   </source>
   <dest>
-    *: "Záložka vytvoøena"
+    *: "Záložka vytvořena"
   </dest>
   <voice>
-    *: "Záložka vytvoøena"
+    *: "Záložka vytvořena"
   </voice>
 </phrase>
 <phrase>
@@ -705,10 +705,10 @@
     *: "Channel Configuration"
   </source>
   <dest>
-    *: "Nastavení kanálù"
+    *: "Nastavení kanálů"
   </dest>
   <voice>
-    *: "Nastavení kanálù"
+    *: "Nastavení kanálů"
   </voice>
 </phrase>
 <phrase>
@@ -820,10 +820,10 @@
     *: "Stereo Width"
   </source>
   <dest>
-    *: "Šíøka sterea"
+    *: "Šířka sterea"
   </dest>
   <voice>
-    *: "Šíøka sterea"
+    *: "Šířka sterea"
   </voice>
 </phrase>
 <phrase>
@@ -836,11 +836,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Køížení kanálù"
+    swcodec: "Křížení kanálů"
   </dest>
   <voice>
     *: none
-    swcodec: "Køížení kanálù"
+    swcodec: "Křížení kanálů"
   </voice>
 </phrase>
 <phrase>
@@ -853,11 +853,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Pøímé zesílení"
+    swcodec: "Přímé zesílení"
   </dest>
   <voice>
     *: none
-    swcodec: "Pøímé zesílení"
+    swcodec: "Přímé zesílení"
   </voice>
 </phrase>
 <phrase>
@@ -870,11 +870,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Pøekøížené zesílení"
+    swcodec: "Překřížené zesílení"
   </dest>
   <voice>
     *: none
-    swcodec: "Pøekøížené zesílení"
+    swcodec: "Překřížené zesílení"
   </voice>
 </phrase>
 <phrase>
@@ -904,11 +904,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Oøíznutí výšek"
+    swcodec: "Oříznutí výšek"
   </dest>
   <voice>
     *: none
-    swcodec: "Oøíznutí výšek"
+    swcodec: "Oříznutí výšek"
   </voice>
 </phrase>
 <phrase>
@@ -972,11 +972,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Pøedoøíznutí"
+    swcodec: "Předoříznutí"
   </dest>
   <voice>
     *: none
-    swcodec: "Pøedoøíznutí"
+    swcodec: "Předoříznutí"
   </voice>
 </phrase>
 <phrase>
@@ -1006,11 +1006,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Rozšíøená nastavení ekvalizéru"
+    swcodec: "Rozšířená nastavení ekvalizéru"
   </dest>
   <voice>
     *: none
-    swcodec: "Rozšíøená nastavení ekvalizéru"
+    swcodec: "Rozšířená nastavení ekvalizéru"
   </voice>
 </phrase>
 <phrase>
@@ -1023,11 +1023,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Uložit pøedvolbu EQ"
+    swcodec: "Uložit předvolbu EQ"
   </dest>
   <voice>
     *: none
-    swcodec: "Uložit pøedvolbu ekvalizéru"
+    swcodec: "Uložit předvolbu ekvalizéru"
   </voice>
 </phrase>
 <phrase>
@@ -1057,7 +1057,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Editaèní mód: %s"
+    swcodec: "Editační mód: %s"
   </dest>
   <voice>
     *: none
@@ -1108,11 +1108,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Filtr špièek %d"
+    swcodec: "Filtr špiček %d"
   </dest>
   <voice>
     *: none
-    swcodec: "Filtr špièek"
+    swcodec: "Filtr špiček"
   </voice>
 </phrase>
 <phrase>
@@ -1142,11 +1142,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Oøezová frekvence"
+    swcodec: "Ořezová frekvence"
   </dest>
   <voice>
     *: none
-    swcodec: "Oøezová frekvence"
+    swcodec: "Ořezová frekvence"
   </voice>
 </phrase>
 <phrase>
@@ -1414,11 +1414,11 @@
   </source>
   <dest>
     *: none
-    masf: "Støedová frekvence MDB"
+    masf: "Středová frekvence MDB"
   </dest>
   <voice>
     *: none
-    masf: "Støedová frekvence emdébé"
+    masf: "Středová frekvence emdébé"
   </voice>
 </phrase>
 <phrase>
@@ -1431,11 +1431,11 @@
   </source>
   <dest>
     *: none
-    masf: "Šíøka pásma MDB"
+    masf: "Šířka pásma MDB"
   </dest>
   <voice>
     *: none
-    masf: "Šíøka pásma emdébé"
+    masf: "Šířka pásma emdébé"
   </voice>
 </phrase>
 <phrase>
@@ -1460,10 +1460,10 @@
     *: "Playback Settings"
   </source>
   <dest>
-    *: "Nastavení pøehrávání"
+    *: "Nastavení přehrávání"
   </dest>
   <voice>
-    *: "Nastavení pøehrávání"
+    *: "Nastavení přehrávání"
   </voice>
 </phrase>
 <phrase>
@@ -1544,10 +1544,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Pøehrát nejprve vybrané"
+    *: "Přehrát nejprve vybrané"
   </dest>
   <voice>
-    *: "Pøehrát nejprve vybrané"
+    *: "Přehrát nejprve vybrané"
   </voice>
 </phrase>
 <phrase>
@@ -1558,10 +1558,10 @@
     *: "Fast-Forward/Rewind"
   </source>
   <dest>
-    *: "Pøetáèení dopøedu/dozadu"
+    *: "Přetáčení dopředu/dozadu"
   </dest>
   <voice>
-    *: "Pøetáèení dopøedu a dozadu"
+    *: "Přetáčení dopředu a dozadu"
   </voice>
 </phrase>
 <phrase>
@@ -1572,10 +1572,10 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "Skok pøevíjení"
+    *: "Skok převíjení"
   </dest>
   <voice>
-    *: "Skok pøevíjení"
+    *: "Skok převíjení"
   </voice>
 </phrase>
 <phrase>
@@ -1586,10 +1586,10 @@
     *: "FF/RW Accel"
   </source>
   <dest>
-    *: "Urychlené pøevíjení"
+    *: "Urychlené převíjení"
   </dest>
   <voice>
-    *: "Urychlené pøevíjení"
+    *: "Urychlené převíjení"
   </voice>
 </phrase>
 <phrase>
@@ -1601,11 +1601,11 @@
     flash_storage: none
   </source>
   <dest>
-    *: "Protiotøesová pamì"
+    *: "Protiotřesová paměť"
     flash_storage: none
   </dest>
   <voice>
-    *: "Protiotøesová pamì"
+    *: "Protiotřesová paměť"
     flash_storage: none
   </voice>
 </phrase>
@@ -1617,10 +1617,10 @@
     *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "Postupnì ztlumit pøi zastevení/pauze"
+    *: "Postupně ztlumit při zastevení/pauze"
   </dest>
   <voice>
-    *: "Postupnì ztlumit pøi zastevení a pauze"
+    *: "Postupně ztlumit při zastevení a pauze"
   </voice>
 </phrase>
 <phrase>
@@ -1681,11 +1681,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Pouze pøi pøeskoèení skladby"
+    crossfade: "Pouze při přeskočení skladby"
   </dest>
   <voice>
     *: none
-    crossfade: "Pouze pøi pøeskoèení skladby"
+    crossfade: "Pouze při přeskočení skladby"
   </voice>
 </phrase>
 <phrase>
@@ -1698,11 +1698,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Zamíchat a pøeskoèit"
+    crossfade: "Zamíchat a přeskočit"
   </dest>
   <voice>
     *: none
-    crossfade: "Zamíchat a pøeskoèit"
+    crossfade: "Zamíchat a přeskočit"
   </voice>
 </phrase>
 <phrase>
@@ -1715,11 +1715,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Prodleva pøi zesílení"
+    crossfade: "Prodleva při zesílení"
   </dest>
   <voice>
     *: none
-    crossfade: "Prodleva pøi zesílení"
+    crossfade: "Prodleva při zesílení"
   </voice>
 </phrase>
 <phrase>
@@ -1749,11 +1749,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Prodleva pøi zeslabení"
+    crossfade: "Prodleva při zeslabení"
   </dest>
   <voice>
     *: none
-    crossfade: "Prodleva pøi zeslabení"
+    crossfade: "Prodleva při zeslabení"
   </voice>
 </phrase>
 <phrase>
@@ -1888,10 +1888,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Pro každou skladbu zvláš"
+    *: "Pro každou skladbu zvlášť"
   </dest>
   <voice>
-    *: "Pro každou skladbu zvláš"
+    *: "Pro každou skladbu zvlášť"
   </voice>
 </phrase>
 <phrase>
@@ -1902,10 +1902,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Zohlednit zesílení pøi náhodném pøehrávání"
+    *: "Zohlednit zesílení při náhodném přehrávání"
   </dest>
   <voice>
-    *: "Zohlednit zesílení pøi náhodném pøehrávání"
+    *: "Zohlednit zesílení při náhodném přehrávání"
   </voice>
 </phrase>
 <phrase>
@@ -1916,10 +1916,10 @@
     *: "Pre-amp"
   </source>
   <dest>
-    *: "Pøedzesílení"
+    *: "Předzesílení"
   </dest>
   <voice>
-    *: "Pøedzesílení"
+    *: "Předzesílení"
   </voice>
 </phrase>
 <phrase>
@@ -1966,11 +1966,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Støední"
+    swcodec: "Střední"
   </dest>
   <voice>
     *: none
-    swcodec: "Støední"
+    swcodec: "Střední"
   </voice>
 </phrase>
 <phrase>
@@ -2057,10 +2057,10 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Pokraèovat další složkou"
+    *: "Pokračovat další složkou"
   </dest>
   <voice>
-    *: "Pokraèovat další složkou"
+    *: "Pokračovat další složkou"
   </voice>
 </phrase>
 <phrase>
@@ -2102,7 +2102,7 @@
     *: "Podpora Cuesheet"
   </dest>
   <voice>
-    *: "Podpora kjùšít"
+    *: "Podpora kjůšít"
   </voice>
 </phrase>
 <phrase>
@@ -2115,11 +2115,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Pauza pøi odpojení sluchátek"
+    headphone_detection: "Pauza při odpojení sluchátek"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pauza pøi odpojení sluchátek"
+    headphone_detection: "Pauza při odpojení sluchátek"
   </voice>
 </phrase>
 <phrase>
@@ -2132,11 +2132,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Pauza a pokraèování"
+    headphone_detection: "Pauza a pokračování"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pauza a pokraèování"
+    headphone_detection: "Pauza a pokračování"
   </voice>
 </phrase>
 <phrase>
@@ -2149,11 +2149,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Délka pøetoèení"
+    headphone_detection: "Délka přetočení"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Délka pøetoèení"
+    headphone_detection: "Délka přetočení"
   </voice>
 </phrase>
 <phrase>
@@ -2166,11 +2166,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Zrušit pokraèování pøehrávání pøi zapnutí pokud jsou sluchátka odpojena"
+    headphone_detection: "Zrušit pokračování přehrávání při zapnutí pokud jsou sluchátka odpojena"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Zrušit pokraèování pøehrávání pøi zapnutí pokud jsou sluchátka odpojena"
+    headphone_detection: "Zrušit pokračování přehrávání při zapnutí pokud jsou sluchátka odpojena"
   </voice>
 </phrase>
 <phrase>
@@ -2181,10 +2181,10 @@
     *: "File View"
   </source>
   <dest>
-    *: "Zobrazení souborù"
+    *: "Zobrazení souborů"
   </dest>
   <voice>
-    *: "Zobrazení souborù"
+    *: "Zobrazení souborů"
   </voice>
 </phrase>
 <phrase>
@@ -2195,10 +2195,10 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "Øadit i podle velikosti písma"
+    *: "Řadit i podle velikosti písma"
   </dest>
   <voice>
-    *: "Øadit i podle velikosti písma"
+    *: "Řadit i podle velikosti písma"
   </voice>
 </phrase>
 <phrase>
@@ -2209,10 +2209,10 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Øadit adresáøe"
+    *: "Řadit adresáře"
   </dest>
   <voice>
-    *: "Øadit adresáøe"
+    *: "Řadit adresáře"
   </voice>
 </phrase>
 <phrase>
@@ -2223,10 +2223,10 @@
     *: "Sort Files"
   </source>
   <dest>
-    *: "Øadit soubory"
+    *: "Řadit soubory"
   </dest>
   <voice>
-    *: "Øadit soubory"
+    *: "Řadit soubory"
   </voice>
 </phrase>
 <phrase>
@@ -2237,10 +2237,10 @@
     *: "Alphabetical"
   </source>
   <dest>
-    *: "Abecednì"
+    *: "Abecedně"
   </dest>
   <voice>
-    *: "Abecednì"
+    *: "Abecedně"
   </voice>
 </phrase>
 <phrase>
@@ -2251,10 +2251,10 @@
     *: "By Date"
   </source>
   <dest>
-    *: "Vzestupnì podle data"
+    *: "Vzestupně podle data"
   </dest>
   <voice>
-    *: "Vzestupnì podle data"
+    *: "Vzestupně podle data"
   </voice>
 </phrase>
 <phrase>
@@ -2265,10 +2265,10 @@
     *: "By Newest Date"
   </source>
   <dest>
-    *: "Sestupnì podle data"
+    *: "Sestupně podle data"
   </dest>
   <voice>
-    *: "Sestupnì podle data"
+    *: "Sestupně podle data"
   </voice>
 </phrase>
 <phrase>
@@ -2363,10 +2363,10 @@
     *: "Current Directory Only"
   </source>
   <dest>
-    *: "Pouze aktuální adresáø"
+    *: "Pouze aktuální adresář"
   </dest>
   <voice>
-    *: "Pouze aktuální adresáø"
+    *: "Pouze aktuální adresář"
   </voice>
 </phrase>
 <phrase>
@@ -2396,12 +2396,12 @@
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
-    *: "Vytváøím databázi... %d nalezeno (OFF pro návrat)"
-    iriverh100,iriverh120,iriverh300: "Vytváøím databázi... %d nalezeno (STOP pro návrat)"
-    ipod*: "Vytváøím databázi... %d found (PREV pro návrat)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Vytváøím databázi... %d nalezeno (LEFT pro návrat)"
-    iaudiox5,iaudiom5*: "Vytváøím databázi... %d nalezeno (PREV pro návrat)"
-    gogearsa9200: "Vytváøím databázi.. %d nalezeno (REW pro návrat)"
+    *: "Vytvářím databázi... %d nalezeno (OFF pro návrat)"
+    iriverh100,iriverh120,iriverh300: "Vytvářím databázi... %d nalezeno (STOP pro návrat)"
+    ipod*: "Vytvářím databázi... %d found (PREV pro návrat)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Vytvářím databázi... %d nalezeno (LEFT pro návrat)"
+    iaudiox5,iaudiom5*: "Vytvářím databázi... %d nalezeno (PREV pro návrat)"
+    gogearsa9200: "Vytvářím databázi.. %d nalezeno (REW pro návrat)"
 </dest>
   <voice>
     *: "záznamy nalezené v databázi"
@@ -2417,11 +2417,11 @@
   </source>
   <dest>
     *: none
-    tc_ramcache: "Nahrát do pamìti"
+    tc_ramcache: "Nahrát do paměti"
   </dest>
   <voice>
     *: none
-    tc_ramcache: "Nahrát do pamìti"
+    tc_ramcache: "Nahrát do paměti"
   </voice>
 </phrase>
 <phrase>
@@ -2446,10 +2446,10 @@
     *: "Initialize Now"
   </source>
   <dest>
-    *: "Vynutit obnovení mezipamìti popiskù"
+    *: "Vynutit obnovení mezipaměti popisků"
   </dest>
   <voice>
-    *: "Vynutit obnovení mezipamìti popiskù"
+    *: "Vynutit obnovení mezipaměti popisků"
   </voice>
 </phrase>
 <phrase>
@@ -2460,10 +2460,10 @@
     *: "Update Now"
   </source>
   <dest>
-    *: "Aktualizovat teï"
+    *: "Aktualizovat teď"
   </dest>
   <voice>
-    *: "Aktualizovat teï"
+    *: "Aktualizovat teď"
   </voice>
 </phrase>
 <phrase>
@@ -2530,10 +2530,10 @@
     *: "Committing database"
   </source>
   <dest>
-    *: "Ukládám mezipamì popisù"
+    *: "Ukládám mezipaměť popisů"
   </dest>
   <voice>
-    *: "Ukládám mezipamì popisù"
+    *: "Ukládám mezipaměť popisů"
   </voice>
 </phrase>
 <phrase>
@@ -2544,10 +2544,10 @@
     *: "Database is not ready"
   </source>
   <dest>
-    *: "Databáze není pøipravena"
+    *: "Databáze není připravena"
   </dest>
   <voice>
-    *: "Databáze není pøipravena"
+    *: "Databáze není připravena"
   </voice>
 </phrase>
 <phrase>
@@ -2664,11 +2664,11 @@
   </source>
   <dest>
     *: none
-    charging: "Podsvítit pøi nabíjení"
+    charging: "Podsvítit při nabíjení"
   </dest>
   <voice>
     *: none
-    charging: "Podsvítit pøi nabíjení"
+    charging: "Podsvítit při nabíjení"
   </voice>
 </phrase>
 <phrase>
@@ -2681,11 +2681,11 @@
   </source>
   <dest>
     *: none
-    hold_button: "Podsvítit pøi zamèených klávesách"
+    hold_button: "Podsvítit při zamčených klávesách"
   </dest>
   <voice>
     *: none
-    hold_button: "Podsvítit pøi zamèených klávesách"
+    hold_button: "Podsvítit při zamčených klávesách"
   </voice>
 </phrase>
 <phrase>
@@ -2696,10 +2696,10 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "Podsvícení zaèátku skladeb"
+    *: "Podsvícení začátku skladeb"
   </dest>
   <voice>
-    *: "Podsvícení zaèátku skladeb"
+    *: "Podsvícení začátku skladeb"
   </voice>
 </phrase>
 <phrase>
@@ -2859,11 +2859,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Vzhùru nohama"
+    lcd_bitmap: "Vzhůru nohama"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Vzhùru nohama"
+    lcd_bitmap: "Vzhůru nohama"
   </voice>
 </phrase>
 <phrase>
@@ -2961,11 +2961,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Barva popøedí"
+    lcd_non-mono: "Barva popředí"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Barva popøedí"
+    lcd_non-mono: "Barva popředí"
   </voice>
 </phrase>
 <phrase>
@@ -3046,11 +3046,11 @@
   </source>
   <dest>
     *: none
-    remote: "Displej na dálk. ovladaèi"
+    remote: "Displej na dálk. ovladači"
   </dest>
   <voice>
     *: none
-    remote: "Dysplej na dálkovém ovladaèi"
+    remote: "Dysplej na dálkovém ovladači"
   </voice>
 </phrase>
 <phrase>
@@ -3176,10 +3176,10 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "Limit obousmìrného rolování"
+    *: "Limit obousměrného rolování"
   </dest>
   <voice>
-    *: "Limit obousmìrného rolování"
+    *: "Limit obousměrného rolování"
   </voice>
 </phrase>
 <phrase>
@@ -3292,11 +3292,11 @@
     wheel_acceleration: none
   </source>
   <dest>
-    *: "Prodleva pøed zrychlením"
+    *: "Prodleva před zrychlením"
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "Prodleva pøed zrychlením"
+    *: "Prodleva před zrychlením"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -3378,11 +3378,11 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "Tlaèítková lišta"
+    recorder_pad: "Tlačítková lišta"
   </dest>
   <voice>
     *: none
-    recorder_pad: "Tlaèítková lišta"
+    recorder_pad: "Tlačítková lišta"
   </voice>
 </phrase>
 <phrase>
@@ -3479,11 +3479,11 @@
     masd: none
   </source>
   <dest>
-    *: "Prodleva pøi pøebuzení"
+    *: "Prodleva při přebuzení"
     masd: none
   </dest>
   <voice>
-    *: "Prodleva pøi pøebuzení"
+    *: "Prodleva při přebuzení"
     masd: none
   </voice>
 </phrase>
@@ -3513,11 +3513,11 @@
     masd: none
   </source>
   <dest>
-    *: "Nekoneèná"
+    *: "Nekonečná"
     masd: none
   </dest>
   <voice>
-    *: "Nekoneèná"
+    *: "Nekonečná"
     masd: none
   </voice>
 </phrase>
@@ -3530,11 +3530,11 @@
     masd: none
   </source>
   <dest>
-    *: "Uvolnìní maxima"
+    *: "Uvolnění maxima"
     masd: none
   </dest>
   <voice>
-    *: "Uvolnìní maxima"
+    *: "Uvolnění maxima"
     masd: none
   </voice>
 </phrase>
@@ -3673,7 +3673,7 @@
     *: "Greek (ISO-8859-7)"
   </source>
   <dest>
-    *: "Øecká (ISO-8859-7)"
+    *: "Řecká (ISO-8859-7)"
   </dest>
   <voice>
     *: "Greek"
@@ -3766,10 +3766,10 @@
     *: "Latin Extended (ISO-8859-2)"
   </source>
   <dest>
-    *: "Rozšíøená latinka (ISO-8859-2)"
+    *: "Rozšířená latinka (ISO-8859-2)"
   </dest>
   <voice>
-    *: "Rozšíøená latinka"
+    *: "Rozšířená latinka"
   </voice>
 </phrase>
 <phrase>
@@ -3799,11 +3799,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Zjednodušená èínština (GB2312)"
+    lcd_bitmap: "Zjednodušená čínština (GB2312)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Zjednodušená èínština"
+    lcd_bitmap: "Zjednodušená čínština"
   </voice>
 </phrase>
 <phrase>
@@ -3833,11 +3833,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Tradièní èínština (BIG5)"
+    lcd_bitmap: "Tradiční čínština (BIG5)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Tradièní èínština"
+    lcd_bitmap: "Tradiční čínština"
   </voice>
 </phrase>
 <phrase>
@@ -3865,13 +3865,13 @@
   </source>
   <dest>
     *: none
-    button_light: "Èasový limit osvìtlení tlaèítka"
-    fuze*,e200*: "Èasový limit osvìtlení koleèka"
+    button_light: "Časový limit osvětlení tlačítka"
+    fuze*,e200*: "Časový limit osvětlení kolečka"
   </dest>
   <voice>
     *: none
-    button_light: "Èasový limit osvìtlení tlaèítka"
-    fuze*,e200*: "Èasový limit osvìtlení koleèka"
+    button_light: "Časový limit osvětlení tlačítka"
+    fuze*,e200*: "Časový limit osvětlení kolečka"
   </voice>
 </phrase>
 <phrase>
@@ -3884,11 +3884,11 @@
   </source>
   <dest>
     *: none
-    buttonlight_brightness: "Jas osvìtlení tlaèítka"
+    buttonlight_brightness: "Jas osvětlení tlačítka"
   </dest>
   <voice>
     *: none
-    buttonlight_brightness: "Jas osvìtlení tlaèítka"
+    buttonlight_brightness: "Jas osvětlení tlačítka"
   </voice>
 </phrase>
 <phrase>
@@ -3927,10 +3927,10 @@
     *: "Previous Screen"
   </source>
   <dest>
-    *: "Pøedchozí okno"
+    *: "Předchozí okno"
   </dest>
   <voice>
-    *: "Pøedchozí okno"
+    *: "Předchozí okno"
   </voice>
 </phrase>
 <phrase>
@@ -4053,11 +4053,11 @@
   </source>
   <dest>
     *: none
-    dircache: "Mezipamì adresáøù"
+    dircache: "Mezipaměť adresářů"
   </dest>
   <voice>
     *: none
-    dircache: "Mezipamì adresáøù"
+    dircache: "Mezipaměť adresářů"
   </voice>
 </phrase>
 <phrase>
@@ -4070,11 +4070,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Datum a èas"
+    rtc: "Datum a čas"
   </dest>
   <voice>
     *: none
-    rtc: "Datum a èas"
+    rtc: "Datum a čas"
   </voice>
 </phrase>
 <phrase>
@@ -4087,11 +4087,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Nastavit datum a èas"
+    rtc: "Nastavit datum a čas"
   </dest>
   <voice>
     *: none
-    rtc: "Nastavit datum a èas"
+    rtc: "Nastavit datum a čas"
   </voice>
 </phrase>
 <phrase>
@@ -4104,11 +4104,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Formát èasu"
+    rtc: "Formát času"
   </dest>
   <voice>
     *: none
-    rtc: "Formát èasu"
+    rtc: "Formát času"
   </voice>
 </phrase>
 <phrase>
@@ -4142,7 +4142,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "dvaceti ètyø hodinový cyklus"
+    rtc: "dvaceti čtyř hodinový cyklus"
   </voice>
 </phrase>
 <phrase>
@@ -4189,16 +4189,16 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    rtc: "OFF = Vrátit zpìt"
-    mrobe500: "POWER = Vrátit zpìt"
-    iriverh100,iriverh120,iriverh300: "STOP = Vrátit zpìt"
-    ipod*,sansac200*: "MENU = Vrátit zpìt"
-    iaudiox5,iaudiom5: "RECORD = Vrátit zpìt"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Vrátit zpìt"
-    gigabeatfx: "POWER = Vrátit zpìt"
-    mrobe100: "DISPLAY = Vrátit zpìt"
-    gigabeats: "BACK = Vrátit zpìt"
-    gogearsa9200: "LEFT = Vrátit zpìt"
+    rtc: "OFF = Vrátit zpět"
+    mrobe500: "POWER = Vrátit zpět"
+    iriverh100,iriverh120,iriverh300: "STOP = Vrátit zpět"
+    ipod*,sansac200*: "MENU = Vrátit zpět"
+    iaudiox5,iaudiom5: "RECORD = Vrátit zpět"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Vrátit zpět"
+    gigabeatfx: "POWER = Vrátit zpět"
+    mrobe100: "DISPLAY = Vrátit zpět"
+    gigabeats: "BACK = Vrátit zpět"
+    gogearsa9200: "LEFT = Vrátit zpět"
   </dest>
   <voice>
     *: none
@@ -4266,7 +4266,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    rtc: "Stø"
+    rtc: "Stř"
   </dest>
   <voice>
     *: none
@@ -4283,7 +4283,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    rtc: "Èt"
+    rtc: "Čt"
   </dest>
   <voice>
     *: none
@@ -4368,11 +4368,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    rtc: "Bøe"
+    rtc: "Bře"
   </dest>
   <voice>
     *: none
-    rtc: "bøezen"
+    rtc: "březen"
   </voice>
 </phrase>
 <phrase>
@@ -4402,11 +4402,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    rtc: "Kvì"
+    rtc: "Kvě"
   </dest>
   <voice>
     *: none
-    rtc: "kvìten"
+    rtc: "květen"
   </voice>
 </phrase>
 <phrase>
@@ -4419,11 +4419,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    rtc: "Èer"
+    rtc: "Čer"
   </dest>
   <voice>
     *: none
-    rtc: "èerven"
+    rtc: "červen"
   </voice>
 </phrase>
 <phrase>
@@ -4436,11 +4436,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    rtc: "Èec"
+    rtc: "Čec"
   </dest>
   <voice>
     *: none
-    rtc: "Èervenec"
+    rtc: "Červenec"
   </voice>
 </phrase>
 <phrase>
@@ -4470,11 +4470,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    rtc: "Záø"
+    rtc: "Zář"
   </dest>
   <voice>
     *: none
-    rtc: "záøí"
+    rtc: "září"
   </voice>
 </phrase>
 <phrase>
@@ -4487,11 +4487,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    rtc: "Øíj"
+    rtc: "Říj"
   </dest>
   <voice>
     *: none
-    rtc: "øíjen"
+    rtc: "říjen"
   </voice>
 </phrase>
 <phrase>
@@ -4536,10 +4536,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Vypnutí pøi neèinnosti"
+    *: "Vypnutí při nečinnosti"
   </dest>
   <voice>
-    *: "Vypnutí pøi neèinnosti"
+    *: "Vypnutí při nečinnosti"
   </voice>
 </phrase>
 <phrase>
@@ -4550,10 +4550,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Sleep Timer"
   </source>
   <dest>
-    *: "Èasovaè usnutí"
+    *: "Časovač usnutí"
   </dest>
   <voice>
-    *: "Èasovaè usnutí"
+    *: "Časovač usnutí"
   </voice>
 </phrase>
 <phrase>
@@ -4578,10 +4578,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "Max.poè. souborù v adresáøi"
+    *: "Max.poč. souborů v adresáři"
   </dest>
   <voice>
-    *: "Maximální poèet souborù v adresáøi"
+    *: "Maximální počet souborů v adresáři"
   </voice>
 </phrase>
 <phrase>
@@ -4642,11 +4642,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    alarm: "Obrazovka pøi buzení"
+    alarm: "Obrazovka při buzení"
   </dest>
   <voice>
     *: none
-    alarm: "Obrazovka pøi buzení"
+    alarm: "Obrazovka při buzení"
   </voice>
 </phrase>
 <phrase>
@@ -4659,7 +4659,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    alarm: "Èas buzení: %02d:%02d"
+    alarm: "Čas buzení: %02d:%02d"
   </dest>
   <voice>
     *: none
@@ -4710,11 +4710,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    alarm: "Èas buzení je pøíliš brzy!"
+    alarm: "Čas buzení je příliš brzy!"
   </dest>
   <voice>
     *: none
-    alarm: "Èas buzení je pøíliš brzy!"
+    alarm: "Čas buzení je příliš brzy!"
   </voice>
 </phrase>
 <phrase>
@@ -4765,10 +4765,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Bookmarking"
   </source>
   <dest>
-    *: "Vytváøení záložek"
+    *: "Vytváření záložek"
   </dest>
   <voice>
-    *: "Vytváøení záložek"
+    *: "Vytváření záložek"
   </voice>
 </phrase>
 <phrase>
@@ -4779,10 +4779,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Vytvoøit záložku pøi zastavení"
+    *: "Vytvořit záložku při zastavení"
   </dest>
   <voice>
-    *: "Vytvoøit záložku pøi zastavení"
+    *: "Vytvořit záložku při zastavení"
   </voice>
 </phrase>
 <phrase>
@@ -4891,10 +4891,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Voice"
   </source>
   <dest>
-    *: "Ozvuèení"
+    *: "Ozvučení"
   </dest>
   <voice>
-    *: "Ozvuèení"
+    *: "Ozvučení"
   </voice>
 </phrase>
 <phrase>
@@ -4905,10 +4905,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Voice Menus"
   </source>
   <dest>
-    *: "Ozvuèit menu"
+    *: "Ozvučit menu"
   </dest>
   <voice>
-    *: "Ozvuèit menu"
+    *: "Ozvučit menu"
   </voice>
 </phrase>
 <phrase>
@@ -4919,10 +4919,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Ozvuèit adresáøe"
+    *: "Ozvučit adresáře"
   </dest>
   <voice>
-    *: "Ozvuèit adresáøe"
+    *: "Ozvučit adresáře"
   </voice>
 </phrase>
 <phrase>
@@ -4933,10 +4933,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Použít adresáø .talk klipù"
+    *: "Použít adresář .talk klipů"
   </dest>
   <voice>
-    *: "Použít adresáø .talk klipù"
+    *: "Použít adresář .talk klipů"
   </voice>
 </phrase>
 <phrase>
@@ -4947,10 +4947,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "Ozvuèit soubory"
+    *: "Ozvučit soubory"
   </dest>
   <voice>
-    *: "Ozvuèit soubory"
+    *: "Ozvučit soubory"
   </voice>
 </phrase>
 <phrase>
@@ -4961,10 +4961,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Použít soubor ozvuèení .talk"
+    *: "Použít soubor ozvučení .talk"
   </dest>
   <voice>
-    *: "Použít soubor ozvuèení .talk"
+    *: "Použít soubor ozvučení .talk"
   </voice>
 </phrase>
 <phrase>
@@ -4975,10 +4975,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Numbers"
   </source>
   <dest>
-    *: "Èíslovat"
+    *: "Číslovat"
   </dest>
   <voice>
-    *: "Èíslovat"
+    *: "Číslovat"
   </voice>
 </phrase>
 <phrase>
@@ -5003,10 +5003,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: ".talk mp3 clip"
   </source>
   <dest>
-    *: "Pøehrávat .talk soubory"
+    *: "Přehrávat .talk soubory"
   </dest>
   <voice>
-    *: "Pøehrávat .talk soubory"
+    *: "Přehrávat .talk soubory"
   </voice>
 </phrase>
 <phrase>
@@ -5017,10 +5017,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Manage Settings"
   </source>
   <dest>
-    *: "Zmìnit nastavení"
+    *: "Změnit nastavení"
   </dest>
   <voice>
-    *: "Zmìnit nastavení"
+    *: "Změnit nastavení"
   </voice>
 </phrase>
 <phrase>
@@ -5031,10 +5031,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Browse .cfg Files"
   </source>
   <dest>
-    *: "Procházet konfiguraèní soubory"
+    *: "Procházet konfigurační soubory"
   </dest>
   <voice>
-    *: "Procházet konfiguraèní soubory"
+    *: "Procházet konfigurační soubory"
   </voice>
 </phrase>
 <phrase>
@@ -5087,10 +5087,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Save .cfg File"
   </source>
   <dest>
-    *: "Uložit konfiguraèní soubor"
+    *: "Uložit konfigurační soubor"
   </dest>
   <voice>
-    *: "Uložit konfiguraèní soubor"
+    *: "Uložit konfigurační soubor"
   </voice>
 </phrase>
 <phrase>
@@ -5213,11 +5213,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    radio: "Pøidat stanici"
+    radio: "Přidat stanici"
   </dest>
   <voice>
     *: none
-    radio: "Pøidat stanici"
+    radio: "Přidat stanici"
   </voice>
 </phrase>
 <phrase>
@@ -5264,11 +5264,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    radio: "Chyba pøi ukládání stanice"
+    radio: "Chyba při ukládání stanice"
   </dest>
   <voice>
     *: none
-    radio: "Chyba pøi ukládání stanice"
+    radio: "Chyba při ukládání stanice"
   </voice>
 </phrase>
 <phrase>
@@ -5315,7 +5315,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    radio_screen_button_bar: "Zpìt"
+    radio_screen_button_bar: "Zpět"
   </dest>
   <voice>
     *: none
@@ -5349,11 +5349,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    radio: "Pøedvolba"
+    radio: "Předvolba"
   </dest>
   <voice>
     *: none
-    radio: "Pøedvolba"
+    radio: "Předvolba"
   </voice>
 </phrase>
 <phrase>
@@ -5366,7 +5366,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    radio_screen_button_bar: "Pøidat"
+    radio_screen_button_bar: "Přidat"
   </dest>
   <voice>
     *: none
@@ -5519,11 +5519,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    radio: "Naèíst seznam stanic"
+    radio: "Načíst seznam stanic"
   </dest>
   <voice>
     *: none
-    radio: "Naèíst seznam stanic"
+    radio: "Načíst seznam stanic"
   </voice>
 </phrase>
 <phrase>
@@ -5604,11 +5604,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    radio: "Uložit zmìny?"
+    radio: "Uložit změny?"
   </dest>
   <voice>
     *: none
-    radio: "Uložit zmìny?"
+    radio: "Uložit změny?"
   </voice>
 </phrase>
 <phrase>
@@ -5981,11 +5981,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Nastavení rozdìlení"
+    recording: "Nastavení rozdělení"
   </dest>
   <voice>
     *: none
-    recording: "Nastavení rozdìlení"
+    recording: "Nastavení rozdělení"
   </voice>
 </phrase>
 <phrase>
@@ -5998,11 +5998,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Mìøítko rozdìlení"
+    recording: "Měřítko rozdělení"
   </dest>
   <voice>
     *: none
-    recording: "Mìøítko rozdìlení"
+    recording: "Měřítko rozdělení"
   </voice>
 </phrase>
 <phrase>
@@ -6015,11 +6015,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Co udìlat pøi rozdìlování"
+    recording: "Co udělat při rozdělování"
   </dest>
   <voice>
     *: none
-    recording: "Co udìlat pøi rozdìlování"
+    recording: "Co udělat při rozdělování"
   </voice>
 </phrase>
 <phrase>
@@ -6032,11 +6032,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Vytvoøit nový soubor"
+    recording: "Vytvořit nový soubor"
   </dest>
   <voice>
     *: none
-    recording: "Vytvoøit nový soubor"
+    recording: "Vytvořit nový soubor"
   </voice>
 </phrase>
 <phrase>
@@ -6066,11 +6066,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Interval rozdìlení:"
+    recording: "Interval rozdělení:"
   </dest>
   <voice>
     *: none
-    recording: "Interval rozdìlení:"
+    recording: "Interval rozdělení:"
   </voice>
 </phrase>
 <phrase>
@@ -6083,11 +6083,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Velikost pro rozdìlení"
+    recording: "Velikost pro rozdělení"
   </dest>
   <voice>
     *: none
-    recording: "Velikost pro rozdìlení"
+    recording: "Velikost pro rozdělení"
   </voice>
 </phrase>
 <phrase>
@@ -6117,11 +6117,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Délka pøednahrátí"
+    recording: "Délka přednahrátí"
   </dest>
   <voice>
     *: none
-    recording: "Délka pøednahrátí"
+    recording: "Délka přednahrátí"
   </voice>
 </phrase>
 <phrase>
@@ -6134,11 +6134,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Adresáø"
+    recording: "Adresář"
   </dest>
   <voice>
     *: none
-    recording: "Adresáø"
+    recording: "Adresář"
   </voice>
 </phrase>
 <phrase>
@@ -6168,11 +6168,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Nastavit adresáø pro záznam"
+    recording: "Nastavit adresář pro záznam"
   </dest>
   <voice>
     *: none
-    recording: "Nastavit adresáø pro záznam"
+    recording: "Nastavit adresář pro záznam"
   </voice>
 </phrase>
 <phrase>
@@ -6185,11 +6185,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Vymazat adresáø s nahrávkami"
+    recording: "Vymazat adresář s nahrávkami"
   </dest>
   <voice>
     *: none
-    recording: "Vymazat adresáø s nahrávkami"
+    recording: "Vymazat adresář s nahrávkami"
   </voice>
 </phrase>
 <phrase>
@@ -6202,11 +6202,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Nelze zapsat do adresáøe pro záznam"
+    recording: "Nelze zapsat do adresáře pro záznam"
   </dest>
   <voice>
     *: none
-    recording: "Nelze zapsat do adresáøe pro záznam"
+    recording: "Nelze zapsat do adresáře pro záznam"
   </voice>
 </phrase>
 <phrase>
@@ -6219,11 +6219,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Indikace oøíznutí špièek podsvìtlením"
+    recording: "Indikace oříznutí špiček podsvětlením"
   </dest>
   <voice>
     *: none
-    recording: "Indikace oøíznutí špièek podsvìtlením"
+    recording: "Indikace oříznutí špiček podsvětlením"
   </voice>
 </phrase>
 <phrase>
@@ -6236,11 +6236,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    remote: "Pouze na pøehrávaèi"
+    remote: "Pouze na přehrávači"
   </dest>
   <voice>
     *: none
-    remote: "Pouze na pøehrávaèi"
+    remote: "Pouze na přehrávači"
   </voice>
 </phrase>
 <phrase>
@@ -6270,11 +6270,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    remote: "Na pøehrávaèi i dálkovém ovládání"
+    remote: "Na přehrávači i dálkovém ovládání"
   </dest>
   <voice>
     *: none
-    remote: "Na pøehrávaèi i dálkovém ovládání"
+    remote: "Na přehrávači i dálkovém ovládání"
   </voice>
 </phrase>
 <phrase>
@@ -6287,11 +6287,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Automatická spouš"
+    recording: "Automatická spoušť"
   </dest>
   <voice>
     *: none
-    recording: "Automatická spouš"
+    recording: "Automatická spoušť"
   </voice>
 </phrase>
 <phrase>
@@ -6321,11 +6321,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Typ spouštì"
+    recording: "Typ spouště"
   </dest>
   <voice>
     *: none
-    recording: "Typ spouštì"
+    recording: "Typ spouště"
   </voice>
 </phrase>
 <phrase>
@@ -6372,11 +6372,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Start pøi"
+    recording: "Start při"
   </dest>
   <voice>
     *: none
-    recording: "Start pøi"
+    recording: "Start při"
   </voice>
 </phrase>
 <phrase>
@@ -6389,11 +6389,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Nejménì"
+    recording: "Nejméně"
   </dest>
   <voice>
     *: none
-    recording: "Nejménì"
+    recording: "Nejméně"
   </voice>
 </phrase>
 <phrase>
@@ -6440,7 +6440,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Pøednahrávání"
+    recording: "Přednahrávání"
   </dest>
   <voice>
     *: none
@@ -6508,11 +6508,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    agc: "Bezpeènì (skok)"
+    agc: "Bezpečně (skok)"
   </dest>
   <voice>
     *: none
-    agc: "Bezpeènì (skok)"
+    agc: "Bezpečně (skok)"
   </voice>
 </phrase>
 <phrase>
@@ -6525,11 +6525,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    agc: "Živì (pomalu)"
+    agc: "Živě (pomalu)"
   </dest>
   <voice>
     *: none
-    agc: "Živì (pomalu)"
+    agc: "Živě (pomalu)"
   </voice>
 </phrase>
 <phrase>
@@ -6559,11 +6559,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    agc: "Støednì"
+    agc: "Středně"
   </dest>
   <voice>
     *: none
-    agc: "Støednì"
+    agc: "Středně"
   </voice>
 </phrase>
 <phrase>
@@ -6642,10 +6642,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Create Playlist"
   </source>
   <dest>
-    *: "Vytvoøit playlist"
+    *: "Vytvořit playlist"
   </dest>
   <voice>
-    *: "Vytvoøit playlist"
+    *: "Vytvořit playlist"
   </voice>
 </phrase>
 <phrase>
@@ -6684,10 +6684,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Move"
   </source>
   <dest>
-    *: "Pøesunout"
+    *: "Přesunout"
   </dest>
   <voice>
-    *: "Pøesunout"
+    *: "Přesunout"
   </voice>
 </phrase>
 <phrase>
@@ -6712,10 +6712,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Track Display"
   </source>
   <dest>
-    *: "Info o skladbì"
+    *: "Info o skladbě"
   </dest>
   <voice>
-    *: "Info o skladbì"
+    *: "Info o skladbě"
   </voice>
 </phrase>
 <phrase>
@@ -6782,10 +6782,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Playlist Catalog"
   </source>
   <dest>
-    *: "Katalog playlistù"
+    *: "Katalog playlistů"
   </dest>
   <voice>
-    *: "Katalog playlistù"
+    *: "Katalog playlistů"
   </voice>
 </phrase>
 <phrase>
@@ -6796,10 +6796,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Vkládat adresáøe rekurzivnì"
+    *: "Vkládat adresáře rekurzivně"
   </dest>
   <voice>
-    *: "Vkládat adresáøe rekurzivnì"
+    *: "Vkládat adresáře rekurzivně"
   </voice>
 </phrase>
 <phrase>
@@ -6810,10 +6810,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Recursively?"
   </source>
   <dest>
-    *: "Rekurzivnì?"
+    *: "Rekurzivně?"
   </dest>
   <voice>
-    *: "Rekurzivnì?"
+    *: "Rekurzivně?"
   </voice>
 </phrase>
 <phrase>
@@ -6824,10 +6824,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "Varovat pøi mazání dynamického playlistu"
+    *: "Varovat při mazání dynamického playlistu"
   </dest>
   <voice>
-    *: "Varovat pøi mazání dynamického playlistu"
+    *: "Varovat při mazání dynamického playlistu"
   </voice>
 </phrase>
 <phrase>
@@ -6888,7 +6888,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     player: "Buf:"
   </dest>
   <voice>
-    *: "Vyrovnávací pamì"
+    *: "Vyrovnávací paměť"
   </voice>
 </phrase>
 <phrase>
@@ -6999,10 +6999,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Running Time"
   </source>
   <dest>
-    *: "Doba bìhu"
+    *: "Doba běhu"
   </dest>
   <voice>
-    *: "Doba bìhu"
+    *: "Doba běhu"
   </voice>
 </phrase>
 <phrase>
@@ -7041,10 +7041,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Clear Time?"
   </source>
   <dest>
-    *: "Vynulovat èas?"
+    *: "Vynulovat čas?"
   </dest>
   <voice>
-    *: "Vynulovat èas?"
+    *: "Vynulovat čas?"
   </voice>
 </phrase>
 <phrase>
@@ -7055,10 +7055,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Testovací informace (Ruce pryè!)"
+    *: "Testovací informace (Ruce pryč!)"
   </dest>
   <voice>
-    *: "Testovací informace, ruce pryè! Neozvuèené"
+    *: "Testovací informace, ruce pryč! Neozvučené"
   </voice>
 </phrase>
 <phrase>
@@ -7125,10 +7125,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Insert Shuffled"
   </source>
   <dest>
-    *: "Vložit náhodnì"
+    *: "Vložit náhodně"
   </dest>
   <voice>
-    *: "Vložit náhodnì"
+    *: "Vložit náhodně"
   </voice>
 </phrase>
 <phrase>
@@ -7153,10 +7153,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Queue Next"
   </source>
   <dest>
-    *: "Zaøadit za"
+    *: "Zařadit za"
   </dest>
   <voice>
-    *: "Zaøadit za"
+    *: "Zařadit za"
   </voice>
 </phrase>
 <phrase>
@@ -7167,10 +7167,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Queue Last"
   </source>
   <dest>
-    *: "Zaøadit na konec"
+    *: "Zařadit na konec"
   </dest>
   <voice>
-    *: "Zaøadit na konec"
+    *: "Zařadit na konec"
   </voice>
 </phrase>
 <phrase>
@@ -7181,10 +7181,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "Zaøadit náhodnì"
+    *: "Zařadit náhodně"
   </dest>
   <voice>
-    *: "Zaøadit náhodnì"
+    *: "Zařadit náhodně"
   </voice>
 </phrase>
 <phrase>
@@ -7195,10 +7195,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Play Next"
   </source>
   <dest>
-    *: "Pøehrát další"
+    *: "Přehrát další"
   </dest>
   <voice>
-    *: "Pøehrát další"
+    *: "Přehrát další"
   </voice>
 </phrase>
 <phrase>
@@ -7223,10 +7223,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "Zaøazeno %d skladeb (%s)"
+    *: "Zařazeno %d skladeb (%s)"
   </dest>
   <voice>
-    *: "zaøazené skladby"
+    *: "zařazené skladby"
   </voice>
 </phrase>
 <phrase>
@@ -7293,10 +7293,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "View Catalog"
   </source>
   <dest>
-    *: "Zobrazit katalog playlistù"
+    *: "Zobrazit katalog playlistů"
   </dest>
   <voice>
-    *: "Zobrazit katalog playlistù"
+    *: "Zobrazit katalog playlistů"
   </voice>
 </phrase>
 <phrase>
@@ -7307,10 +7307,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Add to Playlist"
   </source>
   <dest>
-    *: "Pøidat do playlistu"
+    *: "Přidat do playlistu"
   </dest>
   <voice>
-    *: "Pøidat do playlistu"
+    *: "Přidat do playlistu"
   </voice>
 </phrase>
 <phrase>
@@ -7321,10 +7321,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Add to New Playlist"
   </source>
   <dest>
-    *: "Pøidat do nového playlistu"
+    *: "Přidat do nového playlistu"
   </dest>
   <voice>
-    *: "Pøidat do nového playlistu"
+    *: "Přidat do nového playlistu"
   </voice>
 </phrase>
 <phrase>
@@ -7377,10 +7377,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Create Bookmark"
   </source>
   <dest>
-    *: "Vytvoøit záložku"
+    *: "Vytvořit záložku"
   </dest>
   <voice>
-    *: "Vytvoøit záložku"
+    *: "Vytvořit záložku"
   </voice>
 </phrase>
 <phrase>
@@ -7436,7 +7436,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Procházet Cuesheet"
   </dest>
   <voice>
-    *: "Procházet kjùšít"
+    *: "Procházet kjůšít"
   </voice>
 </phrase>
 <phrase>
@@ -7447,10 +7447,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Show Track Info"
   </source>
   <dest>
-    *: "Zobrazit informace o skladbì"
+    *: "Zobrazit informace o skladbě"
   </dest>
   <voice>
-    *: "Zobrazit informace o skladbì"
+    *: "Zobrazit informace o skladbě"
   </voice>
 </phrase>
 <phrase>
@@ -7503,7 +7503,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[È.skladby]"
+    *: "[Č.skladby]"
   </dest>
   <voice>
     *: ""
@@ -7601,7 +7601,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "[Discnum]"
   </source>
   <dest>
-    *: "[È.disku]"
+    *: "[Č.disku]"
   </dest>
   <voice>
     *: ""
@@ -7615,7 +7615,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "[Comment]"
   </source>
   <dest>
-    *: "[Komentáø]"
+    *: "[Komentář]"
   </dest>
   <voice>
     *: ""
@@ -7713,10 +7713,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Rename"
   </source>
   <dest>
-    *: "Pøejmenovat"
+    *: "Přejmenovat"
   </dest>
   <voice>
-    *: "Pøejmenovat"
+    *: "Přejmenovat"
   </voice>
 </phrase>
 <phrase>
@@ -7769,10 +7769,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Soubor nebo adresáø již existuje. Pøepsat?"
+    *: "Soubor nebo adresář již existuje. Přepsat?"
   </dest>
   <voice>
-    *: "Soubor nebo adresáø již existuje Pøepsat?"
+    *: "Soubor nebo adresář již existuje Přepsat?"
   </voice>
 </phrase>
 <phrase>
@@ -7797,10 +7797,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Delete Directory"
   </source>
   <dest>
-    *: "Smazat adresáø"
+    *: "Smazat adresář"
   </dest>
   <voice>
-    *: "Smazat adresáø"
+    *: "Smazat adresář"
   </voice>
 </phrase>
 <phrase>
@@ -7853,10 +7853,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Moving..."
   </source>
   <dest>
-    *: "Pøesouvám..."
+    *: "Přesouvám..."
   </dest>
   <voice>
-    *: "Pøesouvám"
+    *: "Přesouvám"
   </voice>
 </phrase>
 <phrase>
@@ -7932,10 +7932,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Open With..."
   </source>
   <dest>
-    *: "Otevøít v..."
+    *: "Otevřít v..."
   </dest>
   <voice>
-    *: "Otevøít v"
+    *: "Otevřít v"
   </voice>
 </phrase>
 <phrase>
@@ -7946,10 +7946,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Create Directory"
   </source>
   <dest>
-    *: "Vytvoøit adresáø"
+    *: "Vytvořit adresář"
   </dest>
   <voice>
-    *: "Vytvoøit adresáø"
+    *: "Vytvořit adresář"
   </voice>
 </phrase>
 <phrase>
@@ -7974,10 +7974,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Add to Shortcuts"
   </source>
   <dest>
-    *: "Pøidat do záložek"
+    *: "Přidat do záložek"
   </dest>
   <voice>
-    *: "Pøidat do záložek"
+    *: "Přidat do záložek"
   </voice>
 </phrase>
 <phrase>
@@ -8041,7 +8041,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    pitchscreen: "Pùltón nahoru"
+    pitchscreen: "Půltón nahoru"
   </dest>
   <voice>
     *: none
@@ -8058,7 +8058,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    pitchscreen: "Pùltón dolù"
+    pitchscreen: "Půltón dolů"
   </dest>
   <voice>
     *: none
@@ -8073,10 +8073,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Mezipamì playlistu je plná"
+    *: "Mezipaměť playlistu je plná"
   </dest>
   <voice>
-    *: "Mezipamì playlistu je plná"
+    *: "Mezipaměť playlistu je plná"
   </voice>
 </phrase>
 <phrase>
@@ -8104,7 +8104,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Creating"
   </source>
   <dest>
-    *: "Vytváøím"
+    *: "Vytvářím"
   </dest>
   <voice>
     *: ""
@@ -8118,10 +8118,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Nothing to resume"
   </source>
   <dest>
-    *: "Není v èem pokraèovat"
+    *: "Není v čem pokračovat"
   </dest>
   <voice>
-    *: "Není v èem pokraèovat"
+    *: "Není v čem pokračovat"
   </voice>
 </phrase>
 <phrase>
@@ -8146,10 +8146,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "Chyba pøi pøístupu k playlistu"
+    *: "Chyba při přístupu k playlistu"
   </dest>
   <voice>
-    *: "Chyba pøi pøístupu k playlistu"
+    *: "Chyba při přístupu k playlistu"
   </voice>
 </phrase>
 <phrase>
@@ -8160,10 +8160,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "Chyba pøístupu k nastavení playlistu"
+    *: "Chyba přístupu k nastavení playlistu"
   </dest>
   <voice>
-    *: "Chyba pøístupu k nastavení playlistu"
+    *: "Chyba přístupu k nastavení playlistu"
   </voice>
 </phrase>
 <phrase>
@@ -8174,10 +8174,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Chyba pøístupu k adresáøi"
+    *: "Chyba přístupu k adresáři"
   </dest>
   <voice>
-    *: "Chyba pøístupu k adresáøi"
+    *: "Chyba přístupu k adresáři"
   </voice>
 </phrase>
 <phrase>
@@ -8258,10 +8258,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Time"
   </source>
   <dest>
-    *: "Èas"
+    *: "Čas"
   </dest>
   <voice>
-    *: "Èas"
+    *: "Čas"
   </voice>
 </phrase>
 <phrase>
@@ -8274,11 +8274,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    usb_charging: "Nabíjet pøi pøipojení pøes USB"
+    usb_charging: "Nabíjet při připojení přes USB"
   </dest>
   <voice>
     *: none
-    usb_charging: "Nabíjet pøi pøipojení pøes USB"
+    usb_charging: "Nabíjet při připojení přes USB"
   </voice>
 </phrase>
 <phrase>
@@ -8289,7 +8289,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Buttons Locked"
   </source>
   <dest>
-    *: "Tlaèítka jsou zamknuta"
+    *: "Tlačítka jsou zamknuta"
   </dest>
   <voice>
     *: ""
@@ -8303,7 +8303,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Buttons Unlocked"
   </source>
   <dest>
-    *: "Tlaèítka odemknuta"
+    *: "Tlačítka odemknuta"
   </dest>
   <voice>
     *: ""
@@ -8319,7 +8319,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Èas:"
+    recording: "Čas:"
   </dest>
   <voice>
     *: none
@@ -8339,10 +8339,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Disk je plný. Pro pokraèování stisknìte OFF."
-    h100,h120,h300: "Disk je plný. Pro pokraèování stisknìte STOP."
-    m5,x5: "Disk je plný. Pro pokraèování stisknìte POWER."
-    e200*,c200*: "Disk je plný. Pro pokraèování stisknìte PREV."
+    recording: "Disk je plný. Pro pokračování stiskněte OFF."
+    h100,h120,h300: "Disk je plný. Pro pokračování stiskněte STOP."
+    m5,x5: "Disk je plný. Pro pokračování stiskněte POWER."
+    e200*,c200*: "Disk je plný. Pro pokračování stiskněte PREV."
   </dest>
   <voice>
     *: none
@@ -8363,7 +8363,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    recording: "minus nekoneèno"
+    recording: "minus nekonečno"
   </voice>
 </phrase>
 <phrase>
@@ -8376,7 +8376,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    soft_shutdown: "Vypnìte stisknutím OFF"
+    soft_shutdown: "Vypněte stisknutím OFF"
   </dest>
   <voice>
     *: none
@@ -8393,11 +8393,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    ondio*: "Vyjmìte prosím pamìovou kartu"
+    ondio*: "Vyjměte prosím paměťovou kartu"
   </dest>
   <voice>
     *: none
-    ondio*: "Vyjmìte prosím pamìovou kartu"
+    ondio*: "Vyjměte prosím paměťovou kartu"
   </voice>
 </phrase>
 <phrase>
@@ -8408,10 +8408,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Boot changed"
   </source>
   <dest>
-    *: "Zmìnìn firmware"
+    *: "Změněn firmware"
   </dest>
   <voice>
-    *: "Zmìnìn firmwér"
+    *: "Změněn firmwér"
   </voice>
 </phrase>
 <phrase>
@@ -8422,10 +8422,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Reboot now?"
   </source>
   <dest>
-    *: "Restartovat teï?"
+    *: "Restartovat teď?"
   </dest>
   <voice>
-    *: "Restartovat teï?"
+    *: "Restartovat teď?"
   </voice>
 </phrase>
 <phrase>
@@ -8476,10 +8476,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "New Keyboard"
   </source>
   <dest>
-    *: "Nové klávesy naèteny"
+    *: "Nové klávesy načteny"
   </dest>
   <voice>
-    *: "Nové klávesy naèteny"
+    *: "Nové klávesy načteny"
   </voice>
 </phrase>
 <phrase>
@@ -8490,7 +8490,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Can't open %s"
   </source>
   <dest>
-    *: "Nelze otevøít %s"
+    *: "Nelze otevřít %s"
   </dest>
   <voice>
     *: ""
@@ -8504,7 +8504,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Failed reading %s"
   </source>
   <dest>
-    *: "Chyba ètení %s"
+    *: "Chyba čtení %s"
   </dest>
   <voice>
     *: ""
@@ -8560,10 +8560,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Extension array full"
   </source>
   <dest>
-    *: "Seznam pøípon je plný"
+    *: "Seznam přípon je plný"
   </dest>
   <voice>
-    *: "Seznam pøípon je plný"
+    *: "Seznam přípon je plný"
   </voice>
 </phrase>
 <phrase>
@@ -8574,10 +8574,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Filetype array full"
   </source>
   <dest>
-    *: "Seznam typù souborù je plný"
+    *: "Seznam typů souborů je plný"
   </dest>
   <voice>
-    *: "Seznam typù souborù je plný"
+    *: "Seznam typů souborů je plný"
   </voice>
 </phrase>
 <phrase>
@@ -8588,10 +8588,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Adresáøová mezipamì je zaplòená!"
+    *: "Adresářová mezipaměť je zaplňená!"
   </dest>
   <voice>
-    *: "Adresáøová mezipamì je zaplòená!"
+    *: "Adresářová mezipaměť je zaplňená!"
   </voice>
 </phrase>
 <phrase>
@@ -8616,10 +8616,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Plugin name too long"
   </source>
   <dest>
-    *: "Pøiliš dlouhé jméno pluginu"
+    *: "Přiliš dlouhé jméno pluginu"
   </dest>
   <voice>
-    *: "Pøiliš dlouhé jméno plaginu"
+    *: "Přiliš dlouhé jméno plaginu"
   </voice>
 </phrase>
 <phrase>
@@ -8632,7 +8632,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    swcodec: "Restartuji pøehrávání..."
+    swcodec: "Restartuji přehrávání..."
   </dest>
   <voice>
     *: none
@@ -8697,11 +8697,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    charging: "Baterie: Pøerušov.nab."
+    charging: "Baterie: Přerušov.nab."
   </dest>
   <voice>
     *: none
-    charging: "Baterie: Pøerušov.nab."
+    charging: "Baterie: Přerušov.nab."
   </voice>
 </phrase>
 <phrase>
@@ -8799,7 +8799,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "."
   </dest>
   <voice>
-    *: "teèka"
+    *: "tečka"
   </voice>
 </phrase>
 <phrase>
@@ -9429,7 +9429,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: ""
   </dest>
   <voice>
-    *: "miliampérù za hodinu"
+    *: "miliampérů za hodinu"
   </voice>
 </phrase>
 <phrase>
@@ -9457,7 +9457,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: ""
   </dest>
   <voice>
-    *: "za vteøinu"
+    *: "za vteřinu"
   </voice>
 </phrase>
 <phrase>
@@ -9485,7 +9485,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: ""
   </dest>
   <voice>
-    *: "kilobitù za sekundu"
+    *: "kilobitů za sekundu"
   </voice>
 </phrase>
 <phrase>
@@ -9863,7 +9863,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: ""
   </dest>
   <voice>
-    *: "teèka"
+    *: "tečka"
   </voice>
 </phrase>
 <phrase>
@@ -10062,7 +10062,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
      *: ""
   </dest>
   <voice>
-    *: "kjùšít"
+    *: "kjůšít"
   </voice>
 </phrase>
 <phrase>
@@ -10174,7 +10174,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    swcodec: "Editaèní mód: %s"
+    swcodec: "Editační mód: %s"
   </dest>
   <voice>
     *: none
@@ -10191,11 +10191,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    swcodec: "Frekvence oøíznutí"
+    swcodec: "Frekvence oříznutí"
   </dest>
   <voice>
     *: none
-    swcodec: "Frekvence oøíznutí"
+    swcodec: "Frekvence oříznutí"
   </voice>
 </phrase>
 <phrase>
@@ -10684,11 +10684,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Automatická spouš"
+    recording: "Automatická spoušť"
   </dest>
   <voice>
     *: none
-    recording: "Automatická spouš"
+    recording: "Automatická spoušť"
   </voice>
 </phrase>
 <phrase>
@@ -11024,10 +11024,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "Ukázat pøípony souborù"
+    *: "Ukázat přípony souborů"
   </dest>
   <voice>
-    *: "Ukázat pøípony souborù"
+    *: "Ukázat přípony souborů"
   </voice>
 </phrase>
 <phrase>
@@ -11052,10 +11052,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Only When Viewing All Types"
   </source>
   <dest>
-    *: "Pouze pøi prohlížení všech typù"
+    *: "Pouze při prohlížení všech typů"
   </dest>
   <voice>
-    *: "Pouze pøi prohlížení všech typù"
+    *: "Pouze při prohlížení všech typů"
   </voice>
 </phrase>
 <phrase>
@@ -11150,11 +11150,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Poèítadlo oøíznutí výšek"
+    recording: "Počítadlo oříznutí výšek"
   </dest>
   <voice>
     *: none
-    recording: "Poèítadlo oøíznutí výšek"
+    recording: "Počítadlo oříznutí výšek"
   </voice>
 </phrase>
 <phrase>
@@ -11305,11 +11305,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    lcd_color: "Inverzní kurzor (barva bez pøechodu)"
+    lcd_color: "Inverzní kurzor (barva bez přechodu)"
   </dest>
   <voice>
     *: none
-    lcd_color: "Inverzní kurzor (barva bez pøechodu)"
+    lcd_color: "Inverzní kurzor (barva bez přechodu)"
   </voice>
 </phrase>
 <phrase>
@@ -11322,11 +11322,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    lcd_color: "Inverzní kurzor (barva s pøechodem)"
+    lcd_color: "Inverzní kurzor (barva s přechodem)"
   </dest>
   <voice>
     *: none
-    lcd_color: "Inverzní kurzor (barva s pøechodem)"
+    lcd_color: "Inverzní kurzor (barva s přechodem)"
   </voice>
 </phrase>
 <phrase>
@@ -11337,10 +11337,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Central European (CP1250)"
   </source>
   <dest>
-    *: "Støedoevropský (CP1250)"
+    *: "Středoevropský (CP1250)"
   </dest>
   <voice>
-    *: "Støedoevropský"
+    *: "Středoevropský"
   </voice>
 </phrase>
 <phrase>
@@ -11443,11 +11443,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    multivolume: "Nepøítomný"
+    multivolume: "Nepřítomný"
   </dest>
   <voice>
     *: none
-    multivolume: "Nepøítomný"
+    multivolume: "Nepřítomný"
   </voice>
 </phrase>
 <phrase>  
@@ -11458,10 +11458,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Announce Battery Level"
   </source>
   <dest>
-    *: "Oznámit úroveò baterie"
+    *: "Oznámit úroveň baterie"
   </dest>
   <voice>
-    *: "Oznámit úroveò baterie"
+    *: "Oznámit úroveň baterie"
   </voice>
 </phrase>
 <phrase>
@@ -11488,11 +11488,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    ipodvideo: "Oøíznutí basù"
+    ipodvideo: "Oříznutí basů"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Oøíznutí basù"
+    ipodvideo: "Oříznutí basů"
   </voice>
 </phrase>
 <phrase>
@@ -11505,11 +11505,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    ipodvideo: "Oøíznutí výšek"
+    ipodvideo: "Oříznutí výšek"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Oøíznutí výšek"
+    ipodvideo: "Oříznutí výšek"
   </voice>
 </phrase>
 <phrase>
@@ -11520,10 +11520,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "<Random>"
   </source>
   <dest>
-    *: "<Náhodnì>"
+    *: "<Náhodně>"
   </dest>
   <voice>
-    *: "Náhodnì"
+    *: "Náhodně"
   </voice>
 </phrase>
 <phrase>
@@ -11584,11 +11584,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    accessory_supply: "Napájení pøíslušenství"
+    accessory_supply: "Napájení příslušenství"
   </dest>
   <voice>
     *: none
-    accessory_supply: "Napájení pøíslušenství"
+    accessory_supply: "Napájení příslušenství"
   </voice>
 </phrase>
 <phrase>
@@ -11720,7 +11720,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Citlivost taèpedu"
+    gigabeatf: "Citlivost tačpedu"
   </voice>
 </phrase>
 <phrase>
@@ -11906,10 +11906,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Skip Length"
   </source>
   <dest>
-    *: "Pøeskoèit délku"
+    *: "Přeskočit délku"
   </dest>
   <voice>
-    *: "Pøeskoèit délku"
+    *: "Přeskočit délku"
   </voice>
 </phrase>
 <phrase>
@@ -11920,10 +11920,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Skip Track"
   </source>
   <dest>
-    *: "Pøeskoèit skladbu"
+    *: "Přeskočit skladbu"
   </dest>
   <voice>
-    *: "Pøeskoèit skladbu"
+    *: "Přeskočit skladbu"
   </voice>
 </phrase>
 <phrase>
@@ -11988,7 +11988,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    agc: "Automatické øízení zisku"
+    agc: "Automatické řízení zisku"
   </voice>
 </phrase>
 <phrase>
@@ -12001,11 +12001,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    agc: "AGC èas klipu"
+    agc: "AGC čas klipu"
   </dest>
   <voice>
     *: none
-    agc: "AGC èas klipu"
+    agc: "AGC čas klipu"
   </voice>
 </phrase>
 <phrase>
@@ -12069,7 +12069,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Èas rozdìlení:"
+    recording: "Čas rozdělení:"
   </dest>
   <voice>
     *: none
@@ -12276,7 +12276,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Zásluhy"
   </dest>
   <voice>
-    *: "Zásluhy, neozvuèené"
+    *: "Zásluhy, neozvučené"
   </voice>
 </phrase>
 <phrase>
@@ -12287,10 +12287,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Interpret numbers when sorting"
   </source>
   <dest>
-    *: "Interpretovat èísla pøi tøídìní"
+    *: "Interpretovat čísla při třídění"
   </dest>
   <voice>
-    *: "Interpretovat èísla pøi tøídìní"
+    *: "Interpretovat čísla při třídění"
   </voice>
 </phrase>
 <phrase>
@@ -12301,10 +12301,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "As digits"
   </source>
   <dest>
-    *: "Jako èíslice"
+    *: "Jako číslice"
   </dest>
   <voice>
-    *: "Jako èíslice"
+    *: "Jako číslice"
   </voice>
 </phrase>
 <phrase>
@@ -12315,10 +12315,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "As whole numbers"
   </source>
   <dest>
-    *: "Jako celá èísla"
+    *: "Jako celá čísla"
   </dest>
   <voice>
-    *: "Jako celá èísla"
+    *: "Jako celá čísla"
   </voice>
 </phrase>
 <phrase>
@@ -12365,11 +12365,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    touchscreen: "Møížka 3x3"
+    touchscreen: "Mřížka 3x3"
   </dest>
   <voice>
     *: none
-    touchscreen: "Møížka 3 krát 3"
+    touchscreen: "Mřížka 3 krát 3"
   </voice>
 </phrase>
 <phrase>
@@ -12397,10 +12397,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "Zabránit pøeskakování skladeb"
+    *: "Zabránit přeskakování skladeb"
   </dest>
   <voice>
-    *: "Zabránit pøeskakování skladeb"
+    *: "Zabránit přeskakování skladeb"
   </voice>
 </phrase>
 <phrase>
@@ -12413,11 +12413,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    swcodec: "Èas úseku"
+    swcodec: "Čas úseku"
   </dest>
   <voice>
     *: none
-    swcodec: "Èas úseku"
+    swcodec: "Čas úseku"
   </voice>
 </phrase>
 <phrase>
@@ -12496,10 +12496,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Top"
   </source>
   <dest>
-    *: "Nahoøe"
+    *: "Nahoře"
   </dest>
   <voice>
-    *: "Nahoøe"
+    *: "Nahoře"
   </voice>
 </phrase>
 <phrase>
@@ -12526,11 +12526,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    remote: "Vzdálený stavový øádek"
+    remote: "Vzdálený stavový řádek"
   </dest>
   <voice>
     *: none
-    remote: "Vzdálený stavový øádek"
+    remote: "Vzdálený stavový řádek"
   </voice>
 </phrase>
 <phrase>
@@ -12543,11 +12543,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    pitchscreen: "Pùltón"
+    pitchscreen: "Půltón"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Pùltón"
+    pitchscreen: "Půltón"
   </voice>
 </phrase>
 <phrase>
@@ -12628,11 +12628,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    usb_hid: "Prezentaèní režim"
+    usb_hid: "Prezentační režim"
   </dest>
   <voice>
     *: none
-    usb_hid: "Prezentaèní režim"
+    usb_hid: "Prezentační režim"
   </voice>
 </phrase>
 <phrase>
@@ -12693,11 +12693,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Šíøka pøetáèecí lišty"
+    lcd_bitmap: "Šířka přetáčecí lišty"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Šíøka pøetáèecí lišty"
+    lcd_bitmap: "Šířka přetáčecí lišty"
   </voice>
 </phrase>
 <phrase>
@@ -12710,11 +12710,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Pozice pøetáèecí lišty"
+    lcd_bitmap: "Pozice přetáčecí lišty"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Pozice pøetáèecí lišty"
+    lcd_bitmap: "Pozice přetáčecí lišty"
   </voice>
 </phrase>
 <phrase>
@@ -12812,11 +12812,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    swcodec: "Pomìr"
+    swcodec: "Poměr"
   </dest>
   <voice>
     *: none
-    swcodec: "Pomìr"
+    swcodec: "Poměr"
   </voice>
 </phrase>
 <phrase>
@@ -12833,7 +12833,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    swcodec: "dvì ku jedné"
+    swcodec: "dvě ku jedné"
   </voice>
 </phrase>
 <phrase>
@@ -12850,7 +12850,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    swcodec: "ètyøi ku jedné"
+    swcodec: "čtyři ku jedné"
   </voice>
 </phrase>
 <phrase>
@@ -12982,11 +12982,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    swcodec: "Mìkké ohnutí"
+    swcodec: "Měkké ohnutí"
   </dest>
   <voice>
     *: none
-    swcodec: "Mìkké ohnutí"
+    swcodec: "Měkké ohnutí"
   </voice>
 </phrase>
 <phrase>
@@ -12999,11 +12999,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    swcodec: "Uvolnit èas"
+    swcodec: "Uvolnit čas"
   </dest>
   <voice>
     *: none
-    swcodec: "Uvolnit èas"
+    swcodec: "Uvolnit čas"
   </voice>
 </phrase>
 <phrase>
@@ -13014,10 +13014,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Skip to Outro"
   </source>
   <dest>
-    *: "Pøeskoèit na závìr"
+    *: "Přeskočit na závěr"
   </dest>
   <voice>
-    *: "Pøeskoèit na závìr"
+    *: "Přeskočit na závěr"
   </voice>
 </phrase>
 <phrase>
@@ -13115,10 +13115,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Insert Last Shuffled"
   </source>
   <dest>
-    *: "Vložit náhodnì jako poslední"
+    *: "Vložit náhodně jako poslední"
   </dest>
   <voice>
-    *: "Vložit náhodnì jako poslední"
+    *: "Vložit náhodně jako poslední"
   </voice>
 </phrase>
 <phrase>
@@ -13129,10 +13129,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Queue Last Shuffled"
   </source>
   <dest>
-    *: "Zaøadit do fronty náhodnì jako poslední"
+    *: "Zařadit do fronty náhodně jako poslední"
   </dest>
   <voice>
-    *: "Zaøadit do fronty náhodnì jako poslední"
+    *: "Zařadit do fronty náhodně jako poslední"
   </voice>
 </phrase>
 <phrase>
@@ -13162,11 +13162,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    crossfade: "Automatická zmìna pouze stopy"
+    crossfade: "Automatická změna pouze stopy"
   </dest>
   <voice>
     *: none
-    crossfade: "Automatická zmìna pouze stopy"
+    crossfade: Automatická změna pouze stopy"
   </voice>
 </phrase>
 <phrase>
