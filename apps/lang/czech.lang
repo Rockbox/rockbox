@@ -989,11 +989,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Základní nastavení EQ"
+    crossfade: "Základní nastavení EQ"
   </dest>
   <voice>
     *: none
-    swcodec: "Základní nastavení ekvalizéru"
+    crossfade: "Základní nastavení ekvalizéru"
   </voice>
 </phrase>
 <phrase>
