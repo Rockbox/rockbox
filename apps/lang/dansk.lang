@@ -12652,11 +12652,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Compressor"
+    swcodec: "Lydstyrkekompressor"
   </dest>
   <voice>
     *: none
-    swcodec: "Compressor"
+    swcodec: "Lydstyrkekompressor"
   </voice>
 </phrase>
 <phrase>
