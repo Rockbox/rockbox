@@ -13166,7 +13166,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    crossfade: Automatická změna pouze stopy"
+    crossfade: "Automatická změna pouze stopy"
   </voice>
 </phrase>
 <phrase>
