@@ -832,15 +832,15 @@
   user: core
   <source>
     *: none
-    crossfade: "Crossfeed"
+    swcodec: "Crossfeed"
   </source>
   <dest>
     *: none
-    crossfade: "Køížení kanálù"
+    swcodec: "Køížení kanálù"
   </dest>
   <voice>
     *: none
-    crossfade: "Køížení kanálù"
+    swcodec: "Køížení kanálù"
   </voice>
 </phrase>
 <phrase>
@@ -849,15 +849,15 @@
   user: core
   <source>
     *: none
-    crossfade: "Direct Gain"
+    swcodec: "Direct Gain"
   </source>
   <dest>
     *: none
-    crossfade: "Pøímé zesílení"
+    swcodec: "Pøímé zesílení"
   </dest>
   <voice>
     *: none
-    crossfade: "Pøímé zesílení"
+    swcodec: "Pøímé zesílení"
   </voice>
 </phrase>
 <phrase>
@@ -866,15 +866,15 @@
   user: core
   <source>
     *: none
-    crossfade: "Cross Gain"
+    swcodec: "Cross Gain"
   </source>
   <dest>
     *: none
-    crossfade: "Pøekøížené zesílení"
+    swcodec: "Pøekøížené zesílení"
   </dest>
   <voice>
     *: none
-    crossfade: "Pøekøížené zesílení"
+    swcodec: "Pøekøížené zesílení"
   </voice>
 </phrase>
 <phrase>
@@ -883,15 +883,15 @@
   user: core
   <source>
     *: none
-    crossfade: "High-Frequency Attenuation"
+    swcodec: "High-Frequency Attenuation"
   </source>
   <dest>
     *: none
-    crossfade: "Zeslabení výšek"
+    swcodec: "Zeslabení výšek"
   </dest>
   <voice>
     *: none
-    crossfade: "Zeslabení výšek"
+    swcodec: "Zeslabení výšek"
   </voice>
 </phrase>
 <phrase>
@@ -900,15 +900,15 @@
   user: core
   <source>
     *: none
-    crossfade: "High-Frequency Cutoff"
+    swcodec: "High-Frequency Cutoff"
   </source>
   <dest>
     *: none
-    crossfade: "Oøíznutí výšek"
+    swcodec: "Oøíznutí výšek"
   </dest>
   <voice>
     *: none
-    crossfade: "Oøíznutí výšek"
+    swcodec: "Oøíznutí výšek"
   </voice>
 </phrase>
 <phrase>
@@ -917,15 +917,15 @@
   user: core
   <source>
     *: none
-    crossfade: "Equalizer"
+    swcodec: "Equalizer"
   </source>
   <dest>
     *: none
-    crossfade: "Ekvalizér"
+    swcodec: "Ekvalizér"
   </dest>
   <voice>
     *: none
-    crossfade: "Ekvalizér"
+    swcodec: "Ekvalizér"
   </voice>
 </phrase>
 <phrase>
@@ -934,15 +934,15 @@
   user: core
   <source>
     *: none
-    crossfade: "Enable EQ"
+    swcodec: "Enable EQ"
   </source>
   <dest>
     *: none
-    crossfade: "Zapnout EQ"
+    swcodec: "Zapnout EQ"
   </dest>
   <voice>
     *: none
-    crossfade: "Zapnout ekvalizér"
+    swcodec: "Zapnout ekvalizér"
   </voice>
 </phrase>
 <phrase>
@@ -951,15 +951,15 @@
   user: core
   <source>
     *: none
-    crossfade: "Graphical EQ"
+    swcodec: "Graphical EQ"
   </source>
   <dest>
     *: none
-    crossfade: "Grafický EQ"
+    swcodec: "Grafický EQ"
   </dest>
   <voice>
     *: none
-    crossfade: "Grafický ekvalizér"
+    swcodec: "Grafický ekvalizér"
   </voice>
 </phrase>
 <phrase>
@@ -968,15 +968,15 @@
   user: core
   <source>
     *: none
-    crossfade: "Precut"
+    swcodec: "Precut"
   </source>
   <dest>
     *: none
-    crossfade: "Pøedoøíznutí"
+    swcodec: "Pøedoøíznutí"
   </dest>
   <voice>
     *: none
-    crossfade: "Pøedoøíznutí"
+    swcodec: "Pøedoøíznutí"
   </voice>
 </phrase>
 <phrase>
@@ -985,15 +985,15 @@
   user: core
   <source>
     *: none
-    crossfade: "Simple EQ Settings"
+    swcodec: "Simple EQ Settings"
   </source>
   <dest>
     *: none
-    crossfade: "Základní nastavení EQ"
+    swcodec: "Základní nastavení EQ"
   </dest>
   <voice>
     *: none
-    crossfade: "Základní nastavení ekvalizéru"
+    swcodec: "Základní nastavení ekvalizéru"
   </voice>
 </phrase>
 <phrase>
@@ -1677,7 +1677,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Track Skip Only"
+    crossfade: "Track Skip Only"
   </source>
   <dest>
     *: none
