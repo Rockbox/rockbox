@@ -134,6 +134,19 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3980(struct filter_t* f,
 
     while(LIKELY(count--))
     {
+#ifdef FUSED_VECTOR_MATH
+        if (LIKELY(*data != 0)) {
+            if (*data < 0)
+                res = vector_sp_add(f->coeffs, f->delay - ORDER,
+                                    f->adaptcoeffs - ORDER);
+            else
+                res = vector_sp_sub(f->coeffs, f->delay - ORDER,
+                                    f->adaptcoeffs - ORDER);
+        } else {
+            res = scalarproduct(f->coeffs, f->delay - ORDER);
+        }
+        res = FP_TO_INT(res);
+#else
         res = FP_TO_INT(scalarproduct(f->coeffs, f->delay - ORDER));
 
         if (LIKELY(*data != 0)) {
@@ -142,6 +155,7 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3980(struct filter_t* f,
             else
                 vector_sub(f->coeffs, f->adaptcoeffs - ORDER);
         }
+#endif
 
         res += *data;
 
@@ -193,6 +207,19 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3970(struct filter_t* f,
 
     while(LIKELY(count--))
     {
+#ifdef FUSED_VECTOR_MATH
+        if (LIKELY(*data != 0)) {
+            if (*data < 0)
+                res = vector_sp_add(f->coeffs, f->delay - ORDER,
+                                    f->adaptcoeffs - ORDER);
+            else
+                res = vector_sp_sub(f->coeffs, f->delay - ORDER,
+                                    f->adaptcoeffs - ORDER);
+        } else {
+            res = scalarproduct(f->coeffs, f->delay - ORDER);
+        }
+        res = FP_TO_INT(res);
+#else
         res = FP_TO_INT(scalarproduct(f->coeffs, f->delay - ORDER));
 
         if (LIKELY(*data != 0)) {
@@ -201,6 +228,7 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3970(struct filter_t* f,
             else
                 vector_sub(f->coeffs, f->adaptcoeffs - ORDER);
         }
+#endif
 
         /* Convert res from (32-FRACBITS).FRACBITS fixed-point format to an
            integer (rounding to nearest) and add the input value to

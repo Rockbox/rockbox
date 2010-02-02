@@ -92,7 +92,7 @@
 #if CONFIG_CPU == PP5020
 .set recip_max, 8384
 #elif CONFIG_CPU == PP5002
-.set recip_max, 4992
+.set recip_max, 4608
 #else
 .set recip_max, 16384
 #endif
