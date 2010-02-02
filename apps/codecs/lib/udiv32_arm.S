@@ -99,7 +99,7 @@
 #elif CONFIG_CPU == AS3525
 .set recip_max, 42752
 #elif CONFIG_CPU == S5L8701
-.set recip_max, 13184
+.set recip_max, 12800
 #elif CONFIG_CPU == S5L8700
 .set recip_max, 9088
 #endif
