@@ -38,7 +38,7 @@ langs = {
     'fr'        : 'French',
     'gr'        : 'Greek',
     'he'        : 'Hebrew',
-    'it'        ; 'Italian',
+    'it'        : 'Italian',
     'ja'        : 'Japanese',
     'nl'        : 'Dutch',
     'pl'        : 'Polish',
