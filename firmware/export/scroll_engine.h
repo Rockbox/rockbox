@@ -55,6 +55,9 @@ struct scrollinfo
     int offset;
     int startx;
 #ifdef HAVE_LCD_BITMAP
+#if LCD_DEPTH > 1 || (defined(HAVE_LCD_REMOTE) && LCD_REMOTE_DEPTH > 1)
+    char *backdrop;
+#endif
     int width;  /* length of line in pixels */
     int style; /* line style */
 #endif/* HAVE_LCD_BITMAP */

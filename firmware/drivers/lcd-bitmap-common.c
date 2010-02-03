@@ -39,6 +39,9 @@
 #define MAIN_LCD
 #endif
 
+#define HAS_BACKDROP ((defined(MAIN_LCD) && LCD_DEPTH > 1) \
+                      || (!defined(MAIN_LCD) && LCD_REMOTE_DEPTH > 1))
+
 #if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
 /* Fill a rectangle with a gradient */
 static void lcd_gradient_rect(int x1, int x2, int y, unsigned h,
@@ -370,7 +373,10 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
     s->len = utf8length(string);
     s->offset = offset;
     s->startx = x * LCDFN(getstringsize)(" ", NULL, NULL);
-    s->backward = false;
+    s->backward = false;    
+#if HAS_BACKDROP
+    s->backdrop = (char*)LCDFN(get_backdrop());
+#endif
 
     LCDFN(scroll_info).lines++;
 }
@@ -399,6 +405,9 @@ void LCDFN(scroll_fn)(void)
     int index;
     int xpos, ypos;
     struct viewport* old_vp = current_vp;
+#if HAS_BACKDROP
+    FBFN(data*) old_backdrop = LCDFN(get_backdrop)();
+#endif
 
     for ( index = 0; index < LCDFN(scroll_info).lines; index++ ) {
         s = &LCDFN(scroll_info).scroll[index];
@@ -408,7 +417,9 @@ void LCDFN(scroll_fn)(void)
             continue;
 
         LCDFN(set_viewport)(s->vp);
-
+#if HAS_BACKDROP
+        LCDFN(set_backdrop)((FBFN(data*))s->backdrop);
+#endif
         if (s->backward)
             s->offset -= LCDFN(scroll_info).step;
         else
@@ -442,5 +453,8 @@ void LCDFN(scroll_fn)(void)
         LCDFN(update_viewport_rect)(xpos, ypos, current_vp->width - xpos,
                                     pf->height);
     }
+#if HAS_BACKDROP
+    LCDFN(set_backdrop)(old_backdrop);
+#endif
     LCDFN(set_viewport)(old_vp);
 }

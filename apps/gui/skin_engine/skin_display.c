@@ -1007,7 +1007,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 #endif
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
-        display->backdrop_show(data->backdrop);
+    display->backdrop_show(data->backdrop);
 #endif
 
 
