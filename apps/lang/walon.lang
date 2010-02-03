@@ -12631,20 +12631,3 @@
     lcd_bitmap: "Eplaeçmint del bår d' acinseur"
   </voice>
 </phrase>
-<phrase>
-  id: LANG_COMPRESSOR
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    swcodec: "Compressor"
-  </source>
-  <dest>
-    *: none
-    swcodec: "Compressor"
-  </dest>
-  <voice>
-    *: none
-    swcodec: "Compressor"
-  </voice>
-</phrase>

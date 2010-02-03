@@ -12440,23 +12440,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_COMPRESSOR
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    swcodec: "Compressor"
-  </source>
-  <dest>
-    *: none
-    swcodec: "Compressor"
-  </dest>
-  <voice>
-    *: none
-    swcodec: "Compressor"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYBACK_RATE
   desc: "rate" in pitch screen
   user: core
