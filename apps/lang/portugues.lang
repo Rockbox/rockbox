@@ -668,7 +668,7 @@
     *: "Opções de Reprodução"
   </dest>
   <voice>
-    *: "Reprodução"
+    *: "Opções de Reprodução"
   </voice>
 </phrase>
 <phrase>
@@ -805,7 +805,7 @@
     *: "Save .cfg File"
   </source>
   <dest>
-    *: "Escrever Ficheiro .cfg"
+    *: "Guardar Ficheiro .cfg"
   </dest>
   <voice>
     *: "Escrever ficheiro de configuração"
@@ -1130,10 +1130,10 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "Avisar Quando Apagar Uma Playlist Dinâmica"
+    *: "Avisar ao apagar uma Playlist Dinâmica"
   </dest>
   <voice>
-    *: "Avisar Quando Apagar Uma Playlist Dinâmica"
+    *: "Avisar ao apagar uma Playlist Dinâmica"
   </voice>
 </phrase>
 <phrase>
@@ -1273,10 +1273,10 @@
     *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "Aumentar/Diminuir Som quando Parado/Pausado"
+    *: "Desvanecer Som quando Parado/Pausado"
   </dest>
   <voice>
-    *: "Aumentar e Diminuir Som quando Parado ou Pausado"
+    *: "Desvanecer Som quando Parado ou Pausado"
   </voice>
 </phrase>
 <phrase>
@@ -1304,10 +1304,10 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Ganho de Repetição"
+    *: "Replaygain"
   </dest>
   <voice>
-    *: "Ganho de Repetição"
+    *: "Replaygain"
   </voice>
 </phrase>
 <phrase>
@@ -2140,7 +2140,7 @@
     *: "Perguntar - Apenas Recentes"
   </dest>
   <voice>
-    *: "erguntar - Apenas Recentes"
+    *: "Perguntar - Apenas Recentes"
   </voice>
 </phrase>
 <phrase>
@@ -2554,11 +2554,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Demora no Fade In"
+    crossfade: "Demora no Aumento"
   </dest>
   <voice>
     *: none
-    crossfade: "Demora no Fade In"
+    crossfade: "Demora no Aumento"
   </voice>
 </phrase>
 <phrase>
@@ -2571,11 +2571,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Duração do Fade In"
+    crossfade: "Duração do Aumento"
   </dest>
   <voice>
     *: none
-    crossfade: "Duração do Fade In"
+    crossfade: "Duração do Aumento"
   </voice>
 </phrase>
 <phrase>
@@ -2588,11 +2588,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Demora no Fade Out"
+    crossfade: "Demora no Desvanecimento"
   </dest>
   <voice>
     *: none
-    crossfade: "Demora no Fade Out"
+    crossfade: "Demora no Desvanecimento"
   </voice>
 </phrase>
 <phrase>
@@ -2605,11 +2605,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Duração do Fade Out"
+    crossfade: "Duração do Desvanecimento"
   </dest>
   <voice>
     *: none
-    crossfade: "Duração do Fade Out"
+    crossfade: "Duração do Desvanecimento"
   </voice>
 </phrase>
 <phrase>
@@ -2622,11 +2622,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Modo de Fade Out"
+    crossfade: "Modo de Desvanecimento"
   </dest>
   <voice>
     *: none
-    crossfade: "Modo de Fade Out"
+    crossfade: "Modo de Desvanecimento"
   </voice>
 </phrase>
 <phrase>
@@ -2639,11 +2639,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Mix"
+    crossfade: "Mistura"
   </dest>
   <voice>
     *: none
-    crossfade: "Mix"
+    crossfade: "Mistura"
   </voice>
 </phrase>
 <phrase>
@@ -2670,11 +2670,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Prevenir Clipping"
+    swcodec: "Prevenir Corte"
   </dest>
   <voice>
     *: none
-    swcodec: "Prevenir Clipping"
+    swcodec: "Prevenir Corte"
   </voice>
 </phrase>
 <phrase>
@@ -2730,7 +2730,7 @@
     *: "Ganho de Faixa se em Modo Aleatório"
   </dest>
   <voice>
-    *: "Track gain if shuffling"
+    *: "Ganho de Faixa se em Modo Aleatório"
   </voice>
 </phrase>
 <phrase>
@@ -2771,7 +2771,7 @@
   </source>
   <dest>
     *: none
-    charging: "Retro-iluminação Quando Conectado"
+    charging: "Retro-iluminação (Quando Conectado)"
   </dest>
   <voice>
     *: none
@@ -2786,10 +2786,10 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "Retro-iluminação de Captura"
+    *: "Retro-iluminação de Legenda"
   </dest>
   <voice>
-    *: "Retro-iluminação de Captura"
+    *: "Retro-iluminação de Legenda"
   </voice>
 </phrase>
 <phrase>
@@ -2802,11 +2802,11 @@
   </source>
   <dest>
     *: none
-    backlight_fade*: "Aumentar Progressivamente Intensidade da Retro-Iluminação"
+    backlight_fade*: "Aumentar Gradualmente Intensidade da Retro-Iluminação"
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Aumentar Progressivamente Intensidade da Retro-Iluminação"
+    backlight_fade*: "Aumentar Gradualmente Intensidade da Retro-Iluminação"
   </voice>
 </phrase>
 <phrase>
@@ -2819,11 +2819,11 @@
   </source>
   <dest>
     *: none
-    backlight_fade*: "Diminuir Progressivamente Intensidade da Retro-Iluminação"
+    backlight_fade*: "Desvanecer Intensidade da Retro-Iluminação"
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Diminuir Progressivamente Intensidade da Retro-Iluminação"
+    backlight_fade*: "Desvanecer Intensidade da Retro-Iluminação"
   </voice>
 </phrase>
 <phrase>
@@ -3256,11 +3256,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mostragem do Volume"
+    lcd_bitmap: "Mostrar Volume"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Mostragem do Volume"
+    lcd_bitmap: "Mostrar Volume"
   </voice>
 </phrase>
 <phrase>
@@ -3273,11 +3273,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mostragem da Bateria"
+    lcd_bitmap: "Mostrar Bateria"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Mostragem da Bateria"
+    lcd_bitmap: "Mostrar Bateria"
   </voice>
 </phrase>
 <phrase>
@@ -3371,11 +3371,11 @@
     masd: none
   </source>
   <dest>
-    *: "Compasso de Espera do Clip"
+    *: "Compasso de Espera do Corte"
     masd: none
   </dest>
   <voice>
-    *: "Compasso de Espera do Clip"
+    *: "Compasso de Espera do Corte"
     masd: none
   </voice>
 </phrase>
@@ -3418,11 +3418,11 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: "Logarithmic(dB)"
+    *: "Logarithmic (dB)"
     masd: none
   </source>
   <dest>
-    *: "Logarítmico(dB)"
+    *: "Logarítmico (dB)"
     masd: none
   </dest>
   <voice>
@@ -3807,7 +3807,7 @@
     *: "Open With..."
   </source>
   <dest>
-    *: "Abrir Com"
+    *: "Abrir Com..."
   </dest>
   <voice>
     *: "Abrir Com"
@@ -3849,10 +3849,10 @@
     *: "Reshuffle"
   </source>
   <dest>
-    *: "Re-ordenar Aleatoriamente"
+    *: "Re-baralhar"
   </dest>
   <voice>
-    *: "Re-ordenar Aleatoriamente"
+    *: "Re-baralhar"
   </voice>
 </phrase>
 <phrase>
@@ -3919,10 +3919,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "Enlistar"
+    *: "Enfileirar"
   </dest>
   <voice>
-    *: "Enlistar"
+    *: "Enfileirar"
   </voice>
 </phrase>
 <phrase>
@@ -3933,10 +3933,10 @@
     *: "Queue Next"
   </source>
   <dest>
-    *: "Enlistar a Seguir"
+    *: "Enfileirar a Seguir"
   </dest>
   <voice>
-    *: "Enlistar a Seguir"
+    *: "Enfileirar a Seguir"
   </voice>
 </phrase>
 <phrase>
@@ -3947,10 +3947,10 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "Enlistar em Último Lugar"
+    *: "Enfileirar em Último Lugar"
   </dest>
   <voice>
-    *: "Enlistar em Último Lugar"
+    *: "Enfileirar em Último Lugar"
   </voice>
 </phrase>
 <phrase>
@@ -3961,10 +3961,10 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "Lista Re-ordenada Aleatoriamente"
+    *: "Enfileirar aleatoriamente"
   </dest>
   <voice>
-    *: "Lista Re-ordenada Aleatoriamente"
+    *: "Enfileirar aleatoriamente"
   </voice>
 </phrase>
 <phrase>
@@ -4040,7 +4040,7 @@
   </dest>
   <voice>
     *: none
-    archosrecorder: "Bateria: Carregamento Completado"
+    archosrecorder: "Bateria: Carregamento Completo"
   </voice>
 </phrase>
 <phrase>
@@ -4173,11 +4173,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Desacelerar"
+    pitchscreen: "Abrandar"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Desacelerar"
+    pitchscreen: "Abrandar"
   </voice>
 </phrase>
 <phrase>
@@ -4269,16 +4269,16 @@
   </source>
   <dest>
     *: none
-    rtc: "OFF Para Reverter"
-    mrobe500: "POWER Para Reverter"
-    iriverh100,iriverh120,iriverh300: "STOP Para Reverter"
-    ipod*,sansac200*: "MENU Para Reverter"
-    iaudiox5,iaudiom5: "RECORD Para Reverter"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV Para Reverter"
-    gigabeatfx: "POWER Para Reverter"
-    mrobe100: "DISPLAY Para Reverter"
-    gigabeats: "BACK Para Reverter"
-    gogearsa9200: "LEFT Para Reverter"
+    rtc: "OFF = Reverter"
+    mrobe500: "POWER = Reverter"
+    iriverh100,iriverh120,iriverh300: "STOP = Reverter"
+    ipod*,sansac200*: "MENU = Reverter"
+    iaudiox5,iaudiom5: "RECORD = Reverter"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Reverter"
+    gigabeatfx: "POWER = Reverter"
+    mrobe100: "DISPLAY = Reverter"
+    gigabeats: "BACK = Reverter"
+    gogearsa9200: "LEFT = Reverter"
   </dest>
   <voice>
     *: none
@@ -4797,7 +4797,7 @@
     *: "<No Info>"
   </source>
   <dest>
-    *: "<Informação Ausente>"
+    *: "<Sem Informação>"
   </dest>
   <voice>
     *: ""
@@ -5725,7 +5725,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibel"
+    *: "décibel"
   </voice>
 </phrase>
 <phrase>
@@ -6554,7 +6554,7 @@
     *: "Erro ao Actualizar o Ficheiro de Controlo da Playlist"
   </dest>
   <voice>
-    *: "rro ao Actualizar o Ficheiro de Controlo da Playlist"
+    *: "Erro ao Actualizar o Ficheiro de Controlo da Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -6844,11 +6844,11 @@
   </source>
   <dest>
     *: none
-    radio: "Procuar Automaticamente Predefinções"
+    radio: "Procurar Predefinições"
   </dest>
   <voice>
     *: none
-    radio: "Procuar Automaticamente Predefinções"
+    radio: "Procurar Predefinições"
   </voice>
 </phrase>
 <phrase>
@@ -7182,7 +7182,7 @@
     *: "Failed reading %s"
   </source>
   <dest>
-    *: "Leitura Falhou ao Ler %s"
+    *: "Leitura falhou ao ler %s"
   </dest>
   <voice>
     *: ""
@@ -7224,7 +7224,7 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "O Plugin Retornou um Erro"
+    *: "O Plugin retornou um erro"
   </dest>
   <voice>
     *: ""
@@ -7912,7 +7912,7 @@
     *: ""
   </dest>
   <voice>
-    *: "units per tick"
+    *: "unidades por instante"
   </voice>
 </phrase>
 <phrase>
@@ -8232,11 +8232,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Aleatório e Salto de Faixa"
+    crossfade: "Aleatório ou Salto Manual de Faixa"
   </dest>
   <voice>
     *: none
-    crossfade: "Aleatório e Salto de Faixa"
+    crossfade: "Aleatório ou Salto Manual de Faixa"
   </voice>
 </phrase>
 <phrase>
@@ -8379,10 +8379,10 @@
   </source>
   <dest>
     *: "PLAY = Sim"
-    cowond2*: "MENU, or top-right = Yes"
+    cowond2*: "MENU, ou canto superior direito = Sim"
     iriverh100,iriverh120,iriverh300: "NAVI = Sim"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
-    mrobe500: "PLAY, POWER, or top-right = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Sim"
+    mrobe500: "PLAY, POWER, ou canto superior direito = Sim"
     archosplayer: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -8403,11 +8403,11 @@
   </source>
   <dest>
     *: none
-    rtc: "ON para Definir"
-    mrobe500: "HEART para Definir"
-    iriverh100,iriverh120,iriverh300: "NAVI para Definir"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT para Definir"
-    gogearsa9200: "PLAY para Definir"
+    rtc: "ON = Definir"
+    mrobe500: "HEART = Definir"
+    iriverh100,iriverh120,iriverh300: "NAVI = Definir"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Definir"
+    gogearsa9200: "PLAY = Definir"
   </dest>
   <voice>
     *: none
@@ -8551,7 +8551,7 @@
   </dest>
   <voice>
     *: none
-    tc_ramcache: "Carregar na RAM"
+    tc_ramcache: "Carregar na R A M"
   </voice>
 </phrase>
 <phrase>
@@ -8932,7 +8932,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Voice (rápida)"
+    agc: "Voz (rápida)"
   </voice>
 </phrase>
 <phrase>
@@ -8994,7 +8994,7 @@
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Reactivar)"
+    remote: "(Volume: Reactivar)"
   </voice>
 </phrase>
 <phrase>
@@ -9343,7 +9343,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Gain Direita"
+    recording: "Ganho Direito"
   </voice>
 </phrase>
 <phrase>
@@ -9388,7 +9388,7 @@
   </dest>
   <voice>
     *: none
-    radio: "USA e Canadá"
+    radio: "U S A e Canadá"
   </voice>
 </phrase>
 <phrase>
@@ -9452,7 +9452,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Semi-tom Acima"
+    pitchscreen: "semitom Acima"
   </dest>
   <voice>
     *: none
@@ -9532,7 +9532,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "Ìndice"
   </voice>
 </phrase>
 <phrase>
@@ -9771,7 +9771,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Quick screen"
+    *: "Ecrã rápido"
   </voice>
 </phrase>
 <phrase>
@@ -9801,11 +9801,11 @@
   </source>
   <dest>
     *: none
-    recording: "O que fazer quando está a Separar"
+    recording: "O que fazer ao Separar"
   </dest>
   <voice>
     *: none
-    recording: "O que fazer quando está a Separar"
+    recording: "O que fazer ao Separar"
   </voice>
 </phrase>
 <phrase>
@@ -9946,7 +9946,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "o'clock"
+    rtc: "em ponto"
   </voice>
 </phrase>
 <phrase>
@@ -10875,11 +10875,11 @@
   </source>
   <dest>
     *: none
-    lcd_sleep: "Dormir (Depois de Retro-iluminação desligada)"
+    lcd_sleep: "Dormir (Após a Retro-iluminação desligada)"
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Dormir Depois de Retro-iluminação desligada"
+    lcd_sleep: "Dormir Após a Retro-iluminação desligada"
   </voice>
 </phrase>
 <phrase>
@@ -11172,10 +11172,10 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "Explorar Cuesheet"
+    *: "Explorar Lista Cue"
   </dest>
   <voice>
-    *: "Explorar Cuesheet"
+    *: "Explorar Lista Cue"
   </voice>
 </phrase>
 <phrase>
@@ -11574,11 +11574,11 @@
   </source>
   <dest>
     *: none
-    recording: "Contador de Clips"
+    recording: "Contador de Cortes"
   </dest>
   <voice>
     *: none
-    recording: "Contador de Clips"
+    recording: "Contador de Cortes"
   </voice>
 </phrase>
 <phrase>
@@ -11854,7 +11854,7 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Suporte da lista Cue"
+    *: "Suporte da Lista Cue"
   </dest>
   <voice>
     *: "Suporte da lista Cue"
@@ -12028,11 +12028,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Release Time"
+    swcodec: "Tempo de Libertação"
   </dest>
   <voice>
     *: none
-    swcodec: "Release Time"
+    swcodec: "Tempo de Libertação"
   </voice>
 </phrase>
 <phrase>
@@ -12059,11 +12059,11 @@
   </source>
   <dest>
     *: none
-    recording: "Line In"
+    recording: "Linha de Entrada"
   </dest>
   <voice>
     *: none
-    recording: "Line In"
+    recording: "Linha de Entrada"
   </voice>
 </phrase>
 <phrase>
@@ -12105,7 +12105,7 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
+    *:none
     lcd_bitmap: "Base Skin"
   </source>
   <dest>
@@ -12158,7 +12158,7 @@
   </source>
   <dest>
     *: none
-    remote: "Barra de estado Remota"
+    remote: "Barra de Estado Remota"
   </dest>
   <voice>
     *: none
@@ -12427,7 +12427,7 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
+    *:none
     lcd_bitmap: "Remote Base Skin"
   </source>
   <dest>
@@ -12497,11 +12497,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Semi-tom"
+    pitchscreen: "Semitom"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Semi-tom"
+    pitchscreen: "semitom"
   </voice>
 </phrase>
 <phrase>
@@ -13237,3 +13237,5 @@
   <voice>
     *: none
     recording: "Tipo de Botão de Arranque"
+  </voice>
+</phrase>
