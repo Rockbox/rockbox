@@ -12490,11 +12490,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Base Skin"
+    lcd_bitmap: "浏览sbs(状态栏样式)文件"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Base Skin"
+    lcd_bitmap: "浏览sbs(状态栏样式)文件"
   </voice>
 </phrase>
 <phrase>
@@ -12719,11 +12719,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Remote Base Skin"
+    lcd_bitmap: "浏览rsbs(线控状态栏样式)文件"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Remote Base Skin"
+    lcd_bitmap: "浏览rsbs(线控状态栏样式)文件"
   </voice>
 </phrase>
 <phrase>
