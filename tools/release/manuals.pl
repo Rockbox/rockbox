@@ -2,6 +2,8 @@
 
 $version="3.5";
 
+require "tools/builds.pm";
+
 my $verbose;
 if($ARGV[0] eq "-v") {
     $verbose =1;
@@ -57,7 +59,7 @@ sub buildit {
 
     `rm -rf * >/dev/null 2>&1`;
 
-    my $c = "../tools/configure --target=$target --type=m";
+    my $c = "echo|../tools/configure --target=$target --type=m";
 
     print "C: $c\n" if($verbose);
     `$c`;
@@ -73,7 +75,7 @@ sub buildit {
 `(cd tools && make ) >/dev/null 2>&1`;
 
 for my $b (&stablebuilds) {
-    next if ($builds{$b}{configname} < 3); # no variants
+    #next if ($builds{$b}{configname} < 3); # no variants
 
     runone($b);
 }
