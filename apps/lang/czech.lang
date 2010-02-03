@@ -1672,23 +1672,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TRACKSKIP
-  desc: in crossfade settings
-  user: core
-  <source>
-    *: none
-    crossfade: "Track Skip Only"
-  </source>
-  <dest>
-    *: none
-    crossfade: "Pouze při přeskočení skladby"
-  </dest>
-  <voice>
-    *: none
-    crossfade: "Pouze při přeskočení skladby"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SHUFFLE_TRACKSKIP
   desc: in settings_menu
   user: core
@@ -1928,15 +1911,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Hlasitost pípnutí"
+    swcodec: "Pípnutí při posonu po stopách"
   </dest>
   <voice>
     *: none
-    swcodec: "Hlasitost pípnutí"
+    swcodec: "Pípnutí při posonu po stopách"
   </voice>
 </phrase>
 <phrase>
@@ -2584,15 +2567,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Procházet fonty"
+    lcd_bitmap: "Font"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Procházet fonty"
+    lcd_bitmap: "Font"
   </voice>
 </phrase>
 <phrase>
@@ -2600,13 +2583,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Procházet .wps soubory"
+    *: "Přehrávací obrazovka"
   </dest>
   <voice>
-    *: "Procházet wépées soubory"
+    *: "Přehrávací obrazovka"
   </voice>
 </phrase>
 <phrase>
@@ -2615,15 +2598,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "Procházet .rwps soubory"
+    remote: "Vzdálená přehrávací obrazovka"
   </dest>
   <voice>
     *: none
-    remote: "Procházet ervépées soubory"
+    remote: "Vzdálená přehrávací obrazovka"
   </voice>
 </phrase>
 <phrase>
@@ -3201,7 +3184,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu alternative for jump scroll
+  desc: (archosplayer) menu alternative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
@@ -3215,7 +3198,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -3229,7 +3212,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (player) Delay before making a jump scroll
+  desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
@@ -3861,17 +3844,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    fuze*,e200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Časový limit osvětlení tlačítka"
-    fuze*,e200*: "Časový limit osvětlení kolečka"
+    sansafuze*,sansae200*: "Časový limit osvětlení kolečka"
   </dest>
   <voice>
     *: none
     button_light: "Časový limit osvětlení tlačítka"
-    fuze*,e200*: "Časový limit osvětlení kolečka"
+    sansafuze*,sansae200*: "Časový limit osvětlení kolečka"
   </voice>
 </phrase>
 <phrase>
@@ -4167,7 +4150,6 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -5126,13 +5108,13 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Procházet motivy"
+    *: "Procházet soubory motivů"
   </dest>
   <voice>
-    *: "Procházet motivy"
+    *: "Procházet soubory motivů"
   </voice>
 </phrase>
 <phrase>
@@ -5907,17 +5889,17 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   <source>
     *: none
     recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </source>
   <dest>
     *: none
     recording: "Mikrofón"
-    h100,h120,h300: "Interní mikrofón"
+    iriverh100,iriverh120,iriverh300: "Interní mikrofón"
   </dest>
   <voice>
     *: none
     recording: "Mikrofón"
-    h100,h120,h300: "Interní mikrofón"
+    iriverh100,iriverh120,iriverh300: "Interní mikrofón"
   </voice>
 </phrase>
 <phrase>
@@ -5943,15 +5925,15 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   user: core
   <source>
     *: none
-    recording,player: "Line In"
+    recording,archosplayer: "Line In"
   </source>
   <dest>
     *: none
-    recording,player: "Linkový vstup"
+    recording,archosplayer: "Vnější vstup"
   </dest>
   <voice>
     *: none
-    recording,player: "Linkový vstup"
+    recording,archosplayer: "Vnější vstup"
   </voice>
 </phrase>
 <phrase>
@@ -6881,11 +6863,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   user: core
   <source>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </source>
   <dest>
     *: "Buffer:"
-    player: "Buf:"
+    archosplayer: "Buf:"
   </dest>
   <voice>
     *: "Vyrovnávací paměť"
@@ -6897,13 +6879,13 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Baterie: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Baterie: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Baterie: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Stav baterie"
@@ -6961,20 +6943,20 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   <source>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
-    ondio*: "MMC:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
+    archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200*,c200*,fuze*: "mSD:"
-    ondio*: "MMC:"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
+    archosondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "há dé 1"
-    e200*,c200*,fuze*: "micro es dé"
-    ondio*: "em em cé"
+    sansae200*,sansac200*,sansafuze*: "mikro es dé"
+    archosondio*: "em em cé"
   </voice>
 </phrase>
 <phrase>
@@ -7458,10 +7440,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Title]"
+    *: "Title"
   </source>
   <dest>
-    *: "[Název]"
+    *: "Název"
   </dest>
   <voice>
     *: ""
@@ -7472,10 +7454,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Artist]"
+    *: "Artist"
   </source>
   <dest>
-    *: "[Autor]"
+    *: "Autor"
   </dest>
   <voice>
     *: ""
@@ -7486,10 +7468,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album]"
+    *: "Album"
   </source>
   <dest>
-    *: "[Album]"
+    *: "Album"
   </dest>
   <voice>
     *: ""
@@ -7500,10 +7482,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Tracknum]"
+    *: "Tracknum"
   </source>
   <dest>
-    *: "[Č.skladby]"
+    *: "Č.skladby"
   </dest>
   <voice>
     *: ""
@@ -7514,10 +7496,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Genre]"
+    *: "Genre"
   </source>
   <dest>
-    *: "[Žánr]"
+    *: "Žánr"
   </dest>
   <voice>
     *: ""
@@ -7528,10 +7510,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Year]"
+    *: "Year"
   </source>
   <dest>
-    *: "[Rok]"
+    *: "Rok"
   </dest>
   <voice>
     *: ""
@@ -7542,10 +7524,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Length]"
+    *: "Length"
   </source>
   <dest>
-    *: "[Délka]"
+    *: "Délka"
   </dest>
   <voice>
     *: ""
@@ -7556,10 +7538,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Playlist]"
+    *: "Playlist"
   </source>
   <dest>
-    *: "[Playlist]"
+    *: "Playlist"
   </dest>
   <voice>
     *: ""
@@ -7570,10 +7552,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Bitrate]"
+    *: "Bitrate"
   </source>
   <dest>
-    *: "[Datový tok]"
+    *: "Datový tok"
   </dest>
   <voice>
     *: ""
@@ -7584,10 +7566,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Artist]"
+    *: "Album Artist"
   </source>
   <dest>
-    *: "[Autor alba]"
+    *: "Autor alba"
   </dest>
   <voice>
     *: ""
@@ -7598,10 +7580,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Discnum]"
+    *: "Discnum"
   </source>
   <dest>
-    *: "[Č.disku]"
+    *: "Č.disku"
   </dest>
   <voice>
     *: ""
@@ -7612,10 +7594,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Comment]"
+    *: "Comment"
   </source>
   <dest>
-    *: "[Komentář]"
+    *: "Komentář"
   </dest>
   <voice>
     *: ""
@@ -7640,10 +7622,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Frequency]"
+    *: "Frequency"
   </source>
   <dest>
-    *: "[Frekvence]"
+    *: "Frekvence"
   </dest>
   <voice>
     *: ""
@@ -7654,10 +7636,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Track Gain]"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "[Zesílení skladby]"
+    *: "Zesílení skladby"
   </dest>
   <voice>
     *: ""
@@ -7668,10 +7650,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Album Gain]"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "[Zesílení alba]"
+    *: "Zesílení alba"
   </dest>
   <voice>
     *: ""
@@ -7682,10 +7664,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Path]"
+    *: "Path"
   </source>
   <dest>
-    *: "[Cesta]"
+    *: "Cesta"
   </dest>
   <voice>
     *: ""
@@ -8085,15 +8067,14 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   user: core
   <source>
     *: "End of Song List"
-    player: "End of List"
+    archosplayer: "End of List"
   </source>
   <dest>
     *: "Konec seznamu skladeb"
-    player: "Konec seznamu"
+    archosplayer: "Konec seznamu"
   </dest>
   <voice>
     *: "Konec seznamu skladeb"
-    player: "Konec seznamu"
   </voice>
 </phrase>
 <phrase>
@@ -8270,15 +8251,15 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   user: core
   <source>
     *: none
-    usb_charging: "Charge During USB Connection"
+    usb_charging_enable: "Charge During USB Connection"
   </source>
   <dest>
     *: none
-    usb_charging: "Nabíjet při připojení přes USB"
+    usb_charging_enable: "Nabíjení během USB připojení"
   </dest>
   <voice>
     *: none
-    usb_charging: "Nabíjet při připojení přes USB"
+    usb_charging_enable: "Nabíjení během ú es bé připojení"
   </voice>
 </phrase>
 <phrase>
@@ -8333,20 +8314,19 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   <source>
     *: none
     recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200*: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Disk je plný. Pro pokračování stiskněte OFF."
-    h100,h120,h300: "Disk je plný. Pro pokračování stiskněte STOP."
-    m5,x5: "Disk je plný. Pro pokračování stiskněte POWER."
-    e200*,c200*: "Disk je plný. Pro pokračování stiskněte PREV."
+    iriverh100,iriverh120,iriverh300: "Disk je plný. Pro pokračování stiskněte STOP."
+    iaudiom5,iaudiox5: "Disk je plný. Pro pokračování stiskněte POWER."
+    sansae200*,sansac200*: "Disk je plný. Pro pokračování stiskněte PREV."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200*,c200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8389,15 +8369,15 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   user: core
   <source>
     *: none
-    ondio*: "Please remove inserted MMC"
+    archosondio*: "Please remove inserted MMC"
   </source>
   <dest>
     *: none
-    ondio*: "Vyjměte prosím paměťovou kartu"
+    archosondio*: "Prosím vyjměte MMC kartu"
   </dest>
   <voice>
     *: none
-    ondio*: "Vyjměte prosím paměťovou kartu"
+    archosondio*: "Prosím vyjměte em em cé kartu"
   </voice>
 </phrase>
 <phrase>
@@ -8443,7 +8423,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: "OFF = zrušit"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP = zruít"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP = zrušit"
     ipod*: "PLAY/PAUSE = zrušit"
     iaudiox5,iaudiom5: "Long PLAY = zrušit"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV = zrušit"
@@ -8624,15 +8604,15 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
 </phrase>
 <phrase>
   id: LANG_RESTARTING_PLAYBACK
-  desc: splash screen displayed when pcm buffer size is changed
+  desc: deprecated
   user: core
   <source>
     *: none
-    swcodec: "Restarting playback..."
+    swcodec: ""
   </source>
   <dest>
     *: none
-    swcodec: "Restartuji přehrávání..."
+    swcodec: ""
   </dest>
   <voice>
     *: none
@@ -8672,19 +8652,19 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 recorder
+  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
   user: core
   <source>
     *: none
-    recorder: "Battery: Top-Off Chg"
+    archosrecorder: "Battery: Top-Off Chg"
   </source>
   <dest>
     *: none
-    recorder: "Baterie: Donabíjení"
+    archosrecorder: "Baterie: uplně vybitá"
   </dest>
   <voice>
     *: none
-    recorder: "Donabíjení"
+    archosrecorder: "Baterie je uplně vybitá"
   </voice>
 </phrase>
 <phrase>
@@ -10170,11 +10150,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   user: core
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
-    swcodec: "Editační mód: %s"
+    swcodec: "Editační mód: %s %s"
   </dest>
   <voice>
     *: none
@@ -10187,15 +10167,15 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   user: core
   <source>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </source>
   <dest>
     *: none
-    swcodec: "Frekvence oříznutí"
+    swcodec: "Oříznutí"
   </dest>
   <voice>
     *: none
-    swcodec: "Frekvence oříznutí"
+    swcodec: "Oříznutí"
   </voice>
 </phrase>
 <phrase>
@@ -11007,7 +10987,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   desc: in tag viewer
   user: core
   <source>
-    *: "[Work]"
+    *: "Work"
   </source>
   <dest>
     *: "[Dílo]"
@@ -11712,7 +11692,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   user: core
   <source>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatfx: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
@@ -11729,7 +11709,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   user: core
   <source>
     *: none
-    gigabeatf: "High"
+    gigabeatfx: "High"
   </source>
   <dest>
     *: none
@@ -12649,7 +12629,6 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    usb_hid: "Prohlížecí režim""
   </voice>
 </phrase>
 <phrase>
@@ -12662,7 +12641,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    usb_hid: "Režim myši
+    usb_hid: "Režim myši"
   </dest>
   <voice>
     *: none
@@ -12723,7 +12702,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   user: core
   <source>
     *: none
-    swcodec: "Limiter Preamp"
+    swcodec: "Compressor"
   </source>
   <dest>
     *: none
@@ -13243,5 +13222,22 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   <voice>
     *:none
     lcd_bitmap: "Základní vzdálený vzhled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MANTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Manual Track Skip Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Manual Track Skip Only"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Manual Track Skip Only"
   </voice>
 </phrase>
