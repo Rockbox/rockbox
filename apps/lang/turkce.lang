@@ -1133,7 +1133,7 @@
   </source>
   <dest>
     *: none
-    masf: ""
+    masf: "AV Decay Time"
   </dest>
   <voice>
     *: none
