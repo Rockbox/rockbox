@@ -7,7 +7,7 @@
 	<key>CFBundleName</key>
 	<string>Rockbox Utility</string>
 	<key>CFBundleShortVersionString</key>
-	<string>SVN $Revision$ (1.2.3)</string>
+	<string>SVN $Revision$ (1.2.4)</string>
 	<key>CFBundleIconFile</key>
 	<string>rbutilqt.icns</string>
 	<key>CFBundleIdentifier</key>
