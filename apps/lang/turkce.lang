@@ -2105,13 +2105,11 @@
     *: none
     rtc: "ON = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    gogearsa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    gogearsa9200: ""
   </dest>
   <voice>
     *: none
