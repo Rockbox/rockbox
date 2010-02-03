@@ -8,6 +8,7 @@
 /* Always output samples shifted to 28 bits + sign*/
 #define ALAC_OUTPUT_DEPTH 29
 #define SCALE16 (ALAC_OUTPUT_DEPTH - 16)
+#define SCALE24 (ALAC_OUTPUT_DEPTH - 24)
 #define ALAC_MAX_CHANNELS 2
 #define ALAC_BLOCKSIZE 4096  /* Number of samples per channel per block */
 

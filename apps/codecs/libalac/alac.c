@@ -38,6 +38,8 @@
 #include "codeclib.h"
 #include "decomp.h"
 
+#define SIGNEXTEND24(val) (((signed)val<<8)>>8)
+
 int16_t predictor_coef_table[32] IBSS_ATTR;
 int16_t predictor_coef_table_a[32] IBSS_ATTR;
 int16_t predictor_coef_table_b[32] IBSS_ATTR;
@@ -168,143 +170,128 @@ static inline void unreadbits(alac_file *alac, int bits)
 
 #define count_leading_zeros(x) bs_generic(x, BS_CLZ|BS_SHORT)
 
-void basterdised_rice_decompress(alac_file *alac,
-                                 int32_t *output_buffer,
-                                 int output_size,
-                                 int readsamplesize, /* arg_10 */
-                                 int rice_initialhistory, /* arg424->b */
-                                 int rice_kmodifier, /* arg424->d */
-                                 int rice_historymult, /* arg424->c */
-                                 int rice_kmodifier_mask /* arg424->e */
-                                ) ICODE_ATTR_ALAC;
-void basterdised_rice_decompress(alac_file *alac,
-                                 int32_t *output_buffer,
-                                 int output_size,
-                                 int readsamplesize, /* arg_10 */
-                                 int rice_initialhistory, /* arg424->b */
-                                 int rice_kmodifier, /* arg424->d */
-                                 int rice_historymult, /* arg424->c */
-                                 int rice_kmodifier_mask /* arg424->e */
-                                )
-{
-    int output_count;
-    unsigned int history = rice_initialhistory;
-    int sign_modifier = 0;
+#define RICE_THRESHOLD 8 // maximum number of bits for a rice prefix.
 
+static inline int32_t entropy_decode_value(alac_file* alac,
+                             int readsamplesize,
+                             int k) ICODE_ATTR_ALAC;
+static inline int32_t entropy_decode_value(alac_file* alac,
+                             int readsamplesize,
+                             int k)
+{
+    int32_t x = 0; // decoded value
+    
+    // read x, number of 1s before 0 represent the rice value.
+    while (x <= RICE_THRESHOLD && readbit(alac))
+    {
+        x++;
+    }
+    
+    if (x > RICE_THRESHOLD)
+    {
+        // read the number from the bit stream (raw value)
+        int32_t value;
+        
+        value = readbits(alac, readsamplesize);
+        
+        /* mask value to readsamplesize size */
+        if (readsamplesize != 32)
+            value &= (((uint32_t)0xffffffff) >> (32 - readsamplesize));
+        
+        x = value;
+    }
+    else
+    {
+        if (k != 1)
+        {
+            int extrabits = readbits(alac, k);
+            
+            // x = x * (2^k - 1)
+            x = (x << k) - x;
+            
+            if (extrabits > 1)
+                x += extrabits - 1;
+            else
+                unreadbits(alac, 1);
+        }
+    }
+    
+    return x;
+}
+
+static void entropy_rice_decode(alac_file* alac,
+                         int32_t* output_buffer,
+                         int output_size,
+                         int readsamplesize,
+                         int rice_initialhistory,
+                         int rice_kmodifier,
+                         int rice_historymult,
+                         int rice_kmodifier_mask) ICODE_ATTR_ALAC;
+static void entropy_rice_decode(alac_file* alac,
+                         int32_t* output_buffer,
+                         int output_size,
+                         int readsamplesize,
+                         int rice_initialhistory,
+                         int rice_kmodifier,
+                         int rice_historymult,
+                         int rice_kmodifier_mask)
+{
+    int                output_count;
+    int                history = rice_initialhistory;
+    int                sign_modifier = 0;
+    
     for (output_count = 0; output_count < output_size; output_count++)
     {
-        int32_t x = 0;
-        int32_t x_modified;
-        int32_t final_val;
-
-        /* read x - number of 1s before 0 represent the rice */
-        while (x <= 8 && readbit(alac))
-        {
-            x++;
-        }
-
-
-        if (x > 8) /* RICE THRESHOLD */
-        { /* use alternative encoding */
-            int32_t value;
-
-            value = readbits(alac, readsamplesize);
-
-            /* mask value to readsamplesize size */
-            if (readsamplesize != 32)
-                value &= (0xffffffff >> (32 - readsamplesize));
-
-            x = value;
-        }
-        else
-        { /* standard rice encoding */
-            int extrabits;
-            int k; /* size of extra bits */
-
-            /* read k, that is bits as is */
-            k = 31 - rice_kmodifier - count_leading_zeros((history >> 9) + 3);
-
-            if (k < 0) k += rice_kmodifier;
-            else k = rice_kmodifier;
-
-            if (k != 1)
-            {
-                extrabits = readbits(alac, k);
-
-                /* multiply x by 2^k - 1, as part of their strange algorithm */
-                x = (x << k) - x;
-
-                if (extrabits > 1)
-                {
-                    x += extrabits - 1;
-                }
-                else unreadbits(alac, 1);
-            }
-        }
-
-        x_modified = sign_modifier + x;
-        final_val = (x_modified + 1) / 2;
-        if (x_modified & 1) final_val *= -1;
-
-        output_buffer[output_count] = final_val;
-
+        int32_t        decoded_value;
+        int32_t        final_value;
+        int32_t        k;
+        
+        k = 31 - rice_kmodifier - count_leading_zeros((history >> 9) + 3);
+        
+        if (k < 0) k += rice_kmodifier;
+        else k = rice_kmodifier;
+        
+        decoded_value = entropy_decode_value(alac, readsamplesize, k);
+        
+        decoded_value += sign_modifier;
+        final_value = (decoded_value + 1) / 2; // inc by 1 and shift out sign bit
+        if (decoded_value & 1) // the sign is stored in the low bit
+            final_value *= -1;
+        
+        output_buffer[output_count] = final_value;
+        
         sign_modifier = 0;
-
-        /* now update the history */
-        history += (x_modified * rice_historymult)
-                 - ((history * rice_historymult) >> 9);
-
-        if (x_modified > 0xffff)
-            history = 0xffff;
-
-        /* special case: there may be compressed blocks of 0 */
-        if ((history < 128) && (output_count+1 < output_size))
+        
+        // update history
+        history += (decoded_value * rice_historymult)
+                - ((history * rice_historymult) >> 9);
+        
+        if (decoded_value > 0xFFFF)
+            history = 0xFFFF;
+        
+        // special case, for compressed blocks of 0
+        if ((history < 128) && (output_count + 1 < output_size))
         {
-            int block_size;
-
+            int32_t        block_size;
+            
             sign_modifier = 1;
-
-            x = 0;
-            while (x <= 8 && readbit(alac))
-            {
-                x++;
-            }
-
-            if (x > 8)
-            {
-                block_size = readbits(alac, 16);
-                block_size &= 0xffff;
-            }
-            else
-            {
-                int k;
-                int extrabits;
-
-                k = count_leading_zeros(history) + ((history + 16) >> 6 /* / 64 */) - 24;
-
-                extrabits = readbits(alac, k);
-
-                block_size = (((1 << k) - 1) & rice_kmodifier_mask) * x
-                           + extrabits - 1;
-
-                if (extrabits < 2)
-                {
-                    x = 1 - extrabits;
-                    block_size += x;
-                    unreadbits(alac, 1);
-                }
-            }
-
+            
+            k = count_leading_zeros(history) + ((history + 16) / 64) - 24;
+            
+            // note: block_size is always 16bit
+            block_size = entropy_decode_value(alac, 16, k) & rice_kmodifier_mask;
+            
+            // got block_size 0s
             if (block_size > 0)
             {
-                memset(&output_buffer[output_count+1], 0, block_size * 4);
+                memset(&output_buffer[output_count + 1], 0, 
+                       block_size * sizeof(*output_buffer));
                 output_count += block_size;
-
             }
-
-            if (block_size > 0xffff)
+            
+            if (block_size > 0xFFFF)
                 sign_modifier = 0;
-
+            
             history = 0;
         }
     }
@@ -632,6 +619,72 @@ void deinterlace_16(int32_t* buffer0,
     }
 }
 
+void deinterlace_24(int32_t *buffer0, int32_t *buffer1,
+                    int uncompressed_bytes,
+                    int32_t *uncompressed_bytes_buffer0, 
+                    int32_t *uncompressed_bytes_buffer1,
+                    int numsamples,
+                    uint8_t interlacing_shift,
+                    uint8_t interlacing_leftweight) ICODE_ATTR_ALAC;
+void deinterlace_24(int32_t *buffer0, int32_t *buffer1,
+                    int uncompressed_bytes,
+                    int32_t *uncompressed_bytes_buffer0, 
+                    int32_t *uncompressed_bytes_buffer1,
+                    int numsamples,
+                    uint8_t interlacing_shift,
+                    uint8_t interlacing_leftweight)
+{
+    int i;
+    if (numsamples <= 0) return;
+    
+    /* weighted interlacing */
+    if (interlacing_leftweight)
+    {
+        for (i = 0; i < numsamples; i++)
+        {
+            int32_t difference, midright;
+            
+            midright = buffer0[i];
+            difference = buffer1[i];
+            
+            buffer0[i] = ((midright - ((difference * interlacing_leftweight)
+                            >> interlacing_shift)) + difference) << SCALE24;
+            buffer1[i] = (midright - ((difference * interlacing_leftweight) 
+                            >> interlacing_shift)) << SCALE24;
+            
+            if (uncompressed_bytes)
+            {
+                uint32_t mask = ~(0xFFFFFFFF << (uncompressed_bytes * 8));
+                buffer0[i] <<= (uncompressed_bytes * 8);
+                buffer1[i] <<= (uncompressed_bytes * 8);
+                
+                buffer0[i] |= uncompressed_bytes_buffer0[i] & mask;
+                buffer1[i] |= uncompressed_bytes_buffer1[i] & mask;
+            }
+
+        }
+        
+        return;
+    }
+    
+    /* otherwise basic interlacing took place */
+    for (i = 0; i < numsamples; i++)
+    {
+        if (uncompressed_bytes)
+        {
+            uint32_t mask = ~(0xFFFFFFFF << (uncompressed_bytes * 8));
+            buffer0[i] <<= (uncompressed_bytes * 8);
+            buffer1[i] <<= (uncompressed_bytes * 8);
+            
+            buffer0[i] |= uncompressed_bytes_buffer0[i] & mask;
+            buffer1[i] |= uncompressed_bytes_buffer1[i] & mask;
+        }
+        
+        buffer0[i] = buffer0[i] << SCALE24;
+        buffer1[i] = buffer1[i] << SCALE24;
+    }
+    
+}
 
 static inline int decode_frame_mono(
                     alac_file *alac,
@@ -641,9 +694,10 @@ static inline int decode_frame_mono(
     int hassize;
     int isnotcompressed;
     int readsamplesize;
+    int infosamplesize = alac->setinfo_sample_size;
     int outputsamples = alac->setinfo_max_samples_per_frame;
 
-    int wasted_bytes;
+    int uncompressed_bytes;
     int ricemodifier;
 
 
@@ -656,7 +710,8 @@ static inline int decode_frame_mono(
 
     hassize = readbits(alac, 1); /* the output sample size is stored soon */
 
-    wasted_bytes = readbits(alac, 2); /* unknown ? */
+    /* number of bytes in the (compressed) stream that are not compressed */
+    uncompressed_bytes = readbits(alac, 2);
 
     isnotcompressed = readbits(alac, 1); /* whether the frame is compressed */
 
@@ -667,7 +722,7 @@ static inline int decode_frame_mono(
         outputsamples = readbits(alac, 32);
     }
 
-    readsamplesize = alac->setinfo_sample_size - (wasted_bytes * 8);
+    readsamplesize = infosamplesize - (uncompressed_bytes * 8);
 
     if (!isnotcompressed)
     { /* so it is compressed */
@@ -693,24 +748,26 @@ static inline int decode_frame_mono(
             predictor_coef_table[i] = (int16_t)readbits(alac, 16);
         }
 
-        if (wasted_bytes)
+        if (uncompressed_bytes)
         {
-            /* these bytes seem to have something to do with
-             * > 2 channel files.
-             */
-            //fprintf(stderr, "FIXME: unimplemented, unhandling of wasted_bytes\n");
+            int i;
+            for (i = 0; i < outputsamples; i++)
+            {
+                outputbuffer[0][i] = readbits(alac, uncompressed_bytes * 8);
+                outputbuffer[1][i] = outputbuffer[0][i];
+            }
         }
 
         yield();
 
-        basterdised_rice_decompress(alac,
-                                    outputbuffer[0],
-                                    outputsamples,
-                                    readsamplesize,
-                                    alac->setinfo_rice_initialhistory,
-                                    alac->setinfo_rice_kmodifier,
-                                    ricemodifier * alac->setinfo_rice_historymult / 4,
-                                    (1 << alac->setinfo_rice_kmodifier) - 1);
+        entropy_rice_decode(alac,
+                            outputbuffer[0],
+                            outputsamples,
+                            readsamplesize,
+                            alac->setinfo_rice_initialhistory,
+                            alac->setinfo_rice_kmodifier,
+                            ricemodifier * alac->setinfo_rice_historymult / 4,
+                            (1 << alac->setinfo_rice_kmodifier) - 1);
 
         yield();
 
@@ -738,14 +795,14 @@ static inline int decode_frame_mono(
     }
     else
     { /* not compressed, easy case */
-        if (readsamplesize <= 16)
+        if (infosamplesize <= 16)
         {
             int i;
             for (i = 0; i < outputsamples; i++)
             {
-                int32_t audiobits = readbits(alac, readsamplesize);
+                int32_t audiobits = readbits(alac, infosamplesize);
 
-                audiobits = SIGN_EXTENDED32(audiobits, readsamplesize);
+                audiobits = SIGN_EXTENDED32(audiobits, infosamplesize);
 
                 outputbuffer[0][i] = audiobits;
             }
@@ -760,20 +817,19 @@ static inline int decode_frame_mono(
                 audiobits = readbits(alac, 16);
                 /* special case of sign extension..
                  * as we'll be ORing the low 16bits into this */
-                audiobits = audiobits << 16;
-                audiobits = audiobits >> (32 - readsamplesize);
-
-                audiobits |= readbits(alac, readsamplesize - 16);
+                audiobits = audiobits << (infosamplesize - 16);
+                audiobits |= readbits(alac, infosamplesize - 16);
+                audiobits = SIGNEXTEND24(audiobits);
 
                 outputbuffer[0][i] = audiobits;
             }
         }
-        /* wasted_bytes = 0; // unused */
+        uncompressed_bytes = 0; // always 0 for uncompressed
     }
 
     yield();
 
-    switch(alac->setinfo_sample_size)
+    switch(infosamplesize)
     {
     case 16:
     {
@@ -786,10 +842,29 @@ static inline int decode_frame_mono(
         }
         break;
     }
-    case 20:
     case 24:
+    {
+        int i;
+        for (i = 0; i < outputsamples; i++)
+        {
+            int32_t sample = outputbuffer[0][i];
+            
+            if (uncompressed_bytes)
+            {
+                uint32_t mask;
+                sample = sample << (uncompressed_bytes * 8);
+                mask = ~(0xFFFFFFFF << (uncompressed_bytes * 8));
+                sample |= outputbuffer[0][i] & mask;
+            }
+            
+            outputbuffer[0][i] = sample << SCALE24;
+            outputbuffer[1][i] = outputbuffer[0][i];
+        }
+        break;
+    }
+    case 20:
     case 32:
-        //fprintf(stderr, "FIXME: unimplemented sample size %i\n", alac->setinfo_sample_size);
+        //fprintf(stderr, "FIXME: unimplemented sample size %i\n", infosamplesize);
         break;
     default:
         break;
@@ -806,8 +881,9 @@ static inline int decode_frame_stereo(
     int hassize;
     int isnotcompressed;
     int readsamplesize;
+    int infosamplesize = alac->setinfo_sample_size;
     int outputsamples = alac->setinfo_max_samples_per_frame;
-    int wasted_bytes;
+    int uncompressed_bytes;
 
     uint8_t interlacing_shift;
     uint8_t interlacing_leftweight;
@@ -821,7 +897,8 @@ static inline int decode_frame_stereo(
 
     hassize = readbits(alac, 1); /* the output sample size is stored soon */
 
-    wasted_bytes = readbits(alac, 2); /* unknown ? */
+    /* the number of bytes in the (compressed) stream that are not compressed */
+    uncompressed_bytes = readbits(alac, 2);
 
     isnotcompressed = readbits(alac, 1); /* whether the frame is compressed */
 
@@ -832,7 +909,7 @@ static inline int decode_frame_stereo(
         outputsamples = readbits(alac, 32);
     }
 
-    readsamplesize = alac->setinfo_sample_size - (wasted_bytes * 8) + 1;
+    readsamplesize = infosamplesize - (uncompressed_bytes * 8) + 1;
 
     yield();
     if (!isnotcompressed)
@@ -879,21 +956,26 @@ static inline int decode_frame_stereo(
         }
 
         /*********************/
-        if (wasted_bytes)
+        if (uncompressed_bytes)
         { /* see mono case */
-            //fprintf(stderr, "FIXME: unimplemented, unhandling of wasted_bytes\n");
+            int i;
+            for (i = 0; i < outputsamples; i++)
+            {
+                outputbuffer[0][i] = readbits(alac, uncompressed_bytes * 8);
+                outputbuffer[1][i] = readbits(alac, uncompressed_bytes * 8);
+            }
         }
 
         yield();
         /* channel 1 */
-        basterdised_rice_decompress(alac,
-                                    outputbuffer[0],
-                                    outputsamples,
-                                    readsamplesize,
-                                    alac->setinfo_rice_initialhistory,
-                                    alac->setinfo_rice_kmodifier,
-                                    ricemodifier_a * alac->setinfo_rice_historymult / 4,
-                                    (1 << alac->setinfo_rice_kmodifier) - 1);
+        entropy_rice_decode(alac,
+                            outputbuffer[0],
+                            outputsamples,
+                            readsamplesize,
+                            alac->setinfo_rice_initialhistory,
+                            alac->setinfo_rice_kmodifier,
+                            ricemodifier_a * alac->setinfo_rice_historymult / 4,
+                            (1 << alac->setinfo_rice_kmodifier) - 1);
 
         yield();
         if (prediction_type_a == 0)
@@ -914,14 +996,14 @@ static inline int decode_frame_stereo(
         yield();
 
         /* channel 2 */
-        basterdised_rice_decompress(alac,
-                                    outputbuffer[1],
-                                    outputsamples,
-                                    readsamplesize,
-                                    alac->setinfo_rice_initialhistory,
-                                    alac->setinfo_rice_kmodifier,
-                                    ricemodifier_b * alac->setinfo_rice_historymult / 4,
-                                    (1 << alac->setinfo_rice_kmodifier) - 1);
+        entropy_rice_decode(alac,
+                            outputbuffer[1],
+                            outputsamples,
+                            readsamplesize,
+                            alac->setinfo_rice_initialhistory,
+                            alac->setinfo_rice_kmodifier,
+                            ricemodifier_b * alac->setinfo_rice_historymult / 4,
+                            (1 << alac->setinfo_rice_kmodifier) - 1);
 
         yield();
         if (prediction_type_b == 0)
@@ -941,18 +1023,18 @@ static inline int decode_frame_stereo(
     }
     else
     { /* not compressed, easy case */
-        if (alac->setinfo_sample_size <= 16)
+        if (infosamplesize <= 16)
         {
             int i;
             for (i = 0; i < outputsamples; i++)
             {
                 int32_t audiobits_a, audiobits_b;
 
-                audiobits_a = readbits(alac, alac->setinfo_sample_size);
-                audiobits_b = readbits(alac, alac->setinfo_sample_size);
+                audiobits_a = readbits(alac, infosamplesize);
+                audiobits_b = readbits(alac, infosamplesize);
 
-                audiobits_a = SIGN_EXTENDED32(audiobits_a, alac->setinfo_sample_size);
-                audiobits_b = SIGN_EXTENDED32(audiobits_b, alac->setinfo_sample_size);
+                audiobits_a = SIGN_EXTENDED32(audiobits_a, infosamplesize);
+                audiobits_b = SIGN_EXTENDED32(audiobits_b, infosamplesize);
 
                 outputbuffer[0][i] = audiobits_a;
                 outputbuffer[1][i] = audiobits_b;
@@ -966,27 +1048,27 @@ static inline int decode_frame_stereo(
                 int32_t audiobits_a, audiobits_b;
 
                 audiobits_a = readbits(alac, 16);
-                audiobits_a = audiobits_a << 16;
-                audiobits_a = audiobits_a >> (32 - alac->setinfo_sample_size);
-                audiobits_a |= readbits(alac, alac->setinfo_sample_size - 16);
+                audiobits_a = audiobits_a << (infosamplesize - 16);
+                audiobits_a |= readbits(alac, infosamplesize - 16);
+                audiobits_a = SIGNEXTEND24(audiobits_a);
 
                 audiobits_b = readbits(alac, 16);
-                audiobits_b = audiobits_b << 16;
-                audiobits_b = audiobits_b >> (32 - alac->setinfo_sample_size);
-                audiobits_b |= readbits(alac, alac->setinfo_sample_size - 16);
+                audiobits_b = audiobits_b << (infosamplesize - 16);
+                audiobits_b |= readbits(alac, infosamplesize - 16);
+                audiobits_b = SIGNEXTEND24(audiobits_b);
 
                 outputbuffer[0][i] = audiobits_a;
                 outputbuffer[1][i] = audiobits_b;
             }
         }
-        /* wasted_bytes = 0; */
+        uncompressed_bytes = 0; // always 0 for uncompressed
         interlacing_shift = 0;
         interlacing_leftweight = 0;
     }
 
     yield();
 
-    switch(alac->setinfo_sample_size)
+    switch(infosamplesize)
     {
     case 16:
     {
@@ -997,10 +1079,21 @@ static inline int decode_frame_stereo(
                        interlacing_leftweight);
         break;
     }
-    case 20:
     case 24:
+    {
+        deinterlace_24(outputbuffer[0],
+                       outputbuffer[1],
+                       uncompressed_bytes,
+                       outputbuffer[0],
+                       outputbuffer[1],
+                       outputsamples,
+                       interlacing_shift,
+                       interlacing_leftweight);            
+        break;
+    }
+    case 20:
     case 32:
-        //fprintf(stderr, "FIXME: unimplemented sample size %i\n", alac->setinfo_sample_size);
+        //fprintf(stderr, "FIXME: unimplemented sample size %i\n", infosamplesize);
         break;
     default:
         break;
