@@ -104,6 +104,14 @@
         <source>Success: modified firmware file created</source>
         <translation>Sucesso: criado arquivo de firmware modificado</translation>
     </message>
+    <message>
+        <source>No room to insert bootloader, try another firmware version</source>
+        <translation>Impossível inserir o inicializador, tente outra versão do firmware</translation>
+    </message>
+    <message>
+        <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
+        <translation>Para desinstalar, faça uma atualização normal com um firmware original não modificado</translation>
+    </message>
 </context>
 <context>
     <name>BootloaderInstallBase</name>
@@ -170,6 +178,18 @@
     <message>
         <source>&lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; You can safely install other parts first, but the above steps are &lt;b&gt;required&lt;/b&gt; to finish the installation!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Nota:&lt;/b&gt; Você pode, de forma segura, instalar outros componentes primeiro, porém, os passos acima são &lt;b&gt;necessários&lt;/b&gt; para se finalizar a instalação!&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Waiting for system to remount player</source>
+        <translation>Espere pelo sistema para remontar o reprodutor</translation>
+    </message>
+    <message>
+        <source>Player remounted</source>
+        <translation>Reprodutor remontando</translation>
+    </message>
+    <message>
+        <source>Timeout on remount</source>
+        <translation>Tempo de espera ao remontar</translation>
     </message>
 </context>
 <context>
@@ -358,17 +378,17 @@
     <message>
         <source>No Ipod detected
 Permission for disc access denied!</source>
-        <translation>Nenhum Ipod detectado
+        <translation type="obsolete">Nenhum Ipod detectado
 Permissão para acesso a disco negada!</translation>
     </message>
     <message>
         <source>No Ipod detected!</source>
-        <translation>Nenhum Ipod detectado!</translation>
+        <translation type="obsolete">Nenhum Ipod detectado!</translation>
     </message>
     <message>
         <source>Warning: This is a MacPod, Rockbox only runs on WinPods.
 See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
-        <translation>Atenção: Este é um MacPod, o Rockbox funciona somente em WinPods.
+        <translation type="obsolete">Atenção: Este é um MacPod, o Rockbox funciona somente em WinPods.
 Veja http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
@@ -426,6 +446,28 @@ Veja http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <message>
         <source>No firmware partition on disk</source>
         <translation>Nenhuma partição de firmware no disco</translation>
+    </message>
+    <message>
+        <source>Warning: This is a MacPod, Rockbox only runs on WinPods. 
+See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
+        <translation>Atenção: Este é um MacPod, O Rockbox roda somente em WinPods.
+Veja http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
+    </message>
+    <message>
+        <source>Bootloader Installation complete.</source>
+        <translation>Instalação do Inicializador completada.</translation>
+    </message>
+    <message>
+        <source>Writing log aborted</source>
+        <translation>Abortada a escrita do log</translation>
+    </message>
+    <message>
+        <source>Error: no mountpoint specified!</source>
+        <translation>Erro: nenhum ponto de montagem especificado!</translation>
+    </message>
+    <message>
+        <source>Could not open Ipod: permission denied</source>
+        <translation>Não foi possível abrir o Ipod: permissão negada</translation>
     </message>
 </context>
 <context>
@@ -550,12 +592,20 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
         <source>Disk is not a Sansa (Error %1), aborting.</source>
         <translation>Disco não é um Sansa (Erro %1), abortando.</translation>
     </message>
+    <message>
+        <source>Bootloader Installation complete.</source>
+        <translation>Instalação do Inicializador completada.</translation>
+    </message>
+    <message>
+        <source>Writing log aborted</source>
+        <translation>Abortada a escrita do log</translation>
+    </message>
 </context>
 <context>
     <name>BootloaderInstallTcc</name>
     <message>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons.Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
+        <translation type="obsolete">A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
     </message>
     <message>
         <source>Downloading bootloader file</source>
@@ -575,7 +625,7 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
     </message>
     <message>
         <source>Could patch firmware</source>
-        <translation>Não foi possível aplicar a correção ao firmware</translation>
+        <translation type="obsolete">Não foi possível aplicar a correção ao firmware</translation>
     </message>
     <message>
         <source>Could not open %1 for writing</source>
@@ -588,6 +638,14 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
     <message>
         <source>Success: modified firmware file created</source>
         <translation>Sucesso: criado arquivo de firmware modificado</translation>
+    </message>
+    <message>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki page on how to obtain the file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; e a &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; página wiki para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
+    </message>
+    <message>
+        <source>Could not patch firmware</source>
+        <translation>Não foi possível escrever o arquivo de firmware</translation>
     </message>
 </context>
 <context>
@@ -1072,59 +1130,59 @@ Por favor, configure o motor TTS.</translation>
     <name>Install</name>
     <message>
         <source>Backup to %1</source>
-        <translation>Cópia de segurança em %1</translation>
+        <translation type="obsolete">Cópia de segurança em %1</translation>
     </message>
     <message>
         <source>Mount point is wrong!</source>
-        <translation>O ponto de montagem está encorreto!</translation>
+        <translation type="obsolete">O ponto de montagem está encorreto!</translation>
     </message>
     <message>
         <source>Really continue?</source>
-        <translation>Realmente continuar?</translation>
+        <translation type="obsolete">Realmente continuar?</translation>
     </message>
     <message>
         <source>Aborted!</source>
-        <translation>Abortado!</translation>
+        <translation type="obsolete">Abortado!</translation>
     </message>
     <message>
         <source>Beginning Backup...</source>
-        <translation>Iniciando Cópia de Segurança...</translation>
+        <translation type="obsolete">Iniciando Cópia de Segurança...</translation>
     </message>
     <message>
         <source>Backup successful</source>
-        <translation>Cópia de Segurança realizada com sucesso</translation>
+        <translation type="obsolete">Cópia de Segurança realizada com sucesso</translation>
     </message>
     <message>
         <source>Backup failed!</source>
-        <translation>Cópia de Segurança falhou!</translation>
+        <translation type="obsolete">Cópia de Segurança falhou!</translation>
     </message>
     <message>
         <source>Select Backup Filename</source>
-        <translation>Selecione Nome do Arquivo da Cópia de Segurança</translation>
+        <translation type="obsolete">Selecione Nome do Arquivo da Cópia de Segurança</translation>
     </message>
     <message>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation>Esta é a compilação do Rockbox mais recente. Uma compilação atual será atualizada toda vez que um mudança é efetuada. A versão mais recente é r%1 (%2).</translation>
+        <translation type="obsolete">Esta é a compilação do Rockbox mais recente. Uma compilação atual será atualizada toda vez que um mudança é efetuada. A versão mais recente é r%1 (%2).</translation>
     </message>
     <message>
         <source>&lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Esta é a versão recomendada.&lt;/b&gt;</translation>
+        <translation type="obsolete">&lt;b&gt;Esta é a versão recomendada.&lt;/b&gt;</translation>
     </message>
     <message>
         <source>This is the last released version of Rockbox.</source>
-        <translation>Está é a última versão lançada do Rockbox.</translation>
+        <translation type="obsolete">Está é a última versão lançada do Rockbox.</translation>
     </message>
     <message>
         <source>&lt;b&gt;Note:&lt;/b&gt; The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Nota:&lt;/b&gt; A última versão liberada é %1. &lt;b&gt;Está é a versão recomendada.&lt;/b&gt;</translation>
+        <translation type="obsolete">&lt;b&gt;Nota:&lt;/b&gt; A última versão liberada é %1. &lt;b&gt;Está é a versão recomendada.&lt;/b&gt;</translation>
     </message>
     <message>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
-        <translation>Estas são construidas automaticamente todos os dias a partir do código fonte de desenvolvimento atual. Esta, geralmente, tem mais funcionalidades do que a última versão estável mas pode ser bem menos estável. Funcionalidades podem mudar com frequência.</translation>
+        <translation type="obsolete">Estas são construidas automaticamente todos os dias a partir do código fonte de desenvolvimento atual. Esta, geralmente, tem mais funcionalidades do que a última versão estável mas pode ser bem menos estável. Funcionalidades podem mudar com frequência.</translation>
     </message>
     <message>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation>&lt;b&gt;Nota:&lt;/b&gt; a versão arquivada é r%1 (%2).</translation>
+        <translation type="obsolete">&lt;b&gt;Nota:&lt;/b&gt; a versão arquivada é r%1 (%2).</translation>
     </message>
 </context>
 <context>
@@ -1286,6 +1344,65 @@ Por favor, configure o motor TTS.</translation>
     <message>
         <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Selecionado codificador: &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>InstallWindow</name>
+    <message>
+        <source>Backup to %1</source>
+        <translation>Cópia de segurança em %1</translation>
+    </message>
+    <message>
+        <source>Mount point is wrong!</source>
+        <translation>O ponto de montagem está incorreto!</translation>
+    </message>
+    <message>
+        <source>Really continue?</source>
+        <translation>Realmente continuar?</translation>
+    </message>
+    <message>
+        <source>Aborted!</source>
+        <translation>Abortado!</translation>
+    </message>
+    <message>
+        <source>Beginning Backup...</source>
+        <translation>Iniciando Cópia de Segurança...</translation>
+    </message>
+    <message>
+        <source>Backup successful</source>
+        <translation>Cópia de segurança efetuado com sucesso</translation>
+    </message>
+    <message>
+        <source>Backup failed!</source>
+        <translation>Cópia de segurança falhou!</translation>
+    </message>
+    <message>
+        <source>Select Backup Filename</source>
+        <translation>Selecione Nome do Arquivo da Cópia de Segurança</translation>
+    </message>
+    <message>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
+        <translation>Esta é a compilação do Rockbox mais recente. Uma compilação atual será atualizada toda vez que um mudança é efetuada. A versão mais recente é r%1 (%2).</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Esta é a versão recomendada.&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>This is the last released version of Rockbox.</source>
+        <translation>Está é a última versão lançada do Rockbox.</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Note:&lt;/b&gt; The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Nota:&lt;/b&gt; A última versão liberada é %1. &lt;b&gt;Está é a versão recomendada.&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
+        <translation>Estas são construidas automaticamente todos os dias a partir do código fonte de desenvolvimento atual. Esta, geralmente, tem mais funcionalidades do que a última versão estável mas pode ser bem menos estável. Funcionalidades podem mudar com frequência.</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
+        <translation>&lt;b&gt;Nota:&lt;/b&gt; a versão arquivada é r%1 (%2).</translation>
     </message>
 </context>
 <context>
@@ -1851,7 +1968,7 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     </message>
     <message>
         <source>Abou&amp;t</source>
-        <translation>So&amp;bre</translation>
+        <translation type="obsolete">So&amp;bre</translation>
     </message>
     <message>
         <source>Action&amp;s</source>
@@ -1972,6 +2089,25 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     <message>
         <source>System &amp;Trace</source>
         <translation>&amp;Trace do Sistema</translation>
+    </message>
+</context>
+<context>
+    <name>ServerInfo</name>
+    <message>
+        <source>Unknown</source>
+        <translation>Desconhecido</translation>
+    </message>
+    <message>
+        <source>Unusable</source>
+        <translation>Inutilizável</translation>
+    </message>
+    <message>
+        <source>Unstable</source>
+        <translation>Instável</translation>
+    </message>
+    <message>
+        <source>Stable</source>
+        <translation>Estável</translation>
     </message>
 </context>
 <context>
@@ -2171,7 +2307,7 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     </message>
     <message>
         <source>Cleaning up..</source>
-        <translation>Limpando..</translation>
+        <translation type="obsolete">Limpando..</translation>
     </message>
     <message>
         <source>Copying Talkfiles...</source>
@@ -2184,6 +2320,10 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     <message>
         <source>Finished</source>
         <translation>Finalizado</translation>
+    </message>
+    <message>
+        <source>Cleaning up...</source>
+        <translation>Limpando...</translation>
     </message>
 </context>
 <context>
@@ -2459,15 +2599,23 @@ código de resposta HTTP: %1</translation>
     </message>
     <message>
         <source>Uninstalling </source>
-        <translation>Desinstalando</translation>
+        <translation type="obsolete">Desinstalando</translation>
     </message>
     <message>
         <source>Could not delete: </source>
-        <translation>Não foi possível apagar:</translation>
+        <translation type="obsolete">Não foi possível apagar:</translation>
     </message>
     <message>
         <source>Uninstallation finished</source>
         <translation>Desinstalação finalizada</translation>
+    </message>
+    <message>
+        <source>Uninstalling %1...</source>
+        <translation>Desinstalando %1...</translation>
+    </message>
+    <message>
+        <source>Could not delete %1</source>
+        <translation>Não foi possível apagar %1</translation>
     </message>
 </context>
 <context>
