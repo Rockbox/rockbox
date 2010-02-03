@@ -260,7 +260,7 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
@@ -12215,11 +12215,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Definir como Tela Rápida Esquerda"
+    quickscreen: "Definir como Tela Rápida À Esquerda"
   </dest>
   <voice>
     *: none
-    quickscreen: "Definir como Tela Rápida Esquerda"
+    quickscreen: "Definir como Tela Rápida À Esquerda"
   </voice>
 </phrase>
 <phrase>
@@ -12232,11 +12232,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Definir como Tela Rápida Direita"
+    quickscreen: "Definir como Tela Rápida À Direita"
   </dest>
   <voice>
     *: none
-    quickscreen: "Definir como Tela Rápida Direita"
+    quickscreen: "Definir como Tela Rápida À Direita"
   </voice>
 </phrase>
 <phrase>
@@ -12249,11 +12249,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Definir como Botão de Tela Rápida"
+    quickscreen: "Definir como Tela Rápida Para Baixo"
   </dest>
   <voice>
     *: none
-    quickscreen: "Definir como Botão de Tela Rápida"
+    quickscreen: "Definir como Tela Rápida Para Baixo"
   </voice>
 </phrase>
 <phrase>
@@ -12735,11 +12735,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Ajustar como Item Topo de Tela Rápida"
+    quickscreen: "Definir como Tela Rápida Para Cima"
   </dest>
   <voice>
     *: none
-    quickscreen: "Ajustar como Item Topo de Tela Rápida"
+    quickscreen: "Definir como Tela Rápida Para Cima"
   </voice>
 </phrase>
 <phrase>
@@ -13124,5 +13124,115 @@
   </dest>
   <voice>
     *: "Embaralhar e Enfileirar como Último"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Usar Código Morse Como Entrada"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Usar Código Morse Como Entrada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Apenas Mudança Automática de Faixa"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Apenas Mudança Automática de Faixa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Próxima Faixa:"
+  </dest>
+  <voice>
+    *: "Próxima Faixa:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "Próxima:"
+  </dest>
+  <voice>
+    *: "Próxima:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "de"
+  </dest>
+  <voice>
+    *: "de"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Skin Base"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Skin Base"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Skin Base Remota"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Skin Base Remota"
   </voice>
 </phrase>
