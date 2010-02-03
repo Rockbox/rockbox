@@ -242,30 +242,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CONFIRM_WITH_BUTTON
-  desc: Generic string to use to confirm
-  user: core
-  <source>
-    *: "PLAY = Yes"
-    cowond2*: "MENU, or top-right = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
-    mrobe500: "PLAY, POWER, or top-right = Yes"
-    archosplayer: "(PLAY/STOP)"
-  </source>
-  <dest>
-    *: "PLAY = Devam et"
-    cowond2*: "MENU, or top-right = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Devam et"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
-    mrobe500: "PLAY, POWER, or top-right = Yes"
-    archosplayer: "(PLAY/STOP)"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CANCEL_WITH_ANY
   desc: Generic string to use to cancel
   user: core
@@ -1121,23 +1097,6 @@
   <voice>
     *: none
     masf: "Özdevimli Ses Yüksekliği"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DECAY
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "AV Decay Time"
-  </source>
-  <dest>
-    *: none
-    masf: "AV Decay Time"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -2019,26 +1978,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTONLIGHT_TIMEOUT
-  desc: in settings_menu
-  user: core
-  <source>
-    *: none
-    button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
-  </source>
-  <dest>
-    *: none
-    button_light: "Düğme Işığı Zaman Aşımı"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
-  </dest>
-  <voice>
-    *: none
-    button_light: ""
-    sansafuze*,sansae200*: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BUTTONLIGHT_BRIGHTNESS
   desc: in settings_menu
   user: core
@@ -2121,30 +2060,6 @@
   <voice>
     *: none
     rtc: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TIME_SET_BUTTON
-  desc: used in set_time()
-  user: core
-  <source>
-    *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
-  </source>
-  <dest>
-    *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
-  </dest>
-  <voice>
-    *: none
   </voice>
 </phrase>
 <phrase>
