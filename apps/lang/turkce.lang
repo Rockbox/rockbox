@@ -242,6 +242,24 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_CONFIRM_WITH_BUTTON
+  desc: Generic string to use to confirm
+  user: core
+  <source>
+    *: "PLAY = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    archosplayer: "(PLAY/STOP)"
+  </source>
+  <dest>
+    *: "PLAY = Devam et"
+    iriverh100,iriverh120,iriverh300: "NAVI = Devam et"
+    archosplayer: "(PLAY/STOP)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
   id: LANG_CANCEL_WITH_ANY
   desc: Generic string to use to cancel
   user: core
@@ -1978,6 +1996,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    button_light: "Button Light Timeout"
+  </source>
+  <dest>
+    *: none
+    button_light: "Düğme Işığı Zaman Aşımı"
+  </dest>
+  <voice>
+    *: none
+    button_light: ""
+  </voice>
+</phrase>
+<phrase>
   id: LANG_BUTTONLIGHT_BRIGHTNESS
   desc: in settings_menu
   user: core
@@ -2060,6 +2095,26 @@
   <voice>
     *: none
     rtc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_SET_BUTTON
+  desc: used in set_time()
+  user: core
+  <source>
+    *: none
+    rtc: "ON = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    gogearsa9200: "PLAY = Set"
+  </source>
+  <dest>
+    *: none
+    rtc: "ON = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    gogearsa9200: ""
+  </dest>
+  <voice>
+    *: none
   </voice>
 </phrase>
 <phrase>
