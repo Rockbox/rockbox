@@ -89,7 +89,7 @@ static inline void XNPROD31(int32_t  a, int32_t  b,
 #define XPROD31_R(_a, _b, _t, _v, _x, _y)\
 {\
   int x1, y1, l;\
-  asm volatile(	"smull	%0, %1, %3, %5\n\t"\
+  asm(	"smull	%0, %1, %3, %5\n\t"\
 	"rsb	%2, %6, #0\n\t"\
 	"smlal	%0, %1, %4, %6\n\t"\
 	"smull	%0, %2, %3, %2\n\t"\
@@ -103,7 +103,7 @@ static inline void XNPROD31(int32_t  a, int32_t  b,
 #define XNPROD31_R(_a, _b, _t, _v, _x, _y)\
 {\
   int x1, y1, l;\
-  asm volatile(	"smull	%0, %1, %3, %5\n\t"\
+  asm(	"smull	%0, %1, %3, %5\n\t"\
 	"rsb	%2, %4, #0\n\t"\
 	"smlal	%0, %1, %2, %6\n\t"\
 	"smull	%0, %2, %4, %5\n\t"\
