@@ -45,13 +45,13 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
 #define XPROD32(a, b, t, v, x, y) \
 { \
   long l; \
-  asm(	"smull	%0, %1, %4, %6\n\t" \
-	"rsb	%3, %4, #0\n\t" \
-	"smlal	%0, %1, %5, %7\n\t" \
-	"smull	%0, %2, %5, %6\n\t" \
-	"smlal	%0, %2, %3, %7" \
-	: "=&r" (l), "=&r" (x), "=&r" (y), "=r" ((a)) \
-        : "3" ((a)), "r" ((b)), "r" ((t)), "r" ((v)) ); \
+  asm(	"smull	%0, %1, %3, %5\n\t" \
+	"rsb	%2, %6, #0\n\t" \
+	"smlal	%0, %1, %4, %6\n\t" \
+	"smull	%0, %2, %3, %2\n\t" \
+	"smlal	%0, %2, %4, %5" \
+	: "=&r" (l), "=&r" (x), "=&r" (y) \
+        : "r" ((a)), "r" ((b)), "r" ((t)), "r" ((v)) ); \
 }
 
 static inline void XPROD31(int32_t  a, int32_t  b,
@@ -59,13 +59,13 @@ static inline void XPROD31(int32_t  a, int32_t  b,
 			   int32_t *x, int32_t *y)
 {
   int x1, y1, l;
-  asm(	"smull	%0, %1, %4, %6\n\t"
-	"rsb	%3, %4, #0\n\t"
-	"smlal	%0, %1, %5, %7\n\t"
-	"smull	%0, %2, %5, %6\n\t"
-	"smlal	%0, %2, %3, %7"
-	: "=&r" (l), "=&r" (x1), "=&r" (y1), "=r" (a)
-	: "3" (a), "r" (b), "r" (t), "r" (v) );
+  asm(	"smull	%0, %1, %3, %5\n\t"
+	"rsb	%2, %6, #0\n\t"
+	"smlal	%0, %1, %4, %6\n\t"
+	"smull	%0, %2, %3, %2\n\t"
+	"smlal	%0, %2, %4, %5"
+	: "=&r" (l), "=&r" (x1), "=&r" (y1)
+	: "r" (a), "r" (b), "r" (t), "r" (v) );
   *x = x1 << 1;
   *y = y1 << 1;
 }
