@@ -111,7 +111,7 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* Amiga MOD File */
     [AFMT_MOD] =
         AFMT_ENTRY("MOD",  "mod",     NULL,          "mod\0"      ),
-    /* Amiga SAP File */
+    /* Atari SAP File */
     [AFMT_SAP] =
         AFMT_ENTRY("SAP",  "asap",     NULL,          "sap\0"      ),
     /* Cook in RM/RA */

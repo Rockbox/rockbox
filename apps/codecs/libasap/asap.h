@@ -1,7 +1,7 @@
 /*
- * asap.h - public interface of the ASAP engine
+ * asap.h - public interface of ASAP
  *
- * Copyright (C) 2005-2008  Piotr Fusik
+ * Copyright (C) 2005-2010  Piotr Fusik
  *
  * This file is part of ASAP (Another Slight Atari Player),
  * see http://asap.sourceforge.net
@@ -29,17 +29,19 @@ extern "C" {
 #endif
 
 /* ASAP version. */
-#define ASAP_VERSION_MAJOR   1
-#define ASAP_VERSION_MINOR   2
+#define ASAP_VERSION_MAJOR   2
+#define ASAP_VERSION_MINOR   1
 #define ASAP_VERSION_MICRO   0
-#define ASAP_VERSION         "1.2.0"
+#define ASAP_VERSION         "2.1.0"
 
 /* Short credits of the ASAP engine. */
-#define ASAP_YEARS           "2005-2008"
+#define ASAP_YEARS           "2005-2010"
 #define ASAP_CREDITS \
-	"Another Slight Atari Player (C) 2005-2008 Piotr Fusik\n" \
-	"CMC, MPT, TMC players (C) 1994-2005 Marcin Lewandowski\n" \
-	"RMT player (C) 2002-2005 Radek Sterba\n"
+	"Another Slight Atari Player (C) 2005-2010 Piotr Fusik\n" \
+	"CMC, MPT, TMC, TM2 players (C) 1994-2005 Marcin Lewandowski\n" \
+	"RMT player (C) 2002-2005 Radek Sterba\n" \
+	"DLT player (C) 2009 Marek Konopka\n" \
+	"CMS player (C) 1999 David Spilka\n"
 
 /* Short GPL notice.
    Display after the credits. */
@@ -48,6 +50,32 @@ extern "C" {
 	"it under the terms of the GNU General Public License as published\n" \
 	"by the Free Software Foundation; either version 2 of the License,\n" \
 	"or (at your option) any later version."
+
+/* Maximum length of AUTHOR, NAME and DATE tags including the terminator. */
+#define ASAP_INFO_CHARS         128
+
+/* Maximum length of a "mm:ss.xxx" string including the terminator. */
+#define ASAP_DURATION_CHARS     10
+
+/* Maximum length of a supported input file.
+   You can assume that files longer than this are not supported by ASAP. */
+#define ASAP_MODULE_MAX         65000
+
+/* Maximum number of songs in a file. */
+#define ASAP_SONGS_MAX          32
+
+/* Output sample rate. */
+#define ASAP_SAMPLE_RATE        44100
+
+/* WAV file header length. */
+#define ASAP_WAV_HEADER_BYTES   44
+
+/* Output formats. */
+typedef enum {
+	ASAP_FORMAT_U8 = 8,       /* unsigned char */
+	ASAP_FORMAT_S16_LE = 16,  /* signed short, little-endian */
+	ASAP_FORMAT_S16_BE = -16  /* signed short, big-endian */
+} ASAP_SampleFormat;
 
 /* Useful type definitions. */
 #ifndef FALSE
@@ -59,24 +87,25 @@ extern "C" {
 typedef int abool;
 typedef unsigned char byte;
 
-/* Information about a file. */
+/* Information about a music file. */
 typedef struct {
-	char author[128];    /* author's name */
-	char name[128];      /* title */
-	char date[128];      /* creation date */
-	int channels;        /* 1 for mono or 2 for stereo */
-	int songs;           /* number of subsongs */
-	int default_song;    /* 0-based index of the "main" subsong */
-	int durations[32];   /* lengths of songs, in milliseconds, -1 = unspecified */
-	abool loops[32];     /* whether songs repeat or not */
+	char author[ASAP_INFO_CHARS];  /* author's name */
+	char name[ASAP_INFO_CHARS];    /* title */
+	char date[ASAP_INFO_CHARS];    /* creation date */
+	int channels;                  /* 1 for mono or 2 for stereo */
+	int songs;                     /* number of subsongs */
+	int default_song;              /* 0-based index of the "main" subsong */
+	int durations[ASAP_SONGS_MAX]; /* lengths of songs, in milliseconds, -1 = indeterminate */
+	abool loops[ASAP_SONGS_MAX];   /* whether songs repeat or not */
 	/* the following technical information should not be used outside ASAP. */
-	char type;
+	int type;
 	int fastplay;
 	int music;
 	int init;
 	int player;
+	int covox_addr;
 	int header_len;
-	byte song_pos[128];
+	byte song_pos[ASAP_SONGS_MAX];
 } ASAP_ModuleInfo;
 
 /* POKEY state.
@@ -117,7 +146,7 @@ typedef struct {
 	int delta3;
 	int delta4;
 	int skctl;
-	signed char delta_buffer[888];
+	int delta_buffer[888];
 } PokeyState;
 
 /* Player state.
@@ -140,6 +169,8 @@ typedef struct {
 	int timer4_cycle;
 	int irqst;
 	int extra_pokey_mask;
+	int consol;
+	byte covox[4];
 	PokeyState base_pokey;
 	PokeyState extra_pokey;
 	int sample_offset;
@@ -159,23 +190,6 @@ typedef struct {
 	byte poly17_lookup[16385];
 	byte memory[65536];
 } ASAP_State;
-
-/* Maximum length of a "mm:ss.xxx" string including the terminator. */
-#define ASAP_DURATION_CHARS  10
-
-/* Maximum length of a supported input file.
-   You can assume that files longer than this are not supported by ASAP. */
-#define ASAP_MODULE_MAX      65000
-
-/* Output sample rate. */
-#define ASAP_SAMPLE_RATE     44100
-
-/* Output formats. */
-typedef enum {
-	ASAP_FORMAT_U8 = 8,       /* unsigned char */
-	ASAP_FORMAT_S16_LE = 16,  /* signed short, little-endian */
-	ASAP_FORMAT_S16_BE = -16  /* signed short, big-endian */
-} ASAP_SampleFormat;
 
 /* Parses the string in the "mm:ss.xxx" format
    and returns the number of milliseconds or -1 if an error occurs. */
@@ -203,7 +217,7 @@ abool ASAP_GetModuleInfo(ASAP_ModuleInfo *module_info, const char *filename,
                          const byte module[], int module_len);
 
 /* Loads music data.
-   "as" is the destination structure.
+   "ast" is the destination structure.
    "filename" determines file format.
    "module" is the music data (contents of the file).
    "module_len" is the number of data bytes.
@@ -212,39 +226,50 @@ abool ASAP_GetModuleInfo(ASAP_ModuleInfo *module_info, const char *filename,
    ASAP_Load() returns true on success.
    If false is returned, the structure is invalid and you cannot
    call the following functions. */
-abool ASAP_Load(ASAP_State *as, const char *filename,
+abool ASAP_Load(ASAP_State *ast, const char *filename,
                 const byte module[], int module_len);
 
 /* Enables silence detection.
    Makes ASAP finish playing after the specified period of silence.
-   "as" is ASAP state initialized by ASAP_Load().
+   "ast" is ASAP state initialized by ASAP_Load().
    "seconds" is the minimum length of silence that ends playback. */
-void ASAP_DetectSilence(ASAP_State *as, int seconds);
+void ASAP_DetectSilence(ASAP_State *ast, int seconds);
 
 /* Prepares ASAP to play the specified song of the loaded module.
-   "as" is ASAP state initialized by ASAP_Load().
+   "ast" is ASAP state initialized by ASAP_Load().
    "song" is a zero-based index which must be less than the "songs" field
    of the ASAP_ModuleInfo structure.
    "duration" is playback time in milliseconds - use durations[song]
    unless you want to override it. -1 means indefinitely. */
-void ASAP_PlaySong(ASAP_State *as, int song, int duration);
+void ASAP_PlaySong(ASAP_State *ast, int song, int duration);
 
 /* Mutes the selected POKEY channels.
    This is only useful for people who want to grab samples of individual
    instruments.
-   "as" is ASAP state after calling ASAP_PlaySong().
+   "ast" is ASAP state after calling ASAP_PlaySong().
    "mask" is a bit mask which selects POKEY channels to be muted.
    Bits 0-3 control the base POKEY channels,
    bits 4-7 control the extra POKEY channels. */
-void ASAP_MutePokeyChannels(ASAP_State *as, int mask);
+void ASAP_MutePokeyChannels(ASAP_State *ast, int mask);
+
+/* Returns current position in milliseconds.
+   "ast" is ASAP state initialized by ASAP_PlaySong(). */
+int ASAP_GetPosition(const ASAP_State *ast);
 
 /* Rewinds the current song.
-   "as" is ASAP state initialized by ASAP_PlaySong().
+   "ast" is ASAP state initialized by ASAP_PlaySong().
    "position" is the requested absolute position in milliseconds. */
-void ASAP_Seek(ASAP_State *as, int position);
+void ASAP_Seek(ASAP_State *ast, int position);
+
+/* Fills the specified buffer with WAV file header.
+   "ast" is ASAP state initialized by ASAP_PlaySong() with a positive "duration".
+   "buffer" is buffer of ASAP_WAV_HEADER_BYTES bytes.
+   "format" is the format of samples. */
+void ASAP_GetWavHeader(const ASAP_State *ast, byte buffer[],
+                       ASAP_SampleFormat format);
 
 /* Fills the specified buffer with generated samples.
-   "as" is ASAP state initialized by ASAP_PlaySong().
+   "ast" is ASAP state initialized by ASAP_PlaySong().
    "buffer" is the destination buffer.
    "buffer_len" is the length of this buffer in bytes.
    "format" is the format of samples.
@@ -252,7 +277,7 @@ void ASAP_Seek(ASAP_State *as, int position);
    (less than buffer_len if reached the end of the song).
    Normally you use a buffer of a few kilobytes or less,
    and call ASAP_Generate() in a loop or via a callback. */
-int ASAP_Generate(ASAP_State *as, void *buffer, int buffer_len,
+int ASAP_Generate(ASAP_State *ast, void *buffer, int buffer_len,
                   ASAP_SampleFormat format);
 
 /* Checks whether information in the specified file can be edited. */

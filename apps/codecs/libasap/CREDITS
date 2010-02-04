@@ -1,37 +1,58 @@
-People who have contributed to ASAP
------------------------------------
+Authors
+-------
 
-Atari800 Development Team  (http://atari800.sourceforge.net)
-* 6502 and POKEY emulation used in 0.x.y versions of ASAP
+Piotr Fusik {asapwww!<fox@scene.pl>}::
+Creator and main developer.
 
-Zdenek Eisenhammer  <pg@pinknet.cz>
-* testing
+Atari800 Emulator Developers {asapwww!(http://atari800.sourceforge.net)}::
+6502 and POKEY emulation used in 0.x.y versions of ASAP.
 
-Piotr Fusik  <fox@scene.pl>
-* author and maintainer of ASAP
+Zdenek Eisenhammer {asapwww!<pg@pinknet.cz>}::
+Testing.
 
-Maciek Konecki  <maciusk1@wp.pl>
-* porting to C#
+Henryk Karpowicz {asapwww!<henkar@poczta.tygrys.net>}::
+CMC routine modified for the CM3 format.
 
-Marcin Lewandowski  <jaskier@atari8.info>
-* 6502 routines for playing CMC, MPT, TMC and TM2
+Maciek Konecki {asapwww!<maciusk1@wp.pl>}::
+Porting to C#.
 
-Perry McFarlane  <perry_m@fastmail.fm>
-* POKEY reverse-engineering
+Marek Konopka {asapwww!<konop11@poczta.onet.pl>}::
+6502 routine for playing DLT.
 
-Kostas Nakos  <knakos@gmail.com>
-* compilation for Windows CE
+Marcin Lewandowski {asapwww!<jaskier@atari8.info>}::
+6502 routines for playing CMC, MPT, TMC and TM2.
 
-Slawomir Sledz  <slaves@scene.pl>
-* testing
+Adrian Matoga {asapwww!<epi@atari8.info>}::
+COVOX information and test files. Testing.
 
-Radek Sterba  <raster@infos.cz>
-* 6502 routine for playing RMT
-* testing
+Perry McFarlane {asapwww!<perry_m@fastmail.fm>}::
+POKEY reverse-engineering.
 
-Lukasz Sychowicz  <xray@scene.pl>
-* Windows icons
-* testing
+Kostas Nakos {asapwww!<knakos@gmail.com>}::
+Windows CE testing.
 
-Michal Szpilowski  <miker@atari.pl>
-* testing
+Mariusz Rozwadowski {asapwww!<ramosc64@o2.pl>}::
+Suggested CMS, CM3 and DLT format support.
+
+Slawomir Sledz {asapwww!<slaves@scene.pl>}::
+Testing.
+
+David Spilka::
+6502 routine for playing CMS.
+
+Radek Sterba {asapwww!<raster@infos.cz>}::
+6502 routine for playing RMT.
+Testing.
+
+Lukasz Sychowicz {asapwww!<xray@scene.pl>}::
+Windows icons.
+Testing.
+
+Pawel Szewczyk {asapwww!<ripek@op.pl>}::
+Windows setup graphics.
+
+Michal Szpilowski {asapwww!<miker@atari.pl>}::
+Testing.
+
+Grzegorz Zyla {asapwww!<gsunr@poczta.onet.pl>}::
+XBMC plugin testing.
