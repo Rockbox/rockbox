@@ -273,7 +273,7 @@ void init_board(void) {
             compres.inds++;
         }
     }
-    while(humanres.farms<superdom_settings.humanstartfarms) {
+    while(humanres.farms < superdom_settings.humanstartfarms) {
         i = rb->rand()%10 + 1;
         j = rb->rand()%10 + 1;
         if((board[i][j].colour == COLOUR_LIGHT)&&(board[i][j].farm == false)) {
@@ -281,7 +281,7 @@ void init_board(void) {
             humanres.farms++;
         }
     }
-    while(humanres.inds<superdom_settings.humanstartfarms) {
+    while(humanres.inds < superdom_settings.humanstartinds) {
         i = rb->rand()%10 + 1;
         j = rb->rand()%10 + 1;
         if((board[i][j].colour == COLOUR_LIGHT) && (board[i][j].ind == false)) {
@@ -660,7 +660,7 @@ int save_game(void) {
     rb->write(fd, &superdom_settings.compstartfarms, sizeof(int));
     rb->write(fd, &superdom_settings.compstartinds, sizeof(int));
     rb->write(fd, &superdom_settings.humanstartfarms, sizeof(int));
-    rb->write(fd, &superdom_settings.humanstartfarms, sizeof(int));
+    rb->write(fd, &superdom_settings.humanstartinds, sizeof(int));
     rb->write(fd, &superdom_settings.startcash, sizeof(int));
     rb->write(fd, &superdom_settings.startfood, sizeof(int));
     rb->write(fd, &superdom_settings.movesperturn, sizeof(int));
@@ -1969,7 +1969,7 @@ static int load_game(const char* file) {
     rb->read(fd, &superdom_settings.compstartfarms, sizeof(int));
     rb->read(fd, &superdom_settings.compstartinds, sizeof(int));
     rb->read(fd, &superdom_settings.humanstartfarms, sizeof(int));
-    rb->read(fd, &superdom_settings.humanstartfarms, sizeof(int));
+    rb->read(fd, &superdom_settings.humanstartinds, sizeof(int));
     rb->read(fd, &superdom_settings.startcash, sizeof(int));
     rb->read(fd, &superdom_settings.startfood, sizeof(int));
     rb->read(fd, &superdom_settings.movesperturn, sizeof(int));
