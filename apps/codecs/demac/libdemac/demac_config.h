@@ -91,10 +91,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 /* Defaults */
 
-#ifndef UDIV32
-#define UDIV32(a, b) (a / b)
-#endif
-
 #ifndef FILTER_HISTORY_SIZE
 #define FILTER_HISTORY_SIZE 512
 #endif
@@ -109,6 +105,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 
 #ifndef __ASSEMBLER__
+
+#if defined(CPU_ARM) && (ARM_ARCH < 5 || defined(USE_IRAM))
+/* optimised unsigned integer division for ARMv4, in IRAM */
+unsigned udiv32_arm(unsigned a, unsigned b);
+#define UDIV32(a, b) udiv32_arm(a, b)
+#else
+/* default */
+#define UDIV32(a, b) (a / b)
+#endif
+
 #include <inttypes.h>
 #if FILTER_BITS == 32
 typedef int32_t filter_int;

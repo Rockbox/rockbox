@@ -2,6 +2,7 @@ crc.c
 predictor.c
 #ifdef CPU_ARM
 predictor-arm.S
+udiv32_arm.S
 #elif defined CPU_COLDFIRE
 predictor-cf.S
 #endif

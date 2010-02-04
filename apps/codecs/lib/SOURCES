@@ -7,7 +7,6 @@ mdct_lookup.c
 #ifdef CPU_ARM
 mdct_arm.S
 setjmp_arm.S
-udiv32_arm.S
 ../../../firmware/target/arm/support-arm.S
 #endif
 
