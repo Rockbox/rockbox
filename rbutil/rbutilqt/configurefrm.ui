@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>ConfigForm</class>
- <widget class="QDialog" name="ConfigForm" >
-  <property name="geometry" >
+ <widget class="QDialog" name="ConfigForm">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,195 +10,215 @@
     <height>465</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Configuration</string>
   </property>
-  <layout class="QGridLayout" >
-   <item row="0" column="0" colspan="3" >
-    <widget class="QLabel" name="labelTitle" >
-     <property name="text" >
+  <layout class="QGridLayout">
+   <item row="0" column="0" colspan="3">
+    <widget class="QLabel" name="labelTitle">
+     <property name="text">
       <string>Configure Rockbox Utility</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="3" >
-    <widget class="QTabWidget" name="tabConfiguration" >
-     <property name="currentIndex" >
+   <item row="1" column="0" colspan="3">
+    <widget class="QTabWidget" name="tabConfiguration">
+     <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tabDevice" >
-      <attribute name="title" >
-       <string>&amp;Device</string>
-      </attribute>
-      <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >
+     <widget class="QWidget" name="tabDevice">
+      <attribute name="icon">
+       <iconset resource="rbutilqt.qrc">
         <normaloff>:/icons/rbutil.png</normaloff>:/icons/rbutil.png</iconset>
       </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="labelMountPoint" >
-         <property name="text" >
+      <attribute name="title">
+       <string>&amp;Device</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="labelMountPoint">
+         <property name="text">
           <string>Select your device in the &amp;filesystem</string>
          </property>
-         <property name="buddy" >
+         <property name="buddy">
           <cstring>mountPoint</cstring>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2" >
-        <layout class="QHBoxLayout" >
+       <item row="1" column="0" colspan="3">
+        <layout class="QHBoxLayout">
          <item>
-          <widget class="QLineEdit" name="mountPoint" />
+          <widget class="QLineEdit" name="mountPoint"/>
          </item>
          <item>
-          <widget class="QPushButton" name="browseMountPoint" >
-           <property name="text" >
+          <widget class="QPushButton" name="browseMountPoint">
+           <property name="text">
             <string>&amp;Browse</string>
            </property>
-           <property name="icon" >
-            <iconset resource="rbutilqt.qrc" >
+           <property name="icon">
+            <iconset resource="rbutilqt.qrc">
              <normaloff>:/icons/system-search.png</normaloff>:/icons/system-search.png</iconset>
            </property>
-           <property name="autoDefault" >
+           <property name="autoDefault">
             <bool>false</bool>
            </property>
           </widget>
          </item>
         </layout>
        </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="labelPlayer" >
-         <property name="text" >
+       <item row="2" column="0">
+        <widget class="QLabel" name="labelPlayer">
+         <property name="text">
           <string>&amp;Select your audio player</string>
          </property>
-         <property name="buddy" >
+         <property name="buddy">
           <cstring>treeDevices</cstring>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2" >
-        <widget class="QTreeWidget" name="treeDevices" >
+       <item row="2" column="1">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>118</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="2">
+        <widget class="QCheckBox" name="showDisabled">
+         <property name="text">
+          <string>Show disabled targets</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="3">
+        <widget class="QTreeWidget" name="treeDevices">
          <column>
-          <property name="text" >
+          <property name="text">
            <string>1</string>
           </property>
          </column>
         </widget>
        </item>
-       <item row="4" column="0" colspan="2" >
-        <widget class="QPushButton" name="buttonAutodetect" >
-         <property name="text" >
+       <item row="4" column="0">
+        <widget class="QPushButton" name="buttonAutodetect">
+         <property name="text">
           <string>&amp;Autodetect</string>
          </property>
-         <property name="icon" >
-          <iconset resource="rbutilqt.qrc" >
+         <property name="icon">
+          <iconset resource="rbutilqt.qrc">
            <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
          </property>
-         <property name="default" >
+         <property name="default">
           <bool>true</bool>
          </property>
-         <property name="flat" >
+         <property name="flat">
           <bool>false</bool>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabProxy" >
-      <attribute name="title" >
-       <string>&amp;Proxy</string>
-      </attribute>
-      <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >
+     <widget class="QWidget" name="tabProxy">
+      <attribute name="icon">
+       <iconset resource="rbutilqt.qrc">
         <normaloff>:/icons/network-idle.png</normaloff>:/icons/network-idle.png</iconset>
       </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QRadioButton" name="radioNoProxy" >
-         <property name="text" >
+      <attribute name="title">
+       <string>&amp;Proxy</string>
+      </attribute>
+      <layout class="QGridLayout">
+       <item row="0" column="0">
+        <widget class="QRadioButton" name="radioNoProxy">
+         <property name="text">
           <string>&amp;No Proxy</string>
          </property>
-         <property name="checked" >
+         <property name="checked">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" >
-        <widget class="QRadioButton" name="radioSystemProxy" >
-         <property name="text" >
+       <item row="1" column="0">
+        <widget class="QRadioButton" name="radioSystemProxy">
+         <property name="text">
           <string>Use S&amp;ystem values</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" >
-        <widget class="QRadioButton" name="radioManualProxy" >
-         <property name="text" >
+       <item row="2" column="0">
+        <widget class="QRadioButton" name="radioManualProxy">
+         <property name="text">
           <string>&amp;Manual Proxy settings</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" >
-        <widget class="QGroupBox" name="groupBox" >
-         <property name="title" >
+       <item row="3" column="0">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
           <string>Proxy Values</string>
          </property>
-         <layout class="QGridLayout" >
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label" >
-            <property name="text" >
+         <layout class="QGridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
              <string>&amp;Host:</string>
             </property>
-            <property name="buddy" >
+            <property name="buddy">
              <cstring>proxyHost</cstring>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
-           <widget class="QLineEdit" name="proxyHost" >
-            <property name="frame" >
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="proxyHost">
+            <property name="frame">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="label_2" >
-            <property name="text" >
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
              <string>&amp;Port:</string>
             </property>
-            <property name="buddy" >
+            <property name="buddy">
              <cstring>proxyPort</cstring>
             </property>
            </widget>
           </item>
-          <item row="1" column="1" >
-           <widget class="QLineEdit" name="proxyPort" />
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="proxyPort"/>
           </item>
-          <item row="2" column="1" >
-           <widget class="QLineEdit" name="proxyUser" />
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="proxyUser"/>
           </item>
-          <item row="3" column="1" >
-           <widget class="QLineEdit" name="proxyPass" >
-            <property name="echoMode" >
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="proxyPass">
+            <property name="echoMode">
              <enum>QLineEdit::Password</enum>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" >
-           <widget class="QLabel" name="label_3" >
-            <property name="text" >
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
              <string>&amp;Username</string>
             </property>
-            <property name="buddy" >
+            <property name="buddy">
              <cstring>proxyUser</cstring>
             </property>
            </widget>
           </item>
-          <item row="3" column="0" >
-           <widget class="QLabel" name="label_4" >
-            <property name="text" >
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
              <string>Pass&amp;word</string>
             </property>
-            <property name="buddy" >
+            <property name="buddy">
              <cstring>proxyPass</cstring>
             </property>
            </widget>
@@ -205,12 +226,12 @@
          </layout>
         </widget>
        </item>
-       <item row="4" column="0" >
+       <item row="4" column="0">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -220,108 +241,108 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabLanguage" >
-      <attribute name="title" >
-       <string>&amp;Language</string>
-      </attribute>
-      <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >
+     <widget class="QWidget" name="tabLanguage">
+      <attribute name="icon">
+       <iconset resource="rbutilqt.qrc">
         <normaloff>:/icons/preferences-desktop-locale.png</normaloff>:/icons/preferences-desktop-locale.png</iconset>
       </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QListWidget" name="listLanguages" />
+      <attribute name="title">
+       <string>&amp;Language</string>
+      </attribute>
+      <layout class="QGridLayout">
+       <item row="0" column="0">
+        <widget class="QListWidget" name="listLanguages"/>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabCache" >
-      <attribute name="title" >
-       <string>Cac&amp;he</string>
-      </attribute>
-      <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >
+     <widget class="QWidget" name="tabCache">
+      <attribute name="icon">
+       <iconset resource="rbutilqt.qrc">
         <normaloff>:/icons/package-x-generic.png</normaloff>:/icons/package-x-generic.png</iconset>
       </attribute>
-      <attribute name="toolTip" >
+      <attribute name="title">
+       <string>Cac&amp;he</string>
+      </attribute>
+      <attribute name="toolTip">
        <string>Download cache settings</string>
       </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" colspan="2" >
-        <widget class="QLabel" name="cacheDescription" >
-         <property name="text" >
+      <layout class="QGridLayout">
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="cacheDescription">
+         <property name="text">
           <string>Rockbox Utility uses a local download cache to save network traffic. You can change the path to the cache and use it as local repository by enabling Offline mode.</string>
          </property>
-         <property name="wordWrap" >
+         <property name="wordWrap">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="cacheSize" >
-         <property name="text" >
+       <item row="1" column="0">
+        <widget class="QLabel" name="cacheSize">
+         <property name="text">
           <string>Current cache size is %1</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2" >
-        <layout class="QHBoxLayout" >
+       <item row="2" column="0" colspan="2">
+        <layout class="QHBoxLayout">
          <item>
-          <widget class="QLabel" name="label_5" >
-           <property name="text" >
+          <widget class="QLabel" name="label_5">
+           <property name="text">
             <string>P&amp;ath</string>
            </property>
-           <property name="buddy" >
+           <property name="buddy">
             <cstring>cachePath</cstring>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="cachePath" >
-           <property name="toolTip" >
+          <widget class="QLineEdit" name="cachePath">
+           <property name="toolTip">
             <string>Entering an invalid folder will reset the path to the systems temporary path.</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="buttonCacheBrowse" >
-           <property name="text" >
+          <widget class="QPushButton" name="buttonCacheBrowse">
+           <property name="text">
             <string>&amp;Browse</string>
            </property>
-           <property name="icon" >
-            <iconset resource="rbutilqt.qrc" >
+           <property name="icon">
+            <iconset resource="rbutilqt.qrc">
              <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
            </property>
           </widget>
          </item>
         </layout>
        </item>
-       <item row="3" column="0" colspan="2" >
-        <layout class="QVBoxLayout" >
+       <item row="3" column="0" colspan="2">
+        <layout class="QVBoxLayout">
          <item>
-          <widget class="QCheckBox" name="cacheDisable" >
-           <property name="text" >
+          <widget class="QCheckBox" name="cacheDisable">
+           <property name="text">
             <string>Disable local &amp;download cache</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="cacheOfflineMode" >
-           <property name="toolTip" >
+          <widget class="QCheckBox" name="cacheOfflineMode">
+           <property name="toolTip">
             <string>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</string>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>O&amp;ffline mode</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
-       <item row="4" column="1" >
+       <item row="4" column="1">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>61</height>
@@ -329,12 +350,12 @@
          </property>
         </spacer>
        </item>
-       <item row="5" column="0" >
+       <item row="5" column="0">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -342,78 +363,78 @@
          </property>
         </spacer>
        </item>
-       <item row="5" column="1" >
-        <widget class="QPushButton" name="buttonCacheClear" >
-         <property name="text" >
+       <item row="5" column="1">
+        <widget class="QPushButton" name="buttonCacheClear">
+         <property name="text">
           <string>Clean cache &amp;now</string>
          </property>
-         <property name="icon" >
-          <iconset resource="rbutilqt.qrc" >
+         <property name="icon">
+          <iconset resource="rbutilqt.qrc">
            <normaloff>:/icons/user-trash-full.png</normaloff>:/icons/user-trash-full.png</iconset>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabTts" >
-      <attribute name="title" >
-       <string>&amp;TTS &amp;&amp; Encoder</string>
-      </attribute>
-      <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >
+     <widget class="QWidget" name="tabTts">
+      <attribute name="icon">
+       <iconset resource="rbutilqt.qrc">
         <normaloff>:/icons/audio-input-microphone.png</normaloff>:/icons/audio-input-microphone.png</iconset>
       </attribute>
-      <layout class="QVBoxLayout" >
+      <attribute name="title">
+       <string>&amp;TTS &amp;&amp; Encoder</string>
+      </attribute>
+      <layout class="QVBoxLayout">
        <item>
-        <widget class="QGroupBox" name="groupBox_2" >
-         <property name="title" >
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
           <string>TTS Engine</string>
          </property>
-         <layout class="QGridLayout" >
-          <item row="0" column="0" >
-           <widget class="QLabel" name="labelTts" >
-            <property name="text" >
+         <layout class="QGridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="labelTts">
+            <property name="text">
              <string>&amp;Select TTS Engine</string>
             </property>
-            <property name="buddy" >
+            <property name="buddy">
              <cstring>comboTts</cstring>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="2" >
-           <widget class="QComboBox" name="comboTts" />
+          <item row="0" column="1" colspan="2">
+           <widget class="QComboBox" name="comboTts"/>
           </item>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="labelTtsExecutable" >
-            <property name="text" >
+          <item row="1" column="0">
+           <widget class="QLabel" name="labelTtsExecutable">
+            <property name="text">
              <string>Configure TTS Engine</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1" >
-           <widget class="QLabel" name="configTTSstatus" >
-            <property name="text" >
+          <item row="1" column="1">
+           <widget class="QLabel" name="configTTSstatus">
+            <property name="text">
              <string>Configuration invalid!</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="2" >
-           <widget class="QLabel" name="configTTSstatusimg" >
-            <property name="text" >
+          <item row="1" column="2">
+           <widget class="QLabel" name="configTTSstatusimg">
+            <property name="text">
              <string/>
             </property>
-            <property name="pixmap" >
-             <pixmap resource="rbutilqt.qrc" >:/icons/dialog-error.png</pixmap>
+            <property name="pixmap">
+             <pixmap resource="rbutilqt.qrc">:/icons/dialog-error.png</pixmap>
             </property>
            </widget>
           </item>
-          <item row="1" column="3" >
-           <widget class="QPushButton" name="configTts" >
-            <property name="text" >
+          <item row="1" column="3">
+           <widget class="QPushButton" name="configTts">
+            <property name="text">
              <string>Configure &amp;TTS</string>
             </property>
-            <property name="icon" >
-             <iconset resource="rbutilqt.qrc" >
+            <property name="icon">
+             <iconset resource="rbutilqt.qrc">
               <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
             </property>
            </widget>
@@ -429,42 +450,42 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_3" >
-         <property name="title" >
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
           <string>Encoder Engine</string>
          </property>
-         <layout class="QGridLayout" >
-          <item row="0" column="1" >
-           <widget class="QLabel" name="configEncstatus" >
-            <property name="text" >
+         <layout class="QGridLayout">
+          <item row="0" column="1">
+           <widget class="QLabel" name="configEncstatus">
+            <property name="text">
              <string>Configuration invalid!</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="2" >
-           <widget class="QLabel" name="configEncstatusimg" >
-            <property name="text" >
+          <item row="0" column="2">
+           <widget class="QLabel" name="configEncstatusimg">
+            <property name="text">
              <string/>
             </property>
-            <property name="pixmap" >
-             <pixmap resource="rbutilqt.qrc" >:/icons/dialog-error.png</pixmap>
+            <property name="pixmap">
+             <pixmap resource="rbutilqt.qrc">:/icons/dialog-error.png</pixmap>
             </property>
            </widget>
           </item>
-          <item row="0" column="3" >
-           <widget class="QPushButton" name="configEncoder" >
-            <property name="text" >
+          <item row="0" column="3">
+           <widget class="QPushButton" name="configEncoder">
+            <property name="text">
              <string>Configure &amp;Enc</string>
             </property>
-            <property name="icon" >
-             <iconset resource="rbutilqt.qrc" >
+            <property name="icon">
+             <iconset resource="rbutilqt.qrc">
               <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
             </property>
            </widget>
           </item>
-          <item row="0" column="0" >
-           <widget class="QLabel" name="encoderName" >
-            <property name="text" >
+          <item row="0" column="0">
+           <widget class="QLabel" name="encoderName">
+            <property name="text">
              <string>encoder name</string>
             </property>
            </widget>
@@ -474,10 +495,10 @@
        </item>
        <item>
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>458</width>
            <height>131</height>
@@ -489,12 +510,12 @@
      </widget>
     </widget>
    </item>
-   <item row="2" column="0" >
+   <item row="2" column="0">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>40</width>
        <height>20</height>
@@ -502,24 +523,24 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="1" >
-    <widget class="QPushButton" name="buttonOk" >
-     <property name="text" >
+   <item row="2" column="1">
+    <widget class="QPushButton" name="buttonOk">
+     <property name="text">
       <string>&amp;Ok</string>
      </property>
-     <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >
+     <property name="icon">
+      <iconset resource="rbutilqt.qrc">
        <normaloff>:/icons/go-next.png</normaloff>:/icons/go-next.png</iconset>
      </property>
     </widget>
    </item>
-   <item row="2" column="2" >
-    <widget class="QPushButton" name="buttonCancel" >
-     <property name="text" >
+   <item row="2" column="2">
+    <widget class="QPushButton" name="buttonCancel">
+     <property name="text">
       <string>&amp;Cancel</string>
      </property>
-     <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >
+     <property name="icon">
+      <iconset resource="rbutilqt.qrc">
        <normaloff>:/icons/process-stop.png</normaloff>:/icons/process-stop.png</iconset>
      </property>
     </widget>
@@ -527,7 +548,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="rbutilqt.qrc" />
+  <include location="rbutilqt.qrc"/>
  </resources>
  <connections/>
 </ui>

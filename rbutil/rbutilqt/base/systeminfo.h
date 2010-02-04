@@ -65,6 +65,7 @@ class SystemInfo : public QObject
 
         enum PlatformType {
             PlatformAll,
+            PlatformAllDisabled,
             PlatformBase,
             PlatformVariant
         };

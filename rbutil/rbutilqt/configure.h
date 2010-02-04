@@ -71,6 +71,7 @@ class Config : public QDialog
         void updateTtsState(int);
         void updateEncState();
         void testTts();
+        void showDisabled(bool);
 };
 
 #endif

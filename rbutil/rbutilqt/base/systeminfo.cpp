@@ -119,7 +119,8 @@ QStringList SystemInfo::platforms(enum SystemInfo::PlatformType type, QString va
     {
         QString target = systemInfos->value("platforms/"+a.at(i), "null").toString();
         // only add target if its not disabled
-        if(systemInfos->value(target+"/status").toString() == "disabled")
+        if(type != PlatformAllDisabled
+                && systemInfos->value(target+"/status").toString() == "disabled")
             continue;
         // report only base targets when PlatformBase is requested
         if(type == PlatformBase && target.contains('.'))
