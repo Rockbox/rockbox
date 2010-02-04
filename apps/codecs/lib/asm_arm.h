@@ -88,14 +88,14 @@ static inline void XNPROD31(int32_t  a, int32_t  b,
 
 #define XPROD31_R(_a, _b, _t, _v, _x, _y)\
 {\
-  int x1, y1, l;\
+  int x1, y1, l, t;\
   asm(	"smull	%0, %1, %4, %6\n\t"\
 	"rsb	%3, %4, #0\n\t"\
 	"smlal	%0, %1, %5, %7\n\t"\
 	"smull	%0, %2, %5, %6\n\t"\
 	"smlal	%0, %2, %3, %7"\
-	: "=&r" (l), "=&r" (x1), "=&r" (y1), "=r" (_a)\
-	: "3" (_a), "r" (_b), "r" (_t), "r" (_v) );\
+	: "=&r" (l), "=&r" (x1), "=&r" (y1), "=r" (t)\
+	: "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
   _x = x1 << 1;\
   _y = y1 << 1;\
 }

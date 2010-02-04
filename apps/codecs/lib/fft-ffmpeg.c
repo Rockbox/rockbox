@@ -125,7 +125,10 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
       const int MAX_REVTAB=1<<12;
       
       for(i=0; i<MAX_REVTAB ; i++)
-          s->revtab[-split_radix_permutation(i, MAX_REVTAB, s->inverse) & (MAX_REVTAB-1)] = i;
+      {
+          int xxx = split_radix_permutation(i, MAX_REVTAB, s->inverse);
+          s->revtab[(-xxx) & (MAX_REVTAB-1)] = i;
+      }
           
       revtab_initialised = true;
     }
@@ -300,8 +303,8 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 #define TRANSFORM(a0,a1,a2,a3,wre,wim) {\
     {\
         FFTSample t1,t2,t5,t6;\
-        XPROD31_R(a2.re, a2.im, wre, wim, t1,t2);\
-        XNPROD31_R(a3.re, a3.im, wre, wim, t5,t6);\
+        XPROD31_R(wre, wim, a2.re, a2.im, t1,t2);\
+        XNPROD31_R(wre, wim, a3.re, a3.im, t5,t6);\
         BUTTERFLIES(a0,a1,a2,a3)\
     }\
     muls_inc(8);\
@@ -311,8 +314,8 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
     {\
         FFTSample t1,t2,t5,t6;\
         const FFTSample wre=w[0],wim=w[1];\
-        XPROD31(a2.re, a2.im, wre, wim, &t1, &t2);\
-        XNPROD31(a3.re, a3.im, wre, wim, &t5,&t6);\
+        XPROD31(wre, wim, a2.re, a2.im, &t1, &t2);\
+        XNPROD31(wre, wim, a3.re, a3.im, &t5,&t6);\
         BUTTERFLIES(a0,a1,a2,a3)\
     }\
     muls_inc(8);\
@@ -322,21 +325,21 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
     {\
         FFTSample t1,t2,t5,t6;\
         const FFTSample wim=w[0],wre=w[1];\
-        XPROD31(a2.re, a2.im, wre, wim, &t1, &t2);\
-        XNPROD31(a3.re, a3.im, wre, wim, &t5,&t6);\
+        XPROD31(wre, wim, a2.re, a2.im, &t1, &t2);\
+        XNPROD31(wre, wim, a3.re, a3.im, &t5,&t6);\
         BUTTERFLIES(a0,a1,a2,a3)\
     }\
     muls_inc(8);\
 }
 
 #ifdef CPU_ARM
-#define TRANSFORM_EQUAL(a0,a1,a2,a3,w) {\
+#define TRANSFORM_EQUAL(a0,a1,a2,a3) {\
     {\
         register FFTSample t1,t2,t5,t6;\
-        t2 = MULT32(a2.re, w);\
-        t1 = MULT31(a2.im, w);\
-        t6 = MULT31(a3.re, w);\
-        t5 = MULT32(a3.im, w);\
+        t2 = MULT32(cPI2_8, a2.re);\
+        t1 = MULT31(cPI2_8, a2.im);\
+        t6 = MULT31(cPI2_8, a3.re);\
+        t5 = MULT32(cPI2_8, a3.im);\
         t1 = ( t1 + (t2<<1) );\
         t2 = ( t1 - (t2<<2) );\
         t6 = ( t6 + (t5<<1) );\
@@ -346,13 +349,13 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
     }\
 }
 #else
-#define TRANSFORM_EQUAL(a0,a1,a2,a3,w) {\
+#define TRANSFORM_EQUAL(a0,a1,a2,a3) {\
     {\
         FFTSample t1,t2,t5,t6,temp1,temp2;\
-        t2    = MULT31(a2.re, w);\
-        temp1 = MULT31(a2.im, w);\
-        temp2 = MULT31(a3.re, w);\
-        t5    = MULT31(a3.im, w);\
+        t2    = MULT31(cPI2_8, a2.re);\
+        temp1 = MULT31(cPI2_8, a2.im);\
+        temp2 = MULT31(cPI2_8, a3.re);\
+        t5    = MULT31(cPI2_8, a3.im);\
         t1 = ( temp1 + t2 );\
         t2 = ( temp1 - t2 );\
         t6 = ( temp2 + t5 );\
@@ -400,11 +403,11 @@ static void name(FFTComplex *z, unsigned int STEP, unsigned int n)\
         TRANSFORM_W10(z[1],z[o1+1],z[o2+1],z[o3+1],w);\
         w += STEP;\
 	adds_inc(3);\
-    } while(w < w_end);\
+    } while(LIKELY(w < w_end));\
     /* second half: pass backwards through sincos_lookup0*/\
     /* wim and wre are now in opposite places so ordering now [0],[1] */\
     w_end=sincos_lookup0;\
-    while(w>w_end)\
+    while(LIKELY(w>w_end))\
     {\
         z += 2;\
         TRANSFORM_W01(z[0],z[o1],z[o2],z[o3],w);\
@@ -598,7 +601,7 @@ static inline void fft8(FFTComplex *z)
 
 #endif
 
-    TRANSFORM_EQUAL(z[1],z[3],z[5],z[7],cPI2_8)
+    TRANSFORM_EQUAL(z[1],z[3],z[5],z[7]);
 }
 
 static void fft8_dispatch(FFTComplex *z)
@@ -616,7 +619,7 @@ static void fft16(FFTComplex *z)
     fft4(z+12);
 
     TRANSFORM_ZERO(z[0],z[4],z[8],z[12]);
-    TRANSFORM_EQUAL(z[2],z[6],z[10],z[14],cPI2_8);
+    TRANSFORM_EQUAL(z[2],z[6],z[10],z[14]);
     TRANSFORM(z[1],z[5],z[9],z[13],cPI1_8,cPI3_8);
     TRANSFORM(z[3],z[7],z[11],z[15],cPI3_8,cPI1_8);
 }
