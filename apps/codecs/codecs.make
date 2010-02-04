@@ -59,7 +59,7 @@ CODECLIBS := $(DEMACLIB) $(A52LIB) $(ALACLIB) $(ASAPLIB) \
 	$(ATRACLIB) \
 	$(CODECLIB)
 
-$(CODECS): $(CODEC_CRT0) $(CODECLINK_LDS) 
+$(CODECS): $(CODEC_CRT0) $(CODECLINK_LDS)
 
 $(CODECLINK_LDS): $(CODEC_LDS) $(CONFIGFILE)
 	$(call PRINTS,PP $(@F))
@@ -78,6 +78,7 @@ $(CODECDIR)/wavpack.codec : $(CODECDIR)/libwavpack.a
 $(CODECDIR)/alac.codec : $(CODECDIR)/libalac.a $(CODECDIR)/libm4a.a 
 $(CODECDIR)/aac.codec : $(CODECDIR)/libfaad.a $(CODECDIR)/libm4a.a
 $(CODECDIR)/shorten.codec : $(CODECDIR)/libffmpegFLAC.a
+$(CODECDIR)/ape-pre.map : $(CODECDIR)/libdemac-pre.a
 $(CODECDIR)/ape.codec : $(CODECDIR)/libdemac.a
 $(CODECDIR)/wma.codec : $(CODECDIR)/libwma.a
 $(CODECDIR)/wavpack_enc.codec: $(CODECDIR)/libwavpack.a
@@ -112,6 +113,13 @@ else
  CODECLDFLAGS = -T$(CODECLINK_LDS) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map
  CODECFLAGS += -UDEBUG -DNDEBUG
 endif
+
+$(CODECDIR)/%-pre.map: $(CODEC_CRT0) $(CODECLINK_LDS) $(CODECDIR)/%.o $(CODECLIB)
+	$(call PRINTS,LD $(@F))$(CC) $(CODECFLAGS) -o $(CODECDIR)/$*-pre.elf \
+		$(filter %.o, $^) \
+		$(filter-out $(CODECLIB),$(filter %.a, $+)) \
+		$(CODECLIB) \
+		-lgcc $(subst .map,-pre.map,$(CODECLDFLAGS))
 
 $(CODECDIR)/%.codec: $(CODECDIR)/%.o
 	$(call PRINTS,LD $(@F))$(CC) $(CODECFLAGS) -o $(CODECDIR)/$*.elf \

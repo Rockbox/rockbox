@@ -29,6 +29,13 @@
  ****************************************************************************/
 
 #include "config.h"
+/* On targets with codec iram, a header file will be generated after an initial
+   link of the APE codec, stating the amount of IRAM remaining for use by the
+   reciprocal lookup table. */
+#if !defined(APE_PRE) && defined(USE_IRAM) && ARM_ARCH < 5
+#include "apps/codecs/ape_free_iram.h"
+#endif
+
 /* Codecs should not normally do this, but we need to check a macro, and
  * codecs.h would confuse the assembler. */
 
@@ -88,20 +95,29 @@
     eor     \quotient, \result, \remainder, lsl \bits
 .endm
 
-#ifdef CPU_PP
-#if CONFIG_CPU == PP5020
-.set recip_max, 8384
-#elif CONFIG_CPU == PP5002
-.set recip_max, 4608
+#ifndef FREE_IRAM
+.set recip_max, 2
 #else
-.set recip_max, 16384
-#endif
-#elif CONFIG_CPU == AS3525
-.set recip_max, 42752
-#elif CONFIG_CPU == S5L8701
-.set recip_max, 12800
-#elif CONFIG_CPU == S5L8700
-.set recip_max, 9088
+/* Each table entry is one word. Since a compare is done against the maximum
+   entry as an immediate, the maximum entry must be a valid ARM immediate,
+   which means a byte shifted by an even number of places. */
+.set recip_max, 2 + FREE_IRAM / 4
+.set recip_max_tmp, recip_max >> 8
+.set recip_mask_shift, 0
+.set tmp_shift, 16
+.rept 5
+    .if recip_max_tmp >> tmp_shift
+        .set recip_max_tmp, recip_max_tmp >> tmp_shift
+        .set recip_mask_shift, recip_mask_shift + tmp_shift
+    .endif
+    .set tmp_shift, tmp_shift >> 1
+.endr
+.if recip_max_tmp
+    .set recip_mask_shift, recip_mask_shift + 1
+.endif
+.set recip_mask_shift, (recip_mask_shift + 1) & 62
+.set recip_max, recip_max & (255 << recip_mask_shift)
+//.set recip_max, 2
 #endif
 
 udiv32_arm:
