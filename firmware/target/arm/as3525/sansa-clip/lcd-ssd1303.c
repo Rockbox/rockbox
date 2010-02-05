@@ -73,10 +73,11 @@
 #define LCD_CNTL_HIGHCOL        0x10    /* Upper column address */
 #define LCD_CNTL_LOWCOL         0x00    /* Lower column address */
 
-/* DBOP initialisation, do what OF does */
-static void ams3525_dbop_init(void)
+
+static void lcd_hw_init(void)
 {
-#ifdef SANSA_CLIP
+#if defined(SANSA_CLIP)
+/* DBOP initialisation, do what OF does */
     CGU_DBOP = (1<<3) | AS3525_DBOP_DIV;
 
     GPIOB_AFSEL = 0x08; /* DBOP on pin 3 */
@@ -85,13 +86,21 @@ static void ams3525_dbop_init(void)
     DBOP_CTRL      = 0x51008;
     DBOP_TIMPOL_01 = 0x6E167;
     DBOP_TIMPOL_23 = 0xA167E06F;
-#else /* SANSA_CLIPV2 */
+#elif defined(SANSA_CLIPV2)
+/* DBOP initialisation, do what OF does */
     CCU_IO |= (1<<12); /* ?? */
     CGU_DBOP |= /*(1<<3)*/ 0x18 | AS3525_DBOP_DIV;
 
     DBOP_CTRL      = 0x51004;
     DBOP_TIMPOL_01 = 0x36A12F;
     DBOP_TIMPOL_23 = 0xE037E037;
+#elif defined(SANSA_CLIPPLUS)
+    CGU_PERI |= CGU_SSP_CLOCK_ENABLE;
+
+    SSP_CPSR;           /* No clock prescale */
+    SSP_CR0 = 0 | 7;    /* Motorola SPI frame format, 8 bits */
+    SSP_CR1 = 1<<1;     /* SSP Operation enabled */
+    SSP_IMSC = 0;       /* No interrupts */
 #endif
 }
 
@@ -101,6 +110,7 @@ static void ams3525_dbop_init(void)
 #define LCD_DELAY 10
 #endif
 
+#if defined(SANSA_CLIP) || defined(SANSA_CLIPV2)
 void lcd_write_command(int byte)
 {
     volatile int i = 0;
@@ -126,7 +136,21 @@ void lcd_write_command(int byte)
     DBOP_TIMPOL_23 = 0xE037E037;
 #endif
 }
+#elif defined(SANSA_CLIPPLUS)
+void lcd_write_command(int byte)
+{
+    while(SSP_SR & (1<<4))  /* BSY flag */
+        ;
 
+    GPIOB_PIN(2) = 0;
+    SSP_DATA = byte;
+
+    while(SSP_SR & (1<<4))  /* BSY flag */
+        ;
+}
+#endif
+
+#if defined(SANSA_CLIP) || defined(SANSA_CLIPV2)
 void lcd_write_data(const fb_data* p_bytes, int count)
 {
     volatile int i = 0;
@@ -152,6 +176,23 @@ void lcd_write_data(const fb_data* p_bytes, int count)
     /* While push fifo is not empty */
     while ((DBOP_STAT & (1<<10)) == 0);
 }
+#elif defined(SANSA_CLIPPLUS)
+void lcd_write_data(const fb_data* p_bytes, int count)
+{
+    GPIOB_PIN(2) = (1<<2);
+
+    SSP_CR0 = 0 | 15;   /* Motorola SPI frame format, 16 bits */
+    while (count--)
+    {
+        while(SSP_SR & (1<<1))      /* Transmit FIFO is not full */
+            SSP_DATA = *p_bytes++;
+
+        while(!(SSP_SR & (1<<0)))   /* Transmit FIFO is not empty */
+            ;
+    }
+    SSP_CR0 = 0 | 7;   /* Motorola SPI frame format, 8 bits */
+}
+#endif
 
 
 /** globals **/
@@ -234,9 +275,9 @@ void lcd_init_device(void)
 #define LCD_FULLSCREEN (128+4)
     fb_data p_bytes[LCD_FULLSCREEN]; /* framebuffer used to clear the screen */
 
-    ams3525_dbop_init();
+    lcd_hw_init();
 
-#ifdef SANSA_CLIP
+#if defined(SANSA_CLIP)
     GPIOA_DIR |= 0x33; /* pins 5:4 and 1:0 out */
     GPIOB_DIR |= 0x40; /* pin 6 out */
 
@@ -244,9 +285,16 @@ void lcd_init_device(void)
     GPIOA_PIN(0) = (1<<0);
     GPIOA_PIN(4) = 0;
     GPIOB_PIN(6) = (1<<6);
-#else /* SANSA_CLIPV2 */
+#elif defined(SANSA_CLIPV2)
     GPIOB_DIR |= (1<<2)|(1<<5);
     GPIOB_PIN(5) = (1<<5);
+#elif defined(SANSA_CLIPPLUS)
+    GPIOA_DIR |= (1<<5);
+    GPIOB_DIR |= (1<<2) | (1<<7);
+    GPIOA_PIN(5) = 0;
+    GPIOA_DIR &= (1<<0);
+    GPIOA_PIN(0) = (1<<0);
+    GPIOB_PIN(7) = (1<<7);
 #endif
 
     /* Set display clock (divide ratio = 1) and oscillator frequency (1) */

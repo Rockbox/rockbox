@@ -497,6 +497,20 @@ interface */
 #define I2SOUT_CLEAR        (*(volatile unsigned char*)(I2SOUT_BASE+0x10))
 #define I2SOUT_DATA         (volatile unsigned long*)(I2SOUT_BASE+0x14)
 
+
+/* SSP registers (PrimeCell PL022) */
+
+#define SSP_CR0             (*(volatile unsigned short*)(SSP_BASE+0x00))
+#define SSP_CR1             (*(volatile unsigned char*)(SSP_BASE+0x04))
+#define SSP_DATA            (*(volatile unsigned short*)(SSP_BASE+0x08))
+#define SSP_SR              (*(volatile unsigned char*)(SSP_BASE+0x0C))
+#define SSP_CPSR            (*(volatile unsigned char*)(SSP_BASE+0x10))
+#define SSP_IMSC            (*(volatile unsigned char*)(SSP_BASE+0x14))
+#define SSP_IRS             (*(volatile unsigned char*)(SSP_BASE+0x18))
+#define SSP_MIS             (*(volatile unsigned char*)(SSP_BASE+0x1C))
+#define SSP_ICR             (*(volatile unsigned char*)(SSP_BASE+0x20))
+#define SSP_DMACR           (*(volatile unsigned char*)(SSP_BASE+0x24))
+
 /* PCM addresses for obtaining buffers will be what DMA is using (physical) */
 #define HAVE_PCM_DMA_ADDRESS
 
