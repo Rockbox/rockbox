@@ -610,33 +610,45 @@ const char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_RTC_DAY_OF_MONTH:
             /* d: day of month (01..31) */
             snprintf(buf, buf_size, "%02d", tm->tm_mday);
+            if (intval)
+                *intval = tm->tm_mday - 1;
             return buf;
 
         case WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
             /* e: day of month, blank padded ( 1..31) */
             snprintf(buf, buf_size, "%2d", tm->tm_mday);
+            if (intval)
+                *intval = tm->tm_mday - 1;
             return buf;
 
         case WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED:
             /* H: hour (00..23) */
             snprintf(buf, buf_size, "%02d", tm->tm_hour);
+            if (intval)
+                *intval = tm->tm_hour;
             return buf;
 
         case WPS_TOKEN_RTC_HOUR_24:
             /* k: hour ( 0..23) */
             snprintf(buf, buf_size, "%2d", tm->tm_hour);
+            if (intval)
+                *intval = tm->tm_hour;
             return buf;
 
         case WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED:
             /* I: hour (01..12) */
             snprintf(buf, buf_size, "%02d",
                      (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12);
+            if (intval)
+                *intval = (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12;
             return buf;
 
         case WPS_TOKEN_RTC_HOUR_12:
             /* l: hour ( 1..12) */
             snprintf(buf, buf_size, "%2d",
                      (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12);
+            if (intval)
+                *intval = (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12;
             return buf;
 
         case WPS_TOKEN_RTC_MONTH:
@@ -649,29 +661,41 @@ const char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_RTC_MINUTE:
             /* M: minute (00..59) */
             snprintf(buf, buf_size, "%02d", tm->tm_min);
+            if (intval)
+                *intval = tm->tm_min;
             return buf;
 
         case WPS_TOKEN_RTC_SECOND:
             /* S: second (00..59) */
             snprintf(buf, buf_size, "%02d", tm->tm_sec);
+            if (intval)
+                *intval = tm->tm_sec;
             return buf;
 
         case WPS_TOKEN_RTC_YEAR_2_DIGITS:
             /* y: last two digits of year (00..99) */
             snprintf(buf, buf_size, "%02d", tm->tm_year % 100);
+            if (intval)
+                *intval = tm->tm_year % 100;
             return buf;
 
         case WPS_TOKEN_RTC_YEAR_4_DIGITS:
             /* Y: year (1970...) */
             snprintf(buf, buf_size, "%04d", tm->tm_year + 1900);
+            if (intval)
+                *intval = tm->tm_year + 1900;
             return buf;
 
         case WPS_TOKEN_RTC_AM_PM_UPPER:
             /* p: upper case AM or PM indicator */
+            if (intval)
+                *intval = tm->tm_hour/12 == 0 ? 0 : 1;
             return tm->tm_hour/12 == 0 ? "AM" : "PM";
 
         case WPS_TOKEN_RTC_AM_PM_LOWER:
             /* P: lower case am or pm indicator */
+            if (intval)
+                *intval = tm->tm_hour/12 == 0 ? 0 : 1;
             return tm->tm_hour/12 == 0 ? "am" : "pm";
 
         case WPS_TOKEN_RTC_WEEKDAY_NAME:
