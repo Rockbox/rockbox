@@ -23,7 +23,7 @@ static inline int32_t MULT32(int32_t x, int32_t y) {
   int lo,hi;
   asm volatile("smull\t%0, %1, %2, %3"
                : "=&r"(lo),"=&r"(hi)
-               : "%r"(x),"r"(y) );
+               : "r"(x),"r"(y) );
   return(hi);
 }
 
@@ -37,7 +37,7 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
 	       "movs	%0, %0, lsr #15\n\t"
 	       "adc	%1, %0, %1, lsl #17\n\t"
                : "=&r"(lo),"=&r"(hi)
-               : "%r"(x),"r"(y)
+               : "r"(x),"r"(y)
                : "cc" );
   return(hi);
 }
