@@ -330,13 +330,13 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 }
 
 #ifdef CPU_ARM
-#define TRANSFORM_EQUAL(a0,a1,a2,a3,w) {\
+#define TRANSFORM_EQUAL(a0,a1,a2,a3) {\
     {\
         register FFTSample t1,t2,t5,t6;\
-        t2 = MULT32(a2.re, w);\
-        t1 = MULT31(a2.im, w);\
-        t6 = MULT31(a3.re, w);\
-        t5 = MULT32(a3.im, w);\
+        t2 = MULT32(cPI2_8, a2.re);\
+        t1 = MULT31(cPI2_8, a2.im);\
+        t6 = MULT31(cPI2_8, a3.re);\
+        t5 = MULT32(cPI2_8, a3.im);\
         t1 = ( t1 + (t2<<1) );\
         t2 = ( t1 - (t2<<2) );\
         t6 = ( t6 + (t5<<1) );\
@@ -346,13 +346,13 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
     }\
 }
 #else
-#define TRANSFORM_EQUAL(a0,a1,a2,a3,w) {\
+#define TRANSFORM_EQUAL(a0,a1,a2,a3) {\
     {\
         FFTSample t1,t2,t5,t6,temp1,temp2;\
-        t2    = MULT31(a2.re, w);\
-        temp1 = MULT31(a2.im, w);\
-        temp2 = MULT31(a3.re, w);\
-        t5    = MULT31(a3.im, w);\
+        t2    = MULT31(a2.re, cPI2_8);\
+        temp1 = MULT31(a2.im, cPI2_8);\
+        temp2 = MULT31(a3.re, cPI2_8);\
+        t5    = MULT31(a3.im, cPI2_8);\
         t1 = ( temp1 + t2 );\
         t2 = ( temp1 - t2 );\
         t6 = ( temp2 + t5 );\
@@ -598,7 +598,7 @@ static inline void fft8(FFTComplex *z)
 
 #endif
 
-    TRANSFORM_EQUAL(z[1],z[3],z[5],z[7],cPI2_8)
+    TRANSFORM_EQUAL(z[1],z[3],z[5],z[7])
 }
 
 static void fft8_dispatch(FFTComplex *z)
@@ -616,7 +616,7 @@ static void fft16(FFTComplex *z)
     fft4(z+12);
 
     TRANSFORM_ZERO(z[0],z[4],z[8],z[12]);
-    TRANSFORM_EQUAL(z[2],z[6],z[10],z[14],cPI2_8);
+    TRANSFORM_EQUAL(z[2],z[6],z[10],z[14]);
     TRANSFORM(z[1],z[5],z[9],z[13],cPI1_8,cPI3_8);
     TRANSFORM(z[3],z[7],z[11],z[15],cPI3_8,cPI1_8);
 }
