@@ -559,7 +559,6 @@ int settings_menu(void) {
 
 static int superdom_help(void) {
     int button;
-#define WORDS (sizeof help_text / sizeof (char*))
     static char* help_text[] = {
         "Super", "domination", "is", "a", "turn", "based", "strategy", "game,",
         "where", "the", "aim", "is", "to", "overpower", "the", "computer",
@@ -573,7 +572,7 @@ static int superdom_help(void) {
         "and", "number", "of", "troops", "on", "them.",
     };
 
-    if (display_text(WORDS, help_text, NULL, NULL))
+    if (display_text(ARRAYLEN(help_text), help_text, NULL, NULL))
         return RET_VAL_USB;
     do {
         button = rb->button_get(true);
@@ -609,7 +608,7 @@ int start_menu(void) {
                 if(playback_control(NULL))
                     return RET_VAL_USB;
                 break;
-            default:
+            case 4:
                 return RET_VAL_QUIT_ERR;
                 break;
         }
@@ -700,7 +699,7 @@ int ingame_menu(void) {
     return RET_VAL_OK;
 }
 
-int get_number(char* param, int* value) {
+int get_number(char* param, int* value, int max) {
     static const char *button_labels[4][3] = {
         { "1", "2", "3" },
         { "4", "5", "6" },
@@ -709,7 +708,8 @@ int get_number(char* param, int* value) {
     };
     int i,j,x=0,y=0;
     int height, width;
-    int button = 0;
+    int button = 0, ret = RET_VAL_OK;
+    bool done = false;
     rb->lcd_clear_display();
     rb->lcd_getstringsize("CLR", &width, &height);
     if(width > NUM_BOX_WIDTH || height > NUM_BOX_HEIGHT)
@@ -745,7 +745,7 @@ int get_number(char* param, int* value) {
                     NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_update();
-    while(1) {
+    while(!done) {
         button = rb->button_get(true);
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
         rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x),
@@ -762,9 +762,11 @@ int get_number(char* param, int* value) {
                 } else if(x==1) {
                     *value *= 10;
                 } else if(x==2) {
-                    rb->lcd_setfont(FONT_UI);
-                    return RET_VAL_OK;
+                    done = true;
+                    break;
                 }
+                if ((unsigned) *value > (unsigned) max)
+                    *value = max;
                 rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
                 rb->lcd_fillrect(0, NUM_MARGIN_Y+4*NUM_BOX_HEIGHT+10,
                                 LCD_WIDTH, 30);
@@ -775,9 +777,8 @@ int get_number(char* param, int* value) {
                 break;
             case SUPERDOM_CANCEL:
                 *value = 0;
-                rb->lcd_setfont(FONT_UI);
-                rb->splash(HZ, "Cancelled");
-                return RET_VAL_QUIT_ERR;
+                done = true;
+                ret = RET_VAL_QUIT_ERR;
                 break;
 #if CONFIG_KEYPAD != IRIVER_H10_PAD
             case SUPERDOM_LEFT:
@@ -838,8 +839,8 @@ int get_number(char* param, int* value) {
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
                 {
-                    rb->lcd_setfont(FONT_UI);
-                    return RET_VAL_USB;
+                    done = true;
+                    ret = RET_VAL_USB;
                 }
                 break;
         }
@@ -851,7 +852,10 @@ int get_number(char* param, int* value) {
         rb->lcd_update();
     }
     rb->lcd_setfont(FONT_UI);
-    return RET_VAL_OK;
+    rb->lcd_stop_scroll();
+    if (ret == RET_VAL_QUIT_ERR)
+        rb->splash(HZ, "Cancelled");
+    return ret;
 }
 
 bool tile_has_item(int type, int x, int y) {
@@ -1003,8 +1007,8 @@ int buy_resources_menu(void) {
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
             case 0:
                 nummen = 0;
-                if(get_number("How many men would you like?", &nummen)
-                                == RET_VAL_USB)
+                if(get_number("How many men would you like?", &nummen,
+                                humanres.cash) == RET_VAL_USB)
                     return RET_VAL_USB;
                 if(!nummen)
                     break;
@@ -1073,8 +1077,8 @@ int move_unit(int colour, int type, int fromx, int fromy,
     if(type == 0) {
         if(human) {
             nummen = board[fromx][fromy].men;
-            if((temp = get_number("How many men do you want to move?", &nummen))
-                        != RET_VAL_OK)
+            if((temp = get_number("How many men do you want to move?", &nummen,
+                        nummen)) != RET_VAL_OK)
                 return temp;
         }
         if(nummen > board[fromx][fromy].men) {
@@ -1332,8 +1336,8 @@ int production_menu(void) {
                 break;
             case 3:
                 temp = humanres.cash;
-                if(get_number("How much do you want to invest?", &temp)
-                                == RET_VAL_USB)
+                if(get_number("How much do you want to invest?", &temp,
+                                humanres.cash) == RET_VAL_USB)
                     return RET_VAL_USB;
                 if(temp > humanres.cash) {
                     rb->splash(HZ, "You don't have that much cash to invest");
@@ -1344,8 +1348,8 @@ int production_menu(void) {
                 break;
             case 4:
                 temp = humanres.bank;
-                if(get_number("How much do you want to withdraw?", &temp)
-                                == RET_VAL_USB)
+                if(get_number("How much do you want to withdraw?", &temp,
+                                humanres.bank) == RET_VAL_USB)
                     return RET_VAL_USB;
                 if(temp > humanres.bank) {
                     rb->splash(HZ, "You don't have that much cash to withdraw");
