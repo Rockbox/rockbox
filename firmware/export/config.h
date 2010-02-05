@@ -384,6 +384,8 @@ Lyre prototype 1 */
 #include "config/sansaclip.h"
 #elif defined(SANSA_CLIPV2)
 #include "config/sansaclipv2.h"
+#elif defined(SANSA_CLIPPLUS)
+#include "config/sansaclipplus.h"
 #elif defined(SANSA_E200V2)
 #include "config/sansae200v2.h"
 #elif defined(SANSA_M200V4)
