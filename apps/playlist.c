@@ -984,6 +984,7 @@ static int randomise_playlist(struct playlist_info* playlist,
 /*
  * Sort the array of indices for the playlist. If start_current is true then
  * set the index to the new index of the current song.
+ * Also while going to unshuffled mode set the first_index to 0.
  */
 static int sort_playlist(struct playlist_info* playlist, bool start_current,
                          bool write)
@@ -1012,6 +1013,7 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
         playlist->shuffle_modified = false;
     if (write && playlist->control_fd >= 0)
     {
+        playlist->first_index = 0;
         update_control(playlist, PLAYLIST_COMMAND_UNSHUFFLE,
             playlist->first_index, -1, NULL, NULL, NULL);
     }
