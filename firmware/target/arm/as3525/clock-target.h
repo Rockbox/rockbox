@@ -21,6 +21,9 @@
 #ifndef CLOCK_TARGET_H
 #define CLOCK_TARGET_H
 
+#include "config.h"
+#include "cpu.h"
+
 /* returns clock divider, given maximal target frequency and clock reference */
 #define CLK_DIV(ref, target) ((ref + target - 1) / target)
 
