@@ -72,8 +72,9 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
       /* NOTE the required tables are actually -cos and -sin , so we need to 
          flip sign of the result of the fsincos calculation.
          Alternatively could flip at the calculation step instead */
-      s->tsin[i] = -fsincos(phase, &(s->tcos[i]));
-      s->tcos[i] *= (-1);
+//      s->tsin[i] = -fsincos(phase, &(s->tcos[i]));
+//      s->tcos[i] *= (-1);
+      s->tsin[i] = fsincos(phase, &(s->tcos[i]));
     }
     (&s->fft)->nbits = nbits-2;
     (&s->fft)->inverse = inverse;
@@ -114,9 +115,10 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
     /* pre rotation */
     in1 = input;
     in2 = input + n2 - 1;
-    /* careful: fft is initialised for a different number of bits here
-       so have to use s->fft->nbits not s->nbits .. */
-    const int revtab_shift = (12- s->fft.nbits);
+    
+    /* revtab comes from the fft; revtab table is sized for N=4096 size fft = 2^12.
+       The fft is size N/4 so s->nbits-2, so our shift needs to be (12-(nbits-2)) */
+    const int revtab_shift = (14- s->nbits);
     
     /* bitreverse reorder the input and rotate;   result here is in OUTPUT ... */
     /* (note that when using the current split radix, the bitreverse ordering is
@@ -142,13 +144,15 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
         while(p_revtab < p_revtab_end)
         {
             j = (*p_revtab)>>revtab_shift;
-            CMUL(&z[j].re, &z[j].im, *in2, *in1, -T[1], -T[0] );
+//            XNPROD31(*in2, *in1, -T[1], -T[0], &z[j].re, &z[j].im );
+            XNPROD31(*in2, *in1, T[1], T[0], &z[j].re, &z[j].im );
             T += step;
             in1 += 2;
             in2 -= 2;
             p_revtab++;
             j = (*p_revtab)>>revtab_shift;
-            CMUL(&z[j].re, &z[j].im, *in2, *in1, -T[1], -T[0] );
+//            XNPROD31(*in2, *in1, -T[1], -T[0], &z[j].re, &z[j].im );
+            XNPROD31(*in2, *in1, T[1], T[0], &z[j].re, &z[j].im );
             T += step;
             in1 += 2;
             in2 -= 2;
@@ -160,13 +164,15 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
         while(p_revtab < p_revtab_end)
         {
             j = (*p_revtab)>>revtab_shift;
-            CMUL(&z[j].re, &z[j].im, *in2, *in1, -T[0], -T[1] );
+//            XNPROD31(*in2, *in1, -T[0], -T[1], &z[j].re, &z[j].im);
+            XNPROD31(*in2, *in1, T[0], T[1], &z[j].re, &z[j].im);
             T -= step;
             in1 += 2;
             in2 -= 2;
             p_revtab++;
             j = (*p_revtab)>>revtab_shift;
-            CMUL(&z[j].re, &z[j].im, *in2, *in1, -T[0], -T[1] );
+//            XNPROD31(*in2, *in1, -T[0], -T[1], &z[j].re, &z[j].im);
+            XNPROD31(*in2, *in1, T[0], T[1], &z[j].re, &z[j].im);
             T -= step;
             in1 += 2;
             in2 -= 2;
