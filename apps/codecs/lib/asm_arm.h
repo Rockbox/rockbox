@@ -89,11 +89,11 @@ static inline void XNPROD31(int32_t  a, int32_t  b,
 #define XPROD31_R(_a, _b, _t, _v, _x, _y)\
 {\
   int x1, y1, l;\
-  asm(	"smull	%0, %1, %3, %5\n\t"\
-	"rsb	%2, %6, #0\n\t"\
-	"smlal	%0, %1, %4, %6\n\t"\
-	"smull	%0, %2, %3, %2\n\t"\
-	"smlal	%0, %2, %4, %5"\
+  asm(	"smull	%0, %1, %5, %3\n\t"\
+	"rsb	%2, %3, #0\n\t"\
+	"smlal	%0, %1, %6, %4\n\t"\
+	"smull	%0, %2, %6, %2\n\t"\
+	"smlal	%0, %2, %5, %4"\
 	: "=&r" (l), "=&r" (x1), "=&r" (y1)\
 	: "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
   _x = x1 << 1;\
@@ -103,11 +103,11 @@ static inline void XNPROD31(int32_t  a, int32_t  b,
 #define XNPROD31_R(_a, _b, _t, _v, _x, _y)\
 {\
   int x1, y1, l;\
-  asm(	"smull	%0, %1, %3, %5\n\t"\
+  asm(	"smull	%0, %1, %5, %3\n\t"\
 	"rsb	%2, %4, #0\n\t"\
-	"smlal	%0, %1, %2, %6\n\t"\
-	"smull	%0, %2, %4, %5\n\t"\
-	"smlal	%0, %2, %3, %6"\
+	"smlal	%0, %1, %6, %2\n\t"\
+	"smull	%0, %2, %5, %4\n\t"\
+	"smlal	%0, %2, %6, %3"\
 	: "=&r" (l), "=&r" (x1), "=&r" (y1)\
 	: "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
   _x = x1 << 1;\
