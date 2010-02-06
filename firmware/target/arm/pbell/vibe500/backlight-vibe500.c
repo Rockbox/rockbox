@@ -64,16 +64,16 @@ void _buttonlight_on(void)
 {
     if (!buttonlight_status)
     {
-        touchpad_set_buttonlights(0x0f, 0);
+        touchpad_set_parameter(0x22, 0x000f); /* 0x22 - GPO_ENABLE */
         buttonlight_status = 1;
     }
 }
- 
+
 void _buttonlight_off(void)
 {
     if (buttonlight_status)
     {
-        touchpad_set_buttonlights(0x00, 0);
+        touchpad_set_parameter(0x22, 0x0000); /* 0x22 - GPO_ENABLE */
         buttonlight_status = 0;
     }
 }
@@ -81,7 +81,8 @@ void _buttonlight_off(void)
 void _buttonlight_set_brightness(int brightness)
 {
     /* no brightness control, but lights stays on - for compatibility */
-    touchpad_set_buttonlights(0x0f, brightness);
+    (void)brightness;
+    touchpad_set_parameter(0x22, 0x000f); /* 0x22 - GPO_ENABLE */
     buttonlight_status = 1;
 }
 #endif
