@@ -5069,13 +5069,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </dest>
   <voice>
-    *: "talk mp3 clip"
+    *: "talk Clip"
   </voice>
 </phrase>
 <phrase>
