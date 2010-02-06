@@ -126,6 +126,42 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* ATRAC3 in RM/RA */
     [AFMT_RM_ATRAC3] =
         AFMT_ENTRY("ATRAC3","atrac3_rm",  NULL,        "rm\0ra\0rmvb\0"      ),
+    /* Atari CMC File */
+    [AFMT_CMC] =
+        AFMT_ENTRY("CMC",  "asap",     NULL,          "cmc\0"      ),
+    /* Atari CM3 File */
+    [AFMT_CM3] =
+        AFMT_ENTRY("CM3",  "asap",     NULL,          "cm3\0"      ),
+    /* Atari CMR File */
+    [AFMT_CMR] =
+        AFMT_ENTRY("CMR",  "asap",     NULL,          "cmr\0"      ),
+    /* Atari CMS File */
+    [AFMT_CMS] =
+        AFMT_ENTRY("CMS",  "asap",     NULL,          "cms\0"      ),
+    /* Atari DMC File */
+    [AFMT_DMC] =
+        AFMT_ENTRY("DMC",  "asap",     NULL,          "dmc\0"      ),
+    /* Atari DLT File */
+    [AFMT_DLT] =
+        AFMT_ENTRY("DLT",  "asap",     NULL,          "dlt\0"      ),
+    /* Atari MPT File */
+    [AFMT_MPT] =
+        AFMT_ENTRY("MPT",  "asap",     NULL,          "mpt\0"      ), 
+    /* Atari MPD File */
+    [AFMT_MPD] =
+        AFMT_ENTRY("MPD",  "asap",     NULL,          "mpd\0"      ),
+    /* Atari RMT File */
+    [AFMT_RMT] =
+        AFMT_ENTRY("RMT",  "asap",     NULL,          "rmt\0"      ),
+    /* Atari TMC File */
+    [AFMT_TMC] =
+        AFMT_ENTRY("TMC",  "asap",     NULL,          "tmc\0"      ),
+    /* Atari TM8 File */
+    [AFMT_TM8] =
+        AFMT_ENTRY("TM8",  "asap",     NULL,          "tm8\0"      ),
+    /* Atari TM2 File */
+    [AFMT_TM2] =
+        AFMT_ENTRY("TM2",  "asap",     NULL,          "tm2\0"      ),        
 #endif
 };
 
@@ -375,7 +411,25 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         id3->filesize = filesize(fd);
         id3->genre_string = id3_get_num_genre(36);
         break;
-
+    
+    case AFMT_CMC:
+    case AFMT_CM3:
+    case AFMT_CMR:
+    case AFMT_CMS:
+    case AFMT_DMC:
+    case AFMT_DLT:
+    case AFMT_MPT:
+    case AFMT_MPD:
+    case AFMT_RMT:
+    case AFMT_TMC:
+    case AFMT_TM8:
+    case AFMT_TM2:
+        id3->bitrate = 706;
+        id3->frequency = 44100;
+        id3->vbr = false;
+        id3->filesize = filesize(fd);
+        id3->genre_string = id3_get_num_genre(36);
+        break;
     case AFMT_RM_COOK:
         if (!get_rm_metadata(fd, id3))
         {

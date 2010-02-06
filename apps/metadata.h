@@ -60,11 +60,23 @@ enum
     AFMT_APE,          /* Monkey's Audio (APE) */
     AFMT_WMA,          /* WMAV1/V2 in ASF */
     AFMT_MOD,          /* Amiga MOD File Format */
-    AFMT_SAP,          /* Amiga 8Bit SAP Format */
+    AFMT_SAP,          /* Atari 8Bit SAP Format */
     AFMT_RM_COOK,      /* Cook in RM/RA */
     AFMT_RM_AAC,       /* AAC in RM/RA */
     AFMT_RM_AC3,       /* AC3 in RM/RA */
     AFMT_RM_ATRAC3,    /* ATRAC3 in RM/RA */
+    AFMT_CMC,          /* Atari 8bit cmc format */
+    AFMT_CM3,          /* Atari 8bit cm3 format */
+    AFMT_CMR,          /* Atari 8bit cmr format */
+    AFMT_CMS,          /* Atari 8bit cms format */
+    AFMT_DMC,          /* Atari 8bit dmc format */
+    AFMT_DLT,          /* Atari 8bit dlt format */
+    AFMT_MPT,          /* Atari 8bit mpt format */
+    AFMT_MPD,          /* Atari 8bit mpd format */
+    AFMT_RMT,          /* Atari 8bit rmt format */
+    AFMT_TMC,          /* Atari 8bit tmc format */
+    AFMT_TM8,          /* Atari 8bit tm8 format */
+    AFMT_TM2,          /* Atari 8bit tm2 format */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -
