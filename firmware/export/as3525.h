@@ -219,6 +219,8 @@ CE lines
 
 #define CGU_VIC_CLOCK_ENABLE                 ( 1 << 23 ) /* vic */
 /* --- are disabled after reset --- */
+#define CGU_EXTMEM_CLOCK_ENABLE              ( 1 << 27 ) /* external memory */
+#define CGU_EXTMEMIF_CLOCK_ENABLE            ( 1 << 26 ) /* ext mem AHB IF */
 #define CGU_DMA_CLOCK_ENABLE                 ( 1 << 22 ) /* dma */
 #define CGU_USB_CLOCK_ENABLE                 ( 1 << 21 ) /* usb */
 #define CGU_I2SOUT_APB_CLOCK_ENABLE          ( 1 << 20 ) /* i2sout */
@@ -234,8 +236,7 @@ CE lines
 #define CGU_SSP_CLOCK_ENABLE                 ( 1 << 10 ) /* ssp */
 #define CGU_TIMER1_CLOCK_ENABLE              ( 1 <<  9 ) /* timer 1 */
 #define CGU_TIMER2_CLOCK_ENABLE              ( 1 <<  8 ) /* timer 2 */
-#define CGU_TIMERIF_CLOCK_ENABLE             ( 1 <<  7 ) /* timer
-interface */
+#define CGU_TIMERIF_CLOCK_ENABLE             ( 1 <<  7 ) /* timer interface */
 
 /**  ------------------------------------------------------------------
 * Number of cycles to wait before cgu is safely locked.

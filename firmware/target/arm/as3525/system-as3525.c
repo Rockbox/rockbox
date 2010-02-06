@@ -171,7 +171,7 @@ static void sdram_delay(void)
 /* Use the same initialization than OF */
 static void sdram_init(void)
 {
-    CGU_PERI |= (1<<26)|(1<<27); /* extmem & extmem intf clocks */
+    CGU_PERI |= (CGU_EXTMEM_CLOCK_ENABLE|CGU_EXTMEMIF_CLOCK_ENABLE);
 
     MPMC_CONTROL = 0x1; /* enable MPMC */
 
@@ -301,7 +301,7 @@ void system_init(void)
                 (AS3525_FCLK_PREDIV  << 2) |
                  AS3525_FCLK_SEL);
     /*  Set PCLK frequency */
-    CGU_PERI = ((CGU_PERI & 0xffffff80)  |    /* reset divider bits 0:6 */
+    CGU_PERI = ((CGU_PERI & ~0x7F)  |       /* reset divider bits 0:6 */
                  (AS3525_PCLK_DIV0 << 2) |
                  (AS3525_PCLK_DIV1 << 6) |
                   AS3525_PCLK_SEL);
