@@ -157,7 +157,7 @@
     *: "Nahrávám... %d%% hotovo (%s)"
   </dest>
   <voice>
-    *: "Nahrávám"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2383,7 +2383,7 @@
     iriverh100,iriverh120,iriverh300: "Vytvářím databázi... %d nalezeno (STOP pro návrat)"
     ipod*: "Vytvářím databázi... %d found (PREV pro návrat)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Vytvářím databázi... %d nalezeno (LEFT pro návrat)"
-    iaudiox5,iaudiom5*: "Vytvářím databázi... %d nalezeno (PREV pro návrat)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Vytvářím databázi... %d nalezeno (PREV pro návrat)"
     gogearsa9200: "Vytvářím databázi.. %d nalezeno (REW pro návrat)"
 </dest>
   <voice>
@@ -2429,10 +2429,10 @@
     *: "Initialize Now"
   </source>
   <dest>
-    *: "Vynutit obnovení mezipaměti popisků"
+    *: "Inicializovat jí nyní"
   </dest>
   <voice>
-    *: "Vynutit obnovení mezipaměti popisků"
+    *: "Inycializovat jí nyní"
   </voice>
 </phrase>
 <phrase>
@@ -3445,11 +3445,11 @@
     masd: none
   </source>
   <dest>
-    *: "Peak Meter"
+    *: "Vrcholový diagram"
     masd: none
   </dest>
   <voice>
-    *: "Peak Meter"
+    *: "Vrcholový diagram"
     masd: none
   </voice>
 </phrase>
@@ -3659,7 +3659,7 @@
     *: "Řecká (ISO-8859-7)"
   </dest>
   <voice>
-    *: "Greek"
+    *: "Řecká"
   </voice>
 </phrase>
 <phrase>
@@ -3834,7 +3834,7 @@
     *: "Unicode (UTF-8)"
   </dest>
   <voice>
-    *: "Unicode"
+    *: "Junykód ÚTÉEF 8"
   </voice>
 </phrase>
 <phrase>
@@ -3992,7 +3992,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Nickel metal hydride"
+    battery_types: "Niklometal hydridová"
   </voice>
 </phrase>
 <phrase>
@@ -4136,13 +4136,13 @@
     *: none
     rtc: "ON = Set"
     mrobe500: "HEART = Set"
-iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
- rtc: "ON = Nastavit"
+    rtc: "ON = Nastavit"
     mrobe500: "HEART = Nastavit"
     iriverh100,iriverh120,iriverh300: "NAVI = Nastavit"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Nastavit"
@@ -4150,6 +4150,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
+    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4577,7 +4578,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Maximální velikost playlistu"
   </dest>
   <voice>
-    *: "Maximální velikost playlistu"
+    *: "Maximální velikost plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -4714,7 +4715,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: none
     alarm: "PLAY=Nastavit OFF=Storno"
     ipod*: "SELECT=Nastavit MENU=Storno"
-    iriverh10,iriverh1_5gb: "SELECT=Nastavit PREV=Storno"
+    iriverh10,iriverh10_5gb: "SELECT=Nastavit PREV=Storno"
     gigabeats: "SELECT=Nastavit POWER=Storno"
   </dest>
   <voice>
@@ -4915,10 +4916,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Použít adresář .talk klipů"
+    *: "Použít .talk klipy pro adresáře"
   </dest>
   <voice>
-    *: "Použít adresář .talk klipů"
+    *: "Použít talk klipy pro adresáře"
   </voice>
 </phrase>
 <phrase>
@@ -4943,10 +4944,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Použít soubor ozvučení .talk"
+    *: "Použít .talk klipy pro soubory"
   </dest>
   <voice>
-    *: "Použít soubor ozvučení .talk"
+    *: "Použít talk klipy pro soubory"
   </voice>
 </phrase>
 <phrase>
@@ -5148,7 +5149,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    radio: "FM Rádio Menu"
+    radio: "EFEM Rádio Menu"
   </voice>
 </phrase>
 <phrase>
@@ -5641,7 +5642,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    radio: "USA and Kanada"
+    radio: "USA a Kanada"
   </voice>
 </phrase>
 <phrase>
@@ -5929,11 +5930,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording,archosplayer: "Vnější vstup"
+    recording,archosplayer: "Linkový vstup"
   </dest>
   <voice>
     *: none
-    recording,archosplayer: "Vnější vstup"
+    recording,archosplayer: "Linkový vstup"
   </voice>
 </phrase>
 <phrase>
@@ -6609,11 +6610,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    remote: "(Hlasitost : Znovu zapnout)"
+    remote: "(Hlasitost- : Znovu zapnout)"
   </dest>
   <voice>
     *: none
-    remote: "(Hlasitost : Znovu zapnout)"
+    remote: "Hlasitost mínus: Znovu zapnout"
   </voice>
 </phrase>
 <phrase>
@@ -6627,7 +6628,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Vytvořit playlist"
   </dest>
   <voice>
-    *: "Vytvořit playlist"
+    *: "Vytvořit plejlist"
   </voice>
 </phrase>
 <phrase>
@@ -6641,7 +6642,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Možnosti playlistu"
   </dest>
   <voice>
-    *: "Možnosti playlistu"
+    *: "Možnosti plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -6655,7 +6656,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Zobrazit aktuální playlist"
   </dest>
   <voice>
-    *: "Zobrazit aktuální playlist"
+    *: "Zobrazit aktuální plejlist"
   </voice>
 </phrase>
 <phrase>
@@ -6739,7 +6740,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Uložit aktuální playlist"
   </dest>
   <voice>
-    *: "Uložit aktuální playlist"
+    *: "Uložit aktuální plejlist"
   </voice>
 </phrase>
 <phrase>
@@ -6767,7 +6768,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Katalog playlistů"
   </dest>
   <voice>
-    *: "Katalog playlistů"
+    *: "Katalog plejlistů"
   </voice>
 </phrase>
 <phrase>
@@ -6809,7 +6810,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Varovat při mazání dynamického playlistu"
   </dest>
   <voice>
-    *: "Varovat při mazání dynamického playlistu"
+    *: "Varovat při mazání dynamického plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -6823,7 +6824,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Smazat dymanický playlist?"
   </dest>
   <voice>
-    *: "Smazat dymanický playlist?"
+    *: "Smazat dymanický plejlist?"
   </voice>
 </phrase>
 <phrase>
@@ -6899,10 +6900,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Disk:"
   </source>
   <dest>
-    *: "Velikost disku:"
+    *: "Dostupné:"
   </dest>
   <voice>
-    *: "velikost disku"
+    *: "Dostupné místo"
   </voice>
 </phrase>
 <phrase>
@@ -6913,7 +6914,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Free:"
   </source>
   <dest>
-    *: "Volné místo:"
+    *: "Volné:"
   </dest>
   <voice>
     *: "Volné místo"
@@ -6933,7 +6934,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    multivolume: "Interní"
+    multivolume: "Interní pamět"
   </voice>
 </phrase>
 <phrase>
@@ -7051,10 +7052,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Playlist"
   </source>
   <dest>
-    *: "Playlisy"
+    *: "Playlist"
   </dest>
   <voice>
-    *: "Playlisy"
+    *: "Plejlist"
   </voice>
 </phrase>
 <phrase>
@@ -7236,7 +7237,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Hledat v playlistu"
   </dest>
   <voice>
-    *: "Hledat v playlistu"
+    *: "Hledat v plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -7278,7 +7279,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Zobrazit katalog playlistů"
   </dest>
   <voice>
-    *: "Zobrazit katalog playlistů"
+    *: "Zobrazit katalog plejlistů"
   </voice>
 </phrase>
 <phrase>
@@ -7292,7 +7293,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Přidat do playlistu"
   </dest>
   <voice>
-    *: "Přidat do playlistu"
+    *: "Přidat do plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -7306,7 +7307,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Přidat do nového playlistu"
   </dest>
   <voice>
-    *: "Přidat do nového playlistu"
+    *: "Přidat do nového plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -7320,7 +7321,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "%s neexistuje"
   </dest>
   <voice>
-    *: ""
+    *: "Adresář plejlistů neexistuje"
   </voice>
 </phrase>
 <phrase>
@@ -7334,7 +7335,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Žádné playlisty"
   </dest>
   <voice>
-    *: "Žádné playlisty"
+    *: "Žádné plejlisty"
   </voice>
 </phrase>
 <phrase>
@@ -8058,7 +8059,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Mezipaměť playlistu je plná"
   </dest>
   <voice>
-    *: "Mezipaměť playlistu je plná"
+    *: "Mezipaměť plejlistu je plná"
   </voice>
 </phrase>
 <phrase>
@@ -8116,7 +8117,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Chyba aktualizace nastavení playlistu"
   </dest>
   <voice>
-    *: "Chyba aktualizace nastavení playlistu"
+    *: "Chyba aktualizace nastavení plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -8130,7 +8131,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Chyba při přístupu k playlistu"
   </dest>
   <voice>
-    *: "Chyba při přístupu k playlistu"
+    *: "Chyba při přístupu k plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -8144,7 +8145,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Chyba přístupu k nastavení playlistu"
   </dest>
   <voice>
-    *: "Chyba přístupu k nastavení playlistu"
+    *: "Chyba přístupu k nastavení plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -8172,7 +8173,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Neplatný soubor nastavení playlistu"
   </dest>
   <voice>
-    *: "Neplatný soubor nastavení playlistu"
+    *: "Neplatný soubor nastavení plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -8327,6 +8328,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8422,13 +8424,13 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     gigabeatfx: "POWER to abort"
   </source>
   <dest>
-    *: "OFF = zrušit"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP = zrušit"
-    ipod*: "PLAY/PAUSE = zrušit"
-    iaudiox5,iaudiom5: "Long PLAY = zrušit"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV = zrušit"
-    gigabeats: "BACK = zrušit"
-    gigabeatfx: "POWER = zrušit"
+    *: "OFF pro zrušení"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP pro zrušení"
+    ipod*: "PLAY/PAUSE pro zrušení"
+    iaudiox5,iaudiom5: "Long PLAY pro zrušení"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV pro zrušení"
+    gigabeats: "BACK pro zrušení"
+    gigabeatfx: "POWER pro zrušení"
   </dest>
   <voice>
     *: ""
@@ -8647,7 +8649,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    charging: "Nabíjení"
+    charging: "Baterie: Nabíjení"
   </voice>
 </phrase>
 <phrase>
@@ -8681,7 +8683,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    charging: "Baterie: Přerušov.nab."
+    charging: "Baterie: Přerušované nabíjení"
   </voice>
 </phrase>
 <phrase>
@@ -8723,7 +8725,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "B"
   </dest>
   <voice>
-    *: "bajt"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10073,7 +10075,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    rtc: "Nyní je:"
+    rtc: "Aktualní čas:"
   </voice>
 </phrase>
 <phrase>
@@ -10175,7 +10177,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    swcodec: "Oříznutí"
+    swcodec: "Oříznutí frekvence"
   </voice>
 </phrase>
 <phrase>
@@ -10447,7 +10449,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    recorder_pad: "Možnost"
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -10613,11 +10615,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    recording: "Line In konektor"
+    recording: "Linkový vstup"
   </dest>
   <voice>
     *: none
-    recording: "Line In konektor"
+    recording: "Linkový vstup"
   </voice>
 </phrase>
 <phrase>
@@ -10990,7 +10992,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: "Work"
   </source>
   <dest>
-    *: "[Dílo]"
+    *: "Dílo"
   </dest>
   <voice>
     *: ""
@@ -11666,7 +11668,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: "OUKEJ"
   </voice>
 </phrase>
 <phrase>
@@ -11696,11 +11698,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    gigabeatf: "Citlivost touchpadu"
+    gigabeatfx: "Citlivost touchpadu"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Citlivost tačpedu"
+    gigabeatfx: "Citlivost tačpedu"
   </voice>
 </phrase>
 <phrase>
@@ -11713,11 +11715,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    gigabeatf: "Vysoký"
+    gigabeatfx: "Vysoký"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Vysoký"
+    gigabeatfx: "Vysoký"
   </voice>
 </phrase>
 <phrase>
@@ -12629,6 +12631,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
+    usb_hid: "Prohlížecí režim"
   </voice>
 </phrase>
 <phrase>
@@ -12706,11 +12709,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    swcodec: "Omezený Preamp"
+    swcodec: "Kompresor"
   </dest>
   <voice>
     *: none
-    swcodec: "Omezený Preamp"
+    swcodec: "Kompresor"
   </voice>
 </phrase>
 <phrase>
@@ -12893,11 +12896,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    swcodec: "Makeup Gain"
+    swcodec: "Úprava zesílení"
   </dest>
   <voice>
     *: none
-    swcodec: "Makeup Gain"
+    swcodec: "Úprava zesílení"
   </voice>
 </phrase>
 <phrase>
@@ -12927,11 +12930,11 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    swcodec: "Knee"
+    swcodec: "Ohnutí"
   </dest>
   <voice>
     *: none
-    swcodec: "Knee"
+    swcodec: "Ohnutí"
   </voice>
 </phrase>
 <phrase>
@@ -13083,7 +13086,7 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </dest>
   <voice>
     *: none
-    usb_hid: "USB HID"
+    usb_hid: "USB externí zařízení"
   </voice>
 </phrase>
 <phrase>
@@ -13234,10 +13237,10 @@ iriverh100,iriverh120,iriverh300: "NAVI = Set"
   </source>
   <dest>
     *: none
-    crossfade: "Manual Track Skip Only"
+    crossfade: "Pouze ruční posun po stopách"
   </dest>
   <voice>
     *: none
-    crossfade: "Manual Track Skip Only"
+    crossfade: "Pouze ruční posun po stopách"
   </voice>
 </phrase>
