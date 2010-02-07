@@ -161,7 +161,8 @@ void fiq_handler(void)
     );
 }
 
-#if defined(BOOTLOADER) && (CONFIG_CPU == AS3525) /* not v2 */
+#if (CONFIG_CPU == AS3525) /* not v2 */
+#if defined(BOOTLOADER)
 static void sdram_delay(void)
 {
     int delay = 1024; /* arbitrary */
@@ -233,7 +234,7 @@ static void sdram_init(void)
 
     MPMC_DYNAMIC_CONFIG_0 |= (1<<19); /* buffer enable */
 }
-#else
+#else   /* !BOOTLOADER */
 void memory_init(void)
 {
     ttb_init();
@@ -253,7 +254,8 @@ void memory_init(void)
 
     enable_mmu();
 }
-#endif
+#endif /* BOOTLOADER */
+#endif /* CONFIG_CPU == AS3525 (not v2) */
 
 void system_init(void)
 {
