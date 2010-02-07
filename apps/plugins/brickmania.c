@@ -231,20 +231,26 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-#ifndef LEFT
-#define LEFT    BUTTON_BOTTOMLEFT
+#ifdef LEFT
+#define ALTLEFT   BUTTON_BOTTOMLEFT
+#else
+#define LEFT      BUTTON_BOTTOMLEFT
 #endif
-#ifndef RIGHT
-#define RIGHT   BUTTON_BOTTOMRIGHT
+#ifdef RIGHT
+#define ALTRIGHT  BUTTON_BOTTOMRIGHT
+#else
+#define RIGHT     BUTTON_BOTTOMRIGHT
 #endif
-#ifndef SELECT
-#define SELECT  BUTTON_CENTER
+#ifdef SELECT
+#define ALTSELECT BUTTON_CENTER
+#else
+#define SELECT    BUTTON_CENTER
 #endif
 #ifndef UP
-#define UP      BUTTON_TOPMIDDLE
+#define UP        BUTTON_TOPMIDDLE
 #endif
 #ifndef DOWN
-#define DOWN    BUTTON_BOTTOMMIDDLE
+#define DOWN      BUTTON_BOTTOMMIDDLE
 #endif
 #endif
 
@@ -1100,13 +1106,20 @@ static int brickmania_help(void)
         "Destroy", "all", "the", "bricks", "by", "bouncing",
         "the", "ball", "of", "them", "using", "the", "paddle.", "", "",
         "Controls", "",
-        "< & >", "Moves", "the", "paddle", "",
+#if CONFIG_KEYPAD == COWON_D2_PAD
+        "- & +:",
+#else
+        "< & >:",
+#endif
+        "Moves", "the", "paddle", "",
 #if CONFIG_KEYPAD == ONDIO_PAD
         "MENU:",
 #elif (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IAUDIO_M3_PAD)
         "PLAY:",
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
         "NAVI:",
+#elif CONFIG_KEYPAD == COWON_D2_PAD
+        "MENU:",
 #else
         "SELECT:",
 #endif
@@ -2070,6 +2083,9 @@ static int brickmania_game_loop(void)
 #endif
                 case UP:
                 case SELECT:
+#ifdef ALTSELECT
+                case ALTSELECT:
+#endif
                     if (game_state==ST_READY) 
                     {
                         /* Initialize used balls starting speed */
