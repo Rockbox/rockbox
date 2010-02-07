@@ -43,37 +43,20 @@
 #undef _
 
 #if defined(MPC_FIXED_POINT)
-   #if defined(OPTIMIZE_FOR_SPEED)
-      // round at compile time to +/- 2^14 as a pre-shift before 32=32x32-multiply
-      #define D(value)  (MPC_SHR_RND(value, 3))
+    #if defined(CPU_ARM)
+      // do not up-scale D-values to achieve higher speed in smull/mlal
+      // operations. saves ~14/8 = 1.75 cycles per multiplication
+      #define D(value)  (value)
       
-      // round at runtime to +/- 2^17 as a pre-shift before 32=32x32-multiply
-      // samples are 18.14 fixed point. 30.2 after this shift, whereas the
-      // 15.2 bits are significant (not including sign)
-      #define MPC_V_PRESHIFT(X) MPC_SHR_RND(X, 12)
-      
-      // in this configuration a post-shift by >>1 is needed after synthesis
-   #else
-      #if defined(CPU_ARM)
-          // do not up-scale D-values to achieve higher speed in smull/mlal
-          // operations. saves ~14/8 = 1.75 cycles per multiplication
-          #define D(value)  (value)
-          
-          // in this configuration a post-shift by >>16 is needed after synthesis
-      #else
-          // saturate to +/- 2^31 (= value << (31-17)), D-values are +/- 2^17
-          #define D(value)  (value << (14))
-      #endif
-      // do not perform pre-shift
-      #define MPC_V_PRESHIFT(X) (X)
-   #endif
+      // in this configuration a post-shift by >>16 is needed after synthesis
+    #else
+      // saturate to +/- 2^31 (= value << (31-17)), D-values are +/- 2^17
+      #define D(value)  (value << (14))
+    #endif
 #else
    // IMPORTANT: internal scaling is somehow strange for floating point, therefore we scale the coefficients Di_opt
    // by the correct amount to have proper scaled output
    #define D(value)  MAKE_MPC_SAMPLE((double)value*(double)(0x1000))
-   
-   // do not perform pre-shift
-   #define MPC_V_PRESHIFT(X) (X)
 #endif
     
 // Di_opt coefficients are +/- 2^17 (pre-shifted by <<16)
@@ -115,343 +98,376 @@ static const MPC_SAMPLE_FORMAT  Di_opt [512] ICONST_ATTR = {
 
 #undef  D
 
-// needed to prevent from internal overflow in calculate_V (see below)
-#define OVERFLOW_FIX 2
-
-// V-coefficients were expanded (<<) by V_COEFFICIENT_EXPAND
-#define V_COEFFICIENT_EXPAND 27
+// DCT32-coefficients were expanded (<<) by DCT32_COEFFICIENT_EXPAND
+#define DCT32_COEFFICIENT_EXPAND 31
 
 #if defined(MPC_FIXED_POINT)
-   #if defined(OPTIMIZE_FOR_SPEED)
-      // define 32=32x32-multiplication for DCT-coefficients with samples, vcoef will be pre-shifted on creation
-      // samples are rounded to +/- 2^19 as pre-shift before 32=32x32-multiply
-      #define MPC_MULTIPLY_V(sample, vcoef) ( MPC_SHR_RND(sample, 12) * vcoef )
-      
-      // pre- and postscale are used to avoid internal overflow in synthesis calculation
-      // samples are s15.0, v-coefs are 4.12 -> internal format is s19.12
-      #define MPC_MULTIPLY_V_PRESCALE(sample, vcoef)  ( MPC_SHR_RND(sample, (12+OVERFLOW_FIX)) * vcoef )
-      #define MPC_MULTIPLY_V_POSTSCALE(sample, vcoef) ( MPC_SHR_RND(sample, (12-OVERFLOW_FIX)) * vcoef )
-      #define MPC_V_POSTSCALE(sample) (sample<<OVERFLOW_FIX)
-      
-      // round to +/- 2^16 as pre-shift before 32=32x32-multiply
-      #define MPC_MAKE_INVCOS(value) (MPC_SHR_RND(value, 15))
-   #else
-      // define 64=32x32-multiplication for DCT-coefficients with samples. Via usage of MPC_FRACT highly optimized assembler might be used
-      // MULTIPLY_FRACT will do >>32 after multiplication, as V-coef were expanded by V_COEFFICIENT_EXPAND we'll correct this on the result.
-      // Will loose 5bit accuracy on result in fract part without effect on final audio result
-      #define MPC_MULTIPLY_V(sample, vcoef) ( (MPC_MULTIPLY_FRACT(sample, vcoef)) << (32-V_COEFFICIENT_EXPAND) )
-      
-      // pre- and postscale are used to avoid internal overflow in synthesis calculation
-      // samples are s15.14, v-coefs are 4.27 -> internal format is s19.12
-      #define MPC_MULTIPLY_V_PRESCALE(sample, vcoef)  ( (MPC_MULTIPLY_FRACT(sample, vcoef)) << (32-V_COEFFICIENT_EXPAND-OVERFLOW_FIX) )
-      #define MPC_MULTIPLY_V_POSTSCALE(sample, vcoef) ( (MPC_MULTIPLY_FRACT(sample, vcoef)) << (32-V_COEFFICIENT_EXPAND+OVERFLOW_FIX) )
-      #define MPC_V_POSTSCALE(sample) (sample<<OVERFLOW_FIX)
-      
-      // directly use accurate 32bit-coefficients
-      #define MPC_MAKE_INVCOS(value) (value)
-   #endif
+   // define 64=32x32-multiplication for DCT-coefficients with samples. Via usage of MPC_FRACT highly optimized assembler might be used
+   // MULTIPLY_FRACT will perform >>32 after multiplication, as coef were expanded by DCT32_COEFFICIENT_EXPAND we'll correct this on the result.
+   // Will loose 4 bit accuracy on result in fract part without effect on final audio result
+   #define MPC_DCT32_MUL(sample, coef)  (MPC_MULTIPLY_FRACT(sample,coef) << (32-DCT32_COEFFICIENT_EXPAND))
+   #define MPC_DCT32_SHIFT(sample)      (sample)
 #else
    // for floating point use the standard multiplication macro
-   #define MPC_MULTIPLY_V          (sample, vcoef) ( MPC_MULTIPLY(sample, vcoef) )
-   #define MPC_MULTIPLY_V_PRESCALE (sample, vcoef) ( MPC_MULTIPLY(sample, vcoef) )
-   #define MPC_MULTIPLY_V_POSTSCALE(sample, vcoef) ( MPC_MULTIPLY(sample, vcoef) )
-   #define MPC_V_POSTSCALE(sample) (sample)
-   
-   // downscale the accurate 32bit-coefficients and convert to float
-   #define MPC_MAKE_INVCOS(value) MAKE_MPC_SAMPLE((double)value/(double)(1<<V_COEFFICIENT_EXPAND))
+   #define MPC_DCT32_MUL(sample, coef)  (MPC_MULTIPLY(sample, coef) )
+   #define MPC_DCT32_SHIFT(sample)      (sample)
 #endif
 
-// define constants for DCT-synthesis
-// INVCOSxx = (0.5 / cos(xx*PI/64)) << 27, <<27 to saturate to +/- 2^31
-#define INVCOS01 MPC_MAKE_INVCOS(  67189797)
-#define INVCOS02 MPC_MAKE_INVCOS(  67433575)
-#define INVCOS03 MPC_MAKE_INVCOS(  67843164)
-#define INVCOS04 MPC_MAKE_INVCOS(  68423604)
-#define INVCOS05 MPC_MAKE_INVCOS(  69182167)
-#define INVCOS06 MPC_MAKE_INVCOS(  70128577)
-#define INVCOS07 MPC_MAKE_INVCOS(  71275330)
-#define INVCOS08 MPC_MAKE_INVCOS(  72638111)
-#define INVCOS09 MPC_MAKE_INVCOS(  74236348)
-#define INVCOS10 MPC_MAKE_INVCOS(  76093940)
-#define INVCOS11 MPC_MAKE_INVCOS(  78240207)
-#define INVCOS12 MPC_MAKE_INVCOS(  80711144)
-#define INVCOS13 MPC_MAKE_INVCOS(  83551089)
-#define INVCOS14 MPC_MAKE_INVCOS(  86814950)
-#define INVCOS15 MPC_MAKE_INVCOS(  90571242)
-#define INVCOS16 MPC_MAKE_INVCOS(  94906266)
-#define INVCOS17 MPC_MAKE_INVCOS(  99929967)
-#define INVCOS18 MPC_MAKE_INVCOS( 105784321)
-#define INVCOS19 MPC_MAKE_INVCOS( 112655602)
-#define INVCOS20 MPC_MAKE_INVCOS( 120792764)
-#define INVCOS21 MPC_MAKE_INVCOS( 130535899)
-#define INVCOS22 MPC_MAKE_INVCOS( 142361749)
-#define INVCOS23 MPC_MAKE_INVCOS( 156959571)
-#define INVCOS24 MPC_MAKE_INVCOS( 175363913)
-#define INVCOS25 MPC_MAKE_INVCOS( 199201203)
-#define INVCOS26 MPC_MAKE_INVCOS( 231182936)
-#define INVCOS27 MPC_MAKE_INVCOS( 276190692)
-#define INVCOS28 MPC_MAKE_INVCOS( 343988688)
-#define INVCOS29 MPC_MAKE_INVCOS( 457361460)
-#define INVCOS30 MPC_MAKE_INVCOS( 684664578)
-#define INVCOS31 MPC_MAKE_INVCOS(1367679739)
-
+/******************************************************************************
+ * mpc_dct32(const int *in, int *out)
+ *
+ * mpc_dct32 is a dct32 with in[32]->dct[32] that contains the mirroring from
+ * dct[32] to the expected out[64]. The symmetry is 
+ * out[16] = 0, 
+ * out[ 0..15] =  dct[ 0..15], 
+ * out[32..17] = -dct[ 0..15], 
+ * out[33..48] = -dct[16..31],
+ * out[63..48] = -dct[16..31].
+ * The cos-tab has the format s0.31.
+ *****************************************************************************/
 void 
-mpc_calculate_new_V ( const MPC_SAMPLE_FORMAT * Sample, MPC_SAMPLE_FORMAT * V )
-ICODE_ATTR_MPC_LARGE_IRAM;
+mpc_dct32(const MPC_SAMPLE_FORMAT *in, MPC_SAMPLE_FORMAT *v)
+ICODE_ATTR_MPC_LARGE_IRAM; 
 
-void 
-mpc_calculate_new_V ( const MPC_SAMPLE_FORMAT * Sample, MPC_SAMPLE_FORMAT * V )
+void
+mpc_dct32(const MPC_SAMPLE_FORMAT *in, MPC_SAMPLE_FORMAT *v)
 {
-    // Calculating new V-buffer values for left channel
-    // calculate new V-values (ISO-11172-3, p. 39)
-    // based upon fast-MDCT algorithm by Byeong Gi Lee
-    MPC_SAMPLE_FORMAT A[16];
-    MPC_SAMPLE_FORMAT B[16];
-    MPC_SAMPLE_FORMAT tmp;
+  MPC_SAMPLE_FORMAT t0,   t1,   t2,   t3,   t4,   t5,   t6,   t7;
+  MPC_SAMPLE_FORMAT t8,   t9,   t10,  t11,  t12,  t13,  t14,  t15;
+  MPC_SAMPLE_FORMAT t16,  t17,  t18,  t19,  t20,  t21,  t22,  t23;
+  MPC_SAMPLE_FORMAT t24,  t25,  t26,  t27,  t28,  t29,  t30,  t31;
+  MPC_SAMPLE_FORMAT t32,  t33,  t34,  t35,  t36,  t37,  t38,  t39;
+  MPC_SAMPLE_FORMAT t40,  t41,  t42,  t43,  t44,  t45,  t46,  t47;
+  MPC_SAMPLE_FORMAT t48,  t49,  t50,  t51,  t52,  t53,  t54,  t55;
+  MPC_SAMPLE_FORMAT t56,  t57,  t58,  t59,  t60,  t61,  t62,  t63;
+  MPC_SAMPLE_FORMAT t64,  t65,  t66,  t67,  t68,  t69,  t70,  t71;
+  MPC_SAMPLE_FORMAT t72,  t73,  t74,  t75,  t76,  t77,  t78,  t79;
+  MPC_SAMPLE_FORMAT t80,  t81,  t82,  t83,  t84,  t85,  t86,  t87;
+  MPC_SAMPLE_FORMAT t88,  t89,  t90,  t91,  t92,  t93,  t94,  t95;
+  MPC_SAMPLE_FORMAT t96,  t97,  t98,  t99,  t100, t101, t102, t103;
+  MPC_SAMPLE_FORMAT t104, t105, t106, t107, t108, t109, t110, t111;
+  MPC_SAMPLE_FORMAT t112, t113, t114, t115, t116, t117, t118, t119;
+  MPC_SAMPLE_FORMAT t120, t121, t122, t123, t124, t125, t126, t127;
+  MPC_SAMPLE_FORMAT t128, t129, t130, t131, t132, t133, t134, t135;
+  MPC_SAMPLE_FORMAT t136, t137, t138, t139, t140, t141, t142, t143;
+  MPC_SAMPLE_FORMAT t144, t145, t146, t147, t148, t149, t150, t151;
+  MPC_SAMPLE_FORMAT t152, t153, t154, t155, t156, t157, t158, t159;
+  MPC_SAMPLE_FORMAT t160, t161, t162, t163, t164, t165, t166, t167;
+  MPC_SAMPLE_FORMAT t168, t169, t170, t171, t172, t173, t174, t175;
+  MPC_SAMPLE_FORMAT t176;
 
-    A[ 0] = Sample[ 0] + Sample[31];
-    A[ 1] = Sample[ 1] + Sample[30];
-    A[ 2] = Sample[ 2] + Sample[29];
-    A[ 3] = Sample[ 3] + Sample[28];
-    A[ 4] = Sample[ 4] + Sample[27];
-    A[ 5] = Sample[ 5] + Sample[26];
-    A[ 6] = Sample[ 6] + Sample[25];
-    A[ 7] = Sample[ 7] + Sample[24];
-    A[ 8] = Sample[ 8] + Sample[23];
-    A[ 9] = Sample[ 9] + Sample[22];
-    A[10] = Sample[10] + Sample[21];
-    A[11] = Sample[11] + Sample[20];
-    A[12] = Sample[12] + Sample[19];
-    A[13] = Sample[13] + Sample[18];
-    A[14] = Sample[14] + Sample[17];
-    A[15] = Sample[15] + Sample[16];
-    // 16 adds
+    /* costab[i] = cos(PI / (2 * 32) * i) */
+#define costab01 (0x7fd8878e)  /* 0.998795456 */
+#define costab02 (0x7f62368f)  /* 0.995184727 */
+#define costab03 (0x7e9d55fc)  /* 0.989176510 */
+#define costab04 (0x7d8a5f40)  /* 0.980785280 */
+#define costab05 (0x7c29fbee)  /* 0.970031253 */
+#define costab06 (0x7a7d055b)  /* 0.956940336 */
+#define costab07 (0x78848414)  /* 0.941544065 */
+#define costab08 (0x7641af3d)  /* 0.923879533 */
+#define costab09 (0x73b5ebd1)  /* 0.903989293 */
+#define costab10 (0x70e2cbc6)  /* 0.881921264 */
+#define costab11 (0x6dca0d14)  /* 0.857728610 */
+#define costab12 (0x6a6d98a4)  /* 0.831469612 */
+#define costab13 (0x66cf8120)  /* 0.803207531 */
+#define costab14 (0x62f201ac)  /* 0.773010453 */
+#define costab15 (0x5ed77c8a)  /* 0.740951125 */
+#define costab16 (0x5a82799a)  /* 0.707106781 */
+#define costab17 (0x55f5a4d2)  /* 0.671558955 */
+#define costab18 (0x5133cc94)  /* 0.634393284 */
+#define costab19 (0x4c3fdff4)  /* 0.595699304 */
+#define costab20 (0x471cece7)  /* 0.555570233 */
+#define costab21 (0x41ce1e65)  /* 0.514102744 */
+#define costab22 (0x3c56ba70)  /* 0.471396737 */
+#define costab23 (0x36ba2014)  /* 0.427555093 */
+#define costab24 (0x30fbc54d)  /* 0.382683432 */
+#define costab25 (0x2b1f34eb)  /* 0.336889853 */
+#define costab26 (0x25280c5e)  /* 0.290284677 */
+#define costab27 (0x1f19f97b)  /* 0.242980180 */
+#define costab28 (0x18f8b83c)  /* 0.195090322 */
+#define costab29 (0x12c8106f)  /* 0.146730474 */
+#define costab30 (0x0c8bd35e)  /* 0.098017140 */
+#define costab31 (0x0647d97c)  /* 0.049067674 */
 
-    B[ 0] = A[ 0] + A[15];
-    B[ 1] = A[ 1] + A[14];
-    B[ 2] = A[ 2] + A[13];
-    B[ 3] = A[ 3] + A[12];
-    B[ 4] = A[ 4] + A[11];
-    B[ 5] = A[ 5] + A[10];
-    B[ 6] = A[ 6] + A[ 9];
-    B[ 7] = A[ 7] + A[ 8];
-    B[ 8] = MPC_MULTIPLY_V((A[ 0] - A[15]), INVCOS02);
-    B[ 9] = MPC_MULTIPLY_V((A[ 1] - A[14]), INVCOS06);
-    B[10] = MPC_MULTIPLY_V((A[ 2] - A[13]), INVCOS10);
-    B[11] = MPC_MULTIPLY_V((A[ 3] - A[12]), INVCOS14);
-    B[12] = MPC_MULTIPLY_V((A[ 4] - A[11]), INVCOS18);
-    B[13] = MPC_MULTIPLY_V((A[ 5] - A[10]), INVCOS22);
-    B[14] = MPC_MULTIPLY_V((A[ 6] - A[ 9]), INVCOS26);
-    B[15] = MPC_MULTIPLY_V((A[ 7] - A[ 8]), INVCOS30);
-    // 8 adds, 8 subs, 8 muls, 8 shifts
+  t0   = in[ 0] + in[31];  t16  = MPC_DCT32_MUL(in[ 0] - in[31], costab01);
+  t1   = in[15] + in[16];  t17  = MPC_DCT32_MUL(in[15] - in[16], costab31);
 
-    A[ 0] = B[ 0] + B[ 7];
-    A[ 1] = B[ 1] + B[ 6];
-    A[ 2] = B[ 2] + B[ 5];
-    A[ 3] = B[ 3] + B[ 4];
-    A[ 4] = MPC_MULTIPLY_V((B[ 0] - B[ 7]), INVCOS04);
-    A[ 5] = MPC_MULTIPLY_V((B[ 1] - B[ 6]), INVCOS12);
-    A[ 6] = MPC_MULTIPLY_V((B[ 2] - B[ 5]), INVCOS20);
-    A[ 7] = MPC_MULTIPLY_V((B[ 3] - B[ 4]), INVCOS28);
-    A[ 8] = B[ 8] + B[15];
-    A[ 9] = B[ 9] + B[14];
-    A[10] = B[10] + B[13];
-    A[11] = B[11] + B[12];
-    A[12] = MPC_MULTIPLY_V((B[ 8] - B[15]), INVCOS04);
-    A[13] = MPC_MULTIPLY_V((B[ 9] - B[14]), INVCOS12);
-    A[14] = MPC_MULTIPLY_V((B[10] - B[13]), INVCOS20);
-    A[15] = MPC_MULTIPLY_V((B[11] - B[12]), INVCOS28);
-    // 8 adds, 8 subs, 8 muls, 8 shifts
+  t41  = t16 + t17;
+  t59  = MPC_DCT32_MUL(t16 - t17, costab02);
+  t33  = t0  + t1;
+  t50  = MPC_DCT32_MUL(t0  - t1,  costab02);
 
-    B[ 0] = A[ 0] + A[ 3];
-    B[ 1] = A[ 1] + A[ 2];
-    B[ 2] = MPC_MULTIPLY_V((A[ 0] - A[ 3]), INVCOS08);
-    B[ 3] = MPC_MULTIPLY_V((A[ 1] - A[ 2]), INVCOS24);
-    B[ 4] = A[ 4] + A[ 7];
-    B[ 5] = A[ 5] + A[ 6];
-    B[ 6] = MPC_MULTIPLY_V((A[ 4] - A[ 7]), INVCOS08);
-    B[ 7] = MPC_MULTIPLY_V((A[ 5] - A[ 6]), INVCOS24);
-    B[ 8] = A[ 8] + A[11];
-    B[ 9] = A[ 9] + A[10];
-    B[10] = MPC_MULTIPLY_V((A[ 8] - A[11]), INVCOS08);
-    B[11] = MPC_MULTIPLY_V((A[ 9] - A[10]), INVCOS24);
-    B[12] = A[12] + A[15];
-    B[13] = A[13] + A[14];
-    B[14] = MPC_MULTIPLY_V((A[12] - A[15]), INVCOS08);
-    B[15] = MPC_MULTIPLY_V((A[13] - A[14]), INVCOS24);
-    // 8 adds, 8 subs, 8 muls, 8 shifts
+  t2   = in[ 7] + in[24];  t18  = MPC_DCT32_MUL(in[ 7] - in[24], costab15);
+  t3   = in[ 8] + in[23];  t19  = MPC_DCT32_MUL(in[ 8] - in[23], costab17);
 
-    A[ 0] = B[ 0] + B[ 1];
-    A[ 1] = MPC_MULTIPLY_V((B[ 0] - B[ 1]), INVCOS16);
-    A[ 2] = B[ 2] + B[ 3];
-    A[ 3] = MPC_MULTIPLY_V((B[ 2] - B[ 3]), INVCOS16);
-    A[ 4] = B[ 4] + B[ 5];
-    A[ 5] = MPC_MULTIPLY_V((B[ 4] - B[ 5]), INVCOS16);
-    A[ 6] = B[ 6] + B[ 7];
-    A[ 7] = MPC_MULTIPLY_V((B[ 6] - B[ 7]), INVCOS16);
-    A[ 8] = B[ 8] + B[ 9];
-    A[ 9] = MPC_MULTIPLY_V((B[ 8] - B[ 9]), INVCOS16);
-    A[10] = B[10] + B[11];
-    A[11] = MPC_MULTIPLY_V((B[10] - B[11]), INVCOS16);
-    A[12] = B[12] + B[13];
-    A[13] = MPC_MULTIPLY_V((B[12] - B[13]), INVCOS16);
-    A[14] = B[14] + B[15];
-    A[15] = MPC_MULTIPLY_V((B[14] - B[15]), INVCOS16);
-    // 8 adds, 8 subs, 8 muls, 8 shifts
+  t42  = t18 + t19;
+  t60  = MPC_DCT32_MUL(t18 - t19, costab30);
+  t34  = t2  + t3;
+  t51  = MPC_DCT32_MUL(t2  - t3,  costab30);
 
-    // multiple used expressions: -(A[12] + A[14] + A[15])
-    V[48] = -A[ 0];
-    V[ 0] =  A[ 1];
-    V[40] = -A[ 2] - (V[ 8] = A[ 3]);
-    V[36] = -((V[ 4] = A[ 5] + (V[12] = A[ 7])) + A[ 6]);
-    V[44] = - A[ 4] - A[ 6] - A[ 7];
-    V[ 6] = (V[10] = A[11] + (V[14] = A[15])) + A[13];
-    V[38] = (V[34] = -(V[ 2] = A[ 9] + A[13] + A[15]) - A[14]) + A[ 9] - A[10] - A[11];
-    V[46] = (tmp = -(A[12] + A[14] + A[15])) - A[ 8];
-    V[42] = tmp - A[10] - A[11];
-    // 9 adds, 9 subs
+  t4   = in[ 3] + in[28];  t20  = MPC_DCT32_MUL(in[ 3] - in[28], costab07);
+  t5   = in[12] + in[19];  t21  = MPC_DCT32_MUL(in[12] - in[19], costab25);
 
-    A[ 0] = MPC_MULTIPLY_V_PRESCALE((Sample[ 0] - Sample[31]), INVCOS01);
-    A[ 1] = MPC_MULTIPLY_V_PRESCALE((Sample[ 1] - Sample[30]), INVCOS03);
-    A[ 2] = MPC_MULTIPLY_V_PRESCALE((Sample[ 2] - Sample[29]), INVCOS05);
-    A[ 3] = MPC_MULTIPLY_V_PRESCALE((Sample[ 3] - Sample[28]), INVCOS07);
-    A[ 4] = MPC_MULTIPLY_V_PRESCALE((Sample[ 4] - Sample[27]), INVCOS09);
-    A[ 5] = MPC_MULTIPLY_V_PRESCALE((Sample[ 5] - Sample[26]), INVCOS11);
-    A[ 6] = MPC_MULTIPLY_V_PRESCALE((Sample[ 6] - Sample[25]), INVCOS13);
-    A[ 7] = MPC_MULTIPLY_V_PRESCALE((Sample[ 7] - Sample[24]), INVCOS15);
-    A[ 8] = MPC_MULTIPLY_V_PRESCALE((Sample[ 8] - Sample[23]), INVCOS17);
-    A[ 9] = MPC_MULTIPLY_V_PRESCALE((Sample[ 9] - Sample[22]), INVCOS19);
-    A[10] = MPC_MULTIPLY_V_PRESCALE((Sample[10] - Sample[21]), INVCOS21);
-    A[11] = MPC_MULTIPLY_V_PRESCALE((Sample[11] - Sample[20]), INVCOS23);
-    A[12] = MPC_MULTIPLY_V_PRESCALE((Sample[12] - Sample[19]), INVCOS25);
-    A[13] = MPC_MULTIPLY_V_PRESCALE((Sample[13] - Sample[18]), INVCOS27);
-    A[14] = MPC_MULTIPLY_V_PRESCALE((Sample[14] - Sample[17]), INVCOS29);
-    A[15] = MPC_MULTIPLY_V_PRESCALE((Sample[15] - Sample[16]), INVCOS31);
-    // 16 subs, 16 muls, 16 shifts
+  t43  = t20 + t21;
+  t61  = MPC_DCT32_MUL(t20 - t21, costab14);
+  t35  = t4  + t5;
+  t52  = MPC_DCT32_MUL(t4  - t5,  costab14);
 
-    B[ 0] = A[ 0] + A[15];
-    B[ 1] = A[ 1] + A[14];
-    B[ 2] = A[ 2] + A[13];
-    B[ 3] = A[ 3] + A[12];
-    B[ 4] = A[ 4] + A[11];
-    B[ 5] = A[ 5] + A[10];
-    B[ 6] = A[ 6] + A[ 9];
-    B[ 7] = A[ 7] + A[ 8];
-    B[ 8] = MPC_MULTIPLY_V((A[ 0] - A[15]), INVCOS02);
-    B[ 9] = MPC_MULTIPLY_V((A[ 1] - A[14]), INVCOS06);
-    B[10] = MPC_MULTIPLY_V((A[ 2] - A[13]), INVCOS10);
-    B[11] = MPC_MULTIPLY_V((A[ 3] - A[12]), INVCOS14);
-    B[12] = MPC_MULTIPLY_V((A[ 4] - A[11]), INVCOS18);
-    B[13] = MPC_MULTIPLY_V((A[ 5] - A[10]), INVCOS22);
-    B[14] = MPC_MULTIPLY_V((A[ 6] - A[ 9]), INVCOS26);
-    B[15] = MPC_MULTIPLY_V((A[ 7] - A[ 8]), INVCOS30);
-    // 8 adds, 8 subs, 8 muls, 8 shift
+  t6   = in[ 4] + in[27];  t22  = MPC_DCT32_MUL(in[ 4] - in[27], costab09);
+  t7   = in[11] + in[20];  t23  = MPC_DCT32_MUL(in[11] - in[20], costab23);
 
-    A[ 0] = B[ 0] + B[ 7];
-    A[ 1] = B[ 1] + B[ 6];
-    A[ 2] = B[ 2] + B[ 5];
-    A[ 3] = B[ 3] + B[ 4];
-    A[ 4] = MPC_MULTIPLY_V((B[ 0] - B[ 7]), INVCOS04);
-    A[ 5] = MPC_MULTIPLY_V((B[ 1] - B[ 6]), INVCOS12);
-    A[ 6] = MPC_MULTIPLY_V((B[ 2] - B[ 5]), INVCOS20);
-    A[ 7] = MPC_MULTIPLY_V((B[ 3] - B[ 4]), INVCOS28);
-    A[ 8] = B[ 8] + B[15];
-    A[ 9] = B[ 9] + B[14];
-    A[10] = B[10] + B[13];
-    A[11] = B[11] + B[12];
-    A[12] = MPC_MULTIPLY_V((B[ 8] - B[15]), INVCOS04);
-    A[13] = MPC_MULTIPLY_V((B[ 9] - B[14]), INVCOS12);
-    A[14] = MPC_MULTIPLY_V((B[10] - B[13]), INVCOS20);
-    A[15] = MPC_MULTIPLY_V((B[11] - B[12]), INVCOS28);
-    // 8 adds, 8 subs, 8 muls, 8 shift
+  t44  = t22 + t23;
+  t62  = MPC_DCT32_MUL(t22 - t23, costab18);
+  t36  = t6  + t7;
+  t53  = MPC_DCT32_MUL(t6  - t7,  costab18);
 
-    B[ 0] = A[ 0] + A[ 3];
-    B[ 1] = A[ 1] + A[ 2];
-    B[ 2] = MPC_MULTIPLY_V((A[ 0] - A[ 3]), INVCOS08);
-    B[ 3] = MPC_MULTIPLY_V((A[ 1] - A[ 2]), INVCOS24);
-    B[ 4] = A[ 4] + A[ 7];
-    B[ 5] = A[ 5] + A[ 6];
-    B[ 6] = MPC_MULTIPLY_V((A[ 4] - A[ 7]), INVCOS08);
-    B[ 7] = MPC_MULTIPLY_V((A[ 5] - A[ 6]), INVCOS24);
-    B[ 8] = A[ 8] + A[11];
-    B[ 9] = A[ 9] + A[10];
-    B[10] = MPC_MULTIPLY_V((A[ 8] - A[11]), INVCOS08);
-    B[11] = MPC_MULTIPLY_V((A[ 9] - A[10]), INVCOS24);
-    B[12] = A[12] + A[15];
-    B[13] = A[13] + A[14];
-    B[14] = MPC_MULTIPLY_V((A[12] - A[15]), INVCOS08);
-    B[15] = MPC_MULTIPLY_V((A[13] - A[14]), INVCOS24);
-    // 8 adds, 8 subs, 8 muls, 8 shift
+  t8   = in[ 1] + in[30];  t24  = MPC_DCT32_MUL(in[ 1] - in[30], costab03);
+  t9   = in[14] + in[17];  t25  = MPC_DCT32_MUL(in[14] - in[17], costab29);
 
-    A[ 0] = MPC_V_POSTSCALE((B[ 0] + B[ 1]));
-    A[ 1] = MPC_MULTIPLY_V_POSTSCALE((B[ 0] - B[ 1]), INVCOS16);
-    A[ 2] = MPC_V_POSTSCALE((B[ 2] + B[ 3]));
-    A[ 3] = MPC_MULTIPLY_V_POSTSCALE((B[ 2] - B[ 3]), INVCOS16);
-    A[ 4] = MPC_V_POSTSCALE((B[ 4] + B[ 5]));
-    A[ 5] = MPC_MULTIPLY_V_POSTSCALE((B[ 4] - B[ 5]), INVCOS16);
-    A[ 6] = MPC_V_POSTSCALE((B[ 6] + B[ 7]));
-    A[ 7] = MPC_MULTIPLY_V_POSTSCALE((B[ 6] - B[ 7]), INVCOS16);
-    A[ 8] = MPC_V_POSTSCALE((B[ 8] + B[ 9]));
-    A[ 9] = MPC_MULTIPLY_V_POSTSCALE((B[ 8] - B[ 9]), INVCOS16);
-    A[10] = MPC_V_POSTSCALE((B[10] + B[11]));
-    A[11] = MPC_MULTIPLY_V_POSTSCALE((B[10] - B[11]), INVCOS16);
-    A[12] = MPC_V_POSTSCALE((B[12] + B[13]));
-    A[13] = MPC_MULTIPLY_V_POSTSCALE((B[12] - B[13]), INVCOS16);
-    A[14] = MPC_V_POSTSCALE((B[14] + B[15]));
-    A[15] = MPC_MULTIPLY_V_POSTSCALE((B[14] - B[15]), INVCOS16);
-    // 8 adds, 8 subs, 8 muls, 8 shift
+  t45  = t24 + t25;
+  t63  = MPC_DCT32_MUL(t24 - t25, costab06);
+  t37  = t8  + t9;
+  t54  = MPC_DCT32_MUL(t8  - t9,  costab06);
 
-    // multiple used expressions: A[ 4]+A[ 6]+A[ 7], A[ 9]+A[13]+A[15]
-    V[ 5] = (V[11] = (V[13] = A[ 7] + (V[15] = A[15])) + A[11]) + A[ 5] + A[13];
-    V[ 7] = (V[ 9] = A[ 3] + A[11] + A[15]) + A[13];
-    V[33] = -(V[ 1] = A[ 1] + A[ 9] + A[13] + A[15]) - A[14];
-    V[35] = -(V[ 3] = A[ 5] + A[ 7] + A[ 9] + A[13] + A[15]) - A[ 6] - A[14];
-    V[37] = (tmp = -(A[10] + A[11] + A[13] + A[14] + A[15])) - A[ 5] - A[ 6] - A[ 7];
-    V[39] = tmp - A[ 2] - A[ 3];
-    V[41] = (tmp += A[13] - A[12]) - A[ 2] - A[ 3];
-    V[43] = tmp - A[ 4] - A[ 6] - A[ 7];
-    V[47] = (tmp = -(A[ 8] + A[12] + A[14] + A[15])) - A[ 0];
-    V[45] = tmp - A[ 4] - A[ 6] - A[ 7];
-    // 22 adds, 18 subs
+  t10  = in[ 6] + in[25];  t26  = MPC_DCT32_MUL(in[ 6] - in[25], costab13);
+  t11  = in[ 9] + in[22];  t27  = MPC_DCT32_MUL(in[ 9] - in[22], costab19);
 
-    V[32] = -(V[ 0] = MPC_V_PRESHIFT(V[ 0]));
-    V[31] = -(V[ 1] = MPC_V_PRESHIFT(V[ 1]));
-    V[30] = -(V[ 2] = MPC_V_PRESHIFT(V[ 2]));
-    V[29] = -(V[ 3] = MPC_V_PRESHIFT(V[ 3]));
-    V[28] = -(V[ 4] = MPC_V_PRESHIFT(V[ 4]));
-    V[27] = -(V[ 5] = MPC_V_PRESHIFT(V[ 5]));
-    V[26] = -(V[ 6] = MPC_V_PRESHIFT(V[ 6]));
-    V[25] = -(V[ 7] = MPC_V_PRESHIFT(V[ 7]));
-    V[24] = -(V[ 8] = MPC_V_PRESHIFT(V[ 8]));
-    V[23] = -(V[ 9] = MPC_V_PRESHIFT(V[ 9]));
-    V[22] = -(V[10] = MPC_V_PRESHIFT(V[10]));
-    V[21] = -(V[11] = MPC_V_PRESHIFT(V[11]));
-    V[20] = -(V[12] = MPC_V_PRESHIFT(V[12]));
-    V[19] = -(V[13] = MPC_V_PRESHIFT(V[13]));
-    V[18] = -(V[14] = MPC_V_PRESHIFT(V[14]));
-    V[17] = -(V[15] = MPC_V_PRESHIFT(V[15]));
-    // 16 adds, 16 shifts (OPTIMIZE_FOR_SPEED only)
+  t46  = t26 + t27;
+  t64  = MPC_DCT32_MUL(t26 - t27, costab26);
+  t38  = t10 + t11;
+  t55  = MPC_DCT32_MUL(t10 - t11, costab26);
 
-    V[63] =  (V[33] = MPC_V_PRESHIFT(V[33]));
-    V[62] =  (V[34] = MPC_V_PRESHIFT(V[34]));
-    V[61] =  (V[35] = MPC_V_PRESHIFT(V[35]));
-    V[60] =  (V[36] = MPC_V_PRESHIFT(V[36]));
-    V[59] =  (V[37] = MPC_V_PRESHIFT(V[37]));
-    V[58] =  (V[38] = MPC_V_PRESHIFT(V[38]));
-    V[57] =  (V[39] = MPC_V_PRESHIFT(V[39]));
-    V[56] =  (V[40] = MPC_V_PRESHIFT(V[40]));
-    V[55] =  (V[41] = MPC_V_PRESHIFT(V[41]));
-    V[54] =  (V[42] = MPC_V_PRESHIFT(V[42]));
-    V[53] =  (V[43] = MPC_V_PRESHIFT(V[43]));
-    V[52] =  (V[44] = MPC_V_PRESHIFT(V[44]));
-    V[51] =  (V[45] = MPC_V_PRESHIFT(V[45]));
-    V[50] =  (V[46] = MPC_V_PRESHIFT(V[46]));
-    V[49] =  (V[47] = MPC_V_PRESHIFT(V[47]));
-    V[48] =  (V[48] = MPC_V_PRESHIFT(V[48]));
-    // 16 adds, 16 shifts (OPTIMIZE_FOR_SPEED only)
-    
-    // OPTIMIZE_FOR_SPEED total: 143 adds, 107 subs, 80 muls, 112 shifts
-    //                    total: 111 adds, 107 subs, 80 muls,  80 shifts
+  t12  = in[ 2] + in[29];  t28  = MPC_DCT32_MUL(in[ 2] - in[29], costab05);
+  t13  = in[13] + in[18];  t29  = MPC_DCT32_MUL(in[13] - in[18], costab27);
+
+  t47  = t28 + t29;
+  t65  = MPC_DCT32_MUL(t28 - t29, costab10);
+  t39  = t12 + t13;
+  t56  = MPC_DCT32_MUL(t12 - t13, costab10);
+
+  t14  = in[ 5] + in[26];  t30  = MPC_DCT32_MUL(in[ 5] - in[26], costab11);
+  t15  = in[10] + in[21];  t31  = MPC_DCT32_MUL(in[10] - in[21], costab21);
+
+  t48  = t30 + t31;
+  t66  = MPC_DCT32_MUL(t30 - t31, costab22);
+  t40  = t14 + t15;
+  t57  = MPC_DCT32_MUL(t14 - t15, costab22);
+
+  t69  = t33 + t34;  t89  = MPC_DCT32_MUL(t33 - t34, costab04);
+  t70  = t35 + t36;  t90  = MPC_DCT32_MUL(t35 - t36, costab28);
+  t71  = t37 + t38;  t91  = MPC_DCT32_MUL(t37 - t38, costab12);
+  t72  = t39 + t40;  t92  = MPC_DCT32_MUL(t39 - t40, costab20);
+  t73  = t41 + t42;  t94  = MPC_DCT32_MUL(t41 - t42, costab04);
+  t74  = t43 + t44;  t95  = MPC_DCT32_MUL(t43 - t44, costab28);
+  t75  = t45 + t46;  t96  = MPC_DCT32_MUL(t45 - t46, costab12);
+  t76  = t47 + t48;  t97  = MPC_DCT32_MUL(t47 - t48, costab20);
+
+  t78  = t50 + t51;  t100 = MPC_DCT32_MUL(t50 - t51, costab04);
+  t79  = t52 + t53;  t101 = MPC_DCT32_MUL(t52 - t53, costab28);
+  t80  = t54 + t55;  t102 = MPC_DCT32_MUL(t54 - t55, costab12);
+  t81  = t56 + t57;  t103 = MPC_DCT32_MUL(t56 - t57, costab20);
+
+  t83  = t59 + t60;  t106 = MPC_DCT32_MUL(t59 - t60, costab04);
+  t84  = t61 + t62;  t107 = MPC_DCT32_MUL(t61 - t62, costab28);
+  t85  = t63 + t64;  t108 = MPC_DCT32_MUL(t63 - t64, costab12);
+  t86  = t65 + t66;  t109 = MPC_DCT32_MUL(t65 - t66, costab20);
+
+  t113 = t69  + t70;
+  t114 = t71  + t72;
+
+  /*  0 */ v[48] = -MPC_DCT32_SHIFT(t113 + t114);
+  /* 16 */ v[32] = -(v[ 0] = MPC_DCT32_SHIFT(MPC_DCT32_MUL(t113 - t114, costab16)));
+
+  t115 = t73  + t74;
+  t116 = t75  + t76;
+
+  t32  = t115 + t116;
+
+  /*  1 */ v[49] = v[47] = -MPC_DCT32_SHIFT(t32);
+
+  t118 = t78  + t79;
+  t119 = t80  + t81;
+
+  t58  = t118 + t119;
+
+  /*  2 */ v[50] = v[46] = -MPC_DCT32_SHIFT(t58);
+
+  t121 = t83  + t84;
+  t122 = t85  + t86;
+
+  t67  = t121 + t122;
+
+  t49  = (t67 * 2) - t32;
+
+  /*  3 */ v[51] = v[45] = -MPC_DCT32_SHIFT(t49);
+
+  t125 = t89  + t90;
+  t126 = t91  + t92;
+
+  t93  = t125 + t126;
+
+  /*  4 */ v[52] = v[44] = -MPC_DCT32_SHIFT(t93);
+
+  t128 = t94  + t95;
+  t129 = t96  + t97;
+
+  t98  = t128 + t129;
+
+  t68  = (t98 * 2) - t49;
+
+  /*  5 */ v[53] = v[43] = -MPC_DCT32_SHIFT(t68);
+
+  t132 = t100 + t101;
+  t133 = t102 + t103;
+
+  t104 = t132 + t133;
+
+  t82  = (t104 * 2) - t58;
+
+  /*  6 */ v[54] = v[42] = -MPC_DCT32_SHIFT(t82);
+
+  t136 = t106 + t107;
+  t137 = t108 + t109;
+
+  t110 = t136 + t137;
+
+  t87  = (t110 * 2) - t67;
+
+  t77  = (t87 * 2) - t68;
+
+  /*  7 */ v[55] = v[41] = -MPC_DCT32_SHIFT(t77);
+
+  t141 = MPC_DCT32_MUL(t69 - t70, costab08);
+  t142 = MPC_DCT32_MUL(t71 - t72, costab24);
+  t143 = t141 + t142;
+
+  /*  8 */ v[56] = v[40] = -MPC_DCT32_SHIFT(t143);
+  /* 24 */ v[24] = -(v[ 8] = MPC_DCT32_SHIFT((MPC_DCT32_MUL(t141 - t142, costab16) * 2) - t143));
+
+  t144 = MPC_DCT32_MUL(t73 - t74, costab08);
+  t145 = MPC_DCT32_MUL(t75 - t76, costab24);
+  t146 = t144 + t145;
+
+  t88  = (t146 * 2) - t77;
+
+  /*  9 */ v[57] = v[39] = -MPC_DCT32_SHIFT(t88);
+
+  t148 = MPC_DCT32_MUL(t78 - t79, costab08);
+  t149 = MPC_DCT32_MUL(t80 - t81, costab24);
+  t150 = t148 + t149;
+
+  t105 = (t150 * 2) - t82;
+
+  /* 10 */ v[58] = v[38] = -MPC_DCT32_SHIFT(t105);
+
+  t152 = MPC_DCT32_MUL(t83 - t84, costab08);
+  t153 = MPC_DCT32_MUL(t85 - t86, costab24);
+  t154 = t152 + t153;
+
+  t111 = (t154 * 2) - t87;
+
+  t99  = (t111 * 2) - t88;
+
+  /* 11 */ v[59] = v[37] = -MPC_DCT32_SHIFT(t99);
+
+  t157 = MPC_DCT32_MUL(t89 - t90, costab08);
+  t158 = MPC_DCT32_MUL(t91 - t92, costab24);
+  t159 = t157 + t158;
+
+  t127 = (t159 * 2) - t93;
+
+  /* 12 */ v[60] = v[36] = -MPC_DCT32_SHIFT(t127);
+
+  t160 = (MPC_DCT32_MUL(t125 - t126, costab16) * 2) - t127;
+
+  /* 20 */ v[28] = -(v[ 4] = MPC_DCT32_SHIFT(t160));
+  /* 28 */ v[20] = -(v[12] = MPC_DCT32_SHIFT((((MPC_DCT32_MUL(t157 - t158, costab16) * 2) - t159) * 2) - t160));
+
+  t161 = MPC_DCT32_MUL(t94 - t95, costab08);
+  t162 = MPC_DCT32_MUL(t96 - t97, costab24);
+  t163 = t161 + t162;
+
+  t130 = (t163 * 2) - t98;
+
+  t112 = (t130 * 2) - t99;
+
+  /* 13 */ v[61] = v[35] = -MPC_DCT32_SHIFT(t112);
+
+  t164 = (MPC_DCT32_MUL(t128 - t129, costab16) * 2) - t130;
+
+  t166 = MPC_DCT32_MUL(t100 - t101, costab08);
+  t167 = MPC_DCT32_MUL(t102 - t103, costab24);
+  t168 = t166 + t167;
+
+  t134 = (t168 * 2) - t104;
+
+  t120 = (t134 * 2) - t105;
+
+  /* 14 */ v[62] = v[34] = -MPC_DCT32_SHIFT(t120);
+
+  t135 = (MPC_DCT32_MUL(t118 - t119, costab16) * 2) - t120;
+
+  /* 18 */ v[30] = -(v[ 2] = MPC_DCT32_SHIFT(t135));
+
+  t169 = (MPC_DCT32_MUL(t132 - t133, costab16) * 2) - t134;
+
+  t151 = (t169 * 2) - t135;
+
+  /* 22 */ v[26] = -(v[ 6] = MPC_DCT32_SHIFT(t151));
+
+  t170 = (((MPC_DCT32_MUL(t148 - t149, costab16) * 2) - t150) * 2) - t151;
+
+  /* 26 */ v[22] = -(v[10] = MPC_DCT32_SHIFT(t170));
+  /* 30 */ v[18] = -(v[14] = MPC_DCT32_SHIFT((((((MPC_DCT32_MUL(t166 - t167, costab16) * 2) - t168) * 2) - t169) * 2) - t170));
+
+  t171 = MPC_DCT32_MUL(t106 - t107, costab08);
+  t172 = MPC_DCT32_MUL(t108 - t109, costab24);
+  t173 = t171 + t172;
+
+  t138 = (t173 * 2) - t110;
+
+  t123 = (t138 * 2) - t111;
+
+  t139 = (MPC_DCT32_MUL(t121 - t122, costab16) * 2) - t123;
+
+  t117 = (t123 * 2) - t112;
+
+  /* 15 */ v[63] = v[33] =-MPC_DCT32_SHIFT(t117);
+
+  t124 = (MPC_DCT32_MUL(t115 - t116, costab16) * 2) - t117;
+
+  /* 17 */ v[31] = -(v[ 1] = MPC_DCT32_SHIFT(t124));
+
+  t131 = (t139 * 2) - t124;
+
+  /* 19 */ v[29] = -(v[ 3] = MPC_DCT32_SHIFT(t131));
+
+  t140 = (t164 * 2) - t131;
+
+  /* 21 */ v[27] = -(v[ 5] = MPC_DCT32_SHIFT(t140));
+
+  t174 = (MPC_DCT32_MUL(t136 - t137, costab16) * 2) - t138;
+
+  t155 = (t174 * 2) - t139;
+
+  t147 = (t155 * 2) - t140;
+
+  /* 23 */ v[25] = -(v[ 7] = MPC_DCT32_SHIFT(t147));
+
+  t156 = (((MPC_DCT32_MUL(t144 - t145, costab16) * 2) - t146) * 2) - t147;
+
+  /* 25 */ v[23] = -(v[ 9] = MPC_DCT32_SHIFT(t156));
+
+  t175 = (((MPC_DCT32_MUL(t152 - t153, costab16) * 2) - t154) * 2) - t155;
+
+  t165 = (t175 * 2) - t156;
+
+  /* 27 */ v[21] = -(v[11] = MPC_DCT32_SHIFT(t165));
+
+  t176 = (((((MPC_DCT32_MUL(t161 - t162, costab16) * 2) - t163) * 2) - t164) * 2) - t165;
+
+  /* 29 */ v[19] = -(v[13] = MPC_DCT32_SHIFT(t176));
+  /* 31 */ v[17] = -(v[15] = MPC_DCT32_SHIFT((((((((MPC_DCT32_MUL(t171 - t172, costab16) * 2) - t173) * 2) - t174) * 2) - t175) * 2) - t176));
 }
 
 #if defined(CPU_ARM)
@@ -465,71 +481,57 @@ mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data,
                         const MPC_SAMPLE_FORMAT * V,
                         const MPC_SAMPLE_FORMAT * D)
 {
-   mpc_int32_t k;
+    mpc_int32_t k;
     
-   #if defined(OPTIMIZE_FOR_SPEED)
-      // 32=32x32-multiply (FIXED_POINT)
-      for ( k = 0; k < 32; k++, D += 16, V++ ) 
-      {
-         *Data = V[  0]*D[ 0] + V[ 96]*D[ 1] + V[128]*D[ 2] + V[224]*D[ 3]
-               + V[256]*D[ 4] + V[352]*D[ 5] + V[384]*D[ 6] + V[480]*D[ 7]
-               + V[512]*D[ 8] + V[608]*D[ 9] + V[640]*D[10] + V[736]*D[11]
-               + V[768]*D[12] + V[864]*D[13] + V[896]*D[14] + V[992]*D[15];
-         *Data >>= 1; // post shift to compensate for pre-shifting
-         Data += 1;
-         // total: 32 * (16 muls, 15 adds)
-      }
-   #else
-      #if defined(CPU_COLDFIRE)
-         // 64=32x32-multiply assembler for Coldfire
-         for ( k = 0; k < 32; k++, D += 16, V++ ) 
-         {
-            asm volatile (
-               "movem.l (%[D]), %%d0-%%d3                    \n\t"
-               "move.l (%[V]), %%a5                          \n\t"
-               "mac.l %%d0, %%a5, (96*4, %[V]), %%a5, %%acc0 \n\t"
-               "mac.l %%d1, %%a5, (128*4, %[V]), %%a5, %%acc0\n\t"
-               "mac.l %%d2, %%a5, (224*4, %[V]), %%a5, %%acc0\n\t"
-               "mac.l %%d3, %%a5, (256*4, %[V]), %%a5, %%acc0\n\t"
-               "movem.l (4*4, %[D]), %%d0-%%d3               \n\t"
-               "mac.l %%d0, %%a5, (352*4, %[V]), %%a5, %%acc0\n\t"
-               "mac.l %%d1, %%a5, (384*4, %[V]), %%a5, %%acc0\n\t"
-               "mac.l %%d2, %%a5, (480*4, %[V]), %%a5, %%acc0\n\t"
-               "mac.l %%d3, %%a5, (512*4, %[V]), %%a5, %%acc0\n\t"
-               "movem.l (8*4, %[D]), %%d0-%%d3               \n\t"
-               "mac.l %%d0, %%a5, (608*4, %[V]), %%a5, %%acc0\n\t"
-               "mac.l %%d1, %%a5, (640*4, %[V]), %%a5, %%acc0\n\t"
-               "mac.l %%d2, %%a5, (736*4, %[V]), %%a5, %%acc0\n\t"
-               "mac.l %%d3, %%a5, (768*4, %[V]), %%a5, %%acc0\n\t"
-               "movem.l (12*4, %[D]), %%d0-%%d3              \n\t"
-               "mac.l %%d0, %%a5, (864*4, %[V]), %%a5, %%acc0\n\t"
-               "mac.l %%d1, %%a5, (896*4, %[V]), %%a5, %%acc0\n\t"
-               "mac.l %%d2, %%a5, (992*4, %[V]), %%a5, %%acc0\n\t"
-               "mac.l %%d3, %%a5, %%acc0                     \n\t"
-               "movclr.l %%acc0, %%d0                        \n\t"
-               "lsl.l #1, %%d0                               \n\t"
-               "move.l %%d0, (%[Data])+                      \n"
-               : [Data] "+a" (Data)
-               : [V] "a" (V), [D] "a" (D)
-               : "d0", "d1", "d2", "d3", "a5");
-         }
-      #else
-         // 64=64x64-multiply (FIXED_POINT) or float=float*float (!FIXED_POINT) in C
-         for ( k = 0; k < 32; k++, D += 16, V++ )
-         {
-            *Data = MPC_MULTIPLY_EX(V[  0],D[ 0],30) + MPC_MULTIPLY_EX(V[ 96],D[ 1],30)
-                  + MPC_MULTIPLY_EX(V[128],D[ 2],30) + MPC_MULTIPLY_EX(V[224],D[ 3],30)
-                  + MPC_MULTIPLY_EX(V[256],D[ 4],30) + MPC_MULTIPLY_EX(V[352],D[ 5],30)
-                  + MPC_MULTIPLY_EX(V[384],D[ 6],30) + MPC_MULTIPLY_EX(V[480],D[ 7],30)
-                  + MPC_MULTIPLY_EX(V[512],D[ 8],30) + MPC_MULTIPLY_EX(V[608],D[ 9],30)
-                  + MPC_MULTIPLY_EX(V[640],D[10],30) + MPC_MULTIPLY_EX(V[736],D[11],30)
-                  + MPC_MULTIPLY_EX(V[768],D[12],30) + MPC_MULTIPLY_EX(V[864],D[13],30)
-                  + MPC_MULTIPLY_EX(V[896],D[14],30) + MPC_MULTIPLY_EX(V[992],D[15],30);
-            Data += 1;
-            // total: 16 muls, 15 adds, 16 shifts
-         }
-      #endif
-   #endif
+#if defined(CPU_COLDFIRE)
+    // 64=32x32-multiply assembler for Coldfire
+    for ( k = 0; k < 32; k++, D += 16, V++ ) 
+    {
+        asm volatile (
+        "movem.l (%[D]), %%d0-%%d3                    \n\t"
+        "move.l (%[V]), %%a5                          \n\t"
+        "mac.l %%d0, %%a5, (96*4, %[V]), %%a5, %%acc0 \n\t"
+        "mac.l %%d1, %%a5, (128*4, %[V]), %%a5, %%acc0\n\t"
+        "mac.l %%d2, %%a5, (224*4, %[V]), %%a5, %%acc0\n\t"
+        "mac.l %%d3, %%a5, (256*4, %[V]), %%a5, %%acc0\n\t"
+        "movem.l (4*4, %[D]), %%d0-%%d3               \n\t"
+        "mac.l %%d0, %%a5, (352*4, %[V]), %%a5, %%acc0\n\t"
+        "mac.l %%d1, %%a5, (384*4, %[V]), %%a5, %%acc0\n\t"
+        "mac.l %%d2, %%a5, (480*4, %[V]), %%a5, %%acc0\n\t"
+        "mac.l %%d3, %%a5, (512*4, %[V]), %%a5, %%acc0\n\t"
+        "movem.l (8*4, %[D]), %%d0-%%d3               \n\t"
+        "mac.l %%d0, %%a5, (608*4, %[V]), %%a5, %%acc0\n\t"
+        "mac.l %%d1, %%a5, (640*4, %[V]), %%a5, %%acc0\n\t"
+        "mac.l %%d2, %%a5, (736*4, %[V]), %%a5, %%acc0\n\t"
+        "mac.l %%d3, %%a5, (768*4, %[V]), %%a5, %%acc0\n\t"
+        "movem.l (12*4, %[D]), %%d0-%%d3              \n\t"
+        "mac.l %%d0, %%a5, (864*4, %[V]), %%a5, %%acc0\n\t"
+        "mac.l %%d1, %%a5, (896*4, %[V]), %%a5, %%acc0\n\t"
+        "mac.l %%d2, %%a5, (992*4, %[V]), %%a5, %%acc0\n\t"
+        "mac.l %%d3, %%a5, %%acc0                     \n\t"
+        "movclr.l %%acc0, %%d0                        \n\t"
+        "lsl.l #1, %%d0                               \n\t"
+        "move.l %%d0, (%[Data])+                      \n"
+        : [Data] "+a" (Data)
+        : [V] "a" (V), [D] "a" (D)
+        : "d0", "d1", "d2", "d3", "a5");
+    }
+#else
+    // 64=64x64-multiply (FIXED_POINT) or float=float*float (!FIXED_POINT) in C
+    for ( k = 0; k < 32; k++, D += 16, V++ )
+    {
+        *Data = MPC_MULTIPLY_EX(V[  0],D[ 0],30) + MPC_MULTIPLY_EX(V[ 96],D[ 1],30)
+          + MPC_MULTIPLY_EX(V[128],D[ 2],30) + MPC_MULTIPLY_EX(V[224],D[ 3],30)
+          + MPC_MULTIPLY_EX(V[256],D[ 4],30) + MPC_MULTIPLY_EX(V[352],D[ 5],30)
+          + MPC_MULTIPLY_EX(V[384],D[ 6],30) + MPC_MULTIPLY_EX(V[480],D[ 7],30)
+          + MPC_MULTIPLY_EX(V[512],D[ 8],30) + MPC_MULTIPLY_EX(V[608],D[ 9],30)
+          + MPC_MULTIPLY_EX(V[640],D[10],30) + MPC_MULTIPLY_EX(V[736],D[11],30)
+          + MPC_MULTIPLY_EX(V[768],D[12],30) + MPC_MULTIPLY_EX(V[864],D[13],30)
+          + MPC_MULTIPLY_EX(V[896],D[14],30) + MPC_MULTIPLY_EX(V[992],D[15],30);
+        Data += 1;
+        // total: 16 muls, 15 adds, 16 shifts
+    }
+#endif /* COLDFIRE */
 }
 #endif /* CPU_ARM */
 
@@ -543,7 +545,7 @@ mpc_full_synthesis_filter(MPC_SAMPLE_FORMAT *OutData, MPC_SAMPLE_FORMAT *V, cons
         for ( n = 0; n < 36; n++, Y += 32, OutData += 32 ) 
         {
             V -= 64;
-            mpc_calculate_new_V ( Y, V );
+            mpc_dct32(Y, V);
             mpc_decoder_windowing_D( OutData, V, Di_opt );
         }
      }
