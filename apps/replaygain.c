@@ -48,8 +48,8 @@ static long fp_atof(const char* s, int precision)
     bool point = false;
 
     while ((*s != '\0') && isspace(*s))
-    { 	 
-        s++; 	 
+    {    
+        s++;     
     }
 
     if (*s == '-')

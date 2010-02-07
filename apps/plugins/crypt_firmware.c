@@ -253,9 +253,9 @@ enum plugin_status plugin_start(const void* parameter)
             return PLUGIN_ERROR;
         }
 
-	n = rb->write(fd, buf, 8);
-	n = rb->write(fd, hash, sizeof(hash));
-	n = rb->write(fd, buf + 2, size);
+    n = rb->write(fd, buf, 8);
+    n = rb->write(fd, hash, sizeof(hash));
+    n = rb->write(fd, buf + 2, size);
 
         rb->close(fd);
     } else if (memcmp(buf + 1,"nn2x",4)==0) {

@@ -2878,7 +2878,7 @@ void audio_init(void)
     create_thread(mpeg_thread, mpeg_stack,
                   sizeof(mpeg_stack), 0, mpeg_thread_name
                   IF_PRIO(, PRIORITY_SYSTEM)
-		          IF_COP(, CPU));
+                  IF_COP(, CPU));
 
     memset(trackdata, 0, sizeof(trackdata));
 

@@ -140,9 +140,9 @@ static int readwavpeaks(const char *filename)
     total_bytes_read += sizeof (header);
     little_endian_to_native(&header, WAV_HEADER_FORMAT);
 
-	if (rb->strncmp(header.chunkid, "RIFF", 4) ||
-	    rb->strncmp(header.formatchunkid, "fmt ", 4) ||
-	    rb->strncmp(header.datachunkid, "data", 4) ||
+    if (rb->strncmp(header.chunkid, "RIFF", 4) ||
+        rb->strncmp(header.formatchunkid, "fmt ", 4) ||
+        rb->strncmp(header.datachunkid, "data", 4) ||
         (header.bitspersample != 16) ||
         header.audioformat != 1)
     {

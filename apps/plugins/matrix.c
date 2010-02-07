@@ -259,26 +259,26 @@ static void matrix_loop(void)
             y = 0;
             firstcoldone = 0;
             while (i <= ROWS) {
-	        /* Skip over spaces */
-		/* this is whear the characters were disappearing */
-/*	       
+            /* Skip over spaces */
+        /* this is whear the characters were disappearing */
+/*         
                 while (i <= ROWS && (matrix[i][j].val == 129 ||
                             matrix[i][j].val == -1))
                     i++;
 */
-	/* A little more random now for spaces */
+    /* A little more random now for spaces */
                if (rb->rand() % randomness == 1){
-	           while (i <= ROWS && (matrix[i][j].val == 129 ||
+               while (i <= ROWS && (matrix[i][j].val == 129 ||
                             matrix[i][j].val == -1)){
                     i++;
-		    randomness--;
-	            if(randomness <=1)
-	                randomness = 6;}
+            randomness--;
+                if(randomness <=1)
+                    randomness = 6;}
                 }else{
-		    randomness++;
-	            if(randomness >6)
-	            randomness = 6;
-		}
+            randomness++;
+                if(randomness >6)
+                randomness = 6;
+        }
 
 
                 if (i > ROWS)

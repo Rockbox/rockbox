@@ -163,9 +163,9 @@ next_track:
      * get here.
      */
     if (!error) {
-    	 ogg_free(vf.offsets);
-    	 ogg_free(vf.dataoffsets);
-    	 ogg_free(vf.serialnos);
+         ogg_free(vf.offsets);
+         ogg_free(vf.dataoffsets);
+         ogg_free(vf.serialnos);
 
          vf.offsets = vf_offsets;
          vf.dataoffsets = &vf_dataoffsets;

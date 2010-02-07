@@ -75,42 +75,42 @@ static int write_file(void)
     buf_ptr = stringbuffer;
     str_begin = stringbuffer;
     do {
-	/* Transform slashes into backslashes */
+    /* Transform slashes into backslashes */
         if(*buf_ptr == '/')
-	    *buf_ptr = '\\';
+        *buf_ptr = '\\';
 
-	if((*buf_ptr == '\r') || (*buf_ptr == '\n')) {
-	    /* We have no complete string ? It's only a leading \n or \r ? */
-	    if (!str_begin)
-		continue;
-	    
-	    /* Terminate string */
-	    *buf_ptr = 0;
+    if((*buf_ptr == '\r') || (*buf_ptr == '\n')) {
+        /* We have no complete string ? It's only a leading \n or \r ? */
+        if (!str_begin)
+        continue;
+        
+        /* Terminate string */
+        *buf_ptr = 0;
 
-	    /* Write our new string */
-	    rc = rb->write(fd, str_begin, rb->strlen(str_begin));
-	    if(rc < 0) {
-		rb->close(fd);
-		return 10 * rc - 2;
-	    }
-	    /* Write CR/LF */
-	    rc = rb->write(fd, crlf, 2);
-	    if(rc < 0) {
-		rb->close(fd);
-		return 10 * rc - 3;
-	    }
+        /* Write our new string */
+        rc = rb->write(fd, str_begin, rb->strlen(str_begin));
+        if(rc < 0) {
+        rb->close(fd);
+        return 10 * rc - 2;
+        }
+        /* Write CR/LF */
+        rc = rb->write(fd, crlf, 2);
+        if(rc < 0) {
+        rb->close(fd);
+        return 10 * rc - 3;
+        }
 
-	    /* Reset until we get a new line */
-	    str_begin = NULL;
+        /* Reset until we get a new line */
+        str_begin = NULL;
 
-	}
-	else {
-	    /* We start a new line here */
-	    if (!str_begin)
-		str_begin = buf_ptr;
-	}
+    }
+    else {
+        /* We start a new line here */
+        if (!str_begin)
+        str_begin = buf_ptr;
+    }
 
-	/* Next char, until ... */
+    /* Next char, until ... */
     } while(buf_ptr++ < stringbuffer + readsize);
 
     rb->close(fd);

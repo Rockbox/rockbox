@@ -147,45 +147,45 @@ next_track:
         /* Soul Calibur 2 style (type 03) */
         DEBUGF("ADX: type 03 found\n");
         /* check if header is too small for loop data */
-		if (chanstart-6 < 0x2c) looping=0;
-	    else {
-		    looping = (buf[0x18]) ||
-		              (buf[0x19]) ||
-		              (buf[0x1a]) ||
-		              (buf[0x1b]);
-		    end_adr = (buf[0x28]<<24) |
-		              (buf[0x29]<<16) |
-		              (buf[0x2a]<<8) |
-		              (buf[0x2b]);
+        if (chanstart-6 < 0x2c) looping=0;
+        else {
+            looping = (buf[0x18]) ||
+                      (buf[0x19]) ||
+                      (buf[0x1a]) ||
+                      (buf[0x1b]);
+            end_adr = (buf[0x28]<<24) |
+                      (buf[0x29]<<16) |
+                      (buf[0x2a]<<8) |
+                      (buf[0x2b]);
 
-		    start_adr = (
-		      (buf[0x1c]<<24) |
-		      (buf[0x1d]<<16) |
-		      (buf[0x1e]<<8) |
-		      (buf[0x1f])
-		      )/32*channels*18+chanstart;
-		}
+            start_adr = (
+              (buf[0x1c]<<24) |
+              (buf[0x1d]<<16) |
+              (buf[0x1e]<<8) |
+              (buf[0x1f])
+              )/32*channels*18+chanstart;
+        }
     } else if (!memcmp(buf+0x10,"\x01\xF4\x04\x00",4)) {
         /* Standard (type 04) */
         DEBUGF("ADX: type 04 found\n");
         /* check if header is too small for loop data */
         if (chanstart-6 < 0x38) looping=0;
-		else {
-			looping = (buf[0x24]) ||
-			          (buf[0x25]) ||
-			          (buf[0x26]) ||
-			          (buf[0x27]);
-		    end_adr = (buf[0x34]<<24) |
-		              (buf[0x35]<<16) |
-		              (buf[0x36]<<8) |
-		              buf[0x37];
-			start_adr = (
-			  (buf[0x28]<<24) |
-			  (buf[0x29]<<16) |
-			  (buf[0x2a]<<8) |
-			  (buf[0x2b])
-			  )/32*channels*18+chanstart;
-		}
+        else {
+            looping = (buf[0x24]) ||
+                      (buf[0x25]) ||
+                      (buf[0x26]) ||
+                      (buf[0x27]);
+            end_adr = (buf[0x34]<<24) |
+                      (buf[0x35]<<16) |
+                      (buf[0x36]<<8) |
+                      buf[0x37];
+            start_adr = (
+              (buf[0x28]<<24) |
+              (buf[0x29]<<16) |
+              (buf[0x2a]<<8) |
+              (buf[0x2b])
+              )/32*channels*18+chanstart;
+        }
     } else {
         DEBUGF("ADX: error, couldn't determine ADX type\n");
         return CODEC_ERROR;
@@ -305,10 +305,10 @@ next_track:
                 d = (buf[i] >> 4) & 15;
                 if (d & 8) d-= 16;
                 ch1_0 = d*scale + ((coef1*ch1_1 + coef2*ch1_2) >> 12);
-	            if (ch1_0 > 32767) ch1_0 = 32767;
+                if (ch1_0 > 32767) ch1_0 = 32767;
                 else if (ch1_0 < -32768) ch1_0 = -32768;
-	            samples[sampleswritten] = ch1_0;
-	            sampleswritten+=channels;
+                samples[sampleswritten] = ch1_0;
+                sampleswritten+=channels;
                 ch1_2 = ch1_1; ch1_1 = ch1_0;
 
                 d = buf[i] & 15;
@@ -316,9 +316,9 @@ next_track:
                 ch1_0 = d*scale + ((coef1*ch1_1 + coef2*ch1_2) >> 12);
                 if (ch1_0 > 32767) ch1_0 = 32767;
                 else if (ch1_0 < -32768) ch1_0 = -32768; 
-  	            samples[sampleswritten] = ch1_0;
-  	            sampleswritten+=channels;
-	            ch1_2 = ch1_1; ch1_1 = ch1_0;
+                samples[sampleswritten] = ch1_0;
+                sampleswritten+=channels;
+                ch1_2 = ch1_1; ch1_1 = ch1_0;
             }
             bufoff+=18;
             ci->advance_buffer(18);
@@ -345,10 +345,10 @@ next_track:
                     d = (buf[i] >> 4) & 15;
                     if (d & 8) d-= 16;
                     ch2_0 = d*scale + ((coef1*ch2_1 + coef2*ch2_2) >> 12);
-	                if (ch2_0 > 32767) ch2_0 = 32767;
+                    if (ch2_0 > 32767) ch2_0 = 32767;
                     else if (ch2_0 < -32768) ch2_0 = -32768;
-	                samples[sampleswritten] = ch2_0;
-	                sampleswritten+=2;
+                    samples[sampleswritten] = ch2_0;
+                    sampleswritten+=2;
                     ch2_2 = ch2_1; ch2_1 = ch2_0;
 
                     d = buf[i] & 15;
@@ -356,9 +356,9 @@ next_track:
                     ch2_0 = d*scale + ((coef1*ch2_1 + coef2*ch2_2) >> 12);
                     if (ch2_0 > 32767) ch2_0 = 32767;
                     else if (ch2_0 < -32768) ch2_0 = -32768; 
-  	                samples[sampleswritten] = ch2_0;
-  	                sampleswritten+=2;
-  	                ch2_2 = ch2_1; ch2_1 = ch2_0;
+                    samples[sampleswritten] = ch2_0;
+                    sampleswritten+=2;
+                    ch2_2 = ch2_1; ch2_1 = ch2_0;
                 }
                 bufoff+=18;
                 ci->advance_buffer(18);

@@ -3085,7 +3085,7 @@ static void command_queue_sync_callback(void *data)
     int masterfd;
         
     mutex_lock(&command_queue_mutex);
-	
+    
     if ( (masterfd = open_master_fd(&myhdr, true)) < 0)
         return;
     
@@ -4552,7 +4552,7 @@ void tagcache_init(void)
     create_thread(tagcache_thread, tagcache_stack,
                   sizeof(tagcache_stack), 0, tagcache_thread_name 
                   IF_PRIO(, PRIORITY_BACKGROUND)
-		          IF_COP(, CPU));
+                  IF_COP(, CPU));
 #else
     tc_stat.initialized = true;
     allocate_tempbuf();

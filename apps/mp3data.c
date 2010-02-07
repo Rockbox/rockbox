@@ -88,8 +88,8 @@ static const unsigned short freq_table[3][3] =
 
 unsigned long bytes2int(unsigned long b0,
                      unsigned long b1,
-		     unsigned long b2,
-		     unsigned long b3)
+             unsigned long b2,
+             unsigned long b3)
 {
    return (((long)(b0 & 0xFF) << (3*8)) |
            ((long)(b1 & 0xFF) << (2*8)) |

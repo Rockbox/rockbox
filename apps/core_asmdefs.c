@@ -11,7 +11,7 @@
 /* Size of a pixel with 8-bit components. */
 const int AD_pix8_size =
 #ifdef HAVE_LCD_COLOR
-	sizeof(struct uint8_rgb);
+    sizeof(struct uint8_rgb);
 #else
-	1;
+    1;
 #endif

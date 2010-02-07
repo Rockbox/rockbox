@@ -306,9 +306,9 @@ void tree_gui_init(void)
 /* drawer function for the GUI_EVENT_REDRAW callback */
 void tree_drawlists(void)
 {
-	/* band-aid to fix the bar/list redrawing properly after leaving a plugin */
- 	send_event(GUI_EVENT_THEME_CHANGED, NULL);
-	/* end bandaid */
+    /* band-aid to fix the bar/list redrawing properly after leaving a plugin */
+    send_event(GUI_EVENT_THEME_CHANGED, NULL);
+    /* end bandaid */
     gui_synclist_draw(&tree_lists);
 }
 
@@ -482,21 +482,21 @@ static int update_dir(void)
 /* load tracks from specified directory to resume play */
 void resume_directory(const char *dir)
 {
-	int dirfilter = *tc.dirfilter;
-	int ret;
+    int dirfilter = *tc.dirfilter;
+    int ret;
 #ifdef HAVE_TAGCACHE
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
 #endif
-	/* make sure the dirfilter is sane. The only time it should be possible
-	 * thats its not is when resume playlist is called from a plugin
-	 */
+    /* make sure the dirfilter is sane. The only time it should be possible
+     * thats its not is when resume playlist is called from a plugin
+     */
 #ifdef HAVE_TAGCACHE
-	if (!id3db)
+    if (!id3db)
 #endif
-		*tc.dirfilter = global_settings.dirfilter;			
-	ret = ft_load(&tc, dir);
-	*tc.dirfilter = dirfilter;
-	if (ret < 0)
+        *tc.dirfilter = global_settings.dirfilter;          
+    ret = ft_load(&tc, dir);
+    *tc.dirfilter = dirfilter;
+    if (ret < 0)
         return;
     lastdir[0] = 0;
 

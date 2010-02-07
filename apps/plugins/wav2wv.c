@@ -138,9 +138,9 @@ static int wav2wv(const char *infile)
     rb->memcpy (&native_header, &raw_header, sizeof (raw_header));
     little_endian_to_native (&native_header, WAV_HEADER_FORMAT);
 
-	if (rb->strncmp (native_header.ckID, "RIFF", 4) ||
-	    rb->strncmp (native_header.fmt_ckID, "fmt ", 4) ||
-	    rb->strncmp (native_header.data_ckID, "data", 4) ||
+    if (rb->strncmp (native_header.ckID, "RIFF", 4) ||
+        rb->strncmp (native_header.fmt_ckID, "fmt ", 4) ||
+        rb->strncmp (native_header.data_ckID, "data", 4) ||
         native_header.FormatTag != 1 || native_header.BitsPerSample != 16) {
             rb->splash(HZ*2, "incompatible wav file!");
             return true;
@@ -153,7 +153,7 @@ static int wav2wv(const char *infile)
     config.bytes_per_sample = 2;
     config.sample_rate = native_header.SampleRate;
     num_chans = config.num_channels = native_header.NumChannels;
-	total_samples = native_header.data_ckSize / native_header.BlockAlign;
+    total_samples = native_header.data_ckSize / native_header.BlockAlign;
 
 /*  config.flags |= CONFIG_HIGH_FLAG; */
 

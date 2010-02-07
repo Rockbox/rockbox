@@ -57,19 +57,19 @@ char ppm_getc(int fd)
 {
     char ch;
 
-	if (!rb->read(fd, &ch, 1)) {
-	    ppm_error("EOF. Read error reading a byte");
-	    return PLUGIN_ERROR;
-	}
+    if (!rb->read(fd, &ch, 1)) {
+        ppm_error("EOF. Read error reading a byte");
+        return PLUGIN_ERROR;
+    }
        
     if (ch == '#') {
         do {
-	        if (!rb->read(fd, &ch, 1)) {
-	            ppm_error("EOF. Read error reading a byte");
-	            return PLUGIN_ERROR;
-	        }
-	    } while (ch != '\n' && ch != '\r');
-	}
+            if (!rb->read(fd, &ch, 1)) {
+                ppm_error("EOF. Read error reading a byte");
+                return PLUGIN_ERROR;
+            }
+        } while (ch != '\n' && ch != '\r');
+    }
     return ch;
 }
 
@@ -81,7 +81,7 @@ int ppm_getuint(int fd)
 
     do {
         ch = ppm_getc(fd);
-	} while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
+    } while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
 
     if (ch < '0' || ch > '9') {
         ppm_error("Junk (%c) in file where an integer should be.", ch);
@@ -213,7 +213,7 @@ int read_ppm_row(int fd,
     int col;
     int r, g, b;
     switch (format) {
-	    case PPM_FORMAT:
+        case PPM_FORMAT:
             for (col = 0; col < cols; ++col) {
                 r = ppm_getuint(fd);
                 g = ppm_getuint(fd);
@@ -231,7 +231,7 @@ int read_ppm_row(int fd,
             }
             break;
 
-	    case RPPM_FORMAT:
+        case RPPM_FORMAT:
             for (col = 0; col < cols; ++col) {
                 r = ppm_getrawsample(fd, maxval);
                 g = ppm_getrawsample(fd, maxval);
@@ -246,14 +246,14 @@ int read_ppm_row(int fd,
                     (255 / maxval) * r,
                     (255 / maxval) * g,
                     (255 / maxval) * b);
-	        }
-	        break;
+            }
+            break;
 
-	    default:
+        default:
             ppm_error("What?!");
-	        return PLUGIN_ERROR;
-	}
-	return 1;
+            return PLUGIN_ERROR;
+    }
+    return 1;
 }
 
 int read_ppm(int fd, 

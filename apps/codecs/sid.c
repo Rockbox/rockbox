@@ -179,7 +179,7 @@ unsigned char memory[65536];
 /* ----------------------------------------- Variables for sample stuff */
 static int sample_active IDATA_ATTR;
 static int sample_position, sample_start, sample_end, sample_repeat_start IDATA_ATTR;
-static int fracPos IDATA_ATTR;	/* Fractal position of sample */
+static int fracPos IDATA_ATTR;  /* Fractal position of sample */
 static int sample_period IDATA_ATTR;
 static int sample_repeats IDATA_ATTR;
 static int sample_order IDATA_ATTR;
@@ -278,18 +278,18 @@ static inline int GenerateDigi(int sIn)
     if ((sample_position < sample_end) && (sample_position >= sample_start))
     {
         sIn += sample;
-		
+        
         fracPos += 985248/sample_period;
-		
+        
         if (fracPos > mixing_frequency) 
         {
             fracPos%=mixing_frequency;
 
-            last_sample = sample;			
-						
-			// N�hstes Samples holen
+            last_sample = sample;           
+                        
+            // N�hstes Samples holen
             if (sample_order == 0) {
-                sample_nibble++;						// Nähstes Sample-Nibble
+                sample_nibble++;                        // Nähstes Sample-Nibble
                 if (sample_nibble==2) {
                     sample_nibble = 0;
                     sample_position++;
@@ -301,24 +301,24 @@ static inline int GenerateDigi(int sIn)
                     sample_nibble=1;
                     sample_position++;
                 }
-            }		
+            }       
             if (sample_repeats)
             {
                 if  (sample_position > sample_end)
                 {
                     sample_repeats--;
                     sample_position = sample_repeat_start;
-                }						
+                }                       
                 else sample_active = 0;
             }
-			
+            
             sample = memory[sample_position&0xffff];
-            if (sample_nibble==1)	// Hi-Nibble holen?		
+            if (sample_nibble==1)   // Hi-Nibble holen?     
                 sample = (sample & 0xf0)>>4;
             else sample = sample & 0x0f;
             
             sample -= 7;
-            sample <<= 10;	
+            sample <<= 10;  
         }
     }
 
@@ -1282,7 +1282,7 @@ next_track:
                 
                 /* Find out if cia timing is used and how many samples
                    have to be calculated for each cpujsr */
-                int nRefreshCIA = (int)(20000*(memory[0xdc04]|(memory[0xdc05]<<8))/0x4c00);	
+                int nRefreshCIA = (int)(20000*(memory[0xdc04]|(memory[0xdc05]<<8))/0x4c00); 
                 if ((nRefreshCIA==0) || (song_speed == 0)) 
                     nRefreshCIA = 20000;
                 nSamplesPerCall = mixing_frequency*nRefreshCIA/1000000;

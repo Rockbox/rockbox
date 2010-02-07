@@ -278,12 +278,12 @@ static void mad_synth_thread_quit(void)
 #else
 static inline void mad_synth_thread_ready(void)
 {
-	 mad_synth_frame(&synth, &frame);
+     mad_synth_frame(&synth, &frame);
 }
 
 static inline bool mad_synth_thread_create(void)
 {
-	return true;
+    return true;
 }
 
 static inline void mad_synth_thread_quit(void)
