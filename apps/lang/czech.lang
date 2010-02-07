@@ -1617,10 +1617,10 @@
     *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "Postupně ztlumit při zastevení/pauze"
+    *: "Postupně ztlumit při zastavení/pauze"
   </dest>
   <voice>
-    *: "Postupně ztlumit při zastevení a pauze"
+    *: "Postupně ztlumit při zastavení a pauze"
   </voice>
 </phrase>
 <phrase>
@@ -1915,11 +1915,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Pípnutí při posonu po stopách"
+    swcodec: "Pípnutí při posunu po stopách"
   </dest>
   <voice>
     *: none
-    swcodec: "Pípnutí při posonu po stopách"
+    swcodec: "Pípnutí při posunu po stopách"
   </voice>
 </phrase>
 <phrase>
@@ -2544,7 +2544,7 @@
     *: "<Všechny skladby>"
   </dest>
   <voice>
-    *: "Všechny skladby"
+    *: "Vsechny skladby"
   </voice>
 </phrase>
 <phrase>
@@ -2910,11 +2910,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Odstanit obrázek na pozadí"
+    lcd_non-mono: "Odstranit obrázek na pozadí"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Odstanit obrázek na pozadí"
+    lcd_non-mono: "Odstranit obrázek na pozadí"
   </voice>
 </phrase>
 <phrase>
@@ -4983,13 +4983,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: "Přehrávat .talk soubory"
+    *: "Přehrávat .talk klipy"
   </dest>
   <voice>
-    *: "Přehrávat .talk soubory"
+    *: "Přehrávat talk klipy"
   </voice>
 </phrase>
 <phrase>
@@ -5056,10 +5056,10 @@
     *: "Cleared"
   </source>
   <dest>
-    *: "Vynulováno"
+    *: "Vymazáno"
   </dest>
   <voice>
-    *: "Vynulováno"
+    *: "Vymazáno"
   </voice>
 </phrase>
 <phrase>
@@ -5710,7 +5710,7 @@
   </dest>
   <voice>
     *: none
-    recording: "MP3"
+    recording: "EMPÉ3"
   </voice>
 </phrase>
 <phrase>
@@ -5727,7 +5727,7 @@
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "PÉCÉEM vejf"
   </voice>
 </phrase>
 <phrase>
@@ -5774,11 +5774,11 @@
   </source>
   <dest>
     *: none
-    recording: "Nasatvení enkodéru"
+    recording: "Nastavení enkodéru"
   </dest>
   <voice>
     *: none
-    recording: "Nasatvení enkodéru"
+    recording: "Nastavení enkodéru"
   </voice>
 </phrase>
 <phrase>
@@ -6934,7 +6934,7 @@
   </dest>
   <voice>
     *: none
-    multivolume: "Interní pamět"
+    multivolume: "Interní paměť"
   </voice>
 </phrase>
 <phrase>
@@ -8416,7 +8416,7 @@
   user: core
   <source>
     *: "OFF to abort"
- archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
@@ -8427,7 +8427,7 @@
     *: "OFF pro zrušení"
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP pro zrušení"
     ipod*: "PLAY/PAUSE pro zrušení"
-    iaudiox5,iaudiom5: "Long PLAY pro zrušení"
+    iaudiox5,iaudiom5: "Dlouhé PLAY pro zrušení"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV pro zrušení"
     gigabeats: "BACK pro zrušení"
     gigabeatfx: "POWER pro zrušení"
@@ -11333,10 +11333,10 @@
     *: "Theme Settings"
   </source>
   <dest>
-    *: "Nastavení motivu"
+    *: "Nastavení vzhledu"
   </dest>
   <voice>
-    *: "Nastavení motyvu"
+    *: "Nastavení vzhledu"
   </voice>
 </phrase>
 <phrase>
@@ -11505,7 +11505,7 @@
     *: "<Náhodně>"
   </dest>
   <voice>
-    *: "Náhodně"
+    *: "Nahodne"
   </voice>
 </phrase>
 <phrase>
