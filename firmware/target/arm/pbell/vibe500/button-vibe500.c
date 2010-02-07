@@ -63,12 +63,12 @@ void button_int(void)
         val = ((data[1] >> 4) << 8) | data[2]; /* position */
 
         if (val > 0)
-	{
-	    int scr_pos = val >> 8; /* split the scrollstrip into 16 regions */
-	    if ((old_pos<scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_DOWN;
-	    if ((old_pos>scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_UP;
-	    old_pos = scr_pos;
-	}
+    {
+        int scr_pos = val >> 8; /* split the scrollstrip into 16 regions */
+        if ((old_pos<scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_DOWN;
+        if ((old_pos>scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_UP;
+        old_pos = scr_pos;
+    }
         else old_pos=-1;
     }
 }
@@ -94,13 +94,13 @@ int button_read_device(void)
     if (!hold_button)
     {
         /* Read Record, OK, C */
-	state = GPIOA_INPUT_VAL;
-	if ((state & 0x01)==0) buttons|=BUTTON_REC;
-	if ((state & 0x40)==0) buttons|=BUTTON_OK;
-	if ((state & 0x08)==0) buttons|=BUTTON_CANCEL;
+    state = GPIOA_INPUT_VAL;
+    if ((state & 0x01)==0) buttons|=BUTTON_REC;
+    if ((state & 0x40)==0) buttons|=BUTTON_OK;
+    if ((state & 0x08)==0) buttons|=BUTTON_CANCEL;
 
         /* Read POWER button */
-	if ((GPIOD_INPUT_VAL & 0x40)==0) buttons|=BUTTON_POWER;
+    if ((GPIOD_INPUT_VAL & 0x40)==0) buttons|=BUTTON_POWER;
     }
     else return BUTTON_NONE;
     return buttons;

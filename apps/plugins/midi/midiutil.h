@@ -41,7 +41,7 @@
 #define MAX_VOICES 24 /* Note: 24 midi channels is the minimum general midi spec implementation */
 #endif /* CPU_PP */
 
-#else	/* Simulator requires 44100Hz, and we can afford to use more voices */
+#else   /* Simulator requires 44100Hz, and we can afford to use more voices */
 
 #define SAMPLE_RATE SAMPR_44
 #define MAX_VOICES 48

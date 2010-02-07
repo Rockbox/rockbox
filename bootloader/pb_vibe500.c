@@ -78,6 +78,6 @@ void main(void)
     {
        /* Power off bit */
        if ((button_read_device()&BUTTON_POWER)!=0)
-	   GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL,0x80);
+       GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL,0x80);
     }
 }
