@@ -639,28 +639,22 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
         const int cmd =
             write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
 
-    (*(volatile unsigned long *) (SD_BASE+0x00)) |= 2;
-    while(( *(volatile unsigned long *) (SD_BASE+0x00)) & 2) ;
 
-    //(*(volatile unsigned long *) (SD_BASE+0x1c)) = 512;
-    (*(volatile unsigned long *) (SD_BASE+0x20)) = transfer * 512;
+        (*(volatile unsigned long *) (SD_BASE+0x00)) |= 2;
+        while(( *(volatile unsigned long *) (SD_BASE+0x00)) & 2) ;
 
-    (*(volatile unsigned long *) (SD_BASE+0x00)) |= 2;
-    while(( *(volatile unsigned long *) (SD_BASE+0x00)) & 2) ;
+        //(*(volatile unsigned long *) (SD_BASE+0x1c)) = 512;
+        (*(volatile unsigned long *) (SD_BASE+0x20)) = transfer * 512;
 
-    (*(volatile unsigned long *) (SD_BASE+0x4c)) &= ~0x7fff0fff;
+        (*(volatile unsigned long *) (SD_BASE+0x00)) |= 2;
+        while(( *(volatile unsigned long *) (SD_BASE+0x00)) & 2) ;
 
-    if(0)
-    {
+        (*(volatile unsigned long *) (SD_BASE+0x4c)) &= ~0x7fff0fff;
+
         (*(volatile unsigned long *) (SD_BASE+0x00)) |= 0x20;
         MCI_MASK = 0xBE8C;
         (*(volatile unsigned long *) (SD_BASE+0x4c)) |= 0x503f0080;
-    }
-    else
-    {
-        MCI_MASK = 0xBEB8;
-        (*(volatile unsigned long *) (SD_BASE+0x4c)) |= 0x3f0030;
-    }
+
 
         if(card_info.ocr & (1<<30) ) /* SDHC */
             ret = send_cmd(cmd, start, MCI_NO_RESP, NULL);
