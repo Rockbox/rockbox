@@ -89,6 +89,9 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
  * thus excluding the parts that can be derived by symmetry
  * @param output N/2 samples
  * @param input N/2 samples
+ *
+ * NOTE - CANNOT CURRENTLY OPERATE IN PLACE (input and output must
+ *                                          not overlap or intersect at all)
  */
 void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
 {
@@ -104,12 +107,6 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
     n4 = n >> 2;
     n8 = n >> 3;
 
-    /* function can work in one of two ways, either return the whole N-point
-       imdct, or just the unique N/2-point imdct part (without reflections)
-       If the former, the output buffer needs to be size N/2.
-       If the latter, the output buffer needs to be size N, but all the imdct
-       processing except the final reflection happens in the N/2 samples beginning
-       at N/4  (so range N/4 to 3N/4 in the output buffer) */
     FFTComplex *z = (FFTComplex *)output;
 
     /* pre rotation */
@@ -202,6 +199,11 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
  * Compute inverse MDCT of size N = 2^nbits
  * @param output N samples
  * @param input N/2 samples
+ * "In-place" processing can be achieved provided that:
+ *            [0  ..  N/2-1 | N/2  ..  N-1 ]
+ *            <----input---->
+ *            <-----------output----------->
+ *
  */
 void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
 {
@@ -209,40 +211,67 @@ void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
     const int n2 = (n>>1);
     const int n4 = (n>>2);
     
-    ff_imdct_half(s,output+n4,input);
+    ff_imdct_half(s,output+n2,input);
 
     /* reflect the half imdct into the full N samples */
     /* TODO: this could easily be optimised more! */
-    fixed32 * in_r = output + n2;
-    fixed32 * out_r = output + n-8;
+    fixed32 * in_r, * in_r2, * out_r, * out_r2;
 
-    while(out_r>in_r)
-    {
-        out_r[7] = in_r[0];
-        out_r[6] = in_r[1];
-        out_r[5] = in_r[2];
-        out_r[4] = in_r[3];
-        out_r[3] = in_r[4];
-        out_r[2] = in_r[5];
-        out_r[1] = in_r[6];
-        out_r[0] = in_r[7];
-        in_r += 8;
-        out_r -= 8;
-    }
     out_r = output;
-    in_r  = output+n2-8;
-    while(out_r<in_r)
+    out_r2 = output+n2-8;
+    in_r  = output+n2+n4-8;
+    while(out_r<out_r2)
     {
-        out_r[0]     = -in_r[7];
-        out_r[1]     = -in_r[6];
-        out_r[2]     = -in_r[5];
-        out_r[3]     = -in_r[4];
-        out_r[4]     = -in_r[3];
-        out_r[5]     = -in_r[2];
-        out_r[6]     = -in_r[1];
-        out_r[7]     = -in_r[0];
+        out_r[0]     = -(out_r2[7] = in_r[7]);
+        out_r[1]     = -(out_r2[6] = in_r[6]);
+        out_r[2]     = -(out_r2[5] = in_r[5]);
+        out_r[3]     = -(out_r2[4] = in_r[4]);
+        out_r[4]     = -(out_r2[3] = in_r[3]);
+        out_r[5]     = -(out_r2[2] = in_r[2]);
+        out_r[6]     = -(out_r2[1] = in_r[1]);
+        out_r[7]     = -(out_r2[0] = in_r[0]);
         in_r -= 8;
         out_r += 8;
+        out_r2 -= 8;
+    }
+
+    in_r = output + n2+n4;
+    in_r2 = output + n-4;
+    out_r = output + n2;
+    out_r2 = output + n2 + n4 - 4;
+    while(in_r<in_r2)
+    {
+        register fixed32 t0,t1,t2,t3;
+        register fixed32 s0,s1,s2,s3;
+
+        //simultaneously do the following things:
+        // 1. copy range from [n2+n4 .. n-1] to range[n2 .. n2+n4-1]
+        // 2. reflect range from [n2+n4 .. n-1] inplace
+        //
+        //  [                      |                        ]
+        //   ^a ->            <- ^b ^c ->               <- ^d
+        //
+        //  #1: copy from ^c to ^a
+        //  #2: copy from ^d to ^b
+        //  #3: swap ^c and ^d in place
+        //
+        // #1 pt1 : load 4 words from ^c.
+        t0=in_r[0]; t1=in_r[1]; t2=in_r[2]; t3=in_r[3];
+        // #1 pt2 : write to ^a
+        out_r[0]=t0;out_r[1]=t1;out_r[2]=t2;out_r[3]=t3;
+        // #2 pt1 : load 4 words from ^d
+        s0=in_r2[0];s1=in_r2[1];s2=in_r2[2];s3=in_r2[3];
+        // #2 pt2 : write to ^b
+        out_r2[0]=s0;out_r2[1]=s1;out_r2[2]=s2;out_r2[3]=s3;
+        // #3 pt1 : write words from #2 to ^c
+        in_r[0]=s3;in_r[1]=s2;in_r[2]=s1;in_r[3]=s0;
+        // #3 pt2 : write words from #1 to ^d
+        in_r2[0]=t3;in_r2[1]=t2;in_r2[2]=t1;in_r2[3]=t0;
+
+        in_r += 4;
+        in_r2 -= 4;
+        out_r += 4;
+        out_r2 -= 4;
     }
 }
 
