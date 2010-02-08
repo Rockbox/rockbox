@@ -97,9 +97,9 @@ static void lcd_hw_init(void)
 #elif defined(SANSA_CLIPPLUS)
     CGU_PERI |= CGU_SSP_CLOCK_ENABLE;
 
-    SSP_CPSR;           /* No clock prescale */
-    SSP_CR0 = 0 | 7;    /* Motorola SPI frame format, 8 bits */
-    SSP_CR1 = 1<<1;     /* SSP Operation enabled */
+    SSP_CPSR = AS3525_SSP_PRESCALER;    /* OF = 0x10 */
+    SSP_CR0 = (1<<7) | (1<<6) | 7;  /* Motorola SPI frame format, 8 bits */
+    SSP_CR1 = (1<<3) | (1<<1);  /* SSP Operation enabled */
     SSP_IMSC = 0;       /* No interrupts */
 #endif
 }

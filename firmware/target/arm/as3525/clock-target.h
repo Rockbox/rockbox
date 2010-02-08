@@ -141,6 +141,8 @@
   #define AS3525_I2C_FREQ        400000
   #define AS3525_SD_IDENT_DIV    ((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SD_IDENT_FREQ) / 2) - 1)
   #define AS3525_SD_IDENT_FREQ   400000      /* must be between 100 & 400 kHz */
+  #define AS3525_SSP_PRESCALER   ((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SSP_FREQ) + 1) & ~1)    /* must be an even number */
+  #define AS3525_SSP_FREQ        12000000
 
 #define AS3525_IDE_SEL           AS3525_CLK_PLLA           /* Input Source   */
 #define AS3525_IDE_DIV           (CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1)/*div=1/(n+1)*/
@@ -177,6 +179,11 @@
 /* AS3525_I2C_FREQ */
 #if (CLK_DIV(AS3525_PCLK_FREQ, AS3525_I2C_FREQ)) >= (1<<10) /* 2+8 bits */
 #error I2C frequency is too low : clock divider will not fit !
+#endif
+
+/* AS3525_SSP_FREQ */
+#if (((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SSP_FREQ)) + 1 ) & ~1) >= (1<<8) /* 8 bits */
+#error SSP frequency is too low : clock divider will not fit !
 #endif
 
 /* AS3525_SD_IDENT_FREQ */
