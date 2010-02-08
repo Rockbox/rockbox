@@ -29,9 +29,6 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
 
-/* define this if you have a light associated with the buttons */
-#define HAVE_BUTTON_LIGHT
-
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 

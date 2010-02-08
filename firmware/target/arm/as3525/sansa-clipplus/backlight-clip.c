@@ -39,15 +39,3 @@ void _backlight_off(void)
     ascodec_write(0x25, ascodec_read(0x25) & ~2);    /* lcd power */
     lcd_enable(false);
 }
-
-void _buttonlight_on(void)
-{
-    GPIOA_DIR |= (1<<5);
-    GPIOA_PIN(5) = (1<<5);  /* set pin a5 high */
-}
-
-void _buttonlight_off(void)
-{
-    GPIOA_DIR |= (1<<5);
-    GPIOA_PIN(5) = 0;       /* set pin a5 low */
-}

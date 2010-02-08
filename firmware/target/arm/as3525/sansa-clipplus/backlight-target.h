@@ -26,7 +26,4 @@
 void _backlight_on(void);
 void _backlight_off(void);
 
-void _buttonlight_on(void);
-void _buttonlight_off(void);
-
 #endif
