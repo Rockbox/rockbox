@@ -1006,11 +1006,6 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 
 #endif
 
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
-    display->backdrop_show(data->backdrop);
-#endif
-
-
     /* reset to first subline if refresh all flag is set */
     if (refresh_mode == WPS_REFRESH_ALL)
     {

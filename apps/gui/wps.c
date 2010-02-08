@@ -565,6 +565,7 @@ static void gwps_leave_wps(void)
     FOR_NB_SCREENS(i)
     {
         gui_wps[i].display->stop_scroll();
+        gui_wps[i].display->backdrop_show(sb_get_backdrop(i));
         
 #ifdef HAVE_LCD_BITMAP
         bool draw = false;
@@ -601,9 +602,10 @@ static void gwps_enter_wps(void)
         else if (statusbar_position(i) != STATUSBAR_OFF)
             draw = true;
 #endif
+        display->stop_scroll();
+        display->backdrop_show(gwps->data->backdrop);
         viewportmanager_theme_enable(i, draw, NULL);
 
-        display->stop_scroll();
         /* Update the values in the first (default) viewport - in case the user
            has modified the statusbar or colour settings */
 #if LCD_DEPTH > 1
