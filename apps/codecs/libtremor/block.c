@@ -243,7 +243,6 @@ static int _vds_init(vorbis_dsp_state *v,vorbis_info *vi){
 
   /* setup for ffmpeg-based mdct */
   mdct_init_global();
-  v->ffmpeg_scratchpad = (int32_t *)_ogg_malloc(ci->blocksizes[1] * sizeof(int32_t));
   ff_mdct_init(&v->mdct_ctx[0], bs_generic(ci->blocksizes[0],BS_LOG2|BS_SHORT), 1);
   ff_mdct_init(&v->mdct_ctx[1], bs_generic(ci->blocksizes[1],BS_LOG2|BS_SHORT), 1);
     

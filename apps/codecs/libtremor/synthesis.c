@@ -71,7 +71,6 @@ int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep){
   /* setup for ffmpeg-based mdct */
   /* these pointers on the block just point to the structures
      setup within the dsp state for the appropriate block sizes */
-  vb->ffmpeg_scratchpad = vd->ffmpeg_scratchpad;
   vb->mdct_ctx[0] = &(vd->mdct_ctx[0]);
   vb->mdct_ctx[1] = &(vd->mdct_ctx[1]);
 

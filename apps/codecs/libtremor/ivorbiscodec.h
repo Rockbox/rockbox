@@ -63,7 +63,6 @@ typedef struct vorbis_dsp_state{
   ogg_int32_t **pcmb;
   ogg_int32_t **pcmret;
   MDCTContext mdct_ctx[2]; /* ffmpeg mdct - for the two block sizes */
-  int32_t * ffmpeg_scratchpad; /* ffmpeg mdct - temporary workspace */
   int      pcm_storage;
   int      pcm_current;
   int      pcm_returned;

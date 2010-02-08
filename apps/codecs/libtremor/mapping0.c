@@ -291,24 +291,9 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
       look->floor_func[submap]->
         inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
         
-      /* copy pcm to scratch input buffer */
-      /* (ffmpeg-based mdct doesn't yet operate inplace */
-      /* FIXME: really the workload should take place in PCM not SCRATCHPAD
-                i.e. really we should do the minimum work in scratchpad
-                since this is most likely non-iram, and do the bulk in pcm.
-                ff_imdct_calc does the bulk of the work in its 'output' buffer
-                (the first step transforms the input buffer into the output buffer
-                space) - so we make sure pcm is our 'output' buffer, and copy
-                our input to scratchpad.
-                
-                Ideally we would want imdct to operate inplace and not need an
-                auxiliary buffer, but the particular bitreverse required makes
-                this difficult in practice */
-      memcpy(vb->ffmpeg_scratchpad,pcm,(n/2)*sizeof(int32_t));
       ff_imdct_calc(vb->mdct_ctx[vb->W],      
                     (int32_t*)pcm,
-                    (int32_t*)vb->ffmpeg_scratchpad);
-
+                    (int32_t*)pcm);
       /* window the data */
       _vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
     }
