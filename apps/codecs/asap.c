@@ -89,6 +89,9 @@ next_track:
     if (duration < 0)
         duration = 180 * 1000;
     
+    /* set id3 length, because metadata parse might not have done it */
+    ci->id3->length = duration;
+    
     ASAP_PlaySong(&asap, song, duration);
     ASAP_MutePokeyChannels(&asap, 0);
     
