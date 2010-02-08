@@ -25,6 +25,7 @@
 /* DMA request lines (16 max): not specified in AS3525 datasheet, but common to
  * all AS3525 based models (made by SanDisk) supported by rockbox. */
 
+#define DMA_PERI_SSP        0
 #define DMA_PERI_SD_SLOT    2
 #define DMA_PERI_I2SOUT     3
 #define DMA_PERI_I2SIN      4
