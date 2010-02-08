@@ -181,7 +181,6 @@ void lcd_write_data(const fb_data* p_bytes, int count)
 {
     GPIOB_PIN(2) = (1<<2);
 
-    SSP_CR0 = 0 | 15;   /* Motorola SPI frame format, 16 bits */
     while (count--)
     {
         while(SSP_SR & (1<<1))      /* Transmit FIFO is not full */
@@ -190,7 +189,6 @@ void lcd_write_data(const fb_data* p_bytes, int count)
         while(!(SSP_SR & (1<<0)))   /* Transmit FIFO is not empty */
             ;
     }
-    SSP_CR0 = 0 | 7;   /* Motorola SPI frame format, 8 bits */
 }
 #endif
 
