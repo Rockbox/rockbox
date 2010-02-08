@@ -157,11 +157,35 @@ uclcopy:
         cmp     r1, #0             /* C3 = #0 means button pressed */
         beq     boot_of
 #elif defined(SANSA_CLIPPLUS)
-        /* TODO */
-        mov     r0, #0x500000       /* Approximately 5 seconds */
-1:      subs    r0, r0, #1          /* just to prove we are running */
+        @ Assumes GPIOB_DIR is 0x00 on reset
+        ldr     r0, =GPIOB
+        mov     r1, #(1<<0)         @ pin 0
+        str     r1, [r0, #0x400]    @ GPIOB(0) = output
+        str     r1, [r0, #4*(1<<0)] @ write 1 to GPIOB(0)
+
+        mov     r1, #500            @ small delay
+1:      subs    r1, r1, #1
         bne     1b
-        b       boot_of             /* branch to OF */
+
+        @ read pins
+        ldr     r0, =GPIOC
+        ldr     r1, [r0, #4*(1<<3)] @ read pin C3 "|<<"
+
+        ldr     r0, =GPIOA
+        ldr     r2, [r0, #4*(1<<1)] @ read pin A1 "Home"
+
+        orr     r2, r2, r1          @ c3 || A1
+
+        @ restore GPIOB_DIR(0)
+        ldr     r0, =GPIOB
+        mov     r1, #0
+        str     r1, [r0, #0x400]    @ Restore GPIOB_DIR to 0x00
+
+        @ Unset GPIOB(0)
+        str     r1, [r0, #4*(0<<0)] @ write 0 to GPIOB(0)
+
+        cmp     r2, #0              @ test input from pins
+        bne     boot_of             @ branch directly to OF if either pin high
 #elif defined(SANSA_C200V2)
         /* check for RIGHT on C6, should changed to LEFT as soon as it
          * known in which pin that is in order for consistency  */
