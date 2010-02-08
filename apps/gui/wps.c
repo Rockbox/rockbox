@@ -565,7 +565,9 @@ static void gwps_leave_wps(void)
     FOR_NB_SCREENS(i)
     {
         gui_wps[i].display->stop_scroll();
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
         gui_wps[i].display->backdrop_show(sb_get_backdrop(i));
+#endif
         
 #ifdef HAVE_LCD_BITMAP
         bool draw = false;
@@ -603,7 +605,9 @@ static void gwps_enter_wps(void)
             draw = true;
 #endif
         display->stop_scroll();
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
         display->backdrop_show(gwps->data->backdrop);
+#endif
         viewportmanager_theme_enable(i, draw, NULL);
 
         /* Update the values in the first (default) viewport - in case the user

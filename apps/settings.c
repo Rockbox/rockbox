@@ -737,7 +737,6 @@ void sound_settings_apply(void)
 void settings_apply_skins(void)
 {
     char buf[MAX_PATH];
-    int i;
     /* re-initialize the skin buffer before we start reloading skins */
     skin_buffer_init();
 #ifdef HAVE_LCD_BITMAP
@@ -787,8 +786,11 @@ void settings_apply_skins(void)
     }
 #endif
     viewportmanager_theme_changed(THEME_STATUSBAR);
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    int i;
     FOR_NB_SCREENS(i)
         screens[i].backdrop_show(sb_get_backdrop(i));
+#endif
 }
 
 void settings_apply(bool read_disk)
