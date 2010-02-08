@@ -137,21 +137,18 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
        */
     const int32_t *T = sincos_lookup0;
     const int step = (12-s->nbits)<<1;
-
     const uint16_t * p_revtab=s->fft.revtab;
     {
         const uint16_t * const p_revtab_end = p_revtab + n8;
-        while(p_revtab < p_revtab_end)
+        while(LIKELY(p_revtab < p_revtab_end))
         {
             j = (*p_revtab)>>revtab_shift;
-//            XNPROD31(*in2, *in1, -T[1], -T[0], &z[j].re, &z[j].im );
             XNPROD31(*in2, *in1, T[1], T[0], &z[j].re, &z[j].im );
             T += step;
             in1 += 2;
             in2 -= 2;
             p_revtab++;
             j = (*p_revtab)>>revtab_shift;
-//            XNPROD31(*in2, *in1, -T[1], -T[0], &z[j].re, &z[j].im );
             XNPROD31(*in2, *in1, T[1], T[0], &z[j].re, &z[j].im );
             T += step;
             in1 += 2;
@@ -161,17 +158,15 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
     }
     {
         const uint16_t * const p_revtab_end = p_revtab + n8;
-        while(p_revtab < p_revtab_end)
+        while(LIKELY(p_revtab < p_revtab_end))
         {
             j = (*p_revtab)>>revtab_shift;
-//            XNPROD31(*in2, *in1, -T[0], -T[1], &z[j].re, &z[j].im);
             XNPROD31(*in2, *in1, T[0], T[1], &z[j].re, &z[j].im);
             T -= step;
             in1 += 2;
             in2 -= 2;
             p_revtab++;
             j = (*p_revtab)>>revtab_shift;
-//            XNPROD31(*in2, *in1, -T[0], -T[1], &z[j].re, &z[j].im);
             XNPROD31(*in2, *in1, T[0], T[1], &z[j].re, &z[j].im);
             T -= step;
             in1 += 2;
@@ -185,17 +180,21 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
     ff_fft_calc_c(&s->fft, z);
 
     /* post rotation + reordering.  now keeps the result within the OUTPUT buffer */
-    for(k = 0; k < n8; k++)
+    fixed32 * z1 = (fixed32 *)(&z[n8-1]);
+    fixed32 * z2 = (fixed32 *)(&z[n8]);
+    for(k=0;k<n8;k++)
     {
         /* remember, tcos and tsin are really -cos and -sin 
            so what we're actually calculating is {re,im) x {-cos,-sin} */
         fixed32 r0,i0,r1,i1;
-        XNPROD31_R(z[n8-k-1].im, z[n8-k-1].re, tsin[n8-k-1], tcos[n8-k-1], r0, i1 );
-        XNPROD31_R(z[n8+k].im,   z[n8+k].re,   tsin[n8+k],   tcos[n8+k],   r1, i0 );
-        z[n8-k-1].re = r0;
-        z[n8-k-1].im = i0;
-        z[n8+k].re   = r1;
-        z[n8+k].im   = i1;
+        XNPROD31_R(z1[1], z1[0], tsin[n8-k-1], tcos[n8-k-1], r0, i1 );
+        XNPROD31_R(z2[1], z2[0], tsin[n8+k],   tcos[n8+k],   r1, i0 );
+        z1[0] = r0;
+        z1[1] = i0;
+        z2[0] = r1;
+        z2[1] = i1;
+        z1-=2;
+        z2+=2;
     }
 } 
 
@@ -215,27 +214,35 @@ void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
     /* reflect the half imdct into the full N samples */
     /* TODO: this could easily be optimised more! */
     fixed32 * in_r = output + n2;
-    fixed32 * out_r = output + n-4;
+    fixed32 * out_r = output + n-8;
 
     while(out_r>in_r)
     {
-        out_r[3] = in_r[0];
-        out_r[2] = in_r[1];
-        out_r[1] = in_r[2];
-        out_r[0] = in_r[3];
-        in_r +=4;
-        out_r -= 4;
+        out_r[7] = in_r[0];
+        out_r[6] = in_r[1];
+        out_r[5] = in_r[2];
+        out_r[4] = in_r[3];
+        out_r[3] = in_r[4];
+        out_r[2] = in_r[5];
+        out_r[1] = in_r[6];
+        out_r[0] = in_r[7];
+        in_r += 8;
+        out_r -= 8;
     }
-    out_r =output;
-    in_r  =output+n2-4;
+    out_r = output;
+    in_r  = output+n2-8;
     while(out_r<in_r)
     {
-        out_r[0]     = -in_r[3];
-        out_r[1]     = -in_r[2];
-        out_r[2]     = -in_r[1];
-        out_r[3]     = -in_r[0];
-        in_r -= 4;
-        out_r += 4;
+        out_r[0]     = -in_r[7];
+        out_r[1]     = -in_r[6];
+        out_r[2]     = -in_r[5];
+        out_r[3]     = -in_r[4];
+        out_r[4]     = -in_r[3];
+        out_r[5]     = -in_r[2];
+        out_r[6]     = -in_r[1];
+        out_r[7]     = -in_r[0];
+        in_r -= 8;
+        out_r += 8;
     }
 }
 

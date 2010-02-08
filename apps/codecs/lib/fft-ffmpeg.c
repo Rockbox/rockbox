@@ -190,13 +190,11 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 #define BUTTERFLIES(a0,a1,a2,a3) {\
     {\
         BF_OPT(t1, t5, t5, t1);\
-        BF_OPT(a2.re, a0.re, a0.re, t5);\
-        BF_OPT(a3.im, a1.im, a1.im, t1);\
-    }\
-    {\
         BF_OPT(t6, t2, t2, t6);\
-        BF_OPT(a3.re, a1.re, a1.re, t6);\
+        BF_OPT(a2.re, a0.re, a0.re, t5);\
         BF_OPT(a2.im, a0.im, a0.im, t2);\
+        BF_OPT(a3.re, a1.re, a1.re, t6);\
+        BF_OPT(a3.im, a1.im, a1.im, t1);\
     }\
 }
 #else
@@ -299,7 +297,7 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 */
 #define TRANSFORM(a0,a1,a2,a3,wre,wim) {\
     {\
-        FFTSample t1,t2,t5,t6;\
+        register FFTSample t1,t2,t5,t6;\
         XPROD31_R(a2.re, a2.im, wre, wim, t1,t2);\
         XNPROD31_R(a3.re, a3.im, wre, wim, t5,t6);\
         BUTTERFLIES(a0,a1,a2,a3)\
@@ -309,10 +307,10 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 
 #define TRANSFORM_W01(a0,a1,a2,a3,w) {\
     {\
-        FFTSample t1,t2,t5,t6;\
+        register FFTSample t1,t2,t5,t6;\
         const FFTSample wre=w[0],wim=w[1];\
-        XPROD31(a2.re, a2.im, wre, wim, &t1, &t2);\
-        XNPROD31(a3.re, a3.im, wre, wim, &t5,&t6);\
+        XPROD31_R(a2.re, a2.im, wre, wim, t1, t2);\
+        XNPROD31_R(a3.re, a3.im, wre, wim, t5,t6);\
         BUTTERFLIES(a0,a1,a2,a3)\
     }\
     muls_inc(8);\
@@ -320,10 +318,10 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 
 #define TRANSFORM_W10(a0,a1,a2,a3,w) {\
     {\
-        FFTSample t1,t2,t5,t6;\
+        register FFTSample t1,t2,t5,t6;\
         const FFTSample wim=w[0],wre=w[1];\
-        XPROD31(a2.re, a2.im, wre, wim, &t1, &t2);\
-        XNPROD31(a3.re, a3.im, wre, wim, &t5,&t6);\
+        XPROD31_R(a2.re, a2.im, wre, wim, t1, t2);\
+        XNPROD31_R(a3.re, a3.im, wre, wim, t5,t6);\
         BUTTERFLIES(a0,a1,a2,a3)\
     }\
     muls_inc(8);\
@@ -376,9 +374,7 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 static void name(FFTComplex *z, unsigned int STEP, unsigned int n)\
 {\
     FFTSample t1, t2, t5, t6;\
-    int o1 = n;\
-    int o2 = 2*n;\
-    int o3 = 3*n;\
+    int o1 = n, o2 = n*2, o3 = n*3;\
     muls_inc(2);\
 \
     const FFTSample *w = sincos_lookup0+STEP;\
@@ -400,11 +396,11 @@ static void name(FFTComplex *z, unsigned int STEP, unsigned int n)\
         TRANSFORM_W10(z[1],z[o1+1],z[o2+1],z[o3+1],w);\
         w += STEP;\
 	adds_inc(3);\
-    } while(w < w_end);\
+    } while(LIKELY(w < w_end));\
     /* second half: pass backwards through sincos_lookup0*/\
     /* wim and wre are now in opposite places so ordering now [0],[1] */\
     w_end=sincos_lookup0;\
-    while(w>w_end)\
+    while(LIKELY(w>w_end))\
     {\
         z += 2;\
         TRANSFORM_W01(z[0],z[o1],z[o2],z[o3],w);\
