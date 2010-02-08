@@ -144,7 +144,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
         yn[i].result_message[YESNO_NO]=no_message;
         yn[i].display=&screens[i];
         yn[i].vp = &vp[i];
-        viewport_set_defaults(yn[i].vp, i);
+        viewportmanager_theme_enable(i, true, yn[i].vp);
         screens[i].stop_scroll();
         gui_yesno_draw(&(yn[i]));
     }
@@ -186,7 +186,10 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
     if(result_displayed)
         sleep(HZ);
 
-    FOR_NB_SCREENS(i) /* stop scrolling before getting out */
+    FOR_NB_SCREENS(i)
+    {
         screens[i].scroll_stop(yn[i].vp);
+        viewportmanager_theme_undo(i, true);
+    }
     return(result);
 }
