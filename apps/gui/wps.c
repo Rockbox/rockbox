@@ -605,9 +605,6 @@ static void gwps_enter_wps(void)
             draw = true;
 #endif
         display->stop_scroll();
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-        display->backdrop_show(gwps->data->backdrop);
-#endif
         viewportmanager_theme_enable(i, draw, NULL);
 
         /* Update the values in the first (default) viewport - in case the user
@@ -621,6 +618,9 @@ static void gwps_enter_wps(void)
         }
 #endif
         /* make the backdrop actually take effect */
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+        display->backdrop_show(gwps->data->backdrop);
+#endif
         display->clear_display();
         skin_update(gwps, WPS_REFRESH_ALL);
     }
