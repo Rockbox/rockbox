@@ -111,6 +111,9 @@ static void toggle_theme(enum screen_type screen, bool force)
     {
         /* remove the left overs from the previous screen.
          * could cause a tiny flicker. Redo your screen code if that happens */
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+        screens[i].backdrop_show(sb_get_backdrop(i));
+#endif
         if (!was_enabled[screen] || force)
         {
             struct viewport deadspace, user;
