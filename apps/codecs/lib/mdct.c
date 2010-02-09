@@ -53,28 +53,27 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
     s->nbits = nbits;
     s->n = n;
     n4 = n>>2;
-    s->tcos = tcosarray[12-nbits];
-    s->tsin = tsinarray[12-nbits];
-    
-    unsigned long phase;
-    
-    /* NOTE THAT THESE TWIDDLE FACTORS HAVE NOW CHANGED !! */
-    for(i=0;i<n4;i++)
+
+    if(n>2048)
     {
-      /* phase = (i+(1/4))/N in 32bit range (e.g. 0x0=0deg, 0x80000000=180deg)
-         Shifting by <<16 in two stages works so long as largest nbits < 16
-         (which it is).
-         Note - this has NOTHING to do with fixmul32/PRECISION/etc
-         (see definition of fsincos function below)               */
-      phase = ( ((i<<16) + 0x4000) >> nbits ) << 16;
-      /* tsin and tcos are just reflections of each other with a phase shift
-         so should be able to optimise to reduce storage */
-      /* NOTE the required tables are actually -cos and -sin , so we need to 
-         flip sign of the result of the fsincos calculation.
-         Alternatively could flip at the calculation step instead */
-//      s->tsin[i] = -fsincos(phase, &(s->tcos[i]));
-//      s->tcos[i] *= (-1);
-      s->tsin[i] = fsincos(phase, &(s->tcos[i]));
+        s->tcos = tcosarray[12-nbits];
+        s->tsin = tsinarray[12-nbits];
+        unsigned long phase;
+        
+        /* for now (hopefully very temporarily) build that last twiddle table */
+        /* NOTE THAT THESE TWIDDLE FACTORS HAVE NOW CHANGED !! */
+        for(i=0;i<n4;i++)
+        {
+          /* phase = (i+(1/4))/N in 32bit range (e.g. 0x0=0deg, 0x80000000=180deg)
+             Shifting by <<16 in two stages works so long as largest nbits < 16
+             (which it is).
+             Note - this has NOTHING to do with fixmul32/PRECISION/etc
+             (see definition of fsincos function below)               */
+          phase = ( ((i<<16) + 0x4000) >> nbits ) << 16;
+          /* tsin and tcos are just reflections of each other with a phase shift
+             so should be able to optimise to reduce storage */
+          s->tsin[i] = fsincos(phase, &(s->tcos[i]));
+        }
     }
     (&s->fft)->nbits = nbits-2;
     (&s->fft)->inverse = inverse;
@@ -96,9 +95,6 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
 void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
 {
     int k, n8, n4, n2, n, j;
-    const fixed32 *tcos = s->tcos;
-    const fixed32 *tsin = s->tsin;
-    
     const fixed32 *in1, *in2;
     
     n = 1 << s->nbits;
@@ -133,7 +129,8 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
         an mdct-local set of twiddles to do that part)
        */
     const int32_t *T = sincos_lookup0;
-    const int step = (12-s->nbits)<<1;
+    const int32_t *V;
+    const int step = 2<<(12-s->nbits);
     const uint16_t * p_revtab=s->fft.revtab;
     {
         const uint16_t * const p_revtab_end = p_revtab + n8;
@@ -177,21 +174,62 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
     ff_fft_calc_c(&s->fft, z);
 
     /* post rotation + reordering.  now keeps the result within the OUTPUT buffer */
-    fixed32 * z1 = (fixed32 *)(&z[n8-1]);
-    fixed32 * z2 = (fixed32 *)(&z[n8]);
-    for(k=0;k<n8;k++)
+    if(n<=2048)
     {
-        /* remember, tcos and tsin are really -cos and -sin 
-           so what we're actually calculating is {re,im) x {-cos,-sin} */
-        fixed32 r0,i0,r1,i1;
-        XNPROD31_R(z1[1], z1[0], tsin[n8-k-1], tcos[n8-k-1], r0, i1 );
-        XNPROD31_R(z2[1], z2[0], tsin[n8+k],   tcos[n8+k],   r1, i0 );
-        z1[0] = r0;
-        z1[1] = i0;
-        z2[0] = r1;
-        z2[1] = i1;
-        z1-=2;
-        z2+=2;
+        fixed32 * z1 = (fixed32 *)(&z[0]);
+        fixed32 * z2 = (fixed32 *)(&z[n4-1]);
+        int magic_step = step>>2;
+        int newstep;
+        if(n<=1024)
+        {
+            T = sincos_lookup0 + magic_step;
+            V = sincos_lookup0 + step - magic_step;
+            newstep = step>>1;
+        }
+        else
+        {   
+             T = sincos_lookup1;
+             V = sincos_lookup1 + 2;
+             newstep = 2;
+        }
+        
+        while(z1<z2)
+        {
+            fixed32 r0,i0,r1,i1;
+            XNPROD31_R(z1[1], z1[0], T[0], T[1], r0, i1 ); T+=newstep;
+            XNPROD31_R(z2[1], z2[0], T[1], T[0], r1, i0 ); T+=newstep;
+            z1[0] = r0;
+            z1[1] = i0;
+            z2[0] = r1;
+            z2[1] = i1;
+            z1+=2;
+            z2-=2;
+            V+=step;
+        }
+    }
+    else
+    {
+        /* todo: use sincos_lookup1 plus simple linear interpolation
+                 to get the twiddle factors needed here (for N=4096 or 8192) */
+        fixed32 * z1 = (fixed32 *)(&z[n8-1]);
+        fixed32 * z2 = (fixed32 *)(&z[n8]);
+        const fixed32 *tcos = s->tcos;
+        const fixed32 *tsin = s->tsin;
+    
+        for(k=0;k<n8;k++)
+        {
+            /* remember, tcos and tsin are really -cos and -sin 
+               so what we're actually calculating is {re,im) x {-cos,-sin} */
+            fixed32 r0,i0,r1,i1;
+            XNPROD31_R(z1[1], z1[0], tsin[n8-k-1], tcos[n8-k-1], r0, i1 );
+            XNPROD31_R(z2[1], z2[0], tsin[n8+k],   tcos[n8+k],   r1, i0 );
+            z1[0] = r0;
+            z1[1] = i0;
+            z2[0] = r1;
+            z2[1] = i1;
+            z1-=2;
+            z2+=2;
+        }
     }
 } 
 
@@ -220,7 +258,7 @@ void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
     out_r = output;
     out_r2 = output+n2-8;
     in_r  = output+n2+n4-8;
-    while(out_r<out_r2)
+    while(LIKELY(out_r<out_r2))
     {
         out_r[0]     = -(out_r2[7] = in_r[7]);
         out_r[1]     = -(out_r2[6] = in_r[6]);
@@ -239,7 +277,7 @@ void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
     in_r2 = output + n-4;
     out_r = output + n2;
     out_r2 = output + n2 + n4 - 4;
-    while(in_r<in_r2)
+    while(LIKELY(in_r<in_r2))
     {
         register fixed32 t0,t1,t2,t3;
         register fixed32 s0,s1,s2,s3;
