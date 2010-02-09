@@ -129,7 +129,6 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
         an mdct-local set of twiddles to do that part)
        */
     const int32_t *T = sincos_lookup0;
-    const int32_t *V;
     const int step = 2<<(12-s->nbits);
     const uint16_t * p_revtab=s->fft.revtab;
     {
@@ -183,13 +182,11 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
         if(n<=1024)
         {
             T = sincos_lookup0 + magic_step;
-            V = sincos_lookup0 + step - magic_step;
             newstep = step>>1;
         }
         else
         {   
              T = sincos_lookup1;
-             V = sincos_lookup1 + 2;
              newstep = 2;
         }
         
@@ -204,7 +201,6 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
             z2[1] = i1;
             z1+=2;
             z2-=2;
-            V+=step;
         }
     }
     else
@@ -258,7 +254,7 @@ void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
     out_r = output;
     out_r2 = output+n2-8;
     in_r  = output+n2+n4-8;
-    while(LIKELY(out_r<out_r2))
+    while(out_r<out_r2)
     {
         out_r[0]     = -(out_r2[7] = in_r[7]);
         out_r[1]     = -(out_r2[6] = in_r[6]);
@@ -277,7 +273,7 @@ void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
     in_r2 = output + n-4;
     out_r = output + n2;
     out_r2 = output + n2 + n4 - 4;
-    while(LIKELY(in_r<in_r2))
+    while(in_r<in_r2)
     {
         register fixed32 t0,t1,t2,t3;
         register fixed32 s0,s1,s2,s3;
