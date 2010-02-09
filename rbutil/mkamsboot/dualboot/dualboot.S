@@ -161,7 +161,7 @@ uclcopy:
         ldr     r0, =GPIOB
         mov     r1, #(1<<0)         @ pin 0
         str     r1, [r0, #0x400]    @ GPIOB(0) = output
-        str     r1, [r0, #4*(1<<0)] @ write 1 to GPIOB(0)
+        str     r1, [r0, #4*(1<<0)] @ write 1 to GPIOB(0)  B0 set
 
         mov     r1, #500            @ small delay
 1:      subs    r1, r1, #1
@@ -176,13 +176,13 @@ uclcopy:
 
         orr     r2, r2, r1          @ c3 || A1
 
-        @ restore GPIOB_DIR(0)
-        ldr     r0, =GPIOB
-        mov     r1, #0
-        str     r1, [r0, #0x400]    @ Restore GPIOB_DIR to 0x00
-
         @ Unset GPIOB(0)
-        str     r1, [r0, #4*(0<<0)] @ write 0 to GPIOB(0)
+        mov     r1, #0
+        str     r1, [r0, #4*(1<<0)] @ write 0 to GPIOB(0) B0 unset
+
+        @ restore GPIOB_DIR to 0x00
+        ldr     r0, =GPIOB
+        str     r1, [r0, #0x400]    @ Restore GPIOB_DIR to 0x00
 
         cmp     r2, #0              @ test input from pins
         bne     boot_of             @ branch directly to OF if either pin high
