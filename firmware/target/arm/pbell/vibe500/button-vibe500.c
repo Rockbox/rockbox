@@ -23,6 +23,7 @@
 #include "system.h"
 #include "button.h"
 #include "backlight.h"
+#include "powermgmt.h"
 #include "synaptics-mep.h"
 
 static int int_btn = BUTTON_NONE;
@@ -44,7 +45,7 @@ void button_int(void)
 
     val = touchpad_read_device(data, 4);
 
-    if (val == MEP_BUTTON_HEADER)
+    if (data[0] == MEP_BUTTON_HEADER)
     {
         /* Buttons packet */
         if (data[1] & 0x1)
@@ -56,19 +57,19 @@ void button_int(void)
         if (data[1] & 0x8)
             int_btn |= BUTTON_PREV;
     }
-    else if (val == MEP_ABSOLUTE_HEADER)
+    else if (data[0] == MEP_ABSOLUTE_HEADER)
     {
-        /* Absolute packet - the finger is on the vertical strip.
-           Position ranges from 1-4095, with 1 at the bottom. */
-        val = ((data[1] >> 4) << 8) | data[2]; /* position */
+        if (data[1] & MEP_FINGER)
+        {
+            /* Absolute packet - the finger is on the vertical strip.
+               Position ranges from 1-4095, with 1 at the bottom. */
+            val = ((data[1] >> 4) << 8) | data[2]; /* position */
 
-        if (val > 0)
-    {
-        int scr_pos = val >> 8; /* split the scrollstrip into 16 regions */
-        if ((old_pos<scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_DOWN;
-        if ((old_pos>scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_UP;
-        old_pos = scr_pos;
-    }
+            int scr_pos = val >> 8; /* split the scrollstrip into 16 regions */
+            if ((old_pos<scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_DOWN;
+            if ((old_pos>scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_UP;
+            old_pos = scr_pos;
+        }
         else old_pos=-1;
     }
 }
@@ -94,13 +95,24 @@ int button_read_device(void)
     if (!hold_button)
     {
         /* Read Record, OK, C */
-    state = GPIOA_INPUT_VAL;
-    if ((state & 0x01)==0) buttons|=BUTTON_REC;
-    if ((state & 0x40)==0) buttons|=BUTTON_OK;
-    if ((state & 0x08)==0) buttons|=BUTTON_CANCEL;
+        state = GPIOA_INPUT_VAL;
+        if ((state & 0x01)==0) buttons|=BUTTON_REC;
+        if ((state & 0x40)==0) buttons|=BUTTON_OK;
+        if ((state & 0x08)==0) buttons|=BUTTON_CANCEL;
 
         /* Read POWER button */
-    if ((GPIOD_INPUT_VAL & 0x40)==0) buttons|=BUTTON_POWER;
+        if ((GPIOD_INPUT_VAL & 0x40)==0) buttons|=BUTTON_POWER;
+
+        /* Scrollstrip direct button post - much better response */
+        if ((buttons==BUTTON_UP) || (buttons==BUTTON_DOWN))
+        {
+            queue_post(&button_queue,buttons,0);
+            backlight_on();
+            buttonlight_on();
+            reset_poweroff_timer();
+            buttons = BUTTON_NONE;
+            int_btn = BUTTON_NONE;
+        }
     }
     else return BUTTON_NONE;
     return buttons;
@@ -111,4 +123,3 @@ bool button_hold(void)
     /* GPIOK 01000000B - HOLD when bit not set */
     return (GPIOK_INPUT_VAL & 0x40)?false:true;
 }
-

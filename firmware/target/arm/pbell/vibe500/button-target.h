@@ -27,6 +27,7 @@
 #define MEP_BUTTON_HEADER   0x19
 #define MEP_BUTTON_ID       0x09
 #define MEP_ABSOLUTE_HEADER 0x0b
+#define MEP_FINGER          0x01
 
 #define HAS_BUTTON_HOLD
 
