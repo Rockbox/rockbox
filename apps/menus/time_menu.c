@@ -168,7 +168,7 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
         return;
     display->set_viewport(vp);
     display->clear_viewport();
-    if (viewport_get_nb_lines(vp) > 3)
+    if (viewport_get_nb_lines(vp) >= 4)
         line = 1;
     else
         line = 0;
@@ -271,19 +271,11 @@ int time_screen(void* ignored)
         clock[i].flags |= VP_FLAG_ALIGN_CENTER;
 
         font_h = font_get(clock[i].font)->height;
-        if (nb_lines > 3)
-        {
-            if (nb_lines >= 5)
-            {
-                clock[i].height = 3*font_h;
-                if (nb_lines > 5)
-                    clock[i].height += font_h;
-            }
-            else
-            {
-                clock[i].height = 2*font_h;
-            }
-        }
+        nb_lines -= 2; /* at least 2 lines for menu */
+        if (nb_lines > 4)
+            nb_lines = 4;
+        if (nb_lines >= 2)
+            clock[i].height = nb_lines*font_h;
         else /* disable the clock drawing */
             clock[i].height = 0;
         menu[i].y += clock[i].height;
@@ -292,9 +284,11 @@ int time_screen(void* ignored)
     }
 
     ret = do_menu(&time_menu, NULL, menu, false);
+    FOR_NB_SCREENS(i)
+        screens[i].scroll_stop(&clock[i]);
+
     /* see comments above in the button callback */
     if (!menu_was_pressed && ret == GO_TO_PREVIOUS)
         return 0;
     return ret;
 }
-
