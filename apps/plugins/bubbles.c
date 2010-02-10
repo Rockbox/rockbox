@@ -2369,7 +2369,7 @@ static int bubbles_menu_cb(int action, const struct menu_item_ex *this_item)
 {
     int i = ((intptr_t)this_item);
     if(action == ACTION_REQUEST_MENUITEM
-       && !resume && (i==0 || i==5))
+       && !resume && (i==0))
         return ACTION_EXIT_MENUITEM;
     return action;
 }
@@ -2537,8 +2537,10 @@ enum plugin_status plugin_start(const void* parameter) {
                 break;
 
             case BB_QUIT:
-                rb->splash(HZ*1, "Saving game ...");
+                rb->splash(HZ/3, "Saving game ...");
                 bubbles_savegame(&bb);
+                bubbles_savedata();
+                highscore_save(SCORE_FILE, highscores, NUM_SCORES);
                 /* fall through */
 
             case BB_QUIT_WITHOUT_SAVING:
@@ -2549,8 +2551,6 @@ enum plugin_status plugin_start(const void* parameter) {
                 break;
         }
     }
-    bubbles_savedata();
-    highscore_save(SCORE_FILE, highscores, NUM_SCORES);
     rb->lcd_setfont(FONT_UI);
     return ret;
 }
