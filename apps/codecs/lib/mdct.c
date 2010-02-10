@@ -24,28 +24,12 @@
 #include "codeclib_misc.h"
 #include "mdct_lookup.h"
 
-/* these are the sin and cos rotations used by the MDCT
-   Accessed too infrequently to give much speedup in IRAM */
-/* Fixme - unify all this with the twiddle arrays used by the fft.
-   It should be straightforward to flatten everything into a single
-   table of sin/cos factors of maximum size = maximum block size
-   (Reason: sin and cos factors are symmetric so don't need to store both
-            cos itself has 8-way symmetry so only need to store 1/8th of them
-            and the mdct rotations require 1/8th fractional steps so 8
-            times as many points (so you're at N*8/8 = N) */
-            
-/* NOTE: data format of mdct trig tables is s.31 */
-            
-fixed32 *tcosarray[5], *tsinarray[5];
-fixed32 tcos0[1024], tcos1[512], tcos2[256], tcos3[128], tcos4[64];
-fixed32 tsin0[1024], tsin1[512], tsin2[256], tsin3[128], tsin4[64];
-
 /**
  * init MDCT or IMDCT computation.
  */
 int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
 {
-    int n, n4, i;
+    int n, n4;
 
     memset(s, 0, sizeof(*s));
     n = 1 << nbits;            //nbits ranges from 12 to 8 inclusive
@@ -54,27 +38,6 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
     s->n = n;
     n4 = n>>2;
 
-    if(n>2048)
-    {
-        s->tcos = tcosarray[12-nbits];
-        s->tsin = tsinarray[12-nbits];
-        unsigned long phase;
-        
-        /* for now (hopefully very temporarily) build that last twiddle table */
-        /* NOTE THAT THESE TWIDDLE FACTORS HAVE NOW CHANGED !! */
-        for(i=0;i<n4;i++)
-        {
-          /* phase = (i+(1/4))/N in 32bit range (e.g. 0x0=0deg, 0x80000000=180deg)
-             Shifting by <<16 in two stages works so long as largest nbits < 16
-             (which it is).
-             Note - this has NOTHING to do with fixmul32/PRECISION/etc
-             (see definition of fsincos function below)               */
-          phase = ( ((i<<16) + 0x4000) >> nbits ) << 16;
-          /* tsin and tcos are just reflections of each other with a phase shift
-             so should be able to optimise to reduce storage */
-          s->tsin[i] = fsincos(phase, &(s->tcos[i]));
-        }
-    }
     (&s->fft)->nbits = nbits-2;
     (&s->fft)->inverse = inverse;
 
@@ -94,7 +57,7 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
  */
 void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
 {
-    int k, n8, n4, n2, n, j;
+    int n8, n4, n2, n, j;
     const fixed32 *in1, *in2;
     
     n = 1 << s->nbits;
@@ -173,58 +136,121 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
     ff_fft_calc_c(&s->fft, z);
 
     /* post rotation + reordering.  now keeps the result within the OUTPUT buffer */
-    if(n<=2048)
+    switch( s->nbits )
     {
-        fixed32 * z1 = (fixed32 *)(&z[0]);
-        fixed32 * z2 = (fixed32 *)(&z[n4-1]);
-        int magic_step = step>>2;
-        int newstep;
-        if(n<=1024)
+        default:
         {
-            T = sincos_lookup0 + magic_step;
-            newstep = step>>1;
+            fixed32 * z1 = (fixed32 *)(&z[0]);
+            fixed32 * z2 = (fixed32 *)(&z[n4-1]);
+            int magic_step = step>>2;
+            int newstep;
+            if(n<=1024)
+            {
+                T = sincos_lookup0 + magic_step;
+                newstep = step>>1;
+            }
+            else
+            {   
+                 T = sincos_lookup1;
+                 newstep = 2;
+            }
+        
+            while(z1<z2)
+            {
+                fixed32 r0,i0,r1,i1;
+                XNPROD31_R(z1[1], z1[0], T[0], T[1], r0, i1 ); T+=newstep;
+                XNPROD31_R(z2[1], z2[0], T[1], T[0], r1, i0 ); T+=newstep;
+                z1[0] = r0;
+                z1[1] = i0;
+                z2[0] = r1;
+                z2[1] = i1;
+                z1+=2;
+                z2-=2;
+            }
+            
+            break;
         }
-        else
-        {   
-             T = sincos_lookup1;
-             newstep = 2;
+
+        case 12: /* n=4096 */
+        {
+            /* linear interpolation (50:50) between sincos_lookup0 and sincos_lookup1 */
+            const int32_t * V = sincos_lookup1;
+            T = sincos_lookup0;
+            int32_t t0,t1,v0,v1;
+            fixed32 * z1 = (fixed32 *)(&z[0]);
+            fixed32 * z2 = (fixed32 *)(&z[n4-1]);
+
+            t0 = T[0]>>1; t1=T[1]>>1;
+        
+            while(z1<z2)
+            {
+                fixed32 r0,i0,r1,i1;
+                t0 += (v0 = (V[0]>>1));
+                t1 += (v1 = (V[1]>>1));
+                XNPROD31_R(z1[1], z1[0], t0, t1, r0, i1 );
+                T+=2;
+                v0 += (t0 = (T[0]>>1));
+                v1 += (t1 = (T[1]>>1));
+                XNPROD31_R(z2[1], z2[0], v1, v0, r1, i0 );
+                z1[0] = r0;
+                z1[1] = i0;
+                z2[0] = r1;
+                z2[1] = i1;
+                z1+=2;
+                z2-=2;
+                V+=2;
+            }
+            
+            break;
         }
         
-        while(z1<z2)
+        case 13: /* n = 8192 */
         {
-            fixed32 r0,i0,r1,i1;
-            XNPROD31_R(z1[1], z1[0], T[0], T[1], r0, i1 ); T+=newstep;
-            XNPROD31_R(z2[1], z2[0], T[1], T[0], r1, i0 ); T+=newstep;
-            z1[0] = r0;
-            z1[1] = i0;
-            z2[0] = r1;
-            z2[1] = i1;
-            z1+=2;
-            z2-=2;
-        }
-    }
-    else
-    {
-        /* todo: use sincos_lookup1 plus simple linear interpolation
-                 to get the twiddle factors needed here (for N=4096 or 8192) */
-        fixed32 * z1 = (fixed32 *)(&z[n8-1]);
-        fixed32 * z2 = (fixed32 *)(&z[n8]);
-        const fixed32 *tcos = s->tcos;
-        const fixed32 *tsin = s->tsin;
-    
-        for(k=0;k<n8;k++)
-        {
-            /* remember, tcos and tsin are really -cos and -sin 
-               so what we're actually calculating is {re,im) x {-cos,-sin} */
-            fixed32 r0,i0,r1,i1;
-            XNPROD31_R(z1[1], z1[0], tsin[n8-k-1], tcos[n8-k-1], r0, i1 );
-            XNPROD31_R(z2[1], z2[0], tsin[n8+k],   tcos[n8+k],   r1, i0 );
-            z1[0] = r0;
-            z1[1] = i0;
-            z2[0] = r1;
-            z2[1] = i1;
-            z1-=2;
-            z2+=2;
+            /* weight linear interpolation between sincos_lookup0 and sincos_lookup1
+               specifically: 25:75 for first twiddle and 75:25 for second twiddle */
+            const int32_t * V = sincos_lookup1;
+            T = sincos_lookup0;
+            int32_t t0,t1,v0,v1,q0,q1;
+            fixed32 * z1 = (fixed32 *)(&z[0]);
+            fixed32 * z2 = (fixed32 *)(&z[n4-1]);
+
+            t0 = T[0]; t1=T[1];
+        
+            while(z1<z2)
+            {
+                fixed32 r0,i0,r1,i1;
+                v0 = V[0]; v1 = V[1];
+                t0 += (q0 = (v0-t0)>>1);
+                t1 += (q1 = (v1-t1)>>1);
+                XNPROD31_R(z1[1], z1[0], t0, t1, r0, i1 );
+                t0 = v0-q0;
+                t1 = v1-q1;
+                XNPROD31_R(z2[1], z2[0], t1, t0, r1, i0 );
+                z1[0] = r0;
+                z1[1] = i0;
+                z2[0] = r1;
+                z2[1] = i1;
+                z1+=2;
+                z2-=2;
+                T+=2;
+                
+                t0 = T[0]; t1 = T[1];
+                v0 += (q0 = (t0-v0)>>1);
+                v1 += (q1 = (t1-v1)>>1);
+                XNPROD31_R(z1[1], z1[0], v0, v1, r0, i1 );
+                v0 = t0-q0;
+                v1 = t1-q1;
+                XNPROD31_R(z2[1], z2[0], v1, v0, r1, i0 );
+                z1[0] = r0;
+                z1[1] = i0;
+                z2[0] = r1;
+                z2[1] = i1;
+                z1+=2;
+                z2-=2;
+                V+=2;
+            }
+               
+            break;
         }
     }
 } 
@@ -312,28 +338,13 @@ void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
 /* init MDCT */
 int mdct_init_global(void)
 {
-    /* although seemingly degenerate, these cannot actually be merged
-       together without a substantial increase in error which is unjustified
-       by the tiny memory savings */
-    /* FIXME: Except, that's not true, and these can be merged/flattened */
-    tcosarray[0] = tcos0;
-    tcosarray[1] = tcos1;
-    tcosarray[2] = tcos2;
-    tcosarray[3] = tcos3;
-    tcosarray[4] = tcos4;
-    tsinarray[0] = tsin0;
-    tsinarray[1] = tsin1;
-    tsinarray[2] = tsin2;
-    tsinarray[3] = tsin3;
-    tsinarray[4] = tsin4;
-
     return 0;
 }
 
-const long cordic_circular_gain = 0xb2458939; /* 0.607252929 */
+static const long cordic_circular_gain = 0xb2458939; /* 0.607252929 */
 
 /* Table of values of atan(2^-i) in 0.32 format fractions of pi where pi = 0xffffffff / 2 */
-const unsigned long atan_table[] = {
+static const unsigned long atan_table[] = {
     0x1fffffff, /* +0.785398163 (or pi/4) */
     0x12e4051d, /* +0.463647609 */
     0x09fb385b, /* +0.244978663 */
@@ -368,7 +379,6 @@ const unsigned long atan_table[] = {
     0x00000000, /* +0.000000000 */
 };
 
-/* FIXME: yeah, all of this, should just be a fixed table... */
 /**
  * Implements sin and cos using CORDIC rotation.
  *

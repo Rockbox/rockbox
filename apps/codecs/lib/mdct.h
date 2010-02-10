@@ -149,8 +149,6 @@ void CMUL(fixed32 *pre,
 #endif
 
 /* Inverse gain of circular cordic rotation in s0.31 format. */
-const long cordic_circular_gain;
-extern const unsigned long atan_table[];
 long fsincos(unsigned long phase, fixed32 *cos);
 
 #endif // CODECLIB_MDCT_H_INCLUDED
