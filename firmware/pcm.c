@@ -183,6 +183,11 @@ void pcm_calculate_peaks(int *left, int *right)
         *right = peaks[1];
 }
 
+const void* pcm_get_peak_buffer(int * count)
+{
+    return pcm_play_dma_get_peak_buffer(count);
+}
+
 /****************************************************************************
  * Functions that do not require targeted implementation but only a targeted
  * interface

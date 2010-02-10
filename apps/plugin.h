@@ -580,6 +580,7 @@ struct plugin_api {
     void (*pcm_play_pause)(bool play);
     size_t (*pcm_get_bytes_waiting)(void);
     void (*pcm_calculate_peaks)(int *left, int *right);
+    const void* (*pcm_get_peak_buffer)(int *count);
     void (*pcm_play_lock)(void);
     void (*pcm_play_unlock)(void);
 #ifdef HAVE_RECORDING

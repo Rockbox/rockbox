@@ -75,6 +75,7 @@ void pcm_play_data(pcm_more_callback_type get_more,
                    unsigned char* start, size_t size);
 
 void pcm_calculate_peaks(int *left, int *right);
+const void* pcm_get_peak_buffer(int* count);
 size_t pcm_get_bytes_waiting(void);
 
 void pcm_play_stop(void);

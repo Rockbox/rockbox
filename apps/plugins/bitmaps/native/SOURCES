@@ -261,6 +261,11 @@ clock_logo.112x64x1.bmp
 clock_messages.112x64x1.bmp
 #endif
 
+/* FFT only needs a bitmap with colors mapping to amplitude */
+#ifdef HAVE_LCD_COLOR 
+fft_colors.16.bmp
+#endif
+
 /* Flipit */
 #ifdef HAVE_LCD_COLOR
 #if LCD_WIDTH >= 480

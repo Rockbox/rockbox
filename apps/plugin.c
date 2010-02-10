@@ -448,6 +448,7 @@ static const struct plugin_api rockbox_api = {
     pcm_play_pause,
     pcm_get_bytes_waiting,
     pcm_calculate_peaks,
+    pcm_get_peak_buffer,
     pcm_play_lock,
     pcm_play_unlock,
 #ifdef HAVE_RECORDING
