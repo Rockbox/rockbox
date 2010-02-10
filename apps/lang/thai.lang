@@ -261,9 +261,10 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
@@ -271,7 +272,8 @@
     cowond2*: "MENU = ใช่"
     iriverh100,iriverh120,iriverh300: "NAVI = ใช่"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = ใช่"
-    archosplayer: "(PLAY/STOP)"
+    mrobe500: "PLAY, POWER, หรือ มุมบนขวา = ใช่"
+    archosplayer: "(เล่น/หยุด)"
   </dest>
   <voice>
     *: ""
@@ -3179,13 +3181,13 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu alternative for jump scroll
+  desc: (archosplayer) menu alternative for jump scroll
   user: core
   <source>
     *: "Jump Scroll"
   </source>
   <dest>
-    *: "การเลื่อนตัวอักษรแบบกระโดด"
+    *: "เลื่อนแบบข้าม"
   </dest>
   <voice>
     *: "Jump Scroll"
@@ -3193,7 +3195,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time"
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -3207,13 +3209,13 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
-  desc: (player) Delay before making a jump scroll
+  desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
     *: "Jump Scroll Delay"
   </source>
   <dest>
-    *: "หน่วงเวลาการเลื่อนแบบกระโดด"
+    *: "หน่วงเวลาการเลื่อนแบบข้าม"
   </dest>
   <voice>
     *: "Jump Scroll Delay"
@@ -4958,10 +4960,10 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: "คลิป .talk mp3"
+    *: "คลิป .talk"
   </dest>
   <voice>
     *: "talk mp3 clip"
@@ -6855,12 +6857,12 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    archosplayer,archosrecorder,fmarchosrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "แบตเตอรี่: %d%% %dh %dm"
-    archosplayer,archosrecorder,fmarchosrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "แบต: %d%% %dh %dm"
   </dest>
   <voice>
@@ -8630,19 +8632,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 arhosrecorder
+  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
   user: core
   <source>
     *: none
-    archosrecorder "Battery: Top-Off Chg"
+    archosrecorder: "Battery: Top-Off Chg"
   </source>
   <dest>
     *: none
-    archosrecorder "แบตเตอรี่: ชาร์จสูงสุด"
+    archosrecorder: "แบตเตอรี่: Top-Off Chg"
   </dest>
   <voice>
     *: none
-    archosrecorder "Top off charge"
+    archosrecorder: "Top off charge"
   </voice>
 </phrase>
 <phrase>
@@ -12568,15 +12570,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Limiter Preamp"
+    swcodec: "Compressor"
   </source>
   <dest>
     *: none
-    swcodec: "ขีดจำกัดปรีแอมป์"
+    swcodec: "ตัวบีบอัดเสียง"
   </dest>
   <voice>
     *: none
-    swcodec: "Limiter Preamp"
+    swcodec: "Compressor"
   </voice>
 </phrase>
 <phrase>
@@ -12656,5 +12658,584 @@
   <voice>
     *: none
     serial_port: "Automatic"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "เรียงลำดับการสุ่มครั้งสุดท้าย"
+  </dest>
+  <voice>
+    *: "Queue Last Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_STATUSBAR
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "statusbar skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Release Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "เวลาปล่อย"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Release Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CUSTOM_STATUSBAR
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Threshold"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ช่วงการบีบ"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Threshold"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Makeup Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ปรับแต่งอัตราขยาย"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Makeup Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "หน้ากากหลัก"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Base Skin"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "remote statusbar skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ฐาน"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Knee"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto"
+  </source>
+  <dest>
+    *: none
+    swcodec: "อัตโนมัติ"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Auto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "ใส่การสุ่มล่าสุด"
+  </dest>
+  <voice>
+    *: "Insert Last Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Soft Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ฐานเบา"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Soft Knee"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "ถัดไป:"
+  </dest>
+  <voice>
+    *: "Next:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Ratio"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ratio"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ratio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_KEYPAD_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Hard Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Hard Knee"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Hard Knee"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSER_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Browser Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Browser Mode"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Browser Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB HID"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB Human Interface Device"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_OTHER
+  desc: Catch-all FM region. Select if none of the others work
+  user: core
+  <source>
+    *: none
+    radio: "Other"
+  </source>
+  <dest>
+    *: none
+    radio: "Other"
+  </dest>
+  <voice>
+    *: none
+    radio: "Other"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ITALY
+  desc: fm region Italy
+  user: core
+  <source>
+    *: none
+    radio: "Italy"
+  </source>
+  <dest>
+    *: none
+    radio: "Italy"
+  </dest>
+  <voice>
+    *: none
+    radio: "Italy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_10
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "10:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "10:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "10 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "2:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "2:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "2 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOUSE_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Mouse Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Mouse Mode"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Mouse Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_LIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limit"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIMEDIA_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Multimedia Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Multimedia Mode"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Multimedia Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Custom"
+  </dest>
+  <voice>
+    *: "Custom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Skip to Outro"
+  </dest>
+  <voice>
+    *: "Skip to Outro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_6
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "6:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "6:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "6 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Next Track:"
+  </dest>
+  <voice>
+    *: "Next Track:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_4
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "4:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "4:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "4 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESENTATION_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Presentation Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Presentation Mode"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Presentation Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "of"
+  </dest>
+  <voice>
+    *: "of"
   </voice>
 </phrase>
