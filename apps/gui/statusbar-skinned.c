@@ -160,12 +160,13 @@ void sb_create_from_settings(enum screen_type screen)
 #if NB_SCREENS > 1
     if (screen == SCREEN_REMOTE)
         ptr2 = global_settings.remote_ui_vp_config;
+    else
 #endif
-    ptr2 = global_settings.ui_vp_config;
+        ptr2 = global_settings.ui_vp_config;
     
     if (ptr2[0] && ptr2[0] != '-') /* from ui viewport setting */
     {
-        len = snprintf(ptr, remaining, "%%ax%%Vi|%s\n", ptr2);
+        len = snprintf(ptr, remaining, "%%ax%%Vi|%s|\n", ptr2);
         while ((ptr2 = strchr(ptr, ',')))
             *ptr2 = '|';
     }
