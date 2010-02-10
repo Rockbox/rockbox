@@ -109,7 +109,7 @@ static const void* dma_callback(void)
             get_more(&dma_start_addr, &nextsize);
             if (nextsize >= 4096)
             {
-                dblbufsize = nextsize >> 4;
+                dblbufsize = (nextsize >> 4) & ~3;
                 nextsize = nextsize - dblbufsize;
                 dblbuf = dma_start_addr + nextsize;
                 dmamode = 0;
@@ -235,7 +235,7 @@ void pcm_play_dma_start(const void *addr_in, size_t size)
     clean_dcache();
     if (size >= 4096)
     {
-        dblbufsize = size >> 4;
+        dblbufsize = (size >> 4) & ~3;
         size = size - dblbufsize;
         dblbuf = addr + size;
         dmamode = 0;
