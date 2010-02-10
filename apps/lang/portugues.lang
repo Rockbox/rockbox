@@ -735,10 +735,10 @@
     *: "Language"
   </source>
   <dest>
-    *: "Linguagem"
+    *: "Idioma"
   </dest>
   <voice>
-    *: "Linguagem"
+    *: "Idioma"
   </voice>
 </phrase>
 <phrase>
@@ -872,7 +872,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Opções Simples de EQ"
+    swcodec: "Opções Simples do EQ"
   </dest>
   <voice>
     *: none
@@ -889,7 +889,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Opções Avançadas de EQ"
+    swcodec: "Opções Avançadas do EQ"
   </dest>
   <voice>
     *: none
@@ -923,7 +923,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Explorar Predefinições de EQ"
+    swcodec: "Explorar Predefinições do EQ"
   </dest>
   <voice>
     *: none
@@ -1768,10 +1768,10 @@
     *: "Default Codepage"
   </source>
   <dest>
-    *: "Codificação da Página por Defeito"
+    *: "Codificação da Página por omissão"
   </dest>
   <voice>
-    *: "Codificação da Página por Defeito"
+    *: "Codificação da Página por omissão"
   </voice>
 </phrase>
 <phrase>
@@ -2016,10 +2016,10 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Desligar Quando Inactivo"
+    *: "Desligar quando Inactivo"
   </dest>
   <voice>
-    *: "Desligar Quando Inactivo"
+    *: "Desligar quando inactivo"
   </voice>
 </phrase>
 <phrase>
@@ -2109,10 +2109,10 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Criar Favorito Aquando de um Stop"
+    *: "Criar Favorito ao Parar"
   </dest>
   <voice>
-    *: "Criar Favorito Aquando de um Stop"
+    *: "Criar Favorito ao Parar"
   </voice>
 </phrase>
 <phrase>
@@ -2165,10 +2165,10 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "Manter uma Lista de Favoritos Recentes?"
+    *: "Manter uma Lista de Favoritos Recentes"
   </dest>
   <voice>
-    *: "Manter uma Lista de Favoritos Recentes?"
+    *: "Manter uma Lista de Favoritos Recentes"
   </voice>
 </phrase>
 <phrase>
@@ -2179,10 +2179,10 @@
     *: "Unique only"
   </source>
   <dest>
-    *: "Únicos Apenas"
+    *: "Apenas únicos"
   </dest>
   <voice>
-    *: "Únicos Apenas"
+    *: "Apenas únicos"
   </voice>
 </phrase>
 <phrase>
@@ -2685,10 +2685,10 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Tipo de Ganho de Repetição"
+    *: "Tipo de Replaygain"
   </dest>
   <voice>
-    *: "Tipo de Ganho de Repetição"
+    *: "Tipo de Replaygain"
   </voice>
 </phrase>
 <phrase>
@@ -2716,7 +2716,7 @@
     *: "Ganho de Faixa"
   </dest>
   <voice>
-    *: "Track gain"
+    *: "Ganho de Faixa"
   </voice>
 </phrase>
 <phrase>
@@ -2727,10 +2727,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Ganho de Faixa se em Modo Aleatório"
+    *: "Ganho de Faixa no Modo Aleatório"
   </dest>
   <voice>
-    *: "Ganho de Faixa se em Modo Aleatório"
+    *: "Ganho de Faixa no Modo Aleatório"
   </voice>
 </phrase>
 <phrase>
@@ -2786,7 +2786,7 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "Retro-iluminação de Legenda"
+    *: "Retro-iluminação de Leitura"
   </dest>
   <voice>
     *: "Retro-iluminação de Legenda"
@@ -3052,7 +3052,7 @@
     *: "Exemplo da Velocidade de Navegação Seleccionada"
   </dest>
   <voice>
-    *: "Exemplo da Velocidade de Navegação Seleccionada"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3094,7 +3094,7 @@
     *: "Texto de Exemplificação do Avanço da Navegação"
   </dest>
   <voice>
-    *: "Texto de Exemplificação do Avanço da Navegação"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3422,7 +3422,7 @@
     masd: none
   </source>
   <dest>
-    *: "Logarítmico (dB)"
+    *: "Logarítmica (dB)"
     masd: none
   </dest>
   <voice>
@@ -4160,7 +4160,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Acelerar"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -4177,7 +4177,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Abrandar"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -4219,7 +4219,7 @@
     *: "Favorito Criado"
   </dest>
   <voice>
-    *: ""
+    *: "Favorito Criado"
   </voice>
 </phrase>
 <phrase>
@@ -4233,7 +4233,7 @@
     *: "Erro ao Criar Favorito!"
   </dest>
   <voice>
-    *: ""
+    *: "Erro ao Criar Favorito!"
   </voice>
 </phrase>
 <phrase>
@@ -4247,7 +4247,7 @@
     *: "Favorito Vazio"
   </dest>
   <voice>
-    *: ""
+    *: "Favorito Vazio"
   </voice>
 </phrase>
 <phrase>
@@ -4521,11 +4521,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Acordar Em %d:%02d"
+    alarm: "Acordar às %d:%02d"
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Acordar ás"
   </voice>
 </phrase>
 <phrase>
@@ -4577,8 +4577,8 @@
     *: none
     alarm: "PLAY=Alterar OFF=Cancelar"
     ipod*: "SELECT=Alterar MENU=Cancelar"
-    iriverh10,iriverh10_5gb: "SELECT=Alterar PREV=Cancelar"
-    gigabeats: "SELECT=Alterar POWER=Cancelar"
+    iriverh10,iriverh10_5gb: "SELECT=Definir PREV=Cancelar"
+    gigabeats: "SELECT=Definir POWER=Cancelar"
   </dest>
   <voice>
     *: none
@@ -4615,7 +4615,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "R G B"
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
@@ -4817,7 +4817,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Domingo"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4834,7 +4834,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Segunda"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4851,7 +4851,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Terça"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4868,7 +4868,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Quarta"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4885,7 +4885,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Quinta"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4902,7 +4902,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Sexta"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4919,7 +4919,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Sábado"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -6414,7 +6414,7 @@
   </dest>
   <voice>
     *: none
-    remote: ""
+    remote: "remote while-playing-screen"
   </voice>
 </phrase>
 <phrase>
@@ -6927,10 +6927,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Buffer das Directorias Está Cheio"
+    *: "Buffer das Directorias está Cheio"
   </dest>
   <voice>
-    *: "Buffer das Directorias Está Cheio"
+    *: "Buffer das Directorias está Cheio"
   </voice>
 </phrase>
 <phrase>
@@ -6941,10 +6941,10 @@
     *: "New Language"
   </source>
   <dest>
-    *: "Nova Linguagem"
+    *: "Novo Idioma"
   </dest>
   <voice>
-    *: "Nova Linguagem"
+    *: "Novo Idioma"
   </voice>
 </phrase>
 <phrase>
@@ -7020,9 +7020,10 @@
     *: "OFF para Abortar"
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP para Abortar"
     ipod*: "PLAY/PAUSE para Abortar"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV para Abortar"
-    gigabeats: "BACK para Abortar"
-    gigabeatfx: "POWER para Abortar"
+    iaudiox5,iaudiom5: "PLAY longo para abortar"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV para abortar"
+    gigabeats: "BACK para abortar"
+    gigabeatfx: "POWER para abortar"
   </dest>
   <voice>
     *: ""
@@ -7056,7 +7057,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Fundo Carregado"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7073,7 +7074,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Carregamento do Fundo Falhou"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -8422,7 +8423,7 @@
     archosplayer: none
   </source>
   <dest>
-    *: "Any Other = Não"
+    *: "Qualquer Outro = Não"
     archosplayer: none
   </dest>
   <voice>
@@ -8640,11 +8641,11 @@
   </source>
   <dest>
     *: none
-    accessory_supply: "Fonte de Energia Acessória"
+    accessory_supply: "Fornecer Energia a Acessórios"
   </dest>
   <voice>
     *: none
-    accessory_supply: "Fonte de Energia Acessória"
+    accessory_supply: "Fornecer Energia a Acessórios"
   </voice>
 </phrase>
 <phrase>
@@ -8723,7 +8724,6 @@
   </dest>
   <voice>
     *: "Fim da Lista de Músicas"
-    archosplayer: "Fim da Lista"
   </voice>
 </phrase>
 <phrase>
@@ -8863,11 +8863,11 @@
   </source>
   <dest>
     *: none
-    recording: "Pára a Gravação e Desligar"
+    recording: "Parar a gravação e desligar"
   </dest>
   <voice>
     *: none
-    recording: "Pára a Gravação e Desligar"
+    recording: "Parar a gravação e desligar"
   </voice>
 </phrase>
 <phrase>
@@ -9801,11 +9801,11 @@
   </source>
   <dest>
     *: none
-    recording: "O que fazer ao Separar"
+    recording: "O que fazer ao separar"
   </dest>
   <voice>
     *: none
-    recording: "O que fazer ao Separar"
+    recording: "O que fazer ao separar"
   </voice>
 </phrase>
 <phrase>
@@ -10241,10 +10241,10 @@
     *: "Current Directory Only"
   </source>
   <dest>
-    *: "Só Directoria Actual"
+    *: "Só directoria actual"
   </dest>
   <voice>
-    *: "Só Directoria Actual"
+    *: "Só directoria actual"
   </voice>
 </phrase>
 <phrase>
@@ -10323,10 +10323,10 @@
     *: "Only When Viewing All Types"
   </source>
   <dest>
-    *: "Só Quando Se Vêm Todos Os Tipos"
+    *: "Só quando se vêm todos os tipos"
   </dest>
   <voice>
-    *: "Só Quando Se Vêm Todos Os Tipos"
+    *: "Só quando se vêm todos os tipos"
   </voice>
 </phrase>
 <phrase>
@@ -10337,10 +10337,10 @@
     *: "Only Unknown Types"
   </source>
   <dest>
-    *: "Só Tipos Desconhecidos"
+    *: "Só tipos desconhecidos"
   </dest>
   <voice>
-    *: "Só Tipos Desconhecidos"
+    *: "Só tipos desconhecidos"
   </voice>
 </phrase>
 <phrase>
@@ -10497,7 +10497,7 @@
     *: ""
   </dest>
   <voice>
-    *: "of"
+    *: "por"
   </voice>
 </phrase>
 <phrase>
@@ -10750,12 +10750,12 @@
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
-    *: "Construindo Base da Dados... %d encontrado (OFF para voltar)"
-    iriverh100,iriverh120,iriverh300: "Construindo Base da Dados... %d encontrado (STOP para voltar)"
+    *: "Construindo Base da Dados... %d encontrados (OFF para voltar)"
+    iriverh100,iriverh120,iriverh300: "Construindo Base da Dados... %d encontrados (STOP para voltar)"
     ipod*: "Construindo Base da Dados... %d encontrado (PREV para voltar)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Construindo Base da Dados... %d encontrado (LEFT para voltar)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Construindo Base da Dados... %d encontrado (PREV para voltar)"
-    gogearsa9200: "Construindo Base da Dados... %d encontrado (REW para voltar)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Construindo Base da Dados... %d encontrados (LEFT para voltar)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Construindo Base da Dados... %d encontrados (PREV para voltar)"
+    gogearsa9200: "Construindo Base da Dados... %d encontrados (REW para voltar)"
   </dest>
   <voice>
     *: "entradas encontradas para base de dados"
@@ -11264,7 +11264,7 @@
   </source>
   <dest>
     *: none
-    recording: "Tempo de Separação:"
+    recording: "Tempo para Separação:"
   </dest>
   <voice>
     *: none
@@ -11371,11 +11371,11 @@
   </source>
   <dest>
     *: none
-    recording: "Tempo de Separação"
+    recording: "Tempo para Separação"
   </dest>
   <voice>
     *: none
-    recording: "Tempo de Separação"
+    recording: "Tempo para Separação"
   </voice>
 </phrase>
 <phrase>
@@ -12514,11 +12514,11 @@
   </source>
   <dest>
     *: none
-    recording: "Tamanho do Ficherio na Separação"
+    recording: "Tamanho do Ficheiro para Separação"
   </dest>
   <voice>
     *: none
-    recording: "Tamanho do Ficheiro na Separação"
+    recording: "Tamanho do Ficheiro para Separação"
   </voice>
 </phrase>
 <phrase>
@@ -12526,13 +12526,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </dest>
   <voice>
-    *: "talk mp3 clip"
+    *: "talk clip"
   </voice>
 </phrase>
 <phrase>
@@ -12647,11 +12647,11 @@
   </source>
   <dest>
     *: none
-    recording: "Medida de Separação"
+    recording: "Medida para Separação"
   </dest>
   <voice>
     *: none
-    recording: "Medida de Separação"
+    recording: "Medida para Separação"
   </voice>
 </phrase>
 <phrase>
