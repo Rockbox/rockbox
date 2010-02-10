@@ -157,7 +157,8 @@ uclcopy:
         cmp     r1, #0             /* C3 = #0 means button pressed */
         beq     boot_of
 #elif defined(SANSA_CLIPPLUS)
-        @ Assumes GPIOB_DIR is 0x00 on reset
+        @ All GPIO_DIR == 0x00 from reset
+        @ Set B0
         ldr     r0, =GPIOB
         mov     r1, #(1<<0)         @ pin 0
         str     r1, [r0, #0x400]    @ GPIOB(0) = output
@@ -176,12 +177,10 @@ uclcopy:
 
         orr     r2, r2, r1          @ c3 || A1
 
-        @ Unset GPIOB(0)
+        @ Unset GPIOB(0) & Restore GPIOB_DIR
+        ldr     r0, =GPIOB
         mov     r1, #0
         str     r1, [r0, #4*(1<<0)] @ write 0 to GPIOB(0) B0 unset
-
-        @ restore GPIOB_DIR to 0x00
-        ldr     r0, =GPIOB
         str     r1, [r0, #0x400]    @ Restore GPIOB_DIR to 0x00
 
         cmp     r2, #0              @ test input from pins
