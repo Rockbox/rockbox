@@ -102,6 +102,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.action_About, SIGNAL(triggered()), this, SLOT(about()));
     connect(ui.action_Help, SIGNAL(triggered()), this, SLOT(help()));
     connect(ui.action_Configure, SIGNAL(triggered()), this, SLOT(configDialog()));
+    connect(ui.actionE_xit, SIGNAL(triggered()), this, SLOT(shutdown()));
     connect(ui.buttonChangeDevice, SIGNAL(clicked()), this, SLOT(configDialog()));
     connect(ui.buttonRockbox, SIGNAL(clicked()), this, SLOT(installBtn()));
     connect(ui.buttonBootloader, SIGNAL(clicked()), this, SLOT(installBootloaderBtn()));
@@ -139,6 +140,16 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.actionInstall_Rockbox_Utility_on_player, SIGNAL(triggered()), this, SLOT(installPortable()));
 #endif
 
+}
+
+
+void RbUtilQt::shutdown(void)
+{
+    // restore default message handler to prevent trace accesses during
+    // object destruction -- the trace object could already be destroyed.
+    // Fixes segfaults on exit.
+    qInstallMsgHandler(0);
+    this->close();
 }
 
 

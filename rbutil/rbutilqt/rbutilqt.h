@@ -64,6 +64,7 @@ class RbUtilQt : public QMainWindow
         bool m_auto;
 
     private slots:
+        void shutdown(void);
         void about(void);
         void help(void);
         void sysinfo(void);
