@@ -102,6 +102,9 @@ static bool abort;
 #elif CONFIG_KEYPAD == ONDAVX777_PAD
 #define STATS_STOP BUTTON_POWER
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define STATS_STOP BUTTON_REC
+
 #else
 #error No keymap defined!
 #endif

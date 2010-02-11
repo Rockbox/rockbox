@@ -266,6 +266,16 @@ PLUGIN_HEADER
 #define CHC_SETTINGS_OK      BUTTON_PLAY
 #define CHC_SETTINGS_CANCEL  BUTTON_REW
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define CHC_QUIT             BUTTON_REC
+#define CHC_STARTSTOP        BUTTON_PLAY
+#define CHC_RESET            BUTTON_PREV
+#define CHC_MENU             BUTTON_MENU
+#define CHC_SETTINGS_INC     BUTTON_UP
+#define CHC_SETTINGS_DEC     BUTTON_DOWN
+#define CHC_SETTINGS_OK      BUTTON_OK
+#define CHC_SETTINGS_CANCEL  BUTTON_CANCEL
+
 #else
 #error No keymap defined!
 #endif

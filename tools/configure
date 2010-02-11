@@ -2467,7 +2467,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="jukebox.mi4"
     appextra="recorder:gui"
-    plugins="no"
+    plugins="yes"
     swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=v500 -type=RBBL"
     bootoutput="rockbox.mi4"

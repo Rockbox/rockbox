@@ -264,6 +264,15 @@ PLUGIN_HEADER
 #define CUBE_PAUSE         BUTTON_PLAY
 #define CUBE_HIGHSPEED     BUTTON_FFWD
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define CUBE_QUIT          BUTTON_REC
+#define CUBE_NEXT          BUTTON_NEXT
+#define CUBE_PREV          BUTTON_PREV
+#define CUBE_INC           BUTTON_UP
+#define CUBE_DEC           BUTTON_DOWN
+#define CUBE_MODE          BUTTON_MENU
+#define CUBE_PAUSE         BUTTON_PLAY
+#define CUBE_HIGHSPEED     BUTTON_OK
 
 #else
 #error No keymap defined!

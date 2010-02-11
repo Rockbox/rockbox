@@ -96,6 +96,10 @@ PLUGIN_HEADER
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#   define LAMP_LEFT       BUTTON_PREV
+#   define LAMP_RIGHT      BUTTON_NEXT
+
 #else
 #   error Missing key definitions for this keypad
 #endif

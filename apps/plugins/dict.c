@@ -148,6 +148,8 @@ long reverse (long N) {
 #define LP_QUIT BUTTON_POWER
 #elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
 #define LP_QUIT BUTTON_LEFT
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define LP_QUIT BUTTON_CANCEL
 #else
 #define LP_QUIT BUTTON_OFF
 #endif
