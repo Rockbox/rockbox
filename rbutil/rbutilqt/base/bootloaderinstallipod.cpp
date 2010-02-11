@@ -220,6 +220,9 @@ BootloaderInstallBase::Capabilities BootloaderInstallIpod::capabilities(void)
 }
 
 
+/** @initialize Ipod by opening its file handle and checking if its an ipod.
+ *  Note: the caller has to make sure the file handle gets closed!
+ */
 bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
 {
     if(!m_blfile.isEmpty()) {
@@ -264,7 +267,6 @@ bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
         return false;
     }
     read_directory(ipod);
-    ipod_close(ipod);
     return true;
 }
 
