@@ -162,6 +162,7 @@ static const struct button_mapping button_context_yesno[]  = {
 }; /* button_context_settings_yesno */
 
 static const struct button_mapping button_context_quickscreen[]  = {
+    { ACTION_NONE,       BUTTON_LEFT,                   BUTTON_NONE },
     { ACTION_STD_CANCEL, BUTTON_POWER|BUTTON_REL,       BUTTON_NONE },
     { ACTION_STD_CANCEL, BUTTON_HOME,                   BUTTON_NONE },
     { ACTION_QS_TOP,     BUTTON_UP|BUTTON_REL,          BUTTON_NONE },
