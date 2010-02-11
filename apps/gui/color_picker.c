@@ -155,13 +155,13 @@ static void draw_screen(struct screen *display, char *title,
     unsigned  text_color       = LCD_BLACK;
     unsigned  background_color = LCD_WHITE;
     char      buf[32];
-    int       i, text_x, y, line_height;
-    int       text_top;
+    int       i, char_height, line_height;
+    int       max_label_width;
+    int       text_x, text_top;
     int       slider_x, slider_width;
     bool      display_three_rows;
-    int       max_label_width;
     struct viewport vp;
-    
+
     viewport_set_defaults(&vp, display->screen_type);
     display->set_viewport(&vp);
 
@@ -173,30 +173,30 @@ static void draw_screen(struct screen *display, char *title,
         background_color = display->get_background();
     }
 
-    max_label_width = label_get_max_width(display);
-
     /* Draw title string */
     set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
     vp.flags |= VP_FLAG_ALIGN_CENTER;
-    display->getstringsize(title, NULL, &y);
     display->putsxy(0, MARGIN_TOP, title);
 
     /* Get slider positions and top starting position */
-    text_top     = MARGIN_TOP + y + TITLE_MARGIN_BOTTOM + SELECTOR_TB_MARGIN;
+    max_label_width = label_get_max_width(display);
+    char_height  = display->getcharheight();
+    text_top     = MARGIN_TOP + char_height +
+                   TITLE_MARGIN_BOTTOM + SELECTOR_TB_MARGIN;
     text_x       = SELECTOR_WIDTH;
     slider_x     = text_x + max_label_width + SLIDER_TEXT_MARGIN;
     slider_width = vp.width - slider_x*2 - max_label_width;
-    line_height  = display->getcharheight() + 2*SELECTOR_TB_MARGIN;
+    line_height  = char_height + 2*SELECTOR_TB_MARGIN;
 
     /* Find out if there's enough room for three sliders or just
        enough to display the selected slider - calculate total height
        of display with three sliders present */
     display_three_rows =
         vp.height >=
-            text_top + line_height*3    + /* Title + 3 sliders */
-            SWATCH_TOP_MARGIN           +  /* at least 2 lines */
-            display->getcharheight()*2 + /*  + margins for bottom */
-            MARGIN_BOTTOM;                /* colored rectangle */
+            text_top + line_height*3  + /* Title + 3 sliders     */
+            SWATCH_TOP_MARGIN         + /* at least 2 lines      */
+            char_height*2             + /*  + margins for bottom */
+            MARGIN_BOTTOM;              /* colored rectangle     */
 
     for (i = 0; i < 3; i++)
     {
@@ -207,8 +207,7 @@ static void draw_screen(struct screen *display, char *title,
 
         if (i == row)
         {
-            set_drawinfo(display, DRMODE_SOLID, text_color,
-                         background_color);
+            set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
 
             if (global_settings.cursor_style != 0)
             {
@@ -216,8 +215,7 @@ static void draw_screen(struct screen *display, char *title,
                 display->fillrect(0,
                                   text_top - SELECTOR_TB_MARGIN,
                                   vp.width,
-                                  display->getcharheight() +
-                                  SELECTOR_TB_MARGIN*2);
+                                  char_height + SELECTOR_TB_MARGIN*2);
 
                 if (display->depth < 16)
                 {
@@ -228,13 +226,11 @@ static void draw_screen(struct screen *display, char *title,
             else if (display_three_rows)
             {
                 /* Draw ">    <" around sliders */
-                int top = text_top + (display->getcharheight() -
-                                      SELECTOR_HEIGHT) / 2;
+                int top = text_top + (char_height - SELECTOR_HEIGHT) / 2;
                 screen_put_iconxy(display, 0, top, Icon_Cursor);
-                screen_put_iconxy(display, 
-                                  vp.width -
-                                          get_icon_width(display->screen_type),
-                                          top, Icon_Cursor);
+                screen_put_iconxy(display,
+                                  vp.width - SELECTOR_WIDTH,
+                                  top, Icon_Cursor);
             }
 
             if (display->depth >= 16)
@@ -261,15 +257,15 @@ static void draw_screen(struct screen *display, char *title,
         display->putsxy(text_x, text_top, buf);
 
         /* Draw scrollbar */
-        gui_scrollbar_draw(display,                               /* screen */
-                           slider_x,                                /* x */
-                           text_top + display->getcharheight() / 4,/* y */
-                           slider_width,                            /* width */
-                           display->getcharheight() / 2,          /* height */
-                           rgb_max[i],                             /* items */
-                           0,                                   /* min_shown */
-                           rgb->rgb_val[i],                     /* max_shown */
-                           sb_flags);                           /* flags */
+        gui_scrollbar_draw(display,                     /* screen */
+                           slider_x,                    /* x */
+                           text_top + char_height / 4,  /* y */
+                           slider_width,                /* width */
+                           char_height / 2,             /* height */
+                           rgb_max[i],                  /* items */
+                           0,                           /* min_shown */
+                           rgb->rgb_val[i],             /* max_shown */
+                           sb_flags);                   /* flags */
 
         /* Advance to next line */
         text_top += line_height;
@@ -287,7 +283,7 @@ static void draw_screen(struct screen *display, char *title,
         int height = vp.height - top - MARGIN_BOTTOM;
 
         /* Only draw if room */
-        if (height >= display->getcharheight() + 2)
+        if (height >= char_height + 2)
         {
             /* draw the big rectangle */
             display->set_foreground(rgb->color);
@@ -296,67 +292,61 @@ static void draw_screen(struct screen *display, char *title,
             /* Draw RGB: #rrggbb in middle of swatch */
             set_drawinfo(display, DRMODE_FG, get_black_or_white(rgb),
                          background_color);
-            display->getstringsize(buf, NULL, &y);
 
-            display->putsxy(0, top  + (height - y) / 2, buf);
+            display->putsxy(0, top + (height - char_height) / 2, buf);
 
             /* Draw border around the rect */
-            set_drawinfo(display, DRMODE_SOLID, text_color,
-                         background_color);
+            set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
             display->drawrect(text_x, top, width, height);
         }
     }
     else
     {
         /* Display RGB value only centered on remaining display if room */
-        display->getstringsize(buf, NULL, &y);
-        i = text_top + SWATCH_TOP_MARGIN;
+        int top = text_top + SWATCH_TOP_MARGIN;
+        int height = vp.height - top - MARGIN_BOTTOM;
 
-        if (i + y <= display->getheight() - MARGIN_BOTTOM)
+        if (height >= char_height)
         {
             set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
-            display->putsxy(0, (i + vp.height - MARGIN_BOTTOM - y) / 2, buf);
+            display->putsxy(0, top + (height - char_height) / 2, buf);
         }
     }
 
-    display->setfont(FONT_UI);
-
     display->update_viewport();
     display->set_viewport(NULL);
-    /* Be sure screen mode is reset */
-    set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
 }
 
 #ifdef HAVE_TOUCHSCREEN
 static int touchscreen_slider(struct screen *display,
                                 struct rgb_pick *rgb,
-                                const char* title,
                                 int *selected_slider)
 {
-    short     x,y;
-    int       text_top, slider_x, slider_width, title_height;
-    int       button;
-    bool      display_three_rows;
+    short     x, y;
+    int       char_height, line_height;
     int       max_label_width;
-    int      pressed_slider;
+    int       text_top, slider_x, slider_width;
+    bool      display_three_rows;
+    int       button;
+    int       pressed_slider;
     struct viewport vp;
-    int line_height;
 
     viewport_set_defaults(&vp, display->screen_type);
+    display->set_viewport(&vp);
 
-    max_label_width =  label_get_max_width(display);
-    display->getstringsize(title, NULL, &title_height);
     button = action_get_touchscreen_press_in_vp(&x, &y, &vp);
     if (button == ACTION_UNKNOWN || button == BUTTON_NONE)
         return ACTION_NONE;
     /* Get slider positions and top starting position
      * need vp.y here, because of the statusbar, since touchscreen
      * coordinates are absolute */
-    text_top     = MARGIN_TOP + title_height + TITLE_MARGIN_BOTTOM +
-                   SELECTOR_TB_MARGIN;
+    max_label_width = label_get_max_width(display);
+    char_height  = display->getcharheight();
+    text_top     = MARGIN_TOP + char_height +
+                   TITLE_MARGIN_BOTTOM + SELECTOR_TB_MARGIN;
     slider_x     = SELECTOR_WIDTH + max_label_width + SLIDER_TEXT_MARGIN;
     slider_width = vp.width - slider_x*2 - max_label_width;
-    line_height  = display->getcharheight() + 2*SELECTOR_TB_MARGIN;
+    line_height  = char_height + 2*SELECTOR_TB_MARGIN;
 
     /* same logic as in draw_screen */
     /* Find out if there's enough room for three sliders or just
@@ -364,23 +354,27 @@ static int touchscreen_slider(struct screen *display,
        of display with three sliders present */
     display_three_rows =
         vp.height >=
-            text_top + title_height*3    + /* Title + 3 sliders */
-            SWATCH_TOP_MARGIN           +  /* at least 2 lines */
-            display->getcharheight()*2 + /*  + margins for bottom */
-            MARGIN_BOTTOM;                /* colored rectangle */
+            text_top + line_height*3  + /* Title + 3 sliders     */
+            SWATCH_TOP_MARGIN         + /* at least 2 lines      */
+            char_height*2             + /*  + margins for bottom */
+            MARGIN_BOTTOM;              /* colored rectangle     */
+
+    display->set_viewport(NULL);
 
     if (y < text_top)
     {
         if (button == BUTTON_REL)
             return ACTION_STD_CANCEL;
+        else
+            return ACTION_NONE;
     }
 
-    vp.y += text_top;
-    vp.height = line_height * (display_three_rows ? 3:1);
-    if (!viewport_point_within_vp(&vp, x, y))
+    if (y >= text_top + line_height * (display_three_rows ? 3:1))
     {   /* touching the color area means accept */
         if (button == BUTTON_REL)
             return ACTION_STD_OK;
+        else
+            return ACTION_NONE;
     }
     /* y is relative to the original viewport */
     pressed_slider = (y - text_top)/line_height;
@@ -388,8 +382,7 @@ static int touchscreen_slider(struct screen *display,
         *selected_slider = pressed_slider;
     /* add max_label_width to overcome integer division limits,
      * cap value later since that may lead to an overflow */
-    if (x < slider_x+(slider_width+max_label_width) && 
-        x > slider_x)
+    if (x < slider_x + (slider_width+max_label_width) && x > slider_x)
     {
         char computed_val;
         x -= slider_x;
@@ -407,8 +400,8 @@ static int touchscreen_slider(struct screen *display,
  color is a pointer to the colour (in native format) to modify
  set banned_color to -1 to allow all
  ***********/
-bool set_color(struct screen *display, char *title, unsigned *color,
-               unsigned banned_color)
+bool set_color(struct screen *display, char *title,
+               unsigned *color, unsigned banned_color)
 {
     int exit = 0, slider = 0;
     struct rgb_pick rgb;
@@ -436,7 +429,7 @@ bool set_color(struct screen *display, char *title, unsigned *color,
 #ifdef HAVE_TOUCHSCREEN
         if (button == ACTION_TOUCHSCREEN
                 && display->screen_type == SCREEN_MAIN)
-            button = touchscreen_slider(display, &rgb, title, &slider);
+            button = touchscreen_slider(display, &rgb, &slider);
 #endif
 
         switch (button)

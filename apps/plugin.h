@@ -686,8 +686,8 @@ struct plugin_api {
     bool (*set_bool)(const char* string, const bool* variable );
 
 #ifdef HAVE_LCD_COLOR
-    bool (*set_color)(struct screen *display, char *title, unsigned *color,
-                   unsigned banned_color);
+    bool (*set_color)(struct screen *display, char *title,
+                      unsigned *color, unsigned banned_color);
 #endif
     /* action handling */
     int (*get_custom_action)(int context,int timeout,
