@@ -54,7 +54,8 @@
     || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
     || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD) \
     || (CONFIG_KEYPAD == IAUDIO_M3_PAD) \
-    || (CONFIG_KEYPAD == IRIVER_H10_PAD)
+    || (CONFIG_KEYPAD == IRIVER_H10_PAD) \
+    || (CONFIG_KEYPAD == PBELL_VIBE500_PAD) \
 /* no key combos to move the cursor if not in line edit mode */
 #define KBD_MODES /* uses 2 modes, picker and line edit */
 
@@ -85,7 +86,8 @@
     || (CONFIG_KEYPAD == MROBE100_PAD) \
     || (CONFIG_KEYPAD == SANSA_E200_PAD) \
     || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) \
-    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
+    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) \
+    || (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
 /* certain key combos toggle input mode between keyboard input and Morse input */
 #define KBD_TOGGLE_INPUT
 #endif
