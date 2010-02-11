@@ -182,6 +182,27 @@ GREY_INFO_STRUCT
 #error No keymap defined!
 #endif
 
+#ifdef HAVE_TOUCHSCREEN
+#ifndef FFT_PREV_GRAPH
+#   define FFT_PREV_GRAPH     BUTTON_MIDLEFT
+#endif
+#ifndef FFT_NEXT_GRAPH
+#   define FFT_NEXT_GRAPH    BUTTON_MIDRIGHT
+#endif
+#ifndef FFT_ORIENTATION
+#   define FFT_ORIENTATION  BUTTON_CENTER
+#endif
+#ifndef FFT_WINDOW
+#   define FFT_WINDOW        BUTTON_TOPLEFT
+#endif
+#ifndef FFT_SCALE
+#   define FFT_SCALE       BUTTON_TOPRIGHT
+#endif
+#ifndef FFT_QUIT
+#   define FFT_QUIT     BUTTON_BOTTOMLEFT
+#endif
+#endif
+
 #ifdef HAVE_LCD_COLOR
 #include "pluginbitmaps/fft_colors.h"
 #endif

@@ -19,7 +19,7 @@ rockboy
 #ifdef HAVE_TAGCACHE
 pictureflow
 #endif
-#if CONFIG_CODEC == SWCODEC && !defined(HAVE_TOUCHSCREEN)
+#if (CONFIG_CODEC == SWCODEC)
 fft
 #endif
 chessbox
