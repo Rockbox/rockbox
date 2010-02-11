@@ -109,7 +109,6 @@ typedef struct vorbis_block{
   struct alloc_chain *reap;
   
   MDCTContext * mdct_ctx[2]; /* for the two block sizes */
-  int32_t * ffmpeg_scratchpad; /* because ffmpeg doesn't operate inplace */
 
 } vorbis_block;
 
