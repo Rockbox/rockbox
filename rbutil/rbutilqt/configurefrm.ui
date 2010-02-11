@@ -105,7 +105,7 @@
          </column>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="4" column="0" colspan="3">
         <widget class="QPushButton" name="buttonAutodetect">
          <property name="text">
           <string>&amp;Autodetect</string>
