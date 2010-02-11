@@ -62,10 +62,10 @@ static int timedate_set(void)
 #define C2DIG2DEC(x) (S100(x)-100)
 
         tm.tm_hour = 0;
-        tm.tm_min = 0;
-        tm.tm_sec = 0;
+        tm.tm_min  = 0;
+        tm.tm_sec  = 0;
         tm.tm_mday = C2DIG2DEC(DAY);
-        tm.tm_mon =  C2DIG2DEC(MONTH)-1;
+        tm.tm_mon  = C2DIG2DEC(MONTH)-1;
         tm.tm_wday = 1;
         tm.tm_year = YEAR-1900;
     }
@@ -193,8 +193,8 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
         d = str(LANG_UNKNOWN);
     }
 
-    display->puts_scroll(0, line++, t);
-    display->puts_scroll(0, line, d);
+    display->puts(0, line++, t);
+    display->puts(0, line, d);
 
     display->update_viewport();
     display->set_viewport(NULL);
@@ -284,9 +284,6 @@ int time_screen(void* ignored)
     }
 
     ret = do_menu(&time_menu, NULL, menu, false);
-    FOR_NB_SCREENS(i)
-        screens[i].scroll_stop(&clock[i]);
-
     /* see comments above in the button callback */
     if (!menu_was_pressed && ret == GO_TO_PREVIOUS)
         return 0;

@@ -415,13 +415,13 @@ static int sleep_timer(void)
 
 #if CONFIG_RTC
 int time_screen(void* ignored);
-MENUITEM_FUNCTION(timedate_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_TIME_MENU), time_screen,
-                     NULL,  NULL, Icon_Menu_setting );
+MENUITEM_FUNCTION(timedate_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_TIME_MENU),
+                    time_screen, NULL,  NULL, Icon_Menu_setting );
 #endif
 /* This item is in the time/date screen if there is a RTC */
 MENUITEM_FUNCTION(sleep_timer_call, 0, ID2P(LANG_SLEEP_TIMER), sleep_timer,
                     NULL, NULL, Icon_Menu_setting); /* make it look like a 
-                                                                setting to the user */
+                                                       setting to the user */
 
 MENUITEM_FUNCTION(show_credits_item, 0, ID2P(LANG_CREDITS),
                    (menu_function)show_credits, NULL, NULL, Icon_NOICON);

@@ -165,7 +165,7 @@ static void draw_screen(struct screen *display, char *title,
     viewport_set_defaults(&vp, display->screen_type);
     display->set_viewport(&vp);
 
-    display->clear_display();
+    display->clear_viewport();
 
     if (display->depth > 1)
     {

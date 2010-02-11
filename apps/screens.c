@@ -345,9 +345,10 @@ static void say_time(int cursorpos, const struct tm *tm)
 
 bool set_time_screen(const char* title, struct tm *tm)
 {
-    bool done = false;
+    struct viewport viewports[NB_SCREENS];
+    bool done = false, usb = false;
     int cursorpos = 0;
-    unsigned int statusbar_height = 0;
+    unsigned int s;
     unsigned char offsets_ptr[] =
         { OFF_HOURS, OFF_MINUTES, OFF_SECONDS, OFF_YEAR, 0, OFF_DAY };
 
@@ -359,15 +360,16 @@ bool set_time_screen(const char* title, struct tm *tm)
         offsets_ptr[IDX_DAY] = OFF_YEAR;
     }
 
-    if(global_settings.statusbar)
-        statusbar_height = STATUSBAR_HEIGHT;
-
     /* speak selection when screen is entered */
     say_time(cursorpos, tm);
 
+#ifdef HAVE_TOUCHSCREEN
+    enum touchscreen_mode old_mode = touchscreen_get_mode();
+    touchscreen_set_mode(TOUCHSCREEN_BUTTON);
+#endif
     while (!done) {
         int button;
-        unsigned int i, s, realyear, min, max;
+        unsigned int i, realyear, min, max;
         unsigned char *ptr[6];
         unsigned char buffer[20];
         int *valptr = NULL;
@@ -413,7 +415,6 @@ bool set_time_screen(const char* title, struct tm *tm)
             int pos, nb_lines;
             unsigned int separator_width, weekday_width;
             unsigned int j, width, prev_line_height;
-            struct viewport viewports[NB_SCREENS];
             /* 6 possible cursor possitions, 2 values stored for each: x, y */
             unsigned int cursor[6][2];
             struct viewport *vp = &viewports[s];
@@ -453,7 +454,7 @@ bool set_time_screen(const char* title, struct tm *tm)
                     prev_line_height *= 2;
                 }
                 screen->getstringsize(ptr[i], &width, NULL);
-                cursor[i][INDEX_Y] = prev_line_height + statusbar_height;
+                cursor[i][INDEX_Y] = prev_line_height;
                 cursor[i][INDEX_X] = j;
                 j += width + separator_width;
             }
@@ -527,15 +528,7 @@ bool set_time_screen(const char* title, struct tm *tm)
                 break;
         }
 
-#ifdef HAVE_TOUCHSCREEN
-    enum touchscreen_mode old_mode = touchscreen_get_mode();
-
-    touchscreen_set_mode(TOUCHSCREEN_BUTTON);
-#endif
         button = get_action(CONTEXT_SETTINGS_TIME, TIMEOUT_BLOCK);
-#ifdef HAVE_TOUCHSCREEN
-    touchscreen_set_mode(old_mode);
-#endif
         switch ( button ) {
             case ACTION_STD_PREV:
                 cursorpos = clamp_value_wrap(--cursorpos, 5, 0);
@@ -567,11 +560,16 @@ bool set_time_screen(const char* title, struct tm *tm)
 
             default:
                 if (default_event_handler(button) == SYS_USB_CONNECTED)
-                    return true;
+                    done = usb = true;
                 break;
         }
     }
-    return false;
+    FOR_NB_SCREENS(s)
+        screens[s].scroll_stop(&viewports[s]);
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_set_mode(old_mode);
+#endif
+    return usb;
 }
 #endif /* defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0) */
 

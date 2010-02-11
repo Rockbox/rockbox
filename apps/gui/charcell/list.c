@@ -39,6 +39,16 @@
 #include "sound.h"
 #include "misc.h"
 
+void gui_synclist_scroll_stop(struct gui_synclist *lists)
+{
+    int i;
+    (void)lists;
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].stop_scroll();
+    }
+}
+
 void list_draw(struct screen *display, struct gui_synclist *gui_list)
 {
     int text_pos;

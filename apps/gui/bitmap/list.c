@@ -51,6 +51,17 @@ int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_width,
                              struct viewport *vp);
 bool list_display_title(struct gui_synclist *list, enum screen_type screen);
 
+void gui_synclist_scroll_stop(struct gui_synclist *lists)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].scroll_stop(&list_text[i]);
+        screens[i].scroll_stop(&title_text[i]);
+        screens[i].scroll_stop(lists->parent[i]);
+    }
+}
+
 /* Draw the list...
     internal screen layout:
         -----------------

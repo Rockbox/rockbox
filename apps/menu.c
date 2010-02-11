@@ -73,7 +73,7 @@ static void get_menu_callback(const struct menu_item_ex *m,
 {
     if (m->flags&(MENU_HAS_DESC|MENU_DYNAMIC_DESC))
         *menu_callback= m->callback_and_desc->menu_callback;
-    else 
+    else
         *menu_callback = m->menu_callback;
 }
 
@@ -101,7 +101,7 @@ static const char* get_menu_item_name(int selected_item,
     const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
     int type = (menu->flags&MENU_TYPE_MASK);
     selected_item = get_menu_selection(selected_item, menu);
-    
+
     (void)buffer_len;
     /* only MT_MENU or MT_RETURN_ID is allowed in here */
     if (type == MT_RETURN_ID)
@@ -111,13 +111,13 @@ static const char* get_menu_item_name(int selected_item,
                     menu->menu_get_name_and_icon->list_get_name_data, buffer);
         return menu->strings[selected_item];
     }
-    
+
     menu = menu->submenus[selected_item];
-    
+
     if ((menu->flags&MENU_DYNAMIC_DESC) && (type != MT_SETTING_W_TEXT))
         return menu->menu_get_name_and_icon->list_get_name(selected_item,
                     menu->menu_get_name_and_icon->list_get_name_data, buffer);
-    
+
     type = (menu->flags&MENU_TYPE_MASK);
     if ((type == MT_SETTING) || (type == MT_SETTING_W_TEXT))
     {
@@ -135,7 +135,7 @@ static enum themable_icons  menu_get_icon(int selected_item, void * data)
     const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
     int menu_icon = Icon_NOICON;
     selected_item = get_menu_selection(selected_item, menu);
-    
+
     if ((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID)
     {
         return Icon_Menu_functioncall;
@@ -145,7 +145,7 @@ static enum themable_icons  menu_get_icon(int selected_item, void * data)
         menu_icon = menu->callback_and_desc->icon_id;
     else if (menu->flags&MENU_DYNAMIC_DESC)
         menu_icon = menu->menu_get_name_and_icon->icon_id;
-    
+
     if (menu_icon == Icon_NOICON)
     {
         switch (menu->flags&MENU_TYPE_MASK)
@@ -194,7 +194,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
                 current_subitems_count++;
             }
         }
-        else 
+        else
         {
             current_subitems[current_subitems_count] = i;
             current_subitems_count++;
@@ -219,7 +219,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     gui_synclist_set_nb_items(lists,current_subitems_count);
     gui_synclist_limit_scroll(lists,true);
     gui_synclist_select_item(lists, find_menu_selection(selected));
-    
+
     get_menu_callback(menu,&menu_callback);
     if (callback && menu_callback)
         menu_callback(ACTION_ENTER_MENUITEM,menu);
@@ -234,13 +234,13 @@ static int talk_menu_item(int selected_item, void *data)
     int type;
     unsigned char *str;
     int sel = get_menu_selection(selected_item, menu);
-    
+
         if ((menu->flags&MENU_TYPE_MASK) == MT_MENU)
         {
             type = menu->submenus[sel]->flags&MENU_TYPE_MASK;
             if ((type == MT_SETTING) || (type == MT_SETTING_W_TEXT))
                 talk_setting(menu->submenus[sel]->variable);
-            else 
+            else
             {
                 if (menu->submenus[sel]->flags&(MENU_DYNAMIC_DESC))
                 {
@@ -264,7 +264,7 @@ static int talk_menu_item(int selected_item, void *data)
                 else
                     id = P2ID(menu->submenus[sel]->callback_and_desc->desc);
                 if (id != -1)
-                   talk_id(id,false);
+                    talk_id(id,false);
             }
         }
         else if(((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID))
@@ -285,9 +285,8 @@ void do_setting_from_menu(const struct menu_item_ex *temp,
                           struct viewport parent[NB_SCREENS])
 {
     int setting_id, oldval;
-    const struct settings_list *setting = find_setting(
-                                               temp->variable,
-                                               &setting_id);
+    const struct settings_list *setting =
+            find_setting(temp->variable, &setting_id);
     char *title;
     char padded_title[MAX_PATH];
     int var_type = setting->flags&F_T_MASK;
@@ -305,7 +304,7 @@ void do_setting_from_menu(const struct menu_item_ex *temp,
         title = temp->callback_and_desc->desc;
     else
         title = ID2P(setting->lang_id);
-    
+
     /* Pad the title string by repeating it. This is needed
        so the scroll settings title can actually be used to
        test the setting */
@@ -328,7 +327,7 @@ void do_setting_from_menu(const struct menu_item_ex *temp,
         padded_title[i] = '\0';
         title = padded_title;
     }
-    
+
     option_screen((struct settings_list *)setting, parent,
                   setting->flags&F_TEMPVAR, title);
 }
@@ -345,7 +344,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     bool redraw_lists;
     FOR_NB_SCREENS(i)
         viewportmanager_theme_enable(i, !hide_theme, NULL);
-    
+
     const struct menu_item_ex *menu_stack[MAX_MENUS];
     int menu_stack_selected_item[MAX_MENUS];
     int stack_top = 0;
@@ -370,7 +369,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     in_stringlist = ((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID);
     /* load the callback, and only reload it if menu changes */
     get_menu_callback(menu, &menu_callback);
-    
 
 #ifdef HAVE_BUTTONBAR
     if (!hide_theme)
@@ -391,7 +389,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         action = get_action(CONTEXT_MAINMENU,
                             list_do_action_timeout(&lists, HZ));
         /* HZ so the status bar redraws corectly */
-        
+
         if (menu_callback)
         {
             int old_action = action;
@@ -477,11 +475,10 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                     {
                         case GO_TO_PREVIOUS:
                             break;
-                            case 0: /* reset setting */
-                                reset_setting(setting, setting->setting);
-                                break;
-#ifdef HAVE_QUICKSCREEN
+                        case 0: /* reset setting */
+                            reset_setting(setting, setting->setting);
                             break;
+#ifdef HAVE_QUICKSCREEN
                         case 1: /* set as top QS item */
                             set_as_qs_item(setting, QUICKSCREEN_TOP);
                             break;
@@ -513,10 +510,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             bool exiting_menu = false;
             in_stringlist = false;
             /* might be leaving list, so stop scrolling */
-            FOR_NB_SCREENS(i)
-            {
-                screens[i].scroll_stop(&vps[i]);
-            }
+            gui_synclist_scroll_stop(&lists);
             if (menu_callback)
                 menu_callback(ACTION_EXIT_MENUITEM, menu);
 
@@ -546,10 +540,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         {
             int type;
             /* entering an item that may not be a list, so stop scrolling */
-            FOR_NB_SCREENS(i)
-            {
-                screens[i].scroll_stop(&vps[i]);
-            }
+            gui_synclist_scroll_stop(&lists);
 #ifdef HAVE_BUTTONBAR
             if (!hide_theme)
             {
@@ -562,7 +553,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             redraw_lists = true;
             if (in_stringlist)
                 type = (menu->flags&MENU_TYPE_MASK);
-            else 
+            else
             {
                 type = (temp->flags&MENU_TYPE_MASK);
                 get_menu_callback(temp, &menu_callback);
@@ -592,7 +583,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                     if (temp->flags&MENU_FUNC_USEPARAM)
                         return_value = temp->function->function_w_param(
                                     temp->function->param);
-                    else 
+                    else
                         return_value = temp->function->function();
                     if (!(menu->flags&MENU_EXITAFTERTHISMENU) ||
                             (temp->flags&MENU_EXITAFTERTHISMENU))
@@ -665,7 +656,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             ret = MENU_ATTACHED_USB;
             done = true;
         }
-        
+
         if (redraw_lists && !done)
         {
             if (menu_callback)
@@ -686,8 +677,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         *start_selected = get_menu_selection(
                             gui_synclist_get_sel_pos(&lists), menu);
     }
-   FOR_NB_SCREENS(i)
-       viewportmanager_theme_undo(i, false);
+    FOR_NB_SCREENS(i)
+        viewportmanager_theme_undo(i, false);
     return ret;
 }
-
