@@ -55,7 +55,7 @@
     || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD) \
     || (CONFIG_KEYPAD == IAUDIO_M3_PAD) \
     || (CONFIG_KEYPAD == IRIVER_H10_PAD) \
-    || (CONFIG_KEYPAD == PBELL_VIBE500_PAD) \
+    || (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
 /* no key combos to move the cursor if not in line edit mode */
 #define KBD_MODES /* uses 2 modes, picker and line edit */
 
