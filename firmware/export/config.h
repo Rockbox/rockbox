@@ -908,5 +908,11 @@ Lyre prototype 1 */
 #define STORAGE_ALIGN_MASK 0
 #endif
 
+/* This attribute can be used to enable to detection of plugin file handles leaks.
+ * When enabled, the plugin core will monitor open/close/creat and when the plugin exits
+ * will display an error message if the plugin leaked some file handles */
+#ifndef SIMULATOR
+#define HAVE_PLUGIN_CHECK_OPEN_CLOSE
+#endif
 
 #endif /* __CONFIG_H__ */

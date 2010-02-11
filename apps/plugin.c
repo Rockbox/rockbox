@@ -63,6 +63,15 @@
 #define PREFIX
 #endif
 
+#if defined(HAVE_PLUGIN_CHECK_OPEN_CLOSE) && (MAX_OPEN_FILES>32)
+#warning "MAX_OPEN_FILES>32, disabling plugin file open/close checking"
+#undef HAVE_PLUGIN_CHECK_OPEN_CLOSE
+#endif
+
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
+static unsigned int open_files;
+#endif
+
 #ifdef SIMULATOR
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
 void *sim_plugin_load(char *plugin, void **pd);
@@ -82,6 +91,13 @@ static bool (*pfn_tsr_exit)(bool reenter) = NULL; /* TSR exit callback */
 static char current_plugin[MAX_PATH];
 
 char *plugin_get_current_filename(void);
+
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
+/* Some wrappers used to monitor open and close and detect leaks*/
+static int open_wrapper(const char* pathname, int flags);
+static int close_wrapper(int fd);
+static int creat_wrapper(const char *pathname);
+#endif
 
 static const struct plugin_api rockbox_api = {
 
@@ -276,11 +292,20 @@ static const struct plugin_api rockbox_api = {
 #endif /* HAVE_BUTTON_LIGHT */
 
     /* file */
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
+    (open_func)open_wrapper,
+    close_wrapper,
+#else
     (open_func)PREFIX(open),
     PREFIX(close),
+    #endif
     (read_func)PREFIX(read),
     PREFIX(lseek),
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
+    (creat_func)creat_wrapper,
+#else
     (creat_func)PREFIX(creat),
+#endif
     (write_func)PREFIX(write),
     PREFIX(remove),
     PREFIX(rename),
@@ -805,8 +830,12 @@ int plugin_load(const char* plugin, const void* parameter)
     touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
 
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
+    open_files = 0;
+#endif
+
     rc = hdr->entry_point(parameter);
-    
+
     /* Go back to the global setting in case the plugin changed it */
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(global_settings.touch_mode);
@@ -849,6 +878,25 @@ int plugin_load(const char* plugin, const void* parameter)
 
     if (pfn_tsr_exit == NULL)
         plugin_loaded = false;
+
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
+    if(open_files != 0 && !plugin_loaded)
+    {
+        int fd;
+        logf("Plugin '%s' leaks file handles", plugin);
+        
+        static const char *lines[] = 
+            { ID2P(LANG_PLUGIN_ERROR),
+              "#leak-file-handles" };
+        static const struct text_message message={ lines, 2 };
+        button_clear_queue(); /* Empty the keyboard buffer */
+        gui_syncyesno_run(&message, NULL, NULL);
+        
+        for(fd=0; fd < MAX_OPEN_FILES; fd++)
+            if(open_files & (1<<fd))
+                close_wrapper(fd);
+    }
+#endif
 
     sim_plugin_close(pd);
 
@@ -926,3 +974,37 @@ char *plugin_get_current_filename(void)
 {
     return current_plugin;
 }
+
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
+static int open_wrapper(const char* pathname, int flags)
+{
+    int fd = PREFIX(open)(pathname,flags);
+
+    if(fd >= 0)
+        open_files |= 1<<fd;
+    
+    return fd;
+}
+
+static int close_wrapper(int fd)
+{
+    if((~open_files) & (1<<fd))
+    {
+        logf("double close from plugin");
+    }
+    if(fd >= 0)
+        open_files &= (~(1<<fd));
+
+    return PREFIX(close)(fd);
+}
+
+static int creat_wrapper(const char *pathname)
+{
+    int fd = PREFIX(creat)(pathname);
+
+    if(fd >= 0)
+        open_files |= (1<<fd);
+
+    return fd;
+}
+#endif /* HAVE_PLUGIN_CHECK_OPEN_CLOSE */
