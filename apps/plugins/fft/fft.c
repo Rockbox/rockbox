@@ -178,6 +178,15 @@ GREY_INFO_STRUCT
 #   define FFT_SCALE         BUTTON_FFWD
 #   define FFT_QUIT       BUTTON_PLAY
 
+#elif (CONFIG_KEYPAD == MROBE500_PAD)
+#   define FFT_QUIT             BUTTON_POWER
+
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#   define FFT_QUIT             BUTTON_POWER
+
+#elif (CONFIG_KEYPAD == ONDAVX777_PAD)
+#   define FFT_QUIT             BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif
