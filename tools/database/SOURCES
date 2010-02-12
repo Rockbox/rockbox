@@ -23,6 +23,7 @@ database.c
 ../../apps/metadata/asap.c
 ../../apps/metadata/rm.c
 ../../apps/metadata/nsf.c
+../../apps/metadata/oma.c
 ../../apps/replaygain.c
 #endif
 ../../apps/misc.c
