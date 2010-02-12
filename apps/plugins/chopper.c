@@ -205,7 +205,7 @@ static int iPlayerSpeedY;
 static int iLastBlockPlacedPosX;
 static int iGravityTimerCountdown;
 static int iPlayerAlive;
-static int iLevelMode;
+static int iLevelMode, iCurrLevelMode;
 static int blockh,blockw;
 static int highscore;
 static int score;
@@ -261,7 +261,7 @@ struct CTerrain mRoof;
 /*Function declarations*/
 static void chopDrawParticle(struct CParticle *mParticle);
 static void chopDrawBlock(struct CBlock *mBlock);
-static void chopRenderTerrain(struct CTerrain *ter);
+static void chopRenderTerrain(struct CTerrain *ter, bool isground);
 void chopper_load(bool newgame);
 void cleanup_chopper(void);
 
@@ -385,7 +385,7 @@ int chopUpdateTerrainRecycling(struct CTerrain *ter)
             v = 3*iPlayerSpeedX;
             if(v>50)
                 v=50;
-            if(iLevelMode == LEVEL_MODE_STEEP)
+            if(iCurrLevelMode == LEVEL_MODE_STEEP)
                 v*=5;
 
             chopAddTerrainNode(ter,iNewNodePos,g - iR(-v,v));
@@ -560,7 +560,7 @@ static int chopParticleOffscreen(struct CParticle *mParticle)
 
 static void chopKillPlayer(void)
 {
-    int i, button;
+    int i;
 
     for (i = 0; i < NUMBER_OF_PARTICLES; i++) {
         mParticles[i].bIsActive = 0;
@@ -571,10 +571,6 @@ static void chopKillPlayer(void)
     iPlayerAlive--;
 
     if (iPlayerAlive == 0) {
-        rb->lcd_set_drawmode(DRMODE_FG);
-#if LCD_DEPTH >= 2
-        rb->lcd_set_foreground(LCD_LIGHTGRAY);
-#endif
         rb->splash(HZ, "Game Over");
 
         if (score > highscore) {
@@ -584,36 +580,8 @@ static void chopKillPlayer(void)
                          highscore);
             rb->splash(HZ*2, scoretext);
         }
-
-        rb->splash(HZ/4, "Press " ACTIONTEXT " to continue");
-        rb->lcd_update();
-
-        rb->lcd_set_drawmode(DRMODE_SOLID);
-
-        while (true) {
-            button = rb->button_get(true);
-            if (button == ACTION
-#ifdef ACTION2
-                || button == ACTION2
-#endif
-                ) {
-                while (true) {
-                    button = rb->button_get(true);
-                    if (button == (ACTION | BUTTON_REL)
-#ifdef ACTION2
-                        || button == (ACTION2 | BUTTON_REL)
-#endif
-                       ) {
-                        chopper_load(true);
-                        return;
-                    }
-                }
-            }
-        }
-
     } else
         chopper_load(false);
-
 }
 
 static void chopDrawTheWorld(void)
@@ -648,8 +616,8 @@ static void chopDrawTheWorld(void)
         i++;
     }
 
-    chopRenderTerrain(&mGround);
-    chopRenderTerrain(&mRoof);
+    chopRenderTerrain(&mGround, true);
+    chopRenderTerrain(&mRoof, false);
 
 }
 
@@ -676,6 +644,7 @@ static void chopDrawScene(void)
 #elif LCD_DEPTH == 2
     rb->lcd_set_background(LCD_WHITE);
 #endif
+    rb->lcd_clear_display();
     chopDrawTheWorld();
     chopDrawPlayer(iPlayerPosX - iCameraPosX, iPlayerPosY);
 
@@ -750,6 +719,7 @@ static int chopMenu(int menunum)
 #endif
 
     rb->lcd_clear_display();
+    rb->button_clear_queue();
 
     while (!menu_quit) {
         switch(rb->do_menu(&menu, &result, NULL, false))
@@ -818,7 +788,6 @@ static int chopGameLoop(void)
                 mParticles[i].iWorldY += mParticles[i].iSpeedY;
             }
 
-        rb->lcd_clear_display();
         /* Redraw the main window: */
         chopDrawScene();
 
@@ -831,7 +800,7 @@ static int chopGameLoop(void)
             chopAddParticle(iPlayerPosX, iPlayerPosY+5, 0, 0);
         }
 
-        if(iLevelMode == LEVEL_MODE_NORMAL)
+        if(iCurrLevelMode == LEVEL_MODE_NORMAL)
             chopGenerateBlockIfNeeded();
 
 
@@ -939,18 +908,12 @@ static void chopDrawBlock(struct CBlock *mBlock)
 }
 
 
-static void chopRenderTerrain(struct CTerrain *ter)
+static void chopRenderTerrain(struct CTerrain *ter, bool isground)
 {
 
-    int i=1;
+    int i = 1;
 
-    int oldx=0;
-
-    int ay=0;
-    if(ter->mNodes[0].y < (LCD_HEIGHT*SIZE)/2)
-        ay=0;
-    else
-        ay=(LCD_HEIGHT*SIZE);
+    int oldx = 0;
 
     while(i < ter->iNodesCount && oldx < iScreenX)
     {
@@ -960,6 +923,19 @@ static void chopRenderTerrain(struct CTerrain *ter)
 
         int x2 = ter->mNodes[i].x - iCameraPosX;
         int y2 = ter->mNodes[i].y;
+
+        int ax, ay;
+
+        if ((y < y2) != isground)
+        {
+            ax = x2;
+            ay = y;
+        }
+        else
+        {
+            ax = x;
+            ay = y2;
+        }
 #if LCD_DEPTH > 2
         rb->lcd_set_foreground(LCD_RGBPACK(100,255,100));
 #elif LCD_DEPTH == 2
@@ -969,23 +945,24 @@ static void chopRenderTerrain(struct CTerrain *ter)
         rb->lcd_drawline(SCALE(x), SCALE(y), SCALE(x2), SCALE(y2));
 
         xlcd_filltriangle(SCALE(x), SCALE(y), SCALE(x2), SCALE(y2),
-                          SCALE(x2), SCALE(ay));
-        xlcd_filltriangle(SCALE(x), SCALE(ay), SCALE(x2), SCALE(y2),
-                          SCALE(x2), SCALE(ay));
+                          SCALE(ax), SCALE(ay));
 
-        if (ay == 0)
-            xlcd_filltriangle(SCALE(x), SCALE(ay), SCALE(x), SCALE(y),
-                              SCALE(x2), SCALE(y2 / 2));
+        if (isground)
+        {
+            y = ay;
+            y2 = (LCD_HEIGHT*SIZE);
+        }
         else
-            xlcd_filltriangle(SCALE(x), SCALE(ay), SCALE(x), SCALE(y),
-                              SCALE(x2), SCALE((LCD_HEIGHT*SIZE) -
-                              ((LCD_HEIGHT*SIZE) - y2) / 2));
+        {
+            y = 0;
+            y2 = ay;
+        }
+        if (y2-y > 0)
+            rb->lcd_fillrect(SCALE(x), SCALE(y), SCALE(x2-x)+1, SCALE(y2-y)+1);
 
         oldx = x;
         i++;
-
     }
-
 }
 
 void chopper_load(bool newgame)
@@ -1000,6 +977,7 @@ void chopper_load(bool newgame)
         blockh = iScreenY / 5;
         blockw = iScreenX / 20;
         iPlayerAlive = 1;
+        iCurrLevelMode = iLevelMode;
         score = 0;
     }
     iRotorOffset = 0;
@@ -1028,7 +1006,7 @@ void chopper_load(bool newgame)
         /* mirror the sky if we've changed the ground */
         chopCopyTerrain(&mGround, &mRoof, 0, - ( (iScreenY * 3) / 4));
 
-    if (iLevelMode == LEVEL_MODE_NORMAL)
+    if (iCurrLevelMode == LEVEL_MODE_NORMAL)
         /* make it a bit more exciting, cause it's easy terrain... */
         iPlayerSpeedX *= 2;
 }
