@@ -13,6 +13,7 @@ cook.c
 raac.c
 a52_rm.c
 atrac3_rm.c
+atrac3_oma.c
 mpc.c
 wma.c
 sid.c

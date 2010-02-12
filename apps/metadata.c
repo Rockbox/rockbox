@@ -162,6 +162,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* Atari TM2 File */
     [AFMT_TM2] =
         AFMT_ENTRY("TM2",  "asap",     NULL,          "tm2\0"      ),        
+    /* Atrac3 in Sony OMA Container */
+    [AFMT_OMA_ATRAC3] =
+        AFMT_ENTRY("ATRAC3",  "atrac3_oma",     NULL,          "oma\0aa3\0"      ), 
 #endif
 };
 
@@ -434,6 +437,13 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         if (!get_rm_metadata(fd, id3))
         {
             DEBUGF("get_rm_metadata error\n");
+            return false;
+        }
+        break;
+    case AFMT_OMA_ATRAC3:
+        if (!get_oma_metadata(fd, id3))
+        {
+            DEBUGF("get_oma_metadata error\n");
             return false;
         }
         break;

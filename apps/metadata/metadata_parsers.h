@@ -41,4 +41,5 @@ bool get_asf_metadata(int fd, struct mp3entry* id3);
 bool get_asap_metadata(int fd, struct mp3entry* id3);
 bool get_rm_metadata(int fd, struct mp3entry* id3);
 bool get_nsf_metadata(int fd, struct mp3entry* id3);
+bool get_oma_metadata(int fd, struct mp3entry* id3);
 

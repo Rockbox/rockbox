@@ -77,6 +77,7 @@ enum
     AFMT_TMC,          /* Atari 8bit tmc format */
     AFMT_TM8,          /* Atari 8bit tm8 format */
     AFMT_TM2,          /* Atari 8bit tm2 format */
+    AFMT_OMA_ATRAC3,   /* Atrac3 in Sony OMA container */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -
