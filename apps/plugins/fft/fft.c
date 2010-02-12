@@ -220,7 +220,20 @@ GREY_INFO_STRUCT
 #include "_kiss_fft_guts.h" /* sizeof(struct kiss_fft_state) */
 #include "const.h"
 
-#define FFT_SIZE 2048
+#if (LCD_WIDTH < LCD_HEIGHT)
+#define LCD_SIZE LCD_HEIGHT
+#else
+#define LCD_SIZE LCD_WIDTH
+#endif
+
+#if (LCD_SIZE < 512)
+#define FFT_SIZE 2048 /* 512*4 */
+#elif (LCD_SIZE < 1024)
+#define FFT_SIZE 4096 /* 1024*4 */
+#else
+#define FFT_SIZE 8192 /* 2048*4 */
+#endif
+
 #define ARRAYSIZE_IN (FFT_SIZE)
 #define ARRAYSIZE_OUT (FFT_SIZE/2)
 #define ARRAYSIZE_PLOT (FFT_SIZE/4)
