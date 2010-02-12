@@ -67,7 +67,9 @@ class SystemInfo : public QObject
             PlatformAll,
             PlatformAllDisabled,
             PlatformBase,
-            PlatformVariant
+            PlatformBaseDisabled,
+            PlatformVariant,
+            PlatformVariantDisabled
         };
 
         //! return a list of all platforms (rbutil internal names)

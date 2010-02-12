@@ -118,18 +118,25 @@ QStringList SystemInfo::platforms(enum SystemInfo::PlatformType type, QString va
     for(int i = 0; i < a.size(); i++)
     {
         QString target = systemInfos->value("platforms/"+a.at(i), "null").toString();
-        // only add target if its not disabled
-        if(type != PlatformAllDisabled
+        QRegExp regex("\\..*$");
+        QString targetbase = target;
+        targetbase.remove(regex);
+        // only add target if its not disabled unless Platform*Disabled requested
+        if(type != PlatformAllDisabled && type != PlatformBaseDisabled
+                && type != PlatformVariantDisabled
                 && systemInfos->value(target+"/status").toString() == "disabled")
             continue;
-        // report only base targets when PlatformBase is requested
-        if(type == PlatformBase && target.contains('.'))
+        // report only matching target if PlatformVariant* is requested
+        if((type == PlatformVariant || type == PlatformVariantDisabled)
+                && (targetbase != variant))
             continue;
-        // report only matching target if PlatformVariant is requested
-        if(type == PlatformVariant && !target.startsWith(variant))
-            continue;
-        result.append(target);
+        // report only base targets when PlatformBase* is requested
+        if((type == PlatformBase || type == PlatformBaseDisabled))
+            result.append(targetbase);
+        else
+            result.append(target);
     }
+    result.removeDuplicates();
     return result;
 }
 

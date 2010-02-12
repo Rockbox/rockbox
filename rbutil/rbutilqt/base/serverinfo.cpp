@@ -54,13 +54,13 @@ void ServerInfo::readBuildInfo(QString file)
     info.endGroup();
 
     // get base platforms, handle variants with platforms in the loop
-    QStringList platforms = SystemInfo::platforms(SystemInfo::PlatformBase);
+    QStringList platforms = SystemInfo::platforms(SystemInfo::PlatformBaseDisabled);
     for(int i = 0; i < platforms.size(); i++)
     {
         // check if there are rbutil-variants of the current platform and handle
         // them the same time.
         QStringList variants;
-        variants = SystemInfo::platforms(SystemInfo::PlatformVariant, platforms.at(i));
+        variants = SystemInfo::platforms(SystemInfo::PlatformVariantDisabled, platforms.at(i));
         QVariant release;
         info.beginGroup("release");
         if(keys.contains(platforms.at(i))) {
