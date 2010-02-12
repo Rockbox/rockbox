@@ -156,8 +156,7 @@ int load_image(char *filename, struct image_info *info,
 
     if(!running_slideshow)
     {
-        rb->snprintf(print, sizeof(print), "%s:", rb->strrchr(filename,'/')+1);
-        rb->lcd_puts(0, 0, print);
+        rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
         rb->lcd_update();
 
         rb->snprintf(print, sizeof(print), "loading %d bytes", filesize);
@@ -170,8 +169,7 @@ int load_image(char *filename, struct image_info *info,
 
     if(!running_slideshow)
     {
-        rb->snprintf(print, sizeof(print), "decoding markers");
-        rb->lcd_puts(0, 2, print);
+        rb->lcd_puts(0, 2, "decoding markers");
         rb->lcd_update();
     }
 #ifdef DISK_SPINDOWN
@@ -198,7 +196,7 @@ int load_image(char *filename, struct image_info *info,
     if(!running_slideshow)
     {
         rb->snprintf(print, sizeof(print), "image %dx%d",
-                            p_jpg->x_size, p_jpg->y_size);
+                        p_jpg->x_size, p_jpg->y_size);
         rb->lcd_puts(0, 2, print);
         rb->lcd_update();
     }
@@ -272,7 +270,7 @@ int get_image(struct image_info *info, int ds)
     if(!running_slideshow)
     {
         rb->snprintf(print, sizeof(print), "decoding %d*%d",
-            p_jpg->x_size/ds, p_jpg->y_size/ds);
+                        info->width, info->height);
         rb->lcd_puts(0, 3, print);
         rb->lcd_update();
     }

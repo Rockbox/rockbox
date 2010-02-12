@@ -144,7 +144,7 @@ static fb_data *disp[9];
 static fb_data *disp_buf;
 
 /* my memory pool (from the mp3 buffer) */
-static char print[128]; /* use a common snprintf() buffer */
+static char print[32]; /* use a common snprintf() buffer */
 
 unsigned char *memory, *memory_max; /* inffast.c needs memory_max */
 static size_t memory_size;
@@ -204,7 +204,6 @@ static unsigned LodePNG_decompress(unsigned char* out, size_t* outsize, const un
     if (stream.msg != Z_NULL)
         rb->strcpy(error_msg, stream.msg);
     return err;
-
 }
 
 /* ////////////////////////////////////////////////////////////////////////// */
@@ -469,8 +468,7 @@ unsigned LodePNG_convert(fb_data* out, const unsigned char* in, LodePNG_InfoColo
 
     if (!running_slideshow)
     {
-        rb->snprintf(print, sizeof(print), "color conversion in progress");
-        rb->lcd_puts(0, 3, print);
+        rb->lcd_puts(0, 3, "color conversion in progress");
         rb->lcd_update();
     }
 
@@ -1201,8 +1199,7 @@ static void decodeGeneric(LodePNG_Decoder* decoder, unsigned char* in, size_t si
             memset(decoded_image, 0, decoded_image_size * sizeof(unsigned char));
             if (!running_slideshow)
             {
-                rb->snprintf(print, sizeof(print), "unfiltering scanlines");
-                rb->lcd_puts(0, 3, print);
+                rb->lcd_puts(0, 3, "unfiltering scanlines");
                 rb->lcd_update();
             }
             decoder->error = postProcessScanlines(decoded_image, scanlines, decoder);
@@ -1217,7 +1214,7 @@ void LodePNG_decode(LodePNG_Decoder* decoder, unsigned char* in, size_t insize, 
 
     /*TODO: check if this works according to the statement in the documentation: "The converter can convert from greyscale input color type, to 8-bit greyscale or greyscale with alpha"*/
     if (!(decoder->infoRaw.color.colorType == 2 || decoder->infoRaw.color.colorType == 6) && !(decoder->infoRaw.color.bitDepth == 8)) { decoder->error = 56; return; }
-    converted_image = (fb_data *)((intptr_t)(memory + 3) & ~3);
+    converted_image = (fb_data *)memory;
     converted_image_size = decoder->infoPng.width*decoder->infoPng.height;
     if ((unsigned char *)(converted_image + converted_image_size) >= decoded_image) { decoder->error = OUT_OF_MEMORY; }
     if (!decoder->error) decoder->error = LodePNG_convert(converted_image, decoded_image, &decoder->infoRaw.color, &decoder->infoPng.color, decoder->infoPng.width, decoder->infoPng.height);
@@ -1333,9 +1330,10 @@ int load_image(char *filename, struct image_info *info,
     memset(&disp, 0, sizeof(disp));
     LodePNG_Decoder_init(decoder);
 
-    memory = buf;
-    memory_size = *buf_size;
-    memory_max = memory + memory_size;
+    /* align buffer */
+    memory = (unsigned char *)((intptr_t)(buf + 3) & ~3);
+    memory_max = (unsigned char *)((intptr_t)(memory + *buf_size) & ~3);
+    memory_size = memory_max - memory;
 
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
@@ -1348,8 +1346,7 @@ int load_image(char *filename, struct image_info *info,
     DEBUGF("reading file '%s'\n", filename);
 
     if (!running_slideshow) {
-        rb->snprintf(print, sizeof(print), "%s:", rb->strrchr(filename,'/')+1);
-        rb->lcd_puts(0, 0, print);
+        rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
         rb->lcd_update();
     }
 
@@ -1369,8 +1366,7 @@ int load_image(char *filename, struct image_info *info,
         rb->close(fd);
 
         if (!running_slideshow) {
-            rb->snprintf(print, sizeof(print), "decoding image");
-            rb->lcd_puts(0, 2, print);
+            rb->lcd_puts(0, 2, "decoding image");
             rb->lcd_update();
         }
 #ifdef DISK_SPINDOWN
@@ -1409,10 +1405,9 @@ int load_image(char *filename, struct image_info *info,
 #else
             LodePNG_decode(decoder, image, image_size, cb_progress);
 #endif /*HAVE_ADJUSTABLE_CPU_FREQ*/
+            time = *rb->current_tick - time;
         }
     }
-
-    time = *rb->current_tick - time;
 
     if (!running_slideshow && !decoder->error)
     {
@@ -1423,7 +1418,7 @@ int load_image(char *filename, struct image_info *info,
     }
 
     if (decoder->error) {
-#if PLUGIN_BUFFER_SIZE >= MIN_MEM
+#ifdef USE_PLUG_BUF
         if (plug_buf && (decoder->error == FILE_TOO_LARGE
             || decoder->error == OUT_OF_MEMORY || decoder->error == Z_MEM_ERROR))
             return PLUGIN_OUTOFMEM;
@@ -1457,7 +1452,7 @@ int load_image(char *filename, struct image_info *info,
             return PLUGIN_ERROR;
     }
 
-    disp_buf = (fb_data *)((intptr_t)(converted_image + converted_image_size + 3) & ~3);
+    disp_buf = converted_image + converted_image_size;
     info->x_size = decoder->infoPng.width;
     info->y_size = decoder->infoPng.height;
     *buf_size = memory_max - (unsigned char*)disp_buf;
@@ -1498,11 +1493,11 @@ int get_image(struct image_info *info, int ds)
             for (i=1; i<=8; i++)
                 disp[i] = NULL; /* invalidate all bitmaps */
             /* start again from the beginning of the buffer */
-            disp_buf = (fb_data *)((intptr_t)(converted_image + converted_image_size + 3) & ~3);
+            disp_buf = converted_image + converted_image_size;
         }
 
         *p_disp = disp_buf;
-        disp_buf = (fb_data *)((intptr_t)(disp_buf + size + 3) & ~3);
+        disp_buf += size;
 
         bmp_src.width = decoder->infoPng.width;
         bmp_src.height = decoder->infoPng.height;

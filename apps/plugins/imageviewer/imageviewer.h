@@ -361,6 +361,9 @@
 #if !defined(SIMULATOR) && defined(HAVE_DISK_STORAGE)
 #define DISK_SPINDOWN
 #endif
+#if PLUGIN_BUFFER_SIZE >= MIN_MEM
+#define USE_PLUG_BUF
+#endif
 
 /* Settings. jpeg needs these */
 struct imgview_settings
@@ -390,7 +393,7 @@ extern bool running_slideshow;
 #ifdef DISK_SPINDOWN
 extern bool immediate_ata_off;
 #endif
-#if PLUGIN_BUFFER_SIZE >= MIN_MEM
+#ifdef USE_PLUG_BUF
 extern bool plug_buf;
 #endif
 
