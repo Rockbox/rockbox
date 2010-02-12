@@ -23,7 +23,7 @@
 // contain a build timestamp because it needs to be the same in different
 // files
 // VERSION is the plain version number, used for http User-Agent string.
-#define VERSION "1.2.4"
+#define VERSION "1.2.5"
 #define PUREVERSION "SVN $Revision$"
 
 #define FULLVERSION VERSION" ("PUREVERSION"), built "__DATE__" "__TIME__
