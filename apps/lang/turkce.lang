@@ -247,12 +247,18 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Devam et"
+    cowond2*: "MENU, veya üst-sağ = Evet"
     iriverh100,iriverh120,iriverh300: "NAVI = Devam et"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Evet"
+    mrobe500: "PLAY, POWER, veya üst-sağ = Evet"
     archosplayer: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -2002,14 +2008,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
+    sansafuze*,sansae200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Düğme Işığı Zaman Aşımı"
+    sansafuze*,sansae200*: "Teker Işığı Zaman Aşımı"
   </dest>
   <voice>
     *: none
     button_light: ""
+    sansafuze*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -2104,12 +2113,18 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
+    gogearsa9200: "PLAY = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
+    mrobe500: "HEART = Ayarlandı"
+    iriverh100,iriverh120,iriverh300: "NAVI = Ayarlandı"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Ayarlandı"
+    gogearsa9200: "PLAY = Ayarlandı"
   </dest>
   <voice>
     *: none
@@ -5561,7 +5576,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Base Skin"
+    lcd_bitmap: "Temel Kabuk"
   </dest>
   <voice>
     *: none
@@ -7681,7 +7696,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Remote Base Skin"
+    lcd_bitmap: "Uzak Temel Kabuk"
   </dest>
   <voice>
     *: none
@@ -8433,7 +8448,7 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
     *: ".talk mp3 clip"
@@ -13200,5 +13215,22 @@
   <voice>
     *: none
     radio: "FM Radio Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DECAY
+  desc: in sound_settings
+  user: core
+  <source>
+    *: none
+    masf: "AV Decay Time"
+  </source>
+  <dest>
+    *: none
+    masf: "AV Bozulum Zamanı"
+  </dest>
+  <voice>
+    *: none
+    masf: ""
   </voice>
 </phrase>
