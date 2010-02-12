@@ -25,7 +25,9 @@
 
 PLUGIN_HEADER
 
-static void remote_control_setcolors(void);
+#define PLUGIN_CONTINUE 10
+
+static inline void remote_control_setcolors(void);
 
 /*****************************************************************************
 * remote_control_setcolors() set the foreground and background colors.
@@ -48,9 +50,7 @@ static int menu_desktop(void)
     {
         int id = HID_GENERIC_DESKTOP_UNDEFINED;
 
-        selection = rb->do_menu(&menu, &selection, NULL, false);
-
-        switch (selection)
+        switch (rb->do_menu(&menu, &selection, NULL, false))
         {
             case 0: /* Escape */
                 id = HID_KEYBOARD_ESCAPE;
@@ -71,7 +71,7 @@ static int menu_desktop(void)
             case MENU_ATTACHED_USB:
                 return PLUGIN_USB_CONNECTED;
             case GO_TO_PREVIOUS:
-                return 0;
+                return PLUGIN_CONTINUE;
             default:
                 break;
         }
@@ -92,9 +92,7 @@ static int menu_presentation(void)
     {
         int id = HID_GENERIC_DESKTOP_UNDEFINED;
 
-        selection = rb->do_menu(&menu, &selection, NULL, false);
-
-        switch (selection)
+        switch (rb->do_menu(&menu, &selection, NULL, false))
         {
             case 0: /* Next Slide */
                 id = HID_KEYBOARD_N;
@@ -117,7 +115,7 @@ static int menu_presentation(void)
             case MENU_ATTACHED_USB:
                 return PLUGIN_USB_CONNECTED;
             case GO_TO_PREVIOUS:
-                return 0;
+                return PLUGIN_CONTINUE;
             default:
                 break;
         }
@@ -137,9 +135,7 @@ static int menu_media_player(void)
     {
         int id = HID_CONSUMER_USAGE_UNASSIGNED;
 
-        selection = rb->do_menu(&menu, &selection, NULL, false);
-
-        switch (selection)
+        switch (rb->do_menu(&menu, &selection, NULL, false))
         {
             case 0: /* Play */
                 id = HID_CONSUMER_USAGE_PLAY_PAUSE;
@@ -165,7 +161,7 @@ static int menu_media_player(void)
             case MENU_ATTACHED_USB:
                 return PLUGIN_USB_CONNECTED;
             case GO_TO_PREVIOUS:
-                return 0;
+                return PLUGIN_CONTINUE;
             default:
                 break;
         }
@@ -180,7 +176,7 @@ static int menu_media_player(void)
 ******************************************************************************/
 enum plugin_status plugin_start(const void* parameter)
 {
-    enum plugin_status rc = PLUGIN_USB_CONNECTED;
+    enum plugin_status rc = PLUGIN_CONTINUE;
     int selection = 0;
 
     (void)parameter;
@@ -196,34 +192,30 @@ enum plugin_status plugin_start(const void* parameter)
 
     MENUITEM_STRINGLIST(menu, "Remote Control", NULL, "Desktop", "Presentation",
             "Media Player", "Quit");
-    while(1)
+    while(rc == PLUGIN_CONTINUE)
     {
-        selection = rb->do_menu(&menu, &selection, NULL, false);
-        switch (selection)
+        switch (rb->do_menu(&menu, &selection, NULL, false))
         {
             case 0: /* Desktop */
-                if (menu_desktop() == PLUGIN_USB_CONNECTED)
-                    goto Exit;
+                rc = menu_desktop();
                 break;
             case 1: /* Presentation */
-                if (menu_presentation() == PLUGIN_USB_CONNECTED)
-                    goto Exit;
+                rc = menu_presentation();
                 break;
             case 2: /* Media Player */
-                if (menu_media_player() == PLUGIN_USB_CONNECTED)
-                    goto Exit;
+                rc = menu_media_player();
                 break;
             case 3: /* Quit */
             case GO_TO_PREVIOUS:
                 rc = PLUGIN_OK;
-                goto Exit;
+                break;
             case MENU_ATTACHED_USB:
-                goto Exit;
+                rc = PLUGIN_USB_CONNECTED;
+                break;
             default:
                 break;
         }
     }
-Exit:
     rb->lcd_setfont(FONT_UI);
 
     return rc;
