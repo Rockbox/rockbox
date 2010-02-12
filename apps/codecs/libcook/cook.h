@@ -83,6 +83,9 @@ typedef struct cook {
     /* generatable tables and related variables */
     int                 gain_size_factor;
 
+    /* MDCTContext for imdct calculations */
+    MDCTContext         s;
+
     /* data buffers */
 
     uint8_t             decoded_bytes_buffer[1024];
