@@ -1,5 +1,6 @@
 #include "ffmpeg_bitstream.h"
 #include "../librm/rm.h"
+#include "codeclib.h"
 
 #if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == MCF5250)
 /* PP5022/24 and MCF5250 have larger IRAM */
@@ -70,6 +71,10 @@ typedef struct {
     int32_t             outSamples[2048];
     uint8_t             decoded_bytes_buffer[1024];
     int32_t             tempBuf[1070];
+    //@}
+    //@{
+    /** MDCT Context for imdct calculations  */
+    MDCTContext         mdctx;
     //@}
     //@{
     /** extradata */

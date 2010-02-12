@@ -40,7 +40,6 @@
 #include "atrac3data.h"
 #include "atrac3data_fixed.h"
 #include "fixp_math.h"
-#include "../lib/mdct2.h"
 
 #define JOINT_STEREO    0x12
 #define STEREO          0x2
@@ -189,7 +188,7 @@ static void iqmf (int32_t *inlo, int32_t *inhi, unsigned int nIn, int32_t *pOut,
  * @param odd_band  1 if the band is an odd band
  */
 
-static void IMLT(int32_t *pInput, int32_t *pOutput, int odd_band)
+static void IMLT(MDCTContext *mdctx, int32_t *pInput, int32_t *pOutput, int odd_band)
 {
     int     i;
     if (odd_band) {
@@ -207,7 +206,7 @@ static void IMLT(int32_t *pInput, int32_t *pOutput, int odd_band)
     }
  
     /* Apply the imdct. */
-    mdct_backward(512, pInput, pOutput);
+    ff_imdct_calc(mdctx, pOutput, pInput);
 
     /* Windowing. */
     atrac3_imdct_windowing(pOutput, window_lookup);
@@ -244,7 +243,7 @@ static int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes){
 }
 
 
-static void init_atrac3_transforms(void) {
+static void init_atrac3_transforms(ATRAC3Context *q) {
     int32_t s;
     int i;
 
@@ -259,6 +258,9 @@ static void init_atrac3_transforms(void) {
         qmf_window[i] = s;
         qmf_window[47 - i] = s;
     }
+    
+    /* Initializa the MDCT - ATRAC3 only uses a size-512 MDCT */
+    ff_mdct_init(&q->mdctx, av_log2(512), 1);
 }
 
 /**
@@ -691,7 +693,7 @@ static void channelWeighting (int32_t *su1, int32_t *su2, int *p3)
  */
 
 
-static int decodeChannelSoundUnit (GetBitContext *gb, channel_unit *pSnd, int32_t *pOut, int channelNum, int codingMode)
+static int decodeChannelSoundUnit (MDCTContext *mdctx, GetBitContext *gb, channel_unit *pSnd, int32_t *pOut, int channelNum, int codingMode)
 {
     int   band, result=0, numSubbands, lastTonal, numBands;
     if (codingMode == JOINT_STEREO && channelNum == 1) {
@@ -740,7 +742,7 @@ static int decodeChannelSoundUnit (GetBitContext *gb, channel_unit *pSnd, int32_
     for (band=0; band<4; band++) {
         /* Perform the IMDCT step without overlapping. */
         if (band <= numBands) {
-            IMLT(&(pSnd->spectrum[band*256]), pSnd->IMDCT_buf, band&1);
+            IMLT(mdctx, &(pSnd->spectrum[band*256]), pSnd->IMDCT_buf, band&1);
         } else
             memset(pSnd->IMDCT_buf, 0, 512 * sizeof(int32_t));
 
@@ -775,7 +777,7 @@ static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf, int off)
         /* decode Sound Unit 1 */
         init_get_bits(&q->gb,databuf,q->bits_per_frame);
 
-        result = decodeChannelSoundUnit(&q->gb, q->pUnits, q->outSamples, 0, JOINT_STEREO);
+        result = decodeChannelSoundUnit(&q->mdctx, &q->gb, q->pUnits, q->outSamples, 0, JOINT_STEREO);
         if (result != 0)
             return (result);
 
@@ -816,7 +818,7 @@ static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf, int off)
         }
 
         /* Decode Sound Unit 2. */
-        result = decodeChannelSoundUnit(&q->gb, &q->pUnits[1], &q->outSamples[1024], 1, JOINT_STEREO);
+        result = decodeChannelSoundUnit(&q->mdctx, &q->gb, &q->pUnits[1], &q->outSamples[1024], 1, JOINT_STEREO);
         if (result != 0)
             return (result);
 
@@ -833,7 +835,7 @@ static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf, int off)
             /* Set the bitstream reader at the start of a channel sound unit. */
             init_get_bits(&q->gb, databuf+((i*q->bytes_per_frame)/q->channels)+off, (q->bits_per_frame)/q->channels);
 
-            result = decodeChannelSoundUnit(&q->gb, &q->pUnits[i], &q->outSamples[i*1024], i, q->codingMode);
+            result = decodeChannelSoundUnit(&q->mdctx, &q->gb, &q->pUnits[i], &q->outSamples[i*1024], i, q->codingMode);
             if (result != 0)
                 return (result);
         }
@@ -1002,7 +1004,7 @@ int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
 
     }
 
-    init_atrac3_transforms();
+    init_atrac3_transforms(q);
 
     /* init the joint-stereo decoding data */
     q->weighting_delay[0] = 0;
