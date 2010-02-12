@@ -2379,13 +2379,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: ".talk mp3 片段"
+    *: "语音文件剪辑(talk Clip)"
   </dest>
   <voice>
-    *: ".talk mp3片段"
+    *: "语音文件剪辑"
   </voice>
 </phrase>
 <phrase>
@@ -12490,11 +12490,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "浏览sbs(状态栏样式)文件"
+    lcd_bitmap: "浏览SBS(状态栏样式)文件"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "浏览sbs(状态栏样式)文件"
+    lcd_bitmap: "浏览SBS(状态栏样式)文件"
   </voice>
 </phrase>
 <phrase>
