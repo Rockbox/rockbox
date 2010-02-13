@@ -245,24 +245,13 @@ static int io_lines (lua_State *L) {
 ** =======================================================
 */
 
-
 static int read_number (lua_State *L, int *f) {
-  char buf[10]; /* Maximum uint32 value is 10 chars long */
   lua_Number d;
-  int i = 0;
-  /* Rather hackish, but we don't have fscanf.
-     Was: fscanf(f, LUA_NUMBER_SCAN, &d); */
-  memset(buf, 0, 10);
-  rb->read(*f, buf, 10);
-  while(isdigit(buf[i]) && i < 10)
-    i++;
-  if(i == 0) return 0;
-  else {
-    rb->lseek(*f, i-10, SEEK_CUR);
-    d = rb->atoi(buf);
+  if (PREFIX(fscanf)(*f, LUA_NUMBER_SCAN, &d) == 1) {
     lua_pushnumber(L, d);
     return 1;
   }
+  else return 0;  /* read fails */
 }
 
 

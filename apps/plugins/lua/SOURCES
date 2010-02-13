@@ -29,6 +29,7 @@ lzio.c
 rockaux.c
 rocklib.c
 rockmalloc.c
+fscanf.c
 gmtime.c
 strcspn.c
 strftime.c
