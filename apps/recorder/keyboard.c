@@ -95,6 +95,7 @@
 struct keyboard_parameters
 {
     unsigned short kbd_buf[KBD_BUF_SIZE];
+    unsigned short max_line_len;
     int default_lines;
     int nchars;
     int font_w;
@@ -156,7 +157,7 @@ static const unsigned char morse_codes[] = {
 int load_kbd(unsigned char* filename)
 {
     int fd, l;
-    int i = 0;
+    int i = 0, line_len, max_line_len;
     unsigned char buf[4];
 
     if (filename == NULL)
@@ -169,6 +170,8 @@ int load_kbd(unsigned char* filename)
     if (fd < 0)
         return 1;
 
+    line_len = 0;
+    max_line_len = 0;
     while (read(fd, buf, 1) == 1 && i < KBD_BUF_SIZE)
     {
         /* check how many bytes to read for this character */
@@ -198,6 +201,14 @@ int load_kbd(unsigned char* filename)
             FOR_NB_SCREENS(l)
                 kbd_param[l].kbd_buf[i] = ch;
             i++;
+            if (ch == '\n')
+            {
+                if (max_line_len < line_len)
+                    max_line_len = line_len;
+                line_len = 0;
+            }
+            else
+                line_len++;
         }
     }
 
@@ -211,6 +222,7 @@ int load_kbd(unsigned char* filename)
         /* initialize parameters */
         pm->x = pm->y = pm->page = 0;
         pm->default_lines = 0;
+        pm->max_line_len = max_line_len;
     }
 
     return 0;
@@ -354,6 +366,7 @@ int kbd_input(char* text, int buflen)
                     "òóôõöø çðþýÿ ùúûü ¼½¾¬¶¨:;";
 
                 pm->default_lines = 8;
+                pm->max_line_len = 26;
             }
             else
 #endif /* LCD_WIDTH >= 160 && LCD_HEIGHT >= 96 */
@@ -374,6 +387,7 @@ int kbd_input(char* text, int buflen)
                     "òóôõöø çðþýÿ ùúûü";
 
                 pm->default_lines = 4;
+                pm->max_line_len = 18;
             }
 
             while (*p)
@@ -882,6 +896,8 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
     /* calculate how many characters to put in a row. */
     icon_w = get_icon_width(sc->screen_type);
     sc_w = sc->getwidth();
+    if (pm->font_w < sc_w / pm->max_line_len)
+        pm->font_w = sc_w / pm->max_line_len;
     pm->max_chars = sc_w / pm->font_w;
     pm->max_chars_text = (sc_w - icon_w * 2 - 2) / pm->text_w;
     if (pm->max_chars_text < 3 && icon_w > pm->text_w)
