@@ -125,6 +125,30 @@ void XNPROD31(int32_t  a, int32_t  b,
                   [t] "r" (_t), [v] "r" (_v) \
                 : "cc");
 
+#define XPROD31_R(_a, _b, _t, _v, _x, _y)   \
+  asm volatile ("mac.l %[a], %[t], %%acc0;" \
+                "mac.l %[b], %[v], %%acc0;" \
+                "mac.l %[b], %[t], %%acc1;" \
+                "msac.l %[a], %[v], %%acc1;" \
+                "movclr.l %%acc0, %[x];" \
+                "movclr.l %%acc1, %[y];" \
+                : [x] "+&d" (_x), [y] "=&d" (_y) \
+                : [a] "r" (_a), [b] "r" (_b), \
+                  [t] "r" (_t), [v] "r" (_v) \
+                : "cc");
+
+#define XNPROD31_R(_a, _b, _t, _v, _x, _y)  \
+  asm volatile ("mac.l %[a], %[t], %%acc0;" \
+                "msac.l %[b], %[v], %%acc0;" \
+                "mac.l %[b], %[t], %%acc1;" \
+                "mac.l %[a], %[v], %%acc1;" \
+                "movclr.l %%acc0, %[x];" \
+                "movclr.l %%acc1, %[y];" \
+                : [x] "+&d" (_x), [y] "=&d" (_y) \
+                : [a] "r" (_a), [b] "r" (_b), \
+                  [t] "r" (_t), [v] "r" (_v) \
+                : "cc");
+
 #ifndef _V_VECT_OPS
 #define _V_VECT_OPS
 
