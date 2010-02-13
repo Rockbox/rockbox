@@ -390,6 +390,20 @@ enum {
 #define BJACK_RIGHT        BUTTON_RIGHT
 #define BJACK_LEFT         BUTTON_LEFT
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define BJACK_SELECT_NAME    "OK"
+#define BJACK_STAY_NAME     "CANCEL"
+#define BJACK_QUIT_NAME     "REC"
+#define BJACK_DOUBLE_NAME   "MENU"
+#define BJACK_SELECT        BUTTON_OK
+#define BJACK_QUIT          BUTTON_REC
+#define BJACK_STAY          BUTTON_CANCEL
+#define BJACK_DOUBLEDOWN    BUTTON_MENU
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_NEXT
+#define BJACK_LEFT          BUTTON_PREV
+
 #else
 #error No keymap defined!
 #endif

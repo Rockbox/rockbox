@@ -199,6 +199,14 @@ PLUGIN_HEADER
 #elif CONFIG_KEYPAD == COWON_D2_PAD
 #define SNAKE_QUIT BUTTON_POWER
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define SNAKE_QUIT      BUTTON_REC
+#define SNAKE_LEFT      BUTTON_PREV
+#define SNAKE_RIGHT     BUTTON_NEXT
+#define SNAKE_UP        BUTTON_UP
+#define SNAKE_DOWN      BUTTON_DOWN
+#define SNAKE_PLAYPAUSE BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

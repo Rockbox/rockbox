@@ -411,7 +411,7 @@ PLUGIN_HEADER
 #   define HK_DRAW           "MENU"
 #   define HK_REM2CUR        "LEFT"
 #   define HK_CUR2STACK      "PLAY..."
-#   define REM2STACK         "RIGHT"
+#   define HK_REM2STACK      "RIGHT"
 
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) || \
 (CONFIG_KEYPAD == ONDAVX777_PAD) || \
@@ -438,6 +438,24 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define HK_REM2CUR        "FFWD"
 #   define HK_CUR2STACK      "REW"
 #   define HK_REM2STACK      "FFWD.."
+
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#   define SOL_QUIT          BUTTON_REC
+#   define SOL_UP            BUTTON_UP
+#   define SOL_DOWN          BUTTON_DOWN
+#   define SOL_LEFT          BUTTON_PREV
+#   define SOL_RIGHT         BUTTON_NEXT
+#   define SOL_MOVE_PRE      BUTTON_OK
+#   define SOL_MOVE          (BUTTON_OK | BUTTON_REL)
+#   define SOL_DRAW          BUTTON_MENU
+#   define SOL_REM2CUR       BUTTON_CANCEL
+#   define SOL_CUR2STACK     BUTTON_PLAY
+#   define SOL_REM2STACK     (BUTTON_PLAY | BUTTON_REPEAT)
+#   define HK_MOVE           "OK"
+#   define HK_DRAW           "MENU"
+#   define HK_REM2CUR        "CANCEL"
+#   define HK_CUR2STACK      "PLAY"
+#   define HK_REM2STACK      "PLAY..."
 
 #else
 #error No keymap defined!

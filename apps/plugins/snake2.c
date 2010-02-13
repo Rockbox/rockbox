@@ -308,6 +308,15 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define SNAKE2_PLAYPAUSE   BUTTON_PLAY
 #define SNAKE2_PLAYPAUSE_TEXT "Play"
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define SNAKE2_LEFT        BUTTON_PREV
+#define SNAKE2_RIGHT       BUTTON_NEXT
+#define SNAKE2_UP          BUTTON_UP
+#define SNAKE2_DOWN        BUTTON_DOWN
+#define SNAKE2_QUIT        BUTTON_REC
+#define SNAKE2_PLAYPAUSE   BUTTON_PLAY
+#define SNAKE2_PLAYPAUSE_TEXT "Play"
+
 #else
 #error No keymap defined!
 #endif

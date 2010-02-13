@@ -195,6 +195,13 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define RIGHT BUTTON_RIGHT
 #define FIRE  BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+
+#define QUIT  BUTTON_REC
+#define LEFT  BUTTON_PREV
+#define RIGHT BUTTON_NEXT
+#define FIRE  BUTTON_OK
+
 #else
     #error INVADROX: Unsupported keypad
 #endif

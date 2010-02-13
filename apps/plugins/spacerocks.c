@@ -220,6 +220,15 @@ PLUGIN_HEADER
 #define AST_RIGHT      BUTTON_RIGHT
 #define AST_FIRE       BUTTON_PLAY
 
+#elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
+#define AST_PAUSE      BUTTON_PLAY
+#define AST_QUIT       BUTTON_REC
+#define AST_THRUST     BUTTON_UP
+#define AST_HYPERSPACE BUTTON_DOWN
+#define AST_LEFT       BUTTON_PREV
+#define AST_RIGHT      BUTTON_NEXT
+#define AST_FIRE       BUTTON_OK
+
 #else
 #error No keymap defined!
 #endif

@@ -150,6 +150,12 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define ACTION      BUTTON_RIGHT
 #define ACTIONTEXT "RIGHT"
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define QUIT BUTTON_REC
+#define ACTION BUTTON_PLAY
+#define ACTION2 BUTTON_UP
+#define ACTIONTEXT "PLAY"
+
 #else
 #error No keymap defined!
 #endif

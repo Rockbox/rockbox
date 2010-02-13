@@ -268,6 +268,18 @@ static void setoptions (void)
         options.SELECT=BUTTON_FFWD;
         options.MENU=BUTTON_NONE;        
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+        options.UP=      BUTTON_OK;
+        options.DOWN=    BUTTON_CANCEL;
+        options.LEFT=    BUTTON_PREV;
+        options.RIGHT=   BUTTON_NEXT;
+
+        options.A=       BUTTON_POWER;
+        options.B=       BUTTON_REC;
+        options.START=   BUTTON_PLAY;
+        options.SELECT=  BUTTON_UP;
+        options.MENU=    BUTTON_MENU;
+
 #else
 #error No Keymap Defined!
 #endif

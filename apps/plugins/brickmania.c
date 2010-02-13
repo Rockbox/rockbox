@@ -225,6 +225,15 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define UP     BUTTON_UP
 #define DOWN   BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define QUIT     BUTTON_REC
+#define LEFT     BUTTON_PREV
+#define RIGHT    BUTTON_NEXT
+#define ALTLEFT  BUTTON_MENU
+#define ALTRIGHT BUTTON_PLAY
+#define SELECT   BUTTON_OK
+#define UP       BUTTON_UP
+#define DOWN     BUTTON_DOWN
 
 #else
 #error No keymap defined!
