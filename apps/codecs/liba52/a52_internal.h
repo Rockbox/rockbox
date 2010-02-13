@@ -111,13 +111,13 @@ int a52_downmix_init (int input, int flags, level_t * level,
 		      level_t clev, level_t slev);
 int a52_downmix_coeff (level_t * coeff, int acmod, int output, level_t level,
 		       level_t clev, level_t slev);
-void a52_downmix (sample_t * samples, int acmod, int output, sample_t bias,
+void a52_downmix (sample_t * samples, int acmod, int output, 
 		  level_t clev, level_t slev);
 void a52_upmix (sample_t * samples, int acmod, int output);
 
 void a52_imdct_init (uint32_t mm_accel);
-void a52_imdct_256 (sample_t * data, sample_t * delay, sample_t bias);
-void a52_imdct_512 (sample_t * data, sample_t * delay, sample_t bias);
+void a52_imdct_256 (sample_t * data, sample_t * delay);
+void a52_imdct_512 (sample_t * data, sample_t * delay);
 
 #define ROUND(x) ((int)((x) + ((x) > 0 ? 0.5 : -0.5)))
 
@@ -210,6 +210,6 @@ typedef int16_t quantizer_t;
 
 #define MUL_C(a,b) MUL_L (a, LEVEL (b))
 #define DIV(a,b) ((((int64_t)LEVEL (a)) << 26) / (b))
-#define BIAS(x) ((x) + (bias*0))
+#define BIAS(x) ((x))
 
 #endif

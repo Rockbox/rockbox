@@ -329,7 +329,7 @@ int a52_downmix_coeff (level_t * coeff, int acmod, int output, level_t level,
     return -1;	/* NOTREACHED */
 }
 
-static void mix2to1 (sample_t * dest, sample_t * src, sample_t bias)
+static void mix2to1 (sample_t * dest, sample_t * src)
 {
     int i;
 
@@ -337,7 +337,7 @@ static void mix2to1 (sample_t * dest, sample_t * src, sample_t bias)
 	dest[i] += BIAS (src[i]);
 }
 
-static void mix3to1 (sample_t * samples, sample_t bias)
+static void mix3to1 (sample_t * samples)
 {
     int i;
 
@@ -345,7 +345,7 @@ static void mix3to1 (sample_t * samples, sample_t bias)
 	samples[i] += BIAS (samples[i + 256] + samples[i + 512]);
 }
 
-static void mix4to1 (sample_t * samples, sample_t bias)
+static void mix4to1 (sample_t * samples)
 {
     int i;
 
@@ -354,7 +354,7 @@ static void mix4to1 (sample_t * samples, sample_t bias)
 			    samples[i + 768]);
 }
 
-static void mix5to1 (sample_t * samples, sample_t bias)
+static void mix5to1 (sample_t * samples)
 {
     int i;
 
@@ -363,7 +363,7 @@ static void mix5to1 (sample_t * samples, sample_t bias)
 			    samples[i + 768] + samples[i + 1024]);
 }
 
-static void mix3to2 (sample_t * samples, sample_t bias)
+static void mix3to2 (sample_t * samples)
 {
     int i;
     sample_t common;
@@ -375,7 +375,7 @@ static void mix3to2 (sample_t * samples, sample_t bias)
     }
 }
 
-static void mix21to2 (sample_t * left, sample_t * right, sample_t bias)
+static void mix21to2 (sample_t * left, sample_t * right)
 {
     int i;
     sample_t common;
@@ -387,7 +387,7 @@ static void mix21to2 (sample_t * left, sample_t * right, sample_t bias)
     }
 }
 
-static void mix21toS (sample_t * samples, sample_t bias)
+static void mix21toS (sample_t * samples)
 {
     int i;
     sample_t surround;
@@ -399,7 +399,7 @@ static void mix21toS (sample_t * samples, sample_t bias)
     }
 }
 
-static void mix31to2 (sample_t * samples, sample_t bias)
+static void mix31to2 (sample_t * samples)
 {
     int i;
     sample_t common;
@@ -411,7 +411,7 @@ static void mix31to2 (sample_t * samples, sample_t bias)
     }
 }
 
-static void mix31toS (sample_t * samples, sample_t bias)
+static void mix31toS (sample_t * samples)
 {
     int i;
     sample_t common, surround;
@@ -424,7 +424,7 @@ static void mix31toS (sample_t * samples, sample_t bias)
     }
 }
 
-static void mix22toS (sample_t * samples, sample_t bias)
+static void mix22toS (sample_t * samples)
 {
     int i;
     sample_t surround;
@@ -436,7 +436,7 @@ static void mix22toS (sample_t * samples, sample_t bias)
     }
 }
 
-static void mix32to2 (sample_t * samples, sample_t bias)
+static void mix32to2 (sample_t * samples)
 {
     int i;
     sample_t common;
@@ -448,7 +448,7 @@ static void mix32to2 (sample_t * samples, sample_t bias)
     }
 }
 
-static void mix32toS (sample_t * samples, sample_t bias)
+static void mix32toS (sample_t * samples)
 {
     int i;
     sample_t common, surround;
@@ -461,7 +461,7 @@ static void mix32toS (sample_t * samples, sample_t bias)
     }
 }
 
-static void move2to1 (sample_t * src, sample_t * dest, sample_t bias)
+static void move2to1 (sample_t * src, sample_t * dest)
 {
     int i;
 
@@ -477,7 +477,7 @@ static void zero (sample_t * samples)
 	samples[i] = 0;
 }
 
-void a52_downmix (sample_t * samples, int acmod, int output, sample_t bias,
+void a52_downmix (sample_t * samples, int acmod, int output,
 		  level_t clev, level_t slev)
 {
     /* avoid compiler warning */
@@ -492,7 +492,7 @@ void a52_downmix (sample_t * samples, int acmod, int output, sample_t bias,
     case CONVERT (A52_CHANNEL, A52_MONO):
     case CONVERT (A52_STEREO, A52_MONO):
     mix_2to1:
-	mix2to1 (samples, samples + 256, bias);
+	mix2to1 (samples, samples + 256);
 	break;
 
     case CONVERT (A52_2F1R, A52_MONO):
@@ -500,7 +500,7 @@ void a52_downmix (sample_t * samples, int acmod, int output, sample_t bias,
 	    goto mix_2to1;
     case CONVERT (A52_3F, A52_MONO):
     mix_3to1:
-	mix3to1 (samples, bias);
+	mix3to1 (samples);
 	break;
 
     case CONVERT (A52_3F1R, A52_MONO):
@@ -509,13 +509,13 @@ void a52_downmix (sample_t * samples, int acmod, int output, sample_t bias,
     case CONVERT (A52_2F2R, A52_MONO):
 	if (slev == 0)
 	    goto mix_2to1;
-	mix4to1 (samples, bias);
+	mix4to1 (samples);
 	break;
 
     case CONVERT (A52_3F2R, A52_MONO):
 	if (slev == 0)
 	    goto mix_3to1;
-	mix5to1 (samples, bias);
+	mix5to1 (samples);
 	break;
 
     case CONVERT (A52_MONO, A52_DOLBY):
@@ -525,79 +525,79 @@ void a52_downmix (sample_t * samples, int acmod, int output, sample_t bias,
     case CONVERT (A52_3F, A52_STEREO):
     case CONVERT (A52_3F, A52_DOLBY):
     mix_3to2:
-	mix3to2 (samples, bias);
+	mix3to2 (samples);
 	break;
 
     case CONVERT (A52_2F1R, A52_STEREO):
 	if (slev == 0)
 	    break;
-	mix21to2 (samples, samples + 256, bias);
+	mix21to2 (samples, samples + 256);
 	break;
 
     case CONVERT (A52_2F1R, A52_DOLBY):
-	mix21toS (samples, bias);
+	mix21toS (samples);
 	break;
 
     case CONVERT (A52_3F1R, A52_STEREO):
 	if (slev == 0)
 	    goto mix_3to2;
-	mix31to2 (samples, bias);
+	mix31to2 (samples);
 	break;
 
     case CONVERT (A52_3F1R, A52_DOLBY):
-	mix31toS (samples, bias);
+	mix31toS (samples);
 	break;
 
     case CONVERT (A52_2F2R, A52_STEREO):
 	if (slev == 0)
 	    break;
-	mix2to1 (samples, samples + 512, bias);
-	mix2to1 (samples + 256, samples + 768, bias);
+	mix2to1 (samples, samples + 512);
+	mix2to1 (samples + 256, samples + 768);
 	break;
 
     case CONVERT (A52_2F2R, A52_DOLBY):
-	mix22toS (samples, bias);
+	mix22toS (samples);
 	break;
 
     case CONVERT (A52_3F2R, A52_STEREO):
 	if (slev == 0)
 	    goto mix_3to2;
-	mix32to2 (samples, bias);
+	mix32to2 (samples);
 	break;
 
     case CONVERT (A52_3F2R, A52_DOLBY):
-	mix32toS (samples, bias);
+	mix32toS (samples);
 	break;
 
     case CONVERT (A52_3F1R, A52_3F):
 	if (slev == 0)
 	    break;
-	mix21to2 (samples, samples + 512, bias);
+	mix21to2 (samples, samples + 512);
 	break;
 
     case CONVERT (A52_3F2R, A52_3F):
 	if (slev == 0)
 	    break;
-	mix2to1 (samples, samples + 768, bias);
-	mix2to1 (samples + 512, samples + 1024, bias);
+	mix2to1 (samples, samples + 768);
+	mix2to1 (samples + 512, samples + 1024);
 	break;
 
     case CONVERT (A52_3F1R, A52_2F1R):
-	mix3to2 (samples, bias);
+	mix3to2 (samples);
 	memcpy (samples + 512, samples + 768, 256 * sizeof (sample_t));
 	break;
 
     case CONVERT (A52_2F2R, A52_2F1R):
-	mix2to1 (samples + 512, samples + 768, bias);
+	mix2to1 (samples + 512, samples + 768);
 	break;
 
     case CONVERT (A52_3F2R, A52_2F1R):
-	mix3to2 (samples, bias);
-	move2to1 (samples + 768, samples + 512, bias);
+	mix3to2 (samples);
+	move2to1 (samples + 768, samples + 512);
 	break;
 
     case CONVERT (A52_3F2R, A52_3F1R):
-	mix2to1 (samples + 768, samples + 1024, bias);
+	mix2to1 (samples + 768, samples + 1024);
 	break;
 
     case CONVERT (A52_2F1R, A52_2F2R):
@@ -605,12 +605,12 @@ void a52_downmix (sample_t * samples, int acmod, int output, sample_t bias,
 	break;
 
     case CONVERT (A52_3F1R, A52_2F2R):
-	mix3to2 (samples, bias);
+	mix3to2 (samples);
 	memcpy (samples + 512, samples + 768, 256 * sizeof (sample_t));
 	break;
 
     case CONVERT (A52_3F2R, A52_2F2R):
-	mix3to2 (samples, bias);
+	mix3to2 (samples);
 	memcpy (samples + 512, samples + 768, 256 * sizeof (sample_t));
 	memcpy (samples + 768, samples + 1024, 256 * sizeof (sample_t));
 	break;
