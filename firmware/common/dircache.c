@@ -71,7 +71,6 @@ static unsigned long entry_count = 0;
 static unsigned long reserve_used = 0;
 static unsigned int  cache_build_ticks = 0;
 static unsigned long appflags = 0;
-static char dircache_cur_path[MAX_PATH];
 
 static struct event_queue dircache_queue;
 static long dircache_stack[(DEFAULT_STACK_SIZE + 0x900)/sizeof(long)];
@@ -147,11 +146,6 @@ static struct dircache_entry* dircache_gen_down(struct dircache_entry *ce)
     return next_entry;
 }
 
-/* This will eat ~30 KiB of memory!
- * We should probably use that as additional reserve buffer in future. */
-#define MAX_SCAN_DEPTH 16
-static struct travel_data dir_recursion[MAX_SCAN_DEPTH];
-
 /**
  * Returns true if there is an event waiting in the queue
  * that requires the current operation to be aborted.
@@ -176,130 +170,111 @@ static bool check_event_queue(void)
     return false;
 }
 
-/**
- * Internal function to iterate a path.
- */
-static int dircache_scan(IF_MV2(int volume,) struct travel_data *td)
+#ifndef SIMULATOR
+/* scan and build static data (avoid redundancy on stack) */
+static struct
 {
-#ifdef SIMULATOR
 #ifdef HAVE_MULTIVOLUME
-    (void)volume;
+    int volume;
 #endif
-    while ( ( td->entry = readdir_uncached(td->dir) ) )
-#else
-    while ( (fat_getnext(td->dir, &td->entry) >= 0) && (td->entry.name[0]))
-#endif
+    struct fat_dir *dir;
+    struct fat_direntry *direntry;
+}sab;
+
+static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce)
+{
+    /* normally, opendir expects a full fat_dir as parent but in our case,
+     * it's completely useless because we don't modify anything
+     * WARNING: this heavily relies on current FAT implementation ! */
+    
+    /* those field are necessary to update the FAT entry in case of modification
+       here we don't touch anything so we put dummy values */
+    sab.dir->entry = 0;
+    sab.dir->entrycount = 0;
+    sab.dir->file.firstcluster = 0;
+    /* open directory */
+    int rc = fat_opendir(IF_MV2(sab.volume,) sab.dir, startcluster, sab.dir);
+    if(rc < 0)
     {
-#ifdef SIMULATOR
-        if (!strcmp(".", td->entry->d_name) ||
-             !strcmp("..", td->entry->d_name))
-        {
+        logf("fat_opendir failed: %d", rc);
+        return rc;
+    }
+    
+    /* first pass : read dir */
+    struct dircache_entry *first_ce = ce;
+    
+    /* read through directory */
+    while((rc = fat_getnext(sab.dir, sab.direntry)) >= 0 && sab.direntry->name[0])
+    {
+        if(!strcmp(".", sab.direntry->name) ||
+                !strcmp("..", sab.direntry->name))
             continue;
-        }
         
-        td->ce->attribute = td->entry->attribute;
-        td->ce->name_len = strlen(td->entry->d_name) + 1;
-        td->ce->d_name = ((char *)dircache_root+dircache_size);
-        td->ce->size = td->entry->size;
-        td->ce->wrtdate = td->entry->wrtdate;
-        td->ce->wrttime = td->entry->wrttime;
-        memcpy(td->ce->d_name, td->entry->d_name, td->ce->name_len);
-#else
-        if (!strcmp(".", td->entry.name) ||
-             !strcmp("..", td->entry.name))
-        {
-            continue;
-        }
+        ce->attribute = sab.direntry->attr;
+        ce->name_len = strlen(sab.direntry->name) + 1;
+        ce->d_name = ((char *)dircache_root + dircache_size);
+        ce->startcluster = sab.direntry->firstcluster;
+        ce->size = sab.direntry->filesize;
+        ce->wrtdate = sab.direntry->wrtdate;
+        ce->wrttime = sab.direntry->wrttime;
+        memcpy(ce->d_name, sab.direntry->name, ce->name_len);
         
-        td->ce->attribute = td->entry.attr;
-        td->ce->name_len = strlen(td->entry.name) + 1;
-        td->ce->d_name = ((char *)dircache_root+dircache_size);
-        td->ce->startcluster = td->entry.firstcluster;
-        td->ce->size = td->entry.filesize;
-        td->ce->wrtdate = td->entry.wrtdate;
-        td->ce->wrttime = td->entry.wrttime;
-        memcpy(td->ce->d_name, td->entry.name, td->ce->name_len);
-#endif
-        dircache_size += td->ce->name_len;
+        dircache_size += ce->name_len;
         entry_count++;
         
-#ifdef SIMULATOR
-        if (td->entry->attribute & ATTR_DIRECTORY)
-#else
-        if (td->entry.attr & FAT_ATTR_DIRECTORY)
-#endif
-        {
-            
-            td->down_entry = dircache_gen_down(td->ce);
-            if (td->down_entry == NULL)
-                return -2;
-            
-            td->pathpos = strlen(dircache_cur_path);
-            strlcpy(&dircache_cur_path[td->pathpos], "/", 
-                    sizeof(dircache_cur_path) - td->pathpos);
-#ifdef SIMULATOR
-            strlcpy(&dircache_cur_path[td->pathpos+1], td->entry->d_name, 
-                    sizeof(dircache_cur_path) - td->pathpos - 1);
-            
-            td->newdir = opendir_uncached(dircache_cur_path);
-            if (td->newdir == NULL)
-            {
-                logf("Failed to opendir_uncached(): %s", dircache_cur_path);
-                return -3;
-            }
-#else
-            strlcpy(&dircache_cur_path[td->pathpos+1], td->entry.name,
-                    sizeof(dircache_cur_path) - td->pathpos - 1);
-
-            td->newdir = *td->dir;
-            if (fat_opendir(IF_MV2(volume,) &td->newdir,
-                td->entry.firstcluster, td->dir) < 0 )
-            {
-                return -3;
-            }
-#endif
-
-            td->ce = dircache_gen_next(td->ce);
-            if (td->ce == NULL)
-                return -4;
-            
-            return 1;
-        }
-        
-        td->ce->down = NULL;
-        td->ce = dircache_gen_next(td->ce);
-        if (td->ce == NULL)
+        if(ce->attribute & FAT_ATTR_DIRECTORY)
+            dircache_gen_down(ce);
+                
+        ce = dircache_gen_next(ce);
+        if(ce == NULL)
             return -5;
         
         /* When simulator is used, it's only safe to yield here. */
-        if (thread_enabled)
+        if(thread_enabled)
         {
             /* Stop if we got an external signal. */
-            if (check_event_queue())
+            if(check_event_queue())
                 return -6;
             yield();
         }
-        
     }
-
-    return 0;
+    
+    /* add "." and ".." */
+    ce->d_name = ".";
+    ce->name_len = 2;
+    ce->attribute = FAT_ATTR_DIRECTORY;
+    ce->startcluster = startcluster;
+    ce->size = 0;
+    ce->down = first_ce;
+    
+    ce = dircache_gen_next(ce);
+    
+    ce->d_name = "..";
+    ce->name_len = 3;
+    ce->attribute = FAT_ATTR_DIRECTORY;
+    ce->startcluster = first_ce->up->startcluster;
+    ce->size = 0;
+    ce->down = first_ce->up;
+    
+    /* second pass: recurse ! */
+    ce = first_ce;
+    
+    while(ce)
+    {
+        if(ce->name_len != 0 && ce->down != NULL && strcmp(ce->d_name, ".") && strcmp(ce->d_name, ".."))
+            sab_process_dir(ce->startcluster, ce->down);
+        
+        ce = ce->next;
+    }
+    
+    return rc;
 }
 
-/** 
- * Recursively scan the hard disk and build the cache.
- */
-#ifdef SIMULATOR
-static int dircache_travel(IF_MV2(int volume,) DIR_UNCACHED *dir, struct dircache_entry *ce)
-#else
-static int dircache_travel(IF_MV2(int volume,) struct fat_dir *dir, struct dircache_entry *ce)
-#endif
+static int dircache_scan_and_build(IF_MV2(int volume,) struct dircache_entry *ce)
 {
-    int depth = 0;
-    int result;
-
     memset(ce, 0, sizeof(struct dircache_entry));
 
-#if defined(HAVE_MULTIVOLUME) && !defined(SIMULATOR)
+#ifdef HAVE_MULTIVOLUME
     if (volume > 0)
     {
         ce->d_name = ((char *)dircache_root+dircache_size);
@@ -313,80 +288,116 @@ static int dircache_travel(IF_MV2(int volume,) struct fat_dir *dir, struct dirca
     }
 #endif
 
-    dir_recursion[0].dir = dir;
-    dir_recursion[0].ce = ce;
-    dir_recursion[0].first = ce;
-    
-    do {
-        //logf("=> %s", dircache_cur_path);
-        result = dircache_scan(IF_MV2(volume,) &dir_recursion[depth]);
-        switch (result) {
-            case 0: /* Leaving the current directory. */
-                /* Add the standard . and .. entries. */
-                ce = dir_recursion[depth].ce;
-                ce->d_name = ".";
-                ce->name_len = 2;
-#ifdef SIMULATOR
-                closedir_uncached(dir_recursion[depth].dir);
-                ce->attribute = ATTR_DIRECTORY;
-#else
-                ce->attribute = FAT_ATTR_DIRECTORY;
-                ce->startcluster = dir_recursion[depth].dir->file.firstcluster;
+    struct fat_dir dir; /* allocate on stack once for all scan */
+    struct fat_direntry direntry; /* ditto */
+#ifdef HAVE_MULTIVOLUME
+    sab.volume = volume;
 #endif
-                ce->size = 0;
-                ce->down = dir_recursion[depth].first;
+    sab.dir = &dir;
+    sab.direntry = &direntry;
     
-                depth--;
-                if (depth < 0)
-                    break ;
+    return sab_process_dir(0, ce);
+}
+#else /* !SIMULATOR */
+static char sab_path[MAX_PATH];
 
-                dircache_cur_path[dir_recursion[depth].pathpos] = '\0';
-            
-                ce = dircache_gen_next(ce);
-                if (ce == NULL)
-                {
-                    logf("memory allocation error");
-                    return -3;
-                }
-#ifdef SIMULATOR
-                ce->attribute = ATTR_DIRECTORY;
-#else
-                ce->attribute = FAT_ATTR_DIRECTORY;
-                ce->startcluster = dir_recursion[depth].dir->file.firstcluster;
-#endif
-                ce->d_name = "..";
-                ce->name_len = 3;
-                ce->size = 0;
-                ce->down = dir_recursion[depth].first;
+static int sab_process_dir(struct dircache_entry *ce)
+{
+    struct dirent_uncached *entry;
+    struct dircache_entry *first_ce = ce;
+    DIR_UNCACHED *dir = opendir_uncached(sab_path);
+    if(dir == NULL)
+    {
+        logf("Failed to opendir_uncached(%s)", sab_path);
+        return -1;
+    }
     
-                break ;
-
-            case 1: /* Going down in the directory tree. */
-                depth++;
-                if (depth >= MAX_SCAN_DEPTH)
-                {
-                    logf("Too deep directory structure");
-                    return -2;
-                }
-            
-#ifdef SIMULATOR
-                dir_recursion[depth].dir = dir_recursion[depth-1].newdir;
-#else
-                dir_recursion[depth].dir = &dir_recursion[depth-1].newdir;
-#endif
-                dir_recursion[depth].first = dir_recursion[depth-1].down_entry;
-                dir_recursion[depth].ce = dir_recursion[depth-1].down_entry;
-                break ;
-            
-            default:
-                logf("Scan failed");
-                logf("-> %s", dircache_cur_path);
+    while((entry = readdir_uncached(dir)))
+    {
+        if(!strcmp(".", entry->d_name) ||
+                !strcmp("..", entry->d_name))
+            continue;
+        
+        ce->attribute = entry->attribute;
+        ce->name_len = strlen(entry->d_name) + 1;
+        ce->d_name = ((char *)dircache_root + dircache_size);
+        ce->size = entry->size;
+        ce->wrtdate = entry->wrtdate;
+        ce->wrttime = entry->wrttime;
+        memcpy(ce->d_name, entry->d_name, ce->name_len);
+        
+        dircache_size += ce->name_len;
+        entry_count++;
+        
+        if(entry->attribute & ATTR_DIRECTORY)
+        {
+            dircache_gen_down(ce);
+            if(ce->down == NULL)
+            {
+                closedir_uncached(dir);
                 return -1;
+            }
+            /* save current paths size */
+            int pathpos = strlen(sab_path);
+            /* append entry */
+            strlcpy(&sab_path[pathpos], "/", sizeof(sab_path) - pathpos);
+            strlcpy(&sab_path[pathpos+1], entry->d_name, sizeof(sab_path) - pathpos - 1);
+            
+            int rc = sab_process_dir(ce->down);
+            /* restore path */
+            sab_path[pathpos] = '\0';
+            
+            if(rc < 0)
+            {
+                closedir_uncached(dir);
+                return rc;
+            }
         }
-    } while (depth >= 0) ;
+        
+        ce = dircache_gen_next(ce);
+        if(ce == NULL)
+            return -5;
+        
+        /* When simulator is used, it's only safe to yield here. */
+        if(thread_enabled)
+        {
+            /* Stop if we got an external signal. */
+            if(check_event_queue())
+                return -1;
+            yield();
+        }
+    }
     
+    /* add "." and ".." */
+    ce->d_name = ".";
+    ce->name_len = 2;
+    ce->attribute = ATTR_DIRECTORY;
+    ce->size = 0;
+    ce->down = first_ce;
+    
+    ce = dircache_gen_next(ce);
+    
+    ce->d_name = "..";
+    ce->name_len = 3;
+    ce->attribute = ATTR_DIRECTORY;
+    ce->size = 0;
+    ce->down = first_ce->up;
+    
+    closedir_uncached(dir);
     return 0;
 }
+
+static int dircache_scan_and_build(IF_MV2(int volume,) struct dircache_entry *ce)
+{
+    #ifdef HAVE_MULTIVOLUME
+    (void) volume;
+    #endif
+    memset(ce, 0, sizeof(struct dircache_entry));
+    
+    strlcpy(sab_path, "/", sizeof sab_path);
+    return sab_process_dir(ce);
+}
+#endif /* SIMULATOR */
 
 /**
  * Internal function to get a pointer to dircache_entry for a given filename.
@@ -578,11 +589,6 @@ int dircache_save(void)
  */
 static int dircache_do_rebuild(void)
 {
-#ifdef SIMULATOR
-    DIR_UNCACHED *pdir;
-#else
-    struct fat_dir dir, *pdir;
-#endif
     unsigned int start_tick;
     int i;
     
@@ -592,7 +598,6 @@ static int dircache_do_rebuild(void)
     appflags = 0;
     entry_count = 0;
     
-    memset(dircache_cur_path, 0, sizeof(dircache_cur_path));
     dircache_size = sizeof(struct dircache_entry);
 
 #ifdef HAVE_MULTIVOLUME
@@ -603,31 +608,11 @@ static int dircache_do_rebuild(void)
         if (fat_ismounted(i))
         {
 #endif
-#ifdef SIMULATOR
-            pdir = opendir_uncached("/");
-            if (pdir == NULL)
-            {
-                logf("Failed to open rootdir");
-                dircache_initializing = false;
-                return -3;
-            }
-#else
-#ifdef HAVE_MULTIVOLUME
-            if ( fat_opendir(IF_MV2(i,) &dir, 0, NULL) < 0 ) {
-#else
-            if ( fat_opendir(IF_MV2(0,) &dir, 0, NULL) < 0 ) {
-#endif /* HAVE_MULTIVOLUME */
-                logf("Failed opening root dir");
-                dircache_initializing = false;
-                return -3;
-            }
-            pdir = &dir;
-#endif
             cpu_boost(true);
 #ifdef HAVE_MULTIVOLUME
-            if (dircache_travel(IF_MV2(i,) pdir, append_position) < 0)
+            if (dircache_scan_and_build(IF_MV2(i,) append_position) < 0)
 #else
-            if (dircache_travel(IF_MV2(0,) pdir, dircache_root) < 0)
+            if (dircache_scan_and_build(IF_MV2(0,) dircache_root) < 0)
 #endif /* HAVE_MULTIVOLUME */
             {
                 logf("dircache_travel failed");

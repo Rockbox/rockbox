@@ -122,7 +122,7 @@ extern int fat_rename(struct fat_file* file,
                       long size, int attr);
 
 extern int fat_opendir(IF_MV2(int volume,)
-                       struct fat_dir *ent, unsigned long currdir,
+                       struct fat_dir *ent, unsigned long startcluster,
                        const struct fat_dir *parent_dir);
 extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);
 extern unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume)); /* public for debug info screen */
