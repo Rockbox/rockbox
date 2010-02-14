@@ -52,6 +52,7 @@
 #include "skin_engine.h"
 #include "settings.h"
 #include "settings_list.h"
+#include "skin_fonts.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
@@ -156,6 +157,8 @@ static int parse_statusbar_disable(const char *wps_bufptr,
 static int parse_image_display(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_image_load(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data);
+static int parse_font_load(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 #endif /*HAVE_LCD_BITMAP */
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
@@ -353,6 +356,7 @@ static const struct wps_tag all_tags[] = {
                                                        parse_image_display },
 
     { WPS_TOKEN_IMAGE_DISPLAY,            "x",   0,       parse_image_load },
+    { WPS_NO_TOKEN,                       "Fl",  0,       parse_font_load },
 #ifdef HAVE_ALBUMART
     { WPS_NO_TOKEN,                       "Cl",  0,    parse_albumart_load },
     { WPS_TOKEN_ALBUMART_DISPLAY,         "C",   WPS_REFRESH_STATIC,  parse_albumart_display },
@@ -688,6 +692,39 @@ static int parse_image_load(const char *wps_bufptr,
     return skip_end_of_line(wps_bufptr);
 }
 
+static int font_ids[MAXUSERFONTS];
+static int parse_font_load(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data)
+{
+    (void)wps_data; (void)token;
+    const char *ptr = wps_bufptr;
+    int id;
+    char *filename, buf[MAX_PATH];
+    
+    if (*ptr != '|')
+        return WPS_ERROR_INVALID_PARAM;
+
+    ptr++;
+
+    if (!(ptr = parse_list("ds", NULL, '|', ptr, &id, &filename)))
+        return WPS_ERROR_INVALID_PARAM;
+
+    /* Check there is a terminating | */
+    if (*ptr != '|')
+        return WPS_ERROR_INVALID_PARAM;
+        
+    if (id <= FONT_UI || id >= MAXFONTS-1)
+        return WPS_ERROR_INVALID_PARAM;
+    id -= SYSTEMFONTCOUNT;
+    
+    memcpy(buf, filename, ptr-filename);
+    buf[ptr-filename] = '\0';
+    font_ids[id] = skin_font_load(buf);
+    
+    return font_ids[id] >= 0 ? skip_end_of_line(wps_bufptr) : WPS_ERROR_INVALID_PARAM;
+}
+    
+    
 static int parse_viewport_display(const char *wps_bufptr,
                                   struct wps_token *token,
                                   struct wps_data *wps_data)
@@ -890,7 +927,8 @@ static int parse_viewport(const char *wps_bufptr,
     else
         vp->flags &= ~VP_FLAG_ALIGN_RIGHT; /* ignore right-to-left languages */
 
-
+    if (vp->font >= SYSTEMFONTCOUNT)
+        vp->font = font_ids[vp->font - SYSTEMFONTCOUNT];
 
     struct skin_token_list *list = new_skin_token_list_item(NULL, skin_vp);
     if (!list)

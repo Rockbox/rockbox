@@ -247,6 +247,10 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_bitmap,
 #endif
     viewport_set_defaults,
+#ifdef HAVE_LCD_BITMAP
+    viewportmanager_theme_enable,
+    viewportmanager_theme_undo,
+#endif
     
     /* list */
     gui_synclist_init,
@@ -292,6 +296,7 @@ static const struct plugin_api rockbox_api = {
 #endif /* HAVE_BUTTON_LIGHT */
 
     /* file */
+    open_utf8,
 #ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
     (open_func)open_wrapper,
     close_wrapper,
@@ -325,6 +330,7 @@ static const struct plugin_api rockbox_api = {
     create_numbered_filename,
     file_exists,
     strip_extension,
+    crc_32,
 
     /* dir */
     opendir,
@@ -432,6 +438,7 @@ static const struct plugin_api rockbox_api = {
     atoi,
     strchr,
     strcat,
+    strlcat,
     memchr,
     memcmp,
     strcasestr,
@@ -476,6 +483,7 @@ static const struct plugin_api rockbox_api = {
     pcm_get_peak_buffer,
     pcm_play_lock,
     pcm_play_unlock,
+    pcmbuf_beep,
 #ifdef HAVE_RECORDING
     &rec_freq_sampr[0],
     pcm_init_recording,
@@ -588,6 +596,9 @@ static const struct plugin_api rockbox_api = {
 #endif
 
     /* misc */
+#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
+    &errno,
+#endif
     srand,
     rand,
     (qsort_func)qsort,
@@ -698,19 +709,6 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#if (CONFIG_CODEC == SWCODEC)
-    pcmbuf_beep,
-#endif
-    crc_32,
-    open_utf8,
-#ifdef HAVE_LCD_BITMAP
-    viewportmanager_theme_enable,
-    viewportmanager_theme_undo,
-#endif
-#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
-    &errno,
-#endif
-    strlcat,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

@@ -681,6 +681,9 @@ struct user_settings
     unsigned char icon_file[MAX_FILENAME+1];
     unsigned char viewers_icon_file[MAX_FILENAME+1];
     unsigned char font_file[MAX_FILENAME+1]; /* last font */
+#ifdef HAVE_REMOTE_LCD
+    unsigned char remote_font_file[MAX_FILENAME+1]; /* last font */
+#endif
     unsigned char kbd_file[MAX_FILENAME+1];  /* last keyboard */
 #endif /* HAVE_LCD_BITMAP */
 

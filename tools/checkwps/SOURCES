@@ -1,6 +1,9 @@
 ../../apps/gui/skin_engine/wps_debug.c
 ../../apps/gui/skin_engine/skin_parser.c
 ../../apps/gui/skin_engine/skin_buffer.c
+#ifdef HAVE_LCD_BITMAP
+../../apps/gui/skin_engine/skin_fonts.c
+#endif
 ../../apps/gui/viewport.c
 ../../apps/misc.c
 ../../firmware/common/strlcpy.c

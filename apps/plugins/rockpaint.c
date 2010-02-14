@@ -854,7 +854,7 @@ static bool browse_fonts( char *dst, int dst_size )
                     continue;
                 rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s",
                               de->d_name );
-                rb->font_load( bbuf );
+                rb->font_load(NULL, bbuf );
                 rb->font_getstringsize( de->d_name, &fw, &fh, FONT_UI );
                 if( nvih > 0 )
                 {
@@ -887,12 +887,12 @@ static bool browse_fonts( char *dst, int dst_size )
                 {
                     rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s",
                           de->d_name );
-                    rb->font_load( bbuf );
+                    rb->font_load(NULL, bbuf );
                     rb->font_getstringsize( de->d_name, NULL, &fh, FONT_UI );
                     nvih = fh;
                 }
             }
-            rb->font_load( buffer.text.old_font );
+            rb->font_load(NULL, buffer.text.old_font );
             rb->closedir( d );
         }
 
@@ -1526,7 +1526,7 @@ static void draw_text( int x, int y )
             case TEXT_MENU_FONT:
                 if( browse_fonts( buffer.text.font, MAX_PATH ) )
                 {
-                    rb->font_load( buffer.text.font );
+                    rb->font_load(NULL, buffer.text.font );
                 }
                 break;
 
@@ -1583,7 +1583,7 @@ static void draw_text( int x, int y )
             case TEXT_MENU_CANCEL:
             default:
                 restore_screen();
-                rb->font_load( buffer.text.old_font );
+                rb->font_load(NULL, buffer.text.old_font );
                 return;
         }
     }

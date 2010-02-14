@@ -379,6 +379,32 @@ int ft_load(struct tree_context* c, const char* tempdir)
 
     return 0;
 }
+#ifdef HAVE_LCD_BITMAP
+static void ft_load_font(char *file)
+{
+#if NB_SCREENS > 1
+    MENUITEM_STRINGLIST(menu, ID2P(LANG_CUSTOM_FONT), NULL, 
+                        ID2P(LANG_MAIN_SCREEN), ID2P(LANG_REMOTE_SCREEN))
+    switch (do_menu(&menu, NULL, NULL, false))
+    {
+        case 0: /* main lcd */        
+            splash(0, ID2P(LANG_WAIT));
+            font_load(NULL, file);
+            set_file(file, (char *)global_settings.font_file, MAX_FILENAME);
+            break;
+        case 1: /* remote */
+            splash(0, ID2P(LANG_WAIT));
+            font_load_remoteui(file);
+            set_file(file, (char *)global_settings.remote_font_file, MAX_FILENAME);
+            break;
+    }
+#else
+    splash(0, ID2P(LANG_WAIT));
+    font_load(NULL, file);
+    set_file(file, (char *)global_settings.font_file, MAX_FILENAME);
+#endif
+}    
+#endif
 
 int ft_enter(struct tree_context* c)
 {
@@ -547,9 +573,7 @@ int ft_enter(struct tree_context* c)
 
 #ifdef HAVE_LCD_BITMAP
             case FILE_ATTR_FONT:
-                splash(0, ID2P(LANG_WAIT));
-                font_load(buf);
-                set_file(buf, (char *)global_settings.font_file, MAX_FILENAME);
+                ft_load_font(buf);
                 break;
 
             case FILE_ATTR_KBD:

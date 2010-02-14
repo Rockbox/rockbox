@@ -31,6 +31,7 @@
 #include "settings.h"
 #include "viewport.h"
 #include "file.h"
+#include "font.h"
 
 bool debug_wps = true;
 int wps_verbose_level = 0;
@@ -233,6 +234,21 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
     display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     display->fillrect(xstart, ystart, width, height);
     display->set_drawmode(DRMODE_SOLID);
+}
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+static int loaded_fonts = 0;
+int font_load(struct font* pf, const char *path)
+{
+    int id = SYSTEMFONTCOUNT + loaded_fonts;
+    loaded_fonts++;
+    return id;
+}
+    
+void font_unload(int font_id)
+{
+    (void)font_id;
 }
 #endif
 

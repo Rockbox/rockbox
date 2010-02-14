@@ -1393,7 +1393,16 @@ int gen_c_source(struct font* pf, char *path)
             "  %s  /* offset */\n"
             "  %s\n"
             "  %d,  /* defaultchar */\n"
-            "  %d   /* bits_size */\n"
+            "  %d,   /* bits_size */\n"
+            "  -1,   /* font fd */\n"
+            "  0,   /* buffer start */\n"
+            "  0,   /* ^ position */\n"
+            "  0,   /* ^ end */\n"
+            "  0,   /* ^ size  */\n"
+            "  {{0,0,0,0,0},0,0,0},   /* cache  */\n"
+            "  0,   /*   */\n"
+            "  0,   /*   */\n"
+            "  0,   /*   */\n"
             "};\n"
             "#endif /* HAVE_LCD_BITMAP */\n",
             pf->maxwidth, pf->height,

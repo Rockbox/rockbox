@@ -13315,3 +13315,37 @@
     lcd_bitmap: "Remote Base Skin"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Main Screen"
+  </dest>
+  <voice>
+    *:none
+    remote: "Main Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Remote Screen"
+  </dest>
+  <voice>
+    *:none
+    remote: "Remote Screen"
+  </voice>
+</phrase>

@@ -30,6 +30,7 @@
 
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
 #ifndef __PCTOOL__
+#include "font_cache.h"
 #include "sysfont.h"
 #endif
 
@@ -47,8 +48,13 @@
 enum {
     FONT_SYSFIXED, /* system fixed pitch font*/
     FONT_UI,       /* system porportional font*/
-    MAXFONTS
+#ifdef HAVE_REMOTE_LCD
+    FONT_UI_REMOTE, /* UI font for remote LCD */
+#endif
+    SYSTEMFONTCOUNT /* Number of fonts reserved for the system and ui */
 };
+
+#define MAXFONTS 10
 
 /*
  * .fnt loadable font file format definition
@@ -89,17 +95,38 @@ struct font {
     const unsigned char *width;   /* character widths or NULL if fixed*/
     int          defaultchar;     /* default char (not glyph index)*/
     int32_t      bits_size;       /* # bytes of glyph bits*/
+    
+    /* file, buffer and cache management */
+    int          fd;              /* fd for the font file. >= 0 if cached */
+    unsigned char *buffer_start;    /* buffer to store the font in */       
+    unsigned char *buffer_position; /* position in the buffer */    
+    unsigned char *buffer_end;      /* end of the buffer */
+    int          buffer_size;       /* size of the buffer in bytes */
+#ifndef __PCTOOL__    
+    struct font_cache cache;
+    uint32_t file_width_offset;    /* offset to file width data    */
+    uint32_t file_offset_offset;   /* offset to file offset data   */
+    int long_offset;
+#endif    
+    
 };
 
 /* font routines*/
 void font_init(void);
-struct font* font_load(const char *path);
+#ifdef HAVE_REMOTE_LCD
+/* Load a font into the special remote ui font slot */
+int font_load_remoteui(const char* path);
+#endif
+int font_load(struct font* pf, const char *path);
+void font_unload(int font_id);
+
 struct font* font_get(int font);
-void font_reset(void);
+
+void font_reset(struct font *pf);
 int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber);
 int font_get_width(struct font* ft, unsigned short ch);
 const unsigned char * font_get_bits(struct font* ft, unsigned short ch);
-void glyph_cache_save(void);
+void glyph_cache_save(struct font* pf);
 
 #else /* HAVE_LCD_BITMAP */
 

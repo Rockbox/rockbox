@@ -315,7 +315,7 @@ void viewport_set_fullscreen(struct viewport *vp,
 #ifndef __PCTOOL__
     set_default_align_flags(vp);
 #endif
-    vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */
+    vp->font = FONT_UI + screen; /* default to UI to discourage SYSFONT use */
     vp->drawmode = DRMODE_SOLID;
 #if LCD_DEPTH > 1
 #ifdef HAVE_REMOTE_LCD
@@ -453,11 +453,15 @@ const char* viewport_parse_viewport(struct viewport *vp,
         return NULL;
     }
 
-    /* Default to using the user font if the font was an invalid number or '-'*/
-    if (((vp->font != FONT_SYSFIXED) && (vp->font != FONT_UI))
-            || !LIST_VALUE_PARSED(set, PL_FONT)
-            )
-        vp->font = FONT_UI;
+    /* Default to using the user font if the font was an invalid number or '-'
+     * font 1 is *always* the UI font for the current screen
+     * 2 is always the first extra font    */
+    if (!LIST_VALUE_PARSED(set, PL_FONT))
+        vp->font = FONT_UI + screen;
+#ifdef HAVE_REMOTE_LCD
+    else if (vp->font == FONT_UI && screen == SCREEN_REMOTE)
+        vp->font = FONT_UI_REMOTE;
+#endif
 
     /* Set the defaults for fields not user-specified */
     vp->drawmode = DRMODE_SOLID;

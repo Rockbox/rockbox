@@ -1432,6 +1432,10 @@ const struct settings_list settings[] = {
     TEXT_SETTING(F_THEMESETTING, font_file, "font",
                      DEFAULT_FONTNAME, FONT_DIR "/", ".fnt"),
 #endif
+#ifdef HAVE_REMOTE_LCD
+    TEXT_SETTING(F_THEMESETTING, remote_font_file, "remote font",
+                     "", FONT_DIR "/", ".fnt"),
+#endif
     TEXT_SETTING(F_THEMESETTING,wps_file, "wps",
                      DEFAULT_WPSNAME, WPS_DIR "/", ".wps"),
 #ifdef HAVE_LCD_BITMAP

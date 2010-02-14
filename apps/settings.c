@@ -68,6 +68,7 @@
 #endif
 #include "wps.h"
 #include "skin_engine/skin_engine.h"
+#include "skin_engine/skin_fonts.h"
 #include "viewport.h"
 #include "statusbar-skinned.h"
 
@@ -740,6 +741,7 @@ void settings_apply_skins(void)
     /* re-initialize the skin buffer before we start reloading skins */
     skin_buffer_init();
 #ifdef HAVE_LCD_BITMAP
+    skin_font_init();
     if ( global_settings.sbs_file[0] &&
         global_settings.sbs_file[0] != 0xff )
     {
@@ -887,18 +889,26 @@ void settings_apply(bool read_disk)
 
     if (read_disk)
     {
-        
 #ifdef HAVE_LCD_BITMAP
         /* fonts need to be loaded before the WPS */
         if ( global_settings.font_file[0]) {
             snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                      global_settings.font_file);
-            if (font_load(buf) == NULL)
-                font_reset();
+            if (font_load(NULL, buf) < 0)
+                font_reset(NULL);
         }
         else
-            font_reset();
-    
+            font_reset(NULL);
+#ifdef HAVE_REMOTE_LCD        
+        if ( global_settings.remote_font_file[0]) {
+            snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
+                     global_settings.remote_font_file);
+            if (font_load_remoteui(buf) < 0)
+                font_load_remoteui(NULL);
+        }
+        else
+            font_load_remoteui(NULL);
+#endif
         if ( global_settings.kbd_file[0]) {
             snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
                      global_settings.kbd_file);

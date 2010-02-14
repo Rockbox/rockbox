@@ -135,12 +135,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 180
+#define PLUGIN_API_VERSION 181
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 180
+#define PLUGIN_MIN_API_VERSION 181
 
 /* plugin return codes */
 enum plugin_status {
@@ -250,7 +250,7 @@ struct plugin_api {
 #endif
     unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
     const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
-    struct font* (*font_load)(const char *path);
+    int (*font_load)(struct font*, const char *path);
     struct font* (*font_get)(int font);
     int  (*font_getstringsize)(const unsigned char *str, int *w, int *h,
                                int fontnumber);
@@ -336,7 +336,12 @@ struct plugin_api {
                               int width, int height);
 #endif
     void (*viewport_set_defaults)(struct viewport *vp,
-                                  const enum screen_type screen);
+                                  const enum screen_type screen);                                  
+#ifdef HAVE_LCD_BITMAP
+    void (*viewportmanager_theme_enable)(enum screen_type screen, bool enable,
+                                         struct viewport *viewport);
+    void (*viewportmanager_theme_undo)(enum screen_type screen, bool force_redraw);
+#endif
     /* list */
     void (*gui_synclist_init)(struct gui_synclist * lists,
             list_get_name callback_get_item_name, void * data,
@@ -390,6 +395,7 @@ struct plugin_api {
 #endif /* HAVE_BUTTON_LIGHT */
 
     /* file */
+    int (*open_utf8)(const char* pathname, int flags);
     int (*open)(const char* pathname, int flags);
     int (*close)(int fd);
     ssize_t (*read)(int fd, void* buf, size_t count);
@@ -416,6 +422,7 @@ struct plugin_api {
                                       int numberlen IF_CNFN_NUM_(, int *num));
     bool (*file_exists)(const char *file);
     char* (*strip_extension)(char* buffer, int buffer_size, const char *filename);
+    unsigned (*crc_32)(const void *src, unsigned len, unsigned crc32);
 
 
     /* dir */
@@ -537,6 +544,7 @@ struct plugin_api {
     int (*atoi)(const char *str);
     char *(*strchr)(const char *s, int c);
     char *(*strcat)(char *s1, const char *s2);
+    size_t (*strlcat)(char *dst, const char *src, size_t length);
     void *(*memchr)(const void *s1, int c, size_t n);
     int (*memcmp)(const void *s1, const void *s2, size_t n);
     char *(*strcasestr) (const char* phaystack, const char* pneedle);
@@ -583,6 +591,9 @@ struct plugin_api {
     const void* (*pcm_get_peak_buffer)(int *count);
     void (*pcm_play_lock)(void);
     void (*pcm_play_unlock)(void);
+    void (*pcmbuf_beep)(unsigned int frequency,
+                        size_t duration,
+                        int amplitude);
 #ifdef HAVE_RECORDING
     const unsigned long *rec_freq_sampr;
     void (*pcm_init_recording)(void);
@@ -716,6 +727,9 @@ struct plugin_api {
 #endif
 
     /* misc */
+#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
+    int* __errno;
+#endif
     void (*srand)(unsigned int seed);
     int  (*rand)(void);
     void (*qsort)(void *base, size_t nmemb, size_t size,
@@ -848,23 +862,6 @@ struct plugin_api {
     const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-#if (CONFIG_CODEC == SWCODEC)
-    void (*pcmbuf_beep)(unsigned int frequency,
-                        size_t duration,
-                        int amplitude);
-#endif
-    unsigned (*crc_32)(const void *src, unsigned len, unsigned crc32);
-    int (*open_utf8)(const char* pathname, int flags);
-#ifdef HAVE_LCD_BITMAP
-    void (*viewportmanager_theme_enable)(enum screen_type screen, bool enable,
-                                         struct viewport *viewport);
-    void (*viewportmanager_theme_undo)(enum screen_type screen, bool force_redraw);
-#endif
-#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
-    int* __errno;
-#endif
-    size_t (*strlcat)(char *dst, const char *src, size_t length);
 };
 
 /* plugin header */
