@@ -17,7 +17,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+#ifndef _FONT_CACHE_H_
+#define _FONT_CACHE_H_
 #include "lru.h"
 
 /*******************************************************************************
@@ -48,3 +49,5 @@ struct font_cache_entry* font_cache_get(
     unsigned short char_code,
     void (*callback) (struct font_cache_entry* p, void *callback_data),
     void *callback_data);
+
+#endif
