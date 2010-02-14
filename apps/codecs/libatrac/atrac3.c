@@ -189,23 +189,8 @@ static void iqmf (int32_t *inlo, int32_t *inhi, unsigned int nIn, int32_t *pOut,
  * @param odd_band  1 if the band is an odd band
  */
 
-static void IMLT(int32_t *pInput, int32_t *pOutput, int odd_band)
+static void IMLT(int32_t *pInput, int32_t *pOutput)
 {
-    int     i;
-    if (odd_band) {
-        /**
-        * Reverse the odd bands before IMDCT, this is an effect of the QMF transform
-        * or it gives better compression to do it this way.
-        * FIXME: It should be possible to handle this in ff_imdct_calc
-        * for that to happen a modification of the prerotation step of
-        * all SIMD code and C code is needed.
-        * Or fix the functions before so they generate a pre reversed spectrum.
-        */
-
-        for (i=0; i<128; i++)
-            FFSWAP(int32_t, pInput[i], pInput[255-i]);
-    }
- 
     /* Apply the imdct. */
     mdct_backward(512, pInput, pOutput);
 
@@ -365,8 +350,15 @@ static int decodeSpectrum (GetBitContext *gb, int32_t *pOut)
             SF = fixmul31(SFTable_fixed[SF_idxs[cnt]], iMaxQuant_fix[subband_vlc_index[cnt]]);
 
             /* Inverse quantize the coefficients. */
-            for (pIn=mantissas ; first<last; first++, pIn++)
-                pOut[first] = fixmul16(*pIn, SF);
+            if((first/256) &1) {
+                /* Odd band - Reverse coefficients */
+                for (pIn=mantissas ; last>first; last--, pIn++)
+                    pOut[last] = fixmul16(*pIn, SF);
+            } else {
+                 for (pIn=mantissas ; first<last; first++, pIn++)
+                    pOut[first] = fixmul16(*pIn, SF);
+            }
+
         } else {
             /* This subband was not coded, so zero the entire subband. */
             memset(pOut+first, 0, subbWidth*sizeof(int32_t));
@@ -740,7 +732,7 @@ static int decodeChannelSoundUnit (GetBitContext *gb, channel_unit *pSnd, int32_
     for (band=0; band<4; band++) {
         /* Perform the IMDCT step without overlapping. */
         if (band <= numBands) {
-            IMLT(&(pSnd->spectrum[band*256]), pSnd->IMDCT_buf, band&1);
+            IMLT(&(pSnd->spectrum[band*256]), pSnd->IMDCT_buf);
         } else
             memset(pSnd->IMDCT_buf, 0, 512 * sizeof(int32_t));
 
