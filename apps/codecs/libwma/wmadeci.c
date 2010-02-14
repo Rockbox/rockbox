@@ -452,11 +452,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         }
     }
 
-    /*Not using the ffmpeg IMDCT anymore*/
-    /* yes we are */
-
-    mdct_init_global();
-
+    /* using the ffmpeg IMDCT - init (really inits the fft) */
     for(i = 0; i < s->nb_block_sizes; ++i)
     {
         ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1);

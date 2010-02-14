@@ -335,12 +335,6 @@ void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
     }
 }
 
-/* init MDCT */
-int mdct_init_global(void)
-{
-    return 0;
-}
-
 static const long cordic_circular_gain = 0xb2458939; /* 0.607252929 */
 
 /* Table of values of atan(2^-i) in 0.32 format fractions of pi where pi = 0xffffffff / 2 */
