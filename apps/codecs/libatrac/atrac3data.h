@@ -117,18 +117,18 @@ static const int8_t decTable1[18] = {0,0, 0,1, 0,-1, 1,0, -1,0, 1,1, 1,-1, -1,1,
 
 
 /* tables for the scalefactor decoding */
-
+/* not needed anymore
 static const float iMaxQuant[8] = {
   0.0, 1.0/1.5, 1.0/2.5, 1.0/3.5, 1.0/4.5, 1.0/7.5, 1.0/15.5, 1.0/31.5
 };
-
+*/
 static const uint16_t subbandTab[33] = {
   0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224,
   256, 288, 320, 352, 384, 416, 448, 480, 512, 576, 640, 704, 768, 896, 1024
 };
 
 /* transform data */
-
+/* not needed anymore
 static const float qmf_48tap_half[24] = {
    -0.00001461907, -0.00009205479, -0.000056157569, 0.00030117269,
     0.0002422519,-0.00085293897, -0.0005205574, 0.0020340169,
@@ -137,8 +137,9 @@ static const float qmf_48tap_half[24] = {
    -0.007801671, -0.034090221, 0.01880949, 0.054326009,
    -0.043596379, -0.099384367, 0.13207909, 0.46424159
 };
-
+*/
 /* joint stereo related tables */
+/* not needed anymore
 static const float matrixCoeffs[8] = {0.0, 2.0, 2.0, 2.0, 0.0, 0.0, 1.0, 1.0};
-
+*/
 #endif /* AVCODEC_ATRAC3DATA_H */

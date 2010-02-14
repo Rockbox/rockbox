@@ -98,6 +98,20 @@ static channel_unit     channel_units[2] IBSS_ATTR_LARGE_IRAM;
  * @param in        input buffer
  * @param win       windowing coefficients
  * @param nIn       size of spectrum buffer
+ * Reference implementation:
+ *
+ * for (j = nIn; j != 0; j--) {
+ *          s1 = fixmul32(in[0], win[0]);
+ *          s2 = fixmul32(in[1], win[1]);
+ *          for (i = 2; i < 48; i += 2) {
+ *              s1 += fixmul31(in[i  ], win[i  ]);
+ *              s2 += fixmul31(in[i+1], win[i+1]);
+ *          }
+ *          out[0] = s2;
+ *          out[1] = s1;
+ *          in += 2;
+ *          out += 2;
+ *      }
  */
  
 #if defined(CPU_ARM)
@@ -116,16 +130,62 @@ static channel_unit     channel_units[2] IBSS_ATTR_LARGE_IRAM;
         int32_t i, j, s1, s2;
         
         for (j = nIn; j != 0; j--) {
-            /* i=0 */
-            s1 = fixmul31(win[0], in[0]);
-            s2 = fixmul31(win[1], in[1]);
-    
-            /* i=2..46 */
-            for (i = 2; i < 48; i += 2) {
-                s1 += fixmul31(win[i  ], in[i  ]);
-                s2 += fixmul31(win[i+1], in[i+1]);
-            }
-    
+            i = 0;
+            /*  0.. 7 */
+            s1  = fixmul31(win[i], in[i]); i++;
+            s2  = fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            /*  8..15 */
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            /* 16..23 */
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            /* 24..31 */
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            /* 32..39 */
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            /* 40..47 */
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]); i++;
+            s1 += fixmul31(win[i], in[i]); i++;
+            s2 += fixmul31(win[i], in[i]);
+
             out[0] = s2;
             out[1] = s1;
     

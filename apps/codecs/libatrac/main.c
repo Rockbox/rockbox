@@ -9,6 +9,8 @@
 #include "atrac3.h"
 #include "../librm/rm.h"
 
+ATRAC3Context q IBSS_ATTR;
+
 static unsigned char wav_header[44]={
     'R','I','F','F',//  0 - ChunkID
     0,0,0,0,        //  4 - ChunkSize (filesize-8)
@@ -101,7 +103,6 @@ int main(int argc, char *argv[])
     int16_t outbuf[2048];
     uint16_t fs,sps,h;
     uint32_t packet_count;
-    ATRAC3Context q;
     RMContext rmctx;
     RMPacket pkt;
 
