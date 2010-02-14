@@ -703,7 +703,7 @@ int wps_get_touchaction(struct wps_data *data)
                                             (max_vol - min_vol)) / r->width;
                         else
                             /* portrait */
-                            global_settings.volume = (vy *
+                            global_settings.volume = ((r->height - vy) *
                                                 (max_vol-min_vol)) / r->height;
 
                         global_settings.volume += min_vol;
