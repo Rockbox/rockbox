@@ -308,6 +308,15 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define MPEG_RW         BUTTON_REW
 #define MPEG_FF         BUTTON_FFWD
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define MPEG_MENU       BUTTON_MENU
+#define MPEG_STOP       BUTTON_REC
+#define MPEG_PAUSE      BUTTON_PLAY
+#define MPEG_VOLDOWN    BUTTON_DOWN
+#define MPEG_VOLUP      BUTTON_UP
+#define MPEG_RW         BUTTON_PREV
+#define MPEG_FF         BUTTON_NEXT
+
 #else
 #error No keymap defined!
 #endif

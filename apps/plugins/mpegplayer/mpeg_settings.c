@@ -196,6 +196,16 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_RIGHT2      BUTTON_FFWD
 #define MPEG_START_TIME_EXIT        BUTTON_REC
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define MPEG_START_TIME_SELECT      BUTTON_PLAY
+#define MPEG_START_TIME_LEFT        BUTTON_PREV
+#define MPEG_START_TIME_RIGHT       BUTTON_NEXT
+#define MPEG_START_TIME_UP          BUTTON_UP
+#define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_LEFT2       BUTTON_OK
+#define MPEG_START_TIME_RIGHT2      BUTTON_CANCEL
+#define MPEG_START_TIME_EXIT        BUTTON_REC
+
 #else
 #error No keymap defined!
 #endif

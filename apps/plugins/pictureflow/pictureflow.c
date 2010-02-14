@@ -145,6 +145,8 @@ const struct button_mapping pf_context_buttons[] =
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD || \
     CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == ONDIO_PAD
     {PF_QUIT,         BUTTON_OFF,                 BUTTON_NONE},
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+    {PF_QUIT,         BUTTON_REC,                 BUTTON_NONE},
 #endif
 #if CONFIG_KEYPAD == IAUDIO_M3_PAD
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD|CONTEXT_REMOTE)

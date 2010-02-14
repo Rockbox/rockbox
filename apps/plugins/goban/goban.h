@@ -297,6 +297,18 @@
 /* No advance/retreat */
 /* no next var */
 
+#elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
+#define  GBN_BUTTON_UP                 BUTTON_UP
+#define  GBN_BUTTON_DOWN               BUTTON_DOWN
+#define  GBN_BUTTON_LEFT               BUTTON_PREV
+#define  GBN_BUTTON_RIGHT              BUTTON_NEXT
+#define  GBN_BUTTON_RETREAT            (BUTTON_OK | BUTTON_PREV)
+#define  GBN_BUTTON_ADVANCE            (BUTTON_OK | BUTTON_NEXT)
+#define  GBN_BUTTON_MENU               BUTTON_MENU
+#define  GBN_BUTTON_PLAY               BUTTON_PLAY
+#define  GBN_BUTTON_CONTEXT            BUTTON_OK
+#define  GBN_BUTTON_NEXT_VAR           BUTTON_CANCEL
+
 #else
 #error Unsupported keypad
 #endif

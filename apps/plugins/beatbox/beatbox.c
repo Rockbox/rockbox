@@ -89,6 +89,12 @@ PLUGIN_IRAM_DECLARE
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define BTN_QUIT         BUTTON_REC
+#define BTN_RIGHT        BUTTON_NEXT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+
 #endif
 
 

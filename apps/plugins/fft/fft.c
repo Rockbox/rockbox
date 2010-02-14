@@ -187,6 +187,14 @@ GREY_INFO_STRUCT
 #elif (CONFIG_KEYPAD == ONDAVX777_PAD)
 #   define FFT_QUIT             BUTTON_POWER
 
+#elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
+#   define FFT_PREV_GRAPH       BUTTON_PREV
+#   define FFT_NEXT_GRAPH       BUTTON_NEXT
+#   define FFT_ORIENTATION      BUTTON_MENU
+#   define FFT_WINDOW           BUTTON_OK
+#   define FFT_SCALE            BUTTON_PLAY
+#   define FFT_QUIT             BUTTON_REC
+
 #else
 #error No keymap defined!
 #endif

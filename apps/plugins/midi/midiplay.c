@@ -187,6 +187,14 @@ PLUGIN_IRAM_DECLARE
 #define BTN_DOWN         BUTTON_DOWN
 #define BTN_PLAY         BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define BTN_QUIT         BUTTON_REC
+#define BTN_RIGHT        BUTTON_NEXT
+#define BTN_LEFT         BUTTON_PREV
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+#define BTN_PLAY         BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

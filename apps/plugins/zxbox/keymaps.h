@@ -180,6 +180,15 @@
 #define ZX_SELECT       BUTTON_PLAY
 #define ZX_MENU         BUTTON_FFWD
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+
+#define ZX_UP           BUTTON_UP
+#define ZX_DOWN         BUTTON_DOWN
+#define ZX_LEFT         BUTTON_PREV
+#define ZX_RIGHT        BUTTON_NEXT
+#define ZX_SELECT       BUTTON_OK
+#define ZX_MENU         BUTTON_MENU
+
 #else
 #error Keymap not defined!
 

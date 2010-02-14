@@ -356,6 +356,16 @@
 #define CB_LEVEL   (BUTTON_FFWD|BUTTON_UP)
 #define CB_MENU    (BUTTON_FFWD|BUTTON_LEFT)
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define CB_SELECT  BUTTON_OK
+#define CB_UP      BUTTON_UP
+#define CB_DOWN    BUTTON_DOWN
+#define CB_LEFT    BUTTON_PREV
+#define CB_RIGHT   BUTTON_NEXT
+#define CB_PLAY    BUTTON_PLAY
+#define CB_LEVEL   BUTTON_CANCEL
+#define CB_MENU    BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

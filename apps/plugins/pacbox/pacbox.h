@@ -221,6 +221,17 @@
 #define PACMAN_COIN     BUTTON_FFWD
 #define PACMAN_MENU     BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+
+#define PACMAN_UP       BUTTON_UP
+#define PACMAN_DOWN     BUTTON_DOWN
+#define PACMAN_LEFT     BUTTON_PREV
+#define PACMAN_RIGHT    BUTTON_NEXT
+#define PACMAN_1UP      BUTTON_PLAY
+#define PACMAN_2UP      BUTTON_REC
+#define PACMAN_COIN     BUTTON_OK
+#define PACMAN_MENU     BUTTON_MENU
+
 #else
 
 #error Keymap not defined!
