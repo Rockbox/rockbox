@@ -60,7 +60,7 @@ typedef struct FFTContext {
 int ff_fft_init(void *s, int nbits, int inverse);
 
 // internal api  (fft<->mdct)
-int fft_calc_unscaled(FFTContext *s, FFTComplex *z);
+//int fft_calc_unscaled(FFTContext *s, FFTComplex *z);
 //void ff_fft_permute_c(FFTContext *s, FFTComplex *z); // internal only?
 void ff_fft_calc_c(FFTContext *s, FFTComplex *z);
 
