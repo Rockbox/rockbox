@@ -1613,6 +1613,7 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     id3->albumartist  = get_tag_string(entry, tag_albumartist);
     id3->grouping     = get_tag_string(entry, tag_grouping);
 
+    id3->length     = get_tag_numeric(entry, tag_length);
     id3->playcount  = get_tag_numeric(entry, tag_playcount);
     id3->rating     = get_tag_numeric(entry, tag_rating);
     id3->lastplayed = get_tag_numeric(entry, tag_lastplayed);
