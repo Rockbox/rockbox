@@ -157,7 +157,7 @@ static const unsigned char morse_codes[] = {
 int load_kbd(unsigned char* filename)
 {
     int fd, l;
-    int i = 0, line_len, max_line_len;
+    int i, line_len, max_line_len;
     unsigned char buf[4];
 
     if (filename == NULL)
@@ -171,7 +171,8 @@ int load_kbd(unsigned char* filename)
         return 1;
 
     line_len = 0;
-    max_line_len = 0;
+    max_line_len = 1;
+    i = 0;
     while (read(fd, buf, 1) == 1 && i < KBD_BUF_SIZE)
     {
         /* check how many bytes to read for this character */
@@ -214,6 +215,9 @@ int load_kbd(unsigned char* filename)
 
     close(fd);
     kbd_loaded = true;
+
+    if (max_line_len < line_len)
+        max_line_len = line_len;
 
     FOR_NB_SCREENS(l)
     {
@@ -948,6 +952,8 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
             i++;
         }
     }
+    if (pm->nchars == 0)
+        pm->kbd_buf[pm->nchars++] = ' ';
 
     /* calculate pm->pages and pm->lines */
     sc_h = sc->getheight();
