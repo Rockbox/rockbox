@@ -410,19 +410,13 @@ static int decodeSpectrum (GetBitContext *gb, int32_t *pOut)
             SF = fixmul31(SFTable_fixed[SF_idxs[cnt]], iMaxQuant_fix[subband_vlc_index[cnt]]);
 
             /* Inverse quantize the coefficients. */
-
-            /* Remark: Hardcoded hack to add 2 bits (empty) fract part to internal sample
-             * representation. Needed for higher accuracy in internal calculations as
-             * well as for DSP configuration. See also: ../atrac3_rm.c, DSP_SET_SAMPLE_DEPTH 
-             * Todo: Check spectral requantisation for using and outputting samples with 
-             * fract part. */
             if((first/256) &1) {
                 /* Odd band - Reverse coefficients */
                 for (pIn=mantissas ; last>first; last--, pIn++)
-                    pOut[last] = fixmul16(*pIn, SF) << 2;
+                    pOut[last] = fixmul16(*pIn, SF);
             } else {
                  for (pIn=mantissas ; first<last; first++, pIn++)
-                    pOut[first] = fixmul16(*pIn, SF) << 2;
+                    pOut[first] = fixmul16(*pIn, SF);
             }
 
         } else {
@@ -783,6 +777,16 @@ static int decodeChannelSoundUnit (GetBitContext *gb, channel_unit *pSnd, int32_
     numBands = (subbandTab[numSubbands] - 1) >> 8;
     if (lastTonal >= 0)
         numBands = FFMAX((lastTonal + 256) >> 8, numBands);
+        
+    /* Remark: Hardcoded hack to add 2 bits (empty) fract part to internal sample
+     * representation. Needed for higher accuracy in internal calculations as
+     * well as for DSP configuration. See also: ../atrac3_rm.c, DSP_SET_SAMPLE_DEPTH 
+     * Todo: Check spectral requantisation for using and outputting samples with 
+     * fract part. */
+    int32_t i;
+    for (i=0; i<1024; ++i) {
+        pSnd->spectrum[i] <<= 2;
+    }
 
     /* Reconstruct time domain samples. */
     for (band=0; band<4; band++) {
