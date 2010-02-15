@@ -171,12 +171,20 @@ simcc () {
  GCCOPTS="$GCCOPTS -I\$(SIMDIR)"
 
  if test "X$crosscompile" != "Xyes"; then
-   if [ "`uname -m`" = "x86_64" ] || [ "`uname -m`" = "amd64" ]; then
-     # fPIC is needed to make shared objects link
-     # setting visibility to hidden is necessary to avoid strange crashes
-     # due to symbol clashing
-     GCCOPTS="$GCCOPTS -fPIC -fvisibility=hidden"
-   fi
+   case `uname -m` in
+    x86_64|amd64)
+      # fPIC is needed to make shared objects link
+      # setting visibility to hidden is necessary to avoid strange crashes
+      # due to symbol clashing
+      GCCOPTS="$GCCOPTS -fPIC -fvisibility=hidden"
+      # x86_64 supports MMX by default
+    ;;
+
+    i686)
+      echo "Enabling MMX support"
+      GCCOPTS="$GCCOPTS -mmmx"
+    ;;
+   esac
 
    id=$$
    cat >$tmpdir/conftest-$id.c <<EOF
@@ -218,6 +226,8 @@ EOF
    LDOPTS="-mconsole $sdl_libs"
    output="rockboxui.exe" # use this as output binary name
    endian="little" # windows is little endian
+   echo "Enabling MMX support"
+   GCCOPTS="$GCCOPTS -mmmx"
  fi
 }
 
