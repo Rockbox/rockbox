@@ -55,9 +55,12 @@
 #define FFMIN(a,b) ((a) > (b) ? (b) : (a))
 #define FFSWAP(type,a,b) do{type SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
 
-static int32_t          qmf_window[48] IBSS_ATTR;
-static VLC              spectral_coeff_tab[7];
-static channel_unit     channel_units[2] IBSS_ATTR_LARGE_IRAM;
+static VLC          spectral_coeff_tab[7];
+static int32_t      qmf_window[48] IBSS_ATTR;
+static int32_t      atrac3_spectrum [2][1024] IBSS_ATTR __attribute__((aligned(16)));
+static int32_t      atrac3_IMDCT_buf[2][ 512] IBSS_ATTR __attribute__((aligned(16)));
+static int32_t      atrac3_prevFrame[2][1024] IBSS_ATTR;
+static channel_unit channel_units[2] IBSS_ATTR_LARGE_IRAM;
 
 
 /**
@@ -425,7 +428,7 @@ static void inverseQuantizeSpectrum(int *mantissas, int32_t *pOut,
  * @return outSubbands  subband counter, fix for broken specification/files
  */
 
-int decodeSpectrum (GetBitContext *gb, int32_t *pOut) ICODE_ATTR;
+int decodeSpectrum (GetBitContext *gb, int32_t *pOut) ICODE_ATTR_LARGE_IRAM;
 int decodeSpectrum (GetBitContext *gb, int32_t *pOut)
 {
     int   numSubbands, codingMode, cnt, first, last, subbWidth;
@@ -1228,7 +1231,14 @@ int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
         q->matrix_coeff_index_next[i] = 3;
     }
    
+    /* Link the iram'ed arrays to the decoder's data structure */
     q->pUnits = channel_units;
+    q->pUnits[0].spectrum  = &atrac3_spectrum [0][0];
+    q->pUnits[1].spectrum  = &atrac3_spectrum [1][0];
+    q->pUnits[0].IMDCT_buf = &atrac3_IMDCT_buf[0][0];
+    q->pUnits[1].IMDCT_buf = &atrac3_IMDCT_buf[1][0];
+    q->pUnits[0].prevFrame = &atrac3_prevFrame[0][0];
+    q->pUnits[1].prevFrame = &atrac3_prevFrame[1][0];
     
     return 0;
 }
