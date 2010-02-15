@@ -59,6 +59,7 @@ static int32_t          qmf_window[48] IBSS_ATTR;
 static VLC              spectral_coeff_tab[7];
 static channel_unit     channel_units[2] IBSS_ATTR_LARGE_IRAM;
 
+
 /**
  * Matrixing within quadrature mirror synthesis filter.
  *
@@ -90,6 +91,7 @@ static channel_unit     channel_units[2] IBSS_ATTR_LARGE_IRAM;
         }
     }
 #endif
+
 
 /**
  * Matrixing within quadrature mirror synthesis filter.
@@ -195,6 +197,7 @@ static channel_unit     channel_units[2] IBSS_ATTR_LARGE_IRAM;
     }
 #endif
 
+
 /**
  * IMDCT windowing.
  *
@@ -213,6 +216,7 @@ atrac3_imdct_windowing(int32_t *buffer,
         buffer[511-i] = fixmul31(win[i], buffer[511-i]);
     }
 }
+
 
 /**
  * Quadrature mirror synthesis filter.
@@ -240,12 +244,13 @@ static void iqmf (int32_t *inlo, int32_t *inhi, unsigned int nIn, int32_t *pOut,
     memcpy(delayBuf, temp + (nIn << 1), 46*sizeof(int32_t));
 }
 
+
 /**
  * Regular 512 points IMDCT without overlapping, with the exception of the swapping of odd bands
  * caused by the reverse spectra of the QMF.
  *
- * @param pInput    float input
- * @param pOutput   float output
+ * @param pInput    input
+ * @param pOutput   output
  * @param odd_band  1 if the band is an odd band
  */
 
@@ -274,7 +279,7 @@ static int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes){
     uint32_t* obuf = (uint32_t*) out;
 
 #if ((defined(TEST) || defined(SIMULATOR)) && !defined(CPU_ARM))
-    off = 0; //no check for memory alignment of inbuffer
+    off = 0; /* no check for memory alignment of inbuffer */
 #else
     off = (intptr_t)inbuffer & 3;
 #endif /* TEST */
@@ -305,6 +310,7 @@ static void init_atrac3_transforms(void) {
         qmf_window[47 - i] = s;
     }
 }
+
 
 /**
  * Mantissa decoding
@@ -338,7 +344,7 @@ static void readQuantSpectralCoeffs (GetBitContext *gb, int selector, int coding
         } else {
             for (cnt = 0; cnt < numCodes; cnt++) {
                 if (numBits)
-                    code = get_bits(gb, numBits); //numBits is always 4 in this case
+                    code = get_bits(gb, numBits); /* numBits is always 4 in this case */
                 else
                     code = 0;
                 mantissas[cnt*2] = seTab_0[code >> 2];
@@ -366,6 +372,7 @@ static void readQuantSpectralCoeffs (GetBitContext *gb, int selector, int coding
     }
 }
 
+
 /**
  * Restore the quantized band spectrum coefficients
  *
@@ -382,8 +389,8 @@ int decodeSpectrum (GetBitContext *gb, int32_t *pOut)
     int   mantissas[128];
     int32_t SF;
 
-    numSubbands = get_bits(gb, 5); // number of coded subbands
-    codingMode = get_bits1(gb); // coding Mode: 0 - VLC/ 1-CLC
+    numSubbands = get_bits(gb, 5); /* number of coded subbands */
+    codingMode = get_bits1(gb); /* coding Mode: 0 - VLC/ 1-CLC */
 
     /* Get the VLC selector table for the subbands, 0 means not coded. */
     for (cnt = 0; cnt <= numSubbands; cnt++)
@@ -436,6 +443,7 @@ int decodeSpectrum (GetBitContext *gb, int32_t *pOut)
     memset(pOut+first, 0, (1024 - first) * sizeof(int32_t));
     return numSubbands;
 }
+
 
 /**
  * Restore the quantized tonal components
@@ -517,6 +525,7 @@ static int decodeTonalComponents (GetBitContext *gb, tonal_component *pComponent
     return component_count;
 }
 
+
 /**
  * Decode gain parameters for the coded bands
  *
@@ -554,21 +563,125 @@ static int decodeGainControl (GetBitContext *gb, gain_block *pGb, int numBands)
     return 0;
 }
 
+
+/**
+ * Apply fix (constant) gain and overlap for sample[start...255].
+ *
+ * @param pIn           input buffer
+ * @param pPrev         previous buffer to perform overlap against
+ * @param pOut          output buffer
+ * @param start         index to start with (always a multiple of 8)
+ * @param gain          gain to apply
+ */
+ 
+static void applyFixGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut, 
+                          int32_t start, int32_t gain)
+{
+    int32_t i = start;
+    
+    /* start is always a multiple of 8 and therefore allows us to unroll the 
+     * loop to 8 calculation per loop 
+     */
+    if (ONE_16 == gain) {
+        /* gain1 = 1.0 -> no multiplication needed, just adding */
+        /* Remark: This path is called >90%. */
+        do {
+            pOut[i] = pIn[i] + pPrev[i]; i++;
+            pOut[i] = pIn[i] + pPrev[i]; i++;
+            pOut[i] = pIn[i] + pPrev[i]; i++;
+            pOut[i] = pIn[i] + pPrev[i]; i++;
+            pOut[i] = pIn[i] + pPrev[i]; i++;
+            pOut[i] = pIn[i] + pPrev[i]; i++;
+            pOut[i] = pIn[i] + pPrev[i]; i++;
+            pOut[i] = pIn[i] + pPrev[i]; i++;
+        } while (i<256);
+    } else {
+        /* gain1 != 1.0 -> we need to do a multiplication */
+        /* Remark: This path is called seldom. */
+        do {
+            pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
+            pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
+            pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
+            pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
+            pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
+            pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
+            pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
+            pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
+        } while (i<256);
+    }
+}
+
+
+/**
+ * Apply variable gain and overlap. Returns sample index after applying gain,
+ * resulting sample index is always a multiple of 8.
+ *
+ * @param pIn           input buffer
+ * @param pPrev         previous buffer to perform overlap against
+ * @param pOut          output buffer
+ * @param start         index to start with (always a multiple of 8)
+ * @param end           end index for first loop (always a multiple of 8)
+ * @param gain1         current bands gain to apply
+ * @param gain2         next bands gain to apply
+ * @param gain_inc      stepwise adaption from gain1 to gain2
+ */
+ 
+static int applyVariableGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut, 
+                              int32_t start, int32_t end, 
+                              int32_t gain1, int32_t gain2, int32_t gain_inc)
+{
+    int32_t i = start;
+    
+    /* Apply fix gains until end index is reached */
+    do {
+        pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+        pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+        pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+        pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+        pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+        pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+        pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+        pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+    } while (i < end);
+
+    /* Interpolation is done over next eight samples */
+    pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+    gain2 = fixmul16(gain2, gain_inc);
+    pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+    gain2 = fixmul16(gain2, gain_inc);
+    pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+    gain2 = fixmul16(gain2, gain_inc);
+    pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+    gain2 = fixmul16(gain2, gain_inc);
+    pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+    gain2 = fixmul16(gain2, gain_inc);
+    pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+    gain2 = fixmul16(gain2, gain_inc);
+    pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+    gain2 = fixmul16(gain2, gain_inc);
+    pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
+    gain2 = fixmul16(gain2, gain_inc);
+    
+    return i;
+}
+
+
 /**
  * Apply gain parameters and perform the MDCT overlapping part
  *
- * @param pIn           input float buffer
- * @param pPrev         previous float buffer to perform overlap against
- * @param pOut          output float buffer
+ * @param pIn           input buffer
+ * @param pPrev         previous buffer to perform overlap against
+ * @param pOut          output buffer
  * @param pGain1        current band gain info
  * @param pGain2        next band gain info
  */
 
-static void gainCompensateAndOverlap (int32_t *pIn, int32_t *pPrev, int32_t *pOut, gain_info *pGain1, gain_info *pGain2)
+static void gainCompensateAndOverlap (int32_t *pIn, int32_t *pPrev, int32_t *pOut, 
+                                      gain_info *pGain1, gain_info *pGain2)
 {
     /* gain compensation function */
     int32_t  gain1, gain2, gain_inc;
-    int   cnt, numdata, nsample, startLoc, endLoc;
+    int   cnt, numdata, nsample, startLoc;
 
     if (pGain2->num_gain_data == 0)
         gain1 = ONE_16;
@@ -576,40 +689,34 @@ static void gainCompensateAndOverlap (int32_t *pIn, int32_t *pPrev, int32_t *pOu
         gain1 = gain_tab1[pGain2->levcode[0]];
 
     if (pGain1->num_gain_data == 0) {
-        for (cnt = 0; cnt < 256; cnt++)
-            pOut[cnt] = fixmul16(pIn[cnt], gain1) + pPrev[cnt];
+        /* Remark: This path is called >90%. */
+        /* Apply gain for all samples from 0...255 */
+        applyFixGain(pIn, pPrev, pOut, 0, gain1);
     } else {
+        /* Remark: This path is called seldom. */
         numdata = pGain1->num_gain_data;
         pGain1->loccode[numdata] = 32;
         pGain1->levcode[numdata] = 4;
-
-        nsample = 0; // current sample = 0
+        
+        nsample = 0; /* starting loop with =0 */
 
         for (cnt = 0; cnt < numdata; cnt++) {
             startLoc = pGain1->loccode[cnt] * 8;
-            endLoc = startLoc + 8;
 
-            gain2 = gain_tab1[pGain1->levcode[cnt]];
+            gain2    = gain_tab1[pGain1->levcode[cnt]];
             gain_inc = gain_tab2[(pGain1->levcode[cnt+1] - pGain1->levcode[cnt])+15];
 
-            /* interpolate */
-            for (; nsample < startLoc; nsample++)
-                pOut[nsample] = fixmul16((fixmul16(pIn[nsample], gain1) + pPrev[nsample]), gain2);
-
-            /* interpolation is done over eight samples */
-            for (; nsample < endLoc; nsample++) {
-                pOut[nsample] = fixmul16((fixmul16(pIn[nsample], gain1) + pPrev[nsample]),gain2);
-                gain2 = fixmul16(gain2, gain_inc);
-            }
+            /* Apply variable gain (gain1 -> gain2) to samples */
+            nsample  = applyVariableGain(pIn, pPrev, pOut, nsample, startLoc, gain1, gain2, gain_inc);
         }
-
-        for (; nsample < 256; nsample++)
-            pOut[nsample] = fixmul16(pIn[nsample], gain1) + pPrev[nsample];
+        /* Apply gain for the residual samples from nsample...255 */
+        applyFixGain(pIn, pPrev, pOut, nsample, gain1);
     }
 
     /* Delay for the overlapping part. */
     memcpy(pPrev, &pIn[256], 256*sizeof(int32_t));
 }
+
 
 /**
  * Combine the tonal band spectrum and regular band spectrum
@@ -638,6 +745,7 @@ static int addTonalComponents (int32_t *pSpectrum, int numComponents, tonal_comp
 
     return lastPos;
 }
+
 
 /**
  * Linear equidistant interpolation between two points x and y. 7 interpolation
@@ -712,7 +820,7 @@ static void reverseMatrixing(int32_t *su1, int32_t *su2, int *pPrevCode, int *pC
                 }
                 break;
             default:
-                //assert(0);
+                /* assert(0) */;
                 break;
         }
     }
@@ -755,17 +863,15 @@ static void channelWeighting (int32_t *su1, int32_t *su2, int *p3)
     }
 }
 
-
 /**
  * Decode a Sound Unit
  *
  * @param gb            the GetBit context
  * @param pSnd          the channel unit to be used
- * @param pOut          the decoded samples before IQMF in float representation
+ * @param pOut          the decoded samples before IQMF
  * @param channelNum    channel number
  * @param codingMode    the coding mode (JOINT_STEREO or regular stereo/mono)
  */
-
 
 static int decodeChannelSoundUnit (GetBitContext *gb, channel_unit *pSnd, int32_t *pOut, int channelNum, int codingMode)
 {
@@ -807,8 +913,9 @@ static int decodeChannelSoundUnit (GetBitContext *gb, channel_unit *pSnd, int32_
         /* Perform the IMDCT step without overlapping. */
         if (band <= numBands) {
             IMLT(&(pSnd->spectrum[band*256]), pSnd->IMDCT_buf);
-        } else
+        } else {
             memset(pSnd->IMDCT_buf, 0, 512 * sizeof(int32_t));
+        }
 
         /* gain compensation and overlapping */
         gainCompensateAndOverlap (pSnd->IMDCT_buf, &(pSnd->prevFrame[band*256]), &(pOut[band*256]),
@@ -982,12 +1089,12 @@ int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
     /* Take care of the codec-specific extradata. */
     if (rmctx->extradata_size == 14) {
         /* Parse the extradata, WAV format */
-        DEBUGF("[0-1] %d\n",rm_get_uint16le(&edata_ptr[0]));  //Unknown value always 1
+        DEBUGF("[0-1] %d\n",rm_get_uint16le(&edata_ptr[0]));    /* Unknown value always 1 */
         q->samples_per_channel = rm_get_uint32le(&edata_ptr[2]);
         q->codingMode = rm_get_uint16le(&edata_ptr[6]);
-        DEBUGF("[8-9] %d\n",rm_get_uint16le(&edata_ptr[8]));  //Dupe of coding mode
-        q->frame_factor = rm_get_uint16le(&edata_ptr[10]);  //Unknown always 1
-        DEBUGF("[12-13] %d\n",rm_get_uint16le(&edata_ptr[12]));  //Unknown always 0
+        DEBUGF("[8-9] %d\n",rm_get_uint16le(&edata_ptr[8]));    /* Dupe of coding mode */
+        q->frame_factor = rm_get_uint16le(&edata_ptr[10]);      /* Unknown always 1 */
+        DEBUGF("[12-13] %d\n",rm_get_uint16le(&edata_ptr[12])); /* Unknown always 0 */
 
         /* setup */
         q->samples_per_frame = 1024 * q->channels;
