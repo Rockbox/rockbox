@@ -275,7 +275,7 @@ static int treeplaylist_callback(int action,
 /* insert items */
 MENUITEM_FUNCTION(i_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT,
-                  treeplaylist_callback, Icon_Playlist);
+                  NULL, Icon_Playlist);
 MENUITEM_FUNCTION(i_first_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_FIRST),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT_FIRST,
                   treeplaylist_wplayback_callback, Icon_Playlist);
@@ -350,8 +350,6 @@ static int treeplaylist_callback(int action,
                 {
                     return action;
                 }
-                else
-                    return ACTION_EXIT_MENUITEM;
             }
             else if (this_item == &view_playlist_item)
             {
@@ -360,8 +358,6 @@ static int treeplaylist_callback(int action,
                 {
                     return action;
                 }
-                else
-                    return ACTION_EXIT_MENUITEM;
             }
             else if (this_item == &i_shuf_pl_item)
             {
@@ -371,8 +367,6 @@ static int treeplaylist_callback(int action,
                 {
                     return action;
                 }
-                else
-                    return ACTION_EXIT_MENUITEM;
             }
             else if (this_item == &i_last_shuf_pl_item ||
                      this_item == &q_last_shuf_pl_item)
@@ -384,9 +378,8 @@ static int treeplaylist_callback(int action,
                 {
                     return action;
                 }
-                else
-                    return ACTION_EXIT_MENUITEM;
             }
+            return ACTION_EXIT_MENUITEM;
             break;
     }
     return action;
@@ -422,9 +415,10 @@ MAKE_ONPLAYMENU(cat_playlist_menu, ID2P(LANG_CATALOG),
 static int cat_playlist_callback(int action,
                                  const struct menu_item_ex *this_item)
 {
-    if (((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO) &&
-          ((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) &&
-          ((selected_file_attr & ATTR_DIRECTORY) == 0))
+    if (!selected_file ||
+        (((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO) &&
+         ((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) &&
+         ((selected_file_attr & ATTR_DIRECTORY) == 0)))
     {
         return ACTION_EXIT_MENUITEM;
     }
@@ -434,12 +428,9 @@ static int cat_playlist_callback(int action,
         case ACTION_REQUEST_MENUITEM:
             if (this_item == &cat_view_lists)
             {
-                if (context == CONTEXT_WPS)
-                    return action;
+                return action;
             }
-            else if (selected_file && /* set before calling this menu,
-                                         so safe */
-                     ((audio_status() & AUDIO_STATUS_PLAY &&
+            else if (((audio_status() & AUDIO_STATUS_PLAY &&
                       context == CONTEXT_WPS) ||
                       context == CONTEXT_TREE))
             {
@@ -1046,8 +1037,7 @@ MENUITEM_FUNCTION(set_backdrop_item, 0, ID2P(LANG_SET_AS_BACKDROP),
 #ifdef HAVE_RECORDING
 static bool set_recdir(void)
 {
-    strlcpy(global_settings.rec_directory,
-            selected_file, MAX_FILENAME+1);
+    strlcpy(global_settings.rec_directory, selected_file, MAX_FILENAME+1);
     settings_save();
     return false;
 }
@@ -1066,9 +1056,16 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
                  this_item == &delete_dir_item ||
                  this_item == &clipboard_cut_item) )
                 return ACTION_EXIT_MENUITEM;
+            /* no rename+delete for volumes */
+            if ((selected_file_attr & ATTR_VOLUME) &&
+                 (this_item == &delete_file_item ||
+                  this_item == &list_viewers_item))
+                return ACTION_EXIT_MENUITEM;
 #endif
+#ifdef HAVE_TAGCACHE
             if (context == CONTEXT_ID3DB)
                 return ACTION_EXIT_MENUITEM;
+#endif
             if (this_item == &clipboard_paste_item)
             {  /* visible if there is something to paste */
                 return (clipboard_selection[0] != 0) ?
@@ -1079,20 +1076,35 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
                 /* always visible */
                 return action;
             }
-            else if ((this_item == &rename_file_item) ||
-                     (this_item == &clipboard_cut_item) ||
-                     (this_item == &clipboard_copy_item) ||
-                     (this_item == &properties_item) ||
-                     (this_item == &add_to_faves_item)
-                    )
+            else if (selected_file)
             {
                 /* requires an actual file */
-                return (selected_file) ?  action : ACTION_EXIT_MENUITEM;
-            }
+                if (this_item == &rename_file_item ||
+                    this_item == &clipboard_cut_item ||
+                    this_item == &clipboard_copy_item ||
+                    this_item == &properties_item ||
+                    this_item == &add_to_faves_item)
+                {
+                    return action;
+                }
+                else if ((selected_file_attr & ATTR_DIRECTORY))
+                {
+                    /* only for directories */
+                    if (this_item == &delete_dir_item
+#ifdef HAVE_RECORDING
+                     || this_item == &set_recdir_item
+#endif
+                        )
+                        return action;
+                }
+                else if (this_item == &delete_file_item ||
+                         this_item == &list_viewers_item)
+                {
+                    /* only for files */
+                    return action;
+                }
 #if LCD_DEPTH > 1
-            else if (this_item == &set_backdrop_item)
-            {
-                if (selected_file)
+                else if (this_item == &set_backdrop_item)
                 {
                     char *suffix = strrchr(selected_file, '.');
                     if (suffix)
@@ -1103,31 +1115,7 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
                         }
                     }
                 }
-                return ACTION_EXIT_MENUITEM;
-            }
 #endif
-            else if ((selected_file_attr & ATTR_DIRECTORY))
-            {
-                if ((this_item == &delete_dir_item)
-                    )
-                    return action;
-#ifdef HAVE_RECORDING
-                else if (this_item == &set_recdir_item)
-                    return action;
-#endif
-            }
-            else if (selected_file
-#ifdef HAVE_MULTIVOLUME
-                     /* no rename+delete for volumes */
-                        && !(selected_file_attr & ATTR_VOLUME)
-#endif
-                     )
-            {
-                if ((this_item == &delete_file_item) ||
-                    (this_item == &list_viewers_item))
-                {
-                    return action;
-                }
             }
             return ACTION_EXIT_MENUITEM;
             break;
@@ -1201,6 +1189,6 @@ int onplay(char* file, int attr, int from)
         case GO_TO_MAINMENU:
             return ONPLAY_MAINMENU;
         default:
-            return context == CONTEXT_WPS ? ONPLAY_OK : ONPLAY_RELOAD_DIR;
+            return onplay_result;
     }
 }
