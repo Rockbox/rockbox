@@ -374,17 +374,61 @@ static void readQuantSpectralCoeffs (GetBitContext *gb, int selector, int coding
 
 
 /**
+ * Requantize the spectrum.
+ *
+ * @param *mantissas    pointer to mantissas for each spectral line
+ * @param pOut          requantized band spectrum
+ * @param first         first spectral line in subband
+ * @param last          last spectral line in subband
+ * @param SF            scalefactor for all spectral lines of this band
+ */
+ 
+static void inverseQuantizeSpectrum(int *mantissas, int32_t *pOut,
+                                    int32_t first, int32_t last, int32_t SF)
+{
+    int *pIn = mantissas;
+    
+    /* Inverse quantize the coefficients. */
+    if((first/256) &1) {
+        /* Odd band - Reverse coefficients */
+        do {
+            pOut[last--] = fixmul16(*pIn++, SF);
+            pOut[last--] = fixmul16(*pIn++, SF);
+            pOut[last--] = fixmul16(*pIn++, SF);
+            pOut[last--] = fixmul16(*pIn++, SF);
+            pOut[last--] = fixmul16(*pIn++, SF);
+            pOut[last--] = fixmul16(*pIn++, SF);
+            pOut[last--] = fixmul16(*pIn++, SF);
+            pOut[last--] = fixmul16(*pIn++, SF);
+        } while (last>first);
+    } else {
+         /* Even band - Do not reverse coefficients */
+         do {
+            pOut[first++] = fixmul16(*pIn++, SF);
+            pOut[first++] = fixmul16(*pIn++, SF);
+            pOut[first++] = fixmul16(*pIn++, SF);
+            pOut[first++] = fixmul16(*pIn++, SF);
+            pOut[first++] = fixmul16(*pIn++, SF);
+            pOut[first++] = fixmul16(*pIn++, SF);
+            pOut[first++] = fixmul16(*pIn++, SF);
+            pOut[first++] = fixmul16(*pIn++, SF);
+        } while (first<last);
+    }
+}
+
+
+/**
  * Restore the quantized band spectrum coefficients
  *
  * @param gb            the GetBit context
  * @param pOut          decoded band spectrum
- * @return outSubbands   subband counter, fix for broken specification/files
+ * @return outSubbands  subband counter, fix for broken specification/files
  */
 
 int decodeSpectrum (GetBitContext *gb, int32_t *pOut) ICODE_ATTR;
 int decodeSpectrum (GetBitContext *gb, int32_t *pOut)
 {
-    int   numSubbands, codingMode, cnt, first, last, subbWidth, *pIn;
+    int   numSubbands, codingMode, cnt, first, last, subbWidth;
     int   subband_vlc_index[32], SF_idxs[32];
     int   mantissas[128];
     int32_t SF;
@@ -423,14 +467,7 @@ int decodeSpectrum (GetBitContext *gb, int32_t *pOut)
             SF <<= 2;
 
             /* Inverse quantize the coefficients. */
-            if((first/256) &1) {
-                /* Odd band - Reverse coefficients */
-                for (pIn=mantissas ; last>first; last--, pIn++)
-                    pOut[last] = fixmul16(*pIn, SF);
-            } else {
-                 for (pIn=mantissas ; first<last; first++, pIn++)
-                    pOut[first] = fixmul16(*pIn, SF);
-            }
+            inverseQuantizeSpectrum(mantissas, pOut, first, last, SF);
 
         } else {
             /* This subband was not coded, so zero the entire subband. */
