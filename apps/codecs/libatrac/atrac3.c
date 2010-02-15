@@ -628,8 +628,21 @@ static int addTonalComponents (int32_t *pSpectrum, int numComponents, tonal_comp
     return lastPos;
 }
 
-
-#define INTERPOLATE(old,new,nsample)  ((old*ONE_16) + fixmul16(((nsample*ONE_16)>>3), (((new) - (old))*ONE_16)))
+/**
+ * Linear equidistant interpolation between two points x and y. 7 interpolation
+ * points can be calculated. Result is scaled by <<16.
+ * Result for s=0 is x*ONE_16
+ * Result for s=8 is y*ONE_16
+ *
+ * @param x     first input point
+ * @param y     second input point
+ * @param s     index of interpolation point (0..7)
+ */
+ 
+/*
+#define INTERPOLATE(x, y, s)    ((x*ONE_16) + fixmul16(((s*ONE_16)>>3), (((x) - (y))*ONE_16)))
+*/
+#define INTERPOLATE(x, y, s)    ((((x)<<3) + s*((y)-(x)))<<13)
 
 static void reverseMatrixing(int32_t *su1, int32_t *su2, int *pPrevCode, int *pCurrCode)
 {
@@ -695,14 +708,14 @@ static void reverseMatrixing(int32_t *su1, int32_t *su2, int *pPrevCode, int *pC
 }
 
 static void getChannelWeights (int indx, int flag, int32_t ch[2]){
-    if (indx == 7) {
-        ch[0] = ONE_16;
-        ch[1] = ONE_16;
+    /* Read channel weights from table */
+    if (flag) {
+        /* Swap channel weights */
+        ch[1] = channelWeights0[indx&7];
+        ch[0] = channelWeights1[indx&7];
     } else {
-        ch[0] = fixdiv16(((indx & 7)*ONE_16), 7*ONE_16);
-        ch[1] = fastSqrt((ONE_16 << 1) - fixmul16(ch[0], ch[0]));
-        if(flag)
-            FFSWAP(int32_t, ch[0], ch[1]);
+        ch[0] = channelWeights0[indx&7];
+        ch[1] = channelWeights1[indx&7];
     }
 }
 
