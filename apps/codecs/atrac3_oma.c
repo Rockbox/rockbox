@@ -75,6 +75,7 @@ next_track:
     frame_counter = 0;
     
     ci->set_elapsed(0);
+    ci->seek_buffer(0);
     ci->advance_buffer(ci->id3->first_frame_offset);
 
     /* The main decoder loop */  

@@ -60,9 +60,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* Audio Interchange File Format */
     [AFMT_AIFF] =
         AFMT_ENTRY("AIFF", "aiff",    "aiff_enc",    "aiff\0aif\0"),
-    /* Uncompressed PCM in a WAV file */
+    /* Uncompressed PCM in a WAV file OR ATRAC3 stream in WAV file (.at3) */
     [AFMT_PCM_WAV] =
-        AFMT_ENTRY("WAV",  "wav",     "wav_enc",     "wav\0"      ),
+        AFMT_ENTRY("WAV",  "wav",     "wav_enc",     "wav\0at3\0"      ),
     /* Ogg Vorbis */
     [AFMT_OGG_VORBIS] =
         AFMT_ENTRY("Ogg",  "vorbis",  NULL,          "ogg\0oga\0" ),
