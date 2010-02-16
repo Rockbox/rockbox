@@ -10500,7 +10500,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -12699,7 +12699,7 @@
 <phrase>
   id: LANG_CUSTOM_STATUSBAR
   desc: deprecated
-  user: core
+  user:
   <source>
     *: none
   </source>
@@ -12744,7 +12744,7 @@
 <phrase>
   id: LANG_REMOTE_CUSTOM_STATUSBAR
   desc: deprecated
-  user: core
+  user:
   <source>
     *: none
   </source>
@@ -13259,5 +13259,39 @@
   <voice>
     *:none
     lcd_bitmap: "Fernbedienungs-SBS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Fernbedienungsbildschirm"
+  </dest>
+  <voice>
+    *: none
+    remote: "Fernbedienungsbildschirm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Hauptbildschirm"
+  </dest>
+  <voice>
+    *: none
+    remote: "Hauptbildschirm"
   </voice>
 </phrase>
