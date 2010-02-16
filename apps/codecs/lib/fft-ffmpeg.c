@@ -58,10 +58,10 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
 /* asm-optimised functions and/or macros */
 #include "fft-ffmpeg_arm.h"
 
-#define FFT_SIZE 1024
 
-uint16_t revtab[1<<12];
-static bool revtab_initialised = false;
+
+//uint16_t revtab[1<<12];
+static bool revtab_initialised = true;
 
 static int split_radix_permutation(int i, int n, int inverse)
 {
@@ -85,7 +85,7 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
     s->nbits = nbits;
     n = 1 << nbits;
 
-    s->revtab = revtab;
+    //s->revtab = revtab;
     s->inverse = inverse;
 
     s->fft_permute = ff_fft_permute_c;
@@ -104,6 +104,7 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
        thought of any yet.  Ideally we would be able to massage data
        so that it comes out in standard or standard-bitrev order
        rather than this funky thing */
+    /*dead code now that we have a constant revtab*/
     if( !revtab_initialised )
     {
       /* fully initialise the revtab for entire 1<<12 range */
@@ -122,7 +123,7 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 {
     int j, k, np;
     FFTComplex tmp;
-    const uint16_t *revtab = s->revtab;
+    //const uint16_t *revtab = s->revtab;
     np = 1 << s->nbits;
     
     const int revtab_shift = (12 - s->nbits);
@@ -462,7 +463,7 @@ void ff_fft_calc_c(FFTContext *s, FFTComplex *z)
 int main (void)
 {
 #define PRECISION       16
-
+#define FFT_SIZE 1024
 #define ftofix32(x)       ((fixed32)((x) * (float)(1 << PRECISION) + ((x) < 0 ? -0.5 : 0.5)))
 #define itofix32(x)       ((x) << PRECISION)
 #define fixtoi32(x)       ((x) >> PRECISION)
