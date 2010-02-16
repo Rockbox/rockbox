@@ -227,6 +227,9 @@ struct mp3entry {
     bool has_toc;           /* True if there is a VBR header in the file */
     unsigned char toc[100]; /* table of contents */
 
+    /* Added for ATRAC3 */
+    unsigned int channels;       /* Number of channels in the stream */
+    unsigned int extradata_size; /* Size (in bytes) of the codec's extradata from the container */
     /* these following two fields are used for local buffering */
     char id3v2buf[ID3V2_BUF_SIZE];
     char id3v1buf[4][92];
