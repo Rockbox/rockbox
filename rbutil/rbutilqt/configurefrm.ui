@@ -97,13 +97,7 @@
         </widget>
        </item>
        <item row="3" column="0" colspan="3">
-        <widget class="QTreeWidget" name="treeDevices">
-         <column>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </column>
-        </widget>
+        <widget class="QTreeWidget" name="treeDevices"/>
        </item>
        <item row="4" column="0" colspan="3">
         <widget class="QPushButton" name="buttonAutodetect">
