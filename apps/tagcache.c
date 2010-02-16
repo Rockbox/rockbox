@@ -364,7 +364,7 @@ static bool do_timed_yield(void)
 
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
 static long find_entry_ram(const char *filename,
-                           const struct dirent *dc)
+                           const struct dircache_entry *dc)
 {
     static long last_pos = 0;
     int i;
@@ -697,7 +697,7 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
         if (tag == tag_filename && (idx->flag & FLAG_DIRCACHE)
             && is_dircache_intact())
         {
-            dircache_copy_path((struct dirent *)seek,
+            dircache_copy_path((struct dircache_entry *)seek,
                                buf, size);
             return true;
         }
@@ -1392,7 +1392,7 @@ static bool get_next(struct tagcache_search *tcs)
         if (tcs->type == tag_filename && (flag & FLAG_DIRCACHE)
             && is_dircache_intact())
         {
-            dircache_copy_path((struct dirent *)tcs->position,
+            dircache_copy_path((struct dircache_entry *)tcs->position,
                                buf, sizeof buf);
             tcs->result = buf;
             tcs->result_len = strlen(buf) + 1;
@@ -1671,7 +1671,7 @@ static int check_if_empty(char **tag)
 static void __attribute__ ((noinline)) add_tagcache(char *path,
                                                     unsigned long mtime
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-                                                    ,const struct dirent *dc
+                                                    ,const struct dircache_entry *dc
 #endif
                                                    )
 {
@@ -3942,7 +3942,7 @@ static bool load_tagcache(void)
             if (tag == tag_filename)
             {
 # ifdef HAVE_DIRCACHE
-                const struct dirent *dc;
+                const struct dircache_entry *dc;
 # endif
                 
                 // FIXME: This is wrong!
