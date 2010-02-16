@@ -20,7 +20,8 @@ PPCFLAGS = $(filter-out -Dmain=SDL_main,$(CFLAGS)) # cygwin sdl-config fix
 
 TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 	$(TOOLSDIR)/codepages $(TOOLSDIR)/scramble $(TOOLSDIR)/bmp2rb \
-	$(TOOLSDIR)/uclpack $(TOOLSDIR)/mkboot $(TOOLSDIR)/iaudio_bl_flash.[ch]
+	$(TOOLSDIR)/uclpack $(TOOLSDIR)/mkboot $(TOOLSDIR)/iaudio_bl_flash.c \
+	$(TOOLSDIR)/iaudio_bl_flash.h
 
 
 ifeq (,$(PREFIX))
