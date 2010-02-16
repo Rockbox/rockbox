@@ -260,7 +260,7 @@ static void init_atrac3_transforms(ATRAC3Context *q) {
     }
     
     /* Initializa the MDCT - ATRAC3 only uses a size-512 MDCT */
-    ff_mdct_init(&q->mdctx, av_log2(512), 1);
+    ff_mdct_init(&q->mdctx, 9, 1);
 }
 
 /**
