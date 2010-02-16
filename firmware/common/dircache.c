@@ -73,7 +73,7 @@ static unsigned int  cache_build_ticks = 0;
 static unsigned long appflags = 0;
 
 static struct event_queue dircache_queue;
-static long dircache_stack[(DEFAULT_STACK_SIZE + 0x900)/sizeof(long)];
+static long dircache_stack[(DEFAULT_STACK_SIZE + 0x200)/sizeof(long)];
 static const char dircache_thread_name[] = "dircache";
 
 static struct fdbind_queue fdbind_cache[MAX_PENDING_BINDINGS];
@@ -270,6 +270,9 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     return rc;
 }
 
+/* used during the generation */
+static struct fat_dir sab_fat_dir;
+
 static int dircache_scan_and_build(IF_MV2(int volume,) struct dircache_entry *ce)
 {
     memset(ce, 0, sizeof(struct dircache_entry));
@@ -288,12 +291,11 @@ static int dircache_scan_and_build(IF_MV2(int volume,) struct dircache_entry *ce
     }
 #endif
 
-    struct fat_dir dir; /* allocate on stack once for all scan */
     struct fat_direntry direntry; /* ditto */
 #ifdef HAVE_MULTIVOLUME
     sab.volume = volume;
 #endif
-    sab.dir = &dir;
+    sab.dir = &sab_fat_dir;
     sab.direntry = &direntry;
     
     return sab_process_dir(0, ce);
@@ -615,7 +617,7 @@ static int dircache_do_rebuild(void)
             if (dircache_scan_and_build(IF_MV2(0,) dircache_root) < 0)
 #endif /* HAVE_MULTIVOLUME */
             {
-                logf("dircache_travel failed");
+                logf("dircache_scan_and_build failed");
                 cpu_boost(false);
                 dircache_size = 0;
                 dircache_initializing = false;
@@ -765,7 +767,7 @@ void dircache_init(void)
     memset(opendirs, 0, sizeof(opendirs));
     for (i = 0; i < MAX_OPEN_DIRS; i++)
     {
-        opendirs[i].secondary_entry.d_name = buffer_alloc(MAX_PATH);
+        opendirs[i].theent.d_name = buffer_alloc(MAX_PATH);
     }
     
     queue_init(&dircache_queue, true);
@@ -1205,7 +1207,6 @@ void dircache_add_file(const char *path, long startcluster)
 
 DIR_CACHED* opendir_cached(const char* name)
 {
-    struct dircache_entry *cache_entry;
     int dd;
     DIR_CACHED* pdir = opendirs;
 
@@ -1226,23 +1227,22 @@ DIR_CACHED* opendir_cached(const char* name)
         errno = EMFILE;
         return NULL;
     }
+    
+    pdir->busy = true;
 
     if (!dircache_initialized)
     {
-        pdir->regulardir = opendir_uncached(name);
-        if (!pdir->regulardir)
-            return NULL;
-        
-        pdir->busy = true;
-        return pdir;
+        pdir->internal_entry = NULL;
+        pdir->regulardir = opendir_uncached(name);   
     }
-    
-    pdir->busy = true;
-    pdir->regulardir = NULL;
-    cache_entry = dircache_get_entry(name, true);
-    pdir->entry = cache_entry;
+    else
+    {
+        pdir->regulardir = NULL;
+        pdir->internal_entry = dircache_get_entry(name, true);
+        pdir->theent.attribute = -1; /* used to make readdir_cached aware of the first call */
+    }
 
-    if (cache_entry == NULL)
+    if (pdir->internal_entry == NULL && pdir->regulardir == NULL)
     {
         pdir->busy = false;
         return NULL;
@@ -1251,10 +1251,10 @@ DIR_CACHED* opendir_cached(const char* name)
     return pdir;
 }
 
-struct dircache_entry* readdir_cached(DIR_CACHED* dir)
+struct dirent_cached* readdir_cached(DIR_CACHED* dir)
 {
+    struct dircache_entry *ce = dir->internal_entry;
     struct dirent_uncached *regentry;
-    struct dircache_entry *ce;
     
     if (!dir->busy)
         return NULL;
@@ -1265,41 +1265,40 @@ struct dircache_entry* readdir_cached(DIR_CACHED* dir)
         if (regentry == NULL)
             return NULL;
 
-        strlcpy(dir->secondary_entry.d_name, regentry->d_name, MAX_PATH);
-        dir->secondary_entry.size = regentry->size;
-        dir->secondary_entry.startcluster = regentry->startcluster;
-        dir->secondary_entry.attribute = regentry->attribute;
-        dir->secondary_entry.wrttime = regentry->wrttime;
-        dir->secondary_entry.wrtdate = regentry->wrtdate;
-        dir->secondary_entry.next = NULL;
+        strlcpy(dir->theent.d_name, regentry->d_name, MAX_PATH);
+        dir->theent.size = regentry->size;
+        dir->theent.startcluster = regentry->startcluster;
+        dir->theent.attribute = regentry->attribute;
+        dir->theent.wrttime = regentry->wrttime;
+        dir->theent.wrtdate = regentry->wrtdate;
         
-        return &dir->secondary_entry;
+        return &dir->theent;
     }
-        
-    do {
-        if (dir->entry == NULL)
+    
+    /* if theent.attribute=-1 then this is the first call */
+    /* otherwise, this is is not so we first take the entry's ->next */
+    /* NOTE: normal file can't have attribute=-1 */
+    if(dir->theent.attribute != -1)
+        ce = ce->next;
+    /* skip unused entries */
+    while(ce != NULL && ce->name_len == 0)
+        ce = ce->next;
+    
+    if (ce == NULL)
             return NULL;
 
-        ce = dir->entry;
-        if (ce->name_len == 0)
-            dir->entry = ce->next;
-    } while (ce->name_len == 0) ;
-
-    dir->entry = ce->next;
-
-    strlcpy(dir->secondary_entry.d_name, ce->d_name, MAX_PATH);
-    /* Can't do `dir->secondary_entry = *ce`
+    strlcpy(dir->theent.d_name, ce->d_name, MAX_PATH);
+    /* Can't do `dir->theent = *ce`
        because that modifies the d_name pointer. */
-    dir->secondary_entry.size = ce->size;
-    dir->secondary_entry.startcluster = ce->startcluster;
-    dir->secondary_entry.attribute = ce->attribute;
-    dir->secondary_entry.wrttime = ce->wrttime;
-    dir->secondary_entry.wrtdate = ce->wrtdate;
-    dir->secondary_entry.next = NULL;
+    dir->theent.size = ce->size;
+    dir->theent.startcluster = ce->startcluster;
+    dir->theent.attribute = ce->attribute;
+    dir->theent.wrttime = ce->wrttime;
+    dir->theent.wrtdate = ce->wrtdate;
     dir->internal_entry = ce;
 
     //logf("-> %s", ce->name);
-    return &dir->secondary_entry;
+    return &dir->theent;
 }
 
 int closedir_cached(DIR_CACHED* dir)
@@ -1325,7 +1324,7 @@ int mkdir_cached(const char *name)
 int rmdir_cached(const char* name)
 {
     int rc=rmdir_uncached(name);
-    if(rc>=0)
+    if(rc >= 0)
         dircache_rmdir(name);
     return(rc);
 }

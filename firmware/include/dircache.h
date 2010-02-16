@@ -76,11 +76,20 @@ struct dircache_entry {
     char *d_name;
 };
 
+struct dirent_cached {
+    char *d_name;
+    int attribute;
+    long size;
+    long startcluster;
+    unsigned short wrtdate; /*  Last write date */ 
+    unsigned short wrttime; /*  Last write time */
+};
+
 typedef struct {
     bool busy;
-    struct dircache_entry *entry;
-    struct dircache_entry *internal_entry;
-    struct dircache_entry secondary_entry;
+    struct dirent_cached theent; /* .attribute is set to -1 on init(opendir) */
+    /* the two following field can't be used at the same time so have an union */
+    struct dircache_entry *internal_entry; /* the current entry in the directory */
     DIR_UNCACHED *regulardir;
 } DIR_CACHED;
 
@@ -111,7 +120,7 @@ void dircache_rename(const char *oldpath, const char *newpath);
 void dircache_add_file(const char *path, long startcluster);
 
 DIR_CACHED* opendir_cached(const char* name);
-struct dircache_entry* readdir_cached(DIR_CACHED* dir);
+struct dirent_cached* readdir_cached(DIR_CACHED* dir);
 int closedir_cached(DIR_CACHED *dir);
 int mkdir_cached(const char *name);
 int rmdir_cached(const char* name);

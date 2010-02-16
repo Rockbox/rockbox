@@ -44,7 +44,7 @@
 #ifdef HAVE_DIRCACHE
 # include "dircache.h"
 # define DIR DIR_CACHED
-# define dirent dircache_entry
+# define dirent dirent_cached
 # define opendir opendir_cached
 # define closedir closedir_cached
 # define readdir readdir_cached
