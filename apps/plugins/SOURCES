@@ -60,6 +60,7 @@ disktidy.c
 flipit.c
 
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
+boomshine.lua
 rockblox1d.c
 brickmania.c
 calendar.c
@@ -118,6 +119,7 @@ zxbox.c
 
 /* overlay loader for Goban */
 #if (PLUGIN_BUFFER_SIZE < 0x10000) && !defined(SIMULATOR)
+lua.c
 goban.c
 pictureflow.c
 #endif
@@ -173,13 +175,6 @@ superdom.c
 #endif
 
 md5sum.c
-
-#if (PLUGIN_BUFFER_SIZE >= 0x80000)
-lua.c
-#ifdef HAVE_LCD_BITMAP
-boomshine.lua
-#endif
-#endif
 
 #ifdef USB_ENABLE_HID
 remote_control.c
