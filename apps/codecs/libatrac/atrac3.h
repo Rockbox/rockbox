@@ -73,10 +73,6 @@ typedef struct {
     int32_t             tempBuf[1070];
     //@}
     //@{
-    /** MDCT Context for imdct calculations  */
-    MDCTContext         mdctx;
-    //@}
-    //@{
     /** extradata */
     int                 atrac3version;
     int                 delay;

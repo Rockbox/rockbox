@@ -67,12 +67,10 @@ void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, con
 /* -1- Tremor mdct */
 extern void mdct_backward(int n, int32_t *in, int32_t *out);
 /* -2- ffmpeg fft-based mdct */
-extern int ff_mdct_init(MDCTContext *s, int nbits, int inverse);
-extern void ff_imdct_half(MDCTContext *s, int32_t *output, const int32_t *input);
-extern void ff_imdct_calc(MDCTContext *s, int32_t *output, const int32_t *input);
+extern void ff_imdct_half(unsigned int nbits, int32_t *output, const int32_t *input);
+extern void ff_imdct_calc(unsigned int nbits, int32_t *output, const int32_t *input);
 /*ffmpeg fft (can be used without mdct)*/
 extern void ff_fft_calc_c(int nbits, FFTComplex *z);
-extern int ff_fft_init(void *s, int nbits, int inverse);
 
 #if defined(CPU_ARM) && (ARM_ARCH == 4)
 /* optimised unsigned integer division for ARMv4, in IRAM */

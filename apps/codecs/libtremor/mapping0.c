@@ -291,7 +291,7 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
       look->floor_func[submap]->
         inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
         
-      ff_imdct_calc(vb->mdct_ctx[vb->W],      
+      ff_imdct_calc(ci->blocksizes_nbits[vb->W],
                     (int32_t*)pcm,
                     (int32_t*)pcm);
       /* window the data */

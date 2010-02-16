@@ -63,6 +63,7 @@ typedef struct cook {
     int                 num_vectors;
     int                 bits_per_subpacket;
     int                 cookversion;
+    int                 mdct_nbits; /* is this the same as one of above? */
     /* states */
     int                 random_state;
 
@@ -82,9 +83,6 @@ typedef struct cook {
 
     /* generatable tables and related variables */
     int                 gain_size_factor;
-
-    /* MDCTContext for imdct calculations */
-    MDCTContext         s;
 
     /* data buffers */
 

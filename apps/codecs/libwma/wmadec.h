@@ -23,8 +23,6 @@
 #include "asf.h"
 #include "bitstream.h" /* For GetBitContext */
 #include "types.h"
-//#include "dsputil.h"  /* For MDCTContext */
-
 
 //#define TRACE
 /* size of blocks */
@@ -157,8 +155,6 @@ typedef struct WMADecodeContext
     int bit_offset;
     int nb_frames;
     int current_frame;
-    
-    MDCTContext mdct_ctx[10];
 
 #ifdef TRACE
 

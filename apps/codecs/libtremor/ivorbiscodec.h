@@ -62,7 +62,6 @@ typedef struct vorbis_dsp_state{
   ogg_int32_t **pcm;
   ogg_int32_t **pcmb;
   ogg_int32_t **pcmret;
-  MDCTContext mdct_ctx[2]; /* ffmpeg mdct - for the two block sizes */
   int      pcm_storage;
   int      pcm_current;
   int      pcm_returned;
@@ -107,9 +106,6 @@ typedef struct vorbis_block{
   long                localalloc;
   long                totaluse;
   struct alloc_chain *reap;
-  
-  MDCTContext * mdct_ctx[2]; /* for the two block sizes */
-
 } vorbis_block;
 
 /* vorbis_block is a single block of data to be processed as part of

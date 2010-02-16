@@ -68,12 +68,6 @@ int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep){
   vb->sequence=op->packetno-3; /* first block is third packet */
   vb->eofflag=op->e_o_s;
 
-  /* setup for ffmpeg-based mdct */
-  /* these pointers on the block just point to the structures
-     setup within the dsp state for the appropriate block sizes */
-  vb->mdct_ctx[0] = &(vd->mdct_ctx[0]);
-  vb->mdct_ctx[1] = &(vd->mdct_ctx[1]);
-
   if(decodep && vi->channels<=CHANNELS)
   {
     vb->pcm = ipcm_vect;

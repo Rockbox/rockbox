@@ -23,20 +23,8 @@
 //#include "types.h"
 #include "fft.h"
 
-typedef struct MDCTContext
-{
-    int n;  /* size of MDCT (i.e. number of input data * 2) */
-    int nbits; /* n = 2^nbits */
-    /* pre/post rotation tables */
-    fixed32 *tcos;
-    fixed32 *tsin;
-    FFTContext fft;
-}
-MDCTContext;
-
-int ff_mdct_init(MDCTContext *s, int nbits, int inverse);
-void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input);
-void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input);
+void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input);
+void ff_imdct_half(unsigned int nbits, fixed32 *output, const fixed32 *input);
 
 #ifdef CPU_ARM
 

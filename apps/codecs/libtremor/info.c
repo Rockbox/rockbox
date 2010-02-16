@@ -120,8 +120,10 @@ static int _vorbis_unpack_info(vorbis_info *vi,oggpack_buffer *opb){
   vi->bitrate_nominal=oggpack_read(opb,32);
   vi->bitrate_lower=oggpack_read(opb,32);
 
-  ci->blocksizes[0]=1<<oggpack_read(opb,4);
-  ci->blocksizes[1]=1<<oggpack_read(opb,4);
+  ci->blocksizes_nbits[0]=oggpack_read(opb,4);
+  ci->blocksizes_nbits[1]=oggpack_read(opb,4);
+  ci->blocksizes[0]=1<<(ci->blocksizes_nbits[0]);
+  ci->blocksizes[1]=1<<(ci->blocksizes_nbits[1]);
   
   if(vi->rate<1)goto err_out;
   if(vi->channels<1)goto err_out;

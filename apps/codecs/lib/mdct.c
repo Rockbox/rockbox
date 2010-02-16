@@ -26,28 +26,6 @@
 #include "mdct_lookup.h"
 
 /**
- * init MDCT or IMDCT computation.
- */
-int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
-{
-    int n, n4;
-    (void) inverse;
-    memset(s, 0, sizeof(*s));
-    n = 1 << nbits;            //nbits ranges from 12 to 8 inclusive
-
-    s->nbits = nbits;
-    s->n = n;
-    n4 = n>>2;
-/*
-    (&s->fft)->nbits = nbits-2;
-    (&s->fft)->inverse = inverse;
-
-    ff_fft_init((void *)(&s->fft), s->nbits - 2, 1);
-*/
-    return 0;
-}
-
-/**
  * Compute the middle half of the inverse MDCT of size N = 2^nbits
  * thus excluding the parts that can be derived by symmetry
  * @param output N/2 samples
@@ -56,12 +34,12 @@ int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
  * NOTE - CANNOT CURRENTLY OPERATE IN PLACE (input and output must
  *                                          not overlap or intersect at all)
  */
-void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
+void ff_imdct_half(unsigned int nbits, fixed32 *output, const fixed32 *input)
 {
     int n8, n4, n2, n, j;
     const fixed32 *in1, *in2;
     
-    n = 1 << s->nbits;
+    n = 1 << nbits;
 
     n2 = n >> 1;
     n4 = n >> 2;
@@ -75,7 +53,7 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
     
     /* revtab comes from the fft; revtab table is sized for N=4096 size fft = 2^12.
        The fft is size N/4 so s->nbits-2, so our shift needs to be (12-(nbits-2)) */
-    const int revtab_shift = (14- s->nbits);
+    const int revtab_shift = (14- nbits);
     
     /* bitreverse reorder the input and rotate;   result here is in OUTPUT ... */
     /* (note that when using the current split radix, the bitreverse ordering is
@@ -93,7 +71,7 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
         an mdct-local set of twiddles to do that part)
        */
     const int32_t *T = sincos_lookup0;
-    const int step = 2<<(12-s->nbits);
+    const int step = 2<<(12-nbits);
     const uint16_t * p_revtab=revtab;
     {
         const uint16_t * const p_revtab_end = p_revtab + n8;
@@ -134,10 +112,10 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
 
 
     /* ... and so fft runs in OUTPUT buffer */
-    ff_fft_calc_c(s->nbits-2, z);
+    ff_fft_calc_c(nbits-2, z);
 
     /* post rotation + reordering.  now keeps the result within the OUTPUT buffer */
-    switch( s->nbits )
+    switch( nbits )
     {
         default:
         {
@@ -266,13 +244,13 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
  *            <-----------output----------->
  *
  */
-void ff_imdct_calc(MDCTContext *s, fixed32 *output, const fixed32 *input)
+void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
 {
-    const int n = (1<<s->nbits);
+    const int n = (1<<nbits);
     const int n2 = (n>>1);
     const int n4 = (n>>2);
     
-    ff_imdct_half(s,output+n2,input);
+    ff_imdct_half(nbits,output+n2,input);
 
     /* reflect the half imdct into the full N samples */
     /* TODO: this could easily be optimised more! */

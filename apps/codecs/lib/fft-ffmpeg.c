@@ -59,11 +59,6 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
 /* asm-optimised functions and/or macros */
 #include "fft-ffmpeg_arm.h"
 
-
-
-//uint16_t revtab[1<<12];
-static bool revtab_initialised = true;
-
 static int split_radix_permutation(int i, int n, int inverse)
 {
     int m;
@@ -73,51 +68,6 @@ static int split_radix_permutation(int i, int n, int inverse)
     m >>= 1;
     if(inverse == !(i&m)) return split_radix_permutation(i, m, inverse)*4 + 1;
     else                  return split_radix_permutation(i, m, inverse)*4 - 1;
-}
-
-//int ff_fft_init(FFTContext *s, int nbits, int inverse)
-int ff_fft_init(void *arg_s, int nbits, int inverse)
-{
-    int i, n;
-    FFTContext *s = (FFTContext *)(arg_s);
-  
-    if (nbits < 2 || nbits > 12)
-        return -1;
-    s->nbits = nbits;
-    n = 1 << nbits;
-
-    //s->revtab = revtab;
-    s->inverse = inverse;
-
-    s->fft_permute = ff_fft_permute_c;
-    //s->fft_calc    = ff_fft_calc_c;
-    s->split_radix = 1;
-  /*s->imdct_calc  = ff_imdct_calc_c;
-    s->imdct_half  = ff_imdct_half_c;
-    s->mdct_calc   = ff_mdct_calc_c;
-    s->split_radix = 1;*/
-
-  /*if (ARCH_ARM)     ff_fft_init_arm(s);
-    if (HAVE_ALTIVEC) ff_fft_init_altivec(s);
-    if (HAVE_MMX)     ff_fft_init_mmx(s);*/
-    
-    /* FIXME: there ought to be some shortcuts here, I just haven't
-       thought of any yet.  Ideally we would be able to massage data
-       so that it comes out in standard or standard-bitrev order
-       rather than this funky thing */
-    /*dead code now that we have a constant revtab*/
-    if( !revtab_initialised )
-    {
-      /* fully initialise the revtab for entire 1<<12 range */
-      const int MAX_REVTAB=1<<12;
-      
-      for(i=0; i<MAX_REVTAB ; i++)
-          s->revtab[-split_radix_permutation(i, MAX_REVTAB, s->inverse) & (MAX_REVTAB-1)] = i;
-          
-      revtab_initialised = true;
-    }
-
-    return 0;
 }
 
 static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)

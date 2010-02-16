@@ -55,10 +55,6 @@ typedef struct FFTContext {
 #define FF_MDCT_PERM_INTERLEAVE 1
 } FFTContext;
 
-//public api
-//int ff_fft_init(FFTContext *s, int nbits, int inverse);
-int ff_fft_init(void *s, int nbits, int inverse);
-
 // internal api  (fft<->mdct)
 //int fft_calc_unscaled(FFTContext *s, FFTComplex *z);
 //void ff_fft_permute_c(FFTContext *s, FFTComplex *z); // internal only?

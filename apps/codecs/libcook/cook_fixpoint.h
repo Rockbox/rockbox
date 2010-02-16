@@ -172,7 +172,7 @@ static inline void imlt_math(COOKContext *q, FIXP *in)
     const int step = 2 << (10 - av_log2(n));
     int i = 0, j = 0;
 
-    ff_imdct_calc(&q->s, q->mono_mdct_output, in);
+    ff_imdct_calc(q->mdct_nbits, q->mono_mdct_output, in);
 
     do {
         FIXP tmp = q->mono_mdct_output[i];
