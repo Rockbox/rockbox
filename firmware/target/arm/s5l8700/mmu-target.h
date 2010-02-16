@@ -27,15 +27,15 @@
 #define MMU_S5L8700_H
 
 /* Cleans entire DCache */
-void clean_dcache(void);
+void clean_dcache(void) ICODE_ATTR;
 
 /* Invalidate entire DCache */
 /* will do writeback */
-void invalidate_dcache(void);
+void invalidate_dcache(void) ICODE_ATTR;
 
 /* Invalidate entire ICache and DCache */
 /* will do writeback */
-void invalidate_idcache(void);
+void invalidate_idcache(void) ICODE_ATTR;
 
 #define HAVE_CPUCACHE_INVALIDATE
 #define HAVE_CPUCACHE_FLUSH
