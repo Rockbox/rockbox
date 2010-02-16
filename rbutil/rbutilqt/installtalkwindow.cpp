@@ -50,7 +50,7 @@ void InstallTalkWindow::browseFolder()
     }
     else
     {
-        startfolder = "/media"; // FIXME: This looks Linux specific
+        startfolder = RbSettings::value(RbSettings::Mountpoint).toString();
     }
     selected = QFileDialog::getExistingDirectory(this,
             tr("Select folder to create talk files"), startfolder);
