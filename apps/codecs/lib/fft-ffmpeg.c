@@ -1,5 +1,6 @@
 /*
- * FFT/IFFT transforms
+ * FFT/IFFT transforms converted to integer precision
+ * Copyright (c) 2010 Dave Hooper, Mohamed Tarek, Michael Giacomelli
  * Copyright (c) 2008 Loren Merritt
  * Copyright (c) 2002 Fabrice Bellard
  * Partly based on libdjbfft by D. J. Bernstein
@@ -89,7 +90,7 @@ int ff_fft_init(void *arg_s, int nbits, int inverse)
     s->inverse = inverse;
 
     s->fft_permute = ff_fft_permute_c;
-    s->fft_calc    = ff_fft_calc_c;
+    //s->fft_calc    = ff_fft_calc_c;
     s->split_radix = 1;
   /*s->imdct_calc  = ff_imdct_calc_c;
     s->imdct_half  = ff_imdct_half_c;
@@ -454,9 +455,9 @@ static void (*fft_dispatch[])(FFTComplex*) = {
     fft2048, fft4096
 };
 
-void ff_fft_calc_c(FFTContext *s, FFTComplex *z)
+void ff_fft_calc_c(int nbits, FFTComplex *z)
 {
-    fft_dispatch[s->nbits-2](z);
+    fft_dispatch[nbits-2](z);
 }
 
 #if 0

@@ -1,6 +1,7 @@
 /*
- * WMA compatible decoder
+ * Fixed Point IMDCT 
  * Copyright (c) 2002 The FFmpeg Project.
+ * Copyright (c) 2010 Dave Hooper, Mohamed Tarek, Michael Giacomelli
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,19 +31,19 @@
 int ff_mdct_init(MDCTContext *s, int nbits, int inverse)
 {
     int n, n4;
-
+    (void) inverse;
     memset(s, 0, sizeof(*s));
     n = 1 << nbits;            //nbits ranges from 12 to 8 inclusive
 
     s->nbits = nbits;
     s->n = n;
     n4 = n>>2;
-
+/*
     (&s->fft)->nbits = nbits-2;
     (&s->fft)->inverse = inverse;
 
     ff_fft_init((void *)(&s->fft), s->nbits - 2, 1);
-
+*/
     return 0;
 }
 
@@ -93,7 +94,7 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
        */
     const int32_t *T = sincos_lookup0;
     const int step = 2<<(12-s->nbits);
-    const uint16_t * p_revtab=s->fft.revtab;
+    const uint16_t * p_revtab=revtab;
     {
         const uint16_t * const p_revtab_end = p_revtab + n8;
         while(LIKELY(p_revtab < p_revtab_end))
@@ -133,7 +134,7 @@ void ff_imdct_half(MDCTContext *s, fixed32 *output, const fixed32 *input)
 
 
     /* ... and so fft runs in OUTPUT buffer */
-    ff_fft_calc_c(&s->fft, z);
+    ff_fft_calc_c(s->nbits-2, z);
 
     /* post rotation + reordering.  now keeps the result within the OUTPUT buffer */
     switch( s->nbits )
