@@ -60,4 +60,10 @@ void skin_data_init(struct wps_data *wps_data);
 
 /* call this in statusbar toggle handlers if needed */
 void skin_statusbar_changed(struct gui_wps*);
+
+
+/* load a backdrop into the skin buffer.
+ * reuse buffers if the file is already loaded */
+char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen);
+void skin_backdrop_init(void);
 #endif

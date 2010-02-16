@@ -353,7 +353,8 @@ struct gui_wps
 
 /* gui_wps end */
 
-
+char *get_image_filename(const char *start, const char* bmpdir,
+                                char *buf, int buf_size);
 /***** wps_tokens.c ******/
 
 const char *get_token_value(struct gui_wps *gwps,

@@ -567,7 +567,7 @@ static int get_image_id(int c)
         return -1;
 }
 
-static char *get_image_filename(const char *start, const char* bmpdir,
+char *get_image_filename(const char *start, const char* bmpdir,
                                 char *buf, int buf_size)
 {
     const char *end = strchr(start, '|');
@@ -2045,45 +2045,8 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
      */
     if (wps_data->backdrop)
     {
-        char img_path[MAX_PATH];
-        bool loaded = false;
-        size_t buf_size;
-#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
-        if (curr_screen == SCREEN_REMOTE)
-            buf_size = REMOTE_LCD_BACKDROP_BYTES;
-        else
-#endif
-            buf_size = LCD_BACKDROP_BYTES;
-        if (wps_data->backdrop[0] == '-')
-        {
-#if NB_SCREENS > 1
-            if (curr_screen == SCREEN_REMOTE)
-            {
-                wps_data->backdrop = NULL;
-                return true;
-            }
-            else
-#endif
-            {
-                if (!global_settings.backdrop_file[0])
-                {
-                    wps_data->backdrop = NULL;
-                    return true;
-                }
-                snprintf(img_path, sizeof(img_path), "%s/%s.bmp",
-                         BACKDROP_DIR, global_settings.backdrop_file);
-            }
-        }
-        else
-        {
-            get_image_filename(wps_data->backdrop, bmpdir,
-                              img_path, sizeof(img_path));
-        }
-        char *buffer = skin_buffer_alloc(buf_size);
-        if (!buffer)
-            return false;
-        loaded = screens[curr_screen].backdrop_load(img_path, buffer);
-        wps_data->backdrop = loaded ? buffer : NULL;
+        wps_data->backdrop = skin_backdrop_load(wps_data->backdrop, 
+                                               bmpdir, curr_screen);
     }
 #endif /* has backdrop support */
 

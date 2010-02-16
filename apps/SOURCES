@@ -87,6 +87,7 @@ gui/statusbar-skinned.c
 gui/yesno.c
 gui/viewport.c
 
+gui/skin_engine/skin_backdrops.c
 gui/skin_engine/skin_buffer.c
 gui/skin_engine/wps_debug.c
 gui/skin_engine/skin_display.c

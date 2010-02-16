@@ -741,6 +741,7 @@ void settings_apply_skins(void)
     /* re-initialize the skin buffer before we start reloading skins */
     skin_buffer_init();
 #ifdef HAVE_LCD_BITMAP
+    skin_backdrop_init();
     skin_font_init();
     if ( global_settings.sbs_file[0] &&
         global_settings.sbs_file[0] != 0xff )
