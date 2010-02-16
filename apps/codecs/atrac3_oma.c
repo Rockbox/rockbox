@@ -31,23 +31,7 @@ CODEC_HEADER
 #define FRAMESIZE ci->id3->bytesperframe
 #define BITRATE   ci->id3->bitrate
 
-/* The codec has nothing to do with RM, it just uses an RMContext struct to *
- * store the data needs to be passed to the decoder initializing function.  */
-RMContext rmctx;
 ATRAC3Context q IBSS_ATTR;
-
-static void init_rm(RMContext *rmctx, struct mp3entry *id3)
-{
-    rmctx->sample_rate = id3->frequency;
-    rmctx->nb_channels = 2;
-    rmctx->bit_rate    = id3->bitrate;
-    rmctx->block_align = id3->bytesperframe;
-
-    /* 14-byte extra-data was faked in the metadata parser so that  *
-     * the ATRAC3 decoder would parse it as WAV format extra-data.  */
-    rmctx->extradata_size  = 14;
-    memcpy(rmctx->codec_extradata, &id3->id3v1buf[0][0], 14);
-}
 
 /* this is the codec entry point */
 enum codec_status codec_main(void)
@@ -67,17 +51,14 @@ next_track:
         ci->sleep(1);
 
     codec_set_replaygain(ci->id3);
-    ci->memset(&rmctx,0,sizeof(RMContext));
     ci->memset(&q,0,sizeof(ATRAC3Context));
-
-    init_rm(&rmctx, ci->id3);
  
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     ci->configure(DSP_SET_SAMPLE_DEPTH, 17); /* Remark: atrac3 uses s15.0 by default, s15.2 was hacked. */
-    ci->configure(DSP_SET_STEREO_MODE, rmctx.nb_channels == 1 ?
+    ci->configure(DSP_SET_STEREO_MODE, ci->id3->channels == 1 ?
         STEREO_MONO : STEREO_NONINTERLEAVED);
     
-    res =atrac3_decode_init(&q, &rmctx);
+    res =atrac3_decode_init(&q, ci->id3);
     if(res < 0) {
         DEBUGF("failed to initialize atrac decoder\n");
         return CODEC_ERROR;
@@ -133,7 +114,7 @@ seek_start :
                 ci->seek_complete(); 
             }
 
-            res = atrac3_decode_frame(&rmctx, &q, &datasize, bit_buffer, FRAMESIZE);
+            res = atrac3_decode_frame(FRAMESIZE, &q, &datasize, bit_buffer, FRAMESIZE);
 
             if(res != (int)FRAMESIZE) {
                 DEBUGF("codec error\n");
@@ -141,7 +122,7 @@ seek_start :
             }
 
             if(datasize)
-                ci->pcmbuf_insert(q.outSamples, q.outSamples + 1024, q.samples_per_frame / rmctx.nb_channels);
+                ci->pcmbuf_insert(q.outSamples, q.outSamples + 1024, q.samples_per_frame / ci->id3->channels);
 
             elapsed += (FRAMESIZE * 8) / BITRATE;
             ci->set_elapsed(elapsed);

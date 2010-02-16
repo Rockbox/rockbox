@@ -1074,17 +1074,17 @@ static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf, int off)
  * @param rmctx     pointer to the AVCodecContext
  */
 
-int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
+int atrac3_decode_frame(unsigned long block_align, ATRAC3Context *q,
             int *data_size, const uint8_t *buf, int buf_size) {
     int result = 0, off = 0;
     const uint8_t* databuf;
 
-    if (buf_size < rmctx->block_align)
+    if (buf_size < block_align)
         return buf_size;
 
     /* Check if we need to descramble and what buffer to pass on. */
     if (q->scrambled_stream) {
-        off = decode_bytes(buf, q->decoded_bytes_buffer, rmctx->block_align);
+        off = decode_bytes(buf, q->decoded_bytes_buffer, block_align);
         databuf = q->decoded_bytes_buffer;
     } else {
         databuf = buf;
@@ -1102,7 +1102,7 @@ int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
     else
         *data_size = 2048 * sizeof(int32_t);
 
-    return rmctx->block_align;
+    return block_align;
 }
 
 
@@ -1111,23 +1111,23 @@ int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
  *
  * @param rmctx     pointer to the RMContext
  */
-
-int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
+int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3)
 {
     int i;
-    uint8_t *edata_ptr = rmctx->codec_extradata;
+    uint8_t *edata_ptr = (uint8_t*)&id3->id3v2buf;
     static VLC_TYPE atrac3_vlc_table[4096][2];
     static int vlcs_initialized = 0;
 
-    /* Take data from the AVCodecContext (RM container). */
-    q->sample_rate = rmctx->sample_rate;
-    q->channels = rmctx->nb_channels;
-    q->bit_rate = rmctx->bit_rate;
-    q->bits_per_frame = rmctx->block_align * 8;
-    q->bytes_per_frame = rmctx->block_align;
+    /* Take data from the RM container. */
+    q->sample_rate = id3->frequency;
+    q->channels = id3->channels;
+    q->bit_rate = id3->bitrate * 1000;
+    q->bits_per_frame = id3->bytesperframe * 8;
+    q->bytes_per_frame = id3->bytesperframe;
 
     /* Take care of the codec-specific extradata. */
-    if (rmctx->extradata_size == 14) {
+    
+    if (id3->extradata_size == 14) {
         /* Parse the extradata, WAV format */
         DEBUGF("[0-1] %d\n",rm_get_uint16le(&edata_ptr[0]));    /* Unknown value always 1 */
         q->samples_per_channel = rm_get_uint32le(&edata_ptr[2]);
@@ -1152,7 +1152,7 @@ int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
             return -1;
         }
 
-    } else if (rmctx->extradata_size == 10) {
+    } else if (id3->extradata_size == 10) {
         /* Parse the extradata, RM format. */
         q->atrac3version = rm_get_uint32be(&edata_ptr[0]);
         q->samples_per_frame = rm_get_uint16be(&edata_ptr[4]);
@@ -1163,7 +1163,7 @@ int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
         q->scrambled_stream = 1;
 
     } else {
-        DEBUGF("Unknown extradata size %d.\n",rmctx->extradata_size);
+        DEBUGF("Unknown extradata size %d.\n",id3->extradata_size);
     }
     /* Check the extradata. */
 
@@ -1191,13 +1191,13 @@ int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx)
         return -1;
     }
 
-    if (rmctx->nb_channels <= 0 || rmctx->nb_channels > 2 /*|| ((rmctx->channels * 1024) != q->samples_per_frame)*/) {
+    if (id3->channels <= 0 || id3->channels > 2 ) {
         DEBUGF("Channel configuration error!\n");
         return -1;
     }
 
 
-    if(rmctx->block_align >= UINT16_MAX/2)
+    if(id3->bytesperframe >= UINT16_MAX/2)
         return -1;
 
 

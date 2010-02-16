@@ -137,7 +137,7 @@ int oma_read_header(int fd, struct mp3entry* id3)
         case OMA_CODECID_ATRAC3:
             id3->frequency = srate_tab[(codec_params >> 13) & 7]*100;
             if (id3->frequency != 44100) {
-                DEBUGF("Unsupported sample rate, send sample file to developers: %d\n", samplerate);
+                DEBUGF("Unsupported sample rate, send sample file to developers: %d\n", id3->frequency);
                 return -1;
             }
 
@@ -149,16 +149,17 @@ int oma_read_header(int fd, struct mp3entry* id3)
 
             /* fake the atrac3 extradata (wav format, makes stream copy to wav work) */
             /* ATRAC3 expects and extra-data size of 14 bytes for wav format; extra-data size    *
-             * is stored in ATRAC3Context before initializing the decoder. See atrac3_oma.codec. *
+             * is stored in ATRAC3Context before initializing the decoder.                       *
              * We use id3v2buf to hold the (fake) extra-data provided from the container.        */ 
+            id3->extradata_size = 14;
+            AV_WL16(&id3->id3v2buf[0],  1);             // always 1
+            AV_WL32(&id3->id3v2buf[2],  id3->frequency);    // samples rate
+            AV_WL16(&id3->id3v2buf[6],  jsflag);        // coding mode
+            AV_WL16(&id3->id3v2buf[8],  jsflag);        // coding mode
+            AV_WL16(&id3->id3v2buf[10], 1);             // always 1
+            AV_WL16(&id3->id3v2buf[12], 0);             // always 0
 
-            AV_WL16(&id3->id3v1buf[0][0],  1);             // always 1
-            AV_WL32(&id3->id3v1buf[0][2],  id3->frequency);    // samples rate
-            AV_WL16(&id3->id3v1buf[0][6],  jsflag);        // coding mode
-            AV_WL16(&id3->id3v1buf[0][8],  jsflag);        // coding mode
-            AV_WL16(&id3->id3v1buf[0][10], 1);             // always 1
-            AV_WL16(&id3->id3v1buf[0][12], 0);             // always 0
-
+            id3->channels = 2;
             DEBUGF("sample_rate = %d\n", id3->frequency);
             DEBUGF("frame_size = %d\n", id3->bytesperframe);
             DEBUGF("stereo_coding_mode = %d\n", jsflag);

@@ -1,5 +1,8 @@
 #include "ffmpeg_bitstream.h"
 #include "../librm/rm.h"
+#ifdef ROCKBOX
+#include "codeclib.h"
+#endif
 
 #if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == MCF5250)
 /* PP5022/24 and MCF5250 have larger IRAM */
@@ -82,8 +85,8 @@ typedef struct {
     //@}
 } ATRAC3Context;
 
-int atrac3_decode_init(ATRAC3Context *q, RMContext *rmctx);
+int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3);
 
-int atrac3_decode_frame(RMContext *rmctx, ATRAC3Context *q,
+int atrac3_decode_frame(unsigned long block_align, ATRAC3Context *q,
                         int *data_size, const uint8_t *buf, int buf_size);
 

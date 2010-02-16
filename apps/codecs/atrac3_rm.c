@@ -34,7 +34,11 @@ ATRAC3Context q IBSS_ATTR;
 
 static void init_rm(RMContext *rmctx)
 {
+    /* initialize the RMContext */
     memcpy(rmctx, (void*)(( (intptr_t)ci->id3->id3v2buf + 3 ) &~ 3), sizeof(RMContext));
+
+    /* and atrac3 expects extadata in id3v2buf, so we shall give it that */
+    memcpy(ci->id3->id3v2buf, (char*)rmctx->codec_extradata, rmctx->extradata_size*sizeof(char));
 }
 
 /* this is the codec entry point */
@@ -77,7 +81,7 @@ next_track:
     h = rmctx.sub_packet_h;
     scrambling_unit_size = h*fs;
     
-    res =atrac3_decode_init(&q, &rmctx);
+    res =atrac3_decode_init(&q, ci->id3);
     if(res < 0) {
         DEBUGF("failed to initialize atrac decoder\n");
         return CODEC_ERROR;
@@ -168,7 +172,7 @@ seek_start :
                 ci->seek_complete(); 
             }
             if(pkt.length)    
-                res = atrac3_decode_frame(&rmctx, &q, &datasize, pkt.frames[i], rmctx.block_align);
+                res = atrac3_decode_frame(rmctx.block_align, &q, &datasize, pkt.frames[i], rmctx.block_align);
             else /* indicates that there are no remaining frames */
                 goto done;
 

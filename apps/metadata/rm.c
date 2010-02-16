@@ -438,6 +438,8 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
             break;
     }
 
+    id3->channels = rmctx->nb_channels;
+    id3->extradata_size = rmctx->extradata_size;
     id3->bitrate = rmctx->bit_rate / 1000;
     id3->frequency = rmctx->sample_rate;
     id3->length = rmctx->duration;
