@@ -299,6 +299,7 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define POWERUP_WIDTH    FIXED3(BMPWIDTH_brickmania_powerups)
 #define BALL             FIXED3(BMPHEIGHT_brickmania_ball)
 #define HALFBALL         (BALL / 2)
+#define ON_PAD_POS_Y     (PAD_POS_Y - HALFBALL)
 
 #define GAMEOVER_WIDTH   FIXED3(BMPWIDTH_brickmania_gameover)
 #define GAMEOVER_HEIGHT  FIXED3(BMPHEIGHT_brickmania_gameover)
@@ -968,7 +969,7 @@ static void brickmania_init_game(bool new_game)
         ball[i].speedy  =   0;
         ball[i].tempy   =   0;
         ball[i].tempx   =   0;
-        ball[i].pos_y   =   PAD_POS_Y - HALFBALL;
+        ball[i].pos_y   =   ON_PAD_POS_Y;
         ball[i].pos_x   =   GAMESCREEN_WIDTH/2;
         ball[i].glue    =   false;
     }
@@ -1774,7 +1775,10 @@ static int brickmania_game_loop(void)
                             
                     screen_edge.p2.x = FIXED3(LCD_WIDTH);
                     screen_edge.p2.y = 0;
-                    if (check_lines(&misc_line, &screen_edge, &pt_hit))
+                    /* the test for pos_y prevents the ball from bouncing back
+                     * from _over_ the top to infinity on some rare cases */
+                    if (ball[k].pos_y > 0 &&
+                            check_lines(&misc_line, &screen_edge, &pt_hit))
                     {
                         ball[k].tempy = pt_hit.y + 1;
                         ball[k].tempx = pt_hit.x;
@@ -1804,7 +1808,7 @@ static int brickmania_game_loop(void)
                             ball[used_balls].speedy=0;
                             ball[used_balls].tempy=0;
                             ball[used_balls].tempx=0;
-                            ball[used_balls].pos_y=PAD_POS_Y-BALL;
+                            ball[used_balls].pos_y=ON_PAD_POS_Y;
                             ball[used_balls].pos_x=pad_pos_x+(pad_width/2)-2;
 
                             k--;
@@ -1830,7 +1834,8 @@ static int brickmania_game_loop(void)
                             
                     screen_edge.p2.x = 0;
                     screen_edge.p2.y = FIXED3(LCD_HEIGHT);
-                    if ( check_lines(&misc_line, &screen_edge, &pt_hit))
+                    if ( !ball[k].glue &&
+                            check_lines(&misc_line, &screen_edge, &pt_hit))
                     {
                         /* Reverse direction */
                         ball[k].speedx = -ball[k].speedx;
@@ -1846,7 +1851,8 @@ static int brickmania_game_loop(void)
                             
                     screen_edge.p2.x = FIXED3(LCD_WIDTH);
                     screen_edge.p2.y = FIXED3(LCD_HEIGHT);
-                    if ( check_lines(&misc_line, &screen_edge, &pt_hit))
+                    if ( !ball[k].glue &&
+                            check_lines(&misc_line, &screen_edge, &pt_hit))
                     {
                         /* Reverse direction */
                         ball[k].speedx = -ball[k].speedx;
@@ -1863,7 +1869,7 @@ static int brickmania_game_loop(void)
                         check_lines(&misc_line, &pad_line, &pt_hit) ) 
                     {
                         /* Re-position ball based on collision */
-                        ball[k].tempy = pt_hit.y - 1;
+                        ball[k].tempy = ON_PAD_POS_Y;
                         ball[k].tempx = pt_hit.x;
 
                         /* Calculate the ball position relative to the paddle width */
@@ -1942,7 +1948,7 @@ static int brickmania_game_loop(void)
                              *  position should be forced to keep the ball at the paddle.
                              */
                             ball[k].tempx = 0;
-                            ball[k].tempy = pt_hit.y - BALL;
+                            ball[k].tempy = ON_PAD_POS_Y;
                         }
                     }
 
