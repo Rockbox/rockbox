@@ -40,10 +40,6 @@ enum skinnable_screens {
 int wps_get_touchaction(struct wps_data *data);
 #endif
 
-/* setup and display a WPS for the first time */
-bool gui_wps_display(struct gui_wps *gwps);
- 
-
 /* Do a update_type update of the skinned screen */
 bool skin_update(struct gui_wps *gwps, unsigned int update_type);
 
@@ -53,10 +49,6 @@ bool skin_update(struct gui_wps *gwps, unsigned int update_type);
  */
 bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
                     const char *buf, bool isfile);
-
-
-/* initial setup of wps_data */
-void skin_data_init(struct wps_data *wps_data);
 
 /* call this in statusbar toggle handlers if needed */
 void skin_statusbar_changed(struct gui_wps*);

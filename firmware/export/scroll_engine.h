@@ -50,7 +50,9 @@ struct scrollinfo
 {
     struct viewport* vp;
     char line[SCROLL_LINE_SIZE];
+#ifdef HAVE_LCD_CHARCELLS
     int len;    /* length of line in chars */
+#endif
     int y;      /* Position of the line on the screen (char co-ordinates) */
     int offset;
     int startx;

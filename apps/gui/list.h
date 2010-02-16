@@ -166,7 +166,6 @@ extern void gui_synclist_select_item(struct gui_synclist * lists,
 extern void gui_synclist_add_item(struct gui_synclist * lists);
 extern void gui_synclist_del_item(struct gui_synclist * lists);
 extern void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll);
-extern void gui_synclist_flash(struct gui_synclist * lists);
 extern void gui_synclist_set_title(struct gui_synclist * lists, char * title,
                                    enum themable_icons icon);
 extern void gui_synclist_hide_selection_marker(struct gui_synclist *lists,
@@ -256,7 +255,7 @@ void simplelist_addline(int line_number, const char *fmt, ...);
 */
 void simplelist_info_init(struct simplelist_info *info, char* title,
                           int count, void* data);
-                          
+
 /* show a list.
    if list->action_callback != NULL it is called with the action ACTION_REDRAW
     before the list is dislplayed for the first time */

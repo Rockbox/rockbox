@@ -367,7 +367,6 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
 
     s->vp = current_vp;
     s->y = y;
-    s->len = utf8length(string);
     s->offset = offset;
     s->startx = x * LCDFN(getstringsize)(" ", NULL, NULL);
     s->backward = false;
