@@ -121,6 +121,13 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
+/* define current usage levels */
+#define CURRENT_NORMAL     69  /* ~10h (700mAh), see FS#9072 */
+#define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */
+#if defined(HAVE_RECORDING)
+#define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
+#endif
+
 /* Define Apple remote tuner */
 #define CONFIG_TUNER IPOD_REMOTE_TUNER
 #define HAVE_RDS_CAP

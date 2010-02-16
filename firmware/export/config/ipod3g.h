@@ -127,6 +127,13 @@
 /* Hardware controlled charging? FIXME */
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
+/* define current usage levels */
+#define CURRENT_NORMAL     275  /* ~4h (1100mAh) */
+#define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */
+#if defined(HAVE_RECORDING)
+#define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
+#endif
+
 /* Define this if you have a PortalPlayer PP5002 */
 #define CONFIG_CPU PP5002
 
