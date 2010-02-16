@@ -73,7 +73,7 @@ static void scrollbar_helper(int min_shown, int max_shown, int items,
         *size = inner_len;
         *start = 0;
     }
-    
+
     return;
 }
 
@@ -92,7 +92,7 @@ void gui_scrollbar_draw(struct screen * screen, int x, int y,
     inner_y  = y + 1;
     inner_wd = width  - 2;
     inner_ht = height - 2;
-    
+
     /* Boundary check to make sure that height is reasonable, otherwise nothing
      *  to do 
      */
@@ -194,32 +194,25 @@ void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap bm, int x, 
     screen->set_drawmode(DRMODE_SOLID);
 
     if (flags & HORIZONTAL) {
-#if LCD_DEPTH > 1
-      if (bm.format == FORMAT_MONO)
-#endif
-        screen->mono_bitmap_part(bm.data, 0, 0,
-                                 bm.width, x + start, y, size, height);
-#if LCD_DEPTH > 1
-      else
-        screen->transparent_bitmap_part((fb_data *)bm.data, 0, 0,
-                                        STRIDE(screen->screen_type, 
-                                            bm.width, bm.height), 
-                                        x + start, y, size, height);
-#endif
+        x += start;
+        width = size;
     } else {
+        y += start;
+        height = size;
+    }
+
 #if LCD_DEPTH > 1
-      if (bm.format == FORMAT_MONO)
+    if (bm.format == FORMAT_MONO)
 #endif
         screen->mono_bitmap_part(bm.data, 0, 0,
-                                 bm.width, x, y + start, width, size);
+                                 bm.width, x, y, width, height);
 #if LCD_DEPTH > 1
-      else
+    else
         screen->transparent_bitmap_part((fb_data *)bm.data, 0, 0,
                                         STRIDE(screen->screen_type, 
                                             bm.width, bm.height), 
-                                        x, y + start, width, size);
+                                        x, y, width, height);
 #endif
-    }
 }
 
 void show_busy_slider(struct screen *s, int x, int y, int width, int height)
@@ -229,16 +222,14 @@ void show_busy_slider(struct screen *s, int x, int y, int width, int height)
                            start, start+20, HORIZONTAL);
 #if NB_SCREENS > 1
     if (s->screen_type == SCREEN_MAIN)
-    {
 #endif
+    {
         start += (dir*2);
         if (start > 79)
             dir = -1;
         else if (start < 1)
             dir = 1;
-#if NB_SCREENS > 1
     }
-#endif
 }
 
 #endif /* HAVE_LCD_BITMAP */
