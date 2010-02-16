@@ -735,11 +735,11 @@ void RbUtilQt::installBootloader()
                "in a new folder \"%1\" created below the selected folder.\n"
                "Press \"No\" to skip this step.").arg(targetFolder),
             QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-            BrowseDirtree tree(this, tr("Browse backup folder"));
-            tree.setDir(QDir::home());
-            tree.exec();
+            backupDestination = QFileDialog::getExistingDirectory(this,
+                    tr("Browse backup folder"), QDir::homePath());
+            if(!backupDestination.isEmpty())
+                backupDestination += "/" + targetFolder;
 
-            backupDestination = tree.getSelected() + "/" + targetFolder;
             qDebug() << "[RbUtil] backing up to" << backupDestination;
             // backup needs to be done after the logger has been set up.
         }

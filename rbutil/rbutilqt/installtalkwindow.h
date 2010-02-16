@@ -40,7 +40,6 @@ class InstallTalkWindow : public QDialog
 
     private slots:
         void browseFolder(void);
-        void setTalkFolder(QString folder);
         void updateSettings(void);
 
     signals:

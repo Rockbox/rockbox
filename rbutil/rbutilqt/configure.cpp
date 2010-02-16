@@ -549,29 +549,22 @@ void Config::browseFolder()
 
 void Config::browseCache()
 {
-    cbrowser = new BrowseDirtree(this);
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
-    cbrowser->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-#elif defined(Q_OS_WIN32)
-    cbrowser->setFilter(QDir::Drives | QDir::AllDirs | QDir::NoDotAndDotDot);
-#endif
-    cbrowser->setDir(ui.cachePath->text());
-    connect(cbrowser, SIGNAL(itemChanged(QString)), this, SLOT(setCache(QString)));
-    cbrowser->show();
-
+    QString old = ui.cachePath->text();
+    if(!QFileInfo(old).isDir())
+        old = QDir::tempPath();
+    QString c = QFileDialog::getExistingDirectory(this, tr("Set Cache Path"), old);
+    if(c.isEmpty())
+        c = old;
+    else if(!QFileInfo(c).isDir())
+        c = QDir::tempPath();
+    ui.cachePath->setText(QDir::toNativeSeparators(c));
+    updateCacheInfo(c);
 }
 
 
 void Config::setMountpoint(QString m)
 {
     ui.mountPoint->setText(m);
-}
-
-
-void Config::setCache(QString c)
-{
-    ui.cachePath->setText(c);
-    updateCacheInfo(c);
 }
 
 

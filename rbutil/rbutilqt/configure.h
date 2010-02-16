@@ -64,7 +64,6 @@ class Config : public QDialog
         void browseCache(void);
         void autodetect(void);
         void setMountpoint(QString);
-        void setCache(QString);
         void cacheClear(void);
         void configTts(void);
         void configEnc(void);

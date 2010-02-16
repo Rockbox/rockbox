@@ -42,28 +42,24 @@ InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
 
 void InstallTalkWindow::browseFolder()
 {
-    BrowseDirtree browser(this);
-    browser.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-
+    QString selected;
+    QString startfolder;
     if(QFileInfo(ui.lineTalkFolder->text()).isDir())
     {
-        browser.setDir(ui.lineTalkFolder->text());
+        startfolder = ui.lineTalkFolder->text();
     }
     else
     {
-        browser.setDir("/media"); // FIXME: This looks Linux specific
+        startfolder = "/media"; // FIXME: This looks Linux specific
     }
-    if(browser.exec() == QDialog::Accepted)
+    selected = QFileDialog::getExistingDirectory(this,
+            tr("Select folder to create talk files"), startfolder);
+    if(!selected.isEmpty())
     {
-        qDebug() << browser.getSelected();
-        setTalkFolder(browser.getSelected());
+        ui.lineTalkFolder->setText(selected);
     }
 }
 
-void InstallTalkWindow::setTalkFolder(QString folder)
-{
-    ui.lineTalkFolder->setText(folder);
-}
 
 void InstallTalkWindow::change()
 {
@@ -145,7 +141,8 @@ void InstallTalkWindow::updateSettings(void)
         ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
             .arg("Invalid encoder configuration!"));
 
-    setTalkFolder(RbSettings::value(RbSettings::LastTalkedFolder).toString());
+    ui.lineTalkFolder->setText(
+            RbSettings::value(RbSettings::LastTalkedFolder).toString());
     emit settingsUpdated();
 }
 
