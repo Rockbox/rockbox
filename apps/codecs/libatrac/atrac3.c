@@ -1079,7 +1079,7 @@ int atrac3_decode_frame(unsigned long block_align, ATRAC3Context *q,
     int result = 0, off = 0;
     const uint8_t* databuf;
 
-    if (buf_size < block_align)
+    if ((unsigned)buf_size < block_align)
         return buf_size;
 
     /* Check if we need to descramble and what buffer to pass on. */
