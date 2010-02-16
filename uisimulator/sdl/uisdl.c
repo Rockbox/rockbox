@@ -40,10 +40,12 @@
 #include "thread-sdl.h"
 #include "SDL_mutex.h"
 #include "SDL_thread.h"
+#include "math.h"
+
 
 /* extern functions */
 extern void new_key(int key);
-
+extern int  xy2button( int x, int y);
 void button_event(int key, bool pressed);
 
 SDL_Surface *gui_surface;
@@ -51,6 +53,8 @@ bool background = true;                   /* use backgrounds by default */
 #ifdef HAVE_REMOTE_LCD
 static bool showremote = true;            /* include remote by default */
 #endif
+bool mapping = false;
+bool debug_buttons = false;
 
 bool lcd_display_redraw = true;         /* Used for player simulator */
 char having_new_lcd = true;               /* Used for player simulator */
@@ -62,39 +66,102 @@ bool debug_audio = false;
 bool debug_wps = false;
 int wps_verbose_level = 3;
 
+
+void irq_button_event(int key, bool pressed) {
+    sim_enter_irq_handler();
+    button_event( key, pressed );
+    sim_exit_irq_handler();
+}
+
+int sqr( int a ) {
+    return a*a;
+}
+
 void gui_message_loop(void)
 {
     SDL_Event event;
     bool done = false;
+    static int x,y,xybutton = 0;
 
     while(!done && SDL_WaitEvent(&event))
     {
         switch(event.type)
         {
             case SDL_KEYDOWN:
-                sim_enter_irq_handler();
-                button_event(event.key.keysym.sym, true);
-                sim_exit_irq_handler();
+                irq_button_event(event.key.keysym.sym, true);
                 break;
             case SDL_KEYUP:
-                sim_enter_irq_handler();
-                button_event(event.key.keysym.sym, false);
-                sim_exit_irq_handler();
-                break;
-#ifndef HAVE_TOUCHSCREEN
+                irq_button_event(event.key.keysym.sym, false);
             case SDL_MOUSEBUTTONDOWN:
+                switch ( event.button.button ) {
+#ifdef HAVE_SCROLLWHEEL
+                    case SDL_BUTTON_WHEELUP:
+                        irq_button_event( SDLK_UP, true );
+                        break;
+                    case SDL_BUTTON_WHEELDOWN:
+                        irq_button_event( SDLK_DOWN, true );
+                        break;
+#endif
+                    case SDL_BUTTON_LEFT:
+                    case SDL_BUTTON_MIDDLE:
+                        if ( mapping && background ) {
+                            x = event.button.x;
+                            y = event.button.y;
+                        }
+                        if ( background ) {
+                            xybutton = xy2button( event.button.x, event.button.y );
+                            if( xybutton )
+                                irq_button_event( xybutton, true );
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
                 if (debug_wps && event.button.button == 1)
                 {
-                    printf("Mouse at: (%d, %d)\n", event.button.x, event.button.y);
+                    if ( background ) 
+#ifdef HAVE_REMOTE
+                        if ( event.button.y < UI_REMOTE_POSY ) /* Main Screen */
+                            printf("Mouse at: (%d, %d)\n", event.button.x - UI_LCD_POSX -1 , event.button.y - UI_LCD_POSY - 1 );
+                        else 
+                            printf("Mouse at: (%d, %d)\n", event.button.x - UI_REMOTE_POSX -1 , event.button.y - UI_REMOTE_POSY - 1 );
+#else
+                        printf("Mouse at: (%d, %d)\n", event.button.x - UI_LCD_POSX -1 , event.button.y - UI_LCD_POSY - 1 );
+#endif
+                    else 
+                        if ( event.button.y/display_zoom < LCD_HEIGHT ) /* Main Screen */
+                            printf("Mouse at: (%d, %d)\n", event.button.x/display_zoom, event.button.y/display_zoom );
+#ifdef HAVE_REMOTE
+                        else
+                            printf("Mouse at: (%d, %d)\n", event.button.x/display_zoom, event.button.y/display_zoom - LCD_HEIGHT );
+#endif
                 }
                 break;
-#else 
             case SDL_MOUSEBUTTONUP:
-                sim_enter_irq_handler();
-                button_event(BUTTON_TOUCHSCREEN, false);
-                sim_exit_irq_handler();
-                break;
+                switch ( event.button.button ) {
+                    /* The scrollwheel button up events are ignored as they are queued immediately */
+                    case SDL_BUTTON_LEFT:
+                    case SDL_BUTTON_MIDDLE:
+                        if ( mapping && background ) {
+                            printf("    { SDLK_,     %d, %d, %d, \"\" },\n", x, y, (int)sqrt( sqr(x-(int)event.button.x) + sqr(y-(int)event.button.y))  );
+                        }
+                        if ( background && xybutton ) {
+                                irq_button_event( xybutton, false );
+                                xybutton = 0;
+                            }
+#ifdef HAVE_TOUCHSCREEN
+                            else {
+                                irq_button_event(BUTTON_TOUCHSCREEN, false);
+                            }
 #endif
+                        break;
+                    default:
+                        break;
+                }
+                break;
+                
+
             case SDL_QUIT:
                 done = true;
                 break;
@@ -244,6 +311,16 @@ int main(int argc, char *argv[])
                     printf("Root directory: %s\n", sim_root_dir);
                 }
             }
+            else if (!strcmp("--mapping", argv[x]))
+            {
+                    mapping = true;
+                    printf("Printing click coords with drag radii.\n");
+            }
+            else if (!strcmp("--debugbuttons", argv[x]))
+            {
+                    debug_buttons = true;
+                    printf("Printing background button clicks.\n");
+            }
             else 
             {
                 printf("rockboxui\n");
@@ -258,6 +335,7 @@ int main(int argc, char *argv[])
                 printf("  --zoom [VAL]\t Window zoom (will disable backgrounds)\n");
                 printf("  --alarm \t Simulate a wake-up on alarm\n");
                 printf("  --root [DIR]\t Set root directory\n");
+                printf("  --mapping \t Output coordinates and radius for mapping backgrounds\n");
                 exit(0);
             }
         }

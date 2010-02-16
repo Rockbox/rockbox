@@ -32,6 +32,12 @@
 #undef button_init_device
 #define button_init_device()
 
+struct button_map {
+    int button, x, y, radius;
+    char *description;
+};
+
+int  xy2button( int x, int y);
 bool button_hold(void);
 void button_init_sdl(void);
 #undef button_init_device

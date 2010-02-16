@@ -50,3 +50,10 @@
 
   The keyboard's numerical keypad is used to simulate the target keypad. See
   the output rockboxui displays on start for details.
+
+5. Mouse Input
+
+  Clicking on the button images on the background will simulate pressing the
+  appropriate buttons.  On scroll wheel targts the mouse wheel will simulate
+  scroll wheel motion.
+  

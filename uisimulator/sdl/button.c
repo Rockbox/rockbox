@@ -1092,6 +1092,9 @@ void button_event(int key, bool pressed)
     case SDLK_DOWN:
         new_btn = BUTTON_DOWN;
         break;
+    case SDLK_KP1:
+        new_btn = BUTTON_MENU;
+        break;
     case SDLK_KP5:
     case SDLK_SPACE:
         new_btn = BUTTON_PLAY;
@@ -1392,3 +1395,449 @@ void button_init_sdl(void)
 #endif
 }
 
+/* Button maps: simulated key, x, y, radius, name */
+/* Run sim with --mapping to get coordinates      */
+/* or --debugbuttons to check                     */
+/* The First matching button is returned          */
+
+#ifdef SANSA_FUZE
+struct button_map bm[] = {
+    { SDLK_KP8,          70, 265, 35, "Scroll Back" },
+    { SDLK_KP9,         141, 255, 31, "Play" },
+    { SDLK_KP_MULTIPLY, 228, 267, 18, "Home" },
+    { SDLK_LEFT,         69, 329, 31, "Left" },
+    { SDLK_SPACE,       141, 330, 20, "Select" },
+    { SDLK_RIGHT,       214, 331, 23, "Right" },
+    { SDLK_KP3,         142, 406, 30, "Menu" },
+    { SDLK_DOWN,        221, 384, 24, "Scroll Fwd" },
+    { SDLK_KP_MINUS,    270, 299, 25, "Power" },
+    { SDLK_h,           269, 358, 26, "Hold" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (SANSA_CLIP)
+struct button_map bm[] = {
+    { SDLK_KP_MULTIPLY, 165, 158,  17, "Home" },
+    { SDLK_KP5,         102, 230,  29, "Select" },
+    { SDLK_KP8,         100, 179,  25, "Play" },
+    { SDLK_KP4,          53, 231,  21, "Left" },
+    { SDLK_KP6,         147, 232,  19, "Right" },
+    { SDLK_KP2,         105, 275,  22, "Menu" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (SANSA_C200) || defined(SANSA_C200V2)
+struct button_map bm[] = {
+    
+    { SDLK_KP7,      84,   7, 21, "Vol Down" },
+    { SDLK_KP9,     158,   7, 20, "Vol Up" },
+    { SDLK_KP1,     173, 130, 27, "Record" },
+    { SDLK_KP5,     277,  75, 21, "Select" },
+    { SDLK_KP4,     233,  75, 24, "Left" },
+    { SDLK_KP6,     313,  74, 18, "Right" },
+    { SDLK_KP8,     276,  34, 15, "Play" },
+    { SDLK_KP2,     277, 119, 17, "Down" },
+    { SDLK_KP3,     314, 113, 19, "Menu" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (SANSA_E200V2) || defined(SANSA_E200)
+struct button_map bm[] = {
+    { SDLK_KP7,         5,  92, 18, "Record" },
+    { SDLK_KP9,       128, 295, 43, "Play" },
+    { SDLK_KP4,        42, 380, 33, "Left" },
+    { SDLK_KP5,       129, 378, 36, "Select" },
+    { SDLK_KP6,       218, 383, 30, "Right" },
+    { SDLK_KP3,       129, 461, 29, "Down" },
+    { SDLK_KP1,        55, 464, 20, "Menu" },
+    { SDLK_KP8,        92, 338, 17, "Scroll Back" },
+    { SDLK_KP2,       167, 342, 17, "Scroll Fwd"  },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (SANSA_M200V4)
+struct button_map bm[] = {
+    { SDLK_KP_PLUS, 54,  14, 16, "Power" },
+    { SDLK_KP7,     96,  13, 12, "Vol Down" },
+    { SDLK_KP9,    139,  14, 14, "Vol Up" },
+    { SDLK_KP5,    260,  82, 20, "Select" },
+    { SDLK_KP8,    258,  35, 30, "Play" },
+    { SDLK_KP4,    214,  84, 25, "Left" },
+    { SDLK_KP6,    300,  83, 24, "Right" },
+    { SDLK_KP2,    262, 125, 28, "Repeat" },
+    { SDLK_h,      113, 151, 21, "Hold" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (IPOD_VIDEO)
+struct button_map bm[] = {
+    { SDLK_KP_PERIOD,  174, 350, 35, "Menu" },
+    { SDLK_KP8,        110, 380, 33, "Scroll Back" },
+    { SDLK_KP2,        234, 377, 34, "Scroll Fwd" },
+    { SDLK_KP4,         78, 438, 47, "Left" },
+    { SDLK_KP5,        172, 435, 43, "Select" },
+    { SDLK_KP6,        262, 438, 52, "Right" },
+    { SDLK_KP_PLUS,    172, 519, 43, "Play" },
+    { 0, 0, 0 , 0, "None" }
+};
+#elif defined (IPOD_MINI) || defined(IPOD_MINI2G)
+struct button_map bm[] = {
+    { SDLK_KP5,       92, 267, 29, "Select" },
+    { SDLK_KP4,       31, 263, 37, "Left" },
+    { SDLK_KP6,      150, 268, 33, "Right" },
+    { SDLK_KP_PERIOD, 93, 209, 30, "Menu" },
+    { SDLK_KP_PLUS,   93, 324, 25, "Play" },
+    { SDLK_KP8,       53, 220, 29, "Scroll Back" },
+    { SDLK_KP2,      134, 219, 31, "Scroll Fwd" },
+    { 0, 0, 0 , 0, "None" }
+};
+#elif defined (IPOD_3G)
+struct button_map bm[] = {
+    { SDLK_KP5,       108, 296, 26, "Select" },
+    { SDLK_KP8,        70, 255, 26, "Scroll Back" },
+    { SDLK_KP2,       149, 256, 28, "Scroll Fwd" },
+    { SDLK_KP4,        27, 186, 22, "Left" },
+    { SDLK_KP_PERIOD,  82, 185, 22, "Menu" },
+    { SDLK_KP_PERIOD, 133, 185, 21, "Play" },
+    { SDLK_KP6,       189, 188, 21, "Right" },
+    { 0, 0, 0 , 0, "None" }
+};
+#elif defined (IPOD_4G)
+struct button_map bm[] = {
+    { SDLK_KP5,        96, 269, 27, "Select" },
+    { SDLK_KP4,        39, 267, 30, "Left" },
+    { SDLK_KP6,       153, 270, 27, "Right" },
+    { SDLK_KP_PERIOD,  96, 219, 30, "Menu" },
+    { SDLK_KP_PLUS,    95, 326, 27, "Play" },
+    { SDLK_KP8,        57, 233, 29, "Scroll Back" },
+    { SDLK_KP2,       132, 226, 29, "Scroll Fwd" },
+    { 0, 0, 0 , 0, "None" }
+};
+#elif defined (IPOD_COLOR) 
+struct button_map bm[] = {
+    { SDLK_KP5,        128, 362, 35, "Select" },
+    { SDLK_KP4,         55, 358, 38, "Left" },
+    { SDLK_KP6,        203, 359, 39, "Right" },
+    { SDLK_KP_PERIOD,  128, 282, 34, "Menu" },
+    { SDLK_KP_PLUS,    129, 439, 41, "Play" },
+    { SDLK_KP8,         76, 309, 34, "Scroll Back" },
+    { SDLK_KP2,        182, 311, 45, "Scroll Fwd" },
+    { 0, 0, 0 , 0, "None" }
+};
+#elif defined (IPOD_1G2G) 
+struct button_map bm[] = {
+    { SDLK_KP5,       112, 265, 31, "Select" },
+    { SDLK_KP8,        74, 224, 28, "Scroll Back" },
+    { SDLK_KP2,       146, 228, 28, "Scroll Fwd" },
+    /* Dummy button to make crescent shape */
+    { SDLK_y,         112, 265, 76, "None" },
+    { SDLK_KP8,        74, 224, 28, "Scroll Back" },
+    { SDLK_KP2,       146, 228, 28, "Scroll Fwd" },
+    { SDLK_KP6,       159, 268, 64, "Right" },
+    { SDLK_KP4,        62, 266, 62, "Left" },
+    { SDLK_KP_PERIOD, 111, 216, 64, "Menu" },
+    { SDLK_KP_PLUS,   111, 326, 55, "Down" },
+    { 0, 0, 0 , 0, "None" }
+};
+#elif defined (IPOD_NANO) 
+struct button_map bm[] = {
+    { SDLK_KP5,       98, 316, 37, "Select" },
+    { SDLK_KP4,       37, 312, 28, "Left" },
+    { SDLK_KP6,      160, 313, 25, "Right" },
+    { SDLK_KP_PERIOD,102, 256, 23, "Menu" },
+    { SDLK_KP_PLUS,   99, 378, 28, "Play" },
+    { SDLK_KP8,       58, 272, 24, "Scroll Back" },
+    { SDLK_KP2,      141, 274, 22, "Scroll Fwd" },
+    { 0, 0, 0 , 0, "None" }
+};
+#elif defined (IPOD_NANO2G) 
+struct button_map bm[] = {
+    { SDLK_KP5,       118, 346, 37, "Select" },
+    { SDLK_KP4,        51, 345, 28, "Left" },
+    { SDLK_KP6,       180, 346, 26, "Right" },
+    { SDLK_KP_PERIOD, 114, 286, 23, "Menu" },
+    { SDLK_KP_PLUS,   115, 412, 27, "Down" },
+    { SDLK_KP8,        67, 303, 28, "Scroll Back" },
+    { SDLK_KP2,       163, 303, 27, "Scroll Fwd" },
+    { 0, 0, 0 , 0, "None" }
+};
+#elif defined (COWON_D2)
+struct button_map bm[] = {
+    { SDLK_DELETE,     51, 14, 17, "Power" },
+    { SDLK_h,         138, 14, 16, "Hold" },
+    { SDLK_MINUS,     320, 14, 10, "Minus" },
+    { SDLK_INSERT,    347, 13, 13, "Menu" },
+    { SDLK_KP_PLUS,   374, 14, 12, "Plus" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (IAUDIO_M3)
+struct button_map bm[] = {
+    { SDLK_KP5,         256,  72, 29, "Play" },
+    { SDLK_KP6,         255, 137, 28, "Right" },
+    { SDLK_KP4,         257, 201, 26, "Left" },
+    { SDLK_KP8,         338,  31, 27, "Up" },
+    { SDLK_KP2,         339,  92, 23, "Down" },
+    { SDLK_KP_DIVIDE,   336, 147, 23, "Rec" },
+    { SDLK_h,           336, 212, 30, "Hold" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (IAUDIO_M5)
+struct button_map bm[] = {
+    { SDLK_KP_ENTER,  333,  41, 17, "Enter" },
+    { SDLK_h,         334,  74, 21, "Hold" },
+    { SDLK_KP_DIVIDE, 333, 142, 24, "Record" },
+    { SDLK_KP_PLUS,   332, 213, 20, "Play" },
+    { SDLK_KP5,       250, 291, 19, "Select" },
+    { SDLK_KP8,       249, 236, 32, "Up" },
+    { SDLK_KP4,       194, 292, 29, "Left" },
+    { SDLK_KP6,       297, 290, 27, "Right" },
+    { SDLK_KP2,       252, 335, 28, "Down" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (IAUDIO_7)
+struct button_map bm[] = {  
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (IAUDIO_X5)
+struct button_map bm[] = {
+    { SDLK_KP_ENTER,  275,  38, 17, "Power" },
+    { SDLK_h,         274,  83, 16, "Hold" },
+    { SDLK_KP_DIVIDE, 276, 128, 22, "Record" },
+    { SDLK_KP_PLUS,   274, 186, 22, "Play" },
+    { SDLK_KP5,       200, 247, 16, "Select" },
+    { SDLK_KP8,       200, 206, 16, "Up" },
+    { SDLK_KP4,       163, 248, 19, "Left" },
+    { SDLK_KP6,       225, 247, 24, "Right" },
+    { SDLK_KP2,       199, 279, 20, "Down" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (ARCHOS_PLAYER)
+struct button_map bm[] = {
+    { SDLK_KP_PLUS,   79, 252, 23, "On" },
+    { SDLK_KP_PERIOD, 81, 310, 20, "Menu" },
+    { SDLK_KP8,      154, 237, 28, "Play" },
+    { SDLK_KP4,      121, 282, 23, "Left" },
+    { SDLK_KP6,      187, 282, 22, "Right" },
+    { SDLK_KP2,      157, 312, 20, "Down" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (ARCHOS_RECORDER)
+struct button_map bm[] = {
+    { SDLK_F1,        94, 205, 22, "F1" },
+    { SDLK_F2,       136, 204, 21, "F2" },
+    { SDLK_F3,       174, 204, 24, "F3" },
+    { SDLK_KP_PLUS,   75, 258, 19, "On" },
+    { SDLK_KP_ENTER,  76, 307, 15, "Off" },
+    { SDLK_KP5,      151, 290, 20, "Select" },
+    { SDLK_KP8,      152, 251, 23, "Up" },
+    { SDLK_KP4,      113, 288, 26, "Left" },
+    { SDLK_KP6,      189, 291, 23, "Right" },
+    { SDLK_KP2,      150, 327, 27, "Down" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (ARCHOS_FMRECORDER) || defined (ARCHOS_RECORDERV2)
+struct button_map bm[] = {
+    { SDLK_F1,         88, 210, 28, "F1" },
+    { SDLK_F2,        144, 212, 28, "F2" },
+    { SDLK_F3,        197, 212, 28, "F3" },
+    { SDLK_KP5,       144, 287, 21, "Select" },
+    { SDLK_KP_PLUS,    86, 320, 13, "Menu" },
+    { SDLK_KP_ENTER,  114, 347, 13, "Stop" },
+    { SDLK_y,         144, 288, 31, "None" },
+    { SDLK_KP8,       144, 259, 25, "Up" },
+    { SDLK_KP2,       144, 316, 31, "Down" },
+    { SDLK_KP6,       171, 287, 32, "Right" },
+    { SDLK_KP4,       117, 287, 31, "Left" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (ARCHOS_ONDIOSP) || defined (ARCHOS_ONDIOFM)
+struct button_map bm[] = {
+    { SDLK_KP_ENTER,  75, 23, 30, "Enter" },
+    { SDLK_KP8,       75, 174, 33, "KP8" },
+    { SDLK_KP4,       26, 186, 48, "KP4" },
+    { SDLK_KP6,      118, 196, 32, "KP6" },
+    { SDLK_KP2,       75, 234, 16, "KP2" },
+    { SDLK_KP_PERIOD, 54, 250, 24, "Period" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (IRIVER_H10)
+struct button_map bm[] = {
+    { SDLK_KP_PLUS,       38,  70, 37, "Power" },
+    { SDLK_KP4,          123, 194, 26, "Cancel" },
+    { SDLK_KP6,          257, 195, 34, "Select" },
+    { SDLK_KP8,          190, 221, 28, "Up" },
+    { SDLK_KP2,          192, 320, 27, "Down" },
+    { SDLK_KP_DIVIDE,    349,  49, 20, "Rew" },
+    { SDLK_KP5,          349,  96, 20, "Play" },
+    { SDLK_KP_MULTIPLY,  350, 141, 23, "FF" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (IRIVER_H10_5GB)
+struct button_map bm[] = {
+    { SDLK_KP_PLUS,      34,  76, 23, "Power" },
+    { SDLK_KP4,         106, 222, 28, "Cancel" },
+    { SDLK_KP6,         243, 220, 31, "Select" },
+    { SDLK_KP8,         176, 254, 34, "Up" },
+    { SDLK_KP2,         175, 371, 35, "Down" },
+    { SDLK_KP_DIVIDE,   319,  63, 26, "Rew" },
+    { SDLK_KP5,         320, 124, 26, "Play" },
+    { SDLK_KP_MULTIPLY, 320, 181, 32, "FF" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (IRIVER_H120) || defined (IRIVER_H100)
+struct button_map bm[] = {
+    { SDLK_KP_DIVIDE,   46, 162, 13, "Record" },
+    { SDLK_KP_PLUS,    327,  36, 16, "Play" },
+    { SDLK_KP_ENTER,   330,  99, 18, "Stop" },
+    { SDLK_KP_PERIOD,  330, 163, 18, "AB" },
+    { SDLK_KP5,        186, 227, 27, "5" },
+    { SDLK_KP8,        187, 185, 19, "8" },
+    { SDLK_KP4,        142, 229, 23, "4" },
+    { SDLK_KP6,        231, 229, 22, "6" },
+    { SDLK_KP2,        189, 272, 28, "2" },
+/* Remote Buttons */
+    { SDLK_KP_ENTER,   250, 404, 20, "Stop" },
+    { SDLK_SPACE,      285, 439, 29, "Space" },
+    { SDLK_h,          336, 291, 24, "Hold" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (IRIVER_H300)
+struct button_map bm[] = {
+    { SDLK_KP_PLUS,     56, 335, 20, "Play" },
+    { SDLK_KP8,        140, 304, 29, "Up" },
+    { SDLK_KP_DIVIDE,  233, 331, 23, "Record" },
+    { SDLK_KP_ENTER,    54, 381, 24, "Stop" },
+    { SDLK_KP4,        100, 353, 17, "Left" },
+    { SDLK_KP5,        140, 351, 19, "Navi" },
+    { SDLK_KP6,        185, 356, 19, "Right" },
+    { SDLK_KP_PERIOD,  230, 380, 20, "AB" },
+    { SDLK_KP2,        142, 402, 24, "Down" },
+    { SDLK_KP_ENTER,   211, 479, 21, "Stop" },
+    { SDLK_KP_PLUS,    248, 513, 29, "Play" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (MROBE_500)
+struct button_map bm[] = {
+    { SDLK_KP9,     171, 609, 9, "Play" },
+    { SDLK_KP4,     158, 623, 9, "Left" },
+    { SDLK_KP6,     184, 622, 9, "Right" },
+    { SDLK_KP7,     171, 638, 11, "Menu" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (MROBE_100)
+struct button_map bm[] = {
+    { SDLK_KP7,      80, 233, 30, "Menu" },
+    { SDLK_KP8,     138, 250, 19, "Up" },
+    { SDLK_KP9,     201, 230, 27, "Play" },
+    { SDLK_KP4,      63, 305, 25, "Left" },
+    { SDLK_KP5,     125, 309, 28, "Select" },
+    { SDLK_KP6,     200, 307, 35, "Right" },
+    { SDLK_KP1,      52, 380, 32, "Display" },
+    { SDLK_KP2,     125, 363, 30, "Down" },
+    { SDLK_KP9,     168, 425, 10, "Play" },
+    { SDLK_KP4,     156, 440, 11, "Left" },
+    { SDLK_KP6,     180, 440, 13, "Right" },
+    { SDLK_KP7,     169, 452, 10, "Menu" },
+    { SDLK_KP_MULTIPLY, 222, 15, 16, "Power" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (GIGABEAT_F)
+struct button_map bm[] = {
+    { SDLK_KP_PLUS,    361, 187, 22, "Power" },
+    { SDLK_KP_PERIOD,  361, 270, 17, "Menu" },
+    { SDLK_KP9,        365, 345, 26, "Vol Up" },
+    { SDLK_KP3,        363, 433, 25, "Vol Down" },
+    { SDLK_KP_ENTER,   365, 520, 19, "A" },
+    { SDLK_KP8,        167, 458, 35, "Up" },
+    { SDLK_KP4,         86, 537, 29, "Left" },
+    { SDLK_KP5,        166, 536, 30, "Select" },
+    { SDLK_KP6,        248, 536, 30, "Right" },
+    { SDLK_KP2,        169, 617, 28, "Down" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (GIGABEAT_S)
+struct button_map bm[] = {
+    { SDLK_KP_PLUS, 416, 383, 23, "Play" },
+    { SDLK_KP7,     135, 442, 46, "Back" },
+    { SDLK_KP9,     288, 447, 35, "Menu" },
+    { SDLK_KP8,     214, 480, 32, "Up" },
+    { SDLK_KP4,     128, 558, 33, "Left" },
+    { SDLK_KP5,     214, 556, 34, "Select" },
+    { SDLK_KP6,     293, 558, 35, "Right" },
+    { SDLK_KP2,     214, 637, 38, "Down" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (SAMSUNG_YH820)
+struct button_map bm[] = {
+    { SDLK_KP_PLUS, 330,  53, 23, "Record" },
+    { SDLK_KP7,     132, 208, 21, "Left" },
+    { SDLK_KP5,     182, 210, 18, "Play" },
+    { SDLK_KP9,     234, 211, 22, "Right" },
+    { SDLK_KP8,     182, 260, 15, "Up" },
+    { SDLK_KP4,     122, 277, 29, "Menu" },
+    { SDLK_KP6,     238, 276, 25, "Select" },
+    { SDLK_KP2,     183, 321, 24, "Down" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (SAMSUNG_YH920) || defined (SAMSUNG_YH925)
+struct button_map bm[] = {
+    { SDLK_KP9,     370,  32, 15, "FF" },
+    { SDLK_KP5,     369,  84, 25, "Play" },
+    { SDLK_KP5,     367, 125, 27, "Play" },
+    { SDLK_KP3,     369, 188, 17, "Rew" },
+    { SDLK_KP_PLUS, 370, 330, 30, "Record" },
+    { SDLK_KP4,     146, 252, 32, "Menu" },
+    { SDLK_KP8,     204, 226, 27, "Up" },
+    { SDLK_KP6,     257, 250, 34, "Select" },
+    { SDLK_KP2,     205, 294, 35, "Down" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (ONDA_VX747) || defined (ONDA_VX747P)
+struct button_map bm[] = {
+    { SDLK_MINUS,   113, 583, 28, "Minus" },
+    { SDLK_PLUS,    227, 580, 28, "Plus" },
+    { SDLK_RETURN,  171, 583, 34, "Menu" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (PHILIPS_SA9200)
+struct button_map bm[] = {
+    { SDLK_KP_ENTER,  25, 155, 33, "Power" },
+    { SDLK_PAGEUP,   210,  98, 31, "Vol Up" },
+    { SDLK_PAGEDOWN, 210, 168, 34, "Vol Down" },
+    { SDLK_KP7,       40, 249, 26, "Prev" },
+    { SDLK_KP8,      110, 247, 22, "Up" },
+    { SDLK_KP9,      183, 249, 31, "Next" },
+    { SDLK_KP4,       45, 305, 25, "Left" },
+    { SDLK_KP5,      111, 304, 24, "Play" },
+    { SDLK_KP6,      183, 304, 21, "Right" },
+    { SDLK_KP1,       43, 377, 21, "Menu" },
+    { SDLK_KP2,      112, 371, 24, "Down" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (CREATIVE_ZVM) || defined (CREATIVE_ZVM60GB) || \
+    defined (CREATIVE_ZV)
+struct button_map bm[] = {
+    { SDLK_KP7,      52, 414, 35, "Custom" },
+    { SDLK_KP8,     185, 406, 55, "Up" },
+    { SDLK_KP9,     315, 421, 46, "Play" },
+    { SDLK_KP4,     122, 500, 41, "Left" },
+    { SDLK_KP6,     247, 493, 49, "Right" },
+    { SDLK_KP1,      58, 577, 49, "Back" },
+    { SDLK_KP2,     186, 585, 46, "Down" },
+    { SDLK_KP3,     311, 569, 47, "Menu" },
+    { 0, 0, 0, 0, "None" }
+};
+#else
+struct button_map bm[] = {
+    { 0, 0, 0, 0, ""}
+};
+#endif
+
+int xy2button( int x, int y) {
+    int i;
+    extern bool debug_buttons;
+    
+    for ( i = 0; bm[i].button; i++ )
+        /* check distance from center of button < radius */
+        if ( ( (x-bm[i].x)*(x-bm[i].x) ) + ( ( y-bm[i].y)*(y-bm[i].y) ) < bm[i].radius*bm[i].radius ) {
+            if (debug_buttons) 
+                printf("Button: %s\n", bm[i].description );
+            return bm[i].button;
+        }
+    return 0;
+}
