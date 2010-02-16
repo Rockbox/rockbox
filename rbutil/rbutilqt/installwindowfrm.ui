@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>InstallFrm</class>
- <widget class="QDialog" name="InstallFrm" >
+ <class>InstallWindowFrm</class>
+ <widget class="QDialog" name="InstallWindowFrm" >
   <property name="windowModality" >
    <enum>Qt::WindowModal</enum>
   </property>
@@ -211,7 +211,7 @@
   <connection>
    <sender>buttonOk</sender>
    <signal>clicked()</signal>
-   <receiver>InstallFrm</receiver>
+   <receiver>InstallWindowFrm</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -227,7 +227,7 @@
   <connection>
    <sender>buttonCancel</sender>
    <signal>clicked()</signal>
-   <receiver>InstallFrm</receiver>
+   <receiver>InstallWindowFrm</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel" >

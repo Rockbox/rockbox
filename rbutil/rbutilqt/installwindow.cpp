@@ -18,7 +18,7 @@
  ****************************************************************************/
 
 #include "installwindow.h"
-#include "ui_installfrm.h"
+#include "ui_installwindowfrm.h"
 #include "rbzip.h"
 #include "system.h"
 #include "rbsettings.h"
@@ -149,7 +149,8 @@ void InstallWindow::accept()
     else if(ui.radioArchived->isChecked()) {
         file = SystemInfo::value(SystemInfo::DailyUrl).toString();
         RbSettings::setValue(RbSettings::Build, "archived");
-        myversion = "r" + ServerInfo::value(ServerInfo::DailyRevision).toString() + "-" + ServerInfo::value(ServerInfo::DailyDate).toString();
+        myversion = "r" + ServerInfo::value(ServerInfo::DailyRevision).toString()
+            + "-" + ServerInfo::value(ServerInfo::DailyDate).toString();
     }
     else if(ui.radioCurrent->isChecked()) {
         file = SystemInfo::value(SystemInfo::BleedingUrl).toString();
@@ -270,7 +271,8 @@ void InstallWindow::setDetailsCurrent(bool show)
         ui.labelDetails->setText(tr("This is the absolute up to the minute "
                 "Rockbox built. A current build will get updated every time "
                 "a change is made. Latest version is r%1 (%2).")
-                .arg(ServerInfo::value(ServerInfo::BleedingRevision).toString(),ServerInfo::value(ServerInfo::BleedingDate).toString()));
+                .arg(ServerInfo::value(ServerInfo::BleedingRevision).toString(),
+                    ServerInfo::value(ServerInfo::BleedingDate).toString()));
         if(ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty())
             ui.labelNote->setText(tr("<b>This is the recommended version.</b>"));
         else
@@ -303,7 +305,8 @@ void InstallWindow::setDetailsArchived(bool show)
         "features than the last stable release but may be much less stable. "
         "Features may change regularly."));
         ui.labelNote->setText(tr("<b>Note:</b> archived version is r%1 (%2).")
-            .arg(ServerInfo::value(ServerInfo::DailyRevision).toString(),ServerInfo::value(ServerInfo::DailyDate).toString()));
+            .arg(ServerInfo::value(ServerInfo::DailyRevision).toString(),
+                ServerInfo::value(ServerInfo::DailyDate).toString()));
     }
 }
 

@@ -204,7 +204,7 @@ TARGET = rbutilqt
 
 FORMS += rbutilqtfrm.ui \
  aboutbox.ui \
- installfrm.ui \
+ installwindowfrm.ui \
  progressloggerfrm.ui \
  configurefrm.ui \
  browsedirtreefrm.ui \

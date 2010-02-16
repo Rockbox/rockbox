@@ -24,7 +24,7 @@
 
 #include <QtGui>
 
-#include "ui_installfrm.h"
+#include "ui_installwindowfrm.h"
 #include "zipinstaller.h"
 #include "progressloggergui.h"
 
@@ -38,7 +38,7 @@ class InstallWindow : public QDialog
         void accept(void);
 
     private:
-        Ui::InstallFrm ui;
+        Ui::InstallWindowFrm ui;
         ProgressLoggerGui* logger;
         QHttp *download;
         QFile *target;
