@@ -88,7 +88,6 @@ struct dirent_cached {
 typedef struct {
     bool busy;
     struct dirent_cached theent; /* .attribute is set to -1 on init(opendir) */
-    /* the two following field can't be used at the same time so have an union */
     struct dircache_entry *internal_entry; /* the current entry in the directory */
     DIR_UNCACHED *regulardir;
 } DIR_CACHED;
