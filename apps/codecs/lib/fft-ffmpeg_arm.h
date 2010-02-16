@@ -104,10 +104,9 @@
     z -= n*3;\
 }
 
-#if 0
 #define TRANSFORM( z, n, wre_arg, wim_arg )\
 {\
-    FFTSample wre = wre, wim = wim_arg;\
+    FFTSample wre = wre_arg, wim = wim_arg;\
     register FFTSample t1 asm("r5"),t2 asm("r6"),t5 asm("r7"),t6 asm("r8"),r_re asm("r9"),r_im asm("r10");\
     z += n*2; /* z[o2] */\
     asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));\
@@ -121,7 +120,6 @@
     BF_OPT(t6, t2, t2, t6);\
     TRANSFORM_POST_STORE( z, n );\
 }
-#endif 
 
 #define TRANSFORM_W01( z, n, w )\
 {\

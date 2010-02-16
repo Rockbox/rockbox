@@ -247,8 +247,7 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
     
 */
 
-/* temporary workaround until I fix a bug in TRANSFORM macro in arm code */
-#ifndef TRANSFORM
+#ifndef FFT_FFMPEG_INCL_OPTIMISED_TRANSFORM
 static inline void TRANSFORM(FFTComplex * z, unsigned int n, FFTSample wre, FFTSample wim)
 {
     register FFTSample t1,t2,t5,t6,r_re,r_im;
@@ -260,9 +259,7 @@ static inline void TRANSFORM(FFTComplex * z, unsigned int n, FFTSample wre, FFTS
     XNPROD31_R(r_re, r_im, wre, wim, t5,t6);
     BUTTERFLIES(z[0],z[n],z[n*2],z[n*3]);
 }
-#endif
 
-#ifndef FFT_FFMPEG_INCL_OPTIMISED_TRANSFORM
 static inline void TRANSFORM_W01(FFTComplex * z, unsigned int n, const FFTSample * w)
 {
     register const FFTSample wre=w[0],wim=w[1];
