@@ -171,7 +171,7 @@
 #define HAVE_WHEEL_POSITION
 
 /* Define this if you have adjustable CPU frequency */
-/* #define HAVE_ADJUSTABLE_CPU_FREQ - not yet */
+#define HAVE_ADJUSTABLE_CPU_FREQ
 
 #define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

@@ -25,9 +25,9 @@
 #include "config.h"
 
 unsigned char pmu_read(int address);
-void pmu_write(int address, unsigned char val);
-void pmu_read_multiple(int address, int count, unsigned char* buffer);
-void pmu_write_multiple(int address, int count, unsigned char* buffer);
+int pmu_write(int address, unsigned char val);
+int pmu_read_multiple(int address, int count, unsigned char* buffer);
+int pmu_write_multiple(int address, int count, unsigned char* buffer);
 int pmu_read_adc(unsigned int adc);
 int pmu_read_battery_voltage(void);
 int pmu_read_battery_current(void);

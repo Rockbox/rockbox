@@ -24,16 +24,15 @@
 #include "i2c-s5l8700.h"
 
 static struct mutex pmu_adc_mutex;
-int pmu_initialized = 0;
 
-void pmu_read_multiple(int address, int count, unsigned char* buffer)
+int pmu_read_multiple(int address, int count, unsigned char* buffer)
 {
-    i2c_read(0xe6, address, count, buffer);
+    return i2c_read(0xe6, address, count, buffer);
 }
 
-void pmu_write_multiple(int address, int count, unsigned char* buffer)
+int pmu_write_multiple(int address, int count, unsigned char* buffer)
 {
-    i2c_write(0xe6, address, count, buffer);
+    return i2c_write(0xe6, address, count, buffer);
 }
 
 unsigned char pmu_read(int address)
@@ -45,22 +44,19 @@ unsigned char pmu_read(int address)
     return tmp;
 }
 
-void pmu_write(int address, unsigned char val)
+int pmu_write(int address, unsigned char val)
 {
-    pmu_write_multiple(address, 1, &val);
+    return pmu_write_multiple(address, 1, &val);
 }
 
 void pmu_init(void)
 {
-    if (pmu_initialized) return;
     mutex_init(&pmu_adc_mutex);
-    pmu_initialized = 1;
 }
 
 int pmu_read_adc(unsigned int adc)
 {
     int data = 0;
-    if (!pmu_initialized) pmu_init();
     mutex_lock(&pmu_adc_mutex);
     pmu_write(0x54, 5 | (adc << 4));
     while ((data & 0x80) == 0)
