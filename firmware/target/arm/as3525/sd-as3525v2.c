@@ -231,7 +231,7 @@ void INT_NAND(void)
 //    wakeup_signal(&transfer_completion_signal);
     MCI_CLEAR = status;
 
-    static int x = 0;
+    //static int x = 0;
     switch(status)
     {
         case 0x4:       /* cmd received ? */
@@ -241,9 +241,11 @@ void INT_NAND(void)
         case 0x820:     /* ? 1 time while copy from FIFO (not DMA) */
         case 0x20:      /* ? rx fifo empty */
             break;
+#if 0
         default:
             printf("%2d NAND 0x%x", ++x, status);
             int delay = 0x100000; while(delay--) ;
+#endif
     }
     /*
      * 0x48 = some kind of status
@@ -262,7 +264,7 @@ void INT_NAND(void)
      *  read resp (6, 7, 12, 42) : while bit 9 is unset ;
      *
      */
-    printf("%x %x", status, (*(volatile unsigned long *) (SD_BASE+0x48)));
+    //printf("%x %x", status, (*(volatile unsigned long *) (SD_BASE+0x48)));
     //while(!button_read_device());
     //while(button_read_device());
 
@@ -588,6 +590,21 @@ static int sd_wait_for_state(unsigned int state)
 
 static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool write)
 {
+#if 1
+    /* This is debug code, not functional yet */
+    line = 0;
+    lcd_clear_display();
+    printf("Entering SD transfer");
+    printf("THIS IS DEBUG CODE !");
+    printf("");
+    printf("All your controllers");
+    printf("are belong to us.");
+    volatile int delay = 0x500000;
+    while(delay--) ;
+    line = 0;
+    lcd_clear_display();
+#endif /* debug warning */
+
     int ret = 0;
 
     if((int)buf & 3)
