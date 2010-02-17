@@ -133,11 +133,11 @@
 #if (MEM==32)  /* this is the 30GB-model */
 # define BATTERY_CAPACITY_DEFAULT 400 /* default battery capacity for the 30GB model */
 # define BATTERY_CAPACITY_MIN     300 /* min. capacity selectable */
-# define BATTERY_CAPACITY_MAX     800 /* max. capacity selectable */
+# define BATTERY_CAPACITY_MAX    1000 /* max. capacity selectable */
 #else          /* these are the 60/80GB-models */
 # define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity for the 60/80GB model */
 # define BATTERY_CAPACITY_MIN     500 /* min. capacity selectable */
-# define BATTERY_CAPACITY_MAX    1000 /* max. capacity selectable */
+# define BATTERY_CAPACITY_MAX    1400 /* max. capacity selectable */
 #endif
 #define BATTERY_CAPACITY_INC       50 /* capacity increment */
 #define BATTERY_TYPES_COUNT         1 /* only one type */

@@ -124,10 +124,10 @@
 #define HAVE_HEADPHONE_DETECTION
 
 #define BATTERY_CAPACITY_DEFAULT 400 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 400 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 800 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 10  /* capacity increment */
-#define BATTERY_TYPES_COUNT  1   /* only one type */
+#define BATTERY_CAPACITY_MIN     400 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX    1000 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC      10 /* capacity increment */
+#define BATTERY_TYPES_COUNT        1 /* only one type */
 
 /* define current usage levels */
 #define CURRENT_NORMAL     50  /* PP5024 uses ~40mA, so add some for disk */
