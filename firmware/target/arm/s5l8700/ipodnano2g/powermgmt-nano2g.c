@@ -26,20 +26,20 @@
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     /* TODO: this is just an initial guess */
-    3400
+    3600
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     /* TODO: this is just an initial guess */
-    3300
+    3350
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     /* TODO: simple uncalibrated curve, linear except for first 10% */
-    { 3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200 }
+    { 3377, 3741, 3783, 3820, 3856, 3892, 3934, 3989, 4061, 4144, 4249 }
 };
 
 #if CONFIG_CHARGING
@@ -47,7 +47,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 const unsigned short percent_to_volt_charge[11] =
 {
     /* TODO: simple uncalibrated curve, linear except for first 10% */
-    3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200
+    3344, 3969, 4038, 4105, 4205, 4310, 4312, 4314, 4316, 4318, 4320
 };
 #endif /* CONFIG_CHARGING */
 
