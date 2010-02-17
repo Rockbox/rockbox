@@ -90,7 +90,7 @@ uint8_t nand_tunk3[4];
 uint32_t nand_type[4];
 int nand_powered = 0;
 long nand_last_activity_value = -1;
-static long nand_stack[20];
+static long nand_stack[32];
 
 static struct mutex nand_mtx;
 static struct wakeup nand_wakeup;
