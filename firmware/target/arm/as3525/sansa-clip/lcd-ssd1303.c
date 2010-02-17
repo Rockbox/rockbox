@@ -183,11 +183,10 @@ void lcd_write_data(const fb_data* p_bytes, int count)
 
     while (count--)
     {
-        while(SSP_SR & (1<<1))      /* Transmit FIFO is not full */
-            SSP_DATA = *p_bytes++;
-
-        while(!(SSP_SR & (1<<0)))   /* Transmit FIFO is not empty */
+        while(!(SSP_SR & (1<<1)))   /* wait until transmit FIFO is not full */
             ;
+
+        SSP_DATA = *p_bytes++;
     }
 }
 #endif
@@ -289,10 +288,8 @@ void lcd_init_device(void)
 #elif defined(SANSA_CLIPPLUS)
     GPIOA_DIR |= (1<<5);
     GPIOB_DIR |= (1<<2) | (1<<7);
-    GPIOA_PIN(5) = 0;
-    GPIOA_DIR &= (1<<0);
-    GPIOA_PIN(0) = (1<<0);
-    GPIOB_PIN(7) = (1<<7);
+    GPIOB_PIN(7) = 0;
+    GPIOA_PIN(5) = (1<<5);
 #endif
 
     /* Set display clock (divide ratio = 1) and oscillator frequency (1) */
