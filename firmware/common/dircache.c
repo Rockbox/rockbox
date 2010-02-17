@@ -259,10 +259,10 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     /* second pass: recurse ! */
     ce = first_ce;
     
-    while(ce)
+    while(rc >= 0 && ce)
     {
         if(ce->name_len != 0 && ce->down != NULL && strcmp(ce->d_name, ".") && strcmp(ce->d_name, ".."))
-            sab_process_dir(ce->startcluster, ce->down);
+            rc = sab_process_dir(ce->startcluster, ce->down);
         
         ce = ce->next;
     }
