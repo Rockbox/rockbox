@@ -277,7 +277,7 @@ void system_init(void)
     unsigned int reset_loops = 640;
 
     CCU_SRC = 0x1fffff0
-        & ~(1<<18); /* FIXME */
+        & ~CCU_SRC_IDE_EN; /* FIXME */
     while(reset_loops--)
         CCU_SRL = CCU_SRL_MAGIC_NUMBER;
     CCU_SRC = CCU_SRL = 0;
