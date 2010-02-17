@@ -881,7 +881,7 @@ int a52_block (a52_state_t * state)
 		       state->dynrng, 0, 7);
 	    for (i = 7; i < 256; i++)
 		(samples-256)[i] = 0;
-	    a52_imdct_512 (samples - 256, samples + 1536 - 256, state->bias);
+	    a52_imdct_512 (samples - 256, samples + 1536 - 256);
 	} else {
 	    /* just skip the LFE coefficients */
 	    coeff_get (state, samples + 1280, &state->lfe_expbap, &quant,
@@ -910,11 +910,9 @@ int a52_block (a52_state_t * state)
 
 	    if (coeff[i]) {
 		if (blksw[i])
-		    a52_imdct_256 (samples + 256 * i, samples + 1536 + 256 * i,
-				   bias);
+		    a52_imdct_256 (samples + 256 * i, samples + 1536 + 256 * i);
 		else 
-		    a52_imdct_512 (samples + 256 * i, samples + 1536 + 256 * i,
-				   bias);
+		    a52_imdct_512 (samples + 256 * i, samples + 1536 + 256 * i);
 	    } else {
 		int j;
 
@@ -923,28 +921,26 @@ int a52_block (a52_state_t * state)
 	    }
 	}
 
-	a52_downmix (samples, state->acmod, state->output, state->bias,
+	a52_downmix (samples, state->acmod, state->output,
 		     state->clev, state->slev);
     } else {
 	nfchans = nfchans_tbl[state->output & A52_CHANNEL_MASK];
 
-	a52_downmix (samples, state->acmod, state->output, 0,
+	a52_downmix (samples, state->acmod, state->output,
 		     state->clev, state->slev);
 
 	if (!state->downmixed) {
 	    state->downmixed = 1;
-	    a52_downmix (samples + 1536, state->acmod, state->output, 0,
+	    a52_downmix (samples + 1536, state->acmod, state->output,
 			 state->clev, state->slev);
 	}
 
 	if (blksw[0])
 	    for (i = 0; i < nfchans; i++)
-		a52_imdct_256 (samples + 256 * i, samples + 1536 + 256 * i,
-			       state->bias);
+		a52_imdct_256 (samples + 256 * i, samples + 1536 + 256 * i);
 	else 
 	    for (i = 0; i < nfchans; i++)
-		a52_imdct_512 (samples + 256 * i, samples + 1536 + 256 * i,
-			       state->bias);
+		a52_imdct_512 (samples + 256 * i, samples + 1536 + 256 * i);
     }
 
     return 0;

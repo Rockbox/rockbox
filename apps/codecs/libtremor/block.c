@@ -25,6 +25,7 @@
 #include "window.h"
 #include "registry.h"
 #include "misc.h"
+//#include <codecs/lib/codeclib.h>
 
 static int ilog(unsigned int v){
   int ret=0;
@@ -239,6 +240,7 @@ static int _vds_init(vorbis_dsp_state *v,vorbis_info *vi){
     b->mode[i]=_mapping_P[maptype]->look(v,ci->mode_param[i],
                                          ci->map_param[mapnum]);
   }
+
   return(0);
 }
 

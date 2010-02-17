@@ -21,9 +21,7 @@
 
 #include "ffmpeg_bitstream.h"
 #include "../librm/rm.h"
-#ifdef ROCKBOX
 #include "codeclib.h"
-#endif
 
 #if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == MCF5250)
 /* PP5022/24 and MCF5250 have larger IRAM */

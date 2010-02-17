@@ -797,6 +797,7 @@ static void dump_cook_context(COOKContext *q)
 
     /* Initialize variable relations */
     q->numvector_size = (1 << q->log2_numvector_size);
+    q->mdct_nbits = av_log2(q->samples_per_channel)+1;
 
     /* Generate tables */
     if (init_cook_vlc_tables(q) != 0)

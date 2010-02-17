@@ -24,6 +24,7 @@ extern "C"
 #endif /* __cplusplus */
 
 #include "ogg.h"
+//#include <codecs/lib/codeclib.h>
 
 typedef struct vorbis_info{
   int version;
@@ -105,7 +106,6 @@ typedef struct vorbis_block{
   long                localalloc;
   long                totaluse;
   struct alloc_chain *reap;
-
 } vorbis_block;
 
 /* vorbis_block is a single block of data to be processed as part of

@@ -23,7 +23,7 @@ static inline int32_t MULT32(int32_t x, int32_t y) {
   int lo,hi;
   asm volatile("smull\t%0, %1, %2, %3"
                : "=&r"(lo),"=&r"(hi)
-               : "%r"(x),"r"(y) );
+               : "r"(x),"r"(y) );
   return(hi);
 }
 
@@ -37,7 +37,7 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
 	       "movs	%0, %0, lsr #15\n\t"
 	       "adc	%1, %0, %1, lsl #17\n\t"
                : "=&r"(lo),"=&r"(hi)
-               : "%r"(x),"r"(y)
+               : "r"(x),"r"(y)
                : "cc" );
   return(hi);
 }
@@ -45,13 +45,13 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
 #define XPROD32(a, b, t, v, x, y) \
 { \
   long l; \
-  asm(	"smull	%0, %1, %4, %6\n\t" \
-	"rsb	%3, %4, #0\n\t" \
-	"smlal	%0, %1, %5, %7\n\t" \
-	"smull	%0, %2, %5, %6\n\t" \
-	"smlal	%0, %2, %3, %7" \
-	: "=&r" (l), "=&r" (x), "=&r" (y), "=r" ((a)) \
-        : "3" ((a)), "r" ((b)), "r" ((t)), "r" ((v)) ); \
+  asm(	"smull	%0, %1, %3, %5\n\t" \
+	"rsb	%2, %6, #0\n\t" \
+	"smlal	%0, %1, %4, %6\n\t" \
+	"smull	%0, %2, %3, %2\n\t" \
+	"smlal	%0, %2, %4, %5" \
+	: "=&r" (l), "=&r" (x), "=&r" (y) \
+        : "r" ((a)), "r" ((b)), "r" ((t)), "r" ((v)) ); \
 }
 
 static inline void XPROD31(int32_t  a, int32_t  b,
@@ -59,13 +59,13 @@ static inline void XPROD31(int32_t  a, int32_t  b,
 			   int32_t *x, int32_t *y)
 {
   int x1, y1, l;
-  asm(	"smull	%0, %1, %4, %6\n\t"
-	"rsb	%3, %4, #0\n\t"
-	"smlal	%0, %1, %5, %7\n\t"
-	"smull	%0, %2, %5, %6\n\t"
-	"smlal	%0, %2, %3, %7"
-	: "=&r" (l), "=&r" (x1), "=&r" (y1), "=r" (a)
-	: "3" (a), "r" (b), "r" (t), "r" (v) );
+  asm(	"smull	%0, %1, %3, %5\n\t"
+	"rsb	%2, %6, #0\n\t"
+	"smlal	%0, %1, %4, %6\n\t"
+	"smull	%0, %2, %3, %2\n\t"
+	"smlal	%0, %2, %4, %5"
+	: "=&r" (l), "=&r" (x1), "=&r" (y1)
+	: "r" (a), "r" (b), "r" (t), "r" (v) );
   *x = x1 << 1;
   *y = y1 << 1;
 }
@@ -84,6 +84,34 @@ static inline void XNPROD31(int32_t  a, int32_t  b,
 	: "r" (a), "r" (b), "r" (t), "r" (v) );
   *x = x1 << 1;
   *y = y1 << 1;
+}
+
+#define XPROD31_R(_a, _b, _t, _v, _x, _y)\
+{\
+  int x1, y1, l;\
+  asm(	"smull	%0, %1, %5, %3\n\t"\
+	"rsb	%2, %3, #0\n\t"\
+	"smlal	%0, %1, %6, %4\n\t"\
+	"smull	%0, %2, %6, %2\n\t"\
+	"smlal	%0, %2, %5, %4"\
+	: "=&r" (l), "=&r" (x1), "=&r" (y1)\
+	: "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
+  _x = x1 << 1;\
+  _y = y1 << 1;\
+}
+
+#define XNPROD31_R(_a, _b, _t, _v, _x, _y)\
+{\
+  int x1, y1, l;\
+  asm(	"smull	%0, %1, %5, %3\n\t"\
+	"rsb	%2, %4, #0\n\t"\
+	"smlal	%0, %1, %6, %2\n\t"\
+	"smull	%0, %2, %5, %4\n\t"\
+	"smlal	%0, %2, %6, %3"\
+	: "=&r" (l), "=&r" (x1), "=&r" (y1)\
+	: "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
+  _x = x1 << 1;\
+  _y = y1 << 1;\
 }
 
 #ifndef _V_VECT_OPS

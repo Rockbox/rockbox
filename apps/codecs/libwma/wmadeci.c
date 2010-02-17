@@ -452,17 +452,6 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         }
     }
 
-    /*Not using the ffmpeg IMDCT anymore*/
-
-    /* mdct_init_global();
-
-    for(i = 0; i < s->nb_block_sizes; ++i)
-    {
-        ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1);
-
-    }
-    */
-
     /* ffmpeg uses malloc to only allocate as many window sizes as needed.  
     *  However, we're really only interested in the worst case memory usage.
     *  In the worst case you can have 5 window sizes, 128 doubling up 2048
@@ -1253,14 +1242,9 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
 
             n4 = s->block_len >>1;
 
-            /*faster IMDCT from Vorbis*/
-            mdct_backward( (1 << (s->block_len_bits+1)), (int32_t*)(*(s->coefs))[ch], (int32_t*)scratch_buffer);
-
-            /*slower but more easily understood IMDCT from FFMPEG*/
-            //ff_imdct_calc(&s->mdct_ctx[bsize],
-            //              output,
-            //              (*(s->coefs))[ch]);
-
+            ff_imdct_calc( (s->frame_len_bits - bsize + 1),
+                          (int32_t*)scratch_buffer,
+                          (*(s->coefs))[ch]);
 
             /* add in the frame */
             index = (s->frame_len / 2) + s->block_pos - n4;

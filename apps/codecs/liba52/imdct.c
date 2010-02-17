@@ -72,6 +72,8 @@ static const uint8_t fftorder[] = {
 //static sample_t a52_imdct_window[256];
 #include "imdct_lookups.h"
 
+
+/*
 static void (* ifft128) (complex_t * buf);
 static void (* ifft64) (complex_t * buf);
 
@@ -109,7 +111,7 @@ static inline void ifft4 (complex_t * buf)
     buf[3].real = tmp5 - tmp7;
     buf[3].imag = tmp6 - tmp8;
 }
-
+*/
 /* basic radix-2 ifft butterfly */
 
 #define BUTTERFLY_0(t0,t1,W0,W1,d0,d1) do {	\
@@ -161,7 +163,7 @@ static inline void ifft4 (complex_t * buf)
 } while (0)
 
 /* split-radix ifft butterfly, specialized for wr=wi */
-
+/*
 #define BUTTERFLY_HALF(a0,a1,a2,a3,w) do {	\
     tmp5 = MUL (a2.real + a2.imag, w);		\
     tmp6 = MUL (a2.imag - a2.real, w);		\
@@ -255,93 +257,96 @@ static void ifft128_c (complex_t * buf)
     ifft32 (buf + 96);
     ifft_pass (buf, roots128, 32);
 }
-
-void a52_imdct_512 (sample_t * data, sample_t * delay, sample_t bias)
+*/
+void a52_imdct_512 (sample_t * data, sample_t * delay)
 {
     int i, k;
     sample_t t_r, t_i, a_r, a_i, b_r, b_i, w_1, w_2;
     const sample_t * window = a52_imdct_window;
-    complex_t buf[128];
+    FFTComplex buf[128];
 	
     for (i = 0; i < 128; i++) {
-	k = fftorder[i];
-	t_r = pre1[i].real;
-	t_i = pre1[i].imag;
-	BUTTERFLY_0 (buf[i].real, buf[i].imag, t_r, t_i, data[k], data[255-k]);
+        k = fftorder[i];
+        t_r = pre1[i].real;
+        t_i = pre1[i].imag;
+        BUTTERFLY_0 (buf[i].re, buf[i].im, t_r, t_i, data[k], data[255-k]);
     }
 
-    ifft128 (buf);
+    //ifft128 (buf);
+    ff_fft_calc_c(7, (FFTComplex *)&buf);
 
     /* Post IFFT complex multiply plus IFFT complex conjugate*/
     /* Window and convert to real valued signal */
     for (i = 0; i < 64; i++) {
-	/* y[n] = z[n] * (xcos1[n] + j * xsin1[n]) ; */
-	t_r = post1[i].real;
-	t_i = post1[i].imag;
-	BUTTERFLY_0 (a_r, a_i, t_i, t_r, buf[i].imag, buf[i].real);
-	BUTTERFLY_0 (b_r, b_i, t_r, t_i, buf[127-i].imag, buf[127-i].real);
+        /* y[n] = z[n] * (xcos1[n] + j * xsin1[n]) ; */
+        t_r = post1[i].real;
+        t_i = post1[i].imag;
+        BUTTERFLY_0 (a_r, a_i, t_i, t_r, buf[i].im, buf[i].re);
+        BUTTERFLY_0 (b_r, b_i, t_r, t_i, buf[127-i].im, buf[127-i].re);
 
-	w_1 = window[2*i];
-	w_2 = window[255-2*i];
-	BUTTERFLY_B (data[255-2*i], data[2*i], w_2, w_1, a_r, delay[2*i]);
-	delay[2*i] = a_i;
+        w_1 = window[2*i];
+        w_2 = window[255-2*i];
+        BUTTERFLY_B (data[255-2*i], data[2*i], w_2, w_1, a_r, delay[2*i]);
+        delay[2*i] = a_i;
 
-	w_1 = window[2*i+1];
-	w_2 = window[254-2*i];
-	BUTTERFLY_B (data[2*i+1], data[254-2*i], w_1, w_2, b_r, delay[2*i+1]);
-	delay[2*i+1] = b_i;
+        w_1 = window[2*i+1];
+        w_2 = window[254-2*i];
+        BUTTERFLY_B (data[2*i+1], data[254-2*i], w_1, w_2, b_r, delay[2*i+1]);
+        delay[2*i+1] = b_i;
     }
 }
 
-void a52_imdct_256 (sample_t * data, sample_t * delay, sample_t bias)
+void a52_imdct_256 (sample_t * data, sample_t * delay)
 {
     int i, k;
     sample_t t_r, t_i, a_r, a_i, b_r, b_i, c_r, c_i, d_r, d_i, w_1, w_2;
     const sample_t * window = a52_imdct_window;
-    complex_t buf1[64], buf2[64];
+    FFTComplex buf1[64], buf2[64];
 
     /* Pre IFFT complex multiply plus IFFT cmplx conjugate */
     for (i = 0; i < 64; i++) {
-	k = fftorder[i];
-	t_r = pre2[i].real;
-	t_i = pre2[i].imag;
-	BUTTERFLY_0 (buf1[i].real, buf1[i].imag, t_r, t_i, data[k], data[254-k]);
-	BUTTERFLY_0 (buf2[i].real, buf2[i].imag, t_r, t_i, data[k+1], data[255-k]);
+        k = fftorder[i];
+        t_r = pre2[i].real;
+        t_i = pre2[i].imag;
+        BUTTERFLY_0 (buf1[i].re, buf1[i].im, t_r, t_i, data[k], data[254-k]);
+        BUTTERFLY_0 (buf2[i].re, buf2[i].im, t_r, t_i, data[k+1], data[255-k]);
     }
 
-    ifft64 (buf1);
-    ifft64 (buf2);
+    //ifft64 (buf1);
+    //ifft64 (buf2);
+    ff_fft_calc_c(6, (FFTComplex *)&buf1);
+    ff_fft_calc_c(6, (FFTComplex *)&buf2);
 
     /* Post IFFT complex multiply */
     /* Window and convert to real valued signal */
     for (i = 0; i < 32; i++) {
-	/* y1[n] = z1[n] * (xcos2[n] + j * xs in2[n]) ; */ 
-	t_r = post2[i].real;
-	t_i = post2[i].imag;
-	BUTTERFLY_0 (a_r, a_i, t_i, t_r, buf1[i].imag, buf1[i].real);
-	BUTTERFLY_0 (b_r, b_i, t_r, t_i, buf1[63-i].imag, buf1[63-i].real);
-	BUTTERFLY_0 (c_r, c_i, t_i, t_r, buf2[i].imag, buf2[i].real);
-	BUTTERFLY_0 (d_r, d_i, t_r, t_i, buf2[63-i].imag, buf2[63-i].real);
+        /* y1[n] = z1[n] * (xcos2[n] + j * xs in2[n]) ; */ 
+        t_r = post2[i].real;
+        t_i = post2[i].imag;
+        BUTTERFLY_0 (a_r, a_i, t_i, t_r, buf1[i].im, buf1[i].re);
+        BUTTERFLY_0 (b_r, b_i, t_r, t_i, buf1[63-i].im, buf1[63-i].re);
+        BUTTERFLY_0 (c_r, c_i, t_i, t_r, buf2[i].im, buf2[i].re);
+        BUTTERFLY_0 (d_r, d_i, t_r, t_i, buf2[63-i].im, buf2[63-i].re);
 
-	w_1 = window[2*i];
-	w_2 = window[255-2*i];
-	BUTTERFLY_B (data[255-2*i], data[2*i], w_2, w_1, a_r, delay[2*i]);
-	delay[2*i] = c_i;
+        w_1 = window[2*i];
+        w_2 = window[255-2*i];
+        BUTTERFLY_B (data[255-2*i], data[2*i], w_2, w_1, a_r, delay[2*i]);
+        delay[2*i] = c_i;
 
-	w_1 = window[128+2*i];
-	w_2 = window[127-2*i];
-	BUTTERFLY_B (data[128+2*i], data[127-2*i], w_1, w_2, a_i, delay[127-2*i]);
-	delay[127-2*i] = c_r;
+        w_1 = window[128+2*i];
+        w_2 = window[127-2*i];
+        BUTTERFLY_B (data[128+2*i], data[127-2*i], w_1, w_2, a_i, delay[127-2*i]);
+        delay[127-2*i] = c_r;
 
-	w_1 = window[2*i+1];
-	w_2 = window[254-2*i];
-	BUTTERFLY_B (data[254-2*i], data[2*i+1], w_2, w_1, b_i, delay[2*i+1]);
-	delay[2*i+1] = d_r;
+        w_1 = window[2*i+1];
+        w_2 = window[254-2*i];
+        BUTTERFLY_B (data[254-2*i], data[2*i+1], w_2, w_1, b_i, delay[2*i+1]);
+        delay[2*i+1] = d_r;
 
-	w_1 = window[129+2*i];
-	w_2 = window[126-2*i];
-	BUTTERFLY_B (data[129+2*i], data[126-2*i], w_1, w_2, b_r, delay[126-2*i]);
-	delay[126-2*i] = d_i;
+        w_1 = window[129+2*i];
+        w_2 = window[126-2*i];
+        BUTTERFLY_B (data[129+2*i], data[126-2*i], w_1, w_2, b_r, delay[126-2*i]);
+        delay[126-2*i] = d_i;
     }
 }
 
@@ -361,6 +366,9 @@ static double besselI0 (double x)
 void a52_imdct_init (uint32_t mm_accel)
 {
   (void)mm_accel;
+  //ff_fft_init(&s128, 7, 1);
+  //ff_fft_init(&s64, 6, 1);
+  
 /*    int i, k;
     double sum;
     double local_imdct_window[256];*/
@@ -457,7 +465,7 @@ void a52_imdct_init (uint32_t mm_accel)
     printf("static complex_t post2[32]={");
     for (i=0;i<32;i++) { printf("{%d,%d}%s",post2[i].real,post2[i].imag,(i < 31 ? "," : "")); }
     printf("};\n");
-    */
+    
 
 #ifdef LIBA52_DJBFFT
     if (mm_accel & MM_ACCEL_DJBFFT) {
@@ -474,4 +482,5 @@ void a52_imdct_init (uint32_t mm_accel)
 	ifft128 = ifft128_c;
 	ifft64 = ifft64_c;
     }
+    */
 }

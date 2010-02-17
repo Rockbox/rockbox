@@ -132,22 +132,35 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
 
 #else
 
-static inline void XPROD31(int32_t  a, int32_t  b,
-			   int32_t  t, int32_t  v,
-			   int32_t *x, int32_t *y)
+static inline void XPROD31(int32_t a, int32_t b,
+                      int32_t t, int32_t v,
+                      int32_t *x, int32_t *y)
 {
   *x = MULT31(a, t) + MULT31(b, v);
   *y = MULT31(b, t) - MULT31(a, v);
 }
 
-static inline void XNPROD31(int32_t  a, int32_t  b,
-			    int32_t  t, int32_t  v,
-			    int32_t *x, int32_t *y)
+static inline void XNPROD31(int32_t a, int32_t b,
+                       int32_t  t, int32_t  v,
+                       int32_t *x, int32_t *y)
 {
   *x = MULT31(a, t) - MULT31(b, v);
   *y = MULT31(b, t) + MULT31(a, v);
 }
 #endif
+
+#define XPROD31_R(_a, _b, _t, _v, _x, _y)\
+{\
+  _x = MULT31(_a, _t) + MULT31(_b, _v);\
+  _y = MULT31(_b, _t) - MULT31(_a, _v);\
+}
+
+#define XNPROD31_R(_a, _b, _t, _v, _x, _y)\
+{\
+  _x = MULT31(_a, _t) - MULT31(_b, _v);\
+  _y = MULT31(_b, _t) + MULT31(_a, _v);\
+}
+
 
 #ifndef _V_VECT_OPS
 #define _V_VECT_OPS

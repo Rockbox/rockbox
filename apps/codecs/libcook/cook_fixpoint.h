@@ -165,15 +165,14 @@ static void scalar_dequant_math(COOKContext *q, int index,
  * @param mlt_tmp           pointer to temporary storage space
  */
 #include "../lib/mdct_lookup.h"
-#include "../lib/mdct2.h"
 
 static inline void imlt_math(COOKContext *q, FIXP *in)
 {
     const int n = q->samples_per_channel;
     const int step = 2 << (10 - av_log2(n));
     int i = 0, j = 0;
-    
-    mdct_backward(2 * n, in, q->mono_mdct_output);
+
+    ff_imdct_calc(q->mdct_nbits, q->mono_mdct_output, in);
 
     do {
         FIXP tmp = q->mono_mdct_output[i];

@@ -26,6 +26,7 @@
 
 
 static ogg_int32_t *ipcm_vect[CHANNELS] IBSS_ATTR;
+int32_t staticbuffer[16384];
 
 int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep)
     ICODE_ATTR_TREMOR_NOT_MDCT;
@@ -67,7 +68,8 @@ int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep){
   vb->sequence=op->packetno-3; /* first block is third packet */
   vb->eofflag=op->e_o_s;
 
-  if(decodep && vi->channels<=CHANNELS){
+  if(decodep && vi->channels<=CHANNELS)
+  {
     vb->pcm = ipcm_vect;
 
     /* set pcm end point */
@@ -81,6 +83,7 @@ int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep){
          by simply flipping pointers */
       for(i=0; i<vi->channels; i++)
         vb->pcm[i] = &vd->first_pcm[i*ci->blocksizes[1]];
+        
     }
     vd->reset_pcmb = false;
       

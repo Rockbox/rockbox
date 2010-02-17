@@ -23,8 +23,6 @@
 #include "asf.h"
 #include "bitstream.h" /* For GetBitContext */
 #include "types.h"
-//#include "dsputil.h"  /* For MDCTContext */
-
 
 //#define TRACE
 /* size of blocks */

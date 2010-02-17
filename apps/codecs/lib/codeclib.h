@@ -25,6 +25,8 @@
 #include "config.h"
 #include "codecs.h"
 #include <sys/types.h>
+#include "mdct.h"
+#include "fft.h"
 
 extern struct codec_api *ci;
 extern size_t mem_ptr;
@@ -62,8 +64,13 @@ int strcmp(const char *, const char *);
 void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *));
 
 /*MDCT library functions*/
-
+/* -1- Tremor mdct */
 extern void mdct_backward(int n, int32_t *in, int32_t *out);
+/* -2- ffmpeg fft-based mdct */
+extern void ff_imdct_half(unsigned int nbits, int32_t *output, const int32_t *input);
+extern void ff_imdct_calc(unsigned int nbits, int32_t *output, const int32_t *input);
+/*ffmpeg fft (can be used without mdct)*/
+extern void ff_fft_calc_c(int nbits, FFTComplex *z);
 
 #if !defined(CPU_ARM) || ARM_ARCH < 5
 /* From libavutil/common.h */

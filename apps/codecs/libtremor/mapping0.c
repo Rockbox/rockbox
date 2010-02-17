@@ -27,8 +27,7 @@
 #include "window.h"
 #include "registry.h"
 #include "misc.h"
-
-
+#include <codecs/lib/codeclib.h>
 
 /* simplistic, wasteful way of doing this (unique lookup for each
    mode/submapping); there should be a central repository for
@@ -291,7 +290,10 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
       /* compute and apply spectral envelope */
       look->floor_func[submap]->
         inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
-      mdct_backward(n, (int32_t*) pcm, (int32_t*) pcm);
+        
+      ff_imdct_calc(ci->blocksizes_nbits[vb->W],
+                    (int32_t*)pcm,
+                    (int32_t*)pcm);
       /* window the data */
       _vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
     }

@@ -18,6 +18,7 @@
 
 extern const int32_t sincos_lookup0[1026];
 extern const int32_t sincos_lookup1[1024];
+extern const uint16_t revtab[1<<12];
 
 
 

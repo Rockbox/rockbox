@@ -40,7 +40,6 @@
 #include "atrac3data.h"
 #include "atrac3data_fixed.h"
 #include "fixp_math.h"
-#include "../lib/mdct2.h"
 
 #define JOINT_STEREO    0x12
 #define STEREO          0x2
@@ -260,7 +259,7 @@ static void iqmf (int32_t *inlo, int32_t *inhi, unsigned int nIn, int32_t *pOut,
 static void IMLT(int32_t *pInput, int32_t *pOutput)
 {
     /* Apply the imdct. */
-    mdct_backward(512, pInput, pOutput);
+    ff_imdct_calc(9, pOutput, pInput);
 
     /* Windowing. */
     atrac3_imdct_windowing(pOutput, window_lookup);
@@ -297,7 +296,7 @@ static int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes){
 }
 
 
-static void init_atrac3_transforms(void) {
+static void init_atrac3_transforms() {
     int32_t s;
     int i;
 
@@ -312,7 +311,7 @@ static void init_atrac3_transforms(void) {
         qmf_window[i] = s;
         qmf_window[47 - i] = s;
     }
-}
+    }
 
 
 /**
