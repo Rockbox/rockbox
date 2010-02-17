@@ -522,7 +522,7 @@ int sd_init(void)
         (CLK_DIV(AS3525_PLLA_FREQ, AS3525_MS_FREQ) -1) | 1;
 
     /* ?? */
-    *(volatile int*)0xC80F003C = (1<<7) |
+    *(volatile int*)(CGU_BASE+0x3C) = (1<<7) |
         (CLK_DIV(AS3525_PLLA_FREQ, 24000000) -1) | 1;
 
     wakeup_init(&transfer_completion_signal);
