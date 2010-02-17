@@ -296,7 +296,8 @@ static int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes){
 }
 
 
-static void init_atrac3_transforms() {
+static void init_atrac3_transforms(void)
+{
     int32_t s;
     int i;
 
@@ -311,7 +312,7 @@ static void init_atrac3_transforms() {
         qmf_window[i] = s;
         qmf_window[47 - i] = s;
     }
-    }
+}
 
 
 /**
