@@ -286,6 +286,7 @@ int main(int argc, char **argv)
     }
 
     skin_buffer_init();
+    skin_font_init();
 
     /* Go through every wps that was thrown at us, error out at the first
      * flawed wps */
