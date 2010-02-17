@@ -179,14 +179,3 @@ md5sum.c
 #ifdef USB_ENABLE_HID
 remote_control.c
 #endif
-
-test_codec.c
-test_core_jpeg.c
-test_disk.c
-test_fps.c
-test_gfx.c
-test_mem_jpeg.c
-test_resize.c
-test_sampr.c
-test_scanrate.c
-test_viewports.c

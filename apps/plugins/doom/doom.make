@@ -10,7 +10,7 @@
 DOOMSRCDIR := $(APPSDIR)/plugins/doom
 DOOMBUILDDIR := $(BUILDDIR)/apps/plugins/doom
 
-#ROCKS += $(DOOMBUILDDIR)/doom.rock
+ROCKS += $(DOOMBUILDDIR)/doom.rock
 
 DOOM_SRC := $(call preprocess, $(DOOMSRCDIR)/SOURCES)
 DOOM_SRC += $(ROOTDIR)/firmware/common/sscanf.c

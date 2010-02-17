@@ -48,7 +48,7 @@ void power_off(void)
 
 void power_init(void)
 {
-    pmu_write(0x1e, 15);  /* Vcore = 1.000V */
+    /* TODO */
 }
 
 #if CONFIG_CHARGING
