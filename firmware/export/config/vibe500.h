@@ -81,6 +81,7 @@
 /* define this if you have a real-time clock */
 /* Philips 8563T - E8564 is a clone of it */
 #define CONFIG_RTC RTC_E8564
+#define HAVE_RTC_ALARM
 
 /* define this if you have a disk storage, i.e. something
    that needs spinups and can cause skips when shaked */
