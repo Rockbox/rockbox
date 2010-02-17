@@ -901,10 +901,10 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case WPS_TOKEN_SETTING:
         {
+            const struct settings_list *s = settings+token->value.i;
             if (intval)
             {
                 /* Handle contionals */
-                const struct settings_list *s = settings+token->value.i;
                 switch (s->flags&F_T_MASK)
                 {
                     case F_T_INT:
@@ -930,6 +930,7 @@ const char *get_token_value(struct gui_wps *gwps,
                         *intval = *(bool*)s->setting?1:2;
                         break;
                     case F_T_CHARPTR:
+                    case F_T_UCHARPTR:
                         /* %?St|name|<if non empty string|if empty>
                          * The string's emptyness discards the setting's
                          * prefix and suffix */
@@ -940,6 +941,13 @@ const char *get_token_value(struct gui_wps *gwps,
                         *intval = -1;
                         break;
                 }
+            }
+            /* Special handlng for filenames because we dont want to show the prefix */
+            if ((s->flags&F_T_MASK) == F_T_UCHARPTR ||
+                (s->flags&F_T_MASK) == F_T_UCHARPTR)
+            {
+                if (s->filename_setting->prefix)
+                    return (char*)s->setting;
             }
             cfg_to_string(token->value.i,buf,buf_size);
             return buf;
