@@ -57,6 +57,7 @@
 /* asm-optimised functions and/or macros */
 #include "fft-ffmpeg_arm.h"
 
+#if 0
 static int split_radix_permutation(int i, int n, int inverse)
 {
     int m;
@@ -68,7 +69,6 @@ static int split_radix_permutation(int i, int n, int inverse)
     else                  return split_radix_permutation(i, m, inverse)*4 - 1;
 }
 
-#if 0
 static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 {
     int j, k, np;
