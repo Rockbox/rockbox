@@ -21,10 +21,11 @@
 
 .text
 
-#if defined(SANSA_CLIPV2) || defined(SANSA_CLIPPLUS)
-.set RAM_SIZE, 0x100000 /* Use 1MB of SDRAM on v2 firmwares (bigger firmware) */
+#if defined(SANSA_CLIPV2)
+.set RAM_SIZE, 0x100000 /* Use 1MB of SDRAM (bigger firmware do not fit in
+                         * 0x50000 bytes) */
 #else
-.set RAM_SIZE, 0x50000  /* Use full IRAM on v1 firmwares */
+.set RAM_SIZE, 0x50000  /* Use full IRAM (or part of SDRAM on as3525v2) */
 #endif
 
 /* AS3525 hardware registers */
@@ -157,17 +158,6 @@ uclcopy:
         cmp     r1, #0             /* C3 = #0 means button pressed */
         beq     boot_of
 #elif defined(SANSA_CLIPPLUS)
-        @ All GPIO_DIR == 0x00 from reset
-        @ Set B0
-        ldr     r0, =GPIOB
-        mov     r1, #(1<<0)         @ pin 0
-        str     r1, [r0, #0x400]    @ GPIOB(0) = output
-        str     r1, [r0, #4*(1<<0)] @ write 1 to GPIOB(0)  B0 set
-
-        mov     r1, #500            @ small delay
-1:      subs    r1, r1, #1
-        bne     1b
-
         @ read pins
         ldr     r0, =GPIOC
         ldr     r1, [r0, #4*(1<<3)] @ read pin C3 "|<<"
@@ -176,12 +166,6 @@ uclcopy:
         ldr     r2, [r0, #4*(1<<1)] @ read pin A1 "Home"
 
         orr     r2, r2, r1          @ c3 || A1
-
-        @ Unset GPIOB(0) & Restore GPIOB_DIR
-        ldr     r0, =GPIOB
-        mov     r1, #0
-        str     r1, [r0, #4*(1<<0)] @ write 0 to GPIOB(0) B0 unset
-        str     r1, [r0, #0x400]    @ Restore GPIOB_DIR to 0x00
 
         cmp     r2, #0              @ test input from pins
         bne     boot_of             @ branch directly to OF if either pin high

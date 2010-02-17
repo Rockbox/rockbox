@@ -7,4 +7,4 @@ extern unsigned char dualboot_c200v2[228];
 extern unsigned char dualboot_m200v4[204];
 extern unsigned char dualboot_fuze[228];
 extern unsigned char dualboot_clipv2[272];
-extern unsigned char dualboot_clipplus[256];
+extern unsigned char dualboot_clipplus[208];
