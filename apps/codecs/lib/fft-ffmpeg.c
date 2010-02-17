@@ -49,8 +49,6 @@
 #include "codeclib_misc.h"
 #include "mdct_lookup.h"
 
-static void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
-
 /* constants for fft_16 (same constants as in mdct_arm.S ... ) */
 #define cPI1_8 (0x7641af3d) /* cos(pi/8) s.31 */
 #define cPI2_8 (0x5a82799a) /* cos(2pi/8) = 1/sqrt(2) s.31 */
@@ -70,6 +68,7 @@ static int split_radix_permutation(int i, int n, int inverse)
     else                  return split_radix_permutation(i, m, inverse)*4 - 1;
 }
 
+#if 0
 static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 {
     int j, k, np;
@@ -89,6 +88,7 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
         }
     }
 }
+#endif
 
 #define BF(x,y,a,b) {\
     x = a - b;\
