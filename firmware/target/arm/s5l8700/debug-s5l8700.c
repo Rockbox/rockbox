@@ -92,6 +92,9 @@ bool __dbg_ports(void)
         _DEBUG_PRINTF("GPIO 11: %08x",(unsigned int)PDAT11);
         _DEBUG_PRINTF("GPIO 13: %08x",(unsigned int)PDAT13);
         _DEBUG_PRINTF("GPIO 14: %08x",(unsigned int)PDAT14);
+        _DEBUG_PRINTF("5USEC  : %08x",(unsigned int)FIVE_USEC_TIMER);
+        _DEBUG_PRINTF("USEC   : %08x",(unsigned int)USEC_TIMER);
+        _DEBUG_PRINTF("USECREG: %08x",(unsigned int)(*(REG32_PTR_T)(0x3C700084)));
 
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))

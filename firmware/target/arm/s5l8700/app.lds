@@ -28,7 +28,7 @@ STARTUP(target/arm/s5l8700/crt0.o)
 #define DRAMSIZE (DRAM_SIZE - STUBOFFSET - PLUGINSIZE - CODECSIZE)
 #define CODECORIG (ENDAUDIOADDR)
 #if CONFIG_CPU==S5L8700
-#define IRAMSIZE (64*1024)  /* 128KB total - 64KB for core, 64KB for plugins */
+#define IRAMSIZE (128*1024)  /* 256KB total - 128KB for core, 128KB for plugins */
 #else /* S5L8701 */
 #define IRAMSIZE (96*1024)  /* 176KB total - 96KB for core, 80KB for plugins */
 #endif
@@ -108,7 +108,7 @@ SECTIONS
        stackbegin = .;
        _stackbegin = .;
 #ifdef IPOD_NANO2G
-       . += 0x4000;
+       . += 0x2000;
 #endif
        . += 0x2000;
        stackend = .;

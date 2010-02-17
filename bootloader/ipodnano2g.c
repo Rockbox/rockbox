@@ -84,8 +84,8 @@ void fatal_error(void)
     }
 }
 
-/* aes_decrypt() and readfw() functions taken from iloader - (C)
-   Michael Sparmann and licenced under GPL v2 or later. 
+/* aes_decrypt() and readfw() functions taken from iLoader.
+   (C) Michael Sparmann and licenced under GPL v2 or later. 
 */
 
 static void aes_decrypt(void* data, uint32_t size)

@@ -30,7 +30,7 @@ PLUGIN_HEADER
 #define EV_EXIT 1337
 
 /* seems to work with 1300, but who knows... */ 
-#define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
+#define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x1200
 
 #if CONFIG_KEYPAD == RECORDER_PAD
 

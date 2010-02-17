@@ -1648,6 +1648,28 @@ static bool view_battery(void)
 #elif defined(IPOD_NANO2G)
                 y = pmu_read_battery_current();
                 lcd_putsf(0, 2, "Battery current: %d mA", y);
+                lcd_putsf(0, 3, "PWRCON: %8x", PWRCON);
+                lcd_putsf(0, 4, "PWRCONEXT: %8x", PWRCONEXT);
+                x = pmu_read(0x1b) & 0xf;
+                y = pmu_read(0x1a) * 25 + 625;
+                lcd_putsf(0, 5, "AUTO: %x / %d mV", x, y);
+                x = pmu_read(0x1f) & 0xf;
+                y = pmu_read(0x1e) * 25 + 625;
+                lcd_putsf(0, 6, "DOWN1: %x / %d mV", x, y);
+                x = pmu_read(0x23) & 0xf;
+                y = pmu_read(0x22) * 25 + 625;
+                lcd_putsf(0, 7, "DOWN2: %x / %d mV", x, y);
+                x = pmu_read(0x27) & 0xf;
+                y = pmu_read(0x26) * 100 + 900;
+                lcd_putsf(0, 8, "MEMLDO: %x / %d mV", x, y);
+                for (i = 0; i < 6; i++)
+                {
+                    x = pmu_read(0x2e + (i << 1)) & 0xf;
+                    y = pmu_read(0x2d + (i << 1)) * 100 + 900;
+                    lcd_putsf(0, 9 + i, "LDO%d: %x / %d mV", i + 1, x, y);
+                }
+                lcd_putsf(0, 15, "CLKCON: %8x", CLKCON);
+                lcd_putsf(17, 15, "PLL0: %6x", PLL0PMS);
 #else
                 lcd_putsf(0, 3, "Charger: %s",
                          charger_inserted() ? "present" : "absent");
