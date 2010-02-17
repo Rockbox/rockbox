@@ -132,7 +132,7 @@ void XNPROD31(int32_t  a, int32_t  b,
                 "msac.l %[a], %[v], %%acc1;" \
                 "movclr.l %%acc0, %[x];" \
                 "movclr.l %%acc1, %[y];" \
-                : [x] "+&d" (_x), [y] "=&d" (_y) \
+                : [x] "=&d" (_x), [y] "=&d" (_y) \
                 : [a] "r" (_a), [b] "r" (_b), \
                   [t] "r" (_t), [v] "r" (_v) \
                 : "cc");
@@ -144,7 +144,7 @@ void XNPROD31(int32_t  a, int32_t  b,
                 "mac.l %[a], %[v], %%acc1;" \
                 "movclr.l %%acc0, %[x];" \
                 "movclr.l %%acc1, %[y];" \
-                : [x] "+&d" (_x), [y] "=&d" (_y) \
+                : [x] "=&d" (_x), [y] "=&d" (_y) \
                 : [a] "r" (_a), [b] "r" (_b), \
                   [t] "r" (_t), [v] "r" (_v) \
                 : "cc");
