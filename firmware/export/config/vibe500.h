@@ -79,11 +79,11 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-/* RTC is individual - Philips 8563T - not yet implemented */
-/*#define CONFIG_RTC RTC_S5L8700
-#define CONFIG_RTC RTC_S35390A*/
+/* Philips 8563T - E8564 is a clone of it */
+#define CONFIG_RTC RTC_E8564
 
-/*   that needs spinups and can cause skips when shaked */
+/* define this if you have a disk storage, i.e. something
+   that needs spinups and can cause skips when shaked */
 #define HAVE_DISK_STORAGE
 
 /* Define this if you have a software controlled poweroff */
