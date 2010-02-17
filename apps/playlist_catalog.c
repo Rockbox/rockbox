@@ -124,20 +124,20 @@ static int create_playlist_list(char** playlists, int num_items,
 
     /* use the tree browser dircache to load only playlists */
     *(tc->dirfilter) = SHOW_PLAYLIST;
-    
+
     if (ft_load(tc, playlist_dir) < 0)
     {
         splashf(HZ*2, ID2P(LANG_CATALOG_NO_DIRECTORY), playlist_dir);
         goto exit;
     }
-    
+
     files = (struct entry*) tc->dircache;
     num_files = tc->filesindir;
-    
+
     /* we've overwritten the dircache so tree browser will need to be
        reloaded */
     reload_directory();
-    
+
     /* if it exists, most recent playlist will always be index 0 */
     if (most_recent_playlist[0] != '\0')
     {
@@ -224,7 +224,7 @@ static int display_playlists(char* playlist, bool view)
     char* playlists[MAX_PLAYLISTS];
     struct gui_synclist playlist_lists;
 
-    if (create_playlist_list(playlists, sizeof(playlists),
+    if (create_playlist_list(playlists, MAX_PLAYLISTS,
             &num_playlists) != 0)
         return -1;
 
@@ -345,14 +345,12 @@ static int add_to_playlist(const char* playlist, bool new_playlist,
 {
     int fd;
     int result = -1;
-    int flags = O_CREAT|O_WRONLY;
-    
+
     if (new_playlist)
-        flags |= O_TRUNC;
+        fd = open_utf8(playlist, O_CREAT|O_WRONLY|O_TRUNC);
     else
-        flags |= O_APPEND;
-    
-    fd = open(playlist, flags);
+        fd = open(playlist, O_CREAT|O_WRONLY|O_APPEND);
+
     if(fd < 0)
         return result;
 
@@ -370,33 +368,33 @@ static int add_to_playlist(const char* playlist, bool new_playlist,
         /* append playlist */
         int f, fs, i;
         char buf[1024];
-        
+
         if(strcasecmp(playlist, sel) == 0)
             goto exit;
-        
-        f = open(sel, O_RDONLY);
+
+        f = open_utf8(sel, O_RDONLY);
         if (f < 0)
             goto exit;
-        
+
         fs = filesize(f);
-        
+
         for (i=0; i<fs;)
         {
             int n;
-            
+
             n = read(f, buf, sizeof(buf));
             if (n < 0)
                 break;
-            
+
             if (write(fd, buf, n) < 0)
                 break;
-            
+
             i += n;
         }
-        
+
         if (i >= fs)
             result = 0;
-        
+
         close(f);
     }
     else if (sel_attr & ATTR_DIRECTORY)
@@ -415,7 +413,7 @@ static int add_to_playlist(const char* playlist, bool new_playlist,
             /* Ask if user wants to recurse directory */
             recurse = (gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES);
         }
-        
+
         context.fd = fd;
         context.count = 0;
 
@@ -437,7 +435,7 @@ bool catalog_view_playlists(void)
     bool retval = true;
     if (in_cat_viewer)
         return false;
-        
+
     if (initialize_catalog() == -1)
         return false;
     in_cat_viewer = true;
@@ -450,7 +448,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
                                bool new_playlist, char *m3u8name)
 {
     char playlist[MAX_PATH];
-    
+
     if (initialize_catalog() == -1)
         return false;
 
@@ -465,7 +463,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
         }
         else
             strcpy(playlist, m3u8name);
-        
+
         len = strlen(playlist);
 
         if(len > 4 && !strcasecmp(&playlist[len-4], ".m3u"))
