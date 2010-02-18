@@ -691,6 +691,8 @@ static const char* id3_get_info(int selected_item, void* data,
                 }
                 break;
             case 7:/*LANG_ID3_COMMENT*/
+                if (!id3->comment)
+                    return NULL;
                 snprintf(buffer, buffer_len, "%s", id3->comment);
                 val=buffer;
                 break;
