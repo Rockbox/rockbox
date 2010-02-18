@@ -176,6 +176,7 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     int start_item = MAX(0, cur_playlist_pos + viewer->start_offset);
     int i;
     struct wps_token token;
+    int x, length, alignment = WPS_TOKEN_ALIGN_LEFT;
     
     struct mp3entry *pid3;
 #if CONFIG_CODEC == SWCODEC
@@ -228,6 +229,14 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
             }
             switch (viewer->lines[line].tokens[j])
             {
+                case WPS_TOKEN_ALIGN_CENTER:
+                case WPS_TOKEN_ALIGN_LEFT:
+                case WPS_TOKEN_ALIGN_LEFT_RTL:
+                case WPS_TOKEN_ALIGN_RIGHT:
+                case WPS_TOKEN_ALIGN_RIGHT_RTL:
+                    alignment = viewer->lines[line].tokens[j];
+                    tempbuf[0] = '\0';
+                    break;
                 case WPS_TOKEN_STRING:
                 case WPS_TOKEN_CHARACTER:
                     snprintf(tempbuf, sizeof(tempbuf), "%s",
@@ -255,13 +264,44 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
             j++;
         }
             
-        if (viewer->lines[line].scroll)
+        int vpwidth = viewer->vp->width;
+        length = gwps->display->getstringsize(buf, NULL, NULL);
+        if (viewer->lines[line].scroll && length >= vpwidth)
         {
             gwps->display->puts_scroll(0, (i-start_item), buf );
         }
         else
-        {            
-            gwps->display->putsxy(0, (i-start_item)*line_height, buf );
+        {    
+            if (length >= vpwidth)
+                x = 0;
+            else
+            {
+                switch (alignment)
+                {
+                    case WPS_TOKEN_ALIGN_CENTER:
+                        x = (vpwidth-length)/2;
+                        break;
+                    case WPS_TOKEN_ALIGN_LEFT_RTL:
+                        if (lang_is_rtl() && VP_IS_RTL(viewer->vp))
+                        {
+                            x = vpwidth - length;
+                            break;
+                        }
+                    case WPS_TOKEN_ALIGN_LEFT:
+                        x = 0;
+                        break;
+                    case WPS_TOKEN_ALIGN_RIGHT_RTL:
+                        if (lang_is_rtl() && VP_IS_RTL(viewer->vp))
+                        {
+                            x = 0;
+                            break;
+                        }
+                    case WPS_TOKEN_ALIGN_RIGHT:
+                        x = vpwidth - length;
+                        break;
+                }
+            }                    
+            gwps->display->putsxy(x, (i-start_item)*line_height, buf );
         }
     }
 }
