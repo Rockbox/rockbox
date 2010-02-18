@@ -269,6 +269,10 @@ $releasenotes="/wiki/ReleaseNotes35";
         name => 'Tatung Elio TPJ-1022',
         status => 1,
     },
+    'vibe500' => {
+        name => 'Packard Bell Vibe 500',
+        status => 2,
+    },
     'zenvision' => {
         name => 'Creative Zen Vision',
         status => 1,
