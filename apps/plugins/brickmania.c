@@ -1029,24 +1029,27 @@ static void brickmania_loadgame(void)
     if(fd < 0) return;
 
     /* read in saved game */
-    while(true) {
-        if(rb->read(fd, &pad_pos_x, sizeof(pad_pos_x)) <= 0) break;
-        if(rb->read(fd, &life, sizeof(life)) <= 0) break;
-        if(rb->read(fd, &game_state, sizeof(game_state)) <= 0) break;
-        if(rb->read(fd, &pad_type, sizeof(pad_type)) <= 0) break;
-        if(rb->read(fd, &score, sizeof(score)) <= 0) break;
-        if(rb->read(fd, &flip_sides, sizeof(flip_sides)) <= 0) break;
-        if(rb->read(fd, &level, sizeof(level)) <= 0) break;
-        if(rb->read(fd, &brick_on_board, sizeof(brick_on_board)) <= 0) break;
-        if(rb->read(fd, &used_balls, sizeof(used_balls)) <= 0) break;
-        if(rb->read(fd, &pad_width, sizeof(pad_width)) <= 0) break;
-        if(rb->read(fd, &num_count, sizeof(num_count)) <= 0) break;
-        if(rb->read(fd, &brick, sizeof(brick)) <= 0) break;
-        if(rb->read(fd, &ball, sizeof(ball)) <= 0) break;
-        if(rb->read(fd, &fire, sizeof(fire)) <= 0) break;
+    if((rb->read(fd, &pad_pos_x, sizeof(pad_pos_x)) <= 0) ||
+        (rb->read(fd, &life, sizeof(life)) <= 0) ||
+        (rb->read(fd, &game_state, sizeof(game_state)) <= 0) ||
+        (rb->read(fd, &pad_type, sizeof(pad_type)) <= 0) ||
+        (rb->read(fd, &score, sizeof(score)) <= 0) ||
+        (rb->read(fd, &flip_sides, sizeof(flip_sides)) <= 0) ||
+        (rb->read(fd, &level, sizeof(level)) <= 0) ||
+        (rb->read(fd, &brick_on_board, sizeof(brick_on_board)) <= 0) ||
+        (rb->read(fd, &used_balls, sizeof(used_balls)) <= 0) ||
+        (rb->read(fd, &pad_width, sizeof(pad_width)) <= 0) ||
+        (rb->read(fd, &num_count, sizeof(num_count)) <= 0) ||
+        (rb->read(fd, &brick, sizeof(brick)) <= 0) ||
+        (rb->read(fd, &ball, sizeof(ball)) <= 0) ||
+        (rb->read(fd, &fire, sizeof(fire)) <= 0))
+    {
+        rb->splash(HZ/2, "Failed to load game");
+    }
+    else
+    {
         vscore = score;
         resume = true;
-        break;
     }
 
     rb->close(fd);
@@ -1062,20 +1065,27 @@ static void brickmania_savegame(void)
     fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
     if(fd < 0) return;
 
-    rb->write(fd, &pad_pos_x, sizeof(pad_pos_x));
-    rb->write(fd, &life, sizeof(life));
-    rb->write(fd, &game_state, sizeof(game_state));
-    rb->write(fd, &pad_type, sizeof(pad_type));
-    rb->write(fd, &score, sizeof(score));
-    rb->write(fd, &flip_sides, sizeof(flip_sides));
-    rb->write(fd, &level, sizeof(level));
-    rb->write(fd, &brick_on_board, sizeof(brick_on_board));
-    rb->write(fd, &used_balls, sizeof(used_balls));
-    rb->write(fd, &pad_width, sizeof(pad_width));
-    rb->write(fd, &num_count, sizeof(num_count));
-    rb->write(fd, &brick, sizeof(brick));
-    rb->write(fd, &ball, sizeof(ball));
-    rb->write(fd, &fire, sizeof(fire));
+    if ((rb->write(fd, &pad_pos_x, sizeof(pad_pos_x)) <= 0) ||
+            (rb->write(fd, &life, sizeof(life)) <= 0) ||
+            (rb->write(fd, &game_state, sizeof(game_state)) <= 0) ||
+            (rb->write(fd, &pad_type, sizeof(pad_type)) <= 0) ||
+            (rb->write(fd, &score, sizeof(score)) <= 0) ||
+            (rb->write(fd, &flip_sides, sizeof(flip_sides)) <= 0) ||
+            (rb->write(fd, &level, sizeof(level)) <= 0) ||
+            (rb->write(fd, &brick_on_board, sizeof(brick_on_board)) <= 0) ||
+            (rb->write(fd, &used_balls, sizeof(used_balls)) <= 0) ||
+            (rb->write(fd, &pad_width, sizeof(pad_width)) <= 0) ||
+            (rb->write(fd, &num_count, sizeof(num_count)) <= 0) ||
+            (rb->write(fd, &brick, sizeof(brick)) <= 0) ||
+            (rb->write(fd, &ball, sizeof(ball)) <= 0) ||
+            (rb->write(fd, &fire, sizeof(fire)) <= 0))
+    {
+        rb->close(fd);
+        rb->remove(SAVE_FILE);
+        rb->splash(HZ/2, "Failed to save game");
+        return;
+    }
+
     rb->close(fd);
 }
 
