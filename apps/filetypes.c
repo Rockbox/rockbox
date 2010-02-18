@@ -109,9 +109,6 @@ static const struct filetype inbuilt_filetypes[] = {
 #ifdef HAVE_REMOTE_LCD
     { "rwps",FILE_ATTR_RWPS, Icon_Wps,     VOICE_EXT_RWPS },
 #endif
-#if LCD_DEPTH > 1
-    { "bmp", FILE_ATTR_BMP, Icon_Wps, VOICE_EXT_WPS },
-#endif
 #if CONFIG_TUNER
     { "fmr", FILE_ATTR_FMR, Icon_Preset, LANG_FMR },
 #endif

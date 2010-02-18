@@ -621,6 +621,8 @@ int read_bmp_fd(int fd,
     defined(HAVE_BMP_SCALING) || defined(PLUGIN)
         if(resize)
             totalsize += BM_SCALED_SIZE(bm->width, 0, 0, 0);
+        else if (bm->width > BM_MAX_WIDTH)
+            totalsize += bm->width*4;
 #endif
         return totalsize;
     }
@@ -717,9 +719,7 @@ int read_bmp_fd(int fd,
 
 #if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) && \
     defined(HAVE_BMP_SCALING) || defined(PLUGIN)
-#if LCD_DEPTH > 1 && defined(HAVE_BMP_SCALING)
     if (resize)
-#endif
     {
         if (resize_on_load(bm, dither, &src_dim, &rset,
                            bitmap + totalsize, maxsize - totalsize,
@@ -749,17 +749,51 @@ int read_bmp_fd(int fd,
 #endif
 #endif
 
+    unsigned char *buf = ba.buf;
+#if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) || \
+    defined(PLUGIN)
+    if (bm->width > BM_MAX_WIDTH)
+    {
+#if defined(HAVE_BMP_SCALING) || defined(PLUGIN)
+        unsigned int len = maxsize - totalsize;
+        buf = bitmap + totalsize;
+        ALIGN_BUFFER(buf, len, sizeof(uint32_t));
+        if (bm->width*4 > (int)len)
+#endif
+            return -6;
+    }
+#endif
+
     int row;
     /* loop to read rows and put them to buffer */
     for (row = rset.rowstart; row != rset.rowstop; row += rset.rowstep) {
+#if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) && \
+    defined(HAVE_BMP_SCALING) || defined(PLUGIN)
+        if (bm->width > BM_MAX_WIDTH)
+        {
+#if defined(HAVE_LCD_COLOR)
+            struct uint8_rgb *p = (struct uint8_rgb *)buf;
+#else
+            uint8_t* p = buf;
+#endif
+            do {
+                int len = read_part_line(&ba);
+                if (!len)
+                    return -9;
+                memcpy(p, ba.buf, len*sizeof(*p));
+                p += len;
+            } while (ba.cur_col);
+        }
+        else
+#endif
         if (!read_part_line(&ba))
             return -9;
 #ifndef PLUGIN
 #if !defined(HAVE_LCD_COLOR) && \
         (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1))
-        uint8_t* qp = ba.buf;
+        uint8_t* qp = buf;
 #else
-        struct uint8_rgb *qp = (struct uint8_rgb *)ba.buf;
+        struct uint8_rgb *qp = (struct uint8_rgb *)buf;
 #endif
 #endif
         /* Convert to destination format */
@@ -798,9 +832,9 @@ int read_bmp_fd(int fd,
 #if LCD_DEPTH > 1 || defined(PLUGIN)
             {
 #if !defined(PLUGIN) && !defined(HAVE_JPEG) && !defined(HAVE_BMP_SCALING)
-                output_row_8_native(row, ba.buf, &ctx);
+                output_row_8_native(row, buf, &ctx);
 #else
-                output_row_8(row, ba.buf, &ctx);
+                output_row_8(row, buf, &ctx);
 #endif
             }
 #endif

@@ -136,7 +136,7 @@ int load_image(char *filename, struct image_info *info,
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
     {
-        rb->splashf(HZ, "err opening %s:%d", filename, fd);
+        rb->splashf(HZ, "err opening %s: %d", filename, fd);
         return PLUGIN_ERROR;
     }
     filesize = rb->filesize(fd);
