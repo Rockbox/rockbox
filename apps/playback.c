@@ -1757,6 +1757,7 @@ static void audio_invalidate_tracks(void)
         track_widx = (track_widx + 1) & MAX_TRACK_MASK;
 
         audio_fill_file_buffer(false, 0);
+        send_event(PLAYBACK_EVENT_TRACK_CHANGE, thistrack_id3);
     }
 }
 

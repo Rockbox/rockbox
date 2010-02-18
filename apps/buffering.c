@@ -617,6 +617,8 @@ static bool buffer_handle(int handle_id)
 {
     logf("buffer_handle(%d)", handle_id);
     struct memory_handle *h = find_handle(handle_id);
+    bool stop = false;
+
     if (!h)
         return true;
 
@@ -660,30 +662,32 @@ static bool buffer_handle(int handle_id)
         return true;
     }
 
-    while (h->filerem > 0)
+    while (h->filerem > 0 && !stop)
     {
         /* max amount to copy */
         size_t copy_n = MIN( MIN(h->filerem, BUFFERING_DEFAULT_FILECHUNK),
                              buffer_len - h->widx);
 
+        ssize_t overlap;
+        intptr_t next_handle = (intptr_t)h->next - (intptr_t)buffer;
+
         /* stop copying if it would overwrite the reading position */
         if (ringbuf_add_cross(h->widx, copy_n, buf_ridx) >= 0)
             return false;
 
-        /* This would read into the next handle, this is broken
-        if (h->next && ringbuf_add_cross(h->widx, copy_n,
-                    (unsigned)((void *)h->next - (void *)buffer)) > 0) {
-             Try to recover by truncating this file
-            copy_n = ringbuf_add_cross(h->widx, copy_n,
-                    (unsigned)((void *)h->next - (void *)buffer));
-            h->filerem -= copy_n;
-            h->filesize -= copy_n;
-            logf("buf alloc short %ld", (long)copy_n);
-            if (h->filerem)
-                continue;
-            else
-                break;
-        }  */
+        /* FIXME: This would overwrite the next handle
+         * If this is true, then there's a handle even though we have still
+         * data to buffer. This should NEVER EVER happen! (but it does :( ) */
+        if (h->next && (overlap
+                = ringbuf_add_cross(h->widx, copy_n, next_handle)) > 0)
+        {
+            /* stop buffering data for now and post-pone buffering the rest */
+            stop = true;
+            DEBUGF( "%s(): Preventing handle corruption: h1.id:%d h2.id:%d"
+                    " copy_n:%ld overlap:%ld h1.filerem:%ld\n", __func__,
+                    h->id, h->next->id, copy_n, overlap, h->filerem);
+            copy_n -= overlap;
+        }
 
         /* rc is the actual amount read */
         int rc = read(h->fd, &buffer[h->widx], copy_n);
@@ -732,7 +736,7 @@ static bool buffer_handle(int handle_id)
         send_event(BUFFER_EVENT_FINISHED, &h->id);
     }
 
-    return true;
+    return !stop;
 }
 
 /* Reset writing position and data buffer of a handle to its current offset.
@@ -785,12 +789,12 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     LOGFQUEUE("buffering >| Q_RESET_HANDLE %d", handle_id);
     queue_send(&buffering_queue, Q_RESET_HANDLE, handle_id);
 
-    size_t next = (unsigned)((void *)h->next - (void *)buffer);
+    size_t next = (intptr_t)h->next - (intptr_t)buffer;
     if (ringbuf_sub(next, h->data) < h->filesize - newpos)
     {
         /* There isn't enough space to rebuffer all of the track from its new
            offset, so we ask the user to free some */
-        DEBUGF("rebuffer_handle: space is needed\n");
+        DEBUGF("%s(): space is needed\n", __func__);
         send_event(BUFFER_EVENT_REBUFFER, &handle_id);
     }
 
@@ -1019,7 +1023,7 @@ int bufopen(const char *file, size_t offset, enum data_type type,
                                          can_wrap, false);
     if (!h)
     {
-        DEBUGF("bufopen: failed to add handle\n");
+        DEBUGF("%s(): failed to add handle\n", __func__);
         close(fd);
         return ERR_BUFFER_FULL;
     }
