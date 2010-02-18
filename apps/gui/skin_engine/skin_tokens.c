@@ -909,7 +909,20 @@ const char *get_token_value(struct gui_wps *gwps,
                 {
                     case F_T_INT:
                     case F_T_UINT:
-                        if (s->flags&F_RGB)
+                        if (s->flags&F_T_SOUND)
+                        {
+                            /* %?St|name|<min|min+1|...|max-1|max> */
+                            int sound_setting = s->sound_setting->setting;
+                            /* settings with decimals can't be used in conditionals */
+                            if (sound_numdecimals(sound_setting) == 0)
+                            {                                
+                                *intval = (*(int*)s->setting-sound_min(sound_setting))
+                                      /sound_steps(sound_setting) + 1;
+                            }
+                            else
+                                *intval = -1;
+                        }
+                        else if (s->flags&F_RGB)
                             /* %?St|name|<#000000|#000001|...|#FFFFFF> */
                             /* shouldn't overflow since colors are stored
                              * on 16 bits ...
