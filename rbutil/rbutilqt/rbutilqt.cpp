@@ -881,9 +881,9 @@ void RbUtilQt::installVoice()
     installer = new ZipInstaller(this);
 
     QString voiceurl = SystemInfo::value(SystemInfo::VoiceUrl).toString();
-
+    QDate date = QDate::fromString(ServerInfo::value(ServerInfo::DailyDate).toString(),Qt::ISODate);
     voiceurl += SystemInfo::value(SystemInfo::CurBuildserverModel).toString() + "-" +
-        ServerInfo::value(ServerInfo::DailyDate).toString() + "-english.zip";
+        date.toString("yyyyMMdd") + "-english.zip";
     qDebug() << "[RbUtil] voicefile URL:" << voiceurl;
 
     installer->setUrl(voiceurl);
