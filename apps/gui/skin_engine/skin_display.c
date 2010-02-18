@@ -299,6 +299,9 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
                     case WPS_TOKEN_ALIGN_RIGHT:
                         x = vpwidth - length;
                         break;
+                    default:
+                        x = 0;
+                        break;
                 }
             }                    
             gwps->display->putsxy(x, (i-start_item)*line_height, buf );
