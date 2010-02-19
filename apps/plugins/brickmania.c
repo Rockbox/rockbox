@@ -368,6 +368,18 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define NUM_BRICKS_COLS 10
 #define FLIP_SIDES_DELAY 10
 
+#define SCORE_BALL_HIT_BRICK          2
+#define SCORE_BALL_DEMOLISHED_BRICK   8
+#define SCORE_FIRE_HIT_BRICK         13
+#define SCORE_LEVEL_COMPLETED       100
+#define SCORE_POWER_EXTRA_LIFE       50
+#define SCORE_POWER_STICKY           34
+#define SCORE_POWER_SHOOTER          47
+#define SCORE_POWER_NORMAL           23
+#define SCORE_POWER_FLIP             23
+#define SCORE_POWER_EXTRA_BALL       23
+#define SCORE_POWER_LONG_PADDLE      23
+
 /* change the first number in [ ] to however many levels there are */
 static unsigned char levels[NUM_LEVELS][NUM_BRICKS_ROWS][NUM_BRICKS_COLS] =
 /* You can set up new levels with the level editor
@@ -847,14 +859,14 @@ sfire fire[MAX_FIRES];
 
 #define CONFIG_FILE_NAME "brickmania.cfg"
 #define SAVE_FILE  PLUGIN_GAMES_DIR "/brickmania.save"
-#define HIGH_SCORE PLUGIN_GAMES_DIR "/brickmania.score"
-#define NUM_SCORES 5
+#define HIGH_SCORE_FILE PLUGIN_GAMES_DIR "/brickmania.score"
+#define NUM_HIGH_SCORES 5
 
 static struct configdata config[] = {
     {TYPE_INT, 0, 1, { .int_p = &difficulty }, "difficulty", NULL},
 };
 
-struct highscore highest[NUM_SCORES];
+struct highscore highest[NUM_HIGH_SCORES];
 
 typedef struct point
 {
@@ -990,7 +1002,7 @@ static void brickmania_init_game(bool new_game)
         brick_on_board=0;
         /* add one life per achieved level */
         if (difficulty==EASY && life<2) {
-            score-=100;
+            score+=SCORE_LEVEL_COMPLETED;
             life++;
         }
     }
@@ -1270,7 +1282,7 @@ static int brickmania_menu(void)
                     return 1;
                 break;
             case 4:
-                highscore_show(NUM_SCORES, highest, NUM_SCORES, true);
+                highscore_show(NUM_HIGH_SCORES, highest, NUM_HIGH_SCORES, true);
                 break;
             case 5:
                 if (playback_control(NULL))
@@ -1317,7 +1329,7 @@ void brick_hit(int brick_number)
     if (brick[brick_number].hits > 0) {
         brick[brick_number].hits--;
         brick[brick_number].hiteffect++;
-        score+=2;
+        score+=SCORE_BALL_HIT_BRICK;
     }
     else {
         brick[brick_number].used=false;
@@ -1327,7 +1339,7 @@ void brick_hit(int brick_number)
             brick[brick_number].poweruse = true;
         }
         brick_on_board--;
-        score+=8;
+        score+=SCORE_BALL_DEMOLISHED_BRICK;
     }
 }
 
@@ -1492,7 +1504,7 @@ static int brickmania_game_loop(void)
                             switch(brick[bnum].power) {
                                 case 0: /* Extra Life */
                                     life++;
-                                    score += 50;
+                                    score += SCORE_POWER_EXTRA_LIFE;
                                     break;
                                 case 1: /* Loose a life */
                                     life--;
@@ -1503,17 +1515,17 @@ static int brickmania_game_loop(void)
                                     }
                                     break;
                                 case 2: /* Make the paddle sticky */
-                                    score += 34;
+                                    score += SCORE_POWER_STICKY;
                                     pad_type = STICKY;
                                     break;
                                 case 3: /* Give the paddle shooter */
-                                    score += 47;
+                                    score += SCORE_POWER_SHOOTER;
                                     pad_type = SHOOTER;
                                     for(k=0;k<used_balls;k++)
                                         ball[k].glue=false;
                                     break;
                                 case 4: /* Normal brick */
-                                    score += 23;
+                                    score += SCORE_POWER_NORMAL;
                                     pad_type = PLAIN;
                                     for(k=0;k<used_balls;k++)
                                         ball[k].glue=false;
@@ -1523,13 +1535,13 @@ static int brickmania_game_loop(void)
                                     pad_width = PAD_WIDTH;
                                     break;
                                 case 5: /* Flip the paddle */
-                                    score += 23;
+                                    score += SCORE_POWER_FLIP;
                                     sec_count = *rb->current_tick+HZ;
                                     flip_sides_delay = FLIP_SIDES_DELAY;
                                     flip_sides = true;
                                     break;
                                 case 6: /* Extra Ball */
-                                    score += 23;
+                                    score += SCORE_POWER_EXTRA_BALL;
                                     if(used_balls<MAX_BALLS)
                                     {
                                         /* Set the speed */
@@ -1546,7 +1558,7 @@ static int brickmania_game_loop(void)
                                     }
                                     break;
                                 case 7: /* Long paddle */
-                                    score+=23;
+                                    score+=SCORE_POWER_LONG_PADDLE;
                                     if (pad_width==PAD_WIDTH)
                                     {
                                         pad_width = LONG_PAD_WIDTH;
@@ -1642,7 +1654,7 @@ static int brickmania_game_loop(void)
                                 if (check_lines(&misc_line, &bot_brick,
                                                 &pt_hit))
                                 {
-                                    score+=13;
+                                    score+=SCORE_FIRE_HIT_BRICK;
                                     /* De-activate the fire */
                                     fire[k].top=-1;
                                     brick_hit(bnum);
@@ -1994,7 +2006,7 @@ static int brickmania_game_loop(void)
                 {
                     level++;
                     if (difficulty==NORMAL)
-                        score+=100;
+                        score+=SCORE_LEVEL_COMPLETED;
                     brickmania_init_game(true);
                     brickmania_sleep(2);
                     rb->button_clear_queue();
@@ -2208,7 +2220,7 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
     int last_difficulty;
 
-    highscore_load(HIGH_SCORE,highest,NUM_SCORES);
+    highscore_load(HIGH_SCORE_FILE,highest,NUM_HIGH_SCORES);
     configfile_load(CONFIG_FILE_NAME,config,1,0);
     last_difficulty = difficulty;
 
@@ -2232,7 +2244,7 @@ enum plugin_status plugin_start(const void* parameter)
         if(!resume)
         {
             int position = highscore_update(score, level+1, "", highest,
-                NUM_SCORES);
+                NUM_HIGH_SCORES);
             if (position == 0)
             {
                 rb->splash(HZ*2, "New High Score");
@@ -2240,7 +2252,7 @@ enum plugin_status plugin_start(const void* parameter)
 
             if (position != -1)
             {
-                highscore_show(position, highest, NUM_SCORES, true);
+                highscore_show(position, highest, NUM_HIGH_SCORES, true);
             }
             else
             {
@@ -2249,7 +2261,7 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
 
-    highscore_save(HIGH_SCORE,highest,NUM_SCORES);
+    highscore_save(HIGH_SCORE_FILE,highest,NUM_HIGH_SCORES);
     if(last_difficulty != difficulty)
         configfile_save(CONFIG_FILE_NAME,config,1,0);
     /* Restore user's original backlight setting */
