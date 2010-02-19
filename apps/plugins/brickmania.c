@@ -363,8 +363,10 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 
 /* change to however many levels there are, i.e. how many arrays there are total */
 #define NUM_LEVELS 40
+
 #define NUM_BRICKS_ROWS 8
 #define NUM_BRICKS_COLS 10
+#define FLIP_SIDES_DELAY 10
 
 /* change the first number in [ ] to however many levels there are */
 static unsigned char levels[NUM_LEVELS][NUM_BRICKS_ROWS][NUM_BRICKS_COLS] =
@@ -803,7 +805,7 @@ int brick_on_board=0;
 int used_balls=1;
 int difficulty = NORMAL;
 int pad_width;
-int num_count;
+int flip_sides_delay;
 bool resume = false;
 bool resume_file = false;
 
@@ -982,7 +984,7 @@ static void brickmania_init_game(bool new_game)
     pad_type    =   PLAIN;
     pad_width   =   PAD_WIDTH;
     flip_sides  =   false;
-    num_count   =   10;
+    flip_sides_delay   =   FLIP_SIDES_DELAY;
 
     if (new_game) {
         brick_on_board=0;
@@ -1042,7 +1044,7 @@ static void brickmania_loadgame(void)
         (rb->read(fd, &brick_on_board, sizeof(brick_on_board)) <= 0) ||
         (rb->read(fd, &used_balls, sizeof(used_balls)) <= 0) ||
         (rb->read(fd, &pad_width, sizeof(pad_width)) <= 0) ||
-        (rb->read(fd, &num_count, sizeof(num_count)) <= 0) ||
+        (rb->read(fd, &flip_sides_delay, sizeof(flip_sides_delay)) <= 0) ||
         (rb->read(fd, &brick, sizeof(brick)) <= 0) ||
         (rb->read(fd, &ball, sizeof(ball)) <= 0) ||
         (rb->read(fd, &fire, sizeof(fire)) <= 0))
@@ -1078,7 +1080,7 @@ static void brickmania_savegame(void)
             (rb->write(fd, &brick_on_board, sizeof(brick_on_board)) <= 0) ||
             (rb->write(fd, &used_balls, sizeof(used_balls)) <= 0) ||
             (rb->write(fd, &pad_width, sizeof(pad_width)) <= 0) ||
-            (rb->write(fd, &num_count, sizeof(num_count)) <= 0) ||
+            (rb->write(fd, &flip_sides_delay, sizeof(flip_sides_delay)) <= 0) ||
             (rb->write(fd, &brick, sizeof(brick)) <= 0) ||
             (rb->write(fd, &ball, sizeof(ball)) <= 0) ||
             (rb->write(fd, &fire, sizeof(fire)) <= 0))
@@ -1370,12 +1372,12 @@ static int brickmania_game_loop(void)
                 if (TIME_AFTER(*rb->current_tick, sec_count))
                 {
                     sec_count=*rb->current_tick+HZ;
-                    if (num_count!=0)
-                        num_count--;
+                    if (flip_sides_delay!=0)
+                        flip_sides_delay--;
                     else
                         flip_sides=false;
                 }
-                rb->snprintf(s, sizeof(s), "%d", num_count);
+                rb->snprintf(s, sizeof(s), "%d", flip_sides_delay);
                 rb->lcd_getstringsize(s, &sw, NULL);
                 rb->lcd_putsxy(LCD_WIDTH/2-2, INT3(STRINGPOS_FLIP), s);
             }
@@ -1523,7 +1525,7 @@ static int brickmania_game_loop(void)
                                 case 5: /* Flip the paddle */
                                     score += 23;
                                     sec_count = *rb->current_tick+HZ;
-                                    num_count = 10;
+                                    flip_sides_delay = FLIP_SIDES_DELAY;
                                     flip_sides = true;
                                     break;
                                 case 6: /* Extra Ball */
