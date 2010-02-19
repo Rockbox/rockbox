@@ -692,6 +692,9 @@ static int parse_image_load(const char *wps_bufptr,
     return skip_end_of_line(wps_bufptr);
 }
 
+/* this array acts as a simple mapping between the id the user uses for a font
+ * and the id the font actually gets from the font loader.
+ * font id 2 is always the first skin font (regardless of how many screens */
 static int font_ids[MAXUSERFONTS];
 static int parse_font_load(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
@@ -715,7 +718,7 @@ static int parse_font_load(const char *wps_bufptr,
         
     if (id <= FONT_UI || id >= MAXFONTS-1)
         return WPS_ERROR_INVALID_PARAM;
-    id -= SYSTEMFONTCOUNT;
+    id -= FONT_UI;
     
     memcpy(buf, filename, ptr-filename);
     buf[ptr-filename] = '\0';
