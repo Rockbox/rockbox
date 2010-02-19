@@ -12719,11 +12719,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "浏览rsbs(线控状态栏样式)文件"
+    lcd_bitmap: "浏览RSBS(线控状态栏样式)文件"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "浏览rsbs(线控状态栏样式)文件"
+    lcd_bitmap: "浏览RSBS(线控状态栏样式)文件"
   </voice>
 </phrase>
 <phrase>
@@ -13241,5 +13241,39 @@
   </dest>
   <voice>
     *: "of"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "线控菜单(Remote Screen)"
+  </dest>
+  <voice>
+    *: none
+    remote: "线控菜单(Remote Screen)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "主菜单(Main Screen)"
+  </dest>
+  <voice>
+    *: none
+    remote: "主菜单(Main Screen)"
   </voice>
 </phrase>
