@@ -930,8 +930,8 @@ static int parse_viewport(const char *wps_bufptr,
     else
         vp->flags &= ~VP_FLAG_ALIGN_RIGHT; /* ignore right-to-left languages */
 
-    if (vp->font >= SYSTEMFONTCOUNT)
-        vp->font = font_ids[vp->font - SYSTEMFONTCOUNT];
+    if (vp->font > FONT_UI)
+        vp->font = font_ids[vp->font - FONT_UI];
 
     struct skin_token_list *list = new_skin_token_list_item(NULL, skin_vp);
     if (!list)
