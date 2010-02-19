@@ -1,11 +1,12 @@
 % $Id$ %
-\subsection{PNG viewer}
-This plugin opens \fname{.png} files from the \setting{File Browser} to
-display them.
+\subsection{BMP viewer}
+This plugin opens \fname{.bmp} files from the \setting{File Browser} to display them\nopt{lcd_color}{ using Rockbox's greyscale library}.
 \opt{swcodec}{
-  \note{When an audio file is playing the size of the image is limited as 
-  the decoding process needs to share memory with audio tracks. To be able to
-  view a bigger file you may need to stop playback.\\}
+\par
+\note{
+When an audio file is playing the size of the image is limited as 
+the decoding process needs to share memory with audio tracks. To be able to
+view a bigger file you may need to stop playback.}
 }
 \nopt{large_plugin_buffer}{%
 \note{This plugin will cause playback to stop.}%
@@ -23,10 +24,11 @@ display them.
       ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
       ,MROBE100_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}
       {/ \ButtonLeft\ / \ButtonRight}
+    \opt{COWON_D2_PAD}{}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Move around in zoomed in image\\
     \opt{RECORDER_PAD}{\ButtonPlay}
-    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{ONDIO_PAD,COWON_D2_PAD}{\ButtonMenu}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
         ,SANSA_FUZE_PAD,SANSA_C200_PAD,MROBE100_PAD}{\ButtonSelect}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
@@ -57,7 +59,7 @@ display them.
     \opt{GIGABEAT_S_PAD}{\ButtonNext}
     \opt{MROBE100_PAD}{\ButtonDisplay+\ButtonRight}
        \opt{HAVEREMOTEKEYMAP}{& }
-    & Next png in directory\\
+    & Next bmp in directory\\
     \opt{RECORDER_PAD}{\ButtonFTwo}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
     \opt{IRIVER_H100_PAD,IAUDIO_X5_PAD}{\ButtonRec}
@@ -70,7 +72,7 @@ display them.
     \opt{GIGABEAT_S_PAD}{\ButtonPrev}
     \opt{MROBE100_PAD}{\ButtonDisplay+\ButtonLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
-    & Previous png in directory\\
+    & Previous bmp in directory\\
     \opt{SANSA_E200_PAD,SANSA_C200_PAD}{%currently only defined for the sansa pads
         \ButtonRec
        \opt{HAVEREMOTEKEYMAP}{& }
@@ -81,10 +83,11 @@ display them.
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonMenu}
+    \opt{COWON_D2_PAD}{\ButtonPower}
        \opt{HAVEREMOTEKEYMAP}{&
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
        }
-    & Show menu / Abort while decoding \\
+    & Show menu / Abort \\
 \end{btnmap}
 \end{table}
 

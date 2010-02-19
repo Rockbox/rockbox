@@ -133,6 +133,7 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 \begin{rbtabular}{.92\textwidth}{Xlc}%
       {\textbf{Viewer Plugin}& \textbf{Associated filetype(s)} & \textbf{Context Menu only}}%
       {}{}
+  BMP Viewer            & \fname{.bmp}                     & \\
   Shortcuts             & \fname{.link}                    & \\ 
   Chip-8 Emulator       & \fname{.ch8}                     & \\
   Frotz                 & \fname{.z1 - .z8}                & \\
@@ -158,6 +159,8 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 \end{table}
 
 {\input{plugins/shortcuts.tex}}
+
+\opt{lcd_bitmap}{\input{plugins/bmpviewer.tex}}
 
 \opt{lcd_bitmap}{\input{plugins/chip8emulator.tex}}
 
