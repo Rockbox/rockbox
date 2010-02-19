@@ -362,10 +362,12 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define PAD_POS_Y   (GAMESCREEN_HEIGHT - PAD_HEIGHT - 1)
 
 /* change to however many levels there are, i.e. how many arrays there are total */
-int levels_num = 40;
+#define NUM_LEVELS 40
+#define NUM_BRICKS_ROWS 8
+#define NUM_BRICKS_COLS 10
 
-/* change the first number in [ ] to however many levels there are (levels_num) */
-static unsigned char levels[40][8][10] =
+/* change the first number in [ ] to however many levels there are */
+static unsigned char levels[NUM_LEVELS][NUM_BRICKS_ROWS][NUM_BRICKS_COLS] =
 /* You can set up new levels with the level editor
    ( http://plugbox.rockbox-lounge.com/brickmania.htm ).
    With 0x1, it refers to the first brick in the bitmap, 0x2 would refer to the
@@ -996,9 +998,9 @@ static void brickmania_init_game(bool new_game)
         fire[i].top=-1;
     }
     
-    for(i=0;i<=7;i++) {
-        for(j=0;j<=9;j++) {
-            int bnum = i*10+j;
+    for(i=0;i<NUM_BRICKS_ROWS;i++) {
+        for(j=0;j<NUM_BRICKS_COLS;j++) {
+            int bnum = i*NUM_BRICKS_COLS+j;
             brick[bnum].poweruse = false;
             if (new_game) {
                 brick[bnum].power=rb->rand()%25;
@@ -1442,12 +1444,12 @@ static int brickmania_game_loop(void)
             pad_line.p2.y = PAD_POS_Y;
 
             /* handle all of the bricks/powerups */
-            for (i=0; i<=7; i++) 
+            for (i=0; i<NUM_BRICKS_ROWS; i++) 
             {
-                for (j=0; j<=9 ;j++) 
+                for (j=0; j<NUM_BRICKS_COLS ;j++) 
                 {
                     int brickx;
-                    int bnum = i*10+j;
+                    int bnum = i*NUM_BRICKS_COLS+j;
                     
                     /* This brick is not really a brick, it is a powerup if
                      *  poweruse is set.  Perform appropriate powerup checks.
@@ -1986,7 +1988,7 @@ static int brickmania_game_loop(void)
 
             if (brick_on_board < 0) 
             {
-                if (level+1<levels_num) 
+                if (level+1<NUM_LEVELS) 
                 {
                     level++;
                     if (difficulty==NORMAL)
