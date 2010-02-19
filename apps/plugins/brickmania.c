@@ -819,7 +819,7 @@ typedef struct cube
     int hits;       /* How many hits can this brick take? */
     int hiteffect;
 } cube;
-cube brick[80];
+cube brick[NUM_BRICKS_ROWS * NUM_BRICKS_COLS];
 
 typedef struct balls 
 {
