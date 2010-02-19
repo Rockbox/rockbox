@@ -308,11 +308,12 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #include "pluginbitmaps/brickmania_break.h"
 #endif
 
-/* The time (in ms) for one iteration through the game loop - decrease this
- *  to speed up the game - note that current_tick is (currently) only accurate
- *  to 10ms.
+/* The time ms for one iteration through the game loop - decrease this to speed
+ * up the game - note that current_tick is (currently) only accurate to 10ms.
  */
-#define CYCLETIME           30
+#define CYCLETIME           30 /* ms */
+
+#define FLIP_SIDES_DELAY    10 /* seconds */
 
 #define TOPMARGIN           MAX(BRICK_HEIGHT, FIXED3(8))
 
@@ -364,10 +365,6 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 /* change to however many levels there are, i.e. how many arrays there are total */
 #define NUM_LEVELS 40
 
-#define NUM_BRICKS_ROWS 8
-#define NUM_BRICKS_COLS 10
-#define FLIP_SIDES_DELAY 10
-
 #define SCORE_BALL_HIT_BRICK          2
 #define SCORE_BALL_DEMOLISHED_BRICK   8
 #define SCORE_FIRE_HIT_BRICK         13
@@ -379,6 +376,10 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define SCORE_POWER_FLIP             23
 #define SCORE_POWER_EXTRA_BALL       23
 #define SCORE_POWER_LONG_PADDLE      23
+
+#define NUM_BRICKS_ROWS 8
+#define NUM_BRICKS_COLS 10
+#define BRICK_IDX(row, col) (NUM_BRICKS_COLS * (row) + (col))
 
 /* change the first number in [ ] to however many levels there are */
 static unsigned char levels[NUM_LEVELS][NUM_BRICKS_ROWS][NUM_BRICKS_COLS] =
@@ -815,6 +816,7 @@ bool flip_sides=false;
 int level=0;
 int brick_on_board=0;
 int used_balls=1;
+int used_fires=0;
 int difficulty = NORMAL;
 int pad_width;
 int flip_sides_delay;
@@ -992,6 +994,7 @@ static void brickmania_init_game(bool new_game)
     }
 
     used_balls  =   1;
+    used_fires  =   0;
     game_state  =   ST_READY;
     pad_type    =   PLAIN;
     pad_width   =   PAD_WIDTH;
@@ -1007,14 +1010,9 @@ static void brickmania_init_game(bool new_game)
         }
     }
 
-    for(i=0;i<MAX_FIRES;i++) {
-        /* No fire should be active */
-        fire[i].top=-1;
-    }
-
     for(i=0;i<NUM_BRICKS_ROWS;i++) {
         for(j=0;j<NUM_BRICKS_COLS;j++) {
-            int bnum = i*NUM_BRICKS_COLS+j;
+            int bnum = BRICK_IDX(i, j);
             brick[bnum].poweruse = false;
             if (new_game) {
                 brick[bnum].power=rb->rand()%25;
@@ -1055,6 +1053,7 @@ static void brickmania_loadgame(void)
         (rb->read(fd, &level, sizeof(level)) <= 0) ||
         (rb->read(fd, &brick_on_board, sizeof(brick_on_board)) <= 0) ||
         (rb->read(fd, &used_balls, sizeof(used_balls)) <= 0) ||
+        (rb->read(fd, &used_fires, sizeof(used_fires)) <= 0) ||
         (rb->read(fd, &pad_width, sizeof(pad_width)) <= 0) ||
         (rb->read(fd, &flip_sides_delay, sizeof(flip_sides_delay)) <= 0) ||
         (rb->read(fd, &brick, sizeof(brick)) <= 0) ||
@@ -1091,6 +1090,7 @@ static void brickmania_savegame(void)
             (rb->write(fd, &level, sizeof(level)) <= 0) ||
             (rb->write(fd, &brick_on_board, sizeof(brick_on_board)) <= 0) ||
             (rb->write(fd, &used_balls, sizeof(used_balls)) <= 0) ||
+            (rb->write(fd, &used_fires, sizeof(used_fires)) <= 0) ||
             (rb->write(fd, &pad_width, sizeof(pad_width)) <= 0) ||
             (rb->write(fd, &flip_sides_delay, sizeof(flip_sides_delay)) <= 0) ||
             (rb->write(fd, &brick, sizeof(brick)) <= 0) ||
@@ -1307,17 +1307,6 @@ static int brickmania_menu(void)
 #endif
 }
 
-/* Find an unused fire position */
-static int brickmania_find_empty_fire(void)
-{
-    int t;
-    for(t=0;t<MAX_FIRES;t++)
-        if (fire[t].top < 0)
-            return t;
-
-    return 0;
-}
-
 void brick_hit(int brick_number)
 {
     if(!brick[brick_number].used)
@@ -1436,18 +1425,49 @@ static int brickmania_game_loop(void)
             if (brick_on_board==0)
                 brick_on_board--;
 
-            /* if the pad is fire */
-            for(i=0; i<MAX_FIRES; i++)
+            /* move the fires */
+            if (game_state!=ST_PAUSE)
             {
-                /* If the projectile is active (>0 inactive) */
-                if (fire[i].top >= 0)
+                for(k=0;k<used_fires;k++)
                 {
-                    if (game_state!=ST_PAUSE)
-                        fire[i].top -= SPEED_FIRE;
-                    /* Draw the projectile */
-                    rb->lcd_vline(  INT3(fire[i].x_pos), INT3(fire[i].top),
-                                    INT3(fire[i].top + FIRE_LENGTH));
+                    fire[k].top -= SPEED_FIRE;
+                    if (fire[k].top < 0)
+                    {
+                        used_fires--;
+                        fire[k].top = fire[used_fires].top;
+                        fire[k].x_pos = fire[used_fires].x_pos;
+                        k--;
+                    }
+                    else if (fire[k].x_pos >= LEFTMARGIN &&
+                        fire[k].x_pos < LEFTMARGIN + NUM_BRICKS_COLS * BRICK_WIDTH)
+                    {
+                        j = (fire[k].x_pos - LEFTMARGIN) / BRICK_WIDTH;
+                        for (i=NUM_BRICKS_ROWS-1;i>=0;i--)
+                        {
+                            int bnum = BRICK_IDX(i, j);
+
+                            if (brick[bnum].used)
+                            {
+                                score += SCORE_FIRE_HIT_BRICK;
+                                brick_hit(bnum);
+                                used_fires--;
+                                fire[k].top = fire[used_fires].top;
+                                fire[k].x_pos = fire[used_fires].x_pos;
+                                k--;
+                                break;
+                            }
+                            if (brick[bnum].powertop<=fire[k].top)
+                                break;
+                        }
+                    }
                 }
+            }
+
+            /* draw the fires */
+            for(k=0;k<used_fires;k++)
+            {
+                rb->lcd_vline(INT3(fire[k].x_pos), INT3(fire[k].top), 
+                        INT3(fire[k].top + FIRE_LENGTH));
             }
 
             /* Setup the pad line-later used in intersection test */
@@ -1463,7 +1483,7 @@ static int brickmania_game_loop(void)
                 for (j=0; j<NUM_BRICKS_COLS ;j++)
                 {
                     int brickx;
-                    int bnum = i*NUM_BRICKS_COLS+j;
+                    int bnum = BRICK_IDX(i, j);
 
                     /* This brick is not really a brick, it is a powerup if
                      *  poweruse is set.  Perform appropriate powerup checks.
@@ -1637,30 +1657,6 @@ static int brickmania_game_loop(void)
 
                         rght_brick.p2.x = brickx + BRICK_WIDTH;
                         rght_brick.p2.y = brick[bnum].powertop + BRICK_HEIGHT;
-
-                        /* Check if any of the active fires hit a brick */
-                        for (k=0;k<MAX_FIRES;k++)
-                        {
-                            if(fire[k].top > 0)
-                            {
-                                /* Use misc_line to check if fire hit brick */
-                                misc_line.p1.x = fire[k].x_pos;
-                                misc_line.p1.y = fire[k].top;
-
-                                misc_line.p2.x = fire[k].x_pos;
-                                misc_line.p2.y = fire[k].top + SPEED_FIRE;
-
-                                /* If the fire hit the brick take care of it */
-                                if (check_lines(&misc_line, &bot_brick,
-                                                &pt_hit))
-                                {
-                                    score+=SCORE_FIRE_HIT_BRICK;
-                                    /* De-activate the fire */
-                                    fire[k].top=-1;
-                                    brick_hit(bnum);
-                                }
-                            }
-                        }
 
                         /* Draw the brick */
                         rb->lcd_bitmap_part(brickmania_bricks,0,
@@ -2163,13 +2159,18 @@ static int brickmania_game_loop(void)
                     }
                     else if (pad_type == SHOOTER)
                     {
-                        k=brickmania_find_empty_fire();
-                        fire[k].top=PAD_POS_Y - FIRE_LENGTH;
-                        fire[k].x_pos = pad_pos_x + 1; /* Add 1 for edge */
-
-                        k=brickmania_find_empty_fire();
-                        fire[k].top=PAD_POS_Y - FIRE_LENGTH;
-                        fire[k].x_pos = pad_pos_x + pad_width -1; /* Sub1 edge*/
+                        if (used_fires < MAX_FIRES)
+                        {
+                            fire[used_fires].top = PAD_POS_Y - FIRE_LENGTH;
+                            fire[used_fires].x_pos = pad_pos_x + 1; /* Add 1 for edge */
+                            used_fires++;
+                        }
+                        if (used_fires < MAX_FIRES)
+                        {
+                            fire[used_fires].top = PAD_POS_Y - FIRE_LENGTH;
+                            fire[used_fires].x_pos = pad_pos_x + pad_width - 1; /* Sub1 edge*/
+                            used_fires++;
+                        }
                     }
                     break;
 #ifdef RC_QUIT
