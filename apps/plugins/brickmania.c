@@ -778,6 +778,7 @@ static unsigned char levels[40][8][10] =
 };
 
 #define MAX_BALLS 10
+#define MAX_FIRES 30
 
 enum difficulty_options {
     EASY, NORMAL
@@ -838,7 +839,7 @@ typedef struct sfire {
     int top;    /* This stores the fire y position, it is a fixed point num */
     int x_pos;  /* This stores the fire x position, it is a whole number */
 } sfire;
-sfire fire[30];
+sfire fire[MAX_FIRES];
 
 #define CONFIG_FILE_NAME "brickmania.cfg"
 #define SAVE_FILE  PLUGIN_GAMES_DIR "/brickmania.save"
@@ -990,7 +991,7 @@ static void brickmania_init_game(bool new_game)
         }
     }
     
-    for(i=0;i<30;i++) {
+    for(i=0;i<MAX_FIRES;i++) {
         /* No fire should be active */
         fire[i].top=-1;
     }
@@ -1294,7 +1295,7 @@ static int brickmania_menu(void)
 static int brickmania_find_empty_fire(void)
 {
     int t;
-    for(t=0;t<30;t++)
+    for(t=0;t<MAX_FIRES;t++)
         if (fire[t].top < 0)
             return t;
 
@@ -1420,7 +1421,7 @@ static int brickmania_game_loop(void)
                 brick_on_board--;
 
             /* if the pad is fire */
-            for(i=0; i<30; i++) 
+            for(i=0; i<MAX_FIRES; i++) 
             {
                 /* If the projectile is active (>0 inactive) */
                 if (fire[i].top >= 0) 
@@ -1622,7 +1623,7 @@ static int brickmania_game_loop(void)
                         rght_brick.p2.y = brick[bnum].powertop + BRICK_HEIGHT;
                     
                         /* Check if any of the active fires hit a brick */
-                        for (k=0;k<30;k++) 
+                        for (k=0;k<MAX_FIRES;k++) 
                         {
                             if(fire[k].top > 0)
                             {
