@@ -56,7 +56,7 @@ libmkamsboot$(RBARCH).a: $(LIBOBJS)
 	$(SILENT)$(AR) ruc $(TARGET_DIR)$@ $^
 
 # building the standalone executable
-$(OUTPUT): $(OBJS) $(EXTRADEPS)
+$(OUTPUT): $(OBJS) $(LIBOBJS) $(EXTRADEPS)
 	@echo LD $@
 	$(SILENT)$(CC) $(CFLAGS) -o $(OUTPUT) $(OBJS) $(EXTRADEPS)
 
