@@ -57,6 +57,7 @@ int main(int argc, char* argv[])
     int of_packedsize;
     unsigned char* rb_packed;
     int rb_packedsize;
+    int patchable;
     int totalsize;
     char errstr[200];
     struct md5sums sum;
@@ -121,12 +122,13 @@ int main(int argc, char* argv[])
     fprintf(stderr, "[INFO] UCL unpack function size: %u bytes\n",
             (unsigned int)sizeof(nrv2e_d8));
 
-    totalsize = total_size(sum.model, of_packedsize, rb_packedsize);
+    patchable = check_sizes(sum.model, rb_packedsize, bootloader_size,
+        of_packedsize, firmware_size, &totalsize, errstr, sizeof(errstr));
 
     fprintf(stderr, "[INFO] Total size of new image:  %d bytes\n", totalsize);
 
-    if (totalsize > firmware_size) {
-        fprintf(stderr, "[ERR]  No room to insert bootloader, aborting\n");
+    if (!patchable) {
+        fprintf(stderr, "%s", errstr);
         free(buf);
         free(of_packed);
         free(rb_packed);

@@ -30,7 +30,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 /* Supported models */
 enum {
@@ -133,21 +133,31 @@ void patch_firmware(
         unsigned char* rb_packed, int rb_packedsize);
 
 
-/* total_size()
+/* check_sizes()
  *
- * Calculates the size of the new firmware block
+ * Verify if the given bootloader can be embedded in the OF file, while still
+ * allowing both the bootloader and the OF to be unpacked at runtime
  *
  * ARGUMENTS
  *
  * model            :   firmware model (MODEL_XXX)
  * rb_packed_size   :   size of compressed rockbox bootloader
- * of_packedsize    :   size of compressed original firmware block
+ * rb_unpacked_size :   size of compressed rockbox bootloader
+ * of_packed_size   :   size of compressed original firmware block
+ * of_unpacked_size :   size of compressed original firmware block
+ * total_size       :   will contain the size of useful data that would be
+ *                       written to the firmware block, even in case of an
+ *                       error
+ * errstr           :   provided buffer to store an eventual error
+ * errstrsize       :   size of provided error buffer
  *
  * RETURN VALUE
- *  Size of new firmware block
+ *  0 if the conditions aren't met, 1 if we can go and patch the firmware
 */
 
-int total_size(int model, int rb_packedsize, int of_packedsize);
+int check_sizes(int model, int rb_packed_size, int rb_unpacked_size,
+        int of_packed_size, int of_unpacked_size, int *total_size,
+        char *errstr, int errstrsize);
 
 /* firmware_revision()
  *
@@ -164,6 +174,6 @@ int firmware_revision(int model);
 
 #ifdef __cplusplus
 };
-#endif 
+#endif
 
 #endif

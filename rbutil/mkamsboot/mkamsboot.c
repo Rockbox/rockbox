@@ -227,6 +227,25 @@ static struct md5sums sansasums[] = {
 
 #define NUM_MD5S (sizeof(sansasums)/sizeof(sansasums[0]))
 
+static unsigned int model_memory_size(int model)
+{
+    if(model == MODEL_CLIPV2)
+    {
+        /* The decompressed Clipv2 OF is around 380kB.
+         * Since it doesn't fit in the 0x50000 bytes IRAM, the OF starts
+         * with DRAM mapped at 0x0
+         *
+         * We could use all the available memory (supposedly 8MB)
+         * but 1MB ought to be enough for our use
+         */
+        return 1 << 20;
+    }
+    else
+    {   /* The OF boots with IRAM (320kB) mapped at 0x0 */
+        return 320 << 10;
+    }
+}
+
 int firmware_revision(int model)
 {
     return fw_revisions[model];
@@ -469,8 +488,8 @@ unsigned char* load_rockbox_file(
 
     /* Check for correct model string */
     if (memcmp(rb_model_names[model], header + 4, 4)!=0)
-        ERROR("[ERR]  Model name \"%s\" not found in %s\n",
-                       rb_model_names[model], filename);
+        ERROR("[ERR]  Expected model name \"%s\" in %s, not \"%4.4s\"\n",
+                       rb_model_names[model], filename, (char*)header+4);
 
     *bufsize = filesize(fd) - sizeof(header);
 
@@ -515,6 +534,7 @@ void patch_firmware(
 {
     unsigned char *p;
     uint32_t sum, filesum;
+    uint32_t ucl_dest;
     unsigned int i;
 
     /* Zero the original firmware area - not needed, but helps debugging */
@@ -555,6 +575,8 @@ void patch_firmware(
             - 1);
     put_uint32le(&buf[0x434], rb_packedsize);
 
+    ucl_dest = model_memory_size(model) - 1; /* last byte of memory */
+    put_uint32le(&buf[0x438], ucl_dest);
 
     /* Update the firmware block checksum */
     sum = calc_checksum(buf + 0x400, firmware_size);
@@ -579,10 +601,49 @@ void patch_firmware(
     put_uint32le(buf + len - 4, filesum);
 }
 
-/* returns size of new firmware block */
-int total_size(int model, int rb_packedsize, int of_packedsize)
+/* returns != 0 if the firmware can be safely patched */
+int check_sizes(int model, int rb_packed_size, int rb_unpacked_size,
+        int of_packed_size, int of_unpacked_size, int *total_size,
+        char *errstr, int errstrsize)
 {
-    return bootloader_sizes[model] + sizeof(nrv2e_d8) + of_packedsize +
-                rb_packedsize;
-}
+    unsigned int packed_size = bootloader_sizes[model] + sizeof(nrv2e_d8) +
+            of_packed_size + rb_packed_size;
 
+    /* how much memory is available */
+    unsigned int memory_size = model_memory_size(model);
+
+    /* the memory used when unpacking the OF */
+    unsigned int ram_of = sizeof(nrv2e_d8) + of_packed_size + of_unpacked_size;
+
+    /* the memory used when unpacking the bootloader */
+    unsigned int ram_rb = sizeof(nrv2e_d8) + rb_packed_size + rb_unpacked_size;
+
+    *total_size = packed_size;
+
+#define ERROR(format, ...) \
+    do { \
+        snprintf(errstr, errstrsize, format, __VA_ARGS__); \
+        return 0; \
+    } while(0)
+
+    /* will packed data fit in the OF file ? */
+    if(packed_size > of_unpacked_size)
+        ERROR(
+            "[ERR]  Packed data (%d bytes) doesn't fit in the firmware "
+            "(%d bytes)\n", packed_size, of_unpacked_size
+            );
+
+    else if(ram_rb > memory_size)
+        ERROR("[ERR]  Rockbox can't be unpacked at runtime, needs %d bytes "
+            "of memory and only %d available\n", ram_rb, memory_size
+            );
+
+    else if(ram_of > memory_size)
+        ERROR("[ERR]  OF can't be unpacked at runtime, needs %d bytes "
+            "of memory and only %d available\n", ram_of, memory_size
+            );
+
+    return 1;
+
+#undef ERROR
+}

@@ -21,13 +21,6 @@
 
 .text
 
-#if defined(SANSA_CLIPV2)
-.set RAM_SIZE, 0x100000 /* Use 1MB of SDRAM (bigger firmware do not fit in
-                         * 0x50000 bytes) */
-#else
-.set RAM_SIZE, 0x50000  /* Use full IRAM (or part of SDRAM on as3525v2) */
-#endif
-
 /* AS3525 hardware registers */
 .set GPIOA,     0xC80B0000
 .set GPIOB,     0xC80C0000
@@ -59,6 +52,7 @@ ucl_of_size:     .word   0 /* Size in bytes of the compressed OF image */
 ucl_rb_end:      .word   0 /* End of the ucl-compressed RB image */
 ucl_rb_size:     .word   0 /* Size in bytes of the compressed RB image */
 
+ucl_dest:        .word   0 /* End of our destination buffer (end of memory) */
 
 start:
         /* First copy the UCL unpack function to the end of RAM */
@@ -66,7 +60,7 @@ start:
         ldr     r1, uclunpack_size  /* Source length */
         sub     r2, r0, r1          /* Source start - 1*/
 
-        ldr     r3, =(RAM_SIZE-1)  /* Destination end */
+        ldr     r3, ucl_dest        /* Destination end */
 
 uclcopy:
         ldrb    r4, [r0], #-1
@@ -74,8 +68,8 @@ uclcopy:
         cmp     r2, r0
         bne     uclcopy
 
-        add     r5, r3, #2          /* r5 is entry point of copy of uclunpack */
-                                    /* function, plus one (for thumb mode */
+        /* store the new destination buffer */
+        str     r3, ucl_dest
 
         /* enable gpio clock */
         ldr     r0, =CGU_PERI
@@ -84,9 +78,9 @@ uclcopy:
         str     r1, [r0]
 
 
-/* TODO : M200V4 */
+/* TODO : M200V4 ? */
 #if defined(SANSA_C200V2)
-#define USB_PIN 1
+#define USB_PIN 1   /* FIXME: not correct on some c200v2s */
 #elif defined(SANSA_CLIP) || defined(SANSA_CLIPV2)
 #define USB_PIN 6
 #elif defined(SANSA_FUZE) || defined(SANSA_E200V2)
@@ -210,10 +204,12 @@ boot_of:
 
 decompress:
         /* At this point:                                              */
-        /* r5 = entry point (plus one for thumb) of uclunpack function */
-        /* r3 = destination_end for copy of UCL image                  */
         /* r0 = source_end for UCL image to copy                       */
         /* r1 = size of UCL image to copy                              */
+
+        ldr     r3, ucl_dest
+        add     r5, r3, #2      /* r5 is entry point of copy of uclunpack */
+                                /* function, plus one (for thumb mode */
 
         sub     r4, r3, r1      /* r4 := destination_start - 1 */
 

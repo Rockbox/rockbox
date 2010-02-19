@@ -72,6 +72,7 @@ void BootloaderInstallAms::installStage2(void)
     int n;
     int firmware_size;
     int bootloader_size;
+    int patchable;
     int totalsize;
     char errstr[200];
       
@@ -109,10 +110,13 @@ void BootloaderInstallAms::installStage2(void)
     }
     
     /* check total size */
-    totalsize = total_size(sum.model,rb_packedsize,of_packedsize);
-    if (totalsize > firmware_size) 
+    patchable = check_sizes(sum.model, rb_packedsize, bootloader_size,
+            of_packedsize, firmware_size, &totalsize, errstr, sizeof(errstr));
+
+    if (!patchable)
     {
         qDebug() << "[BootloaderInstallAms] No room to insert bootloader";
+        emit logItem(errstr, LOGERROR);
         emit logItem(tr("No room to insert bootloader, try another firmware version"),
                      LOGERROR);
         free(buf);
