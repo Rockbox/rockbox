@@ -28,9 +28,9 @@ endif
 
 ifdef RBARCH
 CFLAGS += -arch $(RBARCH)
+OBJDIR = $(RBARCH)/
 endif
 
-OUT = $(TARGET_DIR)build$(RBARCH)
 
 all: $(OUTPUT)
 
@@ -43,12 +43,13 @@ $(LIBUCL):
 # inputs
 LIBSOURCES := dualboot.c md5.c mkamsboot.c
 SOURCES := $(LIBSOURCES) main.c
-OBJS := $(patsubst %.c,%.o,$(addprefix $(OUT)/,$(SOURCES)))
-LIBOBJS := $(patsubst %.c,%.o,$(addprefix $(OUT)/,$(LIBSOURCES)))
+OBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(SOURCES)))
+LIBOBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(LIBSOURCES)))
 EXTRADEPS := $(LIBUCL)
 
-$(OUT)/%.o: %.c $(OUT)
+$(OBJDIR)%.o: %.c
 	@echo CC $< $
+	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
 libmkamsboot$(RBARCH).a: $(LIBOBJS)
@@ -68,22 +69,22 @@ $(TARGET_DIR)libmkamsbooti386.a:
 $(TARGET_DIR)libmkamsbootppc.a:
 	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) libmkamsbootppc.a
 endif    
-    
+
 libmkamsboot-universal: $(TARGET_DIR)libmkamsbooti386.a $(TARGET_DIR)libmkamsbootppc.a
 	@echo lipo $(TARGET_DIR)libmkamsboot.a
 	$(SILENT) rm -f $(TARGET_DIR)libmkamsboot.a
 	$(SILENT)lipo -create $(TARGET_DIR)libmkamsbootppc.a $(TARGET_DIR)libmkamsbooti386.a -output $(TARGET_DIR)libmkamsboot.a
-    
+
 clean:
-	rm -f $(OUTPUT) libmkamsboot.o $(TARGET_DIR)libmkamsboot*.a mkamsboot.dmg
-	rm -rf build* mkamsboot-*
+	rm -f $(OBJS) $(OUTPUT) libmkamsboot.o $(TARGET_DIR)libmkamsboot*.a mkamsboot.dmg
+	rm -rf mkamsboot-* i386 ppc $(OBJDIR)
 
 mkamsboot-i386:
 	$(MAKE) RBARCH=i386
 	mv mkamsboot mkamsboot-i386
 
 mkamsboot-ppc:
-	make RBARCH=ppc
+	$(MAKE) RBARCH=ppc
 	mv mkamsboot mkamsboot-ppc
 
 mkamsboot-mac: mkamsboot-i386 mkamsboot-ppc
@@ -93,8 +94,3 @@ mkamsboot.dmg: mkamsboot-mac
 	mkdir -p mkamsboot-dmg
 	cp -p mkamsboot-mac mkamsboot-dmg
 	hdiutil create -srcfolder mkamsboot-dmg mkamsboot.dmg
-    
-$(OUT):
-	@echo MKDIR $(OUT)
-	$(SILENT)mkdir $(OUT)
-
