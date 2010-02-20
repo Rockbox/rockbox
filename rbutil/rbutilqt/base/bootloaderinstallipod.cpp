@@ -200,7 +200,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallIpod::installed(void)
     }
     else {
         read_directory(&ipod);
-        if(ipod.ipod_directory[0].entryOffset == 0) {
+        if(ipod.ipod_directory[0].entryOffset == 0 || ipod.macpod) {
             qDebug() << "[BootloaderInstallIpod] installed: BootloaderOther";
             result = BootloaderOther;
         }
