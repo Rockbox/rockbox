@@ -137,15 +137,13 @@ static bool shuffle_playlist(void)
 
     return false;
 }
-
 static bool save_playlist(void)
 {
     save_playlist_screen(NULL);
     return false;
 }
 
-MENUITEM_FUNCTION(playlist_viewer_item, 0, ID2P(LANG_VIEW_DYNAMIC_PLAYLIST),
-                  playlist_viewer, NULL, NULL, Icon_Playlist);
+extern struct menu_item_ex view_cur_playlist; /* from playlist_menu.c */
 MENUITEM_FUNCTION(search_playlist_item, 0, ID2P(LANG_SEARCH_IN_PLAYLIST),
                   search_playlist, NULL, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(playlist_save_item, 0, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
@@ -154,7 +152,7 @@ MENUITEM_FUNCTION(reshuffle_item, 0, ID2P(LANG_SHUFFLE_PLAYLIST),
                   shuffle_playlist, NULL, NULL, Icon_Playlist);
 MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST),
                  NULL, Icon_Playlist,
-                 &playlist_viewer_item, &search_playlist_item,
+                 &view_cur_playlist, &search_playlist_item,
                  &playlist_save_item, &reshuffle_item
                );
 
@@ -1188,6 +1186,8 @@ int onplay(char* file, int attr, int from)
         case GO_TO_ROOT:
         case GO_TO_MAINMENU:
             return ONPLAY_MAINMENU;
+        case GO_TO_PLAYLIST_VIEWER:
+            return ONPLAY_PLAYLIST;
         default:
             return onplay_result;
     }

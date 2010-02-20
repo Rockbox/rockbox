@@ -60,6 +60,7 @@
 #include "wps.h"
 #include "bookmark.h"
 #include "playlist.h"
+#include "playlist_viewer.h"
 #include "menus/exported_menus.h"
 #ifdef HAVE_RTC_ALARM
 #include "rtc.h"
@@ -313,6 +314,20 @@ static int radio(void* param)
 }
 #endif
 
+static int playlist_view(void * param)
+{
+    (void)param;
+    switch (playlist_viewer())
+    {
+        case PLAYLIST_VIEWER_MAINMENU:
+        case PLAYLIST_VIEWER_USB:
+            return GO_TO_ROOT;
+        case PLAYLIST_VIEWER_OK:
+            return GO_TO_PREVIOUS;
+    }
+    return GO_TO_PREVIOUS;
+}
+
 static int load_bmarks(void* param)
 {
     (void)param;
@@ -381,7 +396,8 @@ static const struct root_items items[] = {
 #endif
     
     [GO_TO_RECENTBMARKS] =  { load_bmarks, NULL, &bookmark_settings_menu }, 
-    [GO_TO_BROWSEPLUGINS] = { plugins_menu, NULL, NULL }, 
+    [GO_TO_BROWSEPLUGINS] = { plugins_menu, NULL, NULL },
+    [GO_TO_PLAYLIST_VIEWER] = { playlist_view, NULL, NULL },
     
 };
 static const int nb_items = sizeof(items)/sizeof(*items);

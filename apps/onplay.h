@@ -27,7 +27,8 @@ enum {
     ONPLAY_MAINMENU = -1,
     ONPLAY_OK = 0,
     ONPLAY_RELOAD_DIR,
-    ONPLAY_START_PLAY
+    ONPLAY_START_PLAY,
+    ONPLAY_PLAYLIST,
 };
 
 #endif

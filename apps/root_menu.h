@@ -52,6 +52,7 @@ enum {
        will need editing if this is the case. */
     GO_TO_BROWSEPLUGINS,
     GO_TO_TIMESCREEN,
+    GO_TO_PLAYLIST_VIEWER,
 };
 
 extern const struct menu_item_ex root_menu_;

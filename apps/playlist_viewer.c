@@ -448,7 +448,8 @@ static int onplay_menu(int index)
         playlist_buffer_get_track(&viewer.buffer, index);
     MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST), NULL, 
                         ID2P(LANG_REMOVE), ID2P(LANG_MOVE),
-                        ID2P(LANG_CATALOG_ADD_TO), ID2P(LANG_CATALOG_ADD_TO_NEW));
+                        ID2P(LANG_CATALOG_ADD_TO), ID2P(LANG_CATALOG_ADD_TO_NEW),
+                        ID2P(LANG_PLAYLISTVIEWER_SETTINGS));
     bool current = (current_track->index == viewer.current_playing_track);
 
     result = do_menu(&menu_items, NULL, NULL, false);
@@ -503,6 +504,10 @@ static int onplay_menu(int index)
                                           result==3, NULL);
                 ret = 0;
                 break;
+            case 4: /* playlist viewer settings */
+                /* true on usb connect */
+                ret = viewer_menu() ? -1 : 0;
+                break;
         }
     }
     return ret;
@@ -531,7 +536,7 @@ static int save_playlist_func(void)
 }
 
 /* View current playlist */
-bool playlist_viewer(void)
+enum playlist_viewer_result playlist_viewer(void)
 {
     return playlist_viewer_ex(NULL);
 }
@@ -606,9 +611,9 @@ static enum themable_icons playlist_callback_icons(int selected_item,
 
 /* Main viewer function.  Filename identifies playlist to be viewed.  If NULL,
    view current playlist. */
-bool playlist_viewer_ex(const char* filename)
+enum playlist_viewer_result playlist_viewer_ex(const char* filename)
 {
-    bool ret = false;       /* return value */
+    enum playlist_viewer_result ret = PLAYLIST_VIEWER_OK;
     bool exit=false;        /* exit viewer */
     int button;
     struct gui_synclist playlist_lists;
@@ -730,7 +735,7 @@ bool playlist_viewer_ex(const char* filename)
 
                 if (ret_val < 0)
                 {
-                    ret = true;
+                    ret = PLAYLIST_VIEWER_USB;
                     goto exit;
                 }
                 else if (ret_val > 0)
@@ -747,23 +752,12 @@ bool playlist_viewer_ex(const char* filename)
                 break;
             }
             case ACTION_STD_MENU:
-                if (viewer_menu())
-                {
-                    ret = true;
-                    goto exit;
-                }
-                gui_synclist_set_icon_callback(
-                    &playlist_lists,
-                    global_settings.playlist_viewer_icons?
-                        &playlist_callback_icons:NULL
-                    );
-                gui_synclist_draw(&playlist_lists);
-                break;
-
+                ret = PLAYLIST_VIEWER_MAINMENU;
+                goto exit;
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                 {
-                    ret = true;
+                    ret = PLAYLIST_VIEWER_USB;
                     goto exit;
                 }
                 break;

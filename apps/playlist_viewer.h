@@ -23,8 +23,14 @@
 #ifndef _PLAYLIST_VIEWER_H_
 #define _PLAYLIST_VIEWER_H_
 
-bool playlist_viewer(void);
-bool playlist_viewer_ex(const char* filename);
+enum playlist_viewer_result playlist_viewer(void);
+enum playlist_viewer_result playlist_viewer_ex(const char* filename);
 bool search_playlist(void);
+
+enum playlist_viewer_result {
+    PLAYLIST_VIEWER_OK,
+    PLAYLIST_VIEWER_USB,
+    PLAYLIST_VIEWER_MAINMENU,
+};
 
 #endif

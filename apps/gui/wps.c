@@ -859,11 +859,14 @@ long gui_wps_show(void)
             case ACTION_WPS_CONTEXT:
             {
                 gwps_leave_wps();
+                int retval = onplay(wps_state.id3->path, 
+                           FILE_ATTR_AUDIO, CONTEXT_WPS);
                 /* if music is stopped in the context menu we want to exit the wps */
-                if (onplay(wps_state.id3->path, 
-                           FILE_ATTR_AUDIO, CONTEXT_WPS) == ONPLAY_MAINMENU 
+                if (retval == ONPLAY_MAINMENU 
                     || !audio_status())
                     return GO_TO_ROOT;
+                else if (retval == ONPLAY_PLAYLIST)
+                    return GO_TO_PLAYLIST_VIEWER;
                 restore = true;
             }
             break;
@@ -1150,9 +1153,7 @@ long gui_wps_show(void)
                 break;
             case ACTION_WPS_VIEW_PLAYLIST:
                 gwps_leave_wps();
-                if (playlist_viewer()) /* true if USB connected */
-                    return GO_TO_ROOT;
-                restore = true;
+                return GO_TO_PLAYLIST_VIEWER;
                 break;
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
