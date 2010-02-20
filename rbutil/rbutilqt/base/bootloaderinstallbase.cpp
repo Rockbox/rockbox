@@ -226,7 +226,7 @@ void BootloaderInstallBase::checkRemount()
         if(!status) {
             // still not remounted, restart timer.
             QTimer::singleShot(500, this, SLOT(checkRemount()));
-            qDebug() << "player not remounted yet" << m_remountDevice;
+            qDebug() << "[BootloaderInstallBase] Player not remounted yet" << m_remountDevice;
         }
         else {
             emit logItem(tr("Player remounted"), LOGINFO);
