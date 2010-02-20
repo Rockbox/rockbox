@@ -99,31 +99,18 @@
 #define FM_RECORD_DBLPRE
 #define FM_RECORD
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || (CONFIG_KEYPAD == SANSA_C200_PAD)
-#define FM_MENU
 #define FM_PRESET
-#define FM_STOP
 #define FM_MODE
-#define FM_EXIT
-#define FM_PLAY
 
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
 #define FM_PRESET
 #define FM_MODE
 
 #elif (CONFIG_KEYPAD == COWON_D2_PAD)
-#define FM_MENU
 #define FM_PRESET
-#define FM_STOP
-#define FM_MODE
-#define FM_EXIT
-#define FM_PLAY
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define FM_MENU
-#define FM_STOP
-#define FM_EXIT
-#define FM_PLAY
 #define FM_MODE
 
 #endif
