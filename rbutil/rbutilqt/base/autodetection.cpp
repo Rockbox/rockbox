@@ -265,8 +265,11 @@ QString Autodetection::resolveMountPoint(QString device)
 
     struct mntent *ent;
     while((ent = getmntent(mn))) {
-        if(QString(ent->mnt_fsname).startsWith(device)
-           && QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)) {
+        // Check for valid filesystem. Allow hfs too, as an Ipod might be a
+        // MacPod.
+        if(QString(ent->mnt_fsname) == device
+           && (QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)
+               || QString(ent->mnt_type).contains("hfs", Qt::CaseInsensitive))) {
             endmntent(mn);
             qDebug() << "[Autodetect] resolved mountpoint is:" << ent->mnt_dir;
             return QString(ent->mnt_dir);
@@ -282,8 +285,11 @@ QString Autodetection::resolveMountPoint(QString device)
 
     num = getmntinfo(&mntinf, MNT_WAIT);
     while(num--) {
-        if(QString(mntinf->f_mntfromname).startsWith(device)
-           && QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive)) {
+        // Check for valid filesystem. Allow hfs too, as an Ipod might be a
+        // MacPod.
+        if(QString(mntinf->f_mntfromname) == device
+           && (QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive)
+                || QString(mntinf->f_fstypename).contains("hfs", Qt::CaseInsensitive))) {
             qDebug() << "[Autodetect] resolved mountpoint is:" << mntinf->f_mntonname;
             return QString(mntinf->f_mntonname);
         }
@@ -324,8 +330,13 @@ QString Autodetection::resolveDevicename(QString path)
 
     struct mntent *ent;
     while((ent = getmntent(mn))) {
-        if(QString(ent->mnt_dir).startsWith(path)
-           && QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)) {
+        // check for valid filesystem type.
+        // Linux can handle hfs (and hfsplus), so consider it a valid file
+        // system. Otherwise resolving the device name would fail, which in
+        // turn would make it impossible to warn about a MacPod.
+        if(QString(ent->mnt_dir) == path
+           && (QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)
+            || QString(ent->mnt_type).contains("hfs", Qt::CaseInsensitive))) {
             endmntent(mn);
             qDebug() << "[Autodetect] device name is" << ent->mnt_fsname;
             return QString(ent->mnt_fsname);
@@ -341,8 +352,11 @@ QString Autodetection::resolveDevicename(QString path)
 
     num = getmntinfo(&mntinf, MNT_WAIT);
     while(num--) {
-        if(QString(mntinf->f_mntonname).startsWith(path)
-           && QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive)) {
+        // check for valid filesystem type. OS X can handle hfs (hfs+ is
+        // treated as hfs), BSD should be the same.
+        if(QString(mntinf->f_mntonname) == path
+           && (QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive)
+            || QString(mntinf->f_fstypename).contains("hfs", Qt::CaseInsensitive))) {
             qDebug() << "[Autodetect] device name is" << mntinf->f_mntfromname;
             return QString(mntinf->f_mntfromname);
         }
