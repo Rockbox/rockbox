@@ -234,10 +234,12 @@ udiv32_arm:
     mul     \inv, \divisor, \neg
     smlawt  \divisor, \divisor, \inv, \divisor
     mul     \inv, \divisor, \neg
-    /* This will save a cycle on ARMv6, but does not produce a correct result
-       if numerator sign bit is set. This case accounts for about 1 in 10^7 of
-       divisions, done by the APE decoder, so we specialize for the more common
-       case and handle the uncommon large-numerator separately */
+    /* This will save a cycle on ARMv6, but requires that the numerator sign
+       bit is not set (that of inv is guaranteed unset). The branch should
+       predict very well, making it typically 1 cycle, and thus both the branch
+       and test fill delay cycles for the multiplies. Based on logging of
+       numerator sizes in the APE codec, the branch is taken about 1/10^7 of
+       the time. */
 #if ARM_ARCH >= 6
     tst     \numerator, \numerator
     smmla   \divisor, \divisor, \inv, \divisor

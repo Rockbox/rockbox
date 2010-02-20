@@ -244,7 +244,9 @@
     tst     \numerator, \numerator
     smmla   \divisor, \divisor, \inv, \divisor
     /* Branch to large-numerator handler, or else use smmul if sign bit is not
-       set. */
+       set. This wins on average with random numerators, and should be no
+       slower than using umull for small numerator, even if prediction fails.
+    */
     bmi     40f
     smmul   \inv, \numerator, \divisor
 #else
