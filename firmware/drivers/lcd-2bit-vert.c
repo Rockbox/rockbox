@@ -464,14 +464,14 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
     deltax = abs(x2 - x1);
     if (deltax == 0)
     {
-        DEBUGF("lcd_drawline() called for vertical line - optimisation.\n");
+        /* DEBUGF("lcd_drawline() called for vertical line - optimisation.\n"); */
         lcd_vline(x1, y1, y2);
         return;
     }
     deltay = abs(y2 - y1);
     if (deltay == 0)
     {
-        DEBUGF("lcd_drawline() called for horizontal line - optimisation.\n");
+        /* DEBUGF("lcd_drawline() called for horizontal line - optimisation.\n"); */
         lcd_hline(x1, x2, y1);
         return;
     }

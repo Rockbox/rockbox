@@ -489,14 +489,14 @@ void LCDFN(drawline)(int x1, int y1, int x2, int y2)
     deltax = abs(x2 - x1);
     if (deltax == 0)
     {
-        DEBUGF(LCDNAME "drawline() called for vertical line - optimisation.\n");
+        /* DEBUGF(LCDNAME "drawline() called for vertical line - optimisation.\n"); */
         LCDFN(vline)(x1, y1, y2);
         return;
     }
     deltay = abs(y2 - y1);
     if (deltay == 0)
     {
-        DEBUGF(LCDNAME "drawline() called for horizontal line - optimisation.\n");
+        /* DEBUGF(LCDNAME "drawline() called for horizontal line - optimisation.\n"); */
         LCDFN(hline)(x1, x2, y1);
         return;
     }
