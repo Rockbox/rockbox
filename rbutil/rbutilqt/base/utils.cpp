@@ -164,9 +164,7 @@ QString findExecutable(QString name)
 
 
 /** @brief checks different Enviroment things. Ask if user wants to continue.
- *  @param settings A pointer to rbutils settings class
  *  @param permission if it should check for permission
- *  @param targetId the targetID to check for. if it is -1 no check is done.
  *  @return string with error messages if problems occurred, empty strings if none.
  */
 QString check(bool permission)
@@ -188,7 +186,8 @@ QString check(bool permission)
     // Check TargetId
     RockboxInfo rbinfo(RbSettings::value(RbSettings::Mountpoint).toString());
     QString installed = rbinfo.target();
-    if(!installed.isEmpty() && installed != SystemInfo::value(SystemInfo::CurConfigureModel).toString())
+    if(!installed.isEmpty() && installed !=
+       SystemInfo::value(SystemInfo::CurConfigureModel).toString())
     {
         text += QObject::tr("<li>Target mismatch detected.\n"
                 "Installed target: %1, selected target: %2.</li>")
