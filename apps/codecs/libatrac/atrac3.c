@@ -726,7 +726,7 @@ static void gainCompensateAndOverlap (int32_t *pIn, int32_t *pPrev, int32_t *pOu
     if (pGain2->num_gain_data == 0)
         gain1 = ONE_16;
     else
-        gain1 = gain_tab1[pGain2->levcode[0]];
+        gain1 = (ONE_16<<4)>>(pGain2->levcode[0]);
 
     if (pGain1->num_gain_data == 0) {
         /* Remark: This path is called >90%. */
@@ -743,7 +743,7 @@ static void gainCompensateAndOverlap (int32_t *pIn, int32_t *pPrev, int32_t *pOu
         for (cnt = 0; cnt < numdata; cnt++) {
             startLoc = pGain1->loccode[cnt] * 8;
 
-            gain2    = gain_tab1[pGain1->levcode[cnt]];
+            gain2    = (ONE_16<<4)>>(pGain1->levcode[cnt]);
             gain_inc = gain_tab2[(pGain1->levcode[cnt+1] - pGain1->levcode[cnt])+15];
 
             /* Apply variable gain (gain1 -> gain2) to samples */

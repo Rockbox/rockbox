@@ -78,12 +78,6 @@ static const int32_t window_lookup[128] ICONST_ATTR  = {
 };
 
 /* Gain tables scaled by 2^16 */
-static const int32_t gain_tab1[16] ICONST_ATTR = {
-    0x00100000, 0x00080000, 0x00040000, 0x00020000, 0x00010000, 0x00008000, 
-    0x00004000, 0x00002000, 0x00001000, 0x00000800, 0x00000400, 0x00000200, 
-    0x00000100, 0x00000080, 0x00000040, 0x00000020, 
-};
-
 static const int32_t gain_tab2[31] ICONST_ATTR = {
     0x0003ab03, 0x00035d14, 0x0003159d, 0x0002d414, 0x000297fb, 0x000260e0, 
     0x00022e57, 0x00020000, 0x0001d582, 0x0001ae8a, 0x00018ace, 0x00016a0a, 
@@ -95,7 +89,7 @@ static const int32_t gain_tab2[31] ICONST_ATTR = {
 };
 
 /* Joint-Stereo related tables, scaled by 2^16 */
-static const int32_t matrixCoeffs_fix[8]= {
+static const int32_t matrixCoeffs_fix[8] ICONST_ATTR = {
     0x00000000, 0x00020000, 0x00020000, 0x00020000, 
     0x00000000, 0x00000000, 0x00010000, 0x00010000, 
 };
