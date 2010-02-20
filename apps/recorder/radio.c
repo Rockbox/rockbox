@@ -455,6 +455,19 @@ static void talk_preset(int preset, bool fallback, bool enqueue)
     }
 }
 
+static void fms_restore(struct viewport vp[NB_SCREENS])
+{
+    struct screen *display;
+    int i;
+    FOR_NB_SCREENS(i)
+    {
+        display = &screens[i];
+        display->set_viewport(&vp[i]);
+        display->clear_viewport();
+        display->update_viewport();
+    }
+}
+
 int radio_screen(void)
 {
     char buf[MAX_PATH];
@@ -502,11 +515,8 @@ int radio_screen(void)
         if (global_settings.buttonbar)
             vp[i].height -= BUTTONBAR_HEIGHT;
 #endif
-        screens[i].set_viewport(&vp[i]);
-        screens[i].stop_scroll();
-        screens[i].clear_viewport();
-        screens[i].update_viewport();
     }
+    fms_restore(vp);
 
     fh = font_get(FONT_UI)->height;
 
@@ -754,13 +764,7 @@ int radio_screen(void)
                 }
                 radio_menu();
                 curr_preset = find_preset(curr_freq);
-                FOR_NB_SCREENS(i)
-                {                
-                    screens[i].set_viewport(&vp[i]);
-                    screens[i].clear_viewport();
-                    screens[i].update_viewport();
-                    screens[i].set_viewport(NULL);
-                }
+                fms_restore(vp);
 #ifdef HAVE_BUTTONBAR
                 gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU),
                                   str(LANG_PRESET),
@@ -775,25 +779,14 @@ int radio_screen(void)
                 {
                     splash(HZ, ID2P(LANG_FM_NO_PRESETS));
                     update_screen = true;
-                    FOR_NB_SCREENS(i)
-                    {
-                        screens[i].set_viewport(&vp[i]);
-                        screens[i].clear_viewport();
-                        screens[i].update_viewport();
-                        screens[i].set_viewport(NULL);
-                    }
+                    fms_restore(vp);
 
                     break;
                 }
-                handle_radio_presets();
                 FOR_NB_SCREENS(i)
-                {
-                    screens[i].set_viewport(&vp[i]);
-                    screens[i].stop_scroll();
-                    screens[i].clear_viewport();
-                    screens[i].update_viewport();
-                    screens[i].set_viewport(NULL);
-                }
+                    screens[i].scroll_stop(&vp[i]);
+                handle_radio_presets();
+                fms_restore(vp);
 #ifdef HAVE_BUTTONBAR
                 gui_buttonbar_set(&buttonbar,
                                   str(LANG_BUTTONBAR_MENU),
@@ -812,14 +805,7 @@ int radio_screen(void)
                     done = true;
                     break;
                 }
-                FOR_NB_SCREENS(i)
-                {
-                    screens[i].set_viewport(&vp[i]);
-                    screens[i].stop_scroll();
-                    screens[i].clear_viewport();
-                    screens[i].update_viewport();
-                    screens[i].set_viewport(NULL);
-                }
+                fms_restore(vp);
                 update_screen = true;
             }
             break;
@@ -940,7 +926,6 @@ int radio_screen(void)
                     peak_meter_screen(&screens[i],0, fh*(top_of_screen + 4),fh);
                     screens[i].update_rect(0, fh*(top_of_screen + 4),
                                            screens[i].getwidth(), fh);
-                    screens[i].set_viewport(NULL);
                 }
             }
 
@@ -1039,11 +1024,7 @@ int radio_screen(void)
 #endif /* CONFIG_CODEC != SWCODEC */
 
                 FOR_NB_SCREENS(i)
-                {
                     screens[i].update_viewport();
-                    screens[i].set_viewport(NULL);
-                }
-
 #ifdef HAVE_BUTTONBAR
                 gui_buttonbar_draw(&buttonbar);
 #endif
@@ -1087,12 +1068,7 @@ int radio_screen(void)
     if(audio_status() & AUDIO_STATUS_ERROR)
     {
         splash(0, str(LANG_DISK_FULL));
-        FOR_NB_SCREENS(i)
-        {
-            screens[i].set_viewport(&vp[i]);
-            screens[i].update_viewport();
-            screens[i].set_viewport(NULL);
-        }
+        fms_restore(vp);
         audio_error_clear();
 
         while(1)
@@ -1138,6 +1114,7 @@ int radio_screen(void)
     FOR_NB_SCREENS(i)
     {
         screens[i].scroll_stop(&vp[i]);
+        screens[i].set_viewport(NULL);
     }
     in_screen = false;
 #if CONFIG_CODEC != SWCODEC
@@ -1489,6 +1466,7 @@ static int handle_radio_presets(void)
                     result = 2;
         }
     }
+    gui_synclist_scroll_stop(&lists);
     return result - 1;
 }
 
