@@ -616,6 +616,12 @@ void Config::autodetect()
             if(detector.errdev() == "h10")
                 text = tr("H10 20GB in MTP mode found!\n"
                         "You need to change your player to UMS mode for installation. ");
+            if(SystemInfo::platformValue(detector.errdev(),
+                                         SystemInfo::CurBootloaderMethod) == "ipod")
+                text = tr("%1 \"MacPod\" found!\n"
+                        "Rockbox needs a FAT formatted Ipod (so-called \"WinPod\") "
+                        "to run. ").arg(SystemInfo::platformValue(
+                                detector.errdev(), SystemInfo::CurName).toString());
             text += tr("Unless you changed this installation will fail!");
 
             QMessageBox::critical(this, tr("Fatal error"), text, QMessageBox::Ok);

@@ -175,6 +175,9 @@ bool Autodetection::detect()
     n = ipod_scan(&ipod);
     if(n == 1) {
         qDebug() << "[Autodetect] Ipod found:" << ipod.modelstr << "at" << ipod.diskname;
+        // if the found ipod is a macpod also notice it as device with problem.
+        if(ipod.macpod)
+            m_errdev = ipod.targetname;
         m_device = ipod.targetname;
         m_mountpoint = resolveMountPoint(ipod.diskname);
         return true;
