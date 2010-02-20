@@ -176,6 +176,12 @@ static struct queue_sender_list buffering_queue_sender_list;
 
 
 /* Ring buffer helper functions */
+
+static inline uintptr_t ringbuf_offset(const void *ptr)
+{
+    return (uintptr_t)(ptr - (void*)buffer);
+}
+
 /* Buffer pointer (p) plus value (v), wrapped if necessary */
 static inline uintptr_t ringbuf_add(uintptr_t p, size_t v)
 {
@@ -347,7 +353,7 @@ static bool rm_handle(const struct memory_handle *h)
             buf_ridx = buf_widx = 0;
         } else {
             /* update buf_ridx to point to the new first handle */
-            buf_ridx = (void *)first_handle - (void *)buffer;
+            buf_ridx = (size_t)ringbuf_offset(first_handle);
         }
     } else {
         struct memory_handle *m = first_handle;
@@ -433,13 +439,9 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
     int32_t *there;
     int32_t *end;
     int32_t *begin;
-    size_t oldpos;
-    size_t newpos;
-    size_t size_to_move;
-    size_t final_delta = *delta;
-    size_t n;
-    int overlap;
-    int overlap_old;
+    size_t final_delta = *delta, size_to_move, n;
+    uintptr_t oldpos, newpos;
+    intptr_t overlap, overlap_old;
 
     if (h == NULL || (src = *h) == NULL)
         return false;
@@ -456,7 +458,7 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
     mutex_lock(&llist_mutex);
     mutex_lock(&llist_mod_mutex);
 
-    oldpos = (void *)src - (void *)buffer;
+    oldpos = ringbuf_offset(src);
     newpos = ringbuf_add(oldpos, final_delta);
     overlap = ringbuf_add_cross(newpos, size_to_move, buffer_len - 1);
     overlap_old = ringbuf_add_cross(oldpos, size_to_move, buffer_len -1);
@@ -470,7 +472,7 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
              * backed out.  This may become conditional if ever we move
              * data that is allowed to wrap (ie audio) */
             correction = overlap;
-        } else if ((unsigned)overlap > data_size) {
+        } else if ((uintptr_t)overlap > data_size) {
             /* Correct the position and real delta to prevent the struct from
              * wrapping, this guarantees an aligned delta, I think */
             correction = overlap - data_size;
@@ -669,7 +671,7 @@ static bool buffer_handle(int handle_id)
                              buffer_len - h->widx);
 
         ssize_t overlap;
-        intptr_t next_handle = (intptr_t)h->next - (intptr_t)buffer;
+        uintptr_t next_handle = ringbuf_offset(h->next);
 
         /* stop copying if it would overwrite the reading position */
         if (ringbuf_add_cross(h->widx, copy_n, buf_ridx) >= 0)
@@ -790,7 +792,7 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     LOGFQUEUE("buffering >| Q_RESET_HANDLE %d", handle_id);
     queue_send(&buffering_queue, Q_RESET_HANDLE, handle_id);
 
-    size_t next = (intptr_t)h->next - (intptr_t)buffer;
+    uintptr_t next = ringbuf_offset(h->next);
     if (ringbuf_sub(next, h->data) < h->filesize - newpos)
     {
         /* There isn't enough space to rebuffer all of the track from its new
@@ -836,8 +838,8 @@ static void shrink_handle(struct memory_handle *h)
              h->type == TYPE_ATOMIC_AUDIO))
     {
         /* metadata handle: we can move all of it */
-        size_t handle_distance =
-            ringbuf_sub((unsigned)((void *)h->next - (void*)buffer), h->data);
+        uintptr_t handle_distance =
+            ringbuf_sub(ringbuf_offset(h->next), h->data);
         delta = handle_distance - h->available;
 
         /* The value of delta might change for alignment reasons */
