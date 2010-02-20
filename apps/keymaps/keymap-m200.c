@@ -234,7 +234,8 @@ static const struct button_mapping button_context_recscreen[]  = {
 #if CONFIG_TUNER
 static const struct button_mapping button_context_radio[]  = {
     { ACTION_NONE,              BUTTON_UP,                      BUTTON_NONE },
-    { ACTION_FM_MENU,           BUTTON_DOWN,                    BUTTON_NONE },
+    { ACTION_FM_MENU,           BUTTON_DOWN|BUTTON_REL,         BUTTON_DOWN },
+    { ACTION_FM_QUICKSCREEN,    BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_DOWN },
     { ACTION_FM_PRESET,         BUTTON_SELECT,                  BUTTON_NONE },
     { ACTION_FM_STOP,           BUTTON_UP|BUTTON_REPEAT,        BUTTON_UP   },
 //    { ACTION_FM_MODE,           BUTTON_REC,                     BUTTON_NONE },

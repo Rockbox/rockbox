@@ -232,13 +232,14 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_MENU,           BUTTON_DOWN,                    BUTTON_NONE },
     { ACTION_FM_PRESET,         BUTTON_SELECT,                  BUTTON_NONE },
     { ACTION_FM_STOP,           BUTTON_UP|BUTTON_REPEAT,        BUTTON_UP   },
-    { ACTION_FM_MODE,           BUTTON_HOME,                    BUTTON_NONE },
+    { ACTION_FM_MODE,           BUTTON_HOME|BUTTON_REL,         BUTTON_HOME },
     { ACTION_FM_EXIT,           BUTTON_POWER|BUTTON_REL,        BUTTON_POWER },
     { ACTION_FM_PLAY,           BUTTON_UP|BUTTON_REL,           BUTTON_UP },
     { ACTION_SETTINGS_INC,      BUTTON_VOL_UP,                  BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_SETTINGS_DEC,      BUTTON_VOL_DOWN,                BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,BUTTON_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_FM_QUICKSCREEN,    BUTTON_HOME|BUTTON_REPEAT,      BUTTON_HOME },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_radio */

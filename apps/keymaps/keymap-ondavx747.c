@@ -153,6 +153,7 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_PRESET,      BUTTON_MENU|BUTTON_REL,            BUTTON_NONE   },
     { ACTION_FM_MODE,        BUTTON_POWER|BUTTON_REL,           BUTTON_POWER  },
     { ACTION_FM_EXIT,        BUTTON_POWER|BUTTON_REPEAT,        BUTTON_NONE   },
+    //{ ACTION_FM_QUICKSCREEN, BUTTON_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_radio */
 

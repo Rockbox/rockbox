@@ -212,7 +212,8 @@ static const struct button_mapping button_context_bmark[]  = {
 
 static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_MENU,        BUTTON_F1,                             BUTTON_NONE },
-    { ACTION_FM_PRESET,      BUTTON_F2,                             BUTTON_NONE },
+    { ACTION_FM_PRESET,      BUTTON_F2|BUTTON_REL,                  BUTTON_F2 },
+    { ACTION_FM_QUICKSCREEN, BUTTON_F2|BUTTON_REPEAT,               BUTTON_NONE },
     { ACTION_FM_RECORD,      BUTTON_F3,                             BUTTON_NONE },
     { ACTION_FM_FREEZE,      BUTTON_PLAY,                           BUTTON_NONE },
     { ACTION_FM_STOP,        BUTTON_OFF,                            BUTTON_NONE },

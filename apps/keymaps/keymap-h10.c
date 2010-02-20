@@ -320,7 +320,8 @@ const struct button_mapping button_context_recscreen[]  = {
 static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_PRESET,      BUTTON_RIGHT | BUTTON_REL,             BUTTON_RIGHT },
     { ACTION_FM_MENU,        BUTTON_RIGHT | BUTTON_REPEAT,          BUTTON_NONE },
-    { ACTION_FM_MODE,        BUTTON_LEFT,                           BUTTON_NONE },
+    { ACTION_FM_MODE,        BUTTON_LEFT|BUTTON_REL,                BUTTON_LEFT },
+    { ACTION_FM_QUICKSCREEN, BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },
     { ACTION_FM_STOP,        BUTTON_PLAY | BUTTON_REPEAT,           BUTTON_PLAY },
     { ACTION_FM_EXIT,        BUTTON_POWER,                          BUTTON_NONE },
     { ACTION_FM_PLAY,        BUTTON_PLAY | BUTTON_REL,              BUTTON_PLAY },

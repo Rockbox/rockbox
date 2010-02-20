@@ -67,6 +67,9 @@
 #include "menus/exported_menus.h"
 #include "root_menu.h"
 #include "viewport.h"
+#ifdef HAVE_QUICKSCREEN
+#include "quickscreen.h"
+#endif
 
 #if CONFIG_TUNER
 
@@ -801,6 +804,26 @@ int radio_screen(void)
                 break;
 #endif /* FM_PRESET */
 
+#ifdef HAVE_QUICKSCREEN
+            case ACTION_FM_QUICKSCREEN:
+            {
+                if (quick_screen_quick(button))
+                {
+                    done = true;
+                    break;
+                }
+                FOR_NB_SCREENS(i)
+                {
+                    screens[i].set_viewport(&vp[i]);
+                    screens[i].stop_scroll();
+                    screens[i].clear_viewport();
+                    screens[i].update_viewport();
+                    screens[i].set_viewport(NULL);
+                }
+                update_screen = true;
+            }
+            break;
+#endif
 #ifdef FM_FREEZE
             case ACTION_FM_FREEZE:
                 if(!screen_freeze)

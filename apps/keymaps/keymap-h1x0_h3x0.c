@@ -280,6 +280,7 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_MODE,        BUTTON_ON | BUTTON_REPEAT,             BUTTON_ON },
     { ACTION_FM_EXIT,        BUTTON_MODE | BUTTON_REL,              BUTTON_MODE },
     { ACTION_FM_PLAY,        BUTTON_ON | BUTTON_REL,                BUTTON_ON },
+    { ACTION_FM_QUICKSCREEN, BUTTON_MODE|BUTTON_REPEAT,             BUTTON_MODE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
     
@@ -690,6 +691,7 @@ static const struct button_mapping button_context_radio_h100remote[]  = {
     { ACTION_FM_STOP,        BUTTON_RC_STOP,                         BUTTON_NONE },
     { ACTION_FM_MODE,        BUTTON_RC_ON | BUTTON_REPEAT,           BUTTON_RC_ON },
     { ACTION_FM_EXIT,        BUTTON_RC_MODE | BUTTON_REL,            BUTTON_RC_MODE },
+    { ACTION_FM_QUICKSCREEN, BUTTON_RC_MODE|BUTTON_REPEAT,           BUTTON_RC_MODE },
     { ACTION_FM_PLAY,        BUTTON_RC_ON | BUTTON_REL,              BUTTON_RC_ON },
     { ACTION_FM_NEXT_PRESET, BUTTON_RC_BITRATE,                      BUTTON_NONE },
     { ACTION_FM_PREV_PRESET, BUTTON_RC_SOURCE,                       BUTTON_NONE },
@@ -711,6 +713,7 @@ static const struct button_mapping button_context_radio_h300lcdremote[] = {
     { ACTION_FM_STOP,        BUTTON_RC_STOP,                         BUTTON_NONE },
     { ACTION_FM_MODE,        BUTTON_RC_ON | BUTTON_REPEAT,           BUTTON_RC_ON },
     { ACTION_FM_EXIT,        BUTTON_RC_MODE | BUTTON_REL,            BUTTON_RC_MODE },
+    { ACTION_FM_QUICKSCREEN, BUTTON_RC_MODE|BUTTON_REPEAT,           BUTTON_RC_MODE },
     { ACTION_FM_PLAY,        BUTTON_RC_ON | BUTTON_REL,              BUTTON_RC_ON },
     { ACTION_FM_NEXT_PRESET, BUTTON_RC_BITRATE,                      BUTTON_NONE },
     { ACTION_FM_PREV_PRESET, BUTTON_RC_SOURCE,                       BUTTON_NONE },
