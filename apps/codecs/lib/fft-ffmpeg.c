@@ -57,6 +57,10 @@
 /* asm-optimised functions and/or macros */
 #include "fft-ffmpeg_arm.h"
 
+#ifndef ICODE_ATTR_TREMOR_MDCT
+#define ICODE_ATTR_TREMOR_MDCT ICODE_ATTR
+#endif
+
 #if 0
 static int split_radix_permutation(int i, int n, int inverse)
 {
@@ -268,7 +272,8 @@ static inline void TRANSFORM_ZERO(FFTComplex * z, unsigned int n)
 #endif
 
 /* z[0...8n-1], w[1...2n-1] */
-static void pass(FFTComplex *z_arg, unsigned int STEP_arg, unsigned int n_arg)
+void pass(FFTComplex *z_arg, unsigned int STEP_arg, unsigned int n_arg) ICODE_ATTR_TREMOR_MDCT;
+void pass(FFTComplex *z_arg, unsigned int STEP_arg, unsigned int n_arg)
 {
     register FFTComplex * z = z_arg;
     register unsigned int STEP = STEP_arg;
@@ -314,7 +319,8 @@ static void pass(FFTComplex *z_arg, unsigned int STEP_arg, unsigned int n_arg)
    8192/16 (from "ff_cos_16") is 512 bytes.
    i.e.  for fft16, STEP = 8192/16 */
 #define DECL_FFT(n,n2,n4)\
-static void fft##n(FFTComplex *z)\
+void fft##n(FFTComplex *z) ICODE_ATTR_TREMOR_MDCT;\
+void fft##n(FFTComplex *z)\
 {\
     fft##n2(z);\
     fft##n4(z+n4*2);\
@@ -374,7 +380,8 @@ static void fft8_dispatch(FFTComplex *z)
 }
 
 #ifndef CONFIG_SMALL
-static void fft16(FFTComplex *z)
+void fft16(FFTComplex *z) ICODE_ATTR_TREMOR_MDCT;
+void fft16(FFTComplex *z)
 {
     fft8(z);
     fft4(z+8);

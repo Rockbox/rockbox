@@ -25,6 +25,10 @@
 #include "codeclib_misc.h"
 #include "mdct_lookup.h"
 
+#ifndef ICODE_ATTR_TREMOR_MDCT
+#define ICODE_ATTR_TREMOR_MDCT ICODE_ATTR
+#endif
+
 /**
  * Compute the middle half of the inverse MDCT of size N = 2^nbits
  * thus excluding the parts that can be derived by symmetry
@@ -34,6 +38,7 @@
  * NOTE - CANNOT CURRENTLY OPERATE IN PLACE (input and output must
  *                                          not overlap or intersect at all)
  */
+void ff_imdct_half(unsigned int nbits, fixed32 *output, const fixed32 *input) ICODE_ATTR_TREMOR_MDCT;
 void ff_imdct_half(unsigned int nbits, fixed32 *output, const fixed32 *input)
 {
     int n8, n4, n2, n, j;
@@ -244,6 +249,7 @@ void ff_imdct_half(unsigned int nbits, fixed32 *output, const fixed32 *input)
  *            <-----------output----------->
  *
  */
+void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input) ICODE_ATTR_TREMOR_MDCT;
 void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
 {
     const int n = (1<<nbits);
