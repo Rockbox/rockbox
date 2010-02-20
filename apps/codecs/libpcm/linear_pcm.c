@@ -59,7 +59,7 @@ static struct pcm_pos *get_seek_pos(long seek_time,
 {
     static struct pcm_pos newpos;
     uint32_t newblock = ((uint64_t)seek_time * ci->id3->frequency)
-                              / (1000LL * fmt->samplesperblock);
+                                             / (1000LL * fmt->samplesperblock);
 
     (void)read_buffer;
     newpos.pos     = newblock * fmt->blockalign;
@@ -67,86 +67,190 @@ static struct pcm_pos *get_seek_pos(long seek_time,
     return &newpos;
 }
 
-static int decode(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf, int *outbufsize)
+/* 8bit decode functions */
+static inline void decode_s8(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
 {
-    uint32_t i;
+    size_t i = 0;
 
+    for ( ; i < inbufsize; i++)
+        outbuf[i] = SE(inbuf[i])<<21;
+}
+
+static inline void decode_u8(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i++)
+        outbuf[i] = SFT(inbuf[i])<<21;
+}
+
+/* 16bit decode functions */
+static inline void decode_s16le(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i += 2)
+        outbuf[i/2] = (inbuf[i]<<13)|(SE(inbuf[i+1])<<21);
+}
+
+static inline void decode_u16le(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i += 2)
+        outbuf[i/2] = (inbuf[i]<<13)|(SFT(inbuf[i+1])<<21);
+}
+
+static inline void decode_s16be(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i += 2)
+        outbuf[i/2] = (inbuf[i+1]<<13)|(SE(inbuf[i])<<21);
+}
+
+static inline void decode_u16be(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i += 2)
+        outbuf[i/2] = (inbuf[i+1]<<13)|(SFT(inbuf[i])<<21);
+}
+
+/* 24bit decode functions */
+static inline void decode_s24le(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i += 3)
+        outbuf[i/3] = (inbuf[i]<<5)|(inbuf[i+1]<<13)|(SE(inbuf[i+2])<<21);
+}
+
+static inline void decode_u24le(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i += 3)
+        outbuf[i/3] = (inbuf[i]<<5)|(inbuf[i+1]<<13)|(SFT(inbuf[i+2])<<21);
+}
+
+static inline void decode_s24be(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i += 3)
+        outbuf[i/3] = (inbuf[i+2]<<5)|(inbuf[i+1]<<13)|(SE(inbuf[i])<<21);
+}
+
+static inline void decode_u24be(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i += 3)
+        outbuf[i/3] = (inbuf[i+2]<<5)|(inbuf[i+1]<<13)|(SFT(inbuf[i])<<21);
+}
+
+/* 32bit decode functions */
+static inline void decode_s32le(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i += 4)
+        outbuf[i/4] = (inbuf[i]>>3)|(inbuf[i+1]<<5)|(inbuf[i+2]<<13)|(SE(inbuf[i+3])<<21);
+}
+
+static inline void decode_u32le(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i += 4)
+        outbuf[i/4] = (inbuf[i]>>3)|(inbuf[i+1]<<5)|(inbuf[i+2]<<13)|(SFT(inbuf[i+3])<<21);
+}
+
+static inline void decode_s32be(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i += 4)
+        outbuf[i/4] = (inbuf[i+3]>>3)|(inbuf[i+2]<<5)|(inbuf[i+1]<<13)|(SE(inbuf[i])<<21);
+}
+
+static inline void decode_u32be(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
+{
+    size_t i = 0;
+
+    for ( ; i < inbufsize; i += 4)
+        outbuf[i/4] = (inbuf[i+3]>>3)|(inbuf[i+2]<<5)|(inbuf[i+1]<<13)|(SFT(inbuf[i])<<21);
+}
+
+static int decode(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf, int *outbufcount)
+{
     if (fmt->bitspersample > 24)
     {
-        for (i = 0; i < inbufsize; i += 4)
+        if (fmt->is_little_endian)
         {
-            if (fmt->is_little_endian)
-            {
-                if (fmt->is_signed)
-                    outbuf[i/4] = (inbuf[i]>>3)|(inbuf[i+1]<<5)|(inbuf[i+2]<<13)|(SE(inbuf[i+3])<<21);
-                else
-                    outbuf[i/4] = (inbuf[i]>>3)|(inbuf[i+1]<<5)|(inbuf[i+2]<<13)|(SFT(inbuf[i+3])<<21);
-            }
+            if (fmt->is_signed)
+                decode_s32le(inbuf, inbufsize, outbuf);
             else
-            {
-                if (fmt->is_signed)
-                    outbuf[i/4] = (inbuf[i+3]>>3)|(inbuf[i+2]<<5)|(inbuf[i+1]<<13)|(SE(inbuf[i])<<21);
-                else
-                    outbuf[i/4] = (inbuf[i+3]>>3)|(inbuf[i+2]<<5)|(inbuf[i+1]<<13)|(SFT(inbuf[i])<<21);
-            }
+                decode_u32le(inbuf, inbufsize, outbuf);
         }
-        *outbufsize = inbufsize >> 2;
+        else
+        {
+            if (fmt->is_signed)
+                decode_s32be(inbuf, inbufsize, outbuf);
+            else
+                decode_u32be(inbuf, inbufsize, outbuf);
+        }
+        *outbufcount = inbufsize >> 2;
     }
     else if (fmt->bitspersample > 16)
     {
-        for (i = 0; i < inbufsize; i += 3)
+        if (fmt->is_little_endian)
         {
-            if (fmt->is_little_endian)
-            {
-                if (fmt->is_signed)
-                    outbuf[i/3] = (inbuf[i]<<5)|(inbuf[i+1]<<13)|(SE(inbuf[i+2])<<21);
-                else
-                    outbuf[i/3] = (inbuf[i]<<5)|(inbuf[i+1]<<13)|(SFT(inbuf[i+2])<<21);
-            }
+            if (fmt->is_signed)
+                decode_s24le(inbuf, inbufsize, outbuf);
             else
-            {
-                if (fmt->is_signed)
-                    outbuf[i/3] = (inbuf[i+2]<<5)|(inbuf[i+1]<<13)|(SE(inbuf[i])<<21);
-                else
-                    outbuf[i/3] = (inbuf[i+2]<<5)|(inbuf[i+1]<<13)|(SFT(inbuf[i])<<21);
-            }
+                decode_u24le(inbuf, inbufsize, outbuf);
         }
-        *outbufsize = inbufsize/3;
+        else
+        {
+            if (fmt->is_signed)
+                decode_s24be(inbuf, inbufsize, outbuf);
+            else
+                decode_u24be(inbuf, inbufsize, outbuf);
+        }
+        *outbufcount = inbufsize / 3;
     }
     else if (fmt->bitspersample > 8)
     {
-        for (i = 0; i < inbufsize; i += 2)
+        if (fmt->is_little_endian)
         {
-            if (fmt->is_little_endian)
-            {
-                if (fmt->is_signed)
-                    outbuf[i/2] = (inbuf[i]<<13)|(SE(inbuf[i+1])<<21);
-                else
-                    outbuf[i/2] = (inbuf[i]<<13)|(SFT(inbuf[i+1])<<21);
-            }
+            if (fmt->is_signed)
+                decode_s16le(inbuf, inbufsize, outbuf);
             else
-            {
-                if (fmt->is_signed)
-                    outbuf[i/2] = (inbuf[i+1]<<13)|(SE(inbuf[i])<<21);
-                else
-                    outbuf[i/2] = (inbuf[i+1]<<13)|(SFT(inbuf[i])<<21);
-            }
+                decode_u16le(inbuf, inbufsize, outbuf);
         }
-        *outbufsize = inbufsize >> 1;
+        else
+        {
+            if (fmt->is_signed)
+                decode_s16be(inbuf, inbufsize, outbuf);
+            else
+                decode_u16be(inbuf, inbufsize, outbuf);
+        }
+        *outbufcount = inbufsize >> 1;
     }
     else
     {
-        for (i = 0; i < inbufsize; i++) {
-            if (fmt->is_signed)
-                outbuf[i] = SE(inbuf[i])<<21;
-            else
-                outbuf[i] = SFT(inbuf[i])<<21;
-        }
-        *outbufsize = inbufsize;
+        if (fmt->is_signed)
+            decode_s8(inbuf, inbufsize, outbuf);
+        else
+            decode_u8(inbuf, inbufsize, outbuf);
+
+        *outbufcount = inbufsize;
     }
 
     if (fmt->channels == 2)
-        *outbufsize >>= 1;
+        *outbufcount >>= 1;
 
     return CODEC_OK;
 }
