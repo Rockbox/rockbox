@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 Yoshihisa Uchida
+ * Copyright (C) 2010 Yoshihisa Uchida
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,38 +18,22 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef CODEC_LIBPCM_SUPPORT_FORMATS_H
-#define CODEC_LIBPCM_SUPPORT_FORMATS_H
+#ifndef CODEC_LIBPCM_ADPCM_SEEK_H
+#define CODEC_LIBPCM_ADPCM_SEEK_H
 
-#include "pcm_common.h"
+#include <sys/types.h>
+#include <stdbool.h>
+#include <inttypes.h>
 
-/* Linear PCM */
-const struct pcm_codec *get_linear_pcm_codec(void);
+struct adpcm_data {
+    int16_t  pcmdata[2];
+    uint16_t step[2];
+    bool     is_valid;
+};
 
-/* ITU-T G.711 A-law */
-const struct pcm_codec *get_itut_g711_alaw_codec(void);
-
-/* ITU-T G.711 mu-law */
-const struct pcm_codec *get_itut_g711_mulaw_codec(void);
-
-/* Intel DVI ADPCM (IMA ADPCM) */
-const struct pcm_codec *get_dvi_adpcm_codec(void);
-
-/* IEEE float */
-const struct pcm_codec *get_ieee_float_codec(void);
-
-/* Microsoft ADPCM */
-const struct pcm_codec *get_ms_adpcm_codec(void);
-
-/* Dialogic OKI ADPCM */
-const struct pcm_codec *get_dialogic_oki_adpcm_codec(void);
-
-/* YAMAHA ADPCM */
-const struct pcm_codec *get_yamaha_adpcm_codec(void);
-
-/* Apple QuickTime IMA ADPCM */
-const struct pcm_codec *get_qt_ima_adpcm_codec(void);
-
-/* Adobe SWF ADPCM */
-const struct pcm_codec *get_swf_adpcm_codec(void);
+void init_seek_table(uint32_t max_count);
+void add_adpcm_data(struct adpcm_data *data);
+uint32_t seek(uint32_t seek_time, struct adpcm_data *seek_data,
+              uint8_t *(*read_buffer)(size_t *realsize),
+              int (*decode)(const uint8_t *inbuf, size_t inbufsize));
 #endif

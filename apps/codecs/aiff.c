@@ -36,6 +36,7 @@ enum {
     AIFC_FORMAT_MULAW        = FOURCC('u', 'l', 'a', 'w'), /* AIFC uLaw compressed */
     AIFC_FORMAT_IEEE_FLOAT32 = FOURCC('f', 'l', '3', '2'), /* AIFC IEEE float 32 bit */
     AIFC_FORMAT_IEEE_FLOAT64 = FOURCC('f', 'l', '6', '4'), /* AIFC IEEE float 64 bit */
+    AIFC_FORMAT_QT_IMA_ADPCM = FOURCC('i', 'm', 'a', '4'), /* AIFC QuickTime IMA ADPCM */
 };
 
 static const struct pcm_entry pcm_codecs[] = {
@@ -44,9 +45,10 @@ static const struct pcm_entry pcm_codecs[] = {
     { AIFC_FORMAT_MULAW,        get_itut_g711_mulaw_codec },
     { AIFC_FORMAT_IEEE_FLOAT32, get_ieee_float_codec      },
     { AIFC_FORMAT_IEEE_FLOAT64, get_ieee_float_codec      },
+    { AIFC_FORMAT_QT_IMA_ADPCM, get_qt_ima_adpcm_codec    },
 };
 
-#define NUM_FORMATS 5
+#define NUM_FORMATS 6
 
 static int32_t samples[PCM_CHUNK_SIZE] IBSS_ATTR;
 
@@ -70,7 +72,7 @@ enum codec_status codec_main(void)
 {
     int status = CODEC_OK;
     struct pcm_format format;
-    uint32_t bytesdone, decodedbytes;
+    uint32_t bytesdone, decodedsamples;
     uint32_t num_sample_frames = 0;
     uint32_t i = CODEC_OK;
     size_t n;
@@ -128,7 +130,7 @@ next_track:
     format.is_signed = true;
     format.is_little_endian = false;
 
-    decodedbytes = 0;
+    decodedsamples = 0;
     codec = 0;
 
     /* read until 'SSND' chunk, which typically is last */
@@ -168,8 +170,11 @@ next_track:
                  * aiff's sample_size is uncompressed sound data size.
                  * But format.bitspersample is compressed sound data size.
                  */
-                if (format.formattag == AIFC_FORMAT_ALAW || format.formattag == AIFC_FORMAT_MULAW)
+                if (format.formattag == AIFC_FORMAT_ALAW ||
+                    format.formattag == AIFC_FORMAT_MULAW)
                     format.bitspersample = 8;
+                else if (format.formattag == AIFC_FORMAT_QT_IMA_ADPCM)
+                    format.bitspersample = 4;
             }
             else
                 format.formattag = AIFC_FORMAT_PCM;
@@ -184,9 +189,9 @@ next_track:
             /* offset2snd */
             offset2snd = (buf[8]<<24)|(buf[9]<<16)|(buf[10]<<8)|buf[11];
             /* block_size */
-            format.blockalign = (buf[12]<<24)|(buf[13]<<16)|(buf[14]<<8)|buf[15];
+            format.blockalign = ((buf[12]<<24)|(buf[13]<<16)|(buf[14]<<8)|buf[15]) >> 3;
             if (format.blockalign == 0)
-                format.blockalign = format.channels*format.bitspersample;
+                format.blockalign = format.channels * format.bitspersample >> 3;
             format.numbytes = i - 8 - offset2snd;
             i = 8 + offset2snd; /* advance to the beginning of data */
         } else if (is_aifc && (memcmp(buf, "FVER", 4)==0)) {
@@ -228,7 +233,7 @@ next_track:
         goto done;
     }
 
-    if (!codec->set_format(&format, 0))
+    if (!codec->set_format(&format))
     {
         i = CODEC_ERROR;
         goto done;
@@ -242,6 +247,30 @@ next_track:
         ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     } else {
         DEBUGF("CODEC_ERROR: more than 2 channels unsupported\n");
+        i = CODEC_ERROR;
+        goto done;
+    }
+
+    if (format.samplesperblock == 0)
+    {
+        DEBUGF("CODEC_ERROR: samplesperblock is 0\n");
+        i = CODEC_ERROR;
+        goto done;
+    }
+    if (format.blockalign == 0)
+    {
+        DEBUGF("CODEC_ERROR: blockalign is 0\n");
+        i = CODEC_ERROR;
+        goto done;
+    }
+
+    /* check chunksize */
+    if ((format.chunksize / format.blockalign) * format.samplesperblock * format.channels
+           > PCM_CHUNK_SIZE)
+        format.chunksize = (PCM_CHUNK_SIZE / format.blockalign) * format.blockalign;
+    if (format.chunksize == 0)
+    {
+        DEBUGF("CODEC_ERROR: chunksize is 0\n");
         i = CODEC_ERROR;
         goto done;
     }
@@ -260,11 +289,14 @@ next_track:
             break;
 
         if (ci->seek_time) {
-            uint32_t newpos = codec->get_seek_pos(ci->seek_time);
-            if (newpos > format.numbytes)
+            /* 2nd args(read_buffer) is unnecessary in the format which AIFF supports. */
+            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, NULL);
+
+            decodedsamples = newpos->samples;
+            if (newpos->pos > format.numbytes)
                 break;
-            if (ci->seek_buffer(firstblockposn + newpos))
-                bytesdone = newpos;
+            if (ci->seek_buffer(firstblockposn + newpos->pos))
+                bytesdone = newpos->pos;
             ci->seek_complete();
         }
         aifbuf = (uint8_t *)ci->request_buffer(&n, format.chunksize);
@@ -288,11 +320,11 @@ next_track:
 
         ci->advance_buffer(n);
         bytesdone += n;
-        decodedbytes += bufcount;
+        decodedsamples += bufcount;
         if (bytesdone >= format.numbytes)
             endofstream = 1;
 
-        ci->set_elapsed(decodedbytes*1000LL/ci->id3->frequency);
+        ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
     }
     i = CODEC_OK;
 

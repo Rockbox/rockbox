@@ -2,3 +2,10 @@ linear_pcm.c
 itut_g711.c
 dvi_adpcm.c
 ieee_float.c
+adpcm_seek.c
+dialogic_oki_adpcm.c
+ms_adpcm.c
+yamaha_adpcm.c
+ima_adpcm_common.c
+qt_ima_adpcm.c
+swf_adpcm.c

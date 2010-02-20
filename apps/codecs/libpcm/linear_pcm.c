@@ -29,11 +29,9 @@
 
 static struct pcm_format *fmt;
 
-static bool set_format(struct pcm_format *format, const unsigned char *fmtpos)
+static bool set_format(struct pcm_format *format)
 {
     fmt = format;
-
-    (void)fmtpos;
 
     if (fmt->bitspersample > 32)
     {
@@ -42,33 +40,34 @@ static bool set_format(struct pcm_format *format, const unsigned char *fmtpos)
         return false;
     }
 
-    if (fmt->totalsamples == 0)
-    {
-        fmt->bytespersample = (((fmt->bitspersample - 1)/8 + 1)*fmt->channels);
-        fmt->totalsamples = fmt->numbytes/fmt->bytespersample;
-    }
+    fmt->bytespersample = fmt->bitspersample >> 3;
 
-    /* chunksize is computed so that one chunk is about 1/50s.
-     * this make 4096 for 44.1kHz 16bits stereo.
-     * It also has to be a multiple of blockalign */
-    fmt->chunksize = (1 + fmt->avgbytespersec / (50*fmt->blockalign))*fmt->blockalign;
+    if (fmt->totalsamples == 0)
+        fmt->totalsamples = fmt->numbytes/fmt->bytespersample;
+
+    fmt->samplesperblock = fmt->blockalign / (fmt->bytespersample * fmt->channels);
+
+    /* chunksize = about 1/50[sec] data */
+    fmt->chunksize = (ci->id3->frequency / (50 * fmt->samplesperblock))
+                                         * fmt->blockalign;
 
     return true;
 }
 
-static uint32_t get_seek_pos(long seek_time)
+static struct pcm_pos *get_seek_pos(long seek_time,
+                                    uint8_t *(*read_buffer)(size_t *realsize))
 {
-    uint32_t newpos;
+    static struct pcm_pos newpos;
+    uint32_t newblock = ((uint64_t)seek_time * ci->id3->frequency)
+                              / (1000LL * fmt->samplesperblock);
 
-    /* use avgbytespersec to round to the closest blockalign multiple,
-       add firstblockposn. 64-bit casts to avoid overflows. */
-    newpos = (((uint64_t)fmt->avgbytespersec*(seek_time - 1))
-             / (1000LL*fmt->blockalign))*fmt->blockalign;
-    return newpos;
+    (void)read_buffer;
+    newpos.pos     = newblock * fmt->blockalign;
+    newpos.samples = newblock * fmt->samplesperblock;
+    return &newpos;
 }
 
-static int decode(const uint8_t *inbuf, size_t inbufsize,
-                  int32_t *outbuf, int *outbufsize)
+static int decode(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf, int *outbufsize)
 {
     uint32_t i;
 

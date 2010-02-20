@@ -28,33 +28,38 @@
 
 static struct pcm_format *fmt;
 
-static bool set_format(struct pcm_format *format, const unsigned char *fmtpos)
+static bool set_format(struct pcm_format *format)
 {
     fmt = format;
 
-    (void)fmtpos;
-
     if (fmt->bitspersample != 32 && fmt->bitspersample != 64)
     {
-        DEBUGF("CODEC_ERROR: ieee float must be 32 or 64 bitspersample %d\n", fmt->bitspersample);
+        DEBUGF("CODEC_ERROR: ieee float must be 32 or 64 bitspersample: %d\n",
+                             fmt->bitspersample);
         return false;
     }
 
     fmt->bytespersample = fmt->bitspersample >> 3;
-    fmt->blockalign = fmt->bytespersample;
+    fmt->samplesperblock = fmt->blockalign / (fmt->bytespersample * fmt->channels);
 
-    /* chunksize is computed so that one chunk is about 1/50s. */
-    fmt->chunksize = (ci->id3->frequency * fmt->channels / 50) * fmt->blockalign;
+    /* chunksize = about 1/50[sec] data */
+    fmt->chunksize = (ci->id3->frequency / (50 * fmt->samplesperblock))
+                                         * fmt->blockalign;
 
     return true;
 }
 
-static uint32_t get_seek_pos(long seek_time)
+static struct pcm_pos *get_seek_pos(long seek_time,
+                                    uint8_t *(*read_buffer)(size_t *realsize))
 {
-    uint32_t newpos;
+    static struct pcm_pos newpos;
+    uint32_t newblock = ((uint64_t)seek_time * ci->id3->frequency)
+                                             / (1000LL * fmt->samplesperblock);
 
-    newpos = ((uint64_t)(seek_time * ci->id3->frequency * fmt->channels / 1000LL))*fmt->blockalign;
-    return newpos;
+    (void)read_buffer;
+    newpos.pos     = newblock * fmt->blockalign;
+    newpos.samples = newblock * fmt->samplesperblock;
+    return &newpos;
 }
 
 static int decode(const uint8_t *inbuf, size_t inbufsize,

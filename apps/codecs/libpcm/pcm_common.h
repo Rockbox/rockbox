@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef CODEC_LIBPCMS_PCM_COMMON_H
-#define CODEC_LIBPCMS_PCM_COMMON_H
+#ifndef CODEC_LIBPCM_PCM_COMMON_H
+#define CODEC_LIBPCM_PCM_COMMON_H
 
 #include <sys/types.h>
 #include <stdbool.h>
@@ -37,6 +37,19 @@
 
 /* Macro that shift to -0x80. (0 .. 127 to -128 .. -1, 128 .. 255 to 0 .. 127) */
 #define SFT(x) ((int32_t)x-0x80)
+
+/* Macro that clipping data */
+#define CLIP(data, min, max) \
+if ((data) > (max)) data = max; \
+else if ((data) < (min)) data = min;
+
+/* nums of msadpcm coeffs
+ * In many case, nNumCoef is 7.
+ * Depending upon the encoder, as for this value there is a possibility
+ * of increasing more.
+ * If you found the file where this value exceeds 7, please report.
+ */
+#define MSADPCM_NUM_COEFF 7
 
 struct pcm_format {
     /*
@@ -103,13 +116,67 @@ struct pcm_format {
      * true: signed, false: unsigned
      */
     bool is_signed;
+
+    /* the following values are format speciffic parameters */
+
+    /* microsoft adpcm: aCoeff */
+    int16_t coeffs[MSADPCM_NUM_COEFF][2];
+};
+
+struct pcm_pos {
+    uint32_t pos;
+    uint32_t samples;
 };
 
 struct pcm_codec {
-    bool (*set_format)(struct pcm_format *format, const unsigned char *fmtpos);
-    uint32_t (*get_seek_pos)(long seek_time);
+    /*
+     * sets the format speciffic RIFF/AIFF header information and checks the pcm_format.
+     *
+     * [In/Out] format
+     *         the structure which supplies RIFF/AIFF header information.
+     *
+     * return
+     *     true:  RIFF/AIFF header check OK
+     *     false: RIFF/AIFF header check NG
+     */
+    bool (*set_format)(struct pcm_format *format);
+
+    /*
+     * get seek position
+     *
+     * [In] seek_time
+     *         seek time [ms]
+     *
+     * [In] read_buffer
+     *         the function which reads the data from the file (chunksize bytes read).
+     *
+     * return
+     *     position after the seeking.
+     */
+    struct pcm_pos *(*get_seek_pos)(long seek_time,
+                                    uint8_t *(*read_buffer)(size_t *realsize));
+
+    /*
+     * decode wave data.
+     *
+     * [In] inbuf
+     *         the start pointer of wave data buffer.
+     *
+     * [In] inbufsize
+     *         wave data buffer size (bytes).
+     *
+     * [Out] outbuf
+     *         the start pointer of the buffer which supplies decoded pcm data.
+     *
+     * [Out] outbufcount
+     *         decoded pcm data count.
+     *
+     * return
+     *     CODEC_OK:    decode succeed.
+     *     CODEC_ERROR: decode failure.
+     */
     int (*decode)(const uint8_t *inbuf, size_t inbufsize,
-                  int32_t *outbuf, int *outbufsize);
+                  int32_t *outbuf, int *outbufcount);
 };
 
 struct pcm_entry {

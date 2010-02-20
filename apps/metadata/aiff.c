@@ -29,6 +29,9 @@
 #include "metadata_common.h"
 #include "metadata_parsers.h"
 
+/* compressionType: AIFC QuickTime IMA ADPCM */
+#define AIFC_FORMAT_QT_IMA_ADPCM "ima4"
+
 bool get_aiff_metadata(int fd, struct mp3entry* id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
@@ -40,6 +43,7 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
     unsigned long numbytes = 0;
     int read_bytes;
     int i;
+    bool is_aifc = false;
 
     if ((lseek(fd, 0, SEEK_SET) < 0) 
         || ((read_bytes = read(fd, buf, sizeof(id3->path))) < 54))
@@ -47,10 +51,15 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
         return false;
     }
     
-    if ((memcmp(buf, "FORM",4) != 0)
-        || ((memcmp(&buf[8], "AIFF", 4) !=0) && (memcmp(&buf[8], "AIFC", 4) !=0)))
-    {
+    if (memcmp(buf, "FORM",4) != 0)
         return false;
+
+    if (memcmp(&buf[8], "AIFF", 4) != 0)
+    {
+        if (memcmp(&buf[8], "AIFC", 4) != 0)
+            return false;
+
+        is_aifc = true;
     }
 
     buf += 12;
@@ -75,7 +84,13 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
             /* save format infos */
             id3->bitrate = (sampleSize * numChannels * sampleRate) / 1000;
             id3->frequency = sampleRate;
-            id3->length = ((int64_t) numSampleFrames * 1000) / id3->frequency;
+            if (!is_aifc || memcmp(&buf[26], AIFC_FORMAT_QT_IMA_ADPCM, 4) != 0)
+                id3->length = ((int64_t) numSampleFrames * 1000) / id3->frequency;
+            else
+            {
+                /* QuickTime IMA ADPCM is 1block = 64 data for each channel */
+                id3->length = (int64_t)(numSampleFrames * 64000LL) / id3->frequency;
+            }
 
             id3->vbr = false;   /* AIFF files are CBR */
             id3->filesize = filesize(fd);

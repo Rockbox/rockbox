@@ -109,49 +109,43 @@ static const int16_t ulaw2linear16[256] ICONST_ATTR = {
 
 static struct pcm_format *fmt;
 
-static bool set_format(struct pcm_format *format, const unsigned char *fmtpos)
+static bool set_format(struct pcm_format *format)
 {
     fmt = format;
 
-    (void)fmtpos;
-
     if (fmt->bitspersample != 8)
     {
-        DEBUGF("CODEC_ERROR: alaw and mulaw must have 8 bitspersample\n");
+        DEBUGF("CODEC_ERROR: alaw and mulaw must have 8 bitspersample: %d\n",
+                             fmt->bitspersample);
         return false;
     }
 
     if (fmt->totalsamples == 0)
     {
-        fmt->bytespersample = fmt->channels;
-        fmt->totalsamples = fmt->numbytes/fmt->bytespersample;
+        fmt->bytespersample = 1;
+        fmt->totalsamples = fmt->numbytes / (fmt->bytespersample * fmt->channels);
     }
 
-    /* chunksize is computed so that one chunk is about 1/50s.
-     * this make 4096 for 44.1kHz 16bits stereo.
-     * It also has to be a multiple of blockalign */
-    fmt->chunksize = (1 + fmt->avgbytespersec / (50*fmt->blockalign))*fmt->blockalign;
+    fmt->samplesperblock = fmt->blockalign / (fmt->bytespersample * fmt->channels);
 
-    /* check that the output buffer is big enough (convert to samplespersec,
-       then round to the blockalign multiple below) */
-    if ((((uint64_t)fmt->chunksize * ci->id3->frequency * fmt->channels * fmt->bitspersample)>>3)
-        /(uint64_t)fmt->avgbytespersec >= PCM_CHUNK_SIZE)
-        fmt->chunksize = ((uint64_t)PCM_CHUNK_SIZE * fmt->avgbytespersec
-                         /((uint64_t)ci->id3->frequency * fmt->channels * 2
-                         * fmt->blockalign)) * fmt->blockalign;
+    /* chunksize = about 1/50[sec] data */
+    fmt->chunksize = (ci->id3->frequency / (50 * fmt->samplesperblock))
+                                         * fmt->blockalign;
 
     return true;
 }
 
-static uint32_t get_seek_pos(long seek_time)
+static struct pcm_pos *get_seek_pos(long seek_time,
+                                    uint8_t *(*read_buffer)(size_t *realsize))
 {
-    uint32_t newpos;
+    static struct pcm_pos newpos;
+    uint32_t newblock = ((uint64_t)seek_time * ci->id3->frequency)
+                              / (1000LL * fmt->samplesperblock);
 
-    /* use avgbytespersec to round to the closest blockalign multiple,
-       add firstblockposn. 64-bit casts to avoid overflows. */
-    newpos = (((uint64_t)fmt->avgbytespersec*(seek_time - 1))
-             / (1000LL*fmt->blockalign))*fmt->blockalign;
-    return newpos;
+    (void)read_buffer;
+    newpos.pos     = newblock * fmt->blockalign;
+    newpos.samples = newblock * fmt->samplesperblock;
+    return &newpos;
 }
 
 static int decode_alaw(const uint8_t *inbuf, size_t inbufsize,
