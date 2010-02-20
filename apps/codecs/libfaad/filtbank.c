@@ -267,7 +267,7 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
     {
     case ONLY_LONG_SEQUENCE:
         /* perform iMDCT */
-        mdct_backward(2048, freq_in, transf_buf);
+        ff_imdct_calc(11, transf_buf, freq_in);
 
         /* add second half output of previous frame to windowed output of current frame */
         vector_fmul_add_add(time_out, transf_buf, window_long_prev, overlap,  nlong);
@@ -279,7 +279,7 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
 
     case LONG_START_SEQUENCE:
         /* perform iMDCT */
-        mdct_backward(2048, freq_in, transf_buf);
+         ff_imdct_calc(11, transf_buf, freq_in);
 
         /* add second half output of previous frame to windowed output of current frame */
         vector_fmul_add_add(time_out, transf_buf, window_long_prev, overlap,  nlong);
@@ -298,14 +298,14 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
          /*this could be assemblerized too, but this case is extremely uncommon*/   
          
         /* perform iMDCT for each short block */
-        mdct_backward(256, freq_in+0*nshort,  transf_buf+2*nshort*0);
-        mdct_backward(256, freq_in+1*nshort, transf_buf+2*nshort*1);
-        mdct_backward(256, freq_in+2*nshort, transf_buf+2*nshort*2);
-        mdct_backward(256, freq_in+3*nshort, transf_buf+2*nshort*3);
-        mdct_backward(256, freq_in+4*nshort, transf_buf+2*nshort*4);
-        mdct_backward(256, freq_in+5*nshort, transf_buf+2*nshort*5);
-        mdct_backward(256, freq_in+6*nshort, transf_buf+2*nshort*6);
-        mdct_backward(256, freq_in+7*nshort, transf_buf+2*nshort*7);
+        ff_imdct_calc(8, transf_buf+2*nshort*0, freq_in+0*nshort);
+        ff_imdct_calc(8, transf_buf+2*nshort*1, freq_in+1*nshort);
+        ff_imdct_calc(8, transf_buf+2*nshort*2, freq_in+2*nshort);
+        ff_imdct_calc(8, transf_buf+2*nshort*3, freq_in+3*nshort);
+        ff_imdct_calc(8, transf_buf+2*nshort*4, freq_in+4*nshort);
+        ff_imdct_calc(8, transf_buf+2*nshort*5, freq_in+5*nshort);
+        ff_imdct_calc(8, transf_buf+2*nshort*6, freq_in+6*nshort);
+        ff_imdct_calc(8, transf_buf+2*nshort*7, freq_in+7*nshort);
 
         /* add second half output of previous frame to windowed output of current frame */
         for (i = 0; i < nflat_ls; i++)
@@ -336,7 +336,7 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
 
     case LONG_STOP_SEQUENCE:
         /* perform iMDCT */
-        mdct_backward(2048, freq_in, transf_buf);
+        ff_imdct_calc(11, transf_buf, freq_in);
 
         /* add second half output of previous frame to windowed output of current frame */
         /* construct first half window using padding with 1's and 0's */
