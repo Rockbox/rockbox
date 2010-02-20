@@ -601,7 +601,7 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 #ifdef HAVE_LCD_BITMAP
         /* clear all pictures in the conditional and nested ones */
         if (data->tokens[i].type == WPS_TOKEN_IMAGE_PRELOAD_DISPLAY)
-            clear_image_pos(gwps, find_image(data->tokens[i].value.i&0xFF, gwps->data));
+            clear_image_pos(gwps, find_image(data->tokens[i].value.i&0xFF, data));
 #endif
 #ifdef HAVE_ALBUMART
         if (data->albumart && data->tokens[i].type == WPS_TOKEN_ALBUMART_DISPLAY)
