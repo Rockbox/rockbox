@@ -65,7 +65,7 @@ static const FIXPU pow128_tab[128] = {
  * Index 2: [0..7] - category
  * Index 3: [0] - dither_table, [1..13] - quant_centroid_table
  */
-static const FIXP quant_tables[2][8][14] = {{{
+static const FIXP quant_tables[2][8][14] ICONST_ATTR = {{{
     0x00000000, 0x0645a1cb, 0x0c2d0e56, 0x11eb851f, 0x17a1cac1, 0x1d4fdf3b,
     0x22ed9168, 0x28a7ef9e, 0x2e49ba5e, 0x33eb851f, 0x39916873, 0x3f126e98,
     0x449ba5e3, 0x4b958106

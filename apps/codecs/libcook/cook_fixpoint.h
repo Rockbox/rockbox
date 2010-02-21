@@ -58,14 +58,9 @@ static const FIXPU* cplscales[5] = {
 static inline FIXP fixp_pow2(FIXP x, int i)
 {
   if (i < 0)
-    return (x >> -i) + ((x >> (-i-1)) & 1);
+    return (x >> -i);
   else
     return x << i;              /* no check for overflow */
-}
-
-static inline FIXP fixp_pow2_neg(FIXP x, int i)
-{
-  return (x >> i) + ((x >> (i-1)) & 1);
 }
 
 /**
@@ -143,13 +138,13 @@ static void scalar_dequant_math(COOKContext *q, int index,
     else 
     {
         for(i=0 ; i<SUBBAND_SIZE ; i++) {
-            f = table[subband_coef_index[i]];
+            f = (table[subband_coef_index[i]])>>s;
             /* noise coding if subband_coef_index[i] == 0 */
             if (((subband_coef_index[i] == 0) && cook_random(q)) ||
                 ((subband_coef_index[i] != 0) && subband_coef_sign[i]))
                 f = -f;
 
-            *mlt_p++ = fixp_pow2_neg(f, s);
+            *mlt_p++ = f;
         }
     }
 }
@@ -171,29 +166,26 @@ void imlt_math(COOKContext *q, FIXP *in)
 {
     const int n = q->samples_per_channel;
     const int step = 2 << (10 - av_log2(n));
+    REAL_T *mdct_out = q->mono_mdct_output;
+    REAL_T tmp;
     int i = 0, j = 0;
 
     ff_imdct_calc(q->mdct_nbits, q->mono_mdct_output, in);
 
     do {
-        FIXP tmp = q->mono_mdct_output[i];
-        
-        q->mono_mdct_output[i] =
-          fixmul31(-q->mono_mdct_output[n + i], (sincos_lookup0[j]));
-          
-        q->mono_mdct_output[n + i] = fixmul31(tmp, (sincos_lookup0[j+1]) );
+        tmp = mdct_out[i];
+        mdct_out[i  ] = fixmul31(-mdct_out[n+i], (sincos_lookup0[j  ]));
+        mdct_out[n+i] = fixmul31(tmp           , (sincos_lookup0[j+1]));
             
-        j += step;
-        
+        j += step;   
     } while (++i < n/2);
 
     do {
-        FIXP tmp = q->mono_mdct_output[i];
-        
         j -= step;
-        q->mono_mdct_output[i] =
-          fixmul31(-q->mono_mdct_output[n + i], (sincos_lookup0[j+1]) );
-        q->mono_mdct_output[n + i] = fixmul31(tmp, (sincos_lookup0[j]) );
+        
+        tmp = mdct_out[i];
+        mdct_out[i  ] = fixmul31(-mdct_out[n+i], (sincos_lookup0[j+1]));
+        mdct_out[n+i] = fixmul31(tmp           , (sincos_lookup0[j  ]));
     } while (++i < n);
 }
 
@@ -219,8 +211,7 @@ void overlap_math(COOKContext *q, int gain, FIXP buffer[])
         
     } else {
         for(i=0 ; i<q->samples_per_channel ; i++) {
-            q->mono_mdct_output[i] =
-              (q->mono_mdct_output[i] >> -gain) + ((q->mono_mdct_output[i] >> (-gain-1)) & 1)+ buffer[i];
+            q->mono_mdct_output[i] = (q->mono_mdct_output[i]>>-gain) + buffer[i];
         }
     }
 #else
