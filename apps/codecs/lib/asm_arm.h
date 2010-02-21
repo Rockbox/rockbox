@@ -226,11 +226,14 @@ void vect_mult_bw(int32_t *data, int32_t *window, int n)
 #define _V_CLIP_MATH
 
 static inline int32_t CLIP_TO_15(int32_t x) {
-  const int32_t mask = 0xffff7fff;
-  asm volatile("teq %0,%0,asr #31\n\t"
-	       "eorne %0,%1,%0,asr #31\n\t"
-	       : "+r"(x)
-	       : "r" (mask)
+  int tmp;
+  asm volatile("subs	%1, %0, #32768\n\t"
+	       "movpl	%0, #0x7f00\n\t"
+	       "orrpl	%0, %0, #0xff\n"
+	       "adds	%1, %0, #32768\n\t"
+	       "movmi	%0, #0x8000"
+	       : "+r"(x),"=r"(tmp)
+	       :
 	       : "cc");
   return(x);
 }
