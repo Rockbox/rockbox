@@ -1796,7 +1796,7 @@ static int brickmania_game_loop(void)
                     screen_edge.p1.x = 0;
                     screen_edge.p1.y = 0;
 
-                    screen_edge.p2.x = FIXED3(LCD_WIDTH);
+                    screen_edge.p2.x = GAMESCREEN_WIDTH;
                     screen_edge.p2.y = 0;
                     /* the test for pos_y prevents the ball from bouncing back
                      * from _over_ the top to infinity on some rare cases */
@@ -1856,7 +1856,7 @@ static int brickmania_game_loop(void)
                     screen_edge.p1.y = 0;
 
                     screen_edge.p2.x = 0;
-                    screen_edge.p2.y = FIXED3(LCD_HEIGHT);
+                    screen_edge.p2.y = GAMESCREEN_HEIGHT;
                     if ( !ball[k].glue &&
                             check_lines(&misc_line, &screen_edge, &pt_hit))
                     {
@@ -1869,11 +1869,11 @@ static int brickmania_game_loop(void)
                     }
 
                     /* Check if the ball hit the right side */
-                    screen_edge.p1.x = FIXED3(LCD_WIDTH);
+                    screen_edge.p1.x = GAMESCREEN_WIDTH;
                     screen_edge.p1.y = 0;
 
-                    screen_edge.p2.x = FIXED3(LCD_WIDTH);
-                    screen_edge.p2.y = FIXED3(LCD_HEIGHT);
+                    screen_edge.p2.x = GAMESCREEN_WIDTH;
+                    screen_edge.p2.y = GAMESCREEN_HEIGHT;
                     if ( !ball[k].glue &&
                             check_lines(&misc_line, &screen_edge, &pt_hit))
                     {
@@ -1882,7 +1882,7 @@ static int brickmania_game_loop(void)
 
                         /* Re-position ball in gameboard */
                         ball[k].tempy = pt_hit.y;
-                        ball[k].tempx = FIXED3(LCD_WIDTH - 1);
+                        ball[k].tempx = GAMESCREEN_WIDTH - FIXED3(1);
                     }
 
                     /* Did the ball hit the paddle? Depending on where the ball
