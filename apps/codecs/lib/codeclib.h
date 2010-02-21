@@ -65,7 +65,7 @@ void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, con
 
 /*MDCT library functions*/
 /* -1- Tremor mdct */
-extern void mdct_backward(int n, int32_t *in, int32_t *out);
+/* extern void mdct_backward(int n, int32_t *in, int32_t *out); */
 /* -2- ffmpeg fft-based mdct */
 extern void ff_imdct_half(unsigned int nbits, int32_t *output, const int32_t *input);
 extern void ff_imdct_calc(unsigned int nbits, int32_t *output, const int32_t *input);

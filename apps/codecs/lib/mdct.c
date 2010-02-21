@@ -72,8 +72,9 @@ void ff_imdct_half(unsigned int nbits, fixed32 *output, const fixed32 *input)
        For postrotation, the factors are sin,cos(2PI*(i+1/4)/N)
        
        Therefore, prerotation can immediately reuse the same twiddles as fft
-       (for postrotation it's still a bit complex, so this is still using
-        an mdct-local set of twiddles to do that part)
+       (for postrotation it's still a bit complex, we reuse the fft trig tables
+        where we can, or a special table for N=2048, or interpolate between
+        trig tables for N>2048)
        */
     const int32_t *T = sincos_lookup0;
     const int step = 2<<(12-nbits);
@@ -248,25 +249,49 @@ void ff_imdct_half(unsigned int nbits, fixed32 *output, const fixed32 *input)
  *            <----input---->
  *            <-----------output----------->
  *
+ * The result of ff_imdct_half is to put the 'half' imdct here
+ *
+ *                          N/2          N-1
+ *                          <--half imdct-->
+ *
+ * We want it here for the full imdct:
+ *                   N/4      3N/4-1
+ *                   <-------------->
+ *
+ * In addition we need to apply two symmetries to get the full imdct:
+ *
+ *           <AAAAAA>                <DDDDDD>
+ *                   <BBBBBB><CCCCCC>
+ *
+ *           D is a reflection of C
+ *           A is a reflection of B (but with sign flipped)
+ *
+ * We process the symmetries at the same time as we 'move' the half imdct
+ * from [N/2,N-1] to [N/4,3N/4-1]
+ *
+ * TODO: find a way to make ff_imdct_half put the result in [N/4..3N/4-1]
+ * This would require being able to use revtab 'inplace' (since the input
+ * and output of imdct_half would then overlap somewhat)
  */
 void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input) ICODE_ATTR_TREMOR_MDCT;
+#ifndef CPU_ARM
 void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
 {
     const int n = (1<<nbits);
     const int n2 = (n>>1);
     const int n4 = (n>>2);
     
+    /* tell imdct_half to put the output in [N/2..3N/4-1] i.e. output+n2 */
     ff_imdct_half(nbits,output+n2,input);
 
-    /* reflect the half imdct into the full N samples */
-    /* TODO: this could easily be optimised more! */
     fixed32 * in_r, * in_r2, * out_r, * out_r2;
 
+    /* Copy BBBB to AAAA, reflected and sign-flipped.
+       Also copy BBBB to its correct destination (from [N/2..3N/4-1] to [N/4..N/2-1]) */
     out_r = output;
     out_r2 = output+n2-8;
     in_r  = output+n2+n4-8;
     while(out_r<out_r2)
-    {
         out_r[0]     = -(out_r2[7] = in_r[7]);
         out_r[1]     = -(out_r2[6] = in_r[6]);
         out_r[2]     = -(out_r2[5] = in_r[5]);
@@ -279,7 +304,6 @@ void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
         out_r += 8;
         out_r2 -= 8;
     }
-
     in_r = output + n2+n4;
     in_r2 = output + n-4;
     out_r = output + n2;
@@ -289,28 +313,30 @@ void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
         register fixed32 t0,t1,t2,t3;
         register fixed32 s0,s1,s2,s3;
 
-        //simultaneously do the following things:
-        // 1. copy range from [n2+n4 .. n-1] to range[n2 .. n2+n4-1]
-        // 2. reflect range from [n2+n4 .. n-1] inplace
-        //
-        //  [                      |                        ]
-        //   ^a ->            <- ^b ^c ->               <- ^d
-        //
-        //  #1: copy from ^c to ^a
-        //  #2: copy from ^d to ^b
-        //  #3: swap ^c and ^d in place
-        //
-        // #1 pt1 : load 4 words from ^c.
+        /* Copy and reflect CCCC to DDDD.  Because CCCC is already where
+           we actually want to put DDDD this is a bit complicated.
+         * So simultaneously do the following things:
+         * 1. copy range from [n2+n4 .. n-1] to range[n2 .. n2+n4-1]
+         * 2. reflect range from [n2+n4 .. n-1] inplace
+         *
+         *  [                      |                        ]
+         *   ^a ->            <- ^b ^c ->               <- ^d
+         *
+         *  #1: copy from ^c to ^a
+         *  #2: copy from ^d to ^b
+         *  #3: swap ^c and ^d in place
+         */
+        /* #1 pt1 : load 4 words from ^c. */
         t0=in_r[0]; t1=in_r[1]; t2=in_r[2]; t3=in_r[3];
-        // #1 pt2 : write to ^a
+        /* #1 pt2 : write to ^a */
         out_r[0]=t0;out_r[1]=t1;out_r[2]=t2;out_r[3]=t3;
-        // #2 pt1 : load 4 words from ^d
+        /* #2 pt1 : load 4 words from ^d */
         s0=in_r2[0];s1=in_r2[1];s2=in_r2[2];s3=in_r2[3];
-        // #2 pt2 : write to ^b
+        /* #2 pt2 : write to ^b */
         out_r2[0]=s0;out_r2[1]=s1;out_r2[2]=s2;out_r2[3]=s3;
-        // #3 pt1 : write words from #2 to ^c
+        /* #3 pt1 : write words from #2 to ^c */
         in_r[0]=s3;in_r[1]=s2;in_r[2]=s1;in_r[3]=s0;
-        // #3 pt2 : write words from #1 to ^d
+        /* #3 pt2 : write words from #1 to ^d */
         in_r2[0]=t3;in_r2[1]=t2;in_r2[2]=t1;in_r2[3]=t0;
 
         in_r += 4;
@@ -319,6 +345,65 @@ void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
         out_r2 -= 4;
     }
 }
+#else
+/* Follows the same structure as the canonical version above */
+void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
+{
+    const int n = (1<<nbits);
+    const int n2 = (n>>1);
+    const int n4 = (n>>2);
+    
+    ff_imdct_half(nbits,output+n2,input);
+
+    fixed32 * in_r, * in_r2, * out_r, * out_r2;
+
+    out_r = output;
+    out_r2 = output+n2;
+    in_r  = output+n2+n4;
+    while(out_r<out_r2)
+    {
+        asm volatile( 
+            "ldmdb %[in_r]!, {r0-r7}\n\t"
+            "stmdb %[out_r2]!, {r0-r7}\n\t"
+            "rsb r8,r0,#0\n\t"
+            "rsb r0,r7,#0\n\t"
+            "rsb r7,r1,#0\n\t"
+            "rsb r1,r6,#0\n\t"
+            "rsb r6,r2,#0\n\t"
+            "rsb r2,r5,#0\n\t"
+            "rsb r5,r3,#0\n\t"
+            "rsb r3,r4,#0\n\t"
+            "stmia %[out_r]!, {r0-r3,r5-r8}\n\t"
+            : [in_r] "+r" (in_r), [out_r] "+r" (out_r), [out_r2] "+r" (out_r2)
+            :
+            : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8" );
+    }
+    in_r = output + n2+n4;
+    in_r2 = output + n;
+    out_r = output + n2;
+    out_r2 = output + n2 + n4;
+    while(in_r<in_r2)
+    {
+        asm volatile(
+            "ldmia %[in_r], {r0-r3}\n\t"
+            "stmia %[out_r]!, {r0-r3}\n\t"
+            "ldmdb %[in_r2], {r5-r8}\n\t"
+            "stmdb %[out_r2]!, {r5-r8}\n\t"
+            "mov r4,r0\n\t"
+            "mov r0,r3\n\t"
+            "mov r3,r1\n\t"
+            "stmdb %[in_r2]!, {r0,r2,r3,r4}\n\t"
+            "mov r4,r8\n\t"
+            "mov r8,r5\n\t"
+            "mov r5,r7\n\t"
+            "stmia %[in_r]!, {r4,r5,r6,r8}\n\t"
+            :
+            [in_r] "+r" (in_r), [in_r2] "+r" (in_r2), [out_r] "+r" (out_r), [out_r2] "+r" (out_r2)
+            :
+            : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8" );
+    }
+}
+#endif
 
 static const long cordic_circular_gain = 0xb2458939; /* 0.607252929 */
 
