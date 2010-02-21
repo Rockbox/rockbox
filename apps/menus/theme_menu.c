@@ -47,7 +47,8 @@
  */
 static int clear_main_backdrop(void)
 {
-    global_settings.backdrop_file[0]=0;
+    global_settings.backdrop_file[0] = '-';
+    global_settings.backdrop_file[1] = '\0';
     sb_set_backdrop(SCREEN_MAIN, NULL);
     viewportmanager_theme_enable(SCREEN_MAIN, false, NULL);
     viewportmanager_theme_undo(SCREEN_MAIN, true);

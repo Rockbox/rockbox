@@ -465,10 +465,18 @@ bool cfg_to_string(int i/*setting_id*/, char* buf, int buf_len)
             if (((char*)settings[i].setting)[0]
                 && settings[i].filename_setting->prefix)
             {
-                snprintf(buf,buf_len,"%s%s%s",
-                    settings[i].filename_setting->prefix,
-                    (char*)settings[i].setting,
-                    settings[i].filename_setting->suffix);
+                if (((char*)settings[i].setting)[0] == '-')
+                {
+                    buf[0] = '-';
+                    buf[1] = '\0';
+                }
+                else
+                {
+                    snprintf(buf,buf_len,"%s%s%s",
+                            settings[i].filename_setting->prefix,
+                            (char*)settings[i].setting,
+                            settings[i].filename_setting->suffix);
+                }
             }
             else strlcpy(buf,(char*)settings[i].setting,
                          settings[i].filename_setting->max_len);

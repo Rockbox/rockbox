@@ -199,7 +199,7 @@ static const char graphic_numeric[] = "graphic,numeric";
 
 /* Default theme settings */
 #define DEFAULT_WPSNAME  "cabbiev2"
-#define DEFAULT_SBS_NAME DEFAULT_WPSNAME
+#define DEFAULT_SBS_NAME "-"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -1425,7 +1425,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(F_BANFROMQS, audioscrobbler, LANG_AUDIOSCROBBLER, false,
                   "Last.fm Logging", NULL),
 #if CONFIG_TUNER
-    TEXT_SETTING(0, fmr_file, "fmr", "",
+    TEXT_SETTING(0, fmr_file, "fmr", "-",
                      FMPRESET_PATH "/", ".fmr"),
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -1434,7 +1434,7 @@ const struct settings_list settings[] = {
 #endif
 #ifdef HAVE_REMOTE_LCD
     TEXT_SETTING(F_THEMESETTING, remote_font_file, "remote font",
-                     "", FONT_DIR "/", ".fnt"),
+                     "-", FONT_DIR "/", ".fnt"),
 #endif
     TEXT_SETTING(F_THEMESETTING,wps_file, "wps",
                      DEFAULT_WPSNAME, WPS_DIR "/", ".wps"),
@@ -1448,13 +1448,13 @@ const struct settings_list settings[] = {
     TEXT_SETTING(F_THEMESETTING,rsbs_file, "rsbs",
                      DEFAULT_WPSNAME, SBS_DIR "/", ".rsbs"),
 #endif
-    TEXT_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng"),
+    TEXT_SETTING(0,lang_file,"lang","-",LANG_DIR "/",".lng"),
 #if LCD_DEPTH > 1
     TEXT_SETTING(F_THEMESETTING,backdrop_file,"backdrop",
                      DEFAULT_BACKDROP, BACKDROP_DIR "/", ".bmp"),
 #endif
 #ifdef HAVE_LCD_BITMAP
-    TEXT_SETTING(0,kbd_file,"kbd","",ROCKBOX_DIR "/",".kbd"),
+    TEXT_SETTING(0,kbd_file,"kbd","-",ROCKBOX_DIR "/",".kbd"),
 #endif
 #ifdef HAVE_USB_CHARGING_ENABLE
     OFFON_SETTING(0,usb_charging,LANG_USB_CHARGING,false,"usb charging",NULL),
@@ -1527,10 +1527,10 @@ const struct settings_list settings[] = {
                      ICON_DIR "/", ".bmp"),
 #endif
 #ifdef HAVE_REMOTE_LCD
-    TEXT_SETTING(F_THEMESETTING, remote_icon_file, "remote iconset", "",
+    TEXT_SETTING(F_THEMESETTING, remote_icon_file, "remote iconset", "-",
                      ICON_DIR "/", ".bmp"),
     TEXT_SETTING(F_THEMESETTING, remote_viewers_icon_file,
-                     "remote viewers iconset", "",
+                     "remote viewers iconset", "-",
                      ICON_DIR "/", ".bmp"),
 #endif /* HAVE_REMOTE_LCD */
 #ifdef HAVE_LCD_COLOR
