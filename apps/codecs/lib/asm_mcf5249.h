@@ -325,17 +325,19 @@ void vect_mult_bw(int32_t *data, int32_t *window, int n)
 #endif
 
 #endif
-
+/* not used anymore */
+/*
 #ifndef _V_CLIP_MATH
 #define _V_CLIP_MATH
 
-/* this is portable C and simple; why not use this as default? */
+* this is portable C and simple; why not use this as default?
 static inline int32_t CLIP_TO_15(register int32_t x) {
   register int32_t hi=32767, lo=-32768;
   return (x>=hi ? hi : (x<=lo ? lo : x));
 }
 
 #endif
+*/
 #else
 #define LINE_ATTR
 #endif

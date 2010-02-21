@@ -36,7 +36,7 @@
  */
 
 #ifdef ROCKBOX
-/* get definitions of MULT31, MULT31_SHIFT15, CLIP_TO_15, vect_add, from codelib */
+/* get definitions of MULT31, MULT31_SHIFT15, vect_add, from codelib */
 #include "asm_arm.h"
 #include "asm_mcf5249.h"
 #include "codeclib_misc.h"

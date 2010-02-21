@@ -33,9 +33,9 @@ static inline int32_t MULT31(int32_t x, int32_t y) {
 
 static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
   int lo,hi;
-  asm volatile("smull	%0, %1, %2, %3\n\t"
-	       "movs	%0, %0, lsr #15\n\t"
-	       "adc	%1, %0, %1, lsl #17\n\t"
+  asm volatile("smull   %0, %1, %2, %3\n\t"
+               "movs    %0, %0, lsr #15\n\t"
+               "adc %1, %0, %1, lsl #17\n\t"
                : "=&r"(lo),"=&r"(hi)
                : "r"(x),"r"(y)
                : "cc" );
@@ -45,43 +45,43 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
 #define XPROD32(a, b, t, v, x, y) \
 { \
   long l; \
-  asm(	"smull	%0, %1, %3, %5\n\t" \
-	"rsb	%2, %6, #0\n\t" \
-	"smlal	%0, %1, %4, %6\n\t" \
-	"smull	%0, %2, %3, %2\n\t" \
-	"smlal	%0, %2, %4, %5" \
-	: "=&r" (l), "=&r" (x), "=&r" (y) \
+  asm(  "smull  %0, %1, %3, %5\n\t" \
+    "rsb    %2, %6, #0\n\t" \
+    "smlal  %0, %1, %4, %6\n\t" \
+    "smull  %0, %2, %3, %2\n\t" \
+    "smlal  %0, %2, %4, %5" \
+    : "=&r" (l), "=&r" (x), "=&r" (y) \
         : "r" ((a)), "r" ((b)), "r" ((t)), "r" ((v)) ); \
 }
 
 static inline void XPROD31(int32_t  a, int32_t  b,
-			   int32_t  t, int32_t  v,
-			   int32_t *x, int32_t *y)
+               int32_t  t, int32_t  v,
+               int32_t *x, int32_t *y)
 {
   int x1, y1, l;
-  asm(	"smull	%0, %1, %3, %5\n\t"
-	"rsb	%2, %6, #0\n\t"
-	"smlal	%0, %1, %4, %6\n\t"
-	"smull	%0, %2, %3, %2\n\t"
-	"smlal	%0, %2, %4, %5"
-	: "=&r" (l), "=&r" (x1), "=&r" (y1)
-	: "r" (a), "r" (b), "r" (t), "r" (v) );
+  asm(  "smull  %0, %1, %3, %5\n\t"
+    "rsb    %2, %6, #0\n\t"
+    "smlal  %0, %1, %4, %6\n\t"
+    "smull  %0, %2, %3, %2\n\t"
+    "smlal  %0, %2, %4, %5"
+    : "=&r" (l), "=&r" (x1), "=&r" (y1)
+    : "r" (a), "r" (b), "r" (t), "r" (v) );
   *x = x1 << 1;
   *y = y1 << 1;
 }
 
 static inline void XNPROD31(int32_t  a, int32_t  b,
-			    int32_t  t, int32_t  v,
-			    int32_t *x, int32_t *y)
+                int32_t  t, int32_t  v,
+                int32_t *x, int32_t *y)
 {
   int x1, y1, l;
-  asm(	"smull	%0, %1, %3, %5\n\t"
-	"rsb	%2, %4, #0\n\t"
-	"smlal	%0, %1, %2, %6\n\t"
-	"smull	%0, %2, %4, %5\n\t"
-	"smlal	%0, %2, %3, %6"
-	: "=&r" (l), "=&r" (x1), "=&r" (y1)
-	: "r" (a), "r" (b), "r" (t), "r" (v) );
+  asm(  "smull  %0, %1, %3, %5\n\t"
+    "rsb    %2, %4, #0\n\t"
+    "smlal  %0, %1, %2, %6\n\t"
+    "smull  %0, %2, %4, %5\n\t"
+    "smlal  %0, %2, %3, %6"
+    : "=&r" (l), "=&r" (x1), "=&r" (y1)
+    : "r" (a), "r" (b), "r" (t), "r" (v) );
   *x = x1 << 1;
   *y = y1 << 1;
 }
@@ -89,13 +89,13 @@ static inline void XNPROD31(int32_t  a, int32_t  b,
 #define XPROD31_R(_a, _b, _t, _v, _x, _y)\
 {\
   int x1, y1, l;\
-  asm(	"smull	%0, %1, %5, %3\n\t"\
-	"rsb	%2, %3, #0\n\t"\
-	"smlal	%0, %1, %6, %4\n\t"\
-	"smull	%0, %2, %6, %2\n\t"\
-	"smlal	%0, %2, %5, %4"\
-	: "=&r" (l), "=&r" (x1), "=&r" (y1)\
-	: "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
+  asm(  "smull  %0, %1, %5, %3\n\t"\
+    "rsb    %2, %3, #0\n\t"\
+    "smlal  %0, %1, %6, %4\n\t"\
+    "smull  %0, %2, %6, %2\n\t"\
+    "smlal  %0, %2, %5, %4"\
+    : "=&r" (l), "=&r" (x1), "=&r" (y1)\
+    : "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
   _x = x1 << 1;\
   _y = y1 << 1;\
 }
@@ -103,13 +103,13 @@ static inline void XNPROD31(int32_t  a, int32_t  b,
 #define XNPROD31_R(_a, _b, _t, _v, _x, _y)\
 {\
   int x1, y1, l;\
-  asm(	"smull	%0, %1, %5, %3\n\t"\
-	"rsb	%2, %4, #0\n\t"\
-	"smlal	%0, %1, %6, %2\n\t"\
-	"smull	%0, %2, %5, %4\n\t"\
-	"smlal	%0, %2, %6, %3"\
-	: "=&r" (l), "=&r" (x1), "=&r" (y1)\
-	: "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
+  asm(  "smull  %0, %1, %5, %3\n\t"\
+    "rsb    %2, %4, #0\n\t"\
+    "smlal  %0, %1, %6, %2\n\t"\
+    "smull  %0, %2, %5, %4\n\t"\
+    "smlal  %0, %2, %6, %3"\
+    : "=&r" (l), "=&r" (x1), "=&r" (y1)\
+    : "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
   _x = x1 << 1;\
   _y = y1 << 1;\
 }
@@ -221,25 +221,26 @@ void vect_mult_bw(int32_t *data, int32_t *window, int n)
 #endif
 
 #endif
-
+/* not used anymore */
+/*
 #ifndef _V_CLIP_MATH
 #define _V_CLIP_MATH
 
 static inline int32_t CLIP_TO_15(int32_t x) {
   int tmp;
-  asm volatile("subs	%1, %0, #32768\n\t"
-	       "movpl	%0, #0x7f00\n\t"
-	       "orrpl	%0, %0, #0xff\n"
-	       "adds	%1, %0, #32768\n\t"
-	       "movmi	%0, #0x8000"
-	       : "+r"(x),"=r"(tmp)
-	       :
-	       : "cc");
+  asm volatile("subs    %1, %0, #32768\n\t"
+           "movpl   %0, #0x7f00\n\t"
+           "orrpl   %0, %0, #0xff\n"
+           "adds    %1, %0, #32768\n\t"
+           "movmi   %0, #0x8000"
+           : "+r"(x),"=r"(tmp)
+           :
+           : "cc");
   return(x);
 }
 
 #endif
-
+*/
 #ifndef _V_LSP_MATH_ASM
 #define _V_LSP_MATH_ASM
 
