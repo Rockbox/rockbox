@@ -100,15 +100,9 @@ struct gui_synclist
     int start_item[NB_SCREENS]; /* the item that is displayed at the top of the screen */
     /* the number of lines that are selected at the same time */
     int selected_size;
-    /* These are used to calculate how much of the screen content we need
-       to redraw. */
-    int last_displayed_selected_item;
-    int last_displayed_start_item[NB_SCREENS];
 #ifdef HAVE_LCD_BITMAP
     int offset_position[NB_SCREENS]; /* the list's screen scroll placement in pixels */
 #endif
-    /* Cache the width of the title string in pixels/characters */
-    int title_width;
     long scheduled_talk_tick, last_talked_tick;
 
     list_get_icon *callback_get_item_icon;

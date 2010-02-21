@@ -65,10 +65,6 @@ void list_draw(struct screen *display, struct gui_synclist *gui_list)
     display->clear_display();
     start = 0;
     end = display->getnblines();
-    gui_list->last_displayed_start_item[display->screen_type] = 
-                                gui_list->start_item[display->screen_type];
-
-    gui_list->last_displayed_selected_item = gui_list->selected_item;
 
     /* Adjust the position of icon, cursor, text for the list */
     draw_cursor = true;

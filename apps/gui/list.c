@@ -155,7 +155,6 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     FOR_NB_SCREENS(i)
     {
         gui_list->start_item[i] = 0;
-        gui_list->last_displayed_start_item[i] = -1 ;
 #ifdef HAVE_LCD_BITMAP
         gui_list->offset_position[i] = 0;
 #endif
@@ -170,12 +169,10 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_list->scroll_all = scroll_all;
     gui_list->selected_size = selected_size;
     gui_list->title = NULL;
-    gui_list->title_width = 0;
     gui_list->title_icon = Icon_NOICON;
 
     gui_list->scheduled_talk_tick = gui_list->last_talked_tick = 0;
     gui_list->show_selection_marker = true;
-    gui_list->last_displayed_selected_item = -1;
 
 #ifdef HAVE_LCD_COLOR
     gui_list->title_color = -1;
@@ -402,20 +399,6 @@ void gui_synclist_set_title(struct gui_synclist * gui_list,
 {
     gui_list->title = title;
     gui_list->title_icon = icon;
-    if (title)
-    {
-#ifdef HAVE_LCD_BITMAP
-        int i;
-        FOR_NB_SCREENS(i)
-            screens[i].getstringsize(title, &gui_list->title_width, NULL);
-#else
-        gui_list->title_width = strlen(title);
-#endif
-    }
-    else
-    {
-        gui_list->title_width = 0;
-    }
 }
 
 void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
