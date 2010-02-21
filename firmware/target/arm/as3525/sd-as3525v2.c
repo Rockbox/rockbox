@@ -157,7 +157,10 @@ static void printf(const char *format, ...)
 #define MCI_CLKSRC      SD_REG(0x0C)    /* clock source */
 #define MCI_CLKENA      SD_REG(0x10)    /* clock enable */
 #define MCI_TMOUT       SD_REG(0x14)    /* timeout */
+
 #define MCI_CTYPE       SD_REG(0x18)    /* card type */
+                                        /* 1 bit per card, set = wide bus */
+
 #define MCI_BLKSIZ      SD_REG(0x1C)    /* block size */
 #define MCI_BYTCNT      SD_REG(0x20)    /* byte count */
 #define MCI_MASK        SD_REG(0x24)    /* interrupt mask */
@@ -423,8 +426,7 @@ static int sd_init_card(void)
     if(!send_cmd(SD_SET_BUS_WIDTH, card_info.rca | 2, MCI_NO_RESP, NULL))
         return -11;
 
-    MCI_CTYPE &= ~(0x10001);
-    MCI_CTYPE |= 0x1;
+    MCI_CTYPE = (1<<0); /* Bus width = 4 */
 
     if(!send_cmd(SD_SELECT_CARD, card_info.rca, MCI_NO_RESP, NULL))
         return -9;
@@ -502,6 +504,8 @@ static void init_controller(void)
 
     MCI_CTRL |= INT_ENABLE;
     MCI_TMOUT = 0xffffffff;
+
+    MCI_CTYPE = 0;
 
     MCI_CLKENA = (1<<shift) - 1;
 
