@@ -163,7 +163,7 @@ static int statusbar_callback_ex(int action,const struct menu_item_ex *this_item
             break;
         case ACTION_EXIT_MENUITEM:
             if (statusbar_position(screen) == STATUSBAR_CUSTOM
-                    && (int)old_bar[screen] != statusbar_position(screen))
+                    && old_bar[screen] != statusbar_position(screen))
                 settings_apply_skins();
             break;
     }
