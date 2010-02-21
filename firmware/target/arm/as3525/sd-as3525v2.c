@@ -651,25 +651,19 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
 
     dma_retain();
 
-    while(count)
+    const int cmd = write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
+
+    /* Interrupt handler might set this to true during transfer */
+    retry = false;
+
+    do
     {
-        /* Interrupt handler might set this to true during transfer */
-        retry = false;
-        /* 128 * 512 = 2^16, and doesn't fit in the 16 bits of DATA_LENGTH
-         * register, so we have to transfer maximum 127 sectors at a time. */
-        //unsigned int transfer = (count >= 128) ? 127 : count; /* sectors */
-        unsigned int transfer = count;
-
-        const int cmd =
-            write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
-
-
         MCI_CTRL |= FIFO_RESET;
         while(MCI_CTRL & FIFO_RESET)
             ;
 
         //MCI_BLKSIZ = 512;
-        MCI_BYTCNT = transfer * 512;
+        MCI_BYTCNT = count * 512;
 
         MCI_CTRL |= FIFO_RESET;
         while(MCI_CTRL & FIFO_RESET)
@@ -708,13 +702,6 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
         printf("dma <-");
         int delay = 0x1000000; while(delay--) ;
 
-        if(!retry)
-        {
-            buf += transfer * SECTOR_SIZE;
-            start += transfer;
-            count -= transfer;
-        }
-
         last_disk_activity = current_tick;
 
         if(!send_cmd(SD_STOP_TRANSMISSION, 0, MCI_NO_RESP, NULL))
@@ -730,7 +717,7 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
             panicf(" wait for state TRAN failed (%d)", ret);
             goto sd_transfer_error;
         }
-    }
+    } while(retry);
 
     dma_release();
 
