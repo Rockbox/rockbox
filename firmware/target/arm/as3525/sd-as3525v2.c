@@ -69,36 +69,6 @@ static void printf(const char *format, ...)
 #define SD_BASE 0xC6070000
 
 /*
- *          REGISTERS
- *
- *      m = modify (orr/bic), r = read, w = write
- *
- * 00   m/r/w
- * 04   m/w
- * 08   m
- * 0C   ?
- * 10   r/w
- * 14   w
- * 18   m
- * 1C   w       ==> set a bit before transfer (sometimes) !
- * 20   w       ==> set a bit before transfer !
- * 24   w       irq mask ?
- * 28   w       arg
- * 2C   r/w     cmd
- * 30   r       resp0
- * 34   r       resp1
- * 38   r       resp2
- * 3C   r       resp3
- * 40   r       irq status (only read in isr)
- * 44   m/w     irq clear
- * 48   r
- * 4C   m
- * 64   w
- * 70   r
- * 100          FIFO
- */
-
-/*
  *  STATUS register
  *  & 0xBA80
  *  & 8
@@ -165,23 +135,50 @@ static void printf(const char *format, ...)
  *
  */
 
-/* FIXME */
-#define MCI_POWER
-#define MCI_CLOCK
-#define MCI_ARGUMENT    (*(volatile unsigned long *) (SD_BASE+0x28))
-#define MCI_COMMAND     (*(volatile unsigned long *) (SD_BASE+0x2C))
-#define MCI_RESPCMD
-#define MCI_RESP0       (*(volatile unsigned long *) (SD_BASE+0x30))
-#define MCI_RESP1       (*(volatile unsigned long *) (SD_BASE+0x34))
-#define MCI_RESP2       (*(volatile unsigned long *) (SD_BASE+0x38))
-#define MCI_RESP3       (*(volatile unsigned long *) (SD_BASE+0x3C))
-#define MCI_DATA_TIMER
-#define MCI_DATA_LENGTH
-#define MCI_DATA_CTRL
-#define MCI_STATUS      (*(volatile unsigned long *) (SD_BASE+0x40))
-#define MCI_CLEAR       (*(volatile unsigned long *) (SD_BASE+0x44))
-#define MCI_MASK        (*(volatile unsigned long *) (SD_BASE+0x24))
-#define MCI_SELECT
+#define SD_REG(x)       (*(volatile unsigned long *) (SD_BASE+x))
+
+#define MCI_CTRL        SD_REG(0x00)
+#define MCI_PWREN       SD_REG(0x04)    /* power enable */
+#define MCI_CLKDIV      SD_REG(0x08)    /* clock divider */
+#define MCI_CLKSRC      SD_REG(0x0C)    /* clock source */
+#define MCI_CLKENA      SD_REG(0x10)    /* clock enable */
+#define MCI_TMOUT       SD_REG(0x14)    /* timeout */
+#define MCI_CTYPE       SD_REG(0x18)    /* card type */
+#define MCI_BLKSIZ      SD_REG(0x1C)    /* block size */
+#define MCI_BYTCNT      SD_REG(0x20)    /* byte count */
+#define MCI_MASK        SD_REG(0x24)    /* interrupt mask */
+
+#define MCI_ARGUMENT    SD_REG(0x28)
+#define MCI_COMMAND     SD_REG(0x2C)
+
+#define MCI_RESP0       SD_REG(0x30)
+#define MCI_RESP1       SD_REG(0x34)
+#define MCI_RESP2       SD_REG(0x38)
+#define MCI_RESP3       SD_REG(0x3C)
+
+#define MCI_MASK_STATUS SD_REG(0x40)    /* masked interrupt status */
+#define MCI_RAW_STATUS  SD_REG(0x44)    /* raw interrupt status, also used as
+                                         * status clear */
+#define MCI_STATUS      SD_REG(0x48)
+
+#define MCI_FIFOTH      SD_REG(0x4C)    /* FIFO threshold */
+#define MCI_CDETECT     SD_REG(0x50)    /* card detect */
+#define MCI_WRTPRT      SD_REG(0x54)    /* write protect */
+#define MCI_GPIO        SD_REG(0x58)
+#define MCI_TCBCNT      SD_REG(0x5C)    /* transferred CIU byte count */
+#define MCI_TBBCNT      SD_REG(0x60)    /* transferred host/DMA to/from bytes */
+#define MCI_DEBNCE      SD_REG(0x64)    /* card detect debounce */
+#define MCI_USRID       SD_REG(0x68)    /* user id */
+#define MCI_VERID       SD_REG(0x6C)    /* version id */
+#define MCI_HCON        SD_REG(0x70)    /* hardware config */
+
+#define MCI_BMOD        SD_REG(0x80)    /* bus mode */
+#define MCI_PLDMND      SD_REG(0x84)    /* poll demand */
+#define MCI_DBADDR      SD_REG(0x88)    /* descriptor base address */
+#define MCI_IDSTS       SD_REG(0x8C)    /* internal DMAC status */
+#define MCI_IDINTEN     SD_REG(0x90)    /* internal DMAC interrupt enable */
+#define MCI_DSCADDR     SD_REG(0x94)    /* current host descriptor address */
+#define MCI_BUFADDR     SD_REG(0x98)    /* current host buffer address */
 
 #define MCI_ERROR 0     /* FIXME */
 
@@ -220,7 +217,7 @@ static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
 void INT_NAND(void)
 {
-    (*(volatile unsigned long *) (SD_BASE+0x0)) &= ~0x10;   // ?
+    MCI_CTRL &= ~0x10;   // ?
     const int status = MCI_STATUS;
 
 #if 0
@@ -229,7 +226,7 @@ void INT_NAND(void)
 #endif
 
 //    wakeup_signal(&transfer_completion_signal);
-    MCI_CLEAR = status;
+    MCI_RAW_STATUS = status;
 
     //static int x = 0;
     switch(status)
@@ -264,11 +261,11 @@ void INT_NAND(void)
      *  read resp (6, 7, 12, 42) : while bit 9 is unset ;
      *
      */
-    //printf("%x %x", status, (*(volatile unsigned long *) (SD_BASE+0x48)));
+    //printf("%x %x", status, MCI_STATUS);
     //while(!button_read_device());
     //while(button_read_device());
 
-    (*(volatile unsigned long *) (SD_BASE+0x0)) |= 0x10;    // ?
+    MCI_CTRL |= 0x10;    // ?
 }
 
 static bool send_cmd(const int cmd, const int arg, const int flags,
@@ -288,23 +285,23 @@ static bool send_cmd(const int cmd, const int arg, const int flags,
     else if(cmd == 25)  /* w */
         val |= 0x2700;
 
-    int tmp = (*(volatile unsigned long *) (SD_BASE+0x10));
-    (*(volatile unsigned long *) (SD_BASE+0x10)) = 0;
+    int tmp = MCI_CLKENA;
+    MCI_CLKENA = 0;
 
     MCI_COMMAND = 0x80202000;
     MCI_ARGUMENT = 0;
     int max = 10;
     while(max-- && MCI_COMMAND & MCI_COMMAND_ACTIVE);
 
-    (*(volatile unsigned long *) (SD_BASE+0x08)) &= ~0xff;
-    (*(volatile unsigned long *) (SD_BASE+0x08)) |= 0;
+    MCI_CLKDIV &= ~0xff;
+    MCI_CLKDIV |= 0;
 
     MCI_COMMAND = 0x80202000;
     MCI_ARGUMENT = 0;
     max = 10;
     while(max-- && MCI_COMMAND & MCI_COMMAND_ACTIVE);
 
-    (*(volatile unsigned long *) (SD_BASE+0x10)) = tmp;
+    MCI_CLKENA = tmp;
 
     MCI_COMMAND = 0x80202000;
     MCI_ARGUMENT = 0;
@@ -316,7 +313,7 @@ static bool send_cmd(const int cmd, const int arg, const int flags,
     MCI_ARGUMENT = arg;
     MCI_COMMAND = val;
 
-    (*(volatile unsigned long *) (SD_BASE+0x00)) |= 0x10;
+    MCI_CTRL |= 0x10;
 
     max = 1000;
     while(max-- && MCI_COMMAND & MCI_COMMAND_ACTIVE); /* wait for cmd completion */
@@ -412,8 +409,8 @@ static int sd_init_card(void)
     if(!send_cmd(SD_SET_BUS_WIDTH, card_info.rca | 2, MCI_NO_RESP, NULL))
         return -11;
 
-    (*(volatile unsigned long *) (SD_BASE+0x18)) &= ~(0x10001);
-    (*(volatile unsigned long *) (SD_BASE+0x18)) |= 0x1;
+    MCI_CTYPE &= ~(0x10001);
+    MCI_CTYPE |= 0x1;
 
     if(!send_cmd(SD_SELECT_CARD, card_info.rca, MCI_NO_RESP, NULL))
         return -9;
@@ -474,36 +471,36 @@ static void sd_thread(void)
 
 static void init_controller(void)
 {
-    int tmp = (*(volatile unsigned long *) (SD_BASE+0x70));
+    int tmp = MCI_HCON;
     int shift = 1 + ((tmp << 26) >> 27);
 
-    (*(volatile unsigned long *) (SD_BASE+0x04)) &= ~((1 << shift) -1);
-    (*(volatile unsigned long *) (SD_BASE+0x04)) = (1 << shift) -1;
+    MCI_PWREN &= ~((1 << shift) -1);
+    MCI_PWREN = (1 << shift) -1;
 
     mci_delay();
 
-    (*(volatile unsigned long *) (SD_BASE+0x00)) |= 1;
+    MCI_CTRL |= 1;
     int max = 1000;
-    while(max-- && !(*(volatile unsigned long *) (SD_BASE+0x00)) & 1)
+    while(max-- && !(MCI_CTRL & 1))
         ;
 
-    MCI_CLEAR = 0xffffffff;
+    MCI_RAW_STATUS = 0xffffffff;
     MCI_MASK = 0xffffbffe;
 
-    (*(volatile unsigned long *) (SD_BASE+0x00)) |= 0x10;
-    (*(volatile unsigned long *) (SD_BASE+0x14)) = 0xffffffff;
+    MCI_CTRL |= 0x10;
+    MCI_TMOUT = 0xffffffff;
 
-    (*(volatile unsigned long *) (SD_BASE+0x10)) = (1<<shift) - 1;
+    MCI_CLKENA = (1<<shift) - 1;
 
     MCI_ARGUMENT = 0;
     MCI_COMMAND = 0x80202000;
     max = 10;
     while(max-- && (MCI_COMMAND & (1<<31))) ;
 
-    (*(volatile unsigned long *) (SD_BASE+0x64)) = 0xfffff;
+    MCI_DEBNCE = 0xfffff;
 
-    (*(volatile unsigned long *) (SD_BASE+0x4c)) = ~0x7fff0fff; // interrupt mask ?
-    (*(volatile unsigned long *) (SD_BASE+0x4c)) |= 0x503f0080;
+    MCI_FIFOTH = ~0x7fff0fff;
+    MCI_FIFOTH |= 0x503f0080;
 
     MCI_MASK = 0xffffbffe;
 }
@@ -657,20 +654,20 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
             write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
 
 
-        (*(volatile unsigned long *) (SD_BASE+0x00)) |= 2;
-        while(( *(volatile unsigned long *) (SD_BASE+0x00)) & 2) ;
+        MCI_CTRL |= 2;
+        while(MCI_CTRL & 2) ;
 
-        //(*(volatile unsigned long *) (SD_BASE+0x1c)) = 512;
-        (*(volatile unsigned long *) (SD_BASE+0x20)) = transfer * 512;
+        //MCI_BLKSIZ = 512;
+        MCI_BYTCNT = transfer * 512;
 
-        (*(volatile unsigned long *) (SD_BASE+0x00)) |= 2;
-        while(( *(volatile unsigned long *) (SD_BASE+0x00)) & 2) ;
+        MCI_CTRL |= 2;
+        while(MCI_CTRL & 2) ;
 
-        (*(volatile unsigned long *) (SD_BASE+0x4c)) &= ~0x7fff0fff;
+        MCI_FIFOTH &= ~0x7fff0fff;
 
-        (*(volatile unsigned long *) (SD_BASE+0x00)) |= 0x20;
+        MCI_CTRL |= 0x20;
         MCI_MASK = 0xBE8C;
-        (*(volatile unsigned long *) (SD_BASE+0x4c)) |= 0x503f0080;
+        MCI_FIFOTH |= 0x503f0080;
 
 
         if(card_info.ocr & (1<<30) ) /* SDHC */
