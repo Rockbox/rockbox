@@ -158,9 +158,9 @@ static void printf(const char *format, ...)
 #define MCI_INT_EBE     (1<<15)     /* end bit error */
 #define MCI_INT_SDIO    (0xf<<16)
 
-#define MCI_ERROR   (MCI_INT_RE | MCI_INT_RCRC | MCI_INT_DCRC | MCI_INT_RTO \
+#define MCI_ERROR   (MCI_INT_RE | MCI_INT_RCRC | MCI_INT_DCRC /*| MCI_INT_RTO*/ \
                    | MCI_INT_DRTO | MCI_INT_HTO | MCI_INT_FRUN | MCI_INT_HLE \
-                   | MCI_INT_SBE | MCI_INT_EBE)
+                   /*| MCI_INT_SBE*/ | MCI_INT_EBE)
 
 #define MCI_FIFOTH      SD_REG(0x4C)    /* FIFO threshold */
 /* TX watermark :    bits 11:0
@@ -225,7 +225,10 @@ void INT_NAND(void)
     MCI_RAW_STATUS = status;    /* clear status */
 
     if(status & MCI_ERROR)
+    {
+        panicf("status 0x%8x", status);
         retry = true;
+    }
     else if(status & MCI_INT_DTO)
         wakeup_signal(&transfer_completion_signal);
 
