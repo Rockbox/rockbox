@@ -292,6 +292,7 @@ void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
     out_r2 = output+n2-8;
     in_r  = output+n2+n4-8;
     while(out_r<out_r2)
+    {
         out_r[0]     = -(out_r2[7] = in_r[7]);
         out_r[1]     = -(out_r2[6] = in_r[6]);
         out_r[2]     = -(out_r2[5] = in_r[5]);
