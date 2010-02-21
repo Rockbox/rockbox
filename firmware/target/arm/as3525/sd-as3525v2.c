@@ -175,7 +175,10 @@ static void printf(const char *format, ...)
 #define MCI_DEBNCE      SD_REG(0x64)    /* card detect debounce */
 #define MCI_USRID       SD_REG(0x68)    /* user id */
 #define MCI_VERID       SD_REG(0x6C)    /* version id */
+
 #define MCI_HCON        SD_REG(0x70)    /* hardware config */
+/* bit 0 : card type
+ * bits 5:1 : maximum card index */
 
 #define MCI_BMOD        SD_REG(0x80)    /* bus mode */
 #define MCI_PLDMND      SD_REG(0x84)    /* poll demand */
@@ -478,11 +481,11 @@ static void sd_thread(void)
 
 static void init_controller(void)
 {
-    int tmp = MCI_HCON;
-    int shift = 1 + ((tmp << 26) >> 27);
+    int idx = (MCI_HCON >> 1) & 31;
+    int idx_bits = (1 << idx) -1;
 
-    MCI_PWREN &= ~((1 << shift) -1);
-    MCI_PWREN = (1 << shift) -1;
+    MCI_PWREN &= ~idx_bits;
+    MCI_PWREN = idx_bits;
 
     mci_delay();
 
@@ -497,7 +500,7 @@ static void init_controller(void)
 
     MCI_CTYPE = 0;
 
-    MCI_CLKENA = (1<<shift) - 1;
+    MCI_CLKENA = idx_bits;
 
     MCI_ARGUMENT = 0;
     MCI_COMMAND = CMD_DONE_BIT|CMD_SEND_CLK_ONLY|CMD_WAIT_PRV_DAT_BIT;
