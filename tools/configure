@@ -1079,7 +1079,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom="$pwd/rombox.ucl"
+    #archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     swcodec=""
