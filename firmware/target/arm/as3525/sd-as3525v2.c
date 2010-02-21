@@ -160,6 +160,13 @@ static void printf(const char *format, ...)
 
 
 #define MCI_FIFOTH      SD_REG(0x4C)    /* FIFO threshold */
+/* TX watermark :    bits 11:0
+ * RX watermark :    bits 27:16
+ * DMA MTRANS SIZE : bits 30:28
+ * bits 31, 15:12 : unused
+ */
+#define MCI_FIFOTH_MASK 0x8000f000
+
 #define MCI_CDETECT     SD_REG(0x50)    /* card detect */
 #define MCI_WRTPRT      SD_REG(0x54)    /* write protect */
 #define MCI_GPIO        SD_REG(0x58)
@@ -499,10 +506,10 @@ static void init_controller(void)
 
     MCI_DEBNCE = 0xfffff;   /* default value */
 
-    MCI_FIFOTH = ~0x7fff0fff;
+    MCI_FIFOTH &= MCI_FIFOTH_MASK;
     MCI_FIFOTH |= 0x503f0080;
 
-    MCI_MASK = 0xffffffff & (~MCI_INT_ACD & ~MCI_INTCRDRET);
+    MCI_MASK = 0xffffffff & ~(MCI_INT_ACD|MCI_INT_CRDDET);
 }
 
 int sd_init(void)
@@ -669,7 +676,7 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
         MCI_MASK = MCI_INT_CD|MCI_INT_DTO|MCI_INT_DCRC|MCI_INT_DRTO| \
             MCI_INT_HTO|MCI_INT_FRUN|MCI_INT_HLE|MCI_INT_SBE|MCI_INT_EBE;
 
-        MCI_FIFOTH &= ~0x7fff0fff;
+        MCI_FIFOTH &= MCI_FIFOTH_MASK;
         MCI_FIFOTH |= 0x503f0080;
 
 
