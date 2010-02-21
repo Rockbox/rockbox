@@ -1851,127 +1851,127 @@ static int brickmania_game_loop(void)
                         }
                     }
 
-                    /* Check if the ball hit the left side */
-                    screen_edge.p1.x = 0;
-                    screen_edge.p1.y = 0;
-
-                    screen_edge.p2.x = 0;
-                    screen_edge.p2.y = GAMESCREEN_HEIGHT;
-                    if ( !ball[k].glue &&
-                            check_lines(&misc_line, &screen_edge, &pt_hit))
+                    if (game_state != ST_READY && !ball[k].glue)
                     {
-                        /* Reverse direction */
-                        ball[k].speedx = -ball[k].speedx;
+                        /* Check if the ball hit the left side */
+                        screen_edge.p1.x = 0;
+                        screen_edge.p1.y = 0;
 
-                        /* Re-position ball in gameboard */
-                        ball[k].tempy = pt_hit.y;
-                        ball[k].tempx = 0;
-                    }
-
-                    /* Check if the ball hit the right side */
-                    screen_edge.p1.x = GAMESCREEN_WIDTH;
-                    screen_edge.p1.y = 0;
-
-                    screen_edge.p2.x = GAMESCREEN_WIDTH;
-                    screen_edge.p2.y = GAMESCREEN_HEIGHT;
-                    if ( !ball[k].glue &&
-                            check_lines(&misc_line, &screen_edge, &pt_hit))
-                    {
-                        /* Reverse direction */
-                        ball[k].speedx = -ball[k].speedx;
-
-                        /* Re-position ball in gameboard */
-                        ball[k].tempy = pt_hit.y;
-                        ball[k].tempx = GAMESCREEN_WIDTH - FIXED3(1);
-                    }
-
-                    /* Did the ball hit the paddle? Depending on where the ball
-                     *  Hit set the x/y speed appropriately.
-                     */
-                    if( game_state!=ST_READY && !ball[k].glue &&
-                        check_lines(&misc_line, &pad_line, &pt_hit) )
-                    {
-                        /* Re-position ball based on collision */
-                        ball[k].tempy = ON_PAD_POS_Y;
-                        ball[k].tempx = pt_hit.x;
-
-                        /* Calculate the ball position relative to the paddle width */
-                        int ball_repos = pt_hit.x - pad_pos_x;
-                        /* If the ball hits the right half of paddle, x speed
-                         *  should be positive, if it hits the left half it
-                         *  should be negative.
-                         */
-                        int x_direction = -1;
-
-                        /* Comparisons are done with respect to 1/2 pad_width */
-                        if(ball_repos > pad_width/2)
+                        screen_edge.p2.x = 0;
+                        screen_edge.p2.y = GAMESCREEN_HEIGHT;
+                        if (check_lines(&misc_line, &screen_edge, &pt_hit))
                         {
-                            /* flip the relative position */
-                            ball_repos -= ((ball_repos - pad_width/2) << 1);
-                            /* Ball hit the right half so X speed calculations
-                             *  should be positive.
-                             */
-                             x_direction = 1;
-                        }
+                            /* Reverse direction */
+                            ball[k].speedx = -ball[k].speedx;
 
-                        /* Figure out where the ball hit relative to 1/2 pad
-                         *  and in divisions of 4.
-                         */
-                        ball_repos = ball_repos / (pad_width/2/4);
-
-                        switch(ball_repos)
-                        {
-                        /* Ball hit the outer edge of the paddle */
-                        case 0:
-                            ball[k].speedy = SPEED_1Q_Y;
-                            ball[k].speedx = SPEED_1Q_X * x_direction;
-                            break;
-                        /* Ball hit the next fourth of the paddle */
-                        case 1:
-                            ball[k].speedy = SPEED_2Q_Y;
-                            ball[k].speedx = SPEED_2Q_X * x_direction;
-                            break;
-                        /* Ball hit the third fourth of the paddle */
-                        case 2:
-                            ball[k].speedy = SPEED_3Q_Y;
-                            ball[k].speedx = SPEED_3Q_X * x_direction;
-                            break;
-                        /* Ball hit the fourth fourth of the paddle or dead
-                         *  center.
-                         */
-                        case 3:
-                        case 4:
-                            ball[k].speedy = SPEED_4Q_Y;
-                            /* Since this is the middle we don't want to
-                             *  force the ball in a different direction.
-                             *  Just keep it going in the same direction
-                             *  with a specific speed.
-                             */
-                            if(ball[k].speedx > 0)
-                            {
-                                ball[k].speedx = SPEED_4Q_X;
-                            }
-                            else
-                            {
-                                ball[k].speedx = -SPEED_4Q_X;
-                            }
-                            break;
-
-                        default:
-                            ball[k].speedy = SPEED_4Q_Y;
-                            break;
-                        }
-
-                        if(pad_type == STICKY)
-                        {
-                            ball[k].speedy = -ball[k].speedy;
-                            ball[k].glue=true;
-
-                            /* X location should not be forced since that is moved with the paddle.  The Y
-                             *  position should be forced to keep the ball at the paddle.
-                             */
+                            /* Re-position ball in gameboard */
+                            ball[k].tempy = pt_hit.y;
                             ball[k].tempx = 0;
+                        }
+
+                        /* Check if the ball hit the right side */
+                        screen_edge.p1.x = GAMESCREEN_WIDTH;
+                        screen_edge.p1.y = 0;
+
+                        screen_edge.p2.x = GAMESCREEN_WIDTH;
+                        screen_edge.p2.y = GAMESCREEN_HEIGHT;
+                        if (check_lines(&misc_line, &screen_edge, &pt_hit))
+                        {
+                            /* Reverse direction */
+                            ball[k].speedx = -ball[k].speedx;
+
+                            /* Re-position ball in gameboard */
+                            ball[k].tempy = pt_hit.y;
+                            ball[k].tempx = GAMESCREEN_WIDTH - FIXED3(1);
+                        }
+
+                        /* Did the ball hit the paddle? Depending on where the ball
+                         *  Hit set the x/y speed appropriately.
+                         */
+                        if(check_lines(&misc_line, &pad_line, &pt_hit) )
+                        {
+                            /* Re-position ball based on collision */
                             ball[k].tempy = ON_PAD_POS_Y;
+                            ball[k].tempx = pt_hit.x;
+
+                            /* Calculate the ball position relative to the paddle width */
+                            int ball_repos = pt_hit.x - pad_pos_x;
+                            /* If the ball hits the right half of paddle, x speed
+                             *  should be positive, if it hits the left half it
+                             *  should be negative.
+                             */
+                            int x_direction = -1;
+
+                            /* Comparisons are done with respect to 1/2 pad_width */
+                            if(ball_repos > pad_width/2)
+                            {
+                                /* flip the relative position */
+                                ball_repos -= ((ball_repos - pad_width/2) << 1);
+                                /* Ball hit the right half so X speed calculations
+                                 *  should be positive.
+                                 */
+                                x_direction = 1;
+                            }
+
+                            /* Figure out where the ball hit relative to 1/2 pad
+                             *  and in divisions of 4.
+                             */
+                            ball_repos = ball_repos / (pad_width/2/4);
+
+                            switch(ball_repos)
+                            {
+                                /* Ball hit the outer edge of the paddle */
+                                case 0:
+                                    ball[k].speedy = SPEED_1Q_Y;
+                                    ball[k].speedx = SPEED_1Q_X * x_direction;
+                                    break;
+                                    /* Ball hit the next fourth of the paddle */
+                                case 1:
+                                    ball[k].speedy = SPEED_2Q_Y;
+                                    ball[k].speedx = SPEED_2Q_X * x_direction;
+                                    break;
+                                    /* Ball hit the third fourth of the paddle */
+                                case 2:
+                                    ball[k].speedy = SPEED_3Q_Y;
+                                    ball[k].speedx = SPEED_3Q_X * x_direction;
+                                    break;
+                                    /* Ball hit the fourth fourth of the paddle or dead
+                                     *  center.
+                                     */
+                                case 3:
+                                case 4:
+                                    ball[k].speedy = SPEED_4Q_Y;
+                                    /* Since this is the middle we don't want to
+                                     *  force the ball in a different direction.
+                                     *  Just keep it going in the same direction
+                                     *  with a specific speed.
+                                     */
+                                    if(ball[k].speedx > 0)
+                                    {
+                                        ball[k].speedx = SPEED_4Q_X;
+                                    }
+                                    else
+                                    {
+                                        ball[k].speedx = -SPEED_4Q_X;
+                                    }
+                                    break;
+
+                                default:
+                                    ball[k].speedy = SPEED_4Q_Y;
+                                    break;
+                            }
+
+                            if(pad_type == STICKY)
+                            {
+                                ball[k].speedy = -ball[k].speedy;
+                                ball[k].glue=true;
+
+                                /* X location should not be forced since that is moved with the paddle.  The Y
+                                 *  position should be forced to keep the ball at the paddle.
+                                 */
+                                ball[k].tempx = 0;
+                                ball[k].tempy = ON_PAD_POS_Y;
+                            }
                         }
                     }
 
