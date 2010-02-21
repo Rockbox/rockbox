@@ -178,7 +178,73 @@ static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb)
   return(NULL);
 }
 
-// static int seq = 0;
+#ifdef CPU_ARM
+#define MAGANG( _mag, _ang )\
+{\
+      register int temp;\
+      asm( "cmp %[mag], #0\n\t"\
+           "cmpgt %[ang], #0\n\t"\
+           "subgt %[temp], %[mag], %[ang]\n\t"\
+           "bgt 1f\n\t"\
+           "cmp %[mag], #0\n\t"\
+           "cmple %[ang], #0\n\t"\
+           "addgt %[temp], %[mag], %[ang]\n\t"\
+           "suble %[temp], %[mag], %[ang]\n\t"\
+           "1: cmp %[ang], #0\n\t"\
+           "movle %[ang], %[mag]\n\t"\
+           "movle %[mag], %[temp]\n\t"\
+           "movgt %[ang], %[temp]\n\t"\
+           : [mag] "+r" ( ( _mag ) ), [ang] "+r" ( ( _ang ) ), [temp] "=&r" (temp)\
+           :\
+           : "cc" );\
+}         
+
+static inline void channel_couple(ogg_int32_t *pcmM, ogg_int32_t *pcmA, int n)
+{
+    ogg_int32_t * const pcmMend = pcmM + n/2;
+    while(LIKELY(pcmM < pcmMend))
+    {
+      register int M0 asm("r2"),M1 asm("r3"),M2 asm("r4"),M3 asm("r5");
+      register int A0 asm("r6"),A1 asm("r7"),A2 asm("r8"),A3 asm("r9");
+      asm volatile( "ldmia %[pcmM], {%[M0], %[M1], %[M2], %[M3]}\n\t"
+                    "ldmia %[pcmA], {%[A0], %[A1], %[A2], %[A3]}\n\t"
+                    : [M0] "=r" (M0), [M1] "=r" (M1), [M2] "=r" (M2), [M3] "=r" (M3),
+                      [A0] "=r" (A0), [A1] "=r" (A1), [A2] "=r" (A2), [A3] "=r" (A3)
+                    : [pcmM] "r" (pcmM), [pcmA] "r" (pcmA) );
+      MAGANG( M0, A0 );
+      MAGANG( M1, A1 );
+      MAGANG( M2, A2 );
+      MAGANG( M3, A3 );
+      asm volatile( "stmia %[pcmM]!, {%[M0], %[M1], %[M2], %[M3]}\n\t"
+                    "stmia %[pcmA]!, {%[A0], %[A1], %[A2], %[A3]}\n\t"
+                    : [pcmM] "+r" (pcmM), [pcmA] "+r" (pcmA)
+                    : [M0] "r" (M0), [M1] "r" (M1), [M2] "r" (M2), [M3] "r" (M3),
+                      [A0] "r" (A0), [A1] "r" (A1), [A2] "r" (A2), [A3] "r" (A3) );
+    }
+}    
+#else
+static inline void channel_couple(ogg_int32_t *pcmM, ogg_int32_t *pcmA, int n)
+{
+    int j;
+    for(j=0;j<n/2;j++){
+      ogg_int32_t mag = pcmM[j], ang = pcmA[j];
+      if(mag>0)
+        if(ang>0)
+          pcmA[j]=mag-ang;
+        else{
+          pcmA[j]=mag;
+          pcmM[j]=mag+ang;
+        }
+      else
+        if(ang>0)
+          pcmA[j]=mag+ang;
+        else{
+          pcmA[j]=mag;
+          pcmM[j]=mag-ang;
+        }
+    }
+}
+#endif
 
 static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
   vorbis_dsp_state     *vd=vb->vd;
@@ -249,28 +315,7 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
   for(i=info->coupling_steps-1;i>=0;i--){
     ogg_int32_t *pcmM=vb->pcm[info->coupling_mag[i]];
     ogg_int32_t *pcmA=vb->pcm[info->coupling_ang[i]];
-    
-    for(j=0;j<n/2;j++){
-      ogg_int32_t mag=pcmM[j];
-      ogg_int32_t ang=pcmA[j];
-      
-      if(mag>0)
-        if(ang>0){
-          pcmM[j]=mag;
-          pcmA[j]=mag-ang;
-        }else{
-          pcmA[j]=mag;
-          pcmM[j]=mag+ang;
-        }
-      else
-        if(ang>0){
-          pcmM[j]=mag;
-          pcmA[j]=mag+ang;
-        }else{
-          pcmA[j]=mag;
-          pcmM[j]=mag-ang;
-        }
-    }
+    channel_couple(pcmM,pcmA,n);
   }
 
   //for(j=0;j<vi->channels;j++)
