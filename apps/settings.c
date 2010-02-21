@@ -748,57 +748,52 @@ void settings_apply_skins(void)
     char buf[MAX_PATH];
     /* re-initialize the skin buffer before we start reloading skins */
     skin_buffer_init();
+    int i;
 #ifdef HAVE_LCD_BITMAP
     skin_backdrop_init();
     skin_font_init();
-    if ( global_settings.sbs_file[0] &&
-        global_settings.sbs_file[0] != 0xff )
+    FOR_NB_SCREENS(i)
     {
-        snprintf(buf, sizeof buf, SBS_DIR "/%s.sbs",
-                global_settings.sbs_file);
-        sb_skin_data_load(SCREEN_MAIN, buf, true);
-    }
-    else
-    {
-        sb_skin_data_load(SCREEN_MAIN, NULL, true);
+        const char* setting;
+#ifdef HAVE_REMOTE_LCD
+        if (i == SCREEN_REMOTE)
+            setting = global_settings.rsbs_file;
+        else
+#endif
+            setting = global_settings.sbs_file;
+        if (setting[0] && setting[0] != '-')
+        {
+            snprintf(buf, sizeof buf, SBS_DIR "/%s.%ssbs", setting,
+                      i == SCREEN_MAIN? "" : "r");
+            sb_skin_data_load(i, buf, true);
+        }
+        else
+        {
+            sb_skin_data_load(i, NULL, true);
+        }
     }
 #endif
-    if ( global_settings.wps_file[0] &&
-        global_settings.wps_file[0] != 0xff )
+    FOR_NB_SCREENS(i)
     {
-        snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
-                global_settings.wps_file);
-        wps_data_load(SCREEN_MAIN, buf, true);
-    }
-    else
-    {
-        wps_data_load(SCREEN_MAIN, NULL, true);
-    }
-#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-    if ( global_settings.rsbs_file[0] &&
-        global_settings.rsbs_file[0] != 0xff ) {
-        snprintf(buf, sizeof buf, SBS_DIR "/%s.rsbs",
-                global_settings.rsbs_file);
-        sb_skin_data_load(SCREEN_REMOTE, buf, true);
-    }
-    else
-    {
-        sb_skin_data_load(SCREEN_REMOTE, NULL, true);
-    }
-    if ( global_settings.rwps_file[0])
-    {
-        snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
-                global_settings.rwps_file);
-        wps_data_load(SCREEN_REMOTE, buf, true);
-    }
-    else
-    {
-        wps_data_load(SCREEN_REMOTE, NULL, true);
-    }
+        const char* setting = global_settings.wps_file;
+#ifdef HAVE_REMOTE_LCD
+        if (i == SCREEN_REMOTE)
+            setting = global_settings.rsbs_file;
 #endif
+        if (setting[0] && setting[0] != '-')
+        {
+            snprintf(buf, sizeof buf, WPS_DIR "/%s.%swps", setting,
+                    i == SCREEN_MAIN? "" : "r");
+            wps_data_load(SCREEN_MAIN, buf, true);
+        }
+        else
+        {
+            wps_data_load(SCREEN_MAIN, NULL, true);
+        }
+    }
+
     viewportmanager_theme_changed(THEME_STATUSBAR);
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    int i;
     FOR_NB_SCREENS(i)
         screens[i].backdrop_show(sb_get_backdrop(i));
 #endif
