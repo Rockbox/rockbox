@@ -420,6 +420,13 @@ static int cat_playlist_callback(int action,
     {
         return ACTION_EXIT_MENUITEM;
     }
+#ifdef HAVE_TAGCACHE
+    if (context == CONTEXT_ID3DB &&
+        ((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO))
+    {
+        return ACTION_EXIT_MENUITEM;
+    }
+#endif
 
     switch (action)
     {
@@ -428,9 +435,8 @@ static int cat_playlist_callback(int action,
             {
                 return action;
             }
-            else if (((audio_status() & AUDIO_STATUS_PLAY &&
-                      context == CONTEXT_WPS) ||
-                      context == CONTEXT_TREE))
+            else if ((audio_status() & AUDIO_STATUS_PLAY) ||
+                     context != CONTEXT_WPS)
             {
                 return action;
             }
@@ -1062,7 +1068,13 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
 #endif
 #ifdef HAVE_TAGCACHE
             if (context == CONTEXT_ID3DB)
+            {
+                if (((selected_file_attr & FILE_ATTR_MASK) ==
+                        FILE_ATTR_AUDIO) &&
+                    this_item == &properties_item)
+                    return action;
                 return ACTION_EXIT_MENUITEM;
+            }
 #endif
             if (this_item == &clipboard_paste_item)
             {  /* visible if there is something to paste */
