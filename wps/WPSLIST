@@ -73,8 +73,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
-ui viewport: -
-remote ui viewport: -
+ui viewport:
+remote ui viewport:
 </wps>
 
 <wps>
@@ -89,8 +89,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
-ui viewport: -
-remote ui viewport: -
+ui viewport:
+remote ui viewport:
 </wps>
 
 <wps>
@@ -105,8 +105,8 @@ iconset:
 viewers iconset:
 selector type: bar (inverse)
 Statusbar: top
-ui viewport: -
-remote ui viewport: -
+ui viewport:
+remote ui viewport:
 </wps>
 
 <wps>
@@ -174,8 +174,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
-ui viewport: -
-remote ui viewport: -
+ui viewport:
+remote ui viewport:
 </wps>
 
 <rwps>
@@ -211,8 +211,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
-ui viewport: -
-remote ui viewport: -
+ui viewport:
+remote ui viewport:
 </wps>
 
 <rwps>
@@ -237,8 +237,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
-ui viewport: -
-remote ui viewport: -
+ui viewport:
+remote ui viewport:
 </wps>
 
 <rwps>
@@ -274,8 +274,8 @@ backdrop:
 iconset:
 viewers iconset:
 selector type: bar (inverse)
-ui viewport: -
-remote ui viewport: -
+ui viewport:
+remote ui viewport:
 </wps>
 
 <wps>
@@ -313,7 +313,7 @@ background color: 000000
 line selector start color: fde89e
 line selector end color: b58c00
 line selector text color: 000000
-filetype colours: -
+filetype colours:
 
 #backdrop - remember this is the source file name in your SVN folder, not dest name!
 backdrop.320x240x16: backdrops/cabbiev2.320x240x16.bmp
@@ -372,8 +372,8 @@ Statusbar: top
 remote statusbar: top
 
 # list & remote ui viewports
-ui viewport: -
-remote ui viewport: -
+ui viewport:
+remote ui viewport:
 </wps>
 
 <rwps>

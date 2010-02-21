@@ -274,7 +274,7 @@ MOO
             push @out, "sbs: /$rbdir/wps/$sbs\n";
         }
     }
-    if(defined($sbs)  && $has_remote) {
+    if(defined($rsbs)  && $has_remote) {
         if ($rsbs eq '') {
             push @out, "rsbs: -\n";
         } else {
@@ -282,7 +282,11 @@ MOO
         }
     }
     if($font) {
-        push @out, "font: /$rbdir/fonts/$font\n";
+        if ($font eq '') {
+            push @out, "font: -\n";
+        } else {
+            push @out, "font: /$rbdir/fonts/$font\n";
+        }
     }
     if($fgcolor && $main_depth > 2) {
         push @out, "foreground color: $fgcolor\n";
@@ -315,25 +319,49 @@ MOO
         push @out, "selector type: $selecttype\n";
     }
     if(defined($iconset)) {
-        push @out, "iconset: $iconset\n";
+        if ($iconset eq '') {
+            push @out, "iconset: -\n";
+        } else {
+            push @out, "iconset: $iconset\n";
+        }
     }
     if(defined($viewericon)) {
-        push @out, "viewers iconset: $viewericon\n";
+        if ($viewericon eq '') {
+            push @out, "viewers iconset: -\n";
+        } else {
+            push @out, "viewers iconset: $viewericon\n";
+        }
     }
     if($lineselecttextcolor && $main_depth > 2 ) {
         push @out, "line selector text color: $lineselecttextcolor\n";
     }
     if($filetylecolor && $main_depth > 2) {
-        push @out, "filetype colours: $filetylecolor\n";
+        if ($filetylecolor eq '') {
+            push @out, "filetype colours: -\n";
+        } else {
+            push @out, "filetype colours: $filetylecolor\n";
+        }
     }
     if($rwps && $has_remote ) {
-        push @out, "rwps: /$rbdir/wps/$rwps\n";
+        if ($rwps eq '') {
+            push @out, "rwps: -\n";
+        } else {
+            push @out, "rwps: /$rbdir/wps/$rwps\n";
+        }
     }
     if(defined($listviewport)) {
-        push @out, "ui viewport: $listviewport\n";
+        if ($listviewport eq '') {
+            push @out, "ui viewport: -\n";
+        } else {
+            push @out, "ui viewport: $listviewport\n";
+        }
     }
     if(defined($remotelistviewport) && $has_remote) {
-        push @out, "remote ui viewport: $listviewport\n";
+        if ($remotelistviewport eq '') {
+            push @out, "remote ui viewport: -\n";
+        } else {
+            push @out, "remote ui viewport: $listviewport\n";
+        }
     }
     if(-f "$rbdir/wps/$cfg") {
         print STDERR "wpsbuild warning: wps/$cfg already exists!\n";
