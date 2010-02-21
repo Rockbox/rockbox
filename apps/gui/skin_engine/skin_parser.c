@@ -1986,7 +1986,6 @@ static void skin_data_reset(struct wps_data *wps_data)
 static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char* bmpdir)
 {
     (void)wps_data; /* only needed for remote targets */
-    bool loaded = false;
     char img_path[MAX_PATH];
     get_image_filename(bitmap->data, bmpdir,
                        img_path, sizeof(img_path));
@@ -2008,19 +2007,19 @@ static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char
     if (ret > 0)
     {
         skin_buffer_increment(ret, true);
-        loaded = true;
+        return true;
     }
     else
     {
         /* Abort if we can't load an image */
-        loaded = false;
+        return false;
     }
-    return loaded;
 }
 
 static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
 {
     struct skin_token_list *list;
+    bool retval = true; /* return false if a single image failed to load */
     /* do the progressbars */
     list = wps_data->progressbars;
     while (list)
@@ -2029,6 +2028,8 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
         if (pb->bm.data)
         {
             pb->have_bitmap_pb = load_skin_bmp(wps_data, &pb->bm, bmpdir);
+            if (!pb->have_bitmap_pb) /* no success */
+                retval = false;
         }
         list = list->next;
     }
@@ -2042,6 +2043,8 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
             img->loaded = load_skin_bmp(wps_data, &img->bm, bmpdir);
             if (img->loaded)
                 img->subimage_height = img->bm.height / img->num_subimages;
+            else
+                retval = false;
         }
         list = list->next;
     }
@@ -2053,13 +2056,15 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
      */
     if (wps_data->backdrop)
     {
+        bool needed = wps_data->backdrop[0] != '-';
         wps_data->backdrop = skin_backdrop_load(wps_data->backdrop, 
                                                bmpdir, curr_screen);
+        if (!wps_data->backdrop && needed)
+            retval = false;
     }
 #endif /* has backdrop support */
 
-    /* If we got here, everything was OK */
-    return true;
+    return retval;
 }
 
 #endif /* HAVE_LCD_BITMAP */

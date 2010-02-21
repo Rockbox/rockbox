@@ -62,7 +62,7 @@ char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen)
     else
 #endif
         buf_size = LCD_BACKDROP_BYTES;
-    
+
     if (backdrop[0] == '-')
     {
 #if NB_SCREENS > 1
@@ -73,7 +73,8 @@ char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen)
         else
 #endif
         {
-            if (!global_settings.backdrop_file[0])
+            char settings_bdrop = global_settings.backdrop_file[0];
+            if (settings_bdrop == '\0' || settings_bdrop == '-')
             {
                 return NULL; /* backdrop setting not set */
             }
