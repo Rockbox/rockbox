@@ -252,7 +252,7 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     ce->d_name = "..";
     ce->name_len = 3;
     ce->attribute = FAT_ATTR_DIRECTORY;
-    ce->startcluster = first_ce->up->startcluster;
+    ce->startcluster = (first_ce->up ? first_ce->up->startcluster : 0);
     ce->size = 0;
     ce->down = first_ce->up;
     
