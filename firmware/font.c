@@ -98,6 +98,9 @@ void font_init(void)
     while (i<MAXFONTS)
         sysfonts[i++] = NULL;
     font_reset(NULL);
+#ifdef HAVE_REMOTE_LCD
+    font_reset(&remote_font_ui);
+#endif
 }
 
 /* Check if we have x bytes left in the file buffer */

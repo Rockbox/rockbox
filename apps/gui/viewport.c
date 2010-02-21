@@ -457,11 +457,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
      * font 1 is *always* the UI font for the current screen
      * 2 is always the first extra font    */
     if (!LIST_VALUE_PARSED(set, PL_FONT))
-        vp->font = FONT_UI + screen;
-#ifdef HAVE_REMOTE_LCD
-    else if (vp->font == FONT_UI && screen == SCREEN_REMOTE)
-        vp->font = FONT_UI_REMOTE;
-#endif
+        vp->font = FONT_UI;
 
     /* Set the defaults for fields not user-specified */
     vp->drawmode = DRMODE_SOLID;

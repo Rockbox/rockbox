@@ -184,8 +184,8 @@ void sb_create_from_settings(enum screen_type screen)
             default:
                 height = screens[screen].lcdheight;
         }
-        len = snprintf(ptr, remaining, "%%ax%%Vi|0|%d|-|%d|%d|-|-|\n", 
-                       y, height, FONT_UI + screen);
+        len = snprintf(ptr, remaining, "%%ax%%Vi|0|%d|-|%d|1|-|-|\n", 
+                       y, height);
     }
     sb_skin_data_load(screen, buf, false);
 }

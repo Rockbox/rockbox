@@ -930,6 +930,11 @@ static int parse_viewport(const char *wps_bufptr,
     else
         vp->flags &= ~VP_FLAG_ALIGN_RIGHT; /* ignore right-to-left languages */
 
+#ifdef HAVE_REMOTE_LCD
+    if (vp->font == FONT_UI && curr_screen == SCREEN_REMOTE)
+        vp->font = FONT_UI_REMOTE;
+    else
+#endif
     if (vp->font > FONT_UI)
         vp->font = font_ids[vp->font - FONT_UI];
 
