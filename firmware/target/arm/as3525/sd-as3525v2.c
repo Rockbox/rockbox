@@ -43,6 +43,7 @@
 #include <stdarg.h>
 #include "sysfont.h"
 
+/* debug helper */
 static int line = 0;
 static void printf(const char *format, ...)
 {
@@ -61,85 +62,18 @@ static void printf(const char *format, ...)
 }
 
 /* command flags */
-#define MCI_NO_RESP    (0<<0)
+#define MCI_NO_RESP     (0<<0)
 #define MCI_RESP        (1<<0)
 #define MCI_LONG_RESP   (1<<1)
 
 /* controller registers */
 #define SD_BASE 0xC6070000
 
-/*
- *  STATUS register
- *  & 0xBA80    = MCI_INT_DCRC | MCI_INT_DRTO | MCI_INT_FRUN | \
- *                  MCI_INT_HLE | MCI_INT_SBE | MCI_INT_EBE
- *  & 8         = MCI_INT_DTO
- *  & 0x428     = MCI_INT_DTO | MCI_INT_RXDR | MCI_INT_HTO
- *  & 0x418     = MCI_INT_DTO | MCI_INT_TXDR | MCI_INT_HTO
- */
-
-/*
- *  INFO on CMD register
- *
- * if(cmd >= 200) cmd -= 200; (>= 200 = acmd?)
- *
- *          COMMANDS        (| (x<<16)        BITS                          RESPONSE
- *
- * 1    ? reserved                  & ~0x80, | 0x40, | 0x8000               ?
- * 5    ? reserved for I/O cards    & ~0x80, | 0x40                         ?
- * 11   ? reserved                  & ~0x80, | 0x40, | 0x2200, | 0x800      ?
- * 14   ? reserved                  & ~0x80, | 0x40, | 0x2200, ~0x1000      ?
- * 19   ? reserved                  & ~0x80, |0x40, | 0x2700, & ~0x1000     ?
- * 20   ? reserved                  & ~0x80, |0x40, | 0x2700, | 0x800       ?
- * 23   ? reserved                  & ~0x80, | 0x40                         ?
- * 39   ? reserved                  & ~0x80, | 0x40                         ?
- * 51   ? reserved                  & ~0x80, | 0x40, | 0x2000, | 0x200      ?
- * 52   ? reserved for I/O          & ~0x80, | 0x40                         ?
- * 53   ? reserved for I/O          & ~0x80, | 0x40, | 0x2200, & ~0x1000    ?
- * 253  ?                           & ~0x80, |0x40, | 0x2700, & ~0x1000     ?
- *
- * 0    GO IDLE STATE               & ~0x4000, & ~0xC0, | 0x4000            no
- * 2    ALL SEND CID                & ~0x4000, |0xC0                        r2
- * 3    SEND RCA                    & ~0x80, | 0x40                         r6
- * 6    SWITCH_FUNC                 & ~0x80, | 0x40                         r1
- * 7    SELECT CARD                 & ~0x80, | 0x40                         r1b
- * 8    SEND IF COND                & ~0x80, | 0x40, | 0x2200, & ~0x1000    r7
- * 9    SEND CSD                    & ~0x4000, | 0xc0                       r2
- * 12   STOP TRANSMISSION           & ~0x80, | 0x40, | 0x4000               r1b
- * 13   SEND STATUS                 & ~0x80, | 0x40                         r1
- * 15   GO INACTIVE STATE           & ~0x4000, & ~0xC0                      no
- * 16   SET BLOCKLEN                & ~0x80, | 0x40                         r1
- * 17   READ SINGLE BLOCK           & ~0x80, | 0x40, | 0x2200               r1
- * 18   READ MULTIPLE BLOCK         & ~0x80, | 0x40, | 0x2200               r1
- * 24   WRITE BLOCK                 & ~0x80, |0x40, | 0x2700                r1
- * 25   WRITE MULTIPLE BLOCK        & ~0x80, |0x40, | 0x2700                r1
- * 41   SEND APP OP COND            & ~0x80, | 0x40                         r3
- * 42   LOCK UNLOCK                 & ~0x80, |0x40, | 0x2700                r1
- * 55   APP CMD                     & ~0x80, | 0x40                         r1
- * 206  SET BUS WIDTH               & ~0x80, | 0x40, | 0x2000               r1
- * 207  SELECT CARD ?               & ~0x4000, & ~0xC0                      r1b
- *
- *
- * bits 5:0 = cmd
- * bit 6 (0x40) = response
- * bit 7 (0x80) = long response
- *      => like pl180 <=
- *                              BIT SET IN COMANDS:
- *
- * bit 8  (0x100) ?     write block, write multi_block, lock/unlock
- * bit 9  (0x200) ?     send if cond, read block, read multi_block, write block, write multi_block, lock/unlock
- * bit 10 (0x400) ?     write block, write multi_block, lock/unlock
- * bit 11 (0x800) ?
- * bit 12 (0x1000) ?
- * bit 13 (0x2000) ?    send if cond, read block, read multi_block, write block, write multi_block, lock/unlock, set bus width
- * bit 14 (0x4000) ?    go idle state, stop transmission
- * bit 15 (0x8000) ?
- *
- */
-
 #define SD_REG(x)       (*(volatile unsigned long *) (SD_BASE+x))
 
 #define MCI_CTRL        SD_REG(0x00)
 
+/* control bits */
 #define CTRL_RESET      (1<<0)
 #define FIFO_RESET      (1<<1)
 #define DMA_RESET       (1<<2)
@@ -169,6 +103,23 @@ static void printf(const char *format, ...)
 #define MCI_ARGUMENT    SD_REG(0x28)
 #define MCI_COMMAND     SD_REG(0x2C)
 
+/* command bits (bits 5:0 are the command index) */
+#define CMD_RESP_EXP_BIT        (1<<6)
+#define CMD_RESP_LENGTH_BIT     (1<<7)
+#define CMD_CHECK_CRC_BIT       (1<<8)
+#define CMD_DATA_EXP_BIT        (1<<9)
+#define CMD_RW_BIT              (1<<10)
+#define CMD_TRANSMODE_BIT       (1<<11)
+#define CMD_SENT_AUTO_STOP_BIT  (1<<12)
+#define CMD_WAIT_PRV_DAT_BIT    (1<<13)
+#define CMD_ABRT_CMD_BIT        (1<<14)
+#define CMD_SEND_INIT_BIT       (1<<15)
+#define CMD_SEND_CLK_ONLY       (1<<21)
+#define CMD_READ_CEATA          (1<<22)
+#define CMD_CCS_EXPECTED        (1<<23)
+#define CMD_DONE_BIT            (1<<31)
+
+
 #define MCI_RESP0       SD_REG(0x30)
 #define MCI_RESP1       SD_REG(0x34)
 #define MCI_RESP2       SD_REG(0x38)
@@ -178,6 +129,15 @@ static void printf(const char *format, ...)
 #define MCI_RAW_STATUS  SD_REG(0x44)    /* raw interrupt status, also used as
                                          * status clear */
 #define MCI_STATUS      SD_REG(0x48)
+
+/*
+ *  STATUS register
+ *  & 0xBA80    = MCI_INT_DCRC | MCI_INT_DRTO | MCI_INT_FRUN | \
+ *                  MCI_INT_HLE | MCI_INT_SBE | MCI_INT_EBE
+ *  & 8         = MCI_INT_DTO
+ *  & 0x428     = MCI_INT_DTO | MCI_INT_RXDR | MCI_INT_HTO
+ *  & 0x418     = MCI_INT_DTO | MCI_INT_TXDR | MCI_INT_HTO
+ */
 
 /* interrupt bits */
 #define MCI_INT_CRDDET  (1<<0)
@@ -221,13 +181,6 @@ static void printf(const char *format, ...)
 #define MCI_ERROR 0     /* FIXME */
 
 #define MCI_FIFO        ((unsigned long *) (SD_BASE+0x100))
-
-#define MCI_COMMAND_ENABLE          (1<<31)
-#define MCI_COMMAND_ACTIVE          MCI_COMMAND_ENABLE
-#define MCI_COMMAND_RESPONSE        (1<<6)
-#define MCI_COMMAND_LONG_RESPONSE   (1<<7)
-
-
 
 static int sd_init_card(void);
 static void init_controller(void);
@@ -318,41 +271,43 @@ static bool send_cmd(const int cmd, const int arg, const int flags,
         unsigned long *response)
 {
     int val;
-    val = cmd | MCI_COMMAND_ENABLE;
+    val = cmd | CMD_DONE_BIT;
     if(flags & MCI_RESP)
     {
-        val |= MCI_COMMAND_RESPONSE;
+        val |= CMD_RESP_EXP_BIT;
         if(flags & MCI_LONG_RESP)
-            val |= MCI_COMMAND_LONG_RESPONSE;
+            val |= CMD_RESP_LENGTH_BIT;
     }
 
-    if(cmd == 18)       /* r */
-        val |= 0x2200;
-    else if(cmd == 25)  /* w */
-        val |= 0x2700;
+    if(cmd == SD_READ_MULTIPLE_BLOCK || cmd == SD_WRITE_MULTIPLE_BLOCK)
+    {
+        val |= CMD_WAIT_PRV_DAT_BIT | CMD_DATA_EXP_BIT;
+        if(cmd == SD_WRITE_MULTIPLE_BLOCK)
+            val |= CMD_RW_BIT | CMD_CHECK_CRC_BIT;
+    }
 
     int tmp = MCI_CLKENA;
     MCI_CLKENA = 0;
 
-    MCI_COMMAND = 0x80202000;
+    MCI_COMMAND = CMD_DONE_BIT|CMD_SEND_CLK_ONLY|CMD_WAIT_PRV_DAT_BIT;
     MCI_ARGUMENT = 0;
     int max = 10;
-    while(max-- && MCI_COMMAND & MCI_COMMAND_ACTIVE);
+    while(max-- && MCI_COMMAND & CMD_DONE_BIT);
 
     MCI_CLKDIV &= ~0xff;
     MCI_CLKDIV |= 0;
 
-    MCI_COMMAND = 0x80202000;
+    MCI_COMMAND = CMD_DONE_BIT|CMD_SEND_CLK_ONLY|CMD_WAIT_PRV_DAT_BIT;
     MCI_ARGUMENT = 0;
     max = 10;
-    while(max-- && MCI_COMMAND & MCI_COMMAND_ACTIVE);
+    while(max-- && MCI_COMMAND & CMD_DONE_BIT);
 
     MCI_CLKENA = tmp;
 
-    MCI_COMMAND = 0x80202000;
+    MCI_COMMAND = CMD_DONE_BIT|CMD_SEND_CLK_ONLY|CMD_WAIT_PRV_DAT_BIT;
     MCI_ARGUMENT = 0;
     max = 10;
-    while(max-- && MCI_COMMAND & MCI_COMMAND_ACTIVE);
+    while(max-- && MCI_COMMAND & CMD_DONE_BIT);
 
     mci_delay();
 
@@ -362,7 +317,7 @@ static bool send_cmd(const int cmd, const int arg, const int flags,
     MCI_CTRL |= INT_ENABLE;
 
     max = 1000;
-    while(max-- && MCI_COMMAND & MCI_COMMAND_ACTIVE); /* wait for cmd completion */
+    while(max-- && MCI_COMMAND & CMD_DONE_BIT); /* wait for cmd completion */
     if(!max)
         return false;
 
@@ -538,9 +493,9 @@ static void init_controller(void)
     MCI_CLKENA = (1<<shift) - 1;
 
     MCI_ARGUMENT = 0;
-    MCI_COMMAND = 0x80202000;
+    MCI_COMMAND = CMD_DONE_BIT|CMD_SEND_CLK_ONLY|CMD_WAIT_PRV_DAT_BIT;
     int max = 10;
-    while(max-- && (MCI_COMMAND & (1<<31))) ;
+    while(max-- && (MCI_COMMAND & CMD_DONE_BIT)) ;
 
     MCI_DEBNCE = 0xfffff;   /* default value */
 
