@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
     char filename[15];
     int fd_out;
 #endif
-    int16_t outbuf[2048];
+    int32_t outbuf[2048];
     uint16_t fs,sps,h;
     uint32_t packet_count;
     COOKContext q;

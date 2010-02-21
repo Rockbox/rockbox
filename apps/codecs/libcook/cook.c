@@ -598,7 +598,7 @@ decode_bytes_and_gain(COOKContext *q, const uint8_t *inbuffer,
 static void
 mlt_compensate_output(COOKContext *q, REAL_T *decode_buffer,
                       cook_gains *gains, REAL_T *previous_buffer,
-                      int16_t *out, int chan)
+                      int32_t *out, int chan)
 {
     REAL_T *buffer = q->mono_mdct_output;
     int i;
@@ -618,7 +618,9 @@ mlt_compensate_output(COOKContext *q, REAL_T *decode_buffer,
     memcpy(previous_buffer, buffer+q->samples_per_channel,
            sizeof(REAL_T)*q->samples_per_channel);
 
-    output_math(q, out, chan);
+    /* Copy output to non-interleaved sample buffer */
+    memcpy(out + (chan * q->samples_per_channel), buffer,
+           sizeof(REAL_T)*q->samples_per_channel);
 }
 
 
@@ -634,7 +636,7 @@ mlt_compensate_output(COOKContext *q, REAL_T *decode_buffer,
 
 
 static int decode_subpacket(COOKContext *q, const uint8_t *inbuffer,
-                            int sub_packet_size, int16_t *outbuffer) {
+                            int sub_packet_size, int32_t *outbuffer) {
     /* packet dump */
 //    for (i=0 ; i<sub_packet_size ; i++) {
 //        DEBUGF("%02x", inbuffer[i]);
@@ -666,7 +668,7 @@ static int decode_subpacket(COOKContext *q, const uint8_t *inbuffer,
                                   q->mono_previous_buffer2, outbuffer, 1);
         }
     }
-    return q->samples_per_frame * sizeof(int16_t);
+    return q->samples_per_frame * sizeof(int32_t);
 }
 
 
@@ -677,7 +679,7 @@ static int decode_subpacket(COOKContext *q, const uint8_t *inbuffer,
  */
 
 int cook_decode_frame(RMContext *rmctx,COOKContext *q,
-            int16_t *outbuffer, int *data_size,
+            int32_t *outbuffer, int *data_size,
             const uint8_t *inbuffer, int buf_size) {
     //COOKContext *q = avctx->priv_data;
     //COOKContext *q;

@@ -79,28 +79,28 @@ static inline FIXP fixp_pow2_neg(FIXP x, int i)
 #else
 static inline FIXP fixp_mult_su(FIXP a, FIXPU b)
 {
-    int32_t hb = (a >> 16) * b; 	 
-    uint32_t lb = (a & 0xffff) * b; 	 
+    int32_t hb = (a >> 16) * b;      
+    uint32_t lb = (a & 0xffff) * b;      
 
-    return hb + (lb >> 16) + ((lb & 0x8000) >> 15); 	 
+    return hb + (lb >> 16) + ((lb & 0x8000) >> 15);      
 }
 #endif
 
 /* Faster version of the above using 32x32=64 bit multiply */
 #ifdef ROCKBOX
 #define fixmul31(x,y) (MULT31(x,y))
-#else 	 
-static inline int32_t fixmul31(int32_t x, int32_t y) 	 
-{ 	 
-    int64_t temp; 	 
+#else    
+static inline int32_t fixmul31(int32_t x, int32_t y)     
+{    
+    int64_t temp;    
 
-    temp = x; 	 
-    temp *= y; 	 
+    temp = x;    
+    temp *= y;   
 
-    temp >>= 31;        //16+31-16 = 31 bits 	 
+    temp >>= 31;        //16+31-16 = 31 bits     
     
-    return (int32_t)temp; 	 
-} 	 
+    return (int32_t)temp;    
+}    
 #endif
 
 /**
@@ -166,7 +166,8 @@ static void scalar_dequant_math(COOKContext *q, int index,
  */
 #include "../lib/mdct_lookup.h"
 
-static inline void imlt_math(COOKContext *q, FIXP *in)
+void imlt_math(COOKContext *q, FIXP *in) ICODE_ATTR;
+void imlt_math(COOKContext *q, FIXP *in)
 {
     const int n = q->samples_per_channel;
     const int step = 2 << (10 - av_log2(n));
@@ -203,7 +204,8 @@ static inline void imlt_math(COOKContext *q, FIXP *in)
  * @param gain              gain correction to apply first to output buffer
  * @param buffer            data to overlap
  */
-static inline void overlap_math(COOKContext *q, int gain, FIXP buffer[])
+void overlap_math(COOKContext *q, int gain, FIXP buffer[]) ICODE_ATTR;
+void overlap_math(COOKContext *q, int gain, FIXP buffer[])
 {
     int i;
 #ifdef ROCKBOX
@@ -279,34 +281,4 @@ interpolate_math(COOKContext *q, register FIXP* buffer,
 static inline FIXP cplscale_math(FIXP x, int table, int i)
 {
   return fixp_mult_su(x, cplscales[table-2][i]);
-}
-
-
-/**
- * Final converion from floating point values to
- * signed, 16 bit sound samples. Round and clip.
- *
- * @param q                 pointer to the COOKContext
- * @param out               pointer to the output buffer
- * @param chan              0: left or single channel, 1: right channel
- */
-static inline void output_math(COOKContext *q, register int16_t *out, int chan)
-{
-#ifdef ROCKBOX
-    register REAL_T * mono_output_ptr = q->mono_mdct_output;
-    register REAL_T * mono_output_end = mono_output_ptr + q->samples_per_channel;
-    out += chan;
-    const int STEP = q->nb_channels;
-    while( mono_output_ptr < mono_output_end )
-    {
-      *out = CLIP_TO_15(fixp_pow2_neg(*mono_output_ptr++, 11));
-      out += STEP;
-    }
-#else
-    int j;
-    for (j = 0; j < q->samples_per_channel; j++) {
-        out[chan + q->nb_channels * j] =
-        av_clip(fixp_pow2(q->mono_mdct_output[j], -11), -32768, 32767);
-    }
-#endif
 }
