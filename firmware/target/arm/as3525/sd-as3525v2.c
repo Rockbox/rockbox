@@ -138,6 +138,20 @@ static void printf(const char *format, ...)
 #define SD_REG(x)       (*(volatile unsigned long *) (SD_BASE+x))
 
 #define MCI_CTRL        SD_REG(0x00)
+
+#define CTRL_RESET      (1<<0)
+#define FIFO_RESET      (1<<1)
+#define DMA_RESET       (1<<2)
+#define INT_ENABLE      (1<<4)
+#define DMA_ENABLE      (1<<5)
+#define READ_WAIT       (1<<6)
+#define SEND_IRQ_RESP   (1<<7)
+#define ABRT_READ_DATA  (1<<8)
+#define SEND_CCSD       (1<<9)
+#define SEND_AS_CCSD    (1<<10)
+#define EN_OD_PULLUP    (1<<24)
+
+
 #define MCI_PWREN       SD_REG(0x04)    /* power enable */
 #define MCI_CLKDIV      SD_REG(0x08)    /* clock divider */
 #define MCI_CLKSRC      SD_REG(0x0C)    /* clock source */
@@ -217,7 +231,7 @@ static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
 void INT_NAND(void)
 {
-    MCI_CTRL &= ~0x10;   // ?
+    MCI_CTRL &= INT_ENABLE;
     const int status = MCI_STATUS;
 
 #if 0
@@ -265,7 +279,7 @@ void INT_NAND(void)
     //while(!button_read_device());
     //while(button_read_device());
 
-    MCI_CTRL |= 0x10;    // ?
+    MCI_CTRL |= INT_ENABLE;
 }
 
 static bool send_cmd(const int cmd, const int arg, const int flags,
@@ -313,7 +327,7 @@ static bool send_cmd(const int cmd, const int arg, const int flags,
     MCI_ARGUMENT = arg;
     MCI_COMMAND = val;
 
-    MCI_CTRL |= 0x10;
+    MCI_CTRL |= INT_ENABLE;
 
     max = 1000;
     while(max-- && MCI_COMMAND & MCI_COMMAND_ACTIVE); /* wait for cmd completion */
@@ -479,22 +493,21 @@ static void init_controller(void)
 
     mci_delay();
 
-    MCI_CTRL |= 1;
-    int max = 1000;
-    while(max-- && !(MCI_CTRL & 1))
+    MCI_CTRL |= CTRL_RESET;     /* FIXME: FIFO & DMA reset? */
+    while(MCI_CTRL & CTRL_RESET)
         ;
 
     MCI_RAW_STATUS = 0xffffffff;
     MCI_MASK = 0xffffbffe;
 
-    MCI_CTRL |= 0x10;
+    MCI_CTRL |= INT_ENABLE;
     MCI_TMOUT = 0xffffffff;
 
     MCI_CLKENA = (1<<shift) - 1;
 
     MCI_ARGUMENT = 0;
     MCI_COMMAND = 0x80202000;
-    max = 10;
+    int max = 10;
     while(max-- && (MCI_COMMAND & (1<<31))) ;
 
     MCI_DEBNCE = 0xfffff;
@@ -654,18 +667,20 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
             write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
 
 
-        MCI_CTRL |= 2;
-        while(MCI_CTRL & 2) ;
+        MCI_CTRL |= FIFO_RESET;
+        while(MCI_CTRL & FIFO_RESET)
+            ;
 
         //MCI_BLKSIZ = 512;
         MCI_BYTCNT = transfer * 512;
 
-        MCI_CTRL |= 2;
-        while(MCI_CTRL & 2) ;
+        MCI_CTRL |= FIFO_RESET;
+        while(MCI_CTRL & FIFO_RESET)
+            ;
 
         MCI_FIFOTH &= ~0x7fff0fff;
 
-        MCI_CTRL |= 0x20;
+        MCI_CTRL |= DMA_ENABLE;
         MCI_MASK = 0xBE8C;
         MCI_FIFOTH |= 0x503f0080;
 
