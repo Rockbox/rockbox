@@ -2935,6 +2935,9 @@ fi
 if test -n "$ccache"; then
   cmdline="--ccache "
 fi
+if [ "$ARG_ARM_EABI" = "1" ]; then
+  cmdline="$cmdline--eabi "
+fi
 
 cmdline="$cmdline--target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts"
 ### end of cmdline
