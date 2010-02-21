@@ -140,24 +140,27 @@ static void printf(const char *format, ...)
  */
 
 /* interrupt bits */
-#define MCI_INT_CRDDET  (1<<0)
-#define MCI_INT_RE      (1<<1)
-#define MCI_INT_CD      (1<<2)
-#define MCI_INT_DTO     (1<<3)
-#define MCI_INT_TXDR    (1<<4)
-#define MCI_INT_RXDR    (1<<5)
-#define MCI_INT_RCRC    (1<<6)
-#define MCI_INT_DCRC    (1<<7)
-#define MCI_INT_RTO     (1<<8)
-#define MCI_INT_DRTO    (1<<9)
-#define MCI_INT_HTO     (1<<10)
-#define MCI_INT_FRUN    (1<<11)
-#define MCI_INT_HLE     (1<<12)
-#define MCI_INT_SBE     (1<<13)
-#define MCI_INT_ACD     (1<<14)
-#define MCI_INT_EBE     (1<<15)
+#define MCI_INT_CRDDET  (1<<0)      /* card detect */
+#define MCI_INT_RE      (1<<1)      /* response error */
+#define MCI_INT_CD      (1<<2)      /* command done */
+#define MCI_INT_DTO     (1<<3)      /* data transfer over */
+#define MCI_INT_TXDR    (1<<4)      /* tx fifo data request */
+#define MCI_INT_RXDR    (1<<5)      /* rx fifo data request */
+#define MCI_INT_RCRC    (1<<6)      /* response crc error */
+#define MCI_INT_DCRC    (1<<7)      /* data crc error */
+#define MCI_INT_RTO     (1<<8)      /* response timeout */
+#define MCI_INT_DRTO    (1<<9)      /* data read timeout */
+#define MCI_INT_HTO     (1<<10)     /* data starv timeout */
+#define MCI_INT_FRUN    (1<<11)     /* fifo over/underrun */
+#define MCI_INT_HLE     (1<<12)     /* hw locked while error */
+#define MCI_INT_SBE     (1<<13)     /* start bit error */
+#define MCI_INT_ACD     (1<<14)     /* auto command done */
+#define MCI_INT_EBE     (1<<15)     /* end bit error */
 #define MCI_INT_SDIO    (0xf<<16)
 
+#define MCI_ERROR   (MCI_INT_RE | MCI_INT_RCRC | MCI_INT_DCRC | MCI_INT_RTO \
+                   | MCI_INT_DRTO | MCI_INT_HTO | MCI_INT_FRUN | MCI_INT_HLE \
+                   | MCI_INT_SBE | MCI_INT_EBE)
 
 #define MCI_FIFOTH      SD_REG(0x4C)    /* FIFO threshold */
 /* TX watermark :    bits 11:0
@@ -188,8 +191,6 @@ static void printf(const char *format, ...)
 #define MCI_DSCADDR     SD_REG(0x94)    /* current host descriptor address */
 #define MCI_BUFADDR     SD_REG(0x98)    /* current host buffer address */
 
-#define MCI_ERROR 0     /* FIXME */
-
 #define MCI_FIFO        ((unsigned long *) (SD_BASE+0x100))
 
 static int sd_init_card(void);
@@ -218,61 +219,15 @@ static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
 void INT_NAND(void)
 {
-    MCI_CTRL &= INT_ENABLE;
-    const int status = MCI_STATUS;
+    MCI_CTRL &= ~INT_ENABLE;
+    const int status = MCI_MASK_STATUS;
 
-#if 0
+    MCI_RAW_STATUS = status;    /* clear status */
+
     if(status & MCI_ERROR)
         retry = true;
-#endif
-
-//    wakeup_signal(&transfer_completion_signal);
-    MCI_RAW_STATUS = status;
-
-    //static int x = 0;
-    switch(status)
-    {
-        case 0x4:       /* cmd received ? = MCI_INT_CDMCI_INT_CD */
-
-        case 0x104:     /* ? 1 time in init (10th interrupt)
-                         * = MCI_INT_CD | MCI_INT_RTO */
-
-        case 0x2000:    /* ? after cmd read_mul_blocks | 0x2200
-                         * = MCI_INT_SBE */
-
-        case 0x820:     /* ? 1 time while copy from FIFO (not DMA)
-                         * = MCI_INT_RXDR | MCI_INT_FRUN */
-
-        case 0x20:      /* ? rx fifo empty = MCI_INT_RXDR */
-            break;
-#if 0
-        default:
-            printf("%2d NAND 0x%x", ++x, status);
-            int delay = 0x100000; while(delay--) ;
-#endif
-    }
-    /*
-     * MCI_STATUS =
-     *  0x106       = MCI_INT_RE | MCI_INT_CD | MCI_INT_RTO
-     *  0x4106      |= MCI_INT_ACD
-     *  1B906       = MCI_INT_RE | MCI_INT_CD | MCI_INT_RTO | MCI_INT_FRUN
-     *                  | MCI_INT_HLE | MCI_INT_SBE | MCI_INT_EBE
-     *  1F906       |= MCI_INT_ACD
-     *  1B906
-     *  1F906
-     *  1F906
-     *  1906
-     *  ...
-     *  6906        = MCI_INT_RE | MCI_INT_CD | MCI_INT_RTO | MCI_INT_FRUN |
-     *                  MCI_INT_SBE | MCI_INT_ACD
-     *  6D06 (dma)  |= MCI_INT_HTO
-     *
-     *  read resp (6, 7, 12, 42) : while bit 9 is unset ;
-     *
-     */
-    //printf("%x %x", status, MCI_STATUS);
-    //while(!button_read_device());
-    //while(button_read_device());
+    else if(status & MCI_INT_DTO)
+        wakeup_signal(&transfer_completion_signal);
 
     MCI_CTRL |= INT_ENABLE;
 }
@@ -658,15 +613,11 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
 
     do
     {
-        MCI_CTRL |= FIFO_RESET;
-        while(MCI_CTRL & FIFO_RESET)
-            ;
-
-        //MCI_BLKSIZ = 512;
+        MCI_BLKSIZ = 512;
         MCI_BYTCNT = count * 512;
 
-        MCI_CTRL |= FIFO_RESET;
-        while(MCI_CTRL & FIFO_RESET)
+        MCI_CTRL |= (FIFO_RESET|DMA_RESET);
+        while(MCI_CTRL & (FIFO_RESET|DMA_RESET))
             ;
 
         MCI_CTRL |= DMA_ENABLE;
