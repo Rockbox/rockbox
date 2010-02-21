@@ -70,10 +70,11 @@ static void printf(const char *format, ...)
 
 /*
  *  STATUS register
- *  & 0xBA80
- *  & 8
- *  & 0x428
- *  & 0x418
+ *  & 0xBA80    = MCI_INT_DCRC | MCI_INT_DRTO | MCI_INT_FRUN | \
+ *                  MCI_INT_HLE | MCI_INT_SBE | MCI_INT_EBE
+ *  & 8         = MCI_INT_DTO
+ *  & 0x428     = MCI_INT_DTO | MCI_INT_RXDR | MCI_INT_HTO
+ *  & 0x418     = MCI_INT_DTO | MCI_INT_TXDR | MCI_INT_HTO
  */
 
 /*
@@ -178,6 +179,26 @@ static void printf(const char *format, ...)
                                          * status clear */
 #define MCI_STATUS      SD_REG(0x48)
 
+/* interrupt bits */
+#define MCI_INT_CRDDET  (1<<0)
+#define MCI_INT_RE      (1<<1)
+#define MCI_INT_CD      (1<<2)
+#define MCI_INT_DTO     (1<<3)
+#define MCI_INT_TXDR    (1<<4)
+#define MCI_INT_RXDR    (1<<5)
+#define MCI_INT_RCRC    (1<<6)
+#define MCI_INT_DCRC    (1<<7)
+#define MCI_INT_RTO     (1<<8)
+#define MCI_INT_DRTO    (1<<9)
+#define MCI_INT_HTO     (1<<10)
+#define MCI_INT_FRUN    (1<<11)
+#define MCI_INT_HLE     (1<<12)
+#define MCI_INT_SBE     (1<<13)
+#define MCI_INT_ACD     (1<<14)
+#define MCI_INT_EBE     (1<<15)
+#define MCI_INT_SDIO    (0xf<<16)
+
+
 #define MCI_FIFOTH      SD_REG(0x4C)    /* FIFO threshold */
 #define MCI_CDETECT     SD_REG(0x50)    /* card detect */
 #define MCI_WRTPRT      SD_REG(0x54)    /* write protect */
@@ -248,12 +269,18 @@ void INT_NAND(void)
     //static int x = 0;
     switch(status)
     {
-        case 0x4:       /* cmd received ? */
-        case 0x104:     /* ? 1 time in init (10th interrupt) */
-        case 0x2000:    /* ? after cmd read_mul_blocks | 0x2200 */
+        case 0x4:       /* cmd received ? = MCI_INT_CDMCI_INT_CD */
 
-        case 0x820:     /* ? 1 time while copy from FIFO (not DMA) */
-        case 0x20:      /* ? rx fifo empty */
+        case 0x104:     /* ? 1 time in init (10th interrupt)
+                         * = MCI_INT_CD | MCI_INT_RTO */
+
+        case 0x2000:    /* ? after cmd read_mul_blocks | 0x2200
+                         * = MCI_INT_SBE */
+
+        case 0x820:     /* ? 1 time while copy from FIFO (not DMA)
+                         * = MCI_INT_RXDR | MCI_INT_FRUN */
+
+        case 0x20:      /* ? rx fifo empty = MCI_INT_RXDR */
             break;
 #if 0
         default:
@@ -262,18 +289,20 @@ void INT_NAND(void)
 #endif
     }
     /*
-     * 0x48 = some kind of status
-     *  0x106
-     *  0x4106
-     *  1B906
-     *  1F906
+     * MCI_STATUS =
+     *  0x106       = MCI_INT_RE | MCI_INT_CD | MCI_INT_RTO
+     *  0x4106      |= MCI_INT_ACD
+     *  1B906       = MCI_INT_RE | MCI_INT_CD | MCI_INT_RTO | MCI_INT_FRUN
+     *                  | MCI_INT_HLE | MCI_INT_SBE | MCI_INT_EBE
+     *  1F906       |= MCI_INT_ACD
      *  1B906
      *  1F906
      *  1F906
      *  1906
      *  ...
-     *  6906
-     *  6D06 (dma)
+     *  6906        = MCI_INT_RE | MCI_INT_CD | MCI_INT_RTO | MCI_INT_FRUN |
+     *                  MCI_INT_SBE | MCI_INT_ACD
+     *  6D06 (dma)  |= MCI_INT_HTO
      *
      *  read resp (6, 7, 12, 42) : while bit 9 is unset ;
      *
@@ -500,7 +529,6 @@ static void init_controller(void)
         ;
 
     MCI_RAW_STATUS = 0xffffffff;
-    MCI_MASK = 0xffffbffe;
 
     MCI_CTRL |= INT_ENABLE;
     MCI_TMOUT = 0xffffffff;
@@ -514,12 +542,12 @@ static void init_controller(void)
     int max = 10;
     while(max-- && (MCI_COMMAND & (1<<31))) ;
 
-    MCI_DEBNCE = 0xfffff;
+    MCI_DEBNCE = 0xfffff;   /* default value */
 
     MCI_FIFOTH = ~0x7fff0fff;
     MCI_FIFOTH |= 0x503f0080;
 
-    MCI_MASK = 0xffffbffe;
+    MCI_MASK = 0xffffffff & (~MCI_INT_ACD & ~MCI_INTCRDRET);
 }
 
 int sd_init(void)
@@ -682,10 +710,11 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
         while(MCI_CTRL & FIFO_RESET)
             ;
 
-        MCI_FIFOTH &= ~0x7fff0fff;
-
         MCI_CTRL |= DMA_ENABLE;
-        MCI_MASK = 0xBE8C;
+        MCI_MASK = MCI_INT_CD|MCI_INT_DTO|MCI_INT_DCRC|MCI_INT_DRTO| \
+            MCI_INT_HTO|MCI_INT_FRUN|MCI_INT_HLE|MCI_INT_SBE|MCI_INT_EBE;
+
+        MCI_FIFOTH &= ~0x7fff0fff;
         MCI_FIFOTH |= 0x503f0080;
 
 
