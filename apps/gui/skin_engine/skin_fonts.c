@@ -55,6 +55,7 @@ void skin_font_init(void)
         font_table[i].buffer = NULL;
         font_table[i].ref_count = 0;
     }
+    first_load = false;
 }
 
 /* load a font into the skin buffer. return the font id. */
