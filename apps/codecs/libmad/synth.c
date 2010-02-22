@@ -30,7 +30,7 @@
 # include "synth.h"
 
 /*
- * NAME:    synth->init()
+ * NAME:        synth->init()
  * DESCRIPTION: initialize synth struct
  */
 void mad_synth_init(struct mad_synth *synth)
@@ -50,7 +50,7 @@ void mad_synth_init(struct mad_synth *synth)
 }
 
 /*
- * NAME:    synth->mute()
+ * NAME:        synth->mute()
  * DESCRIPTION: zero all polyphase filterbank values, resetting synthesis
  */
 void mad_synth_mute(struct mad_synth *synth)
@@ -60,8 +60,8 @@ void mad_synth_mute(struct mad_synth *synth)
   for (ch = 0; ch < 2; ++ch) {
     for (s = 0; s < 16; ++s) {
       for (v = 0; v < 8; ++v) {
-    synth->filter[ch][0][0][s][v] = synth->filter[ch][0][1][s][v] =
-    synth->filter[ch][1][0][s][v] = synth->filter[ch][1][1][s][v] = 0;
+        synth->filter[ch][0][0][s][v] = synth->filter[ch][0][1][s][v] =
+        synth->filter[ch][1][0][s][v] = synth->filter[ch][1][1][s][v] = 0;
       }
     }
   }
@@ -142,12 +142,12 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 # endif
 
 /*
- * NAME:    dct32()
+ * NAME:        dct32()
  * DESCRIPTION: perform fast in[32]->out[32] DCT
  */
 static
 void dct32(mad_fixed_t const in[32], unsigned int slot,
-       mad_fixed_t lo[16][8], mad_fixed_t hi[16][8])
+           mad_fixed_t lo[16][8], mad_fixed_t hi[16][8])
 {
   mad_fixed_t t0,   t1,   t2,   t3,   t4,   t5,   t6,   t7;
   mad_fixed_t t8,   t9,   t10,  t11,  t12,  t13,  t14,  t15;
@@ -176,69 +176,69 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
   /* costab[i] = cos(PI / (2 * 32) * i) */
 
 # if defined(OPT_DCTO)
-#  define costab1   MAD_F(0x7fd8878e)
-#  define costab2   MAD_F(0x7f62368f)
-#  define costab3   MAD_F(0x7e9d55fc)
-#  define costab4   MAD_F(0x7d8a5f40)
-#  define costab5   MAD_F(0x7c29fbee)
-#  define costab6   MAD_F(0x7a7d055b)
-#  define costab7   MAD_F(0x78848414)
-#  define costab8   MAD_F(0x7641af3d)
-#  define costab9   MAD_F(0x73b5ebd1)
-#  define costab10  MAD_F(0x70e2cbc6)
-#  define costab11  MAD_F(0x6dca0d14)
-#  define costab12  MAD_F(0x6a5d98a4)
-#  define costab13  MAD_F(0x66cf8120)
-#  define costab14  MAD_F(0x62f201ac)
-#  define costab15  MAD_F(0x5ed77c8a)
-#  define costab16  MAD_F(0x5a82799a)
-#  define costab17  MAD_F(0x55f5a4d2)
-#  define costab18  MAD_F(0x5133cc94)
-#  define costab19  MAD_F(0x4c3fdff4)
-#  define costab20  MAD_F(0x471cece7)
-#  define costab21  MAD_F(0x41ce1e65)
-#  define costab22  MAD_F(0x3c56ba70)
-#  define costab23  MAD_F(0x36ba2014)
-#  define costab24  MAD_F(0x30fbc54d)
-#  define costab25  MAD_F(0x2b1f34eb)
-#  define costab26  MAD_F(0x25280c5e)
-#  define costab27  MAD_F(0x1f19f97b)
-#  define costab28  MAD_F(0x18f8b83c)
-#  define costab29  MAD_F(0x12c8106f)
-#  define costab30  MAD_F(0x0c8bd35e)
-#  define costab31  MAD_F(0x0647d97c)
+#  define costab1       MAD_F(0x7fd8878e)
+#  define costab2       MAD_F(0x7f62368f)
+#  define costab3       MAD_F(0x7e9d55fc)
+#  define costab4       MAD_F(0x7d8a5f40)
+#  define costab5       MAD_F(0x7c29fbee)
+#  define costab6       MAD_F(0x7a7d055b)
+#  define costab7       MAD_F(0x78848414)
+#  define costab8       MAD_F(0x7641af3d)
+#  define costab9       MAD_F(0x73b5ebd1)
+#  define costab10      MAD_F(0x70e2cbc6)
+#  define costab11      MAD_F(0x6dca0d14)
+#  define costab12      MAD_F(0x6a5d98a4)
+#  define costab13      MAD_F(0x66cf8120)
+#  define costab14      MAD_F(0x62f201ac)
+#  define costab15      MAD_F(0x5ed77c8a)
+#  define costab16      MAD_F(0x5a82799a)
+#  define costab17      MAD_F(0x55f5a4d2)
+#  define costab18      MAD_F(0x5133cc94)
+#  define costab19      MAD_F(0x4c3fdff4)
+#  define costab20      MAD_F(0x471cece7)
+#  define costab21      MAD_F(0x41ce1e65)
+#  define costab22      MAD_F(0x3c56ba70)
+#  define costab23      MAD_F(0x36ba2014)
+#  define costab24      MAD_F(0x30fbc54d)
+#  define costab25      MAD_F(0x2b1f34eb)
+#  define costab26      MAD_F(0x25280c5e)
+#  define costab27      MAD_F(0x1f19f97b)
+#  define costab28      MAD_F(0x18f8b83c)
+#  define costab29      MAD_F(0x12c8106f)
+#  define costab30      MAD_F(0x0c8bd35e)
+#  define costab31      MAD_F(0x0647d97c)
 # else
-#  define costab1   MAD_F(0x0ffb10f2)  /* 0.998795456 */
-#  define costab2   MAD_F(0x0fec46d2)  /* 0.995184727 */
-#  define costab3   MAD_F(0x0fd3aac0)  /* 0.989176510 */
-#  define costab4   MAD_F(0x0fb14be8)  /* 0.980785280 */
-#  define costab5   MAD_F(0x0f853f7e)  /* 0.970031253 */
-#  define costab6   MAD_F(0x0f4fa0ab)  /* 0.956940336 */
-#  define costab7   MAD_F(0x0f109082)  /* 0.941544065 */
-#  define costab8   MAD_F(0x0ec835e8)  /* 0.923879533 */
-#  define costab9   MAD_F(0x0e76bd7a)  /* 0.903989293 */
-#  define costab10  MAD_F(0x0e1c5979)  /* 0.881921264 */
-#  define costab11  MAD_F(0x0db941a3)  /* 0.857728610 */
-#  define costab12  MAD_F(0x0d4db315)  /* 0.831469612 */
-#  define costab13  MAD_F(0x0cd9f024)  /* 0.803207531 */
-#  define costab14  MAD_F(0x0c5e4036)  /* 0.773010453 */
-#  define costab15  MAD_F(0x0bdaef91)  /* 0.740951125 */
-#  define costab16  MAD_F(0x0b504f33)  /* 0.707106781 */
-#  define costab17  MAD_F(0x0abeb49a)  /* 0.671558955 */
-#  define costab18  MAD_F(0x0a267993)  /* 0.634393284 */
-#  define costab19  MAD_F(0x0987fbfe)  /* 0.595699304 */
-#  define costab20  MAD_F(0x08e39d9d)  /* 0.555570233 */
-#  define costab21  MAD_F(0x0839c3cd)  /* 0.514102744 */
-#  define costab22  MAD_F(0x078ad74e)  /* 0.471396737 */
-#  define costab23  MAD_F(0x06d74402)  /* 0.427555093 */
-#  define costab24  MAD_F(0x061f78aa)  /* 0.382683432 */
-#  define costab25  MAD_F(0x0563e69d)  /* 0.336889853 */
-#  define costab26  MAD_F(0x04a5018c)  /* 0.290284677 */
-#  define costab27  MAD_F(0x03e33f2f)  /* 0.242980180 */
-#  define costab28  MAD_F(0x031f1708)  /* 0.195090322 */
-#  define costab29  MAD_F(0x0259020e)  /* 0.146730474 */
-#  define costab30  MAD_F(0x01917a5c)  /* 0.098017140 */
-#  define costab31  MAD_F(0x00c8fb30)  /* 0.049067674 */
+#  define costab1       MAD_F(0x0ffb10f2)  /* 0.998795456 */
+#  define costab2       MAD_F(0x0fec46d2)  /* 0.995184727 */
+#  define costab3       MAD_F(0x0fd3aac0)  /* 0.989176510 */
+#  define costab4       MAD_F(0x0fb14be8)  /* 0.980785280 */
+#  define costab5       MAD_F(0x0f853f7e)  /* 0.970031253 */
+#  define costab6       MAD_F(0x0f4fa0ab)  /* 0.956940336 */
+#  define costab7       MAD_F(0x0f109082)  /* 0.941544065 */
+#  define costab8       MAD_F(0x0ec835e8)  /* 0.923879533 */
+#  define costab9       MAD_F(0x0e76bd7a)  /* 0.903989293 */
+#  define costab10      MAD_F(0x0e1c5979)  /* 0.881921264 */
+#  define costab11      MAD_F(0x0db941a3)  /* 0.857728610 */
+#  define costab12      MAD_F(0x0d4db315)  /* 0.831469612 */
+#  define costab13      MAD_F(0x0cd9f024)  /* 0.803207531 */
+#  define costab14      MAD_F(0x0c5e4036)  /* 0.773010453 */
+#  define costab15      MAD_F(0x0bdaef91)  /* 0.740951125 */
+#  define costab16      MAD_F(0x0b504f33)  /* 0.707106781 */
+#  define costab17      MAD_F(0x0abeb49a)  /* 0.671558955 */
+#  define costab18      MAD_F(0x0a267993)  /* 0.634393284 */
+#  define costab19      MAD_F(0x0987fbfe)  /* 0.595699304 */
+#  define costab20      MAD_F(0x08e39d9d)  /* 0.555570233 */
+#  define costab21      MAD_F(0x0839c3cd)  /* 0.514102744 */
+#  define costab22      MAD_F(0x078ad74e)  /* 0.471396737 */
+#  define costab23      MAD_F(0x06d74402)  /* 0.427555093 */
+#  define costab24      MAD_F(0x061f78aa)  /* 0.382683432 */
+#  define costab25      MAD_F(0x0563e69d)  /* 0.336889853 */
+#  define costab26      MAD_F(0x04a5018c)  /* 0.290284677 */
+#  define costab27      MAD_F(0x03e33f2f)  /* 0.242980180 */
+#  define costab28      MAD_F(0x031f1708)  /* 0.195090322 */
+#  define costab29      MAD_F(0x0259020e)  /* 0.146730474 */
+#  define costab30      MAD_F(0x01917a5c)  /* 0.098017140 */
+#  define costab31      MAD_F(0x00c8fb30)  /* 0.049067674 */
 # endif
 
   t0   = in[0]  + in[31];  t16  = MUL(in[0]  - in[31], costab1);
@@ -395,7 +395,7 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 
   /*  8 */ hi[ 7][slot] = SHIFT(t143);
   /* 24 */ lo[ 8][slot] =
-         SHIFT((MUL(t141 - t142, costab16) * 2) - t143);
+             SHIFT((MUL(t141 - t142, costab16) * 2) - t143);
 
   t144 = MUL(t73 - t74, costab8);
   t145 = MUL(t75 - t76, costab24);
@@ -435,7 +435,7 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 
   /* 20 */ lo[ 4][slot] = SHIFT(t160);
   /* 28 */ lo[12][slot] =
-         SHIFT((((MUL(t157 - t158, costab16) * 2) - t159) * 2) - t160);
+             SHIFT((((MUL(t157 - t158, costab16) * 2) - t159) * 2) - t160);
 
   t161 = MUL(t94 - t95, costab8);
   t162 = MUL(t96 - t97, costab24);
@@ -473,8 +473,8 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 
   /* 26 */ lo[10][slot] = SHIFT(t170);
   /* 30 */ lo[14][slot] =
-         SHIFT((((((MUL(t166 - t167, costab16) * 2) -
-               t168) * 2) - t169) * 2) - t170);
+             SHIFT((((((MUL(t166 - t167, costab16) * 2) -
+                       t168) * 2) - t169) * 2) - t170);
 
   t171 = MUL(t106 - t107, costab8);
   t172 = MUL(t108 - t109, costab24);
@@ -521,12 +521,12 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
   /* 27 */ lo[11][slot] = SHIFT(t165);
 
   t176 = (((((MUL(t161 - t162, costab16) * 2) -
-         t163) * 2) - t164) * 2) - t165;
+             t163) * 2) - t164) * 2) - t165;
 
   /* 29 */ lo[13][slot] = SHIFT(t176);
   /* 31 */ lo[15][slot] =
-         SHIFT((((((((MUL(t171 - t172, costab16) * 2) -
-             t173) * 2) - t174) * 2) - t175) * 2) - t176);
+             SHIFT((((((((MUL(t171 - t172, costab16) * 2) -
+                         t173) * 2) - t174) * 2) - t175) * 2) - t176);
 
   /*
    * Totals:
@@ -548,24 +548,24 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 #  if MAD_F_FRACBITS != 28
 #   error "MAD_F_FRACBITS must be 28 to use OPT_SSO"
 #  endif
-#  define ML0(hi, lo, x, y) ((lo)  = (x) * (y))
-#  define MLA(hi, lo, x, y) ((lo) += (x) * (y))
-#  define MLN(hi, lo)       ((lo)  = -(lo))
-#  define MLZ(hi, lo)       ((void) (hi), (mad_fixed_t) (lo))
-#  define SHIFT(x)      ((x) >> 2)
-#  define PRESHIFT(x)       ((MAD_F(x) + (1L << 13)) >> 14)
+#  define ML0(hi, lo, x, y)     ((lo)  = (x) * (y))
+#  define MLA(hi, lo, x, y)     ((lo) += (x) * (y))
+#  define MLN(hi, lo)           ((lo)  = -(lo))
+#  define MLZ(hi, lo)           ((void) (hi), (mad_fixed_t) (lo))
+#  define SHIFT(x)              ((x) >> 2)
+#  define PRESHIFT(x)           ((MAD_F(x) + (1L << 13)) >> 14)
 # else
-#  define ML0(hi, lo, x, y) MAD_F_ML0((hi), (lo), (x), (y))
-#  define MLA(hi, lo, x, y) MAD_F_MLA((hi), (lo), (x), (y))
-#  define MLN(hi, lo)       MAD_F_MLN((hi), (lo))
-#  define MLZ(hi, lo)       MAD_F_MLZ((hi), (lo))
-#  define SHIFT(x)      (x)
+#  define ML0(hi, lo, x, y)     MAD_F_ML0((hi), (lo), (x), (y))
+#  define MLA(hi, lo, x, y)     MAD_F_MLA((hi), (lo), (x), (y))
+#  define MLN(hi, lo)           MAD_F_MLN((hi), (lo))
+#  define MLZ(hi, lo)           MAD_F_MLZ((hi), (lo))
+#  define SHIFT(x)              (x)
 #  if defined(MAD_F_SCALEBITS)
 #   undef  MAD_F_SCALEBITS
-#   define MAD_F_SCALEBITS  (MAD_F_FRACBITS - 12)
-#   define PRESHIFT(x)      (MAD_F(x) >> 12)
+#   define MAD_F_SCALEBITS      (MAD_F_FRACBITS - 12)
+#   define PRESHIFT(x)          (MAD_F(x) >> 12)
 #  else
-#   define PRESHIFT(x)      MAD_F(x)
+#   define PRESHIFT(x)          MAD_F(x)
 #  endif
 # endif
 
@@ -576,10 +576,10 @@ mad_fixed_t const D[17][32] ICONST_ATTR = {
 
 # if defined(ASO_SYNTH)
 void synth_full(struct mad_synth *, struct mad_frame const *,
-        unsigned int, unsigned int);
+                unsigned int, unsigned int);
 # else
 /*
- * NAME:    synth->full()
+ * NAME:        synth->full()
  * DESCRIPTION: perform full frequency PCM synthesis
  */
 
@@ -587,7 +587,7 @@ void synth_full(struct mad_synth *, struct mad_frame const *,
 # ifdef FPM_COLDFIRE_EMAC
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
-        unsigned int nch, unsigned int ns)
+                unsigned int nch, unsigned int ns)
 {
   int sb;
   unsigned int phase, ch, s, p;
@@ -606,7 +606,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 
     for (s = 0; s < ns; ++s) {
       dct32((*sbsample)[s], phase >> 1,
-        (*filter)[0][phase & 1], (*filter)[1][phase & 1]);
+            (*filter)[0][phase & 1], (*filter)[1][phase & 1]);
 
       p = (phase - 1) & 0xf;
 
@@ -649,11 +649,11 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         pcm   += 16;
 
         for (sb = 15; sb; sb--, fo++) {
-      ++fe;
-      ++D0ptr;
-      ++D1ptr;
+          ++fe;
+          ++D0ptr;
+          ++D1ptr;
 
-      /* D[32 - sb][i] == -D[sb][31 - i] */
+          /* D[32 - sb][i] == -D[sb][31 - i] */
           asm volatile (
           "movem.l (%0), %%d0-%%d7\n\t"
           "move.l 4(%2), %%a5\n\t"
@@ -697,8 +697,8 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
           "movclr.l %%acc0, %0\n\t"
           "movclr.l %%acc1, %1\n\t"  : "=d" (hi0), "=d" (hi1) );
 
-      pcm[-sb] = hi0 << 3;
-      pcm[ sb] = hi1 << 3;
+          pcm[-sb] = hi0 << 3;
+          pcm[ sb] = hi1 << 3;
         }
 
         ++D0ptr;
@@ -750,11 +750,11 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         pcm   += 16;
 
         for (sb = 15; sb; sb--, fo++) {
-      ++fe;
-      ++D0ptr;
-      ++D1ptr;
+          ++fe;
+          ++D0ptr;
+          ++D1ptr;
 
-      /* D[32 - sb][i] == -D[sb][31 - i] */
+          /* D[32 - sb][i] == -D[sb][31 - i] */
           asm volatile (
           "movem.l (%0), %%d0-%%d7\n\t"
           "move.l (%2), %%a5\n\t"
@@ -798,8 +798,8 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
           "movclr.l %%acc0, %0\n\t"
           "movclr.l %%acc1, %1\n\t"  : "=d" (hi0), "=d" (hi1) );
 
-      pcm[-sb] = hi0 << 3;
-      pcm[ sb] = hi1 << 3;
+          pcm[-sb] = hi0 << 3;
+          pcm[ sb] = hi1 << 3;
         }
 
         ++D0ptr;
@@ -1045,10 +1045,10 @@ void synth_full2(mad_fixed_t *pcm, mad_fixed_t (*fo)[8], mad_fixed_t (*fe)[8],
 
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
-        unsigned int nch, unsigned int ns) ICODE_ATTR_MPA_SYNTH;
+                unsigned int nch, unsigned int ns) ICODE_ATTR_MPA_SYNTH;
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
-        unsigned int nch, unsigned int ns)
+                unsigned int nch, unsigned int ns)
 {
   int          p;
   unsigned int phase, ch, s;
@@ -1068,7 +1068,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 
     for (s = 0; s < ns; ++s) {
       dct32((*sbsample)[s], phase >> 1,
-        (*filter)[0][phase & 1], (*filter)[1][phase & 1]);
+            (*filter)[0][phase & 1], (*filter)[1][phase & 1]);
 
       p = (phase - 1) & 0xf;
 
@@ -1189,7 +1189,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
-        unsigned int nch, unsigned int ns)
+                unsigned int nch, unsigned int ns)
 {
   int          p, sb;
   unsigned int phase, ch, s;
@@ -1209,7 +1209,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 
     for (s = 0; s < ns; ++s) {
       dct32((*sbsample)[s], phase >> 1,
-        (*filter)[0][phase & 1], (*filter)[1][phase & 1]);
+            (*filter)[0][phase & 1], (*filter)[1][phase & 1]);
 
       p = (phase - 1) & 0xf;
 
@@ -1246,49 +1246,49 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 
         for (sb = 15; sb; sb--, fo++)
         {
-      ++fe;
-      ++D0ptr;
-      ++D1ptr;
+          ++fe;
+          ++D0ptr;
+          ++D1ptr;
 
-      /* D[32 - sb][i] == -D[sb][31 - i] */
-      ptr = *D0ptr;
-      ML0(hi, lo, (*fo)[0], ptr[ 1]);
-      MLA(hi, lo, (*fo)[1], ptr[15]);
-      MLA(hi, lo, (*fo)[2], ptr[13]);
-      MLA(hi, lo, (*fo)[3], ptr[11]);
-      MLA(hi, lo, (*fo)[4], ptr[ 9]);
-      MLA(hi, lo, (*fo)[5], ptr[ 7]);
-      MLA(hi, lo, (*fo)[6], ptr[ 5]);
-      MLA(hi, lo, (*fo)[7], ptr[ 3]);
-      MLN(hi, lo);
-      MLA(hi, lo, (*fe)[7], ptr[ 2]);
-      MLA(hi, lo, (*fe)[6], ptr[ 4]);
-      MLA(hi, lo, (*fe)[5], ptr[ 6]);
-      MLA(hi, lo, (*fe)[4], ptr[ 8]);
-      MLA(hi, lo, (*fe)[3], ptr[10]);
-      MLA(hi, lo, (*fe)[2], ptr[12]);
-      MLA(hi, lo, (*fe)[1], ptr[14]);
-      MLA(hi, lo, (*fe)[0], ptr[ 0]);
-      pcm[-sb] = SHIFT(MLZ(hi, lo));
+          /* D[32 - sb][i] == -D[sb][31 - i] */
+          ptr = *D0ptr;
+          ML0(hi, lo, (*fo)[0], ptr[ 1]);
+          MLA(hi, lo, (*fo)[1], ptr[15]);
+          MLA(hi, lo, (*fo)[2], ptr[13]);
+          MLA(hi, lo, (*fo)[3], ptr[11]);
+          MLA(hi, lo, (*fo)[4], ptr[ 9]);
+          MLA(hi, lo, (*fo)[5], ptr[ 7]);
+          MLA(hi, lo, (*fo)[6], ptr[ 5]);
+          MLA(hi, lo, (*fo)[7], ptr[ 3]);
+          MLN(hi, lo);
+          MLA(hi, lo, (*fe)[7], ptr[ 2]);
+          MLA(hi, lo, (*fe)[6], ptr[ 4]);
+          MLA(hi, lo, (*fe)[5], ptr[ 6]);
+          MLA(hi, lo, (*fe)[4], ptr[ 8]);
+          MLA(hi, lo, (*fe)[3], ptr[10]);
+          MLA(hi, lo, (*fe)[2], ptr[12]);
+          MLA(hi, lo, (*fe)[1], ptr[14]);
+          MLA(hi, lo, (*fe)[0], ptr[ 0]);
+          pcm[-sb] = SHIFT(MLZ(hi, lo));
 
-      ptr = *D1ptr;
-      ML0(hi, lo, (*fe)[0], ptr[31 - 16]);
-      MLA(hi, lo, (*fe)[1], ptr[31 - 14]);
-      MLA(hi, lo, (*fe)[2], ptr[31 - 12]);
-      MLA(hi, lo, (*fe)[3], ptr[31 - 10]);
-      MLA(hi, lo, (*fe)[4], ptr[31 -  8]);
-      MLA(hi, lo, (*fe)[5], ptr[31 -  6]);
-      MLA(hi, lo, (*fe)[6], ptr[31 -  4]);
-      MLA(hi, lo, (*fe)[7], ptr[31 -  2]);
+          ptr = *D1ptr;
+          ML0(hi, lo, (*fe)[0], ptr[31 - 16]);
+          MLA(hi, lo, (*fe)[1], ptr[31 - 14]);
+          MLA(hi, lo, (*fe)[2], ptr[31 - 12]);
+          MLA(hi, lo, (*fe)[3], ptr[31 - 10]);
+          MLA(hi, lo, (*fe)[4], ptr[31 -  8]);
+          MLA(hi, lo, (*fe)[5], ptr[31 -  6]);
+          MLA(hi, lo, (*fe)[6], ptr[31 -  4]);
+          MLA(hi, lo, (*fe)[7], ptr[31 -  2]);
           MLA(hi, lo, (*fo)[7], ptr[31 -  3]);
-      MLA(hi, lo, (*fo)[6], ptr[31 -  5]);
-      MLA(hi, lo, (*fo)[5], ptr[31 -  7]);
-      MLA(hi, lo, (*fo)[4], ptr[31 -  9]);
-      MLA(hi, lo, (*fo)[3], ptr[31 - 11]);
-      MLA(hi, lo, (*fo)[2], ptr[31 - 13]);
-      MLA(hi, lo, (*fo)[1], ptr[31 - 15]);
-      MLA(hi, lo, (*fo)[0], ptr[31 -  1]);
-      pcm[sb] = SHIFT(MLZ(hi, lo));
+          MLA(hi, lo, (*fo)[6], ptr[31 -  5]);
+          MLA(hi, lo, (*fo)[5], ptr[31 -  7]);
+          MLA(hi, lo, (*fo)[4], ptr[31 -  9]);
+          MLA(hi, lo, (*fo)[3], ptr[31 - 11]);
+          MLA(hi, lo, (*fo)[2], ptr[31 - 13]);
+          MLA(hi, lo, (*fo)[1], ptr[31 - 15]);
+          MLA(hi, lo, (*fo)[0], ptr[31 -  1]);
+          pcm[sb] = SHIFT(MLZ(hi, lo));
         }
 
         ptr = *(D0ptr + 1);
@@ -1327,49 +1327,49 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 
         for (sb = 15; sb; sb--, fo++)
         {
-      ++fe;
-      ++D0ptr;
-      ++D1ptr;
+          ++fe;
+          ++D0ptr;
+          ++D1ptr;
 
-      /* D[32 - sb][i] == -D[sb][31 - i] */
-      ptr = *D0ptr;
-      ML0(hi, lo, (*fo)[0], ptr[ 0]);
-      MLA(hi, lo, (*fo)[1], ptr[14]);
-      MLA(hi, lo, (*fo)[2], ptr[12]);
-      MLA(hi, lo, (*fo)[3], ptr[10]);
-      MLA(hi, lo, (*fo)[4], ptr[ 8]);
-      MLA(hi, lo, (*fo)[5], ptr[ 6]);
-      MLA(hi, lo, (*fo)[6], ptr[ 4]);
-      MLA(hi, lo, (*fo)[7], ptr[ 2]);
-      MLN(hi, lo);
-      MLA(hi, lo, (*fe)[7], ptr[ 3]);
-      MLA(hi, lo, (*fe)[6], ptr[ 5]);
-      MLA(hi, lo, (*fe)[5], ptr[ 7]);
-      MLA(hi, lo, (*fe)[4], ptr[ 9]);
-      MLA(hi, lo, (*fe)[3], ptr[11]);
-      MLA(hi, lo, (*fe)[2], ptr[13]);
-      MLA(hi, lo, (*fe)[1], ptr[15]);
-      MLA(hi, lo, (*fe)[0], ptr[ 1]);
-      pcm[-sb] = SHIFT(MLZ(hi, lo));
+          /* D[32 - sb][i] == -D[sb][31 - i] */
+          ptr = *D0ptr;
+          ML0(hi, lo, (*fo)[0], ptr[ 0]);
+          MLA(hi, lo, (*fo)[1], ptr[14]);
+          MLA(hi, lo, (*fo)[2], ptr[12]);
+          MLA(hi, lo, (*fo)[3], ptr[10]);
+          MLA(hi, lo, (*fo)[4], ptr[ 8]);
+          MLA(hi, lo, (*fo)[5], ptr[ 6]);
+          MLA(hi, lo, (*fo)[6], ptr[ 4]);
+          MLA(hi, lo, (*fo)[7], ptr[ 2]);
+          MLN(hi, lo);
+          MLA(hi, lo, (*fe)[7], ptr[ 3]);
+          MLA(hi, lo, (*fe)[6], ptr[ 5]);
+          MLA(hi, lo, (*fe)[5], ptr[ 7]);
+          MLA(hi, lo, (*fe)[4], ptr[ 9]);
+          MLA(hi, lo, (*fe)[3], ptr[11]);
+          MLA(hi, lo, (*fe)[2], ptr[13]);
+          MLA(hi, lo, (*fe)[1], ptr[15]);
+          MLA(hi, lo, (*fe)[0], ptr[ 1]);
+          pcm[-sb] = SHIFT(MLZ(hi, lo));
 
-      ptr = *D1ptr;
-      ML0(hi, lo, (*fe)[0], ptr[31 -  1]);
-      MLA(hi, lo, (*fe)[1], ptr[31 - 15]);
-      MLA(hi, lo, (*fe)[2], ptr[31 - 13]);
-      MLA(hi, lo, (*fe)[3], ptr[31 - 11]);
-      MLA(hi, lo, (*fe)[4], ptr[31 -  9]);
-      MLA(hi, lo, (*fe)[5], ptr[31 -  7]);
-      MLA(hi, lo, (*fe)[6], ptr[31 -  5]);
-      MLA(hi, lo, (*fe)[7], ptr[31 -  3]);
-      MLA(hi, lo, (*fo)[7], ptr[31 -  2]);
-      MLA(hi, lo, (*fo)[6], ptr[31 -  4]);
-      MLA(hi, lo, (*fo)[5], ptr[31 -  6]);
-      MLA(hi, lo, (*fo)[4], ptr[31 -  8]);
-      MLA(hi, lo, (*fo)[3], ptr[31 - 10]);
-      MLA(hi, lo, (*fo)[2], ptr[31 - 12]);
-      MLA(hi, lo, (*fo)[1], ptr[31 - 14]);
-      MLA(hi, lo, (*fo)[0], ptr[31 - 16]);
-      pcm[sb] = SHIFT(MLZ(hi, lo));
+          ptr = *D1ptr;
+          ML0(hi, lo, (*fe)[0], ptr[31 -  1]);
+          MLA(hi, lo, (*fe)[1], ptr[31 - 15]);
+          MLA(hi, lo, (*fe)[2], ptr[31 - 13]);
+          MLA(hi, lo, (*fe)[3], ptr[31 - 11]);
+          MLA(hi, lo, (*fe)[4], ptr[31 -  9]);
+          MLA(hi, lo, (*fe)[5], ptr[31 -  7]);
+          MLA(hi, lo, (*fe)[6], ptr[31 -  5]);
+          MLA(hi, lo, (*fe)[7], ptr[31 -  3]);
+          MLA(hi, lo, (*fo)[7], ptr[31 -  2]);
+          MLA(hi, lo, (*fo)[6], ptr[31 -  4]);
+          MLA(hi, lo, (*fo)[5], ptr[31 -  6]);
+          MLA(hi, lo, (*fo)[4], ptr[31 -  8]);
+          MLA(hi, lo, (*fo)[3], ptr[31 - 10]);
+          MLA(hi, lo, (*fo)[2], ptr[31 - 12]);
+          MLA(hi, lo, (*fo)[1], ptr[31 - 14]);
+          MLA(hi, lo, (*fo)[0], ptr[31 - 16]);
+          pcm[sb] = SHIFT(MLZ(hi, lo));
         }
 
         ptr = *(D0ptr + 1);
@@ -1394,12 +1394,12 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 # endif
 
 /*
- * NAME:    synth->half()
+ * NAME:        synth->half()
  * DESCRIPTION: perform half frequency PCM synthesis
  */
 static
 void synth_half(struct mad_synth *synth, struct mad_frame const *frame,
-        unsigned int nch, unsigned int ns)
+                unsigned int nch, unsigned int ns)
 {
   unsigned int phase, ch, s, sb, pe, po;
   mad_fixed_t *pcm1, *pcm2, (*filter)[2][2][16][8];
@@ -1417,7 +1417,7 @@ void synth_half(struct mad_synth *synth, struct mad_frame const *frame,
 
     for (s = 0; s < ns; ++s) {
       dct32((*sbsample)[s], phase >> 1,
-        (*filter)[0][phase & 1], (*filter)[1][phase & 1]);
+            (*filter)[0][phase & 1], (*filter)[1][phase & 1]);
 
       pe = phase & ~1;
       po = ((phase - 1) & 0xf) | 1;
@@ -1456,59 +1456,59 @@ void synth_half(struct mad_synth *synth, struct mad_frame const *frame,
       pcm2 = pcm1 + 14;
 
       for (sb = 1; sb < 16; ++sb) {
-    ++fe;
-    ++Dptr;
+        ++fe;
+        ++Dptr;
 
-    /* D[32 - sb][i] == -D[sb][31 - i] */
+        /* D[32 - sb][i] == -D[sb][31 - i] */
 
-    if (!(sb & 1)) {
-      ptr = *Dptr + po;
-      ML0(hi, lo, (*fo)[0], ptr[ 0]);
-      MLA(hi, lo, (*fo)[1], ptr[14]);
-      MLA(hi, lo, (*fo)[2], ptr[12]);
-      MLA(hi, lo, (*fo)[3], ptr[10]);
-      MLA(hi, lo, (*fo)[4], ptr[ 8]);
-      MLA(hi, lo, (*fo)[5], ptr[ 6]);
-      MLA(hi, lo, (*fo)[6], ptr[ 4]);
-      MLA(hi, lo, (*fo)[7], ptr[ 2]);
-      MLN(hi, lo);
+        if (!(sb & 1)) {
+          ptr = *Dptr + po;
+          ML0(hi, lo, (*fo)[0], ptr[ 0]);
+          MLA(hi, lo, (*fo)[1], ptr[14]);
+          MLA(hi, lo, (*fo)[2], ptr[12]);
+          MLA(hi, lo, (*fo)[3], ptr[10]);
+          MLA(hi, lo, (*fo)[4], ptr[ 8]);
+          MLA(hi, lo, (*fo)[5], ptr[ 6]);
+          MLA(hi, lo, (*fo)[6], ptr[ 4]);
+          MLA(hi, lo, (*fo)[7], ptr[ 2]);
+          MLN(hi, lo);
 
-      ptr = *Dptr + pe;
-      MLA(hi, lo, (*fe)[7], ptr[ 2]);
-      MLA(hi, lo, (*fe)[6], ptr[ 4]);
-      MLA(hi, lo, (*fe)[5], ptr[ 6]);
-      MLA(hi, lo, (*fe)[4], ptr[ 8]);
-      MLA(hi, lo, (*fe)[3], ptr[10]);
-      MLA(hi, lo, (*fe)[2], ptr[12]);
-      MLA(hi, lo, (*fe)[1], ptr[14]);
-      MLA(hi, lo, (*fe)[0], ptr[ 0]);
+          ptr = *Dptr + pe;
+          MLA(hi, lo, (*fe)[7], ptr[ 2]);
+          MLA(hi, lo, (*fe)[6], ptr[ 4]);
+          MLA(hi, lo, (*fe)[5], ptr[ 6]);
+          MLA(hi, lo, (*fe)[4], ptr[ 8]);
+          MLA(hi, lo, (*fe)[3], ptr[10]);
+          MLA(hi, lo, (*fe)[2], ptr[12]);
+          MLA(hi, lo, (*fe)[1], ptr[14]);
+          MLA(hi, lo, (*fe)[0], ptr[ 0]);
 
-      *pcm1++ = SHIFT(MLZ(hi, lo));
+          *pcm1++ = SHIFT(MLZ(hi, lo));
 
-      ptr = *Dptr - po;
-      ML0(hi, lo, (*fo)[7], ptr[31 -  2]);
-      MLA(hi, lo, (*fo)[6], ptr[31 -  4]);
-      MLA(hi, lo, (*fo)[5], ptr[31 -  6]);
-      MLA(hi, lo, (*fo)[4], ptr[31 -  8]);
-      MLA(hi, lo, (*fo)[3], ptr[31 - 10]);
-      MLA(hi, lo, (*fo)[2], ptr[31 - 12]);
-      MLA(hi, lo, (*fo)[1], ptr[31 - 14]);
-      MLA(hi, lo, (*fo)[0], ptr[31 - 16]);
+          ptr = *Dptr - po;
+          ML0(hi, lo, (*fo)[7], ptr[31 -  2]);
+          MLA(hi, lo, (*fo)[6], ptr[31 -  4]);
+          MLA(hi, lo, (*fo)[5], ptr[31 -  6]);
+          MLA(hi, lo, (*fo)[4], ptr[31 -  8]);
+          MLA(hi, lo, (*fo)[3], ptr[31 - 10]);
+          MLA(hi, lo, (*fo)[2], ptr[31 - 12]);
+          MLA(hi, lo, (*fo)[1], ptr[31 - 14]);
+          MLA(hi, lo, (*fo)[0], ptr[31 - 16]);
 
-      ptr = *Dptr - pe;
-      MLA(hi, lo, (*fe)[0], ptr[31 - 16]);
-      MLA(hi, lo, (*fe)[1], ptr[31 - 14]);
-      MLA(hi, lo, (*fe)[2], ptr[31 - 12]);
-      MLA(hi, lo, (*fe)[3], ptr[31 - 10]);
-      MLA(hi, lo, (*fe)[4], ptr[31 -  8]);
-      MLA(hi, lo, (*fe)[5], ptr[31 -  6]);
-      MLA(hi, lo, (*fe)[6], ptr[31 -  4]);
-      MLA(hi, lo, (*fe)[7], ptr[31 -  2]);
+          ptr = *Dptr - pe;
+          MLA(hi, lo, (*fe)[0], ptr[31 - 16]);
+          MLA(hi, lo, (*fe)[1], ptr[31 - 14]);
+          MLA(hi, lo, (*fe)[2], ptr[31 - 12]);
+          MLA(hi, lo, (*fe)[3], ptr[31 - 10]);
+          MLA(hi, lo, (*fe)[4], ptr[31 -  8]);
+          MLA(hi, lo, (*fe)[5], ptr[31 -  6]);
+          MLA(hi, lo, (*fe)[6], ptr[31 -  4]);
+          MLA(hi, lo, (*fe)[7], ptr[31 -  2]);
 
-      *pcm2-- = SHIFT(MLZ(hi, lo));
-    }
+          *pcm2-- = SHIFT(MLZ(hi, lo));
+        }
 
-    ++fo;
+        ++fo;
       }
 
       ++Dptr;
@@ -1532,14 +1532,14 @@ void synth_half(struct mad_synth *synth, struct mad_frame const *frame,
 }
 
 /*
- * NAME:    synth->frame()
+ * NAME:        synth->frame()
  * DESCRIPTION: perform PCM synthesis of frame subband samples
  */
 void mad_synth_frame(struct mad_synth *synth, struct mad_frame const *frame)
 {
   unsigned int nch, ns;
   void (*synth_frame)(struct mad_synth *, struct mad_frame const *,
-              unsigned int, unsigned int);
+                      unsigned int, unsigned int);
 
   nch = MAD_NCHANNELS(&frame->header);
   ns  = MAD_NSBSAMPLES(&frame->header);

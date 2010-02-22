@@ -28,7 +28,7 @@
 # include "fixed.h"
 
 /*
- * NAME:    fixed->abs()
+ * NAME:        fixed->abs()
  * DESCRIPTION: return absolute value of a fixed-point number
  */
 mad_fixed_t mad_f_abs(mad_fixed_t x)
@@ -37,7 +37,7 @@ mad_fixed_t mad_f_abs(mad_fixed_t x)
 }
 
 /*
- * NAME:    fixed->div()
+ * NAME:        fixed->div()
  * DESCRIPTION: perform division using fixed-point math
  */
 mad_fixed_t mad_f_div(mad_fixed_t x, mad_fixed_t y)
