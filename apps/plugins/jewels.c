@@ -1300,8 +1300,6 @@ static void jewels_nextlevel(struct game_context* bj) {
 
 static bool jewels_help(void)
 {
-    rb->lcd_setfont(FONT_UI);
-#define WORDS (sizeof help_text / sizeof (char*))
     static char *help_text[] = {
         "Jewels", "", "Aim", "",
         "Swap", "pairs", "of", "jewels", "to", "form", "connected", 
@@ -1323,22 +1321,12 @@ static bool jewels_help(void)
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
         { 2, C_RED },
         { 42, C_RED },
-        { -1, 0 }
+        LAST_STYLE_ITEM
     };
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
-#endif
-    int button;
-    if (display_text(WORDS, help_text, formation, NULL))
+
+    rb->lcd_setfont(FONT_UI);
+    if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    do {
-        button = rb->button_get(true);
-        if (rb->default_event_handler (button) == SYS_USB_CONNECTED) {
-            return true;
-        }
-    } while( ( button == BUTTON_NONE )
-          || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
     rb->lcd_setfont(FONT_SYSFIXED);
 
     return false;

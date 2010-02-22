@@ -863,7 +863,6 @@ static void play_animation(int input)
 
 static void instructions()
 {
-#define WORDS (sizeof help_text / sizeof (char*))
   static char* help_text[] = {
 #if 0
     /* Not sure if we want to include this? */
@@ -879,7 +878,7 @@ static void instructions()
     "The", "game", "ends", "when", "robotfindskitten.", "", "",
     "Press", "any", "key", "to", "start",
   };
-  display_text(WORDS, help_text, NULL, NULL);
+  display_text(ARRAYLEN(help_text), help_text, NULL, NULL, false);
   pause();
 }
 

@@ -1138,7 +1138,6 @@ static void brickmania_sleep(int secs)
 
 static int brickmania_help(void)
 {
-#define WORDS (sizeof help_text / sizeof (char*))
     static char *help_text[] = {
         "Brickmania", "", "Aim", "",
         "Destroy", "all", "the", "bricks", "by", "bouncing",
@@ -1205,26 +1204,18 @@ static int brickmania_help(void)
         { 67, C_GREEN },
         { 74, C_YELLOW },
         { 80, C_RED },
-        { -1, 0 }
+        LAST_STYLE_ITEM
     };
-    int button;
 
     rb->lcd_setfont(FONT_UI);
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
-
-    if (display_text(WORDS, help_text, formation, NULL))
+    if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return 1;
-    do {
-        button = rb->button_get(true);
-        if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-            return 1;
-        }
-    } while( ( button == BUTTON_NONE )
-          || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
     rb->lcd_setfont(FONT_SYSFIXED);
+
     return 0;
 }
 

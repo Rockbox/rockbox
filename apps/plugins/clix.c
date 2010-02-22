@@ -435,6 +435,7 @@ static void clix_draw(struct clix_game_state_t* state)
     }
 
     rb->lcd_update();
+    rb->lcd_set_foreground(LCD_WHITE);
 }
 
 static void clix_move_cursor(struct clix_game_state_t* state, const bool left)
@@ -467,7 +468,6 @@ static void clix_move_cursor(struct clix_game_state_t* state, const bool left)
             }
         }
     } while ( y != state->y);
-
 }
 
 /* returns the color of the given position, if out of bounds return CC_BLACK */
@@ -581,7 +581,6 @@ static int clix_clear_selected(struct clix_game_state_t* state)
 
 static bool clix_help(void)
 {
-#define WORDS (sizeof help_text / sizeof (char*))
     static char *help_text[] = {
         "Clix", "", "Aim", "",
         "Remove", "all", "blocks", "from", "the", "board", "to", "achieve",
@@ -593,22 +592,16 @@ static bool clix_help(void)
     static struct style_text formation[]={
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
         { 2, C_RED },
-        { -1, 0 }
+        LAST_STYLE_ITEM
     };
-    int button;
-    
+
     rb->lcd_setfont(FONT_UI);
     rb->lcd_set_foreground(LCD_WHITE);
-    if (display_text(WORDS, help_text, formation, NULL))
+    if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    do {
-        button = rb->button_get(true);
-        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
-            return true;
-    } while( ( button == BUTTON_NONE )
-            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
     rb->lcd_setfont(FONT_SYSFIXED);
-    return 0;
+
+    return false;
 }
 
 static bool _ingame;

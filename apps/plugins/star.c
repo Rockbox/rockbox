@@ -1051,8 +1051,6 @@ static int star_run_game(int current_level)
  */
 static bool star_help(void)
 {
-    int button;
-#define WORDS (sizeof help_text / sizeof (char*))
     static char* help_text[] = {
         "Star", "", "Aim", "",
         "Take", "all", "the", "stars", "to", "go", "to", "the", "next", "level.",
@@ -1070,27 +1068,17 @@ static bool star_help(void)
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
         { 2, C_RED },
         { 35, C_RED },
-        { -1, 0 }
+        LAST_STYLE_ITEM
     };
-#if LCD_DEPTH > 1
-#ifndef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_WHITE );
-    rb->lcd_set_foreground(LCD_BLACK );
+#if LCD_DEPTH > 1 && !defined(HAVE_LCD_COLOR)
+    rb->lcd_set_background(LCD_WHITE);
+    rb->lcd_set_foreground(LCD_BLACK);
 #endif
-#endif
-    if (display_text(WORDS, help_text, formation, NULL))
+    if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    do {
-        button = rb->button_get(true);
-        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
-            return true;
-    } while( ( button == BUTTON_NONE )
-            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
-#if LCD_DEPTH > 1
-#ifndef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK );
-    rb->lcd_set_foreground(LCD_WHITE );
-#endif
+#if LCD_DEPTH > 1 && !defined(HAVE_LCD_COLOR)
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_set_foreground(LCD_WHITE);
 #endif
     return false;
 }

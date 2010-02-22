@@ -1135,7 +1135,6 @@ static unsigned int play_again(void) {
 * blackjack_help() displays help text.
 ******************************************************************************/
 static bool blackjack_help(void) {
-#define WORDS (sizeof help_text / sizeof (char*))
     static char *help_text[] = {
         "Blackjack", "", "Aim", "",
         "Try", "to", "get", "as", "close", "to", "21", "without", "going",
@@ -1151,26 +1150,18 @@ static bool blackjack_help(void) {
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
         { 2, C_RED },
         { 26, C_RED },
-        { -1, 0 }
+        LAST_STYLE_ITEM
     };
-    int button;
 
     rb->lcd_setfont(FONT_UI);
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
-
-    if (display_text(WORDS, help_text, formation, NULL))
+    if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    do {
-        button = rb->button_get(true);
-        if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-            return true;
-        }
-    } while( ( button == BUTTON_NONE )
-          || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
     rb->lcd_setfont(FONT_SYSFIXED);
+
     return false;
 }
 

@@ -28,8 +28,20 @@
 #define MARGIN 5
 #endif
 
-bool display_text(short words, char** text, struct style_text* style,
-                  struct viewport* vp_text)
+static bool wait_key_press(void)
+{
+    int button;
+    do {
+        button = rb->button_get(true);
+        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+            return true;
+    } while( ( button == BUTTON_NONE )
+            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+    return false;
+}
+
+bool display_text(unsigned short words, char** text, struct style_text* style,
+                  struct viewport* vp_text, bool wait_key)
 {
 #ifdef HAVE_LCD_BITMAP
     int prev_drawmode;
@@ -41,7 +53,6 @@ bool display_text(short words, char** text, struct style_text* style,
     unsigned short x , y;
     unsigned short vp_width = LCD_WIDTH;
     unsigned short vp_height = LCD_HEIGHT;
-    int button;
     unsigned short i = 0, style_index = 0;
     if (vp_text != NULL) {
         vp_width = vp_text->width;
@@ -76,12 +87,8 @@ bool display_text(short words, char** text, struct style_text* style,
         if (y + height > vp_height - MARGIN) {
             y = MARGIN;
             rb->screens[SCREEN_MAIN]->update_viewport();
-            do {
-                button = rb->button_get(true);
-                if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
-                    return true;
-            } while( ( button == BUTTON_NONE )
-                    || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+            if (wait_key_press())
+                return true;
             rb->screens[SCREEN_MAIN]->clear_viewport();
         }
         /* no text formatting available */
@@ -134,5 +141,10 @@ bool display_text(short words, char** text, struct style_text* style,
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_set_drawmode(prev_drawmode);
 #endif
+    if (wait_key)
+    {
+        if (wait_key_press())
+            return true;
+    }
     return false;
 }

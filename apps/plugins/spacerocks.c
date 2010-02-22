@@ -1745,31 +1745,22 @@ static void initialise_game(void)
 static bool spacerocks_help(void)
 {
     static char *help_text[] = {
-        "Spacerocks", "", "Aim", "", "The", "goal", "of", "the", "game", "is",
-        "to", "blow", "up", "the", "asteroids", "and", "avoid", "being", "hit", "by",
-        "them.", "Also", "you'd", "better", "watch", "out", "for", "the", "UFOs!"
+        "Spacerocks", "", "Aim", "",
+        "The", "goal", "of", "the", "game", "is", "to", "blow", "up",
+        "the", "asteroids", "and", "avoid", "being", "hit", "by", "them.",
+        "Also", "you'd", "better", "watch", "out", "for", "the", "UFOs!"
     };
     static struct style_text formation[]={
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
         { 2, C_RED },
-        { -1, 0 }
+        LAST_STYLE_ITEM
     };
-    int button;
 
     rb->lcd_setfont(FONT_UI);
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
-#endif
-    if (display_text(ARRAYLEN(help_text), help_text, formation, NULL)
-            == PLUGIN_USB_CONNECTED)
+    SET_BG(LCD_BLACK);
+    SET_FG(LCD_WHITE);
+    if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    do {
-        button = rb->button_get(true);
-        if (button == SYS_USB_CONNECTED)
-            return true;
-    } while( ( button == BUTTON_NONE )
-            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
     rb->lcd_setfont(FONT_SYSFIXED);
 
     return false;

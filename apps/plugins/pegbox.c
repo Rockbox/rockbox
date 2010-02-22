@@ -970,8 +970,6 @@ static void pegbox_move_player(struct game_context* pb, signed int x_dir,
 ************************************************************************/
 static bool pegbox_help(void)
 {
-    int button;
-#define WORDS (sizeof help_text / sizeof (char*))
     static char* help_text[] = {
         "Pegbox", "", "Aim", "",
         "To", "beat", "each", "level,", "you", "must", "destroy", "all", "of",
@@ -990,20 +988,14 @@ static bool pegbox_help(void)
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
         { 2, C_RED },
         { 46, C_RED },
-        { -1, 0 }
+        LAST_STYLE_ITEM
     };
 
     rb->lcd_setfont(FONT_UI);
-
-    if (display_text(WORDS, help_text, formation, NULL))
+    if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    do {
-        button = rb->button_get(true);
-        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
-            return true;
-    } while( ( button == BUTTON_NONE )
-            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
     rb->lcd_setfont(FONT_SYSFIXED);
+
     return false;
 }
 

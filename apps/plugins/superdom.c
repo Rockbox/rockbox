@@ -566,7 +566,6 @@ int settings_menu(void) {
 }
 
 static int superdom_help(void) {
-    int button;
     static char* help_text[] = {
         "Super", "domination", "is", "a", "turn", "based", "strategy", "game,",
         "where", "the", "aim", "is", "to", "overpower", "the", "computer",
@@ -580,15 +579,8 @@ static int superdom_help(void) {
         "and", "number", "of", "troops", "on", "them.",
     };
 
-    if (display_text(ARRAYLEN(help_text), help_text, NULL, NULL))
+    if (display_text(ARRAYLEN(help_text), help_text, NULL, NULL, true))
         return RET_VAL_USB;
-    do {
-        button = rb->button_get(true);
-        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
-            return RET_VAL_USB;
-    } while( ( button == BUTTON_NONE )
-            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
-
     return RET_VAL_OK;
 }
 

@@ -19,16 +19,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _DISPLAY_TEXT_H
+#define _DISPLAY_TEXT_H
+
 #include "plugin.h"
+
 /*
  * basic usage:
- * #define WORDS (sizeof text / sizeof (char*))
  * char *text[] = {"normal", "centering", "red,underline"};
  * struct style_text formation[]={
  *     { 1, TEXT_CENTER },
  *     { 2, C_RED|TEXT_UNDERLINE },
+ *     LAST_STYLE_ITEM
  * };
- * if (display_text(WORDS, text, formation, NULL))
+ * if (display_text(ARRAYLEN(text), text, formation, NULL, true))
  *      return PLUGIN_USB_CONNECTED;
  */
 
@@ -36,13 +40,23 @@ enum ecolor { STANDARD, C_YELLOW, C_RED, C_BLUE, C_GREEN , C_ORANGE };
 #define TEXT_COLOR_MASK 0x00ff
 #define TEXT_CENTER     0x0100
 #define TEXT_UNDERLINE  0x0200
+#define LAST_STYLE_ITEM { -1, 0 }
 
 struct style_text {
     unsigned short index;
     unsigned short flags;
 };
 
-/* style and vp_text are optional.
- * return true if usb is connected. */
-bool display_text(short words, char** text, struct style_text* style,
-                  struct viewport* vp_text);
+/*
+ * display text.
+ *  - words : number of words in text.
+ *  - text  : array of word to be displayed. use empty string for newline.
+ *  - style : (optional) set style of each word. must be sorted by index.
+ *  - vp_text  : (optional) viewport to display text.
+ *  - wait_key : set true to wait button press after all words is displayed.
+ * return true if usb is connected, false otherwise.
+ */
+bool display_text(unsigned short words, char** text, struct style_text* style,
+                  struct viewport* vp_text, bool wait_key);
+
+#endif /*  _DISPLAY_TEXT_H */

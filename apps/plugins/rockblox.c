@@ -1218,20 +1218,20 @@ static void move_down (void)
 
 static bool rockblox_help(void)
 {
-    int button;
-
-#define WORDS (sizeof help_text / sizeof (char*))
-    char *help_text[] = {
-        "Rockblox", "", "Aim", "", "Make", "the", "falling", "blocks", "of", "different",
-        "shapes", "form", "full", "rows.", "Whenever", "a", "row", "is", "completed,", "it",
-        "will", "be", "cleared", "away", "and", "you", "gain", "points."
+    static char *help_text[] = {
+        "Rockblox", "", "Aim", "",
+        "Make", "the", "falling", "blocks", "of",
+        "different", "shapes", "form", "full", "rows.",
+        "Whenever", "a", "row", "is", "completed,",
+        "it", "will", "be", "cleared", "away",
+        "and", "you", "gain", "points."
     };
-
     static struct style_text formation[]={
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
         { 2, C_RED },
-        { -1, 0 }
+        LAST_STYLE_ITEM
     };
+
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_UI);
 #endif
@@ -1239,17 +1239,12 @@ static bool rockblox_help(void)
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
-    if (display_text(WORDS, help_text, formation, NULL))
+    if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    do {
-        button = rb->button_get(true);
-        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
-            return true;
-    } while( ( button == BUTTON_NONE )
-            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_SYSFIXED);
 #endif
+
     return false;
 }
 

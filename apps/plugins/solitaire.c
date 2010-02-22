@@ -686,8 +686,6 @@ static void draw_empty_stack( int s, int x, int y, bool cursor )
 /* Help */
 static bool solitaire_help( void )
 {
-
-#define WORDS (sizeof help_text / sizeof (char*))
     static char* help_text[] = {
         "Solitaire", "", "Controls", "",
         HK_LR   ":", "Move", "the", "cursor", "to", "the",
@@ -711,29 +709,10 @@ static bool solitaire_help( void )
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
         { 2, C_RED },
         { 48, C_RED },
-        { -1, 0 }
+        LAST_STYLE_ITEM
     };
-#if LCD_DEPTH > 1
-    fb_data* backdrop = rb->lcd_get_backdrop();
-    rb->lcd_set_backdrop(NULL);
-#endif
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
-#endif
-    int button;
-    if (display_text(WORDS, help_text, formation, NULL))
+    if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    do {
-        button = rb->button_get(true);
-        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
-            return true;
-    } while( ( button == BUTTON_NONE )
-            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
-
-#if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(backdrop);
-#endif
     return false;
 }
 
