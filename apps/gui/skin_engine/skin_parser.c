@@ -571,14 +571,13 @@ char *get_image_filename(const char *start, const char* bmpdir,
                                 char *buf, int buf_size)
 {
     const char *end = strchr(start, '|');
+    int bmpdirlen = strlen(bmpdir);
 
-    if ( !end || (end - start) >= (buf_size - (int)ROCKBOX_DIR_LEN - 2) )
+    if ( !end || (end - start) >= (buf_size - bmpdirlen - 2) )
     {
-        buf = "\0";
+        buf[0] = '\0';
         return NULL;
     }
-
-    int bmpdirlen = strlen(bmpdir);
 
     strcpy(buf, bmpdir);
     buf[bmpdirlen] = '/';
