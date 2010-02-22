@@ -175,6 +175,10 @@
 
 #define MCI_FIFO        ((unsigned long *) (SD_BASE+0x100))
 
+#define UNALIGNED_NUM_SECTORS 10
+static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SD_BLOCK_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
+static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
+
 static int sd_init_card(void);
 static void init_controller(void);
 
@@ -404,13 +408,13 @@ static void init_controller(void)
     int idx = (MCI_HCON >> 1) & 31;
     int idx_bits = (1 << idx) -1;
 
-    MCI_CLKSRC = 0;
-    MCI_CLKDIV = 0;
-
     MCI_PWREN &= ~idx_bits;
     MCI_PWREN = idx_bits;
 
     mci_delay();
+
+    MCI_CLKSRC = 0;
+    MCI_CLKDIV = 0;
 
     MCI_CTRL |= CTRL_RESET;
     while(MCI_CTRL & CTRL_RESET)
@@ -563,12 +567,20 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
     const int cmd = write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
 
     /* Interrupt handler might set this to true during transfer */
-    retry = false;
-
     do
     {
+        void *dma_buf = aligned_buffer;
+        unsigned int transfer = count;
+        if(transfer > UNALIGNED_NUM_SECTORS)
+            transfer = UNALIGNED_NUM_SECTORS;
+
+        if(write)
+            memcpy(uncached_buffer, buf, transfer * SD_BLOCK_SIZE);
+
+        retry = false;
+
         MCI_BLKSIZ = SD_BLOCK_SIZE;
-        MCI_BYTCNT = count * SD_BLOCK_SIZE;
+        MCI_BYTCNT = transfer * SD_BLOCK_SIZE;
 
         MCI_CTRL |= (FIFO_RESET|DMA_RESET);
         while(MCI_CTRL & (FIFO_RESET|DMA_RESET))
@@ -592,10 +604,10 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
             panicf("transfer multiple blocks failed (%d)", ret);
 
         if(write)
-            dma_enable_channel(0, buf, MCI_FIFO, DMA_PERI_SD,
+            dma_enable_channel(0, dma_buf, MCI_FIFO, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
         else
-            dma_enable_channel(0, MCI_FIFO, buf, DMA_PERI_SD,
+            dma_enable_channel(0, MCI_FIFO, dma_buf, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
         data_transfer = true;
@@ -617,7 +629,16 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
             panicf(" wait for state TRAN failed (%d)", ret);
             goto sd_transfer_error;
         }
-    } while(retry);
+
+        if(!retry)
+        {
+            if(!write)
+                memcpy(buf, uncached_buffer, transfer * SD_BLOCK_SIZE);
+            buf += transfer * SD_BLOCK_SIZE;
+            start += transfer;
+            count -= transfer;
+        }
+    } while(retry || count);
 
     dma_release();
 
@@ -640,7 +661,8 @@ int sd_read_sectors(unsigned long start, int count, void* buf)
 
 int sd_write_sectors(unsigned long start, int count, const void* buf)
 {
-#if defined(BOOTLOADER) /* we don't need write support in bootloader */
+#if 1 /* disabled until stable*/ \
+    || defined(BOOTLOADER) /* we don't need write support in bootloader */
     (void) start;
     (void) count;
     (void) buf;
