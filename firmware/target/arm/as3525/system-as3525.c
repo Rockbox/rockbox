@@ -268,9 +268,12 @@ void system_init(void)
         CCU_SRL = CCU_SRL_MAGIC_NUMBER;
     CCU_SRC = CCU_SRL = 0;
 
+#ifdef BOOTLOADER   /* FIXME */
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
     CGU_PERI |= ((CLK_DIV(AS3525_PLLA_FREQ, AS3525_PCLK_FREQ) - 1) << 2)
                 | 1; /* clk_in = PLLA */
+#endif
+
 #else
     unsigned int reset_loops = 640;
 
