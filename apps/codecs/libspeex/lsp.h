@@ -1,10 +1,10 @@
 /*---------------------------------------------------------------------------*\
 Original Copyright
-	FILE........: AK2LSPD.H
-	TYPE........: Turbo C header file
-	COMPANY.....: Voicetronix
-	AUTHOR......: James Whitehall
-	DATE CREATED: 21/11/95
+    FILE........: AK2LSPD.H
+    TYPE........: Turbo C header file
+    COMPANY.....: Voicetronix
+    AUTHOR......: James Whitehall
+    DATE CREATED: 21/11/95
 
 Modified by Jean-Marc Valin
 
@@ -61,4 +61,4 @@ void lsp_enforce_margin(spx_lsp_t *lsp, int len, spx_word16_t margin);
 
 void lsp_interpolate(spx_lsp_t *old_lsp, spx_lsp_t *new_lsp, spx_lsp_t *interp_lsp, int len, int subframe, int nb_subframes);
 
-#endif	/* __AK2LSPD__ */
+#endif  /* __AK2LSPD__ */

@@ -69,8 +69,8 @@ mad_fixed_t const linear_table[14] ICONST_ATTR = {
 };
 
 /*
- * NAME:	I_sample()
- * DESCRIPTION:	decode one requantized Layer I sample from a bitstream
+ * NAME:    I_sample()
+ * DESCRIPTION: decode one requantized Layer I sample from a bitstream
  */
 static inline
 mad_fixed_t I_sample(struct mad_bitptr *ptr, unsigned int nb)
@@ -99,8 +99,8 @@ mad_fixed_t I_sample(struct mad_bitptr *ptr, unsigned int nb)
 }
 
 /*
- * NAME:	layer->I()
- * DESCRIPTION:	decode a single Layer I frame
+ * NAME:    layer->I()
+ * DESCRIPTION: decode a single Layer I frame
  */
 int mad_layer_I(struct mad_stream *stream, struct mad_frame *frame)
 {
@@ -121,10 +121,10 @@ int mad_layer_I(struct mad_stream *stream, struct mad_frame *frame)
   if (header->flags & MAD_FLAG_PROTECTION) {
     header->crc_check =
       mad_bit_crc(stream->ptr, 4 * (bound * nch + (32 - bound)),
-		  header->crc_check);
+          header->crc_check);
 
     if (header->crc_check != header->crc_target &&
-	!(frame->options & MAD_OPTION_IGNORECRC)) {
+    !(frame->options & MAD_OPTION_IGNORECRC)) {
       stream->error = MAD_ERROR_BADCRC;
       return -1;
     }
@@ -137,8 +137,8 @@ int mad_layer_I(struct mad_stream *stream, struct mad_frame *frame)
       nb = mad_bit_read(&stream->ptr, 4);
 
       if (nb == 15) {
-	stream->error = MAD_ERROR_BADBITALLOC;
-	return -1;
+    stream->error = MAD_ERROR_BADBITALLOC;
+    return -1;
       }
 
       allocation[ch][sb] = nb ? nb + 1 : 0;
@@ -162,18 +162,18 @@ int mad_layer_I(struct mad_stream *stream, struct mad_frame *frame)
   for (sb = 0; sb < 32; ++sb) {
     for (ch = 0; ch < nch; ++ch) {
       if (allocation[ch][sb]) {
-	scalefactor[ch][sb] = mad_bit_read(&stream->ptr, 6);
+    scalefactor[ch][sb] = mad_bit_read(&stream->ptr, 6);
 
 # if defined(OPT_STRICT)
-	/*
-	 * Scalefactor index 63 does not appear in Table B.1 of
-	 * ISO/IEC 11172-3. Nonetheless, other implementations accept it,
-	 * so we only reject it if OPT_STRICT is defined.
-	 */
-	if (scalefactor[ch][sb] == 63) {
-	  stream->error = MAD_ERROR_BADSCALEFACTOR;
-	  return -1;
-	}
+    /*
+     * Scalefactor index 63 does not appear in Table B.1 of
+     * ISO/IEC 11172-3. Nonetheless, other implementations accept it,
+     * so we only reject it if OPT_STRICT is defined.
+     */
+    if (scalefactor[ch][sb] == 63) {
+      stream->error = MAD_ERROR_BADSCALEFACTOR;
+      return -1;
+    }
 # endif
       }
     }
@@ -184,27 +184,27 @@ int mad_layer_I(struct mad_stream *stream, struct mad_frame *frame)
   for (s = 0; s < 12; ++s) {
     for (sb = 0; sb < bound; ++sb) {
       for (ch = 0; ch < nch; ++ch) {
-	nb = allocation[ch][sb];
-	(*frame->sbsample)[ch][s][sb] = nb ?
-	  mad_f_mul(I_sample(&stream->ptr, nb),
-		    sf_table[scalefactor[ch][sb]]) : 0;
+    nb = allocation[ch][sb];
+    (*frame->sbsample)[ch][s][sb] = nb ?
+      mad_f_mul(I_sample(&stream->ptr, nb),
+            sf_table[scalefactor[ch][sb]]) : 0;
       }
     }
 
     for (sb = bound; sb < 32; ++sb) {
       if ((nb = allocation[0][sb])) {
-	mad_fixed_t sample;
+    mad_fixed_t sample;
 
-	sample = I_sample(&stream->ptr, nb);
+    sample = I_sample(&stream->ptr, nb);
 
-	for (ch = 0; ch < nch; ++ch) {
-	  (*frame->sbsample)[ch][s][sb] =
-	    mad_f_mul(sample, sf_table[scalefactor[ch][sb]]);
-	}
+    for (ch = 0; ch < nch; ++ch) {
+      (*frame->sbsample)[ch][s][sb] =
+        mad_f_mul(sample, sf_table[scalefactor[ch][sb]]);
+    }
       }
       else {
-	for (ch = 0; ch < nch; ++ch)
-	  (*frame->sbsample)[ch][s][sb] = 0;
+    for (ch = 0; ch < nch; ++ch)
+      (*frame->sbsample)[ch][s][sb] = 0;
       }
     }
   }
@@ -221,18 +221,18 @@ struct {
   unsigned char const offsets[30];
 } const sbquant_table[5] = {
   /* ISO/IEC 11172-3 Table B.2a */
-  { 27, { 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3,	/* 0 */
-	  3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0 } },
+  { 27, { 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3,   /* 0 */
+      3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0 } },
   /* ISO/IEC 11172-3 Table B.2b */
-  { 30, { 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3,	/* 1 */
-	  3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0 } },
+  { 30, { 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3,   /* 1 */
+      3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0 } },
   /* ISO/IEC 11172-3 Table B.2c */
-  {  8, { 5, 5, 2, 2, 2, 2, 2, 2 } },				/* 2 */
+  {  8, { 5, 5, 2, 2, 2, 2, 2, 2 } },               /* 2 */
   /* ISO/IEC 11172-3 Table B.2d */
-  { 12, { 5, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 } },		/* 3 */
+  { 12, { 5, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 } },       /* 3 */
   /* ISO/IEC 13818-3 Table B.1 */
-  { 30, { 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1,	/* 4 */
-	  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } }
+  { 30, { 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1,   /* 4 */
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } }
 };
 
 /* bit allocation table */
@@ -275,13 +275,13 @@ struct quantclass {
 };
 
 /*
- * NAME:	II_samples()
- * DESCRIPTION:	decode three requantized Layer II samples from a bitstream
+ * NAME:    II_samples()
+ * DESCRIPTION: decode three requantized Layer II samples from a bitstream
  */
 static
 void II_samples(struct mad_bitptr *ptr,
-		struct quantclass const *quantclass,
-		mad_fixed_t output[3])
+        struct quantclass const *quantclass,
+        mad_fixed_t output[3])
 {
   unsigned int nb, s, sample[3];
 
@@ -326,8 +326,8 @@ void II_samples(struct mad_bitptr *ptr,
 }
 
 /*
- * NAME:	layer->II()
- * DESCRIPTION:	decode a single Layer II frame
+ * NAME:    layer->II()
+ * DESCRIPTION: decode a single Layer II frame
  */
 int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)
 {
@@ -358,19 +358,19 @@ int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)
        * restriction. We enforce it if OPT_STRICT is defined.
        */
       if (bitrate_per_channel <= 28000 || bitrate_per_channel == 40000) {
-	stream->error = MAD_ERROR_BADMODE;
-	return -1;
+    stream->error = MAD_ERROR_BADMODE;
+    return -1;
       }
 # endif
     }
     else {  /* nch == 1 */
       if (bitrate_per_channel > 192000) {
-	/*
-	 * ISO/IEC 11172-3 does not allow single channel mode for 224, 256,
-	 * 320, or 384 kbps bitrates in Layer II.
-	 */
-	stream->error = MAD_ERROR_BADMODE;
-	return -1;
+    /*
+     * ISO/IEC 11172-3 does not allow single channel mode for 224, 256,
+     * 320, or 384 kbps bitrates in Layer II.
+     */
+    stream->error = MAD_ERROR_BADMODE;
+    return -1;
       }
     }
 
@@ -419,7 +419,7 @@ int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)
   for (sb = 0; sb < sblimit; ++sb) {
     for (ch = 0; ch < nch; ++ch) {
       if (allocation[ch][sb])
-	scfsi[ch][sb] = mad_bit_read(&stream->ptr, 2);
+    scfsi[ch][sb] = mad_bit_read(&stream->ptr, 2);
     }
   }
 
@@ -428,10 +428,10 @@ int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)
   if (header->flags & MAD_FLAG_PROTECTION) {
     header->crc_check =
       mad_bit_crc(start, mad_bit_length(&start, &stream->ptr),
-		  header->crc_check);
+          header->crc_check);
 
     if (header->crc_check != header->crc_target &&
-	!(frame->options & MAD_OPTION_IGNORECRC)) {
+    !(frame->options & MAD_OPTION_IGNORECRC)) {
       stream->error = MAD_ERROR_BADCRC;
       return -1;
     }
@@ -442,39 +442,39 @@ int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)
   for (sb = 0; sb < sblimit; ++sb) {
     for (ch = 0; ch < nch; ++ch) {
       if (allocation[ch][sb]) {
-	scalefactor[ch][sb][0] = mad_bit_read(&stream->ptr, 6);
+    scalefactor[ch][sb][0] = mad_bit_read(&stream->ptr, 6);
 
-	switch (scfsi[ch][sb]) {
-	case 2:
-	  scalefactor[ch][sb][2] =
-	  scalefactor[ch][sb][1] =
-	  scalefactor[ch][sb][0];
-	  break;
+    switch (scfsi[ch][sb]) {
+    case 2:
+      scalefactor[ch][sb][2] =
+      scalefactor[ch][sb][1] =
+      scalefactor[ch][sb][0];
+      break;
 
-	case 0:
-	  scalefactor[ch][sb][1] = mad_bit_read(&stream->ptr, 6);
-	  /* fall through */
+    case 0:
+      scalefactor[ch][sb][1] = mad_bit_read(&stream->ptr, 6);
+      /* fall through */
 
-	case 1:
-	case 3:
-	  scalefactor[ch][sb][2] = mad_bit_read(&stream->ptr, 6);
-	}
+    case 1:
+    case 3:
+      scalefactor[ch][sb][2] = mad_bit_read(&stream->ptr, 6);
+    }
 
-	if (scfsi[ch][sb] & 1)
-	  scalefactor[ch][sb][1] = scalefactor[ch][sb][scfsi[ch][sb] - 1];
+    if (scfsi[ch][sb] & 1)
+      scalefactor[ch][sb][1] = scalefactor[ch][sb][scfsi[ch][sb] - 1];
 
 # if defined(OPT_STRICT)
-	/*
-	 * Scalefactor index 63 does not appear in Table B.1 of
-	 * ISO/IEC 11172-3. Nonetheless, other implementations accept it,
-	 * so we only reject it if OPT_STRICT is defined.
-	 */
-	if (scalefactor[ch][sb][0] == 63 ||
-	    scalefactor[ch][sb][1] == 63 ||
-	    scalefactor[ch][sb][2] == 63) {
-	  stream->error = MAD_ERROR_BADSCALEFACTOR;
-	  return -1;
-	}
+    /*
+     * Scalefactor index 63 does not appear in Table B.1 of
+     * ISO/IEC 11172-3. Nonetheless, other implementations accept it,
+     * so we only reject it if OPT_STRICT is defined.
+     */
+    if (scalefactor[ch][sb][0] == 63 ||
+        scalefactor[ch][sb][1] == 63 ||
+        scalefactor[ch][sb][2] == 63) {
+      stream->error = MAD_ERROR_BADSCALEFACTOR;
+      return -1;
+    }
 # endif
       }
     }
@@ -485,50 +485,50 @@ int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)
   for (gr = 0; gr < 12; ++gr) {
     for (sb = 0; sb < bound; ++sb) {
       for (ch = 0; ch < nch; ++ch) {
-	if ((index = allocation[ch][sb])) {
+    if ((index = allocation[ch][sb])) {
           int off = bitalloc_table[offsets[sb]].offset;
-	  index = offset_table[off][index - 1];
+      index = offset_table[off][index - 1];
 
-	  II_samples(&stream->ptr, &qc_table[index], samples);
+      II_samples(&stream->ptr, &qc_table[index], samples);
 
-	  for (s = 0; s < 3; ++s) {
-	    (*frame->sbsample)[ch][3 * gr + s][sb] =
-	      mad_f_mul(samples[s], sf_table[scalefactor[ch][sb][gr / 4]]);
-	  }
-	}
-	else {
-	  for (s = 0; s < 3; ++s)
-	    (*frame->sbsample)[ch][3 * gr + s][sb] = 0;
-	}
+      for (s = 0; s < 3; ++s) {
+        (*frame->sbsample)[ch][3 * gr + s][sb] =
+          mad_f_mul(samples[s], sf_table[scalefactor[ch][sb][gr / 4]]);
+      }
+    }
+    else {
+      for (s = 0; s < 3; ++s)
+        (*frame->sbsample)[ch][3 * gr + s][sb] = 0;
+    }
       }
     }
 
     for (sb = bound; sb < sblimit; ++sb) {
       if ((index = allocation[0][sb])) {
         int off = bitalloc_table[offsets[sb]].offset;
-	index = offset_table[off][index - 1];
+    index = offset_table[off][index - 1];
 
-	II_samples(&stream->ptr, &qc_table[index], samples);
+    II_samples(&stream->ptr, &qc_table[index], samples);
 
-	for (ch = 0; ch < nch; ++ch) {
-	  for (s = 0; s < 3; ++s) {
-	    (*frame->sbsample)[ch][3 * gr + s][sb] =
-	      mad_f_mul(samples[s], sf_table[scalefactor[ch][sb][gr / 4]]);
-	  }
-	}
+    for (ch = 0; ch < nch; ++ch) {
+      for (s = 0; s < 3; ++s) {
+        (*frame->sbsample)[ch][3 * gr + s][sb] =
+          mad_f_mul(samples[s], sf_table[scalefactor[ch][sb][gr / 4]]);
+      }
+    }
       }
       else {
-	for (ch = 0; ch < nch; ++ch) {
-	  for (s = 0; s < 3; ++s)
-	    (*frame->sbsample)[ch][3 * gr + s][sb] = 0;
-	}
+    for (ch = 0; ch < nch; ++ch) {
+      for (s = 0; s < 3; ++s)
+        (*frame->sbsample)[ch][3 * gr + s][sb] = 0;
+    }
       }
     }
 
     for (ch = 0; ch < nch; ++ch) {
       for (s = 0; s < 3; ++s) {
-	for (sb = sblimit; sb < 32; ++sb)
-	  (*frame->sbsample)[ch][3 * gr + s][sb] = 0;
+    for (sb = sblimit; sb < 32; ++sb)
+      (*frame->sbsample)[ch][3 * gr + s][sb] = 0;
       }
     }
   }

@@ -1561,7 +1561,7 @@ static void hf_assembly(sbr_info *sbr, sbr_hfadj_info *adj,
 #ifndef SBR_LOW_POWER
                 if (h_SL != 0)
                 {
-                	uint8_t ri = sbr->GQ_ringbuf_index[ch];
+                    uint8_t ri = sbr->GQ_ringbuf_index[ch];
                     for (n = 0; n <= 4; n++)
                     {
                         real_t curr_h_smooth = h_smooth[n];

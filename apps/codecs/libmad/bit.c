@@ -87,8 +87,8 @@ unsigned short const crc_table[256] = {
 #endif
 
 /*
- * NAME:	bit->init()
- * DESCRIPTION:	initialize bit pointer struct
+ * NAME:    bit->init()
+ * DESCRIPTION: initialize bit pointer struct
  */
 void mad_bit_init(struct mad_bitptr *bitptr, unsigned char const *byte)
 {
@@ -97,11 +97,11 @@ void mad_bit_init(struct mad_bitptr *bitptr, unsigned char const *byte)
 }
 
 /*
- * NAME:	bit->length()
- * DESCRIPTION:	return number of bits between start and end points
+ * NAME:    bit->length()
+ * DESCRIPTION: return number of bits between start and end points
  */
 unsigned int mad_bit_length(struct mad_bitptr const *begin,
-			    struct mad_bitptr const *end)
+                struct mad_bitptr const *end)
 {
   return end->readbit - begin->readbit;
 }
@@ -111,8 +111,8 @@ unsigned char mad_bit_bitsleft(struct mad_bitptr const *bitptr)
   return 8 - (bitptr->readbit & 7);
 }
 /*
- * NAME:	bit->nextbyte()
- * DESCRIPTION:	return pointer to next unprocessed byte
+ * NAME:    bit->nextbyte()
+ * DESCRIPTION: return pointer to next unprocessed byte
  */
 unsigned char const *mad_bit_nextbyte(struct mad_bitptr const *bitptr)
 {
@@ -120,8 +120,8 @@ unsigned char const *mad_bit_nextbyte(struct mad_bitptr const *bitptr)
 }
 
 /*
- * NAME:	bit->skip()
- * DESCRIPTION:	advance bit pointer
+ * NAME:    bit->skip()
+ * DESCRIPTION: advance bit pointer
  */
 void mad_bit_skip(struct mad_bitptr *bitptr, unsigned int len)
 {
@@ -129,8 +129,8 @@ void mad_bit_skip(struct mad_bitptr *bitptr, unsigned int len)
 }
 
 /*
- * NAME:	bit->read()
- * DESCRIPTION:	read an arbitrary number of bits and return their UIMSBF value
+ * NAME:    bit->read()
+ * DESCRIPTION: read an arbitrary number of bits and return their UIMSBF value
  */
 
 uint32_t mad_bit_read(struct mad_bitptr *bitptr, unsigned int len) ICODE_ATTR;
@@ -154,11 +154,11 @@ uint32_t mad_bit_read(struct mad_bitptr *bitptr, unsigned int len)
 
 # if 0
 /*
- * NAME:	bit->write()
- * DESCRIPTION:	write an arbitrary number of bits
+ * NAME:    bit->write()
+ * DESCRIPTION: write an arbitrary number of bits
  */
 void mad_bit_write(struct mad_bitptr *bitptr, unsigned int len,
-		   uint32_t value)
+           uint32_t value)
 {
   unsigned char *ptr;
 
@@ -169,11 +169,11 @@ void mad_bit_write(struct mad_bitptr *bitptr, unsigned int len,
 # endif
 
 /*
- * NAME:	bit->crc()
- * DESCRIPTION:	compute CRC-check word
+ * NAME:    bit->crc()
+ * DESCRIPTION: compute CRC-check word
  */
 unsigned short mad_bit_crc(struct mad_bitptr bitptr, unsigned int len,
-			   unsigned short init)
+               unsigned short init)
 {
   register unsigned int crc;
 
@@ -190,11 +190,11 @@ unsigned short mad_bit_crc(struct mad_bitptr bitptr, unsigned int len,
 
   switch (len / 8) {
   case 3: crc = (crc << 8) ^
-	    crc_table[((crc >> 8) ^ mad_bit_read(&bitptr, 8)) & 0xff];
+        crc_table[((crc >> 8) ^ mad_bit_read(&bitptr, 8)) & 0xff];
   case 2: crc = (crc << 8) ^
-	    crc_table[((crc >> 8) ^ mad_bit_read(&bitptr, 8)) & 0xff];
+        crc_table[((crc >> 8) ^ mad_bit_read(&bitptr, 8)) & 0xff];
   case 1: crc = (crc << 8) ^
-	    crc_table[((crc >> 8) ^ mad_bit_read(&bitptr, 8)) & 0xff];
+        crc_table[((crc >> 8) ^ mad_bit_read(&bitptr, 8)) & 0xff];
 
   len %= 8;
 

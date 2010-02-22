@@ -78,7 +78,7 @@ typedef struct
 {
     uint8_t     cb;
     uint8_t     decoded;
-    uint16_t	sp_offset;
+    uint16_t    sp_offset;
     bits_t      bits;
 } codeword_t;
 

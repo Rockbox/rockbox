@@ -128,20 +128,20 @@ void hf_generation(sbr_info *sbr, qmf_t Xlow[MAX_NTSRHFG][64],
                 a1_i = MUL_C(IM(alpha_1[p]), bw2);
 #endif
 
-            	temp2_r = QMF_RE(Xlow[first - 2 + offset][p]);
-            	temp3_r = QMF_RE(Xlow[first - 1 + offset][p]);
+                temp2_r = QMF_RE(Xlow[first - 2 + offset][p]);
+                temp3_r = QMF_RE(Xlow[first - 1 + offset][p]);
 #ifndef SBR_LOW_POWER
-            	temp2_i = QMF_IM(Xlow[first - 2 + offset][p]);
-            	temp3_i = QMF_IM(Xlow[first - 1 + offset][p]);
+                temp2_i = QMF_IM(Xlow[first - 2 + offset][p]);
+                temp3_i = QMF_IM(Xlow[first - 1 + offset][p]);
 #endif
-				for (l = first; l < last; l++)
+                for (l = first; l < last; l++)
                 {
-                	temp1_r = temp2_r;
-                	temp2_r = temp3_r;
-                	temp3_r = QMF_RE(Xlow[l + offset][p]);
+                    temp1_r = temp2_r;
+                    temp2_r = temp3_r;
+                    temp3_r = QMF_RE(Xlow[l + offset][p]);
 #ifndef SBR_LOW_POWER
-                	temp1_i = temp2_i;
-                	temp2_i = temp3_i;
+                    temp1_i = temp2_i;
+                    temp2_i = temp3_i;
                     temp3_i = QMF_IM(Xlow[l + offset][p]);
 #endif
 
@@ -303,10 +303,10 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
 
     for (j = offset; j < len + offset; j++)
     {
-    	temp1_r = temp2_r; // temp1_r = (QMF_RE(buffer[offset-2][bd] + (1<<(exp-1))) >> exp;
-    	temp1_i = temp2_i; // temp1_i = (QMF_IM(buffer[offset-2][bd] + (1<<(exp-1))) >> exp;
-    	temp2_r = temp3_r; // temp2_r = (QMF_RE(buffer[offset-1][bd] + (1<<(exp-1))) >> exp;
-    	temp2_i = temp3_i; // temp2_i = (QMF_IM(buffer[offset-1][bd] + (1<<(exp-1))) >> exp;
+        temp1_r = temp2_r; // temp1_r = (QMF_RE(buffer[offset-2][bd] + (1<<(exp-1))) >> exp;
+        temp1_i = temp2_i; // temp1_i = (QMF_IM(buffer[offset-2][bd] + (1<<(exp-1))) >> exp;
+        temp2_r = temp3_r; // temp2_r = (QMF_RE(buffer[offset-1][bd] + (1<<(exp-1))) >> exp;
+        temp2_i = temp3_i; // temp2_i = (QMF_IM(buffer[offset-1][bd] + (1<<(exp-1))) >> exp;
         temp3_r = (QMF_RE(buffer[j][bd]) + pow2_to_exp) >> exp;
         temp3_i = (QMF_IM(buffer[j][bd]) + pow2_to_exp) >> exp;
         r01r += MUL_R(temp3_r, temp2_r) + MUL_R(temp3_i, temp2_i);
@@ -352,10 +352,10 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
 
     for (j = offset; j < len + offset; j++)
     {
-    	temp1_r = temp2_r; // temp1_r = QMF_RE(buffer[j-2][bd];
-    	temp1_i = temp2_i; // temp1_i = QMF_IM(buffer[j-2][bd];
-    	temp2_r = temp3_r; // temp2_r = QMF_RE(buffer[j-1][bd];
-    	temp2_i = temp3_i; // temp2_i = QMF_IM(buffer[j-1][bd];
+        temp1_r = temp2_r; // temp1_r = QMF_RE(buffer[j-2][bd];
+        temp1_i = temp2_i; // temp1_i = QMF_IM(buffer[j-2][bd];
+        temp2_r = temp3_r; // temp2_r = QMF_RE(buffer[j-1][bd];
+        temp2_i = temp3_i; // temp2_i = QMF_IM(buffer[j-1][bd];
         temp3_r = QMF_RE(buffer[j][bd]);
         temp3_i = QMF_IM(buffer[j][bd]);
         r01r += temp3_r * temp2_r + temp3_i * temp2_i;

@@ -221,7 +221,7 @@ static bool flac_init(int fd, FLACContext* fc)
                 offset_lo=betoh32(*(p++));
             
                 if ((seekpoint_hi != 0xffffffff) && (seekpoint_lo != 0xffffffff)) {
-		  fprintf(stderr,"Seekpoint: %u, Offset=%u\n",seekpoint_lo,offset_lo);
+          fprintf(stderr,"Seekpoint: %u, Offset=%u\n",seekpoint_lo,offset_lo);
                 }
             }
             lseek(fd, blocklength, SEEK_CUR);

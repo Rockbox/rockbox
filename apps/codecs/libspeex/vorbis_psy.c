@@ -90,9 +90,9 @@ static void _analysis_output(char *base,int i,float *v,int n,int bark,int dB){
     if(dB){
       float val;
       if(v[j]==0.)
-	val=-140.;
+    val=-140.;
       else
-	val=todB(v[j]);
+    val=todB(v[j]);
       fprintf(of,"%f\n",val);
     }else{
       fprintf(of,"%f\n",v[j]);
@@ -254,19 +254,19 @@ static void bark_noise_hybridmp(int n,const long *b,
 }
 
 static void _vp_noisemask(VorbisPsy *p,
-			  float *logfreq, 
-			  float *logmask){
+              float *logfreq, 
+              float *logmask){
 
   int i,n=p->n/2;
   float *work=alloca(n*sizeof(*work));
 
   bark_noise_hybridmp(n,p->bark,logfreq,logmask,
-		      140.,-1);
+              140.,-1);
 
   for(i=0;i<n;i++)work[i]=logfreq[i]-logmask[i];
 
   bark_noise_hybridmp(n,p->bark,work,logmask,0.,
-		      p->vi->noisewindowfixed);
+              p->vi->noisewindowfixed);
 
   for(i=0;i<n;i++)work[i]=logfreq[i]-work[i];
   
@@ -319,10 +319,10 @@ VorbisPsy *vorbis_psy_init(int rate, int n)
     float bark=toBARK(rate/(2*n)*i); 
     
     for(;lo+p->vi->noisewindowlomin<i && 
-	  toBARK(rate/(2*n)*lo)<(bark-p->vi->noisewindowlo);lo++);
+      toBARK(rate/(2*n)*lo)<(bark-p->vi->noisewindowlo);lo++);
     
     for(;hi<=n && (hi<i+p->vi->noisewindowhimin ||
-	  toBARK(rate/(2*n)*hi)<(bark+p->vi->noisewindowhi));hi++);
+      toBARK(rate/(2*n)*hi)<(bark+p->vi->noisewindowhi));hi++);
     
     p->bark[i]=((lo-1)<<16)+(hi-1);
 

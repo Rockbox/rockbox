@@ -34,8 +34,8 @@ static inline uint64_t ByteSwap64(uint64_t x)
 #elif defined(ARCH_X86)
 static inline unsigned short ByteSwap16(unsigned short x)
 {
-  __asm("xchgb %b0,%h0"	:
-        "=q" (x)	:
+  __asm("xchgb %b0,%h0" :
+        "=q" (x)    :
         "0" (x));
     return x;
 }
@@ -44,13 +44,13 @@ static inline unsigned short ByteSwap16(unsigned short x)
 static inline unsigned int ByteSwap32(unsigned int x)
 {
 #if __CPU__ > 386
- __asm("bswap	%0":
+ __asm("bswap   %0":
       "=r" (x)     :
 #else
- __asm("xchgb	%b0,%h0\n"
-      "	rorl	$16,%0\n"
-      "	xchgb	%b0,%h0":
-      "=q" (x)		:
+ __asm("xchgb   %b0,%h0\n"
+      " rorl    $16,%0\n"
+      " xchgb   %b0,%h0":
+      "=q" (x)      :
 #endif
       "0" (x));
   return x;
@@ -61,7 +61,7 @@ static inline unsigned long long int ByteSwap64(unsigned long long int x)
 {
   register union { __extension__ uint64_t __ll;
           uint32_t __l[2]; } __x;
-  asm("xchgl	%0,%1":
+  asm("xchgl    %0,%1":
       "=r"(__x.__l[0]),"=r"(__x.__l[1]):
       "0"(bswap_32((unsigned long)x)),"1"(bswap_32((unsigned long)(x>>32))));
   return __x.__ll;
@@ -71,17 +71,17 @@ static inline unsigned long long int ByteSwap64(unsigned long long int x)
 #elif defined(ARCH_SH4)
 
 static inline uint16_t ByteSwap16(uint16_t x) {
-	__asm__("swap.b %0,%0":"=r"(x):"0"(x));
-	return x;
+    __asm__("swap.b %0,%0":"=r"(x):"0"(x));
+    return x;
 }
 
 static inline uint32_t ByteSwap32(uint32_t x) {
-	__asm__(
-	"swap.b %0,%0\n"
-	"swap.w %0,%0\n"
-	"swap.b %0,%0\n"
-	:"=r"(x):"0"(x));
-	return x;
+    __asm__(
+    "swap.b %0,%0\n"
+    "swap.w %0,%0\n"
+    "swap.b %0,%0\n"
+    :"=r"(x):"0"(x));
+    return x;
 }
 
 #define bswap_16(x) ByteSwap16(x)
@@ -124,9 +124,9 @@ static inline uint64_t ByteSwap64(uint64_t x)
 }
 #define bswap_64(x) ByteSwap64(x)
 
-#endif	/* !ARCH_X86 */
+#endif  /* !ARCH_X86 */
 
-#endif	/* !HAVE_BYTESWAP_H */
+#endif  /* !HAVE_BYTESWAP_H */
 
 // be2me ... BigEndian to MachineEndian
 // le2me ... LittleEndian to MachineEndian

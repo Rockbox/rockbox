@@ -40,7 +40,7 @@ void a52_bitstream_set_ptr (a52_state_t * state, uint8_t * buf)
     state->bits_left = 0;
     state->current_word = 0;
     bitstream_get (state, align * 8);
-    bitstream_get_2 (state, 0);	/* pretend function is used - keep gcc happy */
+    bitstream_get_2 (state, 0); /* pretend function is used - keep gcc happy */
 }
 
 static inline void bitstream_fill_current (a52_state_t * state)
@@ -66,12 +66,12 @@ uint32_t a52_bitstream_get_bh (a52_state_t * state, uint32_t num_bits)
 
     num_bits -= state->bits_left;
     result = ((state->current_word << (32 - state->bits_left)) >>
-	      (32 - state->bits_left));
+          (32 - state->bits_left));
 
     bitstream_fill_current (state);
 
     if (num_bits != 0)
-	result = (result << num_bits) | (state->current_word >> (32 - num_bits));
+    result = (result << num_bits) | (state->current_word >> (32 - num_bits));
 
     state->bits_left = 32 - num_bits;
 
@@ -84,13 +84,13 @@ int32_t a52_bitstream_get_bh_2 (a52_state_t * state, uint32_t num_bits)
 
     num_bits -= state->bits_left;
     result = ((((int32_t)state->current_word) << (32 - state->bits_left)) >>
-	      (32 - state->bits_left));
+          (32 - state->bits_left));
 
     bitstream_fill_current(state);
 
     if (num_bits != 0)
-	result = (result << num_bits) | (state->current_word >> (32 - num_bits));
-	
+    result = (result << num_bits) | (state->current_word >> (32 - num_bits));
+    
     state->bits_left = 32 - num_bits;
 
     return result;

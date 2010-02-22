@@ -119,33 +119,33 @@ static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
 
 /* replaced XPROD32 with a macro to avoid memory reference 
    _x, _y are the results (must be l-values) */
-#define XPROD32(_a, _b, _t, _v, _x, _y)		\
-  { (_x)=MULT32(_a,_t)+MULT32(_b,_v);		\
+#define XPROD32(_a, _b, _t, _v, _x, _y)     \
+  { (_x)=MULT32(_a,_t)+MULT32(_b,_v);       \
     (_y)=MULT32(_b,_t)-MULT32(_a,_v); }
 
 
 #ifdef __i386__
 
-#define XPROD31(_a, _b, _t, _v, _x, _y)		\
-  { *(_x)=MULT31(_a,_t)+MULT31(_b,_v);		\
+#define XPROD31(_a, _b, _t, _v, _x, _y)     \
+  { *(_x)=MULT31(_a,_t)+MULT31(_b,_v);      \
     *(_y)=MULT31(_b,_t)-MULT31(_a,_v); }
-#define XNPROD31(_a, _b, _t, _v, _x, _y)	\
-  { *(_x)=MULT31(_a,_t)-MULT31(_b,_v);		\
+#define XNPROD31(_a, _b, _t, _v, _x, _y)    \
+  { *(_x)=MULT31(_a,_t)-MULT31(_b,_v);      \
     *(_y)=MULT31(_b,_t)+MULT31(_a,_v); }
 
 #else
 
 static inline void XPROD31(ogg_int32_t  a, ogg_int32_t  b,
-			   ogg_int32_t  t, ogg_int32_t  v,
-			   ogg_int32_t *x, ogg_int32_t *y)
+               ogg_int32_t  t, ogg_int32_t  v,
+               ogg_int32_t *x, ogg_int32_t *y)
 {
   *x = MULT31(a, t) + MULT31(b, v);
   *y = MULT31(b, t) - MULT31(a, v);
 }
 
 static inline void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
-			    ogg_int32_t  t, ogg_int32_t  v,
-			    ogg_int32_t *x, ogg_int32_t *y)
+                ogg_int32_t  t, ogg_int32_t  v,
+                ogg_int32_t *x, ogg_int32_t *y)
 {
   *x = MULT31(a, t) - MULT31(b, v);
   *y = MULT31(b, t) + MULT31(a, v);
@@ -217,8 +217,8 @@ static inline ogg_int32_t CLIP_TO_15(ogg_int32_t x) {
 #endif
 
 static inline ogg_int32_t VFLOAT_MULT(ogg_int32_t a,ogg_int32_t ap,
-				      ogg_int32_t b,ogg_int32_t bp,
-				      ogg_int32_t *p){
+                      ogg_int32_t b,ogg_int32_t bp,
+                      ogg_int32_t *p){
   if(a && b){
 #ifndef _LOW_ACCURACY_
     *p=ap+bp+32;
@@ -232,16 +232,16 @@ static inline ogg_int32_t VFLOAT_MULT(ogg_int32_t a,ogg_int32_t ap,
 }
 
 static inline ogg_int32_t VFLOAT_MULTI(ogg_int32_t a,ogg_int32_t ap,
-				      ogg_int32_t i,
-				      ogg_int32_t *p){
+                      ogg_int32_t i,
+                      ogg_int32_t *p){
 
   int ip=_ilog(abs(i))-31;
   return VFLOAT_MULT(a,ap,i<<-ip,ip,p);
 }
 
 static inline ogg_int32_t VFLOAT_ADD(ogg_int32_t a,ogg_int32_t ap,
-				      ogg_int32_t b,ogg_int32_t bp,
-				      ogg_int32_t *p){
+                      ogg_int32_t b,ogg_int32_t bp,
+                      ogg_int32_t *p){
 
   if(!a){
     *p=bp;

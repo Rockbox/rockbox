@@ -49,7 +49,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #define XfilterB        20    /* int32_t XfilterB; */
 #define YfilterA        24    /* int32_t YfilterA; */
-	
+    
 #define YcoeffsA        28    /* int32_t YcoeffsA[4]; */
 #define XcoeffsA        44    /* int32_t XcoeffsA[4]; */
 #define YcoeffsB        60    /* int32_t YcoeffsB[5]; */

@@ -1489,7 +1489,7 @@ static void fft_dif(real_t * Real, real_t * Imag)
     // First 2 stages of 32 point FFT decimation in frequency
     // 4*16*2=64*2=128 multiplications
     // 6*16*2=96*2=192 additions
-	// Stage 1 of 32 point FFT decimation in frequency
+    // Stage 1 of 32 point FFT decimation in frequency
     for (i = 0; i < 16; i++)
     {
         point1_real = Real[i];
@@ -1519,7 +1519,7 @@ static void fft_dif(real_t * Real, real_t * Imag)
         w_real = w_array_real[w_index];
         w_imag = w_array_imag[w_index];
 
-    	i = j;
+        i = j;
         point1_real = Real[i];
         point1_imag = Imag[i];
         i2 = i+8;
@@ -1818,9 +1818,9 @@ void dct4_kernel(real_t * in_real, real_t * in_imag, real_t * out_real, real_t *
     // 3*32=96 additions
     for (i = 0; i < 32; i++)
     {
-    	real_t x_re, x_im, tmp;
-    	x_re = in_real[i];
-    	x_im = in_imag[i];
+        real_t x_re, x_im, tmp;
+        x_re = in_real[i];
+        x_im = in_imag[i];
         tmp =        MUL_C(x_re + x_im, dct4_64_tab[i]);
         in_real[i] = MUL_C(x_im, dct4_64_tab[i + 64]) + tmp;
         in_imag[i] = MUL_C(x_re, dct4_64_tab[i + 32]) + tmp;
@@ -1834,10 +1834,10 @@ void dct4_kernel(real_t * in_real, real_t * in_imag, real_t * out_real, real_t *
     // 3*31+2=95 additions
     for (i = 0; i < 16; i++)
     {
-    	real_t x_re, x_im, tmp;
-    	i_rev = bit_rev_tab[i];
-    	x_re = in_real[i_rev];
-    	x_im = in_imag[i_rev];
+        real_t x_re, x_im, tmp;
+        i_rev = bit_rev_tab[i];
+        x_re = in_real[i_rev];
+        x_im = in_imag[i_rev];
 
         tmp =         MUL_C(x_re + x_im, dct4_64_tab[i + 3*32]);
         out_real[i] = MUL_C(x_im, dct4_64_tab[i + 5*32]) + tmp;
@@ -1848,10 +1848,10 @@ void dct4_kernel(real_t * in_real, real_t * in_imag, real_t * out_real, real_t *
     out_real[16] = MUL_C(in_real[1] + in_imag[1], dct4_64_tab[16 + 3*32]);
     for (i = 17; i < 32; i++)
     {
-    	real_t x_re, x_im, tmp;
-    	i_rev = bit_rev_tab[i];
-    	x_re = in_real[i_rev];
-    	x_im = in_imag[i_rev];
+        real_t x_re, x_im, tmp;
+        i_rev = bit_rev_tab[i];
+        x_re = in_real[i_rev];
+        x_im = in_imag[i_rev];
         tmp =         MUL_C(x_re + x_im, dct4_64_tab[i + 3*32]);
         out_real[i] = MUL_C(x_im, dct4_64_tab[i + 5*32]) + tmp;
         out_imag[i] = MUL_C(x_re, dct4_64_tab[i + 4*32]) + tmp;

@@ -26,13 +26,13 @@ extern "C" {
 # include <xmmintrin.h>
 # define kiss_fft_scalar __m128
 #define KISS_FFT_MALLOC(nbytes) memalign(16,nbytes)
-#else	
+#else   
 #define KISS_FFT_MALLOC speex_alloc
-#endif	
+#endif  
 
 
 #ifdef FIXED_POINT
-#include "arch.h"	
+#include "arch.h"   
 #  define kiss_fft_scalar spx_int16_t
 #else
 # ifndef kiss_fft_scalar
@@ -99,7 +99,7 @@ void kiss_fft_stride(kiss_fft_cfg cfg,const kiss_fft_cpx *fin,kiss_fft_cpx *fout
  your compiler output to call this before you exit.
 */
 void kiss_fft_cleanup(void);
-	
+    
 
 #ifdef __cplusplus
 } 

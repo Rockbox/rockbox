@@ -157,7 +157,7 @@ extern int      vorbis_info_blocksize(vorbis_info *vi,int zo);
 extern void     vorbis_comment_init(vorbis_comment *vc);
 extern void     vorbis_comment_add(vorbis_comment *vc, char *comment); 
 extern void     vorbis_comment_add_tag(vorbis_comment *vc, 
-				       char *tag, char *contents);
+                       char *tag, char *contents);
 extern void     vorbis_comment_clear(vorbis_comment *vc);
 
 extern int      vorbis_block_init(vorbis_dsp_state *v, vorbis_block *vb);
@@ -167,7 +167,7 @@ extern void     vorbis_dsp_clear(vorbis_dsp_state *v);
 /* Vorbis PRIMITIVES: synthesis layer *******************************/
 extern int      vorbis_synthesis_idheader(ogg_packet *op);
 extern int      vorbis_synthesis_headerin(vorbis_info *vi,vorbis_comment *vc,
-					  ogg_packet *op);
+                      ogg_packet *op);
 
 extern int      vorbis_synthesis_init(vorbis_dsp_state *v,vorbis_info *vi);
 extern int      vorbis_synthesis_restart(vorbis_dsp_state *v);

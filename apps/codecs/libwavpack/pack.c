@@ -409,13 +409,13 @@ static void decorr_stereo_pass_17 (struct decorr_pass *dpp, int32_t *bptr, int32
     int32_t sam;
 
     while (bptr < eptr) {
-	sam = 2 * dpp->samples_A [0] - dpp->samples_A [1];
+    sam = 2 * dpp->samples_A [0] - dpp->samples_A [1];
         dpp->samples_A [1] = dpp->samples_A [0];
         dpp->samples_A [0] = bptr [0];
         bptr [0] -= apply_weight_i (dpp->weight_A, sam);
         update_weight (dpp->weight_A, 2, sam, bptr [0]);
         bptr++;
-	sam = 2 * dpp->samples_B [0] - dpp->samples_B [1];
+    sam = 2 * dpp->samples_B [0] - dpp->samples_B [1];
         dpp->samples_B [1] = dpp->samples_B [0];
         dpp->samples_B [0] = bptr [0];
         bptr [0] -= apply_weight_i (dpp->weight_B, sam);

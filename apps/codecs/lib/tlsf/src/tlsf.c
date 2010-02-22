@@ -56,19 +56,19 @@
 #include <string.h>
 
 #ifndef TLSF_USE_LOCKS
-#define	TLSF_USE_LOCKS 	(0)
+#define TLSF_USE_LOCKS  (0)
 #endif
 
 #ifndef TLSF_STATISTIC
-#define	TLSF_STATISTIC 	(0)
+#define TLSF_STATISTIC  (0)
 #endif
 
 #ifndef USE_MMAP
-#define	USE_MMAP 	(0)
+#define USE_MMAP    (0)
 #endif
 
 #ifndef USE_SBRK
-#define	USE_SBRK 	(0)
+#define USE_SBRK    (0)
 #endif
 
 
@@ -82,18 +82,18 @@
 #endif
 
 #if TLSF_STATISTIC
-#define	TLSF_ADD_SIZE(tlsf, b) do {									\
-		tlsf->used_size += (b->size & BLOCK_SIZE) + BHDR_OVERHEAD;	\
-		if (tlsf->used_size > tlsf->max_size) 						\
-			tlsf->max_size = tlsf->used_size;						\
-		} while(0)
+#define TLSF_ADD_SIZE(tlsf, b) do {                                 \
+        tlsf->used_size += (b->size & BLOCK_SIZE) + BHDR_OVERHEAD;  \
+        if (tlsf->used_size > tlsf->max_size)                       \
+            tlsf->max_size = tlsf->used_size;                       \
+        } while(0)
 
-#define	TLSF_REMOVE_SIZE(tlsf, b) do {								\
-		tlsf->used_size -= (b->size & BLOCK_SIZE) + BHDR_OVERHEAD;	\
-	} while(0)
+#define TLSF_REMOVE_SIZE(tlsf, b) do {                              \
+        tlsf->used_size -= (b->size & BLOCK_SIZE) + BHDR_OVERHEAD;  \
+    } while(0)
 #else
-#define	TLSF_ADD_SIZE(tlsf, b)	     do{}while(0)
-#define	TLSF_REMOVE_SIZE(tlsf, b)    do{}while(0)
+#define TLSF_ADD_SIZE(tlsf, b)       do{}while(0)
+#define TLSF_REMOVE_SIZE(tlsf, b)    do{}while(0)
 #endif
 
 #if USE_MMAP || USE_SBRK
@@ -125,37 +125,37 @@
 /* Unlike the preview TLSF versions, now they are statics */
 #define BLOCK_ALIGN (sizeof(void *) * 2)
 
-#define MAX_FLI		(30)
-#define MAX_LOG2_SLI	(5)
-#define MAX_SLI		(1 << MAX_LOG2_SLI)     /* MAX_SLI = 2^MAX_LOG2_SLI */
+#define MAX_FLI     (30)
+#define MAX_LOG2_SLI    (5)
+#define MAX_SLI     (1 << MAX_LOG2_SLI)     /* MAX_SLI = 2^MAX_LOG2_SLI */
 
-#define FLI_OFFSET	(6)     /* tlsf structure just will manage blocks bigger */
+#define FLI_OFFSET  (6)     /* tlsf structure just will manage blocks bigger */
 /* than 128 bytes */
-#define SMALL_BLOCK	(128)
-#define REAL_FLI	(MAX_FLI - FLI_OFFSET)
-#define MIN_BLOCK_SIZE	(sizeof (free_ptr_t))
-#define BHDR_OVERHEAD	(sizeof (bhdr_t) - MIN_BLOCK_SIZE)
-#define TLSF_SIGNATURE	(0x2A59FA59)
+#define SMALL_BLOCK (128)
+#define REAL_FLI    (MAX_FLI - FLI_OFFSET)
+#define MIN_BLOCK_SIZE  (sizeof (free_ptr_t))
+#define BHDR_OVERHEAD   (sizeof (bhdr_t) - MIN_BLOCK_SIZE)
+#define TLSF_SIGNATURE  (0x2A59FA59)
 
-#define	PTR_MASK	(sizeof(void *) - 1)
-#define BLOCK_SIZE	(0xFFFFFFFF - PTR_MASK)
+#define PTR_MASK    (sizeof(void *) - 1)
+#define BLOCK_SIZE  (0xFFFFFFFF - PTR_MASK)
 
 #define GET_NEXT_BLOCK(_addr, _r) ((bhdr_t *) ((char *) (_addr) + (_r)))
-#define	MEM_ALIGN		  ((BLOCK_ALIGN) - 1)
+#define MEM_ALIGN         ((BLOCK_ALIGN) - 1)
 #define ROUNDUP_SIZE(_r)          (((_r) + MEM_ALIGN) & ~MEM_ALIGN)
 #define ROUNDDOWN_SIZE(_r)        ((_r) & ~MEM_ALIGN)
 #define ROUNDUP(_x, _v)           ((((~(_x)) + 1) & ((_v)-1)) + (_x))
 
-#define BLOCK_STATE	(0x1)
-#define PREV_STATE	(0x2)
+#define BLOCK_STATE (0x1)
+#define PREV_STATE  (0x2)
 
 /* bit 0 of the block size */
-#define FREE_BLOCK	(0x1)
-#define USED_BLOCK	(0x0)
+#define FREE_BLOCK  (0x1)
+#define USED_BLOCK  (0x0)
 
 /* bit 1 of the block size */
-#define PREV_FREE	(0x2)
-#define PREV_USED	(0x0)
+#define PREV_FREE   (0x2)
+#define PREV_USED   (0x0)
 
 
 #define DEFAULT_AREA_SIZE (1024*10)
@@ -352,46 +352,46 @@ static __inline__ bhdr_t *FIND_SUITABLE_BLOCK(tlsf_t * _tlsf, int *_fl, int *_sl
 }
 
 
-#define EXTRACT_BLOCK_HDR(_b, _tlsf, _fl, _sl) do {					\
-		_tlsf -> matrix [_fl] [_sl] = _b -> ptr.free_ptr.next;		\
-		if (_tlsf -> matrix[_fl][_sl])								\
-			_tlsf -> matrix[_fl][_sl] -> ptr.free_ptr.prev = NULL;	\
-		else {														\
-			clear_bit (_sl, &_tlsf -> sl_bitmap [_fl]);				\
-			if (!_tlsf -> sl_bitmap [_fl])							\
-				clear_bit (_fl, &_tlsf -> fl_bitmap);				\
-		}															\
-		_b -> ptr.free_ptr.prev =  NULL;				\
-		_b -> ptr.free_ptr.next =  NULL;				\
-	}while(0)
+#define EXTRACT_BLOCK_HDR(_b, _tlsf, _fl, _sl) do {                 \
+        _tlsf -> matrix [_fl] [_sl] = _b -> ptr.free_ptr.next;      \
+        if (_tlsf -> matrix[_fl][_sl])                              \
+            _tlsf -> matrix[_fl][_sl] -> ptr.free_ptr.prev = NULL;  \
+        else {                                                      \
+            clear_bit (_sl, &_tlsf -> sl_bitmap [_fl]);             \
+            if (!_tlsf -> sl_bitmap [_fl])                          \
+                clear_bit (_fl, &_tlsf -> fl_bitmap);               \
+        }                                                           \
+        _b -> ptr.free_ptr.prev =  NULL;                \
+        _b -> ptr.free_ptr.next =  NULL;                \
+    }while(0)
 
 
-#define EXTRACT_BLOCK(_b, _tlsf, _fl, _sl) do {							\
-		if (_b -> ptr.free_ptr.next)									\
-			_b -> ptr.free_ptr.next -> ptr.free_ptr.prev = _b -> ptr.free_ptr.prev; \
-		if (_b -> ptr.free_ptr.prev)									\
-			_b -> ptr.free_ptr.prev -> ptr.free_ptr.next = _b -> ptr.free_ptr.next; \
-		if (_tlsf -> matrix [_fl][_sl] == _b) {							\
-			_tlsf -> matrix [_fl][_sl] = _b -> ptr.free_ptr.next;		\
-			if (!_tlsf -> matrix [_fl][_sl]) {							\
-				clear_bit (_sl, &_tlsf -> sl_bitmap[_fl]);				\
-				if (!_tlsf -> sl_bitmap [_fl])							\
-					clear_bit (_fl, &_tlsf -> fl_bitmap);				\
-			}															\
-		}																\
-		_b -> ptr.free_ptr.prev = NULL;					\
-		_b -> ptr.free_ptr.next = NULL;					\
-	} while(0)
+#define EXTRACT_BLOCK(_b, _tlsf, _fl, _sl) do {                         \
+        if (_b -> ptr.free_ptr.next)                                    \
+            _b -> ptr.free_ptr.next -> ptr.free_ptr.prev = _b -> ptr.free_ptr.prev; \
+        if (_b -> ptr.free_ptr.prev)                                    \
+            _b -> ptr.free_ptr.prev -> ptr.free_ptr.next = _b -> ptr.free_ptr.next; \
+        if (_tlsf -> matrix [_fl][_sl] == _b) {                         \
+            _tlsf -> matrix [_fl][_sl] = _b -> ptr.free_ptr.next;       \
+            if (!_tlsf -> matrix [_fl][_sl]) {                          \
+                clear_bit (_sl, &_tlsf -> sl_bitmap[_fl]);              \
+                if (!_tlsf -> sl_bitmap [_fl])                          \
+                    clear_bit (_fl, &_tlsf -> fl_bitmap);               \
+            }                                                           \
+        }                                                               \
+        _b -> ptr.free_ptr.prev = NULL;                 \
+        _b -> ptr.free_ptr.next = NULL;                 \
+    } while(0)
 
-#define INSERT_BLOCK(_b, _tlsf, _fl, _sl) do {							\
-		_b -> ptr.free_ptr.prev = NULL; \
-		_b -> ptr.free_ptr.next = _tlsf -> matrix [_fl][_sl]; \
-		if (_tlsf -> matrix [_fl][_sl])									\
-			_tlsf -> matrix [_fl][_sl] -> ptr.free_ptr.prev = _b;		\
-		_tlsf -> matrix [_fl][_sl] = _b;								\
-		set_bit (_sl, &_tlsf -> sl_bitmap [_fl]);						\
-		set_bit (_fl, &_tlsf -> fl_bitmap);								\
-	} while(0)
+#define INSERT_BLOCK(_b, _tlsf, _fl, _sl) do {                          \
+        _b -> ptr.free_ptr.prev = NULL; \
+        _b -> ptr.free_ptr.next = _tlsf -> matrix [_fl][_sl]; \
+        if (_tlsf -> matrix [_fl][_sl])                                 \
+            _tlsf -> matrix [_fl][_sl] -> ptr.free_ptr.prev = _b;       \
+        _tlsf -> matrix [_fl][_sl] = _b;                                \
+        set_bit (_sl, &_tlsf -> sl_bitmap [_fl]);                       \
+        set_bit (_fl, &_tlsf -> fl_bitmap);                             \
+    } while(0)
 
 #if USE_SBRK || USE_MMAP
 static __inline__ void *get_new_area(size_t * size) 
@@ -656,9 +656,9 @@ void *tlsf_realloc(void *ptr, size_t size)
     void *ret;
 
 #if USE_MMAP || USE_SBRK
-	if (!mp) {
-		return tlsf_malloc(size);
-	}
+    if (!mp) {
+        return tlsf_malloc(size);
+    }
 #endif
 
     TLSF_ACQUIRE_LOCK(&((tlsf_t *)mp)->lock);
@@ -813,7 +813,7 @@ void *realloc_ex(void *ptr, size_t new_size, void *mem_pool)
     new_size = (new_size < MIN_BLOCK_SIZE) ? MIN_BLOCK_SIZE : ROUNDUP_SIZE(new_size);
     tmp_size = (b->size & BLOCK_SIZE);
     if (new_size <= tmp_size) {
-	TLSF_REMOVE_SIZE(tlsf, b);
+    TLSF_REMOVE_SIZE(tlsf, b);
         if (next_b->size & FREE_BLOCK) {
             MAPPING_INSERT(next_b->size & BLOCK_SIZE, &fl, &sl);
             EXTRACT_BLOCK(next_b, tlsf, fl, sl);
@@ -833,12 +833,12 @@ void *realloc_ex(void *ptr, size_t new_size, void *mem_pool)
             INSERT_BLOCK(tmp_b, tlsf, fl, sl);
             b->size = new_size | (b->size & PREV_STATE);
         }
-	TLSF_ADD_SIZE(tlsf, b);
+    TLSF_ADD_SIZE(tlsf, b);
         return (void *) b->ptr.buffer;
     }
     if ((next_b->size & FREE_BLOCK)) {
         if (new_size <= (tmp_size + (next_b->size & BLOCK_SIZE))) {
-			TLSF_REMOVE_SIZE(tlsf, b);
+            TLSF_REMOVE_SIZE(tlsf, b);
             MAPPING_INSERT(next_b->size & BLOCK_SIZE, &fl, &sl);
             EXTRACT_BLOCK(next_b, tlsf, fl, sl);
             b->size += (next_b->size & BLOCK_SIZE) + BHDR_OVERHEAD;
@@ -856,7 +856,7 @@ void *realloc_ex(void *ptr, size_t new_size, void *mem_pool)
                 INSERT_BLOCK(tmp_b, tlsf, fl, sl);
                 b->size = new_size | (b->size & PREV_STATE);
             }
-			TLSF_ADD_SIZE(tlsf, b);
+            TLSF_ADD_SIZE(tlsf, b);
             return (void *) b->ptr.buffer;
         }
     }

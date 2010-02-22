@@ -29,10 +29,10 @@ struct mad_bitptr {
 
 void mad_bit_init(struct mad_bitptr *, unsigned char const *);
 
-# define mad_bit_finish(bitptr)		/* nothing */
+# define mad_bit_finish(bitptr)     /* nothing */
 
 unsigned int mad_bit_length(struct mad_bitptr const *,
-			    struct mad_bitptr const *);
+                struct mad_bitptr const *);
 
 unsigned char mad_bit_bitsleft(struct mad_bitptr const *bitptr);
 unsigned char const *mad_bit_nextbyte(struct mad_bitptr const *);

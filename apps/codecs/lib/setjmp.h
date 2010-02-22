@@ -18,10 +18,10 @@
 #ifdef CPU_COLDFIRE
 /*
  * onsstack,sigmask,sp,pc,psl,d2-d7,a2-a6,
- * fp2-fp7	for 68881.
+ * fp2-fp7  for 68881.
  * All else recovered by under/over(flow) handling.
  */
-#define	_JBLEN	34
+#define _JBLEN  34
 #endif
 
 #ifdef CPU_MIPS
@@ -48,9 +48,9 @@
 
 #ifdef _JBLEN
 #ifdef _JBTYPE
-typedef	_JBTYPE jmp_buf[_JBLEN];
+typedef _JBTYPE jmp_buf[_JBLEN];
 #else
-typedef	int jmp_buf[_JBLEN];
+typedef int jmp_buf[_JBLEN];
 #endif
 #else
 typedef int jmp_buf;

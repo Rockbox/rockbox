@@ -66,8 +66,8 @@ typedef struct {
 
   int     *lacing_vals;      /* The values that will go to the segment table */
   spx_ogg_int64_t *granule_vals; /* granulepos values for headers. Not compact
-				this way, but it is simple coupled to the
-				lacing fifo */
+                this way, but it is simple coupled to the
+                lacing fifo */
   long    lacing_storage;
   long    lacing_fill;
   long    lacing_packet;
@@ -103,10 +103,10 @@ typedef struct {
   spx_ogg_int64_t  granulepos;
   
   spx_ogg_int64_t  packetno;     /* sequence number for decode; the framing
-				knows where there's a hole in the data,
-				but we need coupling so that the codec
-				(which is in a seperate abstraction
-				layer) also knows about the gap */
+                knows where there's a hole in the data,
+                but we need coupling so that the codec
+                (which is in a seperate abstraction
+                layer) also knows about the gap */
 } spx_ogg_packet;
 
 typedef struct {
@@ -169,7 +169,7 @@ extern int      spx_ogg_stream_flush(spx_ogg_stream_state *os, spx_ogg_page *og)
 extern int      spx_ogg_sync_init(spx_ogg_sync_state *oy);
 extern int      spx_ogg_sync_clear(spx_ogg_sync_state *oy);
 extern int      spx_ogg_sync_reset(spx_ogg_sync_state *oy);
-extern int	spx_ogg_sync_destroy(spx_ogg_sync_state *oy);
+extern int  spx_ogg_sync_destroy(spx_ogg_sync_state *oy);
 
 extern void     spx_ogg_alloc_buffer(spx_ogg_sync_state *oy, long size);
 extern char    *spx_ogg_sync_buffer(spx_ogg_sync_state *oy, long size);

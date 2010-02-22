@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
 Original copyright
-	FILE........: lsp.c
-	AUTHOR......: David Rowe
-	DATE CREATED: 24/2/93
+    FILE........: lsp.c
+    AUTHOR......: David Rowe
+    DATE CREATED: 24/2/93
 
 Heavily modified by Jean-Marc Valin (c) 2002-2006 (fixed-point, 
                        optimizations, additional functions, ...)
@@ -219,31 +219,31 @@ static float cheb_poly_eva(spx_word32_t *coef, spx_word16_t x, int m, char *stac
 
 
 int lpc_to_lsp (spx_coef_t *a,int lpcrdr,spx_lsp_t *freq,int nb,spx_word16_t delta, char *stack)
-/*  float *a 		     	lpc coefficients			*/
-/*  int lpcrdr			order of LPC coefficients (10) 		*/
-/*  float *freq 	      	LSP frequencies in the x domain       	*/
-/*  int nb			number of sub-intervals (4) 		*/
-/*  float delta			grid spacing interval (0.02) 		*/
+/*  float *a                lpc coefficients            */
+/*  int lpcrdr          order of LPC coefficients (10)      */
+/*  float *freq             LSP frequencies in the x domain         */
+/*  int nb          number of sub-intervals (4)         */
+/*  float delta         grid spacing interval (0.02)        */
 
 
 {
     spx_word16_t temp_xr,xl,xr,xm=0;
     spx_word32_t psuml,psumr,psumm,temp_psumr/*,temp_qsumr*/;
     int i,j,m,flag,k;
-    VARDECL(spx_word32_t *Q);                 	/* ptrs for memory allocation 		*/
+    VARDECL(spx_word32_t *Q);                   /* ptrs for memory allocation       */
     VARDECL(spx_word32_t *P);
-    VARDECL(spx_word16_t *Q16);         /* ptrs for memory allocation 		*/
+    VARDECL(spx_word16_t *Q16);         /* ptrs for memory allocation       */
     VARDECL(spx_word16_t *P16);
-    spx_word32_t *px;                	/* ptrs of respective P'(z) & Q'(z)	*/
+    spx_word32_t *px;                   /* ptrs of respective P'(z) & Q'(z) */
     spx_word32_t *qx;
     spx_word32_t *p;
     spx_word32_t *q;
-    spx_word16_t *pt;                	/* ptr used for cheb_poly_eval()
-				whether P' or Q' 			*/
-    int roots=0;              	/* DR 8/2/94: number of roots found 	*/
-    flag = 1;                	/*  program is searching for a root when,
-				1 else has found one 			*/
-    m = lpcrdr/2;            	/* order of P'(z) & Q'(z) polynomials 	*/
+    spx_word16_t *pt;                   /* ptr used for cheb_poly_eval()
+                whether P' or Q'            */
+    int roots=0;                /* DR 8/2/94: number of roots found     */
+    flag = 1;                   /*  program is searching for a root when,
+                1 else has found one            */
+    m = lpcrdr/2;               /* order of P'(z) & Q'(z) polynomials   */
 
     /* Allocate memory space for polynomials */
     ALLOC(Q, (m+1), spx_word32_t);
@@ -252,7 +252,7 @@ int lpc_to_lsp (spx_coef_t *a,int lpcrdr,spx_lsp_t *freq,int nb,spx_word16_t del
     /* determine P'(z)'s and Q'(z)'s coefficients where
       P'(z) = P(z)/(1 + z^(-1)) and Q'(z) = Q(z)/(1-z^(-1)) */
 
-    px = P;                      /* initialise ptrs 			*/
+    px = P;                      /* initialise ptrs             */
     qx = Q;
     p = px;
     q = qx;
@@ -297,7 +297,7 @@ int lpc_to_lsp (spx_coef_t *a,int lpcrdr,spx_lsp_t *freq,int nb,spx_word16_t del
     }
 #endif
 
-    px = P;             	/* re-initialise ptrs 			*/
+    px = P;                 /* re-initialise ptrs           */
     qx = Q;
 
     /* now that we have computed P and Q convert to 16 bits to
@@ -313,20 +313,20 @@ int lpc_to_lsp (spx_coef_t *a,int lpcrdr,spx_lsp_t *freq,int nb,spx_word16_t del
     }
 
     /* Search for a zero in P'(z) polynomial first and then alternate to Q'(z).
-    Keep alternating between the two polynomials as each zero is found 	*/
+    Keep alternating between the two polynomials as each zero is found  */
 
-    xr = 0;             	/* initialise xr to zero 		*/
-    xl = FREQ_SCALE;               	/* start at point xl = 1 		*/
+    xr = 0;                 /* initialise xr to zero        */
+    xl = FREQ_SCALE;                /* start at point xl = 1        */
 
     for(j=0;j<lpcrdr;j++){
-	if(j&1)            	/* determines whether P' or Q' is eval. */
-	    pt = Q16;
-	else
-	    pt = P16;
+    if(j&1)             /* determines whether P' or Q' is eval. */
+        pt = Q16;
+    else
+        pt = P16;
 
-	psuml = cheb_poly_eva(pt,xl,m,stack);	/* evals poly. at xl 	*/
-	flag = 1;
-	while(flag && (xr >= -FREQ_SCALE)){
+    psuml = cheb_poly_eva(pt,xl,m,stack);   /* evals poly. at xl    */
+    flag = 1;
+    while(flag && (xr >= -FREQ_SCALE)){
            spx_word16_t dd;
            /* Modified by JMV to provide smaller steps around x=+-1 */
 #ifdef FIXED_POINT
@@ -338,10 +338,10 @@ int lpc_to_lsp (spx_coef_t *a,int lpcrdr,spx_lsp_t *freq,int nb,spx_word16_t del
            if (fabs(psuml)<.2)
               dd *= .5;
 #endif
-           xr = SUB16(xl, dd);                        	/* interval spacing 	*/
-	    psumr = cheb_poly_eva(pt,xr,m,stack);/* poly(xl-delta_x) 	*/
-	    temp_psumr = psumr;
-	    temp_xr = xr;
+           xr = SUB16(xl, dd);                          /* interval spacing     */
+        psumr = cheb_poly_eva(pt,xr,m,stack);/* poly(xl-delta_x)    */
+        temp_psumr = psumr;
+        temp_xr = xr;
 
     /* if no sign change increment xr and re-evaluate poly(xr). Repeat til
     sign change.
@@ -350,41 +350,41 @@ int lpc_to_lsp (spx_coef_t *a,int lpcrdr,spx_lsp_t *freq,int nb,spx_word16_t del
     interval the zero lies in.
     If there is no sign change between poly(xm) and poly(xl) set interval
     between xm and xr else set interval between xl and xr and repeat till
-    root is located within the specified limits 			*/
+    root is located within the specified limits             */
 
-	    if(SIGN_CHANGE(psumr,psuml))
+        if(SIGN_CHANGE(psumr,psuml))
             {
-		roots++;
+        roots++;
 
-		psumm=psuml;
-		for(k=0;k<=nb;k++){
+        psumm=psuml;
+        for(k=0;k<=nb;k++){
 #ifdef FIXED_POINT
-		    xm = ADD16(PSHR16(xl,1),PSHR16(xr,1));        	/* bisect the interval 	*/
+            xm = ADD16(PSHR16(xl,1),PSHR16(xr,1));          /* bisect the interval  */
 #else
-                    xm = .5*(xl+xr);        	/* bisect the interval 	*/
+                    xm = .5*(xl+xr);            /* bisect the interval  */
 #endif
-		    psumm=cheb_poly_eva(pt,xm,m,stack);
-		    /*if(psumm*psuml>0.)*/
-		    if(!SIGN_CHANGE(psumm,psuml))
+            psumm=cheb_poly_eva(pt,xm,m,stack);
+            /*if(psumm*psuml>0.)*/
+            if(!SIGN_CHANGE(psumm,psuml))
                     {
-			psuml=psumm;
-			xl=xm;
-		    } else {
-			psumr=psumm;
-			xr=xm;
-		    }
-		}
+            psuml=psumm;
+            xl=xm;
+            } else {
+            psumr=psumm;
+            xr=xm;
+            }
+        }
 
-	       /* once zero is found, reset initial interval to xr 	*/
-	       freq[j] = X2ANGLE(xm);
-	       xl = xm;
-	       flag = 0;       		/* reset flag for next search 	*/
-	    }
-	    else{
-		psuml=temp_psumr;
-		xl=temp_xr;
-	    }
-	}
+           /* once zero is found, reset initial interval to xr  */
+           freq[j] = X2ANGLE(xm);
+           xl = xm;
+           flag = 0;            /* reset flag for next search   */
+        }
+        else{
+        psuml=temp_psumr;
+        xl=temp_xr;
+        }
+    }
     }
     return(roots);
 }
@@ -393,10 +393,10 @@ int lpc_to_lsp (spx_coef_t *a,int lpcrdr,spx_lsp_t *freq,int nb,spx_word16_t del
 
 /*---------------------------------------------------------------------------*\
 
-	FUNCTION....: lsp_to_lpc()
+    FUNCTION....: lsp_to_lpc()
 
-	AUTHOR......: David Rowe
-	DATE CREATED: 24/2/93
+    AUTHOR......: David Rowe
+    DATE CREATED: 24/2/93
 
         Converts LSP coefficients to LPC coefficients.
 
@@ -405,9 +405,9 @@ int lpc_to_lsp (spx_coef_t *a,int lpcrdr,spx_lsp_t *freq,int nb,spx_word16_t del
 #ifdef FIXED_POINT
 
 void lsp_to_lpc(spx_lsp_t *freq,spx_coef_t *ak,int lpcrdr, char *stack)
-/*  float *freq 	array of LSP frequencies in the x domain	*/
-/*  float *ak 		array of LPC coefficients 			*/
-/*  int lpcrdr  	order of LPC coefficients 			*/
+/*  float *freq     array of LSP frequencies in the x domain    */
+/*  float *ak       array of LPC coefficients           */
+/*  int lpcrdr      order of LPC coefficients           */
 {
     (void)stack;
     int i,j;
@@ -488,10 +488,10 @@ void lsp_to_lpc(spx_lsp_t *freq,spx_coef_t *ak,int lpcrdr, char *stack)
     for(i=1;i<m;i++) {
 
       for(j=1;j<2*(i+1)-1;j++) {
-	mult = MULT16_32_Q14(freqn[2*i],xp[i][j+1]);
-	xp[i+1][j+2] = ADD32(SUB32(xp[i][j+2], mult), xp[i][j]);
-	mult = MULT16_32_Q14(freqn[2*i+1],xq[i][j+1]);
-	xq[i+1][j+2] = ADD32(SUB32(xq[i][j+2], mult), xq[i][j]);
+    mult = MULT16_32_Q14(freqn[2*i],xp[i][j+1]);
+    xp[i+1][j+2] = ADD32(SUB32(xp[i][j+2], mult), xp[i][j]);
+    mult = MULT16_32_Q14(freqn[2*i+1],xq[i][j+1]);
+    xq[i+1][j+2] = ADD32(SUB32(xq[i][j+2], mult), xq[i][j]);
       }
 
       /* for last col xp[i][j+2] = xq[i][j+2] = 0 */
@@ -525,9 +525,9 @@ void lsp_to_lpc(spx_lsp_t *freq,spx_coef_t *ak,int lpcrdr, char *stack)
 #else
 
 void lsp_to_lpc(spx_lsp_t *freq,spx_coef_t *ak,int lpcrdr, char *stack)
-/*  float *freq 	array of LSP frequencies in the x domain	*/
-/*  float *ak 		array of LPC coefficients 			*/
-/*  int lpcrdr  	order of LPC coefficients 			*/
+/*  float *freq     array of LSP frequencies in the x domain    */
+/*  float *ak       array of LPC coefficients           */
+/*  int lpcrdr      order of LPC coefficients           */
 
 
 {
@@ -543,8 +543,8 @@ void lsp_to_lpc(spx_lsp_t *freq,spx_coef_t *ak,int lpcrdr, char *stack)
 
     /* initialise contents of array */
 
-    for(i=0;i<=4*m+1;i++){       	/* set contents of buffer to 0 */
-	*pw++ = 0.0;
+    for(i=0;i<=4*m+1;i++){          /* set contents of buffer to 0 */
+    *pw++ = 0.0;
     }
 
     /* Set pointers up */
@@ -563,29 +563,29 @@ void lsp_to_lpc(spx_lsp_t *freq,spx_coef_t *ak,int lpcrdr, char *stack)
 
     for(j=0;j<=lpcrdr;j++){
        int i2=0;
-	for(i=0;i<m;i++,i2+=2){
-	    n1 = pw+(i*4);
-	    n2 = n1 + 1;
-	    n3 = n2 + 1;
-	    n4 = n3 + 1;
-	    xout1 = xin1 - 2.f*x_freq[i2] * *n1 + *n2;
-	    xout2 = xin2 - 2.f*x_freq[i2+1] * *n3 + *n4;
-	    *n2 = *n1;
-	    *n4 = *n3;
-	    *n1 = xin1;
-	    *n3 = xin2;
-	    xin1 = xout1;
-	    xin2 = xout2;
-	}
-	xout1 = xin1 + *(n4+1);
-	xout2 = xin2 - *(n4+2);
-	if (j>0)
-	   ak[j-1] = (xout1 + xout2)*0.5f;
-	*(n4+1) = xin1;
-	*(n4+2) = xin2;
+    for(i=0;i<m;i++,i2+=2){
+        n1 = pw+(i*4);
+        n2 = n1 + 1;
+        n3 = n2 + 1;
+        n4 = n3 + 1;
+        xout1 = xin1 - 2.f*x_freq[i2] * *n1 + *n2;
+        xout2 = xin2 - 2.f*x_freq[i2+1] * *n3 + *n4;
+        *n2 = *n1;
+        *n4 = *n3;
+        *n1 = xin1;
+        *n3 = xin2;
+        xin1 = xout1;
+        xin2 = xout2;
+    }
+    xout1 = xin1 + *(n4+1);
+    xout2 = xin2 - *(n4+2);
+    if (j>0)
+       ak[j-1] = (xout1 + xout2)*0.5f;
+    *(n4+1) = xin1;
+    *(n4+2) = xin2;
 
-	xin1 = 0.0;
-	xin2 = 0.0;
+    xin1 = 0.0;
+    xin2 = 0.0;
     }
 
 }

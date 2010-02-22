@@ -459,7 +459,7 @@ int sb_encode(void *state, void *vin, SpeexBits *bits)
          spx_int32_t modeid;
          modeid = mode->nb_modes-1;
          st->relative_quality+=1.0*(ratio+2);
-	 if (st->relative_quality<-1)
+     if (st->relative_quality<-1)
             st->relative_quality=-1;
          while (modeid)
          {

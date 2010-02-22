@@ -463,7 +463,7 @@ int main (void)
 //exec_time = (((double)end-(double)start)/CLOCKS_PER_SEC);
     for(j = 0; j < FFT_SIZE; j++)
     {
-        printf("%8.4f\n", sqrt(pow(fixtof32(z[j].re),2)+ pow(fixtof32(z[j].im), 2)));	
+        printf("%8.4f\n", sqrt(pow(fixtof32(z[j].re),2)+ pow(fixtof32(z[j].im), 2)));   
         //getchar();
     }
     printf("muls = %d, adds = %d\n", muls, adds);

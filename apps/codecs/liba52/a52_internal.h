@@ -22,62 +22,62 @@
  */
 
 typedef struct {
-    uint8_t bai;		/* fine SNR offset, fast gain */
-    uint8_t deltbae;		/* delta bit allocation exists */
-    int8_t deltba[50];		/* per-band delta bit allocation */
+    uint8_t bai;        /* fine SNR offset, fast gain */
+    uint8_t deltbae;        /* delta bit allocation exists */
+    int8_t deltba[50];      /* per-band delta bit allocation */
 } ba_t;
 
 typedef struct {
-    uint8_t exp[256];		/* decoded channel exponents */
-    int8_t bap[256];		/* derived channel bit allocation */
+    uint8_t exp[256];       /* decoded channel exponents */
+    int8_t bap[256];        /* derived channel bit allocation */
 } expbap_t;
 
 struct a52_state_s {
-    uint8_t fscod;		/* sample rate */
-    uint8_t halfrate;		/* halfrate factor */
-    uint8_t acmod;		/* coded channels */
-    uint8_t lfeon;		/* coded lfe channel */
-    level_t clev;		/* centre channel mix level */
-    level_t slev;		/* surround channels mix level */
+    uint8_t fscod;      /* sample rate */
+    uint8_t halfrate;       /* halfrate factor */
+    uint8_t acmod;      /* coded channels */
+    uint8_t lfeon;      /* coded lfe channel */
+    level_t clev;       /* centre channel mix level */
+    level_t slev;       /* surround channels mix level */
 
-    int output;			/* type of output */
-    level_t level;		/* output level */
-    sample_t bias;		/* output bias */
+    int output;         /* type of output */
+    level_t level;      /* output level */
+    sample_t bias;      /* output bias */
 
-    int dynrnge;		/* apply dynamic range */
-    level_t dynrng;		/* dynamic range */
-    void * dynrngdata;		/* dynamic range callback funtion and data */
+    int dynrnge;        /* apply dynamic range */
+    level_t dynrng;     /* dynamic range */
+    void * dynrngdata;      /* dynamic range callback funtion and data */
     level_t (* dynrngcall) (level_t range, void * dynrngdata);
 
-    uint8_t chincpl;		/* channel coupled */
-    uint8_t phsflginu;		/* phase flags in use (stereo only) */
-    uint8_t cplstrtmant;	/* coupling channel start mantissa */
-    uint8_t cplendmant;		/* coupling channel end mantissa */
-    uint32_t cplbndstrc;	/* coupling band structure */
-    level_t cplco[5][18];	/* coupling coordinates */
+    uint8_t chincpl;        /* channel coupled */
+    uint8_t phsflginu;      /* phase flags in use (stereo only) */
+    uint8_t cplstrtmant;    /* coupling channel start mantissa */
+    uint8_t cplendmant;     /* coupling channel end mantissa */
+    uint32_t cplbndstrc;    /* coupling band structure */
+    level_t cplco[5][18];   /* coupling coordinates */
 
     /* derived information */
-    uint8_t cplstrtbnd;		/* coupling start band (for bit allocation) */
-    uint8_t ncplbnd;		/* number of coupling bands */
+    uint8_t cplstrtbnd;     /* coupling start band (for bit allocation) */
+    uint8_t ncplbnd;        /* number of coupling bands */
 
-    uint8_t rematflg;		/* stereo rematrixing */
+    uint8_t rematflg;       /* stereo rematrixing */
 
-    uint8_t endmant[5];		/* channel end mantissa */
+    uint8_t endmant[5];     /* channel end mantissa */
 
-    uint16_t bai;		/* bit allocation information */
+    uint16_t bai;       /* bit allocation information */
 
     uint32_t * buffer_start;
-    uint16_t lfsr_state;	/* dither state */
+    uint16_t lfsr_state;    /* dither state */
     uint32_t bits_left;
     uint32_t current_word;
 
-    uint8_t csnroffst;		/* coarse SNR offset */
-    ba_t cplba;			/* coupling bit allocation parameters */
-    ba_t ba[5];			/* channel bit allocation parameters */
-    ba_t lfeba;			/* lfe bit allocation parameters */
+    uint8_t csnroffst;      /* coarse SNR offset */
+    ba_t cplba;         /* coupling bit allocation parameters */
+    ba_t ba[5];         /* channel bit allocation parameters */
+    ba_t lfeba;         /* lfe bit allocation parameters */
 
-    uint8_t cplfleak;		/* coupling fast leak init */
-    uint8_t cplsleak;		/* coupling slow leak init */
+    uint8_t cplfleak;       /* coupling fast leak init */
+    uint8_t cplsleak;       /* coupling slow leak init */
 
     expbap_t cpl_expbap;
     expbap_t fbw_expbap[5];
@@ -104,15 +104,15 @@ struct a52_state_s {
 #define DELTA_BIT_RESERVED (3)
 
 void a52_bit_allocate (a52_state_t * state, ba_t * ba, int bndstart,
-		       int start, int end, int fastleak, int slowleak,
-		       expbap_t * expbap);
+               int start, int end, int fastleak, int slowleak,
+               expbap_t * expbap);
 
 int a52_downmix_init (int input, int flags, level_t * level,
-		      level_t clev, level_t slev);
+              level_t clev, level_t slev);
 int a52_downmix_coeff (level_t * coeff, int acmod, int output, level_t level,
-		       level_t clev, level_t slev);
+               level_t clev, level_t slev);
 void a52_downmix (sample_t * samples, int acmod, int output, 
-		  level_t clev, level_t slev);
+          level_t clev, level_t slev);
 void a52_upmix (sample_t * samples, int acmod, int output);
 
 void a52_imdct_init (uint32_t mm_accel);

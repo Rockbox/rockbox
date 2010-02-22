@@ -42,12 +42,12 @@ qmfa_info *qmfa_init(uint8_t channels)
 {
     qmfa_info *qmfa = (qmfa_info*)faad_malloc(sizeof(qmfa_info));
 
-	/* x is implemented as double ringbuffer */
+    /* x is implemented as double ringbuffer */
     qmfa->x = (real_t*)faad_malloc(2 * channels * 10 * sizeof(real_t));
     memset(qmfa->x, 0, 2 * channels * 10 * sizeof(real_t));
 
-	/* ringbuffer index */
-	qmfa->x_index = 0;
+    /* ringbuffer index */
+    qmfa->x_index = 0;
 
     qmfa->channels = channels;
 
@@ -81,7 +81,7 @@ void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
         int16_t n;
 
         /* shift input buffer x */
-		/* input buffer is not shifted anymore, x is implemented as double ringbuffer */
+        /* input buffer is not shifted anymore, x is implemented as double ringbuffer */
         //memmove(qmfa->x + 32, qmfa->x, (320-32)*sizeof(real_t));
 
         /* add new samples to input buffer x */
@@ -104,10 +104,10 @@ void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
                 MUL_F(qmfa->x[qmfa->x_index + n + 256], qmf_c[2*(n + 256)]);
         }
 
-		/* update ringbuffer index */
-		qmfa->x_index -= 32;
-		if (qmfa->x_index < 0)
-			qmfa->x_index = (320-32);
+        /* update ringbuffer index */
+        qmfa->x_index -= 32;
+        if (qmfa->x_index < 0)
+            qmfa->x_index = (320-32);
 
         /* calculate 32 subband samples by introducing X */
 #ifdef SBR_LOW_POWER
@@ -224,7 +224,7 @@ qmfs_info *qmfs_init(uint8_t channels)
 {
     qmfs_info *qmfs = (qmfs_info*)faad_malloc(sizeof(qmfs_info));
 
-	/* v is a double ringbuffer */
+    /* v is a double ringbuffer */
     qmfs->v = (real_t*)faad_malloc(2 * channels * 20 * sizeof(real_t));
     memset(qmfs->v, 0, 2 * channels * 20 * sizeof(real_t));
 
@@ -483,8 +483,8 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
     for (l = 0; l < sbr->numTimeSlotsRate; l++)
     {
         /* shift buffer v */
-		/* buffer is not shifted, we use double ringbuffer */
-		//memmove(qmfs->v + 128, qmfs->v, (1280-128)*sizeof(real_t));
+        /* buffer is not shifted, we use double ringbuffer */
+        //memmove(qmfs->v + 128, qmfs->v, (1280-128)*sizeof(real_t));
 
         /* calculate 128 samples */
 #ifndef FIXED_POINT

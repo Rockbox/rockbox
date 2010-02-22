@@ -40,8 +40,8 @@ typedef struct static_codebook{
 
   /* mapping ***************************************************************/
   int    maptype;        /* 0=none
-			    1=implicitly populated values from map column 
-			    2=listed arbitrary values */
+                1=implicitly populated values from map column 
+                2=listed arbitrary values */
 
   /* The below does a linear, single monotonic sequence mapping. */
   long     q_min;       /* packed 32 bit float; quant value 0 maps to minval */
@@ -50,8 +50,8 @@ typedef struct static_codebook{
   int      q_sequencep; /* bitflag */
 
   long     *quantlist;  /* map == 1: (int)(entries^(1/dim)) element column map
-			   map == 2: list of dim*entries quantized entry vals
-			*/
+               map == 2: list of dim*entries quantized entry vals
+            */
 } static_codebook;
 
 typedef struct codebook{
@@ -87,14 +87,14 @@ extern int vorbis_staticbook_unpack(oggpack_buffer *b,static_codebook *c);
 
 extern long vorbis_book_decode(codebook *book, oggpack_buffer *b);
 extern long vorbis_book_decodevs_add(codebook *book, ogg_int32_t *a, 
-				     oggpack_buffer *b,int n,int point);
+                     oggpack_buffer *b,int n,int point);
 extern long vorbis_book_decodev_set(codebook *book, ogg_int32_t *a, 
-				    oggpack_buffer *b,int n,int point);
+                    oggpack_buffer *b,int n,int point);
 extern long vorbis_book_decodev_add(codebook *book, ogg_int32_t *a, 
-				    oggpack_buffer *b,int n,int point);
+                    oggpack_buffer *b,int n,int point);
 extern long vorbis_book_decodevv_add(codebook *book, ogg_int32_t **a,
-				     long off,int ch, 
-				    oggpack_buffer *b,int n,int point);
+                     long off,int ch, 
+                    oggpack_buffer *b,int n,int point);
 
 extern int _ilog(unsigned int v);
 

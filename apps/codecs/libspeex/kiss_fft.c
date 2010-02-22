@@ -184,7 +184,7 @@ static void kf_bfly3(
      do{
         if (!st->inverse) {
          C_FIXDIV(*Fout,3); C_FIXDIV(Fout[m],3); C_FIXDIV(Fout[m2],3);
-	}
+    }
 
          C_MUL(scratch[1],Fout[m] , *tw1);
          C_MUL(scratch[2],Fout[m2] , *tw2);
@@ -237,7 +237,7 @@ static void kf_bfly5(
     for ( u=0; u<m; ++u ) {
         if (!st->inverse) {
         C_FIXDIV( *Fout0,5); C_FIXDIV( *Fout1,5); C_FIXDIV( *Fout2,5); C_FIXDIV( *Fout3,5); C_FIXDIV( *Fout4,5);
-	}
+    }
         scratch[0] = *Fout0;
 
         C_MUL(scratch[1] ,*Fout1, tw[u*fstride]);
@@ -299,7 +299,7 @@ static void kf_bfly_generic(
             scratchbuf[q1] = Fout[ k  ];
         if (!st->inverse) {
             C_FIXDIV(scratchbuf[q1],p);
-	}
+    }
             k += m;
         }
 

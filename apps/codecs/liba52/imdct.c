@@ -114,73 +114,73 @@ static inline void ifft4 (complex_t * buf)
 */
 /* basic radix-2 ifft butterfly */
 
-#define BUTTERFLY_0(t0,t1,W0,W1,d0,d1) do {	\
-    t0 = MUL (W1, d1) + MUL (W0, d0);		\
-    t1 = MUL (W0, d1) - MUL (W1, d0);		\
+#define BUTTERFLY_0(t0,t1,W0,W1,d0,d1) do { \
+    t0 = MUL (W1, d1) + MUL (W0, d0);       \
+    t1 = MUL (W0, d1) - MUL (W1, d0);       \
 } while (0)
 
 /* radix-2 ifft butterfly with bias */
 
-#define BUTTERFLY_B(t0,t1,W0,W1,d0,d1) do {	\
-    t0 = BIAS (MUL (d1, W1) + MUL (d0, W0));	\
-    t1 = BIAS (MUL (d1, W0) - MUL (d0, W1));	\
+#define BUTTERFLY_B(t0,t1,W0,W1,d0,d1) do { \
+    t0 = BIAS (MUL (d1, W1) + MUL (d0, W0));    \
+    t1 = BIAS (MUL (d1, W0) - MUL (d0, W1));    \
 } while (0)
 
 /* the basic split-radix ifft butterfly */
 
-#define BUTTERFLY(a0,a1,a2,a3,wr,wi) do {		\
-    BUTTERFLY_0 (tmp5, tmp6, wr, wi, a2.real, a2.imag);	\
-    BUTTERFLY_0 (tmp8, tmp7, wr, wi, a3.imag, a3.real);	\
-    tmp1 = tmp5 + tmp7;					\
-    tmp2 = tmp6 + tmp8;					\
-    tmp3 = tmp6 - tmp8;					\
-    tmp4 = tmp7 - tmp5;					\
-    a2.real = a0.real - tmp1;				\
-    a2.imag = a0.imag - tmp2;				\
-    a3.real = a1.real - tmp3;				\
-    a3.imag = a1.imag - tmp4;				\
-    a0.real += tmp1;					\
-    a0.imag += tmp2;					\
-    a1.real += tmp3;					\
-    a1.imag += tmp4;					\
+#define BUTTERFLY(a0,a1,a2,a3,wr,wi) do {       \
+    BUTTERFLY_0 (tmp5, tmp6, wr, wi, a2.real, a2.imag); \
+    BUTTERFLY_0 (tmp8, tmp7, wr, wi, a3.imag, a3.real); \
+    tmp1 = tmp5 + tmp7;                 \
+    tmp2 = tmp6 + tmp8;                 \
+    tmp3 = tmp6 - tmp8;                 \
+    tmp4 = tmp7 - tmp5;                 \
+    a2.real = a0.real - tmp1;               \
+    a2.imag = a0.imag - tmp2;               \
+    a3.real = a1.real - tmp3;               \
+    a3.imag = a1.imag - tmp4;               \
+    a0.real += tmp1;                    \
+    a0.imag += tmp2;                    \
+    a1.real += tmp3;                    \
+    a1.imag += tmp4;                    \
 } while (0)
 
 /* split-radix ifft butterfly, specialized for wr=1 wi=0 */
 
-#define BUTTERFLY_ZERO(a0,a1,a2,a3) do {	\
-    tmp1 = a2.real + a3.real;			\
-    tmp2 = a2.imag + a3.imag;			\
-    tmp3 = a2.imag - a3.imag;			\
-    tmp4 = a3.real - a2.real;			\
-    a2.real = a0.real - tmp1;			\
-    a2.imag = a0.imag - tmp2;			\
-    a3.real = a1.real - tmp3;			\
-    a3.imag = a1.imag - tmp4;			\
-    a0.real += tmp1;				\
-    a0.imag += tmp2;				\
-    a1.real += tmp3;				\
-    a1.imag += tmp4;				\
+#define BUTTERFLY_ZERO(a0,a1,a2,a3) do {    \
+    tmp1 = a2.real + a3.real;           \
+    tmp2 = a2.imag + a3.imag;           \
+    tmp3 = a2.imag - a3.imag;           \
+    tmp4 = a3.real - a2.real;           \
+    a2.real = a0.real - tmp1;           \
+    a2.imag = a0.imag - tmp2;           \
+    a3.real = a1.real - tmp3;           \
+    a3.imag = a1.imag - tmp4;           \
+    a0.real += tmp1;                \
+    a0.imag += tmp2;                \
+    a1.real += tmp3;                \
+    a1.imag += tmp4;                \
 } while (0)
 
 /* split-radix ifft butterfly, specialized for wr=wi */
 /*
-#define BUTTERFLY_HALF(a0,a1,a2,a3,w) do {	\
-    tmp5 = MUL (a2.real + a2.imag, w);		\
-    tmp6 = MUL (a2.imag - a2.real, w);		\
-    tmp7 = MUL (a3.real - a3.imag, w);		\
-    tmp8 = MUL (a3.imag + a3.real, w);		\
-    tmp1 = tmp5 + tmp7;				\
-    tmp2 = tmp6 + tmp8;				\
-    tmp3 = tmp6 - tmp8;				\
-    tmp4 = tmp7 - tmp5;				\
-    a2.real = a0.real - tmp1;			\
-    a2.imag = a0.imag - tmp2;			\
-    a3.real = a1.real - tmp3;			\
-    a3.imag = a1.imag - tmp4;			\
-    a0.real += tmp1;				\
-    a0.imag += tmp2;				\
-    a1.real += tmp3;				\
-    a1.imag += tmp4;				\
+#define BUTTERFLY_HALF(a0,a1,a2,a3,w) do {  \
+    tmp5 = MUL (a2.real + a2.imag, w);      \
+    tmp6 = MUL (a2.imag - a2.real, w);      \
+    tmp7 = MUL (a3.real - a3.imag, w);      \
+    tmp8 = MUL (a3.imag + a3.real, w);      \
+    tmp1 = tmp5 + tmp7;             \
+    tmp2 = tmp6 + tmp8;             \
+    tmp3 = tmp6 - tmp8;             \
+    tmp4 = tmp7 - tmp5;             \
+    a2.real = a0.real - tmp1;           \
+    a2.imag = a0.imag - tmp2;           \
+    a3.real = a1.real - tmp3;           \
+    a3.imag = a1.imag - tmp4;           \
+    a0.real += tmp1;                \
+    a0.imag += tmp2;                \
+    a1.real += tmp3;                \
+    a1.imag += tmp4;                \
 } while (0)
 
 static inline void ifft8 (complex_t * buf)
@@ -212,13 +212,13 @@ static void ifft_pass (complex_t * buf, const sample_t * weight, int n)
     i = n - 1;
 
     do {
-	BUTTERFLY (buf[0], buf1[0], buf2[0], buf3[0],
-		   weight[0], weight[2*i-n]);
-	buf++;
-	buf1++;
-	buf2++;
-	buf3++;
-	weight++;
+    BUTTERFLY (buf[0], buf1[0], buf2[0], buf3[0],
+           weight[0], weight[2*i-n]);
+    buf++;
+    buf1++;
+    buf2++;
+    buf3++;
+    weight++;
     } while (--i);
 }
 
@@ -264,7 +264,7 @@ void a52_imdct_512 (sample_t * data, sample_t * delay)
     sample_t t_r, t_i, a_r, a_i, b_r, b_i, w_1, w_2;
     const sample_t * window = a52_imdct_window;
     FFTComplex buf[128];
-	
+    
     for (i = 0; i < 128; i++) {
         k = fftorder[i];
         t_r = pre1[i].real;
@@ -357,7 +357,7 @@ static double besselI0 (double x)
     int i = 100;
 
     do
-	bessel = bessel * x / (i * i) + 1;
+    bessel = bessel * x / (i * i) + 1;
     while (--i);
     return bessel;
 }
@@ -376,13 +376,13 @@ void a52_imdct_init (uint32_t mm_accel)
     /* compute imdct window - kaiser-bessel derived window, alpha = 5.0 */
     /*    sum = 0;
     for (i = 0; i < 256; i++) {
-	sum += besselI0 (i * (256 - i) * (5 * M_PI / 256) * (5 * M_PI / 256));
-	local_imdct_window[i] = sum;
+    sum += besselI0 (i * (256 - i) * (5 * M_PI / 256) * (5 * M_PI / 256));
+    local_imdct_window[i] = sum;
     }
     sum++;
     */
     /*    for (i = 0; i < 256; i++)
-	a52_imdct_window[i] = SAMPLE (sqrt (local_imdct_window[i] / sum));
+    a52_imdct_window[i] = SAMPLE (sqrt (local_imdct_window[i] / sum));
 
     printf("static sample_t a52_imdct_window[256]={");
     for (i=0;i<256;i++) {
@@ -393,26 +393,26 @@ void a52_imdct_init (uint32_t mm_accel)
     */
 
     /*    for (i = 0; i < 3; i++)
-	roots16[i] = SAMPLE (cos ((M_PI / 8) * (i + 1)));
+    roots16[i] = SAMPLE (cos ((M_PI / 8) * (i + 1)));
 
     printf("static sample_t roots16[3]={%d,%d,%d};\n\n",roots16[0],roots16[1],roots16[2]);
 
     for (i = 0; i < 7; i++)
-	roots32[i] = SAMPLE (cos ((M_PI / 16) * (i + 1)));
+    roots32[i] = SAMPLE (cos ((M_PI / 16) * (i + 1)));
 
     printf("static sample_t roots32[7]={");
     for (i=0;i<7;i++) { printf("%d%s",roots32[i],(i < 6 ? "," : "")); }
     printf("};\n");
 
     for (i = 0; i < 15; i++)
-	roots64[i] = SAMPLE (cos ((M_PI / 32) * (i + 1)));
+    roots64[i] = SAMPLE (cos ((M_PI / 32) * (i + 1)));
 
     printf("static sample_t roots64[15]={");
     for (i=0;i<15;i++) { printf("%d%s",roots64[i],(i < 14 ? "," : "")); }
     printf("};\n");
 
     for (i = 0; i < 31; i++)
-	roots128[i] = SAMPLE (cos ((M_PI / 64) * (i + 1)));
+    roots128[i] = SAMPLE (cos ((M_PI / 64) * (i + 1)));
 
     printf("static sample_t roots128[31]={");
     for (i=0;i<31;i++) { printf("%d%s",roots128[i],(i < 30 ? "," : "")); }
@@ -420,15 +420,15 @@ void a52_imdct_init (uint32_t mm_accel)
     */
     /*
     for (i = 0; i < 64; i++) {
-	k = fftorder[i] / 2 + 64;
-	pre1[i].real = SAMPLE (cos ((M_PI / 256) * (k - 0.25)));
-	pre1[i].imag = SAMPLE (sin ((M_PI / 256) * (k - 0.25)));
+    k = fftorder[i] / 2 + 64;
+    pre1[i].real = SAMPLE (cos ((M_PI / 256) * (k - 0.25)));
+    pre1[i].imag = SAMPLE (sin ((M_PI / 256) * (k - 0.25)));
     }
 
     for (i = 64; i < 128; i++) {
-	k = fftorder[i] / 2 + 64;
-	pre1[i].real = SAMPLE (-cos ((M_PI / 256) * (k - 0.25)));
-	pre1[i].imag = SAMPLE (-sin ((M_PI / 256) * (k - 0.25)));
+    k = fftorder[i] / 2 + 64;
+    pre1[i].real = SAMPLE (-cos ((M_PI / 256) * (k - 0.25)));
+    pre1[i].imag = SAMPLE (-sin ((M_PI / 256) * (k - 0.25)));
     }
 
     printf("static complex_t pre1[128]={");
@@ -437,8 +437,8 @@ void a52_imdct_init (uint32_t mm_accel)
     */
     /*
     for (i = 0; i < 64; i++) {
-	post1[i].real = SAMPLE (cos ((M_PI / 256) * (i + 0.5)));
-	post1[i].imag = SAMPLE (sin ((M_PI / 256) * (i + 0.5)));
+    post1[i].real = SAMPLE (cos ((M_PI / 256) * (i + 0.5)));
+    post1[i].imag = SAMPLE (sin ((M_PI / 256) * (i + 0.5)));
     }
 
     printf("static complex_t post1[64]={");
@@ -448,9 +448,9 @@ void a52_imdct_init (uint32_t mm_accel)
 
     /*
     for (i = 0; i < 64; i++) {
-	k = fftorder[i] / 4;
-	pre2[i].real = SAMPLE (cos ((M_PI / 128) * (k - 0.25)));
-	pre2[i].imag = SAMPLE (sin ((M_PI / 128) * (k - 0.25)));
+    k = fftorder[i] / 4;
+    pre2[i].real = SAMPLE (cos ((M_PI / 128) * (k - 0.25)));
+    pre2[i].imag = SAMPLE (sin ((M_PI / 128) * (k - 0.25)));
     }
 
     printf("static complex_t pre2[64]={");
@@ -458,8 +458,8 @@ void a52_imdct_init (uint32_t mm_accel)
     printf("};\n");
 
     for (i = 0; i < 32; i++) {
-	post2[i].real = SAMPLE (cos ((M_PI / 128) * (i + 0.5)));
-	post2[i].imag = SAMPLE (sin ((M_PI / 128) * (i + 0.5)));
+    post2[i].real = SAMPLE (cos ((M_PI / 128) * (i + 0.5)));
+    post2[i].imag = SAMPLE (sin ((M_PI / 128) * (i + 0.5)));
     }
 
     printf("static complex_t post2[32]={");
@@ -470,17 +470,17 @@ void a52_imdct_init (uint32_t mm_accel)
 #ifdef LIBA52_DJBFFT
     if (mm_accel & MM_ACCEL_DJBFFT) {
 #ifndef LIBA52_DOUBLE
-	ifft128 = (void (*) (complex_t *)) fftc4_un128;
-	ifft64 = (void (*) (complex_t *)) fftc4_un64;
+    ifft128 = (void (*) (complex_t *)) fftc4_un128;
+    ifft64 = (void (*) (complex_t *)) fftc4_un64;
 #else
-	ifft128 = (void (*) (complex_t *)) fftc8_un128;
-	ifft64 = (void (*) (complex_t *)) fftc8_un64;
+    ifft128 = (void (*) (complex_t *)) fftc8_un128;
+    ifft64 = (void (*) (complex_t *)) fftc8_un64;
 #endif
     } else
 #endif
     {
-	ifft128 = ifft128_c;
-	ifft64 = ifft64_c;
+    ifft128 = ifft128_c;
+    ifft64 = ifft64_c;
     }
     */
 }

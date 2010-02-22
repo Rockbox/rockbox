@@ -220,7 +220,7 @@ void open_loop_nbest_pitch(spx_word16_t *sw, int start, int end, int len, int *p
       normalize16(energy, ener16, 180, end-start+1);
 
       if (N == 1) {
-	/* optimised asm to handle N==1 case */
+    /* optimised asm to handle N==1 case */
       __asm__ __volatile__
       (
 "        I0 = %1;\n\t"                     /* I0: corr16[]    */
@@ -253,35 +253,35 @@ void open_loop_nbest_pitch(spx_word16_t *sw, int start, int end, int len, int *p
 
       }
       else {
-	for (i=start;i<=end;i++)
-	  {
-	    spx_word16_t tmp = MULT16_16_16(corr16[i-start],corr16[i-start]);
-	    /* Instead of dividing the tmp by the energy, we multiply on the other side */
-	    if (MULT16_16(tmp,best_ener[N-1])>MULT16_16(best_score[N-1],ADD16(1,ener16[i-start])))
-	      {
-		/* We can safely put it last and then check */
-		best_score[N-1]=tmp;
-		best_ener[N-1]=ener16[i-start]+1;
-		pitch[N-1]=i;
-		/* Check if it comes in front of others */
-		for (j=0;j<N-1;j++)
-		  {
-		    if (MULT16_16(tmp,best_ener[j])>MULT16_16(best_score[j],ADD16(1,ener16[i-start])))
-		      {
-			for (k=N-1;k>j;k--)
-			  {
-			    best_score[k]=best_score[k-1];
-			    best_ener[k]=best_ener[k-1];
-			    pitch[k]=pitch[k-1];
-			  }
-			best_score[j]=tmp;
-			best_ener[j]=ener16[i-start]+1;
-			pitch[j]=i;
-			break;
-		      }
-		  }
-	      }
-	  }
+    for (i=start;i<=end;i++)
+      {
+        spx_word16_t tmp = MULT16_16_16(corr16[i-start],corr16[i-start]);
+        /* Instead of dividing the tmp by the energy, we multiply on the other side */
+        if (MULT16_16(tmp,best_ener[N-1])>MULT16_16(best_score[N-1],ADD16(1,ener16[i-start])))
+          {
+        /* We can safely put it last and then check */
+        best_score[N-1]=tmp;
+        best_ener[N-1]=ener16[i-start]+1;
+        pitch[N-1]=i;
+        /* Check if it comes in front of others */
+        for (j=0;j<N-1;j++)
+          {
+            if (MULT16_16(tmp,best_ener[j])>MULT16_16(best_score[j],ADD16(1,ener16[i-start])))
+              {
+            for (k=N-1;k>j;k--)
+              {
+                best_score[k]=best_score[k-1];
+                best_ener[k]=best_ener[k-1];
+                pitch[k]=pitch[k-1];
+              }
+            best_score[j]=tmp;
+            best_ener[j]=ener16[i-start]+1;
+            pitch[j]=i;
+            break;
+              }
+          }
+          }
+      }
       }
    }
 

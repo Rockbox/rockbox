@@ -100,7 +100,7 @@ typedef struct RL_VLC_ELEM {
 #    ifdef __GNUC__
 static inline uint32_t unaligned32(const void *v) {
     struct Unaligned {
-	uint32_t i;
+    uint32_t i;
     } __attribute__((packed));
 
     return ((const struct Unaligned *) v)->i;
@@ -165,10 +165,10 @@ for examples see get_bits, show_bits, skip_bits, get_vlc
 static inline int unaligned32_be(const void *v)
 {
 #ifdef CONFIG_ALIGN
-	const uint8_t *p=v;
-	return (((p[0]<<8) | p[1])<<16) | (p[2]<<8) | (p[3]);
+    const uint8_t *p=v;
+    return (((p[0]<<8) | p[1])<<16) | (p[2]<<8) | (p[3]);
 #else
-	return betoh32( unaligned32(v)); //original
+    return betoh32( unaligned32(v)); //original
 #endif
 }
 

@@ -430,7 +430,7 @@ int real_parse_header(int fd, RMContext *rmctx)
               read_uint32be(fd,&next_data_off);
               skipped += 4;
               if (!rmctx->nb_packets && (rmctx->flags & 4))
-                  rmctx->nb_packets = 3600 * 25;		
+                  rmctx->nb_packets = 3600 * 25;        
 
               /***
                * nb_packets correction :
@@ -444,7 +444,7 @@ int real_parse_header(int fd, RMContext *rmctx)
 
               DEBUGF("    data_nb_packets = %d\n",rmctx->nb_packets);
               DEBUGF("    next DATA offset = %d\n",next_data_off);
-              header_end = 1;			
+              header_end = 1;           
                 break; 
         }
         if(header_end) break;

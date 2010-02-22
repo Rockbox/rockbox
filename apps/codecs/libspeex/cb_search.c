@@ -99,10 +99,10 @@ static inline void target_update(spx_word16_t *t, spx_word16_t g, spx_word16_t *
 
 
 static void split_cb_search_shape_sign_N1(
-spx_word16_t target[],			/* target vector */
-spx_coef_t ak[],			/* LPCs for this subframe */
-spx_coef_t awk1[],			/* Weighted LPCs for this subframe */
-spx_coef_t awk2[],			/* Weighted LPCs for this subframe */
+spx_word16_t target[],          /* target vector */
+spx_coef_t ak[],            /* LPCs for this subframe */
+spx_coef_t awk1[],          /* Weighted LPCs for this subframe */
+spx_coef_t awk2[],          /* Weighted LPCs for this subframe */
 const void *par,                      /* Codebook/search parameters*/
 int   p,                        /* number of LPC coeffs */
 int   nsf,                      /* number of samples in subframe */
@@ -241,10 +241,10 @@ int   update_target
 
 
 void split_cb_search_shape_sign(
-spx_word16_t target[],			/* target vector */
-spx_coef_t ak[],			/* LPCs for this subframe */
-spx_coef_t awk1[],			/* Weighted LPCs for this subframe */
-spx_coef_t awk2[],			/* Weighted LPCs for this subframe */
+spx_word16_t target[],          /* target vector */
+spx_coef_t ak[],            /* LPCs for this subframe */
+spx_coef_t awk1[],          /* Weighted LPCs for this subframe */
+spx_coef_t awk2[],          /* Weighted LPCs for this subframe */
 const void *par,                      /* Codebook/search parameters*/
 int   p,                        /* number of LPC coeffs */
 int   nsf,                      /* number of samples in subframe */
@@ -576,10 +576,10 @@ spx_int32_t *seed
 
 #ifndef SPEEX_DISABLE_ENCODER
 void noise_codebook_quant(
-spx_word16_t target[],			/* target vector */
-spx_coef_t ak[],			/* LPCs for this subframe */
-spx_coef_t awk1[],			/* Weighted LPCs for this subframe */
-spx_coef_t awk2[],			/* Weighted LPCs for this subframe */
+spx_word16_t target[],          /* target vector */
+spx_coef_t ak[],            /* LPCs for this subframe */
+spx_coef_t awk1[],          /* Weighted LPCs for this subframe */
+spx_coef_t awk2[],          /* Weighted LPCs for this subframe */
 const void *par,                      /* Codebook/search parameters*/
 int   p,                        /* number of LPC coeffs */
 int   nsf,                      /* number of samples in subframe */
