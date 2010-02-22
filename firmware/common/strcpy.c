@@ -1,27 +1,27 @@
 /*
 FUNCTION
-	<<strcpy>>---copy string
+        <<strcpy>>---copy string
 
 INDEX
-	strcpy
+        strcpy
 
 ANSI_SYNOPSIS
-	#include <string.h>
-	char *strcpy(char *<[dst]>, const char *<[src]>);
+        #include <string.h>
+        char *strcpy(char *<[dst]>, const char *<[src]>);
 
 TRAD_SYNOPSIS
-	#include <string.h>
-	char *strcpy(<[dst]>, <[src]>)
-	char *<[dst]>;
-	char *<[src]>;
+        #include <string.h>
+        char *strcpy(<[dst]>, <[src]>)
+        char *<[dst]>;
+        char *<[src]>;
 
 DESCRIPTION
-	<<strcpy>> copies the string pointed to by <[src]>
-	(including the terminating null character) to the array
-	pointed to by <[dst]>.
+        <<strcpy>> copies the string pointed to by <[src]>
+        (including the terminating null character) to the array
+        pointed to by <[dst]>.
 
 RETURNS
-	This function returns the initial value of <[dst]>.
+        This function returns the initial value of <[dst]>.
 
 PORTABILITY
 <<strcpy>> is ANSI C.
@@ -29,7 +29,7 @@ PORTABILITY
 <<strcpy>> requires no supporting OS subroutines.
 
 QUICKREF
-	strcpy ansi pure
+        strcpy ansi pure
 */
 
 #include <string.h>
@@ -59,8 +59,8 @@ QUICKREF
 
 char*
 _DEFUN (strcpy, (dst0, src0),
-	char *dst0 _AND
-	_CONST char *src0)
+        char *dst0 _AND
+        _CONST char *src0)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   char *s = dst0;

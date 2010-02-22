@@ -30,7 +30,7 @@ PORTABILITY
 
 QUICKREF
         memcpy ansi pure
-	*/
+        */
 
 #include "config.h"
 #include <_ansi.h>
@@ -51,15 +51,15 @@ QUICKREF
 
 _PTR
 _DEFUN (memcpy, (dst0, src0, len0),
-	_PTR dst0 _AND
-	_CONST _PTR src0 _AND
-	size_t len0) ICODE_ATTR;
+        _PTR dst0 _AND
+        _CONST _PTR src0 _AND
+        size_t len0) ICODE_ATTR;
 
 _PTR
 _DEFUN (memcpy, (dst0, src0, len0),
-	_PTR dst0 _AND
-	_CONST _PTR src0 _AND
-	size_t len0)
+        _PTR dst0 _AND
+        _CONST _PTR src0 _AND
+        size_t len0)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   char *dst = (char *) dst0;

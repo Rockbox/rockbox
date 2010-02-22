@@ -1,28 +1,28 @@
 /*
 FUNCTION
-	<<strchr>>---search for character in string
+        <<strchr>>---search for character in string
 
 INDEX
-	strchr
+        strchr
 
 ANSI_SYNOPSIS
-	#include <string.h>
-	char * strchr(const char *<[string]>, int <[c]>);
+        #include <string.h>
+        char * strchr(const char *<[string]>, int <[c]>);
 
 TRAD_SYNOPSIS
-	#include <string.h>
-	char * strchr(<[string]>, <[c]>);
-	char *<[string]>;
-	int *<[c]>;
+        #include <string.h>
+        char * strchr(<[string]>, <[c]>);
+        char *<[string]>;
+        int *<[c]>;
 
 DESCRIPTION
-	This function finds the first occurence of <[c]> (converted to
-	a char) in the string pointed to by <[string]> (including the
-	terminating null character).
+        This function finds the first occurence of <[c]> (converted to
+        a char) in the string pointed to by <[string]> (including the
+        terminating null character).
 
 RETURNS
-	Returns a pointer to the located character, or a null pointer
-	if <[c]> does not occur in <[string]>.
+        Returns a pointer to the located character, or a null pointer
+        if <[c]> does not occur in <[string]>.
 
 PORTABILITY
 <<strchr>> is ANSI C.
@@ -30,7 +30,7 @@ PORTABILITY
 <<strchr>> requires no supporting OS subroutines.
 
 QUICKREF
-	strchr ansi pure
+        strchr ansi pure
 */
 
 #include <string.h>
@@ -59,8 +59,8 @@ QUICKREF
 
 char *
 _DEFUN (strchr, (s1, i),
-	_CONST char *s1 _AND
-	int i)
+        _CONST char *s1 _AND
+        int i)
 {
   _CONST unsigned char *s = (_CONST unsigned char *)s1;
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

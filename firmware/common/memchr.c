@@ -1,28 +1,28 @@
 /*
 FUNCTION
-	<<memchr>>---search for character in memory
+        <<memchr>>---search for character in memory
 
 INDEX
-	memchr
+        memchr
 
 ANSI_SYNOPSIS
-	#include <string.h>
-	void * memchr(const void *<[s1]>, int <[c]>, size_t <[n]>);
+        #include <string.h>
+        void * memchr(const void *<[s1]>, int <[c]>, size_t <[n]>);
 
 TRAD_SYNOPSIS
-	#include <string.h>
-	void * memchr(<[s1]>, <[c]>, <[n]>);
-	void *<[string]>;
-	int *<[c]>;
-	size_t *<[n]>;
+        #include <string.h>
+        void * memchr(<[s1]>, <[c]>, <[n]>);
+        void *<[string]>;
+        int *<[c]>;
+        size_t *<[n]>;
 
 DESCRIPTION
-	This function scans the first <[n]> bytes of the memory pointed
-	to by <[s1]> for the character <[c]> (converted to a char).
+        This function scans the first <[n]> bytes of the memory pointed
+        to by <[s1]> for the character <[c]> (converted to a char).
 
 RETURNS
-	Returns a pointer to the matching byte, or a null pointer if
-	<[c]> does not occur in <[s1]>.
+        Returns a pointer to the matching byte, or a null pointer if
+        <[c]> does not occur in <[s1]>.
 
 PORTABILITY
 <<memchr>> is ANSI C.
@@ -30,7 +30,7 @@ PORTABILITY
 <<memchr>> requires no supporting OS subroutines.
 
 QUICKREF
-	memchr ansi pure
+        memchr ansi pure
 */
 
 #include <string.h>
@@ -59,8 +59,8 @@ QUICKREF
 
 void *
 _DEFUN (memchr, (s1, i, n),
-	_CONST void *s1 _AND
-	int i _AND size_t n)
+        _CONST void *s1 _AND
+        int i _AND size_t n)
 {
   _CONST unsigned char *s = (_CONST unsigned char *)s1;
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
@@ -69,9 +69,9 @@ _DEFUN (memchr, (s1, i, n),
   while (n-- > 0)
     {
       if (*s == c)
-	{
+        {
           return (void *)s;
-	}
+        }
       s++;
     }
 
@@ -89,15 +89,15 @@ _DEFUN (memchr, (s1, i, n),
 
       aligned_addr = (unsigned long*)s;
       while ((!DETECTCHAR (*aligned_addr, mask)) && (n>LBLOCKSIZE))
-	{
+        {
           aligned_addr++;
-	  n -= LBLOCKSIZE;
-	}
+          n -= LBLOCKSIZE;
+        }
 
       /* The block of bytes currently pointed to by aligned_addr
          may contain the target character or there may be less than
-	 LBLOCKSIZE bytes left to search. We check the last few
-	 bytes using the bytewise search.  */
+         LBLOCKSIZE bytes left to search. We check the last few
+         bytes using the bytewise search.  */
 
       s = (unsigned char*)aligned_addr;
     }
@@ -105,9 +105,9 @@ _DEFUN (memchr, (s1, i, n),
   while (n-- > 0)
     {
       if (*s == c)
-	{
+        {
           return (void *)s;
-	}
+        }
       s++;
     }
 

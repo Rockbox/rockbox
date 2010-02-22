@@ -1,30 +1,30 @@
 /*
 FUNCTION
-	<<memmove>>---move possibly overlapping memory
+        <<memmove>>---move possibly overlapping memory
 
 INDEX
-	memmove
+        memmove
 
 ANSI_SYNOPSIS
-	#include <string.h>
-	void *memmove(void *<[dst]>, const void *<[src]>, size_t <[length]>);
+        #include <string.h>
+        void *memmove(void *<[dst]>, const void *<[src]>, size_t <[length]>);
 
 TRAD_SYNOPSIS
-	#include <string.h>
-	void *memmove(<[dst]>, <[src]>, <[length]>)
-	void *<[dst]>;
-	void *<[src]>;
-	size_t <[length]>;
+        #include <string.h>
+        void *memmove(<[dst]>, <[src]>, <[length]>)
+        void *<[dst]>;
+        void *<[src]>;
+        size_t <[length]>;
 
 DESCRIPTION
-	This function moves <[length]> characters from the block of
-	memory starting at <<*<[src]>>> to the memory starting at
-	<<*<[dst]>>>. <<memmove>> reproduces the characters correctly
-	at <<*<[dst]>>> even if the two areas overlap.
+        This function moves <[length]> characters from the block of
+        memory starting at <<*<[src]>>> to the memory starting at
+        <<*<[dst]>>>. <<memmove>> reproduces the characters correctly
+        at <<*<[dst]>>> even if the two areas overlap.
 
 
 RETURNS
-	The function returns <[dst]> as passed.
+        The function returns <[dst]> as passed.
 
 PORTABILITY
 <<memmove>> is ANSI C.
@@ -32,7 +32,7 @@ PORTABILITY
 <<memmove>> requires no supporting OS subroutines.
 
 QUICKREF
-	memmove ansi pure
+        memmove ansi pure
 */
 
 #include "config.h"
@@ -54,15 +54,15 @@ QUICKREF
 
 _PTR
 _DEFUN (memmove, (dst_void, src_void, length),
-	_PTR dst_void _AND
-	_CONST _PTR src_void _AND
-	size_t length) ICODE_ATTR;
+        _PTR dst_void _AND
+        _CONST _PTR src_void _AND
+        size_t length) ICODE_ATTR;
 
 _PTR
 _DEFUN (memmove, (dst_void, src_void, length),
-	_PTR dst_void _AND
-	_CONST _PTR src_void _AND
-	size_t length)
+        _PTR dst_void _AND
+        _CONST _PTR src_void _AND
+        size_t length)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   char *dst = dst_void;
@@ -74,16 +74,16 @@ _DEFUN (memmove, (dst_void, src_void, length),
       src += length;
       dst += length;
       while (length--)
-	{
-	  *--dst = *--src;
-	}
+        {
+          *--dst = *--src;
+        }
     }
   else
     {
       while (length--)
-	{
-	  *dst++ = *src++;
-	}
+        {
+          *dst++ = *src++;
+        }
     }
 
   return dst_void;
@@ -100,9 +100,9 @@ _DEFUN (memmove, (dst_void, src_void, length),
       src += len;
       dst += len;
       while (len--)
-	{
-	  *--dst = *--src;
-	}
+        {
+          *--dst = *--src;
+        }
     }
   else
     {

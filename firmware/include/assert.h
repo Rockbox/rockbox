@@ -1,11 +1,11 @@
 /*
-	assert.h
+        assert.h
 */
 
 #undef assert
 
 #ifdef NDEBUG           /* required by ANSI standard */
-#define assert(p)  	((void)0)
+#define assert(p)       ((void)0)
 #else
 
 #ifdef __STDC__

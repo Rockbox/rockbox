@@ -1,28 +1,28 @@
 /*
 FUNCTION
-	<<memset>>---set an area of memory
+        <<memset>>---set an area of memory
 
 INDEX
-	memset
+        memset
 
 ANSI_SYNOPSIS
-	#include <string.h>
-	void *memset(const void *<[dst]>, int <[c]>, size_t <[length]>);
+        #include <string.h>
+        void *memset(const void *<[dst]>, int <[c]>, size_t <[length]>);
 
 TRAD_SYNOPSIS
-	#include <string.h>
-	void *memset(<[dst]>, <[c]>, <[length]>)
-	void *<[dst]>;
-	int <[c]>;
-	size_t <[length]>;
+        #include <string.h>
+        void *memset(<[dst]>, <[c]>, <[length]>)
+        void *<[dst]>;
+        int <[c]>;
+        size_t <[length]>;
 
 DESCRIPTION
-	This function converts the argument <[c]> into an unsigned
-	char and fills the first <[length]> characters of the array
-	pointed to by <[dst]> to the value.
+        This function converts the argument <[c]> into an unsigned
+        char and fills the first <[length]> characters of the array
+        pointed to by <[dst]> to the value.
 
 RETURNS
-	<<memset>> returns the value of <[m]>.
+        <<memset>> returns the value of <[m]>.
 
 PORTABILITY
 <<memset>> is ANSI C.
@@ -30,7 +30,7 @@ PORTABILITY
     <<memset>> requires no supporting OS subroutines.
 
 QUICKREF
-	memset ansi pure
+        memset ansi pure
 */
 
 #include <string.h>
@@ -41,9 +41,9 @@ QUICKREF
 
 _PTR 
 _DEFUN (memset, (m, c, n),
-	_PTR m _AND
-	int c _AND
-	size_t n)
+        _PTR m _AND
+        int c _AND
+        size_t n)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   char *s = (char *) m;
@@ -78,7 +78,7 @@ _DEFUN (memset, (m, c, n),
         {
           buffer = 0;
           for (i = 0; i < LBLOCKSIZE; i++)
-	    buffer = (buffer << 8) | c;
+            buffer = (buffer << 8) | c;
         }
 
       while (n >= LBLOCKSIZE*4)

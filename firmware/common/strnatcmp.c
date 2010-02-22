@@ -75,26 +75,26 @@ compare_right(char const *a, char const *b)
      int ca, cb;
      
      /* The longest run of digits wins.  That aside, the greatest
-	value wins, but we can't know that it will until we've scanned
-	both numbers to know that they have the same magnitude, so we
-	remember it in BIAS. */
+        value wins, but we can't know that it will until we've scanned
+        both numbers to know that they have the same magnitude, so we
+        remember it in BIAS. */
      for (;; a++, b++) {
       ca = to_int(*a);
       cb = to_int(*b);
-	  if (!nat_isdigit(ca)  &&  !nat_isdigit(cb))
-	       return bias;
-	  else if (!nat_isdigit(ca))
-	       return -1;
-	  else if (!nat_isdigit(cb))
-	       return +1;
-	  else if (ca < cb) {
-	       if (!bias)
-		    bias = -1;
-	  } else if (ca > cb) {
-	       if (!bias)
-		    bias = +1;
-	  } else if (!ca  &&  !cb)
-	       return bias;
+          if (!nat_isdigit(ca)  &&  !nat_isdigit(cb))
+               return bias;
+          else if (!nat_isdigit(ca))
+               return -1;
+          else if (!nat_isdigit(cb))
+               return +1;
+          else if (ca < cb) {
+               if (!bias)
+                    bias = -1;
+          } else if (ca > cb) {
+               if (!bias)
+                    bias = +1;
+          } else if (!ca  &&  !cb)
+               return bias;
      }
 
      return 0;
@@ -107,18 +107,18 @@ compare_left(char const *a, char const *b)
      /* Compare two left-aligned numbers: the first to have a
         different value wins. */
      for (;; a++, b++) {
-	  if (!nat_isdigit(*a)  &&  !nat_isdigit(*b))
-	       return 0;
-	  else if (!nat_isdigit(*a))
-	       return -1;
-	  else if (!nat_isdigit(*b))
-	       return +1;
-	  else if (*a < *b)
-	       return -1;
-	  else if (*a > *b)
-	       return +1;
+          if (!nat_isdigit(*a)  &&  !nat_isdigit(*b))
+               return 0;
+          else if (!nat_isdigit(*a))
+               return -1;
+          else if (!nat_isdigit(*b))
+               return +1;
+          else if (*a < *b)
+               return -1;
+          else if (*a > *b)
+               return +1;
      }
-	  
+          
      return 0;
 }
 
@@ -134,39 +134,39 @@ static int strnatcmp0(char const *a, char const *b, int fold_case)
       ca = to_int(a[ai]);
       cb = to_int(b[bi]);
 
-	  /* process run of digits */
-	  if (nat_isdigit(ca)  &&  nat_isdigit(cb)) {
-	       fractional = (ca == '0' || cb == '0');
+          /* process run of digits */
+          if (nat_isdigit(ca)  &&  nat_isdigit(cb)) {
+               fractional = (ca == '0' || cb == '0');
 
-	       if (fractional) {
-		    if ((result = compare_left(a+ai, b+bi)) != 0)
-			 return result;
-	       } else {
-		    if ((result = compare_right(a+ai, b+bi)) != 0)
-			 return result;
-	       }
-	  }
+               if (fractional) {
+                    if ((result = compare_left(a+ai, b+bi)) != 0)
+                         return result;
+               } else {
+                    if ((result = compare_right(a+ai, b+bi)) != 0)
+                         return result;
+               }
+          }
 
-	  if (!ca && !cb) {
-	       /* The strings compare the same.  Call str[case]cmp() to ensure
+          if (!ca && !cb) {
+               /* The strings compare the same.  Call str[case]cmp() to ensure
                   consistent results. */
                if(fold_case)
                    return strcasecmp(a,b);
                else
                    return strcmp(a,b);
-	  }
+          }
 
-	  if (fold_case) {
-	       ca = nat_unify_case(ca);
-	       cb = nat_unify_case(cb);
-	  }
-	  
-	  if (ca < cb)
-	       return -1;
-	  else if (ca > cb)
-	       return +1;
+          if (fold_case) {
+               ca = nat_unify_case(ca);
+               cb = nat_unify_case(cb);
+          }
+          
+          if (ca < cb)
+               return -1;
+          else if (ca > cb)
+               return +1;
 
-	  ++ai; ++bi;
+          ++ai; ++bi;
      }
 }
 

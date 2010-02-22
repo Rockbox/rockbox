@@ -1,31 +1,31 @@
 /*
 FUNCTION
-	<<memcmp>>---compare two memory areas
+        <<memcmp>>---compare two memory areas
 
 INDEX
-	memcmp
+        memcmp
 
 ANSI_SYNOPSIS
-	#include <string.h>
-	int memcmp(const void *<[s1]>, const void *<[s2]>, size_t <[n]>);
+        #include <string.h>
+        int memcmp(const void *<[s1]>, const void *<[s2]>, size_t <[n]>);
 
 TRAD_SYNOPSIS
-	#include <string.h>
-	int memcmp(<[s1]>, <[s2]>, <[n]>)
-	void *<[s1]>;
-	void *<[s2]>;
-	size_t <[n]>;
+        #include <string.h>
+        int memcmp(<[s1]>, <[s2]>, <[n]>)
+        void *<[s1]>;
+        void *<[s2]>;
+        size_t <[n]>;
 
 DESCRIPTION
-	This function compares not more than <[n]> characters of the
-	object pointed to by <[s1]> with the object pointed to by <[s2]>.
+        This function compares not more than <[n]> characters of the
+        object pointed to by <[s1]> with the object pointed to by <[s2]>.
 
 
 RETURNS
-	The function returns an integer greater than, equal to or
-	less than zero 	according to whether the object pointed to by
-	<[s1]> is greater than, equal to or less than the object
-	pointed to by <[s2]>.
+        The function returns an integer greater than, equal to or
+        less than zero  according to whether the object pointed to by
+        <[s1]> is greater than, equal to or less than the object
+        pointed to by <[s2]>.
 
 PORTABILITY
 <<memcmp>> is ANSI C.
@@ -33,7 +33,7 @@ PORTABILITY
 <<memcmp>> requires no supporting OS subroutines.
 
 QUICKREF
-	memcmp ansi pure
+        memcmp ansi pure
 */
 
 #include <string.h>
@@ -51,9 +51,9 @@ QUICKREF
 
 int
 _DEFUN (memcmp, (m1, m2, n),
-	_CONST _PTR m1 _AND
-	_CONST _PTR m2 _AND
-	size_t n)
+        _CONST _PTR m1 _AND
+        _CONST _PTR m2 _AND
+        size_t n)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   unsigned char *s1 = (unsigned char *) m1;
@@ -62,9 +62,9 @@ _DEFUN (memcmp, (m1, m2, n),
   while (n--)
     {
       if (*s1 != *s2)
-	{
-	  return *s1 - *s2;
-	}
+        {
+          return *s1 - *s2;
+        }
       s1++;
       s2++;
     }
@@ -87,7 +87,7 @@ _DEFUN (memcmp, (m1, m2, n),
       while (n >= LBLOCKSIZE)
         {
           if (*a1 != *a2) 
-   	    break;
+            break;
           a1++;
           a2++;
           n -= LBLOCKSIZE;
@@ -102,7 +102,7 @@ _DEFUN (memcmp, (m1, m2, n),
   while (n--)
     {
       if (*s1 != *s2)
-	return *s1 - *s2;
+        return *s1 - *s2;
       s1++;
       s2++;
     }
