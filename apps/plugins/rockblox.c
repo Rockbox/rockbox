@@ -1282,11 +1282,7 @@ static int rockblox_menu(void)
                     return 1;
                 break;
             case 3:
-#ifdef HAVE_LCD_BITMAP
                 highscore_show(MAX_HIGH_SCORES, highest, MAX_HIGH_SCORES, true);
-#else
-                rb->splashf(2*HZ, "High Score: %d", highest[0].score);
-#endif
                 break;
             case 4:
                 if (playback_control(NULL))
@@ -1511,17 +1507,14 @@ enum plugin_status plugin_start (const void *parameter)
     resume_file = resume;
     while(!rockblox_loop()) {
         if(!resume) {
-            int position = highscore_update(rockblox_status.score, rockblox_status.level, "", highest,
-                MAX_HIGH_SCORES);
+            int position = highscore_update(rockblox_status.score,
+                                            rockblox_status.level, "",
+                                            highest, MAX_HIGH_SCORES);
             if (position == 0) {
                 rb->splash(HZ*2, "New High Score");
             }
             if (position != -1) {
-#ifdef HAVE_LCD_BITMAP
                 highscore_show(position, highest, MAX_HIGH_SCORES, true);
-#else
-                rb->splashf(2*HZ, "High Score: %d", highest[position].score);
-#endif
             }
         }
     }

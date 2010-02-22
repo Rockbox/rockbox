@@ -82,7 +82,6 @@ int highscore_update(int score, int level, const char *name,
 bool highscore_would_update(int score, struct highscore *scores,
                             int num_scores);
 
-#ifdef HAVE_LCD_BITMAP
 /* Displays a nice highscore table. In general the font is FONT_UI, but if
  * the highscore table doesn't fit on the the display size it uses 
  * FONT_SYSFIXED.
@@ -90,7 +89,8 @@ bool highscore_would_update(int score, struct highscore *scores,
  *  - position : highlight position line
  *  - scores   : the array of existing scores
  *  - num_scores: number of elements in 'scores'
+ *  - show_level: whether to display the level column or not
  */
-void highscore_show(int position, struct highscore *scores, int num_scores, bool show_level);
-#endif
+void highscore_show(int position, struct highscore *scores, int num_scores,
+                    bool show_level);
 #endif
