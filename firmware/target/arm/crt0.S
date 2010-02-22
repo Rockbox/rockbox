@@ -57,7 +57,7 @@ _vectorsend:
 newstart:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
-#if CONFIG_CPU==AS3525 && !defined(BOOTLOADER)
+#if (CONFIG_CPU==AS3525 || CONFIG_CPU==AS3525v2) && !defined(BOOTLOADER)
     /* Setup MMU : has to be done before accessing IRAM ! */
     bl      memory_init
 
