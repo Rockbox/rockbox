@@ -161,7 +161,6 @@ void fiq_handler(void)
     );
 }
 
-#if (CONFIG_CPU == AS3525) /* not v2 */
 #if defined(BOOTLOADER)
 static void sdram_delay(void)
 {
@@ -255,7 +254,6 @@ void memory_init(void)
     enable_mmu();
 }
 #endif /* BOOTLOADER */
-#endif /* CONFIG_CPU == AS3525 (not v2) */
 
 void system_init(void)
 {
@@ -314,11 +312,11 @@ void system_init(void)
         "mcr p15, 0, r0, c1, c0   \n"
         : : : "r0" );
 
+#endif /* CONFIG_CPU == AS3525v2 */
+
 #ifdef BOOTLOADER
     sdram_init();
 #endif  /* BOOTLOADER */
-
-#endif /* CONFIG_CPU == AS3525v2 */
 
 #if 0 /* the GPIO clock is already enabled by the dualboot function */
     CGU_PERI |= CGU_GPIO_CLOCK_ENABLE;
