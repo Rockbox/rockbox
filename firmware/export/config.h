@@ -717,6 +717,7 @@ Lyre prototype 1 */
     defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
     defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
     (CONFIG_CPU == AS3525 && MEMORYSIZE > 2) || /* AS3525 +2MB: core, plugins, codecs */ \
+    (CONFIG_CPU == AS3525v2) || /* AS3525v2: core, plugins, codecs */ \
     (CONFIG_CPU == AS3525 && MEMORYSIZE <= 2 && !defined(PLUGIN) && !defined(CODEC)) || /* AS3525 2MB:core only */ \
     (CONFIG_CPU == PNX0101) || \
     defined(CPU_S5L870X)) || /* Samsung S5L8700: core, plugins, codecs */ \
