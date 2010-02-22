@@ -743,59 +743,48 @@ void sound_settings_apply(void)
 /* call this after loading a .wps/.rwps pr other skin files, so that the
  * skin buffer is reset properly
  */
+struct skin_load_setting {
+    char* setting;
+    char* suffix;
+    void (*loadfunc)(enum screen_type screen, const char *buf, bool isfile);
+};
+static struct skin_load_setting skins[] = {
+    /* This determins the load order. *sbs must be loaded before any other
+     * skin on that screen */
+    { global_settings.sbs_file, "sbs", sb_skin_data_load},
+    { global_settings.wps_file, "wps", wps_data_load},
+#ifdef HAVE_REMOTE_LCD
+    { global_settings.rsbs_file, "rsbs", sb_skin_data_load},
+    { global_settings.rwps_file, "rwps", wps_data_load},
+#endif
+};
 void settings_apply_skins(void)
 {
     char buf[MAX_PATH];
     /* re-initialize the skin buffer before we start reloading skins */
     skin_buffer_init();
-    int i;
+    unsigned int i;
+    enum screen_type screen = SCREEN_MAIN;
 #ifdef HAVE_LCD_BITMAP
     skin_backdrop_init();
     skin_font_init();
-    FOR_NB_SCREENS(i)
+    for (i=0; i<sizeof(skins)/sizeof(*skins); i++)
     {
-        const char* setting = global_settings.sbs_file;
-        const char* suffix = ".sbs";
 #ifdef HAVE_REMOTE_LCD
-        if (i == SCREEN_REMOTE)
-        {
-            setting = global_settings.rsbs_file;
-            suffix = ".rsbs";
-        }
+        screen = skins[i].suffix[0] == 'r' ? SCREEN_REMOTE : SCREEN_MAIN;
 #endif
-        if (setting[0] && setting[0] != '-')
+        if (skins[i].setting[0] && skins[i].setting[0] != '-')
         {
-            snprintf(buf, sizeof buf, SBS_DIR "/%s%s", setting, suffix);
-            sb_skin_data_load(i, buf, true);
+            snprintf(buf, sizeof buf, WPS_DIR "/%s.%s",
+                     skins[i].setting, skins[i].suffix);
+            skins[i].loadfunc(screen, buf, true);
         }
         else
         {
-            sb_skin_data_load(i, NULL, true);
+            skins[i].loadfunc(screen, NULL, true);
         }
     }
 #endif
-    FOR_NB_SCREENS(i)
-    {
-        const char* setting = global_settings.wps_file;
-        const char* suffix = ".wps";
-#ifdef HAVE_REMOTE_LCD
-        if (i == SCREEN_REMOTE)
-        {
-            setting = global_settings.rwps_file;
-            suffix = ".rwps";
-        }
-#endif
-        if (setting[0] && setting[0] != '-')
-        {
-            snprintf(buf, sizeof buf, WPS_DIR "/%s%s", setting, suffix);
-            wps_data_load(i, buf, true);
-        }
-        else
-        {
-            wps_data_load(i, NULL, true);
-        }
-    }
-
     viewportmanager_theme_changed(THEME_STATUSBAR);
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     FOR_NB_SCREENS(i)
