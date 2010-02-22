@@ -1057,6 +1057,8 @@ void input_thread_entry(void)
 
 				input[fft_idx] = left;
 				fft_idx++;
+				input[fft_idx] = 0;
+				fft_idx++;
 
 				if (fft_idx == ARRAYSIZE_IN)
 					break;
