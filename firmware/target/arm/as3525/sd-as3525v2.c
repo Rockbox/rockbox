@@ -43,24 +43,6 @@
 #include <stdarg.h>
 #include "sysfont.h"
 
-/* debug helper */
-static int line = 0;
-static void printf(const char *format, ...)
-{
-    char buf[50];
-    int len;
-    va_list ap;
-    va_start(ap, format);
-
-    len = vsnprintf(buf, sizeof(buf), format, ap);
-    va_end(ap);
-
-    lcd_puts(0, line++, buf);
-    lcd_update();
-    if(line >= LCD_HEIGHT/SYSFONT_HEIGHT)
-        line = 0;
-}
-
 /* command flags */
 #define MCI_NO_RESP     (0<<0)
 #define MCI_RESP        (1<<0)
@@ -378,8 +360,6 @@ static int sd_init_card(void)
     if(!send_cmd(SD_SET_BUS_WIDTH, card_info.rca | 2, MCI_NO_RESP, NULL))
         return -11;
 
-    MCI_CTYPE = (1<<0); /* Bus width = 4 */
-
     if(!send_cmd(SD_SELECT_CARD, card_info.rca, MCI_NO_RESP, NULL))
         return -9;
 
@@ -555,21 +535,6 @@ static int sd_wait_for_state(unsigned int state)
 
 static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool write)
 {
-#if 1
-    /* This is debug code, not functional yet */
-    line = 0;
-    lcd_clear_display();
-    printf("Entering SD transfer");
-    printf("THIS IS DEBUG CODE !");
-    printf("");
-    printf("All your controllers");
-    printf("are belong to us.");
-    volatile int delay = 0x500000;
-    while(delay--) ;
-    line = 0;
-    lcd_clear_display();
-#endif /* debug warning */
-
     int ret = 0;
 
     if((int)buf & 3)
@@ -616,8 +581,8 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
 
     do
     {
-        MCI_BLKSIZ = 512;
-        MCI_BYTCNT = count * 512;
+        MCI_BLKSIZ = SD_BLOCK_SIZE;
+        MCI_BYTCNT = count * SD_BLOCK_SIZE;
 
         MCI_CTRL |= (FIFO_RESET|DMA_RESET);
         while(MCI_CTRL & (FIFO_RESET|DMA_RESET))
@@ -625,7 +590,7 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
 
         MCI_CTRL |= DMA_ENABLE;
         MCI_MASK = MCI_INT_CD|MCI_INT_DTO|MCI_INT_DCRC|MCI_INT_DRTO| \
-            MCI_INT_HTO|MCI_INT_FRUN|MCI_INT_HLE|MCI_INT_SBE|MCI_INT_EBE;
+            MCI_INT_HTO|MCI_INT_FRUN|/*MCI_INT_HLE|*/MCI_INT_SBE|MCI_INT_EBE;
 
         MCI_FIFOTH &= MCI_FIFOTH_MASK;
         MCI_FIFOTH |= 0x503f0080;
@@ -647,14 +612,7 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
             dma_enable_channel(0, MCI_FIFO, buf, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
-        line = 0;
-        lcd_clear_display();
-        printf("dma ->");
-
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
-
-        printf("dma <-");
-        int delay = 0x1000000; while(delay--) ;
 
         last_disk_activity = current_tick;
 
