@@ -191,7 +191,7 @@ static const char         sd_thread_name[] = "ata/sd";
 static struct mutex       sd_mtx SHAREDBSS_ATTR;
 static struct event_queue sd_queue;
 #ifndef BOOTLOADER
-static bool sd_enabled = false;
+bool sd_enabled = false;
 #endif
 
 static struct wakeup transfer_completion_signal;

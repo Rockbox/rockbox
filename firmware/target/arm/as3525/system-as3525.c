@@ -336,7 +336,7 @@ void system_init(void)
 #ifndef BOOTLOADER
     /*  Initialize power management settings */
     ascodec_write(AS3514_CVDD_DCDC3, AS314_CP_DCDC3_SETTING);
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
     fmradio_i2c_init();
 #endif
 #endif /* !BOOTLOADER */

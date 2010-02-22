@@ -104,7 +104,7 @@
 
 #if CONFIG_CPU == DM320 || CONFIG_CPU == S3C2440 || CONFIG_CPU == TCC7801 \
     || CONFIG_CPU == IMX31L || CONFIG_CPU == AS3525 || CONFIG_CPU == JZ4732 \
-    || defined(CPU_S5L870X)
+    || defined(CPU_S5L870X) || CONFIG_CPU == AS3525v2
 #include "debug-target.h"
 #endif
 

@@ -65,7 +65,7 @@ OUTPUT_FORMAT(elf32-littlemips)
 #include "cpu.h"
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGIN_BUFFER_SIZE - CODEC_SIZE - TTB_SIZE
 
-#elif CONFIG_CPU==AS3525
+#elif CONFIG_CPU==AS3525 || CONFIG_CPU==AS3525v2
 #include "cpu.h"
 #define DRAMORIG DRAM_ORIG
 #ifdef AMS_LOWMEM
@@ -130,7 +130,7 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define IRAM DRAM
 #define IRAMSIZE 0
 
-#elif CONFIG_CPU==AS3525
+#elif CONFIG_CPU==AS3525 || CONFIG_CPU==AS3525v2
 #ifdef AMS_LOWMEM
 #define IRAMSIZE 0  /* simulates no IRAM since codec is already entirely in IRAM */
 #define CODEC_ORIGIN (IRAM_ORIG + IRAM_SIZE - CODEC_SIZE)

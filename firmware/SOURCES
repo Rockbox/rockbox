@@ -423,7 +423,9 @@ drivers/generic_i2c.c
 target/arm/adc-as3514.c
 target/arm/as3525/audio-as3525.c
 target/arm/as3525/debug-as3525.c
+#if CONFIG_TUNER
 target/arm/as3525/fmradio-i2c-as3525.c
+#endif /* CONFIG_TUNER */
 target/arm/as3525/i2s-as3525.c
 target/arm/as3525/pcm-as3525.c
 #endif /* BOOTLOADER */

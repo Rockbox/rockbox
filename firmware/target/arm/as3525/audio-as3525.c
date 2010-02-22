@@ -47,7 +47,9 @@ void audio_input_mux(int source, unsigned flags)
         case AUDIO_SRC_PLAYBACK:
             if (source != last_source)
             {
+#if defined(HAVE_RECORDING) || defined(HAVE_FMRADIO_IN)
                 audiohw_set_monitor(false);
+#endif
 #ifdef HAVE_RECORDING
                 audiohw_disable_recording();
 #endif
@@ -63,6 +65,8 @@ void audio_input_mux(int source, unsigned flags)
             }
             break;
 #endif
+
+#if (INPUT_SRC_CAPS & SRC_CAP_FMRADIO)
 
         case AUDIO_SRC_FMRADIO:         /* recording and playback */
             if (source == last_source
@@ -86,9 +90,12 @@ void audio_input_mux(int source, unsigned flags)
 #ifdef HAVE_RECORDING
                 audiohw_disable_recording();
 #endif
+#if defined(HAVE_RECORDING) || defined(HAVE_FMRADIO_IN)
                 audiohw_set_monitor(true); /* line 2 analog audio path */
+#endif
             }
             break;
+#endif /* (INPUT_SRC_CAPS & SRC_CAP_FMRADIO) */
     }
 
     last_source = source;
