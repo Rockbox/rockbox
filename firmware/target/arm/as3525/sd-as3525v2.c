@@ -142,7 +142,7 @@
 
 #define MCI_ERROR   (MCI_INT_RE | MCI_INT_RCRC | MCI_INT_DCRC /*| MCI_INT_RTO*/ \
                    | MCI_INT_DRTO | MCI_INT_HTO | MCI_INT_FRUN | MCI_INT_HLE \
-                   /*| MCI_INT_SBE*/ | MCI_INT_EBE)
+                   | MCI_INT_SBE | MCI_INT_EBE)
 
 #define MCI_FIFOTH      SD_REG(0x4C)    /* FIFO threshold */
 /* TX watermark :    bits 11:0
@@ -196,6 +196,7 @@ bool sd_enabled = false;
 
 static struct wakeup transfer_completion_signal;
 static volatile bool retry;
+static volatile bool data_transfer = false;
 
 static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
@@ -207,11 +208,9 @@ void INT_NAND(void)
     MCI_RAW_STATUS = status;    /* clear status */
 
     if(status & MCI_ERROR)
-    {
-        panicf("status 0x%8x", status);
         retry = true;
-    }
-    else if(status & MCI_INT_DTO)
+
+    if(data_transfer && status & (MCI_INT_DTO|MCI_ERROR))
         wakeup_signal(&transfer_completion_signal);
 
     MCI_CTRL |= INT_ENABLE;
@@ -220,56 +219,39 @@ void INT_NAND(void)
 static bool send_cmd(const int cmd, const int arg, const int flags,
         unsigned long *response)
 {
-    int val;
-    val = cmd | CMD_DONE_BIT;
+    MCI_COMMAND = cmd;
+
     if(flags & MCI_RESP)
     {
-        val |= CMD_RESP_EXP_BIT;
+        MCI_COMMAND |= CMD_RESP_EXP_BIT;
         if(flags & MCI_LONG_RESP)
-            val |= CMD_RESP_LENGTH_BIT;
+            MCI_COMMAND |= CMD_RESP_LENGTH_BIT;
     }
 
     if(cmd == SD_READ_MULTIPLE_BLOCK || cmd == SD_WRITE_MULTIPLE_BLOCK)
     {
-        val |= CMD_WAIT_PRV_DAT_BIT | CMD_DATA_EXP_BIT;
+        MCI_COMMAND |= CMD_WAIT_PRV_DAT_BIT | CMD_DATA_EXP_BIT;
         if(cmd == SD_WRITE_MULTIPLE_BLOCK)
-            val |= CMD_RW_BIT | CMD_CHECK_CRC_BIT;
+            MCI_COMMAND |= CMD_RW_BIT | CMD_CHECK_CRC_BIT;
     }
 
-    int tmp = MCI_CLKENA;
+    int clkena = MCI_CLKENA;
     MCI_CLKENA = 0;
 
-    MCI_COMMAND = CMD_DONE_BIT|CMD_SEND_CLK_ONLY|CMD_WAIT_PRV_DAT_BIT;
-    MCI_ARGUMENT = 0;
-    int max = 10;
-    while(max-- && MCI_COMMAND & CMD_DONE_BIT);
-
-    MCI_CLKDIV &= ~0xff;
-    MCI_CLKDIV |= 0;
-
-    MCI_COMMAND = CMD_DONE_BIT|CMD_SEND_CLK_ONLY|CMD_WAIT_PRV_DAT_BIT;
-    MCI_ARGUMENT = 0;
-    max = 10;
-    while(max-- && MCI_COMMAND & CMD_DONE_BIT);
-
-    MCI_CLKENA = tmp;
-
-    MCI_COMMAND = CMD_DONE_BIT|CMD_SEND_CLK_ONLY|CMD_WAIT_PRV_DAT_BIT;
-    MCI_ARGUMENT = 0;
-    max = 10;
-    while(max-- && MCI_COMMAND & CMD_DONE_BIT);
-
-    mci_delay();
-
     MCI_ARGUMENT = arg;
-    MCI_COMMAND = val;
+    MCI_COMMAND |= CMD_DONE_BIT;
 
-    MCI_CTRL |= INT_ENABLE;
+    int max = 0x40000;
+    while(MCI_COMMAND & CMD_DONE_BIT)
+    {
+        if(--max == 0)  /* timeout */
+        {
+            MCI_CLKENA = clkena;
+            return false;
+        }
+    }
 
-    max = 1000;
-    while(max-- && MCI_COMMAND & CMD_DONE_BIT); /* wait for cmd completion */
-    if(!max)
-        return false;
+    MCI_CLKENA = clkena;
 
     if(flags & MCI_RESP)
     {
@@ -292,7 +274,7 @@ static int sd_init_card(void)
     unsigned long response;
     unsigned long temp_reg[4];
     int max_tries = 100; /* max acmd41 attemps */
-    bool sdhc;
+    bool sd_v2;
     int i;
 
     if(!send_cmd(SD_GO_IDLE_STATE, 0, MCI_NO_RESP, NULL))
@@ -300,10 +282,10 @@ static int sd_init_card(void)
 
     mci_delay();
 
-    sdhc = false;
+    sd_v2 = false;
     if(send_cmd(SD_SEND_IF_COND, 0x1AA, MCI_RESP, &response))
         if((response & 0xFFF) == 0x1AA)
-            sdhc = true;
+            sd_v2 = true;
 
     do {
         /* some MicroSD cards seems to need more delays, so play safe */
@@ -312,14 +294,14 @@ static int sd_init_card(void)
         mci_delay();
 
         /* app_cmd */
-        if( !send_cmd(SD_APP_CMD, 0, MCI_RESP, &response) /*||
-            !(response & (1<<5))*/ )
+        if( !send_cmd(SD_APP_CMD, 0, MCI_RESP, &response) ||
+            !(response & (1<<5)))
         {
             return -2;
         }
 
         /* acmd41 */
-        if(!send_cmd(SD_APP_OP_COND, (sdhc ? 0x40FF8000 : (1<<23)),
+        if(!send_cmd(SD_APP_OP_COND, (sd_v2 ? 0x40FF8000 : (1<<23)),
                         MCI_RESP, &card_info.ocr))
             return -3;
     } while(!(card_info.ocr & (1<<31)) && max_tries--);
@@ -422,18 +404,20 @@ static void init_controller(void)
     int idx = (MCI_HCON >> 1) & 31;
     int idx_bits = (1 << idx) -1;
 
+    MCI_CLKSRC = 0;
+    MCI_CLKDIV = 0;
+
     MCI_PWREN &= ~idx_bits;
     MCI_PWREN = idx_bits;
 
     mci_delay();
 
-    MCI_CTRL |= CTRL_RESET;     /* FIXME: FIFO & DMA reset? */
+    MCI_CTRL |= CTRL_RESET;
     while(MCI_CTRL & CTRL_RESET)
         ;
 
     MCI_RAW_STATUS = 0xffffffff;
 
-    MCI_CTRL |= INT_ENABLE;
     MCI_TMOUT = 0xffffffff;
 
     MCI_CTYPE = 0;
@@ -442,8 +426,8 @@ static void init_controller(void)
 
     MCI_ARGUMENT = 0;
     MCI_COMMAND = CMD_DONE_BIT|CMD_SEND_CLK_ONLY|CMD_WAIT_PRV_DAT_BIT;
-    int max = 10;
-    while(max-- && (MCI_COMMAND & CMD_DONE_BIT)) ;
+    while(MCI_COMMAND & CMD_DONE_BIT)
+        ;
 
     MCI_DEBNCE = 0xfffff;   /* default value */
 
@@ -451,6 +435,8 @@ static void init_controller(void)
     MCI_FIFOTH |= 0x503f0080;
 
     MCI_MASK = 0xffffffff & ~(MCI_INT_ACD|MCI_INT_CRDDET);
+
+    MCI_CTRL |= INT_ENABLE;
 }
 
 int sd_init(void)
@@ -590,7 +576,7 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
 
         MCI_CTRL |= DMA_ENABLE;
         MCI_MASK = MCI_INT_CD|MCI_INT_DTO|MCI_INT_DCRC|MCI_INT_DRTO| \
-            MCI_INT_HTO|MCI_INT_FRUN|/*MCI_INT_HLE|*/MCI_INT_SBE|MCI_INT_EBE;
+            MCI_INT_HTO|MCI_INT_FRUN|MCI_INT_HLE|MCI_INT_SBE|MCI_INT_EBE;
 
         MCI_FIFOTH &= MCI_FIFOTH_MASK;
         MCI_FIFOTH |= 0x503f0080;
@@ -612,7 +598,9 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
             dma_enable_channel(0, MCI_FIFO, buf, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
+        data_transfer = true;
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+        data_transfer = false;
 
         last_disk_activity = current_tick;
 
