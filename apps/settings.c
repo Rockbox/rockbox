@@ -754,17 +754,18 @@ void settings_apply_skins(void)
     skin_font_init();
     FOR_NB_SCREENS(i)
     {
-        const char* setting;
+        const char* setting = global_settings.sbs_file;
+        const char* suffix = ".sbs";
 #ifdef HAVE_REMOTE_LCD
         if (i == SCREEN_REMOTE)
+        {
             setting = global_settings.rsbs_file;
-        else
+            suffix = ".rsbs";
+        }
 #endif
-            setting = global_settings.sbs_file;
         if (setting[0] && setting[0] != '-')
         {
-            snprintf(buf, sizeof buf, SBS_DIR "/%s.%ssbs", setting,
-                      i == SCREEN_MAIN? "" : "r");
+            snprintf(buf, sizeof buf, SBS_DIR "/%s%s", setting, suffix);
             sb_skin_data_load(i, buf, true);
         }
         else
@@ -776,14 +777,17 @@ void settings_apply_skins(void)
     FOR_NB_SCREENS(i)
     {
         const char* setting = global_settings.wps_file;
+        const char* suffix = ".wps";
 #ifdef HAVE_REMOTE_LCD
         if (i == SCREEN_REMOTE)
-            setting = global_settings.rsbs_file;
+        {
+            setting = global_settings.rwps_file;
+            suffix = ".rwps";
+        }
 #endif
         if (setting[0] && setting[0] != '-')
         {
-            snprintf(buf, sizeof buf, WPS_DIR "/%s.%swps", setting,
-                    i == SCREEN_MAIN? "" : "r");
+            snprintf(buf, sizeof buf, WPS_DIR "/%s%s", setting, suffix);
             wps_data_load(SCREEN_MAIN, buf, true);
         }
         else

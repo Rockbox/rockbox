@@ -199,7 +199,7 @@ static const char graphic_numeric[] = "graphic,numeric";
 
 /* Default theme settings */
 #define DEFAULT_WPSNAME  "cabbiev2"
-#define DEFAULT_SBS_NAME "-"
+#define DEFAULT_SBSNAME  "-"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -1440,13 +1440,13 @@ const struct settings_list settings[] = {
                      DEFAULT_WPSNAME, WPS_DIR "/", ".wps"),
 #ifdef HAVE_LCD_BITMAP
     TEXT_SETTING(F_THEMESETTING,sbs_file, "sbs",
-                     DEFAULT_SBS_NAME, SBS_DIR "/", ".sbs"),
+                     DEFAULT_SBSNAME, SBS_DIR "/", ".sbs"),
 #endif
 #ifdef HAVE_REMOTE_LCD
     TEXT_SETTING(F_THEMESETTING,rwps_file,"rwps",
-                     DEFAULT_SBS_NAME, WPS_DIR "/", ".rwps"),
+                     DEFAULT_WPSNAME, WPS_DIR "/", ".rwps"),
     TEXT_SETTING(F_THEMESETTING,rsbs_file, "rsbs",
-                     DEFAULT_WPSNAME, SBS_DIR "/", ".rsbs"),
+                     DEFAULT_SBSNAME, SBS_DIR "/", ".rsbs"),
 #endif
     TEXT_SETTING(0,lang_file,"lang","-",LANG_DIR "/",".lng"),
 #if LCD_DEPTH > 1
