@@ -24,9 +24,11 @@
 #include "as3514.h"
 #include "ascodec.h"
 
-/* AMS Sansas start counting from Jan 1st 1970 instead of 1980 */
+/* AMS Sansas start counting from Jan 1st 1970 instead of 1980 (not as3525v2) */
 #if (CONFIG_CPU==AS3525)
 #define SECS_ADJUST 315532800   /* seconds between 1970-1-1 and 1980-1-1 */
+#elif (CONFIG_CPU==AS3525v2)
+#define SECS_ADJUST 315532800 - (2*365*24*3600) - 26*(24*3600) + 7*3600 + 25*60
 #else
 #define SECS_ADJUST 0
 #endif
