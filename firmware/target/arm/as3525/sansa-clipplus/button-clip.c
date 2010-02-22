@@ -25,6 +25,12 @@
 
 void button_init_device(void)
 {
+    /*  Set pins to input for reading buttons */
+    GPIOC_DIR = 0;                      /* All C pins input */
+    GPIOA_DIR &= ~(1<<1|1<<6|1<<7);     /* Pins A1,A6,A7 input */
+                                        /* OF does not set D6 to input  */
+    GPIOB_DIR |= (1<<6);                     /*  Pin B6 output  */
+    GPIOB_DIR |= (1<<0);                /* Pin B0 set output */
 }
 
 bool button_hold(void)
@@ -35,12 +41,7 @@ bool button_hold(void)
 
 int button_read_device(void)
 {
-    static int buttons = 0;
-
-    /*  Set pins to input for reading buttons */
-    GPIOC_DIR = 0;                      /* All C pins input */
-    GPIOA_DIR &= ~(1<<1|1<<6|1<<7);     /* Pins A1,A6,A7 input */
-                                        /* OF does not set D6 to input  */
+    int buttons = 0;
 
     /* TODO No hold button  Hold toggled by long home(A1) press in OF  */
     if(button_hold())
@@ -50,7 +51,6 @@ int button_read_device(void)
     /*  Buttons do not appear to need reset */
     /*  D6 needs special handling though   */
 
-    GPIOB_DIR |= (1<<0);                /* Pin B0 set output */
     GPIOB_PIN(0) = 1;                   /* set B0  */
 
     int delay = 500;
@@ -85,21 +85,5 @@ int button_read_device(void)
     if GPIOC_PIN(1)
         buttons |= BUTTON_DOWN;
 
-    /* TODO  figure out why OF does this */
-    if (buttons & BUTTON_POWER)
-    {
-        GPIOB_DIR |= (1<<6);                     /*  Pin B6 output  */
-
-        delay = 8;
-        do {
-            asm volatile("nop\n");
-        } while (delay--);
-
-        if GPIOD_PIN(6)
-            buttons |= BUTTON_POWER;    /* OF sets a different flag than PWR  */
-    }
-
   return buttons;
 }
-
-
