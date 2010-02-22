@@ -788,11 +788,11 @@ void settings_apply_skins(void)
         if (setting[0] && setting[0] != '-')
         {
             snprintf(buf, sizeof buf, WPS_DIR "/%s%s", setting, suffix);
-            wps_data_load(SCREEN_MAIN, buf, true);
+            wps_data_load(i, buf, true);
         }
         else
         {
-            wps_data_load(SCREEN_MAIN, NULL, true);
+            wps_data_load(i, NULL, true);
         }
     }
 
