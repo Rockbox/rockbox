@@ -1208,8 +1208,8 @@ target/arm/tcc77x/c100/audio-c100.c
 
 #ifdef SANSA_CLIPPLUS
 #ifndef SIMULATOR
-target/arm/as3525/sansa-clip/lcd-ssd1303.c      /* FIXME */
-target/arm/as3525/sansa-clip/lcd-as-clip.S
+target/arm/as3525/sansa-clip/lcd-ssd1303.c
+target/arm/as3525/sansa-clipplus/lcd-as-clip-plus.S
 target/arm/as3525/sansa-clipplus/button-clip.c
 target/arm/as3525/sansa-clipplus/backlight-clip.c
 #ifndef BOOTLOADER
