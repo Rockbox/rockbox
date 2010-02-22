@@ -1,7 +1,7 @@
 
 #change for releases
 ifndef APPVERSION
-APPVERSION=`../../tools/version.sh`
+APPVERSION=`../../tools/version.sh ../../`
 endif
 
 # We use the UCL code available in the Rockbox tools/ directory
