@@ -6,7 +6,7 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/crt0.o)
 
-#if CONFIG_CPU == AS3525v2
+#ifdef SANSA_CLIPV2
 #define RAMORIG 0x0             /* DRAM */
 #define RAMSIZE (MEM*0x100000)
 #else
