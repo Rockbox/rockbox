@@ -740,7 +740,7 @@ void sound_settings_apply(void)
 
 
 
-/* call this after loading a .wps/.rwps pr other skin files, so that the
+/* call this after loading a .wps/.rwps or other skin files, so that the
  * skin buffer is reset properly
  */
 struct skin_load_setting {
@@ -751,7 +751,9 @@ struct skin_load_setting {
 static struct skin_load_setting skins[] = {
     /* This determins the load order. *sbs must be loaded before any other
      * skin on that screen */
+#ifdef HAVE_LCD_BITMAP
     { global_settings.sbs_file, "sbs", sb_skin_data_load},
+#endif    
     { global_settings.wps_file, "wps", wps_data_load},
 #ifdef HAVE_REMOTE_LCD
     { global_settings.rsbs_file, "rsbs", sb_skin_data_load},
@@ -763,11 +765,12 @@ void settings_apply_skins(void)
     char buf[MAX_PATH];
     /* re-initialize the skin buffer before we start reloading skins */
     skin_buffer_init();
-    unsigned int i;
     enum screen_type screen = SCREEN_MAIN;
+    unsigned int i;
 #ifdef HAVE_LCD_BITMAP
     skin_backdrop_init();
     skin_font_init();
+#endif
     for (i=0; i<sizeof(skins)/sizeof(*skins); i++)
     {
 #ifdef HAVE_REMOTE_LCD
@@ -784,7 +787,6 @@ void settings_apply_skins(void)
             skins[i].loadfunc(screen, NULL, true);
         }
     }
-#endif
     viewportmanager_theme_changed(THEME_STATUSBAR);
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     FOR_NB_SCREENS(i)
