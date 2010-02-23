@@ -527,9 +527,6 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
 {
     int ret = 0;
 
-    if((int)buf & 3)
-        panicf("unaligned transfer");
-
     /* skip SanDisk OF */
     start += 0xf000;
 
