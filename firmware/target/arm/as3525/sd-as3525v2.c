@@ -70,17 +70,54 @@
 
 
 #define MCI_PWREN       SD_REG(0x04)    /* power enable */
+
+#define PWR_CRD_0       (1<<0)
+#define PWR_CRD_1       (1<<1)
+#define PWR_CRD_2       (1<<2)
+#define PWR_CRD_3       (1<<3)
+
 #define MCI_CLKDIV      SD_REG(0x08)    /* clock divider */
+/* CLK_DIV_0 :    bits 7:0
+ * CLK_DIV_1 :    bits 15:8
+ * CLK_DIV_2 :    bits 23:16
+ * CLK_DIV_3 :    bits 31:24
+ */
+
 #define MCI_CLKSRC      SD_REG(0x0C)    /* clock source */
+/* CLK_SRC_CRD0:  bits 1:0
+ * CLK_SRC_CRD0:  bits 3:2
+ * CLK_SRC_CRD0:  bits 5:4
+ * CLK_SRC_CRD0:  bits 7:6
+ */
+
 #define MCI_CLKENA      SD_REG(0x10)    /* clock enable */
+
+#define CCLK_ENA_CRD0   (1<<0)
+#define CCLK_ENA_CRD1   (1<<1)
+#define CCLK_ENA_CRD2   (1<<2)
+#define CCLK_ENA_CRD3   (1<<3)
+#define CCLK_LP_CRD0    (1<<16)
+#define CCLK_LP_CRD1    (1<<17)
+#define CCLK_LP_CRD2    (1<<18)
+#define CCLK_LP_CRD3    (1<<19)
+
 #define MCI_TMOUT       SD_REG(0x14)    /* timeout */
+/* response timeout bits 0:7
+ * data timeout bits     8:31
+ */
 
 #define MCI_CTYPE       SD_REG(0x18)    /* card type */
                                         /* 1 bit per card, set = wide bus */
+#define WIDTH4_CRD0     (1<<0)
+#define WIDTH4_CRD1     (1<<1)
+#define WIDTH4_CRD2     (1<<2)
+#define WIDTH4_CRD3     (1<<3)
 
-#define MCI_BLKSIZ      SD_REG(0x1C)    /* block size */
-#define MCI_BYTCNT      SD_REG(0x20)    /* byte count */
+#define MCI_BLKSIZ      SD_REG(0x1C)    /* block size  bits 0:15*/
+#define MCI_BYTCNT      SD_REG(0x20)    /* byte count  bits 0:31*/
 #define MCI_MASK        SD_REG(0x24)    /* interrupt mask */
+
+
 
 #define MCI_ARGUMENT    SD_REG(0x28)
 #define MCI_COMMAND     SD_REG(0x2C)
@@ -110,16 +147,6 @@
 #define MCI_MASK_STATUS SD_REG(0x40)    /* masked interrupt status */
 #define MCI_RAW_STATUS  SD_REG(0x44)    /* raw interrupt status, also used as
                                          * status clear */
-#define MCI_STATUS      SD_REG(0x48)
-
-/*
- *  STATUS register
- *  & 0xBA80    = MCI_INT_DCRC | MCI_INT_DRTO | MCI_INT_FRUN | \
- *                  MCI_INT_HLE | MCI_INT_SBE | MCI_INT_EBE
- *  & 8         = MCI_INT_DTO
- *  & 0x428     = MCI_INT_DTO | MCI_INT_RXDR | MCI_INT_HTO
- *  & 0x418     = MCI_INT_DTO | MCI_INT_TXDR | MCI_INT_HTO
- */
 
 /* interrupt bits */
 #define MCI_INT_CRDDET  (1<<0)      /* card detect */
@@ -140,9 +167,53 @@
 #define MCI_INT_EBE     (1<<15)     /* end bit error */
 #define MCI_INT_SDIO    (0xf<<16)
 
+/*
+ *  STATUS register
+ *  & 0xBA80    = MCI_INT_DCRC | MCI_INT_DRTO | MCI_INT_FRUN | \
+ *                  MCI_INT_HLE | MCI_INT_SBE | MCI_INT_EBE
+ *  & 8         = MCI_INT_DTO
+ *  & 0x428     = MCI_INT_DTO | MCI_INT_RXDR | MCI_INT_HTO
+ *  & 0x418     = MCI_INT_DTO | MCI_INT_TXDR | MCI_INT_HTO
+ */
+
 #define MCI_ERROR   (MCI_INT_RE | MCI_INT_RCRC | MCI_INT_DCRC /*| MCI_INT_RTO*/ \
                    | MCI_INT_DRTO | MCI_INT_HTO | MCI_INT_FRUN | MCI_INT_HLE \
                    | MCI_INT_SBE | MCI_INT_EBE)
+
+#define MCI_STATUS      SD_REG(0x48)
+
+#define FIFO_RX_WM              (1<<0)
+#define FIFO_TX_WM              (1<<1)
+#define FIFO_EMPTY              (1<<2)
+#define FIFO_FULL               (1<<3)
+#define CMD_FSM_STATE_B0        (1<<4)
+#define CMD_FSM_STATE_B1        (1<<5)
+#define CMD_FSM_STATE_B2        (1<<6)
+#define CMD_FSM_STATE_B3        (1<<7)
+#define DATA_3_STAT             (1<<8)
+#define DATA_BUSY               (1<<9)
+#define DATA_STAT_MC_BUSY       (1<<10)
+#define RESP_IDX_B0             (1<<11)
+#define RESP_IDX_B1             (1<<12)
+#define RESP_IDX_B2             (1<<13)
+#define RESP_IDX_B3             (1<<14)
+#define RESP_IDX_B4             (1<<15)
+#define RESP_IDX_B5             (1<<16)
+#define FIFO_CNT_B00            (1<<17)
+#define FIFO_CNT_B01            (1<<18)
+#define FIFO_CNT_B02            (1<<19)
+#define FIFO_CNT_B03            (1<<20)
+#define FIFO_CNT_B04            (1<<21)
+#define FIFO_CNT_B05            (1<<22)
+#define FIFO_CNT_B06            (1<<23)
+#define FIFO_CNT_B07            (1<<24)
+#define FIFO_CNT_B08            (1<<25)
+#define FIFO_CNT_B09            (1<<26)
+#define FIFO_CNT_B10            (1<<27)
+#define FIFO_CNT_B11            (1<<28)
+#define FIFO_CNT_B12            (1<<29)
+#define DMA_ACK                 (1<<30)
+#define START_CMD               (1<<31)
 
 #define MCI_FIFOTH      SD_REG(0x4C)    /* FIFO threshold */
 /* TX watermark :    bits 11:0
@@ -153,23 +224,70 @@
 #define MCI_FIFOTH_MASK 0x8000f000
 
 #define MCI_CDETECT     SD_REG(0x50)    /* card detect */
+
+#define CDETECT_CRD_0   (1<<0)
+#define CDETECT_CRD_1   (1<<1)
+#define CDETECT_CRD_2   (1<<2)
+#define CDETECT_CRD_3   (1<<3)
+
 #define MCI_WRTPRT      SD_REG(0x54)    /* write protect */
 #define MCI_GPIO        SD_REG(0x58)
-#define MCI_TCBCNT      SD_REG(0x5C)    /* transferred CIU byte count */
-#define MCI_TBBCNT      SD_REG(0x60)    /* transferred host/DMA to/from bytes */
-#define MCI_DEBNCE      SD_REG(0x64)    /* card detect debounce */
+#define MCI_TCBCNT      SD_REG(0x5C)    /* transferred CIU byte count (card)*/
+#define MCI_TBBCNT      SD_REG(0x60)    /* transferred host/DMA to/from bytes (FIFO)*/
+#define MCI_DEBNCE      SD_REG(0x64)    /* card detect debounce  bits 23:0*/
 #define MCI_USRID       SD_REG(0x68)    /* user id */
 #define MCI_VERID       SD_REG(0x6C)    /* version id */
 
 #define MCI_HCON        SD_REG(0x70)    /* hardware config */
-/* bit 0 : card type
- * bits 5:1 : maximum card index */
+/* bit  0       : card type
+ * bits 5:1     : maximum card index
+ * bit  6       : BUS TYPE
+ * bits 9:7     : DATA WIDTH
+ * bits 15:10   : ADDR WIDTH
+ * bits 17:16   : DMA IF
+ * bits 20:18   : DMA WIDTH
+ * bit  21      : FIFO RAM INSIDE
+ * bit  22      : IMPL HOLD REG
+ * bit  23      : SET CLK FALSE
+ * bits 25:24   : MAX CLK DIV IDX
+ * bit  26      : AREA OPTIM
+ */
 
 #define MCI_BMOD        SD_REG(0x80)    /* bus mode */
+/* bit  0       : SWR
+ * bit  1       : FB
+ * bits 6:2     : DSL
+ * bit  7       : DE
+ * bit  10:8    : PBL
+ */
+
 #define MCI_PLDMND      SD_REG(0x84)    /* poll demand */
 #define MCI_DBADDR      SD_REG(0x88)    /* descriptor base address */
 #define MCI_IDSTS       SD_REG(0x8C)    /* internal DMAC status */
+/* bit  0       : TI
+ * bit  1       : RI
+ * bit  2       : FBE
+ * bit  3       : unused
+ * bit  4       : DU
+ * bit  5       : CES
+ * bits 7:6     : unused
+ * bits 8       : NIS
+ * bit  9       : AIS
+ * bits 12:10   : EB
+ * bits 16:13   : FSM
+ */
+
 #define MCI_IDINTEN     SD_REG(0x90)    /* internal DMAC interrupt enable */
+/* bit  0       : TI
+ * bit  1       : RI
+ * bit  2       : FBE
+ * bit  3       : unused
+ * bit  4       : DU
+ * bit  5       : CES
+ * bits 7:6     : unused
+ * bits 8       : NI
+ * bit  9       : AI
+ */
 #define MCI_DSCADDR     SD_REG(0x94)    /* current host descriptor address */
 #define MCI_BUFADDR     SD_REG(0x98)    /* current host buffer address */
 
