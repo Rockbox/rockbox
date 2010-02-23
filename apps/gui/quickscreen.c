@@ -201,17 +201,26 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
     /* draw the icons */
     display->set_viewport(vp_icons);
 
-    display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
-                    (vp_icons->width/2) - 4, 0,      7, 8);
-    display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                    vp_icons->width - 8,
-                    (vp_icons->height/2) - 4,        7, 8);
-    display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],   0,
-                    (vp_icons->height/2) - 4,        7, 8);
-
-    display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                         (vp_icons->width/2) - 4, 
-                          vp_icons->height - 8,       7, 8);
+    if (qs->items[QUICKSCREEN_TOP] != NULL)
+    {
+        display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
+            (vp_icons->width/2) - 4, 0, 7, 8);
+    }
+    if (qs->items[QUICKSCREEN_RIGHT] != NULL)
+    {
+        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
+            vp_icons->width - 8, (vp_icons->height/2) - 4, 7, 8);
+    }
+    if (qs->items[QUICKSCREEN_LEFT] != NULL)
+    {
+        display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
+            0, (vp_icons->height/2) - 4, 7, 8);
+    }
+    if (qs->items[QUICKSCREEN_BOTTOM] != NULL)
+    {
+        display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+            (vp_icons->width/2) - 4, vp_icons->height - 8, 7, 8);
+    }
 
     display->set_viewport(parent);
     display->update_viewport();
@@ -220,12 +229,13 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
 
 static void talk_qs_option(const struct settings_list *opt, bool enqueue)
 {
-    if (global_settings.talk_menu) {
-        if (!enqueue)
-            talk_shutup();
-        talk_id(opt->lang_id, true);
-        option_talk_value(opt, option_value_as_int(opt), true);
-    }
+    if (!global_settings.talk_menu || !opt)
+        return;
+
+    if (!enqueue)
+        talk_shutup();
+    talk_id(opt->lang_id, true);
+    option_talk_value(opt, option_value_as_int(opt), true);
 }
 
 /*
@@ -409,6 +419,7 @@ bool quick_screen_quick(int button_enter)
 bool quick_screen_f3(int button_enter)
 {
     struct gui_quickscreen qs;
+    qs.items[QUICKSCREEN_TOP] = NULL;
     qs.items[QUICKSCREEN_LEFT] =
                     find_setting(&global_settings.scrollbar, NULL);
     qs.items[QUICKSCREEN_RIGHT] =
