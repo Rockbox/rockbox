@@ -454,9 +454,10 @@ int sd_init(void)
                 1;       /* clock source = PLLA */
 
     CGU_MEMSTICK = (1<<8) | (1<<7) |
-        (CLK_DIV(AS3525_PLLA_FREQ, AS3525_MS_FREQ) -1) | 1;
+        ((CLK_DIV(AS3525_PLLA_FREQ, AS3525_MS_FREQ) -1) << 2) | 1;
 
-    /* ?? */
+    /* FIXME: divider should be shifted by 2, but doing prevents card
+     * initialisation */
     *(volatile int*)(CGU_BASE+0x3C) = (1<<7) |
         (CLK_DIV(AS3525_PLLA_FREQ, 24000000) -1) | 1;
 
