@@ -258,27 +258,13 @@ void memory_init(void)
 void system_init(void)
 {
 #if CONFIG_CPU == AS3525v2
-    /* Init procedure isn't fully understood yet
-     * CCU_* registers differ from AS3525
-     */
-    unsigned int reset_loops = 640;
-
     CCU_SRC = 0x57D7BF0;
-    while(reset_loops--)
-        CCU_SRL = CCU_SRL_MAGIC_NUMBER;
-    CCU_SRC = CCU_SRL = 0;
-
-#ifdef BOOTLOADER   /* FIXME */
-    CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
-    CGU_PERI |= ((CLK_DIV(AS3525_PLLA_FREQ, AS3525_PCLK_FREQ) - 1) << 2)
-                | 1; /* clk_in = PLLA */
-#endif
-
 #else
-    unsigned int reset_loops = 640;
-
     CCU_SRC = 0x1fffff0
         & ~CCU_SRC_IDE_EN; /* FIXME */
+#endif
+
+    unsigned int reset_loops = 640;
     while(reset_loops--)
         CCU_SRL = CCU_SRL_MAGIC_NUMBER;
     CCU_SRC = CCU_SRL = 0;
@@ -286,7 +272,9 @@ void system_init(void)
     CCU_SCON = 1; /* AHB master's priority configuration :
                      TIC (Test Interface Controller) > DMA > USB > IDE > ARM */
 
+#if CONFIG_CPU == AS3525
     CGU_PROC = 0;           /* fclk 24 MHz */
+#endif
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
 
     CGU_PLLASUP = 0;        /* enable PLLA */
@@ -299,12 +287,15 @@ void system_init(void)
     while(!(CGU_INTCTRL & (1<<1)));           /* wait until PLLB is locked */
 #endif
 
+#if CONFIG_CPU == AS3525
     /*  Set FCLK frequency */
     CGU_PROC = ((AS3525_FCLK_POSTDIV << 4) |
                 (AS3525_FCLK_PREDIV  << 2) |
                  AS3525_FCLK_SEL);
+#endif
+
     /*  Set PCLK frequency */
-    CGU_PERI = ((CGU_PERI & ~0x7F)  |       /* reset divider bits 0:6 */
+    CGU_PERI = ((CGU_PERI & ~0x7F)  |       /* reset divider & clksel bits */
                  (AS3525_PCLK_DIV0 << 2) |
                  (AS3525_PCLK_DIV1 << 6) |
                   AS3525_PCLK_SEL);
@@ -314,8 +305,6 @@ void system_init(void)
         "bic r0, r0, #3<<30       \n"      /* clears bus bits : sets fastbus */
         "mcr p15, 0, r0, c1, c0   \n"
         : : : "r0" );
-
-#endif /* CONFIG_CPU == AS3525v2 */
 
 #ifdef BOOTLOADER
     sdram_init();

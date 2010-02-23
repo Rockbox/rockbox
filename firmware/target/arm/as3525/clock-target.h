@@ -61,10 +61,21 @@
 /** ************ Change these to reconfigure clocking scheme *******************/
 #if CONFIG_CPU == AS3525v2
 
-/* PLL* registers differ from AS3525 */
+/* PLLA & PLLB registers differ from AS3525(v1)
+ * so we use a setting with a known frequency */
 #define AS3525_PLLA_FREQ        240000000
+#define AS3525_PLLA_SETTING     0x113B
 
-#else
+/* XXX: CGU_PROC seems to be different as well */
+#define AS3525_FCLK_PREDIV      0
+#define AS3525_FCLK_FREQ        AS3525_PLLA_FREQ
+
+/* XXX: CGU_PERI might also be different (i.e. no PCLK_DIV1_SEL), but if we use
+ * the same frequency for DRAM & PCLK it's not a problem as the bit is unset */
+#define AS3525_DRAM_FREQ        60000000    /* Initial DRAM frequency  */
+#define AS3525_PCLK_FREQ        AS3525_DRAM_FREQ/1
+
+#else /* AS3525v1 */
 
 /* PLL  frequencies and settings*/
 #define AS3525_PLLA_FREQ        248000000   /*124,82.7,62,49.6,41.3,35.4 */
@@ -77,17 +88,11 @@
 #define AS3525_PLLB_FREQ        384000000   /* allows 44.1kHz with 0.04% error*/
 #define AS3525_PLLB_SETTING     0x2630
 
-#endif  /* CONFIG_CPU == AS3525v2 */
-
 //#define AS3525_PLLA_FREQ        384000000 /*192,128,96,76.8,64,54.9,48,42.7,38.4*/
        /* FCLK_PREDIV->  *7/8 = 336MHz      168, 112, 84, 67.2, 56, 48, 42, 37.3*/
                       /* *6/8 = 288MHz      144, 96, 72, 57.6, 48, 41.1, */
                       /* *5/8 = 240MHz      120, 80, 60, 48, 40  */
 //#define AS3525_PLLA_SETTING     0x2630
-
-/*  PLLB not used at this time! */
-//#define AS3525_PLLB_FREQ
-//#define AS3525_PLLB_SETTING
 
 #define AS3525_FCLK_PREDIV    0 /* div = (8-n)/8 Enter manually & postdiv will be calculated*/
                                 /* 0 gives you the PLLA 1st line choices, 1 the 2nd line etc. */
@@ -96,6 +101,9 @@
 #define AS3525_DRAM_FREQ       62000000            /* Initial DRAM frequency  */
         /* AS3525_PCLK_FREQ != AS3525_DRAM_FREQ/1 will boot to white lcd screen */
 #define AS3525_PCLK_FREQ      AS3525_DRAM_FREQ/1   /* PCLK divided from DRAM freq */
+
+#endif  /* CONFIG_CPU == AS3525v2 */
+
 #define AS3525_DBOP_FREQ      AS3525_PCLK_FREQ/1   /* DBOP divided from PCLK freq */
 
 /** ****************************************************************************/
