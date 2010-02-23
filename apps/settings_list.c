@@ -1448,7 +1448,7 @@ const struct settings_list settings[] = {
     TEXT_SETTING(F_THEMESETTING,rsbs_file, "rsbs",
                      DEFAULT_SBSNAME, SBS_DIR "/", ".rsbs"),
 #endif
-    TEXT_SETTING(0,lang_file,"lang","-",LANG_DIR "/",".lng"),
+    TEXT_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng"),
 #if LCD_DEPTH > 1
     TEXT_SETTING(F_THEMESETTING,backdrop_file,"backdrop",
                      DEFAULT_BACKDROP, BACKDROP_DIR "/", ".bmp"),
