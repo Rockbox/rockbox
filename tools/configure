@@ -2659,6 +2659,7 @@ fi
       toolset='';
       t_cpu='';
       GCCOPTS='';
+      extradefines="-DDEBUG"
       appsdir='\$(ROOTDIR)/tools/checkwps';
       output='checkwps.'${modelname};
       archosrom='';
