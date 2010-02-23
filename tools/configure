@@ -313,7 +313,7 @@ arm946cc () {
 arm926ejscc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm926ej-s"
- if test "$ARG_ARM_EABI" != "1"; then
+ if test "$t_manufacturer" != "as3525" -a "$ARG_ARM_EABI" != "1"; then
   GCCOPTS="$GCCOPTS -mlong-calls"
  fi
  GCCOPTIMIZE="-fomit-frame-pointer"
@@ -2019,7 +2019,6 @@ fi
     modelname="sansaclipv2"
     target="-DSANSA_CLIPV2"
     memory=8
-    arm926ejscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
     tool="$rootdir/tools/scramble -add=clv2"
@@ -2032,6 +2031,7 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-clipv2"
+    arm926ejscc
     ;;
 
    61|sansaview)
@@ -2063,7 +2063,6 @@ fi
     modelname="sansaclipplus"
     target="-DSANSA_CLIPPLUS"
     memory=8
-    arm926ejscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
     tool="$rootdir/tools/scramble -add=cli+"
@@ -2076,6 +2075,7 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-clipplus"
+    arm926ejscc
     ;;
 
    150|tatungtpj1022)
