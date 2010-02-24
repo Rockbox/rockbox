@@ -120,8 +120,8 @@ static bool force_enqueue_next; /* enqueue next utterance even if enqueue is fal
 static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
 #if CONFIG_CODEC == SWCODEC
-struct mutex queue_mutex SHAREDBSS_ATTR; /* protects queue_read, queue_write
-                                            and thumbnail_buf_used */
+/* protects queue_read, queue_write and thumbnail_buf_used */
+static struct mutex queue_mutex SHAREDBSS_ATTR; 
 #define talk_queue_lock() ({ mutex_lock(&queue_mutex); })
 #define talk_queue_unlock() ({ mutex_unlock(&queue_mutex); })
 #else
