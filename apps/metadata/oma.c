@@ -97,7 +97,7 @@ enum {
  *        present in the ea3 (first) header. The       *
  *        metadata in ea3 is stored as a variation of  *
  *        the ID3v2 metadata format.                   */
-int oma_read_header(int fd, struct mp3entry* id3)
+static int oma_read_header(int fd, struct mp3entry* id3)
 {
     static const uint16_t srate_tab[6] = {320,441,480,882,960,0};
     int     ret, ea3_taglen, EA3_pos, jsflag;

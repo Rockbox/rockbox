@@ -22,6 +22,7 @@
 #include "codeclib.h"
 #include "pcm_common.h"
 #include "ima_adpcm_common.h"
+#include "support_formats.h"
 
 /*
  * Intel DVI ADPCM (IMA ADPCM)

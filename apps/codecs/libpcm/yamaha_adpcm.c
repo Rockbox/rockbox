@@ -21,6 +21,7 @@
 #include "codeclib.h"
 #include "pcm_common.h"
 #include "adpcm_seek.h"
+#include "support_formats.h"
 
 /*
  * YAMAHA ADPCM
