@@ -292,6 +292,8 @@ PLUGIN_HEADER
 #elif CONFIG_KEYPAD == COWON_D2_PAD
 #define VIEWER_QUIT BUTTON_POWER
 #define VIEWER_MENU BUTTON_MENU
+#define VIEWER_PAGE_UP BUTTON_MINUS
+#define VIEWER_PAGE_DOWN BUTTON_PLUS
 
 #elif CONFIG_KEYPAD == IAUDIO67_PAD
 #define VIEWER_QUIT BUTTON_POWER
@@ -369,13 +371,19 @@ PLUGIN_HEADER
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-#ifndef VIEWER_QUIT
+#ifdef VIEWER_QUIT
+#define VIEWER_QUIT2        BUTTON_TOPLEFT
+#else
 #define VIEWER_QUIT         BUTTON_TOPLEFT
 #endif
-#ifndef VIEWER_PAGE_UP
+#ifdef VIEWER_PAGE_UP
+#define VIEWER_PAGE_UP2     BUTTON_TOPMIDDLE
+#else
 #define VIEWER_PAGE_UP      BUTTON_TOPMIDDLE
 #endif
-#ifndef VIEWER_PAGE_DOWN
+#ifdef VIEWER_PAGE_DOWN
+#define VIEWER_PAGE_DOWN2   BUTTON_BOTTOMMIDDLE
+#else
 #define VIEWER_PAGE_DOWN    BUTTON_BOTTOMMIDDLE
 #endif
 #ifndef VIEWER_SCREEN_LEFT
@@ -384,7 +392,9 @@ PLUGIN_HEADER
 #ifndef VIEWER_SCREEN_RIGHT
 #define VIEWER_SCREEN_RIGHT BUTTON_MIDRIGHT
 #endif
-#ifndef VIEWER_MENU
+#ifdef VIEWER_MENU
+#define VIEWER_MENU2        BUTTON_TOPRIGHT
+#else
 #define VIEWER_MENU         BUTTON_TOPRIGHT
 #endif
 #ifndef VIEWER_AUTOSCROLL
@@ -1591,6 +1601,7 @@ enum plugin_status plugin_start(const void* file)
         button = rb->button_get_w_tmo(HZ/10);
         switch (button) {
             case VIEWER_MENU:
+            case VIEWER_MENU2:
                 viewer_menu();
                 break;
 
@@ -1603,7 +1614,9 @@ enum plugin_status plugin_start(const void* file)
                 break;
 
             case VIEWER_PAGE_UP:
+            case VIEWER_PAGE_UP2:
             case VIEWER_PAGE_UP | BUTTON_REPEAT:
+            case VIEWER_PAGE_UP2 | BUTTON_REPEAT:
                 if (prefs.scroll_mode == PAGE)
                 {
                     /* Page up */
@@ -1621,7 +1634,9 @@ enum plugin_status plugin_start(const void* file)
                 break;
 
             case VIEWER_PAGE_DOWN:
+            case VIEWER_PAGE_DOWN2:
             case VIEWER_PAGE_DOWN | BUTTON_REPEAT:
+            case VIEWER_PAGE_DOWN2 | BUTTON_REPEAT:
                 if (prefs.scroll_mode == PAGE)
                 {
                     /* Page down */
@@ -1708,6 +1723,7 @@ enum plugin_status plugin_start(const void* file)
             case VIEWER_RC_QUIT:
 #endif
             case VIEWER_QUIT:
+            case VIEWER_QUIT2:
                 viewer_exit(NULL);
                 done = true;
                 break;
