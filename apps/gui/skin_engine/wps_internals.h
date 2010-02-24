@@ -222,6 +222,8 @@ struct touchregion {
     } type;                  /* type of touch region */
     bool repeat;             /* requires the area be held for the action */
     int action;              /* action this button will return */
+    bool armed;              /* A region is armed on press. Only armed regions are triggered
+                                on repeat or release. */
 };
 #endif
 

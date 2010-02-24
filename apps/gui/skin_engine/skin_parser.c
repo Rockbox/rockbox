@@ -1477,6 +1477,7 @@ static int parse_touchregion(const char *wps_bufptr,
     region->width = w;
     region->height = h;
     region->wvp = curr_vp;
+    region->armed = false;
 
     if(!strncmp(pb_string, action, sizeof(pb_string)-1)
         && *(action + sizeof(pb_string)-1) == '|')

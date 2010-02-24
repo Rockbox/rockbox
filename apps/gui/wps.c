@@ -86,6 +86,10 @@ static void wps_state_init(void);
 static void track_changed_callback(void *param);
 static void nextid3available_callback(void* param);
 
+#ifdef HAVE_TOUCHSCREEN
+static void wps_disarm_touchregions(struct wps_data *data);
+#endif
+
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
 #ifdef HAVE_REMOTE_LCD
 #define RWPS_DEFAULTCFG WPS_DIR "/rockbox_default.rwps"
@@ -623,14 +627,30 @@ static void gwps_enter_wps(void)
 #endif
         display->clear_display();
         skin_update(gwps, WPS_REFRESH_ALL);
+
+#ifdef HAVE_TOUCHSCREEN
+        wps_disarm_touchregions(gui_wps[i].data);
+#endif
     }
     /* force statusbar/skin update since we just cleared the whole screen */
     send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
 }
 
 #ifdef HAVE_TOUCHSCREEN
+/** Disarms all touchregions. */
+static void wps_disarm_touchregions(struct wps_data *data)
+{
+    struct skin_token_list *regions = data->touchregions;
+    while (regions)
+    {
+        ((struct touchregion *)regions->token->value.data)->armed = false;
+        regions = regions->next;
+    }
+}
+
 int wps_get_touchaction(struct wps_data *data)
 {
+    int returncode = ACTION_NONE;
     short x,y;
     short vx, vy;
     int type = action_get_touchscreen_press(&x, &y);
@@ -638,7 +658,9 @@ int wps_get_touchaction(struct wps_data *data)
     struct touchregion *r;
     bool repeated = (type == BUTTON_REPEAT);
     bool released = (type == BUTTON_REL);
+    bool pressed = (type == BUTTON_TOUCHSCREEN);
     struct skin_token_list *regions = data->touchregions;
+
     while (regions)
     {
         r = (struct touchregion *)regions->token->value.data;
@@ -665,11 +687,13 @@ int wps_get_touchaction(struct wps_data *data)
                 switch(r->type)
                 {
                     case WPS_TOUCHREGION_ACTION:
-                        if ((repeated && r->repeat) || (released && !r->repeat))
+                        if (r->armed && ((repeated && r->repeat) || (released && !r->repeat)))
                         {
                             last_action = r->action;
-                            return r->action;
+                            returncode = r->action;
                         }
+                        if (pressed)
+                            r->armed = true;
                         break;
                     case WPS_TOUCHREGION_SCROLLBAR:
                         if(r->width > r->height)
@@ -708,13 +732,20 @@ int wps_get_touchaction(struct wps_data *data)
 
                         global_settings.volume += min_vol;
                         setvol();
-                        return ACTION_REDRAW;
+                        returncode = ACTION_REDRAW;
                     }
                 }
             }
         }
         regions = regions->next;
     }
+
+    /* On release, all regions are disarmed. */
+    if (released)
+    	wps_disarm_touchregions(data);
+
+    if (returncode != ACTION_NONE)
+    	return returncode;
 
     if ((last_action == ACTION_WPS_SEEKBACK || last_action == ACTION_WPS_SEEKFWD))
         return ACTION_WPS_STOPSEEK;
