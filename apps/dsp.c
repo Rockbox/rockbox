@@ -218,8 +218,8 @@ static int treble;                                  /* A/V */
 /* Settings applicable to audio codec only */
 static int32_t  pitch_ratio = PITCH_SPEED_100;
 static int  channels_mode;
-static long dsp_sw_gain;
-static long dsp_sw_cross;
+       long dsp_sw_gain;
+       long dsp_sw_cross;
 static bool dither_enabled;
 static long eq_precut;
 static long track_gain;
