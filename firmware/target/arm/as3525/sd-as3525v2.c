@@ -85,9 +85,9 @@
 
 #define MCI_CLKSRC      SD_REG(0x0C)    /* clock source */
 /* CLK_SRC_CRD0:  bits 1:0
- * CLK_SRC_CRD0:  bits 3:2
- * CLK_SRC_CRD0:  bits 5:4
- * CLK_SRC_CRD0:  bits 7:6
+ * CLK_SRC_CRD1:  bits 3:2
+ * CLK_SRC_CRD2:  bits 5:4
+ * CLK_SRC_CRD3:  bits 7:6
  */
 
 #define MCI_CLKENA      SD_REG(0x10)    /* clock enable */
@@ -96,7 +96,7 @@
 #define CCLK_ENA_CRD1   (1<<1)
 #define CCLK_ENA_CRD2   (1<<2)
 #define CCLK_ENA_CRD3   (1<<3)
-#define CCLK_LP_CRD0    (1<<16)
+#define CCLK_LP_CRD0    (1<<16)         /* LP --> Low Power Mode? */
 #define CCLK_LP_CRD1    (1<<17)
 #define CCLK_LP_CRD2    (1<<18)
 #define CCLK_LP_CRD3    (1<<19)
@@ -399,6 +399,9 @@ static int sd_init_card(void)
     bool sd_v2;
     int i;
 
+    /*  assume 24 MHz clock / 60 = 400 kHz  */
+    MCI_CLKDIV = (MCI_CLKDIV & ~(0xFF)) | 0x3C;    /* CLK_DIV_0 : bits 7:0  */
+
     if(!send_cmd(SD_GO_IDLE_STATE, 0, MCI_NO_RESP, NULL))
         return -1;
 
@@ -472,6 +475,9 @@ static int sd_init_card(void)
                  NULL))
         return -12;
 
+    /*  Card back to full speed  */
+    MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0  */
+
     card_info.initialized = 1;
 
     return 0;
@@ -523,16 +529,19 @@ static void sd_thread(void)
 
 static void init_controller(void)
 {
-    int idx = (MCI_HCON >> 1) & 31;
-    int idx_bits = (1 << idx) -1;
 
-    MCI_PWREN &= ~idx_bits;
-    MCI_PWREN = idx_bits;
+    int temp = MCI_HCON;                   /* we just need to read HCON */
+//    panicf("HCON: %8x",temp);
+//    int idx = (MCI_HCON >> 1) & 31;      /* Maximum card Index */
+//    int idx_bits = (1 << idx) -1;
 
+    MCI_PWREN = 0x0;                       /*  power off all cards  */
+
+    MCI_CLKSRC = 0x00;                     /* All CLK_SRC_CRD set to 0*/
+    MCI_CLKDIV = 0x00;                     /* CLK_DIV_0 : bits 7:0  */
+
+    MCI_PWREN = PWR_CRD_0;                 /*  power up card 0 (internal)  */
     mci_delay();
-
-    MCI_CLKSRC = 0;
-    MCI_CLKDIV = 0;
 
     MCI_CTRL |= CTRL_RESET;
     while(MCI_CTRL & CTRL_RESET)
@@ -540,11 +549,11 @@ static void init_controller(void)
 
     MCI_RAW_STATUS = 0xffffffff;
 
-    MCI_TMOUT = 0xffffffff;
+    MCI_TMOUT = 0xffffffff;             /*  data b31:8, response b7:0 */
 
-    MCI_CTYPE = 0;
+    MCI_CTYPE = 0x0;                    /*  all cards 1 bit bus for now */
 
-    MCI_CLKENA = idx_bits;
+    MCI_CLKENA = CCLK_ENA_CRD0;
 
     MCI_ARGUMENT = 0;
     MCI_COMMAND = CMD_DONE_BIT|CMD_SEND_CLK_ONLY|CMD_WAIT_PRV_DAT_BIT;
