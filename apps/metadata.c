@@ -165,6 +165,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* Atrac3 in Sony OMA Container */
     [AFMT_OMA_ATRAC3] =
         AFMT_ENTRY("ATRAC3",  "atrac3_oma",     NULL,          "oma\0aa3\0"      ), 
+    /* SMAF (Synthetic music Mobile Application Format) */
+    [AFMT_SMAF] =
+        AFMT_ENTRY("SMAF",  "smaf",   NULL,          "mmf\0"      ),
 #endif
 };
 
@@ -444,6 +447,14 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         if (!get_oma_metadata(fd, id3))
         {
             DEBUGF("get_oma_metadata error\n");
+            return false;
+        }
+        break;
+
+    case AFMT_SMAF:
+        if (!get_smaf_metadata(fd, id3))
+        {
+            DEBUGF("get_smaf_metadata error\n");
             return false;
         }
         break;

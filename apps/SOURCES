@@ -186,6 +186,7 @@ metadata/asap.c
 metadata/rm.c
 metadata/nsf.c
 metadata/oma.c
+metadata/smaf.c
 #endif
 #ifdef HAVE_TAGCACHE
 tagcache.c

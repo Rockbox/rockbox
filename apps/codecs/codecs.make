@@ -90,6 +90,7 @@ $(CODECDIR)/atrac3_rm.codec : $(CODECDIR)/libatrac.a $(CODECDIR)/librm.a
 $(CODECDIR)/atrac3_oma.codec : $(CODECDIR)/libatrac.a
 $(CODECDIR)/aiff.codec : $(CODECDIR)/libpcm.a
 $(CODECDIR)/wav.codec : $(CODECDIR)/libpcm.a
+$(CODECDIR)/smaf.codec : $(CODECDIR)/libpcm.a
 
 $(CODECS): $(CODECLIB) # this must be last in codec dependency list
 
