@@ -249,6 +249,7 @@ PLUGIN_HEADER
 #define ROCKBLOX_RESTART       BUTTON_RC_MODE
 
 #elif CONFIG_KEYPAD == COWON_D2_PAD
+
 #define ROCKBLOX_OFF           BUTTON_POWER
 #define ROCKBLOX_RESTART       BUTTON_MENU
 
@@ -342,6 +343,7 @@ PLUGIN_HEADER
 #define ROCKBLOX_ROTATE_CW2   BUTTON_BOTTOMRIGHT
 #else
 #define ROCKBLOX_ROTATE_CW    BUTTON_BOTTOMRIGHT
+#define ROCKBLOX_ROTATE_CW2   BUTTON_TOPMIDDLE
 #endif
 #ifndef ROCKBLOX_DOWN
 #define ROCKBLOX_DOWN          BUTTON_BOTTOMMIDDLE
@@ -1372,6 +1374,10 @@ static int rockblox_loop (void)
                 /* if it's enabled, go ahead and rotate.. */
                 if(wheel_enabled)
 #endif
+#ifdef ROCKBLOX_ROTATE_CCW2
+                /* fallback */
+            case ROCKBLOX_ROTATE_CCW2:
+#endif
                 move_block (0, 0, (rockblox_status.co + 1) % figures[rockblox_status.cf].max_or);
                 break;
 
@@ -1383,16 +1389,14 @@ static int rockblox_loop (void)
 
                 if(wheel_enabled)
 #endif
+#ifdef ROCKBLOX_ROTATE_CW2
+                /* fallback */
+            case ROCKBLOX_ROTATE_CW2:
+#endif
                 move_block (0, 0,
                             (rockblox_status.co + figures[rockblox_status.cf].max_or -
                              1) % figures[rockblox_status.cf].max_or);
                 break;
-
-#ifdef ROCKBLOX_ROTATE_CCW2
-            case ROCKBLOX_ROTATE_CCW2:
-                move_block (0, 0, (rockblox_status.co + 1) % figures[rockblox_status.cf].max_or);
-                break;
-#endif
 
             case ROCKBLOX_DOWN:
             case ROCKBLOX_DOWN | BUTTON_REPEAT:
