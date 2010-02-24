@@ -379,7 +379,6 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 
 #define NUM_BRICKS_ROWS 8
 #define NUM_BRICKS_COLS 10
-#define BRICK_IDX(row, col) (NUM_BRICKS_COLS * (row) + (col))
 
 /* change the first number in [ ] to however many levels there are */
 static unsigned char levels[NUM_LEVELS][NUM_BRICKS_ROWS][NUM_BRICKS_COLS] =
@@ -833,7 +832,7 @@ typedef struct cube
     int hits;       /* How many hits can this brick take? */
     int hiteffect;
 } cube;
-cube brick[NUM_BRICKS_ROWS * NUM_BRICKS_COLS];
+cube brick[NUM_BRICKS_ROWS][NUM_BRICKS_COLS];
 
 typedef struct balls
 {
@@ -1012,18 +1011,17 @@ static void brickmania_init_game(bool new_game)
 
     for(i=0;i<NUM_BRICKS_ROWS;i++) {
         for(j=0;j<NUM_BRICKS_COLS;j++) {
-            int bnum = BRICK_IDX(i, j);
-            brick[bnum].poweruse = false;
+            brick[i][j].poweruse = false;
             if (new_game) {
-                brick[bnum].power=rb->rand()%25;
+                brick[i][j].power=rb->rand()%25;
                 /* +8 make the game with less powerups */
 
-                brick[bnum].hits=levels[level][i][j]>=10?
+                brick[i][j].hits=levels[level][i][j]>=10?
                     levels[level][i][j]/16-1:0;
-                brick[bnum].hiteffect=0;
-                brick[bnum].powertop = TOPMARGIN + i*BRICK_HEIGHT;
-                brick[bnum].used=!(levels[level][i][j]==0);
-                brick[bnum].color=(levels[level][i][j]>=10?
+                brick[i][j].hiteffect=0;
+                brick[i][j].powertop = TOPMARGIN + i*BRICK_HEIGHT;
+                brick[i][j].used=!(levels[level][i][j]==0);
+                brick[i][j].color=(levels[level][i][j]>=10?
                                      levels[level][i][j]%16:
                                      levels[level][i][j])-1;
                 if (levels[level][i][j]!=0)
@@ -1298,25 +1296,25 @@ static int brickmania_menu(void)
 #endif
 }
 
-void brick_hit(int brick_number)
+void brick_hit(int i, int j)
 {
-    if(!brick[brick_number].used)
+    if(!brick[i][j].used)
         return;
 
     /* if this is a crackable brick hits starts as
      * greater than 0.
      */
-    if (brick[brick_number].hits > 0) {
-        brick[brick_number].hits--;
-        brick[brick_number].hiteffect++;
+    if (brick[i][j].hits > 0) {
+        brick[i][j].hits--;
+        brick[i][j].hiteffect++;
         score+=SCORE_BALL_HIT_BRICK;
     }
     else {
-        brick[brick_number].used=false;
+        brick[i][j].used=false;
         /* Was there a powerup on the brick? */
-        if (brick[brick_number].power<NUMBER_OF_POWERUPS) {
+        if (brick[i][j].power<NUMBER_OF_POWERUPS) {
             /* Activate the powerup */
-            brick[brick_number].poweruse = true;
+            brick[i][j].poweruse = true;
         }
         brick_on_board--;
         score+=SCORE_BALL_DEMOLISHED_BRICK;
@@ -1435,19 +1433,18 @@ static int brickmania_game_loop(void)
                         j = (fire[k].x_pos - LEFTMARGIN) / BRICK_WIDTH;
                         for (i=NUM_BRICKS_ROWS-1;i>=0;i--)
                         {
-                            int bnum = BRICK_IDX(i, j);
 
-                            if (brick[bnum].used)
+                            if (brick[i][j].used)
                             {
                                 score += SCORE_FIRE_HIT_BRICK;
-                                brick_hit(bnum);
+                                brick_hit(i, j);
                                 used_fires--;
                                 fire[k].top = fire[used_fires].top;
                                 fire[k].x_pos = fire[used_fires].x_pos;
                                 k--;
                                 break;
                             }
-                            if (brick[bnum].powertop<=fire[k].top)
+                            if (brick[i][j].powertop<=fire[k].top)
                                 break;
                         }
                     }
@@ -1474,28 +1471,27 @@ static int brickmania_game_loop(void)
                 for (j=0; j<NUM_BRICKS_COLS ;j++)
                 {
                     int brickx;
-                    int bnum = BRICK_IDX(i, j);
 
                     /* This brick is not really a brick, it is a powerup if
                      *  poweruse is set.  Perform appropriate powerup checks.
                      */
-                    if(brick[bnum].poweruse)
+                    if(brick[i][j].poweruse)
                     {
                         brickx = LEFTMARGIN + j*BRICK_WIDTH +
                                         (BRICK_WIDTH - POWERUP_WIDTH) / 2;
 
                         /* Update powertop if the game is not paused */
                         if (game_state!=ST_PAUSE)
-                            brick[bnum].powertop+=SPEED_POWER;
+                            brick[i][j].powertop+=SPEED_POWER;
 
                         /* Draw the powerup */
                         rb->lcd_bitmap_part(brickmania_powerups,0,
-                            INT3(POWERUP_HEIGHT)*brick[bnum].power,
+                            INT3(POWERUP_HEIGHT)*brick[i][j].power,
                             STRIDE( SCREEN_MAIN,
                                     BMPWIDTH_brickmania_powerups,
                                     BMPHEIGHT_brickmania_powerups),
                             INT3(brickx),
-                            INT3(brick[bnum].powertop),
+                            INT3(brick[i][j].powertop),
                             INT3(POWERUP_WIDTH),
                             INT3(POWERUP_HEIGHT) );
 
@@ -1503,16 +1499,16 @@ static int brickmania_game_loop(void)
                          *  hit the paddle.
                          */
                         misc_line.p1.x = brickx + (POWERUP_WIDTH >> 1);
-                        misc_line.p1.y = brick[bnum].powertop + POWERUP_HEIGHT;
+                        misc_line.p1.y = brick[i][j].powertop + POWERUP_HEIGHT;
 
                         misc_line.p2.x = brickx + (POWERUP_WIDTH >> 1);
-                        misc_line.p2.y = SPEED_POWER + brick[bnum].powertop +
+                        misc_line.p2.y = SPEED_POWER + brick[i][j].powertop +
                                         POWERUP_HEIGHT;
 
                         /* Check if the powerup will hit the paddle */
                         if ( check_lines(&misc_line, &pad_line, &pt_hit) )
                         {
-                            switch(brick[bnum].power) {
+                            switch(brick[i][j].power) {
                                 case 0: /* Extra Life */
                                     life++;
                                     score += SCORE_POWER_EXTRA_LIFE;
@@ -1604,17 +1600,17 @@ static int brickmania_game_loop(void)
                                     break;
                             }
                             /* Disable the powerup (it was picked up) */
-                            brick[bnum].poweruse = false;
+                            brick[i][j].poweruse = false;
                         }
 
-                        if (brick[bnum].powertop>PAD_POS_Y)
+                        if (brick[i][j].powertop>PAD_POS_Y)
                         {
                             /* Disable the powerup (it was missed) */
-                            brick[bnum].poweruse = false;
+                            brick[i][j].poweruse = false;
                         }
                     }
                     /* The brick is a brick, but it may or may not be in use */
-                    else if(brick[bnum].used)
+                    else if(brick[i][j].used)
                     {
                         /* these lines are used to describe the brick */
                         line bot_brick, top_brick, left_brick, rght_brick;
@@ -1623,51 +1619,51 @@ static int brickmania_game_loop(void)
                         /* Describe the brick for later collision checks */
                         /* Setup the bottom of the brick */
                         bot_brick.p1.x = brickx;
-                        bot_brick.p1.y = brick[bnum].powertop + BRICK_HEIGHT;
+                        bot_brick.p1.y = brick[i][j].powertop + BRICK_HEIGHT;
 
                         bot_brick.p2.x = brickx + BRICK_WIDTH;
-                        bot_brick.p2.y = brick[bnum].powertop + BRICK_HEIGHT;
+                        bot_brick.p2.y = brick[i][j].powertop + BRICK_HEIGHT;
 
                         /* Setup the top of the brick */
                         top_brick.p1.x = brickx;
-                        top_brick.p1.y = brick[bnum].powertop;
+                        top_brick.p1.y = brick[i][j].powertop;
 
                         top_brick.p2.x = brickx + BRICK_WIDTH;
-                        top_brick.p2.y = brick[bnum].powertop;
+                        top_brick.p2.y = brick[i][j].powertop;
 
                         /* Setup the left of the brick */
                         left_brick.p1.x = brickx;
-                        left_brick.p1.y = brick[bnum].powertop;
+                        left_brick.p1.y = brick[i][j].powertop;
 
                         left_brick.p2.x = brickx;
-                        left_brick.p2.y = brick[bnum].powertop + BRICK_HEIGHT;
+                        left_brick.p2.y = brick[i][j].powertop + BRICK_HEIGHT;
 
                         /* Setup the right of the brick */
                         rght_brick.p1.x = brickx + BRICK_WIDTH;
-                        rght_brick.p1.y = brick[bnum].powertop;
+                        rght_brick.p1.y = brick[i][j].powertop;
 
                         rght_brick.p2.x = brickx + BRICK_WIDTH;
-                        rght_brick.p2.y = brick[bnum].powertop + BRICK_HEIGHT;
+                        rght_brick.p2.y = brick[i][j].powertop + BRICK_HEIGHT;
 
                         /* Draw the brick */
                         rb->lcd_bitmap_part(brickmania_bricks,0,
-                            INT3(BRICK_HEIGHT)*brick[bnum].color,
+                            INT3(BRICK_HEIGHT)*brick[i][j].color,
                             STRIDE( SCREEN_MAIN,
                                     BMPWIDTH_brickmania_bricks,
                                     BMPHEIGHT_brickmania_bricks),
                             INT3(brickx),
-                            INT3(brick[bnum].powertop),
+                            INT3(brick[i][j].powertop),
                             INT3(BRICK_WIDTH), INT3(BRICK_HEIGHT) );
 
 #ifdef HAVE_LCD_COLOR  /* No transparent effect for greyscale lcds for now */
-                        if (brick[bnum].hiteffect > 0)
+                        if (brick[i][j].hiteffect > 0)
                             rb->lcd_bitmap_transparent_part(brickmania_break,0,
-                                INT3(BRICK_HEIGHT)*brick[bnum].hiteffect,
+                                INT3(BRICK_HEIGHT)*brick[i][j].hiteffect,
                                 STRIDE( SCREEN_MAIN,
                                         BMPWIDTH_brickmania_break,
                                         BMPHEIGHT_brickmania_break),
                                 INT3(brickx),
-                                INT3(brick[bnum].powertop),
+                                INT3(brick[i][j].powertop),
                                 INT3(BRICK_WIDTH), INT3(BRICK_HEIGHT) );
 #endif
 
@@ -1699,7 +1695,7 @@ static int brickmania_game_loop(void)
                                 ball[k].speedy = -ball[k].speedy;
                                 ball[k].tempy = pt_hit.y;
                                 ball[k].tempx = pt_hit.x;
-                                brick_hit(bnum);
+                                brick_hit(i, j);
                             }
                             /* Check the top, if the ball is moving up dont
                              *  count it as a hit.
@@ -1710,7 +1706,7 @@ static int brickmania_game_loop(void)
                                 ball[k].speedy = -ball[k].speedy;
                                 ball[k].tempy = pt_hit.y;
                                 ball[k].tempx = pt_hit.x;
-                                brick_hit(bnum);
+                                brick_hit(i, j);
                             }
                             /* Check the left side of the brick */
                             else if(
@@ -1719,7 +1715,7 @@ static int brickmania_game_loop(void)
                                 ball[k].speedx = -ball[k].speedx;
                                 ball[k].tempy = pt_hit.y;
                                 ball[k].tempx = pt_hit.x;
-                                brick_hit(bnum);
+                                brick_hit(i, j);
                             }
                             /* Check the right side of the brick */
                             else if(
@@ -1728,7 +1724,7 @@ static int brickmania_game_loop(void)
                                 ball[k].speedx = -ball[k].speedx;
                                 ball[k].tempy = pt_hit.y;
                                 ball[k].tempx = pt_hit.x;
-                                brick_hit(bnum);
+                                brick_hit(i, j);
                             }
                         } /* for k */
                     } /* if(used) */
