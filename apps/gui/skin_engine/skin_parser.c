@@ -1926,7 +1926,10 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
 
 #if defined(DEBUG) || defined(SIMULATOR)
     if (debug)
+    {
         print_debug_info(data, fail, line_number);
+        debug_skin_usage();
+    }
 #else
     (void)debug;
 #endif
@@ -2175,7 +2178,6 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         char *dot = strrchr(buf, '.');
 
         strlcpy(bmpdir, buf, dot - buf + 1);
-
         /* load the bitmaps that were found by the parsing */
         if (!load_skin_bitmaps(wps_data, bmpdir)) {
             skin_data_reset(wps_data);

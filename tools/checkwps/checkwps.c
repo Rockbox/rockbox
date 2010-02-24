@@ -170,7 +170,7 @@ void* plugin_get_buffer(size_t *buffer_size)
 }
 
 struct user_settings global_settings = {
-    .statusbar = true,
+    .statusbar = STATUSBAR_TOP,
 #ifdef HAVE_LCD_COLOR
     .bg_color = LCD_DEFAULT_BG,
     .fg_color = LCD_DEFAULT_FG,

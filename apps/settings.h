@@ -55,7 +55,7 @@ struct opt_items {
 #error ROCKBOX_DIR not defined (should be in autoconf.h)
 #endif
 #define ROCKBOX_DIR_LEN sizeof(ROCKBOX_DIR)
-#endif
+#endif /* def __PCTOOL__ */
 
 
 #define FONT_DIR    ROCKBOX_DIR "/fonts"
