@@ -314,7 +314,7 @@ next_track:
     codec = get_codec(format.formattag);
     if (codec == 0)
     {
-        DEBUGF("CODEC_ERROR: unsupport audio format: 0x%lx\n", format.formattag);
+        DEBUGF("CODEC_ERROR: unsupport audio format: 0x%x\n", (int)format.formattag);
         i = CODEC_ERROR;
         goto done;
     }
