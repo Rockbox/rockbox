@@ -21,7 +21,6 @@
  ****************************************************************************/
 
 #include "codeclib.h"
-#include "inttypes.h"
 #include "codecs/libpcm/support_formats.h"
 
 CODEC_HEADER
@@ -38,7 +37,9 @@ CODEC_HEADER
  *
  */
 
-static int32_t samples[PCM_CHUNK_SIZE] IBSS_ATTR;
+#define PCM_SAMPLE_SIZE (4096*2)
+
+static int32_t samples[PCM_SAMPLE_SIZE] IBSS_ATTR;
 
 /* This codec support WAVE files with the following formats: */
 enum
@@ -350,8 +351,8 @@ next_track:
 
     /* check chunksize */
     if ((format.chunksize / format.blockalign) * format.samplesperblock * format.channels
-           > PCM_CHUNK_SIZE)
-        format.chunksize = (PCM_CHUNK_SIZE / format.blockalign) * format.blockalign;
+           > PCM_SAMPLE_SIZE)
+        format.chunksize = (PCM_SAMPLE_SIZE / format.blockalign) * format.blockalign;
     if (format.chunksize == 0)
     {
         DEBUGF("CODEC_ERROR: chunksize is 0\n");

@@ -25,13 +25,6 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-/*
- * PCM_CHUNK_SIZE has the size only of storing the sample at 1/50 seconds.
- * But it might not be 1/50 seconds according to the format.
- * Please confirm the source file of each format.
- */
-#define PCM_CHUNK_SIZE (4096*2)
-
 /* Macro that sign extends an unsigned byte */
 #define SE(x) ((int32_t)((int8_t)(x)))
 
