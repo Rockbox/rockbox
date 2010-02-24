@@ -2014,6 +2014,7 @@ static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char
     else
     {
         /* Abort if we can't load an image */
+        DEBUGF("Couldn't load '%s'\n", img_path);
         return false;
     }
 }
