@@ -13,7 +13,7 @@ SRC = database.c tagcache.c replaygain.c \
 	metadata.c metadata_common.c mp3data.c \
 	a52.c mp3.c adx.c mp4.c aiff.c mpc.c ape.c ogg.c \
 	asap.c sid.c asf.c spc.c flac.c vorbis.c wave.c \
-	mod.c wavpack.c monkeys.c rm.c nsf.c\
+	mod.c wavpack.c monkeys.c rm.c nsf.c smaf.c \
 	logf.c unicode.c ctype.c structec.c crc32.c io.c \
 	misc.c strlcpy.c fixedpoint.c
 
