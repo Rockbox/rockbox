@@ -1217,7 +1217,7 @@ target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-clip/powermgmt-clip.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
-#endif /* SANSA_CLIPV2 */
+#endif /* SANSA_CLIPPLUS */
 
 #ifdef SANSA_CLIPV2
 #ifndef SIMULATOR
