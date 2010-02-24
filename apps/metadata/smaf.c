@@ -48,8 +48,6 @@ static int support_codepages[7] = {
 #define TAG_ARTIST   (('A'<<8)|'N')
 #define TAG_COMPOSER (('S'<<8)|'W')
 
-static unsigned char smafbuf[1024];
-
 static bool read_datachunk(unsigned char *src, int size, unsigned short tag,
                            int codepage, unsigned char *dst)
 {
@@ -235,9 +233,11 @@ static bool get_smaf_metadata_score_track(struct mp3entry *id3,
 
 bool get_smaf_metadata(int fd, struct mp3entry* id3)
 {
+    unsigned char smafbuf[1024];
+
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char* buf = (unsigned char *)id3->path;
-    unsigned char *endbuf = smafbuf + 1024;
+    unsigned char *endbuf = smafbuf + sizeof(smafbuf);
     int i;
     int contents_size;
     int codepage = ISO_8859_1;
@@ -347,8 +347,8 @@ bool get_smaf_metadata(int fd, struct mp3entry* id3)
     if (contents_size > i)
         lseek(fd, contents_size - i, SEEK_CUR);
 
-    /* assume the SMAF pcm data position is less than 1024 bytes */
-    if (read(fd, smafbuf, 1024) < 1024)
+    /* assume the SMAF pcm data position is near the start */
+    if (read(fd, smafbuf, sizeof(smafbuf)) < (ssize_t)sizeof(smafbuf))
         return false;
 
     buf = smafbuf;
