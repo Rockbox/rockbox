@@ -1601,7 +1601,9 @@ enum plugin_status plugin_start(const void* file)
         button = rb->button_get_w_tmo(HZ/10);
         switch (button) {
             case VIEWER_MENU:
+#ifdef VIEWER_MENU2
             case VIEWER_MENU2:
+#endif
                 viewer_menu();
                 break;
 
@@ -1614,9 +1616,11 @@ enum plugin_status plugin_start(const void* file)
                 break;
 
             case VIEWER_PAGE_UP:
-            case VIEWER_PAGE_UP2:
             case VIEWER_PAGE_UP | BUTTON_REPEAT:
+#ifdef VIEWER_PAGE_UP2
+            case VIEWER_PAGE_UP2:
             case VIEWER_PAGE_UP2 | BUTTON_REPEAT:
+#endif
                 if (prefs.scroll_mode == PAGE)
                 {
                     /* Page up */
@@ -1634,9 +1638,11 @@ enum plugin_status plugin_start(const void* file)
                 break;
 
             case VIEWER_PAGE_DOWN:
-            case VIEWER_PAGE_DOWN2:
             case VIEWER_PAGE_DOWN | BUTTON_REPEAT:
+#ifdef VIEWER_PAGE_DOWN2
+            case VIEWER_PAGE_DOWN2:
             case VIEWER_PAGE_DOWN2 | BUTTON_REPEAT:
+#endif
                 if (prefs.scroll_mode == PAGE)
                 {
                     /* Page down */
@@ -1723,7 +1729,9 @@ enum plugin_status plugin_start(const void* file)
             case VIEWER_RC_QUIT:
 #endif
             case VIEWER_QUIT:
+#ifdef VIEWER_QUIT2
             case VIEWER_QUIT2:
+#endif
                 viewer_exit(NULL);
                 done = true;
                 break;
