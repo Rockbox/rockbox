@@ -479,7 +479,6 @@ static void fill_gvalues(void)
 /* Initialise the framework and prepare the greyscale display buffer
 
  arguments:
-   newrb     = pointer to plugin api
    gbuf      = pointer to the memory area to use (e.g. plugin buffer)
    gbuf_size = max usable size of the buffer
    features  = flags for requesting features

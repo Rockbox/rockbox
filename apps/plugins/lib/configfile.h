@@ -24,7 +24,7 @@
 #define TYPE_INT    1
 #define TYPE_ENUM   2
 #define TYPE_STRING 3
-#define TYPE_BOOL 4
+#define TYPE_BOOL   4
 
 struct configdata
 {

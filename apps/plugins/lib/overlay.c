@@ -28,7 +28,6 @@
 /* load and run a plugin linked as an overlay. 
 
  arguments:
-   rb        = pointer to plugin api, also passed on to the overlay
    parameter = plugin parameter, passed on to the overlay
    filename  = overlay file name, absolute path as usual
    name      = overlay display name
