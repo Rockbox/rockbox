@@ -395,88 +395,73 @@ static int sd_init_card(void)
 {
     unsigned long response;
     unsigned long temp_reg[4];
-    int max_tries = 100; /* max acmd41 attemps */
-    bool sd_v2;
+    long init_timeout;
+    bool sd_v2 = false;
     int i;
 
     /*  assume 24 MHz clock / 60 = 400 kHz  */
     MCI_CLKDIV = (MCI_CLKDIV & ~(0xFF)) | 0x3C;    /* CLK_DIV_0 : bits 7:0  */
 
+    /* 100 - 400kHz clock required for Identification Mode  */
+    /*  Start of Card Identification Mode ************************************/
+
+    /* CMD0 Go Idle  */
     if(!send_cmd(SD_GO_IDLE_STATE, 0, MCI_NO_RESP, NULL))
         return -1;
-
     mci_delay();
 
-    sd_v2 = false;
+    /* CMD8 Check for v2 sd card.  Must be sent before using ACMD41
+      Non v2 cards will not respond to this command*/
     if(send_cmd(SD_SEND_IF_COND, 0x1AA, MCI_RESP, &response))
         if((response & 0xFFF) == 0x1AA)
             sd_v2 = true;
 
+    /* timeout for initialization is 1sec, from SD Specification 2.00 */
+    init_timeout = current_tick + HZ;
+
     do {
-        /* some MicroSD cards seems to need more delays, so play safe */
-        mci_delay();
-        mci_delay();
-        mci_delay();
+        /* this timeout is the only valid error for this loop*/
+        if(TIME_AFTER(current_tick, init_timeout))
+            return -2;
 
         /* app_cmd */
-        if( !send_cmd(SD_APP_CMD, 0, MCI_RESP, &response) ||
-            !(response & (1<<5)))
-        {
-            return -2;
-        }
+        send_cmd(SD_APP_CMD, 0, MCI_RESP, &response);
 
-        /* acmd41 */
+         /* ACMD41 For v2 cards set HCS bit[30] & send host voltage range to all */
         if(!send_cmd(SD_APP_OP_COND, (sd_v2 ? 0x40FF8000 : (1<<23)),
                         MCI_RESP, &card_info.ocr))
             return -3;
-    } while(!(card_info.ocr & (1<<31)) && max_tries--);
+    } while(!(card_info.ocr & (1<<31)) );
 
-    if(max_tries < 0)
-        return -4;
-
-    mci_delay();
-    mci_delay();
-    mci_delay();
-
-    /* send CID */
+    /* CMD2 send CID */
     if(!send_cmd(SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP, card_info.cid))
         return -5;
 
-    /* send RCA */
-    if(!send_cmd(SD_SEND_RELATIVE_ADDR, 0, MCI_RESP, &card_info.rca))
-        return -6;
+    for(i=0; i<4; i++)
+        card_info.cid[3-i] = temp_reg[i];
 
-    /* send CSD */
+    /* CMD3 send RCA */
+    if(!send_cmd(SD_SEND_RELATIVE_ADDR, 0, MCI_RESP, &card_info.rca))
+        return -4;
+
+    /*  End of Card Identification Mode   ************************************/
+
+    /* CMD9 send CSD */
     if(!send_cmd(SD_SEND_CSD, card_info.rca,
                  MCI_RESP|MCI_LONG_RESP, temp_reg))
-        return -7;
+        return -5;
 
     for(i=0; i<4; i++)
         card_info.csd[3-i] = temp_reg[i];
 
     sd_parse_csd(&card_info);
 
-    if(!send_cmd(SD_APP_CMD, 0, MCI_RESP, &response) ||
-       !send_cmd(42, 0, MCI_NO_RESP, NULL)) /* disconnect the 50 KOhm pull-up
-                                               resistor on CD/DAT3 */
-        return -13;
-
-    if(!send_cmd(SD_APP_CMD, card_info.rca, MCI_NO_RESP, NULL))
-        return -10;
-
-    if(!send_cmd(SD_SET_BUS_WIDTH, card_info.rca | 2, MCI_NO_RESP, NULL))
-        return -11;
-
-    if(!send_cmd(SD_SELECT_CARD, card_info.rca, MCI_NO_RESP, NULL))
-        return -9;
-
-    /* not sent in init_card() by OF */
-    if(!send_cmd(SD_SET_BLOCKLEN, card_info.blocksize, MCI_NO_RESP,
-                 NULL))
-        return -12;
-
     /*  Card back to full speed  */
-    MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0  */
+    MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
+
+    /*  CMD7 w/rca: Select card to put it in TRAN state */
+    if(!send_cmd(SD_SELECT_CARD, card_info.rca, MCI_NO_RESP, NULL))
+        return -6;
 
     card_info.initialized = 1;
 
@@ -529,13 +514,6 @@ static void sd_thread(void)
 
 static void init_controller(void)
 {
-
-    int temp = MCI_HCON;                   /* we just need to read HCON */
-    (void)temp;
-//    panicf("HCON: %8x",temp);
-//    int idx = (MCI_HCON >> 1) & 31;      /* Maximum card Index */
-//    int idx_bits = (1 << idx) -1;
-
     MCI_PWREN = 0x0;                       /*  power off all cards  */
 
     MCI_CLKSRC = 0x00;                     /* All CLK_SRC_CRD set to 0*/
