@@ -1,7 +1,7 @@
 /* (C) Guenter Geiger <geiger@xdv.org> */
 
 
-#include "m_pd.h"
+#include "../src/m_pd.h"
 #include "g_canvas.h"
 
 /* ------------------------ gcanvas ----------------------------- */

@@ -9,7 +9,7 @@ put out a "float" as in sliders, toggles, etc. */
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #include "m_pd.h"
 #include "g_canvas.h"
 #include "g_all_guis.h"

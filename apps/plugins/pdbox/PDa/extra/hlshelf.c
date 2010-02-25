@@ -3,11 +3,11 @@
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
-#include "m_pd.h"
+#include "../../pdbox.h"
+#include "../src/m_pd.h"
 #include "math.h"
 #else /* ROCKBOX */
-#include <m_pd.h>
+#include "../src/m_pd.h"
 #include <math.h>
 
 #ifdef NT

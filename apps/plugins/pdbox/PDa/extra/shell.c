@@ -1,6 +1,6 @@
 /* (C) Guenter Geiger <geiger@epy.co.at> */
 
-#include "m_pd.h"
+#include "../src/m_pd.h"
 #ifdef NT
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )

@@ -16,14 +16,12 @@ PDBOX_SRC := $(call preprocess, $(PDBOXSRCDIR)/SOURCES)
 PDBOX_OBJ := $(call c2obj, $(PDBOX_SRC))
 
 # add source files to OTHERSRC to get automatic dependencies
-OTHERSRC += $(PDBOX_SRC)
+OTHER_SRC += $(PDBOX_SRC)
 
 $(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ) $(MPEG_OBJ) $(CODECDIR)/libtlsf.a
 
 PDBOXFLAGS = $(PLUGINFLAGS) \
-             -DFIXEDPOINT -DSTATIC -DPD -DUSEAPI_ROCKBOX \
-             -I$(PDBOXSRCDIR) -I$(PDBOXSRCDIR)/PDa/src \
-             -I$(PDBOXSRCDIR)/TLSF-2.4.4/src
+             -DFIXEDPOINT -DSTATIC -DPD -DUSEAPI_ROCKBOX 
 
 # Compile PDBox with extra flags (adapted from ZXBox)
 $(PDBOXBUILDDIR)/%.o: $(PDBOXSRCDIR)/%.c $(PDBOXSRCDIR)/pdbox.make

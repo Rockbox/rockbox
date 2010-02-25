@@ -1,5 +1,5 @@
-#include <m_pd.h>
-#include <m_fixed.h>
+#include "../src/m_pd.h"
+#include <../src/m_fixed.h>
 
 
 static t_class *snapshot_tilde_class;

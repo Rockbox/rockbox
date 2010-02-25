@@ -3,9 +3,9 @@
 
 #include "math.h"
 #ifdef ROCKBOX
-#include "m_pd.h"
+#include "../src/m_pd.h"
 #else
-#include <m_pd.h>
+#include "../src/m_pd.h"
 #endif
 
 /* ----------------------------- moog ----------------------------- */

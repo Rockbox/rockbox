@@ -22,8 +22,8 @@
 #include "plugin.h"
 #include "pdbox.h"
 
-#include "m_pd.h"
-#include "s_stuff.h"
+#include "PDa/src/m_pd.h"
+#include "PDa/src/s_stuff.h"
 
 /* Welcome to the PDBox plugin */
 PLUGIN_HEADER

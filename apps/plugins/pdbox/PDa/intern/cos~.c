@@ -1,6 +1,6 @@
 
-#include <m_pd.h>
-#include <m_fixed.h>
+#include "../src/m_pd.h"
+#include <../src/m_fixed.h>
 #include "cos_table.h"
 
 /* ------------------------ cos~ ----------------------------- */

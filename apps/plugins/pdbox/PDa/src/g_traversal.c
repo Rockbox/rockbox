@@ -18,7 +18,7 @@ sublist - get a pointer into a list which is an element of another scalar
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #include "m_pd.h"
 #include "g_canvas.h"
 #else /* ROCKBOX */

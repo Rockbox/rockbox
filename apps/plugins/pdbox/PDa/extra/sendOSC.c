@@ -47,7 +47,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 #define MAX_ARGS 2000
 #define SC_BUFFER_SIZE 64000
 
-#include "m_pd.h"
+#include "../src/m_pd.h"
 #include "OSC-client.h"
 
 #include <string.h>

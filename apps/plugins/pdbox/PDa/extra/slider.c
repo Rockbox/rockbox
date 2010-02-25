@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "m_pd.h"
+#include "../src/m_pd.h"
 #include "g_canvas.h" /* for widgetbehaviour */
 #include "fatom.h"
 

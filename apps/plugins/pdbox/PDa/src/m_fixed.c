@@ -1,7 +1,7 @@
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #else /* ROCKBOX */
 #include <sys/socket.h>
 #include <netinet/in.h>

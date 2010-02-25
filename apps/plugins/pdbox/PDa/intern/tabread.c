@@ -1,4 +1,4 @@
-#include <m_pd.h>
+#include "../src/m_pd.h"
 
 /* ---------- tabread: control, non-interpolating ------------------------ */
 

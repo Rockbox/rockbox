@@ -5,7 +5,7 @@
 #if 0
 //#ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #endif
 
 #define PD_CLASS_DEF
@@ -16,7 +16,7 @@
 #ifdef ROCKBOX
 
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 
 #else /* ROCKBOX */
 #include <stdlib.h>

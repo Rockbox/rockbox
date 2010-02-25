@@ -17,7 +17,7 @@ void readsf_banana( void);    /* debugging */
 #ifdef ROCKBOX
 
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 
 #include "m_pd.h"
 #include "m_imp.h"

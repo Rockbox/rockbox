@@ -21,7 +21,7 @@ control their appearances by adding stuff to draw.
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #include "m_pd.h"
 #include "g_canvas.h"
 #else /* ROCKBOX */

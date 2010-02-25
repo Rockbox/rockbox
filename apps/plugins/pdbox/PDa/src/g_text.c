@@ -14,7 +14,7 @@
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #else /* ROCKBOX */
 #include <stdlib.h>
 #include <stdio.h>

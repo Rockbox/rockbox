@@ -4,7 +4,7 @@
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #else /* ROCKBOX */
 #ifdef DL_OPEN
 #include <dlfcn.h>

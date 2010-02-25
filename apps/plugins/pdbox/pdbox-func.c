@@ -23,8 +23,8 @@
 #include "pdbox.h"
 #include "ctype.h"
 
-#include "m_pd.h"
-#include "s_stuff.h"
+#include "PDa/src/m_pd.h"
+#include "PDa/src/s_stuff.h"
 
 
 /* This implementation of strncat is taken from lua plug-in. */

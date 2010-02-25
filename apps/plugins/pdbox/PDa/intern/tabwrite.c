@@ -1,4 +1,4 @@
-#include <m_pd.h>
+#include "../src/m_pd.h"
 /* ------------------ tabwrite: control ------------------------ */
 
 static t_class *tabwrite_class;

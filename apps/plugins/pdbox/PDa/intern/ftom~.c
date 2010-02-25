@@ -1,10 +1,10 @@
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #endif
 
-#include <m_pd.h>
-#include <m_fixed.h>
+#include "../src/m_pd.h"
+#include <../src/m_fixed.h>
 
 typedef struct ftom_tilde
 {

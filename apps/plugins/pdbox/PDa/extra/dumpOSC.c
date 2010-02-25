@@ -70,7 +70,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 #include <config.h> 
 #endif
 
-#include "m_pd.h"
+#include "../src/m_pd.h"
 //#include "m_imp.h"
 #include "s_stuff.h"
 

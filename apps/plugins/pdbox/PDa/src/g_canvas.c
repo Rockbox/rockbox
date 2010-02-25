@@ -20,7 +20,7 @@ to be different but are now unified except for some fossilized names.) */
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #include "m_pd.h"
 #include "m_imp.h"
 #include "s_stuff.h"

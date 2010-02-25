@@ -7,7 +7,7 @@
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #endif
 
 #include "m_pd.h"

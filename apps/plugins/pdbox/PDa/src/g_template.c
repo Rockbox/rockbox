@@ -4,7 +4,7 @@
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #include "m_pd.h"
 #include "s_stuff.h"
 #include "g_canvas.h"

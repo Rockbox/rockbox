@@ -12,7 +12,7 @@
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #ifdef SIMULATOR
 int printf(const char *fmt, ...);
 void perror(const char*);

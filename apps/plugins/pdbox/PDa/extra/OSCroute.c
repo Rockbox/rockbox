@@ -44,7 +44,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #else /* ROCKBOX */
 #ifdef WIN32
 	#include <stdlib.h>
@@ -65,7 +65,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 #define OSCWarning(x...) post(x)
 
 /* the required include files */
-#include "m_pd.h"
+#include "../src/m_pd.h"
 
 
 #ifndef TRUE

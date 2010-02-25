@@ -86,7 +86,7 @@
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #else /* ROCKBOX */
 #include <stdio.h>
 #include <math.h>

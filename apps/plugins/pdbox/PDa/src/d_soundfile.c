@@ -13,7 +13,7 @@ objects use Posix-like threads.  */
 
 #ifdef ROCKBOX
 #include "plugin.h"
-#include "pdbox.h"
+#include "../../pdbox.h"
 #else /* ROCKBOX */
 #ifdef UNIX
 #include <unistd.h>

@@ -29,7 +29,7 @@
 #endif
 
 /* Pure Data */
-#include "m_pd.h"
+#include "PDa/src/m_pd.h"
 
 /* Minimal memory size. */
 #define MIN_MEM_SIZE (4 * 1024 * 1024)
