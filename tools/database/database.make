@@ -7,12 +7,21 @@
 # $Id: checkwps.make 22680 2009-09-11 17:58:17Z gevaerts $
 #
 
-FIRMINC = -I../../firmware/include -fno-builtin
-
 DBDEFINES=-g -DDEBUG -D__PCTOOL__ -DSIMULATOR
 CFLAGS+=$(DBDEFINES)
 
-SRC= $(call preprocess, $(TOOLSDIR)/database/SOURCES)
+createsrc = $(shell cat $(1) > $(3); echo "\#if CONFIG_CODEC == SWCODEC" >> $(3); \
+                                     echo $(2) | sed 's/ /\n/g' >> $(3); \
+                                     echo "\#endif" >> $(3); \
+                                     echo $(3))
+
+METADATAS := $(subst $(ROOTDIR), ../.., $(wildcard $(ROOTDIR)/apps/metadata/*.c))
+
+SRCFILE := $(call createsrc, $(TOOLSDIR)/database/SOURCES, \
+                             $(METADATAS), \
+                             $(TOOLSDIR)/database/SOURCES.build)
+
+SRC= $(call preprocess, $(SRCFILE))
 
 FIRMINC = -I$(ROOTDIR)/firmware/include -fno-builtin
 
@@ -24,19 +33,25 @@ INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(BUILDDIR) \
 
 SIMINCLUDES += -I$(ROOTDIR)/uisimulator/sdl -I$(ROOTDIR)/uisimulator/common \
-	-I$(FIRMDIR)/export $(TARGET_INC) -I$(BUILDDIR) -I$(APPSDIR) -I/usr/include/SDL
+	-I$(FIRMDIR)/export $(TARGET_INC) -I$(BUILDDIR) -I$(APPSDIR)
 
 # Makes mkdepfile happy
+GCCOPTS+=`$(SDLCONFIG) --cflags`
 OLDGCCOPTS:=$(GCCOPTS)
 GCCOPTS+=-D__PCTOOL__  $(FIRMINC) $(SIMINCLUDES)
 
+LIBS=`$(SDLCONFIG) --libs`
+ifneq ($(findstring MINGW,$(shell uname)),MINGW)
+LIBS += -ldl
+endif
+
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
+
+SIMFLAGS += $(SIMINCLUDES) $(DBDEFINES) -DHAVE_CONFIG_H $(OLDGCCOPTS) $(INCLUDES)
 
 $(BUILDDIR)/$(BINARY): $$(OBJ)
 	@echo LD $(BINARY)
-	$(SILENT)$(HOSTCC) $(INCLUDE) $(FLAGS) -ldl -o $@ $+
-
-SIMFLAGS += $(SIMINCLUDES) $(DBDEFINES) -DHAVE_CONFIG_H $(OLDGCCOPTS) $(INCLUDES)
+	$(SILENT)$(HOSTCC) $(SIMFLAGS) $(LIBS) -o $@ $+
 
 $(BUILDDIR)/tools/database/../../uisimulator/%.o: $(ROOTDIR)/uisimulator/%.c
 	$(SILENT)mkdir -p $(dir $@)

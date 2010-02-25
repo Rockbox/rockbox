@@ -57,8 +57,10 @@ all: $(DEPFILE) build
 include $(TOOLSDIR)/tools.make
 
 ifeq (,$(findstring checkwps,$(APPSDIR)))
-  include $(FIRMDIR)/firmware.make
-  include $(ROOTDIR)/apps/bitmaps/bitmaps.make
+  ifeq (,$(findstring database,$(APPSDIR)))
+    include $(FIRMDIR)/firmware.make
+    include $(ROOTDIR)/apps/bitmaps/bitmaps.make
+  endif
 endif
 
 ifneq (,$(findstring bootloader,$(APPSDIR)))

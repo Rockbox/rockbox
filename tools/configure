@@ -2672,8 +2672,17 @@ fi
       t_cpu='';
       GCCOPTS='';
       appsdir='\$(ROOTDIR)/tools/database';
-      output='database.'${modelname};
       archosrom='';
+
+      case $uname in
+          CYGWIN*|MINGW*)
+              output="database_${modelname}.exe"
+              ;;
+          *)
+              output='database.'${modelname};
+              ;;
+      esac
+
       echo "Database tool build selected"
       ;;
     *)
@@ -3007,6 +3016,7 @@ sed > Makefile \
  -e "s,@RBDIR@,${rbdir},g" \
  -e "s,@PREFIX@,$PREFIX,g" \
  -e "s,@CMDLINE@,$cmdline,g" \
+ -e "s,@SDLCONFIG@,$sdl,g" \
 <<EOF
 ## Automatically generated. http://www.rockbox.org/
 
@@ -3071,6 +3081,7 @@ export ENC_OPTS=@ENC_OPTS@
 export ENCODER=@ENCODER@
 export USE_ELF=@USE_ELF@
 export RBDIR=@RBDIR@
+export SDLCONFIG=@SDLCONFIG@
 
 CONFIGURE_OPTIONS=@CMDLINE@
 
