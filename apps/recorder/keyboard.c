@@ -92,6 +92,10 @@
 #define KBD_TOGGLE_INPUT
 #endif
 
+#define CHANGED_PICKER 1
+#define CHANGED_CURSOR 2
+#define CHANGED_TEXT   3
+
 struct keyboard_parameters
 {
     unsigned short kbd_buf[KBD_BUF_SIZE];
@@ -136,6 +140,7 @@ struct edit_state
     unsigned char morse_code;
     int morse_tick;
 #endif
+    int changed;
 };
 
 static struct keyboard_parameters kbd_param[NB_SCREENS];
@@ -232,30 +237,19 @@ int load_kbd(unsigned char* filename)
     return 0;
 }
 
-/* helper function to spell a char if voice UI is enabled */
+/* helper function to spell a char */
 static void kbd_spellchar(unsigned short c)
 {
-    if (global_settings.talk_menu) /* voice UI? */
-    {
-        unsigned char tmp[5];
-        /* store char to pass to talk_spell */
-        unsigned char* utf8 = utf8encode(c, tmp);
-        *utf8 = 0;
+    unsigned char tmp[5];
+    /* store char to pass to talk_spell */
+    unsigned char* utf8 = utf8encode(c, tmp);
+    *utf8 = 0;
 
-        if (c == ' ')
-            talk_id(VOICE_BLANK, false);
-        else
-            talk_spell(tmp, false);
-    }
+    if (c == ' ')
+        talk_id(VOICE_BLANK, false);
+    else
+        talk_spell(tmp, false);
 }
-
-#ifdef KBD_MODES
-static void say_edit(void)
-{
-    if (global_settings.talk_menu)
-        talk_id(VOICE_EDIT, false);
-}
-#endif
 
 static void kbd_inschar(struct edit_state *state, unsigned short ch)
 {
@@ -274,6 +268,7 @@ static void kbd_inschar(struct edit_state *state, unsigned short ch)
         memmove(utf8 + j, utf8, len - i + 1);
         memcpy(utf8, tmp, j);
         state->editpos++;
+        state->changed = CHANGED_TEXT;
     }
 }
 
@@ -290,6 +285,7 @@ static void kbd_delchar(struct edit_state *state)
         utf8 = state->text + i;
         j = utf8seek(utf8, 1);
         memmove(utf8, utf8 + j, len - i - j + 1);
+        state->changed = CHANGED_TEXT;
     }
 }
 
@@ -306,6 +302,12 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
                             struct screen *sc, struct edit_state *state);
 static void kbd_draw_edit_line(struct keyboard_parameters *pm,
                                struct screen *sc, struct edit_state *state);
+static void kbd_insert_selected(struct keyboard_parameters *pm,
+                                struct edit_state *state);
+static void kbd_backspace(struct edit_state *state);
+static void kbd_move_cursor(struct edit_state *state, int dir);
+static void kbd_move_picker_vertical(struct keyboard_parameters *pm,
+                                     struct edit_state *state, int dir);
 
 int kbd_input(char* text, int buflen)
 {
@@ -345,6 +347,7 @@ int kbd_input(char* text, int buflen)
     state.morse_reading = false;
 #endif
     state.hangul = false;
+    state.changed = 0;
 
     if (!kbd_loaded)
     {
@@ -441,8 +444,6 @@ int kbd_input(char* text, int buflen)
             kbd_draw_edit_line(pm, sc, &state);
         }
 
-        state.cur_blink = !state.cur_blink;
-
 #ifdef HAVE_BUTTONBAR
         /* draw the button bar */
         gui_buttonbar_set(&buttonbar, "Shift", "OK", "Del");
@@ -451,6 +452,8 @@ int kbd_input(char* text, int buflen)
 
         FOR_NB_SCREENS(l)
             screens[l].update();
+
+        state.cur_blink = !state.cur_blink;
 
         button = get_action(
 #ifdef HAVE_MORSE_INPUT
@@ -507,24 +510,8 @@ int kbd_input(char* text, int buflen)
                 if (++pm->page >= pm->pages)
                     pm->page = 0;
 
-                ch = get_kbd_ch(pm);
-                kbd_spellchar(ch);
+                state.changed = CHANGED_PICKER;
                 break;
-
-#if defined(HAVE_MORSE_INPUT) && defined(KBD_TOGGLE_INPUT)
-            case ACTION_KBD_MORSE_INPUT:
-                state.morse_mode = !state.morse_mode;
-
-                FOR_NB_SCREENS(l)
-                {
-                    struct keyboard_parameters *pm = &param[l];
-                    int y = pm->main_y;
-                    pm->main_y = pm->old_main_y;
-                    pm->old_main_y = y;
-                }
-                /* FIXME: We should talk something like Morse mode.. */
-                break;
-#endif /* HAVE_MORSE_INPUT && KBD_TOGGLE_INPUT */
 
             case ACTION_KBD_RIGHT:
                 if (++pm->x >= pm->max_chars)
@@ -537,8 +524,7 @@ int kbd_input(char* text, int buflen)
                     pm->x = 0;
                 }
 
-                ch = get_kbd_ch(pm);
-                kbd_spellchar(ch);
+                state.changed = CHANGED_PICKER;
                 break;
 
             case ACTION_KBD_LEFT:
@@ -552,83 +538,33 @@ int kbd_input(char* text, int buflen)
                     pm->x = pm->max_chars - 1;
                 }
 
-                ch = get_kbd_ch(pm);
-                kbd_spellchar(ch);
+                state.changed = CHANGED_PICKER;
                 break;
 
             case ACTION_KBD_DOWN:
-#ifdef HAVE_MORSE_INPUT
-                if (state.morse_mode)
-                {
-#ifdef KBD_MODES
-                    pm->line_edit = !pm->line_edit;
-                    if (pm->line_edit)
-                        say_edit();
-#endif
-                    break;
-                }
-#endif /* HAVE_MORSE_INPUT */
-#ifdef KBD_MODES
-                if (pm->line_edit)
-                {
-                    pm->y = 0;
-                    pm->line_edit = false;
-                }
-                else if (++pm->y >= pm->lines)
-                {
-                    pm->line_edit = true;
-                    say_edit();
-                }
-#else
-                if (++pm->y >= pm->lines)
-                    pm->y = 0;
-#endif
-#ifdef KBD_MODES
-                if (!pm->line_edit)
-#endif
-                {
-                    ch = get_kbd_ch(pm);
-                    kbd_spellchar(ch);
-                }
+                kbd_move_picker_vertical(pm, &state, 1);
                 break;
 
             case ACTION_KBD_UP:
-#ifdef HAVE_MORSE_INPUT
-                if (state.morse_mode)
-                {
-#ifdef KBD_MODES
-                    pm->line_edit = !pm->line_edit;
-                    if (pm->line_edit)
-                        say_edit();
-#endif
-                    break;
-                }
-#endif /* HAVE_MORSE_INPUT */
-#ifdef KBD_MODES
-                if (pm->line_edit)
-                {
-                    pm->y = pm->lines - 1;
-                    pm->line_edit = false;
-                }
-                else if (--pm->y < 0)
-                {
-                    pm->line_edit = true;
-                    say_edit();
-                }
-#else
-                if (--pm->y < 0)
-                    pm->y = pm->lines - 1;
-#endif
-#ifdef KBD_MODES
-                if (!pm->line_edit)
-#endif
-                {
-                    ch = get_kbd_ch(pm);
-                    kbd_spellchar(ch);
-                }
+                kbd_move_picker_vertical(pm, &state, -1);
                 break;
 
 #ifdef HAVE_MORSE_INPUT
+#ifdef KBD_TOGGLE_INPUT
+            case ACTION_KBD_MORSE_INPUT:
+                state.morse_mode = !state.morse_mode;
+
+                FOR_NB_SCREENS(l)
+                {
+                    struct keyboard_parameters *pm = &param[l];
+                    int y = pm->main_y;
+                    pm->main_y = pm->old_main_y;
+                    pm->old_main_y = y;
+                }
+                /* FIXME: We should talk something like Morse mode.. */
+                break;
+#endif /* KBD_TOGGLE_INPUT */
+
             case ACTION_KBD_MORSE_SELECT:
                 if (state.morse_mode && state.morse_reading)
                 {
@@ -653,133 +589,19 @@ int kbd_input(char* text, int buflen)
                 }
                 else
 #endif /* HAVE_MORSE_INPUT */
-                {
-                    /* inserts the selected char */
-                    /* find input char */
-                    ch = get_kbd_ch(pm);
-
-                    /* check for hangul input */
-                    if (ch >= 0x3131 && ch <= 0x3163)
-                    {
-                        unsigned short tmp;
-
-                        if (!state.hangul)
-                        {
-                            state.hlead = state.hvowel = state.htail = 0;
-                            state.hangul = true;
-                        }
-
-                        if (!state.hvowel)
-                        {
-                            state.hvowel = ch;
-                        }
-                        else if (!state.htail)
-                        {
-                            state.htail = ch;
-                        }
-                        else
-                        {
-                            /* previous hangul complete */
-                            /* check whether tail is actually lead of next char */
-                            tmp = hangul_join(state.htail, ch, 0);
-
-                            if (tmp != 0xfffd)
-                            {
-                                tmp = hangul_join(state.hlead, state.hvowel, 0);
-                                kbd_delchar(&state);
-                                kbd_inschar(&state, tmp);
-                                /* insert dummy char */
-                                kbd_inschar(&state, ' ');
-                                state.hlead = state.htail;
-                                state.hvowel = ch;
-                                state.htail = 0;
-                            }
-                            else
-                            {
-                                state.hvowel = state.htail = 0;
-                                state.hlead = ch;
-                            }
-                        }
-
-                        /* combine into hangul */
-                        tmp = hangul_join(state.hlead, state.hvowel, state.htail);
-
-                        if (tmp != 0xfffd)
-                        {
-                            kbd_delchar(&state);
-                            ch = tmp;
-                        }
-                        else
-                        {
-                            state.hvowel = state.htail = 0;
-                            state.hlead = ch;
-                        }
-                    }
-                    else
-                    {
-                        state.hangul = false;
-                    }
-
-                    /* insert char */
-                    kbd_inschar(&state, ch);
-
-                    if (global_settings.talk_menu)      /* voice UI? */
-                        talk_spell(state.text, false);  /* speak revised text */
-                }
+                    kbd_insert_selected(pm, &state);
                 break;
 
             case ACTION_KBD_BACKSPACE:
-                if (state.hangul)
-                {
-                    if (state.htail)
-                        state.htail = 0;
-                    else if (state.hvowel)
-                        state.hvowel = 0;
-                    else
-                        state.hangul = false;
-                }
-
-                kbd_delchar(&state);
-
-                if (state.hangul)
-                {
-                    if (state.hvowel)
-                        ch = hangul_join(state.hlead, state.hvowel, state.htail);
-                    else
-                        ch = state.hlead;
-                    kbd_inschar(&state, ch);
-                }
-
-                if (global_settings.talk_menu)      /* voice UI? */
-                    talk_spell(state.text, false);  /* speak revised text */
+                kbd_backspace(&state);
                 break;
 
             case ACTION_KBD_CURSOR_RIGHT:
-                state.hangul = false;
-
-                if (state.editpos < state.len_utf8)
-                {
-                    int c = utf8seek(state.text, ++state.editpos);
-                    kbd_spellchar(state.text[c]);
-                }
-#if CONFIG_CODEC == SWCODEC
-                else if (global_settings.talk_menu)
-                    pcmbuf_beep(1000, 150, 1500);
-#endif
+                kbd_move_cursor(&state, 1);
                 break;
 
             case ACTION_KBD_CURSOR_LEFT:
-                state.hangul = false;
-
-                if (state.editpos > 0)
-                {
-                    int c = utf8seek(state.text, --state.editpos);
-                    kbd_spellchar(state.text[c]);
-                }
-#if CONFIG_CODEC == SWCODEC
-                else if (global_settings.talk_menu)
-                    pcmbuf_beep(1000, 150, 1500);
-#endif
+                kbd_move_cursor(&state, -1);
                 break;
 
             case ACTION_NONE:
@@ -805,9 +627,6 @@ int kbd_input(char* text, int buflen)
                     /* turn off hangul input */
                     state.hangul = false;
                     kbd_inschar(&state, morse_alphabets[j]);
-
-                    if (global_settings.talk_menu)      /* voice UI? */
-                        talk_spell(state.text, false);  /* speak revised text */
                 }
 #endif /* HAVE_MORSE_INPUT */
                 break;
@@ -826,6 +645,34 @@ int kbd_input(char* text, int buflen)
         {
             state.cur_blink = true;
         }
+        if (global_settings.talk_menu)  /* voice UI? */
+        {
+            if (state.changed == CHANGED_PICKER)
+            {
+#ifdef KBD_MODES
+                if (pm->line_edit)
+                {
+                    talk_id(VOICE_EDIT, false);
+                }
+                else
+#endif
+#ifdef HAVE_MORSE_INPUT
+                if (!state.morse_mode)
+#endif
+                {
+                    ch = get_kbd_ch(pm);
+                    kbd_spellchar(ch);
+                }
+            }
+            else if (state.changed == CHANGED_CURSOR)
+            {
+                int c = utf8seek(state.text, state.editpos);
+                kbd_spellchar(state.text[c]);
+            }
+            else if (state.changed == CHANGED_TEXT)
+                talk_spell(state.text, false);  /* speak revised text */
+        }
+        state.changed = 0;
     }
 
 #ifdef HAVE_BUTTONBAR
@@ -1169,5 +1016,155 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
         sc->fillrect(0, y + 2, sc_w, pm->font_h + 2);
         sc->set_drawmode(DRMODE_SOLID);
     }
+#endif
+}
+
+/* inserts the selected char */
+static void kbd_insert_selected(struct keyboard_parameters *pm,
+                                struct edit_state *state)
+{
+    /* find input char */
+    unsigned short ch = get_kbd_ch(pm);
+
+    /* check for hangul input */
+    if (ch >= 0x3131 && ch <= 0x3163)
+    {
+        unsigned short tmp;
+
+        if (!state->hangul)
+        {
+            state->hlead = state->hvowel = state->htail = 0;
+            state->hangul = true;
+        }
+
+        if (!state->hvowel)
+        {
+            state->hvowel = ch;
+        }
+        else if (!state->htail)
+        {
+            state->htail = ch;
+        }
+        else
+        {
+            /* previous hangul complete */
+            /* check whether tail is actually lead of next char */
+            tmp = hangul_join(state->htail, ch, 0);
+
+            if (tmp != 0xfffd)
+            {
+                tmp = hangul_join(state->hlead, state->hvowel, 0);
+                kbd_delchar(state);
+                kbd_inschar(state, tmp);
+                /* insert dummy char */
+                kbd_inschar(state, ' ');
+                state->hlead = state->htail;
+                state->hvowel = ch;
+                state->htail = 0;
+            }
+            else
+            {
+                state->hvowel = state->htail = 0;
+                state->hlead = ch;
+            }
+        }
+
+        /* combine into hangul */
+        tmp = hangul_join(state->hlead, state->hvowel, state->htail);
+
+        if (tmp != 0xfffd)
+        {
+            kbd_delchar(state);
+            ch = tmp;
+        }
+        else
+        {
+            state->hvowel = state->htail = 0;
+            state->hlead = ch;
+        }
+    }
+    else
+    {
+        state->hangul = false;
+    }
+
+    /* insert char */
+    kbd_inschar(state, ch);
+}
+
+static void kbd_backspace(struct edit_state *state)
+{
+    unsigned short ch;
+    if (state->hangul)
+    {
+        if (state->htail)
+            state->htail = 0;
+        else if (state->hvowel)
+            state->hvowel = 0;
+        else
+            state->hangul = false;
+    }
+
+    kbd_delchar(state);
+
+    if (state->hangul)
+    {
+        if (state->hvowel)
+            ch = hangul_join(state->hlead, state->hvowel, state->htail);
+        else
+            ch = state->hlead;
+        kbd_inschar(state, ch);
+    }
+}
+
+static void kbd_move_cursor(struct edit_state *state, int dir)
+{
+    state->hangul = false;
+    state->editpos += dir;
+
+    if (state->editpos >= 0 && state->editpos <= state->len_utf8)
+    {
+        state->changed = CHANGED_CURSOR;
+    }
+    else
+    {
+        state->editpos -= dir;
+#if CONFIG_CODEC == SWCODEC
+        if (global_settings.talk_menu)
+            pcmbuf_beep(1000, 150, 1500);
+#endif
+    }
+}
+
+static void kbd_move_picker_vertical(struct keyboard_parameters *pm,
+                                     struct edit_state *state, int dir)
+{
+    (void) state;
+    state->changed = CHANGED_PICKER;
+#ifdef HAVE_MORSE_INPUT
+    if (state->morse_mode)
+    {
+#ifdef KBD_MODES
+        pm->line_edit = !pm->line_edit;
+#endif
+        return;
+    }
+#endif /* HAVE_MORSE_INPUT */
+    pm->y += dir;
+#ifdef KBD_MODES
+    if (pm->line_edit)
+    {
+        pm->y = (dir > 0 ? 0 : pm->lines - 1);
+        pm->line_edit = false;
+    }
+    else if (pm->y < 0 || pm->y >= pm->lines)
+    {
+        pm->line_edit = true;
+    }
+#else
+    if (pm->y >= pm->lines)
+        pm->y = 0;
+    if (pm->y < 0)
+        pm->y = pm->lines - 1;
 #endif
 }
