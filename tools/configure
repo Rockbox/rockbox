@@ -911,7 +911,8 @@ cat <<EOF
  120) VX747               ==Meizu==              60) Sansa Clipv2
  121) VX767               110) M6SL              61) Sansa View
  122) VX747+              111) M6SP              62) Sansa Clip+
- 123) VX777               112) M3
+ 123) VX777               112) M3                63) Sansa Fuze v2
+ 
                                                  ==Logik==
  ==Samsung==              ==Tatung==             80) DAX 1GB MP3/DAB
  140) YH-820              150) Elio TPJ-1022
@@ -2076,6 +2077,26 @@ fi
     t_manufacturer="as3525"
     t_model="sansa-clipplus"
     arm926ejscc
+    ;;
+
+   63|sansafuzev2)
+    target_id=68
+    modelname="sansafuzev2"
+    target="-DSANSA_FUZEV2"
+    memory=8 # not sure
+    arm926ejscc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$bmp2rb_mono"
+    tool="$rootdir/tools/scramble -add=fuz2"
+    output="rockbox.sansa"
+    bootoutput="bootloader-fuzev2.sansa"
+    appextra="recorder:gui"
+    plugins=#"yes"
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="as3525"
+    t_model="sansa-fuzev2"
     ;;
 
    150|tatungtpj1022)

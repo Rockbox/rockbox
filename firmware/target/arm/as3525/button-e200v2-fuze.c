@@ -28,7 +28,7 @@
 #include "dbop-as3525.h"
 
 
-#ifdef SANSA_FUZE
+#if defined(SANSA_FUZE) || defined(SANSA_FUZEV2)
 #define DBOP_BIT15_BUTTON       BUTTON_HOME
 #define WHEEL_REPEAT_INTERVAL   (HZ/5)
 #define WHEEL_COUNTER_DIV       4

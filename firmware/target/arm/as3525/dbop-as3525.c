@@ -24,7 +24,7 @@
 #include "as3525.h"
 #include "dbop-as3525.h"
 
-#if defined(SANSA_FUZE)
+#if defined(SANSA_FUZE) || defined(SANSA_FUZEV2)
 #define DBOP_PRECHARGE 0x80FF
 #elif defined(SANSA_E200V2) || defined(SANSA_C200V2)
 #define DBOP_PRECHARGE 0xF0FF
