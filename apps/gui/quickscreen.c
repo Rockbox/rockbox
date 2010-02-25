@@ -56,7 +56,7 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
                                         struct viewport *vp_icons)
 {
     int char_height, width, pad = 0;
-    int left_width, right_width, vert_lines;
+    int left_width = 0, right_width = 0, vert_lines;
     unsigned char *s;
     int nb_lines = viewport_get_nb_lines(parent);
 
@@ -65,7 +65,7 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
      */
     if (nb_lines == 0)
         nb_lines++;
-        
+
     char_height = parent->height/nb_lines;
 
     /* center the icons VP first */
@@ -73,7 +73,6 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     vp_icons->width = CENTER_ICONAREA_SIZE; /* abosulte smallest allowed */
     vp_icons->x = parent->x;
     vp_icons->x += (parent->width-CENTER_ICONAREA_SIZE)/2;
-
 
     vps[QUICKSCREEN_BOTTOM] = *parent;
     vps[QUICKSCREEN_TOP] = *parent;
@@ -97,14 +96,19 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
 
     vp_icons->y = vps[QUICKSCREEN_TOP].y
             + vps[QUICKSCREEN_TOP].height;
-    vp_icons->height = parent->height - vp_icons->y;
-    vp_icons->height -= parent->height - vps[QUICKSCREEN_BOTTOM].y;
+    vp_icons->height = vps[QUICKSCREEN_BOTTOM].y - vp_icons->y;
 
     /* adjust the left/right items widths to fit the screen nicely */
-    s = P2STR(ID2P(qs->items[QUICKSCREEN_LEFT]->lang_id));
-    left_width = display->getstringsize(s, NULL, NULL);
-    s = P2STR(ID2P(qs->items[QUICKSCREEN_RIGHT]->lang_id));
-    right_width = display->getstringsize(s, NULL, NULL);
+    if (qs->items[QUICKSCREEN_LEFT])
+    {
+        s = P2STR(ID2P(qs->items[QUICKSCREEN_LEFT]->lang_id));
+        left_width = display->getstringsize(s, NULL, NULL);
+    }
+    if (qs->items[QUICKSCREEN_RIGHT])
+    {
+        s = P2STR(ID2P(qs->items[QUICKSCREEN_RIGHT]->lang_id));
+        right_width = display->getstringsize(s, NULL, NULL);
+    }
 
     width = MAX(left_width, right_width);
     if (width*2 + vp_icons->width > parent->width)
@@ -126,7 +130,7 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     vps[QUICKSCREEN_LEFT] = *parent;
     vps[QUICKSCREEN_LEFT].x = parent->x + pad;
     vps[QUICKSCREEN_LEFT].width = width;
-    
+
     vps[QUICKSCREEN_RIGHT] = *parent;
     vps[QUICKSCREEN_RIGHT].x = parent->x + parent->width - width - pad;
     vps[QUICKSCREEN_RIGHT].width = width;
@@ -270,6 +274,9 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
         default:
             return false;
     }
+    if (qs->items[item] == NULL)
+        return false;
+
     option_select_next_val(qs->items[item], invert, true);
     talk_qs_option(qs->items[item], false);
     return true;
@@ -292,7 +299,7 @@ static int quickscreen_touchscreen_button(const struct viewport
     else if (viewport_point_within_vp(&vps[QUICKSCREEN_RIGHT], x, y))
         return ACTION_QS_RIGHT;
     return ACTION_STD_CANCEL;
-}    
+}
 #endif
 
 static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
@@ -343,10 +350,10 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
         }
         else if (button == button_enter)
             can_quit = true;
-            
+
         if ((button == button_enter) && can_quit)
             break;
-            
+
         if (button == ACTION_STD_CANCEL)
             break;
     }
@@ -357,7 +364,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
         for (j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
             screens[i].scroll_stop(&vps[i][j]);
     }
-    
+
     return changed;
 }
 
@@ -376,16 +383,16 @@ bool quick_screen_quick(int button_enter)
     bool oldshuffle = global_settings.playlist_shuffle;
     int oldrepeat = global_settings.repeat_mode;
 
-    qs.items[QUICKSCREEN_TOP] = 
+    qs.items[QUICKSCREEN_TOP] =
             get_setting(global_settings.qs_items[QUICKSCREEN_TOP],
                         find_setting(&global_settings.party_mode, NULL));
-    qs.items[QUICKSCREEN_LEFT] = 
+    qs.items[QUICKSCREEN_LEFT] =
             get_setting(global_settings.qs_items[QUICKSCREEN_LEFT],
                         find_setting(&global_settings.playlist_shuffle, NULL));
-    qs.items[QUICKSCREEN_RIGHT] = 
+    qs.items[QUICKSCREEN_RIGHT] =
             get_setting(global_settings.qs_items[QUICKSCREEN_RIGHT],
                         find_setting(&global_settings.repeat_mode, NULL));
-    qs.items[QUICKSCREEN_BOTTOM] = 
+    qs.items[QUICKSCREEN_BOTTOM] =
             get_setting(global_settings.qs_items[QUICKSCREEN_BOTTOM],
                         find_setting(&global_settings.dirfilter, NULL));
 
@@ -466,4 +473,3 @@ void set_as_qs_item(const struct settings_list *setting,
 
     global_settings.qs_items[item] = i;
 }
-
