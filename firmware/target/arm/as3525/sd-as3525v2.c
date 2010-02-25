@@ -530,7 +530,8 @@ static void sd_thread(void)
 static void init_controller(void)
 {
 
-//    int temp = MCI_HCON;                   /* we just need to read HCON */
+    int temp = MCI_HCON;                   /* we just need to read HCON */
+    (void)temp;
 //    panicf("HCON: %8x",temp);
 //    int idx = (MCI_HCON >> 1) & 31;      /* Maximum card Index */
 //    int idx_bits = (1 << idx) -1;
