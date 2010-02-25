@@ -2084,7 +2084,6 @@ fi
     modelname="sansafuzev2"
     target="-DSANSA_FUZEV2"
     memory=8 # not sure
-    arm926ejscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
     tool="$rootdir/tools/scramble -add=fuz2"
@@ -2097,6 +2096,7 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-fuzev2"
+    arm926ejscc
     ;;
 
    150|tatungtpj1022)
