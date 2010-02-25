@@ -352,6 +352,9 @@ static int ask_and_get_audio_buffer(const char *filename)
 #ifdef IMGVIEW_RC_MENU
             case IMGVIEW_RC_MENU:
 #endif
+#ifdef IMGVIEW_QUIT
+            case IMGVIEW_QUIT:
+#endif
             case IMGVIEW_MENU:
                 return PLUGIN_OK;
 
@@ -374,7 +377,6 @@ static int ask_and_get_audio_buffer(const char *filename)
                 if(rb->default_event_handler_ex(button, cleanup, NULL)
                         == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
-
         }
     }
 }
@@ -594,6 +596,10 @@ static int scroll_bmp(struct image_info *info)
         case IMGVIEW_RC_MENU:
 #endif
         case IMGVIEW_MENU:
+#ifdef IMGVIEW_MENU_PRE
+            if (lastbutton != IMGVIEW_MENU_PRE)
+                break;
+#endif
 #ifdef USEGSLIB
             grey_show(false); /* switch off greyscale overlay */
 #endif
@@ -608,6 +614,12 @@ static int scroll_bmp(struct image_info *info)
             MYLCD_UPDATE();
 #endif
             break;
+
+#ifdef IMGVIEW_QUIT
+            case IMGVIEW_QUIT:
+            return PLUGIN_OK;
+            break;
+#endif
 
         default:
             if (rb->default_event_handler_ex(button, cleanup, NULL)
@@ -835,8 +847,7 @@ static int load_and_show(char* filename, struct image_info *info)
 #endif
         rb->lcd_clear_display();
     }
-    while (status != PLUGIN_OK && status != PLUGIN_USB_CONNECTED
-            && status != PLUGIN_OTHER);
+    while (status > PLUGIN_OTHER);
 #ifdef USEGSLIB
     rb->lcd_update();
 #endif
@@ -902,8 +913,7 @@ enum plugin_status plugin_start(const void* parameter)
     do
     {
         condition = load_and_show(np_file, &image_info);
-    } while (condition != PLUGIN_OK && condition != PLUGIN_USB_CONNECTED
-            && condition != PLUGIN_ERROR);
+    } while (condition >= PLUGIN_OTHER);
 
     if (rb->memcmp(&settings, &old_settings, sizeof (settings)))
     {
