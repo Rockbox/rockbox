@@ -226,6 +226,19 @@ Example: \config{\%?mm{\textless}Off{\textbar}All{\textbar}One{\textbar}Shuffle%
 Example: \config{\%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}%
 Ffwd{\textbar}Rew{\textgreater}}
 
+\section{Current Screen}
+\begin{table}
+  \begin{tagmap}{}{}
+    \config{\%cs} & The current screen, 1-4, in the order:
+                Menus, WPS, Recording screen, FM Radio screen\\
+  \end{tagmap}
+\end{table}
+The tag can also be used as the switch in a conditional tag. For players without
+some capabilities (e.g. having no FM radio) some values will be never yielded.
+
+Example: \config{You are in the \%?cs{\textless}Main menu{\textbar}WPS{\textbar}%
+Recording screen{\textbar}FM Radio screen{\textgreater}}
+
 \section{Changing Volume}
 \begin{table}
   \begin{tagmap}{}{}
