@@ -76,8 +76,9 @@ static int reset_settings(void)
     {
         case YESNO_YES:
             settings_reset();
-            settings_apply(true);
             settings_save();
+            settings_apply();
+            settings_apply_skins();
             break;
         case YESNO_NO:
             break;

@@ -110,12 +110,13 @@ static void toggle_theme(enum screen_type screen, bool force)
 
     if (is_theme_enabled(screen))
     {
+        bool first_boot = theme_stack_top[screen] == 0;
         /* remove the left overs from the previous screen.
          * could cause a tiny flicker. Redo your screen code if that happens */
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
         screens[screen].backdrop_show(sb_get_backdrop(screen));
 #endif
-        if (!was_enabled[screen] || force)
+        if (!first_boot && (!was_enabled[screen] || force))
         {
             struct viewport deadspace, user;
             viewport_set_defaults(&user, screen);
@@ -161,7 +162,7 @@ static void toggle_theme(enum screen_type screen, bool force)
                 screens[screen].update_viewport();
             }
         }
-        send_event(GUI_EVENT_ACTIONUPDATE, (void*)1); /* force a redraw */
+        send_event(GUI_EVENT_ACTIONUPDATE, (void*)!first_boot);
     }
     else
     {

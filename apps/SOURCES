@@ -84,6 +84,7 @@ gui/statusbar.c
 #ifdef HAVE_LCD_BITMAP
 gui/statusbar-skinned.c
 #endif
+gui/theme_settings.c
 gui/yesno.c
 gui/viewport.c
 

@@ -420,7 +420,6 @@ void iap_handlepkt(void)
                 {
                     global_settings.playlist_shuffle = 1;
                     settings_save();
-                    settings_apply(false);
                     if (audio_status() & AUDIO_STATUS_PLAY)
                         playlist_randomise(NULL, current_tick, true);
                 }
@@ -428,7 +427,6 @@ void iap_handlepkt(void)
                 {
                     global_settings.playlist_shuffle = 0;
                     settings_save();
-                    settings_apply(false);
                     if (audio_status() & AUDIO_STATUS_PLAY)
                         playlist_sort(NULL, true);
                 }
@@ -451,7 +449,6 @@ void iap_handlepkt(void)
                         global_settings.repeat_mode = REPEAT_ALL;
 
                 settings_save();
-                settings_apply(false);
                 if (audio_status() & AUDIO_STATUS_PLAY)
                 audio_flush_and_reload_tracks();
             }
@@ -716,7 +713,6 @@ void iap_handlepkt(void)
                 {
                     global_settings.playlist_shuffle = 1;
                     settings_save();
-                    settings_apply(false);
                     if (audio_status() & AUDIO_STATUS_PLAY)
                         playlist_randomise(NULL, current_tick, true);
                 }
@@ -724,7 +720,6 @@ void iap_handlepkt(void)
                 {
                     global_settings.playlist_shuffle = 0;
                     settings_save();
-                    settings_apply(false);
                     if (audio_status() & AUDIO_STATUS_PLAY)
                         playlist_sort(NULL, true);
                 }
@@ -762,7 +757,6 @@ void iap_handlepkt(void)
                 if (oldmode != global_settings.repeat_mode)
                 {
                     settings_save();
-                    settings_apply(false);
                     if (audio_status() & AUDIO_STATUS_PLAY)
                         audio_flush_and_reload_tracks();
                 }

@@ -260,7 +260,7 @@ void sound_settings_apply(void);
  */
 void settings_apply_skins(void);
 
-void settings_apply(bool read_disk);
+void settings_apply(void);
 void settings_apply_pm_range(void);
 void settings_display(void);
 

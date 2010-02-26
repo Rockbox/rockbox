@@ -400,7 +400,7 @@ bool quick_screen_quick(int button_enter)
     if (gui_syncquickscreen_run(&qs, button_enter))
     {
         settings_save();
-        settings_apply(false);
+        settings_apply();
         /* make sure repeat/shuffle/any other nasty ones get updated */
         if ( oldrepeat != global_settings.repeat_mode &&
              (audio_status() & AUDIO_STATUS_PLAY) )
@@ -437,7 +437,7 @@ bool quick_screen_f3(int button_enter)
     if (gui_syncquickscreen_run(&qs, button_enter))
     {
         settings_save();
-        settings_apply(false);
+        settings_apply();
     }
     return(0);
 }

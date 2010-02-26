@@ -68,7 +68,6 @@
 #endif
 #include "wps.h"
 #include "skin_engine/skin_engine.h"
-#include "skin_engine/skin_fonts.h"
 #include "viewport.h"
 #include "statusbar-skinned.h"
 
@@ -360,7 +359,10 @@ bool settings_load_config(const char* file, bool apply)
     close(fd);
     settings_save();
     if (apply)
-        settings_apply(true);
+    {
+        settings_apply();
+        settings_apply_skins();
+    }
     return true;
 }
 
@@ -739,62 +741,7 @@ void sound_settings_apply(void)
 }
 
 
-
-/* call this after loading a .wps/.rwps or other skin files, so that the
- * skin buffer is reset properly
- */
-struct skin_load_setting {
-    char* setting;
-    char* suffix;
-    void (*loadfunc)(enum screen_type screen, const char *buf, bool isfile);
-};
-static struct skin_load_setting skins[] = {
-    /* This determins the load order. *sbs must be loaded before any other
-     * skin on that screen */
-#ifdef HAVE_LCD_BITMAP
-    { global_settings.sbs_file, "sbs", sb_skin_data_load},
-#endif    
-    { global_settings.wps_file, "wps", wps_data_load},
-#ifdef HAVE_REMOTE_LCD
-    { global_settings.rsbs_file, "rsbs", sb_skin_data_load},
-    { global_settings.rwps_file, "rwps", wps_data_load},
-#endif
-};
-void settings_apply_skins(void)
-{
-    char buf[MAX_PATH];
-    /* re-initialize the skin buffer before we start reloading skins */
-    skin_buffer_init();
-    enum screen_type screen = SCREEN_MAIN;
-    unsigned int i;
-#ifdef HAVE_LCD_BITMAP
-    skin_backdrop_init();
-    skin_font_init();
-#endif
-    for (i=0; i<sizeof(skins)/sizeof(*skins); i++)
-    {
-#ifdef HAVE_REMOTE_LCD
-        screen = skins[i].suffix[0] == 'r' ? SCREEN_REMOTE : SCREEN_MAIN;
-#endif
-        if (skins[i].setting[0] && skins[i].setting[0] != '-')
-        {
-            snprintf(buf, sizeof buf, WPS_DIR "/%s.%s",
-                     skins[i].setting, skins[i].suffix);
-            skins[i].loadfunc(screen, buf, true);
-        }
-        else
-        {
-            skins[i].loadfunc(screen, NULL, true);
-        }
-    }
-    viewportmanager_theme_changed(THEME_STATUSBAR);
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    FOR_NB_SCREENS(i)
-        screens[i].backdrop_show(sb_get_backdrop(i));
-#endif
-}
-
-void settings_apply(bool read_disk)
+void settings_apply(void)
 {
     
     char buf[64];
@@ -886,55 +833,49 @@ void settings_apply(bool read_disk)
     audiohw_enable_speaker(global_settings.speaker_enabled);
 #endif
 
-    if (read_disk)
-    {
 #ifdef HAVE_LCD_BITMAP
-        /* fonts need to be loaded before the WPS */
-        if ( global_settings.font_file[0]) {
-            snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
-                     global_settings.font_file);
-            if (font_load(NULL, buf) < 0)
-                font_reset(NULL);
-        }
-        else
+    /* fonts need to be loaded before the WPS */
+    if ( global_settings.font_file[0]) {
+        snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
+                 global_settings.font_file);
+        if (font_load(NULL, buf) < 0)
             font_reset(NULL);
+    }
+    else
+        font_reset(NULL);
 #ifdef HAVE_REMOTE_LCD        
-        if ( global_settings.remote_font_file[0]) {
-            snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
-                     global_settings.remote_font_file);
-            if (font_load_remoteui(buf) < 0)
-                font_load_remoteui(NULL);
-        }
-        else
+    if ( global_settings.remote_font_file[0]) {
+        snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
+                 global_settings.remote_font_file);
+        if (font_load_remoteui(buf) < 0)
             font_load_remoteui(NULL);
+    }
+    else
+        font_load_remoteui(NULL);
 #endif
-        if ( global_settings.kbd_file[0]) {
-            snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
-                     global_settings.kbd_file);
-            load_kbd(buf);
-        }
-        else
-            load_kbd(NULL);
+    if ( global_settings.kbd_file[0]) {
+        snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
+                 global_settings.kbd_file);
+        load_kbd(buf);
+    }
+    else
+        load_kbd(NULL);
 #endif
 
-        if ( global_settings.lang_file[0]) {
-            snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
-                     global_settings.lang_file);
-            lang_core_load(buf);
-            talk_init(); /* use voice of same language */
-        }
+    if ( global_settings.lang_file[0]) {
+        snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
+                 global_settings.lang_file);
+        lang_core_load(buf);
+        talk_init(); /* use voice of same language */
+    }
 
-        /* reload wpses */
-        settings_apply_skins();
-
-        /* load the icon set */
-        icons_init();
+    /* load the icon set */
+    icons_init();
 
 #ifdef HAVE_LCD_COLOR
-        if (global_settings.colors_file[0])
-            read_color_theme_file();
+    if (global_settings.colors_file[0])
+        read_color_theme_file();
 #endif
-    }
 
 #ifdef HAVE_LCD_COLOR
     screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
