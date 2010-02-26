@@ -162,7 +162,8 @@ static void toggle_theme(enum screen_type screen, bool force)
                 screens[screen].update_viewport();
             }
         }
-        send_event(GUI_EVENT_ACTIONUPDATE, (void*)!first_boot);
+        intptr_t force = first_boot?0:1;
+        send_event(GUI_EVENT_ACTIONUPDATE, (void*)force);
     }
     else
     {
