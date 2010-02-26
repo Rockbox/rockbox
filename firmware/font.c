@@ -380,7 +380,7 @@ static bool internal_load_font(struct font* pf, const char *path,
     }
     return true;
 }
-    
+
 #ifdef HAVE_REMOTE_LCD
 /* Load a font into the special remote ui font slot */
 int font_load_remoteui(const char* path)
@@ -484,7 +484,7 @@ load_cache_entry(struct font_cache_entry* p, void* callback_data)
     struct font* pf = callback_data;
     unsigned short char_code = p->_char_code;
     unsigned char tmp[2];
- 
+
     if (pf->file_width_offset)
     {
         int width_offset = pf->file_width_offset + char_code;
@@ -495,7 +495,7 @@ load_cache_entry(struct font_cache_entry* p, void* callback_data)
     {
         p->width = pf->maxwidth;
     }
- 
+
     int32_t bitmap_offset = 0;
 
     if (pf->file_offset_offset)
@@ -547,7 +547,7 @@ int font_get_width(struct font* pf, unsigned short char_code)
         font_cache_get(&pf->cache,char_code,load_cache_entry,pf)->width:
         pf->width? pf->width[char_code]: pf->maxwidth;
 }
- 
+
 const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 {
     const unsigned char* bits;
@@ -614,8 +614,8 @@ void glyph_cache_save(struct font* pf)
         if (cache_fd < 0) return;
 
         lru_traverse(&pf->cache._lru, glyph_file_write);
-        
-        if (cache_fd < 0)
+
+        if (cache_fd >= 0)
         {
             close(cache_fd);
             cache_fd = -1;
@@ -677,7 +677,7 @@ int font_get_width(struct font* pf, unsigned short char_code)
 
     return pf->width? pf->width[char_code]: pf->maxwidth;
 }
- 
+
 const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 {
     const unsigned char* bits;
@@ -691,7 +691,7 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
     bits = pf->bits + (pf->offset?
             ((uint16_t*)(pf->offset))[char_code]:
             (((pf->height + 7) / 8) * pf->maxwidth * char_code));
-        
+
     return bits;
 }
 
