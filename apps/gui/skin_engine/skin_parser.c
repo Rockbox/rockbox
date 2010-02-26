@@ -366,6 +366,8 @@ static const struct wps_tag all_tags[] = {
                                                     parse_viewport_display },
 #ifdef HAVE_LCD_BITMAP
     { WPS_VIEWPORT_CUSTOMLIST,            "Vp",  WPS_REFRESH_STATIC, parse_playlistview },
+    { WPS_TOKEN_LIST_TITLE_TEXT,          "Lt",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_LIST_TITLE_ICON,          "Li",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
     { WPS_NO_TOKEN,                       "V",   0,    parse_viewport      },
 

@@ -28,6 +28,7 @@
 #include "config.h"
 #include "system.h"
 
+#include "appevents.h"
 #include "lcd.h"
 #include "font.h"
 #include "file.h"
@@ -364,7 +365,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 
     /* if hide_theme is true, assume parent has been fixed before passed into
      * this function, e.g. with viewport_set_defaults(parent, screen) */
-    init_menu_lists(menu, &lists, selected, true, parent);
+    init_menu_lists(menu, &lists, selected, true, parent);    
     vps = *(lists.parent);
     in_stringlist = ((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID);
     /* load the callback, and only reload it if menu changes */
@@ -604,6 +605,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 case MT_SETTING_W_TEXT:
                 {
                     do_setting_from_menu(temp, vps);
+                    send_event(GUI_EVENT_ACTIONUPDATE, (void*)1); /* force a redraw */
                     break;
                 }
                 case MT_RETURN_ID:

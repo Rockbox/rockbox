@@ -104,6 +104,7 @@ static void toggle_theme(enum screen_type screen, bool force)
     FOR_NB_SCREENS(i)
     {
         enable_event = enable_event || is_theme_enabled(i);
+        sb_set_title_text(NULL, Icon_NOICON, i);
     }
     toggle_events(enable_event);
 

@@ -40,6 +40,7 @@
 #include "sound.h"
 #include "misc.h"
 #include "viewport.h"
+#include "statusbar-skinned.h"
 
 #define ICON_PADDING 1
 
@@ -82,6 +83,8 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
     int style = STYLE_DEFAULT;
     struct viewport *title_text_vp = &title_text[screen];
 
+    if (sb_set_title_text(list->title, list->title_icon, screen))
+        return false; /* the sbs is handling the title */
     display->scroll_stop(title_text_vp);
     if (!list_display_title(list, screen))
         return false;

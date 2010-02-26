@@ -416,6 +416,14 @@ const char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_PLAYLIST_ENTRIES:
             snprintf(buf, buf_size, "%d", playlist_amount());
             return buf;
+        
+        case WPS_TOKEN_LIST_TITLE_TEXT:
+            return (char*)token->value.data;
+        case WPS_TOKEN_LIST_TITLE_ICON:
+            if (intval)
+                *intval = token->value.i;
+            snprintf(buf, buf_size, "%d", token->value.i);
+            return buf;
 
         case WPS_TOKEN_PLAYLIST_NAME:
             return playlist_name(NULL, buf, buf_size);

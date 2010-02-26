@@ -39,6 +39,7 @@
 #include "talk.h"
 #include "viewport.h"
 #include "appevents.h"
+#include "statusbar-skinned.h"
 
 /* The minimum number of pending button events in queue before starting
  * to limit list drawing interval.
@@ -399,6 +400,12 @@ void gui_synclist_set_title(struct gui_synclist * gui_list,
 {
     gui_list->title = title;
     gui_list->title_icon = icon;
+#ifdef HAVE_LCD_BITMAP
+    int i;
+    FOR_NB_SCREENS(i)
+        sb_set_title_text(title, icon, i);
+#endif
+    send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
 }
 
 void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
@@ -550,7 +557,6 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
 #else
     static int next_item_modifier = 1;
     static int last_accel_tick = 0;
-
     if (global_settings.list_accel_start_delay)
     {
         int start_delay = global_settings.list_accel_start_delay * (HZ/2);

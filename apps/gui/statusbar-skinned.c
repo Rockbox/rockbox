@@ -33,6 +33,7 @@
 #include "statusbar-skinned.h"
 #include "debug.h"
 #include "font.h"
+#include "icon.h"
 
 
 /* currently only one wps_state is needed */
@@ -44,6 +45,25 @@ static struct wps_sync_data sb_skin_sync_data        = { .do_full_update = false
 /* initial setup of wps_data  */
 static int update_delay = DEFAULT_UPDATE_DELAY;
 
+bool sb_set_title_text(char* title, enum themable_icons icon, enum screen_type screen)
+{
+    int i;
+    bool retval = false;
+    for(i=0; i<sb_skin_data[screen].num_tokens; i++)
+    {
+        if (sb_skin_data[screen].tokens[i].type == WPS_TOKEN_LIST_TITLE_TEXT)
+        {
+            sb_skin_data[screen].tokens[i].value.data = title;
+            retval = true;
+        }
+        else if (sb_skin_data[screen].tokens[i].type == WPS_TOKEN_LIST_TITLE_ICON)
+        {
+            sb_skin_data[screen].tokens[i].value.i = icon+1;
+        }
+    }
+    return retval;
+}
+    
 
 void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
 {
