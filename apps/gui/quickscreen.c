@@ -175,13 +175,13 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
     int temp;
     display->set_viewport(parent);
     display->clear_viewport();
+    
     for (i = 0; i < QUICKSCREEN_ITEM_COUNT; i++)
     {
         struct viewport *vp = &vps[i];
         if (!qs->items[i])
             continue;
         display->set_viewport(vp);
-        display->scroll_stop(vp);
 
         title = P2STR(ID2P(qs->items[i]->lang_id));
         setting = qs->items[i]->setting;
@@ -200,7 +200,6 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
             display->puts_scroll(0, 0, title);
             display->puts_scroll(0, 1, value);
         }
-        display->update_viewport();
     }
     /* draw the icons */
     display->set_viewport(vp_icons);
@@ -318,7 +317,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
     {
         screens[i].set_viewport(NULL);
         screens[i].stop_scroll();
-        viewport_set_defaults(&parent[i], i);
+        viewportmanager_theme_enable(i, true, &parent[i]);
         quickscreen_fix_viewports(qs, &screens[i], &parent[i], vps[i], &vp_icons[i]);
         gui_quickscreen_draw(qs, &screens[i], &parent[i], vps[i], &vp_icons[i]);
     }
@@ -363,6 +362,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
     {   /* stop scrolling before exiting */
         for (j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
             screens[i].scroll_stop(&vps[i][j]);
+        viewportmanager_theme_undo(i, true);
     }
 
     return changed;
