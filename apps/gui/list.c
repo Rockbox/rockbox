@@ -112,7 +112,8 @@ static struct viewport parent[NB_SCREENS] =
 #ifdef HAVE_LCD_BITMAP
 bool list_display_title(struct gui_synclist *list, enum screen_type screen)
 {
-    return list->title != NULL &&
+    return list->title != NULL && 
+        !sb_set_title_text(list->title, list->title_icon, screen) &&
         viewport_get_nb_lines(list->parent[screen]) > 2;
 }
 
