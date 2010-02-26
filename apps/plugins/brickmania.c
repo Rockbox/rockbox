@@ -29,19 +29,26 @@
 #include "lib/highscore.h"
 #include "lib/playback_control.h"
 
+#include "pluginbitmaps/brickmania_pads.h"
+#include "pluginbitmaps/brickmania_short_pads.h"
+#include "pluginbitmaps/brickmania_long_pads.h"
+#include "pluginbitmaps/brickmania_bricks.h"
+#include "pluginbitmaps/brickmania_powerups.h"
+#include "pluginbitmaps/brickmania_ball.h"
+#include "pluginbitmaps/brickmania_gameover.h"
+
+#ifdef HAVE_LCD_COLOR /* currently no transparency for non-colour */
+#include "pluginbitmaps/brickmania_break.h"
+#endif
+
 PLUGIN_HEADER
 
-/* If there are three fractional bits, the smallest screen size that will scale
- * properly is 28x22.  If you have a smaller screen increase the fractional
- * precision.  If you have a precision of 4 the smallest screen size would be
- * 14x11.  Note though that this will decrease the maximum resolution due to
- * the line intersection tests.  These defines are used for all of the fixed
- * point calculations/conversions.
+
+/*
+ *
+ * Keymaps
+ *
  */
-#define FIXED3(x)           ((x)<<3)
-#define FIXED3_MUL(x, y)    ((long long)((x)*(y))>>3)
-#define FIXED3_DIV(x, y)    (((x)<<3)/(y))
-#define INT3(x)             ((x)>>3)
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -276,13 +283,24 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define SCROLL_BACK(x) (0)
 #endif
 
-#include "pluginbitmaps/brickmania_pads.h"
-#include "pluginbitmaps/brickmania_short_pads.h"
-#include "pluginbitmaps/brickmania_long_pads.h"
-#include "pluginbitmaps/brickmania_bricks.h"
-#include "pluginbitmaps/brickmania_powerups.h"
-#include "pluginbitmaps/brickmania_ball.h"
-#include "pluginbitmaps/brickmania_gameover.h"
+
+/*
+ *
+ * Geometric dimensions
+ *
+ */
+
+/* If there are three fractional bits, the smallest screen size that will scale
+ * properly is 28x22.  If you have a smaller screen increase the fractional
+ * precision.  If you have a precision of 4 the smallest screen size would be
+ * 14x11.  Note though that this will decrease the maximum resolution due to
+ * the line intersection tests.  These defines are used for all of the fixed
+ * point calculations/conversions.
+ */
+#define FIXED3(x)           ((x)<<3)
+#define FIXED3_MUL(x, y)    ((long long)((x)*(y))>>3)
+#define FIXED3_DIV(x, y)    (((x)<<3)/(y))
+#define INT3(x)             ((x)>>3)
 
 #define GAMESCREEN_WIDTH    FIXED3(LCD_WIDTH)
 #define GAMESCREEN_HEIGHT   FIXED3(LCD_HEIGHT)
@@ -299,21 +317,11 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define POWERUP_WIDTH    FIXED3(BMPWIDTH_brickmania_powerups)
 #define BALL             FIXED3(BMPHEIGHT_brickmania_ball)
 #define HALFBALL         (BALL / 2)
+#define PAD_POS_Y        (GAMESCREEN_HEIGHT - PAD_HEIGHT - 1)
 #define ON_PAD_POS_Y     (PAD_POS_Y - HALFBALL)
 
 #define GAMEOVER_WIDTH   FIXED3(BMPWIDTH_brickmania_gameover)
 #define GAMEOVER_HEIGHT  FIXED3(BMPHEIGHT_brickmania_gameover)
-
-#ifdef HAVE_LCD_COLOR /* currently no transparency for non-colour */
-#include "pluginbitmaps/brickmania_break.h"
-#endif
-
-/* The time ms for one iteration through the game loop - decrease this to speed
- * up the game - note that current_tick is (currently) only accurate to 10ms.
- */
-#define CYCLETIME           30 /* ms */
-
-#define FLIP_SIDES_DELAY    10 /* seconds */
 
 #define TOPMARGIN           MAX(BRICK_HEIGHT, FIXED3(8))
 
@@ -321,6 +329,13 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define STRINGPOS_CONGRATS  (STRINGPOS_FINISH - 20)
 #define STRINGPOS_NAVI      (STRINGPOS_FINISH - 10)
 #define STRINGPOS_FLIP      (STRINGPOS_FINISH - 10)
+
+
+/*
+ *
+ * Speeds
+ *
+ */
 
 /* Brickmania was originally designed for the H300, other targets should scale
  *  the speed up/down as needed based on the screen height.
@@ -359,11 +374,26 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define SPEED_FIRE  SPEED_SCALE_H( 4)
 #define FIRE_LENGTH SPEED_SCALE_H( 7)
 
-/*calculate paddle y-position */
-#define PAD_POS_Y   (GAMESCREEN_HEIGHT - PAD_HEIGHT - 1)
 
-/* change to however many levels there are, i.e. how many arrays there are total */
-#define NUM_LEVELS 40
+/*
+ *
+ * Timings
+ *
+ */
+
+/* The time ms for one iteration through the game loop - decrease this to speed
+ * up the game - note that current_tick is (currently) only accurate to 10ms.
+ */
+#define CYCLETIME           30 /* ms */
+
+#define FLIP_SIDES_DELAY    10 /* seconds */
+
+
+/*
+ *
+ * Scores
+ *
+ */
 
 #define SCORE_BALL_HIT_BRICK          2
 #define SCORE_BALL_DEMOLISHED_BRICK   8
@@ -377,8 +407,41 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define SCORE_POWER_EXTRA_BALL       23
 #define SCORE_POWER_LONG_PADDLE      23
 
+
+/*
+ *
+ * Limits
+ *
+ */
+
+#define MAX_BALLS 10
+#define MAX_FIRES 30
+#define MAX_POWERS 10
+
+
+/*
+ *
+ * Files
+ *
+ */
+
+#define CONFIG_FILE_NAME "brickmania.cfg"
+#define SAVE_FILE  PLUGIN_GAMES_DIR "/brickmania.save"
+#define HIGH_SCORE_FILE PLUGIN_GAMES_DIR "/brickmania.score"
+#define NUM_HIGH_SCORES 5
+
+
+/*
+ *
+ * Game levels
+ *
+ */
+
 #define NUM_BRICKS_ROWS 8
 #define NUM_BRICKS_COLS 10
+
+/* change to however many levels there are, i.e. how many arrays there are total */
+#define NUM_LEVELS 40
 
 /* change the first number in [ ] to however many levels there are */
 static unsigned char levels[NUM_LEVELS][NUM_BRICKS_ROWS][NUM_BRICKS_COLS] =
@@ -793,9 +856,12 @@ static unsigned char levels[NUM_LEVELS][NUM_BRICKS_ROWS][NUM_BRICKS_COLS] =
     }
 };
 
-#define MAX_BALLS 10
-#define MAX_FIRES 30
-#define MAX_POWERS 10
+
+/*
+ *
+ * Enums and structs
+ *
+ */
 
 enum power_types
 {
@@ -810,7 +876,8 @@ enum power_types
     POWER_TYPE_PADDLE_SHORT,
     POWER_TYPE_COUNT,
 };
-/* increasing this value makes the game with less powerups */
+
+/* Increasing this value makes the game with less powerups */
 #define POWER_RAND (POWER_TYPE_COUNT + 15)
 
 enum difficulty_options
@@ -819,33 +886,18 @@ enum difficulty_options
     NORMAL
 };
 
-int pad_pos_x;
-int life;
-enum
+enum game_state
 {
     ST_READY,
     ST_START,
     ST_PAUSE
-} game_state = ST_READY;
+};
 
 enum {
     PADDLE_TYPE_NORMAL = 0,
     PADDLE_TYPE_STICKY,
     PADDLE_TYPE_SHOOTER,
 } paddle_type;
-
-int score=0,vscore=0;
-bool flip_sides=false;
-int level=0;
-int brick_on_board=0;
-int used_balls=1;
-int used_fires=0;
-int used_powers=0;
-int difficulty = NORMAL;
-int pad_width;
-int flip_sides_delay;
-bool resume = false;
-bool resume_file = false;
 
 struct brick
 {
@@ -854,7 +906,6 @@ struct brick
     int hits;       /* How many hits can this brick take? */
     int hiteffect;
 };
-struct brick brick[NUM_BRICKS_ROWS][NUM_BRICKS_COLS];
 
 struct ball
 {
@@ -872,44 +923,70 @@ struct ball
     bool glue;  /* Is the ball stuck to the paddle? */
 };
 
-struct ball ball[MAX_BALLS];
-
 struct fire
 {
     int top;    /* This stores the fire y position, it is a fixed point num */
     int x_pos;  /* This stores the fire x position, it is a whole number */
 };
-struct fire fire[MAX_FIRES];
 
 struct power {
     int top;    /* This stores the powerup y position, it is a fixed point num */
     int x_pos;  /* This stores the (middle of) powerup x position, it is a whole number */
     enum power_types type;   /* This stores the powerup type */
 };
+
+struct point
+{
+    int x;
+    int y;
+};
+
+struct line
+{
+    struct point p1;
+    struct point p2;
+};
+
+
+/*
+ *
+ * Globals
+ *
+ */
+
+enum game_state game_state = ST_READY;
+int pad_pos_x;
+int life;
+int score=0,vscore=0;
+bool flip_sides=false;
+int level=0;
+int brick_on_board=0;
+int used_balls=1;
+int used_fires=0;
+int used_powers=0;
+int difficulty = NORMAL;
+int pad_width;
+int flip_sides_delay;
+bool resume = false;
+bool resume_file = false;
+struct brick brick[NUM_BRICKS_ROWS][NUM_BRICKS_COLS];
+struct ball ball[MAX_BALLS];
+struct fire fire[MAX_FIRES];
 struct power power[MAX_POWERS];
 
-#define CONFIG_FILE_NAME "brickmania.cfg"
-#define SAVE_FILE  PLUGIN_GAMES_DIR "/brickmania.save"
-#define HIGH_SCORE_FILE PLUGIN_GAMES_DIR "/brickmania.score"
-#define NUM_HIGH_SCORES 5
-
-static struct configdata config[] = {
+static struct configdata config[] =
+{
     {TYPE_INT, 0, 1, { .int_p = &difficulty }, "difficulty", NULL},
 };
 
 struct highscore highest[NUM_HIGH_SCORES];
 
-typedef struct point
-{
-    int x;
-    int y;
-} point;
 
-typedef struct line
-{
-    point p1;
-    point p2;
-} line;
+/*
+ *
+ * Functions
+ *
+ */
 
 /*
  * check_lines:
@@ -935,7 +1012,7 @@ typedef struct line
  */
 
 #define LINE_PREC 7
-int check_lines(line *line1, line *line2, point *hitp)
+int check_lines(struct line *line1, struct line *line2, struct point *hitp)
 {
     /* Introduction:
      * This code is based on the solution of these two input equations:
@@ -1368,12 +1445,12 @@ static int brickmania_game_loop(void)
     int end;
 
     /* pad_line used for powerup/ball checks */
-    line pad_line;
+    struct line pad_line;
     /* This is used for various lines that are checked (ball and powerup) */
-    line misc_line;
+    struct line misc_line;
 
     /* This stores the point that the two lines intersected in a test */
-    point pt_hit;
+    struct point pt_hit;
 
     if (brickmania_menu()) {
         return 1;
@@ -1645,7 +1722,7 @@ static int brickmania_game_loop(void)
                     if(brick[i][j].used)
                     {
                         /* these lines are used to describe the brick */
-                        line bot_brick, top_brick, left_brick, rght_brick;
+                        struct line bot_brick, top_brick, left_brick, rght_brick;
                         brickx = LEFTMARGIN + j*BRICK_WIDTH;
                         bricky = TOPMARGIN + i*BRICK_HEIGHT;
 
@@ -1803,7 +1880,7 @@ static int brickmania_game_loop(void)
                 /* Loop through all of the balls in play */
                 for(k=0;k<used_balls;k++)
                 {
-                    line screen_edge;
+                    struct line screen_edge;
 
                     /* Describe the ball movement for the edge collision detection */
                     misc_line.p1.x = ball[k].pos_x;
