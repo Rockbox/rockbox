@@ -41,9 +41,23 @@ int rem_seconds(void) {
            -(rb->get_time()->tm_sec));
 }
 
-void draw(void) {
+void draw_centered_string(struct screen * display, char * string) {
+    int w, h;
+    display->getstringsize(string, &w, &h);
+
+    if (w > display->lcdwidth || h > display->lcdheight) {
+        rb->splash(0, string);
+    } else {
+        display->putsxy((display->lcdwidth - w) / 2,
+                        (display->lcdheight - h) / 2,
+                        string);
+        display->update();
+    }
+}
+
+void draw(struct screen * display) {
     char info[128];
-    rb->lcd_clear_display();
+    display->clear_display();
 
     int secs = rem_seconds();
 
@@ -61,16 +75,7 @@ void draw(void) {
                                                                  alarm[0],
                                                                  alarm[1]);
     }
-
-    int w, h;
-    rb->lcd_getstringsize(info, &w, &h);
-
-    if (w > LCD_WIDTH || h > LCD_HEIGHT)
-        rb->splash(0, info);
-    else {
-        rb->lcd_putsxy((LCD_WIDTH - w) / 2, (LCD_HEIGHT - h) / 2, info);
-        rb->lcd_update();
-    }
+    draw_centered_string(display, info);
 }
 
 bool can_play(void) {
@@ -100,6 +105,7 @@ void play(void) {
 enum plugin_status plugin_start(const void* parameter)
 {
     int button;
+    int i;
     (void)parameter;
 
     if (!can_play()) {
@@ -115,7 +121,9 @@ enum plugin_status plugin_start(const void* parameter)
         if (button == PLA_QUIT)
             quit = true;
 
-        draw();
+        FOR_NB_SCREENS(i) {
+            draw(rb->screens[i]);
+        }
         if (waiting) {
             if (rem_seconds() <= 0) {
                 quit = done = true;
