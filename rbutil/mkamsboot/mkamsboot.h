@@ -42,6 +42,7 @@ enum {
     MODEL_M200V4,
     MODEL_C200V2,
     MODEL_CLIPPLUS,
+    MODEL_FUZEV2,
 };
 
 

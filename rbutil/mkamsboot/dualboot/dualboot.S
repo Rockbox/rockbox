@@ -83,7 +83,7 @@ uclcopy:
 #define USB_PIN 1   /* FIXME: not correct on some c200v2s */
 #elif defined(SANSA_CLIP) || defined(SANSA_CLIPV2)
 #define USB_PIN 6
-#elif defined(SANSA_FUZE) || defined(SANSA_E200V2)
+#elif defined(SANSA_FUZE) || defined(SANSA_E200V2) || defined(SANSA_FUZEV2)
 #define USB_PIN 3
 #endif
 
@@ -143,14 +143,20 @@ uclcopy:
 
         cmp     r1, #0
         beq     boot_of
-#elif defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#elif defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_FUZEV2)
         ldr     r0, =GPIOC
         mov     r1, #0
         str     r1, [r0, #0x400]
         ldr     r1, [r0, #0x20]    /* read pin C3 */
 
         cmp     r1, #0             /* C3 = #0 means button pressed */
+#ifdef SANSA_FUZEV2
+        /* the logic is reversed on the fuzev2 */
+        bne     boot_of
+#else
         beq     boot_of
+#endif /* SANSA_FUZEV2 */
+
 #elif defined(SANSA_CLIPPLUS)
         @ read pins
         ldr     r0, =GPIOC

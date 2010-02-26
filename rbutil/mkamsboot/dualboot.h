@@ -8,3 +8,4 @@ extern unsigned char dualboot_m200v4[212];
 extern unsigned char dualboot_fuze[236];
 extern unsigned char dualboot_clipv2[280];
 extern unsigned char dualboot_clipplus[216];
+extern unsigned char dualboot_fuzev2[236];

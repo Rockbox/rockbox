@@ -4,8 +4,8 @@ CC=gcc
 # adding a new target.  mkamsboot.c also needs to be edited to refer to these
 # new images.
 
-BOOTOBJS = nrv2e_d8.o dualboot_clip.o dualboot_e200v2.o dualboot_c200v2.o dualboot_m200v4.o dualboot_fuze.o dualboot_clipv2.o dualboot_clipplus.o
-BOOTBINS = nrv2e_d8.arm-bin dualboot_clip.arm-bin dualboot_e200v2.arm-bin dualboot_c200v2.arm-bin dualboot_m200v4.arm-bin dualboot_fuze.arm-bin dualboot_clipv2.arm-bin dualboot_clipplus.arm-bin
+BOOTOBJS = nrv2e_d8.o dualboot_clip.o dualboot_e200v2.o dualboot_c200v2.o dualboot_m200v4.o dualboot_fuze.o dualboot_clipv2.o dualboot_clipplus.o dualboot_fuzev2.o
+BOOTBINS = nrv2e_d8.arm-bin dualboot_clip.arm-bin dualboot_e200v2.arm-bin dualboot_c200v2.arm-bin dualboot_m200v4.arm-bin dualboot_fuze.arm-bin dualboot_clipv2.arm-bin dualboot_clipplus.arm-bin dualboot_fuzev2.arm-bin
 
 all: ../dualboot.h ../dualboot.c
 
@@ -31,6 +31,9 @@ dualboot_clipv2.o: dualboot.S
 
 dualboot_clipplus.o: dualboot.S
 	arm-elf-gcc -DSANSA_CLIPPLUS -c -o dualboot_clipplus.o dualboot.S
+
+dualboot_fuzev2.o: dualboot.S
+	arm-elf-gcc -DSANSA_FUZEV2 -c -o dualboot_fuzev2.o dualboot.S
 
 # Rules for the ucl unpack function
 nrv2e_d8.o: nrv2e_d8.S
