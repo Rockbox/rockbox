@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>rbutilqt</string>
+	<string>Rockbox Utility</string>
 	<key>CFBundleName</key>
 	<string>Rockbox Utility</string>
 	<key>CFBundleShortVersionString</key>
