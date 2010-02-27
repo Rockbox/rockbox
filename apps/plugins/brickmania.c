@@ -425,8 +425,8 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 
 #define CONFIG_FILE_NAME "brickmania.cfg"
 #define SAVE_FILE  PLUGIN_GAMES_DIR "/brickmania.save"
-#define HIGH_SCORE_FILE PLUGIN_GAMES_DIR "/brickmania.score"
-#define NUM_HIGH_SCORES 5
+#define SCORE_FILE PLUGIN_GAMES_DIR "/brickmania.score"
+#define NUM_SCORES 5
 
 
 /*
@@ -981,7 +981,7 @@ static struct configdata config[] =
     {TYPE_INT, 0, 1, { .int_p = &difficulty }, "difficulty", NULL},
 };
 
-struct highscore highest[NUM_HIGH_SCORES];
+static struct highscore highscores[NUM_SCORES];
 
 
 /*
@@ -1381,7 +1381,7 @@ static int brickmania_menu(void)
                     return 1;
                 break;
             case 4:
-                highscore_show(NUM_HIGH_SCORES, highest, NUM_HIGH_SCORES, true);
+                highscore_show(-1, highscores, NUM_SCORES, true);
                 break;
             case 5:
                 if (playback_control(NULL))
@@ -2337,7 +2337,7 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
     int last_difficulty;
 
-    highscore_load(HIGH_SCORE_FILE,highest,NUM_HIGH_SCORES);
+    highscore_load(SCORE_FILE, highscores, NUM_SCORES);
     configfile_load(CONFIG_FILE_NAME,config,1,0);
     last_difficulty = difficulty;
 
@@ -2360,16 +2360,13 @@ enum plugin_status plugin_start(const void* parameter)
     {
         if(!resume)
         {
-            int position = highscore_update(score, level+1, "", highest,
-                NUM_HIGH_SCORES);
-            if (position == 0)
-            {
-                rb->splash(HZ*2, "New High Score");
-            }
-
+            int position = highscore_update(score, level+1, "",
+                                            highscores, NUM_SCORES);
             if (position != -1)
             {
-                highscore_show(position, highest, NUM_HIGH_SCORES, true);
+                if (position == 0)
+                    rb->splash(HZ*2, "New High Score");
+                highscore_show(position, highscores, NUM_SCORES, true);
             }
             else
             {
@@ -2378,7 +2375,7 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
 
-    highscore_save(HIGH_SCORE_FILE,highest,NUM_HIGH_SCORES);
+    highscore_save(SCORE_FILE, highscores, NUM_SCORES);
     if(last_difficulty != difficulty)
         configfile_save(CONFIG_FILE_NAME,config,1,0);
     /* Restore user's original backlight setting */

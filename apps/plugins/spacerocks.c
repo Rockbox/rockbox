@@ -371,7 +371,7 @@ PLUGIN_HEADER
 #define SET_BG(x)
 #endif
 
-#define HIGH_SCORE PLUGIN_GAMES_DIR "/spacerocks.score"
+#define SCORE_FILE PLUGIN_GAMES_DIR "/spacerocks.score"
 #define NUM_SCORES 5
 
 static struct highscore highscores[NUM_SCORES];
@@ -1799,7 +1799,7 @@ static int spacerocks_menu(void)
                     return PLUGIN_USB_CONNECTED;
                 break;
             case 3:
-                highscore_show(NUM_SCORES, highscores, NUM_SCORES, true);
+                highscore_show(-1, highscores, NUM_SCORES, true);
                 break;
             case 4:
                 playback_control(NULL);
@@ -1985,7 +1985,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_setfont(FONT_SYSFIXED);
     /* Turn off backlight timeout */
     backlight_force_on(); /* backlight control in lib/helper.c */
-    highscore_load(HIGH_SCORE, highscores, NUM_SCORES);
+    highscore_load(SCORE_FILE, highscores, NUM_SCORES);
     rb->srand(*rb->current_tick);
 
     /* create stars once, and once only: */
@@ -1995,7 +1995,7 @@ enum plugin_status plugin_start(const void* parameter)
         ret = spacerocks_game_loop();
 
     rb->lcd_setfont(FONT_UI);
-    highscore_save(HIGH_SCORE, highscores, NUM_SCORES);
+    highscore_save(SCORE_FILE, highscores, NUM_SCORES);
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(); /* backlight control in lib/helper.c */
 

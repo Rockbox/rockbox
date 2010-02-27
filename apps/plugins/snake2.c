@@ -1461,7 +1461,7 @@ void game_init(void)
                             NULL, 1, 1, 10, NULL);
                 break;
             case 4:
-                highscore_show(NUM_SCORES, highscores, NUM_SCORES, true);
+                highscore_show(-1, highscores, NUM_SCORES, true);
                 break;
             case 5:
                 playback_control(NULL);

@@ -773,12 +773,12 @@ bool resume = false;
 bool resume_file = false;
 
 /* Rockbox File System only supports full filenames inc dir */
-#define HIGH_SCORE PLUGIN_GAMES_DIR "/rockblox.score"
+#define SCORE_FILE  PLUGIN_GAMES_DIR "/rockblox.score"
 #define RESUME_FILE PLUGIN_GAMES_DIR "/rockblox.resume"
-#define MAX_HIGH_SCORES 5
+#define NUM_SCORES  5
 
 /* Default High Scores... */
-struct highscore highest[MAX_HIGH_SCORES];
+struct highscore highscores[NUM_SCORES];
 
 /* get random number from (0) to (range-1) */
 static int t_rand (int range)
@@ -831,10 +831,10 @@ static void show_highscores (void)
     int i;
     char str[25];               /* for strings */
 
-    for (i = 0; i<MAX_HIGH_SCORES; i++)
+    for (i = 0; i<NUM_SCORES; i++)
     {
         rb->snprintf (str, sizeof (str), "%06d" _SPACE "L%1d",
-                      highest[i].score, highest[i].level);
+                      highscores[i].score, highscores[i].level);
         rb->lcd_putsxy (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * i), str);
     }
 }
@@ -1288,7 +1288,7 @@ static int rockblox_menu(void)
                     return 1;
                 break;
             case 3:
-                highscore_show(MAX_HIGH_SCORES, highest, MAX_HIGH_SCORES, true);
+                highscore_show(-1, highscores, NUM_SCORES, true);
                 break;
             case 4:
                 if (playback_control(NULL))
@@ -1494,7 +1494,7 @@ enum plugin_status plugin_start (const void *parameter)
     rb->srand (*rb->current_tick);
 
     /* Load HighScore if any */
-    highscore_load(HIGH_SCORE, highest, MAX_HIGH_SCORES);
+    highscore_load(SCORE_FILE, highscores, NUM_SCORES);
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -1517,12 +1517,11 @@ enum plugin_status plugin_start (const void *parameter)
         if(!resume) {
             int position = highscore_update(rockblox_status.score,
                                             rockblox_status.level, "",
-                                            highest, MAX_HIGH_SCORES);
-            if (position == 0) {
-                rb->splash(HZ*2, "New High Score");
-            }
+                                            highscores, NUM_SCORES);
             if (position != -1) {
-                highscore_show(position, highest, MAX_HIGH_SCORES, true);
+                if (position == 0)
+                    rb->splash(HZ*2, "New High Score");
+                highscore_show(position, highscores, NUM_SCORES, true);
             }
         }
     }
@@ -1531,7 +1530,7 @@ enum plugin_status plugin_start (const void *parameter)
     pgfx_release();
 #endif
     /* Save user's HighScore */
-    highscore_save(HIGH_SCORE, highest, MAX_HIGH_SCORES);
+    highscore_save(SCORE_FILE, highscores, NUM_SCORES);
     backlight_use_settings(); /* backlight control in lib/helper.c */
 
     return PLUGIN_OK;

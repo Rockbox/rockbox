@@ -184,7 +184,7 @@ PLUGIN_HEADER
 #define CLIX_BUTTON_CLICK   BUTTON_CENTER
 #endif
 
-#define HIGHSCORE_FILE       PLUGIN_GAMES_DIR "/clix.score"
+#define SCORE_FILE PLUGIN_GAMES_DIR "/clix.score"
 #define NUM_SCORES 5
 struct highscore highscores[NUM_SCORES];
 
@@ -875,12 +875,12 @@ enum plugin_status plugin_start(const void* parameter)
     rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
 #endif
 
-    highscore_load(HIGHSCORE_FILE, highscores, NUM_SCORES);
+    highscore_load(SCORE_FILE, highscores, NUM_SCORES);
 
     struct clix_game_state_t state;
     clix_handle_game( &state);
 
-    highscore_save(HIGHSCORE_FILE, highscores, NUM_SCORES);
+    highscore_save(SCORE_FILE, highscores, NUM_SCORES);
 
     return PLUGIN_OK;
 }
