@@ -110,10 +110,12 @@ static bool abort;
 #endif
 
 /* TODO: Better get the exts from the filetypes var in tree.c */
-const char *music_exts[] = {"mp3","mp2","mp1","mpa","ogg",
+const char *music_exts[] = {"mp3","mp2","mp1","mpa","ogg","oga",
         "wav","flac","ac3","a52","mpc","wv","m4a","m4b","mp4",
-        "shn","aif","aiff","wma","wmv","spx","ape","adx",
-        "sid","mod","nsf","nsfe","spc","asf","mac"};
+        "shn","aif","aiff","wma","wmv","asf","spx","ape","mac",
+        "sid","mod","nsf","nsfe","spc","adx","sap","rm","at3"
+        "ra","rmvb","oma","aa3","dmc","dlt","mpt","mpd","rmt",
+        "tmc","tm8","tm2","cm3","cmc","cmr","cms","mmf"};
 
 void prn(const char *str, int y)
 {
