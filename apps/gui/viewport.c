@@ -99,6 +99,7 @@ static void toggle_theme(enum screen_type screen, bool force)
 {
     bool enable_event = false;
     static bool was_enabled[NB_SCREENS] = {false};
+    static bool after_boot[NB_SCREENS] = {false};
     int i;
 
     FOR_NB_SCREENS(i)
@@ -116,7 +117,7 @@ static void toggle_theme(enum screen_type screen, bool force)
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
         screens[screen].backdrop_show(sb_get_backdrop(screen));
 #endif
-        if (!first_boot && (!was_enabled[screen] || force))
+        if (LIKELY(after_boot[screen]) && (!was_enabled[screen] || force))
         {
             struct viewport deadspace, user;
             viewport_set_defaults(&user, screen);
@@ -176,6 +177,8 @@ static void toggle_theme(enum screen_type screen, bool force)
     send_event(GUI_EVENT_THEME_CHANGED, NULL);
     FOR_NB_SCREENS(i)
         was_enabled[i] = is_theme_enabled(i);
+
+    after_boot[screen] = true;
 }
 
 void viewportmanager_theme_enable(enum screen_type screen, bool enable,
