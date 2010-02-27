@@ -1192,6 +1192,9 @@ const char *get_token_value(struct gui_wps *gwps,
                     curr_screen = 4;
                     break;
 #endif
+                case GO_TO_PLAYLIST_VIEWER:
+                    curr_screen = 5;
+                    break;
                 default: /* lists */
                     curr_screen = 1;
                     break;
