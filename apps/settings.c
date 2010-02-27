@@ -835,7 +835,8 @@ void settings_apply(void)
 
 #ifdef HAVE_LCD_BITMAP
     /* fonts need to be loaded before the WPS */
-    if ( global_settings.font_file[0]) {
+    if (global_settings.font_file[0]
+        && global_settings.font_file[0] != '-') {
         snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                  global_settings.font_file);
         if (font_load(NULL, buf) < 0)
@@ -844,7 +845,8 @@ void settings_apply(void)
     else
         font_reset(NULL);
 #ifdef HAVE_REMOTE_LCD        
-    if ( global_settings.remote_font_file[0]) {
+    if ( global_settings.remote_font_file[0]
+        && global_settings.remote_font_file[0] != '-') {
         snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                  global_settings.remote_font_file);
         if (font_load_remoteui(buf) < 0)
