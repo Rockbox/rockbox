@@ -825,16 +825,8 @@ bool view_runtime(void)
     gui_synclist_speak_item(&lists);
     while(1)
     {
-#if CONFIG_CHARGING
-        if (charger_inserted())
-        {
-            global_status.runtime = 0;
-        }
-        else
-#endif
-        {
-            global_status.runtime += ((current_tick - lasttime) / HZ);
-        }
+        global_status.runtime += ((current_tick - lasttime) / HZ);
+        
         lasttime = current_tick;
         gui_synclist_draw(&lists);
         list_do_action(CONTEXT_STD, HZ,

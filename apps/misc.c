@@ -590,6 +590,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
                 system_restore();
             }
             return SYS_USB_CONNECTED;
+
         case SYS_POWEROFF:
             if (!clean_shutdown(callback, parameter))
                 return SYS_POWEROFF;
@@ -601,6 +602,8 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 
         case SYS_CHARGER_DISCONNECTED:
             car_adapter_mode_processing(false);
+            /*reset rockbox battery runtime*/
+            global_status.runtime = 0;
             return SYS_CHARGER_DISCONNECTED;
 
         case SYS_CAR_ADAPTER_RESUME:
