@@ -901,11 +901,11 @@ enum paddle_type
 
 enum intersection
 {
-    INTERSECTION_NONE = 0,
     INTERSECTION_TOP,
     INTERSECTION_BOTTOM,
     INTERSECTION_LEFT,
     INTERSECTION_RIGHT,
+    INTERSECTION_ALL,
 };
 
 struct brick
@@ -1147,8 +1147,13 @@ static int check_rect(struct line *line, struct rect *rect,
 
             break;
         }
-        default:
-            return 0; /* shouldn't reach here */
+        case INTERSECTION_ALL: /* Test hit on all edges */
+        {
+            return (check_rect(line, rect, INTERSECTION_TOP, hitp) ||
+                    check_rect(line, rect, INTERSECTION_BOTTOM, hitp) ||
+                    check_rect(line, rect, INTERSECTION_LEFT, hitp) ||
+                    check_rect(line, rect, INTERSECTION_RIGHT, hitp));
+        }
     }
 
     return check_lines(line, &edge, hitp);
@@ -1516,8 +1521,8 @@ static int brickmania_game_loop(void)
     int sec_count=0;
     int end;
 
-    /* pad_line used for powerup/ball checks */
-    struct line pad_line;
+    /* pad_rect used for powerup/ball checks */
+    struct rect pad_rect;
     /* This is used for various lines that are checked (ball and powerup) */
     struct line misc_line;
 
@@ -1602,11 +1607,11 @@ static int brickmania_game_loop(void)
                 brick_on_board--;
 
             /* Setup the pad line-later used in intersection test */
-            pad_line.p1.x = pad_pos_x;
-            pad_line.p1.y = PAD_POS_Y;
+            pad_rect.top_left.x = pad_pos_x;
+            pad_rect.top_left.y = PAD_POS_Y;
 
-            pad_line.p2.x = pad_pos_x + pad_width;
-            pad_line.p2.y = PAD_POS_Y;
+            pad_rect.bottom_right.x = pad_pos_x + pad_width;
+            pad_rect.bottom_right.y = PAD_POS_Y + PAD_HEIGHT;
 
             if (game_state!=ST_PAUSE)
             {
@@ -1668,7 +1673,8 @@ static int brickmania_game_loop(void)
                         misc_line.p2.y += SPEED_POWER;
 
                         /* Check if the powerup will hit the paddle */
-                        if (check_lines(&misc_line, &pad_line, &pt_hit))
+                        if (check_rect(&misc_line, &pad_rect, INTERSECTION_ALL,
+                            &pt_hit))
                         {
 
                             /* power hit paddle */
@@ -2051,7 +2057,8 @@ static int brickmania_game_loop(void)
                         /* Did the ball hit the paddle? Depending on where the ball
                          *  Hit set the x/y speed appropriately.
                          */
-                        if(check_lines(&misc_line, &pad_line, &pt_hit) )
+                        if(check_rect(&misc_line, &pad_rect, INTERSECTION_TOP,
+                            &pt_hit) )
                         {
                             /* Re-position ball based on collision */
                             ball[k].tempy = ON_PAD_POS_Y;
