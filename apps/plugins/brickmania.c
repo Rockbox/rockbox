@@ -1603,14 +1603,14 @@ static int brickmania_game_loop(void)
                             case POWER_TYPE_PADDLE_SHOOTER:
                                 score += SCORE_POWER_PADDLE_SHOOTER;
                                 paddle_type = PADDLE_TYPE_SHOOTER;
-                                for(k=0;k<used_balls;k++)
-                                    ball[k].glue=false;
+                                for(i=0;i<used_balls;i++)
+                                    ball[i].glue=false;
                                 break;
                             case POWER_TYPE_PADDLE_NORMAL:
                                 score += SCORE_POWER_PADDLE_NORMAL;
                                 paddle_type = PADDLE_TYPE_NORMAL;
-                                for(k=0;k<used_balls;k++)
-                                    ball[k].glue=false;
+                                for(i=0;i<used_balls;i++)
+                                    ball[i].glue=false;
                                 flip_sides=false;
                                 pad_pos_x += (pad_width-PAD_WIDTH)/2;
                                 pad_width = PAD_WIDTH;
@@ -1677,9 +1677,12 @@ static int brickmania_game_loop(void)
                     if (remove_power)
                     {
                         used_powers--;
-                        power[k].top = power[used_powers].top;
-                        power[k].x_pos = power[used_powers].x_pos;
-                        power[k].type = power[used_powers].type;
+                        if (k != used_powers)
+                        {
+                            power[k].top = power[used_powers].top;
+                            power[k].x_pos = power[used_powers].x_pos;
+                            power[k].type = power[used_powers].type;
+                        }
                         k--;
                     }
                 }
