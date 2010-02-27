@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: settings.c 24848 2010-02-22 07:25:13Z jdgordon $
+ * $Id$
  *
  * Copyright (C) 2002 by Stuart Martin
  * RTC config saving code (C) 2002 by hessu@hes.iki.fi

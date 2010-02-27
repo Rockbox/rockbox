@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: skin_tokens.c 24526 2010-02-05 23:58:53Z jdgordon $
+ * $Id$
  *
  * Copyright (C) 2010 Jonathan Gordon
  *
