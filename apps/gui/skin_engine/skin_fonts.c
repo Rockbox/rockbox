@@ -32,7 +32,7 @@
 #define FONT_SIZE 10000
 
 
-static struct skin_font {
+static struct skin_font_info {
     struct font font;
     int font_id;
     char name[MAX_PATH];
@@ -63,7 +63,7 @@ int skin_font_load(char* font_name)
 {
     int i;
     struct font *pf;
-    struct skin_font *font = NULL;
+    struct skin_font_info *font = NULL;
     char filename[MAX_PATH];
     
     if (!strcmp(font_name, global_settings.font_file))

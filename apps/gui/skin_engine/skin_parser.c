@@ -430,6 +430,19 @@ struct gui_img* find_image(char label, struct wps_data *data)
     }
     return NULL;
 }
+
+struct skin_font* find_font(int id, struct wps_data *data)
+{
+    struct skin_token_list *list = data->fonts;
+    while (list)
+    {
+        struct skin_font *f = (struct skin_font*)list->token->value.data;
+        if (f->id == id)
+            return f;
+        list = list->next;
+    }
+    return NULL;
+}
 #endif
 
 /* traverse the viewport linked list for a viewport */
@@ -696,14 +709,14 @@ static int parse_image_load(const char *wps_bufptr,
 /* this array acts as a simple mapping between the id the user uses for a font
  * and the id the font actually gets from the font loader.
  * font id 2 is always the first skin font (regardless of how many screens */
-static int font_ids[MAXUSERFONTS];
 static int parse_font_load(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
 {
     (void)wps_data; (void)token;
     const char *ptr = wps_bufptr;
     int id;
-    char *filename, buf[MAX_PATH];
+    char *filename;
+    struct skin_font *font;
     
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
@@ -719,13 +732,25 @@ static int parse_font_load(const char *wps_bufptr,
         
     if (id <= FONT_UI || id >= MAXFONTS-1)
         return WPS_ERROR_INVALID_PARAM;
-    id -= FONT_UI;
-    
-    memcpy(buf, filename, ptr-filename);
-    buf[ptr-filename] = '\0';
-    font_ids[id] = skin_font_load(buf);
-    
-    return font_ids[id] >= 0 ? skip_end_of_line(wps_bufptr) : WPS_ERROR_INVALID_PARAM;
+
+    font = skin_buffer_alloc(sizeof(struct skin_font));
+    int len = ptr-filename+1;
+    char* name = skin_buffer_alloc(len);
+    if (!font || !name)
+        return WPS_ERROR_INVALID_PARAM;
+
+    strlcpy(name, filename, len);
+    font->id = id;
+    font->font_id = -1;
+    font->name = name;
+
+    struct skin_token_list *item = new_skin_token_list_item(NULL, font);
+
+    if (!item)
+        return WPS_ERROR_INVALID_PARAM;
+    add_to_ll_chain(&wps_data->fonts, item);
+
+    return skip_end_of_line(wps_bufptr);
 }
     
     
@@ -931,13 +956,13 @@ static int parse_viewport(const char *wps_bufptr,
     else
         vp->flags &= ~VP_FLAG_ALIGN_RIGHT; /* ignore right-to-left languages */
 
+    /* increment because font=2 and FONT_UI_REMOTE is ambiguous */
+    if (vp->font > FONT_UI)
+        vp->font++;
 #ifdef HAVE_REMOTE_LCD
     if (vp->font == FONT_UI && curr_screen == SCREEN_REMOTE)
         vp->font = FONT_UI_REMOTE;
-    else
 #endif
-    if (vp->font > FONT_UI)
-        vp->font = font_ids[vp->font - FONT_UI];
 
     struct skin_token_list *list = new_skin_token_list_item(NULL, skin_vp);
     if (!list)
@@ -1949,8 +1974,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
 static void skin_data_reset(struct wps_data *wps_data)
 {
 #ifdef HAVE_LCD_BITMAP
-    wps_data->images = NULL;
-    wps_data->progressbars = NULL;
+    wps_data->images =  wps_data->progressbars = wps_data->fonts = NULL;
 #endif
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     wps_data->backdrop = NULL;
@@ -2073,6 +2097,57 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
     return retval;
 }
 
+static bool skin_load_fonts(struct wps_data *data)
+{
+    /* don't spit out after the first failue to aid debugging */
+    bool success = true;
+    struct skin_token_list *vp_list;
+    /* walk though each viewport and assign its font */
+    for(vp_list = data->viewports; vp_list; vp_list = vp_list->next)
+    {
+        /* first, find the viewports that have a non-sys/ui-font font */
+        struct skin_viewport *skin_vp =
+                (struct skin_viewport*)vp_list->token->value.data;
+        struct viewport *vp = &skin_vp->vp;
+
+
+        if (vp->font < SYSTEMFONTCOUNT)
+        {   /* the usual case -> built-in fonts */
+            continue;
+        }
+
+        /* decrement, because font has been incremented in viewport parsing
+         * due to the FONT_UI_REMOTE ambiguity */
+        int skin_font_id = vp->font-1;
+
+        /* now find the corresponding skin_font */
+        struct skin_font *font = find_font(skin_font_id, data);
+        if (!font)
+        {
+            DEBUGF("Could not find font %d\n", skin_font_id);
+            success = false;
+            continue;
+        }
+
+        /* load the font - will handle loading the same font again if
+         * multiple viewports use the same */
+        if (font->font_id < 0)
+            font->font_id = skin_font_load(font->name);
+
+        if (font->font_id < 0)
+        {
+            DEBUGF("Unable to load font %d: '%s.fnt'\n",
+                    skin_font_id, font->name);
+            success = false;
+            continue;
+        }
+
+        /* finally, assign the font_id to the viewport */
+        vp->font = font->font_id;
+    }
+    return success;
+}
+
 #endif /* HAVE_LCD_BITMAP */
 
 /* to setup up the wps-data from a format-buffer (isfile = false)
@@ -2184,6 +2259,12 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         strlcpy(bmpdir, buf, dot - buf + 1);
         /* load the bitmaps that were found by the parsing */
         if (!load_skin_bitmaps(wps_data, bmpdir)) {
+            skin_data_reset(wps_data);
+            wps_data->wps_loaded = false;
+            return false;
+        }
+        if (!skin_load_fonts(wps_data))
+        {
             skin_data_reset(wps_data);
             wps_data->wps_loaded = false;
             return false;
