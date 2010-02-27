@@ -312,8 +312,6 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define BRICK_HEIGHT     FIXED3(BMPHEIGHT_brickmania_bricks/7)
 #define BRICK_WIDTH      FIXED3(BMPWIDTH_brickmania_bricks)
 #define LEFTMARGIN       ((GAMESCREEN_WIDTH-10*BRICK_WIDTH)/2)
-#define POWER_TYPE_COUNT 9 /* Number of items in enum power_types */
-#define POWERUP_HEIGHT   FIXED3(BMPHEIGHT_brickmania_powerups/POWER_TYPE_COUNT)
 #define POWERUP_WIDTH    FIXED3(BMPWIDTH_brickmania_powerups)
 #define BALL             FIXED3(BMPHEIGHT_brickmania_ball)
 #define HALFBALL         (BALL / 2)
@@ -874,11 +872,12 @@ enum power_types
     POWER_TYPE_EXTRA_BALL,
     POWER_TYPE_PADDLE_LONG,
     POWER_TYPE_PADDLE_SHORT,
-    /* Make sure to update POWER_TYPE_COUNT value when adding new types */
+    NUMBER_OF_POWERUPS,
 };
 
+#define POWERUP_HEIGHT   FIXED3(BMPHEIGHT_brickmania_powerups/NUMBER_OF_POWERUPS)
 /* Increasing this value makes the game with less powerups */
-#define POWER_RAND (POWER_TYPE_COUNT + 15)
+#define POWER_RAND       (NUMBER_OF_POWERUPS + 15)
 
 enum difficulty_options
 {
@@ -1426,7 +1425,7 @@ static void brick_hit(int i, int j)
         {
             int ran = rb->rand()%POWER_RAND;
 
-            if (ran<POWER_TYPE_COUNT)
+            if (ran<NUMBER_OF_POWERUPS)
             {
                 power[used_powers].top = TOPMARGIN + i*BRICK_HEIGHT;
                 power[used_powers].x_pos = LEFTMARGIN + j*BRICK_WIDTH +
