@@ -434,7 +434,7 @@ static int sd_init_card(void)
     } while(!(card_info.ocr & (1<<31)) );
 
     /* CMD2 send CID */
-    if(!send_cmd(SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP, card_info.cid))
+    if(!send_cmd(SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP, temp_reg))
         return -5;
 
     for(i=0; i<4; i++)
