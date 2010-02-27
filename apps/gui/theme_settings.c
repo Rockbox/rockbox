@@ -35,7 +35,6 @@
 #include "statusbar-skinned.h"
 
 
-
 /* call this after loading a .wps/.rwps or other skin files, so that the
  * skin buffer is reset properly
  */
@@ -44,7 +43,8 @@ struct skin_load_setting {
     char* suffix;
     void (*loadfunc)(enum screen_type screen, const char *buf, bool isfile);
 };
-static struct skin_load_setting skins[] = {
+
+static const struct skin_load_setting skins[] = {
     /* This determins the load order. *sbs must be loaded before any other
      * skin on that screen */
 #ifdef HAVE_LCD_BITMAP
@@ -70,7 +70,7 @@ void settings_apply_skins(void)
     sb_skin_init();
 #endif
     gui_sync_wps_init();
-    for (i=0; i<sizeof(skins)/sizeof(*skins); i++)
+    for (i=0; i<ARRAYLEN(skins); i++)
     {
 #ifdef HAVE_REMOTE_LCD
         screen = skins[i].suffix[0] == 'r' ? SCREEN_REMOTE : SCREEN_MAIN;
