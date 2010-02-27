@@ -179,7 +179,16 @@ bool Autodetection::detect()
         if(ipod.macpod)
             m_errdev = ipod.targetname;
         m_device = ipod.targetname;
-        m_mountpoint = resolveMountPoint(ipod.diskname);
+        // since resolveMountPoint is doing exact matches we need to select
+        // the correct partition.
+        QString mp(ipod.diskname);
+#ifdef Q_OS_LINUX
+        mp.append("2");
+#endif
+#ifdef Q_OS_MACX
+        mp.append("s2");
+#endif
+        m_mountpoint = resolveMountPoint(mp);
         return true;
     }
     else {
@@ -197,7 +206,14 @@ bool Autodetection::detect()
     if(n == 1) {
         qDebug() << "[Autodetect] Sansa found:" << sansa.targetname << "at" << sansa.diskname;
         m_device = QString("sansa%1").arg(sansa.targetname);
-        m_mountpoint = resolveMountPoint(sansa.diskname);
+        QString mp(sansa.diskname);
+#ifdef Q_OS_LINUX
+        mp.append("1");
+#endif
+#ifdef Q_OS_MACX
+        mp.append("s1");
+#endif
+        m_mountpoint = resolveMountPoint(mp);
         return true;
     }
     else {
