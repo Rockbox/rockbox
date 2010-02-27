@@ -899,6 +899,15 @@ enum paddle_type
     PADDLE_TYPE_SHOOTER,
 };
 
+enum intersection
+{
+    INTERSECTION_NONE = 0,
+    INTERSECTION_TOP,
+    INTERSECTION_BOTTOM,
+    INTERSECTION_LEFT,
+    INTERSECTION_RIGHT,
+};
+
 struct brick
 {
     bool used;      /* Is the brick still in play? */
@@ -948,6 +957,11 @@ struct line
     struct point p2;
 };
 
+struct rect
+{
+    struct point top_left;
+    struct point bottom_right;
+};
 
 /*
  *
@@ -1083,6 +1097,61 @@ static int check_lines(struct line *line1, struct line *line2,
         return 1;
     }
     return 0;
+}
+
+
+static int check_rect(struct line *line, struct rect *rect,
+    enum intersection intersection, struct point *hitp)
+{
+    struct line edge;
+
+    switch (intersection)
+    {
+        case INTERSECTION_TOP:
+        {
+            edge.p1.x = rect->top_left.x;
+            edge.p1.y = rect->top_left.y;
+
+            edge.p2.x = rect->bottom_right.x;
+            edge.p2.y = rect->top_left.y;
+
+            break;
+        }
+        case INTERSECTION_BOTTOM:
+        {
+            edge.p1.x = rect->top_left.x;
+            edge.p1.y = rect->bottom_right.y;
+
+            edge.p2.x = rect->bottom_right.x;
+            edge.p2.y = rect->bottom_right.y;
+
+            break;
+        }
+        case INTERSECTION_LEFT:
+        {
+            edge.p1.x = rect->top_left.x;
+            edge.p1.y = rect->top_left.y;
+
+            edge.p2.x = rect->top_left.x;
+            edge.p2.y = rect->bottom_right.y;
+
+            break;
+        }
+        case INTERSECTION_RIGHT:
+        {
+            edge.p1.x = rect->bottom_right.x;
+            edge.p1.y = rect->top_left.y;
+
+            edge.p2.x = rect->bottom_right.x;
+            edge.p2.y = rect->bottom_right.y;
+
+            break;
+        }
+        default:
+            return 0; /* shouldn't reach here */
+    }
+
+    return check_lines(line, &edge, hitp);
 }
 
 static void brickmania_init_game(bool new_game)
@@ -1740,39 +1809,16 @@ static int brickmania_game_loop(void)
                     /* The brick is a brick, but it may or may not be in use */
                     if(brick[i][j].used)
                     {
-                        /* these lines are used to describe the brick */
-                        struct line bot_brick, top_brick, left_brick, rght_brick;
+                        struct rect brick_rect;
+
                         brickx = LEFTMARGIN + j*BRICK_WIDTH;
                         bricky = TOPMARGIN + i*BRICK_HEIGHT;
 
-                        /* Describe the brick for later collision checks */
-                        /* Setup the bottom of the brick */
-                        bot_brick.p1.x = brickx;
-                        bot_brick.p1.y = bricky + BRICK_HEIGHT;
+                        brick_rect.top_left.x = brickx;
+                        brick_rect.top_left.y = bricky;
 
-                        bot_brick.p2.x = brickx + BRICK_WIDTH;
-                        bot_brick.p2.y = bricky + BRICK_HEIGHT;
-
-                        /* Setup the top of the brick */
-                        top_brick.p1.x = brickx;
-                        top_brick.p1.y = bricky;
-
-                        top_brick.p2.x = brickx + BRICK_WIDTH;
-                        top_brick.p2.y = bricky;
-
-                        /* Setup the left of the brick */
-                        left_brick.p1.x = brickx;
-                        left_brick.p1.y = bricky;
-
-                        left_brick.p2.x = brickx;
-                        left_brick.p2.y = bricky + BRICK_HEIGHT;
-
-                        /* Setup the right of the brick */
-                        rght_brick.p1.x = brickx + BRICK_WIDTH;
-                        rght_brick.p1.y = bricky;
-
-                        rght_brick.p2.x = brickx + BRICK_WIDTH;
-                        rght_brick.p2.y = bricky + BRICK_HEIGHT;
+                        brick_rect.bottom_right.x = brickx + BRICK_WIDTH;
+                        brick_rect.bottom_right.y = bricky + BRICK_HEIGHT;
 
                         /* Draw the brick */
                         rb->lcd_bitmap_part(brickmania_bricks,0,
@@ -1799,6 +1845,8 @@ static int brickmania_game_loop(void)
                         /* Check if any balls collided with the brick */
                         for(k=0; k<used_balls; k++)
                         {
+                            int hit = 0;
+
                             /* Setup the ball path to describe the current ball
                              * position and the line it makes to its next
                              * position.
@@ -1818,39 +1866,38 @@ static int brickmania_game_loop(void)
                              * Note that tempx/tempy store the next position
                              *  that the ball should be drawn.
                              */
-                            if(ball[k].speedy <= 0 &&
-                                check_lines(&misc_line, &bot_brick, &pt_hit))
+                            if (ball[k].speedy <= 0 && check_rect(&misc_line,
+                                &brick_rect, INTERSECTION_BOTTOM, &pt_hit))
                             {
                                 ball[k].speedy = -ball[k].speedy;
-                                ball[k].tempy = pt_hit.y;
-                                ball[k].tempx = pt_hit.x;
-                                brick_hit(i, j);
+                                hit = 1;
                             }
                             /* Check the top, if the ball is moving up dont
                              *  count it as a hit.
                              */
-                            else if(ball[k].speedy > 0 &&
-                                check_lines(&misc_line, &top_brick, &pt_hit))
+                            else if (ball[k].speedy > 0 && check_rect(&misc_line,
+                                &brick_rect, INTERSECTION_TOP, &pt_hit))
                             {
                                 ball[k].speedy = -ball[k].speedy;
-                                ball[k].tempy = pt_hit.y;
-                                ball[k].tempx = pt_hit.x;
-                                brick_hit(i, j);
+                                hit = 1;
                             }
                             /* Check the left side of the brick */
-                            else if(
-                                check_lines(&misc_line, &left_brick, &pt_hit))
+                            else if (check_rect(&misc_line, &brick_rect,
+                                INTERSECTION_LEFT, &pt_hit))
                             {
                                 ball[k].speedx = -ball[k].speedx;
-                                ball[k].tempy = pt_hit.y;
-                                ball[k].tempx = pt_hit.x;
-                                brick_hit(i, j);
+                                hit = 1;
                             }
                             /* Check the right side of the brick */
-                            else if(
-                                check_lines(&misc_line, &rght_brick, &pt_hit))
+                            else if (check_rect(&misc_line, &brick_rect,
+                                INTERSECTION_RIGHT, &pt_hit))
                             {
                                 ball[k].speedx = -ball[k].speedx;
+                                hit = 1;
+                            }
+
+                            if (hit)
+                            {
                                 ball[k].tempy = pt_hit.y;
                                 ball[k].tempx = pt_hit.x;
                                 brick_hit(i, j);
@@ -1917,7 +1964,7 @@ static int brickmania_game_loop(void)
                     /* the test for pos_y prevents the ball from bouncing back
                      * from _over_ the top to infinity on some rare cases */
                     if (ball[k].pos_y > 0 &&
-                            check_lines(&misc_line, &screen_edge, &pt_hit))
+                        check_lines(&misc_line, &screen_edge, &pt_hit))
                     {
                         ball[k].tempy = pt_hit.y + 1;
                         ball[k].tempx = pt_hit.x;
