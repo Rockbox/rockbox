@@ -113,7 +113,7 @@ static bool abort;
 const char *music_exts[] = {"mp3","mp2","mp1","mpa","ogg","oga",
         "wav","flac","ac3","a52","mpc","wv","m4a","m4b","mp4",
         "shn","aif","aiff","wma","wmv","asf","spx","ape","mac",
-        "sid","mod","nsf","nsfe","spc","adx","sap","rm","at3"
+        "sid","mod","nsf","nsfe","spc","adx","sap","rm","at3",
         "ra","rmvb","oma","aa3","dmc","dlt","mpt","mpd","rmt",
         "tmc","tm8","tm2","cm3","cmc","cmr","cms","mmf"};
 
