@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 require "tools/builds.pm";
 
-$version="3.5";
+$version="3.5.1";
 
 my $verbose;
 if($ARGV[0] eq "-v") {
