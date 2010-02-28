@@ -102,6 +102,8 @@ static const struct filetype inbuilt_filetypes[] = {
     { "aa3", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "at3", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "mmf", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "au",  FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "snd", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
 #endif
     { "m3u", FILE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
     { "m3u8",FILE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },

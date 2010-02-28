@@ -79,6 +79,7 @@ enum
     AFMT_TM2,          /* Atari 8bit tm2 format */
     AFMT_OMA_ATRAC3,   /* Atrac3 in Sony OMA container */
     AFMT_SMAF,         /* SMAF */
+    AFMT_AU,           /* Sun Audio file */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -

@@ -168,6 +168,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* SMAF (Synthetic music Mobile Application Format) */
     [AFMT_SMAF] =
         AFMT_ENTRY("SMAF",  "smaf",   NULL,          "mmf\0"      ),
+    /* Sun Audio file */
+    [AFMT_AU] =
+        AFMT_ENTRY("AU",  "au",     NULL,          "au\0snd\0"      ),
 #endif
 };
 
@@ -455,6 +458,14 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         if (!get_smaf_metadata(fd, id3))
         {
             DEBUGF("get_smaf_metadata error\n");
+            return false;
+        }
+        break;
+
+    case AFMT_AU:
+        if (!get_au_metadata(fd, id3))
+        {
+            DEBUGF("get_au_metadata error\n");
             return false;
         }
         break;
