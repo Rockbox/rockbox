@@ -29,6 +29,7 @@ speex.c
 adx.c
 smaf.c
 au.c
+vox.c
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
 /* encoders */
 aiff_enc.c

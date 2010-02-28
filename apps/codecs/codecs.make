@@ -92,6 +92,7 @@ $(CODECDIR)/aiff.codec : $(CODECDIR)/libpcm.a
 $(CODECDIR)/wav.codec : $(CODECDIR)/libpcm.a
 $(CODECDIR)/smaf.codec : $(CODECDIR)/libpcm.a
 $(CODECDIR)/au.codec : $(CODECDIR)/libpcm.a
+$(CODECDIR)/vox.codec : $(CODECDIR)/libpcm.a
 
 $(CODECS): $(CODECLIB) # this must be last in codec dependency list
 
