@@ -167,6 +167,17 @@ int load_image(char *filename, struct image_info *info,
     int ds = 1;
     /* check size of image needed to load image. */
     size = scaled_read_bmp_fd(fd, &bmp, 0, format | FORMAT_RETURN_SIZE, cformat);
+#if (LCD_PIXEL_ASPECT_HEIGHT != 1 || LCD_PIXEL_ASPECT_WIDTH != 1)
+    if (size <= *buf_size)
+    {
+        /* correct aspect */
+        format |= FORMAT_RESIZE|FORMAT_KEEP_ASPECT;
+        bmp.width *= LCD_PIXEL_ASPECT_HEIGHT;
+        bmp.height *= LCD_PIXEL_ASPECT_WIDTH;
+        bmp.width /= MAX(LCD_PIXEL_ASPECT_HEIGHT, LCD_PIXEL_ASPECT_WIDTH);
+        bmp.height /= MAX(LCD_PIXEL_ASPECT_HEIGHT, LCD_PIXEL_ASPECT_WIDTH);
+    }
+#endif
 #ifdef USE_PLUG_BUF
     if (!plug_buf)
 #endif
