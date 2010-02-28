@@ -222,7 +222,7 @@ next_track:
     codec = get_au_codec(format.formattag);
     if (!codec)
     {
-        DEBUGF("CODEC_ERROR: unsupport sun audio format: %lx\n", format.formattag);
+        DEBUGF("CODEC_ERROR: unsupport sun audio format: %x\n", format.formattag);
         status = CODEC_ERROR;
         goto done;
     }
