@@ -7,101 +7,134 @@
   & \textbf{Action when selected}}{}{}
 \includegraphics[width=0.37cm]{appendix/images/icon-directory.png} 
   & Directory & \emph{none} & Enter the directory \\
-\includegraphics[width=0.37cm]{appendix/images/icon-audio-file.png} 
-  & Audio file & 
-  \opt{masd,masf}{\fname{.mp2, .mp3}}%
-  \opt{swcodec}{\emph{various}\newline%
-  (see \ref{ref:Supportedaudioformats}})%
+\opt{recorder,recorderv2fm,ondiofm,ondiosp}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  & Rockbox firmware & \fname{.ajz} & Load the new firmware with ROLO \\
+}
+\opt{swcodec}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-audio-file.png} 
+  & Audio file & \emph{various}\newline%
+  (see \ref{ref:Supportedaudioformats})%
   % do NOT use \reference{} here as that will break the table.
   & Start playing the file and show the WPS\\
-  \includegraphics[width=0.37cm]{appendix/images/icon-cuesheet.png} 
-  & Cuesheet & \fname{.cue} & View the cuesheet file \\
-\opt{masf}{
-  \includegraphics[width=0.37cm]{appendix/images/icon-wav-file.png} 
-    & Wave Audio File & \fname{.wav} & Play the WAV file \\%
 }
-\includegraphics[width=0.37cm]{appendix/images/icon-playlist.png}
-  & Playlist & \fname{.m3u, .m3u8} & Load the playlist and start playing 
-    the first file \\
-\includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
-  & Rockbox firmware & 
-    \opt{player}{\fname{.mod}}\opt{recorder,recorderv2fm,ondiofm,ondiosp}{\fname{.ajz}}%
-    \opt{h100,h300}{\fname{.iriver}}\opt{ipod}{\fname{.ipod}}\opt{iaudio}{\fname{.iaudio}}%
-    \opt{h10,h10_5gb,sansa}{\fname{.mi4}}\opt{gigabeat}{\fname{.gigabeat}}%
-    \opt{sansaAMS}{\fname{.sansa}}
-  & Load the new firmware with ROLO \\
-\includegraphics[width=0.37cm]{appendix/images/icon-wps.png} 
-  & While Playing Screen & \fname{.wps} & Load the new WPS display configuration \\
-\includegraphics[width=0.37cm]{appendix/images/icon-lang.png} 
-  & Language File & \fname{.lng} & Load the language file \\
-\includegraphics[width=0.37cm]{appendix/images/icon-text.png} 
-  & Text File & \fname{.txt} & Display the text file using the text viewer plugin\\
+  & Bookmark & \fname{.bmark} & Display all bookmarks for an audio file\\
+\opt{lcd_bitmap}{
+  & Game of Life & \fname{.cells} & Show the configuration with the
+     ``Rocklife'' plugin\\
+}
 \includegraphics[width=0.37cm]{appendix/images/icon-config.png} 
   & Configuration File & \fname{.cfg} & Load the settings file\\
-\includegraphics[width=0.37cm]{appendix/images/icon-font.png} 
-  & Font & \fname{.fnt} & Change the user interface font to this one\\
-\includegraphics[width=0.37cm]{appendix/images/icon-rock.png} 
-  & Plugin & \fname{.rock} & Start the plugin\\
-\opt{archos}{
-  \includegraphics[width=0.37cm]{appendix/images/icon-ucl.png} 
-    & Flash Image & \fname{.ucl} & Flash the Rockbox image into the ROM \\
-  }
 \includegraphics[width=0.37cm]{appendix/images/icon-chip8.png} 
   & Chip8 game & \fname{.ch8} & Play the Chip8 game \\
-\includegraphics[width=0.37cm]{appendix/images/icon-image-file.png} 
-  & Image & \fname{.jpg} & View the JPEG image \\
-\opt{swcodec}{
- \includegraphics[width=0.37cm]{appendix/images/icon-movie-file.png}
- & Video & \fname{.mpg, .mpeg, .mpv, .m2v} & Play the MPEG1/2 video \\
-}
-\opt{masf}{\opt{lcd_bitmap}{
-  \includegraphics[width=0.37cm]{appendix/images/icon-movie-file.png} 
-    & Rockbox Video & \fname{.rvf} & View the movie (Rockbox format)\\}
-}
-\opt{radio}{
-  & FM Presets & \fname{.fmr} & Load the FM Presets (previous are discarded)\\}
-  & Voice file & \fname{.voice} & Allow Rockbox to speak menus\\
-  & Bookmark & \fname{.bmark} & Display all bookmarks for an audio file\\
-  & Link & \fname{.link} & Display list of target files and directories;
-    selecting one jumps to the target. See \reference{ref:Shortcutsplugin}.\\
 \opt{lcd_color}{
   & Colours & \fname{.colours} & Open the colours file for editing.
     See \reference{ref:ChangingFiletypeColours}.\\
 }
-\opt{lcd_bitmap}{
-  & Game of Life & \fname{.cells} & Show the configuration with the
-     ``Rocklife'' plugin\\}
-
+\includegraphics[width=0.37cm]{appendix/images/icon-cuesheet.png} 
+  & Cuesheet & \fname{.cue} & View the cuesheet file \\
+\opt{radio}{
+  & FM Presets & \fname{.fmr} & Load the FM Presets (previous are discarded)\\
+}
+\includegraphics[width=0.37cm]{appendix/images/icon-font.png} 
+  & Font & \fname{.fnt} & Change the user interface font to this one\\
+\opt{gigabeat}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  & Rockbox firmware & \fname{.gigabeat} & Load the new firmware with ROLO \\
+}
+\opt{iaudio}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  & Rockbox firmware & \fname{.iaudio} & Load the new firmware with ROLO \\
+}
+\opt{ipod}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  & Rockbox firmware & \fname{.ipod} & Load the new firmware with ROLO \\
+}
+\opt{h100,h300}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  & Rockbox firmware & \fname{.iriver} & Load the new firmware with ROLO \\
+}
+\includegraphics[width=0.37cm]{appendix/images/icon-image-file.png} 
+  & Image & \fname{.jpg} & View the JPEG image \\
+  & Link & \fname{.link} & Display list of target files and directories;
+    selecting one jumps to the target. See \reference{ref:Shortcutsplugin}.\\
+\includegraphics[width=0.37cm]{appendix/images/icon-lang.png} 
+  & Language File & \fname{.lng} & Load the language file \\
+\includegraphics[width=0.37cm]{appendix/images/icon-playlist.png}
+  & Playlist & \fname{.m3u, .m3u8} & Load the playlist and start playing 
+    the first file \\
+\opt{h10,h10_5gb,sansa}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  & Rockbox firmware & \fname{.mi4} & Load the new firmware with ROLO \\
+}
+\opt{player}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  & Rockbox firmware & \fname{.mod} & Load the new firmware with ROLO \\
+}
+\opt{masd,masf}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-audio-file.png} 
+  & Audio file & \fname{.mp2, .mp3} & Start playing the file and show the WPS\\
+}
+\opt{swcodec}{
+ \includegraphics[width=0.37cm]{appendix/images/icon-movie-file.png}
+ & Video & \fname{.mpg, .mpeg, .mpv, .m2v} & Play the MPEG1/2 video \\
+}
+\includegraphics[width=0.37cm]{appendix/images/icon-rock.png} 
+  & Plugin & \fname{.rock} & Start the plugin\\
+\opt{masf}{\opt{lcd_bitmap}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-movie-file.png} 
+    & Rockbox Video & \fname{.rvf} & View the movie (Rockbox format)\\}
+}
+\opt{sansaAMS}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  & Rockbox firmware & \fname{.sansa} & Load the new firmware with ROLO \\
+}
+\includegraphics[width=0.37cm]{appendix/images/icon-text.png} 
+  & Text File & \fname{.txt} & Display the text file using the text viewer plugin\\
+\opt{archos}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-ucl.png} 
+    & Flash Image & \fname{.ucl} & Flash the Rockbox image into the ROM \\
+  }
+  & Voice file & \fname{.voice} & Allow Rockbox to speak menus\\
+\opt{masf}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-wav-file.png} 
+    & Wave Audio File & \fname{.wav} & Play the WAV file \\%
+}
+\includegraphics[width=0.37cm]{appendix/images/icon-wps.png} 
+  & While Playing Screen & \fname{.wps} & Load the new WPS display configuration\\
 \end{rbtabular}
 \end{table}
 
 \opt{swcodec}{
   \section{\label{ref:Supportedaudioformats}Supported audio formats}
+  \textbf{Lossy codecs}
   \begin{table}
   \begin{rbtabular}{\textwidth}{lp{6em}X}%
   {\textbf{Format} & \textbf{Extension} & \textbf{Notes}}{}{}
-    \multicolumn{2}{c}{\textbf{Lossy codecs}}\\
-    \midrule
-    MPEG audio & \fname{.mp1, .mpa, .mp2, .mp3} & \\
-    OGG/Vorbis & \fname{.ogg, .oga} & Some old ``floor 0'' files may crash Rockbox. \\
-    Musepack & \fname{.mpc} & Supports SV7 only \\
-    Advanced Audio Coding & \fname{.m4a, .m4b, .mp4} & \\
-    Windows Media Audio & \fname{.wma, .wmv, .asf} & \\
     ATSC A/52 & \fname{.a52, .ac3} & Supports downmixing for playback of 5.1 streams in stereo. \\
     ADX & \fname{.adx} & \\
-    Speex & \fname{.spx} & \\
-    RealAudio & \fname{.rm, .ra, .rmvb} & \\
+    Advanced Audio Coding & \fname{.m4a, .m4b, .mp4} & \\
+    MPEG audio & \fname{.mp1, .mpa, .mp2, .mp3} & \\
+    Musepack & \fname{.mpc} & Supports SV7 only \\
+    OGG/Vorbis & \fname{.ogg, .oga} & Some old ``floor 0'' files may crash Rockbox. \\
     Sony Audio & \fname{.oma, .aa3} & \\
-    
-    \midrule
-    \multicolumn{2}{c}{\textbf{Lossless codecs}}\\
-    \midrule
-    Waveform audio format & \fname{.wav} & \\
-    Audio Interchange File Format & \fname{.aif, .aiff} & \\
-    Free Lossless Audio & \fname{.flac} & \\
-    Apple Lossless & \fname{.m4a, .mp4} & \\
-    Wavpack & \fname{.wv} & \\
-    Shorten & \fname{.shn} & Seeking not supported.\\
+    RealAudio & \fname{.rm, .ra, .rmvb} & \\
+    Speex & \fname{.spx} & \\
+    Dialogic telephony type & \fname{.vox} & \\
+    Windows Media Audio & \fname{.wma, .wmv, .asf} & \\
+  \end{rbtabular}
+  \end{table}
+  \newpage
+
+  \textbf{Lossless codecs}
+  \begin{table}
+  \begin{rbtabular}{\textwidth}{lp{6em}X}%
+  {\textbf{Format} & \textbf{Extension} & \textbf{Notes}}{}{}
+    Audio Interchange File Format & \fname{.aif, .aiff} & AIFF supports following formats: \\
+                                  &                     & linear pcm 8/16/24/32 bit. \\
+                                  &                     & IEEE float 32/64 bit\\
+                                  &                     & ITU-T G.711 a-low/$\mu$-low\\
+                                  &                     & QuickTime IMA ADPCM\\
     \opt{h100,h300,x5,m5,m3}{
       Monkey's Audio & \fname{.ape, .mac} & -c1000 and -c2000 files decode
       fast enough to be useful.}
@@ -115,15 +148,38 @@
       Monkey's Audio & \fname{.ape, .mac} & Only -c1000 files decode fast
       enough to be useful.}
     \\
-    \midrule
-    \multicolumn{2}{c}{\textbf{Other codecs}}\\
-    \midrule
-    Sound Interface Device & \fname{.sid} & \\
+    Sun Audio & \fname{.au, .snd} & Sun Audio supports following formats: \\
+              &                   & linear pcm 8/16/24/32 bit. \\
+              &                   & IEEE float 32/64 bit\\
+              &                   & ITU-T G.711 a-low/$\mu$-low\\
+    Free Lossless Audio & \fname{.flac} & \\
+    Apple Lossless & \fname{.m4a, .mp4} & \\
+    Shorten & \fname{.shn} & Seeking not supported.\\
+    Wave64 & \fname{.w64} & Wave/Wave64 supports following formats: \\
+    Waveform audio format & \fname{.wav} & linear pcm 8/16/24/32 bit. \\
+                          &              & IEEE float 32/64 bit\\
+                          &              & ITU-T G.711 a-low/$\mu$-low\\
+                          &              & Microsoft ADPCM\\
+                          &              & Intel DVI ADPCM(IMA ADPCM) 2/3/4/5 bit\\
+                          &              & Dialogic OKI ADPCM\\
+                          &              & YAMAHA ADPCM\\
+                          &              & Adobe SWF ADPCM\\
+    Wavpack & \fname{.wv} & \\
+  \end{rbtabular}
+  \end{table}
+  \newpage
+
+  \textbf{Other codecs}
+  \begin{table}
+  \begin{rbtabular}{\textwidth}{lp{6em}X}%
+  {\textbf{Format} & \textbf{Extension} & \textbf{Notes}}{}{}
+    Atari Sound Format & \fname{.cmc, .cm3, .cmr, .cms, .dmc, .dlt, .mpt, .mpd} & \\
+    Synthetic music Mobile Application Format & \fname{.mmf} & Supports PCM/ADPCM only \\
     MOD & \fname{.mod} & \\
     NES Sound Format & \fname{.nsf, .nsfe} & \\
-    SPC700 & \fname{.spc} & \\
     Atari SAP & \fname{.sap} & \\
-    Atari Sound Format & \fname{.cmc, .cm3, .cmr, .cms, .dmc, .dlt, .mpt, .mpd} & \\
+    Sound Interface Device & \fname{.sid} & \\
+    SPC700 & \fname{.spc} & \\
   \end{rbtabular}
   \end{table}
 }
