@@ -153,16 +153,16 @@ extern const int afmt_rec_format[AFMT_NUM_CODECS];
 /* record describing the audio format */
 struct afmt_entry
 {
-    char label[8];      /* format label */
+    const char *label;      /* format label */
 #if CONFIG_CODEC == SWCODEC
-    char *codec_root_fn; /* root codec filename (sans _enc and .codec) */
+    const char *codec_root_fn; /* root codec filename (sans _enc and .codec) */
 #ifdef HAVE_RECORDING
-    char *codec_enc_root_fn; /* filename of encoder codec */
+    const char *codec_enc_root_fn; /* filename of encoder codec */
 #endif
 #endif
-    char *ext_list;     /* double NULL terminated extension
-                           list for type with the first as
-                           the default for recording */
+    const char *ext_list;   /* double NULL terminated extension
+                               list for type with the first as
+                               the default for recording */
 };
 
 /* database of labels and codecs. add formats per above enum */

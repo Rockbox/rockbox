@@ -64,10 +64,10 @@
 
 extern struct wps_state wps_state;
 
-static char* get_codectype(const struct mp3entry* id3)
+static const char* get_codectype(const struct mp3entry* id3)
 {
     if (id3 && id3->codectype < AFMT_NUM_CODECS) {
-        return (char*)audio_formats[id3->codectype].label;
+        return audio_formats[id3->codectype].label;
     } else {
         return NULL;
     }
