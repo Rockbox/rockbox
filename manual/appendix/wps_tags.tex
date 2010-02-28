@@ -454,6 +454,53 @@ or alternate information on those that do not
 Example:
 \config{\%?cc{\textless}\%cH:\%cM{\textbar}No clock detected{\textgreater}}
 
+\opt{touchscreen}{
+  \section{Touchscreen Areas (WPS only)}
+    \begin{table}
+      \begin{tagmap}{}{}
+        \config{\%T{\textbar}x{\textbar}y{\textbar}width{\textbar}height%
+        {\textbar}action{\textbar}}
+        & Invoke the action specified when the user presses in the defined
+        touchscreen area.\\
+      \end{tagmap}
+    \end{table}
+  If the action starts with \& then the area must be held. Possible actions are:
+
+  \begin{description}
+    \item[play] -- Play/pause playback.
+    \item[stop] -- Stop playback and exit the WPS.
+    \item[prev] -- Previous track.
+    \item[next] -- Next track.
+    \item[ffwd] -- Seek forwards in the track.
+    \item[rwd] -- Seek backwards in the track.
+    \item[menu] -- Go to the main menu.
+    \item[browse] -- Go back to the file browser or database.
+    \item[shuffle] -- Toggle shuffle mode.
+    \item[repmode] -- Cycle through the repeat modes.
+    \item[quickscreen] -- Go to the quickscreen.
+    \item[contextmenu] -- Open the context menu.
+    \item[playlist] -- Go to the playlist viewer.
+    \item[progressbar] -- Seek to the appropriate position in the track based on the touch.
+    \item[volume] -- Set the volume to the appropriate level based on the touch.
+    \item[pitch] -- Open the pitchscreen.
+    \item[voldown] -- Decrease the volume by one step.
+    \item[volup] -- Increase the volume by one step.
+  \end{description}
+
+  \section{Last Touchscreen Press (WPS only)}
+    \begin{table}
+      \begin{tagmap}{}{}
+        \config{\%Tl} & Indicates that the touchscreen is pressed.\\
+      \end{tagmap}
+    \end{table}
+  This tag can be used to display text or images or a viewport when the
+  touchscreen is pressed (like an On Screen Display). If you put a number
+  straight after \%Tl it will be used as a timeout in seconds
+  (e.g \%Tl2.5 will give a 2.5 second timeout) between the touchscreen press
+  being released and the tag going false. If no number is specified it will
+  use a 1 second timeout.  It can also be used as a conditional, and can be
+  used with conditional viewports.
+}
 
 \section{Other Tags}
 \begin{table}
