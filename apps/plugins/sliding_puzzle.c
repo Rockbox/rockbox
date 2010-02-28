@@ -433,6 +433,8 @@ static void draw_spot(int p, int x, int y)
         int old_fg = rb->lcd_get_foreground();
         rb->lcd_set_foreground(LCD_BLACK);
         rb->lcd_fillrect(x,y,SPOTS_WIDTH,SPOTS_HEIGHT);
+        rb->lcd_set_foreground(LCD_WHITE);
+        rb->lcd_drawrect(x,y,SPOTS_WIDTH,SPOTS_HEIGHT);
         rb->lcd_set_foreground(old_fg);
 #endif
     }
