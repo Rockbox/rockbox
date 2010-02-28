@@ -431,18 +431,6 @@ struct gui_img* find_image(char label, struct wps_data *data)
     return NULL;
 }
 
-struct skin_font* find_font(int id, struct wps_data *data)
-{
-    struct skin_token_list *list = data->fonts;
-    while (list)
-    {
-        struct skin_font *f = (struct skin_font*)list->token->value.data;
-        if (f->id == id)
-            return f;
-        list = list->next;
-    }
-    return NULL;
-}
 #endif
 
 /* traverse the viewport linked list for a viewport */
@@ -705,10 +693,11 @@ static int parse_image_load(const char *wps_bufptr,
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);
 }
-
-/* this array acts as a simple mapping between the id the user uses for a font
- * and the id the font actually gets from the font loader.
- * font id 2 is always the first skin font (regardless of how many screens */
+struct skin_font {
+    int id; /* the id from font_load */
+    char *name;  /* filename without path and extension */
+};
+static struct skin_font skinfonts[MAXUSERFONTS];
 static int parse_font_load(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
 {
@@ -716,7 +705,6 @@ static int parse_font_load(const char *wps_bufptr,
     const char *ptr = wps_bufptr;
     int id;
     char *filename;
-    struct skin_font *font;
     
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
@@ -732,24 +720,15 @@ static int parse_font_load(const char *wps_bufptr,
         
     if (id <= FONT_UI || id >= MAXFONTS-1)
         return WPS_ERROR_INVALID_PARAM;
-
-    font = skin_buffer_alloc(sizeof(struct skin_font));
-    int len = ptr-filename+1;
-    char* name = skin_buffer_alloc(len);
-    if (!font || !name)
-        return WPS_ERROR_INVALID_PARAM;
-
-    strlcpy(name, filename, len);
-    font->id = id;
-    font->font_id = -1;
-    font->name = name;
-
-    struct skin_token_list *item = new_skin_token_list_item(NULL, font);
-
-    if (!item)
-        return WPS_ERROR_INVALID_PARAM;
-    add_to_ll_chain(&wps_data->fonts, item);
-
+#if defined(DEBUG) || defined(SIMULATOR)
+    if (skinfonts[id-FONT_FIRSTUSERFONT].name != NULL)
+    {
+        DEBUGF("font id %d already being used\n", id);
+    }
+#endif
+    skinfonts[id-FONT_FIRSTUSERFONT].id = -1;
+    skinfonts[id-FONT_FIRSTUSERFONT].name = filename;
+    
     return skip_end_of_line(wps_bufptr);
 }
     
@@ -1974,7 +1953,8 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
 static void skin_data_reset(struct wps_data *wps_data)
 {
 #ifdef HAVE_LCD_BITMAP
-    wps_data->images =  wps_data->progressbars = wps_data->fonts = NULL;
+    wps_data->images = NULL;
+    wps_data->progressbars = NULL;
 #endif
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     wps_data->backdrop = NULL;
@@ -2121,7 +2101,7 @@ static bool skin_load_fonts(struct wps_data *data)
         int skin_font_id = vp->font-1;
 
         /* now find the corresponding skin_font */
-        struct skin_font *font = find_font(skin_font_id, data);
+        struct skin_font *font = &skinfonts[skin_font_id-FONT_FIRSTUSERFONT];
         if (!font)
         {
             DEBUGF("Could not find font %d\n", skin_font_id);
@@ -2131,10 +2111,14 @@ static bool skin_load_fonts(struct wps_data *data)
 
         /* load the font - will handle loading the same font again if
          * multiple viewports use the same */
-        if (font->font_id < 0)
-            font->font_id = skin_font_load(font->name);
+        if (font->id < 0)
+        {
+            char *bar = strchr(font->name, '|');
+            *bar = '\0';
+            font->id = skin_font_load(font->name);
+        }
 
-        if (font->font_id < 0)
+        if (font->id < 0)
         {
             DEBUGF("Unable to load font %d: '%s.fnt'\n",
                     skin_font_id, font->name);
@@ -2143,7 +2127,7 @@ static bool skin_load_fonts(struct wps_data *data)
         }
 
         /* finally, assign the font_id to the viewport */
-        vp->font = font->font_id;
+        vp->font = font->id;
     }
     return success;
 }

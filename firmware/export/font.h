@@ -51,7 +51,8 @@ enum {
 #ifdef HAVE_REMOTE_LCD
     FONT_UI_REMOTE, /* UI font for remote LCD */
 #endif
-    SYSTEMFONTCOUNT /* Number of fonts reserved for the system and ui */
+    SYSTEMFONTCOUNT, /* Number of fonts reserved for the system and ui */
+    FONT_FIRSTUSERFONT = 2
 };
 
 #define MAXFONTS 10

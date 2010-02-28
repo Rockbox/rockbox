@@ -264,12 +264,6 @@ struct skin_albumart {
 };
 #endif
 
-struct skin_font {
-    int id; /* the id used in the %V tags */
-    int font_id; /* the id returned by font_load */
-    char *name;  /* filename without path and extension */
-};
-
 /* wps_data
    this struct holds all necessary data which describes the
    viewable content of a wps */
@@ -278,7 +272,6 @@ struct wps_data
 #ifdef HAVE_LCD_BITMAP
     struct skin_token_list *images;
     struct skin_token_list *progressbars;
-    struct skin_token_list *fonts;
 #endif
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     char *backdrop;
