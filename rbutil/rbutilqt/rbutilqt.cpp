@@ -1257,7 +1257,7 @@ void RbUtilQt::downloadUpdateDone(bool error)
     else {
         QString toParse(update->readAll());
         
-        QRegExp searchString("<a[^>]*>(rbutilqt[^<]*)</a>");
+        QRegExp searchString("<a[^>]*>([a-zA-Z]+[^<]*)</a>");
         QStringList rbutilList;
         int pos = 0;
         while ((pos = searchString.indexIn(toParse, pos)) != -1) 

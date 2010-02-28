@@ -200,7 +200,7 @@ dbg {
     message("release")
 }
 
-TARGET = rbutilqt
+TARGET = RockboxUtility
 
 FORMS += rbutilqtfrm.ui \
  aboutbox.ui \

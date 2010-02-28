@@ -63,15 +63,15 @@ except ImportError:
 # == Global stuff ==
 # Windows nees some special treatment. Differentiate between program name
 # and executable filename.
-program = "rbutilqt"
+program = "RockboxUtility"
 project = "rbutil/rbutilqt/rbutilqt.pro"
 environment = os.environ
 make = "make"
 if sys.platform == "win32":
-    progexe = "Release/rbutilqt.exe"
+    progexe = "Release/" + program + ".exe"
     make = "mingw32-make"
 elif sys.platform == "darwin":
-    progexe = "rbutilqt.app"
+    progexe = program + ".app"
     # OS X 10.6 defaults to gcc 4.2. Building universal binaries that are
     # compatible with 10.4 requires using gcc-4.0.
     if not "QMAKESPEC" in environment:
