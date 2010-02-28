@@ -40,6 +40,7 @@ class CreateVoiceWindow : public QDialog
         void accept(void);
         void change(void);
         void updateSettings(void);
+        void saveSettings(void);
 
     signals:
         void settingsUpdated(void);

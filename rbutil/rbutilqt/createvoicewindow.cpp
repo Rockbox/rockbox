@@ -35,6 +35,10 @@ CreateVoiceWindow::CreateVoiceWindow(QWidget *parent) : QDialog(parent)
 
 void CreateVoiceWindow::change()
 {
+    // save window settings
+    saveSettings();
+
+    // call configuration dialog
     Config *cw = new Config(this,4);
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
     cw->show();    
@@ -45,19 +49,13 @@ void CreateVoiceWindow::accept()
     logger = new ProgressLoggerGui(this);
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
     logger->show();    
-    
-    QString lang = ui.comboLanguage->currentText();
-    int wvThreshold = ui.wavtrimthreshold->value();
-    
-    //safe selected language
-    RbSettings::setValue(RbSettings::VoiceLanguage, lang);
-    RbSettings::setValue(RbSettings::WavtrimThreshold, wvThreshold);
-    RbSettings::sync();
+
+    saveSettings();
     
     //configure voicecreator
     voicecreator->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
-    voicecreator->setLang(lang);
-    voicecreator->setWavtrimThreshold(wvThreshold);
+    voicecreator->setLang(ui.comboLanguage->currentText());
+    voicecreator->setWavtrimThreshold(ui.wavtrimthreshold->value());
        
     //start creating
     connect(voicecreator, SIGNAL(done(bool)), logger, SLOT(setFinished()));
@@ -119,6 +117,15 @@ void CreateVoiceWindow::updateSettings(void)
 }
 
 
-
-
-
+/** @brief save options
+  */
+void CreateVoiceWindow::saveSettings(void)
+{
+    // save selected language
+    RbSettings::setValue(RbSettings::VoiceLanguage,
+                         ui.comboLanguage->currentText());
+    // save wavtrim threshold value
+    RbSettings::setValue(RbSettings::WavtrimThreshold,
+                         ui.wavtrimthreshold->value());
+    RbSettings::sync();
+}
