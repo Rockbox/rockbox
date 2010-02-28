@@ -30,7 +30,7 @@
 #include "metadata_parsers.h"
 #include "logf.h"
 
-static int bitspersamples[28] = {
+static unsigned char bitspersamples[28] = {
     0,
     8,  /* G.711 MULAW */
     8,  /* 8bit  */
