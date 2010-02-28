@@ -35,6 +35,7 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
 #include "lib/configfile.h"
+#include "lib/highscore.h"
 #include "lib/playback_control.h"
 
 PLUGIN_HEADER
@@ -235,15 +236,18 @@ PLUGIN_HEADER
 #define BOARD_WIDTH (LCD_WIDTH/4)
 #define BOARD_HEIGHT (LCD_HEIGHT/4)
 
-static int board[BOARD_WIDTH][BOARD_HEIGHT],snakelength;
-static unsigned int score,hiscore=0,level=1;
-static int dir;
-static bool apple, dead;
-
 #define CONFIG_FILE_NAME "snake.cfg"
+#define SCORE_FILE PLUGIN_GAMES_DIR "/snake.score"
+#define NUM_SCORES 5
+
+static int board[BOARD_WIDTH][BOARD_HEIGHT],snakelength;
+static unsigned int score, level = 1;
+static int dir;
+static bool apple, dead, ingame;
+static struct highscore highscores[NUM_SCORES];
+
 static struct configdata config[] = {
-   {TYPE_INT, 0, 10, { .int_p = &level }, "level", NULL},
-   {TYPE_INT, 0, 10000, { .int_p = &hiscore }, "hiscore", NULL},
+    {TYPE_INT, 1, 9, { .int_p = &level }, "level", NULL},
 };
 
 static void snake_die (void)
@@ -253,12 +257,12 @@ static void snake_die (void)
     rb->snprintf(pscore,sizeof(pscore),"Your score: %d",score);
     rb->lcd_puts(0,0,"Oops...");
     rb->lcd_puts(0,1, pscore);
-    if (score>hiscore) {
-        hiscore=score;
+    if (highscore_update(score, level, "", highscores, NUM_SCORES) == 0) {
         rb->lcd_puts(0,2,"New High Score!");
     }
     else {
-        rb->snprintf(pscore,sizeof(pscore),"High Score: %d",hiscore);
+        rb->snprintf(pscore, sizeof(pscore),
+                    "High Score: %d", highscores[0].score);
         rb->lcd_puts(0,2,pscore);
     }
     rb->lcd_update();
@@ -379,30 +383,20 @@ static void snake_game_init(void) {
     dead=false;
     snakelength=4;
     score=0;
-    board[11][7]=1;   
+    dir=1;
+    board[11][7]=1;
 }
 
-static void snake_choose_level(void)
-{
-    rb->set_int("Snake Speed", "", UNIT_INT, &level, NULL, 1, 1, 9, NULL);
-}
-
-static bool _ingame;
 static int snake_menu_cb(int action, const struct menu_item_ex *this_item)
 {
     if(action == ACTION_REQUEST_MENUITEM
-       && !_ingame && ((intptr_t)this_item)==0)
+       && !ingame && ((intptr_t)this_item)==0)
         return ACTION_EXIT_MENUITEM;
     return action;
 }
 
-static int snake_game_menu(bool ingame)
+static int snake_game_menu(void)
 {
-    rb->button_clear_queue();
-    int choice = 0;
-    
-    _ingame = ingame;
-
     MENUITEM_STRINGLIST(main_menu,"Snake Menu",snake_menu_cb,
                         "Resume Game",
                         "Start New Game",
@@ -410,10 +404,12 @@ static int snake_game_menu(bool ingame)
                         "High Score",
                         "Playback Control",
                         "Quit");
-                             
+    int selected = 0;
+
+    rb->button_clear_queue();
+
     while (true) {
-        choice = rb->do_menu(&main_menu, &choice, NULL, false);
-        switch (choice) {
+        switch (rb->do_menu(&main_menu, &selected, NULL, false)) {
             case 0:
                 snake_redraw();
                 return 0;
@@ -421,10 +417,12 @@ static int snake_game_menu(bool ingame)
                 snake_game_init();
                 return 0;
             case 2:
-                snake_choose_level();
+                rb->set_int("Snake Speed", "", UNIT_INT, &level,
+                            NULL, 1, 1, 9, NULL);
                 break;
             case 3:
-                rb->splashf(HZ*2, "High Score: %d", hiscore);
+                highscore_show(-1, highscores, NUM_SCORES, true);
+                rb->lcd_setfont(FONT_UI);
                 break;
             case 4:
                 playback_control(NULL);
@@ -442,17 +440,18 @@ static int snake_game_menu(bool ingame)
 static int snake_game_loop (void) {
     int button;
     short x,y;
-    bool pause = false; 
-    
-    if (snake_game_menu(false)==1)
+    bool pause = false;
+
+    if (snake_game_menu())
         return 1;
 
+    ingame = true;
     while (true) {
         if (!pause) {
             snake_frame();
             if (dead) {
-                if (snake_game_menu(false)==1)
-                    return 1;
+                ingame = false;
+                return 0;
             }
             if (!apple) {
                 do {
@@ -469,26 +468,24 @@ static int snake_game_loop (void) {
         }
 
         button=rb->button_get(false);
-        
+
 #ifdef HAS_BUTTON_HOLD
-        if (rb->button_hold()) {
-            pause = true;
-            rb->splash (HZ, "Paused");
-        }
+        if (rb->button_hold() && !pause)
+            button = SNAKE_PLAYPAUSE;
 #endif
         switch (button) {
-             case SNAKE_UP:
-                 if (dir!=2) dir=0;
-                 break;
-             case SNAKE_RIGHT:
-                 if (dir!=3) dir=1;
-                 break;
-             case SNAKE_DOWN:
-                 if (dir!=0) dir=2;
-                 break;
-             case SNAKE_LEFT:
-                 if (dir!=1) dir=3;
-                 break;
+            case SNAKE_UP:
+                if (dir!=2) dir=0;
+                break;
+            case SNAKE_RIGHT:
+                if (dir!=3) dir=1;
+                break;
+            case SNAKE_DOWN:
+                if (dir!=0) dir=2;
+                break;
+            case SNAKE_LEFT:
+                if (dir!=1) dir=3;
+                break;
             case SNAKE_PLAYPAUSE:
                 pause = !pause;
                 if (pause)
@@ -497,16 +494,14 @@ static int snake_game_loop (void) {
                     snake_redraw();
                 break;
 #ifdef SNAKE_RC_QUIT
-             case SNAKE_RC_QUIT:
+            case SNAKE_RC_QUIT:
 #endif
-             case SNAKE_QUIT:
-                    pause = false;
-                    if (snake_game_menu(true)==1)
-                        return 1;
+            case SNAKE_QUIT:
+                return 0;
                 break;
             default:
                 if (rb->default_event_handler (button) == SYS_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
+                    return 1;
                 break;
         }
     }
@@ -516,10 +511,14 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-    configfile_load(CONFIG_FILE_NAME,config,2,0);
+    configfile_load(CONFIG_FILE_NAME, config, 1, 0);
+    highscore_load(SCORE_FILE, highscores, NUM_SCORES);
     rb->lcd_clear_display();
-    snake_game_loop();
-    configfile_save(CONFIG_FILE_NAME,config,2,0);
+    ingame = false;
+    while(snake_game_loop() == 0)
+        ;
+    configfile_save(CONFIG_FILE_NAME, config, 1, 0);
+    highscore_save(SCORE_FILE, highscores, NUM_SCORES);
     return PLUGIN_OK;
 }
 #endif
