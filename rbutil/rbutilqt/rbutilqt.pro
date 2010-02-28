@@ -272,11 +272,13 @@ unix:static {
 }
 
 macx {
+    SOURCES += base/ttscarbon.cpp
+    HEADERS += base/ttscarbon.h
     QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
     QMAKE_LFLAGS_PPC=-mmacosx-version-min=10.4 -arch ppc
     QMAKE_LFLAGS_X86=-mmacosx-version-min=10.4 -arch i386
     CONFIG+=x86 ppc
-    LIBS += -L/usr/local/lib -framework IOKit -framework CoreFoundation -lz
+    LIBS += -L/usr/local/lib -framework IOKit -framework CoreFoundation -framework Carbon -lz
     INCLUDEPATH += /usr/local/include
     QMAKE_INFO_PLIST = Info.plist
     RC_FILE = icons/rbutilqt.icns

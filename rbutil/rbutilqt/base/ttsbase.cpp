@@ -22,6 +22,9 @@
 #include "ttsfestival.h"
 #include "ttssapi.h"
 #include "ttsexes.h"
+#if defined(Q_OS_MACX)
+#include "ttscarbon.h"
+#endif
 
 // list of tts names and identifiers
 QMap<QString,QString> TTSBase::ttsList;
@@ -43,6 +46,9 @@ void TTSBase::initTTSList()
 #if defined(Q_OS_LINUX)
     ttsList["festival"] = "Festival TTS Engine";
 #endif
+#if defined(Q_OS_MACX)
+    ttsList["carbon"] = "OS X System Engine";
+#endif
 }
 
 // function to get a specific encoder
@@ -62,6 +68,14 @@ TTSBase* TTSBase::getTTS(QObject* parent,QString ttsName)
     if (ttsName == "festival")
     {
         tts = new TTSFestival(parent);
+        return tts;
+    }
+    else
+#endif
+#if defined(Q_OS_MACX)
+    if(ttsName == "carbon")
+    {
+        tts = new TTSCarbon(parent);
         return tts;
     }
     else
