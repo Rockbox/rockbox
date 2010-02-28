@@ -1106,6 +1106,8 @@ enum plugin_status plugin_start(const void* parameter)
     rb->cpu_boost(true);
 #endif
 
+    rb->mutex_init(&input_mutex);
+
     /* Defaults */
     bool run = true;
     graph_settings.mode = 0;
