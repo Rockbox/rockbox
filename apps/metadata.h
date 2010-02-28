@@ -81,6 +81,7 @@ enum
     AFMT_SMAF,         /* SMAF */
     AFMT_AU,           /* Sun Audio file */
     AFMT_VOX,          /* VOX */
+    AFMT_WAVE64,       /* Wave64 */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -

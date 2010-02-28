@@ -174,6 +174,15 @@ int read_uint64le(int fd, uint64_t* buf)
 }
 #endif
 
+/* Read an unaligned 64-bit little endian unsigned integer from buffer. */
+uint64_t get_uint64_le(void* buf)
+{
+    unsigned char* p = (unsigned char*) buf;
+
+    return p[0] | (p[1] << 8)  | (p[2] << 16) | (p[3] << 24) | ((uint64_t)p[4] << 32) |
+                  ((uint64_t)p[5] << 40) | ((uint64_t)p[6] << 48) | ((uint64_t)p[7] << 56);
+}
+
 /* Read an unaligned 32-bit little endian long from buffer. */
 unsigned long get_long_le(void* buf)
 {

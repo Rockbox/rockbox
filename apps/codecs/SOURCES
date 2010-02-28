@@ -30,6 +30,7 @@ adx.c
 smaf.c
 au.c
 vox.c
+wav64.c
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
 /* encoders */
 aiff_enc.c

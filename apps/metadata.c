@@ -174,6 +174,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* VOX (Dialogic telephony file formats) */
     [AFMT_VOX] =
         AFMT_ENTRY("VOX",  "vox",   NULL,          "vox\0"      ),
+    /* Wave64 */
+    [AFMT_WAVE64] =
+        AFMT_ENTRY("WAVE64",  "wav64",   NULL,          "w64\0"      ),
 #endif
 };
 
@@ -477,6 +480,14 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         if (!get_vox_metadata(fd, id3))
         {
             DEBUGF("get_vox_metadata error\n");
+            return false;
+        }
+        break;
+        
+    case AFMT_WAVE64:
+        if (!get_wave64_metadata(fd, id3))
+        {
+            DEBUGF("get_wave64_metadata error\n");
             return false;
         }
         break;

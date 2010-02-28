@@ -57,6 +57,7 @@ int read_uint64be(int fd, uint64_t* buf);
 #define read_uint64le(fd,buf) read((fd), (buf), 8)
 #endif
 
+uint64_t get_uint64_le(void* buf);
 unsigned long get_long_le(void* buf);
 unsigned short get_short_le(void* buf);
 unsigned long get_long_be(void* buf);
