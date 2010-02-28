@@ -64,7 +64,7 @@ struct viewport_stack_item
 
 #ifdef HAVE_LCD_BITMAP
 static void viewportmanager_redraw(void* data);
-   
+
 static int theme_stack_top[NB_SCREENS]; /* the last item added */
 static struct viewport_stack_item theme_stack[NB_SCREENS][VPSTACK_DEPTH];
 static bool is_theme_enabled(enum screen_type screen);
@@ -91,7 +91,7 @@ static void toggle_events(bool enable)
         remove_event(PLAYBACK_EVENT_TRACK_CHANGE, do_sbs_update_callback);
         remove_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, do_sbs_update_callback);
         remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
-    }   
+    }
 }
 
 
@@ -162,6 +162,7 @@ static void toggle_theme(enum screen_type screen, bool force)
                 screens[screen].clear_viewport();
                 screens[screen].update_viewport();
             }
+            screens[screen].set_viewport(NULL);
         }
         intptr_t force = first_boot?0:1;
         send_event(GUI_EVENT_ACTIONUPDATE, (void*)force);
@@ -228,8 +229,8 @@ static void viewportmanager_redraw(void* data)
     FOR_NB_SCREENS(i)
     {
 #ifdef HAVE_LCD_BITMAP
-       if (statusbar_position(i) == STATUSBAR_CUSTOM)
-           sb_skin_update(i, NULL != data);
+        if (statusbar_position(i) == STATUSBAR_CUSTOM)
+            sb_skin_update(i, NULL != data);
         else if (statusbar_position(i) != STATUSBAR_OFF)
 #endif
             gui_statusbar_draw(&statusbars.statusbars[i], NULL != data);
@@ -244,7 +245,7 @@ void viewportmanager_init()
     {
         theme_stack_top[i] = -1; /* the next call fixes this to 0 */
         /* We always want the theme enabled by default... */
-        viewportmanager_theme_enable(i, true, NULL); 
+        viewportmanager_theme_enable(i, true, NULL);
     }
 #else
     add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
@@ -266,7 +267,7 @@ void viewportmanager_theme_changed(const int which)
     {
     }
     if (which & THEME_LANGUAGE)
-    {   
+    {
     }
     if (which & THEME_STATUSBAR)
     {
@@ -353,20 +354,19 @@ void viewport_set_defaults(struct viewport *vp,
                             const enum screen_type screen)
 {
 #if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
-    
     struct viewport *sbs_area = NULL;
     if (!is_theme_enabled(screen))
     {
-       viewport_set_fullscreen(vp, screen);
-       return;
+        viewport_set_fullscreen(vp, screen);
+        return;
     }
     sbs_area = sb_skin_get_info_vp(screen);
     
     if (sbs_area)
         *vp = *sbs_area;
-    else  
+    else
 #endif /* HAVE_LCD_BITMAP */
-        viewport_set_fullscreen(vp, screen);  
+        viewport_set_fullscreen(vp, screen);
 }
 
 
@@ -418,7 +418,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
     /* X and Y *must* be set */
     if (!LIST_VALUE_PARSED(set, PL_X) || !LIST_VALUE_PARSED(set, PL_Y))
         return NULL;
-    /* check for negative values */        
+    /* check for negative values */
     if (vp->x < 0)
         vp->x += screens[screen].lcdwidth;
     if (vp->y < 0)
