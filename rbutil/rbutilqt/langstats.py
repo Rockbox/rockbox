@@ -29,6 +29,7 @@ import tempfile
 import os
 import shutil
 from datetime import date
+import time
 
 
 langs = {
@@ -162,6 +163,8 @@ def main():
     client = pysvn.Client()
     # scan output
     i = 0
+    tslateststamp = 0
+    tsoldeststamp = time.time()
     while i < len(lines):
         line = lines[i]
         if re_updating.search(line):
@@ -170,6 +173,10 @@ def main():
             fileinfo = client.info2(svnserver + langbase + tsfile)[0][1]
             tsrev = fileinfo.last_changed_rev.number
             tsdate = date.fromtimestamp(fileinfo.last_changed_date).isoformat()
+            if fileinfo.last_changed_date > tslateststamp:
+                tslateststamp = fileinfo.last_changed_date
+            if fileinfo.last_changed_date < tsoldeststamp:
+                tsoldeststamp = fileinfo.last_changed_date
 
             line = lines[i + 1]
             if re_generated.search(line):
@@ -219,6 +226,8 @@ def main():
     if pretty == 1:
         print delim
 
+    print "Last language updated on " + date.fromtimestamp(tslateststamp).isoformat()
+    print "Oldest language update was " + date.fromtimestamp(tsoldeststamp).isoformat()
     shutil.rmtree(workfolder)
 
 
