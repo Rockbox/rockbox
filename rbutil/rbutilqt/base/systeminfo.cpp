@@ -156,18 +156,6 @@ QStringList SystemInfo::languages()
 }
 
 
-QString SystemInfo::name(QString platform)
-{
-    ensureSystemInfoExists();
-    return systemInfos->value(platform + "/name").toString();
-}
-
-QString SystemInfo::brand(QString platform)
-{
-    ensureSystemInfoExists();
-    return systemInfos->value(platform + "/brand").toString();
-}
-
 QMap<int, QString> SystemInfo::usbIdMap(enum MapType type)
 {
     ensureSystemInfoExists();

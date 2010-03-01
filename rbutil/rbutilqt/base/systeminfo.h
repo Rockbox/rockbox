@@ -77,10 +77,6 @@ class SystemInfo : public QObject
                                      QString variant="");
         //! returns a list of all languages
         static QStringList languages(void);
-        //! maps a platform to its name
-        static QString name(QString platform);
-        //! maps a platform to its brand
-        static QString brand(QString platform);
         //! returns a map of usb-ids and their targets
         static QMap<int, QString> usbIdMap(enum MapType);
         //! get a value from system settings

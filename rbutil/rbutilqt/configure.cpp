@@ -309,19 +309,12 @@ void Config::setDevices()
         platformList = SystemInfo::platforms(SystemInfo::PlatformAll);
 
     QMap <QString, QString> manuf;
-    QMap <QString, QString> devcs;
     for(int it = 0; it < platformList.size(); it++)
     {
-        QString curname = SystemInfo::name(platformList.at(it)) +
-            " (" +ServerInfo::platformValue(platformList.at(it),
-                        ServerInfo::CurStatus).toString() + ")";
-        QString curbrand = SystemInfo::brand(platformList.at(it));
+        QString curbrand = SystemInfo::platformValue(platformList.at(it),
+                    SystemInfo::CurBrand).toString();
         manuf.insertMulti(curbrand, platformList.at(it));
-        devcs.insert(platformList.at(it), curname);
     }
-
-    QString platform;
-    platform = devcs.value(RbSettings::value(RbSettings::Platform).toString());
 
     // set up devices table
     ui.treeDevices->header()->hide();
@@ -334,25 +327,28 @@ void Config::setDevices()
     QTreeWidgetItem *w;
     QTreeWidgetItem *w2;
     QTreeWidgetItem *w3 = 0;
+
+    QString selected = RbSettings::value(RbSettings::Platform).toString();
     for(int c = 0; c < brands.size(); c++) {
         w = new QTreeWidgetItem();
         w->setFlags(Qt::ItemIsEnabled);
         w->setText(0, brands.at(c));
         items.append(w);
-
-        // go through platforms again for sake of order
+        // go through platforms and add all players matching the current brand
         for(int it = 0; it < platformList.size(); it++) {
-
-            QString curname = SystemInfo::name(platformList.at(it)) +
-                " (" +ServerInfo::platformValue(platformList.at(it),ServerInfo::CurStatus).toString() +")";
-            QString curbrand = SystemInfo::brand(platformList.at(it));
-
-            if(curbrand != brands.at(c)) continue;
+            // skip if not current brand
+            if(!manuf.values(brands.at(c)).contains(platformList.at(it)))
+                continue;
+            // construct display name
+            QString curname = SystemInfo::platformValue(platformList.at(it),
+                                SystemInfo::CurName).toString() +
+                " (" +ServerInfo::platformValue(platformList.at(it),
+                            ServerInfo::CurStatus).toString() +")";
             qDebug() << "[Config] add supported device:" << brands.at(c) << curname;
             w2 = new QTreeWidgetItem(w, QStringList(curname));
             w2->setData(0, Qt::UserRole, platformList.at(it));
 
-            if(platform.contains(curname)) {
+            if(platformList.at(it) == selected) {
                 w2->setSelected(true);
                 w->setExpanded(true);
                 w3 = w2; // save pointer to hilight old selection
@@ -369,8 +365,10 @@ void Config::setDevices()
     while(widgetitem);
     // add new items
     ui.treeDevices->insertTopLevelItems(0, items);
-    if(w3 != 0)
+    if(w3 != 0) {
         ui.treeDevices->setCurrentItem(w3); // hilight old selection
+        ui.treeDevices->scrollToItem(w3);
+    }
 
     // tts / encoder tab
 
@@ -589,7 +587,8 @@ void Config::autodetect()
 
         // find the new item
         // enumerate all platform items
-        QList<QTreeWidgetItem*> itmList= ui.treeDevices->findItems("*",Qt::MatchWildcard);
+        QList<QTreeWidgetItem*> itmList
+            = ui.treeDevices->findItems("*",Qt::MatchWildcard);
         for(int i=0; i< itmList.size();i++)
         {
             //enumerate device items
@@ -602,6 +601,7 @@ void Config::autodetect()
                     itmList.at(i)->child(j)->setSelected(true); //select the item
                     itmList.at(i)->setExpanded(true); //expand the platform item
                     //ui.treeDevices->indexOfTopLevelItem(itmList.at(i)->child(j));
+                    ui.treeDevices->scrollToItem(itmList.at(i)->child(j));
                     break;
                 }
             }
