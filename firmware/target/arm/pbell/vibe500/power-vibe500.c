@@ -55,7 +55,7 @@ void power_init(void)
        ClipZifnoFinger=0,DisableDeceleration=0,Dribble=0.
        MEP parameter 0x21 - Enhanced Operating Configuration */
     touchpad_set_parameter(0x21,0x0008);
-    /* Set the GPO_LEVEL = 0 - for the button lights */
+    /* Set the GPO_LEVELS = 0 - for the button lights */
     touchpad_set_parameter(0x23,0x0000);
 
     /* Sound unmute (on) */
@@ -94,22 +94,21 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-    /* from the OF */
-/*
-    DEV_INIT2 |= DEV_I2S;
-    GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 0x10);
-    sleep(HZ/100);
-    GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 0x10);
-    sleep(HZ);
-    GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x80);
-    sleep(HZ);
-    GPIO_CLEAR_BITWISE(GPIOC_OUTPUT_VAL, 0x08);
-    GPO32_VAL |= 0x40000000;
-    GPO32_ENABLE |= 0x40000000;
-*/
     /* Sound mute (off) */
     DEV_INIT2 |= DEV_I2S;
     GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 0x10);
     /* shutdown bit */
     GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x80);
+    /* button lights off */
+    touchpad_set_parameter(0x22,0x0000);
+    /* ATA power off */
+    ide_power_enable(false);
+    /* ? - in the OF */
+    GPO32_VAL |= 0x40000000;
+    GPO32_ENABLE |= 0x40000000;
+    /* lcd controller off ? - makes lcd white until power on */
+    GPIO_CLEAR_BITWISE(GPIOJ_OUTPUT_VAL, 0x04);
+    /* a way to poweroff while charging = system_reset */
+    if (power_input_status())
+    system_reboot();
 }
