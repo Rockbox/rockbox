@@ -30,15 +30,16 @@
 #include "metadata_parsers.h"
 #include "logf.h"
 
+/* table of bits per sample / 8 */
 static const unsigned char bitspersamples[28] = {
     0,
-    8,  /* G.711 MULAW */
-    8,  /* 8bit  */
-    16, /* 16bit */
-    24, /* 24bit */
-    32, /* 32bit */
-    32, /* 32bit */
-    64, /* 64bit */
+    1,  /* G.711 MULAW */
+    1,  /* 8bit  */
+    2,  /* 16bit */
+    3,  /* 24bit */
+    4,  /* 32bit */
+    4,  /* 32bit */
+    8,  /* 64bit */
     0,  /* Fragmented sample data */
     0,  /* DSP program */
     0,  /* 8bit fixed point */
@@ -58,10 +59,10 @@ static const unsigned char bitspersamples[28] = {
     0,  /* G.722 */
     0,  /* G.723 3bit */
     0,  /* G.723 5bit */
-    8,  /* G.711 ALAW */
+    1,  /* G.711 ALAW */
 };
 
-static int get_au_bitspersample(unsigned int encoding)
+static inline unsigned char get_au_bitspersample(unsigned int encoding)
 {
     if (encoding > 27)
         return 0;
@@ -72,26 +73,30 @@ bool get_au_metadata(int fd, struct mp3entry* id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char* buf = (unsigned char *)id3->path;
-    unsigned long totalsamples = 0;
-    unsigned long channels = 0;
-    unsigned long bitspersample = 0;
     unsigned long numbytes = 0;
     int read_bytes;
     int offset;
+    unsigned char bits_ch; /* bitspersample * channels */
 
-    id3->vbr = false;   /* All Sun audio files are CBR */
+    id3->vbr      = false;   /* All Sun audio files are CBR */
     id3->filesize = filesize(fd);
+    id3->length   = 0;
 
     if ((lseek(fd, 0, SEEK_SET) < 0) || ((read_bytes = read(fd, buf, 24)) < 0))
         return false;
 
     if (read_bytes < 24 || (memcmp(buf, ".snd", 4) != 0))
     {
-        /* no header */
+        /*
+         * no header
+         *
+         * frequency:       8000 Hz
+         * bits per sample: 8 bit
+         * channel:         mono
+         */
         numbytes = id3->filesize;
-        bitspersample = 8;
         id3->frequency = 8000;
-        channels = 1;
+        bits_ch = 1;
     }
     else
     {
@@ -106,17 +111,14 @@ bool get_au_metadata(int fd, struct mp3entry* id3)
         numbytes = get_long_be(buf + 8);
         if (numbytes == (uint32_t)0xffffffff)
             numbytes = id3->filesize - offset;
-        /* bitspersample */
-        bitspersample = get_au_bitspersample(get_long_be(buf + 12));
-        /* sample rate */
+
+        bits_ch = get_au_bitspersample(get_long_be(buf + 12)) * get_long_be(buf + 20);
         id3->frequency = get_long_be(buf + 16);
-        channels = get_long_be(buf + 20);
     }
 
-    totalsamples = numbytes / ((((bitspersample - 1) / 8) + 1) * channels);
-
-    /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
-    id3->length = ((int64_t) totalsamples * 1000) / id3->frequency;
+    /* Calculate track length [ms] */
+    if (bits_ch)
+        id3->length = ((int64_t)numbytes * 1000LL) / (bits_ch * id3->frequency);
 
     return true;
 }
