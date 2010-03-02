@@ -1124,11 +1124,6 @@ static int parse_progressbar(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM;
 
     struct viewport *vp = &curr_vp->vp;
-#ifndef __PCTOOL__
-    int font_height = font_get(vp->font)->height;
-#else
-    int font_height = 8;
-#endif
     /* we need to know what line number (viewport relative) this pb is,
      * so count them... */
     int line_num = -1;
@@ -1187,7 +1182,18 @@ static int parse_progressbar(const char *wps_bufptr,
         pb->height = height;
     }
     else
-        pb->height = font_height;
+    {
+        if (vp->font > FONT_UI)
+            pb->height = -1; /* calculate at display time */
+        else
+        {
+#ifndef __PCTOOL__
+            pb->height = font_get(vp->font)->height;
+#else
+            pb->height = 8;
+#endif
+        }
+    }
 
     if (LIST_VALUE_PARSED(set, PB_Y)) /* y */
         pb->y = y;

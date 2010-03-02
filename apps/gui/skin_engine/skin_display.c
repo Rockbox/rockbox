@@ -122,6 +122,10 @@ static void draw_progressbar(struct gui_wps *gwps,
     struct progressbar *pb = wps_vp->pb;
     struct mp3entry *id3 = state->id3;
     int y = pb->y;
+    int height = pb->height;
+    
+    if (pb->height < 0 && !pb->have_bitmap_pb)
+        height = font_get(wps_vp->vp.font)->height;
 
     if (y < 0)
     {
@@ -151,19 +155,19 @@ static void draw_progressbar(struct gui_wps *gwps,
                                 length ? elapsed + state->ff_rewind_count : 0,
                                 HORIZONTAL);
     else
-        gui_scrollbar_draw(display, pb->x, y, pb->width, pb->height,
+        gui_scrollbar_draw(display, pb->x, y, pb->width, height,
                            length ? length : 1, 0,
                            length ? elapsed + state->ff_rewind_count : 0,
                            HORIZONTAL);
 #ifdef AB_REPEAT_ENABLE
     if ( ab_repeat_mode_enabled() && length != 0 )
         ab_draw_markers(display, length,
-                        pb->x, pb->x + pb->width, y, pb->height);
+                        pb->x, pb->x + pb->width, y, height);
 #endif
 
     if (id3 && id3->cuesheet)
         cue_draw_markers(display, state->id3->cuesheet, length,
-                         pb->x, pb->x + pb->width, y+1, pb->height-2);
+                         pb->x, pb->x + pb->width, y+1, height-2);
 }
 bool audio_peek_track(struct mp3entry* id3, int offset);
 static void draw_playlist_viewer_list(struct gui_wps *gwps,
