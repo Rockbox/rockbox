@@ -2148,12 +2148,14 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         old_aa.width = wps_data->albumart->width;
     }
 #endif
+#ifdef HAVE_LCD_BITMAP
     int i;
     for (i=0;i<MAXUSERFONTS;i++)
     {
         skinfonts[i].id = -1;
         skinfonts[i].name = NULL;
     }
+#endif
 
     skin_data_reset(wps_data);
     curr_screen = screen;
@@ -2175,7 +2177,9 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     curr_vp->lines         = NULL;
     
     viewport_set_defaults(&curr_vp->vp, screen);
+#ifdef HAVE_LCD_BITMAP
     curr_vp->vp.font = FONT_UI;
+#endif
 
     curr_line = NULL;
     if (!skin_start_new_line(curr_vp, 0))
