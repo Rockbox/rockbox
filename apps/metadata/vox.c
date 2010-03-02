@@ -32,12 +32,17 @@
 
 bool get_vox_metadata(int fd, struct mp3entry* id3)
 {
-    /* vox is headerless format */
-
+    /*
+     * vox is headerless format
+     *
+     * frequency:     8000 Hz
+     * channels:      mono
+     * bitspersample: 4
+     */
     id3->frequency = 8000;
-    id3->vbr = false;   /* All VOX files are CBR */
-    id3->filesize = filesize(fd);
-    id3->length = ((int64_t) id3->filesize * 2000) / id3->frequency;
+    id3->vbr       = false;   /* All VOX files are CBR */
+    id3->filesize  = filesize(fd);
+    id3->length    = id3->filesize >> 2;
 
     return true;
 }

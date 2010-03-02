@@ -48,7 +48,6 @@
 #define WAVE64_GUID_RIFF "riff\x2e\x91\xcf\x11\xa5\xd6\x28\xdb\x04\xc1\x00\x00"
 #define WAVE64_GUID_WAVE "wave\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
 #define WAVE64_GUID_FMT  "fmt \xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
-#define WAVE64_GUID_FACT "fact\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
 #define WAVE64_GUID_DATA "data\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
 
 enum
@@ -90,7 +89,7 @@ static unsigned long get_totalsamples(struct wave_fmt *fmt, struct mp3entry* id3
         case IBM_FORMAT_ALAW:
         case IBM_FORMAT_MULAW:
             totalsamples =
-                 fmt->numbytes / ((((fmt->bitspersample - 1) / 8) + 1) * fmt->channels);
+                 fmt->numbytes / ((fmt->bitspersample >> 3) * fmt->channels);
             break;
         case WAVE_FORMAT_ADPCM:
         case WAVE_FORMAT_DVI_ADPCM:
@@ -103,12 +102,12 @@ static unsigned long get_totalsamples(struct wave_fmt *fmt, struct mp3entry* id3
                 if (fmt->blockalign == ((id3->frequency / 60) + 4) * fmt->channels)
                     fmt->samplesperblock = id3->frequency / 30;
                 else
-                    fmt->samplesperblock = fmt->blockalign * 2 / fmt->channels;
+                    fmt->samplesperblock = (fmt->blockalign << 1) / fmt->channels;
             }
             totalsamples = (fmt->numbytes / fmt->blockalign) * fmt->samplesperblock;
             break;
         case WAVE_FORMAT_DIALOGIC_OKI_ADPCM:
-            totalsamples = 2 * fmt->numbytes;
+            totalsamples = fmt->numbytes << 1;
             break;
         case WAVE_FORMAT_SWF_ADPCM:
             if (fmt->samplesperblock == 0)
@@ -188,9 +187,7 @@ bool get_wave_metadata(int fd, struct mp3entry* id3)
             if (i < 16)
                 return false;
 
-            read_bytes = 16;
-            if (i > 19)
-                read_bytes = 20;
+            read_bytes = (i > 19)? 20 : 16;
 
             if (read(fd, buf, read_bytes) != read_bytes)
                 return false;
@@ -198,7 +195,7 @@ bool get_wave_metadata(int fd, struct mp3entry* id3)
             offset += read_bytes;
             i -= read_bytes;
 
-            parse_riff_format(buf, i, &fmt, id3);
+            parse_riff_format(buf, read_bytes, &fmt, id3);
 
             /* Check for ATRAC3 stream */
             if (fmt.formattag == WAVE_FORMAT_ATRAC3)
@@ -241,8 +238,7 @@ bool get_wave_metadata(int fd, struct mp3entry* id3)
         }
 
         /* seek to next chunk (even chunk sizes must be padded) */
-        if (i & 0x01)
-            i++;
+        i += (i & 0x01);
 
         if(lseek(fd, i, SEEK_CUR) < 0)
             return false;
@@ -290,7 +286,7 @@ bool get_wave64_metadata(int fd, struct mp3entry* id3)
     if ((memcmp(buf   , WAVE64_GUID_RIFF, 16) != 0)||
         (memcmp(buf+24, WAVE64_GUID_WAVE, 16) != 0))
     {
-        DEBUGF("metada error: does not wave64 file\n");
+        DEBUGF("metadata error: does not wave64 file\n");
         return false;
     }
 
@@ -302,7 +298,7 @@ bool get_wave64_metadata(int fd, struct mp3entry* id3)
             return false;
 
         /* chunkSize (excludes GUID and size length) */
-        i = get_uint64_le(&buf[16]) - 24;
+        i = get_uint64_le(buf + 16) - 24;
 
         if (memcmp(buf, WAVE64_GUID_FMT, 16) == 0)
         {
@@ -310,19 +306,16 @@ bool get_wave64_metadata(int fd, struct mp3entry* id3)
             if (i < 16)
                 return false;
 
-            read_bytes = 16;
-            if (i > 16)
-            {
-                read_bytes = 24;
-                if (i < 24)
-                    i = 24;
-            }
+            read_bytes = (i > 16)? 24 : 16;
+            if ((int)i < read_bytes)
+                i = 0;
+            else
+                i -= read_bytes;
 
             /* get rest of chunk */
             if (read(fd, buf, read_bytes) < read_bytes)
                 return false;
 
-            i -= read_bytes;
             parse_riff_format(buf, read_bytes, &fmt, id3);
         }
         else if (memcmp(buf, WAVE64_GUID_DATA, 16) == 0)
@@ -331,15 +324,9 @@ bool get_wave64_metadata(int fd, struct mp3entry* id3)
             fmt.numbytes = i;
             break;
         }
-        else if (memcmp(buf, WAVE64_GUID_FACT, 16) == 0)
-        {
-            /* Skip 'fact' chunk */
-            DEBUGF("find 'fact' chunk\n");
-        }
 
         /* seek to next chunk (8byte bound) */
-        if (i & 0x07)
-            i += 8 - (i & 0x7);
+        i += (1 + ~i) & 0x07;
 
         if(lseek(fd, i, SEEK_CUR) < 0)
             return false;
@@ -359,7 +346,7 @@ bool get_wave64_metadata(int fd, struct mp3entry* id3)
     id3->vbr = false;   /* All Wave64 files are CBR */
     id3->filesize = filesize(fd);
 
-    /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
+    /* Calculate track length [ms] */
     id3->length = ((int64_t) totalsamples * 1000) / id3->frequency;
 
     return true;
