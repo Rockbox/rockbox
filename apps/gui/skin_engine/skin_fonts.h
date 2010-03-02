@@ -32,6 +32,7 @@
 #ifndef _SKINFONTS_H_
 #define _SKINFONTS_H_
 
+#define MAXUSERFONTS (MAXFONTS - SYSTEMFONTCOUNT)
 
 void skin_font_init(void);
 

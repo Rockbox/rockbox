@@ -54,10 +54,9 @@ enum {
     SYSTEMFONTCOUNT, /* Number of fonts reserved for the system and ui */
     FONT_FIRSTUSERFONT = 2
 };
-#define MAXUSERFONTS 8
 
-/* SYSFONT, FONT_UI, FONT_UI_REMOTE + MAXUSERFONTS fonts in skins */
-#define MAXFONTS (SYSTEMFONTCOUNT + MAXUSERFONTS)
+/* SYSFONT, FONT_UI, FONT_UI_REMOTE + 8 fonts in skins */
+#define MAXFONTS 11
 
 /*
  * .fnt loadable font file format definition

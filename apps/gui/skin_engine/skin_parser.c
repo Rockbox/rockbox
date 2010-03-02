@@ -935,6 +935,14 @@ static int parse_viewport(const char *wps_bufptr,
     else
         vp->flags &= ~VP_FLAG_ALIGN_RIGHT; /* ignore right-to-left languages */
 
+    /* increment because font==2 and FONT_UI_REMOTE is ambiguous */
+    if (vp->font > FONT_UI)
+        vp->font++;
+#ifdef HAVE_REMOTE_LCD
+    if (vp->font == FONT_UI && curr_screen == SCREEN_REMOTE)
+        vp->font = FONT_UI_REMOTE;
+#endif
+
     struct skin_token_list *list = new_skin_token_list_item(NULL, skin_vp);
     if (!list)
         return WPS_ERROR_INVALID_PARAM;
@@ -2080,7 +2088,6 @@ static bool skin_load_fonts(struct wps_data *data)
     /* don't spit out after the first failue to aid debugging */
     bool success = true;
     struct skin_token_list *vp_list;
-    int font_id;
     /* walk though each viewport and assign its font */
     for(vp_list = data->viewports; vp_list; vp_list = vp_list->next)
     {
@@ -2090,21 +2097,20 @@ static bool skin_load_fonts(struct wps_data *data)
         struct viewport *vp = &skin_vp->vp;
 
 
-        if (vp->font <= FONT_UI)
+        if (vp->font < SYSTEMFONTCOUNT)
         {   /* the usual case -> built-in fonts */
-#ifdef HAVE_REMOTE_LCD
-            if (vp->font == FONT_UI)
-                vp->font += curr_screen;
-#endif
             continue;
         }
-        font_id = vp->font;
+
+        /* decrement, because font has been incremented in viewport parsing
+         * due to the FONT_UI_REMOTE ambiguity */
+        int skin_font_id = vp->font-1;
 
         /* now find the corresponding skin_font */
-        struct skin_font *font = &skinfonts[font_id-FONT_FIRSTUSERFONT];
+        struct skin_font *font = &skinfonts[skin_font_id-FONT_FIRSTUSERFONT];
         if (!font)
         {
-            DEBUGF("Could not find font %d\n", font_id);
+            DEBUGF("Could not find font %d\n", skin_font_id);
             success = false;
             continue;
         }
@@ -2121,7 +2127,7 @@ static bool skin_load_fonts(struct wps_data *data)
         if (font->id < 0)
         {
             DEBUGF("Unable to load font %d: '%s.fnt'\n",
-                    font_id, font->name);
+                    skin_font_id, font->name);
             success = false;
             continue;
         }
@@ -2154,14 +2160,6 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         old_aa.width = wps_data->albumart->width;
     }
 #endif
-#ifdef HAVE_LCD_BITMAP
-    int i;
-    for (i=0;i<MAXUSERFONTS;i++)
-    {
-        skinfonts[i].id = -1;
-        skinfonts[i].name = NULL;
-    }
-#endif
 
     skin_data_reset(wps_data);
     curr_screen = screen;
@@ -2183,9 +2181,6 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     curr_vp->lines         = NULL;
     
     viewport_set_defaults(&curr_vp->vp, screen);
-#ifdef HAVE_LCD_BITMAP
-    curr_vp->vp.font = FONT_UI;
-#endif
 
     curr_line = NULL;
     if (!skin_start_new_line(curr_vp, 0))
