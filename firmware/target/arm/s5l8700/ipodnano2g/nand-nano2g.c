@@ -406,9 +406,12 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
         return nand_unlock(rc);
     }
     if (nand_transfer_data(bank, 0, spare, 0x40)) return nand_unlock(1);
-    memcpy(nand_ecc, &spare[0xC], 0x28);
-    rc |= (ecc_decode(3, data, nand_ecc) & 0xF) << 4;
-    if (databuffer && data != databuffer) memcpy(databuffer, data, 0x800);
+    if (databuffer)
+    {
+        memcpy(nand_ecc, &spare[0xC], 0x28);
+        rc |= (ecc_decode(3, data, nand_ecc) & 0xF) << 4;
+        if (data != databuffer) memcpy(databuffer, data, 0x800);
+    }
     memset(nand_ctrl, 0xFF, 0x200);
     memcpy(nand_ctrl, spare, 0xC);
     memcpy(nand_ecc, &spare[0x34], 0xC);

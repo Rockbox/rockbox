@@ -113,19 +113,19 @@ struct ftl_cxt_type
     /* Count of currently free pages in the block pool */
     uint16_t freecount;
 
-    /* Index to the first free block in the blockpool ring buffer */
+    /* Index to the first free hyperblock in the blockpool ring buffer */
     uint16_t nextfreeidx;
 
     /* This is a counter that is used to better distribute block
        wear. It is incremented on every block erase, and if it
        gets too high (300 on writes, 20 on sync), the most and
-       least worn block will be swapped (inferring an additional
+       least worn hyperblock will be swapped (causing an additional
        block write) and the counter will be decreased by 20. */
     uint16_t swapcounter;
 
-    /* Ring buffer of currently free blocks. nextfreeidx is the
+    /* Ring buffer of currently free hyperblocks. nextfreeidx is the
        index to freecount free ones, the other ones are currently
-       allocated for scattered page blocks. */
+       allocated for scattered page hyperblocks. */
     uint16_t blockpool[0x14];
 
     /* Alignment to 32 bits */
@@ -153,7 +153,7 @@ struct ftl_cxt_type
     uint32_t ftl_log_ptr;
 
     /* Flag used to indicate that some erase counter pages should be committed
-       as they were changed more than 100 times since the last commit. */
+       because they were changed more than 100 times since the last commit. */
     uint32_t erasedirty;
 
     /* Seems to be unused */
@@ -203,7 +203,7 @@ typedef struct ftl_vfl_cxt_type
        into vflcxtblocks. */
     uint16_t activecxtblock;
 
-    /* Number of the first free page in the active FTL context block */
+    /* Number of the first free page in the active VFL context block */
     uint16_t nextcxtpage;
 
     /* Seems to be unused */
@@ -270,7 +270,8 @@ union ftl_spare_data_type
         /* Seems to be unused */
         uint8_t field_8;
 
-        /* Type field, 0x40 (data page) or 0x41 (last data page of block) */
+        /* Type field, 0x40 (data page) or 0x41
+           (last data page of hyperblock) */
         uint8_t type;
 
         /* ECC mark, usually 0xFF. If an error occurred while reading the
@@ -379,7 +380,7 @@ union ftl_spare_data_type ftl_sparebuffer __attribute__((aligned(16)));
 /* Lowlevel BBT for each bank */
 uint8_t ftl_bbt[4][0x410];
 
-/* Erase countes for the vBlocks */
+/* Erase counters for the vBlocks */
 uint16_t ftl_erasectr[0x2000];
 
 /* Used by ftl_log */
@@ -462,8 +463,8 @@ uint32_t ftl_load_bbt(uint32_t bank, uint8_t* bbt)
     if (memcmp(&ftl_buffer[0x18], "BBT", 4) != 0) return 1;
     unk1 = ((uint16_t*)ftl_buffer)[0x10];
     unk2 = ((uint16_t*)ftl_buffer)[0x11];
-    unk3 = ((uint16_t*)ftl_buffer)[((uint32_t*)ftl_buffer)[4] * 0xC + 10]
-         + ((uint16_t*)ftl_buffer)[((uint32_t*)ftl_buffer)[4] * 0xC + 11];
+    unk3 = ((uint16_t*)ftl_buffer)[((uint32_t*)ftl_buffer)[4] * 6 + 10]
+         + ((uint16_t*)ftl_buffer)[((uint32_t*)ftl_buffer)[4] * 6 + 11];
     for (i = 0; i < unk1; i++)
     {
         for (j = 0; ; j++)
@@ -976,16 +977,16 @@ uint32_t ftl_open(void)
     struct ftl_vfl_cxt_type* cxt = ftl_vfl_get_newest_cxt();
 
     uint32_t ftlcxtblock = 0xffffffff;
-    uint32_t minlpn = 0xffffffff;
+    uint32_t minusn = 0xffffffff;
     for (i = 0; i < 3; i++)
     {
         ret = ftl_vfl_read(ppb * (*cxt).ftlctrlblocks[i],
                            ftl_buffer, &ftl_sparebuffer, 1, 0);
         if ((ret &= 0x11F) != 0) continue;
-        if (ftl_sparebuffer.user.type - 0x43 > 4) continue;
-        if (ftlcxtblock != 0xffffffff && ftl_sparebuffer.user.lpn >= minlpn)
+        if (ftl_sparebuffer.meta.type - 0x43 > 4) continue;
+        if (ftlcxtblock != 0xffffffff && ftl_sparebuffer.meta.usn >= minusn)
             continue;
-        minlpn = ftl_sparebuffer.user.lpn;
+        minusn = ftl_sparebuffer.meta.usn;
         ftlcxtblock = (*cxt).ftlctrlblocks[i];
     }
 
@@ -998,7 +999,7 @@ uint32_t ftl_open(void)
         ret = ftl_vfl_read(ppb * ftlcxtblock + i,
                            ftl_buffer, &ftl_sparebuffer, 1, 0);
         if ((ret & 0x11F) != 0) continue;
-        else if (ftl_sparebuffer.user.type == 0x43)
+        else if (ftl_sparebuffer.meta.type == 0x43)
         {
             memcpy(&ftl_cxt, ftl_buffer, 0x28C);
             ftlcxtfound = 1;
