@@ -142,6 +142,12 @@ static char *get_token_desc(struct wps_token *token, char *buf,
             break;
 
 #ifdef HAVE_LCD_BITMAP
+        case WPS_TOKEN_LIST_TITLE_TEXT:
+            snprintf(buf, bufsize, "list title text");
+            break;
+        case WPS_TOKEN_LIST_TITLE_ICON:
+            snprintf(buf, bufsize, "list title icon");
+            break;
         case WPS_TOKEN_IMAGE_PRELOAD:
             snprintf(buf, bufsize, "preload image");
             break;
@@ -152,7 +158,13 @@ static char *get_token_desc(struct wps_token *token, char *buf,
             char label = token->value.i&0xFF;
             struct gui_img *img = find_image(label, data);
             if (img && img->num_subimages > 1)
-                subimage = 'a' + (token->value.i>>8);
+            {
+                int item = token->value.i>>8;
+                if (item >= 26)
+                    subimage = 'A' + item-26;
+                else
+                    subimage = 'a' + item;
+            }
             snprintf(buf, bufsize, "display preloaded image '%c%c'",
                     label, subimage);
         }
