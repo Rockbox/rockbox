@@ -71,8 +71,8 @@ struct tree_context {
 };
 
 void tree_drawlists(void);
-void tree_mem_init(void);
-void tree_gui_init(void);
+void tree_mem_init(void) INIT_ATTR;
+void tree_gui_init(void) INIT_ATTR;
 void get_current_file(char* buffer, int buffer_len);
 void set_dirfilter(int l_dirfilter);
 void set_current_file(char *path);

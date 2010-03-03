@@ -25,7 +25,7 @@
 #include "adc-target.h"
 
 unsigned short adc_read(int channel);
-void adc_init(void);
+void adc_init(void) INIT_ATTR;
 
 #ifndef NEED_ADC_CLOSE
 #define adc_close()

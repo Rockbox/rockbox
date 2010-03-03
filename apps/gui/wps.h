@@ -28,7 +28,7 @@ long gui_wps_show(void);
 /* wrapper for the wps to load the skin (.wps/.rwps) files */
 void wps_data_load(enum screen_type, const char *, bool);
 
-void gui_sync_wps_init(void);
+void gui_sync_wps_init(void) INIT_ATTR;
 
 /* fades the volume, e.g. on pause or stop */
 void fade(bool fade_in, bool updatewps);

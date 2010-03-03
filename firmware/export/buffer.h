@@ -21,6 +21,7 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
+#include "config.h"
 /* defined in linker script */
 #ifdef SIMULATOR
 extern unsigned char *audiobufend;
@@ -30,7 +31,7 @@ extern unsigned char audiobufend[];
 
 extern unsigned char *audiobuf;
 
-void buffer_init(void);
+void buffer_init(void) INIT_ATTR;
 void *buffer_alloc(size_t size);
 
 #endif

@@ -132,7 +132,7 @@ struct usb_transfer_completion_event_data
 };
 #endif /* HAVE_USBSTACK */
 
-void usb_init(void);
+void usb_init(void) INIT_ATTR;
 void usb_enable(bool on);
 void usb_attach(void);
 void usb_start_monitoring(void);

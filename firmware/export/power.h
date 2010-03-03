@@ -83,7 +83,7 @@ bool charging_state(void);
 
 #ifndef SIMULATOR
 
-void power_init(void);
+void power_init(void) INIT_ATTR;
 
 bool ide_powered(void);
 #endif

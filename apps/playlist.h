@@ -119,7 +119,7 @@ struct playlist_track_info
 };
 
 /* Exported functions only for current playlist. */
-void playlist_init(void);
+void playlist_init(void) INIT_ATTR;
 void playlist_shutdown(void);
 int playlist_create(const char *dir, const char *file);
 int playlist_resume(void);

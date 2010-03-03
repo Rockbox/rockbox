@@ -158,7 +158,7 @@ enum
 
 /** **/
 
-void tuner_init(void);
+void tuner_init(void) INIT_ATTR;
 
 #endif /* #if CONFIG_TUNER */
 

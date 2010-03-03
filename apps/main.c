@@ -127,7 +127,7 @@ static void init(void);
 #ifdef SIMULATOR
 void app_main(void)
 #else
-int main(void) __attribute__((noreturn));
+int main(void)  INIT_ATTR __attribute__((noreturn));
 int main(void)
 #endif
 {
@@ -164,6 +164,7 @@ int main(void)
     root_menu();
 }
 
+static int init_dircache(bool preinit) INIT_ATTR;
 static int init_dircache(bool preinit)
 {
 #ifdef HAVE_DIRCACHE
@@ -239,6 +240,7 @@ static int init_dircache(bool preinit)
 }
 
 #ifdef HAVE_TAGCACHE
+static void init_tagcache(void) INIT_ATTR;
 static void init_tagcache(void)
 {
     bool clear = false;
@@ -372,6 +374,7 @@ static void init(void)
 
 #else
 
+static void init(void) INIT_ATTR;
 static void init(void)
 {
     int rc;

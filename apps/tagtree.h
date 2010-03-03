@@ -38,7 +38,7 @@ struct tagentry {
 
 bool tagtree_export(void);
 bool tagtree_import(void);
-void tagtree_init(void);
+void tagtree_init(void) INIT_ATTR;
 int tagtree_enter(struct tree_context* c);
 void tagtree_exit(struct tree_context* c);
 int tagtree_load(struct tree_context* c);

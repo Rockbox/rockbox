@@ -42,8 +42,7 @@ int viewport_get_nb_lines(const struct viewport *vp);
  * Initialize the viewportmanager, which in turns initializes the UI vp and
  * statusbar stuff
  */
-void viewportmanager_init(void);
-
+void viewportmanager_init(void) INIT_ATTR;
 
 void viewport_set_defaults(struct viewport *vp,
                             const enum screen_type screen);

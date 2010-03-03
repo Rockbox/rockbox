@@ -213,6 +213,19 @@ cpu_init:
     strhi  r5, [r3], #4
     bhi    1b
 
+#ifdef INIT_ATTR
+    /* copy init code to codec buffer */
+    ldr    r2, =_initstart
+    ldr    r3, =_initend
+    ldr    r4, =_initcopy
+
+1:
+    cmp     r3, r2
+    ldrhi   r5, [r4], #4
+    strhi   r5, [r2], #4
+    bhi 1b
+#endif
+
     /* Zero out IBSS */
     ldr    r2, =_iedata
     ldr    r3, =_iend

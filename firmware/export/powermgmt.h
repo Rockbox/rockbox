@@ -131,7 +131,7 @@ extern const unsigned short percent_to_volt_charge[11];
 #endif
 
 /* Start up power management thread */
-void powermgmt_init(void);
+void powermgmt_init(void) INIT_ATTR;
 
 #endif /* SIMULATOR */
 

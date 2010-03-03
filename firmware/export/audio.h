@@ -53,7 +53,7 @@
 #define AUDIO_GAIN_MIC          1
 
 
-void audio_init(void);
+void audio_init(void) INIT_ATTR;
 void audio_play(long offset);
 void audio_stop(void);
 void audio_pause(void);

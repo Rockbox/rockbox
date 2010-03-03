@@ -724,7 +724,8 @@ static void __attribute__((naked))
  * initializations.
  *---------------------------------------------------------------------------
  */
-static void core_thread_init(unsigned int core)
+static void core_thread_init(unsigned int core) INIT_ATTR;
+static void core_thread_init(unsigned int core) 
 {
     if (core == CPU)
     {

@@ -479,7 +479,7 @@ void core_idle(void);
 void core_wake(IF_COP_VOID(unsigned int core));
 
 /* Initialize the scheduler */
-void init_threads(void);
+void init_threads(void) INIT_ATTR;
 
 /* Allocate a thread in the scheduler */
 #define CREATE_THREAD_FROZEN   0x00000001 /* Thread is frozen at create time */

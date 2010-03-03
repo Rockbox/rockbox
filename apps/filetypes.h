@@ -56,7 +56,7 @@ void tree_get_filetypes(const struct filetype**, int*);
 
 /* init the filetypes structs.
    uses audio buffer for storage, so call early in init... */
-void  filetype_init(void);
+void  filetype_init(void) INIT_ATTR;
 void read_viewer_theme_file(void);
 #ifdef HAVE_LCD_COLOR
 void read_color_theme_file(void);

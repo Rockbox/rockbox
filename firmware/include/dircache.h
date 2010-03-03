@@ -92,7 +92,7 @@ typedef struct {
     DIR_UNCACHED *regulardir;
 } DIR_CACHED;
 
-void dircache_init(void);
+void dircache_init(void) INIT_ATTR;
 int dircache_load(void);
 int dircache_save(void);
 int dircache_build(int last_size);

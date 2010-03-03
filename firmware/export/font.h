@@ -115,7 +115,7 @@ struct font {
 };
 
 /* font routines*/
-void font_init(void);
+void font_init(void) INIT_ATTR;
 #ifdef HAVE_REMOTE_LCD
 /* Load a font into the special remote ui font slot */
 int font_load_remoteui(const char* path);

@@ -28,7 +28,7 @@
 #include <lcd.h>
 #include "file.h"
 
-void scroll_init(void);
+void scroll_init(void) INIT_ATTR;
 void lcd_scroll_stop(const struct viewport* vp);
 void lcd_scroll_stop_line(const struct viewport* vp, int y);
 void lcd_scroll_fn(void);

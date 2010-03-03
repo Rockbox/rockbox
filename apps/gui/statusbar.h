@@ -100,7 +100,7 @@ struct gui_syncstatusbar
     struct gui_statusbar statusbars[NB_SCREENS];
 };
 
-extern void gui_syncstatusbar_init(struct gui_syncstatusbar * bars);
+extern void gui_syncstatusbar_init(struct gui_syncstatusbar * bars) INIT_ATTR;
 extern void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
                                     bool force_redraw);
 void gui_statusbar_changed(enum screen_type screen,

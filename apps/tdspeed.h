@@ -36,7 +36,7 @@
 #define GET_STRETCH(pitch, speed) \
     ((speed * PITCH_SPEED_100 + pitch   / 2L) / pitch)
 
-void tdspeed_init(void);
+void tdspeed_init(void) INIT_ATTR;
 bool tdspeed_config(int samplerate, bool stereo, int32_t factor);
 long tdspeed_est_output_size(void);
 long tdspeed_est_input_size(long size);

@@ -214,7 +214,7 @@ static inline void call_tick_tasks(void)
 #endif
 
 /* kernel functions */
-extern void kernel_init(void);
+extern void kernel_init(void) INIT_ATTR;
 extern void yield(void);
 extern void sleep(int ticks);
 int tick_add_task(void (*f)(void));

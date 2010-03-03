@@ -747,6 +747,11 @@ Lyre prototype 1 */
 #define IBSS_ATTR
 #define STATICIRAM static
 #endif
+#if (defined(CPU_PP) || (CONFIG_CPU == AS3525)) && !defined(SIMULATOR)
+#define INIT_ATTR       __attribute__ ((section(".init")))
+#else
+#define INIT_ATTR
+#endif
 
 #if defined(SIMULATOR) && defined(__APPLE__)
 #define DATA_ATTR       __attribute__ ((section("__DATA, .data")))

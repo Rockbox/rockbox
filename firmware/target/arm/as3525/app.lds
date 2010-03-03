@@ -99,6 +99,8 @@ SECTIONS
         _iramend = .;
     } > IRAM AT> DRAM
 
+    _iramcopy = LOADADDR(.iram);
+
     .ibss (NOLOAD) :
     {
         _iedata = .;
@@ -108,9 +110,17 @@ SECTIONS
         _iend = .;
     } > IRAM
 
-    _iramcopy = LOADADDR(.iram);
+    .init ENDAUDIOADDR : 
+    {
+        . = ALIGN(4);
+        _initstart = .;
+        *(.init)
+        _initend = .;
+    } AT> DRAM
 
-    .stack (NOLOAD) :
+    _initcopy = LOADADDR(.init);
+
+    .stack _iramcopy (NOLOAD) :
     {
        *(.stack)
        stackbegin = .;
