@@ -2380,13 +2380,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: ".voorlezen mp3 clip"
+    *: ".voorlezen clip"
   </dest>
   <voice>
-    *: "voorlezen mp3 clip"
+    *: "voorlezen clip"
   </voice>
 </phrase>
 <phrase>
@@ -13241,5 +13241,56 @@
   <voice>
     *:none
     lcd_bitmap: "Afstandsbediening basis skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Afstandsbediening scherm"
+  </dest>
+  <voice>
+    *:none
+    remote: "Afstandsbediening scherm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Hoofd scherm"
+  </dest>
+  <voice>
+    *:none
+    remote: "Hoofd scherm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "Histogram interval"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Histogram interval"
   </voice>
 </phrase>

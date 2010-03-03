@@ -13350,23 +13350,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_HISTOGRAM_MODE
-  desc: in record settings menu
-  user: core
-  <source>
-    *: none
-    recording_histogram: "Histogram mode"
-  </source>
-  <dest>
-    *: none
-    recording_histogram: "Histogram mode"
-  </dest>
-  <voice>
-    *: none
-    recording_histogram: "Histogram mode"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_HISTOGRAM_INTERVAL
   desc: in record settings menu
   user: core
