@@ -851,7 +851,7 @@ static bool update_curr_subline(struct gui_wps *gwps, struct skin_line *line)
         else
             line->curr_subline = &line->sublines;
         get_subline_timeout(gwps, line->curr_subline);
-        line->subline_expire_time += TIMEOUT_UNIT*line->curr_subline->time_mult;
+        line->subline_expire_time = current_tick + TIMEOUT_UNIT*line->curr_subline->time_mult;
         return true;
     }
     return false;
