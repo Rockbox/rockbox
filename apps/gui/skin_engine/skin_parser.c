@@ -545,6 +545,7 @@ static int parse_statusbar_enable(const char *wps_bufptr,
     wps_data->show_sb_on_wps = true;
     struct skin_viewport *default_vp = find_viewport(VP_DEFAULT_LABEL, wps_data);
     viewport_set_defaults(&default_vp->vp, curr_screen);
+    default_vp->vp.font = FONT_UI;
     return skip_end_of_line(wps_bufptr);
 }
 
@@ -557,6 +558,7 @@ static int parse_statusbar_disable(const char *wps_bufptr,
     wps_data->show_sb_on_wps = false;
     struct skin_viewport *default_vp = find_viewport(VP_DEFAULT_LABEL, wps_data);
     viewport_set_fullscreen(&default_vp->vp, curr_screen);
+    default_vp->vp.font = FONT_UI;
     return skip_end_of_line(wps_bufptr);
 }
 
