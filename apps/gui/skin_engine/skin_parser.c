@@ -2169,6 +2169,12 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         skinfonts[i].name = NULL;
     }
 #endif
+#if defined(DEBUG) || defined(SIMULATOR)
+    if (isfile)
+    {
+        DEBUGF("\n=====================\nLoading '%s'\n=====================\n", buf);
+    }
+#endif
 
     skin_data_reset(wps_data);
     curr_screen = screen;
