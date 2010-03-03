@@ -469,6 +469,9 @@ struct user_settings
     int rec_stop_gap;       /* index of trig_durations */
     int rec_trigger_mode;   /* see TRIG_MODE_XXX constants */
     int rec_trigger_type;   /* what to do when trigger released */
+#ifdef HAVE_RECORDING_HISTOGRAM
+    int rec_histogram_interval; /* recording peakmeter histogram */
+#endif
 
 #ifdef HAVE_AGC
     int rec_agc_preset_mic; /* AGC mic preset modes:

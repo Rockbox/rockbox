@@ -148,6 +148,10 @@ recording_mic
 #endif
 #endif
 
+#if defined(HAVE_RECORDING_HISTOGRAM)
+recording_histogram
+#endif
+
 #if defined(HAVE_REMOTE_LCD)
 remote
 remote_lcd_invert

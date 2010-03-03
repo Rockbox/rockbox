@@ -1135,6 +1135,13 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(F_RECSETTING, rec_trigger_type, LANG_RECORD_TRIGGER_TYPE, TRIG_TYPE_STOP,
         "trigger type","stop,pause,nf stp", NULL ,3,
        ID2P(LANG_RECORD_TRIGGER_STOP), ID2P(LANG_PAUSE), ID2P(LANG_RECORD_TRIGGER_NEWFILESTP)),
+#ifdef HAVE_RECORDING_HISTOGRAM
+     /* TO DO: additional restictions of following REP items? */
+    TABLE_SETTING(F_RECSETTING, rec_histogram_interval, LANG_RECORDING_HISTOGRAM_INTERVAL, 0,
+        "histogram interval","0s,1s,2s,4s",
+        UNIT_SEC, NULL, NULL, NULL, 4, 0,1,2,4),
+#endif /* HAVE_RECORDING_HISTOGRAM */
+
 #endif /* HAVE_RECORDING */
 
 #ifdef HAVE_SPDIF_POWER

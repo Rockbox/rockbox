@@ -66,7 +66,7 @@ static int pm_cur_left;        /* current values (last peak_meter_peek) */
 static int pm_cur_right;
 static int pm_max_left;        /* maximum values between peak meter draws */
 static int pm_max_right;
-#ifdef HAVE_AGC
+#if defined(HAVE_AGC) || defined(HAVE_RECORDING_HISTOGRAM)
 static int pm_peakhold_left;   /* max. peak values between peakhold calls */
 static int pm_peakhold_right;  /* used for AGC and histogram display */
 #endif
@@ -799,9 +799,16 @@ static int peak_meter_read_l(void)
 {
     /* pm_max_left contains the maximum of all peak values that were read
        by peak_meter_peek since the last call of peak_meter_read_l */
-    int retval = pm_max_left;
+    int retval;
 
-#ifdef HAVE_AGC
+#if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
+    srand(current_tick);
+    pm_max_left = rand()%MAX_PEAK;
+#endif
+
+    retval = pm_max_left;
+
+#if defined(HAVE_RECORDING_HISTOGRAM) || defined(HAVE_AGC)
     /* store max peak value for peak_meter_get_peakhold_x readout */
     pm_peakhold_left = MAX(pm_max_left, pm_peakhold_left);
 #endif
@@ -811,11 +818,6 @@ static int peak_meter_read_l(void)
     /* reset pm_max_left so that subsequent calls of peak_meter_peek don't
        get fooled by an old maximum value */
     pm_max_left = pm_cur_left;
-
-#if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-    srand(current_tick);
-    retval = rand()%MAX_PEAK;
-#endif
 
     return retval;
 }
@@ -830,9 +832,16 @@ static int peak_meter_read_r(void)
 {
     /* peak_meter_r contains the maximum of all peak values that were read
        by peak_meter_peek since the last call of peak_meter_read_r */
-    int retval = pm_max_right;
+    int retval;
 
-#ifdef HAVE_AGC
+#if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
+    srand(current_tick);
+    pm_max_right = rand()%MAX_PEAK;
+#endif
+
+    retval = pm_max_right;
+
+#if defined(HAVE_RECORDING_HISTOGRAM) || defined(HAVE_AGC)
     /* store max peak value for peak_meter_get_peakhold_x readout */
     pm_peakhold_right = MAX(pm_max_right, pm_peakhold_right);
 #endif
@@ -843,15 +852,10 @@ static int peak_meter_read_r(void)
        get fooled by an old maximum value */
     pm_max_right = pm_cur_right;
 
-#if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-    srand(current_tick);
-    retval = rand()%MAX_PEAK;
-#endif
-
     return retval;
 }
 
-#ifdef HAVE_AGC
+#if defined(HAVE_AGC) || defined(HAVE_RECORDING_HISTOGRAM)
 /**
  * Reads out the current peak-hold values since the last call.
  * This is used by the histogram feature in the recording screen.

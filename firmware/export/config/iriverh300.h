@@ -107,6 +107,8 @@
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
+#define HAVE_RECORDING_HISTOGRAM
+
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_FMRADIO)
