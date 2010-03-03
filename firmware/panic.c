@@ -32,7 +32,7 @@
 #include "system.h"
 
 static char panic_buf[128];
-#define LINECHARS (LCD_WIDTH/SYSFONT_WIDTH)
+#define LINECHARS (LCD_WIDTH/SYSFONT_WIDTH) - 2
 
 /*
  * "Dude. This is pretty fucked-up, right here." 
