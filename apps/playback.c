@@ -1565,7 +1565,6 @@ static int audio_check_new_track(void)
 
     /* Move to the new track */
     track_ridx = (track_ridx + ci.new_track) & MAX_TRACK_MASK;
-    buf_set_base_handle(CUR_TI->audio_hid);
 
 
     if (automatic_skip)
@@ -1724,7 +1723,6 @@ static void audio_play_start(size_t offset)
 
     sound_set_volume(global_settings.volume);
     track_widx = track_ridx = 0;
-    buf_set_base_handle(-1);
 
     /* Clear all track entries. */
     for (i = 0; i < MAX_TRACK; i++) {
@@ -1759,7 +1757,6 @@ static void audio_invalidate_tracks(void)
         track_widx = (track_widx + 1) & MAX_TRACK_MASK;
 
         audio_fill_file_buffer(false, 0);
-        send_event(PLAYBACK_EVENT_TRACK_CHANGE, thistrack_id3);
     }
 }
 
