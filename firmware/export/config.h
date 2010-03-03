@@ -747,7 +747,7 @@ Lyre prototype 1 */
 #define IBSS_ATTR
 #define STATICIRAM static
 #endif
-#if (defined(CPU_PP) || (CONFIG_CPU == AS3525)) && !defined(SIMULATOR)
+#if (defined(CPU_PP) || (CONFIG_CPU == AS3525)) && !defined(SIMULATOR) && !defined(BOOTLOADER)
 #define INIT_ATTR       __attribute__ ((section(".init")))
 #else
 #define INIT_ATTR
