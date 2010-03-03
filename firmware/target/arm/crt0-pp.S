@@ -213,7 +213,7 @@ cpu_init:
     strhi  r5, [r3], #4
     bhi    1b
 
-#ifdef INIT_ATTR
+#ifdef HAVE_INIT_ATTR
     /* copy init code to codec buffer */
     ldr    r2, =_initstart
     ldr    r3, =_initend

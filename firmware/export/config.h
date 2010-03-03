@@ -749,6 +749,7 @@ Lyre prototype 1 */
 #endif
 #if (defined(CPU_PP) || (CONFIG_CPU == AS3525)) && !defined(SIMULATOR) && !defined(BOOTLOADER)
 #define INIT_ATTR       __attribute__ ((section(".init")))
+#define HAVE_INIT_ATTR
 #else
 #define INIT_ATTR
 #endif

@@ -83,7 +83,7 @@ newstart:
 
 #endif
 
-#ifdef INIT_ATTR
+#ifdef HAVE_INIT_ATTR
     /* copy init data to codec buffer */
     /* must be done before bss is zeroed */
     ldr    r2, =_initcopy
