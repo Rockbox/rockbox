@@ -1241,7 +1241,8 @@ long gui_wps_show(void)
                 if (lcd_active() || (i != SCREEN_MAIN))
 #endif
                 {
-                    skin_update(&gui_wps[i], WPS_REFRESH_NON_STATIC);
+                    skin_update(&gui_wps[i], wps_sync_data.do_full_update ?
+                                            WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
                 }
             }
             wps_sync_data.do_full_update = false;
