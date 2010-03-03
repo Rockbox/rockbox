@@ -585,11 +585,6 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
     }
 #endif /* SIMULATOR */
 
-    if (data->num_tokens >= WPS_MAX_TOKENS - 1) {
-        DEBUGF("Warning: Max number of tokens was reached (%d)\n",
-               WPS_MAX_TOKENS - 1);
-    }
-
     if (fail != PARSE_OK)
     {
         char buf[64];
