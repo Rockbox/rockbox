@@ -27,11 +27,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #define FUSED_VECTOR_MATH
 
 #if ORDER > 32
-#define BLOCK_REPEAT "8"
+#define REPEAT_BLOCK(x) x x x x x x x x
 #elif ORDER > 16
-#define BLOCK_REPEAT "7"
+#define REPEAT_BLOCK(x) x x x x x x x
 #else
-#define BLOCK_REPEAT "3"
+#define REPEAT_BLOCK(x) x x x
 #endif
 
 /* Calculate scalarproduct, then add a 2nd vector (fused for performance) */
@@ -60,7 +60,7 @@ static inline int32_t vector_sp_add(int32_t* v1, int32_t* f2, int32_t* s2)
         "add     r3, r3, r7              \n"
         "stmia   %[v1]!, {r0-r3}         \n"
 #endif
-        ".rept " BLOCK_REPEAT           "\n"
+        REPEAT_BLOCK(
         "ldmia   %[v1],  {r0-r3}         \n"
         "ldmia   %[f2]!, {r4-r7}         \n"
         "mla     %[res], r4, r0, %[res]  \n"
@@ -73,7 +73,7 @@ static inline int32_t vector_sp_add(int32_t* v1, int32_t* f2, int32_t* s2)
         "add     r2, r2, r6              \n"
         "add     r3, r3, r7              \n"
         "stmia   %[v1]!, {r0-r3}         \n"
-        ".endr                           \n"
+        )
 #if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
         "bne     1b                      \n"
@@ -120,7 +120,7 @@ static inline int32_t vector_sp_sub(int32_t* v1, int32_t* f2, int32_t* s2)
         "sub     r3, r3, r7              \n"
         "stmia   %[v1]!, {r0-r3}         \n"
 #endif
-        ".rept " BLOCK_REPEAT           "\n"
+        REPEAT_BLOCK(
         "ldmia   %[v1],  {r0-r3}         \n"
         "ldmia   %[f2]!, {r4-r7}         \n"
         "mla     %[res], r4, r0, %[res]  \n"
@@ -133,7 +133,7 @@ static inline int32_t vector_sp_sub(int32_t* v1, int32_t* f2, int32_t* s2)
         "sub     r2, r2, r6              \n"
         "sub     r3, r3, r7              \n"
         "stmia   %[v1]!, {r0-r3}         \n"
-        ".endr                           \n"
+        )
 #if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
         "bne     1b                      \n"
@@ -173,14 +173,14 @@ static inline int32_t scalarproduct(int32_t* v1, int32_t* v2)
         "mla     %[res], r6, r2, %[res]  \n"
         "mla     %[res], r7, r3, %[res]  \n"
 #endif
-        ".rept " BLOCK_REPEAT           "\n"
+        REPEAT_BLOCK(
         "ldmia   %[v1]!, {r0-r3}         \n"
         "ldmia   %[v2]!, {r4-r7}         \n"
         "mla     %[res], r4, r0, %[res]  \n"
         "mla     %[res], r5, r1, %[res]  \n"
         "mla     %[res], r6, r2, %[res]  \n"
         "mla     %[res], r7, r3, %[res]  \n"
-        ".endr                           \n"
+        )
 #if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
         "bne     1b                      \n"

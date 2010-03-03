@@ -28,6 +28,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #define PREPARE_SCALARPRODUCT coldfire_set_macsr(0); /* signed integer mode */
 
+#define REPEAT_2(x) x x
+#define REPEAT_3(x) x x x
+#define REPEAT_7(x) x x x x x x x
+
 /* Calculate scalarproduct, then add a 2nd vector (fused for performance)
  * This version fetches data as 32 bit words, and *recommends* v1 to be
  * 32 bit aligned. It also assumes that f2 and s2 are either both 32 bit
@@ -64,7 +68,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         "move.w  (%[s2])+, %%d1                      \n"
         "swap    %%d1                                \n"
     "1:                                              \n"
-        ".rept   2                                   \n"
+        REPEAT_2(
         "movem.l (%[v1]), %%d6-%%d7/%%a0-%%a1        \n"
         "mac.w   %%d0l, %%d6u, (%[f2])+, %%d0, %%acc0\n"
         "mac.w   %%d0u, %%d6l, (%[s2])+, %%d2, %%acc0\n"
@@ -82,7 +86,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         "move.l  %%d6, (%[v1])+                      \n"
         ADDHALFXREGS(%%a1, %%d1, %%d7)
         "move.l  %%d7, (%[v1])+                      \n"
-        ".endr                                       \n"
+        )
 
 #if ORDER > 16
         "subq.l  #1, %[res]                          \n"
@@ -193,7 +197,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         "move.w  (%[s2])+, %%d1                      \n"
         "swap    %%d1                                \n"
     "1:                                              \n"
-        ".rept   2                                   \n"
+        REPEAT_2(
         "movem.l (%[v1]), %%d6-%%d7/%%a0-%%a1        \n"
         "mac.w   %%d0l, %%d6u, (%[f2])+, %%d0, %%acc0\n"
         "mac.w   %%d0u, %%d6l, (%[s2])+, %%d2, %%acc0\n"
@@ -211,7 +215,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         "move.l  %%d6, (%[v1])+                      \n"
         SUBHALFXREGS(%%a1, %%d1, %%d7)
         "move.l  %%d7, (%[v1])+                      \n"
-        ".endr                                       \n"
+        )
 
 #if ORDER > 16
         "subq.l  #1, %[res]                          \n"
@@ -305,10 +309,10 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "move.l  (%[v1])+, %%d0                      \n"
         "move.w  (%[v2])+, %%d1                      \n"
     "1:                                              \n"
-        ".rept   7                                   \n"
+        REPEAT_7(
         "mac.w   %%d0u, %%d1l, (%[v2])+, %%d1, %%acc0\n"
         "mac.w   %%d0l, %%d1u, (%[v1])+, %%d0, %%acc0\n"
-        ".endr                                       \n"
+        )
 
         "mac.w   %%d0u, %%d1l, (%[v2])+, %%d1, %%acc0\n"
 #if ORDER > 16
@@ -324,12 +328,12 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "move.l  (%[v1])+, %%d0                      \n"
         "move.l  (%[v2])+, %%d1                      \n"
     "1:                                              \n"
-        ".rept   3                                   \n"
+        REPEAT_3(
         "mac.w   %%d0u, %%d1u, (%[v1])+, %%d2, %%acc0\n"
         "mac.w   %%d0l, %%d1l, (%[v2])+, %%d1, %%acc0\n"
         "mac.w   %%d2u, %%d1u, (%[v1])+, %%d0, %%acc0\n"
         "mac.w   %%d2l, %%d1l, (%[v2])+, %%d1, %%acc0\n"
-        ".endr                                       \n"
+        )
 
         "mac.w   %%d0u, %%d1u, (%[v1])+, %%d2, %%acc0\n"
         "mac.w   %%d0l, %%d1l, (%[v2])+, %%d1, %%acc0\n"

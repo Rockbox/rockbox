@@ -26,6 +26,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #define FUSED_VECTOR_MATH
 
+#define REPEAT_3(x) x x x
+#if ORDER > 16
+#define REPEAT_MLA(x) x x x x x x x
+#else
+#define REPEAT_MLA(x) x x x
+#endif
+
 /* Calculate scalarproduct, then add a 2nd vector (fused for performance)
  * This version fetches data as 32 bit words, and *requires* v1 to be
  * 32 bit aligned. It also requires that f2 and s2 are either both 32 bit
@@ -133,7 +140,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         ADDHALFREGS(r1, r2, r4)
         "stmia   %[v1]!, {r0,r1}         \n"
 
-        ".rept   3                       \n"
+        REPEAT_3(
         "ldmia   %[v1],  {r1,r2}         \n"
         "ldmia   %[f2]!, {r3,r4}         \n"
         "smlabb  %[res], r1, r3, %[res]  \n"
@@ -144,7 +151,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         ADDHALFREGS(r0, r1, r3)
         ADDHALFREGS(r1, r2, r4)
         "stmia   %[v1]!, {r0,r1}         \n"
-        ".endr                           \n"
+        )
 #if ORDER > 16
         "subs    %[cnt], %[cnt], #1      \n"
         "bne     1b                      \n"
@@ -275,7 +282,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         SUBHALFREGS(r1, r2, r4)
         "stmia   %[v1]!, {r0,r1}         \n"
 
-        ".rept   3                       \n"
+        REPEAT_3(
         "ldmia   %[v1],  {r1,r2}         \n"
         "ldmia   %[f2]!, {r3,r4}         \n"
         "smlabb  %[res], r1, r3, %[res]  \n"
@@ -286,7 +293,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         SUBHALFREGS(r0, r1, r3)
         SUBHALFREGS(r1, r2, r4)
         "stmia   %[v1]!, {r0,r1}         \n"
-        ".endr                           \n"
+        )
 #if ORDER > 16
         "subs    %[cnt], %[cnt], #1      \n"
         "bne     1b                      \n"
@@ -318,12 +325,6 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
     int cnt = ORDER>>5;
 #endif
 
-#if ORDER > 16
-#define MLA_BLOCKS "7"
-#else
-#define MLA_BLOCKS "3"
-#endif
-
     asm volatile (
 #if ORDER > 32
         "mov     %[res], #0              \n"
@@ -347,14 +348,14 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "smlabt  %[res], r1, r2, %[res]  \n"
         "smlatb  %[res], r1, r3, %[res]  \n"
 
-        ".rept " MLA_BLOCKS             "\n"
+        REPEAT_MLA(
         "ldmia   %[v1]!, {r0,r1}         \n"
         "smlabt  %[res], r0, r3, %[res]  \n"
         "ldmia   %[v2]!, {r2,r3}         \n"
         "smlatb  %[res], r0, r2, %[res]  \n"
         "smlabt  %[res], r1, r2, %[res]  \n"
         "smlatb  %[res], r1, r3, %[res]  \n"
-        ".endr                           \n"
+        )
 #if ORDER > 32
         "subs    %[cnt], %[cnt], #1  \n"
         "bne     1b                  \n"
@@ -374,14 +375,14 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "smlabb  %[res], r1, r3, %[res]  \n"
         "smlatt  %[res], r1, r3, %[res]  \n"
 
-        ".rept " MLA_BLOCKS             "\n"
+        REPEAT_MLA(
         "ldmia   %[v1]!, {r0,r1}         \n"
         "ldmia   %[v2]!, {r2,r3}         \n"
         "smlabb  %[res], r0, r2, %[res]  \n"
         "smlatt  %[res], r0, r2, %[res]  \n"
         "smlabb  %[res], r1, r3, %[res]  \n"
         "smlatt  %[res], r1, r3, %[res]  \n"
-        ".endr                           \n"
+        )
 #if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
         "bne     1b                      \n"  

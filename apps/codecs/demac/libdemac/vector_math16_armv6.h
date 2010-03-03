@@ -22,14 +22,14 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
-*/          
+*/
 
 #define FUSED_VECTOR_MATH
 
 #if ORDER > 16
-#define BLOCK_REPEAT "3"
+#define REPEAT_BLOCK(x) x x x
 #else
-#define BLOCK_REPEAT "1"
+#define REPEAT_BLOCK(x) x
 #endif
 
 /* Calculate scalarproduct, then add a 2nd vector (fused for performance)
@@ -77,7 +77,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         "sadd16  r1, r1, r5              \n"
         "strd    r0, [%[v1]], #8         \n"
 
-        ".rept " BLOCK_REPEAT           "\n"
+        REPEAT_BLOCK(
         "ldmia   %[s2]!, {r5,r6}         \n"
         "pkhtb   r4, r4, r2              \n"
         "pkhtb   r2, r2, r3              \n"
@@ -104,7 +104,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         "sadd16  r0, r0, r6              \n"
         "sadd16  r1, r1, r5              \n"
         "strd    r0, [%[v1]], #8         \n"
-        ".endr                           \n"
+        )
 
         "ldmia   %[s2]!, {r5,r6}         \n"
         "pkhtb   r4, r4, r2              \n"
@@ -148,7 +148,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         "sadd16  r1, r1, r7              \n"
         "strd    r0, [%[v1]], #8         \n"
 
-        ".rept " BLOCK_REPEAT           "\n"
+        REPEAT_BLOCK(
         "smlad   %[res], r2, r4, %[res]  \n"
         "ldrd    r6, [%[s2]], #8         \n"
         "smlad   %[res], r3, r5, %[res]  \n"
@@ -165,7 +165,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         "sadd16  r0, r0, r6              \n"
         "sadd16  r1, r1, r7              \n"
         "strd    r0, [%[v1]], #8         \n"
-        ".endr                           \n"
+        )
 
         "smlad   %[res], r2, r4, %[res]  \n"
         "ldrd    r6, [%[s2]], #8         \n"
@@ -246,7 +246,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         "ssub16  r1, r1, r5              \n"
         "strd    r0, [%[v1]], #8         \n"
 
-        ".rept " BLOCK_REPEAT           "\n"
+        REPEAT_BLOCK(
         "ldmia   %[s2]!, {r5,r6}         \n"
         "pkhtb   r4, r4, r2              \n"
         "pkhtb   r2, r2, r3              \n"
@@ -273,7 +273,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         "ssub16  r0, r0, r6              \n"
         "ssub16  r1, r1, r5              \n"
         "strd    r0, [%[v1]], #8         \n"
-        ".endr                           \n"
+        )
 
         "ldmia   %[s2]!, {r5,r6}         \n"
         "pkhtb   r4, r4, r2              \n"
@@ -317,7 +317,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         "ssub16  r1, r1, r7              \n"
         "strd    r0, [%[v1]], #8         \n"
 
-        ".rept " BLOCK_REPEAT           "\n"
+        REPEAT_BLOCK(
         "smlad   %[res], r2, r4, %[res]  \n"
         "ldrd    r6, [%[s2]], #8         \n"
         "smlad   %[res], r3, r5, %[res]  \n"
@@ -334,7 +334,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         "ssub16  r0, r0, r6              \n"
         "ssub16  r1, r1, r7              \n"
         "strd    r0, [%[v1]], #8         \n"
-        ".endr                           \n"
+        )
 
         "smlad   %[res], r2, r4, %[res]  \n"
         "ldrd    r6, [%[s2]], #8         \n"
@@ -400,7 +400,7 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 #else
         "smuadx  %[res], r0, r3          \n"
 #endif
-        ".rept " BLOCK_REPEAT           "\n"
+        REPEAT_BLOCK(
         "pkhtb   r0, r6, r7              \n"
         "ldrd    r2, [%[v1]], #8         \n"
         "smladx  %[res], r1, r0, %[res]  \n"
@@ -413,8 +413,8 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "pkhtb   r3, r5, r6              \n"
         "ldrd    r4, [%[v2]], #8         \n"
         "smladx  %[res], r0, r3, %[res]  \n"
-        ".endr                           \n"
-        
+        )
+
         "pkhtb   r0, r6, r7              \n"
         "ldrd    r2, [%[v1]], #8         \n"
         "smladx  %[res], r1, r0, %[res]  \n"
@@ -434,7 +434,7 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 #endif
 
         "b       99f                     \n"
-        
+
     "20:                                 \n"
         "ldrd    r0, [%[v1]], #8         \n"
         "ldmia   %[v2]!, {r5-r7}         \n"
@@ -446,7 +446,7 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 #else
         "smuad   %[res], r0, r5          \n"
 #endif
-        ".rept " BLOCK_REPEAT           "\n"
+        REPEAT_BLOCK(
         "ldrd    r4, [%[v2]], #8         \n"
         "smlad   %[res], r1, r6, %[res]  \n"
         "ldrd    r0, [%[v1]], #8         \n"
@@ -455,7 +455,7 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "smlad   %[res], r3, r4, %[res]  \n"
         "ldrd    r2, [%[v1]], #8         \n"
         "smlad   %[res], r0, r5, %[res]  \n"
-        ".endr                           \n"
+        )
 
 #if ORDER > 32
         "ldrd    r4, [%[v2]], #8         \n"
