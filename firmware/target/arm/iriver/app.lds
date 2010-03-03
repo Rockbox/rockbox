@@ -37,8 +37,8 @@ STARTUP(target/arm/crt0-pp.o)
 
 MEMORY
 {
-    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
-    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+    DRAM : ORIGIN = DRAMORIG,     LENGTH = DRAMSIZE
+    IRAM : ORIGIN = IRAMORIG,     LENGTH = IRAMSIZE
 }
 
 SECTIONS
@@ -126,6 +126,17 @@ SECTIONS
 
     _iramcopy = LOADADDR(.iram);
 
+
+    .init ENDAUDIOADDR : 
+    {
+        . = ALIGN(4);
+        _initstart = .;
+        *(.init)
+        _initend = .;
+    } AT> DRAM
+
+    _initcopy = LOADADDR(.init);
+
     .idle_stacks (NOLOAD) :
     {
        *(.idle_stacks)
@@ -146,7 +157,7 @@ SECTIONS
        . += 0x2000;
        stackend = .;
     } > IRAM
-
+    
     /* .bss and .ncbss are treated as a single section to use one init loop to
      * zero it - note "_edata" and "_end" */
     .bss _noloaddram (NOLOAD) :
@@ -175,6 +186,7 @@ SECTIONS
     .audiobuf (NOLOAD) :
     {
         _audiobuffer = .;
+        . = ALIGN(0x4);
         audiobuffer = .;
     } > DRAM
     
