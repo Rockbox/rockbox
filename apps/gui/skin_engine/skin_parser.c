@@ -726,6 +726,11 @@ static int parse_font_load(const char *wps_bufptr,
         DEBUGF("font id %d already being used\n", id);
     }
 #endif
+    /* make sure the filename contains .fnt, 
+     * we dont actually use it, but require it anyway */
+    ptr = strchr(filename, '.');
+    if (!ptr || strncmp(ptr, ".fnt|", 5))
+        return WPS_ERROR_INVALID_PARAM;
     skinfonts[id-FONT_FIRSTUSERFONT].id = -1;
     skinfonts[id-FONT_FIRSTUSERFONT].name = filename;
     
@@ -2113,8 +2118,8 @@ static bool skin_load_fonts(struct wps_data *data)
          * multiple viewports use the same */
         if (font->id < 0)
         {
-            char *bar = strchr(font->name, '|');
-            *bar = '\0';
+            char *dot = strchr(font->name, '.');
+            *dot = '\0';
             font->id = skin_font_load(font->name);
         }
 
