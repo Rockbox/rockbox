@@ -67,9 +67,7 @@ void settings_apply_skins(void)
 #ifdef HAVE_LCD_BITMAP
     skin_backdrop_init();
     skin_font_init();
-    sb_skin_init();
 #endif
-    gui_sync_wps_init();
     for (i=0; i<ARRAYLEN(skins); i++)
     {
 #ifdef HAVE_REMOTE_LCD
