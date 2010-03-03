@@ -260,8 +260,7 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3970(struct filter_t* f,
     }
 }
 
-static struct filter_t filter0 IBSS_ATTR;
-static struct filter_t filter1 IBSS_ATTR;
+static struct filter_t filter[2] IBSS_ATTR;
 
 static void do_init_filter(struct filter_t* f, filter_int* buf)
 {
@@ -281,20 +280,15 @@ static void do_init_filter(struct filter_t* f, filter_int* buf)
 
 void INIT_FILTER(filter_int* buf)
 {
-    do_init_filter(&filter0, buf);
-    do_init_filter(&filter1, buf + ORDER*3 + FILTER_HISTORY_SIZE);
+    do_init_filter(&filter[0], buf);
+    do_init_filter(&filter[1], buf + ORDER*3 + FILTER_HISTORY_SIZE);
 }
 
-void ICODE_ATTR_DEMAC APPLY_FILTER(int fileversion, int32_t* data0,
-                                   int32_t* data1, int count)
+void ICODE_ATTR_DEMAC APPLY_FILTER(int fileversion, int channel,
+                                   int32_t* data, int count)
 {
-    if (fileversion >= 3980) {
-        do_apply_filter_3980(&filter0, data0, count);
-        if (data1 != NULL)
-            do_apply_filter_3980(&filter1, data1, count);
-    } else {
-        do_apply_filter_3970(&filter0, data0, count);
-        if (data1 != NULL)
-            do_apply_filter_3970(&filter1, data1, count);
-    }
+    if (fileversion >= 3980)
+        do_apply_filter_3980(&filter[channel], data, count);
+    else
+        do_apply_filter_3970(&filter[channel], data, count);
 }

@@ -118,22 +118,22 @@ int ICODE_ATTR_DEMAC decode_chunk(struct ape_ctx_t* ape_ctx,
         switch (ape_ctx->compressiontype)
         {
             case 2000:
-                apply_filter_16_11(ape_ctx->fileversion,decoded0,NULL,count);
+                apply_filter_16_11(ape_ctx->fileversion,0,decoded0,count);
                 break;
     
             case 3000:
-                apply_filter_64_11(ape_ctx->fileversion,decoded0,NULL,count);
+                apply_filter_64_11(ape_ctx->fileversion,0,decoded0,count);
                 break;
     
             case 4000:
-                apply_filter_32_10(ape_ctx->fileversion,decoded0,NULL,count);
-                apply_filter_256_13(ape_ctx->fileversion,decoded0,NULL,count);
+                apply_filter_32_10(ape_ctx->fileversion,0,decoded0,count);
+                apply_filter_256_13(ape_ctx->fileversion,0,decoded0,count);
                 break;
     
             case 5000:
-                apply_filter_16_11(ape_ctx->fileversion,decoded0,NULL,count);
-                apply_filter_256_13(ape_ctx->fileversion,decoded0,NULL,count);
-                apply_filter_1280_15(ape_ctx->fileversion,decoded0,NULL,count);
+                apply_filter_16_11(ape_ctx->fileversion,0,decoded0,count);
+                apply_filter_256_13(ape_ctx->fileversion,0,decoded0,count);
+                apply_filter_1280_15(ape_ctx->fileversion,0,decoded0,count);
         }
 
         /* Now apply the predictor decoding */
@@ -171,22 +171,29 @@ int ICODE_ATTR_DEMAC decode_chunk(struct ape_ctx_t* ape_ctx,
         switch (ape_ctx->compressiontype)
         {
             case 2000:
-                apply_filter_16_11(ape_ctx->fileversion,decoded0,decoded1,count);
+                apply_filter_16_11(ape_ctx->fileversion,0,decoded0,count);
+                apply_filter_16_11(ape_ctx->fileversion,1,decoded1,count);
                 break;
     
             case 3000:
-                apply_filter_64_11(ape_ctx->fileversion,decoded0,decoded1,count);
+                apply_filter_64_11(ape_ctx->fileversion,0,decoded0,count);
+                apply_filter_64_11(ape_ctx->fileversion,1,decoded1,count);
                 break;
     
             case 4000:
-                apply_filter_32_10(ape_ctx->fileversion,decoded0,decoded1,count);
-                apply_filter_256_13(ape_ctx->fileversion,decoded0,decoded1,count);
+                apply_filter_32_10(ape_ctx->fileversion,0,decoded0,count);
+                apply_filter_32_10(ape_ctx->fileversion,1,decoded1,count);
+                apply_filter_256_13(ape_ctx->fileversion,0,decoded0,count);
+                apply_filter_256_13(ape_ctx->fileversion,1,decoded1,count);
                 break;
     
             case 5000:
-                apply_filter_16_11(ape_ctx->fileversion,decoded0,decoded1,count);
-                apply_filter_256_13(ape_ctx->fileversion,decoded0,decoded1,count);
-                apply_filter_1280_15(ape_ctx->fileversion,decoded0,decoded1,count);
+                apply_filter_16_11(ape_ctx->fileversion,0,decoded0,count);
+                apply_filter_16_11(ape_ctx->fileversion,1,decoded1,count);
+                apply_filter_256_13(ape_ctx->fileversion,0,decoded0,count);
+                apply_filter_256_13(ape_ctx->fileversion,1,decoded1,count);
+                apply_filter_1280_15(ape_ctx->fileversion,0,decoded0,count);
+                apply_filter_1280_15(ape_ctx->fileversion,1,decoded1,count);
         }
 
         /* Now apply the predictor decoding */
