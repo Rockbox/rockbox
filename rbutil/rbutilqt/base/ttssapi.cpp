@@ -24,7 +24,8 @@
 
 TTSSapi::TTSSapi(QObject* parent) : TTSBase(parent)
 {
-    m_TTSTemplate = "cscript //nologo \"%exe\" /language:%lang /voice:\"%voice\" /speed:%speed \"%options\"";
+    m_TTSTemplate = "cscript //nologo \"%exe\" /language:%lang /voice:\"%voice\""
+        " /speed:%speed \"%options\"";
     defaultLanguage ="english";
     m_sapi4 =false;
 }
@@ -35,12 +36,15 @@ void TTSSapi::generateSettings()
     QStringList languages = SystemInfo::languages();
     languages.sort();
     EncTtsSetting* setting =new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,
-        tr("Language:"),RbSettings::subValue("sapi",RbSettings::TtsLanguage),languages);
+        tr("Language:"),RbSettings::subValue("sapi",RbSettings::TtsLanguage),
+        languages);
     connect(setting,SIGNAL(dataChanged()),this,SLOT(updateVoiceList()));
     insertSetting(eLANGUAGE,setting);
     // voice
     setting = new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,
-        tr("Voice:"),RbSettings::subValue("sapi",RbSettings::TtsVoice),getVoiceList(RbSettings::subValue("sapi",RbSettings::TtsLanguage).toString()),EncTtsSetting::eREFRESHBTN);
+        tr("Voice:"),RbSettings::subValue("sapi",RbSettings::TtsVoice),
+        getVoiceList(RbSettings::subValue("sapi",RbSettings::TtsLanguage).toString()),
+        EncTtsSetting::eREFRESHBTN);
     connect(setting,SIGNAL(refresh()),this,SLOT(updateVoiceList()));
     insertSetting(eVOICE,setting);
     //speed
@@ -55,10 +59,14 @@ void TTSSapi::generateSettings()
 void TTSSapi::saveSettings()
 {
     //save settings in user config
-    RbSettings::setSubValue("sapi",RbSettings::TtsLanguage,getSetting(eLANGUAGE)->current().toString());
-    RbSettings::setSubValue("sapi",RbSettings::TtsVoice,getSetting(eVOICE)->current().toString());
-    RbSettings::setSubValue("sapi",RbSettings::TtsSpeed,getSetting(eSPEED)->current().toInt());
-    RbSettings::setSubValue("sapi",RbSettings::TtsOptions,getSetting(eOPTIONS)->current().toString());
+    RbSettings::setSubValue("sapi",RbSettings::TtsLanguage,
+            getSetting(eLANGUAGE)->current().toString());
+    RbSettings::setSubValue("sapi",RbSettings::TtsVoice,
+            getSetting(eVOICE)->current().toString());
+    RbSettings::setSubValue("sapi",RbSettings::TtsSpeed,
+            getSetting(eSPEED)->current().toInt());
+    RbSettings::setSubValue("sapi",RbSettings::TtsOptions,
+            getSetting(eOPTIONS)->current().toString());
 
     RbSettings::sync();
 }
@@ -168,10 +176,11 @@ QStringList TTSSapi::getVoiceList(QString language)
     }
 
     delete voicescript;
-    QFile::setPermissions(QDir::tempPath() +"/sapi_voice.vbs",QFile::ReadOwner |QFile::WriteOwner|QFile::ExeOwner
-                                                             |QFile::ReadUser| QFile::WriteUser| QFile::ExeUser
-                                                             |QFile::ReadGroup  |QFile::WriteGroup    |QFile::ExeGroup
-                                                             |QFile::ReadOther  |QFile::WriteOther    |QFile::ExeOther );
+    QFile::setPermissions(QDir::tempPath() +"/sapi_voice.vbs",
+              QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner
+            | QFile::ReadUser  | QFile::WriteUser  | QFile::ExeUser
+            | QFile::ReadGroup | QFile::WriteGroup | QFile::ExeGroup
+            | QFile::ReadOther | QFile::WriteOther | QFile::ExeOther );
     QFile::remove(QDir::tempPath() +"/sapi_voice.vbs");
     return result;
 }
@@ -198,10 +207,11 @@ bool TTSSapi::stop()
     voicescript->waitForFinished();
     delete voicestream;
     delete voicescript;
-    QFile::setPermissions(QDir::tempPath() +"/sapi_voice.vbs",QFile::ReadOwner |QFile::WriteOwner|QFile::ExeOwner
-                                                             |QFile::ReadUser| QFile::WriteUser| QFile::ExeUser
-                                                             |QFile::ReadGroup  |QFile::WriteGroup    |QFile::ExeGroup
-                                                             |QFile::ReadOther  |QFile::WriteOther    |QFile::ExeOther );
+    QFile::setPermissions(QDir::tempPath() +"/sapi_voice.vbs",
+              QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner
+            | QFile::ReadUser  | QFile::WriteUser  | QFile::ExeUser
+            | QFile::ReadGroup | QFile::WriteGroup | QFile::ExeGroup
+            | QFile::ReadOther | QFile::WriteOther | QFile::ExeOther );
     QFile::remove(QDir::tempPath() +"/sapi_voice.vbs");
     return true;
 }
@@ -212,3 +222,4 @@ bool TTSSapi::configOk()
         return false;
     return true;
 }
+

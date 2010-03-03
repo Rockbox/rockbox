@@ -33,34 +33,34 @@ class TTSFestival : public TTSBase
         eVOICE,
         eVOICEDESC
     };
-    
-	Q_OBJECT
-public:
-    TTSFestival(QObject* parent=NULL) :TTSBase(parent) {}
-	~TTSFestival();
-	bool start(QString *errStr);
-	bool stop();
-	TTSStatus voice(QString text,QString wavfile,  QString *errStr);
 
-    // for settings 
-    bool configOk();
-    void generateSettings();
-    void saveSettings();
-    
-private slots:
-    void updateVoiceList();
-    void updateVoiceDescription();
-    void clearVoiceDescription();
-private:
-	QStringList  getVoiceList(QString path ="");
-	QString 	 getVoiceInfo(QString voice,QString path ="");
-    
-	inline void	startServer(QString path="");
-	inline void	ensureServerRunning(QString path="");
-	QString	queryServer(QString query, int timeout = -1,QString path="");
-	QProcess serverProcess;
-	QStringList voices;
-	QMap<QString, QString> voiceDescriptions;
+    Q_OBJECT
+    public:
+        TTSFestival(QObject* parent=NULL) : TTSBase(parent) {}
+        ~TTSFestival();
+        bool start(QString *errStr);
+        bool stop();
+        TTSStatus voice(QString text,QString wavfile,  QString *errStr);
+
+        // for settings
+        bool configOk();
+        void generateSettings();
+        void saveSettings();
+
+        private slots:
+            void updateVoiceList();
+        void updateVoiceDescription();
+        void clearVoiceDescription();
+    private:
+        QStringList  getVoiceList(QString path ="");
+        QString getVoiceInfo(QString voice,QString path ="");
+
+        inline void startServer(QString path="");
+        inline void ensureServerRunning(QString path="");
+        QString queryServer(QString query, int timeout = -1,QString path="");
+        QProcess serverProcess;
+        QStringList voices;
+        QMap<QString, QString> voiceDescriptions;
 };
 
 

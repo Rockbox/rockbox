@@ -29,19 +29,26 @@ TTSFestival::~TTSFestival()
 void TTSFestival::generateSettings()
 {
     // server path
-    QString exepath = RbSettings::subValue("festival-server",RbSettings::TtsPath).toString();
+    QString exepath = RbSettings::subValue("festival-server",
+                        RbSettings::TtsPath).toString();
     if(exepath == "" ) exepath = findExecutable("festival");
-    insertSetting(eSERVERPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,"Path to Festival server:",exepath,EncTtsSetting::eBROWSEBTN));
+    insertSetting(eSERVERPATH,new EncTtsSetting(this,
+                        EncTtsSetting::eSTRING, "Path to Festival server:",
+                        exepath,EncTtsSetting::eBROWSEBTN));
 
     // client path
-    QString clientpath = RbSettings::subValue("festival-client",RbSettings::TtsPath).toString();
+    QString clientpath = RbSettings::subValue("festival-client",
+                        RbSettings::TtsPath).toString();
     if(clientpath == "" ) clientpath = findExecutable("festival_client");
     insertSetting(eCLIENTPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,
-        tr("Path to Festival client:"),clientpath,EncTtsSetting::eBROWSEBTN));
+                        tr("Path to Festival client:"),
+                        clientpath,EncTtsSetting::eBROWSEBTN));
 
     // voice
-    EncTtsSetting* setting = new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,
-        tr("Voice:"),RbSettings::subValue("festival",RbSettings::TtsVoice),getVoiceList(exepath),EncTtsSetting::eREFRESHBTN);
+    EncTtsSetting* setting = new EncTtsSetting(this,
+                        EncTtsSetting::eSTRINGLIST, tr("Voice:"),
+                        RbSettings::subValue("festival", RbSettings::TtsVoice),
+                        getVoiceList(exepath), EncTtsSetting::eREFRESHBTN);
     connect(setting,SIGNAL(refresh()),this,SLOT(updateVoiceList()));
     connect(setting,SIGNAL(dataChanged()),this,SLOT(clearVoiceDescription()));
     insertSetting(eVOICE,setting);
@@ -56,9 +63,12 @@ void TTSFestival::generateSettings()
 void TTSFestival::saveSettings()
 {
     //save settings in user config
-    RbSettings::setSubValue("festival-server",RbSettings::TtsPath,getSetting(eSERVERPATH)->current().toString());
-    RbSettings::setSubValue("festival-client",RbSettings::TtsPath,getSetting(eCLIENTPATH)->current().toString());
-    RbSettings::setSubValue("festival",RbSettings::TtsVoice,getSetting(eVOICE)->current().toString());
+    RbSettings::setSubValue("festival-server",
+            RbSettings::TtsPath,getSetting(eSERVERPATH)->current().toString());
+    RbSettings::setSubValue("festival-client",
+            RbSettings::TtsPath,getSetting(eCLIENTPATH)->current().toString());
+    RbSettings::setSubValue("festival",
+            RbSettings::TtsVoice,getSetting(eVOICE)->current().toString());
 
     RbSettings::sync();
 }
@@ -66,7 +76,8 @@ void TTSFestival::saveSettings()
 void TTSFestival::updateVoiceDescription()
 {
     // get voice Info with current voice and path
-    QString info = getVoiceInfo(getSetting(eVOICE)->current().toString(),getSetting(eSERVERPATH)->current().toString());
+    QString info = getVoiceInfo(getSetting(eVOICE)->current().toString(),
+            getSetting(eSERVERPATH)->current().toString());
     getSetting(eVOICEDESC)->setCurrent(info);
 }
 
@@ -132,8 +143,10 @@ TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
 {
     qDebug() << text << "->" << wavfile;
 
-    QString path = RbSettings::subValue("festival-client",RbSettings::TtsPath).toString();
-    QString cmd = QString("%1 --server localhost --otype riff --ttw --withlisp --output \"%2\" - ").arg(path).arg(wavfile);
+    QString path = RbSettings::subValue("festival-client",
+            RbSettings::TtsPath).toString();
+    QString cmd = QString("%1 --server localhost --otype riff --ttw --withlisp"
+            " --output \"%2\" - ").arg(path).arg(wavfile);
     qDebug() << cmd;
 
     QProcess clientProcess;
@@ -162,13 +175,17 @@ TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
 
 bool TTSFestival::configOk()
 {
-    QString serverPath = RbSettings::subValue("festival-server",RbSettings::TtsPath).toString();
-    QString clientPath = RbSettings::subValue("festival-client",RbSettings::TtsPath).toString();
+    QString serverPath = RbSettings::subValue("festival-server",
+                                RbSettings::TtsPath).toString();
+    QString clientPath = RbSettings::subValue("festival-client",
+                                RbSettings::TtsPath).toString();
 
     bool ret = QFileInfo(serverPath).isExecutable() &&
         QFileInfo(clientPath).isExecutable();
-    if(RbSettings::subValue("festival",RbSettings::TtsVoice).toString().size() > 0 && voices.size() > 0)
-        ret = ret && (voices.indexOf(RbSettings::subValue("festival",RbSettings::TtsVoice).toString()) != -1);
+    if(RbSettings::subValue("festival",RbSettings::TtsVoice).toString().size() > 0
+            && voices.size() > 0)
+        ret = ret && (voices.indexOf(RbSettings::subValue("festival",
+                        RbSettings::TtsVoice).toString()) != -1);
     return ret;
 }
 
@@ -213,7 +230,8 @@ QString TTSFestival::getVoiceInfo(QString voice,QString path)
     if(voiceDescriptions.contains(voice))
         return voiceDescriptions[voice];
 
-    QString response = queryServer(QString("(voice.description '%1)").arg(voice), 3000,path);
+    QString response = queryServer(QString("(voice.description '%1)").arg(voice),
+                            3000,path);
 
     if (response == "")
     {
@@ -221,7 +239,8 @@ QString TTSFestival::getVoiceInfo(QString voice,QString path)
     }
     else
     {
-        response = response.remove(QRegExp("(description \"*\")", Qt::CaseInsensitive, QRegExp::Wildcard));
+        response = response.remove(QRegExp("(description \"*\")",
+                    Qt::CaseInsensitive, QRegExp::Wildcard));
         qDebug() << "voiceInfo w/o descr: " << response;
         response = response.remove(')');
         QStringList responseLines = response.split('(', QString::SkipEmptyParts);
@@ -238,8 +257,10 @@ QString TTSFestival::getVoiceInfo(QString voice,QString path)
             int firstSpace = line.indexOf(' ');
             if (firstSpace > 0)
             {
-                line = line.insert(firstSpace, ':'); // add a colon between the key and the value
-                line[firstSpace+2] = line[firstSpace+2].toUpper(); // capitalize the value
+                // add a colon between the key and the value
+                line = line.insert(firstSpace, ':');
+                // capitalize the value
+                line[firstSpace+2] = line[firstSpace+2].toUpper();
             }
 
             description += line + "\n";
@@ -298,7 +319,8 @@ QString TTSFestival::queryServer(QString query, int timeout,QString path)
             emit busyEnd();
             return "";
         }
-        /* make sure we wait a little as we don't want to flood the server with requests */
+        /* make sure we wait a little as we don't want to flood the server
+         * with requests */
         QDateTime tmpEndTime = QDateTime::currentDateTime().addMSecs(500);
         while(QDateTime::currentDateTime() < tmpEndTime)
             QCoreApplication::processEvents(QEventLoop::AllEvents);

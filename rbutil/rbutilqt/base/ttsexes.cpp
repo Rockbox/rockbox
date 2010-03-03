@@ -44,8 +44,10 @@ void TTSExes::generateSettings()
 
 void TTSExes::saveSettings()
 {
-    RbSettings::setSubValue(m_name,RbSettings::TtsPath,getSetting(eEXEPATH)->current().toString());
-    RbSettings::setSubValue(m_name,RbSettings::TtsOptions,getSetting(eOPTIONS)->current().toString());
+    RbSettings::setSubValue(m_name,RbSettings::TtsPath,
+            getSetting(eEXEPATH)->current().toString());
+    RbSettings::setSubValue(m_name,RbSettings::TtsOptions,
+            getSetting(eOPTIONS)->current().toString());
     RbSettings::sync();
 }
 

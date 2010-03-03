@@ -31,15 +31,15 @@ class TTSExes : public TTSBase
         eEXEPATH,
         eOPTIONS
     };
-    
+
     Q_OBJECT
     public:
         TTSExes(QString name,QObject* parent=NULL);
-        TTSStatus voice(QString text,QString wavfile, QString *errStr);
+        TTSStatus voice(QString text, QString wavfile, QString *errStr);
         bool start(QString *errStr);
         bool stop() {return true;}
-        
-        // for settings 
+
+        // for settings
         void generateSettings();
         void saveSettings();
         bool configOk();

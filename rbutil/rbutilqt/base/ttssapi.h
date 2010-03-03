@@ -34,30 +34,30 @@ class TTSSapi : public TTSBase
         eSPEED,
         eOPTIONS
     };
-    
- Q_OBJECT
+
+    Q_OBJECT
     public:
         TTSSapi(QObject* parent=NULL);
-        
+
         TTSStatus voice(QString text,QString wavfile, QString *errStr);
         bool start(QString *errStr);
         bool stop();
-        
+
         // for settings
         bool configOk();
         void generateSettings();
         void saveSettings();
-    
-    private slots:
-        void updateVoiceList();
-        
-    private:       
+
+        private slots:
+            void updateVoiceList();
+
+    private:
         QStringList getVoiceList(QString language);
-    
+
         QProcess* voicescript;
         QTextStream* voicestream;
         QString defaultLanguage;
-        
+
         QString m_TTSexec;
         QString m_TTSOpts;
         QString m_TTSTemplate;
