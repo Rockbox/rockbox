@@ -400,7 +400,7 @@ static bool history_interval(void)
         { "0s", TALK_ID(0, UNIT_SEC) },
         { "1s", TALK_ID(1, UNIT_SEC) },
         { "2s", TALK_ID(2, UNIT_SEC) },
-        { "4s", TALK_ID(5, UNIT_SEC) }
+        { "4s", TALK_ID(4, UNIT_SEC) }
     };
     return set_option(str(LANG_RECORDING_HISTOGRAM_INTERVAL),
                           &global_settings.rec_histogram_interval,
