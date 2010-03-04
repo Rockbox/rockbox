@@ -32,14 +32,15 @@
 /* Vectors */
 
         ldr   pc, =start    /* reset vector */
-        /* next vectors are unused */
-        .word   0
-        .word   0
-        .word   0
-        .word   0
-        .word   0
-        .word   0
-        .word   0
+        /* next vectors are unused, halt cpu */
+1:      b 1b
+1:      b 1b
+1:      b 1b
+1:      b 1b
+1:      b 1b
+1:      b 1b
+1:      b 1b
+
 
 /* These values are filled in by mkamsboot - don't move them from offset 0x20 */
 
