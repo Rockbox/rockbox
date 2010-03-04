@@ -324,6 +324,7 @@ static void init(void)
     /* Keep the order of this 3 (viewportmanager handles statusbars)
      * Must be done before any code uses the multi-screen API */
     gui_syncstatusbar_init(&statusbars);
+    gui_sync_wps_init();
     sb_skin_init();
     viewportmanager_init();
 
@@ -455,6 +456,7 @@ static void init(void)
      * Must be done before any code uses the multi-screen API */
     gui_syncstatusbar_init(&statusbars);
     sb_skin_init();
+    gui_sync_wps_init();
     viewportmanager_init();
 
 #if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
