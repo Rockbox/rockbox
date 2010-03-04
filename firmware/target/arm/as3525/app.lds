@@ -110,7 +110,7 @@ SECTIONS
         _iend = .;
     } > IRAM
 
-    .init ENDAUDIOADDR : 
+    .init CODECORIG : 
     {
         . = ALIGN(4);
         _initstart = .;
