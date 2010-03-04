@@ -289,7 +289,7 @@ cpu_init:
     str    r3, [r4]
 #endif
 
-    bl     main
+    ldr    pc, =main
     /* main() should never return */
 
 cop_init:
@@ -328,7 +328,7 @@ cop_init:
     msr    cpsr_c, #0xd3
     
     /* Run cop_main() in apps/main.c */
-    bl     cop_main
+    ldr    pc, =cop_main
 
 /* Exception handlers. Will be copied to address 0 after memory remapping */
     .section .vectors,"aw"
