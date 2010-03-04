@@ -127,6 +127,10 @@ static void init(void);
 #ifdef SIMULATOR
 void app_main(void)
 #else
+/* main(), and various functions called by main() and init() may be
+ * be INIT_ATTR. These functions must not be called after the final call
+ * to root_menu() at the end of main()
+ * see definition of INIT_ATTR in config.h */
 int main(void)  INIT_ATTR __attribute__((noreturn));
 int main(void)
 #endif
@@ -161,6 +165,8 @@ int main(void)
 #endif /* #ifdef AUTOROCK */
 
     global_status.last_volume_change = 0;
+    /* no calls INIT_ATTR functions after this point anymore!
+     * see definition of INIT_ATTR in config.h */
     root_menu();
 }
 
