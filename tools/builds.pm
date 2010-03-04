@@ -1,4 +1,4 @@
-$publicrelease="3.51";
+$publicrelease="3.5.1";
 $releasedate="March 4, 2010";
 $releasenotes="/wiki/ReleaseNotes351";
 
