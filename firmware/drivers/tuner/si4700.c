@@ -282,29 +282,6 @@ static inline int si4700_st(void)
 }
 #endif
 
-void si4700_init(void)
-{
-    tuner_power(true);
-
-    /* read all registers */
-    si4700_read(16);
-    
-    /* check device id */
-    if (cache[DEVICEID] == 0x1242)
-    {
-        tuner_present = true;
-
-#ifdef USE_INTERNAL_OSCILLATOR
-        /* Enable the internal oscillator
-          (Si4702-16 needs this register to be initialised to 0x100) */
-        si4700_write_set(TEST1, TEST1_XOSCEN | 0x100);
-        sleep(HZ/2);
-#endif    
-    }
-
-    tuner_power(false);
-}
-
 static void si4700_sleep(int snooze)
 {
     if (snooze)
@@ -337,6 +314,32 @@ static void si4700_sleep(int snooze)
                             SYSCONFIG2_VOLUMEw(0xF),
                             SYSCONFIG2_VOLUME | SYSCONFIG2_SEEKTH);
     }
+}
+
+void si4700_init(void)
+{
+    tuner_power(true);
+
+    /* read all registers */
+    si4700_read(16);
+    si4700_sleep(0);
+
+    /* check device id */
+    if (cache[DEVICEID] == 0x1242)
+    {
+        tuner_present = true;
+
+#ifdef USE_INTERNAL_OSCILLATOR
+        /* Enable the internal oscillator
+          (Si4702-16 needs this register to be initialised to 0x100) */
+        si4700_write_set(TEST1, TEST1_XOSCEN | 0x100);
+        sleep(HZ/2);
+#endif
+    }
+
+    si4700_sleep(1);
+
+    tuner_power(false);
 }
 
 static void si4700_set_frequency(int freq)
