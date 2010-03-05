@@ -107,4 +107,5 @@ static inline fixed32 fixmul32(fixed32 x, fixed32 y)
 #endif
 
 
-/* get fixmul32b from codeclib */
+/* Inverse gain of circular cordic rotation in s0.31 format. */     
+long fsincos(unsigned long phase, fixed32 *cos);
