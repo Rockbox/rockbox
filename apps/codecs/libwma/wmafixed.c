@@ -350,4 +350,3 @@ fixed64 fixdiv64(fixed64 x, fixed64 y)
      
      return y;   
  }
- 
