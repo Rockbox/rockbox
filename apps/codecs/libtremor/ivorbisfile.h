@@ -89,11 +89,11 @@ typedef struct OggVorbis_File {
 extern int ov_clear(OggVorbis_File *vf);
   //extern int ov_open(FILE *f,OggVorbis_File *vf,char *initial,long ibytes);
 extern int ov_open_callbacks(void *datasource, OggVorbis_File *vf,
-        char *initial, long ibytes, ov_callbacks callbacks);
+                char *initial, long ibytes, ov_callbacks callbacks);
 
   //extern int ov_test(FILE *f,OggVorbis_File *vf,char *initial,long ibytes);
 extern int ov_test_callbacks(void *datasource, OggVorbis_File *vf,
-        char *initial, long ibytes, ov_callbacks callbacks);
+                char *initial, long ibytes, ov_callbacks callbacks);
 extern int ov_test_open(OggVorbis_File *vf);
 
 extern long ov_bitrate(OggVorbis_File *vf,int i);
@@ -120,7 +120,7 @@ extern vorbis_info *ov_info(OggVorbis_File *vf,int link);
 extern vorbis_comment *ov_comment(OggVorbis_File *vf,int link);
 
 extern long ov_read(OggVorbis_File *vf,char *buffer,int length,
-            int *bitstream);
+                    int *bitstream);
 extern long ov_read_fixed(OggVorbis_File *vf,ogg_int32_t ***pcm_channels,
                           int length,int *bitstream);
 

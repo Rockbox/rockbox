@@ -1003,11 +1003,11 @@ STATICIRAM_NOT_MDCT int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
     /* split the body contents off */
     if(op){
       op->packet=ogg_buffer_split(&os->body_tail,&os->body_head,
-                  os->body_fill&FINMASK);
+                                  os->body_fill&FINMASK);
       op->bytes=os->body_fill&FINMASK;
     }else{
       os->body_tail=ogg_buffer_pretruncate(os->body_tail,
-                       os->body_fill&FINMASK);
+                                           os->body_fill&FINMASK);
       if(os->body_tail==0)os->body_head=0;
     }
 
