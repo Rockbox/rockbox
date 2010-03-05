@@ -262,14 +262,14 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Sì"
-    cowond2*: "MENU = Sì"
+    cowond2*: "MENU, o alto-destra = Sì"
     iriverh100,iriverh120,iriverh300: "NAVI = Sì"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Sì"
     mrobe500: "PLAY o POWER = Sì"
@@ -13205,7 +13205,93 @@
   <dest>
     *: "di"
   </dest>
-  <voice>
+		<voice>
     *: "di"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Skin Base "
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Skin Base "
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Skin Base Per Telecomando"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Skin Base Per Telecomando"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Schermata Principale"
+  </source>
+  <dest>
+    *:none
+    remote: "Schermata Principale"
+  </dest>
+  <voice>
+    *:none
+    remote: "Schermata Principale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Schermata Telecomando"
+  </dest>
+  <voice>
+    *:none
+    remote: "Schermata Telecomando"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "Intervallo Istogramma"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Intervallo Istogramma"
+  </voice>
+</phrase>
+
