@@ -184,7 +184,7 @@ static void gui_statusbar_init(struct gui_statusbar * bar)
             (vp).y = (display)->lcdheight - STATUSBAR_HEIGHT;       \
         } while(0)
 
-void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
+void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct viewport *vp)
 {
     struct screen * display = bar->display;
 
@@ -194,6 +194,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #ifdef HAVE_LCD_CHARCELLS
     int val;
     (void)force_redraw; /* The Player always has "redraw" */
+    (void)vp;
 #endif /* HAVE_LCD_CHARCELLS */
 
     bar->info.battlevel = battery_level();
@@ -277,10 +278,16 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #endif
         memcmp(&(bar->info), &(bar->lastinfo), sizeof(struct status_info)))
     {
-        struct viewport vp;
-        
-        GET_RECT(vp,statusbar_position(display->screen_type),display);
-        display->set_viewport(&vp);
+        if (vp == NULL)
+        {
+            struct viewport viewport;
+            GET_RECT(viewport,statusbar_position(display->screen_type),display);
+            display->set_viewport(&viewport);
+        }
+        else
+        {
+            display->set_viewport(vp);
+        }
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         display->fillrect(0, 0, display->getwidth(), STATUSBAR_HEIGHT);
         display->set_drawmode(DRMODE_SOLID);
@@ -823,30 +830,10 @@ void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
 #endif /* HAVE_LCD_BITMAP */
     int i;
     FOR_NB_SCREENS(i) {
-        gui_statusbar_draw( &(bars->statusbars[i]), force_redraw );
+        gui_statusbar_draw( &(bars->statusbars[i]), force_redraw, NULL );
     }
 }
 
-#ifdef HAVE_LCD_BITMAP
-void gui_statusbar_changed( enum screen_type screen,
-                            enum statusbar_values old)
-{
-    /* clear and update the statusbar area to remove old parts */
-    enum statusbar_values bar = statusbar_position(screen);
-
-    struct screen *display = &screens[screen];
-    struct viewport vp;
-
-    if (old != STATUSBAR_OFF && old != bar)
-    {
-        GET_RECT(vp, old, display);
-        display->set_viewport(&vp);
-        display->clear_viewport();
-        display->update_viewport();
-        display->set_viewport(NULL);
-    }
-}
-#endif
 
 #ifdef HAVE_REMOTE_LCD
 enum statusbar_values statusbar_position(int screen)

@@ -630,7 +630,8 @@ static bool get_line(struct gui_wps *gwps,
                      struct skin_subline *subline,
                      struct align_pos *align,
                      char *linebuf,
-                     int linebuf_size)
+                     int linebuf_size,
+                     unsigned refresh_mode)
 {
     struct wps_data *data = gwps->data;
 
@@ -639,6 +640,7 @@ static bool get_line(struct gui_wps *gwps,
     char *linebuf_end = linebuf + linebuf_size - 1;
     bool update = false;
     int i;
+    (void)refresh_mode; /* silence warning on charcell */
 
     /* alignment-related variables */
     int cur_align;
@@ -676,6 +678,11 @@ static bool get_line(struct gui_wps *gwps,
                     img->display = subimage;
                 break;
             }
+            case WPS_TOKEN_DRAW_INBUILTBAR:
+                gui_statusbar_draw(&(statusbars.statusbars[gwps->display->screen_type]),
+                                   refresh_mode == WPS_REFRESH_ALL,
+                                   data->tokens[i].value.data);
+                break;
 #endif
 
             case WPS_TOKEN_ALIGN_LEFT:
@@ -1176,8 +1183,8 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
                 || new_subline_refresh || hidden_vp)
             {
                 /* get_line tells us if we need to update the line */
-                update_line = get_line(gwps, subline,
-                                       &align, linebuf, sizeof(linebuf));
+                update_line = get_line(gwps, subline, &align,
+                                       linebuf, sizeof(linebuf), vp_refresh_mode);
             }
 #ifdef HAVE_LCD_BITMAP
             /* peakmeter */

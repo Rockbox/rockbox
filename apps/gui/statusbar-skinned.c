@@ -173,10 +173,23 @@ void sb_create_from_settings(enum screen_type screen)
 {
     char buf[128], *ptr, *ptr2;
     int len, remaining = sizeof(buf);
-    
+    int bar_position = statusbar_position(screen);
     ptr = buf;
     ptr[0] = '\0';
     
+    /* setup the inbuilt statusbar */
+    if (bar_position != STATUSBAR_OFF)
+    {
+        int y = 0, height = STATUSBAR_HEIGHT;
+        if (bar_position == STATUSBAR_BOTTOM)
+        {
+            y = screens[screen].lcdheight - STATUSBAR_HEIGHT;
+        }
+        len = snprintf(ptr, remaining, "%%V|0|%d|-|%d|0|-|-|\n%%wi\n", 
+                       y, height);
+        remaining -= len;
+        ptr += len;
+    }
     /* %Vi viewport, colours handled by the parser */
 #if NB_SCREENS > 1
     if (screen == SCREEN_REMOTE)
@@ -194,7 +207,7 @@ void sb_create_from_settings(enum screen_type screen)
     else
     {
         int y = 0, height;
-        switch (statusbar_position(screen))
+        switch (bar_position)
         {
             case STATUSBAR_TOP:
                 y = STATUSBAR_HEIGHT;

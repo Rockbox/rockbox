@@ -624,14 +624,14 @@ const struct settings_list settings[] = {
                     ID2P(LANG_INVERT_CURSOR_BAR)),
  #endif
     CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, statusbar,
-                  LANG_STATUS_BAR, STATUSBAR_TOP, "statusbar","off,top,bottom,custom",
-                  NULL, 4, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
-                  ID2P(LANG_STATUSBAR_BOTTOM), ID2P(LANG_STATUSBAR_CUSTOM)),
+                  LANG_STATUS_BAR, STATUSBAR_TOP, "statusbar","off,top,bottom",
+                  NULL, 3, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
+                  ID2P(LANG_STATUSBAR_BOTTOM)),
 #ifdef HAVE_REMOTE_LCD
     CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, remote_statusbar,
-                  LANG_REMOTE_STATUSBAR, STATUSBAR_TOP, "remote statusbar","off,top,bottom,custom",
-                  NULL, 4, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
-                  ID2P(LANG_STATUSBAR_BOTTOM), ID2P(LANG_STATUSBAR_CUSTOM)),
+                  LANG_REMOTE_STATUSBAR, STATUSBAR_TOP, "remote statusbar","off,top,bottom",
+                  NULL, 3, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
+                  ID2P(LANG_STATUSBAR_BOTTOM)),
 #endif
     CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, scrollbar,
                   LANG_SCROLL_BAR, SCROLLBAR_LEFT, "scrollbar","off,left,right",

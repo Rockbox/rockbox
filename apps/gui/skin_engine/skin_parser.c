@@ -154,6 +154,8 @@ static int parse_statusbar_enable(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_statusbar_disable(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
+static int parse_statusbar_inbuilt(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data);
 static int parse_image_display(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_image_load(const char *wps_bufptr,
@@ -349,6 +351,7 @@ static const struct wps_tag all_tags[] = {
 #ifdef HAVE_LCD_BITMAP
     { WPS_NO_TOKEN,                       "we",  0, parse_statusbar_enable },
     { WPS_NO_TOKEN,                       "wd",  0, parse_statusbar_disable },
+    { WPS_TOKEN_DRAW_INBUILTBAR,          "wi",  WPS_REFRESH_DYNAMIC, parse_statusbar_inbuilt },
 
     { WPS_NO_TOKEN,                       "xl",  0,       parse_image_load },
 
@@ -559,6 +562,14 @@ static int parse_statusbar_disable(const char *wps_bufptr,
     struct skin_viewport *default_vp = find_viewport(VP_DEFAULT_LABEL, wps_data);
     viewport_set_fullscreen(&default_vp->vp, curr_screen);
     default_vp->vp.font = FONT_UI;
+    return skip_end_of_line(wps_bufptr);
+}
+
+static int parse_statusbar_inbuilt(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data)
+{
+    (void)wps_data;
+    token->value.data = (void*)&curr_vp->vp;
     return skip_end_of_line(wps_bufptr);
 }
 

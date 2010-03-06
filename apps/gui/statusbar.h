@@ -55,8 +55,7 @@ struct status_info {
 };
 
 /* statusbar visibility/position, used for settings also */
-enum statusbar_values { STATUSBAR_OFF = 0, STATUSBAR_TOP, STATUSBAR_BOTTOM,
-                        STATUSBAR_CUSTOM };
+enum statusbar_values { STATUSBAR_OFF = 0, STATUSBAR_TOP, STATUSBAR_BOTTOM };
 
 struct gui_statusbar
 {
@@ -92,7 +91,8 @@ extern struct gui_syncstatusbar statusbars;
  * Draws the status bar on the attached screen
  * - bar : the statusbar structure
  */
-extern void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw);
+extern void gui_statusbar_draw(struct gui_statusbar * bar,
+                               bool force_redraw, struct viewport *vp);
 
 
 struct gui_syncstatusbar
@@ -103,8 +103,6 @@ struct gui_syncstatusbar
 extern void gui_syncstatusbar_init(struct gui_syncstatusbar * bars) INIT_ATTR;
 extern void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
                                     bool force_redraw);
-void gui_statusbar_changed(enum screen_type screen,
-                            enum statusbar_values old);
 #if !defined(HAVE_REMOTE_LCD) || defined(__PCTOOL__)
 #include "settings.h"
 #define statusbar_position(a) ((enum statusbar_values)global_settings.statusbar)
