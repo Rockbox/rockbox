@@ -966,7 +966,7 @@ void settings_apply(bool read_disk)
 #endif
 #ifdef HAVE_LCD_BITMAP
     /* already called with THEME_STATUSBAR in settings_apply_skins() */
-    viewportmanager_theme_changed(THEME_UI_VIEWPORT|THEME_LANGUAGE);
+    viewportmanager_theme_changed(THEME_UI_VIEWPORT|THEME_LANGUAGE|THEME_BUTTONBAR);
 #endif
 }
 

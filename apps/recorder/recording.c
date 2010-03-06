@@ -2101,6 +2101,7 @@ static bool f2_rec_screen(void)
 
     FOR_NB_SCREENS(i)
     {
+        screens[i].set_viewport(NULL);
         screens[i].setfont(FONT_SYSFIXED);
         screens[i].getstringsize("A",&w,&h);
     }
@@ -2236,6 +2237,7 @@ static bool f3_rec_screen(void)
 
     FOR_NB_SCREENS(i)
     {
+        screens[i].set_viewport(NULL);
         screens[i].setfont(FONT_SYSFIXED);
         screens[i].getstringsize("A",&w,&h);
     }
