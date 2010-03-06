@@ -231,6 +231,7 @@ static void viewportmanager_redraw(void* data)
 #ifdef HAVE_LCD_BITMAP
         sb_skin_update(i, NULL != data);
 #else
+        (void)data;
         gui_statusbar_draw(&statusbars.statusbars[i], NULL, NULL);
 #endif
     }
