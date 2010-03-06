@@ -395,12 +395,12 @@ next_track:
         if (ci->seek_time) {
             struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, &read_buffer);
 
-            decodedsamples = newpos->samples;
             if (newpos->pos > format.numbytes)
                 break;
             if (ci->seek_buffer(firstblockposn + newpos->pos))
             {
-                bytesdone = newpos->pos;
+                bytesdone      = newpos->pos;
+                decodedsamples = newpos->samples;
             }
             ci->seek_complete();
         }

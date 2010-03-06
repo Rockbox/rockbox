@@ -293,11 +293,13 @@ next_track:
             /* 2nd args(read_buffer) is unnecessary in the format which AIFF supports. */
             struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, NULL);
 
-            decodedsamples = newpos->samples;
             if (newpos->pos > format.numbytes)
                 break;
             if (ci->seek_buffer(firstblockposn + newpos->pos))
-                bytesdone = newpos->pos;
+            {
+                bytesdone      = newpos->pos;
+                decodedsamples = newpos->samples;
+            }
             ci->seek_complete();
         }
         aifbuf = (uint8_t *)ci->request_buffer(&n, format.chunksize);
