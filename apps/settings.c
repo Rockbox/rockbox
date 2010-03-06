@@ -360,7 +360,7 @@ bool settings_load_config(const char* file, bool apply)
     settings_save();
     if (apply)
     {
-        settings_apply();
+        settings_apply(true);
         settings_apply_skins();
     }
     return true;
@@ -741,7 +741,7 @@ void sound_settings_apply(void)
 }
 
 
-void settings_apply(void)
+void settings_apply(bool read_disk)
 {
     
     char buf[64];
@@ -833,52 +833,54 @@ void settings_apply(void)
     audiohw_enable_speaker(global_settings.speaker_enabled);
 #endif
 
+    if (read_disk)
+    {
 #ifdef HAVE_LCD_BITMAP
-    /* fonts need to be loaded before the WPS */
-    if (global_settings.font_file[0]
-        && global_settings.font_file[0] != '-') {
-        snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
-                 global_settings.font_file);
-        if (font_load(NULL, buf) < 0)
+        /* fonts need to be loaded before the WPS */
+        if (global_settings.font_file[0]
+            && global_settings.font_file[0] != '-') {
+            snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
+                     global_settings.font_file);
+            if (font_load(NULL, buf) < 0)
+                font_reset(NULL);
+        }
+        else
             font_reset(NULL);
-    }
-    else
-        font_reset(NULL);
 #ifdef HAVE_REMOTE_LCD        
-    if ( global_settings.remote_font_file[0]
-        && global_settings.remote_font_file[0] != '-') {
-        snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
-                 global_settings.remote_font_file);
-        if (font_load_remoteui(buf) < 0)
+        if ( global_settings.remote_font_file[0]
+            && global_settings.remote_font_file[0] != '-') {
+            snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
+                     global_settings.remote_font_file);
+            if (font_load_remoteui(buf) < 0)
+                font_load_remoteui(NULL);
+        }
+        else
             font_load_remoteui(NULL);
-    }
-    else
-        font_load_remoteui(NULL);
 #endif
-    if ( global_settings.kbd_file[0]) {
-        snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
-                 global_settings.kbd_file);
-        load_kbd(buf);
-    }
-    else
-        load_kbd(NULL);
+        if ( global_settings.kbd_file[0]) {
+            snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
+                     global_settings.kbd_file);
+            load_kbd(buf);
+        }
+        else
+            load_kbd(NULL);
 #endif
 
-    if ( global_settings.lang_file[0]) {
-        snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
-                 global_settings.lang_file);
-        lang_core_load(buf);
-        talk_init(); /* use voice of same language */
-    }
+        if ( global_settings.lang_file[0]) {
+            snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
+                     global_settings.lang_file);
+            lang_core_load(buf);
+            talk_init(); /* use voice of same language */
+        }
 
-    /* load the icon set */
-    icons_init();
+        /* load the icon set */
+        icons_init();
 
 #ifdef HAVE_LCD_COLOR
-    if (global_settings.colors_file[0])
-        read_color_theme_file();
+        if (global_settings.colors_file[0])
+            read_color_theme_file();
 #endif
-
+    }
 #ifdef HAVE_LCD_COLOR
     screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
     screens[SCREEN_MAIN].set_background(global_settings.bg_color);
