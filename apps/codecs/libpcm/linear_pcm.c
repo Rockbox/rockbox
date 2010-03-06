@@ -20,12 +20,17 @@
  *
  ****************************************************************************/
 #include "codeclib.h"
-#include "pcm_common.h"
 #include "support_formats.h"
 
 /*
  * Linear PCM
  */
+
+#define INC_DEPTH_8   (PCM_OUTPUT_DEPTH - 8)
+#define INC_DEPTH_16  (PCM_OUTPUT_DEPTH - 16)
+#define INC_DEPTH_24  (PCM_OUTPUT_DEPTH - 24)
+#define DEC_DEPTH_32  (32 - PCM_OUTPUT_DEPTH)
+
 
 static struct pcm_format *fmt;
 
@@ -73,7 +78,7 @@ static inline void decode_s8(const uint8_t *inbuf, size_t inbufsize, int32_t *ou
     size_t i = 0;
 
     for ( ; i < inbufsize; i++)
-        outbuf[i] = SE(inbuf[i])<<21;
+        outbuf[i] = SE(inbuf[i]) << INC_DEPTH_8;
 }
 
 static inline void decode_u8(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
@@ -81,7 +86,7 @@ static inline void decode_u8(const uint8_t *inbuf, size_t inbufsize, int32_t *ou
     size_t i = 0;
 
     for ( ; i < inbufsize; i++)
-        outbuf[i] = SFT(inbuf[i])<<21;
+        outbuf[i] = SFT(inbuf[i]) << INC_DEPTH_8;
 }
 
 /* 16bit decode functions */
@@ -90,7 +95,7 @@ static inline void decode_s16le(const uint8_t *inbuf, size_t inbufsize, int32_t 
     size_t i = 0;
 
     for ( ; i < inbufsize; i += 2)
-        outbuf[i/2] = (inbuf[i]<<13)|(SE(inbuf[i+1])<<21);
+        outbuf[i/2] = (inbuf[i] << INC_DEPTH_16)|(SE(inbuf[i+1]) << INC_DEPTH_16);
 }
 
 static inline void decode_u16le(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
@@ -98,7 +103,7 @@ static inline void decode_u16le(const uint8_t *inbuf, size_t inbufsize, int32_t 
     size_t i = 0;
 
     for ( ; i < inbufsize; i += 2)
-        outbuf[i/2] = (inbuf[i]<<13)|(SFT(inbuf[i+1])<<21);
+        outbuf[i/2] = (inbuf[i] << INC_DEPTH_16)|(SFT(inbuf[i+1]) << INC_DEPTH_8);
 }
 
 static inline void decode_s16be(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
@@ -106,7 +111,7 @@ static inline void decode_s16be(const uint8_t *inbuf, size_t inbufsize, int32_t 
     size_t i = 0;
 
     for ( ; i < inbufsize; i += 2)
-        outbuf[i/2] = (inbuf[i+1]<<13)|(SE(inbuf[i])<<21);
+        outbuf[i/2] = (inbuf[i+1] << INC_DEPTH_16)|(SE(inbuf[i]) << INC_DEPTH_8);
 }
 
 static inline void decode_u16be(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
@@ -114,7 +119,7 @@ static inline void decode_u16be(const uint8_t *inbuf, size_t inbufsize, int32_t 
     size_t i = 0;
 
     for ( ; i < inbufsize; i += 2)
-        outbuf[i/2] = (inbuf[i+1]<<13)|(SFT(inbuf[i])<<21);
+        outbuf[i/2] = (inbuf[i+1] << INC_DEPTH_16)|(SFT(inbuf[i]) << INC_DEPTH_8);
 }
 
 /* 24bit decode functions */
@@ -123,7 +128,8 @@ static inline void decode_s24le(const uint8_t *inbuf, size_t inbufsize, int32_t 
     size_t i = 0;
 
     for ( ; i < inbufsize; i += 3)
-        outbuf[i/3] = (inbuf[i]<<5)|(inbuf[i+1]<<13)|(SE(inbuf[i+2])<<21);
+        outbuf[i/3] = (inbuf[i] << INC_DEPTH_24)|(inbuf[i+1] << INC_DEPTH_16)|
+                      (SE(inbuf[i+2]) << INC_DEPTH_8);
 }
 
 static inline void decode_u24le(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
@@ -131,7 +137,8 @@ static inline void decode_u24le(const uint8_t *inbuf, size_t inbufsize, int32_t 
     size_t i = 0;
 
     for ( ; i < inbufsize; i += 3)
-        outbuf[i/3] = (inbuf[i]<<5)|(inbuf[i+1]<<13)|(SFT(inbuf[i+2])<<21);
+        outbuf[i/3] = (inbuf[i] << INC_DEPTH_24)|(inbuf[i+1] << INC_DEPTH_16)|
+                      (SFT(inbuf[i+2]) << INC_DEPTH_8);
 }
 
 static inline void decode_s24be(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
@@ -139,7 +146,8 @@ static inline void decode_s24be(const uint8_t *inbuf, size_t inbufsize, int32_t 
     size_t i = 0;
 
     for ( ; i < inbufsize; i += 3)
-        outbuf[i/3] = (inbuf[i+2]<<5)|(inbuf[i+1]<<13)|(SE(inbuf[i])<<21);
+        outbuf[i/3] = (inbuf[i+2] << INC_DEPTH_24)|(inbuf[i+1] << INC_DEPTH_16)|
+                      (SE(inbuf[i]) << INC_DEPTH_8);
 }
 
 static inline void decode_u24be(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
@@ -147,7 +155,8 @@ static inline void decode_u24be(const uint8_t *inbuf, size_t inbufsize, int32_t 
     size_t i = 0;
 
     for ( ; i < inbufsize; i += 3)
-        outbuf[i/3] = (inbuf[i+2]<<5)|(inbuf[i+1]<<13)|(SFT(inbuf[i])<<21);
+        outbuf[i/3] = (inbuf[i+2] << INC_DEPTH_24)|(inbuf[i+1] << INC_DEPTH_8)|
+                      (SFT(inbuf[i]) << INC_DEPTH_8);
 }
 
 /* 32bit decode functions */
@@ -156,7 +165,8 @@ static inline void decode_s32le(const uint8_t *inbuf, size_t inbufsize, int32_t 
     size_t i = 0;
 
     for ( ; i < inbufsize; i += 4)
-        outbuf[i/4] = (inbuf[i]>>3)|(inbuf[i+1]<<5)|(inbuf[i+2]<<13)|(SE(inbuf[i+3])<<21);
+        outbuf[i/4] = (inbuf[i]   >> DEC_DEPTH_32)|(inbuf[i+1] << INC_DEPTH_24)|
+                      (inbuf[i+2] << INC_DEPTH_16)|(SE(inbuf[i+3]) << INC_DEPTH_8);
 }
 
 static inline void decode_u32le(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
@@ -164,7 +174,8 @@ static inline void decode_u32le(const uint8_t *inbuf, size_t inbufsize, int32_t 
     size_t i = 0;
 
     for ( ; i < inbufsize; i += 4)
-        outbuf[i/4] = (inbuf[i]>>3)|(inbuf[i+1]<<5)|(inbuf[i+2]<<13)|(SFT(inbuf[i+3])<<21);
+        outbuf[i/4] = (inbuf[i]   >> DEC_DEPTH_32)|(inbuf[i+1] << INC_DEPTH_24)|
+                      (inbuf[i+2] << INC_DEPTH_16)|(SFT(inbuf[i+3]) << INC_DEPTH_8);
 }
 
 static inline void decode_s32be(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
@@ -172,7 +183,8 @@ static inline void decode_s32be(const uint8_t *inbuf, size_t inbufsize, int32_t 
     size_t i = 0;
 
     for ( ; i < inbufsize; i += 4)
-        outbuf[i/4] = (inbuf[i+3]>>3)|(inbuf[i+2]<<5)|(inbuf[i+1]<<13)|(SE(inbuf[i])<<21);
+        outbuf[i/4] = (inbuf[i+3] >> DEC_DEPTH_32)|(inbuf[i+2] << INC_DEPTH_24)|
+                      (inbuf[i+1] << INC_DEPTH_16)|(SE(inbuf[i]) << INC_DEPTH_8);
 }
 
 static inline void decode_u32be(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf)
@@ -180,7 +192,8 @@ static inline void decode_u32be(const uint8_t *inbuf, size_t inbufsize, int32_t 
     size_t i = 0;
 
     for ( ; i < inbufsize; i += 4)
-        outbuf[i/4] = (inbuf[i+3]>>3)|(inbuf[i+2]<<5)|(inbuf[i+1]<<13)|(SFT(inbuf[i])<<21);
+        outbuf[i/4] = (inbuf[i+3] >> DEC_DEPTH_32)|(inbuf[i+2] << INC_DEPTH_24)|
+                      (inbuf[i+1] << INC_DEPTH_16)|(SFT(inbuf[i]) << INC_DEPTH_8);
 }
 
 static int decode(const uint8_t *inbuf, size_t inbufsize, int32_t *outbuf, int *outbufcount)

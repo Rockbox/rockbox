@@ -165,7 +165,7 @@ enum codec_status codec_main(void)
     const struct pcm_codec *codec;
 
     /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH);
   
 next_track:
     if (codec_init()) {

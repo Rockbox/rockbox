@@ -20,7 +20,6 @@
  *
  ****************************************************************************/
 #include "codeclib.h"
-#include "pcm_common.h"
 #include "support_formats.h"
 
 /*
@@ -154,7 +153,7 @@ static int decode_alaw(const uint8_t *inbuf, size_t inbufsize,
     uint32_t i;
 
     for (i = 0; i < inbufsize; i++)
-        outbuf[i] = alaw2linear16[inbuf[i]] << 13;
+        outbuf[i] = alaw2linear16[inbuf[i]] << (PCM_OUTPUT_DEPTH - 16);
 
     *outbufsize = (fmt->channels == 2) ? (inbufsize >> 1) : inbufsize;
 
@@ -167,7 +166,7 @@ static int decode_mulaw(const uint8_t *inbuf, size_t inbufsize,
     uint32_t i;
 
     for (i = 0; i < inbufsize; i++)
-        outbuf[i] = ulaw2linear16[inbuf[i]] << 13;
+        outbuf[i] = ulaw2linear16[inbuf[i]] << (PCM_OUTPUT_DEPTH - 16);
 
     *outbufsize = (fmt->channels == 2) ? (inbufsize >> 1) : inbufsize;
 

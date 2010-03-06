@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "codeclib.h"
-#include "pcm_common.h"
 #include "adpcm_seek.h"
 #include "support_formats.h"
 
@@ -173,8 +172,8 @@ static int decode(const uint8_t *inbuf, size_t inbufsize,
     ch = fmt->channels - 1;
     while (inbufsize)
     {
-        *outbuf++ = create_pcmdata(0,  *inbuf     ) << 13;
-        *outbuf++ = create_pcmdata(ch, *inbuf >> 4) << 13;
+        *outbuf++ = create_pcmdata(0,  *inbuf     ) << (PCM_OUTPUT_DEPTH - 16);
+        *outbuf++ = create_pcmdata(ch, *inbuf >> 4) << (PCM_OUTPUT_DEPTH - 16);
         nsamples += 2;
 
         inbuf++;

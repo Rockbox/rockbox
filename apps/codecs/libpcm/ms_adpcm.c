@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "codeclib.h"
-#include "pcm_common.h"
 #include "support_formats.h"
 
 /*
@@ -138,8 +137,8 @@ static int decode(const uint8_t *inbuf, size_t inbufsize,
 
     while (size-- > 0)
     {
-        *outbuf++ = create_pcmdata(0,  *inbuf >> 4 ) << 13;
-        *outbuf++ = create_pcmdata(ch, *inbuf & 0xf) << 13;
+        *outbuf++ = create_pcmdata(0,  *inbuf >> 4 ) << (PCM_OUTPUT_DEPTH - 16);
+        *outbuf++ = create_pcmdata(ch, *inbuf & 0xf) << (PCM_OUTPUT_DEPTH - 16);
         nsamples += 2;
 
         inbuf++;

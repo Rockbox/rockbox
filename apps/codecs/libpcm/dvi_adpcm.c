@@ -20,7 +20,6 @@
  *
  ****************************************************************************/
 #include "codeclib.h"
-#include "pcm_common.h"
 #include "ima_adpcm_common.h"
 #include "support_formats.h"
 
@@ -85,13 +84,13 @@ static inline void decode_2bit(const uint8_t **inbuf,
             pcmbuf = *outbuf + ch;
             for (i = 0; i < 4; i++)
             {
-                *pcmbuf = create_pcmdata(ch, **inbuf     ) << 13;
+                *pcmbuf = create_pcmdata(ch, **inbuf     ) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
-                *pcmbuf = create_pcmdata(ch, **inbuf >> 2) << 13;
+                *pcmbuf = create_pcmdata(ch, **inbuf >> 2) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
-                *pcmbuf = create_pcmdata(ch, **inbuf >> 4) << 13;
+                *pcmbuf = create_pcmdata(ch, **inbuf >> 4) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
-                *pcmbuf = create_pcmdata(ch, **inbuf >> 6) << 13;
+                *pcmbuf = create_pcmdata(ch, **inbuf >> 6) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
                 (*inbuf)++;
             }
@@ -123,7 +122,7 @@ static inline void decode_3bit(const uint8_t **inbuf,
             adpcms |= (*adpcmbuf++) << 16;
             for (i = 0; i < 8; i++)
             {
-                *pcmbuf = create_pcmdata(ch, adpcms >> (3 * i)) << 13;
+                *pcmbuf = create_pcmdata(ch, adpcms >> (3 * i)) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
             }
             adpcms = *adpcmbuf++;
@@ -132,7 +131,7 @@ static inline void decode_3bit(const uint8_t **inbuf,
             adpcms |= (*adpcmbuf++) << 16;
             for (i = 0; i < 8; i++)
             {
-                *pcmbuf = create_pcmdata(ch, adpcms >> (3 * i)) << 13;
+                *pcmbuf = create_pcmdata(ch, adpcms >> (3 * i)) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
             }
             adpcms = *adpcmbuf++;
@@ -141,7 +140,7 @@ static inline void decode_3bit(const uint8_t **inbuf,
             adpcms |= (*adpcmbuf++) << 16;
             for (i = 0; i < 8; i++)
             {
-                *pcmbuf = create_pcmdata(ch, adpcms >> (3 * i)) << 13;
+                *pcmbuf = create_pcmdata(ch, adpcms >> (3 * i)) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
             }
             adpcms = *adpcmbuf++;
@@ -149,7 +148,7 @@ static inline void decode_3bit(const uint8_t **inbuf,
             adpcms |= (*adpcmbuf++) << 16;
             for (i = 0; i < 8; i++)
             {
-                *pcmbuf = create_pcmdata(ch, adpcms >> (3 * i)) << 13;
+                *pcmbuf = create_pcmdata(ch, adpcms >> (3 * i)) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
             }
         }
@@ -175,9 +174,9 @@ static inline void decode_4bit(const uint8_t **inbuf,
             pcmbuf = *outbuf + ch;
             for (i = 0; i < 4; i++)
             {
-                *pcmbuf = create_pcmdata_size4(ch, **inbuf     ) << 13;
+                *pcmbuf = create_pcmdata_size4(ch, **inbuf     ) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
-                *pcmbuf = create_pcmdata_size4(ch, **inbuf >> 4) << 13;
+                *pcmbuf = create_pcmdata_size4(ch, **inbuf >> 4) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
                 (*inbuf)++;
             }
@@ -212,7 +211,7 @@ static inline void decode_5bit(const uint8_t **inbuf,
             adpcms |= (uint64_t)(*adpcmbuf++) << 32;
             for (i = 0; i < 8; i++)
             {
-                *pcmbuf = create_pcmdata(ch, adpcms >> (5 * i)) << 13;
+                *pcmbuf = create_pcmdata(ch, adpcms >> (5 * i)) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
             }
             adpcms = *adpcmbuf++;
@@ -223,7 +222,7 @@ static inline void decode_5bit(const uint8_t **inbuf,
             adpcms |= (uint64_t)(*adpcmbuf++) << 32;
             for (i = 0; i < 8; i++)
             {
-                *pcmbuf = create_pcmdata(ch, adpcms >> (5 * i)) << 13;
+                *pcmbuf = create_pcmdata(ch, adpcms >> (5 * i)) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
             }
             adpcms = *adpcmbuf++;
@@ -234,7 +233,7 @@ static inline void decode_5bit(const uint8_t **inbuf,
             adpcms |= (uint64_t)(*adpcmbuf++) << 32;
             for (i = 0; i < 8; i++)
             {
-                *pcmbuf = create_pcmdata(ch, adpcms >> (5 * i)) << 13;
+                *pcmbuf = create_pcmdata(ch, adpcms >> (5 * i)) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
             }
             adpcms = *adpcmbuf++;
@@ -245,7 +244,7 @@ static inline void decode_5bit(const uint8_t **inbuf,
             adpcms |= (uint64_t)(*adpcmbuf++) << 32;
             for (i = 0; i < 8; i++)
             {
-                *pcmbuf = create_pcmdata(ch, adpcms >> (5 * i)) << 13;
+                *pcmbuf = create_pcmdata(ch, adpcms >> (5 * i)) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
             }
         }
@@ -283,7 +282,7 @@ static int decode(const uint8_t *inbuf, size_t inbufsize,
             }
             inbuf += 4;
 
-            *outbuf++ = init_pcmdata[ch] << 13;
+            *outbuf++ = init_pcmdata[ch] << IMA_ADPCM_INC_DEPTH;
         }
 
         *outbufcount += 1;

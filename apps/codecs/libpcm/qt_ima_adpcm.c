@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "codeclib.h"
-#include "pcm_common.h"
 #include "ima_adpcm_common.h"
 #include "support_formats.h"
 
@@ -107,9 +106,9 @@ static int decode(const uint8_t *inbuf, size_t inbufsize,
             pcmbuf = outbuf + ch;
             for (block_size = 32; block_size > 0 && inbufsize > 0; block_size--, inbufsize--)
             {
-                *pcmbuf = create_pcmdata_size4(ch, *inbuf     ) << 13;
+                *pcmbuf = create_pcmdata_size4(ch, *inbuf     ) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
-                *pcmbuf = create_pcmdata_size4(ch, *inbuf >> 4) << 13;
+                *pcmbuf = create_pcmdata_size4(ch, *inbuf >> 4) << IMA_ADPCM_INC_DEPTH;
                 pcmbuf += fmt->channels;
                 nsamples += 2;
                 inbuf++;

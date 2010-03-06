@@ -138,7 +138,7 @@ enum codec_status codec_main(void)
     int offset = 0;
 
     /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH);
   
 next_track:
     if (codec_init()) {

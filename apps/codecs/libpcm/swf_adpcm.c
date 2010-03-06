@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "codeclib.h"
-#include "pcm_common.h"
 #include "ima_adpcm_common.h"
 #include "support_formats.h"
 
@@ -193,18 +192,20 @@ static int decode(const uint8_t *inbuf, size_t inbufsize,
             init_pcmdata[1] -= 65536;
     }
 
-    *outbuf++ = init_pcmdata[0] << 13;
+    *outbuf++ = init_pcmdata[0] << IMA_ADPCM_INC_DEPTH;
     if (ch > 0)
-        *outbuf++ = init_pcmdata[1] << 13;
+        *outbuf++ = init_pcmdata[1] << IMA_ADPCM_INC_DEPTH;
 
     set_decode_parameters(fmt->channels, init_pcmdata, init_index);
 
     /* read block data */
     while (--count > 0)
     {
-        *outbuf++ = create_pcmdata(0, get_data(&inbuf, fmt->bitspersample)) << 13;
+        *outbuf++ = create_pcmdata(0, get_data(&inbuf, fmt->bitspersample))
+                        << IMA_ADPCM_INC_DEPTH;
         if (ch > 0)
-            *outbuf++ = create_pcmdata(ch, get_data(&inbuf, fmt->bitspersample)) << 13;
+            *outbuf++ = create_pcmdata(ch, get_data(&inbuf, fmt->bitspersample))
+                            << IMA_ADPCM_INC_DEPTH;
     }
 
     *outbufcount = fmt->samplesperblock;
