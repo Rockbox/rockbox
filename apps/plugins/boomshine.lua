@@ -58,8 +58,8 @@ local Ball = {
 function Ball:new(o)
     if o == nil then
         o = {
-                x = math.random(self.size, rb.LCD_WIDTH - self.size),
-                y = math.random(self.size, rb.LCD_HEIGHT - self.size),
+                x = math.random(0, rb.LCD_WIDTH - self.size),
+                y = math.random(0, rb.LCD_HEIGHT - self.size),
                 color = random_color(),
                 up_speed = Ball:generateSpeed(),
                 right_speed = Ball:generateSpeed(),
@@ -108,20 +108,19 @@ function Ball:step()
 
     self.x = self.x + self.right_speed
     self.y = self.y + self.up_speed
-    if (self.x + self.size) >= rb.LCD_WIDTH or self.x <= self.size then
-        self.right_speed = self.right_speed * (-1)
-    elseif (self.y + self.size) >= rb.LCD_HEIGHT or self.y <= self.size then
-        self.up_speed = self.up_speed * (-1)
+    if (self.right_speed > 0 and self.x + self.size >= rb.LCD_WIDTH) or
+       (self.right_speed < 0 and self.x <= 0) then
+        self.right_speed = -self.right_speed
+    end
+    if (self.up_speed > 0 and self.y + self.size >= rb.LCD_HEIGHT) or
+       (self.up_speed < 0 and self.y <= 0) then
+        self.up_speed = -self.up_speed
     end
 end
 
 function Ball:checkHit(other)
-    local x_dist = math.abs(other.x - self.x)
-    local y_dist = math.abs(other.y - self.y)
-    local x_size = self.x > other.x and other.size or self.size
-    local y_size = self.y > other.y and other.size or self.size
-
-    if (x_dist <= x_size) and (y_dist <= y_size) then
+    if (other.x + other.size >= self.x) and (self.x + self.size >= other.x) and
+       (other.y + other.size >= self.y) and (self.y + self.size >= other.y) then
         assert(not self.exploded)
         self.exploded = true
         self.death_time = rb.current_tick() + self.life_duration
