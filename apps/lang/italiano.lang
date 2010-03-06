@@ -4997,7 +4997,7 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
     *: "Clip Audio .Talk"
@@ -13249,7 +13249,7 @@
   user: core
   <source>
     *:none
-    remote: "Schermata Principale"
+    remote: "Main Screen"
   </source>
   <dest>
     *:none
@@ -13294,4 +13294,3 @@
     recording_histogram: "Intervallo Istogramma"
   </voice>
 </phrase>
-
