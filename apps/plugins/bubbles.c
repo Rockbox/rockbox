@@ -2419,10 +2419,7 @@ static int bubbles_menu(struct game_context* bb) {
             case 5: /* quit but don't save */
                 return BB_QUIT_WITHOUT_SAVING;
             case 6: /* save and quit  */
-                if (resume)
-                    return BB_QUIT;
-                else
-                    return BB_QUIT_WITHOUT_SAVING;
+                return BB_QUIT;
             case MENU_ATTACHED_USB:
                 bubbles_callback(bb);
                 return BB_USB;
@@ -2539,7 +2536,7 @@ enum plugin_status plugin_start(const void* parameter) {
                 break;
 
             case BB_QUIT:
-                rb->splash(HZ/3, "Saving game ...");
+                rb->splash(HZ/3, "Saving game data ...");
                 bubbles_savegame(&bb);
                 bubbles_savedata();
                 highscore_save(SCORE_FILE, highscores, NUM_SCORES);
