@@ -185,7 +185,7 @@ static inline int ipod_4g_button_read(void)
                         v = (v<0) ? -v : v;                       /* undo signedness */
             
                         /* some velocity filtering to smooth things out */
-                        wheel_velocity = (31 * wheel_velocity + v) / 32;
+                        wheel_velocity = (15 * wheel_velocity + v) / 16;
                         /* limit to 24 bit */
                         wheel_velocity = (wheel_velocity>0xffffff) ? 0xffffff : wheel_velocity;
 
