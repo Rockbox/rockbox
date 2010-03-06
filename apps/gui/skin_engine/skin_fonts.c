@@ -109,7 +109,7 @@ int skin_font_load(char* font_name)
     
     if (font->font_id < 0)
         return -1;
-    font->ref_count = 1;    
+    font->ref_count = 1;
     
     return font->font_id;
 }
@@ -128,13 +128,8 @@ void skin_font_unload(int font_id)
                 font_unload(font_id);
                 font_table[i].font_id = -1;
                 font_table[i].name[0] = '\0';
-            }                
+            }
             return;
         }
     }
 }
-    
-    
-            
-    
-

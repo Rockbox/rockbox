@@ -158,6 +158,8 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
     struct wps_state *state = &wps_state;
     if (id3)
     {
+        unsigned long length = id3->length;
+        unsigned long elapsed = id3->elapsed + state->ff_rewind_count;
         switch (token->type)
         {
             case WPS_TOKEN_METADATA_ARTIST:
@@ -216,9 +218,9 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 }
                 return NULL;
             case WPS_TOKEN_METADATA_COMMENT:
-                return id3->comment;   
+                return id3->comment;
             case WPS_TOKEN_FILE_PATH:
-                return id3->path;     
+                return id3->path;
             case WPS_TOKEN_FILE_BITRATE:
                 if(id3->bitrate)
                     snprintf(buf, buf_size, "%d", id3->bitrate);
@@ -226,31 +228,26 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                     return "?";
                 return buf;
             case WPS_TOKEN_TRACK_TIME_ELAPSED:
-                format_time(buf, buf_size,
-                            id3->elapsed + state->ff_rewind_count);
+                format_time(buf, buf_size, elapsed);
                 return buf;
 
             case WPS_TOKEN_TRACK_TIME_REMAINING:
-                format_time(buf, buf_size,
-                            id3->length - id3->elapsed -
-                            state->ff_rewind_count);
+                format_time(buf, buf_size, length - elapsed);
                 return buf;
 
             case WPS_TOKEN_TRACK_LENGTH:
-                format_time(buf, buf_size, id3->length);
+                format_time(buf, buf_size, length);
                 return buf;
 
             case WPS_TOKEN_TRACK_ELAPSED_PERCENT:
-                if (id3->length <= 0)
+                if (length <= 0)
                     return NULL;
 
                 if (intval)
                 {
-                    *intval = limit * (id3->elapsed + state->ff_rewind_count)
-                              / id3->length + 1;
+                    *intval = limit * elapsed / length + 1;
                 }
-                snprintf(buf, buf_size, "%d",
-                         100*(id3->elapsed + state->ff_rewind_count) / id3->length);
+                snprintf(buf, buf_size, "%d", 100 * elapsed / length);
                 return buf;
 
 
@@ -295,7 +292,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 return (id3->vbr) ? "(avg)" : NULL;
             case WPS_TOKEN_FILE_DIRECTORY:
                 return get_dir(buf, buf_size, id3->path, token->value.i);
-                                
+
 #ifdef HAVE_TAGCACHE
         case WPS_TOKEN_DATABASE_PLAYCOUNT:
             if (intval)
@@ -313,7 +310,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
             snprintf(buf, buf_size, "%ld", id3->score);
             return buf;
 #endif
-    
+
             default:
                 return NULL;
         }
@@ -326,7 +323,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
              * The ones that expect "0" need to be handled */
             case WPS_TOKEN_FILE_FREQUENCY:
             case WPS_TOKEN_FILE_FREQUENCY_KHZ:
-            case WPS_TOKEN_FILE_SIZE:         
+            case WPS_TOKEN_FILE_SIZE:
 #ifdef HAVE_TAGCACHE
             case WPS_TOKEN_DATABASE_PLAYCOUNT:
             case WPS_TOKEN_DATABASE_RATING:
@@ -443,7 +440,8 @@ const char *get_token_value(struct gui_wps *gwps,
             snprintf(buf, buf_size, "%d", global_settings.volume);
             if (intval)
             {
-                if (global_settings.volume == sound_min(SOUND_VOLUME))
+                int minvol = sound_min(SOUND_VOLUME);
+                if (global_settings.volume == minvol)
                 {
                     *intval = 1;
                 }
@@ -457,9 +455,8 @@ const char *get_token_value(struct gui_wps *gwps,
                 }
                 else
                 {
-                    *intval = (limit - 3) * (global_settings.volume
-                                             - sound_min(SOUND_VOLUME) - 1)
-                              / (-1 - sound_min(SOUND_VOLUME)) + 2;
+                    *intval = (limit-3) * (global_settings.volume - minvol - 1)
+                                / (-1 - minvol) + 2;
                 }
             }
             return buf;
@@ -473,7 +470,7 @@ const char *get_token_value(struct gui_wps *gwps,
             
         case WPS_TOKEN_ALBUMART_DISPLAY:
             if (!data->albumart)
-                return NULL;        
+                return NULL;
             if (!data->albumart->draw)
                 data->albumart->draw = true;
             return NULL;
@@ -801,7 +798,7 @@ const char *get_token_value(struct gui_wps *gwps,
                                         id3->album_gain_string != NULL);
                 else
                     type = -1;
-                                        
+
                 if (type < 0)
                     val = 6;    /* no tag */
                 else
@@ -923,7 +920,7 @@ const char *get_token_value(struct gui_wps *gwps,
                             int sound_setting = s->sound_setting->setting;
                             /* settings with decimals can't be used in conditionals */
                             if (sound_numdecimals(sound_setting) == 0)
-                            {                                
+                            {
                                 *intval = (*(int*)s->setting-sound_min(sound_setting))
                                       /sound_steps(sound_setting) + 1;
                             }
@@ -999,7 +996,7 @@ const char *get_token_value(struct gui_wps *gwps,
                 rec_freq = 0;
                 while (rec_freq < SAMPR_NUM_FREQ &&
                        audio_master_sampr_list[rec_freq] != samprk)
-                {       
+                {
                     rec_freq++;
                 }
             }
@@ -1053,7 +1050,7 @@ const char *get_token_value(struct gui_wps *gwps,
 #else /* HWCODEC */
             
             static const char * const freq_strings[] =
-               {"--", "44", "48", "32", "22", "24", "16"};
+                {"--", "44", "48", "32", "22", "24", "16"};
             int freq = 1 + global_settings.rec_frequency;
 #ifdef HAVE_SPDIF_REC
             if (global_settings.rec_source == AUDIO_SRC_SPDIF)
@@ -1069,7 +1066,7 @@ const char *get_token_value(struct gui_wps *gwps,
 #endif
             return buf;
         }
-#if CONFIG_CODEC == SWCODEC        
+#if CONFIG_CODEC == SWCODEC
         case WPS_TOKEN_REC_ENCODER:
         {
             int rec_format = global_settings.rec_format+1; /* WAV, AIFF, WV, MPEG */
@@ -1092,7 +1089,7 @@ const char *get_token_value(struct gui_wps *gwps,
         }
 #endif
         case WPS_TOKEN_REC_BITRATE:
-#if CONFIG_CODEC == SWCODEC  
+#if CONFIG_CODEC == SWCODEC
             if (global_settings.rec_format == REC_FORMAT_MPA_L3)
             {
                 if (intval)
@@ -1201,7 +1198,6 @@ const char *get_token_value(struct gui_wps *gwps,
             }
             if (intval)
             {
-                
                 *intval = curr_screen;
             }
             snprintf(buf, buf_size, "%d", curr_screen);

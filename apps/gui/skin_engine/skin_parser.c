@@ -380,7 +380,7 @@ static const struct wps_tag all_tags[] = {
 #endif
 
     { WPS_TOKEN_SETTING,                  "St",  WPS_REFRESH_DYNAMIC,
-                                                    parse_setting_and_lang },    
+                                                    parse_setting_and_lang },
     { WPS_TOKEN_TRANSLATEDSTRING,         "Sx",  WPS_REFRESH_STATIC,
                                                     parse_setting_and_lang },
     { WPS_TOKEN_LANG_IS_RTL ,             "Sr",  WPS_REFRESH_STATIC, NULL },
@@ -388,8 +388,8 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_LASTTOUCH,                "Tl",  WPS_REFRESH_DYNAMIC, parse_timeout },
     { WPS_TOKEN_CURRENT_SCREEN,           "cs",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_NO_TOKEN,                       "T",   0,    parse_touchregion      },
-    
-    
+
+
     /* Recording Tokens */
     { WPS_TOKEN_HAVE_RECORDING,         "Rp", WPS_REFRESH_STATIC, NULL },
 #ifdef HAVE_RECORDING
@@ -827,12 +827,12 @@ static int parse_playlistview_text(struct playlistviewer *viewer,
                     taglen = i;
                 }
                 else
-                { 
+                {
                     if (tag->parse_func)
                     {
                         /* unsupported tag, reject */
                         return -1;
-                    }                   
+                    }
                     taglen = strlen(tag->name);
                     viewer->lines[line].tokens[viewer->lines[line].count++] = tag->type;
                 }
@@ -857,7 +857,7 @@ static int parse_playlistview_text(struct playlistviewer *viewer,
     }
     return text - start;
 }
-    
+
 
 static int parse_playlistview(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
@@ -874,10 +874,10 @@ static int parse_playlistview(const char *wps_bufptr,
     viewer->start_offset = atoi(ptr+1);
     token->value.data = (void*)viewer;
     ptr = strchr(ptr+1, '|');
-    length = parse_playlistview_text(viewer, TRACK_HAS_INFO, ptr);          
+    length = parse_playlistview_text(viewer, TRACK_HAS_INFO, ptr);
     if (length < 0)
         return WPS_ERROR_INVALID_PARAM;
-    length = parse_playlistview_text(viewer, TRACK_HAS_NO_INFO, ptr+length);          
+    length = parse_playlistview_text(viewer, TRACK_HAS_NO_INFO, ptr+length);
     if (length < 0)
         return WPS_ERROR_INVALID_PARAM;
     
@@ -909,8 +909,7 @@ static int parse_viewport(const char *wps_bufptr,
     curr_line = NULL;
     if (!skin_start_new_line(skin_vp, wps_data->num_tokens))
         return WPS_ERROR_INVALID_PARAM;
-        
-    
+
     if (*ptr == 'i')
     {
         skin_vp->label = VP_INFO_LABEL;
@@ -940,7 +939,7 @@ static int parse_viewport(const char *wps_bufptr,
     /* format: %V|x|y|width|height|font|fg_pattern|bg_pattern| */
     if (!(ptr = viewport_parse_viewport(vp, curr_screen, ptr, '|')))
         return WPS_ERROR_INVALID_PARAM;
-        
+
     /* Check for trailing | */
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
@@ -975,9 +974,8 @@ static int parse_image_special(const char *wps_bufptr,
 
     pos = strchr(wps_bufptr + 1, '|');
     newline = strchr(wps_bufptr, '\n');
-    
+
     error = (pos > newline);
-        
 
 #if LCD_DEPTH > 1
     if (token->type == WPS_TOKEN_IMAGE_BACKDROP)
@@ -1386,7 +1384,7 @@ static int parse_albumart_load(const char *wps_bufptr,
         aa->height = 0;
     else if (aa->height > LCD_HEIGHT)
         aa->height = LCD_HEIGHT;
-        
+
     if (swap_for_rtl)
         aa->x = LCD_WIDTH - (aa->x + aa->width);
 
@@ -1689,7 +1687,7 @@ static int check_feature_tag(const char *wps_bufptr, const int type)
             return 0;
 #else
             return find_false_branch(wps_bufptr);
-#endif          
+#endif
         default: /* not a tag we care about, just don't skip */
             return 0;
     }
@@ -2083,8 +2081,8 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
     if (wps_data->backdrop)
     {
         bool needed = wps_data->backdrop[0] != '-';
-        wps_data->backdrop = skin_backdrop_load(wps_data->backdrop, 
-                                               bmpdir, curr_screen);
+        wps_data->backdrop = skin_backdrop_load(wps_data->backdrop,
+                                                bmpdir, curr_screen);
         if (!wps_data->backdrop && needed)
             retval = false;
     }

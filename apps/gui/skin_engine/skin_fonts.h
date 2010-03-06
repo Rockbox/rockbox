@@ -41,5 +41,4 @@ int skin_font_load(char* font_name);
 /* unload a skin font. If a font has been loaded more than once it wont actually
  * be unloaded untill all references have been unloaded */
 void skin_font_unload(int font_id);
-    
 #endif

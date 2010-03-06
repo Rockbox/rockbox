@@ -23,7 +23,7 @@
 #define _SKIN_TOKENS_H_
 
 #include <stdbool.h>
- 
+
 
 enum wps_token_type {
     
@@ -235,13 +235,12 @@ struct wps_token {
         void* data;
     } value;
 };
- 
+
 struct skin_token_list {
     struct wps_token *token;
     struct skin_token_list *next;
 };
 
 char* get_dir(char* buf, int buf_size, const char* path, int level);
- 
+
 #endif
- 

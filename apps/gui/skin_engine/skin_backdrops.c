@@ -93,7 +93,7 @@ char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen)
         {
             return backdrops[i].buffer;
         }
-        else if (backdrops[i].buffer == NULL)
+        else if (!bdrop && backdrops[i].buffer == NULL)
         {
             bdrop = &backdrops[i];
         }
@@ -107,7 +107,6 @@ char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen)
     loaded = screens[screen].backdrop_load(filename, bdrop->buffer);
     bdrop->screen = screen;
     strlcpy(bdrop->name, backdrop, MAX_FILENAME+1);
-    bdrop->name[MAX_FILENAME] = '\0';
     
     return loaded ? bdrop->buffer : NULL;
 }
@@ -117,4 +116,3 @@ void skin_backdrop_init(void)
 {
 }
 #endif
-

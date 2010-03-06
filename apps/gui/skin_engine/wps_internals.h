@@ -33,7 +33,7 @@
 
 #include "skin_tokens.h"
 
-                           
+
 /* TODO: sort this mess out */
 
 #include "screen_access.h"
@@ -245,7 +245,6 @@ struct playlistviewer {
         bool scroll;
     } lines[2];
 };
-    
 
 
 #ifdef HAVE_ALBUMART

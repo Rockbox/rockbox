@@ -56,7 +56,7 @@ struct debug_token_table tokens[] = {
     { X(TOKEN_MARKER_DATABASE) },
     { X(TOKEN_MARKER_FILE) },
     { X(TOKEN_MARKER_IMAGES) },
-    { X(TOKEN_MARKER_METADATA) },   
+    { X(TOKEN_MARKER_METADATA) },
     { X(TOKEN_MARKER_PLAYBACK_INFO) },
     { X(TOKEN_MARKER_PLAYLIST) },
     { X(TOKEN_MARKER_MISC) },
@@ -194,7 +194,7 @@ static char *get_token_desc(struct wps_token *token, char *buf,
         case WPS_TOKEN_PLAYBACK_STATUS:
             snprintf(buf, bufsize, "mode playback");
             break;
-            
+
         case WPS_TOKEN_RTC_PRESENT:
             snprintf(buf, bufsize, "rtc: present?");
             break;
@@ -500,7 +500,7 @@ static char *get_token_desc(struct wps_token *token, char *buf,
             break;
         case WPS_TOKEN_SETTING:
             snprintf(buf, bufsize, "Setting value: '%s'",
-                 settings[token->value.i].cfg_name);
+                     settings[token->value.i].cfg_name);
             break;
         case WPS_TOKEN_LANG_IS_RTL:
             snprintf(buf, bufsize, "lang: is_rtl?");
@@ -514,7 +514,7 @@ static char *get_token_desc(struct wps_token *token, char *buf,
                              token->type - tokens[i-1].start_marker);
                     break;
                 }
-            } 
+            }
             break;
     }
 
@@ -648,6 +648,5 @@ void debug_skin_usage(void)
         DEBUGF("Skin buffer usage: %lu/%lu\n", (unsigned long)skin_buffer_usage(),
                                 (unsigned long)(skin_buffer_usage() + skin_buffer_freespace()));
 }
-
 
 #endif /* DEBUG || SIMULATOR */
