@@ -337,7 +337,7 @@ static void init(void)
     storage_init();
     settings_reset();
     settings_load(SETTINGS_ALL);
-    settings_apply(false);
+    settings_apply(true);
     init_dircache(true);
     init_dircache(false);
 #ifdef HAVE_TAGCACHE
@@ -376,7 +376,6 @@ static void init(void)
     audio_init();
     button_clear_queue(); /* Empty the keyboard buffer */
     
-    settings_apply(true);
     settings_apply_skins();
 }
 
@@ -571,7 +570,7 @@ static void init(void)
 #endif
     }
 
-    settings_apply(false);
+    settings_apply(true);        
     init_dircache(false);
 #ifdef HAVE_TAGCACHE
     init_tagcache();
@@ -636,7 +635,6 @@ static void init(void)
 #ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
     check_bootfile(false); /* remember write time and filesize */
 #endif
-    settings_apply(true);
     settings_apply_skins();
 }
 
