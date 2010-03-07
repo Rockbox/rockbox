@@ -92,8 +92,8 @@ OUTPUT_FORMAT(elf32-littlemips)
 
 #elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
 #define DRAMORIG 0x31000000
-#define IRAMORIG 0x10010000
-#define IRAMSIZE 0x10000
+#define IRAMORIG 0x1000c000
+#define IRAMSIZE 0x14000
 
 #elif CONFIG_CPU == PP5022 || CONFIG_CPU == PP5024
 /* PP5022/24 have 128KB of IRAM */
