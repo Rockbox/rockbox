@@ -47,6 +47,8 @@ static bool after_seek = false;
 
 static struct pcm_format *fmt;
 
+#define GET_SAMPLE_COUNT(s) ((((s) << 3) / fmt->channels - 22) / fmt->bitspersample + 1)
+
 static bool set_format(struct pcm_format *format)
 {
     fmt = format;
@@ -139,14 +141,14 @@ static int decode(const uint8_t *inbuf, size_t inbufsize,
 {
     int ch;
     int adpcm_code_size;
-    int count = fmt->samplesperblock;
+    int count = ((size_t)fmt->chunksize == inbufsize) ? fmt->samplesperblock :
+                                                        GET_SAMPLE_COUNT(inbufsize);
     int32_t init_pcmdata[2];
     int8_t init_index[2];
     static uint8_t lastbyte = 0;
 
-    (void)inbufsize;
-
     validity_bits = 8;
+    *outbufcount = count;
 
     /* read block header */
     ch = fmt->channels - 1;
@@ -207,8 +209,6 @@ static int decode(const uint8_t *inbuf, size_t inbufsize,
             *outbuf++ = create_pcmdata(ch, get_data(&inbuf, fmt->bitspersample))
                             << IMA_ADPCM_INC_DEPTH;
     }
-
-    *outbufcount = fmt->samplesperblock;
 
     lastbyte = *inbuf;
     lastbytebits = (8 - validity_bits) & 0x07;
