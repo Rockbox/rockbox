@@ -165,8 +165,7 @@ void ab_set_B_marker(unsigned int song_position)
 static inline int ab_calc_mark_x_pos(int mark, int capacity, 
         int offset, int size)
 {
-    int w = size - offset;
-    return offset + ( (w * mark) / capacity );
+    return offset + ( (size * mark) / capacity );
 }
 
 static inline void ab_draw_vertical_line_mark(struct screen * screen,
@@ -195,14 +194,14 @@ static inline void ab_draw_arrow_mark(struct screen * screen,
 }
 
 void ab_draw_markers(struct screen * screen, int capacity, 
-                     int x0, int x1, int y, int h)
+                     int x, int y, int w, int h)
 {
     /* if both markers are set, determine if they're far enough apart
     to draw arrows */
     if ( ab_A_marker_set() && ab_B_marker_set() )
     {
-        int xa = ab_calc_mark_x_pos(ab_A_marker, capacity, x0, x1);
-        int xb = ab_calc_mark_x_pos(ab_B_marker, capacity, x0, x1);
+        int xa = ab_calc_mark_x_pos(ab_A_marker, capacity, x, w);
+        int xb = ab_calc_mark_x_pos(ab_B_marker, capacity, x, w);
         int arrow_width = (h+1) / 2;
         if ( (xb-xa) < (arrow_width*2) )
         {
@@ -219,12 +218,12 @@ void ab_draw_markers(struct screen * screen, int capacity,
     {
         if (ab_A_marker_set())
         {
-            int xa = ab_calc_mark_x_pos(ab_A_marker, capacity, x0, x1);
+            int xa = ab_calc_mark_x_pos(ab_A_marker, capacity, x, w);
             ab_draw_arrow_mark(screen, xa, y, h, DIRECTION_RIGHT);
         }
         if (ab_B_marker_set())
         {
-            int xb = ab_calc_mark_x_pos(ab_B_marker, capacity, x0, x1);
+            int xb = ab_calc_mark_x_pos(ab_B_marker, capacity, x, w);
             ab_draw_arrow_mark(screen, xb, y, h, DIRECTION_LEFT);
         }
     }

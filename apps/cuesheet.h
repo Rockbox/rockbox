@@ -79,7 +79,7 @@ bool curr_cuesheet_skip(struct cuesheet *cue, int direction, unsigned long curr_
 /* draw track markers on the progressbar */
 void cue_draw_markers(struct screen *screen, struct cuesheet *cue,
                       unsigned long tracklen,
-                      int x1, int x2, int y, int h);
+                      int x, int y, int w, int h);
 #endif
 
 /* check if the subtrack has changed */

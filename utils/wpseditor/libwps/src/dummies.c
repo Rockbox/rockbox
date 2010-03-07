@@ -194,7 +194,7 @@ bool curr_cuesheet_skip(int direction, unsigned long curr_pos){return false;}
 #ifdef HAVE_LCD_BITMAP
 /* draw track markers on the progressbar */
 void cue_draw_markers(struct screen *screen, unsigned long tracklen,
-int x1, int x2, int y, int h){}
+int x, int y, int w, int h){}
 #endif
 
 #ifdef HAVE_ALBUMART
@@ -383,7 +383,7 @@ long default_event_handler(long event)
 }
 
 void ab_draw_markers(struct screen * screen, int capacity,
-                     int x0, int x1, int y, int h)
+                     int x, int y, int w, int h)
                      {
                      }
 void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude){}

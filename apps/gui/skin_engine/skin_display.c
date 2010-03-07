@@ -124,14 +124,14 @@ static void draw_progressbar(struct gui_wps *gwps,
     int y = pb->y, height = pb->height;
     unsigned long length, elapsed;
     
-    if (pb->height < 0 && !pb->have_bitmap_pb)
+    if (height < 0)
         height = font_get(wps_vp->vp.font)->height;
 
     if (y < 0)
     {
         int line_height = font_get(wps_vp->vp.font)->height;
         /* center the pb in the line, but only if the line is higher than the pb */
-        int center = (line_height-pb->height)/2;
+        int center = (line_height-height)/2;
         /* if Y was not set calculate by font height,Y is -line_number-1 */
         y = (-y -1)*line_height + (0 > center ? 0 : center);
     }
@@ -160,12 +160,12 @@ static void draw_progressbar(struct gui_wps *gwps,
 #ifdef AB_REPEAT_ENABLE
         if (ab_repeat_mode_enabled())
             ab_draw_markers(display, id3->length,
-                            pb->x, pb->x + pb->width, y, height);
+                            pb->x, y, pb->width, height);
 #endif
 
         if (id3->cuesheet)
             cue_draw_markers(display, id3->cuesheet, id3->length,
-                             pb->x, pb->x + pb->width, y+1, height-2);
+                             pb->x, y+1, pb->width, height-2);
     }
 }
 

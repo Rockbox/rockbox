@@ -381,16 +381,15 @@ static inline void draw_veritcal_line_mark(struct screen * screen,
 }
 
 /* draw the cuesheet markers for a track of length "tracklen",
-   between (x1,y) and (x2,y) */
+   between (x,y) and (x+w,y) */
 void cue_draw_markers(struct screen *screen, struct cuesheet *cue,
                       unsigned long tracklen,
-                      int x1, int x2, int y, int h)
+                      int x, int y, int w, int h)
 {
     int i,xi;
-    int w = x2 - x1;
     for (i=1; i < cue->track_count; i++)
     {
-        xi = x1 + (w * cue->tracks[i].offset)/tracklen;
+        xi = x + (w * cue->tracks[i].offset)/tracklen;
         draw_veritcal_line_mark(screen, xi, y, h);
     }
 }

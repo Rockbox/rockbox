@@ -49,7 +49,7 @@ void ab_end_of_track_report(void);
 #ifdef HAVE_LCD_BITMAP
 #include "screen_access.h"
 void ab_draw_markers(struct screen * screen, int capacity,
-                     int x0, int x1, int y, int h);
+                     int x, int y, int w, int h);
 #endif
 
 /* These functions really need to be inlined for speed */
