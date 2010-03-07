@@ -163,7 +163,6 @@ enum codec_status codec_main(void)
 {
     int status = CODEC_OK;
     uint32_t decodedsamples;
-    uint32_t i;
     size_t n;
     int bufcount;
     int endofstream;
@@ -255,10 +254,10 @@ next_track:
                 }
                 else
                 {
-                    format.size = buf[40]|(buf[41]<<8);
                     if (format.formattag != WAVE_FORMAT_EXTENSIBLE)
                         format.samplesperblock = buf[42]|(buf[43]<<8);
                     else {
+                        format.size = buf[40]|(buf[41]<<8);
                         if (format.size < 22) {
                             DEBUGF("CODEC_ERROR: WAVE_FORMAT_EXTENSIBLE is "
                                    "missing extension\n");
@@ -320,10 +319,10 @@ next_track:
         }
 
         /* go to next chunk (8byte bound) */
-        if (size & 0x07)
-            size += 8 - (size & 0x7);
-        ci->advance_buffer(size + 24);
-        firstblockposn += size + 24;
+        size += 24 + ((1 + ~size) & 0x07);
+
+        ci->advance_buffer(size);
+        firstblockposn += size;
     }
 
     if (!codec)
@@ -347,7 +346,7 @@ next_track:
     if (format.blockalign == 0)
     {
         DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-blockalign file\n");
-        i = CODEC_ERROR;
+        status = CODEC_ERROR;
         goto done;
     }
     if (format.numbytes == 0) {
@@ -363,7 +362,7 @@ next_track:
     if (format.chunksize == 0)
     {
         DEBUGF("CODEC_ERROR: chunksize is 0\n");
-        i = CODEC_ERROR;
+        status = CODEC_ERROR;
         goto done;
     }
 

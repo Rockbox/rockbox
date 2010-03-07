@@ -155,7 +155,6 @@ enum codec_status codec_main(void)
 {
     int status = CODEC_OK;
     uint32_t decodedsamples;
-    uint32_t i;
     size_t n;
     int bufcount;
     int endofstream;
@@ -163,6 +162,7 @@ enum codec_status codec_main(void)
     uint8_t *wavbuf;
     off_t firstblockposn;     /* position of the first block in file */
     const struct pcm_codec *codec;
+    uint32_t size;
 
     /* Generic codec initialisation */
     ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH);
@@ -218,11 +218,11 @@ next_track:
         }
 
         /* chunkSize */
-        i = (buf[4]|(buf[5]<<8)|(buf[6]<<16)|(buf[7]<<24));
+        size = (buf[4]|(buf[5]<<8)|(buf[6]<<16)|(buf[7]<<24));
         if (memcmp(buf, "fmt ", 4) == 0) {
-            if (i < 16) {
+            if (size < 16) {
                 DEBUGF("CODEC_ERROR: 'fmt ' chunk size=%lu < 16\n",
-                       (unsigned long)i);
+                       (unsigned long)size);
                 status = CODEC_ERROR;
                 goto done;
             }
@@ -231,26 +231,26 @@ next_track:
             /* wChannels */
             format.channels=buf[10]|(buf[11]<<8);
             /* skipping dwSamplesPerSec */
-            /* dwAvgBytesPerSec */
-            format.avgbytespersec = buf[16]|(buf[17]<<8)|(buf[18]<<16)|(buf[19]<<24);
+            /* skipping dwAvgBytesPerSec */
             /* wBlockAlign */
             format.blockalign=buf[20]|(buf[21]<<8);
             /* wBitsPerSample */
             format.bitspersample=buf[22]|(buf[23]<<8);
             if (format.formattag != WAVE_FORMAT_PCM) {
-                if (i < 18) {
+                if (size < 18) {
                     /* this is not a fatal error with some formats,
                      * we'll see later if we can't decode it */
                     DEBUGF("CODEC_WARNING: non-PCM WAVE (formattag=0x%x) "
                            "doesn't have ext. fmt descr (chunksize=%d<18).\n",
-                           (unsigned int)format.formattag, (int)i);
+                           (unsigned int)format.formattag, (int)size);
                 }
                 else
                 {
-                    format.size = buf[24]|(buf[25]<<8);
                     if (format.formattag != WAVE_FORMAT_EXTENSIBLE)
                         format.samplesperblock = buf[26]|(buf[27]<<8);
-                    else {
+                    else
+                    {
+                        format.size = buf[24]|(buf[25]<<8);
                         if (format.size < 22) {
                             DEBUGF("CODEC_ERROR: WAVE_FORMAT_EXTENSIBLE is "
                                    "missing extension\n");
@@ -297,26 +297,26 @@ next_track:
                 goto done;
             }
         } else if (memcmp(buf, "data", 4) == 0) {
-            format.numbytes = i;
+            format.numbytes = size;
             /* advance to start of data */
             ci->advance_buffer(8);
             firstblockposn += 8;
             break;
         } else if (memcmp(buf, "fact", 4) == 0) {
             /* dwSampleLength */
-            if (i >= 4)
+            if (size >= 4)
                 format.totalsamples =
                              (buf[8]|(buf[9]<<8)|(buf[10]<<16)|(buf[11]<<24));
         } else {
             DEBUGF("unknown WAVE chunk: '%c%c%c%c', size=%lu\n",
-                   buf[0], buf[1], buf[2], buf[3], (unsigned long)i);
+                   buf[0], buf[1], buf[2], buf[3], (unsigned long)size);
         }
 
         /* go to next chunk (even chunk sizes must be padded) */
-        if (i & 0x01)
-            i++;
-        ci->advance_buffer(i+8);
-        firstblockposn += i + 8;
+        size += 8 + (size & 0x01);
+
+        ci->advance_buffer(size);
+        firstblockposn += size;
     }
 
     if (!codec)
@@ -340,7 +340,7 @@ next_track:
     if (format.blockalign == 0)
     {
         DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-blockalign file\n");
-        i = CODEC_ERROR;
+        status = CODEC_ERROR;
         goto done;
     }
     if (format.numbytes == 0) {
@@ -356,7 +356,7 @@ next_track:
     if (format.chunksize == 0)
     {
         DEBUGF("CODEC_ERROR: chunksize is 0\n");
-        i = CODEC_ERROR;
+        status = CODEC_ERROR;
         goto done;
     }
 

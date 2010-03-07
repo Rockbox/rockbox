@@ -276,7 +276,6 @@ enum codec_status codec_main(void)
 {
     int status = CODEC_OK;
     uint32_t decodedsamples;
-    uint32_t i = CODEC_OK;
     size_t n;
     int bufcount;
     int endofstream;
@@ -289,7 +288,7 @@ enum codec_status codec_main(void)
   
 next_track:
     if (codec_init()) {
-        i = CODEC_ERROR;
+        status = CODEC_ERROR;
         goto exit;
     }
 
@@ -307,7 +306,7 @@ next_track:
 
     if (!parse_header(&format, &n))
     {
-        i = CODEC_ERROR;
+        status = CODEC_ERROR;
         goto done;
     }
 
@@ -315,13 +314,13 @@ next_track:
     if (codec == 0)
     {
         DEBUGF("CODEC_ERROR: unsupport audio format: 0x%x\n", (int)format.formattag);
-        i = CODEC_ERROR;
+        status = CODEC_ERROR;
         goto done;
     }
 
     if (!codec->set_format(&format))
     {
-        i = CODEC_ERROR;
+        status = CODEC_ERROR;
         goto done;
     }
 
@@ -339,7 +338,7 @@ next_track:
     if (format.blockalign == 0)
     {
         DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-blockalign file\n");
-        i = CODEC_ERROR;
+        status = CODEC_ERROR;
         goto done;
     }
     if (format.numbytes == 0) {
@@ -355,7 +354,7 @@ next_track:
     if (format.chunksize == 0)
     {
         DEBUGF("CODEC_ERROR: chunksize is 0\n");
-        i = CODEC_ERROR;
+        status = CODEC_ERROR;
         goto done;
     }
 
@@ -367,7 +366,7 @@ next_track:
         ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     } else {
         DEBUGF("CODEC_ERROR: more than 2 channels unsupported\n");
-        i = CODEC_ERROR;
+        status = CODEC_ERROR;
         goto done;
     }
 
@@ -423,13 +422,13 @@ next_track:
 
         ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
     }
-    i = CODEC_OK;
+    status = CODEC_OK;
 
 done:
     if (ci->request_next_track())
         goto next_track;
 
 exit:
-    return i;
+    return status;
 }
 
