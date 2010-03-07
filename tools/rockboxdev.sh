@@ -168,7 +168,7 @@ case $arch in
     target="m68k-elf"
     gccver="3.4.6"
     case $system in
-      CYGWIN* | Darwin | FreeBSD | Interix)
+      CYGWIN* | Darwin | FreeBSD | Interix | SunOS)
         gccpatch="gcc-3.4.6.patch"
         ;;
       Linux)
@@ -180,6 +180,10 @@ case $arch in
         esac
         ;;
       *)
+        echo "Unknown host system $system detected - check necessity of" \
+             "patch for ${target}-gcc $gccver and add it."
+        echo "Press enter to continue..."
+        read ignore
         ;;
     esac
     ;;
@@ -289,9 +293,9 @@ echo "=================================================================" >> $sum
 cat $summary
 
 echo "ROCKBOXDEV: extracting binutils-$binutils in $builddir"
-tar xjf $dlwhere/binutils-$binutils.tar.bz2
+bunzip2 < $dlwhere/binutils-$binutils.tar.bz2 | tar xf -
 echo "ROCKBOXDEV: extracting gcc-$gccver in $builddir"
-tar xjf $dlwhere/gcc-core-$gccver.tar.bz2
+bunzip2 < $dlwhere/gcc-core-$gccver.tar.bz2 | tar xf -
 
 if test -n "$gccpatch"; then
   echo "ROCKBOXDEV: applying gcc patch"
