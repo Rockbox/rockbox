@@ -255,16 +255,13 @@
 % usage: \begin{tagmap}{caption}{label} Tag & Description \\ \end{tagmap}
 % Note: this automatically sets the table lines.
 % Note: you *need* to terminate the last line with a linebreak \\
-% Note: you still need to enclose this with \begin{table} / \end{table}
 % Cheers for the usenet helping me building this up :)
-\newenvironment{tagmap}[2]{%
+\newenvironment{tagmap}{%
 \rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
   \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
     \bottomrule
     \SavedEndTab%
-    \if\given{#1}\caption{#1}\fi%
-    \if\given{#2}\label{#2}\fi%
     \endcenter%
   }
   \center

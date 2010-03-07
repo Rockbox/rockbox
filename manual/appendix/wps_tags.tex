@@ -1,17 +1,14 @@
 % $Id$ %
 \chapter{\label{ref:wps_tags}WPS Tags}
 \section{Status Bar}
-\begin{table}
 \begin{tagmap}{}{}
 \config{\%we} & Display Status Bar\\
 \config{\%wd} & Hide Status Bar\\
 \end{tagmap}
-\end{table}
 These tags override the player setting for the display of the status bar.
 They must be noted on their own line (which will not be shown in the WPS).
 
 \section{Information from the track tags}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%ia} & Artist\\
     \config{\%ic} & Composer\\
@@ -26,7 +23,6 @@ They must be noted on their own line (which will not be shown in the WPS).
     \config{\%iy} & Year\\
     \config{\%ik} & Disc Number\\
   \end{tagmap}
-\end{table}
 Remember that this information is not always available, so use the 
 conditionals to show alternate information in preference to assuming.
 
@@ -35,7 +31,6 @@ show the information for the next song to be played.
 
 \nopt{lcd_charcell}{
   \section{Viewports}
-  \begin{table}
     \begin{tagmap}{}{}
       \nopt{lcd_non-mono}{~%
         \config{\%V{\textbar}x{\textbar}y{\textbar}[width]{\textbar}%
@@ -56,11 +51,9 @@ show the information for the next song to be played.
       \config{\%?C{\textless}\%C\%Vda{\textbar}\%Vdb{\textgreater}}
       will show viewport 'a' if album art is found, and 'b' if it isn't.\\
     \end{tagmap}
-  \end{table}
 }
 
 \section{Power Related Information}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%bl} & Numeric battery level in percents\\
                   & Can also be used in a conditional: 
@@ -76,10 +69,8 @@ show the information for the next song to be played.
                     targets that have software charge control or monitoring)\\
     \config{\%bs} & Remaining time of the sleep timer (if it is set)\\
   \end{tagmap}
-\end{table}
 
 \section{Information about the file}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%fb} & File Bitrate (in kbps)\\
     \config{\%fc} & File Codec (e.g. ``MP3'' or ``FLAC''). %
@@ -105,7 +96,6 @@ show the information for the next song to be played.
     \config{\%d2} & Second directory from the end of the file path\\
     \config{\%d3} & Third directory from the end of the file path\\
   \end{tagmap}
-\end{table}
 Example for the \config{\%dN} commands: If the path is 
 ``/Rock/Kent/Isola/11 - 747.mp3'', \config{\%d1} is ``Isola'', 
 \config{\%d2} is ``Kent'' and \config{\%d3} is ``Rock''.
@@ -114,7 +104,6 @@ These tags, when written with the first letter capitalized (e.g. \config{\%Fn} o
 produce the information for the next file to be played.
 
 \section{Playlist/Song Info}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%pb} & Progress Bar\\
     \opt{player}{
@@ -146,10 +135,8 @@ produce the information for the next file to be played.
          & 0 is used for mute, the last option is used for values greater than zero.\\
     \config{\%Sp} & Current Playback Pitch\\
   \end{tagmap}
-\end{table}
 
 \section{Runtime Database}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%rp} & Song playcount\\
     \config{\%rr} & Song rating (0-10). This tag can also be used in a conditional tag: %
@@ -158,11 +145,9 @@ produce the information for the next file to be played.
            10{\textgreater}}\\
     \config{\%ra} & Autoscore for the song\\
   \end{tagmap}
-\end{table}
 
 \opt{swcodec}{
 \section{Sound (DSP) settings}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%Sp} & Current playback pitch \\
   \opt{swcodec}{
@@ -174,7 +159,6 @@ produce the information for the next file to be played.
            {\textbar}No tag{\textgreater}}\\
   }
   \end{tagmap}
-\end{table}
 }
 
 % this will not include the "remote hold switch" tag for targets lacking 
@@ -182,57 +166,45 @@ produce the information for the next file to be played.
 \opt{hold_button}{
   \opt{remote_button_hold}{
     \section{Hold Switches}
-    \begin{table}
       \begin{tagmap}{}{}
         \config{\%mh} & ``h'' if the main unit hold switch is on\\
         \config{\%mr} & ``r'' if the remote hold switch is on\\
       \end{tagmap}
-    \end{table}
   }
   \nopt{remote_button_hold}{
     \section{Hold Switch}
-    \begin{table}
       \begin{tagmap}{}{}
         \config{\%mh} & ``h'' if the hold switch is on\\
       \end{tagmap}
-    \end{table}
   }
 }
 
 \section{Virtual LED}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%lh} & ``h'' if the \disk\ is accessed\\
   \end{tagmap}
-\end{table}
 
 \section{Repeat Mode}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%mm} & Repeat mode, 0-4, in the order: Off, All, One, Shuffle
            \opt{player,recorder,recorderv2fm}{, A-B}\\
   \end{tagmap}
-\end{table}
 Example: \config{\%?mm{\textless}Off{\textbar}All{\textbar}One{\textbar}Shuffle%
 {\textbar}A-B{\textgreater}}
 
 \section{Playback Mode}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%mp} & Play status, 0-4, in the order: Stop, Play, Pause, 
            Fast Forward, Rewind\\
   \end{tagmap}
-\end{table}
 Example: \config{\%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}%
 Ffwd{\textbar}Rew{\textgreater}}
 
 \section{Current Screen}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%cs} & The current screen, 1-5, in the order:
                 Menus, WPS, Recording screen, FM Radio screen, Current Playlist screen\\
   \end{tagmap}
-\end{table}
 The tag can also be used as the switch in a conditional tag. For players without
 some capabilities (e.g. having no FM radio) some values will be never yielded.
 
@@ -240,11 +212,9 @@ Example: \config{You are in the \%?cs{\textless}Main menu{\textbar}WPS{\textbar}
 Recording screen{\textbar}FM Radio screen{\textgreater}}
 
 \section{Changing Volume}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%mv[t]} & ``v'' if the volume is being changed\\
   \end{tagmap}
-\end{table}
 
 The tag produces the letter ``v'' while the volume is being changed and some
 amount of time after that, i.e. after the volume button has been released. The
@@ -262,13 +232,11 @@ being changed and 2.5 secs after the volume button has been released. After
 that, it will display the volume value.
 
 \section{Settings}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%St{\textbar}<setting name>{\textbar}} & The value of the Rockbox
              setting with the specified name. See \reference{ref:config_file_options}
              for the list of the available settings.\\
   \end{tagmap}
-\end{table}
 
 Examples:
 \begin{enumerate}
@@ -279,7 +247,6 @@ Examples:
 
 \opt{lcd_bitmap}{
 \section{\label{ref:wps_images}Images}
-\begin{table}
   \begin{tagmap}{}{}
     \nopt{archos}{%
     \config{\%X{\textbar}filename.bmp{\textbar}}
@@ -305,7 +272,6 @@ Examples:
         & \config{i}: (optional) number of the sub-image to display (a-z for 1-26 and A-Z for 27-52).
           By default the first (i.e. top most) sub-image will be used.\\
   \end{tagmap}
-\end{table}
 
 Examples:
 \begin{enumerate}
@@ -333,7 +299,6 @@ with image ID ``M'', and then reference the individual sub-images in a condition
 
 \opt{albumart}{
 \section{Album Art}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%Cl{\textbar}x{\textbar}y{\textbar}[[l{\textbar}c{\textbar}r]maxwidth]{\textbar}[[t{\textbar}c{\textbar}b]maxheight]{\textbar}}
         & Define the settings for albumart\\
@@ -343,7 +308,6 @@ with image ID ``M'', and then reference the individual sub-images in a condition
         & \config{maxheight}: Maximum width\\
     \config{\%C}  & Display the album art as configured. This tag can also be used as a conditional.\\
   \end{tagmap}
-\end{table}
 
 The picture will be rescaled, preserving aspect ratio to fit the given
 \config{maxwidth} and \config{maxheight}. If the aspect ratio doesn't match the
@@ -376,7 +340,6 @@ Examples:
 }
 
 \section{Alignment}
-\begin{table}
   \begin{tagmap}{}{}
     \config{\%al} & Align the text left\\
     \config{\%aL} & Align the text left, or to the right if RTL language is in use\\
@@ -384,31 +347,26 @@ Examples:
     \config{\%ar} & Align the text right\\
     \config{\%aR} & Align the text right, or to the left if RTL language is in use\\
   \end{tagmap}
-\end{table}
 All alignment tags may be present in one line, but they need to be in the 
 order left -- centre -- right. If the aligned texts overlap, they are merged.
 
 \section{Conditional Tags}
 
-\begin{table}
 \begin{tagmap}{}{}
 \config{\%?xx{\textless}true{\textbar}false{\textgreater}}
     & If / Else: Evaluate for true or false case \\
 \config{\%?xx{\textless}alt1{\textbar}alt2{\textbar}alt3{\textbar}\dots{\textbar}else{\textgreater}}
     & Enumerations: Evaluate for first / second / third / \dots / last condition \\
 \end{tagmap}
-\end{table}
 
 \section{Subline Tags}
 
-\begin{table}
 \begin{tagmap}{}{}
 \config{\%t{\textless}time{\textgreater}}
     & Set the subline display cycle time (\%t5 or \%t3.4 formats) \\
 \config{;}
     & Split items on a line into separate sublines \\
 \end{tagmap}
-\end{table}
 
 Allows grouping of several items (sublines) onto one line, with the
 display cycling round the defined sublines. See
@@ -416,7 +374,6 @@ display cycling round the defined sublines. See
 
 
 \section{Time and Date}
-  \begin{table}
     \begin{tagmap}{}{}
     \opt{rtc}{
       \config{\%cd}          & Day of month from 01 to 31\\
@@ -440,7 +397,6 @@ display cycling round the defined sublines. See
     }
       \config{\%cc}          & Check for presence of the clock hardware\\
     \end{tagmap}
-  \end{table}
 The \%cc tag returns ``c'' if the necessary hardware is present and can also be
 used as a conditional. This can be very useful for designing a WPS that works on
 multiple targets, some with and some without a clock. By using this tag as a
@@ -456,14 +412,12 @@ Example:
 
 \opt{touchscreen}{
   \section{Touchscreen Areas (WPS only)}
-    \begin{table}
-      \begin{tagmap}{}{}
-        \config{\%T{\textbar}x{\textbar}y{\textbar}width{\textbar}height%
-        {\textbar}action{\textbar}}
-        & Invoke the action specified when the user presses in the defined
-        touchscreen area.\\
-      \end{tagmap}
-    \end{table}
+    \begin{tagmap}{}{}
+      \config{\%T{\textbar}x{\textbar}y{\textbar}width{\textbar}height%
+      {\textbar}action{\textbar}}
+      & Invoke the action specified when the user presses in the defined
+      touchscreen area.\\
+    \end{tagmap}
   If the action starts with \& then the area must be held. Possible actions are:
 
   \begin{description}
@@ -488,11 +442,9 @@ Example:
   \end{description}
 
   \section{Last Touchscreen Press (WPS only)}
-    \begin{table}
-      \begin{tagmap}{}{}
-        \config{\%Tl} & Indicates that the touchscreen is pressed.\\
-      \end{tagmap}
-    \end{table}
+    \begin{tagmap}{}{}
+      \config{\%Tl} & Indicates that the touchscreen is pressed.\\
+    \end{tagmap}
   This tag can be used to display text or images or a viewport when the
   touchscreen is pressed (like an On Screen Display). If you put a number
   straight after \%Tl it will be used as a timeout in seconds
@@ -503,7 +455,6 @@ Example:
 }
 
 \section{Other Tags}
-\begin{table}
 \begin{tagmap}{}{}
   \config{\%\%}          & The character `\%'\\
   \config{\%{\textless}} & The character `{\textless}'\\
@@ -517,4 +468,4 @@ Example:
                            contain dynamic content such as timers, peak meters 
                            or progress bars.\\
 \end{tagmap}
-\end{table}
+
