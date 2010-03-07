@@ -28,13 +28,8 @@
 #include "logf.h"
 #include "replaygain.h"
 
-#include "fixedpoint.h"
-#include <stdlib.h>
-#include <stdbool.h>
-#include <inttypes.h>
-
 /* Needed for replay gain in sv8, please search MPC_OLD_GAIN_REF in libmusepack */
-#define SV8_TO_SV7_CONVERT_GAIN (64.82*100)
+#define SV8_TO_SV7_CONVERT_GAIN (6482) /* 64.82 * 100 */
 
 static int set_replaygain_sv7(struct mp3entry* id3, 
                               bool album, 
@@ -66,7 +61,7 @@ static int set_replaygain_sv8(struct mp3entry* id3,
                               long peak,
                               long used)
 {
-    gain = (long)(SV8_TO_SV7_CONVERT_GAIN - (gain*100./256.));
+    gain = (long)(SV8_TO_SV7_CONVERT_GAIN - ((gain*100)/256));
 
     /* We use a peak value of 0 to indicate a given gain type isn't used. */
     if (peak != 0) {
