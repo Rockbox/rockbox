@@ -418,7 +418,7 @@ const char *get_token_value(struct gui_wps *gwps,
             return (char*)token->value.data;
         case WPS_TOKEN_LIST_TITLE_ICON:
             if (intval)
-                *intval = MIN(token->value.i, limit-1);
+                *intval = token->value.i;
             snprintf(buf, buf_size, "%d", token->value.i);
             return buf;
 

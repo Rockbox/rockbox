@@ -58,7 +58,8 @@ bool sb_set_title_text(char* title, enum themable_icons icon, enum screen_type s
         }
         else if (sb_skin_data[screen].tokens[i].type == WPS_TOKEN_LIST_TITLE_ICON)
         {
-            sb_skin_data[screen].tokens[i].value.i = icon+1;
+            /* Icon_NOICON == -1 which the skin engine wants at position 1, so + 2 */
+            sb_skin_data[screen].tokens[i].value.i = icon+2;
         }
     }
     return retval;
