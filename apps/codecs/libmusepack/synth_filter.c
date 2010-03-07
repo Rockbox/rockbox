@@ -35,9 +35,10 @@
 /// \file synth_filter.c
 /// Synthesis functions.
 /// \todo document me
-
-#include "musepack.h"
-#include "internal.h"
+#include <string.h>
+#include "mpcdec.h"
+#include "decoder.h"
+#include "mpcdec_math.h"
 
 /* C O N S T A N T S */
 #undef _
@@ -127,7 +128,7 @@ static const MPC_SAMPLE_FORMAT  Di_opt [512] ICONST_ATTR = {
  *****************************************************************************/
 void 
 mpc_dct32(const MPC_SAMPLE_FORMAT *in, MPC_SAMPLE_FORMAT *v)
-ICODE_ATTR_MPC_LARGE_IRAM; 
+ICODE_ATTR_MPC_LARGE_IRAM;
 
 void
 mpc_dct32(const MPC_SAMPLE_FORMAT *in, MPC_SAMPLE_FORMAT *v)
@@ -548,27 +549,26 @@ mpc_full_synthesis_filter(MPC_SAMPLE_FORMAT *OutData, MPC_SAMPLE_FORMAT *V, cons
             mpc_dct32(Y, V);
             mpc_decoder_windowing_D( OutData, V, Di_opt );
         }
-     }
+    }
 }
 
 void
-mpc_decoder_synthese_filter_float(mpc_decoder *d, MPC_SAMPLE_FORMAT *OutData) 
+mpc_decoder_synthese_filter_float(mpc_decoder *d, MPC_SAMPLE_FORMAT *OutData,
+                                  int num_channels) 
 {
+    (void)num_channels;
+    
     /********* left channel ********/
     memmove(d->V_L + MPC_V_MEM, d->V_L, 960 * sizeof(MPC_SAMPLE_FORMAT) );
-
-    mpc_full_synthesis_filter(
-        OutData,
-        (MPC_SAMPLE_FORMAT *)(d->V_L + MPC_V_MEM),
-        (MPC_SAMPLE_FORMAT *)(d->Y_L [0]));
+    mpc_full_synthesis_filter(OutData,
+                              (MPC_SAMPLE_FORMAT *)(d->V_L + MPC_V_MEM),
+                              (MPC_SAMPLE_FORMAT *)(d->Y_L));
 
     /******** right channel ********/
     memmove(d->V_R + MPC_V_MEM, d->V_R, 960 * sizeof(MPC_SAMPLE_FORMAT) );
-
-    mpc_full_synthesis_filter(
-        (OutData == NULL ? NULL : OutData + MPC_FRAME_LENGTH),
-        (MPC_SAMPLE_FORMAT *)(d->V_R + MPC_V_MEM),
-        (MPC_SAMPLE_FORMAT *)(d->Y_R [0]));
+    mpc_full_synthesis_filter((OutData == NULL ? NULL : OutData + MPC_FRAME_LENGTH),
+                              (MPC_SAMPLE_FORMAT *)(d->V_R + MPC_V_MEM),
+                              (MPC_SAMPLE_FORMAT *)(d->Y_R));
 }
 
 /*******************************************/
@@ -577,7 +577,7 @@ mpc_decoder_synthese_filter_float(mpc_decoder *d, MPC_SAMPLE_FORMAT *OutData)
 /*                                         */
 /*******************************************/
 
-static const unsigned char Parity [256] ICONST_ATTR = {  // parity
+static const unsigned char Parity [256] = {  // parity
     0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0,1,0,0,1,0,1,1,0,0,1,1,0,1,0,0,1,
     1,0,0,1,0,1,1,0,0,1,1,0,1,0,0,1,0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0,
     1,0,0,1,0,1,1,0,0,1,1,0,1,0,0,1,0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0,

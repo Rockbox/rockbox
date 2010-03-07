@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005, The Musepack Development Team
+  Copyright (c) 2005-2009, The Musepack Development Team
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -31,23 +31,53 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 /// \file huffman.h
 /// Data structures and functions for huffman coding.
 
-#ifndef _mpcdec_huffman_h_
-#define _mpcdec_huffman_h_
+#ifndef _MPCDEC_HUFFMAN_H_
+#define _MPCDEC_HUFFMAN_H_
+#ifdef WIN32
+#pragma once
+#endif
 
-#include "config_types.h"
-#include "decoder.h"
+#include "mpc_types.h"
 
-struct mpc_decoder_t; // forward declare to break circular dependencies
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// LUT size parameter, LUT size is 1 << LUT_DEPTH
+#define LUT_DEPTH 6
 
 /// Huffman table entry.
-typedef struct huffman_type_t {
-    mpc_uint32_t  Code;
-    mpc_uint8_t   Length;
-    mpc_int8_t    Value;
-} HuffmanTyp;
+typedef struct mpc_huffman_t {
+    mpc_uint16_t  Code;
+    mpc_uint8_t  Length;
+    mpc_int8_t   Value;
+} mpc_huffman;
 
-#endif // _mpcdec_huffman_h_
+/// Huffman LUT entry.
+typedef struct mpc_huff_lut_t {
+    mpc_uint8_t  Length;
+    mpc_int8_t   Value;
+} mpc_huff_lut;
+
+/// Type used for huffman LUT decoding
+typedef struct mpc_lut_data_t {
+    mpc_huffman const *table;
+    mpc_huff_lut lut[1 << LUT_DEPTH];
+} mpc_lut_data;
+
+/// Type used for canonical huffman decoding
+typedef struct mpc_can_data_t {
+    mpc_huffman const *table;
+    mpc_int8_t const *sym;
+    mpc_huff_lut lut[1 << LUT_DEPTH];
+} mpc_can_data;
+
+void huff_init_lut(const int bits);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

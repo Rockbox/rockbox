@@ -1,7 +1,8 @@
-huffsv46.c
-huffsv7.c
-idtag.c
+crc32.c
+huffman.c
+mpc_bits_reader.c
 mpc_decoder.c
+mpc_demux.c
 requant.c
 streaminfo.c
 synth_filter.c

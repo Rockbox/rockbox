@@ -38,7 +38,7 @@
 #ifndef _mpcdec_math_h_
 #define _mpcdec_math_h_
 
-#include "mpc_config.h"
+#include "mpc_types.h"
 
 #define MPC_FIXED_POINT_SHIFT 16
 
@@ -48,15 +48,9 @@
       #include <cmnintrin.h>
       #define MPC_HAVE_MULHIGH
    #endif
-   
-   #define MPC_FIXED_POINT_SCALE_SHIFT (MPC_FIXED_POINT_SHIFT + MPC_FIXED_POINT_FRACTPART)
-   #define MPC_FIXED_POINT_SCALE (1 << (MPC_FIXED_POINT_SCALE_SHIFT - 1))
-   //in fixedpoint mode, results in decode output buffer are in -MPC_FIXED_POINT_SCALE ... MPC_FIXED_POINT_SCALE range
-   
-   #define MPC_FIXED_POINT_FRACTPART 14
-   typedef mpc_int32_t MPC_SAMPLE_FORMAT;
+
    typedef mpc_int64_t MPC_SAMPLE_FORMAT_MULTIPLY;
-   
+
    #define MAKE_MPC_SAMPLE(X)      (MPC_SAMPLE_FORMAT)((double)(X) * (double)(((mpc_int64_t)1)<<MPC_FIXED_POINT_FRACTPART))
    #define MAKE_MPC_SAMPLE_EX(X,Y) (MPC_SAMPLE_FORMAT)((double)(X) * (double)(((mpc_int64_t)1)<<(Y)))
    

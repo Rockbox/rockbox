@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005, The Musepack Development Team
+  Copyright (c) 2005-2009, The Musepack Development Team
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -31,27 +31,31 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 /// \file requant.h
 /// Requantization function definitions.
+#ifndef _MPCDEC_REQUANT_H_
+#define _MPCDEC_REQUANT_H_
+#ifdef WIN32
+#pragma once
+#endif
 
-#ifndef _mpcdec_requant_h
-#define _mpcdec_requant_h_
+#include "mpc_types.h"
 
-#include "musepack.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /* C O N S T A N T S */
-extern const mpc_uint32_t       Res_bit[18]; // bits per sample for chosen quantizer
-extern const MPC_SAMPLE_FORMAT __Cc[1 + 18]; // coefficients for requantization
-extern const mpc_int32_t       __Dc[1 + 18]; // offset for requantization
-extern const mpc_int32_t          idx30[27]; // 1st value of bundled 3-step quantizer
-extern const mpc_int32_t          idx31[27]; // 2nd value of bundled 3-step quantizer
-extern const mpc_int32_t          idx32[27]; // 3rd value of bundled 3-step quantizer
-extern const mpc_int32_t          idx50[25]; // 1st value of bundled 5-step quantizer
-extern const mpc_int32_t          idx51[25]; // 2nd value of bundled 5-step quantizer
+const mpc_uint8_t      Res_bit [18];     ///< Bits per sample for chosen quantizer
+const MPC_SAMPLE_FORMAT __Cc    [1 + 18]; ///< Requantization coefficients
+const mpc_int16_t       __Dc    [1 + 18]; ///< Requantization offset
+
+#define Cc (__Cc + 1)
+#define Dc (__Dc + 1)
 
 
-#define Cc      (__Cc + 1)
-#define Dc      (__Dc + 1)
-
-#endif // _mpcdec_requant_h_
+#ifdef __cplusplus
+}
+#endif
+#endif

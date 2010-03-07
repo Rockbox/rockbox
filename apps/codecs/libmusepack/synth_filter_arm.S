@@ -18,8 +18,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
-#include "mpc_config.h"
 
     .section .text, "ax", %progbits
 
