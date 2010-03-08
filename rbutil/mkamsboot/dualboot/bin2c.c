@@ -97,6 +97,7 @@ int main (int argc, char* argv[])
     for(i=0; i < argc - 2; i++) {
         unsigned char* buf;
         off_t len;
+        off_t orig_len;
         char *ext;
         char *array = argv[2+i];
 
@@ -108,14 +109,20 @@ int main (int argc, char* argv[])
             return 4;
         }
 
-        len = filesize(fd);
+        orig_len = filesize(fd);
+        /* pad to 32bit */
+        len = (orig_len + 3) & ~3;
 
         buf = malloc(len);
-        if (read(fd,buf,len) < len) {
+        if (read(fd,buf,orig_len) < orig_len) {
             fprintf(stderr,"Short read, aborting\n");
             return 5;
         }
 
+        /* pad to 32bit with zeros */
+        if (len > orig_len)
+            memset(buf+orig_len, 0, len-orig_len);
+        
         /* remove file extension */
         ext = strchr (array, '.');
         if (ext != NULL)
