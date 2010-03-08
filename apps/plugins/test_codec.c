@@ -262,104 +262,8 @@ static void pcmbuf_insert_null(const void *ch1, const void *ch2, int count)
     rb->reset_poweroff_timer();
 }
 
-static void pcmbuf_insert_checksum(const void *ch1, const void *ch2, int count)
-{
-    const int16_t* data1_16;
-    const int16_t* data2_16;
-    const int32_t* data1_32;
-    const int32_t* data2_32;
-    const int scale = wavinfo.sampledepth - 15;
-    const int dc_bias = 1 << (scale - 1);
-    int channels = (wavinfo.stereomode == STEREO_MONO) ? 1 : 2;
-
-    /* Prevent idle poweroff */
-    rb->reset_poweroff_timer();
-
-    if (use_dsp) {
-        count = process_dsp(ch1, ch2, count);
-        wavinfo.totalsamples += count;
-        if (channels == 1)
-        {
-            unsigned char *s = dspbuffer, *d = dspbuffer;
-            int c = count;
-            while (c-- > 0)
-            {
-                *d++ = *s++;
-                *d++ = *s++;
-                s++;
-                s++;
-            }
-        }
-        crc32 = rb->crc_32(dspbuffer, count * 2 * channels, crc32);
-    }
-    else
-    {
-        if (wavinfo.sampledepth <= 16) {
-            data1_16 = ch1;
-            data2_16 = ch2;
-
-            switch(wavinfo.stereomode)
-            {
-                case STEREO_INTERLEAVED:
-                    while (count--) {
-                        crc32 = rb->crc_32(data1_16, 4, crc32);
-                        data1_16 += 2;
-                    }
-                    break;
- 
-                case STEREO_NONINTERLEAVED:
-                    while (count--) {
-                        crc32 = rb->crc_32(data1_16++, 2, crc32);
-                        crc32 = rb->crc_32(data2_16++, 2, crc32);
-                    }
-                    break;
-     
-                case STEREO_MONO:
-                    while (count--) {
-                        crc32 = rb->crc_32(data1_16++, 2, crc32);
-                    }
-                    break;
-            }
-        }
-        else
-        {
-            data1_32 = ch1;
-            data2_32 = ch2;
-
-            switch(wavinfo.stereomode)
-            {
-                case STEREO_INTERLEAVED:
-                    while (count--) {
-                        int16_t s = clip_sample((*data1_32++ + dc_bias) >> scale);
-                        crc32 = rb->crc_32(&s, 2, crc32);
-                        s = clip_sample((*data1_32++ + dc_bias) >> scale);
-                        crc32 = rb->crc_32(&s, 2, crc32);
-                    }
-                    break;
- 
-                case STEREO_NONINTERLEAVED:
-                    while (count--) {
-                        int16_t s = clip_sample((*data1_32++ + dc_bias) >> scale);
-                        crc32 = rb->crc_32(&s, 2, crc32);
-                        s = clip_sample((*data2_32++ + dc_bias) >> scale);
-                        crc32 = rb->crc_32(&s, 2, crc32);
-                    }
-
-                    break;
-
-                case STEREO_MONO:
-                    while (count--) {
-                        int16_t s = clip_sample((*data1_32++ + dc_bias) >> scale);
-                        crc32 = rb->crc_32(&s, 2, crc32);
-                    }
-                    break;
-            }
-        }
-    }
-}
-
-/* WAV output */
-static void pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
+/* WAV output or calculate crc32 of output*/
+static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int count)
 {
     const int16_t* data1_16;
     const int16_t* data2_16;
@@ -388,7 +292,10 @@ static void pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
                 s++;
             }
         }
-        rb->write(wavinfo.fd, dspbuffer, count * 2 * channels);
+        if (checksum)
+            crc32 = rb->crc_32(dspbuffer, count * 2 * channels, crc32);
+        else
+            rb->write(wavinfo.fd, dspbuffer, count * 2 * channels);
     }
     else
     { 
@@ -459,7 +366,10 @@ static void pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
         }
 
         wavinfo.totalsamples += count;
-        rb->write(wavinfo.fd, wavbuffer, p - wavbuffer);
+        if (checksum)
+            crc32 = rb->crc_32(wavbuffer, p - wavbuffer, crc32);
+        else
+            rb->write(wavinfo.fd, wavbuffer, p - wavbuffer);
     } /* else */
 }
 
@@ -582,10 +492,8 @@ static void init_ci(void)
 
     ci.codec_get_buffer = codec_get_buffer;
 
-    if (wavinfo.fd >= 0) {
-        ci.pcmbuf_insert = pcmbuf_insert_wav;
-    } else if (checksum){
-        ci.pcmbuf_insert = pcmbuf_insert_checksum;
+    if (wavinfo.fd >= 0 || checksum) {
+        ci.pcmbuf_insert = pcmbuf_insert_wav_checksum;
     } else {
         ci.pcmbuf_insert = pcmbuf_insert_null;
     }
