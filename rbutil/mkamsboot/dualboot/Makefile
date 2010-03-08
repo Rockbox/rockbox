@@ -42,10 +42,10 @@ nrv2e_d8.o: nrv2e_d8.S
 # Rules for the ARM code embedded in mkamsboot - assemble, link, then extract
 # the binary code and finally convert to .h for building in mkamsboot
 
-%.$(CROSS_PREFIX): %.o
+%.arm-elf: %.o
 	$(CROSS_PREFIX)-ld -e 0 -Ttext=0 -o $@ $<
 
-%.arm-bin: %.$(CROSS_PREFIX)
+%.arm-bin: %.arm-elf
 	$(CROSS_PREFIX)-objcopy -O binary $< $@
 
 ../dualboot.c ../dualboot.h: $(BOOTBINS) bin2c
