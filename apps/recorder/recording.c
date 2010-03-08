@@ -1057,7 +1057,7 @@ bool recording_screen(bool no_source)
     int peak_l, peak_r;
     int balance = 0;
 #endif
-    int i,j;
+    int i;
     int pm_x[NB_SCREENS];           /* peakmeter (and trigger bar) x pos */
     int pm_y[NB_SCREENS];           /* peakmeter y pos */
     int pm_h[NB_SCREENS];           /* peakmeter height */
@@ -1070,6 +1070,7 @@ bool recording_screen(bool no_source)
     bool peak_valid = false;
 #endif
 #if defined(HAVE_RECORDING_HISTOGRAM)
+    int j;
     unsigned short hist_pos_y = 0;
     unsigned short hist_size_h = 0;
     int history_pos = 0;
