@@ -56,7 +56,7 @@ SECTIONS
     _dataend = . ;
   } > IRAM
 
-  .stack : {
+  .stack (NOLOAD) : {
      *(.stack)
      _stackbegin = .;
      stackbegin = .;
@@ -69,7 +69,7 @@ SECTIONS
      DRAM */
 
   . = DRAMORIG;
-  .bss . + (16*1024*1024): {
+  .bss . + (16*1024*1024) (NOLOAD) : {
      _edata = .;
      *(.bss*);
      *(.ibss);

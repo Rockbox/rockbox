@@ -40,7 +40,7 @@ SECTIONS
     _dataend = . ;
    } > RAM
 
-  .stack :
+  .stack  (NOLOAD) :
   {
      *(.stack)
      _stackbegin = .;
@@ -50,7 +50,7 @@ SECTIONS
      stackend = .;
   } > RAM
 
-  .bss : {
+  .bss (NOLOAD) : {
      _edata = .;
      *(.bss*);
      *(.ibss);

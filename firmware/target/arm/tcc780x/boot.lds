@@ -43,7 +43,7 @@ SECTIONS
         _dataend = . ;
     } > DRAM
 
-    .stack :
+    .stack (NOLOAD) :
     {
          *(.stack)
          _stackbegin = .;
@@ -52,7 +52,7 @@ SECTIONS
          _stackend = .;
          stackend = .;
     } > DRAM
-    .bss : {
+    .bss (NOLOAD) : {
          _edata = .;
          *(.bss*);
          *(.ibss);

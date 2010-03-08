@@ -74,7 +74,7 @@ SECTIONS
    } > IRAM AT> LOAD_AREA
    _datacopy = LOADADDR(.data) ;
 
-  .stack :
+  .stack (NOLOAD) :
   {
      *(.stack)
      _stackbegin = .;
@@ -96,7 +96,7 @@ SECTIONS
      DRAM */
   . += (12*1024*1024);
 #endif
-  .bss : {
+  .bss : (NOLOAD) {
      _edata = .;
      *(.bss*);
      *(.ibss);
