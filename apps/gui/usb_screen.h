@@ -21,7 +21,11 @@
 #ifndef _USB_SCREEN_H_
 #define _USB_SCREEN_H_
 
+#ifdef USB_NONE
+static inline void gui_usb_screen_run(void) {}
+#else
 extern void gui_usb_screen_run(void);
+#endif
 
 #endif
 

@@ -162,7 +162,9 @@ eq_arm.S
 #ifdef USB_ENABLE_HID
 usb_keymaps.c
 #endif
+#ifndef USB_NONE
 gui/usb_screen.c
+#endif
 metadata.c
 metadata/mp3.c
 #if CONFIG_CODEC == SWCODEC

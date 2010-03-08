@@ -112,13 +112,8 @@ static int handle_usb_events(void)
 
     return 0;
 }
-#endif
+#endif /* SIMULATOR */
 
-#ifdef USB_NONE
-void gui_usb_screen_run(void)
-{
-}
-#else
 #define MODE_NAME_LEN 32
 
 struct usb_screen_vps_t
@@ -315,5 +310,4 @@ void gui_usb_screen_run(void)
     }
 
 }
-#endif /* !defined(USB_NONE) */
 

@@ -882,7 +882,7 @@ int sd_read_sectors(IF_MD2(int card_no,) unsigned long start, int incount,
 }
 
 /*****************************************************************************/
-int sd_write_sectors(IF_MD2(int card_no,) unsigned long start, int count,
+int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
 #ifdef BOOTLOADER /* we don't need write support in bootloader */
@@ -895,7 +895,7 @@ int sd_write_sectors(IF_MD2(int card_no,) unsigned long start, int count,
     return -1;
 #else
 #ifdef HAVE_MULTIDRIVE
-    dbgprintf ("sd_write %d %x %d\n", card_no, start, count);
+    dbgprintf ("sd_write %d %x %d\n", drive, start, count);
 #else
     dbgprintf ("sd_write %x %d\n", start, count);
 #endif
@@ -904,7 +904,7 @@ int sd_write_sectors(IF_MD2(int card_no,) unsigned long start, int count,
         return 0; /* assume success */
     else
 #endif
-        return sd_transfer_sectors(card_no, start, count, (void*)outbuf, true);
+        return sd_transfer_sectors(drive, start, count, (void*)outbuf, true);
 #endif
 }
 /*****************************************************************************/
