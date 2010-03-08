@@ -96,7 +96,7 @@ SECTIONS
      DRAM */
   . += (12*1024*1024);
 #endif
-  .bss : (NOLOAD) {
+  .bss (NOLOAD) : {
      _edata = .;
      *(.bss*);
      *(.ibss);
