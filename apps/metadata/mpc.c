@@ -132,14 +132,18 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
         if (!memcmp(sv8_header, "SH", 2)) { /* Stream Header ID */
             int32_t k = 0;
             uint32_t streamversion;
-            uint64_t size = 0;
+            uint64_t size  = 0; /* tag size */
+            uint64_t dummy = 0; /* used to dummy read data from header */
 
-            /* 4 bytes 'MPCK' + 4 bytes crc + 2 'SH' */
-            lseek(fd, 10, SEEK_SET);
+            /* 4 bytes 'MPCK' +  2 'SH' */
+            lseek(fd, 6, SEEK_SET);
             if (read(fd, sv8_header, 32) != 32) return false;
-
-            /* dummy read the correct amount of bits within the header data. */
-            size = sv8_header[k++];
+            
+            /* Read the size of 'SH'-tag */
+            k = sv8_get_size(sv8_header, k, &size);
+            
+            /* Skip crc32 */
+            k += 4;
         
             /* Read stream version */
             streamversion = sv8_header[k++];
@@ -149,13 +153,16 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
             k = sv8_get_size(sv8_header, k, &samples);
             
             /* Number of leading zero-samples */
-            k = sv8_get_size(sv8_header, k, &size);
+            k = sv8_get_size(sv8_header, k, &dummy);
             
             /* Sampling frequency */
             id3->frequency = sfreqs[(sv8_header[k++] >> 5) & 0x0003];
             
             /* Number of channels */
             id3->channels = (sv8_header[k++] >> 4) + 1;
+
+            /* Skip to next tag: k = size -2 */
+            k = size - 2;
 
             if (!memcmp(sv8_header+k, "RG", 2)) { /* Replay Gain ID */
                 long peak, gain; 
