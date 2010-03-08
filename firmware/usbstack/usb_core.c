@@ -729,7 +729,26 @@ static void request_handler_interface(struct usb_ctrlrequest* req)
     }
 }
 
-static void request_handler_endpoint(struct usb_ctrlrequest* req)
+static void request_handler_endoint_drivers(struct usb_ctrlrequest* req)
+{
+    bool handled = false;
+    control_handler_t control_handler = NULL;
+
+    if(EP_NUM(req->wIndex) < USB_NUM_ENDPOINTS)
+        control_handler = ep_data[EP_NUM(req->wIndex)].control_handler[EP_DIR(req->wIndex)];
+    
+    if(control_handler)
+        handled = control_handler(req, response_data);
+    
+    if (!handled) {
+        /* nope. flag error */
+        logf("usb bad req %d",req->bRequest);
+        usb_drv_stall(EP_CONTROL,true,true);
+        usb_core_ack_control(req);
+    }
+}
+
+static void request_handler_endpoint_standard(struct usb_ctrlrequest* req)
 {
     switch (req->bRequest) {
         case USB_REQ_CLEAR_FEATURE:
@@ -755,24 +774,24 @@ static void request_handler_endpoint(struct usb_ctrlrequest* req)
             usb_drv_recv(EP_CONTROL,NULL,0);
             usb_drv_send(EP_CONTROL,response_data,2);
             break;
-        default: {
-                bool handled;
-                control_handler_t control_handler;
+        default:
+            request_handler_endoint_drivers(req);
+            break;
+    }
+}
 
-               control_handler=
-                   ep_data[EP_NUM(req->wIndex)].control_handler[EP_CONTROL];
-                if (!control_handler)
-                    break;
-
-                handled=control_handler(req, response_data);
-                if (!handled) {
-                    /* nope. flag error */
-                    logf("usb bad req %d",req->bRequest);
-                    usb_drv_stall(EP_CONTROL,true,true);
-                    usb_core_ack_control(req);
-                }
-                break;
-            }
+static void request_handler_endpoint(struct usb_ctrlrequest* req)
+{
+    switch(req->bRequestType & USB_TYPE_MASK) {
+        case USB_TYPE_STANDARD:
+            request_handler_endpoint_standard(req);
+            break;
+        case USB_TYPE_CLASS:
+            request_handler_endoint_drivers(req);
+            break;
+        case USB_TYPE_VENDOR:
+        default:
+            break;
     }
 }
 
