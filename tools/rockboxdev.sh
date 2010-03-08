@@ -194,12 +194,11 @@ case $arch in
   [Ee])
     target="arm-elf-eabi"
     gccpatch="rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff"
-    binutilsconf="--disable-werror"
-    gccver="4.4.2"
+    gccver="4.4.3"
     # needed to build a bare-metal gcc-4.4.2
     gcctarget="all-gcc all-target-libgcc"
     gccinstalltarget="install-gcc install-target-libgcc"
-    binutils="2.20"
+    binutils="2.20.1"
     ;;
   [Ii])
     target="mipsel-elf"
@@ -299,7 +298,13 @@ bunzip2 < $dlwhere/gcc-core-$gccver.tar.bz2 | tar xf -
 
 if test -n "$gccpatch"; then
   echo "ROCKBOXDEV: applying gcc patch"
-  patch -p0 < "$dlwhere/$gccpatch"
+  # apply the patch and hope it runs well - don't be dependant on the
+  # exact gcc version, thus strip the gcc folder
+  (cd $builddir/gcc-$gccver && patch -p1 < "$dlwhere/$gccpatch")
+    if [ $? -gt 0 ]; then # check if the applied cleanly
+      echo "ROCKBOXDEV: failed to apply the gcc patch"
+      exit
+    fi
 fi
 
 echo "ROCKBOXDEV: mkdir build-binu-$1"

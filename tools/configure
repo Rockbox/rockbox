@@ -41,7 +41,7 @@ prefixtools () {
 findarmgcc() {
   if [ "$ARG_ARM_EABI" = "1" ]; then
     prefixtools arm-elf-eabi-
-    gccchoice="4.4.2"
+    gccchoice="4.4.3"
   else
     prefixtools arm-elf-
     gccchoice="4.0.3"
