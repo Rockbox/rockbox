@@ -276,6 +276,7 @@ static long hist_time = 0;
 #ifdef HAVE_RECORDING_HISTOGRAM
 static int hist_l = 0;
 static int hist_r = 0;
+#define HIST_BUF_SIZE (LCD_WIDTH)
 #define HIST_Y (hist_pos_y+hist_size_h-1)
 #define HIST_W (LCD_WIDTH / 2 - 4)
 #if LCD_DEPTH > 1
@@ -1056,7 +1057,7 @@ bool recording_screen(bool no_source)
     int peak_l, peak_r;
     int balance = 0;
 #endif
-    int i;
+    int i,j;
     int pm_x[NB_SCREENS];           /* peakmeter (and trigger bar) x pos */
     int pm_y[NB_SCREENS];           /* peakmeter y pos */
     int pm_h[NB_SCREENS];           /* peakmeter height */
@@ -1073,8 +1074,8 @@ bool recording_screen(bool no_source)
     unsigned short hist_size_h = 0;
     int history_pos = 0;
     short hist_time_interval = 1; /* 1, 2, 4, 8 */
-    unsigned char history_l[HIST_W];
-    unsigned char history_r[HIST_W];
+    unsigned char history_l[HIST_BUF_SIZE];
+    unsigned char history_r[HIST_BUF_SIZE];
     const char hist_level_marks[6] = { 29, 26, 23, 17, 9, 2};
 #endif
 #ifdef HAVE_FMRADIO_REC
@@ -1204,8 +1205,8 @@ bool recording_screen(bool no_source)
             hist_pos_y = (compact_view[0] ? 3 : 4) * (font_get(vp_top[0].font)->height)
                                                                                     + 1;
             hist_size_h = font_get(vp_top[0].font)->height - 2;
-            memset(history_l, 0, sizeof(unsigned char)*HIST_W);
-            memset(history_r, 0, sizeof(unsigned char)*HIST_W);
+            memset(history_l, 0, sizeof(unsigned char)*HIST_BUF_SIZE);
+            memset(history_r, 0, sizeof(unsigned char)*HIST_BUF_SIZE);
 #endif
 
             FOR_NB_SCREENS(i)
@@ -1865,12 +1866,13 @@ bool recording_screen(bool no_source)
         {
             if (peak_valid && !(hist_time % hist_time_interval) && hist_l)
             {
+                /* fill history buffer */
                 history_l[history_pos] = hist_l * hist_size_h / 32767;
                 history_r[history_pos] = hist_r * hist_size_h / 32767;
-                history_pos = (history_pos + 1) % HIST_W;
+                history_pos = (history_pos + 1) % HIST_BUF_SIZE;
                 history_l[history_pos] = history_r[history_pos] = 0;
-                history_l[(history_pos + 1) % HIST_W] = 0;
-                history_r[(history_pos + 1) % HIST_W] = 0;
+                history_l[(history_pos + 1) % HIST_BUF_SIZE] = 0;
+                history_r[(history_pos + 1) % HIST_BUF_SIZE] = 0;
                 hist_l = 0;
                 hist_r = 0;
             }
@@ -1880,51 +1882,38 @@ bool recording_screen(bool no_source)
             lcd_drawrect(HIST_W + 6, hist_pos_y - 1,
                             HIST_W + 2, hist_size_h + 1);
             lcd_set_drawmode(DRMODE_FG);
+
+            j = history_pos;
+            for (i = HIST_W-1; i >= 0; i--)
+            {
+                j--;
+                if(j<0)
+                    j = HIST_BUF_SIZE-1;
+                if (history_l[j])
+                {
+                    if (history_l[j] == hist_size_h)
+                        lcd_set_foreground(LCD_HIST_OVER);
 #ifdef HAVE_LCD_COLOR
-            for (i = 0; i < HIST_W; i++)
-            {
-                if (history_l[i])
-                {
-                    if (history_l[i] == hist_size_h)
-                        lcd_set_foreground(LCD_HIST_OVER);
-                    else if (history_l[i] > hist_level_marks[1])
+                    else if (history_l[j] > hist_level_marks[1])
                         lcd_set_foreground(LCD_HIST_HI);
+#endif
                     else
                         lcd_set_foreground(LCD_HIST_OK);
-                    lcd_vline(1 + i, HIST_Y-1, HIST_Y - history_l[i]);
+                    lcd_vline(1 + i, HIST_Y-1, HIST_Y - history_l[j]);
                 }
-                if (history_r[i])
+                if (history_r[j])
                 {
-                    if (history_r[i] == hist_size_h)
+                    if (history_r[j] == hist_size_h)
                         lcd_set_foreground(LCD_HIST_OVER);
-                    else if (history_r[i] > hist_level_marks[1])
+#ifdef HAVE_LCD_COLOR
+                    else if (history_r[j] > hist_level_marks[1])
                         lcd_set_foreground(LCD_HIST_HI);
+#endif
                     else
                         lcd_set_foreground(LCD_HIST_OK);
-                    lcd_vline(HIST_W+7 + i, HIST_Y-1, HIST_Y - history_r[i]);
+                    lcd_vline(HIST_W+7 + i, HIST_Y-1, HIST_Y - history_r[j]);
                 }
             }
-#else
-            for (i = 0; i < HIST_W; i++)
-            {
-                if (history_l[i])
-                {
-                    if (history_l[i] == hist_size_h)
-                        lcd_set_foreground(LCD_HIST_OVER);
-                    else
-                        lcd_set_foreground(LCD_HIST_OK);
-                    lcd_vline(1 + i, HIST_Y-1, HIST_Y - history_l[i]);
-                }
-                if (history_r[i])
-                {
-                    if (history_r[i] == hist_size_h)
-                        lcd_set_foreground(LCD_HIST_OVER);
-                    else
-                        lcd_set_foreground(LCD_HIST_OK);
-                    lcd_vline(HIST_W+7 + i, HIST_Y-1, HIST_Y - history_r[i]);
-                }
-            }
-#endif /* HAVE_LCD_COLOR */
             lcd_set_foreground(
 #ifdef HAVE_LCD_COLOR
             global_settings.fg_color);
