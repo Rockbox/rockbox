@@ -1064,7 +1064,8 @@ bool recording_screen(bool no_source)
     int trig_ypos[NB_SCREENS];      /* trigger bar y pos */
     int trig_width[NB_SCREENS];     /* trigger bar width */
     int top_height_req[NB_SCREENS]; /* required height for top half */
-    bool compact_view[NB_SCREENS];  /* tweak layout tiny screens / big fonts */
+                                     /* tweak layout tiny screens / big fonts */                                    
+    bool compact_view[NB_SCREENS] = { false };
     struct gui_synclist lists;      /* the list in the bottom vp */
 #if defined(HAVE_AGC) || defined(HAVE_RECORDING_HISTOGRAM)
     bool peak_valid = false;

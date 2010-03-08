@@ -173,6 +173,7 @@ static int os_time (lua_State *L) {
 
 static int os_exit (lua_State *L) {
   exit(luaL_optint(L, 1, EXIT_SUCCESS));
+  return EXIT_SUCCESS; /* never reached, surpress warning */
 }
 
 static const luaL_Reg syslib[] = {
