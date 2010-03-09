@@ -17,12 +17,6 @@ $(TREMORLIB): $(TREMORLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-$(CODECDIR)/libtremor/%.o: $(ROOTDIR)/apps/codecs/libtremor/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) \
-		-I$(APPSDIR)/codecs/libtremor \
-		$(CODECFLAGS) $(CFLAGS) -c $< -o $@
-
 TREMORFLAGS = -I$(APPSDIR)/codecs/libtremor $(filter-out -O%,$(CODECFLAGS)) 
 
 # Tremor is slightly faster on coldfire with -O3
