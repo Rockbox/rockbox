@@ -94,7 +94,7 @@ static int battery_type = 0;
 #endif
 
 /* Power history: power_history[0] is the newest sample */
-unsigned short power_history[POWER_HISTORY_LEN];
+unsigned short power_history[POWER_HISTORY_LEN] = {0};
 
 #if CONFIG_CPU == JZ4732 /* FIXME! */
 static char power_stack[DEFAULT_STACK_SIZE + POWERMGMT_DEBUG_STACK];
@@ -729,8 +729,6 @@ static void power_thread(void)
 
 void powermgmt_init(void)
 {
-    /* init history to 0 */
-    memset(power_history, 0, sizeof(power_history));
     create_thread(power_thread, power_stack, sizeof(power_stack), 0,
                   power_thread_name IF_PRIO(, PRIORITY_SYSTEM)
                   IF_COP(, CPU));
