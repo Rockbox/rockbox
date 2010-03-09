@@ -22,32 +22,29 @@
 #include "config.h"
 #include "powermgmt.h"
 #include "pmu-target.h"
+#include "power.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    /* TODO: this is just an initial guess */
     3600
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    /* TODO: this is just an initial guess */
     3350
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    /* TODO: simple uncalibrated curve, linear except for first 10% */
-    { 3377, 3741, 3783, 3820, 3856, 3892, 3934, 3989, 4061, 4144, 4249 }
+    { 3550, 3783, 3830, 3882, 3911, 3949, 3996, 4067, 4148, 4228, 4310 }
 };
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    /* TODO: simple uncalibrated curve, linear except for first 10% */
-    3344, 3969, 4038, 4105, 4205, 4310, 4312, 4314, 4316, 4318, 4320
+    3550, 3783, 3830, 3882, 3911, 3949, 3996, 4067, 4148, 4228, 4310
 };
 #endif /* CONFIG_CHARGING */
 
@@ -59,5 +56,24 @@ const unsigned short percent_to_volt_charge[11] =
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    return pmu_read_battery_voltage();
+    int compensation = (10 * (pmu_read_battery_current() - 7)) / 12;
+    if (charging_state()) return pmu_read_battery_voltage() - compensation;
+    return pmu_read_battery_voltage() + compensation;
 }
+
+
+#ifdef HAVE_ACCESSORY_SUPPLY
+void accessory_supply_set(bool enable)
+{
+    if (enable)
+    {
+        /* Accessory voltage supply on */
+        pmu_ldo_power_on(6);
+    }
+    else
+    {
+        /* Accessory voltage supply off */
+        pmu_ldo_power_off(6);
+    }
+}
+#endif
