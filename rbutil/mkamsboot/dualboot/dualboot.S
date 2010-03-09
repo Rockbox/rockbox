@@ -27,7 +27,26 @@
 .set GPIOC,     0xC80D0000
 .set GPIOD,     0xC80E0000
 .set CGU_PERI,  0xC80F0014
-
+.set I2C_BASE,  0xC8070000
+.set I2C_DATA,  0x00
+.set I2C_SLAD0, 0x04
+.set I2C_CNTRL, 0x0c
+.set I2C_DACNT, 0x10
+.set I2C_CPSR0, 0x1c
+.set I2C_CPSR1, 0x20
+.set I2C_IMR,   0x24
+.set I2C_SR,    0x30
+.set I2C_SADDR, 0x44
+.set AS3514_I2C_ADDR, 0x46
+.set AS3514_IRQ_ENRD0, 0x25
+.set PCLK, 24000000
+.set I2C_CLK, 400000
+.set I2C_PRESCALER, ((PCLK + I2C_CLK -1) / I2C_CLK)
+.set I2C_PRESCALER_LOW, (I2C_PRESCALER & 0xff)
+.set I2C_PRESCALER_HIGH, (I2C_PRESCALER >> 8)
+#if I2C_PRESCALER_HIGH > 3
+#error i2c prescaler too big!
+#endif
 
 /* Vectors */
 
@@ -80,9 +99,7 @@ uclcopy:
 
 
 /* TODO : M200V4 ? */
-#if defined(SANSA_C200V2)
-#define USB_PIN 1   /* FIXME: not correct on some c200v2s */
-#elif defined(SANSA_CLIP) || defined(SANSA_CLIPV2)
+#if defined(SANSA_CLIP) || defined(SANSA_CLIPV2)
 #define USB_PIN 6
 #elif defined(SANSA_FUZE) || defined(SANSA_E200V2) || defined(SANSA_FUZEV2)
 #define USB_PIN 3
@@ -94,6 +111,58 @@ uclcopy:
         str     r1, [r0, #0x400]
         ldr     r1, [r0, #(4*(1<<USB_PIN))]
         cmp     r1, #0
+        bne     boot_of
+#endif
+#if defined(SANSA_C200V2)
+        /* Instead of checking the GPIO, check the audio master IRQ_ENRD0
+         * USB_STATUS bit on C200V2 */
+
+        ldr     r0, =CGU_PERI
+        ldr     r1, [r0]
+        /* enable i2c audio master clock */
+        orr     r1, r1, #(1<<17)
+        /* make sure 24MHz clk_main is selected */
+        bic     r1, r1, #0x7f
+        str     r1, [r0]
+
+        ldr     r0, =I2C_BASE
+        /* disable i2c interrupts */
+        mov     r1, #0
+        str     r1, [r0, #I2C_IMR]
+        /* setup prescaler */
+        mov     r1, #I2C_PRESCALER_LOW
+        str     r1, [r0, #I2C_CPSR0]
+        mov     r1, #I2C_PRESCALER_HIGH
+        str     r1, [r0, #I2C_CPSR1]
+        /* setup i2c slave address */
+        mov     r1, #(AS3514_I2C_ADDR << 1)
+        str     r1, [r0, #I2C_SLAD0]
+        mov     r2, #0x51
+        str     r2, [r0, #I2C_CNTRL]
+
+        /* wait for not busy */
+1:
+        ldr     r1, [r0, #I2C_SR]
+        tst     r1, #1
+        bne 1b
+
+        /* start read of irq_enrd0 */
+        mov     r1, #AS3514_IRQ_ENRD0
+        str     r1, [r0, #I2C_SADDR]
+        orr     r2, r2, #(1 << 1)
+        str     r2, [r0, #I2C_CNTRL]
+        mov     r1, #1
+        str     r1, [r0, #I2C_DACNT]
+
+        /* wait for transfer to finish */
+1:
+        ldr     r1, [r0, #I2C_DACNT]
+        cmp     r1, #0
+        bne     1b
+
+        /* load result and test USB_STATUS bit */
+        ldr     r1, [r0, #I2C_DATA]
+        tst     r1, #(1 << 3)
         bne     boot_of
 #endif
 
