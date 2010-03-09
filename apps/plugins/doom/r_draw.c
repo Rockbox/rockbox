@@ -534,12 +534,10 @@ void R_DrawSpan (void)
       "clr.l %%d4                               \n"
       "spanloop:                                \n"
       "move.l %[xfrac], %%d1                    \n"
-      "move.l %[yfrac], %%d2                    \n"
-      "lsr.l #8,%%d1                            \n"
-      "lsr.l #8,%%d2                            \n"
-      "lsr.l #8,%%d1                            \n"
-      "lsr.l #2,%%d2                            \n"
+      "swap %%d1                                \n"
       "and.l #63,%%d1                           \n"
+      "move.l %[yfrac], %%d2                    \n"
+      "lsr.l %[ten],%%d2                        \n"
       "and.l #4032,%%d2                         \n"
       "or.l %%d2, %%d1                          \n"
       "move.b (%[source], %%d1), %%d4           \n"
@@ -551,9 +549,10 @@ void R_DrawSpan (void)
       "endspanloop:                             \n"
    : /* outputs */
    : /* inputs */
+      [ten] "d"(10),
       [count] "d" (ds_x2-ds_x1+1),
-      [xfrac] "d" (ds_xfrac),
-      [yfrac] "d" (ds_yfrac),
+      [xfrac] "a" (ds_xfrac),
+      [yfrac] "a" (ds_yfrac),
       [source] "a" (ds_source),
       [colormap] "a" (ds_colormap),
       [dest] "a" (topleft+ds_y*SCREENWIDTH +ds_x1),
