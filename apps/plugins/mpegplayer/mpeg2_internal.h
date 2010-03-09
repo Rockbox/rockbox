@@ -102,7 +102,7 @@ struct mpeg2_decoder_s
     int16_t dc_dct_pred[MPEG2_COMPONENTS];
 
     /* DCT coefficients */
-    int16_t * ATTR_ALIGN(16) DCTblock;  /* put buffer separately to have it in IRAM */
+    int16_t * DCTblock;  /* put buffer separately to have it in IRAM */
 
     uint8_t * picture_dest[MPEG2_COMPONENTS];
     void (* convert) (void * convert_id, uint8_t * const * src,
