@@ -472,7 +472,11 @@ void system_init(void)
 #elif defined (TATUNG_TPJ1022)
         /* to be done */
 #elif defined(PBELL_VIBE500)
-        /* to be done */
+        /* reset all allowed devices */
+        DEV_RS         = 0x3ffffef8;
+        DEV_RS2        = 0xffffffff;
+        DEV_RS         = 0x00000000;
+        DEV_RS2        = 0x00000000;
 #endif
 
 #if !defined(SANSA_E200) && !defined(SANSA_C200) && !defined(PHILIPS_SA9200)
