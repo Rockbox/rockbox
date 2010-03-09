@@ -59,6 +59,8 @@
 #define RET movs        pc, lr
 #elif defined(__thumb2__)
 #define RET bx lr
+#elif !defined(ROCKBOX_SUPPORTS_AN_ARMV4_NON_T_CPU)
+#define RET bx lr   /* BX exists on v4T, v5 and more recent architectures */
 #else
 #define RET tst     lr, #1; \
             moveq       pc, lr ; \
