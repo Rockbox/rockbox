@@ -1646,6 +1646,8 @@ static bool view_battery(void)
                 lcd_putsf(0, 5, "CHARGER: %02X", 
                          ascodec_read(AS3514_CHARGER));
 #elif defined(IPOD_NANO2G)
+                y = pmu_read_battery_voltage();
+                lcd_putsf(17, 1, "RAW: %d.%03d V", y / 1000, y % 1000);
                 y = pmu_read_battery_current();
                 lcd_putsf(0, 2, "Battery current: %d mA", y);
                 lcd_putsf(0, 3, "PWRCON: %8x", PWRCON);
