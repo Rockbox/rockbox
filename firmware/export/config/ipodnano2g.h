@@ -47,6 +47,9 @@
 /* define this if you can invert the colours on your LCD */
 //#define HAVE_LCD_INVERT
 
+/* LCD stays visible without backlight - simulator hint */
+#define HAVE_TRANSFLECTIVE_LCD
+
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 
@@ -106,6 +109,9 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_NANO2G
 
+/* Define if the device can wake from an RTC alarm */
+//#define HAVE_RTC_ALARM
+
 #define CONFIG_LCD LCD_NANO2G
 
 /* Define the type of audio codec */
@@ -141,6 +147,10 @@
 /* Define this if your LCD can set contrast */
 //#define HAVE_LCD_CONTRAST
 
+/* Define Apple remote tuner */
+//#define CONFIG_TUNER IPOD_REMOTE_TUNER
+//#define HAVE_RDS_CAP
+
 /* The exact type of CPU */
 #define CONFIG_CPU S5L8701
 
@@ -155,17 +165,14 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ        191692800
 
-/* Define this if you have ATA power-off control */
-//#define HAVE_ATA_POWER_OFF
+/* define this if the hardware can be powered off while charging */
+#define HAVE_POWEROFF_WHILE_CHARGING
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
 
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
-
-/* USB On-the-go */
-//#define CONFIG_USBOTG USBOTG_M5636
 
 /* Define this if you can read an absolute wheel position */
 #define HAVE_WHEEL_POSITION
@@ -179,12 +186,6 @@
 
 /* Alternative bootfile extension - this is for encrypted images */
 #define BOOTFILE_EXT2 "ipodx"
-
-#if 0
-#define BOOTLOADER_ENTRYPOINT  0x001F0000
-#define FLASH_ENTRYPOINT       0x00001000
-#define FLASH_MAGIC            0xfbfbfbf1
-#endif
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN
@@ -205,9 +206,18 @@
 
 /* USB defines */
 #define HAVE_USBSTACK
+//#define HAVE_USB_HID_MOUSE - broken?
 #define CONFIG_USBOTG USBOTG_S3C6400X
 #define USB_VENDOR_ID 0x05AC
 #define USB_PRODUCT_ID 0x1260
 #define USB_NUM_ENDPOINTS 5
 #define USE_ROCKBOX_USB
 #define USB_DEVBSS_ATTR __attribute__((aligned(16)))
+
+/* Define this if you can switch on/off the accessory power supply */
+#define HAVE_ACCESSORY_SUPPLY
+//#define IPOD_ACCESSORY_PROTOCOL
+//#define HAVE_SERIAL
+
+#define STORAGE_ALIGN_MASK 15
+
