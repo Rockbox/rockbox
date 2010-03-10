@@ -206,7 +206,7 @@ static void parse_riff_format(unsigned char* buf, int fmtsize, struct wave_fmt *
     }
 }
 
-bool read_header(int fd, struct mp3entry* id3, const unsigned char **chunknames, bool is_64)
+static bool read_header(int fd, struct mp3entry* id3, const unsigned char **chunknames, bool is_64)
 {
     /* Use the temporary buffer */
     unsigned char* buf = (unsigned char *)id3->path;
