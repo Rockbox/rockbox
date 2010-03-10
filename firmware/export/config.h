@@ -879,7 +879,7 @@ Lyre prototype 1 */
 #define USB_HAS_BULK
 #elif CONFIG_USBOTG == USBOTG_S3C6400X
 #define USB_HAS_BULK
-#define USB_HAS_INTERRUPT
+//#define USB_HAS_INTERRUPT -- seems to be broken
 #endif /* CONFIG_USBOTG */
 
 /* define the class drivers to enable */
