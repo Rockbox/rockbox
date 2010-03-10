@@ -35,24 +35,27 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #ifdef FILTER256_IRAM
 static filter_int filterbuf32[(32*3 + FILTER_HISTORY_SIZE) * 2]   
-                  IBSS_ATTR __attribute__((aligned(16))); /* 2432/4864 bytes */
+                  IBSS_ATTR_DEMAC __attribute__((aligned(16))); 
+                  /* 2432 or 4864 bytes */
 static filter_int filterbuf256[(256*3 + FILTER_HISTORY_SIZE) * 2]
-                  IBSS_ATTR __attribute__((aligned(16))); /* 5120/10240 bytes */
+                  IBSS_ATTR_DEMAC __attribute__((aligned(16))); 
+                  /* 5120 or 10240 bytes */
 #define FILTERBUF64 filterbuf256
 #define FILTERBUF32 filterbuf32
 #define FILTERBUF16 filterbuf32
 #else
 static filter_int filterbuf64[(64*3 + FILTER_HISTORY_SIZE) * 2]   
-                  IBSS_ATTR __attribute__((aligned(16))); /* 2432/4864 bytes */
+                  IBSS_ATTR_DEMAC __attribute__((aligned(16))); 
+                  /* 2432 or 4864 bytes */
 static filter_int filterbuf256[(256*3 + FILTER_HISTORY_SIZE) * 2]
-                  __attribute__((aligned(16))); /* 5120/10240 bytes */
+                  __attribute__((aligned(16))); /* 5120 or 10240 bytes */
 #define FILTERBUF64 filterbuf64
 #define FILTERBUF32 filterbuf64
 #define FILTERBUF16 filterbuf64
 #endif
 
 /* This is only needed for "insane" files, and no current Rockbox targets
-   can hope to decode them in realtime, although the Gigabeat S comes close. */
+   can hope to decode them in realtime, except the Gigabeat S (at 528MHz). */
 static filter_int filterbuf1280[(1280*3 + FILTER_HISTORY_SIZE) * 2] 
                   IBSS_ATTR_DEMAC_INSANEBUF __attribute__((aligned(16)));
                   /* 17408 or 34816 bytes */

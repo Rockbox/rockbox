@@ -36,7 +36,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
   hard-coded in the Monkey's Audio decoder.
 */
 
-static const int counts_3970[65] ICONST_ATTR =
+static const int counts_3970[65] ICONST_ATTR_DEMAC =
 {
         0,14824,28224,39348,47855,53994,58171,60926,
     62682,63786,64463,64878,65126,65276,65365,65419,
@@ -50,7 +50,7 @@ static const int counts_3970[65] ICONST_ATTR =
 };
 
 /* counts_diff_3970[i] = counts_3970[i+1] - counts_3970[i] */
-static const int counts_diff_3970[64] ICONST_ATTR =
+static const int counts_diff_3970[64] ICONST_ATTR_DEMAC =
 {
     14824,13400,11124,8507,6139,4177,2755,1756,
     1104,677,415,248,150,89,54,31,
@@ -62,7 +62,7 @@ static const int counts_diff_3970[64] ICONST_ATTR =
     1,1,1,1,1,1,1,1
 };
 
-static const int counts_3980[65] ICONST_ATTR =
+static const int counts_3980[65] ICONST_ATTR_DEMAC =
 {
         0,19578,36160,48417,56323,60899,63265,64435,
     64971,65232,65351,65416,65447,65466,65476,65482,
@@ -77,7 +77,7 @@ static const int counts_3980[65] ICONST_ATTR =
 
 /* counts_diff_3980[i] = counts_3980[i+1] - counts_3980[i] */
 
-static const int counts_diff_3980[64] ICONST_ATTR =
+static const int counts_diff_3980[64] ICONST_ATTR_DEMAC =
 {
     19578,16582,12257,7906,4576,2366,1170,536,
     261,119,65,31,19,10,6,3,
@@ -122,8 +122,8 @@ each function (and the RNGC macro)).
    for aligned reads.
 */
 
-static unsigned char* bytebuffer IBSS_ATTR;
-static int bytebufferoffset IBSS_ATTR;
+static unsigned char* bytebuffer IBSS_ATTR_DEMAC;
+static int bytebufferoffset IBSS_ATTR_DEMAC;
 
 static inline void skip_byte(void)
 {
@@ -159,7 +159,7 @@ struct rangecoder_t
     unsigned int buffer; /* buffer for input/output */
 };
 
-static struct rangecoder_t rc IBSS_ATTR;
+static struct rangecoder_t rc IBSS_ATTR_DEMAC;
 
 /* Start the decoder */
 static inline void range_start_decoding(void)
@@ -276,8 +276,8 @@ struct rice_t
   uint32_t ksum;
 };
 
-static struct rice_t riceX IBSS_ATTR;
-static struct rice_t riceY IBSS_ATTR;
+static struct rice_t riceX IBSS_ATTR_DEMAC;
+static struct rice_t riceY IBSS_ATTR_DEMAC;
 
 static inline void update_rice(struct rice_t* rice, int x)
 {

@@ -260,7 +260,7 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3970(struct filter_t* f,
     }
 }
 
-static struct filter_t filter[2] IBSS_ATTR;
+static struct filter_t filter[2] IBSS_ATTR_DEMAC;
 
 static void do_init_filter(struct filter_t* f, filter_int* buf)
 {

@@ -49,18 +49,39 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #endif
 
 #if CONFIG_CPU == PP5002 || defined(CPU_S5L870X)
-/* Code in IRAM for speed, not enough IRAM for the insane filter buffer. */
+/* Code and data IRAM for speed (PP5002 has a broken cache), not enough IRAM
+ * for the insane filter buffer. Reciprocal table for division in IRAM. */
 #define ICODE_SECTION_DEMAC_ARM   .icode
 #define ICODE_ATTR_DEMAC          ICODE_ATTR
+#define ICONST_ATTR_DEMAC         ICONST_ATTR
+#define IBSS_ATTR_DEMAC           IBSS_ATTR
 #define IBSS_ATTR_DEMAC_INSANEBUF
-#elif defined(CPU_PP502x)
-/* Insane filter buffer not in IRAM due to division table. */
+
+#elif CONFIG_CPU == PP5020
+/* Code and small data in DRAM for speed (PP5020 IRAM isn't completely single
+ * cycle). Insane filter buffer not in IRAM in favour of reciprocal table for
+ * divison. Decoded data buffers should be in IRAM (defined by the caller). */
 #define ICODE_SECTION_DEMAC_ARM   .text
 #define ICODE_ATTR_DEMAC
+#define ICONST_ATTR_DEMAC
+#define IBSS_ATTR_DEMAC
 #define IBSS_ATTR_DEMAC_INSANEBUF
+
+#elif CONFIG_CPU == PP5022
+/* Code in DRAM, data in IRAM. Insane filter buffer not in IRAM in favour of
+ * reciprocal table for divison */
+#define ICODE_SECTION_DEMAC_ARM   .text
+#define ICODE_ATTR_DEMAC
+#define ICONST_ATTR_DEMAC         ICONST_ATTR
+#define IBSS_ATTR_DEMAC           IBSS_ATTR
+#define IBSS_ATTR_DEMAC_INSANEBUF
+
 #else
+/* Code in DRAM, data in IRAM, including insane filter buffer. */
 #define ICODE_SECTION_DEMAC_ARM   .text
 #define ICODE_ATTR_DEMAC
+#define ICONST_ATTR_DEMAC         ICONST_ATTR
+#define IBSS_ATTR_DEMAC           IBSS_ATTR
 #define IBSS_ATTR_DEMAC_INSANEBUF IBSS_ATTR
 #endif
 
@@ -68,11 +89,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #define APE_OUTPUT_DEPTH (ape_ctx->bps)
 
-#define IBSS_ATTR
-#define IBSS_ATTR_DEMAC_INSANEBUF
-#define ICONST_ATTR
-#define ICODE_ATTR
 #define ICODE_ATTR_DEMAC
+#define ICONST_ATTR_DEMAC
+#define IBSS_ATTR_DEMAC
+#define IBSS_ATTR_DEMAC_INSANEBUF
 
 /* Use to give gcc hints on which branch is most likely taken */
 #if defined(__GNUC__) && __GNUC__ >= 3
