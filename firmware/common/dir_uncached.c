@@ -114,11 +114,16 @@ DIR_UNCACHED* opendir_uncached(const char* name)
             }
             if ( (entry.attr & FAT_ATTR_DIRECTORY) &&
                  (!strcasecmp(part, entry.name)) ) {
-                pdir->parent_dir = pdir->fatdir;
+                /* in reality, the parent_dir parameter of fat_opendir is
+                 * useless because it's sole purpose it to have a way to
+                 * update the file metadata, but here we are only reading
+                 * a directory so there's no need for that kind of stuff.
+                 * Consequently, we can safely pass NULL of it because
+                 * fat_opendir and fat_open are NULL-protected. */
                 if ( fat_opendir(IF_MV2(volume,)
                                  &pdir->fatdir,
                                  entry.firstcluster,
-                                 &pdir->parent_dir) < 0 ) {
+                                 NULL) < 0 ) {
                     DEBUGF("Failed opening dir '%s' (%ld)\n",
                            part, entry.firstcluster);
                     pdir->busy = false;

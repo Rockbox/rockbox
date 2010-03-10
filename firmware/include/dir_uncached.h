@@ -61,7 +61,6 @@ typedef struct {
     bool busy;
     long startcluster;
     struct fat_dir fatdir;
-    struct fat_dir parent_dir;
     struct dirent_uncached theent;
 #ifdef HAVE_MULTIVOLUME
     int volumecounter; /* running counter for faked volume entries */
