@@ -1230,8 +1230,12 @@ uint32_t ftl_read(uint32_t sector, uint32_t count, void* buffer)
                         + (*logentry).pageoffsets[page];
 #endif
 
+#ifndef FTL_READONLY
         if (count >= i + ftl_banks && !(page & (ftl_banks - 1))
          && logentry == (struct ftl_log_type*)0)
+#else
+        if (count >= i + ftl_banks && !(page & (ftl_banks - 1)))
+#endif
         {
             uint32_t ret = ftl_vfl_read_fast(abspage, &((uint8_t*)buffer)[i << 11],
                                              &ftl_sparebuffer[0], 1, 1);
